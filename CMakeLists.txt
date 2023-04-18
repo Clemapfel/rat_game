@@ -6,7 +6,7 @@ project(rat_game VERSION 0.1.0 DESCRIPTION "" LANGUAGES CXX)
 find_library(lua REQUIRED NAMES lua)
 set(SOL_INCLUDE_DIR "${CMAKE_SOURCE_DIR}/submodules/sol2/include")
 
-### LIBRARY ###
+### EXECUTABLE ###
 
 add_executable(battle_main battle/main.cpp)
 target_link_libraries(battle_main PRIVATE

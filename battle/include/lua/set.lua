@@ -1,5 +1,6 @@
 --- @class Set
 Set = meta.new_type("Set", {})
+
 --- @constructor Set
 Set:add_constructor(function()
 
@@ -19,6 +20,8 @@ Set:add_constructor(function()
     out.__meta.__newindex = function(this, x, new)
         Set.insert(this, new)
     end
+
+    return out
 end)
 
 --- @brief check whether element is present in Set
@@ -28,7 +31,7 @@ function Set.contains(set, x)
 
     meta.assert_type(Set, set, "Set.erase", 1)
 
-    return set[x] == true
+    return rawget(set, x) == true
 end
 
 --- @brief insert into set
@@ -38,11 +41,11 @@ function Set.insert(set, x)
 
     meta.assert_type(Set, set, "Set.erase", 1)
 
-    if set[x] == true then
+    if rawget(set, x) == true then
         return
     end
 
-    set[x] = true
+    rawset(set, x, true)
     getmetatable(set).n_elements = getmetatable(set).n_elements + 1
 end
 
@@ -53,8 +56,8 @@ function Set.erase(set, x)
 
     meta.assert_type(Set, set, "Set.erase", 1)
 
-    if set[x] ~= nil then
-        set[x] = nil
+    if rawget(set, x) ~= nil then
+        rawset(set, x, nil)
         getmetatable(set).n_elements = getmetatable(set).n_elements - 1
     end
 end
@@ -65,7 +68,6 @@ end
 function Set.size(set)
 
     meta.assert_type(Set, set, "Set.size", 1)
-
     return getmetatable(set).n_elements
 end
 
@@ -78,5 +80,10 @@ function Set.is_empty(set)
     return set:size() == 0
 end
 
-Set.is_empty("abc")
-
+set = Set()
+print(meta.typeof(set))
+set:insert(10)
+set:insert(11)
+set:insert(10)
+set:insert(9)
+print(set)

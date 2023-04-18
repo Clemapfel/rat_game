@@ -47,4 +47,3 @@ for i=1,10 do
     rt.queue_action(function() print(i) end)
 end
 
-rt.flush_actions()

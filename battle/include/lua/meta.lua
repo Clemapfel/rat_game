@@ -257,11 +257,11 @@ function meta._new_type(typename)
 
     x.has_property = meta.has_property
     x.add_property = meta.add_property
-    x.add_constructor = meta.add_construt
+    x.add_constructor = meta.add_construtor
     x.name = typename
+    x.properties = {}
 
     x.__meta.typename = "Type"
-    x.__meta.properties = {}
     return x
 end
 
@@ -274,7 +274,7 @@ function meta.is_type(x)
         return false
     end
 
-    return x.__meta ~= nil and x.__meta.typename == meta.Type
+    return x.__meta ~= nil and x.__meta.typename == meta.Type and x.properties ~= nil and x.name ~= nil
 end
 
 --- @brief is object an instance of type
@@ -295,7 +295,7 @@ function meta.isa(entity, type)
         return false
     end
 
-    return m.typename == type.__meta.name
+    return m.typename == type.name
 end
 
 --- @brief Add property to meta.Type
@@ -310,19 +310,7 @@ function meta.add_property(type, property_name, initial_value)
         error("[ERROR] In meta.add_property: Object is not a type")
     end
 
-    type.__meta.properties[property_name] = initial_value
-end
-
---- @brief Does meta instance have a property with given id?
---- @param x meta.Type
---- @returns boolean
-function meta.has_property(type, property_name)
-
-    if (type.__meta == nil or type.__meta.is_property_private == nil) then
-        return false
-    end
-
-    return meta.is_boolean(type.__meta.is_property_private[property_name])
+    type.properties[property_name] = initial_value
 end
 
 --- @brief create a constructor for a given type T, it is invoked by calling T()
@@ -362,7 +350,6 @@ function meta.new_type(typename, table)
 
     x.add_property = meta.add_property
     x.remove_property = meta.remove_property
-    x.has_property = meta.has_property
     x.add_constructor = meta.add_constructor
 
     return x
@@ -378,13 +365,13 @@ function meta.new(type, args)
         error("[ERROR] In meta.new: Argument is not a type")
     end
 
-    local x = meta._new(type.__meta.name)
+    local x = meta._new(type.name)
 
     if args == nil then
         args = {}
     end
 
-    for name, value in pairs(type.__meta.properties) do
+    for name, value in pairs(type.properties) do
         if (name == "__meta") then
             goto continue
         end
