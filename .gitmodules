@@ -1,0 +1,3 @@
+[submodule "submodules/sol2"]
+	path = submodules/sol2
+	url = https://github.com/lmoureaux/sol2
