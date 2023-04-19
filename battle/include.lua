@@ -9,41 +9,13 @@ require "set"
 
 --- @module rat_game battle module
 rt = {}
+log = {}
 
 require "battle_log"
 require "status_ailment"
 require "stat_modifier"
---- require "entity"
+require "entity"
 
-
---- ### ACTION QUEUE ###
-
-rt._action_queue = Queue()
-
-function rt.queue_action(f)
-    rt._action_queue:push_back(coroutine.wrap(f))
-end
-
-function test()
-end
-
-
-function rt.step_action()
-
-    if rt._action_queue:is_empty() then
-        return
-    end
-
-    (rt._action_queue:pop_back())()
-end
-
-function rt.flush_actions()
-    while not rt._action_queue:is_empty() do
-        rt.step_action()
-    end
-end
-
-for i=1,10 do
-    rt.queue_action(function() print(i) end)
-end
-
+entity = rt.BattleEntity("test")
+rt.set_attack_level(entity, rt.StatModifier.PLUS_1)
+rt.set_attack_level(entity, rt.StatModifier.MINUS_1)

@@ -6,16 +6,30 @@ project(rat_game VERSION 0.1.0 DESCRIPTION "" LANGUAGES CXX)
 find_library(lua REQUIRED NAMES lua)
 set(SOL_INCLUDE_DIR "${CMAKE_SOURCE_DIR}/submodules/sol2/include")
 
+find_library(mousetrap REQUIRED NAMES mousetrap PATHS "${CMAKE_SOURCE_DIR}/submodules/mousetrap/build")
+set(MOUSETRAP_INCLUDE_DIR "${CMAKE_SOURCE_DIR}/submodules/mousetrap")
+
+find_package(PkgConfig)
+pkg_check_modules(GTK gtk4)
+
+if (NOT GTK_FOUND)
+    message(FATAL_ERROR "Missing Dependency: unable to locate GTK4")
+endif()
+
 ### EXECUTABLE ###
 
 add_executable(battle_main battle/main.cpp)
 target_link_libraries(battle_main PRIVATE
     ${lua}
+    ${mousetrap}
+    ${GTK_LIBRARIES}
 )
 
 target_include_directories(battle_main PRIVATE
     "${SOL_INCLUDE_DIR}"
+    "${MOUSETRAP_INCLUDE_DIR}"
     "${CMAKE_SOURCE_DIR}/battle/"
+    "${GTK_INCLUDE_DIRS}"
 )
 
 target_compile_features(battle_main PUBLIC

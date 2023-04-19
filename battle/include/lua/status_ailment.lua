@@ -13,20 +13,61 @@ rt.StatusAilment = meta.new_enum({
     FROZEN = "FROZEN"
 })
 
+--- @brief get attack modifier of status ailment
+--- @param status StatusAilment
+--- @return number
+function rt.status_ailment_to_attack_multiplier(status)
+    
+    meta.assert_type(rt.StatusAilment, status, "status_ailment_to_attack_multiplier")
+
+    if status == StatusAilment.BLINDED then
+        return 0
+    elseif status == StatusAilment.BURNED then
+        return 0.5
+    end
+        
+    return 1
+end
+
+--- @brief get defense modifier of status ailment
+--- @param status StatusAilment
+--- @return number
+function rt.status_ailment_to_defense_multiplier(status)
+
+    meta.assert_type(rt.StatusAilment, status, "status_ailment_to_defense_multiplier")
+
+    if status == StatusAilment.ASLEEP then
+        return 0.5
+    end
+    
+    return 1
+end
+
+--- @brief get speed modifier of status ailment
+--- @param status StatusAilment
+--- @return number
+function rt.status_ailment_to_speed_multiplier(status)
+
+    meta.assert_type(rt.StatusAilment, status, "status_ailment_to_speed_multiplier")
+    
+    if status == StatusAilment.CHILLED then
+        return 0.5
+    elseif status == StatusAilment.FROZEN then
+        return 0
+    end
+        
+    return 1
+end
+
 --- @brief message when object gains status ailment
 --- @param subject BattleID name of the subject
 --- @param status_ailment StatusAilment
 function rt.status_ailment_gained_message(subject, status_ailment)
 
-    if not meta.isa(subject, rt.BattleID) then
-        error("[ERROR] In status_ailment_gained_message: Argument #1 is not a string")
-    end
+    meta.assert_type(rt.BattleEntity, subject)
+    meta.assert_enum(rt.StatusAilment, status_ailment)
 
-    if not meta.is_enum_value(rt.StatusAIlment, status_ailment) then
-        error("[ERROR] In status_ailment_gained_message: Argument #2 is not a StatusAilment")
-    end
-
-    local out = subject.name .. " "
+    local out = rt.get_id(subject).name .. " "
 
     if status_ailment == rt.StatusAilment.DEAD then
         return out .. " died"
@@ -56,15 +97,10 @@ end
 --- @param status_ailment StatusAilment
 function rt.status_ailment_lost_message(subject, status_ailment)
 
-    if not meta.isa(subject, rt.BattleID) then
-        error("[ERROR] In status_ailment_lost_message: Argument #1 is not a string")
-    end
+    meta.assert_type(rt.BattleEntity, subject)
+    meta.assert_enum(rt.StatusAilment, status_ailment)
 
-    if not meta.is_enum_value(StatusAilment, status_ailment) then
-        error("[ERROR] In status_ailment_lost_message: Argument #2 is not a StatusAilment")
-    end
-
-    local out = subject.name .. " "
+    local out = rt.get_id(subject).name .. " "
 
     if status_ailment == rt.StatusAilment.DEAD then
         return out .. " came back from the dead"

@@ -257,7 +257,7 @@ function meta._new_type(typename)
 
     x.has_property = meta.has_property
     x.add_property = meta.add_property
-    x.add_constructor = meta.add_construtor
+    x.set_constructor = meta.add_construtor
     x.name = typename
     x.properties = {}
 
@@ -313,17 +313,17 @@ function meta.add_property(type, property_name, initial_value)
     type.properties[property_name] = initial_value
 end
 
---- @brief create a constructor for a given type T, it is invoked by calling T()
+--- @brief create a set_constructor for a given type T, it is invoked by calling T()
 --- @param type Type
 --- @param function function
-function meta.add_constructor(type, f)
+function meta.set_constructor(type, f)
 
     if not meta.is_type(type) then
-        error("[ERROR] In meta.add_constructor: Argument #1 is not a type")
+        error("[ERROR] In meta.set_constructor: Argument #1 is not a type")
     end
 
     if not meta.is_function(f) then
-        error("[ERROR] In meta.add_constructor: Argumnet #2 is not a callable")
+        error("[ERROR] In meta.set_constructor: Argumnet #2 is not a callable")
     end
 
     getmetatable(type).__call = f
@@ -350,14 +350,14 @@ function meta.new_type(typename, table)
 
     x.add_property = meta.add_property
     x.remove_property = meta.remove_property
-    x.add_constructor = meta.add_constructor
+    x.set_constructor = meta.set_constructor
 
     return x
 end
 
 --- @brief Instantiate object from a meta.Type
 --- @param type meta.Type
---- @param args table [optional] constructor arguments
+--- @param args table [optional] set_constructor arguments
 --- @returns instance
 function meta.new(type, args)
 
@@ -390,6 +390,10 @@ function meta.new(type, args)
 end
 
 --- @brief raise an error when input item is not as expected
+--- @param type meta.Type
+--- @param x any
+--- @param domain string
+--- @param arg_i number
 function meta.assert_type(type, x, domain, arg_i)
 
     if not meta.is_type(type) then
@@ -400,5 +404,23 @@ function meta.assert_type(type, x, domain, arg_i)
 
     if not meta.isa(x, type) then
         error("[ERROR] In " .. domain .. ": Argument Mismatch for parameter #" .. tostring(arg_i) .. ": Expected `" .. type.name .. "`, got `" .. tostring(meta.typeof(x)).. "`")
+    end
+end
+
+--- @brief raise an error when input item is not as expected
+--- @param type meta.Enum
+--- @param x any
+--- @param domain string
+--- @param arg_i number
+function meta.assert_enum(enum, x, domain, arg_i)
+
+    if not meta.is_enum(enum) then
+        error("[ERROR] In meta.assert_type: Argument #1 is not a type")
+    end
+
+    if arg_i == nil then arg_i = "1" end
+
+    if not meta.is_enum_value(enum, x) then
+        error("[ERROR] In " .. domain .. ": Argument Mismatch for parameter #" .. tostring(arg_i) .. ": Argument `" .. tostring(x) .. "` is not an enum value")
     end
 end

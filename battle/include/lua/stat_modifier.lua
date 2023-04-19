@@ -12,6 +12,10 @@ rt.StatModifier = meta.new_enum({
     PLUS_4 = 4,
 })
 
+rt.Attack = "Attack"
+rt.Defense = "Defense"
+rt.Speed = "Speed"
+
 --- @brief convert modifier to numerical stat factor
 --- @param modifier StatModifier
 function rt.stat_modifier_to_factor(modifier)
@@ -41,29 +45,19 @@ function rt.stat_modifier_to_factor(modifier)
     end
 end
 
+
 --- @brief message when stat is raised
 --- @param subject BattleID
 --- @param state string stat name, for example "Attack"
 --- @param current_modifier StatModifier current modifier
 --- @param next_modifier StatModifier newly to-apply modifier
-function rt.stat_modifier_change_message(subject, stat, current_modifier, next_modifier)
+function rt.stat_modifier_changed_message(subject, stat, current_modifier, next_modifier)
 
-    -- todo
-    if not meta.isa(subject, rt.BattleID) then
-        error("[ERROR] In stat_modifier_increase_message: Argument #1 is not a string")
-    end
+    meta.assert_type(rt.BattleEntity, subject)
+    meta.assert_enum(rt.StatModifier, current_modifier)
+    meta.assert_enum(rt.StatModifier, next_modifier)
 
-    if not meta.isa(subject, rt.BattleID) then
-        error("[ERROR] In stat_modifier_increase_message: Argument #2 is not a string")
-    end
-
-    if not meta.is_enum_value(rt.StatModifier, modifier) then
-        error("[ERROR] In stat_modifier_increase_message: Argument #3 is not a StatusAilment")
-    end
-
-    if not meta.is_enum_value(rt.StatModifier, modifier) then
-        error("[ERROR] In stat_modifier_increase_message: Argument #4 is not a StatusAilment")
-    end
+    local id = rt.get_id(subject)
 
     if (current_modifier == next_modifier) then
         return id.name .. "s " .. stat .. " remained unchanged"
@@ -78,9 +72,9 @@ function rt.stat_modifier_change_message(subject, stat, current_modifier, next_m
     end
 
     local delta = math.abs(current_modifier - next_modifier)
-    local out = id.name .. "s " .. state
+    local out = id.name .. "s " .. stat
 
-    if (current_modifier < next_modifier) then
+    if (current_modifier > next_modifier) then
         if delta == 1 then
             return out .. " was lowered"
         elseif delta == 2 then
@@ -88,7 +82,7 @@ function rt.stat_modifier_change_message(subject, stat, current_modifier, next_m
         else
             return out .. " was drastically lowered"
         end
-    elseif (current_modifier > next_modifier) then
+    elseif (current_modifier < next_modifier) then
         if delta == 1 then
             return out .. " grew"
         elseif delta == 2 then

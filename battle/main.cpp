@@ -1,6 +1,8 @@
 #include <sol/sol.hpp>
+#include <mousetrap.hpp>
 
 const std::string RESOURCE_PATH = "/home/clem/Workspace/rat_game/battle/";
+using namespace mousetrap;
 
 int main()
 {
@@ -20,4 +22,12 @@ int main()
     lua.safe_script_file(RESOURCE_PATH + "include.lua");
 
     return 0;
+
+    auto app = Application("rat.game");
+    app.connect_signal_activate([](Application* app){
+        auto window = Window(*app);
+        window.present();
+    });
+
+    return app.run();
 }
