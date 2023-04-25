@@ -1,3 +1,36 @@
+--- @class IgnitionEffect
+rt.IgnitionEffect = meta.new_type("IgnitionEffect", {
+
+    --- @brief (Entity self, Entity target, ...) -> string
+    --- @param self Entity
+    --- @param target Entity
+    apply = meta.Function(),
+})
+
+--- @param f Function  (Entity, Entity, (any)) ->
+--- @param message Function (Entity) -> string
+meta.set_constructor(rt.IgnitionEffect, function(type, f, message)
+
+    local out = meta.new(rt.IgnitionEffect)
+    out.apply = function(self, other, data)
+        meta.assert_type(rt.Entity, self)
+
+        if other ~= nil then
+            meta.assert_type(rt.Entity, other)
+        end
+
+        return f(self, other, data)
+    end
+
+    out.on_apply_message = message
+
+    out.__meta.__call = function(instance, self, other, data)
+        instance.apply(self, other, data)
+    end
+
+    return out
+end)
+
 --- @class ContinuousEffect
 rt.ContinuousEffect = meta.new_type("ContinuousEffect", {
 
@@ -6,35 +39,53 @@ rt.ContinuousEffect = meta.new_type("ContinuousEffect", {
 
     duration = POSITIVE_INFINITY,
 
-    hp_multiplier = meta.Number(1),
+    --- @brief is stunned is true, entity cannot act this turn
+    stunned = false,
+
+    hp_factor = meta.Number(1),
     hp_offset = meta.Number(0),
 
-    ap_multiplier = meta.Number(1),
+    ap_factor = meta.Number(1),
     ap_offset = meta.Number(0),
 
-    attack_multiplier = meta.Number(1),
+    attack_factor = meta.Number(1),
     attack_offset = meta.Number(0),
 
-    defense_multiplier = meta.Number(1),
+    defense_factor = meta.Number(1),
     defense_offset = meta.Number(0),
 
-    speed_multiplier = meta.Number(1),
+    speed_factor = meta.Number(1),
     speed_offset = meta.Number(0),
 
-    on_damage_taken = rt.IgnitionEffect(),
-    on_damage_dealt = rt.IgnitionEffect(),
+    --- @param entity Entity self
+    --- @param entity Entity person that transmitted status on self, or nil if it was a global
+    --- @param status ContinuousEffect
+    on_status_gained = rt.IgnitionEffect(),
 
-    on_move_used = rt.IgnitionEffect(),
+    --- @brief (Entity self, Continuonous this)
+    --- @param self Entity entity loosing teh status
+    --- @param entity Entity entity that originally inflicted the status
+    on_status_lost = rt.IgnitionEffect(),
 
-    --- @brief (BattleEntity self) -> string
-    status_gained_message = function(self)
-        return nil
-    end,
+    --- @brief (Entity self, Entity other, Number damage) -> nil
+    after_taking_damage = rt.IgnitionEffect(),
+    before_taking_damge = rt.IgnitionEffect(),
 
-    --- @brief (BattleEntity self) -> string
-    status_lost_message = function(self)
-        return nil
-    end
+    --- @brief (Entity self, Entity other, Number damage) -> nil
+    after_dealing_damage = rt.IgnitionEffect(),
+    before_dealing_damage = rt.IgnitionEffect(),
+
+    --- @brief (Entity self, Entity other, Move move) -> nil
+    before_move_used = rt.IgnitionEffect(),
+    after_move_used = rt.IgnitionEffect(),
+
+    --- @brief (Entity self, Entity other, Item item) -> nil
+    before_item_used = rt.IgnitionEffect(),
+    after_move_used = rt.IgnitionEffect(),
+
+    --- @brief (Entity self) -> nil
+    on_turn_start = rt.IgnitionEffect(),
+    on_turn_end = rt.IgnitionEffect(),
 })
 
 rt.ContinuousEffect.__meta.__eq = function(self, other)
@@ -44,22 +95,31 @@ end
 --- @brief add continuous effect
 --- @param id string
 --- @param arguments table
-rt.ContinuousEffects = {}
-function rt.new_continuous_effect(id, args)
+--- @return ContinuousEffect
+rt._ContinuousEffects = {}
+function rt.new_effect(id, args)
     args[id] = id
-    rt.ContinuousEffects[id] = meta.new(rt.ContinuousEffects, args)
+    local out = meta.new(rt.ContinuousEffect, args)
+    rt._ContinuousEffects[id] = out
+    return out
+end
 
+--- @brief access global database
+--- @param id string
+--- @return ContinuousEffect or nil
+function rt.get_effect(id)
+    return rt._ContinuousEffects[id]
 end
 
 --- @brief add to entity
 --- @param entity Entity
 --- @param effect ContinuousEffect
-function rt.add_continuous_effect(entity, effect)
+function rt.add_effect(entity, effect)
 
-    meta.assert_type(rt.Entity, entity, "add_continuous_effect", 1)
-    meta.assert_type(rt.ContinuousEffect, effect, "add_continuous_effect", 2)
+    meta.assert_type(rt.Entity, entity, "add_effect", 1)
+    meta.assert_type(rt.ContinuousEffect, effect, "add_effect", 2)
 
-    if entity.continuous_effects:insert(effect) then
+    if entity.effects:insert(effect) then
         log.message(effect.status_gained_message(entity))
     end
 end
@@ -67,12 +127,12 @@ end
 --- @brief check if effect is present
 --- @param entity Entity
 --- @param effect ContinuousEffect
-function rt.has_continuous_effect(entity, effect)
+function rt.has_effect(entity, effect)
 
-    meta.assert_type(rt.Entity, entity, "has_continuous_effect", 1)
-    meta.assert_type(rt.ContinuousEffect, effect, "has_continuous_effect", 2)
+    meta.assert_type(rt.Entity, entity, "has_effect", 1)
+    meta.assert_type(rt.ContinuousEffect, effect, "has_effect", 2)
 
-    for value in pairs(entity.continuous_effects) do
+    for value in pairs(entity.effects) do
         if value.id == effect.id then
             return true
         end
@@ -83,49 +143,18 @@ end
 --- @brief remove effect
 --- @param entity Entity
 --- @param effect ContinuousEffect
-function rt.remove_conitnuous_effect(entity, effect)
-    meta.assert_type(rt.Entity, entity, "has_continuous_effect", 1)
-    meta.assert_type(rt.ContinuousEffect, effect, "has_continuous_effect", 2)
+function rt.remove_effect(entity, effect)
+    meta.assert_type(rt.Entity, entity, "has_effect", 1)
+    meta.assert_type(rt.ContinuousEffect, effect, "has_effect", 2)
 
-    for value in pairs(entity.continuous_effects) do
+    for value in pairs(entity.effects) do
         if value.id == effect.id then
-            entity.continuous_effects:erase(effect)
+            entity.effects:erase(effect)
             log.message(effect.status_lost_message(entity))
             return
         end
     end
 end
-
---[[
-test = {
-    AT_RISK = "AT_RISK",
-    STUNNED = "STUNNED",
-    ASLEEP = "ASLEEP",
-    POISONED = "POISONED",
-    BLINDED = "BLINDED",
-    BURNED = "BURNED",
-    CHILLED = "CHILLED",
-    FROZEN = "FROZEN"
-}
-]]--
-
---- @brief StatusAilment: at risk
-rt.new_continuous_effect("at_risk", {
-
-    on_damage_taken = function(self)
-        rt.set_status(self, rt.StatusAilment.DEAD)
-    end,
-
-    status_gained_message = function(self)
-        return self.name .. " is now at risk"
-    end,
-
-    status_lost_message = function(self)
-        return self.name .. " is no longer at risk"
-    end
-})
-
-
 
 
 

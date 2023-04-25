@@ -1,6 +1,6 @@
 --- @brief print, arguments are concatenated
 --- @param vararg any
---- @return void
+--- @return nil
 function print(...)
 
     local values = {...}
@@ -16,7 +16,7 @@ end
 
 --- @brief print, arguments are concatenade with a newline in between each
 --- @param vararg any
---- @return void
+--- @return nil
 function println(...)
 
     local values = {...}

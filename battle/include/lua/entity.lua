@@ -59,9 +59,85 @@ function rt.get_id(entity)
     })
 end
 
+--- @brief get current hp value
+--- @param entity Entity
+--- @return Number
+function rt.get_hp(entity)
+    meta.assert_type(rt.Entity, entity)
+    --- @todo
+end
+
+--- @brief get hp base
+--- @param entity Entity
+--- @return Number
+function rt.get_hp_base(entity)
+    meta.assert_type(rt.Entity, entity)
+    --- @todo
+end
+
+--- @brief modify hp
+--- @param entity Entity
+--- @return Number
+function rt.set_hp(entity)
+    meta.assert_type(rt.Entity, entity)
+    --- @todo
+end
+
+--- @brief add to hp, convenience function
+--- @param entity Entity
+--- @param value Number
+function rt.add_hp(entity, value)
+    rt.set_hp(entity, rt.get_hp(entity) + value)
+end
+
+--- @brief recude hp, convenience function
+--- @param entity Entity
+--- @param value Number
+function rt.reduce_hp(entity, value)
+    rt.set_hp(entity, rt.get_hp(entity) - value)
+end
+
+--- @brief get current hp value
+--- @param entity Entity
+--- @return Number
+function rt.get_ap(entity)
+    meta.assert_type(rt.Entity, entity)
+    --- @todo
+end
+
+--- @brief get hp base
+--- @param entity Entity
+--- @return Number
+function rt.get_ap_base(entity)
+    meta.assert_type(rt.Entity, entity)
+    --- @todo
+end
+
+--- @brief modify hp
+--- @param entity Entity
+--- @return Number
+function rt.set_ap(entity)
+    meta.assert_type(rt.Entity, entity)
+    --- @todo
+end
+
+--- @brief add to hp, convenience function
+--- @param entity Entity
+--- @param value Number
+function rt.add_ap(entity, value)
+    rt.set_ap(entity, rt.get_ap(entity) + value)
+end
+
+--- @brief recude hp, convenience function
+--- @param entity Entity
+--- @param value Number
+function rt.reduce_ap(entity, value)
+    rt.set_ap(entity, rt.get_ap(entity) - value)
+end
+
 --- @brief getter: current attack
 --- @param entity Entity
---- @return number
+--- @return Number
 function rt.get_attack(entity)
     meta.assert_type(rt.Entity, entity, "get_attack")
 
@@ -80,7 +156,7 @@ end
 
 --- @brief getter: attack base
 --- @param entity Entity
---- @return number
+--- @return Number
 function rt.get_attack_base(entity)
     meta.assert_type(rt.Entity, entity, "get_attack_base")
     return entity.base_attack
@@ -96,7 +172,7 @@ end
 
 --- @brief getter: current defense
 --- @param entity Entity
---- @return number
+--- @return Number
 function rt.get_defense(entity)
     meta.assert_type(rt.Entity, entity, "get_defense")
 
@@ -115,7 +191,7 @@ end
 
 --- @brief getter: defense base
 --- @param entity Entity
---- @return number
+--- @return Number
 function rt.get_defense_base(entity)
     meta.assert_type(rt.Entity, entity, "get_defense_base")
     return entity.base_defense
@@ -131,7 +207,7 @@ end
 
 --- @brief getter: current speed
 --- @param entity Entity
---- @return number
+--- @return Number
 function rt.get_speed(entity)
     meta.assert_type(rt.Entity, entity, "get_speed")
 
@@ -150,7 +226,7 @@ end
 
 --- @brief getter: speed base
 --- @param entity Entity
---- @return number
+--- @return Number
 function rt.get_speed_base(entity)
     meta.assert_type(rt.Entity, entity, "get_speed_base")
     return entity.base_speed

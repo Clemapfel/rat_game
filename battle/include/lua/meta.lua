@@ -7,26 +7,31 @@ function Function()
     return function() error("[ERROR] In meta.Function: Attempting to call an uninitialized function") end
 end
 
+--- @class String
 --- @brief default value for string member
 function meta.String()
     return ""
 end
 
+--- @class Number
 --- @brief default value for number member
 function meta.Number(n)
     if n == nil then return 0 else return n end
 end
 
+--- @class Table
 --- @brief default value for table member
 function meta.Table()
     return {}
 end
 
+--- @class Boolean
 --- @brief default value for boolean
 function meta.Boolean()
     return false
 end
 
+--- @class Function
 --- @brief default function
 function meta.Function()
     return function() end
@@ -312,7 +317,7 @@ end
 --- @param property_name string
 --- @param initial_value any
 --- @param is_private boolean
---- @returns void
+--- @returns nil
 function meta.add_property(type, property_name, initial_value)
 
     if not meta.is_type(type) then

@@ -89,9 +89,3 @@ function rt.reflexive_pronoun(id)
     end
 end
 
---- @brief print log message
---- @param message string
-function log.message(message)
-    -- todo
-    println("[LOG] ", message)
-end

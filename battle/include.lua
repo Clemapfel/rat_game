@@ -14,16 +14,14 @@ log = {}
 require "battle_log"
 require "status_ailment"
 require "stat_modifier"
-require "ignition_effect"
 require "continuous_effect"
 require "weather"
 require "entity"
 
-entity = rt.Entity("test")
-println(entity)
-rt.add_continuous_effect(entity, rt.Continuous.at_risk)
-assert(rt.has_continuous_effect(entity, rt.Continuous.at_risk))
-rt.remove_conitnuous_effect(entity, rt.Continuous.at_risk)
-println(entity)
+effect = rt.IgnitionEffect(function (a, b, c)
+    println(a.name .. b.name .. c)
+end)
 
-println()
+entity_a = rt.Entity("a")
+entity_b = rt.Entity("b")
+effect(entity_a, entity_b, "test")
