@@ -27,6 +27,11 @@ function meta.Boolean()
     return false
 end
 
+--- @brief default function
+function meta.Function()
+    return function() end
+end
+
 --- @brief Is x a lua string?
 --- @param x any
 --- @returns boolean
@@ -76,6 +81,10 @@ end
 --- @brief check if id can be used as a valid lua variable name
 --- @param id string
 function meta.is_valid_name(str)
+
+    if not meta.is_string(str) then
+        return false
+    end
 
     local before = _G[str]  -- prevent accidentally override global var
     local out, _ = pcall(load(str .. "=nil"))
@@ -239,15 +248,15 @@ meta.Type = "Type"
 function meta._new_type(typename)
 
     if typename == nil then
-        error("[ERROR] In meta.new_type: typename cannot be nil")
+        error("[ERROR] In meta._new_type: typename cannot be nil")
     end
 
     if not meta.is_string(typename) then
-        error("[ERROR] In meta.new_type: typename has to be string")
+        error("[ERROR] In meta._new_type: typename has to be string")
     end
 
     if not meta.is_valid_name(typename) then
-        error("[ERROR] In meta.new_type: " .. typename .. " is not a valid variable identifier")
+        error("[ERROR] In meta._new_type: " .. typename .. " is not a valid variable identifier")
     end
 
     local x = meta._new("Type")
@@ -362,7 +371,7 @@ end
 function meta.new(type, args)
 
     if not meta.is_type(type) then
-        error("[ERROR] In meta.new: Argument is not a type")
+        error("[ERROR] In meta.new: Argument #1 is not a type")
     end
 
     local x = meta._new(type.name)
@@ -403,7 +412,7 @@ function meta.assert_type(type, x, domain, arg_i)
     if arg_i == nil then arg_i = "1" end
 
     if not meta.isa(x, type) then
-        error("[ERROR] In " .. domain .. ": Argument Mismatch for parameter #" .. tostring(arg_i) .. ": Expected `" .. type.name .. "`, got `" .. tostring(meta.typeof(x)).. "`")
+        error("[ERROR] In " .. domain .. ": Type Mismatch for argument `" .. tostring(arg_i) .. "`: Expected `" .. type.name .. "`, got `" .. tostring(meta.typeof(x)).. "`")
     end
 end
 

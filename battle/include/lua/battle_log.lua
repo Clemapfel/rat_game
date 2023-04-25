@@ -13,12 +13,6 @@ rt.BattleID = meta.new_type("BattleID", {
     gender = rt.GrammaticGender.NEUTRAL
 })
 
---- @brief print log message
---- @param message string
-function log.message(message)
-    print("[LOG] ", message)
-end
-
 --- @brief he/she/it/they
 --- @param id BattleID
 function rt.subject_pronoun(id)
@@ -93,4 +87,11 @@ function rt.reflexive_pronoun(id)
     elseif id.gender == rt.GrammaticGender.PLURAL then
         return "themself"
     end
+end
+
+--- @brief print log message
+--- @param message string
+function log.message(message)
+    -- todo
+    println("[LOG] ", message)
 end

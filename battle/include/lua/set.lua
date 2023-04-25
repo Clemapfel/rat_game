@@ -11,7 +11,7 @@ meta.set_constructor(Set, function(this, to_add)
     out.__meta.elements = {}
     out.contains = Set.contains
     out.insert = Set.insert
-    out.remove = Set.remove
+    out.erase = Set.erase
     out.is_empty = Set.is_empty
     out.size = Set.size
 
@@ -58,21 +58,24 @@ end
 --- @brief insert into set
 --- @param set Set
 --- @param x any
+--- @return boolean
 function Set.insert(set, x)
 
     meta.assert_type(Set, set, "Set.erase", 1)
 
     if getmetatable(set).elements == true then
-        return
+        return false
     end
 
     getmetatable(set).elements[x] = true
     getmetatable(set).n_elements = getmetatable(set).n_elements + 1
+    return true
 end
 
 --- @brief remove from set
 --- @param set Set
 --- @param x any
+--- @return boolean
 function Set.erase(set, x)
 
     meta.assert_type(Set, set, "Set.erase", 1)
@@ -80,7 +83,10 @@ function Set.erase(set, x)
     if getmetatable(set).elements[x] ~= nil then
         getmetatable(set).elements[x] = nil
         getmetatable(set).n_elements = getmetatable(set).n_elements - 1
+        return true
     end
+
+    return false
 end
 
 --- @brief get number of elements in set

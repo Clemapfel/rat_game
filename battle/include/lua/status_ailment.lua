@@ -3,14 +3,6 @@ rt.StatusAilment = meta.new_enum({
     DEAD = "DEAD",
     KNOCKED_OUT = "KNOCKED_OUT",
     NO_STATUS = "NO_STATUS",
-    AT_RISK = "AT_RISK",
-    STUNNED = "STUNNED",
-    ASLEEP = "ASLEEP",
-    POISONED = "POISONED",
-    BLINDED = "BLINDED",
-    BURNED = "BURNED",
-    CHILLED = "CHILLED",
-    FROZEN = "FROZEN"
 })
 
 --- @brief get attack modifier of status ailment
@@ -64,7 +56,7 @@ end
 --- @param status_ailment StatusAilment
 function rt.status_ailment_gained_message(subject, status_ailment)
 
-    meta.assert_type(rt.BattleEntity, subject)
+    meta.assert_type(rt.Entity, subject)
     meta.assert_enum(rt.StatusAilment, status_ailment)
 
     local out = rt.get_id(subject).name .. " "
@@ -97,7 +89,7 @@ end
 --- @param status_ailment StatusAilment
 function rt.status_ailment_lost_message(subject, status_ailment)
 
-    meta.assert_type(rt.BattleEntity, subject)
+    meta.assert_type(rt.Entity, subject)
     meta.assert_enum(rt.StatusAilment, status_ailment)
 
     local out = rt.get_id(subject).name .. " "

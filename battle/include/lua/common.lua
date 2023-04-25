@@ -2,6 +2,13 @@
 --- @param vararg any
 --- @return void
 function print(...)
+
+    local values = {...}
+    if #values == 0 then
+        io.write("nil")
+        return
+    end
+
     for _, v in pairs({...}) do
         io.write(tostring(v))
     end
@@ -12,8 +19,14 @@ end
 --- @return void
 function println(...)
 
-    for _, v in pairs({...}) do
-        io.write(tostring(v))
+    local values = {...}
+    if #values == 0 then
+        io.write("nil\n")
+        return
+    end
+
+    for _, v in pairs(values) do
+        print(v)
         io.write("\n")
     end
 end
@@ -239,6 +252,7 @@ end
 
 --- @brief positive infinity
 INFINITY = 1/0
+POSITIVE_INFINITY = INFINITY
 
 --- @brief negative infinity
 NEGATIVE_INFINITY = -1/0
