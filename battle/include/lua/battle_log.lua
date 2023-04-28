@@ -13,13 +13,16 @@ rt.BattleID = meta.new_type("BattleID", {
     gender = rt.GrammaticGender.NEUTRAL
 })
 
+--- @brief message
+function rt.log(message)
+    print("[LOG] ", message, "\n")
+end
+
 --- @brief he/she/it/they
 --- @param id BattleID
 function rt.subject_pronoun(id)
 
-    if not meta.isa(id, "BattleID") then
-        error("[ERROR] In subject_pronoun: Argument #1 is not a BattleID")
-    end
+    meta.assert_type(rt.Entity, id)
 
     if id.gender == rt.GrammaticGender.MALE then
         return "he"
@@ -36,9 +39,7 @@ end
 --- @param id BattleID
 function rt.object_pronoun(id)
 
-    if not meta.isa(id, "BattleID") then
-        error("[ERROR] In object_pronoun: Argument #1 is not a BattleID")
-    end
+    meta.assert_type(rt.Entity, id)
 
     if id.gender == rt.GrammaticGender.MALE then
         return "him"
@@ -55,9 +56,7 @@ end
 --- @param id BattleID
 function rt.possesive_pronoun(id)
 
-    if not meta.isa(id, rt.BattleID) then
-        error("[ERROR] In object_pronoun: Argument #1 is not a BattleID")
-    end
+    meta.assert_type(rt.Entity, id)
 
     if id.gender == rt.GrammaticGender.MALE then
         return "his"
@@ -74,9 +73,7 @@ end
 --- @param id BattleID
 function rt.reflexive_pronoun(id)
 
-    if not meta.isa(id, "BattleID") then
-        error("[ERROR] In object_pronoun: Argument #1 is not a BattleID")
-    end
+    meta.assert_type(rt.Entity, id)
 
     if id.gender == rt.GrammaticGender.MALE then
         return "himself"

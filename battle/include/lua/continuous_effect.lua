@@ -36,11 +36,11 @@ rt.ContinuousEffect = meta.new_type("ContinuousEffect", {
 
     id = "",
     name = "",
+    description = "TODO",
 
     duration = POSITIVE_INFINITY,
 
-    --- @brief is stunned is true, entity cannot act this turn
-    stunned = false,
+    is_stun = false,
 
     hp_factor = meta.Number(1),
     hp_offset = meta.Number(0),
@@ -63,17 +63,17 @@ rt.ContinuousEffect = meta.new_type("ContinuousEffect", {
     on_status_gained = rt.IgnitionEffect(),
 
     --- @brief (Entity self, Continuonous this)
-    --- @param self Entity entity loosing teh status
+    --- @param self Entity entity loosing the status
     --- @param entity Entity entity that originally inflicted the status
     on_status_lost = rt.IgnitionEffect(),
 
     --- @brief (Entity self, Entity other, Number damage) -> nil
-    after_taking_damage = rt.IgnitionEffect(),
-    before_taking_damge = rt.IgnitionEffect(),
+    after_damage_taken = rt.IgnitionEffect(),
+    before_damage_taken = rt.IgnitionEffect(),
 
     --- @brief (Entity self, Entity other, Number damage) -> nil
-    after_dealing_damage = rt.IgnitionEffect(),
-    before_dealing_damage = rt.IgnitionEffect(),
+    after_damage_dealt = rt.IgnitionEffect(),
+    before_damage_dealt = rt.IgnitionEffect(),
 
     --- @brief (Entity self, Entity other, Move move) -> nil
     before_move_used = rt.IgnitionEffect(),
@@ -81,7 +81,7 @@ rt.ContinuousEffect = meta.new_type("ContinuousEffect", {
 
     --- @brief (Entity self, Entity other, Item item) -> nil
     before_item_used = rt.IgnitionEffect(),
-    after_move_used = rt.IgnitionEffect(),
+    after_item_used = rt.IgnitionEffect(),
 
     --- @brief (Entity self) -> nil
     on_turn_start = rt.IgnitionEffect(),
@@ -144,6 +144,7 @@ end
 --- @param entity Entity
 --- @param effect ContinuousEffect
 function rt.remove_effect(entity, effect)
+
     meta.assert_type(rt.Entity, entity, "has_effect", 1)
     meta.assert_type(rt.ContinuousEffect, effect, "has_effect", 2)
 

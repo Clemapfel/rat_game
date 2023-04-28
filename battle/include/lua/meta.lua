@@ -9,8 +9,8 @@ end
 
 --- @class String
 --- @brief default value for string member
-function meta.String()
-    return ""
+function meta.String(x)
+    if x == nil then return "" else return x end
 end
 
 --- @class Number
@@ -27,14 +27,14 @@ end
 
 --- @class Boolean
 --- @brief default value for boolean
-function meta.Boolean()
-    return false
+function meta.Boolean(x)
+    if x == nil then return false else return x end
 end
 
 --- @class Function
 --- @brief default function
 function meta.Function()
-    return function() end
+    return function() return nil end
 end
 
 --- @brief Is x a lua string?
