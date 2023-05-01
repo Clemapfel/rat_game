@@ -18,10 +18,16 @@ require "continuous_effect"
 require "weather"
 require "entity"
 
-effect = rt.IgnitionEffect(function (a, b, c)
-    println(a.name .. b.name .. c)
-end)
+require "data/effects"
+
+--- @TODO
 
 entity_a = rt.Entity("a")
 entity_b = rt.Entity("b")
-effect(entity_a, entity_b, "test")
+
+rt.raise_attack_level(entity_b)
+
+print(serialize(rt.UNAWARE))
+
+rt.UNAWARE.before_damage_taken(entity_a, entity_b)
+rt.UNAWARE.on_damage_taken(entity_a, entity_b, 10)

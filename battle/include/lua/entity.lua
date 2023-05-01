@@ -15,9 +15,9 @@ rt.Entity = meta.new_type("Entity", {
     ap_base = meta.Number(1),
     ap_current = meta.Number(0),
 
-    attack_level = rt.StatLevel.NONE,
-    defense_level = rt.StatLevel.NONE,
-    speed_level = rt.StatLevel.NONE,
+    attack_level = rt.StatLevel.ZERO,
+    defense_level = rt.StatLevel.ZERO,
+    speed_level = rt.StatLevel.ZERO,
 
     continuous_effects = Set()
 })
@@ -162,12 +162,61 @@ function rt.get_attack_base(entity)
     return entity.base_attack
 end
 
---- @brief getter: attack base
+--- @brief getter: attack level
 --- @param entity Entity
 --- @return StatLevel
 function rt.get_attack_level(entity)
     meta.assert_type(rt.Entity, entity, "get_attack_level")
     return entity.attack_level
+end
+
+--- @brief setter: attack modifier
+--- @param entity Entity
+--- @param modifier StatLevel
+function rt.set_attack_level(entity, modifier)
+
+    meta.assert_type(rt.Entity, entity, "set_attack_level", 1)
+    meta.assert_enum(rt.StatLevel, modifier, "set_attack_level", 2)
+
+    local current = rt.get_attack_level(entity)
+    local next = modifier
+
+    entity.attack_level = modifier;
+    rt.log(rt.stat_modifier_changed_message(entity, rt.Attack, current, next))
+end
+
+--- @brief raise attack by 1
+--- @param entity Entity
+function rt.raise_attack_level(entity)
+    meta.assert_type(rt.Entity, entity, "raise_attack_level", 1)
+
+    local current = rt.get_attack_level(entity)
+    local next = rt.StatLevel.ZERO
+
+    if current == rt.StatLevel.MAX then
+        --- @todo: log
+        return
+    end
+
+    next = current + 1
+    rt.set_attack_level(entity, next)
+end
+
+--- @brief lower attack by 1
+--- @param entity Entity
+function rt.lower_attack_level(entity)
+    meta.assert_type(rt.Entity, entity, "lower_attack_level", 1)
+
+    local current = rt.get_attack_level(entity)
+    local next = rt.StatLevel.ZERO
+
+    if current == rt.StatLevel.MIN then
+        --- @todo: log
+        return
+    end
+
+    next = current - 1
+    rt.set_attack_level(entity, next)
 end
 
 --- @brief getter: current defense
@@ -197,12 +246,61 @@ function rt.get_defense_base(entity)
     return entity.base_defense
 end
 
---- @brief getter: defense base
+--- @brief getter: defense level
 --- @param entity Entity
 --- @return StatLevel
 function rt.get_defense_level(entity)
     meta.assert_type(rt.Entity, entity, "get_defense_level")
     return entity.defense_level
+end
+
+--- @brief setter: defense modifier
+--- @param entity Entity
+--- @param modifier StatLevel
+function rt.set_defense_level(entity, modifier)
+
+    meta.assert_type(rt.Entity, entity, "set_defense_level", 1)
+    meta.assert_enum(rt.StatLevel, modifier, "set_defense_level", 2)
+
+    local current = rt.get_defense_level(entity)
+    local next = modifier
+
+    entity.defense_level = modifier;
+    rt.log(rt.stat_modifier_changed_message(entity, rt.Defense, current, next))
+end
+
+--- @brief raise defense by 1
+--- @param entity Entity
+function rt.raise_defense_level(entity)
+    meta.assert_type(rt.Entity, entity, "raise_defense_level", 1)
+
+    local current = rt.get_defense_level(entity)
+    local next = rt.StatLevel.ZERO
+
+    if current == rt.StatLevel.MAX then
+        --- @todo: log
+        return
+    end
+
+    next = current + 1
+    rt.set_defense_level(entity, next)
+end
+
+--- @brief lower defense by 1
+--- @param entity Entity
+function rt.lower_defense_level(entity)
+    meta.assert_type(rt.Entity, entity, "lower_defense_level", 1)
+
+    local current = rt.get_defense_level(entity)
+    local next = rt.StatLevel.ZERO
+
+    if current == rt.StatLevel.MIN then
+        --- @todo: log
+        return
+    end
+
+    next = current - 1
+    rt.set_defense_level(entity, next)
 end
 
 --- @brief getter: current speed
@@ -232,7 +330,7 @@ function rt.get_speed_base(entity)
     return entity.base_speed
 end
 
---- @brief getter: speed base
+--- @brief getter: speed level
 --- @param entity Entity
 --- @return StatLevel
 function rt.get_speed_level(entity)
@@ -240,37 +338,7 @@ function rt.get_speed_level(entity)
     return entity.speed_level
 end
 
---- @brief setter: attack modifier
---- @param entity Entity
---- @param modifier StatLevel
-function rt.set_attack_level(entity, modifier)
-
-    meta.assert_type(rt.Entity, entity, "set_attack_level", 1)
-    meta.assert_enum(rt.StatLevel, modifier, "set_attack_level", 2)
-
-    local current = rt.get_attack_level(entity)
-    local next = modifier
-
-    entity.attack_level = modifier;
-    log.message(rt.stat_modifier_changed_message(entity, rt.Attack, current, next))
-end
-
---- @brief setter: attack modifier
---- @param entity Entity
---- @param modifier StatLevel
-function rt.set_defense_level(entity, modifier)
-
-    meta.assert_type(rt.Entity, entity, "set_defense_level", 1)
-    meta.assert_enum(rt.StatLevel, modifier, "set_defense_level", 2)
-
-    local current = rt.get_defense_level(entity)
-    local next = modifier
-
-    entity.defense_level = modifier;
-    log.message(rt.stat_modifier_changed_message(entity, rt.Defense, current, next))
-end
-
---- @brief setter: attack modifier
+--- @brief setter: speed modifier
 --- @param entity Entity
 --- @param modifier StatLevel
 function rt.set_speed_level(entity, modifier)
@@ -282,5 +350,39 @@ function rt.set_speed_level(entity, modifier)
     local next = modifier
 
     entity.speed_level = modifier;
-    log.message(rt.stat_modifier_changed_message(entity, rt.Speed, current, next))
+    rt.log(rt.stat_modifier_changed_message(entity, rt.Speed, current, next))
+end
+
+--- @brief raise speed by 1
+--- @param entity Entity
+function rt.raise_speed_level(entity)
+    meta.assert_type(rt.Entity, entity, "raise_speed_level", 1)
+
+    local current = rt.get_speed_level(entity)
+    local next = rt.StatLevel.ZERO
+
+    if current == rt.StatLevel.MAX then
+        --- @todo: log
+        return
+    end
+
+    next = current + 1
+    rt.set_speed_level(entity, next)
+end
+
+--- @brief lower speed by 1
+--- @param entity Entity
+function rt.lower_speed_level(entity)
+    meta.assert_type(rt.Entity, entity, "lower_speed_level", 1)
+
+    local current = rt.get_speed_level(entity)
+    local next = rt.StatLevel.ZERO
+
+    if current == rt.StatLevel.MIN then
+        --- @todo: log
+        return
+    end
+
+    next = current - 1
+    rt.set_speed_level(entity, next)
 end

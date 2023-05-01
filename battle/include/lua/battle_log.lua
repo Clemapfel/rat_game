@@ -13,9 +13,42 @@ rt.BattleID = meta.new_type("BattleID", {
     gender = rt.GrammaticGender.NEUTRAL
 })
 
+rt._log_muted = false
+rt._animations_muted = false
+
 --- @brief message
 function rt.log(message)
-    print("[LOG] ", message, "\n")
+    if not rt._log_muted then
+        print("[LOG] ", message, "\n")
+    end
+end
+
+--- @brief mute all messages until unmute_log is called
+function rt.mute_log()
+    rt._log_muted = true
+end
+
+--- @brief unmute log
+function rt.unmute_log()
+
+    if rt._log_muted == false then
+        print("[WARNING] IN rt.unmute_log: Log is not currently muted")
+    end
+    rt._log_muted = false
+end
+
+--- @brief prevent all animations until unmuate_animations is called
+function rt.mute_animations()
+    rt._animations_muted = true
+end
+
+--- @brief unmute animations
+function rt.unmute_animations()
+
+    if rt._animations_muted == false then
+        print("[WARNING] IN rt.unmute_log: Log is not currently muted")
+    end
+    rt._animations_unmuted = false
 end
 
 --- @brief he/she/it/they

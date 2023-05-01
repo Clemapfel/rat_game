@@ -3,10 +3,10 @@ rt.AT_RISK = rt.new_effect("at_risk", {
 
     duration = 3,
 
-    after_damage_taken = rt.IgnitionEffect(function(self, other, damage)
+    after_damage_taken = function(self, other, damage)
         self.set_status(DEAD)
         rt.log(self.name .. " was executed")
-    end),
+    end,
 
     on_status_gained = function(self)
         rt.log(self.name .. " is now at risk")
@@ -24,10 +24,10 @@ rt.POISONED = rt.new_effect("poisoned", {
 
     duration = POSITIVE_INFINITY,
 
-    on_turn_end = rt.IgnitionEffect(function(self)
+    on_turn_end = function(self)
         rt.reduce_hp(1/8 * rt.get_hp_base(self))
         rt.log(self.name .. " was hurt by poison")
-    end),
+    end,
 
     on_status_gained = function(self)
         rt.log(self.name .. " was poisoned")
@@ -106,6 +106,7 @@ rt.CHILLED = rt.new_effect("chilled", {
         if rt.has_effect(rt.CHILLED) then
             rt.remove_effect(self, rt.CHILLD)
             rt.add_effect(self, rt.FROZEN)
+            return
         end
         rt.log(self.name .. " is now chilled")
     end,
@@ -132,7 +133,7 @@ rt.STUNNED = rt.new_effect("stunned", {
     end
 })
 
---- @brief sleep
+--- @brief sleep: wake up if damaged
 rt.ASLEEP = rt.new_effect("asleep", {
 
     duration = 3,
@@ -150,6 +151,53 @@ rt.ASLEEP = rt.new_effect("asleep", {
 
     on_status_lost = function(self)
         rt.log(self.name .. " woke up")
+    end,
+
+    description = "TODO"
+})
+
+--- @brief unaware: ignore enemy buffs (but not debuffs)
+rt.UNAWARE = rt.new_effect("unaware", {
+
+    before_damage_taken = function(self, other)
+        rt.mute_log()
+        rt.mute_animations()
+
+        rt.UNAWARE._previous_attack = rt.get_attack_level(other)
+        rt.UNAWARE._previous_defense = rt.get_defense_level(other)
+        rt.UNAWARE._previous_speed = rt.get_speed_level(other)
+
+        if rt.get_attack_level(other) > 0 then
+            rt.set_attack_level(other, rt.StatLevel.ZERO)
+        end
+
+        if rt.get_defense_level(other) > 0 then
+            rt.set_defense_level(other, rt.StatLevel.ZERO)
+        end
+
+        if rt.get_speed_level(other) > 0 then
+            rt.set_speed_level(other, rt.StatLevel.ZERO)
+        end
+
+        rt.unmute_log()
+        rt.unmute_animations()
+    end,
+
+    on_damage_taken = function(self, other, damage)
+
+        rt.mute_log()
+        rt.mute_animations()
+
+        rt.set_attack_level(other, rt.UNAWARE._previous_attack)
+        rt.set_defense_level(other, rt.UNAWARE._previous_defense)
+        rt.set_speed_level(other, rt.UNAWARE._previous_speed)
+
+        rt.UNAWARE._previous_attack = nil
+        rt.UNAWARE._previous_defense = nil
+        rt.UNAWARE._previous_speed = nil
+
+        rt.unmute_log()
+        rt.unmute_animations()
     end,
 
     description = "TODO"

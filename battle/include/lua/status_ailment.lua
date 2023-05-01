@@ -2,7 +2,7 @@
 rt.StatusAilment = meta.new_enum({
     DEAD = "DEAD",
     KNOCKED_OUT = "KNOCKED_OUT",
-    NO_STATUS = "NO_STATUS",
+    ALIVE = "ALIVE",
 })
 
 --- @brief get attack modifier of status ailment

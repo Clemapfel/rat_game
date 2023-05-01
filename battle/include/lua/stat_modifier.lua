@@ -5,11 +5,12 @@ rt.StatLevel = meta.new_enum({
     MINUS_3 = -3,
     MINUS_2 = -2,
     MINUS_1 = -1,
-    NONE = 0,
+    ZERO = 0,
     PLUS_1 = 1,
     PLUS_2 = 2,
     PLUS_3 = 3,
     PLUS_4 = 4,
+    MAX = 5
 })
 
 rt.Attack = "Attack"
@@ -42,6 +43,8 @@ function rt.stat_modifier_to_factor(modifier)
         return 2
     elseif modifier == rt.StatLevel.PLUS_4 then
         return 3
+    elseif modifier == rt.StatLevel.MAX then
+        return 4
     end
 end
 
@@ -63,7 +66,7 @@ function rt.stat_modifier_changed_message(subject, stat, current_modifier, next_
         return id.name .. "s " .. stat .. " remained unchanged"
     end
 
-    if (next_modifier == rt.StatLevel.NONE) then
+    if (next_modifier == rt.StatLevel.ZERO) then
         return id.name .. "s " .. stat .. " was reset" -- TODO: phrasing
     end
 
