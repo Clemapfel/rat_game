@@ -3,7 +3,7 @@ rt.AT_RISK = rt.new_effect("at_risk", {
 
     duration = 3,
 
-    after_damage_taken = function(self, other, damage)
+    on_damage_taken = function(self, other, damage)
         self.set_status(DEAD)
         rt.log(self.name .. " was executed")
     end,
@@ -44,7 +44,7 @@ rt.POISONED = rt.new_effect("poisoned", {
 rt.BURNED = rt.new_effect("burned", {
 
     duration = 3,
-    attack = 0.5,
+    attack_factor = 0.5,
 
     on_turn_end = function(self)
         rt.reduce_hp(self, 1/16 * rt.get_hp_based(self))

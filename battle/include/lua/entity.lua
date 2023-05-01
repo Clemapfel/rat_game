@@ -5,9 +5,9 @@ rt.Entity = meta.new_type("Entity", {
     name = "",
     gender = rt.GrammaticGender.NEUTRAL,
 
-    attack_base = meta.Number(0),
-    defense_base = meta.Number(0),
-    speed_base = meta.Number(0),
+    attack_base = meta.Number(1),
+    defense_base = meta.Number(1),
+    speed_base = meta.Number(1),
 
     hp_base = meta.Number(1),
     hp_current = meta.Number(0),
@@ -19,7 +19,9 @@ rt.Entity = meta.new_type("Entity", {
     defense_level = rt.StatLevel.ZERO,
     speed_level = rt.StatLevel.ZERO,
 
-    continuous_effects = Set()
+    status = rt.ALIVE,
+
+    effects = Set() -- rt.ContinuousEffect
 })
 
 meta.set_constructor(rt.Entity, function(this, id)
@@ -34,18 +36,6 @@ meta.set_constructor(rt.Entity, function(this, id)
     return out
 end)
 
---- @brief does entity have status
---- @param entity Entity Entity
---- @param status StatusAilment
---- @return boolean
-function rt.has_status(entity, status)
-
-    meta.assert_type(rt.Entity, entity, "has_status", 1)
-    meta.assert_type(rt.StatusAilment, entity, "has_status", 2)
-
-    return entity.status_ailments:contains(status)
-end
-
 --- @brief get id
 --- @return BattleID
 function rt.get_id(entity)
@@ -59,330 +49,164 @@ function rt.get_id(entity)
     })
 end
 
---- @brief get current hp value
+--- @brief get current stat value
 --- @param entity Entity
 --- @return Number
-function rt.get_hp(entity)
-    meta.assert_type(rt.Entity, entity)
-    --- @todo
-end
+function rt.generate.get_stat(stat)
+    return function(entity)
+        meta.assert_type(rt.Entity, entity, "get_" .. stat)
 
---- @brief get hp base
---- @param entity Entity
---- @return Number
-function rt.get_hp_base(entity)
-    meta.assert_type(rt.Entity, entity)
-    --- @todo
-end
+        local out = entity[stat .. "_base"]
 
---- @brief modify hp
---- @param entity Entity
---- @return Number
-function rt.set_hp(entity)
-    meta.assert_type(rt.Entity, entity)
-    --- @todo
-end
+        for effect in pairs(entity.effects) do
+            out = out * effect[stat .. "_factor"]
+        end
 
---- @brief add to hp, convenience function
---- @param entity Entity
---- @param value Number
-function rt.add_hp(entity, value)
-    rt.set_hp(entity, rt.get_hp(entity) + value)
-end
+        out = out * rt.stat_level_to_factor(entity[stat .. "_level"])
 
---- @brief recude hp, convenience function
---- @param entity Entity
---- @param value Number
-function rt.reduce_hp(entity, value)
-    rt.set_hp(entity, rt.get_hp(entity) - value)
-end
+        for effect in pairs(entity.effects) do
+            out = out + effect[stat .. "_offset"]
+        end
 
---- @brief get current hp value
---- @param entity Entity
---- @return Number
-function rt.get_ap(entity)
-    meta.assert_type(rt.Entity, entity)
-    --- @todo
-end
-
---- @brief get hp base
---- @param entity Entity
---- @return Number
-function rt.get_ap_base(entity)
-    meta.assert_type(rt.Entity, entity)
-    --- @todo
-end
-
---- @brief modify hp
---- @param entity Entity
---- @return Number
-function rt.set_ap(entity)
-    meta.assert_type(rt.Entity, entity)
-    --- @todo
-end
-
---- @brief add to hp, convenience function
---- @param entity Entity
---- @param value Number
-function rt.add_ap(entity, value)
-    rt.set_ap(entity, rt.get_ap(entity) + value)
-end
-
---- @brief recude hp, convenience function
---- @param entity Entity
---- @param value Number
-function rt.reduce_ap(entity, value)
-    rt.set_ap(entity, rt.get_ap(entity) - value)
-end
-
---- @brief getter: current attack
---- @param entity Entity
---- @return Number
-function rt.get_attack(entity)
-    meta.assert_type(rt.Entity, entity, "get_attack")
-
-    local out = entity.base_attack * rt.stat_modifier_to_factor(entity.attack_level)
-
-    for status in pairs(entity.status_ailments) do
-        out = out * rt.status_ailment_to_attack_factor(status)
+        return out
     end
-    
-    for _, effect in ipairs(entity.continuous_effects) do
-        out = out * effect.attack_multiplier
-    end
-
-    return out
 end
 
---- @brief getter: attack base
+--- @brief get current stat value
 --- @param entity Entity
 --- @return Number
-function rt.get_attack_base(entity)
-    meta.assert_type(rt.Entity, entity, "get_attack_base")
-    return entity.base_attack
+function rt.generate.set_stat(stat)
+    return function(entity, value)
+        entity[stat] = value
+        -- @todo log
+    end
 end
 
---- @brief getter: attack level
+--- @brief get stat base
+--- @param entity Entity
+--- @return Number
+function rt.generate.get_stat_base(stat)
+    return function(entity)
+        meta.assert_type(rt.Entity, entity, "get_" .. stat .. "_base")
+        return entity[stat .. "_base"]
+    end
+end
+
+--- @brief get stat level
 --- @param entity Entity
 --- @return StatLevel
-function rt.get_attack_level(entity)
-    meta.assert_type(rt.Entity, entity, "get_attack_level")
-    return entity.attack_level
-end
-
---- @brief setter: attack modifier
---- @param entity Entity
---- @param modifier StatLevel
-function rt.set_attack_level(entity, modifier)
-
-    meta.assert_type(rt.Entity, entity, "set_attack_level", 1)
-    meta.assert_enum(rt.StatLevel, modifier, "set_attack_level", 2)
-
-    local current = rt.get_attack_level(entity)
-    local next = modifier
-
-    entity.attack_level = modifier;
-    rt.log(rt.stat_modifier_changed_message(entity, rt.Attack, current, next))
-end
-
---- @brief raise attack by 1
---- @param entity Entity
-function rt.raise_attack_level(entity)
-    meta.assert_type(rt.Entity, entity, "raise_attack_level", 1)
-
-    local current = rt.get_attack_level(entity)
-    local next = rt.StatLevel.ZERO
-
-    if current == rt.StatLevel.MAX then
-        --- @todo: log
-        return
+function rt.generate.get_stat_level(stat)
+    return function(entity)
+        meta.assert_type(rt.Entity, entity)
+        return entity[stat .. "_level"]
     end
-
-    next = current + 1
-    rt.set_attack_level(entity, next)
 end
 
---- @brief lower attack by 1
+--- @brief get stat level
 --- @param entity Entity
-function rt.lower_attack_level(entity)
-    meta.assert_type(rt.Entity, entity, "lower_attack_level", 1)
+--- @param StatLevel
+function rt.generate.set_stat_level(stat)
+    return function(entity, level)
+        meta.assert_type(rt.Entity, entity)
+        meta.assert_enum(rt.StatLevel, level)
 
-    local current = rt.get_attack_level(entity)
-    local next = rt.StatLevel.ZERO
-
-    if current == rt.StatLevel.MIN then
-        --- @todo: log
-        return
+        entity[stat .. "_level"] = level
+        --@todo log
     end
-
-    next = current - 1
-    rt.set_attack_level(entity, next)
 end
 
---- @brief getter: current defense
+--- @brief raise stat level by 1
 --- @param entity Entity
---- @return Number
-function rt.get_defense(entity)
-    meta.assert_type(rt.Entity, entity, "get_defense")
+function rt.generate.raise_stat_level(stat)
+    return function(entity)
+        meta.assert_type(rt.Entity, entity, "raise" .. stat .. "_level", 1)
 
-    local out = entity.base_defense * rt.stat_modifier_to_factor(entity.defense_level)
+        local current = rt["get_" .. stat .. "_level"](entity)
+        local next = rt.StatLevel.ZERO
 
-    for status in pairs(entity.status_ailments) do
-        out = out * rt.status_ailment_to_defense_factor(status)
+        if current == rt.StatLevel.MAX then
+            -- @todo log
+            return
+        end
+
+        next = current + 1
+        rt["set_" .. stat .. "_level"](entity, next)
     end
+end
 
-    for _, effect in ipairs(entity.continuous_effects) do
-        out = out * effect.defense_multiplier
+--- @brief raise stat level by 1
+--- @param entity Entity
+function rt.generate.lower_stat_level(stat)
+    return function(entity)
+        meta.assert_type(rt.Entity, entity, "lower_" .. stat .. "_level", 1)
+
+        local current = rt["get_" .. stat .. "_level"](entity)
+        local next = rt.StatLevel.ZERO
+
+        if current == rt.StatLevel.MIN then
+            -- @todo log
+            return
+        end
+
+        next = current - 1
+        rt["set_" .. stat .. "_level"](entity, next)
     end
-
-    return out
 end
 
---- @brief getter: defense base
+--- @brief add to stat
 --- @param entity Entity
---- @return Number
-function rt.get_defense_base(entity)
-    meta.assert_type(rt.Entity, entity, "get_defense_base")
-    return entity.base_defense
-end
-
---- @brief getter: defense level
---- @param entity Entity
---- @return StatLevel
-function rt.get_defense_level(entity)
-    meta.assert_type(rt.Entity, entity, "get_defense_level")
-    return entity.defense_level
-end
-
---- @brief setter: defense modifier
---- @param entity Entity
---- @param modifier StatLevel
-function rt.set_defense_level(entity, modifier)
-
-    meta.assert_type(rt.Entity, entity, "set_defense_level", 1)
-    meta.assert_enum(rt.StatLevel, modifier, "set_defense_level", 2)
-
-    local current = rt.get_defense_level(entity)
-    local next = modifier
-
-    entity.defense_level = modifier;
-    rt.log(rt.stat_modifier_changed_message(entity, rt.Defense, current, next))
-end
-
---- @brief raise defense by 1
---- @param entity Entity
-function rt.raise_defense_level(entity)
-    meta.assert_type(rt.Entity, entity, "raise_defense_level", 1)
-
-    local current = rt.get_defense_level(entity)
-    local next = rt.StatLevel.ZERO
-
-    if current == rt.StatLevel.MAX then
-        --- @todo: log
-        return
+--- @param value Number
+function rt.generate.add_stat(stat)
+    return function(entity, value)
+        meta.assert_type(entity)
+        rt["set_" .. stat](entity, rt["get_" .. stat] + value)
     end
-
-    next = current + 1
-    rt.set_defense_level(entity, next)
 end
 
---- @brief lower defense by 1
+--- @brief subtract from stat
 --- @param entity Entity
-function rt.lower_defense_level(entity)
-    meta.assert_type(rt.Entity, entity, "lower_defense_level", 1)
-
-    local current = rt.get_defense_level(entity)
-    local next = rt.StatLevel.ZERO
-
-    if current == rt.StatLevel.MIN then
-        --- @todo: log
-        return
+--- @param value Number
+function rt.generate.reduce_stat(stat)
+    return function(entity, value)
+        meta.assert_type(entity)
+        rt["set_" .. stat](entity, rt["get_" .. stat] - value)
     end
-
-    next = current - 1
-    rt.set_defense_level(entity, next)
 end
 
---- @brief getter: current speed
---- @param entity Entity
---- @return Number
-function rt.get_speed(entity)
-    meta.assert_type(rt.Entity, entity, "get_speed")
+-- hp
+rt.get_hp = rt.generate.get_stat("hp")
+rt.get_hp_hp = rt.generate.get_stat_base("hp")
+rt.set_hp = rt.generate.set_stat("hp")
+rt.add_hp = rt.generate.add_stat("hp")
+rt.reduce_hp = rt.generate.reduce_stat("hp")
 
-    local out = entity.base_speed * rt.stat_modifier_to_factor(entity.speed_level)
+-- ap
+rt.get_ap = rt.generate.get_stat("ap")
+rt.get_ap_ap = rt.generate.get_stat_base("ap")
+rt.set_ap = rt.generate.set_stat("ap")
+rt.add_ap = rt.generate.add_stat("ap")
+rt.reduce_ap = rt.generate.reduce_stat("ap")
 
-    for status in pairs(entity.status_ailments) do
-        out = out * rt.status_ailment_to_speed_factor(status)
-    end
+-- attack
+rt.get_attack = rt.generate.get_stat("attack")
+rt.get_attack_base = rt.generate.get_stat_base("attack")
+rt.get_attack_level = rt.generate.get_stat_level("attack")
+rt.set_attack_level = rt.generate.set_stat_level("attack")
+rt.raise_attack_level = rt.generate.raise_stat_level("attack")
+rt.lower_attack_level = rt.generate.lower_stat_level("attack")
 
-    for _, effect in ipairs(entity.continuous_effects) do
-        out = out * effect.speed_multiplier
-    end
+-- defense
+rt.get_defense = rt.generate.get_stat("defense")
+rt.get_defense_base = rt.generate.get_stat_base("defense")
+rt.get_defense_level = rt.generate.get_stat_level("defense")
+rt.set_defense_level = rt.generate.set_stat_level("defense")
+rt.raise_defense_level = rt.generate.raise_stat_level("defense")
+rt.lower_defense_level = rt.generate.lower_stat_level("defense")
 
-    return out
-end
-
---- @brief getter: speed base
---- @param entity Entity
---- @return Number
-function rt.get_speed_base(entity)
-    meta.assert_type(rt.Entity, entity, "get_speed_base")
-    return entity.base_speed
-end
-
---- @brief getter: speed level
---- @param entity Entity
---- @return StatLevel
-function rt.get_speed_level(entity)
-    meta.assert_type(rt.Entity, entity, "get_speed_level")
-    return entity.speed_level
-end
-
---- @brief setter: speed modifier
---- @param entity Entity
---- @param modifier StatLevel
-function rt.set_speed_level(entity, modifier)
-
-    meta.assert_type(rt.Entity, entity, "set_speed_level", 1)
-    meta.assert_enum(rt.StatLevel, modifier, "set_speed_level", 2)
-
-    local current = rt.get_speed_level(entity)
-    local next = modifier
-
-    entity.speed_level = modifier;
-    rt.log(rt.stat_modifier_changed_message(entity, rt.Speed, current, next))
-end
-
---- @brief raise speed by 1
---- @param entity Entity
-function rt.raise_speed_level(entity)
-    meta.assert_type(rt.Entity, entity, "raise_speed_level", 1)
-
-    local current = rt.get_speed_level(entity)
-    local next = rt.StatLevel.ZERO
-
-    if current == rt.StatLevel.MAX then
-        --- @todo: log
-        return
-    end
-
-    next = current + 1
-    rt.set_speed_level(entity, next)
-end
-
---- @brief lower speed by 1
---- @param entity Entity
-function rt.lower_speed_level(entity)
-    meta.assert_type(rt.Entity, entity, "lower_speed_level", 1)
-
-    local current = rt.get_speed_level(entity)
-    local next = rt.StatLevel.ZERO
-
-    if current == rt.StatLevel.MIN then
-        --- @todo: log
-        return
-    end
-
-    next = current - 1
-    rt.set_speed_level(entity, next)
-end
+-- speed
+rt.get_speed = rt.generate.get_stat("speed")
+rt.get_speed_base = rt.generate.get_stat_base("speed")
+rt.get_speed_level = rt.generate.get_stat_level("speed")
+rt.set_speed_level = rt.generate.set_stat_level("speed")
+rt.raise_speed_level = rt.generate.raise_stat_level("speed")
+rt.lower_speed_level = rt.generate.lower_stat_level("speed")

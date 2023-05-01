@@ -130,17 +130,7 @@ end)
 --- @return ContinuousEffect
 rt._ContinuousEffects = {}
 function rt.new_effect(id, args)
-    args[id] = id
-    local out = meta.new(rt.ContinuousEffect, args)
-    rt._ContinuousEffects[id] = out
-    return out
-end
-
---- @brief access global database
---- @param id string
---- @return ContinuousEffect or nil
-function rt.get_effect(id)
-    return rt._ContinuousEffects[id]
+    return rt.ContinuousEffect(args)
 end
 
 --- @brief add to entity
@@ -152,7 +142,7 @@ function rt.add_effect(entity, effect)
     meta.assert_type(rt.ContinuousEffect, effect, "add_effect", 2)
 
     if entity.effects:insert(effect) then
-        rt.log(effect.status_gained_message(entity))
+        -- @todo log
     end
 end
 
@@ -183,7 +173,7 @@ function rt.remove_effect(entity, effect)
     for value in pairs(entity.effects) do
         if value.id == effect.id then
             entity.effects:erase(effect)
-            rt.log(effect.status_lost_message(entity))
+            -- @todo log
             return
         end
     end

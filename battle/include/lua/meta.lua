@@ -390,14 +390,20 @@ function meta.new(type, args)
             goto continue
         end
 
-        local ctor_value = args[name]
-        if ctor_value ~= nil then
-            x[name] = ctor_value
-        else
+        local value = args[name]
+        if value ~= nil then
             x[name] = value
+        else
+            x[name] = type.properties[name]
         end
 
         ::continue::
+    end
+
+    for name in pairs(args) do
+        if type.properties[name] == nil then
+            error("[ERROR] In meta.new: Type " .. type.name .. " has no field `" .. name .. "`")
+        end
     end
 
     return x
