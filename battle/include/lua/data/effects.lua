@@ -16,6 +16,7 @@ rt.AT_RISK = rt.new_effect("at_risk", {
         rt.log(self.name .. " is no longer at risk")
     end,
 
+    name = "TODO",
     description = "TODO"
 })
 
@@ -37,6 +38,7 @@ rt.POISONED = rt.new_effect("poisoned", {
         rt.log(self.name .. " is no longer poisoned")
     end,
 
+    name = "TODO",
     description = "TODO"
 })
 
@@ -59,6 +61,7 @@ rt.BURNED = rt.new_effect("burned", {
         rt.log(self.name .. " is no longer poisoned")
     end,
 
+    name = "TODO",
     description = "TODO"
 })
 
@@ -76,6 +79,7 @@ rt.BLINDED = rt.new_effect("blinded", {
         rt.log(self.name .. " is no longer blinded and can see clearly again")
     end,
 
+    name = "TODO",
     description = "TODO"
 })
 
@@ -93,6 +97,7 @@ rt.FROZEN = rt.new_effect("frozen", {
         rt.log(self.name .. " thawed and is no longer frozen")
     end,
 
+    name = "TODO",
     description = "TODO"
 })
 
@@ -115,6 +120,7 @@ rt.CHILLED = rt.new_effect("chilled", {
         rt.log(self.name .. " is now chilled")
     end,
 
+    name = "TODO",
     description = "TODO"
 })
 
@@ -130,7 +136,10 @@ rt.STUNNED = rt.new_effect("stunned", {
 
     on_status_lost = function(self)
         rt.log(self.name .. " is no longer stunned")
-    end
+    end,
+
+    name = "TODO",
+    description = "TODO"
 })
 
 --- @brief sleep: wake up if damaged
@@ -153,6 +162,7 @@ rt.ASLEEP = rt.new_effect("asleep", {
         rt.log(self.name .. " woke up")
     end,
 
+    name = "TODO",
     description = "TODO"
 })
 
@@ -200,5 +210,6 @@ rt.UNAWARE = rt.new_effect("unaware", {
         rt.unmute_animations()
     end,
 
+    name = "TODO",
     description = "TODO"
 })

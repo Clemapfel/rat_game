@@ -119,3 +119,53 @@ function rt.reflexive_pronoun(id)
     end
 end
 
+
+
+--- @brief message when stat is raised
+--- @param subject BattleID
+--- @param state string stat name, for example "Attack"
+--- @param current_level StatLevel current level
+--- @param next_level StatLevel newly to-apply level
+function rt.stat_level_changed_message(subject, stat, current_level, next_level)
+
+    meta.assert_type(rt.Entity, subject)
+    meta.assert_enum(rt.StatLevel, current_level)
+    meta.assert_enum(rt.StatLevel, next_level)
+
+    local id = rt.get_id(subject)
+
+    if (current_level == next_level) then
+        return id.name .. "s " .. stat .. " remained unchanged"
+    end
+
+    if (next_level == rt.StatLevel.ZERO) then
+        return id.name .. "s " .. stat .. " was reset" -- TODO: phrasing
+    end
+
+    if (next_level == rt.StatLevel.MIN) then
+        return id.name .. "s " .. stat .. " was minimized" -- TODO: phrasing
+    end
+
+    local delta = math.abs(current_level - next_level)
+    local out = id.name .. "s " .. stat
+
+    if (current_level > next_level) then
+        if delta == 1 then
+            return out .. " was lowered"
+        elseif delta == 2 then
+            return out .. " was sharply lowered"
+        else
+            return out .. " was drastically lowered"
+        end
+    elseif (current_level < next_level) then
+        if delta == 1 then
+            return out .. " grew"
+        elseif delta == 2 then
+            return out .. " grew sharply"
+        else
+            return out .. " grew drastically"
+        end
+    end
+end
+
+

@@ -15,16 +15,17 @@ require "battle_log"
 require "stat_level"
 require "continuous_effect"
 require "weather"
+require "move"
 require "entity"
 
 require "data/effects"
+require "data/moves"
 
 --- @TODO
 
 entity_a = rt.Entity("a")
 entity_b = rt.Entity("b")
 
-
-rt.raise_attack_level(entity_b)
-rt.add_effect(entity_b, rt.BURNED)
-println(rt.get_attack(entity_b))
+println(rt.get_hp(entity_b))
+rt.BASIC_ATTACK.apply(entity_a, entity_b)
+println(rt.get_hp(entity_b))

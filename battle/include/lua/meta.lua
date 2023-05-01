@@ -444,3 +444,15 @@ function meta.assert_enum(enum, x, domain, arg_i)
         error("[ERROR] In " .. domain .. ": Argument Mismatch for parameter #" .. tostring(arg_i) .. ": Argument `" .. tostring(x) .. "` is not an enum value")
     end
 end
+
+--- @brief raise an error when input item is not as expected
+--- @param type meta.Enum
+--- @param x any
+--- @param domain string
+--- @param arg_i number
+function meta.assert_number(x, domain, arg_i)
+
+    if not meta.is_number(x) then
+        error("[ERROR] In " .. domain .. ": Argument Mismatch for parameter #" .. tostring(arg_i) .. ": Argument `" .. tostring(x) .. "` is not a number")
+    end
+end

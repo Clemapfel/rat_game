@@ -125,11 +125,14 @@ meta.set_constructor(rt.ContinuousEffect, function(self, args)
 end)
 
 --- @brief add continuous effect
---- @param id string
---- @param arguments table
+--- @param id String
+--- @param arguments Table
 --- @return ContinuousEffect
-rt._ContinuousEffects = {}
 function rt.new_effect(id, args)
+    args.id = id
+    if args.name == nil then
+        args.name = id
+    end
     return rt.ContinuousEffect(args)
 end
 

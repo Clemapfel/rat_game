@@ -33,6 +33,8 @@ meta.set_constructor(rt.Entity, function(this, id)
     local out = meta.new(rt.Entity)
     out.id = id
     out.name = id
+    out.hp_current = out.hp_base
+    out.ap_current = out.ap_base
     return out
 end)
 
@@ -62,7 +64,10 @@ function rt.generate.get_stat(stat)
             out = out * effect[stat .. "_factor"]
         end
 
-        out = out * rt.stat_level_to_factor(entity[stat .. "_level"])
+        local level = entity[stat .. "_level"]
+        if level ~= nil then
+            out = out * rt.stat_level_to_factor(level)
+        end
 
         for effect in pairs(entity.effects) do
             out = out + effect[stat .. "_offset"]
@@ -77,8 +82,20 @@ end
 --- @return Number
 function rt.generate.set_stat(stat)
     return function(entity, value)
-        entity[stat] = value
-        -- @todo log
+
+        meta.assert_type(rt.Entity, entity, "set_" .. stat, 1)
+        meta.assert_number(value, "set_" .. stat, 2)
+
+        local delta = value - entity[stat .. "_current"]
+        entity[stat .. "_current"] = value
+
+        if delta > 0 then
+            rt.log(entity.name .. " gained " .. serialize(delta) .. " " .. stat)
+        elseif delta < 0 then
+            rt.log(entity.name .. " lost " .. serialize(math.abs(delta)) .. " " .. stat)
+        else
+            rt.log(entity.name .. " took no damage")
+        end
     end
 end
 
@@ -87,7 +104,7 @@ end
 --- @return Number
 function rt.generate.get_stat_base(stat)
     return function(entity)
-        meta.assert_type(rt.Entity, entity, "get_" .. stat .. "_base")
+        meta.assert_type(rt.Entity, entity, "get_" .. stat .. "_base", 1)
         return entity[stat .. "_base"]
     end
 end
@@ -97,7 +114,7 @@ end
 --- @return StatLevel
 function rt.generate.get_stat_level(stat)
     return function(entity)
-        meta.assert_type(rt.Entity, entity)
+        meta.assert_type(rt.Entity, entity, "get_" .. stat .. "_level", 1)
         return entity[stat .. "_level"]
     end
 end
@@ -107,8 +124,8 @@ end
 --- @param StatLevel
 function rt.generate.set_stat_level(stat)
     return function(entity, level)
-        meta.assert_type(rt.Entity, entity)
-        meta.assert_enum(rt.StatLevel, level)
+        meta.assert_type(rt.Entity, entity, "set_" .. stat .. "_level", 1)
+        meta.assert_enum(rt.StatLevel, level, "set_" .. stat .. "_level", 2)
 
         entity[stat .. "_level"] = level
         --@todo log
@@ -158,8 +175,10 @@ end
 --- @param value Number
 function rt.generate.add_stat(stat)
     return function(entity, value)
-        meta.assert_type(entity)
-        rt["set_" .. stat](entity, rt["get_" .. stat] + value)
+        meta.assert_type(rt.Entity, entity, "add_" .. stat, 1)
+        meta.assert_number(value, "add_" .. stat, 2)
+
+        rt["set_" .. stat](entity, rt["get_" .. stat](entity) + value)
     end
 end
 
@@ -168,8 +187,10 @@ end
 --- @param value Number
 function rt.generate.reduce_stat(stat)
     return function(entity, value)
-        meta.assert_type(entity)
-        rt["set_" .. stat](entity, rt["get_" .. stat] - value)
+        meta.assert_type(rt.Entity, entity, "reduce_" .. stat, 1)
+        meta.assert_number(value, "reduce_" .. stat, 2)
+
+        rt["set_" .. stat](entity, rt["get_" .. stat](entity) - value)
     end
 end
 

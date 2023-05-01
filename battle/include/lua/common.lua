@@ -21,14 +21,16 @@ function println(...)
 
     local values = {...}
     if #values == 0 then
-        io.write("nil\n")
+        io.write("nil")
         return
     end
 
     for _, v in pairs(values) do
         print(v)
-        io.write("\n")
+        io.write("")
     end
+
+    io.write("\n")
 end
 
 --- @brief get number of elements in arbitrary object
@@ -182,7 +184,14 @@ function serialize(object_identifier, object, inject_sourcecode)
     serialize_inner = function (buffer, object, n_indent_tabs)
 
         if type(object) == "number" then
-            insert(buffer, object)
+
+            -- remove .0 for integers
+            if math.fmod(object, 1) == 0 then
+                local base = tostring(object)
+                insert(buffer, string.sub(base, 0, sizeof(base) - 2))
+            else
+                insert(buffer, object)
+            end
 
         elseif type(object) == "boolean" then
             if (object) then insert(buffer, "true") else insert(buffer, "false") end
