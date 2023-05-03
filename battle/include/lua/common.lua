@@ -209,16 +209,15 @@ function serialize(object_identifier, object, inject_sourcecode)
                 local index = 0
                 for key, value in pairs(object) do
 
-                    if type(key) == "string" then
-                        insert(buffer, get_indent(n_indent_tabs), key, " = ")
-
-                    elseif type(key) == "number" then
+                    if type(key) == "number" then
 
                         if key ~= index+1 then
                             insert(buffer, get_indent(n_indent_tabs), "[", key, "] = ")
                         else
                             insert(buffer, get_indent(n_indent_tabs))
                         end
+                    else
+                        insert(buffer, get_indent(n_indent_tabs), tostring(key), " = ")
                     end
 
                     serialize_inner(buffer, value, n_indent_tabs)

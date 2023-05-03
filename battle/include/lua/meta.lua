@@ -446,13 +446,64 @@ function meta.assert_enum(enum, x, domain, arg_i)
 end
 
 --- @brief raise an error when input item is not as expected
---- @param type meta.Enum
 --- @param x any
 --- @param domain string
 --- @param arg_i number
 function meta.assert_number(x, domain, arg_i)
-
     if not meta.is_number(x) then
         error("[ERROR] In " .. domain .. ": Argument Mismatch for parameter #" .. tostring(arg_i) .. ": Argument `" .. tostring(x) .. "` is not a number")
     end
 end
+
+--- @brief raise an error when input item is not as expected
+--- @param x any
+--- @param domain string
+--- @param arg_i number
+function meta.assert_string(x, domain, arg_i)
+    if not meta.is_string(x) then
+        error("[ERROR] In " .. domain .. ": Argument Mismatch for parameter #" .. tostring(arg_i) .. ": Argument `" .. tostring(x) .. "` is not a string")
+    end
+end
+
+--- @brief raise an error when input item is not as expected
+--- @param x any
+--- @param domain string
+--- @param arg_i number
+function meta.assert_boolean(x, domain, arg_i)
+    if not meta.is_boolean(x) then
+        error("[ERROR] In " .. domain .. ": Argument Mismatch for parameter #" .. tostring(arg_i) .. ": Argument `" .. tostring(x) .. "` is not a boolean")
+    end
+end
+
+--- @brief raise an error when input item is not as expected
+--- @param x any
+--- @param domain string
+--- @param arg_i number
+function meta.assert_table(x, domain, arg_i)
+    if not meta.is_table(x) then
+        error("[ERROR] In " .. domain .. ": Argument Mismatch for parameter #" .. tostring(arg_i) .. ": Argument `" .. tostring(x) .. "` is not a boolean")
+    end
+end
+
+--- @brief raise an error when input item is not as expected
+--- @param x any
+--- @param domain string
+--- @param arg_i number
+function meta.assert_function(x, domain, arg_i)
+    if not meta.is_function(x) then
+        error("[ERROR] In " .. domain .. ": Argument Mismatch for parameter #" .. tostring(arg_i) .. ": Argument `" .. tostring(x) .. "` is not a a valid function")
+    end
+end
+
+--- @brief raise an error when input item is not as expected
+--- @param x any
+--- @param domain string
+--- @param arg_i number
+function meta.assert_valid_name(x, domain, arg_i)
+    if not meta.is_string(x) or not meta.is_valid_name(x) then
+        error("[ERROR] In " .. domain .. ": Argument Mismatch for parameter #" .. tostring(arg_i) .. ": Argument `" .. tostring(x) .. "` is not a a valid identifier")
+    end
+end
+
+
+

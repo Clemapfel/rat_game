@@ -13,6 +13,10 @@ meta.set_constructor(rt.IgnitionEffect, function(type, f)
 
     local out = meta.new(rt.IgnitionEffect)
 
+    if f ~= nil then
+        meta.assert_function(f, "IgnitionEffect", 2)
+    end
+
     out.__meta.__call = function(instance, self, other, data)
         instance.apply(self, other, data)
     end

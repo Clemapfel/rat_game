@@ -4,6 +4,7 @@ rt.Entity = meta.new_type("Entity", {
     id = "",
     name = "",
     gender = rt.GrammaticGender.NEUTRAL,
+    is_enemy = true,
 
     attack_base = meta.Number(1),
     defense_base = meta.Number(1),
@@ -38,19 +39,6 @@ meta.set_constructor(rt.Entity, function(this, id)
     return out
 end)
 
---- @brief get id
---- @return BattleID
-function rt.get_id(entity)
-
-    meta.assert_type(rt.Entity, entity, "get_id", 1)
-
-    return rt.BattleID({
-        id = entity.id,
-        name = entity.name,
-        gender = entity.gender
-    })
-end
-
 --- @brief get current stat value
 --- @param entity Entity
 --- @return Number
@@ -60,6 +48,10 @@ function rt.generate.get_stat(stat)
 
         local out = entity[stat .. "_base"]
 
+        if rt.current_weather ~= nil then
+            out = out * rt.continuous_effect[stat .. "_factor"]
+        end
+
         for effect in pairs(entity.effects) do
             out = out * effect[stat .. "_factor"]
         end
@@ -67,6 +59,10 @@ function rt.generate.get_stat(stat)
         local level = entity[stat .. "_level"]
         if level ~= nil then
             out = out * rt.stat_level_to_factor(level)
+        end
+
+        if rt.current_weather ~= nil then
+            out = out * rt.continuous_effect[stat .. "_offset"]
         end
 
         for effect in pairs(entity.effects) do
@@ -94,7 +90,7 @@ function rt.generate.set_stat(stat)
         elseif delta < 0 then
             rt.log(entity.name .. " lost " .. serialize(math.abs(delta)) .. " " .. stat)
         else
-            rt.log(entity.name .. " took no damage")
+            rt.log(entity.name .. "s " .. stat .. " remained unchanged")
         end
     end
 end
@@ -194,10 +190,40 @@ function rt.generate.reduce_stat(stat)
     end
 end
 
+--- @brief set hp
+--- @param entity Entity
+--- @return Number
+function rt.set_hp(entity, value)
+
+    meta.assert_type(rt.Entity, entity, "set_hp", 1)
+    meta.assert_number(value, "set_hp", 2)
+
+    local delta = value - entity["hp_current"]
+
+    if entity.status == rt.Status.KNOCKED_OUT and delta > 0 then
+        rt.kill(entity)
+        return
+    end
+
+    entity.hp_current = value
+
+    if delta > 0 then
+        rt.log(entity.name .. "s hp were restored by " .. serialize(delta))
+    elseif delta < 0 then
+        rt.log(entity.name .. " took " .. serialize(math.abs(delta)) .. " damage")
+    else
+        rt.log(entity.name .. "s " .. stat .. " remained unchanged")
+    end
+
+    if value == 0 then
+        rt.knock_out(entity)
+        return
+    end
+end
+
 -- hp
 rt.get_hp = rt.generate.get_stat("hp")
 rt.get_hp_hp = rt.generate.get_stat_base("hp")
-rt.set_hp = rt.generate.set_stat("hp")
 rt.add_hp = rt.generate.add_stat("hp")
 rt.reduce_hp = rt.generate.reduce_stat("hp")
 
