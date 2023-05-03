@@ -257,3 +257,19 @@ rt.get_speed_level = rt.generate.get_stat_level("speed")
 rt.set_speed_level = rt.generate.set_stat_level("speed")
 rt.raise_speed_level = rt.generate.raise_stat_level("speed")
 rt.lower_speed_level = rt.generate.lower_stat_level("speed")
+
+--- @brief get id
+--- @param entity Entity
+--- @return String
+function rt.get_id(entity)
+    meta.assert_type(rt.Entity, entity, "get_id")
+    return entity.id
+end
+
+--- @brief get name
+--- @param entity Entity
+--- @return String
+function rt.get_name(entity)
+    meta.assert_type(rt.Entity, entity, "get_name")
+    return entity.name
+end

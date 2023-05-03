@@ -16,7 +16,7 @@ namespace rt::battle
     return_t Entity::name() const                   \
     {                                               \
         static sol::function f = state["rt"][#name]; \
-        return f(_internal);                        \
+        return static_cast<return_t>(f(_internal));                        \
     }
 
     implement_entity_function(get_attack, float);
@@ -34,4 +34,7 @@ namespace rt::battle
     implement_entity_function(get_attack_level, int);
     implement_entity_function(get_defense_level, int);
     implement_entity_function(get_speed_level, int);
+
+    implement_entity_function(get_name, std::string);
+    implement_entity_function(get_id, std::string);
 }

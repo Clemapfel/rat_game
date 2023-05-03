@@ -13,6 +13,9 @@ namespace rt::battle
         public:
             Entity(sol::table);
 
+            std::string get_id() const;
+            std::string get_name() const;
+
             float get_attack() const;
             float get_defense() const;
             float get_speed() const;
