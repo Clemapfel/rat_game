@@ -1,13 +1,16 @@
 #include <sol/sol.hpp>
 #include <mousetrap.hpp>
 
+#include <include/lua/state.hpp>
+#include <include/battle_entity.hpp>
+
 const std::string RESOURCE_PATH = "/home/clem/Workspace/rat_game/battle/";
 using namespace mousetrap;
+using namespace rt;
 
 int main()
 {
-    static sol::state lua;
-    lua.open_libraries(
+    rt::battle::state.open_libraries(
         sol::lib::base,
         sol::lib::package,
         sol::lib::os,
@@ -18,8 +21,11 @@ int main()
         sol::lib::coroutine
     );
 
-    lua["RESOURCE_PATH"] = RESOURCE_PATH;
-    lua.safe_script_file(RESOURCE_PATH + "include.lua");
+    rt::battle::state["RESOURCE_PATH"] = RESOURCE_PATH;
+    rt::battle::state.safe_script_file(RESOURCE_PATH + "include.lua");
+
+    auto entity = battle::Entity(battle::state.get<sol::table>("entity_a"));
+    std::cout << entity.get_attack_level() << std::endl;
 
     return 0;
 

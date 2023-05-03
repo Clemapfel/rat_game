@@ -18,7 +18,7 @@ endif()
 
 ### EXECUTABLE ###
 
-add_executable(battle_main battle/main.cpp)
+add_executable(battle_main battle/main.cpp battle/include/party_info.hpp battle/include/battle_entity.hpp battle/src/battle_entity.cpp battle/include/lua/state.hpp battle/src/party_info.cpp battle/include/verbose_entity_info.hpp battle/src/verbose_entity_info.cpp battle/include/level_bar.hpp)
 target_link_libraries(battle_main PRIVATE
     ${lua}
     ${mousetrap}
