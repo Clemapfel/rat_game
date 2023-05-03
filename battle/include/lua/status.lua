@@ -6,6 +6,7 @@ rt.Status = meta.new_enum({
 })
 
 --- @brief set status to knocked out
+--- @param entity Entity
 function rt.knock_out(entity)
 
     meta.assert_type(rt.Entity, entity, "knock_out")
@@ -24,6 +25,7 @@ function rt.knock_out(entity)
 end
 
 --- @brief kill
+--- @param entity Entity
 function rt.kill(entity)
 
     meta.assert_type(rt.Entity, entity, "kill")
