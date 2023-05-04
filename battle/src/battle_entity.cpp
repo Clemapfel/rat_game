@@ -19,6 +19,7 @@ namespace rt::battle
         return static_cast<return_t>(f(_internal));                        \
     }
 
+
     implement_entity_function(get_attack, float);
     implement_entity_function(get_defense, float);
     implement_entity_function(get_speed, float);
