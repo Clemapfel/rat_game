@@ -21,6 +21,7 @@ rt.Entity = meta.new_type("Entity", {
     speed_level = rt.StatLevel.ZERO,
 
     status = rt.ALIVE,
+    priority = rt.Priority.NEUTRAL,
 
     effects = Set() -- rt.ContinuousEffect
 })
@@ -257,6 +258,33 @@ rt.get_speed_level = rt.generate.get_stat_level("speed")
 rt.set_speed_level = rt.generate.set_stat_level("speed")
 rt.raise_speed_level = rt.generate.raise_stat_level("speed")
 rt.lower_speed_level = rt.generate.lower_stat_level("speed")
+
+--- @brief get priority
+--- @param entity Entity
+function rt.get_priority(entity)
+
+    meta.assert_type(rt.Entity, entity, "get_priority", 1)
+    local out = entity.priority
+    for effect in pairs(entity.effects) do
+        out = out + effect.priority_offset
+    end
+
+    if out < rt.Priority.NEGATIVE then
+        return rt.Priority.NEGATIVE
+    elseif out > rt.Priority.POSITIVE then
+        return rt.Priority.POSITIVE
+    else
+        return out
+    end
+end
+
+--- @brief set priority
+--- @param entity Entity
+function rt.set_priority(entity, priority)
+    meta.assert_type(rt.Entity, entity, "set_priority", 1)
+    meta.assert_enum(rt.Priority, priority)
+    entity.priority = priority
+end
 
 --- @brief get id
 --- @param entity Entity

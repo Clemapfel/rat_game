@@ -6,8 +6,7 @@ project(rat_game VERSION 0.1.0 DESCRIPTION "" LANGUAGES CXX)
 find_library(lua REQUIRED NAMES lua)
 set(SOL_INCLUDE_DIR "${CMAKE_SOURCE_DIR}/submodules/sol2/include")
 
-find_library(mousetrap REQUIRED NAMES mousetrap PATHS "${CMAKE_SOURCE_DIR}/submodules/mousetrap/build")
-set(MOUSETRAP_INCLUDE_DIR "${CMAKE_SOURCE_DIR}/submodules/mousetrap")
+find_package(mousetrap REQUIRED)
 
 find_package(PkgConfig)
 pkg_check_modules(GTK gtk4)
@@ -18,16 +17,16 @@ endif()
 
 ### EXECUTABLE ###
 
-add_executable(battle_main battle/main.cpp battle/include/party_info.hpp battle/include/battle_entity.hpp battle/src/battle_entity.cpp battle/include/lua/state.hpp battle/src/party_info.cpp battle/include/verbose_entity_info.hpp battle/src/verbose_entity_info.cpp battle/include/level_bar.hpp)
+add_executable(battle_main battle/main.cpp battle/include/party_info.hpp battle/include/battle_entity.hpp battle/src/battle_entity.cpp battle/include/lua/state.hpp battle/src/party_info.cpp battle/include/verbose_entity_info.hpp battle/src/verbose_entity_info.cpp)
 target_link_libraries(battle_main PRIVATE
     ${lua}
-    ${mousetrap}
+    "${MOUSETRAP_LIBRARIES}"
     ${GTK_LIBRARIES}
 )
 
 target_include_directories(battle_main PRIVATE
     "${SOL_INCLUDE_DIR}"
-    "${MOUSETRAP_INCLUDE_DIR}"
+    "${MOUSETRAP_INCLUDE_DIRECTORIES}"
     "${CMAKE_SOURCE_DIR}/battle/"
     "${GTK_INCLUDE_DIRS}"
 )

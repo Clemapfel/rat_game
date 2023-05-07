@@ -29,12 +29,14 @@ int main()
     app.connect_signal_activate([](Application* app){
         auto window = Window(*app);
 
-        static sol::table temp = battle::state["entity_a"];
-        static auto entity = battle::Entity(temp);
-        static auto entity_info = battle::VerboseEntityInfo();
-        entity_info.update_from(entity);
-
-        window.set_child(entity_info);
+        auto button = Button();
+        button.connect_signal_clicked([](Button*){
+            sol::function step = battle::state["rt"]["step"];
+            step();
+        });
+        button.set_child(Label("&#8594;"));
+        button.set_margin(75);
+        window.set_child(button);
         window.present();
     });
 

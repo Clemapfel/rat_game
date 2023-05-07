@@ -64,6 +64,8 @@ rt.ContinuousEffect = meta.new_type("ContinuousEffect", {
     speed_factor = meta.Number(1),
     speed_offset = meta.Number(0),
 
+    priority_offset = 0,
+
     --- @brief (Entity self, ContinuousEffect this) - nil
     on_status_gained = rt.IgnitionEffect(),
 
