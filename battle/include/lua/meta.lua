@@ -73,7 +73,7 @@ function meta.is_nil(x)
 end
 
 ---@brief Is callable
----@param x and
+---@param x any
 ---@returns boolean
 function meta.is_function(x)
     if type(x) == "function" then
@@ -147,7 +147,7 @@ function meta.new_enum(values)
     out.__meta.__index = function(instance, key)
         local res = instance.__meta.values[key]
         if res == nil then
-            error("In Enum.__index: No key with name `" .. key .. "`")
+            error("In enum.__index: No key with name `" .. key .. "`")
         end
         return res
     end

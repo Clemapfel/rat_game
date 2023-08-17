@@ -1,4 +1,4 @@
--- RESOURCE_PATH = ""
+-- RESOURCE_PATH = "."
 package.path = package.path .. ";" .. RESOURCE_PATH .. "include/lua/?.lua"
 
 require "common"
@@ -29,7 +29,6 @@ require "data/weathers"
 entity_a = rt.Entity("a")
 entity_b = rt.Entity("b")
 rt.raise_attack_level(entity_a)
-
 
 do
 local brackets = {}

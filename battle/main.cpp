@@ -26,11 +26,11 @@ int main()
     rt::battle::state.safe_script_file(RESOURCE_PATH + "include.lua");
 
     auto app = Application("rat.game");
-    app.connect_signal_activate([](Application* app){
-        auto window = Window(*app);
+    app.connect_signal_activate([](Application& app){
+        auto window = Window(app);
 
         auto button = Button();
-        button.connect_signal_clicked([](Button*){
+        button.connect_signal_clicked([](Button&){
             sol::function step = battle::state["rt"]["step"];
             step();
         });
