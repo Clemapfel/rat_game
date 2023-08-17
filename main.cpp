@@ -1,13 +1,13 @@
 #include <sol/sol.hpp>
 #include <mousetrap.hpp>
 
-#include <include/lua/state.hpp>
-#include <include/battle_entity.hpp>
-#include <include/verbose_entity_info.hpp>
-
 const std::string RESOURCE_PATH = "/home/clem/Workspace/rat_game/battle/";
 using namespace mousetrap;
-using namespace rt;
+
+namespace rt::battle
+{
+    static inline sol::state state = sol::state();
+}
 
 int main()
 {
@@ -31,7 +31,7 @@ int main()
 
         auto button = Button();
         button.connect_signal_clicked([](Button&){
-            sol::function step = battle::state["rt"]["step"];
+            sol::function step = rt::battle::state["rt"]["step"];
             step();
         });
         button.set_child(Label("&#8594;"));

@@ -13,7 +13,15 @@ pkg_check_modules(GTK REQUIRED gtk4)
 
 ### EXECUTABLE ###
 
-add_executable(battle_main battle/main.cpp battle/include/party_info.hpp battle/include/battle_entity.hpp battle/src/battle_entity.cpp battle/include/lua/state.hpp battle/src/party_info.cpp battle/include/verbose_entity_info.hpp battle/src/verbose_entity_info.cpp)
+set(MOUSETRAP_HEADER_FILES
+    battle/party_info.hpp
+)
+
+set(MOUSETRAP_SOURCE_FILES
+    battle/party_info.cpp
+)
+
+add_executable(battle_main main.cpp)
 target_link_libraries(battle_main PRIVATE
     "${lua}"
     "${MOUSETRAP_LIBRARIES}"
@@ -22,7 +30,6 @@ target_link_libraries(battle_main PRIVATE
 target_include_directories(battle_main PRIVATE
     "${SOL_INCLUDE_DIR}"
     "${MOUSETRAP_INCLUDE_DIRECTORIES}"
-    "${CMAKE_SOURCE_DIR}/battle/"
 )
 
 target_compile_features(battle_main PUBLIC
