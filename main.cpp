@@ -1,7 +1,7 @@
 #include <sol/sol.hpp>
 #include <mousetrap.hpp>
 
-const std::string RESOURCE_PATH = "/home/clem/Workspace/rat_game/battle/";
+const std::string RESOURCE_PATH = "/home/clem/Workspace/rat_game/";
 using namespace mousetrap;
 
 namespace rt::battle
@@ -19,26 +19,12 @@ int main()
         sol::lib::string,
         sol::lib::table,
         sol::lib::math,
-        sol::lib::coroutine
+        sol::lib::coroutine,
+        sol::lib::debug
     );
 
     rt::battle::state["RESOURCE_PATH"] = RESOURCE_PATH;
-    rt::battle::state.safe_script_file(RESOURCE_PATH + "include.lua");
+    rt::battle::state.safe_script_file(RESOURCE_PATH + "lua/include.lua");
 
-    auto app = Application("rat.game");
-    app.connect_signal_activate([](Application& app){
-        auto window = Window(app);
-
-        auto button = Button();
-        button.connect_signal_clicked([](Button&){
-            sol::function step = rt::battle::state["rt"]["step"];
-            step();
-        });
-        button.set_child(Label("&#8594;"));
-        button.set_margin(75);
-        window.set_child(button);
-        window.present();
-    });
-
-    return app.run();
+    return 0;
 }
