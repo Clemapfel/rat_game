@@ -60,7 +60,7 @@ function meta.is_function(x)
 end
 
 --- @brief [internal] access metatable used by module meta
-function meta._get_metatable(x)
+function getmetatable(x)
     return rawget(x, "__meta")
 end
 
@@ -76,8 +76,37 @@ function meta._new(typename)
     out.__meta.properties = {}
     out.__meta.is_private = {}
     out.__meta.is_mutable = true
-    out.__meta.signals = {}
-    out.__meta.notify = {}
+
+    out.__meta.__index = function(this, property_name)
+        local metatable = getmetatable(this)
+        if metatable.is_private[property_name] == true then
+            error("In " .. metatable.typename .. ".__index: Cannot access property `" .. property_name .. "`, because it was declared private.")
+        end
+        return metatable.properties[property_name]
+    end
+
+    out.__meta.__newindex = function(this, property_name, property_value)
+        local metatable = getmetatable(this)
+        if metatable.is_private[property_name] == true then
+            error("In " .. metatable.typename .. ".__newindex: Cannot set property `" .. property_name .. "`, because it was declared private.")
+        end
+        if not metatable.is_mutable then
+            error("In " .. metatable.typename .. ".__newindex: Cannot set property `" .. property_name .. "`, object was declared immutable.")
+        end
+        metatable.properties[property_name] = property_value
+
+        if metatable.notify == nil then return end
+        local notify = metatable.notify[property_name]
+        if meta.is_table(notify) and not notify.is_blocked  then
+            notify.callback(this, property_value)
+        end
+    end
+
+    out.__meta.__tostring = function(this)
+        return serialize("(" .. this.__meta.typename .. ")", this, false)
+    end
+
+    setmetatable(out, out.__meta)
 
     local function assert_has_signal(this, signal_name)
         if this.__meta.signals[signal_name] ~= nil then
@@ -89,6 +118,7 @@ function meta._new(typename)
 
     local function init_notify(x, name)
         if meta.is_table(x.__meta.notify[name]) then return end
+        x.__meta.notify = {}
         x.__meta.notify[name] = {
             is_blocked = false,
             callback = function()  end
@@ -172,35 +202,6 @@ function meta._new(typename)
         this.__meta.notify[name].callback = function () end
     end
 
-    out.__meta.__index = function(this, property_name)
-        local metatable = meta._get_metatable(this)
-
-        if metatable.is_private[property_name] == true then
-            error("In " .. metatable.typename .. ".__index: Cannot access property `" .. property_name .. "`, because it was declared private.")
-        end
-        return metatable.properties[property_name]
-    end
-
-    out.__meta.__newindex = function(this, property_name, property_value)
-        local metatable = meta._get_metatable(this)
-        if metatable.is_private[property_name] == true then
-            error("In " .. metatable.typename .. ".__newindex: Cannot set property `" .. property_name .. "`, because it was declared private.")
-        end
-        if not metatable.is_mutable then
-            error("In " .. metatable.typename .. ".__newindex: Cannot set property `" .. property_name .. "`, object was declared immutable.")
-        end
-        metatable.properties[property_name] = property_value
-        local notify = metatable.notify[property_name]
-        if meta.is_table(notify) and not notify.is_blocked  then
-            notify.callback(this, property_value)
-        end
-    end
-
-    out.__meta.__tostring = function(this)
-        return serialize("(" .. this.__meta.typename .. ")", this, false)
-    end
-
-    setmetatable(out, out.__meta)
     return out
 end
 
@@ -221,13 +222,20 @@ function meta.typeof(x)
     if not meta.is_table(x) then
         return type(x)
     else
-        local metatable = meta._get_metatable(x)
+        local metatable = getmetatable(x)
         if meta.is_nil(metatable) then
             return meta.Table
         else
             return x.__meta.typename
         end
     end
+end
+
+--- @brief check if type is as given
+--- @param x
+--- @param type string
+function meta.isa(x, type)
+    return meta.typeof(x) == type
 end
 
 --- @brief [internal] print type assertion error message
@@ -289,7 +297,12 @@ function meta._install_signal(x, signal_name)
     meta.assert_object(x)
     meta.assert_string(signal_name)
 
-    meta._get_metatable(x).signals[signal_name] = {
+    local metatable = getmetatable(x)
+    if meta.is_nil(metatable.signals) then
+        metatable.signals = {}
+    end
+
+    metatable.signals[signal_name] = {
         is_blocked = false,
         callback = function() end
     }
@@ -301,14 +314,19 @@ function meta._uninstall_signal(x, signal_name)
     meta.assert_object(x)
     meta.assert_string(signal_name)
 
-    meta._get_metatable(x).signals[signal_name] = nil
+    local metatable = getmetatable(x)
+    metatble.signals[signal_name] = nil
+
+    if is_empty(metatable).signals then
+        metatable.signals = nil
+    end
 end
 
 --- @brief [internal] add a property, set to intial value
 function meta._install_property(x, property_name, initial_value, is_private)
     meta.assert_object(x);
     meta.assert_string(property_name)
-    local metatable = meta._get_metatable(x)
+    local metatable = getmetatable(x)
     metatable.properties[property_name] = initial_value
     metatable.is_private[property_name] = (is_private == true)
 end
@@ -317,7 +335,7 @@ end
 function meta._uninstall_property(x, property_name)
     meta.assert_object(x);
     meta.assert_string(property_name)
-    local metatable = meta._get_metatable(x)
+    local metatable = getmetatable(x)
     metatable.properties[property_name] = nil
     metatable.is_private[property_name] = nil
 end
@@ -326,21 +344,28 @@ end
 function meta._set_is_mutable(x, b)
     meta.assert_object(x);
     meta.assert_boolean(b)
-    meta._get_metatable(x).is_mutable = b
+    getmetatable(x).is_mutable = b
 end
 
 --- @brief [internal] check if object is immutable
 function meta._get_is_mutable(x)
     meta.assert_object(x);
-    return meta._get_metatable(x).is_mutable
+    return getmetatable(x).is_mutable
 end
 
 --- @brief create a new object instance
---- @param typename String type
+--- @param type
 --- @param fields Table property_name -> property_value
-function meta.new(typename, fields)
-    meta.assert_string(typename)
-    local out = meta._new(typename)
+function meta.new(type, fields)
+
+    local out = {}
+    if meta.isa(typename, "Type") then
+        out = meta._new(type.name)
+    else
+        meta.assert_string(type)
+        out = meta._new(type)
+    end
+
     meta._set_is_mutable(out, true)
     if fiels ~= nil then
         for name, value in pairs(fields) do
@@ -364,6 +389,15 @@ function meta.new_enum(fields)
         end
         meta._install_property(out, name, value)
     end
+    return out
+end
+
+function meta.new_type(typename, ctor)
+    meta.assert_string(typename) meta.assert_function(ctor)
+    local out = meta._new("Type")
+    out.name = typename
+    getmetatable(out).__call = ctor
+    meta._set_is_mutable(out, false)
     return out
 end
 
