@@ -1,3 +1,4 @@
+--- @module meta Introspection and basic type sytem
 meta = {}
 
 --- @class String
@@ -75,12 +76,13 @@ function meta._new(typename)
     out.__meta.properties = {}
     out.__meta.is_private = {}
     out.__meta.is_mutable = true
+    out.__meta.notify = {}
 
     out.__meta.__index = function(this, property_name)
         local metatable = meta._get_metatable(this)
 
         if metatable.is_private[property_name] == true then
-            error("In " .. metatable.typename .. ".__index: Cannot access property `" .. property_name .. "`, property was declared private.")
+            error("In " .. metatable.typename .. ".__index: Cannot access property `" .. property_name .. "`, because it was declared private.")
         end
         return metatable.properties[property_name]
     end
@@ -88,12 +90,16 @@ function meta._new(typename)
     out.__meta.__newindex = function(this, property_name, property_value)
         local metatable = meta._get_metatable(this)
         if metatable.is_private[property_name] == true then
-            error("In " .. metatable.typename .. ".__newindex: Cannot set property `" .. property_name .. "`, property was declared private.")
+            error("In " .. metatable.typename .. ".__newindex: Cannot set property `" .. property_name .. "`, because it was declared private.")
         end
         if not metatable.is_mutable then
             error("In " .. metatable.typename .. ".__newindex: Cannot set property `" .. property_name .. "`, object was declared immutable.")
         end
         metatable.properties[property_name] = property_value
+        local notify_cb_maybe = metatable.notify[property_name]
+        if meta.is_function(notify_cb_maybe) then
+            notify_cb_maybe(this, property_value)
+        end
     end
 
     out.__meta.__tostring = function(this)
@@ -112,7 +118,6 @@ function meta.is_object(x)
     if not meta.is_table(x) then
         return false
     end
-
     return not (x.__meta == nil or x.__meta.typename == nil)
 end
 
@@ -135,10 +140,8 @@ end
 --- @param b Boolean true if no error, false otherwise
 --- @param x Object
 --- @param type String typename
-function meta._assert_typeof(b, x, type)
-    if b then
-        return true
-    end
+function meta._assert_aux(b, x, type)
+    if b then return true end
     local name = debug.getinfo(2, "n").name
     error("In " .. name .. ": expected `" .. type .. "`, got `" .. meta.typeof(x) .. "`")
     return false
@@ -146,44 +149,44 @@ end
 
 --- @brief throw if object is not a boolean
 function meta.assert_boolean(x)
-    meta._assert_typeof(meta.typeof(x) ==  meta.Boolean, x, meta.Boolean)
+    meta._assert_aux(meta.typeof(x) ==  meta.Boolean, x, meta.Boolean)
 end
 
 --- @brief throw if object is not a table
 function meta.assert_table(x)
-    meta._assert_typeof(meta.typeof(x) ==  meta.Table, x, meta.Table)
+    meta._assert_aux(meta.typeof(x) ==  meta.Table, x, meta.Table)
 end
 
 --- @brief throw if object is not callable
 function meta.assert_function(x)
-    meta._assert_typeof(meta.is_function(x), x, meta.Function)
+    meta._assert_aux(meta.is_function(x), x, meta.Function)
 end
 
 --- @brief throw if object is not a string
 function meta.assert_string(x)
-    meta._assert_typeof(meta.typeof(x) ==  meta.String, x, meta.String)
+    meta._assert_aux(meta.typeof(x) ==  meta.String, x, meta.String)
 end
 
 --- @brief throw if object is not a number
 function meta.assert_number(x)
-    meta._assert_typeof(meta.typeof(x) ==  meta.Number, x, meta.Number)
+    meta._assert_aux(meta.typeof(x) ==  meta.Number, x, meta.Number)
 end
 
 --- @brief throw if object is not nil
 function meta.assert_nil(x)
-    meta._assert_typeof(meta.typeof(x) ==  meta.Nil, x, meta.Nil)
+    meta._assert_aux(meta.typeof(x) ==  meta.Nil, x, meta.Nil)
 end
 
 --- @brief throw if object is not a meta.Object
 function meta.assert_object(x)
-    meta._assert_typeof(meta.is_object(x), x, "meta.Object")
+    meta._assert_aux(meta.is_object(x), x, "meta.Object")
 end
 
 --- @brief throw if object is not of given type
 --- @param x
 --- @param type String
 function meta.assert_isa(x, type)
-    meta._assert_typeof(meta.typeof(x) == type, x, type)
+    meta._assert_aux(meta.typeof(x) == type, x, type)
 end
 
 --- @brief [internal] add signal
@@ -296,8 +299,7 @@ end
 --- @param x meta.Object
 --- @param signal_name String
 function meta.add_signal(x, signal_name)
-    meta.assert_object(x)
-    meta.assert_string(signal_name)
+    meta.assert_object(x) meta.assert_string(signal_name)
 
     if not meta._get_is_mutable(x) then
         error("In meta.add_signal: Object of type `" .. meta.typeof(x) .. "` was declared immutable.")
@@ -306,3 +308,4 @@ function meta.add_signal(x, signal_name)
     meta._install_signal(x, signal_name)
     return x
 end
+

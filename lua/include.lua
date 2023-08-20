@@ -3,12 +3,15 @@ package.path = package.path .. ";" .. RESOURCE_PATH .. "lua/src/?.lua"
 require "common"
 require "meta"
 
-enum = meta.new("Test", {
-    x = 1234,
-    y = "test",
-})
-
-meta.add_signal(x)
-meta.add_signal(enum, "test")
-enum["test"] = enum
-println(enum)
+properties = {
+    x = nil,
+    y = nil
+}
+enum = meta.new("Enum")
+enum:connect_signal("notify:x", function()
+    -- TODO
+end)
+meta._get_metatable(enum).notify["x"] = function ()
+    println("called")
+end
+enum.x = 1234
