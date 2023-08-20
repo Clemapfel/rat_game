@@ -6,28 +6,23 @@ require "queue"
 
 Test_t = meta.new_type("Test", function()
     local out = meta.new("Test")
-    meta._initialize_signals(out)
-    meta._initialize_notify(out)
+    meta.add_signal(out, "test")
+    meta.add_signal(out, "test2")
+    meta.allow_notify(out, "test4")
     out.property = 1234
     return out
 end)
 
-t = {}
-t[0] = 1234
-t[-1] = 2312
-t[2] = 12312
-
-for i, v in pairs(t) do
-    println(i, " ", v)
-end
-
 x = Test_t()
-x:connect_notify("property", function()
-    println("first called")
+x:add_signal("property")
+x:connect_signal("property", function()
+    x:set_signal_blocked("property", true)
+    x:emit_signal("property")
+    x:set_signal_blocked("property", false)
 end)
-second = x:connect_notify("property", function()
+second = x:connect_signal("property", function()
     println("second called")
 end)
-x:disconnect_notify("property", x:get_notify_handler_ids("property"))
-println(x)
+
 x.property = 4567
+println(x)

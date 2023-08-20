@@ -66,73 +66,118 @@ end
 
 --- @brief [internal] create signal architecture
 function meta._initialize_signals(x)
+
     local mt = getmetatable(x)
     if mt.signals ~= nil then
         return
     end
     mt.signals = {}
 
-    local function assert_has_signal(this, signal_name)
-        if this.__meta.signals[signal_name] ~= nil then
-            return
-        end
-        local info = debug.getinfo(2, "n")
-        error("In " .. meta.typeof(this) .. "." .. info.name .. ": No signal with ID `" .. signal_name .. "` registered.")
-    end
-
-    --- @brief create a new signal
-    --- @param name String
-    x.add_signal = function(this, name)
-        meta.assert_string(this)
-        this.__meta.signals[name] = {
+    local function init_signal(x, name)
+        if meta.is_table(x.__meta.signals[name]) then return end
+        getmetatable(x).signals[name] = {
             is_blocked = false,
-            callback = function() end
+            n = 0,
+            callbacks = {}
         }
     end
 
-    --- @brief block signal emission
+    local function assert_has_signal(x, name, scope)
+        if getmetatable(x).signals[name] == nil then
+            error("In " .. meta.typeof(x) .. "." .. scope .. ": Object has no signal with name `" .. name .. "`")
+        end
+    end
+
+    --- @brief allow for emission of a named signal
+    --- @param name String
+    x.add_signal = function(this, name)
+        meta.assert_string(name)
+        init_signal(x, name)
+    end
+
+    x.emit_signal = function(this, name, ...)
+        meta.assert_string(name)
+        assert_has_signal(this, name, "emit_signal")
+        local metatable = getmetatable(this)
+        local signal = metatable.signals[name]
+        if meta.is_nil(signal) or signal.is_blocked then return end
+
+        for _, callback in pairs(signal.callbacks) do
+            callback(this, ...)
+        end
+    end
+
+    --- @brief set whether emission is blocked
     --- @param name String
     --- @param b Boolean
     x.set_signal_blocked = function(this, name, b)
         meta.assert_string(name) meta.assert_boolean(b)
-        assert_has_signal(this, name)
+        assert_has_signal(this, name, "set_signal_blocked")
         this.__meta.signals[name].is_blocked = b
     end
 
-    --- @brief check if signal is blocked
+    --- @brief get whether emission is blocked
     --- @param name String
     x.get_signal_blocked = function(this, name)
         meta.assert_string(name)
-        assert_has_signal(this, name)
+        assert_has_signal(this, name, "get_signal_blocked")
         return this.__meta.signals[name].is_blocked
     end
 
-    --- @brief register a callback, called on emission
+    --- @brief register a callback, called when signal is emitted
     --- @param name String
     --- @param callback Function With signature (Instance, ...) -> Any
+    --- @return Number handler ID
     x.connect_signal = function(this, name, callback)
         meta.assert_string(name) meta.assert_function(callback)
-        assert_has_signal(this, name)
-        this.__meta.signals[name].callback = callback
+        assert_has_signal(this, name, "connect_signal")
+        local signal = getmetatable(this).signals[name]
+        signal.callbacks[signal.n] = callback
+        signal.n = signal.n + 1
+        return signal.n
     end
 
     --- @brief reset signal handler
     --- @param name String
-    x.disconnect_signal = function(this, name)
+    --- @param n Number signel handler ID or list of handler IDs
+    x.disconnect_signal = function(this, name, n)
         meta.assert_string(name)
-        assert_has_signal(this, name)
-        this.__meta.signals[name].callback = function () end
+        assert_has_signal(this, name, "disconnect_signal")
+        local signal = getmetatable(this).signals[name]
+        if not meta.is_nil(signal) then
+            if meta.is_nil(n) then
+                return
+            elseif meta.is_number(n) then
+                signal.callbacks[n] = nil
+            elseif meta.is_table(n) then
+                for id in ipairs(n) do
+                    signal.callbacks[id] = nil
+                end
+            end
+        end
     end
 
-    --- @brief emit signal
-    --- @param name String
-    --- @param args... any
-    x.emit_signal = function(this, name, ...)
+    --- @brief get handler ids
+    --- @return Table of numbers
+    x.get_signal_handler_ids = function(this, name)
         meta.assert_string(name)
-        assert_has_signal(this, name)
-        this.__meta.signals[name].callback(this, ...)
+        assert_has_signal(this, name, "get_signal_handler_ids")
+        local signal = getmetatable(this).signals[name]
+        local out = {}
+        for id, _ in pairs(signal.callbacks) do
+            out[id] = id
+        end
+        return out
     end
 
+    return x
+end
+
+--- @brief allow object to emit signals, usa `add_signal` to add them during the types ctor
+function meta.add_signal(x, signal_name)
+    meta.assert_object(x) meta.assert_string(signal_name)
+    meta._initialize_signals(x)
+    x:add_signal(signal_name)
     return x
 end
 
@@ -149,7 +194,7 @@ function meta._initialize_notify(x)
         if meta.is_table(x.__meta.notify[name]) then return end
         x.__meta.notify[name] = {
             is_blocked = false,
-            n = 1,
+            n = 0,
             callbacks = {}
         }
     end
@@ -218,6 +263,13 @@ function meta._initialize_notify(x)
         return out
     end
 
+    return x
+end
+
+--- @brief allow object to emit signals, usa `add_signal` to add them during the types ctor
+function meta.allow_notify(x, signal_name)
+    meta.assert_object(x) meta.assert_string(signal_name)
+    meta._initialize_notify(x)
     return x
 end
 
@@ -433,17 +485,4 @@ function meta.new_type(typename, ctor)
     return out
 end
 
---- @brief add architecture for a signal to an object
---- @param x meta.Object
---- @param signal_name String
-function meta.add_signal(x, signal_name)
-    meta.assert_object(x) meta.assert_string(signal_name)
-
-    if not meta._get_is_mutable(x) then
-        error("In meta.add_signal: Object of type `" .. meta.typeof(x) .. "` was declared immutable.")
-    end
-
-    meta._install_signal(x, signal_name)
-    return x
-end
 
