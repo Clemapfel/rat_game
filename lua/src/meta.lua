@@ -203,13 +203,10 @@ function meta._initialize_notify(x)
                 end
             end
         end
-
-        if is_empty(notify.callbacks) then
-            notify.n = 0
-        end
     end
 
     --- @brief get handler ids
+    --- @return Table of numbers
     x.get_notify_handler_ids = function(this, name)
         meta.assert_string(name)
         init_notify(this, name)
