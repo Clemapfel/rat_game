@@ -72,11 +72,81 @@ function meta._new(typename)
     local out = {}
     out.__meta = {}
     out.__meta.typename = typename
-    out.__meta.signals = {}
     out.__meta.properties = {}
     out.__meta.is_private = {}
     out.__meta.is_mutable = true
+    out.__meta.signals = {}
     out.__meta.notify = {}
+
+    function assert_has_signal(this, signal_name)
+        if this.__meta.signals[signal_name] ~= nil then
+            return
+        end
+        local info = debug.getinfo(2, "n")
+        error("In " .. meta.typeof(this) .. "." .. info.name .. ": No signal with ID `" .. signal_name .. "` registered.")
+    end
+
+    out.set_signal_blocked = function(this, name, b)
+        meta.assert_string(name) meta.assert_boolean(b)
+        assert_has_signal(this, name)
+        this.__meta.signals[name].is_blocked = b
+    end
+
+    out.get_signal_blocked = function(this, name)
+        meta.assert_string(name)
+        assert_has_signal(this, name)
+        return this.__meta.signals[name].is_blocked
+    end
+
+    out.connect_signal = function(this, name, callback)
+        meta.assert_string(name) meta.assert_function(callback)
+        assert_has_signal(this, name)
+        this.__meta.signals[name].callback = callback
+    end
+
+    out.disconnect_signal = function(this, name)
+        meta.assert_string(name)
+        assert_has_signal(this, name)
+        this.__meta.signals[name].callback = function () end
+    end
+
+    out.emit_signal = function(this, name, ...)
+        meta.assert_string(name)
+        assert_has_signal(this, name)
+        this.__meta.signals[name].callback(...)
+    end
+
+    function init_notify(x, name)
+        if meta.is_table(x.__meta.notify[name]) then return end
+        x.__meta.notify[name] = {
+            is_blocked = false,
+            callback = function()  end
+        }
+    end
+
+    out.set_notify_blocked = function(this, name, b)
+        meta.assert_string(name) meta.assert_boolean(b)
+        init_notify(this, name)
+        this.__meta.notify[name].is_blocked = b
+    end
+
+    out.get_notify_blocked = function(this, name)
+        meta.assert_string(name)
+        init_notify(this, name)
+        return this.__meta.notify[name].is_blocked
+    end
+
+    out.connect_notify = function(this, name, callback)
+        meta.assert_string(name) meta.assert_function(callback)
+        init_notify(this, name)
+        this.__meta.notify[name].callback = callback
+    end
+
+    out.disconnect_notify = function(this, name)
+        meta.assert_string(name)
+        init_notify(this, name)
+        this.__meta.notify[name].callback = function () end
+    end
 
     out.__meta.__index = function(this, property_name)
         local metatable = meta._get_metatable(this)
@@ -96,9 +166,9 @@ function meta._new(typename)
             error("In " .. metatable.typename .. ".__newindex: Cannot set property `" .. property_name .. "`, object was declared immutable.")
         end
         metatable.properties[property_name] = property_value
-        local notify_cb_maybe = metatable.notify[property_name]
-        if meta.is_function(notify_cb_maybe) then
-            notify_cb_maybe(this, property_value)
+        local notify = metatable.notify[property_name]
+        if meta.is_table(notify) and not notify.is_blocked  then
+            notify.callback(this, property_value)
         end
     end
 
@@ -195,50 +265,19 @@ function meta._install_signal(x, signal_name)
     meta.assert_object(x)
     meta.assert_string(signal_name)
 
-    function Signal(name, instance)
+    meta._get_metatable(x).signals[signal_name] = {
+        is_blocked = false,
+        callback = function() end
+    }
+end
 
-        local out = meta._new("Signal")
-        out.name = name
-        out.is_blocked = false
-        out.callback = function() end
-        out.instance = instance
-        out.set_is_blocked = function(this, b)
-            this.is_blocked = b
-        end
-        out.get_is_blocked = function(this)
-            return this.is_blocked
-        end
-        out.emit = function(this, ...)
-            return this.callback(...)
-        end
-        out.connect = function(this, f)
-            this.callback = f
-        end
-        out.disconnect = function(this)
-            this.callback = function() end
-        end
-        return out
-    end
+--- @brief [internal] remove signal
+function meta._uninstall_signal(x, signal_name)
 
-    assert(meta.is_object(x))
-    meta._get_metatable(x).signals[signal_name] = Signal(signal_name, x)
-    rawset(x, "set_signal_" .. signal_name .. "_blocked", function(self, b)
-        meta.assert_boolean(b)
-        meta._get_metatable(x).signals[signal_name]:set_is_blocked(b)
-    end)
-    rawset(x, "get_signal_" .. signal_name .. "_blocked", function(self)
-        return meta._get_metatable(x).signals[signal_name]:get_is_blocked()
-    end)
-    rawset(x, "emit_signal_" .. signal_name, function(self, ...)
-        meta._get_metatable(x).signals[signal_name]:emit(...)
-    end)
-    rawset(x, "connect_signal_" .. signal_name, function(self, f)
-        meta.assert_function(f)
-        meta._get_metatable(x).signals[signal_name]:connect(f)
-    end)
-    rawset(x, "disconnect_signal_" .. signal_name, function(self)
-        meta._get_metatable(x).signals[signal_name]:disconnect()
-    end)
+    meta.assert_object(x)
+    meta.assert_string(signal_name)
+
+    meta._get_metatable(x).signals[signal_name] = nil
 end
 
 --- @brief [internal] add a property, set to intial value
@@ -248,6 +287,15 @@ function meta._install_property(x, property_name, initial_value, is_private)
     local metatable = meta._get_metatable(x)
     metatable.properties[property_name] = initial_value
     metatable.is_private[property_name] = (is_private == true)
+end
+
+--- @brief [internal] add a property, set to intial value
+function meta._uninstall_property(x, property_name)
+    meta.assert_object(x);
+    meta.assert_string(property_name)
+    local metatable = meta._get_metatable(x)
+    metatable.properties[property_name] = nil
+    metatable.is_private[property_name] = nil
 end
 
 --- @brief [internal] make object immutable

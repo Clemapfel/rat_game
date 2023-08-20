@@ -8,10 +8,7 @@ properties = {
     y = nil
 }
 enum = meta.new("Enum")
-enum:connect_signal("notify:x", function()
-    -- TODO
+enum:connect_notify("x", function(self, new_value)
+    println(sizeof(self), new_value)
 end)
-meta._get_metatable(enum).notify["x"] = function ()
-    println("called")
-end
 enum.x = 1234
