@@ -181,7 +181,8 @@ function serialize(object_identifier, object, inject_sourcecode)
         return table.concat(str_buffer)
     end
 
-    serialize_inner = function (buffer, object, n_indent_tabs)
+
+    serialize_inner = function (buffer, object, n_indent_tabs, seen)
 
         if type(object) == "number" then
 
@@ -200,6 +201,13 @@ function serialize(object_identifier, object, inject_sourcecode)
             insert(buffer, string.format("%q", object))
 
         elseif type(object) == "table" then
+
+            -- saveguard against cyclic tables
+            if seen[object] ~= nil then
+                insert(buffer, " { ...")
+                return
+            end
+            seen[object] = true
 
             if sizeof(object) > 0 then
                 insert(buffer, "{\n")
@@ -220,7 +228,7 @@ function serialize(object_identifier, object, inject_sourcecode)
                         insert(buffer, get_indent(n_indent_tabs), tostring(key), " = ")
                     end
 
-                    serialize_inner(buffer, value, n_indent_tabs)
+                    serialize_inner(buffer, value, n_indent_tabs, seen)
                     index = index +1
 
                     if index < n_entries then
@@ -254,7 +262,8 @@ function serialize(object_identifier, object, inject_sourcecode)
         table.insert(buffer, object_identifier .. " = ")
     end
 
-    serialize_inner(buffer, object, 0)
+    local seen = {}
+    serialize_inner(buffer, object, 0, seen)
     return table.concat(buffer, "")
 end
 
@@ -268,9 +277,4 @@ NEGATIVE_INFINITY = -1/0
 --- @brief make first letter capital
 function string.capitalize(str)
     return string.upper(string.sub(str, 1, 1)) .. string.sub(str, 2, string.len(str))
-end
-
---- @brief throw error
-function error(message)
-
 end
