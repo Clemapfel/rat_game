@@ -64,6 +64,166 @@ function getmetatable(x)
     return rawget(x, "__meta")
 end
 
+--- @brief [internal] create signal architecture
+function meta._initialize_signals(x)
+    local mt = getmetatable(x)
+    if mt.signals ~= nil then
+        return
+    end
+    mt.signals = {}
+
+    local function assert_has_signal(this, signal_name)
+        if this.__meta.signals[signal_name] ~= nil then
+            return
+        end
+        local info = debug.getinfo(2, "n")
+        error("In " .. meta.typeof(this) .. "." .. info.name .. ": No signal with ID `" .. signal_name .. "` registered.")
+    end
+
+    --- @brief create a new signal
+    --- @param name String
+    x.add_signal = function(this, name)
+        meta.assert_string(this)
+        this.__meta.signals[name] = {
+            is_blocked = false,
+            callback = function() end
+        }
+    end
+
+    --- @brief block signal emission
+    --- @param name String
+    --- @param b Boolean
+    x.set_signal_blocked = function(this, name, b)
+        meta.assert_string(name) meta.assert_boolean(b)
+        assert_has_signal(this, name)
+        this.__meta.signals[name].is_blocked = b
+    end
+
+    --- @brief check if signal is blocked
+    --- @param name String
+    x.get_signal_blocked = function(this, name)
+        meta.assert_string(name)
+        assert_has_signal(this, name)
+        return this.__meta.signals[name].is_blocked
+    end
+
+    --- @brief register a callback, called on emission
+    --- @param name String
+    --- @param callback Function With signature (Instance, ...) -> Any
+    x.connect_signal = function(this, name, callback)
+        meta.assert_string(name) meta.assert_function(callback)
+        assert_has_signal(this, name)
+        this.__meta.signals[name].callback = callback
+    end
+
+    --- @brief reset signal handler
+    --- @param name String
+    x.disconnect_signal = function(this, name)
+        meta.assert_string(name)
+        assert_has_signal(this, name)
+        this.__meta.signals[name].callback = function () end
+    end
+
+    --- @brief emit signal
+    --- @param name String
+    --- @param args... any
+    x.emit_signal = function(this, name, ...)
+        meta.assert_string(name)
+        assert_has_signal(this, name)
+        this.__meta.signals[name].callback(this, ...)
+    end
+
+    return x
+end
+
+--- @brief [internal] create notify architecture
+function meta._initialize_notify(x)
+
+    local mt = getmetatable(x)
+    if mt.notify ~= nil then
+        return
+    end
+    mt.notify = {}
+
+    local function init_notify(x, name)
+        if meta.is_table(x.__meta.notify[name]) then return end
+        x.__meta.notify[name] = {
+            is_blocked = false,
+            n = 1,
+            callbacks = {}
+        }
+    end
+
+    --- @brief block notification
+    --- @param name String
+    --- @param b Boolean
+    x.set_notify_blocked = function(this, name, b)
+        meta.assert_string(name) meta.assert_boolean(b)
+        init_notify(this, name)
+        this.__meta.notify[name].is_blocked = b
+    end
+
+    --- @brief check if notification is blocked
+    --- @param name String
+    x.get_notify_blocked = function(this, name)
+        meta.assert_string(name)
+        init_notify(this, name)
+        return this.__meta.notify[name].is_blocked
+    end
+
+    --- @brief register a callback, called when property with given name changes
+    --- @param name String
+    --- @param callback Function With signature (Instance, ...) -> Any
+    --- @return Number handler ID
+    x.connect_notify = function(this, name, callback)
+        meta.assert_string(name) meta.assert_function(callback)
+        init_notify(this, name)
+        local notify = getmetatable(this).notify[name]
+        notify.callbacks[notify.n] = callback
+        notify.n = notify.n + 1
+        return notify.n
+    end
+
+    --- @brief reset notification handler
+    --- @param name String
+    --- @param n Number signel handler ID or list of handler IDs
+    x.disconnect_notify = function(this, name, n)
+        meta.assert_string(name)
+
+        init_notify(this, name)
+        local notify = getmetatable(this).notify[name]
+        if not meta.is_nil(notify) then
+            if meta.is_nil(n) then
+                return
+            elseif meta.is_number(n) then
+                notify.callbacks[n] = nil
+            elseif meta.is_table(n) then
+                for id in ipairs(n) do
+                    notify.callbacks[id] = nil
+                end
+            end
+        end
+
+        if is_empty(notify.callbacks) then
+            notify.n = 0
+        end
+    end
+
+    --- @brief get handler ids
+    x.get_notify_handler_ids = function(this, name)
+        meta.assert_string(name)
+        init_notify(this, name)
+        local notify = getmetatable(this).notify[name]
+        local out = {}
+        for id, _ in pairs(notify.callbacks) do
+            out[id] = id
+        end
+        return out
+    end
+
+    return x
+end
+
 --- @class meta.Object
 --- @brief [internal] Create new empty object
 --- @param typename string type identifier
@@ -97,8 +257,9 @@ function meta._new(typename)
 
         if metatable.notify == nil then return end
         local notify = metatable.notify[property_name]
-        if meta.is_table(notify) and not notify.is_blocked  then
-            notify.callback(this, property_value)
+        if meta.is_nil(notify) or notify.is_blocked then return end
+        for _, callback in pairs(notify.callbacks) do
+            callback(property_value)
         end
     end
 
@@ -107,100 +268,6 @@ function meta._new(typename)
     end
 
     setmetatable(out, out.__meta)
-
-    local function assert_has_signal(this, signal_name)
-        if this.__meta.signals[signal_name] ~= nil then
-            return
-        end
-        local info = debug.getinfo(2, "n")
-        error("In " .. meta.typeof(this) .. "." .. info.name .. ": No signal with ID `" .. signal_name .. "` registered.")
-    end
-
-    local function init_notify(x, name)
-        if meta.is_table(x.__meta.notify[name]) then return end
-        x.__meta.notify = {}
-        x.__meta.notify[name] = {
-            is_blocked = false,
-            callback = function()  end
-        }
-    end
-
-    --- @brief block signal emission
-    --- @param name String
-    --- @param b Boolean
-    out.set_signal_blocked = function(this, name, b)
-        meta.assert_string(name) meta.assert_boolean(b)
-        assert_has_signal(this, name)
-        this.__meta.signals[name].is_blocked = b
-    end
-
-    --- @brief check if signal is blocked
-    --- @param name String
-    out.get_signal_blocked = function(this, name)
-        meta.assert_string(name)
-        assert_has_signal(this, name)
-        return this.__meta.signals[name].is_blocked
-    end
-
-    --- @brief register a callback, called on emission
-    --- @param name String
-    --- @param callback Function With signature (Instance, ...) -> Any
-    out.connect_signal = function(this, name, callback)
-        meta.assert_string(name) meta.assert_function(callback)
-        assert_has_signal(this, name)
-        this.__meta.signals[name].callback = callback
-    end
-
-    --- @brief reset signal handler
-    --- @param name String
-    out.disconnect_signal = function(this, name)
-        meta.assert_string(name)
-        assert_has_signal(this, name)
-        this.__meta.signals[name].callback = function () end
-    end
-
-    --- @brief emit signal
-    --- @param name String
-    --- @param args... any
-    out.emit_signal = function(this, name, ...)
-        meta.assert_string(name)
-        assert_has_signal(this, name)
-        this.__meta.signals[name].callback(this, ...)
-    end
-
-    --- @brief block notification
-    --- @param name String
-    --- @param b Boolean
-    out.set_notify_blocked = function(this, name, b)
-        meta.assert_string(name) meta.assert_boolean(b)
-        init_notify(this, name)
-        this.__meta.notify[name].is_blocked = b
-    end
-
-    --- @brief check if notification is blocked
-    --- @param name String
-    out.get_notify_blocked = function(this, name)
-        meta.assert_string(name)
-        init_notify(this, name)
-        return this.__meta.notify[name].is_blocked
-    end
-
-    --- @brief register a callback, called when property with given name changes
-    --- @param name String
-    --- @param callback Function With signature (Instance, ...) -> Any
-    out.connect_notify = function(this, name, callback)
-        meta.assert_string(name) meta.assert_function(callback)
-        init_notify(this, name)
-        this.__meta.notify[name].callback = callback
-    end
-
-    --- @brief reset notification handler
-    --- @param name String
-    out.disconnect_notify = function(this, name)
-        meta.assert_string(name)
-        init_notify(this, name)
-        this.__meta.notify[name].callback = function () end
-    end
 
     return out
 end
@@ -291,37 +358,6 @@ function meta.assert_isa(x, type)
     meta._assert_aux(meta.typeof(x) == type, x, type)
 end
 
---- @brief [internal] add signal
-function meta._install_signal(x, signal_name)
-
-    meta.assert_object(x)
-    meta.assert_string(signal_name)
-
-    local metatable = getmetatable(x)
-    if meta.is_nil(metatable.signals) then
-        metatable.signals = {}
-    end
-
-    metatable.signals[signal_name] = {
-        is_blocked = false,
-        callback = function() end
-    }
-end
-
---- @brief [internal] remove signal
-function meta._uninstall_signal(x, signal_name)
-
-    meta.assert_object(x)
-    meta.assert_string(signal_name)
-
-    local metatable = getmetatable(x)
-    metatble.signals[signal_name] = nil
-
-    if is_empty(metatable).signals then
-        metatable.signals = nil
-    end
-end
-
 --- @brief [internal] add a property, set to intial value
 function meta._install_property(x, property_name, initial_value, is_private)
     meta.assert_object(x);
@@ -397,7 +433,6 @@ function meta.new_type(typename, ctor)
     local out = meta._new("Type")
     out.name = typename
     getmetatable(out).__call = ctor
-    meta._set_is_mutable(out, false)
     return out
 end
 
