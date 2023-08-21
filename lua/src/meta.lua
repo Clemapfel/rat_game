@@ -1,8 +1,23 @@
 --- @module meta Introspection and basic type sytem
 meta = {}
 
+--- @class Function
+meta.Function = "function"
+
+--- @class Nil
+meta.Nil = "nil"
+
 --- @class String
 meta.String = "string"
+
+--- @class Table
+meta.Table = "table"
+
+--- @class Boolean
+meta.Boolean = "boolean"
+
+--- @class Number
+meta.Number = "number"
 
 --- @brief is x a lua string?
 --- @param x any
@@ -10,26 +25,17 @@ function meta.is_string(x)
     return type(x) == meta.String
 end
 
---- @class Table
-meta.Table = "table"
-
 --- @brief is x a lua table?
 --- @param x any
 function meta.is_table(x)
     return type(x) == meta.Table
 end
 
---- @class Number
-meta.Number = "number"
-
 --- @brief is x a lua number?
 --- @param x any
 function meta.is_number(x)
-    return type(x) == "number"
+    return type(x) == meta.Number
 end
-
---- @class Boolean
-meta.Boolean = "boolean"
 
 --- @brief is x a lua boolean?
 --- @param x any
@@ -37,25 +43,21 @@ function meta.is_boolean(x)
     return type(x) == meta.Boolean
 end
 
---- @class Nil
-meta.Nil = "nil"
-
 --- @brief is x nil?
 --- @param x any
 function meta.is_nil(x)
     return type(x) == meta.Nil
 end
 
---- @class Function
-meta.Function = "function"
-
 ---@brief is callable
 --- @param x any
 function meta.is_function(x)
     if type(x) == meta.Function then
         return true
-    elseif getmetatable(x) ~= nil then
+    elseif meta.is_table(x) and getmetatable(x) ~= nil then
         return meta.is_function(getmetatable(x).__call)
+    else
+        return false
     end
 end
 
@@ -95,6 +97,9 @@ function meta._initialize_signals(x)
         init_signal(x, name)
     end
 
+    --- @brief invoke all connected signal handlers
+    --- @param name String
+    --- @param vararg
     x.emit_signal = function(this, name, ...)
         meta.assert_string(name)
         assert_has_signal(this, name, "emit_signal")
@@ -218,7 +223,7 @@ function meta._initialize_notify(x)
 
     --- @brief register a callback, called when property with given name changes
     --- @param name String
-    --- @param callback Function With signature (Instance, ...) -> Any
+    --- @param callback Function With signature (Instance, property_value, ...) -> void
     --- @return Number handler ID
     x.connect_notify = function(this, name, callback)
         meta.assert_string(name) meta.assert_function(callback)
@@ -308,7 +313,7 @@ function meta._new(typename)
         local notify = metatable.notify[property_name]
         if meta.is_nil(notify) or notify.is_blocked then return end
         for _, callback in pairs(notify.callbacks) do
-            callback(property_value)
+            callback(this, property_value)
         end
     end
 
@@ -320,9 +325,6 @@ function meta._new(typename)
 
     return out
 end
-
---- @class Object
-meta.Object = "object"
 
 --- @brief is meta object
 function meta.is_object(x)
@@ -342,7 +344,7 @@ function meta.typeof(x)
         if meta.is_nil(metatable) then
             return meta.Table
         else
-            return x.__meta.typename
+            return meta[x.__meta.typename]
         end
     end
 end
@@ -367,44 +369,45 @@ end
 
 --- @brief throw if object is not a boolean
 function meta.assert_boolean(x)
-    meta._assert_aux(meta.typeof(x) ==  meta.Boolean, x, meta.Boolean)
+    meta._assert_aux(meta.typeof(x) ==  meta.Boolean, x, meta.Boolean.name)
 end
 
 --- @brief throw if object is not a table
 function meta.assert_table(x)
-    meta._assert_aux(meta.typeof(x) ==  meta.Table, x, meta.Table)
+    meta._assert_aux(meta.typeof(x) ==  meta.Table, x, meta.Table.name)
 end
 
 --- @brief throw if object is not callable
 function meta.assert_function(x)
-    meta._assert_aux(meta.is_function(x), x, meta.Function)
+    meta._assert_aux(meta.is_function(x), x, meta.Function.name)
 end
 
 --- @brief throw if object is not a string
 function meta.assert_string(x)
-    meta._assert_aux(meta.typeof(x) ==  meta.String, x, meta.String)
+    meta._assert_aux(meta.typeof(x) ==  meta.String, x, meta.String.name)
 end
 
 --- @brief throw if object is not a number
 function meta.assert_number(x)
-    meta._assert_aux(meta.typeof(x) ==  meta.Number, x, meta.Number)
+    meta._assert_aux(meta.typeof(x) ==  meta.Number, x, meta.Number.name)
 end
 
 --- @brief throw if object is not nil
 function meta.assert_nil(x)
-    meta._assert_aux(meta.typeof(x) ==  meta.Nil, x, meta.Nil)
+    meta._assert_aux(meta.typeof(x) ==  meta.Nil, x, meta.Nil.name)
 end
 
 --- @brief throw if object is not a meta.Object
 function meta.assert_object(x)
-    meta._assert_aux(meta.is_object(x), x, "meta.Object")
+    meta._assert_aux(meta.is_object(x), x, meta.Object.name)
 end
 
 --- @brief throw if object is not of given type
 --- @param x
 --- @param type String
 function meta.assert_isa(x, type)
-    meta._assert_aux(meta.typeof(x) == type, x, type)
+    meta.assert_isa(type, meta.Type)
+    meta._assert_aux(meta.typeof(x) == type, x, type.name)
 end
 
 --- @brief [internal] add a property, set to intial value
@@ -438,6 +441,9 @@ function meta._get_is_mutable(x)
     return getmetatable(x).is_mutable
 end
 
+--- @class meta.Object
+meta.Object = "Object"
+
 --- @brief create a new object instance
 --- @param type
 --- @param fields Table property_name -> property_value
@@ -461,11 +467,14 @@ function meta.new(type, fields)
     return out
 end
 
+--- @class meta.Enum
+meta.Enum = "Enum"
+
 --- @brief create a new immutable object
 --- @param fields Table
 function meta.new_enum(fields)
     meta.assert_table(fields)
-    local out = meta._new("Enum")
+    local out = meta._new(meta.Enum)
     meta._set_is_mutable(out, false)
     for name, value in pairs(fields) do
         meta.assert_string(name)
@@ -477,12 +486,20 @@ function meta.new_enum(fields)
     return out
 end
 
+--- @class meta.Type
+meta.Type = "Type"
+
+--- @brief create a new type with given constructor
 function meta.new_type(typename, ctor)
-    meta.assert_string(typename) meta.assert_function(ctor)
-    local out = meta._new("Type")
+    meta.assert_string(typename)
+    local out = meta._new(meta.Type)
     out.name = typename
+
     getmetatable(out).__call = ctor
+
+    if meta[typename] ~= nil then
+        error("In meta.new_type: A type with name `" .. typename .. "` already exists.")
+    end
+    meta[typename] = typename
     return out
 end
-
-
