@@ -1,5 +1,3 @@
-
-
 --- @class StatAlteration
 rt.StatAlteration = meta.new_enum({
     MIN = -5,
@@ -15,11 +13,11 @@ rt.StatAlteration = meta.new_enum({
     MAX = 5
 })
 
---- @class BattleEntity
-rt.BattleEntity = meta.new_type("BattleEntity", function(id)
+--- @class Entity
+rt.Entity = meta.new_type("Entity", function(id)
 
     local entity = rt.ENTITIES[id]
-    local out = meta.new("BattleEntity", {
+    local out = meta.new("Entity", {
         hp = entity.hp_base,
         hp_base = entity.hp_base,
 

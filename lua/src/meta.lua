@@ -2,7 +2,7 @@
 meta = {}
 
 --- @class Function
-meta.Function = "function"
+meta.Function = meta.new_type("Function")
 
 --- @class Nil
 meta.Nil = "nil"
@@ -368,12 +368,12 @@ end
 
 --- @brief throw if object is not a boolean
 function meta.assert_boolean(x)
-    meta._assert_aux(meta.typeof(x) ==  meta.Boolean, x, meta.Boolean.name)
+    meta._assert_aux(meta.typeof(x) ==  meta.Boolean, x, meta.Boolean)
 end
 
 --- @brief throw if object is not a table
 function meta.assert_table(x)
-    meta._assert_aux(meta.typeof(x) ==  meta.Table, x, meta.Table.name)
+    meta._assert_aux(meta.typeof(x) == meta.Table, x, meta.Table)
 end
 
 --- @brief throw if object is not callable
@@ -472,16 +472,35 @@ meta.Enum = "Enum"
 --- @brief create a new immutable object
 --- @param fields Table
 function meta.new_enum(fields)
+
     meta.assert_table(fields)
+
     local out = meta._new(meta.Enum)
-    meta._set_is_mutable(out, false)
+    local used_values = {}
+
     for name, value in pairs(fields) do
         meta.assert_string(name)
         if meta.is_table(value) or meta.is_nil(value) then
-            error("[rt] [rt] In meta.new_enum: Enum value for key `" .. name .. "` is a `" .. meta.typeof(value) .. "`, which is not a primitive.")
+            error("[rt] In meta.new_enum: Enum value for key `" .. name .. "` is a `" .. meta.typeof(value) .. "`, which is not a primitive.")
         end
+
+        if used_values[value] ~= nil then
+            error("[rt] In meta.new_enum: Duplicate value, key `" .. name .. "` and `" .. used_values[value] .. "` both have the same value `" .. tostring(value) .. "`")
+        end
+        used_values[value] = name
+
         meta._install_property(out, name, value)
     end
+
+    local metatable = getmetatable(out)
+    metatable__pairs = function(this)
+        return pairs(getmetatable(this).properties)
+    end
+    metatable.__ipairs = function(this)
+        return ipairs(getmetatable(this).properties)
+    end
+
+    meta._set_is_mutable(out, false)
     return out
 end
 

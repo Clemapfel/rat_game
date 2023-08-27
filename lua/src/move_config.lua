@@ -1,3 +1,12 @@
+--- @class Priority
+rt.Priority = meta.new_enum({
+    MIN = NEGATIVE_INFINITY,
+    NEGATIVE = -1,
+    NEUTRAL = 0,
+    POSITIVE = 1,
+    MAX = POSITIVE_INFINITY
+})
+
 --- @class MoveConfig
 rt.MoveConfig = meta.new_type("MoveConfig", function(config)
 
