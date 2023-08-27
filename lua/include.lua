@@ -4,13 +4,3 @@ require "common"
 require "meta"
 require "queue"
 
-mt = {
-    __call = function()
-        println("called")
-    end
-}
-
-test = ""
-setmetatable(test, mt)
-
-""()

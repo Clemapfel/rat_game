@@ -123,6 +123,8 @@ Queue = meta.new_type("Queue", function()
         end
     end
 
+    metatable.__len = out.size
+
     return out
 end) -- Queue
 
