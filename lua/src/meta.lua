@@ -81,7 +81,7 @@ function meta._initialize_signals(x)
 
     local function assert_has_signal(x, name, scope)
         if getmetatable(x).signals[name] == nil then
-            error("In " .. meta.typeof(x) .. "." .. scope .. ": Object has no signal with name `" .. name .. "`")
+            error("[rt] In " .. meta.typeof(x) .. "." .. scope .. ": Object has no signal with name `" .. name .. "`")
         end
     end
 
@@ -267,15 +267,12 @@ function meta._initialize_notify(x)
     return x
 end
 
---- @brief allow object to emit signals, usa `add_signal` to add them during the types ctor
-function meta.allow_notify(x, signal_name)
+--- @brief allow connecting notify handler to properties
+function meta.add_notify(x)
     meta.assert_object(x) meta.assert_string(signal_name)
     meta._initialize_notify(x)
     return x
 end
-
-meta.metatables = {}
-meta.metatable_i = 0
 
 --- @class meta.Object
 --- @brief [internal] Create new empty object
@@ -295,7 +292,7 @@ function meta._new(typename)
     metatable.__index = function(this, property_name)
         local metatable = getmetatable(this)
         if metatable.is_private[property_name] == true then
-            error("In " .. metatable.__name .. ".__index: Cannot access property `" .. property_name .. "`, because it was declared private.")
+            error("[rt] In " .. metatable.__name .. ".__index: Cannot access property `" .. property_name .. "`, because it was declared private.")
         end
         return metatable.properties[property_name]
     end
@@ -303,10 +300,10 @@ function meta._new(typename)
     metatable.__newindex = function(this, property_name, property_value)
         local metatable = getmetatable(this)
         if metatable.is_private[property_name] == true then
-            error("In " .. metatable.__name .. ".__newindex: Cannot set property `" .. property_name .. "`, because it was declared private.")
+            error("[rt] In " .. metatable.__name .. ".__newindex: Cannot set property `" .. property_name .. "`, because it was declared private.")
         end
         if not metatable.is_mutable then
-            error("In " .. metatable.__name .. ".__newindex: Cannot set property `" .. property_name .. "`, object was declared immutable.")
+            error("[rt] In " .. metatable.__name .. ".__newindex: Cannot set property `" .. property_name .. "`, object was declared immutable.")
         end
         metatable.properties[property_name] = property_value
 
@@ -365,7 +362,7 @@ end
 function meta._assert_aux(b, x, type)
     if b then return true end
     local name = debug.getinfo(2, "n").name
-    error("In " .. name .. ": expected `" .. type .. "`, got `" .. meta.typeof(x) .. "`")
+    error("[rt] In " .. name .. ": expected `" .. type .. "`, got `" .. meta.typeof(x) .. "`")
     return false
 end
 
@@ -381,27 +378,27 @@ end
 
 --- @brief throw if object is not callable
 function meta.assert_function(x)
-    meta._assert_aux(meta.is_function(x), x, meta.Function.name)
+    meta._assert_aux(meta.is_function(x), x, meta.Function)
 end
 
 --- @brief throw if object is not a string
 function meta.assert_string(x)
-    meta._assert_aux(meta.typeof(x) ==  meta.String, x, meta.String.name)
+    meta._assert_aux(meta.typeof(x) ==  meta.String, x, meta.String)
 end
 
 --- @brief throw if object is not a number
 function meta.assert_number(x)
-    meta._assert_aux(meta.typeof(x) ==  meta.Number, x, meta.Number.name)
+    meta._assert_aux(meta.typeof(x) ==  meta.Number, x, meta.Number)
 end
 
 --- @brief throw if object is not nil
 function meta.assert_nil(x)
-    meta._assert_aux(meta.typeof(x) ==  meta.Nil, x, meta.Nil.name)
+    meta._assert_aux(meta.typeof(x) ==  meta.Nil, x, meta.Nil)
 end
 
 --- @brief throw if object is not a meta.Object
 function meta.assert_object(x)
-    meta._assert_aux(meta.is_object(x), x, meta.Object.name)
+    meta._assert_aux(meta.is_object(x), x, meta.Object)
 end
 
 --- @brief throw if object is not of given type
@@ -452,7 +449,7 @@ meta.Object = "Object"
 function meta.new(type, fields)
 
     local out = {}
-    if meta.isa(typename, "Type") then
+    if meta.isa(type, "Type") then
         out = meta._new(type.name)
     else
         meta.assert_string(type)
@@ -481,7 +478,7 @@ function meta.new_enum(fields)
     for name, value in pairs(fields) do
         meta.assert_string(name)
         if meta.is_table(value) or meta.is_nil(value) then
-            error("In meta.new_enum: Enum value for key `" .. name .. "` is a `" .. meta.typeof(value) .. "`, which is not a primitive.")
+            error("[rt] [rt] In meta.new_enum: Enum value for key `" .. name .. "` is a `" .. meta.typeof(value) .. "`, which is not a primitive.")
         end
         meta._install_property(out, name, value)
     end
@@ -494,19 +491,15 @@ meta.Type = "Type"
 --- @brief create a new type with given constructor
 function meta.new_type(typename, ctor)
     meta.assert_string(typename)
+    meta.assert_function(ctor)
     local out = meta._new(meta.Type)
     out.name = typename
-
-    if meta.is_nil(ctor) then
-        getmetatable(out).__call = function(self)
-            return meta.new(self.name)
-        end
-    else
-        getmetatable(out).__call = ctor
+    getmetatable(out).__call = function(self, ...)
+        return ctor(...)
     end
 
     if meta[typename] ~= nil then
-        error("In meta.new_type: A type with name `" .. typename .. "` already exists.")
+        error("[rt] [rt] In meta.new_type: A type with name `" .. typename .. "` already exists.")
     end
     meta[typename] = typename
     return out
