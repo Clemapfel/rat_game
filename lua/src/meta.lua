@@ -375,7 +375,12 @@ end
 
 --- @brief throw if object is not nil
 function meta.assert_nil(x)
-    meta._assert_aux(meta.is_nil(x), x, "nil")
+    meta._assert_aux(meta.is_nil(x), x, "typeof(nil)")
+end
+
+function meta.assert_object(x)
+    local metatable = getmetatable(x)
+    return metatable ~= nil and metatable.typename ~= nil
 end
 
 --- @brief [internal] add a property, set to intial value
@@ -396,15 +401,15 @@ function meta._uninstall_property(x, property_name)
     metatable.is_private[property_name] = nil
 end
 
---- @brief [internal] make object immutable
-function meta._set_is_mutable(x, b)
+--- @brief make object immutable, this should be done inside the objects constructor
+function meta.set_is_mutable(x, b)
     meta.assert_object(x)
     meta.assert_boolean(b)
     getmetatable(x).is_mutable = b
 end
 
---- @brief [internal] check if object is immutable
-function meta._get_is_mutable(x)
+--- @brief check if object is immutable
+function meta.get_is_mutable(x)
     meta.assert_object(x);
     return getmetatable(x).is_mutable
 end
@@ -425,7 +430,7 @@ function meta.new(type, fields)
         out = meta._new(type)
     end
 
-    meta._set_is_mutable(out, true)
+    meta.set_is_mutable(out, true)
     if fields ~= nil then
         for name, value in pairs(fields) do
             meta.assert_string(name)
@@ -462,14 +467,14 @@ function meta.new_enum(fields)
     end
 
     local metatable = getmetatable(out)
-    metatable__pairs = function(this)
+    metatable.__pairs = function(this)
         return pairs(getmetatable(this).properties)
     end
     metatable.__ipairs = function(this)
         return ipairs(getmetatable(this).properties)
     end
 
-    meta._set_is_mutable(out, false)
+    meta.set_is_mutable(out, false)
     return out
 end
 

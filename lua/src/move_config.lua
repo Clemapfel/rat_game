@@ -28,11 +28,12 @@ rt.MoveConfig = meta.new_type("MoveConfig", function(config)
             meta.assert_type(self, rt.BattleEntity)
         end
     })
-    meta.allow_notify()
 
     for key, value in pairs(config) do
         out[key] = value
     end
+
+    meta.set_is_mutable(out, false)
     return out
 end)
 

@@ -8,7 +8,11 @@ rt.EntityConfig = meta.new_type("EntityConfig", function(config)
     meta.assert_number(config.speed_base)
     meta.assert_table(config.moveset)
 
-    return meta.new("EntityConfig", config)
+    local out = meta.new(rt.EntityConfig, {
+
+    })
+
+    return out
 end)
 
 rt.ENTITES = {

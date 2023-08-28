@@ -21,6 +21,7 @@ rt.Status = meta.new_type("Status", function(config)
     for key, value in pairs(config) do
         out[key] = value
     end
+    meta.set_is_mutable(out, false)
     return out
 end)
 
