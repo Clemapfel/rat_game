@@ -1,58 +1,40 @@
 --- @module meta Introspection and basic type sytem
 meta = {}
 
---- @class Function
-meta.Function = meta.new_type("Function")
-
---- @class Nil
-meta.Nil = "nil"
-
---- @class String
-meta.String = "string"
-
---- @class Table
-meta.Table = "table"
-
---- @class Boolean
-meta.Boolean = "boolean"
-
---- @class Number
-meta.Number = "number"
-
 --- @brief is x a lua string?
 --- @param x any
 function meta.is_string(x)
-    return type(x) == meta.String
+    return type(x) == "string"
 end
 
 --- @brief is x a lua table?
 --- @param x any
 function meta.is_table(x)
-    return type(x) == meta.Table
+    return type(x) == "table"
 end
 
 --- @brief is x a lua number?
 --- @param x any
 function meta.is_number(x)
-    return type(x) == meta.Number
+    return type(x) == "number"
 end
 
 --- @brief is x a lua boolean?
 --- @param x any
 function meta.is_boolean(x)
-    return type(x) == meta.Boolean
+    return type(x) == "boolean"
 end
 
 --- @brief is x nil?
 --- @param x any
 function meta.is_nil(x)
-    return type(x) == meta.Nil
+    return type(x) == "nil"
 end
 
 ---@brief is callable
 --- @param x any
 function meta.is_function(x)
-    if type(x) == meta.Function then
+    if type(x) == "function" then
         return true
     elseif meta.is_table(x) and getmetatable(x) ~= nil then
         return meta.is_function(getmetatable(x).__call)
@@ -341,7 +323,7 @@ function meta.typeof(x)
     else
         local metatable = getmetatable(x)
         if meta.is_nil(metatable) then
-            return meta.Table
+            return meta.Table.name
         else
             return meta[getmetatable(x).__name]
         end
@@ -368,45 +350,32 @@ end
 
 --- @brief throw if object is not a boolean
 function meta.assert_boolean(x)
-    meta._assert_aux(meta.typeof(x) ==  meta.Boolean, x, meta.Boolean)
+    meta._assert_aux(meta.is_boolean(x), x, "boolean")
 end
 
 --- @brief throw if object is not a table
 function meta.assert_table(x)
-    meta._assert_aux(meta.typeof(x) == meta.Table, x, meta.Table)
+    meta._assert_aux(meta.is_table(x), x, "table")
 end
 
 --- @brief throw if object is not callable
 function meta.assert_function(x)
-    meta._assert_aux(meta.is_function(x), x, meta.Function)
+    meta._assert_aux(meta.is_function(x), x, "function")
 end
 
 --- @brief throw if object is not a string
 function meta.assert_string(x)
-    meta._assert_aux(meta.typeof(x) ==  meta.String, x, meta.String)
+    meta._assert_aux(meta.is_string(x), x, "string")
 end
 
 --- @brief throw if object is not a number
 function meta.assert_number(x)
-    meta._assert_aux(meta.typeof(x) ==  meta.Number, x, meta.Number)
+    meta._assert_aux(meta.is_number(x), x, "number")
 end
 
 --- @brief throw if object is not nil
 function meta.assert_nil(x)
-    meta._assert_aux(meta.typeof(x) ==  meta.Nil, x, meta.Nil)
-end
-
---- @brief throw if object is not a meta.Object
-function meta.assert_object(x)
-    meta._assert_aux(meta.is_object(x), x, meta.Object)
-end
-
---- @brief throw if object is not of given type
---- @param x
---- @param type String
-function meta.assert_isa(x, type)
-    meta.assert_string(type)
-    meta._assert_aux(meta.typeof(x) == type, x, type.name)
+    meta._assert_aux(meta.is_nil(x), x, "nil")
 end
 
 --- @brief [internal] add a property, set to intial value
@@ -523,3 +492,43 @@ function meta.new_type(typename, ctor)
     meta[typename] = typename
     return out
 end
+
+--- @class Function
+meta.Function = meta.new_type("function", function()
+    return function() end
+end)
+
+--- @class Nil
+meta.Nil = meta.new_type("nil", function()
+    return nil
+end)
+
+--- @class String
+meta.String = meta.new_type("string", function()
+    return ""
+end)
+
+--- @class Table
+meta.Table = meta.new_type("table", function()
+    return {}
+end)
+
+--- @class Boolean
+meta.Boolean = meta.new_type("boolean", function()
+    return false
+end)
+
+--- @class Number
+meta.Number = meta.new_type("number", function()
+    return 0
+end)
+
+--- @brief throw if object is not of given type
+--- @param x
+--- @param type String
+function meta.assert_isa(x, type)
+    meta.assert_string(type)
+    meta._assert_aux(meta.typeof(type) == "Type", type, "Type")
+    meta._assert_aux(meta.typeof(x) == type, x, type.name)
+end
+
