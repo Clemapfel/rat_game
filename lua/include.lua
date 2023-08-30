@@ -6,21 +6,22 @@ rt = {}
 require "common"
 require "meta"
 require "queue"
+require "action_queue"
 
 require "status_config"
 require "move_config"
 require "entity_config"
 require "entity"
 
-rt.NewType = meta.new_type("NewType", function()
-    return meta.new(rt.NewType)
+queue = rt.ActionQueue()
+queue:push(function()
+    println("called")
+end)
+queue:push(function()
+    println("called 2")
 end)
 
-rt.NewType.test_f = function()
-    println("called")
-end
-
-instance = rt.NewType()
-instance:test_f()
-
-println(instance.test)
+queue:step()
+println("twee")
+queue:step()
+println("end")

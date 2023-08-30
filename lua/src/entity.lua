@@ -26,43 +26,21 @@ rt.Entity = meta.new_type("Entity", function(id)
     local out = meta.new(rt.Entity, {
         hp = entity.hp_base,
         hp_base = entity.hp_base,
-        get_hp = rt.Entity.get_hp,
-        get_hp_base = rt.Entity.get_hp_base,
-        set_hp = rt.Entity.set_hp,
-        add_hp = rt.Entity.add_hp,
-        reduce_hp = rt.Entity.reduce_hp,
 
         ap = entity.ap_base,
         ap_base = entity.ap_base,
-        get_ap = rt.Entity.get_hp,
-        get_ap_base = rt.Entity.get_hp_base,
-        set_ap = rt.Entity.set_hp,
-        add_ap = rt.Entity.add_hp,
-        reduce_hp = rt.Entity.reduce_hp,
 
         attack = entity.attack_base,
         attack_base = entity.attack_base,
         attack_level = rt.StatAlteration.ZERO,
-        get_attack = rt.Entity.get_attack,
-        raise_attack_level = rt.Entity.raise_attack,
-        lower_attack_level = rt.Entity.lower_attack,
-        set_attack_level = rt.Entity.set_attack_level,
 
         defense = entity.defense_base,
         defense_base = entity.defense_base,
         defense_level = rt.StatAlteration.ZERO,
-        get_defense = rt.Entity.get_attack,
-        raise_defense = rt.Entity.raise_attack,
-        lower_defense = rt.Entity.lower_attack,
-        set_defense_level = rt.Entity.set_attack_level,
 
         speed = entity.speed_base,
         speed_base = entity.speed_base,
         speed_level = rt.StatAlteration.ZERO,
-        get_speed = rt.Entity.get_attack,
-        raise_speed = rt.Entity.raise_attack,
-        lower_speed = rt.Entity.lower_attack,
-        set_speed_level = rt.Entity.set_attack_level,
 
         moveset = {
             BASE_ATTACK,
@@ -72,7 +50,6 @@ rt.Entity = meta.new_type("Entity", function(id)
         status = {},
 
         is_enemy = true,
-        get_is_enemy = rt.Entity.get_is_enemy
     })
 
     is_enemy = not (
@@ -140,3 +117,10 @@ function rt.Entity.raise_attack(target, TODO) end
 function rt.Entity.lower_attack(target, TODO) end
 function rt.Entity.set_attack_level(target, TODO) end
 
+function rt.Entity.get_is_enemy(target) end
+
+function rt.Entity.is_ally_of(a, b)
+    meta.assert_isa(a, rt.Entity)
+    meta.assert_isa(b, rt.Entity)
+    return a:get_is_enemy() == b:get_is_enemy()
+end

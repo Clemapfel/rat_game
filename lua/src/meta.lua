@@ -559,8 +559,12 @@ end)
 --- @param x
 --- @param type String
 function meta.assert_isa(x, type)
-    meta.assert_string(type)
-    meta._assert_aux(meta.typeof(type) == "Type", type, "Type")
-    meta._assert_aux(meta.typeof(x) == type, x, type.name)
+
+    if meta.typeof(type) == "Type" then
+        meta._assert_aux(meta.typeof(x) == type.name, x, type.name)
+    else
+        meta.assert_string(type)
+        meta._assert_aux(meta.typeof(x) == type, x, type)
+    end
 end
 
