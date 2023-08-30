@@ -401,6 +401,17 @@ function meta._uninstall_property(x, property_name)
     metatable.is_private[property_name] = nil
 end
 
+--- @brief get whether property is installed
+function meta.has_property(x, property_name)
+    meta.assert_object(x)
+    meta.assert_string(property_name)
+    local metatable = getmetatable(x)
+    if metatable == nil or metatable.is_private == nil then
+        return false
+    end
+    return meta.is_boolean(metatable.is_private[property_name])
+end
+
 --- @brief make object immutable, this should be done inside the objects constructor
 function meta.set_is_mutable(x, b)
     meta.assert_object(x)
@@ -431,11 +442,13 @@ function meta.new(type, fields)
     end
 
     meta.set_is_mutable(out, true)
-    if fields ~= nil then
+    if meta.is_table(fields) then
         for name, value in pairs(fields) do
             meta.assert_string(name)
             meta._install_property(out, name, value)
         end
+    else
+        meta.assert_nil(fields)
     end
     return out
 end
@@ -485,15 +498,29 @@ meta.Type = "Type"
 function meta.new_type(typename, ctor)
     meta.assert_string(typename)
     meta.assert_function(ctor)
+
     local out = meta._new(meta.Type)
     out.name = typename
+
     getmetatable(out).__call = function(self, ...)
-        return ctor(...)
+        local out = ctor(...)
+        if not meta.isa(out, self.name) then
+            error("[rt] In " .. self.name .. ": Constructor does not return object of type `" .. self.name .. "`")
+        end
+
+        -- automatically add any fields or functions that were defined for the type
+        for key, value in pairs(getmetatable(self).properties) do
+            if not meta.has_property(out, key) then
+                meta._install_property(out, key, value)
+            end
+        end
+        return out
     end
 
     if meta[typename] ~= nil then
-        error("[rt] [rt] In meta.new_type: A type with name `" .. typename .. "` already exists.")
+        error("[rt] In meta.new_type: A type with name `" .. typename .. "` already exists.")
     end
+
     meta[typename] = typename
     return out
 end

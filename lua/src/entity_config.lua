@@ -15,7 +15,7 @@ rt.EntityConfig = meta.new_type("EntityConfig", function(config)
     return out
 end)
 
-rt.ENTITES = {
+rt.ENTITIES = {
     TEST = rt.EntityConfig({
         hp_base = 0,
         ap_base = 0,
@@ -29,5 +29,5 @@ rt.ENTITES = {
 }
 
 for id, config in pairs(rt.ENTITIES) do
-    meta.add_property(config, "id", id)
+    meta._install_property(config, "id", id)
 end

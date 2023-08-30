@@ -37,6 +37,7 @@ rt.MoveConfig = meta.new_type("MoveConfig", function(config)
     return out
 end)
 
+--[[
 rt.MOVES = {
     BASE_ATTACK = rt.MoveConfig({
         name = "Attack",
@@ -68,3 +69,4 @@ rt.MOVES = {
 for id, config in pairs(rt.MOVES) do
     meta._install_property(config, "id", id)
 end
+]]--
