@@ -172,10 +172,13 @@ function meta._initialize_notify(x)
     end
     mt.notify = {}
 
-    local function init_notify(x, name)
+    local function init_notify(x, property_name)
+        if not meta.has_property(x, property_name) then
+            error("[rt] In meta.notify: Object of type `" .. meta.typeof(x) .. "` does not have a property with name `" .. property_name .. "`")
+        end
         local metatable = getmetatable(x)
-        if meta.is_table(metatable.notify[name]) then return end
-        metatable.notify[name] = {
+        if meta.is_table(metatable.notify[property_name]) then return end
+        metatable.notify[property_name] = {
             is_blocked = false,
             n = 0,
             callbacks = {}
@@ -183,43 +186,38 @@ function meta._initialize_notify(x)
     end
 
     --- @brief block notification
-    --- @param name String
-    --- @param b Boolean
-    x.set_notify_blocked = function(this, name, b)
-        meta.assert_string(name) meta.assert_boolean(b)
-        init_notify(this, name)
-        getmetatable(this).notify[name].is_blocked = b
+    x.set_notify_blocked = function(this, property_name, b)
+        meta.assert_string(property_name) meta.assert_boolean(b)
+        init_notify(this, property_name)
+        getmetatable(this).notify[property_name].is_blocked = b
     end
 
     --- @brief check if notification is blocked
-    --- @param name String
-    x.get_notify_blocked = function(this, name)
-        meta.assert_string(name)
-        init_notify(this, name)
-        return getmetatable(this).notify[name].is_blocked
+    x.get_notify_blocked = function(this, property_name)
+        meta.assert_string(property_name)
+        init_notify(this, property_name)
+        return getmetatable(this).notify[property_name].is_blocked
     end
 
-    --- @brief register a callback, called when property with given name changes
+    --- @brief register a callback, called when property with given property_name changes
     --- @param name String
     --- @param callback Function With signature (Instance, property_value, ...) -> void
     --- @return Number handler ID
-    x.connect_notify = function(this, name, callback)
-        meta.assert_string(name) meta.assert_function(callback)
-        init_notify(this, name)
-        local notify = getmetatable(this).notify[name]
+    x.connect_notify = function(this, property_name, callback)
+        meta.assert_string(property_name) meta.assert_function(callback)
+        init_notify(this, property_name)
+        local notify = getmetatable(this).notify[property_name]
         notify.callbacks[notify.n] = callback
         notify.n = notify.n + 1
         return notify.n
     end
 
     --- @brief reset notification handler
-    --- @param name String
-    --- @param n Number signel handler ID or list of handler IDs
-    x.disconnect_notify = function(this, name, n)
-        meta.assert_string(name)
+    x.disconnect_notify = function(this, property_name, n)
+        meta.assert_string(property_name)
 
-        init_notify(this, name)
-        local notify = getmetatable(this).notify[name]
+        init_notify(this, property_name)
+        local notify = getmetatable(this).notify[property_name]
         if not meta.is_nil(notify) then
             if meta.is_nil(n) then
                 return
@@ -233,12 +231,11 @@ function meta._initialize_notify(x)
         end
     end
 
-    --- @brief get handler ids
-    --- @return Table of numbers
-    x.get_notify_handler_ids = function(this, name)
-        meta.assert_string(name)
-        init_notify(this, name)
-        local notify = getmetatable(this).notify[name]
+    --- @brief get IDs of connected notify handlers
+    x.get_notify_handler_ids = function(this, property_name)
+        meta.assert_string(property_name)
+        init_notify(this, property_name)
+        local notify = getmetatable(this).notify[property_name]
         local out = {}
         for id, _ in pairs(notify.callbacks) do
             out[id] = id
@@ -256,9 +253,7 @@ function meta.add_notify(x)
     return x
 end
 
---- @class meta.Object
 --- @brief [internal] Create new empty object
---- @param typename string type identifier
 function meta._new(typename)
     meta.assert_string(typename)
 
@@ -285,7 +280,7 @@ function meta._new(typename)
             error("[rt] In " .. metatable.__name .. ".__newindex: Cannot set property `" .. property_name .. "`, because it was declared private.")
         end
         if not metatable.is_mutable then
-            error("[rt] In " .. metatable.__name .. ".__newindex: Cannot set property `" .. property_name .. "`, object was declared immutable.")
+            error("[rt] In " .. metatable.__name .. ".__newindex: Cannot set property `" .. property_name .. "`, because the object was declared immutable.")
         end
         metatable.properties[property_name] = property_value
 
@@ -316,7 +311,6 @@ function meta.is_object(x)
 end
 
 --- @brief get typename identifier
---- @return String
 function meta.typeof(x)
     if not meta.is_table(x) then
         return type(x)
@@ -330,9 +324,8 @@ function meta.typeof(x)
     end
 end
 
---- @brief check if type is as given
---- @param x
---- @param type string
+--- @brief check if type of object is as given
+--- @return Boolean
 function meta.isa(x, type)
     return meta.typeof(x) == type
 end
@@ -412,6 +405,31 @@ function meta.has_property(x, property_name)
     return meta.is_boolean(metatable.is_private[property_name])
 end
 
+--- @brief declare property as immutable
+function meta.set_is_private(x, property_name, b)
+    meta.assert_object(x)
+    meta.assert_string(property_name)
+    meta.assert_boolean(b)
+    
+    local private_table = getmetatable(x).is_private
+    if not meta.is_boolean(private_table[property_name]) then
+        error("[rt] In meta.set_is_private: Object of type `" ..  meta.typeof(x) .. "` does not yet have a property named `" ..  property_name .. "`")
+    end
+    private_table[property_name] = b
+end
+
+--- @brief get whether property was declared private
+function meta.get_is_private(x, property_name)
+    meta.assert_object(x)
+    meta.assert_string(property_name)
+    local private_table = getmetatable(x).is_private
+
+    if not meta.is_boolean(private_table[property_name]) then
+        error("[rt] In meta.get_is_private: Object of type `" ..  meta.typeof(x) .. "` does not yet have a property named `" ..  property_name .. "`")
+    end
+    return getmetatable(x).is_private[property_name]
+end
+
 --- @brief make object immutable, this should be done inside the objects constructor
 function meta.set_is_mutable(x, b)
     meta.assert_object(x)
@@ -429,7 +447,7 @@ end
 meta.Object = "Object"
 
 --- @brief create a new object instance
---- @param type
+--- @param type meta.Type
 --- @param fields Table property_name -> property_value
 function meta.new(type, fields)
 
@@ -505,7 +523,7 @@ function meta.new_type(typename, ctor)
     getmetatable(out).__call = function(self, ...)
         local out = ctor(...)
         if not meta.isa(out, self.name) then
-            error("[rt] In " .. self.name .. ": Constructor does not return object of type `" .. self.name .. "`")
+            error("[rt] In " .. self.name .. ".__call: Constructor does not return object of type `" .. self.name .. "`.")
         end
 
         -- automatically add any fields or functions that were defined for the type
@@ -556,8 +574,6 @@ meta.Number = meta.new_type("number", function()
 end)
 
 --- @brief throw if object is not of given type
---- @param x
---- @param type String
 function meta.assert_isa(x, type)
 
     if meta.typeof(type) == "Type" then

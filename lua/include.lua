@@ -14,14 +14,11 @@ require "entity_config"
 require "entity"
 
 queue = rt.ActionQueue()
-queue:push(function()
-    println("called")
-end)
-queue:push(function()
-    println("called 2")
-end)
+do
+    local test = 1234
+    queue:push(function()
+        println(test)
+    end)
+end
 
 queue:step()
-println("twee")
-queue:step()
-println("end")
