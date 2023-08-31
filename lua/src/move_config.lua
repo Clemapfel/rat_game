@@ -26,6 +26,7 @@ rt.MoveConfig = meta.new_type("MoveConfig", function(config)
         apply = function(self, target)
             meta.assert_type(self, rt.BattleEntity)
             meta.assert_type(self, rt.BattleEntity)
+            return nil
         end
     })
 
@@ -37,11 +38,11 @@ rt.MoveConfig = meta.new_type("MoveConfig", function(config)
     return out
 end)
 
---[[
+--- @brief list of moves
 rt.MOVES = {
     BASE_ATTACK = rt.MoveConfig({
         name = "Attack",
-        description = "Simple attack, deals 1x$ATTACK to target enemy",
+        description = "Simple attack, deals $ATTACK to target enemy",
 
         can_target_self = false,
         can_target_enemy = true,
@@ -54,7 +55,7 @@ rt.MOVES = {
 
     BASE_PROTECT = rt.MoveConfig({
         name = "Protect",
-        description = "Prevents any damage done to user this turn",
+        description = "Prevents any damage done to user this turn, fails if used twice in a row",
 
         can_target_self = true,
         can_target_enemy = false,
@@ -66,7 +67,7 @@ rt.MOVES = {
     })
 }
 
+-- inject ID from table key
 for id, config in pairs(rt.MOVES) do
     meta._install_property(config, "id", id)
 end
-]]--

@@ -332,13 +332,22 @@ end
 
 --- @brief [internal] print type assertion error message
 --- @param b Boolean true if no error, false otherwise
---- @param x Object
+--- @param x meta.Object
 --- @param type String typename
 function meta._assert_aux(b, x, type)
     if b then return true end
     local name = debug.getinfo(2, "n").name
     error("[rt] In " .. name .. ": expected `" .. type .. "`, got `" .. meta.typeof(x) .. "`")
     return false
+end
+
+--- @brief throw if false
+function meta.assert(b)
+    meta.assert_boolean(b)
+    if not b then
+        local name = debug.getinfo(2, "n").name
+        error("[rt] In " .. name .. ": Assertion failed")
+    end
 end
 
 --- @brief throw if object is not a boolean
@@ -507,6 +516,24 @@ function meta.new_enum(fields)
 
     meta.set_is_mutable(out, false)
     return out
+end
+
+--- @brief check if value is part of enum
+function meta.is_enum(x, enum)
+    meta.assert_isa(enum,  meta.Enum)
+    for _, value in pairs(enum) do
+        if x == value then
+            return true
+        end
+    end
+    return false
+end
+
+--- @brief throw if object is not an enum value
+function meta.assert_enum(x, enum)
+    if not meta.is_enum(x, enum) then
+        error("[rt] In assert_enum: Value `" .. tostring(x) .. "` is not a value of enum")
+    end
 end
 
 --- @class meta.Type

@@ -21,4 +21,7 @@ do
     end)
 end
 
+meta.assert_enum(-3, rt.StatAlteration)
+meta.assert_enum(12, rt.StatAlteration)
+
 queue:step()

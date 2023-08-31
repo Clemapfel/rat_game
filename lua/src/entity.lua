@@ -13,6 +13,115 @@ rt.StatAlteration = meta.new_enum({
     MAX = 5
 })
 
+--- @brief convert stat level to numerical factor
+function rt._stat_alteration_to_factor(level)
+    if level == rt.StatAlteration.MIN then
+        return NEGATIVE_INFINITY
+    elseif level == rt.StatAlteration.MINUS_4 then
+        return 0.1
+    elseif level == rt.StatAlteration.MINUS_3 then
+        return 0.25
+    elseif level == rt.StatAlteration.MINUS_2 then
+        return 0.5
+    elseif level == rt.StatAlteration.MINUS_1 then
+        return 0.75
+    elseif level == rt.StatAlteration.ZERO then
+        return 1.0
+    elseif level == rt.StatAlteration.PLUS_1 then
+        return 1.25
+    elseif level == rt.StatAlteration.PLUS_2 then
+        return 1.5
+    elseif level == rt.StatAlteration.PLUS_3 then
+        return 1.75
+    elseif level == rt.StatAlteration.PLUS_4 then
+        return 2
+    elseif level == rt.StatAlteration.MAX then
+        return POSITIVE_INFINITY
+    end
+end
+
+--- @brief raise state alteration by number of steps
+function rt._stat_alteration_add(level, offset)
+    meta.assert_enum(level, rt.StatAlteration)
+    meta.assert_number(offset)
+
+    _stat_alteration_add_offset_plus_1 = function(x)
+
+        if x == rt.StatAlteration.MIN then
+            return rt.StatAlteration.MIN
+        end
+
+        if x == rt.StatAlteration.MAX then
+            return rt.StatAlteration.MAX
+        end
+
+        if level == rt.StatAlteration.MINUS_4 then
+            return rt.StatAlteration.MINUS_3
+        elseif level == rt.StatAlteration.MINUS_3 then
+            return rt.StatAlteration.MINUS_2
+        elseif level == rt.StatAlteration.MINUS_2 then
+            return rt.StatAlteration.MINUS_1
+        elseif level == rt.StatAlteration.MINUS_1 then
+            return rt.StatAlteration.ZERO
+        elseif level == rt.StatAlteration.ZERO then
+            return rt.StatAlteration.PLUS_1
+        elseif level == rt.StatAlteration.PLUS_1 then
+            return rt.StatAlteration.PLUS_2
+        elseif level == rt.StatAlteration.PLUS_2 then
+            return rt.StatAlteration.PLUS_3
+        elseif level == rt.StatAlteration.PLUS_3 then
+            return rt.StatAlteration.PLUS_4
+        elseif level == rt.StatAlteration.PLUS_4 then
+            return rt.StatAlteration.PLUS_4
+        end
+    end
+
+    _stat_alteration_add_offset_minus_1 = function(x)
+
+        if x == rt.StatAlteration.MIN then
+            return rt.StatAlteration.MIN
+        end
+
+        if x == rt.StatAlteration.MAX then
+            return rt.StatAlteration.MAX
+        end
+
+        if level == rt.StatAlteration.MINUS_4 then
+            return rt.StatAlteration.MINUS_4
+        elseif level == rt.StatAlteration.MINUS_3 then
+            return rt.StatAlteration.MINUS_4
+        elseif level == rt.StatAlteration.MINUS_2 then
+            return rt.StatAlteration.MINUS_3
+        elseif level == rt.StatAlteration.MINUS_1 then
+            return rt.StatAlteration.MINUS_2
+        elseif level == rt.StatAlteration.ZERO then
+            return rt.StatAlteration.MINUS_1
+        elseif level == rt.StatAlteration.PLUS_1 then
+            return rt.StatAlteration.ZERO
+        elseif level == rt.StatAlteration.PLUS_2 then
+            return rt.StatAlteration.PLUS_1
+        elseif level == rt.StatAlteration.PLUS_3 then
+            return rt.StatAlteration.PLUS_2
+        elseif level == rt.StatAlteration.PLUS_4 then
+            return rt.StatAlteration.PLUS_3
+        end
+    end
+
+    local out = level
+    if offset > 0 then
+        while offset > 0 do
+            out = _stat_alteration_add_offset_plus_1(out)
+            offset = offset - 1
+        end
+    elseif offset < 0 then
+        while offset < 0 do
+            out = _stat_alteration_add_offset_minus_1(out)
+            offset = offset + 1
+        end
+    end
+    return out
+end
+
 rt.MC_ID = "MC"
 rt.RAT_ID = "RAT"
 rt.PROF_ID = "PROF"
@@ -30,23 +139,22 @@ rt.Entity = meta.new_type("Entity", function(id)
         ap = entity.ap_base,
         ap_base = entity.ap_base,
 
-        attack = entity.attack_base,
         attack_base = entity.attack_base,
         attack_level = rt.StatAlteration.ZERO,
 
-        defense = entity.defense_base,
         defense_base = entity.defense_base,
         defense_level = rt.StatAlteration.ZERO,
 
-        speed = entity.speed_base,
         speed_base = entity.speed_base,
         speed_level = rt.StatAlteration.ZERO,
 
+        --- @brief Move ID -> PP left
         moveset = {
-            BASE_ATTACK,
-            BASE_PROTECT
+            BASE_ATTACK = POSITIVE_INFINITY,
+            BASE_PROTECT = POSITIVE_INFINITY
         },
 
+        --- @brief Status ID -> table of status-specific fields
         status = {},
 
         is_enemy = true,
@@ -93,29 +201,64 @@ function rt.Entity.set_hp(target, new_value)
     meta.assert_isa(target, rt.Entity)
 
     new_value = clamp(new_value, 0, target.hp_base)
-
 end
 
-function rt.Entity.get_hp(target, TODO) end
-function rt.Entity.get_hp_base(target, TODO) end
-function rt.Entity.set_hp(target, TODO) end
-function rt.Entity.add_hp(target, TODO) end
-function rt.Entity.reduce_hp(target, TODO) end
+--- @brief access attack after modifiers
+function rt.Entity.get_attack(target)
+    meta.assert_isa(target, rt.Entity)
+    local out = target.attack_base
+    out = out * rt._stat_alteration_to_factor(target.attack_level)
 
-function rt.Entity.get_attack(target, TODO) end
-function rt.Entity.raise_attack(target, TODO) end
+    for id, _ in pairs(target.status) do
+        out = out * rt.STATUS[id].attack_modifier.factor
+    end
+    for id, _ in pairs(target.status) do
+        out = out + rt.STATUS[id].attack_modifier.offset
+    end
+    return out
+end
+
+function rt.Entity.raise_attack(target) end
 function rt.Entity.lower_attack(target, TODO) end
 function rt.Entity.set_attack_level(target, TODO) end
 
-function rt.Entity.get_attack(target, TODO) end
-function rt.Entity.raise_attack(target, TODO) end
-function rt.Entity.lower_attack(target, TODO) end
-function rt.Entity.set_attack_level(target, TODO) end
+--- @brief access defense after modifiers
+function rt.Entity.get_defense(target)
+    meta.assert_isa(target, rt.Entity)
+    local out = target.defense_base
+    out = out * rt._stat_alteration_to_factor(target.defense_level)
 
-function rt.Entity.get_attack(target, TODO) end
-function rt.Entity.raise_attack(target, TODO) end
-function rt.Entity.lower_attack(target, TODO) end
-function rt.Entity.set_attack_level(target, TODO) end
+    for id, _ in pairs(target.status) do
+        out = out * rt.STATUS[id].defense_modifier.factor
+    end
+    for id, _ in pairs(target.status) do
+        out = out + rt.STATUS[id].defense_modifier.offset
+    end
+    return out
+end
+
+function rt.Entity.raise_defense(target, TODO) end
+function rt.Entity.lower_defense(target, TODO) end
+function rt.Entity.set_defense_level(target, TODO) end
+
+--- @brief access speed after modifiers
+function rt.Entity.get_speed(target)
+    meta.assert_isa(target, rt.Entity)
+    local out = target.speed_base
+    out = out * rt._stat_alteration_to_factor(target.speed_level)
+
+    for id, _ in pairs(target.status) do
+        out = out * rt.STATUS[id].speed_modifier.factor
+    end
+    for id, _ in pairs(target.status) do
+        out = out + rt.STATUS[id].speed_modifier.offset
+    end
+    return out
+end
+
+function rt.Entity.raise_speed(target, TODO) end
+function rt.Entity.lower_speed(target, TODO) end
+function rt.Entity.set_speed_level(target, TODO) end
 
 function rt.Entity.get_is_enemy(target) end
 
