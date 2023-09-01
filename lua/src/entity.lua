@@ -218,7 +218,11 @@ function rt.Entity.get_attack(target)
     return out
 end
 
-function rt.Entity.raise_attack(target) end
+function rt.Entity.raise_attack(target)
+    rt.queue(function()
+
+    end)
+end
 function rt.Entity.lower_attack(target, TODO) end
 function rt.Entity.set_attack_level(target, TODO) end
 

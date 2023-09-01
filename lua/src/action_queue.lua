@@ -50,3 +50,9 @@ rt.ActionQueue.is_empty = function(self)
     return self.queue:is_empty()
 end
 
+
+rt._action_queue = rt.ActionQueue()
+function rt.queue(f)
+    rt._action_queue:push(f)
+end
+
