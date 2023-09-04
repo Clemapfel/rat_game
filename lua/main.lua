@@ -13,15 +13,7 @@ require "move_config"
 require "entity_config"
 require "entity"
 
-queue = rt.ActionQueue()
-do
-    local test = 1234
-    queue:push(function()
-        println(test)
-    end)
+function love.draw()
+    love.graphics.print("Hello World", 400, 300)
 end
 
-meta.assert_enum(-3, rt.StatAlteration)
-meta.assert_enum(12, rt.StatAlteration)
-
-queue:step()

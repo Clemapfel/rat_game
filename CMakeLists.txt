@@ -8,9 +8,6 @@ set(SOL_INCLUDE_DIR "${CMAKE_SOURCE_DIR}/submodules/sol2/include")
 
 find_package(mousetrap REQUIRED)
 
-find_package(PkgConfig)
-pkg_check_modules(GTK REQUIRED gtk4)
-
 ### EXECUTABLE ###
 
 set(MOUSETRAP_HEADER_FILES

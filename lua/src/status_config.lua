@@ -73,14 +73,6 @@ rt.StatusConfig = meta.new_type("StatusConfig", function(config)
 end)
 
 rt.STATUS = {
-    BASE_PROTECT = StatusConfig({
-        name = "Protect",
-        description = "Prevents all damager this turn",
-        duration = 2,
-        on_damage_taken = function(self, value)
-            return 0
-        end
-    })
 }
 
 for id, config in pairs(rt.STATUS) do
