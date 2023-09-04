@@ -101,22 +101,25 @@ end
 --- @brief disconnect handler permanently
 --- @param component SignalComponent
 --- @param name String
-function rt.SignalComponent.disconnect(component, name)
+--- @param handler_ids
+function rt.SignalComponent.disconnect(component, name, handler_ids)
     meta.assert_isa(component, rt.SignalComponent)
     meta.assert_string(name)
-    component:_assert_has_signal(name, "disconnect")
+
+    if not component:has_signal(name) then
+        return
+    end
 
     local signal = getmetatable(component._instance).signals[name]
-    if not meta.is_nil(signal) then
-        if meta.is_nil(n) then
-            return
-        elseif meta.is_number(n) then
-            signal.callbacks[n] = nil
-        elseif meta.is_table(n) then
-            for id in ipairs(n) do
-                signal.callbacks[id] = nil
-            end
+    if meta.is_nil(handler_id) then
+        signal.callbacks = {}
+    elseif meta.is_table(handler_id) then
+        for id in pairs(handler_id) do
+            signal[handler_id] = nil
         end
+    else
+        meta.assert_number(handler_id)
+        signal.callbacks[handler_id] = nil
     end
 end
 
