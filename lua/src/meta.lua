@@ -44,6 +44,7 @@ function meta.is_function(x)
 end
 
 --- @brief [internal] Create new empty object
+--- @param typename String
 function meta._new(typename)
     meta.assert_string(typename)
 
@@ -92,6 +93,8 @@ function meta._new(typename)
 end
 
 --- @brief is meta object
+--- @param x any
+--- @return Boolean
 function meta.is_object(x)
     if not meta.is_table(x) then
         return false
@@ -202,6 +205,16 @@ function meta.has_property(x, property_name)
         return false
     end
     return meta.is_boolean(metatable.is_private[property_name])
+end
+
+--- @brief get list of all property names
+function meta.get_property_names(x)
+    meta.assert_object(x)
+    local out = {}
+    for name, _ in pairs(getmetatable(x).properties) do
+        table.insert(out, name)
+    end
+    return out
 end
 
 --- @brief declare property as immutable

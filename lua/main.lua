@@ -7,11 +7,14 @@ rt.test = {}
 
 require "common"
 require "meta"
-require "notify_component"
 require "signal_component"
 require "queue"
 
 -- ### MAIN ###
+
+test = meta.new(rt.SignalComponent)
+rt.add_signal_component(test)
+println(serialize(test))
 
 if meta.is_nil(love) then goto exit end
 

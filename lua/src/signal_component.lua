@@ -11,7 +11,14 @@ end)
 --- @param object meta.Object
 function rt.add_signal_component(object)
     meta.assert_object(object)
+    if not meta.is_nil(object.signals) then
+        error("[rt] In add_signal_component: Object already has a signal component")
+    end
+
     object.signals = rt.SignalComponent(object)
+    --for _, property in ipairs(meta.get_property_names(object)) do
+    --    object.signals:add("notfiy::" .. property)
+    --end
     return object
 end
 

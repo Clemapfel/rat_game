@@ -269,6 +269,8 @@ end
 
 --- @brief positive infinity
 INFINITY = 1/0
+
+--- @brief positive infinity
 POSITIVE_INFINITY = INFINITY
 
 --- @brief negative infinity
