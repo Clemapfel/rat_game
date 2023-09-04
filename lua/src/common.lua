@@ -1,4 +1,4 @@
---- @brief print, arguments are concatenated
+    --- @brief print, arguments are concatenated
 --- @param vararg any
 --- @return nil
 function print(...)

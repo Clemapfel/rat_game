@@ -6,17 +6,7 @@ project(rat_game VERSION 0.1.0 DESCRIPTION "" LANGUAGES CXX)
 find_library(lua REQUIRED NAMES lua)
 set(SOL_INCLUDE_DIR "${CMAKE_SOURCE_DIR}/submodules/sol2/include")
 
-find_package(mousetrap REQUIRED)
-
 ### EXECUTABLE ###
-
-set(MOUSETRAP_HEADER_FILES
-    battle/party_info.hpp
-)
-
-set(MOUSETRAP_SOURCE_FILES
-    battle/party_info.cpp
-)
 
 add_executable(battle_main main.cpp)
 target_link_libraries(battle_main PRIVATE
