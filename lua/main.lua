@@ -10,11 +10,22 @@ require "meta"
 require "signal_component"
 require "queue"
 
--- ### MAIN ###
+Test = meta.new_type("Test", function()
+    local out = meta.new(Test, {
+        property_01 = 1234,
+        property_02 = 5678
+    })
+    rt.add_signal_component(out)
+    return out
+end)
 
-test = meta.new(rt.SignalComponent)
-rt.add_signal_component(test)
-println(serialize(test))
+instance = Test()
+instance.signals:connect("notify::property_02", function(self, property)
+    println("called ", property)
+end)
+instance.property_02 = "test"
+
+-- ### MAIN ###
 
 if meta.is_nil(love) then goto exit end
 

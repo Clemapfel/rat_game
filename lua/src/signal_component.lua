@@ -7,6 +7,8 @@ rt.SignalComponent = meta.new_type("SignalComponent", function(holder)
     })
 end)
 
+rt.SignalComponent._notify_prefix = "notify::"
+
 --- @brief add a signal component to object, use `object.signals:add_signal` to add new signals
 --- @param object meta.Object
 function rt.add_signal_component(object)
@@ -17,7 +19,7 @@ function rt.add_signal_component(object)
 
     object.signals = rt.SignalComponent(object)
     for _, property in ipairs(meta.get_property_names(object)) do
-        object.signals:add("notfiy::" .. property)
+        object.signals:add(rt.SignalComponent._notify_prefix .. property)
     end
     return object
 end
@@ -200,4 +202,3 @@ rt.test.signal_component = function()
     assert(not called)
 end
 rt.test.signal_component()
-

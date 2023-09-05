@@ -75,8 +75,8 @@ function meta._new(typename)
         end
         metatable.properties[property_name] = property_value
 
-        if metatable.notify == nil then return end
-        local notify = metatable.notify[property_name]
+        if metatable.signals == nil then return end
+        local notify = metatable.signals[rt.SignalComponent._notify_prefix .. property_name]
         if meta.is_nil(notify) or notify.is_blocked then return end
         for _, callback in pairs(notify.callbacks) do
             callback(this, property_value)
