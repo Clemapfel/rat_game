@@ -13,12 +13,27 @@ require "keyboard_component"
 
 instance = meta._new("Object")
 rt.add_keyboard_component(instance)
-instance.keyboard.signals:connect("key_pressed", function(self, key)
-    println("Pressed: ", key)
+instance.keyboard.signal:connect("key_pressed", function(self, key)
+    println("Pressed 1: ", key)
+    return false
 end)
-instance.keyboard.signals:connect("key_released", function(self, key)
-    println("Released: ", key)
+instance.keyboard.signal:connect("key_released", function(self, key)
+    println("Released 1: ", key)
+    return false
 end)
+
+
+instance2 = meta._new("Object")
+rt.add_keyboard_component(instance2)
+instance2.keyboard.signal:connect("key_pressed", function(self, key)
+    println("Pressed 2: ", key)
+    return false
+end)
+instance2.keyboard.signal:connect("key_released", function(self, key)
+    println("Released 2: ", key)
+    return false
+end)
+
 -- ### MAIN ###
 
 if meta.is_nil(love) then goto exit end

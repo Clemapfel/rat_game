@@ -44,13 +44,19 @@ function rt.KeyboardHandler.update()
         if current == true and next == false then
             for _, component in ipairs(rt.KeyboardHandler._components) do
                 if getmetatable(component._instance).is_focused == true then
-                    component.signals:emit("key_released", key)
+                    local res = component.signal:emit("key_released", key)
+                    if res == true then
+                        break
+                    end
                 end
             end
         elseif current == false and next == true then
             for _, component in ipairs(rt.KeyboardHandler._components) do
                 if getmetatable(component._instance).is_focused == true then
-                    component.signals:emit("key_pressed", key)
+                    local res = component.signal:emit("key_pressed", key)
+                    if res == true then
+                        break
+                    end
                 end
             end
         end
@@ -82,8 +88,8 @@ function rt.KeyboardHandler.is_down(this, key)
 end
 
 --- @class KeyboardComponent
---- @signal key_pressed (::KeyboardComponent, key::String) -> nil
---- @signal key_pressed (::KeyboardComponent, key::String) -> nil
+--- @signal key_pressed (::KeyboardComponent, key::String) -> Boolean
+--- @signal key_pressed (::KeyboardComponent, key::String) -> Boolean
 rt.KeyboardComponent = meta.new_type("KeyboardComponent", function(holder)
     meta.assert_object(holder)
     local hash = rt.KeyboardHandler._hash
@@ -92,8 +98,8 @@ rt.KeyboardComponent = meta.new_type("KeyboardComponent", function(holder)
         _instance = holder
     })
     rt.add_signal_component(out)
-    out.signals:add("key_pressed")
-    out.signals:add("key_released")
+    out.signal:add("key_pressed")
+    out.signal:add("key_released")
     rt.KeyboardHandler._components[hash] = out
     rt.KeyboardHandler._hash = hash + 1
 
@@ -125,18 +131,26 @@ rt.test.keyboard_component = function()
     assert(meta.is_boolean(getmetatable(instance).is_focused))
 
     local pressed_called = false
-    component.signals:connect("key_pressed", function(self, key)
+    component.signal:connect("key_pressed", function(self, key)
         pressed_called = true
+        return false
     end)
 
     local release_called = false
-    component.signals:connect("key_released", function(self, key)
+    component.signal:connect("key_released", function(self, key)
         release_called = true
+        return true
     end)
 
     rt.KeyboardHandler:update()
-    -- assert(pressed_called == true)
-    -- assert(release_called == true)
+
+    if love == nil then
+        assert(component.signal:emit("key_pressed", "space") == false)
+        assert(component.signal:emit("key_released", "space") == true)
+    end
+
+    -- assert(pressed_called)
+    -- assert(release_called)
 
     Test = nil
 end
