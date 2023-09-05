@@ -1,8 +1,8 @@
---- @class SignalComponent
+--- @class rt.SignalComponent
 --- @param holder meta.Object
 rt.SignalComponent = meta.new_type("SignalComponent", function(holder)
     meta.assert_object(holder)
-    return meta.new(meta.SignalComponent, {
+    return meta.new(rt.SignalComponent, {
         _instance = holder
     })
 end)
@@ -16,14 +16,14 @@ function rt.add_signal_component(object)
     end
 
     object.signals = rt.SignalComponent(object)
-    --for _, property in ipairs(meta.get_property_names(object)) do
-    --    object.signals:add("notfiy::" .. property)
-    --end
+    for _, property in ipairs(meta.get_property_names(object)) do
+        object.signals:add("notfiy::" .. property)
+    end
     return object
 end
 
 --- @brief [internal] initialize signal of given name
---- @param component SignalComponent
+--- @param component rt.SignalComponent
 --- @param name String
 function rt.SignalComponent._init_signal(component, name)
     meta.assert_isa(component, rt.SignalComponent)
@@ -40,11 +40,11 @@ function rt.SignalComponent._init_signal(component, name)
 end
 
 --- @brief [internal] assert that object has a signal with given name
---- @param component SignalComponent
+--- @param component rt.SignalComponent
 --- @param name String
 --- @param scope String
 function rt.SignalComponent._assert_has_signal(component, name, scope)
-    meta.assert_isa(component, SignalComponent)
+    meta.assert_isa(component, rt.SignalComponent)
     meta.assert_string(name)
     meta.assert_string(scope)
 
@@ -54,7 +54,7 @@ function rt.SignalComponent._assert_has_signal(component, name, scope)
 end
 
 --- @brief check if instance has a signal with given name
---- @param component SignalComponent
+--- @param component rt.SignalComponent
 --- @param name String
 function rt.SignalComponent.has_signal(component, name)
     meta.assert_isa(component, rt.SignalComponent)
@@ -62,8 +62,8 @@ function rt.SignalComponent.has_signal(component, name)
     return not meta.is_nil(getmetatable(component._instance).signals[name])
 end
 
---- @brief add a signal, afterwards, all other SignalComponent functions will become available
---- @param component SignalComponent
+--- @brief add a signal, afterwards, all other rt.SignalComponent functions will become available
+--- @param component rt.SignalComponent
 --- @param name String
 function rt.SignalComponent.add(component, name)
     meta.assert_isa(component, rt.SignalComponent)
@@ -72,7 +72,7 @@ function rt.SignalComponent.add(component, name)
 end
 
 --- @brief invoke all connected signal handlers
---- @param component SignalComponent
+--- @param component rt.SignalComponent
 --- @param name String
 --- @param vararg any
 function rt.SignalComponent.emit(component, name, ...)
@@ -106,7 +106,7 @@ function rt.SignalComponent.connect(component, name, callback)
 end
 
 --- @brief disconnect handler permanently
---- @param component SignalComponent
+--- @param component rt.SignalComponent
 --- @param name String
 --- @param handler_ids
 function rt.SignalComponent.disconnect(component, name, handler_ids)
@@ -131,7 +131,7 @@ function rt.SignalComponent.disconnect(component, name, handler_ids)
 end
 
 --- @brief block handler temporarily
---- @param component SignalComponent
+--- @param component rt.SignalComponent
 --- @param name String
 --- @param b Boolean
 function rt.SignalComponent.set_is_blocked(component, name, b)
@@ -142,7 +142,7 @@ function rt.SignalComponent.set_is_blocked(component, name, b)
 end
 
 --- @brief check whether signal handler is not connected or currently blocked
---- @param component SignalComponent
+--- @param component rt.SignalComponent
 --- @param name String
 --- @return Boolean
 function rt.SignalComponent.get_is_blocked(component, name)
@@ -153,7 +153,7 @@ function rt.SignalComponent.get_is_blocked(component, name)
 end
 
 --- @brief get all handler ids for given signal
---- @param component SignalComponent
+--- @param component rt.SignalComponent
 --- @param name String
 --- @return Table list of handler IDs
 function rt.SignalComponent.get_handler_ids(component, name)

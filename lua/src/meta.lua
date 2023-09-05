@@ -135,6 +135,7 @@ function meta._assert_aux(b, x, type)
 end
 
 --- @brief throw if false
+--- @param b Boolean
 function meta.assert(b)
     meta.assert_boolean(b)
     if not b then
@@ -144,50 +145,67 @@ function meta.assert(b)
 end
 
 --- @brief throw if object is not a boolean
+--- @param x any
 function meta.assert_boolean(x)
     meta._assert_aux(meta.is_boolean(x), x, "boolean")
 end
 
 --- @brief throw if object is not a table
+--- @param x any
 function meta.assert_table(x)
     meta._assert_aux(meta.is_table(x), x, "table")
 end
 
 --- @brief throw if object is not callable
+--- @param x any
 function meta.assert_function(x)
     meta._assert_aux(meta.is_function(x), x, "function")
 end
 
 --- @brief throw if object is not a string
+--- @param x any
 function meta.assert_string(x)
     meta._assert_aux(meta.is_string(x), x, "string")
 end
 
 --- @brief throw if object is not a number
+--- @param x any
 function meta.assert_number(x)
     meta._assert_aux(meta.is_number(x), x, "number")
 end
 
 --- @brief throw if object is not nil
+--- @param x any
 function meta.assert_nil(x)
     meta._assert_aux(meta.is_nil(x), x, "typeof(nil)")
 end
 
+--- @brief assert that object was created using `meta.new`
+--- @param x any
 function meta.assert_object(x)
     local metatable = getmetatable(x)
     return metatable ~= nil and metatable.typename ~= nil
 end
 
 --- @brief [internal] add a property, set to intial value
+--- @param x meta.Object
+--- @param property_name String
+--- @param initial_value any
+--- @param is_private Boolean
 function meta._install_property(x, property_name, initial_value, is_private)
     meta.assert_object(x);
     meta.assert_string(property_name)
+    if not meta.is_nil(is_private) then
+        meta.assert_boolean(is_private)
+    end
     local metatable = getmetatable(x)
     metatable.properties[property_name] = initial_value
     metatable.is_private[property_name] = (is_private == true)
 end
 
 --- @brief [internal] add a property, set to intial value
+--- @param x meta.Object
+--- @param property_name String
 function meta._uninstall_property(x, property_name)
     meta.assert_object(x)
     meta.assert_string(property_name)
@@ -197,6 +215,9 @@ function meta._uninstall_property(x, property_name)
 end
 
 --- @brief get whether property is installed
+--- @param x meta.Object
+--- @param property_name String
+--- @return Boolean
 function meta.has_property(x, property_name)
     meta.assert_object(x)
     meta.assert_string(property_name)
@@ -208,6 +229,8 @@ function meta.has_property(x, property_name)
 end
 
 --- @brief get list of all property names
+--- @param x meta.Object
+--- @return Table
 function meta.get_property_names(x)
     meta.assert_object(x)
     local out = {}
@@ -218,6 +241,7 @@ function meta.get_property_names(x)
 end
 
 --- @brief declare property as immutable
+--- @param x any
 function meta.set_is_private(x, property_name, b)
     meta.assert_object(x)
     meta.assert_string(property_name)
@@ -231,6 +255,8 @@ function meta.set_is_private(x, property_name, b)
 end
 
 --- @brief get whether property was declared private
+--- @param x meta.Object
+--- @param property_name String
 function meta.get_is_private(x, property_name)
     meta.assert_object(x)
     meta.assert_string(property_name)
@@ -243,6 +269,8 @@ function meta.get_is_private(x, property_name)
 end
 
 --- @brief make object immutable, this should be done inside the objects constructor
+--- @param x meta.Object
+--- @param b Boolean
 function meta.set_is_mutable(x, b)
     meta.assert_object(x)
     meta.assert_boolean(b)
@@ -250,6 +278,8 @@ function meta.set_is_mutable(x, b)
 end
 
 --- @brief check if object is immutable
+--- @param x meta.Object
+--- @return Boolean
 function meta.get_is_mutable(x)
     meta.assert_object(x);
     return getmetatable(x).is_mutable
@@ -262,6 +292,9 @@ meta.Object = "Object"
 --- @param type meta.Type
 --- @param fields Table property_name -> property_value
 function meta.new(type, fields)
+
+    meta.assert_isa(type, "Type")
+    meta.assert_table(fields)
 
     local out = {}
     if meta.isa(type, "Type") then
@@ -322,6 +355,8 @@ function meta.new_enum(fields)
 end
 
 --- @brief check if value is part of enum
+--- @param x any
+--- @param enum meta.Enum
 function meta.is_enum(x, enum)
     meta.assert_isa(enum,  meta.Enum)
     for _, value in pairs(enum) do
@@ -333,6 +368,8 @@ function meta.is_enum(x, enum)
 end
 
 --- @brief throw if object is not an enum value
+--- @param x any
+--- @param enum meta.Enum
 function meta.assert_enum(x, enum)
     if not meta.is_enum(x, enum) then
         error("[rt] In assert_enum: Value `" .. tostring(x) .. "` is not a value of enum")
@@ -343,6 +380,8 @@ end
 meta.Type = "Type"
 
 --- @brief create a new type with given constructor
+--- @param typename String
+--- @param ctor Function
 function meta.new_type(typename, ctor)
     meta.assert_string(typename)
     meta.assert_function(ctor)
@@ -404,6 +443,8 @@ meta.Number = meta.new_type("number", function()
 end)
 
 --- @brief throw if object is not of given type
+--- @param x any
+--- @param type meta.Type
 function meta.assert_isa(x, type)
 
     if meta.typeof(type) == "Type" then
