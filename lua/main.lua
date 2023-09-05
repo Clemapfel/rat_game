@@ -11,6 +11,14 @@ require "signal_component"
 require "queue"
 require "keyboard_component"
 
+instance = meta._new("Object")
+rt.add_keyboard_component(instance)
+instance.keyboard.signals:connect("key_pressed", function(self, key)
+    println("Pressed: ", key)
+end)
+instance.keyboard.signals:connect("key_released", function(self, key)
+    println("Released: ", key)
+end)
 -- ### MAIN ###
 
 if meta.is_nil(love) then goto exit end

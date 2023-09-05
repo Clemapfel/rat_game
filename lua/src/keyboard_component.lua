@@ -1,8 +1,8 @@
+--- @brief singleton, handles keyboard key events
 rt.KeyboardHandler = {}
 
 --- @brief list of valid keyboard key identifiers
 --- @see https://love2d.org/wiki/KeyConstant
-
 rt.KeyboardKey = meta.new_enum((function()
     local out = {}
     local i = 1
@@ -22,6 +22,8 @@ function rt.KeyboardHandler._new_state()
     return out
 end
 
+rt.KeyboardHandler._hash = 1
+rt.KeyboardHandler._components = {}
 rt.KeyboardHandler._state_now = rt.KeyboardHandler._new_state()
 rt.KeyboardHandler._state_previous = rt.KeyboardHandler._new_state()
 
@@ -30,15 +32,27 @@ function rt.KeyboardHandler.update()
     for key, now in pairs(rt.KeyboardHandler._state_now) do
 
         local current = now
-        local next = love.keyboard.isDown(key)
+
+        local next = not now -- for debug
+        if love ~= nil then
+            next = love.keyboard.isDown(key)
+        end
 
         rt.KeyboardHandler._state_previous[key] = current
         rt.KeyboardHandler._state_now[key] = next
 
         if current == true and next == false then
-            println("Pressed: ", key)
+            for _, component in ipairs(rt.KeyboardHandler._components) do
+                if getmetatable(component._instance).is_focused == true then
+                    component.signals:emit("key_released", key)
+                end
+            end
         elseif current == false and next == true then
-            println("Released: ", key)
+            for _, component in ipairs(rt.KeyboardHandler._components) do
+                if getmetatable(component._instance).is_focused == true then
+                    component.signals:emit("key_pressed", key)
+                end
+            end
         end
     end
 end
@@ -47,6 +61,7 @@ end
 --- @param key String
 --- @return Boolean
 function rt.KeyboardHandler.was_pressed(this, key)
+    meta.assert_string(key)
     return this._state_previous[key] == false and this._state_now[key] == true
 end
 
@@ -54,6 +69,7 @@ end
 --- @param key String
 --- @return Boolean
 function rt.KeyboardHandler.was_released(this, key)
+    meta.assert_string(key)
     return this._state_previous[key] == true and this._state_now[key] == false
 end
 
@@ -61,7 +77,67 @@ end
 --- @param key String
 --- @return Boolean
 function rt.KeyboardHandler.is_down(this, key)
+    meta.assert_string(key)
     return this._state_now[key]
 end
 
+--- @class KeyboardComponent
+--- @signal key_pressed (::KeyboardComponent, key::String) -> nil
+--- @signal key_pressed (::KeyboardComponent, key::String) -> nil
+rt.KeyboardComponent = meta.new_type("KeyboardComponent", function(holder)
+    meta.assert_object(holder)
+    local hash = rt.KeyboardHandler._hash
+    local out = meta.new(rt.KeyboardComponent, {
+        _hash = hash,
+        _instance = holder
+    })
+    rt.add_signal_component(out)
+    out.signals:add("key_pressed")
+    out.signals:add("key_released")
+    rt.KeyboardHandler._components[hash] = out
+    rt.KeyboardHandler._hash = hash + 1
 
+    local metatable = getmetatable(holder)
+    if not meta.is_boolean(metatable.is_focused) then
+        metatable.is_focused = true
+    end
+
+    return rt.KeyboardHandler._components[hash]
+end)
+
+--- @brief add a keyboard component to object, signals `key_pressed` and `key_released` are emitted when the global keyboard state changes
+--- @param object meta.Object
+function rt.add_keyboard_component(object)
+    meta.assert_object(object)
+    if not meta.is_nil(object.keyboard) then
+        error("[rt] In rt.add_keyboard_component: Overriding property `keyboard` of object `" .. meta.typeof(object) .. "`")
+    end
+    object.keyboard = rt.KeyboardComponent(object)
+    return object
+end
+
+--- @brief [internal] test keyboard component
+rt.test.keyboard_component = function()
+
+    local instance = meta._new("Object")
+    local component = rt.KeyboardComponent(instance)
+    assert(component._instance == instance)
+    assert(meta.is_boolean(getmetatable(instance).is_focused))
+
+    local pressed_called = false
+    component.signals:connect("key_pressed", function(self, key)
+        pressed_called = true
+    end)
+
+    local release_called = false
+    component.signals:connect("key_released", function(self, key)
+        release_called = true
+    end)
+
+    rt.KeyboardHandler:update()
+    -- assert(pressed_called == true)
+    -- assert(release_called == true)
+
+    Test = nil
+end
+rt.test.keyboard_component()

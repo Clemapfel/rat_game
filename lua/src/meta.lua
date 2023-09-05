@@ -180,8 +180,7 @@ end
 --- @brief assert that object was created using `meta.new`
 --- @param x any
 function meta.assert_object(x)
-    local metatable = getmetatable(x)
-    return metatable ~= nil and metatable.typename ~= nil
+    meta._assert_aux(meta.is_object(x), x, "meta.Object")
 end
 
 --- @brief [internal] add a property, set to intial value
@@ -404,7 +403,6 @@ function meta.new_type(typename, ctor)
     if meta[typename] ~= nil then
         error("[rt] In meta.new_type: A type with name `" .. typename .. "` already exists.")
     end
-
     meta[typename] = typename
     return out
 end
