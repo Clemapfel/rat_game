@@ -1,11 +1,15 @@
-RESOURCE_PATH = "/home/clem/Workspace/rat_game/lua" --love.filesystem.getSource()
+if love == nil then -- debug mode
+    RESOURCE_PATH = "/home/clem/Workspace/rat_game/lua"
+    love = {}
+else
+    RESOURCE_PATH = love.filesystem.getSource()
+end
+
 package.path = package.path .. ";" .. RESOURCE_PATH .. "/src/?.lua"
 package.path = package.path .. ";" .. RESOURCE_PATH .. "/battle/?.lua"
 
 rt = {}
 rt.test = {}
-
-if love == nil then love = {} end
 
 require "common"
 require "meta"
@@ -17,13 +21,9 @@ require "keyboard_component"
 require "gamepad_component"
 require "mouse_component"
 
-rectangle = rt.Rectangle(12, 14, 100, 200)
-println(rectangle:get_top_left())
-println(rectangle:contains(12, 14))
-
 -- ### MAIN ###
 
-if meta.is_nil(love) then love = {} end
+if meta.is_nil(love) then goto exit end
 
 --- @brief startup
 function love.load()

@@ -51,7 +51,12 @@ end)
 --- @param y Number
 --- @param object
 function rt.MouseHandler.is_cursor_in_bounds(x, y, object)
-    return x > 200 and y > 200
+    if not meta.is_nil(object.allocation) then
+        meta.assert_isa(object.allocation, rt.AllocationComponent)
+        return object.allocation:get_bounds():contains(x, y)
+    else
+        return true
+    end
 end
 
 --- @brief handle mouse button press

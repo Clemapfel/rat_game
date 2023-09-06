@@ -118,9 +118,10 @@ end
 function rt.AllocationComponent.set_margin_left(self, value)
     meta.assert_isa(self, rt.AllocationComponent)
     rt.AllocationComponent._assert_margin(value, "AllocationComponent.set_margin_left")
-    self._bounds._margins.left = value
+    self._margins.left = value
     rt.AllocationHandler._emit_changed(self)
 end
+rt.AllocationComponent.set_margin_start = rt.AllocationComponent.set_margin_left
 
 --- @brief set margin end
 --- @param self AllocationComponent
@@ -128,9 +129,10 @@ end
 function rt.AllocationComponent.set_margin_right(self, value)
     meta.assert_isa(self, rt.AllocationComponent)
     rt.AllocationComponent._assert_margin(value, "AllocationComponent.set_margin_right")
-    self._bounds._margins.right = value
+    self._margins.right = value
     rt.AllocationHandler._emit_changed(self)
 end
+rt.AllocationComponent.set_margin_end = rt.AllocationComponent.set_margin_right
 
 --- @brief set margin top
 --- @param self AllocationComponent
@@ -138,7 +140,7 @@ end
 function rt.AllocationComponent.set_margin_top(self, value)
     meta.assert_isa(self, rt.AllocationComponent)
     rt.AllocationComponent._assert_margin(value, "AllocationComponent.set_margin_left")
-    self._bounds._margins.top = value
+    self._margins.top = value
     rt.AllocationHandler._emit_changed(self)
 end
 
@@ -148,7 +150,7 @@ end
 function rt.AllocationComponent.set_margin_bottom(self, value)
     meta.assert_isa(self, rt.AllocationComponent)
     rt.AllocationComponent._assert_margin(value, "AllocationComponent.set_margin_bottom")
-    self._bounds._margins.bottom = value
+    self._margins.bottom = value
     rt.AllocationHandler._emit_changed(self)
 end
 
@@ -157,7 +159,7 @@ end
 --- @return Number
 function rt.AllocationComponent.get_margin_left(self)
     meta.assert_isa(self, rt.AllocationComponent)
-    return self._bounds._margins.left
+    return self._margins.left
 end
 
 --- @brief get margin end
@@ -165,7 +167,7 @@ end
 --- @return Number
 function rt.AllocationComponent.get_margin_right(self)
     meta.assert_isa(self, rt.AllocationComponent)
-    return self._bounds._margins.right
+    return self._margins.right
 end
 
 --- @brief get margin top
@@ -173,7 +175,7 @@ end
 --- @return Number
 function rt.AllocationComponent.get_margin_top(self)
     meta.assert_isa(self, rt.AllocationComponent)
-    return self._bounds._margins.top
+    return self._margins.top
 end
 
 --- @brief get margin bottom
@@ -181,7 +183,7 @@ end
 --- @return Number
 function rt.AllocationComponent.get_margin_bottom(self)
     meta.assert_isa(self, rt.AllocationComponent)
-    return self._bounds._margins.bottom
+    return self._margins.bottom
 end
 
 --- @brief set margin start and end
@@ -190,8 +192,8 @@ end
 function rt.AllocationComponent.set_margin_horizontal(self, both)
     meta.assert_isa(self, rt.AllocationComponent)
     rt.AllocationComponent._assert_margin(both, "AllocationComponent.set_margin_horizontal")
-    self._bounds._margins.left = both
-    self._bounds._margins.right = both
+    self._margins.left = both
+    self._margins.right = both
     rt.AllocationHandler._emit_changed(self)
 end
 
@@ -201,8 +203,8 @@ end
 function rt.AllocationComponent.set_margin_vertical(self, both)
     meta.assert_isa(self, rt.AllocationComponent)
     rt.AllocationComponent._assert_margin(both, "AllocationComponent.set_margin_vertical")
-    self._bounds._margins.top = both
-    self._bounds._margins.bottom = both
+    self._margins.top = both
+    self._margins.bottom = both
     rt.AllocationHandler._emit_changed(self)
 end
 
@@ -241,12 +243,12 @@ end
 
 --- @brief set whether object should expand along both axes
 --- @param self AllocationComponent
---- @param b Boolean
-function rt.AllocationComponent.set_expand(self, b)
+--- @param both Boolean
+function rt.AllocationComponent.set_expand(self, both)
     meta.assert_isa(self, rt.AllocationComponent)
-    meta.assert_boolean(b)
-    self._expand_horizontally = b
-    self._expand_vertically = b
+    meta.assert_boolean(both)
+    self._expand_horizontally = both
+    self._expand_vertically = both
     rt.AllocationHandler._emit_changed(self)
 end
 
@@ -318,6 +320,11 @@ function rt.test.allocation_component()
     local instance = meta._new("Object")
     instance.allocation = rt.AllocationComponent(instance)
 
+    local changed_called = 0
+    instance.allocation.signal:connect("changed", function()
+        changed_called = changed_called + 1
+    end)
+
     local x, y = instance.allocation:get_position()
     assert(x == 0 and y == 0)
     local width, height = instance.allocation:get_size()
@@ -330,8 +337,28 @@ function rt.test.allocation_component()
     width, height = instance.allocation:get_size()
     assert(width == 3 and height == 4)
 
-    instance.allocation:set_margin(10)
+    instance.allocation:set_margin_left(10)
+    instance.allocation:set_margin_right(10)
+    instance.allocation:set_margin_top(10)
+    instance.allocation:set_margin_bottom(10)
+
     width, height = instance.allocation:get_size()
     assert(width == 3 + 20 and height == 4 + 20)
+
+    assert(instance.allocation:get_expand_horizontally() == true)
+    assert(instance.allocation:get_expand_vertically() == true)
+    instance.allocation:set_expand_horizontally(false)
+    instance.allocation:set_expand_vertically(false)
+    assert(instance.allocation:get_expand_horizontally() == false)
+    assert(instance.allocation:get_expand_vertically() == false)
+
+    assert(instance.allocation:get_horizontal_alignment() == rt.Alignment.CENTER)
+    assert(instance.allocation:get_vertical_alignment() == rt.Alignment.CENTER)
+    instance.allocation:set_horizontal_alignment(rt.Alignment.START)
+    instance.allocation:set_vertical_alignment(rt.Alignment.END)
+    assert(instance.allocation:get_horizontal_alignment() == rt.Alignment.START)
+    assert(instance.allocation:get_vertical_alignment() == rt.Alignment.END)
+
+    assert(changed_called == 10)
 end
 rt.test.allocation_component()
