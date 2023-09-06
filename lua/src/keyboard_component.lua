@@ -147,6 +147,9 @@ rt.KeyboardKey = meta.new_enum({
 
 rt.KeyboardHandler._hash = 1
 rt.KeyboardHandler._components = {}
+rt.KeyboardHandler._components_meta = { __mode = "v" }
+setmetatable(rt.KeyboardHandler._components, rt.KeyboardHandler._components_meta)
+
 
 --- @class KeyboardComponent
 --- @signal key_pressed (::KeyboardComponent, key::String) -> Boolean

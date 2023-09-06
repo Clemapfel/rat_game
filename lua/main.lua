@@ -13,6 +13,7 @@ require "signal_component"
 require "queue"
 require "keyboard_component"
 require "gamepad_component"
+require "mouse_component"
 
 instance = meta._new("Object")
 instance.keyboard = rt.KeyboardComponent(instance)
@@ -23,6 +24,22 @@ instance.keyboard.signal:connect("key_released", function(self, key)
     println("Released: ", key)
 end)
 
+instance.mouse = rt.MouseComponent(instance)
+instance.mouse.signal:connect("button_pressed", function(self, x, y, id)
+    println("Pressed: ", x, " ", y, " ", id)
+end)
+instance.mouse.signal:connect("button_released", function(self, x, y, id)
+    println("Released: ", x, " ", y, " ", id)
+end)
+instance.mouse.signal:connect("motion", function(self, x, y, dx, dy)
+    --println("Motion: ", x, " ", y, " ", dx, " ", dy)
+end)
+instance.mouse.signal:connect("motion_enter", function(self, x, y)
+    println("Enter: ", x, " ", y)
+end)
+instance.mouse.signal:connect("motion_leave", function(self, x, y)
+    println("Leave: ", x, " ", y)
+end)
 
 -- ### MAIN ###
 

@@ -32,6 +32,9 @@ rt.GamepadAxis = meta.new_enum({
 
 rt.GamepadHandler._hash = 1
 rt.GamepadHandler._components = {}
+rt.GamepadHandler._components_meta = { __mode = "v" }
+setmetatable(rt.GamepadHandler._components, rt.GamepadHandler._components_meta)
+
 rt.GamepadHandler._active_joystick_id = 0
 rt.GamepadHandler._joysticks = {} -- JoystickID -> love.Joystick
 
