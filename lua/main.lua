@@ -9,37 +9,16 @@ if love == nil then love = {} end
 
 require "common"
 require "meta"
-require "signal_component"
 require "queue"
+require "geometry"
+require "signal_component"
 require "keyboard_component"
 require "gamepad_component"
 require "mouse_component"
 
-instance = meta._new("Object")
-instance.keyboard = rt.KeyboardComponent(instance)
-instance.keyboard.signal:connect("key_pressed", function(self, key)
-    println("Pressed: ", key)
-end)
-instance.keyboard.signal:connect("key_released", function(self, key)
-    println("Released: ", key)
-end)
-
-instance.mouse = rt.MouseComponent(instance)
-instance.mouse.signal:connect("button_pressed", function(self, x, y, id)
-    println("Pressed: ", x, " ", y, " ", id)
-end)
-instance.mouse.signal:connect("button_released", function(self, x, y, id)
-    println("Released: ", x, " ", y, " ", id)
-end)
-instance.mouse.signal:connect("motion", function(self, x, y, dx, dy)
-    --println("Motion: ", x, " ", y, " ", dx, " ", dy)
-end)
-instance.mouse.signal:connect("motion_enter", function(self, x, y)
-    println("Enter: ", x, " ", y)
-end)
-instance.mouse.signal:connect("motion_leave", function(self, x, y)
-    println("Leave: ", x, " ", y)
-end)
+rectangle = rt.Rectangle(12, 14, 100, 200)
+println(rectangle:get_top_left())
+println(rectangle:contains(12, 14))
 
 -- ### MAIN ###
 

@@ -150,7 +150,6 @@ rt.KeyboardHandler._components = {}
 rt.KeyboardHandler._components_meta = { __mode = "v" }
 setmetatable(rt.KeyboardHandler._components, rt.KeyboardHandler._components_meta)
 
-
 --- @class KeyboardComponent
 --- @signal key_pressed (::KeyboardComponent, key::String) -> Boolean
 --- @signal key_released (::KeyboardComponent, key::String) -> Boolean
