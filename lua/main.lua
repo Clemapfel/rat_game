@@ -12,6 +12,7 @@ require "meta"
 require "queue"
 require "geometry"
 require "signal_component"
+require "allocation_component"
 require "keyboard_component"
 require "gamepad_component"
 require "mouse_component"
@@ -31,7 +32,6 @@ end
 --- @brief update tick
 function love.update()
 end
-
 
 --- @brief draw step
 function love.draw()

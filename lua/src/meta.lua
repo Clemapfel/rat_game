@@ -143,44 +143,62 @@ end
 
 --- @brief throw if object is not a boolean
 --- @param x any
-function meta.assert_boolean(x)
+function meta.assert_boolean(x, ...)
     meta._assert_aux(meta.is_boolean(x), x, "boolean")
+    for _, n in ipairs({...}) do
+        meta._assert_aux(meta.is_boolean(n), n, "boolean")
+    end
 end
 
 --- @brief throw if object is not a table
 --- @param x any
-function meta.assert_table(x)
+function meta.assert_table(x, ...)
     meta._assert_aux(meta.is_table(x), x, "table")
+    for _, n in ipairs({...}) do
+        meta._assert_aux(meta.is_table(n), n, "table")
+    end
 end
 
 --- @brief throw if object is not callable
 --- @param x any
-function meta.assert_function(x)
+function meta.assert_function(x, ...)
     meta._assert_aux(meta.is_function(x), x, "function")
+    for _, n in ipairs({...}) do
+        meta._assert_aux(meta.is_function(n), n, "function")
+    end
 end
 
 --- @brief throw if object is not a string
 --- @param x any
-function meta.assert_string(x)
+function meta.assert_string(x, ...)
     meta._assert_aux(meta.is_string(x), x, "string")
 end
 
 --- @brief throw if object is not a number
 --- @param x any
-function meta.assert_number(x)
+function meta.assert_number(x, ...)
     meta._assert_aux(meta.is_number(x), x, "number")
+    for _, number in ipairs({...}) do
+        meta._assert_aux(meta.is_number(number), number, "number")
+    end
 end
 
 --- @brief throw if object is not nil
 --- @param x any
-function meta.assert_nil(x)
+function meta.assert_nil(x, ...)
     meta._assert_aux(meta.is_nil(x), x, "typeof(nil)")
+    for _, number in ipairs({...}) do
+        meta._assert_aux(meta.is_nil(number), number, "typeof(nil)")
+    end
 end
 
 --- @brief assert that object was created using `meta.new`
 --- @param x any
-function meta.assert_object(x)
+function meta.assert_object(x, ...)
     meta._assert_aux(meta.is_object(x), x, "meta.Object")
+    for _, number in ipairs({...}) do
+        meta._assert_aux(meta.is_object(number), number, "meta.Object")
+    end
 end
 
 --- @brief [internal] add a property, set to intial value

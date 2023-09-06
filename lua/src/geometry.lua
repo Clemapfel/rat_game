@@ -1,9 +1,27 @@
 --- @class Rectangle
 rt.Rectangle = meta.new_type("Rectangle", function(top_left_x, top_left_y, width, height)
+
+    if meta.is_nil(top_left_x) then
+        top_left_x = 0
+    end
+
+    if meta.is_nil(top_left_y) then
+        top_left_y = 0
+    end
+
+    if meta.is_nil(width) then
+        width = 0
+    end
+
+    if meta.is_nil(height) then
+        height = 0
+    end
+
     meta.assert_number(top_left_x)
     meta.assert_number(top_left_y)
     meta.assert_number(width)
     meta.assert_number(height)
+
     return meta.new(rt.Rectangle, {
         x = top_left_x,
         y = top_left_y,

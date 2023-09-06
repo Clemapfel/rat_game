@@ -96,7 +96,10 @@ love.mousemoved = rt.MouseHandler.handle_motion
 function rt.MouseHandler.handle_button_pressed(x, y, button_id, is_touch)
     for _, component in ipairs(rt.MouseHandler._components) do
         if rt.MouseHandler.is_cursor_in_bounds(x, y, component._instance) and getmetatable(component._instance).is_focused == true then
-            component.signal:emit("button_pressed", x, y, button_id)
+            local out = component.signal:emit("button_pressed", x, y, button_id)
+            if out == true then
+                break
+            end
         end
     end
 end
@@ -110,7 +113,10 @@ love.mousepressed = rt.MouseHandler.handle_button_pressed
 function rt.MouseHandler.handle_button_released(x, y, button_id, is_touch)
     for _, component in ipairs(rt.MouseHandler._components) do
         if rt.MouseHandler.is_cursor_in_bounds(x, y, component._instance) and getmetatable(component._instance).is_focused == true then
-            component.signal:emit("button_released", x, y, button_id)
+            local out = component.signal:emit("button_released", x, y, button_id)
+            if out == true then
+                break
+            end
         end
     end
 end
