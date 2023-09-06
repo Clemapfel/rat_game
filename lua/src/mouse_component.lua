@@ -43,6 +43,7 @@ rt.MouseComponent = meta.new_type("MouseComponent", function(holder)
     out.signal:add("motion")
     out.signal:add("motion_leave")
 
+    getmetatable(holder).components.mouse = out
     return out
 end)
 
@@ -51,9 +52,10 @@ end)
 --- @param y Number
 --- @param object
 function rt.MouseHandler.is_cursor_in_bounds(x, y, object)
-    if not meta.is_nil(object.allocation) then
-        meta.assert_isa(object.allocation, rt.AllocationComponent)
-        return object.allocation:get_bounds():contains(x, y)
+    local allocation_maybe = getmetatable(object).components.allocation
+    if not meta.is_nil(allocation) then
+        meta.assert_isa(allocation_maybe, rt.AllocationComponent)
+        return allocation_maybe:get_bounds():contains(x, y)
     else
         return true
     end

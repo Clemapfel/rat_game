@@ -21,6 +21,14 @@ require "keyboard_component"
 require "gamepad_component"
 require "mouse_component"
 
+instance = meta._new("Object")
+rt.AllocationComponent(instance)
+rt.GamepadComponent(instance)
+rt.KeyboardComponent(instance)
+rt.MouseComponent(instance)
+rt.SignalComponent(instance)
+println(serialize(instance))
+
 -- ### MAIN ###
 
 if meta.is_nil(love) then goto exit end

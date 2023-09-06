@@ -56,6 +56,7 @@ function meta._new(typename)
     metatable.properties = {}
     metatable.is_private = {}
     metatable.is_mutable = true
+    metatable.components = {}
 
     metatable.__index = function(this, property_name)
         local metatable = getmetatable(this)

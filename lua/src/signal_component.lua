@@ -2,9 +2,11 @@
 --- @param holder meta.Object
 rt.SignalComponent = meta.new_type("SignalComponent", function(holder)
     meta.assert_object(holder)
-    return meta.new(rt.SignalComponent, {
+    local out = meta.new(rt.SignalComponent, {
         _instance = holder
     })
+    getmetatable(holder).components.signal = out
+    return out
 end)
 
 rt.SignalComponent._notify_prefix = "notify::"
@@ -12,15 +14,24 @@ rt.SignalComponent._signal_property = "signal"
 
 --- @brief add a signal component to object, use `object[rt.SignalComponent._signal_property]:add_signal` to add new signals
 --- @param object meta.Object
-function rt.add_signal_component(object)
+--- @param implement_notify Boolean whether the `notify::` signals should be initialized
+function rt.add_signal_component(object, implement_notify)
     meta.assert_object(object)
     if not meta.is_nil(object[rt.SignalComponent._signal_property]) then
         error("[rt] In add_signal_component: Object already has a signal component")
     end
 
     object[rt.SignalComponent._signal_property] = rt.SignalComponent(object)
-    for _, property in ipairs(meta.get_property_names(object)) do
-        object[rt.SignalComponent._signal_property]:add(rt.SignalComponent._notify_prefix .. property)
+
+    if meta.is_nil(implement_notify) then
+        implement_notify = true
+    end
+    meta.assert_boolean(implement_notify)
+
+    if implement_notify then
+        for _, property in ipairs(meta.get_property_names(object)) do
+            object[rt.SignalComponent._signal_property]:add(rt.SignalComponent._notify_prefix .. property)
+        end
     end
     return object
 end

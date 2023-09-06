@@ -171,6 +171,7 @@ rt.KeyboardComponent = meta.new_type("KeyboardComponent", function(holder)
         metatable.is_focused = true
     end
 
+    getmetatable(holder).components.keyboard = out
     return rt.KeyboardHandler._components[hash]
 end)
 

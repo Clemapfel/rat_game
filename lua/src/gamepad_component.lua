@@ -75,6 +75,7 @@ rt.GamepadComponent = meta.new_type("GamepadComponent", function(holder)
     out.signal:add("button_released")
     out.signal:add("axis_changed")
 
+    getmetatable(holder).components.gamepad = out
     return rt.GamepadHandler._components[hash]
 end)
 
