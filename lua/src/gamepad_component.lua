@@ -38,11 +38,9 @@ rt.GamepadHandler._joysticks = {} -- JoystickID -> love.Joystick
 --- @brief [internal] store love.Joystick
 --- @param joystick love.Joystick
 function rt.GamepadHandler._update_joystick(joystick)
-    local id = love.getID(joystick)
+    local id = joystick:getID()
     rt.GamepadHandler._active_joystick_id = id
-    if meta.is_nil(rt.GamepadHandler._joysticks[id]) then
-        rt.GamepadHandler._joysticks[id] = joystick
-    end
+    rt.GamepadHandler._joysticks[id] = joystick
 end
 
 --- @class GamepadComponent
@@ -83,7 +81,7 @@ function rt.GamepadHandler.handle_joystick_added(joystick)
     rt.GamepadHandler._update_joystick(joystick)
     for _, component in ipairs(rt.GamepadHandler._components) do
         if getmetatable(component._instance).is_focused == true then
-            component.signal:emit("added", love.getID(joystick))
+            component.signal:emit("added", joystick:getID())
         end
     end
 end
@@ -95,7 +93,7 @@ function rt.GamepadHandler.handle_joystick_removed(joystick)
     rt.GamepadHandler._update_joystick(joystick)
     for _, component in ipairs(rt.GamepadHandler._components) do
         if getmetatable(component._instance).is_focused == true then
-            component.signal:emit("removed",  love.getID(joystick))
+            component.signal:emit("removed",  joystick:getID())
         end
     end
 end
@@ -108,7 +106,7 @@ function rt.GamepadHandler.handle_button_pressed(joystick, button)
     rt.GamepadHandler._update_joystick(joystick)
     for _, component in ipairs(rt.GamepadHandler._components) do
         if getmetatable(component._instance).is_focused == true then
-            component.signal:emit("button_pressed", love.getID(joystick), button)
+            component.signal:emit("button_pressed", joystick:getID(), button)
         end
     end
 end
@@ -121,7 +119,7 @@ function rt.GamepadHandler.handle_button_released(joystick, button)
     rt.GamepadHandler._update_joystick(joystick)
     for _, component in ipairs(rt.GamepadHandler._components) do
         if getmetatable(component._instance).is_focused == true then
-            component.signal:emit("button_released", love.getID(joystick), button)
+            component.signal:emit("button_released", joystick:getID(), button)
         end
     end
 end
@@ -135,7 +133,7 @@ function rt.GamepadHandler.handle_axis_changed(joystick, axis, value)
     rt.GamepadHandler._update_joystick(joystick)
     for _, component in ipairs(rt.GamepadHandler._components) do
         if getmetatable(component._instance).is_focused == true then
-            component.signal:emit("axis_changed", love.getID(joystick), axis, value)
+            component.signal:emit("axis_changed", joystick:getID(), axis, value)
         end
     end
 end
@@ -146,29 +144,29 @@ rt.test.gamepad_component = function()
     local instance = meta._new("Object")
     instance.gamepad = rt.GamepadComponent(instance)
 
+    local dummy = {
+        getID = function() return 0 end
+    }
+
     local added_called = false
     instance.gamepad.signal:connect("added", function(self, id)
         added_called = true
     end)
-
-    local removed_called = false
-    instance.gamepad.signal:connect("removed", function(self, id)
-        removed_called = true
-    end)
+    rt.GamepadHandler.handle_joystick_added(dummy)
 
     local button_pressed_called = false
     instance.gamepad.signal:connect("button_pressed", function(self, id, button)
         assert(id == rt.GamepadHandler._active_joystick_id)
         button_pressed_called = true
     end)
-    instance.gamepad.signal:emit("button_pressed", 0, rt.GamepadButton.START)
+    rt.GamepadHandler.handle_button_pressed(dummy, rt.GamepadButton.START)
 
     local button_released_called = false
     instance.gamepad.signal:connect("button_released", function(self, id, button)
         assert(id == rt.GamepadHandler._active_joystick_id)
         button_released_called = true
     end)
-    instance.gamepad.signal:emit("button_released", 0, rt.GamepadButton.START)
+    rt.GamepadHandler.handle_button_released(dummy, rt.GamepadButton.START)
 
     local n_axis_called = 0
     instance.gamepad.signal:connect("axis_changed", function(self, id, axis, value)
@@ -177,15 +175,21 @@ rt.test.gamepad_component = function()
     end)
 
     for axis, _ in pairs(rt.GamepadAxis) do
-        instance.gamepad.signal:emit("axis_changed", 0, axis, 0)
+        rt.GamepadHandler.handle_axis_changed(dummy, axis, 0.1)
     end
 
-    -- assert(added_called)
-    -- assert(not isempty(rt.GamepadComponent._joysticks))
-    -- assert(removed_called)
+    assert(added_called)
+    assert(not is_empty(rt.GamepadHandler._joysticks))
     assert(n_axis_called == 6)
     assert(button_released_called)
     assert(button_pressed_called)
+
+    local removed_called = false
+    instance.gamepad.signal:connect("removed", function(self, id)
+        removed_called = true
+    end)
+    rt.GamepadHandler.handle_joystick_removed(dummy)
+    assert(removed_called)
 end
 rt.test.gamepad_component()
 
