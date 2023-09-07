@@ -24,6 +24,7 @@ require "allocation_component"
 require "keyboard_component"
 require "gamepad_component"
 require "mouse_component"
+require "animation"
 
 instance = meta._new("Object")
 rt.AllocationComponent(instance)
@@ -31,6 +32,15 @@ rt.GamepadComponent(instance)
 rt.KeyboardComponent(instance)
 rt.MouseComponent(instance)
 rt.SignalComponent(instance)
+
+pos_x, pos_y = 0, 0
+animation = rt.Animation(1)
+animation:set_timing_function(rt.AnimationTimingFunction.EASE_IN_OUT)
+animation.signal:connect("tick", function(self, value)
+    local w, h = love.graphics.getPixelDimensions()
+    pos_x, pos_y = w * value, h * value
+end)
+animation:play()
 
 -- ### MAIN ###
 
@@ -44,6 +54,7 @@ end
 
 --- @brief update tick
 function love.update()
+    rt.AnimationHandler.update(love.timer.getDelta())
 end
 
 --- @brief draw step
@@ -53,6 +64,9 @@ function love.draw()
     local w, h = text:getWidth(), text:getHeight()
     love.graphics.translate(love.graphics.getWidth() - w, 0)
     love.graphics.draw(text)
+    love.graphics.reset()
+
+    love.graphics.print("test", pos_x, pos_y)
 end
 
 --- @brief shutdown

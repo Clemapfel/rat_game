@@ -3,9 +3,9 @@ rt.AllocationHandler = {}
 
 --- @class Alignment
 rt.Alignment = meta.new_enum({
-    START = 0,
-    CENTER = 1,
-    END = 2
+    START = "ALIGNMENT_START",
+    CENTER = "ALIGNMENT_CENTER",
+    END = "ALIGNMENT_END"
 })
 
 --- @class AllocationComponent

@@ -339,13 +339,18 @@ meta.Enum = "Enum"
 function meta.new_enum(fields)
 
     meta.assert_table(fields)
+    if is_empty(fields) then
+        error("[rt] In meta.new_enum: list of values cannot be empty")
+    end
 
     local out = meta._new(meta.Enum)
     local used_values = {}
 
+    local i = 0
     for name, value in pairs(fields) do
         meta.assert_string(name)
-        if meta.is_table(value) or meta.is_nil(value) then
+
+        if meta.is_table(value) then
             error("[rt] In meta.new_enum: Enum value for key `" .. name .. "` is a `" .. meta.typeof(value) .. "`, which is not a primitive.")
         end
 
