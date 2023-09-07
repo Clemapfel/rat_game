@@ -280,3 +280,8 @@ NEGATIVE_INFINITY = -1/0
 function string.capitalize(str)
     return string.upper(string.sub(str, 1, 1)) .. string.sub(str, 2, string.len(str))
 end
+
+--- @brief round to nearest integer
+function math.round(i)
+    return math.floor(i + 0.5)
+end

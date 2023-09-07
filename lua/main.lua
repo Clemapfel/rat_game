@@ -1,4 +1,7 @@
-if love == nil then -- debug mode
+DEBUG_MODE = love == nil
+MARGIN_UNIT = 10
+
+if DEBUG_MODE then
     RESOURCE_PATH = "/home/clem/Workspace/rat_game/lua"
     love = {}
 else
@@ -7,6 +10,7 @@ end
 
 package.path = package.path .. ";" .. RESOURCE_PATH .. "/src/?.lua"
 package.path = package.path .. ";" .. RESOURCE_PATH .. "/battle/?.lua"
+package.path = package.path .. ";" .. RESOURCE_PATH .. "/?.lua"
 
 rt = {}
 rt.test = {}
@@ -27,14 +31,15 @@ rt.GamepadComponent(instance)
 rt.KeyboardComponent(instance)
 rt.MouseComponent(instance)
 rt.SignalComponent(instance)
-println(serialize(instance))
 
 -- ### MAIN ###
 
-if meta.is_nil(love) then goto exit end
+if DEBUG_MODE then goto exit end
 
 --- @brief startup
 function love.load()
+    love.window.setTitle("rat_game")
+    love.graphics.setFont(love.graphics.newFont(12))
 end
 
 --- @brief update tick
@@ -43,6 +48,11 @@ end
 
 --- @brief draw step
 function love.draw()
+
+    local text = love.graphics.newText(love.graphics.getFont(), tostring(math.round(love.timer.getFPS())))
+    local w, h = text:getWidth(), text:getHeight()
+    love.graphics.translate(love.graphics.getWidth() - w, 0)
+    love.graphics.draw(text)
 end
 
 --- @brief shutdown
