@@ -147,8 +147,6 @@ rt.KeyboardKey = meta.new_enum({
 
 rt.KeyboardHandler._hash = 1
 rt.KeyboardHandler._components = {}
-rt.KeyboardHandler._components_meta = { __mode = "v" }
-setmetatable(rt.KeyboardHandler._components, rt.KeyboardHandler._components_meta)
 
 --- @class KeyboardComponent
 --- @signal key_pressed (::KeyboardComponent, key::String) -> Boolean
@@ -171,7 +169,12 @@ rt.KeyboardComponent = meta.new_type("KeyboardComponent", function(holder)
         metatable.is_focused = true
     end
 
-    getmetatable(holder).components.keyboard = out
+    local metatable = getmetatable(holder)
+    metatable.components.keyboard = out
+    metatable.__gc = function(self)
+        rt.KeyboardHandler._components[self._hash] = nil
+    end
+
     return rt.KeyboardHandler._components[hash]
 end)
 

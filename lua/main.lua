@@ -26,21 +26,20 @@ require "gamepad_component"
 require "mouse_component"
 require "animation"
 
-instance = meta._new("Object")
-rt.AllocationComponent(instance)
-rt.GamepadComponent(instance)
-rt.KeyboardComponent(instance)
-rt.MouseComponent(instance)
-rt.SignalComponent(instance)
+main = {}
 
-pos_x, pos_y = 0, 0
-animation = rt.Animation(1)
-animation:set_timing_function(rt.AnimationTimingFunction.EASE_IN_OUT)
-animation.signal:connect("tick", function(self, value)
-    local w, h = love.graphics.getPixelDimensions()
-    pos_x, pos_y = w * value, h * value
-end)
-animation:play()
+do
+    local instance = meta._new("Object")
+    meta._install_property(instance, "hash", 1234)
+
+    main[instance.hash] = instance
+    getmetatable(instance).__gc = function(self)
+        main[self.hash] = nil
+    end
+    println(serialize(main))
+end
+
+println(serialize(man))
 
 -- ### MAIN ###
 

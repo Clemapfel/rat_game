@@ -473,3 +473,33 @@ function meta.assert_isa(x, type)
         meta._assert_aux(meta.typeof(x) == type, x, type)
     end
 end
+
+--- @brief make table weak, meaning it does not increase the reference count of its values
+--- @param x Table
+--- @param weak_keys Boolean
+--- @param weak_values Boolean
+function meta.make_weak(table, weak_keys, weak_values)
+
+    if meta.is_nil(weak_keys) then weak_keys = true end
+    if meta.is_nil(weak_values) then weak_values = true end
+
+    meta.assert_table(table)
+    meta.assert_boolean(weak_keys, weak_values)
+
+    local metatable = getmetatable(table)
+    if meta.is_nil(metatable) then
+        metatable = {}
+        setmetatable(table, metatable)
+    end
+
+    metatable.__mode = ""
+    if weak_keys then
+        metatable.__mode = metatable.__mode .. "k"
+    end
+
+    if weak_values then
+        metatable.__mode = metatable.__mode .. "v"
+    end
+
+    return table
+end

@@ -32,8 +32,6 @@ rt.GamepadAxis = meta.new_enum({
 
 rt.GamepadHandler._hash = 1
 rt.GamepadHandler._components = {}
-rt.GamepadHandler._components_meta = { __mode = "v" }
-setmetatable(rt.GamepadHandler._components, rt.GamepadHandler._components_meta)
 
 rt.GamepadHandler._active_joystick_id = 0
 rt.GamepadHandler._joysticks = {} -- JoystickID -> love.Joystick
@@ -75,7 +73,12 @@ rt.GamepadComponent = meta.new_type("GamepadComponent", function(holder)
     out.signal:add("button_released")
     out.signal:add("axis_changed")
 
-    getmetatable(holder).components.gamepad = out
+    local metatable = getmetatable(holder)
+    metatable.components.gamepad = out
+    metatable.__gc = function(self)
+        rt.GamepadHandler._components[self._hash] = nil
+    end
+
     return rt.GamepadHandler._components[hash]
 end)
 

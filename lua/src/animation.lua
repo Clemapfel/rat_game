@@ -3,8 +3,6 @@ rt.AnimationHandler = {}
 
 rt.AnimationHandler._hash = 1
 rt.AnimationHandler._components = {}
-rt.AnimationHandler._components_meta = { __mode = "v" }
-setmetatable(rt.AnimationHandler._components, rt.AnimationHandler._components_meta)
 
 --- @class AnimationState
 rt.AnimationState = meta.new_enum({
@@ -12,6 +10,7 @@ rt.AnimationState = meta.new_enum({
     PAUSED = "ANIMATION_STATE_PAUSED",
     IDLE = "ANIMATION_STATE_IDLE"
 })
+
 
 --- @class AnimationTimingFunction
 --- @see https://gitlab.gnome.org/GNOME/libadwaita/-/blob/main/src/adw-easing.c#L77
@@ -22,36 +21,34 @@ rt.AnimationTimingFunction = meta.new_enum({
     EASE_IN_OUT = "ANIMATION_TIMING_FUNCTION_EASE_IN_OUT"
 })
 
---- @brief [internal] linear mapping in [0, 1]
-rt.AnimationHandler._linear_f = function(x)
-    assert(x >= 0 and x <= 1)
-    return x
-end
+rt.AnimationHandler._timing_functions = (function()
 
---- @brief [internal] ease-in, in [0, 1]
-rt.AnimationHandler._ease_in_f = function(x)
-    assert(x >= 0 and x <= 1)
-    local pi2 = math.pi / 2
-    return (1 - math.sin(pi2 - x * pi2))
-end
+    --- @see https://gitlab.gnome.org/GNOME/libadwaita/-/blob/main/src/adw-easing.c
+    local out = {}
+    out[rt.AnimationTimingFunction.LINEAR] = function(x)
+        return x
+    end
 
---- @brief [internal] ease-out, in [0, 1]
-rt.AnimationHandler._ease_out_f = function(x)
-    assert(x >= 0 and x <= 1)
-    return math.sin(math.pi - x * (math.pi / 2))
-end
+    out[rt.AnimationTimingFunction.EASE_IN] = function(x)
+        return -1.0 * math.cos(x * (math.pi / 2)) + 1.0;
+    end
 
---- @brief [internal] sigmoid, in [0, 1]
-rt.AnimationHandler._ease_in_out_f = function(x)
-    assert(x >= 0 and x <= 1)
-    return -0.5 * (math.cos(math.pi * x) - 1);
-end
+    out[rt.AnimationTimingFunction.EASE_OUT] = function(x)
+        return math.sin(x * (math.pi / 2));
+    end
+
+    out[rt.AnimationTimingFunction.EASE_IN_OUT] = function(x)
+        return -0.5 * (math.cos(math.pi * x) - 1);
+    end
+    return out
+end)()
+
 
 --- @class Animation
 rt.Animation = meta.new_type("Animation", function(duration_seconds)
     meta.assert_number(duration_seconds)
     if duration_seconds < 0 then
-        error("[rt] In Animation._call: Duration `" .. string(duration_seconds) .. "` cannot be negative")
+        error("[rt] In Animation(): Duration `" .. string(duration_seconds) .. "` cannot be negative")
     end
 
     local hash = rt.AnimationHandler._hash
@@ -76,6 +73,7 @@ end)
 --- @param delta Number duration of last frame, in seconds
 function rt.AnimationHandler.update(delta)
     for _, component in pairs(rt.AnimationHandler._components) do
+
         if component:get_state() ~= rt.AnimationState.PLAYING then
             goto continue
         end
@@ -89,17 +87,9 @@ function rt.AnimationHandler.update(delta)
             goto continue
         end
 
-        local value = 0
-        local x = component._time / component._duration
-        if component._timing_function == rt.AnimationTimingFunction.LINEAR then
-            value = rt.AnimationHandler._linear_f(x)
-        elseif component._timing_function == rt.AnimationTimingFunction.EASE_IN then
-            value = rt.AnimationHandler._ease_in_f(x)
-        elseif component._timing_function == rt.AnimationTimingFunction.EASE_OUT then
-            value = rt.AnimationHandler._ease_out(x)
-        elseif component._timing_function == rt.AnimationTimingFunction.EASE_IN_OUT then
-            value = rt.AnimationHandler._ease_in_out_f(x)
-        end
+        local value = rt.AnimationHandler._timing_functions[component._timing_function](
+            component._time / component._duration
+        )
 
         component.signal:emit("tick", value)
         ::continue::

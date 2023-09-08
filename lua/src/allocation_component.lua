@@ -29,7 +29,8 @@ rt.AllocationComponent = meta.new_type("AllocationComponent", function(holder)
     rt.add_signal_component(out)
     out.signal:add("changed")
 
-    getmetatable(holder).components.allocation = out
+    local metatable = getmetatable(holder)
+    metatable.components.allocation = out
     return out
 end)
 

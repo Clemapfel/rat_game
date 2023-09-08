@@ -10,8 +10,6 @@ rt.MouseButton = meta.new_enum({
 
 rt.MouseHandler._hash = 1
 rt.MouseHandler._components = {}
-rt.MouseHandler._components_meta = { __mode = "v" }
-setmetatable(rt.MouseHandler._components, rt.MouseHandler._components_meta)
 
 --- @class MouseComponent
 --- @signal button_pressed (::MouseComponent, x::Number, y::Number, ::MouseButton) -> Boolean
@@ -43,7 +41,12 @@ rt.MouseComponent = meta.new_type("MouseComponent", function(holder)
     out.signal:add("motion")
     out.signal:add("motion_leave")
 
-    getmetatable(holder).components.mouse = out
+    local metatable = getmetatable(holder)
+    metatable.components.mouse = out
+    metatable.__gc = function(self)
+        rt.MouseHandler._components[self._hash] = nil
+    end
+
     return out
 end)
 
