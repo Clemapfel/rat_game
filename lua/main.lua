@@ -26,6 +26,28 @@ require "gamepad_component"
 require "mouse_component"
 require "animation"
 
+rt.Super = meta.new_type("Super", function()
+    return meta.new(rt.Super)
+end)
+
+function rt.Super.super_method(self)
+    println("super")
+end
+
+rt.Child = meta.new_type("Child", function()
+    local out = meta.new(rt.Child)
+    return out
+end)
+
+function rt.Child.child_method(self)
+    println("child")
+end
+
+local instance = rt.Child()
+println(meta.isa(instance, "Child"))
+println(meta.isa(instance, rt.Child))
+
+
 -- ### MAIN ###
 
 if DEBUG_MODE then goto exit end

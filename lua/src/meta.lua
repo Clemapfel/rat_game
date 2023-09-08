@@ -103,22 +103,32 @@ end
 
 --- @brief get typename identifier
 function meta.typeof(x)
+    local out = ""
     if not meta.is_table(x) then
-        return type(x)
+        out = type(x)
     else
         local metatable = getmetatable(x)
         if meta.is_nil(metatable) then
-            return meta.Table.name
+            out = meta.Table.name
         else
-            return meta[getmetatable(x).__name]
+            out = getmetatable(x).__name
         end
     end
+    return out
 end
 
 --- @brief check if type of object is as given
+--- @param type meta.Type (or String)
 --- @return Boolean
 function meta.isa(x, type)
-    return meta.typeof(x) == type
+    if meta.is_string(type) then
+        return meta.typeof(x) == type
+    else
+        if meta.typeof(type) ~= "Type" then
+            error("[rt] In meta.isa: Expected `Type` or `String`, got `" .. meta.typeof(type) .. "`")
+        end
+        return meta.typeof(x) == type.name
+    end
 end
 
 --- @brief [internal] print type assertion error message
@@ -308,11 +318,16 @@ meta.Object = "Object"
 --- @param fields Table property_name -> property_value
 function meta.new(type, fields)
 
-    meta.assert_isa(type, "Type")
-    meta.assert_table(fields)
+    meta.assert_isa(type, meta.Type)
+
+    if meta.is_nil(fields) then
+        fields = {}
+    else
+        meta.assert_table(fields)
+    end
 
     local out = {}
-    if meta.isa(type, "Type") then
+    if meta.isa(type, meta.Type) then
         out = meta._new(type.name)
     else
         meta.assert_string(type)
@@ -328,6 +343,8 @@ function meta.new(type, fields)
     else
         meta.assert_nil(fields)
     end
+
+    meta._install_inheritance(out, type)
     return out
 end
 
@@ -396,8 +413,19 @@ function meta.assert_enum(x, enum)
     end
 end
 
---- @class meta.Type
-meta.Type = "Type"
+--- @brief [internal] apply properties of a type to an instance
+--- @param instance meta.Object
+--- @param type meta.Type
+function meta._install_inheritance(instance, type)
+    meta.assert_object(instance)
+    meta.assert_isa(type, meta.Type)
+
+    for key, value in pairs(getmetatable(type).properties) do
+        if key ~= "name" and not meta.has_property(instance, key) then
+            meta._install_property(instance, key, value)
+        end
+    end
+end
 
 --- @brief create a new type with given constructor
 --- @param typename String
@@ -406,20 +434,13 @@ function meta.new_type(typename, ctor)
     meta.assert_string(typename)
     meta.assert_function(ctor)
 
-    local out = meta._new(meta.Type)
+    local out = meta._new("Type")
     out.name = typename
 
     getmetatable(out).__call = function(self, ...)
         local out = ctor(...)
         if not meta.isa(out, self.name) then
             error("[rt] In " .. self.name .. ".__call: Constructor does not return object of type `" .. self.name .. "`.")
-        end
-
-        -- automatically add any fields or functions that were defined for the type
-        for key, value in pairs(getmetatable(self).properties) do
-            if not meta.has_property(out, key) then
-                meta._install_property(out, key, value)
-            end
         end
         return out
     end
@@ -430,6 +451,11 @@ function meta.new_type(typename, ctor)
     meta[typename] = typename
     return out
 end
+
+--- @class meta.Type
+meta.Type = meta.new_type("Type", function()
+    return meta.new(meta.Type)
+end)
 
 --- @class Function
 meta.Function = meta.new_type("function", function()
