@@ -4,6 +4,9 @@ MARGIN_UNIT = 10
 if DEBUG_MODE then
     RESOURCE_PATH = "/home/clem/Workspace/rat_game/lua"
     love = {}
+    love.graphics = {}
+    love.graphics.getWidth = function() return 1 end
+    love.graphics.getHeight = function() return 1 end
 else
     RESOURCE_PATH = love.filesystem.getSource()
 end
@@ -29,13 +32,17 @@ require "layout_manager"
 require "drawable"
 
 drawable = rt.Drawable()
-drawable._allocation:set_position(50, 50)
-drawable._allocation:set_size(100, 150)
-drawable._allocation:set_margin(10)
-drawable._allocation:set_margin_right(20)
+drawable.allocation:set_position(50, 50)
+drawable.allocation:set_size(100, 150)
+drawable.allocation:set_margin(10)
+drawable.allocation:set_margin_right(20)
+drawable.allocation:set_expand_horizontally(true)
+drawable.allocation:set_expand_vertically(false)
 
-bin = rt.Bin()
-bin.child = "test"
+drawable.allocation:set_horizontal_alignment(rt.Alignment.END)
+drawable.allocation:set_vertical_alignment(rt.Alignment.CENTER)
+
+drawable.allocation:resize(rt.Rectangle(0, 0, love.graphics.getWidth(), love.graphics.getHeight()))
 
 -- ### MAIN ###
 

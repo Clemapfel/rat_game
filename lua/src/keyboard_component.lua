@@ -1,17 +1,9 @@
---- @brief singleton, handles keyboard key events
+--- @class rt.KeyboardHandler
 rt.KeyboardHandler = {}
 
---- @brief list of valid keyboard key identifiers
---- @see https://love2d.org/wiki/KeyConstant
-rt.KeyboardKey = meta.new_enum((function()
-    local out = {}
-    for i, key in ipairs({"a", "b", "c", "d", "e", "f", "g", "h", "i", "j", "k", "l", "m", "n", "o", "p", "q", "r", "s", "t", "u", "v", "w", "x", "y", "z", "0", "1", "2", "3", "4", "5", "6", "7", "8", "9", "space", "!", "\"", "#", "$", "&", "'", "(", ")", "*", "+", ",", "-", ".", "/", ":", ";", "<", "=", ">", "?", "@", "[", "\"", "]", "^", "_", "`", "kp0", "kp1", "kp2", "kp3", "kp4", "kp5", "kp6", "kp7", "kp8", "kp9", "kp.", "kp,", "kp/", "kp*", "kp-", "kp+", "kpenter", "kp=", "up", "down", "right", "left", "home", "end", "pageup", "pagedown", "insert", "backspace", "tab", "clear", "return", "delete", "f1", "f2", "f3", "f4", "f5", "f6", "f7", "f8", "f9", "f10", "f11", "f12", "f13", "f14", "f15", "f16", "f17", "f18", "numlock", "capslock", "scrolllock", "rshift", "lshift", "rctrl", "lctrl", "ralt", "lalt", "rgui", "lgui", "mode", "www", "mail", "calculator", "computer", "appsearch", "apphome", "appback", "appforward", "apprefresh", "appbookmarks", "pause", "escape", "help", "printscreen", "sysreq", "menu", "application", "power", "currencyunit", "undo" }) do
-        out[key] = key
-    end
-    return out
-end)())
 
---- @brief keyboard keys
+--- @class rt.KeyboardKey
+--- @see https://love2d.org/wiki/KeyConstant
 rt.KeyboardKey = meta.new_enum({
     KEY_UNKNOWN = "unknown",
     KEY_A = "a",
@@ -148,7 +140,7 @@ rt.KeyboardKey = meta.new_enum({
 rt.KeyboardHandler._hash = 1
 rt.KeyboardHandler._components = {}
 
---- @class KeyboardComponent
+--- @class rt.KeyboardComponent
 --- @signal key_pressed (::KeyboardComponent, key::String) -> Boolean
 --- @signal key_released (::KeyboardComponent, key::String) -> Boolean
 rt.KeyboardComponent = meta.new_type("KeyboardComponent", function(holder)
@@ -212,6 +204,24 @@ love.keyreleased = function(key) rt.KeyboardHandler.handle_key_released(key) end
 function rt.KeyboardHandler.is_down(this, key)
     meta.assert_string(key)
     return this._state_now[key]
+end
+
+--- @brief add an keyboard component as `.keyboard`
+function rt.add_keyboard_component(self)
+    meta.assert_object(self)
+
+    if not meta.is_nil(self.keyboard) then
+        error("[rt] In add_keyboard_component: Object of type `" .. meta.typeof(self) .. "` already has a member called `keyboard`")
+    end
+
+    meta._install_property(self, "keyboard", rt.AllocationComponent(self))
+    return rt.get_keyboard_component(self)
+end
+
+--- @brief get keyboard component assigned
+--- @return rt.AllocationComponent
+function rt.get_keyboard_component(self)
+    return self.keyboard
 end
 
 --- @brief [internal] test keyboard component

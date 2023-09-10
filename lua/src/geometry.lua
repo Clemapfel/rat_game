@@ -1,4 +1,4 @@
---- @class Rectangle
+--- @class rt.Rectangle
 rt.Rectangle = meta.new_type("Rectangle", function(top_left_x, top_left_y, width, height)
 
     if meta.is_nil(top_left_x) then
@@ -31,6 +31,7 @@ rt.Rectangle = meta.new_type("Rectangle", function(top_left_x, top_left_y, width
 end)
 
 --- @brief get size
+--- @param self rt.Rectangle
 --- @return (Number, Number)
 function rt.Rectangle.get_size(self)
     meta.assert_isa(self, rt.Rectangle)
@@ -38,6 +39,7 @@ function rt.Rectangle.get_size(self)
 end
 
 --- @brief get top left
+--- @param self rt.Rectangle
 --- @return (Number, Number)
 function rt.Rectangle.get_top_left(self)
     meta.assert_isa(self, rt.Rectangle)
@@ -45,6 +47,7 @@ function rt.Rectangle.get_top_left(self)
 end
 
 --- @brief get top center
+--- @param self rt.Rectangle
 --- @return (Number, Number)
 function rt.Rectangle.get_top_center(self)
     meta.assert_isa(self, rt.Rectangle)
@@ -52,6 +55,7 @@ function rt.Rectangle.get_top_center(self)
 end
 
 --- @brief get top right
+--- @param self rt.Rectangle
 --- @return (Number, Number)
 function rt.Rectangle.get_top_right(self)
     meta.assert_isa(self, rt.Rectangle)
@@ -59,6 +63,7 @@ function rt.Rectangle.get_top_right(self)
 end
 
 --- @brief get center left
+--- @param self rt.Rectangle
 --- @return (Number, Number)
 function rt.Rectangle.get_center_left(self)
     meta.assert_isa(self, rt.Rectangle)
@@ -66,6 +71,7 @@ function rt.Rectangle.get_center_left(self)
 end
 
 --- @brief get center center
+--- @param self rt.Rectangle
 --- @return (Number, Number)
 function rt.Rectangle.get_center(self)
     meta.assert_isa(self, rt.Rectangle)
@@ -73,6 +79,7 @@ function rt.Rectangle.get_center(self)
 end
 
 --- @brief get center right
+--- @param self rt.Rectangle
 --- @return (Number, Number)
 function rt.Rectangle.get_center_right(self)
     meta.assert_isa(self, rt.Rectangle)
@@ -87,6 +94,7 @@ function rt.Rectangle.get_bottom_left(self)
 end
 
 --- @brief get bottom center
+--- @param self rt.Rectangle
 --- @return (Number, Number)
 function rt.Rectangle.get_bottom_center(self)
     meta.assert_isa(self, rt.Rectangle)
@@ -94,6 +102,7 @@ function rt.Rectangle.get_bottom_center(self)
 end
 
 --- @brief get bottom right
+--- @param self rt.Rectangle
 --- @return (Number, Number)
 function rt.Rectangle.get_bottom_right(self)
     meta.assert_isa(self, rt.Rectangle)
@@ -101,6 +110,7 @@ function rt.Rectangle.get_bottom_right(self)
 end
 
 --- @brief is point inside rectangles bounds
+--- @param self rt.Rectangle
 --- @param x Number
 --- @param y Number
 --- @return Boolean

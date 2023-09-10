@@ -1,7 +1,7 @@
---- @brief singleton, handles controller input
+--- @brief rt.GamepadHandler
 rt.GamepadHandler = {}
 
---- @class GamepadButton
+--- @class rt.GamepadButton
 rt.GamepadButton = meta.new_enum({
     TOP = "y",
     RIGHT = "b",
@@ -20,7 +20,7 @@ rt.GamepadButton = meta.new_enum({
     RIGHT_SHOULDER = "rightshoulder"
 })
 
---- @class GamepadAxis
+--- @class rt.GamepadAxis
 rt.GamepadAxis = meta.new_enum({
     LEFT_X = "leftx",
     LEFT_Y = "lefty",
@@ -44,7 +44,7 @@ function rt.GamepadHandler._update_joystick(joystick)
     rt.GamepadHandler._joysticks[id] = joystick
 end
 
---- @class GamepadComponent
+--- @class rt.GamepadComponent
 --- @signal added (::GamepadComponent, ::JoystickID) -> nil
 --- @signal removed (::GamepadComponent, ::JoysticKID) -> nil
 --- @signal button_pressed (::GamepadComponent, ::JoystickID, ::GamepadButton) -> Boolean
@@ -108,7 +108,7 @@ love.joystickremoved = rt.GamepadHandler.handle_joystick_removed
 
 --- @brief handle button pressed
 --- @param joystick love.Joystick
---- @param button GamepadButton
+--- @param button rt.GamepadButton
 function rt.GamepadHandler.handle_button_pressed(joystick, button)
     rt.GamepadHandler._update_joystick(joystick)
     for _, component in ipairs(rt.GamepadHandler._components) do
@@ -121,7 +121,7 @@ love.gamepadpressed = rt.GamepadHandler.handle_button_pressed
 
 --- @brief handle button released
 --- @param joystick love.Joystick
---- @param button GamepadButton
+--- @param button rt.GamepadButton
 function rt.GamepadHandler.handle_button_released(joystick, button)
     rt.GamepadHandler._update_joystick(joystick)
     for _, component in ipairs(rt.GamepadHandler._components) do
@@ -134,7 +134,7 @@ love.gamepadreleased = rt.GamepadHandler.handle_button_released
 
 --- @brief handle axis changed
 --- @param joystick love.Joystick
---- @param axis GamepadAxis
+--- @param axis rt.GamepadAxis
 --- @param value Number
 function rt.GamepadHandler.handle_axis_changed(joystick, axis, value)
     rt.GamepadHandler._update_joystick(joystick)
@@ -145,6 +145,24 @@ function rt.GamepadHandler.handle_axis_changed(joystick, axis, value)
     end
 end
 love.gamepadaxis = rt.GamepadHandler.handle_axis_changed
+
+--- @brief add an gamepad component as `.gamepad`
+function rt.add_gamepad_component(self)
+    meta.assert_object(self)
+
+    if not meta.is_nil(self.gamepad) then
+        error("[rt] In add_gamepad_component: Object of type `" .. meta.typeof(self) .. "` already has a member called `gamepad`")
+    end
+
+    meta._install_property(self, "gamepad", rt.AllocationComponent(self))
+    return rt.get_gamepad_component(self)
+end
+
+--- @brief get gamepad component assigned
+--- @return rt.AllocationComponent
+function rt.get_gamepad_component(self)
+    return self.gamepad
+end
 
 --- @brief [internal] test keyboard component
 rt.test.gamepad_component = function()

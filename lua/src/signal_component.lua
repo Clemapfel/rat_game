@@ -21,7 +21,7 @@ function rt.add_signal_component(object, implement_notify)
         error("[rt] In add_signal_component: Object already has a signal component")
     end
 
-    object.signal = rt.SignalComponent(object)
+    meta._install_property(object, "signal", rt.SignalComponent(object))
 
     if meta.is_nil(implement_notify) then
         implement_notify = true
@@ -34,6 +34,13 @@ function rt.add_signal_component(object, implement_notify)
         end
     end
     return object
+end
+
+--- @brief access signal component
+--- @return rt.SignalComponent
+function rt.get_signal_component(object)
+    meta.assert_object(object)
+    return object.signal
 end
 
 --- @brief [internal] initialize signal of given name

@@ -1,10 +1,10 @@
---- @class AnimationHandler
+--- @class rt.AnimationHandler
 rt.AnimationHandler = {}
 
 rt.AnimationHandler._hash = 1
 rt.AnimationHandler._components = {}
 
---- @class AnimationState
+--- @class rt.AnimationState
 rt.AnimationState = meta.new_enum({
     PLAYING = "ANIMATION_STATE_PLAYING",
     PAUSED = "ANIMATION_STATE_PAUSED",
@@ -12,7 +12,7 @@ rt.AnimationState = meta.new_enum({
 })
 
 
---- @class AnimationTimingFunction
+--- @class rt.AnimationTimingFunction
 --- @see https://gitlab.gnome.org/GNOME/libadwaita/-/blob/main/src/adw-easing.c#L77
 rt.AnimationTimingFunction = meta.new_enum({
     LINEAR = "ANIMATION_TIMING_FUNCTION_LINEAR",
@@ -44,7 +44,7 @@ rt.AnimationHandler._timing_functions = (function()
 end)()
 
 
---- @class Animation
+--- @class rt.Animation
 rt.Animation = meta.new_type("Animation", function(duration_seconds)
     meta.assert_number(duration_seconds)
     if duration_seconds < 0 then
@@ -97,14 +97,14 @@ function rt.AnimationHandler.update(delta)
 end
 
 --- @brief get current state
---- @param self Animation
---- @return AnimationState
+--- @param self rt.Animation
+--- @return rt.AnimationState
 function rt.Animation.get_state(self)
     return self._state
 end
 
 --- @brief reset animation back to idle
---- @param self Animation
+--- @param self rt.Animation
 function rt.Animation.play(self)
     if self:get_state() == rt.AnimationState.IDLE then
         self._state = rt.AnimationState.PLAYING
@@ -113,7 +113,7 @@ function rt.Animation.play(self)
 end
 
 --- @brief pause animation if it playing, otherwise do nothing
---- @param self Animation
+--- @param self rt.Animation
 function rt.Animation.pause(self)
     if self:get_state() == rt.AnimationState.PLAYING then
        self._state = rt.AnimationState.PAUSED
@@ -121,14 +121,14 @@ function rt.Animation.pause(self)
 end
 
 --- @brief reset animation back to idle
---- @param self Animation
+--- @param self rt.Animation
 function rt.Animation.reset(self)
     self._state = rt.AnimationState.IDLE
     self._time = 0
 end
 
 --- @brief set duration of animation
---- @param self Animation
+--- @param self rt.Animation
 --- @param duration_s Number
 function rt.Animation.set_duration(self, duration_s)
     meta.assert_isa(self, rt.Animation)
@@ -136,7 +136,7 @@ function rt.Animation.set_duration(self, duration_s)
 end
 
 --- @brief get duration of animation, in seconds
---- @param self Animation
+--- @param self rt.Animation
 --- @return Number
 function rt.Animation.get_duration(self)
     meta.assert_isa(self, rt.Animation)
@@ -144,8 +144,8 @@ function rt.Animation.get_duration(self)
 end
 
 --- @brief set timing function
---- @param self Animation
---- @param f AnimationTimingFunction
+--- @param self rt.Animation
+--- @param f rt.AnimationTimingFunction
 function rt.Animation.set_timing_function(self, f)
     meta.assert_isa(self, rt.Animation)
     meta.assert_enum(f, rt.AnimationTimingFunction)
@@ -153,8 +153,8 @@ function rt.Animation.set_timing_function(self, f)
 end
 
 --- @brief get timing function
---- @param self Animation
---- @return AnimationTimingFunction
+--- @param self rt.Animation
+--- @return rt.AnimationTimingFunction
 function rt.Animation.get_timing_function(self, f)
     meta.assert_isa(self, rt.Animation)
     return self._timing_function

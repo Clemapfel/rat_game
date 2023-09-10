@@ -154,6 +154,24 @@ function rt.MouseHandler.set_position(x, y)
     rt.MouseHandler.handle_motion(x, y, current_x - x, current_y - y, false)
 end
 
+--- @brief add an mouse component as `.mouse`
+function rt.add_mouse_component(self)
+    meta.assert_object(self)
+
+    if not meta.is_nil(self.mouse) then
+        error("[rt] In add_mouse_component: Object of type `" .. meta.typeof(self) .. "` already has a member called `mouse`")
+    end
+
+    meta._install_property(self, "mouse", rt.AllocationComponent(self))
+    return rt.get_mouse_component(self)
+end
+
+--- @brief get mouse component assigned
+--- @return rt.AllocationComponent
+function rt.get_mouse_component(self)
+    return self.mouse
+end
+
 --- @brief [internal] test mouse component
 rt.test.mouse_component = function()
     local instance = meta._new("Object")
