@@ -565,3 +565,13 @@ function meta.make_weak(table, weak_keys, weak_values)
 
     return table
 end
+
+--- @brief Add abstract method that needs to be overloaded or an assertion is raised
+--- @param super meta.Type
+--- @param name String
+function meta.declare_abstract_method(super, name)
+    meta.assert_object(super)
+    super[name] = function(self)
+        error("[rt] In " .. super.name .. "." .. name .. ": Abstract method called by object of type `" .. meta.typeof(self) .. "`")
+    end
+end

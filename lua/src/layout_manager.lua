@@ -1,27 +1,22 @@
 --- @class LayoutManager
 rt.LayoutManager = meta.new_type("LayoutManager", function()
-    local out = meta.new(rt.LayoutManager, {})
+    local out = meta.new(rt.LayoutManager)
+    meta._install_property(out, "allocation", rt.AllocationComponent(out))
     return out
 end)
 
-function rt.LayoutManager.reformat(self)
-    assert("[rt] In rt.LayoutManager:reformat: Called abstract method")
-end
-
+meta.declare_abstract_method(rt.LayoutManager, "reformat")
 
 --- @class Bin
 --- @brief Layout with a single child
 rt.Bin = meta.new_type("Bin", function()
     local out = meta.new(rt.Bin, {
         child = {}
-    }, rt.Layoutmanager)
+    }, rt.LayoutManager)
     rt.add_signal_component(out)
-
     getmetatable(out).components.signal:connect("notify::child", function(self)
-        rt.LayoutManager.reformat(self)
-        println("called")
+        self:reformat(self)
     end)
-
     return out
 end)
 
@@ -36,4 +31,16 @@ end
 function rt.Bin.remove_child(self)
     meta.assert_isa(self, rt.Bin)
     self.child = nil
+end
+
+--- @brief
+function rt.Bin.reformat(self)
+    local child_allocation = getmetatable(self.child).components.allocation
+    local self_allocation = self.allocation
+
+    if meta.is_nil(child_allocation) then
+        error("In Bin.reformat: Child of type `" .. meta.typeof(self.child) .. "` does not have an allocation component")
+    end
+
+    child_allocation:resize(self_allocation)
 end

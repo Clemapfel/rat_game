@@ -319,6 +319,16 @@ function rt.AllocationComponent.get_vertical_alignment(self, alignment)
     return self._vertical_alignment
 end
 
+--- @brief fit into rectangle, respecting margins
+function rt.AllocationComponent.resize(self, new_bounds)
+    meta.assert_isa(new_bounds, rt.Rectangle)
+
+    self._bounds.x = new_bounds.x + self._margins.left
+    self._bounds.y = new_bounds.y + self._margins.top
+    self._bounds.width = new_bounds.width - (self._margins.left + self._margins.right)
+    self._bounds.height = new_bounds.height - (self._margins.top + self._margins.bottom)
+end
+
 --- @brief [internal] test allocation component
 function rt.test.allocation_component()
     local instance = meta._new("Object")
