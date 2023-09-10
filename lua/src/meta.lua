@@ -56,6 +56,7 @@ function meta._new(typename)
     metatable.properties = {}
     metatable.is_private = {}
     metatable.is_mutable = true
+    metatable.super = {}
     metatable.components = {}
 
     metatable.__index = function(this, property_name)
@@ -77,8 +78,11 @@ function meta._new(typename)
         metatable.properties[property_name] = property_value
 
         -- trigger notify signals, c.f. `signal_component.lua`
-        if metatable.signals == nil then return end
-        this.signals:emit(rt.SignalComponent._notify_prefix .. property_name, property_value)
+        if metatable.components.signal == nil then return end
+        local notify_signal_id = rt.SignalComponent._notify_prefix .. property_name
+        if metatable.components.signal:has_signal(notify_signal_id) then
+            metatable.components.signal:emit(notify_signal_id, property_value)
+        end
     end
 
     metatable.__tostring = function(this)
@@ -129,6 +133,19 @@ function meta.isa(x, type)
         end
         return meta.typeof(x) == type.name
     end
+end
+
+--- @brief check if instance has type as super
+function meta.inherits(x, super)
+    meta.assert_object(x)
+    meta.assert_isa(super, meta.Type)
+
+    for _, name in ipairs(getmetatable(x).super) do
+        if name == super.name then
+            return true
+        end
+    end
+    return false
 end
 
 --- @brief [internal] print type assertion error message
@@ -209,6 +226,17 @@ function meta.assert_object(x, ...)
     meta._assert_aux(meta.is_object(x), x, "meta.Object")
     for _, number in ipairs({...}) do
         meta._assert_aux(meta.is_object(number), number, "meta.Object")
+    end
+end
+
+--- @brief assert that instance inherits from type
+--- @param x any
+function meta.assert_inherits(x, type)
+    if meta.typeof(type) == "Type" then
+        meta._assert_aux(meta.inherits(x, type), x, type.name)
+    else
+        meta.assert_string(type)
+        meta._assert_aux(meta.inherits(x, type), x, type)
     end
 end
 
@@ -316,7 +344,8 @@ meta.Object = "Object"
 --- @brief create a new object instance
 --- @param type meta.Type
 --- @param fields Table property_name -> property_value
-function meta.new(type, fields)
+--- @vararg meta.Type
+function meta.new(type, fields, ...)
 
     meta.assert_isa(type, meta.Type)
 
@@ -345,6 +374,11 @@ function meta.new(type, fields)
     end
 
     meta._install_inheritance(out, type)
+
+    for _, super in ipairs({...}) do
+        meta.assert_isa(super, meta.Type)
+        meta._install_inheritance(out, super)
+    end
     return out
 end
 
@@ -419,6 +453,8 @@ end
 function meta._install_inheritance(instance, type)
     meta.assert_object(instance)
     meta.assert_isa(type, meta.Type)
+
+    table.insert(getmetatable(instance).super, type.name)
 
     for key, value in pairs(getmetatable(type).properties) do
         if key ~= "name" and not meta.has_property(instance, key) then

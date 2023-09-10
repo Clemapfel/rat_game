@@ -11,6 +11,7 @@ rt.Alignment = meta.new_enum({
 --- @class AllocationComponent
 --- @signal changed (::AllocationComponent, x::Number, y::Number, width::Number, height::Number) -> nil
 rt.AllocationComponent = meta.new_type("AllocationComponent", function(holder)
+    meta.assert_object(holder)
     local out = meta.new(rt.AllocationComponent, {
         _instance = holder,
         _bounds = rt.Rectangle(),

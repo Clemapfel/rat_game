@@ -16,6 +16,7 @@ rt.SignalComponent._signal_property = "signal"
 --- @param object meta.Object
 --- @param implement_notify Boolean whether the `notify::` signals should be initialized
 function rt.add_signal_component(object, implement_notify)
+
     meta.assert_object(object)
     if not meta.is_nil(object[rt.SignalComponent._signal_property]) then
         error("[rt] In add_signal_component: Object already has a signal component")
@@ -62,7 +63,7 @@ function rt.SignalComponent._assert_has_signal(component, name, scope)
     meta.assert_string(name)
     meta.assert_string(scope)
 
-    if getmetatable(component._instance)[rt.SignalComponent._signal_property][name] == nil then
+    if not component:has_signal(name) then
         error("[rt] In SignalComponent." .. scope .. ": Object of type `" .. meta.typeof(component._instance) .. "`has no signal with name `" .. name .. "`")
     end
 end
@@ -73,7 +74,9 @@ end
 function rt.SignalComponent.has_signal(component, name)
     meta.assert_isa(component, rt.SignalComponent)
     meta.assert_string(name)
-    return not meta.is_nil(getmetatable(component._instance)[rt.SignalComponent._signal_property][name])
+
+    local metatable = getmetatable(component._instance)
+    return not meta.is_nil(metatable[rt.SignalComponent._signal_property]) and not meta.is_nil(metatable[rt.SignalComponent._signal_property][name])
 end
 
 --- @brief add a signal, afterwards, all other rt.SignalComponent functions will become available
@@ -188,7 +191,8 @@ end
 --- @brief [internal] test signal component
 rt.test.signal_component = function()
 
-    local instance = meta._new("Object", {})
+    local instance = meta._new("Object")
+    meta._install_property(instance, "property", 1234)
     local signal = "test"
 
     rt.add_signal_component(instance)
@@ -215,5 +219,12 @@ rt.test.signal_component = function()
     instance[rt.SignalComponent._signal_property]:disconnect(signal)
     instance[rt.SignalComponent._signal_property]:emit(signal)
     assert(not called)
+
+    local notify_called = false
+    instance[rt.SignalComponent._signal_property]:connect("notify::property", function()
+        notify_called = true
+    end)
+    instance.property = true
+    assert(notify_called)
 end
 rt.test.signal_component()

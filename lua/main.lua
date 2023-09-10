@@ -20,33 +20,22 @@ require "meta"
 require "queue"
 require "geometry"
 require "signal_component"
-require "allocation_component"
 require "keyboard_component"
 require "gamepad_component"
 require "mouse_component"
 require "animation"
+require "allocation_component"
+require "layout_manager"
+require "drawable"
 
-rt.Super = meta.new_type("Super", function()
-    return meta.new(rt.Super)
-end)
+drawable = rt.Drawable()
+drawable._allocation:set_position(50, 50)
+drawable._allocation:set_size(100, 150)
+drawable._allocation:set_margin(10)
+drawable._allocation:set_margin_right(20)
 
-function rt.Super.super_method(self)
-    println("super")
-end
-
-rt.Child = meta.new_type("Child", function()
-    local out = meta.new(rt.Child)
-    return out
-end)
-
-function rt.Child.child_method(self)
-    println("child")
-end
-
-local instance = rt.Child()
-println(meta.isa(instance, "Child"))
-println(meta.isa(instance, rt.Child))
-
+bin = rt.Bin()
+bin.child = "test"
 
 -- ### MAIN ###
 
@@ -66,26 +55,7 @@ end
 --- @brief draw step
 function love.draw()
 
-    local text = love.graphics.newText(love.graphics.getFont(), "EEEEEEEE\nEEEEEEE")
-    local text_w = text:getWidth()
-    local text_h = text:getHeight()
-
-    local x, y, orientation_rad, scale_x, scale_y, origin_offset_x, origin_offset_y, shear_x, shear_y
-    x = love.graphics.getWidth() * 0.5 - 0.5 * text_w
-    y = love.graphics.getHeight() * 0.5 - 0.5 * text_h
-
-    love.graphics.setColor(1, 1, 1, 1)
-    love.graphics.draw(text, x, y, orientation_rad, scale_x, scale_y, origin_offset_x, origin_offset_y, shear_x, shear_y)
-
-    love.graphics.line(x, y, x + text_w, y, x + text_w, y + text_h, x, y + text_h)
-
-    local screen_w = love.graphics.getWidth()
-    local screen_h = love.graphics.getHeight()
-
-    love.graphics.setColor(1, 0, 1, 1)
-    love.graphics.line(0.5 * screen_w, 0, 0.5 * screen_w, screen_h)
-    love.graphics.setColor(0, 1, 1, 1)
-    love.graphics.line(0, 0.5 * screen_h, screen_w, 0.5 * screen_h)
+    drawable:draw_hitbox()
 
     function show_fps()
         local text = love.graphics.newText(love.graphics.getFont(), tostring(math.round(love.timer.getFPS())))
