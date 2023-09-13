@@ -23,7 +23,9 @@ require "meta"
 require "queue"
 require "geometry"
 require "color"
+require "drawable"
 require "shape"
+require "label"
 require "signal_component"
 require "keyboard_component"
 require "gamepad_component"
@@ -31,7 +33,6 @@ require "mouse_component"
 require "animation"
 require "allocation_component"
 require "layout_manager"
-require "drawable"
 
 -- ### MAIN ###
 
@@ -40,7 +41,7 @@ if DEBUG_MODE then goto exit end
 --- @brief startup
 function love.load()
     love.window.setTitle("rat_game")
-    love.graphics.setFont(love.graphics.newFont(12))
+    rt.Font.DEFAULT = rt.load_font("Roboto", "assets/Roboto")
 end
 
 --- @brief update tick
@@ -51,10 +52,19 @@ end
 --- @brief draw step
 function love.draw()
 
-    local circle = rt.CircleShape(400, 300, 100)
-    circle:set_is_outline(true)
-    println(serialize(circle))
-    circle:draw()
+    local regular = rt.Glyph(rt.Font.DEFAULT, "regular", rt.FontStyle.REGULAR)
+    local italic = rt.Glyph(rt.Font.DEFAULT, "italic", rt.FontStyle.ITALIC)
+    local bold = rt.Glyph(rt.Font.DEFAULT, "bold", rt.FontStyle.BOLD)
+    local bold_italic = rt.Glyph(rt.Font.DEFAULT, "bold_italic", rt.FontStyle.BOLD_ITALIC)
+
+    regular:draw()
+    love.graphics.translate(0, 50)
+    italic:draw()
+    love.graphics.translate(0, 50)
+    bold:draw()
+    love.graphics.translate(0, 50)
+    bold_italic:draw()
+    love.graphics.translate(0, 50)
 
     function show_fps()
         local text = love.graphics.newText(love.graphics.getFont(), tostring(math.round(love.timer.getFPS())))

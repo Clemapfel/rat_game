@@ -19,7 +19,7 @@ end)
 
 function rt.LayoutComponent.reformat(self, bounds)
     meta.assert_isa(self, rt.LayoutComponent)
-    meta.assert_isa(bounds, rt.Rectangle)
+    meta.assert_isa(bounds, rt.AxisAlignedRectangle)
 
 
 end

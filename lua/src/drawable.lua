@@ -1,3 +1,4 @@
+--- @class SymbolicTransform
 rt.SymbolicTransform = meta.new_type("SymbolicTransform", function()
     local out = meta.new(rt.SymbolicTransform, {
         _offset_x = 0,
@@ -29,7 +30,7 @@ meta.declare_abstract_method(rt.Drawable, "reformat")
 --- @param b Boolean
 function rt.Drawable:set_is_visible(b)
     meta.assert_isa(self, rt.Drawable)
-    self._is_visible= b
+    self._is_visible = b
 end
 
 --- @brief get whether drawable should be culled

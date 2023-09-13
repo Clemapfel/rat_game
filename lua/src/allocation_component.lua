@@ -11,7 +11,7 @@ rt.AllocationComponent = meta.new_type("AllocationComponent", function(holder)
     meta.assert_object(holder)
     local out = meta.new(rt.AllocationComponent, {
         _instance = holder,
-        _bounds = rt.Rectangle(),
+        _bounds = rt.AxisAlignedRectangle(),
         _margins = {
             top = 0,
             right = 0,
@@ -80,10 +80,10 @@ end
 
 --- @brief get axis aligned bounding box including margin
 --- @param self rt.AllocationComponent
---- @return rt.Rectangle
+--- @return rt.AxisAlignedRectangle
 function rt.AllocationComponent.get_bounds(self)
     meta.assert_isa(self, rt.AllocationComponent)
-    local out = rt.Rectangle()
+    local out = rt.AxisAlignedRectangle()
     out.x = self._bounds.x - self._margins.left
     out.y = self._bounds.y - self._margins.top
     out.width = self._bounds.width + self._margins.left + self._margins.right
@@ -395,9 +395,9 @@ end
 
 --- @brief fit into rectangle, respecting margins
 --- @param self rt.AllocationComponent
---- @param new_bounds rt.Rectangle
+--- @param new_bounds rt.AxisAlignedRectangle
 function rt.AllocationComponent.resize(self, new_bounds)
-    meta.assert_isa(new_bounds, rt.Rectangle)
+    meta.assert_isa(new_bounds, rt.AxisAlignedRectangle)
 
     local x, width = rt.AllocationComponent._calculate_size(self,
         math.max(self._bounds.width, self._minimum_width),
@@ -419,7 +419,7 @@ function rt.AllocationComponent.resize(self, new_bounds)
         new_bounds.height
     )
     
-    self._bounds = rt.Rectangle(x, y, width, height)
+    self._bounds = rt.AxisAlignedRectangle(x, y, width, height)
 end
 
 --- @brief add an allocation component as `.allocation`
