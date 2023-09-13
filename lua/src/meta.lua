@@ -126,26 +126,23 @@ end
 --- @return Boolean
 function meta.isa(x, type)
 
-    local super
-    if meta.is_string(type) then
-        super = meta.typeof(x)
+    local typename = type
+    if meta.typeof(type) == "Type" then
+        typename = type.name
     else
-        if meta.typeof(type) ~= "Type" then
-            error("[rt] In meta.isa: Expected `Type` or `String`, got `" .. meta.typeof(type) .. "`")
-        end
-        super = meta.typeof(x)
+        typename = type
     end
 
-    if meta.typeof(x) == super then
+    if meta.typeof(x) == typename then
         return true
     end
 
-    for s in getmetatable(super).super do
-        if s == super then
+    local metatable = getmetatable(x)
+    for _, super in ipairs(metatable.super) do
+        if super == typename then
             return true
         end
     end
-
     return false
 end
 
