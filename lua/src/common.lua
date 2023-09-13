@@ -185,14 +185,7 @@ function serialize(object_identifier, object, inject_sourcecode)
     serialize_inner = function (buffer, object, n_indent_tabs, seen)
 
         if type(object) == "number" then
-
-            -- remove .0 for integers
-            if math.fmod(object, 1) == 0 then
-                local base = tostring(object)
-                insert(buffer, string.sub(base, 0, sizeof(base) - 2))
-            else
-                insert(buffer, object)
-            end
+            insert(buffer, tostring(object))
 
         elseif type(object) == "boolean" then
             if (object) then insert(buffer, "true") else insert(buffer, "false") end
@@ -218,14 +211,7 @@ function serialize(object_identifier, object, inject_sourcecode)
                 for key, value in pairs(object) do
 
                     if type(key) == "number" then
-
-                        if key ~= index+1 then
-                            insert(buffer, get_indent(n_indent_tabs), "[", key, "] = ")
-                        else
-                            insert(buffer, get_indent(n_indent_tabs))
-                        end
-                    else
-                        insert(buffer, get_indent(n_indent_tabs), tostring(key), " = ")
+                        insert(buffer, get_indent(n_indent_tabs), "[", key, "] = ")
                     end
 
                     serialize_inner(buffer, value, n_indent_tabs, seen)
