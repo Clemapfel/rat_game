@@ -1,11 +1,11 @@
 --- @class rt.RGBA
-function rt.RGBA(r, g, b, a)
-    local out = {}
+rt.RGBA = function(r, g, b, a)
     if meta.is_nil(r) then r = 1 end
     if meta.is_nil(g) then g = 1 end
     if meta.is_nil(b) then b = 1 end
     if meta.is_nil(a) then a = 1 end
 
+    local out = {}
     out.r = r
     out.g = g
     out.b = b
@@ -13,19 +13,52 @@ function rt.RGBA(r, g, b, a)
     return out
 end
 
+--- @brief [internal]
+function rt.is_rgba(object)
+    return sizeof(object) == 4 and
+        meta.is_number(object.r) and
+        meta.is_number(object.g) and
+        meta.is_number(object.b) and
+        meta.is_number(object.a)
+end
+
+--- @brief [internal] check if object is RGBA
+function rt.assert_rgba(object)
+    if not rt.is_rgba(object) then
+        error("In " .. debug.getinfo(2, "n").name .. ": Excpected `RGBA`, got `" .. meta.typeof(object) .. "`")
+    end
+end
+
+
 --- @class rt.HSVA
 function rt.HSVA(h, s, v, a)
-    local out = {}
     if meta.is_nil(h) then h = 1 end
     if meta.is_nil(s) then s = 1 end
     if meta.is_nil(v) then v = 1 end
     if meta.is_nil(a) then a = 1 end
 
+    local out = {}
     out.r = h
     out.g = s
     out.b = v
     out.a = a
     return out
+end
+
+--- @brief [internal]
+function rt.is_hsva(object)
+    return sizeof(object) == 4 and
+    meta.is_number(object.r) and
+    meta.is_number(object.g) and
+    meta.is_number(object.b) and
+    meta.is_number(object.a)
+end
+
+--- @brief [internal] check if object is RGBA
+function rt.assert_hsva(object)
+    if not rt.is_hsva(object) then
+        error("In " .. debug.getinfo(2, "n").name .. ": Excpected `HSVA`, got `" .. meta.typeof(object) .. "`")
+    end
 end
 
 --- @brief conver rgba to hsva
@@ -115,3 +148,9 @@ function hsva_to_rgba(hsva)
 
     return RGBA(r, g, b, a)
 end
+
+--- @brief [internal] test colors
+function rt.test.colors()
+    --- TODO
+end
+rt.test.colors()
