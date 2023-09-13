@@ -33,11 +33,12 @@ end)
 rt.Font.DEFAULT_SIZE = 14
 rt.Font.DEFAULT = {}
 
+--- @class rt.FontStyle
 rt.FontStyle = meta.new_enum({
-    REGULAR = "regular",
-    ITALIC = "italic",
-    BOLD = "bold",
-    BOLD_ITALIC = "bold_italic"
+    REGULAR = "FONT_STYLE_REGULAR",
+    ITALIC = "FONT_STYLE_ITALIC",
+    BOLD = "FONT_STYLE_BOLD",
+    BOLD_ITALIC = "FONT_STYLE_BOLD_ITALIC"
 })
 
 rt.Font[rt.FontStyle.REGULAR] = love.graphics.getFont()
@@ -45,18 +46,18 @@ rt.Font[rt.FontStyle.BOLD] = love.graphics.getFont()
 rt.Font[rt.FontStyle.ITALIC] = love.graphics.getFont()
 rt.Font[rt.FontStyle.BOLD_ITALIC] = love.graphics.getFont()
 
---- @brief [internal]
+--- @brief [internal] update held fonts
 function rt.Font:_update()
     meta.assert_isa(self, rt.Font)
     self[rt.FontStyle.REGULAR] = love.graphics.newFont(self._regular_path, self._size)
-    self[rt.FontStyle.BOLD] = love.graphics.newFont(self._italic_path, self._size)
-    self[rt.FontStyle.ITALIC] = love.graphics.newFont(self._bold_path, self._size)
+    self[rt.FontStyle.BOLD] = love.graphics.newFont(self._bold_path, self._size)
+    self[rt.FontStyle.ITALIC] = love.graphics.newFont(self._italic_path, self._size)
     self[rt.FontStyle.BOLD_ITALIC] = love.graphics.newFont(self._bold_italic_path, self._size)
 end
 
---- @brief [internal]
+--- @brief [internal] load font form a google fonts folder
 function rt.load_font(name, path)
-    local regular = path .. "/" .. name .. "-Medium.ttf"
+    local regular = path .. "/" .. name .. "-Regular.ttf"
     local bold = path .. "/" .. name .. "-Bold.ttf"
     local italic = path .. "/" .. name .. "-Italic.ttf"
     local bold_italic = path .. "/" .. name .. "-BoldItalic.ttf"
@@ -65,7 +66,7 @@ end
 
 --- @brief set font size, in px
 --- @param px Number
-function rt.Font.set_size(px)
+function rt.Font:set_size(px)
     meta.assert_isa(self, rt.Font)
     self._size = px
     self:_update()
@@ -73,7 +74,7 @@ end
 
 --- @brief get font size, in px
 --- @return Number
-function rt.Font.get_size()
+function rt.Font:get_size()
     meta.assert_isa(self, rt.Font)
     return self._size
 end
@@ -94,22 +95,59 @@ rt.Glyph = meta.new_type("Glyph", function(font, content, font_style, color)
         _color = color,
         _style = font_style,
         _text = {}
-    })
+    }, rt.Drawable)
     out:_update()
     return out
 end)
 
---- @brief [internal]
+--- @brief [internal] update held graphical object
 function rt.Glyph:_update()
     meta.assert_isa(self, rt.Glyph)
-
     local font = self._font[self._style]
     self._text = love.graphics.newText(font, {{self._color.r, self._color.g, self._color.b}, self._content})
-    println(serialize(self))
 end
 
---- @brief
+--- @brief draw glyph
 function rt.Glyph:draw()
     meta.assert_isa(self, rt.Glyph)
-    love.graphics.draw(self._text)
+    rt.Drawable._draw(self, self._text)
+end
+
+--- @brief set font style
+--- @param style rt.FontStyle
+function rt.Glyph:set_style(style)
+    meta.assert_isa(self, rt.Glyph)
+    meta.assert_enum(style, rt.FontStyle)
+    self._style = style
+    self:_update()
+end
+
+--- @brief get font style
+--- @param style rt.FontStyle
+function rt.Glyph:get_style()
+    meta.assert_isa(self, rt.Glyph)
+    meta.assert_enum(style, rt.FontStyle)
+    return self._style
+end
+
+--- @brief set font color
+--- @param color rt.RGBA
+function rt.Glyph:set_color(color)
+    meta.assert_isa(self, rt.Glyph)
+
+    if rt.is_hsva(color) then
+        color = rt.hsva_to_rgba(color)
+    else
+        rt.assert_rgba(color)
+    end
+
+    self._color = color
+    self:_update()
+end
+
+--- @brief get color
+--- @return rt.RGBA
+function rt.Glyph:get_color(color)
+    meta.assert_isa(self, rt.Glyph)
+    return self._color
 end

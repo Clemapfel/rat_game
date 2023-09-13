@@ -48,9 +48,9 @@ end
 --- @brief [internal]
 function rt.is_hsva(object)
     return sizeof(object) == 4 and
-    meta.is_number(object.r) and
-    meta.is_number(object.g) and
-    meta.is_number(object.b) and
+    meta.is_number(object.h) and
+    meta.is_number(object.s) and
+    meta.is_number(object.v) and
     meta.is_number(object.a)
 end
 
@@ -64,6 +64,7 @@ end
 --- @brief conver rgba to hsva
 --- @param rgba rt.RGBA
 function rt.rgba_to_hsva(rgba)
+    rt.assert_rgba(rgba)
 
     -- cf. https://github.com/Clemapfel/mousetrap/blob/main/src/color.cpp#L112
     local r = rgba.r
@@ -112,7 +113,8 @@ end
 
 --- @brief convert hsva to rgba
 --- @param hsva rt.HSVA
-function hsva_to_rgba(hsva)
+function rt.hsva_to_rgba(hsva)
+    rt.assert_hsva(hsva)
 
     --- cf https://github.com/Clemapfel/mousetrap/blob/main/src/color.cpp#L151
     local h = hsva.h * 360

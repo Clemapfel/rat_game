@@ -1,14 +1,15 @@
---- @class SymbolicTransform
-rt.SymbolicTransform = meta.new_type("SymbolicTransform", function()
-    local out = meta.new(rt.SymbolicTransform, {
+--- @class Transform
+rt.Transform = meta.new_type("Transform", function()
+    local out = meta.new(rt.Transform, {
         _offset_x = 0,
         _offset_y = 0,
         _rotation = 0,
         _scale_x = 1,
         _scale_y = 1,
-        _shear_x = 1,
-        _shear_y = 1
+        _shear_x = 0,
+        _shear_y = 0
     })
+    return out
 end)
 
 --- @class rt.Drawable
@@ -19,11 +20,36 @@ rt.Drawable = meta.new_type("Drawable", function()
     return out
 end)
 
-rt.Drawable._transform = rt.SymbolicTransform()
+rt.Drawable._transform = rt.Transform()
 rt.Drawable._is_visible = true
+rt.Drawable._position_x = 0
+rt.Drawable._position_y = 0
 
 meta.declare_abstract_method(rt.Drawable, "draw")
 meta.declare_abstract_method(rt.Drawable, "reformat")
+
+--- @brief [internal]
+function rt.Drawable:_draw(love_drawable)
+
+    meta.assert_isa(self, rt.Drawable)
+
+    if self._is_visible == false then
+        return
+    end
+
+    local transform = self._transform
+    love.graphics.draw(love_drawable,
+        self.position_x,
+        self.position_y,
+        transform._rotation,
+        transform._scale_x,
+        transform._scale_y,
+        transform._offset_x,
+        transform._offset_y,
+        transform._shear_x,
+        transform._shear_y
+    )
+end
 
 --- @brief get whether drawable should be culled
 --- @param self rt.Drawable

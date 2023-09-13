@@ -57,14 +57,12 @@ function love.draw()
     local bold = rt.Glyph(rt.Font.DEFAULT, "bold", rt.FontStyle.BOLD)
     local bold_italic = rt.Glyph(rt.Font.DEFAULT, "bold_italic", rt.FontStyle.BOLD_ITALIC)
 
+    bold:set_color(rt.RGBA(1, 0, 1, 1))
+
     regular:draw()
-    love.graphics.translate(0, 50)
     italic:draw()
-    love.graphics.translate(0, 50)
     bold:draw()
-    love.graphics.translate(0, 50)
     bold_italic:draw()
-    love.graphics.translate(0, 50)
 
     function show_fps()
         local text = love.graphics.newText(love.graphics.getFont(), tostring(math.round(love.timer.getFPS())))
