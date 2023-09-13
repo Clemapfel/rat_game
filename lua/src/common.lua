@@ -1,4 +1,4 @@
-    --- @brief print, arguments are concatenated
+--- @brief print, arguments are concatenated
 --- @param vararg any
 --- @return nil
 function print(...)
@@ -185,7 +185,7 @@ function serialize(object_identifier, object, inject_sourcecode)
     serialize_inner = function (buffer, object, n_indent_tabs, seen)
 
         if type(object) == "number" then
-            insert(buffer, tostring(object))
+            insert(buffer, object)
 
         elseif type(object) == "boolean" then
             if (object) then insert(buffer, "true") else insert(buffer, "false") end
@@ -211,7 +211,14 @@ function serialize(object_identifier, object, inject_sourcecode)
                 for key, value in pairs(object) do
 
                     if type(key) == "number" then
-                        insert(buffer, get_indent(n_indent_tabs), "[", key, "] = ")
+
+                        if key ~= index+1 then
+                            insert(buffer, get_indent(n_indent_tabs), "[", key, "] = ")
+                        else
+                            insert(buffer, get_indent(n_indent_tabs))
+                        end
+                    else
+                        insert(buffer, get_indent(n_indent_tabs), tostring(key), " = ")
                     end
 
                     serialize_inner(buffer, value, n_indent_tabs, seen)

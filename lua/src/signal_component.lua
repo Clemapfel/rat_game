@@ -24,7 +24,7 @@ function rt.add_signal_component(object, implement_notify)
     meta._install_property(object, "signal", rt.SignalComponent(object))
 
     if meta.is_nil(implement_notify) then
-        implement_notify = true
+        implement_notify = false
     end
     meta.assert_boolean(implement_notify)
 
@@ -201,7 +201,7 @@ rt.test.signal_component = function()
     meta._install_property(instance, "property", 1234)
     local signal = "test"
 
-    rt.add_signal_component(instance)
+    rt.add_signal_component(instance, true)
     instance.signal:add(signal)
     assert(instance.signal:has_signal(signal) == true)
 

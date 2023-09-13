@@ -23,7 +23,9 @@ rt.AllocationComponent = meta.new_type("AllocationComponent", function(holder)
         _horizontal_alignment = rt.Alignment.CENTER,
         _vertical_alignment = rt.Alignment.CENTER,
         _minimum_width = 0,
-        _minimum_height = 0
+        _minimum_height = 0,
+        _parent = nil,
+        _children = {}
     })
 
     rt.add_signal_component(out)
@@ -421,18 +423,20 @@ function rt.AllocationComponent.resize(self, new_bounds)
 end
 
 --- @brief add an allocation component as `.allocation`
-function rt.add_allocation_component(self)
-    meta.assert_object(self)
+--- @param object meta.Object
+function rt.add_allocation_component(object)
+    meta.assert_object(object)
 
-    if not meta.is_nil(self.allocation) then
-        error("[rt] In add_allocation_component: Object of type `" .. meta.typeof(self) .. "` already has a member called `allocation`")
+    if not meta.is_nil(object.allocation) then
+        error("[rt] In add_allocation_component: Object of type `" .. meta.typeof(object) .. "` already has a member called `allocation`")
     end
 
-    meta._install_property(self, "allocation", rt.AllocationComponent(self))
-    return rt.get_allocation_component(self)
+    meta._install_property(object, "allocation", rt.AllocationComponent(object))
+    return rt.get_allocation_component(object)
 end
 
 --- @brief get allocation component assigned
+--- @param object meta.Object
 --- @return rt.AllocationComponent
 function rt.get_allocation_component(self)
     return self.allocation

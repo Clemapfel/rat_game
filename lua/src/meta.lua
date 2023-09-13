@@ -125,14 +125,28 @@ end
 --- @param type meta.Type (or String)
 --- @return Boolean
 function meta.isa(x, type)
+
+    local super
     if meta.is_string(type) then
-        return meta.typeof(x) == type
+        super = meta.typeof(x)
     else
         if meta.typeof(type) ~= "Type" then
             error("[rt] In meta.isa: Expected `Type` or `String`, got `" .. meta.typeof(type) .. "`")
         end
-        return meta.typeof(x) == type.name
+        super = meta.typeof(x)
     end
+
+    if meta.typeof(x) == super then
+        return true
+    end
+
+    for s in getmetatable(super).super do
+        if s == super then
+            return true
+        end
+    end
+
+    return false
 end
 
 --- @brief check if instance has type as super
@@ -299,7 +313,7 @@ function meta.set_is_private(x, property_name, b)
     meta.assert_object(x)
     meta.assert_string(property_name)
     meta.assert_boolean(b)
-    
+
     local private_table = getmetatable(x).is_private
     if not meta.is_boolean(private_table[property_name]) then
         error("[rt] In meta.set_is_private: Object of type `" ..  meta.typeof(x) .. "` does not yet have a property named `" ..  property_name .. "`")
@@ -527,13 +541,7 @@ end)
 --- @param x any
 --- @param type meta.Type
 function meta.assert_isa(x, type)
-
-    if meta.typeof(type) == "Type" then
-        meta._assert_aux(meta.typeof(x) == type.name, x, type.name)
-    else
-        meta.assert_string(type)
-        meta._assert_aux(meta.typeof(x) == type, x, type)
-    end
+    meta._assert_aux(meta.isa(x, type), x, type.name)
 end
 
 --- @brief make table weak, meaning it does not increase the reference count of its values

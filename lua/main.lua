@@ -22,6 +22,8 @@ require "common"
 require "meta"
 require "queue"
 require "geometry"
+require "color"
+require "shape"
 require "signal_component"
 require "keyboard_component"
 require "gamepad_component"
@@ -30,19 +32,6 @@ require "animation"
 require "allocation_component"
 require "layout_manager"
 require "drawable"
-
-drawable = rt.Drawable()
-drawable.allocation:set_position(50, 50)
-drawable.allocation:set_size(100, 150)
-drawable.allocation:set_margin(10)
-drawable.allocation:set_margin_right(20)
-drawable.allocation:set_expand_horizontally(true)
-drawable.allocation:set_expand_vertically(false)
-
-drawable.allocation:set_horizontal_alignment(rt.Alignment.END)
-drawable.allocation:set_vertical_alignment(rt.Alignment.CENTER)
-
-drawable.allocation:resize(rt.Rectangle(0, 0, love.graphics.getWidth(), love.graphics.getHeight()))
 
 -- ### MAIN ###
 
@@ -62,7 +51,10 @@ end
 --- @brief draw step
 function love.draw()
 
-    drawable:draw_hitbox()
+    local circle = rt.CircleShape(400, 300, 100)
+    circle:set_is_outline(true)
+    println(serialize(circle))
+    circle:draw()
 
     function show_fps()
         local text = love.graphics.newText(love.graphics.getFont(), tostring(math.round(love.timer.getFPS())))
