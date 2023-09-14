@@ -192,6 +192,13 @@ function rt.Label:parse_from(text)
         s = string.sub(text, i, i)
     end
 
+    local function push_glyph()
+        if current_glyph ~= "" then
+            println(current_glyph, " ", bold, " ", italic)
+        end
+        current_glyph = ""
+    end
+
     while i < #text do
         if s == "<" then
             step()
@@ -202,6 +209,7 @@ function rt.Label:parse_from(text)
                         error("attempting to close a bold reason, but none is open")
                     end
                     bold = false
+                    push_glyph()
                     step()
                     if s ~= ">" then
                         error("Expected `>`, got `" .. s .. "`")
@@ -212,6 +220,7 @@ function rt.Label:parse_from(text)
                         error("attempting to close an italic region, but none is open")
                     end
                     italic = false
+                    push_glyph()
                     step()
                     if s ~= ">" then
                         error("Expected `>`, got `" .. s .. "`")
@@ -223,6 +232,7 @@ function rt.Label:parse_from(text)
                     error("attempting to open a bold region, but one is already open")
                 end
                 bold = true
+                push_glyph()
                 step()
                 if s ~= ">" then
                     error("Expected `>`, got `" .. s .. "`")
@@ -233,6 +243,7 @@ function rt.Label:parse_from(text)
                     error("attempting to open an italic region, but one is already open")
                 end
                 italic = true
+                push_glyph()
                 step()
                 if s ~= ">" then
                    error("Expected `>`, got `" .. s .. "`")
@@ -242,7 +253,7 @@ function rt.Label:parse_from(text)
                 error("unrecognized flag: `" .. s .. "`")
             end
         else
-            println(s, " ", bold, " ", italic)
+            current_glyph = current_glyph .. s
             step()
         end
     end
