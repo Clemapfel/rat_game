@@ -46,26 +46,31 @@ end
 meta.declare_abstract_method(rt.Drawable, "draw")
 
 --- @brief [internal] paste a love drawable
-function rt.Drawable:_draw(love_drawable)
+function rt.Drawable:_draw(love_drawable, x, y, transform)
 
     meta.assert_isa(self, rt.Drawable)
+    meta.assert_number(x, y)
 
     if self._is_visible == false then
         return
     end
 
-    local transform = self._transform
-    love.graphics.draw(love_drawable,
-        self._position_x,
-        self._position_y,
-        transform._rotation,
-        transform._scale_x,
-        transform._scale_y,
-        transform._offset_x,
-        transform._offset_y,
-        transform._shear_x,
-        transform._shear_y
-    )
+    if meta.is_nil(transform) then
+        love.graphics.draw(love_drawable, x, y)
+    else
+        meta.assert_isa(transform, rt.Transform)
+        love.graphics.draw(love_drawable,
+            x,
+            y,
+            transform._rotation,
+            transform._scale_x,
+            transform._scale_y,
+            transform._offset_x,
+            transform._offset_y,
+            transform._shear_x,
+            transform._shear_y
+        )
+    end
 end
 
 --- @brief get whether drawable should be culled

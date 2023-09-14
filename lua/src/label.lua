@@ -110,7 +110,9 @@ end
 --- @brief draw glyph
 function rt.Glyph:draw()
     meta.assert_isa(self, rt.Glyph)
-    rt.Drawable._draw(self, self._text)
+    love.graphics.setColor(self._color.r, self._color.g, self._color.b, self._color.a)
+    local pos = rt.Vector2(self:get_position())
+    self:_draw(self._text, pos.x, pos.y)
 end
 
 --- @brief set font style
@@ -288,7 +290,6 @@ end
 
 function rt.Label:draw()
     for _, glyph in ipairs(self._glyphs) do
-        local x, y = glyph:get_position()
         glyph:draw()
     end
 end

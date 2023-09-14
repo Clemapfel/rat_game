@@ -7,6 +7,7 @@ if DEBUG_MODE then
     love.graphics = {}
     love.graphics.getWidth = function() return 1 end
     love.graphics.getHeight = function() return 1 end
+    love.graphics.getFont = function() return {} end
 else
     RESOURCE_PATH = love.filesystem.getSource()
 end
@@ -21,6 +22,7 @@ rt.test = {}
 require "common"
 require "meta"
 require "queue"
+require "vector"
 require "geometry"
 require "color"
 require "drawable"
@@ -70,3 +72,7 @@ function love.quit()
 end
 
 ::exit::
+
+if DEBUG_MODE then
+    println("done.")
+end
