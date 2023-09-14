@@ -170,10 +170,12 @@ rt.Label.BOLD_TAG = "b"       -- <b>example</b>
 rt.Label.ITALIC_TAG = "i"     -- <i>example</i>
 rt.Label.COLOR_TAG = "color"  -- <color=hotpink>example</color>
 
+--- @brief
 function rt.Label:parse_from(text)
 
     local glyphs = self._glyphs
     local error_reason = ""
+    local error_occurred = false
 
     local bold = false
     local italic = false
@@ -183,104 +185,75 @@ function rt.Label:parse_from(text)
     local x = 0   -- x-position
     local y = 0   -- y-position
     local i = 1   -- character index
-    local s = ""  -- current character
+    local s = string.sub(text, 1, 1)  -- current character
 
     local function step()
         i = i + 1
         s = string.sub(text, i, i)
     end
 
-    local function assert_tag_close()
-        if s ~= ">" then
-            error_reason = "Expected `<`, got `" .. s .. "`"
-            return false
-        end
-        return true
-    end
-
     while i < #text do
-        if s == "<" then  -- open tag
-
+        if s == "<" then
             step()
-            if i > #text then
-                goto error
-            end
-
-            if s == "b" then -- open bold
-                if bold then
-                    error_reason = "bold region is already open"
-                    goto error
-                end
-
-                bold = true
-                step()
-                if not assert_tag_close() then goto error end
-            elseif s == "i" then -- open italic
-                if italic then
-                    error_reason = "italic region is already open"
-                    goto error
-                end
-                italic = true
-                step()
-                if not assert_tag_close() then goto error end
-            elseif s == "c" then -- open color
-                -- TODO color
-                step()
-                if not assert_tag_close() then goto error end
-            elseif s == "/" then -- close tag
-                step()
-                if s == "b" then -- close bold
+            if s == "/" then
+                step(true)
+                if s == "b" then
                     if not bold then
-                        error_reason = "trying to close bold region, but it is not open"
-                        goto error
+                        error("attempting to close a bold reason, but none is open")
                     end
                     bold = false
                     step()
-                    if not assert_tag_close() then goto error end
-                    goto next
+                    if s ~= ">" then
+                        error("Expected `>`, got `" .. s .. "`")
+                    end
+                    step()
                 elseif s == "i" then
                     if not italic then
-                        error_reason = "trying to close italic region, but it is not open"
-                        goto error
+                        error("attempting to close an italic region, but none is open")
                     end
                     italic = false
                     step()
-                    if not assert_tag_close() then goto error end
-                    goto next
-                elseif s == "c" then
-                    -- TODO: color
+                    if s ~= ">" then
+                        error("Expected `>`, got `" .. s .. "`")
+                    end
                     step()
-                    if not assert_tag_close() then goto error end
-                    goto next
-                else
-                    error_reason = "Unexpcted control character: `" .. s .. "`"
-                    goto error
                 end
+            elseif s == "b" then
+                if bold then
+                    error("attempting to open a bold region, but one is already open")
+                end
+                bold = true
+                step()
+                if s ~= ">" then
+                    error("Expected `>`, got `" .. s .. "`")
+                end
+                step()
+            elseif s == "i" then
+                if italic then
+                    error("attempting to open an italic region, but one is already open")
+                end
+                italic = true
+                step()
+                if s ~= ">" then
+                   error("Expected `>`, got `" .. s .. "`")
+                end
+                step()
             else
-                error_reason = "Unexpcted control character: `" .. s .. "`"
-                goto error
+                error("unrecognized flag: `" .. s .. "`")
             end
-        elseif s == ">" then
-            error_reason  = "Unexpected control region"
-            goto error
         else
-            local style = rt.FontStyle.REGULAR
-            if bold and italic then
-                style = rt.FontStyle.BOLD_ITALIC
-            elseif bold then
-                style = rt.FontStyle.BOLD
-            elseif italic then
-                style = rt.FontStyle.ITALIC
-            end
-
-            table.insert(glyphs, rt.Glyph(rt.Font.DEFAULT, s, style))
+            println(s, " ", bold, " ", italic)
+            step()
         end
-        step()
-        ::next::
     end
 
-    ::error::
-    error("[rt] In Label.parse_from: At position `" .. tostring(i) .. "`: " .. error_reason)
+    if bold then
+        error("Reached end of text, but bold region is still open")
+    end
+
+    if italic then
+        error("Reached end of text, but italic region is still open")
+    end
 end
 
 function rt.Label:draw()
