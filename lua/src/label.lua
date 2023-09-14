@@ -151,3 +151,141 @@ function rt.Glyph:get_color(color)
     meta.assert_isa(self, rt.Glyph)
     return self._color
 end
+
+--- @brief measure text size
+function rt.Glyph:get_width()
+    return self._text:getWidth()
+end
+
+--- @class Label
+rt.Label = meta.new_type("Label", function(formatted_text)
+    local out = meta.new(rt.Label, {
+        _glyphs = {}
+    }, rt.Drawable)
+    out:parse_from(formatted_text)
+    return out
+end)
+
+rt.Label.BOLD_TAG = "b"       -- <b>example</b>
+rt.Label.ITALIC_TAG = "i"     -- <i>example</i>
+rt.Label.COLOR_TAG = "color"  -- <color=hotpink>example</color>
+
+function rt.Label:parse_from(text)
+
+    local glyphs = self._glyphs
+    local error_reason = ""
+
+    local bold = false
+    local italic = false
+    local color = false
+
+    local current_glyph = ""
+    local x = 0   -- x-position
+    local y = 0   -- y-position
+    local i = 1   -- character index
+    local s = ""  -- current character
+
+    local function step()
+        i = i + 1
+        s = string.sub(text, i, i)
+    end
+
+    local function assert_tag_close()
+        if s ~= ">" then
+            error_reason = "Expected `<`, got `" .. s .. "`"
+            return false
+        end
+        return true
+    end
+
+    while i < #text do
+        if s == "<" then  -- open tag
+
+            step()
+            if i > #text then
+                goto error
+            end
+
+            if s == "b" then -- open bold
+                if bold then
+                    error_reason = "bold region is already open"
+                    goto error
+                end
+
+                bold = true
+                step()
+                if not assert_tag_close() then goto error end
+            elseif s == "i" then -- open italic
+                if italic then
+                    error_reason = "italic region is already open"
+                    goto error
+                end
+                italic = true
+                step()
+                if not assert_tag_close() then goto error end
+            elseif s == "c" then -- open color
+                -- TODO color
+                step()
+                if not assert_tag_close() then goto error end
+            elseif s == "/" then -- close tag
+                step()
+                if s == "b" then -- close bold
+                    if not bold then
+                        error_reason = "trying to close bold region, but it is not open"
+                        goto error
+                    end
+                    bold = false
+                    step()
+                    if not assert_tag_close() then goto error end
+                    goto next
+                elseif s == "i" then
+                    if not italic then
+                        error_reason = "trying to close italic region, but it is not open"
+                        goto error
+                    end
+                    italic = false
+                    step()
+                    if not assert_tag_close() then goto error end
+                    goto next
+                elseif s == "c" then
+                    -- TODO: color
+                    step()
+                    if not assert_tag_close() then goto error end
+                    goto next
+                else
+                    error_reason = "Unexpcted control character: `" .. s .. "`"
+                    goto error
+                end
+            else
+                error_reason = "Unexpcted control character: `" .. s .. "`"
+                goto error
+            end
+        elseif s == ">" then
+            error_reason  = "Unexpected control region"
+            goto error
+        else
+            local style = rt.FontStyle.REGULAR
+            if bold and italic then
+                style = rt.FontStyle.BOLD_ITALIC
+            elseif bold then
+                style = rt.FontStyle.BOLD
+            elseif italic then
+                style = rt.FontStyle.ITALIC
+            end
+
+            table.insert(glyphs, rt.Glyph(rt.Font.DEFAULT, s, style))
+        end
+        step()
+        ::next::
+    end
+
+    ::error::
+    error("[rt] In Label.parse_from: At position `" .. tostring(i) .. "`: " .. error_reason)
+end
+
+function rt.Label:draw()
+    for _, glyph in ipairs(self._glyphs) do
+        glyph:draw()
+    end
+end
+
