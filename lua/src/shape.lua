@@ -201,20 +201,6 @@ function rt.Rectangle:draw()
     love.graphics.rectangle(self:_get_draw_mode(), self._x, self._y, self._w, self._h, self._border_radius, self._border_radius, self._border_radius * 2)
 end
 
---- @class rt.Triangle
-rt.Triangle = meta.new_type("Triangle", function(a_x, a_y, b_x, b_y, c_x, c_y)
-    meta.assert_number(a_x, a_y, b_x, b_y, c_x, c_y)
-    return meta.new(rt.Triangle, {
-        _vertices = {a_x, a_y, b_x, b_y, c_x, c_y}
-    }, rt.Shape, rt.Drawable)
-end)
-
-function rt.Triangle:draw()
-    self:_bind_for_rendering()
-    local vs = self._vertices
-    love.graphics.triangle(self:_get_draw_mode(), vs[1], vs[2], vs[3], vs[4], vs[5], vs[6])
-end
-
 --- @class rt.Ellipse
 rt.Ellipse = meta.new_type("Ellipse", function(center_x, center_y, x_radius, y_radius, n_outer_vertices)
     meta.assert_number(center_x, center_y, x_radius, y_radius)
@@ -249,10 +235,12 @@ end
 rt.Polygon = meta.new_type("Polygon", function(a_x, a_y, b_x, b_y, c_x, c_y, ...)
     meta.assert_number(a_x, a_y, b_x, b_y, c_x, c_y)
 
-    local decomposition = love.math.triangulate({a_x, a_y, b_x, b_y, c_x, c_y, ...})
+    local vertices =  {a_x, a_y, b_x, b_y, c_x, c_y, ...}
+    local outer_hull = vertices
 
-    local vertices = {}
-    for _, triangle in ipairs(decomposition) do
+    -- TODO: compute outer hull
+
+    for _, triangle in ipairs(outer_hull) do
         for _, vertex in ipairs(triangle) do
             table.insert(vertices, vertex)
         end
@@ -262,6 +250,11 @@ rt.Polygon = meta.new_type("Polygon", function(a_x, a_y, b_x, b_y, c_x, c_y, ...
         _vertices = vertices
     }, rt.Shape, rt.Drawable)
 end)
+
+--- @class rt.Triangle
+function rt.Triangle(a_x, a_y, b_x, b_y, c_x, c_y)
+   return rt.Polygon(a_x, a_y, b_x, b_y, c_x, c_y)
+end
 
 function rt.Polygon:draw()
     self:_bind_for_rendering()

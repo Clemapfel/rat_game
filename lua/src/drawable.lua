@@ -26,10 +26,9 @@ rt.Drawable._position_x = 0
 rt.Drawable._position_y = 0
 
 meta.declare_abstract_method(rt.Drawable, "draw")
-meta.declare_abstract_method(rt.Drawable, "reformat")
 
 --- @brief [internal]
-function rt.Drawable:_draw(love_drawable)
+function rt.Drawable:_draw(love_drawable, position_x, position_y, transform)
 
     meta.assert_isa(self, rt.Drawable)
 
