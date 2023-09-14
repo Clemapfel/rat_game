@@ -29,7 +29,6 @@ function rt.assert_rgba(object)
     end
 end
 
-
 --- @class rt.HSVA
 function rt.HSVA(h, s, v, a)
     if meta.is_nil(h) then h = 1 end

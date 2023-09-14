@@ -180,6 +180,7 @@ function rt.Label:parse_from(text)
     local bold = false
     local italic = false
     local color = false
+    local current_color = rt.RGBA(1, 1, 1, 1)
 
     local current_glyph = ""
     local x = 0   -- x-position
@@ -193,9 +194,22 @@ function rt.Label:parse_from(text)
     end
 
     local function push_glyph()
-        if current_glyph ~= "" then
-            println(current_glyph, " ", bold, " ", italic)
+        if current_glyph == "" then return end
+
+        println(current_glyph, " ", bold, " ", italic)
+
+        local style = rt.FontStyle.REGULAR
+        if bold and italic then
+            style = rt.FontStyle.BOLD_ITALIC
+        elseif bold then
+            style = rt.FontStyle.BOLD
+        elseif italic then
+            style = rt.FontStyle.ITALIC
         end
+        local to_push = rt.Glyph(rt.Font.DEFAULT, current_glyph, style, current_color)
+        to_push:set_position(x, y)
+        x = x + to_push:get_width()
+        table.insert(glyphs, to_push)
         current_glyph = ""
     end
 
@@ -203,13 +217,13 @@ function rt.Label:parse_from(text)
         if s == "<" then
             step()
             if s == "/" then
-                step(true)
+                step()
                 if s == "b" then
                     if not bold then
                         error("attempting to close a bold reason, but none is open")
                     end
-                    bold = false
                     push_glyph()
+                    bold = false
                     step()
                     if s ~= ">" then
                         error("Expected `>`, got `" .. s .. "`")
@@ -219,20 +233,22 @@ function rt.Label:parse_from(text)
                     if not italic then
                         error("attempting to close an italic region, but none is open")
                     end
-                    italic = false
                     push_glyph()
+                    italic = false
                     step()
                     if s ~= ">" then
                         error("Expected `>`, got `" .. s .. "`")
                     end
                     step()
+                else
+                    error("unrecognized flag: `" .. s .. "`")
                 end
             elseif s == "b" then
                 if bold then
                     error("attempting to open a bold region, but one is already open")
                 end
-                bold = true
                 push_glyph()
+                bold = true
                 step()
                 if s ~= ">" then
                     error("Expected `>`, got `" .. s .. "`")
@@ -242,8 +258,8 @@ function rt.Label:parse_from(text)
                 if italic then
                     error("attempting to open an italic region, but one is already open")
                 end
-                italic = true
                 push_glyph()
+                italic = true
                 step()
                 if s ~= ">" then
                    error("Expected `>`, got `" .. s .. "`")
@@ -258,6 +274,9 @@ function rt.Label:parse_from(text)
         end
     end
 
+    current_glyph = current_glyph .. s
+    push_glyph()
+
     if bold then
         error("Reached end of text, but bold region is still open")
     end
@@ -269,6 +288,7 @@ end
 
 function rt.Label:draw()
     for _, glyph in ipairs(self._glyphs) do
+        local x, y = glyph:get_position()
         glyph:draw()
     end
 end

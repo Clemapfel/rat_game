@@ -20,15 +20,33 @@ rt.Drawable = meta.new_type("Drawable", function()
     return out
 end)
 
-rt.Drawable._transform = rt.Transform()
+rt.Drawable._transform = {}
 rt.Drawable._is_visible = true
 rt.Drawable._position_x = 0
 rt.Drawable._position_y = 0
 
+--- @brief set position
+--- @param x Number
+--- @param y Number
+function rt.Drawable:set_position(x, y)
+    meta.assert_isa(self, rt.Drawable)
+    meta.assert_number(x, y)
+
+    self._position_x = x
+    self._position_y = y
+end
+
+--- @brief get position
+--- @return (Number, Number)
+function rt.Drawable:get_position()
+    meta.assert_isa(self, rt.Drawable)
+    return self._position_x, self._position_y
+end
+
 meta.declare_abstract_method(rt.Drawable, "draw")
 
---- @brief [internal]
-function rt.Drawable:_draw(love_drawable, position_x, position_y, transform)
+--- @brief [internal] paste a love drawable
+function rt.Drawable:_draw(love_drawable)
 
     meta.assert_isa(self, rt.Drawable)
 
@@ -38,8 +56,8 @@ function rt.Drawable:_draw(love_drawable, position_x, position_y, transform)
 
     local transform = self._transform
     love.graphics.draw(love_drawable,
-        self.position_x,
-        self.position_y,
+        self._position_x,
+        self._position_y,
         transform._rotation,
         transform._scale_x,
         transform._scale_y,

@@ -138,9 +138,11 @@ function meta.isa(x, type)
     end
 
     local metatable = getmetatable(x)
-    for _, super in ipairs(metatable.super) do
-        if super == typename then
-            return true
+    if not meta.is_nil(metatable) then
+        for _, super in ipairs(metatable.super) do
+            if super == typename then
+                return true
+            end
         end
     end
     return false

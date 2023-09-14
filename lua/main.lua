@@ -38,13 +38,12 @@ require "layout_manager"
 
 if DEBUG_MODE then goto exit end
 
+rt.Font.DEFAULT = rt.load_font("Roboto", "assets/Roboto")
+label = rt.Label("regular <b>bold</b> <i>italic</i> <b><i>bolditalic</b></i>")--"regular\n<b>bold</b>\n<i>italic</i>\n<b><i>bolditalic</b></i>")
+
 --- @brief startup
 function love.load()
     love.window.setTitle("rat_game")
-    rt.Font.DEFAULT = rt.load_font("Roboto", "assets/Roboto")
-
-    local label = rt.Label("<b>bold<i>bolditalic</b>italic</i>")
-    label:draw()
 end
 
 --- @brief update tick
@@ -54,6 +53,9 @@ end
 
 --- @brief draw step
 function love.draw()
+
+    label:draw()
+
     function show_fps()
         local text = love.graphics.newText(love.graphics.getFont(), tostring(math.round(love.timer.getFPS())))
         local w, h = text:getWidth(), text:getHeight()
