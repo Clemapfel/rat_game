@@ -81,6 +81,8 @@ end
 
 --- @brief make first letter in word capitalized
 
+SERIALIZE_DEPTH = POSITIVE_INFINITY
+
 --- @brief convert arbitrary object to string
 --- @param id string
 --- @param object any
@@ -196,7 +198,7 @@ function serialize(object_identifier, object, inject_sourcecode)
         elseif type(object) == "table" then
 
             -- saveguard against cyclic tables
-            if seen[object] ~= nil then
+            if seen[object] ~= nil or n_indent_tabs >= SERIALIZE_DEPTH then
                 insert(buffer, " { ...")
                 return
             end

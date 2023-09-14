@@ -41,7 +41,11 @@ require "layout_manager"
 if DEBUG_MODE then goto exit end
 
 rt.Font.DEFAULT = rt.load_font("Roboto", "assets/Roboto")
-label = rt.Label("regular <b>bold</b> <i>italic</i> <b><i>bolditalic</b></i>")--"regular\n<b>bold</b>\n<i>italic</i>\n<b><i>bolditalic</b></i>")
+label = rt.Label("regular <b><color>bold</color></b> <i>italic </i><b><i>bolditalic</b></i>")--"regular\n<b>bold</b>\n<i>italic</i>\n<b><i>bolditalic</b></i>")
+
+for _, glyph in pairs(label._glyphs) do
+    println("\"", glyph:get_content(), "\"")
+end
 
 --- @brief startup
 function love.load()
