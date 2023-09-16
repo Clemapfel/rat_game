@@ -22,8 +22,7 @@ end)
 
 rt.Drawable._transform = {}
 rt.Drawable._is_visible = true
-rt.Drawable._position_x = 0
-rt.Drawable._position_y = 0
+rt.Drawable._position = rt.Vector2(0, 0)
 
 --- @brief set position
 --- @param x Number
