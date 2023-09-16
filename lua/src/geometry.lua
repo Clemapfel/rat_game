@@ -30,6 +30,8 @@ rt.AxisAlignedRectangle = meta.new_type("AxisAlignedRectangle", function(top_lef
     })
 end)
 
+rt.AABB = rt.AxisAlignedRectangle
+
 --- @brief get size
 --- @param self rt.AxisAlignedRectangle
 --- @return (Number, Number)

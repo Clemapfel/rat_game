@@ -46,7 +46,7 @@ rt.VertexShape = meta.new_type("VertexShape", function(...)
             rt.SpriteBatchUsage.DYNAMIC
         )
     }, rt.Drawable)
-    out:reset_texture_rectangle()
+    out:set_texture_rectangle(rt.AABB(0, 0, 1, 1))
     return out
 end)
 
@@ -122,8 +122,9 @@ function rt.VertexShape:set_color(rgba)
 end
 
 --- @brief
-function rt.VertexShape:reset_texture_rectangle()
+function rt.VertexShape:set_texture_rectangle(rectangle)
     meta.assert_isa(self, rt.VertexShape)
+    meta.assert_isa(rectangle, rt.AxisAlignedRectangle)
 
     local min_x = POSITIVE_INFINITY
     local min_y = POSITIVE_INFINITY
@@ -137,11 +138,13 @@ function rt.VertexShape:reset_texture_rectangle()
         max_y = math.max(pos.y, max_y)
     end
 
+    local width = (max_x - min_x)
+    local height = (max_y - min_y)
     for i = 1, self:get_n_vertices() do
         local pos = self:get_vertex_position(i)
         self:set_vertex_texture_coordinate(i,
-            (pos.x - min_x) / (max_x - min_x),
-            (pos.y - min_y) / (max_y - min_y)
+            (pos.x - min_x) / (width / rectangle.width) + rectangle.x,
+            (pos.y - min_y) / (height / rectangle.height) + rectangle.y
         )
     end
 end

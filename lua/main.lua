@@ -35,7 +35,7 @@ require "mouse_component"
 require "animation"
 require "allocation_component"
 require "layout_manager"
-require "sprite"
+require "vertex_shape"
 
 -- ### MAIN ###
 
@@ -47,20 +47,21 @@ label = rt.Label("regular <b><color>bold</color></b> <i>italic </i><b><i>boldita
 shape = rt.VertexShape(
     rt.Vector2(50, 50),
     rt.Vector2(50 + 100, 50),
-    rt.Vector2(50, 50 + 70),
-    rt.Vector2(50 + 100, 50 + 70)
+    rt.Vector2(50, 50 + 100),
+    rt.Vector2(50 + 100, 50 + 100)
 )
 
 shape2 = rt.VertexShape(
     rt.Vector2(50, 50),
     rt.Vector2(50 + 100, 50),
-    rt.Vector2(50, 50 + 70),
-    rt.Vector2(50 + 100, 50 + 70)
+    rt.Vector2(50, 50 + 100),
+    rt.Vector2(50 + 100, 50 + 100)
 )
 
-image = love.graphics.newImage("assets/favicon.png")
+image = love.graphics.newImage("assets/test.png")
+image:setFilter("nearest", "nearest")
 shape._mesh:setTexture(image)
-shape2:set_color(rt.RGBA(1, 0, 1, 0.5))
+shape:set_texture_rectangle(rt.AABB(0.25, 0.25, 0.5, 0.5))
 
 --- @brief startup
 function love.load()
@@ -77,8 +78,6 @@ function love.draw()
 
     love.graphics.setColor(1, 1, 1, 1)
     shape:draw()
-
-    shape2:draw()
 
     function show_fps()
         local text = love.graphics.newText(love.graphics.getFont(), tostring(math.round(love.timer.getFPS())))
