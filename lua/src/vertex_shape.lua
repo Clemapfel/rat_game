@@ -1,5 +1,3 @@
---- @class Image
-
 --- @class
 rt.SpriteBatchUsage = meta.new_enum({
     DYNAMIC = "dynamic",
@@ -41,7 +39,7 @@ rt.VertexShape = meta.new_type("VertexShape", function(...)
         table.insert(vertices, rt.Vertex(pos.x, pos.y, 0, 0))
     end
     local out = meta.new(rt.VertexShape, {
-        _mesh = love.graphics.newMesh(vertices,
+        _native = love.graphics.newMesh(vertices,
             rt.MeshDrawMode.TRIANGLE_STRIP,
             rt.SpriteBatchUsage.DYNAMIC
         )
@@ -59,14 +57,14 @@ rt.VertexAttribute = meta.new_enum({
 --- @brief
 function rt.VertexShape:get_n_vertices()
     meta.assert_isa(self, rt.VertexShape)
-    return self._mesh:getVertexCount()
+    return self._native:getVertexCount()
 end
 
 --- @brief
 function rt.VertexShape:set_vertex_color(i, rgba)
     meta.assert_isa(self, rt.VertexShape)
     rt.assert_rgba(rgba)
-    self._mesh:setVertexAttribute(i, 3, rgba.r, rgba.g, rgba.b, rgba.a)
+    self._native:setVertexAttribute(i, 3, rgba.r, rgba.g, rgba.b, rgba.a)
 end
 
 --- @brief
@@ -74,7 +72,7 @@ function rt.VertexShape:get_vertex_color(i)
     meta.assert_isa(self, rt.VertexShape)
 
     local r, g, b, a
-    r, g, b, a = self._mesh:getVertexAttribute(i, 3)
+    r, g, b, a = self._native:getVertexAttribute(i, 3)
     return rt.RGBA(r, g, b, a)
 end
 
@@ -83,7 +81,7 @@ function rt.VertexShape:set_vertex_position(i, x, y)
     meta.assert_isa(self, rt.VertexShape)
     meta.assert_number(x, y)
 
-    self._mesh:setVertexAttribute(i, 1, x, y)
+    self._native:setVertexAttribute(i, 1, x, y)
 end
 
 --- @brief
@@ -92,7 +90,7 @@ function rt.VertexShape:get_vertex_position(i)
     meta.assert_isa(self, rt.VertexShape)
 
     local x, y
-    x, y = self._mesh:getVertexAttribute(i, 1)
+    x, y = self._native:getVertexAttribute(i, 1)
     return rt.Vector2(x, y)
 end
 
@@ -101,14 +99,14 @@ function rt.VertexShape:set_vertex_texture_coordinate(i, u, v)
     meta.assert_isa(self, rt.VertexShape)
     meta.assert_number(u, v)
 
-    self._mesh:setVertexAttribute(i, 2, u, v)
+    self._native:setVertexAttribute(i, 2, u, v)
 end
 
 --- @brief
 --- @return Vector2
 function rt.VertexShape:get_vertex_texture_coordinate(i)
     local u, v
-    u, v = self._mesh:getVertexAttribute(i, 2)
+    u, v = self._native:getVertexAttribute(i, 2)
     return rt.Vector2(u, v)
 end
 
@@ -150,8 +148,17 @@ function rt.VertexShape:set_texture_rectangle(rectangle)
 end
 
 --- @brief
+function rt.VertexShape:set_texture(texture)
+    meta.assert_isa(self, rt.VertexShape)
+    if not meta.is_nil(texture) then
+        meta.assert_isa(texture, rt.Texture)
+    end
+    self._native:setTexture(texture._native)
+end
+
+--- @brief
 function rt.VertexShape:draw()
-    love.graphics.draw(self._mesh)
+    love.graphics.draw(self._native)
 end
 
 

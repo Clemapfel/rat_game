@@ -198,7 +198,7 @@ function serialize(object_identifier, object, inject_sourcecode)
         elseif type(object) == "table" then
 
             -- saveguard against cyclic tables
-            if seen[object] ~= nil or n_indent_tabs >= SERIALIZE_DEPTH then
+            if type(seen[object]) ~= "nil" then
                 insert(buffer, " { ...")
                 return
             end

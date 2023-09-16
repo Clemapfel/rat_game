@@ -37,9 +37,9 @@ function rt.HSVA(h, s, v, a)
     if meta.is_nil(a) then a = 1 end
 
     local out = {}
-    out.r = h
-    out.g = s
-    out.b = v
+    out.h = h
+    out.s = s
+    out.v = v
     out.a = a
     return out
 end
@@ -47,10 +47,10 @@ end
 --- @brief [internal]
 function rt.is_hsva(object)
     return sizeof(object) == 4 and
-    meta.is_number(object.h) and
-    meta.is_number(object.s) and
-    meta.is_number(object.v) and
-    meta.is_number(object.a)
+        meta.is_number(object.h) and
+        meta.is_number(object.s) and
+        meta.is_number(object.v) and
+        meta.is_number(object.a)
 end
 
 --- @brief [internal] check if object is RGBA
@@ -123,7 +123,7 @@ function rt.hsva_to_rgba(hsva)
 
     local c = v * s
     local h_2 = h / 60.0
-    local x = c * (1 - math.fabs(math.fmod(h_2, 2) - 1))
+    local x = c * (1 - math.abs(math.fmod(h_2, 2) - 1))
 
     local r, g, b
 
@@ -147,7 +147,7 @@ function rt.hsva_to_rgba(hsva)
     g = g + m
     b = b + m
 
-    return RGBA(r, g, b, a)
+    return rt.RGBA(r, g, b, a)
 end
 
 --- @brief [internal] test colors

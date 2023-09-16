@@ -35,6 +35,7 @@ require "mouse_component"
 require "animation"
 require "allocation_component"
 require "layout_manager"
+require "image"
 require "vertex_shape"
 
 -- ### MAIN ###
@@ -51,16 +52,16 @@ shape = rt.VertexShape(
     rt.Vector2(50 + 100, 50 + 100)
 )
 
-shape2 = rt.VertexShape(
-    rt.Vector2(50, 50),
-    rt.Vector2(50 + 100, 50),
-    rt.Vector2(50, 50 + 100),
-    rt.Vector2(50 + 100, 50 + 100)
-)
-
-image = love.graphics.newImage("assets/test.png")
-image:setFilter("nearest", "nearest")
-shape._mesh:setTexture(image)
+image = rt.Image(100, 100)
+for x = 0, 100-1 do
+    for y = 0, 100-1 do
+        local color = rt.HSVA(x / 100, 1, 1, 1)
+        println(serialize(color))
+        image:set_pixel(x, y, rt.hsva_to_rgba(color))
+    end
+end
+texture = rt.Texture(image)
+shape:set_texture(texture)
 shape:set_texture_rectangle(rt.AABB(0.25, 0.25, 0.5, 0.5))
 
 --- @brief startup
