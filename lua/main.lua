@@ -1,3 +1,9 @@
+function try_connect_emmy_lua_debugger()
+    package.cpath = package.cpath .. ';/home/clem/.local/share/JetBrains/CLion2023.2/EmmyLua/debugger/emmy/linux/?.so'
+    require('emmy_core').tcpConnect('localhost', 8172)
+end
+pcall(try_connect_emmy_lua_debugger)
+
 DEBUG_MODE = love == nil
 MARGIN_UNIT = 10
 
@@ -56,13 +62,12 @@ image = rt.Image(100, 100)
 for x = 0, 100-1 do
     for y = 0, 100-1 do
         local color = rt.HSVA(x / 100, 1, 1, 1)
-        println(serialize(color))
         image:set_pixel(x, y, rt.hsva_to_rgba(color))
     end
 end
 texture = rt.Texture(image)
 shape:set_texture(texture)
-shape:set_texture_rectangle(rt.AABB(0.25, 0.25, 0.5, 0.5))
+--shape:set_texture_rectangle(rt.AABB(0.25, 0.25, 0.5, 0.5))
 
 --- @brief startup
 function love.load()
