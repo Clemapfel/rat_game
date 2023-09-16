@@ -1,70 +1,154 @@
 --- @class Image
 
+--- @class
+rt.SpriteBatchUsage = meta.new_enum({
+    DYNAMIC = "dynamic",
+    STATIC = "static",
+    STREAM = "stream"
+})
 
---- @class Vertex
-rt.Vertex = meta.new("Vertex", function()
-    return meta.new(rt.Vertex, {})
-end)
-
-rt.Vertex._position_x_index = 1
-rt.Vertex._position_y_index = 2
-rt.Vertex._texture_coordinate_u_index = 3
-rt.Vertex._texture_coordinate_v_index = 4
-rt.Vertex._color_r_index = 5
-rt.Vertex._color_g_index = 6
-rt.Vertex._color_b_index = 7
-rt.Vertex._color_b_index = 8
-
---- @brief
-function rt.Vertex:set_position(x, y)
-    meta.assert_isa(self, rt.Vertex)
-    self[rt.Vertex._position_x_index] = x
-    self[rt.Vertex._position_y_index] = y
-end
+--- @class
+rt.MeshDrawMode = meta.new_enum({
+    TRIANGLE_FAN = "fan",
+    TRIANGLE_STRIP = "strip",
+    TRIANGLE_LIST = "triangles",
+    POINTS = "points"
+})
 
 --- @brief
-function rt.Vertex:get_position()
-    meta.assert_isa(self, rt.Vertex)
-    return self[rt.Vertex._position_x_index], self[rt.Vertex._position_y_index]
-end
+function rt.Vertex(top_left_x, top_left_y, texture_coordinate_x, texture_coordinate_y, color)
+    meta.assert_number(top_left_x, top_left_y, texture_coordinate_x, texture_coordinate_y)
 
---- @brief
-function rt.Vertex:set_texture_coordinate(u, v)
-    meta.assert_isa(self, rt.Vertex)
-    self[rt.Vertex._texture_coordinate_u_index] = u
-    self[rt.Vertex._texture_coordinate_v_index] = v
-end
-
---- @brief
-function rt.Vertex:get_texture_coordinate()
-    meta.assert_isa(self, rt.Vertex)
-    return self[rt.Vertex._texture_coordinate_u_index], self[rt.Vertex._texture_coordinate_v_index]
-end
-
---- @brief
-function rt.Vertex:set_color(color)
-    meta.assert_isa(self, rt.Vertex)
+    if meta.is_nil(color) then
+        color = rt.RGBA(1, 1, 1, 1)
+    end
     rt.assert_rgba(color)
-    self[rt.Vertex._color_r_index] = color.r
-    self[rt.Vertex._color_g_index] = color.g
-    self[rt.Vertex._color_b_index] = color.b
-    self[rt.Vertex._color_a_index] = color.a
+
+    return {
+        top_left_x, top_left_y,
+        texture_coordinate_x, texture_coordinate_y,
+        color.r, color.g, color.b, color.a
+    }
+end
+
+--- @class VertexShape
+--- @param vararg Vector2
+rt.VertexShape = meta.new_type("VertexShape", function(...)
+    local positions = {...}
+    local vertices = {}
+    for _, pos in ipairs(positions) do
+        rt.assert_vector2(pos)
+        table.insert(vertices, rt.Vertex(pos.x, pos.y, 0, 0))
+    end
+    local out = meta.new(rt.VertexShape, {
+        _mesh = love.graphics.newMesh(vertices,
+            rt.MeshDrawMode.TRIANGLE_STRIP,
+            rt.SpriteBatchUsage.DYNAMIC
+        )
+    }, rt.Drawable)
+    out:reset_texture_rectangle()
+    return out
+end)
+
+rt.VertexAttribute = meta.new_enum({
+    POSITION = "VertexPosition",
+    TEXTURE_COORDINATES = "VertexTexCoord",
+    COLOR = "VertexColor"
+})
+
+--- @brief
+function rt.VertexShape:get_n_vertices()
+    meta.assert_isa(self, rt.VertexShape)
+    return self._mesh:getVertexCount()
 end
 
 --- @brief
-function rt.Vertex:get_color()
-    meta.assert_isa(self, rt.Vertex)
-    return rt.RGBA(
-        self[rt.Vertex._color_r_index],
-        self[rt.Vertex._color_g_index],
-        self[rt.Vertex._color_b_index],
-        self[rt.Vertex._color_a_index]
-    )
+function rt.VertexShape:set_vertex_color(i, rgba)
+    meta.assert_isa(self, rt.VertexShape)
+    rt.assert_rgba(rgba)
+    self._mesh:setVertexAttribute(i, 3, rgba.r, rgba.g, rgba.b, rgba.a)
 end
 
---- @class Sprite
-rt.Sprite = meta.new("Sprite", function()
-    local out = meta.new(rt.Sprite, {
-        _mesh =
-    }, rt.Drawable)
-end)
+--- @brief
+function rt.VertexShape:get_vertex_color(i)
+    meta.assert_isa(self, rt.VertexShape)
+
+    local r, g, b, a
+    r, g, b, a = self._mesh:getVertexAttribute(i, 3)
+    return rt.RGBA(r, g, b, a)
+end
+
+--- @brief
+function rt.VertexShape:set_vertex_position(i, x, y)
+    meta.assert_isa(self, rt.VertexShape)
+    meta.assert_number(x, y)
+
+    self._mesh:setVertexAttribute(i, 1, x, y)
+end
+
+--- @brief
+--- @return Vector2
+function rt.VertexShape:get_vertex_position(i)
+    meta.assert_isa(self, rt.VertexShape)
+
+    local x, y
+    x, y = self._mesh:getVertexAttribute(i, 1)
+    return rt.Vector2(x, y)
+end
+
+--- @brief
+function rt.VertexShape:set_vertex_texture_coordinate(i, u, v)
+    meta.assert_isa(self, rt.VertexShape)
+    meta.assert_number(u, v)
+
+    self._mesh:setVertexAttribute(i, 2, u, v)
+end
+
+--- @brief
+--- @return Vector2
+function rt.VertexShape:get_vertex_texture_coordinate(i)
+    local u, v
+    u, v = self._mesh:getVertexAttribute(i, 2)
+    return rt.Vector2(u, v)
+end
+
+--- @brief
+function rt.VertexShape:set_color(rgba)
+    meta.assert_isa(self, rt.VertexShape)
+    rt.assert_rgba(rgba)
+    for i = 1, self:get_n_vertices() do
+        self:set_vertex_color(i, rgba)
+    end
+end
+
+--- @brief
+function rt.VertexShape:reset_texture_rectangle()
+    meta.assert_isa(self, rt.VertexShape)
+
+    local min_x = POSITIVE_INFINITY
+    local min_y = POSITIVE_INFINITY
+    local max_x = NEGATIVE_INFINITY
+    local max_y = NEGATIVE_INFINITY
+    for i = 1, self:get_n_vertices() do
+        local pos = self:get_vertex_position(i)
+        min_x = math.min(pos.x, min_x)
+        max_x = math.max(pos.x, max_x)
+        min_y = math.min(pos.y, min_y)
+        max_y = math.max(pos.y, max_y)
+    end
+
+    for i = 1, self:get_n_vertices() do
+        local pos = self:get_vertex_position(i)
+        self:set_vertex_texture_coordinate(i,
+            (pos.x - min_x) / (max_x - min_x),
+            (pos.y - min_y) / (max_y - min_y)
+        )
+    end
+end
+
+--- @brief
+function rt.VertexShape:draw()
+    love.graphics.draw(self._mesh)
+end
+
+

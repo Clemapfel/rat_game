@@ -35,6 +35,7 @@ require "mouse_component"
 require "animation"
 require "allocation_component"
 require "layout_manager"
+require "sprite"
 
 -- ### MAIN ###
 
@@ -43,9 +44,23 @@ if DEBUG_MODE then goto exit end
 rt.Font.DEFAULT = rt.load_font("Roboto", "assets/Roboto")
 label = rt.Label("regular <b><color>bold</color></b> <i>italic </i><b><i>bolditalic</b></i>")--"regular\n<b>bold</b>\n<i>italic</i>\n<b><i>bolditalic</b></i>")
 
-for _, glyph in pairs(label._glyphs) do
-    println("\"", glyph:get_content(), "\"")
-end
+shape = rt.VertexShape(
+    rt.Vector2(50, 50),
+    rt.Vector2(50 + 100, 50),
+    rt.Vector2(50, 50 + 70),
+    rt.Vector2(50 + 100, 50 + 70)
+)
+
+shape2 = rt.VertexShape(
+    rt.Vector2(50, 50),
+    rt.Vector2(50 + 100, 50),
+    rt.Vector2(50, 50 + 70),
+    rt.Vector2(50 + 100, 50 + 70)
+)
+
+image = love.graphics.newImage("assets/favicon.png")
+shape._mesh:setTexture(image)
+shape2:set_color(rt.RGBA(1, 0, 1, 0.5))
 
 --- @brief startup
 function love.load()
@@ -60,12 +75,14 @@ end
 --- @brief draw step
 function love.draw()
 
-    label:draw()
+    love.graphics.setColor(1, 1, 1, 1)
+    shape:draw()
+
+    shape2:draw()
 
     function show_fps()
         local text = love.graphics.newText(love.graphics.getFont(), tostring(math.round(love.timer.getFPS())))
         local w, h = text:getWidth(), text:getHeight()
-        love.graphics.setColor(1, 1, 1, 0.5)
         love.graphics.draw(text, love.graphics.getWidth() - w, 0)
     end
     show_fps()
