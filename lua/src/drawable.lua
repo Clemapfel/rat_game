@@ -2,9 +2,7 @@
 rt.Drawable = meta.new_abstract_type("Drawable")
 rt.Drawable._is_visible = true
 
---- @brief
---[[
---- @class Transform
+--- @class rt.Transform
 rt.Transform = meta.new_type("Transform", function()
     local out = meta.new(rt.Transform, {
         _offset_x = 0,
@@ -18,41 +16,19 @@ rt.Transform = meta.new_type("Transform", function()
     return out
 end)
 
-rt.Drawable = meta.new_abstract_type("Drawable")
-rt.Drawable._transform = {}
-rt.Drawable._is_visible = true
-rt.Drawable._position = rt.Vector2(0, 0)
-rt.Drawable.allocation = rt.AllocationComponent()
-rt.Drawable.signal = rt.SignalComponent()
-
---- @brief set position
+--- @brief [internal] paste a love drawable
 --- @param x Number
 --- @param y Number
-function rt.Drawable:set_position(x, y)
-    meta.assert_isa(self, rt.Drawable)
-    meta.assert_number(x, y)
-
-    self._position = rt.Vector2(x, y)
-end
-
---- @brief get position
---- @return (Number, Number)
-function rt.Drawable:get_position()
-    meta.assert_isa(self, rt.Drawable)
-    return self._position.x, self._position.y
-end
-
---- @brief [internal] paste a love drawable
-function rt.Drawable:_draw(love_drawable, x, y, transform)
+--- @param transform rt.Transform
+function rt.Drawable:render(love_drawable, x, y, transform)
 
     meta.assert_isa(self, rt.Drawable)
-    meta.assert_number(x, y)
 
     if self._is_visible == false then
         return
     end
 
-    if meta.is_nil(transform) then
+    if sizeof(self._transform) == 0 then
         love.graphics.draw(love_drawable, x, y)
     else
         meta.assert_isa(transform, rt.Transform)
@@ -70,51 +46,20 @@ function rt.Drawable:_draw(love_drawable, x, y, transform)
     end
 end
 
---- @brief get whether drawable should be culled
---- @param self rt.Drawable
+--- @brief abstract method, must be overriden
+function rt.Drawable:draw()
+    error("[rt] In " .. meta.typeof(self) .. ":draw(): abstract method called")
+end
+
+--- @brief set whether drawable should be culled, this affects `render`
 --- @param b Boolean
 function rt.Drawable:set_is_visible(b)
     meta.assert_isa(self, rt.Drawable)
     self._is_visible = b
 end
 
---- @brief get whether drawable should be culled
---- @param self rt.Drawable
+--- @brief get whether drawable is visible
 --- @return Boolean
 function rt.Drawable:get_is_visible()
-    meta.assert_isa(self, rt.Drawable)
-    return self._is_visible()
+    return self._is_visible
 end
-
---- @brief [internal] draw allocation component as wireframe
---- @param self rt.Drawable
-function rt.Drawable:draw_hitbox()
-    meta.assert_inherits(self, rt.Drawable)
-
-    local allocation = rt.get_allocation_component(self)
-    love.graphics.setLineWidth(1)
-    love.graphics.setLineStyle("rough")
-    love.graphics.setColor(1, 0, 1, 1)
-    local bounds = allocation:get_bounds()
-    love.graphics.line(
-        bounds.x, bounds.y,
-        bounds.x + bounds.width, bounds.y,
-        bounds.x + bounds.width, bounds.y + bounds.height,
-        bounds.x, bounds.y + bounds.height,
-        bounds.x, bounds.y
-    )
-
-    love.graphics.setColor(0, 1, 1, 1)
-    bounds = allocation._bounds
-    love.graphics.line(
-        bounds.x, bounds.y,
-        bounds.x + bounds.width, bounds.y,
-        bounds.x + bounds.width, bounds.y + bounds.height,
-        bounds.x, bounds.y + bounds.height,
-        bounds.x, bounds.y
-    )
-
-    love.graphics.setColor(0, 1, 0, 1)
-    love.graphics.points(bounds.x + 0.5 * bounds.width, bounds.y + 0.5 * bounds.height)
-end
-]]--

@@ -1,3 +1,4 @@
+--[[
 --- @class rt.Alignment
 rt.Alignment = meta.new_enum({
     START = "ALIGNMENT_START",
@@ -7,34 +8,26 @@ rt.Alignment = meta.new_enum({
 
 --- @class rt.AllocationComponent
 --- @signal changed (::AllocationComponent, x::Number, y::Number, width::Number, height::Number) -> nil
-rt.AllocationComponent = meta.new_type("AllocationComponent", function(holder)
-    meta.assert_object(holder)
-    local out = meta.new(rt.AllocationComponent, {
-        _instance = holder,
-        _bounds = rt.AxisAlignedRectangle(),
-        _margins = {
-            top = 0,
-            right = 0,
-            bottom = 0,
-            left = 0
-        },
-        _expand_horizontally = true,
-        _expand_vertically = true,
-        _horizontal_alignment = rt.Alignment.CENTER,
-        _vertical_alignment = rt.Alignment.CENTER,
-        _minimum_width = 0,
-        _minimum_height = 0,
-        _parent = nil,
-        _children = {}
-    })
-
+rt.AllocationComponent = meta.new_type("AllocationComponent", function()
+    local out = meta.new(rt.AllocationComponent)
     rt.add_signal_component(out)
     out.signal:add("changed")
-
-    local metatable = getmetatable(holder)
-    metatable.components.allocation = out
     return out
 end)
+
+rt.AllocationCompoent_bounds = rt.AxisAlignedRectangle()
+rt.AllocationCompoent_margins = {
+    top = 0,
+    right = 0,
+    bottom = 0,
+    left = 0
+}
+rt.AllocationCompoent_expand_horizontally = true
+rt.AllocationCompoent_expand_vertically = true
+rt.AllocationCompoent_horizontal_alignment = rt.Alignment.CENTER
+rt.AllocationCompoent_vertical_alignment = rt.Alignment.CENTER
+rt.AllocationCompoent_minimum_width = 0
+rt.AllocationCompoent_minimum_height = 0
 
 function rt.AllocationComponent._emit_changed(self)
     meta.assert_isa(self, rt.AllocationComponent)
@@ -490,3 +483,5 @@ function rt.test.allocation_component()
     -- todo: test .resize
 end
 rt.test.allocation_component()
+
+]]--

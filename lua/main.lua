@@ -6,8 +6,6 @@ end
 pcall(try_connect_emmy_lua_debugger)
 
 DEBUG_MODE = love == nil
-MARGIN_UNIT = 10
-
 if DEBUG_MODE then
     RESOURCE_PATH = "/home/clem/Workspace/rat_game/lua"
     love = {}
@@ -33,8 +31,8 @@ require "vector"
 require "geometry"
 require "color"
 require "signal_component"
-require "allocation_component"
 require "drawable"
+require "widget"
 require "shape"
 require "label"
 require "keyboard_component"
@@ -54,8 +52,8 @@ rt.ImageDisplay = meta.new_type("ImageDisplay", function(image)
     local out = meta.new(rt.ImageDisplay, {
         _texture = rt.Texture(image),
         _shape = rt.VertexRectangle(0, 0, 1, 1)
-    })
-    out._shape:set_texture(out._texture)
+    }, rt.Drawable, rt.Widget)
+    --out._shape:set_texture(out._texture)
     out._texture:set_wrap_mode(rt.TextureWrapMode.CLAMP)
     return out
 end)
@@ -65,7 +63,7 @@ function rt.ImageDisplay:draw()
     self._shape:draw()
 end
 
-function rt.ImageDisplay:resize(x, y, width, height)
+function rt.ImageDisplay:size_allocate(x, y, width, height)
     meta.assert_isa(self, rt.ImageDisplay)
     self._shape:set_vertex_position(1, x, y)
     self._shape:set_vertex_color(1, rt.HSVA(0, 1, 1, 1))
@@ -84,12 +82,16 @@ function rt.ImageDisplay:resize(x, y, width, height)
 end
 
 display = rt.ImageDisplay(rt.Image("assets/favicon.png"))
+display:set_margin_left(40)
+display:set_margin_right(50)
+display:set_expand_vertically(false)
+display:set_expand_horizontally(false)
+display:set_minimum_size(50, 50)
 
 --- @brief startup
 function love.load()
     love.window.setTitle("rat_game")
-
-    display:resize(0, 0, love.graphics.getWidth(), love.graphics.getHeight())
+    display:fit_into(rt.AABB(100, 100, love.graphics.getWidth() - 200, love.graphics.getHeight() - 200))
 end
 
 --- @brief update tick

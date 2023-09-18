@@ -504,9 +504,10 @@ end
 --- @brief declare abstract type, this is a type that cannot be instanced
 --- @param name String
 function meta.new_abstract_type(name)
-    return meta.new_type(name, function()
+    local out = meta.new_type(name, function()
         error("[rt] In " .. name .. "._call: Type `" .. name .. "` is abstract, it cannot be instanced")
     end)
+    return out
 end
 
 --- @class meta.Type
