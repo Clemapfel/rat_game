@@ -357,3 +357,9 @@ function rt.Widget:draw_bounds()
     love.graphics.setPointSize(4)
     love.graphics.points(x + w / 2, y + h / 2)
 end
+
+--- @brief [internal] test widget
+function rt.test.test_widget()
+    -- TODO
+end
+rt.test.test_widget()

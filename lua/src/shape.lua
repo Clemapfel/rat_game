@@ -201,6 +201,22 @@ function rt.Rectangle:draw()
     love.graphics.rectangle(self:_get_draw_mode(), self._x, self._y, self._w, self._h, self._border_radius, self._border_radius, self._border_radius * 2)
 end
 
+--- @brief
+function rt.Rectangle:set_position(x, y)
+    meta.assert_isa(self, rt.Rectangle)
+    meta.assert_number(x, y)
+    self._x = x
+    self._y = y
+end
+
+--- @brief
+function rt.Rectangle:set_size(width, height)
+    meta.assert_isa(self, rt.Rectangle)
+    meta.assert_number(width, height)
+    self._w = width
+    self._h = height
+end
+
 --- @class rt.Ellipse
 rt.Ellipse = meta.new_type("Ellipse", function(center_x, center_y, x_radius, y_radius, n_outer_vertices)
     meta.assert_number(center_x, center_y, x_radius, y_radius)

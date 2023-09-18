@@ -14,14 +14,16 @@ rt.ImageDisplay = meta.new_type("ImageDisplay", function(image)
     out._shape:set_texture_rectangle(rt.AABB(0, 0, 1, 1))
 
     local x, y = image:get_size()
-    out:set_minimum_size(x, y)
+    out:set_minimum_size(image:get_size().x, image:get_size().y)
     return out
 end)
 
 --- @overload rt.Drawable.draw
 function rt.ImageDisplay:draw()
     meta.assert_isa(self, rt.ImageDisplay)
-    self._shape:draw()
+    if self:get_is_visible() then
+        self._shape:draw()
+    end
 end
 
 --- @overload rt.Widget.size_allocate

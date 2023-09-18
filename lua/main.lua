@@ -26,30 +26,31 @@ rt.test = {}
 
 require "common"
 require "meta"
-require "queue"
 require "vector"
-require "geometry"
-require "color"
 require "signal_component"
-require "drawable"
-require "widget"
-require "shape"
-require "label"
-require "keyboard_component"
-require "gamepad_component"
-require "mouse_component"
-require "animation"
-require "layout_manager"
-require "image"
-require "texture"
 require "vertex_shape"
+require "gamepad_component"
+require "keyboard_component"
+require "mouse_component"
+require "queue"
+require "color"
+require "geometry"
+require "image"
+require "animation"
+require "drawable"
+require "texture"
+require "shape"
+
+require "widget"
+require "spacer"
 require "image_display"
+require "label"
 
 -- ### MAIN ###
 
 if DEBUG_MODE then goto exit end
 
-display = rt.ImageDisplay(rt.Image("assets/favicon.png"))
+display = rt.Spacer()
 display:set_margin_left(40)
 display:set_margin_right(50)
 display:set_expand(false)
