@@ -320,10 +320,8 @@ function rt.Widget:draw_bounds()
     local x, y = self:get_position()
     local w, h = self:get_size()
 
-    local bounds = rt.AABB(x, y, w, h)
-
     love.graphics.setLineWidth(1)
-    love.graphics.setLineStyle("rough")
+    love.graphics.setLineStyle("smooth")
 
     -- outer bounds with margin
     love.graphics.setColor(0, 1, 1, 1)
@@ -356,5 +354,6 @@ function rt.Widget:draw_bounds()
     )
 
     love.graphics.setColor(0, 1, 0, 1)
-    love.graphics.points(bounds.x + 0.5 * bounds.width, bounds.y + 0.5 * bounds.height)
+    love.graphics.setPointSize(4)
+    love.graphics.points(x + w / 2, y + h / 2)
 end

@@ -1,5 +1,5 @@
--- entry point for JetBrains IDE debugger
 function try_connect_emmy_lua_debugger()
+    -- entry point for JetBrains IDE debugger
     package.cpath = package.cpath .. ';/home/clem/.local/share/JetBrains/CLion2023.2/EmmyLua/debugger/emmy/linux/?.so'
     require('emmy_core').tcpConnect('localhost', 8172)
 end
@@ -41,52 +41,20 @@ require "mouse_component"
 require "animation"
 require "layout_manager"
 require "image"
+require "texture"
 require "vertex_shape"
+require "image_display"
 
 -- ### MAIN ###
 
 if DEBUG_MODE then goto exit end
 
---- @class rt.ImageDisplay
-rt.ImageDisplay = meta.new_type("ImageDisplay", function(image)
-    local out = meta.new(rt.ImageDisplay, {
-        _texture = rt.Texture(image),
-        _shape = rt.VertexRectangle(0, 0, 1, 1)
-    }, rt.Drawable, rt.Widget)
-    --out._shape:set_texture(out._texture)
-    out._texture:set_wrap_mode(rt.TextureWrapMode.CLAMP)
-    return out
-end)
-
-function rt.ImageDisplay:draw()
-    meta.assert_isa(self, rt.ImageDisplay)
-    self._shape:draw()
-end
-
-function rt.ImageDisplay:size_allocate(x, y, width, height)
-    meta.assert_isa(self, rt.ImageDisplay)
-    self._shape:set_vertex_position(1, x, y)
-    self._shape:set_vertex_color(1, rt.HSVA(0, 1, 1, 0.25))
-
-    self._shape:set_vertex_position(2, x + width, y)
-    self._shape:set_vertex_color(2, rt.HSVA(0.3, 1, 1, 0.25))
-
-    self._shape:set_vertex_position(3, x + width, y + height)
-    self._shape:set_vertex_color(3, rt.HSVA(0.6, 1, 1, 0.25))
-
-    self._shape:set_vertex_position(4, x, y + height)
-    self._shape:set_vertex_color(4, rt.HSVA(0.9, 1, 1, 0.25))
-
-    self._shape:set_vertex_order({1, 2, 4, 3})
-    self._shape:set_texture_rectangle(rt.AABB(0, 0, 1, 1))
-end
-
 display = rt.ImageDisplay(rt.Image("assets/favicon.png"))
 display:set_margin_left(40)
 display:set_margin_right(50)
-display:set_expand_horizontally(false)
-display:set_horizontal_alignment(rt.Alignment.START)
-display:set_vertical_alignment(rt.Alignment.END)
+display:set_expand(false)
+display:set_horizontal_alignment(rt.Alignment.CENTER)
+display:set_vertical_alignment(rt.Alignment.CENTER)
 display:set_minimum_size(50, 50)
 
 --- @brief startup
