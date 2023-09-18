@@ -84,7 +84,6 @@ end
 display = rt.ImageDisplay(rt.Image("assets/favicon.png"))
 display:set_margin_left(40)
 display:set_margin_right(50)
-display:set_expand_vertically(false)
 display:set_expand_horizontally(false)
 display:set_horizontal_alignment(rt.Alignment.START)
 display:set_vertical_alignment(rt.Alignment.END)

@@ -65,75 +65,87 @@ function rt.Widget:reformat()
     self:size_allocate(x, y, width, height)
 end
 
---- @brief
+--- @brief resize widget such that it fits into the given bounds
+--- @param aabb rt.AxisAlignedRectangle
 function rt.Widget:fit_into(aabb)
     self._bounds = aabb
     self:reformat()
 end
 
---- @brief
+--- @brief get size of allocation
+--- @return (Number, Number)
 function rt.Widget:get_size()
     return self._bounds.width, self._bounds.height
-end 
+end
 
---- @brief
+--- @brief get top left of allocation
+--- @return (Number, Number)
 function rt.Widget:get_position()
     return self._bounds.x, self._bounds.y
-end 
+end
 
---- @brief
+--- @brief set start margin
+--- @param margin Number
 function rt.Widget:set_margin_left(margin)
     meta.assert_isa(self, rt.Widget)
     self._margins.left = margin
     self:reformat()
 end
 
---- @brief
+--- @brief get start margin
+--- @return Number
 function rt.Widget:get_margin_left()
     meta.assert_isa(self, rt.Widget)
     return self._margins.left
 end
 
---- @brief
+--- @brief set end margin
+--- @param margin Number
 function rt.Widget:set_margin_right(margin)
     meta.assert_isa(self, rt.Widget)
     self._margins.right = margin
     self:reformat()
 end
 
---- @brief
+--- @brief get end margin
+--- @return Number
 function rt.Widget:get_margin_right()
     meta.assert_isa(self, rt.Widget)
     return self._margins.right
 end
 
---- @brief
+--- @brief set top margin
+--- @param margin Number
 function rt.Widget:set_margin_top(margin)
     meta.assert_isa(self, rt.Widget)
     self._margins.top = margin
     self:reformat()
 end
 
---- @brief
+--- @brief get top margin
+--- @return Number
 function rt.Widget:get_margin_top()
     meta.assert_isa(self, rt.Widget)
     return self._margins.top
 end
 
---- @brief
+--- @brief set bottom margin
+--- @param margin Number
 function rt.Widget:set_margin_bottom(margin)
     meta.assert_isa(self, rt.Widget)
     self._margins.bottom = margin
     self:reformat()
 end
 
---- @brief
+--- @brief get bottom margin
+--- @return Number
 function rt.Widget:get_margin_bottom()
     meta.assert_isa(self, rt.Widget)
     return self._margins.bottom
-end 
+end
 
---- @brief
+--- @brief set left and right margin
+--- @param margin Number
 function rt.Widget:set_margin_horizontal(margin)
     meta.assert_isa(self, rt.Widget)
     self._margins.left = margin
@@ -141,7 +153,8 @@ function rt.Widget:set_margin_horizontal(margin)
     self:reformat()
 end
 
---- @brief
+--- @brief set top and bottom margin
+--- @param margin Number
 function rt.Widget:set_margin_vertical(margin)
     meta.assert_isa(self, rt.Widget)
     self._margins.top = margin
@@ -149,7 +162,8 @@ function rt.Widget:set_margin_vertical(margin)
     self:reformat()
 end
 
---- @brief
+--- @brief set top, bottom, left, and right margin
+--- @param margin Number
 function rt.Widget:set_margin(margin)
     meta.assert_isa(self, rt.Widget)
     self._margins.top = margin
@@ -159,7 +173,8 @@ function rt.Widget:set_margin(margin)
     self:reformat()
 end
 
---- @brief
+--- @brief set expansion along x-axis
+--- @param b Boolean
 function rt.Widget:set_expand_horizontally(b)
     meta.assert_isa(self, rt.Widget)
     meta.assert_boolean(b)
@@ -167,13 +182,15 @@ function rt.Widget:set_expand_horizontally(b)
     self:reformat()
 end
 
---- @brief
+--- @brief get expansion along x-axis
+--- @return Number
 function rt.Widget:get_expand_horizontally()
     meta.assert_isa(self, rt.Widget)
     return self._expand_horizontally
 end
 
---- @brief
+--- @brief set expansion along y-axis
+--- @param b Boolean
 function rt.Widget:set_expand_vertically(b)
     meta.assert_isa(self, rt.Widget)
     meta.assert_boolean(b)
@@ -181,13 +198,15 @@ function rt.Widget:set_expand_vertically(b)
     self:reformat()
 end
 
---- @brief
+--- @brief get expansion along y-axis
+--- @return Boolean
 function rt.Widget:get_expand_vertically()
     meta.assert_isa(self, rt.Widget)
     return self._expand_vertically
 end
 
---- @brief
+--- @brief set expansion along both axes
+--- @param b Boolean
 function rt.Widget:set_expand(b)
     meta.assert_isa(self, rt.Widget)
     meta.assert_boolean(b)
@@ -196,7 +215,8 @@ function rt.Widget:set_expand(b)
     self:reformat()
 end
 
---- @brief
+--- @brief set alignment along x-axis
+--- @param alignment rt.Alignment
 function rt.Widget:set_horizontal_alignment(alignment)
     meta.assert_isa(self, rt.Widget)
     meta.assert_enum(alignment, rt.Alignment)
@@ -204,7 +224,15 @@ function rt.Widget:set_horizontal_alignment(alignment)
     self:reformat()
 end
 
---- @brief
+--- @brief get alignment along x-axis
+--- @return rt.Alignment
+function rt.Widget:get_horizontal_alignment()
+    meta.assert_isa(self, rt.Widget)
+    return self._horizontal_alignment
+end
+
+--- @brief set alignment along y-axis
+--- @param alignment rt.Alignment
 function rt.Widget:set_vertical_alignment(alignment)
     meta.assert_isa(self, rt.Widget)
     meta.assert_enum(alignment, rt.Alignment)
@@ -212,7 +240,15 @@ function rt.Widget:set_vertical_alignment(alignment)
     self:reformat()
 end
 
---- @brief
+--- @brief get alignment along y-axis
+--- @return rt.Alignment
+function rt.Widget:get_horizontal_alignment()
+    meta.assert_isa(self, rt.Widget)
+    return self._vertical_alignment
+end
+
+--- @brief set alignment among both axes
+--- @param alignment rt.Alignment
 function rt.Widget:set_alignment(alignment)
     meta.assert_isa(self, rt.Widget)
     meta.assert_enum(alignment, rt.Alignment)
@@ -221,7 +257,9 @@ function rt.Widget:set_alignment(alignment)
     self:reformat()
 end
 
---- @brief
+--- @brief set size request
+--- @param width Number
+--- @param height Number
 function rt.Widget:set_minimum_size(width, height)
     meta.assert_isa(self, rt.Widget)
     meta.assert_number(width, height)
@@ -230,12 +268,12 @@ function rt.Widget:set_minimum_size(width, height)
     self:reformat()
 end
 
---- @brief
+--- @brief get size request
+--- @return Number, Number
 function rt.Widget:get_minimum_size()
     meta.assert_isa(self, rt.Widget)
     return self._minimum_width, self._minimum_height
 end
-
 
 --- @brief [internal] calulcate size along one axis
 --- @param self rt.Widget
@@ -272,11 +310,8 @@ function rt.Widget._calculate_size(self, width, margin_start, margin_end, align,
     elseif align == rt.Alignment.END and expand == true then
         local w_out = math.max(w, (L - m0 - m1) / 2)
         return x + L - m1 - w_out, w_out
-    else
-        error("In rt.Widget._calculate_size: unreachable reached")
     end
 end
-
 
 --- @brief [internal] draw allocation component as wireframe
 function rt.Widget:draw_bounds()
