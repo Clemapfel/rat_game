@@ -33,4 +33,3 @@ function rt.BinLayout:size_allocate(x, y, width, height)
     self._child:fit_into(rt.AABB(x, y, width, height))
 end
 
-

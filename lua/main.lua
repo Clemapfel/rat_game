@@ -42,7 +42,8 @@ require "texture"
 require "shape"
 
 require "widget"
-require "layout"
+require "bin_layout"
+require "list_layout"
 require "spacer"
 require "image_display"
 require "label"
@@ -50,6 +51,18 @@ require "label"
 -- ### MAIN ###
 
 if DEBUG_MODE then goto exit end
+
+list = rt.ListLayout()
+list._children:push_back(1)
+list._children:push_back(2)
+list._children:push_back(3)
+list._children:push_back(4)
+list._children:push_front(0)
+
+for _, value in ipairs(list) do
+    println(value)
+end
+
 
 window = rt.BinLayout()
 

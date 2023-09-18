@@ -1,7 +1,7 @@
 --- @class rt.Queue
 rt.Queue = meta.new_type("Queue", function()
 
-    local out = meta.new("Queue")
+    local out = meta.new(rt.Queue)
     local metatable = getmetatable(out)
     metatable.first_element = 0
     metatable.last_element = 0
