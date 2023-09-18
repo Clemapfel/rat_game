@@ -549,6 +549,7 @@ end)
 --- @param x any
 --- @param type meta.Type
 function meta.assert_isa(x, type)
+    assert(not meta.is_nil(type))
     meta._assert_aux(meta.isa(x, type), x, type.name)
 end
 

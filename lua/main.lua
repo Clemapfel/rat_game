@@ -42,6 +42,7 @@ require "texture"
 require "shape"
 
 require "widget"
+require "layout"
 require "spacer"
 require "image_display"
 require "label"
@@ -50,16 +51,28 @@ require "label"
 
 if DEBUG_MODE then goto exit end
 
+window = rt.BinLayout()
+
 display = rt.Spacer()
 display:set_margin_left(40)
 display:set_margin_right(50)
-display:set_expand(false)
+display:set_expand_horizontally(true)
+display:set_expand_vertically(false)
 display:set_horizontal_alignment(rt.Alignment.CENTER)
 display:set_vertical_alignment(rt.Alignment.CENTER)
 display:set_minimum_size(50, 50)
+window:set_child(display)
+
+-- @brief window resized
+function love.resize(width, height)
+    window:fit_into(rt.AABB(0, 0, width, height))
+end
 
 --- @brief startup
 function love.load()
+    love.window.setMode(love.graphics.getWidth(), love.graphics.getHeight(), {
+        resizable = true
+    })
     love.window.setTitle("rat_game")
     display:fit_into(rt.AABB(1, 1, love.graphics.getWidth()-2, love.graphics.getHeight()-2))
 end
@@ -74,8 +87,7 @@ function love.draw()
 
     love.graphics.setColor(1, 1, 1, 1)
 
-    display:draw()
-    display:draw_bounds()
+    window:draw()
 
     local w, h = love.graphics.getWidth(), love.graphics.getHeight()
     local line = rt.Line(0.5 * w, 0, 0.5 * w, h)
