@@ -61,8 +61,15 @@ function rt.VertexShape:get_n_vertices()
 end
 
 --- @brief
+--- @param positions Table<Number>
+function rt.VertexShape:set_vertex_order(positions)
+    self._native:setVertexMap(positions)
+end
+
+--- @brief
 function rt.VertexShape:set_vertex_color(i, rgba)
     meta.assert_isa(self, rt.VertexShape)
+    if rt.is_hsva(rgba) then rgba = rt.hsva_to_rgba(rgba) end
     rt.assert_rgba(rgba)
     self._native:setVertexAttribute(i, 3, rgba.r, rgba.g, rgba.b, rgba.a)
 end
@@ -113,6 +120,7 @@ end
 --- @brief
 function rt.VertexShape:set_color(rgba)
     meta.assert_isa(self, rt.VertexShape)
+    if rt.is_hsva(rgba) then rgba = rt.hsva_to_rgba(rgba) end
     rt.assert_rgba(rgba)
     for i = 1, self:get_n_vertices() do
         self:set_vertex_color(i, rgba)
@@ -161,4 +169,14 @@ function rt.VertexShape:draw()
     love.graphics.draw(self._native)
 end
 
-
+--- @class rt.VertexRectangle
+function rt.VertexRectangle(x, y, width, height)
+    local out = rt.VertexShape(
+        rt.Vector2(x, y),
+        rt.Vector2(x + width, y),
+        rt.Vector2(x + width, y + height),
+        rt.Vector2(x, y + height)
+    )
+    out:set_vertex_order(1, 2, 4, 3)
+    return out
+end

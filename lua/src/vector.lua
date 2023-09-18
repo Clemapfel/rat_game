@@ -47,7 +47,8 @@ end
 
 --- @brief
 function rt.is_vector2(object)
-    return #object and meta.is_number(object.x) and meta.is_number(object.y)
+    if not meta.is_table(object) then return false end
+    return #object == 2 and meta.is_number(object.x) and meta.is_number(object.y)
 end
 
 --- @brief
@@ -63,7 +64,7 @@ function rt.Vector3(x, y, z)
     out.__metatable = {
         __name = "Vector3",
         __add = function(self, other)
-            rt.assert_vector2(other)
+            rt.assert_vector3(other)
             return {
                 x = self.x + other.x,
                 y = self.y + other.y,
@@ -79,7 +80,7 @@ function rt.Vector3(x, y, z)
             }
         end,
         __mul = function(self, other)
-            rt.assert_vector2(other)
+            rt.assert_vector3(other)
             return {
                 x = self.x * other.x,
                 y = self.y * other.y,
@@ -87,7 +88,7 @@ function rt.Vector3(x, y, z)
             }
         end,
         __div = function(self, other)
-            rt.assert_vector2(other)
+            rt.assert_vector3(other)
             return {
                 x = self.x / other.x,
                 y = self.y / other.y,
@@ -110,6 +111,7 @@ end
 
 --- @brief
 function rt.is_vector3(object)
+    if not meta.is_table(object) then return false end
     return #object == 3 and meta.is_number(object.x) and meta.is_number(object.y) and meta.is_number(object.z)
 end
 
@@ -147,7 +149,7 @@ function rt.test.test_vector()
         local b = rt.Vector3(3, 4, 5)
 
         assert(#a == 3 and #b == 3)
-        assert(rt.is_vector2(a) and rt.is_vector2(b))
+        assert(rt.is_vector3(a) and rt.is_vector3(b))
         assert(a.x == 1 and a.y == 2 and a.z == 3 and b.x == 3 and b.y == 4 and b.z == 5)
 
         local add = a + b

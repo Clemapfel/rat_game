@@ -1,3 +1,9 @@
+--- @class rt.Drawable
+rt.Drawable = meta.new_abstract_type("Drawable")
+rt.Drawable._is_visible = true
+
+--- @brief
+--[[
 --- @class Transform
 rt.Transform = meta.new_type("Transform", function()
     local out = meta.new(rt.Transform, {
@@ -12,17 +18,12 @@ rt.Transform = meta.new_type("Transform", function()
     return out
 end)
 
---- @class rt.Drawable
-rt.Drawable = meta.new_type("Drawable", function()
-    local out = meta.new(rt.Drawable)
-    rt.add_signal_component(out)
-    rt.add_allocation_component(out)
-    return out
-end)
-
+rt.Drawable = meta.new_abstract_type("Drawable")
 rt.Drawable._transform = {}
 rt.Drawable._is_visible = true
 rt.Drawable._position = rt.Vector2(0, 0)
+rt.Drawable.allocation = rt.AllocationComponent()
+rt.Drawable.signal = rt.SignalComponent()
 
 --- @brief set position
 --- @param x Number
@@ -31,18 +32,15 @@ function rt.Drawable:set_position(x, y)
     meta.assert_isa(self, rt.Drawable)
     meta.assert_number(x, y)
 
-    self._position_x = x
-    self._position_y = y
+    self._position = rt.Vector2(x, y)
 end
 
 --- @brief get position
 --- @return (Number, Number)
 function rt.Drawable:get_position()
     meta.assert_isa(self, rt.Drawable)
-    return self._position_x, self._position_y
+    return self._position.x, self._position.y
 end
-
-meta.declare_abstract_method(rt.Drawable, "draw")
 
 --- @brief [internal] paste a love drawable
 function rt.Drawable:_draw(love_drawable, x, y, transform)
@@ -119,3 +117,4 @@ function rt.Drawable:draw_hitbox()
     love.graphics.setColor(0, 1, 0, 1)
     love.graphics.points(bounds.x + 0.5 * bounds.width, bounds.y + 0.5 * bounds.height)
 end
+]]--
