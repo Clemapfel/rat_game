@@ -66,16 +66,16 @@ end
 function rt.ImageDisplay:size_allocate(x, y, width, height)
     meta.assert_isa(self, rt.ImageDisplay)
     self._shape:set_vertex_position(1, x, y)
-    self._shape:set_vertex_color(1, rt.HSVA(0, 1, 1, 1))
+    self._shape:set_vertex_color(1, rt.HSVA(0, 1, 1, 0.25))
 
     self._shape:set_vertex_position(2, x + width, y)
-    self._shape:set_vertex_color(2, rt.HSVA(0.3, 1, 1, 1))
+    self._shape:set_vertex_color(2, rt.HSVA(0.3, 1, 1, 0.25))
 
     self._shape:set_vertex_position(3, x + width, y + height)
-    self._shape:set_vertex_color(3, rt.HSVA(0.6, 1, 1, 1))
+    self._shape:set_vertex_color(3, rt.HSVA(0.6, 1, 1, 0.25))
 
     self._shape:set_vertex_position(4, x, y + height)
-    self._shape:set_vertex_color(4, rt.HSVA(0.9, 1, 1, 1))
+    self._shape:set_vertex_color(4, rt.HSVA(0.9, 1, 1, 0.25))
 
     self._shape:set_vertex_order({1, 2, 4, 3})
     self._shape:set_texture_rectangle(rt.AABB(0, 0, 1, 1))
@@ -86,12 +86,14 @@ display:set_margin_left(40)
 display:set_margin_right(50)
 display:set_expand_vertically(false)
 display:set_expand_horizontally(false)
+display:set_horizontal_alignment(rt.Alignment.START)
+display:set_vertical_alignment(rt.Alignment.END)
 display:set_minimum_size(50, 50)
 
 --- @brief startup
 function love.load()
     love.window.setTitle("rat_game")
-    display:fit_into(rt.AABB(100, 100, love.graphics.getWidth() - 200, love.graphics.getHeight() - 200))
+    display:fit_into(rt.AABB(1, 1, love.graphics.getWidth()-2, love.graphics.getHeight()-2))
 end
 
 --- @brief update tick
@@ -105,10 +107,18 @@ function love.draw()
     love.graphics.setColor(1, 1, 1, 1)
 
     display:draw()
+    display:draw_bounds()
+
+    local w, h = love.graphics.getWidth(), love.graphics.getHeight()
+    local line = rt.Line(0.5 * w, 0, 0.5 * w, h)
+    line:draw()
+    line = rt.Line(0, 0.5 * h, w, 0.5 * h)
+    line:draw()
 
     function show_fps()
         local text = love.graphics.newText(love.graphics.getFont(), tostring(math.round(love.timer.getFPS())))
         local w, h = text:getWidth(), text:getHeight()
+        love.graphics.setColor(1, 1, 1, 0.5)
         love.graphics.draw(text, love.graphics.getWidth() - w, 0)
     end
     show_fps()

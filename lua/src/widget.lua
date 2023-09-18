@@ -7,7 +7,8 @@ rt.Alignment = meta.new_enum({
 
 --- @class rt.Widget
 rt.Widget = meta.new_abstract_type("Widget")
-rt.Widget._bounds = rt.AxisAlignedRectangle()
+rt.Widget._bounds = rt.AxisAlignedRectangle()     -- maximum area
+rt.Widget._allocation = rt.AxisAlignedRectangle() -- actual area
 rt.Widget._margins = {
     top = 0,
     right = 0,
@@ -60,6 +61,7 @@ function rt.Widget:reformat()
     height = math.max(height, 1)
     width = math.max(width, 1)
 
+    self._allocation = rt.AABB(x, y, width, height)
     self:size_allocate(x, y, width, height)
 end
 
@@ -260,7 +262,7 @@ function rt.Widget._calculate_size(self, width, margin_start, margin_end, align,
     if align == rt.Alignment.START and expand == false then
         return x + m0, w
     elseif align == rt.Alignment.CENTER and expand == false then
-        return x + L - m1 - w - (L - m0 - m1 - w) / 2, w
+        return x + (L - w) / 2, w
     elseif align == rt.Alignment.END and expand == false then
         return x + L - m1 - w, w
     elseif align == rt.Alignment.START and expand == true then
@@ -273,4 +275,51 @@ function rt.Widget._calculate_size(self, width, margin_start, margin_end, align,
     else
         error("In rt.Widget._calculate_size: unreachable reached")
     end
+end
+
+
+--- @brief [internal] draw allocation component as wireframe
+function rt.Widget:draw_bounds()
+    meta.assert_inherits(self, rt.Drawable)
+
+    local x, y = self:get_position()
+    local w, h = self:get_size()
+
+    local bounds = rt.AABB(x, y, w, h)
+
+    love.graphics.setLineWidth(1)
+    love.graphics.setLineStyle("rough")
+
+    -- outer bounds with margin
+    love.graphics.setColor(0, 1, 1, 1)
+    love.graphics.line(
+        x + self._margins.left, y + self._margins.top,
+        x + self._margins.left + w - self._margins.right, y + self._margins.top,
+        x + self._margins.left + w - self._margins.right, y + self._margins.top + h - self._margins.bottom,
+        x + self._margins.left, y + self._margins.top + h - self._margins.bottom,
+        x + self._margins.left, y + self._margins.top
+    )
+
+    -- outer bounds
+    love.graphics.setColor(1, 0, 1, 1)
+    love.graphics.line(
+        x, y,
+        x + w, y ,
+        x + w, y + h,
+        x, y + h,
+        x, y
+    )
+
+    -- final size
+    love.graphics.setColor(1, 1, 0, 1)
+    love.graphics.line(
+        self._allocation.x, self._allocation.y,
+        self._allocation.x + self._allocation.width, self._allocation.y,
+        self._allocation.x + self._allocation.width, self._allocation.y + self._allocation.height,
+        self._allocation.x, self._allocation.y + self._allocation.height,
+        self._allocation.x, self._allocation.y
+    )
+
+    love.graphics.setColor(0, 1, 0, 1)
+    love.graphics.points(bounds.x + 0.5 * bounds.width, bounds.y + 0.5 * bounds.height)
 end
