@@ -44,6 +44,7 @@ require "shape"
 require "widget"
 require "bin_layout"
 require "list_layout"
+require "overlay_layout"
 require "spacer"
 require "image_display"
 require "label"
@@ -52,28 +53,44 @@ require "label"
 
 if DEBUG_MODE then goto exit end
 
-list = rt.ListLayout()
-list._children:push_back(1)
-list._children:push_back(2)
-list._children:push_back(3)
-list._children:push_back(4)
-list._children:push_front(0)
+window = rt.BinLayout()
+overlay = rt.OverlayLayout()
+window:set_child(overlay)
 
-for _, value in ipairs(list) do
-    println(value)
+do
+    local child = rt.Spacer()
+    child:set_minimum_size(100, 100)
+    child:set_margin(10)
+    overlay:set_base_child(child)
+    child:set_color(rt.RGBA(1, 0, 1, 0.25))
+end
+do
+    local child = rt.Spacer()
+    child:set_minimum_size(100, 110)
+    child:set_horizontal_alignment(rt.Alignment.START)
+    child:set_vertical_alignment(rt.Alignment.START)
+    overlay:add_overlay(child)
+    child:set_color(rt.RGBA(0, 1, 1, 1))
+end
+do
+    local child = rt.Spacer()
+    child:set_minimum_size(110, 100)
+    child:set_horizontal_alignment(rt.Alignment.END)
+    child:set_vertical_alignment(rt.Alignment.END)
+    overlay:add_overlay(child)
+    child:set_color(rt.RGBA(1, 1, 0, 1))
 end
 
-window = rt.BinLayout()
-
-display = rt.Spacer()
-display:set_margin_left(40)
-display:set_margin_right(50)
-display:set_expand_horizontally(true)
-display:set_expand_vertically(false)
-display:set_horizontal_alignment(rt.Alignment.CENTER)
-display:set_vertical_alignment(rt.Alignment.CENTER)
-display:set_minimum_size(50, 50)
-window:set_child(display)
+do
+    local child = rt.Spacer()
+    child:set_minimum_size(110, 100)
+    child:set_horizontal_alignment(rt.Alignment.CENTER)
+    child:set_vertical_alignment(rt.Alignment.CENTER)
+    child:set_expand_vertically(true)
+    child:set_expand_vertically(false)
+    overlay:add_overlay(child)
+    child:set_color(rt.RGBA(0, 1, 0, 1))
+end
 
 -- @brief window resized
 function love.resize(width, height)
@@ -86,7 +103,7 @@ function love.load()
         resizable = true
     })
     love.window.setTitle("rat_game")
-    display:fit_into(rt.AABB(1, 1, love.graphics.getWidth()-2, love.graphics.getHeight()-2))
+    window:fit_into(rt.AABB(1, 1, love.graphics.getWidth()-2, love.graphics.getHeight()-2))
 end
 
 --- @brief update tick
@@ -101,11 +118,13 @@ function love.draw()
 
     window:draw()
 
-    local w, h = love.graphics.getWidth(), love.graphics.getHeight()
-    local line = rt.Line(0.5 * w, 0, 0.5 * w, h)
-    line:draw()
-    line = rt.Line(0, 0.5 * h, w, 0.5 * h)
-    line:draw()
+    function draw_guides()
+        local w, h = love.graphics.getWidth(), love.graphics.getHeight()
+        local line = rt.Line(0.5 * w, 0, 0.5 * w, h)
+        line:draw()
+        line = rt.Line(0, 0.5 * h, w, 0.5 * h)
+        line:draw()
+    end
 
     function show_fps()
         local text = love.graphics.newText(love.graphics.getFont(), tostring(math.round(love.timer.getFPS())))

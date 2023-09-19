@@ -5,6 +5,12 @@ rt.Alignment = meta.new_enum({
     END = "ALIGNMENT_END"
 })
 
+--- @class rt.Orientation
+rt.Orientation = meta.new_enum({
+    HORIZONTAL = "ORIENTATION_HORIZONTAL",
+    VERTICAL = "ORIENTATION_VERTICAL"
+})
+
 --- @class rt.Widget
 rt.Widget = meta.new_abstract_type("Widget")
 rt.Widget._bounds = rt.AxisAlignedRectangle()     -- maximum area
@@ -68,6 +74,8 @@ end
 --- @brief resize widget such that it fits into the given bounds
 --- @param aabb rt.AxisAlignedRectangle
 function rt.Widget:fit_into(aabb)
+    meta.assert_isa(self, rt.Widget)
+    meta.assert_isa(aabb, rt.AxisAlignedRectangle)
     self._bounds = aabb
     self:reformat()
 end
