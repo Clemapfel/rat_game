@@ -32,9 +32,9 @@ end) -- Queue
 --- @param queue rt.Queue
 --- @param x any
 function rt.Queue.push_front(queue, x)
-    meta.assert_isa(queue, "Queue")
+    meta.assert_isa(queue, rt.Queue)
 
-    local q_meta = getmetatable(out)
+    local q_meta = getmetatable(queue)
     local current = q_meta.first_element - 1
     rawset(queue, current, x)
 
@@ -46,7 +46,7 @@ end
 --- @param queue rt.Queue
 --- @param x any
 function rt.Queue.push_back(queue, x)
-    meta.assert_isa(queue, "Queue")
+    meta.assert_isa(queue, rt.Queue)
 
     local q_meta = getmetatable(queue)
     local current = q_meta.last_element
@@ -60,7 +60,7 @@ end
 --- @param queue rt.Queue
 --- @return any nil if queue is empty
 function rt.Queue.pop_front(queue)
-    meta.assert_isa(queue, "Queue")
+    meta.assert_isa(queue, rt.Queue)
 
     local q_meta = getmetatable(queue)
 
@@ -102,35 +102,48 @@ end
 --- @param queue rt.Queue
 --- @return any nil if queue is empty
 function rt.Queue.front(queue)
-    meta.assert_isa(queue, "Queue")
-    return rawget(queue, getmetatable(queue).first_element + 1)
+    meta.assert_isa(queue, rt.Queue)
+    return rawget(queue, getmetatable(queue).first_element)
 end
 
 --- @brief get element at end of queue
 --- @param queue rt.Queue
 --- @return any nil if queue is empty
 function rt.Queue.back(queue)
-    meta.assert_isa(queue, "Queue")
+    meta.assert_isa(queue, rt.Queue)
     return rawget(queue, getmetatable(queue).last_element - 1)
 end
 
 --- @brief get number of elements in queue
 --- @return number
 function rt.Queue.size(queue)
-    meta.assert_isa(queue, "Queue")
+    meta.assert_isa(queue, rt.Queue)
     return getmetatable(queue).n_elements
 end
 
 --- @brief check whether queue is empty
 --- @return boolean
 function rt.Queue.is_empty(queue)
-    meta.assert_isa(queue, "Queue")
-    return out.size(queue) == 0
+    meta.assert_isa(queue, rt.Queue)
+    return queue.size(queue) == 0
 end
 
 --- @brief [internal] test queue
 function rt.test.queue()
-    -- TODO
+    local queue = rt.Queue()
+    assert(queue:size() == 0)
+    assert(queue:is_empty())
+    queue:push_front("front")
+    queue:push_back("back")
+    assert(queue:front() == "front")
+    assert(queue:back() == "back")
+    assert(queue:size() == 2)
+
+    local front = queue:pop_front()
+    assert(front == "front")
+    local back = queue:pop_back()
+    assert(back == "back")
+    assert(queue:is_empty())
 end
 rt.test.queue()
 

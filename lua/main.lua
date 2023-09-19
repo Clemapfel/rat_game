@@ -63,7 +63,6 @@ for _, value in ipairs(list) do
     println(value)
 end
 
-
 window = rt.BinLayout()
 
 display = rt.Spacer()
