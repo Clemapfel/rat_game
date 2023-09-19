@@ -92,6 +92,8 @@ do
     child:set_color(rt.RGBA(0, 1, 0, 1))
 end
 
+println(serialize(#(overlay._overlays.elements)))
+
 -- @brief window resized
 function love.resize(width, height)
     window:fit_into(rt.AABB(0, 0, width, height))
