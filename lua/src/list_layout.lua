@@ -10,7 +10,7 @@ end)
 function rt.ListLayout:draw()
     meta.assert_isa(self, rt.ListLayout)
     if not self:get_is_visible() then return end
-    for _, child in ipairs(self._children) do
+    for _, child in pairs(self._children) do
         child:draw()
     end
 end
@@ -21,13 +21,13 @@ function rt.ListLayout:size_allocate(x, y, width, height)
     self._bounds = rt.AABB(x, y, width, height)
     if self:get_orientation() == rt.Orientation.HORIZONTAL then
         local w = width / #self._children
-        for _, child in ipairs(self._children) do
+        for _, child in pairs(self._children) do
             child:fit_into(rt.AABB(x, y, w, height))
             x = x + w
         end
     else
         local h = height / #self._children
-        for _, child in ipairs(self._children) do
+        for _, child in pairs(self._children) do
             child:fit_into(rt.AABB(x, y, width, h))
             y = y + h
         end

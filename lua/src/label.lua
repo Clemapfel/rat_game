@@ -333,7 +333,7 @@ function rt.Label:parse_from(text)
 end
 
 function rt.Label:draw()
-    for _, glyph in ipairs(self._glyphs) do
+    for _, glyph in pairs(self._glyphs) do
         glyph:draw()
     end
 end

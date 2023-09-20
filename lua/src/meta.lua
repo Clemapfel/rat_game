@@ -139,7 +139,7 @@ function meta.isa(x, type)
 
     local metatable = getmetatable(x)
     if not meta.is_nil(metatable) and not meta.is_nil(metatable.super)then
-        for _, super in ipairs(metatable.super) do
+        for _, super in pairs(metatable.super) do
             if super == typename then
                 return true
             end
@@ -153,7 +153,7 @@ function meta.inherits(x, super)
     meta.assert_object(x)
     meta.assert_isa(super, meta.Type)
 
-    for _, name in ipairs(getmetatable(x).super) do
+    for _, name in pairs(getmetatable(x).super) do
         if name == super.name then
             return true
         end
@@ -186,7 +186,7 @@ end
 --- @param x any
 function meta.assert_boolean(x, ...)
     meta._assert_aux(meta.is_boolean(x), x, "boolean")
-    for _, n in ipairs({...}) do
+    for _, n in pairs({...}) do
         meta._assert_aux(meta.is_boolean(n), n, "boolean")
     end
 end
@@ -195,7 +195,7 @@ end
 --- @param x any
 function meta.assert_table(x, ...)
     meta._assert_aux(meta.is_table(x), x, "table")
-    for _, n in ipairs({...}) do
+    for _, n in pairs({...}) do
         meta._assert_aux(meta.is_table(n), n, "table")
     end
 end
@@ -204,7 +204,7 @@ end
 --- @param x any
 function meta.assert_function(x, ...)
     meta._assert_aux(meta.is_function(x), x, "function")
-    for _, n in ipairs({...}) do
+    for _, n in pairs({...}) do
         meta._assert_aux(meta.is_function(n), n, "function")
     end
 end
@@ -219,7 +219,7 @@ end
 --- @param x any
 function meta.assert_number(x, ...)
     meta._assert_aux(meta.is_number(x), x, "number")
-    for _, number in ipairs({...}) do
+    for _, number in pairs({...}) do
         meta._assert_aux(meta.is_number(number), number, "number")
     end
 end
@@ -228,7 +228,7 @@ end
 --- @param x any
 function meta.assert_nil(x, ...)
     meta._assert_aux(meta.is_nil(x), x, "typeof(nil)")
-    for _, number in ipairs({...}) do
+    for _, number in pairs({...}) do
         meta._assert_aux(meta.is_nil(number), number, "typeof(nil)")
     end
 end
@@ -237,7 +237,7 @@ end
 --- @param x any
 function meta.assert_object(x, ...)
     meta._assert_aux(meta.is_object(x), x, "meta.Object")
-    for _, number in ipairs({...}) do
+    for _, number in pairs({...}) do
         meta._assert_aux(meta.is_object(number), number, "meta.Object")
     end
 end
@@ -388,7 +388,7 @@ function meta.new(type, fields, ...)
 
     meta._install_inheritance(out, type)
 
-    for _, super in ipairs({...}) do
+    for _, super in pairs({...}) do
         meta.assert_isa(super, meta.Type)
         meta._install_inheritance(out, super)
     end

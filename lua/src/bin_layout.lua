@@ -11,6 +11,7 @@ function rt.BinLayout:set_child(child)
     meta.assert_isa(self, rt.BinLayout)
     meta.assert_isa(self, rt.Widget)
     self._child = child
+    self:reformat()
 end
 
 --- @brief get singular child

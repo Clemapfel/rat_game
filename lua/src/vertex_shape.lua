@@ -34,7 +34,7 @@ end
 rt.VertexShape = meta.new_type("VertexShape", function(...)
     local positions = {...}
     local vertices = {}
-    for _, pos in ipairs(positions) do
+    for _, pos in pairs(positions) do
         rt.assert_vector2(pos)
         table.insert(vertices, rt.Vertex(pos.x, pos.y, 0, 0))
     end

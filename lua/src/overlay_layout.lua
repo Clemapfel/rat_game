@@ -16,7 +16,7 @@ function rt.OverlayLayout:draw()
         self._base_child:draw()
     end
 
-    for _, child in ipairs(self._overlays) do
+    for _, child in pairs(self._overlays) do
         child:draw()
     end
 end

@@ -45,6 +45,8 @@ require "widget"
 require "bin_layout"
 require "list_layout"
 require "overlay_layout"
+require "split_layout"
+
 require "spacer"
 require "image_display"
 require "label"
@@ -54,48 +56,31 @@ require "label"
 if DEBUG_MODE then goto exit end
 
 window = rt.BinLayout()
-layout = rt.ListLayout()
+layout = rt.SplitLayout()
 window:set_child(layout)
 
-
 do
     local child = rt.Spacer()
     child:set_margin(10)
-    child:set_margin_right(20)
-    layout:push_back(child)
+    --child:set_margin_right(20)
+    layout:set_start_child(child)
     child:set_color(rt.RGBA(1, 0, 1, 0.25))
-end
-do
-    local child = rt.Spacer()
-    child:set_margin(10)
-    child:set_horizontal_alignment(rt.Alignment.START)
-    child:set_vertical_alignment(rt.Alignment.CENTER)
-    layout:push_back(child)
-    child:set_color(rt.RGBA(0, 1, 1, 1))
-end
-do
-    local child = rt.Spacer()
-    child:set_margin(10)
-    child:set_horizontal_alignment(rt.Alignment.END)
-    child:set_vertical_alignment(rt.Alignment.CENTER)
-    layout:push_back(child)
-    child:set_color(rt.RGBA(1, 1, 0, 1))
 end
 do
     local child = rt.Spacer()
     child:set_margin(10)
     child:set_horizontal_alignment(rt.Alignment.CENTER)
     child:set_vertical_alignment(rt.Alignment.CENTER)
-    child:set_expand_vertically(true)
-    child:set_expand_horizontally(true)
-    layout:push_back(child)
-    child:set_color(rt.RGBA(0, 1, 0, 1))
+    layout:set_end_child(child)
+    child:set_color(rt.RGBA(0, 1, 1, 1))
 end
+layout:set_margin(10)
 
 
 -- @brief window resized
 function love.resize(width, height)
     window:fit_into(rt.AABB(0, 0, width, height))
+    layout:set_ratio(layout:get_ratio() + 0.05)
 end
 
 --- @brief startup

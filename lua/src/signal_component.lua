@@ -29,7 +29,7 @@ function rt.add_signal_component(object, implement_notify)
     meta.assert_boolean(implement_notify)
 
     if implement_notify then
-        for _, property in ipairs(meta.get_property_names(object)) do
+        for _, property in pairs(meta.get_property_names(object)) do
             object.signal:add(rt.SignalComponent._notify_prefix .. property)
         end
     end

@@ -71,7 +71,7 @@ end
 --- @param dy Number
 --- @param is_touch Boolean
 function rt.MouseHandler.handle_motion(x, y, dx, dy, is_touch)
-    for _, component in ipairs(rt.MouseHandler._components) do
+    for _, component in pairs(rt.MouseHandler._components) do
         if not getmetatable(component._instance).is_focused then
             goto continue
         end
@@ -104,7 +104,7 @@ love.mousemoved = rt.MouseHandler.handle_motion
 --- @param button_id MouseButton
 --- @param is_touch Boolean
 function rt.MouseHandler.handle_button_pressed(x, y, button_id, is_touch)
-    for _, component in ipairs(rt.MouseHandler._components) do
+    for _, component in pairs(rt.MouseHandler._components) do
         if rt.MouseHandler.is_cursor_in_bounds(x, y, component._instance) and getmetatable(component._instance).is_focused == true then
             local out = component.signal:emit("button_pressed", x, y, button_id)
             if out == true then
@@ -121,7 +121,7 @@ love.mousepressed = rt.MouseHandler.handle_button_pressed
 --- @param button_id MouseButton
 --- @param is_touch Boolean
 function rt.MouseHandler.handle_button_released(x, y, button_id, is_touch)
-    for _, component in ipairs(rt.MouseHandler._components) do
+    for _, component in pairs(rt.MouseHandler._components) do
         if rt.MouseHandler.is_cursor_in_bounds(x, y, component._instance) and getmetatable(component._instance).is_focused == true then
             local out = component.signal:emit("button_released", x, y, button_id)
             if out == true then

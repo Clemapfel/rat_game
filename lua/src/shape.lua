@@ -166,7 +166,7 @@ function rt.LineStrip:draw()
     self:_bind_for_rendering()
     if self._is_loop then
         local vertices = {}
-        for _, v in ipairs(self._vertices) do
+        for _, v in pairs(self._vertices) do
             table.insert(vertices, v)
         end
         table.insert(vertices, self._vertices[1])
@@ -256,8 +256,8 @@ rt.Polygon = meta.new_type("Polygon", function(a_x, a_y, b_x, b_y, c_x, c_y, ...
 
     -- TODO: compute outer hull
 
-    for _, triangle in ipairs(outer_hull) do
-        for _, vertex in ipairs(triangle) do
+    for _, triangle in pairs(outer_hull) do
+        for _, vertex in pairs(triangle) do
             table.insert(vertices, vertex)
         end
     end

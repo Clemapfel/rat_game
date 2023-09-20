@@ -86,7 +86,7 @@ end)
 --- @param joystick love.Joystick
 function rt.GamepadHandler.handle_joystick_added(joystick)
     rt.GamepadHandler._update_joystick(joystick)
-    for _, component in ipairs(rt.GamepadHandler._components) do
+    for _, component in pairs(rt.GamepadHandler._components) do
         if getmetatable(component._instance).is_focused == true then
             component.signal:emit("added", joystick:getID())
         end
@@ -98,7 +98,7 @@ love.joystickadded = rt.GamepadHandler.handle_joystick_added
 --- @param joystick love.Joystick
 function rt.GamepadHandler.handle_joystick_removed(joystick)
     rt.GamepadHandler._update_joystick(joystick)
-    for _, component in ipairs(rt.GamepadHandler._components) do
+    for _, component in pairs(rt.GamepadHandler._components) do
         if getmetatable(component._instance).is_focused == true then
             component.signal:emit("removed",  joystick:getID())
         end
@@ -111,7 +111,7 @@ love.joystickremoved = rt.GamepadHandler.handle_joystick_removed
 --- @param button rt.GamepadButton
 function rt.GamepadHandler.handle_button_pressed(joystick, button)
     rt.GamepadHandler._update_joystick(joystick)
-    for _, component in ipairs(rt.GamepadHandler._components) do
+    for _, component in pairs(rt.GamepadHandler._components) do
         if getmetatable(component._instance).is_focused == true then
             component.signal:emit("button_pressed", joystick:getID(), button)
         end
@@ -124,7 +124,7 @@ love.gamepadpressed = rt.GamepadHandler.handle_button_pressed
 --- @param button rt.GamepadButton
 function rt.GamepadHandler.handle_button_released(joystick, button)
     rt.GamepadHandler._update_joystick(joystick)
-    for _, component in ipairs(rt.GamepadHandler._components) do
+    for _, component in pairs(rt.GamepadHandler._components) do
         if getmetatable(component._instance).is_focused == true then
             component.signal:emit("button_released", joystick:getID(), button)
         end
@@ -138,7 +138,7 @@ love.gamepadreleased = rt.GamepadHandler.handle_button_released
 --- @param value Number
 function rt.GamepadHandler.handle_axis_changed(joystick, axis, value)
     rt.GamepadHandler._update_joystick(joystick)
-    for _, component in ipairs(rt.GamepadHandler._components) do
+    for _, component in pairs(rt.GamepadHandler._components) do
         if getmetatable(component._instance).is_focused == true then
             component.signal:emit("axis_changed", joystick:getID(), axis, value)
         end
