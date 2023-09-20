@@ -57,12 +57,13 @@ window = rt.BinLayout()
 layout = rt.ListLayout()
 window:set_child(layout)
 
-test = rt.Spacer()
-
-test2 = deepcopy(test)
-println(test2:get_margin_right())
-test:set_margin_right(20)
-println(test2:get_margin_right())
+first = rt.Spacer()
+first:set_color(rt.RGBA(1, 0, 1, 1))
+rt.add_signal_component(first)
+println(meta.is_nil(first.signal))
+second = deepcopy(first)
+second.signal:add_signal("test")
+second.signal.signal:emit("test")
 
 love.event.quit()
 

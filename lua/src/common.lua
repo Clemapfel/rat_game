@@ -265,21 +265,27 @@ end
 --- @brief create deepcopy, includes metatable
 function deepcopy(x)
 
-    if type(x) ~= "table" then
-        return x
+    function deepcopy_aux(x, seen)
+        if type(x) ~= "table" then
+            return x
+        end
+
+        local metatable = getmetatable(x)
+        setmetatable(x, {})
+
+        local out = {}
+        for key, value in pairs(x) do
+            if seen[out][value] ~= true then
+                seen[out][value] = true
+                out[key] = deepcopy_aux(value, seen)
+            end
+        end
+
+        setmetatable(x, metatable)
+        setmetatable(out, deepcopy_aux(metatable, seen))
+        return out
     end
-
-    local metatable = getmetatable(x)
-    local out = {}
-    setmetatable(x, {})
-
-    for key, value in pairs(x) do
-        x[key] = deepcopy(value)
-    end
-
-    setmetatable(out, metatable)
-    setmetatable(out, deepcopy(metatable))
-    return out
+    return deepcopy_aux(x, {})
 end
 
 --- @brief positive infinity

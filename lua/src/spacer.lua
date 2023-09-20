@@ -29,11 +29,17 @@ function rt.Spacer:measure()
     return self:get_minimum_size()
 end
 
-
-
 --- @brief set color
 --- @param color rt.RGBA
 function rt.Spacer:set_color(color)
     meta.assert_isa(self, rt.Spacer)
+    rt.assert_rgba(color)
     self._shape:set_color(color)
+end
+
+--- @brief get color
+--- @return rt.RGBA
+function rt.Spacer:get_color()
+    meta.assert_isa(self, rt.Spacer)
+    return self._shape:get_color()
 end

@@ -150,6 +150,14 @@ function rt.hsva_to_rgba(hsva)
     return rt.RGBA(r, g, b, a)
 end
 
+
+--- @brief
+function rt.compare_rgba(c1, c2)
+    rt.assert_rgba(c1)
+    rt.assert_rgba(c2)
+    return c1.r == c2.r and c1.g == c2.g and c1.b == c2.b and c1.a == c2.a
+end
+
 --- @brief [internal] test colors
 function rt.test.colors()
     --- TODO
