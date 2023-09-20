@@ -97,7 +97,8 @@ function rt.SplitLayout:get_ratio()
     return self._ratio
 end
 
---- @brief
+--- @brief set orientation, causes reformat
+--- @param orientation rt.Orientation
 function rt.SplitLayout:set_orientation(orientation)
     meta.assert_isa(self, rt.SplitLayout)
     if self._orientation == orientation then return end
@@ -105,13 +106,12 @@ function rt.SplitLayout:set_orientation(orientation)
     self:reformat()
 end
 
---- @brief
+--- @brief get orientation
 --- @return rt.Orientation
 function rt.SplitLayout:get_orientation()
     meta.assert_isa(self, rt.SplitLayout)
     return self._orientation
 end
-
 
 --- @brief test SplitLayout
 function rt.test.split_layout()

@@ -55,4 +55,4 @@ end
 function rt.test.image_display()
     -- TODO
 end
-rt.test.image_display
+rt.test.image_display()

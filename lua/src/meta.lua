@@ -43,6 +43,8 @@ function meta.is_function(x)
     end
 end
 
+meta.hash = 0
+
 --- @brief [internal] Create new empty object
 --- @param typename String
 function meta._new(typename)
@@ -53,25 +55,20 @@ function meta._new(typename)
     metatable = out.__metatable
 
     metatable.__name = typename
+    metatable.__hash = meta.hash
+    meta.hash = meta.hash + 1
     metatable.properties = {}
-    metatable.is_private = {}
     metatable.is_mutable = true
     metatable.super = {}
     metatable.components = {}
 
     metatable.__index = function(this, property_name)
         local metatable = getmetatable(this)
-        if metatable.is_private[property_name] == true then
-            error("[rt] In " .. metatable.__name .. ".__index: Cannot access property `" .. property_name .. "`, because it was declared private.")
-        end
         return metatable.properties[property_name]
     end
 
     metatable.__newindex = function(this, property_name, property_value)
         local metatable = getmetatable(this)
-        if metatable.is_private[property_name] == true then
-            error("[rt] In " .. metatable.__name .. ".__newindex: Cannot set property `" .. property_name .. "`, because it was declared private.")
-        end
         if not metatable.is_mutable then
             error("[rt] In " .. metatable.__name .. ".__newindex: Cannot set property `" .. property_name .. "`, because the object was declared immutable.")
         end
@@ -90,6 +87,10 @@ function meta._new(typename)
     end
 
     metatable.__name = metatable.__name
+    metatable.__eq = function(self, other)
+        meta.assert_object(other)
+        return getmetatable(self).__hash == getmetatable(other).__hash
+    end
     setmetatable(out, metatable)
     return out
 end
@@ -257,16 +258,12 @@ end
 --- @param x meta.Object
 --- @param property_name String
 --- @param initial_value any
---- @param is_private Boolean
-function meta._install_property(x, property_name, initial_value, is_private)
+function meta._install_property(x, property_name, initial_value)
     meta.assert_object(x);
     meta.assert_string(property_name)
-    if not meta.is_nil(is_private) then
-        meta.assert_boolean(is_private)
-    end
+
     local metatable = getmetatable(x)
     metatable.properties[property_name] = initial_value
-    metatable.is_private[property_name] = (is_private == true)
 end
 
 --- @brief [internal] add a property, set to intial value
@@ -277,7 +274,6 @@ function meta._uninstall_property(x, property_name)
     meta.assert_string(property_name)
     local metatable = getmetatable(x)
     metatable.properties[property_name] = nil
-    metatable.is_private[property_name] = nil
 end
 
 --- @brief get whether property is installed
@@ -288,10 +284,7 @@ function meta.has_property(x, property_name)
     meta.assert_object(x)
     meta.assert_string(property_name)
     local metatable = getmetatable(x)
-    if metatable == nil or metatable.is_private == nil then
-        return false
-    end
-    return meta.is_boolean(metatable.is_private[property_name])
+    return not meta.is_nil(metatable.properties[property_name])
 end
 
 --- @brief get list of all property names
@@ -304,34 +297,6 @@ function meta.get_property_names(x)
         table.insert(out, name)
     end
     return out
-end
-
---- @brief declare property as immutable
---- @param x any
-function meta.set_is_private(x, property_name, b)
-    meta.assert_object(x)
-    meta.assert_string(property_name)
-    meta.assert_boolean(b)
-
-    local private_table = getmetatable(x).is_private
-    if not meta.is_boolean(private_table[property_name]) then
-        error("[rt] In meta.set_is_private: Object of type `" ..  meta.typeof(x) .. "` does not yet have a property named `" ..  property_name .. "`")
-    end
-    private_table[property_name] = b
-end
-
---- @brief get whether property was declared private
---- @param x meta.Object
---- @param property_name String
-function meta.get_is_private(x, property_name)
-    meta.assert_object(x)
-    meta.assert_string(property_name)
-    local private_table = getmetatable(x).is_private
-
-    if not meta.is_boolean(private_table[property_name]) then
-        error("[rt] In meta.get_is_private: Object of type `" ..  meta.typeof(x) .. "` does not yet have a property named `" ..  property_name .. "`")
-    end
-    return getmetatable(x).is_private[property_name]
 end
 
 --- @brief make object immutable, this should be done inside the objects constructor
