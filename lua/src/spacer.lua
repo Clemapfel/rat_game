@@ -18,11 +18,18 @@ function rt.Spacer:draw()
     self._shape:draw()
 end
 
---- @overlay rt.Widget.size_allocate
+--- @overload rt.Widget.size_allocate
 function rt.Spacer:size_allocate(x, y, width, height)
     self._shape:set_position(x, y)
     self._shape:set_size(width, height)
 end
+
+--- @overload rt.Widget.measure
+function rt.Spacer:measure()
+    return self:get_minimum_size()
+end
+
+
 
 --- @brief set color
 --- @param color rt.RGBA

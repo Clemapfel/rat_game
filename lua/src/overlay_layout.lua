@@ -25,12 +25,10 @@ end
 function rt.OverlayLayout:size_allocate(x, y, width, height)
     meta.assert_isa(self, rt.OverlayLayout)
 
-    --[[
     x = x + self:get_margin_left()
     y = y + self:get_margin_top()
     width = width - (self:get_margin_left() + self:get_margin_right())
     height = height - (self:get_margin_top() + self:get_margin_bottom())
-    ]]--
 
     if meta.isa(self._base_child, rt.Widget) then
         self._base_child:fit_into(rt.AABB(x, y, width, height))

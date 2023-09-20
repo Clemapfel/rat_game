@@ -7,7 +7,7 @@ rt.ListLayout = meta.new_type("ListLayout", function()
 end)
 
 --- @overload rt.Drawable.draw
-function rt.ListLayout.draw()
+function rt.ListLayout:draw()
     meta.assert_isa(self, rt.ListLayout)
     if not self:get_is_visible() then return end
     for _, child in ipairs(self._children) do
@@ -16,20 +16,22 @@ function rt.ListLayout.draw()
 end
 
 --- @overlay rt.Widget.size_allocate
-function rt.ListLayout.size_allocate(x, y, width, height)
+function rt.ListLayout:size_allocate(x, y, width, height)
     meta.assert_isa(self, rt.ListLayout)
-    if self:get_oientation() == rt.Orientation.HORIZONTAL then
-        local i = 0
+    self._bounds = rt.AABB(x, y, width, height)
+    if self:get_orientation() == rt.Orientation.HORIZONTAL then
+        local w = width / #self._children
         for _, child in ipairs(self._children) do
-
+            child:fit_into(rt.AABB(x, y, w, height))
+            x = x + w
         end
     else
-
+        local h = height / #self._children
+        for _, child in ipairs(self._children) do
+            child:fit_into(rt.AABB(x, y, width, h))
+            y = y + h
+        end
     end
-end
-
---- @brief
-function rt.ListLayout:reformat()
 end
 
 --- @brief

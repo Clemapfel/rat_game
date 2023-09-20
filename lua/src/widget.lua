@@ -38,6 +38,12 @@ function rt.Widget:size_allocate(x, y, width, height)
     error("[rt] " .. meta.typeof(self) .. ":size_allocate: abstract method called")
 end
 
+--- @brief abstract method, returns minimum space that needs to be allocated
+--- @return (Number, Number)
+function rt.Widget:measure()
+    error("[rt] " .. meta.typeof(self) .. ":measure: abstract method called")
+end
+
 --- @brief
 function rt.Widget:reformat()
     if not self._realized then

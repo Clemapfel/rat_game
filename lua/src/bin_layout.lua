@@ -33,3 +33,9 @@ function rt.BinLayout:size_allocate(x, y, width, height)
     self._child:fit_into(rt.AABB(x, y, width, height))
 end
 
+--- @overload rt.Widget.measure
+function rt.BinLayout:measure()
+    if meta.is_nil(self._child) then return 0, 0 end
+    return self._child:measure()
+end
+

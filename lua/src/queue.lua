@@ -15,11 +15,9 @@ rt.Queue = meta.new_type("Queue", function()
     metatable.__ipairs = function(self)
         return ipairs(self.elements)
     end
-
     metatable.__len = out.size
     return out
-end) -- Queue
-
+end)
 
 --- @brief add element to start of queue
 --- @param x any

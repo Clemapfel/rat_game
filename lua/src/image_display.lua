@@ -5,16 +5,16 @@ rt.ImageDisplay = meta.new_type("ImageDisplay", function(image)
         image = rt.Image(image)
     end
     meta.assert_isa(image, rt.Image)
+    local x, y = image:get_size()
 
     local out = meta.new(rt.ImageDisplay, {
+        _resolution = rt.Vector2(x, y),
         _texture = rt.Texture(image),
         _shape = rt.VertexRectangle(0, 0, 1, 1)
     }, rt.Drawable, rt.Widget)
     out._shape:set_texture(out._texture)
+    out._shape:set_vertex_order({1, 2, 4, 3})
     out._shape:set_texture_rectangle(rt.AABB(0, 0, 1, 1))
-
-    local x, y = image:get_size()
-    out:set_minimum_size(image:get_size().x, image:get_size().y)
     return out
 end)
 
@@ -33,9 +33,13 @@ function rt.ImageDisplay:size_allocate(x, y, width, height)
     self._shape:set_vertex_position(2, x + width, y)
     self._shape:set_vertex_position(3, x + width, y + height)
     self._shape:set_vertex_position(4, x, y + height)
-
-    self._shape:set_vertex_order({1, 2, 4, 3})
     self._shape:set_texture_rectangle(rt.AABB(0, 0, 1, 1))
+end
+
+--- @overload rt.Widget.measure
+function rt.ImageDisplay:measure()
+    return math.max(self._resolution.x, self._minimum_width),
+           math.max(self._resolution.y, self._minimum_height)
 end
 
 --- @brief update texture
@@ -43,11 +47,6 @@ function rt.ImageDisplay:create_from_image(image)
     meta.assert_isa(self, rt.ImageDisplay)
     meta.assert_isa(image, rt.Image)
     self._texture:create_from_image(image)
-
-    local w, h = self:get_minimum_size()
-    local new_w, new_h = image:get_size()
-
-    w = math.min(w, new_w)
-    w = math.max()
-    self:set_minimum_size()
+    local w, h = image:get_size()
+    self._resolution = rt.Vector2(w, h)
 end

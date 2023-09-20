@@ -54,45 +54,49 @@ require "label"
 if DEBUG_MODE then goto exit end
 
 window = rt.BinLayout()
-overlay = rt.OverlayLayout()
-window:set_child(overlay)
+layout = rt.ListLayout()
+window:set_child(layout)
+
+test = rt.Spacer()
+
+test2 = deepcopy(test)
+println(test2:get_margin_right())
+test:set_margin_right(20)
+println(test2:get_margin_right())
+
+love.event.quit()
 
 do
     local child = rt.Spacer()
-    child:set_minimum_size(100, 100)
     child:set_margin(10)
-    overlay:set_base_child(child)
+    child:set_margin_right(20)
+    layout:push_back(child)
     child:set_color(rt.RGBA(1, 0, 1, 0.25))
 end
 do
     local child = rt.Spacer()
-    child:set_minimum_size(100, 110)
     child:set_horizontal_alignment(rt.Alignment.START)
-    child:set_vertical_alignment(rt.Alignment.START)
-    overlay:add_overlay(child)
+    child:set_vertical_alignment(rt.Alignment.CENTER)
+    layout:push_back(child)
     child:set_color(rt.RGBA(0, 1, 1, 1))
 end
 do
     local child = rt.Spacer()
-    child:set_minimum_size(110, 100)
     child:set_horizontal_alignment(rt.Alignment.END)
-    child:set_vertical_alignment(rt.Alignment.END)
-    overlay:add_overlay(child)
+    child:set_vertical_alignment(rt.Alignment.CENTER)
+    layout:push_back(child)
     child:set_color(rt.RGBA(1, 1, 0, 1))
 end
-
 do
     local child = rt.Spacer()
-    child:set_minimum_size(110, 100)
     child:set_horizontal_alignment(rt.Alignment.CENTER)
     child:set_vertical_alignment(rt.Alignment.CENTER)
     child:set_expand_vertically(true)
-    child:set_expand_vertically(false)
-    overlay:add_overlay(child)
+    child:set_expand_horizontally(true)
+    layout:push_back(child)
     child:set_color(rt.RGBA(0, 1, 0, 1))
 end
 
-println(serialize(#(overlay._overlays.elements)))
 
 -- @brief window resized
 function love.resize(width, height)
@@ -117,16 +121,22 @@ end
 function love.draw()
 
     love.graphics.setColor(1, 1, 1, 1)
-
     window:draw()
 
     function draw_guides()
         local w, h = love.graphics.getWidth(), love.graphics.getHeight()
-        local line = rt.Line(0.5 * w, 0, 0.5 * w, h)
-        line:draw()
-        line = rt.Line(0, 0.5 * h, w, 0.5 * h)
-        line:draw()
+
+        love.graphics.setColor(0, 1, 1, 0.5)
+        rt.Line(0.5 * w, 0, 0.5 * w, h):draw()
+        rt.Line(0, 0.5 * h, w, 0.5 * h):draw()
+
+        love.graphics.setColor(1, 0, 1, 0.5)
+        rt.Line(0.33 * w, 0, 0.33 * w, h):draw()
+        rt.Line(0.66 * w, 0, 0.66 * w, h):draw()
+        rt.Line(0, 0.33 * h, w, 0.33 * h):draw()
+        rt.Line(0, 0.66 * h, w, 0.66 * h):draw()
     end
+    --draw_guides()
 
     function show_fps()
         local text = love.graphics.newText(love.graphics.getFont(), tostring(math.round(love.timer.getFPS())))
