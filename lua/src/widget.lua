@@ -15,12 +15,10 @@ rt.Orientation = meta.new_enum({
 rt.Widget = meta.new_abstract_type("Widget")
 rt.Widget._bounds = rt.AxisAlignedRectangle()     -- maximum area
 rt.Widget._allocation = rt.AxisAlignedRectangle() -- actual area
-rt.Widget._margins = {
-    top = 0,
-    right = 0,
-    bottom = 0,
-    left = 0
-}
+rt.Widget._margin_top = 0
+rt.Widget._margin_bottom = 0
+rt.Widget._margin_left = 0
+rt.Widget._margin_right = 0
 rt.Widget._expand_horizontally = true
 rt.Widget._expand_vertically = true
 rt.Widget._horizontal_alignment = rt.Alignment.CENTER
@@ -52,8 +50,8 @@ function rt.Widget:reformat()
 
     local x, width = rt.Widget._calculate_size(self,
         self._minimum_width,
-        self._margins.left,
-        self._margins.right,
+        self._margin_left,
+        self._margin_right,
         self._horizontal_alignment,
         self._expand_horizontally,
         self._bounds.x,
@@ -62,8 +60,8 @@ function rt.Widget:reformat()
 
     local y, height = rt.Widget._calculate_size(self,
         self._minimum_height,
-        self._margins.top,
-        self._margins.bottom,
+        self._margin_top,
+        self._margin_bottom,
         self._vertical_alignment,
         self._expand_vertically,
         self._bounds.y,
@@ -102,7 +100,7 @@ end
 --- @param margin Number
 function rt.Widget:set_margin_left(margin)
     meta.assert_isa(self, rt.Widget)
-    self._margins.left = margin
+    self._margin_left = margin
     self:reformat()
 end
 
@@ -110,14 +108,14 @@ end
 --- @return Number
 function rt.Widget:get_margin_left()
     meta.assert_isa(self, rt.Widget)
-    return self._margins.left
+    return self._margin_left
 end
 
 --- @brief set end margin
 --- @param margin Number
 function rt.Widget:set_margin_right(margin)
     meta.assert_isa(self, rt.Widget)
-    self._margins.right = margin
+    self._margin_right = margin
     self:reformat()
 end
 
@@ -125,14 +123,14 @@ end
 --- @return Number
 function rt.Widget:get_margin_right()
     meta.assert_isa(self, rt.Widget)
-    return self._margins.right
+    return self._margin_right
 end
 
 --- @brief set top margin
 --- @param margin Number
 function rt.Widget:set_margin_top(margin)
     meta.assert_isa(self, rt.Widget)
-    self._margins.top = margin
+    self._margin_top = margin
     self:reformat()
 end
 
@@ -140,14 +138,14 @@ end
 --- @return Number
 function rt.Widget:get_margin_top()
     meta.assert_isa(self, rt.Widget)
-    return self._margins.top
+    return self._margin_top
 end
 
 --- @brief set bottom margin
 --- @param margin Number
 function rt.Widget:set_margin_bottom(margin)
     meta.assert_isa(self, rt.Widget)
-    self._margins.bottom = margin
+    self._margin_bottom = margin
     self:reformat()
 end
 
@@ -155,15 +153,15 @@ end
 --- @return Number
 function rt.Widget:get_margin_bottom()
     meta.assert_isa(self, rt.Widget)
-    return self._margins.bottom
+    return self._margin_bottom
 end
 
 --- @brief set left and right margin
 --- @param margin Number
 function rt.Widget:set_margin_horizontal(margin)
     meta.assert_isa(self, rt.Widget)
-    self._margins.left = margin
-    self._margins.right = margin
+    self._margin_left = margin
+    self._margin_right = margin
     self:reformat()
 end
 
@@ -171,8 +169,8 @@ end
 --- @param margin Number
 function rt.Widget:set_margin_vertical(margin)
     meta.assert_isa(self, rt.Widget)
-    self._margins.top = margin
-    self._margins.bottom = margin
+    self._margin_top = margin
+    self._margin_bottom = margin
     self:reformat()
 end
 
@@ -180,10 +178,10 @@ end
 --- @param margin Number
 function rt.Widget:set_margin(margin)
     meta.assert_isa(self, rt.Widget)
-    self._margins.top = margin
-    self._margins.bottom = margin
-    self._margins.left = margin
-    self._margins.right = margin
+    self._margin_top = margin
+    self._margin_bottom = margin
+    self._margin_left = margin
+    self._margin_right = margin
     self:reformat()
 end
 
@@ -340,11 +338,11 @@ function rt.Widget:draw_bounds()
     -- outer bounds with margin
     love.graphics.setColor(0, 1, 1, 1)
     love.graphics.line(
-        x + self._margins.left, y + self._margins.top,
-        x + self._margins.left + w - self._margins.right, y + self._margins.top,
-        x + self._margins.left + w - self._margins.right, y + self._margins.top + h - self._margins.bottom,
-        x + self._margins.left, y + self._margins.top + h - self._margins.bottom,
-        x + self._margins.left, y + self._margins.top
+        x + self._margin_left, y + self._margin_top,
+        x + self._margin_left + w - self._margin_right, y + self._margin_top,
+        x + self._margin_left + w - self._margin_right, y + self._margin_top + h - self._margin_bottom,
+        x + self._margin_left, y + self._margin_top + h - self._margin_bottom,
+        x + self._margin_left, y + self._margin_top
     )
 
     -- outer bounds

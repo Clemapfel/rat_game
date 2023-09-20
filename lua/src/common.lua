@@ -262,32 +262,6 @@ function serialize(object_identifier, object, inject_sourcecode)
     return table.concat(buffer, "")
 end
 
---- @brief create deepcopy, includes metatable
-function deepcopy(x)
-
-    function deepcopy_aux(x, seen)
-        if type(x) ~= "table" then
-            return x
-        end
-
-        local metatable = getmetatable(x)
-        setmetatable(x, {})
-
-        local out = {}
-        for key, value in pairs(x) do
-            if seen[out][value] ~= true then
-                seen[out][value] = true
-                out[key] = deepcopy_aux(value, seen)
-            end
-        end
-
-        setmetatable(x, metatable)
-        setmetatable(out, deepcopy_aux(metatable, seen))
-        return out
-    end
-    return deepcopy_aux(x, {})
-end
-
 --- @brief positive infinity
 INFINITY = 1/0
 

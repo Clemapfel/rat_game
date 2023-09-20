@@ -57,15 +57,6 @@ window = rt.BinLayout()
 layout = rt.ListLayout()
 window:set_child(layout)
 
-first = rt.Spacer()
-first:set_color(rt.RGBA(1, 0, 1, 1))
-rt.add_signal_component(first)
-println(meta.is_nil(first.signal))
-second = deepcopy(first)
-second.signal:add_signal("test")
-second.signal.signal:emit("test")
-
-love.event.quit()
 
 do
     local child = rt.Spacer()
@@ -76,6 +67,7 @@ do
 end
 do
     local child = rt.Spacer()
+    child:set_margin(10)
     child:set_horizontal_alignment(rt.Alignment.START)
     child:set_vertical_alignment(rt.Alignment.CENTER)
     layout:push_back(child)
@@ -83,6 +75,7 @@ do
 end
 do
     local child = rt.Spacer()
+    child:set_margin(10)
     child:set_horizontal_alignment(rt.Alignment.END)
     child:set_vertical_alignment(rt.Alignment.CENTER)
     layout:push_back(child)
@@ -90,6 +83,7 @@ do
 end
 do
     local child = rt.Spacer()
+    child:set_margin(10)
     child:set_horizontal_alignment(rt.Alignment.CENTER)
     child:set_vertical_alignment(rt.Alignment.CENTER)
     child:set_expand_vertically(true)
