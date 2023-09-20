@@ -47,3 +47,9 @@ function rt.Image:get_size()
     meta.assert_isa(self, rt.Image)
     return self._native:getDimensions()
 end
+
+--- @brief test Image
+function rt.test.image()
+    -- TODO
+end
+rt.test.image()

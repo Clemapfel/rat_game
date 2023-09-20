@@ -82,3 +82,9 @@ function rt.ListLayout:get_orientation()
     meta.assert_isa(self, rt.ListLayout)
     return self._orientation
 end
+
+--- @brief test ListLayout
+function rt.test.list_layout()
+    -- TODO
+end
+rt.test.list_layout()

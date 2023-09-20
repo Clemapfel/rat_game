@@ -50,3 +50,9 @@ function rt.ImageDisplay:create_from_image(image)
     local w, h = image:get_size()
     self._resolution = rt.Vector2(w, h)
 end
+
+--- @brief test `ImageDisplay`
+function rt.test.image_display()
+    -- TODO
+end
+rt.test.image_display

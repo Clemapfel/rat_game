@@ -40,3 +40,8 @@ function rt.BinLayout:measure()
     return self._child:measure()
 end
 
+--- @brief test BinLayout
+function rt.test.bin_layout()
+    -- TODO
+end
+rt.test.bin_layout()

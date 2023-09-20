@@ -119,3 +119,9 @@ end
 function rt.AxisAlignedRectangle.contains(self, x, y)
     return x >= self.x and x <= self.x + self.width and y >= self.y and y <= self.y + self.height;
 end
+
+--- @brief test aabb
+function rt.test.geometry()
+    -- TODO
+end
+rt.test.geometry()

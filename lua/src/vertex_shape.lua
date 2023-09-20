@@ -180,3 +180,9 @@ function rt.VertexRectangle(x, y, width, height)
     out:set_vertex_order(1, 2, 4, 3)
     return out
 end
+
+--- @brief test VertexShape
+function rt.test.vertex_shape()
+    -- TODO
+end
+rt.test.vertex_shape()

@@ -150,7 +150,6 @@ function rt.hsva_to_rgba(hsva)
     return rt.RGBA(r, g, b, a)
 end
 
-
 --- @brief
 function rt.compare_rgba(c1, c2)
     rt.assert_rgba(c1)
@@ -160,6 +159,6 @@ end
 
 --- @brief [internal] test colors
 function rt.test.colors()
-    --- TODO
+    -- TODO
 end
 rt.test.colors()

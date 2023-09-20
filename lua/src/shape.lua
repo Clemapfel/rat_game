@@ -276,3 +276,9 @@ function rt.Polygon:draw()
     self:_bind_for_rendering()
     love.graphics.polygon(self:_get_draw_mode(), table.unpack(self._vertices))
 end
+
+--- @brief test shapes
+function rt.test.shapes()
+    -- TODO
+end
+rt.test.shapes()

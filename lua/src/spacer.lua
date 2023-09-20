@@ -43,3 +43,9 @@ function rt.Spacer:get_color()
     meta.assert_isa(self, rt.Spacer)
     return self._shape:get_color()
 end
+
+--- @brief test Spacer
+function rt.test.spacer()
+    -- TODO
+end
+rt.test.spacer()

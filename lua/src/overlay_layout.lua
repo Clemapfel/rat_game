@@ -52,3 +52,9 @@ function rt.OverlayLayout:add_overlay(child)
     meta.assert_isa(child, rt.Widget)
     self._overlays:push_back(child)
 end
+
+--- @brief test OverlayLayout
+function rt.test.overlay_layout()
+    -- TODO
+end
+rt.test.overlay_layout()

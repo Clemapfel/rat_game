@@ -64,3 +64,9 @@ function rt.Texture:get_size()
     meta.assert_isa(self, rt.Texture)
     return self._native:getDimension()
 end
+
+--- @brief test texture
+function rt.test.texture()
+    -- TODO
+end
+rt.test.texture()

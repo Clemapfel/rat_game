@@ -111,3 +111,10 @@ function rt.SplitLayout:get_orientation()
     meta.assert_isa(self, rt.SplitLayout)
     return self._orientation
 end
+
+
+--- @brief test SplitLayout
+function rt.test.split_layout()
+    -- TODO
+end
+rt.test.split_layout()
