@@ -33,8 +33,13 @@ end
 --- @param color rt.RGBA
 function rt.Spacer:set_color(color)
     meta.assert_isa(self, rt.Spacer)
-    rt.assert_rgba(color)
-    self._shape:set_color(color)
+
+    if rt.is_hsva(color) then
+        self._shape:set_color(rt.hsva_to_rgba(color))
+    else
+        rt.assert_rgba(color)
+        self._shape:set_color(color)
+    end
 end
 
 --- @brief get color

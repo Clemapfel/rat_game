@@ -44,13 +44,13 @@ function rt.SplitLayout:measure()
         local x, y = self._start_child:get_position()
         local start_w, start_h = self._start_child:get_size()
         local end_w, end_h = self._end_child:get_size()
-        return rt.AABB(x, y, start_w + end_w, start_h + end_h)
+        return start_w + end_w, start_h + end_h
     elseif not meta.is_nil(self._start_child) then
         return self._start_child:measure()
     elseif notmeta.is_nil(self._end_child) then
         return self._end_child:measure()
     else
-        return rt.AABB(0, 0, 0, 0)
+        return 0, 0
     end
 end
 

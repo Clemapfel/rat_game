@@ -46,6 +46,7 @@ require "bin_layout"
 require "list_layout"
 require "overlay_layout"
 require "split_layout"
+require "grid_layout"
 
 require "spacer"
 require "image_display"
@@ -56,25 +57,19 @@ require "label"
 if DEBUG_MODE then goto exit end
 
 window = rt.BinLayout()
-layout = rt.SplitLayout()
+layout = rt.ListLayout()
 window:set_child(layout)
 
-do
-    local child = rt.Spacer()
-    child:set_margin(10)
-    --child:set_margin_right(20)
-    layout:set_start_child(child)
-    child:set_color(rt.RGBA(1, 0, 1, 0.25))
+for i = 1, 10 do
+    local spacer = rt.Spacer()
+    spacer:set_color(rt.HSVA(i / 10, 1, 1, 1))
+    spacer:set_minimum_size(math.random() * 100, math.random() * 100)
+    spacer:set_alignment(rt.Alignment.CENTER)
+    spacer:set_expand_horizontally(false)
+    layout:push_back(spacer)
 end
-do
-    local child = rt.Spacer()
-    child:set_margin(10)
-    child:set_horizontal_alignment(rt.Alignment.CENTER)
-    child:set_vertical_alignment(rt.Alignment.CENTER)
-    layout:set_end_child(child)
-    child:set_color(rt.RGBA(0, 1, 1, 1))
-end
-layout:set_margin(10)
+layout:set_expand_vertically(true)
+layout:set_expand_horizontally(true)
 
 
 -- @brief window resized

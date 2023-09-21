@@ -20,17 +20,75 @@ function rt.ListLayout:size_allocate(x, y, width, height)
     meta.assert_isa(self, rt.ListLayout)
     self._bounds = rt.AABB(x, y, width, height)
     if self:get_orientation() == rt.Orientation.HORIZONTAL then
-        local w = width / #self._children
-        for _, child in pairs(self._children) do
-            child:fit_into(rt.AABB(x, y, w, height))
-            x = x + w
+        if self:get_expand_horizontally() then
+            local width_sum = 0
+            for _, child in pairs(self._children) do
+                local w, _ = child:measure()
+                if w > 1 then
+                    width_sum = width_sum + w
+                end
+            end
+
+            local target_w = (width - width_sum) / #self._children
+            for _, child in pairs(self._children) do
+                local measure_w, _ = child:measure()
+                local final_w = math.max(measure_w, target_w)
+                child:fit_into(rt.AABB(x, y, final_w, height))
+                x = x + final_w
+            end
+        else
+            for _, child in pairs(self._children) do
+                local w, h = child:measure()
+                child:fit_into(rt.AABB(x, y, w, height))
+                x = x + w
+            end
         end
     else
-        local h = height / #self._children
-        for _, child in pairs(self._children) do
-            child:fit_into(rt.AABB(x, y, width, h))
-            y = y + h
+        if self:get_expand_vertically() then
+            local height_sum = 0
+            for _, child in pairs(self._children) do
+                local _, h = child:measure()
+                if h > 1 then
+                    height_sum = height_sum + h
+                end
+            end
+
+            local target_h = (height - height_sum) / #self._children
+            for _, child in pairs(self._children) do
+                local _, measure_h = child:measure()
+                local final_h = math.max(measure_h, target_h)
+                child:fit_into(rt.AABB(x, y, width, final_h))
+                y = y + final_h
+            end
+        else
+            for _, child in pairs(self._children) do
+                local w, h = child:measure()
+                child:fit_into(rt.AABB(x, y, width, h))
+                y = y + h
+            end
         end
+    end
+end
+
+--- @overload rt.Widget.measure
+function rt.ListLayout:measure()
+    local w_sum = 0
+    local w_max = NEGATIVE_INFINITY
+    local h_sum = 0
+    local h_max = NEGATIVE_INFINITY
+
+    for _, child in pairs(children) do
+        local w, h = child:measure()
+        w_sum = w_sum + w
+        h_sum = h_sum + h
+        w_max = math.max(w_max, w)
+        h_max = math.max(h_max, h)
+    end
+
+    if self:get_orientation() == rt.Orientation.HORIZONTAL then
+        return w_sum, h_max
+    else
+        return w_max, h_sum
     end
 end
 
