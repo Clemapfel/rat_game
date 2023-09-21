@@ -112,12 +112,11 @@ function rt.AxisAlignedRectangle.get_bottom_right(self)
 end
 
 --- @brief is point inside rectangles bounds
---- @param self rt.AxisAlignedRectangle
 --- @param x Number
 --- @param y Number
 --- @return Boolean
-function rt.AxisAlignedRectangle.contains(self, x, y)
-    return x >= self.x and x <= self.x + self.width and y >= self.y and y <= self.y + self.height;
+function rt.AxisAlignedRectangle:contains(x, y)
+    return x >= self.x and x <= (self.x + self.width) and y >= self.y and y <= (self.y + self.height)
 end
 
 --- @brief test aabb

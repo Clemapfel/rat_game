@@ -122,6 +122,7 @@ rt.Point = meta.new_type("Point", function(x, y)
 end)
 
 function rt.Point:draw()
+    if not self:get_is_visible() then return end
     self:_bind_for_rendering()
     love.graphics.point(self._vertices[1], self._vertcies[2])
 end
@@ -136,6 +137,7 @@ rt.Points = meta.new_type("Points", function(x, y, ...)
 end)
 
 function rt.Points:draw()
+    if not self:get_is_visible() then return end
     self:_bind_for_rendering()
     love.graphics.points(table.unpack(self._vertices))
 end
@@ -163,6 +165,7 @@ function rt.LineLoop(a_x, a_y, b_x, b_y, ...)
 end
 
 function rt.LineStrip:draw()
+    if not self:get_is_visible() then return end
     self:_bind_for_rendering()
     if self._is_loop then
         local vertices = {}
@@ -197,11 +200,12 @@ function rt.Square(top_left_x, top_left_y, size)
 end
 
 function rt.Rectangle:draw()
+    if not self:get_is_visible() then return end
     self:_bind_for_rendering()
     love.graphics.rectangle(self:_get_draw_mode(), self._x, self._y, self._w, self._h, self._border_radius, self._border_radius, self._border_radius * 2)
 end
 
---- @brief
+--- @brief TODO
 function rt.Rectangle:set_position(x, y)
     meta.assert_isa(self, rt.Rectangle)
     meta.assert_number(x, y)
@@ -209,12 +213,18 @@ function rt.Rectangle:set_position(x, y)
     self._y = y
 end
 
---- @brief
+--- @brief TODO
 function rt.Rectangle:set_size(width, height)
     meta.assert_isa(self, rt.Rectangle)
     meta.assert_number(width, height)
     self._w = width
     self._h = height
+end
+
+--- @brief TODO
+function rt.Rectangle:set_border_radius(px)
+    meta.assert_isa(self, rt.Rectangle)
+    self._border_radius = px
 end
 
 --- @class rt.Ellipse
@@ -239,6 +249,7 @@ function rt.Circle(center_x, center_y, radius, n_outer_vertices)
 end
 
 function rt.Ellipse:draw()
+    if not self:get_is_visible() then return end
     self:_bind_for_rendering()
     if self._n_outer_vertices > 0 then
         love.graphics.ellipse(self:_get_draw_mode(), self._center_x, self._center_y, self._x_radius, self._y_radius, self._n_outer_vertices)
@@ -273,6 +284,7 @@ function rt.Triangle(a_x, a_y, b_x, b_y, c_x, c_y)
 end
 
 function rt.Polygon:draw()
+    if not self:get_is_visible() then return end
     self:_bind_for_rendering()
     love.graphics.polygon(self:_get_draw_mode(), table.unpack(self._vertices))
 end

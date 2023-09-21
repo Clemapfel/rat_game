@@ -31,6 +31,7 @@ function println(...)
     end
 
     io.write("\n")
+    io.flush()
 end
 
 --- @brief get number of elements in arbitrary object

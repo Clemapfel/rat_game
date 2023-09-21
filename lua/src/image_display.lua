@@ -22,6 +22,7 @@ end)
 function rt.ImageDisplay:draw()
     meta.assert_isa(self, rt.ImageDisplay)
     if self:get_is_visible() then
+        love.graphics.setColor(1, 1, 1, 1)
         self._shape:draw()
     end
 end

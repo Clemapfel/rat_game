@@ -55,29 +55,18 @@ rt.GamepadComponent = meta.new_type("GamepadComponent", function(holder)
     local hash = rt.GamepadHandler._hash
     local out = meta.new(rt.GamepadComponent, {
         _hash = hash,
-        _instance = holder
+        instance = holder
     })
     rt.add_signal_component(out)
    
     rt.GamepadHandler._components[hash] = out
     rt.GamepadHandler._hash = hash + 1
 
-    local metatable = getmetatable(holder)
-    if not meta.is_boolean(metatable.is_focused) then
-        metatable.is_focused = true
-    end
-
     out.signal:add("added")
     out.signal:add("removed")
     out.signal:add("button_pressed")
     out.signal:add("button_released")
     out.signal:add("axis_changed")
-
-    local metatable = getmetatable(holder)
-    metatable.components.gamepad = out
-    metatable.__gc = function(self)
-        rt.GamepadHandler._components[self._hash] = nil
-    end
 
     return rt.GamepadHandler._components[hash]
 end)
@@ -87,7 +76,7 @@ end)
 function rt.GamepadHandler.handle_joystick_added(joystick)
     rt.GamepadHandler._update_joystick(joystick)
     for _, component in pairs(rt.GamepadHandler._components) do
-        if getmetatable(component._instance).is_focused == true then
+        if getmetatable(component.instance).is_focused == true then
             component.signal:emit("added", joystick:getID())
         end
     end
@@ -99,7 +88,7 @@ love.joystickadded = rt.GamepadHandler.handle_joystick_added
 function rt.GamepadHandler.handle_joystick_removed(joystick)
     rt.GamepadHandler._update_joystick(joystick)
     for _, component in pairs(rt.GamepadHandler._components) do
-        if getmetatable(component._instance).is_focused == true then
+        if getmetatable(component.instance).is_focused == true then
             component.signal:emit("removed",  joystick:getID())
         end
     end
@@ -112,7 +101,7 @@ love.joystickremoved = rt.GamepadHandler.handle_joystick_removed
 function rt.GamepadHandler.handle_button_pressed(joystick, button)
     rt.GamepadHandler._update_joystick(joystick)
     for _, component in pairs(rt.GamepadHandler._components) do
-        if getmetatable(component._instance).is_focused == true then
+        if getmetatable(component.instance).is_focused == true then
             component.signal:emit("button_pressed", joystick:getID(), button)
         end
     end
@@ -125,7 +114,7 @@ love.gamepadpressed = rt.GamepadHandler.handle_button_pressed
 function rt.GamepadHandler.handle_button_released(joystick, button)
     rt.GamepadHandler._update_joystick(joystick)
     for _, component in pairs(rt.GamepadHandler._components) do
-        if getmetatable(component._instance).is_focused == true then
+        if getmetatable(component.instance).is_focused == true then
             component.signal:emit("button_released", joystick:getID(), button)
         end
     end
@@ -139,7 +128,7 @@ love.gamepadreleased = rt.GamepadHandler.handle_button_released
 function rt.GamepadHandler.handle_axis_changed(joystick, axis, value)
     rt.GamepadHandler._update_joystick(joystick)
     for _, component in pairs(rt.GamepadHandler._components) do
-        if getmetatable(component._instance).is_focused == true then
+        if getmetatable(component.instance).is_focused == true then
             component.signal:emit("axis_changed", joystick:getID(), axis, value)
         end
     end
@@ -147,21 +136,21 @@ end
 love.gamepadaxis = rt.GamepadHandler.handle_axis_changed
 
 --- @brief add an gamepad component as `.gamepad`
-function rt.add_gamepad_component(self)
-    meta.assert_object(self)
-
-    if not meta.is_nil(self.gamepad) then
-        error("[rt] In add_gamepad_component: Object of type `" .. meta.typeof(self) .. "` already has a member called `gamepad`")
-    end
-
-    meta._install_property(self, "gamepad", rt.AllocationComponent(self))
-    return rt.get_gamepad_component(self)
+function rt.add_gamepad_component(target)
+    meta.assert_object(target)
+    getmetatable(target).components.gamepad = rt.GamepadComponent(target)
+    return getmetatable(target).components.gamepad
 end
 
 --- @brief get gamepad component assigned
---- @return rt.AllocationComponent
+--- @return rt.GamepadComponent
 function rt.get_gamepad_component(self)
-    return self.gamepad
+    meta.assert_object(target)
+    local components = getmetatable(target).components
+    if meta.is_nil(components) then
+        return nil
+    end
+    return components.keyboard
 end
 
 --- @brief [internal] test keyboard component

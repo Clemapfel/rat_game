@@ -3,7 +3,7 @@
 rt.SignalComponent = meta.new_type("SignalComponent", function(holder)
     meta.assert_object(holder)
     local out = meta.new(rt.SignalComponent, {
-        _instance = holder
+        instance = holder
     })
     getmetatable(holder).components.signal = out
     return out
@@ -49,7 +49,7 @@ end
 function rt.SignalComponent._init_signal(component, name)
     meta.assert_isa(component, rt.SignalComponent)
     meta.assert_string(name)
-    local metatable = getmetatable(component._instance)
+    local metatable = getmetatable(component.instance)
     if meta.is_nil(metatable.signal) then
         metatable.signal = {}
     end
@@ -70,7 +70,7 @@ function rt.SignalComponent._assert_has_signal(component, name, scope)
     meta.assert_string(scope)
 
     if not component:has_signal(name) then
-        error("[rt] In SignalComponent." .. scope .. ": Object of type `" .. meta.typeof(component._instance) .. "`has no signal with name `" .. name .. "`")
+        error("[rt] In SignalComponent." .. scope .. ": Object of type `" .. meta.typeof(component.instance) .. "`has no signal with name `" .. name .. "`")
     end
 end
 
@@ -81,7 +81,7 @@ function rt.SignalComponent.has_signal(component, name)
     meta.assert_isa(component, rt.SignalComponent)
     meta.assert_string(name)
 
-    local metatable = getmetatable(component._instance)
+    local metatable = getmetatable(component.instance)
     return not meta.is_nil(metatable.signal) and not meta.is_nil(metatable.signal[name])
 end
 
@@ -104,13 +104,13 @@ function rt.SignalComponent.emit(component, name, ...)
     meta.assert_string(name)
     component:_assert_has_signal(name, "emit")
 
-    local metatable = getmetatable(component._instance)
+    local metatable = getmetatable(component.instance)
     local signal = metatable.signal[name]
 
     if meta.is_nil(signal) or signal.is_blocked then return end
     local res = nil
     for _, callback in pairs(signal.callbacks) do
-        res = callback(component._instance, ...)
+        res = callback(component.instance, ...)
     end
     return res
 end
@@ -125,7 +125,7 @@ function rt.SignalComponent.connect(component, name, callback)
     meta.assert_function(callback)
     component:_assert_has_signal(name, "connect")
 
-    local signal = getmetatable(component._instance).signal[name]
+    local signal = getmetatable(component.instance).signal[name]
     signal.callbacks[signal.n] = callback
     signal.n = signal.n + 1
     return signal.n
@@ -143,7 +143,7 @@ function rt.SignalComponent.disconnect(component, name, handler_ids)
         return
     end
 
-    local signal = getmetatable(component._instance).signal[name]
+    local signal = getmetatable(component.instance).signal[name]
     if meta.is_nil(handler_id) then
         signal.callbacks = {}
     elseif meta.is_table(handler_id) then
@@ -164,7 +164,7 @@ function rt.SignalComponent.set_is_blocked(component, name, b)
     meta.assert_isa(component, rt.SignalComponent)
     meta.assert_string(name)
     component:_assert_has_signal(name, "set_is_blocked")
-    getmetatable(component._instance).signal[name].is_blocked = b
+    getmetatable(component.instance).signal[name].is_blocked = b
 end
 
 --- @brief check whether signal handler is not connected or currently blocked
@@ -175,7 +175,7 @@ function rt.SignalComponent.get_is_blocked(component, name)
     meta.assert_isa(component, rt.SignalComponent)
     meta.assert_string(name)
     component:_assert_has_signal(name, "get_is_blocked")
-    return getmetatable(component._instance).signal[name].is_blocked
+    return getmetatable(component.instance).signal[name].is_blocked
 end
 
 --- @brief get all handler ids for given signal
@@ -186,7 +186,7 @@ function rt.SignalComponent.get_handler_ids(component, name)
     meta.assert_isa(component, rt.SignalComponent)
     meta.assert_string(name)
     component:_assert_has_signal(this, name, "get_signal_handler_ids")
-    local signal = getmetatable(component._instance).signal[name]
+    local signal = getmetatable(component.instance).signal[name]
     local out = {}
     for id, _ in pairs(signal.callbacks) do
         out[id] = id

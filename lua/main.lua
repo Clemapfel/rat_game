@@ -29,10 +29,6 @@ require "meta"
 require "vector"
 require "random"
 require "signal_component"
-require "vertex_shape"
-require "gamepad_component"
-require "keyboard_component"
-require "mouse_component"
 require "queue"
 require "color"
 require "geometry"
@@ -41,6 +37,10 @@ require "animation"
 require "drawable"
 require "texture"
 require "shape"
+require "vertex_shape"
+require "gamepad_component"
+require "keyboard_component"
+require "mouse_component"
 
 require "widget"
 require "bin_layout"
@@ -53,28 +53,19 @@ require "spacer"
 require "image_display"
 require "label"
 
-for i = 0, 100 do
-    println(rt.random.string(16))
-end
-
 -- ### MAIN ###
 
 if DEBUG_MODE then goto exit end
 
 window = rt.BinLayout()
-layout = rt.ListLayout()
-window:set_child(layout)
-
-for i = 1, 10 do
-    local spacer = rt.Spacer()
-    spacer:set_color(rt.HSVA(i / 10, 1, 1, 1))
-    spacer:set_minimum_size(math.random() * 100, math.random() * 100)
-    spacer:set_alignment(rt.Alignment.CENTER)
-    layout:push_back(spacer)
-end
-layout:set_expand_vertically(true)
-layout:set_expand_horizontally(true)
-
+button = rt.Button()
+window:set_child(button)
+button:set_expand(false)
+button:set_minimum_size(100, 100)
+button:set_child(rt.ImageDisplay("assets/favicon.png"))
+button.signal:connect("clicked", function(self)
+    println("clicked")
+end)
 
 -- @brief window resized
 function love.resize(width, height)
@@ -98,7 +89,7 @@ end
 
 --- @brief draw step
 function love.draw()
-
+    love.graphics.setBackgroundColor(0.5, 0, 0.5, 0.5)
     love.graphics.setColor(1, 1, 1, 1)
     window:draw()
 

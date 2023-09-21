@@ -26,6 +26,7 @@ rt.Widget._vertical_alignment = rt.Alignment.CENTER
 rt.Widget._minimum_width = 1
 rt.Widget._minimum_height = 1
 rt.Widget._realized = true
+rt.Widget._focused = true
 
 --- @brief abstract method, emitted when widgets bounds should change
 --- @param x Number
@@ -94,6 +95,16 @@ end
 --- @return (Number, Number)
 function rt.Widget:get_position()
     return self._bounds.x, self._bounds.y
+end
+
+--- @brief get bounds
+function rt.Widget:get_bounds()
+    return rt.AABB(
+        self._allocation.x,
+        self._allocation.y,
+        self._allocation.width,
+        self._allocation.height
+    )
 end
 
 --- @brief set start margin
@@ -285,6 +296,12 @@ end
 function rt.Widget:get_minimum_size()
     meta.assert_isa(self, rt.Widget)
     return self._minimum_width, self._minimum_height
+end
+
+--- @brief get whether widget currently holds input focus
+function rt.Widget:get_has_focus()
+    meta.assert_isa(self, rt.Widget)
+    return self._focused
 end
 
 --- @brief [internal] calulcate size along one axis
