@@ -27,6 +27,7 @@ rt.test = {}
 require "common"
 require "meta"
 require "vector"
+require "random"
 require "signal_component"
 require "vertex_shape"
 require "gamepad_component"
@@ -52,6 +53,10 @@ require "spacer"
 require "image_display"
 require "label"
 
+for i = 0, 100 do
+    println(rt.random.string(16))
+end
+
 -- ### MAIN ###
 
 if DEBUG_MODE then goto exit end
@@ -65,7 +70,6 @@ for i = 1, 10 do
     spacer:set_color(rt.HSVA(i / 10, 1, 1, 1))
     spacer:set_minimum_size(math.random() * 100, math.random() * 100)
     spacer:set_alignment(rt.Alignment.CENTER)
-    spacer:set_expand_horizontally(false)
     layout:push_back(spacer)
 end
 layout:set_expand_vertically(true)
