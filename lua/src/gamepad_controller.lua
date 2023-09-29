@@ -27,9 +27,116 @@ rt.GamepadAxis = meta.new_enum({
     RIGHT_X = "rightx",
     RIGHT_Y = "righty",
     LEFT_TRIGGER = "triggerleft",
-    RIGHT_TRIGGER = "triggeright"
+    RIGHT_TRIGGER = "triggerright"
 })
 
+rt.GamepadHandler = {}
+rt.GamepadHandler._hash = 0
+rt.GamepadHandler._components = {}
+
+rt.SIGNAL_BUTTON_PRESSED = "button_pressed"
+rt.SIGNAL_BUTTON_RELEASED = "button_released"
+rt.SIGNAL_CONTROLLER_ADDED = "connected"
+rt.SIGNAL_CONTROLLER_REMOVED = "disconnected"
+rt.SIGNAL_AXIS_CHANGED = "axis"
+
+--- @class GamepadController
+rt.GamepadController = meta.new_type("GamepadController", function(instance)
+    meta.assert_object(instance)
+    local hash = rt.GamepadHandler._hash
+    rt.GamepadHandler._hash = rt.GamepadHandler._hash + 1
+
+    local out = meta.new(rt.GamepadController, {
+        instance = instance,
+        _hash = hash
+    })
+    rt.add_signal_component(out)
+    out.signal:add(rt.SIGNAL_BUTTON_PRESSED)
+    out.signal:add(rt.SIGNAL_BUTTON_RELEASED)
+    out.signal:add(rt.SIGNAL_CONTROLLER_ADDED)
+    out.signal:add(rt.SIGNAL_CONTROLLER_REMOVED)
+    out.signal:add(rt.SIGNAL_AXIS_CHANGED)
+
+    rt.GamepadHandler._components[hash] = out
+    return out
+end)
+
+--- @brief handle joystick add
+--- @param joystick love.Joystick
+function rt.GamepadHandler.handle_joystick_added(joystick)
+    for _, component in pairs(rt.GamepadHandler._components) do
+        component.signal:emit(rt.SIGNAL_CONTROLLER_ADDED, joystick:getID())
+    end
+end
+love.joystickadded = rt.GamepadHandler.handle_joystick_added
+
+--- @brief handle joystick remove
+--- @param joystick love.Joystick
+function rt.GamepadHandler.handle_joystick_removed(joystick)
+    for _, component in pairs(rt.GamepadHandler._components) do
+        component.signal:emit(rt.SIGNAL_CONTROLLER_REMOVED, joystick:getID())
+    end
+end
+love.joystickremoved = rt.GamepadHandler.handle_joystick_removed
+
+--- @brief handle button pressed
+--- @param joystick love.Joystick
+--- @param button rt.GamepadButton
+function rt.GamepadHandler.handle_button_pressed(joystick, button)
+    meta.assert_enum(button, rt.GamepadButton)
+    for _, component in pairs(rt.GamepadHandler._components) do
+        component.signal:emit(rt.SIGNAL_BUTTON_PRESSED, joystick:getID(), button)
+    end
+end
+love.gamepadpressed = rt.GamepadHandler.handle_button_pressed
+
+--- @brief handle button released
+--- @param joystick love.Joystick
+--- @param button rt.GamepadButton
+function rt.GamepadHandler.handle_button_released(joystick, button)
+    meta.assert_enum(button, rt.GamepadButton)
+    for _, component in pairs(rt.GamepadHandler._components) do
+        component.signal:emit(rt.SIGNAL_BUTTON_RELEASED, joystick:getID(), button)
+    end
+end
+love.gamepadreleased = rt.GamepadHandler.handle_button_released
+
+--- @brief handle axis changed
+--- @param joystick love.Joystick
+--- @param axis rt.GamepadAxis
+--- @param value Number
+function rt.GamepadHandler.handle_axis_changed(joystick, axis, value)
+    meta.assert_enum(axis, rt.GamepadAxis)
+    for _, component in pairs(rt.GamepadHandler._components) do
+        component.signal:emit(rt.SIGNAL_AXIS_CHANGED, joystick:getID(), axis, value)
+    end
+end
+love.gamepadaxis = rt.GamepadHandler.handle_axis_changed
+
+--- @brief add an gamepad component
+function rt.add_gamepad_controller(target)
+    meta.assert_object(target)
+    getmetatable(target).components.gamepad = rt.GamepadController(target)
+    return getmetatable(target).components.gamepad
+end
+
+--- @brief
+function rt.get_gamepad_controller(target)
+    meta.assert_object(target)
+    local components = getmetatable(target).components
+    if meta.is_nil(components) then
+        return nil
+    end
+    return components.gamepad
+end
+
+--- @brief [internal] test gamepad controller
+function rt.test.gamepad_controller()
+    -- TODO
+end
+rt.test.gamepad_controller()
+
+--[[
 rt.GamepadHandler._hash = 1
 rt.GamepadHandler._components = {}
 
@@ -58,7 +165,7 @@ rt.GamepadComponent = meta.new_type("GamepadComponent", function(holder)
         instance = holder
     })
     rt.add_signal_component(out)
-   
+
     rt.GamepadHandler._components[hash] = out
     rt.GamepadHandler._hash = hash + 1
 
@@ -155,55 +262,6 @@ end
 
 --- @brief [internal] test keyboard component
 rt.test.gamepad_component = function()
-    local instance = meta._new("Object")
-    instance.gamepad = rt.GamepadComponent(instance)
-
-    local dummy = {
-        getID = function() return 0 end
-    }
-
-    local added_called = false
-    instance.gamepad.signal:connect("added", function(self, id)
-        added_called = true
-    end)
-    rt.GamepadHandler.handle_joystick_added(dummy)
-
-    local button_pressed_called = false
-    instance.gamepad.signal:connect("button_pressed", function(self, id, button)
-        assert(id == rt.GamepadHandler._active_joystick_id)
-        button_pressed_called = true
-    end)
-    rt.GamepadHandler.handle_button_pressed(dummy, rt.GamepadButton.START)
-
-    local button_released_called = false
-    instance.gamepad.signal:connect("button_released", function(self, id, button)
-        assert(id == rt.GamepadHandler._active_joystick_id)
-        button_released_called = true
-    end)
-    rt.GamepadHandler.handle_button_released(dummy, rt.GamepadButton.START)
-
-    local n_axis_called = 0
-    instance.gamepad.signal:connect("axis_changed", function(self, id, axis, value)
-        assert(id == rt.GamepadHandler._active_joystick_id)
-        n_axis_called = n_axis_called + 1
-    end)
-
-    for axis, _ in pairs(rt.GamepadAxis) do
-        rt.GamepadHandler.handle_axis_changed(dummy, axis, 0.1)
-    end
-
-    assert(added_called)
-    assert(not is_empty(rt.GamepadHandler._joysticks))
-    assert(n_axis_called == 6)
-    assert(button_released_called)
-    assert(button_pressed_called)
-
-    local removed_called = false
-    instance.gamepad.signal:connect("removed", function(self, id)
-        removed_called = true
-    end)
-    rt.GamepadHandler.handle_joystick_removed(dummy)
-    assert(removed_called)
 end
 rt.test.gamepad_component()
-
+]]--

@@ -140,15 +140,16 @@ rt.KeyboardHandler._hash = 1
 rt.KeyboardHandler._components = {}
 
 --- @brief
-rt.KeyboardComponent = meta.new_type("KeyboardComponent", function(instance)
+rt.KeyboardController = meta.new_type("KeyboardController", function(instance)
+    meta.assert_object(instance)
     local hash = rt.KeyboardHandler._hash
-    rt.KeyboardHandler._hash = rt.MouseHandler._hash + 1
+    rt.KeyboardHandler._hash = rt.KeyboardHandler._hash + 1
 
     if meta.is_nil(instance.get_bounds) then
-        error("[rt] In KeyboardComponent: instance of type `" .. instance .. "` does not have a `get_bounds` function")
+        error("[rt] In KeyboardController: instance of type `" .. instance .. "` does not have a `get_bounds` function")
     end
 
-    local out = meta.new(rt.KeyboardComponent, {
+    local out = meta.new(rt.KeyboardController, {
         instance = instance,
         _hash = hash
     })
@@ -185,14 +186,14 @@ love.keyreleased = function(key) rt.KeyboardHandler.handle_key_released(key) end
 
 
 --- @brief add an keyboard component
-function rt.add_keyboard_component(target)
+function rt.add_keyboard_controller(target)
     meta.assert_object(target)
-    getmetatable(target).components.keyboard = rt.KeyboardComponent(target)
+    getmetatable(target).components.keyboard = rt.KeyboardController(target)
     return getmetatable(target).components.keyboard
 end
 
 --- @brief
-function rt.get_keyboard_component(target)
+function rt.get_keyboard_controller(target)
     meta.assert_object(target)
     local components = getmetatable(target).components
     if meta.is_nil(components) then
@@ -202,13 +203,13 @@ function rt.get_keyboard_component(target)
 end
 
 --[[
---- @class rt.KeyboardComponent
---- @signal key_pressed (::KeyboardComponent, key::String) -> Boolean
---- @signal key_released (::KeyboardComponent, key::String) -> Boolean
-rt.KeyboardComponent = meta.new_type("KeyboardComponent", function(holder)
+--- @class rt.KeyboardController
+--- @signal key_pressed (::KeyboardController, key::String) -> Boolean
+--- @signal key_released (::KeyboardController, key::String) -> Boolean
+rt.KeyboardController = meta.new_type("KeyboardController", function(holder)
     meta.assert_object(holder)
     local hash = rt.KeyboardHandler._hash
-    local out = meta.new(rt.KeyboardComponent, {
+    local out = meta.new(rt.KeyboardController, {
         _hash = hash,
         instance = holder
     })
@@ -281,7 +282,7 @@ function rt.add_keyboard_component(self)
 end
 
 --- @brief get keyboard component assigned
---- @return rt.KeyboardComponent
+--- @return rt.KeyboardController
 function rt.get_keyboard_component(self)
     return self.keyboard
 end
@@ -290,7 +291,7 @@ end
 rt.test.keyboard_component = function()
 
     local instance = meta._new("Object")
-    local component = rt.KeyboardComponent(instance)
+    local component = rt.KeyboardController(instance)
     assert(component.instance == instance)
     assert(meta.is_boolean(getmetatable(instance).is_focused))
 

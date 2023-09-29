@@ -421,7 +421,7 @@ end
 --- @param enum meta.Enum
 function meta.assert_enum(x, enum)
     if not meta.is_enum(x, enum) then
-        error("[rt] In assert_enum: Value `" .. tostring(x) .. "` is not a value of enum")
+        error("[rt] In assert_enum: Value `" .. tostring(x) .. "` is not a value of enum ")
     end
 end
 

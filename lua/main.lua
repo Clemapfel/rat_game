@@ -58,13 +58,21 @@ require "label"
 if DEBUG_MODE then goto exit end
 
 window = rt.BinLayout()
-button = rt.Button()
-window:set_child(button)
-button:set_expand(false)
-button:set_minimum_size(100, 100)
-button:set_child(rt.ImageDisplay("assets/favicon.png"))
-button.signal:connect("clicked", function(self)
-    println("clicked")
+gamepad = rt.GamepadController(window)
+gamepad.signal:connect(rt.SIGNAL_CONTROLLER_ADDED, function(self, id)
+    println("added: ", id)
+end)
+gamepad.signal:connect(rt.SIGNAL_CONTROLLER_REMOVED, function(self, id)
+    println("removed: ", id)
+end)
+gamepad.signal:connect(rt.SIGNAL_BUTTON_PRESSED, function(self, id, button)
+    println("pressed: ", id, " ", button)
+end)
+gamepad.signal:connect(rt.SIGNAL_BUTTON_RELEASED, function(self, id, button)
+    println("released: ", id, " ", button)
+end)
+gamepad.signal:connect(rt.SIGNAL_AXIS_CHANGED, function(self, id, axis, value)
+    println("axis: ", id, " ", axis, " ", value)
 end)
 
 -- @brief window resized

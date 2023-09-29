@@ -12,7 +12,8 @@ rt.MouseHandler._hash = 1
 rt.MouseHandler._components = {}
 
 --- @brief
-rt.MouseComponent = meta.new_type("MouseComponent", function(instance)
+rt.MouseController = meta.new_type("MouseController", function(instance)
+    meta.assert_object(instance)
     local hash = rt.MouseHandler._hash
     rt.MouseHandler._hash = rt.MouseHandler._hash + 1
 
@@ -20,7 +21,7 @@ rt.MouseComponent = meta.new_type("MouseComponent", function(instance)
         error("[rt] In MouseCompoent: instance of type `" .. instance .. "` does not have a `get_bounds` function")
     end
 
-    local out = meta.new(rt.MouseComponent, {
+    local out = meta.new(rt.MouseController, {
         instance = instance,
         _hash = hash,
         _active = false
@@ -37,8 +38,8 @@ rt.MouseComponent = meta.new_type("MouseComponent", function(instance)
 end)
 
 --- @brief
-function rt.MouseComponent:is_cursor_in_bounds(x, y)
-    meta.assert_isa(self, rt.MouseComponent)
+function rt.MouseController:is_cursor_in_bounds(x, y)
+    meta.assert_isa(self, rt.MouseController)
     return self.instance:get_bounds():contains(x, y)
 end
 
@@ -100,14 +101,14 @@ end
 love.mousemoved = rt.MouseHandler.handle_motion
 
 --- @brief add an mouse component
-function rt.add_mouse_component(target)
+function rt.add_mouse_controller(target)
     meta.assert_object(target)
-    getmetatable(target).components.mouse = rt.MouseComponent(target)
+    getmetatable(target).components.mouse = rt.MouseController(target)
     return getmetatable(target).components.mouse
 end
 
 --- @brief
-function rt.get_mouse_component(target)
+function rt.get_mouse_controller(target)
     meta.assert_object(target)
     local components = getmetatable(target).components
     if meta.is_nil(components) then
@@ -115,49 +116,9 @@ function rt.get_mouse_component(target)
     end
     return components.mouse
 end
---[[
---- @brief [internal] test mouse component
-rt.test.mouse_component = function()
-    local instance = meta._new("Object")
-    function instance:get_bounds()
-        return rt.AABB(NEGATIVE_INFINITY, NEGATIVE_INFINITY, POSITIVE_INFINITY, POSITIVE_INFINITY)
-    end
-    instance.mouse = rt.MouseComponent(instance)
 
-    local pressed_called = false
-    instance.mouse.signal:connect("button_pressed", function(self, x, y, id)
-        pressed_called = true
-    end)
-    rt.MouseHandler.handle_button_pressed(0, 0, rt.MouseButton.LEFT)
-
-    local released_called = false
-    instance.mouse.signal:connect("button_released", function(self, x, y, id)
-        released_called = true
-    end)
-    rt.MouseHandler.handle_button_released(0, 0, rt.MouseButton.RIGHT)
-
-    local motion_enter_called = false
-    instance.mouse.signal:connect("motion_enter", function(self, x, y)
-        motion_enter_called = true
-    end)
-
-    local motion_leave_called = false
-    instance.mouse.signal:connect("motion_leave", function(self, x, y)
-        motion_leave_called = true
-    end)
-
-    local motion_called = false
-    instance.mouse.signal:connect("motion", function(self, x, y, dx, dy)
-        motion_called = true
-    end)
-    rt.MouseHandler.handle_motion(0, 0, 0, 0, false)
-
-    -- assert(pressed_called)
-    -- assert(released_called)
-    -- assert(motion_called)
-    -- assert(motion_enter_called)
-    -- assert(motion_leave_called)
+--- @brief
+function rt.test.test_mouse_controller()
+    -- TODO
 end
-rt.test.mouse_component()
-
-]]--
+rt.test.test_mouse_controller()
