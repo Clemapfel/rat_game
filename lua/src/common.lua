@@ -80,6 +80,20 @@ function clamp(x, lower_bound, upper_bound)
     return x
 end
 
+--- @brief ternary
+--- @param condition boolean
+--- @param if_true any returned if condition == true
+--- @param if_false any return if condition == false
+function ternary(condition, if_true, if_false)
+    if condition == true then
+        return if_true
+    elseif condition == false then
+        return if_false
+    else
+        error("In ternary: argument #1 does not evaluate to boolean")
+    end
+end
+
 --- @brief make first letter in word capitalized
 
 SERIALIZE_DEPTH = POSITIVE_INFINITY

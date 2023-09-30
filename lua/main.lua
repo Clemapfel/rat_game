@@ -31,6 +31,7 @@ require "random"
 require "signal_component"
 require "queue"
 require "color"
+require "palette"
 require "geometry"
 require "image"
 require "animation"
@@ -56,6 +57,11 @@ require "label"
 -- ### MAIN ###
 
 if DEBUG_MODE then goto exit end
+
+rgba = rt.html_code_to_color("#FF00FF12")
+println(serialize(rgba))
+html = rt.color_to_html_code(rgba)
+println(serialize(html, true))
 
 window = rt.BinLayout()
 gamepad = rt.GamepadController(window)
@@ -105,16 +111,37 @@ function love.draw()
         local w, h = love.graphics.getWidth(), love.graphics.getHeight()
 
         love.graphics.setColor(0, 1, 1, 0.5)
-        rt.Line(0.5 * w, 0, 0.5 * w, h):draw()
-        rt.Line(0, 0.5 * h, w, 0.5 * h):draw()
+        local lines = {}
+        for _, x in pairs({0.25, 0.5, 0.75, 0.33, 0.66, 0, 1}) do
+            table.insert(lines, rt.Line(x * w, 0, x * w, h))
+            table.insert(lines, rt.Line(0, x * h, w, x * h))
+        end
 
-        love.graphics.setColor(1, 0, 1, 0.5)
-        rt.Line(0.33 * w, 0, 0.33 * w, h):draw()
-        rt.Line(0.66 * w, 0, 0.66 * w, h):draw()
-        rt.Line(0, 0.33 * h, w, 0.33 * h):draw()
-        rt.Line(0, 0.66 * h, w, 0.66 * h):draw()
+        local half_color = rt.RGBA(1, 1, 0, 1)
+        local third_color = rt.RGBA(0, 1, 1, 1)
+        local quarter_color = rt.RGBA(0, 1, 0, 1)
+        local outline_color = rt.RGBA(1, 0, 1, 1)
+
+        lines[1]:set_color(quarter_color)
+        lines[2]:set_color(quarter_color)
+        lines[3]:set_color(half_color)
+        lines[4]:set_color(half_color)
+        lines[5]:set_color(quarter_color)
+        lines[6]:set_color(quarter_color)
+        lines[7]:set_color(third_color)
+        lines[8]:set_color(third_color)
+        lines[9]:set_color(third_color)
+        lines[10]:set_color(third_color)
+        lines[11]:set_color(outline_color)
+        lines[12]:set_color(outline_color)
+        lines[13]:set_color(outline_color)
+        lines[14]:set_color(outline_color)
+
+        for _, line in pairs(lines) do
+            line:draw()
+        end
     end
-    --draw_guides()
+    draw_guides()
 
     function show_fps()
         local text = love.graphics.newText(love.graphics.getFont(), tostring(math.round(love.timer.getFPS())))
