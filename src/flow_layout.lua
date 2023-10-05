@@ -29,7 +29,8 @@ function rt.FlowLayout:size_allocate(x, y, width, height)
         local tile_y = y + self._column_spacing
 
         for _, child in pairs(self._children) do
-            local offset = tile_w + self._row_spacing
+            local child_w, child_h = child:measure()
+            local offset = child_w + self._row_spacing
             if tile_x + offset >= width then
                 tile_x = x + self._row_spacing
                 tile_y = tile_y + tile_h + self._column_spacing
@@ -41,14 +42,18 @@ function rt.FlowLayout:size_allocate(x, y, width, height)
         local tile_x = x + self._row_spacing
         local tile_y = y + self._column_spacing
 
+        local row_width = NEGATIVE_INFINITY
         for _, child in pairs(self._children) do
-            local offset = tile_h + self._column_spacing
+            local child_w, child_h = child:measure()
+            local offset = child_h + self._column_spacing
             if tile_y + offset >= height then
                 tile_y = y + self._column_spacing
                 tile_x = tile_x + tile_w + self._row_spacing
+                row_width = NEGATIVE_INFINITY
             end
             child:fit_into(rt.AABB(tile_x, tile_y, tile_w, tile_h))
             tile_y = tile_y + offset
+            row_max = math.max(row_width, child_w)
         end
     end
 end

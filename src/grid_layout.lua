@@ -29,8 +29,7 @@ function rt.GridLayout:size_allocate(x, y, width, height)
         local tile_y = y + self._column_spacing
 
         for _, child in pairs(self._children) do
-            local child_w, child_h = child:measure()
-            local offset = child_w + self._row_spacing
+            local offset = tile_w + self._row_spacing
             if tile_x + offset >= width then
                 tile_x = x + self._row_spacing
                 tile_y = tile_y + tile_h + self._column_spacing
@@ -43,8 +42,7 @@ function rt.GridLayout:size_allocate(x, y, width, height)
         local tile_y = y + self._column_spacing
 
         for _, child in pairs(self._children) do
-            local child_w, child_h = child:measure()
-            local offset = child_h + self._column_spacing
+            local offset = tile_h + self._column_spacing
             if tile_y + offset >= height then
                 tile_y = y + self._column_spacing
                 tile_x = tile_x + tile_w + self._row_spacing

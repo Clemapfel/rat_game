@@ -70,14 +70,17 @@ for _, color in pairs(rt.Palette) do
     if meta.is_string(color) then
         local spacer = rt.Spacer()
         spacer:set_color(rt.html_code_to_color(color))
-        spacer:set_minimum_size(50 + rt.random.integer(-25, 25), 50 + rt.random.integer(-25, 25))
+        spacer:set_minimum_size(
+            50 + rt.random.integer(-25, 25),
+            50 + rt.random.integer(-25, 25)
+        )
         spacer:set_expand(false)
         spacers[i] = spacer
         i = i + 1
     end
 end
-grid:set_row_spacing(10)
-grid:set_column_spacing(10)
+--grid:set_row_spacing(10)
+--grid:set_column_spacing(10)
 grid:set_alignment(rt.Alignment.CENTER)
 grid:set_children(spacers)
 

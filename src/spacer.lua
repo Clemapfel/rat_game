@@ -26,7 +26,10 @@ end
 
 --- @overload rt.Widget.measure
 function rt.Spacer:measure()
-    return self:get_minimum_size()
+    local w, h = self:get_minimum_size()
+    w = w + self:get_margin_left() + self:get_margin_right()
+    h = h + self:get_margin_top() + self:get_margin_bottom()
+    return w, h
 end
 
 --- @brief set color
