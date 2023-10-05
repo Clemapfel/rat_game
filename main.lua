@@ -49,6 +49,7 @@ require "list_layout"
 require "overlay_layout"
 require "split_layout"
 require "grid_layout"
+require "flow_layout"
 
 require "spacer"
 require "image_display"
@@ -59,7 +60,7 @@ require "label"
 if DEBUG_MODE then goto exit end
 
 window = rt.BinLayout()
-grid = rt.GridLayout()
+grid = rt.FlowLayout()
 grid:set_orientation(rt.Orientation.VERTICAL)
 window:set_child(grid)
 
@@ -69,7 +70,8 @@ for _, color in pairs(rt.Palette) do
     if meta.is_string(color) then
         local spacer = rt.Spacer()
         spacer:set_color(rt.html_code_to_color(color))
-        spacer:set_minimum_size(50, 50)
+        spacer:set_minimum_size(50 + rt.random.integer(-25, 25), 50 + rt.random.integer(-25, 25))
+        spacer:set_expand(false)
         spacers[i] = spacer
         i = i + 1
     end

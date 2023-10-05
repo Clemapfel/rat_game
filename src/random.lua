@@ -7,7 +7,8 @@ else
 end
 
 --- @brief generate number in [0, 1]
-function rt.rand()
+function rt.rand(_)
+    meta.assert_nil(_)
     return love.math.random()
 end
 

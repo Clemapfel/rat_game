@@ -1,6 +1,6 @@
---- @class rt.GridLayout
-rt.GridLayout = meta.new_type("GridLayout", function()
-    return meta.new(rt.GridLayout, {
+--- @class rt.FlowLayout
+rt.FlowLayout = meta.new_type("FlowLayout", function()
+    return meta.new(rt.FlowLayout, {
         _children = rt.Queue(),
         _orientation = rt.Orientation.VERTICAL,
         _min_n_rows = 0,
@@ -11,8 +11,8 @@ rt.GridLayout = meta.new_type("GridLayout", function()
 end)
 
 --- @overlay rt.Widget.size_allocate
-function rt.GridLayout:size_allocate(x, y, width, height)
-    meta.assert_isa(self, rt.GridLayout)
+function rt.FlowLayout:size_allocate(x, y, width, height)
+    meta.assert_isa(self, rt.FlowLayout)
 
     local tile_w = 0
     local tile_h = 0
@@ -29,8 +29,7 @@ function rt.GridLayout:size_allocate(x, y, width, height)
         local tile_y = y + self._column_spacing
 
         for _, child in pairs(self._children) do
-            local child_w, child_h = child:measure()
-            local offset = child_w + self._row_spacing
+            local offset = tile_w + self._row_spacing
             if tile_x + offset >= width then
                 tile_x = x + self._row_spacing
                 tile_y = tile_y + tile_h + self._column_spacing
@@ -43,8 +42,7 @@ function rt.GridLayout:size_allocate(x, y, width, height)
         local tile_y = y + self._column_spacing
 
         for _, child in pairs(self._children) do
-            local child_w, child_h = child:measure()
-            local offset = child_h + self._column_spacing
+            local offset = tile_h + self._column_spacing
             if tile_y + offset >= height then
                 tile_y = y + self._column_spacing
                 tile_x = tile_x + tile_w + self._row_spacing
@@ -56,7 +54,7 @@ function rt.GridLayout:size_allocate(x, y, width, height)
 end
 
 --- @overload rt.Widget.measure
-function rt.GridLayout:measure()
+function rt.FlowLayout:measure()
     local min_x = POSITIVE_INFINITY
     local min_y = POSITIVE_INFINITY
     local max_x = NEGATIVE_INFINITY
@@ -75,8 +73,8 @@ function rt.GridLayout:measure()
 end
 
 --- @overload rt.Drawable.draw
-function rt.GridLayout:draw()
-    meta.assert_isa(self, rt.GridLayout)
+function rt.FlowLayout:draw()
+    meta.assert_isa(self, rt.FlowLayout)
     if not self:get_is_visible() then return end
     for _, child in pairs(self._children) do
         child:draw()
@@ -84,8 +82,8 @@ function rt.GridLayout:draw()
 end
 
 --- @brief
-function rt.GridLayout:set_children(children)
-    meta.assert_isa(self, rt.GridLayout)
+function rt.FlowLayout:set_children(children)
+    meta.assert_isa(self, rt.FlowLayout)
     self._children:clear()
     for _, child in pairs(children) do
         meta.assert_isa(child, rt.Widget)
@@ -95,16 +93,16 @@ function rt.GridLayout:set_children(children)
 end
 
 --- @brief
-function rt.GridLayout:push_back(child)
-    meta.assert_isa(self, rt.GridLayout)
+function rt.FlowLayout:push_back(child)
+    meta.assert_isa(self, rt.FlowLayout)
     meta.assert_isa(child, rt.Widget)
     self._children:push_back(child)
     self:reformat()
 end
 
 --- @brief
-function rt.GridLayout:push_front(child)
-    meta.assert_isa(self, rt.GridLayout)
+function rt.FlowLayout:push_front(child)
+    meta.assert_isa(self, rt.FlowLayout)
     meta.assert_isa(child, rt.Widget)
     self._children:push_back(child)
     self:reformat()
@@ -112,8 +110,8 @@ end
 
 --- @brief
 --- @return rt.Widget
-function rt.GridLayout:pop_front()
-    meta.assert_isa(self, rt.GridLayout)
+function rt.FlowLayout:pop_front()
+    meta.assert_isa(self, rt.FlowLayout)
     local out = self._children:pop_front()
     self:reformat()
     return out
@@ -121,8 +119,8 @@ end
 
 --- @brief
 --- @return rt.Widget
-function rt.GridLayout:pop_back()
-    meta.assert_isa(self, rt.GridLayout)
+function rt.FlowLayout:pop_back()
+    meta.assert_isa(self, rt.FlowLayout)
     local out = self._children:pop_back()
     self:reformat()
     return out
@@ -130,8 +128,8 @@ end
 
 --- @brief set orientation, causes reformat
 --- @param orientation rt.Orientation
-function rt.GridLayout:set_orientation(orientation)
-    meta.assert_isa(self, rt.GridLayout)
+function rt.FlowLayout:set_orientation(orientation)
+    meta.assert_isa(self, rt.FlowLayout)
     if self._orientation == orientation then return end
     self._orientation = orientation
     self:reformat()
@@ -139,34 +137,34 @@ end
 
 --- @brief get orientation
 --- @return rt.Orientation
-function rt.GridLayout:get_orientation()
-    meta.assert_isa(self, rt.GridLayout)
+function rt.FlowLayout:get_orientation()
+    meta.assert_isa(self, rt.FlowLayout)
     return self._orientation
 end
 
 --- @brief TODO
-function rt.GridLayout:set_row_spacing(x)
-    meta.assert_isa(self, rt.GridLayout)
+function rt.FlowLayout:set_row_spacing(x)
+    meta.assert_isa(self, rt.FlowLayout)
     meta.assert_number(x)
     self._row_spacing = x
 end
 
 --- @brief
-function rt.GridLayout:get_row_spacing()
-    meta.assert_isa(self, rt.GridLayout)
+function rt.FlowLayout:get_row_spacing()
+    meta.assert_isa(self, rt.FlowLayout)
     return self._row_spacing
 end
 
 --- @brief TODO
-function rt.GridLayout:set_column_spacing(x)
-    meta.assert_isa(self, rt.GridLayout)
+function rt.FlowLayout:set_column_spacing(x)
+    meta.assert_isa(self, rt.FlowLayout)
     meta.assert_number(x)
     self._column_spacing = x
 end
 
 --- @brief
-function rt.GridLayout:get_column_spacing()
-    meta.assert_isa(self, rt.GridLayout)
+function rt.FlowLayout:get_column_spacing()
+    meta.assert_isa(self, rt.FlowLayout)
     return self._column_spacing
 end
 
