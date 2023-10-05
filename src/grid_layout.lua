@@ -23,32 +23,51 @@ function rt.GridLayout:size_allocate(x, y, width, height)
         tile_h = math.max(tile_h, h)
     end
 
-    if self._orientation == rt.Orientation.HORIZONTAL then
+    local n_rows = math.floor(width / (tile_w + self._row_spacing))
+    tile_w = width / n_rows
 
+    local n_cols = math.floor(height / (tile_h + self._column_spacing))
+    tile_h = height / n_cols
+
+    if self._orientation == rt.Orientation.HORIZONTAL then
         local tile_x = x + self._row_spacing
         local tile_y = y + self._column_spacing
 
+        local row_i = 0
+        local col_i = 0
         for _, child in pairs(self._children) do
-            local offset = tile_w + self._row_spacing
-            if tile_x + offset >= width then
-                tile_x = x + self._row_spacing
-                tile_y = tile_y + tile_h + self._column_spacing
+
+            child:fit_into(rt.AABB(
+                x + (tile_w * row_i) + 0.5 * self._row_spacing,
+                y + (tile_h * col_i) + 0.5 * self._column_spacing,
+                tile_w - 0.5 * self._row_spacing,
+                tile_h - 0.5 * self._column_spacing
+            ))
+            row_i = row_i + 1
+            if row_i >= n_rows then
+                col_i = col_i + 1
+                row_i = 0
             end
-            child:fit_into(rt.AABB(tile_x, tile_y, tile_w, tile_h))
-            tile_x = tile_x + offset
         end
     elseif self._orientation == rt.Orientation.VERTICAL then
         local tile_x = x + self._row_spacing
         local tile_y = y + self._column_spacing
 
+        local row_i = 0
+        local col_i = 0
         for _, child in pairs(self._children) do
-            local offset = tile_h + self._column_spacing
-            if tile_y + offset >= height then
-                tile_y = y + self._column_spacing
-                tile_x = tile_x + tile_w + self._row_spacing
+
+            child:fit_into(rt.AABB(
+                    x + (tile_w * row_i) + 0.5 * self._row_spacing,
+                    y + (tile_h * col_i) + 0.5 * self._column_spacing,
+                    tile_w - 0.5 * self._row_spacing,
+                    tile_h - 0.5 * self._column_spacing
+            ))
+            col_i = col_i + 1
+            if col_i >= n_cols then
+                row_i = row_i + 1
+                col_i = 0
             end
-            child:fit_into(rt.AABB(tile_x, tile_y, tile_w, tile_h))
-            tile_y = tile_y + offset
         end
     end
 end

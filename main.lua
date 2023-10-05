@@ -60,7 +60,7 @@ require "label"
 if DEBUG_MODE then goto exit end
 
 window = rt.BinLayout()
-grid = rt.FlowLayout()
+grid = rt.GridLayout()
 grid:set_orientation(rt.Orientation.VERTICAL)
 window:set_child(grid)
 
@@ -74,12 +74,12 @@ for _, color in pairs(rt.Palette) do
             50 + rt.random.integer(-25, 25),
             50 + rt.random.integer(-25, 25)
         )
-        spacer:set_expand(false)
+        spacer:set_expand(true)
         spacers[i] = spacer
         i = i + 1
     end
 end
---grid:set_row_spacing(10)
+grid:set_row_spacing(10)
 --grid:set_column_spacing(10)
 grid:set_alignment(rt.Alignment.CENTER)
 grid:set_children(spacers)
