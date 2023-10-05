@@ -104,6 +104,15 @@ function rt.Queue:is_empty()
     return self:size() == 0
 end
 
+--- @brief remove all children
+function rt.Queue:clear()
+    meta.assert_isa(self, rt.Queue)
+    self.elements = {}
+    self.first_element = 0
+    self.last_element = 1
+    self.n_elements = 0
+end
+
 --- @brief [internal] test queue
 function rt.test.queue()
     local queue = rt.Queue()

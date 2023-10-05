@@ -1,9 +1,19 @@
 --- @class ListLayout
-rt.ListLayout = meta.new_type("ListLayout", function()
-    return meta.new(rt.ListLayout, {
+rt.ListLayout = meta.new_type("ListLayout", function(orientation, ...)
+    if meta.is_nil(orientation) then
+        orientation = rt.Orientation.VERTICAL
+    end
+    meta.assert_enum(orientation, rt.Orientation)
+
+    local out = meta.new(rt.ListLayout, {
         _children = rt.Queue(),
         _orientation = rt.Orientation
     }, rt.Drawable, rt.Widget)
+
+    for _, x in pairs({...}) do
+        out:push_bacK(x)
+    end
+    return out
 end)
 
 --- @overload rt.Drawable.draw

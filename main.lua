@@ -7,7 +7,7 @@ pcall(try_connect_emmy_lua_debugger)
 
 DEBUG_MODE = love == nil
 if DEBUG_MODE then
-    RESOURCE_PATH = "/home/clem/Workspace/rat_game/lua"
+    RESOURCE_PATH = "/home/clem/Workspace/rat_game"
     love = {}
     love.graphics = {}
     love.graphics.getWidth = function() return 1 end
@@ -58,33 +58,30 @@ require "label"
 
 if DEBUG_MODE then goto exit end
 
-rgba = rt.html_code_to_color("#FF00FF12")
-println(serialize(rgba))
-html = rt.color_to_html_code(rgba)
-println(serialize(html, true))
-
 window = rt.BinLayout()
-gamepad = rt.GamepadController(window)
-gamepad.signal:connect(rt.SIGNAL_CONTROLLER_ADDED, function(self, id)
-    println("added: ", id)
-end)
-gamepad.signal:connect(rt.SIGNAL_CONTROLLER_REMOVED, function(self, id)
-    println("removed: ", id)
-end)
-gamepad.signal:connect(rt.SIGNAL_BUTTON_PRESSED, function(self, id, button)
-    println("pressed: ", id, " ", button)
-end)
-gamepad.signal:connect(rt.SIGNAL_BUTTON_RELEASED, function(self, id, button)
-    println("released: ", id, " ", button)
-end)
-gamepad.signal:connect(rt.SIGNAL_AXIS_CHANGED, function(self, id, axis, value)
-    println("axis: ", id, " ", axis, " ", value)
-end)
+grid = rt.GridLayout()
+grid:set_orientation(rt.Orientation.VERTICAL)
+window:set_child(grid)
+
+i = 0
+spacers = {}
+for _, color in pairs(rt.Palette) do
+    if meta.is_string(color) then
+        local spacer = rt.Spacer()
+        spacer:set_color(rt.html_code_to_color(color))
+        spacer:set_minimum_size(50, 50)
+        spacers[i] = spacer
+        i = i + 1
+    end
+end
+grid:set_row_spacing(10)
+grid:set_column_spacing(10)
+grid:set_alignment(rt.Alignment.CENTER)
+grid:set_children(spacers)
 
 -- @brief window resized
 function love.resize(width, height)
     window:fit_into(rt.AABB(0, 0, width, height))
-    layout:set_ratio(layout:get_ratio() + 0.05)
 end
 
 --- @brief startup
@@ -141,7 +138,7 @@ function love.draw()
             line:draw()
         end
     end
-    draw_guides()
+    --draw_guides()
 
     function show_fps()
         local text = love.graphics.newText(love.graphics.getFont(), tostring(math.round(love.timer.getFPS())))

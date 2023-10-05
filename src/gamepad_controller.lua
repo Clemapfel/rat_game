@@ -133,6 +133,24 @@ end
 --- @brief [internal] test gamepad controller
 function rt.test.gamepad_controller()
     -- TODO
+    --[[
+    gamepad = rt.GamepadController(window)
+    gamepad.signal:connect(rt.SIGNAL_CONTROLLER_ADDED, function(self, id)
+        println("added: ", id)
+    end)
+    gamepad.signal:connect(rt.SIGNAL_CONTROLLER_REMOVED, function(self, id)
+        println("removed: ", id)
+    end)
+    gamepad.signal:connect(rt.SIGNAL_BUTTON_PRESSED, function(self, id, button)
+        println("pressed: ", id, " ", button)
+    end)
+    gamepad.signal:connect(rt.SIGNAL_BUTTON_RELEASED, function(self, id, button)
+        println("released: ", id, " ", button)
+    end)
+    gamepad.signal:connect(rt.SIGNAL_AXIS_CHANGED, function(self, id, axis, value)
+        println("axis: ", id, " ", axis, " ", value)
+    end)
+    ]]--
 end
 rt.test.gamepad_controller()
 

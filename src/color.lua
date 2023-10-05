@@ -163,6 +163,7 @@ function rt.html_code_to_color(code)
     meta.assert_string(code)
 
     function hex_char_to_int(c)
+        c = string.upper(c)
         if c == '0' then return 0
         elseif c == '1' then return 1
         elseif c == '2' then return 2
@@ -187,11 +188,18 @@ function rt.html_code_to_color(code)
         return left * 16 + right
     end
 
+    local error_reason = ""
+
     local as_hex = {}
-    local start_i = ternary(string.sub(code, 1, 1) == '#', 2, 1)
-    for i = start_i, #code do
+    if string.sub(code, 1, 1) ~= '#' then
+        code = "#" .. code
+    end
+    for i = 2, #code do
         local to_push = hex_char_to_int(string.sub(code, i, i))
-        if to_push == -1 then goto error end
+        if to_push == -1 then
+            error_reason = "character `" .. string.sub(code, i, i) .. "` is not a valid hexadecimal digit"
+            goto error
+        end
         table.insert(as_hex, to_push)
     end
 
@@ -210,11 +218,12 @@ function rt.html_code_to_color(code)
                 hex_component_to_int(as_hex[7], as_hex[8]) / 255.0
         )
     else
+        error_reason = "more than 6 or 8 digits specified"
         goto error
     end
 
     ::error::
-    error("[rt] In rt.html_code_to_rgba: `" .. code .. "` is not a valid hexadecimal color identifier")
+    error("[rt] In rt.html_code_to_rgba: `" .. code .. "` is not a valid hexadecimal color identifier. Reason: " .. error_reason)
 end
 
 --- @brief
@@ -253,7 +262,7 @@ end
 --- @brief [internal] test colors
 function rt.test.colors()
     -- TODO
-    local as_rgba = rt.html_code_to_color("#12345678")
+    local as_rgba = rt.html_code_to_color("#123456")
     assert(rt.color_to_html_code(as_rgba) == "#123456")
     as_rgba = rt.html_code_to_color("#ABCDEF")
     assert(rt.color_to_html_code(as_rgba) == "#ABCDEF")
