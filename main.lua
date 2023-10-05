@@ -61,7 +61,7 @@ if DEBUG_MODE then goto exit end
 
 window = rt.BinLayout()
 grid = rt.GridLayout()
-grid:set_orientation(rt.Orientation.VERTICAL)
+grid:set_orientation(rt.Orientation.HORIZONTAL)
 window:set_child(grid)
 
 i = 0
@@ -74,13 +74,13 @@ for _, color in pairs(rt.Palette) do
             50 + rt.random.integer(-25, 25),
             50 + rt.random.integer(-25, 25)
         )
-        spacer:set_expand(true)
+        spacer:set_expand(false)
         spacers[i] = spacer
         i = i + 1
     end
 end
 grid:set_row_spacing(10)
---grid:set_column_spacing(10)
+grid:set_max_n_columns(5)
 grid:set_alignment(rt.Alignment.CENTER)
 grid:set_children(spacers)
 

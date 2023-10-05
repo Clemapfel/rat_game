@@ -3,8 +3,10 @@ rt.GridLayout = meta.new_type("GridLayout", function()
     return meta.new(rt.GridLayout, {
         _children = rt.Queue(),
         _orientation = rt.Orientation.VERTICAL,
-        _min_n_rows = 0,
         _min_n_cols = 0,
+        _max_n_cols = POSITIVE_INFINITY,
+        _min_n_rows = 0,
+        _max_n_rows = POSITIVE_INFINITY,
         _row_spacing = 0,
         _column_spacing = 0
     }, rt.Drawable, rt.Widget)
@@ -23,13 +25,20 @@ function rt.GridLayout:size_allocate(x, y, width, height)
         tile_h = math.max(tile_h, h)
     end
 
-    local n_rows = math.floor(width / (tile_w + self._row_spacing))
-    tile_w = width / n_rows
-
-    local n_cols = math.floor(height / (tile_h + self._column_spacing))
-    tile_h = height / n_cols
+    if self._max_n_rows * self._max_n_cols < self._children:size() then
+        println("[rt] In rt.GridLayout:size_allocate: Requested grid layout to have a maximum size of `" .. tostring(self._max_n_rows) .. " * " .. tostring(self._max_n_cols) .. " = " .. tostring(self._max_n_rows * self._max_n_cols) .. "`, but it has `" .. tostring(self._children:size()) .. "` elements.")
+    end
 
     if self._orientation == rt.Orientation.HORIZONTAL then
+
+        local n_rows = math.floor(width / (tile_w + self._row_spacing))
+        n_rows = clamp(n_rows, self._min_n_rows, self._max_n_rows)
+        tile_w = math.max(tile_w, width / n_rows)
+
+        local n_cols = math.floor(height / (tile_h + self._column_spacing))
+        n_cols = clamp(n_cols, self._min_n_cols, self._max_n_cols)
+        tile_h = math.max(tile_h, height / n_cols)
+
         local tile_x = x + self._row_spacing
         local tile_y = y + self._column_spacing
 
@@ -50,6 +59,15 @@ function rt.GridLayout:size_allocate(x, y, width, height)
             end
         end
     elseif self._orientation == rt.Orientation.VERTICAL then
+
+        local n_rows = math.floor(width / (tile_w + self._row_spacing))
+        n_rows = clamp(n_rows, self._min_n_rows, self._max_n_rows)
+        tile_w = math.max(tile_w, width / n_rows)
+
+        local n_cols = math.floor(height / (tile_h + self._column_spacing))
+        n_cols = clamp(n_cols, self._min_n_cols, self._max_n_cols)
+        tile_h = math.max(tile_h, height / n_cols)
+
         local tile_x = x + self._row_spacing
         local tile_y = y + self._column_spacing
 
@@ -58,10 +76,10 @@ function rt.GridLayout:size_allocate(x, y, width, height)
         for _, child in pairs(self._children) do
 
             child:fit_into(rt.AABB(
-                    x + (tile_w * row_i) + 0.5 * self._row_spacing,
-                    y + (tile_h * col_i) + 0.5 * self._column_spacing,
-                    tile_w - 0.5 * self._row_spacing,
-                    tile_h - 0.5 * self._column_spacing
+                x + (tile_w * row_i) + 0.5 * self._row_spacing,
+                y + (tile_h * col_i) + 0.5 * self._column_spacing,
+                tile_w - 0.5 * self._row_spacing,
+                tile_h - 0.5 * self._column_spacing
             ))
             col_i = col_i + 1
             if col_i >= n_cols then
@@ -165,7 +183,10 @@ end
 function rt.GridLayout:set_row_spacing(x)
     meta.assert_isa(self, rt.GridLayout)
     meta.assert_number(x)
-    self._row_spacing = x
+    if self._row_spacing ~= x then
+        self._row_spacing = x
+        self:reformat()
+    end
 end
 
 --- @brief
@@ -178,12 +199,50 @@ end
 function rt.GridLayout:set_column_spacing(x)
     meta.assert_isa(self, rt.GridLayout)
     meta.assert_number(x)
-    self._column_spacing = x
+    if self._column_spacing ~= x then
+        self._column_spacing = x
+        self:reformat();
+    end
 end
-
 --- @brief
 function rt.GridLayout:get_column_spacing()
     meta.assert_isa(self, rt.GridLayout)
     return self._column_spacing
+end
+
+--- @brief
+function rt.GridLayout:set_min_n_rows(n)
+    meta.assert_isa(self, rt.GridLayout)
+    if self._min_n_rows ~= n then
+        self._min_n_rows = n
+        self:reformat()
+    end
+end
+
+--- @brief
+function rt.GridLayout:set_max_n_rows(n)
+    meta.assert_isa(self, rt.GridLayout)
+    if self._max_n_rows ~= n then
+        self._max_n_rows = n
+        self:reformat()
+    end
+end
+
+--- @brief
+function rt.GridLayout:set_min_n_columns(n)
+    meta.assert_isa(self, rt.GridLayout)
+    if self._min_n_cols ~= n then
+        self._min_n_cols = n
+        self:reformat()
+    end
+end
+
+--- @brief
+function rt.GridLayout:set_max_n_columns(n)
+    meta.assert_isa(self, rt.GridLayout)
+    if self._max_n_cols ~= n then
+        self._max_n_cols = n
+        self:reformat()
+    end
 end
 
