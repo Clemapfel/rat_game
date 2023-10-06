@@ -222,9 +222,24 @@ function rt.Rectangle:set_size(width, height)
 end
 
 --- @brief TODO
+function rt.Rectangle:get_size()
+    meta.assert_isa(self, rt.Rectangle)
+    return self._w, self._h
+end
+
+--- @brief TODO
 function rt.Rectangle:set_border_radius(px)
     meta.assert_isa(self, rt.Rectangle)
     self._border_radius = px
+end
+
+--- @brief TODO
+function rt.Rectangle:resize(aabb)
+    meta.assert_isa(aabb, rt.AABB)
+    self._x = aabb.x
+    self._y = aabb.y
+    self._w = aabb.width
+    self._h = aabb.height
 end
 
 --- @class rt.Ellipse

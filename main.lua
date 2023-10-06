@@ -54,35 +54,35 @@ require "flow_layout"
 require "spacer"
 require "image_display"
 require "label"
+require "scrollbar"
 
 -- ### MAIN ###
 
 if DEBUG_MODE then goto exit end
 
 window = rt.BinLayout()
-grid = rt.GridLayout()
-grid:set_orientation(rt.Orientation.HORIZONTAL)
-window:set_child(grid)
+box = rt.ListLayout(rt.Orientation.VERTICAL)
+window:set_child(box)
 
-i = 0
-spacers = {}
-for _, color in pairs(rt.Palette) do
-    if meta.is_string(color) then
-        local spacer = rt.Spacer()
-        spacer:set_color(rt.html_code_to_color(color))
-        spacer:set_minimum_size(
-            50 + rt.random.integer(-25, 25),
-            50 + rt.random.integer(-25, 25)
-        )
-        spacer:set_expand(false)
-        spacers[i] = spacer
-        i = i + 1
-    end
+for i = 0, 4 do
+    local scrollbar = rt.Scrollbar(rt.Orientation.HORIZONTAL)
+    scrollbar:set_margin_vertical(10)
+    local component = rt.add_keyboard_controller(scrollbar)
+    component.signal:connect("key_pressed", function(self, key)
+        if key == rt.KeyboardKey.UP_ARROW then
+            self.instance:scroll_up(0.01)
+        end
+
+        if key == rt.KeyboardKey.DOWN_ARROW then
+            self.instance:scroll_down(0.01)
+        end
+    end)
+    box:push_back(scrollbar)
 end
-grid:set_row_spacing(10)
-grid:set_max_n_columns(5)
-grid:set_alignment(rt.Alignment.CENTER)
-grid:set_children(spacers)
+
+
+--scrollbar:set_expand_horizontally(false)
+--scrollbar:set_minimum_size(10, 0)
 
 -- @brief window resized
 function love.resize(width, height)

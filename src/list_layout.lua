@@ -15,6 +15,7 @@ rt.ListLayout = meta.new_type("ListLayout", function(orientation, ...)
     end
     return out
 end)
+rt.BoxLayout = rt.ListLayout
 
 --- @overload rt.Drawable.draw
 function rt.ListLayout:draw()
