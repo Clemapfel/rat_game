@@ -1,16 +1,23 @@
 --- @class rt.RGBA
-rt.RGBA = function(r, g, b, a)
-    if meta.is_nil(r) then r = 1 end
-    if meta.is_nil(g) then g = 1 end
-    if meta.is_nil(b) then b = 1 end
-    if meta.is_nil(a) then a = 1 end
+rt.RGBA = function(r_or_string, g, b, a)
 
-    local out = {}
-    out.r = r
-    out.g = g
-    out.b = b
-    out.a = a
-    return out
+    if meta.is_string(r_or_string) then
+        local code = r_or_string
+        return rt.html_code_to_color(code)
+    else
+        local r = r_or_string
+        if meta.is_nil(r) then r = 1 end
+        if meta.is_nil(g) then g = 1 end
+        if meta.is_nil(b) then b = 1 end
+        if meta.is_nil(a) then a = 1 end
+
+        local out = {}
+        out.r = r
+        out.g = g
+        out.b = b
+        out.a = a
+        return out
+    end
 end
 
 --- @brief [internal]
