@@ -121,9 +121,13 @@ end
 --- @brief
 function rt.GridLayout:set_children(children)
     meta.assert_isa(self, rt.GridLayout)
+    for child in pairs(self._children) do
+        child:set_parent(nil)
+    end
     self._children:clear()
     for _, child in pairs(children) do
         meta.assert_isa(child, rt.Widget)
+        child:set_parent(self)
         self._children:push_back(child)
     end
     self:reformat()
@@ -133,6 +137,7 @@ end
 function rt.GridLayout:push_back(child)
     meta.assert_isa(self, rt.GridLayout)
     meta.assert_isa(child, rt.Widget)
+    child:set_parent(self)
     self._children:push_back(child)
     self:reformat()
 end
@@ -141,6 +146,7 @@ end
 function rt.GridLayout:push_front(child)
     meta.assert_isa(self, rt.GridLayout)
     meta.assert_isa(child, rt.Widget)
+    child:set_parent(self)
     self._children:push_back(child)
     self:reformat()
 end
@@ -150,6 +156,7 @@ end
 function rt.GridLayout:pop_front()
     meta.assert_isa(self, rt.GridLayout)
     local out = self._children:pop_front()
+    out:set_parent(nil)
     self:reformat()
     return out
 end
@@ -159,6 +166,7 @@ end
 function rt.GridLayout:pop_back()
     meta.assert_isa(self, rt.GridLayout)
     local out = self._children:pop_back()
+    out:set_parent(nil)
     self:reformat()
     return out
 end

@@ -27,6 +27,7 @@ rt.Widget._minimum_width = 1
 rt.Widget._minimum_height = 1
 rt.Widget._realized = true
 rt.Widget._focused = true
+rt.Widget._parent = nil
 
 --- @brief abstract method, emitted when widgets bounds should change
 --- @param x Number
@@ -302,6 +303,29 @@ end
 function rt.Widget:get_has_focus()
     meta.assert_isa(self, rt.Widget)
     return self._focused
+end
+
+--- @brief set the parent property of the child. If it already has a parent, print a warning
+function rt.Widget:set_parent(other)
+    meta.assert_isa(self, rt.Widget)
+
+    if meta.is_nil(other) then
+        self._parent = nil
+        return
+    end
+
+    meta.assert_isa(other, rt.Widget)
+    if not meta.is_nil(self._parent) then
+        println("[rt] In Widget:set_parent: warning: replacing parent of hild `" .. meta.typeof(self) .. "`, which already has a parent")
+    end
+
+    self._parent = other
+end
+
+--- @brief get parent
+function rt.Widget:get_parent()
+    meta.assert_isa(self, rt.Widget)
+    return self._parent
 end
 
 --- @brief [internal] calulcate size along one axis

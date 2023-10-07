@@ -89,9 +89,14 @@ end
 --- @brief
 function rt.FlowLayout:set_children(children)
     meta.assert_isa(self, rt.FlowLayout)
+    for child in pairs(self._children) do
+        child:set_parent(nil)
+    end
+
     self._children:clear()
     for _, child in pairs(children) do
         meta.assert_isa(child, rt.Widget)
+        child:set_parent(self)
         self._children:push_back(child)
     end
     self:reformat()
@@ -101,6 +106,7 @@ end
 function rt.FlowLayout:push_back(child)
     meta.assert_isa(self, rt.FlowLayout)
     meta.assert_isa(child, rt.Widget)
+    child:set_parent(self)
     self._children:push_back(child)
     self:reformat()
 end
@@ -109,6 +115,7 @@ end
 function rt.FlowLayout:push_front(child)
     meta.assert_isa(self, rt.FlowLayout)
     meta.assert_isa(child, rt.Widget)
+    child:set_parent(self)
     self._children:push_back(child)
     self:reformat()
 end
@@ -118,6 +125,7 @@ end
 function rt.FlowLayout:pop_front()
     meta.assert_isa(self, rt.FlowLayout)
     local out = self._children:pop_front()
+    out:set_parent(nil)
     self:reformat()
     return out
 end
@@ -127,6 +135,7 @@ end
 function rt.FlowLayout:pop_back()
     meta.assert_isa(self, rt.FlowLayout)
     local out = self._children:pop_back()
+    out:set_parent(nil)
     self:reformat()
     return out
 end

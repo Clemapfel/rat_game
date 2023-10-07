@@ -43,13 +43,27 @@ end
 function rt.OverlayLayout:set_base_child(child)
     meta.assert_isa(self, rt.OverlayLayout)
     meta.assert_isa(child, rt.Widget)
+
+    self:remove_base_child()
+    child:set_parent(self)
     self._base_child = child
+end
+
+--- @brief
+function rt.OverlayLayout:remove_base_child()
+    meta.assert_isa(self, rt.OverlayLayout)
+
+    if not meta.is_nil(self._base_child) then
+        self._base_child:set_parent(nil)
+        self._base_child = nil
+    end
 end
 
 --- @brief
 function rt.OverlayLayout:add_overlay(child)
     meta.assert_isa(self, rt.OverlayLayout)
     meta.assert_isa(child, rt.Widget)
+    child:set_parent(self)
     self._overlays:push_back(child)
 end
 

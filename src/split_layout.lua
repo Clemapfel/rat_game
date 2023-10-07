@@ -57,6 +57,8 @@ end
 --- @brief
 function rt.SplitLayout:set_start_child(child)
     meta.assert_isa(self, rt.SplitLayout)
+    self:remove_start_child()
+    child:set_parent(self)
     self._start_child = child
     self:reformat()
 end
@@ -65,6 +67,15 @@ end
 function rt.SplitLayout:get_start_child()
     meta.assert_isa(self, rt.SplitLayout)
     return self._start_child
+end
+
+--- @brief
+function rt.SplitLayout:remove_start_child()
+    meta.assert_isa(self, rt.SplitLayout)
+    if not meta.is_nil(self._start_child) then
+        self._start_child:set_parent(nil)
+        self._start_child = nil
+    end
 end
 
 --- @brief
@@ -78,6 +89,15 @@ end
 function rt.SplitLayout:get_end_child()
     meta.assert_isa(self, rt.SplitLayout)
     return self._end_child
+end
+
+--- @brief
+function rt.SplitLayout:remove_end_child()
+    meta.assert_isa(self, rt.SplitLayout)
+    if not meta.is_nil(self._end_child) then
+        self._end_child:set_parent(nil)
+        self._end_child = nil
+    end
 end
 
 --- @brief

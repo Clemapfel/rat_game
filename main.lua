@@ -80,7 +80,6 @@ for i = 0, 4 do
     box:push_back(scrollbar)
 end
 
-
 --scrollbar:set_expand_horizontally(false)
 --scrollbar:set_minimum_size(10, 0)
 

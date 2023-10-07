@@ -104,9 +104,25 @@ function rt.ListLayout:measure()
 end
 
 --- @brief
+function rt.ListLayout:set_children(children)
+    meta.assert_isa(self, rt.GridLayout)
+    for child in pairs(self._children) do
+        child:set_parent(nil)
+    end
+    self._children:clear()
+    for _, child in pairs(children) do
+        meta.assert_isa(child, rt.Widget)
+        child:set_parent(self)
+        self._children:push_back(child)
+    end
+    self:reformat()
+end
+
+--- @brief
 function rt.ListLayout:push_back(child)
     meta.assert_isa(self, rt.ListLayout)
     meta.assert_isa(child, rt.Widget)
+    child:set_parent(self)
     self._children:push_back(child)
     self:reformat()
 end
@@ -115,6 +131,7 @@ end
 function rt.ListLayout:push_front(child)
     meta.assert_isa(self, rt.ListLayout)
     meta.assert_isa(child, rt.Widget)
+    child:set_parent(self)
     self._children:push_back(child)
     self:reformat()
 end
@@ -124,6 +141,7 @@ end
 function rt.ListLayout:pop_front()
     meta.assert_isa(self, rt.ListLayout)
     local out = self._children:pop_front()
+    out:set_parent(nil)
     self:reformat()
     return out
 end
@@ -133,6 +151,7 @@ end
 function rt.ListLayout:pop_back()
     meta.assert_isa(self, rt.ListLayout)
     local out = self._children:pop_back()
+    out:set_parent(nil)
     self:reformat()
     return out
 end
