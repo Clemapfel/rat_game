@@ -55,6 +55,7 @@ require "spacer"
 require "image_display"
 require "label"
 require "scrollbar"
+require "viewport"
 
 -- ### MAIN ###
 
@@ -62,11 +63,35 @@ if DEBUG_MODE then goto exit end
 
 window = rt.BinLayout()
 box = rt.ListLayout(rt.Orientation.VERTICAL)
-window:set_child(box)
+viewport = rt.Viewport()
+viewport:set_child(box)
+
+viewport:set_expand_horizontally(true)
+viewport:set_horizontal_alignment(rt.Alignment.START)
+viewport:set_minimum_size(150, 0)
+window:set_child(viewport)
+
+key = rt.add_keyboard_controller(viewport)
+key.signal:connect("key_pressed", function(self, key)
+    if key == rt.KeyboardKey.ARROW_UP then
+        viewport:translate(0, -10)
+    elseif key == rt.KeyboardKey.ARROW_DOWN then
+        viewport:translate(0, 10)
+    elseif key == rt.KeyboardKey.ARROW_LEFT then
+        viewport:translate(-10, 0)
+    elseif key == rt.KeyboardKey.ARROW_RIGHT then
+        viewport:translate(10, 0)
+    elseif key == rt.KeyboardKey.PLUS then
+        viewport:scale(1.1)
+    elseif key == rt.KeyboardKey.MINUS then
+        viewport:scale(0.9)
+    end
+end)
 
 for i = 0, 4 do
     local scrollbar = rt.Scrollbar(rt.Orientation.HORIZONTAL)
     scrollbar:set_margin_vertical(10)
+    --[[
     local component = rt.add_keyboard_controller(scrollbar)
     component.signal:connect("key_pressed", function(self, key)
         if key == rt.KeyboardKey.UP_ARROW then
@@ -77,11 +102,9 @@ for i = 0, 4 do
             self.instance:scroll_down(0.01)
         end
     end)
+    ]]--
     box:push_back(scrollbar)
 end
-
---scrollbar:set_expand_horizontally(false)
---scrollbar:set_minimum_size(10, 0)
 
 -- @brief window resized
 function love.resize(width, height)

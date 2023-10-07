@@ -398,6 +398,14 @@ function meta.new_enum(fields)
     metatable.__ipairs = function(this)
         return ipairs(getmetatable(this).properties)
     end
+    metatable.__index = function(this, key)
+        if not meta.has_property(this, key) then
+            error("[rt] In Enum:__index: Key `" .. key .. "` does not exist for enum")
+        else
+            local metatable = getmetatable(this)
+            return metatable.properties[key]
+        end
+    end
 
     meta.set_is_mutable(out, false)
     return out
