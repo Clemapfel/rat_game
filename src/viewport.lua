@@ -6,6 +6,7 @@ rt.Viewport = meta.new_type("Viewport", function()
         _y_offset = 0,
         _x_scale = 1,
         _y_scale = 1,
+        _rotation = rt.Angle(),
         _propagate_width = false,
         _propagate_height = false,
         _width = 0,
@@ -26,10 +27,14 @@ function rt.Viewport:draw()
 
         love.graphics.translate(self._x_offset, self._y_offset)
         love.graphics.scale(self._x_scale, self._y_scale)
+
+        love.graphics.translate(self._width * 0.5, self._height * 0.5)
+        love.graphics.rotate(self._rotation:as_radians())
+        love.graphics.translate(self._width * -0.5, self._height * -0.5)
+
         self._child:draw()
 
         love.graphics.setScissor()
-
         love.graphics.pop()
     end
 end
@@ -145,6 +150,7 @@ end
 
 --- @brief
 function rt.Viewport:set_scale(x, y)
+    meta.assert_isa(self, rt.Viewport)
     meta.assert_number(x)
     if meta.is_nil(y) then y = x end
     meta.assert_number(y)
@@ -155,10 +161,32 @@ end
 
 --- @brief
 function rt.Viewport:scale(x, y)
+    meta.assert_isa(self, rt.Viewport)
     meta.assert_number(x)
     if meta.is_nil(y) then y = x end
     meta.assert_number(y)
 
     self._x_scale = self._x_scale * x
     self._y_scale = self._y_scale * y
+end
+
+--- @brief
+function rt.Viewport:set_rotation(angle)
+    meta.assert_isa(self, rt.Viewport)
+    meta.assert_isa(angle, rt.Angle)
+
+    self._rotation = angle
+end
+
+--- @brief
+function rt.Viewport:get_rotation()
+    meta.assert_isa(self, rt.Viewport)
+    return self._rotation
+end
+
+--- @brief
+function rt.Viewport:rotate(angle)
+    meta.assert_isa(self, rt.Viewport)
+    meta.assert_isa(angle, rt.Angle)
+    self._rotation = self._rotation + angle
 end

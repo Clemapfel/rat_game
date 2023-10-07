@@ -27,6 +27,7 @@ rt.test = {}
 require "common"
 require "meta"
 require "vector"
+require "angle"
 require "random"
 require "signal_component"
 require "queue"
@@ -82,9 +83,11 @@ key.signal:connect("key_pressed", function(self, key)
     elseif key == rt.KeyboardKey.ARROW_RIGHT then
         viewport:translate(10, 0)
     elseif key == rt.KeyboardKey.PLUS then
-        viewport:scale(1.1)
+        viewport:rotate(rt.degrees(-10))
+        --viewport:scale(1.1)
     elseif key == rt.KeyboardKey.MINUS then
-        viewport:scale(0.9)
+        --viewport:scale(0.9)
+        viewport:rotate(rt.degrees(10))
     end
 end)
 
