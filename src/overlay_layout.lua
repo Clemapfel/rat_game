@@ -1,7 +1,7 @@
 --- @class OverlayLayout
 rt.OverlayLayout = meta.new_type("OverlayLayout", function()
     return meta.new(rt.OverlayLayout, {
-        _base_child = {},
+        _base_child = nil,
         _overlays = rt.Queue()
     }, rt.Drawable, rt.Widget)
 end)
