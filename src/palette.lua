@@ -102,6 +102,9 @@ rt.Palette.BACKGROUND_OUTLINE = rt.Palette.BLACK
 rt.Palette.FOREGROUND = rt.Palette.WHITE
 rt.Palette.FOREGROUND_OUTLINE = rt.Palette.BACKGROUND_OUTLINE
 
+rt.Palette.HIGHLIGHT = rt.Palette.BLUE_2
+rt.Palette.HIGHLIGHT_OUTLINE = rt.Palette.BLUE_4
+
 --- @brief
 function rt.Palette.lighten(color, offset)
     offset = offset or 0.3
