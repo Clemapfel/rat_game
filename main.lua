@@ -51,6 +51,7 @@ require "overlay_layout"
 require "split_layout"
 require "grid_layout"
 require "flow_layout"
+require "aspect_layout"
 
 require "spacer"
 require "image_display"
@@ -64,13 +65,20 @@ if DEBUG_MODE then goto exit end
 
 window = rt.BinLayout()
 box = rt.ListLayout(rt.Orientation.VERTICAL)
-viewport = rt.Viewport()
-viewport:set_child(box)
+overlay = rt.OverlayLayout()
+base = rt.Spacer()
+base:set_color(rt.RGBA(0.1, 0.9, 0.9))
+overlay:set_base_child(base)
+overlay:add_overlay(box)
 
-viewport:set_expand_horizontally(true)
-viewport:set_horizontal_alignment(rt.Alignment.START)
+viewport = rt.Viewport()
+--viewport:set_child(overlay)
+
 viewport:set_minimum_size(150, 0)
-window:set_child(viewport)
+
+aspect = rt.AspectLayout(1.0)
+aspect:set_child(overlay)
+window:set_child(aspect)
 
 key = rt.add_keyboard_controller(viewport)
 key.signal:connect("key_pressed", function(self, key)
