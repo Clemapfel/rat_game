@@ -9,9 +9,9 @@ rt.Spacer = meta.new_type("Spacer", function(is_transparent)
         _shape = rt.Rectangle(0, 0, 1, 1),
         _outline = rt.Rectangle(0, 0, 1, 1)
     }, rt.Drawable, rt.Widget)
-    out._shape:set_color(rt.Palette.BACKGROUND_COLOR_OUTLINE)
-    out._shape_outline:set_color(rt.Palette.darken(rt.Palette.BACKGROUND_COLOR_OUTLINE), 0.1)
-    out._shape_outline:set_is_outline(true)
+    out._shape:set_color(rt.Palette.BACKGROUND)
+    out._outline:set_color(rt.Palette.BACKGROUND_OUTLINE)
+    out._outline:set_is_outline(true)
     return out
 end)
 
@@ -48,7 +48,7 @@ function rt.Spacer:set_color(color)
 
     rt.assert_rgba(rgba)
     self._shape:set_color(rgba)
-    self._shape_outline:set_color(rt.Palette.darken(rgba, 0.1))
+    self._outline:set_color(rgba)
 end
 
 --- @brief get color
