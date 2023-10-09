@@ -88,3 +88,27 @@ function rt.Font:get_size()
     meta.assert_isa(self, rt.Font)
     return self._size
 end
+
+--- @brief
+function rt.Font:get_regular()
+    meta.assert_isa(self, rt.Font)
+    return self[rt.FontStyle.REGULAR]
+end
+
+--- @brief
+function rt.Font:get_bold()
+    meta.assert_isa(self, rt.Font)
+    return self[rt.FontStyle.BOLD]
+end
+
+--- @brief
+function rt.Font:get_italic()
+    meta.assert_isa(self, rt.Font)
+    return self[rt.FontStyle.ITALIC]
+end
+
+--- @brief
+function rt.Font:get_bold_italic()
+    meta.assert_isa(self, rt.Font)
+    return self[rt.FontStyle.BOLD_ITALIC]
+end

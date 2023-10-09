@@ -1,12 +1,16 @@
 --- @class Glyph
-rt.Glyph = meta.new_type("Glyph", function(font, content, font_style, color)
+rt.Glyph = meta.new_type("Glyph", function(font, content, font_style, color, wrap_width)
+
+    meta.assert_isa(font, rt.Font)
+    meta.assert_string(content)
 
     if meta.is_nil(font_style) then font_style = rt.FontStyle.REGULAR end
     if meta.is_nil(color) then color = rt.RGBA(1, 1, 1, 1) end
+    if meta.is_nil(wrap_width) then wrap_width = POSITIVE_INFINITY end
 
-    meta.assert_isa(font, rt.Font)
     meta.assert_enum(font_style, rt.FontStyle)
     rt.assert_rgba(color)
+    meta.assert_number(wrap_width)
 
     local out = meta.new(rt.Glyph, {
         _font = font,
@@ -28,7 +32,8 @@ function rt.Glyph:_update()
     meta.assert_isa(self, rt.Glyph)
     local font = self._font[self._style]
     self._text = love.graphics.newText(font, {{self._color.r, self._color.g, self._color.b}, self._content})
-    if #self._glyph_offsets > 0 then
+
+    if not sizeof(self._glyph_offsets) == 0 then
         self:_initialize_glyph_offsets()
     end
 end
@@ -40,69 +45,43 @@ function rt.Glyph:_initialize_glyph_offsets()
     local now = rt.Cloc
     self._glyph_offsets = {}
     local offset = 0
-    for i = 1, #self._content do
-        local x = string.sub(self._content, 1, i)
-        --self._glyph_offsets[i] = #x --self._font[rt.FontStyle.REGULAR]:getWrap(, POSITIVE_INFINITY)
+    local n_chars = #self._content
+    for i = 1, n_chars  do
+
         local c = string.sub(self._content, i, i)
-        local previous;
+        local width;
         if i == 1 then
-            previous = " "
+            width = self._font[rt.FontStyle.REGULAR]:getWidth(c)
         else
-            previous = string.sub(self._content, i - 1, i - 1)
-        end
-
-        local data, kerning, bearing, advance
-
-        if self._style == rt.FontStyle.BOLD_ITALIC then
-            data = self._font._bold_italic_rasterizer:getGlyphData(c)
-            kerning = self._font[rt.FontStyle.BOLD_ITALIC]:getKerning(previous, c)
-            advance = self._font._bold_italic_rasterizer:getAdvance()
-        elseif self._style == rt.FontStyle.ITALIC then
-            data = self._font._italic_rasterizer:getGlyphData(c)
-            kerning = self._font[rt.FontStyle.ITALIC]:getKerning(previous, c)
-            advance = self._font._italic_rasterizer:getAdvance()
-        elseif self._style == rt.FontStyle.BOLD then
-            data = self._font._bold_rasterizer:getGlyphData(c)
-            kerning = self._font[rt.FontStyle.BOLD]:getKerning(previous, c)
-            advance = self._font._bold_rasterizer:getAdvance()
-        else
-            data = self._font._regular_rasterizer:getGlyphData(c)
-            kerning = self._font[rt.FontStyle.REGULAR]:getKerning(previous, c)
-            advance = self._font._regular_rasterizer:getAdvance()
-        end
-
-        local width = data:getWidth()
-        local bearing, _ = data:getBearing()
-
-        println(previous, " ", c, " : ", width , " + ", bearing, " + ", kerning, " | ", advance)
-        local new_width;
-        if previous == "" then
-            new_width = self._font[rt.FontStyle.REGULAR]:getWidth(c)
-        else
-            new_width = self._font[rt.FontStyle.REGULAR]:getWidth(c) + self._font[rt.FontStyle.REGULAR]:getKerning(previous, c)
+            local previous = string.sub(self._content, i - 1, i - 1)
+            width = self._font[rt.FontStyle.REGULAR]:getWidth(c) + self._font[rt.FontStyle.REGULAR]:getKerning(previous, c)
         end
 
         self._glyph_offsets[i] = offset
-        offset = offset + new_width
+        offset = offset + width
     end
-
-    println(clock:restart():as_seconds())
 end
 
 --- @brief draw glyph
 function rt.Glyph:draw()
     meta.assert_isa(self, rt.Glyph)
 
-    if not self:get_is_visible() then return end
+    if not self:get_is_visible() or #self._content == 0 then return end
 
     local old_r, old_g, old_b, old_a = love.graphics.getColor()
     love.graphics.setColor(self._color.r, self._color.g, self._color.b, self._color.a)
+    love.graphics.push()
 
     local x, y = self:get_position()
 
-    if self._n_visible_chars >= #self._content then
+    if self._n_visible_chars > #self._content then
         self:render(self._text, x, y)
     elseif self:get_n_visible_characters() > 0 then
+
+        if sizeof(self._glyph_offsets) == 0 then
+            self:_initialize_glyph_offsets()
+        end
+
         local _, h = self:get_size()
         local w = self._glyph_offsets[self:get_n_visible_characters()]
         love.graphics.setScissor(x, y, w, h)
@@ -110,6 +89,7 @@ function rt.Glyph:draw()
         love.graphics.setScissor()
     end
 
+    love.graphics.pop()
     love.graphics.setColor(old_r, old_g, old_b, old_a)
 end
 

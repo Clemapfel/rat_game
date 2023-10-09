@@ -31,13 +31,6 @@ function meta.is_nil(x)
     return type(x) == "nil"
 end
 
-
---- @brief is x nil or {}
---- @param x any
-function meta.is_missing(x)
-    return meta.is_nil(x) or (type(x) == "table" and #x == 0)
-end
-
 ---@brief is callable
 --- @param x any
 function meta.is_function(x)

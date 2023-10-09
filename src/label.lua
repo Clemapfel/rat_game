@@ -1,3 +1,101 @@
+--- class TextAlignment
+rt.TextAlignment = meta.new_enum({
+    LEFT = "TEXT_ALIGNMENT_LEFT",
+    RIGHT = "TEXT_ALIGNMENT_RIGHT",
+    CENTER = "TEXT_ALIGNMENT_CENTER",
+    BLOCK = "TEXT_ALIGNMENT_BLOCK"
+})
+
+--- @class Label
+rt.Label = meta.new_type("Label", function(text)
+    if not meta.is_nil(text) then
+        meta.assert_string(text)
+    end
+
+    local out = meta.new(rt.Label, {
+        _glyphs = {},
+        _raw = "",
+        _width = POSITIVE_INFINITY,
+        _height = 0,
+        _font = rt.Font.DEFAULT,
+        _text_alignment = rt.TextAlignment.LEFT
+    }, rt.Widget, rt.Drawable)
+    out:set_text(text)
+    return out
+end)
+
+--- @brief
+function rt.Label:_apply_wrapping()
+    meta.assert_isa(self, rt.Label)
+    self._glyphs = {}
+    local _, wrapped = self._font:get_bold_italic():getWrap(self._raw, self._width)
+    for i, line in ipairs(wrapped) do
+
+        local stripped = string.gsub(line, '^%s*(.-)%s*$', '%1') -- src: https://stackoverflow.com/a/51181334
+        local split = {}
+        for left, right in string.gmatch(line, "(%w+) (%w+)") do
+            table.insert(split, left)
+            table.insert(split, right)
+        end
+
+
+        table.insert(self._glyphs, rt.Glyph(self._font, stripped))
+    end
+end
+
+--- @brief
+function rt.Label:set_text(text)
+    meta.assert_isa(self, rt.Label)
+    if self._raw == text then return end
+
+    self._raw = text
+    self:_apply_wrapping()
+end
+
+--- @overload rt.Drawable.draw
+function rt.Label:draw()
+    meta.assert_isa(self, rt.Label)
+    for _, glyph in pairs(self._glyphs) do
+        glyph:draw()
+    end
+end
+
+--- @overload rt.Widget.size_allocate
+function rt.Label:size_allocate(x, y, width, height)
+    meta.assert_isa(self, rt.Label)
+
+    local should_wrap = self._width ~= width
+
+    self._width = width
+    self._height = height
+
+    if should_wrap then self:_apply_wrapping() end
+
+    local row_x = x
+    local row_y = y
+
+    for _, glyph in pairs(self._glyphs) do
+        local w, h = glyph:get_size()
+
+        local glyph_x
+        if self._text_alignment == rt.TextAlignment.LEFT then
+            glyph_x = row_x
+        elseif self._text_alignment == rt.TextAlignment.RIGHT then
+            glyph_x = row_x + width - w
+        elseif self._text_alignment == rt.TextAlignment.CENTER then
+            glyph_x = row_x + 0.5 * math.abs(width - w)
+        end
+
+        glyph:set_position(glyph_x, row_y)
+        row_y = row_y + h
+    end
+end
+
+--- @overload rt.Widget.measure
+function rt.Label:measure()
+    if meta.is_nil(self._child) then return 0, 0 end
+    return self._width, self._height
+end
 
 
 

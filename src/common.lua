@@ -291,6 +291,11 @@ function string.capitalize(str)
     return string.upper(string.sub(str, 1, 1)) .. string.sub(str, 2, string.len(str))
 end
 
+--- @brief replace all occurens in string
+function string.replace(str, to_replace, replacement)
+
+end
+
 --- @brief round to nearest integer
 function math.round(i)
     return math.floor(i + 0.5)

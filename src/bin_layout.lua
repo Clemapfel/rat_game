@@ -11,7 +11,7 @@ function rt.BinLayout:set_child(child)
     meta.assert_isa(self, rt.BinLayout)
     meta.assert_isa(self, rt.Widget)
 
-    if not meta.is_nil(self._child) then
+    if not meta.is_nil(self._child) and meta.isa(self._child, rt.Widget) then
         self._child:set_parent(nil)
     end
 
@@ -38,7 +38,7 @@ end
 --- @overload rt.Drawable.draw
 function rt.BinLayout:draw()
     meta.assert_isa(self, rt.BinLayout)
-    if self:get_is_visible() and not meta.is_missing(self._child) then
+    if self:get_is_visible() and meta.isa(self._child, rt.Widget) then
         self._child:draw()
     end
 end
@@ -46,8 +46,9 @@ end
 --- @overload rt.Widget.size_allocate
 function rt.BinLayout:size_allocate(x, y, width, height)
     meta.assert_isa(self, rt.BinLayout)
-    if meta.is_missing(self._child) then return end
-    self._child:fit_into(rt.AABB(x, y, width, height))
+    if meta.isa(self._child, rt.Widget) then
+        self._child:fit_into(rt.AABB(x, y, width, height))
+    end
 end
 
 --- @overload rt.Widget.measure

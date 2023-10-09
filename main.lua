@@ -1,7 +1,7 @@
 function try_connect_emmy_lua_debugger()
     -- entry point for JetBrains IDE debugger
-    local dbg = require("emmy_core")
     package.cpath = package.cpath .. ';/home/clem/.local/share/JetBrains/CLion2023.2/EmmyLua/debugger/emmy/linux/?.so'
+    local dbg = require('emmy_core')
     dbg.tcpConnect('localhost', 8172)
 
     love.errorhandler = function(msg)
@@ -66,29 +66,16 @@ rt.Font.DEFAULT:set_size(50)
 
 window = rt.BinLayout()
 
-buffer = {}
-for i = 1, 10000 do
-    table.insert(buffer, rt.random.string(1))
-end
-buffer = table.concat(buffer)
-
-glyph = rt.Glyph(rt.Font.DEFAULT, "A B C D E FF GG")
-glyph:set_color(rt.RGBA(1, 0, 1, 1))
-glyph:set_position(100, 100)
-glyph:set_n_visible_characters(POSITIVE_INFINITY)
+label = rt.Label("TEST LABEL \n ASIDBASLIDUBA, ADSUNASLND")
+window:set_child(label)
 
 key = rt.add_keyboard_controller(window)
 key.signal:connect("key_pressed", function(self, key)
 
-    local n = glyph:get_n_visible_characters()
     if key == rt.KeyboardKey.ARROW_UP then
     elseif key == rt.KeyboardKey.ARROW_DOWN then
     elseif key == rt.KeyboardKey.ARROW_LEFT then
-        n = n - 1
-        glyph:set_n_visible_characters(n)
     elseif key == rt.KeyboardKey.ARROW_RIGHT then
-        n = n + 1
-        glyph:set_n_visible_characters(n)
     elseif key == rt.KeyboardKey.PLUS then
     elseif key == rt.KeyboardKey.MINUS then
         error("test")
@@ -119,7 +106,6 @@ function love.draw()
     love.graphics.setBackgroundColor(0.5, 0, 0.5, 0.5)
     love.graphics.setColor(1, 1, 1, 1)
     window:draw()
-    glyph:draw()
 
     function draw_guides()
         local w, h = love.graphics.getWidth(), love.graphics.getHeight()
