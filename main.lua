@@ -26,6 +26,7 @@ rt.test = {}
 
 require "common"
 require "meta"
+require "time"
 require "vector"
 require "angle"
 require "random"
@@ -62,60 +63,39 @@ require "viewport"
 -- ### MAIN ###
 
 if DEBUG_MODE then goto exit end
+rt.Font.DEFAULT = rt.load_font("Roboto", "assets/Roboto")
+rt.Font.DEFAULT:set_size(50)
 
 window = rt.BinLayout()
-box = rt.ListLayout(rt.Orientation.VERTICAL)
-overlay = rt.OverlayLayout()
-base = rt.Spacer()
-base:set_color(rt.RGBA(0.1, 0.9, 0.9))
-overlay:set_base_child(base)
-overlay:add_overlay(box)
 
-viewport = rt.Viewport()
---viewport:set_child(overlay)
+buffer = {}
+for i = 1, 10000 do
+    table.insert(buffer, rt.random.string(1))
+end
+buffer = table.concat(buffer)
 
-viewport:set_minimum_size(150, 0)
+glyph = rt.Glyph(rt.Font.DEFAULT, "A B C D E FF GG")
+glyph:set_color(rt.RGBA(1, 0, 1, 1))
+glyph:set_position(100, 100)
+glyph:set_n_visible_characters(POSITIVE_INFINITY)
 
-aspect = rt.AspectLayout(1.0)
-aspect:set_child(overlay)
-window:set_child(aspect)
 
-key = rt.add_keyboard_controller(viewport)
+key = rt.add_keyboard_controller(window)
 key.signal:connect("key_pressed", function(self, key)
+
+    local n = glyph:get_n_visible_characters()
     if key == rt.KeyboardKey.ARROW_UP then
-        viewport:translate(0, -10)
     elseif key == rt.KeyboardKey.ARROW_DOWN then
-        viewport:translate(0, 10)
     elseif key == rt.KeyboardKey.ARROW_LEFT then
-        viewport:translate(-10, 0)
+        n = n - 1
+        glyph:set_n_visible_characters(n)
     elseif key == rt.KeyboardKey.ARROW_RIGHT then
-        viewport:translate(10, 0)
+        n = n + 1
+        glyph:set_n_visible_characters(n)
     elseif key == rt.KeyboardKey.PLUS then
-        viewport:rotate(rt.degrees(-10))
-        --viewport:scale(1.1)
     elseif key == rt.KeyboardKey.MINUS then
-        --viewport:scale(0.9)
-        viewport:rotate(rt.degrees(10))
     end
 end)
-
-for i = 0, 4 do
-    local scrollbar = rt.Scrollbar(rt.Orientation.HORIZONTAL)
-    scrollbar:set_margin_vertical(10)
-    --[[
-    local component = rt.add_keyboard_controller(scrollbar)
-    component.signal:connect("key_pressed", function(self, key)
-        if key == rt.KeyboardKey.UP_ARROW then
-            self.instance:scroll_up(0.01)
-        end
-
-        if key == rt.KeyboardKey.DOWN_ARROW then
-            self.instance:scroll_down(0.01)
-        end
-    end)
-    ]]--
-    box:push_back(scrollbar)
-end
 
 -- @brief window resized
 function love.resize(width, height)
@@ -141,6 +121,7 @@ function love.draw()
     love.graphics.setBackgroundColor(0.5, 0, 0.5, 0.5)
     love.graphics.setColor(1, 1, 1, 1)
     window:draw()
+    glyph:draw()
 
     function draw_guides()
         local w, h = love.graphics.getWidth(), love.graphics.getHeight()

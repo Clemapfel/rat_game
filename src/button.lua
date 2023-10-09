@@ -7,7 +7,7 @@ rt.Button = meta.new_type("Button", function()
         _overlay_shadow = rt.Rectangle(0, 0, 1, 1),
         _focus_highlight = rt.Rectangle(0, 0, 1, 1, 10),
         _depressed = false,
-        _child = nil
+        _child = {}
     }, rt.Drawable, rt.Widget)
 
     rt.add_signal_component(out)

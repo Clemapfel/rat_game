@@ -2,7 +2,7 @@
 rt.AspectLayout = meta.new_type("AspectLayout", function(ratio)
     meta.assert_number(ratio)
     local out = meta.new(rt.AspectLayout, {
-        _child = nil,
+        _child = {},
         _ratio = ratio,
         _width = 0,
         _height = 0

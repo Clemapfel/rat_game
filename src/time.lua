@@ -82,13 +82,19 @@ end)
 --- @brief
 function rt.Clock:get_elapsed()
     meta.assert_isa(self, rt.Clock)
-    return love.time.getTime() - self._start
+    return rt.seconds(love.timer.getTime() - self._start)
 end
 
 --- @brief
 function rt.Clock:restart()
     meta.assert_isa(self, rt.Clock)
-    local out = love.time.getTime() - self._start
-    self._start = love.time.getTime()
-    return out
+    local out = love.timer.getTime() - self._start
+    self._start = love.timer.getTime()
+    return rt.seconds(out)
 end
+
+--- @brief [internal]
+function rt.test.time()
+    -- TODO
+end
+rt.test.time()

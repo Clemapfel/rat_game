@@ -28,7 +28,7 @@ function rt.Drawable:render(love_drawable, x, y, transform)
         return
     end
 
-    if sizeof(self._transform) == 0 then
+    if meta.is_nil(transform) then
         love.graphics.draw(love_drawable, x, y)
     else
         meta.assert_isa(transform, rt.Transform)

@@ -1,7 +1,7 @@
 --- @class Viewport
 rt.Viewport = meta.new_type("Viewport", function()
     local out = meta.new(rt.Viewport, {
-        _child = nil,
+        _child = {},
         _x_offset = 0,
         _y_offset = 0,
         _x_scale = 1,

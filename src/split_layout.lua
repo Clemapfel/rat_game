@@ -1,8 +1,8 @@
 --- @class rt.SplitLayout
 rt.SplitLayout = meta.new_type("SplitLayout", function()
     local out = meta.new(rt.SplitLayout, {
-        _start_child = nil,
-        _end_child = nil,
+        _start_child = {},
+        _end_child = {},
         _orientation = rt.Orientation.HORIZONTAL,
         _ratio = 0.5 -- start to end child
     }, rt.Drawable, rt.Widget)
