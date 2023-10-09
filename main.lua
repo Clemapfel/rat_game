@@ -1,22 +1,18 @@
 function try_connect_emmy_lua_debugger()
     -- entry point for JetBrains IDE debugger
+    local dbg = require("emmy_core")
     package.cpath = package.cpath .. ';/home/clem/.local/share/JetBrains/CLion2023.2/EmmyLua/debugger/emmy/linux/?.so'
-    require('emmy_core').tcpConnect('localhost', 8172)
+    dbg.tcpConnect('localhost', 8172)
+
+    love.errorhandler = function(msg)
+        dbg.breakHere()
+        return nil -- exit
+    end
 end
 pcall(try_connect_emmy_lua_debugger)
+io.stdout:setvbuf("no") -- makes it so error message is printed to console immediately
 
-DEBUG_MODE = love == nil
-if DEBUG_MODE then
-    RESOURCE_PATH = "/home/clem/Workspace/rat_game"
-    love = {}
-    love.graphics = {}
-    love.graphics.getWidth = function() return 1 end
-    love.graphics.getHeight = function() return 1 end
-    love.graphics.getFont = function() return {} end
-else
-    RESOURCE_PATH = love.filesystem.getSource()
-end
-
+RESOURCE_PATH = love.filesystem.getSource()
 package.path = package.path .. ";" .. RESOURCE_PATH .. "/src/?.lua"
 package.path = package.path .. ";" .. RESOURCE_PATH .. "/battle/?.lua"
 package.path = package.path .. ";" .. RESOURCE_PATH .. "/?.lua"
@@ -41,6 +37,8 @@ require "drawable"
 require "texture"
 require "shape"
 require "vertex_shape"
+require "font"
+require "glyph"
 require "gamepad_controller"
 require "keyboard_controller"
 require "mouse_controller"
@@ -79,7 +77,6 @@ glyph:set_color(rt.RGBA(1, 0, 1, 1))
 glyph:set_position(100, 100)
 glyph:set_n_visible_characters(POSITIVE_INFINITY)
 
-
 key = rt.add_keyboard_controller(window)
 key.signal:connect("key_pressed", function(self, key)
 
@@ -94,6 +91,7 @@ key.signal:connect("key_pressed", function(self, key)
         glyph:set_n_visible_characters(n)
     elseif key == rt.KeyboardKey.PLUS then
     elseif key == rt.KeyboardKey.MINUS then
+        error("test")
     end
 end)
 
