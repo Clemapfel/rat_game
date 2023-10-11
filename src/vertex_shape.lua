@@ -40,7 +40,7 @@ rt.VertexShape = meta.new_type("VertexShape", function(...)
     end
     local out = meta.new(rt.VertexShape, {
         _native = love.graphics.newMesh(vertices,
-            rt.MeshDrawMode.TRIANGLE_STRIP,
+            rt.MeshDrawMode.TRIANGLE_FAN,
             rt.SpriteBatchUsage.DYNAMIC
         )
     }, rt.Drawable)
@@ -166,7 +166,9 @@ end
 
 --- @brief
 function rt.VertexShape:draw()
-    love.graphics.draw(self._native)
+    if self:get_is_visible() then
+        love.graphics.draw(self._native)
+    end
 end
 
 --- @class rt.VertexRectangle
@@ -177,7 +179,7 @@ function rt.VertexRectangle(x, y, width, height)
         rt.Vector2(x + width, y + height),
         rt.Vector2(x, y + height)
     )
-    out:set_vertex_order(1, 2, 4, 3)
+    --out:set_vertex_order(1, 2, 4, 3)
     return out
 end
 

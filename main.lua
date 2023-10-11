@@ -75,6 +75,14 @@ Quisque rutrum, arcu a placerat elementum, leo tortor convallis tortor, at conse
 ]])
 window:set_child(label)
 
+canvas = rt.RenderTexture(400, 400)
+
+sprite = rt.VertexRectangle(10, 10, 100, 100)
+sprite:set_color(rt.RGBA(1, 1, 1, 1))
+
+sprite:set_texture(canvas)
+sprite:set_texture_rectangle(rt.AABB(0, 0, 1, 1))
+
 key = rt.add_keyboard_controller(window)
 key.signal:connect("key_pressed", function(self, key)
 
@@ -109,9 +117,14 @@ end
 
 --- @brief draw step
 function love.draw()
-    love.graphics.setBackgroundColor(0.5, 0, 0.5, 0.5)
+
+    love.graphics.setBackgroundColor(0, 0, 0, 0)
     love.graphics.setColor(1, 1, 1, 1)
+
+    canvas:bind_as_render_target()
     window:draw()
+    canvas:unbind_as_render_target()
+    sprite:draw()
 
     function draw_guides()
         local w, h = love.graphics.getWidth(), love.graphics.getHeight()
@@ -156,6 +169,8 @@ function love.draw()
         love.graphics.draw(text, love.graphics.getWidth() - w, 0)
     end
     show_fps()
+
+    canvas:unbind_as_render_target()
 end
 
 --- @brief shutdown

@@ -15,18 +15,42 @@ rt.TextureWrapMode = meta.new_enum({
 })
 
 --- @class Texture
-rt.Texture = meta.new_type("Texture", function(path_or_image)
+rt.Texture = meta.new_type("Texture", function(path_or_image_or_width, height)
     local out
-    if meta.is_string(path_or_image) then
+    if meta.is_string(path_or_image_or_width) then
+        local path = path_or_image_or_width
         out =  meta.new(rt.Texture, {
-            _native = love.graphics.newImage(path_or_image)
+            _native = love.graphics.newImage(path)
+        })
+    elseif meta.isa(path_or_image_or_width, rt.Image) then
+        meta.assert_isa(path_or_image_or_width, rt.Image)
+        local image = path_or_image_or_width
+        out = meta.new(rt.Texture, {
+            _native = love.graphics.newImage(image._native)
+        })
+    elseif meta.is_number(path_or_image_or_width) then
+        meta.assert_number(height)
+        local width = path_or_image_or_width
+        out = meta.new(rt.Texture, {
+            _native = love.graphics.newImage(width, height)
         })
     else
-        meta.assert_isa(path_or_image, rt.Image)
+        meta.assert_nil(path_or_image_or_width)
         out = meta.new(rt.Texture, {
-            _native = love.graphics.newImage(path_or_image._native)
+            _native = love.graphics.newImage()
         })
     end
+    out:set_scale_mode(rt.TextureScaleMode.NEAREST)
+    out:set_wrap_mode(rt.TextureWrapMode.CLAMP)
+    return out
+end)
+
+--- @class RenderTexture
+rt.RenderTexture = meta.new_type("RenderTexture", function(width, height)
+    meta.assert_number(width, height)
+    local out = meta.new(rt.RenderTexture, {
+        _native = love.graphics.newCanvas(width, height)
+    }, rt.Texture)
     out:set_scale_mode(rt.TextureScaleMode.NEAREST)
     out:set_wrap_mode(rt.TextureWrapMode.CLAMP)
     return out
@@ -63,6 +87,18 @@ end
 function rt.Texture:get_size()
     meta.assert_isa(self, rt.Texture)
     return self._native:getDimension()
+end
+
+--- @brief
+function rt.RenderTexture:bind_as_render_target()
+    meta.assert_isa(self, rt.RenderTexture)
+    love.graphics.setCanvas(self._native)
+end
+
+--- @brief
+function rt.RenderTexture:unbind_as_render_target()
+    meta.assert_isa(self, rt.RenderTexture)
+    love.graphics.setCanvas()
 end
 
 --- @brief test texture
