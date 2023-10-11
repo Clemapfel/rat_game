@@ -152,8 +152,8 @@ end
 --- @brief
 function rt.Glyph:set_position(x, y)
     meta.assert_isa(self, rt.Glyph)
-    self._position_x = x
-    self._position_y = y
+    self._position_x = math.round(x)
+    self._position_y = math.round(y)
 end
 
 --- @brief

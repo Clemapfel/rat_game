@@ -2,8 +2,8 @@
 rt.TextAlignment = meta.new_enum({
     LEFT = "left",
     RIGHT = "right",
-    CENTER = "center",
-    JUSTIFY = "justify"
+    CENTER = "center"
+    -- JUSTIFY = "justify"
 })
 
 --- @class Label
@@ -13,7 +13,8 @@ rt.Label = meta.new_type("Label", function(text)
     end
 
     local out = meta.new(rt.Label, {
-        _glyphs = {},
+        _glyph_rows = {},
+        _glyph_row_widths = {},
         _raw = "",
         _width = POSITIVE_INFINITY,
         _height = 0,
@@ -27,27 +28,31 @@ end)
 --- @brief
 function rt.Label:_apply_wrapping()
     meta.assert_isa(self, rt.Label)
-    self._glyphs = {}
+    self._glyph_rows = {}
     local wrapped = {}
     for _, line in pairs(string.split(self._raw, "\n")) do
         local _, lines = self._font:get_regular():getWrap(line, self._width)
         for _, split_line in pairs(lines) do
-            --split_line = string.gsub(split_line, "\n", "")
+            split_line = string.gsub(split_line, "\n", "")
             table.insert(wrapped, split_line)
         end
     end
 
     local row_i = 1
+    local glyph_count = 0
     for _, line in pairs(wrapped) do
-
-        self._glyphs[row_i] = {}
+        self._glyph_rows[row_i] = {}
+        self._glyph_row_widths[row_i] = 0
         local stripped = string.gsub(line, '^%s*(.-)%s*$', '%1') -- strip trailing whitespace
         local split = string.split(stripped, " ")
         for i, glyph in ipairs(split) do
             if i < #split then
                 glyph = glyph .. " "
             end
-            table.insert(self._glyphs[row_i], rt.Glyph(self._font, glyph))
+            local to_push = rt.Glyph(self._font, glyph)
+            table.insert(self._glyph_rows[row_i], to_push)
+            self._glyph_row_widths[row_i] = self._glyph_row_widths[row_i] + to_push:get_size()
+            glyph_count = glyph_count + 1
         end
         row_i = row_i + 1
     end
@@ -58,15 +63,18 @@ end
 function rt.Label:set_text(text)
     meta.assert_isa(self, rt.Label)
     if self._raw == text then return end
-
+    
     self._raw = text
-    self:_apply_wrapping()
+
+    if #self._raw ~= 0 then
+        self:_apply_wrapping()
+    end
 end
 
 --- @overload rt.Drawable.draw
 function rt.Label:draw()
     meta.assert_isa(self, rt.Label)
-    for _, row in pairs(self._glyphs) do
+    for _, row in pairs(self._glyph_rows) do
         for _, glyph in pairs(row) do
             glyph:draw()
         end
@@ -86,21 +94,22 @@ function rt.Label:size_allocate(x, y, width, height)
 
     local row_x = x
     local row_y = y
-    for row_i, row in pairs(self._glyphs) do
+    for row_i, row in pairs(self._glyph_rows) do
         local offset = 0
         local line_height = NEGATIVE_INFINITY
-        for _, glyph in pairs(row) do
+        local row_w = self._glyph_row_widths[row_i]
+
+        for i, glyph in pairs(row) do
             local w, h = glyph:get_size()
+            local glyph_x = row_x + offset
 
-            local glyph_x
             if self._text_alignment == rt.TextAlignment.LEFT then
-            elseif self._text_alignment == rt.TextAlignment.RIGHT then
+                -- noop
             elseif self._text_alignment == rt.TextAlignment.CENTER then
-            elseif self._text_alignment == rt.TextAlignment.JUSTIFY then
-                -- TODO
+                glyph_x = glyph_x + 0.5 * (self._width - row_w)
+            elseif self._text_alignment == rt.TextAlignment.RIGHT then
+                glyph_x = glyph_x + (self._width - row_w)
             end
-
-            glyph_x = row_x + offset
 
             glyph:set_position(glyph_x, row_y)
             offset = offset + w
@@ -122,7 +131,7 @@ end
 --- @class Label
 rt.Label = meta.new_type("Label", function(formatted_text)
     local out = meta.new(rt.Label, {
-        _glyphs = {},
+        _glyph_rows = {},
         _raw = formatted_text
     }, rt.Drawable)
     out:parse_from(formatted_text)
@@ -136,7 +145,7 @@ rt.Label.COLOR_TAG = "color"  -- <color=hotpink>example</color>
 --- @brief
 function rt.Label:parse_from(text)
     self._raw = text
-    local glyphs = self._glyphs
+    local glyphs = self._glyph_rows
     local error_reason = ""
     local error_occurred = false
 
@@ -288,7 +297,7 @@ function rt.Label:parse_from(text)
 end
 
 function rt.Label:draw()
-    for _, glyph in pairs(self._glyphs) do
+    for _, glyph in pairs(self._glyph_rows) do
         glyph:draw()
     end
 end
