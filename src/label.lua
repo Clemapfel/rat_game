@@ -1,9 +1,9 @@
 --- class TextAlignment
 rt.TextAlignment = meta.new_enum({
-    LEFT = "TEXT_ALIGNMENT_LEFT",
-    RIGHT = "TEXT_ALIGNMENT_RIGHT",
-    CENTER = "TEXT_ALIGNMENT_CENTER",
-    BLOCK = "TEXT_ALIGNMENT_BLOCK"
+    LEFT = "left",
+    RIGHT = "right",
+    CENTER = "center",
+    JUSTIFY = "justify"
 })
 
 --- @class Label
@@ -28,19 +28,30 @@ end)
 function rt.Label:_apply_wrapping()
     meta.assert_isa(self, rt.Label)
     self._glyphs = {}
-    local _, wrapped = self._font:get_bold_italic():getWrap(self._raw, self._width)
-    for i, line in ipairs(wrapped) do
-
-        local stripped = string.gsub(line, '^%s*(.-)%s*$', '%1') -- src: https://stackoverflow.com/a/51181334
-        local split = {}
-        for left, right in string.gmatch(line, "(%w+) (%w+)") do
-            table.insert(split, left)
-            table.insert(split, right)
+    local wrapped = {}
+    for _, line in pairs(string.split(self._raw, "\n")) do
+        local _, lines = self._font:get_regular():getWrap(line, self._width)
+        for _, split_line in pairs(lines) do
+            --split_line = string.gsub(split_line, "\n", "")
+            table.insert(wrapped, split_line)
         end
-
-
-        table.insert(self._glyphs, rt.Glyph(self._font, stripped))
     end
+
+    local row_i = 1
+    for _, line in pairs(wrapped) do
+
+        self._glyphs[row_i] = {}
+        local stripped = string.gsub(line, '^%s*(.-)%s*$', '%1') -- strip trailing whitespace
+        local split = string.split(stripped, " ")
+        for i, glyph in ipairs(split) do
+            if i < #split then
+                glyph = glyph .. " "
+            end
+            table.insert(self._glyphs[row_i], rt.Glyph(self._font, glyph))
+        end
+        row_i = row_i + 1
+    end
+    self:reformat()
 end
 
 --- @brief
@@ -55,8 +66,10 @@ end
 --- @overload rt.Drawable.draw
 function rt.Label:draw()
     meta.assert_isa(self, rt.Label)
-    for _, glyph in pairs(self._glyphs) do
-        glyph:draw()
+    for _, row in pairs(self._glyphs) do
+        for _, glyph in pairs(row) do
+            glyph:draw()
+        end
     end
 end
 
@@ -73,21 +86,27 @@ function rt.Label:size_allocate(x, y, width, height)
 
     local row_x = x
     local row_y = y
+    for row_i, row in pairs(self._glyphs) do
+        local offset = 0
+        local line_height = NEGATIVE_INFINITY
+        for _, glyph in pairs(row) do
+            local w, h = glyph:get_size()
 
-    for _, glyph in pairs(self._glyphs) do
-        local w, h = glyph:get_size()
+            local glyph_x
+            if self._text_alignment == rt.TextAlignment.LEFT then
+            elseif self._text_alignment == rt.TextAlignment.RIGHT then
+            elseif self._text_alignment == rt.TextAlignment.CENTER then
+            elseif self._text_alignment == rt.TextAlignment.JUSTIFY then
+                -- TODO
+            end
 
-        local glyph_x
-        if self._text_alignment == rt.TextAlignment.LEFT then
-            glyph_x = row_x
-        elseif self._text_alignment == rt.TextAlignment.RIGHT then
-            glyph_x = row_x + width - w
-        elseif self._text_alignment == rt.TextAlignment.CENTER then
-            glyph_x = row_x + 0.5 * math.abs(width - w)
+            glyph_x = row_x + offset
+
+            glyph:set_position(glyph_x, row_y)
+            offset = offset + w
+            line_height = math.max(line_height, h)
         end
-
-        glyph:set_position(glyph_x, row_y)
-        row_y = row_y + h
+        row_y = row_y + line_height
     end
 end
 

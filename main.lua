@@ -62,11 +62,17 @@ require "viewport"
 
 if DEBUG_MODE then goto exit end
 rt.Font.DEFAULT = rt.load_font("Roboto", "assets/Roboto")
-rt.Font.DEFAULT:set_size(50)
+rt.Font.DEFAULT:set_size(12)
 
 window = rt.BinLayout()
 
-label = rt.Label("TEST LABEL \n ASIDBASLIDUBA, ADSUNASLND")
+label = rt.Label([[
+Lorem ipsum dolor sit amet, consectetur adipiscing elit. Curabitur at mi vel tellus sagittis ullamcorper nec ut dui. Ut accumsan pulvinar dui, sit amet convallis velit ornare sit amet. Nam eu ligula in velit accumsan semper a a justo. Quisque volutpat risus ut quam ultricies, rutrum varius magna fermentum. Maecenas non eleifend orci. Proin in nibh nulla. Vestibulum vitae vestibulum est, sed ultrices velit. Vivamus purus lorem, condimentum id purus ac, tincidunt euismod nisl. Mauris tempus pharetra augue, a congue sapien mollis at. Sed tristique purus a elit blandit pharetra. Pellentesque ultricies lobortis lobortis. Integer fringilla tempus libero nec tincidunt. Phasellus luctus lorem ut malesuada tincidunt.
+
+Mauris sit amet iaculis nulla. Etiam commodo pulvinar urna, blandit mattis urna iaculis eget. Quisque fermentum massa vitae mauris vulputate, ac faucibus odio sollicitudin. Nullam ornare urna sed nunc cursus egestas. Proin sit amet dictum metus, eu vehicula arcu. Donec mi urna, convallis a commodo nec, varius non diam. Ut at ullamcorper nisi.
+
+Quisque rutrum, arcu a placerat elementum, leo tortor convallis tortor, at consequat felis urna non risus. Nam in leo scelerisque, feugiat nisl vel, hendrerit velit. Quisque sit amet tellus nec nulla tincidunt consectetur. Nullam tellus sem, aliquet vitae mauris sit amet, cursus cursus tortor. Sed facilisis justo sed diam mattis, non gravida dolor tristique. Donec consectetur suscipit arcu, a scelerisque nibh placerat at. Donec nec metus volutpat, suscipit nisi sit amet, rutrum nulla. Orci varius natoque penatibus et magnis dis parturient montes, nascetur ridiculus mus. Donec suscipit rutrum sapien in suscipit. Maecenas pretium orci nec aliquet consequat. Etiam luctus est vitae ex elementum, sit amet maximus urna efficitur. Maecenas lacinia, diam ac dictum convallis, est massa gravida ex, nec ornare felis dui vitae libero.")
+]])
 window:set_child(label)
 
 key = rt.add_keyboard_controller(window)

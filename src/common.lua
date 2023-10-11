@@ -291,9 +291,21 @@ function string.capitalize(str)
     return string.upper(string.sub(str, 1, 1)) .. string.sub(str, 2, string.len(str))
 end
 
---- @brief replace all occurens in string
-function string.replace(str, to_replace, replacement)
+--- @brief split along character
+function string.split(str, separator)
+    assert(type(str) == "string")
+    assert(type(separator) == "string")
 
+    local out = {}
+    for word, _ in string.gmatch(str, "([^".. separator .."]+)") do
+        table.insert(out, word)
+    end
+    return out
+end
+
+--- @brief check if pattern occurrs in string
+function string.contains(str, pattern)
+    return type(string.find(str, pattern)) ~= "nil"
 end
 
 --- @brief round to nearest integer
