@@ -19,6 +19,7 @@ rt.Palette = {
     LIGHT_RED_1 = rt.RGBA("#f9b9b9"),
     LIGHT_RED_2 = rt.RGBA("#ffa0a0"), -- light red
     LIGHT_RED_3 = rt.RGBA("#fe5a5a"),
+
     RED_1 = rt.RGBA("#ff001e"), -- red
     RED_2 = rt.RGBA("#cf0018"),
     RED_3 = rt.RGBA("#9c001a"),
@@ -75,7 +76,7 @@ rt.Palette = {
     DARK_SKIN_2 = rt.RGBA("#693b1f"),
     DARK_SKIN_3 = rt.RGBA("#392825"),
     DARK_SKIN_4 = rt.RGBA("#1f1717"),
-    
+
     WHITE = rt.RGBA("#fafaff"),
     GREY_1 = rt.RGBA("#dcdce1"),
     GREY_2 = rt.RGBA("#c0c0c5"),
@@ -269,6 +270,7 @@ function rt.Palette:export()
     local from = love.filesystem.getAppdataDirectory() .. "love/rat_game/palette.png"
     local to = love.filesystem.getSourceBaseDirectory() .. "/rat_game/assets/palette.png"
     os.execute("mv " .. from .. " " .. to)
+    love.filesystem.remove("palette.png")
     println("[rt][LOG] Exported palette to " .. to)
 end
 
