@@ -108,6 +108,8 @@ function love.load()
     })
     love.window.setTitle("rat_game")
     window:fit_into(rt.AABB(1, 1, love.graphics.getWidth()-2, love.graphics.getHeight()-2))
+
+    rt.Palette:export("palette.png")
 end
 
 --- @brief update tick

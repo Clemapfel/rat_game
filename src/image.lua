@@ -29,6 +29,13 @@ function rt.Image:create(width, height)
 end
 
 --- @brief
+function rt.Image:save_to_file(file)
+    meta.assert_isa(self, rt.Image)
+    meta.assert_string(file)
+    return self._native:encode("png", file)
+end
+
+--- @brief 0-based
 function rt.Image:set_pixel(x, y, rgba)
     meta.assert_isa(self, rt.Image)
     rt.assert_rgba(rgba)
