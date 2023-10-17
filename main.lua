@@ -32,11 +32,12 @@ require "color"
 require "palette"
 require "geometry"
 require "image"
-require "animation"
+require "animation_timer"
 require "drawable"
 require "texture"
 require "shape"
 require "vertex_shape"
+require "spritesheet"
 require "font"
 require "glyph"
 require "gamepad_controller"
@@ -60,44 +61,25 @@ require "viewport"
 
 -- ### MAIN ###
 
-code = love.filesystem.read("art/orbs.lua")
-println(serialize(load(code)()))
-
 if DEBUG_MODE then goto exit end
 rt.Font.DEFAULT = rt.load_font("Roboto", "assets/Roboto")
 rt.Font.DEFAULT:set_size(12)
 
 window = rt.BinLayout()
 
-label = rt.Label([[
-Lorem ipsum dolor sit amet, consectetur adipiscing elit. Curabitur at mi vel tellus sagittis ullamcorper nec ut dui. Ut accumsan pulvinar dui, sit amet convallis velit ornare sit amet. Nam eu ligula in velit accumsan semper a a justo. Quisque volutpat risus ut quam ultricies, rutrum varius magna fermentum. Maecenas non eleifend orci. Proin in nibh nulla. Vestibulum vitae vestibulum est, sed ultrices velit. Vivamus purus lorem, condimentum id purus ac, tincidunt euismod nisl. Mauris tempus pharetra augue, a congue sapien mollis at. Sed tristique purus a elit blandit pharetra. Pellentesque ultricies lobortis lobortis. Integer fringilla tempus libero nec tincidunt. Phasellus luctus lorem ut malesuada tincidunt.
+clock = rt.Clock()
+spritesheet = rt.Spritesheet("art", "orbs")
+println(clock:get_elapsed():as_seconds())
 
-Mauris sit amet iaculis nulla. Etiam commodo pulvinar urna, blandit mattis urna iaculis eget. Quisque fermentum massa vitae mauris vulputate, ac faucibus odio sollicitudin. Nullam ornare urna sed nunc cursus egestas. Proin sit amet dictum metus, eu vehicula arcu. Donec mi urna, convallis a commodo nec, varius non diam. Ut at ullamcorper nisi.
-
-Quisque rutrum, arcu a placerat elementum, leo tortor convallis tortor, at consequat felis urna non risus. Nam in leo scelerisque, feugiat nisl vel, hendrerit velit. Quisque sit amet tellus nec nulla tincidunt consectetur. Nullam tellus sem, aliquet vitae mauris sit amet, cursus cursus tortor. Sed facilisis justo sed diam mattis, non gravida dolor tristique. Donec consectetur suscipit arcu, a scelerisque nibh placerat at. Donec nec metus volutpat, suscipit nisi sit amet, rutrum nulla. Orci varius natoque penatibus et magnis dis parturient montes, nascetur ridiculus mus. Donec suscipit rutrum sapien in suscipit. Maecenas pretium orci nec aliquet consequat. Etiam luctus est vitae ex elementum, sit amet maximus urna efficitur. Maecenas lacinia, diam ac dictum convallis, est massa gravida ex, nec ornare felis dui vitae libero.")
-]])
-window:set_child(label)
-
-canvas = rt.RenderTexture(400, 400)
+animation = rt.Animation(spritesheet, "orbs")
+println(clock:get_elapsed():as_seconds())
 
 sprite = rt.VertexRectangle(10, 10, 100, 100)
 sprite:set_color(rt.RGBA(1, 1, 1, 1))
 
-sprite:set_texture(canvas)
+sprite:set_texture(animation)
 sprite:set_texture_rectangle(rt.AABB(0, 0, 1, 1))
-
-key = rt.add_keyboard_controller(window)
-key.signal:connect("key_pressed", function(self, key)
-
-    if key == rt.KeyboardKey.ARROW_UP then
-    elseif key == rt.KeyboardKey.ARROW_DOWN then
-    elseif key == rt.KeyboardKey.ARROW_LEFT then
-    elseif key == rt.KeyboardKey.ARROW_RIGHT then
-    elseif key == rt.KeyboardKey.PLUS then
-    elseif key == rt.KeyboardKey.MINUS then
-        error("test")
-    end
-end)
+println(clock:get_elapsed():as_seconds())
 
 -- @brief window resized
 function love.resize(width, height)
@@ -115,7 +97,7 @@ end
 
 --- @brief update tick
 function love.update()
-    rt.AnimationHandler.update(love.timer.getDelta())
+    rt.AnimationTimerHandler.update(love.timer.getDelta())
 end
 
 --- @brief draw step
@@ -124,9 +106,7 @@ function love.draw()
     love.graphics.setBackgroundColor(0, 0, 0, 0)
     love.graphics.setColor(1, 1, 1, 1)
 
-    canvas:bind_as_render_target()
     window:draw()
-    canvas:unbind_as_render_target()
     sprite:draw()
 
     function draw_guides()
@@ -172,7 +152,6 @@ function love.draw()
         love.graphics.draw(text, love.graphics.getWidth() - w, 0)
     end
     show_fps()
-    canvas:unbind_as_render_target()
 end
 
 --- @brief shutdown

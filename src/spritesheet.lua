@@ -12,30 +12,23 @@ function assert_array_textures_supported()
 end
 rt.USE_ARRAY_TEXTURES = assert_array_textures_supported()
 
---- @class Spritesheet
-rt.Spritesheet = meta.new_type("Spritesheet", function(table)
-    return meta.new(rt.Spritesheet, table)
-end)
-
-rt.Spritesheet.name = ""
-rt.Spritesheet.frame_width = -1
-rt.Spritesheet.frame_height = -1
-rt.Spritesheet.n_frames = 0
-
 --- @brief
-function rt.Spritesheet:create(path, id)
-    meta.assert_isa(self, rt.Spritesheet)
+rt.Spritesheet = meta.new_type("Spritesheet", function(path, id)
     meta.assert_string(path, id)
 
     local config_path = path .. "/" .. id .. ".lua"
     local image_path = path .. "/" .. id .. ".png"
-    local error_occurred = false
+
+    for _, path in ipairs({config_path, image_path}) do
+        if meta.is_nil(love.filesystem.getInfo(path)) then
+            error("[rt] In Spritesheet:create_from_file: file `" .. path .. "` does not exist")
+        end
+    end
 
     local file = love.filesystem.read(config_path)
     local code, error_maybe = load(file)
     if not meta.is_nil(error_maybe) then
-        println("[rt] In Spritesheet:create_from_file: Unable to read file at `" .. config_path .. "`: " .. error_maybe)
-        error_occurred = true
+        error("[rt] In Spritesheet:create_from_file: Unable to read file at `" .. config_path .. "`: " .. error_maybe)
     end
 
     local image = rt.Image(image_path)
@@ -51,8 +44,7 @@ function rt.Spritesheet:create(path, id)
     local n_frames = math.floor(image_width / width)
 
     if (image_width % width) ~= 0 then
-        println("[rt] In Spritesheet:create_from_file: Spritesheet `" .. id .. "` has a width of `" .. tostring(image_width) .. "`, which is not evenly divisble by its frame width `" .. tostring(width) .. "`")
-        error_occurred = true
+        error("[rt] In Spritesheet:create_from_file: Spritesheet `" .. id .. "` has a width of `" .. tostring(image_width) .. "`, which is not evenly divisble by its frame width `" .. tostring(width) .. "`")
     end
 
     local animations = config.animations
@@ -63,9 +55,8 @@ function rt.Spritesheet:create(path, id)
 
     local frame_to_name = {}
     for id, frames in pairs(animations) do
-        if #frames ~= 2 then
-            println("[rt] In Spritesheet:create_from_file: Spritesheet `" .. id .. "` has a malformed frame range for animation `" .. id .. "`")
-            error_occurred = true
+        if not (#frames == 2 and meta.is_number(frames[1]) and meta.is_number(frames[1])) then
+            error("[rt] In Spritesheet:create_from_file: Spritesheet `" .. id .. "` has a malformed frame range for animation `" .. id .. "`")
         end
         for i = frames[1], frames[2] do
             frame_to_name[i] = id
@@ -79,8 +70,7 @@ function rt.Spritesheet:create(path, id)
                 table.insert(unnamed, i)
             end
         end
-        println("[rt] In Spritesheet:create_from_file: Spritesheet `" .. id .. "` does not have an animation name assigned for frames `" .. serialize(unnamed) .. "`")
-        error_occurred = true
+        error("[rt] In Spritesheet:create_from_file: Spritesheet `" .. id .. "` does not have an animation name assigned for frames `" .. serialize(unnamed) .. "`")
     end
 
     local out = meta.new(rt.Spritesheet, {
@@ -98,27 +88,57 @@ function rt.Spritesheet:create(path, id)
     out.n_frames = n_frames
 
     return out
-end
+end)
+
+rt.Spritesheet.name = ""
+rt.Spritesheet.frame_width = -1
+rt.Spritesheet.frame_height = -1
+rt.Spritesheet.n_frames = 0
 
 --- @brief
 function rt.Spritesheet:get_frame(i)
     meta.assert_isa(self, rt.Spritesheet)
     meta.assert_number(i)
 
-    local out = love.graphics.newImageData(self.frame_width, self.frame_height)
+    if i < 1 or i > self.n_frames then
+        error("[rt] In rt.Spritesheet:get_frame: index `" .. tostring(i) .. "` is out of range for spritesheet with `" .. tostring(self.n_frames) .. "` frames")
+    end
+
+    local out = rt.Image(self.frame_width, self.frame_height)
     local valid = false
-    for x = 0, out:getWidth() do
-        for y = 0, out:getHeight() do
-            local r, g, b, a = self._data:getPixel(i * self._frame_width + x, y)
-            out:setPixel(x, y, r, g, b, a)
+    for x = 1, out:get_width() do
+        for y = 1, out:get_height() do
+            out:set_pixel(x, y, self._data:get_pixel((i - 1) * self.frame_width + x, y))
         end
     end
     return out
 end
 
---- @brief export spritesheet to folder
-function rt.Spritesheet:export(path)
-    if not self._valid then
-        println("[rt] In Spritesheet:export: Spritesheet `" .. self.name .. "` has had a formatting error and cannot be exported")
+--- @class Animation
+rt.Animation = meta.new_type("Animation", function(spritesheet, animation_id)
+
+    meta.assert_isa(spritesheet, rt.Spritesheet)
+    if meta.is_nil(animation_id) then animation_id = spritesheet.name end
+    meta.assert_string(animation_id)
+
+    local start_end = spritesheet._name_to_frame[animation_id]
+    if meta.is_nil(start_end) then
+        error("[rt] in Spritesheet:get_frames: Spritesheet `" .. self.name .. "` has no animation with id `" .. animation_id .. "`")
     end
-end
+
+    local textures = {}
+    for i = start_end[1], start_end[2] do
+        table.insert(textures, love.graphics.newImage(spritesheet:get_frame(i)._native))
+    end
+
+    return meta.new(rt.Animation, {
+        _textures = textures,
+        _native = textures[1],
+        _frame = 1,
+        _n_frames = sizeof(slices),
+        _id = animation_id
+    }, rt.Texture)
+end)
+
+
+
