@@ -60,6 +60,9 @@ require "viewport"
 
 -- ### MAIN ###
 
+code = love.filesystem.read("art/orbs.lua")
+println(serialize(load(code)()))
+
 if DEBUG_MODE then goto exit end
 rt.Font.DEFAULT = rt.load_font("Roboto", "assets/Roboto")
 rt.Font.DEFAULT:set_size(12)
@@ -108,8 +111,6 @@ function love.load()
     })
     love.window.setTitle("rat_game")
     window:fit_into(rt.AABB(1, 1, love.graphics.getWidth()-2, love.graphics.getHeight()-2))
-
-    rt.Palette:export("palette.png")
 end
 
 --- @brief update tick
@@ -171,12 +172,12 @@ function love.draw()
         love.graphics.draw(text, love.graphics.getWidth() - w, 0)
     end
     show_fps()
-
     canvas:unbind_as_render_target()
 end
 
 --- @brief shutdown
 function love.quit()
+    rt.Palette:export("palette.png")
 end
 
 ::exit::

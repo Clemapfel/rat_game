@@ -28,13 +28,13 @@ rt.Palette = {
 
     LIGHT_BLUE_1 = rt.RGBA("#79eaff"),
     LIGHT_BLUE_2 = rt.RGBA("#00d6fe"), -- light blue
-    LIGHT_BLUE_3 = rt.RGBA("#00a9ea"),
 
-    BLUE_1 = rt.RGBA("#009afe"),
-    BLUE_2 = rt.RGBA("#0074fe"),
-    BLUE_3 = rt.RGBA("#0053ed"), -- blue
-    BLUE_4 = rt.RGBA("#0e30ad"),
-    BLUE_5 = rt.RGBA("#06185a"),
+    BLUE_1 = rt.RGBA("#53bbff"),
+    BLUE_2 = rt.RGBA("#009afe"),
+    BLUE_3 = rt.RGBA("#0074fe"),
+    BLUE_4 = rt.RGBA("#0053ed"), -- blue
+    BLUE_5 = rt.RGBA("#0e30ad"),
+    BLUE_6 = rt.RGBA("#06185a"),
 
     PINK_1 = rt.RGBA("#f8a6dc"),
     PINK_2 = rt.RGBA("#f272bd"), -- pink
@@ -196,12 +196,12 @@ function rt.Palette:export()
 
         "LIGHT_BLUE_1",
         "LIGHT_BLUE_2",
-        "LIGHT_BLUE_3",
         "BLUE_1",
         "BLUE_2",
         "BLUE_3",
         "BLUE_4",
         "BLUE_5",
+        "BLUE_6",
 
         "PINK_1",
         "PINK_2",
@@ -268,7 +268,7 @@ function rt.Palette:export()
 
     image:save_to_file("palette.png")
     local from = love.filesystem.getAppdataDirectory() .. "love/rat_game/palette.png"
-    local to = love.filesystem.getSourceBaseDirectory() .. "/rat_game/assets/palette.png"
+    local to = love.filesystem.getSourceBaseDirectory() .. "/rat_game/art/palette.png"
     os.execute("mv " .. from .. " " .. to)
     love.filesystem.remove("palette.png")
     println("[rt][LOG] Exported palette to " .. to)

@@ -55,6 +55,20 @@ function rt.Image:get_size()
     return self._native:getDimensions()
 end
 
+--- @brief
+function rt.Image:get_width()
+    meta.assert_isa(self, rt.Image)
+    local w, h = self:get_size()
+    return w
+end
+
+--- @brief
+function rt.Image:get_height()
+    meta.assert_isa(self, rt.Image)
+    local w, h = self:get_size()
+    return h
+end
+
 --- @brief test Image
 function rt.test.image()
     -- TODO
