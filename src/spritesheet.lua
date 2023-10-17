@@ -97,60 +97,32 @@ rt.Spritesheet.frame_width = -1
 rt.Spritesheet.frame_height = -1
 rt.Spritesheet.n_frames = 0
 
---- @brief
+--- @brief index 1-basaed
 --- @return rt.AABB
 function rt.Spritesheet:get_frame(animation_id_or_index, index_maybe)
     meta.assert_isa(self, rt.Spritesheet)
 
+    local i = 0
     if meta.is_number(animation_id_or_index) then
         meta.assert_nil(index_maybe)
-        local i = animation_id_or_index
+        i = animation_id_or_index
 
         if i < 1 or i > self.n_frames then
             error("[rt] In rt.Spritesheet:get_frame: index `" .. tostring(i) .. "` is out of range for spritesheet with `" .. tostring(self.n_frames) .. "` frames")
         end
-
         return rt.AABB((i - 1) / self.n_frames, 0, 1 / self.n_frames, 1)
     else
         meta.assert_string(animation_id_or_index)
         meta.assert_number(index_maybe)
 
         local id = animation_id_or_index
-        local i = index_maybe
 
+        local start_end = self._name_to_frame[id]
+        if meta.is_nil(start_end) then
+            error("[rt] in Spritesheet:get_frame: Spritesheet `" .. self.name .. "` has no animation with id `" .. id .. "`")
+        end
 
+        local i = (start_end[1] - 1) + (index_maybe - 1)
+        return rt.AABB(i / self.n_frames, 0, 1 / self.n_frames, 1)
     end
-
-    println(out.x, " ", out.y, " ", out.width, " ", out.height)
-    return out
 end
-
---[[
---- @class Animation
-rt.Animation = meta.new_type("Animation", function(spritesheet, animation_id)
-
-    meta.assert_isa(spritesheet, rt.Spritesheet)
-    if meta.is_nil(animation_id) then animation_id = spritesheet.name end
-    meta.assert_string(animation_id)
-
-    local start_end = spritesheet._name_to_frame[animation_id]
-    if meta.is_nil(start_end) then
-        error("[rt] in Spritesheet:get_frames: Spritesheet `" .. self.name .. "` has no animation with id `" .. animation_id .. "`")
-    end
-
-    local textures = {}
-    for i = start_end[1], start_end[2] do
-        table.insert(textures, love.graphics.newImage(spritesheet:get_frame(i)._native))
-    end
-
-    return meta.new(rt.Animation, {
-        _textures = textures,
-        _native = textures[1],
-        _frame = 1,
-        _n_frames = sizeof(slices),
-        _id = animation_id
-    }, rt.Texture)
-end)]]--
-
-
-
