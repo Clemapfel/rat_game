@@ -69,17 +69,33 @@ window = rt.BinLayout()
 
 clock = rt.Clock()
 spritesheet = rt.Spritesheet("art", "orbs")
-println(clock:get_elapsed():as_seconds())
 
-animation = rt.Animation(spritesheet, "orbs")
 println(clock:get_elapsed():as_seconds())
-
 sprite = rt.VertexRectangle(10, 10, 100, 100)
 sprite:set_color(rt.RGBA(1, 1, 1, 1))
 
-sprite:set_texture(animation)
-sprite:set_texture_rectangle(rt.AABB(0, 0, 1, 1))
+sprite:set_texture(spritesheet)
+sprite:set_texture_rectangle(spritesheet:get_frame(1))
 println(clock:get_elapsed():as_seconds())
+
+frame_i = 1
+
+key = rt.add_keyboard_controller(window)
+key.signal:connect("key_pressed", function(self, key)
+
+    if key == rt.KeyboardKey.ARROW_UP then
+    elseif key == rt.KeyboardKey.ARROW_DOWN then
+    elseif key == rt.KeyboardKey.ARROW_LEFT then
+        frame_i = clamp(frame_i - 1, 1, POSITIVE_INFINITY)
+        sprite:set_texture_rectangle(spritesheet:get_frame(frame_i))
+    elseif key == rt.KeyboardKey.ARROW_RIGHT then
+        frame_i = clamp(frame_i + 1, 1, POSITIVE_INFINITY)
+        sprite:set_texture_rectangle(spritesheet:get_frame(frame_i))
+    elseif key == rt.KeyboardKey.PLUS then
+    elseif key == rt.KeyboardKey.MINUS then
+        error("test")
+    end
+end)
 
 -- @brief window resized
 function love.resize(width, height)

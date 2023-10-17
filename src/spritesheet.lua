@@ -10,7 +10,6 @@ function assert_array_textures_supported()
     println("[rt] In assert_array_textures_supported: Array textures for this device unsupported, using fallback")
     return false
 end
-rt.USE_ARRAY_TEXTURES = assert_array_textures_supported()
 
 --- @brief
 rt.Spritesheet = meta.new_type("Spritesheet", function(path, id)
@@ -31,7 +30,7 @@ rt.Spritesheet = meta.new_type("Spritesheet", function(path, id)
         error("[rt] In Spritesheet:create_from_file: Unable to read file at `" .. config_path .. "`: " .. error_maybe)
     end
 
-    local image = rt.Image(image_path)
+    local image = love.graphics.newImage(image_path)
     local config = code()
 
     local name = config.name
@@ -40,7 +39,7 @@ rt.Spritesheet = meta.new_type("Spritesheet", function(path, id)
     local width, height = config.width, config.height
     meta.assert_number(width, height)
 
-    local image_width = image:get_width()
+    local image_width = image:getWidth()
     local n_frames = math.floor(image_width / width)
 
     if (image_width % width) ~= 0 then
@@ -79,13 +78,16 @@ rt.Spritesheet = meta.new_type("Spritesheet", function(path, id)
         _name_to_frame = animations,
         _frame_to_name = frame_to_name,
         _valid = error_occurred,
-        _data = image
-    })
+        _native = image
+    }, rt.Texture)
 
     out.name = name
     out.frame_width = width
     out.frame_height = height
     out.n_frames = n_frames
+
+    out:set_scale_mode(rt.TextureScaleMode.NEAREST)
+    out:set_wrap_mode(rt.TextureWrapMode.REPEAT)
 
     return out
 end)
@@ -96,24 +98,34 @@ rt.Spritesheet.frame_height = -1
 rt.Spritesheet.n_frames = 0
 
 --- @brief
-function rt.Spritesheet:get_frame(i)
+--- @return rt.AABB
+function rt.Spritesheet:get_frame(animation_id_or_index, index_maybe)
     meta.assert_isa(self, rt.Spritesheet)
-    meta.assert_number(i)
 
-    if i < 1 or i > self.n_frames then
-        error("[rt] In rt.Spritesheet:get_frame: index `" .. tostring(i) .. "` is out of range for spritesheet with `" .. tostring(self.n_frames) .. "` frames")
-    end
+    if meta.is_number(animation_id_or_index) then
+        meta.assert_nil(index_maybe)
+        local i = animation_id_or_index
 
-    local out = rt.Image(self.frame_width, self.frame_height)
-    local valid = false
-    for x = 1, out:get_width() do
-        for y = 1, out:get_height() do
-            out:set_pixel(x, y, self._data:get_pixel((i - 1) * self.frame_width + x, y))
+        if i < 1 or i > self.n_frames then
+            error("[rt] In rt.Spritesheet:get_frame: index `" .. tostring(i) .. "` is out of range for spritesheet with `" .. tostring(self.n_frames) .. "` frames")
         end
+
+        return rt.AABB((i - 1) / self.n_frames, 0, 1 / self.n_frames, 1)
+    else
+        meta.assert_string(animation_id_or_index)
+        meta.assert_number(index_maybe)
+
+        local id = animation_id_or_index
+        local i = index_maybe
+
+
     end
+
+    println(out.x, " ", out.y, " ", out.width, " ", out.height)
     return out
 end
 
+--[[
 --- @class Animation
 rt.Animation = meta.new_type("Animation", function(spritesheet, animation_id)
 
@@ -138,7 +150,7 @@ rt.Animation = meta.new_type("Animation", function(spritesheet, animation_id)
         _n_frames = sizeof(slices),
         _id = animation_id
     }, rt.Texture)
-end)
+end)]]--
 
 
 
