@@ -11,9 +11,9 @@ rt.AnimationTimerState = meta.new_enum({
     IDLE = "ANIMATION_STATE_IDLE"
 })
 
---- @class rt.AnimationTimerTimingFunction
+--- @class rt.AnimationTimingFunction
 --- @see https://gitlab.gnome.org/GNOME/libadwaita/-/blob/main/src/adw-easing.c#L77
-rt.AnimationTimerTimingFunction = meta.new_enum({
+rt.AnimationTimingFunction = meta.new_enum({
     LINEAR = "ANIMATION_TIMING_FUNCTION_LINEAR",
     EASE_IN = "ANIMATION_TIMING_FUNCTION_EASE_IN",
     EASE_OUT = "ANIMATION_TIMING_FUNCTION_EASE_OUT",
@@ -24,19 +24,19 @@ rt.AnimationTimerHandler._timing_functions = (function()
 
     --- @see https://gitlab.gnome.org/GNOME/libadwaita/-/blob/main/src/adw-easing.c
     local out = {}
-    out[rt.AnimationTimerTimingFunction.LINEAR] = function(x)
+    out[rt.AnimationTimingFunction.LINEAR] = function(x)
         return x
     end
 
-    out[rt.AnimationTimerTimingFunction.EASE_IN] = function(x)
+    out[rt.AnimationTimingFunction.EASE_IN] = function(x)
         return -1.0 * math.cos(x * (math.pi / 2)) + 1.0;
     end
 
-    out[rt.AnimationTimerTimingFunction.EASE_OUT] = function(x)
+    out[rt.AnimationTimingFunction.EASE_OUT] = function(x)
         return math.sin(x * (math.pi / 2));
     end
 
-    out[rt.AnimationTimerTimingFunction.EASE_IN_OUT] = function(x)
+    out[rt.AnimationTimingFunction.EASE_IN_OUT] = function(x)
         return -0.5 * (math.cos(math.pi * x) - 1);
     end
     return out
@@ -55,7 +55,8 @@ rt.AnimationTimer = meta.new_type("AnimationTimer", function(duration_seconds)
         _state = rt.AnimationTimerState.IDLE,
         _duration = duration_seconds,
         _time = 0,
-        _timing_function = rt.AnimationTimerTimingFunction.LINEAR
+        _timing_function = rt.AnimationTimingFunction.LINEAR,
+        _loop = false
     })
 
     rt.AnimationTimerHandler._components[hash] = out
@@ -80,10 +81,17 @@ function rt.AnimationTimerHandler.update(delta)
         component._time = component._time + delta
 
         if component._time >= component._duration then
-            component._state = rt.AnimationTimerState.IDLE
-            component.signal:emit("tick", 1)
-            component.signal:emit("done")
-            goto continue
+            if component._loop then
+                while component._time > component._duration do
+                    component.signal:emit("tick", 1)
+                    component._time = component._time - component._duration
+                end
+            else
+                component._state = rt.AnimationTimerState.IDLE
+                component.signal:emit("tick", 1)
+                component.signal:emit("done")
+                goto continue
+            end
         end
 
         local value = rt.AnimationTimerHandler._timing_functions[component._timing_function](
@@ -98,13 +106,15 @@ end
 --- @brief get current state
 --- @param self rt.AnimationTimer
 --- @return rt.AnimationTimerState
-function rt.AnimationTimer.get_state(self)
+function rt.AnimationTimer:get_state()
+    meta.assert_isa(self, rt.AnimationTimer)
     return self._state
 end
 
 --- @brief reset animation back to idle
 --- @param self rt.AnimationTimer
-function rt.AnimationTimer.play(self)
+function rt.AnimationTimer:play()
+    meta.assert_isa(self, rt.AnimationTimer)
     if self:get_state() == rt.AnimationTimerState.IDLE then
         self._state = rt.AnimationTimerState.PLAYING
         self._time = 0
@@ -113,7 +123,8 @@ end
 
 --- @brief pause animation if it playing, otherwise do nothing
 --- @param self rt.AnimationTimer
-function rt.AnimationTimer.pause(self)
+function rt.AnimationTimer:pause()
+    meta.assert_isa(self, rt.AnimationTimer)
     if self:get_state() == rt.AnimationTimerState.PLAYING then
        self._state = rt.AnimationTimerState.PAUSED
     end
@@ -121,7 +132,8 @@ end
 
 --- @brief reset animation back to idle
 --- @param self rt.AnimationTimer
-function rt.AnimationTimer.reset(self)
+function rt.AnimationTimer:reset()
+    meta.assert_isa(self, rt.AnimationTimer)
     self._state = rt.AnimationTimerState.IDLE
     self._time = 0
 end
@@ -129,7 +141,7 @@ end
 --- @brief set duration of animation
 --- @param self rt.AnimationTimer
 --- @param duration_s Number
-function rt.AnimationTimer.set_duration(self, duration_s)
+function rt.AnimationTimer:set_duration(duration_s)
     meta.assert_isa(self, rt.AnimationTimer)
     self._duration = duration_s
 end
@@ -137,26 +149,34 @@ end
 --- @brief get duration of animation, in seconds
 --- @param self rt.AnimationTimer
 --- @return Number
-function rt.AnimationTimer.get_duration(self)
+function rt.AnimationTimer:get_duration()
     meta.assert_isa(self, rt.AnimationTimer)
     return self._duration
 end
 
 --- @brief set timing function
 --- @param self rt.AnimationTimer
---- @param f rt.AnimationTimerTimingFunction
-function rt.AnimationTimer.set_timing_function(self, f)
+--- @param f rt.AnimationTimingFunction
+function rt.AnimationTimer:set_timing_function(f)
     meta.assert_isa(self, rt.AnimationTimer)
-    meta.assert_enum(f, rt.AnimationTimerTimingFunction)
+    meta.assert_enum(f, rt.AnimationTimingFunction)
     self._timing_function = f
 end
 
 --- @brief get timing function
 --- @param self rt.AnimationTimer
---- @return rt.AnimationTimerTimingFunction
-function rt.AnimationTimer.get_timing_function(self, f)
+--- @return rt.AnimationTimingFunction
+function rt.AnimationTimer:get_timing_function(f)
     meta.assert_isa(self, rt.AnimationTimer)
     return self._timing_function
+end
+
+--- @bief set loop
+--- @param b Boolean
+function rt.AnimationTimer:set_should_loop(b)
+    meta.assert_isa(self, rt.AnimationTimer)
+    meta.assert_boolean(b)
+    self._loop = b
 end
 
 --- @brief [internal] test animation
@@ -188,8 +208,8 @@ function rt.test.test_animation()
     animation:set_duration(1)
     assert(animation:get_duration() == 1)
 
-    animation:set_timing_function(rt.AnimationTimerTimingFunction.EASE_IN_OUT)
-    assert(animation:get_timing_function(rt.AnimationTimerTimingFunction.EASE_IN_OUT))
+    animation:set_timing_function(rt.AnimationTimingFunction.EASE_IN_OUT)
+    assert(animation:get_timing_function(rt.AnimationTimingFunction.EASE_IN_OUT))
 
     assert(animation:get_state() == rt.AnimationTimerState.IDLE)
     animation:play()

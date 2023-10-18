@@ -59,12 +59,22 @@ require "label"
 require "scrollbar"
 require "viewport"
 require "sprite"
+require "animated_sprite"
 
 -- ### MAIN ###
 
 if DEBUG_MODE then goto exit end
 rt.Font.DEFAULT = rt.load_font("Roboto", "assets/Roboto")
 rt.Font.DEFAULT:set_size(12)
+
+timer = rt.AnimationTimer(1)
+timer:set_timing_function(rt.AnimationTimingFunction.LINEAR)
+timer:set_should_loop(true)
+timer:play()
+
+timer.signal:connect("tick", function(self, t)
+    println(t)
+end)
 
 window = rt.BinLayout()
 

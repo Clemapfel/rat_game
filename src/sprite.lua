@@ -112,3 +112,19 @@ function rt.Sprite:get_n_frames()
     meta.assert_isa(self, rt.Sprite)
     return self._spritesheet:get_n_frames(self._animation_id)
 end
+
+--- @brief
+function rt.Sprite:set_animation(id)
+
+    self._spritesheet:_assert_has_animation("Sprite:", id)
+    local w, h = self._spritesheet:get_frame_size(id)
+
+    self._animation_id = id
+    self._current_frame = 1
+    self._frame_width = w
+    self._frame_height = h
+
+    self:set_minimum_size(w, h)
+    self:set_frame(1)
+    self:reformat()
+end
