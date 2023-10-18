@@ -266,7 +266,7 @@ end
 
 --- @brief get alignment along y-axis
 --- @return rt.Alignment
-function rt.Widget:get_horizontal_alignment()
+function rt.Widget:get_vertical_alignment()
     meta.assert_isa(self, rt.Widget)
     return self._vertical_alignment
 end

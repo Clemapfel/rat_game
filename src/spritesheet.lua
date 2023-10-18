@@ -54,8 +54,8 @@ rt.Spritesheet = meta.new_type("Spritesheet", function(path, id)
 
     local frame_to_name = {}
     for id, frames in pairs(animations) do
-        if not (#frames == 2 and meta.is_number(frames[1]) and meta.is_number(frames[1])) then
-            error("[rt] In Spritesheet:create_from_file: Spritesheet `" .. id .. "` has a malformed frame range for animation `" .. id .. "`")
+        if not (#frames == 2 and meta.is_number(frames[1]) and meta.is_number(frames[1])) and frames[2] >= frames[1] then
+            error("[rt] In Spritesheet:create_from_file: Spritesheet `" .. id .. "`: frame range `{" .. tostring(frames[1]) .. ", " .. tostring(frames[2]) .. "} for animation `" .. id .. "` is malformed")
         end
         for i = frames[1], frames[2] do
             frame_to_name[i] = id
@@ -77,14 +77,14 @@ rt.Spritesheet = meta.new_type("Spritesheet", function(path, id)
         _image_path = image_path,
         _name_to_frame = animations,
         _frame_to_name = frame_to_name,
+        _frame_width = width,
+        _frame_height = height,
+        _n_frames = n_frames,
         _valid = error_occurred,
         _native = image
     }, rt.Texture)
 
     out.name = name
-    out.frame_width = width
-    out.frame_height = height
-    out.n_frames = n_frames
 
     out:set_scale_mode(rt.TextureScaleMode.NEAREST)
     out:set_wrap_mode(rt.TextureWrapMode.REPEAT)
@@ -93,9 +93,15 @@ rt.Spritesheet = meta.new_type("Spritesheet", function(path, id)
 end)
 
 rt.Spritesheet.name = ""
-rt.Spritesheet.frame_width = -1
-rt.Spritesheet.frame_height = -1
-rt.Spritesheet.n_frames = 0
+
+--- @brief [internal]
+function rt.Spritesheet:_assert_has_animation(scope, animation_id)
+    meta.assert_string(scope, animation_id)
+    meta.assert_isa(self, rt.Spritesheet)
+    if meta.is_nil(self._name_to_frame[animation_id]) then
+        error("[rt] in rt." .. scope .. ": Spritesheet `" .. self.name .. "` has no animation with id `" .. id .. "`")
+    end
+end
 
 --- @brief index 1-basaed
 --- @return rt.AABB
@@ -117,12 +123,30 @@ function rt.Spritesheet:get_frame(animation_id_or_index, index_maybe)
 
         local id = animation_id_or_index
 
+        self:_assert_has_animation("Spritesheet.get_frame", id)
         local start_end = self._name_to_frame[id]
-        if meta.is_nil(start_end) then
-            error("[rt] in Spritesheet:get_frame: Spritesheet `" .. self.name .. "` has no animation with id `" .. id .. "`")
-        end
-
         local i = (start_end[1] - 1) + (index_maybe - 1)
-        return rt.AABB(i / self.n_frames, 0, 1 / self.n_frames, 1)
+        return rt.AABB(i / self._n_frames, 0, 1 / self._n_frames, 1)
     end
+end
+
+--- @brief
+function rt.Spritesheet:get_frame_size(animation_id)
+    meta.assert_isa(self, rt.Spritesheet)
+    if meta.is_nil(animation_id) then
+        animation_id = self.name
+    end
+    self:_assert_has_animation("Spritesheet.get_frame_size", animation_id)
+    return self._frame_width, self._frame_height
+end
+
+--- @brief
+function rt.Spritesheet:get_n_frames(animation_id)
+    meta.assert_isa(self, rt.Spritesheet)
+    if meta.is_nil(animation_id) then
+        animation_id = self.name
+    end
+    self:_assert_has_animation("Spritesheet.get_n_frames", animation_id)
+    local start_end = self._name_to_frame[animation_id]
+    return start_end[2] - start_end[1] + 1
 end

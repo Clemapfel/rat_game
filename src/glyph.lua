@@ -1,4 +1,4 @@
---- @class Glyph
+--- @class rt.Glyph
 rt.Glyph = meta.new_type("Glyph", function(font, content, font_style, color, wrap_width)
 
     meta.assert_isa(font, rt.Font)

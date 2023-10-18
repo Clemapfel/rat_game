@@ -1,4 +1,4 @@
---- @class Palette
+--- @class rt.Palette
 rt.Palette = {
     LIGHT_GREEN_1 = rt.RGBA("#76ffc1"), -- light mint
     LIGHT_GREEN_2 = rt.RGBA("#12ff8d"), -- mint

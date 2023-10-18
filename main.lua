@@ -58,6 +58,7 @@ require "image_display"
 require "label"
 require "scrollbar"
 require "viewport"
+require "sprite"
 
 -- ### MAIN ###
 
@@ -69,29 +70,26 @@ window = rt.BinLayout()
 
 clock = rt.Clock()
 spritesheet = rt.Spritesheet("art", "orbs")
-println(serialize(spritesheet._name_to_frame))
-
-println(clock:get_elapsed():as_seconds())
-sprite = rt.VertexRectangle(10, 10, 100, 100)
-sprite:set_color(rt.RGBA(1, 1, 1, 1))
-
-sprite:set_texture(spritesheet)
-sprite:set_texture_rectangle(spritesheet:get_frame(1))
-println(clock:get_elapsed():as_seconds())
-
-frame_i = 1
+sprite = rt.Sprite(spritesheet, "orbs")
+window:set_child(sprite)
 
 key = rt.add_keyboard_controller(window)
 key.signal:connect("key_pressed", function(self, key)
 
     if key == rt.KeyboardKey.ARROW_UP then
+        sprite:set_vertical_alignment(rt.Alignment.START)
     elseif key == rt.KeyboardKey.ARROW_DOWN then
+        sprite:set_vertical_alignment(rt.Alignment.END)
     elseif key == rt.KeyboardKey.ARROW_LEFT then
-        frame_i = clamp(frame_i - 1, 1, POSITIVE_INFINITY)
-        sprite:set_texture_rectangle(spritesheet:get_frame("orbs", frame_i))
+        sprite:set_horizontal_alignment(rt.Alignment.START)
+        local frame_i = sprite:get_frame()
+        frame_i = clamp(frame_i + 1, 1, sprite:get_n_frames())
+        sprite:set_frame(frame_i)
     elseif key == rt.KeyboardKey.ARROW_RIGHT then
-        frame_i = clamp(frame_i + 1, 1, POSITIVE_INFINITY)
-        sprite:set_texture_rectangle(spritesheet:get_frame("orbs", frame_i))
+        sprite:set_horizontal_alignment(rt.Alignment.END)
+        local frame_i = sprite:get_frame()
+        frame_i = clamp(frame_i - 1, 1, sprite:get_n_frames())
+        sprite:set_frame(frame_i)
     elseif key == rt.KeyboardKey.PLUS then
     elseif key == rt.KeyboardKey.MINUS then
         error("test")
@@ -124,7 +122,6 @@ function love.draw()
     love.graphics.setColor(1, 1, 1, 1)
 
     window:draw()
-    sprite:draw()
 
     function draw_guides()
         local w, h = love.graphics.getWidth(), love.graphics.getHeight()

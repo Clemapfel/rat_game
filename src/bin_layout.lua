@@ -1,4 +1,4 @@
---- @class BinLayout
+--- @class rt.BinLayout
 rt.BinLayout = meta.new_type("BinLayout", function()
     local out = meta.new(rt.BinLayout, {
         _child = {}

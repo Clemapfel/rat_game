@@ -40,7 +40,7 @@ rt.SIGNAL_CONTROLLER_ADDED = "connected"
 rt.SIGNAL_CONTROLLER_REMOVED = "disconnected"
 rt.SIGNAL_AXIS_CHANGED = "axis"
 
---- @class GamepadController
+--- @class rt.GamepadController
 rt.GamepadController = meta.new_type("GamepadController", function(instance)
     meta.assert_object(instance)
     local hash = rt.GamepadHandler._hash

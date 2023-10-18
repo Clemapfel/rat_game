@@ -1,11 +1,11 @@
---- @class
+--- @class rt.SpriteBatchUsage
 rt.SpriteBatchUsage = meta.new_enum({
     DYNAMIC = "dynamic",
     STATIC = "static",
     STREAM = "stream"
 })
 
---- @class
+--- @class rt.MeshDrawMode
 rt.MeshDrawMode = meta.new_enum({
     TRIANGLE_FAN = "fan",
     TRIANGLE_STRIP = "strip",
@@ -29,8 +29,8 @@ function rt.Vertex(top_left_x, top_left_y, texture_coordinate_x, texture_coordin
     }
 end
 
---- @class VertexShape
---- @param vararg Vector2
+--- @class rt.VertexShape
+--- @param vararg rt.Vector2
 rt.VertexShape = meta.new_type("VertexShape", function(...)
     local positions = {...}
     local vertices = {}
@@ -171,16 +171,26 @@ function rt.VertexShape:draw()
     end
 end
 
---- @class rt.VertexRectangle
 function rt.VertexRectangle(x, y, width, height)
+    meta.assert_number(x, y, width, height)
     local out = rt.VertexShape(
         rt.Vector2(x, y),
         rt.Vector2(x + width, y),
         rt.Vector2(x + width, y + height),
         rt.Vector2(x, y + height)
     )
-    --out:set_vertex_order(1, 2, 4, 3)
     return out
+end
+
+--- @briefa
+function rt.VertexShape:resize(x, y, width, height)
+    meta.assert_isa(self, rt.VertexShape)
+    meta.assert_number(x, y, width, height)
+    assert(self:get_n_vertices() == 4) -- TODO: generalize to all shapes
+    self:set_vertex_position(1, x, y)
+    self:set_vertex_position(2, x + width, y)
+    self:set_vertex_position(3, x + width, y + height)
+    self:set_vertex_position(4, x, y + height)
 end
 
 --- @brief test VertexShape

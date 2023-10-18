@@ -1,4 +1,4 @@
---- @class OverlayLayout
+--- @class rt.OverlayLayout
 rt.OverlayLayout = meta.new_type("OverlayLayout", function()
     return meta.new(rt.OverlayLayout, {
         _base_child = {},

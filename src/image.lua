@@ -1,4 +1,4 @@
---- @class Image
+--- @class rt.Image
 rt.Image = meta.new_type("Image", function(width_or_filename, height)
     if meta.is_string(width_or_filename) then
         return meta.new(rt.Image, {

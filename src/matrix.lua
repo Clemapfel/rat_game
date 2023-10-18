@@ -1,4 +1,4 @@
---- @class Matrix
+--- @class rt.Matrix
 function rt.Matrix(n_rows, n_columns, default_value)
     meta.assert_number(n_rows, n_columns)
     if meta.is_nil(default_value) then

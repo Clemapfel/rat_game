@@ -1,4 +1,4 @@
---- @class AspectLayout
+--- @class rt.AspectLayout
 rt.AspectLayout = meta.new_type("AspectLayout", function(ratio)
     meta.assert_number(ratio)
     local out = meta.new(rt.AspectLayout, {

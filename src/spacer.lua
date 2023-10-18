@@ -24,12 +24,14 @@ end
 
 --- @overload rt.Widget.size_allocate
 function rt.Spacer:size_allocate(x, y, width, height)
+    meta.assert_isa(self, rt.Spacer)
     self._shape:set_position(x, y)
     self._shape:set_size(width, height)
 end
 
 --- @overload rt.Widget.measure
 function rt.Spacer:measure()
+    meta.assert_isa(self, rt.Spacer)
     local w, h = self:get_minimum_size()
     w = w + self:get_margin_left() + self:get_margin_right()
     h = h + self:get_margin_top() + self:get_margin_bottom()

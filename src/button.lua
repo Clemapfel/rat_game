@@ -1,4 +1,4 @@
---- @class Button
+--- @class rt.Button
 --- @signal clicked (::Button) -> nil
 rt.Button = meta.new_type("Button", function()
     local out = meta.new(rt.Button, {

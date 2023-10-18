@@ -1,7 +1,7 @@
 --- @brief singleton, handles mouse input
 rt.MouseHandler = {}
 
---- @class MouseButton
+--- @class rt.MouseButton
 rt.MouseButton = meta.new_enum({
     LEFT = 1,
     MIDDLE = 2,

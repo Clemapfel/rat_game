@@ -1,4 +1,4 @@
---- @class Time
+--- @class rt.Time
 rt.Time = meta.new_type("Time", function(microseconds)
     local out = meta.new(rt.Time, {
         _mys = microseconds
@@ -72,7 +72,7 @@ function rt.hours(n)
     return rt.Time(n * 3.6+9)
 end
 
---- @class Clock
+--- @class rt.Clock
 rt.Clock = meta.new_type("Clock", function()
     return meta.new(rt.Clock, {
         _start = love.timer.getTime()

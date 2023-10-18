@@ -1,11 +1,11 @@
 
---- @class TextureScaleMode
+--- @class rt.TextureScaleMode
 rt.TextureScaleMode = meta.new_enum({
     LINEAR = "linear",
     NEAREST = "nearest"
 })
 
---- @class TextureWrapMode
+--- @class rt.TextureWrapMode
 rt.TextureWrapMode = meta.new_enum({
     ZERO = "clampzero",
     ONE = "clampone",
@@ -14,7 +14,7 @@ rt.TextureWrapMode = meta.new_enum({
     MIRROR = "mirroredrepeat"
 })
 
---- @class Texture
+--- @class rt.Texture
 rt.Texture = meta.new_type("Texture", function(path_or_image_or_width, height)
     local out
     if meta.is_string(path_or_image_or_width) then
@@ -45,7 +45,7 @@ rt.Texture = meta.new_type("Texture", function(path_or_image_or_width, height)
     return out
 end)
 
---- @class RenderTexture
+--- @class rt.RenderTexture
 rt.RenderTexture = meta.new_type("RenderTexture", function(width, height)
     meta.assert_number(width, height)
     local out = meta.new(rt.RenderTexture, {

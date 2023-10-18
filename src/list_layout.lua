@@ -1,4 +1,4 @@
---- @class ListLayout
+--- @class rt.ListLayout
 rt.ListLayout = meta.new_type("ListLayout", function(orientation, ...)
     if meta.is_nil(orientation) then
         orientation = rt.Orientation.VERTICAL

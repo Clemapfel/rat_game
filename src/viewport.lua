@@ -1,4 +1,4 @@
---- @class Viewport
+--- @class rt.Viewport
 rt.Viewport = meta.new_type("Viewport", function()
     local out = meta.new(rt.Viewport, {
         _child = {},

@@ -1,4 +1,4 @@
---- @class Vector2
+--- @class rt.Vector2
 function rt.Vector2(x, y)
     local out = {x = x, y = y}
     out.__metatable = {
@@ -58,7 +58,7 @@ function rt.assert_vector2(object)
     end
 end
 
---- @class Vector3
+--- @class rt.Vector3
 function rt.Vector3(x, y, z)
     local out = {x = x, y = y, z = z}
     out.__metatable = {

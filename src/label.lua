@@ -6,7 +6,7 @@ rt.TextAlignment = meta.new_enum({
     -- JUSTIFY = "justify"
 })
 
---- @class Label
+--- @class rt.Label
 rt.Label = meta.new_type("Label", function(text)
     if not meta.is_nil(text) then
         meta.assert_string(text)
