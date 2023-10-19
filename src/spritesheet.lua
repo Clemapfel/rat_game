@@ -1,17 +1,6 @@
---- @brief check if array textures are available on this device
-function assert_array_textures_supported()
-    local types = love.graphics.getTextureTypes()
-    for _, type in pairs(types) do
-        if type == "array" then
-            return true
-        end
-    end
+rt.DEFAULT_ANIMATION_FPS = 24
 
-    println("[rt] In assert_array_textures_supported: Array textures for this device unsupported, using fallback")
-    return false
-end
-
---- @brief
+--- @class rt.Spritesheet
 rt.Spritesheet = meta.new_type("Spritesheet", function(path, id)
     meta.assert_string(path, id)
 
@@ -38,6 +27,10 @@ rt.Spritesheet = meta.new_type("Spritesheet", function(path, id)
 
     local width, height = config.width, config.height
     meta.assert_number(width, height)
+
+    local fps = config.fps
+    if meta.is_nil(fps) then fps = rt.DEFAULT_ANIMATION_FPS end
+    meta.assert_number(fps)
 
     local image_width = image:getWidth()
     local n_frames = math.floor(image_width / width)

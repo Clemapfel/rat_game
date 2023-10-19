@@ -1,4 +1,5 @@
 --- @class rt.AxisAlignedRectangle
+--- @param
 rt.AxisAlignedRectangle = meta.new_type("AxisAlignedRectangle", function(top_left_x, top_left_y, width, height)
 
     if meta.is_nil(top_left_x) then

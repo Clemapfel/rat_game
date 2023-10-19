@@ -63,14 +63,14 @@ rt.Button = meta.new_type("Button", function()
     return out
 end)
 
---- @brief
+--- @brief [internal] resolve depressing button
 function rt.Button:_resolve_clicked()
     meta.assert_isa(self, rt.Button)
     self._overlay_shadow:set_is_visible(true)
     self._depressed = true
 end
 
---- @brief
+--- @brief [internal] resolve unpressing button that is currently depressed
 function rt.Button:_resolve_unclicked()
     meta.assert_isa(self, rt.Button)
 
@@ -82,7 +82,7 @@ function rt.Button:_resolve_unclicked()
     self._depressed = false
 end
 
---- @brief
+--- @overload rt.Widget.size_allocate
 function rt.Button:size_allocate(x, y, width, height)
     self._base:set_position(x + 1, y + 1)
     self._base:set_size(width - 2, height - 2)
@@ -101,7 +101,7 @@ function rt.Button:size_allocate(x, y, width, height)
     end
 end
 
---- @brief
+--- @overload rt.Widget.measure
 function rt.Button:measure()
     if meta.is_nil(self._child) then
         return 2*5 + 2*5
@@ -111,7 +111,7 @@ function rt.Button:measure()
     end
 end
 
---- @brief
+--- @overload rt.Drawable.draw
 function rt.Button:draw()
     self._base:draw()
     self._child:draw()
@@ -123,14 +123,16 @@ function rt.Button:draw()
     end
 end
 
---- @brief
+--- @brief set singular child
+--- @param child rt.Widget
 function rt.Button:set_child(child)
     meta.assert_isa(child, rt.Widget)
     self._child = child
     self:reformat()
 end
 
---- @brief
+--- @brief get singular child
+--- @return rt.Widget
 function rt.Button:get_child()
     return self._child
 end

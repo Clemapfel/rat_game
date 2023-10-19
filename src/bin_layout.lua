@@ -1,4 +1,5 @@
 --- @class rt.BinLayout
+--- @brief Single-child container that assumes the dimensions of its singular child
 rt.BinLayout = meta.new_type("BinLayout", function()
     local out = meta.new(rt.BinLayout, {
         _child = {}
@@ -7,6 +8,7 @@ rt.BinLayout = meta.new_type("BinLayout", function()
 end)
 
 --- @brief set singular child
+--- @param child rt.Widget
 function rt.BinLayout:set_child(child)
     meta.assert_isa(self, rt.BinLayout)
     meta.assert_isa(self, rt.Widget)
@@ -21,6 +23,7 @@ function rt.BinLayout:set_child(child)
 end
 
 --- @brief get singular child
+--- @return rt.Widget
 function rt.BinLayout:get_child()
     meta.assert_isa(self, rt.BinLayout)
     return self._child

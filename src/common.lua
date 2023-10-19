@@ -287,6 +287,7 @@ POSITIVE_INFINITY = INFINITY
 NEGATIVE_INFINITY = -1/0
 
 --- @brief make first letter capital
+--- @param str string
 function string.capitalize(str)
     return string.upper(string.sub(str, 1, 1)) .. string.sub(str, 2, string.len(str))
 end
@@ -304,11 +305,14 @@ function string.split(str, separator)
 end
 
 --- @brief check if pattern occurrs in string
+--- @param str string
+--- @param pattern string
 function string.contains(str, pattern)
     return type(string.find(str, pattern)) ~= "nil"
 end
 
 --- @brief round to nearest integer
+--- @param i number
 function math.round(i)
     return math.floor(i + 0.5)
 end

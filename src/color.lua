@@ -1,4 +1,8 @@
 --- @class rt.RGBA
+--- @param r Number (or String)
+--- @param g Number (or nil)
+--- @param b Number (or nil)
+--- @param a Number (or nil)
 rt.RGBA = function(r_or_string, g, b, a)
 
     if meta.is_string(r_or_string) then
@@ -20,7 +24,8 @@ rt.RGBA = function(r_or_string, g, b, a)
     end
 end
 
---- @brief [internal]
+--- @brief [internal] check if object is rt.RGBA
+--- @param object any
 function rt.is_rgba(object)
     return sizeof(object) == 4 and
         meta.is_number(object.r) and
@@ -29,7 +34,7 @@ function rt.is_rgba(object)
         meta.is_number(object.a)
 end
 
---- @brief [internal] check if object is RGBA
+--- @brief [internal] throw if object is not rt.RGBA
 function rt.assert_rgba(object)
     if not rt.is_rgba(object) then
         error("In " .. debug.getinfo(2, "n").name .. ": Excpected `RGBA`, got `" .. meta.typeof(object) .. "`")
@@ -37,6 +42,10 @@ function rt.assert_rgba(object)
 end
 
 --- @class rt.HSVA
+--- @param h Number
+--- @param s Number
+--- @param v Number
+--- @param a Number
 function rt.HSVA(h, s, v, a)
     if meta.is_nil(h) then h = 1 end
     if meta.is_nil(s) then s = 1 end
@@ -51,7 +60,9 @@ function rt.HSVA(h, s, v, a)
     return out
 end
 
---- @brief [internal]
+--- @brief [internal] check if object is rt.HSVA
+--- @param object any
+--- @return Boolean
 function rt.is_hsva(object)
     return sizeof(object) == 4 and
         meta.is_number(object.h) and
@@ -60,7 +71,8 @@ function rt.is_hsva(object)
         meta.is_number(object.a)
 end
 
---- @brief [internal] check if object is RGBA
+--- @brief [internal] throw if object is not rt.HSVA
+--- @param object any
 function rt.assert_hsva(object)
     if not rt.is_hsva(object) then
         error("In " .. debug.getinfo(2, "n").name .. ": Excpected `HSVA`, got `" .. meta.typeof(object) .. "`")
@@ -69,6 +81,7 @@ end
 
 --- @brief conver rgba to hsva
 --- @param rgba rt.RGBA
+--- @return rt.HSVA
 function rt.rgba_to_hsva(rgba)
     rt.assert_rgba(rgba)
 
@@ -119,6 +132,7 @@ end
 
 --- @brief convert hsva to rgba
 --- @param hsva rt.HSVA
+--- @return rt.RGBA
 function rt.hsva_to_rgba(hsva)
     rt.assert_hsva(hsva)
 
@@ -157,7 +171,10 @@ function rt.hsva_to_rgba(hsva)
     return rt.RGBA(r, g, b, a)
 end
 
---- @brief
+--- @brief compare colors
+--- @param c1 rt.RGBA
+--- @param c2 rt.RGBA
+--- @return Boolean
 function rt.compare_rgba(c1, c2)
     rt.assert_rgba(c1)
     rt.assert_rgba(c2)

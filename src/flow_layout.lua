@@ -1,8 +1,14 @@
 --- @class rt.FlowLayout
-rt.FlowLayout = meta.new_type("FlowLayout", function()
+--- @brief container that automatically redistributes it's children across as many rows/columns as necessary
+rt.FlowLayout = meta.new_type("FlowLayout", function(orientation)
+    if meta.is_nil(orientation) then
+        orientation = rt.Orientation.VERTICAL
+    end
+    meta.assert_enum(orientation, rt.Orientation)
+
     return meta.new(rt.FlowLayout, {
         _children = rt.Queue(),
-        _orientation = rt.Orientation.VERTICAL,
+        _orientation = orientation,
         _min_n_rows = 0,
         _min_n_cols = 0,
         _row_spacing = 0,
@@ -10,7 +16,7 @@ rt.FlowLayout = meta.new_type("FlowLayout", function()
     }, rt.Drawable, rt.Widget)
 end)
 
---- @overlay rt.Widget.size_allocate
+--- @overload rt.Widget.size_allocate
 function rt.FlowLayout:size_allocate(x, y, width, height)
     meta.assert_isa(self, rt.FlowLayout)
 
@@ -86,7 +92,8 @@ function rt.FlowLayout:draw()
     end
 end
 
---- @brief
+--- @brief replace all children at once
+--- @param children Table<rt.Widget>
 function rt.FlowLayout:set_children(children)
     meta.assert_isa(self, rt.FlowLayout)
     for child in pairs(self._children) do
@@ -102,7 +109,8 @@ function rt.FlowLayout:set_children(children)
     self:reformat()
 end
 
---- @brief
+--- @brief append child
+--- @param child rt.Widget
 function rt.FlowLayout:push_back(child)
     meta.assert_isa(self, rt.FlowLayout)
     meta.assert_isa(child, rt.Widget)
@@ -111,7 +119,8 @@ function rt.FlowLayout:push_back(child)
     self:reformat()
 end
 
---- @brief
+--- @brief prepend child
+--- @param child rt.Widget
 function rt.FlowLayout:push_front(child)
     meta.assert_isa(self, rt.FlowLayout)
     meta.assert_isa(child, rt.Widget)
@@ -120,8 +129,8 @@ function rt.FlowLayout:push_front(child)
     self:reformat()
 end
 
---- @brief
---- @return rt.Widget
+--- @brief remove first child
+--- @return rt.Widget (or nil)
 function rt.FlowLayout:pop_front()
     meta.assert_isa(self, rt.FlowLayout)
     local out = self._children:pop_front()
@@ -130,8 +139,8 @@ function rt.FlowLayout:pop_front()
     return out
 end
 
---- @brief
---- @return rt.Widget
+--- @brief remove last child
+--- @return rt.Widget (or nil)
 function rt.FlowLayout:pop_back()
     meta.assert_isa(self, rt.FlowLayout)
     local out = self._children:pop_back()
@@ -156,27 +165,31 @@ function rt.FlowLayout:get_orientation()
     return self._orientation
 end
 
---- @brief TODO
+--- @brief set spacing in-between rows
+--- @param x Number
 function rt.FlowLayout:set_row_spacing(x)
     meta.assert_isa(self, rt.FlowLayout)
     meta.assert_number(x)
     self._row_spacing = x
 end
 
---- @brief
+--- @brief get spacing in-between rows
+--- @return Number
 function rt.FlowLayout:get_row_spacing()
     meta.assert_isa(self, rt.FlowLayout)
     return self._row_spacing
 end
 
---- @brief TODO
+--- @brief set spacing in-between columns
+--- @param x Number
 function rt.FlowLayout:set_column_spacing(x)
     meta.assert_isa(self, rt.FlowLayout)
     meta.assert_number(x)
     self._column_spacing = x
 end
 
---- @brief
+--- @brief get spacing in-between columns
+--- @return Number
 function rt.FlowLayout:get_column_spacing()
     meta.assert_isa(self, rt.FlowLayout)
     return self._column_spacing

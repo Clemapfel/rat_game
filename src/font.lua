@@ -1,4 +1,8 @@
 --- @class rt.Font
+--- @param regular_path String
+--- @param bold_path String (or nil)
+--- @param italic_path String (or nil)
+--- @param bold_italic_path String (or nil)
 rt.Font = meta.new_type("Font", function(regular_path, bold_path, italic_path, bold_italic_path)
 
     meta.assert_string(regular_path)
@@ -33,6 +37,8 @@ rt.Font = meta.new_type("Font", function(regular_path, bold_path, italic_path, b
     out:_update()
     return out
 end)
+
+--- @class love.Font
 
 rt.Font.DEFAULT_SIZE = 14
 rt.Font.DEFAULT = {}
@@ -89,25 +95,29 @@ function rt.Font:get_size()
     return self._size
 end
 
---- @brief
+--- @brief get regular version of font
+--- @return love.Font
 function rt.Font:get_regular()
     meta.assert_isa(self, rt.Font)
     return self[rt.FontStyle.REGULAR]
 end
 
---- @brief
+--- @brief get bold version of font
+--- @return love.Font
 function rt.Font:get_bold()
     meta.assert_isa(self, rt.Font)
     return self[rt.FontStyle.BOLD]
 end
 
---- @brief
+--- @brief get italic version of font
+--- @return love.Font
 function rt.Font:get_italic()
     meta.assert_isa(self, rt.Font)
     return self[rt.FontStyle.ITALIC]
 end
 
---- @brief
+--- @brief get bold-italic version of font
+--- @return love.Font
 function rt.Font:get_bold_italic()
     meta.assert_isa(self, rt.Font)
     return self[rt.FontStyle.BOLD_ITALIC]

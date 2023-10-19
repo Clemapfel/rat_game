@@ -5,3 +5,5 @@ rt.AnimatedSprite = meta.new_type("AnimatedSprite", function(spritesheet, animat
         _timer = rt.AnimationTimer()
     })
 end)
+
+---

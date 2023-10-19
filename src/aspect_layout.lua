@@ -1,4 +1,6 @@
 --- @class rt.AspectLayout
+--- @brief Makes sure its singular child conforms to given width-to-height ratio
+--- @param ratio Number
 rt.AspectLayout = meta.new_type("AspectLayout", function(ratio)
     meta.assert_number(ratio)
     local out = meta.new(rt.AspectLayout, {
@@ -11,6 +13,7 @@ rt.AspectLayout = meta.new_type("AspectLayout", function(ratio)
 end)
 
 --- @brief set singular child
+--- @param child rt.Widget
 function rt.AspectLayout:set_child(child)
     meta.assert_isa(self, rt.AspectLayout)
     meta.assert_isa(self, rt.Widget)
@@ -25,6 +28,7 @@ function rt.AspectLayout:set_child(child)
 end
 
 --- @brief get singular child
+--- @return rt.Widget
 function rt.AspectLayout:get_child()
     meta.assert_isa(self, rt.AspectLayout)
     return self._child
