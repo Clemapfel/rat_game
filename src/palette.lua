@@ -24,7 +24,7 @@ rt.Palette = {
     RED_2 = rt.RGBA("#cf0018"),
     RED_3 = rt.RGBA("#9c001a"),
     RED_4 = rt.RGBA("#6c0012"),
-    RED_5 = rt.RGBA("#4c000d"),
+    RED_5 = rt.RGBA("#43000b"),
 
     LIGHT_BLUE_1 = rt.RGBA("#79eaff"),
     LIGHT_BLUE_2 = rt.RGBA("#00d6fe"), -- light blue
@@ -54,7 +54,7 @@ rt.Palette = {
     LILAC_4 = rt.RGBA("#6919c5"),
     LILAC_5 = rt.RGBA("#470296"),
 
-    YELLOW_1 = rt.RGBA("#ffeda3"),
+    YELLOW_1 = rt.RGBA("#fcf3a6"),
     YELLOW_2 = rt.RGBA("#ffe200"), -- yellow
     YELLOW_3 = rt.RGBA("#ddb60a"),
 
