@@ -79,8 +79,8 @@ end)
 window = rt.BinLayout()
 
 clock = rt.Clock()
-spritesheet = rt.Spritesheet("art", "orbs")
-sprite = rt.Sprite(spritesheet, "orbs")
+spritesheet = rt.Spritesheet("art", "test_animation")
+sprite = rt.Sprite(spritesheet, "test_animation")
 window:set_child(sprite)
 
 key = rt.add_keyboard_controller(window)
