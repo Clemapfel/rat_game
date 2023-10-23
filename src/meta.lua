@@ -74,12 +74,13 @@ function meta._new(typename)
         end
         metatable.properties[property_name] = property_value
 
-        -- trigger notify signals, c.f. `signal_component.lua`
+        --[[
         if metatable.components.signal == nil then return end
         local notify_signal_id = rt.SignalComponent._notify_prefix .. property_name
         if metatable.components.signal:has_signal(notify_signal_id) then
             metatable.components.signal:emit(notify_signal_id, property_value)
         end
+        ]]--
     end
 
     metatable.__tostring = function(this)
