@@ -76,7 +76,7 @@ window:set_child(sprite)
 sprite:play()
 
 key = rt.add_keyboard_controller(window)
-key.signal:connect("key_pressed", function(self, key)
+key:signal_connect("key_pressed", function(self, key)
 
     if key == rt.KeyboardKey.ARROW_UP then
     elseif key == rt.KeyboardKey.ARROW_DOWN then

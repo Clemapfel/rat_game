@@ -8,10 +8,9 @@ rt.Button = meta.new_type("Button", function()
         _focus_highlight = rt.Rectangle(0, 0, 1, 1, 10),
         _depressed = false,
         _child = {}
-    }, rt.Drawable, rt.Widget)
+    }, rt.Drawable, rt.Widget, rt.SignalEmitter)
 
-    rt.add_signal_component(out)
-    out.signal:add("clicked")
+    out:signal_add("clicked")
 
     out._base:set_color(rt.RGBA(0.5, 0.5, 0.5, 1))
     out._overlay_shadow:set_color(rt.RGBA(0, 0, 0, 0.5))
@@ -26,21 +25,21 @@ rt.Button = meta.new_type("Button", function()
     out._overlay_shadow:set_is_visible(false)
 
     local mouse = rt.add_mouse_component(out)
-    mouse.signal:connect("button_pressed", function(self, x, y, which_button)
+    mouse:signal_connect("button_pressed", function(self, x, y, which_button)
         self.instance:_resolve_clicked()
     end)
-    mouse.signal:connect("button_released", function(self, x, y, which_button)
+    mouse:signal_connect("button_released", function(self, x, y, which_button)
         self.instance:_resolve_unclicked()
     end)
 
     local key = rt.add_keyboard_component(out)
-    key.signal:connect("key_pressed", function(self, key)
+    key:signal_connect("key_pressed", function(self, key)
         if self.instance._depressed then return end
         if rt.KeyMap.should_trigger("activate", key) then
             self.instance:_resolve_clicked()
         end
     end)
-    key.signal:connect("key_released", function(self, key)
+    key:signal_connect("key_released", function(self, key)
         if not self.instance._depressed then return end
         if rt.KeyMap.should_trigger("activate", key) then
             self.instance:_resolve_unclicked()
@@ -48,13 +47,13 @@ rt.Button = meta.new_type("Button", function()
     end)
 
     local gamepad = rt.add_gamepad_component(out)
-    gamepad.signal:connect("button_pressed", function(self, id, button)
+    gamepad:signal_connect("button_pressed", function(self, id, button)
         if self.instance._depressed then return end
         if rt.KeyMap.should_trigger("activate", key) then
             self.instance:_resolve_clicked()
         end
     end)
-    gamepad.signal:connect("button_released", function(self, id, button)
+    gamepad:signal_connect("button_released", function(self, id, button)
         if self.instance._depressed then return end
         if rt.KeyMap.should_trigger("activate", key) then
             self.instance:_resolve_unclicked()
@@ -75,7 +74,7 @@ function rt.Button:_resolve_unclicked()
     meta.assert_isa(self, rt.Button)
 
     if self._depressed then
-        self.signal:emit("clicked")
+        self:signal_emit("clicked")
     end
 
     self._overlay_shadow:set_is_visible(false)

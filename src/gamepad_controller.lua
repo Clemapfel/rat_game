@@ -50,13 +50,12 @@ rt.GamepadController = meta.new_type("GamepadController", function(instance)
     local out = meta.new(rt.GamepadController, {
         instance = instance,
         _hash = hash
-    })
-    rt.add_signal_component(out)
-    out.signal:add(rt.SIGNAL_BUTTON_PRESSED)
-    out.signal:add(rt.SIGNAL_BUTTON_RELEASED)
-    out.signal:add(rt.SIGNAL_CONTROLLER_ADDED)
-    out.signal:add(rt.SIGNAL_CONTROLLER_REMOVED)
-    out.signal:add(rt.SIGNAL_AXIS_CHANGED)
+    }, rt.SignalEmitter)
+    out:signal_add(rt.SIGNAL_BUTTON_PRESSED)
+    out:signal_add(rt.SIGNAL_BUTTON_RELEASED)
+    out:signal_add(rt.SIGNAL_CONTROLLER_ADDED)
+    out:signal_add(rt.SIGNAL_CONTROLLER_REMOVED)
+    out:signal_add(rt.SIGNAL_AXIS_CHANGED)
 
     rt.GamepadHandler._components[hash] = out
     return out
@@ -66,7 +65,7 @@ end)
 --- @param joystick love.Joystick
 function rt.GamepadHandler.handle_joystick_added(joystick)
     for _, component in pairs(rt.GamepadHandler._components) do
-        component.signal:emit(rt.SIGNAL_CONTROLLER_ADDED, joystick:getID())
+        component:signal_emit(rt.SIGNAL_CONTROLLER_ADDED, joystick:getID())
     end
 end
 love.joystickadded = rt.GamepadHandler.handle_joystick_added
@@ -75,7 +74,7 @@ love.joystickadded = rt.GamepadHandler.handle_joystick_added
 --- @param joystick love.Joystick
 function rt.GamepadHandler.handle_joystick_removed(joystick)
     for _, component in pairs(rt.GamepadHandler._components) do
-        component.signal:emit(rt.SIGNAL_CONTROLLER_REMOVED, joystick:getID())
+        component:signal_emit(rt.SIGNAL_CONTROLLER_REMOVED, joystick:getID())
     end
 end
 love.joystickremoved = rt.GamepadHandler.handle_joystick_removed
@@ -86,7 +85,7 @@ love.joystickremoved = rt.GamepadHandler.handle_joystick_removed
 function rt.GamepadHandler.handle_button_pressed(joystick, button)
     meta.assert_enum(button, rt.GamepadButton)
     for _, component in pairs(rt.GamepadHandler._components) do
-        component.signal:emit(rt.SIGNAL_BUTTON_PRESSED, joystick:getID(), button)
+        component:signal_emit(rt.SIGNAL_BUTTON_PRESSED, joystick:getID(), button)
     end
 end
 love.gamepadpressed = rt.GamepadHandler.handle_button_pressed
@@ -97,7 +96,7 @@ love.gamepadpressed = rt.GamepadHandler.handle_button_pressed
 function rt.GamepadHandler.handle_button_released(joystick, button)
     meta.assert_enum(button, rt.GamepadButton)
     for _, component in pairs(rt.GamepadHandler._components) do
-        component.signal:emit(rt.SIGNAL_BUTTON_RELEASED, joystick:getID(), button)
+        component:signal_emit(rt.SIGNAL_BUTTON_RELEASED, joystick:getID(), button)
     end
 end
 love.gamepadreleased = rt.GamepadHandler.handle_button_released
@@ -109,7 +108,7 @@ love.gamepadreleased = rt.GamepadHandler.handle_button_released
 function rt.GamepadHandler.handle_axis_changed(joystick, axis, value)
     meta.assert_enum(axis, rt.GamepadAxis)
     for _, component in pairs(rt.GamepadHandler._components) do
-        component.signal:emit(rt.SIGNAL_AXIS_CHANGED, joystick:getID(), axis, value)
+        component:signal_emit(rt.SIGNAL_AXIS_CHANGED, joystick:getID(), axis, value)
     end
 end
 love.gamepadaxis = rt.GamepadHandler.handle_axis_changed

@@ -152,10 +152,10 @@ rt.KeyboardController = meta.new_type("KeyboardController", function(instance)
     local out = meta.new(rt.KeyboardController, {
         instance = instance,
         _hash = hash
-    })
-    rt.add_signal_component(out)
-    out.signal:add("key_pressed")
-    out.signal:add("key_released")
+    }, rt.SignalEmitter)
+
+    out:signal_add("key_pressed")
+    out:signal_add("key_released")
 
     rt.KeyboardHandler._components[hash] = out
     return out
@@ -167,7 +167,7 @@ end)
 function rt.KeyboardHandler.handle_key_pressed(key)
     for _, component in pairs(rt.KeyboardHandler._components) do
         if component.instance:get_has_focus() then
-            component.signal:emit("key_pressed", key)
+            component:signal_emit("key_pressed", key)
         end
     end
 end
@@ -178,7 +178,7 @@ love.keypressed = function(key) rt.KeyboardHandler.handle_key_pressed(key) end
 function rt.KeyboardHandler.handle_key_released(key)
     for _, component in pairs(rt.KeyboardHandler._components) do
         if component.instance:get_has_focus() then
-            component.signal:emit("key_released", key)
+            component:signal_emit("key_released", key)
         end
     end
 end
@@ -214,8 +214,8 @@ rt.KeyboardController = meta.new_type("KeyboardController", function(holder)
         instance = holder
     })
     rt.add_signal_component(out)
-    out.signal:add("key_pressed")
-    out.signal:add("key_released")
+    out:signal_add("key_pressed")
+    out:signal_add("key_released")
     rt.KeyboardHandler._components[hash] = out
     rt.KeyboardHandler._hash = hash + 1
 
@@ -238,7 +238,7 @@ end)
 function rt.KeyboardHandler.handle_key_pressed(key)
     for _, component in pairs(rt.KeyboardHandler._components) do
         if getmetatable(component.instance).is_focused == true then
-            local res = component.signal:emit("key_released", key)
+            local res = component:signal_emit("key_released", key)
             if res == true then
                 break
             end
@@ -252,7 +252,7 @@ love.keypressed = function(key) rt.KeyboardHandler.handle_key_pressed(key) end
 function rt.KeyboardHandler.handle_key_released(key)
     for _, component in pairs(rt.KeyboardHandler._components) do
         if getmetatable(component.instance).is_focused == true then
-            local res = component.signal:emit("key_pressed", key)
+            local res = component:signal_emit("key_pressed", key)
             if res == true then
                 break
             end
@@ -296,13 +296,13 @@ rt.test.keyboard_component = function()
     assert(meta.is_boolean(getmetatable(instance).is_focused))
 
     local pressed_called = false
-    component.signal:connect("key_pressed", function(self, key)
+    component:signal_connect("key_pressed", function(self, key)
         pressed_called = true
         return false
     end)
 
     local release_called = false
-    component.signal:connect("key_released", function(self, key)
+    component:signal_connect("key_released", function(self, key)
         release_called = true
         return true
     end)

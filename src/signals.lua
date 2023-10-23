@@ -16,8 +16,7 @@ end
 
 --- @brief add a signal component to object, use `object.signal:add_signal` to add new signals
 --- @param object meta.Object
---- @param implement_notify Boolean whether the `notify::` signals should be initialized
-function rt.add_signal_component(object, implement_notify)
+function rt.add_signal_component(object)
     meta.assert_object(object)
 
     if not meta.is_nil(getmetatable(object).components.signal) then
@@ -26,17 +25,6 @@ function rt.add_signal_component(object, implement_notify)
 
     local component = rt.SignalComponent(object)
     getmetatable(object).components.signal = component
-
-    if meta.is_nil(implement_notify) then
-        implement_notify = false
-    end
-    meta.assert_boolean(implement_notify)
-
-    if implement_notify then
-        for _, property in pairs(meta.get_property_names(object)) do
-            component:add(rt.SignalComponent._notify_prefix .. property)
-        end
-    end
     return component
 end
 
@@ -44,7 +32,7 @@ end
 --- @return rt.SignalComponent
 function rt.get_signal_component(object)
     meta.assert_object(object)
-    return object.components.signal
+    return getmetatable(object).components.signal
 end
 
 --- @brief [internal] initialize signal of given name
@@ -108,8 +96,8 @@ function rt.SignalComponent:emit(name, ...)
 
     if meta.is_nil(signal) or signal.is_blocked then return end
     local res = nil
-    for _, callback in pairs(signal.callbacks) do
-        res = callback(self._instance, ...)
+    for id, callback in pairs(signal.callbacks) do
+        res = callback(self._instance, ..., signal.data[id])
     end
     return res
 end
@@ -125,10 +113,12 @@ function rt.SignalComponent:connect(name, callback, data)
     self:_assert_has_signal(name, "connect")
 
     local signal = self._signals[name]
-    signal.callbacks[signal.n] = callback
-    signal.data[signal.callbacks] = data
+    local callback_id = signal.n
+    signal.callbacks[callback_id] = callback
+    signal.data[callback_id] = data
     signal.n = signal.n + 1
-    return signal.n
+
+    return callback_id
 end
 
 --- @brief disconnect handler permanently
@@ -201,7 +191,7 @@ rt.SignalEmitter = meta.new_abstract_type("SignalEmitter")
 function rt.SignalEmitter:signal_has_signal(name)
     meta.assert_isa(self, rt.SignalEmitter)
     local component = rt.get_signal_component(self)
-    meta.assert_isa(component, rt.SignalComponent)
+    if meta.is_nil(component) then component = rt.add_signal_component(self) end
     return component:has_signal(name)
 end
 
@@ -209,7 +199,7 @@ end
 function rt.SignalEmitter:signal_add(name)
     meta.assert_isa(self, rt.SignalEmitter)
     local component = rt.get_signal_component(self)
-    meta.assert_isa(component, rt.SignalComponent)
+    if meta.is_nil(component) then component = rt.add_signal_component(self) end
     return component:add(name)
 end
 
@@ -217,7 +207,7 @@ end
 function rt.SignalEmitter:signal_emit(name, ...)
     meta.assert_isa(self, rt.SignalEmitter)
     local component = rt.get_signal_component(self)
-    meta.assert_isa(component, rt.SignalComponent)
+    if meta.is_nil(component) then component = rt.add_signal_component(self) end
     return component:emit(name, ...)
 end
 
@@ -225,7 +215,7 @@ end
 function rt.SignalEmitter:signal_connect(name, callback, data)
     meta.assert_isa(self, rt.SignalEmitter)
     local component = rt.get_signal_component(self)
-    meta.assert_isa(component, rt.SignalComponent)
+    if meta.is_nil(component) then component = rt.add_signal_component(self) end
     return component:connect(name, callback, data)
 end
 
@@ -233,7 +223,7 @@ end
 function rt.SignalEmitter:signal_disconnect(name, handle_id)
     meta.assert_isa(self, rt.SignalEmitter)
     local component = rt.get_signal_component(self)
-    meta.assert_isa(component, rt.SignalComponent)
+    if meta.is_nil(component) then component = rt.add_signal_component(self) end
     return component:disconnect(name, handler_id)
 end
 
@@ -241,7 +231,7 @@ end
 function rt.SignalEmitter:signal_set_is_blocked(name, b)
     meta.assert_isa(self, rt.SignalEmitter)
     local component = rt.get_signal_component(self)
-    meta.assert_isa(component, rt.SignalComponent)
+    if meta.is_nil(component) then component = rt.add_signal_component(self) end
     return component:set_is_blocked(name, b)
 end
 
@@ -249,7 +239,7 @@ end
 function rt.SignalEmitter:signalgset_is_blocked(name)
     meta.assert_isa(self, rt.SignalEmitter)
     local component = rt.get_signal_component(self)
-    meta.assert_isa(component, rt.SignalComponent)
+    if meta.is_nil(component) then component = rt.add_signal_component(self) end
     return component:get_is_blocked(name)
 end
 
@@ -257,7 +247,7 @@ end
 function rt.SignalEmitter:signal_get_handler_ids(name)
     meta.assert_isa(self, rt.SignalEmitter)
     local component = rt.get_signal_component(self)
-    meta.assert_isa(component, rt.SignalComponent)
+    if meta.is_nil(component) then component = rt.add_signal_component(self) end
     return component:get_handler_ids(name)
 end
 
@@ -267,37 +257,29 @@ rt.test.signal_component = function()
     meta._install_property(instance, "property", 1234)
     local signal = "test"
 
-    rt.add_signal_component(instance, true)
-    instance.signal:add(signal)
-    assert(instance.signal:has_signal(signal) == true)
+    local component = rt.add_signal_component(instance, true)
+    component:add(signal)
+    assert(component:has_signal(signal) == true)
 
-    assert(instance.signal:get_is_blocked(signal) == false)
+    assert(component:get_is_blocked(signal) == false)
     local called = false
-    instance.signal:connect(signal, function()
+    component:connect(signal, function()
         called = true
     end)
-    assert(instance.signal:get_is_blocked(signal) == false)
+    assert(component:get_is_blocked(signal) == false)
 
-    instance.signal:emit(signal)
+    component:emit(signal)
     assert(called)
 
-    instance.signal:set_is_blocked(signal, true)
-    assert(instance.signal:get_is_blocked(signal) == true)
+    component:set_is_blocked(signal, true)
+    assert(component:get_is_blocked(signal) == true)
 
     called = false
-    instance.signal:emit(signal)
+    component:emit(signal)
     assert(not called)
-    instance.signal:set_is_blocked(signal, false)
-    instance.signal:disconnect(signal)
-    instance.signal:emit(signal)
+    component:set_is_blocked(signal, false)
+    component:disconnect(signal)
+    component:emit(signal)
     assert(not called)
-
-    local notify_called = false
-    local data = 1234
-    instance.signal:connect("notify::property", function()
-        notify_called = true
-    end, data)
-    instance.property = true
-    assert(notify_called)
 end
 rt.test.signal_component()

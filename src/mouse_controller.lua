@@ -25,13 +25,13 @@ rt.MouseController = meta.new_type("MouseController", function(instance)
         instance = instance,
         _hash = hash,
         _active = false
-    })
-    rt.add_signal_component(out)
-    out.signal:add("button_pressed")
-    out.signal:add("button_released")
-    out.signal:add("motion_enter")
-    out.signal:add("motion")
-    out.signal:add("motion_leave")
+    }, rt.SignalEmitter)
+
+    out:signal_add("button_pressed")
+    out:signal_add("button_released")
+    out:signal_add("motion_enter")
+    out:signal_add("motion")
+    out:signal_add("motion_leave")
 
     rt.MouseHandler._components[hash] = out
     return out
@@ -51,7 +51,7 @@ end
 function rt.MouseHandler.handle_button_pressed(x, y, button_id, is_touch)
     for _, component in pairs(rt.MouseHandler._components) do
         if component:is_cursor_in_bounds(x, y) then
-            component.signal:emit("button_pressed", x, y, button_id)
+            component:signal_emit("button_pressed", x, y, button_id)
         end
     end
 end
@@ -65,7 +65,7 @@ love.mousepressed = rt.MouseHandler.handle_button_pressed
 function rt.MouseHandler.handle_button_released(x, y, button_id, is_touch)
     for _, component in pairs(rt.MouseHandler._components) do
         if component:is_cursor_in_bounds(x, y) then
-            component.signal:emit("button_released", x, y, button_id)
+            component:signal_emit("button_released", x, y, button_id)
         end
     end
 end
@@ -85,16 +85,16 @@ function rt.MouseHandler.handle_motion(x, y, dx, dy, is_touch)
 
         if current == false and next == true then
             component._is_active = true
-            component.signal:emit("motion_enter", x, y)
+            component:signal_emit("motion_enter", x, y)
         end
 
         if next then
-            component.signal:emit("motion", x, y, dx, dy)
+            component:signal_emit("motion", x, y, dx, dy)
         end
 
         if current == true and next == false then
             component._is_active = false
-            component.signal:emit("motion_leave", x, y)
+            component:signal_emit("motion_leave", x, y)
         end
     end
 end

@@ -26,9 +26,9 @@ rt.AnimatedSprite = meta.new_type("AnimatedSprite", function(spritesheet, animat
     out:set_minimum_size(out._frame_width, out._frame_height)
     out._shape:set_texture(out._spritesheet)
 
-    out._clock.signal:connect("tick", function(_, value)
-        out:set_frame(clamp(math.floor(out._n_frames * value), 1, out._n_frames))
-    end)
+    out._clock:signal_connect("tick", function(self, value, data)
+        data:set_frame(clamp(math.floor(data._n_frames * value), 1, data._n_frames))
+    end, out)
     out._clock:set_should_loop(should_loop)
 
     return out

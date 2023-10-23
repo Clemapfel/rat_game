@@ -16,7 +16,7 @@ rt.Scrollbar = meta.new_type("Scrollbar", function(orientation, n_steps)
         _orientation = orientation,
         _value = 0.5,
         _n_steps = n_steps
-    }, rt.Drawable, rt.Widget)
+    }, rt.Drawable, rt.Widget, rt.SignalEmitter)
 
     out._base:set_color(rt.Palette.BACKGROUND)
     out._base_outline:set_color(rt.Palette.BACKGROUND_OUTLINE)
@@ -26,8 +26,7 @@ rt.Scrollbar = meta.new_type("Scrollbar", function(orientation, n_steps)
     out._cursor_outline:set_color(rt.Palette.FOREGROUND_OUTLINE)
     out._cursor_outline:set_is_outline(true)
 
-    rt.add_signal_component(out)
-    out.signal:add("value_changed")
+    out:signal_add("value_changed")
     out:reformat()
     return out
 end)
@@ -35,7 +34,7 @@ end)
 --- @brief [internal] emit signal and reformat
 function rt.Scrollbar:_emit_value_changed()
     meta.assert_isa(self, rt.Scrollbar)
-    self.signal:emit("value_changed", self._value)
+    self:signal_emit("value_changed", self._value)
     self:reformat()
 end
 

@@ -57,14 +57,13 @@ rt.AnimationTimer = meta.new_type("AnimationTimer", function(duration_seconds)
         _time = 0,
         _timing_function = rt.AnimationTimingFunction.LINEAR,
         _loop = false
-    })
+    }, rt.SignalEmitter)
 
     rt.AnimationTimerHandler._components[hash] = out
     rt.AnimationTimerHandler._hash = hash + 1
 
-    rt.add_signal_component(out)
-    out.signal:add("tick")
-    out.signal:add("done")
+    out:signal_add("tick")
+    out:signal_add("done")
 
     return out
 end)
@@ -83,13 +82,13 @@ function rt.AnimationTimerHandler.update(delta)
         if component._time >= component._duration then
             if component._loop then
                 while component._time > component._duration do
-                    component.signal:emit("tick", 1)
+                    component:signal_emit("tick", 1)
                     component._time = component._time - component._duration
                 end
             else
                 component._state = rt.AnimationTimerState.IDLE
-                component.signal:emit("tick", 1)
-                component.signal:emit("done")
+                component:signal_emit("tick", 1)
+                component:signal_emit("done")
                 goto continue
             end
         end
@@ -98,7 +97,7 @@ function rt.AnimationTimerHandler.update(delta)
             component._time / component._duration
         )
 
-        component.signal:emit("tick", value)
+        component:signal_emit("tick", value)
         ::continue::
     end
 end
@@ -195,12 +194,12 @@ function rt.test.test_animation()
     local animation = rt.AnimationTimer(0)
 
     local tick_called = false
-    animation.signal:connect("tick", function()
+    animation:signal_connect("tick", function()
         tick_called = true
     end)
 
     local done_called = false
-    animation.signal:connect("done", function()
+    animation:signal_connect("done", function()
         done_called = true
     end)
 
