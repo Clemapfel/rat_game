@@ -16,14 +16,14 @@ function test.assert(condition, ...)
     elseif type(condition) == "function" then
         success = condition(...)
     else
-        error("[rt] In test.assert_that: Argument #1 cannot be evaluated to boolean")
+        error("[rt][ERROR] In test.assert_that: Argument #1 cannot be evaluated to boolean")
     end
 
     if success then
         test.n_successful = test.n_successful + 1
     else
         test.n_failed = test.n_failed + 1
-        error("[rt] test failed")
+        error("[rt][ERROR] test failed")
     end
 end
 
@@ -37,7 +37,7 @@ function test.assert_that_errors(condition, ...)
         test.n_successful = test.n_successful + 1
     else
         test.n_failed = test.n_failed + 1
-        error("[rt] test failed")
+        error("[rt][ERROR] test failed")
     end
 end
 
@@ -59,7 +59,7 @@ function test.testset(name, code)
     println("")
 
     if test.failed_test_are_fatal and test.n_failed > 0 then
-        error("[rt] In test.testset(\"" .. name .. "\"): 1 or more tests failed.")
+        error("[rt][ERROR] In test.testset(\"" .. name .. "\"): 1 or more tests failed.")
     end
 end
 

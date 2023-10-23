@@ -48,7 +48,7 @@ end
 
 --- @brief abstract method, must be overriden
 function rt.Drawable:draw()
-    error("[rt] In " .. meta.typeof(self) .. ":draw(): abstract method called")
+    error("[rt][ERROR] In " .. meta.typeof(self) .. ":draw(): abstract method called")
 end
 
 --- @brief set whether drawable should be culled, this affects `render`

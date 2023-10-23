@@ -35,13 +35,13 @@ rt.Widget._parent = nil
 --- @param width Number
 --- @param height Number
 function rt.Widget:size_allocate(x, y, width, height)
-    error("[rt] " .. meta.typeof(self) .. ":size_allocate: abstract method called")
+    error("[rt][ERROR] " .. meta.typeof(self) .. ":size_allocate: abstract method called")
 end
 
 --- @brief abstract method, returns minimum space that needs to be allocated
 --- @return (Number, Number)
 function rt.Widget:measure()
-    error("[rt] " .. meta.typeof(self) .. ":measure: abstract method called")
+    error("[rt][ERROR] " .. meta.typeof(self) .. ":measure: abstract method called")
 end
 
 --- @brief
@@ -316,7 +316,7 @@ function rt.Widget:set_parent(other)
 
     meta.assert_isa(other, rt.Widget)
     if not meta.is_nil(self._parent) then
-        println("[rt] In Widget:set_parent: warning: replacing parent of hild `" .. meta.typeof(self) .. "`, which already has a parent")
+        println("[rt][WARNING] In Widget:set_parent: replacing parent of hild `" .. meta.typeof(self) .. "`, which already has a parent")
     end
 
     self._parent = other

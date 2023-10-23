@@ -47,7 +47,7 @@ end)()
 rt.AnimationTimer = meta.new_type("AnimationTimer", function(duration_seconds)
     meta.assert_number(duration_seconds)
     if duration_seconds < 0 then
-        error("[rt] In AnimationTimer(): Duration `" .. string(duration_seconds) .. "` cannot be negative")
+        error("[rt][ERROR] In AnimationTimer(): Duration `" .. string(duration_seconds) .. "` cannot be negative")
     end
 
     local hash = rt.AnimationTimerHandler._hash

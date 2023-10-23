@@ -146,7 +146,7 @@ rt.KeyboardController = meta.new_type("KeyboardController", function(instance)
     rt.KeyboardHandler._hash = rt.KeyboardHandler._hash + 1
 
     if meta.is_nil(instance.get_bounds) then
-        error("[rt] In KeyboardController: instance of type `" .. instance .. "` does not have a `get_bounds` function")
+        error("[rt][ERROR] In KeyboardController: instance of type `" .. instance .. "` does not have a `get_bounds` function")
     end
 
     local out = meta.new(rt.KeyboardController, {
@@ -274,7 +274,7 @@ function rt.add_keyboard_component(self)
     meta.assert_object(self)
 
     if not meta.is_nil(self.keyboard) then
-        error("[rt] In add_keyboard_component: Object of type `" .. meta.typeof(self) .. "` already has a member called `keyboard`")
+        error("[rt][ERROR] In add_keyboard_component: Object of type `" .. meta.typeof(self) .. "` already has a member called `keyboard`")
     end
 
     meta._install_property(self, "keyboard", rt.AllocationComponent(self))

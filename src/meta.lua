@@ -70,7 +70,7 @@ function meta._new(typename)
     metatable.__newindex = function(this, property_name, property_value)
         local metatable = getmetatable(this)
         if not metatable.is_mutable then
-            error("[rt] In " .. metatable.__name .. ".__newindex: Cannot set property `" .. property_name .. "`, because the object was declared immutable.")
+            error("[rt][ERROR] In " .. metatable.__name .. ".__newindex: Cannot set property `" .. property_name .. "`, because the object was declared immutable.")
         end
         metatable.properties[property_name] = property_value
 
@@ -170,7 +170,7 @@ end
 function meta._assert_aux(b, x, type)
     if b then return true end
     local name = debug.getinfo(2, "n").name
-    error("[rt] In " .. name .. ": expected `" .. type .. "`, got `" .. meta.typeof(x) .. "`")
+    error("[rt][ERROR] In " .. name .. ": expected `" .. type .. "`, got `" .. meta.typeof(x) .. "`")
     return false
 end
 
@@ -180,7 +180,7 @@ function meta.assert(b)
     meta.assert_boolean(b)
     if not b then
         local name = debug.getinfo(2, "n").name
-        error("[rt] In " .. name .. ": Assertion failed")
+        error("[rt][ERROR] In " .. name .. ": Assertion failed")
     end
 end
 
@@ -370,7 +370,7 @@ function meta.new_enum(fields)
 
     meta.assert_table(fields)
     if is_empty(fields) then
-        error("[rt] In meta.new_enum: list of values cannot be empty")
+        error("[rt][ERROR] In meta.new_enum: list of values cannot be empty")
     end
 
     local out = meta._new(meta.Enum)
@@ -381,11 +381,11 @@ function meta.new_enum(fields)
         meta.assert_string(name)
 
         if meta.is_table(value) then
-            error("[rt] In meta.new_enum: Enum value for key `" .. name .. "` is a `" .. meta.typeof(value) .. "`, which is not a primitive.")
+            error("[rt][ERROR] In meta.new_enum: Enum value for key `" .. name .. "` is a `" .. meta.typeof(value) .. "`, which is not a primitive.")
         end
 
         if used_values[value] ~= nil then
-            error("[rt] In meta.new_enum: Duplicate value, key `" .. name .. "` and `" .. used_values[value] .. "` both have the same value `" .. tostring(value) .. "`")
+            error("[rt][ERROR] In meta.new_enum: Duplicate value, key `" .. name .. "` and `" .. used_values[value] .. "` both have the same value `" .. tostring(value) .. "`")
         end
         used_values[value] = name
 
@@ -401,7 +401,7 @@ function meta.new_enum(fields)
     end
     metatable.__index = function(this, key)
         if not meta.has_property(this, key) then
-            error("[rt] In Enum:__index: Key `" .. key .. "` does not exist for enum")
+            error("[rt][ERROR] In Enum:__index: Key `" .. key .. "` does not exist for enum")
         else
             local metatable = getmetatable(this)
             return metatable.properties[key]
@@ -430,7 +430,7 @@ end
 --- @param enum meta.Enum
 function meta.assert_enum(x, enum)
     if not meta.is_enum(x, enum) then
-        error("[rt] In assert_enum: Value `" .. tostring(x) .. "` is not a value of enum ")
+        error("[rt][ERROR] In assert_enum: Value `" .. tostring(x) .. "` is not a value of enum ")
     end
 end
 
@@ -463,13 +463,13 @@ function meta.new_type(typename, ctor)
     getmetatable(out).__call = function(self, ...)
         local out = ctor(...)
         if not meta.isa(out, self.name) then
-            error("[rt] In " .. self.name .. ".__call: Constructor does not return object of type `" .. self.name .. "`.")
+            error("[rt][ERROR] In " .. self.name .. ".__call: Constructor does not return object of type `" .. self.name .. "`.")
         end
         return out
     end
 
     if meta[typename] ~= nil then
-        error("[rt] In meta.new_type: A type with name `" .. typename .. "` already exists.")
+        error("[rt][ERROR] In meta.new_type: A type with name `" .. typename .. "` already exists.")
     end
     meta[typename] = typename
     return out
@@ -479,7 +479,7 @@ end
 --- @param name String
 function meta.new_abstract_type(name)
     local out = meta.new_type(name, function()
-        error("[rt] In " .. name .. "._call: Type `" .. name .. "` is abstract, it cannot be instanced")
+        error("[rt][ERROR] In " .. name .. "._call: Type `" .. name .. "` is abstract, it cannot be instanced")
     end)
     return out
 end
@@ -563,6 +563,6 @@ end
 function meta.declare_abstract_method(super, name)
     meta.assert_object(super)
     super[name] = function(self)
-        error("[rt] In " .. super.name .. "." .. name .. ": Abstract method called by object of type `" .. meta.typeof(self) .. "`")
+        error("[rt][ERROR] In " .. super.name .. "." .. name .. ": Abstract method called by object of type `" .. meta.typeof(self) .. "`")
     end
 end

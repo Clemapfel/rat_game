@@ -9,6 +9,7 @@ rt.SignalComponent = meta.new_type("SignalComponent", function(holder)
 end)
 
 --- @brief [internal] access signal component
+--- @param object meta.Object
 function rt.get_signal_component(object)
     meta.assert_object(object)
     return getmetatable(object).components.signal
@@ -20,7 +21,7 @@ function rt.add_signal_component(object)
     meta.assert_object(object)
 
     if not meta.is_nil(getmetatable(object).components.signal) then
-        error("[rt] In add_signal_component: Object already has a signal component")
+        error("[rt][ERROR] In add_signal_component: Object already has a signal component")
     end
 
     local component = rt.SignalComponent(object)
@@ -53,13 +54,12 @@ end
 --- @param component rt.SignalComponent
 --- @param name String
 --- @param scope String
-function rt.SignalComponent:_assert_has_signal(name, scope)
-    meta.assert_isa(self, rt.SignalComponent)
-    meta.assert_string(name)
-    meta.assert_string(scope)
+function rt._assert_has_signal(scope, component, signal_id)
+    meta.assert_isa(component, rt.SignalComponent)
+    meta.assert_string(scope, signal_id)
 
-    if not self:has_signal(name) then
-        error("[rt] In SignalComponent." .. scope .. ": Object of type `" .. meta.typeof(self._instance) .. "`has no signal with name `" .. name .. "`")
+    if not self:has_signal(signal_id) then
+        error("[rt][ERROR] In SignalComponent." .. scope .. ": Object of type `" .. meta.typeof(self._instance) .. "`has no signal with name `" .. signal_id .. "`")
     end
 end
 
@@ -78,6 +78,7 @@ end
 function rt.SignalComponent:add(name)
     meta.assert_isa(self, rt.SignalComponent)
     meta.assert_string(name)
+    if self:has_signal(name) then return end
     self:_init_signal(name)
 end
 
@@ -89,12 +90,16 @@ end
 function rt.SignalComponent:emit(name, ...)
     meta.assert_isa(self, rt.SignalComponent)
     meta.assert_string(name)
-    self:_assert_has_signal(name, "emit")
+    rt._assert_has_signal("emit", self, name)
 
     local metatable = getmetatable(self._instance)
     local signal = self._signals[name]
 
-    if meta.is_nil(signal) or signal.is_blocked then return end
+    if meta.is_nil(signal) then
+        error("[rt][ERROR] In SignalComponent:emit: Object of type `" .. meta.typeof(self._instance) .. "` has no signal with name `" .. name .. "`")
+    end
+
+    if signal.is_blocked then return end
     local res = nil
     for id, callback in pairs(signal.callbacks) do
         res = callback(self._instance, ..., signal.data[id])
@@ -110,7 +115,7 @@ function rt.SignalComponent:connect(name, callback, data)
     meta.assert_isa(self, rt.SignalComponent)
     meta.assert_string(name)
     meta.assert_function(callback)
-    self:_assert_has_signal(name, "connect")
+    rt._assert_has_signal("connect", self, name)
 
     local signal = self._signals[name]
     local callback_id = signal.n
@@ -136,13 +141,17 @@ function rt.SignalComponent:disconnect(name, handler_id)
     local signal = self._signals[name]
     if meta.is_nil(handler_id) then
         signal.callbacks = {}
+        signal.data = {}
     elseif meta.is_table(handler_id) then
-        for id in pairs(handler_id) do
-            signal[handler_id] = nil
+        for _, id in ipairs(handler_id) do
+            meta.assert_number(id)
+            signal.callbacks[id] = nil
+            signal.data[id] = nil
         end
     else
         meta.assert_number(handler_id)
         signal.callbacks[handler_id] = nil
+        signal.data[handler_id] = nil
     end
 end
 
@@ -153,7 +162,7 @@ end
 function rt.SignalComponent:set_is_blocked(name, b)
     meta.assert_isa(self, rt.SignalComponent)
     meta.assert_string(name)
-    self:_assert_has_signal(name, "set_is_blocked")
+    rt._assert_has_signal("set_is_blocked", self, name)
     self._signals[name].is_blocked = b
 end
 
@@ -164,7 +173,7 @@ end
 function rt.SignalComponent:get_is_blocked(name)
     meta.assert_isa(self, rt.SignalComponent)
     meta.assert_string(name)
-    self:_assert_has_signal(name, "get_is_blocked")
+    rt._assert_has_signal("get_is_blocked", self, name)
     return self._signals[name].is_blocked
 end
 
@@ -175,13 +184,20 @@ end
 function rt.SignalComponent:get_handler_ids(name)
     meta.assert_isa(self, rt.SignalComponent)
     meta.assert_string(name)
-    self:_assert_has_signal(name, "get_signal_handler_ids")
+    rt._assert_has_signal("get_signal_handler_ids", self, name)
     local signal = self._signals[name]
     local out = {}
     for id, _ in pairs(signal.callbacks) do
         out[id] = id
     end
     return out
+end
+
+--- @brief get holder of component
+--- @return meta.Object
+function rt.SignalComponent:get_emitter_instance()
+    meta.assert_isa(self, rt.SignalComponent)
+    return self._instance
 end
 
 --- @class SignalEmitter
@@ -220,7 +236,7 @@ function rt.SignalEmitter:signal_connect(name, callback, data)
 end
 
 --- @see rt.SignalComponent.disconnect
-function rt.SignalEmitter:signal_disconnect(name, handle_id)
+function rt.SignalEmitter:signal_disconnect(name, handler_id)
     meta.assert_isa(self, rt.SignalEmitter)
     local component = rt.get_signal_component(self)
     if meta.is_nil(component) then component = rt.add_signal_component(self) end

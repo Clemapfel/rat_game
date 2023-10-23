@@ -90,7 +90,7 @@ function rt.Sprite:set_frame(i)
     meta.assert_number(i)
     local n_frames = self._spritesheet:get_n_frames(self._animation_id)
     if i < 1 or i > n_frames then
-        error("[rt] In Sprite:set_frame: frame index `" .. tostring(i) .. "` is out of range for animation `" .. self._animation_id .. "` of spritesheet `" .. self._spritesheet.name .. "` which has `" .. tostring(n_frames) .. "` frames")
+        error("[rt][ERROR] In Sprite:set_frame: frame index `" .. tostring(i) .. "` is out of range for animation `" .. self._animation_id .. "` of spritesheet `" .. self._spritesheet.name .. "` which has `" .. tostring(n_frames) .. "` frames")
     end
 
     self._current_frame = i

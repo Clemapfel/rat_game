@@ -247,7 +247,7 @@ function rt.html_code_to_color(code)
     end
 
     ::error::
-    error("[rt] In rt.html_code_to_rgba: `" .. code .. "` is not a valid hexadecimal color identifier. Reason: " .. error_reason)
+    error("[rt][ERROR] In rt.html_code_to_rgba: `" .. code .. "` is not a valid hexadecimal color identifier. Reason: " .. error_reason)
 end
 
 --- @brief

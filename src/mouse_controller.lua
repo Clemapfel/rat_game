@@ -18,7 +18,7 @@ rt.MouseController = meta.new_type("MouseController", function(instance)
     rt.MouseHandler._hash = rt.MouseHandler._hash + 1
 
     if meta.is_nil(instance.get_bounds) then
-        error("[rt] In MouseCompoent: instance of type `" .. instance .. "` does not have a `get_bounds` function")
+        error("[rt][ERROR] In MouseCompoent: instance of type `" .. instance .. "` does not have a `get_bounds` function")
     end
 
     local out = meta.new(rt.MouseController, {

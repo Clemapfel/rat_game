@@ -9,14 +9,14 @@ rt.Spritesheet = meta.new_type("Spritesheet", function(path, id)
 
     for _, path in ipairs({config_path, image_path}) do
         if meta.is_nil(love.filesystem.getInfo(path)) then
-            error("[rt] In Spritesheet:create_from_file: file `" .. path .. "` does not exist")
+            error("[rt][ERROR] In Spritesheet:create_from_file: file `" .. path .. "` does not exist")
         end
     end
 
     local file = love.filesystem.read(config_path)
     local code, error_maybe = load(file)
     if not meta.is_nil(error_maybe) then
-        error("[rt] In Spritesheet:create_from_file: Unable to read file at `" .. config_path .. "`: " .. error_maybe)
+        error("[rt][ERROR] In Spritesheet:create_from_file: Unable to read file at `" .. config_path .. "`: " .. error_maybe)
     end
 
     local image = love.graphics.newImage(image_path)
@@ -36,7 +36,7 @@ rt.Spritesheet = meta.new_type("Spritesheet", function(path, id)
     local n_frames = math.floor(image_width / width)
 
     if (image_width % width) ~= 0 then
-        error("[rt] In Spritesheet:create_from_file: Spritesheet `" .. id .. "` has a width of `" .. tostring(image_width) .. "`, which is not evenly divisble by its frame width `" .. tostring(width) .. "`")
+        error("[rt][ERROR] In Spritesheet:create_from_file: Spritesheet `" .. id .. "` has a width of `" .. tostring(image_width) .. "`, which is not evenly divisble by its frame width `" .. tostring(width) .. "`")
     end
 
     local animations = config.animations
@@ -48,7 +48,7 @@ rt.Spritesheet = meta.new_type("Spritesheet", function(path, id)
     local frame_to_name = {}
     for id, frames in pairs(animations) do
         if not (#frames == 2 and meta.is_number(frames[1]) and meta.is_number(frames[1])) and frames[2] >= frames[1] then
-            error("[rt] In Spritesheet:create_from_file: Spritesheet `" .. id .. "`: frame range `{" .. tostring(frames[1]) .. ", " .. tostring(frames[2]) .. "} for animation `" .. id .. "` is malformed")
+            error("[rt][ERROR] In Spritesheet:create_from_file: Spritesheet `" .. id .. "`: frame range `{" .. tostring(frames[1]) .. ", " .. tostring(frames[2]) .. "} for animation `" .. id .. "` is malformed")
         end
         for i = frames[1], frames[2] do
             frame_to_name[i] = id
@@ -62,7 +62,7 @@ rt.Spritesheet = meta.new_type("Spritesheet", function(path, id)
                 table.insert(unnamed, i)
             end
         end
-        error("[rt] In Spritesheet:create_from_file: Spritesheet `" .. id .. "` does not have an animation name assigned for frames `" .. serialize(unnamed) .. "`")
+        error("[rt][ERROR] In Spritesheet:create_from_file: Spritesheet `" .. id .. "` does not have an animation name assigned for frames `" .. serialize(unnamed) .. "`")
     end
 
     local out = meta.new(rt.Spritesheet, {
@@ -92,7 +92,7 @@ function rt.Spritesheet:_assert_has_animation(scope, animation_id)
     meta.assert_string(scope, animation_id)
     meta.assert_isa(self, rt.Spritesheet)
     if meta.is_nil(self._name_to_frame[animation_id]) then
-        error("[rt] in rt." .. scope .. ": Spritesheet `" .. self.name .. "` has no animation with id `" .. id .. "`")
+        error("[rt][ERROR] in rt." .. scope .. ": Spritesheet `" .. self.name .. "` has no animation with id `" .. id .. "`")
     end
 end
 
@@ -107,7 +107,7 @@ function rt.Spritesheet:get_frame(animation_id_or_index, index_maybe)
         i = animation_id_or_index
 
         if i < 1 or i > self.n_frames then
-            error("[rt] In rt.Spritesheet:get_frame: index `" .. tostring(i) .. "` is out of range for spritesheet with `" .. tostring(self.n_frames) .. "` frames")
+            error("[rt][ERROR] In rt.Spritesheet:get_frame: index `" .. tostring(i) .. "` is out of range for spritesheet with `" .. tostring(self.n_frames) .. "` frames")
         end
         return rt.AABB((i - 1) / self.n_frames, 0, 1 / self.n_frames, 1)
     else
