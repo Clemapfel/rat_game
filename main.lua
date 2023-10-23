@@ -67,42 +67,29 @@ if DEBUG_MODE then goto exit end
 rt.Font.DEFAULT = rt.load_font("Roboto", "assets/Roboto")
 rt.Font.DEFAULT:set_size(12)
 
-timer = rt.AnimationTimer(1)
-timer:set_timing_function(rt.AnimationTimingFunction.LINEAR)
-timer:set_should_loop(true)
-timer:play()
-
-timer.signal:connect("tick", function(self, t)
-    println(t)
-end)
-
 window = rt.BinLayout()
 
 clock = rt.Clock()
 spritesheet = rt.Spritesheet("art", "test_animation")
-sprite = rt.Sprite(spritesheet, "test_animation")
+sprite = rt.AnimatedSprite(spritesheet, "test_animation")
 window:set_child(sprite)
+sprite:play()
 
 key = rt.add_keyboard_controller(window)
 key.signal:connect("key_pressed", function(self, key)
 
     if key == rt.KeyboardKey.ARROW_UP then
-        sprite:set_vertical_alignment(rt.Alignment.START)
     elseif key == rt.KeyboardKey.ARROW_DOWN then
-        sprite:set_vertical_alignment(rt.Alignment.END)
     elseif key == rt.KeyboardKey.ARROW_LEFT then
-        sprite:set_horizontal_alignment(rt.Alignment.START)
-        local frame_i = sprite:get_frame()
-        frame_i = clamp(frame_i + 1, 1, sprite:get_n_frames())
-        sprite:set_frame(frame_i)
-    elseif key == rt.KeyboardKey.ARROW_RIGHT then
-        sprite:set_horizontal_alignment(rt.Alignment.END)
-        local frame_i = sprite:get_frame()
+        local frame_i = rt.Sprite.get_frame(sprite)
         frame_i = clamp(frame_i - 1, 1, sprite:get_n_frames())
-        sprite:set_frame(frame_i)
+        rt.Sprite.set_frame(sprite, frame_i)
+    elseif key == rt.KeyboardKey.ARROW_RIGHT then
+        local frame_i = rt.Sprite.get_frame(sprite)
+        frame_i = clamp(frame_i + 1, 1, sprite:get_n_frames())
+        rt.Sprite.set_frame(sprite, frame_i)
     elseif key == rt.KeyboardKey.PLUS then
     elseif key == rt.KeyboardKey.MINUS then
-        error("test")
     end
 end)
 

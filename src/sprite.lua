@@ -5,13 +5,14 @@ rt.Sprite = meta.new_type("Sprite", function(spritesheet, animation_id)
     end
     spritesheet:_assert_has_animation("Sprite:", animation_id)
     local w, h = spritesheet:get_frame_size(animation_id)
-    local out = meta.new(rt.Sprite, {}, rt.Drawable, rt.Widget)
-
-    out._spritesheet = spritesheet
-    out._animation_id = animation_id
-    out._current_frame = 1
-    out._frame_width = w
-    out._frame_height = h
+    local out = meta.new(rt.Sprite, {
+        _spritesheet = spritesheet,
+        _animation_id = animation_id,
+        _shape = rt.VertexRectangle(0, 0, 0, 0),
+        _current_frame = 1,
+        _fame_width = w,
+        _frame_height = h
+    }, rt.Drawable, rt.Widget, rt.Sprite)
 
     out:set_minimum_size(w, h)
     out:set_expand(false)
@@ -20,12 +21,6 @@ rt.Sprite = meta.new_type("Sprite", function(spritesheet, animation_id)
     return out
 end)
 
-rt.Sprite._spritesheet = {}
-rt.Sprite._animation_id = ""
-rt.Sprite._current_frame = -1
-rt.Sprite._shape = rt.VertexRectangle(0, 0, 0, 0)
-rt.Sprite._frame_width = 0
-rt.Sprite._frame_height = 0
 
 --- @overload rt.Drawable.draw
 function rt.Sprite:draw()
@@ -82,6 +77,7 @@ end
 
 --- @overload rt.Widget.measure
 function rt.Sprite:measure()
+    meta.assert_isa(self, rt.Sprite)
     local w, h = self._frame_width, self._frame_height
     w = w + self:get_margin_left() + self:get_margin_right()
     h = h + self:get_margin_top() + self:get_margin_bottom()
