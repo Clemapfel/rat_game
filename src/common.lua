@@ -307,12 +307,26 @@ end
 --- @brief check if pattern occurrs in string
 --- @param str string
 --- @param pattern string
+--- @return boolean
 function string.contains(str, pattern)
     return type(string.find(str, pattern)) ~= "nil"
 end
 
+--- @brief hash string
+--- @param str string
+--- @return number
+function string.hash(str)
+    -- see: https://stackoverflow.com/a/7666577
+    local hash = 5381
+    for i = 1, #str do
+        hash = (bit.lshift(hash, 5) + hash) + string.byte(string.sub(str, i, i))
+    end
+    return hash
+end
+
 --- @brief round to nearest integer
 --- @param i number
+--- @return number
 function math.round(i)
     return math.floor(i + 0.5)
 end

@@ -58,8 +58,8 @@ function rt._assert_has_signal(scope, component, signal_id)
     meta.assert_isa(component, rt.SignalComponent)
     meta.assert_string(scope, signal_id)
 
-    if not self:has_signal(signal_id) then
-        error("[rt][ERROR] In SignalComponent." .. scope .. ": Object of type `" .. meta.typeof(self._instance) .. "`has no signal with name `" .. signal_id .. "`")
+    if not component:has_signal(signal_id) then
+        error("[rt][ERROR] In SignalComponent." .. scope .. ": Object of type `" .. meta.typeof(component._instance) .. "`has no signal with name `" .. signal_id .. "`")
     end
 end
 

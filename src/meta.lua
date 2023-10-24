@@ -84,7 +84,7 @@ function meta._new(typename)
     end
 
     metatable.__tostring = function(this)
-        return serialize("(" .. getmetatable(this).__name .. ")", this, false)
+        return "(" .. getmetatable(this).__name .. ") " .. serialize(this)
     end
 
     metatable.__name = metatable.__name
@@ -444,7 +444,7 @@ function meta._install_inheritance(instance, type)
     table.insert(getmetatable(instance).super, type.name)
 
     for key, value in pairs(getmetatable(type).properties) do
-        if key ~= "name" and not meta.has_property(instance, key) then
+        if key ~= "name" and key ~= "is_abstract" and not meta.has_property(instance, key) then
             meta._install_property(instance, key, value)
         end
     end
@@ -459,6 +459,7 @@ function meta.new_type(typename, ctor)
 
     local out = meta._new("Type")
     out.name = typename
+    out.is_abstract = false
 
     getmetatable(out).__call = function(self, ...)
         local out = ctor(...)
@@ -468,10 +469,10 @@ function meta.new_type(typename, ctor)
         return out
     end
 
-    if meta[typename] ~= nil then
+    if not meta.is_nil(meta[typename]) then
         error("[rt][ERROR] In meta.new_type: A type with name `" .. typename .. "` already exists.")
     end
-    meta[typename] = typename
+    meta[typename] = out
     return out
 end
 
@@ -481,6 +482,7 @@ function meta.new_abstract_type(name)
     local out = meta.new_type(name, function()
         error("[rt][ERROR] In " .. name .. "._call: Type `" .. name .. "` is abstract, it cannot be instanced")
     end)
+    out.is_abstract = true
     return out
 end
 

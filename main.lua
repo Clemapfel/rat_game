@@ -67,6 +67,9 @@ if DEBUG_MODE then goto exit end
 rt.Font.DEFAULT = rt.load_font("Roboto", "assets/Roboto")
 rt.Font.DEFAULT:set_size(12)
 
+println(string.hash("abcdef"))
+println(string.hash("abcdefg"))
+
 window = rt.BinLayout()
 
 clock = rt.Clock()
