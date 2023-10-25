@@ -2,7 +2,8 @@
 rt.JustifyMode = meta.new_enum({
     LEFT = "left",
     RIGHT = "right",
-    CENTER = "center"
+    CENTER = "center",
+    BLOCK = "justify",
 })
 
 --- @class rt.Label
@@ -11,7 +12,7 @@ rt.Label = meta.new_type("Label", function(text)
     local out = meta.new(rt.Label, {
         _raw = text,
         _font = rt.Font.DEFAULT,
-        _justify_mode = rt.JustifyMode.LEFT,
+        _justify_mode = rt.JustifyMode.BLOCK,
         _glyphs = {}
     }, rt.Widget, rt.Drawable)
     out:_parse()
@@ -31,23 +32,35 @@ end
 --- @overload rt.Widget.size_allocate
 function rt.Label:size_allocate(x, y, width, height)
 
-    local space = self._font:get_bold_italic():getWidth(" ")
+    local space = self._font:get_bold_italic():getWidth(rt.Label.SPACE)
+    local tab = self._font:get_bold_italic():getWidth(rt.Label.TAB)
     local line_height = self._font:get_bold_italic():getHeight()
 
     local glyph_x = x
     local glyph_y = y
 
-    println(self._raw)
+    local row_widths = {0}
+    local rows = {{}}
+    local row_i = 1
+    local line_width = 0
 
     for _, glyph in pairs(self._glyphs) do
-
         if glyph == rt.Label.SPACE then
             glyph_x = glyph_x + space
+            line_width = line_width + space
+            table.insert(rows[row_i], rt.Label.SPACE)
         elseif glyph == rt.Label.TAB then
-            glyph_x = glyph_x + 4 * space
+            glyph_x = glyph_x + tab
+            line_width = line_width + tab
+            table.insert(rows[row_i], rt.Label.TAB)
         elseif glyph == rt.Label.NEWLINE then
             glyph_x = x
             glyph_y = glyph_y + line_height
+
+            row_widths[row_i] = line_width
+            line_width = 0
+            row_i = row_i + 1
+            rows[row_i] = {}
         else
             local w, h = glyph:get_size()
             if glyph_x - x + w >= width then
@@ -55,10 +68,64 @@ function rt.Label:size_allocate(x, y, width, height)
                 glyph_y = glyph_y + line_height
                 glyph:set_position(glyph_x, glyph_y)
                 glyph_x = glyph_x + w
+
+                row_widths[row_i] = line_width
+                line_width = w
+                row_i = row_i + 1
+                rows[row_i] = {glyph}
             else
                 glyph:set_position(glyph_x, glyph_y)
                 glyph_x = glyph_x + w
+
+                line_width = line_width + w
+                table.insert(rows[row_i], glyph)
             end
+        end
+    end
+    row_widths[row_i] = line_width
+
+    if self._justify_mode == rt.JustifyMode.LEFT then
+        return
+    elseif self._justify_mode == rt.JustifyMode.CENTER or self._justify_mode == rt.JustifyMode.RIGHT then
+        for i, row in ipairs(rows) do
+            for _, glyph in ipairs(rows[i]) do
+                if meta.isa(glyph, rt.Glyph) then
+                    local position_x, position_y = glyph:get_position()
+                    if self._justify_mode == rt.JustifyMode.CENTER then
+                        glyph:set_position(position_x + (width - row_widths[i]) * 0.5, position_y)
+                    elseif self._justify_mode == rt.JustifyMode.RIGHT then
+                        glyph:set_position(position_x + (width - row_widths[i]), position_y)
+                    end
+                end
+            end
+        end
+    elseif self._justify_mode == rt.JustifyMode.BLOCK then
+        -- calculate free space per line, then distribute evenly into spaces between words
+        for i, row in ipairs(rows) do
+            if sizeof(row) == 0 then goto continue end
+            local free_space = width - row_widths[i]
+            if free_space <= 0 then goto continue end
+
+            local n_spaces = 0
+            for _, glyph in ipairs(rows[i]) do
+                if glyph == rt.Label.SPACE then
+                    free_space = free_space + space
+                    n_spaces = n_spaces + 1
+                elseif glyph == rt.Label.TAB then
+                    free_space = free_space + tab
+                    n_spaces = n_spaces + 1
+                end
+            end
+
+            local row_x, row_y = rows[i][1]:get_position()
+            local space_increment = free_space / (n_spaces + 1)
+            for _, glyph in ipairs(rows[i]) do
+                if meta.isa(glyph, rt.Glyph) then
+                    glyph:set_position(row_x, row_y)
+                    row_x = row_x + glyph:get_size() + space_increment
+                end
+            end
+            ::continue::
         end
     end
 end
@@ -142,8 +209,6 @@ function rt.Label:_parse()
         if effect_rainbow then table.insert(effects, rt.TextEffect.RAINBOW) end
         if effect_shake then table.insert(effects, rt.TextEffect.SHAKE) end
         if effect_wave then table.insert(effects, rt.TextEffect.WAVE) end
-
-        println("push: ", current_word, " | ", bold, " ", italic, " ", color, " ", effect_wave, " ", effect_shake, " ", effect_rainbow)
 
         table.insert(self._glyphs, rt.Glyph(self._font, current_word, style, rt.Palette[color], effects))
         current_word = ""

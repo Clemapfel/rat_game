@@ -69,6 +69,9 @@ end
 --- @return number
 function clamp(x, lower_bound, upper_bound)
 
+    if type(lower_bound) == "nil" then lower_bound = NEGATIVE_INFINITY end
+    if type(upper_bound) == "nil" then upper_bound = POSITIVE_INFINITY end
+
     if x < lower_bound then
         x = lower_bound
     end
