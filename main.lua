@@ -75,7 +75,7 @@ sprite = rt.AnimatedSprite(spritesheet, "test_animation")
 window:set_child(sprite)
 sprite:play()
 
-label = rt.Label("regular <b>bold</b> <i>italics</i> <b><i>bold_italic</i></b>")
+label = rt.Label("regular <b>bold</b> <i>italics</i> <b><i>bold_italic</i></b> <col=PURE_MAGENTA>color</col> <b><i><col=BLUE_1>TEST</b>ABC</i>DEF</col>")
 --label:set_justify_mode(rt.JustifyMode.CENTER)
 --label:set_alignment(rt.Alignment.CENTER)
 label:set_expand(true)

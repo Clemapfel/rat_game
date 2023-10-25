@@ -60,6 +60,14 @@ rt.Label.SPACE = " "
 rt.Label.NEWLINE = "\n"
 rt.Label.TAB = "    "
 
+rt.Label.BOLD_TAG_START = "<b>"
+rt.Label.BOLD_TAG_END = "</b>"
+rt.Label.ITALIC_TAG_START = "<i>"
+rt.Label.ITALIC_TAG_END = "</i>"
+
+rt.Label.COLOR_TAG_START = "<col=(.*)>" -- regex pattern
+rt.Label.COLOR_TAG_END = "</col>"
+
 --- @brief [internal]
 function rt.Label:_parse()
     meta.assert_isa(self, rt.Label)
@@ -68,14 +76,16 @@ function rt.Label:_parse()
 
     local bold = false
     local italic = false
+    local is_colored = false
+    local color = "PURE_WHITE"
 
     local current_word = ""
 
     local i = 1
     local s = string.sub(self._raw, 1, 1)
 
+    -- push `current_word` and apply formatting
     local function push_glyph()
-
         if current_word == "" then return end
 
         local style = rt.FontStyle.REGULAR
@@ -87,15 +97,58 @@ function rt.Label:_parse()
             style = rt.FontStyle.ITALIC
         end
 
-        println("push: ", current_word)
+        println("push: ", current_word, " | ", bold, " ", italic, " ", color)
 
-        table.insert(self._glyphs, rt.Glyph(self._font, current_word, style))
+        table.insert(self._glyphs, rt.Glyph(self._font, current_word, style, rt.Palette[color]))
         current_word = ""
     end
 
-    local function step()
-        i = i + 1
+    -- advance n characters
+    local function step(n)
+        if meta.is_nil(n) then n = 1 end
+        meta.assert_number(n)
+        i = i + n
         s = string.sub(self._raw, i, i)
+    end
+
+    -- check if next `#tag` characters match `tag`
+    local function tag_matches(tag)
+        meta.assert_string(tag)
+        local out = string.sub(self._raw, i, i + #tag - 1) == tag
+        if out then step(#tag) end
+        return out
+    end
+
+    -- throw error, with guides
+    local function throw_parse_error(reason)
+        meta.assert_string(reason)
+        error("[rt] In rt.Label._parse: Error at position `" .. tostring(i) .. "`: " .. reason)
+    end
+
+    -- test if upcoming control sequence matches rt.Label.COLOR_TAG_START
+    local function is_color_tag()
+        local tag = ""
+        local color_i = 0
+        repeat
+            if i + color_i > #self._raw then
+                throw_parse_error("malformed tag, reached end of text")
+            end
+            local color_s = string.sub(self._raw, i + color_i, i + color_i)
+            tag = tag .. color_s
+            color_i = color_i + 1
+        until color_s == ">"
+
+        local _, _, new_color = string.find(tag, rt.Label.COLOR_TAG_START)
+        if meta.is_nil(new_color) then
+            return false
+        end
+
+        if not rt.is_rgba(rt.Palette[new_color]) then
+            throw_parse_error("malformed color tag: color `" .. new_color .. "` unknown")
+        end
+        color = new_color
+        step(#tag)
+        return true
     end
 
     while i < #self._raw do
@@ -108,11 +161,52 @@ function rt.Label:_parse()
         elseif s == "\t" then
             table.insert(self._glyphs, rt.Label.TAB)
             push_glyph()
+        elseif s == "<" then
+            push_glyph()
+            if tag_matches(rt.Label.BOLD_TAG_START) then
+                if bold == true then
+                    throw_parse_error("trying to open a bold region, but one is already open")
+                end
+                bold = true
+            elseif tag_matches(rt.Label.BOLD_TAG_END) then
+                if bold == false then
+                    throw_parse_error("trying to close a bold region, but one is not open")
+                end
+                bold = false
+            elseif tag_matches(rt.Label.ITALIC_TAG_START) then
+                if italic == true then
+                    throw_parse_error("trying to open an italic region, but one is already open")
+                end
+                italic = true
+            elseif tag_matches(rt.Label.ITALIC_TAG_END) then
+                if italic == false then
+                    throw_parse_error("trying to close an italic region, but one is not open")
+                end
+                italic = false
+            elseif is_color_tag() then
+                if is_colored == true then
+                    throw_parse_error("trying to open a color region, but one is already open")
+                end
+                is_colored = true
+            elseif tag_matches(rt.Label.COLOR_TAG_END) then
+                if is_colored == false then
+                    throw_parse_error("trying to close a color region, but one is not open")
+                end
+                is_colored = false
+            else
+                throw_parse_error("unknown control sequence: " .. string.sub(self._raw, i, i))
+            end
+            goto continue
         else
             current_word = current_word .. s
         end
         step()
+        ::continue::
     end
     push_glyph()
+
+    if bold then throw_parse_error("reached end of text, but bold region is still open") end
+    if italic then throw_parse_error("reached end of text, but italic region is still open") end
+    if is_colored then throw_parse_error("reached end of text, but colored region is still open") end
 end
 
