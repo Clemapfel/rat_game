@@ -103,6 +103,12 @@ function rt.Label:_parse()
         current_word = ""
     end
 
+    -- throw error, with guides
+    local function throw_parse_error(reason)
+        meta.assert_string(reason)
+        error("[rt] In rt.Label._parse: Error at position `" .. tostring(i) .. "`: " .. reason)
+    end
+
     -- advance n characters
     local function step(n)
         if meta.is_nil(n) then n = 1 end
@@ -113,16 +119,21 @@ function rt.Label:_parse()
 
     -- check if next `#tag` characters match `tag`
     local function tag_matches(tag)
-        meta.assert_string(tag)
-        local out = string.sub(self._raw, i, i + #tag - 1) == tag
-        if out then step(#tag) end
-        return out
-    end
-
-    -- throw error, with guides
-    local function throw_parse_error(reason)
-        meta.assert_string(reason)
-        error("[rt] In rt.Label._parse: Error at position `" .. tostring(i) .. "`: " .. reason)
+        local sequence = ""
+        local sequence_i = 0
+        repeat
+            if i + sequence_i > #self._raw then
+                throw_parse_error("malformed tag, reached end of text")
+            end
+            local sequence_s = string.sub(self._raw, i + sequence_i, i + sequence_i)
+            sequence = sequence .. sequence_s
+            sequence_i = sequence_i + 1
+        until sequence_s == ">"
+        if not meta.is_nil(string.find(sequence, tag)) then
+            step(#tag)
+            return true
+        end
+        return false
     end
 
     -- test if upcoming control sequence matches rt.Label.COLOR_TAG_START
