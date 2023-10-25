@@ -8,7 +8,6 @@ rt.JustifyMode = meta.new_enum({
 --- @class rt.Label
 rt.Label = meta.new_type("Label", function(text)
     meta.assert_string(text)
-
     local out = meta.new(rt.Label, {
         _raw = text,
         _font = rt.Font.DEFAULT,
@@ -32,6 +31,36 @@ end
 --- @overload rt.Widget.size_allocate
 function rt.Label:size_allocate(x, y, width, height)
 
+    local space = self._font:get_bold_italic():getWidth(" ")
+    local line_height = self._font:get_bold_italic():getHeight()
+
+    local glyph_x = x
+    local glyph_y = y
+
+    println(self._raw)
+
+    for _, glyph in pairs(self._glyphs) do
+
+        if glyph == rt.Label.SPACE then
+            glyph_x = glyph_x + space
+        elseif glyph == rt.Label.TAB then
+            glyph_x = glyph_x + 4 * space
+        elseif glyph == rt.Label.NEWLINE then
+            glyph_x = x
+            glyph_y = glyph_y + line_height
+        else
+            local w, h = glyph:get_size()
+            if glyph_x - x + w >= width then
+                glyph_x = x
+                glyph_y = glyph_y + line_height
+                glyph:set_position(glyph_x, glyph_y)
+                glyph_x = glyph_x + w
+            else
+                glyph:set_position(glyph_x, glyph_y)
+                glyph_x = glyph_x + w
+            end
+        end
+    end
 end
 
 --- @overload rt.Widget.measure
@@ -94,7 +123,7 @@ function rt.Label:_parse()
     local current_word = ""
 
     local i = 1
-    local s = string.sub(self._raw, 1, 1)
+    local s = string.sub(self._raw, i, i)
 
     -- push `current_word` and apply formatting
     local function push_glyph()
@@ -195,6 +224,7 @@ function rt.Label:_parse()
             push_glyph()
         elseif s == "<" then
             push_glyph()
+            -- bold
             if tag_matches(rt.Label.BOLD_TAG_START) then
                 if bold == true then
                     throw_parse_error("trying to open a bold region, but one is already open")
@@ -205,6 +235,7 @@ function rt.Label:_parse()
                     throw_parse_error("trying to close a bold region, but one is not open")
                 end
                 bold = false
+            -- italic
             elseif tag_matches(rt.Label.ITALIC_TAG_START) then
                 if italic == true then
                     throw_parse_error("trying to open an italic region, but one is already open")
@@ -215,6 +246,7 @@ function rt.Label:_parse()
                     throw_parse_error("trying to close an italic region, but one is not open")
                 end
                 italic = false
+            -- color
             elseif is_color_tag() then
                 if is_colored == true then
                     throw_parse_error("trying to open a color region, but one is already open")
@@ -225,6 +257,7 @@ function rt.Label:_parse()
                     throw_parse_error("trying to close a color region, but one is not open")
                 end
                 is_colored = false
+            -- effect: shake
             elseif tag_matches(rt.Label.EFFECT_SHAKE_TAG_START) then
                 if effect_shake == true then
                     throw_parse_error("trying to open an effect shake region, but one is already open")
@@ -235,6 +268,7 @@ function rt.Label:_parse()
                     throw_parse_error("trying to close an effect shake region, but one is not open")
                 end
                 effect_shake = false
+            -- effect: wave
             elseif tag_matches(rt.Label.EFFECT_WAVE_TAG_START) then
                 if effect_wave == true then
                     throw_parse_error("trying to open an effect wave region, but one is already open")
@@ -245,6 +279,7 @@ function rt.Label:_parse()
                     throw_parse_error("trying to close an effect wave region, but one is not open")
                 end
                 effect_wave = false
+            -- effect: rainbow
             elseif tag_matches(rt.Label.EFFECT_RAINBOW_TAG_START) then
                 if effect_rainbow == true then
                     throw_parse_error("trying to open an effect rainbow region, but one is already open")
@@ -255,7 +290,7 @@ function rt.Label:_parse()
                     throw_parse_error("trying to close an effect rainbow region, but one is not open")
                 end
                 effect_rainbow = false
-            else
+            else -- unknown tag
                 local sequence = ""
                 local sequence_i = 0
                 repeat
