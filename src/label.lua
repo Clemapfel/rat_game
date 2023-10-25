@@ -214,14 +214,14 @@ function rt.Label:_parse()
 
     while i < #self._raw do
         if s == " " then
+            push_glyph()
             table.insert(self._glyphs, rt.Label.SPACE)
-            push_glyph()
         elseif s == "\n" then
+            push_glyph()
             table.insert(self._glyphs, rt.Label.NEWLINE)
-            push_glyph()
         elseif s == "\t" then
-            table.insert(self._glyphs, rt.Label.TAB)
             push_glyph()
+            table.insert(self._glyphs, rt.Label.TAB)
         elseif s == "<" then
             push_glyph()
             -- bold
