@@ -1,22 +1,37 @@
+--- @class rt.TextEffect
+rt.TextEffect = meta.new_enum({
+    NONE = "TEXT_EFFECT_NONE",
+    SHAKE = "TEXT_EFFECT_SHAKE",
+    WAVE = "TEXT_EFFECT_WAVE",
+    RAINBOW = "TEXT_EFFECT_RAINBOW"
+})
+
 --- @class rt.Glyph
-rt.Glyph = meta.new_type("Glyph", function(font, content, font_style, color, wrap_width)
+rt.Glyph = meta.new_type("Glyph", function(font, content, font_style, color, effects, wrap_width)
 
     meta.assert_isa(font, rt.Font)
     meta.assert_string(content)
 
     if meta.is_nil(font_style) then font_style = rt.FontStyle.REGULAR end
     if meta.is_nil(color) then color = rt.RGBA(1, 1, 1, 1) end
+    if meta.is_nil(effects) then effects = {} end
     if meta.is_nil(wrap_width) then wrap_width = POSITIVE_INFINITY end
 
     meta.assert_enum(font_style, rt.FontStyle)
     rt.assert_rgba(color)
     meta.assert_number(wrap_width)
 
+    meta.assert_table(effects)
+    for _, effect in pairs(effects) do
+        meta.assert_enum(effect, effects)
+    end
+
     local out = meta.new(rt.Glyph, {
         _font = font,
         _content = content,
         _color = color,
         _style = font_style,
+        _effects = effects,
         _text = {},
         _position_x = 0,
         _position_y = 0,

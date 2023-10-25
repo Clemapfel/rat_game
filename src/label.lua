@@ -1,4 +1,4 @@
----@class JustifyMode
+---@class rt.JustifyMode
 rt.JustifyMode = meta.new_enum({
     LEFT = "left",
     RIGHT = "right",
@@ -60,6 +60,7 @@ end
 rt.Label.SPACE = " "
 rt.Label.NEWLINE = "\n"
 rt.Label.TAB = "    "
+rt.Label.ESCAPE_CHARACTER = "%"
 
 -- regex patterns to match tags
 rt.Label.BOLD_TAG_START = rt.Set("<b>", "<bold>")
@@ -68,8 +69,12 @@ rt.Label.ITALIC_TAG_START = rt.Set("<i>", "<italic>")
 rt.Label.ITALIC_TAG_END = rt.Set("</i>", "</italic>")
 rt.Label.COLOR_TAG_START = rt.Set("<col=(.*)>", "<color=(.*)>")
 rt.Label.COLOR_TAG_END = rt.Set("</col>", "</color>")
-rt.Label.EFFECT_TAG_START = rt.Set("<fx=(.*)>", "<effect=(.*)>")
-rt.Label.EFFECT_TAG_END = rt.Set("<fx=(.*)>", "<effects=(.*)>")
+rt.Label.EFFECT_SHAKE_TAG_START = rt.Set("<shake>", "<fx_shake>")
+rt.Label.EFFECT_SHAKE_TAG_END = rt.Set("</shake>", "</fx_shake>")
+rt.Label.EFFECT_WAVE_TAG_START = rt.Set("<wave>", "<fx_wave>")
+rt.Label.EFFECT_WAVE_TAG_END = rt.Set("</wave", "</fx_wave>")
+rt.Label.EFFECT_RAINBOW_TAG_START = rt.Set("<rainbow>", "<fx_rainbow>")
+rt.Label.EFFECT_RAINBOW_TAG_END = rt.Set("</rainbow>", "</fx_rainbow>")
 
 --- @brief [internal]
 function rt.Label:_parse()
@@ -81,7 +86,10 @@ function rt.Label:_parse()
     local italic = false
     local is_colored = false
     local color = "PURE_WHITE"
-    local effect = rt.
+
+    local effect_rainbow = false
+    local effect_shake = false
+    local effect_wave = false
 
     local current_word = ""
 
@@ -101,9 +109,14 @@ function rt.Label:_parse()
             style = rt.FontStyle.ITALIC
         end
 
-        println("push: ", current_word, " | ", bold, " ", italic, " ", color)
+        local effects = {}
+        if effect_rainbow then table.insert(effects, rt.TextEffect.RAINBOW) end
+        if effect_shake then table.insert(effects, rt.TextEffect.SHAKE) end
+        if effect_wave then table.insert(effects, rt.TextEffect.WAVE) end
 
-        table.insert(self._glyphs, rt.Glyph(self._font, current_word, style, rt.Palette[color]))
+        println("push: ", current_word, " | ", bold, " ", italic, " ", color, " ", effect_wave, " ", effect_shake, " ", effect_rainbow)
+
+        table.insert(self._glyphs, rt.Glyph(self._font, current_word, style, rt.Palette[color], effects))
         current_word = ""
     end
 
@@ -170,33 +183,6 @@ function rt.Label:_parse()
         return false
     end
 
-    -- test if upcoming control sequence matches rt.Label.COLOR_TAG_START
-    local function is_effect_tag()
-        local sequence = ""
-        local effect_i = 0
-        repeat
-            if i + effect_i > #self._raw then
-                throw_parse_error("malformed effect tag, reached end of text")
-            end
-            local effect_s = string.sub(self._raw, i + effect_i, i + effect_i)
-            sequence = sequence .. effect_s
-            effect_i = effect_i + 1
-        until effect_s == ">"
-
-        for tag in pairs(rt.Label.EFFECT_TAG_START) do
-            local _, _, new_effect = string.find(sequence, tag)
-            if not meta.is_nil(effect) then
-                if
-                    throw_parse_error("malformed effect tag: effect `" .. new_effect .. "` unknown")
-                end
-                effect = new_effect
-                step(#sequence)
-                return true
-            end
-        end
-        return false
-    end
-
     while i < #self._raw do
         if s == " " then
             table.insert(self._glyphs, rt.Label.SPACE)
@@ -239,8 +225,48 @@ function rt.Label:_parse()
                     throw_parse_error("trying to close a color region, but one is not open")
                 end
                 is_colored = false
+            elseif tag_matches(rt.Label.EFFECT_SHAKE_TAG_START) then
+                if effect_shake == true then
+                    throw_parse_error("trying to open an effect shake region, but one is already open")
+                end
+                effect_shake = true
+            elseif tag_matches(rt.Label.EFFECT_SHAKE_TAG_END) then
+                if effect_shake == false then
+                    throw_parse_error("trying to close an effect shake region, but one is not open")
+                end
+                effect_shake = false
+            elseif tag_matches(rt.Label.EFFECT_WAVE_TAG_START) then
+                if effect_wave == true then
+                    throw_parse_error("trying to open an effect wave region, but one is already open")
+                end
+                effect_wave = true
+            elseif tag_matches(rt.Label.EFFECT_WAVE_TAG_END) then
+                if effect_wave == false then
+                    throw_parse_error("trying to close an effect wave region, but one is not open")
+                end
+                effect_wave = false
+            elseif tag_matches(rt.Label.EFFECT_RAINBOW_TAG_START) then
+                if effect_rainbow == true then
+                    throw_parse_error("trying to open an effect rainbow region, but one is already open")
+                end
+                effect_rainbow = true
+            elseif tag_matches(rt.Label.EFFECT_RAINBOW_TAG_END) then
+                if effect_rainbow == false then
+                    throw_parse_error("trying to close an effect rainbow region, but one is not open")
+                end
+                effect_rainbow = false
             else
-                throw_parse_error("unknown control sequence: " .. string.sub(self._raw, i, i))
+                local sequence = ""
+                local sequence_i = 0
+                repeat
+                    if i + sequence_i > #self._raw then
+                        throw_parse_error("malformed tag, reached end of text")
+                    end
+                    local sequence_s = string.sub(self._raw, i + sequence_i, i + sequence_i)
+                    sequence = sequence .. sequence_s
+                    sequence_i = sequence_i + 1
+                until sequence_s == ">"
+                throw_parse_error("unknown control sequence: " .. sequence)
             end
             goto continue
         else
@@ -254,5 +280,8 @@ function rt.Label:_parse()
     if bold then throw_parse_error("reached end of text, but bold region is still open") end
     if italic then throw_parse_error("reached end of text, but italic region is still open") end
     if is_colored then throw_parse_error("reached end of text, but colored region is still open") end
+    if effect_shake then throw_parse_error("reached end of text, but effect shake region is still open") end
+    if effect_wave then throw_parse_error("reached end of text, but effect wave region is still open") end
+    if effect_rainbow then throw_parse_error("reached end of text, but effect rainbow region is still open") end
 end
 
