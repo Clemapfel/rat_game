@@ -268,7 +268,7 @@ function rt.Palette:export()
 
     image:save_to_file("palette.png")
     local from = love.filesystem.getAppdataDirectory() .. "love/rat_game/palette.png"
-    local to = love.filesystem.getSourceBaseDirectory() .. "/rat_game/art/palette.png"
+    local to = love.filesystem.getSourceBaseDirectory() .. "/rat_game/assets/palette.png"
     os.execute("mv " .. from .. " " .. to)
     love.filesystem.remove("palette.png")
     println("[rt][LOG] Exported palette to " .. to)
