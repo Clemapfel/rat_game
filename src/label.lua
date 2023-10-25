@@ -1,81 +1,29 @@
---- class TextAlignment
-rt.TextAlignment = meta.new_enum({
+---@class JustifyMode
+rt.JustifyMode = meta.new_enum({
     LEFT = "left",
     RIGHT = "right",
     CENTER = "center"
-    -- JUSTIFY = "justify"
 })
 
 --- @class rt.Label
 rt.Label = meta.new_type("Label", function(text)
-    if not meta.is_nil(text) then
-        meta.assert_string(text)
-    end
+    meta.assert_string(text)
 
     local out = meta.new(rt.Label, {
-        _glyph_rows = {},
-        _glyph_row_widths = {},
-        _raw = "",
-        _width = POSITIVE_INFINITY,
-        _height = 0,
+        _raw = text,
         _font = rt.Font.DEFAULT,
-        _text_alignment = rt.TextAlignment.LEFT
+        _justify_mode = rt.JustifyMode.LEFT,
+        _glyphs = {}
     }, rt.Widget, rt.Drawable)
-    out:set_text(text)
+    out:_parse()
     return out
 end)
-
---- @brief
-function rt.Label:_apply_wrapping()
-    meta.assert_isa(self, rt.Label)
-    self._glyph_rows = {}
-    local wrapped = {}
-    for _, line in pairs(string.split(self._raw, "\n")) do
-        local _, lines = self._font:get_regular():getWrap(line, self._width)
-        for _, split_line in pairs(lines) do
-            split_line = string.gsub(split_line, "\n", "")
-            table.insert(wrapped, split_line)
-        end
-    end
-
-    local row_i = 1
-    local glyph_count = 0
-    for _, line in pairs(wrapped) do
-        self._glyph_rows[row_i] = {}
-        self._glyph_row_widths[row_i] = 0
-        local stripped = string.gsub(line, '^%s*(.-)%s*$', '%1') -- strip trailing whitespace
-        local split = string.split(stripped, " ")
-        for i, glyph in ipairs(split) do
-            if i < #split then
-                glyph = glyph .. " "
-            end
-            local to_push = rt.Glyph(self._font, glyph)
-            table.insert(self._glyph_rows[row_i], to_push)
-            self._glyph_row_widths[row_i] = self._glyph_row_widths[row_i] + to_push:get_size()
-            glyph_count = glyph_count + 1
-        end
-        row_i = row_i + 1
-    end
-    self:reformat()
-end
-
---- @brief
-function rt.Label:set_text(text)
-    meta.assert_isa(self, rt.Label)
-    if self._raw == text then return end
-    
-    self._raw = text
-
-    if #self._raw ~= 0 then
-        self:_apply_wrapping()
-    end
-end
 
 --- @overload rt.Drawable.draw
 function rt.Label:draw()
     meta.assert_isa(self, rt.Label)
-    for _, row in pairs(self._glyph_rows) do
-        for _, glyph in pairs(row) do
+    for _, glyph in pairs(self._glyphs) do
+        if meta.isa(glyph, rt.Glyph) then
             glyph:draw()
         end
     end
@@ -83,92 +31,52 @@ end
 
 --- @overload rt.Widget.size_allocate
 function rt.Label:size_allocate(x, y, width, height)
-    meta.assert_isa(self, rt.Label)
 
-    local should_wrap = self._width ~= width
-
-    self._width = width
-    self._height = height
-
-    if should_wrap then self:_apply_wrapping() end
-
-    local row_x = x
-    local row_y = y
-    for row_i, row in pairs(self._glyph_rows) do
-        local offset = 0
-        local line_height = NEGATIVE_INFINITY
-        local row_w = self._glyph_row_widths[row_i]
-
-        for i, glyph in pairs(row) do
-            local w, h = glyph:get_size()
-            local glyph_x = row_x + offset
-
-            if self._text_alignment == rt.TextAlignment.LEFT then
-                -- noop
-            elseif self._text_alignment == rt.TextAlignment.CENTER then
-                glyph_x = glyph_x + 0.5 * (self._width - row_w)
-            elseif self._text_alignment == rt.TextAlignment.RIGHT then
-                glyph_x = glyph_x + (self._width - row_w)
-            end
-
-            glyph:set_position(glyph_x, row_y)
-            offset = offset + w
-            line_height = math.max(line_height, h)
-        end
-        row_y = row_y + line_height
-    end
 end
 
 --- @overload rt.Widget.measure
 function rt.Label:measure()
-    if meta.is_nil(self._child) then return 0, 0 end
-    return self._width, self._height
+    meta.assert_isa(self, rt.Label)
+
+    local min_x = POSITIVE_INFINITY
+    local min_y = POSITIVE_INFINITY
+    local max_x = NEGATIVE_INFINITY
+    local max_y = NEGATIVE_INFINITY
+
+    for _, glyph in pairs(self._glyphs) do
+        local x, y = glyph:get_position()
+        local w, h = glyph:get_size()
+
+        min_x = math.min(min_x, x)
+        min_y = math.min(min_y, y)
+        max_x = math.max(max_x, x + w)
+        max_y = math.max(max_y, y + h)
+    end
+
+    return max_x - min_x, max_y - min_y
 end
 
+rt.Label.SPACE = " "
+rt.Label.NEWLINE = "\n"
+rt.Label.TAB = "    "
 
+--- @brief [internal]
+function rt.Label:_parse()
+    meta.assert_isa(self, rt.Label)
 
---[[
---- @class Label
-rt.Label = meta.new_type("Label", function(formatted_text)
-    local out = meta.new(rt.Label, {
-        _glyph_rows = {},
-        _raw = formatted_text
-    }, rt.Drawable)
-    out:parse_from(formatted_text)
-    return out
-end)
-
-rt.Label.BOLD_TAG = "b"       -- <b>example</b>
-rt.Label.ITALIC_TAG = "i"     -- <i>example</i>
-rt.Label.COLOR_TAG = "color"  -- <color=hotpink>example</color>
-
---- @brief
-function rt.Label:parse_from(text)
-    self._raw = text
-    local glyphs = self._glyph_rows
-    local error_reason = ""
-    local error_occurred = false
+    self._glyphs = {}
 
     local bold = false
     local italic = false
-    local color = false
-    local current_color = "white"
 
-    local current_glyph = ""
-    local x = 0   -- x-position
-    local y = 0   -- y-position
-    local i = 1   -- character index
-    local s = string.sub(text, 1, 1)  -- current character
+    local current_word = ""
 
-    local function step()
-        i = i + 1
-        s = string.sub(text, i, i)
-    end
+    local i = 1
+    local s = string.sub(self._raw, 1, 1)
 
     local function push_glyph()
-        if current_glyph == "" then return end
 
-        ---println(current_glyph, " ", bold, " ", italic, " ", color)
+        if current_word == "" then return end
 
         local style = rt.FontStyle.REGULAR
         if bold and italic then
@@ -179,126 +87,32 @@ function rt.Label:parse_from(text)
             style = rt.FontStyle.ITALIC
         end
 
-        if color then
-            current_color = rt.RGBA(1, 0, 1, 1)
-            println(current_color)
-        else
-            current_color = rt.RGBA(1, 1, 1, 1)
-        end
+        println("push: ", current_word)
 
-        local to_push = rt.Glyph(rt.Font.DEFAULT, current_glyph, style, current_color)
-        to_push:set_position(x, y)
-        x = x + to_push:get_width()
-        table.insert(glyphs, to_push)
-        current_glyph = ""
+        table.insert(self._glyphs, rt.Glyph(self._font, current_word, style))
+        current_word = ""
     end
 
-    while i < #text do
-        if s == "<" then
-            step()
-            if s == "/" then
-                step()
-                if s == "b" then
-                    if not bold then
-                        error("attempting to close a bold reason, but none is open")
-                    end
-                    push_glyph()
-                    bold = false
-                    step()
-                    if s ~= ">" then
-                        error("Expected `>`, got `" .. s .. "`")
-                    end
-                    step()
-                elseif s == "i" then
-                    if not italic then
-                        error("attempting to close an italic region, but none is open")
-                    end
-                    push_glyph()
-                    italic = false
-                    step()
-                    if s ~= ">" then
-                        error("Expected `>`, got `" .. s .. "`")
-                    end
-                    step()
-                elseif s == "c" then
-                    if not color then
-                        error("attempting to close a color region, but none is open")
-                    end
-
-                    step()
-                    local next = string.sub(text, i, i + #"olor>"-1)
-                    if not (next == "olor>") then
-                        error("unexpected `" .. next .. "` when closing color region")
-                    end
-
-                    push_glyph()
-                    color = false
-                    for i = 1, #"olor>" do
-                        step()
-                    end
-                else
-                    error("unrecognized flag: `" .. s .. "`")
-                end
-            elseif s == "b" then
-                if bold then
-                    error("attempting to open a bold region, but one is already open")
-                end
-                push_glyph()
-                bold = true
-                step()
-                if s ~= ">" then
-                    error("Expected `>`, got `" .. s .. "`")
-                end
-                step()
-            elseif s == "i" then
-                if italic then
-                    error("attempting to open an italic region, but one is already open")
-                end
-                push_glyph()
-                italic = true
-                step()
-                if s ~= ">" then
-                   error("Expected `>`, got `" .. s .. "`")
-                end
-                step()
-            elseif s == "c" then
-                if color then
-                    error("attempting to open a color region, but one is already open")
-                end
-
-                step()
-                local next = string.sub(text, i, i + #"olor>"-1)
-                if not (next == "olor>") then
-                    error("unexpected `" .. next .. "` when opening color region")
-                end
-                push_glyph()
-                color = true
-
-                for i=1,#"olor>" do step() end
-            else
-                error("unrecognized flag: `" .. s .. "`")
-            end
-        else
-            current_glyph = current_glyph .. s
-            step()
-        end
+    local function step()
+        i = i + 1
+        s = string.sub(self._raw, i, i)
     end
 
-    current_glyph = current_glyph .. s
+    while i < #self._raw do
+        if s == " " then
+            table.insert(self._glyphs, rt.Label.SPACE)
+            push_glyph()
+        elseif s == "\n" then
+            table.insert(self._glyphs, rt.Label.NEWLINE)
+            push_glyph()
+        elseif s == "\t" then
+            table.insert(self._glyphs, rt.Label.TAB)
+            push_glyph()
+        else
+            current_word = current_word .. s
+        end
+        step()
+    end
     push_glyph()
-
-    if bold then
-        error("Reached end of text, but bold region is still open")
-    end
-
-    if italic then
-        error("Reached end of text, but italic region is still open")
-    end
 end
 
-function rt.Label:draw()
-    for _, glyph in pairs(self._glyph_rows) do
-        glyph:draw()
-    end
-end
-]]--
