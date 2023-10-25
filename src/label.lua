@@ -56,17 +56,20 @@ function rt.Label:measure()
     return max_x - min_x, max_y - min_y
 end
 
+-- control characters used for wrap hinting
 rt.Label.SPACE = " "
 rt.Label.NEWLINE = "\n"
 rt.Label.TAB = "    "
 
-rt.Label.BOLD_TAG_START = "<b>"
-rt.Label.BOLD_TAG_END = "</b>"
-rt.Label.ITALIC_TAG_START = "<i>"
-rt.Label.ITALIC_TAG_END = "</i>"
-
-rt.Label.COLOR_TAG_START = "<col=(.*)>" -- regex pattern
-rt.Label.COLOR_TAG_END = "</col>"
+-- regex patterns to match tags
+rt.Label.BOLD_TAG_START = rt.Set("<b>", "<bold>")
+rt.Label.BOLD_TAG_END = rt.Set("</b>", "</bold>")
+rt.Label.ITALIC_TAG_START = rt.Set("<i>", "<italic>")
+rt.Label.ITALIC_TAG_END = rt.Set("</i>", "</italic>")
+rt.Label.COLOR_TAG_START = rt.Set("<col=(.*)>", "<color=(.*)>")
+rt.Label.COLOR_TAG_END = rt.Set("</col>", "</color>")
+rt.Label.EFFECT_TAG_START = rt.Set("<fx=(.*)>", "<effect=(.*)>")
+rt.Label.EFFECT_TAG_END = rt.Set("<fx=(.*)>", "<effects=(.*)>")
 
 --- @brief [internal]
 function rt.Label:_parse()
@@ -78,6 +81,7 @@ function rt.Label:_parse()
     local italic = false
     local is_colored = false
     local color = "PURE_WHITE"
+    local effect = rt.
 
     local current_word = ""
 
@@ -118,7 +122,7 @@ function rt.Label:_parse()
     end
 
     -- check if next `#tag` characters match `tag`
-    local function tag_matches(tag)
+    local function tag_matches(tags)
         local sequence = ""
         local sequence_i = 0
         repeat
@@ -129,37 +133,68 @@ function rt.Label:_parse()
             sequence = sequence .. sequence_s
             sequence_i = sequence_i + 1
         until sequence_s == ">"
-        if not meta.is_nil(string.find(sequence, tag)) then
-            step(#tag)
-            return true
+
+        for tag in pairs(tags) do
+            if not meta.is_nil(string.find(sequence, tag)) then
+                step(#sequence)
+                return true
+            end
         end
         return false
     end
 
     -- test if upcoming control sequence matches rt.Label.COLOR_TAG_START
     local function is_color_tag()
-        local tag = ""
+        local sequence = ""
         local color_i = 0
         repeat
             if i + color_i > #self._raw then
-                throw_parse_error("malformed tag, reached end of text")
+                throw_parse_error("malformed color tag, reached end of text")
             end
             local color_s = string.sub(self._raw, i + color_i, i + color_i)
-            tag = tag .. color_s
+            sequence = sequence .. color_s
             color_i = color_i + 1
         until color_s == ">"
 
-        local _, _, new_color = string.find(tag, rt.Label.COLOR_TAG_START)
-        if meta.is_nil(new_color) then
-            return false
+        for tag in pairs(rt.Label.COLOR_TAG_START) do
+            local _, _, new_color = string.find(sequence, tag)
+            if not meta.is_nil(new_color) then
+                if not rt.is_rgba(rt.Palette[new_color]) then
+                    throw_parse_error("malformed color tag: color `" .. new_color .. "` unknown")
+                end
+                color = new_color
+                step(#sequence)
+                return true
+            end
         end
+        return false
+    end
 
-        if not rt.is_rgba(rt.Palette[new_color]) then
-            throw_parse_error("malformed color tag: color `" .. new_color .. "` unknown")
+    -- test if upcoming control sequence matches rt.Label.COLOR_TAG_START
+    local function is_effect_tag()
+        local sequence = ""
+        local effect_i = 0
+        repeat
+            if i + effect_i > #self._raw then
+                throw_parse_error("malformed effect tag, reached end of text")
+            end
+            local effect_s = string.sub(self._raw, i + effect_i, i + effect_i)
+            sequence = sequence .. effect_s
+            effect_i = effect_i + 1
+        until effect_s == ">"
+
+        for tag in pairs(rt.Label.EFFECT_TAG_START) do
+            local _, _, new_effect = string.find(sequence, tag)
+            if not meta.is_nil(effect) then
+                if
+                    throw_parse_error("malformed effect tag: effect `" .. new_effect .. "` unknown")
+                end
+                effect = new_effect
+                step(#sequence)
+                return true
+            end
         end
-        color = new_color
-        step(#tag)
-        return true
+        return false
     end
 
     while i < #self._raw do

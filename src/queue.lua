@@ -1,6 +1,5 @@
 --- @class rt.Queue
 rt.Queue = meta.new_type("Queue", function()
-
     local out = meta.new(rt.Queue, {
         elements = {},
         first_element = 0,

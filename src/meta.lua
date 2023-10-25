@@ -415,7 +415,7 @@ end
 --- @brief check if value is part of enum
 --- @param x any
 --- @param enum meta.Enum
-function meta.is_enum(x, enum)
+function meta.is_enum_value(x, enum)
     meta.assert_isa(enum,  meta.Enum)
     for _, value in pairs(enum) do
         if x == value then
@@ -429,7 +429,7 @@ end
 --- @param x any
 --- @param enum meta.Enum
 function meta.assert_enum(x, enum)
-    if not meta.is_enum(x, enum) then
+    if not meta.is_enum_value(x, enum) then
         error("[rt][ERROR] In assert_enum: Value `" .. tostring(x) .. "` is not a value of enum ")
     end
 end
