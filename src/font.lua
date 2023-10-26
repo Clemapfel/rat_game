@@ -42,6 +42,7 @@ end)
 
 rt.Font.DEFAULT_SIZE = 14
 rt.Font.DEFAULT = {}
+rt.Font.DEFAULT_MONO = {}
 
 --- @class rt.FontStyle
 rt.FontStyle = meta.new_enum({

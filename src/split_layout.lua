@@ -54,12 +54,27 @@ function rt.SplitLayout:measure()
     end
 end
 
+--- @overload rt.Widget.realize
+function rt.SplitLayout:realize()
+    meta.assert_isa(self, rt.SplitLayout)
+    self._realized = true
+
+    if meta.isa(self._start_child, rt.Widget) then
+        self._start_child:realize()
+    end
+
+    if meta.isa(self._end_child, rt.Widget) then
+        self._end_child:realize()
+    end
+end
+
 --- @brief
 function rt.SplitLayout:set_start_child(child)
     meta.assert_isa(self, rt.SplitLayout)
     self:remove_start_child()
     child:set_parent(self)
     self._start_child = child
+    if self:get_is_realized() then child:realize() end
     self:reformat()
 end
 
@@ -82,6 +97,7 @@ end
 function rt.SplitLayout:set_end_child(child)
     meta.assert_isa(self, rt.SplitLayout)
     self._end_child = child
+    if self:get_is_realized() then child:realize() end
     self:reformat()
 end
 

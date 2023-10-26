@@ -25,7 +25,7 @@ rt.Widget._horizontal_alignment = rt.Alignment.CENTER
 rt.Widget._vertical_alignment = rt.Alignment.CENTER
 rt.Widget._minimum_width = 1
 rt.Widget._minimum_height = 1
-rt.Widget._realized = true
+rt.Widget._realized = false
 rt.Widget._focused = true
 rt.Widget._parent = nil
 
@@ -42,6 +42,20 @@ end
 --- @return (Number, Number)
 function rt.Widget:measure()
     error("[rt][ERROR] " .. meta.typeof(self) .. ":measure: abstract method called")
+end
+
+--- @brief
+function rt.Widget:realize()
+    meta.assert_isa(self, rt.Widget)
+    if self._realized then return end
+    self._realized = true
+    self:reformat()
+end
+
+--- @brief
+function rt.Widget:get_is_realized()
+    meta.assert_isa(self, rt.Widget)
+    return self._realized
 end
 
 --- @brief

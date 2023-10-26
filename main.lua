@@ -65,8 +65,9 @@ require "animated_sprite"
 -- ### MAIN ###
 
 if DEBUG_MODE then goto exit end
+
 rt.Font.DEFAULT = rt.load_font("Roboto", "assets/fonts/Roboto")
-rt.Font.DEFAULT:set_size(50)
+rt.Font.DEFAULT_MONO = rt.load_font("DejaVuSansMono", "assets/fonts/DejaVuSansMono")
 
 window = rt.BinLayout()
 
@@ -76,11 +77,14 @@ sprite = rt.AnimatedSprite(spritesheet, "test_animation")
 window:set_child(sprite)
 sprite:play()
 
-label = rt.Label("regular <b>bold</b> <i>italics</i> <b><i>bold_italic</i></b> <col=PURE_MAGENTA>color</col> <b><i><col=BLUE_1>TEST</b>ABC</i>DEF</col>")
---label:set_justify_mode(rt.JustifyMode.CENTER)
---label:set_alignment(rt.Alignment.CENTER)
+label = rt.Label("abc")
+label:set_justify_mode(rt.JustifyMode.CENTER)
+label:set_alignment(rt.Alignment.CENTER)
 label:set_expand(true)
+label:set_font(rt.Font.DEFAULT_MONO)
 window:set_child(label)
+
+label:set_text("regular <b>bold</b> <i>italics</i> <b><i>bold_italic</i></b> <col=PURE_MAGENTA>color</col> <b><i><col=BLUE_1>TEST</b>ABC</i>DEF</col>")
 
 key = rt.add_keyboard_controller(window)
 key:signal_connect("key_pressed", function(self, key)
@@ -99,6 +103,8 @@ key:signal_connect("key_pressed", function(self, key)
     elseif key == rt.KeyboardKey.MINUS then
     end
 end)
+
+window:realize()
 
 -- @brief window resized
 function love.resize(width, height)

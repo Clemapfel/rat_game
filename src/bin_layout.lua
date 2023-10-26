@@ -19,7 +19,11 @@ function rt.BinLayout:set_child(child)
 
     self._child = child
     child:set_parent(self)
-    self:reformat()
+
+    if self:get_is_realized() then
+        self._child:realize()
+        self:reformat()
+    end
 end
 
 --- @brief get singular child
@@ -58,6 +62,15 @@ end
 function rt.BinLayout:measure()
     if meta.is_nil(self._child) then return 0, 0 end
     return self._child:measure()
+end
+
+--- @overload rt.Widget.realize
+function rt.BinLayout:realize()
+
+    if self:get_is_realized() then return end
+
+    self._realized = true
+    self._child:realize()
 end
 
 --- @brief test BinLayout

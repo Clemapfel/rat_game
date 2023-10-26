@@ -92,6 +92,16 @@ function rt.FlowLayout:draw()
     end
 end
 
+--- @overload rt.Widget.realize
+function rt.FlowLayout:realize()
+    meta.assert_isa(self, rt.FlowLayout)
+    if self:get_is_realized() == true then return end
+    self._realized = true
+    for _, child in pairs(self._children) do
+        child:realize()
+    end
+end
+
 --- @brief replace all children at once
 --- @param children Table<rt.Widget>
 function rt.FlowLayout:set_children(children)
@@ -105,6 +115,7 @@ function rt.FlowLayout:set_children(children)
         meta.assert_isa(child, rt.Widget)
         child:set_parent(self)
         self._children:push_back(child)
+        if self:get_is_realized() then child:realize() end
     end
     self:reformat()
 end
@@ -116,7 +127,11 @@ function rt.FlowLayout:push_back(child)
     meta.assert_isa(child, rt.Widget)
     child:set_parent(self)
     self._children:push_back(child)
-    self:reformat()
+
+    if self:get_is_realized() then
+        child:realize()
+        self:reformat()
+    end
 end
 
 --- @brief prepend child
@@ -126,7 +141,10 @@ function rt.FlowLayout:push_front(child)
     meta.assert_isa(child, rt.Widget)
     child:set_parent(self)
     self._children:push_back(child)
-    self:reformat()
+    if self:get_is_realized() then
+        child:realize()
+        self:reformat()
+    end
 end
 
 --- @brief remove first child

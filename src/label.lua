@@ -22,6 +22,8 @@ end)
 --- @overload rt.Drawable.draw
 function rt.Label:draw()
     meta.assert_isa(self, rt.Label)
+
+    if not self:get_is_visible() then return end
     for _, glyph in pairs(self._glyphs) do
         if meta.isa(glyph, rt.Glyph) then
             glyph:draw()
@@ -383,5 +385,45 @@ function rt.Label:_parse()
     if effect_shake then throw_parse_error("reached end of text, but effect shake region is still open") end
     if effect_wave then throw_parse_error("reached end of text, but effect wave region is still open") end
     if effect_rainbow then throw_parse_error("reached end of text, but effect rainbow region is still open") end
+end
+
+--- @brief
+function rt.Label:set_justify_mode(mode)
+    meta.assert_isa(self, rt.Label)
+    meta.assert_enum(mode, rt.JustifyMode)
+
+    if self._justify_mode ~= mode then
+        self._justify_mode = mode
+        self:reformat()
+    end
+end
+
+--- @brief
+function rt.Label:get_justify_mode()
+    meta.assert_isa(self, rt.Label)
+    return self._justify_mode
+end
+
+--- @brief
+function rt.Label:set_text(formatted_text)
+    meta.assert_isa(self, rt.Label)
+    meta.assert_string(formatted_text)
+    self._raw = formatted_text
+    self:_parse()
+    self:reformat()
+end
+
+--- @brief
+function rt.Label:get_text()
+    meta.assert_isa(self, rt.Label)
+    return self._raw;
+end
+
+--- @brief
+function rt.Label:set_font(font)
+    meta.assert_isa(self, rt.Label)
+    meta.assert_isa(font, rt.Font)
+    self._font = font
+    self:reformat();
 end
 

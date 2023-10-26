@@ -103,6 +103,15 @@ function rt.ListLayout:measure()
     end
 end
 
+--- @overload rt.Widget.realize
+function rt.ListLayout:realize()
+    meta.assert_isa(self, rt.ListLayout)
+    self._realized = true
+    for _, child in pairs(self._children) do
+        child:realize()
+    end
+end
+
 --- @brief
 function rt.ListLayout:set_children(children)
     meta.assert_isa(self, rt.GridLayout)
@@ -114,6 +123,7 @@ function rt.ListLayout:set_children(children)
         meta.assert_isa(child, rt.Widget)
         child:set_parent(self)
         self._children:push_back(child)
+        if self:get_is_realized() then child:realize() end
     end
     self:reformat()
 end
@@ -124,7 +134,10 @@ function rt.ListLayout:push_back(child)
     meta.assert_isa(child, rt.Widget)
     child:set_parent(self)
     self._children:push_back(child)
-    self:reformat()
+    if self:get_is_realized() then
+        child:realize()
+        self:reformat()
+    end
 end
 
 --- @brief
@@ -133,7 +146,10 @@ function rt.ListLayout:push_front(child)
     meta.assert_isa(child, rt.Widget)
     child:set_parent(self)
     self._children:push_back(child)
-    self:reformat()
+    if self:get_is_realized() then
+        child:realize()
+        self:reformat()
+    end
 end
 
 --- @brief

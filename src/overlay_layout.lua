@@ -39,6 +39,17 @@ function rt.OverlayLayout:size_allocate(x, y, width, height)
     end
 end
 
+--- @overload rt.Widget.realize
+function rt.OverlayLayout:realize()
+    meta.assert_isa(self, rt.OverlayLayout)
+    self._realized = true
+    self._base_child:realize()
+
+    for _, child in pairs(self._overlays) do
+        child:realize()
+    end
+end
+
 --- @brief
 function rt.OverlayLayout:set_base_child(child)
     meta.assert_isa(self, rt.OverlayLayout)
@@ -47,6 +58,8 @@ function rt.OverlayLayout:set_base_child(child)
     self:remove_base_child()
     child:set_parent(self)
     self._base_child = child
+
+    if self:get_is_realized() then child:realize() end
 end
 
 --- @brief
@@ -65,6 +78,8 @@ function rt.OverlayLayout:add_overlay(child)
     meta.assert_isa(child, rt.Widget)
     child:set_parent(self)
     self._overlays:push_back(child)
+
+    if self:get_is_realized() then child:realize() end
 end
 
 --- @brief test OverlayLayout

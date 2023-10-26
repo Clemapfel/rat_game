@@ -24,7 +24,11 @@ function rt.AspectLayout:set_child(child)
 
     self._child = child
     child:set_parent(self)
-    self:reformat()
+
+    if self:get_is_realized() then
+        child:realize()
+        self:reformat()
+    end
 end
 
 --- @brief get singular child
@@ -77,6 +81,19 @@ end
 function rt.AspectLayout:measure()
     if meta.is_nil(self._child) then return 0, 0 end
     return self._child:measure()
+end
+
+--- @overload rt.Widget.realize
+function rt.AspectLayout:realize()
+    local should_reformat = self:get_is_realized() == false
+
+    self._realized = true
+
+    if meta.isa(self._child, rt.Widget) then
+        self._child:realize()
+    end
+
+    if should_reformat then self:reformat() end
 end
 
 --- @brief test AspectLayout

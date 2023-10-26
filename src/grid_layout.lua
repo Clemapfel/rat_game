@@ -118,6 +118,16 @@ function rt.GridLayout:draw()
     end
 end
 
+--- @overload rt.Drawable.realize
+function rt.GridLayout:realize()
+    meta.assert_isa(self, rt.GridLayout)
+    if self:get_is_realized() == true then return end
+    self._realized = true
+    for _, child in pairs(self._children) do
+        child:realize()
+    end
+end
+
 --- @brief
 function rt.GridLayout:set_children(children)
     meta.assert_isa(self, rt.GridLayout)
@@ -129,6 +139,7 @@ function rt.GridLayout:set_children(children)
         meta.assert_isa(child, rt.Widget)
         child:set_parent(self)
         self._children:push_back(child)
+        if self._realize then child:realize() end
     end
     self:reformat()
 end
@@ -139,7 +150,10 @@ function rt.GridLayout:push_back(child)
     meta.assert_isa(child, rt.Widget)
     child:set_parent(self)
     self._children:push_back(child)
-    self:reformat()
+    if self:get_is_realized() then
+        child:realize()
+        self:reformat()
+    end
 end
 
 --- @brief
@@ -148,7 +162,10 @@ function rt.GridLayout:push_front(child)
     meta.assert_isa(child, rt.Widget)
     child:set_parent(self)
     self._children:push_back(child)
-    self:reformat()
+    if self:get_is_realized() then
+        child:realize()
+        self:reformat()
+    end
 end
 
 --- @brief
