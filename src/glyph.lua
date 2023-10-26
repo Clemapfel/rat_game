@@ -23,7 +23,7 @@ rt.Glyph = meta.new_type("Glyph", function(font, content, font_style, color, eff
 
     meta.assert_table(effects)
     for _, effect in pairs(effects) do
-        meta.assert_enum(effect, effects)
+        meta.assert_enum(effect, rt.TextEffect)
     end
 
     local out = meta.new(rt.Glyph, {

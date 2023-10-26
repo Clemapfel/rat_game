@@ -79,8 +79,16 @@ label:set_font(rt.Font.DEFAULT_MONO)
 window:set_child(label)
 
 n_chars = 0
-label:set_text("regular <b>bold</b>||| <i>italics</i> <b><i>bold_italic</i></b> <col=PURE_MAGENTA>color</col> <b><i><col=BLUE_1>TEST</b>ABC</i>DEF</col>")
+label:set_text("regular <b><shake>bold</shake></b>||| <i>italics</i> <b><i>bold_italic</i></b> <col=PURE_MAGENTA>color</col> <b><i><col=BLUE_1>TEST</b>ABC</i>DEF</col>")
 label:set_n_visible_characters(n_chars)
+
+for _, glyph in pairs(label._glyphs) do
+    if meta.isa(glyph, rt.Glyph) then
+        println("\"", glyph:get_content(), serialize(glyph._effects), "\"")
+    else
+        println("\"", glyph, "\"")
+    end
+end
 
 key = rt.add_keyboard_controller(window)
 key:signal_connect("key_pressed", function(self, key)
