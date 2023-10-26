@@ -13,7 +13,8 @@ rt.Label = meta.new_type("Label", function(text)
         _raw = text,
         _font = rt.Font.DEFAULT,
         _justify_mode = rt.JustifyMode.BLOCK,
-        _glyphs = {}
+        _glyphs = {},
+        _n_characters = 0,
     }, rt.Widget, rt.Drawable)
     out:_parse()
     return out
@@ -34,6 +35,7 @@ end
 --- @overload rt.Widget.size_allocate
 function rt.Label:size_allocate(x, y, width, height)
 
+    -- apply wrapping
     local space = self._font:get_bold_italic():getWidth(rt.Label.SPACE)
     local tab = self._font:get_bold_italic():getWidth(rt.Label.TAB)
     local line_height = self._font:get_bold_italic():getHeight()
@@ -63,7 +65,7 @@ function rt.Label:size_allocate(x, y, width, height)
             line_width = 0
             row_i = row_i + 1
             rows[row_i] = {}
-        else
+        elseif meta.isa(glyph, rt.Glyph) then
             local w, h = glyph:get_size()
             if glyph_x - x + w >= width then
                 glyph_x = x
@@ -159,6 +161,7 @@ rt.Label.SPACE = " "
 rt.Label.NEWLINE = "\n"
 rt.Label.TAB = "    "
 rt.Label.ESCAPE_CHARACTER = "%"
+rt.Label.BEAT = "|" -- pause when text scrolling
 
 -- regex patterns to match tags
 rt.Label.BOLD_TAG_START = rt.Set("<b>", "<bold>")
@@ -174,11 +177,12 @@ rt.Label.EFFECT_WAVE_TAG_END = rt.Set("</wave", "</fx_wave>")
 rt.Label.EFFECT_RAINBOW_TAG_START = rt.Set("<rainbow>", "<fx_rainbow>")
 rt.Label.EFFECT_RAINBOW_TAG_END = rt.Set("</rainbow>", "</fx_rainbow>")
 
---- @brief [internal]
+--- @brief [internal] transform _raw into set of glyphs
 function rt.Label:_parse()
     meta.assert_isa(self, rt.Label)
 
     self._glyphs = {}
+    self._n_characters = 0
 
     local bold = false
     local italic = false
@@ -213,6 +217,7 @@ function rt.Label:_parse()
         if effect_wave then table.insert(effects, rt.TextEffect.WAVE) end
 
         table.insert(self._glyphs, rt.Glyph(self._font, current_word, style, rt.Palette[color], effects))
+        self._n_characters = self._n_characters + #current_word
         current_word = ""
     end
 
@@ -279,7 +284,7 @@ function rt.Label:_parse()
         return false
     end
 
-    while i < #self._raw do
+    while i <= #self._raw do
         if s == " " then
             push_glyph()
             table.insert(self._glyphs, rt.Label.SPACE)
@@ -289,6 +294,9 @@ function rt.Label:_parse()
         elseif s == "\t" then
             push_glyph()
             table.insert(self._glyphs, rt.Label.TAB)
+        elseif s == rt.Label.BEAT then
+            push_glyph()
+            table.insert(self._glyphs, rt.Label.BEAT)
         elseif s == "<" then
             push_glyph()
             -- bold
@@ -387,7 +395,8 @@ function rt.Label:_parse()
     if effect_rainbow then throw_parse_error("reached end of text, but effect rainbow region is still open") end
 end
 
---- @brief
+--- @brief set text justification
+--- @param mode rt.JustifyMode
 function rt.Label:set_justify_mode(mode)
     meta.assert_isa(self, rt.Label)
     meta.assert_enum(mode, rt.JustifyMode)
@@ -398,13 +407,15 @@ function rt.Label:set_justify_mode(mode)
     end
 end
 
---- @brief
+--- @brief get text justification
+--- @return rt.JustifyMode
 function rt.Label:get_justify_mode()
     meta.assert_isa(self, rt.Label)
     return self._justify_mode
 end
 
---- @brief
+--- @brief replace text and reformat
+--- @param formatted_text String supports formatting tags
 function rt.Label:set_text(formatted_text)
     meta.assert_isa(self, rt.Label)
     meta.assert_string(formatted_text)
@@ -413,13 +424,15 @@ function rt.Label:set_text(formatted_text)
     self:reformat()
 end
 
---- @brief
+--- @brief access raw text
+--- @return String
 function rt.Label:get_text()
     meta.assert_isa(self, rt.Label)
     return self._raw;
 end
 
---- @brief
+--- @brief replace font
+--- @param font rt.Font
 function rt.Label:set_font(font)
     meta.assert_isa(self, rt.Label)
     meta.assert_isa(font, rt.Font)
@@ -427,3 +440,27 @@ function rt.Label:set_font(font)
     self:reformat();
 end
 
+--- @brief
+function rt.Label:set_n_visible_characters(n)
+    meta.assert_isa(self, rt.Label)
+    meta.assert_number(n)
+    local n_left =  clamp(n, 0, self._n_characters)
+    local n_glyphs = sizeof(self._glyphs)
+    local glyph_i = 1
+
+    while glyph_i <= n_glyphs do
+        local glyph = self._glyphs[glyph_i]
+
+        if meta.isa(glyph, rt.Glyph) then
+            local n_chars = glyph:get_n_characters()
+            if n_left >= n_chars then
+                glyph:set_n_visible_characters(n_chars)
+                n_left = n_left - n_chars
+            else
+                glyph:set_n_visible_characters(n_left)
+                n_left = 0
+            end
+        end
+        glyph_i = glyph_i + 1
+    end
+end

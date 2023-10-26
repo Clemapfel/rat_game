@@ -71,12 +71,6 @@ rt.Font.DEFAULT_MONO = rt.load_font("DejaVuSansMono", "assets/fonts/DejaVuSansMo
 
 window = rt.BinLayout()
 
-clock = rt.Clock()
-spritesheet = rt.Spritesheet("assets/sprites", "test_animation")
-sprite = rt.AnimatedSprite(spritesheet, "test_animation")
-window:set_child(sprite)
-sprite:play()
-
 label = rt.Label("abc")
 label:set_justify_mode(rt.JustifyMode.CENTER)
 label:set_alignment(rt.Alignment.CENTER)
@@ -84,7 +78,9 @@ label:set_expand(true)
 label:set_font(rt.Font.DEFAULT_MONO)
 window:set_child(label)
 
-label:set_text("regular <b>bold</b> <i>italics</i> <b><i>bold_italic</i></b> <col=PURE_MAGENTA>color</col> <b><i><col=BLUE_1>TEST</b>ABC</i>DEF</col>")
+n_chars = 0
+label:set_text("regular <b>bold</b>||| <i>italics</i> <b><i>bold_italic</i></b> <col=PURE_MAGENTA>color</col> <b><i><col=BLUE_1>TEST</b>ABC</i>DEF</col>")
+label:set_n_visible_characters(n_chars)
 
 key = rt.add_keyboard_controller(window)
 key:signal_connect("key_pressed", function(self, key)
@@ -92,16 +88,16 @@ key:signal_connect("key_pressed", function(self, key)
     if key == rt.KeyboardKey.ARROW_UP then
     elseif key == rt.KeyboardKey.ARROW_DOWN then
     elseif key == rt.KeyboardKey.ARROW_LEFT then
-        local frame_i = rt.Sprite.get_frame(sprite)
-        frame_i = clamp(frame_i - 1, 1, sprite:get_n_frames())
-        rt.Sprite.set_frame(sprite, frame_i)
+        n_chars = n_chars - 1
+        label:set_n_visible_characters(n_chars)
     elseif key == rt.KeyboardKey.ARROW_RIGHT then
-        local frame_i = rt.Sprite.get_frame(sprite)
-        frame_i = clamp(frame_i + 1, 1, sprite:get_n_frames())
-        rt.Sprite.set_frame(sprite, frame_i)
+        n_chars = n_chars + 1
+        label:set_n_visible_characters(n_chars)
     elseif key == rt.KeyboardKey.PLUS then
     elseif key == rt.KeyboardKey.MINUS then
     end
+
+    println(n_chars)
 end)
 
 window:realize()

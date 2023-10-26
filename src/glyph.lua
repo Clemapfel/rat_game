@@ -72,8 +72,8 @@ function rt.Glyph:_initialize_glyph_offsets()
             width = self._font[rt.FontStyle.REGULAR]:getWidth(c) + self._font[rt.FontStyle.REGULAR]:getKerning(previous, c)
         end
 
-        self._glyph_offsets[i] = offset
         offset = offset + width
+        self._glyph_offsets[i] = offset
     end
 end
 
@@ -89,10 +89,9 @@ function rt.Glyph:draw()
 
     local x, y = self:get_position()
 
-    if self._n_visible_chars > #self._content then
+    if self._n_visible_chars >= #self._content then
         self:render(self._text, x, y)
     elseif self:get_n_visible_characters() > 0 then
-
         if sizeof(self._glyph_offsets) == 0 then
             self:_initialize_glyph_offsets()
         end
@@ -178,12 +177,13 @@ function rt.Glyph:get_position()
 end
 
 --- @brief
-function rt.Glyph:set_n_visible_characters(x)
+function rt.Glyph:set_n_visible_characters(n)
     meta.assert_isa(self, rt.Glyph)
-    meta.assert_number(x)
-    x = clamp(x, 0, self:get_n_characters())
-    self._n_visible_chars = x
-    if x < self:get_n_characters() and sizeof(self._glyph_offsets) == 0 then
+    meta.assert_number(n)
+    n = clamp(n, 0, self:get_n_characters())
+    self._n_visible_chars = n
+
+    if sizeof(self._glyph_offsets) == 0 then
         self:_initialize_glyph_offsets()
     end
 end
@@ -193,3 +193,4 @@ function rt.Glyph:get_n_visible_characters()
     meta.assert_isa(self, rt.Glyph)
     return clamp(self._n_visible_chars, 0, self:get_n_characters())
 end
+
