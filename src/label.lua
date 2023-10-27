@@ -14,7 +14,9 @@ rt.Label = meta.new_type("Label", function(text)
         _justify_mode = rt.JustifyMode.LEFT,
         _glyphs = {},
         _n_characters = 0,
-        _debug = rt.Rectangle(0, 0, 1, 1)
+        _debug = rt.Rectangle(0, 0, 1, 1),
+        _is_animated = false,
+        _animation_timer = {}
     }, rt.Widget, rt.Drawable)
     out:_parse()
 
@@ -479,5 +481,16 @@ function rt.Label:set_n_visible_characters(n)
             end
         end
         glyph_i = glyph_i + 1
+    end
+end
+
+--- @brief
+function rt.Label:set_is_animated(b)
+    meta.assert_isa(self, rt.Label)
+    meta.assert_boolean(b)
+
+    if not b then
+        self._is_animated = false
+        self._animation_timer = {}
     end
 end

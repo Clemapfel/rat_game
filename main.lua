@@ -69,8 +69,13 @@ if DEBUG_MODE then goto exit end
 rt.Font.DEFAULT_SIZE = 50
 rt.Font.DEFAULT = rt.load_font("Roboto", "assets/fonts/Roboto")
 rt.Font.DEFAULT_MONO = rt.load_font("DejaVuSansMono", "assets/fonts/DejaVuSansMono")
-
 window = rt.BinLayout()
+
+timer = rt.AnimationTimer(1)
+meta.finalize(timer)
+
+--[[
+
 
 label = rt.Label("abc")
 label:set_justify_mode(rt.JustifyMode.LEFT)
@@ -81,7 +86,7 @@ window:set_child(label)
 
 n_chars = 0
 label:set_text("regular <b><shake>bold</shake></b>||| <i>italics</i><b><i>bold_italic</i></b> <col=PURE_MAGENTA>color</col><b><i><col=BLUE_1>TEST</b>ABC</i>DEF</col>")
-
+]]--
 key = rt.add_keyboard_controller(window)
 key:signal_connect("key_pressed", function(self, key)
 

@@ -68,6 +68,9 @@ rt.AnimationTimer = meta.new_type("AnimationTimer", function(duration_seconds)
     out:signal_add("done")
 
     return out
+end, function(self)
+    println("freed: ", self._hash)
+    rt.AnimationTimerHandler._components[self._hash] = nil
 end)
 
 --- @brief advance all animation timers, this uses a stable clock independent of fps

@@ -453,9 +453,11 @@ end
 --- @brief create a new type with given constructor
 --- @param typename String
 --- @param ctor Function
-function meta.new_type(typename, ctor)
+--- @param dtor Function
+function meta.new_type(typename, ctor, dtor)
     meta.assert_string(typename)
     meta.assert_function(ctor)
+    if not meta.is_nil(dtor) then meta.assert_function(dtor) end
 
     local out = meta._new("Type")
     out.name = typename
@@ -466,6 +468,7 @@ function meta.new_type(typename, ctor)
         if not meta.isa(out, self.name) then
             error("[rt][ERROR] In " .. self.name .. ".__call: Constructor does not return object of type `" .. self.name .. "`.")
         end
+        getmetatable(out).__gc = dtor
         return out
     end
 
@@ -474,6 +477,14 @@ function meta.new_type(typename, ctor)
     end
     meta[typename] = out
     return out
+end
+
+--- @brief invoke destructor
+--- @param x meta.Object
+function meta.finalize(x)
+    meta.assert_object(x)
+    local gc = getmetatable(x).__gc
+    if not meta.is_nil(gc) then gc(x) end
 end
 
 --- @brief declare abstract type, this is a type that cannot be instanced

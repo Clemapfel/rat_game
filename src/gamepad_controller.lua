@@ -33,7 +33,7 @@ rt.GamepadAxis = meta.new_enum({
 rt.GamepadHandler = {}
 rt.GamepadHandler._hash = 0
 rt.GamepadHandler._components = {}
-meta.make_weak(rt.GamepadController._components, false, true)
+meta.make_weak(rt.GamepadHandler._components, false, true)
 
 rt.SIGNAL_BUTTON_PRESSED = "button_pressed"
 rt.SIGNAL_BUTTON_RELEASED = "button_released"
