@@ -73,15 +73,14 @@ rt.Font.DEFAULT_MONO = rt.load_font("DejaVuSansMono", "assets/fonts/DejaVuSansMo
 window = rt.BinLayout()
 
 label = rt.Label("abc")
-label:set_justify_mode(rt.JustifyMode.RIGHT)
-label:set_horizontal_alignment(rt.Alignment.END)
-label:set_vertical_alignment(rt.Alignment.END)
-label:set_expand(true)
+label:set_justify_mode(rt.JustifyMode.LEFT)
+label:set_horizontal_alignment(rt.Alignment.START)
+label:set_vertical_alignment(rt.Alignment.CENTER)
 label:set_font(rt.Font.DEFAULT_MONO)
 window:set_child(label)
 
 n_chars = 0
-label:set_text("regular <b><shake>bold</shake></b>||| <i>italics</i>\n<b><i>bold_italic</i></b> <col=PURE_MAGENTA>color</col>\n<b><i><col=BLUE_1>TEST</b>ABC</i>DEF</col>")
+label:set_text("regular <b><shake>bold</shake></b>||| <i>italics</i><b><i>bold_italic</i></b> <col=PURE_MAGENTA>color</col><b><i><col=BLUE_1>TEST</b>ABC</i>DEF</col>")
 
 key = rt.add_keyboard_controller(window)
 key:signal_connect("key_pressed", function(self, key)
@@ -96,9 +95,16 @@ key:signal_connect("key_pressed", function(self, key)
         label:set_n_visible_characters(n_chars)
     elseif key == rt.KeyboardKey.PLUS then
     elseif key == rt.KeyboardKey.MINUS then
+    elseif key == rt.KeyboardKey.SPACE then
+        local current = label:get_justify_mode()
+        if current == rt.JustifyMode.LEFT then
+            label:set_justify_mode(rt.JustifyMode.CENTER)
+        elseif current == rt.JustifyMode.CENTER then
+            label:set_justify_mode(rt.JustifyMode.RIGHT)
+        elseif current == rt.JustifyMode.RIGHT then
+            label:set_justify_mode(rt.JustifyMode.LEFT)
+        end
     end
-
-    println(n_chars)
 end)
 
 window:realize()

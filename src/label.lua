@@ -2,8 +2,7 @@
 rt.JustifyMode = meta.new_enum({
     LEFT = "left",
     RIGHT = "right",
-    CENTER = "center",
-    BLOCK = "justify",
+    CENTER = "center"
 })
 
 --- @class rt.Label
@@ -12,7 +11,7 @@ rt.Label = meta.new_type("Label", function(text)
     local out = meta.new(rt.Label, {
         _raw = text,
         _font = rt.Font.DEFAULT,
-        _justify_mode = rt.JustifyMode.BLOCK,
+        _justify_mode = rt.JustifyMode.LEFT,
         _glyphs = {},
         _n_characters = 0,
         _debug = rt.Rectangle(0, 0, 1, 1)
@@ -46,8 +45,8 @@ function rt.Label:size_allocate(x, y, width, height)
     local tab = self._font:get_bold_italic():getWidth(rt.Label.TAB)
     local line_height = self._font:get_bold_italic():getHeight()
 
-    local glyph_x = x
-    local glyph_y = y
+    local glyph_x = 0
+    local glyph_y = 0
 
     local row_widths = {0}
     local rows = {{}}
@@ -94,52 +93,33 @@ function rt.Label:size_allocate(x, y, width, height)
     end
     row_widths[row_i] = line_width
 
-    if self._justify_mode == rt.JustifyMode.LEFT then
-        -- noop
-    elseif self._justify_mode == rt.JustifyMode.CENTER or self._justify_mode == rt.JustifyMode.RIGHT then
-        for i, row in ipairs(rows) do
-            for _, glyph in ipairs(rows[i]) do
-                if meta.isa(glyph, rt.Glyph) then
-                    local position_x, position_y = glyph:get_position()
-                    if self._justify_mode == rt.JustifyMode.CENTER then
-                        glyph:set_position(position_x + (width - row_widths[i]) * 0.5, position_y)
-                    elseif self._justify_mode == rt.JustifyMode.RIGHT then
-                        glyph:set_position(position_x + (width - row_widths[i]), position_y)
-                    end
-                end
-            end
-        end
-    elseif self._justify_mode == rt.JustifyMode.BLOCK then
-        -- calculate free space per line, then distribute evenly into spaces between words
-        for i, row in ipairs(rows) do
-            if sizeof(row) == 0 then goto continue end
-            local free_space = width - row_widths[i]
-            if free_space <= 0 then goto continue end
+    local min_x = POSITIVE_INFINITY
+    local min_y = POSITIVE_INFINITY
+    local max_x = NEGATIVE_INFINITY
+    local max_y = NEGATIVE_INFINITY
 
-            local n_spaces = 0
-            for _, glyph in ipairs(rows[i]) do
-                if glyph == rt.Label.SPACE then
-                    free_space = free_space + space
-                    n_spaces = n_spaces + 1
-                elseif glyph == rt.Label.TAB then
-                    free_space = free_space + tab
-                    n_spaces = n_spaces + 1
+    for i, row in ipairs(rows) do
+        for _, glyph in ipairs(rows[i]) do
+            if meta.isa(glyph, rt.Glyph) then
+                local position_x, position_y = glyph:get_position()
+                if self._justify_mode == rt.JustifyMode.CENTER then
+                    position_x = position_x + (width - row_widths[i]) * 0.5
+                elseif self._justify_mode == rt.JustifyMode.RIGHT then
+                    position_x = position_x + (width - row_widths[i])
                 end
-            end
 
-            local row_x, row_y = rows[i][1]:get_position()
-            local space_increment = free_space / (n_spaces + 1)
-            for _, glyph in ipairs(rows[i]) do
-                if meta.isa(glyph, rt.Glyph) then
-                    glyph:set_position(row_x, row_y)
-                    row_x = row_x + glyph:get_size() + space_increment
-                end
+                local w, h = glyph:get_size()
+                min_x = math.min(min_x, position_x)
+                min_y = math.min(min_y, position_y)
+                max_x = math.max(max_x, position_x + w)
+                max_y = math.max(max_y, position_y + h)
+
+                glyph:set_position(position_x, position_y)
             end
-            ::continue::
         end
     end
 
-    local w, h = self:measure()
+    local w, h = max_x - min_x, max_y - min_y
     local x_offset, y_offset = 0, 0
 
     if self:get_horizontal_alignment() == rt.Alignment.START then
@@ -147,7 +127,7 @@ function rt.Label:size_allocate(x, y, width, height)
     elseif self:get_horizontal_alignment() == rt.Alignment.CENTER then
         x_offset = 0.5 * width - 0.5 * w
     elseif self:get_horizontal_alignment() == rt.Alignment.END then
-        x_offset = width - w
+        -- noop
     end
 
     if self:get_vertical_alignment() == rt.Alignment.START then
@@ -155,10 +135,8 @@ function rt.Label:size_allocate(x, y, width, height)
     elseif self:get_vertical_alignment() == rt.Alignment.CENTER then
         y_offset = 0.5 * height - 0.5 * h
     elseif self:get_vertical_alignment() == rt.Alignment.END then
-        y_offset = height - h
+        -- noop
     end
-
-    println(w, " ", h, " ", width, " ", height, " | ", x_offset, " ", y_offset)
 
     if x_offset ~= 0 or y_offset ~= 0 then
         for _, glyph in pairs(self._glyphs) do
@@ -168,9 +146,6 @@ function rt.Label:size_allocate(x, y, width, height)
             end
         end
     end
-
-    -- todo
-    self:measure()
 end
 
 --- @overload rt.Widget.measure
