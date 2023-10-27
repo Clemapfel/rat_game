@@ -138,6 +138,7 @@ rt.KeyboardKey = meta.new_enum({
 
 rt.KeyboardHandler._hash = 1
 rt.KeyboardHandler._components = {}
+meta.make_weak(rt.KeyboardHandler._components, false, true)
 
 --- @brief
 rt.KeyboardController = meta.new_type("KeyboardController", function(instance)

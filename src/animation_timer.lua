@@ -3,6 +3,7 @@ rt.AnimationTimerHandler = {}
 
 rt.AnimationTimerHandler._hash = 1
 rt.AnimationTimerHandler._components = {}
+meta.make_weak(rt.AnimationTimerHandler._components, false, true)
 
 --- @class rt.AnimationTimerState
 rt.AnimationTimerState = meta.new_enum({
@@ -56,7 +57,8 @@ rt.AnimationTimer = meta.new_type("AnimationTimer", function(duration_seconds)
         _duration = duration_seconds,
         _time = 0,
         _timing_function = rt.AnimationTimingFunction.LINEAR,
-        _loop = false
+        _loop = false,
+        _hash = hash
     }, rt.SignalEmitter)
 
     rt.AnimationTimerHandler._components[hash] = out
@@ -72,7 +74,6 @@ end)
 --- @param delta Number duration of last frame, in seconds
 function rt.AnimationTimerHandler.update(delta)
     for _, component in pairs(rt.AnimationTimerHandler._components) do
-
         if component:get_state() ~= rt.AnimationTimerState.PLAYING then
             goto continue
         end
@@ -220,4 +221,4 @@ function rt.test.test_animation()
 
     rt.AnimationTimerHandler.update(2)
 end
-rt.test.test_animation()
+--rt.test.test_animation()

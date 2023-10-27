@@ -10,6 +10,7 @@ rt.MouseButton = meta.new_enum({
 
 rt.MouseHandler._hash = 1
 rt.MouseHandler._components = {}
+meta.make_weak(rt.MouseHandler._components, false, true)
 
 --- @brief
 rt.MouseController = meta.new_type("MouseController", function(instance)
