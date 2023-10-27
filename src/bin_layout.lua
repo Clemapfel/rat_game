@@ -70,7 +70,9 @@ function rt.BinLayout:realize()
     if self:get_is_realized() then return end
 
     self._realized = true
-    self._child:realize()
+    if meta.isa(self._child, rt.Widget) then
+        self._child:realize()
+    end
 end
 
 --- @brief test BinLayout
