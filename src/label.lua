@@ -15,8 +15,13 @@ rt.Label = meta.new_type("Label", function(text)
         _justify_mode = rt.JustifyMode.BLOCK,
         _glyphs = {},
         _n_characters = 0,
+        _debug = rt.Rectangle(0, 0, 1, 1)
     }, rt.Widget, rt.Drawable)
     out:_parse()
+
+    out._debug:set_is_outline(true)
+    out._debug:set_color(rt.RGBA(1, 0, 1, 1))
+    out._debug:set_line_width(1)
     return out
 end)
 
@@ -30,6 +35,7 @@ function rt.Label:draw()
             glyph:draw()
         end
     end
+    self._debug:draw()
 end
 
 --- @overload rt.Widget.size_allocate
@@ -89,7 +95,7 @@ function rt.Label:size_allocate(x, y, width, height)
     row_widths[row_i] = line_width
 
     if self._justify_mode == rt.JustifyMode.LEFT then
-        return
+        -- noop
     elseif self._justify_mode == rt.JustifyMode.CENTER or self._justify_mode == rt.JustifyMode.RIGHT then
         for i, row in ipairs(rows) do
             for _, glyph in ipairs(rows[i]) do
@@ -132,6 +138,39 @@ function rt.Label:size_allocate(x, y, width, height)
             ::continue::
         end
     end
+
+    local w, h = self:measure()
+    local x_offset, y_offset = 0, 0
+
+    if self:get_horizontal_alignment() == rt.Alignment.START then
+        -- noop
+    elseif self:get_horizontal_alignment() == rt.Alignment.CENTER then
+        x_offset = 0.5 * width - 0.5 * w
+    elseif self:get_horizontal_alignment() == rt.Alignment.END then
+        x_offset = width - w
+    end
+
+    if self:get_vertical_alignment() == rt.Alignment.START then
+        -- noop
+    elseif self:get_vertical_alignment() == rt.Alignment.CENTER then
+        y_offset = 0.5 * height - 0.5 * h
+    elseif self:get_vertical_alignment() == rt.Alignment.END then
+        y_offset = height - h
+    end
+
+    println(w, " ", h, " ", width, " ", height, " | ", x_offset, " ", y_offset)
+
+    if x_offset ~= 0 or y_offset ~= 0 then
+        for _, glyph in pairs(self._glyphs) do
+            if meta.isa(glyph, rt.Glyph) then
+                local glyph_x, glyph_y = glyph:get_position()
+                glyph:set_position(glyph_x + x_offset, glyph_y + y_offset)
+            end
+        end
+    end
+
+    -- todo
+    self:measure()
 end
 
 --- @overload rt.Widget.measure
@@ -144,15 +183,18 @@ function rt.Label:measure()
     local max_y = NEGATIVE_INFINITY
 
     for _, glyph in pairs(self._glyphs) do
-        local x, y = glyph:get_position()
-        local w, h = glyph:get_size()
+        if meta.isa(glyph, rt.Glyph) then
+            local x, y = glyph:get_position()
+            local w, h = glyph:get_size()
 
-        min_x = math.min(min_x, x)
-        min_y = math.min(min_y, y)
-        max_x = math.max(max_x, x + w)
-        max_y = math.max(max_y, y + h)
+            min_x = math.min(min_x, x)
+            min_y = math.min(min_y, y)
+            max_x = math.max(max_x, x + w)
+            max_y = math.max(max_y, y + h)
+        end
     end
 
+    self._debug:resize(rt.AABB(min_x, min_y, max_x - min_x, max_y - min_y))
     return max_x - min_x, max_y - min_y
 end
 
