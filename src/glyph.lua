@@ -89,10 +89,8 @@ function rt.Glyph:_non_animated_draw()
 
     local old_r, old_g, old_b, old_a = love.graphics.getColor()
     love.graphics.setColor(self._color.r, self._color.g, self._color.b, self._color.a)
-    love.graphics.push()
 
     local x, y = self:get_position()
-    local w = self._character_offsets[self._n_visible_chars]
 
     if self._n_visible_chars >= #self._content then
         self:render(self._glyph, x, y)
@@ -101,13 +99,13 @@ function rt.Glyph:_non_animated_draw()
             self:_initialize_character_widths()
         end
 
+        local w = self._character_offsets[self._n_visible_chars]
         local _, h = self:get_size()
         love.graphics.setScissor(x, y, w, h)
         self:render(self._glyph, x, y)
         love.graphics.setScissor()
     end
 
-    love.graphics.pop()
     love.graphics.setColor(old_r, old_g, old_b, old_a)
 end
 

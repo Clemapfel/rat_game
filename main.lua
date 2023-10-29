@@ -80,7 +80,7 @@ label:set_font(rt.Font.DEFAULT_MONO)
 window:set_child(label)
 
 n_chars = 0
-label:set_text("<b>bold</b> <i>italics</i> <b><i>bold_italic</i></b> <shake>SHAKE</shake> <wave>WAYWAVE</wave> <rainbow>RAINBOW</rainbow>\n\n<b><wave><rainbow><shake>EVERYTHING</shake></wave></b></rainbow>")
+label:set_text("regular <color=RED_1>color</color> <b>bold</b> <i>italics</i> <b><i>bold_italic</i></b> <shake>SHAKE</shake> <wave>WAYWAVE</wave> <color=RED_1><rainbow>RAINBOW</rainbow>\n\n<b><wave><rainbow><shake>EVERYTHING</shake></wave></b></rainbow></color>")
 
 for _, glyph in pairs(label._glyphs) do
     if meta.isa(glyph, rt.Glyph) then

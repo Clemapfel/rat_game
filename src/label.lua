@@ -365,6 +365,7 @@ function rt.Label:_parse()
                     throw_parse_error("trying to close a color region, but one is not open")
                 end
                 is_colored = false
+                color = "PURE_WHITE"
             -- effect: shake
             elseif tag_matches(rt.Label.EFFECT_SHAKE_TAG_START) then
                 if effect_shake == true then
