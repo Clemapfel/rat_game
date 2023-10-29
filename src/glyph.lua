@@ -32,7 +32,8 @@ rt.Glyph = meta.new_type("Glyph", function(font, content, font_style, color, eff
         _color = color,
         _style = font_style,
         _effects = effects,
-        _text = {},
+        _is_animated = false,
+        _glyph = {},
         _position_x = 0,
         _position_y = 0,
         _n_visible_chars = POSITIVE_INFINITY,
@@ -46,7 +47,7 @@ end)
 function rt.Glyph:_update()
     meta.assert_isa(self, rt.Glyph)
     local font = self._font[self._style]
-    self._text = love.graphics.newText(font, {{self._color.r, self._color.g, self._color.b}, self._content})
+    self._glyph = love.graphics.newText(font, {{self._color.r, self._color.g, self._color.b}, self._content})
 
     if not sizeof(self._glyph_offsets) == 0 then
         self:_initialize_glyph_offsets()
@@ -77,11 +78,8 @@ function rt.Glyph:_initialize_glyph_offsets()
     end
 end
 
---- @brief draw glyph
-function rt.Glyph:draw()
-    meta.assert_isa(self, rt.Glyph)
-
-    if not self:get_is_visible() or #self._content == 0 then return end
+--- @brief [internal] draw glyph with _is_animated = false
+function rt.Glyph:_non_animated_draw()
 
     local old_r, old_g, old_b, old_a = love.graphics.getColor()
     love.graphics.setColor(self._color.r, self._color.g, self._color.b, self._color.a)
@@ -90,7 +88,7 @@ function rt.Glyph:draw()
     local x, y = self:get_position()
 
     if self._n_visible_chars >= #self._content then
-        self:render(self._text, x, y)
+        self:render(self._glyph, x, y)
     elseif self:get_n_visible_characters() > 0 then
         if sizeof(self._glyph_offsets) == 0 then
             self:_initialize_glyph_offsets()
@@ -99,12 +97,83 @@ function rt.Glyph:draw()
         local _, h = self:get_size()
         local w = self._glyph_offsets[self:get_n_visible_characters()]
         love.graphics.setScissor(x, y, w, h)
-        self:render(self._text, x, y)
+        self:render(self._glyph, x, y)
         love.graphics.setScissor()
     end
 
     love.graphics.pop()
     love.graphics.setColor(old_r, old_g, old_b, old_a)
+end
+
+rt.Glyph.SHAKE_INTENSITY = 10 -- in px
+
+--- @brief [internal] draw glyph with _is_animated = true, much less performant
+function rt.Glyph:_animated_draw()
+
+    if sizeof(self._glyph_offsets) == 0 then
+        self:_initialize_glyph_offsets()
+    end
+
+    local old_r, old_g, old_b, old_a = love.graphics.getColor()
+    love.graphics.setColor(self._color.r, self._color.g, self._color.b, self._color.a)
+    love.graphics.push()
+
+    local x, y = self:get_position()
+    local shake = false
+    local rainbow = false
+    local wave = false
+
+    for _, effect in ipairs(self._effects) do
+        if effect == rt.TextEffect.SHAKE then
+            shake = true
+        elseif effect == rt.TextEffect.WAVE then
+            wave = true
+        elseif effect == rt.TextEffect.RAINBOW then
+            rainbow = true
+        end
+    end
+
+    local x, y = self:get_position()
+    local _, h = self:get_size()
+
+    for i = 0, 10 do
+        rt.rand()
+    end
+
+    if meta.is_nil(rt.Glyph.DEBUG_COLORS) then
+        rt.Glyph.DEBUG_COLORS = {}
+        for i = 1, #self._content do
+            table.insert(rt.Glyph.DEBUG_COLORS, rt.hsva_to_rgba(rt.HSVA(clamp(rt.rand(), 0.1, 0.9), 1, 1, 1)))
+        end
+    end
+
+    local w = 0
+    for i = 1, #self._content do
+        w = self._glyph_offsets[i] - w
+        love.graphics.setScissor(x, y, w, h)
+
+        local color = rt.Glyph.DEBUG_COLORS[i]
+        love.graphics.setColor(color.r, color.g, color.b, color.a)
+
+        self:render(self._glyph, self:get_position())
+        love.graphics.setScissor()
+        x = x + w
+    end
+
+    love.graphics.pop()
+    love.graphics.setColor(old_r, old_g, old_b, old_a)
+end
+
+--- @overload rt.Drawable.draw
+function rt.Glyph:draw()
+    meta.assert_isa(self, rt.Glyph)
+    if not self:get_is_visible() then return end
+
+    if self._is_animated then
+        self:_animated_draw()
+    else
+        self:_non_animated_draw()
+    end
 end
 
 --- @brief set font style
@@ -148,7 +217,7 @@ end
 --- @brief measure text size
 function rt.Glyph:get_size()
     meta.assert_isa(self, rt.Glyph)
-    return self._text:getDimensions()
+    return self._glyph:getDimensions()
 end
 
 --- @brief access content as string
@@ -194,3 +263,14 @@ function rt.Glyph:get_n_visible_characters()
     return clamp(self._n_visible_chars, 0, self:get_n_characters())
 end
 
+--- @brief
+function rt.Glyph:get_is_animated()
+    meta.assert_isa(self, rt.Glyph)
+    return self._is_animated
+end
+
+--- @brief
+function rt.Glyph:set_is_animated()
+    meta.assert_isa(self, rt.Glyph)
+    self._is_animated = true
+end

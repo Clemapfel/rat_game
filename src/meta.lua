@@ -61,6 +61,7 @@ function meta._new(typename)
     metatable.is_mutable = true
     metatable.super = {}
     metatable.components = {}
+    metatable.was_finalized = false
 
     metatable.__index = function(this, property_name)
         local metatable = getmetatable(this)
@@ -483,8 +484,11 @@ end
 --- @param x meta.Object
 function meta.finalize(x)
     meta.assert_object(x)
-    local gc = getmetatable(x).__gc
-    if not meta.is_nil(gc) then gc(x) end
+    local metatable = getmetatable(x)
+    if not meta.is_nil(metatable.__gc) and metatable.was_finalized == false then
+        metatable.__gc(x)
+        metatable.was_finalized = true
+    end
 end
 
 --- @brief declare abstract type, this is a type that cannot be instanced
