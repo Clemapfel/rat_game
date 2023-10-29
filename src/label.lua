@@ -508,3 +508,9 @@ function rt.Label:set_is_animated(b)
         self._animation_timer = {}
     end
 end
+
+--- @brief [internal]
+rt.test.label = function()
+    -- label:set_text("<b>bold</b> <i>italics</i> <b><i>bold_italic</i></b> <shake>SHAKE</shake> <wave>WAYWAVE</wave> <rainbow>RAINBOW</rainbow>\n\n<b><wave><rainbow><shake>EVERYTHING</shake></wave></b></rainbow>")
+end
+rt.test.label()

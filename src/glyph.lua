@@ -66,15 +66,16 @@ function rt.Glyph:_initialize_character_widths()
     self._character_widths = {}
     local offset = 0
     local n_chars = #self._content
+    local font = self._font[self._style]
     for i = 1, n_chars  do
 
         local c = string.sub(self._content, i, i)
         local width;
         if i == 1 then
-            width = self._font[rt.FontStyle.REGULAR]:getWidth(c)
+            width = font:getWidth(c)
         else
             local previous = string.sub(self._content, i - 1, i - 1)
-            width = self._font[rt.FontStyle.REGULAR]:getWidth(c) + self._font[rt.FontStyle.REGULAR]:getKerning(previous, c)
+            width = font:getWidth(c) + font:getKerning(previous, c)
         end
 
         offset = offset + width
@@ -111,7 +112,7 @@ function rt.Glyph:_non_animated_draw()
 end
 
 rt.SETTINGS.glyph = {}
-rt.SETTINGS.glyph.rainbow_width = 15
+rt.SETTINGS.glyph.rainbow_width = 15    -- n characters
 
 rt.SETTINGS.glyph.shake_offset = 6      -- px
 rt.SETTINGS.glyph.shake_period = 15     -- shakes per second
@@ -119,7 +120,7 @@ rt.SETTINGS.glyph.shake_period = 15     -- shakes per second
 rt.SETTINGS.glyph.wave_period = 10      -- n chars
 rt.SETTINGS.glyph.wave_function = function(x) return math.sin((x * 4 * math.pi) / (2 * rt.SETTINGS.glyph.wave_period)) end
 rt.SETTINGS.glyph.wave_offset = 10      -- px
-rt.SETTINGS.glyph.wave_speed = 10       -- multiplier
+rt.SETTINGS.glyph.wave_speed = 0.2      -- cycles per second
 
 --- @brief update animated glyph
 function rt.Glyph:update(delta, animation_offset)
@@ -161,13 +162,13 @@ function rt.Glyph:_animated_draw()
         local x_offset = 0
         local y_offset = 0
         if self._effects[rt.TextEffect.WAVE] == true then
-            y_offset = rt.SETTINGS.glyph.wave_function(self._elapsed_time * rt.SETTINGS.glyph.wave_speed + i) * rt.SETTINGS.glyph.wave_offset
+            y_offset = y_offset + rt.SETTINGS.glyph.wave_function((self._elapsed_time / rt.SETTINGS.glyph.wave_speed) + i) * rt.SETTINGS.glyph.wave_offset
         end
 
         if self._effects[rt.TextEffect.SHAKE] == true then
             local i_offset = math.round(self._elapsed_time / (1 / rt.SETTINGS.glyph.shake_period))
-            x_offset = rt.rand(i + i_offset) * rt.SETTINGS.glyph.shake_offset
-            y_offset = rt.rand(i + i_offset + 4294967297 ) * rt.SETTINGS.glyph.shake_offset -- + 2^32+1
+            x_offset = x_offset + rt.rand(i + i_offset) * rt.SETTINGS.glyph.shake_offset
+            y_offset = y_offset + rt.rand(i + i_offset + 4294967297 ) * rt.SETTINGS.glyph.shake_offset -- + 2^32+1
         end
 
         love.graphics.setScissor(scissor.x + x_offset, scissor.y + y_offset, scissor.width, scissor.height)
