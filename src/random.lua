@@ -7,8 +7,10 @@ else
 end
 
 --- @brief generate number in [0, 1]
-function rt.rand(_)
-    meta.assert_nil(_)
+function rt.rand(seed_maybe)
+    if not meta.is_nil(seed_maybe) then
+        love.math.setRandomSeed(seed_maybe)
+    end
     return love.math.random()
 end
 

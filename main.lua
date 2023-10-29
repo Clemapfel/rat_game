@@ -80,7 +80,7 @@ label:set_font(rt.Font.DEFAULT_MONO)
 window:set_child(label)
 
 n_chars = 0
-label:set_text("<shake><wave><rainbow>SHAKESHAKE</wave></rainbow></shake>")
+label:set_text("<b>bold</b> <i>italics</i> <b><i>bold_italic</i></b> <shake>SHAKE</shake> <wave>WAYWAVE</wave> <rainbow>RAINBOW</rainbow>\n\n<b><i><wave><rainbow>EVERYTHING</wave></i></b></rainbow>")
 
 for _, glyph in pairs(label._glyphs) do
     if meta.isa(glyph, rt.Glyph) then
@@ -135,10 +135,6 @@ end
 function love.update()
     local delta = love.timer.getDelta()
     rt.AnimationTimerHandler.update(delta)
-
-    for _, glyph in pairs(label._glyphs) do
-        glyph:update(delta)
-    end
 end
 
 --- @brief draw step

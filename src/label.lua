@@ -16,9 +16,19 @@ rt.Label = meta.new_type("Label", function(text)
         _n_characters = 0,
         _debug = rt.Rectangle(0, 0, 1, 1),
         _is_animated = false,
-        _animation_timer = {}
+        _animation_timer = rt.AnimationTimer(POSITIVE_INFINITY)
     }, rt.Widget, rt.Drawable)
     out:_parse()
+
+    out._animation_timer:signal_connect("tick", function(_, value, self)
+        local delta = love.timer.getDelta()
+        for _, glyph in pairs(self._glyphs) do
+            if meta.isa(glyph, rt.Glyph) then
+                glyph:update(delta)
+            end
+        end
+    end, out)
+    out._animation_timer:play()
 
     out._debug:set_is_outline(true)
     out._debug:set_color(rt.RGBA(1, 0, 1, 1))
@@ -179,7 +189,7 @@ end
 rt.Label.SPACE = " "
 rt.Label.NEWLINE = "\n"
 rt.Label.TAB = "    "
-rt.Label.ESCAPE_CHARACTER = "%"
+rt.Label.ESCAPE_CHARACTER = "\\"
 rt.Label.BEAT = "|" -- pause when text scrolling
 
 -- regex patterns to match tags
@@ -304,7 +314,11 @@ function rt.Label:_parse()
     end
 
     while i <= #self._raw do
-        if s == " " then
+        if s == rt.Label.ESCAPE_CHARACTER then
+            current_word = current_word .. s
+            step(1)
+            goto continue;
+        elseif s == " " then
             push_glyph()
             table.insert(self._glyphs, rt.Label.SPACE)
         elseif s == "\n" then
