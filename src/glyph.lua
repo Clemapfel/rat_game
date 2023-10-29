@@ -20,25 +20,29 @@ rt.Glyph = meta.new_type("Glyph", function(font, content, font_style, color, eff
     meta.assert_enum(font_style, rt.FontStyle)
     rt.assert_rgba(color)
     meta.assert_number(wrap_width)
-
     meta.assert_table(effects)
-    for _, effect in pairs(effects) do
-        meta.assert_enum(effect, rt.TextEffect)
-    end
 
     local out = meta.new(rt.Glyph, {
         _font = font,
         _content = content,
         _color = color,
         _style = font_style,
-        _effects = effects,
+        _effects = {},
         _is_animated = false,
+        _elapsed_time = 0,
+        _animation_offset = 0,
         _glyph = {},
         _position_x = 0,
         _position_y = 0,
         _n_visible_chars = POSITIVE_INFINITY,
-        _glyph_offsets = {}
+        _character_widths = {},
+        _character_offsets = {}
     }, rt.Drawable)
+
+    for _, effect in pairs(effects) do
+       out._effects[effect] = true
+    end
+
     out:_update()
     return out
 end)
@@ -49,17 +53,17 @@ function rt.Glyph:_update()
     local font = self._font[self._style]
     self._glyph = love.graphics.newText(font, {{self._color.r, self._color.g, self._color.b}, self._content})
 
-    if not sizeof(self._glyph_offsets) == 0 then
-        self:_initialize_glyph_offsets()
+    if not sizeof(self._character_widths) == 0 then
+        self:_initialize_character_widths()
     end
 end
 
 --- @brief [internal] initialize data needed for `set_n_visible_characters`
-function rt.Glyph:_initialize_glyph_offsets()
+function rt.Glyph:_initialize_character_widths()
 
     local clock = rt.Clock()
     local now = rt.Cloc
-    self._glyph_offsets = {}
+    self._character_widths = {}
     local offset = 0
     local n_chars = #self._content
     for i = 1, n_chars  do
@@ -74,7 +78,8 @@ function rt.Glyph:_initialize_glyph_offsets()
         end
 
         offset = offset + width
-        self._glyph_offsets[i] = offset
+        self._character_widths[i] = width
+        self._character_offsets[i] = offset
     end
 end
 
@@ -86,16 +91,16 @@ function rt.Glyph:_non_animated_draw()
     love.graphics.push()
 
     local x, y = self:get_position()
+    local w = self._character_offsets[self._n_visible_chars]
 
     if self._n_visible_chars >= #self._content then
         self:render(self._glyph, x, y)
     elseif self:get_n_visible_characters() > 0 then
-        if sizeof(self._glyph_offsets) == 0 then
-            self:_initialize_glyph_offsets()
+        if sizeof(self._character_widths) == 0 then
+            self:_initialize_character_widths()
         end
 
         local _, h = self:get_size()
-        local w = self._glyph_offsets[self:get_n_visible_characters()]
         love.graphics.setScissor(x, y, w, h)
         self:render(self._glyph, x, y)
         love.graphics.setScissor()
@@ -105,13 +110,33 @@ function rt.Glyph:_non_animated_draw()
     love.graphics.setColor(old_r, old_g, old_b, old_a)
 end
 
-rt.Glyph.SHAKE_INTENSITY = 10 -- in px
+rt.SETTINGS.glyph = {}
+rt.SETTINGS.glyph.rainbow_width = 15 -- n characters
+rt.SETTINGS.glyph.shake_intensity = 10 -- in px
+
+rt.SETTINGS.glyph.wave_period = 5
+rt.SETTINGS.glyph.wave_function = function(x)
+    return math.sin((x * 4 * math.pi) / (2 * rt.SETTINGS.glyph.wave_period))
+end
+
+--- @brief update animated glyph
+function rt.Glyph:update(delta, animation_offset)
+    meta.assert_isa(self, rt.Glyph)
+    meta.assert_number(delta)
+
+    if not meta.is_nil(animation_offset) then
+        meta.assert_number(animation_offset)
+        self._animation_offset = animation_offset
+    end
+
+    self._elapsed_time = self._elapsed_time + delta
+end
 
 --- @brief [internal] draw glyph with _is_animated = true, much less performant
 function rt.Glyph:_animated_draw()
 
-    if sizeof(self._glyph_offsets) == 0 then
-        self:_initialize_glyph_offsets()
+    if sizeof(self._character_widths) == 0 then
+        self:_initialize_character_widths()
     end
 
     local old_r, old_g, old_b, old_a = love.graphics.getColor()
@@ -119,42 +144,30 @@ function rt.Glyph:_animated_draw()
     love.graphics.push()
 
     local x, y = self:get_position()
-    local shake = false
-    local rainbow = false
-    local wave = false
-
-    for _, effect in ipairs(self._effects) do
-        if effect == rt.TextEffect.SHAKE then
-            shake = true
-        elseif effect == rt.TextEffect.WAVE then
-            wave = true
-        elseif effect == rt.TextEffect.RAINBOW then
-            rainbow = true
-        end
-    end
-
-    local x, y = self:get_position()
     local _, h = self:get_size()
 
-    for i = 0, 10 do
-        rt.rand()
-    end
-
+    -- todo
     if meta.is_nil(rt.Glyph.DEBUG_COLORS) then
         rt.Glyph.DEBUG_COLORS = {}
         for i = 1, #self._content do
-            table.insert(rt.Glyph.DEBUG_COLORS, rt.hsva_to_rgba(rt.HSVA(clamp(rt.rand(), 0.1, 0.9), 1, 1, 1)))
+            local hue = i / #self._content
+            table.insert(rt.Glyph.DEBUG_COLORS, rt.hsva_to_rgba(rt.HSVA(hue, 1, 1, 1)))
         end
     end
+    -- todo
 
     local w = 0
     for i = 1, #self._content do
-        w = self._glyph_offsets[i] - w
-        love.graphics.setScissor(x, y, w, h)
+        w = self._character_widths[i]
+        local scissor = rt.AABB(x, y, w, h)
+        love.graphics.setScissor(scissor.x, scissor.y, scissor.width, scissor.height)
+        local color = self._color
 
-        local color = rt.Glyph.DEBUG_COLORS[i]
+        if self._effects[rt.TextEffect.RAINBOW] == true then
+            color = rt.hsva_to_rgba(rt.HSVA(math.fmod((i / rt.SETTINGS.glyph.rainbow_width) + self._elapsed_time, 1), 1, 1, 1))
+        end
+
         love.graphics.setColor(color.r, color.g, color.b, color.a)
-
         self:render(self._glyph, self:get_position())
         love.graphics.setScissor()
         x = x + w
@@ -252,8 +265,8 @@ function rt.Glyph:set_n_visible_characters(n)
     n = clamp(n, 0, self:get_n_characters())
     self._n_visible_chars = n
 
-    if sizeof(self._glyph_offsets) == 0 then
-        self:_initialize_glyph_offsets()
+    if sizeof(self._character_widths) == 0 then
+        self:_initialize_character_widths()
     end
 end
 

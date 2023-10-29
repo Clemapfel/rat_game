@@ -19,6 +19,7 @@ package.path = package.path .. ";" .. RESOURCE_PATH .. "/?.lua"
 
 rt = {}
 rt.test = {}
+rt.SETTINGS = {}
 
 require "common"
 require "meta"
@@ -79,12 +80,14 @@ label:set_font(rt.Font.DEFAULT_MONO)
 window:set_child(label)
 
 n_chars = 0
-label:set_text("<shake>SHAKE SHAKE</shake>")
+label:set_text("<shake><wave><rainbow>SHAKESHAKE</wave></rainbow></shake>")
+
 for _, glyph in pairs(label._glyphs) do
     if meta.isa(glyph, rt.Glyph) then
-        glyph:set_is_animated(true)
+        glyph:set_is_animated(false)
     end
 end
+
 --label:set_text("regular <b><shake>bold</shake></b>||| <i>italics</i><b><i>bold_italic</i></b> <col=PURE_MAGENTA>color</col><b><i><col=BLUE_1>TEST</b>ABC</i>DEF</col>")
 
 key = rt.add_keyboard_controller(window)
@@ -130,7 +133,12 @@ end
 
 --- @brief update tick
 function love.update()
-    rt.AnimationTimerHandler.update(love.timer.getDelta())
+    local delta = love.timer.getDelta()
+    rt.AnimationTimerHandler.update(delta)
+
+    for _, glyph in pairs(label._glyphs) do
+        glyph:update(delta)
+    end
 end
 
 --- @brief draw step
