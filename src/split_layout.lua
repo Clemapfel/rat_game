@@ -68,7 +68,8 @@ function rt.SplitLayout:realize()
     end
 end
 
---- @brief
+--- @brief set first child
+--- @param child rt.Widget
 function rt.SplitLayout:set_start_child(child)
     meta.assert_isa(self, rt.SplitLayout)
     self:remove_start_child()
@@ -78,13 +79,15 @@ function rt.SplitLayout:set_start_child(child)
     self:reformat()
 end
 
---- @brief
+--- @brief set last child
+--- @param child rt.Widget
+--- @return rt.Widget
 function rt.SplitLayout:get_start_child()
     meta.assert_isa(self, rt.SplitLayout)
     return self._start_child
 end
 
---- @brief
+--- @brief remove first child
 function rt.SplitLayout:remove_start_child()
     meta.assert_isa(self, rt.SplitLayout)
     if not meta.is_nil(self._start_child) then
@@ -93,7 +96,8 @@ function rt.SplitLayout:remove_start_child()
     end
 end
 
---- @brief
+--- @brief set last child
+--- @param child rt.Widget
 function rt.SplitLayout:set_end_child(child)
     meta.assert_isa(self, rt.SplitLayout)
     self._end_child = child
@@ -101,13 +105,14 @@ function rt.SplitLayout:set_end_child(child)
     self:reformat()
 end
 
---- @brief
+--- @brief get last child
+--- @return rt.Widget
 function rt.SplitLayout:get_end_child()
     meta.assert_isa(self, rt.SplitLayout)
     return self._end_child
 end
 
---- @brief
+--- @brief remove last child
 function rt.SplitLayout:remove_end_child()
     meta.assert_isa(self, rt.SplitLayout)
     if not meta.is_nil(self._end_child) then
@@ -116,7 +121,8 @@ function rt.SplitLayout:remove_end_child()
     end
 end
 
---- @brief
+--- @brief set ratio between first and last child, width if horizontal, height if vertical
+--- @param ratio Number
 function rt.SplitLayout:set_ratio(ratio)
     meta.assert_isa(self, rt.SplitLayout)
     meta.assert_number(ratio)
@@ -127,7 +133,8 @@ function rt.SplitLayout:set_ratio(ratio)
     self:reformat()
 end
 
---- @brief
+--- @brief get ratio
+--- @return Number
 function rt.SplitLayout:get_ratio()
     meta.assert_isa(self, rt.SplitLayout)
     return self._ratio

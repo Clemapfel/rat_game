@@ -1,6 +1,8 @@
 rt.DEFAULT_ANIMATION_FPS = 24
 
 --- @class rt.Spritesheet
+--- @param path String path prefix, not absolute path
+--- @param id String spritsheet ID, expects <ID>.png and <ID>.lua to be in `path`
 rt.Spritesheet = meta.new_type("Spritesheet", function(path, id)
     meta.assert_string(path, id)
 
@@ -87,7 +89,9 @@ end)
 
 rt.Spritesheet.name = ""
 
---- @brief [internal]
+--- @brief [internal] check whether spritesheet has animation with given id
+--- @param scope String scope for error message
+--- @param animation_id String
 function rt.Spritesheet:_assert_has_animation(scope, animation_id)
     meta.assert_string(scope, animation_id)
     meta.assert_isa(self, rt.Spritesheet)
@@ -96,8 +100,10 @@ function rt.Spritesheet:_assert_has_animation(scope, animation_id)
     end
 end
 
---- @brief index 1-basaed
---- @return rt.AABB
+--- @brief get bounds of frame
+--- @param animation_id String
+--- @param index_maybe Number
+--- @return rt.AxisAlignedRectangle
 function rt.Spritesheet:get_frame(animation_id_or_index, index_maybe)
     meta.assert_isa(self, rt.Spritesheet)
 
@@ -123,7 +129,8 @@ function rt.Spritesheet:get_frame(animation_id_or_index, index_maybe)
     end
 end
 
---- @brief
+--- @brief get constant frame dimension for animation
+--- @param animation_id String (or nil)
 function rt.Spritesheet:get_frame_size(animation_id)
     meta.assert_isa(self, rt.Spritesheet)
     if meta.is_nil(animation_id) then
@@ -133,7 +140,8 @@ function rt.Spritesheet:get_frame_size(animation_id)
     return self._frame_width, self._frame_height
 end
 
---- @brief
+--- @brief get number of frames for animation
+--- @param animation_id String (or nil)
 function rt.Spritesheet:get_n_frames(animation_id)
     meta.assert_isa(self, rt.Spritesheet)
     if meta.is_nil(animation_id) then
@@ -143,3 +151,9 @@ function rt.Spritesheet:get_n_frames(animation_id)
     local start_end = self._name_to_frame[animation_id]
     return start_end[2] - start_end[1] + 1
 end
+
+--- @brief test spritesheet
+function rt.test.spritesheet()
+    -- TODO
+end
+rt.test.spritesheet()

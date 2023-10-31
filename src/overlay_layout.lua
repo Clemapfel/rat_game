@@ -50,7 +50,8 @@ function rt.OverlayLayout:realize()
     end
 end
 
---- @brief
+--- @brief set lower-most child
+--- @param child rt.Widget
 function rt.OverlayLayout:set_base_child(child)
     meta.assert_isa(self, rt.OverlayLayout)
     meta.assert_isa(child, rt.Widget)
@@ -62,7 +63,7 @@ function rt.OverlayLayout:set_base_child(child)
     if self:get_is_realized() then child:realize() end
 end
 
---- @brief
+--- @brief remove lower most child
 function rt.OverlayLayout:remove_base_child()
     meta.assert_isa(self, rt.OverlayLayout)
 
@@ -72,7 +73,8 @@ function rt.OverlayLayout:remove_base_child()
     end
 end
 
---- @brief
+--- @brief add overlay child on top
+--- @param child rt.Widget
 function rt.OverlayLayout:add_overlay(child)
     meta.assert_isa(self, rt.OverlayLayout)
     meta.assert_isa(child, rt.Widget)

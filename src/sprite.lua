@@ -1,4 +1,6 @@
 --- @class rt.Sprite
+--- @param spritesheet rt.Spritesheet
+--- @param animation_id String
 rt.Sprite = meta.new_type("Sprite", function(spritesheet, animation_id)
     if meta.is_nil(animation_id) then
         animation_id = spritesheet.name
@@ -20,7 +22,6 @@ rt.Sprite = meta.new_type("Sprite", function(spritesheet, animation_id)
     out:set_frame(1)
     return out
 end)
-
 
 --- @overload rt.Drawable.draw
 function rt.Sprite:draw()
@@ -84,7 +85,8 @@ function rt.Sprite:measure()
     return w, h
 end
 
---- @brief
+--- @brief set which frame is currently displayed
+--- @param i Number 1-based
 function rt.Sprite:set_frame(i)
     meta.assert_isa(self, rt.Sprite)
     meta.assert_number(i)
@@ -97,19 +99,22 @@ function rt.Sprite:set_frame(i)
     self._shape:set_texture_rectangle(self._spritesheet:get_frame(self._animation_id, i))
 end
 
---- @brief
+--- @brief get which frame is currently displayed
+--- @return Number
 function rt.Sprite:get_frame()
     meta.assert_isa(self, rt.Sprite)
     return self._current_frame
 end
 
---- @brief
+--- @brief get number of frames
+--- @return Number
 function rt.Sprite:get_n_frames()
     meta.assert_isa(self, rt.Sprite)
     return self._spritesheet:get_n_frames(self._animation_id)
 end
 
---- @brief
+--- @brief set which animation is used, this resets the current frame to 1
+--- @param id String
 function rt.Sprite:set_animation(id)
 
     self._spritesheet:_assert_has_animation("Sprite:", id)
@@ -124,3 +129,9 @@ function rt.Sprite:set_animation(id)
     self:set_frame(1)
     self:reformat()
 end
+
+--- @brief test sprite
+function rt.test.sprite()
+    -- TODO
+end
+rt.test.sprite()

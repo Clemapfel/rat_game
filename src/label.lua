@@ -6,6 +6,7 @@ rt.JustifyMode = meta.new_enum({
 })
 
 --- @class rt.Label
+--- @param text String
 rt.Label = meta.new_type("Label", function(text)
     meta.assert_string(text)
     local out = meta.new(rt.Label, {
@@ -15,8 +16,7 @@ rt.Label = meta.new_type("Label", function(text)
         _glyphs = {},
         _n_characters = 0,
         _debug = rt.Rectangle(0, 0, 1, 1),
-        _is_animated = false,
-        _animation_timer = rt.AnimationTimer(POSITIVE_INFINITY)
+        _is_animated = false
     }, rt.Widget, rt.Drawable)
     out:_parse()
 
@@ -245,7 +245,9 @@ function rt.Label:_parse()
         if effect_shake then table.insert(effects, rt.TextEffect.SHAKE) end
         if effect_wave then table.insert(effects, rt.TextEffect.WAVE) end
 
-        table.insert(self._glyphs, rt.Glyph(self._font, current_word, style, rt.Palette[color], effects))
+        local to_push = rt.Glyph(self._font, current_word, style, rt.Palette[color], effects)
+        to_push:set_is_animated(self._is_animated)
+        table.insert(self._glyphs, to_push)
         self._n_characters = self._n_characters + #current_word
         current_word = ""
     end
@@ -474,7 +476,8 @@ function rt.Label:set_font(font)
     self:reformat();
 end
 
---- @brief
+--- @brief set number of visible characters, used for text scrolling
+--- @param n Number
 function rt.Label:set_n_visible_characters(n)
     meta.assert_isa(self, rt.Label)
     meta.assert_number(n)
@@ -499,15 +502,25 @@ function rt.Label:set_n_visible_characters(n)
     end
 end
 
---- @brief
+--- @brief set whether the glyphs of the label are animated
+--- @param b Boolean
 function rt.Label:set_is_animated(b)
     meta.assert_isa(self, rt.Label)
     meta.assert_boolean(b)
 
-    if not b then
-        self._is_animated = false
-        self._animation_timer = {}
+    self._is_animated = b
+    for _, glyph in pairs(self._glyphs) do
+        if meta.isa(glyph, rt.Glyph) then
+            glyph:set_is_animated(b)
+        end
     end
+end
+
+--- @brief get whether the glyphs of the label are animated
+--- @return Boolean
+function rt.Label:get_is_animated()
+    meta.assert_isa(self, rt.Label)
+    return self._is_animated
 end
 
 --- @brief [internal]

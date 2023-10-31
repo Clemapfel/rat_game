@@ -140,7 +140,9 @@ rt.KeyboardHandler._hash = 1
 rt.KeyboardHandler._components = {}
 meta.make_weak(rt.KeyboardHandler._components, false, true)
 
---- @brief
+--- @class rt.KeyboardController
+--- @brief create new controller
+--- @param holder meta.Object
 rt.KeyboardController = meta.new_type("KeyboardController", function(instance)
     meta.assert_object(instance)
     local hash = rt.KeyboardHandler._hash
@@ -185,15 +187,18 @@ function rt.KeyboardHandler.handle_key_released(key)
 end
 love.keyreleased = function(key) rt.KeyboardHandler.handle_key_released(key) end
 
-
 --- @brief add an keyboard component
+--- @param target meta.Object
+--- @return rt.KeyboardController
 function rt.add_keyboard_controller(target)
     meta.assert_object(target)
     getmetatable(target).components.keyboard = rt.KeyboardController(target)
     return getmetatable(target).components.keyboard
 end
 
---- @brief
+--- @brief get keyboard component
+--- @param target meta.Object
+--- @return rt.KeyboardController
 function rt.get_keyboard_controller(target)
     meta.assert_object(target)
     local components = getmetatable(target).components
@@ -202,117 +207,3 @@ function rt.get_keyboard_controller(target)
     end
     return components.keyboard
 end
-
---[[
---- @class rt.KeyboardController
---- @signal key_pressed (::KeyboardController, key::String) -> Boolean
---- @signal key_released (::KeyboardController, key::String) -> Boolean
-rt.KeyboardController = meta.new_type("KeyboardController", function(holder)
-    meta.assert_object(holder)
-    local hash = rt.KeyboardHandler._hash
-    local out = meta.new(rt.KeyboardController, {
-        _hash = hash,
-        instance = holder
-    })
-    rt.add_signal_component(out)
-    out:signal_add("key_pressed")
-    out:signal_add("key_released")
-    rt.KeyboardHandler._components[hash] = out
-    rt.KeyboardHandler._hash = hash + 1
-
-    local metatable = getmetatable(holder)
-    if not meta.is_boolean(metatable.is_focused) then
-        metatable.is_focused = true
-    end
-
-    local metatable = getmetatable(holder)
-    metatable.components.keyboard = out
-    metatable.__gc = function(self)
-        rt.KeyboardHandler._components[self._hash] = nil
-    end
-
-    return rt.KeyboardHandler._components[hash]
-end)
-
---- @brief on key pressed
---- @param key String
-function rt.KeyboardHandler.handle_key_pressed(key)
-    for _, component in pairs(rt.KeyboardHandler._components) do
-        if getmetatable(component.instance).is_focused == true then
-            local res = component:signal_emit("key_released", key)
-            if res == true then
-                break
-            end
-        end
-    end
-end
-love.keypressed = function(key) rt.KeyboardHandler.handle_key_pressed(key) end
-
---- @brief on key released
---- @param key String
-function rt.KeyboardHandler.handle_key_released(key)
-    for _, component in pairs(rt.KeyboardHandler._components) do
-        if getmetatable(component.instance).is_focused == true then
-            local res = component:signal_emit("key_pressed", key)
-            if res == true then
-                break
-            end
-        end
-    end
-end
-love.keyreleased = function(key) rt.KeyboardHandler.handle_key_released(key) end
-
---- @brief is key currently pressed
---- @param key String
---- @return Boolean
-function rt.KeyboardHandler.is_down(this, key)
-    meta.assert_string(key)
-    return this._state_now[key]
-end
-
---- @brief add an keyboard component
-function rt.add_keyboard_component(self)
-    meta.assert_object(self)
-
-    if not meta.is_nil(self.keyboard) then
-        error("[rt][ERROR] In add_keyboard_component: Object of type `" .. meta.typeof(self) .. "` already has a member called `keyboard`")
-    end
-
-    meta._install_property(self, "keyboard", rt.AllocationComponent(self))
-    return rt.get_keyboard_component(self)
-end
-
---- @brief get keyboard component assigned
---- @return rt.KeyboardController
-function rt.get_keyboard_component(self)
-    return self.keyboard
-end
-
---- @brief [internal] test keyboard component
-rt.test.keyboard_component = function()
-
-    local instance = meta._new("Object")
-    local component = rt.KeyboardController(instance)
-    assert(component.instance == instance)
-    assert(meta.is_boolean(getmetatable(instance).is_focused))
-
-    local pressed_called = false
-    component:signal_connect("key_pressed", function(self, key)
-        pressed_called = true
-        return false
-    end)
-
-    local release_called = false
-    component:signal_connect("key_released", function(self, key)
-        release_called = true
-        return true
-    end)
-
-    rt.KeyboardHandler.handle_key_pressed("space")
-    rt.KeyboardHandler.handle_key_released("space")
-
-    assert(pressed_called)
-    assert(release_called)
-end
-rt.test.keyboard_component()
-]]--

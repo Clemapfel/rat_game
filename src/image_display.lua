@@ -1,4 +1,5 @@
 --- @class rt.ImageDisplay
+--- @param image rt.Image
 rt.ImageDisplay = meta.new_type("ImageDisplay", function(image)
 
     if meta.is_string(image) then
@@ -44,6 +45,7 @@ function rt.ImageDisplay:measure()
 end
 
 --- @brief update texture
+--- @param image rt.Image
 function rt.ImageDisplay:create_from_image(image)
     meta.assert_isa(self, rt.ImageDisplay)
     meta.assert_isa(image, rt.Image)

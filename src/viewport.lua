@@ -57,7 +57,8 @@ function rt.Viewport:measure()
     return
 end
 
---- @brief
+--- @brief set singular child
+--- @param child rt.Widget
 function rt.Viewport:set_child(child)
     meta.assert_isa(self, rt.Viewport)
     meta.assert_isa(child, rt.Widget)
@@ -69,13 +70,14 @@ function rt.Viewport:set_child(child)
     self:reformat()
 end
 
---- @brief
+--- @brief get child
+--- @return rt.Widget
 function rt.Viewport:get_child()
     meta.assert_isa(self, rt.Viewport)
     return self._child
 end
 
---- @brief
+--- @brief remove child
 function rt.Viewport:remove_child()
     meta.assert_isa(self, rt.Viewport)
     if not meta.is_nil(self._child) then
@@ -85,7 +87,8 @@ function rt.Viewport:remove_child()
     end
 end
 
---- @brief
+--- @brief set whether viewport should assume width of its child
+--- @param b Boolean
 function rt.Viewport:set_propagate_width(b)
     meta.assert_isa(self, rt.Viewport)
     if self._propagate_width ~= b then
@@ -94,13 +97,15 @@ function rt.Viewport:set_propagate_width(b)
     end
 end
 
---- @brief
+--- @brief get whether viewport assumes width of its child
+--- @return Boolean
 function rt.Viewport:get_propagate_width()
     meta.assert_isa(self, rt.Viewport)
     return self._propagate_width
 end
 
---- @brief
+--- @brief set whether viewport should assume height of its child
+--- @param b Boolean
 function rt.Viewport:set_propagate_height(b)
     meta.assert_isa(self, rt.Viewport)
     if self._propagate_height ~= b then
@@ -109,19 +114,23 @@ function rt.Viewport:set_propagate_height(b)
     end
 end
 
---- @brief
+--- @brief get whether viewport assumes height of its child
+--- @return Boolean
 function rt.Viewport:get_propagate_height()
     meta.assert_isa(self, rt.Viewport)
     return self._propagate_height
 end
 
---- @brief
+--- @brief get scroll offset
+--- @return (Number, Number)
 function rt.Viewport:get_offset()
     meta.assert_isa(self, rt.Viewport)
     return self._x_offset, self._y_offset
 end
 
---- @brief
+--- @brief set scroll offset
+--- @param x Number px
+--- @param y Number px
 function rt.Viewport:set_offset(x, y)
     meta.assert_isa(self, rt.Viewport)
     meta.assert_number(x, y)
@@ -133,7 +142,9 @@ function rt.Viewport:set_offset(x, y)
     local after_x, after_y = self:get_offset()
 end
 
---- @brief
+--- @brief move scroll offset
+--- @param x_offset Number px
+--- @param y_offset Number px
 function rt.Viewport:translate(x_offset, y_offset)
     meta.assert_isa(self, rt.Viewport)
     meta.assert_number(x_offset, y_offset)
@@ -142,13 +153,9 @@ function rt.Viewport:translate(x_offset, y_offset)
     self:set_offset(current_x + x_offset, current_y + y_offset)
 end
 
---- @brief
-function rt.Viewport:get_scale()
-    meta.assert_isa(self, rt.Viewport)
-    return self._x_scale, self._y_scale
-end
-
---- @brief
+--- @brief set scroll scale
+--- @param x Number factor
+--- @param y Number factor
 function rt.Viewport:set_scale(x, y)
     meta.assert_isa(self, rt.Viewport)
     meta.assert_number(x)
@@ -159,7 +166,16 @@ function rt.Viewport:set_scale(x, y)
     self._y_scale = y
 end
 
---- @brief
+--- @brief get scroll scale
+--- @return (Number, Number)
+function rt.Viewport:get_scale()
+    meta.assert_isa(self, rt.Viewport)
+    return self._x_scale, self._y_scale
+end
+
+--- @brief apply scale factor
+--- @param x Number factor
+--- @param y Number factor
 function rt.Viewport:scale(x, y)
     meta.assert_isa(self, rt.Viewport)
     meta.assert_number(x)
@@ -170,7 +186,8 @@ function rt.Viewport:scale(x, y)
     self._y_scale = self._y_scale * y
 end
 
---- @brief
+--- @brief override rotation
+--- @param angle rt.Angle
 function rt.Viewport:set_rotation(angle)
     meta.assert_isa(self, rt.Viewport)
     meta.assert_isa(angle, rt.Angle)
@@ -178,15 +195,23 @@ function rt.Viewport:set_rotation(angle)
     self._rotation = angle
 end
 
---- @brief
+--- @brief get rotation
+--- @return rt.Angle
 function rt.Viewport:get_rotation()
     meta.assert_isa(self, rt.Viewport)
     return self._rotation
 end
 
---- @brief
+--- @brief add rotation
+--- @param angle rt.Angle
 function rt.Viewport:rotate(angle)
     meta.assert_isa(self, rt.Viewport)
     meta.assert_isa(angle, rt.Angle)
     self._rotation = self._rotation + angle
 end
+
+--- @brief test viewport
+function rt.test.viewport()
+    -- TODO
+end
+rt.test.viewport()

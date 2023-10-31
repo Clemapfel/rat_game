@@ -7,6 +7,8 @@ else
 end
 
 --- @brief generate number in [0, 1]
+--- @param seed_maybe Number (or nil)
+--- @return Number
 function rt.rand(seed_maybe)
     if not meta.is_nil(seed_maybe) then
         love.math.setRandomSeed(seed_maybe)
@@ -14,25 +16,33 @@ function rt.rand(seed_maybe)
     return love.math.random()
 end
 
---- @brief seed randomness
+--- @brief re-seed randomness
+--- @param seed Number
 function rt.random.seed(seed)
     meta.assert_number(seed)
     love.math.setRandomSeed(seed)
 end
 
 --- @brief get random number in given range
+--- @param min Number
+--- @param max Number
+--- @return Number
 function rt.random.integer(min, max)
     meta.assert_number(min, max)
     return love.math.random(min, max)
 end
 
 --- @brief get random float in given range
+--- @param min Number
+--- @param max Number
+--- @return Number
 function rt.random.number(min, max)
     meta.assert_number(min, max)
     return min + rt.rand() * max
 end
 
 --- @brief pick random element from table
+--- @param set Table
 function rt.random.choose(set)
     meta.assert_table(set)
     local step = rt.random.integer(0, #set)
@@ -55,6 +65,8 @@ rt.random.CHAR_LIST = {
 }
 
 --- @brief generate string
+--- @param length Number
+--- @param set Table<String> (or nil)
 function rt.random.string(length, set)
     if meta.is_nil(set) then
         set = rt.random.CHAR_LIST

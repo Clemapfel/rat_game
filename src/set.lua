@@ -1,4 +1,5 @@
 --- @class rt.Set
+--- @vararg any
 rt.Set = meta.new_type("Set", function(...)
     local out = meta.new(rt.Set, {
         elements = {},
@@ -37,7 +38,8 @@ rt.Set = meta.new_type("Set", function(...)
     return out
 end)
 
---- @brief
+--- @brief add element
+--- @param x any
 function rt.Set:push(x)
     meta.assert_isa(self, rt.Set)
     if meta.is_nil(self.elements[x]) then
@@ -46,7 +48,8 @@ function rt.Set:push(x)
     self.elements[x] = true
 end
 
---- @brief
+--- @brief remove element
+--- @param x
 function rt.Set:remove(x)
     meta.assert_isa(self, rt.Set)
     if not meta.is_nil(self.elements[x]) then
@@ -55,19 +58,22 @@ function rt.Set:remove(x)
     self.elements[x] = nil
 end
 
---- @brief
+--- @brief check if element is in set
+--- @param x
 function rt.Set:contains(x)
     meta.assert_isa(self, rt.Set)
     return not meta.is_nil(self.elements[x])
 end
 
---- @brief
+--- @brief remove all elements
 function rt.Set:clear()
     meta.assert_isa(self, rt.Set)
     self.elements = {}
 end
 
---- @brief
+--- @brief get intersection between two sets
+--- @param other rt.Set
+--- @return rt.Set
 function rt.Set:intersect(other)
     meta.assert_isa(self, rt.Set)
     meta.assert_isa(other, rt.Set)
@@ -81,7 +87,9 @@ function rt.Set:intersect(other)
     return out
 end
 
---- @brief
+--- @brief get union of two sets
+--- @param other rt.Set
+--- @return rt.Set
 function rt.Set:union(other)
     meta.assert_isa(self, rt.Set)
     meta.assert_isa(other, rt.Set)

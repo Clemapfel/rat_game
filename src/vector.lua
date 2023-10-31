@@ -1,4 +1,6 @@
 --- @class rt.Vector2
+--- @param x Number
+--- @param y Number
 function rt.Vector2(x, y)
     local out = {x = x, y = y}
     out.__metatable = {
@@ -45,13 +47,15 @@ function rt.Vector2(x, y)
     return out
 end
 
---- @brief
+--- @brief [internal] check if object is rt.
+--- @param object any
 function rt.is_vector2(object)
     if not meta.is_table(object) then return false end
     return #object == 2 and meta.is_number(object.x) and meta.is_number(object.y)
 end
 
---- @brief
+--- @brief [internal] assert if object is rt.Vector2
+--- @param object any
 function rt.assert_vector2(object)
     if not rt.is_vector2(object) then
         error("In " .. debug.getinfo(2, "n").name .. ": Excpected `Vector2`, got `" .. meta.typeof(object) .. "`")
@@ -59,6 +63,9 @@ function rt.assert_vector2(object)
 end
 
 --- @class rt.Vector3
+--- @param x Number
+--- @param y Number
+--- @param z Number
 function rt.Vector3(x, y, z)
     local out = {x = x, y = y, z = z}
     out.__metatable = {
@@ -109,20 +116,22 @@ function rt.Vector3(x, y, z)
     return out
 end
 
---- @brief
+--- @brief [internal] check if object is rt.Vector3
+--- @param object any
 function rt.is_vector3(object)
     if not meta.is_table(object) then return false end
     return #object == 3 and meta.is_number(object.x) and meta.is_number(object.y) and meta.is_number(object.z)
 end
 
---- @brief
+--- @brief [internal] assert if object is rt.Vector3
+--- @param object any
 function rt.assert_vector3(object)
     if not rt.is_vector3(object) then
         error("In " .. debug.getinfo(2, "n").name .. ": Excpected `Vector3`, got `" .. meta.typeof(object) .. "`")
     end
 end
 
---- @brief [internal] test vector2, vector3, vector 4
+--- @brief [internal] test vector2, vector3
 function rt.test.test_vector()
     do
         local a = rt.Vector2(1, 2)

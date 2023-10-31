@@ -1,4 +1,6 @@
 --- @class rt.ListLayout
+--- @param orientation rt.Orientation
+--- @varag rt.Widget
 rt.ListLayout = meta.new_type("ListLayout", function(orientation, ...)
     if meta.is_nil(orientation) then
         orientation = rt.Orientation.VERTICAL
@@ -112,7 +114,8 @@ function rt.ListLayout:realize()
     end
 end
 
---- @brief
+--- @brief replace all children
+--- @param children Table<rt.Widget>
 function rt.ListLayout:set_children(children)
     meta.assert_isa(self, rt.GridLayout)
     for child in pairs(self._children) do
@@ -128,7 +131,8 @@ function rt.ListLayout:set_children(children)
     self:reformat()
 end
 
---- @brief
+--- @brief append child
+--- @param child rt.Widget
 function rt.ListLayout:push_back(child)
     meta.assert_isa(self, rt.ListLayout)
     meta.assert_isa(child, rt.Widget)
@@ -140,7 +144,8 @@ function rt.ListLayout:push_back(child)
     end
 end
 
---- @brief
+--- @brief prepend child
+--- @param child rt.Widget
 function rt.ListLayout:push_front(child)
     meta.assert_isa(self, rt.ListLayout)
     meta.assert_isa(child, rt.Widget)
@@ -152,7 +157,7 @@ function rt.ListLayout:push_front(child)
     end
 end
 
---- @brief
+--- @brief remove first child
 --- @return rt.Widget
 function rt.ListLayout:pop_front()
     meta.assert_isa(self, rt.ListLayout)
@@ -162,7 +167,7 @@ function rt.ListLayout:pop_front()
     return out
 end
 
---- @brief
+--- @brief remove last child
 --- @return rt.Widget
 function rt.ListLayout:pop_back()
     meta.assert_isa(self, rt.ListLayout)
@@ -172,7 +177,8 @@ function rt.ListLayout:pop_back()
     return out
 end
 
---- @brief
+--- @brief set orientation
+--- @param orientation rt.Orientation
 function rt.ListLayout:set_orientation(orientation)
     meta.assert_isa(self, rt.ListLayout)
     if self._orientation == orientation then return end
@@ -180,7 +186,7 @@ function rt.ListLayout:set_orientation(orientation)
     self:reformat()
 end
 
---- @brief
+--- @brief get orientation
 --- @return rt.Orientation
 function rt.ListLayout:get_orientation()
     meta.assert_isa(self, rt.ListLayout)

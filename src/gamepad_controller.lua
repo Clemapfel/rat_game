@@ -116,6 +116,7 @@ love.gamepadaxis = rt.GamepadHandler.handle_axis_changed
 
 --- @brief add a gamepad controller
 --- @param target meta.Object
+--- @return rt.GamepadController
 function rt.add_gamepad_controller(target)
     meta.assert_object(target)
     getmetatable(target).components.gamepad = rt.GamepadController(target)

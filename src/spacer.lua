@@ -1,4 +1,5 @@
 --- @class rt.Space
+--- @param is_transparent Boolean (or nil)
 rt.Spacer = meta.new_type("Spacer", function(is_transparent)
     if meta.is_nil(is_transparent) then
         is_transparent = false

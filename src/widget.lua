@@ -44,7 +44,7 @@ function rt.Widget:measure()
     error("[rt][ERROR] " .. meta.typeof(self) .. ":measure: abstract method called")
 end
 
---- @brief
+--- @brief realize widget
 function rt.Widget:realize()
     meta.assert_isa(self, rt.Widget)
     if self._realized then return end
@@ -52,13 +52,13 @@ function rt.Widget:realize()
     self:reformat()
 end
 
---- @brief
+--- @brief get whether widget was realized
 function rt.Widget:get_is_realized()
     meta.assert_isa(self, rt.Widget)
     return self._realized
 end
 
---- @brief
+--- @brief resize widget
 function rt.Widget:reformat()
     if not self._realized then
         return

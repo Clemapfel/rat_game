@@ -1,4 +1,6 @@
 --- @class rt.Scrollbar
+--- @param orientation rt.Orientation
+--- @param n_steps Number (or nil)
 --- @signal value_changed: (::Scrollbar, value::Number) -> nil
 rt.Scrollbar = meta.new_type("Scrollbar", function(orientation, n_steps)
     meta.assert_enum(orientation, rt.Orientation)

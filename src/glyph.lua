@@ -7,6 +7,12 @@ rt.TextEffect = meta.new_enum({
 })
 
 --- @class rt.Glyph
+--- @param font rt.Font
+--- @param content String
+--- @param font_style rt.FontStyle
+--- @param color rt.RGBA
+--- @param effects rt.TextEffect
+--- @param wrap_width Number px
 rt.Glyph = meta.new_type("Glyph", function(font, content, font_style, color, effects, wrap_width)
 
     meta.assert_isa(font, rt.Font)
@@ -30,13 +36,11 @@ rt.Glyph = meta.new_type("Glyph", function(font, content, font_style, color, eff
         _effects = {},
         _is_animated = false,
         _elapsed_time = 0,
-        _animation_offset = 0,
         _glyph = {},
         _position_x = 0,
         _position_y = 0,
         _n_visible_chars = POSITIVE_INFINITY,
-        _character_widths = {},
-        _character_offsets = {}
+        _character_widths = {}
     }, rt.Drawable)
 
     for _, effect in pairs(effects) do
@@ -121,14 +125,10 @@ rt.SETTINGS.glyph.wave_offset = 10      -- px
 rt.SETTINGS.glyph.wave_speed = 0.2      -- cycles per second
 
 --- @brief update animated glyph
-function rt.Glyph:update(delta, animation_offset)
+--- @param delta Number microseconds
+function rt.Glyph:update(delta)
     meta.assert_isa(self, rt.Glyph)
     meta.assert_number(delta)
-
-    if not meta.is_nil(animation_offset) then
-        meta.assert_number(animation_offset)
-        self._animation_offset = animation_offset
-    end
 
     self._elapsed_time = self._elapsed_time + delta
 end
@@ -203,7 +203,7 @@ function rt.Glyph:set_style(style)
 end
 
 --- @brief get font style
---- @param style rt.FontStyle
+--- @return rt.FontStyle
 function rt.Glyph:get_style()
     meta.assert_isa(self, rt.Glyph)
     meta.assert_enum(style, rt.FontStyle)
@@ -232,37 +232,44 @@ function rt.Glyph:get_color(color)
 end
 
 --- @brief measure text size
+--- @return (Number, Number)
 function rt.Glyph:get_size()
     meta.assert_isa(self, rt.Glyph)
     return self._glyph:getDimensions()
 end
 
 --- @brief access content as string
+--- @return String
 function rt.Glyph:get_content()
     meta.assert_isa(self, rt.Glyph)
     return self._content
 end
 
---- @brief
+--- @brief get number of characters of content
+--- @return Number
 function rt.Glyph:get_n_characters()
     meta.assert_isa(self, rt.Glyph)
     return #self._content
 end
 
---- @brief
+--- @brief set top left position
+--- @param x Number
+--- @param y Number
 function rt.Glyph:set_position(x, y)
     meta.assert_isa(self, rt.Glyph)
     self._position_x = math.round(x)
     self._position_y = math.round(y)
 end
 
---- @brief
+--- @brief get top left position
+--- @return (Number, Number)
 function rt.Glyph:get_position()
     meta.assert_isa(self, rt.Glyph)
     return self._position_x, self._position_y
 end
 
---- @brief
+--- @brief set number of visible characters, used for text scrolling
+--- @param n Number
 function rt.Glyph:set_n_visible_characters(n)
     meta.assert_isa(self, rt.Glyph)
     meta.assert_number(n)
@@ -274,20 +281,23 @@ function rt.Glyph:set_n_visible_characters(n)
     end
 end
 
---- @brief
+--- @brief get number of visible characters
+--- @return Number
 function rt.Glyph:get_n_visible_characters()
     meta.assert_isa(self, rt.Glyph)
     return clamp(self._n_visible_chars, 0, self:get_n_characters())
 end
 
---- @brief
+--- @brief get whether the glyph should animate text effects
+--- @return Boolean
 function rt.Glyph:get_is_animated()
     meta.assert_isa(self, rt.Glyph)
     return self._is_animated
 end
 
---- @brief
-function rt.Glyph:set_is_animated()
+--- @brief set whether the glyph should be animated
+--- @param b Boolean
+function rt.Glyph:set_is_animated(b)
     meta.assert_isa(self, rt.Glyph)
-    self._is_animated = true
+    self._is_animated = b
 end

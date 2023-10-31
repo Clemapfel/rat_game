@@ -12,7 +12,8 @@ rt.MouseHandler._hash = 1
 rt.MouseHandler._components = {}
 meta.make_weak(rt.MouseHandler._components, false, true)
 
---- @brief
+--- @class rt.MouseController
+--- @param instance meta.Object
 rt.MouseController = meta.new_type("MouseController", function(instance)
     meta.assert_object(instance)
     local hash = rt.MouseHandler._hash
@@ -38,9 +39,12 @@ rt.MouseController = meta.new_type("MouseController", function(instance)
     return out
 end)
 
---- @brief
+--- @brief check if cursor is over holder
+--- @param x Number
+--- @param y Number
 function rt.MouseController:is_cursor_in_bounds(x, y)
     meta.assert_isa(self, rt.MouseController)
+    meta.assert_number(x, y)
     return self.instance:get_bounds():contains(x, y)
 end
 
@@ -102,6 +106,8 @@ end
 love.mousemoved = rt.MouseHandler.handle_motion
 
 --- @brief add an mouse component
+--- @param target meta.Object
+--- @return rt.MouseComponent
 function rt.add_mouse_controller(target)
     meta.assert_object(target)
     getmetatable(target).components.mouse = rt.MouseController(target)

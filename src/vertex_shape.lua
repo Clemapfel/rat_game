@@ -13,7 +13,12 @@ rt.MeshDrawMode = meta.new_enum({
     POINTS = "points"
 })
 
---- @brief
+--- @class rt.Vertex
+--- @param top_left_x Number in px
+--- @param top_left_y Number in px
+--- @param texture_coordinate_x Number in [0, 1]
+--- @param texture_coordinate_y Number in [0, 1]
+--- @param color rt.RGBA
 function rt.Vertex(top_left_x, top_left_y, texture_coordinate_x, texture_coordinate_y, color)
     meta.assert_number(top_left_x, top_left_y, texture_coordinate_x, texture_coordinate_y)
 
@@ -48,25 +53,23 @@ rt.VertexShape = meta.new_type("VertexShape", function(...)
     return out
 end)
 
+--- @class rt.VertexAttribute
 rt.VertexAttribute = meta.new_enum({
     POSITION = "VertexPosition",
     TEXTURE_COORDINATES = "VertexTexCoord",
     COLOR = "VertexColor"
 })
 
---- @brief
+--- @brief get number of vertices
+--- @return Number
 function rt.VertexShape:get_n_vertices()
     meta.assert_isa(self, rt.VertexShape)
     return self._native:getVertexCount()
 end
 
---- @brief
---- @param positions Table<Number>
-function rt.VertexShape:set_vertex_order(positions)
-    self._native:setVertexMap(positions)
-end
-
---- @brief
+--- @brief set color of one vertex
+--- @param i Number 1-based
+--- @param rgba rt.RGBA
 function rt.VertexShape:set_vertex_color(i, rgba)
     meta.assert_isa(self, rt.VertexShape)
     if rt.is_hsva(rgba) then rgba = rt.hsva_to_rgba(rgba) end
@@ -74,7 +77,9 @@ function rt.VertexShape:set_vertex_color(i, rgba)
     self._native:setVertexAttribute(i, 3, rgba.r, rgba.g, rgba.b, rgba.a)
 end
 
---- @brief
+--- @brief get color of one vertex
+--- @param i Number 1-based
+--- @return rt.RGBA
 function rt.VertexShape:get_vertex_color(i)
     meta.assert_isa(self, rt.VertexShape)
 
@@ -83,7 +88,10 @@ function rt.VertexShape:get_vertex_color(i)
     return rt.RGBA(r, g, b, a)
 end
 
---- @brief
+--- @brief set vertex position
+--- @param i Number 1-based
+--- @param x Number in px
+--- @param y Number in px
 function rt.VertexShape:set_vertex_position(i, x, y)
     meta.assert_isa(self, rt.VertexShape)
     meta.assert_number(x, y)
@@ -91,17 +99,18 @@ function rt.VertexShape:set_vertex_position(i, x, y)
     self._native:setVertexAttribute(i, 1, x, y)
 end
 
---- @brief
---- @return Vector2
+--- @brief get position of vertex
+--- @param i Number 1-based
+--- @return (Number, Number)
 function rt.VertexShape:get_vertex_position(i)
     meta.assert_isa(self, rt.VertexShape)
-
-    local x, y
-    x, y = self._native:getVertexAttribute(i, 1)
-    return rt.Vector2(x, y)
+    return self._native:getVertexAttribute(i, 1)
 end
 
---- @brief
+--- @brief get vertex texture coordinate
+--- @param i Number 1-based
+--- @param u Number in [0, 1]
+--- @param v Number in [0, 1]
 function rt.VertexShape:set_vertex_texture_coordinate(i, u, v)
     meta.assert_isa(self, rt.VertexShape)
     meta.assert_number(u, v)
@@ -109,15 +118,14 @@ function rt.VertexShape:set_vertex_texture_coordinate(i, u, v)
     self._native:setVertexAttribute(i, 2, u, v)
 end
 
---- @brief
---- @return Vector2
+--- @brief get texture coordinate
+--- @return (Number, Number)
 function rt.VertexShape:get_vertex_texture_coordinate(i)
-    local u, v
-    u, v = self._native:getVertexAttribute(i, 2)
-    return rt.Vector2(u, v)
+    return self._native:getVertexAttribute(i, 2)
 end
 
---- @brief
+--- @brief set color of all vertices
+--- @param rgba rt.RGBA (or rt.HSVA)
 function rt.VertexShape:set_color(rgba)
     meta.assert_isa(self, rt.VertexShape)
     if rt.is_hsva(rgba) then rgba = rt.hsva_to_rgba(rgba) end
@@ -127,7 +135,8 @@ function rt.VertexShape:set_color(rgba)
     end
 end
 
---- @brief
+--- @brief replace texture coordinates of all vertices
+--- @param rectangle rt.AxisAlignedRectangle
 function rt.VertexShape:set_texture_rectangle(rectangle)
     meta.assert_isa(self, rt.VertexShape)
     meta.assert_isa(rectangle, rt.AxisAlignedRectangle)
@@ -137,25 +146,26 @@ function rt.VertexShape:set_texture_rectangle(rectangle)
     local max_x = NEGATIVE_INFINITY
     local max_y = NEGATIVE_INFINITY
     for i = 1, self:get_n_vertices() do
-        local pos = self:get_vertex_position(i)
-        min_x = math.min(pos.x, min_x)
-        max_x = math.max(pos.x, max_x)
-        min_y = math.min(pos.y, min_y)
-        max_y = math.max(pos.y, max_y)
+        local x, y = self:get_vertex_position(i)
+        min_x = math.min(x, min_x)
+        max_x = math.max(x, max_x)
+        min_y = math.min(y, min_y)
+        max_y = math.max(y, max_y)
     end
 
     local width = (max_x - min_x)
     local height = (max_y - min_y)
     for i = 1, self:get_n_vertices() do
-        local pos = self:get_vertex_position(i)
+        local x, y = self:get_vertex_position(i)
         self:set_vertex_texture_coordinate(i,
-            (pos.x - min_x) / (width / rectangle.width) + rectangle.x,
-            (pos.y - min_y) / (height / rectangle.height) + rectangle.y
+            (x - min_x) / (width / rectangle.width) + rectangle.x,
+            (y - min_y) / (height / rectangle.height) + rectangle.y
         )
     end
 end
 
---- @brief
+--- @brief set texture
+--- @param texture rt.Texture
 function rt.VertexShape:set_texture(texture)
     meta.assert_isa(self, rt.VertexShape)
     if not meta.is_nil(texture) then
@@ -164,13 +174,18 @@ function rt.VertexShape:set_texture(texture)
     self._native:setTexture(texture._native)
 end
 
---- @brief
+--- @overload rt.Drawable.draw
 function rt.VertexShape:draw()
     if self:get_is_visible() then
         love.graphics.draw(self._native)
     end
 end
 
+--- @brief create vertex shape as rectangle
+--- @param x Number in px
+--- @param y Number in px
+--- @param width Number in px
+--- @param height Number in px
 function rt.VertexRectangle(x, y, width, height)
     meta.assert_number(x, y, width, height)
     local out = rt.VertexShape(
@@ -182,7 +197,11 @@ function rt.VertexRectangle(x, y, width, height)
     return out
 end
 
---- @briefa
+--- @brief reformat vertex shape
+--- @param x Number in px
+--- @param y Number in px
+--- @param width Number in px
+--- @param height Number in px
 function rt.VertexShape:resize(x, y, width, height)
     meta.assert_isa(self, rt.VertexShape)
     meta.assert_number(x, y, width, height)
