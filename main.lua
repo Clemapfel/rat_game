@@ -1,17 +1,3 @@
-function try_connect_emmy_lua_debugger()
-    -- entry point for JetBrains IDE debugger
-    package.cpath = package.cpath .. ';/home/clem/.local/share/JetBrains/CLion2023.2/EmmyLua/debugger/emmy/linux/?.so'
-    local dbg = require('emmy_core')
-    dbg.tcpConnect('localhost', 8172)
-
-    love.errorhandler = function(msg)
-        dbg.breakHere()
-        return nil -- exit
-    end
-end
-pcall(try_connect_emmy_lua_debugger)
-io.stdout:setvbuf("no") -- makes it so error message is printed to console immediately
-
 RESOURCE_PATH = love.filesystem.getSource()
 package.path = package.path .. ";" .. RESOURCE_PATH .. "/src/?.lua"
 package.path = package.path .. ";" .. RESOURCE_PATH .. "/battle/?.lua"
@@ -19,7 +5,7 @@ package.path = package.path .. ";" .. RESOURCE_PATH .. "/?.lua"
 
 rt = {}
 rt.test = {}
-rt.SETTINGS = {}
+rt.settings = {}
 
 require "common"
 require "meta"
@@ -36,7 +22,7 @@ require "geometry"
 require "image"
 require "animation_timer"
 require "drawable"
-require "animated_drawable"
+require "animation"
 require "texture"
 require "shape"
 require "vertex_shape"
@@ -48,6 +34,7 @@ require "keyboard_controller"
 require "mouse_controller"
 
 require "widget"
+require "window_layout"
 require "bin_layout"
 require "list_layout"
 require "overlay_layout"
@@ -64,14 +51,26 @@ require "viewport"
 require "sprite"
 require "animated_sprite"
 
--- ### MAIN ###
+function try_connect_emmy_lua_debugger()
+    -- entry point for JetBrains IDE debugger
+    package.cpath = package.cpath .. ';/home/clem/.local/share/JetBrains/CLion2023.2/EmmyLua/debugger/emmy/linux/?.so'
+    local dbg = require('emmy_core')
+    dbg.tcpConnect('localhost', 8172)
 
-if DEBUG_MODE then goto exit end
+    love.errorhandler = function(msg)
+        dbg.breakHere()
+        return nil -- exit
+    end
+end
+try_catch(try_connect_emmy_lua_debugger)
+io.stdout:setvbuf("no") -- makes it so error message is printed to console immediately
+
+-- #############################
 
 rt.Font.DEFAULT_SIZE = 50
 rt.Font.DEFAULT = rt.load_font("Roboto", "assets/fonts/Roboto")
 rt.Font.DEFAULT_MONO = rt.load_font("DejaVuSansMono", "assets/fonts/DejaVuSansMono")
-window = rt.BinLayout()
+window = rt.WindowLayout()
 
 label = rt.Label("")
 label:set_justify_mode(rt.JustifyMode.LEFT)
@@ -81,10 +80,7 @@ label:set_font(rt.Font.DEFAULT_MONO)
 window:set_child(label)
 
 n_chars = 0
-label:set_text("regular <color=RED_1>color</color> <b>bold</b> <i>italics</i> <b><i>bold_italic</i></b> <shake>SHAKE</shake> <wave>WAYWAVE</wave> <color=RED_1><rainbow>RAINBOW</rainbow></color>")
-
-
---label:set_text("regular <b><shake>bold</shake></b>||| <i>italics</i><b><i>bold_italic</i></b> <col=PURE_MAGENTA>color</col><b><i><col=BLUE_1>TEST</b>ABC</i>DEF</col>")
+label:set_text("<wave>WAVE</wave>")--regular <color=RED_1>color</color> <b>bold</b> <i>italics</i> <b><i>bold_italic</i></b> <shake>SHAKE</shake> <wave>WAYWAVE</wave> <color=RED_1><rainbow>RAINBOW</rainbow></color>")
 
 key = rt.add_keyboard_controller(window)
 key:signal_connect("key_pressed", function(self, key)
@@ -111,12 +107,9 @@ key:signal_connect("key_pressed", function(self, key)
     end
 end)
 
-window:realize()
-
--- @brief window resized
-function love.resize(width, height)
-    window:fit_into(rt.AABB(0, 0, width, height))
-end
+spritesheet = rt.Spritesheet("assets/sprites", "test_animation")
+sprite = rt.Sprite(spritesheet, "test_animation")
+window:set_child(sprite)
 
 --- @brief startup
 function love.load()
@@ -124,6 +117,8 @@ function love.load()
         resizable = true
     })
     love.window.setTitle("rat_game")
+
+    window:realize()
     window:fit_into(rt.AABB(1, 1, love.graphics.getWidth()-2, love.graphics.getHeight()-2))
 end
 

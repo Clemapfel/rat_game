@@ -587,5 +587,5 @@ end
 --- @brief hash object, each instance has a unique ID
 function meta.hash(x)
     meta.assert_object(x)
-    return getmetatable(x)._hash
+    return getmetatable(x).__hash
 end

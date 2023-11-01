@@ -227,7 +227,7 @@ function rt.Label:_parse()
         if effect_shake then table.insert(effects, rt.TextEffect.SHAKE) end
         if effect_wave then table.insert(effects, rt.TextEffect.WAVE) end
 
-        table.insert(self._glyphs, rt.Glyph(self._font, current_word, style, rt.Palette[color], effects))
+        table.insert(self._glyphs, rt.Glyph(self._font, current_word, style, rt.Palette[ternary(effect_rainbow, "PURE_WHITE", color)], effects))
         self._n_characters = self._n_characters + #current_word
         current_word = ""
     end

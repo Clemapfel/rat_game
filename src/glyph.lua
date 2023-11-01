@@ -14,7 +14,6 @@ rt.TextEffect = meta.new_enum({
 --- @param effects rt.TextEffect
 --- @param wrap_width Number px
 rt.Glyph = meta.new_type("Glyph", function(font, content, font_style, color, effects, wrap_width)
-
     meta.assert_isa(font, rt.Font)
     meta.assert_string(content)
 
@@ -40,15 +39,15 @@ rt.Glyph = meta.new_type("Glyph", function(font, content, font_style, color, eff
         _position_x = 0,
         _position_y = 0,
         _n_visible_chars = POSITIVE_INFINITY,
-        _character_widths = {}
-    }, rt.AnimatedDrawable)
+        _character_widths = {},
+        _character_offsets = {},
+        _effects_data = {}
+    }, rt.Drawable, rt.Animation)
 
     for _, effect in pairs(effects) do
         meta.assert_enum(effect, rt.TextEffect)
         out._effects[effect] = true
-        out:set_is_animated(true)
     end
-
     out:_update()
     return out
 end)
@@ -61,6 +60,22 @@ function rt.Glyph:_update()
 
     if not sizeof(self._character_widths) == 0 then
         self:_initialize_character_widths()
+    end
+
+    self:set_is_animated(sizeof(self._effects) > 0)
+
+    if self._effects[rt.TextEffect.RAINBOW] == true then
+        self._effects_data.rainbow = {}
+        for i = 1, #self._content do
+            self._effects_data.rainbow[i] = rt.RGBA(1, 1, 1, 1)
+        end
+    end
+
+    if self._effects[rt.TextEffect.WAVE] == true or self._effects[rt.TextEffect.SHAKE] then
+        self._effects_data.offsets = {}
+        for i = 1, #self._content do
+            self._effects_data.offsets[i] = rt.Vector2(0, 0)
+        end
     end
 end
 
@@ -115,16 +130,16 @@ function rt.Glyph:_non_animated_draw()
     love.graphics.setColor(old_r, old_g, old_b, old_a)
 end
 
-rt.SETTINGS.glyph = {}
-rt.SETTINGS.glyph.rainbow_width = 15    -- n characters
+rt.settings.glyph = {}
+rt.settings.glyph.rainbow_width = 15    -- n characters
 
-rt.SETTINGS.glyph.shake_offset = 6      -- px
-rt.SETTINGS.glyph.shake_period = 15     -- shakes per second
+rt.settings.glyph.shake_offset = 6      -- px
+rt.settings.glyph.shake_period = 15     -- shakes per second
 
-rt.SETTINGS.glyph.wave_period = 10      -- n chars
-rt.SETTINGS.glyph.wave_function = function(x) return math.sin((x * 4 * math.pi) / (2 * rt.SETTINGS.glyph.wave_period)) end
-rt.SETTINGS.glyph.wave_offset = 10      -- px
-rt.SETTINGS.glyph.wave_speed = 0.2      -- cycles per second
+rt.settings.glyph.wave_period = 10      -- n chars
+rt.settings.glyph.wave_function = function(x) return math.sin((x * 4 * math.pi) / (2 * rt.settings.glyph.wave_period)) end
+rt.settings.glyph.wave_offset = 10      -- px
+rt.settings.glyph.wave_speed = 0.2      -- cycles per second
 
 --- @brief update animated glyph
 --- @param delta Number microseconds
@@ -135,7 +150,7 @@ function rt.Glyph:update(delta)
     self._elapsed_time = self._elapsed_time + delta
 end
 
---- @brief [internal] draw glyph with _is_animated = true, much less performant
+--- @brief [internal] draw glyph animation , much less performant
 function rt.Glyph:_animated_draw()
 
     if sizeof(self._character_widths) == 0 then
@@ -151,30 +166,27 @@ function rt.Glyph:_animated_draw()
 
     local w = 0
     for i = 1, #self._content do
+
+        if i > self._n_visible_chars then break end
+
         w = self._character_widths[i]
         local scissor = rt.AABB(x, y, w, h)
         local color = self._color
 
         if self._effects[rt.TextEffect.RAINBOW] == true then
-            color = rt.hsva_to_rgba(rt.HSVA(math.fmod((i / rt.SETTINGS.glyph.rainbow_width) + self._elapsed_time, 1), 1, 1, 1))
+            color = self._effects_data.rainbow[i]
         end
 
-        local x_offset = 0
-        local y_offset = 0
-        if self._effects[rt.TextEffect.WAVE] == true then
-            y_offset = y_offset + rt.SETTINGS.glyph.wave_function((self._elapsed_time / rt.SETTINGS.glyph.wave_speed) + i) * rt.SETTINGS.glyph.wave_offset
+        local offset = rt.Vector2(0, 0)
+
+        if self._effects[rt.TextEffect.WAVE] == true or self._effects[rt.TextEffect.SHAKE] == true then
+            offset = self._effects_data.offsets[i]
         end
 
-        if self._effects[rt.TextEffect.SHAKE] == true then
-            local i_offset = math.round(self._elapsed_time / (1 / rt.SETTINGS.glyph.shake_period))
-            x_offset = x_offset + rt.rand(i + i_offset) * rt.SETTINGS.glyph.shake_offset
-            y_offset = y_offset + rt.rand(i + i_offset + 4294967297 ) * rt.SETTINGS.glyph.shake_offset -- + 2^32+1
-        end
-
-        love.graphics.setScissor(scissor.x + x_offset, scissor.y + y_offset, scissor.width, scissor.height)
+        love.graphics.setScissor(scissor.x + offset.x, scissor.y + offset.y, scissor.width, scissor.height)
         love.graphics.setColor(color.r, color.g, color.b, color.a)
         local pos_x, pos_y = self:get_position()
-        self:render(self._glyph, pos_x + x_offset, pos_y + y_offset)
+        self:render(self._glyph, pos_x + offset.x, pos_y + offset.y)
         x = x + w
     end
 
@@ -188,10 +200,42 @@ function rt.Glyph:draw()
     meta.assert_isa(self, rt.Glyph)
     if not self:get_is_visible() then return end
 
-    if self._is_animated then
+    if self:get_is_animated() then
         self:_animated_draw()
     else
         self:_non_animated_draw()
+    end
+end
+
+--- @overload rt.Animation.update
+function rt.Glyph:update(delta)
+    self._elapsed_time = self._elapsed_time + delta
+    for i = 1, #self._content do
+
+        local x_offset = 0
+        local y_offset = 0
+        local use_offset = false
+
+        if self._effects[rt.TextEffect.RAINBOW] then
+            self._effects_data.rainbow[i] = rt.hsva_to_rgba(rt.HSVA(math.fmod((i / rt.settings.glyph.rainbow_width) + self._elapsed_time, 1), 1, 1, 1))
+            local col = self._effects_data.rainbow[i]
+        end
+
+        if self._effects[rt.TextEffect.WAVE] == true then
+            y_offset = y_offset + rt.settings.glyph.wave_function((self._elapsed_time / rt.settings.glyph.wave_speed) + i) * rt.settings.glyph.wave_offset
+            use_offset = true
+        end
+
+        if self._effects[rt.TextEffect.SHAKE] == true then
+            local i_offset = math.round(self._elapsed_time / (1 / rt.settings.glyph.shake_period))
+            x_offset = x_offset + rt.rand(i + i_offset) * rt.settings.glyph.shake_offset
+            y_offset = y_offset + rt.rand(i + i_offset + 4294967297) * rt.settings.glyph.shake_offset -- + 2^32+1
+            use_offset = true
+        end
+
+        if use_offset then
+            self._effects_data.offsets[i] = rt.Vector2(x_offset, y_offset)
+        end
     end
 end
 
@@ -289,3 +333,9 @@ function rt.Glyph:get_n_visible_characters()
     meta.assert_isa(self, rt.Glyph)
     return clamp(self._n_visible_chars, 0, self:get_n_characters())
 end
+
+--- @brief [internal] test glyph
+function rt.test.glyph()
+    -- TODO
+end
+rt.test.glyph()

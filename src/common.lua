@@ -97,6 +97,22 @@ function ternary(condition, if_true, if_false)
     end
 end
 
+--- @brief try-catch
+--- @param to_try function
+--- @param on_fail function
+function try_catch(to_try, on_fail)
+    local status, out = pcall(to_try)
+    if status == true then
+        return out
+    else
+        if type(on_fail) == "nil" then
+            return nil
+        else
+            return on_fail(out)
+        end
+    end
+end
+
 --- @brief make first letter in word capitalized
 
 SERIALIZE_DEPTH = POSITIVE_INFINITY
