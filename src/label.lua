@@ -14,25 +14,9 @@ rt.Label = meta.new_type("Label", function(text)
         _font = rt.Font.DEFAULT,
         _justify_mode = rt.JustifyMode.LEFT,
         _glyphs = {},
-        _n_characters = 0,
-        _debug = rt.Rectangle(0, 0, 1, 1),
-        _is_animated = false
+        _n_characters = 0
     }, rt.Widget, rt.Drawable)
     out:_parse()
-
-    out._animation_timer:signal_connect("tick", function(_, value, self)
-        local delta = love.timer.getDelta()
-        for _, glyph in pairs(self._glyphs) do
-            if meta.isa(glyph, rt.Glyph) then
-                glyph:update(delta)
-            end
-        end
-    end, out)
-    out._animation_timer:play()
-
-    out._debug:set_is_outline(true)
-    out._debug:set_color(rt.RGBA(1, 0, 1, 1))
-    out._debug:set_line_width(1)
     return out
 end)
 
@@ -46,7 +30,6 @@ function rt.Label:draw()
             glyph:draw()
         end
     end
-    self._debug:draw()
 end
 
 --- @overload rt.Widget.size_allocate
@@ -181,7 +164,6 @@ function rt.Label:measure()
         end
     end
 
-    self._debug:resize(rt.AABB(min_x, min_y, max_x - min_x, max_y - min_y))
     return max_x - min_x, max_y - min_y
 end
 
@@ -245,9 +227,7 @@ function rt.Label:_parse()
         if effect_shake then table.insert(effects, rt.TextEffect.SHAKE) end
         if effect_wave then table.insert(effects, rt.TextEffect.WAVE) end
 
-        local to_push = rt.Glyph(self._font, current_word, style, rt.Palette[color], effects)
-        to_push:set_is_animated(self._is_animated)
-        table.insert(self._glyphs, to_push)
+        table.insert(self._glyphs, rt.Glyph(self._font, current_word, style, rt.Palette[color], effects))
         self._n_characters = self._n_characters + #current_word
         current_word = ""
     end

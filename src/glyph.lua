@@ -41,10 +41,12 @@ rt.Glyph = meta.new_type("Glyph", function(font, content, font_style, color, eff
         _position_y = 0,
         _n_visible_chars = POSITIVE_INFINITY,
         _character_widths = {}
-    }, rt.Drawable)
+    }, rt.AnimatedDrawable)
 
     for _, effect in pairs(effects) do
-       out._effects[effect] = true
+        meta.assert_enum(effect, rt.TextEffect)
+        out._effects[effect] = true
+        out:set_is_animated(true)
     end
 
     out:_update()
@@ -286,18 +288,4 @@ end
 function rt.Glyph:get_n_visible_characters()
     meta.assert_isa(self, rt.Glyph)
     return clamp(self._n_visible_chars, 0, self:get_n_characters())
-end
-
---- @brief get whether the glyph should animate text effects
---- @return Boolean
-function rt.Glyph:get_is_animated()
-    meta.assert_isa(self, rt.Glyph)
-    return self._is_animated
-end
-
---- @brief set whether the glyph should be animated
---- @param b Boolean
-function rt.Glyph:set_is_animated(b)
-    meta.assert_isa(self, rt.Glyph)
-    self._is_animated = b
 end

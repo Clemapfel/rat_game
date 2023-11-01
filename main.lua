@@ -36,6 +36,7 @@ require "geometry"
 require "image"
 require "animation_timer"
 require "drawable"
+require "animated_drawable"
 require "texture"
 require "shape"
 require "vertex_shape"
@@ -82,11 +83,6 @@ window:set_child(label)
 n_chars = 0
 label:set_text("regular <color=RED_1>color</color> <b>bold</b> <i>italics</i> <b><i>bold_italic</i></b> <shake>SHAKE</shake> <wave>WAYWAVE</wave> <color=RED_1><rainbow>RAINBOW</rainbow></color>")
 
-for _, glyph in pairs(label._glyphs) do
-    if meta.isa(glyph, rt.Glyph) then
-        glyph:set_is_animated(false)
-    end
-end
 
 --label:set_text("regular <b><shake>bold</shake></b>||| <i>italics</i><b><i>bold_italic</i></b> <col=PURE_MAGENTA>color</col><b><i><col=BLUE_1>TEST</b>ABC</i>DEF</col>")
 
@@ -134,7 +130,13 @@ end
 --- @brief update tick
 function love.update()
     local delta = love.timer.getDelta()
-    rt.AnimationTimerHandler.update(delta)
+    if meta.is_nil(delta) then
+        println("test")
+        return
+    end
+
+    rt.AnimationTimerHandler:update(delta)
+    rt.AnimationHandler:update(delta)
 end
 
 --- @brief draw step

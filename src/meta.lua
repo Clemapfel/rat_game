@@ -43,7 +43,7 @@ function meta.is_function(x)
     end
 end
 
-meta.hash = 0
+meta._hash = 2^16
 
 --- @brief [internal] Create new empty object
 --- @param typename String
@@ -55,8 +55,8 @@ function meta._new(typename)
     metatable = out.__metatable
 
     metatable.__name = typename
-    metatable.__hash = meta.hash
-    meta.hash = meta.hash + 1
+    metatable.__hash = meta._hash
+    meta._hash = meta._hash + 1
     metatable.properties = {}
     metatable.is_mutable = true
     metatable.super = {}
@@ -582,4 +582,10 @@ function meta.declare_abstract_method(super, name)
     super[name] = function(self)
         error("[rt][ERROR] In " .. super.name .. "." .. name .. ": Abstract method called by object of type `" .. meta.typeof(self) .. "`")
     end
+end
+
+--- @brief hash object, each instance has a unique ID
+function meta.hash(x)
+    meta.assert_object(x)
+    return getmetatable(x)._hash
 end
