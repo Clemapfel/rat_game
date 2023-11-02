@@ -127,7 +127,7 @@ function rt.rgba_to_hsva(rgba)
         h = h + 360
     end
 
-    return HSVA(h / 360, s, v, a)
+    return rt.HSVA(h / 360, s, v, a)
 end
 
 --- @brief convert hsva to rgba
@@ -181,8 +181,20 @@ function rt.compare_rgba(c1, c2)
     return c1.r == c2.r and c1.g == c2.g and c1.b == c2.b and c1.a == c2.a
 end
 
+--- @brief compare colors
+--- @param c1 rt.HSVA
+--- @param c2 rt.HSVA
+--- @return Boolean
+function rt.compare_hsva(c1, c2)
+    rt.assert_hsva(c1)
+    rt.assert_hsva(c2)
+    local hue_matches = ternary(math.abs(c1.h - c2.h) == 1, true, c1.h == c2.h)
+    return hue_matches and c1.s == c2.s and c1.v == c2.v and c1.a == c2.a
+end
 
---- @brief
+--- @brief convert html hexadecimal to rgba
+--- @param code String "#RRGGBB(AA)"
+--- @return rt.RGBA
 function rt.html_code_to_color(code)
     meta.assert_string(code)
 
@@ -250,7 +262,10 @@ function rt.html_code_to_color(code)
     error("[rt][ERROR] In rt.html_code_to_rgba: `" .. code .. "` is not a valid hexadecimal color identifier. Reason: " .. error_reason)
 end
 
---- @brief
+--- @brief convert rgba to html color code
+--- @param rgba rt.RGBA
+--- @param use_alpha Boolean (or nil)
+--- @return String "#RRGGBB" or "#RRGGBBAA" if `use_alpha`
 function rt.color_to_html_code(rgba, use_alpha)
     rt.assert_rgba(rgba)
 
@@ -285,10 +300,17 @@ end
 
 --- @brief [internal] test colors
 function rt.test.colors()
-    -- TODO
-    local as_rgba = rt.html_code_to_color("#123456")
-    assert(rt.color_to_html_code(as_rgba) == "#123456")
-    as_rgba = rt.html_code_to_color("#ABCDEF")
-    assert(rt.color_to_html_code(as_rgba) == "#ABCDEF")
+    local rgba_from_string = rt.RGBA("#FF00FF")
+    local rgba_from_components = rt.RGBA(1, 0, 1, 1)
+    assert(rt.is_rgba(rgba_from_string))
+    assert(not rt.is_hsva(rgba_from_string))
+    assert(rt.compare_rgba(rgba_from_string, rgba_from_components))
+
+    local hsva = rt.HSVA(0.5, 1, 0.75, 1)
+    assert(rt.compare_hsva(hsva, rt.HSVA(0.5, 1, 0.75, 1)))
+    assert(not rt.is_rgba(hsva))
+    assert(not rt.compare_hsva(hsva, rt.HSVA(0, 1, 0, 1)))
+    assert(rt.compare_hsva(hsva, rt.rgba_to_hsva(rt.hsva_to_rgba(hsva))))
+    assert(rt.compare_hsva(rt.HSVA(1, 1, 1, 1), rt.HSVA(0, 1, 1, 1)))
 end
 rt.test.colors()
