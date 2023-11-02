@@ -11,9 +11,11 @@ rt.SpriteFrame = meta.new_type("SpriteFrame", function(spritesheet)
         _bottom = rt.Sprite(spritesheet, "bottom"),
         _bottom_left = rt.Sprite(spritesheet, "bottom_left"),
         _left = rt.Sprite(spritesheet, "left"),
-        _child = {}
+        _child = {},
+        _width = 30
     }, rt.Drawable, rt.Widget)
 
+    --[[
     out._top_left:set_expand(false)
     out._top_right:set_expand(false)
     out._bottom_left:set_expand(false)
@@ -27,6 +29,7 @@ rt.SpriteFrame = meta.new_type("SpriteFrame", function(spritesheet)
     out._left:set_expand_vertically(true)
     out._right:set_expand_horizontally(false)
     out._right:set_expand_vertically(true)
+    ]]--
 
     return out
 end)
@@ -89,10 +92,15 @@ function rt.SpriteFrame:size_allocate(x, y, width, height)
 
     local fw, fh = self._spritesheet:get_frame_size("top_left")
 
+    if self._width ~= 0 then
+        fw = self._width
+        fh = self._width
+    end
+
     self._top_left:fit_into(rt.AABB(x, y, fw, fh))
     self._top:fit_into(rt.AABB(x + fw, y, width - 2 * fw, fh))
     self._top_right:fit_into(rt.AABB(x + width - fw, y, fw, fh))
-    self._right:fit_into(rt.AABB(x + width - fw, y + fh, fw, height))
+    self._right:fit_into(rt.AABB(x + width - fw, y + fh, fw, height - 2 * fh))
     self._bottom_right:fit_into(rt.AABB(x + width - fw, y + height - fh, fw, fh))
     self._bottom:fit_into(rt.AABB(x + fw, y + height - fh, width - 2 * fw, fh))
     self._bottom_left:fit_into(rt.AABB(x, y + height - fh, fw, fh))
@@ -127,6 +135,13 @@ function rt.SpriteFrame:realize()
     if meta.isa(self._child, rt.Widget) then
         self._child:realize()
     end
+end
+
+--- @param width Number in px, or 0 for default width
+function rt.Spritesheet:set_width(number)
+    meta.assert_number(number)
+    self._width = number
+    self:reformat()
 end
 
 --- @brief multiple color of frame sprites
