@@ -45,12 +45,15 @@ rt.Spritesheet = meta.new_type("Spritesheet", function(path, id)
         animations[name] = {1, n_frames}
     end
 
-    local frame_to_name = {}
+    -- expand shorthand
     for id, frames in pairs(animations) do
         if meta.is_number(frames) then
-            frames = {frames, frames}
+            animations[id] = {frames, frames}
         end
+    end
 
+    local frame_to_name = {}
+    for id, frames in pairs(animations) do
         if not (#frames == 2 and meta.is_number(frames[1]) and meta.is_number(frames[1])) and frames[2] >= frames[1] then
             error("[rt][ERROR] In Spritesheet:create_from_file: Spritesheet `" .. id .. "`: frame range `{" .. tostring(frames[1]) .. ", " .. tostring(frames[2]) .. "} for animation `" .. id .. "` is malformed")
         end
@@ -120,6 +123,7 @@ end
 --- @return (Number, Number)
 function rt.Spritesheet:get_frame_size(animation_id)
     meta.assert_isa(self, rt.Spritesheet)
+    meta.assert_string(animation_id)
     self:_assert_has_animation("Spritesheet.get_frame_size", animation_id)
     return self._frame_width, self._frame_height
 end
@@ -129,6 +133,7 @@ end
 --- @return Number
 function rt.Spritesheet:get_n_frames(animation_id)
     meta.assert_isa(self, rt.Spritesheet)
+    meta.assert_string(animation_id)
     self:_assert_has_animation("Spritesheet.get_n_frames", animation_id)
     local start_end = self._name_to_frame[animation_id]
     return start_end[2] - start_end[1] + 1

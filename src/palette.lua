@@ -24,7 +24,7 @@ rt.Palette = {
     RED_2 = rt.RGBA("#cf0018"),
     RED_3 = rt.RGBA("#9c001a"),
     RED_4 = rt.RGBA("#6c0012"),
-    RED_5 = rt.RGBA("#43000b"),
+    RED_5 = rt.RGBA("#43000b"), -- dark red
 
     LIGHT_BLUE_1 = rt.RGBA("#79eaff"),
     LIGHT_BLUE_2 = rt.RGBA("#00d6fe"), -- light blue
@@ -63,7 +63,7 @@ rt.Palette = {
     ORANGE_3 = rt.RGBA("#ce6300"),
 
     BROWN_1 = rt.RGBA("#914803"),
-    BROWN_2 = rt.RGBA("#693100"),
+    BROWN_2 = rt.RGBA("#693100"), -- brown
     BROWN_3 = rt.RGBA("#4c2300"),
     BROWN_4 = rt.RGBA("#2f1600"),
 
@@ -80,7 +80,7 @@ rt.Palette = {
     WHITE = rt.RGBA("#fafaff"),
     GREY_1 = rt.RGBA("#dcdce1"),
     GREY_2 = rt.RGBA("#c0c0c5"),
-    GREY_3 = rt.RGBA("#a0a0a7"),
+    GREY_3 = rt.RGBA("#a0a0a7"), -- grey
     GREY_4 = rt.RGBA("#737378"),
     GREY_5 = rt.RGBA("#404045"),
     GREY_6 = rt.RGBA("#202025"),
@@ -95,6 +95,17 @@ rt.Palette = {
     PURE_MAGENTA = rt.RGBA("#ff00ff"),
     PURE_BLACK = rt.RGBA("#000000")
 }
+
+rt.Palette.GREEN = rt.Palette.GREEN_1
+rt.Palette.RED = rt.Palette.RED_1
+rt.Palette.BLUE = rt.Palette.BLUE_4
+rt.Palette.PINK = rt.Palette.PINK_2
+rt.Palette.PURPLE = rt.Palette.PURPLE_3
+rt.Palette.LILAC = rt.Palette.LILAC_3
+rt.Palette.YELLOW = rt.Palette.YELLOW_2
+rt.Palette.ORANGE = rt.Palette.ORANGE_1
+rt.Palette.BROWN = rt.Palette.BROWN_2
+rt.Palette.GREY = rt.Palette.GREY_3
 
 rt.Palette.BACKGROUND = rt.Palette.GREY_5
 rt.Palette.BACKGROUND_OUTLINE = rt.Palette.BLACK
@@ -214,6 +225,16 @@ function rt.Palette:export()
     love.filesystem.remove("palette.png")
     println("[rt][LOG] Exported palette to " .. to)
 end
+
+rt._PaletteMetatable = {
+    __index = function(self, key)
+        error("In Palette:__index: No color with name `" .. key .. "` in rt.Palette")
+    end,
+    __newindex = function(self, key, new_value)
+        error("In Palette:__new_index: No color with name `" .. key .. "` in rt.Palette")
+    end
+}
+setmetatable(rt.Palette, rt._PaletteMetatable)
 
 --- @brief [internal] test palette
 function rt.test.palette()

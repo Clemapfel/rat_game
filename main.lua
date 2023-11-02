@@ -50,6 +50,7 @@ require "scrollbar"
 require "viewport"
 require "sprite"
 require "animated_sprite"
+require "sprite_frame"
 
 require "test"
 
@@ -79,7 +80,11 @@ sprite = rt.Sprite(spritesheet)
 sprite:set_should_loop(true)
 sprite:set_is_animated(true)
 sprite:set_expand(false)
-window:set_child(sprite)
+
+frame = rt.SpriteFrame(rt.Spritesheet("assets/sprites", "test_frame"))
+frame:set_child(sprite)
+frame:set_color(rt.Palette.YELLOW)
+window:set_child(frame)
 
 --window:set_child(rt.Label("<wave>WAVE</wave>"))
 

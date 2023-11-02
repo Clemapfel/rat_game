@@ -173,6 +173,13 @@ function rt.Sprite:get_should_loop()
     return self._should_loop
 end
 
+--- @brief set color, multiplied with texture
+--- @param color rt.RGBA (or rt.HSVA)
+function rt.Sprite:set_color(color)
+    meta.assert_isa(self, rt.Sprite)
+    self._shape:set_color(color)
+end
+
 --- @brief test sprite
 function rt.test.sprite()
     -- TODO
