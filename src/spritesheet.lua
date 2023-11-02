@@ -71,11 +71,9 @@ rt.Spritesheet = meta.new_type("Spritesheet", function(path, id)
         _config_path = config_path,
         _image_path = image_path,
         _name_to_frame = animations,
-        _frame_to_name = frame_to_name,
         _frame_width = width,
         _frame_height = height,
         _n_frames = n_frames,
-        _valid = error_occurred,
         _native = image
     }, rt.Texture)
 
@@ -83,7 +81,6 @@ rt.Spritesheet = meta.new_type("Spritesheet", function(path, id)
 
     out:set_scale_mode(rt.TextureScaleMode.NEAREST)
     out:set_wrap_mode(rt.TextureWrapMode.REPEAT)
-
     return out
 end)
 
@@ -104,52 +101,45 @@ end
 --- @param animation_id String
 --- @param index_maybe Number
 --- @return rt.AxisAlignedRectangle
-function rt.Spritesheet:get_frame(animation_id_or_index, index_maybe)
+function rt.Spritesheet:get_frame(animation_id, index_maybe)
     meta.assert_isa(self, rt.Spritesheet)
+    meta.assert_string(animation_id)
+    meta.assert_number(index_maybe)
+    self:_assert_has_animation("Spritesheet.get_frame", animation_id)
 
-    local i = 0
-    if meta.is_number(animation_id_or_index) then
-        meta.assert_nil(index_maybe)
-        i = animation_id_or_index
-
-        if i < 1 or i > self.n_frames then
-            error("[rt][ERROR] In rt.Spritesheet:get_frame: index `" .. tostring(i) .. "` is out of range for spritesheet with `" .. tostring(self.n_frames) .. "` frames")
-        end
-        return rt.AABB((i - 1) / self.n_frames, 0, 1 / self.n_frames, 1)
-    else
-        meta.assert_string(animation_id_or_index)
-        meta.assert_number(index_maybe)
-
-        local id = animation_id_or_index
-
-        self:_assert_has_animation("Spritesheet.get_frame", id)
-        local start_end = self._name_to_frame[id]
-        local i = (start_end[1] - 1) + (index_maybe - 1)
-        return rt.AABB(i / self._n_frames, 0, 1 / self._n_frames, 1)
-    end
+    local start_end = self._name_to_frame[animation_id]
+    local i = (start_end[1] - 1) + (index_maybe - 1)
+    return rt.AABB(i / self._n_frames, 0, 1 / self._n_frames, 1)
 end
 
 --- @brief get constant frame dimension for animation
---- @param animation_id String (or nil)
+--- @param animation_id String
+--- @return (Number, Number)
 function rt.Spritesheet:get_frame_size(animation_id)
     meta.assert_isa(self, rt.Spritesheet)
-    if meta.is_nil(animation_id) then
-        animation_id = self.name
-    end
     self:_assert_has_animation("Spritesheet.get_frame_size", animation_id)
     return self._frame_width, self._frame_height
 end
 
 --- @brief get number of frames for animation
---- @param animation_id String (or nil)
+--- @param animation_id String
+--- @return Number
 function rt.Spritesheet:get_n_frames(animation_id)
     meta.assert_isa(self, rt.Spritesheet)
-    if meta.is_nil(animation_id) then
-        animation_id = self.name
-    end
     self:_assert_has_animation("Spritesheet.get_n_frames", animation_id)
     local start_end = self._name_to_frame[animation_id]
     return start_end[2] - start_end[1] + 1
+end
+
+--- @brief list animation ids
+--- @return Table<String>
+function rt.Spritesheet:get_animation_ids()
+    meta.assert_isa(self, rt.Spritesheet)
+    local out = {}
+    for id, _ in pairs(self._name_to_frame) do
+        table.insert(out, id)
+    end
+    return out
 end
 
 --- @brief test spritesheet

@@ -53,7 +53,7 @@ require "animated_sprite"
 
 require "test"
 
-function try_connect_emmy_lua_debugger()
+function connect_emmy_lua_debugger()
     -- entry point for JetBrains IDE debugger
     package.cpath = package.cpath .. ';/home/clem/.local/share/JetBrains/CLion2023.2/EmmyLua/debugger/emmy/linux/?.so'
     local dbg = require('emmy_core')
@@ -64,8 +64,8 @@ function try_connect_emmy_lua_debugger()
         return nil -- exit
     end
 end
-try_catch(try_connect_emmy_lua_debugger)
-io.stdout:setvbuf("no") -- makes it so error message is printed to console immediately
+try_catch(connect_emmy_lua_debugger)
+io.stdout:setvbuf("no") -- makes it so love2d error message is printed to console immediately
 
 -- #############################
 
@@ -110,8 +110,8 @@ key:signal_connect("key_pressed", function(self, key)
 end)
 
 spritesheet = rt.Spritesheet("assets/sprites", "test_animation")
-sprite = rt.Sprite(spritesheet, "test_animation")
---window:set_child(sprite)
+sprite = rt.Sprite(spritesheet)
+window:set_child(sprite)
 
 --- @brief startup
 function love.load()
