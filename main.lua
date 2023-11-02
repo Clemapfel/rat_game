@@ -78,6 +78,7 @@ spritesheet = rt.Spritesheet("assets/sprites", "test_animation")
 sprite = rt.Sprite(spritesheet)
 sprite:set_should_loop(true)
 sprite:set_is_animated(true)
+sprite:set_expand(false)
 window:set_child(sprite)
 
 --window:set_child(rt.Label("<wave>WAVE</wave>"))

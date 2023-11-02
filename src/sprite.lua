@@ -75,6 +75,8 @@ function rt.Sprite:size_allocate(x, y, width, height)
     elseif x_align == rt.Alignment.END and y_align == rt.Alignment.END then
         self._shape:resize(x + w - w, y + h - h, w, h)
     end
+
+    self._shape:set_texture_rectangle(self._spritesheet:get_frame(self._animation_id, self._current_frame))
 end
 
 --- @overload rt.Widget.measure
@@ -174,4 +176,11 @@ end
 --- @brief test sprite
 function rt.test.sprite()
     -- TODO
+    --[[
+    spritesheet = rt.Spritesheet("assets/sprites", "test_animation")
+    sprite = rt.Sprite(spritesheet)
+    sprite:set_should_loop(true)
+    sprite:set_is_animated(true)
+    sprite:set_expand(false)
+    ]]
 end

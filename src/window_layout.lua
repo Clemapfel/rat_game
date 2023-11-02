@@ -23,7 +23,7 @@ end
 --- @param child rt.Widget
 function rt.WindowLayout:set_child(child)
     meta.assert_isa(self, rt.WindowLayout)
-    meta.assert_isa(self, rt.Widget)
+    meta.assert_isa(child, rt.Widget)
 
     if not meta.is_nil(self._child) and meta.isa(self._child, rt.Widget) then
         self._child:set_parent(nil)
