@@ -47,6 +47,10 @@ rt.Spritesheet = meta.new_type("Spritesheet", function(path, id)
 
     local frame_to_name = {}
     for id, frames in pairs(animations) do
+        if meta.is_number(frames) then
+            frames = {frames, frames}
+        end
+
         if not (#frames == 2 and meta.is_number(frames[1]) and meta.is_number(frames[1])) and frames[2] >= frames[1] then
             error("[rt][ERROR] In Spritesheet:create_from_file: Spritesheet `" .. id .. "`: frame range `{" .. tostring(frames[1]) .. ", " .. tostring(frames[2]) .. "} for animation `" .. id .. "` is malformed")
         end
