@@ -18,13 +18,14 @@ function rt.AnimationHandler:update(delta)
     local frame_length = 1 / rt.settings.animation.fps
     while elapsed >= frame_length do
         elapsed = elapsed - frame_length
+        local now = love.timer.getTime()
         if rt.settings.animation.enabled then
-            local delta = love.timer.getTime() - rt.AnimationHandler._last_update
+            local delta = now - rt.AnimationHandler._last_update
             for _, drawable in pairs(rt.AnimationHandler._components) do
                 drawable:update(delta)
             end
         end
-        rt.AnimationHandler._last_update = love.timer.getTime()
+        rt.AnimationHandler._last_update = now
     end
     rt.AnimationHandler._elapsed = elapsed
 end

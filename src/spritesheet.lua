@@ -1,5 +1,3 @@
-rt.DEFAULT_ANIMATION_FPS = 24
-
 --- @class rt.Spritesheet
 --- @param path String path prefix, not absolute path
 --- @param id String spritsheet ID, expects <ID>.png and <ID>.lua to be in `path`
@@ -31,7 +29,7 @@ rt.Spritesheet = meta.new_type("Spritesheet", function(path, id)
     meta.assert_number(width, height)
 
     local fps = config.fps
-    if meta.is_nil(fps) then fps = rt.DEFAULT_ANIMATION_FPS end
+    if meta.is_nil(fps) then fps = 24 end
     meta.assert_number(fps)
 
     local image_width = image:getWidth()
@@ -74,7 +72,8 @@ rt.Spritesheet = meta.new_type("Spritesheet", function(path, id)
         _frame_width = width,
         _frame_height = height,
         _n_frames = n_frames,
-        _native = image
+        _native = image,
+        _fps = fps
     }, rt.Texture)
 
     out.name = name
@@ -93,7 +92,7 @@ function rt.Spritesheet:_assert_has_animation(scope, animation_id)
     meta.assert_string(scope, animation_id)
     meta.assert_isa(self, rt.Spritesheet)
     if meta.is_nil(self._name_to_frame[animation_id]) then
-        error("[rt][ERROR] in rt." .. scope .. ": Spritesheet `" .. self.name .. "` has no animation with id `" .. id .. "`")
+        error("[rt][ERROR] in rt." .. scope .. ": Spritesheet `" .. self.name .. "` has no animation with id `" .. animation_id .. "`")
     end
 end
 
@@ -140,6 +139,12 @@ function rt.Spritesheet:get_animation_ids()
         table.insert(out, id)
     end
     return out
+end
+
+--- @brief get target fps
+function rt.Spritesheet:get_fps()
+    meta.assert_isa(self, rt.Spritesheet)
+    return self._fps
 end
 
 --- @brief test spritesheet

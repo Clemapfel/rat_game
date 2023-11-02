@@ -72,17 +72,15 @@ io.stdout:setvbuf("no") -- makes it so love2d error message is printed to consol
 rt.Font.DEFAULT_SIZE = 50
 rt.Font.DEFAULT = rt.load_font("Roboto", "assets/fonts/Roboto")
 rt.Font.DEFAULT_MONO = rt.load_font("DejaVuSansMono", "assets/fonts/DejaVuSansMono")
+
 window = rt.WindowLayout()
+spritesheet = rt.Spritesheet("assets/sprites", "test_animation")
+sprite = rt.Sprite(spritesheet)
+sprite:set_should_loop(true)
+sprite:set_is_animated(true)
+window:set_child(sprite)
 
-label = rt.Label("")
-label:set_justify_mode(rt.JustifyMode.LEFT)
-label:set_horizontal_alignment(rt.Alignment.CENTER)
-label:set_vertical_alignment(rt.Alignment.CENTER)
-label:set_font(rt.Font.DEFAULT_MONO)
-window:set_child(label)
-
-n_chars = 0
-label:set_text("<wave>WAVE</wave>")--regular <color=RED_1>color</color> <b>bold</b> <i>italics</i> <b><i>bold_italic</i></b> <shake>SHAKE</shake> <wave>WAYWAVE</wave> <color=RED_1><rainbow>RAINBOW</rainbow></color>")
+--window:set_child(rt.Label("<wave>WAVE</wave>"))
 
 key = rt.add_keyboard_controller(window)
 key:signal_connect("key_pressed", function(self, key)
@@ -90,11 +88,11 @@ key:signal_connect("key_pressed", function(self, key)
     if key == rt.KeyboardKey.ARROW_UP then
     elseif key == rt.KeyboardKey.ARROW_DOWN then
     elseif key == rt.KeyboardKey.ARROW_LEFT then
-        n_chars = n_chars - 1
-        label:set_n_visible_characters(n_chars)
+        local frame = clamp(sprite:get_frame() + 1, 1, sprite:get_n_frames())
+        sprite:set_frame(frame)
     elseif key == rt.KeyboardKey.ARROW_RIGHT then
-        n_chars = n_chars + 1
-        label:set_n_visible_characters(n_chars)
+        local frame = clamp(sprite:get_frame() - 1, 1, sprite:get_n_frames())
+        sprite:set_frame(frame)
     elseif key == rt.KeyboardKey.PLUS then
     elseif key == rt.KeyboardKey.MINUS then
     elseif key == rt.KeyboardKey.SPACE then
@@ -108,10 +106,6 @@ key:signal_connect("key_pressed", function(self, key)
         end
     end
 end)
-
-spritesheet = rt.Spritesheet("assets/sprites", "test_animation")
-sprite = rt.Sprite(spritesheet)
-window:set_child(sprite)
 
 --- @brief startup
 function love.load()

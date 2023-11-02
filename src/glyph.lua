@@ -141,15 +141,6 @@ rt.settings.glyph.wave_function = function(x) return math.sin((x * 4 * math.pi) 
 rt.settings.glyph.wave_offset = 10      -- px
 rt.settings.glyph.wave_speed = 0.2      -- cycles per second
 
---- @brief update animated glyph
---- @param delta Number microseconds
-function rt.Glyph:update(delta)
-    meta.assert_isa(self, rt.Glyph)
-    meta.assert_number(delta)
-
-    self._elapsed_time = self._elapsed_time + delta
-end
-
 --- @brief [internal] draw glyph animation , much less performant
 function rt.Glyph:_animated_draw()
 
