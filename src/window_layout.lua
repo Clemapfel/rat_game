@@ -91,4 +91,4 @@ end
 function rt.test.bin_layout()
     -- TODO
 end
-rt.test.bin_layout()
+

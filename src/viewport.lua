@@ -214,4 +214,3 @@ end
 function rt.test.viewport()
     -- TODO
 end
-rt.test.viewport()

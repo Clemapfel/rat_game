@@ -112,4 +112,3 @@ end
 function rt.test.texture()
     -- TODO
 end
-rt.test.texture()

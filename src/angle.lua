@@ -63,7 +63,7 @@ function rt.Angle:as_radians()
     return self._rads
 end
 
---- @brief [internal]
+--- @brief [internal] test angle
 function rt.test.angle()
     local dgs = 180
     local rads = rt.degrees_to_radians(dgs)
@@ -75,4 +75,3 @@ function rt.test.angle()
     assert(angle_dgs:as_degrees() == dgs)
     assert(angle_rads:as_radians() == rads)
 end
-rt.test.angle()

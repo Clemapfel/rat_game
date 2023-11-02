@@ -197,4 +197,3 @@ end
 function rt.test.list_layout()
     -- TODO
 end
-rt.test.list_layout()

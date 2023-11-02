@@ -135,3 +135,8 @@ end
 function rt.Button:get_child()
     return self._child
 end
+
+--- @brief [internal] test button
+function rt.test.button()
+    -- TODO
+end

@@ -59,3 +59,8 @@ function rt.Animation:set_is_animated(b)
         rt.AnimationHandler._components[meta.hash(self)] = nil
     end
 end
+
+--- @brief [internal] test animation
+function rt.test.animation()
+    -- TODO
+end

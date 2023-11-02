@@ -1,5 +1,6 @@
 --- @module meta Introspection and basic type sytem
 meta = {}
+meta.types = {}
 
 --- @brief is x a lua string?
 --- @param x any
@@ -473,10 +474,10 @@ function meta.new_type(typename, ctor, dtor)
         return out
     end
 
-    if not meta.is_nil(meta[typename]) then
+    if not meta.is_nil(meta.types[typename]) then
         error("[rt][ERROR] In meta.new_type: A type with name `" .. typename .. "` already exists.")
     end
-    meta[typename] = out
+    meta.types[typename] = out
     return out
 end
 

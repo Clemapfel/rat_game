@@ -98,4 +98,3 @@ end
 function rt.test.image()
     -- TODO
 end
-rt.test.image()

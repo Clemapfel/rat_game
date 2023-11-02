@@ -139,4 +139,3 @@ end
 function rt.test.gamepad_controller()
     -- TODO
 end
-rt.test.gamepad_controller()

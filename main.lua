@@ -51,6 +51,8 @@ require "viewport"
 require "sprite"
 require "animated_sprite"
 
+require "test"
+
 function try_connect_emmy_lua_debugger()
     -- entry point for JetBrains IDE debugger
     package.cpath = package.cpath .. ';/home/clem/.local/share/JetBrains/CLion2023.2/EmmyLua/debugger/emmy/linux/?.so'
@@ -109,7 +111,7 @@ end)
 
 spritesheet = rt.Spritesheet("assets/sprites", "test_animation")
 sprite = rt.Sprite(spritesheet, "test_animation")
-window:set_child(sprite)
+--window:set_child(sprite)
 
 --- @brief startup
 function love.load()

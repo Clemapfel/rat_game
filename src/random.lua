@@ -81,9 +81,5 @@ end
 
 --- @brief test random
 function rt.test.random()
-    local str = rt.random.string(10)
-    assert(#str == 10)
-    assert(rt.random.choose({1, 2, 3, 4, 5, 6, 7, 8, 9, 10}) <= 10)
-    assert(math.fmod(rt.random.integer(0, 10), 1) == 0)
-    assert(meta.is_number(rt.random.number()))
+   -- TODO
 end

@@ -218,4 +218,3 @@ end
 --- @brief [internal] test palette
 function rt.test.palette()
 end
-rt.test.palette()

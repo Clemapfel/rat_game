@@ -65,4 +65,3 @@ end
 function rt.test.spacer()
     -- TODO
 end
-rt.test.spacer()

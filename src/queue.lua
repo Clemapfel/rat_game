@@ -129,6 +129,6 @@ function rt.test.queue()
     assert(back == "back")
     assert(queue:is_empty())
 end
-rt.test.queue()
+
 
 

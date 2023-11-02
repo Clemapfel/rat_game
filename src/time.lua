@@ -110,4 +110,3 @@ end
 function rt.test.time()
     -- TODO
 end
-rt.test.time()

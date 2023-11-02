@@ -160,4 +160,3 @@ end
 function rt.test.split_layout()
     -- TODO
 end
-rt.test.split_layout()

@@ -268,7 +268,7 @@ function rt.SignalEmitter:signal_get_handler_ids(name)
 end
 
 --- @brief [internal] test signal component
-rt.test.signal_component = function()
+function rt.test.signals()
     local instance = meta._new("Object")
     meta._install_property(instance, "property", 1234)
     local signal = "test"
@@ -298,4 +298,4 @@ rt.test.signal_component = function()
     component:emit(signal)
     assert(not called)
 end
-rt.test.signal_component()
+

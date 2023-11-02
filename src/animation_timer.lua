@@ -182,4 +182,3 @@ end
 function rt.test.test_animation()
     -- TODO
 end
-rt.test.test_animation()

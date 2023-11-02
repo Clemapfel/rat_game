@@ -128,4 +128,4 @@ end
 function rt.test.test_mouse_controller()
     -- TODO
 end
-rt.test.test_mouse_controller()
+

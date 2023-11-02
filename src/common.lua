@@ -34,6 +34,11 @@ function println(...)
     io.flush()
 end
 
+--- @brief print to stderr
+--- @param str string
+function printerr(str)
+end
+
 --- @brief get number of elements in arbitrary object
 --- @param x any
 --- @return number
@@ -46,6 +51,8 @@ function sizeof(x)
         return n
     elseif type(x) == "string" then
         return #x
+    elseif type(x) == "nil" then
+        return 0
     else
         return 1
     end
@@ -113,10 +120,6 @@ function try_catch(to_try, on_fail)
     end
 end
 
---- @brief make first letter in word capitalized
-
-SERIALIZE_DEPTH = POSITIVE_INFINITY
-
 --- @brief convert arbitrary object to string
 --- @param id string
 --- @param object any
@@ -127,7 +130,7 @@ function serialize(object_identifier, object, inject_sourcecode)
         inject_sourcecode = false
     end
 
-    get_indent = function (n_indent_tabs)
+    local get_indent = function (n_indent_tabs)
 
         local tabspace = "    "
         local buffer = {""}
@@ -139,14 +142,14 @@ function serialize(object_identifier, object, inject_sourcecode)
         return table.concat(buffer)
     end
 
-    insert = function (buffer, ...)
+    local insert = function (buffer, ...)
 
         for i, value in pairs({...}) do
             table.insert(buffer, value)
         end
     end
 
-    get_source_code = function (func)
+    local get_source_code = function (func)
 
         local info = debug.getinfo(func);
 
@@ -216,7 +219,6 @@ function serialize(object_identifier, object, inject_sourcecode)
 
         return table.concat(str_buffer)
     end
-
 
     serialize_inner = function (buffer, object, n_indent_tabs, seen)
 

@@ -88,4 +88,3 @@ end
 function rt.test.overlay_layout()
     -- TODO
 end
-rt.test.overlay_layout()

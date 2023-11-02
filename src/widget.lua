@@ -429,4 +429,3 @@ end
 function rt.test.test_widget()
     -- TODO
 end
-rt.test.test_widget()

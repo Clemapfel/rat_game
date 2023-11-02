@@ -127,4 +127,3 @@ end
 function rt.test.geometry()
     -- TODO
 end
-rt.test.geometry()

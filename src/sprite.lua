@@ -134,4 +134,3 @@ end
 function rt.test.sprite()
     -- TODO
 end
-rt.test.sprite()

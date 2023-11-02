@@ -216,4 +216,3 @@ end
 function rt.test.vertex_shape()
     -- TODO
 end
-rt.test.vertex_shape()

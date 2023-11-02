@@ -313,4 +313,3 @@ function rt.test.colors()
     assert(rt.compare_hsva(hsva, rt.rgba_to_hsva(rt.hsva_to_rgba(hsva))))
     assert(rt.compare_hsva(rt.HSVA(1, 1, 1, 1), rt.HSVA(0, 1, 1, 1)))
 end
-rt.test.colors()

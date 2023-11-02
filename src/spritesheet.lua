@@ -156,4 +156,3 @@ end
 function rt.test.spritesheet()
     -- TODO
 end
-rt.test.spritesheet()

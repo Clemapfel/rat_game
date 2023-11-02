@@ -173,4 +173,3 @@ function rt.test.test_vector()
         assert(a == a and b == b)
     end
 end
-rt.test.test_vector()

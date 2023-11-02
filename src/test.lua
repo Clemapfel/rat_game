@@ -52,4 +52,37 @@ function rt.test.common()
     assert(math.round(0.5 - 1 / 2^32) == 0)
     assert(math.round(0.5 + 1 / 2^32) == 1)
 end
-rt.test.common()
+
+--- @brief [internal] test meta
+function rt.test.meta()
+    assert(meta.is_string("abc"))
+    assert(meta.is_string(""))
+    assert(not meta.is_string(nil))
+
+    assert(meta.is_table({}))
+    assert(meta.is_table({1, 2, 3}))
+    assert(not meta.is_table(nil))
+
+    assert(meta.is_number(1234))
+    assert(meta.is_number(POSITIVE_INFINITY) and meta.is_number(NEGATIVE_INFINITY))
+    assert(meta.is_number(POSITIVE_INFINITY - POSITIVE_INFINITY))
+    assert(not meta.is_number(nil))
+
+    assert(meta.is_boolean(true))
+    assert(not meta.is_boolean(1) and not meta.is_boolean(0))
+    assert(not meta.is_boolean(nil))
+
+    assert(meta.is_function(function() end))
+    assert(not meta.is_function(nil))
+
+    -- TODO
+end
+
+-- run all tests
+for name, f in pairs(rt.test) do
+    if meta.is_function(f) then
+        try_catch(f, function(err)
+            println("[rt][ERROR] In rt.test." .. name .. ": Test Failed: " .. err)
+        end)
+    end
+end
