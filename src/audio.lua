@@ -1,3 +1,4 @@
+rt.settings.audio = {}
 rt.settings.audio.data_sample_rate = 44100
 rt.settings.audio.data_bit_depth = 16
 rt.settings.audio.data_n_channels = 1
@@ -8,9 +9,9 @@ rt.Audio = meta.new_type("Audio", function(filename_or_duration_or_n_samples)
     local native = {}
     local arg = filename_or_duration_or_n_samples
     if meta.is_string(arg) then
-        native = love.audio.newSoundData(arg)
+        native = love.sound.newSoundData(arg)
     elseif meta.isa(arg, rt.Time) then
-        native = love.audio.newSoundData(
+        native = love.sound.newSoundData(
             arg:as_seconds() * rt.settings.audio.default_sample_rate,
             rt.settings.audio.default_sample_rate,
             rt.settings.audio.data_bit_depth,
@@ -18,7 +19,7 @@ rt.Audio = meta.new_type("Audio", function(filename_or_duration_or_n_samples)
         )
     else -- n samples
         meta.assert_number(arg)
-        native = love.audio.newSoundData(
+        native = love.sound.newSoundData(
             arg,
             rt.settings.audio.default_sample_rate,
             rt.settings.audio.data_bit_depth,
@@ -36,14 +37,14 @@ end)
 function rt.Audio:create_from_file(file)
     meta.assert_isa(self, rt.Audio)
     meta.assert_string(file)
-    self._native = love.audio.newSoundData(file)
+    self._native = love.sound.newSoundData(file)
 end
 
 --- @brief load from data
 --- @param duration_or_n_samples rt.Time (or Number)
 function rt.Audio:create(duration_or_n_samples)
     if meta.isa(duration_or_n_samples, rt.Time) then
-        self._native = love.audio.newSoundData(
+        self._native = love.sound.newSoundData(
             duration_or_n_samples:as_seconds() * rt.settings.audio.default_sample_rate,
             rt.settings.audio.default_sample_rate,
             rt.settings.audio.data_bit_depth,
@@ -51,7 +52,7 @@ function rt.Audio:create(duration_or_n_samples)
         )
     else
         meta.assert_number(duration_or_n_samples)
-        self._native = love.audio.newSoundData(
+        self._native = love.sound.newSoundData(
             duration_or_n_samples,
             rt.settings.audio.default_sample_rate,
             rt.settings.audio.data_bit_depth,

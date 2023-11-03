@@ -29,6 +29,8 @@ require "vertex_shape"
 require "spritesheet"
 require "font"
 require "glyph"
+require "audio"
+require "audio_playback"
 require "gamepad_controller"
 require "keyboard_controller"
 require "mouse_controller"
@@ -49,7 +51,6 @@ require "label"
 require "scrollbar"
 require "viewport"
 require "sprite"
-require "animated_sprite"
 require "sprite_frame"
 
 require "test"
@@ -81,6 +82,10 @@ sprite:set_should_loop(true)
 sprite:set_is_animated(true)
 sprite:set_expand(false)
 
+audio = rt.Audio("assets/sound/test_music.mp3")
+playback = rt.AudioPlayback(audio)
+playback._native:setVelocity(-1, 1, 0.5)
+
 frame = rt.SpriteFrame(rt.Spritesheet("assets/sprites", "test_frame"))
 frame:set_child(sprite)
 frame:set_color(rt.Palette.YELLOW)
@@ -96,20 +101,22 @@ key:signal_connect("key_pressed", function(self, key)
     elseif key == rt.KeyboardKey.ARROW_LEFT then
         local frame = clamp(sprite:get_frame() + 1, 1, sprite:get_n_frames())
         sprite:set_frame(frame)
+
+        local current = playback._native:getPitch()
+        playback._native:setPitch(current + 0.05)
+
     elseif key == rt.KeyboardKey.ARROW_RIGHT then
         local frame = clamp(sprite:get_frame() - 1, 1, sprite:get_n_frames())
         sprite:set_frame(frame)
+
+        local current = playback._native:getPitch()
+        playback._native:setPitch(current - 0.05)
+
     elseif key == rt.KeyboardKey.PLUS then
     elseif key == rt.KeyboardKey.MINUS then
     elseif key == rt.KeyboardKey.SPACE then
-        local current = label:get_justify_mode()
-        if current == rt.JustifyMode.LEFT then
-            label:set_justify_mode(rt.JustifyMode.CENTER)
-        elseif current == rt.JustifyMode.CENTER then
-            label:set_justify_mode(rt.JustifyMode.RIGHT)
-        elseif current == rt.JustifyMode.RIGHT then
-            label:set_justify_mode(rt.JustifyMode.LEFT)
-        end
+        playback:reset()
+        playback:play()
     end
 end)
 
