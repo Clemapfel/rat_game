@@ -330,7 +330,7 @@ function rt.Widget:set_parent(other)
 
     meta.assert_isa(other, rt.Widget)
     if not meta.is_nil(self._parent) then
-        println("[rt][WARNING] In Widget:set_parent: replacing parent of hild `" .. meta.typeof(self) .. "`, which already has a parent")
+        println("[rt][WARNING] In Widget:set_parent: replacing parent of child `" .. meta.typeof(self) .. "`, which already has a parent")
     end
 
     self._parent = other

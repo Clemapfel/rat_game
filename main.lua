@@ -26,6 +26,7 @@ require "animation"
 require "texture"
 require "shape"
 require "vertex_shape"
+require "shader"
 require "spritesheet"
 require "font"
 require "glyph"
@@ -80,17 +81,21 @@ spritesheet = rt.Spritesheet("assets/sprites", "test_animation")
 sprite = rt.Sprite(spritesheet)
 sprite:set_should_loop(true)
 sprite:set_is_animated(true)
-sprite:set_expand(false)
+sprite:set_expand(true)
+--sprite._shape:set_texture(nil)
+sprite:set_color(rt.RGBA(1, 0, 1, 1))
 
 audio = rt.Audio("assets/sound/test_music.mp3")
 playback = rt.AudioPlayback(audio)
-playback._native:setVelocity(-1, 1, 0.5)
 
 frame = rt.SpriteFrame(rt.Spritesheet("assets/sprites", "test_frame"))
 frame:set_child(sprite)
 frame:set_color(rt.Palette.YELLOW)
-window:set_child(frame)
+window:set_child(sprite)
 
+shader = love.graphics.newShader(rt.settings.default_fragment_shader) --"assets/shaders/mint_wave.glsl")
+love.graphics.setShader(shader)
+elapsed = 0
 --window:set_child(rt.Label("<wave>WAVE</wave>"))
 
 key = rt.add_keyboard_controller(window)
@@ -141,6 +146,11 @@ function love.update()
 
     rt.AnimationTimerHandler:update(delta)
     rt.AnimationHandler:update(delta)
+
+    -- TODO
+    elapsed = elapsed + delta
+    --shader:send("_time", elapsed)
+    -- TODO
 end
 
 --- @brief draw step

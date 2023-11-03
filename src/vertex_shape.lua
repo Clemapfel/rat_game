@@ -168,10 +168,13 @@ end
 --- @param texture rt.Texture
 function rt.VertexShape:set_texture(texture)
     meta.assert_isa(self, rt.VertexShape)
+
     if not meta.is_nil(texture) then
         meta.assert_isa(texture, rt.Texture)
+        self._native:setTexture(texture._native)
+    else
+        self._native:setTexture(nil)
     end
-    self._native:setTexture(texture._native)
 end
 
 --- @overload rt.Drawable.draw
