@@ -1,35 +1,30 @@
+rt.settings.sprite_frame = {
+    top_left_id = "top_left",
+    top_id = "top",
+    top_right_id = "top_right",
+    right_id = "right",
+    bottom_right_id = "bottom_right",
+    bottom_id = "bottom",
+    bottom_left_id = "bottom_left",
+    left_id = "left"
+}
+
 --- @class rt.SpriteFrame
 rt.SpriteFrame = meta.new_type("SpriteFrame", function(spritesheet)  
     meta.assert_isa(spritesheet, rt.Spritesheet)
     local out = meta.new(rt.SpriteFrame, {
         _spritesheet = spritesheet,
-        _top_left = rt.Sprite(spritesheet, "top_left"),
-        _top = rt.Sprite(spritesheet, "top"),
-        _top_right = rt.Sprite(spritesheet, "top_right"),
-        _right = rt.Sprite(spritesheet, "right"),
-        _bottom_right = rt.Sprite(spritesheet, "bottom_right"),
-        _bottom = rt.Sprite(spritesheet, "bottom"),
-        _bottom_left = rt.Sprite(spritesheet, "bottom_left"),
-        _left = rt.Sprite(spritesheet, "left"),
+        _top_left = rt.Sprite(spritesheet, rt.settings.sprite_frame.top_left_id),
+        _top = rt.Sprite(spritesheet, rt.settings.sprite_frame.top_id),
+        _top_right = rt.Sprite(spritesheet, rt.settings.sprite_frame.top_right_id),
+        _right = rt.Sprite(spritesheet, rt.settings.sprite_frame.right_id),
+        _bottom_right = rt.Sprite(spritesheet, rt.settings.sprite_frame.bottom_right_id),
+        _bottom = rt.Sprite(spritesheet, rt.settings.sprite_frame.bottom_id),
+        _bottom_left = rt.Sprite(spritesheet, rt.settings.sprite_frame.bottom_left_id),
+        _left = rt.Sprite(spritesheet, rt.settings.sprite_frame.left_id),
         _child = {},
         _width = 30
     }, rt.Drawable, rt.Widget)
-
-    --[[
-    out._top_left:set_expand(false)
-    out._top_right:set_expand(false)
-    out._bottom_left:set_expand(false)
-    out._bottom_right:set_expand(false)
-
-    out._top:set_expand_horizontally(true)
-    out._top:set_expand_vertically(false)
-    out._bottom:set_expand_horizontally(true)
-    out._bottom:set_expand_vertically(false)
-    out._left:set_expand_horizontally(false)
-    out._left:set_expand_vertically(true)
-    out._right:set_expand_horizontally(false)
-    out._right:set_expand_vertically(true)
-    ]]--
 
     return out
 end)
@@ -69,7 +64,7 @@ function rt.SpriteFrame:remove_child()
     end
 end
 
---- @overload rt.Drawable.draw
+--- @overload rt.e.draw
 function rt.SpriteFrame:draw()
     meta.assert_isa(self, rt.SpriteFrame)
     if self:get_is_visible() and meta.isa(self._child, rt.Widget) then
@@ -90,7 +85,7 @@ end
 function rt.SpriteFrame:size_allocate(x, y, width, height)
     meta.assert_isa(self, rt.SpriteFrame)
 
-    local fw, fh = self._spritesheet:get_frame_size("top_left")
+    local fw, fh = self._spritesheet:get_frame_size(rt.settings.sprite_frame.top_left_id)
 
     if self._width ~= 0 then
         fw = self._width
