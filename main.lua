@@ -53,6 +53,7 @@ require "scrollbar"
 require "viewport"
 require "sprite"
 require "sprite_frame"
+require "scale"
 
 require "test"
 
@@ -82,7 +83,7 @@ sprite = rt.Sprite(spritesheet)
 sprite:set_should_loop(true)
 sprite:set_is_animated(true)
 sprite:set_expand(true)
---sprite._shape:set_texture(nil)
+sprite._shape:set_texture(nil)
 sprite:set_color(rt.RGBA(1, 0, 1, 1))
 
 audio = rt.Audio("assets/sound/test_music.mp3")
@@ -93,10 +94,10 @@ frame:set_child(sprite)
 frame:set_color(rt.Palette.YELLOW)
 window:set_child(sprite)
 
-shader = love.graphics.newShader(rt.settings.default_fragment_shader) --"assets/shaders/mint_wave.glsl")
-love.graphics.setShader(shader)
-elapsed = 0
---window:set_child(rt.Label("<wave>WAVE</wave>"))
+scale_sheet = rt.Spritesheet("assets/sprites", "test_scale")
+scale = rt.Scale(scale_sheet, 0, 1, 0.5)
+scale:set_expand_vertically(false)
+window:set_child(scale)
 
 key = rt.add_keyboard_controller(window)
 key:signal_connect("key_pressed", function(self, key)
@@ -146,11 +147,6 @@ function love.update()
 
     rt.AnimationTimerHandler:update(delta)
     rt.AnimationHandler:update(delta)
-
-    -- TODO
-    elapsed = elapsed + delta
-    --shader:send("_time", elapsed)
-    -- TODO
 end
 
 --- @brief draw step

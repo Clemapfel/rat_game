@@ -90,6 +90,18 @@ function clamp(x, lower_bound, upper_bound)
     return x
 end
 
+--- @brief linear interpolate between two values
+--- @param lower number
+--- @param upper number
+--- @param ratio number in [0, 1]
+--- @return number
+function mix(lower, upper, ratio)
+    -- @see https://registry.khronos.org/OpenGL-Refpages/gl4/html/mix.xhtml
+    local x = math.min(lower, upper)
+    local y = math.max(lower, upper)
+    return x * (1 - ratio) + y * ratio
+end
+
 --- @brief ternary
 --- @param condition boolean
 --- @param if_true any returned if condition == true
@@ -333,7 +345,7 @@ function string.contains(str, pattern)
     return type(string.find(str, pattern)) ~= "nil"
 end
 
---- @brief hash string
+--- @brief map string to 64-bit signed integer
 --- @param str string
 --- @return number
 function string.hash(str)

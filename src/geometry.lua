@@ -39,7 +39,7 @@ rt.AABB = rt.AxisAlignedRectangle
 --- @brief get size
 --- @param self rt.AxisAlignedRectangle
 --- @return (Number, Number)
-function rt.AxisAlignedRectangle.get_size(self)
+function rt.AxisAlignedRectangle:get_size(self)
     meta.assert_isa(self, rt.AxisAlignedRectangle)
     return self.width, self.height
 end
@@ -47,7 +47,7 @@ end
 --- @brief get top left
 --- @param self rt.AxisAlignedRectangle
 --- @return (Number, Number)
-function rt.AxisAlignedRectangle.get_top_left(self)
+function rt.AxisAlignedRectangle:get_top_left(self)
     meta.assert_isa(self, rt.AxisAlignedRectangle)
     return self.x, self.y
 end
@@ -55,7 +55,7 @@ end
 --- @brief get top center
 --- @param self rt.AxisAlignedRectangle
 --- @return (Number, Number)
-function rt.AxisAlignedRectangle.get_top_center(self)
+function rt.AxisAlignedRectangle:get_top_center(self)
     meta.assert_isa(self, rt.AxisAlignedRectangle)
     return (self.x + 0.5 * self.width), self.x
 end
@@ -63,7 +63,7 @@ end
 --- @brief get top right
 --- @param self rt.AxisAlignedRectangle
 --- @return (Number, Number)
-function rt.AxisAlignedRectangle.get_top_right(self)
+function rt.AxisAlignedRectangle:get_top_right(self)
     meta.assert_isa(self, rt.AxisAlignedRectangle)
     return self.x + self.width, self.y
 end
@@ -71,7 +71,7 @@ end
 --- @brief get center left
 --- @param self rt.AxisAlignedRectangle
 --- @return (Number, Number)
-function rt.AxisAlignedRectangle.get_center_left(self)
+function rt.AxisAlignedRectangle:get_center_left(self)
     meta.assert_isa(self, rt.AxisAlignedRectangle)
     return self.x, self.y + self.height * 0.5
 end
@@ -79,7 +79,7 @@ end
 --- @brief get center center
 --- @param self rt.AxisAlignedRectangle
 --- @return (Number, Number)
-function rt.AxisAlignedRectangle.get_center(self)
+function rt.AxisAlignedRectangle:get_center(self)
     meta.assert_isa(self, rt.AxisAlignedRectangle)
     return self.x + self.width * 0.5, self.y + self.height * 0.5
 end
@@ -87,14 +87,14 @@ end
 --- @brief get center right
 --- @param self rt.AxisAlignedRectangle
 --- @return (Number, Number)
-function rt.AxisAlignedRectangle.get_center_right(self)
+function rt.AxisAlignedRectangle:get_center_right(self)
     meta.assert_isa(self, rt.AxisAlignedRectangle)
     return self.x + self.width, self.y + self.height * 0.5
 end
 
 --- @brief get bottom left
 --- @return (Number, Number)
-function rt.AxisAlignedRectangle.get_bottom_left(self)
+function rt.AxisAlignedRectangle:get_bottom_left(self)
     meta.assert_isa(self, rt.AxisAlignedRectangle)
     return self.x, self.y + self.height
 end
@@ -102,7 +102,7 @@ end
 --- @brief get bottom center
 --- @param self rt.AxisAlignedRectangle
 --- @return (Number, Number)
-function rt.AxisAlignedRectangle.get_bottom_center(self)
+function rt.AxisAlignedRectangle:get_bottom_center(self)
     meta.assert_isa(self, rt.AxisAlignedRectangle)
     return self.x + self.width * 0.5, self.y + self.height
 end
@@ -110,7 +110,7 @@ end
 --- @brief get bottom right
 --- @param self rt.AxisAlignedRectangle
 --- @return (Number, Number)
-function rt.AxisAlignedRectangle.get_bottom_right(self)
+function rt.AxisAlignedRectangle:get_bottom_right(self)
     meta.assert_isa(self, rt.AxisAlignedRectangle)
     return self.x + self.width, self.y + self.height
 end

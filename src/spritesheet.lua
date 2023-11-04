@@ -128,6 +128,26 @@ function rt.Spritesheet:get_frame_size(animation_id)
     return self._frame_width, self._frame_height
 end
 
+--- @brief get constant frame height
+--- @param animation_id String
+--- @return Number
+function rt.Spritesheet:get_frame_height(animation_id)
+    meta.assert_isa(self, rt.Spritesheet)
+    meta.assert_string(animation_id)
+    self:_assert_has_animation("Spritesheet.get_frame_size", animation_id)
+    return self._frame_height
+end
+
+--- @brief get constant frame width
+--- @param animation_id String
+--- @return Number
+function rt.Spritesheet:get_frame_width(animation_id)
+    meta.assert_isa(self, rt.Spritesheet)
+    meta.assert_string(animation_id)
+    self:_assert_has_animation("Spritesheet.get_frame_size", animation_id)
+    return self._frame_width
+end
+
 --- @brief get number of frames for animation
 --- @param animation_id String
 --- @return Number

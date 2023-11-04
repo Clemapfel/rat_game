@@ -51,6 +51,8 @@ meta._hash = 2^16
 function meta._new(typename)
     meta.assert_string(typename)
 
+    if #typename == 0 then error("") end
+
     local out = {}
     out.__metatable = {}
     metatable = out.__metatable
@@ -89,12 +91,12 @@ function meta._new(typename)
         return "(" .. getmetatable(this).__name .. ") " .. serialize(this)
     end
 
-    metatable.__name = metatable.__name
     metatable.__eq = function(self, other)
         meta.assert_object(other)
         return getmetatable(self).__hash == getmetatable(other).__hash
     end
     setmetatable(out, metatable)
+
     return out
 end
 
@@ -112,15 +114,10 @@ end
 --- @brief get typename identifier
 function meta.typeof(x)
     local out = ""
-    if not meta.is_table(x) then
-        out = type(x)
+    if meta.is_object(x) then
+        out = getmetatable(x).__name
     else
-        local metatable = getmetatable(x)
-        if meta.is_nil(metatable) then
-            out = meta.Table.name
-        else
-            out = getmetatable(x).__name
-        end
+        out = type(x)
     end
     return out
 end
@@ -132,7 +129,7 @@ function meta.isa(x, type)
 
     local typename = type
     if meta.typeof(type) == "Type" then
-        typename = type.name
+        typename = type._typename
     else
         typename = type
     end
@@ -158,7 +155,7 @@ function meta.inherits(x, super)
     meta.assert_isa(super, meta.Type)
 
     for _, name in pairs(getmetatable(x).super) do
-        if name == super.name then
+        if name == super._typename then
             return true
         end
     end
@@ -250,7 +247,7 @@ end
 --- @param x any
 function meta.assert_inherits(x, type)
     if meta.typeof(type) == "Type" then
-        meta._assert_aux(meta.inherits(x, type), x, type.name)
+        meta._assert_aux(meta.inherits(x, type), x, type._typename)
     else
         meta.assert_string(type)
         meta._assert_aux(meta.inherits(x, type), x, type)
@@ -338,7 +335,7 @@ function meta.new(type, fields, ...)
 
     local out = {}
     if meta.isa(type, meta.Type) then
-        out = meta._new(type.name)
+        out = meta._new(type._typename)
     else
         meta.assert_string(type)
         out = meta._new(type)
@@ -443,10 +440,10 @@ function meta._install_inheritance(instance, type)
     meta.assert_object(instance)
     meta.assert_isa(type, meta.Type)
 
-    table.insert(getmetatable(instance).super, type.name)
+    table.insert(getmetatable(instance).super, type._typename)
 
     for key, value in pairs(getmetatable(type).properties) do
-        if key ~= "name" and key ~= "is_abstract" and not meta.has_property(instance, key) then
+        if key ~= "_typename" and not meta.has_property(instance, key) then
             meta._install_property(instance, key, value)
         end
     end
@@ -462,13 +459,13 @@ function meta.new_type(typename, ctor, dtor)
     if not meta.is_nil(dtor) then meta.assert_function(dtor) end
 
     local out = meta._new("Type")
-    out.name = typename
-    out.is_abstract = false
+    local metatable = getmetatable(out)
+    out._typename = typename
 
-    getmetatable(out).__call = function(self, ...)
+    metatable.__call = function(self, ...)
         local out = ctor(...)
-        if not meta.isa(out, self.name) then
-            error("[rt][ERROR] In " .. self.name .. ".__call: Constructor does not return object of type `" .. self.name .. "`.")
+        if not meta.isa(out, self._typename) then
+            error("[rt][ERROR] In " .. self._typename .. ".__call: Constructor does not return object of type `" .. self._typename .. "`.")
         end
         getmetatable(out).__gc = dtor
         return out
@@ -498,7 +495,6 @@ function meta.new_abstract_type(name)
     local out = meta.new_type(name, function()
         error("[rt][ERROR] In " .. name .. "._call: Type `" .. name .. "` is abstract, it cannot be instanced")
     end)
-    out.is_abstract = true
     return out
 end
 
@@ -542,7 +538,7 @@ end)
 --- @param type meta.Type
 function meta.assert_isa(x, type)
     assert(not meta.is_nil(type))
-    meta._assert_aux(meta.isa(x, type), x, type.name)
+    meta._assert_aux(meta.isa(x, type), x, type._typename)
 end
 
 --- @brief make table weak, meaning it does not increase the reference count of its values
@@ -581,7 +577,7 @@ end
 function meta.declare_abstract_method(super, name)
     meta.assert_object(super)
     super[name] = function(self)
-        error("[rt][ERROR] In " .. super.name .. "." .. name .. ": Abstract method called by object of type `" .. meta.typeof(self) .. "`")
+        error("[rt][ERROR] In " .. super._typename .. "." .. name .. ": Abstract method called by object of type `" .. meta.typeof(self) .. "`")
     end
 end
 

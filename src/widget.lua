@@ -106,6 +106,18 @@ function rt.Widget:get_size()
     return self._bounds.width, self._bounds.height
 end
 
+--- @brief get width of size allocation
+--- @return Number
+function rt.Widget:get_width()
+    return self._bounds.width
+end
+
+--- @brief get height of size allocation
+--- @return Number
+function rt.Widget:get_height()
+    return self._bounds.height
+end
+
 --- @brief get top left of allocation
 --- @return (Number, Number)
 function rt.Widget:get_position()
