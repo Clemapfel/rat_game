@@ -1,10 +1,5 @@
 --- @class rt.AxisAlignedRectangle
---- @param top_left_x Number (or nil)
---- @param top_left_y Number (or nil)
---- @param width Number (or nil)
---- @param height Number (or nil)
-rt.AxisAlignedRectangle = meta.new_type("AxisAlignedRectangle", function(top_left_x, top_left_y, width, height)
-
+function rt.AxisAlignedRectangle(top_left_x, top_left_y, width, height)
     if meta.is_nil(top_left_x) then
         top_left_x = 0
     end
@@ -26,15 +21,30 @@ rt.AxisAlignedRectangle = meta.new_type("AxisAlignedRectangle", function(top_lef
     meta.assert_number(width)
     meta.assert_number(height)
 
-    return meta.new(rt.AxisAlignedRectangle, {
+    return {
         x = top_left_x,
         y = top_left_y,
         width = width,
         height = height
-    })
-end)
+    }
+end
 
 rt.AABB = rt.AxisAlignedRectangle
+
+--- @brief
+function meta.is_aabb(object)
+    return sizeof(object) == 4 and meta.is_number(object.x) and meta.is_number(object.y) and meta.is_number(object.width) and meta.is_number(object.height)
+end
+
+--- @brief
+function meta.assert_aabb(object)
+    if not meta.is_aabb(object) then
+        error("In " .. debug.getinfo(2, "n").name .. ": Excpected `AxisAlignedRectangle`, got `" .. meta.typeof(object) .. "`")
+    end
+end
+meta.make_debug_only("meta.assert_aabb")
+
+--[[
 
 --- @brief get size
 --- @param self rt.AxisAlignedRectangle
@@ -127,3 +137,5 @@ end
 function rt.test.geometry()
     -- TODO
 end
+]]--
+

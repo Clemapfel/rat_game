@@ -48,7 +48,7 @@ end
 function rt.Image:set_pixel(x, y, rgba)
     meta.assert_number(x, y)
     meta.assert_isa(self, rt.Image)
-    rt.assert_rgba(rgba)
+    meta.assert_rgba(rgba)
 
     if x < 1 or x > self:get_width() or y < 1 or y > self:get_width() then
         error("[rt][ERROR] In Image:set_pixel: index (" .. tostring(x) .. ", " .. tostring(y) .. ") is out of range for image of size `" .. tostring(self:get_width()) .. " x " .. tostring(self:get_height()) .. "`")

@@ -55,11 +55,11 @@ function rt.Spacer:set_color(color)
     meta.assert_isa(self, rt.Spacer)
 
     local rgba = color
-    if rt.is_hsva(color) then
+    if meta.is_hsva(color) then
         rgba = rt.hsav_to_rgba(color)
     end
 
-    rt.assert_rgba(rgba)
+    meta.assert_rgba(rgba)
     self._shape:set_color(rgba)
     self._outline:set_color(rgba)
 end

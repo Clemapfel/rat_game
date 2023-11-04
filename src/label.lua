@@ -284,7 +284,7 @@ function rt.Label:_parse()
         for tag in pairs(rt.Label.COLOR_TAG_START) do
             local _, _, new_color = string.find(sequence, tag)
             if not meta.is_nil(new_color) then
-                if not rt.is_rgba(rt.Palette[new_color]) then
+                if not meta.is_rgba(rt.Palette[new_color]) then
                     throw_parse_error("malformed color tag: color `" .. new_color .. "` unknown")
                 end
                 color = new_color

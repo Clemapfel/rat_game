@@ -2,6 +2,17 @@
 meta = {}
 meta.types = {}
 
+meta.DEBUG_MODE = true
+meta.DUMMY_FUNCTION = function(...) end
+
+--- @brief [internal] disable function unless `meta.DEBUG_MODE` is set to `true`
+--- @param name String symbol name
+function meta.make_debug_only(name)
+    local to_call = load("if meta.DEBUG_MODE ~= true then " .. name .. "= meta.DUMMY_FUNCTION end")
+    if meta.is_nil(to_call) then error("[rt][ERROR] In meta.debug_only: Symbol `" .. name .. "` is malformatted") end
+    to_call()
+end
+
 --- @brief is x a lua string?
 --- @param x any
 function meta.is_string(x)
@@ -191,6 +202,7 @@ function meta.assert_boolean(x, ...)
         meta._assert_aux(meta.is_boolean(n), n, "boolean")
     end
 end
+meta.make_debug_only("meta.assert_boolean")
 
 --- @brief throw if object is not a table
 --- @param x any
@@ -200,6 +212,7 @@ function meta.assert_table(x, ...)
         meta._assert_aux(meta.is_table(n), n, "table")
     end
 end
+meta.make_debug_only("meta.assert_table")
 
 --- @brief throw if object is not callable
 --- @param x any
@@ -209,12 +222,14 @@ function meta.assert_function(x, ...)
         meta._assert_aux(meta.is_function(n), n, "function")
     end
 end
+meta.make_debug_only("meta.assert_function")
 
 --- @brief throw if object is not a string
 --- @param x any
 function meta.assert_string(x, ...)
     meta._assert_aux(meta.is_string(x), x, "string")
 end
+meta.make_debug_only("meta.assert_string")
 
 --- @brief throw if object is not a number
 --- @param x any
@@ -224,6 +239,7 @@ function meta.assert_number(x, ...)
         meta._assert_aux(meta.is_number(number), number, "number")
     end
 end
+meta.make_debug_only("meta.assert_number")
 
 --- @brief throw if object is not nil
 --- @param x any
@@ -233,6 +249,7 @@ function meta.assert_nil(x, ...)
         meta._assert_aux(meta.is_nil(number), number, "typeof(nil)")
     end
 end
+meta.make_debug_only("meta.assert_nil")
 
 --- @brief assert that object was created using `meta.new`
 --- @param x any
@@ -242,6 +259,7 @@ function meta.assert_object(x, ...)
         meta._assert_aux(meta.is_object(number), number, "meta.Object")
     end
 end
+meta.make_debug_only("meta.assert_object")
 
 --- @brief assert that instance inherits from type
 --- @param x any
@@ -540,6 +558,7 @@ function meta.assert_isa(x, type)
     assert(not meta.is_nil(type))
     meta._assert_aux(meta.isa(x, type), x, type._typename)
 end
+meta.make_debug_only("meta.assert_isa")
 
 --- @brief make table weak, meaning it does not increase the reference count of its values
 --- @param x Table

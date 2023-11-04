@@ -11,6 +11,7 @@ require "common"
 require "meta"
 require "time"
 require "vector"
+require "geometry"
 require "angle"
 require "random"
 require "signals"
@@ -18,7 +19,6 @@ require "queue"
 require "set"
 require "color"
 require "palette"
-require "geometry"
 require "image"
 require "animation_timer"
 require "drawable"
@@ -93,6 +93,7 @@ frame = rt.SpriteFrame(rt.Spritesheet("assets/sprites", "test_frame"))
 frame:set_child(sprite)
 frame:set_color(rt.Palette.YELLOW)
 window:set_child(sprite)
+window:set_child({})
 
 scale_sheet = rt.Spritesheet("assets/sprites", "test_scale")
 scale = rt.Scale(scale_sheet, 0, 1, 0.5)
@@ -208,7 +209,3 @@ function love.quit()
 end
 
 ::exit::
-
-if DEBUG_MODE then
-    println("done.")
-end

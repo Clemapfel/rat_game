@@ -95,7 +95,7 @@ end
 --- @param aabb rt.AxisAlignedRectangle
 function rt.Widget:fit_into(aabb)
     meta.assert_isa(self, rt.Widget)
-    meta.assert_isa(aabb, rt.AxisAlignedRectangle)
+    meta.assert_aabb(aabb)
     self._bounds = aabb
     self:reformat()
 end

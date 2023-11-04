@@ -25,7 +25,7 @@ function rt.Vertex(top_left_x, top_left_y, texture_coordinate_x, texture_coordin
     if meta.is_nil(color) then
         color = rt.RGBA(1, 1, 1, 1)
     end
-    rt.assert_rgba(color)
+    meta.assert_rgba(color)
 
     return {
         top_left_x, top_left_y,
@@ -40,7 +40,7 @@ rt.VertexShape = meta.new_type("VertexShape", function(...)
     local positions = {...}
     local vertices = {}
     for _, pos in pairs(positions) do
-        rt.assert_vector2(pos)
+        meta.assert_vector2(pos)
         table.insert(vertices, rt.Vertex(pos.x, pos.y, 0, 0))
     end
     local out = meta.new(rt.VertexShape, {
@@ -72,8 +72,8 @@ end
 --- @param rgba rt.RGBA
 function rt.VertexShape:set_vertex_color(i, rgba)
     meta.assert_isa(self, rt.VertexShape)
-    if rt.is_hsva(rgba) then rgba = rt.hsva_to_rgba(rgba) end
-    rt.assert_rgba(rgba)
+    if meta.is_hsva(rgba) then rgba = rt.hsva_to_rgba(rgba) end
+    meta.assert_rgba(rgba)
     self._native:setVertexAttribute(i, 3, rgba.r, rgba.g, rgba.b, rgba.a)
 end
 
@@ -128,8 +128,8 @@ end
 --- @param rgba rt.RGBA (or rt.HSVA)
 function rt.VertexShape:set_color(rgba)
     meta.assert_isa(self, rt.VertexShape)
-    if rt.is_hsva(rgba) then rgba = rt.hsva_to_rgba(rgba) end
-    rt.assert_rgba(rgba)
+    if meta.is_hsva(rgba) then rgba = rt.hsva_to_rgba(rgba) end
+    meta.assert_rgba(rgba)
     for i = 1, self:get_n_vertices() do
         self:set_vertex_color(i, rgba)
     end
@@ -139,7 +139,7 @@ end
 --- @param rectangle rt.AxisAlignedRectangle
 function rt.VertexShape:set_texture_rectangle(rectangle)
     meta.assert_isa(self, rt.VertexShape)
-    meta.assert_isa(rectangle, rt.AxisAlignedRectangle)
+    meta.assert_aabb(rectangle)
 
     local min_x = POSITIVE_INFINITY
     local min_y = POSITIVE_INFINITY

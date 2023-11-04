@@ -6,28 +6,28 @@ function rt.Vector2(x, y)
     out.__metatable = {
         __name = "Vector2",
         __add = function(self, other)
-            rt.assert_vector2(other)
+            meta.assert_vector2(other)
             return {
                 x = self.x + other.x,
                 y = self.y + other.y
             }
         end,
         __sub = function(self, other)
-            rt.assert_vector2(other)
+            meta.assert_vector2(other)
             return {
                 x = self.x - other.x,
                 y = self.y - other.y
             }
         end,
         __mul = function(self, other)
-            rt.assert_vector2(other)
+            meta.assert_vector2(other)
             return {
                 x = self.x * other.x,
                 y = self.y * other.y
             }
         end,
         __div = function(self, other)
-            rt.assert_vector2(other)
+            meta.assert_vector2(other)
             return {
                 x = self.x / other.x,
                 y = self.y / other.y
@@ -49,18 +49,19 @@ end
 
 --- @brief [internal] check if object is rt.
 --- @param object any
-function rt.is_vector2(object)
+function meta.is_vector2(object)
     if not meta.is_table(object) then return false end
     return #object == 2 and meta.is_number(object.x) and meta.is_number(object.y)
 end
 
 --- @brief [internal] assert if object is rt.Vector2
 --- @param object any
-function rt.assert_vector2(object)
-    if not rt.is_vector2(object) then
+function meta.assert_vector2(object)
+    if not meta.is_vector2(object) then
         error("In " .. debug.getinfo(2, "n").name .. ": Excpected `Vector2`, got `" .. meta.typeof(object) .. "`")
     end
 end
+meta.make_debug_only("meta.assert_vector2")
 
 --- @class rt.Vector3
 --- @param x Number
@@ -71,7 +72,7 @@ function rt.Vector3(x, y, z)
     out.__metatable = {
         __name = "Vector3",
         __add = function(self, other)
-            rt.assert_vector3(other)
+            meta.assert_vector3(other)
             return {
                 x = self.x + other.x,
                 y = self.y + other.y,
@@ -79,7 +80,7 @@ function rt.Vector3(x, y, z)
             }
         end,
         __sub = function(self, other)
-            rt.assert_vector3(other)
+            meta.assert_vector3(other)
             return {
                 x = self.x - other.x,
                 y = self.y - other.y,
@@ -87,7 +88,7 @@ function rt.Vector3(x, y, z)
             }
         end,
         __mul = function(self, other)
-            rt.assert_vector3(other)
+            meta.assert_vector3(other)
             return {
                 x = self.x * other.x,
                 y = self.y * other.y,
@@ -95,7 +96,7 @@ function rt.Vector3(x, y, z)
             }
         end,
         __div = function(self, other)
-            rt.assert_vector3(other)
+            meta.assert_vector3(other)
             return {
                 x = self.x / other.x,
                 y = self.y / other.y,
@@ -118,18 +119,19 @@ end
 
 --- @brief [internal] check if object is rt.Vector3
 --- @param object any
-function rt.is_vector3(object)
+function meta.is_vector3(object)
     if not meta.is_table(object) then return false end
     return #object == 3 and meta.is_number(object.x) and meta.is_number(object.y) and meta.is_number(object.z)
 end
 
 --- @brief [internal] assert if object is rt.Vector3
 --- @param object any
-function rt.assert_vector3(object)
-    if not rt.is_vector3(object) then
+function meta.assert_vector3(object)
+    if not meta.is_vector3(object) then
         error("In " .. debug.getinfo(2, "n").name .. ": Excpected `Vector3`, got `" .. meta.typeof(object) .. "`")
     end
 end
+meta.make_debug_only("meta.assert_vector3")
 
 --- @brief [internal] test vector2, vector3
 function rt.test.test_vector()
@@ -137,7 +139,7 @@ function rt.test.test_vector()
         local a = rt.Vector2(1, 2)
         local b = rt.Vector2(3, 4)
 
-        assert(rt.is_vector2(a) and rt.is_vector2(b))
+        assert(meta.is_vector2(a) and meta.is_vector2(b))
         assert(#a == 2 and #b == 2)
         assert(a.x == 1 and a.y == 2 and b.x == 3 and b.y == 4)
 
@@ -158,7 +160,7 @@ function rt.test.test_vector()
         local b = rt.Vector3(3, 4, 5)
 
         assert(#a == 3 and #b == 3)
-        assert(rt.is_vector3(a) and rt.is_vector3(b))
+        assert(meta.is_vector3(a) and meta.is_vector3(b))
         assert(a.x == 1 and a.y == 2 and a.z == 3 and b.x == 3 and b.y == 4 and b.z == 5)
 
         local add = a + b

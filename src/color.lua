@@ -26,7 +26,7 @@ end
 
 --- @brief [internal] check if object is rt.RGBA
 --- @param object any
-function rt.is_rgba(object)
+function meta.is_rgba(object)
     return sizeof(object) == 4 and
         meta.is_number(object.r) and
         meta.is_number(object.g) and
@@ -35,11 +35,12 @@ function rt.is_rgba(object)
 end
 
 --- @brief [internal] throw if object is not rt.RGBA
-function rt.assert_rgba(object)
-    if not rt.is_rgba(object) then
+function meta.assert_rgba(object)
+    if not meta.is_rgba(object) then
         error("In " .. debug.getinfo(2, "n").name .. ": Excpected `RGBA`, got `" .. meta.typeof(object) .. "`")
     end
 end
+meta.make_debug_only("meta.assert_rgba")
 
 --- @class rt.HSVA
 --- @param h Number
@@ -63,7 +64,7 @@ end
 --- @brief [internal] check if object is rt.HSVA
 --- @param object any
 --- @return Boolean
-function rt.is_hsva(object)
+function meta.is_hsva(object)
     return sizeof(object) == 4 and
         meta.is_number(object.h) and
         meta.is_number(object.s) and
@@ -73,17 +74,18 @@ end
 
 --- @brief [internal] throw if object is not rt.HSVA
 --- @param object any
-function rt.assert_hsva(object)
-    if not rt.is_hsva(object) then
+function meta.assert_hsva(object)
+    if not meta.is_hsva(object) then
         error("In " .. debug.getinfo(2, "n").name .. ": Excpected `HSVA`, got `" .. meta.typeof(object) .. "`")
     end
 end
+meta.make_debug_only("meta.assert_hsva")
 
 --- @brief conver rgba to hsva
 --- @param rgba rt.RGBA
 --- @return rt.HSVA
 function rt.rgba_to_hsva(rgba)
-    rt.assert_rgba(rgba)
+    meta.assert_rgba(rgba)
 
     -- cf. https://github.com/Clemapfel/mousetrap/blob/main/src/color.cpp#L112
     local r = rgba.r
@@ -134,7 +136,7 @@ end
 --- @param hsva rt.HSVA
 --- @return rt.RGBA
 function rt.hsva_to_rgba(hsva)
-    rt.assert_hsva(hsva)
+    meta.assert_hsva(hsva)
 
     --- cf https://github.com/Clemapfel/mousetrap/blob/main/src/color.cpp#L151
     local h = hsva.h * 360
@@ -176,8 +178,8 @@ end
 --- @param c2 rt.RGBA
 --- @return Boolean
 function rt.compare_rgba(c1, c2)
-    rt.assert_rgba(c1)
-    rt.assert_rgba(c2)
+    meta.assert_rgba(c1)
+    meta.assert_rgba(c2)
     return c1.r == c2.r and c1.g == c2.g and c1.b == c2.b and c1.a == c2.a
 end
 
@@ -186,8 +188,8 @@ end
 --- @param c2 rt.HSVA
 --- @return Boolean
 function rt.compare_hsva(c1, c2)
-    rt.assert_hsva(c1)
-    rt.assert_hsva(c2)
+    meta.assert_hsva(c1)
+    meta.assert_hsva(c2)
     local hue_matches = ternary(math.abs(c1.h - c2.h) == 1, true, c1.h == c2.h)
     return hue_matches and c1.s == c2.s and c1.v == c2.v and c1.a == c2.a
 end
@@ -267,7 +269,7 @@ end
 --- @param use_alpha Boolean (or nil)
 --- @return String "#RRGGBB" or "#RRGGBBAA" if `use_alpha`
 function rt.color_to_html_code(rgba, use_alpha)
-    rt.assert_rgba(rgba)
+    meta.assert_rgba(rgba)
 
     if meta.is_nil(use_alpha) then
         use_alpha = false
@@ -302,13 +304,13 @@ end
 function rt.test.colors()
     local rgba_from_string = rt.RGBA("#FF00FF")
     local rgba_from_components = rt.RGBA(1, 0, 1, 1)
-    assert(rt.is_rgba(rgba_from_string))
-    assert(not rt.is_hsva(rgba_from_string))
+    assert(meta.is_rgba(rgba_from_string))
+    assert(not meta.is_hsva(rgba_from_string))
     assert(rt.compare_rgba(rgba_from_string, rgba_from_components))
 
     local hsva = rt.HSVA(0.5, 1, 0.75, 1)
     assert(rt.compare_hsva(hsva, rt.HSVA(0.5, 1, 0.75, 1)))
-    assert(not rt.is_rgba(hsva))
+    assert(not meta.is_rgba(hsva))
     assert(not rt.compare_hsva(hsva, rt.HSVA(0, 1, 0, 1)))
     assert(rt.compare_hsva(hsva, rt.rgba_to_hsva(rt.hsva_to_rgba(hsva))))
     assert(rt.compare_hsva(rt.HSVA(1, 1, 1, 1), rt.HSVA(0, 1, 1, 1)))

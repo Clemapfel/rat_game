@@ -77,12 +77,12 @@ end
 --- @param rgba rt.RGBA
 function rt.Shape:set_color(rgba)
     meta.assert_isa(self, rt.Shape)
-    if rt.is_rgba(rgba) then
+    if meta.is_rgba(rgba) then
         self._color = rgba
-    elseif rt.is_hsva(rgba) then
+    elseif meta.is_hsva(rgba) then
         self._color = rt.hsva_to_rgba(rgba)
     else
-        rt.assert_rgba(rgba)
+        meta.assert_rgba(rgba)
     end
 end
 
@@ -235,7 +235,7 @@ end
 
 --- @brief TODO
 function rt.Rectangle:resize(aabb)
-    meta.assert_isa(aabb, rt.AABB)
+    meta.assert_aabb(aabb)
     self._x = aabb.x
     self._y = aabb.y
     self._w = aabb.width

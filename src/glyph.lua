@@ -23,7 +23,7 @@ rt.Glyph = meta.new_type("Glyph", function(font, content, font_style, color, eff
     if meta.is_nil(wrap_width) then wrap_width = POSITIVE_INFINITY end
 
     meta.assert_enum(font_style, rt.FontStyle)
-    rt.assert_rgba(color)
+    meta.assert_rgba(color)
     meta.assert_number(wrap_width)
     meta.assert_table(effects)
 
@@ -252,10 +252,10 @@ end
 function rt.Glyph:set_color(color)
     meta.assert_isa(self, rt.Glyph)
 
-    if rt.is_hsva(color) then
+    if meta.is_hsva(color) then
         color = rt.hsva_to_rgba(color)
     end
-    rt.assert_rgba(color)
+    meta.assert_rgba(color)
 
     self._color = color
     self:_update()
