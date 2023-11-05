@@ -164,7 +164,7 @@ function rt.Label:measure()
         end
     end
 
-    return max_x - min_x, max_y - min_y
+    return max_x - min_x + self:get_margin_left() + self:get_margin_right(), max_y - min_y + self:get_margin_top() + self:get_margin_bottom()
 end
 
 -- control characters used for wrap hinting
