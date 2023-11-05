@@ -12,6 +12,15 @@ return {
         up = 7,
         right = 8,
         down = 9,
-        left = 10
+        left = 10,
+        round_backdrop_left = 11,
+        round_backdrop_center = 12,
+        round_backdrop_right = 13,
+        round_backdrop = 14,
+        backdrop_left = 15,
+        backdrop_center = 16,
+        backdrop_right = 17,
+        backdrop = 18
+
     }
 }
