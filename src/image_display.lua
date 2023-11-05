@@ -40,8 +40,8 @@ end
 
 --- @overload rt.Widget.measure
 function rt.ImageDisplay:measure()
-    return math.max(self._resolution.x, self._minimum_width),
-           math.max(self._resolution.y, self._minimum_height)
+    return math.max(self._resolution.x, self._minimum_width) + self:get_margin_left() + self:get_margin_right(),
+           math.max(self._resolution.y, self._minimum_height) + self:get_margin_top() + self:get_margin_bottom()
 end
 
 --- @brief update texture

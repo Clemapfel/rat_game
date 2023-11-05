@@ -79,15 +79,6 @@ function rt.Sprite:size_allocate(x, y, width, height)
     self._shape:set_texture_rectangle(self._spritesheet:get_frame(self._animation_id, self._current_frame))
 end
 
---- @overload rt.Widget.measure
-function rt.Sprite:measure()
-    meta.assert_isa(self, rt.Sprite)
-    local w, h = self._frame_width, self._frame_height
-    w = w + self:get_margin_left() + self:get_margin_right()
-    h = h + self:get_margin_top() + self:get_margin_bottom()
-    return w, h
-end
-
 --- @overload rt.Animation.update
 function rt.Sprite:update(delta)
     meta.assert_isa(self, rt.Sprite)

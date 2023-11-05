@@ -40,15 +40,6 @@ function rt.Spacer:size_allocate(x, y, width, height)
     self._shape:set_size(w, h)
 end
 
---- @overload rt.Widget.measure
-function rt.Spacer:measure()
-    meta.assert_isa(self, rt.Spacer)
-    local w, h = self:get_minimum_size()
-    w = w + self:get_margin_left() + self:get_margin_right()
-    h = h + self:get_margin_top() + self:get_margin_bottom()
-    return w, h
-end
-
 --- @brief set color
 --- @param color rt.RGBA
 function rt.Spacer:set_color(color)

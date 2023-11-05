@@ -54,7 +54,7 @@ end
 --- @overload rt.Widget.measure
 function rt.Viewport:measure()
     if meta.is_nil(self._child) then return 0, 0 end
-    return
+    return rt.Widget.measure(self)
 end
 
 --- @brief set singular child

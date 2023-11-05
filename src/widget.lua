@@ -41,7 +41,9 @@ end
 --- @brief abstract method, returns minimum space that needs to be allocated
 --- @return (Number, Number)
 function rt.Widget:measure()
-    error("[rt][ERROR] " .. meta.typeof(self) .. ":measure: abstract method called")
+    meta.assert_isa(self, rt.Widget)
+    local min_w, min_h = self:get_minimum_size()
+    return min_w + self:get_margin_left() + self:get_margin_right(), min_h + self:get_margin_top() + self:get_margin_bottom()
 end
 
 --- @brief realize widget
