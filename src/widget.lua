@@ -89,6 +89,8 @@ function rt.Widget:reformat()
     height = math.max(height, 1)
     width = math.max(width, 1)
 
+    x = math.floor(x) -- align to pixelgrid to avoid rasterizer artifacting
+    y = math.floor(y)
     self._allocation = rt.AABB(x, y, width, height)
     self:size_allocate(x, y, width, height)
 end
