@@ -19,7 +19,7 @@ rt.Scale = meta.new_type("Scale", function(spritesheet, lower, upper, value, ori
         orientation = rt.Orientation.HORIZONTAL
     end
 
-    local self = meta.new(rt.Scale, {
+    local out = meta.new(rt.Scale, {
         _spritesheet = spritesheet,
         _left = rt.Sprite(spritesheet, rt.settings.scale.rail_left_id),
         _left_right = rt.Sprite(spritesheet, rt.settings.scale.rail_left_right_id),
@@ -37,7 +37,7 @@ rt.Scale = meta.new_type("Scale", function(spritesheet, lower, upper, value, ori
     -- allow squishing of center pieces
     self._left_right:set_minimum_size(0, self._spritesheet:get_frame_height(rt.settings.scale.rail_left_right_id))
     self._top_bottom:set_minimum_size(0, self._spritesheet:get_frame_height(rt.settings.scale.rail_top_bottom_id))
-    return self
+    return out
 end)
 
 --- @overload rt.Drawable.draw
@@ -81,7 +81,7 @@ function rt.Scale:_update_slider()
         local x, y = self._top:get_position()
         local h = ({self._bottom:get_position()})[2] + self._bottom:get_height() - y
 
-        if self:get_expand_vertically() then
+        if self:get_expand_horizontally() then
             slider_w = self._top_bottom:get_width()
             slider_h = frame_h * (slider_w / frame_w)
         else

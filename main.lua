@@ -53,6 +53,8 @@ require "scrollbar"
 require "viewport"
 require "sprite"
 require "sprite_frame"
+require "sprite_scale"
+
 require "scale"
 
 require "test"
