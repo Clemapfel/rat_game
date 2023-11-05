@@ -54,8 +54,7 @@ require "viewport"
 require "sprite"
 require "sprite_frame"
 require "sprite_scale"
-
-require "scale"
+require "sprite_levelbar"
 
 require "test"
 
@@ -96,8 +95,8 @@ frame:set_child(sprite)
 frame:set_color(rt.Palette.YELLOW)
 window:set_child(sprite)
 
-scale_sheet = rt.Spritesheet("assets/sprites", "test_scale")
-scale = rt.Scale(scale_sheet, 0, 1, 0.5, rt.Orientation.VERTICAL)
+scale_sheet = rt.Spritesheet("assets/sprites", "test_levelbar")
+scale = rt.Levelbar(scale_sheet, 0, 1, 0.5, rt.Orientation.HORIZONTAL)
 scale:set_expand_vertically(true)
 scale:set_expand_horizontally(true)
 --scale:set_margin(50)
