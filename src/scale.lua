@@ -191,3 +191,19 @@ function rt.Scale:get_value()
     meta.assert_isa(self, rt.Scale)
     return self._value
 end
+
+--- @brief set orientation
+--- @param orientation rt.Orientation
+function rt.Scale:set_orientation(orientation)
+    meta.assert_isa(self, rt.Scale)
+    meta.assert_enum(orientation, rt.Orientation)
+    self._orientation = orientation
+    self:reformat()
+end
+
+--- @brief get orientation
+--- @return rt.Orientation
+function rt.Scale:get_orientation()
+    meta.assert_isa(self, rt.Scale)
+    return self._orientation
+end

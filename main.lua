@@ -113,7 +113,7 @@ key:signal_connect("key_pressed", function(self, key)
     elseif key == rt.KeyboardKey.PLUS then
     elseif key == rt.KeyboardKey.MINUS then
     elseif key == rt.KeyboardKey.SPACE then
-
+        scale:set_orientation(rt.Orientation.HORIZONTAL)
     end
 end)
 
