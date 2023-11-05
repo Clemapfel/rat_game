@@ -93,11 +93,11 @@ frame = rt.SpriteFrame(rt.Spritesheet("assets/sprites", "test_frame"))
 frame:set_child(sprite)
 frame:set_color(rt.Palette.YELLOW)
 window:set_child(sprite)
-window:set_child({})
 
 scale_sheet = rt.Spritesheet("assets/sprites", "test_scale")
 scale = rt.Scale(scale_sheet, 0, 1, 0.5)
 scale:set_expand_vertically(false)
+scale:set_margin(50)
 window:set_child(scale)
 
 key = rt.add_keyboard_controller(window)
@@ -106,24 +106,13 @@ key:signal_connect("key_pressed", function(self, key)
     if key == rt.KeyboardKey.ARROW_UP then
     elseif key == rt.KeyboardKey.ARROW_DOWN then
     elseif key == rt.KeyboardKey.ARROW_LEFT then
-        local frame = clamp(sprite:get_frame() + 1, 1, sprite:get_n_frames())
-        sprite:set_frame(frame)
-
-        local current = playback._native:getPitch()
-        playback._native:setPitch(current + 0.05)
-
+        scale:set_value(scale:get_value() - 0.05)
     elseif key == rt.KeyboardKey.ARROW_RIGHT then
-        local frame = clamp(sprite:get_frame() - 1, 1, sprite:get_n_frames())
-        sprite:set_frame(frame)
-
-        local current = playback._native:getPitch()
-        playback._native:setPitch(current - 0.05)
-
+        scale:set_value(scale:get_value() + 0.05)
     elseif key == rt.KeyboardKey.PLUS then
     elseif key == rt.KeyboardKey.MINUS then
     elseif key == rt.KeyboardKey.SPACE then
-        playback:reset()
-        playback:play()
+
     end
 end)
 
