@@ -1,19 +1,19 @@
-rt.settings.levelbar = {}
-rt.settings.levelbar.rail_left_id = "rail_left"
-rt.settings.levelbar.rail_left_right_id = "rail_horizontal"
-rt.settings.levelbar.rail_right_id = "rail_right"
-rt.settings.levelbar.rail_top_id = "rail_top"
-rt.settings.levelbar.rail_top_bottom_id = "rail_vertical"
-rt.settings.levelbar.rail_bottom_id = "rail_bottom"
-rt.settings.levelbar.bar_left_id = "bar_left"
-rt.settings.levelbar.bar_left_right_id = "bar_horizontal"
-rt.settings.levelbar.bar_right_id = "bar_right"
-rt.settings.levelbar.bar_top_id = "bar_top"
-rt.settings.levelbar.bar_top_bottom_id = "bar_vertical"
-rt.settings.levelbar.bar_bottom_id = "bar_bottom"
+rt.settings.sprite_levelbar = {}
+rt.settings.sprite_levelbar.rail_left_id = "rail_left"
+rt.settings.sprite_levelbar.rail_left_right_id = "rail_horizontal"
+rt.settings.sprite_levelbar.rail_right_id = "rail_right"
+rt.settings.sprite_levelbar.rail_top_id = "rail_top"
+rt.settings.sprite_levelbar.rail_top_bottom_id = "rail_vertical"
+rt.settings.sprite_levelbar.rail_bottom_id = "rail_bottom"
+rt.settings.sprite_levelbar.overlay_left_id = "overlay_left"
+rt.settings.sprite_levelbar.overlay_left_right_id = "overlay_horizontal"
+rt.settings.sprite_levelbar.overlay_right_id = "overlay_right"
+rt.settings.sprite_levelbar.overlay_top_id = "overlay_top"
+rt.settings.sprite_levelbar.overlay_top_bottom_id = "overlay_vertical"
+rt.settings.sprite_levelbar.overlay_bottom_id = "overlay_bottom"
 
---- @class rt.Levelbar
-rt.Levelbar = meta.new_type("Levelbar", function(spritesheet, lower, upper, value, orientation)
+--- @class rt.SpriteLevelbar
+rt.SpriteLevelbar = meta.new_type("SpriteLevelbar", function(spritesheet, lower, upper, value, orientation, use_overlay)
     meta.assert_isa(spritesheet, rt.Spritesheet)
     meta.assert_number(lower, upper)
     if meta.is_nil(value) then
@@ -23,41 +23,77 @@ rt.Levelbar = meta.new_type("Levelbar", function(spritesheet, lower, upper, valu
     if meta.is_nil(orientation) then
         orientation = rt.Orientation.HORIZONTAL
     end
+    meta.assert_enum(orientation, rt.Orientation)
 
-    local out = meta.new(rt.Levelbar, {
+    if meta.is_nil(use_overlay) then
+        use_overlay = true
+    end
+    meta.assert_boolean(use_overlay)
+
+    local use_overlay = true
+    for _, id in pairs({
+        rt.settings.sprite_levelbar.overlay_left_id,
+        rt.settings.sprite_levelbar.overlay_left_right_id,
+        rt.settings.sprite_levelbar.overlay_right_id,
+        rt.settings.sprite_levelbar.overlay_top_id,
+        rt.settings.sprite_levelbar.overlay_top_bottom_id,
+        rt.settings.sprite_levelbar.overlay_bottom_id
+    }) do
+        if not spritesheet:has_animation(id) then
+            use_overlay = false
+            break
+        end
+    end
+
+    local out = meta.new(rt.SpriteLevelbar, {
         _spritesheet = spritesheet,
-        _rail_left = rt.Sprite(spritesheet, rt.settings.levelbar.rail_left_id),
-        _rail_left_right = rt.Sprite(spritesheet, rt.settings.levelbar.rail_left_right_id),
-        _rail_right = rt.Sprite(spritesheet, rt.settings.levelbar.rail_right_id),
-        _rail_top = rt.Sprite(spritesheet, rt.settings.levelbar.rail_top_id),
-        _rail_top_bottom = rt.Sprite(spritesheet, rt.settings.levelbar.rail_top_bottom_id),
-        _rail_bottom = rt.Sprite(spritesheet, rt.settings.levelbar.rail_bottom_id),
-        _bar_left = rt.Sprite(spritesheet, rt.settings.levelbar.bar_left_id),
-        _bar_left_right = rt.Sprite(spritesheet, rt.settings.levelbar.bar_left_right_id),
-        _bar_right = rt.Sprite(spritesheet, rt.settings.levelbar.bar_right_id),
-        _bar_top = rt.Sprite(spritesheet, rt.settings.levelbar.bar_top_id),
-        _bar_top_bottom = rt.Sprite(spritesheet, rt.settings.levelbar.bar_top_bottom_id),
-        _bar_bottom = rt.Sprite(spritesheet, rt.settings.levelbar.bar_bottom_id),
+        _rail_left = rt.Sprite(spritesheet, rt.settings.sprite_levelbar.rail_left_id),
+        _rail_left_right = rt.Sprite(spritesheet, rt.settings.sprite_levelbar.rail_left_right_id),
+        _rail_right = rt.Sprite(spritesheet, rt.settings.sprite_levelbar.rail_right_id),
+        _rail_top = rt.Sprite(spritesheet, rt.settings.sprite_levelbar.rail_top_id),
+        _rail_top_bottom = rt.Sprite(spritesheet, rt.settings.sprite_levelbar.rail_top_bottom_id),
+        _rail_bottom = rt.Sprite(spritesheet, rt.settings.sprite_levelbar.rail_bottom_id),
+        _overlay_left = {},
+        _overlay_left_right = {},
+        _overlay_right = {},
+        _overlay_top = {},
+        _overlay_top_bottom = {},
+        _overlay_bottom = {},
+        _bar = rt.VertexRectangle(0, 0, 0, 0),
+        _use_overlay = use_overlay,
         _lower = lower,
         _upper = upper,
         _value = value,
         _orientation = orientation
     }, rt.Drawable, rt.Widget)
+
+    if use_overlay then
+        out._overlay_left = rt.Sprite(spritesheet, rt.settings.sprite_levelbar.overlay_left_id)
+        out._overlay_left_right = rt.Sprite(spritesheet, rt.settings.sprite_levelbar.overlay_left_right_id)
+        out._overlay_right = rt.Sprite(spritesheet, rt.settings.sprite_levelbar.overlay_right_id)
+        out._overlay_top = rt.Sprite(spritesheet, rt.settings.sprite_levelbar.overlay_top_id)
+        out._overlay_top_bottom = rt.Sprite(spritesheet, rt.settings.sprite_levelbar.overlay_top_bottom_id)
+        out._overlay_bottom = rt.Sprite(spritesheet, rt.settings.sprite_levelbar.overlay_bottom_id)
+    end
+
+    out._bar:set_color(rt.Palette.TRUE_MAGENTA)
     return out
 end)
 
 --- @overload rt.Drawable.draw
-function rt.Levelbar:draw()
-    meta.assert_isa(self, rt.Levelbar)
+function rt.SpriteLevelbar:draw()
+    meta.assert_isa(self, rt.SpriteLevelbar)
     if self._orientation == rt.Orientation.HORIZONTAL then
         self._rail_left_right:draw()
         self._rail_left:draw()
         self._rail_right:draw()
 
-        if self._value > self._lower then
-            self._bar_left_right:draw()
-            self._bar_left:draw()
-            self._bar_right:draw()
+        self._bar:draw()
+
+        if self._use_overlay then
+            self._overlay_left_right:draw()
+            self._overlay_left:draw()
+            self._overlay_right:draw()
         end
 
     elseif self._orientation == rt.Orientation.VERTICAL then
@@ -65,49 +101,49 @@ function rt.Levelbar:draw()
         self._rail_top:draw()
         self._rail_bottom:draw()
 
-        if self._value > self._lower then
-            self._bar_top_bottom:draw()
-            self._bar_top:draw()
-            self._bar_bottom:draw()
+        self._bar:draw()
+
+        if self._use_overlay then
+            self._overlay_top_bottom:draw()
+            self._overlay_top:draw()
+            self._overlay_bottom:draw()
         end
     end
 end
 
 --- @brief [internal] reposition slider element
-function rt.Levelbar:_update_bar()
-    meta.assert_isa(self, rt.Levelbar)
+function rt.SpriteLevelbar:_update_bar()
+    meta.assert_isa(self, rt.SpriteLevelbar)
 
+    local frame_w, frame_h = self._spritesheet:get_frame_size(rt.settings.sprite_levelbar.overlay_left_id)
+    local x, y, bar_w, bar_h
     if self._orientation == rt.Orientation.HORIZONTAL then
-        local x, y = self._rail_left:get_position()
+        x, y = self._rail_left:get_position()
         local w = self._rail_right:get_position() + self._rail_right:get_width() - x
         local h = self._rail_left_right:get_height()
+        bar_h = ternary(self:get_expand_vertically(), self._rail_left_right:get_height(), frame_h)
+        bar_w = ((self._value - self._lower) / (self._upper - self._lower)) * w
+    elseif self._orientation == rt.Orientation.VERTICAL then
+        x, y = self._rail_top:get_position()
+        local h = ({self._rail_bottom:get_position()})[2] + self._rail_bottom:get_height() - x
 
-        local frame_w, frame_h = self._spritesheet:get_frame_size(rt.settings.levelbar.bar_left_id)
-        local slider_w, slider_h
-        if self:get_expand_vertically() then
-            slider_h = self._rail_left_right:get_height()
-            slider_w = frame_w * (slider_h / frame_h)
-        else
-            slider_h = frame_h
-            slider_w = frame_w
-        end
-
-        --self._bar_left:fit_into(rt.AABB(x, y, slider_w, slider_h))
-        self._bar_left_right:fit_into(rt.AABB(x, y, ((self._value - self._lower) / (self._upper - self._lower)) * w, h))
-        --self._bar_right:fit_into(rt.AABB(x + self._bar_left_right:get_width() - slider_w, y, slider_w, slider_h))
+        bar_w = ternary(self:get_expand_horizontally(), self._rail_top_bottom:get_width(), frame_w)
+        bar_h = ((self._value - self._lower) / (self._upper - self._lower)) * h
     end
+
+    self._bar:resize(x, y, bar_w, bar_h)
 end
 
 --- @overload rt.Widget.size_allocate
-function rt.Levelbar:size_allocate(x, y, width, height)
-    meta.assert_isa(self, rt.Levelbar)
+function rt.SpriteLevelbar:size_allocate(x, y, width, height)
+    meta.assert_isa(self, rt.SpriteLevelbar)
 
     local left_m, right_m, top_m, bottom_m = self:get_margin_left(), self:get_margin_right(), self:get_margin_top(), self:get_margin_bottom()
 
     if self._orientation == rt.Orientation.HORIZONTAL then
-        local left_frame_w, left_frame_h = self._spritesheet:get_frame_size(rt.settings.levelbar.rail_left_id)
-        local right_frame_w, right_frame_h = self._spritesheet:get_frame_size(rt.settings.levelbar.rail_right_id)
-        local center_frame_w, center_frame_h = self._spritesheet:get_frame_size(rt.settings.levelbar.rail_left_right_id)
+        local left_frame_w, left_frame_h = self._spritesheet:get_frame_size(rt.settings.sprite_levelbar.rail_left_id)
+        local right_frame_w, right_frame_h = self._spritesheet:get_frame_size(rt.settings.sprite_levelbar.rail_right_id)
+        local center_frame_w, center_frame_h = self._spritesheet:get_frame_size(rt.settings.sprite_levelbar.rail_left_right_id)
 
         local left_w, left_h, right_w, right_h, center_w, center_h
 
@@ -127,13 +163,24 @@ function rt.Levelbar:size_allocate(x, y, width, height)
         end
 
         center_w = clamp(width - left_m - right_m - left_w - right_w, 0)
-        self._rail_left:fit_into(rt.AABB(x + left_m, y + 0.5 * height - 0.5 * left_h, left_w, left_h))
-        self._rail_left_right:fit_into(rt.AABB(x + left_m + left_w, y + 0.5 * height - 0.5 * center_h, center_w, center_h))
-        self._rail_right:fit_into(rt.AABB(x + width - right_m - right_w, y + 0.5 * height - 0.5 * right_h, right_w, right_h))
+
+        local left_aabb = rt.AABB(x + left_m, y + 0.5 * height - 0.5 * left_h, left_w, left_h)
+        local center_aabb = rt.AABB(x + left_m + left_w, y + 0.5 * height - 0.5 * center_h, center_w, center_h)
+        local right_aabb = rt.AABB(x + width - right_m - right_w, y + 0.5 * height - 0.5 * right_h, right_w, right_h)
+        self._rail_left:fit_into(left_aabb)
+        self._rail_left_right:fit_into(center_aabb)
+        self._rail_right:fit_into(right_aabb)
+
+        if self._use_overlay then
+            self._overlay_left:fit_into(left_aabb)
+            self._overlay_left_right:fit_into(center_aabb)
+            self._overlay_right:fit_into(right_aabb)
+        end
+
     elseif self._orientation == rt.Orientation.VERTICAL then
-        local top_frame_w, top_frame_h = self._spritesheet:get_frame_size(rt.settings.levelbar.rail_top_id)
-        local center_frame_w, center_frame_h = self._spritesheet:get_frame_size(rt.settings.levelbar.rail_top_bottom_id)
-        local bottom_frame_w, bottom_frame_h = self._spritesheet:get_frame_size(rt.settings.levelbar.rail_bottom_id)
+        local top_frame_w, top_frame_h = self._spritesheet:get_frame_size(rt.settings.sprite_levelbar.rail_top_id)
+        local center_frame_w, center_frame_h = self._spritesheet:get_frame_size(rt.settings.sprite_levelbar.rail_top_bottom_id)
+        local bottom_frame_w, bottom_frame_h = self._spritesheet:get_frame_size(rt.settings.sprite_levelbar.rail_bottom_id)
 
         local top_w, top_h, center_w, center_h,  bottom_w, bottom_h
 
@@ -153,17 +200,27 @@ function rt.Levelbar:size_allocate(x, y, width, height)
         end
 
         center_h = clamp(height - top_m - bottom_m - top_h - bottom_h)
-        self._rail_top:fit_into(rt.AABB(x + 0.5 * width - 0.5 * top_w, y + top_m, top_w, top_h))
-        self._rail_top_bottom:fit_into(rt.AABB(x + 0.5 * width - 0.5 * center_w, y + top_m + top_h, center_w, center_h))
-        self._rail_bottom:fit_into(rt.AABB(x + 0.5 * width - 0.5 * bottom_w, y + height - bottom_m - bottom_h, bottom_w, bottom_h))
+
+        local top_aabb = rt.AABB(x + 0.5 * width - 0.5 * top_w, y + top_m, top_w, top_h)
+        local center_aabb = rt.AABB(x + 0.5 * width - 0.5 * center_w, y + top_m + top_h, center_w, center_h)
+        local bottom_aabb = rt.AABB(x + 0.5 * width - 0.5 * bottom_w, y + height - bottom_m - bottom_h, bottom_w, bottom_h)
+        self._rail_top:fit_into(top_aabb)
+        self._rail_top_bottom:fit_into(center_aabb)
+        self._rail_bottom:fit_into(bottom_aabb)
+
+        if self._use_overlay then
+            self._overlay_top:fit_into(top_aabb)
+            self._overlay_top_bottom:fit_into(center_aabb)
+            self._overlay_bottom:fit_into(bottom_aabb)
+        end
     end
 
     self:_update_bar()
 end
 
 --- @overload rt.Widget.realize
-function rt.Levelbar:realize()
-    meta.assert_isa(self, rt.Levelbar)
+function rt.SpriteLevelbar:realize()
+    meta.assert_isa(self, rt.SpriteLevelbar)
 
     self._rail_left:realize()
     self._rail_left_right:realize()
@@ -171,12 +228,15 @@ function rt.Levelbar:realize()
     self._rail_top:realize()
     self._rail_top_bottom:realize()
     self._rail_bottom:realize()
-    self._bar_left:realize()
-    self._bar_left_right:realize()
-    self._bar_right:realize()
-    self._bar_top:realize()
-    self._bar_top_bottom:realize()
-    self._bar_bottom:realize()
+
+    if self._use_overlay then
+        self._overlay_left:realize()
+        self._overlay_left_right:realize()
+        self._overlay_right:realize()
+        self._overlay_top:realize()
+        self._overlay_top_bottom:realize()
+        self._overlay_bottom:realize()
+    end
 
     self:_update_bar()
     rt.Widget.realize(self)
@@ -184,8 +244,8 @@ end
 
 --- @brief set levelbar value
 --- @param value Number
-function rt.Levelbar:set_value(value)
-    meta.assert_isa(self, rt.Levelbar)
+function rt.SpriteLevelbar:set_value(value)
+    meta.assert_isa(self, rt.SpriteLevelbar)
     meta.assert_number(value)
 
     self._value = clamp(value, self._lower, self._upper)
@@ -194,15 +254,15 @@ end
 
 --- @brief get levelbar value
 --- @return Number
-function rt.Levelbar:get_value()
-    meta.assert_isa(self, rt.Levelbar)
+function rt.SpriteLevelbar:get_value()
+    meta.assert_isa(self, rt.SpriteLevelbar)
     return self._value
 end
 
 --- @brief set orientation
 --- @param orientation rt.Orientation
-function rt.Levelbar:set_orientation(orientation)
-    meta.assert_isa(self, rt.Levelbar)
+function rt.SpriteLevelbar:set_orientation(orientation)
+    meta.assert_isa(self, rt.SpriteLevelbar)
     meta.assert_enum(orientation, rt.Orientation)
     self._orientation = orientation
     self:reformat()
@@ -210,7 +270,22 @@ end
 
 --- @brief get orientation
 --- @return rt.Orientation
-function rt.Levelbar:get_orientation()
-    meta.assert_isa(self, rt.Levelbar)
+function rt.SpriteLevelbar:get_orientation()
+    meta.assert_isa(self, rt.SpriteLevelbar)
     return self._orientation
+end
+
+--- @brief set color
+--- @param color rt.RGBA (or rt.HSVA)
+function rt.SpriteLevelbar:set_color(color)
+    meta.assert_isa(self, rt.SpriteLevelbar)
+    if not (meta.is_rgba(color) or meta.is_hsva(color)) then
+        error("[rt][ERROR] In rt.SpriteLevelbar:set_color: Expected color, got `" .. meta.typeof(color) .. "`")
+    end
+    self._bar:set_color(color)
+end
+
+--- @brief [internal] test
+function rt.test.sprite_levelbar()
+    error("TODO")
 end

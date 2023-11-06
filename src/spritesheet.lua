@@ -103,6 +103,15 @@ function rt.Spritesheet:_assert_has_animation(scope, animation_id)
     end
 end
 
+--- @brief check if spritesheet has animation with given name
+--- @param id String
+--- @return Boolean
+function rt.Spritesheet:has_animation(animation_id)
+    meta.assert_isa(self, rt.Spritesheet)
+    meta.assert_string(animation_id)
+    return not meta.is_nil(self._name_to_frame[animation_id])
+end
+
 --- @brief get bounds of frame
 --- @param animation_id String
 --- @param index_maybe Number
@@ -178,5 +187,5 @@ end
 
 --- @brief test spritesheet
 function rt.test.spritesheet()
-    -- TODO
+    error("TODO")
 end

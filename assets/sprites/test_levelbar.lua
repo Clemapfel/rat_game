@@ -9,11 +9,11 @@ return {
         rail_top = 4,
         rail_vertical = 5,
         rail_bottom = 6,
-        bar_left = 7,
-        bar_horizontal = 8,
-        bar_right = 9,
-        bar_top = 10,
-        bar_vertical = 11,
-        bar_bottom = 12
+        overlay_left = 7,
+        overlay_horizontal = 8,
+        overlay_right = 9,
+        overlay_top = 10,
+        overlay_vertical = 11,
+        overlay_bottom = 12
     }
 }
