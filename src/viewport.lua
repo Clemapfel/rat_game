@@ -212,5 +212,5 @@ end
 
 --- @brief test viewport
 function rt.test.viewport()
-    -- TODO
+    error("TODO")
 end

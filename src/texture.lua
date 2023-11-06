@@ -110,5 +110,5 @@ end
 
 --- @brief test texture
 function rt.test.texture()
-    -- TODO
+    error("TODO")
 end

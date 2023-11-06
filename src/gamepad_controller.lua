@@ -137,5 +137,5 @@ end
 
 --- @brief [internal] test gamepad controller
 function rt.test.gamepad_controller()
-    -- TODO
+    error("TODO")
 end

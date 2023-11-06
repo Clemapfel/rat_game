@@ -306,6 +306,6 @@ end
 
 --- @brief test shapes
 function rt.test.shapes()
-    -- TODO
+    error("TODO")
 end
 

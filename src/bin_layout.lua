@@ -77,6 +77,6 @@ end
 
 --- @brief test BinLayout
 function rt.test.bin_layout()
-    -- TODO
+    error("TODO")
 end
 

@@ -89,6 +89,6 @@ end
 
 --- @brief test WindowLayout
 function rt.test.bin_layout()
-    -- TODO
+    error("TODO")
 end
 

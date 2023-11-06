@@ -98,6 +98,6 @@ end
 
 --- @brief test AspectLayout
 function rt.test.aspect_layout()
-    -- TODO
+    error("TODO")
 end
 

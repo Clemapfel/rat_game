@@ -443,5 +443,5 @@ end
 
 --- @brief [internal] test widget
 function rt.test.test_widget()
-    -- TODO
+    error("TODO")
 end

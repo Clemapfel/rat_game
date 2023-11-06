@@ -126,6 +126,6 @@ end
 
 --- @brief
 function rt.test.test_mouse_controller()
-    -- TODO
+    error("TODO")
 end
 

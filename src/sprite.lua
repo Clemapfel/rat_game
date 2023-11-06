@@ -173,7 +173,7 @@ end
 
 --- @brief test sprite
 function rt.test.sprite()
-    -- TODO
+    error("TODO")
     --[[
     spritesheet = rt.Spritesheet("assets/sprites", "test_animation")
     sprite = rt.Sprite(spritesheet)

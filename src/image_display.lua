@@ -56,5 +56,5 @@ end
 
 --- @brief test `ImageDisplay`
 function rt.test.image_display()
-    -- TODO
+    error("TODO")
 end

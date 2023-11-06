@@ -180,5 +180,5 @@ end
 
 --- @brief [internal] test animation
 function rt.test.test_animation()
-    -- TODO
+    error("TODO")
 end

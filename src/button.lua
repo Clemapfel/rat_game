@@ -138,5 +138,5 @@ end
 
 --- @brief [internal] test button
 function rt.test.button()
-    -- TODO
+    error("TODO")
 end

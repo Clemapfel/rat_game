@@ -134,7 +134,7 @@ end
 
 --- @brief [internal]
 function rt.test.scrollbar()
-    -- TODO
+    error("TODO")
 end
 
 

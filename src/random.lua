@@ -81,5 +81,5 @@ end
 
 --- @brief test random
 function rt.test.random()
-   -- TODO
+   error("TODO")
 end

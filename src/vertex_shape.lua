@@ -217,5 +217,5 @@ end
 
 --- @brief test VertexShape
 function rt.test.vertex_shape()
-    -- TODO
+    error("TODO")
 end

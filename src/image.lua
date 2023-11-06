@@ -96,5 +96,5 @@ end
 
 --- @brief test Image
 function rt.test.image()
-    -- TODO
+    error("TODO")
 end

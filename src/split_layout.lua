@@ -158,5 +158,5 @@ end
 
 --- @brief test SplitLayout
 function rt.test.split_layout()
-    -- TODO
+    error("TODO")
 end

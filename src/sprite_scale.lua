@@ -1,14 +1,14 @@
-rt.settings.scale = {}
-rt.settings.scale.rail_left_id = "rail_left"
-rt.settings.scale.rail_left_right_id = "rail_horizontal"
-rt.settings.scale.rail_right_id = "rail_right"
-rt.settings.scale.rail_top_id = "rail_top"
-rt.settings.scale.rail_top_bottom_id = "rail_vertical"
-rt.settings.scale.rail_bottom_id = "rail_bottom"
-rt.settings.scale.slider_id = "slider"
+rt.settings.sprite_scale = {}
+rt.settings.sprite_scale.rail_left_id = "rail_left"
+rt.settings.sprite_scale.rail_left_right_id = "rail_horizontal"
+rt.settings.sprite_scale.rail_right_id = "rail_right"
+rt.settings.sprite_scale.rail_top_id = "rail_top"
+rt.settings.sprite_scale.rail_top_bottom_id = "rail_vertical"
+rt.settings.sprite_scale.rail_bottom_id = "rail_bottom"
+rt.settings.sprite_scale.slider_id = "slider"
 
---- @class rt.Scale
-rt.Scale = meta.new_type("Scale", function(spritesheet, lower, upper, value, orientation)
+--- @class rt.SpriteScale
+rt.SpriteScale = meta.new_type("SpriteScale", function(spritesheet, lower, upper, value, orientation)
     meta.assert_isa(spritesheet, rt.Spritesheet)
     meta.assert_number(lower, upper)
     if meta.is_nil(value) then
@@ -19,30 +19,26 @@ rt.Scale = meta.new_type("Scale", function(spritesheet, lower, upper, value, ori
         orientation = rt.Orientation.HORIZONTAL
     end
 
-    local out = meta.new(rt.Scale, {
+    local out = meta.new(rt.SpriteScale, {
         _spritesheet = spritesheet,
-        _left = rt.Sprite(spritesheet, rt.settings.scale.rail_left_id),
-        _left_right = rt.Sprite(spritesheet, rt.settings.scale.rail_left_right_id),
-        _right = rt.Sprite(spritesheet, rt.settings.scale.rail_right_id),
-        _top = rt.Sprite(spritesheet, rt.settings.scale.rail_top_id),
-        _top_bottom = rt.Sprite(spritesheet, rt.settings.scale.rail_top_bottom_id),
-        _bottom = rt.Sprite(spritesheet, rt.settings.scale.rail_bottom_id),
-        _slider = rt.Sprite(spritesheet, rt.settings.scale.slider_id),
+        _left = rt.Sprite(spritesheet, rt.settings.sprite_scale.rail_left_id),
+        _left_right = rt.Sprite(spritesheet, rt.settings.sprite_scale.rail_left_right_id),
+        _right = rt.Sprite(spritesheet, rt.settings.sprite_scale.rail_right_id),
+        _top = rt.Sprite(spritesheet, rt.settings.sprite_scale.rail_top_id),
+        _top_bottom = rt.Sprite(spritesheet, rt.settings.sprite_scale.rail_top_bottom_id),
+        _bottom = rt.Sprite(spritesheet, rt.settings.sprite_scale.rail_bottom_id),
+        _slider = rt.Sprite(spritesheet, rt.settings.sprite_scale.slider_id),
         _lower = lower,
         _upper = upper,
         _value = value,
         _orientation = orientation
     }, rt.Drawable, rt.Widget)
-
-    -- allow squishing of center pieces
-    self._left_right:set_minimum_size(0, self._spritesheet:get_frame_height(rt.settings.scale.rail_left_right_id))
-    self._top_bottom:set_minimum_size(0, self._spritesheet:get_frame_height(rt.settings.scale.rail_top_bottom_id))
     return out
 end)
 
 --- @overload rt.Drawable.draw
-function rt.Scale:draw()
-    meta.assert_isa(self, rt.Scale)
+function rt.SpriteScale:draw()
+    meta.assert_isa(self, rt.SpriteScale)
     if self._orientation == rt.Orientation.HORIZONTAL then
         self._left_right:draw()
         self._left:draw()
@@ -57,10 +53,10 @@ function rt.Scale:draw()
 end
 
 --- @brief [internal] reposition slider element
-function rt.Scale:_update_slider()
-    meta.assert_isa(self, rt.Scale)
+function rt.SpriteScale:_update_slider()
+    meta.assert_isa(self, rt.SpriteScale)
 
-    local frame_w, frame_h = self._spritesheet:get_frame_size(rt.settings.scale.slider_id)
+    local frame_w, frame_h = self._spritesheet:get_frame_size(rt.settings.sprite_scale.slider_id)
     local slider_x, slider_y, slider_w, slider_h
     if self._orientation == rt.Orientation.HORIZONTAL then
         local x, y = self._left:get_position()
@@ -97,15 +93,15 @@ function rt.Scale:_update_slider()
 end
 
 --- @overload rt.Widget.size_allocate
-function rt.Scale:size_allocate(x, y, width, height)
-    meta.assert_isa(self, rt.Scale)
+function rt.SpriteScale:size_allocate(x, y, width, height)
+    meta.assert_isa(self, rt.SpriteScale)
 
     local left_m, right_m, top_m, bottom_m = self:get_margin_left(), self:get_margin_right(), self:get_margin_top(), self:get_margin_bottom()
 
     if self._orientation == rt.Orientation.HORIZONTAL then
-        local left_frame_w, left_frame_h = self._spritesheet:get_frame_size(rt.settings.scale.rail_left_id)
-        local right_frame_w, right_frame_h = self._spritesheet:get_frame_size(rt.settings.scale.rail_right_id)
-        local center_frame_w, center_frame_h = self._spritesheet:get_frame_size(rt.settings.scale.rail_left_right_id)
+        local left_frame_w, left_frame_h = self._spritesheet:get_frame_size(rt.settings.sprite_scale.rail_left_id)
+        local right_frame_w, right_frame_h = self._spritesheet:get_frame_size(rt.settings.sprite_scale.rail_right_id)
+        local center_frame_w, center_frame_h = self._spritesheet:get_frame_size(rt.settings.sprite_scale.rail_left_right_id)
 
         local left_w, left_h, right_w, right_h, center_w, center_h
 
@@ -129,9 +125,9 @@ function rt.Scale:size_allocate(x, y, width, height)
         self._left_right:fit_into(rt.AABB(x + left_m + left_w, y + 0.5 * height - 0.5 * center_h, center_w, center_h))
         self._right:fit_into(rt.AABB(x + width - right_m - right_w, y + 0.5 * height - 0.5 * right_h, right_w, right_h))
     elseif self._orientation == rt.Orientation.VERTICAL then
-        local top_frame_w, top_frame_h = self._spritesheet:get_frame_size(rt.settings.scale.rail_top_id)
-        local center_frame_w, center_frame_h = self._spritesheet:get_frame_size(rt.settings.scale.rail_top_bottom_id)
-        local bottom_frame_w, bottom_frame_h = self._spritesheet:get_frame_size(rt.settings.scale.rail_bottom_id)
+        local top_frame_w, top_frame_h = self._spritesheet:get_frame_size(rt.settings.sprite_scale.rail_top_id)
+        local center_frame_w, center_frame_h = self._spritesheet:get_frame_size(rt.settings.sprite_scale.rail_top_bottom_id)
+        local bottom_frame_w, bottom_frame_h = self._spritesheet:get_frame_size(rt.settings.sprite_scale.rail_bottom_id)
 
         local top_w, top_h, center_w, center_h,  bottom_w, bottom_h
 
@@ -160,8 +156,8 @@ function rt.Scale:size_allocate(x, y, width, height)
 end
 
 --- @overload rt.Widget.realize
-function rt.Scale:realize()
-    meta.assert_isa(self, rt.Scale)
+function rt.SpriteScale:realize()
+    meta.assert_isa(self, rt.SpriteScale)
 
     self._left:realize()
     self._left_right:realize()
@@ -177,8 +173,8 @@ end
 
 --- @brief set scale value
 --- @param value Number
-function rt.Scale:set_value(value)
-    meta.assert_isa(self, rt.Scale)
+function rt.SpriteScale:set_value(value)
+    meta.assert_isa(self, rt.SpriteScale)
     meta.assert_number(value)
 
     self._value = clamp(value, self._lower, self._upper)
@@ -187,15 +183,15 @@ end
 
 --- @brief get scale value
 --- @return Number
-function rt.Scale:get_value()
-    meta.assert_isa(self, rt.Scale)
+function rt.SpriteScale:get_value()
+    meta.assert_isa(self, rt.SpriteScale)
     return self._value
 end
 
 --- @brief set orientation
 --- @param orientation rt.Orientation
-function rt.Scale:set_orientation(orientation)
-    meta.assert_isa(self, rt.Scale)
+function rt.SpriteScale:set_orientation(orientation)
+    meta.assert_isa(self, rt.SpriteScale)
     meta.assert_enum(orientation, rt.Orientation)
     self._orientation = orientation
     self:reformat()
@@ -203,7 +199,13 @@ end
 
 --- @brief get orientation
 --- @return rt.Orientation
-function rt.Scale:get_orientation()
-    meta.assert_isa(self, rt.Scale)
+function rt.SpriteScale:get_orientation()
+    meta.assert_isa(self, rt.SpriteScale)
     return self._orientation
+end
+
+
+--- @brief [internal] test
+function rt.test.sprite_scale()
+    error("TODO")
 end

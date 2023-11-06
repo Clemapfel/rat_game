@@ -152,3 +152,8 @@ function rt.SpriteFrame:set_color(color)
     self._bottom_left:set_color(color)
     self._left:set_color(color)
 end
+
+--- @brief [internal] test
+function rt.test.sprite_frame()
+    error("TODO")
+end

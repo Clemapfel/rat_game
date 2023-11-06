@@ -86,14 +86,14 @@ rt.Palette = {
     GREY_6 = rt.RGBA("#202025"),
     BLACK = rt.RGBA("#0b0b10"),
 
-    PURE_WHITE = rt.RGBA("#ffffff"),
-    PURE_RED = rt.RGBA("#ff0000"),
-    PURE_GREEN = rt.RGBA("#00ff00"),
-    PURE_BLUE = rt.RGBA("#0000ff"),
-    PURE_CYAN = rt.RGBA("#00ffff"),
-    PURE_YELLOW = rt.RGBA("#ffff00"),
-    PURE_MAGENTA = rt.RGBA("#ff00ff"),
-    PURE_BLACK = rt.RGBA("#000000")
+     TRUE_WHITE = rt.RGBA("#ffffff"),
+    TRUE_RED = rt.RGBA("#ff0000"),
+    TRUE_GREEN = rt.RGBA("#00ff00"),
+    TRUE_BLUE = rt.RGBA("#0000ff"),
+    TRUE_CYAN = rt.RGBA("#00ffff"),
+    TRUE_YELLOW = rt.RGBA("#ffff00"),
+    TRUE_MAGENTA = rt.RGBA("#ff00ff"),
+    TRUE_BLACK = rt.RGBA("#000000")
 }
 
 rt.Palette.GREEN = rt.Palette.GREEN_1
@@ -200,14 +200,14 @@ function rt.Palette:export()
         "GREY_6",
         "BLACK",
 
-        "PURE_WHITE",
-        "PURE_RED",
-        "PURE_GREEN",
-        "PURE_BLUE",
-        "PURE_CYAN",
-        "PURE_YELLOW",
-        "PURE_MAGENTA",
-        "PURE_BLACK"
+        "TRUE_WHITE",
+        "TRUE_RED",
+        "TRUE_GREEN",
+        "TRUE_BLUE",
+        "TRUE_CYAN",
+        "TRUE_YELLOW",
+        "TRUE_MAGENTA",
+        "TRUE_BLACK"
     }
 
     local image = rt.Image(sizeof(ordered)+1, 1)

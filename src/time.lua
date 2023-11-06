@@ -108,5 +108,5 @@ end
 
 --- @brief [internal] test time
 function rt.test.time()
-    -- TODO
+    error("TODO")
 end

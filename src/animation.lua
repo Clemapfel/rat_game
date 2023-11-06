@@ -63,5 +63,5 @@ end
 
 --- @brief [internal] test animation
 function rt.test.animation()
-    -- TODO
+    error("TODO")
 end

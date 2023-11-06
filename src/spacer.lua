@@ -64,5 +64,5 @@ end
 
 --- @brief test Spacer
 function rt.test.spacer()
-    -- TODO
+    error("TODO")
 end

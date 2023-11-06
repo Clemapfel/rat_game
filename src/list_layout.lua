@@ -195,5 +195,5 @@ end
 
 --- @brief test ListLayout
 function rt.test.list_layout()
-    -- TODO
+    error("TODO")
 end

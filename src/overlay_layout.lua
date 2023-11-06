@@ -86,5 +86,5 @@ end
 
 --- @brief test OverlayLayout
 function rt.test.overlay_layout()
-    -- TODO
+    error("TODO")
 end

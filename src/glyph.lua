@@ -327,6 +327,6 @@ end
 
 --- @brief [internal] test glyph
 function rt.test.glyph()
-    -- TODO
+    error("TODO")
 end
 
