@@ -8,6 +8,7 @@ rt.test = {}
 rt.settings = {}
 
 require "common"
+require "log"
 require "meta"
 require "time"
 require "vector"

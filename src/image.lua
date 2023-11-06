@@ -51,7 +51,7 @@ function rt.Image:set_pixel(x, y, rgba)
     meta.assert_rgba(rgba)
 
     if x < 1 or x > self:get_width() or y < 1 or y > self:get_width() then
-        error("[rt][ERROR] In Image:set_pixel: index (" .. tostring(x) .. ", " .. tostring(y) .. ") is out of range for image of size `" .. tostring(self:get_width()) .. " x " .. tostring(self:get_height()) .. "`")
+        rt.error("In Image:set_pixel: index (" .. tostring(x) .. ", " .. tostring(y) .. ") is out of range for image of size `" .. tostring(self:get_width()) .. " x " .. tostring(self:get_height()) .. "`")
     end
     self._native:setPixel(x - 1, y - 1, rgba.r, rgba.g, rgba.b, rgba.a)
 end
@@ -65,7 +65,7 @@ function rt.Image:get_pixel(x, y)
     meta.assert_isa(self, rt.Image)
 
     if x < 1 or x > self:get_width() or y < 1 or y > self:get_width() then
-        error("[rt][ERROR] In Image:get_pixel: index (" .. tostring(x) .. ", " .. tostring(y) .. ") is out of range for image of size `" .. tostring(self:get_width()) .. " x " .. tostring(self:get_height()) .. "`")
+        rt.error("In Image:get_pixel: index (" .. tostring(x) .. ", " .. tostring(y) .. ") is out of range for image of size `" .. tostring(self:get_width()) .. " x " .. tostring(self:get_height()) .. "`")
     end
     local r, g, b, a = self._native:getPixel(x - 1, y - 1)
     return rt.RGBA(r, g, b, a)

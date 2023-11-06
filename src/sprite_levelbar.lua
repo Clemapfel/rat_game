@@ -280,7 +280,7 @@ end
 function rt.SpriteLevelbar:set_color(color)
     meta.assert_isa(self, rt.SpriteLevelbar)
     if not (meta.is_rgba(color) or meta.is_hsva(color)) then
-        error("[rt][ERROR] In rt.SpriteLevelbar:set_color: Expected color, got `" .. meta.typeof(color) .. "`")
+        rt.error("In rt.SpriteLevelbar:set_color: Expected color, got `" .. meta.typeof(color) .. "`")
     end
     self._bar:set_color(color)
 end

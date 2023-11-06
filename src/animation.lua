@@ -37,7 +37,7 @@ rt.Animation._is_animated = false
 --- @brief abstract method, must be override
 function rt.Animation:update(delta)
     meta.assert_isa(self, rt.Animation)
-    error("[rt][ERROR] In " .. meta.typeof(self) .. ":update(): abstract method called")
+    rt.error("In " .. meta.typeof(self) .. ":update(): abstract method called")
 end
 
 --- @brief get whether animation is active

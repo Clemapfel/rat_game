@@ -26,7 +26,7 @@ function rt.GridLayout:size_allocate(x, y, width, height)
     end
 
     if self._max_n_rows * self._max_n_cols < self._children:size() then
-        println("[rt][WARNING] In rt.GridLayout:size_allocate: Requested grid layout to have a maximum size of `" .. tostring(self._max_n_rows) .. " * " .. tostring(self._max_n_cols) .. " = " .. tostring(self._max_n_rows * self._max_n_cols) .. "`, but it has `" .. tostring(self._children:size()) .. "` elements.")
+        rt.warning(" In rt.GridLayout:size_allocate: Requested grid layout to have a maximum size of `" .. tostring(self._max_n_rows) .. " * " .. tostring(self._max_n_cols) .. " = " .. tostring(self._max_n_rows * self._max_n_cols) .. "`, but it has `" .. tostring(self._children:size()) .. "` elements.")
     end
 
     if self._orientation == rt.Orientation.HORIZONTAL then

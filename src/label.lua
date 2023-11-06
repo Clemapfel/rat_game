@@ -235,7 +235,7 @@ function rt.Label:_parse()
     -- throw error, with guides
     local function throw_parse_error(reason)
         meta.assert_string(reason)
-        error("[rt] In rt.Label._parse: Error at position `" .. tostring(i) .. "`: " .. reason)
+        rt.error("[rt] In rt.Label._parse: Error at position `" .. tostring(i) .. "`: " .. reason)
     end
 
     -- advance n characters

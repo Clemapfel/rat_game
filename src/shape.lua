@@ -6,9 +6,7 @@ rt.LineJoin = meta.new_enum({
 })
 
 --- @class rt.Shape
-rt.Shape = meta.new_type("Shape", function()
-    error("In rt.Shape(): called abstract constructor")
-end)
+rt.Shape = meta.new_abstract_type("Shape")
 
 rt.Shape._color = rt.RGBA()
 rt.Shape._is_outline = false

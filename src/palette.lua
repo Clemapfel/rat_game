@@ -223,15 +223,15 @@ function rt.Palette:export()
     local to = love.filesystem.getSourceBaseDirectory() .. "/rat_game/assets/palette.png"
     os.execute("mv " .. from .. " " .. to)
     love.filesystem.remove("palette.png")
-    println("[rt][LOG] Exported palette to " .. to)
+    rt.log(" Exported palette to " .. to)
 end
 
 rt._PaletteMetatable = {
     __index = function(self, key)
-        error("In Palette:__index: No color with name `" .. key .. "` in rt.Palette")
+        rt.error("In Palette:__index: No color with name `" .. key .. "` in rt.Palette")
     end,
     __newindex = function(self, key, new_value)
-        error("In Palette:__new_index: No color with name `" .. key .. "` in rt.Palette")
+        rt.error("In Palette:__new_index: No color with name `" .. key .. "` in rt.Palette")
     end
 }
 setmetatable(rt.Palette, rt._PaletteMetatable)

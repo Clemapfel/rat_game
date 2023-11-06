@@ -39,7 +39,7 @@ end
 --- @brief
 function meta.assert_aabb(object)
     if not meta.is_aabb(object) then
-        error("In " .. debug.getinfo(2, "n").name .. ": Expected `AxisAlignedRectangle`, got `" .. meta.typeof(object) .. "`")
+        rt.error("In " .. debug.getinfo(2, "n").name .. ": Expected `AxisAlignedRectangle`, got `" .. meta.typeof(object) .. "`")
     end
 end
 meta.make_debug_only("meta.assert_aabb")

@@ -69,13 +69,13 @@ function rt.Audio:set_sample(i, value)
     meta.assert_number(i, value)
 
     if value < -1 or value > 1 then
-        println("[rt][WARNING] In rt.Audio.set_sample: Value `" .. tostring(value) .. "` is outside of [-1, 1]")
+        rt.warning(" In rt.Audio.set_sample: Value `" .. tostring(value) .. "` is outside of [-1, 1]")
         value = clamp(value, -1, 1)
     end
 
     local n_samples = self:get_n_samples()
     if i < 1 or i > n_samples then
-        error("[rt][ERROR] In rt.Audio.set_sample: Index `" .. tostring(i) .. "` is out of range for audio data with `" .. tostring(n_samples) .. "`")
+        rt.error("In rt.Audio.set_sample: Index `" .. tostring(i) .. "` is out of range for audio data with `" .. tostring(n_samples) .. "`")
     end
 
     self._native:setSample(i - 1, value)
@@ -90,7 +90,7 @@ function rt.Audio:get_sample(i)
 
     local n_samples = self:get_n_samples()
     if i < 1 or i > n_samples then
-        error("[rt][ERROR] In rt.Audio.get_sample: Index `" .. tostring(i) .. "` is out of range for audio data with `" .. tostring(n_samples) .. "`")
+        rt.error("In rt.Audio.get_sample: Index `" .. tostring(i) .. "` is out of range for audio data with `" .. tostring(n_samples) .. "`")
     end
 
     return self._native:getSample(i - 1)

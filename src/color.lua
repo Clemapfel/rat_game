@@ -37,7 +37,7 @@ end
 --- @brief [internal] throw if object is not rt.RGBA
 function meta.assert_rgba(object)
     if not meta.is_rgba(object) then
-        error("In " .. debug.getinfo(2, "n").name .. ": Excpected `RGBA`, got `" .. meta.typeof(object) .. "`")
+        rt.error("In " .. debug.getinfo(2, "n").name .. ": Excpected `RGBA`, got `" .. meta.typeof(object) .. "`")
     end
 end
 meta.make_debug_only("meta.assert_rgba")
@@ -76,7 +76,7 @@ end
 --- @param object any
 function meta.assert_hsva(object)
     if not meta.is_hsva(object) then
-        error("In " .. debug.getinfo(2, "n").name .. ": Excpected `HSVA`, got `" .. meta.typeof(object) .. "`")
+        rt.error("In " .. debug.getinfo(2, "n").name .. ": Excpected `HSVA`, got `" .. meta.typeof(object) .. "`")
     end
 end
 meta.make_debug_only("meta.assert_hsva")
@@ -261,7 +261,7 @@ function rt.html_code_to_color(code)
     end
 
     ::error::
-    error("[rt][ERROR] In rt.html_code_to_rgba: `" .. code .. "` is not a valid hexadecimal color identifier. Reason: " .. error_reason)
+    rt.error("In rt.html_code_to_rgba: `" .. code .. "` is not a valid hexadecimal color identifier. Reason: " .. error_reason)
 end
 
 --- @brief convert rgba to html color code

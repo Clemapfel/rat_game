@@ -127,7 +127,7 @@ function rt.SplitLayout:set_ratio(ratio)
     meta.assert_isa(self, rt.SplitLayout)
     meta.assert_number(ratio)
     if ratio < 0 or ratio > 1 then
-        error("[rt][ERROR] In rt.SplitLayout.set_ratio: ratio `" .. tostring(ratio) .. "` has to be inside [0, 1]")
+        rt.error("In rt.SplitLayout.set_ratio: ratio `" .. tostring(ratio) .. "` has to be inside [0, 1]")
     end
     self._ratio = ratio
     self:reformat()

@@ -82,7 +82,7 @@ end
 for name, f in pairs(rt.test) do
     if meta.is_function(f) then
         try_catch(f, function(err)
-            println("[rt][TEST_FAILED] In rt.test." .. name .. ": " .. err)
+            println(rt.settings.rt_prefix, "[TEST_FAILED] In rt.test." .. name .. ": " .. err)
         end)
     end
 end

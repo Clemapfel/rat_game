@@ -21,7 +21,7 @@ function rt.add_signal_component(object)
     meta.assert_object(object)
 
     if not meta.is_nil(getmetatable(object).components.signal) then
-        error("[rt][ERROR] In add_signal_component: Object already has a signal component")
+        rt.error("In add_signal_component: Object already has a signal component")
     end
 
     local component = rt.SignalComponent(object)
@@ -59,7 +59,7 @@ function rt._assert_has_signal(scope, component, signal_id)
     meta.assert_string(scope, signal_id)
 
     if not component:has_signal(signal_id) then
-        error("[rt][ERROR] In SignalComponent." .. scope .. ": Object of type `" .. meta.typeof(component._instance) .. "`has no signal with name `" .. signal_id .. "`")
+        rt.error("In SignalComponent." .. scope .. ": Object of type `" .. meta.typeof(component._instance) .. "`has no signal with name `" .. signal_id .. "`")
     end
 end
 
@@ -96,7 +96,7 @@ function rt.SignalComponent:emit(name, ...)
     local signal = self._signals[name]
 
     if meta.is_nil(signal) then
-        error("[rt][ERROR] In SignalComponent:emit: Object of type `" .. meta.typeof(self._instance) .. "` has no signal with name `" .. name .. "`")
+        rt.error("In SignalComponent:emit: Object of type `" .. meta.typeof(self._instance) .. "` has no signal with name `" .. name .. "`")
     end
 
     if signal.is_blocked then return end

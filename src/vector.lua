@@ -58,7 +58,7 @@ end
 --- @param object any
 function meta.assert_vector2(object)
     if not meta.is_vector2(object) then
-        error("In " .. debug.getinfo(2, "n").name .. ": Excpected `Vector2`, got `" .. meta.typeof(object) .. "`")
+        rt.error("In " .. debug.getinfo(2, "n").name .. ": Excpected `Vector2`, got `" .. meta.typeof(object) .. "`")
     end
 end
 meta.make_debug_only("meta.assert_vector2")
@@ -128,7 +128,7 @@ end
 --- @param object any
 function meta.assert_vector3(object)
     if not meta.is_vector3(object) then
-        error("In " .. debug.getinfo(2, "n").name .. ": Excpected `Vector3`, got `" .. meta.typeof(object) .. "`")
+        rt.error("In " .. debug.getinfo(2, "n").name .. ": Excpected `Vector3`, got `" .. meta.typeof(object) .. "`")
     end
 end
 meta.make_debug_only("meta.assert_vector3")

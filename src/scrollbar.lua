@@ -46,7 +46,7 @@ function rt.Scrollbar:set_value(value)
     meta.assert_isa(self, rt.Scrollbar)
 
     if value < 0 or value > 1 then
-        error("[rt][ERROR] In rt.Scrollbar.set_value: value `" .. tostring(value) .. "` is outside [0, 1]")
+        rt.error("In rt.Scrollbar.set_value: value `" .. tostring(value) .. "` is outside [0, 1]")
     end
 
     self._value = value

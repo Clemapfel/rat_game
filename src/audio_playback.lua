@@ -84,7 +84,7 @@ function rt.AudioPlayback:set_volume(value)
     meta.assert_isa(self, rt.AudioPlayback)
     meta.assert_number(value)
     if value < 0 or value > 1 then
-        error("[rt][ERROR] In AudioPlayback:set_volume: Value `" .. tostring(value) .. "` is outside [0, 1]")
+        rt.error("In AudioPlayback:set_volume: Value `" .. tostring(value) .. "` is outside [0, 1]")
     end
     self._native:setVolumne(value)
 end
