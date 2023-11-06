@@ -57,7 +57,7 @@ require "sprite_frame"
 require "sprite_scale"
 require "sprite_levelbar"
 
-require "test"
+--require "test"
 
 function connect_emmy_lua_debugger()
     -- entry point for JetBrains IDE debugger
@@ -133,10 +133,6 @@ end
 --- @brief update tick
 function love.update()
     local delta = love.timer.getDelta()
-    if meta.is_nil(delta) then
-        println("test")
-        return
-    end
 
     rt.AnimationTimerHandler:update(delta)
     rt.AnimationHandler:update(delta)

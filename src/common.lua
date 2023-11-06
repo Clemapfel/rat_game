@@ -26,8 +26,7 @@ function println(...)
     end
 
     for _, v in pairs(values) do
-        print(v)
-        io.write("")
+        io.write(tostring(v))
     end
 
     io.write("\n")

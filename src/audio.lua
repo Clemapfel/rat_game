@@ -69,7 +69,7 @@ function rt.Audio:set_sample(i, value)
     meta.assert_number(i, value)
 
     if value < -1 or value > 1 then
-        rt.warning(" In rt.Audio.set_sample: Value `" .. tostring(value) .. "` is outside of [-1, 1]")
+        rt.warning("In rt.Audio.set_sample: Value `".. tostring(value) .. "` is outside of [-1, 1]")
         value = clamp(value, -1, 1)
     end
 

@@ -41,6 +41,7 @@ rt.SpriteLevelbar = meta.new_type("SpriteLevelbar", function(spritesheet, lower,
     }) do
         if not spritesheet:has_animation(id) then
             use_overlay = false
+            rt.log("In rt.SpriteLevelbar: Spritesheet `" .. spritesheet.name .. "` is missing bar overlay animations, disabling overlay...")
             break
         end
     end

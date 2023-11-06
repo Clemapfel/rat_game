@@ -9,7 +9,7 @@ meta.DUMMY_FUNCTION = function(...) end
 --- @param name String symbol name
 function meta.make_debug_only(name)
     local to_call = load("if meta.DEBUG_MODE ~= true then " .. name .. "= meta.DUMMY_FUNCTION end")
-    if meta.is_nil(to_call) then rt.error(" In meta.debug_only: Symbol `" .. name .. "` is malformatted") end
+    if meta.is_nil(to_call) then rt.error("In meta.debug_only: Symbol `" .. name .. "` is malformatted") end
     to_call()
 end
 
@@ -85,7 +85,7 @@ function meta._new(typename)
     metatable.__newindex = function(this, property_name, property_value)
         local metatable = getmetatable(this)
         if not metatable.is_mutable then
-            rt.error(" In " .. metatable.__name .. ".__newindex: Cannot set property `" .. property_name .. "`, because the object was declared immutable.")
+            rt.error("In " .. metatable.__name .. ".__newindex: Cannot set property `" .. property_name .. "`, because the object was declared immutable.")
         end
         metatable.properties[property_name] = property_value
 
@@ -180,7 +180,7 @@ end
 function meta._assert_aux(b, x, type)
     if b then return true end
     local name = debug.getinfo(2, "n").name
-    rt.error(" In " .. name .. ": expected `" .. type .. "`, got `" .. meta.typeof(x) .. "`")
+    rt.error("In " .. name .. ": expected `" .. type .. "`, got `" .. meta.typeof(x) .. "`")
     return false
 end
 
@@ -190,7 +190,7 @@ function meta.assert(b)
     meta.assert_boolean(b)
     if not b then
         local name = debug.getinfo(2, "n").name
-        rt.error(" In " .. name .. ": Assertion failed")
+        rt.error("In " .. name .. ": Assertion failed")
     end
 end
 
@@ -387,7 +387,7 @@ function meta.new_enum(fields)
 
     meta.assert_table(fields)
     if is_empty(fields) then
-        rt.error(" In meta.new_enum: list of values cannot be empty")
+        rt.error("In meta.new_enum: list of values cannot be empty")
     end
 
     local out = meta._new(meta.Enum)
@@ -398,11 +398,11 @@ function meta.new_enum(fields)
         meta.assert_string(name)
 
         if meta.is_table(value) then
-            rt.error(" In meta.new_enum: Enum value for key `" .. name .. "` is a `" .. meta.typeof(value) .. "`, which is not a primitive.")
+            rt.error("In meta.new_enum: Enum value for key `" .. name .. "` is a `" .. meta.typeof(value) .. "`, which is not a primitive.")
         end
 
         if used_values[value] ~= nil then
-            rt.error(" In meta.new_enum: Duplicate value, key `" .. name .. "` and `" .. used_values[value] .. "` both have the same value `" .. tostring(value) .. "`")
+            rt.error("In meta.new_enum: Duplicate value, key `" .. name .. "` and `" .. used_values[value] .. "` both have the same value `" .. tostring(value) .. "`")
         end
         used_values[value] = name
 
@@ -418,7 +418,7 @@ function meta.new_enum(fields)
     end
     metatable.__index = function(this, key)
         if not meta.has_property(this, key) then
-            rt.error(" In Enum:__index: Key `" .. key .. "` does not exist for enum")
+            rt.error("In Enum:__index: Key `" .. key .. "` does not exist for enum")
         else
             local metatable = getmetatable(this)
             return metatable.properties[key]
@@ -447,7 +447,7 @@ end
 --- @param enum meta.Enum
 function meta.assert_enum(x, enum)
     if not meta.is_enum_value(x, enum) then
-        rt.error(" In assert_enum: Value `" .. tostring(x) .. "` is not a value of enum ")
+        rt.error("In assert_enum: Value `" .. tostring(x) .. "` is not a value of enum ")
     end
 end
 
@@ -483,14 +483,14 @@ function meta.new_type(typename, ctor, dtor)
     metatable.__call = function(self, ...)
         local out = ctor(...)
         if not meta.isa(out, self._typename) then
-            rt.error(" In " .. self._typename .. ".__call: Constructor does not return object of type `" .. self._typename .. "`.")
+            rt.error("In " .. self._typename .. ".__call: Constructor does not return object of type `" .. self._typename .. "`.")
         end
         getmetatable(out).__gc = dtor
         return out
     end
 
     if not meta.is_nil(meta.types[typename]) then
-        rt.error(" In meta.new_type: A type with name `" .. typename .. "` already exists.")
+        rt.error("In meta.new_type: A type with name `" .. typename .. "` already exists.")
     end
     meta.types[typename] = out
     return out
@@ -511,7 +511,7 @@ end
 --- @param name String
 function meta.new_abstract_type(name)
     local out = meta.new_type(name, function()
-        rt.error(" In " .. name .. "._call: Type `" .. name .. "` is abstract, it cannot be instanced")
+        rt.error("In " .. name .. "._call: Type `" .. name .. "` is abstract, it cannot be instanced")
     end)
     return out
 end
@@ -596,7 +596,7 @@ end
 function meta.declare_abstract_method(super, name)
     meta.assert_object(super)
     super[name] = function(self)
-        rt.error(" In " .. super._typename .. "." .. name .. ": Abstract method called by object of type `" .. meta.typeof(self) .. "`")
+        rt.error("In " .. super._typename .. "." .. name .. ": Abstract method called by object of type `" .. meta.typeof(self) .. "`")
     end
 end
 

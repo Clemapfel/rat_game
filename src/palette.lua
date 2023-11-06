@@ -223,7 +223,7 @@ function rt.Palette:export()
     local to = love.filesystem.getSourceBaseDirectory() .. "/rat_game/assets/palette.png"
     os.execute("mv " .. from .. " " .. to)
     love.filesystem.remove("palette.png")
-    rt.log(" Exported palette to " .. to)
+    rt.log("Exported palette to " .. to)
 end
 
 rt._PaletteMetatable = {
