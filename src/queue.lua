@@ -1,18 +1,18 @@
 --- @class rt.Queue
 rt.Queue = meta.new_type("Queue", function()
     local out = meta.new(rt.Queue, {
-        elements = {},
-        first_element = 0,
-        last_element = 1,
-        n_elements = 0
+        _elements = {},
+        _first_element = 0,
+        _last_element = 1,
+        _n_elements = 0
     })
 
     local metatable = getmetatable(out)
     metatable.__pairs = function(self)
-        return pairs(self.elements)
+        return pairs(self._elements)
     end
     metatable.__ipairs = function(self)
-        return ipairs(self.elements)
+        return ipairs(self._elements)
     end
     metatable.__len = out.size
     return out
@@ -23,10 +23,10 @@ end)
 function rt.Queue:push_front(x)
     meta.assert_isa(self, rt.Queue)
 
-    local current = self.first_element - 1
-    self.elements[current] = x
-    self.first_element = current
-    self.n_elements = self.n_elements + 1
+    local current = self._first_element - 1
+    self._elements[current] = x
+    self._first_element = current
+    self._n_elements = self._n_elements + 1
 end
 
 --- @brief add element to end of queue
@@ -34,10 +34,10 @@ end
 function rt.Queue:push_back(x)
     meta.assert_isa(self, rt.Queue)
 
-    local current = self.last_element
-    self.elements[current] = x
-    self.last_element = current + 1
-    self.n_elements = self.n_elements + 1
+    local current = self._last_element
+    self._elements[current] = x
+    self._last_element = current + 1
+    self._n_elements = self._n_elements + 1
 end
 
 --- @brief remove element at start of queue
@@ -45,14 +45,14 @@ end
 function rt.Queue:pop_front()
     meta.assert_isa(self, rt.Queue)
 
-    if (self.n_elements == 0) then
+    if (self._n_elements == 0) then
         return nil
     end
 
-    local i = self.first_element
-    local out = self.elements[i]
-    self.first_element = i + 1
-    self.n_elements = self.n_elements - 1
+    local i = self._first_element
+    local out = self._elements[i]
+    self._first_element = i + 1
+    self._n_elements = self._n_elements - 1
 
     return out
 end
@@ -62,15 +62,15 @@ end
 function rt.Queue:pop_back()
     meta.assert_isa(self, rt.Queue)
 
-    if (self.n_elements == 0) then
+    if (self._n_elements == 0) then
         return nil
     end
 
-    local i = self.last_element - 1
-    local out = self.elements[i]
-    self.elements[i] = nil
-    self.last_element = i
-    self.n_elements = self.n_elements - 1
+    local i = self._last_element - 1
+    local out = self._elements[i]
+    self._elements[i] = nil
+    self._last_element = i
+    self._n_elements = self._n_elements - 1
 
     return out
 end
@@ -79,21 +79,21 @@ end
 --- @return any nil if queue is empty
 function rt.Queue:front()
     meta.assert_isa(self, rt.Queue)
-    return self.elements[self.first_element]
+    return self._elements[self._first_element]
 end
 
 --- @brief get element at end of queue
 --- @return any nil if queue is empty
 function rt.Queue:back()
     meta.assert_isa(self, rt.Queue)
-    return self.elements[self.last_element - 1]
+    return self._elements[self._last_element - 1]
 end
 
 --- @brief get number of elements in queue
 --- @return number
 function rt.Queue:size()
     meta.assert_isa(self, rt.Queue)
-    return self.n_elements
+    return self._n_elements
 end
 
 --- @brief check whether queue is empty
@@ -106,10 +106,10 @@ end
 --- @brief remove all children
 function rt.Queue:clear()
     meta.assert_isa(self, rt.Queue)
-    self.elements = {}
-    self.first_element = 0
-    self.last_element = 1
-    self.n_elements = 0
+    self._elements = {}
+    self._first_element = 0
+    self._last_element = 1
+    self._n_elements = 0
 end
 
 --- @brief [internal] test queue
