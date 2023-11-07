@@ -1,4 +1,5 @@
 --- @class rt.List
+--- @see rt.test.list for how to iterate
 rt.List = meta.new_type("List", function()
     local out = meta.new(rt.List, {
         _first_node = {},
@@ -9,16 +10,27 @@ rt.List = meta.new_type("List", function()
 
     local metatable = getmetatable(out)
     metatable.__pairs = function(self)
-
-        local function iterator(self, node)
-            local value
-            node, value = node.next, node.value
-            return node, value
+        local function iterator(self, state)
+            local node = state.node
+            local value = state.node.value
+            state.index = state.index + 1
+            state.node = state.node.next
+            if meta.is_nil(state.node) then return nil end
+            return state, value
         end
-        return iterator, self, self._first_node
+        return iterator, self, {node = self._first_node, index = 0}
     end
 
-    metatable.__ipairs = metatable.__pairs
+    metatable.__ipairs = function(self)
+        local function iterator(self, index)
+            local value = self:at(index) -- TODO: return index without using `at`
+            index = index + 1
+            if index > self._n_elements then return nil end
+            return index, value
+        end
+        return iterator, self, 0
+    end
+
     metatable.__len = out.size
     return out
 end)
@@ -248,8 +260,7 @@ function rt.test.list()
     end
 
     for i, value in pairs(list) do
-        println(i, " ", value)
-        --assert(list:at(i) == value)
+        assert(i.index == value)
     end
 end
 rt.test.list()
