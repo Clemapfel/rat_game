@@ -13,7 +13,7 @@ rt.ListLayout = meta.new_type("ListLayout", function(orientation, ...)
     }, rt.Drawable, rt.Widget)
 
     for _, x in pairs({...}) do
-        out:push_bacK(x)
+        out:push_back(x)
     end
     return out
 end)
