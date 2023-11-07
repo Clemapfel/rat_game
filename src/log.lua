@@ -16,5 +16,5 @@ end
 
 --- @brief
 function rt.error(message)
-    error(rt.settings.log.rt_prefix, rt.settings.log.error_prefix, " ", message)
+    error(rt.settings.log.rt_prefix .. rt.settings.log.error_prefix .. " " .. message)
 end
