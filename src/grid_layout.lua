@@ -1,7 +1,7 @@
 --- @class rt.GridLayout
 rt.GridLayout = meta.new_type("GridLayout", function()
     return meta.new(rt.GridLayout, {
-        _children = rt.Queue(),
+        _children = rt.List(),
         _orientation = rt.Orientation.VERTICAL,
         _min_n_cols = 0,
         _max_n_cols = POSITIVE_INFINITY,
@@ -191,6 +191,34 @@ function rt.GridLayout:pop_back()
     out:set_parent(nil)
     self:reformat()
     return out
+end
+
+--- @brief insert child at position
+--- @param index Number 1-based
+--- @param child rt.Widget
+function rt.GridLayout:insert(index, child)
+    meta.assert_isa(self, rt.GridLayout)
+    meta.assert_isa(child, rt.Widget)
+    meta.assert_number(index)
+
+    child:set_parent(self)
+    self._children:insert(index, child)
+    if self:get_is_realized() then
+        child:realize()
+        self:reformat()
+    end
+    self:reformat()
+end
+
+--- @brief remove child at position
+--- @param index Number 1-based
+function rt.GridLayout:erase(index)
+    meta.assert_isa(self, rt.GridLayout)
+    meta.assert_number(index)
+
+    local child = self._children:erase(index)
+    child:set_parent(nil)
+    self:reformat()
 end
 
 --- @brief set orientation, causes reformat

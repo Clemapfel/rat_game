@@ -75,13 +75,21 @@ end
 
 --- @brief add overlay child on top
 --- @param child rt.Widget
-function rt.OverlayLayout:add_overlay(child)
+function rt.OverlayLayout:push_overlay(child)
     meta.assert_isa(self, rt.OverlayLayout)
     meta.assert_isa(child, rt.Widget)
     child:set_parent(self)
     self._overlays:push_back(child)
-
     if self:get_is_realized() then child:realize() end
+end
+
+--- @brief remove top-most overlay
+function rt.OverlayLayout:pop_overlay()
+    meta.assert_isa(self, rt.OverlayLayout)
+    meta.assert_isa(child, rt.Widget)
+    local child = self._overlays:pop_back()
+    child:set_parent(nil)
+    return child
 end
 
 --- @brief test OverlayLayout

@@ -7,7 +7,7 @@ rt.FlowLayout = meta.new_type("FlowLayout", function(orientation)
     meta.assert_enum(orientation, rt.Orientation)
 
     return meta.new(rt.FlowLayout, {
-        _children = rt.Queue(),
+        _children = rt.List(),
         _orientation = orientation,
         _min_n_rows = 0,
         _min_n_cols = 0,
@@ -167,6 +167,34 @@ function rt.FlowLayout:pop_back()
     return out
 end
 
+--- @brief insert child at position
+--- @param index Number 1-based
+--- @param child rt.Widget
+function rt.FlowLayout:insert(index, child)
+    meta.assert_isa(self, rt.FlowLayout)
+    meta.assert_isa(child, rt.Widget)
+    meta.assert_number(index)
+
+    child:set_parent(self)
+    self._children:insert(index, child)
+    if self:get_is_realized() then
+        child:realize()
+        self:reformat()
+    end
+    self:reformat()
+end
+
+--- @brief remove child at position
+--- @param index Number 1-based
+function rt.FlowLayout:erase(index)
+    meta.assert_isa(self, rt.FlowLayout)
+    meta.assert_number(index)
+
+    local child = self._children:erase(index)
+    child:set_parent(nil)
+    self:reformat()
+end
+
 --- @brief set orientation, causes reformat
 --- @param orientation rt.Orientation
 function rt.FlowLayout:set_orientation(orientation)
@@ -211,5 +239,10 @@ end
 function rt.FlowLayout:get_column_spacing()
     meta.assert_isa(self, rt.FlowLayout)
     return self._column_spacing
+end
+
+--- @brief [internal] test
+function rt.test.flow_layout()
+    error("TODO")
 end
 

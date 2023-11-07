@@ -8,7 +8,7 @@ rt.ListLayout = meta.new_type("ListLayout", function(orientation, ...)
     meta.assert_enum(orientation, rt.Orientation)
 
     local out = meta.new(rt.ListLayout, {
-        _children = rt.Queue(),
+        _children = rt.List(),
         _orientation = rt.Orientation
     }, rt.Drawable, rt.Widget)
 
@@ -117,7 +117,7 @@ end
 --- @brief replace all children
 --- @param children Table<rt.Widget>
 function rt.ListLayout:set_children(children)
-    meta.assert_isa(self, rt.GridLayout)
+    meta.assert_isa(self, rt.ListLayout)
     for child in pairs(self._children) do
         child:set_parent(nil)
     end
@@ -175,6 +175,34 @@ function rt.ListLayout:pop_back()
     out:set_parent(nil)
     self:reformat()
     return out
+end
+
+--- @brief insert child at position
+--- @param index Number 1-based
+--- @param child rt.Widget
+function rt.ListLayout:insert(index, child)
+    meta.assert_isa(self, rt.ListLayout)
+    meta.assert_isa(child, rt.Widget)
+    meta.assert_number(index)
+
+    child:set_parent(self)
+    self._children:insert(index, child)
+    if self:get_is_realized() then
+        child:realize()
+        self:reformat()
+    end
+    self:reformat()
+end
+
+--- @brief remove child at position
+--- @param index Number 1-based
+function rt.ListLayout:erase(index)
+    meta.assert_isa(self, rt.ListLayout)
+    meta.assert_number(index)
+
+    local child = self._children:erase(index)
+    child:set_parent(nil)
+    self:reformat()
 end
 
 --- @brief set orientation
