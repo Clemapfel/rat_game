@@ -1,11 +1,26 @@
 --- @class rt.List
 rt.List = meta.new_type("List", function()
-    return meta.new(rt.List, {
+    local out = meta.new(rt.List, {
         _first_node = {},
         _last_node = {},
         _nodes = {},
         _n_elements = 0
     })
+
+    local metatable = getmetatable(out)
+    metatable.__pairs = function(self)
+
+        local function iterator(self, node)
+            local value
+            node, value = node.next, node.value
+            return node, value
+        end
+        return iterator, self, self._first_node
+    end
+
+    metatable.__ipairs = metatable.__pairs
+    metatable.__len = out.size
+    return out
 end)
 
 --- @brief
@@ -47,6 +62,33 @@ function rt.List:push_back(element)
 end
 
 --- @brief
+function rt.List:pop_front()
+    meta.assert_isa(self, rt.List)
+    local out = self._first_node
+    if not meta.is_nil(out.next) then
+        out.next.previous = nil
+    end
+
+    self._first_node = out.next
+    self._n_elements = self._n_elements - 1
+    return out.value
+end
+
+--- @brief
+function rt.List:pop_back()
+    meta.assert_isa(self, rt.List)
+    local out = self._last_node
+    if not meta.is_nil(out.previous) then
+        out.previous.next = nil
+    end
+
+    self._last_node = out.previous
+    self._n_elements = self._n_elements - 1
+    return out.value
+end
+
+--- @brief
+--- @return any removed value
 function rt.List:erase(index)
     meta.assert_isa(self, rt.List)
     if index > self._n_elements or index < 1 then
@@ -74,6 +116,7 @@ function rt.List:erase(index)
 
     self._n_elements = self._n_elements - 1
     table.remove(self._nodes, i)
+    return node.value
 end
 
 --- @brief insert element after index, or 0 to insert at start
@@ -202,6 +245,11 @@ function rt.test.list()
         assert(node.value ~= 1234)
         node = node.next
         i = i + 1
+    end
+
+    for i, value in pairs(list) do
+        println(i, " ", value)
+        --assert(list:at(i) == value)
     end
 end
 rt.test.list()
