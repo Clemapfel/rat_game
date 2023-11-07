@@ -35,7 +35,8 @@ rt.List = meta.new_type("List", function()
     return out
 end)
 
---- @brief
+--- @brief add element to start of list, O(1)
+--- @param element any
 function rt.List:push_front(element)
     meta.assert_isa(self, rt.List)
     local to_insert = {
@@ -54,7 +55,8 @@ function rt.List:push_front(element)
     table.insert(self._nodes, to_insert)
 end
 
---- @brief
+--- @brief add element to back of list, O(1)
+--- @param element any
 function rt.List:push_back(element)
     meta.assert_isa(self, rt.List)
     local to_insert = {
@@ -73,7 +75,8 @@ function rt.List:push_back(element)
     table.insert(self._nodes, to_insert)
 end
 
---- @brief
+--- @brief remove element from front of list, O(1)
+--- @return any
 function rt.List:pop_front()
     meta.assert_isa(self, rt.List)
     local out = self._first_node
@@ -86,7 +89,8 @@ function rt.List:pop_front()
     return out.value
 end
 
---- @brief
+--- @brief remove element from end of list, O(1)
+--- @return any
 function rt.List:pop_back()
     meta.assert_isa(self, rt.List)
     local out = self._last_node
@@ -99,7 +103,8 @@ function rt.List:pop_back()
     return out.value
 end
 
---- @brief
+--- @brief erase element in list, O(i)
+--- @param index Number 1-based
 --- @return any removed value
 function rt.List:erase(index)
     meta.assert_isa(self, rt.List)
@@ -131,7 +136,9 @@ function rt.List:erase(index)
     return node.value
 end
 
---- @brief insert element after index, or 0 to insert at start
+--- @brief insert element after index, or 0 to insert at start, O(i)
+--- @param index Number 1-based
+--- @param element any
 function rt.List:insert(index, element)
     meta.assert_isa(self, rt.List)
     if index > self._n_elements or index < 0 then
@@ -170,7 +177,9 @@ function rt.List:insert(index, element)
     self._n_elements = self._n_elements + 1
 end
 
---- @brief
+--- @brief get value at given index, O(i)
+--- @param index Number 1-based
+--- @return any
 function rt.List:at(index)
     meta.assert_isa(self, rt.List)
     if index > self._n_elements then
@@ -186,7 +195,9 @@ function rt.List:at(index)
     return node.value
 end
 
---- @brief
+--- @brief replace value at given index, O(i)
+--- @param index Number 1-based
+--- @param new_value any
 function rt.List:set(index, new_value)
     meta.assert_isa(self, rt.List)
     if index > self._n_elements then
@@ -202,7 +213,7 @@ function rt.List:set(index, new_value)
     node.value = new_value
 end
 
---- @brief
+--- @brief remove all elements in queue
 function rt.List:clear()
     meta.assert_isa(self, rt.List)
     self._nodes = {}
@@ -211,13 +222,14 @@ function rt.List:clear()
     self._n_elements = 0
 end
 
---- @brief
+--- @brief get number of elements, O(1)
+--- @return Number
 function rt.List:size()
     meta.assert_isa(self, rt.List)
     return self._n_elements
 end
 
---- @brief [internal] test
+--- @brief [internal] test list
 function rt.test.list()
     local list = rt.List()
     for i = 10, 20 do
@@ -263,5 +275,4 @@ function rt.test.list()
         assert(i.index == value)
     end
 end
-rt.test.list()
 
