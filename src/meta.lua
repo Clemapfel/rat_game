@@ -458,7 +458,9 @@ function meta._install_inheritance(instance, type)
     meta.assert_object(instance)
     meta.assert_isa(type, meta.Type)
 
-    table.insert(getmetatable(instance).super, type._typename)
+    if type._typename ~= meta.typeof(instance) then
+        table.insert(getmetatable(instance).super, type._typename)
+    end
 
     for key, value in pairs(getmetatable(type).properties) do
         if key ~= "_typename" and not meta.has_property(instance, key) then
