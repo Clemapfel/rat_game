@@ -1,3 +1,7 @@
+rt.settings.tab_layout = {
+    selection_indicator_alpha = 0.3
+}
+
 --- @class rt.TabLayout
 rt.TabLayout = meta.new_type("TabLayout", function()
     local out = meta.new(rt.TabLayout, {
@@ -12,7 +16,7 @@ rt.TabLayout = meta.new_type("TabLayout", function()
     out._content_area_backdrop_outline:set_color(rt.Palette.BACKGROUND_OUTLINE)
     out._content_area_backdrop_outline:set_is_outline(true)
     out._tab_content_area_divider:set_color(rt.Palette.BACKGROUND_OUTLINE)
-    
+
     return out
 end)
 
@@ -21,10 +25,19 @@ function rt.TabLayout:draw()
     meta.assert_isa(self, rt.TabLayout)
     if self:get_is_visible() then
         self._content_area_backdrop:draw()
+        local i = 1
         for _, page in pairs(self._pages) do
             page.label_backdrop:draw()
             page.label_backdrop_outline:draw()
+
+            if i == self._current_page then
+                page.selection_indicator:draw()
+            end
+
             page.label:draw()
+            page.content:draw()
+
+            i = i + 1
         end
 
         self._content_area_backdrop_outline:draw()
@@ -36,32 +49,37 @@ end
 function rt.TabLayout:size_allocate(x, y, width, height)
     meta.assert_isa(self, rt.TabLayout)
 
-
     local tab_height = NEGATIVE_INFINITY
     for _, page in pairs(self._pages) do
         local w, h = page.label:measure()
         tab_height = math.max(tab_height, ({page.label:measure()})[2])
     end
 
+    local content_bounds = rt.AABB(x, y + tab_height, width, height - tab_height)
+
     local tab_x = x
     local tab_y = y
     for _, page in pairs(self._pages) do
-        local tab_width = ({page.label:measure()})[1] + 2 * 10
+        local tab_width = ({page.label:measure()})[1] + 2 * rt.settings.margin_unit
 
-        local label_bounds = rt.AABB(tab_x, tab_y, tab_width, tab_height)
-        page.label:set_margin_horizontal(10)
-        page.label:fit_into(rt.AABB(tab_x, tab_y, tab_width, tab_height))
+        local label_bounds = rt.AABB(tab_x + rt.settings.margin_unit, tab_y, tab_width, tab_height)
+        page.label:fit_into(label_bounds)
         page.label_backdrop:resize(label_bounds)
         page.label_backdrop_outline:resize(label_bounds)
+        page.selection_indicator:resize(label_bounds)
 
         tab_x = tab_x + tab_width
+        page.content:fit_into(content_bounds)
     end
+
+    self._content_area_backdrop:resize(content_bounds)
+    self._content_area_backdrop_outline:resize(content_bounds)
 end
 
 --- @overload rt.Widget.realize
 function rt.TabLayout:realize()
     for _, page in pairs(self._pages) do
-        page.child:realize()
+        page.content:realize()
         page.label:realize()
     end
     rt.Widget.realize(self)
@@ -87,14 +105,16 @@ function rt.TabLayout:insert_page(index, title, child)
 
     local to_push = {
         label = title,
-        child = child,
+        content = child,
         label_backdrop = rt.Rectangle(0, 0, 1, 1),
-        label_backdrop_outline = rt.Rectangle(0, 0, 1, 1)
+        label_backdrop_outline = rt.Rectangle(0, 0, 1, 1),
+        selection_indicator = rt.Rectangle(0, 0, 1, 1)
     }
 
     to_push.label_backdrop:set_color(self._content_area_backdrop:get_color())
     to_push.label_backdrop_outline:set_color(self._content_area_backdrop_outline:get_color())
     to_push.label_backdrop_outline:set_is_outline(true)
+    to_push.selection_indicator:set_color(rt.RGBA(1, 1, 1, rt.settings.tab_layout.selection_indicator_alpha))
 
     self._pages:insert(index, to_push)
     child:set_parent(self)
@@ -115,7 +135,7 @@ function rt.TabLayout:remove_page(index)
     end
 
     local page = self._pages:erase(index)
-    page.child:set_parent(nil)
+    page.content:set_parent(nil)
     page.title:set_parent(nil)
 end
 
