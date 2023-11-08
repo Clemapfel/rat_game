@@ -17,6 +17,7 @@ require "angle"
 require "random"
 require "signals"
 require "queue"
+require "list"
 require "set"
 require "color"
 require "palette"
@@ -46,6 +47,7 @@ require "split_layout"
 require "grid_layout"
 require "flow_layout"
 require "aspect_layout"
+require "tab_layout"
 
 require "spacer"
 require "image_display"
@@ -80,28 +82,13 @@ rt.Font.DEFAULT = rt.load_font("Roboto", "assets/fonts/Roboto")
 rt.Font.DEFAULT_MONO = rt.load_font("DejaVuSansMono", "assets/fonts/DejaVuSansMono")
 
 window = rt.WindowLayout()
-spritesheet = rt.Spritesheet("assets/sprites", "test_animation")
-sprite = rt.Sprite(spritesheet)
-sprite:set_should_loop(true)
-sprite:set_is_animated(true)
-sprite:set_expand(true)
-sprite._shape:set_texture(nil)
-sprite:set_color(rt.RGBA(1, 0, 1, 1))
+tab = rt.TabLayout()
+tab:add_page(rt.Label("Page 01"), rt.Spacer())
+tab:add_page(rt.Label("Page 02"), rt.Spacer())
+tab:add_page(rt.Label("Page 03"), rt.Spacer())
 
-audio = rt.Audio("assets/sound/test_music.mp3")
-playback = rt.AudioPlayback(audio)
 
-frame = rt.SpriteFrame(rt.Spritesheet("assets/sprites", "test_frame"))
-frame:set_child(sprite)
-frame:set_color(rt.Palette.YELLOW)
-window:set_child(sprite)
-
-scale_sheet = rt.Spritesheet("assets/sprites", "test_levelbar")
-scale = rt.SpriteLevelbar(scale_sheet, 0, 1, 0.5, rt.Orientation.VERTICAL)
-scale:set_expand_vertically(true)
-scale:set_expand_horizontally(true)
-scale:set_margin_horizontal(50)
-window:set_child(scale)
+window:set_child(tab)
 
 key = rt.add_keyboard_controller(window)
 key:signal_connect("key_pressed", function(self, key)

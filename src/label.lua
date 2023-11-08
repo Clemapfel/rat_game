@@ -14,9 +14,31 @@ rt.Label = meta.new_type("Label", function(text)
         _font = rt.Font.DEFAULT,
         _justify_mode = rt.JustifyMode.LEFT,
         _glyphs = {},
-        _n_characters = 0
+        _n_characters = 0,
+        _default_width = 0,
+        _default_height = 0
     }, rt.Widget, rt.Drawable)
     out:_parse()
+
+    -- todo optimize this away
+    out:size_allocate(0, 0, 2^32, 2^32)
+    local min_x = POSITIVE_INFINITY
+    local min_y = POSITIVE_INFINITY
+    local max_x = NEGATIVE_INFINITY
+    local max_y = NEGATIVE_INFINITY
+
+    for _, glyph in pairs(out._glyphs) do
+        if meta.isa(glyph, rt.Glyph) then
+            local x, y = glyph:get_position()
+            local w, h = glyph:get_size()
+
+            min_x = math.min(min_x, x)
+            min_y = math.min(min_y, y)
+            max_x = math.max(max_x, x + w)
+            max_y = math.max(max_y, y + h)
+        end
+    end
+    out._default_width, out._default_height = max_x - min_x, max_y - min_y
     return out
 end)
 
@@ -40,8 +62,8 @@ function rt.Label:size_allocate(x, y, width, height)
     local tab = self._font:get_bold_italic():getWidth(rt.Label.TAB)
     local line_height = self._font:get_bold_italic():getHeight()
 
-    local glyph_x = 0
-    local glyph_y = 0
+    local glyph_x = x
+    local glyph_y = y
 
     local row_widths = {0}
     local rows = {{}}
@@ -146,25 +168,7 @@ end
 --- @overload rt.Widget.measure
 function rt.Label:measure()
     meta.assert_isa(self, rt.Label)
-
-    local min_x = POSITIVE_INFINITY
-    local min_y = POSITIVE_INFINITY
-    local max_x = NEGATIVE_INFINITY
-    local max_y = NEGATIVE_INFINITY
-
-    for _, glyph in pairs(self._glyphs) do
-        if meta.isa(glyph, rt.Glyph) then
-            local x, y = glyph:get_position()
-            local w, h = glyph:get_size()
-
-            min_x = math.min(min_x, x)
-            min_y = math.min(min_y, y)
-            max_x = math.max(max_x, x + w)
-            max_y = math.max(max_y, y + h)
-        end
-    end
-
-    return max_x - min_x + self:get_margin_left() + self:get_margin_right(), max_y - min_y + self:get_margin_top() + self:get_margin_bottom()
+    return self._default_width + self:get_margin_left() + self:get_margin_right(), self._default_height + self:get_margin_top() + self:get_margin_bottom()
 end
 
 -- control characters used for wrap hinting
