@@ -173,7 +173,7 @@ end
 --- @signal pressed     (self, rt.InputButton) -> nil
 --- @signal released    (self, rt.InputButton) -> nil
 rt.InputController = meta.new_type("InputController", function(holder)
-    meta.assert_isa(self, rt.Widget)
+    meta.assert_isa(holder, rt.Widget)
 
     local out = meta.new(rt.InputController, {
         _instance = holder,
@@ -225,6 +225,18 @@ rt.InputController = meta.new_type("InputController", function(holder)
         self._state[action] = false
     end, out)
 
+    out._mouse:signal_connect("click_pressed", function(_, x, y, button_id, n_presses)
+        meta.assert_enum(button_id, rt.MouseButton)
+        self:signal_emit("pressed", rt.InputButton.A)
+        self._state[rt.InputButton.A] = true
+    end)
+
+    out._mouse:signal_connect("click_released", function(_, x, y, button_id, n_presses)
+        meta.assert_enum(button_id, rt.MouseButton)
+        self:signal_emit("released", rt.InputButton.A)
+        self._state[rt.InputButton.A] = false
+    end)
+    
     return out
 end)
 

@@ -5,14 +5,19 @@ rt.MouseHandler = {}
 rt.MouseButton = meta.new_enum({
     LEFT = 1,
     MIDDLE = 2,
-    RIGHT = 3
+    RIGHT = 3,
+    TOUCH = 4
 })
 
 rt.MouseHandler._components = {}
 meta.make_weak(rt.MouseHandler._components, false, true)
 
 --- @class rt.MouseController
---- @param instance meta.Object
+--- @signal click_pressed  (self, x, y, rt.ButtonID, n_presses) -> nil
+--- @signal click_released (self, x, y, rt.ButtonID, n_presses) -> nil
+--- @signal motion_enter    (self, x, y) -> nil 
+--- @signal motion          (self, x, y, dx, dy) -> nil
+--- @signal motion_leave    (self, x, y) -> nil
 rt.MouseController = meta.new_type("MouseController", function(instance)
     meta.assert_object(instance)
     if meta.is_nil(instance.get_bounds) then
@@ -24,8 +29,8 @@ rt.MouseController = meta.new_type("MouseController", function(instance)
         _active = false
     }, rt.SignalEmitter)
 
-    out:signal_add("button_pressed")
-    out:signal_add("button_released")
+    out:signal_add("click_pressed")
+    out:signal_add("click_released")
     out:signal_add("motion_enter")
     out:signal_add("motion")
     out:signal_add("motion_leave")
@@ -40,36 +45,37 @@ end)
 function rt.MouseController:is_cursor_in_bounds(x, y)
     meta.assert_isa(self, rt.MouseController)
     meta.assert_number(x, y)
-    return self.instance:get_bounds():contains(x, y)
+    local bounds = self.instance:get_bounds()
+    return x >= bounds.x and x <= bounds.x + bounds.width and y >= bounds.y and y <= bounds.y + bounds.height
 end
 
 --- @brief handle mouse button press
 --- @param x Number
 --- @param y Number
---- @param button_id MouseButton
+--- @param button_id rt.MouseButton
 --- @param is_touch Boolean
-function rt.MouseHandler.handle_button_pressed(x, y, button_id, is_touch)
+function rt.MouseHandler.handle_click_pressed(x, y, button_id, is_touch, n_presses)
     for _, component in pairs(rt.MouseHandler._components) do
         if component:is_cursor_in_bounds(x, y) then
-            component:signal_emit("button_pressed", x, y, button_id)
+            component:signal_emit("click_pressed", x, y, ternary(is_touch, rt.MouseButton.TOUCH, button_id), n_presses)
         end
     end
 end
-love.mousepressed = rt.MouseHandler.handle_button_pressed
+love.mousepressed = rt.MouseHandler.handle_click_pressed
 
 --- @brief handle mouse button release
 --- @param x Number
 --- @param y Number
---- @param button_id MouseButton
+--- @param button_id rt.MouseButton
 --- @param is_touch Boolean
-function rt.MouseHandler.handle_button_released(x, y, button_id, is_touch)
+function rt.MouseHandler.handle_click_released(x, y, button_id, is_touch, n_presses)
     for _, component in pairs(rt.MouseHandler._components) do
         if component:is_cursor_in_bounds(x, y) then
-            component:signal_emit("button_released", x, y, button_id)
+            component:signal_emit("click_released", x, y, ternary(is_touch, rt.MouseButton.TOUCH, button_id), n_presses)
         end
     end
 end
-love.mousereleased = rt.MouseHandler.handle_button_released
+love.mousereleased = rt.MouseHandler.handle_click_released
 
 --- @brief handle mouse button press
 --- @param x Number
@@ -102,7 +108,7 @@ love.mousemoved = rt.MouseHandler.handle_motion
 
 --- @brief add an mouse component
 --- @param target meta.Object
---- @return rt.MouseComponent
+--- @return rt.MouseController
 function rt.add_mouse_controller(target)
     meta.assert_object(target)
     getmetatable(target).components.mouse = rt.MouseController(target)

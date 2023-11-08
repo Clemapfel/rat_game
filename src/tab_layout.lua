@@ -35,7 +35,10 @@ function rt.TabLayout:draw()
             end
 
             page.label:draw()
-            page.content:draw()
+
+            if i == self._current_page then
+                page.content:draw()
+            end
 
             i = i + 1
         end
@@ -130,8 +133,8 @@ end
 --- @brief
 function rt.TabLayout:remove_page(index)
     meta.assert_isa(self, rt.TabLayout)
-    if index > self._n_pages or index < 1 then
-        rt.error("In rt.TabLayout.remove_page: index `" .. tostring(index) .. "` is out of bounds for a TabLayout with `" .. tostring(self._n_pages) .. "` pages")
+    if index > self._pages:size() or index < 1 then
+        rt.error("In rt.TabLayout.remove_page: index `" .. tostring(index) .. "` is out of bounds for a TabLayout with `" .. tostring(self._pages:size()) .. "` pages")
     end
 
     local page = self._pages:erase(index)
@@ -142,8 +145,8 @@ end
 --- @brief
 function rt.TabLayout:set_page(index)
     meta.assert_isa(self, rt.TabLayout)
-    if index > self._n_pages or index < 1 then
-        rt.error("In rt.TabLayout.set_page: index `" .. tostring(index) .. "` is out of bounds for a TabLayout with `" .. tostring(self._n_pages) .. "` pages")
+    if index > self._pages:size() or index < 1 then
+        rt.error("In rt.TabLayout.set_page: index `" .. tostring(index) .. "` is out of bounds for a TabLayout with `" .. tostring(self._pages:size()) .. "` pages")
     end
 
     self._current_page = index
@@ -153,10 +156,10 @@ end
 --- @brief
 function rt.TabLayout:next_page()
     meta.assert_isa(self, rt.TabLayout)
-    if self._n_pages <= 1 then return end
+    if self._pages:size() <= 1 then return end
 
     local next = self._current_page + 1
-    if next <= self._n_pages then
+    if next <= self._pages:size() then
         self:set_page(next)
     end
 end
@@ -164,7 +167,7 @@ end
 --- @brief
 function rt.TabLayout:previous_page()
     meta.assert_isa(self, rt.TabLayout)
-    if self._n_pages <= 1 then return end
+    if self._pages:size() <= 1 then return end
 
     local next = self._current_page - 1
     if next >= 1 then
@@ -173,7 +176,7 @@ function rt.TabLayout:previous_page()
 end
 
 --- @brief
-function rt.TabLayout:get_n_pages()
+function rt.TabLayout:get_n_pages_size()
     meta.assert_isa(self, rt.TabLayout)
-    return self._n_pages
+    return self._pages:size()
 end

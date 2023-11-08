@@ -86,7 +86,7 @@ window = rt.WindowLayout()
 tab = rt.TabLayout()
 local image = rt.Image("assets/favicon.png")
 tab:add_page(rt.Label("Page 01"), rt.AspectLayout(1 / 1, rt.ImageDisplay(image)))
-tab:add_page(rt.Label("Page 02"), rt.AspectLayout(1 / 1, rt.ImageDisplay(image)))
+tab:add_page(rt.Label("Page 02"), rt.AspectLayout(1 / 1, rt.Spacer()))
 tab:add_page(rt.Label("Page 03"), rt.AspectLayout(1 / 1, rt.ImageDisplay(image)))
 
 window:set_child(tab)
@@ -94,13 +94,16 @@ window:set_child(tab)
 input = rt.InputController(window)
 input:signal_connect("pressed", function(self, button)
     if button == rt.InputButton.A then
+        println("activate")
     elseif button == rt.InputButton.B then
     elseif button == rt.InputButton.X then
     elseif button == rt.InputButton.Y then
     elseif button == rt.InputButton.UP then
     elseif button == rt.InputButton.RIGHT then
+        tab:next_page()
     elseif button == rt.InputButton.DOWN then
     elseif button == rt.InputButton.LEFT then
+        tab:previous_page()
     elseif button == rt.InputButton.START then
     elseif button == rt.InputButton.SELECT then
     elseif button == rt.InputButton.L then
