@@ -14,7 +14,6 @@ rt.ImageDisplay = meta.new_type("ImageDisplay", function(image)
         _shape = rt.VertexRectangle(0, 0, 1, 1)
     }, rt.Drawable, rt.Widget)
     out._shape:set_texture(out._texture)
-    out._shape:set_vertex_order({1, 2, 4, 3})
     out._shape:set_texture_rectangle(rt.AABB(0, 0, 1, 1))
     return out
 end)
