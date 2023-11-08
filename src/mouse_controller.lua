@@ -8,7 +8,6 @@ rt.MouseButton = meta.new_enum({
     RIGHT = 3
 })
 
-rt.MouseHandler._hash = 1
 rt.MouseHandler._components = {}
 meta.make_weak(rt.MouseHandler._components, false, true)
 
@@ -16,16 +15,12 @@ meta.make_weak(rt.MouseHandler._components, false, true)
 --- @param instance meta.Object
 rt.MouseController = meta.new_type("MouseController", function(instance)
     meta.assert_object(instance)
-    local hash = rt.MouseHandler._hash
-    rt.MouseHandler._hash = rt.MouseHandler._hash + 1
-
     if meta.is_nil(instance.get_bounds) then
         rt.error("In MouseCompoent: instance of type `" .. instance .. "` does not have a `get_bounds` function")
     end
 
     local out = meta.new(rt.MouseController, {
         instance = instance,
-        _hash = hash,
         _active = false
     }, rt.SignalEmitter)
 
@@ -35,7 +30,7 @@ rt.MouseController = meta.new_type("MouseController", function(instance)
     out:signal_add("motion")
     out:signal_add("motion_leave")
 
-    rt.MouseHandler._components[hash] = out
+    rt.MouseHandler._components[meta.hash(out)] = out
     return out
 end)
 
