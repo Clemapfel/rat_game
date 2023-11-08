@@ -200,15 +200,61 @@ rt.InputController = meta.new_type("InputController", function(holder)
     out._gamepad:signal_connect("button_pressed", function(_, id, button, self)
         meta.assert_enum(button, rt.GamepadButton)
         local action = rt.InputHandler._reverse_mapping.gamepad[button]
-        if not meta.is_nil(action) then self:signal_emit("pressed", action) end
-        self._state[action] = true
+
+        if self._state[action] == false then
+            if not meta.is_nil(action) then self:signal_emit("pressed", action) end
+            self._state[action] = true
+        end
     end, out)
 
     out._gamepad:signal_connect("button_released", function(_, id, button, self)
         meta.assert_enum(button, rt.GamepadButton)
         local action = rt.InputHandler._reverse_mapping.gamepad[button]
-        if not meta.is_nil(action) then self:signal_emit("released", action) end
-        self._state[action] = false
+
+        if self._state[action] == true then
+            if not meta.is_nil(action) then self:signal_emit("released", action) end
+            self._state[action] = false
+        end
+    end, out)
+
+
+    rt.settings.input_controller = {
+        trigger_threshold = 0.1
+    }
+
+    out._gamepad:signal_connect("axis_changed", function(_, id, which_axis, value, self)
+        if which_axis == rt.GamepadAxis.LEFT_X then
+            -- TODO
+        elseif which_axis == rt.GamepadAxis.LEFT_Y then
+        elseif which_axis == rt.GamepadAxis.RIGHT_X then
+        elseif which_axis == rt.GamepadAxis.RIGHTY then
+        elseif which_axis == rt.GamepadAxis.LEFT_TRIGGER then
+            if self._axis_state[rt.GamepadAxis.LEFT_TRIGGER] < 0.5 and value > 0.5 then
+                if self._state[rt.InputButton.L] == false then
+                    self:signal_emit("pressed", rt.InputButton.L)
+                    self._state[rt.InputButton.L] = true
+                end
+            elseif self._axis_state[rt.GamepadAxis.LEFT_TRIGGER] > 0.5 and value < 0.5 then
+                if self._state[rt.InputButton.L] == true then
+                    self:signal_emit("pressed", rt.InputButton.L)
+                    self._state[rt.InputButton.L] = false
+                end
+            end
+        elseif which_axis == rt.GamepadAxis.RIGHT_TRIGGER then
+            if self._axis_state[rt.GamepadAxis.RIGHT_TRIGGER] < 0.5 and value > 0.5 then
+                if self._state[rt.InputButton.R] == false then
+                    self:signal_emit("pressed", rt.InputButton.R)
+                    self._state[rt.InputButton.R] = true
+                end
+            elseif self._axis_state[rt.GamepadAxis.RIGHT_TRIGGER] > 0.5 and value < 0.5 then
+                if self._state[rt.InputButton.R] == true then
+                    self:signal_emit("pressed", rt.InputButton.R)
+                    self._state[rt.InputButton.R] = false
+                end
+            end
+        end
+
+        self._axis_state[which_axis] = value
     end, out)
 
     out._keyboard:signal_connect("key_pressed", function(_, key, self)
