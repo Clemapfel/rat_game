@@ -1,7 +1,8 @@
 --- @class rt.AspectLayout
 --- @brief Makes sure its singular child conforms to given width-to-height ratio
 --- @param ratio Number
-rt.AspectLayout = meta.new_type("AspectLayout", function(ratio)
+--- @param child rt.Widget (or nil)
+rt.AspectLayout = meta.new_type("AspectLayout", function(ratio, child)
     meta.assert_number(ratio)
     local out = meta.new(rt.AspectLayout, {
         _child = {},
@@ -9,6 +10,11 @@ rt.AspectLayout = meta.new_type("AspectLayout", function(ratio)
         _width = 0,
         _height = 0
     }, rt.Widget, rt.Drawable)
+
+    if not meta.is_nil(child) then
+        meta.assert_isa(child, rt.Widget)
+        out:set_child(child)
+    end
     return out
 end)
 
@@ -18,7 +24,7 @@ function rt.AspectLayout:set_child(child)
     meta.assert_isa(self, rt.AspectLayout)
     meta.assert_isa(self, rt.Widget)
 
-    if not meta.is_nil(self._child) then
+    if meta.isa(self._child, rt.Widget) then
         self._child:set_parent(nil)
     end
 
@@ -41,7 +47,7 @@ end
 --- @brief remove child
 function rt.AspectLayout:remove_child()
     meta.assert_isa(self, rt.AspectLayout)
-    if not meta.is_nil(self._child) then
+    if meta.isa(self._child, rt.Widget) then
         self._child:set_parent(nil)
         self._child = nil
     end
@@ -50,7 +56,7 @@ end
 --- @overload rt.Drawable.draw
 function rt.AspectLayout:draw()
     meta.assert_isa(self, rt.AspectLayout)
-    if self:get_is_visible() and not meta.is_nil(self._child) then
+    if self:get_is_visible() and meta.isa(self._child, rt.Widget) then
         self._child:draw()
     end
 end
@@ -60,7 +66,7 @@ function rt.AspectLayout:size_allocate(x, y, width, height)
     meta.assert_isa(self, rt.AspectLayout)
     self._width = width
     self._height = height
-    if meta.is_nil(self._child) then return end
+    if not meta.isa(self._child, rt.Widget) then return end
 
     local child_x, child_y, child_w, child_h
     if height < width then
@@ -74,12 +80,14 @@ function rt.AspectLayout:size_allocate(x, y, width, height)
     local child_x = x + (width - child_w) / 2
     local child_y = y + (height - child_h) / 2
 
-    self._child:fit_into(rt.AABB(child_x, child_y, child_w, child_h))
+    if meta.isa(self._child, rt.Widget) then
+        self._child:fit_into(rt.AABB(child_x, child_y, child_w, child_h))
+    end
 end
 
 --- @overload rt.Widget.measure
 function rt.AspectLayout:measure()
-    if meta.is_nil(self._child) then return 0, 0 end
+    if not meta.isa(self._child, rt.Widget) then return 0, 0 end
     return self._child:measure()
 end
 
