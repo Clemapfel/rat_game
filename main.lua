@@ -37,6 +37,7 @@ require "audio_playback"
 require "gamepad_controller"
 require "keyboard_controller"
 require "mouse_controller"
+require "input_controller"
 
 require "widget"
 require "window_layout"
@@ -90,19 +91,20 @@ tab:add_page(rt.Label("Page 03"), rt.AspectLayout(1 / 1, rt.ImageDisplay(image))
 
 window:set_child(tab)
 
-key = rt.add_keyboard_controller(window)
-key:signal_connect("key_pressed", function(self, key)
-
-    if key == rt.KeyboardKey.ARROW_UP then
-    elseif key == rt.KeyboardKey.ARROW_DOWN then
-    elseif key == rt.KeyboardKey.ARROW_LEFT then
-        scale:set_value(scale:get_value() - 0.05)
-    elseif key == rt.KeyboardKey.ARROW_RIGHT then
-        scale:set_value(scale:get_value() + 0.05)
-    elseif key == rt.KeyboardKey.PLUS then
-    elseif key == rt.KeyboardKey.MINUS then
-    elseif key == rt.KeyboardKey.SPACE then
-        scale:set_orientation(rt.Orientation.HORIZONTAL)
+input = rt.InputController(window)
+input:signal_connect("pressed", function(self, button)
+    if button == rt.InputButton.A then
+    elseif button == rt.InputButton.B then
+    elseif button == rt.InputButton.X then
+    elseif button == rt.InputButton.Y then
+    elseif button == rt.InputButton.UP then
+    elseif button == rt.InputButton.RIGHT then
+    elseif button == rt.InputButton.DOWN then
+    elseif button == rt.InputButton.LEFT then
+    elseif button == rt.InputButton.START then
+    elseif button == rt.InputButton.SELECT then
+    elseif button == rt.InputButton.L then
+    elseif button == rt.InputButton.R then
     end
 end)
 
