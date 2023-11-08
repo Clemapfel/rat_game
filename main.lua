@@ -5,9 +5,9 @@ package.path = package.path .. ";" .. RESOURCE_PATH .. "/?.lua"
 
 rt = {}
 rt.test = {}
-rt.settings = {}
 
 require "common"
+require "settings"
 require "log"
 require "meta"
 require "time"
@@ -83,10 +83,10 @@ rt.Font.DEFAULT_MONO = rt.load_font("DejaVuSansMono", "assets/fonts/DejaVuSansMo
 
 window = rt.WindowLayout()
 tab = rt.TabLayout()
-tab:add_page(rt.Label("Page 01"), rt.Spacer())
-tab:add_page(rt.Label("Page 02"), rt.Spacer())
-tab:add_page(rt.Label("Page 03"), rt.Spacer())
-
+local image = rt.Image("assets/favicon.png")
+tab:add_page(rt.Label("Page 01"), rt.AspectLayout(1 / 1, rt.ImageDisplay(image)))
+tab:add_page(rt.Label("Page 02"), rt.AspectLayout(1 / 1, rt.ImageDisplay(image)))
+tab:add_page(rt.Label("Page 03"), rt.AspectLayout(1 / 1, rt.ImageDisplay(image)))
 
 window:set_child(tab)
 
