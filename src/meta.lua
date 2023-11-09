@@ -447,7 +447,7 @@ end
 --- @param enum meta.Enum
 function meta.assert_enum(x, enum)
     if not meta.is_enum_value(x, enum) then
-        rt.error("In assert_enum: Value `" .. tostring(x) .. "` is not a value of enum ")
+        rt.error("In assert_enum: Value `" .. meta.typeof(x) .. "` is not a value of enum `" .. serialize(getmetatable(enum).properties) .. "`")
     end
 end
 

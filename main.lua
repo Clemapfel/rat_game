@@ -99,11 +99,13 @@ input:signal_connect("pressed", function(self, button)
     elseif button == rt.InputButton.X then
     elseif button == rt.InputButton.Y then
     elseif button == rt.InputButton.UP then
+        println("up")
     elseif button == rt.InputButton.RIGHT then
-        tab:next_page()
+        println("right")
     elseif button == rt.InputButton.DOWN then
+        println("down")
     elseif button == rt.InputButton.LEFT then
-        tab:previous_page()
+        println("left")
     elseif button == rt.InputButton.START then
     elseif button == rt.InputButton.SELECT then
     elseif button == rt.InputButton.L then

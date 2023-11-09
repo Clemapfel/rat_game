@@ -102,7 +102,9 @@ function rt.SignalComponent:emit(name, ...)
     if signal.is_blocked then return end
     local res = nil
     for id, callback in pairs(signal.callbacks) do
-        res = callback(self._instance, ..., signal.data[id])
+        local args = {...}
+        table.insert(args, signal.data[id])
+        res = callback(self._instance, table.unpack(args))
     end
     return res
 end
@@ -297,5 +299,17 @@ function rt.test.signals()
     component:disconnect(signal)
     component:emit(signal)
     assert(not called)
+
+    local x = 1
+    local y = 2
+    local z = 3
+
+    component:connect(signal, function(self, a, b, c, data)
+        assert(a == x)
+        assert(b == y)
+        assert(c == z)
+        assert(data == 1234)
+    end, 1234)
+    component:emit(signal, x, y, z)
 end
 
