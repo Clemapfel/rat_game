@@ -229,33 +229,12 @@ rt.InputController = meta.new_type("InputController", function(holder)
 
     out._gamepad:signal_connect("axis_changed", function(_, id, which_axis, value, self)
 
-        if which_axis == rt.GamepadAxis.LEFT_X then
-            if self._axis_state[rt.GamepadAxis.LEFT_X] <= 0 and value > 0 then
-                if self._state[rt.InputButton.RIGHT] == false then
-                    self:signal_emit("pressed", rt.InputButton.RIGHT)
-                    self._state[rt.InputButton.RIGHT] = true
-                end
-            elseif self._axis_state[rt.GamepadAxis.LEFT_X] >= 0 and value < 0 then
-                if self._state[rt.InputButton.LEFT] == false then
-                    self:signal_emit("pressed", rt.InputButton.LEFT)
-                    self._state[rt.InputButton.LEFT] = true
-                end
-            end
-        elseif which_axis == rt.GamepadAxis.LEFT_Y then
-            if self._axis_state[rt.GamepadAxis.LEFT_Y] <= 0 and value > 0 then
-                if self._state[rt.InputButton.UP] == false then
-                    self:signal_emit("pressed", rt.InputButton.UP)
-                    self._state[rt.InputButton.UP] = true
-                end
-            elseif self._axis_state[rt.GamepadAxis.LEFT_Y] >= 0 and value < 0 then
-                if self._state[rt.InputButton.DOWN] == false then
-                    self:signal_emit("pressed", rt.InputButton.DOWN)
-                    self._state[rt.InputButton.DOWN] = true
-                end
-            end
-        elseif which_axis == rt.GamepadAxis.RIGHT_X then
-            -- noop
-        elseif which_axis == rt.GamepadAxis.RIGHT_Y then
+        if which_axis == rt.GamepadAxis.LEFT_X or which_axis == rt.GamepadAxis.LEFT_Y then
+            local x, y = rt.GamepadHandler.get_axes(id, rt.GamepadAxis.LEFT_X, rt.GamepadAxis.LEFT_Y)
+            println(x, " ", y)
+        end
+
+        if which_axis == rt.GamepadAxis.RIGHT_X or which_axis == rt.GamepadAxis.RIGHT_Y then
             -- noop
         elseif which_axis == rt.GamepadAxis.LEFT_TRIGGER then
             if self._axis_state[rt.GamepadAxis.LEFT_TRIGGER] < 0.5 and value > 0.5 then

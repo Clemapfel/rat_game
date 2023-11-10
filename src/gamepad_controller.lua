@@ -113,6 +113,25 @@ function rt.GamepadHandler.handle_axis_changed(joystick, axis, value)
 end
 love.gamepadaxis = rt.GamepadHandler.handle_axis_changed
 
+--- @brief get current axis position
+--- @param vararg rt.GamepadAxis
+function rt.GamepadHandler.get_axes(controller_id, ...)
+    local out = {}
+    local joystick
+    local joysticks = love.joystick.getJoysticks()
+    for i, x in ipairs(joysticks) do
+        if i == controller_id then
+            joystick = x
+        end
+    end
+
+    if joystick == nil then
+        rt.error("In rt.GamepadHandler.get_axes: no controller with id `" .. tostring(controller_id) .. "` available")
+    end
+
+    return joystick:getAxes(...)
+end
+
 --- @brief add a gamepad controller
 --- @param target meta.Object
 --- @return rt.GamepadController
