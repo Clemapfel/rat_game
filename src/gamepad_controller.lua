@@ -129,7 +129,20 @@ function rt.GamepadHandler.get_axes(controller_id, ...)
         rt.error("In rt.GamepadHandler.get_axes: no controller with id `" .. tostring(controller_id) .. "` available")
     end
 
-    return joystick:getAxes(...)
+    local raw = {joystick:getAxes()}
+    local axes = {}
+    axes[rt.GamepadAxis.LEFT_X] = raw[1]
+    axes[rt.GamepadAxis.LEFT_Y] = raw[2]
+    axes[rt.GamepadAxis.LEFT_TRIGGER] = raw[3]
+    axes[rt.GamepadAxis.RIGHT_X] = raw[4]
+    axes[rt.GamepadAxis.RIGHT_Y] = raw[5]
+    axes[rt.GamepadAxis.RIGHT_TRIGGER] = raw[6]
+
+    local out = {}
+    for _, which in pairs({...}) do
+        table.insert(out, axes[which])
+    end
+    return table.unpack(out)
 end
 
 --- @brief add a gamepad controller

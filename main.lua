@@ -94,10 +94,13 @@ window:set_child(tab)
 input = rt.InputController(window)
 input:signal_connect("pressed", function(self, button)
     if button == rt.InputButton.A then
-        println("activate")
+        println("A")
     elseif button == rt.InputButton.B then
+        println("B")
     elseif button == rt.InputButton.X then
+        println("X")
     elseif button == rt.InputButton.Y then
+        println("Y")
     elseif button == rt.InputButton.UP then
         println("up")
     elseif button == rt.InputButton.RIGHT then
@@ -107,10 +110,30 @@ input:signal_connect("pressed", function(self, button)
     elseif button == rt.InputButton.LEFT then
         println("left")
     elseif button == rt.InputButton.START then
+        println("start")
     elseif button == rt.InputButton.SELECT then
+        println("select")
     elseif button == rt.InputButton.L then
+        println("l")
     elseif button == rt.InputButton.R then
+        println("r")
     end
+end)
+
+input:signal_connect("joystick", function(self, x, y)
+    println(x, " ", y)
+end)
+
+input:signal_connect("enter", function(motion, x, y)
+    println("enter")
+end)
+
+input:signal_connect("leave", function(motion, x, y)
+    println("leave")
+end)
+
+input:signal_connect("motion", function(motion, x, y, dx, dy)
+    println(x, " ", y, " ", dx, " ", dy)
 end)
 
 --- @brief startup

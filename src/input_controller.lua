@@ -1,3 +1,11 @@
+rt.settings.input = {}
+rt.settings.input = {
+    trigger_threshold = 0.1,
+    deadzone = 0.05,
+    convert_left_trigger_to_dpad = true,
+    convert_right_trigger_to_dpad = true
+}
+
 rt.InputHandler = {}
 rt.InputHandler._components = {}
 meta.make_weak(rt.InputHandler._components, false, true)
@@ -170,8 +178,13 @@ function rt.InputHandler._load_input_mapping()
 end
 
 --- @class rt.InputController
---- @signal pressed     (self, rt.InputButton) -> nil
---- @signal released    (self, rt.InputButton) -> nil
+--- @brief combines all input methods into one, fully abstracted controller
+--- @signal pressed   (self, rt.InputButton) -> nil
+--- @signal released  (self, rt.InputButton) -> nil
+--- @signal joystick  (self, x, y) -> nil
+--- @signal enter     (self, x, y) -> nil
+--- @signal motion    (self, x, y, dx, dy) -> nil
+--- @signal leave     (self, x, y) -> nil
 rt.InputController = meta.new_type("InputController", function(holder)
     meta.assert_isa(holder, rt.Widget)
 
@@ -187,9 +200,6 @@ rt.InputController = meta.new_type("InputController", function(holder)
     if sizeof(rt.InputHandler._mapping) == 0 then
         rt.InputHandler._mapping = rt.InputHandler._load_input_mapping()
     end
-    if sizeof(rt.InputHandler._reverse_mapping) == 0 then
-        rt.InputHandler._reverse_mapping = rt.InputHandler._generate_reverse_mapping()
-    end
 
     for _, key in pairs(rt.InputButton) do
         out._state[key] = false
@@ -201,6 +211,10 @@ rt.InputController = meta.new_type("InputController", function(holder)
 
     out:signal_add("pressed")
     out:signal_add("released")
+    out:signal_add("joystick")
+    out:signal_add("enter")
+    out:signal_add("motion")
+    out:signal_add("leave")
 
     out._gamepad:signal_connect("button_pressed", function(_, id, button, self)
         meta.assert_enum(button, rt.GamepadButton)
@@ -222,42 +236,137 @@ rt.InputController = meta.new_type("InputController", function(holder)
         end
     end, out)
 
-
-    rt.settings.input_controller = {
-        trigger_threshold = 0.1
-    }
-
     out._gamepad:signal_connect("axis_changed", function(_, id, which_axis, value, self)
+
+        local in_range = function(x, a, b)
+            local lower = math.min(a, b)
+            local upper = math.max(a, b)
+            return x >= lower and x <= upper
+        end
 
         if which_axis == rt.GamepadAxis.LEFT_X or which_axis == rt.GamepadAxis.LEFT_Y then
             local x, y = rt.GamepadHandler.get_axes(id, rt.GamepadAxis.LEFT_X, rt.GamepadAxis.LEFT_Y)
-            println(x, " ", y)
+            self:signal_emit("joystick", x, y)
+
+            if rt.settings.input.convert_left_trigger_to_dpad then
+                local distance = math.sqrt((x - 0)^2 + (y - 0)^2)
+                local angle = rt.radians(math.atan2(x - 0, y - 0)):as_degrees()
+
+                if distance >= rt.settings.input.deadzone then
+                    if in_range(angle, 180 - 45, 180) or in_range(angle, -180 + 45, -180) then -- top
+                        if self._state[rt.InputButton.UP] == false then
+                            self._state[rt.InputButton.UP] = true
+                            self._state[rt.InputButton.DOWN] = false
+                            self._state[rt.InputButton.LEFT] = false
+                            self._state[rt.InputButton.RIGHT] = false
+                            self:signal_emit("pressed", rt.InputButton.UP)
+                        end
+                    elseif in_range(angle, 90 + 45, 90 - 45) then -- right
+                        if self._state[rt.InputButton.RIGHT] == false then
+                            self._state[rt.InputButton.UP] = false
+                            self._state[rt.InputButton.DOWN] = false
+                            self._state[rt.InputButton.LEFT] = false
+                            self._state[rt.InputButton.RIGHT] = true
+                            self:signal_emit("pressed", rt.InputButton.RIGHT)
+                        end
+                    elseif in_range(angle, 0 - 45, 0 + 45) then -- bottom
+                        if self._state[rt.InputButton.DOWN] == false then
+                            self._state[rt.InputButton.UP] = false
+                            self._state[rt.InputButton.DOWN] = true
+                            self._state[rt.InputButton.LEFT] = false
+                            self._state[rt.InputButton.RIGHT] = false
+                            self:signal_emit("pressed", rt.InputButton.DOWN)
+                        end
+                    elseif  in_range(angle, -90 - 45, -90 + 45) then -- left
+                        if self._state[rt.InputButton.LEFT] == false then
+                            self._state[rt.InputButton.UP] = false
+                            self._state[rt.InputButton.DOWN] = false
+                            self._state[rt.InputButton.LEFT] = true
+                            self._state[rt.InputButton.RIGHT] = false
+                            self:signal_emit("pressed", rt.InputButton.LEFT)
+                        end
+                    end
+                end
+            end
         end
 
         if which_axis == rt.GamepadAxis.RIGHT_X or which_axis == rt.GamepadAxis.RIGHT_Y then
-            -- noop
-        elseif which_axis == rt.GamepadAxis.LEFT_TRIGGER then
-            if self._axis_state[rt.GamepadAxis.LEFT_TRIGGER] < 0.5 and value > 0.5 then
-                if self._state[rt.InputButton.L] == false then
-                    self:signal_emit("pressed", rt.InputButton.L)
-                    self._state[rt.InputButton.L] = true
+            local x, y = rt.GamepadHandler.get_axes(id, rt.GamepadAxis.RIGHT_X, rt.GamepadAxis.RIGHT_Y)
+            self:signal_emit("joystick", x, y)
+
+            if rt.settings.input.convert_right_trigger_to_dpad then
+                local distance = math.sqrt((x - 0)^2 + (y - 0)^2)
+                local angle = rt.radians(math.atan2(x - 0, y - 0)):as_degrees()
+
+                local out = {}
+                local joystick
+                local joysticks = love.joystick.getJoysticks()
+                for i, x in ipairs(joysticks) do
+                    if i == id then
+                        joystick = x
+                    end
                 end
-            elseif self._axis_state[rt.GamepadAxis.LEFT_TRIGGER] > 0.5 and value < 0.5 then
-                if self._state[rt.InputButton.L] == true then
+
+                if distance >= rt.settings.input.deadzone then
+                    if in_range(angle, 180 - 45, 180) or in_range(angle, -180 + 45, -180) then -- top
+                        if self._state[rt.InputButton.UP] == false then
+                            self._state[rt.InputButton.UP] = true
+                            self._state[rt.InputButton.DOWN] = false
+                            self._state[rt.InputButton.LEFT] = false
+                            self._state[rt.InputButton.RIGHT] = false
+                            self:signal_emit("pressed", rt.InputButton.UP)
+                        end
+                    elseif in_range(angle, 90 + 45, 90 - 45) then -- right
+                        if self._state[rt.InputButton.RIGHT] == false then
+                            self._state[rt.InputButton.UP] = false
+                            self._state[rt.InputButton.DOWN] = false
+                            self._state[rt.InputButton.LEFT] = false
+                            self._state[rt.InputButton.RIGHT] = true
+                            self:signal_emit("pressed", rt.InputButton.RIGHT)
+                        end
+                    elseif in_range(angle, 0 - 45, 0 + 45) then -- bottom
+                        if self._state[rt.InputButton.DOWN] == false then
+                            self._state[rt.InputButton.UP] = false
+                            self._state[rt.InputButton.DOWN] = true
+                            self._state[rt.InputButton.LEFT] = false
+                            self._state[rt.InputButton.RIGHT] = false
+                            self:signal_emit("pressed", rt.InputButton.DOWN)
+                        end
+                    elseif  in_range(angle, -90 - 45, -90 + 45) then -- left
+                        if self._state[rt.InputButton.LEFT] == false then
+                            self._state[rt.InputButton.UP] = false
+                            self._state[rt.InputButton.DOWN] = false
+                            self._state[rt.InputButton.LEFT] = true
+                            self._state[rt.InputButton.RIGHT] = false
+                            self:signal_emit("pressed", rt.InputButton.LEFT)
+                        end
+                    end
+                end
+            end
+        elseif which_axis == rt.GamepadAxis.LEFT_TRIGGER then
+            local eps = rt.settings.input.trigger_threshold
+            if self._axis_state[rt.GamepadAxis.LEFT_TRIGGER] < eps and value > eps then
+                if self._state[rt.InputButton.L] == false then
+                    self._state[rt.InputButton.L] = true
                     self:signal_emit("pressed", rt.InputButton.L)
+                end
+            elseif self._axis_state[rt.GamepadAxis.LEFT_TRIGGER] > eps and value < eps then
+                if self._state[rt.InputButton.L] == true then
                     self._state[rt.InputButton.L] = false
+                    self:signal_emit("released", rt.InputButton.L)
                 end
             end
         elseif which_axis == rt.GamepadAxis.RIGHT_TRIGGER then
-            if self._axis_state[rt.GamepadAxis.RIGHT_TRIGGER] < 0.5 and value > 0.5 then
+            local eps = rt.settings.input.trigger_threshold
+            if self._axis_state[rt.GamepadAxis.RIGHT_TRIGGER] < eps and value > eps then
                 if self._state[rt.InputButton.R] == false then
-                    self:signal_emit("pressed", rt.InputButton.R)
                     self._state[rt.InputButton.R] = true
-                end
-            elseif self._axis_state[rt.GamepadAxis.RIGHT_TRIGGER] > 0.5 and value < 0.5 then
-                if self._state[rt.InputButton.R] == true then
                     self:signal_emit("pressed", rt.InputButton.R)
+                end
+            elseif self._axis_state[rt.GamepadAxis.RIGHT_TRIGGER] > eps and value < eps then
+                if self._state[rt.InputButton.R] == true then
                     self._state[rt.InputButton.R] = false
+                    self:signal_emit("released", rt.InputButton.R)
                 end
             end
         end
@@ -278,18 +387,110 @@ rt.InputController = meta.new_type("InputController", function(holder)
         self._state[action] = false
     end, out)
 
-    out._mouse:signal_connect("click_pressed", function(_, x, y, button_id, n_presses)
+    out._mouse:signal_connect("click_pressed", function(_, x, y, button_id, n_presses, self)
         meta.assert_enum(button_id, rt.MouseButton)
         self:signal_emit("pressed", rt.InputButton.A)
         self._state[rt.InputButton.A] = true
-    end)
+    end, out)
 
-    out._mouse:signal_connect("click_released", function(_, x, y, button_id, n_presses)
+    out._mouse:signal_connect("click_released", function(_, x, y, button_id, n_presses, self)
         meta.assert_enum(button_id, rt.MouseButton)
         self:signal_emit("released", rt.InputButton.A)
         self._state[rt.InputButton.A] = false
-    end)
+    end, out)
+
+    out._mouse:signal_connect("motion_enter", function(_, x, y, self)
+        self:signal_emit("enter", x, y)
+    end, out)
+
+    out._mouse:signal_connect("motion", function(_, x, y, dx, dy, self)
+        self:signal_emit("motion", x, y, dx, dy)
+    end, out)
+
+    out._mouse:signal_connect("motion_leave", function(_, x, y, self)
+        self:signal_emit("leave", x, y)
+    end, out)
     
     return out
 end)
+
+--- @brief
+function rt.InputController:is_down(key)
+    meta.assert_isa(self, rt.InputController)
+    meta.assert_enum(key, rt.InputButton)
+    return self._state[rt.InputButton] == true
+end
+
+--- @brief
+function rt.InputController:is_up(key)
+    meta.assert_isa(self, rt.InputController)
+    meta.assert_enum(key, rt.InputButton)
+    return self._state[rt.InputButton] == false
+end
+
+--- @brief
+--- @return Number, Number
+function rt.InputController:get_left_joystick()
+    meta.assert_isa(self, rt.InputController)
+    return self._axis_state[rt.GamepadAxis.LEFT_X], self._axis_state[rt.GamepadAxis.LEFT_Y]
+end
+
+--- @brief
+--- @return Number, Number
+function rt.InputController:get_right_joystick()
+    meta.assert_isa(self, rt.InputController)
+    return self._axis_state[rt.GamepadAxis.RIGHT_X], self._axis_state[rt.GamepadAxis.RIGHT_Y]
+end
+
+--- @brief [internal]
+rt.test.input_controller = function()
+    --[[
+    input = rt.InputController(window)
+    input:signal_connect("pressed", function(self, button)
+        if button == rt.InputButton.A then
+            println("A")
+        elseif button == rt.InputButton.B then
+            println("B")
+        elseif button == rt.InputButton.X then
+            println("X")
+        elseif button == rt.InputButton.Y then
+            println("Y")
+        elseif button == rt.InputButton.UP then
+            println("up")
+        elseif button == rt.InputButton.RIGHT then
+            println("right")
+        elseif button == rt.InputButton.DOWN then
+            println("down")
+        elseif button == rt.InputButton.LEFT then
+            println("left")
+        elseif button == rt.InputButton.START then
+            println("start")
+        elseif button == rt.InputButton.SELECT then
+            println("select")
+        elseif button == rt.InputButton.L then
+            println("l")
+        elseif button == rt.InputButton.R then
+            println("r")
+        end
+    end)
+
+    input:signal_connect("joystick", function(self, x, y)
+        println(x, " ", y)
+    end)
+
+    input:signal_connect("enter", function(motion, x, y)
+        println("enter")
+    end)
+
+    input:signal_connect("leave", function(motion, x, y)
+        println("leave")
+    end)
+
+    input:signal_connect("motion", function(motion, x, y, dx, dy)
+        println(x, " ", y, " ", dx, " ", dy)
+    end)
+    ]]--
+end
+
+
 
