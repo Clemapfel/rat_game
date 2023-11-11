@@ -7,11 +7,17 @@ rt.JustifyMode = meta.new_enum({
 
 --- @class rt.Label
 --- @param text String
-rt.Label = meta.new_type("Label", function(text)
+--- @param font rt.Font (or nil)
+rt.Label = meta.new_type("Label", function(text, font)
     meta.assert_string(text)
+    if meta.is_nil(font) then
+        font = rt.settings.font.default
+    end
+    meta.assert_isa(font, rt.Font)
+
     local out = meta.new(rt.Label, {
         _raw = text,
-        _font = rt.Font.DEFAULT,
+        _font = font,
         _justify_mode = rt.JustifyMode.LEFT,
         _glyphs = {},
         _n_characters = 0,
@@ -19,26 +25,7 @@ rt.Label = meta.new_type("Label", function(text)
         _default_height = 0
     }, rt.Widget, rt.Drawable)
     out:_parse()
-
-    -- todo optimize this away
-    out:size_allocate(0, 0, 2^32, 2^32)
-    local min_x = POSITIVE_INFINITY
-    local min_y = POSITIVE_INFINITY
-    local max_x = NEGATIVE_INFINITY
-    local max_y = NEGATIVE_INFINITY
-
-    for _, glyph in pairs(out._glyphs) do
-        if meta.isa(glyph, rt.Glyph) then
-            local x, y = glyph:get_position()
-            local w, h = glyph:get_size()
-
-            min_x = math.min(min_x, x)
-            min_y = math.min(min_y, y)
-            max_x = math.max(max_x, x + w)
-            max_y = math.max(max_y, y + h)
-        end
-    end
-    out._default_width, out._default_height = max_x - min_x, max_y - min_y
+    out:_update_default_size()
     return out
 end)
 
@@ -415,6 +402,30 @@ function rt.Label:_parse()
     if effect_rainbow then throw_parse_error("reached end of text, but effect rainbow region is still open") end
 end
 
+--- @brief [internal] calculate size given infinite area
+function rt.Label:_update_default_size()
+    meta.assert_isa(self, rt.Label)
+
+    self:size_allocate(0, 0, 2^32, 2^32)
+    local min_x = POSITIVE_INFINITY
+    local min_y = POSITIVE_INFINITY
+    local max_x = NEGATIVE_INFINITY
+    local max_y = NEGATIVE_INFINITY
+
+    for _, glyph in pairs(self._glyphs) do
+        if meta.isa(glyph, rt.Glyph) then
+            local x, y = glyph:get_position()
+            local w, h = glyph:get_size()
+
+            min_x = math.min(min_x, x)
+            min_y = math.min(min_y, y)
+            max_x = math.max(max_x, x + w)
+            max_y = math.max(max_y, y + h)
+        end
+    end
+    self._default_width, self._default_height = max_x - min_x, max_y - min_y
+end
+
 --- @brief set text justification
 --- @param mode rt.JustifyMode
 function rt.Label:set_justify_mode(mode)
@@ -441,6 +452,7 @@ function rt.Label:set_text(formatted_text)
     meta.assert_string(formatted_text)
     self._raw = formatted_text
     self:_parse()
+    self:_update_default_size()
     self:reformat()
 end
 

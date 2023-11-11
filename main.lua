@@ -53,7 +53,9 @@ require "tab_layout"
 require "spacer"
 require "image_display"
 require "label"
+require "button"
 require "scrollbar"
+require "spin_button"
 require "viewport"
 require "sprite"
 require "sprite_frame"
@@ -78,63 +80,11 @@ io.stdout:setvbuf("no") -- makes it so love2d error message is printed to consol
 
 -- #############################
 
-rt.Font.DEFAULT_SIZE = 50
-rt.Font.DEFAULT = rt.load_font("Roboto", "assets/fonts/Roboto")
-rt.Font.DEFAULT_MONO = rt.load_font("DejaVuSansMono", "assets/fonts/DejaVuSansMono")
-
 window = rt.WindowLayout()
-tab = rt.TabLayout()
-local image = rt.Image("assets/favicon.png")
-tab:add_page(rt.Label("Page 01"), rt.AspectLayout(1 / 1, rt.ImageDisplay(image)))
-tab:add_page(rt.Label("Page 02"), rt.AspectLayout(1 / 1, rt.Spacer()))
-tab:add_page(rt.Label("Page 03"), rt.AspectLayout(1 / 1, rt.ImageDisplay(image)))
-
-window:set_child(tab)
-
-input = rt.InputController(window)
-input:signal_connect("pressed", function(self, button)
-    if button == rt.InputButton.A then
-        println("A")
-    elseif button == rt.InputButton.B then
-        println("B")
-    elseif button == rt.InputButton.X then
-        println("X")
-    elseif button == rt.InputButton.Y then
-        println("Y")
-    elseif button == rt.InputButton.UP then
-        println("up")
-    elseif button == rt.InputButton.RIGHT then
-        println("right")
-    elseif button == rt.InputButton.DOWN then
-        println("down")
-    elseif button == rt.InputButton.LEFT then
-        println("left")
-    elseif button == rt.InputButton.START then
-        println("start")
-    elseif button == rt.InputButton.SELECT then
-        println("select")
-    elseif button == rt.InputButton.L then
-        println("l")
-    elseif button == rt.InputButton.R then
-        println("r")
-    end
-end)
-
-input:signal_connect("joystick", function(self, x, y)
-    println(x, " ", y)
-end)
-
-input:signal_connect("enter", function(motion, x, y)
-    println("enter")
-end)
-
-input:signal_connect("leave", function(motion, x, y)
-    println("leave")
-end)
-
-input:signal_connect("motion", function(motion, x, y, dx, dy)
-    println(x, " ", y, " ", dx, " ", dy)
-end)
+button = rt.SpinButton(0, 1)
+button:set_margin(50)
+button:set_expand_vertically(false)
+window:set_child(button)
 
 --- @brief startup
 function love.load()
@@ -158,7 +108,7 @@ end
 --- @brief draw step
 function love.draw()
 
-    love.graphics.setBackgroundColor(0, 0, 0, 0)
+    love.graphics.setBackgroundColor(0.6, 0.05, 0.6, 1)
     love.graphics.setColor(1, 1, 1, 1)
 
     window:draw()
