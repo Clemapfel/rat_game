@@ -56,16 +56,19 @@ function rt.Label:size_allocate(x, y, width, height)
     local rows = {{}}
     local row_i = 1
     local line_width = 0
+    local one_word_mode = true -- avoids wrapping of one-word labels
 
     for _, glyph in pairs(self._glyphs) do
         if glyph == rt.Label.SPACE then
             glyph_x = glyph_x + space
             line_width = line_width + space
             table.insert(rows[row_i], rt.Label.SPACE)
+            one_word_mode = false
         elseif glyph == rt.Label.TAB then
             glyph_x = glyph_x + tab
             line_width = line_width + tab
             table.insert(rows[row_i], rt.Label.TAB)
+            one_word_mode = false
         elseif glyph == rt.Label.NEWLINE then
             glyph_x = x
             glyph_y = glyph_y + line_height
@@ -74,9 +77,10 @@ function rt.Label:size_allocate(x, y, width, height)
             line_width = 0
             row_i = row_i + 1
             rows[row_i] = {}
+            one_word_mode = false
         elseif meta.isa(glyph, rt.Glyph) then
             local w, h = glyph:get_size()
-            if glyph_x - x + w >= width then
+            if glyph_x - x + w >= width and not one_word_mode then
                 glyph_x = x
                 glyph_y = glyph_y + line_height
                 glyph:set_position(glyph_x, glyph_y)
