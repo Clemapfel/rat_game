@@ -44,6 +44,16 @@ function meta.assert_aabb(object)
 end
 meta.make_debug_only("meta.assert_aabb")
 
+--- @brief is point inside rectangles bounds
+--- @param x Number
+--- @param y Number
+--- @return Boolean
+function rt.aabb_contains(self, x, y)
+    meta.assert_aabb(self)
+    meta.assert_number(x, y)
+    return x >= self.x and x <= (self.x + self.width) and y >= self.y and y <= (self.y + self.height)
+end
+
 --[[
 
 --- @brief get size

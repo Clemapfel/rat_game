@@ -467,6 +467,13 @@ function rt.InputController:get_right_joystick()
 end
 
 --- @brief
+--- @return Number, Number
+function rt.InputController:get_cursor_position()
+    meta.assert_isa(self, rt.InputController)
+    return self._mouse:get_cursor_position()
+end
+
+--- @brief
 function rt.add_input_controller(object)
     meta.assert_object(object)
     local to_add = rt.InputController(object)

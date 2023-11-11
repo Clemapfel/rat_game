@@ -108,6 +108,13 @@ function rt.MouseHandler.handle_motion(x, y, dx, dy, is_touch)
 end
 love.mousemoved = rt.MouseHandler.handle_motion
 
+--- @brief get absolute cursor position
+--- @return Number, Number
+function rt.MouseController:get_cursor_position()
+    meta.assert_isa(self, rt.MouseController)
+    return love.mouse.getPosition()
+end
+
 --- @brief add an mouse component
 --- @param target meta.Object
 --- @return rt.MouseController

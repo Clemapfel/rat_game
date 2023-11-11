@@ -82,15 +82,6 @@ function rt.Font:_update()
     self._bold_italic_rasterizer = love.font.newRasterizer(self._bold_italic_path, self._size)
 end
 
---- @brief [internal] load font form a google fonts folder
-function rt.load_font(name, path)
-    local regular = path .. "/" .. name .. "-Regular.ttf"
-    local bold = path .. "/" .. name .. "-Bold.ttf"
-    local italic = path .. "/" .. name .. "-Italic.ttf"
-    local bold_italic = path .. "/" .. name .. "-BoldItalic.ttf"
-    return rt.Font(regular, bold, italic, bold_italic)
-end
-
 --- @brief set font size, in px
 --- @param px Number
 function rt.Font:set_size(px)
@@ -136,6 +127,7 @@ end
 
 --- @brief [internal] load default fonts and fallbacks
 function rt.load_default_fonts()
+    -- fallback fonts to support more symbols
     local noto_math = love.graphics.newFont("assets/fonts/NotoSansMath/NotoSansMath-Regular.ttf")
     local gnu_unifont = love.graphics.newFont("assets/fonts/fallback.otf")
 

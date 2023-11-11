@@ -81,7 +81,7 @@ io.stdout:setvbuf("no") -- makes it so love2d error message is printed to consol
 -- #############################
 
 window = rt.WindowLayout()
-button = rt.SpinButton(0, 1)
+button = rt.SpinButton(0, 1, 0.1, 0.5)
 button:set_margin(50)
 button:set_expand_vertically(false)
 window:set_child(button)

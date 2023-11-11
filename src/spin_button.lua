@@ -4,11 +4,13 @@ rt.settings.spin_button = {
 }
 
 --- @class rt.SpinButton
-rt.SpinButton = meta.new_type("SpinButton", function(lower, upper, value)
+rt.SpinButton = meta.new_type("SpinButton", function(lower, upper, increment, value)
+    meta.assert_number(lower, upper, increment)
     value = ternary(meta.is_nil(value), mix(lower, upper, 0.5), value)
     local out = meta.new(rt.SpinButton, {
         _lower = math.min(lower, upper),
         _upper = math.max(upper, lower),
+        _increment = increment,
         _value = value,
         _value_label = rt.Label(tostring(value)),
         _backdrop = rt.Rectangle(0, 0, 1, 1),
@@ -33,17 +35,50 @@ rt.SpinButton = meta.new_type("SpinButton", function(lower, upper, value)
     out._increase_button_backdrop:set_color(rt.Palette.BACKGROUND)
     out._increase_button_outline:set_color(rt.Palette.BACKGROUND_OUTLINE)
     out._increase_button_disabled_overlay:set_color(rt.RGBA(0, 0, 0, 0.5))
+    out._increase_button_disabled_overlay:set_is_visible(value >= out._upper)
 
     out._decrease_button_backdrop:set_color(rt.Palette.BACKGROUND)
     out._decrease_button_outline:set_color(rt.Palette.BACKGROUND_OUTLINE)
     out._decrease_button_disabled_overlay:set_color(rt.RGBA(0, 0, 0, 0.5))
+    out._decrease_button_disabled_overlay:set_is_visible(value <= out._lower)
 
     for _, outline in pairs({out._backdrop_outline, out._increase_button_outline, out._decrease_button_outline}) do
         outline:set_is_outline(true)
     end
 
     out:signal_add("value_changed")
-    --out:_update_value()
+
+    out._input = rt.add_input_controller(out)
+    out._input:signal_connect("pressed", function(controller, button, self)
+
+        local increment = function()
+            self:set_value(self:get_value() + self._increment)
+            self._increase_button_disabled_overlay:set_is_visible(true)
+        end
+
+        local decrement = function()
+            self:set_value(self:get_value() - self._increment)
+            self._decrease_button_disabled_overlay:set_is_visible(true)
+        end
+
+        if button == rt.InputButton.UP then
+            increment()
+        elseif button == rt.InputButton.DOWN then
+            decrement()
+        end
+
+        local cursor_x, cursor_y = controller:get_cursor_position()
+        if rt.aabb_contains(self._increase_button_backdrop:get_bounds(), cursor_x, cursor_y) then
+            increment()
+        elseif rt.aabb_contains(self._decrease_button_backdrop:get_bounds(), cursor_x, cursor_y) then
+            decrement()
+        end
+    end, out)
+
+    out._input:signal_connect("released", function(_, button, self)
+        self._increase_button_disabled_overlay:set_is_visible(self._value >= self._upper)
+        self._decrease_button_disabled_overlay:set_is_visible(self._value <= self._lower)
+    end, out)
 
     return out
 end)
@@ -71,6 +106,8 @@ function rt.SpinButton:draw()
     self._decrease_button_label:draw()
     self._increase_button_outline:draw()
     self._decrease_button_outline:draw()
+    self._increase_button_disabled_overlay:draw()
+    self._decrease_button_disabled_overlay:draw()
     self._value_label:draw()
 end
 
@@ -127,7 +164,11 @@ end
 --- @brief
 function rt.SpinButton:set_value(x)
     meta.assert_isa(self, rt.SpinButton)
-    self._value = clamp(x, self._lower, self._upper)
+    if self._value == x then return end
+
+    -- round to nearest step increment
+    x = clamp(x, self._lower, self._upper)
+    self._value = self._increment * math.round(x / self._increment)
     self:_update_value()
     self:signal_emit("value_changed", self._value)
 end
