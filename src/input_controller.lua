@@ -186,15 +186,14 @@ end
 --- @signal motion    (self, x, y, dx, dy) -> nil
 --- @signal leave     (self, x, y) -> nil
 rt.InputController = meta.new_type("InputController", function(holder)
-    meta.assert_isa(holder, rt.Widget)
-
     local out = meta.new(rt.InputController, {
         _instance = holder,
         _gamepad = rt.GamepadController(holder),
         _keyboard = rt.KeyboardController(holder),
         _mouse = rt.MouseController(holder),
         _state = {},
-        _axis_state = {}
+        _axis_state = {},
+        _is_disabled = false
     }, rt.SignalEmitter)
 
     if sizeof(rt.InputHandler._mapping) == 0 then
@@ -221,7 +220,9 @@ rt.InputController = meta.new_type("InputController", function(holder)
         local action = rt.InputHandler._reverse_mapping.gamepad[button]
 
         if self._state[action] == false then
-            if not meta.is_nil(action) then self:signal_emit("pressed", action) end
+            if not meta.is_nil(action) then
+                self:signal_emit("pressed", action)
+            end
             self._state[action] = true
         end
     end, out)
@@ -231,7 +232,9 @@ rt.InputController = meta.new_type("InputController", function(holder)
         local action = rt.InputHandler._reverse_mapping.gamepad[button]
 
         if self._state[action] == true then
-            if not meta.is_nil(action) then self:signal_emit("released", action) end
+            if not meta.is_nil(action) and not self._is_disabled then
+                self:signal_emit("released", action)
+            end
             self._state[action] = false
         end
     end, out)
@@ -246,7 +249,9 @@ rt.InputController = meta.new_type("InputController", function(holder)
 
         if which_axis == rt.GamepadAxis.LEFT_X or which_axis == rt.GamepadAxis.LEFT_Y then
             local x, y = rt.GamepadHandler.get_axes(id, rt.GamepadAxis.LEFT_X, rt.GamepadAxis.LEFT_Y)
-            self:signal_emit("joystick", x, y)
+            if not self._is_disabled then
+                self:signal_emit("joystick", x, y)
+            end
 
             if rt.settings.input.convert_left_trigger_to_dpad then
                 local distance = math.sqrt((x - 0)^2 + (y - 0)^2)
@@ -259,7 +264,9 @@ rt.InputController = meta.new_type("InputController", function(holder)
                             self._state[rt.InputButton.DOWN] = false
                             self._state[rt.InputButton.LEFT] = false
                             self._state[rt.InputButton.RIGHT] = false
-                            self:signal_emit("pressed", rt.InputButton.UP)
+                            if not self._is_disabled then
+                                self:signal_emit("pressed", rt.InputButton.UP)
+                            end
                         end
                     elseif in_range(angle, 90 + 45, 90 - 45) then -- right
                         if self._state[rt.InputButton.RIGHT] == false then
@@ -267,7 +274,9 @@ rt.InputController = meta.new_type("InputController", function(holder)
                             self._state[rt.InputButton.DOWN] = false
                             self._state[rt.InputButton.LEFT] = false
                             self._state[rt.InputButton.RIGHT] = true
-                            self:signal_emit("pressed", rt.InputButton.RIGHT)
+                            if not self._is_disabled then
+                                self:signal_emit("pressed", rt.InputButton.RIGHT)
+                            end
                         end
                     elseif in_range(angle, 0 - 45, 0 + 45) then -- bottom
                         if self._state[rt.InputButton.DOWN] == false then
@@ -275,7 +284,9 @@ rt.InputController = meta.new_type("InputController", function(holder)
                             self._state[rt.InputButton.DOWN] = true
                             self._state[rt.InputButton.LEFT] = false
                             self._state[rt.InputButton.RIGHT] = false
-                            self:signal_emit("pressed", rt.InputButton.DOWN)
+                            if not self._is_disabled then
+                                self:signal_emit("pressed", rt.InputButton.DOWN)
+                            end
                         end
                     elseif  in_range(angle, -90 - 45, -90 + 45) then -- left
                         if self._state[rt.InputButton.LEFT] == false then
@@ -283,7 +294,9 @@ rt.InputController = meta.new_type("InputController", function(holder)
                             self._state[rt.InputButton.DOWN] = false
                             self._state[rt.InputButton.LEFT] = true
                             self._state[rt.InputButton.RIGHT] = false
-                            self:signal_emit("pressed", rt.InputButton.LEFT)
+                            if not self._is_disabled then
+                                self:signal_emit("pressed", rt.InputButton.LEFT)
+                            end
                         end
                     end
                 end
@@ -292,7 +305,10 @@ rt.InputController = meta.new_type("InputController", function(holder)
 
         if which_axis == rt.GamepadAxis.RIGHT_X or which_axis == rt.GamepadAxis.RIGHT_Y then
             local x, y = rt.GamepadHandler.get_axes(id, rt.GamepadAxis.RIGHT_X, rt.GamepadAxis.RIGHT_Y)
-            self:signal_emit("joystick", x, y)
+
+            if not self._is_disabled then
+                self:signal_emit("joystick", x, y)
+            end
 
             if rt.settings.input.convert_right_trigger_to_dpad then
                 local distance = math.sqrt((x - 0)^2 + (y - 0)^2)
@@ -314,7 +330,9 @@ rt.InputController = meta.new_type("InputController", function(holder)
                             self._state[rt.InputButton.DOWN] = false
                             self._state[rt.InputButton.LEFT] = false
                             self._state[rt.InputButton.RIGHT] = false
-                            self:signal_emit("pressed", rt.InputButton.UP)
+                            if not self._is_disabled then
+                                self:signal_emit("pressed", rt.InputButton.UP)
+                            end
                         end
                     elseif in_range(angle, 90 + 45, 90 - 45) then -- right
                         if self._state[rt.InputButton.RIGHT] == false then
@@ -322,7 +340,9 @@ rt.InputController = meta.new_type("InputController", function(holder)
                             self._state[rt.InputButton.DOWN] = false
                             self._state[rt.InputButton.LEFT] = false
                             self._state[rt.InputButton.RIGHT] = true
-                            self:signal_emit("pressed", rt.InputButton.RIGHT)
+                            if not self._is_disabled then
+                                self:signal_emit("pressed", rt.InputButton.RIGHT)
+                            end
                         end
                     elseif in_range(angle, 0 - 45, 0 + 45) then -- bottom
                         if self._state[rt.InputButton.DOWN] == false then
@@ -330,7 +350,9 @@ rt.InputController = meta.new_type("InputController", function(holder)
                             self._state[rt.InputButton.DOWN] = true
                             self._state[rt.InputButton.LEFT] = false
                             self._state[rt.InputButton.RIGHT] = false
-                            self:signal_emit("pressed", rt.InputButton.DOWN)
+                            if not self._is_disabled then
+                                self:signal_emit("pressed", rt.InputButton.DOWN)
+                            end
                         end
                     elseif  in_range(angle, -90 - 45, -90 + 45) then -- left
                         if self._state[rt.InputButton.LEFT] == false then
@@ -338,7 +360,9 @@ rt.InputController = meta.new_type("InputController", function(holder)
                             self._state[rt.InputButton.DOWN] = false
                             self._state[rt.InputButton.LEFT] = true
                             self._state[rt.InputButton.RIGHT] = false
-                            self:signal_emit("pressed", rt.InputButton.LEFT)
+                            if not self._is_disabled then
+                                self:signal_emit("pressed", rt.InputButton.LEFT)
+                            end
                         end
                     end
                 end
@@ -348,12 +372,12 @@ rt.InputController = meta.new_type("InputController", function(holder)
             if self._axis_state[rt.GamepadAxis.LEFT_TRIGGER] < eps and value > eps then
                 if self._state[rt.InputButton.L] == false then
                     self._state[rt.InputButton.L] = true
-                    self:signal_emit("pressed", rt.InputButton.L)
+                    if not self._is_disabled then self:signal_emit("pressed", rt.InputButton.L) end
                 end
             elseif self._axis_state[rt.GamepadAxis.LEFT_TRIGGER] > eps and value < eps then
                 if self._state[rt.InputButton.L] == true then
                     self._state[rt.InputButton.L] = false
-                    self:signal_emit("released", rt.InputButton.L)
+                    if not self._is_disabled then self:signal_emit("released", rt.InputButton.L) end
                 end
             end
         elseif which_axis == rt.GamepadAxis.RIGHT_TRIGGER then
@@ -361,12 +385,12 @@ rt.InputController = meta.new_type("InputController", function(holder)
             if self._axis_state[rt.GamepadAxis.RIGHT_TRIGGER] < eps and value > eps then
                 if self._state[rt.InputButton.R] == false then
                     self._state[rt.InputButton.R] = true
-                    self:signal_emit("pressed", rt.InputButton.R)
+                    if not self._is_disabled then self:signal_emit("pressed", rt.InputButton.R) end
                 end
             elseif self._axis_state[rt.GamepadAxis.RIGHT_TRIGGER] > eps and value < eps then
                 if self._state[rt.InputButton.R] == true then
                     self._state[rt.InputButton.R] = false
-                    self:signal_emit("released", rt.InputButton.R)
+                    if not self._is_disabled then self:signal_emit("released", rt.InputButton.R) end
                 end
             end
         end
@@ -376,39 +400,39 @@ rt.InputController = meta.new_type("InputController", function(holder)
     out._keyboard:signal_connect("key_pressed", function(_, key, self)
         meta.assert_enum(key, rt.KeyboardKey)
         local action = rt.InputHandler._reverse_mapping.keyboard[key]
-        if not meta.is_nil(action) then self:signal_emit("pressed", action) end
+        if not meta.is_nil(action) and not self._is_disabled then self:signal_emit("pressed", action) end
         self._state[action] = true
     end, out)
 
     out._keyboard:signal_connect("key_released", function(_, key, self)
         meta.assert_enum(key, rt.KeyboardKey)
         local action = rt.InputHandler._reverse_mapping.keyboard[key]
-        if not meta.is_nil(action) then self:signal_emit("released", action) end
+        if not meta.is_nil(action) and not self._is_disabled then self:signal_emit("released", action) end
         self._state[action] = false
     end, out)
 
     out._mouse:signal_connect("click_pressed", function(_, x, y, button_id, n_presses, self)
         meta.assert_enum(button_id, rt.MouseButton)
-        self:signal_emit("pressed", rt.InputButton.A)
+        if not self._is_disabled then self:signal_emit("pressed", rt.InputButton.A) end
         self._state[rt.InputButton.A] = true
     end, out)
 
     out._mouse:signal_connect("click_released", function(_, x, y, button_id, n_presses, self)
         meta.assert_enum(button_id, rt.MouseButton)
-        self:signal_emit("released", rt.InputButton.A)
+        if not self._is_disabled then self:signal_emit("released", rt.InputButton.A) end
         self._state[rt.InputButton.A] = false
     end, out)
 
     out._mouse:signal_connect("motion_enter", function(_, x, y, self)
-        self:signal_emit("enter", x, y)
+        if not self._is_disabled then self:signal_emit("enter", x, y) end
     end, out)
 
     out._mouse:signal_connect("motion", function(_, x, y, dx, dy, self)
-        self:signal_emit("motion", x, y, dx, dy)
+        if not self._is_disabled then self:signal_emit("motion", x, y, dx, dy) end
     end, out)
 
     out._mouse:signal_connect("motion_leave", function(_, x, y, self)
-        self:signal_emit("leave", x, y)
+        if not self._is_disabled then self:signal_emit("leave", x, y) end
     end, out)
     
     return out
@@ -440,6 +464,33 @@ end
 function rt.InputController:get_right_joystick()
     meta.assert_isa(self, rt.InputController)
     return self._axis_state[rt.GamepadAxis.RIGHT_X], self._axis_state[rt.GamepadAxis.RIGHT_Y]
+end
+
+--- @brief
+function rt.add_input_controller(object)
+    meta.assert_object(object)
+    local to_add = rt.InputController(object)
+    getmetatable(object).components.input = to_add
+    return to_add
+end
+
+--- @brief
+function rt.get_input_controller(object)
+    meta.assert_object(object)
+    return getmetatable(object).components.input
+end
+
+
+--- @brief
+function rt.InputController:set_is_disabled(b)
+    meta.assert_isa(self, rt.InputController)
+    self._is_disabled = b
+end
+
+--- @brief
+function rt.InputController:get_is_disabled()
+    meta.assert_isa(self, rt.InputController)
+    return self._is_disabled
 end
 
 --- @brief [internal]

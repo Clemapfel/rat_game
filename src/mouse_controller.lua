@@ -21,7 +21,9 @@ meta.make_weak(rt.MouseHandler._components, false, true)
 rt.MouseController = meta.new_type("MouseController", function(instance)
     meta.assert_object(instance)
     if meta.is_nil(instance.get_bounds) then
-        rt.error("In MouseCompoent: instance of type `" .. instance .. "` does not have a `get_bounds` function")
+        if meta.is_nil(instance.get_position) or meta.is_nil(instance.get_size) then
+            rt.error("In MouseCompoent: instance of type `" .. meta.typeof(instance) .. "` does not have a `get_bounds` function")
+        end
     end
 
     local out = meta.new(rt.MouseController, {

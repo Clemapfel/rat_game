@@ -131,6 +131,15 @@ function try_catch(to_try, on_fail)
     end
 end
 
+base_select = select
+
+--- @brief get n-th element of varag
+--- @param n number
+--- @vararg
+function select(n, ...)
+    return ({...})[n]
+end
+
 --- @brief convert arbitrary object to string
 --- @param id string
 --- @param object any

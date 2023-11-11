@@ -148,10 +148,6 @@ rt.KeyboardController = meta.new_type("KeyboardController", function(instance)
     local hash = rt.KeyboardHandler._hash
     rt.KeyboardHandler._hash = rt.KeyboardHandler._hash + 1
 
-    if meta.is_nil(instance.get_bounds) then
-        rt.error("In KeyboardController: instance of type `" .. instance .. "` does not have a `get_bounds` function")
-    end
-
     local out = meta.new(rt.KeyboardController, {
         instance = instance,
         _hash = hash
