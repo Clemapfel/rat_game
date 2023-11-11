@@ -167,8 +167,14 @@ function rt.SpinButton:set_value(x)
     if self._value == x then return end
 
     -- round to nearest step increment
-    x = clamp(x, self._lower, self._upper)
-    self._value = self._increment * math.round(x / self._increment)
+    if x >= self._upper then
+        x = self._upper
+    elseif x <= self._lower then
+        x = self._lower
+    else
+        x = self._increment * math.round(x / self._increment)
+    end
+    self._value = x
     self:_update_value()
     self:signal_emit("value_changed", self._value)
 end
