@@ -20,11 +20,6 @@ meta.make_weak(rt.MouseHandler._components, false, true)
 --- @signal motion_leave    (self, x, y) -> nil
 rt.MouseController = meta.new_type("MouseController", function(instance)
     meta.assert_object(instance)
-    if meta.is_nil(instance.get_bounds) then
-        if meta.is_nil(instance.get_position) or meta.is_nil(instance.get_size) then
-            rt.error("In MouseCompoent: instance of type `" .. meta.typeof(instance) .. "` does not have a `get_bounds` function")
-        end
-    end
 
     local out = meta.new(rt.MouseController, {
         instance = instance,
@@ -58,9 +53,7 @@ end
 --- @param is_touch Boolean
 function rt.MouseHandler.handle_click_pressed(x, y, button_id, is_touch, n_presses)
     for _, component in pairs(rt.MouseHandler._components) do
-        if component:is_cursor_in_bounds(x, y) then
-            component:signal_emit("click_pressed", x, y, ternary(is_touch, rt.MouseButton.TOUCH, button_id), n_presses)
-        end
+        component:signal_emit("click_pressed", x, y, ternary(is_touch, rt.MouseButton.TOUCH, button_id), n_presses)
     end
 end
 love.mousepressed = rt.MouseHandler.handle_click_pressed
@@ -72,9 +65,7 @@ love.mousepressed = rt.MouseHandler.handle_click_pressed
 --- @param is_touch Boolean
 function rt.MouseHandler.handle_click_released(x, y, button_id, is_touch, n_presses)
     for _, component in pairs(rt.MouseHandler._components) do
-        if component:is_cursor_in_bounds(x, y) then
-            component:signal_emit("click_released", x, y, ternary(is_touch, rt.MouseButton.TOUCH, button_id), n_presses)
-        end
+        component:signal_emit("click_released", x, y, ternary(is_touch, rt.MouseButton.TOUCH, button_id), n_presses)
     end
 end
 love.mousereleased = rt.MouseHandler.handle_click_released

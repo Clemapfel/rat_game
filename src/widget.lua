@@ -14,7 +14,6 @@ rt.Orientation = meta.new_enum({
 --- @class rt.Widget
 rt.Widget = meta.new_abstract_type("Widget")
 rt.Widget._bounds = rt.AxisAlignedRectangle()     -- maximum area
-rt.Widget._allocation = rt.AxisAlignedRectangle() -- actual area
 rt.Widget._margin_top = 0
 rt.Widget._margin_bottom = 0
 rt.Widget._margin_left = 0
@@ -91,7 +90,6 @@ function rt.Widget:reformat()
 
     x = math.floor(x) -- align to pixelgrid to avoid rasterizer artifacting
     y = math.floor(y)
-    self._allocation = rt.AABB(x, y, width, height)
     self:size_allocate(x, y, width, height)
 end
 
@@ -130,12 +128,9 @@ end
 
 --- @brief get bounds
 function rt.Widget:get_bounds()
-    return rt.AABB(
-        self._allocation.x,
-        self._allocation.y,
-        self._allocation.width,
-        self._allocation.height
-    )
+    local x, y = self:get_position()
+    local w, h = self:get_size()
+    return rt.AABB(x, y, w, h)
 end
 
 --- @brief set start margin
@@ -428,12 +423,13 @@ function rt.Widget:draw_bounds()
 
     -- final size
     love.graphics.setColor(1, 1, 0, 1)
+    local allocation = self:get_bounds()
     love.graphics.line(
-        self._allocation.x, self._allocation.y,
-        self._allocation.x + self._allocation.width, self._allocation.y,
-        self._allocation.x + self._allocation.width, self._allocation.y + self._allocation.height,
-        self._allocation.x, self._allocation.y + self._allocation.height,
-        self._allocation.x, self._allocation.y
+        allocation.x, allocation.y,
+        allocation.x + allocation.width, allocation.y,
+        allocation.x + allocation.width, allocation.y + allocation.height,
+        allocation.x, allocation.y + allocation.height,
+        allocation.x, allocation.y
     )
 
     love.graphics.setColor(0, 1, 0, 1)

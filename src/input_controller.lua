@@ -413,13 +413,17 @@ rt.InputController = meta.new_type("InputController", function(holder)
 
     out._mouse:signal_connect("click_pressed", function(_, x, y, button_id, n_presses, self)
         meta.assert_enum(button_id, rt.MouseButton)
-        if not self._is_disabled then self:signal_emit("pressed", rt.InputButton.A) end
+        if not self._is_disabled and rt.aabb_contains(self._instance:get_bounds(), x, y) then
+            self:signal_emit("pressed", rt.InputButton.A)
+        end
         self._state[rt.InputButton.A] = true
     end, out)
 
     out._mouse:signal_connect("click_released", function(_, x, y, button_id, n_presses, self)
         meta.assert_enum(button_id, rt.MouseButton)
-        if not self._is_disabled then self:signal_emit("released", rt.InputButton.A) end
+        if not self._is_disabled and rt.aabb_contains(self._instance:get_bounds(), x, y) then
+            self:signal_emit("released", rt.InputButton.A)
+        end
         self._state[rt.InputButton.A] = false
     end, out)
 
