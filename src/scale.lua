@@ -34,11 +34,14 @@ rt.Scale = meta.new_type("Scale", function(lower, upper, increment, value)
         _fill_end = rt.Circle(0, 0, 1),
         _fill = rt.Rectangle(0, 0, 1, 1),
         _fill_color = rt.Palette.HIGHLIGHT,
-        _input = {}
+        _show_value = false,
+        _value_label = rt.Label(tostring(value)),
+        _input = {},
+        _mouse = {}
     }, rt.Drawable, rt.Widget, rt.SignalEmitter)
 
-    out._slider:set_color(rt.Palette.BASE)
-    out._slider_outline:set_color(rt.Palette.BASE_OUTLINE)
+    out._slider:set_color(rt.Palette.FOREGROUND)
+    out._slider_outline:set_color(rt.Palette.FOREGROUND_OUTLINE)
     out._slider_outline:set_is_outline(true)
 
     for _, rail in pairs({out._rail, out._rail_start, out._rail_end}) do
@@ -72,9 +75,10 @@ rt.Scale = meta.new_type("Scale", function(lower, upper, increment, value)
     out._trough_end_outline:set_is_outline(true)
 
     for _, shape in pairs({out._fill_start, out._fill, out._fill_end}) do
-        shape:set_color(rt.Palette.BLUE)
         shape:set_is_visible(true)
     end
+
+    out:set_color(rt.Palette.HIGHLIGHT)
 
     out:_update_slider()
     out:signal_add("value_changed")
@@ -96,17 +100,27 @@ rt.Scale = meta.new_type("Scale", function(lower, upper, increment, value)
             decrement()
         end
 
-        println(self._input:is_down(button))
+        local x, y = self._input:get_cursor_position()
+        local rail_x = select(1, self._rail:get_position())
+        local rail_w = select(1, self._rail:get_size())
+
+        if x >= rail_x and x <= rail_x + rail_w then
+            self:set_value(self._lower + ((x - rail_x) / rail_w) * (self._upper - self._lower))
+        end
     end, out)
 
     out._input:signal_connect("motion", function(controller, x, y, dx, dy, self)
         if self._input:is_down(rt.InputButton.A) then
             local rail_x = select(1, self._rail:get_position())
             local rail_w = select(1, self._rail:get_size())
-            println((x - rail_x) / rail_w)
-            self:set_value(self._lower + ((x - rail_x) / rail_w) * (self._upper - self._lower))
+
+
+            if x >= rail_x and x <= rail_x + rail_w then
+                self:set_value(self._lower + ((x - rail_x) / rail_w) * (self._upper - self._lower))
+            end
         end
     end, out)
+
     return out
 end)
 
@@ -137,6 +151,10 @@ function rt.Scale:draw()
 
     self._slider:draw()
     self._slider_outline:draw()
+
+    if self._show_value then
+        self._value_label:draw()
+    end
 end
 
 --- @overload rt.Widget.size_allocate
@@ -177,6 +195,7 @@ function rt.Scale:size_allocate(x, y, width, height)
     self:_update_slider()
 end
 
+--- @brief [internal]
 function rt.Scale:_update_slider()
     meta.assert_isa(self, rt.Scale)
 
@@ -196,6 +215,10 @@ function rt.Scale:_update_slider()
 
     self._fill_start:set_is_visible(slider_x > select(1, self._fill_start:get_center()))
     self._fill_end:set_is_visible(slider_x >= trough_x + trough_w)
+
+    local label_w, label_h = self._value_label:measure()
+    local label_area = rt.AABB(slider_x - 0.5 * label_w, slider_y - slider_radius - rt.settings.margin_unit - label_h, label_w, label_h)
+    self._value_label:fit_into(label_area)
 end
 
 --- @brief
@@ -212,6 +235,7 @@ function rt.Scale:set_value(x)
         x = self._increment * math.round(x / self._increment)
     end
     self._value = x
+    self._value_label:set_text(tostring(self._value))
     self:_update_slider()
     self:signal_emit("value_changed", self._value)
 end
@@ -220,4 +244,28 @@ end
 function rt.Scale:get_value()
     meta.assert_isa(self, rt.Scale)
     return self._value
+end
+
+--- @brief
+function rt.Scale:set_color(color)
+    meta.assert_isa(self, rt.Scale)
+    if meta.is_hsva(color) then
+        color = rt.hsva_to_rgba(color)
+    end
+    meta.assert_rgba(color)
+    self._fill_color = color
+    self._fill_start:set_color(self._fill_color)
+    self._fill:set_color(self._fill_color)
+    self._fill_end:set_color(self._fill_color)
+end
+
+--- @brief
+function rt.Scale:set_show_value(b)
+    meta.assert_isa(self, rt.Scale)
+    meta.assert_boolean(b)
+
+    if b == true and not self._value_label:get_is_realized() then
+        self._value_label:realize()
+    end
+    self._show_value = b
 end

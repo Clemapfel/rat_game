@@ -113,8 +113,10 @@ rt.Palette.BACKGROUND_OUTLINE = rt.Palette.BLACK
 rt.Palette.BASE = rt.Palette.GREY_5
 rt.Palette.BASE_OUTLINE = rt.Palette.BLACK
 
-rt.Palette.FOREGROUND = rt.Palette.WHITE
-rt.Palette.FOREGROUND_OUTLINE = rt.Palette.BACKGROUND_OUTLINE
+rt.Palette.FOREGROUND = rt.Palette.GREY_1
+rt.Palette.FOREGROUND_OUTLINE = rt.Palette.BLACK
+
+rt.Palette.TEXT = rt.Palette.WHITE
 
 rt.Palette.HIGHLIGHT = rt.Palette.BLUE_2
 rt.Palette.HIGHLIGHT_OUTLINE = rt.Palette.BLUE_4

@@ -19,6 +19,7 @@ io.stdout:setvbuf("no") -- makes it so love2d error message is printed to consol
 
 window = rt.WindowLayout()
 widget = rt.Scale(0, 1, 0.01)
+widget:set_show_value(true)
 widget:set_margin(10)
 widget:set_expand_vertically(false)
 window:set_child(widget)
