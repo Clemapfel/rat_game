@@ -1,3 +1,4 @@
+if type(rt.settings) == "nil" then rt.settings = {} end
 rt.settings.log = {}
 rt.settings.log.rt_prefix = "[rt]"
 rt.settings.log.log_prefix = "[LOG]"
