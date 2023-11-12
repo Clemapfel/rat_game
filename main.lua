@@ -24,10 +24,44 @@ widget:set_margin(10)
 widget:set_expand_vertically(false)
 window:set_child(widget)
 
+thread = love.thread.newThread([[
+    require "love.timer"
+    while true do
+        print(love.thread.getChannel(1234):getCount())
+        local message = love.thread.getChannel(1234):demand()
+        load(message)()
+    end
+]])
+thread:start()
+
+love.thread.getChannel(1234):push(string.dump(function()
+    f = function(x)
+        print(x + 1234)
+    end
+end))
+
+love.thread.getChannel(1234):push(string.dump(function()
+    f(1234)
+end))
+
+
+--[[
 input = rt.add_input_controller(window)
 input:signal_connect("pressed", function()
+
+    channel = love.thread.getChannel(1)
+    channel:push(string.dump(function()
+        f = function(x)
+            print(x)
+        end
+        f(1234)
+    end))
+    channel:push(string.dump(function()
+        f(5678)
+    end))
+
     thread = rt.get_thread(1)
-    --[[
+    [[
     rt.threads.execute(1, function()
         f = function(x, ...)
             println(...)
@@ -37,7 +71,7 @@ input:signal_connect("pressed", function()
     end)
     rt.threads.execute(1, function()
         println("check " .. tostring(ID) .. ": ", meta.is_function(_G.f))
-    end)]]--
+    end)--
 
     if meta.is_nil(future) then
         future = rt.threads.request(1, "test_f", 1234)
@@ -45,6 +79,7 @@ input:signal_connect("pressed", function()
     println(future._value)
     --future = rt.threads.request(1, "f", 1234)
 end)
+]]--
 
 --- @brief startup
 function love.load()
