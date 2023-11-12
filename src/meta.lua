@@ -592,6 +592,15 @@ function meta.make_weak(table, weak_keys, weak_values)
     return table
 end
 
+--- @brief create an empty weak table
+--- @param weak_keys Boolean
+--- @param weak_values Boolean
+function meta.weak_table(weak_keys, weak_values)
+    local out = {}
+    meta.make_weak(out, weak_keys, weak_values)
+    return out
+end
+
 --- @brief Add abstract method that needs to be overloaded or an assertion is raised
 --- @param super meta.Type
 --- @param name String

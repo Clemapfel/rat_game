@@ -131,9 +131,10 @@ function try_catch(to_try, on_fail)
     end
 end
 
---- @brief iterable range of objects
-function range(...)
-    return pairs({...})
+--- @brief invoke function with arguments
+function invoke(f, ...)
+    assert(type(f) == "function")
+    f(...)
 end
 
 base_select = select

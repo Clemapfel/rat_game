@@ -205,3 +205,8 @@ function rt.SpinButton:get_value()
     meta.assert_isa(self, rt.SpinButton)
     return self._value
 end
+
+--- @brief
+function rt.test.spin_button()
+    error("TODO")
+end

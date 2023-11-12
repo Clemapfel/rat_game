@@ -24,39 +24,27 @@ widget:set_margin(10)
 widget:set_expand_vertically(false)
 window:set_child(widget)
 
---[[
-local r1, r2
-
-r1 = coroutine.create(function()
-    ::loop::
-    println("1")
-    coroutine.yield()
-    goto loop
-end)
-
-r2 = coroutine.create(function()
-    ::loop::
-    println("2")
-    coroutine.yield()
-    goto loop
-end)
-
---while true do
-coroutine.resume(r1)
-coroutine.resume(r2)
---end
-
-worker = love.thread.newThread(
-worker:start()
-    love.thread.getChannel(1):push(string.dump(function() print(x) end))
-
-x = 1234
-]]--
-
 input = rt.add_input_controller(window)
 input:signal_connect("pressed", function()
-end)
+    thread = rt.get_thread(1)
+    --[[
+    rt.threads.execute(1, function()
+        f = function(x, ...)
+            println(...)
+            return x + 1234
+        end
+        println("check " .. tostring(ID) .. ": ", meta.is_function(_G.f))
+    end)
+    rt.threads.execute(1, function()
+        println("check " .. tostring(ID) .. ": ", meta.is_function(_G.f))
+    end)]]--
 
+    if meta.is_nil(future) then
+        future = rt.threads.request(1, "test_f", 1234)
+    end
+    println(future._value)
+    --future = rt.threads.request(1, "f", 1234)
+end)
 
 --- @brief startup
 function love.load()
@@ -73,6 +61,7 @@ end
 function love.update()
     local delta = love.timer.getDelta()
 
+    rt.FutureHandler.update_futures(delta)
     rt.AnimationTimerHandler:update(delta)
     rt.AnimationHandler:update(delta)
 end

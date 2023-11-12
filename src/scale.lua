@@ -269,3 +269,8 @@ function rt.Scale:set_show_value(b)
     end
     self._show_value = b
 end
+
+--- @brief
+function rt.test.scale()
+    error("TODO")
+end

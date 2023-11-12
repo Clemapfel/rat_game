@@ -38,7 +38,6 @@ require "gamepad_controller"
 require "keyboard_controller"
 require "mouse_controller"
 require "input_controller"
-require "thread_pool"
 require "thread"
 
 require "widget"
