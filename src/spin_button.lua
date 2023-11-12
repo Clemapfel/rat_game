@@ -1,6 +1,7 @@
 rt.settings.spin_button = {
     increase_label = "+",
-    decrease_label = "–"
+    decrease_label = "–",
+    frame_offset = 5 -- distance between backdrop and value_label_area
 }
 
 --- @class rt.SpinButton
@@ -13,6 +14,8 @@ rt.SpinButton = meta.new_type("SpinButton", function(lower, upper, increment, va
         _increment = increment,
         _value = value,
         _value_label = rt.Label(tostring(value)),
+        _value_label_area = rt.Rectangle(0, 0, 1, 1),
+        _value_label_area_outline = rt.Rectangle(0, 0, 1, 1),
         _backdrop = rt.Rectangle(0, 0, 1, 1),
         _backdrop_outline = rt.Rectangle(0, 0, 1, 1),
         _increase_button_backdrop = rt.Rectangle(0, 0, 1, 1),
@@ -26,19 +29,25 @@ rt.SpinButton = meta.new_type("SpinButton", function(lower, upper, increment, va
         _input = {}
     }, rt.Drawable, rt.Widget, rt.SignalEmitter)
 
-    out._backdrop:set_color(rt.Palette.BACKGROUND)
-    out._backdrop_outline:set_color(rt.Palette.BACKGROUND_OUTLINE)
+    out._backdrop:set_color(rt.Palette.BASE)
+    out._backdrop_outline:set_color(rt.Palette.BASE_OUTLINE)
 
     out._backdrop:set_border_radius(rt.settings.margin_unit)
     out._backdrop_outline:set_border_radius(rt.settings.margin_unit)
+    out._value_label_area_outline:set_border_radius(rt.settings.margin_unit)
+    out._value_label_area:set_border_radius(rt.settings.margin_unit)
 
-    out._increase_button_backdrop:set_color(rt.Palette.BACKGROUND)
-    out._increase_button_outline:set_color(rt.Palette.BACKGROUND_OUTLINE)
+    out._increase_button_backdrop:set_color(rt.Palette.BASE)
+    out._increase_button_outline:set_color(rt.Palette.BASE_OUTLINE)
     out._increase_button_disabled_overlay:set_color(rt.RGBA(0, 0, 0, 0.5))
     out._increase_button_disabled_overlay:set_is_visible(value >= out._upper)
 
-    out._decrease_button_backdrop:set_color(rt.Palette.BACKGROUND)
-    out._decrease_button_outline:set_color(rt.Palette.BACKGROUND_OUTLINE)
+    out._value_label_area:set_color(rt.Palette.BACKGROUND)
+    out._value_label_area_outline:set_color(rt.Palette.BACKGROUND_OUTLINE)
+    out._value_label_area_outline:set_is_outline(true)
+
+    out._decrease_button_backdrop:set_color(rt.Palette.BASE)
+    out._decrease_button_outline:set_color(rt.Palette.BASE_OUTLINE)
     out._decrease_button_disabled_overlay:set_color(rt.RGBA(0, 0, 0, 0.5))
     out._decrease_button_disabled_overlay:set_is_visible(value <= out._lower)
 
@@ -100,6 +109,8 @@ function rt.SpinButton:draw()
 
     self._backdrop:draw()
     self._backdrop_outline:draw()
+    self._value_label_area:draw()
+    self._value_label_area_outline:draw()
     self._increase_button_backdrop:draw()
     self._decrease_button_backdrop:draw()
     self._increase_button_label:draw()
@@ -123,23 +134,29 @@ end
 
 --- @overload rt.Widget.size_allocate
 function rt.SpinButton:size_allocate(x, y, width, height)
-    local label_h = select(2, self._value_label:measure())
+    local eps = rt.settings.spin_button.frame_offset
+    local label_h = select(2, self._value_label:measure()) + 2 * eps
     local label_y_align = y + 0.5 * height - 0.5 * label_h
 
     local vexpand = self:get_expand_vertically()
     local hexpand = self:get_expand_horizontally()
 
-    local button_width = math.max(select(1, self._increase_button_label:measure()), select(1, self._increase_button_label:measure()))
-    local button_x = x + width - button_width
+    local button_width = math.max(select(1, self._increase_button_label:measure()), select(1, self._increase_button_label:measure())) + 2 * rt.settings.margin_unit
 
     if not vexpand then
         y = y - label_h * 0.5
     end
 
-    self._backdrop:resize(rt.AABB(x, y, width, ternary(vexpand, height, label_h)))
-    self._backdrop_outline:resize(rt.AABB(x, y, width, ternary(vexpand, height, label_h)))
+    local backdrop_area = rt.AABB(x, y, width, ternary(vexpand, height, label_h))
+    self._backdrop:resize(backdrop_area)
+    self._backdrop_outline:resize(backdrop_area)
 
-    local increase_area = rt.AABB(button_x, y, button_width + 2 * rt.settings.margin_unit, ternary(vexpand, height, label_h))
+    self._value_label_area:resize(rt.AABB(x + eps, y + eps, backdrop_area.width - 2 * eps, backdrop_area.height - 2 * eps))
+    self._value_label_area_outline:resize(rt.AABB(x + eps, y + eps, backdrop_area.width - 2 * eps, backdrop_area.height - 2 * eps))
+
+    local button_x = backdrop_area.x + backdrop_area.width - button_width
+
+    local increase_area = rt.AABB(button_x, y, button_width, ternary(vexpand, height, label_h))
     self._increase_button_backdrop:resize(increase_area)
     self._increase_button_outline:resize(increase_area)
     self._increase_button_disabled_overlay:resize(increase_area)

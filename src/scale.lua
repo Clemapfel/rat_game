@@ -1,89 +1,174 @@
+rt.settings.scale = {}
+
 --- @class rt.Scale
-rt.Scale = meta.new_type("Scale", function(lower, upper, value)
-    local out = meta.new(rt.SpinButton, {
+rt.Scale = meta.new_type("Scale", function(lower, upper, increment, value)
+    meta.assert_number(lower, upper, increment)
+    value = ternary(meta.is_nil(value), mix(lower, upper, 0.5), value)
+    local out = meta.new(rt.Scale, {
         _lower = math.min(lower, upper),
         _upper = math.max(upper, lower),
-        _value = ternary(meta.is_nil(value), mix(lower, upper, 0.5), value)
-        _rail_center = rt.Rectangle(0, 0, 1, 1),
-        _rail_start = rt.Circle(0, 0, 1, 16),
-        _rail_end = rt.Circle(0, 0, 1, 16),
-        _rail_outline = rt.Rectangle(0, 0, 1, 1),
-        _slider = rt.Circle(0, 0, 1, 16),
-        _slider_outline = rt.Circle(0, 0, 1, 16)
+        _increment = increment,
+        _value = value,
+        _value_label = rt.Label(tostring(value)),
+
+        _input = {}
     }, rt.Drawable, rt.Widget, rt.SignalEmitter)
+
+    out._backdrop:set_color(rt.Palette.BACKGROUND)
+    out._backdrop_outline:set_color(rt.Palette.BACKGROUND_OUTLINE)
+
+    out._backdrop:set_border_radius(rt.settings.margin_unit)
+    out._backdrop_outline:set_border_radius(rt.settings.margin_unit)
+
+    out._increase_button_backdrop:set_color(rt.Palette.BACKGROUND)
+    out._increase_button_outline:set_color(rt.Palette.BACKGROUND_OUTLINE)
+    out._increase_button_disabled_overlay:set_color(rt.RGBA(0, 0, 0, 0.5))
+    out._increase_button_disabled_overlay:set_is_visible(value >= out._upper)
+
+    out._decrease_button_backdrop:set_color(rt.Palette.BACKGROUND)
+    out._decrease_button_outline:set_color(rt.Palette.BACKGROUND_OUTLINE)
+    out._decrease_button_disabled_overlay:set_color(rt.RGBA(0, 0, 0, 0.5))
+    out._decrease_button_disabled_overlay:set_is_visible(value <= out._lower)
+
+    for _, outline in pairs({out._backdrop_outline, out._increase_button_outline, out._decrease_button_outline}) do
+        outline:set_is_outline(true)
+    end
+
+    out:signal_add("value_changed")
+
+    out._input = rt.add_input_controller(out)
+    out._input:signal_connect("pressed", function(controller, button, self)
+
+        local increment = function()
+            self:set_value(self:get_value() + self._increment)
+            self._increase_button_disabled_overlay:set_is_visible(true)
+        end
+
+        local decrement = function()
+            self:set_value(self:get_value() - self._increment)
+            self._decrease_button_disabled_overlay:set_is_visible(true)
+        end
+
+        if button == rt.InputButton.UP then
+            increment()
+        elseif button == rt.InputButton.DOWN then
+            decrement()
+        end
+
+        local cursor_x, cursor_y = controller:get_cursor_position()
+        if rt.aabb_contains(self._increase_button_backdrop:get_bounds(), cursor_x, cursor_y) then
+            increment()
+        elseif rt.aabb_contains(self._decrease_button_backdrop:get_bounds(), cursor_x, cursor_y) then
+            decrement()
+        end
+    end, out)
+
+    out._input:signal_connect("released", function(_, button, self)
+        self._increase_button_disabled_overlay:set_is_visible(self._value >= self._upper)
+        self._decrease_button_disabled_overlay:set_is_visible(self._value <= self._lower)
+    end, out)
+
+    return out
 end)
+
+--- @overload rt.Widget.realize
+function rt.Scale:realize()
+    meta.assert_isa(self, rt.Scale)
+
+    self._value_label:realize()
+    self._increase_button_label:realize()
+    self._decrease_button_label:realize()
+
+    rt.Widget.realize(self)
+end
 
 --- @overload rt.Drawable.draw
 function rt.Scale:draw()
-    meta.assert_isa(self, rt.SpriteScale)
-    self._rail_star:draw()
-    self._rail_end:draw()
-    self._rail_center:draw()
-    self._rail_outline:draw()
+    meta.assert_isa(self, rt.Scale)
 
-    self._slider:draw()
-    self._slider_outline:draw()
+    self._backdrop:draw()
+    self._backdrop_outline:draw()
+    self._increase_button_backdrop:draw()
+    self._decrease_button_backdrop:draw()
+    self._increase_button_label:draw()
+    self._decrease_button_label:draw()
+    self._increase_button_outline:draw()
+    self._decrease_button_outline:draw()
+    self._increase_button_disabled_overlay:draw()
+    self._decrease_button_disabled_overlay:draw()
+    self._value_label:draw()
+end
+
+--- @overload rt.Widget.measure
+function rt.Scale:measure()
+    local value_w, value_h = self._value_label:measure()
+    local increase_w, increase_h = self._increase_button_label:measure()
+    local decrease_w, decrease_h = self._decrease_button_label:measure()
+    local min_w, min_h = self:get_minimum_size()
+
+    return math.max(min_w, value_w + increase_w + increase_h + rt.settings.margin_unit * 2), math.max(min_h, math.max(value_h, increase_h, decrease_h))
 end
 
 --- @overload rt.Widget.size_allocate
-function rt.SpriteScale:size_allocate(x, y, width, height)
-    meta.assert_isa(self, rt.SpriteScale)
+function rt.Scale:size_allocate(x, y, width, height)
+    local label_h = select(2, self._value_label:measure())
+    local label_y_align = y + 0.5 * height - 0.5 * label_h
 
-    local left_m, right_m, top_m, bottom_m = self:get_margin_left(), self:get_margin_right(), self:get_margin_top(), self:get_margin_bottom()
+    local vexpand = self:get_expand_vertically()
+    local hexpand = self:get_expand_horizontally()
 
-    if self._orientation == rt.Orientation.HORIZONTAL then
-        local left_frame_w, left_frame_h = self._spritesheet:get_frame_size(rt.settings.sprite_scale.rail_left_id)
-        local right_frame_w, right_frame_h = self._spritesheet:get_frame_size(rt.settings.sprite_scale.rail_right_id)
-        local center_frame_w, center_frame_h = self._spritesheet:get_frame_size(rt.settings.sprite_scale.rail_left_right_id)
+    local button_width = math.max(select(1, self._increase_button_label:measure()), select(1, self._increase_button_label:measure()))
+    local button_x = x + width - button_width
 
-        local left_w, left_h, right_w, right_h, center_w, center_h
-
-        if self:get_expand_vertically() then
-            local h = height - top_m - bottom_m
-            left_h = h
-            left_w = left_frame_w * (left_h / left_frame_h)
-            right_h = h
-            right_w = right_frame_w * (right_h / left_frame_h)
-            center_h = math.max(h, center_frame_h)
-        else
-            left_h = left_frame_h
-            left_w = left_frame_w
-            right_h = right_frame_h
-            right_w = right_frame_w
-            center_h = center_frame_h
-        end
-
-        center_w = clamp(width - left_m - right_m - left_w - right_w, 0)
-        self._left:fit_into(rt.AABB(x + left_m, y + 0.5 * height - 0.5 * left_h, left_w, left_h))
-        self._left_right:fit_into(rt.AABB(x + left_m + left_w, y + 0.5 * height - 0.5 * center_h, center_w, center_h))
-        self._right:fit_into(rt.AABB(x + width - right_m - right_w, y + 0.5 * height - 0.5 * right_h, right_w, right_h))
-    elseif self._orientation == rt.Orientation.VERTICAL then
-        local top_frame_w, top_frame_h = self._spritesheet:get_frame_size(rt.settings.sprite_scale.rail_top_id)
-        local center_frame_w, center_frame_h = self._spritesheet:get_frame_size(rt.settings.sprite_scale.rail_top_bottom_id)
-        local bottom_frame_w, bottom_frame_h = self._spritesheet:get_frame_size(rt.settings.sprite_scale.rail_bottom_id)
-
-        local top_w, top_h, center_w, center_h,  bottom_w, bottom_h
-
-        if self:get_expand_horizontally() then
-            local w = width - left_m - right_m
-            top_w = w
-            top_h = top_frame_h * (top_w / top_frame_w)
-            bottom_w = w
-            bottom_h = bottom_frame_h * (bottom_w / bottom_frame_w)
-            center_w = math.max(w, center_frame_w)
-        else
-            top_w = top_frame_w
-            top_h = top_frame_h
-            bottom_w = bottom_frame_w
-            bottom_h = bottom_frame_h
-            center_w = center_frame_w
-        end
-
-        center_h = clamp(height - top_m - bottom_m - top_h - bottom_h)
-        self._top:fit_into(rt.AABB(x + 0.5 * width - 0.5 * top_w, y + top_m, top_w, top_h))
-        self._top_bottom:fit_into(rt.AABB(x + 0.5 * width - 0.5 * center_w, y + top_m + top_h, center_w, center_h))
-        self._bottom:fit_into(rt.AABB(x + 0.5 * width - 0.5 * bottom_w, y + height - bottom_m - bottom_h, bottom_w, bottom_h))
+    if not vexpand then
+        y = y - label_h * 0.5
     end
 
-    self:_update_slider()
+    self._backdrop:resize(rt.AABB(x, y, width, ternary(vexpand, height, label_h)))
+    self._backdrop_outline:resize(rt.AABB(x, y, width, ternary(vexpand, height, label_h)))
+
+    local increase_area = rt.AABB(button_x, y, button_width + 2 * rt.settings.margin_unit, ternary(vexpand, height, label_h))
+    self._increase_button_backdrop:resize(increase_area)
+    self._increase_button_outline:resize(increase_area)
+    self._increase_button_disabled_overlay:resize(increase_area)
+    self._increase_button_label:fit_into(rt.AABB(increase_area.x, label_y_align, increase_area.width, label_h))
+
+    local decrease_area = rt.AABB(increase_area.x - increase_area.width, y, increase_area.width, ternary(vexpand, height, label_h))
+    self._decrease_button_backdrop:resize(decrease_area)
+    self._decrease_button_outline:resize(decrease_area)
+    self._decrease_button_disabled_overlay:resize(decrease_area)
+    self._decrease_button_label:fit_into(rt.AABB(decrease_area.x, label_y_align, decrease_area.width, label_h))
+
+    self._value_label:fit_into(rt.AABB(x + rt.settings.margin_unit, label_y_align, width - increase_area.width - decrease_area.width, label_h))
+end
+
+function rt.Scale:_update_value()
+    meta.assert_isa(self, rt.Scale)
+    self._value_label:set_text(tostring(self._value))
+    self._decrease_button_disabled_overlay:set_is_visible(self._value <= self._lower)
+    self._increase_button_disabled_overlay:set_is_visible(self._value >= self._upper)
+end
+
+--- @brief
+function rt.Scale:set_value(x)
+    meta.assert_isa(self, rt.Scale)
+    if self._value == x then return end
+
+    -- round to nearest step increment
+    if x >= self._upper then
+        x = self._upper
+    elseif x <= self._lower then
+        x = self._lower
+    else
+        x = self._increment * math.round(x / self._increment)
+    end
+    self._value = x
+    self:_update_value()
+    self:signal_emit("value_changed", self._value)
+end
+
+--- @brief
+function rt.Scale:get_value()
+    meta.assert_isa(self, rt.Scale)
+    return self._value
 end

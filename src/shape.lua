@@ -245,6 +245,18 @@ function rt.Rectangle:get_bounds()
     return rt.AABB(self._x, self._y, self._w, self._h)
 end
 
+--- @brief TODO
+function rt.Rectangle:get_position()
+    local bounds = self:get_bounds()
+    return bounds.x, bounds.y
+end
+
+--- @brief TODO
+function rt.Rectangle:get_size()
+    local bounds = self:get_bounds()
+    return bounds.width, bounds.height
+end
+
 --- @class rt.Ellipse
 rt.Ellipse = meta.new_type("Ellipse", function(center_x, center_y, x_radius, y_radius, n_outer_vertices)
     meta.assert_number(center_x, center_y, x_radius, y_radius)

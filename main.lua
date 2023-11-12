@@ -1,67 +1,4 @@
-RESOURCE_PATH = love.filesystem.getSource()
-package.path = package.path .. ";" .. RESOURCE_PATH .. "/src/?.lua"
-package.path = package.path .. ";" .. RESOURCE_PATH .. "/battle/?.lua"
-package.path = package.path .. ";" .. RESOURCE_PATH .. "/?.lua"
-
-rt = {}
-rt.test = {}
-
-require "common"
-require "settings"
-require "log"
-require "meta"
-require "time"
-require "vector"
-require "geometry"
-require "angle"
-require "random"
-require "signals"
-require "queue"
-require "list"
-require "set"
-require "color"
-require "palette"
-require "image"
-require "animation_timer"
-require "drawable"
-require "animation"
-require "texture"
-require "shape"
-require "vertex_shape"
-require "shader"
-require "spritesheet"
-require "font"
-require "glyph"
-require "audio"
-require "audio_playback"
-require "gamepad_controller"
-require "keyboard_controller"
-require "mouse_controller"
-require "input_controller"
-
-require "widget"
-require "window_layout"
-require "bin_layout"
-require "list_layout"
-require "overlay_layout"
-require "split_layout"
-require "grid_layout"
-require "flow_layout"
-require "aspect_layout"
-require "tab_layout"
-
-require "spacer"
-require "image_display"
-require "label"
-require "button"
-require "scrollbar"
-require "spin_button"
-require "viewport"
-require "sprite"
-require "sprite_frame"
-require "sprite_scale"
-require "sprite_levelbar"
-
+require "include"
 --require "test"
 
 function connect_emmy_lua_debugger()
@@ -81,10 +18,44 @@ io.stdout:setvbuf("no") -- makes it so love2d error message is printed to consol
 -- #############################
 
 window = rt.WindowLayout()
-button = rt.SpinButton(0, 10, math.pi)
-button:set_margin(50)
-button:set_expand_vertically(false)
-window:set_child(button)
+widget = rt.SpinButton(0, 1, 0.1)
+widget:set_margin(10)
+widget:set_expand_vertically(false)
+window:set_child(widget)
+
+--[[
+local r1, r2
+
+r1 = coroutine.create(function()
+    ::loop::
+    println("1")
+    coroutine.yield()
+    goto loop
+end)
+
+r2 = coroutine.create(function()
+    ::loop::
+    println("2")
+    coroutine.yield()
+    goto loop
+end)
+
+--while true do
+coroutine.resume(r1)
+coroutine.resume(r2)
+--end
+
+worker = love.thread.newThread(
+worker:start()
+    love.thread.getChannel(1):push(string.dump(function() print(x) end))
+
+x = 1234
+]]--
+
+input = rt.add_input_controller(window)
+input:signal_connect("pressed", function()
+end)
+
 
 --- @brief startup
 function love.load()

@@ -107,8 +107,11 @@ rt.Palette.ORANGE = rt.Palette.ORANGE_1
 rt.Palette.BROWN = rt.Palette.BROWN_2
 rt.Palette.GREY = rt.Palette.GREY_3
 
-rt.Palette.BACKGROUND = rt.Palette.GREY_5
+rt.Palette.BACKGROUND = rt.Palette.GREY_6
 rt.Palette.BACKGROUND_OUTLINE = rt.Palette.BLACK
+
+rt.Palette.BASE = rt.Palette.GREY_5
+rt.Palette.BASE_OUTLINE = rt.Palette.BLACK
 
 rt.Palette.FOREGROUND = rt.Palette.WHITE
 rt.Palette.FOREGROUND_OUTLINE = rt.Palette.BACKGROUND_OUTLINE
