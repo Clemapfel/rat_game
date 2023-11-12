@@ -1,4 +1,8 @@
-rt.settings.scale = {}
+assert(not meta.is_nil(rt.settings.font.default_size))
+rt.settings.scale = {
+    slider_radius = rt.settings.font.default_size,
+    trough_offset = 8 -- distance between rail and trough
+}
 
 --- @class rt.Scale
 rt.Scale = meta.new_type("Scale", function(lower, upper, increment, value)
@@ -10,30 +14,60 @@ rt.Scale = meta.new_type("Scale", function(lower, upper, increment, value)
         _increment = increment,
         _value = value,
         _value_label = rt.Label(tostring(value)),
-
+        _slider = rt.Circle(0, 0, 1, 16),
+        _slider_outline = rt.Circle(0, 0, 1),
+        _rail_start = rt.Circle(0, 0, 1),
+        _rail_start_outline = rt.Circle(0, 0, 1),
+        _rail_end = rt.Circle(0, 0, 1),
+        _rail_end_outline = rt.Circle(0, 0, 1),
+        _rail = rt.Rectangle(0, 0, 1, 1),
+        _rail_outline_top = rt.Line(0, 0, 1, 1),
+        _rail_outline_bottom = rt.Line(0, 0, 1, 1),
+        _trough_start = rt.Circle(0, 0, 1),
+        _trough_start_outline = rt.Circle(0, 0, 1),
+        _trough_end = rt.Circle(0, 0, 1),
+        _trough_end_outline = rt.Circle(0, 0, 1),
+        _trough = rt.Rectangle(0, 0, 1, 1),
+        _trough_outline_top = rt.Line(0, 0, 1, 1),
+        _trough_outline_bottom = rt.Line(0, 0, 1, 1),
         _input = {}
     }, rt.Drawable, rt.Widget, rt.SignalEmitter)
 
-    out._backdrop:set_color(rt.Palette.BACKGROUND)
-    out._backdrop_outline:set_color(rt.Palette.BACKGROUND_OUTLINE)
+    out._slider:set_color(rt.Palette.BASE)
+    out._slider_outline:set_color(rt.Palette.BASE_OUTLINE)
+    out._slider_outline:set_is_outline(true)
 
-    out._backdrop:set_border_radius(rt.settings.margin_unit)
-    out._backdrop_outline:set_border_radius(rt.settings.margin_unit)
-
-    out._increase_button_backdrop:set_color(rt.Palette.BACKGROUND)
-    out._increase_button_outline:set_color(rt.Palette.BACKGROUND_OUTLINE)
-    out._increase_button_disabled_overlay:set_color(rt.RGBA(0, 0, 0, 0.5))
-    out._increase_button_disabled_overlay:set_is_visible(value >= out._upper)
-
-    out._decrease_button_backdrop:set_color(rt.Palette.BACKGROUND)
-    out._decrease_button_outline:set_color(rt.Palette.BACKGROUND_OUTLINE)
-    out._decrease_button_disabled_overlay:set_color(rt.RGBA(0, 0, 0, 0.5))
-    out._decrease_button_disabled_overlay:set_is_visible(value <= out._lower)
-
-    for _, outline in pairs({out._backdrop_outline, out._increase_button_outline, out._decrease_button_outline}) do
-        outline:set_is_outline(true)
+    for _, rail in pairs({out._rail, out._rail_start, out._rail_end}) do
+        rail:set_color(rt.Palette.BASE)
     end
 
+    for _, outline in pairs({
+        out._rail_outline_top,
+        out._rail_outline_bottom,
+        out._rail_start_outline,
+        out._rail_end_outline
+    }) do
+        outline:set_color(rt.Palette.BASE_OUTLINE)
+    end
+    out._rail_start_outline:set_is_outline(true)
+    out._rail_end_outline:set_is_outline(true)
+
+    for _, trough in pairs({out._trough, out._trough_start, out._trough_end}) do
+        trough:set_color(rt.Palette.BACKGROUND)
+    end
+
+    for _, outline in pairs({
+        out._trough_outline_top,
+        out._trough_outline_bottom,
+        out._trough_start_outline,
+        out._trough_end_outline
+    }) do
+        outline:set_color(rt.Palette.BACKGROUND_OUTLINE)
+    end
+    out._trough_start_outline:set_is_outline(true)
+    out._trough_end_outline:set_is_outline(true)
+
+    out:_update_slider()
     out:signal_add("value_changed")
 
     out._input = rt.add_input_controller(out)
@@ -41,12 +75,10 @@ rt.Scale = meta.new_type("Scale", function(lower, upper, increment, value)
 
         local increment = function()
             self:set_value(self:get_value() + self._increment)
-            self._increase_button_disabled_overlay:set_is_visible(true)
         end
 
         local decrement = function()
             self:set_value(self:get_value() - self._increment)
-            self._decrease_button_disabled_overlay:set_is_visible(true)
         end
 
         if button == rt.InputButton.UP then
@@ -55,98 +87,87 @@ rt.Scale = meta.new_type("Scale", function(lower, upper, increment, value)
             decrement()
         end
 
-        local cursor_x, cursor_y = controller:get_cursor_position()
-        if rt.aabb_contains(self._increase_button_backdrop:get_bounds(), cursor_x, cursor_y) then
-            increment()
-        elseif rt.aabb_contains(self._decrease_button_backdrop:get_bounds(), cursor_x, cursor_y) then
-            decrement()
-        end
+        -- TODO: drag
     end, out)
-
-    out._input:signal_connect("released", function(_, button, self)
-        self._increase_button_disabled_overlay:set_is_visible(self._value >= self._upper)
-        self._decrease_button_disabled_overlay:set_is_visible(self._value <= self._lower)
-    end, out)
-
     return out
 end)
-
---- @overload rt.Widget.realize
-function rt.Scale:realize()
-    meta.assert_isa(self, rt.Scale)
-
-    self._value_label:realize()
-    self._increase_button_label:realize()
-    self._decrease_button_label:realize()
-
-    rt.Widget.realize(self)
-end
 
 --- @overload rt.Drawable.draw
 function rt.Scale:draw()
     meta.assert_isa(self, rt.Scale)
 
-    self._backdrop:draw()
-    self._backdrop_outline:draw()
-    self._increase_button_backdrop:draw()
-    self._decrease_button_backdrop:draw()
-    self._increase_button_label:draw()
-    self._decrease_button_label:draw()
-    self._increase_button_outline:draw()
-    self._decrease_button_outline:draw()
-    self._increase_button_disabled_overlay:draw()
-    self._decrease_button_disabled_overlay:draw()
-    self._value_label:draw()
-end
+    self._rail_start:draw()
+    self._rail_start_outline:draw()
+    self._rail_end:draw()
+    self._rail_end_outline:draw()
 
---- @overload rt.Widget.measure
-function rt.Scale:measure()
-    local value_w, value_h = self._value_label:measure()
-    local increase_w, increase_h = self._increase_button_label:measure()
-    local decrease_w, decrease_h = self._decrease_button_label:measure()
-    local min_w, min_h = self:get_minimum_size()
+    self._rail:draw()
+    self._rail_outline_top:draw()
+    self._rail_outline_bottom:draw()
 
-    return math.max(min_w, value_w + increase_w + increase_h + rt.settings.margin_unit * 2), math.max(min_h, math.max(value_h, increase_h, decrease_h))
+    self._trough_start:draw()
+    self._trough_start_outline:draw()
+    self._trough_end:draw()
+    self._trough_end_outline:draw()
+
+    self._trough:draw()
+    self._trough_outline_top:draw()
+    self._trough_outline_bottom:draw()
+
+    self._slider:draw()
+    self._slider_outline:draw()
 end
 
 --- @overload rt.Widget.size_allocate
 function rt.Scale:size_allocate(x, y, width, height)
-    local label_h = select(2, self._value_label:measure())
-    local label_y_align = y + 0.5 * height - 0.5 * label_h
+    meta.assert_isa(self, rt.Scale)
 
-    local vexpand = self:get_expand_vertically()
-    local hexpand = self:get_expand_horizontally()
+    local slider_radius = rt.settings.scale.slider_radius
+    local rail_radius = slider_radius * 0.5
+    local rail_x = x + rail_radius
+    local rail_y = y + rail_radius
+    self._rail_start:resize(rail_x, rail_y, rail_radius)
+    self._rail_start_outline:resize(rail_x, rail_y, rail_radius)
+    self._rail_end:resize(x + width - rail_radius, rail_y, rail_radius)
+    self._rail_end_outline:resize(x + width - rail_radius, rail_y, rail_radius)
 
-    local button_width = math.max(select(1, self._increase_button_label:measure()), select(1, self._increase_button_label:measure()))
-    local button_x = x + width - button_width
+    local rail_area = rt.AABB(x + rail_radius, y, width - 2 * rail_radius, 2 * rail_radius)
+    self._rail:resize(rail_area)
+    self._rail_outline_top:resize(rail_area.x, rail_area.y, rail_area.x + rail_area.width, rail_area.y)
+    self._rail_outline_bottom:resize(rail_area.x, rail_area.y + rail_area.height, rail_area.x + rail_area.width, rail_area.y + rail_area.height)
 
-    if not vexpand then
-        y = y - label_h * 0.5
-    end
+    local trough_radius = rail_radius - rt.settings.scale.trough_offset
+    self._trough_start:resize(rail_x, rail_y, trough_radius)
+    self._trough_start_outline:resize(rail_x, rail_y, trough_radius)
+    self._trough_end:resize(x + width - rail_radius, rail_y, trough_radius)
+    self._trough_end_outline:resize(x + width - rail_radius, rail_y, trough_radius)
 
-    self._backdrop:resize(rt.AABB(x, y, width, ternary(vexpand, height, label_h)))
-    self._backdrop_outline:resize(rt.AABB(x, y, width, ternary(vexpand, height, label_h)))
+    local trough_area = rt.AABB(rail_x, rail_y - trough_radius, width - 2 * rail_radius, 2 * trough_radius)
+    self._trough:resize(trough_area)
+    self._trough_outline_top:resize(trough_area.x, trough_area.y, trough_area.x + trough_area.width, trough_area.y)
+    self._trough_outline_bottom:resize(trough_area.x, trough_area.y + trough_area.height, trough_area.x + trough_area.width, trough_area.y + trough_area.height)
 
-    local increase_area = rt.AABB(button_x, y, button_width + 2 * rt.settings.margin_unit, ternary(vexpand, height, label_h))
-    self._increase_button_backdrop:resize(increase_area)
-    self._increase_button_outline:resize(increase_area)
-    self._increase_button_disabled_overlay:resize(increase_area)
-    self._increase_button_label:fit_into(rt.AABB(increase_area.x, label_y_align, increase_area.width, label_h))
+    --[[
+     ]]--
 
-    local decrease_area = rt.AABB(increase_area.x - increase_area.width, y, increase_area.width, ternary(vexpand, height, label_h))
-    self._decrease_button_backdrop:resize(decrease_area)
-    self._decrease_button_outline:resize(decrease_area)
-    self._decrease_button_disabled_overlay:resize(decrease_area)
-    self._decrease_button_label:fit_into(rt.AABB(decrease_area.x, label_y_align, decrease_area.width, label_h))
+    self._slider:set_radius(slider_radius)
+    self._slider_outline:set_radius(slider_radius)
 
-    self._value_label:fit_into(rt.AABB(x + rt.settings.margin_unit, label_y_align, width - increase_area.width - decrease_area.width, label_h))
+    self:_update_slider()
 end
 
-function rt.Scale:_update_value()
+function rt.Scale:_update_slider()
     meta.assert_isa(self, rt.Scale)
-    self._value_label:set_text(tostring(self._value))
-    self._decrease_button_disabled_overlay:set_is_visible(self._value <= self._lower)
-    self._increase_button_disabled_overlay:set_is_visible(self._value >= self._upper)
+
+    local x, y = self._rail:get_position()
+    local w = select(1, self._rail:get_size())
+
+    local slider_radius = rt.settings.scale.slider_radius
+    local slider_x = x + ((self._value - self._lower) / (self._upper - self._lower)) * w
+    local slider_y = y + 0.5 * slider_radius
+
+    self._slider:resize(slider_x, slider_y, slider_radius)
+    self._slider_outline:resize(slider_x, slider_y, slider_radius)
 end
 
 --- @brief
@@ -163,7 +184,7 @@ function rt.Scale:set_value(x)
         x = self._increment * math.round(x / self._increment)
     end
     self._value = x
-    self:_update_value()
+    self:_update_slider()
     self:signal_emit("value_changed", self._value)
 end
 

@@ -398,17 +398,21 @@ rt.InputController = meta.new_type("InputController", function(holder)
     end, out)
 
     out._keyboard:signal_connect("key_pressed", function(_, key, self)
-        meta.assert_enum(key, rt.KeyboardKey)
+        if not meta.is_enum_value(key, rt.KeyboardKey) then return end
         local action = rt.InputHandler._reverse_mapping.keyboard[key]
-        if not meta.is_nil(action) and not self._is_disabled then self:signal_emit("pressed", action) end
-        self._state[action] = true
+        if not meta.is_nil(action) then
+            if not self._is_disabled then self:signal_emit("pressed", action) end
+            self._state[action] = true
+        end
     end, out)
 
     out._keyboard:signal_connect("key_released", function(_, key, self)
-        meta.assert_enum(key, rt.KeyboardKey)
+        if not meta.is_enum_value(key, rt.KeyboardKey) then return end
         local action = rt.InputHandler._reverse_mapping.keyboard[key]
-        if not meta.is_nil(action) and not self._is_disabled then self:signal_emit("released", action) end
-        self._state[action] = false
+        if not meta.is_nil(action) then
+            if not self._is_disabled then self:signal_emit("released", action) end
+            self._state[action] = true
+        end
     end, out)
 
     out._mouse:signal_connect("click_pressed", function(_, x, y, button_id, n_presses, self)

@@ -131,6 +131,11 @@ function try_catch(to_try, on_fail)
     end
 end
 
+--- @brief iterable range of objects
+function range(...)
+    return pairs({...})
+end
+
 base_select = select
 
 --- @brief get n-th element of varag
@@ -295,7 +300,7 @@ function serialize(object_identifier, object, inject_sourcecode)
             end
 
         elseif type(object) == "function" and inject_sourcecode then
-            insert(buffer, get_source_code(object))
+            insert(buffer, string.dump(object))
         elseif type(object) == "nil" then
             insert(buffer, "nil")
         else

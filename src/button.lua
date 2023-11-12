@@ -12,8 +12,8 @@ rt.Button = meta.new_type("Button", function(child)
 
     out:signal_add("clicked")
 
-    out._base:set_color(rt.Palette.BACKGROUND)
-    out._outline:set_color(rt.Palette.BACKGROUND_OUTLINE)
+    out._base:set_color(rt.Palette.BASE)
+    out._outline:set_color(rt.Palette.BASE_OUTLINE)
     out._outline:set_is_outline(true)
     out._outline:set_line_width(5)
 

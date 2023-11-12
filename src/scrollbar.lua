@@ -9,12 +9,12 @@ rt.Scrollbar = meta.new_type("Scrollbar", function(orientation, n_steps)
         n_steps = 10
     end
 
-    local border_radius = 10
+    local corner_radius = 10
     local out = meta.new(rt.Scrollbar, {
         _base = rt.Rectangle(0, 0, 1, 1),
         _base_outline = rt.Rectangle(0, 0, 1, 1),
-        _cursor = rt.Rectangle(0, 0, 1, 1, border_radius),
-        _cursor_outline = rt.Rectangle(0, 0, 1, 1, border_radius),
+        _cursor = rt.Rectangle(0, 0, 1, 1, corner_radius),
+        _cursor_outline = rt.Rectangle(0, 0, 1, 1, corner_radius),
         _orientation = orientation,
         _value = 0.5,
         _n_steps = n_steps

@@ -162,6 +162,13 @@ function rt.LineLoop(a_x, a_y, b_x, b_y, ...)
     return out
 end
 
+--- @brief
+function rt.LineStrip:resize(a_x, a_y, b_x, b_y, ...)
+    meta.assert_isa(self, rt.LineStrip)
+    self._vertices = {a_x, a_y, b_x, b_y, ...}
+end
+
+--- @brief
 function rt.LineStrip:draw()
     if not self:get_is_visible() then return end
     self:_bind_for_rendering()
@@ -179,8 +186,8 @@ function rt.LineStrip:draw()
 end
 
 --- @class rt.Rectangle
-rt.Rectangle = meta.new_type("Rectangle", function(top_left_x, top_left_y, width, height, border_radius)
-    if meta.is_nil(border_radius) then border_radius = 0 end
+rt.Rectangle = meta.new_type("Rectangle", function(top_left_x, top_left_y, width, height, corner_radius)
+    if meta.is_nil(corner_radius) then corner_radius = 0 end
     meta.assert_number(top_left_x, top_left_y, width, height)
 
     return meta.new(rt.Rectangle, {
@@ -188,7 +195,7 @@ rt.Rectangle = meta.new_type("Rectangle", function(top_left_x, top_left_y, width
         _y = top_left_y,
         _w = width,
         _h = height,
-        _border_radius = border_radius
+        _corner_radius = corner_radius
     }, rt.Shape, rt.Drawable)
 end)
 
@@ -200,7 +207,7 @@ end
 function rt.Rectangle:draw()
     if not self:get_is_visible() then return end
     self:_bind_for_rendering()
-    love.graphics.rectangle(self:_get_draw_mode(), self._x, self._y, self._w, self._h, self._border_radius, self._border_radius, self._border_radius * 2)
+    love.graphics.rectangle(self:_get_draw_mode(), self._x, self._y, self._w, self._h, self._corner_radius, self._corner_radius, self._corner_radius * 2)
 end
 
 --- @brief TODO
@@ -226,9 +233,9 @@ function rt.Rectangle:get_size()
 end
 
 --- @brief TODO
-function rt.Rectangle:set_border_radius(px)
+function rt.Rectangle:set_corner_radius(px)
     meta.assert_isa(self, rt.Rectangle)
-    self._border_radius = px
+    self._corner_radius = px
 end
 
 --- @brief TODO
@@ -268,23 +275,64 @@ rt.Ellipse = meta.new_type("Ellipse", function(center_x, center_y, x_radius, y_r
     return meta.new(rt.Ellipse, {
         _center_x = center_x,
         _center_y = center_y,
-        _x_radius = x_radius,
-        _y_radius = y_radius,
+        _radius_x = x_radius,
+        _radius_y = y_radius,
         _n_outer_vertices = n_outer_vertices
     }, rt.Shape, rt.Drawable)
 end)
 
+--- @brief
 function rt.Circle(center_x, center_y, radius, n_outer_vertices)
     return rt.Ellipse(center_x, center_y, radius, radius, n_outer_vertices)
 end
 
+--- @brief
+function rt.Ellipse:set_radius(radius_x, radius_y)
+    meta.assert_isa(self, rt.Ellipse)
+    if not meta.is_nil(radius_y) then
+        radius_y = radius_x
+    end
+    meta.assert_number(radius_x, radius_y)
+    self._radius_x = radius_x
+    self._radius_y = radius_y
+end
+
+--- @brief
+function rt.Ellipse:resize(center_x, center_y, radius_x, radius_y)
+    meta.assert_isa(self, rt.Ellipse)
+    meta.assert_number(center_x, center_y, radius_x, radius_y)
+    if not meta.is_nil(radius_y) then
+        meta.assert_number(radius_y)
+    end
+
+    self._center_x = center_x
+    self._center_y = center_y
+    self._radius_x = radius_x
+    self._radius_y = ternary(meta.is_nil(radius_y), radius_x, radius_y)
+end
+
+--- @brief
+function rt.Ellipse:get_center()
+    meta.assert_isa(self, rt.Ellipse)
+    return self._center_x, self._center_y
+end
+
+--- @brief
+function rt.Ellipse:get_radius()
+    meta.assert_isa(self, rt.Ellipse)
+    return self._radius_x, self._radius_y
+end
+
+--- @brief
 function rt.Ellipse:draw()
+    meta.assert_isa(self, rt.Ellipse)
     if not self:get_is_visible() then return end
     self:_bind_for_rendering()
+
     if self._n_outer_vertices > 0 then
-        love.graphics.ellipse(self:_get_draw_mode(), self._center_x, self._center_y, self._x_radius, self._y_radius, self._n_outer_vertices)
+        love.graphics.ellipse(self:_get_draw_mode(), self._center_x, self._center_y, self._radius_x, self._radius_y, self._n_outer_vertices)
     else
-        love.graphics.ellipse(self:_get_draw_mode(), self._center_x, self._center_y, self._x_radius, self._y_radius)
+        love.graphics.ellipse(self:_get_draw_mode(), self._center_x, self._center_y, self._radius_x, self._radius_y)
     end
 end
 

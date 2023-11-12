@@ -32,10 +32,10 @@ rt.SpinButton = meta.new_type("SpinButton", function(lower, upper, increment, va
     out._backdrop:set_color(rt.Palette.BASE)
     out._backdrop_outline:set_color(rt.Palette.BASE_OUTLINE)
 
-    out._backdrop:set_border_radius(rt.settings.margin_unit)
-    out._backdrop_outline:set_border_radius(rt.settings.margin_unit)
-    out._value_label_area_outline:set_border_radius(rt.settings.margin_unit)
-    out._value_label_area:set_border_radius(rt.settings.margin_unit)
+    out._backdrop:set_corner_radius(rt.settings.margin_unit)
+    out._backdrop_outline:set_corner_radius(rt.settings.margin_unit)
+    out._value_label_area_outline:set_corner_radius(rt.settings.margin_unit)
+    out._value_label_area:set_corner_radius(rt.settings.margin_unit)
 
     out._increase_button_backdrop:set_color(rt.Palette.BASE)
     out._increase_button_outline:set_color(rt.Palette.BASE_OUTLINE)
