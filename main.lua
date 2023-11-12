@@ -27,59 +27,43 @@ window:set_child(widget)
 thread = love.thread.newThread([[
     require "love.timer"
     while true do
-        print(love.thread.getChannel(1234):getCount())
         local message = love.thread.getChannel(1234):demand()
-        load(message)()
+        load(message.code)()
     end
 ]])
 thread:start()
 
-love.thread.getChannel(1234):push(string.dump(function()
-    f = function(x)
-        print(x + 1234)
-    end
-end))
+love.thread.getChannel(1234):push({
+    code = string.dump(function()
+        f = function(x)
+            print(x + 1234)
+        end
+    end)
+})
 
-love.thread.getChannel(1234):push(string.dump(function()
-    f(1234)
-end))
+love.thread.getChannel(1234):push({
+    code = string.dump(function()
+        f(1234)
+    end)
+})
 
-
---[[
 input = rt.add_input_controller(window)
 input:signal_connect("pressed", function()
 
-    channel = love.thread.getChannel(1)
-    channel:push(string.dump(function()
-        f = function(x)
-            print(x)
-        end
-        f(1234)
-    end))
-    channel:push(string.dump(function()
-        f(5678)
-    end))
+    love.thread.getChannel(1):push({
+        type = rt.MessageType.LOAD,
+        code = string.dump(function()
+            f = function(x) println("called") end
+        end)
+    })
 
-    thread = rt.get_thread(1)
-    [[
-    rt.threads.execute(1, function()
-        f = function(x, ...)
-            println(...)
-            return x + 1234
-        end
-        println("check " .. tostring(ID) .. ": ", meta.is_function(_G.f))
-    end)
-    rt.threads.execute(1, function()
-        println("check " .. tostring(ID) .. ": ", meta.is_function(_G.f))
-    end)--
-
-    if meta.is_nil(future) then
-        future = rt.threads.request(1, "test_f", 1234)
-    end
-    println(future._value)
-    --future = rt.threads.request(1, "f", 1234)
+    love.thread.getChannel(1):push({
+        type = rt.MessageType.LOAD,
+        code = string.dump(function()
+            f()
+        end)
+    })
 end)
-]]--
 
 --- @brief startup
 function love.load()

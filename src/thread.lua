@@ -63,7 +63,8 @@ end
 function rt.FutureHandler.update_futures()
     for _, thread in pairs(rt.FutureHandler._threads) do
         local channel = rt.threads.get_worker_to_main_channel(thread:get_id())
-        assert(meta.is_nil(thread._native:getError()))
+        local error_maybe = thread._native:getError()
+        if not meta.is_nil(error_maybe) then rt.error(error_maybe) end
         while channel:getCount() > 0 do
             local message = channel:pop()
             meta.assert_message(message)
@@ -135,11 +136,18 @@ end
 --- @brief execute arbitrary code worker-side
 function rt.threads.execute(id, code)
     meta.assert_number(id)
-    meta.assert_function(code)
-    love.thread.getChannel(id):push({
-        type = rt.MessageType.LOAD,
-        code = string.dump(code)
-    })
+    if meta.is_string(code) then
+        love.thread.getChannel(id):push({
+            type = rt.MessageType.LOAD,
+            code = code
+        })
+    else
+        meta.assert_function(code)
+        love.thread.getChannel(id):push({
+            type = rt.MessageType.LOAD,
+            code = string.dump(code)
+        })
+    end
 end
 
 --- @brief send task request from main to worker

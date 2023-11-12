@@ -8,6 +8,9 @@ require "common"
 require "log"
 require "meta"
 require "thread"
+meta.assert_number(ID)
+
+require "love.timer"
 
 --[[
 MessageType     Member      Type        Purpose
@@ -21,33 +24,26 @@ DELIVER         .id         number      future ID
                 .value      any         returned value
 ]]--
 
-
-
-require "love.timer"
-function test_f(x)
-    love.timer.sleep(4)
-    return x + 1234
-end
-
--- ID = @out@
 message_routine = coroutine.create(function()
     local in_channel = rt.threads.get_main_to_worker_channel(ID)
     local out_channel = rt.threads.get_main_to_worker_channel(ID)
     while true do
         message = in_channel:demand()
-        println("received: " .. message.type)
         meta.assert_message(message)
+
         if message.type == rt.MessageType.LOAD then
-            meta.assert_string(message.code)
-            local f, error_maybe = load(message.code)
-            if meta.is_nil(f) then rt.error(error_maybe) end
-            f()
+            local __f, error = load(message.code)
+            if meta.is_nil(__f) then println(error) end
+            try_catch(function()
+                __f()
+            end, function(err)
+                println("[rt][ERROR] In thread #" .. tostring(ID) .. ": ", err)
+            end)
         elseif message.type == rt.MessageType.REQUEST then
             meta.assert_string(message.name)
-            local f = _G[message.name]
             meta.assert_function(f)
             meta.assert_table(message.args)
-            local result = f(table.unpack(message.args))
+            local result = _G[message.name](table.unpack(message.args))
             rt.threads.deliver(ID, message.id, result)
         else
             rt.error("In thread `" .. tostring(ID) .. "` message_routine: unhandled message type `" .. type "`")
@@ -58,4 +54,5 @@ end)
 
 while true do
     coroutine.resume(message_routine)
+    love.timer.sleep(1 / 60)
 end
