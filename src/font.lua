@@ -1,5 +1,5 @@
 rt.settings.font = {}
-rt.settings.font.default_size = 50
+rt.settings.font.default_size = 20
 rt.settings.font.default = {}
 rt.settings.font.default_mono = {}
 rt.settings.font.regular_fallbacks = {}
@@ -155,7 +155,6 @@ function rt.load_default_fonts()
         gnu_unifont
     }
 
-    rt.settings.font.default_size = 50
     rt.settings.font.default = rt.Font(
         "assets/fonts/DejaVuSans/DejaVuSans-Regular.ttf",
         "assets/fonts/DejaVuSans/DejaVuSans-Bold.ttf",
