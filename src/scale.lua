@@ -30,6 +30,10 @@ rt.Scale = meta.new_type("Scale", function(lower, upper, increment, value)
         _trough = rt.Rectangle(0, 0, 1, 1),
         _trough_outline_top = rt.Line(0, 0, 1, 1),
         _trough_outline_bottom = rt.Line(0, 0, 1, 1),
+        _fill_start = rt.Circle(0, 0, 1),
+        _fill_end = rt.Circle(0, 0, 1),
+        _fill = rt.Rectangle(0, 0, 1, 1),
+        _fill_color = rt.Palette.HIGHLIGHT,
         _input = {}
     }, rt.Drawable, rt.Widget, rt.SignalEmitter)
 
@@ -67,6 +71,11 @@ rt.Scale = meta.new_type("Scale", function(lower, upper, increment, value)
     out._trough_start_outline:set_is_outline(true)
     out._trough_end_outline:set_is_outline(true)
 
+    for _, shape in pairs({out._fill_start, out._fill, out._fill_end}) do
+        shape:set_color(rt.Palette.BLUE)
+        shape:set_is_visible(true)
+    end
+
     out:_update_slider()
     out:signal_add("value_changed")
 
@@ -81,13 +90,22 @@ rt.Scale = meta.new_type("Scale", function(lower, upper, increment, value)
             self:set_value(self:get_value() - self._increment)
         end
 
-        if button == rt.InputButton.UP then
+        if button == rt.InputButton.RIGHT then
             increment()
-        elseif button == rt.InputButton.DOWN then
+        elseif button == rt.InputButton.LEFT then
             decrement()
         end
 
-        -- TODO: drag
+        println(self._input:is_down(button))
+    end, out)
+
+    out._input:signal_connect("motion", function(controller, x, y, dx, dy, self)
+        if self._input:is_down(rt.InputButton.A) then
+            local rail_x = select(1, self._rail:get_position())
+            local rail_w = select(1, self._rail:get_size())
+            println((x - rail_x) / rail_w)
+            self:set_value(self._lower + ((x - rail_x) / rail_w) * (self._upper - self._lower))
+        end
     end, out)
     return out
 end)
@@ -106,11 +124,14 @@ function rt.Scale:draw()
     self._rail_outline_bottom:draw()
 
     self._trough_start:draw()
+    self._fill_start:draw()
     self._trough_start_outline:draw()
     self._trough_end:draw()
+    self._fill_end:draw()
     self._trough_end_outline:draw()
 
     self._trough:draw()
+    self._fill:draw()
     self._trough_outline_top:draw()
     self._trough_outline_bottom:draw()
 
@@ -142,13 +163,13 @@ function rt.Scale:size_allocate(x, y, width, height)
     self._trough_end:resize(x + width - rail_radius, rail_y, trough_radius)
     self._trough_end_outline:resize(x + width - rail_radius, rail_y, trough_radius)
 
+    self._fill_start:resize(rail_x, rail_y, trough_radius)
+    self._fill_end:resize(x + width - rail_radius, rail_y, trough_radius)
+
     local trough_area = rt.AABB(rail_x, rail_y - trough_radius, width - 2 * rail_radius, 2 * trough_radius)
     self._trough:resize(trough_area)
     self._trough_outline_top:resize(trough_area.x, trough_area.y, trough_area.x + trough_area.width, trough_area.y)
     self._trough_outline_bottom:resize(trough_area.x, trough_area.y + trough_area.height, trough_area.x + trough_area.width, trough_area.y + trough_area.height)
-
-    --[[
-     ]]--
 
     self._slider:set_radius(slider_radius)
     self._slider_outline:set_radius(slider_radius)
@@ -168,6 +189,13 @@ function rt.Scale:_update_slider()
 
     self._slider:resize(slider_x, slider_y, slider_radius)
     self._slider_outline:resize(slider_x, slider_y, slider_radius)
+
+    local trough_x, trough_y = self._trough:get_position()
+    local trough_w, trough_h = self._trough:get_size()
+    self._fill:resize(rt.AABB(trough_x, trough_y, slider_x - trough_x, trough_h))
+
+    self._fill_start:set_is_visible(slider_x > select(1, self._fill_start:get_center()))
+    self._fill_end:set_is_visible(slider_x >= trough_x + trough_w)
 end
 
 --- @brief

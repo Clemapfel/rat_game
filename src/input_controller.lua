@@ -218,24 +218,20 @@ rt.InputController = meta.new_type("InputController", function(holder)
     out._gamepad:signal_connect("button_pressed", function(_, id, button, self)
         meta.assert_enum(button, rt.GamepadButton)
         local action = rt.InputHandler._reverse_mapping.gamepad[button]
-
-        if self._state[action] == false then
-            if not meta.is_nil(action) then
-                self:signal_emit("pressed", action)
-            end
-            self._state[action] = true
+        local current = self._state[action]
+        self._state[action] = true
+        if current == false and not self._is_disabled then
+            self:signal_emit("pressed", action)
         end
     end, out)
 
     out._gamepad:signal_connect("button_released", function(_, id, button, self)
         meta.assert_enum(button, rt.GamepadButton)
         local action = rt.InputHandler._reverse_mapping.gamepad[button]
-
-        if self._state[action] == true then
-            if not meta.is_nil(action) and not self._is_disabled then
-                self:signal_emit("released", action)
-            end
-            self._state[action] = false
+        local current = self._state[action]
+        self._state[action] = false
+        if current == true and not self._is_disabled then
+            self:signal_emit("released", action)
         end
     end, out)
 
@@ -400,35 +396,43 @@ rt.InputController = meta.new_type("InputController", function(holder)
     out._keyboard:signal_connect("key_pressed", function(_, key, self)
         if not meta.is_enum_value(key, rt.KeyboardKey) then return end
         local action = rt.InputHandler._reverse_mapping.keyboard[key]
-        if not meta.is_nil(action) then
-            if not self._is_disabled then self:signal_emit("pressed", action) end
-            self._state[action] = true
+        if meta.is_nil(action) then return end
+
+        local current = self._state[action]
+        self._state[action] = true
+        if current == false and not self._is_disabled then
+            self:signal_emit("pressed", action)
         end
     end, out)
 
     out._keyboard:signal_connect("key_released", function(_, key, self)
         if not meta.is_enum_value(key, rt.KeyboardKey) then return end
         local action = rt.InputHandler._reverse_mapping.keyboard[key]
-        if not meta.is_nil(action) then
-            if not self._is_disabled then self:signal_emit("released", action) end
-            self._state[action] = true
+        if meta.is_nil(action) then return end
+
+        local current = self._state[action]
+        self._state[action] = false
+        if current == true and not self._is_disabled then
+            self:signal_emit("released", action)
         end
     end, out)
 
     out._mouse:signal_connect("click_pressed", function(_, x, y, button_id, n_presses, self)
         meta.assert_enum(button_id, rt.MouseButton)
-        if not self._is_disabled and rt.aabb_contains(self._instance:get_bounds(), x, y) then
+        local current = self._state[rt.InputButton.A]
+        self._state[rt.InputButton.A] = true
+        if current == false and not self._is_disabled and rt.aabb_contains(self._instance:get_bounds(), x, y) then
             self:signal_emit("pressed", rt.InputButton.A)
         end
-        self._state[rt.InputButton.A] = true
     end, out)
 
     out._mouse:signal_connect("click_released", function(_, x, y, button_id, n_presses, self)
         meta.assert_enum(button_id, rt.MouseButton)
-        if not self._is_disabled and rt.aabb_contains(self._instance:get_bounds(), x, y) then
+        local current = self._state[rt.InputButton.A]
+        self._state[rt.InputButton.A] = false
+        if current == true and not self._is_disabled and rt.aabb_contains(self._instance:get_bounds(), x, y) then
             self:signal_emit("released", rt.InputButton.A)
         end
-        self._state[rt.InputButton.A] = false
     end, out)
 
     out._mouse:signal_connect("motion_enter", function(_, x, y, self)
@@ -450,14 +454,14 @@ end)
 function rt.InputController:is_down(key)
     meta.assert_isa(self, rt.InputController)
     meta.assert_enum(key, rt.InputButton)
-    return self._state[rt.InputButton] == true
+    return self._state[key] == true
 end
 
 --- @brief
 function rt.InputController:is_up(key)
     meta.assert_isa(self, rt.InputController)
     meta.assert_enum(key, rt.InputButton)
-    return self._state[rt.InputButton] == false
+    return self._state[key] == false
 end
 
 --- @brief

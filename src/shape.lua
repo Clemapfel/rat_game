@@ -330,7 +330,7 @@ function rt.Ellipse:draw()
     self:_bind_for_rendering()
 
     if self._n_outer_vertices > 0 then
-        love.graphics.ellipse(self:_get_draw_mode(), self._center_x, self._center_y, self._radius_x, self._radius_y, self._n_outer_vertices)
+        love.graphics.ellipse(self:_get_draw_mode(), self._center_x, self._center_y, self._radius_x, self._radius_y, clamp(self._n_outer_vertices, 3))
     else
         love.graphics.ellipse(self:_get_draw_mode(), self._center_x, self._center_y, self._radius_x, self._radius_y)
     end
