@@ -138,6 +138,10 @@ function rt.SpinButton:size_allocate(x, y, width, height)
     local label_h = select(2, self._value_label:measure()) + 2 * eps
     local label_y_align = y + 0.5 * height - 0.5 * label_h
 
+    -- manually align + and - to align, this may need to be changed if rt.settings.spin_button.*_label changes
+    local increase_label_y_align = label_y_align - 0.025 * self._increase_button_label:get_font():get_size()
+    local decrease_label_y_align = label_y_align - 0.05 * self._increase_button_label:get_font():get_size()
+
     local vexpand = self:get_expand_vertically()
     local hexpand = self:get_expand_horizontally()
 
@@ -160,13 +164,13 @@ function rt.SpinButton:size_allocate(x, y, width, height)
     self._increase_button_backdrop:resize(increase_area)
     self._increase_button_outline:resize(increase_area)
     self._increase_button_disabled_overlay:resize(increase_area)
-    self._increase_button_label:fit_into(rt.AABB(increase_area.x, label_y_align, increase_area.width, label_h))
+    self._increase_button_label:fit_into(rt.AABB(increase_area.x, increase_label_y_align, increase_area.width, label_h))
 
     local decrease_area = rt.AABB(increase_area.x - increase_area.width, y, increase_area.width, ternary(vexpand, height, label_h))
     self._decrease_button_backdrop:resize(decrease_area)
     self._decrease_button_outline:resize(decrease_area)
     self._decrease_button_disabled_overlay:resize(decrease_area)
-    self._decrease_button_label:fit_into(rt.AABB(decrease_area.x, label_y_align, decrease_area.width, label_h))
+    self._decrease_button_label:fit_into(rt.AABB(decrease_area.x, decrease_label_y_align, decrease_area.width, label_h))
 
     self._value_label:fit_into(rt.AABB(x + rt.settings.margin_unit, label_y_align, width - increase_area.width - decrease_area.width, label_h))
 end

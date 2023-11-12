@@ -523,6 +523,13 @@ function rt.Label:get_is_animated()
     return self._is_animated
 end
 
+--- @brief get font
+--- @retun rt.Font
+function rt.Label:get_font()
+    meta.assert_isa(self, rt.Label)
+    return self._font
+end
+
 --- @brief [internal]
 function rt.test.label()
     error("TODO")

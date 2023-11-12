@@ -1,5 +1,5 @@
 rt.settings.font = {}
-rt.settings.font.default_size = 20
+rt.settings.font.default_size = 26
 rt.settings.font.default = {}
 rt.settings.font.default_mono = {}
 rt.settings.font.regular_fallbacks = {}
