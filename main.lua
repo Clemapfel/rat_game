@@ -24,45 +24,24 @@ widget:set_margin(10)
 widget:set_expand_vertically(false)
 window:set_child(widget)
 
-thread = love.thread.newThread([[
-    require "love.timer"
-    while true do
-        local message = love.thread.getChannel(1234):demand()
-        load(message.code)()
-    end
-]])
-thread:start()
+thread = rt.Thread(1)
 
-love.thread.getChannel(1234):push({
-    code = string.dump(function()
-        f = function(x)
-            print(x + 1234)
-        end
-    end)
-})
-
-love.thread.getChannel(1234):push({
-    code = string.dump(function()
-        f(1234)
-    end)
-})
+thread:execute(function()
+    f = function(x) println(x + 1234)  end
+end)
+thread:execute(function()
+    f(4567)
+end)
+thread:execute(function()
+    --require "love.timer"
+    println("before")
+    love.timer.sleep(2)
+    println("after")
+end)
 
 input = rt.add_input_controller(window)
 input:signal_connect("pressed", function()
 
-    love.thread.getChannel(1):push({
-        type = rt.MessageType.LOAD,
-        code = string.dump(function()
-            f = function(x) println("called") end
-        end)
-    })
-
-    love.thread.getChannel(1):push({
-        type = rt.MessageType.LOAD,
-        code = string.dump(function()
-            f()
-        end)
-    })
 end)
 
 --- @brief startup
@@ -80,7 +59,7 @@ end
 function love.update()
     local delta = love.timer.getDelta()
 
-    rt.FutureHandler.update_futures(delta)
+    --rt.FutureHandler.update_futures(delta)
     rt.AnimationTimerHandler:update(delta)
     rt.AnimationHandler:update(delta)
 end
