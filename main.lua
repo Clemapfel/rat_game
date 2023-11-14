@@ -21,18 +21,15 @@ window = rt.WindowLayout()
 widget = rt.Switch()
 window:set_child(widget)
 
-thread = rt.Thread(1)
-thread:execute(function()
-    require "love.timer"
-    f = function(x) return (x + 1234)  end
-end)
-future = thread:execute(function()
-    --love.timer.sleep(1)
-    return f(4567)
-end)
 
+thread = rt.Thread(1) -- create thread
+
+
+future = rt.Future()
+-- connect handle to future which is called when the value becomes available
 future:signal_connect("delivered", function(self, value)
-    println("delivered: " .. serialize(value))
+    assert(self:has_value())
+    println("delivered: ", serialize(value))
 end)
 
 input = rt.add_input_controller(window)

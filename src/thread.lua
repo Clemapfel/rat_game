@@ -1,11 +1,16 @@
-rt.threads = {}
+rt.threads = {
+    n_threads = 16
+}
 
 --- @class rt.MessageType
 rt.MessageType = meta.new_enum({
     LOAD = "LOAD",
     INVOKE = "INVOKE",
     DELIVER = "DELIVER",
-    ERROR = "ERROR"
+    ERROR = "ERROR",
+    SET = "SET",
+    GET = "GET",
+    RETURN = "RETURN"
 })
 
 rt.ThreadPool = {}
@@ -50,6 +55,7 @@ rt.Future = meta.new_type("Future", function()
 
     out:signal_add("delivered")
     rt.ThreadPool._future_id = rt.ThreadPool._future_id + 1
+    rt.ThreadPool._futures[out._id] = out
     return out
 end)
 
@@ -73,7 +79,7 @@ end
 
 --- @brief clear the delivery message queue and supply all futures
 function rt.ThreadPool.update_futures()
-    local in_channel = love.thread.getChannel(-1)
+    local in_channel = love.thread.getChannel(0)
     while in_channel:getCount() > 0 do
         local message = in_channel:pop()
         println("main received: ", message.type, " ", tostring(message.future_id))
@@ -82,14 +88,16 @@ function rt.ThreadPool.update_futures()
             meta.assert_number(message.future_id, message.thread_id)
             local future = rt.ThreadPool._futures[message.future_id]
 
-            if future == nil then
+            if meta.is_nil(future) then
+                -- happens when future goes out of scope before delivery
                 goto continue
             end
 
-            future.value = message.value
-            future:signal_emit("delivered", future.value)
+            future._value = message.value
+            future._value_delivered = true
+            future:signal_emit("delivered", future._value)
             rt.ThreadPool._futures[message.future_id] = nil
-            println("main deliever `" .. serialize(future.value) .. "` to future #" .. tostring(future:get_id()))
+            println("main deliever `" .. serialize(future._value) .. "` to future #" .. tostring(future:get_id()))
         elseif message.type == rt.MessageType.ERROR then
             meta.assert_number(message.thread_id, message.future_id)
             rt.error("In Thread #" .. tostring(message.thread_id) .. ": " .. message.error)
@@ -100,11 +108,10 @@ function rt.ThreadPool.update_futures()
     end
 end
 
---- @class
+--- @return rt.Future
 function rt.Thread.execute(self, code)
     meta.assert_isa(self, rt.Thread)
     local future = rt.Future()
-    rt.ThreadPool._futures[future:get_id()] = future
     if meta.is_string(code) then
         love.thread.getChannel(self:get_id()):push({
             future_id = future:get_id(),
@@ -122,19 +129,18 @@ function rt.Thread.execute(self, code)
     return future
 end
 
---- @class
+--- @return rt.Future
 function rt.Thread.invoke(self, function_id, ...)
     meta.assert_isa(self, rt.Thread)
     meta.assert_string(function_id)
 
     local future = rt.Future()
     love.thread.getChannel(self:get_id()):push({
-        type = rt.MessageType.REQUEST,
-        future_id = future.get_id(),
+        type = rt.MessageType.INVOKE,
+        future_id = future:get_id(),
         function_id = function_id,
         args = {...}
     })
-
     return future
 end
 
@@ -142,7 +148,7 @@ end
 function rt.Thread.deliver(future_id, value, error_occurred, error)
     meta.assert_number(future_id)
 
-    love.thread.getChannel(-1):push({
+    love.thread.getChannel(0):push({
         type = rt.MessageType.DELIVER,
         thread_id = rt.get_thread_id(),
         future_id = future_id,
@@ -155,11 +161,70 @@ function rt.Thread.error(future_id, error_message)
     meta.assert_number(future_id)
     meta.assert_string(error_message)
 
-    love.thread.getChannel(-1):push({
+    love.thread.getChannel(0):push({
         type = rt.MessageType.ERROR,
         future_id = future_id,
         thread_id = rt.get_thread_id(),
         error = error_message
     })
+end
+
+--- @return nil
+function rt.Thread:set(variable_name, value)
+    meta.assert_isa(self, rt.Thread)
+    meta.assert_string(variable_name)
+
+    if meta.is_nil(value) then
+        love.thread.getChannel(self:get_id()):push({
+            type = rt.MessageType.SET,
+            name = variable_name,
+            value = nil,
+            is_function = false,
+            is_nil = true
+        })
+    elseif meta.is_function(value) then
+        love.thread.getChannel(self:get_id()):push({
+            type = rt.MessageType.SET,
+            name = variable_name,
+            value = string.dump(value),
+            is_function = true,
+            is_nil = false
+        })
+    else
+        love.thread.getChannel(self:get_id()):push({
+            type = rt.MessageType.SET,
+            name = variable_name,
+            value = value,
+            is_function = false,
+            is_nil = false
+        })
+    end
+end
+
+--- @return any
+function rt.Thread:get(variable_name)
+    meta.assert_isa(self, rt.Thread)
+    meta.assert_string(variable_name)
+
+    love.thread.getChannel(self:get_id()):push({
+        type = rt.MessageType.GET,
+        name = variable_name
+    })
+    local channel = love.thread.getChannel(self:get_id() + 256)
+    local message = channel:demand()
+
+    meta.assert_enum(message.type, rt.MessageType)
+    assert(message.type == rt.MessageType.RETURN)
+    if message.is_function then
+        local f, parse_error = load(message.value)
+        if meta.is_nil(f) then
+            rt.error("In rt.Thread:get: unable to load function from string `" .. message.value .. "`")
+        end
+        return f
+    elseif message.is_nil then
+        return nil
+    else
+        return message.value
+    end
 end
 

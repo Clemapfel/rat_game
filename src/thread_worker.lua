@@ -9,15 +9,13 @@ require "meta"
 require "thread"
 
 meta.assert_number(rt.get_thread_id())
-local out_channel = love.thread.getChannel(-1)
+local out_channel = love.thread.getChannel(0)
 local in_channel = love.thread.getChannel(rt.get_thread_id())
 
 while true do
     ::check_message::
     local message = in_channel:demand()
     meta.assert_enum(message.type, rt.MessageType)
-
-    println("thread #" .. tostring(rt.get_thread_id()) .. " received: ", message.type, " #" .. tostring(message.future_id))
 
     if message.type == rt.MessageType.LOAD then
         local code = message.code
@@ -38,19 +36,15 @@ while true do
         end
 
         local on_catch = function(err)
-            println("[rt][ERROR] In Thread.execute: (" .. tostring(rt.get_thread_id()) .. ") " .. err)
-            println("thread #" .. tostring(rt.get_thread_id()) .. " send: ERROR ", error_maybe)
-            rt.Thread.error(message.future_id, error_maybe)
+            rt.Thread.error(message.future_id, err)
         end
 
         try_catch(on_try, on_catch)
 
         if error_occurred then
-            println("thread #" .. tostring(rt.get_thread_id()) .. " send: ERROR ", error_maybe)
             rt.Thread.error(message.future_id, error_maybe)
         else
             if not meta.is_nil(value) then
-                println("thread #" .. tostring(rt.get_thread_id()) .. " send: DELIVER ", serialize(message.future_id))
                 rt.Thread.deliver(message.future_id, value)
             end
         end
@@ -83,6 +77,55 @@ while true do
             println("thread #" .. tostring(rt.get_thread_id()) .. " send: DELIVER #", tostring(message.future_id), " ", serialize(value))
             rt.Thread.deliver(message.future_id, value, error_occurred, error_maybe)
         end
+    elseif message.type == rt.MessageType.SET then
+        meta.assert_string(message.name)
+        if message.is_function then
+            local f, parse_error = load(message.value)
+            if meta.is_nil(f) then
+                rt.Thread.error(message.future_id, parse_error)
+                goto check_message
+            end
+            _G[message.name] = f
+        elseif message.is_nil then
+            _G[message.name] = nil
+        else
+            _G[message.name] = message.value
+        end
+    elseif message.type == rt.MessageType.GET then
+        meta.assert_string(message.name)
+
+        local value = nil
+        local on_try = function()
+            value = load("return " .. message.name)()
+        end
+        local on_catch = function(err)
+            rt.Thread.error(-1, err)
+        end
+
+        try_catch(on_try, on_catch)
+        if meta.is_nil(value) then
+            love.thread.getChannel(rt.get_thread_id() + 256):push({
+                type = rt.MessageType.RETURN,
+                value = nil,
+                is_function = false,
+                is_nil = true
+            })
+        elseif meta.is_function(value) then
+            love.thread.getChannel(rt.get_thread_id() + 256):push({
+                type = rt.MessageType.RETURN,
+                value = string.dump(value),
+                is_function = true,
+                is_nil = false
+            })
+        else
+            love.thread.getChannel(rt.get_thread_id() + 256):push({
+                type = rt.MessageType.RETURN,
+                value = value,
+                is_function = false,
+                is_nil = false
+            })
+        end
+
     else
         println("[rt][ERROR] In Thread.main: (" .. tostring(rt.get_thread_id()) .. ") " .. "unhandled message type `" .. message.type .. "`")
     end
