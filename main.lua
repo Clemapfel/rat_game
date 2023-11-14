@@ -19,6 +19,9 @@ io.stdout:setvbuf("no") -- makes it so love2d error message is printed to consol
 
 window = rt.WindowLayout()
 widget = rt.Switch()
+widget:signal_connect("toggled", function(self, b)
+    println("button on: " .. tostring(b))
+end)
 window:set_child(widget)
 
 --- @brief startup

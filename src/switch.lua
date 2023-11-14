@@ -41,7 +41,7 @@ rt.Switch = meta.new_type("Switch", function()
     out._slider_outline:set_color(rt.Palette.FOREGROUND_OUTLINE)
 
     out:_update_slider()
-    out:signal_add("switched")
+    out:signal_add("toggled")
 
     out._input:signal_connect("pressed", function(_, button, self)
         if button == rt.InputButton.A then
@@ -61,18 +61,20 @@ function rt.Switch:_update_slider()
         self._slider:set_center(pos_x, pos_y)
         self._slider_outline:set_center(pos_x, pos_y)
 
-        self._start:set_color(self._on_color)
-        self._center:set_color(self._on_color)
-        self._end:set_color(self._on_color)
+        self._start:set_color(self._off_color)
+        self._center:set_color(self._off_color)
+        self._end:set_color(self._off_color)
+
     else
         local pos_x, pos_y = self._end:get_center()
         local radius = self._end:get_radius()
         self._slider:set_center(pos_x, pos_y)
         self._slider_outline:set_center(pos_x, pos_y)
 
-        self._start:set_color(self._off_color)
-        self._center:set_color(self._off_color)
-        self._end:set_color(self._off_color)
+
+        self._start:set_color(self._on_color)
+        self._center:set_color(self._on_color)
+        self._end:set_color(self._on_color)
     end
 end
 
@@ -128,7 +130,7 @@ function rt.Switch:set_is_on(b)
 
     if before ~= b then
         self:_update_slider()
-        self:signal_emit("switched", self._is_on)
+        self:signal_emit("toggled", self._is_on)
     end
 end
 

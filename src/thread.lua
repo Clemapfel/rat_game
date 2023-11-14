@@ -276,5 +276,7 @@ function rt.test.thread()
     for _, var in pairs({"f", "test_nil", "test_f", "test_table"}) do
         assert(meta.is_nil(thread:get(var)))
     end
+
+    -- TODO THESE DEADLOC
 end
 
