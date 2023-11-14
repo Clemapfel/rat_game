@@ -55,7 +55,6 @@ end)
 --- @brief
 function rt.Switch:_update_slider()
     meta.assert_isa(self, rt.Switch)
-
     if self._is_on == false then
         local pos_x, pos_y = self._start:get_center()
         local radius = self._start:get_radius()

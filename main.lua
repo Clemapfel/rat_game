@@ -23,16 +23,16 @@ window:set_child(widget)
 
 thread = rt.Thread(1)
 thread:execute(function()
-    f = function(x) println(x + 1234)  end
+    require "love.timer"
+    f = function(x) return (x + 1234)  end
 end)
-thread:execute(function()
-    f(4567)
+future = thread:execute(function()
+    --love.timer.sleep(1)
+    return f(4567)
 end)
-thread:execute(function()
-    --require "love.timer"
-    println("before")
-    love.timer.sleep(2)
-    println("after")
+
+future:signal_connect("delivered", function(self, value)
+    println("delivered: " .. serialize(value))
 end)
 
 input = rt.add_input_controller(window)
@@ -54,7 +54,7 @@ end
 --- @brief update tick
 function love.update()
     local delta = love.timer.getDelta()
-    --rt.FutureHandler.update_futures(delta)
+    rt.ThreadPool.update_futures(delta)
     rt.AnimationTimerHandler:update(delta)
     rt.AnimationHandler:update(delta)
 end
