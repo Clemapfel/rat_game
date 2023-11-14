@@ -21,21 +21,6 @@ window = rt.WindowLayout()
 widget = rt.Switch()
 window:set_child(widget)
 
-
-thread = rt.Thread(1) -- create thread
-
-
-future = rt.Future()
--- connect handle to future which is called when the value becomes available
-future:signal_connect("delivered", function(self, value)
-    assert(self:has_value())
-    println("delivered: ", serialize(value))
-end)
-
-input = rt.add_input_controller(window)
-input:signal_connect("pressed", function()
-end)
-
 --- @brief startup
 function love.load()
 
@@ -50,6 +35,7 @@ end
 
 --- @brief update tick
 function love.update()
+
     local delta = love.timer.getDelta()
     rt.ThreadPool.update_futures(delta)
     rt.AnimationTimerHandler:update(delta)
@@ -112,6 +98,7 @@ end
 --- @brief shutdown
 function love.quit()
     rt.Palette:export("palette.png")
+
 end
 
 ::exit::

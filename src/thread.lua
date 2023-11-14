@@ -4,13 +4,14 @@ rt.threads = {
 
 --- @class rt.MessageType
 rt.MessageType = meta.new_enum({
-    LOAD = "LOAD",
-    INVOKE = "INVOKE",
-    DELIVER = "DELIVER",
-    ERROR = "ERROR",
-    SET = "SET",
-    GET = "GET",
-    RETURN = "RETURN"
+    LOAD = "LOAD",          -- master -> thread: cause arbitrary code execution
+    INVOKE = "INVOKE",      -- master -> thread: invoke a named function with arguments
+    DELIVER = "DELIVER",    -- thread -> master: transmit value thread -> master for future
+    ERROR = "ERROR",        -- thread -> master: thread has encountered error, send to master to propagate
+    SET = "SET",            -- master -> thread: set a thread-side global with master-side value
+    GET = "GET",            -- master -> thread: request thread-side value
+    RETURN = "RETURN",      -- thread -> master: send `GET` request thread -> master
+    KILL = "KILL"          -- master -> thread: cause termination
 })
 
 rt.ThreadPool = {}
@@ -38,6 +39,19 @@ rt.Thread = meta.new_type("Thread", function(id)
     out._native:start()
     return out
 end)
+
+--- @brief restart the thread with a fresh environment
+function rt.Thread:restart()
+    meta.assert_isa(self, rt.Thread)
+
+    ::try_again::
+    local message = love.thread.getChannel(self:get_id()):push({
+        type = rt.MessageType.KILL
+    })
+    self._native:wait()
+    assert(not self._native:isRunning())
+    self._native:start()
+end
 
 --- @brief
 function rt.Thread:get_id()
@@ -225,6 +239,42 @@ function rt.Thread:get(variable_name)
         return nil
     else
         return message.value
+    end
+end
+
+--- @brief [internal]
+if meta.is_nil(rt.test) then rt.test = {} end
+function rt.test.thread()
+    local ID = 2^32
+    local thread = rt.Thread(ID)
+    thread._native:start()
+    assert(thread:get_id() == ID)
+
+    thread:execute([[
+        require "love.timer"
+    ]])
+
+    thread:execute(function()
+        f = function(x) return x + 1111 end
+    end)
+    local future = thread:invoke("f", 1234)
+
+    thread:set("test_nil", nil)
+    thread:set("test_f", function() return 1234 end)
+    thread:set("test_table", {1, 2, 3})
+
+    assert(meta.is_nil(thread:get("test_nil")))
+    assert(thread:get("test_f")() == 1234)
+
+    local test_table = thread:get("test_table")
+    assert(meta.is_table(test_table) and sizeof(test_table) == 3 and test_table[1] == 1 and test_table[2] == 2 and test_table[3] == 3)
+
+    assert(future:has_value())
+    assert(future:get_value() == 1234 + 1111)
+
+    thread:restart()
+    for _, var in pairs({"f", "test_nil", "test_f", "test_table"}) do
+        assert(meta.is_nil(thread:get(var)))
     end
 end
 
