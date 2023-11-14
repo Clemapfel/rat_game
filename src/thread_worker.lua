@@ -50,7 +50,7 @@ while true do
             rt.Thread.error(message.future_id, error_maybe)
         else
             if not meta.is_nil(value) then
-                println("thread #" .. tostring(rt.get_thread_id()) .. " send: DELIVER ", serialize(value))
+                println("thread #" .. tostring(rt.get_thread_id()) .. " send: DELIVER ", serialize(message.future_id))
                 rt.Thread.deliver(message.future_id, value)
             end
         end
@@ -80,7 +80,7 @@ while true do
             println("thread #" .. tostring(rt.get_thread_id()) .. " send: ERROR ", error_maybe)
             rt.Thread.error(message.future_id, error_maybe)
         else
-            println("thread #" .. tostring(rt.get_thread_id()) .. " send: DELIVER ", serialize(value))
+            println("thread #" .. tostring(rt.get_thread_id()) .. " send: DELIVER #", tostring(message.future_id), " ", serialize(value))
             rt.Thread.deliver(message.future_id, value, error_occurred, error_maybe)
         end
     else

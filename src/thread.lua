@@ -76,7 +76,7 @@ function rt.ThreadPool.update_futures()
     local in_channel = love.thread.getChannel(-1)
     while in_channel:getCount() > 0 do
         local message = in_channel:pop()
-        println("main received: ", message.type)
+        println("main received: ", message.type, " ", tostring(message.future_id))
         meta.assert_enum(message.type, rt.MessageType)
         if message.type == rt.MessageType.DELIVER then
             meta.assert_number(message.future_id, message.thread_id)
@@ -89,7 +89,7 @@ function rt.ThreadPool.update_futures()
             future.value = message.value
             future:signal_emit("delivered", future.value)
             rt.ThreadPool._futures[message.future_id] = nil
-            println("main deliever `" .. serialize(value) .. "` to future #" .. tostring(future:get_id()))
+            println("main deliever `" .. serialize(future.value) .. "` to future #" .. tostring(future:get_id()))
         elseif message.type == rt.MessageType.ERROR then
             meta.assert_number(message.thread_id, message.future_id)
             rt.error("In Thread #" .. tostring(message.thread_id) .. ": " .. message.error)
@@ -104,6 +104,7 @@ end
 function rt.Thread.execute(self, code)
     meta.assert_isa(self, rt.Thread)
     local future = rt.Future()
+    rt.ThreadPool._futures[future:get_id()] = future
     if meta.is_string(code) then
         love.thread.getChannel(self:get_id()):push({
             future_id = future:get_id(),
@@ -114,7 +115,6 @@ function rt.Thread.execute(self, code)
         meta.assert_function(code)
         love.thread.getChannel(self:get_id()):push({
             future_id = future:get_id(),
-
             type = rt.MessageType.LOAD,
             code = string.dump(code)
         })
