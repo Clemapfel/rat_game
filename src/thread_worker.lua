@@ -8,9 +8,11 @@ require "log"
 require "meta"
 require "thread"
 
+meta.assert_number(rt.get_thread_id())
+
 while true do
     local in_channel = love.thread.getChannel(rt.get_thread_id())
-    local out_channel = love.thread.getChannel(-1 * rt.get_thread_id())
+    local out_channel = love.thread.getChannel(-1)
     local message = in_channel:demand()
     meta.assert_enum(message.type, rt.MessageType)
 
@@ -25,6 +27,6 @@ while true do
         local on_catch = function(err) println("[rt][ERROR] In Thread.execute: (" .. tostring(rt.get_thread_id()) .. ") " .. err) end
         try_catch(on_try, on_catch)
     else
-        println("[rt][ERROR] In Thread.execute: (" .. tostring(rt.get_thread_id()) .. ") " .. "unhandled message type `" .. message.type .. "`")
+        println("[rt][ERROR] In Thread.main: (" .. tostring(rt.get_thread_id()) .. ") " .. "unhandled message type `" .. message.type .. "`")
     end
 end

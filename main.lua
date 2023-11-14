@@ -18,14 +18,10 @@ io.stdout:setvbuf("no") -- makes it so love2d error message is printed to consol
 -- #############################
 
 window = rt.WindowLayout()
-widget = rt.Scale(0, 1, 0.01)
-widget:set_show_value(true)
-widget:set_margin(10)
-widget:set_expand_vertically(false)
+widget = rt.Switch()
 window:set_child(widget)
 
 thread = rt.Thread(1)
-
 thread:execute(function()
     f = function(x) println(x + 1234)  end
 end)
@@ -41,11 +37,11 @@ end)
 
 input = rt.add_input_controller(window)
 input:signal_connect("pressed", function()
-
 end)
 
 --- @brief startup
 function love.load()
+
     love.window.setMode(love.graphics.getWidth(), love.graphics.getHeight(), {
         resizable = true
     })
@@ -58,7 +54,6 @@ end
 --- @brief update tick
 function love.update()
     local delta = love.timer.getDelta()
-
     --rt.FutureHandler.update_futures(delta)
     rt.AnimationTimerHandler:update(delta)
     rt.AnimationHandler:update(delta)

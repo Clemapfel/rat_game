@@ -77,6 +77,24 @@ love.mousereleased = rt.MouseHandler.handle_click_released
 --- @param dy Number
 --- @param is_touch Boolean
 function rt.MouseHandler.handle_motion(x, y, dx, dy, is_touch)
+
+    local check_enter_or_leave = function()
+        local window_w, window_h = love.window.getMode()
+        if x + dx < 0 then
+            println("exit left")
+        end
+        if y + dy < 0 then
+            println("exit top")
+        end
+
+        if x + dx > window_w then
+            println("exit right")
+        end
+        if y + dy > window_h then
+            println("exit bottom")
+        end
+    end
+
     for _, component in pairs(rt.MouseHandler._components) do
         local instance = component.instance
         local current = component._is_active

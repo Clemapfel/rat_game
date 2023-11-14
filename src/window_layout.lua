@@ -19,6 +19,13 @@ function love.resize(width, height)
     end
 end
 
+--- @brief window looses focus
+function love.focus(b)
+    for _, window in pairs(rt.WindowHandler._components) do
+        window:set_has_focus(b)
+    end
+end
+
 --- @brief set singular child
 --- @param child rt.Widget
 function rt.WindowLayout:set_child(child)

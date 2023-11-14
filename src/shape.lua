@@ -318,9 +318,27 @@ function rt.Ellipse:get_center()
 end
 
 --- @brief
+function rt.Ellipse:set_center(x, y)
+    meta.assert_isa(self, rt.Ellipse)
+    meta.assert_number(x, y)
+    self._center_x = x
+    self._center_y = y
+end
+
+--- @brief
 function rt.Ellipse:get_radius()
     meta.assert_isa(self, rt.Ellipse)
     return self._radius_x, self._radius_y
+end
+
+--- @brief
+function rt.Ellipse:set_radius(radius_x, radius_y)
+    meta.assert_isa(self, rt.Ellipse)
+    meta.assert_number(radius_x)
+    if not meta.is_nil(radius_y) then meta.assert_number(radius_y) end
+
+    self._radius_x = radius_x
+    self._radius_y = ternary(meta.is_nil(radius_y), radius_x, radius_y)
 end
 
 --- @brief

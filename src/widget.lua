@@ -1,3 +1,10 @@
+rt.settings.widget = {
+    selection_indicator_width = 3,
+    selection_indicator_outline_width = 7,
+    selection_indicator_corner_radius = 5,
+    selection_indicator_alpha = 1
+}
+
 --- @class rt.Alignment
 rt.Alignment = meta.new_enum({
     START = "ALIGNMENT_START",
@@ -27,6 +34,7 @@ rt.Widget._minimum_height = 1
 rt.Widget._realized = false
 rt.Widget._focused = true
 rt.Widget._parent = nil
+rt.Widget._selected = false
 
 --- @brief abstract method, emitted when widgets bounds should change
 --- @param x Number
@@ -389,6 +397,51 @@ function rt.Widget._calculate_size(self, width, margin_start, margin_end, align,
         local w_out = math.max(w, (L - m0 - m1) / 2)
         return x + L - m1 - w_out, w_out
     end
+end
+
+--- @brief
+function rt.Widget:draw_selection_indicator()
+    meta.assert_isa(self, rt.Widget)
+    local x, y = self:get_position()
+    local w, h = self:get_size()
+
+    local color = rt.Palette.SELECTION_OUTLINE
+    local width = rt.settings.widget.selection_indicator_outline_width
+    local corner_radius = rt.settings.widget.selection_indicator_corner_radius
+    local alpha = rt.settings.widget.selection_indicator_alpha
+    love.graphics.setColor(color.r, color.g, color.b, alpha)
+    love.graphics.setLineWidth(width)
+    love.graphics.rectangle("line", x + 0.5 * width, y + 0.5 * width, w - width, h - width, corner_radius, corner_radius)
+
+    color = rt.Palette.SELECTION
+    love.graphics.setColor(color.r, color.g, color.b, alpha)
+    love.graphics.setLineWidth(rt.settings.widget.selection_indicator_width)
+    love.graphics.rectangle("line", x + 0.5 * width, y + 0.5 * width, w - width, h - width, corner_radius, corner_radius)
+end
+
+--- @brief
+function rt.Widget:set_is_selected(b)
+    meta.assert_isa(self, rt.Widget)
+    meta.assert_boolean(b)
+    self._selected = b
+end
+
+--- @brief
+function rt.Widget:get_is_selected()
+    meta.assert_isa(self, rt.Widget)
+    return self._selected
+end
+
+--- @brief
+function rt.Widget:set_has_focus(b)
+    meta.assert_isa(self, rt.Widget)
+    self._focused = b
+end
+
+--- @brief
+function rt.Widget:get_has_focus()
+    meta.assert_isa(self, rt.Widget)
+    return self._focused
 end
 
 --- @brief [internal] draw allocation component as wireframe

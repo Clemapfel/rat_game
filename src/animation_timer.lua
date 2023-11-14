@@ -44,6 +44,8 @@ rt.AnimationTimerHandler._timing_functions = (function()
 end)()
 
 --- @class rt.AnimationTimer
+--- @signal tick    (self, [0, 1]) -> nil
+--- @signal done    (self) -> nil
 rt.AnimationTimer = meta.new_type("AnimationTimer", function(duration_seconds)
     meta.assert_number(duration_seconds)
     if duration_seconds < 0 then

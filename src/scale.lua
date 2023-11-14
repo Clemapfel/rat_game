@@ -5,6 +5,7 @@ rt.settings.scale = {
 }
 
 --- @class rt.Scale
+--- @signal value_changed   (self, new_value) -> nil
 rt.Scale = meta.new_type("Scale", function(lower, upper, increment, value)
     meta.assert_number(lower, upper, increment)
     value = ternary(meta.is_nil(value), mix(lower, upper, 0.5), value)
