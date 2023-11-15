@@ -300,6 +300,23 @@ function rt.color_to_html_code(rgba, use_alpha)
     return out
 end
 
+--- @brief
+function rt.color_darken(color, offset)
+    meta.assert_number(offset)
+    offset = clamp(offset, 0, 1)
+    if meta.is_hsva(color) then
+        return rt.HSVA(color.h, color.s, color.v - offset, color.a)
+    else
+        meta.assert_rgba(color)
+        return rt.RGBA(color.r - offset, color.g - offset, color.b - offset, color.a)
+    end
+end
+
+--- @brief
+function rt.color_lighten(color, offset)
+    return rt.color_darken(color, -1 * offset)
+end
+
 --- @brief [internal] test colors
 function rt.test.colors()
     local rgba_from_string = rt.RGBA("#FF00FF")

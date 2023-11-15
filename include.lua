@@ -51,6 +51,7 @@ require "flow_layout"
 require "aspect_layout"
 require "tab_layout"
 require "tooltip_layout"
+require "levelbar"
 
 require "spacer"
 require "image_display"

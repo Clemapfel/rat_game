@@ -1,11 +1,13 @@
-rt.settings.font = {}
-rt.settings.font.default_size = 26
-rt.settings.font.default = {}
-rt.settings.font.default_mono = {}
-rt.settings.font.regular_fallbacks = {}
-rt.settings.font.italic_fallbacks = {}
-rt.settings.font.bold_italic_fallbacks = {}
-rt.settings.font.bold_fallbacks = {}
+rt.settings.font = {
+    default_size = 26,
+    default = {},       -- rt.Font
+    default_mono = {},  -- rt.Font
+    regular_fallbacks = {},     -- Table<love.Font>
+    italic_fallbacks = {},      -- Table<love.Font>
+    bold_italic_fallbacks = {}, -- Table<love.Font>
+    bold_fallbacks = {},        -- Table<love.Font>
+}
+
 
 --- @class rt.Font
 --- @param regular_path String

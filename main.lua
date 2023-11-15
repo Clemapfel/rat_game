@@ -18,11 +18,20 @@ io.stdout:setvbuf("no") -- makes it so love2d error message is printed to consol
 -- #############################
 
 window = rt.WindowLayout()
-widget = rt.Switch()
-widget:signal_connect("toggled", function(self, b)
-    println("button on: " .. tostring(b))
-end)
+widget = rt.LevelBar(0, 1)
+widget:set_margin(50)
+widget:set_expand_vertically(false)
+
 window:set_child(widget)
+
+input = rt.add_input_controller(window)
+input:signal_connect("pressed", function(_, button)
+    if button == rt.InputButton.LEFT then
+        widget:set_value(widget:get_value() - 0.1)
+    elseif button == rt.InputButton.RIGHT then
+        widget:set_value(widget:get_value() + 0.1)
+    end
+end)
 
 --- @brief startup
 function love.load()
