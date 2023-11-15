@@ -86,7 +86,7 @@ rt.Palette = {
     GREY_6 = rt.RGBA("#202025"),
     BLACK = rt.RGBA("#0b0b10"),
 
-     TRUE_WHITE = rt.RGBA("#ffffff"),
+    TRUE_WHITE = rt.RGBA("#ffffff"),
     TRUE_RED = rt.RGBA("#ff0000"),
     TRUE_GREEN = rt.RGBA("#00ff00"),
     TRUE_BLUE = rt.RGBA("#0000ff"),

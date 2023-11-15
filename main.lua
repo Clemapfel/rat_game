@@ -21,7 +21,7 @@ window = rt.WindowLayout()
 widget = rt.LevelBar(0, 1)
 widget:set_margin(50)
 widget:set_expand_vertically(false)
-
+widget:set_color(rt.Palette.GREEN, rt.Palette.TRUE_CYAN)
 window:set_child(widget)
 
 input = rt.add_input_controller(window)

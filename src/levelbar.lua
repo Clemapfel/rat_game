@@ -1,5 +1,5 @@
 rt.settings.level_bar = {
-    backdrop_darken_offset = 0.3
+    backdrop_darken_offset = 0.4
 }
 
 --- @class rt.LevelBar
@@ -18,7 +18,8 @@ rt.LevelBar = meta.new_type("LevelBar", function(lower, upper, value)
         _shape_outline = rt.Line(0, 0, 1, 1),   -- right edge of bar, to avoid overlap with `_backdrop_outline`
         _backdrop = rt.Rectangle(0, 0, 1, 1),
         _backdrop_outline = rt.Rectangle(0, 0, 1, 1),
-        _color = rt.Palette.HIGHLIGHT
+        _color = rt.Palette.HIGHLIGHT,
+        _backdrop_color = rt.color_darken(rt.Palette.HIGHLIGHT, rt.settings.level_bar.backdrop_darken_offset)
     }, rt.Drawable, rt.Widget)
 
     out._backdrop_outline:set_is_outline(true)
@@ -83,10 +84,16 @@ function rt.LevelBar:get_value()
 end
 
 --- @brief
-function rt.LevelBar:set_color(color)
+function rt.LevelBar:set_color(color, backdrop_color)
     meta.assert_isa(self, rt.LevelBar)
     meta.assert_rgba(color)
+    if not meta.is_nil(backdrop_color) then
+        meta.assert_rgba(color)
+    end
+
     self._color = color
+    self._backdrop_color = ternary(meta.is_nil(backdrop_color), rt.color_darken(self._color, rt.settings.level_bar.backdrop_darken_offset), backdrop_color)
+
     self._shape:set_color(self._color)
-    self._backdrop:set_color(rt.color_darken(self._color, rt.settings.level_bar.backdrop_darken_offset))
+    self._backdrop:set_color(self._backdrop_color)
 end
