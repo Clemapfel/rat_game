@@ -72,6 +72,7 @@ end
 --- @param rgba rt.RGBA
 function rt.VertexShape:set_vertex_color(i, rgba)
     meta.assert_isa(self, rt.VertexShape)
+    meta.assert_number(i)
     if meta.is_hsva(rgba) then rgba = rt.hsva_to_rgba(rgba) end
     meta.assert_rgba(rgba)
     self._native:setVertexAttribute(i, 3, rgba.r, rgba.g, rgba.b, rgba.a)
@@ -82,6 +83,7 @@ end
 --- @return rt.RGBA
 function rt.VertexShape:get_vertex_color(i)
     meta.assert_isa(self, rt.VertexShape)
+    meta.assert_number(i)
 
     local r, g, b, a
     r, g, b, a = self._native:getVertexAttribute(i, 3)
@@ -94,7 +96,7 @@ end
 --- @param y Number in px
 function rt.VertexShape:set_vertex_position(i, x, y)
     meta.assert_isa(self, rt.VertexShape)
-    meta.assert_number(x, y)
+    meta.assert_number(i, x, y)
 
     self._native:setVertexAttribute(i, 1, x, y)
 end
@@ -104,6 +106,7 @@ end
 --- @return (Number, Number)
 function rt.VertexShape:get_vertex_position(i)
     meta.assert_isa(self, rt.VertexShape)
+    meta.assert_number(i)
     return self._native:getVertexAttribute(i, 1)
 end
 
@@ -113,7 +116,7 @@ end
 --- @param v Number in [0, 1]
 function rt.VertexShape:set_vertex_texture_coordinate(i, u, v)
     meta.assert_isa(self, rt.VertexShape)
-    meta.assert_number(u, v)
+    meta.assert_number(i, u, v)
 
     self._native:setVertexAttribute(i, 2, u, v)
 end
@@ -121,6 +124,8 @@ end
 --- @brief get texture coordinate
 --- @return (Number, Number)
 function rt.VertexShape:get_vertex_texture_coordinate(i)
+    meta.assert_isa(self, rt.VertexShape)
+    meta.assert_number(i)
     return self._native:getVertexAttribute(i, 2)
 end
 
@@ -207,7 +212,16 @@ end
 --- @param height Number in px
 function rt.VertexShape:resize(x, y, width, height)
     meta.assert_isa(self, rt.VertexShape)
-    meta.assert_number(x, y, width, height)
+    if meta.is_aabb(x) then
+        local aabb = x
+        x = aabb.x
+        y = aabb.y
+        width = aabb.width
+        height = aabb.height
+    else
+        meta.assert_number(x, y, width, height)
+    end
+
     assert(self:get_n_vertices() == 4) -- TODO: generalize to all shapes
     self:set_vertex_position(1, x, y)
     self:set_vertex_position(2, x + width, y)

@@ -113,25 +113,25 @@ end
 --- @brief get size of allocation
 --- @return (Number, Number)
 function rt.Widget:get_size()
-    return self._bounds.width, self._bounds.height
+    return self._bounds.width - self:get_margin_left() - self:get_margin_right(), self._bounds.height - self:get_margin_top() - self:get_margin_bottom()
 end
 
 --- @brief get width of size allocation
 --- @return Number
 function rt.Widget:get_width()
-    return self._bounds.width
+    return select(1, self:get_size())
 end
 
 --- @brief get height of size allocation
 --- @return Number
 function rt.Widget:get_height()
-    return self._bounds.height
+    return select(2, self:get_size())
 end
 
 --- @brief get top left of allocation
 --- @return (Number, Number)
 function rt.Widget:get_position()
-    return self._bounds.x, self._bounds.y
+    return self._bounds.x + self:get_margin_left(), self._bounds.y + self:get_margin_top()
 end
 
 --- @brief get bounds

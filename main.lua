@@ -20,17 +20,13 @@ io.stdout:setvbuf("no") -- makes it so love2d error message is printed to consol
 window = rt.WindowLayout()
 widget = rt.LevelBar(0, 1)
 widget:set_margin(50)
-widget:set_expand_vertically(false)
+--widget:set_expand_vertically(false)
 widget:set_color(rt.Palette.GREEN, rt.Palette.TRUE_CYAN)
 window:set_child(widget)
 
-input = rt.add_input_controller(window)
+input = rt.add_input_controller(widget)
 input:signal_connect("pressed", function(_, button)
-    if button == rt.InputButton.LEFT then
-        widget:set_value(widget:get_value() - 0.1)
-    elseif button == rt.InputButton.RIGHT then
-        widget:set_value(widget:get_value() + 0.1)
-    end
+    println("clicked")
 end)
 
 --- @brief startup
@@ -61,6 +57,7 @@ function love.draw()
     love.graphics.setColor(1, 1, 1, 1)
 
     window:draw()
+    widget:draw_selection_indicator()
 
     function draw_guides()
         local w, h = love.graphics.getWidth(), love.graphics.getHeight()
