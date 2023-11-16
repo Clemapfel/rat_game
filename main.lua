@@ -18,16 +18,22 @@ io.stdout:setvbuf("no") -- makes it so love2d error message is printed to consol
 -- #############################
 
 window = rt.WindowLayout()
-widget = rt.LevelBar(0, 1)
-widget:set_margin(50)
---widget:set_expand_vertically(false)
-widget:set_color(rt.Palette.GREEN, rt.Palette.TRUE_CYAN)
-window:set_child(widget)
 
-input = rt.add_input_controller(widget)
-input:signal_connect("pressed", function(_, button)
-    println("clicked")
-end)
+list = rt.ListLayout()
+for i = 0, 7 do
+    local to_push = rt.Spacer(rt.HSVA(rt.rand(), 1, 1, 0.7))
+    to_push:set_minimum_size(50, 50)
+    to_push:set_margin(15)
+    list:push_back(to_push)
+end
+list:set_expand(true)
+
+selection = rt.SelectionHandler(list)
+
+for i = 1, 6 do
+    selection:connect(rt.Direction.DOWN, list._children:at(i), list._children:at(i+1))
+end
+window:set_child(selection)
 
 --- @brief startup
 function love.load()
@@ -57,7 +63,7 @@ function love.draw()
     love.graphics.setColor(1, 1, 1, 1)
 
     window:draw()
-    widget:draw_selection_indicator()
+
 
     function draw_guides()
         local w, h = love.graphics.getWidth(), love.graphics.getHeight()

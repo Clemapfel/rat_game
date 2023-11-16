@@ -1,17 +1,22 @@
 --- @class rt.Space
 --- @param is_transparent Boolean (or nil)
-rt.Spacer = meta.new_type("Spacer", function(is_transparent)
-    if meta.is_nil(is_transparent) then
-        is_transparent = false
+rt.Spacer = meta.new_type("Spacer", function(color)
+    if meta.is_nil(color) then
+        color = rt.Palette.BACKGROUND
     end
-    meta.assert_boolean(is_transparent)
+
+    if meta.is_hsva(color) then
+        color = rt.hsva_to_rgba(color)
+    end
+    meta.assert_rgba(color)
 
     local out = meta.new(rt.Spacer, {
         _shape = rt.Rectangle(0, 0, 1, 1),
-        _outline = rt.Rectangle(0, 0, 1, 1)
+        _outline = rt.Rectangle(0, 0, 1, 1),
+        _color = color
     }, rt.Drawable, rt.Widget)
-    out._shape:set_color(rt.Palette.BASE)
-    out._outline:set_color(rt.Palette.BASE_OUTLINE)
+    out._shape:set_color(out._color)
+    out._outline:set_color(rt.color_darken(out._color, 0.3))
     out._outline:set_is_outline(true)
     return out
 end)

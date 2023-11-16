@@ -1,6 +1,6 @@
 --- @class rt.SelectionNode
 rt.SelectionNode = meta.new_type("SelectionNode", function(self, up, right, down, left)
-    meta.assert_isa(child, rt.Widget)
+    meta.assert_isa(self, rt.Widget)
     for _, widget in pairs({up, right, down, left}) do
         if not meta.is_nil(widget) then
             meta.assert_isa(widget, rt.Widget)
@@ -32,12 +32,15 @@ rt.Direction = meta.new_enum({
 
 --- @class rt.SelectionHandler
 --- @signal selection_changed (self, previous_widget, next_widget) -> nil
-rt.SelectionHandler = meta.new_type("SelectionHandler", function()
+rt.SelectionHandler = meta.new_type("SelectionHandler", function(child)
+    meta.assert_isa(child, rt.Widget)
     local out = meta.new(rt.SelectionHandler, {
         _nodes = {},        -- meta.hash(self) -> rt.SelectionNode(self, ...)
         _current_node = {}, -- meta.hash
         _input = {},
-    }, rt.SignalHandler, rt.Drawable)
+        _child = child
+    }, rt.SignalEmitter, rt.Drawable, rt.Widget)
+
     out._input = rt.add_input_controller(out)
     out._input:signal_connect("pressed", function(_, button, self)
         if button == rt.InputButton.UP then
@@ -57,6 +60,8 @@ end)
 
 --- @overload rt.Drawable.draw
 function rt.SelectionHandler:draw()
+    self._child:draw()
+
     local center = function(widget)
         local pos_x, pos_y = widget:get_position()
         local width, height = widget:get_size()
@@ -65,27 +70,63 @@ function rt.SelectionHandler:draw()
 
     for _, node in pairs(self._nodes) do
         for _, to in pairs({node.top, node.right, node.bottom, node.left}) do
-            local to_x, to_y = center(to.self)
-            local from_x, from_y = center(node.self)
-            love.graphics.line(to_x, to_y, from_x, from_y)
+            if not meta.is_nil(to.self) then
+                local to_x, to_y = center(to.self)
+                local from_x, from_y = center(node.self)
+                love.graphics.line(to_x, to_y, from_x, from_y)
+            end
         end
     end
+
+    self._current_node.self:draw_selection_indicator()
+end
+
+--- @overload rt.Widget.size_allocate
+function rt.SelectionHandler:size_allocate(x, y, width, height)
+    self._child:fit_into(rt.AABB(x, y, width, height))
+end
+
+--- @overload rt.Widget.measure
+function rt.SelectionHandler:measure()
+    return self._child:measure()
 end
 
 --- @brief
 function rt.SelectionHandler:move(direction)
     meta.assert_isa(self, rt.SelectionHandler)
     meta.assert_enum(direction, rt.Direction)
-    if not meta.isa(self._current_node, rt.SelectionNode) then return end
-    a
-    local current = self._current_node
-    local next = current[direction]
 
-    if current ~= next and not meta.is_nil(next) then
-        current:set_is_selected(false)
-        next:set_is_selected(true)
+    if not meta.isa(self._current_node, rt.SelectionNode) then return end
+
+    local current = self._current_node
+    local next = {}
+    if direction == rt.Direction.UP then
+        next = current.up
+    elseif direction == rt.Direction.RIGHT then
+        next = current.right
+    elseif direction == rt.Direction.DOWN then
+        next = current.down
+    elseif direction == rt.Direction.LEFT then
+        next = current.left
+    end
+
+    if meta.isa(next, rt.SelectionNode) then
+        current.self:set_is_selected(false)
+        next.self:set_is_selected(true)
+        self._current_node = next
         self:signal_emit("selection_changed", current.self, next.self)
     end
+end
+
+--- @overload rt.Widget.realize
+function rt.SelectionHandler:realize()
+    self._child:realize()
+    rt.Widget.realize(self)
+
+    for _, node in pairs(self._nodes) do
+        node.self:set_is_selected(false)
+    end
+    self._current_node.self:set_is_selected(true)
 end
 
 --- @bief
@@ -118,6 +159,10 @@ function rt.SelectionHandler:connect(direction, from, to)
     elseif direction == rt.Direction.LEFT then
         from_node.left = to_node
         to_node.right = from_node
+    end
+
+    if not meta.isa(self._current_node, rt.SelectionNode) then
+        self._current_node = from_node
     end
 end
 

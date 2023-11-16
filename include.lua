@@ -42,6 +42,7 @@ require "input_controller"
 require "thread"
 
 require "widget"
+require "selection_handler"
 require "window_layout"
 require "bin_layout"
 require "list_layout"
