@@ -411,12 +411,12 @@ function rt.Widget:draw_selection_indicator()
     local alpha = rt.settings.widget.selection_indicator_alpha
     love.graphics.setColor(color.r, color.g, color.b, alpha)
     love.graphics.setLineWidth(width)
-    love.graphics.rectangle("line", x + 0.5 * width, y + 0.5 * width, w - width, h - width, corner_radius, corner_radius)
+    love.graphics.rectangle("line", x - 0.5 * width, y - 0.5 * width, w + width, h + width, corner_radius, corner_radius)
 
     color = rt.Palette.SELECTION
     love.graphics.setColor(color.r, color.g, color.b, alpha)
     love.graphics.setLineWidth(rt.settings.widget.selection_indicator_width)
-    love.graphics.rectangle("line", x + 0.5 * width, y + 0.5 * width, w - width, h - width, corner_radius, corner_radius)
+    love.graphics.rectangle("line", x - 0.5 * width, y - 0.5 * width, w + width, h + width, corner_radius, corner_radius)
 end
 
 --- @brief
