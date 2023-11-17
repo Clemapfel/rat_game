@@ -141,10 +141,10 @@ function rt.SelectionHandler:connect(direction, from, to)
         self._nodes[meta.hash(from)] = from_node
     end
 
-    local to_node = self._nodes[meta.hash(from)]
+    local to_node = self._nodes[meta.hash(to)]
     if meta.is_nil(to_node) then
-        to_node = rt.SelectionNode(from)
-        self._nodes[meta.hash(from)] = to_node
+        to_node = rt.SelectionNode(to)
+        self._nodes[meta.hash(to)] = to_node
     end
 
     if direction == rt.Direction.UP then
