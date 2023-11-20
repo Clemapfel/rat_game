@@ -33,6 +33,7 @@ selection = rt.SelectionHandler(list)
 for i = 1, 6 do
     selection:connect(rt.Direction.DOWN, list._children:at(i), list._children:at(i+1))
 end
+selection:connect(rt.Direction.DOWN, list._children:at(1), list._children:at(1))
 window:set_child(selection)
 
 --- @brief startup

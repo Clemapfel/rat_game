@@ -1,0 +1,40 @@
+Overworld:
+    Hitbox Trigger
+        Emits signal when player enters its area
+    Activate Trigger
+        Emits signal when player presses A while facing it
+    Wall
+        Enable / Disable
+    PlayerCircle
+        Direction
+        Control
+            sprint button?
+            should first dpad hit only rotate like in pkmn?
+    Skybox
+        parallax scrolling
+
+Battle:
+    Entity:
+
+    Move:
+
+    Status:
+
+Menu:
+    Character Page:
+        Whole-body sprites, should characters be able to equip gear?
+        Attack, Def, Speed:
+            Sprite
+            Colored `LevelBar`
+            Final Value
+        EV:
+            `Scale` or `SpinButton` or series of dots?
+
+    Character Inventory:
+
+    Character Moveset:
+        Orb Sprites
+
+UI:
+    Animation for `Switch`
+    Animation for `TabView` page transition

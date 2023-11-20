@@ -81,6 +81,54 @@ function rt.SelectionHandler:draw()
     self._current_node.self:draw_selection_indicator()
 end
 
+
+--- @brief [internal]
+function rt.SelectionHandler:_validate_node_map()
+    meta.assert_isa(self, rt.SelectionHandler)
+
+    local n_nodes = sizeof(self._nodes)
+    local error_message, error_occurred = false
+    for _, node in pairs(self._nodes) do
+        if meta.isa(node.top, rt.SelectionNode) then
+            if node.top.bottom ~= node or node.top == node then
+                error_message = "non-symmetric node map"
+                goto error
+            end
+        end
+
+        if meta.isa(node.right, rt.SelectionNode) then
+            if node.right.left ~= node or node.right == node then
+                error_message = "non-symmetric node map"
+                goto error
+            end
+        end
+
+        if meta.isa(node.bottom, rt.SelectionNode) then
+            if node.bottom.top ~= node or node.bottom == node then
+                error_message = "non-symmetric node map"
+                goto error
+            end
+        end
+
+        if meta.isa(node.left, rt.SelectionNode) then
+            if node.left.right ~= node or node.left == node then
+                error_message = "non-symmetric node map"
+                goto error
+            end
+        end
+
+        if n_nodes > 1 and (not meta.isa(node.top)) and (not meta.isa(node.right)) and (not meta.isa(node.bottom)) and (not meta.isa(node.left)) then
+            error_message = "unreachable node"
+            goto error
+        end
+    end
+
+    ::error::
+    if error_occurred then
+        rt.error("In SelectionHandler:_validate_node_map: " .. error_message)
+    end
+end
+
 --- @overload rt.Widget.size_allocate
 function rt.SelectionHandler:size_allocate(x, y, width, height)
     self._child:fit_into(rt.AABB(x, y, width, height))
@@ -135,6 +183,11 @@ function rt.SelectionHandler:connect(direction, from, to)
     meta.assert_isa(from, rt.Widget)
     meta.assert_isa(to, rt.Widget)
 
+    if from == to then
+        rt.error("In rt.SelectionHandler:connect: trying to connect `" .. meta.typeof(from) .. "` with itself, this would create an infinite loop")
+        return
+    end
+
     local from_node = self._nodes[meta.hash(from)]
     if meta.is_nil(from_node) then
         from_node = rt.SelectionNode(from)
@@ -164,6 +217,8 @@ function rt.SelectionHandler:connect(direction, from, to)
     if not meta.isa(self._current_node, rt.SelectionNode) then
         self._current_node = from_node
     end
+
+    self:_validate_node_map()
 end
 
 --- @brief
