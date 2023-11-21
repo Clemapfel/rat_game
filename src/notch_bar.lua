@@ -41,6 +41,8 @@ end
 --- @overload rt.Drawable.draw
 function rt.Notch:draw()
     meta.assert_isa(self, rt.Notch)
+    if not self:get_is_visible() then return end
+
     self._frame:draw()
     self._shape:draw()
     self._center:draw()
@@ -106,6 +108,8 @@ end)
 --- @overload rt.Drawable.draw
 function rt.NotchBar:draw()
     meta.assert_isa(self, rt.NotchBar)
+    if not self:get_is_visible() then return end
+
     for _, notch in pairs(self._notches) do
         notch:draw()
     end

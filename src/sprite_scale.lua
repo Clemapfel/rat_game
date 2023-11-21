@@ -39,6 +39,8 @@ end)
 --- @overload rt.Drawable.draw
 function rt.SpriteScale:draw()
     meta.assert_isa(self, rt.SpriteScale)
+    if not self:get_is_visible() then return end
+
     if self._orientation == rt.Orientation.HORIZONTAL then
         self._left_right:draw()
         self._left:draw()

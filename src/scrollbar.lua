@@ -99,6 +99,8 @@ end
 --- @overload rt.Drawable.draw
 function rt.Scrollbar:draw()
     meta.assert_isa(self, rt.Scrollbar)
+    if not self:get_is_visible() then return end
+
     if self:get_is_visible() then
         self._base:draw()
         self._base_outline:draw()

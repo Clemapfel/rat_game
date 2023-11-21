@@ -22,14 +22,6 @@ rt.SelectionNode.right = {}
 rt.SelectionNode.down = {}
 rt.SelectionNode.left = {}
 
---- @class rt.Direction
-rt.Direction = meta.new_enum({
-    UP = "up",
-    RIGHT = "right",
-    DOWN = "down",
-    LEFT = "left"
-})
-
 --- @class rt.SelectionHandler
 --- @signal selection_changed (self, previous_widget, next_widget) -> nil
 rt.SelectionHandler = meta.new_type("SelectionHandler", function(child)
@@ -60,6 +52,9 @@ end)
 
 --- @overload rt.Drawable.draw
 function rt.SelectionHandler:draw()
+    meta.assert_isa(self, rt.SelectionHandler)
+    if not self:get_is_visible() then return end
+
     self._child:draw()
 
     local center = function(widget)

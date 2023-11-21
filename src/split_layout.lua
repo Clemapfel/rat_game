@@ -12,6 +12,8 @@ end)
 --- @overload rt.Drawable.draw
 function rt.SplitLayout:draw()
     meta.assert_isa(self, rt.SplitLayout)
+    if not self:get_is_visible() then return end
+
     self._start_child:draw()
     self._end_child:draw()
 end

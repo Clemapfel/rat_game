@@ -184,6 +184,9 @@ end
 
 --- @overload rt.Drawable.draw
 function rt.VertexShape:draw()
+    meta.assert_isa(self, rt.VertexShape)
+    if not self:get_is_visible() then return end
+
     if self:get_is_visible() then
         love.graphics.draw(self._native)
     end

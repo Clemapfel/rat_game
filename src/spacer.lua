@@ -24,6 +24,8 @@ end)
 --- @overload rt.Drawable.draw
 function rt.Spacer:draw()
     meta.assert_isa(self, rt.Spacer)
+    if not self:get_is_visible() then return end
+
     self._shape:draw()
     self._outline:draw()
 end

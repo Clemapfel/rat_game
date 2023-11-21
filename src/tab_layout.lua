@@ -23,6 +23,8 @@ end)
 --- @overload rt.Drawable.draw
 function rt.TabLayout:draw()
     meta.assert_isa(self, rt.TabLayout)
+    if not self:get_is_visible() then return end
+
     if self:get_is_visible() then
         self._content_area_backdrop:draw()
         local i = 1

@@ -31,12 +31,26 @@ animation:signal_connect("tick", function(self, value)
     layout:set_ratio(value)
 end)
 
-window:set_child(layout)
+frame = rt.Frame()
+frame:set_child(layout)
+
+indicator = rt.DirectionIndicator(rt.Direction.UP)
+indicator:set_margin(10)
+
+window:set_child(indicator)
 input = rt.add_input_controller(window)
 input:signal_connect("pressed", function(_, button)
     if button == rt.InputButton.A then
         animation:reset()
         animation:play()
+    elseif button == rt.InputButton.UP then
+        indicator:set_direction(rt.Direction.UP)
+    elseif button == rt.InputButton.RIGHT then
+        indicator:set_direction(rt.Direction.RIGHT)
+    elseif button == rt.InputButton.DOWN then
+        indicator:set_direction(rt.Direction.DOWN)
+    elseif button == rt.InputButton.LEFT then
+        indicator:set_direction(rt.Direction.LEFT)
     end
 end)
 

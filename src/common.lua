@@ -137,6 +137,17 @@ function invoke(f, ...)
     f(...)
 end
 
+--- @brief expand table to tuple
+function splat(t)
+    assert(type(t) == "table")
+    return table.unpack(t)
+end
+
+--- @brief wrap tuple in table
+function slurp(...)
+    return {...}
+end
+
 base_select = select
 
 --- @brief get n-th element of varag

@@ -48,6 +48,8 @@ end
 --- @overload rt.Drawable.draw
 function rt.LevelBar:draw()
     meta.assert_isa(self, rt.LevelBar)
+    if not self:get_is_visible() then return end
+
     self._backdrop:draw()
     self._shape:draw()
     self._backdrop_outline:draw()

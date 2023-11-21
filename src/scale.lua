@@ -128,6 +128,8 @@ end)
 --- @overload rt.Drawable.draw
 function rt.Scale:draw()
     meta.assert_isa(self, rt.Scale)
+    if not self:get_is_visible() then return end
+
 
     self._rail_start:draw()
     self._rail_start_outline:draw()

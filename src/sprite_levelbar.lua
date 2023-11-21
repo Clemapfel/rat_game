@@ -84,6 +84,8 @@ end)
 --- @overload rt.Drawable.draw
 function rt.SpriteLevelbar:draw()
     meta.assert_isa(self, rt.SpriteLevelbar)
+    if not self:get_is_visible() then return end
+
     if self._orientation == rt.Orientation.HORIZONTAL then
         self._rail_left_right:draw()
         self._rail_left:draw()

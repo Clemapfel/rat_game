@@ -92,6 +92,8 @@ end
 --- @overload rt.Drawable.draw
 function rt.TooltipLayout:draw()
     meta.assert_isa(self, rt.TooltipLayout)
+    if not self:get_is_visible() then return end
+
     if meta.isa(self._tooltip, rt.Widget) then
         self._child:draw()
     end

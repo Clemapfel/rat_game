@@ -14,6 +14,9 @@ rt.Shape._anti_aliasing = true
 rt.Shape._line_join = rt.LineJoin.MITER
 rt.Shape._line_width = 1
 rt.Shape._rotation = 0 -- radians
+rt.Shape._origin_x = 0
+rt.Shape._origin_y = 0
+rt.Shape._use_origin = false
 
 --- @brief get centroid
 function rt.Shape:get_centroid()
@@ -61,9 +64,22 @@ function rt.Shape:get_line_width()
 end
 
 --- @brief set rotation
-function rt.Shape:set_rotation(angle)
+function rt.Shape:set_rotation(angle, origin_x, origin_y)
+    meta.assert_isa(self, rt.Shape)
     meta.assert_isa(angle, rt.Angle)
     self._rotation = angle:as_radians()
+    self._use_origin = false
+
+    if not meta.is_nil(origin_x) then
+        meta.assert_number(origin_x, origin_y)
+        self._use_origin = true
+    end
+end
+
+--- @brief get_rotation
+function rt.Shape:get_rotation()
+    meta.assert_isa(self, rt.Shape)
+    return self._rotation
 end
 
 --- @brief [internal] bind all shape properties
@@ -85,7 +101,10 @@ function rt.Shape:_bind()
     love.graphics.setColor(self._color.r, self._color.g, self._color.b, self._color.a)
 
     if self._rotation ~= 0 then
-        local center_x, center_y = self:get_centroid()
+        local center_x, center_y = self._origin_x, self._origin_y
+        if not self._use_origin then
+            center_x, center_y = self:get_centroid()
+        end
         love.graphics.translate(center_x, center_y)
         love.graphics.rotate(self._rotation)
         love.graphics.translate(-1 * center_x, -1 * center_y)
@@ -187,27 +206,38 @@ function rt.Points:draw()
     self:_unbind()
 end
 
+--- @brief
+function rt.Shape:_compute_centroid()
+    local x_sum = 0
+    local y_sum = 0
+    local n = sizeof(self._vertices)
+
+    for i = 1, n, 2 do
+        x_sum = x_sum + self._vertices[i]
+        y_sum = y_sum + self._vertices[i+1]
+    end
+    self._centroid_x = 2 * x_sum / n
+    self._centroid_y = 2 * y_sum / n
+end
+
 --- @class rt.LineStrip
 rt.LineStrip = meta.new_type("LineStrip", function(a_x, a_y, b_x, b_y, ...)
     meta.assert_number(a_x, a_y, b_x, b_y, ...)
     assert(sizeof({...}) % 2 == 0)
-    return meta.new(rt.LineStrip, {
+    local out = meta.new(rt.LineStrip, {
         _vertices = {a_x, a_y, b_x, b_y, ...},
-        _is_loop = false
+        _is_loop = false,
+        _centroid_x = 0,
+        _centroid_y = 0
     }, rt.Shape, rt.Drawable)
+    out:_compute_centroid()
+    return out
 end)
 
 --- @overload rt.Shape:get_centroid
 function rt.LineStrip:get_centroid()
     meta.assert_isa(self, rt.LineStrip)
-    local x_sum = 0
-    local y_sum = 0
-    local n = sizeof(self._vertices)
-    for i = 1, i < n, 2 do
-        x_sum = x_sum + self._vertices[i]
-        y_sum = y_sum + self._vertices[i+1]
-    end
-    return x_sum / n, y_sum / n
+    return self._centroid_x, self._centroid_y
 end
 
 --- @class rt.Line
@@ -226,6 +256,7 @@ end
 function rt.LineStrip:resize(a_x, a_y, b_x, b_y, ...)
     meta.assert_isa(self, rt.LineStrip)
     self._vertices = {a_x, a_y, b_x, b_y, ...}
+    self:_compute_centroid()
 end
 
 --- @brief
@@ -434,20 +465,34 @@ rt.Polygon = meta.new_type("Polygon", function(a_x, a_y, b_x, b_y, c_x, c_y, ...
     meta.assert_number(a_x, a_y, b_x, b_y, c_x, c_y)
 
     local vertices =  {a_x, a_y, b_x, b_y, c_x, c_y, ...}
-    local outer_hull = vertices
-
-    -- TODO: compute outer hull
-
+    local outer_hull = love.math.triangulate(vertices)
     for _, triangle in pairs(outer_hull) do
         for _, vertex in pairs(triangle) do
             table.insert(vertices, vertex)
         end
     end
 
-    return meta.new(rt.Polygon, {
-        _vertices = vertices
+    local out = meta.new(rt.Polygon, {
+        _vertices = vertices,
+        _centroid_x = 0,
+        _centroid_y = 0
     }, rt.Shape, rt.Drawable)
+    out:_compute_centroid()
+    return out
 end)
+
+function rt.Polygon:resize(a_x, a_y, b_x, b_y, c_x, c_y, ...)
+    meta.assert_number(a_x, a_y, b_x, b_y, c_x, c_y)
+    local vertices =  {a_x, a_y, b_x, b_y, c_x, c_y, ...}
+    local outer_hull = love.math.triangulate(vertices)
+    for _, triangle in pairs(outer_hull) do
+        for _, vertex in pairs(triangle) do
+            table.insert(vertices, vertex)
+        end
+    end
+    self._vertices = vertices
+    self:_compute_centroid()
+end
 
 --- @overload rt.Shape.get_centroid
 function rt.Polygon:get_centroid()
@@ -455,7 +500,7 @@ function rt.Polygon:get_centroid()
     local x_sum = 0
     local y_sum = 0
     local n = sizeof(self._vertices)
-    for i = 1, i < n, 2 do
+    for i = 1, n, 2 do
         x_sum = x_sum + self._vertices[i]
         y_sum = y_sum + self._vertices[i+1]
     end

@@ -107,6 +107,8 @@ end
 --- @overload rt.Drawable.draw
 function rt.Gradient:draw()
     meta.assert_isa(self, rt.Gradient)
+    if not self:get_is_visible() then return end
+
     self._shape:draw()
 end
 

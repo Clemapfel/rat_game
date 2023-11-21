@@ -106,6 +106,8 @@ end
 --- @overload rt.Drawable.draw
 function rt.SpinButton:draw()
     meta.assert_isa(self, rt.SpinButton)
+    if not self:get_is_visible() then return end
+
 
     self._backdrop:draw()
     self._backdrop_outline:draw()
