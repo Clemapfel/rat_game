@@ -1,5 +1,6 @@
 rt.settings.direction_indicator = {
-    min_line_width = rt.settings.margin_unit
+    min_line_width = rt.settings.margin_unit,
+    arrow_offset = 0 -- thickness factor
 }
 
 --- @class rt.DirectionIndicator
@@ -43,7 +44,6 @@ function rt.DirectionIndicator:draw()
     else
         self._arrow:draw()
         self._arrow_outline:draw()
-        love.graphics.circle("fill", select(1, self._arrow:get_centroid()), select(2, self._arrow:get_centroid()), 5)
     end
 end
 
@@ -75,7 +75,7 @@ function rt.DirectionIndicator:size_allocate(x, y, width, height)
             }
 
             for i = 2, 12, 2 do
-                vertices[i] = vertices[i] + 0.5 * thickness
+                vertices[i] = vertices[i] + rt.settings.direction_indicator.arrow_offset * thickness
             end
         elseif self._direction == rt.Direction.RIGHT then
             vertices = {
@@ -88,7 +88,7 @@ function rt.DirectionIndicator:size_allocate(x, y, width, height)
             }
 
             for i = 1, 12, 2 do
-                vertices[i] = vertices[i] - 0.5 * thickness
+                vertices[i] = vertices[i] - rt.settings.direction_indicator.arrow_offset * thickness
             end
         elseif self._direction == rt.Direction.DOWN then
             vertices = {
@@ -101,7 +101,7 @@ function rt.DirectionIndicator:size_allocate(x, y, width, height)
             }
 
             for i = 2, 12, 2 do
-                vertices[i] = vertices[i] - 0.5 * thickness
+                vertices[i] = vertices[i] - rt.settings.direction_indicator.arrow_offset * thickness
             end
         elseif self._direction == rt.Direction.LEFT then
             vertices = {
@@ -114,7 +114,7 @@ function rt.DirectionIndicator:size_allocate(x, y, width, height)
             }
 
             for i = 1, 12, 2 do
-                vertices[i] = vertices[i] + 0.5 * thickness
+                vertices[i] = vertices[i] + rt.settings.direction_indicator.arrow_offset * thickness
             end
         end
 

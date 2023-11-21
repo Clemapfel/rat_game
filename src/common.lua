@@ -347,7 +347,28 @@ NEGATIVE_INFINITY = -1/0
 --- @brief make first letter capital
 --- @param str string
 function string.capitalize(str)
+    assert(type(str) == "string")
     return string.upper(string.sub(str, 1, 1)) .. string.sub(str, 2, string.len(str))
+end
+
+--- @brief make all letters lower case
+function string.to_lower(str)
+    assert(type(str) == "string")
+    local out = {""}
+    for i = 1, #str do
+        table.insert(out, string.lower(string.sub(str, i, i)))
+    end
+    return table.concat(out)
+end
+
+--- @brief make all letters upper case
+function string.to_lower(str)
+    assert(type(str) == "string")
+    local out = {""}
+    for i = 1, #str do
+        table.insert(out, string.upper(string.sub(str, i, i)))
+    end
+    return table.concat(out)
 end
 
 --- @brief split along character

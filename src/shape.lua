@@ -206,8 +206,11 @@ function rt.Points:draw()
     self:_unbind()
 end
 
---- @brief
+--- @brief [internal] compute vertex for shape with _vertices
 function rt.Shape:_compute_centroid()
+    meta.assert_table(self._vertices)
+    meta.assert_number(self._centroid_x, self._centroid_y)
+
     local x_sum = 0
     local y_sum = 0
     local n = sizeof(self._vertices)
@@ -216,8 +219,9 @@ function rt.Shape:_compute_centroid()
         x_sum = x_sum + self._vertices[i]
         y_sum = y_sum + self._vertices[i+1]
     end
-    self._centroid_x = 2 * x_sum / n
-    self._centroid_y = 2 * y_sum / n
+
+    self._centroid_x = x_sum / n
+    self._centroid_y = y_sum / n
 end
 
 --- @class rt.LineStrip

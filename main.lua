@@ -38,7 +38,12 @@ indicator = rt.DirectionIndicator(rt.Direction.UP)
 indicator:set_margin(10)
 indicator:set_color(rt.Palette.GREEN)
 
-window:set_child(indicator)
+list = rt.ListLayout()
+list:push_back(rt.DirectionIndicator(rt.Direction.UP))
+list:push_back(rt.DirectionIndicator(rt.Direction.NONE))
+list:push_back(rt.DirectionIndicator(rt.Direction.RIGHT))
+
+window:set_child(list)
 input = rt.add_input_controller(window)
 input:signal_connect("pressed", function(_, button)
     if button == rt.InputButton.A then

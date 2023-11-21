@@ -5,6 +5,11 @@ package.path = package.path .. ";" .. RESOURCE_PATH .. "/?.lua"
 
 rt = {}
 rt.test = {}
+rt.settings = {}
+
+rt.battle = {}
+bt = rt.battle
+
 
 require "common"
 require "settings"
@@ -73,3 +78,6 @@ require "frame"
 require "sprite_frame"
 require "sprite_scale"
 require "sprite_levelbar"
+
+-- battle
+require "battle/action"

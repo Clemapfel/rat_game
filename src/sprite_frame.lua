@@ -10,7 +10,7 @@ rt.settings.sprite_frame = {
 }
 
 --- @class rt.SpriteFrame
-rt.SpriteFrame = meta.new_type("SpriteFrame", function(spritesheet)  
+rt.SpriteFrame = meta.new_type("SpriteFrame", function(spritesheet)
     meta.assert_isa(spritesheet, rt.Spritesheet)
     local out = meta.new(rt.SpriteFrame, {
         _spritesheet = spritesheet,

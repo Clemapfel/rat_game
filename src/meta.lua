@@ -469,6 +469,12 @@ function meta._install_inheritance(instance, type)
     end
 end
 
+--- @brief [internal] add meta.is_* and meta.assert_* given type
+function meta._define_type_assertion(type)
+    meta.assert_isa(type, rt.Type)
+    load("meta.assert_" .. )()
+end
+
 --- @brief create a new type with given constructor
 --- @param typename String
 --- @param ctor Function
