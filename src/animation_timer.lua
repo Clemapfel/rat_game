@@ -46,16 +46,16 @@ end)()
 --- @class rt.AnimationTimer
 --- @signal tick    (self, [0, 1]) -> nil
 --- @signal done    (self) -> nil
-rt.AnimationTimer = meta.new_type("AnimationTimer", function(duration_seconds)
-    meta.assert_number(duration_seconds)
-    if duration_seconds < 0 then
-        rt.error("In AnimationTimer(): Duration `" .. string(duration_seconds) .. "` cannot be negative")
+rt.AnimationTimer = meta.new_type("AnimationTimer", function(duration)
+    meta.assert_isa(duration, rt.Time)
+    if duration:as_seconds() < 0 then
+        rt.error("In AnimationTimer(): Duration `" .. string(duration) .. "` cannot be negative")
     end
 
     local hash = rt.AnimationTimerHandler._hash
     local out = meta.new(rt.AnimationTimer, {
         _state = rt.AnimationTimerState.IDLE,
-        _duration = duration_seconds,
+        _duration = duration:as_seconds(),
         _time = 0,
         _timing_function = rt.AnimationTimingFunction.LINEAR,
         _loop = false,
@@ -141,18 +141,19 @@ end
 
 --- @brief set duration of animation
 --- @param self rt.AnimationTimer
---- @param duration_s Number
-function rt.AnimationTimer:set_duration(duration_s)
+--- @param duration_s rt.Time
+function rt.AnimationTimer:set_duration(duration)
     meta.assert_isa(self, rt.AnimationTimer)
-    self._duration = duration_s
+    meta.assert_isa(duration, rt.Time)
+    self._duration = duration:as_seconds()
 end
 
 --- @brief get duration of animation, in seconds
 --- @param self rt.AnimationTimer
---- @return Number
+--- @return rt.Time
 function rt.AnimationTimer:get_duration()
     meta.assert_isa(self, rt.AnimationTimer)
-    return self._duration
+    return rt.seconds(self._duration)
 end
 
 --- @brief set timing function

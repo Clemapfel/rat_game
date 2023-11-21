@@ -19,38 +19,46 @@ end
 --- @overload rt.Widget.size_allocate
 function rt.SplitLayout:size_allocate(x, y, width, height)
     meta.assert_isa(self, rt.SplitLayout)
-    if meta.is_nil(self._start_child) and meta.is_nil(self._end_child) then
-        -- noop
-    elseif not meta.is_nil(self._start_child) and meta.is_nil(self._end_child) then
-        self._start_child:fit_into(rt.AABB(x, y, width, height))
-    elseif meta.is_nil(self._start_child) and not meta.is_nil(self._end_child) then
-        self._end_child:fit_into(rt.AABB(x, y, width, height))
+    local has_start = meta.isa(self._start_child, rt.Widget)
+    local has_end = meta.isa(self._end_child, rt.Widget)
+    if has_start and not has_end then
+        self._start_child:fit_into(x, y, width, height)
+    elseif not has_start and has_end then
+        self._end_child:fit_into(x, y, width, height)
     else
-        if self:get_orientation() == rt.Orientation.HORIZONTAL then
-            local start_width = self._ratio * width
-            self._start_child:fit_into(rt.AABB(x, y, start_width, height))
-            self._end_child:fit_into(rt.AABB(x + start_width, y, width - start_width, height))
-        elseif self:get_orientation() == rt.Orientation.VERTICAL then
-            local start_height = self._ratio * height
-            self._start_child:fit_into(rt.AABB(x, y, width, start_height))
-            self._end_child:fit_into(rt.AABB(x, y + start_height, width, height - start_height))
+        if self._orientation == rt.Orientation.HORIZONTAL then
+            local left_width = self._ratio * width
+            local right_width = (1 - self._ratio) * width
+            self._start_child:fit_into(rt.AABB(x, y, left_width, height))
+            self._end_child:fit_into(rt.AABB(x + left_width, y, right_width, height))
+        else
+            local top_height = self._ratio * height
+            local bottom_height = (1 - self._ratio) * height
+            self._start_child:fit_into(rt.AABB(x, y, width, top_height))
+            self._end_child:fit_into(rt.AABB(x, y + top_height, width, bottom_height))
         end
     end
 end
 
 --- @overload rt.Widget.measure
 function rt.SplitLayout:measure()
-    if not meta.is_nil(self._start_child) and not meta.is_nil(self._end_child) then
-        local x, y = self._start_child:get_position()
-        local start_w, start_h = self._start_child:get_size()
-        local end_w, end_h = self._end_child:get_size()
-        return start_w + end_w, start_h + end_h
-    elseif not meta.is_nil(self._start_child) then
+    meta.assert_isa(self, rt.SplitLayout)
+    local has_start = meta.isa(self._start_child, rt.Widget)
+    local has_end = meta.isa(self._end_child, rt.Widget)
+    if has_start and not has_end then
         return self._start_child:measure()
-    elseif notmeta.is_nil(self._end_child) then
+    elseif not has_start and has_end then
         return self._end_child:measure()
     else
-        return 0, 0
+        if self._orientation == rt.Orientation.HORIZONTAL then
+            local left_w, left_h = self._start_child:measure()
+            local right_w, right_h = self._start_child:measure()
+            return left_w + right_w, math.max(left_h, right_h)
+        else
+            local top_w, top_h = self._start_child:measure()
+            local bottom_w, bottom_h = self._end_child:measure()
+            return math.max(top_w, bottom_w), top_h + bottom_h
+        end
     end
 end
 
@@ -72,6 +80,8 @@ end
 --- @param child rt.Widget
 function rt.SplitLayout:set_start_child(child)
     meta.assert_isa(self, rt.SplitLayout)
+    meta.assert_isa(child, rt.Widget)
+
     self:remove_start_child()
     child:set_parent(self)
     self._start_child = child
@@ -90,7 +100,7 @@ end
 --- @brief remove first child
 function rt.SplitLayout:remove_start_child()
     meta.assert_isa(self, rt.SplitLayout)
-    if not meta.is_nil(self._start_child) then
+    if meta.isa(self._start_child, rt.Widget) then
         self._start_child:set_parent(nil)
         self._start_child = nil
     end
@@ -100,6 +110,10 @@ end
 --- @param child rt.Widget
 function rt.SplitLayout:set_end_child(child)
     meta.assert_isa(self, rt.SplitLayout)
+    meta.assert_isa(child, rt.Widget)
+
+    self:remove_end_child()
+    child:set_parent(self)
     self._end_child = child
     if self:get_is_realized() then child:realize() end
     self:reformat()
@@ -115,7 +129,7 @@ end
 --- @brief remove last child
 function rt.SplitLayout:remove_end_child()
     meta.assert_isa(self, rt.SplitLayout)
-    if not meta.is_nil(self._end_child) then
+    if meta.isa(self._end_child, rt.Widget) then
         self._end_child:set_parent(nil)
         self._end_child = nil
     end

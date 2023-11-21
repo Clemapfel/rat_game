@@ -53,6 +53,7 @@ require "flow_layout"
 require "aspect_layout"
 require "tab_layout"
 require "tooltip_layout"
+require "transition_layout"
 require "levelbar"
 require "notch_bar"
 
