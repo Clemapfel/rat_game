@@ -36,6 +36,7 @@ frame:set_child(layout)
 
 indicator = rt.DirectionIndicator(rt.Direction.UP)
 indicator:set_margin(10)
+indicator:set_color(rt.Palette.GREEN)
 
 window:set_child(indicator)
 input = rt.add_input_controller(window)
@@ -43,6 +44,8 @@ input:signal_connect("pressed", function(_, button)
     if button == rt.InputButton.A then
         animation:reset()
         animation:play()
+    elseif button == rt.InputButton.B then
+        indicator:set_direction(rt.Direction.NONE)
     elseif button == rt.InputButton.UP then
         indicator:set_direction(rt.Direction.UP)
     elseif button == rt.InputButton.RIGHT then
