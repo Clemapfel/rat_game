@@ -29,12 +29,35 @@ Menu:
             Final Value
         EV:
             `Scale` or `SpinButton` or series of dots?
+        Moveslots:
+            Permanents
+            Consumable Items
+            Moveslots
 
     Character Inventory:
+        Left: VROW of everything
+        Moves / Consumables have different pages
 
     Character Moveset:
         Orb Sprites
 
+    Move:
+        Menu Row:
+            Orb / Item Sprite
+            Name
+            Stacks
+                if move: x / y, eg. `3/4` or `3/∞`
+                if item: x, eg. `4`
+                if item reaches 0, remove from inventory
+                if move reaches 0, grey out
+        Tooltip:
+            Name (Move | Consumable)
+            Stacks: 3 / 4
+            Effect: Deal 1.5 x $ATK to target enemy
+            (flavor text, sprite in background)
+
 UI:
     Animation for `Switch`
     Animation for `TabView` page transition
+    Revealer Animation
+

@@ -54,6 +54,7 @@ require "aspect_layout"
 require "tab_layout"
 require "tooltip_layout"
 require "levelbar"
+require "notch_bar"
 
 require "spacer"
 require "image_display"

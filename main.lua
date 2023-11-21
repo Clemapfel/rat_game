@@ -19,22 +19,8 @@ io.stdout:setvbuf("no") -- makes it so love2d error message is printed to consol
 
 window = rt.WindowLayout()
 
-list = rt.ListLayout()
-for i = 0, 7 do
-    local to_push = rt.Spacer(rt.HSVA(rt.rand(), 1, 1, 0.7))
-    to_push:set_minimum_size(50, 50)
-    to_push:set_margin(15)
-    list:push_back(to_push)
-end
-list:set_expand(true)
-
-selection = rt.SelectionHandler(list)
-
-for i = 1, 6 do
-    selection:connect(rt.Direction.DOWN, list._children:at(i), list._children:at(i+1))
-end
-selection:connect(rt.Direction.DOWN, list._children:at(1), list._children:at(1))
-window:set_child(selection)
+widget = rt.NotchBar(1)
+window:set_child(widget)
 
 --- @brief startup
 function love.load()
