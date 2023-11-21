@@ -54,6 +54,12 @@ function rt.Shape:get_line_width()
     return self._line_width
 end
 
+--- @brief set rotation
+function rt.Shape:set_rotation(angle)
+    meta.assert_isa(angle, rt.Angle)
+    self._rotation = angle:as_radians()
+end
+
 --- @brief [internal] bind all shape properties
 function rt.Shape:_bind_for_rendering()
     meta.assert_isa(self, rt.Shape)

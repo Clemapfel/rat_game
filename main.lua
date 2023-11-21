@@ -19,8 +19,22 @@ io.stdout:setvbuf("no") -- makes it so love2d error message is printed to consol
 
 window = rt.WindowLayout()
 
-widget = rt.NotchBar(1)
+widget = rt.NotchBar(4)
 window:set_child(widget)
+
+n_notches = 1
+input = rt.add_input_controller(widget)
+input:signal_connect("pressed", function(_, button)
+    if button == rt.InputButton.LEFT then
+        n_notches = n_notches - 1
+        widget:set_filled(n_notches)
+    elseif button == rt.InputButton.RIGHT then
+        n_notches = n_notches + 1
+        widget:set_filled(n_notches)
+    elseif button == rt.InputButton.A then
+        widget:set_fill_color(rt.Palette.PINK)
+    end
+end)
 
 --- @brief startup
 function love.load()
