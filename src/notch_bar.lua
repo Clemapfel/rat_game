@@ -92,6 +92,9 @@ rt.NotchBar = meta.new_type("NotchBar", function(n_notches)
     out._left_indicator_frame:set_color(rt.Palette.BASE_OUTLINE)
     out._left_indicator_frame:set_is_outline(true)
 
+    out._left_indicator:set_rotation(rt.degrees(180))
+    out._left_indicator_frame:set_rotation(rt.degrees(180))
+
     out._right_indicator:set_color(rt.Palette.FOREGROUND)
     out._right_indicator_frame:set_color(rt.Palette.BASE_OUTLINE)
     out._right_indicator_frame:set_is_outline(true)
@@ -107,17 +110,8 @@ function rt.NotchBar:draw()
         notch:draw()
     end
 
-    -- rotate so it points to the left
-    love.graphics.push()
-    local x, y = self._left_indicator:get_center()
-    love.graphics.translate(x, y)
-    love.graphics.rotate(rt.degrees(180):as_radians())
-    love.graphics.translate(-x, -y)
-
     self._left_indicator:draw()
     self._left_indicator_frame:draw()
-
-    love.graphics.pop()
 
     self._right_indicator:draw()
     self._right_indicator_frame:draw()

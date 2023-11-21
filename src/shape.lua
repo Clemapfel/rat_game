@@ -13,6 +13,12 @@ rt.Shape._is_outline = false
 rt.Shape._anti_aliasing = true
 rt.Shape._line_join = rt.LineJoin.MITER
 rt.Shape._line_width = 1
+rt.Shape._rotation = 0 -- radians
+
+--- @brief get centroid
+function rt.Shape:get_centroid()
+    error("In " .. meta.typeof(self) .. "get_centroid: abstract method called")
+end
 
 --- @brief set how line vertices connect
 --- @param style rt.LineJoin
@@ -61,8 +67,10 @@ function rt.Shape:set_rotation(angle)
 end
 
 --- @brief [internal] bind all shape properties
-function rt.Shape:_bind_for_rendering()
+function rt.Shape:_bind()
     meta.assert_isa(self, rt.Shape)
+    
+    love.graphics.push()
 
     if self:get_use_anti_aliasing() then
         love.graphics.setLineStyle("smooth")
@@ -75,6 +83,18 @@ function rt.Shape:_bind_for_rendering()
 
     love.graphics.setLineJoin(self._line_join)
     love.graphics.setColor(self._color.r, self._color.g, self._color.b, self._color.a)
+
+    if self._rotation ~= 0 then
+        local center_x, center_y = self:get_centroid()
+        love.graphics.translate(center_x, center_y)
+        love.graphics.rotate(self._rotation)
+        love.graphics.translate(-1 * center_x, -1 * center_y)
+    end
+end
+
+--- @brief unbind properties
+function rt.Shape:_unbind()
+    love.graphics.pop()
 end
 
 --- @brief set color of all vertices
@@ -94,6 +114,20 @@ end
 function rt.Shape:get_color()
     meta.assert_isa(self, rt.Shape)
     return self._color
+end
+
+--- @brief
+function rt.Shape:set_rotation(angle)
+    meta.assert_isa(self, rt.Shape)
+    meta.assert_isa(angle, rt.Angle)
+    self._rotation = angle:as_radians()
+end
+
+--- @brief
+--- @return rt.Angle
+function rt.Shape:get_rotation()
+    meta.assert_isa(self, rt.Shape)
+    return rt.radians(self._rotation)
 end
 
 --- @brief set whether the shape should be rendered without a volume
@@ -125,10 +159,16 @@ rt.Point = meta.new_type("Point", function(x, y)
     }, rt.Shape, rt.Drawable)
 end)
 
+--- @overload rt.Shape.get_centroid
+function rt.Point:get_centroid()
+    return self._vertices.x, self._vertices.y
+end
+
 function rt.Point:draw()
     if not self:get_is_visible() then return end
-    self:_bind_for_rendering()
+    self:_bind()
     love.graphics.point(self._vertices[1], self._vertcies[2])
+    self:_unbind()
 end
 
 --- @class rt.Points
@@ -142,8 +182,9 @@ end)
 
 function rt.Points:draw()
     if not self:get_is_visible() then return end
-    self:_bind_for_rendering()
+    self:_bind()
     love.graphics.points(table.unpack(self._vertices))
+    self:_unbind()
 end
 
 --- @class rt.LineStrip
@@ -155,6 +196,19 @@ rt.LineStrip = meta.new_type("LineStrip", function(a_x, a_y, b_x, b_y, ...)
         _is_loop = false
     }, rt.Shape, rt.Drawable)
 end)
+
+--- @overload rt.Shape:get_centroid
+function rt.LineStrip:get_centroid()
+    meta.assert_isa(self, rt.LineStrip)
+    local x_sum = 0
+    local y_sum = 0
+    local n = sizeof(self._vertices)
+    for i = 1, i < n, 2 do
+        x_sum = x_sum + self._vertices[i]
+        y_sum = y_sum + self._vertices[i+1]
+    end
+    return x_sum / n, y_sum / n
+end
 
 --- @class rt.Line
 function rt.Line(a_x, a_y, b_x, b_y)
@@ -177,7 +231,7 @@ end
 --- @brief
 function rt.LineStrip:draw()
     if not self:get_is_visible() then return end
-    self:_bind_for_rendering()
+    self:_bind()
     if self._is_loop then
         local vertices = {}
         for _, v in pairs(self._vertices) do
@@ -189,6 +243,7 @@ function rt.LineStrip:draw()
     else
         love.graphics.line(table.unpack(self._vertices))
     end
+    self._unbind()
 end
 
 --- @class rt.Rectangle
@@ -205,6 +260,11 @@ rt.Rectangle = meta.new_type("Rectangle", function(top_left_x, top_left_y, width
     }, rt.Shape, rt.Drawable)
 end)
 
+--- @overload rt.Shape.get_centroid()
+function rt.Rectangle:get_centroid()
+    return self._x + 0.5 * self._width, self._y + 0.5 * self._height
+end
+
 --- @class rt.Square
 function rt.Square(top_left_x, top_left_y, size)
     return rt.Rectangle(top_left_x, top_left_y, size, size)
@@ -212,8 +272,9 @@ end
 
 function rt.Rectangle:draw()
     if not self:get_is_visible() then return end
-    self:_bind_for_rendering()
+    self:_bind()
     love.graphics.rectangle(self:_get_draw_mode(), self._x, self._y, self._w, self._h, self._corner_radius, self._corner_radius, self._corner_radius * 2)
+    self._unbind()
 end
 
 --- @brief TODO
@@ -287,6 +348,12 @@ rt.Ellipse = meta.new_type("Ellipse", function(center_x, center_y, x_radius, y_r
     }, rt.Shape, rt.Drawable)
 end)
 
+--- @overload rt.Shape:get_centroid
+function rt.Ellipse:get_centroid()
+    meta.assert_isa(self, rt.Ellipse)
+    return self._center_x, self._center_y
+end
+
 --- @brief
 function rt.Circle(center_x, center_y, radius, n_outer_vertices)
     return rt.Ellipse(center_x, center_y, radius, radius, n_outer_vertices)
@@ -351,13 +418,15 @@ end
 function rt.Ellipse:draw()
     meta.assert_isa(self, rt.Ellipse)
     if not self:get_is_visible() then return end
-    self:_bind_for_rendering()
+    self:_bind()
 
     if self._n_outer_vertices > 0 then
         love.graphics.ellipse(self:_get_draw_mode(), self._center_x, self._center_y, self._radius_x, self._radius_y, clamp(self._n_outer_vertices, 3))
     else
         love.graphics.ellipse(self:_get_draw_mode(), self._center_x, self._center_y, self._radius_x, self._radius_y)
     end
+
+    self._unbind()
 end
 
 --- @class rt.Polygon
@@ -380,6 +449,20 @@ rt.Polygon = meta.new_type("Polygon", function(a_x, a_y, b_x, b_y, c_x, c_y, ...
     }, rt.Shape, rt.Drawable)
 end)
 
+--- @overload rt.Shape.get_centroid
+function rt.Polygon:get_centroid()
+    meta.assert_isa(self, rt.Polygon)
+    local x_sum = 0
+    local y_sum = 0
+    local n = sizeof(self._vertices)
+    for i = 1, i < n, 2 do
+        x_sum = x_sum + self._vertices[i]
+        y_sum = y_sum + self._vertices[i+1]
+    end
+    return x_sum / n, y_sum / n
+end
+
+
 --- @class rt.Triangle
 function rt.Triangle(a_x, a_y, b_x, b_y, c_x, c_y)
    return rt.Polygon(a_x, a_y, b_x, b_y, c_x, c_y)
@@ -387,8 +470,9 @@ end
 
 function rt.Polygon:draw()
     if not self:get_is_visible() then return end
-    self:_bind_for_rendering()
+    self:_bind()
     love.graphics.polygon(self:_get_draw_mode(), table.unpack(self._vertices))
+    self._unbind()
 end
 
 --- @brief test shapes
