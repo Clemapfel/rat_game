@@ -1,7 +1,8 @@
 --- @class bt.TargetingMode
 bt.TargetingMode = meta.new_enum({
     SINGLE = 1,
-    MULTIPLE = 2
+    MULTIPLE = 2,
+    STAGE = 3
 })
 
 bt.Action = meta.new_abstract_type("BattleAction")

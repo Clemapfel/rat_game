@@ -17,7 +17,6 @@ io.stdout:setvbuf("no") -- makes it so love2d error message is printed to consol
 
 -- #############################
 
-
 window = rt.WindowLayout()
 
 layout = rt.SplitLayout()
@@ -144,7 +143,6 @@ end
 --- @brief shutdown
 function love.quit()
     rt.Palette:export("palette.png")
-
 end
 
 ::exit::
