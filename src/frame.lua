@@ -19,23 +19,20 @@ rt.Frame = meta.new_type("Frame", function(type)
         _child = {},
         _frame_thickness = rt.settings.frame.thickness,
         _frame = ternary(type == rt.FrameType.RECTANGULAR, rt.Rectangle(0, 0, 1, 1), rt.Circle(0, 0, 1)),
-        _frame_outline_inner = ternary(type == rt.FrameType.RECTANGULAR, rt.Rectangle(0, 0, 1, 1), rt.Circle(0, 0, 1)),
-        _frame_outline_outer = ternary(type == rt.FrameType.RECTANGULAR, rt.Rectangle(0, 0, 1, 1), rt.Circle(0, 0, 1)),
+        _frame_outline = ternary(type == rt.FrameType.RECTANGULAR, rt.Rectangle(0, 0, 1, 1), rt.Circle(0, 0, 1)),
     }, rt.Drawable, rt.Widget)
 
     out._frame:set_is_outline(true)
     out._frame:set_line_width(out._frame_thickness)
-    out._frame_outline_inner:set_is_outline(true)
-    out._frame_outline_outer:set_is_outline(true)
+    out._frame_outline:set_line_width(rt.settings.frame.thickness + 2)
+    out._frame_outline:set_is_outline(true)
 
     out._frame:set_color(rt.Palette.FOREGROUND)
-    out._frame_outline_inner:set_color(rt.Palette.BASE_OUTLINE)
-    out._frame_outline_outer:set_color(rt.Palette.BASE_OUTLINE)
+    out._frame_outline:set_color(rt.Palette.BASE_OUTLINE)
 
     local corner_radius = rt.settings.frame.corner_radius
     out._frame:set_corner_radius(corner_radius)
-    out._frame_outline_outer:set_corner_radius(corner_radius)
-    out._frame_outline_inner:set_corner_radius(corner_radius)
+    out._frame_outline:set_corner_radius(corner_radius)
     return out
 end)
 
@@ -50,13 +47,19 @@ function rt.Frame:draw()
         local pos_x, pos_y = self._child:get_position()
         local w, h = self._child:get_size()
         local thickness = rt.settings.frame.thickness
-        love.graphics.setScissor(pos_x + thickness, pos_y + thickness, w - 2 * thickness, h - 2 * thickness)
-        self._child:draw()
-        love.graphics.setScissor()
 
+
+        love.graphics.stencil(function()
+            love.graphics.setColor(1, 1, 1, 1)
+            love.graphics.rectangle("fill", 225, 200, 350, 300)
+        end, "replace", 255)
+        love.graphics.setStencilTest("less", 255)
+
+        self._child:draw()
+        self._frame_outline:draw()
         self._frame:draw()
-        --self._frame_outline_inner:draw()
-        self._frame_outline_outer:draw()
+
+        love.graphics.setStencilTest()
     end
 end
 
@@ -72,9 +75,8 @@ function rt.Frame:size_allocate(x, y, width, height)
         local w, h = self._child:get_size()
 
         local thickness = rt.settings.frame.thickness
-        self._frame_outline_outer:resize(rt.AABB(pos_x, pos_y, w, h))
         self._frame:resize(rt.AABB(pos_x + 0.5 * thickness, pos_y + 0.5 * thickness, w - thickness, h - thickness))
-        self._frame_outline_inner:resize(rt.AABB(pos_x + thickness, pos_y + thickness, w - 2 * thickness, h - 2 * thickness))
+        self._frame_outline:resize(rt.AABB(pos_x + 0.5 * thickness, pos_y + 0.5 * thickness, w - thickness, h - thickness))
     end
 end
 

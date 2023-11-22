@@ -20,8 +20,8 @@ io.stdout:setvbuf("no") -- makes it so love2d error message is printed to consol
 window = rt.WindowLayout()
 
 layout = rt.SplitLayout()
-left = rt.Spacer(rt.RGBA(0.1, 0, 0.1, 1))
-right = rt.Spacer(rt.RGBA(0, 0.1, 0, 1))
+left = rt.Spacer(rt.RGBA(1, 0, 1, 1))
+right = rt.Spacer(rt.RGBA(0, 1, 0, 1))
 
 layout:set_start_child(left)
 layout:set_end_child(right)
@@ -90,7 +90,8 @@ end
 --- @brief draw step
 function love.draw()
 
-    love.graphics.setBackgroundColor(0.6, 0.05, 0.6, 1)
+    local bg_color = rt.Palette.PURPLE_3
+    love.graphics.setBackgroundColor(bg_color.r, bg_color.g, bg_color.b, bg_color.a)
     love.graphics.setColor(1, 1, 1, 1)
 
     window:draw()
