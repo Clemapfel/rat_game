@@ -5,7 +5,8 @@ rt.FrameType = meta.new_enum({
 })
 
 rt.settings.frame = {
-    thickness = 10 -- px
+    thickness = 5, -- px
+    corner_radius = 10
 }
 
 --- @class rt.Frame
@@ -31,8 +32,13 @@ rt.Frame = meta.new_type("Frame", function(type)
     out._frame_outline_inner:set_color(rt.Palette.BASE_OUTLINE)
     out._frame_outline_outer:set_color(rt.Palette.BASE_OUTLINE)
 
+    local corner_radius = rt.settings.frame.corner_radius
+    out._frame:set_corner_radius(corner_radius)
+    out._frame_outline_outer:set_corner_radius(corner_radius)
+    out._frame_outline_inner:set_corner_radius(corner_radius)
     return out
 end)
+
 
 --- @overload rt.Drawable.draw
 function rt.Frame:draw()
@@ -40,27 +46,35 @@ function rt.Frame:draw()
     if not self:get_is_visible() then return end
 
     if meta.is_widget(self._child) then
+
+        local pos_x, pos_y = self._child:get_position()
+        local w, h = self._child:get_size()
+        local thickness = rt.settings.frame.thickness
+        love.graphics.setScissor(pos_x + thickness, pos_y + thickness, w - 2 * thickness, h - 2 * thickness)
         self._child:draw()
+        love.graphics.setScissor()
+
+        self._frame:draw()
+        --self._frame_outline_inner:draw()
+        self._frame_outline_outer:draw()
     end
-    self._frame:draw()
-    --self._frame_outline_inner:draw()
-    --self._frame_outline_outer:draw()
 end
 
 --- @overload rt.Widget.size_allocate
 function rt.Frame:size_allocate(x, y, width, height)
-    if meta.is_widget(self._child) then
-        self._child:fit_into(rt.AABB(x, y, width, height))
+    if not meta.is_widget(self._child) then
+        return
     end
 
+    self._child:fit_into(rt.AABB(x, y, width, height))
     if self._type == rt.FrameType.RECTANGULAR then
+        local pos_x, pos_y = self._child:get_position()
+        local w, h = self._child:get_size()
 
-        local x, y = self._child:get_position()
-        local w, h = self._child:measure()
-
-        self._frame:resize(rt.AABB(x - 0.5 * width, y - 0.5 * width, w + width, h + width))
-        self._frame_outline_inner:resize(rt.AABB(x - 0.5 * width, y - 0.5 * width, w + width, h + width))
-        self._frame_outline_outer:resize(rt.AABB(x, y, width, height))
+        local thickness = rt.settings.frame.thickness
+        self._frame_outline_outer:resize(rt.AABB(pos_x, pos_y, w, h))
+        self._frame:resize(rt.AABB(pos_x + 0.5 * thickness, pos_y + 0.5 * thickness, w - thickness, h - thickness))
+        self._frame_outline_inner:resize(rt.AABB(pos_x + thickness, pos_y + thickness, w - 2 * thickness, h - 2 * thickness))
     end
 end
 

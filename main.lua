@@ -20,11 +20,12 @@ io.stdout:setvbuf("no") -- makes it so love2d error message is printed to consol
 window = rt.WindowLayout()
 
 layout = rt.SplitLayout()
-left = rt.Spacer(rt.RGBA(1, 0, 1, 1))
-right = rt.Spacer(rt.RGBA(0, 1, 0, 1))
+left = rt.Spacer(rt.RGBA(0.1, 0, 0.1, 1))
+right = rt.Spacer(rt.RGBA(0, 0.1, 0, 1))
 
 layout:set_start_child(left)
 layout:set_end_child(right)
+layout:set_margin(30)
 
 animation = rt.AnimationTimer(rt.seconds(1))
 animation:signal_connect("tick", function(self, value)
@@ -46,7 +47,7 @@ list:push_back(rt.DirectionIndicator(rt.Direction.RIGHT))
 list:push_back(rt.DirectionIndicator(rt.Direction.LEFT))
 list:push_back(rt.DirectionIndicator(rt.Direction.DOWN))
 
-window:set_child(list)
+window:set_child(frame)
 input = rt.add_input_controller(window)
 input:signal_connect("pressed", function(_, button)
     if button == rt.InputButton.A then
@@ -93,7 +94,6 @@ function love.draw()
     love.graphics.setColor(1, 1, 1, 1)
 
     window:draw()
-
 
     function draw_guides()
         local w, h = love.graphics.getWidth(), love.graphics.getHeight()

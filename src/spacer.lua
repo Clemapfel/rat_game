@@ -12,12 +12,10 @@ rt.Spacer = meta.new_type("Spacer", function(color)
 
     local out = meta.new(rt.Spacer, {
         _shape = rt.Rectangle(0, 0, 1, 1),
-        _outline = rt.Rectangle(0, 0, 1, 1),
         _color = color
     }, rt.Drawable, rt.Widget)
     out._shape:set_color(out._color)
-    out._outline:set_color(rt.color_darken(out._color, 0.3))
-    out._outline:set_is_outline(true)
+
     return out
 end)
 
@@ -27,7 +25,6 @@ function rt.Spacer:draw()
     if not self:get_is_visible() then return end
 
     self._shape:draw()
-    self._outline:draw()
 end
 
 --- @overload rt.Widget.size_allocate
@@ -59,7 +56,6 @@ function rt.Spacer:set_color(color)
 
     meta.assert_rgba(rgba)
     self._shape:set_color(rgba)
-    self._outline:set_color(rgba)
 end
 
 --- @brief get color
