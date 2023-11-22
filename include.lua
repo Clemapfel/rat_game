@@ -79,5 +79,8 @@ require "sprite_frame"
 require "sprite_scale"
 require "sprite_levelbar"
 
--- battle
 require "battle/action"
+
+
+require "scene"
+-- require "test

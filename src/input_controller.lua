@@ -7,8 +7,6 @@ rt.settings.input = {
 }
 
 rt.InputHandler = {}
-rt.InputHandler._components = {}
-meta.make_weak(rt.InputHandler._components, false, true)
 
 --- @class rt.InputButton
 rt.InputButton = meta.new_enum({
@@ -498,7 +496,6 @@ function rt.get_input_controller(object)
     meta.assert_object(object)
     return getmetatable(object).components.input
 end
-
 
 --- @brief
 function rt.InputController:set_is_disabled(b)

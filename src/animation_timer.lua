@@ -1,9 +1,11 @@
 --- @class rt.AnimationTimerHandler
-rt.AnimationTimerHandler = {}
-
-rt.AnimationTimerHandler._hash = 1
-rt.AnimationTimerHandler._components = {}
-meta.make_weak(rt.AnimationTimerHandler._components, false, true)
+rt.AnimationTimerHandler = meta.new_type("AnimationTimerHandler", function()
+    local out = meta.new(rt.AnimationTimerHandler, {
+        _components = {}
+    })
+    meta.make_weak(out._components, false, true)
+    return out
+end)
 
 --- @class rt.AnimationTimerState
 rt.AnimationTimerState = meta.new_enum({
@@ -52,18 +54,15 @@ rt.AnimationTimer = meta.new_type("AnimationTimer", function(duration)
         rt.error("In AnimationTimer(): Duration `" .. string(duration) .. "` cannot be negative")
     end
 
-    local hash = rt.AnimationTimerHandler._hash
     local out = meta.new(rt.AnimationTimer, {
         _state = rt.AnimationTimerState.IDLE,
         _duration = duration:as_seconds(),
         _time = 0,
         _timing_function = rt.AnimationTimingFunction.LINEAR,
-        _loop = false,
-        _hash = hash
+        _loop = false
     }, rt.SignalEmitter)
 
-    rt.AnimationTimerHandler._components[hash] = out
-    rt.AnimationTimerHandler._hash = hash + 1
+    rt.current_scene.animation_timer_handler._components[meta.hash(out)] = out
 
     out:signal_add("tick")
     out:signal_add("done")
@@ -74,7 +73,7 @@ end)
 --- @brief advance all animation timers, this uses a stable clock independent of fps
 --- @param delta Number duration of last frame, in seconds
 function rt.AnimationTimerHandler:update(delta)
-    for _, component in pairs(rt.AnimationTimerHandler._components) do
+    for _, component in pairs(rt.current_scene.animation_timer_handler._components) do
         if component:get_state() ~= rt.AnimationTimerState.PLAYING then
             goto continue
         end

@@ -14,7 +14,6 @@ local out_channel = love.thread.getChannel(0)
 local in_channel = love.thread.getChannel(rt.get_thread_id())
 
 while true do
-    ::check_message::
     local message = in_channel:demand()
     meta.assert_enum(message.type, rt.MessageType)
 
@@ -28,7 +27,7 @@ while true do
         local f, parse_error = load(code)
         if meta.is_nil(f) then
             rt.Thread.error(message.future_id, parse_error)
-            goto check_message
+            return
         end
 
         local value = {}
@@ -69,7 +68,7 @@ while true do
 
         local on_catch = function(err)
             rt.Thread.error(message.future_id, err)
-            goto check_message
+            return
         end
 
         try_catch(on_try, on_catch)
@@ -82,7 +81,7 @@ while true do
             local f, parse_error = load(message.value)
             if meta.is_nil(f) then
                 rt.Thread.error(message.future_id, parse_error)
-                goto check_message
+                return
             end
             _G[message.name] = f
         elseif message.is_nil then

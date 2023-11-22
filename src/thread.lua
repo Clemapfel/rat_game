@@ -1,7 +1,3 @@
-rt.threads = {
-    n_threads = 16
-}
-
 --- @class rt.MessageType
 rt.MessageType = meta.new_enum({
     LOAD = "LOAD",          -- master -> thread: cause arbitrary code execution
@@ -14,17 +10,21 @@ rt.MessageType = meta.new_enum({
     KILL = "KILL"          -- master -> thread: cause termination
 })
 
-rt.ThreadPool = {}
-rt.ThreadPool._threads = {} -- thread:get_id() -> thread
-rt.ThreadPool._future_id = 2^16
-rt.ThreadPool._futures = {} -- future:get_id() -> future
-meta.make_weak(rt.ThreadPool._futures, false, true)
+rt.ThreadPool = meta.new_type("ThreadPool", function()
+    local out = meta.new(rt.ThreadPool, {
+        _threads = {}, -- thread:get_id() -> thread
+        _future_id = 2^16,
+        _futures = {} -- future:get_id() -> future
+    })
+    meta.make_weak(out._futures, false, true)
+    return out
+end)
 
 --- @class rt.Thread
 rt.Thread = meta.new_type("Thread", function(id)
     meta.assert_number(id)
     assert(id > 0)
-    if not meta.is_nil(rt.ThreadPool._threads[id]) then
+    if not meta.is_nil(rt.current_scene.thread_pool._threads[id]) then
         rt.error("In Thread(): thread with ID `" .. tostring(id) .. "` already registered")
     end
 
@@ -35,15 +35,15 @@ rt.Thread = meta.new_type("Thread", function(id)
         _native = love.thread.newThread(code)
     })
 
-    rt.ThreadPool._threads[out:get_id()] = out
+    rt.current_scene.thread_pool._threads[out:get_id()] = out
     out._native:start()
     return out
 end)
 
 --- @brief restart the thread with a fresh environment
+--- @param wait Boolean
 function rt.Thread:restart()
     meta.assert_isa(self, rt.Thread)
-
     ::try_again::
     local message = love.thread.getChannel(self:get_id()):push({
         type = rt.MessageType.KILL
@@ -51,6 +51,14 @@ function rt.Thread:restart()
     self._native:wait()
     assert(not self._native:isRunning())
     self._native:start()
+end
+
+--- @brief
+function rt.ThreadPool:restart()
+    meta.assert_isa(self, rt.ThreadPool)
+    for _, thread in pairs(self._thread) do
+        thread:restart()
+    end
 end
 
 --- @brief
@@ -62,14 +70,14 @@ end
 --- @class rt.Future
 rt.Future = meta.new_type("Future", function()
     local out = meta.new(rt.Future, {
-        _id = rt.ThreadPool._future_id,
+        _id = rt.current_scene.thread_pool._future_id,
         _value_delivered = false,
         _value = {}
     }, rt.SignalEmitter)
 
     out:signal_add("delivered")
-    rt.ThreadPool._future_id = rt.ThreadPool._future_id + 1
-    rt.ThreadPool._futures[out._id] = out
+    rt.current_scene.thread_pool._future_id = rt.current_scene.thread_pool._future_id + 1
+    rt.current_scene.thread_pool._futures[out._id] = out
     return out
 end)
 
@@ -92,7 +100,8 @@ function rt.Future:get_value()
 end
 
 --- @brief clear the delivery message queue and supply all futures
-function rt.ThreadPool.update_futures()
+function rt.ThreadPool:update_futures()
+    meta.assert_isa(self, rt.ThreadPool)
     local in_channel = love.thread.getChannel(0)
     while in_channel:getCount() > 0 do
         local message = in_channel:pop()
@@ -100,17 +109,17 @@ function rt.ThreadPool.update_futures()
         meta.assert_enum(message.type, rt.MessageType)
         if message.type == rt.MessageType.DELIVER then
             meta.assert_number(message.future_id, message.thread_id)
-            local future = rt.ThreadPool._futures[message.future_id]
+            local future = rt.current_scene.thread_pool._futures[message.future_id]
 
             if meta.is_nil(future) then
-                -- happens when future goes out of scope before delivery
+                -- future goes out of scope before delivery
                 goto continue
             end
 
             future._value = message.value
             future._value_delivered = true
             future:signal_emit("delivered", future._value)
-            rt.ThreadPool._futures[message.future_id] = nil
+            rt.current_scene.thread_pool._futures[message.future_id] = nil
             println("main deliever `" .. serialize(future._value) .. "` to future #" .. tostring(future:get_id()))
         elseif message.type == rt.MessageType.ERROR then
             meta.assert_number(message.thread_id, message.future_id)

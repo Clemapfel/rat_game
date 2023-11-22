@@ -188,6 +188,7 @@ function rt.VertexShape:draw()
     if not self:get_is_visible() then return end
 
     if self:get_is_visible() then
+        love.graphics.setColor(1, 1, 1, 1)
         love.graphics.draw(self._native)
     end
 end

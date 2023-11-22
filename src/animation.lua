@@ -1,33 +1,38 @@
+--- @class rt.AnimationHandler
+rt.AnimationHandler = meta.new_type("AnimationHandler", function()
+    local out = meta.new(rt.AnimationHandler, {
+        _elapsed = 0,
+        _last_update = love.timer.getTime(),
+        _components = {}
+    })
+    meta.make_weak(out._components, false, true)
+    return out
+end)
 
-rt.AnimationHandler = {}
-rt.AnimationHandler._components = {}
-meta.make_weak(rt.AnimationTimerHandler._components, false, true)
-
-rt.AnimationHandler._elapsed = 0
-rt.AnimationHandler._last_update = love.timer.getTime()
-
-rt.settings.animation = {}
-rt.settings.animation.fps = 24 -- ticks per second
-rt.settings.animation.enabled = true
+rt.settings.animation = {
+    fps = 24,
+    enabled = true
+}
 
 --- @brief [internal] update all Animations
 --- @param delta Number seconds
 function rt.AnimationHandler:update(delta)
+    meta.assert_isa(self, rt.AnimationHandler)
     meta.assert_number(delta)
-    local elapsed = rt.AnimationHandler._elapsed + delta
+    local elapsed = self._elapsed + delta
     local frame_length = 1 / rt.settings.animation.fps
     while elapsed >= frame_length do
         elapsed = elapsed - frame_length
         local now = love.timer.getTime()
         if rt.settings.animation.enabled then
-            local delta = now - rt.AnimationHandler._last_update
-            for _, drawable in pairs(rt.AnimationHandler._components) do
+            local delta = now - self._last_update
+            for _, drawable in pairs(self._components) do
                 drawable:update(delta)
             end
         end
-        rt.AnimationHandler._last_update = now
+        self._last_update = now
     end
-    rt.AnimationHandler._elapsed = elapsed
+    self._elapsed = elapsed
 end
 
 --- @class rt.Animation
@@ -55,9 +60,9 @@ function rt.Animation:set_is_animated(b)
     self._is_animated = b
 
     if b then
-        rt.AnimationHandler._components[meta.hash(self)] = self
+        rt.current_scene.animation_handler._components[meta.hash(self)] = self
     else
-        rt.AnimationHandler._components[meta.hash(self)] = nil
+        rt.current_scene.animation_handler._components[meta.hash(self)] = nil
     end
 end
 

@@ -1,5 +1,4 @@
 require "include"
--- require "test"
 
 function connect_emmy_lua_debugger()
     -- entry point for JetBrains IDE debugger
@@ -17,39 +16,42 @@ io.stdout:setvbuf("no") -- makes it so love2d error message is printed to consol
 
 -- #############################
 
-window = rt.WindowLayout()
+sc.layout = rt.SplitLayout()
+sc.left = rt.Spacer(rt.RGBA(1, 0, 1, 1))
+sc.right = rt.Spacer(rt.RGBA(0, 1, 0, 1))
 
-layout = rt.SplitLayout()
-left = rt.Spacer(rt.RGBA(1, 0, 1, 1))
-right = rt.Spacer(rt.RGBA(0, 1, 0, 1))
+sc.layout:set_start_child(sc.left)
+sc.layout:set_end_child(sc.right)
+sc.layout:set_margin(30)
 
-layout:set_start_child(left)
-layout:set_end_child(right)
-layout:set_margin(30)
+sc.frame = rt.Frame(rt.FrameType.CIRCULAR)
+sc.frame:set_child(sc.layout)
 
-animation = rt.AnimationTimer(rt.seconds(1))
-animation:signal_connect("tick", function(self, value)
-    layout:set_ratio(value)
+sc.indicator = rt.DirectionIndicator(rt.Direction.UP)
+sc.indicator:set_margin(10)
+sc.indicator:set_color(rt.Palette.GREEN)
+
+sc.list = rt.ListLayout(rt.Orientation.VERTICAL)
+sc.list:set_spacing(10)
+sc.list:push_back(rt.DirectionIndicator(rt.Direction.UP))
+sc.list:push_back(rt.DirectionIndicator(rt.Direction.NONE))
+sc.list:push_back(rt.DirectionIndicator(rt.Direction.RIGHT))
+sc.list:push_back(rt.DirectionIndicator(rt.Direction.LEFT))
+sc.list:push_back(rt.DirectionIndicator(rt.Direction.DOWN))
+
+sc.sheet = rt.Spritesheet("assets/sprites", "test_animation")
+sc.sprite = rt.Sprite(sc.sheet, "test_animation")
+sc.sprite:set_is_animated(true)
+sc.sprite:set_should_loop(true)
+rt.current_scene:set_child(sc.sprite)
+
+sc.timer = rt.AnimationTimer(rt.seconds(1))
+sc.timer:signal_connect("tick", function(_, value)
+    --println(value)
 end)
+sc.timer:play()
 
-frame = rt.Frame(rt.FrameType.CIRCULAR)
-frame:set_child(layout)
-
-indicator = rt.DirectionIndicator(rt.Direction.UP)
-indicator:set_margin(10)
-indicator:set_color(rt.Palette.GREEN)
-
-list = rt.ListLayout(rt.Orientation.VERTICAL)
-list:set_spacing(10)
-list:push_back(rt.DirectionIndicator(rt.Direction.UP))
-list:push_back(rt.DirectionIndicator(rt.Direction.NONE))
-list:push_back(rt.DirectionIndicator(rt.Direction.RIGHT))
-list:push_back(rt.DirectionIndicator(rt.Direction.LEFT))
-list:push_back(rt.DirectionIndicator(rt.Direction.DOWN))
-
-window:set_child(frame)
-input = rt.add_input_controller(window)
-input:signal_connect("pressed", function(_, button)
+sc.input:signal_connect("pressed", function(_, button)
     if button == rt.InputButton.A then
         animation:reset()
         animation:play()
@@ -68,33 +70,23 @@ end)
 
 --- @brief startup
 function love.load()
-
     love.window.setMode(love.graphics.getWidth(), love.graphics.getHeight(), {
         resizable = true
     })
     love.window.setTitle("rat_game")
 
-    window:realize()
-    window:fit_into(rt.AABB(1, 1, love.graphics.getWidth()-2, love.graphics.getHeight()-2))
+    rt.current_scene:realize()
 end
 
 --- @brief update tick
 function love.update()
-
-    local delta = love.timer.getDelta()
-    rt.ThreadPool.update_futures(delta)
-    rt.AnimationTimerHandler:update(delta)
-    rt.AnimationHandler:update(delta)
+    rt.current_scene:update(love.timer.getDelta())
 end
 
 --- @brief draw step
 function love.draw()
 
-    local bg_color = rt.Palette.PURPLE_3
-    love.graphics.setBackgroundColor(bg_color.r, bg_color.g, bg_color.b, bg_color.a)
-    love.graphics.setColor(1, 1, 1, 1)
-
-    window:draw()
+    rt.current_scene:draw()
 
     function draw_guides()
         local w, h = love.graphics.getWidth(), love.graphics.getHeight()
