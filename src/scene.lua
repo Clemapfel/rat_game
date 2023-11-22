@@ -1,19 +1,24 @@
 --- @class rt.Scene
 rt.Scene = meta.new_type("Scene", function()
-    local out = meta.new(rt.Scene, {
-        _internal = {
-            window = rt.WindowLayout(),
-            skybox = rt.Palette.PURPLE
-        },
-        animation_handler = rt.AnimationHandler(),
-        animation_timer_handler = rt.AnimationTimerHandler(),
-        input = {}
-    }, rt.Drawable, rt.Widget)
-    out.input = rt.add_input_controller(out)
-    return out
+
+    local scene = meta.new(rt.Scene, rt.Drawable, rt.Widget)
+
+    -- use regular user setters, but retain type info
+    local metatable = getmetatable(scene)
+    scene.__index = nil
+    scene.__newindex = nil
+
+    scene._internal = {
+        window = rt.WindowLayout(),
+        skybox = rt.Palette.PURPLE
+    }
+    scene.animation_handler = rt.AnimationHandler()
+    scene.animation_timer_handler = rt.AnimationTimerHandler()
+    scene.input = rt.add_input_controller(scene)
+    return scene
 end)
 
-rt.Scene.thread_pool = rt.ThreadPool() -- static variable
+rt.Scene.thread_pool = rt.ThreadPool() -- static, shared by all scenes
 
 --- @brief set top-level child
 function rt.Scene:set_child(child)
