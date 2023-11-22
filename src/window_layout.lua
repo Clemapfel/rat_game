@@ -32,7 +32,7 @@ function rt.WindowLayout:set_child(child)
     meta.assert_isa(self, rt.WindowLayout)
     meta.assert_isa(child, rt.Widget)
 
-    if not meta.is_nil(self._child) and meta.isa(self._child, rt.Widget) then
+    if not meta.is_nil(self._child) and meta.is_widget(self._child) then
         self._child:set_parent(nil)
     end
 
@@ -64,7 +64,7 @@ end
 --- @overload rt.Drawable.draw
 function rt.WindowLayout:draw()
     meta.assert_isa(self, rt.WindowLayout)
-    if self:get_is_visible() and meta.isa(self._child, rt.Widget) then
+    if self:get_is_visible() and meta.is_widget(self._child) then
         self._child:draw()
     end
 end
@@ -72,7 +72,7 @@ end
 --- @overload rt.Widget.size_allocate
 function rt.WindowLayout:size_allocate(x, y, width, height)
     meta.assert_isa(self, rt.WindowLayout)
-    if meta.isa(self._child, rt.Widget) then
+    if meta.is_widget(self._child) then
         self._child:fit_into(rt.AABB(x, y, width, height))
     end
 end
@@ -89,7 +89,7 @@ function rt.WindowLayout:realize()
     if self:get_is_realized() then return end
 
     self._realized = true
-    if meta.isa(self._child, rt.Widget) then
+    if meta.is_widget(self._child) then
         self._child:realize()
     end
 end

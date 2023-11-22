@@ -21,7 +21,7 @@ end
 --- @overload rt.Drawabl.draw
 function rt.TransitionLayout:draw()
     meta.assert_isa(self, rt.TransitionLayout)
-    if meta.isa(self._child, rt.Widget) then
+    if meta.is_widget(self._child) then
         self._child:draw()
     end
 end
@@ -35,7 +35,7 @@ end
 --- @overload rt.Widget.size_allocate
 function rt.TransitionLayout:size_allocate(x, y, width, height)
     meta.assert_isa(self, rt.TransitionLayout)
-    if meta.isa(self._child, rt.Widget) then
+    if meta.is_widget(self._child) then
         child:fit_into(x, y, self._current_w, self._current_h)
     end
 end
@@ -43,7 +43,7 @@ end
 --- @overload rt.Widget.realize
 function rt.TransitionLayout:realize()
     meta.assert_isa(self, rt.TransitionLayout)
-    if meta.isa(self._child, rt.Widget) then
+    if meta.is_widget(self._child) then
         self._child:realize()
     end
 end
@@ -54,7 +54,7 @@ function rt.TransitionLayout:set_child(child)
     meta.assert_isa(self, rt.TransitionLayout)
     meta.assert_isa(child, rt.Widget)
 
-    if not meta.is_nil(self._child) and meta.isa(self._child, rt.Widget) then
+    if not meta.is_nil(self._child) and meta.is_widget(self._child) then
         self._child:set_parent(nil)
     end
 

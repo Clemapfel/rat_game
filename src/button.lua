@@ -52,7 +52,7 @@ function rt.Button:draw()
     self._base:draw()
     self._outline:draw()
 
-    if meta.isa(self._child, rt.Widget) then
+    if meta.is_widget(self._child) then
         self._child:draw()
     end
 
@@ -70,7 +70,7 @@ function rt.Button:size_allocate(x, y, width, height)
     self._overlay_shadow:set_position(x, y)
     self._overlay_shadow:set_size(width, height)
 
-    if meta.isa(self._child, rt.Widget) then
+    if meta.is_widget(self._child) then
         self._child:fit_into(rt.AABB(x + 5, y + 5, width - 10, height - 10))
     end
 end
@@ -81,7 +81,7 @@ function rt.Button:set_child(child)
     meta.assert_isa(self, rt.Button)
     meta.assert_isa(child, rt.Widget)
 
-    if not meta.is_nil(self._child) and meta.isa(self._child, rt.Widget) then
+    if not meta.is_nil(self._child) and meta.is_widget(self._child) then
         self._child:set_parent(nil)
     end
 
@@ -98,7 +98,7 @@ end
 function rt.Button:realize()
     meta.assert_isa(self, rt.Button)
 
-    if meta.isa(self._child, rt.Widget) then
+    if meta.is_widget(self._child) then
         self._child:realize()
     end
     rt.Widget.realize(self)

@@ -130,7 +130,7 @@ end
 --- @overload rt.Widget.size_allocate
 function rt.TooltipLayout:size_allocate(x, y, width, height)
     meta.assert_isa(self, rt.TooltipLayout)
-    if meta.isa(self._child, rt.Widget) then
+    if meta.is_widget(self._child) then
         self._child:fit_into(rt.AABB(x, y, width, height))
     end
 

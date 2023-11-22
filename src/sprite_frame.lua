@@ -35,7 +35,7 @@ function rt.SpriteFrame:set_child(child)
     meta.assert_isa(self, rt.SpriteFrame)
     meta.assert_isa(self, rt.Widget)
 
-    if not meta.is_nil(self._child) and meta.isa(self._child, rt.Widget) then
+    if not meta.is_nil(self._child) and meta.is_widget(self._child) then
         self._child:set_parent(nil)
     end
 
@@ -67,7 +67,7 @@ end
 --- @overload rt.e.draw
 function rt.SpriteFrame:draw()
     meta.assert_isa(self, rt.SpriteFrame)
-    if self:get_is_visible() and meta.isa(self._child, rt.Widget) then
+    if self:get_is_visible() and meta.is_widget(self._child) then
         self._child:draw()
     end
 
@@ -101,7 +101,7 @@ function rt.SpriteFrame:size_allocate(x, y, width, height)
     self._bottom_left:fit_into(rt.AABB(x, y + height - fh, fw, fh))
     self._left:fit_into(rt.AABB(x, y + fh, fw, height - 2 * fw))
 
-    if meta.isa(self._child, rt.Widget) then
+    if meta.is_widget(self._child) then
         self._child:fit_into(rt.AABB(x, y, width, height))
     end
 end
@@ -127,7 +127,7 @@ function rt.SpriteFrame:realize()
     self._bottom_left:realize()
     self._left:realize()
 
-    if meta.isa(self._child, rt.Widget) then
+    if meta.is_widget(self._child) then
         self._child:realize()
     end
 end

@@ -3,13 +3,14 @@
 --- @varag rt.Widget
 rt.ListLayout = meta.new_type("ListLayout", function(orientation, ...)
     if meta.is_nil(orientation) then
-        orientation = rt.Orientation.VERTICAL
+        orientation = rt.Orientation.HORIZONTAL
     end
     meta.assert_enum(orientation, rt.Orientation)
 
     local out = meta.new(rt.ListLayout, {
         _children = rt.List(),
-        _orientation = rt.Orientation
+        _orientation = orientation,
+        _spacing = 0,
     }, rt.Drawable, rt.Widget)
 
     for _, x in pairs({...}) do
@@ -31,54 +32,50 @@ end
 --- @overlay rt.Widget.size_allocate
 function rt.ListLayout:size_allocate(x, y, width, height)
     meta.assert_isa(self, rt.ListLayout)
-    self._bounds = rt.AABB(x, y, width, height)
-    if self:get_orientation() == rt.Orientation.HORIZONTAL then
-        if self:get_expand_horizontally() then
-            local width_sum = 0
-            for _, child in pairs(self._children) do
-                local w, _ = child:measure()
-                if w > 1 then
-                    width_sum = width_sum + w
-                end
+    local n_children = self._children:size()
+    if self._orientation == rt.Orientation.HORIZONTAL then
+
+        -- measure final size of all children after expansion
+        local child_w = 0
+        for _, child in pairs(self._children) do
+            local w, h = child:measure()
+            if child:get_expand_horizontally() then
+                w = math.max(width / n_children, w)
+            end
+            child_w = child_w + w
+        end
+
+        local child_x = x + 0.5 * width - 0.5 * child_w
+        for _, child in pairs(self._children) do
+            local w, h = child:measure()
+            if child:get_expand_horizontally() then
+                w = math.max((width - (n_children - 1) * self._spacing) / n_children, w)
             end
 
-            local target_w = (width - width_sum) / #self._children
-            for _, child in pairs(self._children) do
-                local measure_w, _ = child:measure()
-                local final_w = math.max(measure_w, target_w)
-                child:fit_into(rt.AABB(x, y, final_w, height))
-                x = x + final_w
-            end
-        else
-            for _, child in pairs(self._children) do
-                local w, h = child:measure()
-                child:fit_into(rt.AABB(x, y, w, height))
-                x = x + w
-            end
+            child:fit_into(rt.AABB(
+                child_x, y,
+                w, ternary(self:get_expand_vertically(), height, h))
+            )
+            child_x = child_x + w + self._spacing
         end
     else
-        if self:get_expand_vertically() then
-            local height_sum = 0
-            for _, child in pairs(self._children) do
-                local _, h = child:measure()
-                if h > 1 then
-                    height_sum = height_sum + h
-                end
+        local child_h = 0
+        for _, child in pairs(self._children) do
+            local w, h = child:measure()
+            if child:get_expand_vertically() then
+                h = math.max(height / n_children, h)
             end
+            child_h = child_h + h
+        end
 
-            local target_h = (height - height_sum) / #self._children
-            for _, child in pairs(self._children) do
-                local _, measure_h = child:measure()
-                local final_h = math.max(measure_h, target_h)
-                child:fit_into(rt.AABB(x, y, width, final_h))
-                y = y + final_h
+        local child_y = y + 0.5 * height - 0.5 * child_h
+        for _, child in pairs(self._children) do
+            local w, h = child:measure()
+            if child:get_expand_vertically() then
+                h = math.max((height - (n_children - 1) * self._spacing)  / n_children, h)
             end
-        else
-            for _, child in pairs(self._children) do
-                local w, h = child:measure()
-                child:fit_into(rt.AABB(x, y, width, h))
-                y = y + h
-            end
+            child:fit_into(rt.AABB(x, child_y, width, h))
+            child_y = child_y + h + self._spacing
         end
     end
 end
@@ -219,6 +216,23 @@ end
 function rt.ListLayout:get_orientation()
     meta.assert_isa(self, rt.ListLayout)
     return self._orientation
+end
+
+--- @brief set spacing
+function rt.ListLayout:set_spacing(spacing)
+    meta.assert_isa(self, rt.ListLayout)
+    meta.assert_number(spacing)
+    spacing = clamp(spacing, 0)
+    if self._spacing ~= spacing then
+        self._spacing = spacing
+        self:reformat()
+    end
+end
+
+--- @brief get spacing
+function rt.ListLayout:get_spacing()
+    meta.assert_isa(self, rt.ListLayout)
+    return self._spacing
 end
 
 --- @brief test ListLayout

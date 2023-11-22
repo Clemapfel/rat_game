@@ -24,7 +24,7 @@ function rt.AspectLayout:set_child(child)
     meta.assert_isa(self, rt.AspectLayout)
     meta.assert_isa(self, rt.Widget)
 
-    if meta.isa(self._child, rt.Widget) then
+    if meta.is_widget(self._child) then
         self._child:set_parent(nil)
     end
 
@@ -47,7 +47,7 @@ end
 --- @brief remove child
 function rt.AspectLayout:remove_child()
     meta.assert_isa(self, rt.AspectLayout)
-    if meta.isa(self._child, rt.Widget) then
+    if meta.is_widget(self._child) then
         self._child:set_parent(nil)
         self._child = nil
     end
@@ -56,7 +56,7 @@ end
 --- @overload rt.Drawable.draw
 function rt.AspectLayout:draw()
     meta.assert_isa(self, rt.AspectLayout)
-    if self:get_is_visible() and meta.isa(self._child, rt.Widget) then
+    if self:get_is_visible() and meta.is_widget(self._child) then
         self._child:draw()
     end
 end
@@ -66,7 +66,7 @@ function rt.AspectLayout:size_allocate(x, y, width, height)
     meta.assert_isa(self, rt.AspectLayout)
     self._width = width
     self._height = height
-    if not meta.isa(self._child, rt.Widget) then return end
+    if not meta.is_widget(self._child) then return end
 
     local child_x, child_y, child_w, child_h
     if height < width then
@@ -80,14 +80,14 @@ function rt.AspectLayout:size_allocate(x, y, width, height)
     local child_x = x + (width - child_w) / 2
     local child_y = y + (height - child_h) / 2
 
-    if meta.isa(self._child, rt.Widget) then
+    if meta.is_widget(self._child) then
         self._child:fit_into(rt.AABB(child_x, child_y, child_w, child_h))
     end
 end
 
 --- @overload rt.Widget.measure
 function rt.AspectLayout:measure()
-    if not meta.isa(self._child, rt.Widget) then return 0, 0 end
+    if not meta.is_widget(self._child) then return 0, 0 end
     return self._child:measure()
 end
 
@@ -97,7 +97,7 @@ function rt.AspectLayout:realize()
 
     self._realized = true
 
-    if meta.isa(self._child, rt.Widget) then
+    if meta.is_widget(self._child) then
         self._child:realize()
     end
 

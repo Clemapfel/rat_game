@@ -133,33 +133,6 @@ function meta.typeof(x)
     return out
 end
 
---- @brief check if type of object is as given
---- @param type meta.Type (or String)
---- @return Boolean
-function meta.isa(x, type)
-
-    local typename = type
-    if meta.typeof(type) == "Type" then
-        typename = type._typename
-    else
-        typename = type
-    end
-
-    if meta.typeof(x) == typename then
-        return true
-    end
-
-    local metatable = getmetatable(x)
-    if not meta.is_nil(metatable) and not meta.is_nil(metatable.super)then
-        for _, super in pairs(metatable.super) do
-            if super == typename then
-                return true
-            end
-        end
-    end
-    return false
-end
-
 --- @brief check if instance has type as super
 function meta.inherits(x, super)
     meta.assert_object(x)
@@ -344,7 +317,6 @@ meta.Object = "Object"
 function meta.new(type, fields, ...)
 
     meta.assert_isa(type, meta.Type)
-
     if meta.is_nil(fields) then
         fields = {}
     else
@@ -429,6 +401,34 @@ function meta.new_enum(fields)
     return out
 end
 
+
+--- @brief check if type of object is as given
+--- @param type meta.Type (or String)
+--- @return Boolean
+function meta.isa(x, type)
+
+    local typename = type
+    if meta.typeof(type) == "Type" then
+        typename = type._typename
+    else
+        typename = type
+    end
+
+    if meta.typeof(x) == typename then
+        return true
+    end
+
+    local metatable = getmetatable(x)
+    if not meta.is_nil(metatable) and not meta.is_nil(metatable.super)then
+        for _, super in pairs(metatable.super) do
+            if super == typename then
+                return true
+            end
+        end
+    end
+    return false
+end
+
 --- @brief check if value is part of enum
 --- @param x any
 --- @param enum meta.Enum
@@ -469,13 +469,46 @@ function meta._install_inheritance(instance, type)
     end
 end
 
+--- @brief throw if object is not of given type
+--- @param x any
+--- @param type meta.Type
+function meta.assert_isa(x, type)
+    assert(not meta.is_nil(type))
+    meta._assert_aux(meta.isa(x, type), x, type._typename)
+end
+meta.make_debug_only("meta.assert_isa")
+
 --- @brief [internal] add meta.is_* and meta.assert_* given type
-function meta._define_type_assertion(type)
-    meta.assert_isa(type, rt.Type)
-    load("meta.assert_" .. )()
+function meta._define_type_assertion(typename)
+
+    if #typename == 0 or typename == "nil" or typename == "number" or typename == "table" or typename == "boolean" or typename == "function" or typename == "userdata" then return end
+
+    function string.to_snake_case(str, screaming)
+        local out = {""}
+        table.insert(out, string.lower(string.sub(str, 1, 1)))
+        for i = 2, #str do
+            local c = string.sub(str, i, i)
+            if string.is_upper(c) then
+                table.insert(out, "_")
+            end
+            table.insert(out, ternary(screaming == true, string.upper(c), string.lower(c)))
+        end
+        return table.concat(out)
+    end
+
+    local assert_name = "assert_" .. string.to_snake_case(typename)
+    local is_name = "is_" .. string.to_snake_case(typename)
+
+    if type(meta[assert_name] == "nil") then
+        load("function meta." .. assert_name .. "(x)\n meta.assert_isa(x, meta.types[\"" .. typename .. "\"])\nend")()
+    end
+
+    if type(meta[is_name] == "nil") then
+        load("function meta." .. is_name .. "(x)\n return meta.isa(x, meta.types[\"" .. typename .. "\"])\nend")()
+    end
 end
 
---- @brief create a new type with given constructor
+--- @brief create a new type with given constructor, this also defines `meta.is_*` and `meta.assert_*` for typename
 --- @param typename String
 --- @param ctor Function
 --- @param dtor Function
@@ -501,6 +534,7 @@ function meta.new_type(typename, ctor, dtor)
         rt.error("In meta.new_type: A type with name `" .. typename .. "` already exists.")
     end
     meta.types[typename] = out
+    meta._define_type_assertion(typename)
     return out
 end
 
@@ -558,15 +592,6 @@ end)
 meta.Number = meta.new_type("number", function()
     return 0
 end)
-
---- @brief throw if object is not of given type
---- @param x any
---- @param type meta.Type
-function meta.assert_isa(x, type)
-    assert(not meta.is_nil(type))
-    meta._assert_aux(meta.isa(x, type), x, type._typename)
-end
-meta.make_debug_only("meta.assert_isa")
 
 --- @brief make table weak, meaning it does not increase the reference count of its values
 --- @param x Table

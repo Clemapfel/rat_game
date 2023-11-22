@@ -39,7 +39,7 @@ function rt.Frame:draw()
     meta.assert_isa(self, rt.Frame)
     if not self:get_is_visible() then return end
 
-    if meta.isa(self._child, rt.Widget) then
+    if meta.is_widget(self._child) then
         self._child:draw()
     end
     self._frame:draw()
@@ -49,7 +49,7 @@ end
 
 --- @overload rt.Widget.size_allocate
 function rt.Frame:size_allocate(x, y, width, height)
-    if meta.isa(self._child, rt.Widget) then
+    if meta.is_widget(self._child) then
         self._child:fit_into(rt.AABB(x, y, width, height))
     end
 
@@ -67,7 +67,7 @@ end
 --- @overload rt.Widget.realize
 function rt.Frame:realize()
     meta.assert_isa(self, rt.Frame)
-    if meta.isa(self._child, rt.Widget) then
+    if meta.is_widget(self._child) then
         self._child:realize()
     end
     rt.Widget.realize(self)
@@ -79,7 +79,7 @@ function rt.Frame:set_child(child)
     meta.assert_isa(self, rt.Frame)
     meta.assert_isa(child, rt.Widget)
 
-    if not meta.is_nil(self._child) and meta.isa(self._child, rt.Widget) then
+    if not meta.is_nil(self._child) and meta.is_widget(self._child) then
         self._child:set_parent(nil)
     end
 

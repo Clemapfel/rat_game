@@ -51,7 +51,13 @@ function rt.test.common()
     assert(math.round(0.5) == 1)
     assert(math.round(0.5 - 1 / 2^32) == 0)
     assert(math.round(0.5 + 1 / 2^32) == 1)
+
+    local camel = "CamelCaseTest"
+    local snake = "camel_case_test"
+
+    assert(string.to_snake_case(camel) == snake)
 end
+
 
 --- @brief [internal] test meta
 function rt.test.meta()

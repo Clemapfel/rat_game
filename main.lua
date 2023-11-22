@@ -1,5 +1,5 @@
 require "include"
---require "test"
+-- require "test"
 
 function connect_emmy_lua_debugger()
     -- entry point for JetBrains IDE debugger
@@ -16,6 +16,7 @@ try_catch(connect_emmy_lua_debugger)
 io.stdout:setvbuf("no") -- makes it so love2d error message is printed to console immediately
 
 -- #############################
+
 
 window = rt.WindowLayout()
 
@@ -38,10 +39,13 @@ indicator = rt.DirectionIndicator(rt.Direction.UP)
 indicator:set_margin(10)
 indicator:set_color(rt.Palette.GREEN)
 
-list = rt.ListLayout()
+list = rt.ListLayout(rt.Orientation.VERTICAL)
+list:set_spacing(10)
 list:push_back(rt.DirectionIndicator(rt.Direction.UP))
 list:push_back(rt.DirectionIndicator(rt.Direction.NONE))
 list:push_back(rt.DirectionIndicator(rt.Direction.RIGHT))
+list:push_back(rt.DirectionIndicator(rt.Direction.LEFT))
+list:push_back(rt.DirectionIndicator(rt.Direction.DOWN))
 
 window:set_child(list)
 input = rt.add_input_controller(window)

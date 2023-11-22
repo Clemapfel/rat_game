@@ -351,25 +351,22 @@ function string.capitalize(str)
     return string.upper(string.sub(str, 1, 1)) .. string.sub(str, 2, string.len(str))
 end
 
---- @brief make all letters lower case
-function string.to_lower(str)
-    assert(type(str) == "string")
-    local out = {""}
-    for i = 1, #str do
-        table.insert(out, string.lower(string.sub(str, i, i)))
-    end
-    return table.concat(out)
+--- @brief check if character is upper case or non-letter
+function string.is_lower(str)
+    assert(type(str) == "string" and #str == 1)
+    return string.find(str, "[a-z]") ~= nil
 end
 
---- @brief make all letters upper case
-function string.to_lower(str)
-    assert(type(str) == "string")
-    local out = {""}
-    for i = 1, #str do
-        table.insert(out, string.upper(string.sub(str, i, i)))
-    end
-    return table.concat(out)
+--- @brief check if character is lower case
+function string.is_upper(str)
+    assert(type(str) == "string" and #str == 1)
+    return not string.is_lower(str)
 end
+
+
+
+
+--- @brief convert snake_case to CamelCase
 
 --- @brief split along character
 function string.split(str, separator)
