@@ -32,7 +32,7 @@ animation:signal_connect("tick", function(self, value)
     layout:set_ratio(value)
 end)
 
-frame = rt.Frame()
+frame = rt.Frame(rt.FrameType.CIRCULAR)
 frame:set_child(layout)
 
 indicator = rt.DirectionIndicator(rt.Direction.UP)

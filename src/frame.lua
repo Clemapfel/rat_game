@@ -1,11 +1,12 @@
 --- @class rt.FrameType
 rt.FrameType = meta.new_enum({
     RECTANGULAR = 1,
-    CIRCULAR = 2
+    CIRCULAR = 2,
+    ELLIPTICAL = 3
 })
 
 rt.settings.frame = {
-    thickness = 5, -- px
+    thickness = 4, -- px
     corner_radius = 10
 }
 
@@ -17,6 +18,7 @@ rt.Frame = meta.new_type("Frame", function(type)
     local out = meta.new(rt.Frame, {
         _type = type,
         _child = {},
+        _stencil_mask = ternary(type == rt.FrameType.RECTANGULAR, rt.Rectangle(0, 0, 1, 1), rt.Circle(0, 0, 1)),
         _frame_thickness = rt.settings.frame.thickness,
         _frame = ternary(type == rt.FrameType.RECTANGULAR, rt.Rectangle(0, 0, 1, 1), rt.Circle(0, 0, 1)),
         _frame_outline = ternary(type == rt.FrameType.RECTANGULAR, rt.Rectangle(0, 0, 1, 1), rt.Circle(0, 0, 1)),
@@ -30,9 +32,12 @@ rt.Frame = meta.new_type("Frame", function(type)
     out._frame:set_color(rt.Palette.FOREGROUND)
     out._frame_outline:set_color(rt.Palette.BASE_OUTLINE)
 
-    local corner_radius = rt.settings.frame.corner_radius
-    out._frame:set_corner_radius(corner_radius)
-    out._frame_outline:set_corner_radius(corner_radius)
+    if out._type == rt.FrameType.RECTANGULAR then
+        local corner_radius = rt.settings.frame.corner_radius
+        out._frame:set_corner_radius(corner_radius)
+        out._frame_outline:set_corner_radius(corner_radius)
+        out._stencil_mask:set_corner_radius(corner_radius)
+    end
     return out
 end)
 
@@ -48,18 +53,19 @@ function rt.Frame:draw()
         local w, h = self._child:get_size()
         local thickness = rt.settings.frame.thickness
 
-
+        -- draw child with corners masked away
+        local stencil_value = 255
         love.graphics.stencil(function()
-            love.graphics.setColor(1, 1, 1, 1)
-            love.graphics.rectangle("fill", 225, 200, 350, 300)
-        end, "replace", 255)
-        love.graphics.setStencilTest("less", 255)
+            self._stencil_mask:draw()
+        end, "replace", stencil_value, true)
+        love.graphics.setStencilTest("equal", stencil_value)
 
         self._child:draw()
-        self._frame_outline:draw()
-        self._frame:draw()
 
         love.graphics.setStencilTest()
+
+        self._frame_outline:draw()
+        self._frame:draw()
     end
 end
 
@@ -70,13 +76,26 @@ function rt.Frame:size_allocate(x, y, width, height)
     end
 
     self._child:fit_into(rt.AABB(x, y, width, height))
-    if self._type == rt.FrameType.RECTANGULAR then
-        local pos_x, pos_y = self._child:get_position()
-        local w, h = self._child:get_size()
 
-        local thickness = rt.settings.frame.thickness
+    local pos_x, pos_y = self._child:get_position()
+    local w, h = self._child:get_size()
+    local thickness = rt.settings.frame.thickness
+
+    if self._type == rt.FrameType.RECTANGULAR then
         self._frame:resize(rt.AABB(pos_x + 0.5 * thickness, pos_y + 0.5 * thickness, w - thickness, h - thickness))
         self._frame_outline:resize(rt.AABB(pos_x + 0.5 * thickness, pos_y + 0.5 * thickness, w - thickness, h - thickness))
+        self._stencil_mask:resize(rt.AABB(pos_x + 0.5 * thickness, pos_y + 0.5 * thickness, w - thickness, h - thickness))
+    elseif self._type == rt.FrameType.CIRCULAR then
+        local radius = math.min(w, h) / 2 - 0.5 * thickness
+        self._frame:resize(pos_x + 0.5 * w, pos_y + 0.5 * h, radius)
+        self._frame_outline:resize(pos_x + 0.5 * w, pos_y + 0.5 * h, radius)
+        self._stencil_mask:resize(pos_x + 0.5 * w, pos_y + 0.5 * h, radius)
+    elseif self._type == rt.FrameType.ELLIPTICAL then
+        local x_radius = w / 2 - 0.5 * thickness
+        local y_radius = h / 2 - 0.5 * thickness
+        self._frame:resize(pos_x + 0.5 * w, pos_y + 0.5 * h, x_radius, y_radius)
+        self._frame_outline:resize(pos_x + 0.5 * w, pos_y + 0.5 * h, x_radius, y_radius)
+        self._stencil_mask:resize(pos_x + 0.5 * w, pos_y + 0.5 * h, x_radius, y_radius)
     end
 end
 
