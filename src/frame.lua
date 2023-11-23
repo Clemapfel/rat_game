@@ -22,6 +22,7 @@ rt.Frame = meta.new_type("Frame", function(type)
         _frame_thickness = rt.settings.frame.thickness,
         _frame = ternary(type == rt.FrameType.RECTANGULAR, rt.Rectangle(0, 0, 1, 1), rt.Circle(0, 0, 1)),
         _frame_outline = ternary(type == rt.FrameType.RECTANGULAR, rt.Rectangle(0, 0, 1, 1), rt.Circle(0, 0, 1)),
+        _color = rt.Palette.FOREGROUND,
     }, rt.Drawable, rt.Widget)
 
     out._frame:set_is_outline(true)
@@ -29,7 +30,7 @@ rt.Frame = meta.new_type("Frame", function(type)
     out._frame_outline:set_line_width(rt.settings.frame.thickness + 2)
     out._frame_outline:set_is_outline(true)
 
-    out._frame:set_color(rt.Palette.FOREGROUND)
+    out._frame:set_color(out._color)
     out._frame_outline:set_color(rt.Palette.BASE_OUTLINE)
 
     if out._type == rt.FrameType.RECTANGULAR then
@@ -142,3 +143,21 @@ function rt.Frame:remove_child()
         self._child = nil
     end
 end
+
+--- @brief
+function rt.Frame:set_color(color)
+    meta.assert_isa(self, rt.Frame)
+    if meta.is_hsva(color) then
+        color = rt.rgba_to_hsva(color)
+    end
+    meta.assert_rgba(color)
+    self._color = color
+    self._frame:set_color(self._color)
+end
+
+--- @brief
+function rt.Frame:get_color()
+    meta.assert_isa(self, rt.Frame)
+    return self._frame
+end
+

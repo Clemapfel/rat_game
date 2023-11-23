@@ -67,7 +67,7 @@ end
 function rt.OverlayLayout:remove_base_child()
     meta.assert_isa(self, rt.OverlayLayout)
 
-    if not meta.is_nil(self._base_child) then
+    if meta.is_widget(self._base_child) then
         self._base_child:set_parent(nil)
         self._base_child = nil
     end

@@ -83,6 +83,7 @@ require "battle/action"
 require "battle/equipment"
 
 require "battle/equipment_tooltip"
+require "battle/equipment_slot"
 
 require "scene"
 -- require "test

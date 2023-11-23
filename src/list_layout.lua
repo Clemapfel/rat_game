@@ -87,7 +87,7 @@ function rt.ListLayout:measure()
     local h_sum = 0
     local h_max = NEGATIVE_INFINITY
 
-    for _, child in pairs(children) do
+    for _, child in pairs(self._children) do
         local w, h = child:measure()
         w_sum = w_sum + w
         h_sum = h_sum + h
