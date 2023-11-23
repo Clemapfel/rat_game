@@ -37,7 +37,7 @@ bt.EquipmentSlot = meta.new_type("EquipmentSlot", function(equipment)
 
         _indicator_box = rt.BoxLayout(rt.Orientation.VERTICAL),
 
-        _main = rt.BoxLayout()
+        _main = rt.SplitLayout()
 
     }, rt.Drawable, rt.Widget)
 
@@ -66,8 +66,8 @@ bt.EquipmentSlot = meta.new_type("EquipmentSlot", function(equipment)
 
     out._indicator_box:set_horizontal_alignment(rt.Alignment.END)
     out._sprite_frame:set_horizontal_alignment(rt.Alignment.START)
-    out._main:push_back(out._sprite_frame)
-    out._main:push_back(out._indicator_box)
+    out._main:set_start_child(out._sprite_frame)
+    out._main:set_end_child(out._indicator_box)
 
     return out
 end)

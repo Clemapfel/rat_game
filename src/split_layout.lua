@@ -1,11 +1,25 @@
+rt.settings.split_layout = {
+    divider_width = rt.settings.margin_unit
+}
+
 --- @class rt.SplitLayout
 rt.SplitLayout = meta.new_type("SplitLayout", function()
     local out = meta.new(rt.SplitLayout, {
         _start_child = {},
         _end_child = {},
         _orientation = rt.Orientation.HORIZONTAL,
-        _ratio = 0.5 -- start to end child
+        _draw_divider = true,
+        _divider_base = rt.Rectangle(0, 0, 1, 1),
+        _divider_outline = rt.Rectangle(0, 0, 1, 1),
+        _ratio = 0.5, -- start to end child
     }, rt.Drawable, rt.Widget)
+
+    out._divider_base:set_color(rt.Palette.BASE)
+    out._divider_outline:set_color(rt.Palette.BASE_OUTLINE)
+    out._divider_outline:set_is_outline(true)
+
+    out._divider_base:set_corner_radius(rt.settings.margin_unit)
+    out._divider_outline:set_corner_radius(rt.settings.margin_unit)
     return out
 end)
 
@@ -16,6 +30,11 @@ function rt.SplitLayout:draw()
 
     self._start_child:draw()
     self._end_child:draw()
+
+    if self._draw_divider == true then
+        self._divider_base:draw()
+        self._divider_outline:draw()
+    end
 end
 
 --- @overload rt.Widget.size_allocate
@@ -28,11 +47,18 @@ function rt.SplitLayout:size_allocate(x, y, width, height)
     elseif not has_start and has_end then
         self._end_child:fit_into(x, y, width, height)
     else
+        local divider_size = rt.settings.split_layout.divider_width
         if self._orientation == rt.Orientation.HORIZONTAL then
-            local left_width = self._ratio * width
-            local right_width = (1 - self._ratio) * width
+            local left_width = self._ratio * width - 0.5 * divider_size
+            local right_width = (1 - self._ratio) * width - 0.5 * divider_size
             self._start_child:fit_into(rt.AABB(x, y, left_width, height))
-            self._end_child:fit_into(rt.AABB(x + left_width, y, right_width, height))
+
+            local divider_area = rt.AABB(x + left_width, y, divider_size, height)
+            self._divider_base:resize(divider_area)
+            self._divider_outline:resize(divider_area)
+
+            self._end_child:fit_into(rt.AABB(x + left_width + divider_size, y, right_width, height))
+
         else
             local top_height = self._ratio * height
             local bottom_height = (1 - self._ratio) * height
