@@ -25,7 +25,7 @@ bt.Action.can_target_self = true
 bt.Action.max_n_uses = POSITIVE_INFINITY
 
 -- cleartext name
-bt.Action.name = "ERROR"
+bt.Action.name = "ERROR_ACTION"
 
 -- clear text effect
 bt.Action.effect_text = "No effect."
@@ -41,6 +41,7 @@ bt.Action.animation_id = "default"
 
 --- @class bt.Move
 bt.Move = meta.new_type("Move", function(id)
+    meta.assert_string(id)
     local action = bt.Action(id)
     return meta.new(bt.Move, {
         action = action,
@@ -50,6 +51,8 @@ end)
 
 --- @class bt.Consumable
 bt.Consumable = meta.new_type("Consumable", function(id, n_stacks)
+    meta.assert_string(id)
+    meta.assert_number(n_stacks)
     local action = bt.Action(id)
     return meta.new(bt.Consumable, {
         action = action,

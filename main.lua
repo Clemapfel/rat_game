@@ -18,40 +18,9 @@ io.stdout:setvbuf("no") -- makes it so love2d error message is printed to consol
 
 rt.add_scene("debug")
 
-env.layout = rt.SplitLayout()
-env.left = rt.Spacer(rt.RGBA(1, 0, 1, 1))
-env.right = rt.Spacer(rt.RGBA(0, 1, 0, 1))
-
-env.layout:set_start_child(env.left)
-env.layout:set_end_child(env.right)
-env.layout:set_margin(30)
-
-env.frame = rt.Frame(rt.FrameType.CIRCULAR)
-env.frame:set_child(env.layout)
-
-env.indicator = rt.DirectionIndicator(rt.Direction.UP)
-env.indicator:set_margin(10)
-env.indicator:set_color(rt.Palette.GREEN)
-
-env.list = rt.ListLayout(rt.Orientation.VERTICAL)
-env.list:set_spacing(10)
-env.list:push_back(rt.DirectionIndicator(rt.Direction.UP))
-env.list:push_back(rt.DirectionIndicator(rt.Direction.NONE))
-env.list:push_back(rt.DirectionIndicator(rt.Direction.RIGHT))
-env.list:push_back(rt.DirectionIndicator(rt.Direction.LEFT))
-env.list:push_back(rt.DirectionIndicator(rt.Direction.DOWN))
-
-env.sheet = rt.Spritesheet("assets/sprites", "test_animation")
-env.sprite = rt.Sprite(env.sheet, "test_animation")
-env.sprite:set_is_animated(true)
-env.sprite:set_should_loop(true)
-rt.current_scene:set_child(env.sprite)
-
-env.timer = rt.AnimationTimer(rt.seconds(1))
-env.timer:signal_connect("tick", function(_, value)
-    --println(value)
-end)
-env.timer:play()
+equipment = bt.Equipment("TEST_EQUIPMENT")
+equipment_tooltip = bt.EquipmentTooltip(equipment)
+rt.current_scene:set_child(equipment_tooltip)
 
 rt.current_scene.input:signal_connect("pressed", function(_, button)
     if button == rt.InputButton.A then

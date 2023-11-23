@@ -80,7 +80,9 @@ require "sprite_scale"
 require "sprite_levelbar"
 
 require "battle/action"
+require "battle/equipment"
 
+require "battle/equipment_tooltip"
 
 require "scene"
 -- require "test

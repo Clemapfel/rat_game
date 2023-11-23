@@ -28,9 +28,9 @@ bt.Entity.defense_ev = 0
 bt.Entity.speed_base = 0
 bt.Entity.speed_ev = 0
 
-bt.Entity.moveset = rt.List()           -- List<{id, n_uses, is_disabled)>
-bt.Entity.permanent_moveset = rt.List() -- List<{id}>
-bt.Entity.consumables = rt.List()       -- List<ID, n_stacks>
+bt.Entity.moveset = rt.List()           -- List<bt.Move>
+bt.Entity.permanent_moveset = rt.List() -- List<bt.Move>
+bt.Entity.consumables = rt.List()       -- List<bt.Consumables>
 
 -- equipment
 bt.Entity.n_equip_slots = 2
