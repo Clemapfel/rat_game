@@ -19,13 +19,12 @@ io.stdout:setvbuf("no") -- makes it so love2d error message is printed to consol
 rt.add_scene("debug")
 
 equipment = bt.Equipment("TEST_EQUIPMENT")
-widget = bt.EquipmentSlot(equipment)
-rt.current_scene:set_child(widget)
+slot = bt.EquipmentSlot(equipment)
+tooltip = bt.EquipmentTooltip(equipment)
 
+rt.current_scene:set_child(slot)
 rt.current_scene.input:signal_connect("pressed", function(_, button)
     if button == rt.InputButton.A then
-        animation:reset()
-        animation:play()
     elseif button == rt.InputButton.B then
         indicator:set_direction(rt.Direction.NONE)
     elseif button == rt.InputButton.UP then

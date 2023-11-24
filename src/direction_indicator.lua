@@ -52,7 +52,7 @@ function rt.DirectionIndicator:size_allocate(x, y, width, height)
     meta.assert_isa(self, rt.DirectionIndicator)
 
     local center_x, center_y = x + 0.5 * width, y + 0.5 * height
-    local radius = math.max(math.min(width, height) / 2, rt.settings.direction_indicator.min_line_width)
+    local radius = math.min(width, height) / 2
     local ring_thickness = 0.4 * radius
     local eps = 1
     if self._direction == rt.Direction.NONE then

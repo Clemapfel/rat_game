@@ -54,10 +54,10 @@ bt.Equipment = meta.new_type("Equipment", function(id)
 
     local flavor_text = config.flavor_text
     if meta.is_nil(flavor_text) then
-        out.effect_text = ""
+        out.flavor_text = ""
     else
         meta.assert_string(flavor_text)
-        out.effect_text = flavor_text
+        out.flavor_text = flavor_text
     end
 
     local thumbnail_id = config.thumbnail_id

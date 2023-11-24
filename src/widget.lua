@@ -230,6 +230,12 @@ function rt.Widget:set_margin(margin)
     self:reformat()
 end
 
+--- @brief get all margins
+--- @return (Number, Number, Number, Number) top, right, bottom, left
+function rt.Widget:get_margins()
+    return self._margin_top, self._margin_right, self._margin_bottom, self._margin_left
+end
+
 --- @brief set expansion along x-axis
 --- @param b Boolean
 function rt.Widget:set_expand_horizontally(b)

@@ -23,6 +23,8 @@ rt.Frame = meta.new_type("Frame", function(type)
         _frame = ternary(type == rt.FrameType.RECTANGULAR, rt.Rectangle(0, 0, 1, 1), rt.Circle(0, 0, 1)),
         _frame_outline = ternary(type == rt.FrameType.RECTANGULAR, rt.Rectangle(0, 0, 1, 1), rt.Circle(0, 0, 1)),
         _color = rt.Palette.FOREGROUND,
+        _thickness = rt.settings.frame.thickness,
+        _corner_radius = rt.settings.frame.corner_radius
     }, rt.Drawable, rt.Widget)
 
     out._frame:set_is_outline(true)
@@ -33,12 +35,8 @@ rt.Frame = meta.new_type("Frame", function(type)
     out._frame:set_color(out._color)
     out._frame_outline:set_color(rt.Palette.BASE_OUTLINE)
 
-    if out._type == rt.FrameType.RECTANGULAR then
-        local corner_radius = rt.settings.frame.corner_radius
-        out._frame:set_corner_radius(corner_radius)
-        out._frame_outline:set_corner_radius(corner_radius)
-        out._stencil_mask:set_corner_radius(corner_radius)
-    end
+    out:set_thickness(rt.settings.frame.thickness)
+    out:set_corner_radius(rt.settings.frame.corner_radius)
     return out
 end)
 
@@ -63,10 +61,15 @@ function rt.Frame:draw()
 
         self._child:draw()
 
+        love.graphics.stencil(function() end, "replace", 0, false) -- reset stencil value
         love.graphics.setStencilTest()
 
-        self._frame_outline:draw()
-        self._frame:draw()
+        if self._thickness > 0 then
+            if self._thickness > 1 then
+                self._frame_outline:draw()
+            end
+            self._frame:draw()
+        end
     end
 end
 
@@ -80,7 +83,7 @@ function rt.Frame:size_allocate(x, y, width, height)
 
     local pos_x, pos_y = self._child:get_position()
     local w, h = self._child:get_size()
-    local thickness = rt.settings.frame.thickness
+    local thickness = self._thickness
 
     if self._type == rt.FrameType.RECTANGULAR then
         self._frame:resize(rt.AABB(pos_x + 0.5 * thickness, pos_y + 0.5 * thickness, w - thickness, h - thickness))
@@ -161,3 +164,38 @@ function rt.Frame:get_color()
     return self._frame
 end
 
+--- @brief
+function rt.Frame:set_thickness(thickness)
+    meta.assert_number(thickness)
+    meta.assert_isa(self, rt.Frame)
+    if thickness < 0 then
+        rt.error("In rt.Frame.set_thickness: value `" .. tostring(thickness) .. "` is out of range")
+    end
+    assert(thickness >= 0)
+    self._thickness = thickness
+    self._frame:set_line_width(self._thickness)
+    self:reformat()
+end
+
+--- @brief
+function rt.Frame:get_thickness()
+    meta.assert_isa(self, rt.Frame)
+    return self._thickness
+end
+
+--- @brief
+function rt.Frame:set_corner_radius(radius)
+    meta.assert_isa(self, rt.Frame)
+    meta.assert_number(radius)
+    if radius < 0 then
+        rt.error("In rt.Frame.set_corner_radius: value `" .. tostring(radius) .. "` is out of range")
+    end
+    self._corner_radius = radius
+
+    if self._type == rt.FrameType.RECTANGULAR then
+        local corner_radius = self._corner_radius
+        self._frame:set_corner_radius(corner_radius)
+        self._frame_outline:set_corner_radius(corner_radius)
+        self._stencil_mask:set_corner_radius(corner_radius)
+    end
+end
