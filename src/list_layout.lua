@@ -10,7 +10,7 @@ rt.ListLayout = meta.new_type("ListLayout", function(orientation, ...)
     local out = meta.new(rt.ListLayout, {
         _children = rt.List(),
         _orientation = orientation,
-        _spacing = 0,
+        _spacing = 0
     }, rt.Drawable, rt.Widget)
 
     for _, x in pairs({...}) do
@@ -33,49 +33,59 @@ end
 function rt.ListLayout:size_allocate(x, y, width, height)
     meta.assert_isa(self, rt.ListLayout)
     local n_children = self._children:size()
-    if self._orientation == rt.Orientation.HORIZONTAL then
 
-        -- measure final size of all children after expansion
-        local child_w = 0
+    if self._orientation == rt.Orientation.HORIZONTAL then
+        local child_min_w = 0
+        local child_max_h = NEGATIVE_INFINITY
+        local n_expand_children = 0
         for _, child in pairs(self._children) do
             local w, h = child:measure()
-            if child:get_expand_horizontally() then
-                w = math.max(width / n_children, w)
+            if not child:get_expand_horizontally() then
+                child_min_w = child_min_w + w
+            else
+                n_expand_children = n_expand_children + 1
             end
-            child_w = child_w + w
+
+            child_max_h = math.max(child_max_h, h)
         end
 
-        local child_x = x + 0.5 * width - 0.5 * child_w
+        local expand_child_width = (width - child_min_w - (n_children - 1) * self._spacing) / n_expand_children
+
+        local child_x = x
+        local child_y = y
         for _, child in pairs(self._children) do
             local w, h = child:measure()
-            if child:get_expand_horizontally() then
-                w = math.max((width - (n_children - 1) * self._spacing) / n_children, w)
-            end
 
-            child:fit_into(rt.AABB(
-                child_x, y,
-                w, ternary(self:get_expand_vertically(), height, h))
-            )
-            child_x = child_x + w + self._spacing
+            local child_h = ternary(self:get_expand_vertically(), child_max_h, math.max(child_max_h, height))
+            local child_w = ternary(child:get_expand_horizontally(), expand_child_width, w)
+            child:fit_into(rt.AABB(child_x, child_y, child_w, child_h))
+            child_x = child_x + child_w + self._spacing
         end
     else
-        local child_h = 0
+        local child_min_h = 0
+        local child_max_w = NEGATIVE_INFINITY
+        local n_expand_children = 0
         for _, child in pairs(self._children) do
             local w, h = child:measure()
-            if child:get_expand_vertically() then
-                h = math.max(height / n_children, h)
+            if not child:get_expand_vertically() then
+                child_min_h = child_min_h + h
+            else
+                n_expand_children = n_expand_children + 1
             end
-            child_h = child_h + h
+            child_max_w = math.max(child_max_w, w)
         end
 
-        local child_y = y + 0.5 * height - 0.5 * child_h
+        local expand_child_height = (height - child_min_h - (n_children - 1) * self._spacing) / n_expand_children
+
+        local child_x = x
+        local child_y = y
         for _, child in pairs(self._children) do
             local w, h = child:measure()
-            if child:get_expand_vertically() then
-                h = math.max((height - (n_children - 1) * self._spacing)  / n_children, h)
-            end
-            child:fit_into(rt.AABB(x, child_y, width, h))
-            child_y = child_y + h + self._spacing
+
+            local child_w = ternary(self:get_expand_horizontally(), child_max_w, math.max(child_max_w, width))
+            local child_h = ternary(child:get_expand_vertically(), expand_child_height, h)
+            child:fit_into(rt.AABB(child_x, child_y, child_w, child_h))
+            child_y = child_y + child_h + self._spacing
         end
     end
 end

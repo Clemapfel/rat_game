@@ -22,7 +22,23 @@ equipment = bt.Equipment("TEST_EQUIPMENT")
 slot = bt.EquipmentSlot(equipment)
 tooltip = bt.EquipmentTooltip(equipment)
 
-rt.current_scene:set_child(slot)
+box = rt.ListLayout(rt.Orientation.VERTICAL)
+left = rt.Spacer()
+left:set_color(rt.Palette.PURPLE)
+right = rt.Spacer()
+right:set_color(rt.Palette.GREEN)
+box:push_back(left)
+box:push_back(right)
+box:set_spacing(10)
+
+left:set_minimum_size(50, 30)
+left:set_expand(false)
+right:set_expand(true)
+
+box:set_expand_vertically(true)
+
+
+rt.current_scene:set_child(tooltip)
 rt.current_scene.input:signal_connect("pressed", function(_, button)
     if button == rt.InputButton.A then
     elseif button == rt.InputButton.B then

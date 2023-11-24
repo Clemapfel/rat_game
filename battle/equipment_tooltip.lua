@@ -26,10 +26,7 @@ bt.EquipmentTooltip = meta.new_type("EquipmentTooltip", function(equipment)
         _sprite_overlay = rt.OverlayLayout(),
         _sprite_frame = rt.Frame(),
 
-        _name_and_sprite_box = rt.BoxLayout(rt.Orientation.HORIZONTAL),
-
-        _overlay = rt.OverlayLayout(),
-        _vbox = rt.BoxLayout(rt.Orientation.VERTICAL)
+        _name_and_sprite_box = rt.BoxLayout(rt.Orientation.HORIZONTAL)
     }, rt.Drawable, rt.Widget)
 
     out._sprite_overlay:set_base_child(out._sprite_backdrop)
@@ -43,28 +40,23 @@ bt.EquipmentTooltip = meta.new_type("EquipmentTooltip", function(equipment)
 
     out._name_label:set_horizontal_alignment(rt.Alignment.START)
     out._name_label:set_margin_horizontal(rt.settings.margin_unit)
-    out._name_label:set_expand_vertically(false)
     out._name_label:set_expand_horizontally(true)
 
     out._name_and_sprite_box:push_back(out._sprite_frame)
     out._name_and_sprite_box:push_back(out._name_label)
     out._name_and_sprite_box:set_alignment(rt.Alignment.START)
+    out._sprite_frame:set_expand_horizontally(false)
+    out._name_label:set_expand_horizontally(true)
+
     out._sprite_frame:set_expand(false)
     out._sprite_frame:set_minimum_size(sprite_size_x * 3, sprite_size_y * 3)
 
-    out._vbox:push_back(out._name_and_sprite_box)
-    --out._vbox:push_back(out._effect_label)
-    --out._vbox:push_back(out._flavor_text_label)
-    out._overlay:set_base_child(out._backdrop)
-    out._overlay:push_overlay(out._vbox)
-
-    out._frame:set_child(out._overlay)
     return out
 end)
 
 --- @brief [internal]
 function bt.EquipmentTooltip:toplevel()
-    return self._frame
+    return self._name_and_sprite_box
 end
 
 --- @overload rt.Drawable.draw

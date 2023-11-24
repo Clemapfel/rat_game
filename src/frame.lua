@@ -35,8 +35,13 @@ rt.Frame = meta.new_type("Frame", function(type)
     out._frame:set_color(out._color)
     out._frame_outline:set_color(rt.Palette.BASE_OUTLINE)
 
-    out:set_thickness(rt.settings.frame.thickness)
-    out:set_corner_radius(rt.settings.frame.corner_radius)
+    out._frame:set_line_width(out._thickness)
+    if out._type == rt.FrameType.RECTANGULAR and out._corner_radius ~= radius then
+        local corner_radius = out._corner_radius
+        out._frame:set_corner_radius(corner_radius)
+        out._frame_outline:set_corner_radius(corner_radius)
+        out._stencil_mask:set_corner_radius(corner_radius)
+    end
     return out
 end)
 
@@ -171,10 +176,12 @@ function rt.Frame:set_thickness(thickness)
     if thickness < 0 then
         rt.error("In rt.Frame.set_thickness: value `" .. tostring(thickness) .. "` is out of range")
     end
-    assert(thickness >= 0)
-    self._thickness = thickness
-    self._frame:set_line_width(self._thickness)
-    self:reformat()
+
+    if self._thickness ~= thickness then
+        self._thickness = thickness
+        self._frame:set_line_width(self._thickness)
+        self:reformat()
+    end
 end
 
 --- @brief
@@ -192,7 +199,7 @@ function rt.Frame:set_corner_radius(radius)
     end
     self._corner_radius = radius
 
-    if self._type == rt.FrameType.RECTANGULAR then
+    if self._type == rt.FrameType.RECTANGULAR and self._corner_radius ~= radius then
         local corner_radius = self._corner_radius
         self._frame:set_corner_radius(corner_radius)
         self._frame_outline:set_corner_radius(corner_radius)
