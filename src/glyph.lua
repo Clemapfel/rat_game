@@ -11,9 +11,11 @@ rt.TextEffect = meta.new_enum({
 --- @param content String
 --- @param font_style rt.FontStyle
 --- @param color rt.RGBA
+--- @param is_underlined Boolean
+--- @param is_strikethrough Boolean
 --- @param effects rt.TextEffect
 --- @param wrap_width Number px
-rt.Glyph = meta.new_type("Glyph", function(font, content, font_style, color, effects, wrap_width)
+rt.Glyph = meta.new_type("Glyph", function(font, content, font_style, color, is_underlined, is_strikethrough, effects, wrap_width)
     meta.assert_isa(font, rt.Font)
     meta.assert_string(content)
 
@@ -21,8 +23,11 @@ rt.Glyph = meta.new_type("Glyph", function(font, content, font_style, color, eff
     if meta.is_nil(color) then color = rt.RGBA(1, 1, 1, 1) end
     if meta.is_nil(effects) then effects = {} end
     if meta.is_nil(wrap_width) then wrap_width = POSITIVE_INFINITY end
+    if meta.is_nil(is_underlined) then is_underlined = false end
+    if meta.is_nil(is_strikethrough) then is_strikethrough = false end
 
     meta.assert_enum(font_style, rt.FontStyle)
+    meta.assert_boolean(is_underlined, is_strikethrough)
     meta.assert_rgba(color)
     meta.assert_number(wrap_width)
     meta.assert_table(effects)
@@ -32,6 +37,8 @@ rt.Glyph = meta.new_type("Glyph", function(font, content, font_style, color, eff
         _content = content,
         _color = color,
         _style = font_style,
+        _is_underlined = is_underlined,
+        _is_strikethrough = is_strikethrough,
         _effects = {},
         _is_animated = false,
         _elapsed_time = 0,
@@ -127,6 +134,20 @@ function rt.Glyph:_non_animated_draw()
         love.graphics.setScissor()
     end
 
+    local font = self._font[self._style]
+    local strikethrough_base = y + 0.5 * font:getHeight() + 0.5
+    local underline_base = y + font:getBaseline()
+    local w = select(1, self:get_size())
+    love.graphics.setLineWidth(1)
+
+    if self._is_strikethrough then
+        love.graphics.line(x, strikethrough_base, x + w, strikethrough_base)
+    end
+
+    if self._is_underlined then
+        love.graphics.line(x, underline_base, x + w, underline_base)
+    end
+
     love.graphics.setColor(old_r, old_g, old_b, old_a)
 end
 
@@ -178,6 +199,23 @@ function rt.Glyph:_animated_draw()
         love.graphics.setColor(color.r, color.g, color.b, color.a)
         local pos_x, pos_y = self:get_position()
         self:render(self._glyph, pos_x + offset.x, pos_y + offset.y)
+
+        if self._is_strikethrough or self._is_underlined then
+            local font = self._font[self._style]
+            local strikethrough_base = pos_y + offset.y + 0.5 * font:getHeight() + 0.5
+            local underline_base = pos_y + offset.y + font:getBaseline()
+            local w = select(1, self:get_size())
+            love.graphics.setLineWidth(1)
+
+            if self._is_strikethrough then
+                love.graphics.line(pos_x + offset.x, strikethrough_base, pos_x + offset.x + w, strikethrough_base)
+            end
+
+            if self._is_underlined then
+                love.graphics.line(pos_x + offset.x, underline_base, pos_x + offset.x + w, underline_base)
+            end
+        end
+
         x = x + w
     end
 

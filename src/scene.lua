@@ -5,7 +5,7 @@ rt.Scene = meta.new_type("Scene", function()
     local scene = meta.new(rt.Scene)
 
     scene.window = rt.WindowLayout()
-    scene.skybox = rt.Palette.TRUE_MAGENTA
+    scene.skybox = rt.Palette.PURPLE --TRUE_MAGENTA
     scene.animation_handler = rt.AnimationHandler()
     scene.animation_timer_handler = rt.AnimationTimerHandler()
     scene.input = rt.add_input_controller(scene.window)

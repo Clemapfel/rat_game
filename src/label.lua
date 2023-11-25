@@ -174,6 +174,10 @@ rt.Label.BOLD_TAG_START = rt.Set("<b>", "<bold>")
 rt.Label.BOLD_TAG_END = rt.Set("</b>", "</bold>")
 rt.Label.ITALIC_TAG_START = rt.Set("<i>", "<italic>")
 rt.Label.ITALIC_TAG_END = rt.Set("</i>", "</italic>")
+rt.Label.UNDERLINED_TAG_START = rt.Set("<u>", "<underlined>")
+rt.Label.UNDERLINED_TAG_END = rt.Set("</u>", "</underlined>")
+rt.Label.STRIKETHROUGH_TAG_START = rt.Set("<s>", "<strikethrough>")
+rt.Label.STRIKETHROUGH_TAG_END = rt.Set("</s>", "</strikethrough>")
 rt.Label.COLOR_TAG_START = rt.Set("<col=(.*)>", "<color=(.*)>")
 rt.Label.COLOR_TAG_END = rt.Set("</col>", "</color>")
 rt.Label.EFFECT_SHAKE_TAG_START = rt.Set("<shake>", "<fx_shake>")
@@ -194,7 +198,8 @@ function rt.Label:_parse()
     local italic = false
     local is_colored = false
     local color = "TRUE_WHITE"
-
+    local underlined = false
+    local strikethrough = false
     local effect_rainbow = false
     local effect_shake = false
     local effect_wave = false
@@ -222,7 +227,16 @@ function rt.Label:_parse()
         if effect_shake then table.insert(effects, rt.TextEffect.SHAKE) end
         if effect_wave then table.insert(effects, rt.TextEffect.WAVE) end
 
-        table.insert(self._glyphs, rt.Glyph(self._font, current_word, style, rt.Palette[ternary(effect_rainbow, "TRUE_WHITE", color)], effects))
+        table.insert(self._glyphs, rt.Glyph(
+            self._font,
+            current_word,
+            style,
+            rt.Palette[ternary(effect_rainbow, "TRUE_WHITE", color)],
+            underlined,
+            strikethrough,
+            effects
+        ))
+
         self._n_characters = self._n_characters + #current_word
         current_word = ""
     end
@@ -331,6 +345,28 @@ function rt.Label:_parse()
                     throw_parse_error("trying to close an italic region, but one is not open")
                 end
                 italic = false
+            -- underlined
+            elseif tag_matches(rt.Label.UNDERLINED_TAG_START) then
+                if underlined == true then
+                    throw_parse_error("trying to open an underlined region, but one is already open")
+                end
+                underlined = true
+            elseif tag_matches(rt.Label.UNDERLINED_TAG_END) then
+                if underlined == false then
+                    throw_parse_error("trying to close an underlined region, but one is not open")
+                end
+                underlined = false
+            -- strikethrough
+            elseif tag_matches(rt.Label.STRIKETHROUGH_TAG_START) then
+                if strikethrough == true then
+                    throw_parse_error("trying to open an strikethrough region, but one is already open")
+                end
+                strikethrough = true
+            elseif tag_matches(rt.Label.STRIKETHROUGH_TAG_END) then
+                if strikethrough == false then
+                    throw_parse_error("trying to close an strikethrough region, but one is not open")
+                end
+                strikethrough = false
             -- color
             elseif is_color_tag() then
                 if is_colored == true then
