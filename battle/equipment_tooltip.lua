@@ -27,7 +27,7 @@ bt.EquipmentTooltip = meta.new_type("EquipmentTooltip", function(equipment)
         _sprite_frame = rt.Frame(),
 
         _name_and_sprite_box = rt.BoxLayout(rt.Orientation.HORIZONTAL)
-    }, rt.Drawable, rt.Widget)
+    }, rt.Widget)
 
     out._sprite_overlay:set_base_child(out._sprite_backdrop)
 
@@ -55,26 +55,6 @@ bt.EquipmentTooltip = meta.new_type("EquipmentTooltip", function(equipment)
 end)
 
 --- @brief [internal]
-function bt.EquipmentTooltip:toplevel()
+function bt.EquipmentTooltip:get_top_level_widget()
     return self._name_and_sprite_box
-end
-
---- @overload rt.Drawable.draw
-function bt.EquipmentTooltip:draw()
-    meta.assert_isa(self, bt.EquipmentTooltip)
-    self:toplevel():draw()
-    self._name_label:draw_bounds()
-end
-
---- @overload rt.Widget.size_allocate
-function bt.EquipmentTooltip:size_allocate(x, y, width, height)
-    meta.assert_isa(self, bt.EquipmentTooltip)
-    self:toplevel():size_allocate(x, y, width, height)
-end
-
---- @overload rt.Widget.realize
-function bt.EquipmentTooltip:realize()
-    meta.assert_isa(self, bt.EquipmentTooltip)
-    self:toplevel():realize()
-    rt.Widget.realize(self)
 end

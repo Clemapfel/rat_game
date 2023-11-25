@@ -42,7 +42,12 @@ rt.Widget._selected = false
 --- @param width Number
 --- @param height Number
 function rt.Widget:size_allocate(x, y, width, height)
-    rt.error("" .. meta.typeof(self) .. ":size_allocate: abstract method called")
+    rt.error("" .. meta.typeof(self) .. ":size_allocate: abstract method called. Neither `rt.Widget.get_top_level_widget` nor `rt.Widget.size_allocate` are implemented for type `" .. meta.typeof(self) .. "`")
+end
+
+--- @brief method that can be overloaded by compound widgets
+function rt.Widget:get_top_level_widget()
+    return nil
 end
 
 --- @brief abstract method, returns minimum space that needs to be allocated
@@ -58,6 +63,10 @@ function rt.Widget:realize()
     meta.assert_isa(self, rt.Widget)
     if self._realized then return end
     self._realized = true
+    local top_level = self:get_top_level_widget()
+    if not meta.is_nil(top_level) then
+        top_level:realize()
+    end
     self:reformat()
 end
 
@@ -98,7 +107,25 @@ function rt.Widget:reformat()
 
     x = math.floor(x) -- align to pixelgrid to avoid rasterizer artifacting
     y = math.floor(y)
-    self:size_allocate(x, y, width, height)
+
+    -- if widget is compound widget, size_allocate top-level, else call virtual function
+    local top_level = self:get_top_level_widget()
+    if meta.is_nil(top_level) then
+        self:size_allocate(x, y, width, height)
+    else
+        top_level:size_allocate(x, y, width, height)
+    end
+end
+
+--- @brief implements rt.Drawable.draw
+function rt.Widget:draw()
+    -- if widget is compound widget, draw top-level, else call virtual function
+    local top_level = self:get_top_level_widget()
+    if meta.is_nil(top_level) then
+        rt.error("" .. meta.typeof(self) .. ":draw: abstract method called. Neither `rt.Widget.get_top_level_widget` nor `rt.Drawable.draw` are implemented for type `" .. meta.typeof(self) .. "`")
+    else
+        top_level:draw()
+    end
 end
 
 --- @brief resize widget such that it fits into the given bounds
