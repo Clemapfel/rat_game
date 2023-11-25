@@ -423,7 +423,7 @@ function rt.Widget._calculate_size(self, width, margin_start, margin_end, align,
     elseif align == rt.Alignment.END and expand == false then
         return x + L - m1 - w, w
     elseif align == rt.Alignment.START and expand == true then
-        return x + m0, math.max(w, (L - m0 - m1) / 2)
+        return x + m0, L - m0 - m1
     elseif align == rt.Alignment.CENTER and expand == true then
         return x + m0, math.max(w, L - m0 - m1)
     elseif align == rt.Alignment.END and expand == true then

@@ -1,5 +1,5 @@
 rt.settings.equipment_tooltip = {
-        effect_prefix = "Effect: "
+        effect_prefix = "<b>Effect</b>: "
 }
 
 --- @class bt.EquipmentTooltip
@@ -26,7 +26,10 @@ bt.EquipmentTooltip = meta.new_type("EquipmentTooltip", function(equipment)
         _sprite_overlay = rt.OverlayLayout(),
         _sprite_frame = rt.Frame(),
 
-        _name_and_sprite_box = rt.BoxLayout(rt.Orientation.HORIZONTAL)
+        _name_and_sprite_box = rt.BoxLayout(rt.Orientation.HORIZONTAL),
+        _effect_box = rt.BoxLayout(rt.Orientation.VERTICAL),
+
+        _main = rt.BoxLayout(rt.Orientation.VERTICAL)
     }, rt.Widget)
 
     out._sprite_overlay:set_base_child(out._sprite_backdrop)
@@ -47,14 +50,33 @@ bt.EquipmentTooltip = meta.new_type("EquipmentTooltip", function(equipment)
     out._name_and_sprite_box:set_alignment(rt.Alignment.START)
     out._sprite_frame:set_expand_horizontally(false)
     out._name_label:set_expand_horizontally(true)
+    out._name_and_sprite_box:set_expand_vertically(false)
+    out._name_and_sprite_box:set_expand_horizontally(true)
 
     out._sprite_frame:set_expand(false)
     out._sprite_frame:set_minimum_size(sprite_size_x * 3, sprite_size_y * 3)
 
+    out._effect_label:set_alignment(rt.Alignment.START)
+    out._effect_label:set_margin(rt.settings.margin_unit)
+    out._effect_label:set_expand_vertically(false)
+
+    out._flavor_text_label:set_alignment(rt.Alignment.START)
+    out._flavor_text_label:set_margin(rt.settings.margin_unit)
+    out._effect_label:set_expand_vertically(false)
+
+    out._main:push_back(out._name_and_sprite_box)
+    out._main:push_back(out._effect_label)
+    out._main:push_back(out._flavor_text_label)
     return out
 end)
 
 --- @brief [internal]
 function bt.EquipmentTooltip:get_top_level_widget()
-    return self._name_and_sprite_box
+    return self._main
+end
+
+function bt.EquipmentTooltip:draw()
+    self._main:draw()
+    --self._name_and_sprite_box:draw()
+    self._name_label:draw_bounds()
 end

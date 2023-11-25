@@ -37,7 +37,7 @@ right:set_expand(true)
 
 box:set_expand_vertically(true)
 
-rt.current_scene:set_child(rt.Label("<wave><shake><u><s>regular#<b>bold#</b><i>italic#</i></s><b><i>bolditalic#</i></b></u></wave></shake>"))
+rt.current_scene:set_child(tooltip)
 rt.current_scene.input:signal_connect("pressed", function(_, button)
     if button == rt.InputButton.A then
     elseif button == rt.InputButton.B then

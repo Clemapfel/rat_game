@@ -23,7 +23,7 @@ rt.BoxLayout = rt.ListLayout
 --- @overload rt.Drawable.draw
 function rt.ListLayout:draw()
     meta.assert_isa(self, rt.ListLayout)
-    if not self:get_is_visible() then return end
+    if not self:get_is_visible() or self._children:size() == 0 then return end
     for _, child in pairs(self._children) do
         child:draw()
     end
@@ -56,7 +56,7 @@ function rt.ListLayout:size_allocate(x, y, width, height)
         for _, child in pairs(self._children) do
             local w, h = child:measure()
 
-            local child_h = ternary(self:get_expand_vertically(), child_max_h, math.max(child_max_h, height))
+            local child_h = ternary(self:get_expand_vertically(), height, math.max(child_max_h, height))
             local child_w = ternary(child:get_expand_horizontally(), expand_child_width, w)
             child:fit_into(rt.AABB(child_x, child_y, child_w, child_h))
             child_x = child_x + child_w + self._spacing
@@ -82,7 +82,7 @@ function rt.ListLayout:size_allocate(x, y, width, height)
         for _, child in pairs(self._children) do
             local w, h = child:measure()
 
-            local child_w = ternary(self:get_expand_horizontally(), child_max_w, math.max(child_max_w, width))
+            local child_w = ternary(self:get_expand_horizontally(), width, math.max(child_max_w, width))
             local child_h = ternary(child:get_expand_vertically(), expand_child_height, h)
             child:fit_into(rt.AABB(child_x, child_y, child_w, child_h))
             child_y = child_y + child_h + self._spacing
