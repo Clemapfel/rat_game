@@ -473,7 +473,9 @@ end
 --- @param x any
 --- @param type meta.Type
 function meta.assert_isa(x, type)
-    assert(not meta.is_nil(type))
+    if not meta.is_string(type) and (not meta.is_object(type) or not getmetatable(type).__typename == "Type") then
+        rt.error("In meta.assert_isa: object `" .. meta.typeof(type) .. "` is not a type")
+    end
     meta._assert_aux(meta.isa(x, type), x, type._typename)
 end
 meta.make_debug_only("meta.assert_isa")

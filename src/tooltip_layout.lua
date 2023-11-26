@@ -1,7 +1,6 @@
 rt.settings.tooltip = {
     frame_width = 3,
-    frame_outline_width = 3 + 2,
-    delay = 1 -- seconds
+    frame_outline_width = 3 + 2
 }
 
 --- @class rt.TooltipLayout
@@ -236,7 +235,7 @@ function rt.TooltipLayout:set_is_selected(b)
 end
 
 --- @brief test Tooltip
-function rt.test.bin_layout()
+function rt.test.tooltip()
     error("TODO")
 end
 

@@ -1,8 +1,8 @@
 --- @class bt.TargetingMode
 bt.TargetingMode = meta.new_enum({
-    SINGLE = 1,
-    MULTIPLE = 2,
-    STAGE = 3
+    SINGLE = "SINGLE",
+    MULTIPLE = "MULTIPLE",
+    STAGE = "STAGE"
 })
 
 --- @class bt.Action

@@ -13,9 +13,6 @@ bt.EquipmentTooltip = meta.new_type("EquipmentTooltip", function(equipment)
     local sprite_id = "knife"
     local sprite_size_x, sprite_size_y = env.equipment_spritesheet:get_frame_size(sprite_id)
     local out = meta.new(bt.EquipmentTooltip, {
-        _backdrop = rt.Spacer(),
-        _frame = rt.Frame(),
-
         _name_label = rt.Label("<b>" .. equipment.name .. "</b>"),
         _effect_label = rt.Label(rt.settings.equipment_tooltip.effect_prefix .. equipment.effect_text .. ""),
         _flavor_text_label = rt.Label(ternary(#equipment.flavor_text == 0, "", "<color=GREY_2>(" .. equipment.flavor_text .. ")</color>")),
@@ -33,10 +30,6 @@ bt.EquipmentTooltip = meta.new_type("EquipmentTooltip", function(equipment)
         _effect_box = rt.BoxLayout(rt.Orientation.VERTICAL),
 
         _vbox = rt.BoxLayout(rt.Orientation.VERTICAL),
-
-        _backdrop = rt.Spacer(),
-        _backdrop_overlay = rt.OverlayLayout(),
-        _frame = rt.Frame()
     }, rt.Widget, rt.Drawable)
 
 
@@ -128,15 +121,6 @@ bt.EquipmentTooltip = meta.new_type("EquipmentTooltip", function(equipment)
     end
 
     out._vbox:push_back(out._effect_label)
-
-    --out._vbox:push_back(out._flavor_text_hrule)
-    --out._vbox:push_back(out._flavor_text_label)
-
-    --out._backdrop_overlay:set_base_child(out._vbox)
-    --out._backdrop:set_color(rt.Palette.BACKGROUND)
-    --out._frame:set_child(out._backdrop)
-    --out._backdrop_overlay:push_overlay(out._frame)
-    --out._backdrop_overlay:push_overlay(out._vbox)
 
     return out
     end)
