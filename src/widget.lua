@@ -54,8 +54,14 @@ end
 --- @return (Number, Number)
 function rt.Widget:measure()
     meta.assert_isa(self, rt.Widget)
-    local min_w, min_h = self:get_minimum_size()
-    return min_w + self:get_margin_left() + self:get_margin_right(), min_h + self:get_margin_top() + self:get_margin_bottom()
+
+    local top_level = self:get_top_level_widget()
+    if not meta.is_nil(top_level) then
+        return top_level:measure()
+    else
+        local min_w, min_h = self:get_minimum_size()
+        return min_w + self:get_margin_left() + self:get_margin_right(), min_h + self:get_margin_top() + self:get_margin_bottom()
+    end
 end
 
 --- @brief realize widget
@@ -82,8 +88,10 @@ function rt.Widget:reformat()
         return
     end
 
+    local min_w, min_h = self:measure()
+
     local x, width = rt.Widget._calculate_size(self,
-        self._minimum_width,
+        min_w,
         self._margin_left,
         self._margin_right,
         self._horizontal_alignment,
@@ -93,7 +101,7 @@ function rt.Widget:reformat()
     )
 
     local y, height = rt.Widget._calculate_size(self,
-        self._minimum_height,
+        min_h,
         self._margin_top,
         self._margin_bottom,
         self._vertical_alignment,
@@ -419,9 +427,9 @@ function rt.Widget._calculate_size(self, width, margin_start, margin_end, align,
     if align == rt.Alignment.START and expand == false then
         return x + m0, w
     elseif align == rt.Alignment.CENTER and expand == false then
-        return x + (L - w) / 2, w
+        return x + m0, w--x + (L - w) / 2, w
     elseif align == rt.Alignment.END and expand == false then
-        return x + L - m1 - w, w
+        return x + m0, w--x + L - m1 - w, w
     elseif align == rt.Alignment.START and expand == true then
         return x + m0, L - m0 - m1
     elseif align == rt.Alignment.CENTER and expand == true then

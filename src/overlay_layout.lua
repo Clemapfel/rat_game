@@ -27,8 +27,8 @@ function rt.OverlayLayout:size_allocate(x, y, width, height)
 
     x = x + self:get_margin_left()
     y = y + self:get_margin_top()
-    width = width - (self:get_margin_left() + self:get_margin_right())
-    height = height - (self:get_margin_top() + self:get_margin_bottom())
+    width = clamp(width - (self:get_margin_left() + self:get_margin_right()), 0)
+    height = clamp(height - (self:get_margin_top() + self:get_margin_bottom()), 0)
 
     if meta.isa(self._base_child, rt.Widget) then
         self._base_child:fit_into(rt.AABB(x, y, width, height))
@@ -48,6 +48,25 @@ function rt.OverlayLayout:realize()
     for _, child in pairs(self._overlays) do
         child:realize()
     end
+end
+
+--- @overload rt.Widget.measure
+function rt.OverlayLayout:measure()
+    meta.assert_isa(self, rt.OverlayLayout)
+    local max_w = 0
+    local max_h = 0
+
+    if meta.is_widget(self._base_child) then
+        max_w, max_h = self._base_child:measure()
+    end
+
+    for _, child in pairs(self._overlays) do
+        local w, h = child:measure()
+        max_w = math.max(max_w, w)
+        max_h = math.max(max_h, h)
+    end
+
+    return max_w, max_h
 end
 
 --- @brief set lower-most child

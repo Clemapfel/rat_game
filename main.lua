@@ -21,25 +21,18 @@ rt.add_scene("debug")
 equipment = bt.Equipment("TEST_EQUIPMENT")
 slot = bt.EquipmentSlot(equipment)
 tooltip = bt.EquipmentTooltip(equipment)
+tooltip:set_expand(false)
 
 box = rt.ListLayout(rt.Orientation.VERTICAL)
-left = rt.Spacer()
-left:set_color(rt.Palette.PURPLE)
-right = rt.Spacer()
-right:set_color(rt.Palette.GREEN)
-box:push_back(left)
-box:push_back(right)
-box:set_spacing(10)
-
-left:set_minimum_size(50, 30)
-left:set_expand(false)
-right:set_expand(true)
-
-box:set_expand_vertically(true)
+--box:push_back(tooltip)
+--box:push_back(rt.Spacer(rt.RGBA(1, 1, 1, 0.5)))
 
 rt.current_scene:set_child(tooltip)
 rt.current_scene.input:signal_connect("pressed", function(_, button)
     if button == rt.InputButton.A then
+        local w, h = tooltip:measure()
+        local x, y = tooltip._vbox:get_position()
+        println(x, " ", y, " ", w, " ", h)
     elseif button == rt.InputButton.B then
         indicator:set_direction(rt.Direction.NONE)
     elseif button == rt.InputButton.UP then
