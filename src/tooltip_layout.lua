@@ -1,7 +1,6 @@
 rt.settings.tooltip = {
     frame_width = 3,
     frame_outline_width = 3 + 2,
-    margin = rt.settings.margin_unit * 1.5,
     delay = 1 -- seconds
 }
 
@@ -13,9 +12,9 @@ rt.TooltipLayout = meta.new_type("TooltipLayout", function(child)
         _tooltip_frame = rt.Rectangle(0, 0, 1, 1),
         _tooltip_frame_outline = rt.Rectangle(0, 0, 1, 1),
         _show_tooltip = true,
-        _child = child,
+        _child = ternary(meta.is_nil(child), {}, child),
         _input = {}
-    }, rt.Drawable, rt.Widget)
+    }, rt.Widget, rt.Drawable)
 
     out._tooltip_backdrop:set_color(rt.Palette.BACKGROUND)
     out._tooltip_backdrop:set_corner_radius(rt.settings.margin_unit)
@@ -33,13 +32,13 @@ rt.TooltipLayout = meta.new_type("TooltipLayout", function(child)
 
     out._input = rt.add_input_controller(out)
     out._input:signal_connect("enter", function(_, x, y, self)
-        self:set_show_tooltip(true)
+        self:set_tooltip_visible(true)
     end, out)
     out._input:signal_connect("motion", function(_, x, y, dx, dy, self)
-        self:set_show_tooltip(true)
+        self:set_tooltip_visible(true)
     end, out)
     out._input:signal_connect("leave", function(_, x, y, self)
-        self:set_show_tooltip(false)
+        self:set_tooltip_visible(false)
     end, out)
     return out
 end)
@@ -51,6 +50,41 @@ function rt.TooltipLayout:_set_tooltip_opacity(alpha)
         local color = shape:get_color()
         color.a = alpha
         shape:set_color(color)
+    end
+end
+
+--- @brief set singular child
+--- @param child rt.Widget
+function rt.TooltipLayout:set_child(child)
+    meta.assert_isa(self, rt.TooltipLayout)
+    meta.assert_isa(child, rt.Widget)
+
+    if not meta.is_nil(self._child) and meta.is_widget(self._child) then
+        self._child:set_parent(nil)
+    end
+
+    self._child = child
+    child:set_parent(self)
+
+    if self:get_is_realized() then
+        self._child:realize()
+        self:reformat()
+    end
+end
+
+--- @brief get singular child
+--- @return rt.Widget
+function rt.TooltipLayout:get_child()
+    meta.assert_isa(self, rt.TooltipLayout)
+    return self._child
+end
+
+--- @brief remove child
+function rt.TooltipLayout:remove_child()
+    meta.assert_isa(self, rt.TooltipLayout)
+    if not meta.is_nil(self._child) then
+        self._child:set_parent(nil)
+        self._child = nil
     end
 end
 
@@ -100,14 +134,14 @@ function rt.TooltipLayout:draw()
 
     if meta.isa(self._tooltip, rt.Widget) and self:get_is_visible() and self._show_tooltip then
         self._tooltip_backdrop:draw()
-        self._tooltip:draw()
         self._tooltip_frame_outline:draw()
         self._tooltip_frame:draw()
+        self._tooltip:draw()
     end
 end
 
 --- @brief
-function rt.TooltipLayout:set_show_tooltip(b)
+function rt.TooltipLayout:set_tooltip_visible(b)
     meta.assert_isa(self, rt.TooltipLayout)
     meta.assert_boolean(b)
 
@@ -122,35 +156,51 @@ function rt.TooltipLayout:set_show_tooltip(b)
 end
 
 --- @brief
-function rt.TooltipLayout:get_show_tooltip()
+function rt.TooltipLayout:get_tooltip_visible()
     meta.assert_isa(self, rt.TooltipLayout)
     return self._show_tooltip
 end
 
 --- @overload rt.Widget.size_allocate
 function rt.TooltipLayout:size_allocate(x, y, width, height)
+
+    local child_x, child_y = x, y
+    local child_w, child_h = 0, 0
+
     meta.assert_isa(self, rt.TooltipLayout)
     if meta.is_widget(self._child) then
         self._child:fit_into(rt.AABB(x, y, width, height))
+        child_x, child_y = self._child:get_position()
+        child_w, child_h = self._child:measure()
     end
 
-    meta.assert_isa(self, rt.TooltipLayout)
-    meta.assert_number(x, y)
-
     if meta.isa(self._tooltip, rt.Widget) then
+        local frame_thickness = self._tooltip_frame:get_line_width()
         local tooltip_w, tooltip_h = self._tooltip:measure()
-        local tooltip_x, tooltip_y = x + 0.5 * width - 0.5 * tooltip_w, y + 0.5 * height - 0.5 * tooltip_h
+        local tooltip_x, tooltip_y = child_x + child_w + rt.settings.margin_unit + frame_thickness, child_y --+ frame_thickness
 
-        local margin = rt.settings.tooltip.margin
+        -- prefer right of chlid, if not enough space, display left of child
+        local space_right = (tooltip_x + tooltip_w + rt.settings.margin_unit + 2 * frame_thickness) < love.graphics.getWidth()
+        if not space_right then
+            tooltip_x = child_x - tooltip_w - rt.settings.margin_unit - 2 * frame_thickness
+        end
+
+        -- prefer top left of tooltip aligned with child_y, if not enough space, shift tooltip up
+        local space_bottom = tooltip_y + tooltip_h + rt.settings.margin_unit + frame_thickness < love.graphics.getHeight()
+        if not space_bottom then
+            tooltip_y = child_y - ((tooltip_y + tooltip_h + 2 * frame_thickness + rt.settings.margin_unit) - love.graphics.getHeight())
+        end
+
+        local margin = 0
         local frame_width = rt.settings.tooltip.frame_outline_width
         local backdrop_area = rt.AABB(
-                tooltip_x - margin - frame_width ,
-                tooltip_y - margin - frame_width,
-                tooltip_w + 2 * margin + 2 * frame_width,
-                tooltip_h + 2 * margin + 2 * frame_width
+            tooltip_x,
+            tooltip_y,
+            tooltip_w + 2 * margin + 2 * frame_width,
+            tooltip_h + 2 * margin + 2 * frame_width
         )
 
-        self._tooltip:fit_into(rt.AABB(tooltip_x, tooltip_y, tooltip_w, tooltip_h))
+        self._tooltip:fit_into(rt.AABB(tooltip_x + margin + frame_thickness, tooltip_y + margin + frame_thickness, tooltip_w, tooltip_h))
         self._tooltip_backdrop:resize(backdrop_area)
         self._tooltip_frame:resize(backdrop_area)
         self._tooltip_frame_outline:resize(backdrop_area)
@@ -166,8 +216,15 @@ end
 --- @overload rt.Widget.realize
 function rt.TooltipLayout:realize()
     if self:get_is_realized() then return end
-    self._child:realize()
-    self._tooltip:realize()
+
+    if meta.is_widget(self._child) then
+        self._child:realize()
+    end
+
+    if meta.is_widget(self._tooltip) then
+        self._tooltip:realize()
+    end
+
     rt.Widget.realize(self)
 end
 
@@ -175,7 +232,7 @@ end
 function rt.TooltipLayout:set_is_selected(b)
     meta.assert_isa(self, rt.TooltipLayout)
     rt.Widget.set_is_selected(b)
-    self:set_show_tooltip(b)
+    self:set_tooltip_visible(b)
 end
 
 --- @brief test Tooltip

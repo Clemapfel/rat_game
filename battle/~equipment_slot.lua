@@ -39,7 +39,7 @@ bt.EquipmentSlot = meta.new_type("EquipmentSlot", function(equipment)
 
         _main = rt.BoxLayout(rt.Orientation.VERTICAL)
 
-    }, rt.Drawable, rt.Widget)
+    }, rt.Widget)
 
 
     for _, stat in pairs({"attack", "defense", "speed", "hp"}) do

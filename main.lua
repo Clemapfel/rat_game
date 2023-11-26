@@ -21,28 +21,35 @@ rt.add_scene("debug")
 equipment = bt.Equipment("TEST_EQUIPMENT")
 slot = bt.EquipmentSlot(equipment)
 tooltip = bt.EquipmentTooltip(equipment)
-tooltip:set_expand(false)
+tooltip:set_expand_vertically(false)
 
 box = rt.ListLayout(rt.Orientation.VERTICAL)
---box:push_back(tooltip)
---box:push_back(rt.Spacer(rt.RGBA(1, 1, 1, 0.5)))
+box:push_back(tooltip)
+box:push_back(rt.Spacer(rt.RGBA(1, 1, 1, 1)))
 
-rt.current_scene:set_child(tooltip)
+root = rt.Spacer()
+root:set_minimum_size(100, 100)
+root:set_expand(false)
+root:set_alignment(rt.Alignment.CENTER)
+
+layout = rt.TooltipLayout()
+layout:set_child(root)
+layout:set_tooltip(tooltip)
+
+rt.current_scene:set_child(layout)
 rt.current_scene.input:signal_connect("pressed", function(_, button)
     if button == rt.InputButton.A then
-        local w, h = tooltip:measure()
-        local x, y = tooltip._vbox:get_position()
-        println(x, " ", y, " ", w, " ", h)
+        layout:set_tooltip_visible(not layout:get_tooltip_visible())
     elseif button == rt.InputButton.B then
-        indicator:set_direction(rt.Direction.NONE)
+        root:set_alignment(rt.Alignment.CENTER)
     elseif button == rt.InputButton.UP then
-        indicator:set_direction(rt.Direction.UP)
+        root:set_vertical_alignment(rt.Alignment.START)
     elseif button == rt.InputButton.RIGHT then
-        indicator:set_direction(rt.Direction.RIGHT)
+        root:set_horizontal_alignment(rt.Alignment.START)
     elseif button == rt.InputButton.DOWN then
-        indicator:set_direction(rt.Direction.DOWN)
+        root:set_vertical_alignment(rt.Alignment.END)
     elseif button == rt.InputButton.LEFT then
-        indicator:set_direction(rt.Direction.LEFT)
+        root:set_horizontal_alignment(rt.Alignment.END)
     end
 end)
 

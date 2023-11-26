@@ -37,7 +37,7 @@ bt.EquipmentTooltip = meta.new_type("EquipmentTooltip", function(equipment)
         _backdrop = rt.Spacer(),
         _backdrop_overlay = rt.OverlayLayout(),
         _frame = rt.Frame()
-    }, rt.Widget)
+    }, rt.Widget, rt.Drawable)
 
 
     -- offset each label with spaces so the right-most digit aligns
@@ -76,14 +76,17 @@ bt.EquipmentTooltip = meta.new_type("EquipmentTooltip", function(equipment)
     .. ternary(equipment.hp_modifier ~= 0, "<color=HP>HP : " .. modifier_to_label(equipment.hp_modifier) .. "</color>\n", "")
 
     out._stat_label = rt.Label(stat_label_text, rt.settings.font.default_mono)
+    out._stat_label:set_margin_top(0.5 * rt.settings.margin_unit)
 
     out._sprite_overlay:set_base_child(out._sprite_backdrop)
 
     out._sprite_aspect:set_child(out._sprite)
     out._sprite_overlay:push_overlay(out._sprite_aspect)
     out._sprite_frame:set_child(out._sprite_overlay)
+    out._sprite_frame:set_color(rt.Palette.GREY_3)
+    out._sprite_frame:set_thickness(2)
 
-    out._sprite_backdrop:set_color(rt.Palette.BASE)
+    out._sprite_backdrop:set_color(rt.Palette.GREY_5)
 
     out._name_label:set_horizontal_alignment(rt.Alignment.START)
     out._name_label:set_margin_horizontal(rt.settings.margin_unit)
@@ -98,7 +101,7 @@ bt.EquipmentTooltip = meta.new_type("EquipmentTooltip", function(equipment)
     out._name_and_sprite_box:set_expand_horizontally(true)
 
     out._sprite_frame:set_expand(false)
-    out._sprite_frame:set_minimum_size(sprite_size_x * 3, sprite_size_y * 3)
+    out._sprite_frame:set_minimum_size(sprite_size_x * 2, sprite_size_y * 2)
 
     for _, label in pairs({out._name_label, out._effect_label, out._stat_label}) do
     label:set_horizontal_alignment(rt.Alignment.START)
@@ -129,16 +132,16 @@ bt.EquipmentTooltip = meta.new_type("EquipmentTooltip", function(equipment)
     --out._vbox:push_back(out._flavor_text_hrule)
     --out._vbox:push_back(out._flavor_text_label)
 
-    out._backdrop_overlay:set_base_child(out._vbox)
-    out._backdrop:set_color(rt.Palette.BACKGROUND)
-    out._frame:set_child(out._backdrop)
-    out._backdrop_overlay:push_overlay(out._frame)
-    out._backdrop_overlay:push_overlay(out._vbox)
+    --out._backdrop_overlay:set_base_child(out._vbox)
+    --out._backdrop:set_color(rt.Palette.BACKGROUND)
+    --out._frame:set_child(out._backdrop)
+    --out._backdrop_overlay:push_overlay(out._frame)
+    --out._backdrop_overlay:push_overlay(out._vbox)
 
     return out
     end)
 
 --- @brief [internal]
 function bt.EquipmentTooltip:get_top_level_widget()
-    return self._backdrop_overlay
+    return self._vbox
 end

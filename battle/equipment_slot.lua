@@ -40,7 +40,7 @@ bt.EquipmentSlot = meta.new_type("EquipmentSlot", function(equipment)
 
         _indicator_box = rt.BoxLayout(rt.Orientation.VERTICAL),
         _indicator_box_frame = rt.Frame(rt.FrameType.RECTANGULAR)
-    }, rt.Drawable, rt.Widget)
+    }, rt.Widget)
 
     for _, stat in pairs({"attack", "defense", "speed", "hp"}) do
         local backdrop = out["_" .. stat .. "_backdrop"]

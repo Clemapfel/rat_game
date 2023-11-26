@@ -13,16 +13,17 @@ rt.settings.font = {
 --- @param bold_path String (or nil)
 --- @param italic_path String (or nil)
 --- @param bold_italic_path String (or nil)
-rt.Font = meta.new_type("Font", function(regular_path, bold_path, italic_path, bold_italic_path)
+rt.Font = meta.new_type("Font", function(size, regular_path, bold_path, italic_path, bold_italic_path)
 
     meta.assert_string(regular_path)
+    meta.assert_number(size)
 
     local out = meta.new(rt.Font, {
         _regular_path = regular_path,
         _italic_path = regular_path,
         _bold_path = regular_path,
         _bold_italic_path = regular_path,
-        _size = rt.settings.font.default_size,
+        _size = size,
         _regular_rasterizer = {},
         _italic_rasterizer = {},
         _bold_rasterizer = {},
@@ -156,13 +157,13 @@ function rt.load_default_fonts()
         gnu_unifont
     }
 
-    rt.settings.font.default = rt.Font(
+    rt.settings.font.default = rt.Font(rt.settings.font.default_size,
         "assets/fonts/DejaVuSans/DejaVuSans-Regular.ttf",
         "assets/fonts/DejaVuSans/DejaVuSans-Bold.ttf",
         "assets/fonts/DejaVuSans/DejaVuSans-Italic.ttf",
         "assets/fonts/DejaVuSans/DejaVuSans-BoldItalic.ttf"
     )
-    rt.settings.font.default_mono = rt.Font(
+    rt.settings.font.default_mono = rt.Font(rt.settings.font.default_size,
         "assets/fonts/DejaVuSansMono/DejaVuSansMono-Regular.ttf",
         "assets/fonts/DejaVuSansMono/DejaVuSansMono-Bold.ttf",
         "assets/fonts/DejaVuSansMono/DejaVuSansMono-Italic.ttf",

@@ -35,6 +35,8 @@ rt.Widget._realized = false
 rt.Widget._focused = true
 rt.Widget._parent = nil
 rt.Widget._selected = false
+rt.Widget._final_pos_x = 0
+rt.Widget._final_pos_y = 0
 
 --- @brief abstract method, emitted when widgets bounds should change
 --- @param x Number
@@ -116,6 +118,9 @@ function rt.Widget:reformat()
     x = math.floor(x) -- align to pixelgrid to avoid rasterizer artifacting
     y = math.floor(y)
 
+    self._final_pos_x = x
+    self._final_pos_y = y
+
     -- if widget is compound widget, size_allocate top-level, else call virtual function
     local top_level = self:get_top_level_widget()
     if meta.is_nil(top_level) then
@@ -166,7 +171,7 @@ end
 --- @brief get top left of allocation
 --- @return (Number, Number)
 function rt.Widget:get_position()
-    return self._bounds.x + self:get_margin_left(), self._bounds.y + self:get_margin_top()
+    return self._final_pos_x, self._final_pos_y ---self._bounds.x + self:get_margin_left(), self._bounds.y + self:get_margin_top()
 end
 
 --- @brief get bounds
@@ -427,9 +432,9 @@ function rt.Widget._calculate_size(self, width, margin_start, margin_end, align,
     if align == rt.Alignment.START and expand == false then
         return x + m0, w
     elseif align == rt.Alignment.CENTER and expand == false then
-        return x + m0, w--x + (L - w) / 2, w
+        return x + (L - w) / 2, w
     elseif align == rt.Alignment.END and expand == false then
-        return x + m0, w--x + L - m1 - w, w
+        return x + L - m1 - w, w
     elseif align == rt.Alignment.START and expand == true then
         return x + m0, L - m0 - m1
     elseif align == rt.Alignment.CENTER and expand == true then
