@@ -106,9 +106,9 @@ function rt.ListLayout:measure()
     end
 
     if self:get_orientation() == rt.Orientation.HORIZONTAL then
-        return w_sum, h_max
+        return w_sum + (self._children:size() - 1) * self._spacing, h_max
     else
-        return w_max, h_sum
+        return w_max, h_sum + (self._children:size() - 1) * self._spacing
     end
 end
 

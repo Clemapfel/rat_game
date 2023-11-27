@@ -36,6 +36,8 @@ bt.EquipmentListItem = meta.new_type("EquipmentListItem", function(equipment)
         _tooltip_layout = rt.TooltipLayout()
     }, rt.Widget, rt.Drawable)
 
+    out:set_count(1) -- TODO
+
     out._sprite_overlay:set_base_child(out._sprite_backdrop)
     out._sprite_aspect:set_child(out._sprite)
     out._sprite_overlay:push_overlay(out._sprite_aspect)
@@ -51,7 +53,7 @@ bt.EquipmentListItem = meta.new_type("EquipmentListItem", function(equipment)
     out._sprite:set_minimum_size(sprite_size_x * 2, sprite_size_y * 2)
     out._sprite_overlay:set_margin_right(rt.settings.margin_unit)
     out._sprite_overlay:set_expand(false)
-    out._name_label:set_expand(true)
+    out._name_label:set_expand_horizontally(true)
     out._name_label:set_horizontal_alignment(rt.Alignment.START)
 
     for _, indicator in pairs({out._attack_indicator, out._defense_indicator, out._speed_indicator, out._hp_indicator}) do
@@ -66,10 +68,12 @@ bt.EquipmentListItem = meta.new_type("EquipmentListItem", function(equipment)
     out._hbox:push_back(out._name_spacer)
     out._hbox:push_back(out._indicator_hbox)
     out._hbox:push_back(out._count_spacer)
-    out._hbox:push_back(out._count_label)
+    --out._hbox:push_back(out._count_label)
 
     out._indicator_hbox:set_expand_horizontally(false)
     out._count_label:set_expand_horizontally(false)
+    out._count_label:set_horizontal_alignment(rt.Alignment.START)
+    out._count_label:set_margin_right(2 * rt.settings.margin_unit)
 
     out._hbox:set_expand_vertically(false)
 
@@ -109,4 +113,12 @@ function bt.EquipmentListItem:update_indicators(entity)
     for _, which in pairs({"attack", "defense", "speed", "hp"}) do
         update_direction(self["_" .. which .. "_indicator"], self._equipment[which .. "_modifier"])
     end
+end
+
+--- @brief
+function bt.EquipmentListItem:set_count(n)
+    meta.assert_isa(self, bt.EquipmentListItem)
+    meta.assert_number(n)
+    assert(n > 0)
+    self._name_label:set_text(self._equipment.name .. " (" .. tostring(n) .. ") ")
 end
