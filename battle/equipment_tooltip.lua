@@ -13,6 +13,8 @@ bt.EquipmentTooltip = meta.new_type("EquipmentTooltip", function(equipment)
     local sprite_id = "knife"
     local sprite_size_x, sprite_size_y = env.equipment_spritesheet:get_frame_size(sprite_id)
     local out = meta.new(bt.EquipmentTooltip, {
+        _equipment = equipment,
+
         _name_label = rt.Label("<b>" .. equipment.name .. "</b>"),
         _effect_label = rt.Label(rt.settings.equipment_tooltip.effect_prefix .. equipment.effect_text .. ""),
         _flavor_text_label = rt.Label(ternary(#equipment.flavor_text == 0, "", "<color=GREY_2>(" .. equipment.flavor_text .. ")</color>")),
@@ -36,6 +38,7 @@ bt.EquipmentTooltip = meta.new_type("EquipmentTooltip", function(equipment)
     -- offset each label with spaces so the right-most digit aligns
     local get_n_digits = function(x)
         if x < 0 then x = math.abs(x) end
+        if x == 0 then return 1 end
         return math.floor(math.log(x, 10)) + 1 + ternary(x < 0, 1, 0)
     end
 
@@ -49,6 +52,7 @@ bt.EquipmentTooltip = meta.new_type("EquipmentTooltip", function(equipment)
 
         local out = ""
         for i = 1, n_digits - get_n_digits(modifier) do
+            println(i)
             out = out .. " "
         end
 

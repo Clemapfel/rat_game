@@ -79,7 +79,7 @@ end
 
 --- @overload rt.Widget.measure
 function rt.WindowLayout:measure()
-    if meta.is_nil(self._child) then return 0, 0 end
+    if not meta.is_widget(self._child) then return 0, 0 end
     return self._child:measure()
 end
 

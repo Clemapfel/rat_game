@@ -75,7 +75,7 @@ function rt.DirectionIndicator:size_allocate(x, y, width, height)
             }
 
             for i = 2, 12, 2 do
-                vertices[i] = vertices[i] + rt.settings.direction_indicator.arrow_offset * thickness
+                vertices[i] = vertices[i] + rt.settings.direction_indicator.arrow_offset * thickness + (radius - thickness) * 0.5
             end
         elseif self._direction == rt.Direction.RIGHT then
             vertices = {
@@ -101,7 +101,7 @@ function rt.DirectionIndicator:size_allocate(x, y, width, height)
             }
 
             for i = 2, 12, 2 do
-                vertices[i] = vertices[i] - rt.settings.direction_indicator.arrow_offset * thickness
+                vertices[i] = vertices[i] - rt.settings.direction_indicator.arrow_offset * thickness - (radius - thickness) * 0.5
             end
         elseif self._direction == rt.Direction.LEFT then
             vertices = {

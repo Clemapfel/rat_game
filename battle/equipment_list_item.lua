@@ -11,6 +11,7 @@ bt.EquipmentListItem = meta.new_type("EquipmentListItem", function(equipment)
     sprite_size_y = sprite_size_y * 1
 
     local out = meta.new(bt.EquipmentListItem, {
+        _equipment = equipment,
         _sprite = rt.Sprite(env.equipment_spritesheet, sprite_id),
         _sprite_aspect = rt.AspectLayout(sprite_size_x / sprite_size_y),
         _sprite_backdrop = rt.Spacer(),
@@ -39,26 +40,25 @@ bt.EquipmentListItem = meta.new_type("EquipmentListItem", function(equipment)
     out._sprite_aspect:set_child(out._sprite)
     out._sprite_overlay:push_overlay(out._sprite_aspect)
 
-    out._tooltip_layout:set_child(out._hbox)
-    out._tooltip_layout:set_tooltip(out._tooltip)
-
-    for _, spacer in pairs({out._name_spacer, out._count_spacer}) do
+    for _, spacer in pairs({out._sprite_spacer, out._name_spacer, out._count_spacer}) do
         spacer:set_expand_horizontally(false)
         spacer:set_expand_vertically(true)
         spacer:set_minimum_size(3, 0)
         spacer:set_color(rt.Palette.FOREGROUND)
+        spacer:set_margin_horizontal(rt.settings.margin_unit)
     end
 
     out._sprite:set_minimum_size(sprite_size_x * 2, sprite_size_y * 2)
+    out._sprite_overlay:set_margin_right(rt.settings.margin_unit)
     out._sprite_overlay:set_expand(false)
     out._name_label:set_expand(true)
+    out._name_label:set_horizontal_alignment(rt.Alignment.START)
 
     for _, indicator in pairs({out._attack_indicator, out._defense_indicator, out._speed_indicator, out._hp_indicator}) do
         out._indicator_hbox:push_back(indicator)
         indicator:set_minimum_size(sprite_size_x, sprite_size_y)
         indicator:set_expand(false)
     end
-    out._indicator_hbox:set_margin_horizontal(rt.settings.margin_unit)
     out._indicator_hbox:set_spacing(rt.settings.margin_unit)
 
     out._hbox:push_back(out._sprite_overlay)
@@ -70,9 +70,13 @@ bt.EquipmentListItem = meta.new_type("EquipmentListItem", function(equipment)
 
     out._indicator_hbox:set_expand_horizontally(false)
     out._count_label:set_expand_horizontally(false)
-    out._count_label:set_margin_horizontal(rt.settings.margin_unit)
 
     out._hbox:set_expand_vertically(false)
+
+    out._tooltip_layout:set_child(out._hbox)
+    out._tooltip_layout:set_tooltip(out._tooltip)
+
+    out:update_indicators()
 
     return out
 end)
@@ -80,4 +84,29 @@ end)
 --- @brief [internal]
 function bt.EquipmentListItem:get_top_level_widget()
     return self._tooltip_layout
+end
+
+--- @brief
+function bt.EquipmentListItem:update_indicators(entity)
+    -- TODO
+    meta.assert_isa(self, bt.EquipmentListItem)
+
+    self._attack_indicator:set_color(rt.Palette.ATTACK)
+    self._defense_indicator:set_color(rt.Palette.DEFENSE)
+    self._speed_indicator:set_color(rt.Palette.SPEED)
+    self._hp_indicator:set_color(rt.Palette.HP)
+
+    local update_direction = function(to_set, value)
+        if value > 0 then
+            to_set:set_direction(rt.Direction.UP)
+        elseif value == 0 then
+            to_set:set_direction(rt.Direction.NONE)
+        else
+            to_set:set_direction(rt.Direction.DOWN)
+        end
+    end
+
+    for _, which in pairs({"attack", "defense", "speed", "hp"}) do
+        update_direction(self["_" .. which .. "_indicator"], self._equipment[which .. "_modifier"])
+    end
 end
