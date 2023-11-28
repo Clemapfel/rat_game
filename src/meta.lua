@@ -2,7 +2,7 @@
 meta = {}
 meta.types = {}
 
-meta.DEBUG_MODE = true
+meta.DEBUG_MODE = false
 meta.DUMMY_FUNCTION = function(...) end
 
 --- @brief [internal] disable function unless `meta.DEBUG_MODE` is set to `true`
@@ -389,12 +389,15 @@ function meta.new_enum(fields)
         return ipairs(getmetatable(this).properties)
     end
     metatable.__index = function(this, key)
+        --[[
         if not meta.has_property(this, key) then
             rt.error("In Enum:__index: Key `" .. key .. "` does not exist for enum")
         else
             local metatable = getmetatable(this)
             return metatable.properties[key]
         end
+        ]]
+        return getmetatable(this).properties[key]
     end
 
     meta.set_is_mutable(out, false)
@@ -450,6 +453,7 @@ function meta.assert_enum(x, enum)
         rt.error("In assert_enum: Value `" .. meta.typeof(x) .. "` is not a value of enum `" .. serialize(getmetatable(enum).properties) .. "`")
     end
 end
+meta.make_debug_only("meta.assert_enum")
 
 --- @brief [internal] apply properties of a type to an instance
 --- @param instance meta.Object

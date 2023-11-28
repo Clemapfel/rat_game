@@ -18,12 +18,23 @@ io.stdout:setvbuf("no") -- makes it so love2d error message is printed to consol
 
 rt.add_scene("debug")
 
+list = rt.ListLayout(rt.Orientation.VERTICAL)
+list:push_back(rt.Spacer())
 equipment = bt.Equipment("TEST_EQUIPMENT")
-slot = bt.EquipmentSlot(equipment)
-tooltip = bt.EquipmentTooltip(equipment)
-item = bt.EquipmentListItem(equipment)
 
-rt.current_scene:set_child(item)
+--profile = require "profiler"
+--profile.start()
+
+li = {}
+
+benchmark(function()
+    table.insert(li, bt.EquipmentTooltip(equipment))
+end)
+
+--profile.stop()
+--println(profile.report())
+
+rt.current_scene:set_child(list)
 rt.current_scene.input:signal_connect("pressed", function(_, button)
     if button == rt.InputButton.A then
         item._tooltip_layout:set_tooltip_visible(not item._tooltip_layout:get_tooltip_visible())

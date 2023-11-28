@@ -52,7 +52,6 @@ bt.EquipmentTooltip = meta.new_type("EquipmentTooltip", function(equipment)
 
         local out = ""
         for i = 1, n_digits - get_n_digits(modifier) do
-            println(i)
             out = out .. " "
         end
 

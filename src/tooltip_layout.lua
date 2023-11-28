@@ -127,11 +127,11 @@ function rt.TooltipLayout:draw()
     meta.assert_isa(self, rt.TooltipLayout)
     if not self:get_is_visible() then return end
 
-    if meta.isa(self._tooltip, rt.Widget) then
+    if meta.isa(self._child, rt.Widget) then
         self._child:draw()
     end
 
-    if meta.isa(self._tooltip, rt.Widget) and self:get_is_visible() and self._show_tooltip then
+    if meta.isa(self._tooltip, rt.Widget) and self._show_tooltip then
         self._tooltip_backdrop:draw()
         self._tooltip_frame_outline:draw()
         self._tooltip_frame:draw()

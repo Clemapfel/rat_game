@@ -130,8 +130,7 @@ end
 
 --- @overload rt.Widget.measure
 function rt.Scrollbar:measure()
-    if meta.is_nil(self._child) then return 0, 0 end
-    return self._background:measure()
+    return self._base:get_size()
 end
 
 --- @brief [internal]
