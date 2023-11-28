@@ -34,7 +34,7 @@ end
 --- @brief is x a lua boolean?
 --- @param x any
 function meta.is_boolean(x)
-    return type(x) == "boolean"
+    return x == true or x == false
 end
 
 --- @brief is x nil?
@@ -240,19 +240,17 @@ end
 --- @param property_name String
 --- @param initial_value any
 function meta._install_property(x, property_name, initial_value)
-    meta.assert_object(x);
-    meta.assert_string(property_name)
-
-    local metatable = getmetatable(x)
-    metatable.properties[property_name] = initial_value
+    --meta.assert_object(x);
+    --meta.assert_string(property_name)
+    getmetatable(x).properties[property_name] = initial_value
 end
 
 --- @brief [internal] add a property, set to intial value
 --- @param x meta.Object
 --- @param property_name String
 function meta._uninstall_property(x, property_name)
-    meta.assert_object(x)
-    meta.assert_string(property_name)
+    --meta.assert_object(x)
+    --meta.assert_string(property_name)
     local metatable = getmetatable(x)
     metatable.properties[property_name] = nil
 end
@@ -332,10 +330,13 @@ function meta.new(type, fields, ...)
     end
 
     meta._install_inheritance(out, type)
+    local installed = {type = true}
 
     for _, super in pairs({...}) do
-        meta.assert_isa(super, meta.Type)
-        meta._install_inheritance(out, super)
+        if installed[super] ~= true then
+            meta._install_inheritance(out, super)
+            installed[super] = true
+        end
     end
     return out
 end
@@ -446,15 +447,15 @@ meta.make_debug_only("meta.assert_enum")
 --- @param instance meta.Object
 --- @param type meta.Type
 function meta._install_inheritance(instance, type)
-    meta.assert_object(instance)
-    meta.assert_isa(type, meta.Type)
+    --meta.assert_object(instance)
+    --meta.assert_isa(type, meta.Type)
 
     if type._typename ~= meta.typeof(instance) then
         table.insert(getmetatable(instance).super, type._typename)
     end
 
     for key, value in pairs(getmetatable(type).properties) do
-        if key ~= "_typename" and not meta.has_property(instance, key) then
+        if key ~= "_typename" then --and not meta.has_property(instance, key) then
             meta._install_property(instance, key, value)
         end
     end

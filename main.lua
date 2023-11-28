@@ -22,29 +22,6 @@ list = rt.ListLayout(rt.Orientation.VERTICAL)
 list:push_back(rt.Spacer())
 equipment = bt.Equipment("TEST_EQUIPMENT")
 
-TestSuper = meta.new_type("TestSuper", function()
-    return meta.new(TestSuper)
-end)
-
-for i = 1, 1000 do
-    TestSuper[rt.random.string(8)] = rt.random.string(32)
-end
-
-TestType = meta.new_type("TestType", function()
-    return meta.new(TestType, {}, TestSuper)
-end)
-
-li = {}
-
-require "profiler"
-profiler.start()
-
-benchmark(function()
-  table.insert(li, TestType())
-end, 10)
-
-profiler.stop()
-println(profiler.report())
 
 rt.current_scene:set_child(bt.EquipmentListItem(equipment))
 rt.current_scene.input:signal_connect("pressed", function(_, button)
