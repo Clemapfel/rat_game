@@ -2,7 +2,7 @@
 meta = {}
 meta.types = {}
 
-meta.DEBUG_MODE = false
+meta.DEBUG_MODE = true
 meta.DUMMY_FUNCTION = function(...) end
 
 --- @brief [internal] disable function unless `meta.DEBUG_MODE` is set to `true`
@@ -88,14 +88,6 @@ function meta._new(typename)
             rt.error("In " .. metatable.__name .. ".__newindex: Cannot set property `" .. property_name .. "`, because the object was declared immutable.")
         end
         metatable.properties[property_name] = property_value
-
-        --[[
-        if metatable.components.signal == nil then return end
-        local notify_signal_id = rt.SignalComponent._notify_prefix .. property_name
-        if metatable.components.signal:has_signal(notify_signal_id) then
-            metatable.components.signal:emit(notify_signal_id, property_value)
-        end
-        ]]--
     end
 
     metatable.__tostring = function(this)
@@ -389,15 +381,12 @@ function meta.new_enum(fields)
         return ipairs(getmetatable(this).properties)
     end
     metatable.__index = function(this, key)
-        --[[
         if not meta.has_property(this, key) then
             rt.error("In Enum:__index: Key `" .. key .. "` does not exist for enum")
         else
             local metatable = getmetatable(this)
             return metatable.properties[key]
         end
-        ]]
-        return getmetatable(this).properties[key]
     end
 
     meta.set_is_mutable(out, false)

@@ -27,14 +27,14 @@ equipment = bt.Equipment("TEST_EQUIPMENT")
 
 li = {}
 
-benchmark(function()
-    table.insert(li, bt.EquipmentTooltip(equipment))
-end)
+--benchmark(function()
+  -- table.insert(li, bt.EquipmentListItem(equipment))
+--end)
 
 --profile.stop()
 --println(profile.report())
 
-rt.current_scene:set_child(list)
+rt.current_scene:set_child(bt.EquipmentListItem(equipment))
 rt.current_scene.input:signal_connect("pressed", function(_, button)
     if button == rt.InputButton.A then
         item._tooltip_layout:set_tooltip_visible(not item._tooltip_layout:get_tooltip_visible())

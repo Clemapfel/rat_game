@@ -26,7 +26,7 @@ bt.EquipmentTooltip = meta.new_type("EquipmentTooltip", function(equipment)
         _sprite_overlay = rt.OverlayLayout(),
         _sprite_frame = rt.Frame(),
 
-        _stat_label = {}, -- rt.Label
+        _stat_label = rt.Label,
 
         _name_and_sprite_box = rt.BoxLayout(rt.Orientation.HORIZONTAL),
         _effect_box = rt.BoxLayout(rt.Orientation.VERTICAL),
@@ -126,7 +126,7 @@ bt.EquipmentTooltip = meta.new_type("EquipmentTooltip", function(equipment)
     out._vbox:push_back(out._effect_label)
 
     return out
-    end)
+end)
 
 --- @brief [internal]
 function bt.EquipmentTooltip:get_top_level_widget()

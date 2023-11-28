@@ -32,7 +32,7 @@ bt.EquipmentListItem = meta.new_type("EquipmentListItem", function(equipment)
 
         _hbox = rt.BoxLayout(rt.Orientation.HORIZONTAL),
 
-        _tooltip = {}, --bt.EquipmentTooltip(equipment),
+        _tooltip = bt.EquipmentTooltip(equipment),
         _tooltip_layout = rt.TooltipLayout()
     }, rt.Widget, rt.Drawable)
 
@@ -78,7 +78,7 @@ bt.EquipmentListItem = meta.new_type("EquipmentListItem", function(equipment)
     out._hbox:set_expand_vertically(false)
 
     out._tooltip_layout:set_child(out._hbox)
-    --out._tooltip_layout:set_tooltip(out._tooltip)
+    out._tooltip_layout:set_tooltip(out._tooltip)
 
     out:update_indicators()
 

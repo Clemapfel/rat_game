@@ -54,7 +54,7 @@ function benchmark(f, duration)
     meta.assert_function(f)
 
     if meta.is_nil(duration) then
-        duration = 1
+        duration = 10
     end
 
     local runs = {}
