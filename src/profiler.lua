@@ -1,98 +1,94 @@
--- SOURCE: https://github.com/2dengine/profile.lua/blob/main/profile.lua
+-- SOURCE: https://github.com/2dengine/profiler.lua/blob/main/profiler.lua
 
-profiler._clock = os.profiler._clock
+profiler = {}
 
---- Simple profiler written in Lua.
--- @module profile
--- @alias profile
-profiler = {
 
-}
+profiler._clock = os.clock
 
 -- function labels
-local _labeled = {}
+profiler._labeled = {}
 -- function definitions
-local _defined = {}
+profiler._defined = {}
 -- time of last call
-local _tcalled = {}
+profiler._tcalled = {}
 -- total execution time
-local _telapsed = {}
+profiler._telapsed = {}
 -- number of calls
-local _ncalls = {}
+profiler._ncalls = {}
 -- list of internal profiler functions
-local _internal = {}
+profiler._internal = {}
 
 --- This is an internal function.
 -- @tparam string event Event type
 -- @tparam number line Line number
 -- @tparam[opt] table info Debug info table
-function profile.hooker(event, line, info)
+function profiler.hooker(event, line, info)
     info = info or debug.getinfo(2, 'fnS')
     local f = info.func
     -- ignore the profiler itself
-    if _internal[f] or info.what ~= "Lua" then
+    if profiler._internal[f] or info.what ~= "Lua" then
         return
     end
     -- get the function name if available
     if info.name then
-        _labeled[f] = info.name
+        profiler._labeled[f] = info.name
     end
     -- find the line definition
-    if not _defined[f] then
-        _defined[f] = info.short_src..":"..info.linedefined
-        _ncalls[f] = 0
-        _telapsed[f] = 0
+    if not profiler._defined[f] then
+        profiler._defined[f] = info.short_src..":"..info.linedefined
+        profiler._ncalls[f] = 0
+        profiler._telapsed[f] = 0
     end
-    if _tcalled[f] then
-        local dt = profiler._clock() - _tcalled[f]
-        _telapsed[f] = _telapsed[f] + dt
-        _tcalled[f] = nil
+    if profiler._tcalled[f] then
+        local dt = profiler._clock() - profiler._tcalled[f]
+        profiler._telapsed[f] = profiler._telapsed[f] + dt
+        profiler._tcalled[f] = nil
     end
     if event == "tail call" then
         local prev = debug.getinfo(3, 'fnS')
-        profile.hooker("return", line, prev)
-        profile.hooker("call", line, info)
+        profiler.hooker("return", line, prev)
+        profiler.hooker("call", line, info)
     elseif event == 'call' then
-        _tcalled[f] = profiler._clock()
+        profiler._tcalled[f] = profiler._clock()
     else
-        _ncalls[f] = _ncalls[f] + 1
+        profiler._ncalls[f] = profiler._ncalls[f] + 1
     end
 end
 
 --- Sets a profiler._clock function to be used by the profiler.
 -- @tparam function func Clock function that returns a number
-function profile.setprofiler._clock(f)
+function profiler.clock(f)
     assert(type(f) == "function", "profiler._clock must be a function")
     profiler._clock = f
 end
 
 --- Starts collecting data.
-function profile.start()
+function profiler.start()
     if rawget(_G, 'jit') then
         jit.off()
         jit.flush()
     end
-    debug.sethook(profile.hooker, "cr")
+    debug.sethook(profiler.hooker, "cr")
 end
 
 --- Stops collecting data.
-function profile.stop()
+function profiler.stop()
     debug.sethook()
-    for f in pairs(_tcalled) do
-        local dt = profiler._clock() - _tcalled[f]
-        _telapsed[f] = _telapsed[f] + dt
-        _tcalled[f] = nil
+    for f in pairs(profiler._tcalled) do
+        local dt = profiler._clock() - profiler._tcalled[f]
+        profiler._telapsed[f] = profiler._telapsed[f] + dt
+        profiler._tcalled[f] = nil
     end
     -- merge closures
     local lookup = {}
-    for f, d in pairs(_defined) do
-        local id = (_labeled[f] or '?')..d
+    for f, d in pairs(profiler._defined) do
+        local id = (profiler._labeled[f] or '?')..d
         local f2 = lookup[id]
         if f2 then
-            _ncalls[f2] = _ncalls[f2] + (_ncalls[f] or 0)
-            _telapsed[f2] = _telapsed[f2] + (_telapsed[f] or 0)
-            _defined[f], _labeled[f] = nil, nil
-            _ncalls[f], _telapsed[f] = nil, nil
+            profiler._ncalls[f2] = profiler._ncalls[f2] + (profiler._ncalls[f] or 0)
+            profiler._telapsed[f2] = profiler._telapsed[f2] + (profiler._telapsed[f] or 0)
+            profiler._defined[f], profiler._labeled[f] = nil, nil
+            profiler._ncalls[f], profiler._telapsed[f] = nil, nil
         else
             lookup[id] = f
         end
@@ -101,15 +97,15 @@ function profile.stop()
 end
 
 --- Resets all collected data.
-function profile.reset()
-    for f in pairs(_ncalls) do
-        _ncalls[f] = 0
+function profiler.reset()
+    for f in pairs(profiler._ncalls) do
+        profiler._ncalls[f] = 0
     end
-    for f in pairs(_telapsed) do
-        _telapsed[f] = 0
+    for f in pairs(profiler._telapsed) do
+        profiler._telapsed[f] = 0
     end
-    for f in pairs(_tcalled) do
-        _tcalled[f] = nil
+    for f in pairs(profiler._tcalled) do
+        profiler._tcalled[f] = nil
     end
     collectgarbage('collect')
 end
@@ -117,24 +113,24 @@ end
 --- This is an internal function.
 -- @tparam function a First function
 -- @tparam function b Second function
-function profile.comp(a, b)
-    local dt = _telapsed[b] - _telapsed[a]
+function profiler.comp(a, b)
+    local dt = profiler._telapsed[b] - profiler._telapsed[a]
     if dt == 0 then
-        return _ncalls[b] < _ncalls[a]
+        return profiler._ncalls[b] < profiler._ncalls[a]
     end
     return dt < 0
 end
 
 --- Iterates all functions that have been called since the profile was started.
 -- @tparam[opt] number limit Maximum number of rows
-function profile.query(limit)
+function profiler.query(limit)
     local t = {}
-    for f, n in pairs(_ncalls) do
+    for f, n in pairs(profiler._ncalls) do
         if n > 0 then
             t[#t + 1] = f
         end
     end
-    table.sort(t, profile.comp)
+    table.sort(t, profiler.comp)
     if limit then
         while #t > limit do
             table.remove(t)
@@ -142,10 +138,10 @@ function profile.query(limit)
     end
     for i, f in ipairs(t) do
         local dt = 0
-        if _tcalled[f] then
-            dt = profiler._clock() - _tcalled[f]
+        if profiler._tcalled[f] then
+            dt = profiler._clock() - profiler._tcalled[f]
         end
-        t[i] = { i, _labeled[f] or '?', _ncalls[f], _telapsed[f] + dt, _defined[f] }
+        t[i] = { i, profiler._labeled[f] or '?', profiler._ncalls[f], profiler._telapsed[f] + dt, profiler._defined[f] }
     end
     return t
 end
@@ -154,9 +150,9 @@ local cols = { 3, 29, 11, 24, 24, 24}
 
 --- Generates a text report.
 -- @tparam[opt] number limit Maximum number of rows
-function profile.report(n)
+function profiler.report(n)
     local out = {}
-    local report = profile.query(n)
+    local report = profiler.query(n)
 
     local total_count = 0
     local total_time = 0
@@ -196,12 +192,3 @@ function profile.report(n)
     end
     return '\n'..sz..row
 end
-
--- store all internal profiler functions
-for _, v in pairs(profile) do
-    if type(v) == "function" then
-        _internal[v] = true
-    end
-end
-
-return profile

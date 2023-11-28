@@ -40,7 +40,7 @@ end
 --- @brief is x nil?
 --- @param x any
 function meta.is_nil(x)
-    return type(x) == "nil"
+    return x == nil
 end
 
 ---@brief is callable
@@ -61,8 +61,6 @@ meta._hash = 2^16
 --- @param typename String
 function meta._new(typename)
     meta.assert_string(typename)
-
-    if #typename == 0 then error("") end
 
     local out = {}
     out.__metatable = {}
@@ -515,6 +513,7 @@ function meta.new_type(typename, ctor, dtor)
     local out = meta._new("Type")
     local metatable = getmetatable(out)
     out._typename = typename
+    out._type_id = string.hash(typename)
 
     metatable.__call = function(self, ...)
         local out = ctor(...)

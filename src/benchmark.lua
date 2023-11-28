@@ -76,8 +76,9 @@ function benchmark(f, duration)
     end
 
     local to_time_unit = function(x)
-        local digit_factor = 10e4
-        return tostring(math.round(rt.seconds(x):as_microseconds() * digit_factor) / digit_factor) .. " mys"
+        local x = rt.seconds(x):as_microseconds()
+        x = x - math.fmod(x, 0.001) -- only keep 3 decimals after dot
+        return tostring(x) .. " mys"
     end
 
     local mean = to_time_unit(mean(runs))
