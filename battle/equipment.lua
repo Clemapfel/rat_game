@@ -1,7 +1,7 @@
 --- @class bt.Equipment
 --- @brief immutable config for equipment
 bt.Equipment = meta.new_type("Equipment", function(id)
-    meta.assert_string(id)
+    --[[meta.assert_string(id)
     local path = "assets/equipment/" .. id .. ".lua"
     if meta.is_nil(love.filesystem.getInfo(path)) then
         rt.error("In Equipment(\"" .. id .. "\"): path `" .. path .. "` does not exist")
@@ -10,12 +10,18 @@ bt.Equipment = meta.new_type("Equipment", function(id)
     if meta.is_nil(config_file) then
         rt.error("In Equipment(\"" .. id .. "\"): error parsing file at `" .. path .. "`: " .. error_maybe)
     end
+    ]]--
+
+    local path = "assets/equipment/" .. id .. ".lua"
+    local config_file, error_maybe = load(love.filesystem.read(path))
+
     local config = config_file()
     local out = meta.new(bt.Equipment, {
         id = id,
         thumbnail = {}
     })
 
+    --[[
     local attack_modifier = config.attack_modifier
     if not meta.is_nil(attack_modifier) then
         meta.assert_number(attack_modifier)
@@ -65,6 +71,7 @@ bt.Equipment = meta.new_type("Equipment", function(id)
     out.thumbnail_id = thumbnail_id
 
     meta.set_is_mutable(out, false)
+    ]]--
     return out
 end)
 

@@ -64,7 +64,7 @@ function benchmark(f, duration)
     local max = NEGATIVE_INFINITY
 
     local total_time = love.timer.getTime()
-    while sum < duration do
+    while sum < duration or #runs < 3 do
         local now = love.timer.getTime()
         f()
         local result = love.timer.getTime() - now
@@ -77,7 +77,7 @@ function benchmark(f, duration)
 
     local to_time_unit = function(x)
         local digit_factor = 10e4
-        return tostring(math.round(rt.seconds(x):as_milliseconds() * digit_factor) / digit_factor) .. " ms"
+        return tostring(math.round(rt.seconds(x):as_microseconds() * digit_factor) / digit_factor) .. " mys"
     end
 
     local mean = to_time_unit(mean(runs))

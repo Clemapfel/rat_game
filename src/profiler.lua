@@ -1,11 +1,13 @@
 -- SOURCE: https://github.com/2dengine/profile.lua/blob/main/profile.lua
 
-local clock = os.clock
+profiler._clock = os.profiler._clock
 
 --- Simple profiler written in Lua.
 -- @module profile
 -- @alias profile
-local profile = {}
+profiler = {
+
+}
 
 -- function labels
 local _labeled = {}
@@ -42,7 +44,7 @@ function profile.hooker(event, line, info)
         _telapsed[f] = 0
     end
     if _tcalled[f] then
-        local dt = clock() - _tcalled[f]
+        local dt = profiler._clock() - _tcalled[f]
         _telapsed[f] = _telapsed[f] + dt
         _tcalled[f] = nil
     end
@@ -51,17 +53,17 @@ function profile.hooker(event, line, info)
         profile.hooker("return", line, prev)
         profile.hooker("call", line, info)
     elseif event == 'call' then
-        _tcalled[f] = clock()
+        _tcalled[f] = profiler._clock()
     else
         _ncalls[f] = _ncalls[f] + 1
     end
 end
 
---- Sets a clock function to be used by the profiler.
+--- Sets a profiler._clock function to be used by the profiler.
 -- @tparam function func Clock function that returns a number
-function profile.setclock(f)
-    assert(type(f) == "function", "clock must be a function")
-    clock = f
+function profile.setprofiler._clock(f)
+    assert(type(f) == "function", "profiler._clock must be a function")
+    profiler._clock = f
 end
 
 --- Starts collecting data.
@@ -77,7 +79,7 @@ end
 function profile.stop()
     debug.sethook()
     for f in pairs(_tcalled) do
-        local dt = clock() - _tcalled[f]
+        local dt = profiler._clock() - _tcalled[f]
         _telapsed[f] = _telapsed[f] + dt
         _tcalled[f] = nil
     end
@@ -141,24 +143,37 @@ function profile.query(limit)
     for i, f in ipairs(t) do
         local dt = 0
         if _tcalled[f] then
-            dt = clock() - _tcalled[f]
+            dt = profiler._clock() - _tcalled[f]
         end
         t[i] = { i, _labeled[f] or '?', _ncalls[f], _telapsed[f] + dt, _defined[f] }
     end
     return t
 end
 
-local cols = { 3, 29, 11, 24, 32 }
+local cols = { 3, 29, 11, 24, 24, 24}
 
 --- Generates a text report.
 -- @tparam[opt] number limit Maximum number of rows
 function profile.report(n)
     local out = {}
     local report = profile.query(n)
+
+    local total_count = 0
+    local total_time = 0
+
+    for _, row in ipairs(report) do
+        total_count = total_count + row[3]
+        total_time = total_time + row[4]
+    end
+
+    total_time = report[1][4]
+
     for i, row in ipairs(report) do
         local count = row[3]
         local time = row[4]
-        for j = 1, 5 do
+        row[5] = time / count
+        row[6] = time / total_time * 100
+        for j = 1, 6 do
             local s = row[j]
             local l2 = cols[j]
             s = tostring(s)
@@ -171,11 +186,10 @@ function profile.report(n)
             row[j] = s
         end
         out[i] = table.concat(row, ' | ')
-        out[i] = out[i] .. " | " .. tostring(time / count)
     end
 
-    local row = " +-----+-------------------------------+-------------+--------------------------+----------------------------------+------------------------------- \n"
-    local col = " | #   | Function                      | Calls       | Time                     | Code                             | Normalized                     \n"
+    local row = " +-----+-------------------------------+-------------+--------------------------+--------------------------+--------------------------+ \n"
+    local col = " | #   | Function                      | #Calls      | Time (s)                 | Time per Call (s)        | Overally Contribution (%)| \n"
     local sz = row..col..row
     if #out > 0 then
         sz = sz..' | '..table.concat(out, ' | \n | ')..' | \n'

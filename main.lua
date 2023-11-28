@@ -22,17 +22,17 @@ list = rt.ListLayout(rt.Orientation.VERTICAL)
 list:push_back(rt.Spacer())
 equipment = bt.Equipment("TEST_EQUIPMENT")
 
---profile = require "profiler"
---profile.start()
+profile = require "profiler"
+profile.start()
 
 li = {}
 
---benchmark(function()
-  -- table.insert(li, bt.EquipmentListItem(equipment))
---end)
+benchmark(function()
+  table.insert(li, bt.Equipment(equipment.id))
+end, 10)
 
---profile.stop()
---println(profile.report())
+profile.stop()
+println(profile.report())
 
 rt.current_scene:set_child(bt.EquipmentListItem(equipment))
 rt.current_scene.input:signal_connect("pressed", function(_, button)

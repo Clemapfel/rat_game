@@ -2,7 +2,7 @@
 meta = {}
 meta.types = {}
 
-meta.DEBUG_MODE = true
+meta.DEBUG_MODE = false
 meta.DUMMY_FUNCTION = function(...) end
 
 --- @brief [internal] disable function unless `meta.DEBUG_MODE` is set to `true`
