@@ -45,16 +45,10 @@ function rt.Viewport:size_allocate(x, y, width, height)
     self._width = width
     self._height = height
 
-    if not meta.is_nil(self._child) and not meta.is_nil(self:get_parent()) then
-        local w, h = self:get_parent():get_size()
+    if meta.is_widget(self._child) then
+        local w, h = self._child:measure()
         self._child:fit_into(rt.AABB(x, y, w, h))
     end
-end
-
---- @overload rt.Widget.measure
-function rt.Viewport:measure()
-    if meta.is_nil(self._child) then return 0, 0 end
-    return rt.Widget.measure(self)
 end
 
 --- @brief set singular child
@@ -67,7 +61,19 @@ function rt.Viewport:set_child(child)
 
     self._child = child
     child:set_parent(self)
+
+    if self:get_is_realized() then
+        self._child:realize()
+    end
     self:reformat()
+end
+
+--- @overload rt.Widget.realize
+function rt.Viewport:realize()
+    if meta.is_widget(self._child) then
+        self._child:realize()
+    end
+    rt.Widget.realize(self)
 end
 
 --- @brief get child
@@ -83,7 +89,7 @@ function rt.Viewport:remove_child()
     if not meta.is_nil(self._child) then
         self._child:set_parent(nil)
         self._child = nil
-            self:reformat()
+        self:reformat()
     end
 end
 

@@ -42,9 +42,6 @@ end
 
 --- @brief raise state alteration by number of steps
 function rt._stat_alteration_add(level, offset)
-    meta.assert_enum(level, rt.StatAlteration)
-    meta.assert_number(offset)
-
     _stat_alteration_add_offset_plus_1 = function(x)
 
         if x == rt.StatAlteration.MIN then

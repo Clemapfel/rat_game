@@ -18,12 +18,15 @@ io.stdout:setvbuf("no") -- makes it so love2d error message is printed to consol
 
 rt.add_scene("debug")
 
-list = rt.ListLayout(rt.Orientation.VERTICAL)
+list = rt.ListView()
 list:push_back(rt.Spacer())
 equipment = bt.Equipment("TEST_EQUIPMENT")
 
+for i = 1, 3 do
+    list:push_back(bt.EquipmentListItem(equipment))
+end
 
-rt.current_scene:set_child(bt.EquipmentListItem(equipment))
+rt.current_scene:set_child(list)
 rt.current_scene.input:signal_connect("pressed", function(_, button)
     if button == rt.InputButton.A then
         item._tooltip_layout:set_tooltip_visible(not item._tooltip_layout:get_tooltip_visible())

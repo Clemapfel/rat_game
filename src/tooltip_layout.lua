@@ -10,7 +10,7 @@ rt.TooltipLayout = meta.new_type("TooltipLayout", function(child)
         _tooltip_backdrop = rt.Rectangle(0, 0, 1, 1),
         _tooltip_frame = rt.Rectangle(0, 0, 1, 1),
         _tooltip_frame_outline = rt.Rectangle(0, 0, 1, 1),
-        _show_tooltip = true,
+        _show_tooltip = false,
         _child = ternary(meta.is_nil(child), {}, child),
         _input = {}
     }, rt.Widget, rt.Drawable)
@@ -146,6 +146,12 @@ function rt.TooltipLayout:set_tooltip_visible(b)
 
     self._show_tooltip = b
     local visible = self._show_tooltip
+    if not meta.is_widget(self._tooltip) then return end
+
+    if visible == true and not self._tooltip:get_is_realized() then
+        self._tooltip:realize()
+    end
+
     if meta.isa(self._tooltip, rt.Widget) then
         self._tooltip:set_is_visible(visible)
     end
@@ -220,7 +226,7 @@ function rt.TooltipLayout:realize()
         self._child:realize()
     end
 
-    if meta.is_widget(self._tooltip) then
+    if meta.is_widget(self._tooltip) and self._show_tooltip then
         self._tooltip:realize()
     end
 

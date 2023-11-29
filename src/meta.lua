@@ -2,7 +2,7 @@
 meta = {}
 meta.types = {}
 
-meta.DEBUG_MODE = false
+meta.DEBUG_MODE = true
 meta.DUMMY_FUNCTION = function(...) end
 
 --- @brief [internal] disable function unless `meta.DEBUG_MODE` is set to `true`
@@ -60,7 +60,7 @@ meta._hash = 2^16
 --- @brief [internal] Create new empty object
 --- @param typename String
 function meta._new(typename)
-    meta.assert_string(typename)
+    --meta.assert_string(typename)
 
     local out = {}
     out.__metatable = {}
@@ -455,7 +455,7 @@ function meta._install_inheritance(instance, type)
     end
 
     for key, value in pairs(getmetatable(type).properties) do
-        if key ~= "_typename" then --and not meta.has_property(instance, key) then
+        if key ~= "_typename" and instance[key] == nil then --and not meta.has_property(instance, key) then
             meta._install_property(instance, key, value)
         end
     end

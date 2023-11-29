@@ -128,11 +128,6 @@ function rt.Scrollbar:size_allocate(x, y, width, height)
     end
 end
 
---- @overload rt.Widget.measure
-function rt.Scrollbar:measure()
-    return self._base:get_size()
-end
-
 --- @brief [internal]
 function rt.test.scrollbar()
     error("TODO")

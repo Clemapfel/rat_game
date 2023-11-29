@@ -65,6 +65,13 @@ function rt.Spacer:get_color()
     return self._shape:get_color()
 end
 
+--- @brief
+function rt.Spacer:set_corner_radius(r)
+    meta.assert_isa(self, rt.Spacer)
+    meta.assert_number(r)
+    self._shape:set_corner_radius(r)
+end
+
 --- @brief test Spacer
 function rt.test.spacer()
     error("TODO")

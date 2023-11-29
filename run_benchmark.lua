@@ -13,7 +13,6 @@ require "random"
 require "time"
 require "benchmark"
 
-
 TestSuper = meta.new_type("TestSuper", function()
     return meta.new(TestSuper)
 end)
