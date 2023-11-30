@@ -1,5 +1,65 @@
 rt.settings.pixel_effect = {}
-rt.settings.pixel_effect.vertex_shader_source = [[
+
+--- @class rt.PixelEffect
+rt.PixelEffect = meta.new_type("PixelEffect", function(n_instances, vertex_source, fragment_source)
+
+    local out = meta.new(rt.PixelEffect, {
+        _n_instances = n_instances,
+        _data = love.graphics.newMesh(
+            n_instances,
+            rt.MeshDrawMode.POINTS,
+            rt.SpriteBatchUsage.STREAM
+        ),
+        _shape = love.graphics.newMesh(
+            {{0, 0}},
+            rt.MeshDrawMode.POINTS,
+            rt.SpriteBatchUsage.STATIC
+        ),
+        _shader = love.graphics.newShader(
+            vertex_source,
+            fragment_source
+        ),
+        _elapsed = 0
+    }, rt.Drawable)
+
+    out._shader:send("_instance_count", out._n_instances)
+    out._shape:attachAttribute(rt.VertexAttribute.POSITION, out._data, "perinstance")
+    return out
+end)
+
+--- @overload rt.Drawable.draw
+function rt.PixelEffect:draw()
+    meta.assert_isa(self, rt.PixelEffect)
+    self:update(love.timer.getDelta())
+
+    love.graphics.setShader(self._shader)
+    love.graphics.drawInstanced(self._shape, self._n_instances)
+    love.graphics.setShader()
+end
+
+--- @overload rt.Animation.update
+function rt.PixelEffect:update(delta)
+    meta.assert_isa(self, rt.PixelEffect)
+    self._elapsed = self._elapsed + delta
+    self._shader:send("_time", self._elapsed)
+    println(self._elapsed)
+end
+
+--- @brief
+function rt.PixelEffect:set_instance_position(index, x, y, z)
+    meta.assert_isa(self, rt.PixelEffect)
+    self._data:setVertexAttribute(index, 1, x, y, z)
+end
+
+--- @brief
+function rt.PixelEffect:get_n_instances()
+    meta.assert_isa(self, rt.PixelEffect)
+    return self._n_instances
+end
+
+-- #######
+
+rt.settings.pixel_effect.snow.vertex_shader_source = [[
 #pragma language glsl3
 
 // random
@@ -89,7 +149,7 @@ vec4 position(mat4 transform, vec4 vertex_position)
 }
 ]]
 
-rt.settings.pixel_effect.fragment_shader_source = [[
+rt.settings.pixel_effect.snow.fragment_shader_source = [[
 #pragma language glsl3
 
 vec3 rgb_to_hsv(vec3 c)
@@ -177,70 +237,3 @@ vec4 effect(vec4 vertex_color, Image texture, vec2 texture_coords, vec2 vertex_p
     return vec4(1, 1, 1, hue);
 }
 ]]
-
---- @class rt.PixelEffect
-rt.PixelEffect = meta.new_type("PixelEffect", function(n_instances)
-
-    local attributes = {}
-    for i = 1, n_instances do
-        table.insert(attributes, {0, 0})
-    end
-
-    local out = meta.new(rt.PixelEffect, {
-        _n_instances = n_instances,
-        _data = love.graphics.newMesh(
-            attributes,
-            rt.MeshDrawMode.POINTS,
-            rt.SpriteBatchUsage.STREAM
-        ),
-        _shape = love.graphics.newMesh(
-            {{0, 0}},
-            rt.MeshDrawMode.POINTS,
-            rt.SpriteBatchUsage.STATIC
-        ),
-        _shader = love.graphics.newShader(
-            rt.settings.pixel_effect.vertex_shader_source,
-            rt.settings.pixel_effect.fragment_shader_source
-        ),
-        _elapsed = 0
-    }, rt.Drawable)
-
-    out._shader:send("_instance_count", out._n_instances)
-    out._shape:attachAttribute(rt.VertexAttribute.POSITION, out._data, "perinstance")
-    return out
-end)
-
---- @overload rt.Drawable.draw
-function rt.PixelEffect:draw()
-    meta.assert_isa(self, rt.PixelEffect)
-    self:update(love.timer.getDelta())
-
-    love.graphics.setShader(self._shader)
-    love.graphics.drawInstanced(self._shape, self._n_instances)
-    love.graphics.setShader()
-end
-
---- @overload rt.Animation.update
-function rt.PixelEffect:update(delta)
-    meta.assert_isa(self, rt.PixelEffect)
-    self._elapsed = self._elapsed + delta
-    self._shader:send("_time", self._elapsed)
-    println(self._elapsed)
-end
-
---- @brief [internal]
-function rt.PixelEffect:_draw_data()
-    love.graphics.draw(self._data)
-end
-
---- @brief
-function rt.PixelEffect:set_instance_position(index, x, y, z)
-    meta.assert_isa(self, rt.PixelEffect)
-    self._data:setVertexAttribute(index, 1, x, y, z)
-end
-
---- @brief
-function rt.PixelEffect:get_n_instances()
-    meta.assert_isa(self, rt.PixelEffect)
-    return self._n_instances
-end

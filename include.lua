@@ -10,11 +10,10 @@ rt.settings = {}
 rt.battle = {}
 bt = rt.battle
 
-
 require "common"
-require "settings"
 require "log"
 require "meta"
+require "settings"
 require "time"
 require "benchmark"
 require "vector"

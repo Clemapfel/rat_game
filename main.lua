@@ -26,6 +26,13 @@ for i = 1, 3 do
     list:push_back(bt.EquipmentListItem(equipment))
 end
 
+
+
+perl = {}
+make_auto_extend_table(perl, true)
+perl.settings.is_foo.are_you_sure = true
+println(serialize(perl))
+
 --rt.current_scene:set_child(list)
 rt.current_scene.input:signal_connect("pressed", function(_, button)
     if button == rt.InputButton.A then

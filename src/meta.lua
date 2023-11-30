@@ -642,3 +642,32 @@ function meta.hash(x)
     meta.assert_object(x)
     return getmetatable(x).__hash
 end
+
+--- @brief make it such that when a table is queried, it will create the index if it does not already have it
+--- @param table Table
+--- @param recursive Boolean true if any table added via this mechanism should itself be made auto extendable
+function meta.make_auto_extend_table(table, recursive)
+    meta.assert_table(table)
+    if recursive == nil then recursive = false end
+    meta.assert_boolean(recursive)
+
+    local metatable = getmetatable(table)
+    if metatable == nil then
+        metatable = {}
+        setmetatable(table, metatable)
+    end
+
+    if metatable.__index ~= nil then
+        error("In make_auto_extend_table: table already has a metatable with an __index method")
+    end
+
+    metatable.__index = function(self, key)
+        local out = {}
+        self[key] = out
+
+        if recursive then
+            make_auto_extend_table(out, recursive)
+        end
+        return out
+    end
+end
