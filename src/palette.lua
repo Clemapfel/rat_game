@@ -124,10 +124,18 @@ rt.Palette.HIGHLIGHT_OUTLINE = rt.Palette.BLUE_4
 rt.Palette.SELECTION = rt.Palette.YELLOW_1
 rt.Palette.SELECTION_OUTLINE = rt.Palette.YELLOW_2
 
+-- battle
+
 rt.Palette.ATTACK = rt.Palette.NEON_RED_3
 rt.Palette.DEFENSE = rt.Palette.LIGHT_BLUE_2
 rt.Palette.SPEED = rt.Palette.LIGHT_GREEN_2
 rt.Palette.HP = rt.Palette.PURPLE_1
+
+rt.Palette.ALLY = rt.Palette.LIGHT_BLUE_1
+rt.Palette.ENEMY = rt.Palette.RED_1
+rt.Palette.SELF = rt.Palette.LILAC_1
+rt.Palette.FIELD = rt.Palette.ORANGE_1
+
 
 --- @brief save palette to assets/palette.png
 function rt.Palette:export()

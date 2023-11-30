@@ -10,7 +10,7 @@ bt.EquipmentTooltip = meta.new_type("EquipmentTooltip", function(equipment)
         env.equipment_spritesheet = rt.Spritesheet("assets/sprites", "equipment")
     end
 
-    local sprite_id = "knife"
+    local sprite_id = "default"
     local sprite_size_x, sprite_size_y = env.equipment_spritesheet:get_frame_size(sprite_id)
     local out = meta.new(bt.EquipmentTooltip, {
         _equipment = equipment,

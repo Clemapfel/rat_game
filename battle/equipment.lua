@@ -1,3 +1,5 @@
+rt.settings.battle.equipment.default_effect_text = "no additional effect"
+
 --- @class bt.Equipment
 --- @brief immutable config for equipment
 bt.Equipment = meta.new_type("Equipment", function(id)
@@ -13,8 +15,7 @@ bt.Equipment = meta.new_type("Equipment", function(id)
 
     local config = config_file()
     local out = meta.new(bt.Equipment, {
-        id = id,
-        thumbnail = {}
+        id = id
     })
 
     local attack_modifier = config.attack_modifier
@@ -42,12 +43,14 @@ bt.Equipment = meta.new_type("Equipment", function(id)
     end
 
     meta.assert_string(config.name)
-    assert(#config.name > 0)
+    if #config.name == 0 then
+        rt.error("In Equipment(\"" .. id .. "\"): `name` field cannot be empty")
+    end
     out.name = config.name
 
     local effect_text = config.effect_text
     if meta.is_nil(effect_text) then
-        out.effect_text = "No additional effect"
+        out.effect_text = rt.settings.battle.equipment.default_effect_text
     else
         meta.assert_string(effect_text)
         out.effect_text = effect_text

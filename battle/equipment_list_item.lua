@@ -5,7 +5,7 @@ bt.EquipmentListItem = meta.new_type("EquipmentListItem", function(equipment)
         env.equipment_spritesheet = rt.Spritesheet("assets/sprites", "equipment")
     end
 
-    local sprite_id = "knife"
+    local sprite_id = "default"
     local sprite_size_x, sprite_size_y = env.equipment_spritesheet:get_frame_size(sprite_id)
     sprite_size_x = sprite_size_x * 1
     sprite_size_y = sprite_size_y * 1

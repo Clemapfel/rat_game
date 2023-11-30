@@ -5,14 +5,89 @@ bt.TargetingMode = meta.new_enum({
     STAGE = "STAGE"
 })
 
+rt.settings.battle_action.default_effect_text = "does nothing."
+
 --- @class bt.Action
 --- @brief immutable config for battle actions
 bt.Action = meta.new_type("Action", function(id)
     meta.assert_string(id)
+
+    local path = "assets/actions/" .. id .. ".lua"
+    if meta.is_nil(love.filesystem.getInfo(path)) then
+        rt.error("In Action(\"" .. id .. "\"): path `" .. path .. "` does not exist")
+    end
+    local config_file, error_maybe = load(love.filesystem.read(path))
+    if meta.is_nil(config_file) then
+        rt.error("In Action(\"" .. id .. "\"): error parsing file at `" .. path .. "`: " .. error_maybe)
+    end
+
+    local config = config_file()
     local out = meta.new(bt.Action, {
-        id = id
+        id = id,
+        thumbnail = {}
     })
+
+    local is_consumable = config.is_consumable
+    if not meta.is_nil(is_consumable) then
+        meta.assert_boolean(is_consumable)
+        out.is_consumable = is_consumable
+    end
+
+    local max_n_uses = config.max_n_uses
+    if not meta.is_nil(max_n_uses) then
+        meta.assert_number(max_n_uses)
+        if max_n_uses <= 0 then
+            rt.error("In Action(\"" .. id .. "\"): value `" .. tostring(max_n_uses) .. "` for field `max_n_uses` is out of range")
+        end
+        out.max_n_uses = max_n_uses
+    end
+
+    local targeting_mode = config.targeting_mode
+    if not meta.is_nil(targeting_mode) then
+        meta.assert_enum(targeting_mode, bt.TargetingMode)
+        out.targeting_mode = targeting_mode
+    end
+
+    for _, which in pairs({"self", "ally", "enemy"}) do
+        local value = config["can_target_" .. which]
+        if not meta.is_nil(value) then
+            meta.assert_boolean(value)
+            out["can_target_" .. which] = value
+        end
+    end
+
+    meta.assert_string(config.name)
+    if #config.name == 0 then
+        rt.error("In Action(\"" .. id .. "\"): `name` field cannot be empty")
+    end
+    out.name = config.name
+
+    local effect_text = config.effect_text
+    if meta.is_nil(effect_text) then
+        out.effect_text = rt.settings.battle_action.default_effect_text
+    else
+        meta.assert_string(effect_text)
+        out.effect_text = effect_text
+    end
+
+    local flavor_text = config.flavor_text
+    if meta.is_nil(flavor_text) then
+        out.flavor_text = ""
+    else
+        meta.assert_string(flavor_text)
+        out.flavor_text = flavor_text
+    end
+
+    local thumbnail_id = config.thumbnail_id
+    meta.assert_string(thumbnail_id)
+    out.thumbnail_id = thumbnail_id
+
+    local animation_id = config.animation_id
+    meta.assert_string(animation_id)
+    out.animation_id = animation_id
+
     meta.set_is_mutable(out, false)
+    return out
 end)
 
 -- possible targets
@@ -23,6 +98,9 @@ bt.Action.can_target_self = true
 
 -- maximum number of uses
 bt.Action.max_n_uses = POSITIVE_INFINITY
+
+--- whether an actions stacks can be replenished
+bt.Action.is_consumable = false
 
 -- cleartext name
 bt.Action.name = "ERROR_ACTION"
@@ -38,27 +116,6 @@ bt.Action.thumbnail_id = "default"
 
 -- sprite for in-battle animation
 bt.Action.animation_id = "default"
-
---- @class bt.Move
-bt.Move = meta.new_type("Move", function(id)
-    meta.assert_string(id)
-    local action = bt.Action(id)
-    return meta.new(bt.Move, {
-        action = action,
-        current_n_uses = action.max_n_uses
-    })
-end)
-
---- @class bt.Consumable
-bt.Consumable = meta.new_type("Consumable", function(id, n_stacks)
-    meta.assert_string(id)
-    meta.assert_number(n_stacks)
-    local action = bt.Action(id)
-    return meta.new(bt.Consumable, {
-        action = action,
-        n_stacks = n_stacks
-    })
-end)
 
 
 

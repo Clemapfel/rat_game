@@ -3,9 +3,10 @@ return {
     width = 32,
     height = 32,
     animations = {
-        sword = 1,
-        knife = 2,
-        slingshot = 3,
-        cane = 4
+        default = 1,
+        sword = 2,
+        knife = 3,
+        slingshot = 4,
+        cane = 5
     }
 }

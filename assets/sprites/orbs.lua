@@ -4,8 +4,9 @@ return {
     height = 32,
 
     animations = {
-        NOT_FOUND = {1, 1},
-        DUSK = {2, 2},
-        MANAPHY = {3, 3}
+        default = 1,
+        dusk = 2,
+        manaphy = 3,
+        rest = {4, 22}
     }
 }
