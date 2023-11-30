@@ -206,3 +206,13 @@ function rt.Frame:set_corner_radius(radius)
         self._stencil_mask:set_corner_radius(corner_radius)
     end
 end
+
+--- @overload rt.Widget.measure
+function rt.Frame:measure()
+    if meta.is_widget(self._child) then
+        local w, h = self._child:measure()
+        return w + self._thickness * 2, h + self._thickness * 2
+    else
+        return rt.Widget.measure(self)
+    end
+end

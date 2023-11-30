@@ -66,15 +66,17 @@ bt.EquipmentTooltip = meta.new_type("EquipmentTooltip", function(equipment)
 
     local stat_label_text = ""
     stat_label_text = stat_label_text
-    .. ternary(equipment.attack_modifier ~= 0, "<color=ATTACK>ATK: " .. modifier_to_label(equipment.attack_modifier) .. "</color>\n", "")
-    .. ternary(equipment.defense_modifier ~= 0, "<color=DEFENSE>DEF: " .. modifier_to_label(equipment.defense_modifier) .. "</color>\n", "")
-    .. ternary(equipment.speed_modifier ~= 0, "<color=SPEED>SPD: " .. modifier_to_label(equipment.speed_modifier) .. "</color>\n", "")
-    .. ternary(equipment.hp_modifier ~= 0, "<color=HP>HP : " .. modifier_to_label(equipment.hp_modifier) .. "</color>\n", "")
+    .. ternary(equipment.attack_modifier ~= 0, "<color=ATTACK><b>ATK</b><mono> " .. modifier_to_label(equipment.attack_modifier) .. "</mono></color>\n", "")
+    .. ternary(equipment.defense_modifier ~= 0, "<color=DEFENSE><b>DEF</b><mono> " .. modifier_to_label(equipment.defense_modifier) .. "</mono></color>\n", "")
+    .. ternary(equipment.speed_modifier ~= 0, "<color=SPEED><b>SPD</b><mono> " .. modifier_to_label(equipment.speed_modifier) .. "</mono></color>\n", "")
+    .. ternary(equipment.hp_modifier ~= 0, "<color=HP><b>HP  </b><mono> " .. modifier_to_label(equipment.hp_modifier) .. "</mono></color>\n", "")
 
-    out._stat_label = rt.Label(stat_label_text, rt.settings.font.default_mono)
+    out._stat_label = rt.Label(stat_label_text)
     out._stat_label:set_margin_top(0.5 * rt.settings.margin_unit)
 
     out._sprite_overlay:set_base_child(out._sprite_backdrop)
+
+    out._sprite:set_minimum_size(sprite_size_x * 2, sprite_size_y * 2)
 
     out._sprite_aspect:set_child(out._sprite)
     out._sprite_overlay:push_overlay(out._sprite_aspect)

@@ -8,16 +8,22 @@ rt.JustifyMode = meta.new_enum({
 --- @class rt.Label
 --- @param text String
 --- @param font rt.Font (or nil)
-rt.Label = meta.new_type("Label", function(text, font)
+rt.Label = meta.new_type("Label", function(text, font, monospace_font)
     meta.assert_string(text)
     if meta.is_nil(font) then
         font = rt.settings.font.default
     end
     meta.assert_isa(font, rt.Font)
 
+    if meta.is_nil(monospace_font) then
+        monospace_font = rt.settings.font.default_mono
+    end
+    meta.assert_isa(monospace_font, rt.Font)
+
     local out = meta.new(rt.Label, {
         _raw = text,
         _font = font,
+        _monospace_font = monospace_font,
         _justify_mode = rt.JustifyMode.LEFT,
         _glyphs = {},
         _n_characters = 0,
@@ -202,6 +208,8 @@ rt.Label.EFFECT_WAVE_TAG_START = rt.Set("<wave>", "<fx_wave>")
 rt.Label.EFFECT_WAVE_TAG_END = rt.Set("</wave", "</fx_wave>")
 rt.Label.EFFECT_RAINBOW_TAG_START = rt.Set("<rainbow>", "<fx_rainbow>")
 rt.Label.EFFECT_RAINBOW_TAG_END = rt.Set("</rainbow>", "</fx_rainbow>")
+rt.Label.MONOSPACE_TAG_START = rt.Set("<tt>", "<mono>")
+rt.Label.MONOSPACE_TAG_END = rt.Set("</tt>", "</mono>")
 
 --- @brief [internal] transform _raw into set of glyphs
 function rt.Label:_parse()
@@ -214,6 +222,7 @@ function rt.Label:_parse()
     local italic = false
     local is_colored = false
     local color = "TRUE_WHITE"
+    local mono = false
     local underlined = false
     local strikethrough = false
     local effect_rainbow = false
@@ -238,13 +247,18 @@ function rt.Label:_parse()
             style = rt.FontStyle.ITALIC
         end
 
+        local font = self._font
+        if mono == true then
+            font = self._monospace_font
+        end
+
         local effects = {}
         if effect_rainbow then table.insert(effects, rt.TextEffect.RAINBOW) end
         if effect_shake then table.insert(effects, rt.TextEffect.SHAKE) end
         if effect_wave then table.insert(effects, rt.TextEffect.WAVE) end
 
         table.insert(self._glyphs, rt.Glyph(
-            self._font,
+            font,
             current_word,
             style,
             rt.Palette[ternary(effect_rainbow, "TRUE_WHITE", color)],
@@ -384,6 +398,17 @@ function rt.Label:_parse()
                     throw_parse_error("trying to close an strikethrough region, but one is not open")
                 end
                 strikethrough = false
+            -- mono
+            elseif tag_matches(rt.Label.MONOSPACE_TAG_START) then
+                if mono == true then
+                    throw_parse_error("trying to open an monospace region, but one is already open")
+                end
+                mono = true
+            elseif tag_matches(rt.Label.MONOSPACE_TAG_END) then
+                if mono == false then
+                    throw_parse_error("trying to close an monospace region, but one is not open")
+                end
+                mono = false
             -- color
             elseif is_color_tag() then
                 if is_colored == true then

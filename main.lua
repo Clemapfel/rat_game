@@ -19,8 +19,16 @@ io.stdout:setvbuf("no") -- makes it so love2d error message is printed to consol
 rt.add_scene("debug")
 
 action = bt.Action("TEST_ACTION")
-tooltip = bt.ActionTooltip(action)
-rt.current_scene:set_child(tooltip)
+action_tooltip = bt.ActionTooltip(action)
+
+equipment = bt.Equipment("TEST_EQUIPMENT")
+equipment_tooltip = bt.EquipmentTooltip(equipment)
+
+layout = rt.SplitLayout()
+layout:set_start_child(action_tooltip)
+layout:set_end_child(equipment_tooltip)
+
+rt.current_scene:set_child(layout)
 
 -- #############################
 

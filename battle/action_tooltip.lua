@@ -1,7 +1,7 @@
 rt.settings.action_tooltip = {
     effect_prefix = "<b><u>Effect</u></b>: ",
     possible_targets_prefix = "<b>Can Target</b>: ",
-    consumable_prefix = "<b>Amount: </b>"
+    consumable_prefix = "<b>Count: </b>"
 }
 
 function bt.Action:_possible_targets_as_label()
@@ -77,6 +77,7 @@ bt.ActionTooltip = meta.new_type("ActionTooltip", function(action)
 
     local sprite_id = "dusk"
     local sprite_size_x, sprite_size_y = env.action_spritesheet:get_frame_size(sprite_id)
+    println(sprite_size_x, " ", sprite_size_y)
     local out = meta.new(bt.ActionTooltip, {
         _action = action,
 
@@ -92,7 +93,7 @@ bt.ActionTooltip = meta.new_type("ActionTooltip", function(action)
         _sprite_aspect = rt.AspectLayout(sprite_size_x / sprite_size_y),
         _sprite_backdrop = rt.Spacer(),
         _sprite_overlay = rt.OverlayLayout(),
-        _sprite_frame = rt.Frame(rt.FrameType.CIRCULAR),
+        _sprite_frame = rt.Frame(rt.FrameType.RECTANGULAR),
 
         _name_and_sprite_box = rt.BoxLayout(rt.Orientation.HORIZONTAL),
         _effect_box = rt.BoxLayout(rt.Orientation.VERTICAL),
@@ -118,11 +119,11 @@ bt.ActionTooltip = meta.new_type("ActionTooltip", function(action)
         if action.is_consumable then
             consumable_text = tostring(action.max_n_uses) .. " left"
         else
-            consumable_text = consumable_text .."? / " .. tostring(action.max_n_uses) .. ""
+            consumable_text = consumable_text .."<mono> 0/" .. tostring(action.max_n_uses) .. "</mono>"
         end
     end
 
-    out._n_uses_label = rt.Label(rt.settings.action_tooltip.consumable_prefix .. consumable_text, rt.settings.font.default_mono)
+    out._n_uses_label = rt.Label(rt.settings.action_tooltip.consumable_prefix .. consumable_text)
     
     out._name_label = rt.Label("<b>" .. action.name .. "</b>")
     out._name_label:set_horizontal_alignment(rt.Alignment.START)
@@ -141,7 +142,7 @@ bt.ActionTooltip = meta.new_type("ActionTooltip", function(action)
     out._name_and_sprite_box:set_expand_horizontally(true)
 
     out._sprite_frame:set_expand(false)
-    out._sprite_frame:set_minimum_size(sprite_size_x * 2, sprite_size_y * 2)
+    out._sprite:set_minimum_size(sprite_size_x * 2, sprite_size_y * 2)
 
     for _, label in pairs({out._name_label, out._effect_label, out._possible_target_label, out._n_uses_label}) do
         label:set_horizontal_alignment(rt.Alignment.START)
