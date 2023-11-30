@@ -8,7 +8,7 @@ rt.Priority = meta.new_enum({
 })
 
 --- @class MoveConfig
-rt.MoveConfig = meta.new_type("MoveConfig", function(config)
+rt.MoveConfig = meta.new_type("MoveConfig", function(id)
 
     meta.assert_string(config.name)
     meta.assert_string(config.description)

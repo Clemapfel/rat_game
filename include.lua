@@ -11,9 +11,9 @@ rt.battle = {}
 bt = rt.battle
 
 require "common"
+require "settings"
 require "log"
 require "meta"
-require "settings"
 require "time"
 require "benchmark"
 require "vector"
@@ -46,7 +46,6 @@ require "keyboard_controller"
 require "mouse_controller"
 require "input_controller"
 require "thread"
-require "pixel_effect"
 
 require "widget"
 require "selection_handler"
@@ -80,6 +79,9 @@ require "sprite_frame"
 require "sprite_scale"
 require "sprite_levelbar"
 require "list_view"
+
+require "overworld/snow_effect"
+require "overworld/rain_effect"
 
 require "battle/action"
 require "battle/equipment"

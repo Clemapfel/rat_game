@@ -1,9 +1,9 @@
-if type(rt.settings) == "nil" then rt.settings = {} end
-rt.settings.log = {}
-rt.settings.log.rt_prefix = "[rt]"
-rt.settings.log.log_prefix = "[LOG]"
-rt.settings.log.warning_prefix = "[WARNING]"
-rt.settings.log.error_prefix = "[ERROR]"
+rt.settings.log = {
+    rt_prefix = "[rt]",
+    log_prefix = "[LOG]",
+    warning_prefix = "[WARNING]",
+    error_prefix = "[ERROR]"
+}
 
 --- @brief
 function rt.log(message)
