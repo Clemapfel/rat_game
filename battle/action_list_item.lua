@@ -20,8 +20,9 @@ bt.ActionListItem = meta.new_type("ActionListItem", function(action)
         _name_label = rt.Label(action.name),
 
         _name_spacer = rt.Spacer(),
-
+        _effect_spacer = rt.Spacer(),
         _n_uses_spacer = rt.Spacer(),
+
         _n_uses_label = rt.Label("? / ?"),
 
         _hbox = rt.BoxLayout(rt.Orientation.HORIZONTAL),
@@ -34,7 +35,7 @@ bt.ActionListItem = meta.new_type("ActionListItem", function(action)
     out._sprite_aspect:set_child(out._sprite)
     out._sprite_overlay:push_overlay(out._sprite_aspect)
 
-    for _, spacer in pairs({out._sprite_spacer, out._name_spacer, out._n_uses_spacer}) do
+    for _, spacer in pairs({out._sprite_spacer, out._name_spacer, out._n_uses_spacer, out._effect_spacer}) do
         spacer:set_expand_horizontally(false)
         spacer:set_expand_vertically(true)
         spacer:set_minimum_size(3, 0)
@@ -47,16 +48,19 @@ bt.ActionListItem = meta.new_type("ActionListItem", function(action)
     out._sprite_overlay:set_expand(false)
     out._name_label:set_expand_horizontally(true)
     out._name_label:set_horizontal_alignment(rt.Alignment.START)
+    out._name_label:set_margin_left(rt.settings.margin_unit)
 
     out._hbox:push_back(out._sprite_overlay)
     out._hbox:push_back(out._name_label)
     out._hbox:push_back(out._name_spacer)
+    out._hbox:push_back(rt.Label("effect"))
+    out._hbox:push_back(out._effect_spacer)
     out._hbox:push_back(out._n_uses_label)
+    out._hbox:push_back(out._n_uses_spacer)
 
     out:update_n_uses(action.max_n_uses)
     out._n_uses_label:set_expand_horizontally(false)
     out._n_uses_label:set_horizontal_alignment(rt.Alignment.START)
-    out._n_uses_label:set_margin_right(2 * rt.settings.margin_unit)
 
     out._hbox:set_expand_vertically(false)
 

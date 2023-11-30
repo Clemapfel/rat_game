@@ -55,6 +55,7 @@ bt.EquipmentListItem = meta.new_type("EquipmentListItem", function(equipment)
     out._sprite_overlay:set_expand(false)
     out._name_label:set_expand_horizontally(true)
     out._name_label:set_horizontal_alignment(rt.Alignment.START)
+    out._name_label:set_margin_left(rt.settings.margin_unit)
 
     for _, indicator in pairs({out._attack_indicator, out._defense_indicator, out._speed_indicator, out._hp_indicator}) do
         out._indicator_hbox:push_back(indicator)
