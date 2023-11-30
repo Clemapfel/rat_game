@@ -20,10 +20,22 @@ function rt.Shader:send(name, value)
     self._native:send(name, value)
 end
 
+--- @brief make shader the current on
+function rt.Shader:bind()
+    love.graphics.setShader(self._native)
+end
+
 rt.settings.default_fragment_shader = [[
 vec4 effect(vec4 vertex_color, Image texture, vec2 texture_coords, vec2 vertex_position)
 {
     vec2 screen_size = love_ScreenSize.xy;
     return Texel(texture, texture_coords) * vertex_color;
+}
+]]
+
+rt.settings.default_vertex_shader = [[
+vec4 position(mat4 transform, vec4 vertex_position)
+{
+    return transform * vertex_position;
 }
 ]]

@@ -47,6 +47,7 @@ require "keyboard_controller"
 require "mouse_controller"
 require "input_controller"
 require "thread"
+require "pixel_effect"
 
 require "widget"
 require "selection_handler"

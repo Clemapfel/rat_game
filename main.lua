@@ -26,7 +26,7 @@ for i = 1, 3 do
     list:push_back(bt.EquipmentListItem(equipment))
 end
 
-rt.current_scene:set_child(list)
+--rt.current_scene:set_child(list)
 rt.current_scene.input:signal_connect("pressed", function(_, button)
     if button == rt.InputButton.A then
         item._tooltip_layout:set_tooltip_visible(not item._tooltip_layout:get_tooltip_visible())
@@ -37,6 +37,42 @@ rt.current_scene.input:signal_connect("pressed", function(_, button)
     elseif button == rt.InputButton.LEFT then
     end
 end)
+
+local x, y, w, h = 100, 100, 150, 75
+
+local attributes = {
+    rt.Vector2(x, y),
+    rt.Vector2(x + w, y),
+    rt.Vector2(x + w, y + h),
+    rt.Vector2(x, y + h)
+}
+
+data = rt.VertexShape(table.unpack(attributes))
+dot = rt.VertexShape(rt.Vector2(0, 0))
+dot._native:attachAttribute(rt.VertexAttribute.POSITION, data._native)
+
+data:set_draw_mode(rt.MeshDrawMode.POINTS)
+dot:set_draw_mode(rt.MeshDrawMode.POINTS)
+
+local attributes = {
+    {x, y},
+    {x + w, y},
+    {x + w, y + h},
+    {x, y + h}
+}
+
+data = love.graphics.newMesh(attributes, rt.MeshDrawMode.POINTS, rt.SpriteBatchUsage.DYNAMIC)
+dot = love.graphics.newMesh({{0, 0}}, rt.MeshDrawMode.POINTS, rt.SpriteBatchUsage.DYNAMIC)
+
+dot:attachAttribute(rt.VertexAttribute.POSITION, data, "perinstance")
+
+-- TODO
+
+effect = rt.PixelEffect(3000)
+local w, h = love.graphics.getWidth(), love.graphics.getHeight()
+for i = 1, effect:get_n_instances() do
+    effect:set_instance_position(i, rt.random.number(0, w), rt.random.number(0, h), 0)
+end
 
 --- @brief startup
 function love.load()
@@ -56,7 +92,9 @@ end
 --- @brief draw step
 function love.draw()
 
-    rt.current_scene:draw()
+    --rt.current_scene:draw()
+
+    effect:draw()
 
     function draw_guides()
         local w, h = love.graphics.getWidth(), love.graphics.getHeight()

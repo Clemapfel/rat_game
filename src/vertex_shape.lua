@@ -13,6 +13,13 @@ rt.MeshDrawMode = meta.new_enum({
     POINTS = "points"
 })
 
+--- @class rt.VertexAttribute
+rt.VertexAttribute = meta.new_enum({
+    POSITION = "VertexPosition",
+    TEXTURE_COORDINATES = "VertexTexCoord",
+    COLOR = "VertexColor"
+})
+
 --- @class rt.Vertex
 --- @param top_left_x Number in px
 --- @param top_left_y Number in px
@@ -39,6 +46,7 @@ end
 rt.VertexShape = meta.new_type("VertexShape", function(...)
     local positions = {...}
     local vertices = {}
+
     for _, pos in pairs(positions) do
         meta.assert_vector2(pos)
         table.insert(vertices, rt.Vertex(pos.x, pos.y, 0, 0))
@@ -52,13 +60,6 @@ rt.VertexShape = meta.new_type("VertexShape", function(...)
     out:set_texture_rectangle(rt.AABB(0, 0, 1, 1))
     return out
 end)
-
---- @class rt.VertexAttribute
-rt.VertexAttribute = meta.new_enum({
-    POSITION = "VertexPosition",
-    TEXTURE_COORDINATES = "VertexTexCoord",
-    COLOR = "VertexColor"
-})
 
 --- @brief get number of vertices
 --- @return Number
@@ -180,6 +181,13 @@ function rt.VertexShape:set_texture(texture)
     else
         self._native:setTexture(nil)
     end
+end
+
+--- @brief set draw mode
+function rt.VertexShape:set_draw_mode(mode)
+    meta.assert_isa(self, rt.VertexShape)
+    meta.assert_enum(mode, rt.MeshDrawMode)
+    self._native:setDrawMode(mode)
 end
 
 --- @overload rt.Drawable.draw
