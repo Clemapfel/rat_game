@@ -90,6 +90,7 @@ require "battle/equipment_tooltip"
 require "battle/equipment_slot"
 require "battle/equipment_list_item"
 require "battle/action_tooltip"
+require "battle/action_list_item"
 
 require "scene"
 -- require "test

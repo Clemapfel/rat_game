@@ -105,10 +105,11 @@ bt.ActionTooltip = meta.new_type("ActionTooltip", function(action)
 
     out._sprite_aspect:set_child(out._sprite)
     out._sprite_overlay:push_overlay(out._sprite_aspect)
-    out._sprite_overlay:set_margin(3)
     out._sprite_frame:set_child(out._sprite_overlay)
     out._sprite_frame:set_color(rt.Palette.GREY_4)
     out._sprite_frame:set_thickness(2)
+
+    out._sprite:set_margin(2)
 
     out._sprite_backdrop:set_color(rt.Palette.GREY_5)
 

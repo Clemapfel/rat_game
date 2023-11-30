@@ -24,9 +24,11 @@ action_tooltip = bt.ActionTooltip(action)
 equipment = bt.Equipment("TEST_EQUIPMENT")
 equipment_tooltip = bt.EquipmentTooltip(equipment)
 
-layout = rt.SplitLayout()
-layout:set_start_child(action_tooltip)
-layout:set_end_child(equipment_tooltip)
+layout = rt.ListLayout(rt.Orientation.VERTICAL)
+layout:push_back(bt.ActionListItem(action))
+layout:push_back(bt.EquipmentListItem(equipment))
+layout:push_back(bt.ActionListItem(action))
+
 
 rt.current_scene:set_child(layout)
 

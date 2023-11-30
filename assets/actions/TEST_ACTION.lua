@@ -1,6 +1,6 @@
 return {
     name = "Test Move",
-    effect_text = "Deals [1*user.attack] to target enemy",
+    effect_text = "Deals damage to target",
 
     is_consumable = false,
     max_n_uses = 14,
