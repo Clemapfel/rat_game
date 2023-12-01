@@ -18,6 +18,7 @@ bt.ActionListItem = meta.new_type("ActionListItem", function(action)
         _sprite_overlay = rt.OverlayLayout(),
 
         _name_label = rt.Label(action.name),
+        _effect_label = rt.Label(action.effect_text),
 
         _name_spacer = rt.Spacer(),
         _effect_spacer = rt.Spacer(),
@@ -49,11 +50,12 @@ bt.ActionListItem = meta.new_type("ActionListItem", function(action)
     out._name_label:set_expand_horizontally(true)
     out._name_label:set_horizontal_alignment(rt.Alignment.START)
     out._name_label:set_margin_left(rt.settings.margin_unit)
+    out._effect_label:set_horizontal_alignment(rt.Alignment.START)
 
     out._hbox:push_back(out._sprite_overlay)
     out._hbox:push_back(out._name_label)
     out._hbox:push_back(out._name_spacer)
-    out._hbox:push_back(rt.Label("effect"))
+    out._hbox:push_back(out._effect_label)
     out._hbox:push_back(out._effect_spacer)
     out._hbox:push_back(out._n_uses_label)
     out._hbox:push_back(out._n_uses_spacer)
