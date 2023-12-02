@@ -77,14 +77,13 @@ bt.ActionTooltip = meta.new_type("ActionTooltip", function(action)
 
     local sprite_id = "dusk"
     local sprite_size_x, sprite_size_y = env.action_spritesheet:get_frame_size(sprite_id)
-    println(sprite_size_x, " ", sprite_size_y)
     local out = meta.new(bt.ActionTooltip, {
         _action = action,
 
         _name_label = rt.Label("<b>" .. action.name .. "</b>"),
         _n_uses_label = {}, -- rt.Label
         _possible_target_label = rt.Label(rt.settings.action_tooltip.possible_targets_prefix .. action:_possible_targets_as_label()),
-        _effect_label = rt.Label(rt.settings.action_tooltip.effect_prefix .. action.effect_text .. ""),
+        _effect_label = rt.Label(rt.settings.action_tooltip.effect_prefix .. action.verbose_effect_text .. ""),
 
         _flavor_text_label = rt.Label(ternary(#action.flavor_text == 0, "", "<color=GREY_2>(" .. action.flavor_text .. ")</color>")),
         _flavor_text_hrule = rt.Spacer(),

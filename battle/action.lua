@@ -5,8 +5,6 @@ bt.TargetingMode = meta.new_enum({
     STAGE = "STAGE"
 })
 
-rt.settings.battle_action.default_effect_text = "does nothing."
-
 --- @class bt.Action
 --- @brief immutable config for battle actions
 bt.Action = meta.new_type("Action", function(id)
@@ -63,12 +61,12 @@ bt.Action = meta.new_type("Action", function(id)
     out.name = config.name
 
     local effect_text = config.effect_text
-    if meta.is_nil(effect_text) then
-        out.effect_text = rt.settings.battle_action.default_effect_text
-    else
-        meta.assert_string(effect_text)
-        out.effect_text = effect_text
-    end
+    meta.assert_string(effect_text)
+    out.effect_text = effect_text
+
+    local verbose_effect_text = config.verbose_effect_text
+    meta.assert_string(verbose_effect_text)
+    out.verbose_effect_text = verbose_effect_text
 
     local flavor_text = config.flavor_text
     if meta.is_nil(flavor_text) then
@@ -107,6 +105,7 @@ bt.Action.name = "ERROR_ACTION"
 
 -- clear text effect
 bt.Action.effect_text = "No effect."
+bt.Action.verbose_effect_text = "Has no additional effect."
 
 -- flavor text for inventory, optional
 bt.Action.flavor_text = ""

@@ -1,59 +1,69 @@
-rt.settings.list_view = {
-    scrollbar_width = 2 * rt.settings.margin_unit
-}
-
 --- @class rt.ListView
 rt.ListView = meta.new_type("ListView", function()
-    local out = meta.new(rt.ListView, {
-        _layout = rt.ListLayout(rt.Orientation.VERTICAL),
-        _scrollbar = rt.Scrollbar(rt.Orientation.VERTICAL),
-        _viewport = rt.Viewport(),
-        _hbox = rt.BoxLayout(rt.Orientation.HORIZONTAL)
-    }, rt.Widget, rt.Drawable)
-
-    out._viewport:set_child(out._layout)
-
-    out._viewport:set_propagate_width(true)
-
-    out._hbox:push_back(out._viewport)
-    out._hbox:push_back(out._scrollbar)
-
-    out._scrollbar:set_expand_horizontally(false)
-    out._scrollbar:set_minimum_size(rt.settings.list_view.scrollbar_width, 0)
-
-    return out
+    return meta.new(rt.ListView, {
+        _children = {},
+        _children_hash = 0,
+        _default_order = rt.List(),
+        _area = rt.AABB(0, 0, 0, 0)
+    }, rt.Drawable, rt.Widget)
 end)
-
-function rt.ListView:get_top_level_widget()
-    meta.assert_isa(self, rt.ListView)
-    return self._hbox
-end
-
---- @class rt.ListViewItem
-rt.ListViewItem = meta.new_type("ListViewItem", function(child)
-    local out = meta.new(rt.ListViewItem, {
-        _child = child,
-        _backdrop = rt.Spacer(),
-        _frame = rt.Frame(),
-        _overlay = rt.OverlayLayout()
-    }, rt.Widget, rt.Drawable)
-
-    out._overlay:set_base_child(out._backdrop)
-    out._overlay:push_overlay(out._child)
-    out._frame:set_child(out._overlay)
-
-    out._backdrop:set_corner_radius(0)
-    out._frame:set_corner_radius(0)
-    return out
-end)
-
-function rt.ListViewItem:get_top_level_widget()
-    meta.assert_isa(self, rt.ListViewItem)
-    return self._frame
-end
 
 --- @brief
 function rt.ListView:push_back(child)
-    self._layout:push_back(rt.ListViewItem(child))
+    meta.assert_isa(self, rt.ListView)
+    meta.assert_widget(child)
+    table.insert(self._children, self._children_hash, child)
+    self._default_order:push_back(self._children_hash)
+    self._children_hash = self._children_hash + 1
+
+    if self:get_is_realized() then
+        child:realize()
+    end
+end
+
+--- @overlad rt.Widget.size_allocate
+function rt.ListView:size_allocate(x, y, width, height)
+    local before = self._area.width
+    self._area = rt.AABB(x, y, width, height)
+    if width ~= before then
+        for _, child in pairs(self._children) do
+            local w, h = child:measure()
+            child:fit_into(rt.AABB(0, 0, width, h))
+        end
+    end
+end
+
+--- @overload rt.Drawable.draw
+function rt.ListView:draw()
+    love.graphics.setScissor(self._area.x, self._area.y, self._area.width, self._area.height)
+    local x, y = self._area.x, self._area.y
+    local h_sum = 0
+
+    local current = self._default_order._first_node
+    while not meta.is_nil(current) do -- and h_sum <= self._area.height do
+        local child = self._children[current.value]
+
+        love.graphics.translate(x, y)
+        child:draw()
+        love.graphics.translate(-x, -y)
+
+        y = y + select(2, child:measure())
+        current = current.next
+    end
+
+    love.graphics.setScissor()
+end
+
+--- @overload rt.Widget.realize
+function rt.ListView:realize()
+    for _, child in pairs(self._children) do
+        child:realize()
+    end
+    rt.Widget.realize(self)
+end
+
+--- @brief
+function rt.ListView:sort_by()
+
 end
 

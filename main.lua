@@ -20,17 +20,28 @@ rt.add_scene("debug")
 
 action = bt.Action("TEST_ACTION")
 action_tooltip = bt.ActionTooltip(action)
+action_item = bt.ActionListItem(action)
 
 equipment = bt.Equipment("TEST_EQUIPMENT")
 equipment_tooltip = bt.EquipmentTooltip(equipment)
+equipment_item = bt.EquipmentListItem(equipment)
 
 layout = rt.ListLayout(rt.Orientation.VERTICAL)
-layout:push_back(bt.ActionListItem(action))
-layout:push_back(bt.EquipmentListItem(equipment))
-layout:push_back(bt.ActionListItem(action))
+layout:push_back(action_tooltip)
 
+list_view = rt.ListView()
+for i = 1, 10 do
+    list_view:push_back(bt.ActionListItem(action))
+end
 
-rt.current_scene:set_child(layout)
+rt.current_scene:set_child(list_view)
+
+input = rt.add_input_controller(rt.current_scene.window)
+input:signal_connect("pressed", function(self, button)
+    if button == rt.InputButton.A then
+
+    end
+end)
 
 -- #############################
 
