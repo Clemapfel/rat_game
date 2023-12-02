@@ -33,14 +33,14 @@ rt.Notch = meta.new_type("Notch", function()
 end)
 
 function rt.Notch:set_color(color)
-    meta.assert_rgba(color)
-    meta.assert_isa(self, rt.Notch)
+
+
     self._shape:set_color(color)
 end
 
 --- @overload rt.Drawable.draw
 function rt.Notch:draw()
-    meta.assert_isa(self, rt.Notch)
+
     if not self:get_is_visible() then return end
 
     self._frame:draw()
@@ -53,7 +53,7 @@ end
 
 --- @overload rt.Widget.size_allocate
 function rt.Notch:fit_into(x, y, width, height)
-    meta.assert_isa(self, rt.Notch)
+
 
     local radius = math.min(width, height) / 2
     local center_x, center_y = x + 0.5 * width, y + 0.5 * height
@@ -74,7 +74,7 @@ end
 --- @class rt.NotchBar
 rt.NotchBar = meta.new_type("NotchBar", function(n_notches)
     if meta.is_nil(n_notches) then n_notches = 1 end
-    meta.assert_number(n_notches)
+
 
     local out = meta.new(rt.NotchBar, {
         _notches = rt.List(),
@@ -107,7 +107,7 @@ end)
 
 --- @overload rt.Drawable.draw
 function rt.NotchBar:draw()
-    meta.assert_isa(self, rt.NotchBar)
+
     if not self:get_is_visible() then return end
 
     for _, notch in pairs(self._notches) do
@@ -123,7 +123,7 @@ end
 
 --- @overload rt.Widget.size_allocate
 function rt.NotchBar:size_allocate(x, y, width, height)
-    meta.assert_isa(self, rt.NotchBar)
+
     local n_notches = self._notches:size()
     local notch_diameter = width / (n_notches + 2)
 
@@ -146,8 +146,8 @@ end
 
 --- @brief fill all notches up to position
 function rt.NotchBar:set_n_filled(n)
-    meta.assert_isa(self, rt.NotchBar)
-    meta.assert_number(n)
+
+
 
     n = clamp(n, 0, self._notches:size())
 
@@ -165,8 +165,8 @@ end
 --- @brief fill notch at position
 --- @param index Number or 0 for none filled
 function rt.NotchBar:set_filled(index)
-    meta.assert_isa(self, rt.NotchBar)
-    meta.assert_number(index)
+
+
     index = clamp(index, 0, self._notches:size() - 1)
 
     local i = 1
@@ -182,7 +182,7 @@ end
 
 --- @brief
 function rt.NotchBar:set_fill_color(color)
-    meta.assert_isa(self, rt.NotchBar)
+
 
     if meta.is_hsva(color) then
         color = rt.hsva_to_rgba(color)

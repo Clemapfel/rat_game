@@ -9,8 +9,8 @@ rt.settings.sprite_scale.slider_id = "slider"
 
 --- @class rt.SpriteScale
 rt.SpriteScale = meta.new_type("SpriteScale", function(spritesheet, lower, upper, value, orientation)
-    meta.assert_isa(spritesheet, rt.Spritesheet)
-    meta.assert_number(lower, upper)
+
+
     if meta.is_nil(value) then
         value = mix(lower, upper, 0.5)
     end
@@ -38,7 +38,7 @@ end)
 
 --- @overload rt.Drawable.draw
 function rt.SpriteScale:draw()
-    meta.assert_isa(self, rt.SpriteScale)
+
     if not self:get_is_visible() then return end
 
     if self._orientation == rt.Orientation.HORIZONTAL then
@@ -56,7 +56,7 @@ end
 
 --- @brief [internal] reposition slider element
 function rt.SpriteScale:_update_slider()
-    meta.assert_isa(self, rt.SpriteScale)
+
 
     local frame_w, frame_h = self._spritesheet:get_frame_size(rt.settings.sprite_scale.slider_id)
     local slider_x, slider_y, slider_w, slider_h
@@ -96,7 +96,7 @@ end
 
 --- @overload rt.Widget.size_allocate
 function rt.SpriteScale:size_allocate(x, y, width, height)
-    meta.assert_isa(self, rt.SpriteScale)
+
 
     local left_m, right_m, top_m, bottom_m = self:get_margin_left(), self:get_margin_right(), self:get_margin_top(), self:get_margin_bottom()
 
@@ -159,7 +159,7 @@ end
 
 --- @overload rt.Widget.realize
 function rt.SpriteScale:realize()
-    meta.assert_isa(self, rt.SpriteScale)
+
 
     self._left:realize()
     self._left_right:realize()
@@ -176,8 +176,8 @@ end
 --- @brief set scale value
 --- @param value Number
 function rt.SpriteScale:set_value(value)
-    meta.assert_isa(self, rt.SpriteScale)
-    meta.assert_number(value)
+
+
 
     self._value = clamp(value, self._lower, self._upper)
     self:_update_slider()
@@ -186,15 +186,15 @@ end
 --- @brief get scale value
 --- @return Number
 function rt.SpriteScale:get_value()
-    meta.assert_isa(self, rt.SpriteScale)
+
     return self._value
 end
 
 --- @brief set orientation
 --- @param orientation rt.Orientation
 function rt.SpriteScale:set_orientation(orientation)
-    meta.assert_isa(self, rt.SpriteScale)
-    meta.assert_enum(orientation, rt.Orientation)
+
+
     self._orientation = orientation
     self:reformat()
 end
@@ -202,7 +202,7 @@ end
 --- @brief get orientation
 --- @return rt.Orientation
 function rt.SpriteScale:get_orientation()
-    meta.assert_isa(self, rt.SpriteScale)
+
     return self._orientation
 end
 

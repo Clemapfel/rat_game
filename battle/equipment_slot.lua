@@ -4,7 +4,7 @@ rt.settings.equipment_slot = {
 
 --- @class bt.EquipmentSlot
 bt.EquipmentSlot = meta.new_type("EquipmentSlot", function(equipment)
-    meta.assert_isa(equipment, bt.Equipment)
+
 
     if meta.is_nil(env.equipment_spritesheet) then
         env.equipment_spritesheet = rt.Spritesheet("assets/sprites", "equipment")
@@ -83,7 +83,7 @@ end
 
 --- @overload rt.Widget.size_allocate
 function bt.EquipmentSlot:size_allocate(x, y, width, height)
-    meta.assert_isa(self, bt.EquipmentSlot)
+
 
     local indicator_w = select(1, self._sprite:get_resolution())
     local sprite_size = indicator_w * 4
@@ -104,7 +104,7 @@ end
 
 --- @overload rt.Widget.realize
 function bt.EquipmentSlot:realize()
-    meta.assert_isa(self, bt.EquipmentSlot)
+
     self._sprite_frame:realize()
     self._indicator_box_frame:realize()
     rt.Widget.realize(self)

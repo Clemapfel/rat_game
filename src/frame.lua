@@ -13,7 +13,7 @@ rt.settings.frame = {
 --- @class rt.Frame
 rt.Frame = meta.new_type("Frame", function(type)
     if meta.is_nil(type) then type = rt.FrameType.RECTANGULAR end
-    meta.assert_enum(type, rt.FrameType)
+
 
     local out = meta.new(rt.Frame, {
         _type = type,
@@ -48,7 +48,7 @@ end)
 
 --- @overload rt.Drawable.draw
 function rt.Frame:draw()
-    meta.assert_isa(self, rt.Frame)
+
     if not self:get_is_visible() then return end
 
     if meta.is_widget(self._child) then
@@ -110,7 +110,7 @@ end
 
 --- @overload rt.Widget.realize
 function rt.Frame:realize()
-    meta.assert_isa(self, rt.Frame)
+
     if meta.is_widget(self._child) then
         self._child:realize()
     end
@@ -120,8 +120,8 @@ end
 --- @brief set singular child
 --- @param child rt.Widget
 function rt.Frame:set_child(child)
-    meta.assert_isa(self, rt.Frame)
-    meta.assert_isa(child, rt.Widget)
+
+
 
     if not meta.is_nil(self._child) and meta.is_widget(self._child) then
         self._child:set_parent(nil)
@@ -139,13 +139,13 @@ end
 --- @brief get singular child
 --- @return rt.Widget
 function rt.Frame:get_child()
-    meta.assert_isa(self, rt.Frame)
+
     return self._child
 end
 
 --- @brief remove child
 function rt.Frame:remove_child()
-    meta.assert_isa(self, rt.Frame)
+
     if not meta.is_nil(self._child) then
         self._child:set_parent(nil)
         self._child = nil
@@ -154,25 +154,25 @@ end
 
 --- @brief
 function rt.Frame:set_color(color)
-    meta.assert_isa(self, rt.Frame)
+
     if meta.is_hsva(color) then
         color = rt.rgba_to_hsva(color)
     end
-    meta.assert_rgba(color)
+
     self._color = color
     self._frame:set_color(self._color)
 end
 
 --- @brief
 function rt.Frame:get_color()
-    meta.assert_isa(self, rt.Frame)
+
     return self._frame
 end
 
 --- @brief
 function rt.Frame:set_thickness(thickness)
-    meta.assert_number(thickness)
-    meta.assert_isa(self, rt.Frame)
+
+
     if thickness < 0 then
         rt.error("In rt.Frame.set_thickness: value `" .. tostring(thickness) .. "` is out of range")
     end
@@ -186,14 +186,14 @@ end
 
 --- @brief
 function rt.Frame:get_thickness()
-    meta.assert_isa(self, rt.Frame)
+
     return self._thickness
 end
 
 --- @brief
 function rt.Frame:set_corner_radius(radius)
-    meta.assert_isa(self, rt.Frame)
-    meta.assert_number(radius)
+
+
     if radius < 0 then
         rt.error("In rt.Frame.set_corner_radius: value `" .. tostring(radius) .. "` is out of range")
     end

@@ -13,8 +13,8 @@ rt.GradientDirection = meta.new_enum({
 --- @class rt.Gradient
 --- @brief 2-tone gradient
 rt.Gradient = meta.new_type("Gradient", function(x, y, width, height, color_from, color_to, type)
-    if not meta.is_hsva(color_from) then meta.assert_rgba(color_from) end
-    if not meta.is_hsva(color_to) then meta.assert_rgba(color_to) end
+    if not meta.is_hsva(color_from) then  end
+    if not meta.is_hsva(color_to) then  end
 
     if meta.is_hsva(color_from) then
         color_from = rt.hsva_to_rgba(color_from)
@@ -27,9 +27,9 @@ rt.Gradient = meta.new_type("Gradient", function(x, y, width, height, color_from
     if meta.is_nil(type) then
         type = rt.GradientDirection.LEFT_TO_RIGHT
     end
-    meta.assert_enum(type, rt.GradientDirection)
 
-    meta.assert_number(x, y, width, height)
+
+
 
     local out = meta.new(rt.Gradient, {
         _shape = rt.VertexRectangle(x, y, width, height),
@@ -47,7 +47,7 @@ end)
 
 --- @brief [internal]
 function rt.Gradient:_update_color()
-    meta.assert_isa(self, rt.Gradient)
+
 
     local set_color = function(i, color)
         self._shape:set_vertex_color(i, color)
@@ -106,21 +106,21 @@ end
 
 --- @overload rt.Drawable.draw
 function rt.Gradient:draw()
-    meta.assert_isa(self, rt.Gradient)
+
     if not self:get_is_visible() then return end
 
     self._shape:draw()
 end
 
 function rt.Gradient:_update_shape()
-    meta.assert_isa(self, rt.Gradient)
+
     self._shape:resize(rt.AABB(self._x, self._y, self._width, self._height))
 end
 
 --- @brief
 function rt.Gradient:set_position(x, y)
-    meta.assert_isa(self, rt.Gradient)
-    meta.assert_number(x, y)
+
+
     self._x = x
     self._y = y
     self:_update_shape()
@@ -128,8 +128,8 @@ end
 
 --- @brief
 function rt.Gradient:set_size(width, height)
-    meta.assert_isa(self, rt.Gradient)
-    meta.assert_number(width, height)
+
+
     self._width = width
     self._height = height
     self:_update_shape()
@@ -137,7 +137,7 @@ end
 
 --- @bief
 function rt.Gradient:resize(x, y, width, height)
-    meta.assert_isa(self, rt.Gradient)
+
     self._x = x
     self._y = y
     self._width = width
@@ -147,13 +147,13 @@ end
 
 --- @brief
 function rt.Gradient:set_color(color_from, color_to)
-    meta.assert_isa(self, rt.Gradient)
+
     if not meta.is_hsva(color_from) then
-        meta.assert_rgba(color_from)
+
     end
 
     if not meta.is_hsva(color_to) then
-        meta.assert_rgba(color_to)
+
     end
 
     self._color_from = ternary(meta.is_hsva(color_from), rt.hsva_to_rgba(color_from), color_from)
@@ -164,21 +164,21 @@ end
 --- @brief
 --- @return (rt.RGBA, rt.RGBA)
 function rt.Gradient:get_color()
-    meta.assert_isa(self, rt.Gradient)
+
     return self._color_from, self._color_to
 end
 
 --- @class rt.CircularGradient
 rt.CircularGradient = meta.new_type("CircularGradient", function(center_x, center_y, radius, color_from, color_to, n_outer_vertices)
 
-    meta.assert_number(center_x, center_y, radius)
-    if not meta.is_hsva(color_from) then meta.assert_rgba(color_from) end
-    if not meta.is_hsva(color_to) then meta.assert_rgba(color_to) end
+
+    if not meta.is_hsva(color_from) then  end
+    if not meta.is_hsva(color_to) then  end
 
     if meta.is_nil(n_outer_vertices) then
         n_outer_vertices = 64
     end
-    meta.assert_number(n_outer_vertices)
+
 
     if meta.is_hsva(color_from) then
         color_from = rt.hsva_to_rgba(color_from)
@@ -219,7 +219,7 @@ end)
 
 --- @overload rt.Drawable.draw
 function rt.CircularGradient:draw()
-    meta.assert_isa(self, rt.CircularGradient)
+
     if self:get_is_visible() then
         self._shape:draw()
     end
@@ -227,7 +227,7 @@ end
 
 --- @brief
 function rt.CircularGradient:_update_shape()
-    meta.assert_isa(self, rt.CircularGradient)
+
 
     local radius_x = self._radius_x
     local radius_y = self._radius_y
@@ -249,15 +249,15 @@ end
 
 --- @brief
 function rt.CircularGradient:_update_color()
-    meta.assert_isa(self, rt.CircularGradient)
+
     self._shape:set_color(self._color_to)
     self._shape:set_vertex_color(1, self._color_from)
 end
 
 --- @brief
 function rt.CircularGradient:set_position(center_x, center_y)
-    meta.assert_isa(self, rt.CircularGradient)
-    meta.assert_number(center_x, center_y)
+
+
     self._center_x = center_x
     self._center_y = center_y
     self:_update_shape()
@@ -265,9 +265,9 @@ end
 
 --- @brief
 function rt.CircularGradient:set_radius(radius_x, radius_y)
-    meta.assert_isa(self, rt.CircularGradient)
+
     if meta.is_nil(radius_y) then radius_y = radius_y end
-    meta.assert_number(radius_x, radius_y)
+
 
     self._radius_x = radius_x
     self._radius_y = radius_y

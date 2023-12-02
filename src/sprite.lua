@@ -2,12 +2,12 @@
 --- @param spritesheet rt.Spritesheet
 --- @param animation_id String
 rt.Sprite = meta.new_type("Sprite", function(spritesheet, animation_id)
-    meta.assert_isa(spritesheet, rt.Spritesheet)
+
 
     if meta.is_nil(animation_id) then
         animation_id = spritesheet.name
     end
-    meta.assert_string(animation_id)
+
 
     spritesheet:_assert_has_animation("Sprite:", animation_id)
 
@@ -30,7 +30,7 @@ end)
 
 --- @overload rt.Drawable.draw
 function rt.Sprite:draw()
-    meta.assert_isa(self, rt.Sprite)
+
     if self:get_is_visible() then
         self._shape:draw()
     end
@@ -38,7 +38,7 @@ end
 
 --- @overload rt.Widget.size_allocate
 function rt.Sprite:size_allocate(x, y, width, height)
-    meta.assert_isa(self, rt.Sprite)
+
 
     local w, h
     if self:get_expand_horizontally() then
@@ -81,7 +81,7 @@ end
 
 --- @overload rt.Animation.update
 function rt.Sprite:update(delta)
-    meta.assert_isa(self, rt.Sprite)
+
 
     self._elapsed = self._elapsed + delta
     local frame_duration = 1 / self._spritesheet:get_fps()
@@ -97,8 +97,8 @@ end
 --- @brief set which frame is currently displayed
 --- @param i Number 1-based
 function rt.Sprite:set_frame(i)
-    meta.assert_isa(self, rt.Sprite)
-    meta.assert_number(i)
+
+
 
     local n_frames = self._spritesheet:get_n_frames(self._animation_id)
     if i < 1 or i > n_frames then
@@ -112,22 +112,22 @@ end
 --- @brief get which frame is currently displayed
 --- @return Number
 function rt.Sprite:get_frame()
-    meta.assert_isa(self, rt.Sprite)
+
     return self._current_frame
 end
 
 --- @brief get number of frames
 --- @return Number
 function rt.Sprite:get_n_frames()
-    meta.assert_isa(self, rt.Sprite)
+
     return self._spritesheet:get_n_frames(self._animation_id)
 end
 
 --- @brief set which animation is used, this resets the current frame to 1
 --- @param id String
 function rt.Sprite:set_animation(id)
-    meta.assert_isa(self, rt.Sprite)
-    meta.assert_string(id)
+
+
 
     self._spritesheet:_assert_has_animation("Sprite:", id)
     local w, h = self._spritesheet:get_frame_size(id)
@@ -145,29 +145,29 @@ end
 --- @brief get frame resolution
 --- @return (Number, Number)
 function rt.Sprite:get_resolution()
-    meta.assert_isa(self, rt.Sprite)
+
     return self._frame_width, self._frame_height
 end
 
 --- @brief set whether sprite should loop when animated
 --- @param b Boolean
 function rt.Sprite:set_should_loop(b)
-    meta.assert_isa(self, rt.Sprite)
-    meta.assert_boolean(b)
+
+
     self._should_loop = b
 end
 
 --- @brief get whether sprite loops when animated
 --- @return Boolean
 function rt.Sprite:get_should_loop()
-    meta.assert_isa(self, rt.Sprite)
+
     return self._should_loop
 end
 
 --- @brief set color, multiplied with texture
 --- @param color rt.RGBA (or rt.HSVA)
 function rt.Sprite:set_color(color)
-    meta.assert_isa(self, rt.Sprite)
+
     self._shape:set_color(color)
 end
 

@@ -140,7 +140,7 @@ rt.Palette.HP = rt.Palette.SELF
 
 --- @brief save palette to assets/palette.png
 function rt.Palette:export()
-    meta.assert_table(self)
+
 
     local ordered = {
         "LIGHT_GREEN_1",

@@ -16,8 +16,8 @@ rt.TextEffect = meta.new_enum({
 --- @param effects rt.TextEffect
 --- @param wrap_width Number px
 rt.Glyph = meta.new_type("Glyph", function(font, content, font_style, color, is_underlined, is_strikethrough, effects, wrap_width)
-    meta.assert_isa(font, rt.Font)
-    meta.assert_string(content)
+
+
 
     if meta.is_nil(font_style) then font_style = rt.FontStyle.REGULAR end
     if meta.is_nil(color) then color = rt.RGBA(1, 1, 1, 1) end
@@ -26,11 +26,11 @@ rt.Glyph = meta.new_type("Glyph", function(font, content, font_style, color, is_
     if meta.is_nil(is_underlined) then is_underlined = false end
     if meta.is_nil(is_strikethrough) then is_strikethrough = false end
 
-    meta.assert_enum(font_style, rt.FontStyle)
-    meta.assert_boolean(is_underlined, is_strikethrough)
-    meta.assert_rgba(color)
-    meta.assert_number(wrap_width)
-    meta.assert_table(effects)
+
+
+
+
+
 
     local out = meta.new(rt.Glyph, {
         _font = font,
@@ -52,7 +52,7 @@ rt.Glyph = meta.new_type("Glyph", function(font, content, font_style, color, is_
     }, rt.Drawable, rt.Animation)
 
     for _, effect in pairs(effects) do
-        meta.assert_enum(effect, rt.TextEffect)
+
         out._effects[effect] = true
     end
     out:_update()
@@ -61,7 +61,7 @@ end)
 
 --- @brief [internal] update held graphical object
 function rt.Glyph:_update()
-    meta.assert_isa(self, rt.Glyph)
+
     local font = self._font[self._style]
     self._glyph = love.graphics.newText(font, {{self._color.r, self._color.g, self._color.b}, self._content})
 
@@ -226,7 +226,7 @@ end
 
 --- @overload rt.Drawable.draw
 function rt.Glyph:draw()
-    meta.assert_isa(self, rt.Glyph)
+
     if not self:get_is_visible() then return end
 
     if self:get_is_animated() then
@@ -271,8 +271,8 @@ end
 --- @brief set font style
 --- @param style rt.FontStyle
 function rt.Glyph:set_style(style)
-    meta.assert_isa(self, rt.Glyph)
-    meta.assert_enum(style, rt.FontStyle)
+
+
     self._style = style
     self:_update()
 end
@@ -280,20 +280,20 @@ end
 --- @brief get font style
 --- @return rt.FontStyle
 function rt.Glyph:get_style()
-    meta.assert_isa(self, rt.Glyph)
-    meta.assert_enum(style, rt.FontStyle)
+
+
     return self._style
 end
 
 --- @brief set font color
 --- @param color rt.RGBA
 function rt.Glyph:set_color(color)
-    meta.assert_isa(self, rt.Glyph)
+
 
     if meta.is_hsva(color) then
         color = rt.hsva_to_rgba(color)
     end
-    meta.assert_rgba(color)
+
 
     self._color = color
     self:_update()
@@ -302,28 +302,28 @@ end
 --- @brief get color
 --- @return rt.RGBA
 function rt.Glyph:get_color(color)
-    meta.assert_isa(self, rt.Glyph)
+
     return self._color
 end
 
 --- @brief measure text size
 --- @return (Number, Number)
 function rt.Glyph:get_size()
-    meta.assert_isa(self, rt.Glyph)
+
     return self._glyph:getDimensions()
 end
 
 --- @brief access content as string
 --- @return String
 function rt.Glyph:get_content()
-    meta.assert_isa(self, rt.Glyph)
+
     return self._content
 end
 
 --- @brief get number of characters of content
 --- @return Number
 function rt.Glyph:get_n_characters()
-    meta.assert_isa(self, rt.Glyph)
+
     return #self._content
 end
 
@@ -331,7 +331,7 @@ end
 --- @param x Number
 --- @param y Number
 function rt.Glyph:set_position(x, y)
-    meta.assert_isa(self, rt.Glyph)
+
     self._position_x = math.round(x)
     self._position_y = math.round(y)
 end
@@ -339,15 +339,15 @@ end
 --- @brief get top left position
 --- @return (Number, Number)
 function rt.Glyph:get_position()
-    meta.assert_isa(self, rt.Glyph)
+
     return self._position_x, self._position_y
 end
 
 --- @brief set number of visible characters, used for text scrolling
 --- @param n Number
 function rt.Glyph:set_n_visible_characters(n)
-    meta.assert_isa(self, rt.Glyph)
-    meta.assert_number(n)
+
+
     n = clamp(n, 0, self:get_n_characters())
     self._n_visible_chars = n
 
@@ -359,7 +359,7 @@ end
 --- @brief get number of visible characters
 --- @return Number
 function rt.Glyph:get_n_visible_characters()
-    meta.assert_isa(self, rt.Glyph)
+
     return clamp(self._n_visible_chars, 0, self:get_n_characters())
 end
 

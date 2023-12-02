@@ -21,7 +21,7 @@ end)
 --- @brief add element to start of queue
 --- @param x any
 function rt.Queue:push_front(x)
-    meta.assert_isa(self, rt.Queue)
+
 
     local current = self._first_element - 1
     self._elements[current] = x
@@ -32,7 +32,7 @@ end
 --- @brief add element to end of queue
 --- @param x any
 function rt.Queue:push_back(x)
-    meta.assert_isa(self, rt.Queue)
+
 
     local current = self._last_element
     self._elements[current] = x
@@ -43,7 +43,7 @@ end
 --- @brief remove element at start of queue
 --- @return any nil if queue is empty
 function rt.Queue:pop_front()
-    meta.assert_isa(self, rt.Queue)
+
 
     if (self._n_elements == 0) then
         return nil
@@ -60,7 +60,7 @@ end
 --- @brief remove element at end of queue
 --- @return any nil if queue is empty
 function rt.Queue:pop_back()
-    meta.assert_isa(self, rt.Queue)
+
 
     if (self._n_elements == 0) then
         return nil
@@ -78,34 +78,34 @@ end
 --- @brief get element at start of queue
 --- @return any nil if queue is empty
 function rt.Queue:front()
-    meta.assert_isa(self, rt.Queue)
+
     return self._elements[self._first_element]
 end
 
 --- @brief get element at end of queue
 --- @return any nil if queue is empty
 function rt.Queue:back()
-    meta.assert_isa(self, rt.Queue)
+
     return self._elements[self._last_element - 1]
 end
 
 --- @brief get number of elements in queue
 --- @return number
 function rt.Queue:size()
-    meta.assert_isa(self, rt.Queue)
+
     return self._n_elements
 end
 
 --- @brief check whether queue is empty
 --- @return boolean
 function rt.Queue:is_empty()
-    meta.assert_isa(self, rt.Queue)
+
     return self:size() == 0
 end
 
 --- @brief remove all children
 function rt.Queue:clear()
-    meta.assert_isa(self, rt.Queue)
+
     self._elements = {}
     self._first_element = 0
     self._last_element = 1

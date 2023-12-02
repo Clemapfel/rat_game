@@ -1,6 +1,6 @@
 --- @class bt.ActionListItem
 bt.ActionListItem = meta.new_type("ActionListItem", function(action)
-    meta.assert_isa(action, bt.Action)
+
     if meta.is_nil(env.action_spritesheet) then
         env.action_spritesheet = rt.Spritesheet("assets/sprites", "orbs")
     end
@@ -83,7 +83,7 @@ end
 
 --- @brief
 function bt.ActionListItem:update_n_uses(n_uses)
-    meta.assert_isa(self, bt.ActionListItem)
+
     local max_n_uses = self._action.max_n_uses
     n_uses = clamp(n_uses, 0, max_n_uses)
     self._n_uses_label:set_text("<mono>" .. tostring(n_uses) .. "/" .. tostring(max_n_uses) .. "</mono>")

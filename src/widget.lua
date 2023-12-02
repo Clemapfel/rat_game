@@ -55,7 +55,7 @@ end
 --- @brief abstract method, returns minimum space that needs to be allocated
 --- @return (Number, Number)
 function rt.Widget:measure()
-    meta.assert_isa(self, rt.Widget)
+
 
     local top_level = self:get_top_level_widget()
     if not meta.is_nil(top_level) then
@@ -68,7 +68,7 @@ end
 
 --- @brief realize widget
 function rt.Widget:realize()
-    meta.assert_isa(self, rt.Widget)
+
 
     if self._realized then return end
     self._realized = true
@@ -81,7 +81,7 @@ end
 
 --- @brief get whether widget was realized
 function rt.Widget:get_is_realized()
-    meta.assert_isa(self, rt.Widget)
+
     return self._realized
 end
 
@@ -145,8 +145,8 @@ end
 --- @brief resize widget such that it fits into the given bounds
 --- @param aabb rt.AxisAlignedRectangle
 function rt.Widget:fit_into(aabb)
-    meta.assert_isa(self, rt.Widget)
-    meta.assert_aabb(aabb)
+
+
     self._bounds = aabb
     self:reformat()
 end
@@ -185,7 +185,7 @@ end
 --- @brief set start margin
 --- @param margin Number
 function rt.Widget:set_margin_left(margin)
-    meta.assert_isa(self, rt.Widget)
+
     self._margin_left = margin
     self:reformat()
 end
@@ -193,14 +193,14 @@ end
 --- @brief get start margin
 --- @return Number
 function rt.Widget:get_margin_left()
-    meta.assert_isa(self, rt.Widget)
+
     return self._margin_left
 end
 
 --- @brief set end margin
 --- @param margin Number
 function rt.Widget:set_margin_right(margin)
-    meta.assert_isa(self, rt.Widget)
+
     self._margin_right = margin
     self:reformat()
 end
@@ -208,14 +208,14 @@ end
 --- @brief get end margin
 --- @return Number
 function rt.Widget:get_margin_right()
-    meta.assert_isa(self, rt.Widget)
+
     return self._margin_right
 end
 
 --- @brief set top margin
 --- @param margin Number
 function rt.Widget:set_margin_top(margin)
-    meta.assert_isa(self, rt.Widget)
+
     self._margin_top = margin
     self:reformat()
 end
@@ -223,14 +223,14 @@ end
 --- @brief get top margin
 --- @return Number
 function rt.Widget:get_margin_top()
-    meta.assert_isa(self, rt.Widget)
+
     return self._margin_top
 end
 
 --- @brief set bottom margin
 --- @param margin Number
 function rt.Widget:set_margin_bottom(margin)
-    meta.assert_isa(self, rt.Widget)
+
     self._margin_bottom = margin
     self:reformat()
 end
@@ -238,14 +238,14 @@ end
 --- @brief get bottom margin
 --- @return Number
 function rt.Widget:get_margin_bottom()
-    meta.assert_isa(self, rt.Widget)
+
     return self._margin_bottom
 end
 
 --- @brief set left and right margin
 --- @param margin Number
 function rt.Widget:set_margin_horizontal(margin)
-    meta.assert_isa(self, rt.Widget)
+
     self._margin_left = margin
     self._margin_right = margin
     self:reformat()
@@ -254,7 +254,7 @@ end
 --- @brief set top and bottom margin
 --- @param margin Number
 function rt.Widget:set_margin_vertical(margin)
-    meta.assert_isa(self, rt.Widget)
+
     self._margin_top = margin
     self._margin_bottom = margin
     self:reformat()
@@ -263,7 +263,7 @@ end
 --- @brief set top, bottom, left, and right margin
 --- @param margin Number
 function rt.Widget:set_margin(margin)
-    meta.assert_isa(self, rt.Widget)
+
     self._margin_top = margin
     self._margin_bottom = margin
     self._margin_left = margin
@@ -280,8 +280,8 @@ end
 --- @brief set expansion along x-axis
 --- @param b Boolean
 function rt.Widget:set_expand_horizontally(b)
-    meta.assert_isa(self, rt.Widget)
-    meta.assert_boolean(b)
+
+
     self._expand_horizontally = b
     self:reformat()
 end
@@ -289,15 +289,15 @@ end
 --- @brief get expansion along x-axis
 --- @return Number
 function rt.Widget:get_expand_horizontally()
-    meta.assert_isa(self, rt.Widget)
+
     return self._expand_horizontally
 end
 
 --- @brief set expansion along y-axis
 --- @param b Boolean
 function rt.Widget:set_expand_vertically(b)
-    meta.assert_isa(self, rt.Widget)
-    meta.assert_boolean(b)
+
+
     self._expand_vertically = b
     self:reformat()
 end
@@ -305,15 +305,15 @@ end
 --- @brief get expansion along y-axis
 --- @return Boolean
 function rt.Widget:get_expand_vertically()
-    meta.assert_isa(self, rt.Widget)
+
     return self._expand_vertically
 end
 
 --- @brief set expansion along both axes
 --- @param b Boolean
 function rt.Widget:set_expand(b)
-    meta.assert_isa(self, rt.Widget)
-    meta.assert_boolean(b)
+
+
     self._expand_horizontally = b
     self._expand_vertically = b
     self:reformat()
@@ -322,8 +322,8 @@ end
 --- @brief set alignment along x-axis
 --- @param alignment rt.Alignment
 function rt.Widget:set_horizontal_alignment(alignment)
-    meta.assert_isa(self, rt.Widget)
-    meta.assert_enum(alignment, rt.Alignment)
+
+
     self._horizontal_alignment = alignment
     self:reformat()
 end
@@ -331,15 +331,15 @@ end
 --- @brief get alignment along x-axis
 --- @return rt.Alignment
 function rt.Widget:get_horizontal_alignment()
-    meta.assert_isa(self, rt.Widget)
+
     return self._horizontal_alignment
 end
 
 --- @brief set alignment along y-axis
 --- @param alignment rt.Alignment
 function rt.Widget:set_vertical_alignment(alignment)
-    meta.assert_isa(self, rt.Widget)
-    meta.assert_enum(alignment, rt.Alignment)
+
+
     self._vertical_alignment = alignment
     self:reformat()
 end
@@ -347,15 +347,15 @@ end
 --- @brief get alignment along y-axis
 --- @return rt.Alignment
 function rt.Widget:get_vertical_alignment()
-    meta.assert_isa(self, rt.Widget)
+
     return self._vertical_alignment
 end
 
 --- @brief set alignment among both axes
 --- @param alignment rt.Alignment
 function rt.Widget:set_alignment(alignment)
-    meta.assert_isa(self, rt.Widget)
-    meta.assert_enum(alignment, rt.Alignment)
+
+
     self._horizontal_alignment = alignment
     self._vertical_alignment = alignment
     self:reformat()
@@ -365,8 +365,8 @@ end
 --- @param width Number
 --- @param height Number
 function rt.Widget:set_minimum_size(width, height)
-    meta.assert_isa(self, rt.Widget)
-    meta.assert_number(width, height)
+
+
     self._minimum_width = width
     self._minimum_height = height
     self:reformat()
@@ -375,26 +375,26 @@ end
 --- @brief get size request
 --- @return Number, Number
 function rt.Widget:get_minimum_size()
-    meta.assert_isa(self, rt.Widget)
+
     return self._minimum_width, self._minimum_height
 end
 
 --- @brief get whether widget currently holds input focus
 function rt.Widget:get_has_focus()
-    meta.assert_isa(self, rt.Widget)
+
     return self._focused
 end
 
 --- @brief set the parent property of the child. If it already has a parent, print a warning
 function rt.Widget:set_parent(other)
-    meta.assert_isa(self, rt.Widget)
+
 
     if meta.is_nil(other) then
         self._parent = nil
         return
     end
 
-    meta.assert_isa(other, rt.Widget)
+
     if not meta.is_nil(self._parent) then
         rt.warning("In Widget:set_parent: replacing parent of child `" .. meta.typeof(self) .. "`, which already has a parent")
     end
@@ -404,7 +404,7 @@ end
 
 --- @brief get parent
 function rt.Widget:get_parent()
-    meta.assert_isa(self, rt.Widget)
+
     return self._parent
 end
 
@@ -419,10 +419,10 @@ end
 --- @param range_size Number maximum width
 --- @return (Number, Number) x, width
 function rt.Widget._calculate_size(self, width, margin_start, margin_end, align, expand, range_start, range_size)
-    meta.assert_isa(self, rt.Widget)
-    meta.assert_number(width, margin_start, margin_end)
-    meta.assert_enum(align, rt.Alignment)
-    meta.assert_boolean(expand)
+
+
+
+
 
     local x = range_start
     local w = width
@@ -448,7 +448,7 @@ end
 
 --- @brief
 function rt.Widget:draw_selection_indicator()
-    meta.assert_isa(self, rt.Widget)
+
     local x, y = self:get_position()
     local w, h = self:get_size()
 
@@ -468,32 +468,32 @@ end
 
 --- @brief
 function rt.Widget:set_is_selected(b)
-    meta.assert_isa(self, rt.Widget)
-    meta.assert_boolean(b)
+
+
     self._selected = b
 end
 
 --- @brief
 function rt.Widget:get_is_selected()
-    meta.assert_isa(self, rt.Widget)
+
     return self._selected
 end
 
 --- @brief
 function rt.Widget:set_has_focus(b)
-    meta.assert_isa(self, rt.Widget)
+
     self._focused = b
 end
 
 --- @brief
 function rt.Widget:get_has_focus()
-    meta.assert_isa(self, rt.Widget)
+
     return self._focused
 end
 
 --- @brief [internal] draw allocation component as wireframe
 function rt.Widget:draw_bounds()
-    meta.assert_inherits(self, rt.Drawable)
+
 
     local x, y = self:get_position()
     local w, h = self:get_size()

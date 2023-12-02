@@ -18,14 +18,14 @@ rt.Scene.thread_pool = rt.ThreadPool() -- static, shared by all scenes
 
 --- @brief set top-level child
 function rt.Scene:set_child(child)
-    meta.assert_isa(self, rt.Scene)
-    meta.assert_widget(child)
+
+
     self.window:set_child(child)
 end
 
 --- @overload rt.Drawable.draw
 function rt.Scene:draw()
-    meta.assert_isa(self, rt.Scene)
+
 
     if meta.is_rgba(self.skybox) then
         local bg_color = self.skybox
@@ -36,25 +36,25 @@ end
 
 --- @overload rt.Widget.realize
 function rt.Scene:realize()
-    meta.assert_isa(self, rt.Scene)
+
     self.window:realize()
     self.window:fit_into(rt.AABB(0, 0, love.graphics.getWidth(), love.graphics.getHeight()))
 end
 
 --- @brief update all regular handlers
 function rt.Scene:update(delta)
-    meta.assert_scene(self)
-    meta.assert_number(delta)
 
-    meta.assert_scene(self)
+
+
+
     self.animation_handler:update(delta)
     self.animation_timer_handler:update(delta)
     self.thread_pool:update_futures()
 end
 
 function rt.Scene:_set_property(key, new_value)
-    meta.assert_scene(self)
-    meta.assert_string(key)
+
+
     local properties = getmetatable(self).properties
     if meta.is_nil(properties[key]) then
         rt.error("In Scene:_set_property: scene has no property with name `" .. key .. "`")
@@ -64,18 +64,18 @@ end
 
 --- @brief
 function rt.Scene:set_skybox(color)
-    meta.assert_scene(self)
+
 
     if meta.is_hsva(color) then
         color = rt.hsva_to_rgba(color)
     end
-    meta.assert_rgba(color)
+
     self:_set_property("skybox", color)
 end
 
 --- @brief add variable in scene scope
 function rt.Scene:add(key, value)
-    meta.assert_scene(self)
+
     self.env[key] = value
     return value
 end
@@ -92,8 +92,8 @@ env = {}
 --- @brief
 function rt.add_scene(name, scene)
     if meta.is_nil(scene) then scene = rt.Scene() end
-    meta.assert_scene(scene)
-    meta.assert_string(name)
+
+
 
     if not meta.is_nil(rt.scenes[name]) then
         rt.error("In rt.add_scene: scene with ID `" .. name "` already exists")
@@ -108,7 +108,7 @@ end
 
 --- @brief
 function rt.set_current_scene(name)
-    meta.assert_string(name)
+
 
     if meta.is_nil(rt.scenes[name]) then
         rt.error("In rt.set_current_scene: no scene with ID `" .. name "` available")

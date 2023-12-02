@@ -6,28 +6,28 @@ function rt.Vector2(x, y)
     out.__metatable = {
         __name = "Vector2",
         __add = function(self, other)
-            meta.assert_vector2(other)
+
             return {
                 x = self.x + other.x,
                 y = self.y + other.y
             }
         end,
         __sub = function(self, other)
-            meta.assert_vector2(other)
+
             return {
                 x = self.x - other.x,
                 y = self.y - other.y
             }
         end,
         __mul = function(self, other)
-            meta.assert_vector2(other)
+
             return {
                 x = self.x * other.x,
                 y = self.y * other.y
             }
         end,
         __div = function(self, other)
-            meta.assert_vector2(other)
+
             return {
                 x = self.x / other.x,
                 y = self.y / other.y
@@ -72,7 +72,7 @@ function rt.Vector3(x, y, z)
     out.__metatable = {
         __name = "Vector3",
         __add = function(self, other)
-            meta.assert_vector3(other)
+
             return {
                 x = self.x + other.x,
                 y = self.y + other.y,
@@ -80,7 +80,7 @@ function rt.Vector3(x, y, z)
             }
         end,
         __sub = function(self, other)
-            meta.assert_vector3(other)
+
             return {
                 x = self.x - other.x,
                 y = self.y - other.y,
@@ -88,7 +88,7 @@ function rt.Vector3(x, y, z)
             }
         end,
         __mul = function(self, other)
-            meta.assert_vector3(other)
+
             return {
                 x = self.x * other.x,
                 y = self.y * other.y,
@@ -96,7 +96,7 @@ function rt.Vector3(x, y, z)
             }
         end,
         __div = function(self, other)
-            meta.assert_vector3(other)
+
             return {
                 x = self.x / other.x,
                 y = self.y / other.y,
@@ -131,7 +131,7 @@ function meta.assert_vector3(object)
         rt.error("In " .. debug.getinfo(2, "n").name .. ": Excpected `Vector3`, got `" .. meta.typeof(object) .. "`")
     end
 end
-meta.make_debug_only("meta.assert_vector3")
+meta.make_debug_only("meta.assert_vector2")
 
 --- @brief [internal] test vector2, vector3
 function rt.test.test_vector()

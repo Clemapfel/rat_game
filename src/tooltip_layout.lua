@@ -44,7 +44,7 @@ end)
 
 --- @brief
 function rt.TooltipLayout:_set_tooltip_opacity(alpha)
-    meta.assert_isa(self, rt.TooltipLayout)
+
     for _, shape in pairs({self._tooltip_backdrop, self._tooltip_frame, self._tooltip_frame_outline}) do
         local color = shape:get_color()
         color.a = alpha
@@ -55,8 +55,8 @@ end
 --- @brief set singular child
 --- @param child rt.Widget
 function rt.TooltipLayout:set_child(child)
-    meta.assert_isa(self, rt.TooltipLayout)
-    meta.assert_isa(child, rt.Widget)
+
+
 
     if not meta.is_nil(self._child) and meta.is_widget(self._child) then
         self._child:set_parent(nil)
@@ -74,13 +74,13 @@ end
 --- @brief get singular child
 --- @return rt.Widget
 function rt.TooltipLayout:get_child()
-    meta.assert_isa(self, rt.TooltipLayout)
+
     return self._child
 end
 
 --- @brief remove child
 function rt.TooltipLayout:remove_child()
-    meta.assert_isa(self, rt.TooltipLayout)
+
     if not meta.is_nil(self._child) then
         self._child:set_parent(nil)
         self._child = nil
@@ -90,8 +90,8 @@ end
 --- @brief set singular child
 --- @param child rt.Widget
 function rt.TooltipLayout:set_tooltip(child)
-    meta.assert_isa(self, rt.TooltipLayout)
-    meta.assert_isa(child, rt.Widget)
+
+
 
     if not meta.is_nil(self._tooltip) and meta.isa(self._tooltip, rt.Widget) then
         self._tooltip:set_parent(nil)
@@ -109,13 +109,13 @@ end
 --- @brief get singular child
 --- @return rt.Widget
 function rt.TooltipLayout:get_tooltip()
-    meta.assert_isa(self, rt.TooltipLayout)
+
     return self._tooltip
 end
 
 --- @brief remove child
 function rt.TooltipLayout:remove_tooltip()
-    meta.assert_isa(self, rt.TooltipLayout)
+
     if not meta.is_nil(self._tooltip) then
         self._tooltip:set_parent(nil)
         self._tooltip = nil
@@ -124,7 +124,7 @@ end
 
 --- @overload rt.Drawable.draw
 function rt.TooltipLayout:draw()
-    meta.assert_isa(self, rt.TooltipLayout)
+
     if not self:get_is_visible() then return end
 
     if meta.isa(self._child, rt.Widget) then
@@ -141,8 +141,8 @@ end
 
 --- @brief
 function rt.TooltipLayout:set_tooltip_visible(b)
-    meta.assert_isa(self, rt.TooltipLayout)
-    meta.assert_boolean(b)
+
+
 
     self._show_tooltip = b
     local visible = self._show_tooltip
@@ -162,7 +162,7 @@ end
 
 --- @brief
 function rt.TooltipLayout:get_tooltip_visible()
-    meta.assert_isa(self, rt.TooltipLayout)
+
     return self._show_tooltip
 end
 
@@ -172,7 +172,7 @@ function rt.TooltipLayout:size_allocate(x, y, width, height)
     local child_x, child_y = x, y
     local child_w, child_h = 0, 0
 
-    meta.assert_isa(self, rt.TooltipLayout)
+
     if meta.is_widget(self._child) then
         self._child:fit_into(rt.AABB(x, y, width, height))
         child_x, child_y = self._child:get_position()
@@ -235,7 +235,7 @@ end
 
 --- @overload rt.Widget.set_is_selected
 function rt.TooltipLayout:set_is_selected(b)
-    meta.assert_isa(self, rt.TooltipLayout)
+
     rt.Widget.set_is_selected(b)
     self:set_tooltip_visible(b)
 end

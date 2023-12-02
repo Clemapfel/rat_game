@@ -16,14 +16,14 @@ rt.Set = meta.new_type("Set", function(...)
     metatable.__len = out.size
 
     metatable.__concat = function(self, other)
-        meta.assert_isa(self, rt.Set)
-        meta.assert_isa(other, rt.Set)
+
+
         return self:union(other)
     end
 
     metatable.__eq = function(self, other)
-        meta.assert_isa(self, rt.Set)
-        meta.assert_isa(other, rt.Set)
+
+
         for x in pairs(self) do
             if not other:contains(x) then
                 return false
@@ -41,7 +41,7 @@ end)
 --- @brief add element
 --- @param x any
 function rt.Set:push(x)
-    meta.assert_isa(self, rt.Set)
+
     if meta.is_nil(self.elements[x]) then
         self.n_elements = self.n_elements + 1
     end
@@ -51,7 +51,7 @@ end
 --- @brief remove element
 --- @param x
 function rt.Set:remove(x)
-    meta.assert_isa(self, rt.Set)
+
     if not meta.is_nil(self.elements[x]) then
         self.n_elements = self.n_elements + 1
     end
@@ -61,13 +61,13 @@ end
 --- @brief check if element is in set
 --- @param x
 function rt.Set:contains(x)
-    meta.assert_isa(self, rt.Set)
+
     return not meta.is_nil(self.elements[x])
 end
 
 --- @brief remove all elements
 function rt.Set:clear()
-    meta.assert_isa(self, rt.Set)
+
     self.elements = {}
 end
 
@@ -75,8 +75,8 @@ end
 --- @param other rt.Set
 --- @return rt.Set
 function rt.Set:intersect(other)
-    meta.assert_isa(self, rt.Set)
-    meta.assert_isa(other, rt.Set)
+
+
 
     local out = rt.Set()
     for key in pairs(out) do
@@ -91,8 +91,8 @@ end
 --- @param other rt.Set
 --- @return rt.Set
 function rt.Set:union(other)
-    meta.assert_isa(self, rt.Set)
-    meta.assert_isa(other, rt.Set)
+
+
 
     local out = rt.Set()
     for key in pairs(out) do
@@ -106,6 +106,6 @@ end
 --- @brief get number of elements in set
 --- @return number
 function rt.Set:size()
-    meta.assert_isa(self, rt.Queue)
+
     return self.n_elements
 end

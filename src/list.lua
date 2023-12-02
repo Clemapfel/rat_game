@@ -36,7 +36,7 @@ end)
 --- @brief add element to start of list, O(1)
 --- @param element any
 function rt.List:push_front(element)
-    meta.assert_isa(self, rt.List)
+
     local to_insert = {
         value = element,
         previous = nil,
@@ -56,7 +56,7 @@ end
 --- @brief add element to back of list, O(1)
 --- @param element any
 function rt.List:push_back(element)
-    meta.assert_isa(self, rt.List)
+
     local to_insert = {
         value = element,
         previous = self._last_node,
@@ -76,7 +76,7 @@ end
 --- @brief remove element from front of list, O(1)
 --- @return any
 function rt.List:pop_front()
-    meta.assert_isa(self, rt.List)
+
     local out = self._first_node
     if not meta.is_nil(out.next) then
         out.next.previous = nil
@@ -90,7 +90,7 @@ end
 --- @brief remove element from end of list, O(1)
 --- @return any
 function rt.List:pop_back()
-    meta.assert_isa(self, rt.List)
+
     local out = self._last_node
     if not meta.is_nil(out.previous) then
         out.previous.next = nil
@@ -105,7 +105,7 @@ end
 --- @param index Number 1-based
 --- @return any removed value
 function rt.List:erase(index)
-    meta.assert_isa(self, rt.List)
+
     if index > self._n_elements or index < 1 then
         rt.error("In rt.list:erase: index `" .. tostring(index) .. "` is out of bounds for list with `" .. tostring(self._n_elements) .. "` elements")
     end
@@ -138,7 +138,7 @@ end
 --- @param index Number 1-based
 --- @param element any
 function rt.List:insert(index, element)
-    meta.assert_isa(self, rt.List)
+
     if index > self._n_elements or index < 0 then
         rt.error("In rt.list:erase: index `" .. tostring(index) .. "` is out of bounds for list with `" .. tostring(self._n_elements) .. "` elements")
     end
@@ -179,7 +179,7 @@ end
 --- @param index Number 1-based
 --- @return any
 function rt.List:at(index)
-    meta.assert_isa(self, rt.List)
+
     if index > self._n_elements then
         rt.error("In rt.list:at: index `" .. tostring(index) .. "` is out of bounds for list with `" .. tostring(self._n_elements) .. "` elements")
     end
@@ -197,7 +197,7 @@ end
 --- @param index Number 1-based
 --- @param new_value any
 function rt.List:set(index, new_value)
-    meta.assert_isa(self, rt.List)
+
     if index > self._n_elements then
         rt.error("In rt.list:set: index `" .. tostring(index) .. "` is out of bounds for list with `" .. tostring(self._n_elements) .. "` elements")
     end
@@ -213,7 +213,7 @@ end
 
 --- @brief remove all elements in queue
 function rt.List:clear()
-    meta.assert_isa(self, rt.List)
+
     self._nodes = {}
     self._first_node = nil
     self._last_node = nil
@@ -223,7 +223,7 @@ end
 --- @brief get number of elements, O(1)
 --- @return Number
 function rt.List:size()
-    meta.assert_isa(self, rt.List)
+
     return self._n_elements
 end
 

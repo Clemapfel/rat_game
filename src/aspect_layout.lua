@@ -3,7 +3,7 @@
 --- @param ratio Number
 --- @param child rt.Widget (or nil)
 rt.AspectLayout = meta.new_type("AspectLayout", function(ratio, child)
-    meta.assert_number(ratio)
+
     local out = meta.new(rt.AspectLayout, {
         _child = {},
         _ratio = ratio,
@@ -12,7 +12,7 @@ rt.AspectLayout = meta.new_type("AspectLayout", function(ratio, child)
     }, rt.Widget, rt.Drawable)
 
     if not meta.is_nil(child) then
-        meta.assert_isa(child, rt.Widget)
+
         out:set_child(child)
     end
     return out
@@ -21,8 +21,8 @@ end)
 --- @brief set singular child
 --- @param child rt.Widget
 function rt.AspectLayout:set_child(child)
-    meta.assert_isa(self, rt.AspectLayout)
-    meta.assert_isa(self, rt.Widget)
+
+
 
     if meta.is_widget(self._child) then
         self._child:set_parent(nil)
@@ -40,13 +40,13 @@ end
 --- @brief get singular child
 --- @return rt.Widget
 function rt.AspectLayout:get_child()
-    meta.assert_isa(self, rt.AspectLayout)
+
     return self._child
 end
 
 --- @brief remove child
 function rt.AspectLayout:remove_child()
-    meta.assert_isa(self, rt.AspectLayout)
+
     if meta.is_widget(self._child) then
         self._child:set_parent(nil)
         self._child = nil
@@ -55,7 +55,7 @@ end
 
 --- @overload rt.Drawable.draw
 function rt.AspectLayout:draw()
-    meta.assert_isa(self, rt.AspectLayout)
+
     if self:get_is_visible() and meta.is_widget(self._child) then
         self._child:draw()
     end
@@ -63,7 +63,7 @@ end
 
 --- @overload rt.Widget.size_allocate
 function rt.AspectLayout:size_allocate(x, y, width, height)
-    meta.assert_isa(self, rt.AspectLayout)
+
     self._width = width
     self._height = height
     if not meta.is_widget(self._child) then return end

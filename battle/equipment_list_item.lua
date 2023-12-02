@@ -1,6 +1,6 @@
 --- @class bt.EquipmentListItem
 bt.EquipmentListItem = meta.new_type("EquipmentListItem", function(equipment)
-    meta.assert_isa(equipment, bt.Equipment)
+
     if meta.is_nil(env.equipment_spritesheet) then
         env.equipment_spritesheet = rt.Spritesheet("assets/sprites", "equipment")
     end
@@ -94,7 +94,7 @@ end
 --- @brief
 function bt.EquipmentListItem:update_indicators(entity)
     -- TODO
-    meta.assert_isa(self, bt.EquipmentListItem)
+
 
     self._attack_indicator:set_color(rt.Palette.ATTACK)
     self._defense_indicator:set_color(rt.Palette.DEFENSE)
@@ -118,8 +118,8 @@ end
 
 --- @brief
 function bt.EquipmentListItem:set_count(n)
-    meta.assert_isa(self, bt.EquipmentListItem)
-    meta.assert_number(n)
+
+
     assert(n > 0)
     self._name_label:set_text(self._equipment.name .. " (" .. tostring(n) .. ") ")
 end

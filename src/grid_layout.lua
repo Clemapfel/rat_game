@@ -14,7 +14,7 @@ end)
 
 --- @overlay rt.Widget.size_allocate
 function rt.GridLayout:size_allocate(x, y, width, height)
-    meta.assert_isa(self, rt.GridLayout)
+
 
     local tile_w = 0
     local tile_h = 0
@@ -111,7 +111,7 @@ end
 
 --- @overload rt.Drawable.draw
 function rt.GridLayout:draw()
-    meta.assert_isa(self, rt.GridLayout)
+
     if not self:get_is_visible() then return end
     for _, child in pairs(self._children) do
         child:draw()
@@ -120,7 +120,7 @@ end
 
 --- @overload rt.Drawable.realize
 function rt.GridLayout:realize()
-    meta.assert_isa(self, rt.GridLayout)
+
     if self:get_is_realized() == true then return end
     self._realized = true
     for _, child in pairs(self._children) do
@@ -131,15 +131,15 @@ end
 --- @brief replace children
 --- @param children Table<rt.Widget>
 function rt.GridLayout:set_children(children)
-    meta.assert_isa(self, rt.GridLayout)
-    meta.assert_table(children)
+
+
 
     for child in pairs(self._children) do
         child:set_parent(nil)
     end
     self._children:clear()
     for _, child in pairs(children) do
-        meta.assert_isa(child, rt.Widget)
+
         child:set_parent(self)
         self._children:push_back(child)
         if self._realize then child:realize() end
@@ -150,8 +150,8 @@ end
 --- @brief append child
 --- @param child rt.Widget
 function rt.GridLayout:push_back(child)
-    meta.assert_isa(self, rt.GridLayout)
-    meta.assert_isa(child, rt.Widget)
+
+
     child:set_parent(self)
     self._children:push_back(child)
     if self:get_is_realized() then
@@ -163,8 +163,8 @@ end
 --- @brief prepend child
 --- @param child rt.Widget
 function rt.GridLayout:push_front(child)
-    meta.assert_isa(self, rt.GridLayout)
-    meta.assert_isa(child, rt.Widget)
+
+
     child:set_parent(self)
     self._children:push_back(child)
     if self:get_is_realized() then
@@ -176,7 +176,7 @@ end
 --- @brief remove first child
 --- @return rt.Widget
 function rt.GridLayout:pop_front()
-    meta.assert_isa(self, rt.GridLayout)
+
     local out = self._children:pop_front()
     out:set_parent(nil)
     self:reformat()
@@ -186,7 +186,7 @@ end
 --- @brief remove last child
 --- @return rt.Widget
 function rt.GridLayout:pop_back()
-    meta.assert_isa(self, rt.GridLayout)
+
     local out = self._children:pop_back()
     out:set_parent(nil)
     self:reformat()
@@ -197,9 +197,9 @@ end
 --- @param index Number 1-based
 --- @param child rt.Widget
 function rt.GridLayout:insert(index, child)
-    meta.assert_isa(self, rt.GridLayout)
-    meta.assert_isa(child, rt.Widget)
-    meta.assert_number(index)
+
+
+
 
     child:set_parent(self)
     self._children:insert(index, child)
@@ -213,8 +213,8 @@ end
 --- @brief remove child at position
 --- @param index Number 1-based
 function rt.GridLayout:erase(index)
-    meta.assert_isa(self, rt.GridLayout)
-    meta.assert_number(index)
+
+
 
     local child = self._children:erase(index)
     child:set_parent(nil)
@@ -224,7 +224,7 @@ end
 --- @brief set orientation, causes reformat
 --- @param orientation rt.Orientation
 function rt.GridLayout:set_orientation(orientation)
-    meta.assert_isa(self, rt.GridLayout)
+
     if self._orientation == orientation then return end
     self._orientation = orientation
     self:reformat()
@@ -233,15 +233,15 @@ end
 --- @brief get orientation
 --- @return rt.Orientation
 function rt.GridLayout:get_orientation()
-    meta.assert_isa(self, rt.GridLayout)
+
     return self._orientation
 end
 
 --- @brief set spacing between rows
 --- @param x Number px
 function rt.GridLayout:set_row_spacing(x)
-    meta.assert_isa(self, rt.GridLayout)
-    meta.assert_number(x)
+
+
     if self._row_spacing ~= x then
         self._row_spacing = x
         self:reformat()
@@ -251,15 +251,15 @@ end
 --- @brief get spacing between rows
 --- @return Number px
 function rt.GridLayout:get_row_spacing()
-    meta.assert_isa(self, rt.GridLayout)
+
     return self._row_spacing
 end
 
 --- @brief set spacing between columns
 --- @param x Number px
 function rt.GridLayout:set_column_spacing(x)
-    meta.assert_isa(self, rt.GridLayout)
-    meta.assert_number(x)
+
+
     if self._column_spacing ~= x then
         self._column_spacing = x
         self:reformat();
@@ -269,14 +269,14 @@ end
 --- @brief get spacing between columns
 --- @param Number px
 function rt.GridLayout:get_column_spacing()
-    meta.assert_isa(self, rt.GridLayout)
+
     return self._column_spacing
 end
 
 --- @brief set lower bound for rows
 --- @param n Number
 function rt.GridLayout:set_min_n_rows(n)
-    meta.assert_isa(self, rt.GridLayout)
+
     if self._min_n_rows ~= n then
         self._min_n_rows = n
         self:reformat()
@@ -286,7 +286,7 @@ end
 --- @brief set upper bound for rows
 --- @param n Number
 function rt.GridLayout:set_max_n_rows(n)
-    meta.assert_isa(self, rt.GridLayout)
+
     if self._max_n_rows ~= n then
         self._max_n_rows = n
         self:reformat()
@@ -296,7 +296,7 @@ end
 --- @brief set lower bound for columns
 --- @param n Number
 function rt.GridLayout:set_min_n_columns(n)
-    meta.assert_isa(self, rt.GridLayout)
+
     if self._min_n_cols ~= n then
         self._min_n_cols = n
         self:reformat()
@@ -306,7 +306,7 @@ end
 --- @brief set upper bound for columns
 --- @param n Number
 function rt.GridLayout:set_max_n_columns(n)
-    meta.assert_isa(self, rt.GridLayout)
+
     if self._max_n_cols ~= n then
         self._max_n_cols = n
         self:reformat()

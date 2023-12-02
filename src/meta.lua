@@ -2,15 +2,15 @@
 meta = {}
 meta.types = {}
 
-meta.DEBUG_MODE = true
+meta.DEBUG_MODE = false
 meta.DUMMY_FUNCTION = function(...) end
 
 --- @brief [internal] disable function unless `meta.DEBUG_MODE` is set to `true`
 --- @param name String symbol name
 function meta.make_debug_only(name)
-    local to_call = load("if meta.DEBUG_MODE ~= true then " .. name .. "= meta.DUMMY_FUNCTION end")
-    if meta.is_nil(to_call) then rt.error("In meta.debug_only: Symbol `" .. name .. "` is malformatted") end
-    to_call()
+    if meta.DEBUG_MODE == false then
+        _G[name] = nil
+    end
 end
 
 --- @brief is x a lua string?
@@ -60,8 +60,6 @@ meta._hash = 2^16
 --- @brief [internal] Create new empty object
 --- @param typename String
 function meta._new(typename)
-    --meta.assert_string(typename)
-
     local out = {}
     out.__metatable = {}
     metatable = out.__metatable
@@ -70,30 +68,59 @@ function meta._new(typename)
     metatable.__hash = meta._hash
     meta._hash = meta._hash + 1
     metatable.properties = {}
+    metatable.is_type = typename == "Type"
     metatable.is_mutable = true
     metatable.super = {}
     metatable.components = {}
     metatable.was_finalized = false
 
-    metatable.__index = function(this, property_name)
-        local metatable = getmetatable(this)
-        return metatable.properties[property_name]
+    if metatable.is_type then
+        metatable.type_properties = {}
+
+        metatable.__index = function(this, property_name)
+            local metatable = getmetatable(this)
+
+            if metatable.is_type then
+                local out_maybe = metatable.type_properties[property_name]
+                if not meta.is_nil(out_maybe) then return out_maybe end
+            end
+            return metatable.properties[property_name]
+        end
+
+        metatable.__newindex = function(this, property_name, property_value)
+            local metatable = getmetatable(this)
+            if not metatable.is_mutable then
+                rt.error("In " .. metatable.__name .. ".__newindex: Cannot set property `" .. property_name .. "`, because the object was declared immutable.")
+            end
+
+            if metatable.is_type then
+                metatable.type_properties[property_name] = property_value
+            else
+                metatable.properties[property_name] = property_value
+            end
+        end
+    else
+        metatable.__index = function(this, property_name)
+            return getmetatable(this).properties[property_name]
+        end
+
+        metatable.__newindex = function(this, property_name, property_value)
+            local metatable = getmetatable(this)
+            if not metatable.is_mutable then
+                rt.error("In " .. metatable.__name .. ".__newindex: Cannot set property `" .. property_name .. "`, because the object was declared immutable.")
+            end
+
+            metatable.properties[property_name] = property_value
+        end
     end
 
-    metatable.__newindex = function(this, property_name, property_value)
-        local metatable = getmetatable(this)
-        if not metatable.is_mutable then
-            rt.error("In " .. metatable.__name .. ".__newindex: Cannot set property `" .. property_name .. "`, because the object was declared immutable.")
-        end
-        metatable.properties[property_name] = property_value
-    end
+
 
     metatable.__tostring = function(this)
         return "(" .. getmetatable(this).__name .. ") " .. serialize(this)
     end
 
     metatable.__eq = function(self, other)
-        meta.assert_object(other)
         return getmetatable(self).__hash == getmetatable(other).__hash
     end
     setmetatable(out, metatable)
@@ -125,9 +152,6 @@ end
 
 --- @brief check if instance has type as super
 function meta.inherits(x, super)
-    meta.assert_object(x)
-    meta.assert_isa(super, meta.Type)
-
     for _, name in pairs(getmetatable(x).super) do
         if name == super._typename then
             return true
@@ -150,7 +174,6 @@ end
 --- @brief throw if false
 --- @param b Boolean
 function meta.assert(b)
-    meta.assert_boolean(b)
     if not b then
         local name = debug.getinfo(2, "n").name
         rt.error("In " .. name .. ": Assertion failed")
@@ -230,7 +253,6 @@ function meta.assert_inherits(x, type)
     if meta.typeof(type) == "Type" then
         meta._assert_aux(meta.inherits(x, type), x, type._typename)
     else
-        meta.assert_string(type)
         meta._assert_aux(meta.inherits(x, type), x, type)
     end
 end
@@ -240,8 +262,6 @@ end
 --- @param property_name String
 --- @param initial_value any
 function meta._install_property(x, property_name, initial_value)
-    --meta.assert_object(x);
-    --meta.assert_string(property_name)
     getmetatable(x).properties[property_name] = initial_value
 end
 
@@ -249,8 +269,6 @@ end
 --- @param x meta.Object
 --- @param property_name String
 function meta._uninstall_property(x, property_name)
-    --meta.assert_object(x)
-    --meta.assert_string(property_name)
     local metatable = getmetatable(x)
     metatable.properties[property_name] = nil
 end
@@ -260,8 +278,6 @@ end
 --- @param property_name String
 --- @return Boolean
 function meta.has_property(x, property_name)
-    meta.assert_object(x)
-    meta.assert_string(property_name)
     local metatable = getmetatable(x)
     return not meta.is_nil(metatable.properties[property_name])
 end
@@ -270,7 +286,6 @@ end
 --- @param x meta.Object
 --- @return Table
 function meta.get_property_names(x)
-    meta.assert_object(x)
     local out = {}
     for name, _ in pairs(getmetatable(x).properties) do
         table.insert(out, name)
@@ -282,8 +297,6 @@ end
 --- @param x meta.Object
 --- @param b Boolean
 function meta.set_is_mutable(x, b)
-    meta.assert_object(x)
-    meta.assert_boolean(b)
     getmetatable(x).is_mutable = b
 end
 
@@ -291,7 +304,6 @@ end
 --- @param x meta.Object
 --- @return Boolean
 function meta.get_is_mutable(x)
-    meta.assert_object(x);
     return getmetatable(x).is_mutable
 end
 
@@ -303,34 +315,27 @@ meta.Object = "Object"
 --- @param fields Table property_name -> property_value
 --- @vararg meta.Type
 function meta.new(type, fields, ...)
-
-    meta.assert_isa(type, meta.Type)
     if meta.is_nil(fields) then
         fields = {}
-    else
-        meta.assert_table(fields)
     end
 
     local out = {}
     if meta.isa(type, meta.Type) then
         out = meta._new(type._typename)
     else
-        meta.assert_string(type)
         out = meta._new(type)
     end
 
     meta.set_is_mutable(out, true)
     if meta.is_table(fields) then
         for name, value in pairs(fields) do
-            meta.assert_string(name)
             meta._install_property(out, name, value)
         end
-    else
-        meta.assert_nil(fields)
     end
 
     meta._install_inheritance(out, type)
-    local installed = {type = true}
+    local installed = {}
+    installed[type] = true
 
     for _, super in pairs({...}) do
         if installed[super] ~= true then
@@ -347,8 +352,6 @@ meta.Enum = "Enum"
 --- @brief create a new immutable object
 --- @param fields Table
 function meta.new_enum(fields)
-
-    meta.assert_table(fields)
     if is_empty(fields) then
         rt.error("In meta.new_enum: list of values cannot be empty")
     end
@@ -358,7 +361,6 @@ function meta.new_enum(fields)
 
     local i = 0
     for name, value in pairs(fields) do
-        meta.assert_string(name)
 
         if meta.is_table(value) then
             rt.error("In meta.new_enum: Enum value for key `" .. name .. "` is a `" .. meta.typeof(value) .. "`, which is not a primitive.")
@@ -424,7 +426,6 @@ end
 --- @param x any
 --- @param enum meta.Enum
 function meta.is_enum_value(x, enum)
-    meta.assert_isa(enum,  meta.Enum)
     for _, value in pairs(enum) do
         if x == value then
             return true
@@ -447,15 +448,12 @@ meta.make_debug_only("meta.assert_enum")
 --- @param instance meta.Object
 --- @param type meta.Type
 function meta._install_inheritance(instance, type)
-    --meta.assert_object(instance)
-    --meta.assert_isa(type, meta.Type)
-
     if type._typename ~= meta.typeof(instance) then
         table.insert(getmetatable(instance).super, type._typename)
     end
 
-    for key, value in pairs(getmetatable(type).properties) do
-        if key ~= "_typename" and instance[key] == nil then --and not meta.has_property(instance, key) then
+    for key, value in pairs(getmetatable(type).type_properties) do
+        if instance[key] == nil then
             meta._install_property(instance, key, value)
         end
     end
@@ -507,14 +505,11 @@ end
 --- @param ctor Function
 --- @param dtor Function
 function meta.new_type(typename, ctor, dtor)
-    meta.assert_string(typename)
-    meta.assert_function(ctor)
-    if not meta.is_nil(dtor) then meta.assert_function(dtor) end
-
     local out = meta._new("Type")
     local metatable = getmetatable(out)
-    out._typename = typename
-    out._type_id = string.hash(typename)
+
+    rawset(metatable.properties, "_typename", typename)
+    rawset(metatable.properties, "_type_id", string.hash(typename))
 
     metatable.__call = function(self, ...)
         local out = ctor(...)
@@ -536,7 +531,6 @@ end
 --- @brief invoke destructor
 --- @param x meta.Object
 function meta.finalize(x)
-    meta.assert_object(x)
     local metatable = getmetatable(x)
     if not meta.is_nil(metatable.__gc) and metatable.was_finalized == false then
         metatable.__gc(x)
@@ -597,9 +591,6 @@ function meta.make_weak(table, weak_keys, weak_values)
     if meta.is_nil(weak_keys) then weak_keys = true end
     if meta.is_nil(weak_values) then weak_values = true end
 
-    meta.assert_table(table)
-    meta.assert_boolean(weak_keys, weak_values)
-
     local metatable = getmetatable(table)
     if meta.is_nil(metatable) then
         metatable = {}
@@ -631,7 +622,6 @@ end
 --- @param super meta.Type
 --- @param name String
 function meta.declare_abstract_method(super, name)
-    meta.assert_object(super)
     super[name] = function(self)
         rt.error("In " .. super._typename .. "." .. name .. ": Abstract method called by object of type `" .. meta.typeof(self) .. "`")
     end
@@ -639,6 +629,5 @@ end
 
 --- @brief hash object, each instance has a unique ID
 function meta.hash(x)
-    meta.assert_object(x)
     return getmetatable(x).__hash
 end

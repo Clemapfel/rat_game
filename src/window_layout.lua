@@ -29,8 +29,8 @@ end
 --- @brief set singular child
 --- @param child rt.Widget
 function rt.WindowLayout:set_child(child)
-    meta.assert_isa(self, rt.WindowLayout)
-    meta.assert_isa(child, rt.Widget)
+
+
 
     if not meta.is_nil(self._child) and meta.is_widget(self._child) then
         self._child:set_parent(nil)
@@ -48,13 +48,13 @@ end
 --- @brief get singular child
 --- @return rt.Widget
 function rt.WindowLayout:get_child()
-    meta.assert_isa(self, rt.WindowLayout)
+
     return self._child
 end
 
 --- @brief remove child
 function rt.WindowLayout:remove_child()
-    meta.assert_isa(self, rt.WindowLayout)
+
     if not meta.is_nil(self._child) then
         self._child:set_parent(nil)
         self._child = nil
@@ -63,7 +63,7 @@ end
 
 --- @overload rt.Drawable.draw
 function rt.WindowLayout:draw()
-    meta.assert_isa(self, rt.WindowLayout)
+
     if self:get_is_visible() and meta.is_widget(self._child) then
         self._child:draw()
     end
@@ -71,7 +71,7 @@ end
 
 --- @overload rt.Widget.size_allocate
 function rt.WindowLayout:size_allocate(x, y, width, height)
-    meta.assert_isa(self, rt.WindowLayout)
+
     if meta.is_widget(self._child) then
         self._child:fit_into(rt.AABB(x, y, width, height))
     end

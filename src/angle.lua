@@ -1,19 +1,19 @@
 --- @class rt.Angle
 rt.Angle = meta.new_type("Angle", function(rads)
     if meta.is_nil(rads) then rads = 0 end
-    meta.assert_number(rads)
+
     local out = meta.new(rt.Angle, {
         _rads = rads
     })
     local metatable = getmetatable(out)
     metatable.__add = function(self, other)
-        meta.assert_isa(self, rt.Angle)
-        meta.assert_isa(other, rt.Angle)
+
+
         return rt.Angle(math.fmod(self._rads + other._rads, 2 * math.pi))
     end
     metatable.__sub = function(self, other)
-        meta.assert_isa(self, rt.Angle)
-        meta.assert_isa(other, rt.Angle)
+
+
         return rt.Angle(math.fmod(self._rads - other._rads, 2 * math.pi))
     end
     return out
@@ -23,7 +23,7 @@ end)
 --- @param rads Number
 --- @return Number
 function rt.radians_to_degrees(rads)
-    meta.assert_number(rads)
+
     return rads * (180 / math.pi)
 end
 
@@ -31,7 +31,7 @@ end
 --- @param dgs Number
 --- @return Number
 function rt.degrees_to_radians(dgs)
-    meta.assert_number(dgs)
+
     return dgs * (math.pi / 180)
 end
 
@@ -52,14 +52,14 @@ end
 --- @brief convert `Angle` to degrees
 --- @return Number
 function rt.Angle:as_degrees()
-    meta.assert_isa(self, rt.Angle)
+
     return rt.radians_to_degrees(self._rads)
 end
 
 --- @brief convert `Angle` to radians
 --- @return Number
 function rt.Angle:as_radians()
-    meta.assert_isa(self, rt.Angle)
+
     return self._rads
 end
 

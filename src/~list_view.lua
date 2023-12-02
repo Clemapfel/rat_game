@@ -27,7 +27,7 @@ rt.ListView = meta.new_type("ListView", function()
 end)
 
 function rt.ListView:get_top_level_widget()
-    meta.assert_isa(self, rt.ListView)
+
     return self._hbox
 end
 
@@ -50,7 +50,7 @@ rt.ListViewItem = meta.new_type("ListViewItem", function(child)
 end)
 
 function rt.ListViewItem:get_top_level_widget()
-    meta.assert_isa(self, rt.ListViewItem)
+
     return self._frame
 end
 

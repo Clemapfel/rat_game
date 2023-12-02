@@ -22,7 +22,7 @@ end)
 --- @param transform rt.Transform
 function rt.Drawable:render(love_drawable, x, y, transform)
 
-    meta.assert_isa(self, rt.Drawable)
+
 
     if self._is_visible == false then
         return
@@ -31,7 +31,7 @@ function rt.Drawable:render(love_drawable, x, y, transform)
     if meta.is_nil(transform) then
         love.graphics.draw(love_drawable, x, y)
     else
-        meta.assert_isa(transform, rt.Transform)
+
         love.graphics.draw(love_drawable,
             x,
             y,
@@ -54,7 +54,7 @@ end
 --- @brief set whether drawable should be culled, this affects `render`
 --- @param b Boolean
 function rt.Drawable:set_is_visible(b)
-    meta.assert_isa(self, rt.Drawable)
+
     self._is_visible = b
 end
 

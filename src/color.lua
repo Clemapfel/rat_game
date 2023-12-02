@@ -85,7 +85,7 @@ meta.make_debug_only("meta.assert_hsva")
 --- @param rgba rt.RGBA
 --- @return rt.HSVA
 function rt.rgba_to_hsva(rgba)
-    meta.assert_rgba(rgba)
+
 
     -- cf. https://github.com/Clemapfel/mousetrap/blob/main/src/color.cpp#L112
     local r = rgba.r
@@ -136,7 +136,7 @@ end
 --- @param hsva rt.HSVA
 --- @return rt.RGBA
 function rt.hsva_to_rgba(hsva)
-    meta.assert_hsva(hsva)
+
 
     --- cf https://github.com/Clemapfel/mousetrap/blob/main/src/color.cpp#L151
     local h = hsva.h * 360
@@ -178,8 +178,8 @@ end
 --- @param c2 rt.RGBA
 --- @return Boolean
 function rt.compare_rgba(c1, c2)
-    meta.assert_rgba(c1)
-    meta.assert_rgba(c2)
+
+
     return c1.r == c2.r and c1.g == c2.g and c1.b == c2.b and c1.a == c2.a
 end
 
@@ -188,8 +188,8 @@ end
 --- @param c2 rt.HSVA
 --- @return Boolean
 function rt.compare_hsva(c1, c2)
-    meta.assert_hsva(c1)
-    meta.assert_hsva(c2)
+
+
     local hue_matches = ternary(math.abs(c1.h - c2.h) == 1, true, c1.h == c2.h)
     return hue_matches and c1.s == c2.s and c1.v == c2.v and c1.a == c2.a
 end
@@ -198,7 +198,7 @@ end
 --- @param code String "#RRGGBB(AA)"
 --- @return rt.RGBA
 function rt.html_code_to_color(code)
-    meta.assert_string(code)
+
 
     function hex_char_to_int(c)
         c = string.upper(c)
@@ -222,7 +222,7 @@ function rt.html_code_to_color(code)
     end
 
     function hex_component_to_int(left, right)
-        meta.assert_number(left, right)
+
         return left * 16 + right
     end
 
@@ -269,12 +269,12 @@ end
 --- @param use_alpha Boolean (or nil)
 --- @return String "#RRGGBB" or "#RRGGBBAA" if `use_alpha`
 function rt.color_to_html_code(rgba, use_alpha)
-    meta.assert_rgba(rgba)
+
 
     if meta.is_nil(use_alpha) then
         use_alpha = false
     end
-    meta.assert_boolean(use_alpha)
+
 
     rgba.r = clamp(rgba.r, 0, 1)
     rgba.g = clamp(rgba.g, 0, 1)
@@ -302,12 +302,12 @@ end
 
 --- @brief
 function rt.color_darken(color, offset)
-    meta.assert_number(offset)
+
     offset = clamp(offset, 0, 1)
     if meta.is_hsva(color) then
         return rt.HSVA(color.h, color.s, color.v - offset, color.a)
     else
-        meta.assert_rgba(color)
+
         return rt.RGBA(color.r - offset, color.g - offset, color.b - offset, color.a)
     end
 end

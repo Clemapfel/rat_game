@@ -19,7 +19,7 @@ meta.make_weak(rt.MouseHandler._components, false, true)
 --- @signal motion          (self, x, y, dx, dy) -> nil
 --- @signal motion_leave    (self, x, y) -> nil
 rt.MouseController = meta.new_type("MouseController", function(instance)
-    meta.assert_object(instance)
+
 
     local out = meta.new(rt.MouseController, {
         instance = instance,
@@ -40,8 +40,8 @@ end)
 --- @param x Number
 --- @param y Number
 function rt.MouseController:is_cursor_in_bounds(x, y)
-    meta.assert_isa(self, rt.MouseController)
-    meta.assert_number(x, y)
+
+
     local bounds = self.instance:get_bounds()
     return x >= bounds.x and x <= bounds.x + bounds.width and y >= bounds.y and y <= bounds.y + bounds.height
 end
@@ -120,7 +120,7 @@ love.mousemoved = rt.MouseHandler.handle_motion
 --- @brief get absolute cursor position
 --- @return Number, Number
 function rt.MouseController:get_cursor_position()
-    meta.assert_isa(self, rt.MouseController)
+
     return love.mouse.getPosition()
 end
 
@@ -128,14 +128,14 @@ end
 --- @param target meta.Object
 --- @return rt.MouseController
 function rt.add_mouse_controller(target)
-    meta.assert_object(target)
+
     getmetatable(target).components.mouse = rt.MouseController(target)
     return getmetatable(target).components.mouse
 end
 
 --- @brief
 function rt.get_mouse_controller(target)
-    meta.assert_object(target)
+
     local components = getmetatable(target).components
     if meta.is_nil(components) then
         return nil

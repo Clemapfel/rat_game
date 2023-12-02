@@ -144,7 +144,7 @@ meta.make_weak(rt.KeyboardHandler._components, false, true)
 --- @brief create new controller
 --- @param holder meta.Object
 rt.KeyboardController = meta.new_type("KeyboardController", function(instance)
-    meta.assert_object(instance)
+
     local hash = rt.KeyboardHandler._hash
     rt.KeyboardHandler._hash = rt.KeyboardHandler._hash + 1
 
@@ -187,7 +187,7 @@ love.keyreleased = function(key) rt.KeyboardHandler.handle_key_released(key) end
 --- @param target meta.Object
 --- @return rt.KeyboardController
 function rt.add_keyboard_controller(target)
-    meta.assert_object(target)
+
     getmetatable(target).components.keyboard = rt.KeyboardController(target)
     return getmetatable(target).components.keyboard
 end
@@ -196,7 +196,7 @@ end
 --- @param target meta.Object
 --- @return rt.KeyboardController
 function rt.get_keyboard_controller(target)
-    meta.assert_object(target)
+
     local components = getmetatable(target).components
     if meta.is_nil(components) then
         return nil

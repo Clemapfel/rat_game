@@ -9,16 +9,16 @@ rt.JustifyMode = meta.new_enum({
 --- @param text String
 --- @param font rt.Font (or nil)
 rt.Label = meta.new_type("Label", function(text, font, monospace_font)
-    meta.assert_string(text)
+
     if meta.is_nil(font) then
         font = rt.settings.font.default
     end
-    meta.assert_isa(font, rt.Font)
+
 
     if meta.is_nil(monospace_font) then
         monospace_font = rt.settings.font.default_mono
     end
-    meta.assert_isa(monospace_font, rt.Font)
+
 
     local out = meta.new(rt.Label, {
         _raw = text,
@@ -39,7 +39,7 @@ end)
 
 --- @overload rt.Drawable.draw
 function rt.Label:draw()
-    meta.assert_isa(self, rt.Label)
+
 
     if not self:get_is_visible() then return end
     for _, glyph in pairs(self._glyphs) do
@@ -180,7 +180,7 @@ end
 
 --- @overload rt.Widget.measure
 function rt.Label:measure()
-    meta.assert_isa(self, rt.Label)
+
     return self._current_width + self:get_margin_left() + self:get_margin_right(), self._current_height + self:get_margin_top() + self:get_margin_bottom()
 end
 
@@ -213,7 +213,7 @@ rt.Label.MONOSPACE_TAG_END = rt.Set("</tt>", "</mono>")
 
 --- @brief [internal] transform _raw into set of glyphs
 function rt.Label:_parse()
-    meta.assert_isa(self, rt.Label)
+
 
     self._glyphs = {}
     self._n_characters = 0
@@ -273,14 +273,14 @@ function rt.Label:_parse()
 
     -- throw error, with guides
     local function throw_parse_error(reason)
-        meta.assert_string(reason)
+
         rt.error("[rt] In rt.Label._parse: Error at position `" .. tostring(i) .. "`: " .. reason)
     end
 
     -- advance n characters
     local function step(n)
         if meta.is_nil(n) then n = 1 end
-        meta.assert_number(n)
+
         i = i + n
         s = string.sub(self._raw, i, i)
     end
@@ -486,7 +486,7 @@ end
 
 --- @brief [internal] calculate size given infinite area
 function rt.Label:_update_default_size()
-    meta.assert_isa(self, rt.Label)
+
 
     self:size_allocate(0, 0, 2^32, 2^32)
     local min_x = POSITIVE_INFINITY
@@ -513,8 +513,8 @@ end
 --- @brief set text justification
 --- @param mode rt.JustifyMode
 function rt.Label:set_justify_mode(mode)
-    meta.assert_isa(self, rt.Label)
-    meta.assert_enum(mode, rt.JustifyMode)
+
+
 
     if self._justify_mode ~= mode then
         self._justify_mode = mode
@@ -525,15 +525,15 @@ end
 --- @brief get text justification
 --- @return rt.JustifyMode
 function rt.Label:get_justify_mode()
-    meta.assert_isa(self, rt.Label)
+
     return self._justify_mode
 end
 
 --- @brief replace text and reformat
 --- @param formatted_text String supports formatting tags
 function rt.Label:set_text(formatted_text)
-    meta.assert_isa(self, rt.Label)
-    meta.assert_string(formatted_text)
+
+
     self._raw = formatted_text
     self:_parse()
     self:_update_default_size()
@@ -543,15 +543,15 @@ end
 --- @brief access raw text
 --- @return String
 function rt.Label:get_text()
-    meta.assert_isa(self, rt.Label)
+
     return self._raw;
 end
 
 --- @brief replace font
 --- @param font rt.Font
 function rt.Label:set_font(font)
-    meta.assert_isa(self, rt.Label)
-    meta.assert_isa(font, rt.Font)
+
+
     self._font = font
     self:reformat();
 end
@@ -559,8 +559,8 @@ end
 --- @brief set number of visible characters, used for text scrolling
 --- @param n Number
 function rt.Label:set_n_visible_characters(n)
-    meta.assert_isa(self, rt.Label)
-    meta.assert_number(n)
+
+
     local n_left =  clamp(n, 0, self._n_characters)
     local n_glyphs = sizeof(self._glyphs)
     local glyph_i = 1
@@ -585,8 +585,8 @@ end
 --- @brief set whether the glyphs of the label are animated
 --- @param b Boolean
 function rt.Label:set_is_animated(b)
-    meta.assert_isa(self, rt.Label)
-    meta.assert_boolean(b)
+
+
 
     self._is_animated = b
     for _, glyph in pairs(self._glyphs) do
@@ -599,14 +599,14 @@ end
 --- @brief get whether the glyphs of the label are animated
 --- @return Boolean
 function rt.Label:get_is_animated()
-    meta.assert_isa(self, rt.Label)
+
     return self._is_animated
 end
 
 --- @brief get font
 --- @retun rt.Font
 function rt.Label:get_font()
-    meta.assert_isa(self, rt.Label)
+
     return self._font
 end
 

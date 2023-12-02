@@ -8,7 +8,7 @@ rt.DirectionIndicator = meta.new_type("DirectionIndicator", function(direction)
     if meta.is_nil(direction) then
         direction = rt.Direction.NONE
     end
-    meta.assert_enum(direction, rt.Direction)
+
     local out = meta.new(rt.DirectionIndicator, {
         _direction = direction,
         _color = {},
@@ -49,7 +49,7 @@ end
 
 --- @overload rt.Widget.size_allocate
 function rt.DirectionIndicator:size_allocate(x, y, width, height)
-    meta.assert_isa(self, rt.DirectionIndicator)
+
 
     local center_x, center_y = x + 0.5 * width, y + 0.5 * height
     local radius = math.min(width, height) / 2
@@ -125,8 +125,8 @@ end
 
 --- @brief
 function rt.DirectionIndicator:set_direction(direction)
-    meta.assert_isa(self, rt.DirectionIndicator)
-    meta.assert_enum(direction, rt.Direction)
+
+
 
     self._direction = direction
     self:reformat()
@@ -134,17 +134,17 @@ end
 
 --- @brief
 function rt.DirectionIndicator:get_direction()
-    meta.assert_isa(self, rt.DirectionIndicator)
+
     return self._direction
 end
 
 --- @brief
 function rt.DirectionIndicator:set_color(color)
-    meta.assert_isa(self, rt.DirectionIndicator)
+
     if meta.is_hsva(color) then
         color = rt.hsva_to_rgba(color)
     end
-    meta.assert_rgba(color)
+
     self._color = color
     self._arrow:set_color(self._color)
     self._ring:set_color(self._color)
@@ -152,6 +152,6 @@ end
 
 --- @brief
 function rt.DirectionIndicator:get_color()
-    meta.assert_isa(self, rt.DirectionIndicator)
+
     return self._color
 end

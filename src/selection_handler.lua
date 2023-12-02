@@ -1,9 +1,9 @@
 --- @class rt.SelectionNode
 rt.SelectionNode = meta.new_type("SelectionNode", function(self, up, right, down, left)
-    meta.assert_isa(self, rt.Widget)
+
     for _, widget in pairs({up, right, down, left}) do
         if not meta.is_nil(widget) then
-            meta.assert_isa(widget, rt.Widget)
+
         end
     end
 
@@ -25,7 +25,7 @@ rt.SelectionNode.left = {}
 --- @class rt.SelectionHandler
 --- @signal selection_changed (self, previous_widget, next_widget) -> nil
 rt.SelectionHandler = meta.new_type("SelectionHandler", function(child)
-    meta.assert_isa(child, rt.Widget)
+
     local out = meta.new(rt.SelectionHandler, {
         _nodes = {},        -- meta.hash(self) -> rt.SelectionNode(self, ...)
         _current_node = {}, -- meta.hash
@@ -52,7 +52,7 @@ end)
 
 --- @overload rt.Drawable.draw
 function rt.SelectionHandler:draw()
-    meta.assert_isa(self, rt.SelectionHandler)
+
     if not self:get_is_visible() then return end
 
     self._child:draw()
@@ -79,7 +79,7 @@ end
 
 --- @brief [internal]
 function rt.SelectionHandler:_validate_node_map()
-    meta.assert_isa(self, rt.SelectionHandler)
+
 
     local n_nodes = sizeof(self._nodes)
     local error_message, error_occurred = false
@@ -136,8 +136,8 @@ end
 
 --- @brief
 function rt.SelectionHandler:move(direction)
-    meta.assert_isa(self, rt.SelectionHandler)
-    meta.assert_enum(direction, rt.Direction)
+
+
 
     if not meta.isa(self._current_node, rt.SelectionNode) then return end
 
@@ -174,9 +174,9 @@ end
 
 --- @bief
 function rt.SelectionHandler:connect(direction, from, to)
-    meta.assert_enum(direction, rt.Direction)
-    meta.assert_isa(from, rt.Widget)
-    meta.assert_isa(to, rt.Widget)
+
+
+
 
     if from == to then
         rt.error("In rt.SelectionHandler:connect: trying to connect `" .. meta.typeof(from) .. "` with itself, this would create an infinite loop")
@@ -219,15 +219,15 @@ end
 --- @brief
 --- @return rt.Widget
 function rt.SelectionHandler:get_selected()
-    meta.assert_isa(self, rt.SelectionHandler)
+
     return self._current_node.self
 end
 
 --- @brief
 --- @param rt.Widget
 function rt.SelectionHandler:set_selected(widget)
-    meta.assert_isa(self, rt.SelectionHandler)
-    meta.assert_isa(self, rt.Widget)
+
+
 
     local next = self._nodes[meta.hash(widget)]
     if meta.is_nil(next) then

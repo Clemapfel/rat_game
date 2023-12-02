@@ -13,7 +13,7 @@ end)
 
 function rt.ListView:_regenerate_sorting(name)
 
-    meta.assert_table(self._sortings[name])
+
 
     self._sortings[name].order = {}
     local to_sort = self._sortings[name].order
@@ -28,7 +28,7 @@ function rt.ListView:_regenerate_sorting(name)
         local right = self._children[y]
         return try_catch(function()
             local out = comp(left, right)
-            meta.assert_boolean(out)
+
             return out
         end, function(error)
             rt.error("In ListView:_regenerate_sorting: comparator for sort mode `" .. name .. "` failed for widgets `" .. tostring(meta.typeof(left)) .. "`, `" .. tostring(meta.typeof(right)) .. "`: " .. error)
@@ -38,9 +38,9 @@ end
 
 --- @brief
 function rt.ListView:add_sort_mode(name, comparator)
-    meta.assert_isa(self, rt.ListView)
-    meta.assert_string(name)
-    meta.assert_function(comparator)
+
+
+
 
     self._sortings[name] = {
         comparator = comparator,
@@ -50,8 +50,8 @@ end
 
 --- @brief
 function rt.ListView:set_sort_mode(name)
-    meta.assert_isa(self, rt.ListView)
-    meta.assert_string(name)
+
+
 
     if meta.is_nil(self._sortings[name]) then
         rt.error("In rt.ListView.set_sort_mode: no sort mode `" .. name .. "` registered")
@@ -68,14 +68,14 @@ end
 
 --- @brief
 function rt.ListView:get_sort_mode()
-    meta.assert_isa(self, rt.ListView)
+
     return self._sort_mode
 end
 
 --- @brief
 function rt.ListView:push_back(child)
-    meta.assert_isa(self, rt.ListView)
-    meta.assert_widget(child)
+
+
     self._children[self._children_hash] = child
     self._children_hash = self._children_hash + 1
 

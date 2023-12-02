@@ -6,13 +6,13 @@ rt.Time = meta.new_type("Time", function(microseconds)
     })
     local metatable = getmetatable(out)
     metatable.__add = function(self, other)
-        meta.assert_isa(self, rt.Time)
-        meta.assert_isa(other, rt.Time)
+
+
         return rt.Time(self._mys + other._mys)
     end
     metatable.__sub = function(self, other)
-        meta.assert_isa(self, rt.Time)
-        meta.assert_isa(other, rt.Time)
+
+
         return rt.Time(self._mys - other._mys)
     end
     return out
@@ -21,35 +21,35 @@ end)
 --- @brief convert to microseconds
 --- @return Number
 function rt.Time:as_microseconds()
-    meta.assert_isa(self, rt.Time)
+
     return self._mys
 end
 
 --- @brief convert to milliseconds
 --- @return Number
 function rt.Time:as_milliseconds()
-    meta.assert_isa(self, rt.Time)
+
     return self._mys / 1e3
 end
 
 --- @brief convert to seconds
 --- @return Number
 function rt.Time:as_seconds()
-    meta.assert_isa(self, rt.Time)
+
     return self._mys / 1e6
 end
 
 --- @brief convert to minutes
 --- @return Number
 function rt.Time:as_minutes()
-    meta.assert_isa(self, rt.Time)
+
     return self._mys / 6e7
 end
 
 --- @brief convert to hours
 --- @return Number
 function rt.Time:as_hours()
-    meta.assert_isa(self, rt.Time)
+
     return self._mys / 3.6e+9
 end
 
@@ -93,14 +93,14 @@ end)
 --- @brief get time sinc last restart
 --- @return rt.Time
 function rt.Clock:get_elapsed()
-    meta.assert_isa(self, rt.Clock)
+
     return rt.seconds(love.timer.getTime() - self._start)
 end
 
 --- @brief restart and return elapsed time
 --- @return rt.Time
 function rt.Clock:restart()
-    meta.assert_isa(self, rt.Clock)
+
     local out = love.timer.getTime() - self._start
     self._start = love.timer.getTime()
     return rt.seconds(out)

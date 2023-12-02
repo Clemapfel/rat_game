@@ -8,14 +8,14 @@ require "log"
 require "meta"
 require "thread"
 
-meta.assert_number(rt.get_thread_id())
+
 assert(rt.get_thread_id() > 0)
 local out_channel = love.thread.getChannel(0)
 local in_channel = love.thread.getChannel(rt.get_thread_id())
 
 while true do
     local message = in_channel:demand()
-    meta.assert_enum(message.type, rt.MessageType)
+
 
     if message.type == rt.MessageType.KILL then
         break
@@ -53,9 +53,9 @@ while true do
             end
         end
     elseif message.type == rt.MessageType.INVOKE then
-        meta.assert_string(message.function_id)
-        meta.assert_table(message.args)
-        meta.assert_number(message.future_id)
+
+
+
 
         local value = {}
         local error_occurred = false
@@ -76,7 +76,7 @@ while true do
         rt.Thread.deliver(message.future_id, value, error_occurred, error_maybe)
 
     elseif message.type == rt.MessageType.SET then
-        meta.assert_string(message.name)
+
         if message.is_function then
             local f, parse_error = load(message.value)
             if meta.is_nil(f) then
@@ -90,7 +90,7 @@ while true do
             _G[message.name] = message.value
         end
     elseif message.type == rt.MessageType.GET then
-        meta.assert_string(message.name)
+
 
         local value = nil
         local on_try = function()

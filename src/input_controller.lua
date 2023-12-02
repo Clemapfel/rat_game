@@ -154,17 +154,17 @@ function rt.InputHandler._load_input_mapping()
     local keyboard_mapping = {}
 
     for key, binding in pairs(rt.InputHandler._mapping) do
-        meta.assert_enum(key, rt.InputButton)
 
-        meta.assert_table(binding.gamepad)
+
+
         for _, gamepad_button in pairs(binding.gamepad) do
-            meta.assert_enum(gamepad_button, rt.GamepadButton)
+
             gamepad_mapping[gamepad_button] = key
         end
 
-        meta.assert_table(binding.keyboard)
+
         for _, keyboard_key in pairs(binding.keyboard) do
-            meta.assert_enum(keyboard_key, rt.KeyboardKey)
+
             keyboard_mapping[keyboard_key] = key
         end
     end
@@ -214,7 +214,7 @@ rt.InputController = meta.new_type("InputController", function(holder)
     out:signal_add("leave")
 
     out._gamepad:signal_connect("button_pressed", function(_, id, button, self)
-        meta.assert_enum(button, rt.GamepadButton)
+
         local action = rt.InputHandler._reverse_mapping.gamepad[button]
         local current = self._state[action]
         self._state[action] = true
@@ -224,7 +224,7 @@ rt.InputController = meta.new_type("InputController", function(holder)
     end, out)
 
     out._gamepad:signal_connect("button_released", function(_, id, button, self)
-        meta.assert_enum(button, rt.GamepadButton)
+
         local action = rt.InputHandler._reverse_mapping.gamepad[button]
         local current = self._state[action]
         self._state[action] = false
@@ -416,7 +416,7 @@ rt.InputController = meta.new_type("InputController", function(holder)
     end, out)
 
     out._mouse:signal_connect("click_pressed", function(_, x, y, button_id, n_presses, self)
-        meta.assert_enum(button_id, rt.MouseButton)
+
         local current = self._state[rt.InputButton.A]
         self._state[rt.InputButton.A] = true
         if current == false and not self._is_disabled and rt.aabb_contains(self._instance:get_bounds(), x, y) then
@@ -425,7 +425,7 @@ rt.InputController = meta.new_type("InputController", function(holder)
     end, out)
 
     out._mouse:signal_connect("click_released", function(_, x, y, button_id, n_presses, self)
-        meta.assert_enum(button_id, rt.MouseButton)
+
         local current = self._state[rt.InputButton.A]
         self._state[rt.InputButton.A] = false
         if current == true and not self._is_disabled and rt.aabb_contains(self._instance:get_bounds(), x, y) then
@@ -450,42 +450,42 @@ end)
 
 --- @brief
 function rt.InputController:is_down(key)
-    meta.assert_isa(self, rt.InputController)
-    meta.assert_enum(key, rt.InputButton)
+
+
     return self._state[key] == true
 end
 
 --- @brief
 function rt.InputController:is_up(key)
-    meta.assert_isa(self, rt.InputController)
-    meta.assert_enum(key, rt.InputButton)
+
+
     return self._state[key] == false
 end
 
 --- @brief
 --- @return Number, Number
 function rt.InputController:get_left_joystick()
-    meta.assert_isa(self, rt.InputController)
+
     return self._axis_state[rt.GamepadAxis.LEFT_X], self._axis_state[rt.GamepadAxis.LEFT_Y]
 end
 
 --- @brief
 --- @return Number, Number
 function rt.InputController:get_right_joystick()
-    meta.assert_isa(self, rt.InputController)
+
     return self._axis_state[rt.GamepadAxis.RIGHT_X], self._axis_state[rt.GamepadAxis.RIGHT_Y]
 end
 
 --- @brief
 --- @return Number, Number
 function rt.InputController:get_cursor_position()
-    meta.assert_isa(self, rt.InputController)
+
     return self._mouse:get_cursor_position()
 end
 
 --- @brief
 function rt.add_input_controller(object)
-    meta.assert_object(object)
+
     local to_add = rt.InputController(object)
     getmetatable(object).components.input = to_add
     return to_add
@@ -493,19 +493,19 @@ end
 
 --- @brief
 function rt.get_input_controller(object)
-    meta.assert_object(object)
+
     return getmetatable(object).components.input
 end
 
 --- @brief
 function rt.InputController:set_is_disabled(b)
-    meta.assert_isa(self, rt.InputController)
+
     self._is_disabled = b
 end
 
 --- @brief
 function rt.InputController:get_is_disabled()
-    meta.assert_isa(self, rt.InputController)
+
     return self._is_disabled
 end
 

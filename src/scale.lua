@@ -7,7 +7,7 @@ rt.settings.scale = {
 --- @class rt.Scale
 --- @signal value_changed   (self, new_value) -> nil
 rt.Scale = meta.new_type("Scale", function(lower, upper, increment, value)
-    meta.assert_number(lower, upper, increment)
+
     value = ternary(meta.is_nil(value), mix(lower, upper, 0.5), value)
     local out = meta.new(rt.Scale, {
         _lower = math.min(lower, upper),
@@ -127,7 +127,7 @@ end)
 
 --- @overload rt.Drawable.draw
 function rt.Scale:draw()
-    meta.assert_isa(self, rt.Scale)
+
     if not self:get_is_visible() then return end
 
 
@@ -162,7 +162,7 @@ end
 
 --- @overload rt.Widget.size_allocate
 function rt.Scale:size_allocate(x, y, width, height)
-    meta.assert_isa(self, rt.Scale)
+
 
     local slider_radius = rt.settings.scale.slider_radius
     local rail_radius = slider_radius * 0.5
@@ -200,7 +200,7 @@ end
 
 --- @brief [internal]
 function rt.Scale:_update_slider()
-    meta.assert_isa(self, rt.Scale)
+
 
     local x, y = self._rail:get_position()
     local w = select(1, self._rail:get_size())
@@ -226,7 +226,7 @@ end
 
 --- @brief
 function rt.Scale:set_value(x)
-    meta.assert_isa(self, rt.Scale)
+
     if self._value == x then return end
 
     -- round to nearest step increment
@@ -245,17 +245,17 @@ end
 
 --- @brief
 function rt.Scale:get_value()
-    meta.assert_isa(self, rt.Scale)
+
     return self._value
 end
 
 --- @brief
 function rt.Scale:set_color(color)
-    meta.assert_isa(self, rt.Scale)
+
     if meta.is_hsva(color) then
         color = rt.hsva_to_rgba(color)
     end
-    meta.assert_rgba(color)
+
     self._fill_color = color
     self._fill_start:set_color(self._fill_color)
     self._fill:set_color(self._fill_color)
@@ -264,8 +264,8 @@ end
 
 --- @brief
 function rt.Scale:set_show_value(b)
-    meta.assert_isa(self, rt.Scale)
-    meta.assert_boolean(b)
+
+
 
     if b == true and not self._value_label:get_is_realized() then
         self._value_label:realize()

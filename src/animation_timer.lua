@@ -49,7 +49,7 @@ end)()
 --- @signal tick    (self, [0, 1]) -> nil
 --- @signal done    (self) -> nil
 rt.AnimationTimer = meta.new_type("AnimationTimer", function(duration)
-    meta.assert_isa(duration, rt.Time)
+
     if duration:as_seconds() < 0 then
         rt.error("In AnimationTimer(): Duration `" .. string(duration) .. "` cannot be negative")
     end
@@ -107,14 +107,14 @@ end
 --- @param self rt.AnimationTimer
 --- @return rt.AnimationTimerState
 function rt.AnimationTimer:get_state()
-    meta.assert_isa(self, rt.AnimationTimer)
+
     return self._state
 end
 
 --- @brief reset animation back to idle
 --- @param self rt.AnimationTimer
 function rt.AnimationTimer:play()
-    meta.assert_isa(self, rt.AnimationTimer)
+
     if self:get_state() == rt.AnimationTimerState.IDLE then
         self._state = rt.AnimationTimerState.PLAYING
         self._time = 0
@@ -124,7 +124,7 @@ end
 --- @brief pause animation if it playing, otherwise do nothing
 --- @param self rt.AnimationTimer
 function rt.AnimationTimer:pause()
-    meta.assert_isa(self, rt.AnimationTimer)
+
     if self:get_state() == rt.AnimationTimerState.PLAYING then
        self._state = rt.AnimationTimerState.PAUSED
     end
@@ -133,7 +133,7 @@ end
 --- @brief reset animation back to idle
 --- @param self rt.AnimationTimer
 function rt.AnimationTimer:reset()
-    meta.assert_isa(self, rt.AnimationTimer)
+
     self._state = rt.AnimationTimerState.IDLE
     self._time = 0
 end
@@ -142,8 +142,8 @@ end
 --- @param self rt.AnimationTimer
 --- @param duration_s rt.Time
 function rt.AnimationTimer:set_duration(duration)
-    meta.assert_isa(self, rt.AnimationTimer)
-    meta.assert_isa(duration, rt.Time)
+
+
     self._duration = duration:as_seconds()
 end
 
@@ -151,7 +151,7 @@ end
 --- @param self rt.AnimationTimer
 --- @return rt.Time
 function rt.AnimationTimer:get_duration()
-    meta.assert_isa(self, rt.AnimationTimer)
+
     return rt.seconds(self._duration)
 end
 
@@ -159,8 +159,8 @@ end
 --- @param self rt.AnimationTimer
 --- @param f rt.AnimationTimingFunction
 function rt.AnimationTimer:set_timing_function(f)
-    meta.assert_isa(self, rt.AnimationTimer)
-    meta.assert_enum(f, rt.AnimationTimingFunction)
+
+
     self._timing_function = f
 end
 
@@ -168,15 +168,15 @@ end
 --- @param self rt.AnimationTimer
 --- @return rt.AnimationTimingFunction
 function rt.AnimationTimer:get_timing_function(f)
-    meta.assert_isa(self, rt.AnimationTimer)
+
     return self._timing_function
 end
 
 --- @bief set loop
 --- @param b Boolean
 function rt.AnimationTimer:set_should_loop(b)
-    meta.assert_isa(self, rt.AnimationTimer)
-    meta.assert_boolean(b)
+
+
     self._loop = b
 end
 

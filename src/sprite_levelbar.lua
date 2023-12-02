@@ -14,8 +14,8 @@ rt.settings.sprite_levelbar.overlay_bottom_id = "overlay_bottom"
 
 --- @class rt.SpriteLevelbar
 rt.SpriteLevelbar = meta.new_type("SpriteLevelbar", function(spritesheet, lower, upper, value, orientation, use_overlay)
-    meta.assert_isa(spritesheet, rt.Spritesheet)
-    meta.assert_number(lower, upper)
+
+
     if meta.is_nil(value) then
         value = mix(lower, upper, 0.5)
     end
@@ -23,12 +23,12 @@ rt.SpriteLevelbar = meta.new_type("SpriteLevelbar", function(spritesheet, lower,
     if meta.is_nil(orientation) then
         orientation = rt.Orientation.HORIZONTAL
     end
-    meta.assert_enum(orientation, rt.Orientation)
+
 
     if meta.is_nil(use_overlay) then
         use_overlay = true
     end
-    meta.assert_boolean(use_overlay)
+
 
     local use_overlay = true
     for _, id in pairs({
@@ -83,7 +83,7 @@ end)
 
 --- @overload rt.Drawable.draw
 function rt.SpriteLevelbar:draw()
-    meta.assert_isa(self, rt.SpriteLevelbar)
+
     if not self:get_is_visible() then return end
 
     if self._orientation == rt.Orientation.HORIZONTAL then
@@ -116,7 +116,7 @@ end
 
 --- @brief [internal] reposition slider element
 function rt.SpriteLevelbar:_update_bar()
-    meta.assert_isa(self, rt.SpriteLevelbar)
+
 
     local frame_w, frame_h = self._spritesheet:get_frame_size(rt.settings.sprite_levelbar.overlay_left_id)
     local x, y, bar_w, bar_h
@@ -139,7 +139,7 @@ end
 
 --- @overload rt.Widget.size_allocate
 function rt.SpriteLevelbar:size_allocate(x, y, width, height)
-    meta.assert_isa(self, rt.SpriteLevelbar)
+
 
     local left_m, right_m, top_m, bottom_m = self:get_margin_left(), self:get_margin_right(), self:get_margin_top(), self:get_margin_bottom()
 
@@ -223,7 +223,7 @@ end
 
 --- @overload rt.Widget.realize
 function rt.SpriteLevelbar:realize()
-    meta.assert_isa(self, rt.SpriteLevelbar)
+
 
     self._rail_left:realize()
     self._rail_left_right:realize()
@@ -248,8 +248,8 @@ end
 --- @brief set levelbar value
 --- @param value Number
 function rt.SpriteLevelbar:set_value(value)
-    meta.assert_isa(self, rt.SpriteLevelbar)
-    meta.assert_number(value)
+
+
 
     self._value = clamp(value, self._lower, self._upper)
     self:_update_bar()
@@ -258,15 +258,15 @@ end
 --- @brief get levelbar value
 --- @return Number
 function rt.SpriteLevelbar:get_value()
-    meta.assert_isa(self, rt.SpriteLevelbar)
+
     return self._value
 end
 
 --- @brief set orientation
 --- @param orientation rt.Orientation
 function rt.SpriteLevelbar:set_orientation(orientation)
-    meta.assert_isa(self, rt.SpriteLevelbar)
-    meta.assert_enum(orientation, rt.Orientation)
+
+
     self._orientation = orientation
     self:reformat()
 end
@@ -274,14 +274,14 @@ end
 --- @brief get orientation
 --- @return rt.Orientation
 function rt.SpriteLevelbar:get_orientation()
-    meta.assert_isa(self, rt.SpriteLevelbar)
+
     return self._orientation
 end
 
 --- @brief set color
 --- @param color rt.RGBA (or rt.HSVA)
 function rt.SpriteLevelbar:set_color(color)
-    meta.assert_isa(self, rt.SpriteLevelbar)
+
     if not (meta.is_rgba(color) or meta.is_hsva(color)) then
         rt.error("In rt.SpriteLevelbar:set_color: Expected color, got `" .. meta.typeof(color) .. "`")
     end

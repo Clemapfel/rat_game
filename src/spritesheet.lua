@@ -2,7 +2,7 @@
 --- @param path String path prefix, not absolute path
 --- @param id String spritsheet ID, expects <ID>.png and <ID>.lua to be in `path`
 rt.Spritesheet = meta.new_type("Spritesheet", function(path, id)
-    meta.assert_string(path, id)
+
 
     local config_path = path .. "/" .. id .. ".lua"
     local image_path = path .. "/" .. id .. ".png"
@@ -23,14 +23,14 @@ rt.Spritesheet = meta.new_type("Spritesheet", function(path, id)
     local config = code()
 
     local name = config.name
-    meta.assert_string(name)
+
 
     local width, height = config.width, config.height
-    meta.assert_number(width, height)
+
 
     local fps = config.fps
     if meta.is_nil(fps) then fps = 24 end
-    meta.assert_number(fps)
+
 
     local image_width = image:getWidth()
     local n_frames = math.floor(image_width / width)
@@ -96,8 +96,8 @@ rt.Spritesheet.name = ""
 --- @param scope String scope for error message
 --- @param animation_id String
 function rt.Spritesheet:_assert_has_animation(scope, animation_id)
-    meta.assert_string(scope, animation_id)
-    meta.assert_isa(self, rt.Spritesheet)
+
+
     if meta.is_nil(self._name_to_frame[animation_id]) then
         rt.error("in rt." .. scope .. ": Spritesheet `" .. self.name .. "` has no animation with id `" .. animation_id .. "`")
     end
@@ -107,8 +107,8 @@ end
 --- @param id String
 --- @return Boolean
 function rt.Spritesheet:has_animation(animation_id)
-    meta.assert_isa(self, rt.Spritesheet)
-    meta.assert_string(animation_id)
+
+
     return not meta.is_nil(self._name_to_frame[animation_id])
 end
 
@@ -117,9 +117,9 @@ end
 --- @param index_maybe Number
 --- @return rt.AxisAlignedRectangle
 function rt.Spritesheet:get_frame(animation_id, index_maybe)
-    meta.assert_isa(self, rt.Spritesheet)
-    meta.assert_string(animation_id)
-    meta.assert_number(index_maybe)
+
+
+
     self:_assert_has_animation("Spritesheet.get_frame", animation_id)
 
     local start_end = self._name_to_frame[animation_id]
@@ -131,8 +131,8 @@ end
 --- @param animation_id String
 --- @return (Number, Number)
 function rt.Spritesheet:get_frame_size(animation_id)
-    meta.assert_isa(self, rt.Spritesheet)
-    meta.assert_string(animation_id)
+
+
     self:_assert_has_animation("Spritesheet.get_frame_size", animation_id)
     return self._frame_width, self._frame_height
 end
@@ -141,8 +141,8 @@ end
 --- @param animation_id String
 --- @return Number
 function rt.Spritesheet:get_frame_height(animation_id)
-    meta.assert_isa(self, rt.Spritesheet)
-    meta.assert_string(animation_id)
+
+
     self:_assert_has_animation("Spritesheet.get_frame_size", animation_id)
     return self._frame_height
 end
@@ -151,8 +151,8 @@ end
 --- @param animation_id String
 --- @return Number
 function rt.Spritesheet:get_frame_width(animation_id)
-    meta.assert_isa(self, rt.Spritesheet)
-    meta.assert_string(animation_id)
+
+
     self:_assert_has_animation("Spritesheet.get_frame_size", animation_id)
     return self._frame_width
 end
@@ -161,8 +161,8 @@ end
 --- @param animation_id String
 --- @return Number
 function rt.Spritesheet:get_n_frames(animation_id)
-    meta.assert_isa(self, rt.Spritesheet)
-    meta.assert_string(animation_id)
+
+
     self:_assert_has_animation("Spritesheet.get_n_frames", animation_id)
     local start_end = self._name_to_frame[animation_id]
     return start_end[2] - start_end[1] + 1
@@ -171,7 +171,7 @@ end
 --- @brief list animation ids
 --- @return Table<String>
 function rt.Spritesheet:get_animation_ids()
-    meta.assert_isa(self, rt.Spritesheet)
+
     local out = {}
     for id, _ in pairs(self._name_to_frame) do
         table.insert(out, id)
@@ -181,7 +181,7 @@ end
 
 --- @brief get target fps
 function rt.Spritesheet:get_fps()
-    meta.assert_isa(self, rt.Spritesheet)
+
     return self._fps
 end
 

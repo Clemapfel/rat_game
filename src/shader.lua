@@ -1,6 +1,6 @@
 --- @class rt.Shader
 rt.Shader = meta.new_type("Shader", function(code_or_filename)
-    meta.assert_string(code_or_filename)
+
     return meta.new(rt.Shader, {
         _native = love.graphics.newShader(code_or_filename)
     })
@@ -10,7 +10,7 @@ end)
 --- @param name String
 --- @param value
 function rt.Shader:send(name, value)
-    meta.assert_isa(self, rt.Shader)
+
     local to_send = value
     if meta.is_vector2(value) then
         to_send = {value.x, value.y}

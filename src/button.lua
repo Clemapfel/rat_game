@@ -37,7 +37,7 @@ rt.Button = meta.new_type("Button", function(child)
     end, out)
 
     if not meta.is_nil(child) then
-        meta.assert_isa(child, rt.Widget)
+
         out:set_child(child)
     end
 
@@ -46,7 +46,7 @@ end)
 
 --- @overload rt.Drawable.draw
 function rt.Button:draw()
-    meta.assert_isa(self, rt.Button)
+
     if self:get_is_visible() == false then return end
 
     self._base:draw()
@@ -78,8 +78,8 @@ end
 --- @brief set singular child
 --- @param child rt.Widget
 function rt.Button:set_child(child)
-    meta.assert_isa(self, rt.Button)
-    meta.assert_isa(child, rt.Widget)
+
+
 
     if not meta.is_nil(self._child) and meta.is_widget(self._child) then
         self._child:set_parent(nil)
@@ -96,7 +96,7 @@ end
 
 --- @overload rt.Widget.realize
 function rt.Button:realize()
-    meta.assert_isa(self, rt.Button)
+
 
     if meta.is_widget(self._child) then
         self._child:realize()
@@ -107,13 +107,13 @@ end
 --- @brief get singular child
 --- @return rt.Widget
 function rt.Button:get_child()
-    meta.assert_isa(self, rt.Button)
+
     return self._child
 end
 
 --- @brief remove child
 function rt.Button:remove_child()
-    meta.assert_isa(self, rt.Button)
+
     if not meta.is_nil(self._child) then
         self._child:set_parent(nil)
         self._child = nil

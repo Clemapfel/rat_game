@@ -12,9 +12,10 @@ bt = rt.battle
 
 require "common"
 require "profiler"
+require "meta"
 require "settings"
 require "log"
-require "meta"
+
 require "time"
 require "benchmark"
 require "vector"

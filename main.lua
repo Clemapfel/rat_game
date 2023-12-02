@@ -33,7 +33,7 @@ layout:push_back(rt.Spacer())
 list_view = rt.ListView()
 
 profiler.start()
-for i = 1, 50 do
+for i = 1, 10 do
     list_view:push_back(bt.ActionListItem(action))
 end
 profiler.stop()
@@ -51,7 +51,7 @@ list_view:set_sort_mode("ascending")
 rt.current_scene:set_child(list_view)
 
 function snapshot_widget(widget)
-    meta.assert_widget(widget)
+
     local w, h = widget:measure()
     local x, y = widget:get_position()
     local canvas = love.graphics.newCanvas(w, h)

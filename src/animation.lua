@@ -17,8 +17,8 @@ rt.settings.animation = {
 --- @brief [internal] update all Animations
 --- @param delta Number seconds
 function rt.AnimationHandler:update(delta)
-    meta.assert_isa(self, rt.AnimationHandler)
-    meta.assert_number(delta)
+
+
     local elapsed = self._elapsed + delta
     local frame_length = 1 / rt.settings.animation.fps
     while elapsed >= frame_length do
@@ -41,21 +41,21 @@ rt.Animation._is_animated = false
 
 --- @brief abstract method, must be override
 function rt.Animation:update(delta)
-    meta.assert_isa(self, rt.Animation)
+
     rt.error("In " .. meta.typeof(self) .. ":update(): abstract method called")
 end
 
 --- @brief get whether animation is active
 --- @return Boolean
 function rt.Animation:get_is_animated()
-    meta.assert_isa(self, rt.Animation)
+
     return self._is_animated
 end
 
 --- @brief set whether animation is active
 --- @param b Boolean
 function rt.Animation:set_is_animated(b)
-    meta.assert_isa(self, rt.Animation)
+
     if b == self._is_animated then return end
     self._is_animated = b
 

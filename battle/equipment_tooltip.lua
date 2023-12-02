@@ -4,7 +4,7 @@ rt.settings.equipment_tooltip = {
 
 --- @class bt.EquipmentTooltip
 bt.EquipmentTooltip = meta.new_type("EquipmentTooltip", function(equipment)
-    meta.assert_isa(equipment, bt.Equipment)
+
 
     if meta.is_nil(env.equipment_spritesheet) then
         env.equipment_spritesheet = rt.Spritesheet("assets/sprites", "equipment")
@@ -48,7 +48,7 @@ bt.EquipmentTooltip = meta.new_type("EquipmentTooltip", function(equipment)
     end
 
     local modifier_to_label = function(modifier)
-    meta.assert_number(modifier)
+
 
         local out = ""
         for i = 1, n_digits - get_n_digits(modifier) do

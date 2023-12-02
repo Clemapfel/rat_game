@@ -51,7 +51,7 @@ function stddev(t)
 end
 
 function benchmark(f, duration)
-    meta.assert_function(f)
+
 
     if meta.is_nil(duration) then
         duration = 10

@@ -54,7 +54,7 @@ end)
 
 --- @brief
 function rt.Switch:_update_slider()
-    meta.assert_isa(self, rt.Switch)
+
     if self._is_on == false then
         local pos_x, pos_y = self._start:get_center()
         local radius = self._start:get_radius()
@@ -80,7 +80,7 @@ end
 
 --- @overload rt.Drawable.draw
 function rt.Switch:draw()
-    meta.assert_isa(self, rt.Switch)
+
     if not self:get_is_visible() then return end
 
 
@@ -97,7 +97,7 @@ end
 
 --- @overload rt.Widget.size_allocate()
 function rt.Switch:size_allocate(x, y, width, height)
-    meta.assert_isa(self, rt.Switch)
+
 
     local slider_radius = rt.settings.switch.slider_radius
     self._slider:set_radius(slider_radius)
@@ -126,7 +126,7 @@ end
 
 --- @brief
 function rt.Switch:set_is_on(b)
-    meta.assert_isa(self, rt.Switch)
+
     local before = self._is_on
     self._is_on = b
 
@@ -138,6 +138,6 @@ end
 
 --- @brief
 function rt.Switch:get_is_on()
-    meta.assert_isa(self, rt.Switch)
+
     return self._is_on
 end

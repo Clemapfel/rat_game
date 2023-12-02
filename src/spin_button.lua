@@ -6,7 +6,7 @@ rt.settings.spin_button = {
 
 --- @class rt.SpinButton
 rt.SpinButton = meta.new_type("SpinButton", function(lower, upper, increment, value)
-    meta.assert_number(lower, upper, increment)
+
     value = ternary(meta.is_nil(value), mix(lower, upper, 0.5), value)
     local out = meta.new(rt.SpinButton, {
         _lower = math.min(lower, upper),
@@ -94,7 +94,7 @@ end)
 
 --- @overload rt.Widget.realize
 function rt.SpinButton:realize()
-    meta.assert_isa(self, rt.SpinButton)
+
 
     self._value_label:realize()
     self._increase_button_label:realize()
@@ -105,7 +105,7 @@ end
 
 --- @overload rt.Drawable.draw
 function rt.SpinButton:draw()
-    meta.assert_isa(self, rt.SpinButton)
+
     if not self:get_is_visible() then return end
 
 
@@ -178,7 +178,7 @@ function rt.SpinButton:size_allocate(x, y, width, height)
 end
 
 function rt.SpinButton:_update_value()
-    meta.assert_isa(self, rt.SpinButton)
+
     self._value_label:set_text(tostring(self._value))
     self._decrease_button_disabled_overlay:set_is_visible(self._value <= self._lower)
     self._increase_button_disabled_overlay:set_is_visible(self._value >= self._upper)
@@ -186,7 +186,7 @@ end
 
 --- @brief
 function rt.SpinButton:set_value(x)
-    meta.assert_isa(self, rt.SpinButton)
+
     if self._value == x then return end
 
     -- round to nearest step increment
@@ -204,7 +204,7 @@ end
 
 --- @brief
 function rt.SpinButton:get_value()
-    meta.assert_isa(self, rt.SpinButton)
+
     return self._value
 end
 

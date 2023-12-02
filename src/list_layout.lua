@@ -5,7 +5,7 @@ rt.ListLayout = meta.new_type("ListLayout", function(orientation, ...)
     if meta.is_nil(orientation) then
         orientation = rt.Orientation.HORIZONTAL
     end
-    meta.assert_enum(orientation, rt.Orientation)
+
 
     local out = meta.new(rt.ListLayout, {
         _children = rt.List(),
@@ -22,7 +22,7 @@ rt.BoxLayout = rt.ListLayout
 
 --- @overload rt.Drawable.draw
 function rt.ListLayout:draw()
-    meta.assert_isa(self, rt.ListLayout)
+
     if not self:get_is_visible() or self._children:size() == 0 then return end
     for _, child in pairs(self._children) do
         child:draw()
@@ -31,7 +31,7 @@ end
 
 --- @overlay rt.Widget.size_allocate
 function rt.ListLayout:size_allocate(x, y, width, height)
-    meta.assert_isa(self, rt.ListLayout)
+
     local n_children = self._children:size()
 
     if self._orientation == rt.Orientation.HORIZONTAL then
@@ -114,7 +114,7 @@ end
 
 --- @overload rt.Widget.realize
 function rt.ListLayout:realize()
-    meta.assert_isa(self, rt.ListLayout)
+
     self._realized = true
     for _, child in pairs(self._children) do
         child:realize()
@@ -124,13 +124,13 @@ end
 --- @brief replace all children
 --- @param children Table<rt.Widget>
 function rt.ListLayout:set_children(children)
-    meta.assert_isa(self, rt.ListLayout)
+
     for child in pairs(self._children) do
         child:set_parent(nil)
     end
     self._children:clear()
     for _, child in pairs(children) do
-        meta.assert_isa(child, rt.Widget)
+
         child:set_parent(self)
         self._children:push_back(child)
         if self:get_is_realized() then child:realize() end
@@ -141,8 +141,8 @@ end
 --- @brief append child
 --- @param child rt.Widget
 function rt.ListLayout:push_back(child)
-    meta.assert_isa(self, rt.ListLayout)
-    meta.assert_isa(child, rt.Widget)
+
+
     child:set_parent(self)
     self._children:push_back(child)
     if self:get_is_realized() then
@@ -154,8 +154,8 @@ end
 --- @brief prepend child
 --- @param child rt.Widget
 function rt.ListLayout:push_front(child)
-    meta.assert_isa(self, rt.ListLayout)
-    meta.assert_isa(child, rt.Widget)
+
+
     child:set_parent(self)
     self._children:push_back(child)
     if self:get_is_realized() then
@@ -167,7 +167,7 @@ end
 --- @brief remove first child
 --- @return rt.Widget
 function rt.ListLayout:pop_front()
-    meta.assert_isa(self, rt.ListLayout)
+
     local out = self._children:pop_front()
     out:set_parent(nil)
     self:reformat()
@@ -177,7 +177,7 @@ end
 --- @brief remove last child
 --- @return rt.Widget
 function rt.ListLayout:pop_back()
-    meta.assert_isa(self, rt.ListLayout)
+
     local out = self._children:pop_back()
     out:set_parent(nil)
     self:reformat()
@@ -188,9 +188,9 @@ end
 --- @param index Number 1-based
 --- @param child rt.Widget
 function rt.ListLayout:insert(index, child)
-    meta.assert_isa(self, rt.ListLayout)
-    meta.assert_isa(child, rt.Widget)
-    meta.assert_number(index)
+
+
+
 
     child:set_parent(self)
     self._children:insert(index, child)
@@ -204,8 +204,8 @@ end
 --- @brief remove child at position
 --- @param index Number 1-based
 function rt.ListLayout:erase(index)
-    meta.assert_isa(self, rt.ListLayout)
-    meta.assert_number(index)
+
+
 
     local child = self._children:erase(index)
     child:set_parent(nil)
@@ -215,7 +215,7 @@ end
 --- @brief set orientation
 --- @param orientation rt.Orientation
 function rt.ListLayout:set_orientation(orientation)
-    meta.assert_isa(self, rt.ListLayout)
+
     if self._orientation == orientation then return end
     self._orientation = orientation
     self:reformat()
@@ -224,14 +224,14 @@ end
 --- @brief get orientation
 --- @return rt.Orientation
 function rt.ListLayout:get_orientation()
-    meta.assert_isa(self, rt.ListLayout)
+
     return self._orientation
 end
 
 --- @brief set spacing
 function rt.ListLayout:set_spacing(spacing)
-    meta.assert_isa(self, rt.ListLayout)
-    meta.assert_number(spacing)
+
+
     spacing = clamp(spacing, 0)
     if self._spacing ~= spacing then
         self._spacing = spacing
@@ -241,7 +241,7 @@ end
 
 --- @brief get spacing
 function rt.ListLayout:get_spacing()
-    meta.assert_isa(self, rt.ListLayout)
+
     return self._spacing
 end
 

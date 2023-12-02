@@ -15,8 +15,8 @@ rt.settings.font = {
 --- @param bold_italic_path String (or nil)
 rt.Font = meta.new_type("Font", function(size, regular_path, bold_path, italic_path, bold_italic_path)
 
-    meta.assert_string(regular_path)
-    meta.assert_number(size)
+
+
 
     local out = meta.new(rt.Font, {
         _regular_path = regular_path,
@@ -31,17 +31,17 @@ rt.Font = meta.new_type("Font", function(size, regular_path, bold_path, italic_p
     })
 
     if not meta.is_nil(bold_path) then
-        meta.assert_string(bold_path)
+
         out._bold_path = bold_path
     end
 
     if not meta.is_nil(italic_path) then
-        meta.assert_string(italic_path)
+
         out._italic_path = italic_path
     end
 
     if not meta.is_nil(bold_italic_path) then
-        meta.assert_string(bold_italic_path)
+
         out._bold_italic_path = bold_italic_path
     end
 
@@ -66,7 +66,7 @@ rt.Font[rt.FontStyle.BOLD_ITALIC] = love.graphics.getFont()
 
 --- @brief [internal] update held fonts
 function rt.Font:_update()
-    meta.assert_isa(self, rt.Font)
+
 
     self[rt.FontStyle.REGULAR] = love.graphics.newFont(self._regular_path, self._size)
     self[rt.FontStyle.BOLD] = love.graphics.newFont(self._bold_path, self._size)
@@ -87,7 +87,7 @@ end
 --- @brief set font size, in px
 --- @param px Number
 function rt.Font:set_size(px)
-    meta.assert_isa(self, rt.Font)
+
     self._size = px
     self:_update()
 end
@@ -95,35 +95,35 @@ end
 --- @brief get font size, in px
 --- @return Number
 function rt.Font:get_size()
-    meta.assert_isa(self, rt.Font)
+
     return self._size
 end
 
 --- @brief get regular version of font
 --- @return love.Font
 function rt.Font:get_regular()
-    meta.assert_isa(self, rt.Font)
+
     return self[rt.FontStyle.REGULAR]
 end
 
 --- @brief get bold version of font
 --- @return love.Font
 function rt.Font:get_bold()
-    meta.assert_isa(self, rt.Font)
+
     return self[rt.FontStyle.BOLD]
 end
 
 --- @brief get italic version of font
 --- @return love.Font
 function rt.Font:get_italic()
-    meta.assert_isa(self, rt.Font)
+
     return self[rt.FontStyle.ITALIC]
 end
 
 --- @brief get bold-italic version of font
 --- @return love.Font
 function rt.Font:get_bold_italic()
-    meta.assert_isa(self, rt.Font)
+
     return self[rt.FontStyle.BOLD_ITALIC]
 end
 

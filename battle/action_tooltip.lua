@@ -5,7 +5,7 @@ rt.settings.action_tooltip = {
 }
 
 function bt.Action:_possible_targets_as_label()
-    meta.assert_isa(self, bt.Action)
+
     local me, enemy, ally = self.can_target_self, self.can_target_enemy, self.can_target_ally
 
     local function _ally(str)  
@@ -69,7 +69,7 @@ end
 
 --- @class bt.ActionTooltip
 bt.ActionTooltip = meta.new_type("ActionTooltip", function(action)
-    meta.assert_isa(action, bt.Action)
+
 
     if meta.is_nil(env.action_spritesheet) then
         env.action_spritesheet = rt.Spritesheet("assets/sprites", "orbs")

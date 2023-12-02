@@ -23,7 +23,7 @@ end
 
 --- @overlay rt.Widget.size_allocate
 function rt.OverlayLayout:size_allocate(x, y, width, height)
-    meta.assert_isa(self, rt.OverlayLayout)
+
 
     x = x + self:get_margin_left()
     y = y + self:get_margin_top()
@@ -41,7 +41,7 @@ end
 
 --- @overload rt.Widget.realize
 function rt.OverlayLayout:realize()
-    meta.assert_isa(self, rt.OverlayLayout)
+
     self._realized = true
     self._base_child:realize()
 
@@ -52,7 +52,7 @@ end
 
 --- @overload rt.Widget.measure
 function rt.OverlayLayout:measure()
-    meta.assert_isa(self, rt.OverlayLayout)
+
     local max_w = 0
     local max_h = 0
 
@@ -72,8 +72,8 @@ end
 --- @brief set lower-most child
 --- @param child rt.Widget
 function rt.OverlayLayout:set_base_child(child)
-    meta.assert_isa(self, rt.OverlayLayout)
-    meta.assert_isa(child, rt.Widget)
+
+
 
     self:remove_base_child()
     child:set_parent(self)
@@ -84,7 +84,7 @@ end
 
 --- @brief remove lower most child
 function rt.OverlayLayout:remove_base_child()
-    meta.assert_isa(self, rt.OverlayLayout)
+
 
     if meta.is_widget(self._base_child) then
         self._base_child:set_parent(nil)
@@ -95,8 +95,8 @@ end
 --- @brief add overlay child on top
 --- @param child rt.Widget
 function rt.OverlayLayout:push_overlay(child)
-    meta.assert_isa(self, rt.OverlayLayout)
-    meta.assert_isa(child, rt.Widget)
+
+
     child:set_parent(self)
     self._overlays:push_back(child)
     if self:get_is_realized() then child:realize() end
@@ -104,8 +104,8 @@ end
 
 --- @brief remove top-most overlay
 function rt.OverlayLayout:pop_overlay()
-    meta.assert_isa(self, rt.OverlayLayout)
-    meta.assert_isa(child, rt.Widget)
+
+
     local child = self._overlays:pop_back()
     child:set_parent(nil)
     return child

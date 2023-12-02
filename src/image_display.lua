@@ -5,7 +5,7 @@ rt.ImageDisplay = meta.new_type("ImageDisplay", function(image)
     if meta.is_string(image) then
         image = rt.Image(image)
     end
-    meta.assert_isa(image, rt.Image)
+
     local x, y = image:get_size()
 
     local out = meta.new(rt.ImageDisplay, {
@@ -20,7 +20,7 @@ end)
 
 --- @overload rt.Drawable.draw
 function rt.ImageDisplay:draw()
-    meta.assert_isa(self, rt.ImageDisplay)
+
     if self:get_is_visible() then
         love.graphics.setColor(1, 1, 1, 1)
         self._shape:draw()
@@ -29,7 +29,7 @@ end
 
 --- @overload rt.Widget.size_allocate
 function rt.ImageDisplay:size_allocate(x, y, width, height)
-    meta.assert_isa(self, rt.ImageDisplay)
+
     self._shape:set_vertex_position(1, x, y)
     self._shape:set_vertex_position(2, x + width, y)
     self._shape:set_vertex_position(3, x + width, y + height)
@@ -46,8 +46,8 @@ end
 --- @brief update texture
 --- @param image rt.Image
 function rt.ImageDisplay:create_from_image(image)
-    meta.assert_isa(self, rt.ImageDisplay)
-    meta.assert_isa(image, rt.Image)
+
+
     self._texture:create_from_image(image)
     local w, h = image:get_size()
     self._resolution = rt.Vector2(w, h)

@@ -38,53 +38,53 @@ end
 --- @brief set whether smoothing should be applied
 --- @param b Boolean
 function rt.Shape:set_use_anti_aliasing(b)
-    meta.assert_isa(self, rt.Shape)
+
     self._anti_aliasing = b
 end
 
 --- @brief get whether smoothing should be applied
 --- @return Boolean
 function rt.Shape:get_use_anti_aliasing()
-    meta.assert_isa(self, rt.Shape)
+
     return self._anti_aliasing
 end
 
 --- @brief set line width
 --- @param px Number
 function rt.Shape:set_line_width(px)
-    meta.assert_isa(self, rt.Shape)
+
     self._line_width = px
 end
 
 --- @brief get line width
 --- @return Number
 function rt.Shape:get_line_width()
-    meta.assert_isa(self, rt.Shape)
+
     return self._line_width
 end
 
 --- @brief set rotation
 function rt.Shape:set_rotation(angle, origin_x, origin_y)
-    meta.assert_isa(self, rt.Shape)
-    meta.assert_isa(angle, rt.Angle)
+
+
     self._rotation = angle:as_radians()
     self._use_origin = false
 
     if not meta.is_nil(origin_x) then
-        meta.assert_number(origin_x, origin_y)
+
         self._use_origin = true
     end
 end
 
 --- @brief get_rotation
 function rt.Shape:get_rotation()
-    meta.assert_isa(self, rt.Shape)
+
     return self._rotation
 end
 
 --- @brief [internal] bind all shape properties
 function rt.Shape:_bind()
-    meta.assert_isa(self, rt.Shape)
+
     
     love.graphics.push()
 
@@ -119,60 +119,60 @@ end
 --- @brief set color of all vertices
 --- @param rgba rt.RGBA
 function rt.Shape:set_color(rgba)
-    meta.assert_isa(self, rt.Shape)
+
     if meta.is_rgba(rgba) then
         self._color = rgba
     elseif meta.is_hsva(rgba) then
         self._color = rt.hsva_to_rgba(rgba)
     else
-        meta.assert_rgba(rgba)
+
     end
 end
 
 --- @brief get color of all vertices
 function rt.Shape:get_color()
-    meta.assert_isa(self, rt.Shape)
+
     return self._color
 end
 
 --- @brief
 function rt.Shape:set_rotation(angle)
-    meta.assert_isa(self, rt.Shape)
-    meta.assert_isa(angle, rt.Angle)
+
+
     self._rotation = angle:as_radians()
 end
 
 --- @brief
 --- @return rt.Angle
 function rt.Shape:get_rotation()
-    meta.assert_isa(self, rt.Shape)
+
     return rt.radians(self._rotation)
 end
 
 --- @brief set whether the shape should be rendered without a volume
 --- @param b Boolean
 function rt.Shape:set_is_outline(b)
-    meta.assert_isa(self, rt.Shape)
+
     self._is_outline = b
 end
 
 --- @brief get whether the shape should be rendered without a volume
 --- @return Boolean
 function rt.Shape:get_is_outline()
-    meta.assert_isa(self, rt.Shape)
+
     return self._is_outline
 end
 
 --- @brief [internal] convert to love.graphics.DrawMode
 --- @return String
 function rt.Shape:_get_draw_mode()
-    meta.assert_isa(self, rt.Shape)
+
     if self._is_outline then return "line" else return "fill" end
 end
 
 --- @class rt.Point
 rt.Point = meta.new_type("Point", function(x, y)
-    meta.assert_number(x, y)
+
     return meta.new(rt.Point, {
         _vertices = {x, y}
     }, rt.Shape, rt.Drawable)
@@ -192,7 +192,7 @@ end
 
 --- @class rt.Points
 rt.Points = meta.new_type("Points", function(x, y, ...)
-    meta.assert_number(x, y, ...)
+
     assert(sizeof({...}) % 2 == 0)
     return meta.new(rt.Points, {
         _vertices = {...}
@@ -208,8 +208,8 @@ end
 
 --- @brief [internal] compute vertex for shape with _vertices
 function rt.Shape:_compute_centroid()
-    meta.assert_table(self._vertices)
-    meta.assert_number(self._centroid_x, self._centroid_y)
+
+
 
     local x_sum = 0
     local y_sum = 0
@@ -226,7 +226,7 @@ end
 
 --- @class rt.LineStrip
 rt.LineStrip = meta.new_type("LineStrip", function(a_x, a_y, b_x, b_y, ...)
-    meta.assert_number(a_x, a_y, b_x, b_y, ...)
+
     assert(sizeof({...}) % 2 == 0)
     local out = meta.new(rt.LineStrip, {
         _vertices = {a_x, a_y, b_x, b_y, ...},
@@ -240,7 +240,7 @@ end)
 
 --- @overload rt.Shape:get_centroid
 function rt.LineStrip:get_centroid()
-    meta.assert_isa(self, rt.LineStrip)
+
     return self._centroid_x, self._centroid_y
 end
 
@@ -258,7 +258,7 @@ end
 
 --- @brief
 function rt.LineStrip:resize(a_x, a_y, b_x, b_y, ...)
-    meta.assert_isa(self, rt.LineStrip)
+
     self._vertices = {a_x, a_y, b_x, b_y, ...}
     self:_compute_centroid()
 end
@@ -284,7 +284,7 @@ end
 --- @class rt.Rectangle
 rt.Rectangle = meta.new_type("Rectangle", function(top_left_x, top_left_y, width, height, corner_radius)
     if meta.is_nil(corner_radius) then corner_radius = 0 end
-    meta.assert_number(top_left_x, top_left_y, width, height)
+
 
     return meta.new(rt.Rectangle, {
         _x = top_left_x,
@@ -314,35 +314,35 @@ end
 
 --- @brief TODO
 function rt.Rectangle:set_position(x, y)
-    meta.assert_isa(self, rt.Rectangle)
-    meta.assert_number(x, y)
+
+
     self._x = x
     self._y = y
 end
 
 --- @brief TODO
 function rt.Rectangle:set_size(width, height)
-    meta.assert_isa(self, rt.Rectangle)
-    meta.assert_number(width, height)
+
+
     self._w = width
     self._h = height
 end
 
 --- @brief TODO
 function rt.Rectangle:get_size()
-    meta.assert_isa(self, rt.Rectangle)
+
     return self._w, self._h
 end
 
 --- @brief TODO
 function rt.Rectangle:set_corner_radius(px)
-    meta.assert_isa(self, rt.Rectangle)
+
     self._corner_radius = px
 end
 
 --- @brief TODO
 function rt.Rectangle:resize(aabb)
-    meta.assert_aabb(aabb)
+
     self._x = aabb.x
     self._y = aabb.y
     self._w = aabb.width
@@ -368,11 +368,11 @@ end
 
 --- @class rt.Ellipse
 rt.Ellipse = meta.new_type("Ellipse", function(center_x, center_y, x_radius, y_radius, n_outer_vertices)
-    meta.assert_number(center_x, center_y, x_radius, y_radius)
+
     if meta.is_nil(n_outer_vertices) then
         n_outer_vertices = 0
     end
-    meta.assert_number(n_outer_vertices)
+
 
     return meta.new(rt.Ellipse, {
         _center_x = center_x,
@@ -385,7 +385,7 @@ end)
 
 --- @overload rt.Shape:get_centroid
 function rt.Ellipse:get_centroid()
-    meta.assert_isa(self, rt.Ellipse)
+
     return self._center_x, self._center_y
 end
 
@@ -396,21 +396,21 @@ end
 
 --- @brief
 function rt.Ellipse:set_radius(radius_x, radius_y)
-    meta.assert_isa(self, rt.Ellipse)
+
     if not meta.is_nil(radius_y) then
         radius_y = radius_x
     end
-    meta.assert_number(radius_x, radius_y)
+
     self._radius_x = radius_x
     self._radius_y = radius_y
 end
 
 --- @brief
 function rt.Ellipse:resize(center_x, center_y, radius_x, radius_y)
-    meta.assert_isa(self, rt.Ellipse)
-    meta.assert_number(center_x, center_y, radius_x, radius_y)
+
+
     if not meta.is_nil(radius_y) then
-        meta.assert_number(radius_y)
+
     end
 
     self._center_x = center_x
@@ -421,29 +421,29 @@ end
 
 --- @brief
 function rt.Ellipse:get_center()
-    meta.assert_isa(self, rt.Ellipse)
+
     return self._center_x, self._center_y
 end
 
 --- @brief
 function rt.Ellipse:set_center(x, y)
-    meta.assert_isa(self, rt.Ellipse)
-    meta.assert_number(x, y)
+
+
     self._center_x = x
     self._center_y = y
 end
 
 --- @brief
 function rt.Ellipse:get_radius()
-    meta.assert_isa(self, rt.Ellipse)
+
     return self._radius_x, self._radius_y
 end
 
 --- @brief
 function rt.Ellipse:set_radius(radius_x, radius_y)
-    meta.assert_isa(self, rt.Ellipse)
-    meta.assert_number(radius_x)
-    if not meta.is_nil(radius_y) then meta.assert_number(radius_y) end
+
+
+    if not meta.is_nil(radius_y) then  end
 
     self._radius_x = radius_x
     self._radius_y = ternary(meta.is_nil(radius_y), radius_x, radius_y)
@@ -451,7 +451,7 @@ end
 
 --- @brief
 function rt.Ellipse:draw()
-    meta.assert_isa(self, rt.Ellipse)
+
     if not self:get_is_visible() then return end
     self:_bind()
 
@@ -466,7 +466,7 @@ end
 
 --- @class rt.Polygon
 rt.Polygon = meta.new_type("Polygon", function(a_x, a_y, b_x, b_y, c_x, c_y, ...)
-    meta.assert_number(a_x, a_y, b_x, b_y, c_x, c_y)
+
 
     local vertices =  {a_x, a_y, b_x, b_y, c_x, c_y, ...}
     local outer_hull = love.math.triangulate(vertices)
@@ -486,7 +486,7 @@ rt.Polygon = meta.new_type("Polygon", function(a_x, a_y, b_x, b_y, c_x, c_y, ...
 end)
 
 function rt.Polygon:resize(a_x, a_y, b_x, b_y, c_x, c_y, ...)
-    meta.assert_number(a_x, a_y, b_x, b_y, c_x, c_y)
+
     local vertices =  {a_x, a_y, b_x, b_y, c_x, c_y, ...}
     local outer_hull = love.math.triangulate(vertices)
     for _, triangle in pairs(outer_hull) do
@@ -500,7 +500,7 @@ end
 
 --- @overload rt.Shape.get_centroid
 function rt.Polygon:get_centroid()
-    meta.assert_isa(self, rt.Polygon)
+
     local x_sum = 0
     local y_sum = 0
     local n = sizeof(self._vertices)

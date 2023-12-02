@@ -3,7 +3,7 @@
 --- @param n_steps Number (or nil)
 --- @signal value_changed: (::Scrollbar, value::Number) -> nil
 rt.Scrollbar = meta.new_type("Scrollbar", function(orientation, n_steps)
-    meta.assert_enum(orientation, rt.Orientation)
+
 
     if meta.is_nil(n_steps) then
         n_steps = 10
@@ -35,15 +35,15 @@ end)
 
 --- @brief [internal] emit signal and reformat
 function rt.Scrollbar:_emit_value_changed()
-    meta.assert_isa(self, rt.Scrollbar)
+
     self:signal_emit("value_changed", self._value)
     self:reformat()
 end
 
 --- @brief
 function rt.Scrollbar:set_value(value)
-    meta.assert_number(value)
-    meta.assert_isa(self, rt.Scrollbar)
+
+
 
     if value < 0 or value > 1 then
         rt.error("In rt.Scrollbar.set_value: value `" .. tostring(value) .. "` is outside [0, 1]")
@@ -55,13 +55,13 @@ end
 
 --- @brief
 function rt.Scrollbar:get_value()
-    meta.assert_isa(self, rt.Scrollbar)
+
     return self._value
 end
 
 --- @brief 
 function rt.Scrollbar:scroll_down(offset)
-    meta.assert_isa(self, rt.Scrollbar)
+
 
     if meta.is_nil(offset) then
         local w, h = self:measure()
@@ -71,7 +71,7 @@ function rt.Scrollbar:scroll_down(offset)
             offset = 1 / h
         end
     end
-    meta.assert_number(offset)
+
     
     self._value = self._value + offset
     self._value = clamp(self._value, 0, 1)
@@ -80,7 +80,7 @@ end
 
 --- @brief
 function rt.Scrollbar:scroll_up(offset)
-    meta.assert_isa(self, rt.Scrollbar)
+
     if meta.is_nil(offset) then
         local w, h = self:measure()
         if self._orientation == rt.Orientation.HORIZONTAL then
@@ -89,7 +89,7 @@ function rt.Scrollbar:scroll_up(offset)
             offset = 1 / h
         end
     end
-    meta.assert_number(offset)
+
 
     self._value = self._value - offset
     self._value = clamp(self._value, 0, 1)
@@ -98,7 +98,7 @@ end
 
 --- @overload rt.Drawable.draw
 function rt.Scrollbar:draw()
-    meta.assert_isa(self, rt.Scrollbar)
+
     if not self:get_is_visible() then return end
 
     if self:get_is_visible() then
@@ -111,7 +111,7 @@ end
 
 --- @overload rt.Widget.size_allocate
 function rt.Scrollbar:size_allocate(x, y, width, height)
-    meta.assert_isa(self, rt.Scrollbar)
+
     self._base:resize(rt.AABB(x, y, width, height))
     self._base_outline:resize(rt.AABB(x, y, width, height))
 

@@ -8,7 +8,7 @@ bt.TargetingMode = meta.new_enum({
 --- @class bt.Action
 --- @brief immutable config for battle actions
 bt.Action = meta.new_type("Action", function(id)
-    meta.assert_string(id)
+
 
     local path = "assets/actions/" .. id .. ".lua"
     if meta.is_nil(love.filesystem.getInfo(path)) then
@@ -27,13 +27,13 @@ bt.Action = meta.new_type("Action", function(id)
 
     local is_consumable = config.is_consumable
     if not meta.is_nil(is_consumable) then
-        meta.assert_boolean(is_consumable)
+
         out.is_consumable = is_consumable
     end
 
     local max_n_uses = config.max_n_uses
     if not meta.is_nil(max_n_uses) then
-        meta.assert_number(max_n_uses)
+
         if max_n_uses <= 0 then
             rt.error("In Action(\"" .. id .. "\"): value `" .. tostring(max_n_uses) .. "` for field `max_n_uses` is out of range")
         end
@@ -42,46 +42,46 @@ bt.Action = meta.new_type("Action", function(id)
 
     local targeting_mode = config.targeting_mode
     if not meta.is_nil(targeting_mode) then
-        meta.assert_enum(targeting_mode, bt.TargetingMode)
+
         out.targeting_mode = targeting_mode
     end
 
     for _, which in pairs({"self", "ally", "enemy"}) do
         local value = config["can_target_" .. which]
         if not meta.is_nil(value) then
-            meta.assert_boolean(value)
+
             out["can_target_" .. which] = value
         end
     end
 
-    meta.assert_string(config.name)
+
     if #config.name == 0 then
         rt.error("In Action(\"" .. id .. "\"): `name` field cannot be empty")
     end
     out.name = config.name
 
     local effect_text = config.effect_text
-    meta.assert_string(effect_text)
+
     out.effect_text = effect_text
 
     local verbose_effect_text = config.verbose_effect_text
-    meta.assert_string(verbose_effect_text)
+
     out.verbose_effect_text = verbose_effect_text
 
     local flavor_text = config.flavor_text
     if meta.is_nil(flavor_text) then
         out.flavor_text = ""
     else
-        meta.assert_string(flavor_text)
+
         out.flavor_text = flavor_text
     end
 
     local thumbnail_id = config.thumbnail_id
-    meta.assert_string(thumbnail_id)
+
     out.thumbnail_id = thumbnail_id
 
     local animation_id = config.animation_id
-    meta.assert_string(animation_id)
+
     out.animation_id = animation_id
 
     meta.set_is_mutable(out, false)
