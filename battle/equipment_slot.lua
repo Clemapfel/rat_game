@@ -77,7 +77,6 @@ end)
 
 --- @overload rt.Drawable.draw
 function bt.EquipmentSlot:draw()
-    meta.assert_isa(self, bt.EquipmentSlot)
     self._sprite_frame:draw()
     self._indicator_box_frame:draw()
 end

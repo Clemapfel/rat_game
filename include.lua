@@ -11,6 +11,7 @@ rt.battle = {}
 bt = rt.battle
 
 require "common"
+require "profiler"
 require "settings"
 require "log"
 require "meta"
@@ -48,6 +49,7 @@ require "input_controller"
 require "thread"
 
 require "widget"
+require "snapshot"
 require "selection_handler"
 require "window_layout"
 require "bin_layout"

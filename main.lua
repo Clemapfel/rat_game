@@ -28,11 +28,16 @@ equipment_item = bt.EquipmentListItem(equipment)
 
 layout = rt.ListLayout(rt.Orientation.VERTICAL)
 layout:push_back(action_tooltip)
+layout:push_back(rt.Spacer())
 
 list_view = rt.ListView()
-for i = 1, 100 do
+
+profiler.start()
+for i = 1, 50 do
     list_view:push_back(bt.ActionListItem(action))
 end
+profiler.stop()
+println(profiler.report())
 
 list_view:add_sort_mode("ascending", function(x, y)
     return meta.hash(x) < meta.hash(y)
@@ -45,6 +50,28 @@ list_view:set_sort_mode("ascending")
 
 rt.current_scene:set_child(list_view)
 
+function snapshot_widget(widget)
+    meta.assert_widget(widget)
+    local w, h = widget:measure()
+    local x, y = widget:get_position()
+    local canvas = love.graphics.newCanvas(w, h)
+
+    if not widget:get_is_realized() then
+        widget:realize()
+    end
+    widget:fit_into(rt.AABB(0, 0, w, h))
+
+    love.graphics.setCanvas({
+        canvas,
+        stencil = true
+    })
+    --love.graphics.reset()
+    widget:draw()
+    love.graphics.setCanvas()
+
+    return canvas
+end
+
 input = rt.add_input_controller(rt.current_scene.window)
 input:signal_connect("pressed", function(self, button)
     if button == rt.InputButton.A then
@@ -54,6 +81,8 @@ input:signal_connect("pressed", function(self, button)
         else
             list_view:set_sort_mode("ascending")
         end
+    elseif button == rt.InputButton.B then
+        list_view:reformat()
     end
 end)
 
