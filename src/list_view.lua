@@ -3,7 +3,7 @@ rt.settings.list_view.default_sort_mode_id = "default"
 --- @class rt.ListView
 rt.ListView = meta.new_type("ListView", function()
     return meta.new(rt.ListView, {
-        _children = {},              -- _children_hash -> rt.Widget
+        _children = {},              -- _children_hash -> {child, height}
         _children_hash = 0,          -- running hash
         _area = rt.AABB(0, 0, 0, 0),
         _sort_mode = rt.settings.list_view.default_sort_mode_id,
@@ -19,13 +19,13 @@ function rt.ListView:_regenerate_sorting(name)
     local to_sort = self._sortings[name].order
     local comp = self._sortings[name].comparator
 
-    for i, child in ipairs(self._children) do
+    for i, _ in ipairs(self._children) do
         table.insert(to_sort, i)
     end
 
     table.sort(to_sort, function(x, y)
-        local left = self._children[x]
-        local right = self._children[y]
+        local left = self._children[x].child
+        local right = self._children[y].child
         return try_catch(function()
             local out = comp(left, right)
             meta.assert_boolean(out)
@@ -74,7 +74,10 @@ end
 function rt.ListView:push_back(child)
     meta.assert_isa(self, rt.ListView)
     meta.assert_widget(child)
-    table.insert(self._children, self._children_hash, child)
+    table.insert(self._children, self._children_hash, {
+        child = child,
+        height = 0,
+    })
     self._children_hash = self._children_hash + 1
 
     if self:get_is_realized() then
@@ -87,9 +90,10 @@ function rt.ListView:size_allocate(x, y, width, height)
     local before = self._area.width
     self._area = rt.AABB(x, y, width, height)
     if width ~= before then
-        for _, child in pairs(self._children) do
-            local w, h = child:measure()
-            child:fit_into(rt.AABB(0, 0, width, h))
+        for _, t in pairs(self._children) do
+            local w, h = t.child:measure()
+            t.height = h
+            t.child:fit_into(rt.AABB(0, 0, width, h))
         end
     end
 end
@@ -102,21 +106,21 @@ function rt.ListView:draw()
 
     -- if unsorted, used order of insertion
     if self._sort_mode == rt.settings.list_view.default_sort_mode_id then
-        for i, child in ipairs(self._children) do
+        for i, t in ipairs(self._children) do
             love.graphics.translate(x, y)
-            child:draw()
+            t.child:draw()
             love.graphics.translate(-x, -y)
 
-            y = y + select(2, child:measure())
+            y = y + t.height
         end
     else
         for _, index in ipairs(self._sortings[self._sort_mode].order) do
-            local child = self._children[index]
+            local t = self._children[index]
             love.graphics.translate(x, y)
-            child:draw()
+            t.child:draw()
             love.graphics.translate(-x, -y)
 
-            y = y + select(2, child:measure())
+            y = y + t.height
         end
     end
     love.graphics.setScissor()
@@ -124,8 +128,8 @@ end
 
 --- @overload rt.Widget.realize
 function rt.ListView:realize()
-    for _, child in pairs(self._children) do
-        child:realize()
+    for _, t in pairs(self._children) do
+        t.child:realize()
     end
 
     rt.Widget.realize(self)
