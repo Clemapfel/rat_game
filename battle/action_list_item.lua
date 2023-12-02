@@ -69,6 +69,10 @@ bt.ActionListItem = meta.new_type("ActionListItem", function(action)
     out._tooltip_layout:set_child(out._hbox)
     out._tooltip_layout:set_tooltip(out._tooltip)
 
+    -- TODO
+    out._name_label:set_text(tostring(meta.hash(out)))
+    -- TODO
+
     return out
 end)
 

@@ -30,16 +30,30 @@ layout = rt.ListLayout(rt.Orientation.VERTICAL)
 layout:push_back(action_tooltip)
 
 list_view = rt.ListView()
-for i = 1, 10 do
+for i = 1, 100 do
     list_view:push_back(bt.ActionListItem(action))
 end
+
+list_view:add_sort_mode("ascending", function(x, y)
+    return meta.hash(x) < meta.hash(y)
+end)
+
+list_view:add_sort_mode("descending", function(x, y)
+    return meta.hash(x) > meta.hash(y)
+end)
+list_view:set_sort_mode("ascending")
 
 rt.current_scene:set_child(list_view)
 
 input = rt.add_input_controller(rt.current_scene.window)
 input:signal_connect("pressed", function(self, button)
     if button == rt.InputButton.A then
-
+        local current = list_view:get_sort_mode()
+        if current == "ascending" then
+            list_view:set_sort_mode("descending")
+        else
+            list_view:set_sort_mode("ascending")
+        end
     end
 end)
 
