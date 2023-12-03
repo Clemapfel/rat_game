@@ -14,11 +14,9 @@ rt.Label = meta.new_type("Label", function(text, font, monospace_font)
         font = rt.settings.font.default
     end
 
-
     if meta.is_nil(monospace_font) then
         monospace_font = rt.settings.font.default_mono
     end
-
 
     local out = meta.new(rt.Label, {
         _raw = text,
@@ -32,14 +30,20 @@ rt.Label = meta.new_type("Label", function(text, font, monospace_font)
         _current_width = 0,
         _current_height = 0
     }, rt.Widget, rt.Drawable)
-    out:_parse()
-    out:_update_default_size()
     return out
 end)
 
+--- @overload rt.Widget.realize
+function rt.Label:realize()
+    if not self:get_is_realized() then
+        self:_parse()
+        self:_update_default_size()
+        rt.Widget.realize(self)
+    end
+end
+
 --- @overload rt.Drawable.draw
 function rt.Label:draw()
-
 
     if not self:get_is_visible() then return end
     for _, glyph in pairs(self._glyphs) do

@@ -69,7 +69,6 @@ end
 --- @brief realize widget
 function rt.Widget:realize()
 
-
     if self._realized then return end
     self._realized = true
     local top_level = self:get_top_level_widget()
@@ -112,6 +111,10 @@ function rt.Widget:reformat()
         self._bounds.y,
         self._bounds.height
     )
+
+    if width < 1 or height < 1 then
+        return
+    end
 
     height = math.max(height, 1)
     width = math.max(width, 1)
@@ -420,10 +423,6 @@ end
 --- @return (Number, Number) x, width
 function rt.Widget._calculate_size(self, width, margin_start, margin_end, align, expand, range_start, range_size)
 
-
-
-
-
     local x = range_start
     local w = width
     local m0 = margin_start
@@ -493,7 +492,6 @@ end
 
 --- @brief [internal] draw allocation component as wireframe
 function rt.Widget:draw_bounds()
-
 
     local x, y = self:get_position()
     local w, h = self:get_size()

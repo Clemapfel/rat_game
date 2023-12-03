@@ -74,46 +74,17 @@ function meta._new(typename)
     metatable.components = {}
     metatable.was_finalized = false
 
-    if metatable.is_type then
-        metatable.type_properties = {}
-
-        metatable.__index = function(this, property_name)
-            local metatable = getmetatable(this)
-
-            if metatable.is_type then
-                local out_maybe = metatable.type_properties[property_name]
-                if not meta.is_nil(out_maybe) then return out_maybe end
-            end
-            return metatable.properties[property_name]
-        end
-
-        metatable.__newindex = function(this, property_name, property_value)
-            local metatable = getmetatable(this)
-            if not metatable.is_mutable then
-                rt.error("In " .. metatable.__name .. ".__newindex: Cannot set property `" .. property_name .. "`, because the object was declared immutable.")
-            end
-
-            if metatable.is_type then
-                metatable.type_properties[property_name] = property_value
-            else
-                metatable.properties[property_name] = property_value
-            end
-        end
-    else
-        metatable.__index = function(this, property_name)
-            return getmetatable(this).properties[property_name]
-        end
-
-        metatable.__newindex = function(this, property_name, property_value)
-            local metatable = getmetatable(this)
-            if not metatable.is_mutable then
-                rt.error("In " .. metatable.__name .. ".__newindex: Cannot set property `" .. property_name .. "`, because the object was declared immutable.")
-            end
-
-            metatable.properties[property_name] = property_value
-        end
+    metatable.__index = function(this, property_name)
+        return getmetatable(this).properties[property_name]
     end
 
+    metatable.__newindex = function(this, property_name, property_value)
+        local metatable = getmetatable(this)
+        if not metatable.is_mutable then
+            rt.error("In " .. metatable.__name .. ".__newindex: Cannot set property `" .. property_name .. "`, because the object was declared immutable.")
+        end
+        metatable.properties[property_name] = property_value
+    end
 
 
     metatable.__tostring = function(this)
@@ -448,11 +419,13 @@ meta.make_debug_only("meta.assert_enum")
 --- @param instance meta.Object
 --- @param type meta.Type
 function meta._install_inheritance(instance, type)
+    if not getmetatable(type).is_type then return end
+
     if type._typename ~= meta.typeof(instance) then
         table.insert(getmetatable(instance).super, type._typename)
     end
 
-    for key, value in pairs(getmetatable(type).type_properties) do
+    for key, value in pairs(getmetatable(type).properties) do
         if instance[key] == nil then
             meta._install_property(instance, key, value)
         end
@@ -500,23 +473,29 @@ function meta._define_type_assertion(typename)
     end
 end
 
+meta._typenames = {}
+
+--- @brief [internal]
+function meta._type_id_to_typename(id)
+    return meta._typenames[id]
+end
+
 --- @brief create a new type with given constructor, this also defines `meta.is_*` and `meta.assert_*` for typename
 --- @param typename String
 --- @param ctor Function
---- @param dtor Function
-function meta.new_type(typename, ctor, dtor)
+function meta.new_type(typename, ctor)
     local out = meta._new("Type")
     local metatable = getmetatable(out)
 
+    local type_id = string.hash(typename)
     rawset(metatable.properties, "_typename", typename)
-    rawset(metatable.properties, "_type_id", string.hash(typename))
+    rawset(metatable.properties, "_type_id", type_id)
 
     metatable.__call = function(self, ...)
         local out = ctor(...)
         if not meta.isa(out, self._typename) then
             rt.error("In " .. self._typename .. ".__call: Constructor does not return object of type `" .. self._typename .. "`.")
         end
-        getmetatable(out).__gc = dtor
         return out
     end
 
@@ -526,16 +505,6 @@ function meta.new_type(typename, ctor, dtor)
     meta.types[typename] = out
     meta._define_type_assertion(typename)
     return out
-end
-
---- @brief invoke destructor
---- @param x meta.Object
-function meta.finalize(x)
-    local metatable = getmetatable(x)
-    if not meta.is_nil(metatable.__gc) and metatable.was_finalized == false then
-        metatable.__gc(x)
-        metatable.was_finalized = true
-    end
 end
 
 --- @brief declare abstract type, this is a type that cannot be instanced
