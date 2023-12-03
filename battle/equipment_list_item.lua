@@ -19,7 +19,7 @@ bt.EquipmentListItem = meta.new_type("EquipmentListItem", function(equipment, co
         _sprite_backdrop = rt.Spacer(),
         _sprite_overlay = rt.OverlayLayout(),
 
-        _name_label = rt.Label(equipment.name .. "(<mono>" .. ternary(count < 10, "0", "") .. tostring(count) .. "</mono>)"),
+        _name_label = rt.Label(equipment.name),
 
         _name_spacer = rt.Spacer(),
 
@@ -30,6 +30,8 @@ bt.EquipmentListItem = meta.new_type("EquipmentListItem", function(equipment, co
         _indicator_hbox = rt.BoxLayout(rt.Orientation.HORIZONTAL),
 
         _count_spacer = rt.Spacer(),
+        _count_label = rt.Label("<mono>" .. ternary(count < 10, "0", "") .. tostring(count) .. "</mono>"),
+        _end_spacer = rt.Spacer(),
 
         _hbox = rt.BoxLayout(rt.Orientation.HORIZONTAL),
 
@@ -41,7 +43,7 @@ bt.EquipmentListItem = meta.new_type("EquipmentListItem", function(equipment, co
     out._sprite_aspect:set_child(out._sprite)
     out._sprite_overlay:push_overlay(out._sprite_aspect)
 
-    for _, spacer in pairs({out._sprite_spacer, out._name_spacer, out._count_spacer}) do
+    for _, spacer in pairs({out._sprite_spacer, out._name_spacer, out._count_spacer, out._end_spacer}) do
         spacer:set_expand_horizontally(false)
         spacer:set_expand_vertically(true)
         spacer:set_minimum_size(3, 0)
@@ -68,7 +70,10 @@ bt.EquipmentListItem = meta.new_type("EquipmentListItem", function(equipment, co
     out._hbox:push_back(out._name_spacer)
     out._hbox:push_back(out._indicator_hbox)
     out._hbox:push_back(out._count_spacer)
-    --out._hbox:push_back(out._count_label)
+    out._hbox:push_back(out._count_label)
+    out._hbox:push_back(out._end_spacer)
+
+    out._count_label:set_expand_horizontally(false)
 
     out._indicator_hbox:set_expand_horizontally(false)
     out._hbox:set_expand_vertically(false)
@@ -114,5 +119,5 @@ end
 --- @brief
 function bt.EquipmentListItem:set_count(n)
     assert(n > 0)
-    self._name_label:set_text(self._equipment.name .. "<mono>(" .. ternary(n < 10, "0", "") .. tostring(n) .. ")</mono>")
+    self._count_label:set_text(self._equipment.name .. "<mono>" .. ternary(n < 10, "0", "") .. tostring(n) .. "</mono>")
 end

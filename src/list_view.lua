@@ -7,13 +7,13 @@ rt.ListView = meta.new_type("ListView", function()
         _children_hash = 0,
         _area = rt.AABB(0, 0, 0, 0),
         _sort_mode = rt.settings.list_view.default_sort_mode_id,
-        _sortings = {}  -- name -> {comparator, order}
+        _sortings = {},  -- name -> {comparator, order}
+
+        _scrollbar = rt.Scrollbar()
     }, rt.Drawable, rt.Widget)
 end)
 
 function rt.ListView:_regenerate_sorting(name)
-
-
 
     self._sortings[name].order = {}
     local to_sort = self._sortings[name].order
@@ -38,10 +38,6 @@ end
 
 --- @brief
 function rt.ListView:add_sort_mode(name, comparator)
-
-
-
-
     self._sortings[name] = {
         comparator = comparator,
         order = {}
@@ -50,8 +46,6 @@ end
 
 --- @brief
 function rt.ListView:set_sort_mode(name)
-
-
 
     if meta.is_nil(self._sortings[name]) then
         rt.error("In rt.ListView.set_sort_mode: no sort mode `" .. name .. "` registered")
@@ -68,13 +62,11 @@ end
 
 --- @brief
 function rt.ListView:get_sort_mode()
-
     return self._sort_mode
 end
 
 --- @brief
 function rt.ListView:push_back(child)
-
 
     self._children[self._children_hash] = child
     self._children_hash = self._children_hash + 1

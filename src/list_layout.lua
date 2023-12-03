@@ -141,8 +141,6 @@ end
 --- @brief append child
 --- @param child rt.Widget
 function rt.ListLayout:push_back(child)
-
-
     child:set_parent(self)
     self._children:push_back(child)
     if self:get_is_realized() then
