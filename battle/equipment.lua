@@ -20,39 +20,39 @@ bt.Equipment = meta.new_type("Equipment", function(id)
 
     local attack_modifier = config.attack_modifier
     if not meta.is_nil(attack_modifier) then
-
+        meta.assert_number(attack_modifier)
         out.attack_modifier = attack_modifier
     end
 
     local defense_modifier = config.defense_modifier
     if not meta.is_nil(defense_modifier) then
-
+        meta.assert_number(defense_modifier)
         out.defense_modifier = defense_modifier
     end
 
     local speed_modifier = config.speed_modifier
     if not meta.is_nil(speed_modifier) then
-
+        meta.assert_number(speed_modifier)
         out.speed_modifier = speed_modifier
     end
 
     local hp_modifier = config.hp_modifier
     if not meta.is_nil(hp_modifier) then
-
+        meta.assert_number(hp_modifier)
         out.hp_modifier = hp_modifier
     end
-
 
     if #config.name == 0 then
         rt.error("In Equipment(\"" .. id .. "\"): `name` field cannot be empty")
     end
+    meta.assert_string(config.name)
     out.name = config.name
 
     local effect_text = config.effect_text
     if meta.is_nil(effect_text) then
         out.effect_text = rt.settings.battle.equipment.default_effect_text
     else
-
+        meta.assert_string(effect_text)
         out.effect_text = effect_text
     end
 
@@ -60,12 +60,12 @@ bt.Equipment = meta.new_type("Equipment", function(id)
     if meta.is_nil(flavor_text) then
         out.flavor_text = ""
     else
-
+        meta.assert_string(flavor_text)
         out.flavor_text = flavor_text
     end
 
     local thumbnail_id = config.thumbnail_id
-
+    meta.assert_string(thumbnail_id)
     out.thumbnail_id = thumbnail_id
 
     meta.set_is_mutable(out, false)

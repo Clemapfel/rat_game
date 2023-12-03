@@ -564,7 +564,6 @@ end
 --- @param n Number
 function rt.Label:set_n_visible_characters(n)
 
-
     local n_left =  clamp(n, 0, self._n_characters)
     local n_glyphs = sizeof(self._glyphs)
     local glyph_i = 1

@@ -147,8 +147,11 @@ end
 
 --- @brief resize widget such that it fits into the given bounds
 --- @param aabb rt.AxisAlignedRectangle
-function rt.Widget:fit_into(aabb)
+function rt.Widget:fit_into(aabb, y, w, h)
 
+    if meta.is_number(aabb) then
+        aabb = rt.AABB(x, y, w, h)
+    end
 
     self._bounds = aabb
     self:reformat()

@@ -469,34 +469,11 @@ meta.Type = meta.new_type("Type", function()
 end)
 
 --- @class Function
-meta.Function = meta.new_type("function", function()
-    return function() end
-end)
-
 --- @class Nil
-meta.Nil = meta.new_type("nil", function()
-    return nil
-end)
-
 --- @class String
-meta.String = meta.new_type("string", function()
-    return ""
-end)
-
 --- @class Table
-meta.Table = meta.new_type("table", function()
-    return {}
-end)
-
 --- @class Boolean
-meta.Boolean = meta.new_type("boolean", function()
-    return false
-end)
-
 --- @class Number
-meta.Number = meta.new_type("number", function()
-    return 0
-end)
 
 --- @brief make table weak, meaning it does not increase the reference count of its values
 --- @param x Table

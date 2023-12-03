@@ -32,12 +32,21 @@ layout:push_back(rt.Spacer())
 
 list_view = rt.ListView()
 
-profiler.start()
-for i = 1, 50 do
+for i = 1, 2 do
     list_view:push_back(bt.ActionListItem(action))
+    list_view:push_back(bt.EquipmentListItem(equipment))
 end
-profiler.stop()
-println(profiler.report())
+
+
+benchmark(function()
+    love.graphics.setFont(rt.settings.font.default)
+    love.graphics.setFont(rt.settings.font.default_mono)
+end)
+
+benchmark(function()
+    love.graphics.setFont(rt.settings.font.default)
+end)
+
 
 list_view:add_sort_mode("ascending", function(x, y)
     return meta.hash(x) < meta.hash(y)

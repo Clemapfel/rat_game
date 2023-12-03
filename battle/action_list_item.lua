@@ -1,5 +1,5 @@
 --- @class bt.ActionListItem
-bt.ActionListItem = meta.new_type("ActionListItem", function(action)
+bt.ActionListItem = meta.new_type("ActionListItem", function(action, count)
 
     if meta.is_nil(env.action_spritesheet) then
         env.action_spritesheet = rt.Spritesheet("assets/sprites", "orbs")
@@ -10,6 +10,8 @@ bt.ActionListItem = meta.new_type("ActionListItem", function(action)
     sprite_size_x = sprite_size_x * 1
     sprite_size_y = sprite_size_y * 1
 
+    if meta.is_nil(count) then count = 0 end
+
     local out = meta.new(bt.ActionListItem, {
         _action = action,
         _sprite = rt.Sprite(env.action_spritesheet, sprite_id),
@@ -17,7 +19,7 @@ bt.ActionListItem = meta.new_type("ActionListItem", function(action)
         _sprite_backdrop = rt.Spacer(),
         _sprite_overlay = rt.OverlayLayout(),
 
-        _name_label = rt.Label(action.name),
+        _name_label = rt.Label(action.name .. "<mono>(" .. ternary(count < 10, "0", "") .. tostring(count) .. ")</mono>"),
         _effect_label = rt.Label(action.effect_text),
 
         _name_spacer = rt.Spacer(),
@@ -69,9 +71,7 @@ bt.ActionListItem = meta.new_type("ActionListItem", function(action)
     out._tooltip_layout:set_child(out._hbox)
     out._tooltip_layout:set_tooltip(out._tooltip)
 
-    -- TODO
-    out._name_label:set_text(tostring(meta.hash(out)))
-    -- TODO
+    out:set_count(count)
 
     return out
 end)
@@ -87,4 +87,10 @@ function bt.ActionListItem:update_n_uses(n_uses)
     local max_n_uses = self._action.max_n_uses
     n_uses = clamp(n_uses, 0, max_n_uses)
     self._n_uses_label:set_text("<mono>" .. tostring(n_uses) .. "/" .. tostring(max_n_uses) .. "</mono>")
+end
+
+
+--- @brief
+function bt.ActionListItem:set_count(n)
+    self._name_label:set_text(self._action.name .. "<mono>(" .. ternary(n < 10, "0", "") .. tostring(n) .. ")</mono>")
 end

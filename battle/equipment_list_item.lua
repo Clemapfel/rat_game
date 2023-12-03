@@ -1,5 +1,5 @@
 --- @class bt.EquipmentListItem
-bt.EquipmentListItem = meta.new_type("EquipmentListItem", function(equipment)
+bt.EquipmentListItem = meta.new_type("EquipmentListItem", function(equipment, count)
 
     if meta.is_nil(env.equipment_spritesheet) then
         env.equipment_spritesheet = rt.Spritesheet("assets/sprites", "equipment")
@@ -10,6 +10,8 @@ bt.EquipmentListItem = meta.new_type("EquipmentListItem", function(equipment)
     sprite_size_x = sprite_size_x * 1
     sprite_size_y = sprite_size_y * 1
 
+    if meta.is_nil(count) then count = 0 end
+
     local out = meta.new(bt.EquipmentListItem, {
         _equipment = equipment,
         _sprite = rt.Sprite(env.equipment_spritesheet, sprite_id),
@@ -17,7 +19,7 @@ bt.EquipmentListItem = meta.new_type("EquipmentListItem", function(equipment)
         _sprite_backdrop = rt.Spacer(),
         _sprite_overlay = rt.OverlayLayout(),
 
-        _name_label = rt.Label(equipment.name),
+        _name_label = rt.Label(equipment.name .. "(<mono>" .. ternary(count < 10, "0", "") .. tostring(count) .. "</mono>)"),
 
         _name_spacer = rt.Spacer(),
 
@@ -28,15 +30,12 @@ bt.EquipmentListItem = meta.new_type("EquipmentListItem", function(equipment)
         _indicator_hbox = rt.BoxLayout(rt.Orientation.HORIZONTAL),
 
         _count_spacer = rt.Spacer(),
-        _count_label = rt.Label("0" .. tostring(1), rt.settings.font.default_mono),
 
         _hbox = rt.BoxLayout(rt.Orientation.HORIZONTAL),
 
         _tooltip = bt.EquipmentTooltip(equipment),
         _tooltip_layout = rt.TooltipLayout()
     }, rt.Widget, rt.Drawable)
-
-    out:set_count(1) -- TODO
 
     out._sprite_overlay:set_base_child(out._sprite_backdrop)
     out._sprite_aspect:set_child(out._sprite)
@@ -72,10 +71,6 @@ bt.EquipmentListItem = meta.new_type("EquipmentListItem", function(equipment)
     --out._hbox:push_back(out._count_label)
 
     out._indicator_hbox:set_expand_horizontally(false)
-    out._count_label:set_expand_horizontally(false)
-    out._count_label:set_horizontal_alignment(rt.Alignment.START)
-    out._count_label:set_margin_right(2 * rt.settings.margin_unit)
-
     out._hbox:set_expand_vertically(false)
 
     out._tooltip_layout:set_child(out._hbox)
@@ -118,8 +113,6 @@ end
 
 --- @brief
 function bt.EquipmentListItem:set_count(n)
-
-
     assert(n > 0)
-    self._name_label:set_text(self._equipment.name .. " (" .. tostring(n) .. ") ")
+    self._name_label:set_text(self._equipment.name .. "<mono>(" .. ternary(n < 10, "0", "") .. tostring(n) .. ")</mono>")
 end

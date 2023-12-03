@@ -17,20 +17,12 @@ rt.TextEffect = meta.new_enum({
 --- @param wrap_width Number px
 rt.Glyph = meta.new_type("Glyph", function(font, content, font_style, color, is_underlined, is_strikethrough, effects, wrap_width)
 
-
-
     if meta.is_nil(font_style) then font_style = rt.FontStyle.REGULAR end
     if meta.is_nil(color) then color = rt.RGBA(1, 1, 1, 1) end
     if meta.is_nil(effects) then effects = {} end
     if meta.is_nil(wrap_width) then wrap_width = POSITIVE_INFINITY end
     if meta.is_nil(is_underlined) then is_underlined = false end
     if meta.is_nil(is_strikethrough) then is_strikethrough = false end
-
-
-
-
-
-
 
     local out = meta.new(rt.Glyph, {
         _font = font,
@@ -52,7 +44,6 @@ rt.Glyph = meta.new_type("Glyph", function(font, content, font_style, color, is_
     }, rt.Drawable, rt.Animation)
 
     for _, effect in pairs(effects) do
-
         out._effects[effect] = true
     end
     out:_update()
