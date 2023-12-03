@@ -2,17 +2,6 @@
 meta = {}
 meta.types = {}
 
-meta.DEBUG_MODE = false
-meta.DUMMY_FUNCTION = function(...) end
-
---- @brief [internal] disable function unless `meta.DEBUG_MODE` is set to `true`
---- @param name String symbol name
-function meta.make_debug_only(name)
-    if meta.DEBUG_MODE == false then
-        _G[name] = nil
-    end
-end
-
 --- @brief is x a lua string?
 --- @param x any
 function meta.is_string(x)
@@ -64,15 +53,13 @@ function meta._new(typename)
     out.__metatable = {}
     metatable = out.__metatable
 
-    metatable.__name = typename
+    metatable.__name = typename._typename
     metatable.__hash = meta._hash
     meta._hash = meta._hash + 1
     metatable.properties = {}
-    metatable.is_type = typename == "Type"
     metatable.is_mutable = true
     metatable.super = {}
     metatable.components = {}
-    metatable.was_finalized = false
 
     metatable.__index = function(this, property_name)
         return getmetatable(this).properties[property_name]
@@ -96,7 +83,7 @@ function meta._new(typename)
     end
     setmetatable(out, metatable)
 
-    return out
+    return out, metatable
 end
 
 --- @brief is meta object
@@ -112,13 +99,11 @@ end
 
 --- @brief get typename identifier
 function meta.typeof(x)
-    local out = ""
     if meta.is_object(x) then
-        out = getmetatable(x).__name
+        return getmetatable(x).__name
     else
-        out = type(x)
+        return type(x)
     end
-    return out
 end
 
 --- @brief check if instance has type as super
@@ -159,7 +144,6 @@ function meta.assert_boolean(x, ...)
         meta._assert_aux(meta.is_boolean(n), n, "boolean")
     end
 end
-meta.make_debug_only("meta.assert_boolean")
 
 --- @brief throw if object is not a table
 --- @param x any
@@ -169,7 +153,6 @@ function meta.assert_table(x, ...)
         meta._assert_aux(meta.is_table(n), n, "table")
     end
 end
-meta.make_debug_only("meta.assert_table")
 
 --- @brief throw if object is not callable
 --- @param x any
@@ -179,14 +162,12 @@ function meta.assert_function(x, ...)
         meta._assert_aux(meta.is_function(n), n, "function")
     end
 end
-meta.make_debug_only("meta.assert_function")
 
 --- @brief throw if object is not a string
 --- @param x any
 function meta.assert_string(x, ...)
     meta._assert_aux(meta.is_string(x), x, "string")
 end
-meta.make_debug_only("meta.assert_string")
 
 --- @brief throw if object is not a number
 --- @param x any
@@ -196,7 +177,6 @@ function meta.assert_number(x, ...)
         meta._assert_aux(meta.is_number(number), number, "number")
     end
 end
-meta.make_debug_only("meta.assert_number")
 
 --- @brief throw if object is not nil
 --- @param x any
@@ -206,7 +186,6 @@ function meta.assert_nil(x, ...)
         meta._assert_aux(meta.is_nil(number), number, "typeof(nil)")
     end
 end
-meta.make_debug_only("meta.assert_nil")
 
 --- @brief assert that object was created using `meta.new`
 --- @param x any
@@ -216,7 +195,6 @@ function meta.assert_object(x, ...)
         meta._assert_aux(meta.is_object(number), number, "meta.Object")
     end
 end
-meta.make_debug_only("meta.assert_object")
 
 --- @brief assert that instance inherits from type
 --- @param x any
@@ -226,14 +204,6 @@ function meta.assert_inherits(x, type)
     else
         meta._assert_aux(meta.inherits(x, type), x, type)
     end
-end
-
---- @brief [internal] add a property, set to intial value
---- @param x meta.Object
---- @param property_name String
---- @param initial_value any
-function meta._install_property(x, property_name, initial_value)
-    getmetatable(x).properties[property_name] = initial_value
 end
 
 --- @brief [internal] add a property, set to intial value
@@ -290,28 +260,39 @@ function meta.new(type, fields, ...)
         fields = {}
     end
 
-    local out = {}
-    if meta.isa(type, meta.Type) then
-        out = meta._new(type._typename)
-    else
-        out = meta._new(type)
-    end
-
+    out, metatable = meta._new(type)
     meta.set_is_mutable(out, true)
+
     if meta.is_table(fields) then
         for name, value in pairs(fields) do
-            meta._install_property(out, name, value)
+            metatable.properties[name] = value
         end
     end
 
-    meta._install_inheritance(out, type)
+    --[[
+    local metatable = getmetatable(instance)
+    metatable.super[type._typename] = true
+
+    for key, value in pairs(getmetatable(type).properties) do
+        if instance[key] == nil then
+            metatable.properties[key] = value
+        end
+    end
+    ]]--
+
     local installed = {}
-    installed[type] = true
+    for key, value in pairs(getmetatable(type).properties) do
+        metatable.properties[key] = value
+    end
+
+    metatable.super[type._typename] = true
 
     for _, super in pairs({...}) do
-        if installed[super] ~= true then
-            meta._install_inheritance(out, super)
-            installed[super] = true
+        metatable.super[super._typename] = true
+        for key, value in pairs(getmetatable(super).properties) do
+            if metatable.properties[key] == nil then
+                metatable.properties[key] = value
+            end
         end
     end
     return out
@@ -327,7 +308,7 @@ function meta.new_enum(fields)
         rt.error("In meta.new_enum: list of values cannot be empty")
     end
 
-    local out = meta._new(meta.Enum)
+    local out, metatable = meta._new(meta.Enum)
     local used_values = {}
 
     local i = 0
@@ -342,10 +323,9 @@ function meta.new_enum(fields)
         end
         used_values[value] = name
 
-        meta._install_property(out, name, value)
+        metatable.properties[name] = value
     end
 
-    local metatable = getmetatable(out)
     metatable.__pairs = function(this)
         return pairs(getmetatable(this).properties)
     end
@@ -370,27 +350,13 @@ end
 --- @param type meta.Type (or String)
 --- @return Boolean
 function meta.isa(x, type)
-
-    local typename = type
-    if meta.typeof(type) == "Type" then
-        typename = type._typename
-    else
-        typename = type
-    end
-
-    if meta.typeof(x) == typename then
-        return true
-    end
-
     local metatable = getmetatable(x)
-    if not meta.is_nil(metatable) and not meta.is_nil(metatable.super)then
-        for _, super in pairs(metatable.super) do
-            if super == typename then
-                return true
-            end
-        end
+    if meta.is_nil(metatable) or meta.is_nil(metatable.super) then
+        return false
+    else
+        return metatable.super[type._typename] == true
     end
-    return false
+
 end
 
 --- @brief check if value is part of enum
@@ -413,24 +379,6 @@ function meta.assert_enum(x, enum)
         rt.error("In assert_enum: Value `" .. meta.typeof(x) .. "` is not a value of enum `" .. serialize(getmetatable(enum).properties) .. "`")
     end
 end
-meta.make_debug_only("meta.assert_enum")
-
---- @brief [internal] apply properties of a type to an instance
---- @param instance meta.Object
---- @param type meta.Type
-function meta._install_inheritance(instance, type)
-    if not getmetatable(type).is_type then return end
-
-    if type._typename ~= meta.typeof(instance) then
-        table.insert(getmetatable(instance).super, type._typename)
-    end
-
-    for key, value in pairs(getmetatable(type).properties) do
-        if instance[key] == nil then
-            meta._install_property(instance, key, value)
-        end
-    end
-end
 
 --- @brief throw if object is not of given type
 --- @param x any
@@ -441,7 +389,6 @@ function meta.assert_isa(x, type)
     end
     meta._assert_aux(meta.isa(x, type), x, type._typename)
 end
-meta.make_debug_only("meta.assert_isa")
 
 --- @brief [internal] add meta.is_* and meta.assert_* given type
 function meta._define_type_assertion(typename)
@@ -493,7 +440,7 @@ function meta.new_type(typename, ctor)
 
     metatable.__call = function(self, ...)
         local out = ctor(...)
-        if not meta.isa(out, self._typename) then
+        if not meta.isa(out, self) then
             rt.error("In " .. self._typename .. ".__call: Constructor does not return object of type `" .. self._typename .. "`.")
         end
         return out

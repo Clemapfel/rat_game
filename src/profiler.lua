@@ -146,7 +146,7 @@ function profiler.query(limit)
     return t
 end
 
-local cols = { 3, 29, 11, 24, 24, 24}
+local cols = { 3, 29, 11, 24, 24, 24, 24}
 
 --- Generates a text report.
 -- @tparam[opt] number limit Maximum number of rows
@@ -167,9 +167,14 @@ function profiler.report(n)
     for i, row in ipairs(report) do
         local count = row[3]
         local time = row[4]
+
+        local location = string.sub(row[5], string.find(row[5], "[A-Za-z_.]*.lua:.*"))
+
         row[5] = time / count
         row[6] = time / total_time * 100
-        for j = 1, 6 do
+        row[7] = location
+
+        for j = 1, 7 do
             local s = row[j]
             local l2 = cols[j]
             s = tostring(s)
@@ -184,8 +189,8 @@ function profiler.report(n)
         out[i] = table.concat(row, ' | ')
     end
 
-    local row = " +-----+-------------------------------+-------------+--------------------------+--------------------------+--------------------------+ \n"
-    local col = " | #   | Function                      | #Calls      | Time (s)                 | Time per Call (s)        | Overally Contribution (%)| \n"
+    local row = " +-----+-------------------------------+-------------+--------------------------+--------------------------+--------------------------+--------------------------+ \n"
+    local col = " | #   | Function                      | #Calls      | Time (s)                 | Time per Call (s)        | Overally Contribution (%)| Location                 | \n"
     local sz = row..col..row
     if #out > 0 then
         sz = sz..' | '..table.concat(out, ' | \n | ')..' | \n'

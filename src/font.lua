@@ -15,9 +15,6 @@ rt.settings.font = {
 --- @param bold_italic_path String (or nil)
 rt.Font = meta.new_type("Font", function(size, regular_path, bold_path, italic_path, bold_italic_path)
 
-
-
-
     local out = meta.new(rt.Font, {
         _regular_path = regular_path,
         _italic_path = regular_path,

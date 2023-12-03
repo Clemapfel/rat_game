@@ -42,7 +42,6 @@ function meta.assert_aabb(object)
         rt.error("In " .. debug.getinfo(2, "n").name .. ": Expected `AxisAlignedRectangle`, got `" .. meta.typeof(object) .. "`")
     end
 end
-meta.make_debug_only("meta.assert_aabb")
 
 --- @brief is point inside rectangles bounds
 --- @param x Number

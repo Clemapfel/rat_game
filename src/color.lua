@@ -5,7 +5,7 @@
 --- @param a Number (or nil)
 rt.RGBA = function(r_or_string, g, b, a)
 
-    if meta.is_string(r_or_string) then
+    if type(r_or_string) == "string" then --meta.is_string(r_or_string) then
         local code = r_or_string
         return rt.html_code_to_color(code)
     else
@@ -40,7 +40,6 @@ function meta.assert_rgba(object)
         rt.error("In " .. debug.getinfo(2, "n").name .. ": Excpected `RGBA`, got `" .. meta.typeof(object) .. "`")
     end
 end
-meta.make_debug_only("meta.assert_rgba")
 
 --- @class rt.HSVA
 --- @param h Number
@@ -79,7 +78,6 @@ function meta.assert_hsva(object)
         rt.error("In " .. debug.getinfo(2, "n").name .. ": Excpected `HSVA`, got `" .. meta.typeof(object) .. "`")
     end
 end
-meta.make_debug_only("meta.assert_hsva")
 
 --- @brief conver rgba to hsva
 --- @param rgba rt.RGBA

@@ -33,7 +33,7 @@ layout:push_back(rt.Spacer())
 list_view = rt.ListView()
 
 profiler.start()
-for i = 1, 10 do
+for i = 1, 50 do
     list_view:push_back(bt.ActionListItem(action))
 end
 profiler.stop()

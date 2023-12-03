@@ -61,7 +61,6 @@ function meta.assert_vector2(object)
         rt.error("In " .. debug.getinfo(2, "n").name .. ": Excpected `Vector2`, got `" .. meta.typeof(object) .. "`")
     end
 end
-meta.make_debug_only("meta.assert_vector2")
 
 --- @class rt.Vector3
 --- @param x Number
@@ -131,7 +130,6 @@ function meta.assert_vector3(object)
         rt.error("In " .. debug.getinfo(2, "n").name .. ": Excpected `Vector3`, got `" .. meta.typeof(object) .. "`")
     end
 end
-meta.make_debug_only("meta.assert_vector2")
 
 --- @brief [internal] test vector2, vector3
 function rt.test.test_vector()
