@@ -4,7 +4,6 @@
 --- @signal value_changed: (::Scrollbar, value::Number) -> nil
 rt.Scrollbar = meta.new_type("Scrollbar", function(orientation, n_steps)
 
-
     if meta.is_nil(n_steps) then
         n_steps = 10
     end
@@ -42,9 +41,6 @@ end
 
 --- @brief
 function rt.Scrollbar:set_value(value)
-
-
-
     if value < 0 or value > 1 then
         rt.error("In rt.Scrollbar.set_value: value `" .. tostring(value) .. "` is outside [0, 1]")
     end
@@ -55,14 +51,11 @@ end
 
 --- @brief
 function rt.Scrollbar:get_value()
-
     return self._value
 end
 
 --- @brief 
 function rt.Scrollbar:scroll_down(offset)
-
-
     if meta.is_nil(offset) then
         local w, h = self:measure()
         if self._orientation == rt.Orientation.HORIZONTAL then
@@ -72,7 +65,6 @@ function rt.Scrollbar:scroll_down(offset)
         end
     end
 
-    
     self._value = self._value + offset
     self._value = clamp(self._value, 0, 1)
     self:_emit_value_changed()
@@ -80,7 +72,6 @@ end
 
 --- @brief
 function rt.Scrollbar:scroll_up(offset)
-
     if meta.is_nil(offset) then
         local w, h = self:measure()
         if self._orientation == rt.Orientation.HORIZONTAL then
@@ -89,7 +80,6 @@ function rt.Scrollbar:scroll_up(offset)
             offset = 1 / h
         end
     end
-
 
     self._value = self._value - offset
     self._value = clamp(self._value, 0, 1)

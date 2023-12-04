@@ -4,7 +4,7 @@ rt.settings.battle.equipment.default_effect_text = "no additional effect"
 --- @brief immutable config for equipment
 bt.Equipment = meta.new_type("Equipment", function(id)
 
-    local path = "assets/equipment/" .. id .. ".lua"
+    local path = "battle/configs/equipment/" .. id .. ".lua"
     if meta.is_nil(love.filesystem.getInfo(path)) then
         rt.error("In Equipment(\"" .. id .. "\"): path `" .. path .. "` does not exist")
     end
@@ -72,7 +72,7 @@ bt.Equipment = meta.new_type("Equipment", function(id)
     return out
 end)
 
--- stat buffs
+-- stat buffs (absolute values)
 bt.Equipment.attack_modifier = 0
 bt.Equipment.defense_modifier = 0
 bt.Equipment.speed_modifier = 0

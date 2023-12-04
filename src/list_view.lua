@@ -1,4 +1,5 @@
 rt.settings.list_view.default_sort_mode_id = "default"
+rt.settings.list_view.scrollbar_width = rt.settings.margin_unit
 
 --- @class rt.ListView
 rt.ListView = meta.new_type("ListView", function()
@@ -8,8 +9,6 @@ rt.ListView = meta.new_type("ListView", function()
         _area = rt.AABB(0, 0, 0, 0),
         _sort_mode = rt.settings.list_view.default_sort_mode_id,
         _sortings = {},  -- name -> {comparator, order}
-
-        _scrollbar = rt.Scrollbar()
     }, rt.Drawable, rt.Widget)
 end)
 

@@ -56,7 +56,6 @@ end
 --- @return (Number, Number)
 function rt.Widget:measure()
 
-
     local top_level = self:get_top_level_widget()
     if not meta.is_nil(top_level) then
         return top_level:measure()
@@ -130,6 +129,7 @@ function rt.Widget:reformat()
     if meta.is_nil(top_level) then
         self:size_allocate(x, y, width, height)
     else
+        meta.assert_widget(top_level)
         top_level:size_allocate(x, y, width, height)
     end
 end
@@ -148,9 +148,8 @@ end
 --- @brief resize widget such that it fits into the given bounds
 --- @param aabb rt.AxisAlignedRectangle
 function rt.Widget:fit_into(aabb, y, w, h)
-
     if meta.is_number(aabb) then
-        aabb = rt.AABB(x, y, w, h)
+        aabb = rt.AABB(aabb, y, w, h)
     end
 
     self._bounds = aabb

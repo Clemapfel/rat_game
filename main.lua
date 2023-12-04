@@ -18,6 +18,12 @@ io.stdout:setvbuf("no") -- makes it so love2d error message is printed to consol
 
 rt.add_scene("debug")
 
+list = rt.List()
+for k, v in pairs(list) do
+    println(meta.typeof(k), " ", meta.typeof(v))
+    assert(false)
+end
+
 action = bt.Action("TEST_ACTION")
 action_tooltip = bt.ActionTooltip(action)
 action_item = bt.ActionListItem(action)
@@ -26,28 +32,14 @@ equipment = bt.Equipment("TEST_EQUIPMENT")
 equipment_tooltip = bt.EquipmentTooltip(equipment)
 equipment_item = bt.EquipmentListItem(equipment)
 
-layout = rt.ListLayout(rt.Orientation.VERTICAL)
-layout:push_back(action_tooltip)
-layout:push_back(rt.Spacer())
+entity = bt.Entity("TEST_ENTITY")
+entity.attack_level = -2
+entity.defense_level = 1
+entity.speed_level = -1
 
-list_view = rt.ListView()
+entity_tooltip = bt.EntityTooltip(entity)
 
-for i = 1, 50 do
-    list_view:push_back(bt.ActionListItem(action))
-    list_view:push_back(bt.EquipmentListItem(equipment))
-end
-
-list_view:add_sort_mode("ascending", function(x, y)
-    return meta.hash(x) < meta.hash(y)
-end)
-
-list_view:add_sort_mode("descending", function(x, y)
-    return meta.hash(x) > meta.hash(y)
-end)
-list_view:set_sort_mode("ascending")
-
-rt.current_scene:set_child(list_view)
-
+rt.current_scene:set_child(entity_tooltip)
 function snapshot_widget(widget)
 
     local w, h = widget:measure()

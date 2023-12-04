@@ -40,6 +40,16 @@ function printerr(message)
     io.stderr:flush()
 end
 
+--- @brief concatenate vararg into string
+function paste(...)
+    local values = {...}
+    local out = {}
+    for _, v in pairs(values) do
+        table.insert(out, tostring(v))
+    end
+    return table.concat(out)
+end
+
 --- @brief get number of elements in arbitrary object
 --- @param x any
 --- @return number
@@ -365,8 +375,15 @@ function string.is_upper(str)
     return not string.is_lower(str)
 end
 
+--- @brief get last character
+function string.last(str)
+    return string.sub(str, #str, #str)
+end
 
-
+--- @brief get first character
+function string.fisrt(str)
+    return string.sub(str, 1, 1)
+end
 
 --- @brief convert snake_case to CamelCase
 

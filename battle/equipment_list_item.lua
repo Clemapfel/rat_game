@@ -71,7 +71,7 @@ bt.EquipmentListItem = meta.new_type("EquipmentListItem", function(equipment, co
     out._hbox:push_back(out._indicator_hbox)
     out._hbox:push_back(out._count_spacer)
     out._hbox:push_back(out._count_label)
-    out._hbox:push_back(out._end_spacer)
+    --out._hbox:push_back(out._end_spacer)
 
     out._count_label:set_expand_horizontally(false)
 

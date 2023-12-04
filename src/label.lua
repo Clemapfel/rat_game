@@ -10,6 +10,10 @@ rt.JustifyMode = meta.new_enum({
 --- @param font rt.Font (or nil)
 rt.Label = meta.new_type("Label", function(text, font, monospace_font)
 
+    if meta.is_nil(text) then
+        text = ""
+    end
+
     if meta.is_nil(font) then
         font = rt.settings.font.default
     end
@@ -217,7 +221,6 @@ rt.Label.MONOSPACE_TAG_END = rt.Set("</tt>", "</mono>")
 
 --- @brief [internal] transform _raw into set of glyphs
 function rt.Label:_parse()
-
 
     self._glyphs = {}
     self._n_characters = 0

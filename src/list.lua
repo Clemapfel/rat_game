@@ -11,12 +11,12 @@ rt.List = meta.new_type("List", function()
     local metatable = getmetatable(out)
     metatable.__pairs = function(self)
         local function iterator(_, state)
-            if meta.is_nil(state.node) then return end
+            if meta.is_nil(state) or meta.is_nil(state.node) then return end
             local value = state.node.value
             state.node = state.node.next
             return state, value
         end
-        return iterator, self, { node = self._first_node }
+        return iterator, self, ternary(self:size() == 0, nil, { node = self._first_node })
     end
 
     metatable.__ipairs = function(self)

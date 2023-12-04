@@ -10,7 +10,7 @@ bt.TargetingMode = meta.new_enum({
 bt.Action = meta.new_type("Action", function(id)
 
 
-    local path = "assets/actions/" .. id .. ".lua"
+    local path = "battle/configs/actions/" .. id .. ".lua"
     if meta.is_nil(love.filesystem.getInfo(path)) then
         rt.error("In Action(\"" .. id .. "\"): path `" .. path .. "` does not exist")
     end
@@ -53,7 +53,6 @@ bt.Action = meta.new_type("Action", function(id)
             out["can_target_" .. which] = value
         end
     end
-
 
     if #config.name == 0 then
         rt.error("In Action(\"" .. id .. "\"): `name` field cannot be empty")
@@ -104,8 +103,8 @@ bt.Action.is_consumable = false
 bt.Action.name = "ERROR_ACTION"
 
 -- clear text effect
-bt.Action.effect_text = "No effect."
-bt.Action.verbose_effect_text = "Has no additional effect."
+bt.Action.effect_text = "No effect"
+bt.Action.verbose_effect_text = "Has no additional effect"
 
 -- flavor text for inventory, optional
 bt.Action.flavor_text = ""

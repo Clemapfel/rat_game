@@ -49,7 +49,6 @@ bt.EquipmentTooltip = meta.new_type("EquipmentTooltip", function(equipment)
 
     local modifier_to_label = function(modifier)
 
-
         local out = ""
         for i = 1, n_digits - get_n_digits(modifier) do
             out = out .. " "
@@ -102,8 +101,8 @@ bt.EquipmentTooltip = meta.new_type("EquipmentTooltip", function(equipment)
     out._sprite_frame:set_minimum_size(sprite_size_x * 2, sprite_size_y * 2)
 
     for _, label in pairs({out._name_label, out._effect_label, out._stat_label}) do
-    label:set_horizontal_alignment(rt.Alignment.START)
-    label:set_margin_left(rt.settings.margin_unit)
+        label:set_horizontal_alignment(rt.Alignment.START)
+        label:set_margin_left(rt.settings.margin_unit)
     end
     out._effect_label:set_margin_vertical(rt.settings.margin_unit)
 

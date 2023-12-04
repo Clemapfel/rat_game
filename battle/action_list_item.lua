@@ -66,7 +66,7 @@ bt.ActionListItem = meta.new_type("ActionListItem", function(action, count)
     out._hbox:push_back(out._n_uses_label)
     out._hbox:push_back(out._n_uses_spacer)
     out._hbox:push_back(out._count_label)
-    out._hbox:push_back(out._end_spacer)
+    --out._hbox:push_back(out._end_spacer)
 
     out:update_n_uses(action.max_n_uses)
     out._n_uses_label:set_expand_horizontally(false)
