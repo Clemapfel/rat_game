@@ -35,7 +35,9 @@ end
 
 --- @brief print to stderr
 --- @param str string
-function printerr(str)
+function printerr(message)
+    io.stderr:write(string.format("\27[38;5;9m%s\27[38;5;7m", message), "\n")
+    io.stderr:flush()
 end
 
 --- @brief get number of elements in arbitrary object
