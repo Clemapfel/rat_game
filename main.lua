@@ -18,11 +18,6 @@ io.stdout:setvbuf("no") -- makes it so love2d error message is printed to consol
 
 rt.add_scene("debug")
 
-list = rt.List()
-for k, v in pairs(list) do
-    println(meta.typeof(k), " ", meta.typeof(v))
-    assert(false)
-end
 
 action = bt.Action("TEST_ACTION")
 action_tooltip = bt.ActionTooltip(action)
@@ -41,7 +36,6 @@ entity.defense_level = 1
 entity.speed_level = -1
 entity:add_status_ailment(bt.StatusAilment("TEST_STATUS_TEMPORARY"))
 entity:add_status_ailment(bt.StatusAilment("TEST_STATUS_INFINITE"))
-
 entity_tooltip = bt.EntityTooltip(entity)
 
 --rt.current_scene:set_child(status_tooltip)
@@ -71,6 +65,13 @@ clock = rt.Clock()
 sprite = rt.Sprite(env.equipment_spritesheet, "default")
 rt.current_scene:set_child(sprite)
 
+local depth_buffer = {
+    color = love.graphics.newCanvas(w, h, {format = "rgba8"}),
+    depth = love.graphics.newCanvas(w, h, {format = "depth24"}),
+}
+depth_buffer.canvas = {depth_buffer.color, depthstencil = depth_buffer.depth}
+
+
 depth = 0
 function set_depth()
     local shape = sprite._shape
@@ -78,6 +79,8 @@ function set_depth()
         local x, y, z = shape:get_vertex_position(1)
         shape:set_vertex_position(1, x, y, depth)
     end
+
+    println(depth)
 end
 
 input = rt.add_input_controller(rt.current_scene.window)
@@ -114,9 +117,19 @@ end
 --- @brief draw step
 function love.draw()
 
-    rt.current_scene:draw()
+    --rt.current_scene:draw()
+
+    love.graphics.setCanvas(depth_buffer.canvas)
+    --love.graphics.setMeshCullMode("back")
 
     sprite._shape:draw()
+
+    --love.graphics.setMeshCullMode("none")
+    --love.graphics.setDepthMode()
+    love.graphics.setCanvas()
+
+    love.graphics.clear(1, 0, 1, 1, true, 1)
+    love.graphics.draw(depth_buffer.color)
 
     function draw_guides()
         local w, h = love.graphics.getWidth(), love.graphics.getHeight()

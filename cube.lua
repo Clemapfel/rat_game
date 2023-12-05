@@ -19,11 +19,11 @@ vec4 effect(vec4 color, Image texture, vec2 texture_coords, vec2 screen_coords) 
 #endif
 ]])
 
-local DepthBuffer = {
+local depth_buffer = {
     color = love.graphics.newCanvas(w, h, {format = "rgba8"}),
     depth = love.graphics.newCanvas(w, h, {format = "depth24"}),
 }
-DepthBuffer.canvas = {DepthBuffer.color, depthstencil = DepthBuffer.depth}
+depth_buffer.canvas = {depth_buffer.color, depthstencil = depth_buffer.depth}
 
 local VertexFormat = {
     {"VertexPosition", "float", 3},
@@ -155,7 +155,7 @@ function love.draw()
     love.graphics.setShader(Shader)
     love.graphics.setColor(1, 1, 1)
     love.graphics.setDepthMode("lequal", true)
-    love.graphics.setCanvas(DepthBuffer.canvas)
+    love.graphics.setCanvas(depth_buffer.canvas)
     love.graphics.clear(0, 0, 0, 0, true, 1)
     love.graphics.setMeshCullMode("back")
 
@@ -170,7 +170,7 @@ function love.draw()
     love.graphics.setDepthMode()
     love.graphics.setCanvas()
 
-    love.graphics.draw(DepthBuffer.color)
+    love.graphics.draw(depth_buffer.color)
 end
 
 function love.keypressed(key)

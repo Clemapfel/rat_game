@@ -2,12 +2,9 @@
 --- @param spritesheet rt.Spritesheet
 --- @param animation_id String
 rt.Sprite = meta.new_type("Sprite", function(spritesheet, animation_id)
-
-
     if meta.is_nil(animation_id) then
         animation_id = spritesheet.name
     end
-
 
     spritesheet:_assert_has_animation("Sprite:", animation_id)
 
