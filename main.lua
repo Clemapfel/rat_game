@@ -44,7 +44,7 @@ entity:add_status_ailment(bt.StatusAilment("TEST_STATUS_INFINITE"))
 
 entity_tooltip = bt.EntityTooltip(entity)
 
-rt.current_scene:set_child(status_tooltip)
+--rt.current_scene:set_child(status_tooltip)
 function snapshot_widget(widget)
 
     local w, h = widget:measure()
@@ -67,19 +67,32 @@ function snapshot_widget(widget)
     return canvas
 end
 
+clock = rt.Clock()
+sprite = rt.Sprite(env.equipment_spritesheet, "default")
+rt.current_scene:set_child(sprite)
+
+depth = 0
+function set_depth()
+    local shape = sprite._shape
+    for i = 1, shape:get_n_vertices() do
+        local x, y, z = shape:get_vertex_position(1)
+        shape:set_vertex_position(1, x, y, depth)
+    end
+end
+
 input = rt.add_input_controller(rt.current_scene.window)
 input:signal_connect("pressed", function(self, button)
     if button == rt.InputButton.A then
-        local current = list_view:get_sort_mode()
-        if current == "ascending" then
-            list_view:set_sort_mode("descending")
-        else
-            list_view:set_sort_mode("ascending")
-        end
-    elseif button == rt.InputButton.B then
-        list_view:reformat()
+        status_tooltip._tooltip:set_show_sprite(not status_tooltip._tooltip:get_show_sprite())
+    elseif button == rt.InputButton.UP then
+        depth = depth + 10
+        set_depth(depth)
+    elseif button == rt.InputButton.DOWN then
+        depth = depth - 10
+        set_depth(depth)
     end
 end)
+
 
 -- #############################
 
@@ -102,6 +115,8 @@ end
 function love.draw()
 
     rt.current_scene:draw()
+
+    sprite._shape:draw()
 
     function draw_guides()
         local w, h = love.graphics.getWidth(), love.graphics.getHeight()

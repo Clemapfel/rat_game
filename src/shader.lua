@@ -1,6 +1,5 @@
 --- @class rt.Shader
 rt.Shader = meta.new_type("Shader", function(code_or_filename)
-
     return meta.new(rt.Shader, {
         _native = love.graphics.newShader(code_or_filename)
     })
@@ -23,6 +22,11 @@ end
 --- @brief make shader the current on
 function rt.Shader:bind()
     love.graphics.setShader(self._native)
+end
+
+--- @brief
+function rt.Shader:unbindg()
+    love.graphics.setShader(nil)
 end
 
 rt.settings.default_fragment_shader = [[

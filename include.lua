@@ -10,6 +10,8 @@ rt.settings = {}
 rt.battle = {}
 bt = rt.battle
 
+math3d = require("cpml")
+
 require "common"
 require "profiler"
 require "meta"

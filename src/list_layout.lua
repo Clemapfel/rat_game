@@ -126,11 +126,12 @@ end
 function rt.ListLayout:set_children(children)
 
     for child in pairs(self._children) do
-        child:set_parent(nil)
+        if meta.is_widget(child) then
+            child:set_parent(nil)
+        end
     end
     self._children:clear()
     for _, child in pairs(children) do
-
         child:set_parent(self)
         self._children:push_back(child)
         if self:get_is_realized() then child:realize() end

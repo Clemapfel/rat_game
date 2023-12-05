@@ -21,6 +21,7 @@ bt.BattleTooltip = meta.new_type("BattleTooltip", function(name, status, descrip
         _sprite_backdrop = rt.Spacer(),
         _sprite_overlay = rt.OverlayLayout(),
         _sprite_frame = rt.Frame(),
+        _show_sprite = true,
 
         _name_and_sprite_box = rt.BoxLayout(rt.Orientation.HORIZONTAL),
         _main = rt.BoxLayout(rt.Orientation.VERTICAL)
@@ -94,4 +95,21 @@ end
 --- @brief
 function bt.BattleTooltip:set_sprite(widget)
     self._sprite_aspect:set_child(widget)
+end
+
+--- @brief
+function bt.BattleTooltip:set_show_sprite(b)
+    if b ~= self._show_sprite then
+        self._show_sprite = b
+        if self._show_sprite then
+            self._name_and_sprite_box:set_children({self._sprite_frame, self._name_label})
+        else
+            self._name_and_sprite_box:set_children({self._name_label})
+        end
+    end
+end
+
+--- @brief
+function bt.BattleTooltip:get_show_sprite()
+    return self._show_sprite
 end

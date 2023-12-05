@@ -21,21 +21,18 @@ rt.VertexAttribute = meta.new_enum({
 })
 
 --- @class rt.Vertex
---- @param top_left_x Number in px
---- @param top_left_y Number in px
+--- @param x Number in px
+--- @param y Number in px
+--- @param z Number in px
 --- @param texture_coordinate_x Number in [0, 1]
 --- @param texture_coordinate_y Number in [0, 1]
 --- @param color rt.RGBA
-function rt.Vertex(top_left_x, top_left_y, texture_coordinate_x, texture_coordinate_y, color)
-
-
+function rt.Vertex(x, y, z, texture_coordinate_x, texture_coordinate_y, color)
     if meta.is_nil(color) then
         color = rt.RGBA(1, 1, 1, 1)
     end
-
-
     return {
-        top_left_x, top_left_y,
+        x, y, z,
         texture_coordinate_x, texture_coordinate_y,
         color.r, color.g, color.b, color.a
     }
@@ -48,11 +45,19 @@ rt.VertexShape = meta.new_type("VertexShape", function(...)
     local vertices = {}
 
     for _, pos in pairs(positions) do
-
-        table.insert(vertices, rt.Vertex(pos.x, pos.y, 0, 0))
+        table.insert(vertices, rt.Vertex(pos.x, pos.y, 0, 0, 0))
     end
+
+    vertex_format = {
+        {rt.VertexAttribute.POSITION, "float", 3},
+        {rt.VertexAttribute.TEXTURE_COORDINATES, "float", 2},
+        {rt.VertexAttribute.COLOR, "float", 4}
+    }
+
     local out = meta.new(rt.VertexShape, {
-        _native = love.graphics.newMesh(vertices,
+        _native = love.graphics.newMesh(
+            vertex_format,
+            vertices,
             rt.MeshDrawMode.TRIANGLE_FAN,
             rt.SpriteBatchUsage.DYNAMIC
         )
@@ -72,8 +77,6 @@ end
 --- @param i Number 1-based
 --- @param rgba rt.RGBA
 function rt.VertexShape:set_vertex_color(i, rgba)
-
-
     if meta.is_hsva(rgba) then rgba = rt.hsva_to_rgba(rgba) end
 
     self._native:setVertexAttribute(i, 3, rgba.r, rgba.g, rgba.b, rgba.a)
@@ -83,9 +86,6 @@ end
 --- @param i Number 1-based
 --- @return rt.RGBA
 function rt.VertexShape:get_vertex_color(i)
-
-
-
     local r, g, b, a
     r, g, b, a = self._native:getVertexAttribute(i, 3)
     return rt.RGBA(r, g, b, a)
@@ -95,19 +95,14 @@ end
 --- @param i Number 1-based
 --- @param x Number in px
 --- @param y Number in px
-function rt.VertexShape:set_vertex_position(i, x, y)
-
-
-
-    self._native:setVertexAttribute(i, 1, x, y)
+function rt.VertexShape:set_vertex_position(i, x, y, z)
+    self._native:setVertexAttribute(i, 1, x, y, z)
 end
 
 --- @brief get position of vertex
 --- @param i Number 1-based
 --- @return (Number, Number)
 function rt.VertexShape:get_vertex_position(i)
-
-
     return self._native:getVertexAttribute(i, 1)
 end
 
@@ -116,26 +111,19 @@ end
 --- @param u Number in [0, 1]
 --- @param v Number in [0, 1]
 function rt.VertexShape:set_vertex_texture_coordinate(i, u, v)
-
-
-
     self._native:setVertexAttribute(i, 2, u, v)
 end
 
 --- @brief get texture coordinate
 --- @return (Number, Number)
 function rt.VertexShape:get_vertex_texture_coordinate(i)
-
-
     return self._native:getVertexAttribute(i, 2)
 end
 
 --- @brief set color of all vertices
 --- @param rgba rt.RGBA (or rt.HSVA)
 function rt.VertexShape:set_color(rgba)
-
     if meta.is_hsva(rgba) then rgba = rt.hsva_to_rgba(rgba) end
-
     for i = 1, self:get_n_vertices() do
         self:set_vertex_color(i, rgba)
     end
@@ -144,9 +132,6 @@ end
 --- @brief replace texture coordinates of all vertices
 --- @param rectangle rt.AxisAlignedRectangle
 function rt.VertexShape:set_texture_rectangle(rectangle)
-
-
-
     local min_x = POSITIVE_INFINITY
     local min_y = POSITIVE_INFINITY
     local max_x = NEGATIVE_INFINITY
@@ -173,8 +158,6 @@ end
 --- @brief set texture
 --- @param texture rt.Texture
 function rt.VertexShape:set_texture(texture)
-
-
     if not meta.is_nil(texture) then
 
         self._native:setTexture(texture._native)
@@ -185,8 +168,6 @@ end
 
 --- @brief set draw mode
 function rt.VertexShape:set_draw_mode(mode)
-
-
     self._native:setDrawMode(mode)
 end
 
@@ -207,7 +188,6 @@ end
 --- @param width Number in px
 --- @param height Number in px
 function rt.VertexRectangle(x, y, width, height)
-
     local out = rt.VertexShape(
         rt.Vector2(x, y),
         rt.Vector2(x + width, y),

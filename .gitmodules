@@ -1,3 +1,6 @@
 [submodule "submodules/sol2"]
 	path = submodules/sol2
 	url = https://github.com/lmoureaux/sol2
+[submodule "cpml"]
+	path = cpml
+	url = https://github.com/excessive/cpml

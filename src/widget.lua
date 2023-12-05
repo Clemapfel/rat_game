@@ -35,6 +35,7 @@ rt.Widget._realized = false
 rt.Widget._focused = true
 rt.Widget._parent = nil
 rt.Widget._selected = false
+rt.Widget._is_hidden = false
 rt.Widget._final_pos_x = 0
 rt.Widget._final_pos_y = 0
 
@@ -79,7 +80,6 @@ end
 
 --- @brief get whether widget was realized
 function rt.Widget:get_is_realized()
-
     return self._realized
 end
 
