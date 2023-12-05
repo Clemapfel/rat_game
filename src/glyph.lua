@@ -127,7 +127,7 @@ function rt.Glyph:_non_animated_draw()
 
     local font = self._font[self._style]
     local strikethrough_base = y + 0.5 * font:getHeight() + 0.5
-    local underline_base = y + font:getBaseline()
+    local underline_base = y + font:getBaseline() - 0.5 * font:getDescent()
     local w = select(1, self:get_size())
     love.graphics.setLineWidth(1)
 
@@ -194,7 +194,7 @@ function rt.Glyph:_animated_draw()
         if self._is_strikethrough or self._is_underlined then
             local font = self._font[self._style]
             local strikethrough_base = pos_y + offset.y + 0.5 * font:getHeight() + 0.5
-            local underline_base = pos_y + offset.y + font:getBaseline()
+            local underline_base = pos_y + offset.y + font:getBaseline() - 0.5 * font:getDescent()
             local w = select(1, self:get_size())
             love.graphics.setLineWidth(1)
 

@@ -1,7 +1,7 @@
 --- @class bt.Stats
 bt.StatusAilment = meta.new_type("StatusAilment", function(id)
 
-    local path = "battle/configs/entities/" .. id .. ".lua"
+    local path = "battle/configs/status_ailments/" .. id .. ".lua"
     if meta.is_nil(love.filesystem.getInfo(path)) then
         rt.error("In StatusAilment(\"" .. id .. "\"): path `" .. path .. "` does not exist")
     end
@@ -11,7 +11,7 @@ bt.StatusAilment = meta.new_type("StatusAilment", function(id)
     end
 
     local config = config_file()
-    local out = meta.new(bt.Entity, {
+    local out = meta.new(bt.StatusAilment, {
         id = id
     })
 
@@ -43,12 +43,15 @@ end)
 bt.StatusAilment.name = ""
 bt.StatusAilment.description = "has no effect"
 bt.StatusAilment.verbose_description = "this status ailment has no effect, it is only used for testing"
+bt.StatusAilment.flavor_text = "status statis"
 
 -- sprite IDs
 bt.StatusAilment.sprite = "default"
 
---- stats
+-- stats
 bt.StatusAilment.attack_factor = 1
 bt.StatusAilment.defense_factor = 1
 bt.StatusAilment.speed_factor = 1
 
+-- duration
+bt.StatusAilment.max_duration = POSITIVE_INFINITY

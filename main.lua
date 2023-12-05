@@ -39,7 +39,10 @@ entity.speed_level = -1
 
 entity_tooltip = bt.EntityTooltip(entity)
 
-rt.current_scene:set_child(entity_tooltip)
+status = bt.StatusAilment("TEST_STATUS")
+status_tooltip = bt.StatusTooltip(status)
+
+rt.current_scene:set_child(status_tooltip)
 function snapshot_widget(widget)
 
     local w, h = widget:measure()

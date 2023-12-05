@@ -99,6 +99,7 @@ require "battle/equipment_list_item"
 require "battle/action_tooltip"
 require "battle/action_list_item"
 require "battle/entity_tooltip"
+require "battle/status_tooltip"
 
 require "scene"
 -- require "test

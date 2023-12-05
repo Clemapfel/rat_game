@@ -7,7 +7,7 @@ rt.settings.battle_tooltip = {
 }
 
 --- @class bt.BattleTooltip
-bt.BattleTooltip = meta.new_type("BattleTooltip", function(name, status, description, flavor_text)
+bt.BattleTooltip = meta.new_type("BattleTooltip", function(name, status, description, flavor_text, sprite)
 
     local out = meta.new(bt.BattleTooltip, {
         _entity = entity,
@@ -16,7 +16,7 @@ bt.BattleTooltip = meta.new_type("BattleTooltip", function(name, status, descrip
         _description_label = rt.Label(description),
         _flavor_text_label = rt.Label(rt.settings.battle_tooltip.flavor_text_prefix .. flavor_text .. rt.settings.battle_tooltip.flavor_text_suffix),
 
-        _sprite = rt.Spacer(),
+        _sprite = ternary(meta.is_nil(sprite), rt.Spacer(), sprite),
         _sprite_aspect = rt.AspectLayout(1),
         _sprite_backdrop = rt.Spacer(),
         _sprite_overlay = rt.OverlayLayout(),
@@ -45,7 +45,7 @@ bt.BattleTooltip = meta.new_type("BattleTooltip", function(name, status, descrip
     out._main:push_back(out._name_and_sprite_box)
     out._main:push_back(out._stat_label)
     out._main:push_back(out._description_label)
-    --out._main:push_back(out._flavor_text_label)
+    out._main:push_back(out._flavor_text_label)
 
     out._sprite_frame:set_expand(false)
 
@@ -59,6 +59,9 @@ bt.BattleTooltip = meta.new_type("BattleTooltip", function(name, status, descrip
 
     out._name_label:set_margin_left(rt.settings.margin_unit)
     out._main:set_spacing(rt.settings.margin_unit)
+
+    out._stat_label:set_margin_left(rt.settings.margin_unit)
+    out._description_label:set_margin_left(rt.settings.margin_unit)
 
     return out
 end)

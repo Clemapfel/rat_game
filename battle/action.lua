@@ -9,7 +9,6 @@ bt.TargetingMode = meta.new_enum({
 --- @brief immutable config for battle actions
 bt.Action = meta.new_type("Action", function(id)
 
-
     local path = "battle/configs/actions/" .. id .. ".lua"
     if meta.is_nil(love.filesystem.getInfo(path)) then
         rt.error("In Action(\"" .. id .. "\"): path `" .. path .. "` does not exist")
@@ -68,10 +67,8 @@ bt.Action = meta.new_type("Action", function(id)
     out.verbose_effect_text = verbose_effect_text
 
     local flavor_text = config.flavor_text
-    if meta.is_nil(flavor_text) then
-        out.flavor_text = ""
-    else
-
+    if not meta.is_nil(flavor_text) then
+        meta.assert_string(flavor_text)
         out.flavor_text = flavor_text
     end
 
@@ -105,9 +102,7 @@ bt.Action.name = "ERROR_ACTION"
 -- clear text effect
 bt.Action.effect_text = "No effect"
 bt.Action.verbose_effect_text = "Has no additional effect"
-
--- flavor text for inventory, optional
-bt.Action.flavor_text = ""
+bt.Action.flavor_text = "flavorless"
 
 -- sprite for inventory thumbnail
 bt.Action.thumbnail_id = "default"

@@ -2,6 +2,7 @@ rt.settings.entity_tooltip.no_status_label = "none"
 
 --- @class bt.EntityTooltip
 bt.EntityTooltip = meta.new_type("EntityTooltip", function(entity)
+    meta.assert_entity(entity)
     local out = meta.new(bt.EntityTooltip, {
         _entity = entity,
         _tooltip = {} -- bt.BattleTooltip
