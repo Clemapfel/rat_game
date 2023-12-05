@@ -62,6 +62,14 @@ rt.Palette = {
     ORANGE_2 = rt.RGBA("#ff8400"),
     ORANGE_3 = rt.RGBA("#ce6300"),
 
+    TEAL_1 = rt.RGBA("#00e6c7"),
+    TEAL_2 = rt.RGBA("#00bfa9"), -- teal
+    TEAL_3 = rt.RGBA("#00a69b"),
+    TEAL_4 = rt.RGBA("#008f8a"),
+    TEAL_5 = rt.RGBA("#005a5c"),
+    TEAL_6 = rt.RGBA("#003f40"),
+
+
     BROWN_1 = rt.RGBA("#914803"),
     BROWN_2 = rt.RGBA("#693100"), -- brown
     BROWN_3 = rt.RGBA("#4c2300"),
@@ -102,6 +110,7 @@ rt.Palette.BLUE = rt.Palette.BLUE_4
 rt.Palette.PINK = rt.Palette.PINK_2
 rt.Palette.PURPLE = rt.Palette.PURPLE_3
 rt.Palette.LILAC = rt.Palette.LILAC_3
+rt.Palette.TEAL = rt.Palette.TEAL_2
 rt.Palette.YELLOW = rt.Palette.YELLOW_2
 rt.Palette.ORANGE = rt.Palette.ORANGE_1
 rt.Palette.BROWN = rt.Palette.BROWN_2
@@ -152,6 +161,40 @@ function rt.Palette:export()
         "GREEN_5",
         "GREEN_6",
 
+        "TEAL_1",
+        "TEAL_2",
+        "TEAL_3",
+        "TEAL_4",
+        "TEAL_5",
+        "TEAL_6",
+
+        "LIGHT_BLUE_1",
+        "LIGHT_BLUE_2",
+        "BLUE_1",
+        "BLUE_2",
+        "BLUE_3",
+        "BLUE_4",
+        "BLUE_5",
+        "BLUE_6",
+
+        "LILAC_1",
+        "LILAC_2",
+        "LILAC_3",
+        "LILAC_4",
+        "LILAC_5",
+
+
+        "PURPLE_1",
+        "PURPLE_2",
+        "PURPLE_3",
+        "PURPLE_4",
+
+        "PINK_1",
+        "PINK_2",
+        "PINK_3",
+        "PINK_4",
+        "PINK_5",
+
         "NEON_RED_1",
         "NEON_RED_2",
         "NEON_RED_3",
@@ -167,31 +210,6 @@ function rt.Palette:export()
         "RED_3",
         "RED_4",
         "RED_5",
-
-        "LIGHT_BLUE_1",
-        "LIGHT_BLUE_2",
-        "BLUE_1",
-        "BLUE_2",
-        "BLUE_3",
-        "BLUE_4",
-        "BLUE_5",
-        "BLUE_6",
-
-        "PINK_1",
-        "PINK_2",
-        "PINK_3",
-        "PINK_4",
-        "PINK_5",
-
-        "PURPLE_1",
-        "PURPLE_2",
-        "PURPLE_3",
-        "PURPLE_4",
-        "LILAC_1",
-        "LILAC_2",
-        "LILAC_3",
-        "LILAC_4",
-        "LILAC_5",
 
         "YELLOW_1",
         "YELLOW_2",
