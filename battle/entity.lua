@@ -71,10 +71,10 @@ bt.Entity.n_move_slots = POSITIVE_INFINITY
 
 -- equipment
 bt.Entity.n_equip_slots = 2
-bt.Entity.equipment = {}            -- index -> ID
+bt.Entity.equipment = {}              -- slot_index -> rt.Equipment
 
 -- status
-bt.Entity.status_ailments = rt.List()
+bt.Entity.status_ailments = {}        -- rt.StatusAilment -> Elapsed
 
 -- stat level to factor
 rt.settings.entity.level_to_factor = {}
@@ -117,7 +117,7 @@ function bt.Entity:_calculate_stat(which)
 
     local out = base * rt.settings.entity.level_to_factor[level]
 
-    for _, status in pairs(self.status_ailments) do
+    for status, _ in pairs(self.status_ailments) do
         out = out * status[which .. "_factor"]
     end
 
@@ -132,3 +132,19 @@ function bt.Entity:get_speed() return self:_calculate_stat("speed") end
 function bt.Entity:get_attack_level() return self.attack_level end
 function bt.Entity:get_defense_level() return self.defense_level end
 function bt.Entity:get_speed_level() return self.speed_level end
+
+
+--- @brief add new status
+function bt.Entity:add_status_ailment(status_ailment)
+    self.status_ailments[status_ailment] = 0
+end
+
+--- @brief
+function bt.Entity:_get_status_ailment_elapsed(status)
+    meta.assert_isa(status, bt.StatusAilment)
+    local out = self.status_ailments[status]
+    if meta.is_nil(out) then
+        rt.error("In bt.Entity:_get_status_ailmend_elapsed: entity is not afflicated by status `" .. status.id .. "`")
+    end
+    return out
+end

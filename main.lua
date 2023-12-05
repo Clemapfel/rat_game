@@ -32,15 +32,17 @@ equipment = bt.Equipment("TEST_EQUIPMENT")
 equipment_tooltip = bt.EquipmentTooltip(equipment)
 equipment_item = bt.EquipmentListItem(equipment)
 
+status = bt.StatusAilment("TEST_STATUS")
+status_tooltip = bt.StatusTooltip(status)
+
 entity = bt.Entity("TEST_ENTITY")
 entity.attack_level = -2
 entity.defense_level = 1
 entity.speed_level = -1
+entity:add_status_ailment(bt.StatusAilment("TEST_STATUS_TEMPORARY"))
+entity:add_status_ailment(bt.StatusAilment("TEST_STATUS_INFINITE"))
 
 entity_tooltip = bt.EntityTooltip(entity)
-
-status = bt.StatusAilment("TEST_STATUS")
-status_tooltip = bt.StatusTooltip(status)
 
 rt.current_scene:set_child(status_tooltip)
 function snapshot_widget(widget)

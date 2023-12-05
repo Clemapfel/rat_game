@@ -27,6 +27,10 @@ bt.StatusAilment = meta.new_type("StatusAilment", function(id)
     meta.assert_string(config.name)
     out.name = config.name
 
+    local duration = config.duration
+    meta.assert_number(duration)
+    out.max_duration = duration
+
     for _, which in pairs({"description", "verbose_description", "sprite"}) do
         local value = config[which]
         if not meta.is_nil(value) then

@@ -1,4 +1,9 @@
-rt.settings.entity_tooltip.no_status_label = "none"
+rt.settings.entity_tooltip = {
+    no_status_label = "none",
+    status_prefix = "<b>Status Effects:</b> ",
+    status_duration_prefix = "  <color=GREY_2>(<mono>",
+    status_duration_suffix = "</mono> turns left)</color>"
+}
 
 --- @class bt.EntityTooltip
 bt.EntityTooltip = meta.new_type("EntityTooltip", function(entity)
@@ -88,13 +93,17 @@ end
 --- @brief [internal]
 function bt.EntityTooltip:_format_status_ailment_label()
 
-    if self._entity.status_ailments:size() == 0 then
-        return "<b>Status Effects:</b> " .. rt.settings.entity_tooltip.no_status_label
+    if sizeof(self._entity.status_ailments) == 0 then
+        return rt.settings.entity_tooltip.status_prefix .. rt.settings.entity_tooltip.no_status_label
     end
 
-    local out = "<b>Status:<b>\n"
-    for _, status in pairs(self._entity.status_ailments) do
-        out = out .. "\t" .. status.name .. "\n"
+    local out = rt.settings.entity_tooltip.status_prefix .. "\n"
+    for status, _ in pairs(self._entity.status_ailments) do
+        out = out .. "\t" .. status.name;
+        if status.max_duration < POSITIVE_INFINITY then
+            local left = status.max_duration - self._entity:_get_status_ailment_elapsed(status)
+            out = out .. rt.settings.entity_tooltip.status_duration_prefix .. tostring(left) .. rt.settings.entity_tooltip.status_duration_suffix .. "\n"
+        end
     end
     return out
 end

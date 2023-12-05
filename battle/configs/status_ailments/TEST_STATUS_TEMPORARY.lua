@@ -1,5 +1,5 @@
 return {
-    name = "Test Status",
+    name = "Limited Test Status",
     description = "No effect",
     verbose_description = "This status is used for testing and has no effect",
 
