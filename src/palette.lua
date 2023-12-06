@@ -69,7 +69,6 @@ rt.Palette = {
     TEAL_5 = rt.RGBA("#005a5c"),
     TEAL_6 = rt.RGBA("#003f40"),
 
-
     BROWN_1 = rt.RGBA("#914803"),
     BROWN_2 = rt.RGBA("#693100"), -- brown
     BROWN_3 = rt.RGBA("#4c2300"),
@@ -92,6 +91,7 @@ rt.Palette = {
     GREY_4 = rt.RGBA("#737378"),
     GREY_5 = rt.RGBA("#404045"),
     GREY_6 = rt.RGBA("#202025"),
+    GREY_7 = rt.RGBA("#101013"),
     BLACK = rt.RGBA("#0b0b10"),
 
     TRUE_WHITE = rt.RGBA("#ffffff"),
