@@ -29,8 +29,7 @@ end
 --- @brief set singular child
 --- @param child rt.Widget
 function rt.WindowLayout:set_child(child)
-
-
+    meta.assert_widget(child)
 
     if not meta.is_nil(self._child) and meta.is_widget(self._child) then
         self._child:set_parent(nil)

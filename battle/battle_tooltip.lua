@@ -99,14 +99,14 @@ end
 
 --- @brief
 function bt.BattleTooltip:set_show_sprite(b)
-    if b ~= self._show_sprite then
+    --if b ~= self._show_sprite then
         self._show_sprite = b
         if self._show_sprite then
             self._name_and_sprite_box:set_children({self._sprite_frame, self._name_label})
         else
             self._name_and_sprite_box:set_children({self._name_label})
         end
-    end
+    --end
 end
 
 --- @brief

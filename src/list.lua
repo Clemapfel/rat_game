@@ -65,6 +65,7 @@ function rt.List:push_back(element)
 
     if self._n_elements == 0 then
         self._first_node = to_insert
+        self._last_node = to_insert
     end
 
     self._last_node.next = to_insert

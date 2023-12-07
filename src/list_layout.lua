@@ -6,7 +6,6 @@ rt.ListLayout = meta.new_type("ListLayout", function(orientation, ...)
         orientation = rt.Orientation.HORIZONTAL
     end
 
-
     local out = meta.new(rt.ListLayout, {
         _children = rt.List(),
         _orientation = orientation,
@@ -126,10 +125,12 @@ end
 function rt.ListLayout:set_children(children)
 
     for child in pairs(self._children) do
+        println("calld: " .. serialize(child))
         if meta.is_widget(child) then
             child:set_parent(nil)
         end
     end
+
     self._children:clear()
     for _, child in pairs(children) do
         child:set_parent(self)

@@ -18,8 +18,6 @@ rt.Scene.thread_pool = rt.ThreadPool() -- static, shared by all scenes
 
 --- @brief set top-level child
 function rt.Scene:set_child(child)
-
-
     self.window:set_child(child)
 end
 
