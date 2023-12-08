@@ -1,5 +1,8 @@
-local Cpml = require("cpml")
-local Shader = love.graphics.newShader([[
+require "include"
+
+rt._3d = {}
+
+rt._3d.shader = love.graphics.newShader([[
 uniform mat4 model_matrix;
 uniform mat4 view_matrix;
 uniform mat4 projection_matrix;
@@ -20,159 +23,153 @@ vec4 effect(vec4 color, Image texture, vec2 texture_coords, vec2 screen_coords)
 #endif
 ]])
 
-local DepthBuffer = {
-    color = love.graphics.newCanvas(w, h, {format = "rgba8"}),
-    depth = love.graphics.newCanvas(w, h, {format = "depth24"}),
+rt._3d.depth_buffer = {
+    color = love.graphics.newCanvas(love.graphics.getWidth(), love.graphics.getHeight(), {format = "rgba8"}),
+    depth = love.graphics.newCanvas(love.graphics.getWidth(), love.graphics.getHeight(), {format = "depth24"}),
 }
-DepthBuffer.canvas = {DepthBuffer.color, depthstencil = DepthBuffer.depth}
+rt._3d.depth_buffer.canvas = {rt._3d.depth_buffer.color, depthstencil = rt._3d.depth_buffer.depth}
 
-local VertexFormat = {
-    {"VertexPosition", "float", 3},
-    {"VertexTexCoord","float", 2},
-    {"VertexColor", "byte", 4},
-}
+local vertices = {}
+local lower, upper = rt.degrees(0):as_radians(), rt.degrees(360):as_radians()
+local n_steps = 19
+local step = 2 * math.pi / n_steps
 
-local Mesh = love.graphics.newMesh(VertexFormat, {
-    -- Front
-    {-1, -1, 1, 0, 1, 1,    1,    1,    1},
-    { 1, -1, 1, 1, 1, 1,    1,    1,    1},
-    {-1,  1, 1, 0, 0, 1,    1,    1,    1},
-    { 1,  1, 1, 1, 0, 1,    1,    1,    1},
+local sum = math3d.vec3(0, 0, 0)
+for x = lower, upper, step do
+    for y = lower, upper, step do
+        for z = lower, upper, step do
+            local m = math3d.mat4()
+            m:rotate(m, x, math3d.vec3.unit_x)
+            m:rotate(m, y, math3d.vec3.unit_y)
+            m:rotate(m, z, math3d.vec3.unit_z)
 
-    -- Back
-    { 1, -1, -1, 0, 1, 1,    1,    1,    1},
-    {-1, -1, -1, 1, 1, 1,    1,    1,    1},
-    { 1,  1, -1, 0, 0, 1,    1,    1,    1},
-    {-1,  1, -1, 1, 0, 1,    1,    1,    1},
+            local point = math3d.vec3(1, 1, 1)
+            point:rotate(point, z, math3d.vec3.unit_z)
+            point:rotate(point, x, math3d.vec3.unit_x)
+            point:rotate(point, y, math3d.vec3.unit_y)
 
-    -- Left
-    {-1, -1, -1, 0, 1, 1,    1,    1,    1},
-    {-1, -1,  1, 1, 1, 1,    1,    1,    1},
-    {-1,  1, -1, 0, 0, 1,    1,    1,    1},
-    {-1,  1, 1,  1, 0, 1,    1,    1,    1},
+            point = m * point
 
-    -- Right
-    { 1, -1,  1,  0, 1, 1,    1,    1,    1},
-    { 1, -1, -1,  1, 1, 1,    1,    1,    1},
-    { 1,  1,  1,  0, 0, 1,    1,    1,    1},
-    { 1,  1, -1,  1, 0, 1,    1,    1,    1},
+            table.insert(vertices, {
+                point.x, point.y, point.z
+            })
+        end
+    end
+end
 
-    -- Top
-    {-1, -1, -1,  0, 1, 1,    1,    1,    1},
-    { 1, -1, -1,  1, 1, 1,    1,    1,    1},
-    {-1, -1,  1,  0, 0, 1,    1,    1,    1},
-    { 1, -1,  1,  1, 0, 1,    1,    1,    1},
+println(sizeof(vertices))
 
-    -- Bottom
-    { 1, 1, -1, 0, 1, 1,    1,    1,    1},
-    {-1, 1, -1, 1, 1, 1,    1,    1,    1},
-    { 1, 1,  1, 0, 0, 1,    1,    1,    1},
-    {-1, 1,  1, 1, 0, 1,    1,    1,    1},
-}, "triangles")
-Mesh:setVertexMap({
-    1,  3,  2,  2,  3,  4,
-    5,  7,  6,  6,  7,  8,
-    9, 11, 10, 10, 11, 12,
-    13, 15, 14, 14, 15, 16,
-    17, 19, 18, 18, 19, 20,
-    21, 23, 22, 22, 23, 24,
-})
---Mesh:setTexture(love.graphics.newImage("stone.png"))
+mesh_shape = rt.VertexShape(vertices)
+mesh_shape:set_draw_mode(rt.MeshDrawMode.POINTS)
+local n = mesh_shape:get_n_vertices()
+for i = 1, n do
+    local x, y, z = mesh_shape:get_vertex_position(i)
+    x = x - sum.x / n
+    y = y - sum.y / n
+    z = z - sum.z / n
+    mesh_shape:set_vertex_position(i, x, y, z)
+    mesh_shape:set_vertex_color(i, rt.HSVA(i / n, 1, 1, 1));
+end
 
-local Camera = {
-    position = Cpml.vec3(0, 0, -10),
-    rotation = Cpml.vec2(0, 0),
+mesh = mesh_shape._native
+
+rt._3d.camera = {
+    position = math3d.vec3(0, 0, 0),
+    rotation = math3d.vec2(0, 0),
 
     direction = nil,
     right     = nil,
     up        = nil,
 }
 
-local PerspectiveMatrix = Cpml.mat4.from_perspective(
-        75,
-        love.graphics.getWidth() / love.graphics.getHeight(),
-        0.1,
-        1000
+rt._3d.camera.direction = math3d.vec3(
+    math.cos(rt._3d.camera.rotation.y) * math.sin(rt._3d.camera.rotation.x),
+    math.sin(rt._3d.camera.rotation.y),
+    math.cos(rt._3d.camera.rotation.y) * math.cos(rt._3d.camera.rotation.x)
 )
-local ViewMatrix = Cpml.mat4()
 
-local ModelMatrix_1 = Cpml.mat4.identity()
---ModelMatrix_1:translate(ModelMatrix_1, Cpml.vec3(5, 0, 0))
+rt._3d.camera.right = math3d.vec3(
+    math.sin(rt._3d.camera.rotation.x - math.pi/2),
+    0,
+    math.cos(rt._3d.camera.rotation.x - math.pi/2)
+)
 
-local ModelMatrix_2 = Cpml.mat4.identity()
-ModelMatrix_2:translate(ModelMatrix_2, Cpml.vec3(5, 0, 2))
+rt._3d.camera.forward = math3d.vec3(
+    math.sin(rt._3d.camera.rotation.x + math.pi),
+    0,
+    math.cos(rt._3d.camera.rotation.x + math.pi)
+)
+
+rt._3d.camera.up = math3d.vec3.cross(rt._3d.camera.right, rt._3d.camera.direction)
+
+local view_matrix = math3d.mat4()
+local model_matrix = math3d.mat4()
 
 function love.update(dt)
-    Camera.direction = Cpml.vec3(
-            math.cos(Camera.rotation.y) * math.sin(Camera.rotation.x),
-            math.sin(Camera.rotation.y),
-            math.cos(Camera.rotation.y) * math.cos(Camera.rotation.x)
-    )
 
-    Camera.right = Cpml.vec3(
-            math.sin(Camera.rotation.x - math.pi/2),
-            0,
-            math.cos(Camera.rotation.x - math.pi/2)
-    )
+    local movementVector = math3d.vec3()
+    local camera = rt._3d.camera
 
-    Camera.forward = Cpml.vec3(
-            math.sin(Camera.rotation.x + math.pi),
-            0,
-            math.cos(Camera.rotation.x + math.pi)
-    )
+    if love.keyboard.isDown("w") then
+        movementVector = movementVector - camera.forward
+    end
 
-    Camera.up = Cpml.vec3.cross(Camera.right, Camera.direction)
+    if love.keyboard.isDown("s") then
+        movementVector = movementVector + camera.forward
+    end
 
+    rt._3d.camera.position = rt._3d.camera.position + movementVector * 0.1
 
-    local movementVector = Cpml.vec3()
+    if love.keyboard.isDown("up") then
+        model_matrix:translate(model_matrix, math3d.vec3(0, 1, 0))
+    end
 
-    if love.keyboard.isDown("w") then movementVector = movementVector + Camera.forward end
-    if love.keyboard.isDown("s") then movementVector = movementVector - Camera.forward end
+    if love.keyboard.isDown("down") then
+        model_matrix:translate(model_matrix, math3d.vec3(0, -1, 0))
+    end
 
-    if love.keyboard.isDown("a") then movementVector = movementVector + Camera.right end
-    if love.keyboard.isDown("d") then movementVector = movementVector - Camera.right end
+    local rotation_offset = rt.degrees(0.5 * dt):as_radians();
+    if love.keyboard.isDown("left") then
+        camera.rotation.x = camera.rotation.x - rotation_offset
+        model_matrix:rotate(model_matrix, camera.rotation.x, math3d.vec3.unit_y)
+    end
+    if love.keyboard.isDown("right") then
+        camera.rotation.y = camera.rotation.y + rotation_offset
+        model_matrix:rotate(model_matrix, camera.rotation.y, math3d.vec3.unit_y)
+    end
 
-    if love.keyboard.isDown("space")  then movementVector.y = movementVector.y + 1 end
-    if love.keyboard.isDown("lshift") then movementVector.y = movementVector.y - 1 end
-
-
-    Camera.position = Camera.position + movementVector * 10 * dt
-
+    model_matrix:rotate(model_matrix, rt.degrees(0.1):as_radians(), math3d.vec3.unit_y)
 
 
-
+    view_matrix = view_matrix:identity()
+    view_matrix:translate(view_matrix, camera.position + camera.forward)
+    view_matrix:look_at(camera.position, math3d.vec3(0, 0, 0), camera.up)
 end
 
 function love.draw()
-    local ViewMatrix = ViewMatrix:identity()
+    
+rt._3d.shader:send("view_matrix",       "column", view_matrix)
+rt._3d.shader:send("projection_matrix", "column", math3d.mat4.from_perspective(100, love.graphics.getWidth() / love.graphics.getHeight(), 0.1, 1000))
 
-    ViewMatrix.look_at(ViewMatrix, Camera.position, Camera.position + Camera.direction, Camera.up)
-    ViewMatrix:translate(ViewMatrix, Camera.position)
-    --ViewMatrix:rotate   (ViewMatrix, Camera.rotation.y, Cpml.vec3.unit_x)
-    --ViewMatrix:rotate   (ViewMatrix, Camera.rotation.x, Cpml.vec3.unit_y)
+love.graphics.setShader(rt._3d.shader)
+love.graphics.setColor(1, 1, 1)
+love.graphics.setDepthMode("lequal", true)
+love.graphics.setCanvas(rt._3d.depth_buffer.canvas)
+love.graphics.clear(0, 0, 0, 0, true, 1)
+love.graphics.setMeshCullMode("none")
 
-    Shader:send("view_matrix",       "column", ViewMatrix)
-    Shader:send("projection_matrix", "column", PerspectiveMatrix)
+love.graphics.setPointSize(3)
 
-    love.graphics.setShader(Shader)
-    love.graphics.setColor(1, 1, 1)
-    love.graphics.setDepthMode("lequal", true)
-    love.graphics.setCanvas(DepthBuffer.canvas)
-    love.graphics.clear(0, 0, 0, 0, true, 1)
-    love.graphics.setMeshCullMode("back")
+rt._3d.shader:send("model_matrix", "column", model_matrix)
+love.graphics.draw(mesh)
 
-    Shader:send("model_matrix", "column", ModelMatrix_1)
-    love.graphics.draw(Mesh)
+love.graphics.setMeshCullMode("none")
+love.graphics.setShader()
+love.graphics.setDepthMode()
+love.graphics.setCanvas()
 
-    Shader:send("model_matrix", "column", ModelMatrix_2)
-    love.graphics.draw(Mesh)
+love.graphics.draw(rt._3d.depth_buffer.color)
 
-    love.graphics.setMeshCullMode("none")
-    love.graphics.setShader()
-    love.graphics.setDepthMode()
-    love.graphics.setCanvas()
-
-    love.graphics.draw(DepthBuffer.color)
 end
 
 function love.keypressed(key)
@@ -185,7 +182,7 @@ end
 
 function love.mousemoved(x, y, dx, dy)
     if love.mouse.getRelativeMode() then
-        local rotationVector = Cpml.vec2(-dx, dy)
-        Camera.rotation = Camera.rotation + rotationVector / 80
+        local rotationVector = math3d.vec2(-dx, dy)
+        rt._3d.camera.rotation = rt._3d.camera.rotation + rotationVector / 80
     end
 end

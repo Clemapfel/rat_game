@@ -20,6 +20,12 @@ rt.VertexAttribute = meta.new_enum({
     COLOR = "VertexColor"
 })
 
+rt.VertexFormat = {
+    {"VertexPosition", "float", 3},
+    {"VertexTexCoord","float", 2},
+    {"VertexColor", "float", 4},
+}
+
 --- @class rt.Vertex
 --- @param x Number in px
 --- @param y Number in px
@@ -40,23 +46,16 @@ end
 
 --- @class rt.VertexShape
 --- @param vararg rt.Vector2
-rt.VertexShape = meta.new_type("VertexShape", function(...)
-    local positions = {...}
+rt.VertexShape = meta.new_type("VertexShape", function(points)
     local vertices = {}
 
-    for _, pos in pairs(positions) do
-        table.insert(vertices, rt.Vertex(pos.x, pos.y, 0, 0, 0))
+    for _, pos in pairs(points) do
+        table.insert(vertices, rt.Vertex(pos[1], pos[2], pos[3], 0, 0))
     end
-
-    vertex_format = {
-        {rt.VertexAttribute.POSITION, "float", 3},
-        {rt.VertexAttribute.TEXTURE_COORDINATES, "float", 2},
-        {rt.VertexAttribute.COLOR, "float", 4}
-    }
 
     local out = meta.new(rt.VertexShape, {
         _native = love.graphics.newMesh(
-            vertex_format,
+            rt.VertexFormat,
             vertices,
             rt.MeshDrawMode.TRIANGLE_FAN,
             rt.SpriteBatchUsage.DYNAMIC
@@ -78,7 +77,6 @@ end
 --- @param rgba rt.RGBA
 function rt.VertexShape:set_vertex_color(i, rgba)
     if meta.is_hsva(rgba) then rgba = rt.hsva_to_rgba(rgba) end
-
     self._native:setVertexAttribute(i, 3, rgba.r, rgba.g, rgba.b, rgba.a)
 end
 
@@ -188,12 +186,12 @@ end
 --- @param width Number in px
 --- @param height Number in px
 function rt.VertexRectangle(x, y, width, height)
-    local out = rt.VertexShape(
-        rt.Vector2(x, y),
-        rt.Vector2(x + width, y),
-        rt.Vector2(x + width, y + height),
-        rt.Vector2(x, y + height)
-    )
+    local out = rt.VertexShape({
+        { x, y, 0 },
+        { x + width, y, 0 },
+        { x + width, y + height, 0 },
+        { x, y + height }
+    })
     return out
 end
 
