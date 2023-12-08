@@ -9,7 +9,7 @@ rt.SpriteBatchUsage = meta.new_enum({
 rt.MeshDrawMode = meta.new_enum({
     TRIANGLE_FAN = "fan",
     TRIANGLE_STRIP = "strip",
-    TRIANGLE_LIST = "triangles",
+    TRIANGLES = "triangles",
     POINTS = "points"
 })
 
