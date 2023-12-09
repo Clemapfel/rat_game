@@ -1,188 +1,63 @@
 require "include"
 
-rt._3d = {}
+function connect_emmy_lua_debugger()
+    -- entry point for JetBrains IDE debugger
+    io.stdout:setvbuf("no")
+    package.cpath = package.cpath .. ';/home/clem/.local/share/JetBrains/CLion2023.2/EmmyLua/debugger/emmy/linux/?.so'
+    local dbg = require('emmy_core')
+    dbg.tcpConnect('localhost', 8172)
 
-rt._3d.shader = love.graphics.newShader("shader3d.glsl")
-
-rt._3d.depth_buffer = {
-    color = love.graphics.newCanvas(love.graphics.getWidth(), love.graphics.getHeight(), {format = "rgba8"}),
-    depth = love.graphics.newCanvas(love.graphics.getWidth(), love.graphics.getHeight(), {format = "depth24"}),
-}
-rt._3d.depth_buffer.canvas = {rt._3d.depth_buffer.color, depthstencil = rt._3d.depth_buffer.depth}
-
-mesh = nil
-function set_polyhedron(n_steps)
-
-    n_steps = clamp(1, n_steps)
-    println(n_steps)
-
-    local vertices = {}
-    local lower, upper = rt.degrees(-180):as_radians(), rt.degrees(180):as_radians()
-    local step = 2 * math.pi / n_steps
-    local sum = math3d.vec3(0, 0, 0)
-
-    for x_i = 1, n_steps do
-        for z_i = 1, n_steps do
-            local x = 1 * x_i * 2 * rt.degrees(180):as_radians() / n_steps
-            local z = -1 * z_i * 2 * rt.degrees(180):as_radians() / n_steps
-
-            local point = math3d.vec3.unit_y
-            local rotation =
-                math3d.quat.from_angle_axis(z, math3d.vec3.unit_z) *
-                math3d.quat.from_angle_axis(x, math3d.vec3.unit_x)
-
-            point = rotation * point
-            table.insert(vertices, {
-                point.x,
-                point.y,
-                point.z
-            })
-        end
-    end
-
-    local vertex_order = {}
-    for i = 1, sizeof(vertices) - 2 do
-        table.insert(vertex_order, i)
-        table.insert(vertex_order, i + 2)
-        table.insert(vertex_order, i + 1)
-    end
-
-    mesh = rt.VertexShape(vertices)
-    mesh:set_draw_mode(rt.MeshDrawMode.TRIANGLE_STRIP)
-    mesh._native:setVertexMap(vertex_order)
-    local n = mesh:get_n_vertices()
-    for i = 1, n do
-        local x, y, z = mesh:get_vertex_position(i)
-        x = x - sum.x / n
-        y = y - sum.y / n
-        z = z - sum.z / n
-        mesh:set_vertex_position(i, x, y, z)
-        mesh:set_vertex_color(i, rt.HSVA(i / n, 1, 1, 1));
+    love.errorhandler = function(error_message)
+        dbg.breakHere()
+        return nil -- exit
     end
 end
-set_polyhedron(3)
+try_catch(connect_emmy_lua_debugger)
 
-rt._3d.camera = {
-    position = math3d.vec3(0, 0, 0),
-    rotation = math3d.vec2(0, 0),
+-- ###########################
 
-    direction = nil,
-    right     = nil,
-    up        = nil,
-}
+rt.add_scene("debug")
 
-rt._3d.camera.direction = math3d.vec3(
-    math.cos(rt._3d.camera.rotation.y) * math.sin(rt._3d.camera.rotation.x),
-    math.sin(rt._3d.camera.rotation.y),
-    math.cos(rt._3d.camera.rotation.y) * math.cos(rt._3d.camera.rotation.x)
-)
+equipment = bt.Equipment("TEST_EQUIPMENT")
+status_inf = bt.StatusAilment("TEST_STATUS_INFINITE")
+status_temp = bt.StatusAilment("TEST_STATUS_TEMPORARY")
 
-rt._3d.camera.right = math3d.vec3(
-    math.sin(rt._3d.camera.rotation.x - math.pi/2),
-    0,
-    math.cos(rt._3d.camera.rotation.x - math.pi/2)
-)
+entity = bt.Entity("TEST_ENTITY")
 
-rt._3d.camera.forward = math3d.vec3(
-    math.sin(rt._3d.camera.rotation.x + math.pi),
-    0,
-    math.cos(rt._3d.camera.rotation.x + math.pi)
-)
+entity_tooltip = bt.EntityTooltip(entity)
+rt.current_scene:set_child(entity_tooltip)
 
-rt._3d.camera.up = math3d.vec3.cross(rt._3d.camera.right, rt._3d.camera.direction)
-
-local view_matrix = math3d.mat4()
-local model_matrix = math3d.mat4()
-
-poly_n = 3
-wireframe = false
-love.keypressed = function(which)
-    if which == "x" then
-        poly_n = poly_n - 1
-        set_polyhedron(poly_n)
+local n = 1
+input = rt.add_input_controller(rt.current_scene.window)
+input:signal_connect("pressed", function(self, which)
+    if which == rt.InputButton.A then
+        entity_tooltip._tooltip:set_show_sprite(not entity_tooltip._tooltip:get_show_sprite())
+    elseif which == rt.InputButton.RIGHT then
+        n = n + 1
+        bar:set_n_filled(n)
+    elseif which == rt.InputButton.LEFT then
+        n = n - 1
+        bar:set_n_filled(n)
     end
+end)
 
-    if which == "y" then
-        poly_n = poly_n + 1
-        set_polyhedron(poly_n)
-    end
+bar = rt.NotchBar(10)
+rt.current_scene:set_child(bar)
 
-    if which == "b" then
-        wireframe = not wireframe
-        stlove.graphics.setWireframe(wireframe)
-    end
+-- ###########################
+
+function love.load()
+    rt.current_scene:realize()
 end
 
-function love.update(dt)
-
-    local movementVector = math3d.vec3()
-    local camera = rt._3d.camera
-
-    if love.keyboard.isDown("w") then
-        movementVector = movementVector - camera.forward
-    end
-
-    if love.keyboard.isDown("s") then
-        movementVector = movementVector + camera.forward
-    end
-
-    rt._3d.camera.position = rt._3d.camera.position + movementVector * 0.1
-
-    if love.keyboard.isDown("up") then
-        model_matrix:translate(model_matrix, math3d.vec3(0, 1, 0))
-    end
-
-    if love.keyboard.isDown("down") then
-        model_matrix:translate(model_matrix, math3d.vec3(0, -1, 0))
-    end
-
-    local rotation_offset = rt.degrees(0.5 * dt):as_radians();
-    if love.keyboard.isDown("left") then
-        camera.rotation.x = camera.rotation.x - rotation_offset
-        model_matrix:rotate(model_matrix, camera.rotation.x, math3d.vec3.unit_y)
-    end
-    if love.keyboard.isDown("right") then
-        camera.rotation.y = camera.rotation.y + rotation_offset
-        model_matrix:rotate(model_matrix, camera.rotation.y, math3d.vec3.unit_y)
-    end
-
-    model_matrix:rotate(model_matrix, rt.degrees(0.5):as_radians(), math3d.vec3.unit_y)
-
-    view_matrix = view_matrix:identity()
-    view_matrix:translate(view_matrix, camera.position + camera.forward)
-    view_matrix:look_at(camera.position, math3d.vec3(0, 0, 0), camera.up)
+function love.update()
+    rt.current_scene:update(love.timer.getDelta())
 end
 
 function love.draw()
-    
-rt._3d.shader:send("view_matrix",       "column", view_matrix)
-rt._3d.shader:send("projection_matrix", "column", math3d.mat4.from_perspective(100, love.graphics.getWidth() / love.graphics.getHeight(), 0.1, 1000))
-
-love.graphics.setShader(rt._3d.shader)
-love.graphics.setColor(1, 1, 1)
-love.graphics.setDepthMode("lequal", true)
-love.graphics.setCanvas(rt._3d.depth_buffer.canvas)
-love.graphics.clear(0, 0, 0, 0, true, 1)
-love.graphics.setMeshCullMode("none")
-
-love.graphics.setPointSize(3)
-
-rt._3d.shader:send("model_matrix", "column", model_matrix)
-
-if wireframe then
-    --rt._3d.shader:send("view_matrix",       "column", math3d.mat4():identity())
-    --rt._3d.shader:send("projection_matrix", "column", math3d.mat4():identity())
-    rt._3d.shader:send("model_matrix", "column", math3d.mat4():identity())
+    rt.current_scene:draw()
 end
 
-mesh:draw()
-
-
-love.graphics.setMeshCullMode("none")
-love.graphics.setShader()
-love.graphics.setDepthMode()
-love.graphics.setCanvas()
-
-love.graphics.draw(rt._3d.depth_buffer.color)
-
+function love.quit()
+    --rt.Palette:export("palette.png")
 end

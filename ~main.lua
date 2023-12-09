@@ -185,10 +185,6 @@ end
 
 --- @brief startup
 function love.load()
-    love.window.setMode(love.graphics.getWidth(), love.graphics.getHeight(), {
-        resizable = true
-    })
-    love.window.setTitle("rat_game")
 
     --rt.current_scene:realize()
 end

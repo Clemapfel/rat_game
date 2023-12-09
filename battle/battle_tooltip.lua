@@ -27,7 +27,6 @@ bt.BattleTooltip = meta.new_type("BattleTooltip", function(name, status, descrip
         _main = rt.BoxLayout(rt.Orientation.VERTICAL)
     }, rt.Widget, rt.Drawable)
 
-
     out._name_label:set_expand_horizontally(true)
 
     out._sprite_backdrop:set_color(rt.Palette.GREY_5)
@@ -99,14 +98,10 @@ end
 
 --- @brief
 function bt.BattleTooltip:set_show_sprite(b)
-    --if b ~= self._show_sprite then
-        self._show_sprite = b
-        if self._show_sprite then
-            self._name_and_sprite_box:set_children({self._sprite_frame, self._name_label})
-        else
-            self._name_and_sprite_box:set_children({self._name_label})
-        end
-    --end
+    self._name_and_sprite_box:set_children({
+        ternary(b, self._sprite_frame, nil),
+        self._name_label
+    })
 end
 
 --- @brief

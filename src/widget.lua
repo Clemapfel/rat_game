@@ -90,6 +90,8 @@ function rt.Widget:reformat()
     end
 
     local min_w, min_h = self:measure()
+    min_w = clamp(min_w, 1)
+    min_h = clamp(min_h, 1)
 
     local x, width = rt.Widget._calculate_size(self,
         min_w,

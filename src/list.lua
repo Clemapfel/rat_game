@@ -13,6 +13,10 @@ rt.List = meta.new_type("List", function()
         local function iterator(_, state)
             if meta.is_nil(state) or meta.is_nil(state.node) then return end
             local value = state.node.value
+
+            if state.node == state.node.next then
+                rt.error("In ListView:__pairs: nfinite loop detected")
+            end
             state.node = state.node.next
             return state, value
         end
@@ -45,10 +49,11 @@ function rt.List:push_front(element)
 
     if self._n_elements == 0 then
         self._last_node = to_insert
+        self._first_node = to_insert
+    else
+        self._first_node.previous = to_insert
+        self._first_node = to_insert
     end
-
-    self._first_node.previous = to_insert
-    self._first_node = to_insert
     self._n_elements = self._n_elements + 1
     table.insert(self._nodes, to_insert)
 end
@@ -66,10 +71,11 @@ function rt.List:push_back(element)
     if self._n_elements == 0 then
         self._first_node = to_insert
         self._last_node = to_insert
+    else
+        self._last_node.next = to_insert
+        self._last_node = to_insert
     end
 
-    self._last_node.next = to_insert
-    self._last_node = to_insert
     self._n_elements = self._n_elements + 1
     table.insert(self._nodes, to_insert)
 end
@@ -214,7 +220,6 @@ end
 
 --- @brief remove all elements in queue
 function rt.List:clear()
-
     self._nodes = {}
     self._first_node = nil
     self._last_node = nil
@@ -224,8 +229,12 @@ end
 --- @brief get number of elements, O(1)
 --- @return Number
 function rt.List:size()
-
     return self._n_elements
+end
+
+--- @brief
+function rt.List:is_empty()
+    return self._n_elements == 0
 end
 
 --- @brief [internal] test list

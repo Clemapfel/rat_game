@@ -74,8 +74,6 @@ end
 --- @class rt.NotchBar
 rt.NotchBar = meta.new_type("NotchBar", function(n_notches)
     if meta.is_nil(n_notches) then n_notches = 1 end
-
-
     local out = meta.new(rt.NotchBar, {
         _notches = rt.List(),
         _left_indicator = rt.Circle(0, 0, 1, 3),
@@ -146,9 +144,6 @@ end
 
 --- @brief fill all notches up to position
 function rt.NotchBar:set_n_filled(n)
-
-
-
     n = clamp(n, 0, self._notches:size())
 
     local i = 1
@@ -162,11 +157,10 @@ function rt.NotchBar:set_n_filled(n)
     end
 end
 
+
 --- @brief fill notch at position
 --- @param index Number or 0 for none filled
 function rt.NotchBar:set_filled(index)
-
-
     index = clamp(index, 0, self._notches:size() - 1)
 
     local i = 1
@@ -182,8 +176,6 @@ end
 
 --- @brief
 function rt.NotchBar:set_fill_color(color)
-
-
     if meta.is_hsva(color) then
         color = rt.hsva_to_rgba(color)
     end

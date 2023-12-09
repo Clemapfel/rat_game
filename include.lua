@@ -7,10 +7,22 @@ rt = {}
 rt.test = {}
 rt.settings = {}
 
+setmetatable(rt, {
+    __index = function(self, key)
+        rt.error("In rt.__index: key `" .. key .. "` does not exist")
+    end
+})
+
 rt.battle = {}
 bt = rt.battle
 
-math3d = require("cpml")
+setmetatable(bt, {
+    __index = function(self, key)
+        rt.error("In bt.__index: key `" .. key .. "` does not exist")
+    end
+})
+
+math3d = require("submodules/cpml")
 
 require "common"
 require "profiler"

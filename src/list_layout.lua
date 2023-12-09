@@ -91,6 +91,9 @@ end
 
 --- @overload rt.Widget.measure
 function rt.ListLayout:measure()
+
+    if self._children:is_empty() then return rt.Widget.measure(self) end
+
     local w_sum = 0
     local w_max = NEGATIVE_INFINITY
     local h_sum = 0
@@ -113,30 +116,40 @@ end
 
 --- @overload rt.Widget.realize
 function rt.ListLayout:realize()
-
-    self._realized = true
     for _, child in pairs(self._children) do
         child:realize()
     end
+    rt.Widget.realize(self)
+end
+
+--- @brief
+function rt.ListLayout:clear()
+    for child in pairs(self._children) do
+        if meta.is_widget(child) then
+            child:set_parent(nil)
+        end
+    end
+    self._children:clear()
+    self:reformat()
 end
 
 --- @brief replace all children
 --- @param children Table<rt.Widget>
 function rt.ListLayout:set_children(children)
 
-    for child in pairs(self._children) do
-        println("calld: " .. serialize(child))
+    for _, child in pairs(self._children) do
         if meta.is_widget(child) then
             child:set_parent(nil)
         end
     end
-
     self._children:clear()
+
     for _, child in pairs(children) do
         child:set_parent(self)
         self._children:push_back(child)
         if self:get_is_realized() then child:realize() end
     end
+
     self:reformat()
 end
 
@@ -189,9 +202,6 @@ end
 --- @param child rt.Widget
 function rt.ListLayout:insert(index, child)
 
-
-
-
     child:set_parent(self)
     self._children:insert(index, child)
     if self:get_is_realized() then
@@ -204,8 +214,6 @@ end
 --- @brief remove child at position
 --- @param index Number 1-based
 function rt.ListLayout:erase(index)
-
-
 
     local child = self._children:erase(index)
     child:set_parent(nil)

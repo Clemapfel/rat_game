@@ -34,9 +34,13 @@ end
 
 --- @overload rt.Widget.realize
 function rt.Scene:realize()
-
     self.window:realize()
     self.window:fit_into(rt.AABB(0, 0, love.graphics.getWidth(), love.graphics.getHeight()))
+
+    love.window.setMode(love.graphics.getWidth(), love.graphics.getHeight(), {
+        resizable = true
+    })
+    love.window.setTitle("rat_game")
 end
 
 --- @brief update all regular handlers
@@ -90,9 +94,6 @@ env = {}
 --- @brief
 function rt.add_scene(name, scene)
     if meta.is_nil(scene) then scene = rt.Scene() end
-
-
-
     if not meta.is_nil(rt.scenes[name]) then
         rt.error("In rt.add_scene: scene with ID `" .. name "` already exists")
     end
