@@ -117,3 +117,18 @@ require "battle/status_tooltip"
 
 require "scene"
 -- require "test
+
+
+function connect_emmy_lua_debugger()
+    -- entry point for JetBrains IDE debugger
+    package.cpath = package.cpath .. ';/home/clem/.local/share/JetBrains/CLion2023.2/EmmyLua/debugger/emmy/linux/?.so'
+    local dbg = require('emmy_core')
+    dbg.tcpConnect('localhost', 8172)
+
+    love.errorhandler = function(msg)
+        dbg.breakHere()
+        return nil -- exit
+    end
+end
+try_catch(connect_emmy_lua_debugger)
+io.stdout:setvbuf("no") -- makes it so love2d error message is printed to console immediately

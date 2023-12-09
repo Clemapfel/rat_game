@@ -135,7 +135,6 @@ end
 --- @return rt.RGBA
 function rt.hsva_to_rgba(hsva)
 
-
     --- cf https://github.com/Clemapfel/mousetrap/blob/main/src/color.cpp#L151
     local h = hsva.h * 360
     local s = hsva.s
@@ -158,11 +157,11 @@ function rt.hsva_to_rgba(hsva)
         r, g, b  = 0, x, c
     elseif (4 <= h_2 and h_2 < 5) then
         r, g, b  = x, 0, c
-    elseif (5 <= h_2 and h_2 <= 6) then
+    else
         r, g, b  = c, 0, x
     end
     
-    local  m = v - c
+    local m = v - c
 
     r = r + m
     g = g + m

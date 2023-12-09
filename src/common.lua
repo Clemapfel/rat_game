@@ -425,3 +425,13 @@ end
 function math.round(i)
     return math.floor(i + 0.5)
 end
+
+--- @brief get minimum and maximu
+function table.min_max(t)
+    local min, max = POSITIVE_INFINITY, NEGATIVE_INFINITY
+    for key, value in pairs(t) do
+        if value < min then min = value end
+        if value > max then max = value end
+    end
+    return min, max
+end
