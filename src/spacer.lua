@@ -9,7 +9,6 @@ rt.Spacer = meta.new_type("Spacer", function(color)
         color = rt.hsva_to_rgba(color)
     end
 
-
     local out = meta.new(rt.Spacer, {
         _shape = rt.Rectangle(0, 0, 1, 1),
         _color = color
@@ -21,7 +20,6 @@ end)
 
 --- @overload rt.Drawable.draw
 function rt.Spacer:draw()
-
     if not self:get_is_visible() then return end
 
     self._shape:draw()
@@ -29,8 +27,6 @@ end
 
 --- @overload rt.Widget.size_allocate
 function rt.Spacer:size_allocate(x, y, width, height)
-
-
     local w, h = self:get_minimum_size()
     if self:get_expand_horizontally() then
         w = width - self:get_margin_left() - self:get_margin_right()
@@ -48,12 +44,10 @@ end
 --- @param color rt.RGBA
 function rt.Spacer:set_color(color)
 
-
     local rgba = color
     if meta.is_hsva(color) then
         rgba = rt.hsav_to_rgba(color)
     end
-
 
     self._shape:set_color(rgba)
 end

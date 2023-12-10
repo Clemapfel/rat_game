@@ -62,49 +62,40 @@ end)
 --- @brief set scale mode
 --- @param mode rt.TextureScaleMode
 function rt.Texture:set_scale_mode(mode)
-
-
     self._native:setFilter(mode, mode)
 end
 
 --- @brief get scale mode
 --- @return rt.TextureScaleMode
 function rt.Texture:get_scale_mode()
-
     return self._native:getFilter()
 end
 
 --- @brief set wrap mode
 --- @param mode rt.TextureWrapMode
 function rt.Texture:set_wrap_mode(mode)
-
-
     self._native:setWrap(mode, mode)
 end
 
 --- @brief get wrap mode
 --- @return rt.TextureWrapMode
 function rt.Texture:get_wrap_mode()
-
     return self._native:getWrap()
 end
 
 --- @brief get resolution
 --- @return (Number, Number)
 function rt.Texture:get_size()
-
     return self._native:getDimension()
 end
 
 --- @brief bind texture as render target, needs to be unbound manually later
 function rt.RenderTexture:bind_as_render_target()
-
     love.graphics.setCanvas(self._native)
 end
 
 --- @brief unbind texture
 function rt.RenderTexture:unbind_as_render_target()
-
     love.graphics.setCanvas()
 end
 

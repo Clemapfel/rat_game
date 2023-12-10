@@ -94,6 +94,17 @@ function set_polyhedron(n_steps)
 end
 set_polyhedron(3)
 
+local w, h = love.graphics.getWidth(), love.graphics.getHeight()
+render_texture = rt.RenderTexture(w, h)
+
+local canvas_h = 2
+local canvas_w = w / h * canvas_h
+canvas = rt.VertexRectangle(0 - 0.5 * canvas_w, 0 - 0.5 * canvas_h, canvas_w, canvas_h)
+canvas:set_texture(render_texture)
+
+point = rt.VertexShape({{0, 0, 0}})
+point:set_draw_mode(rt.MeshDrawMode.POINTS)
+
 rt.add_scene("debug")
 
 equipment = bt.Equipment("TEST_EQUIPMENT")
@@ -134,12 +145,10 @@ input:signal_connect("pressed", function(self, which)
             shape:set_vertex_position(i, x, y, z - sprite_offset)
         end
     end
-
-    println(sprite_offset)
 end)
 
 rt._3d.camera = {
-    position = math3d.vec3(0, 0, 0),
+    position = math3d.vec3(0, 0, 0.84),
     rotation = math3d.vec2(0, 0),
 
     direction = nil,
@@ -172,6 +181,7 @@ local model_matrix = math3d.mat4()
 
 poly_n = 3
 wireframe = false
+use_3d = true
 love.keypressed = function(which)
     if which == "x" then
         poly_n = poly_n - 1
@@ -184,8 +194,7 @@ love.keypressed = function(which)
     end
 
     if which == "b" then
-        wireframe = not wireframe
-        love.graphics.setWireframe(wireframe)
+        use_3d = not use_3d
     end
 
     local shape = sprite._shape
@@ -203,8 +212,6 @@ love.keypressed = function(which)
             shape:set_vertex_position(i, x, y, z - sprite_offset)
         end
     end
-
-    println(sprite_offset)
 end
 
 function love.update(dt)
@@ -220,7 +227,21 @@ function love.update(dt)
         movementVector = movementVector + camera.forward
     end
 
-    rt._3d.camera.position = rt._3d.camera.position + movementVector * 0.1
+    if love.keyboard.isDown("a") then
+        local translate = math3d.mat4()
+        translate:translate(translate, math3d.vec3(0.01, 0, 0))
+        camera.position = translate * camera.position
+    end
+
+    if love.keyboard.isDown("d") then
+        local translate = math3d.mat4()
+        translate:translate(translate, math3d.vec3(0.01, 0, 0))
+        camera.position = translate * camera.position
+    end
+
+    rt._3d.camera.position = rt._3d.camera.position + movementVector * 0.01
+    local pos = rt._3d.camera.position
+    println(pos.x, " ", pos.y, " ", pos.z)
 
     if love.keyboard.isDown("up") then
         model_matrix:translate(model_matrix, math3d.vec3(0, 1, 0))
@@ -244,35 +265,62 @@ function love.update(dt)
 
     view_matrix = view_matrix:identity()
     view_matrix:translate(view_matrix, camera.position + camera.forward)
-    view_matrix:look_at(camera.position, math3d.vec3(0, 0, 0), camera.up)
+    view_matrix:look_at(camera.position, camera.position + camera.forward, camera.up)
 end
 
+sum = 0
 function love.draw()
 
-rt._3d.shader:send("view_matrix",       "column", view_matrix)
-rt._3d.shader:send("projection_matrix", "column", math3d.mat4.from_perspective(100, love.graphics.getWidth() / love.graphics.getHeight(), 0.1, 1000))
+    sum = sum + love.timer.getDelta()
+    local purple = rt.Palette.PURPLE_2
 
-love.graphics.setShader(rt._3d.shader)
-love.graphics.setColor(1, 1, 1)
-love.graphics.setDepthMode("lequal", true)
-love.graphics.setCanvas(rt._3d.depth_buffer.canvas)
-love.graphics.clear(0, 0, 0, 0, true, 1)
-love.graphics.setMeshCullMode("none")
-love.graphics.setPointSize(3)
+    function draw_scene()
+        love.graphics.setLineWidth(10)
+        love.graphics.rectangle("line", 0, 0, love.graphics.getWidth(), love.graphics.getHeight())
+        love.graphics.print("text abada", 200, 200)
+    end
 
-rt._3d.shader:send("model_matrix", "column", model_matrix)
+    if use_3d then
+        render_texture:bind_as_render_target()
+        love.graphics.clear(purple.r, purple.g, purple.b, 1)
+        draw_scene()
+        render_texture:unbind_as_render_target()
 
-love.graphics.setShader(rt._3d.shader)
-sprite._shape:draw()
---rt.current_scene:draw()
-mesh:draw()
+        rt._3d.shader:send("view_matrix",       "column", view_matrix)
+        rt._3d.shader:send("projection_matrix", "column", math3d.mat4.from_perspective(100, love.graphics.getWidth() / love.graphics.getHeight(), 0.1, 1000))
 
-love.graphics.setMeshCullMode("none")
-love.graphics.setShader()
-love.graphics.setDepthMode()
-love.graphics.setCanvas()
+        love.graphics.reset()
+        love.graphics.setShader(rt._3d.shader)
+        love.graphics.setDepthMode("lequal", true)
+        love.graphics.setCanvas(rt._3d.depth_buffer.canvas)
+        love.graphics.clear(0, 0, 0, 0, true, 1)
+        love.graphics.setMeshCullMode("none")
+        love.graphics.setPointSize(3)
 
+        rt._3d.shader:send("model_matrix", "column", model_matrix)
 
-love.graphics.draw(rt._3d.depth_buffer.color)
+        love.graphics.setShader(rt._3d.shader)
+        love.graphics.clear(purple.r, purple.g, purple.b, 1)
+        sprite._shape:draw()
+        --rt.current_scene:draw()
+
+        if not meta.is_nil(mesh) then
+            mesh:draw()
+        end
+
+        rt._3d.shader:send("model_matrix", "column", math3d.mat4.identity())
+        canvas:draw()
+        point:set_color(rt.RGBA(1, 0, 1, 1))
+        point:draw()
+
+        love.graphics.setMeshCullMode("none")
+        love.graphics.setShader()
+        love.graphics.setDepthMode()
+        love.graphics.setCanvas()
+
+        love.graphics.draw(rt._3d.depth_buffer.color)
+    else
+        draw_scene()
+    end
 
 end
