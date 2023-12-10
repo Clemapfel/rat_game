@@ -17,6 +17,7 @@ function love.resize(width, height)
     for _, window in pairs(rt.WindowHandler._components) do
         window:fit_into(rt.AABB(0, 0, width, height))
     end
+    rt.Renderer:set_resolution(width, height)
 end
 
 --- @brief window looses focus
