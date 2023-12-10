@@ -13,7 +13,7 @@ for _, action in pairs({move, consumable, intrinsic}) do
 end
 
 selection_menu = bt.ActionSelectionMenu(entity)
-rt.current_scene:set_child(selection_menu)
+rt.current_scene:set_child(rt.Label("TEST 0123456789"))
 
 input = rt.add_input_controller(rt.current_scene.window)
 input:signal_connect("pressed", function(self, which)
@@ -45,14 +45,9 @@ local mesh = love.graphics.newMesh(rt.VertexFormat, {
 
 function love.draw()
 
-    rt.Renderer:draw_3d(function()
-        love.graphics.clear(1, 0, 1, 1)
-        for _, sprite in pairs(sprites) do
-            sprite:draw()
-        end
-    end)
-    rt.Renderer:draw()
-
+    love.graphics.clear(1, 0, 1, 1)
+    rt.current_scene:draw()
+    
     -- scene rendering
     --rt.current_scene:draw()
 
