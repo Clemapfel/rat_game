@@ -5,6 +5,13 @@ bt.TargetingMode = meta.new_enum({
     STAGE = "STAGE"
 })
 
+--- @class bt.ActionType
+bt.ActionType = meta.new_enum({
+    MOVE = "MOVE",
+    CONSUMABLE = "CONSUMABLE",
+    INTRINSIC = "INTRINSIC"
+})
+
 --- @class bt.Action
 --- @brief immutable config for battle actions
 bt.Action = meta.new_type("Action", function(id)
@@ -24,20 +31,21 @@ bt.Action = meta.new_type("Action", function(id)
         thumbnail = {}
     })
 
-    local is_consumable = config.is_consumable
-    if not meta.is_nil(is_consumable) then
-
-        out.is_consumable = is_consumable
-    end
+    local type = config.type
+    meta.assert_enum(type, bt.ActionType)
+    out.type = type
 
     local max_n_uses = config.max_n_uses
     if not meta.is_nil(max_n_uses) then
-
+        meta.assert_number(max_n_uses)
         if max_n_uses <= 0 then
             rt.error("In Action(\"" .. id .. "\"): value `" .. tostring(max_n_uses) .. "` for field `max_n_uses` is out of range")
         end
         out.max_n_uses = max_n_uses
+    else
+        out.max_n_uses = POSITIVE_INFINITY
     end
+
 
     local targeting_mode = config.targeting_mode
     if not meta.is_nil(targeting_mode) then
@@ -94,7 +102,7 @@ bt.Action.can_target_self = true
 bt.Action.max_n_uses = POSITIVE_INFINITY
 
 --- whether an actions stacks can be replenished
-bt.Action.is_consumable = false
+bt.Action.type = "ERROR_TYPE"
 
 -- cleartext name
 bt.Action.name = "ERROR_ACTION"

@@ -116,6 +116,8 @@ require "battle/action_list_item"
 require "battle/entity_tooltip"
 require "battle/status_tooltip"
 
+require "battle/action_selection_menu"
+
 require "scene"
 -- require "test
 

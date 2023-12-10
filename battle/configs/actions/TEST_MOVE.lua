@@ -1,10 +1,10 @@
 return {
     name = "Test Move",
-    effect_text = "Deals damage to target",
-    verbose_effect_text = "Deal damage to single target, this effect text is verbose and has a lot more characters",
+    effect_text = "This is a move used for testing",
+    verbose_effect_text = "moves have a set number of uses that can be replenished",
     flavor_text = "Truly useless",
 
-    is_consumable = false,
+    type = "MOVE",
     max_n_uses = 14,
 
     targeting_mode = bt.TargetingMode.SINGLE,

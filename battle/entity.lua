@@ -66,7 +66,7 @@ bt.Entity.speed_ev = 0
 bt.Entity.speed_level = 0
 
 -- moves
-bt.Entity.moveset = {}
+bt.Entity.moveset = {}                -- bt.Action -> n_uses
 bt.Entity.n_move_slots = POSITIVE_INFINITY
 
 -- equipment
@@ -147,4 +147,9 @@ function bt.Entity:_get_status_ailment_elapsed(status)
         rt.error("In bt.Entity:_get_status_ailmend_elapsed: entity is not afflicated by status `" .. status.id .. "`")
     end
     return out
+end
+
+--- @brief add move to moveset
+function bt.Entity:add_action(action)
+    entity.moveset[action] = action.max_n_use
 end
