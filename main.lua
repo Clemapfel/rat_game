@@ -6,11 +6,19 @@ local equipment = bt.Equipment("TEST_EQUIPMENT")
 local tooltip = bt.EquipmentTooltip(equipment)
 rt.current_scene:set_child(tooltip)
 
-draw_2d = true
 input = rt.add_input_controller(rt.current_scene.window)
 input:signal_connect("pressed", function(self, which)
+
     local speed = 0.1
-    if which == rt.InputButton.UP then
+    if which == rt.InputButton.A then
+
+    elseif which == rt.InputButton.B then
+
+    elseif which == rt.InputButton.X then
+
+    elseif which == rt.InputButton.Y then
+
+    elseif which == rt.InputButton.UP then
         rt.Renderer:move_camera(0, speed, 0)
     elseif which == rt.InputButton.DOWN then
         rt.Renderer:move_camera(0, -speed, 0)
@@ -22,8 +30,6 @@ input:signal_connect("pressed", function(self, which)
         rt.Renderer:move_camera(0, 0, speed)
     elseif which == rt.InputButton.L then
         rt.Renderer:move_camera(0, 0, -speed)
-    elseif which == rt.InputButton.X then
-        draw_2d = not draw_2d
     end
 
     if which == rt.InputButton.A then
@@ -36,15 +42,10 @@ function love.load()
 end
 
 function love.draw()
+
     -- 3d rendering
-    rt.Renderer:draw_2d(function()
-        rt.current_scene:draw()
-    end)
-    rt.Renderer:draw_3d(function()
-        --mesh:draw()
-    end)
-    rt.Renderer:draw()
+    rt.test.renderer()
 
     -- scene rendering
-    --rt.current_scene:draw()
+    rt.current_scene:draw()
 end

@@ -42,15 +42,19 @@ rt.Renderer._2d_canvas = (function()
     return out
 end)()
 
-local w, h = love.graphics.getWidth(), love.graphics.getHeight()
-local canvas_h = 2
-local canvas_w = w / h * canvas_h
-rt.Renderer._2d_shape = rt.VertexRectangle(0 - 0.5 * canvas_w, 0 - 0.5 * canvas_h, canvas_w, canvas_h)
+
+rt.Renderer._2d_shape = (function()
+    local w, h = love.graphics.getWidth(), love.graphics.getHeight()
+    local canvas_h = 1
+    local canvas_w = w / h * canvas_h
+    return rt.VertexRectangle(0 - 0.5 * canvas_w, 0 - 0.5 * canvas_h, canvas_w, canvas_h)
+end)()
+
 rt.Renderer._2d_shape._native:setTexture(rt.Renderer._2d_canvas)
 
 -- camera
 rt.Renderer.camera = {
-    position = math3d.vec3(0, 0, 0.838),
+    position = math3d.vec3(0, 0, 0.424), -- distance what is the expression for this value?
     rotation = math3d.vec2(0, 0),
 
     direction = nil,
@@ -200,7 +204,6 @@ end
 function rt.test.renderer()
 
     function polyhedron(n_steps)
-
         n_steps = clamp(1, n_steps)
 
         local vertices = {}
@@ -260,15 +263,16 @@ function rt.test.renderer()
         end
         return mesh
     end
-    mesh = polyhedron(3)
 
+
+    if meta.is_nil(mesh) then
+        mesh = polyhedron(3)
+    end
 
     rt.Renderer:draw_2d(function()
-        love.graphics.paste(300, 400, "TESTETS")
     end)
     rt.Renderer:draw_3d(function()
         mesh:draw()
     end)
     rt.Renderer:draw()
-
 end
