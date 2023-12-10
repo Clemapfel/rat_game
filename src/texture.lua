@@ -49,7 +49,7 @@ end)
 --- @class rt.RenderTexture
 --- @param width Number
 --- @param height Number
-rt.RenderTexture = meta.new_type("RenderTexture", function(width, height)
+rt.RenderTexture = meta.new_type("RenderTexture", function(width, height, stencil)
 
     local out = meta.new(rt.RenderTexture, {
         _native = love.graphics.newCanvas(width, height)

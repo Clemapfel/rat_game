@@ -53,7 +53,6 @@ end
 
 --- @brief remove child
 function rt.WindowLayout:remove_child()
-
     if not meta.is_nil(self._child) then
         self._child:set_parent(nil)
         self._child = nil
@@ -62,7 +61,6 @@ end
 
 --- @overload rt.Drawable.draw
 function rt.WindowLayout:draw()
-
     if self:get_is_visible() and meta.is_widget(self._child) then
         self._child:draw()
     end
@@ -70,7 +68,6 @@ end
 
 --- @overload rt.Widget.size_allocate
 function rt.WindowLayout:size_allocate(x, y, width, height)
-
     if meta.is_widget(self._child) then
         self._child:fit_into(rt.AABB(x, y, width, height))
     end
@@ -84,7 +81,6 @@ end
 
 --- @overload rt.Widget.realize
 function rt.WindowLayout:realize()
-
     if self:get_is_realized() then return end
 
     self._realized = true

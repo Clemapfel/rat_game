@@ -1,7 +1,7 @@
-rt.settings.equpment_tooltip.no_effect_label = "(no additional effect)"
+rt.settings.equipment_tooltip.no_effect_label = "(no additional effect)"
 
 --- @class bt.EquipmentTooltip
-bt.EquipmentTooltip = meta.new_type("EquipmentTooltip", function(equpment)
+bt.EquipmentTooltip = meta.new_type("EquipmentTooltip", function(equipment)
 
     if meta.is_nil(env.equipment_spritesheet) then
         env.equipment_spritesheet = rt.Spritesheet("assets/sprites", "equipment")
@@ -11,7 +11,7 @@ bt.EquipmentTooltip = meta.new_type("EquipmentTooltip", function(equpment)
     local sprite_size_x, sprite_size_y = env.equipment_spritesheet:get_frame_size(sprite_id)
 
     local out = meta.new(bt.EquipmentTooltip, {
-        _equipment = equpment,
+        _equipment = equipment,
         _sprite = rt.Sprite(env.equipment_spritesheet, sprite_id),
         _tooltip = {} -- bt.BattleTooltip
     }, rt.Widget, rt.Drawable)
@@ -42,7 +42,7 @@ function bt.EquipmentTooltip:_format_stat_label()
     end
 
     local n_digits = 0
-    for _, modifier in pairs({equipment.attack_modifier, equipment.defense_modifier, equipment.speed, equipment.hp}) do
+    for _, modifier in pairs({self._equipment.attack_modifier, self._equipment.defense_modifier, self._equipment.speed, self._equipment.hp}) do
         n_digits = math.max(n_digits, get_n_digits(modifier))
     end
 
@@ -63,6 +63,7 @@ function bt.EquipmentTooltip:_format_stat_label()
     end
 
     local stat_label_text = ""
+    local equipment = self._equipment
     stat_label_text = stat_label_text
             .. ternary(equipment.attack_modifier ~= 0, "<color=ATTACK><b>ATK</b><mono> " .. modifier_to_label(equipment.attack_modifier) .. "</mono></color>\n", "")
             .. ternary(equipment.defense_modifier ~= 0, "<color=DEFENSE><b>DEF</b><mono> " .. modifier_to_label(equipment.defense_modifier) .. "</mono></color>\n", "")

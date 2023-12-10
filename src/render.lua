@@ -1,10 +1,10 @@
---- @class
+--- @class Renderer allows rendering in 3d
 rt.Renderer = {}
 
 --- shader
 rt.Renderer.shader_source = [[
-uniform mat4 view_matrix;
-uniform mat4 projection_matrix;
+uniform highp mat4 view_matrix;
+uniform highp mat4 projection_matrix;
 
 #ifdef VERTEX
 vec4 position(mat4 transform_projection, vec4 vertex_position)
@@ -33,17 +33,24 @@ rt.Renderer.depth_buffer.canvas = {rt.Renderer.depth_buffer.color, depthstencil 
 
 -- 2d render canvas, this is what regular love will be rendered to
 rt.Renderer._resolution = { love.graphics.getWidth(), love.graphics.getHeight() }
-rt.Renderer._2d_canvas = rt.RenderTexture(love.graphics.getWidth(), love.graphics.getHeight())
+rt.Renderer._2d_canvas = (function()
+    local out = love.graphics.newCanvas(love.graphics.getWidth(), love.graphics.getHeight(), {
+        msaa = 8
+    })
+    out:setFilter(rt.TextureScaleMode.NEAREST)
+    out:setWrap(rt.TextureWrapMode.REPEAT)
+    return out
+end)()
 
 local w, h = love.graphics.getWidth(), love.graphics.getHeight()
 local canvas_h = 2
 local canvas_w = w / h * canvas_h
 rt.Renderer._2d_shape = rt.VertexRectangle(0 - 0.5 * canvas_w, 0 - 0.5 * canvas_h, canvas_w, canvas_h)
-rt.Renderer._2d_shape:set_texture(rt.Renderer._2d_canvas)
+rt.Renderer._2d_shape._native:setTexture(rt.Renderer._2d_canvas)
 
 -- camera
 rt.Renderer.camera = {
-    position = math3d.vec3(0, 0, 0.84),
+    position = math3d.vec3(0, 0, 0.838),
     rotation = math3d.vec2(0, 0),
 
     direction = nil,
@@ -123,19 +130,17 @@ function rt.Renderer:reset_camera()
 end
 rt.Renderer:_update_view_matrix()
 
-rt.Renderer._background_color = rt.Palette.PURPLE_3
-
 --- @brief
 function rt.Renderer:render()
 
-    local bg_color = rt.Renderer._background_color
+    local bg_color = rt.Palette.PURPLE_2
 
-    self._2d_canvas:bind_as_render_target()
+    love.graphics.setCanvas(self._2d_canvas)
     love.graphics.clear(bg_color.r, bg_color.g, bg_color.b, 1)
     love.graphics.setLineWidth(10)
     love.graphics.rectangle("line", 0, 0, love.graphics.getWidth(), love.graphics.getHeight())
     love.graphics.print("text abada", 200, 200)
-    self._2d_canvas:unbind_as_render_target()
+    love.graphics.setCanvas()
 
     self.shader:send("view_matrix",       "column", self.view_matrix)
     self.shader:send("projection_matrix", "column", self.projection_matrix)
@@ -156,11 +161,13 @@ end
 
 --- @brief
 function rt.Renderer:draw_2d(callback)
-    local bg_color = rt.Renderer._background_color
-    self._2d_canvas:bind_as_render_target()
-    love.graphics.clear(bg_color.r, bg_color.g, bg_color.a, 1)
+    love.graphics.setCanvas({
+        self._2d_canvas,
+        stencil = true
+    })
+    love.graphics.clear(0, 0, 0, 0)
     callback()
-    self._2d_canvas:unbind_as_render_target()
+    love.graphics.setCanvas()
 end
 
 --- @brief
@@ -173,8 +180,7 @@ function rt.Renderer:draw_3d(callback)
     love.graphics.setCanvas(rt.Renderer.depth_buffer.canvas)
     love.graphics.setMeshCullMode("none")
 
-    local bg_color = rt.Renderer._background_color
-    love.graphics.clear(bg_color.r, bg_color.g, bg_color.a, 1)
+    love.graphics.clear(0, 0, 0, 0)
     self._2d_shape:draw()
     callback()
 
@@ -185,8 +191,84 @@ function rt.Renderer:draw_3d(callback)
 end
 
 --- @brief
-function rt.Renderer:flush()
-    local bg_color = rt.Renderer._background_color
-    love.graphics.clear(bg_color.r, bg_color.g, bg_color.a, 1)
+function rt.Renderer:draw()
+    love.graphics.setColor(1, 1, 1, 1)
     love.graphics.draw(rt.Renderer.depth_buffer.color)
+end
+
+--- @brief _internal
+function rt.test.renderer()
+
+    function polyhedron(n_steps)
+
+        n_steps = clamp(1, n_steps)
+
+        local vertices = {}
+        local lower, upper = rt.degrees(-180):as_radians(), rt.degrees(180):as_radians()
+        local step = 2 * math.pi / n_steps
+        local sum = math3d.vec3(0, 0, 0)
+
+        for x_i = 1, n_steps do
+            for z_i = 1, n_steps do
+                local x = 1 * x_i * 2 * rt.degrees(180):as_radians() / n_steps
+                local z = -1 * z_i * 2 * rt.degrees(180):as_radians() / n_steps
+
+                local point = math3d.vec3.unit_y
+                local rotation =
+                math3d.quat.from_angle_axis(z, math3d.vec3.unit_z) *
+                        math3d.quat.from_angle_axis(x, math3d.vec3.unit_x)
+
+                point = rotation * point
+                table.insert(vertices, {
+                    point.x,
+                    point.y,
+                    point.z
+                })
+            end
+        end
+
+        table.sort(vertices, function(a, b)
+            return a[3] > b[3]
+        end)
+
+        local vertex_order = {}
+        for i = 1, sizeof(vertices) - 2 do
+            table.insert(vertex_order, i)
+            table.insert(vertex_order, i + 2)
+            table.insert(vertex_order, i + 1)
+        end
+
+        local min, max = POSITIVE_INFINITY, NEGATIVE_INFINITY
+        for _, v in pairs(vertices) do
+            min = math.min(v[3], min)
+            max = math.max(v[3], max)
+        end
+
+        mesh = rt.VertexShape(vertices)
+        mesh:set_draw_mode(rt.MeshDrawMode.TRIANGLE_STRIP)
+        mesh._native:setVertexMap(vertex_order)
+        local n = mesh:get_n_vertices()
+        for i = 1, n do
+            local x, y, z = mesh:get_vertex_position(i)
+            x = x - sum.x / n
+            y = y - sum.y / n
+            z = z - sum.z / n
+            mesh:set_vertex_position(i, x, y, z)
+
+            local value = (z - min) / (max - min)
+            mesh:set_vertex_color(i, rt.HSVA(value, 1, 1, 1));
+        end
+        return mesh
+    end
+    mesh = polyhedron(3)
+
+
+    rt.Renderer:draw_2d(function()
+        love.graphics.paste(300, 400, "TESTETS")
+    end)
+    rt.Renderer:draw_3d(function()
+        mesh:draw()
+    end)
+    rt.Renderer:draw()
+
 end

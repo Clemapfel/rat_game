@@ -23,12 +23,6 @@ end
 
 --- @overload rt.Drawable.draw
 function rt.Scene:draw()
-
-
-    if meta.is_rgba(self.skybox) then
-        local bg_color = self.skybox
-        love.graphics.setBackgroundColor(bg_color.r, bg_color.g, bg_color.b, bg_color.a)
-    end
     self.window:draw()
 end
 
@@ -55,7 +49,6 @@ function rt.Scene:update(delta)
 end
 
 function rt.Scene:_set_property(key, new_value)
-
 
     local properties = getmetatable(self).properties
     if meta.is_nil(properties[key]) then
