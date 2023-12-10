@@ -134,7 +134,8 @@ function rt.InputHandler._load_input_mapping()
             rt.GamepadButton.LEFT_SHOULDER
         },
         keyboard = {
-            rt.KeyboardKey.A
+            rt.KeyboardKey.L,
+            rt.KeyboardKey.N
         }
     }
 
@@ -144,7 +145,8 @@ function rt.InputHandler._load_input_mapping()
             rt.GamepadButton.RIGHT_SHOULDER
         },
         keyboard = {
-            rt.KeyboardKey.S
+            rt.KeyboardKey.R,
+            rt.KeyboardKey.M
         }
     }
 
