@@ -13,7 +13,14 @@ for _, action in pairs({move, consumable, intrinsic}) do
 end
 
 selection_menu = bt.ActionSelectionMenu(entity)
-rt.current_scene:set_child(rt.Label("TEST 0123456789"))
+
+glyph = rt.Glyph(rt.settings.font.default_mono, "test", rt.FontStyle.REGULAR, {
+    is_outlined = true,
+    outline_color = rt.RGBA(0, 0, 0, 1),
+    effect = {rt.TextEffect.WAVE}
+})
+
+rt.current_scene:set_child(rt.Label("<o>TEST 0123456789</o>"))
 
 input = rt.add_input_controller(rt.current_scene.window)
 input:signal_connect("pressed", function(self, which)
@@ -49,7 +56,11 @@ function love.draw()
     rt.current_scene:draw()
     
     -- scene rendering
-    --rt.current_scene:draw()
+    rt.current_scene:draw()
 
-    love.graphics.draw(mesh)
+    glyph:draw()
+end
+
+function love.update()
+    rt.current_scene:update(love.timer.getDelta())
 end

@@ -1,3 +1,18 @@
+--- @class bt.ActionSelectionThumbnail
+bt.ActionSelectionThumbnail = meta.new_type("ActionSelectionThumbnail", function(action, n_uses)
+    if meta.is_nil(n_uses) then n_uses = POSITIVE_INFINITY end
+    local out = meta.new(bt.ActionSelectionThumbnail, {
+        _use_count = POSITIVE_INFINITY,
+        --_label =
+    })
+    return out
+end)
+
+--- @brief
+function bt.ActionSelectionThumbnail:set_n_uses()
+
+end
+
 --- @class bt.ActionSelectionMenu
 bt.ActionSelectionMenu = meta.new_type("ActionSelectionMenu", function(entity)
     local out = meta.new(bt.ActionSelectionMenu, {

@@ -202,20 +202,32 @@ rt.Label.BEAT = "|" -- pause when text scrolling
 -- regex patterns to match tags
 rt.Label.BOLD_TAG_START = rt.Set("<b>", "<bold>")
 rt.Label.BOLD_TAG_END = rt.Set("</b>", "</bold>")
+
 rt.Label.ITALIC_TAG_START = rt.Set("<i>", "<italic>")
 rt.Label.ITALIC_TAG_END = rt.Set("</i>", "</italic>")
+
 rt.Label.UNDERLINED_TAG_START = rt.Set("<u>", "<underlined>")
 rt.Label.UNDERLINED_TAG_END = rt.Set("</u>", "</underlined>")
+
 rt.Label.STRIKETHROUGH_TAG_START = rt.Set("<s>", "<strikethrough>")
 rt.Label.STRIKETHROUGH_TAG_END = rt.Set("</s>", "</strikethrough>")
+
 rt.Label.COLOR_TAG_START = rt.Set("<col=(.*)>", "<color=(.*)>")
 rt.Label.COLOR_TAG_END = rt.Set("</col>", "</color>")
+
+rt.Label.OUTLINE_TAG_START = rt.Set("<o>", "<outline>")
+rt.Label.OUTLINE_TAG_END = rt.Set("</o>", "</outline>")
+
+rt.Label.BACKGROUND_TAG_START = rt.Set("<bg=(.*)>", "<background=(.*)>")
+rt.Label.BACKGROUND_TAG_END = rt.Set("</bg>", "</background>")
+
 rt.Label.EFFECT_SHAKE_TAG_START = rt.Set("<shake>", "<fx_shake>")
 rt.Label.EFFECT_SHAKE_TAG_END = rt.Set("</shake>", "</fx_shake>")
 rt.Label.EFFECT_WAVE_TAG_START = rt.Set("<wave>", "<fx_wave>")
 rt.Label.EFFECT_WAVE_TAG_END = rt.Set("</wave", "</fx_wave>")
 rt.Label.EFFECT_RAINBOW_TAG_START = rt.Set("<rainbow>", "<fx_rainbow>")
 rt.Label.EFFECT_RAINBOW_TAG_END = rt.Set("</rainbow>", "</fx_rainbow>")
+
 rt.Label.MONOSPACE_TAG_START = rt.Set("<tt>", "<mono>")
 rt.Label.MONOSPACE_TAG_END = rt.Set("</tt>", "</mono>")
 
@@ -228,10 +240,15 @@ function rt.Label:_parse()
     local bold = false
     local italic = false
     local is_colored = false
+    local is_outlined = false
+    local is_background = false
     local color = "TRUE_WHITE"
+    local background_color = "TRUE_BLACK"
+    local outline_color = "TRUE_BLACK"
     local mono = false
     local underlined = false
     local strikethrough = false
+    local outlined = false
     local effect_rainbow = false
     local effect_shake = false
     local effect_wave = false
@@ -268,10 +285,14 @@ function rt.Label:_parse()
             font,
             current_word,
             style,
-            rt.Palette[ternary(effect_rainbow, "TRUE_WHITE", color)],
-            underlined,
-            strikethrough,
-            effects
+            {
+                color = rt.Palette[ternary(effect_rainbow, "TRUE_WHITE", color)],
+                is_underlined = underlined,
+                is_strikethrough = strikethrough,
+                is_outlined = outlined,
+                outline_color = nil,
+                effects = effects
+            }
         ))
 
         self._n_characters = self._n_characters + #current_word
@@ -315,7 +336,7 @@ function rt.Label:_parse()
     end
 
     -- test if upcoming control sequence matches rt.Label.COLOR_TAG_START
-    local function is_color_tag()
+    local function is_color_tag(which)
         local sequence = ""
         local color_i = 0
         repeat
@@ -327,7 +348,7 @@ function rt.Label:_parse()
             color_i = color_i + 1
         until color_s == ">"
 
-        for tag in pairs(rt.Label.COLOR_TAG_START) do
+        for tag in pairs(which) do
             local _, _, new_color = string.find(sequence, tag)
             if not meta.is_nil(new_color) then
                 if not meta.is_rgba(rt.Palette[new_color]) then
@@ -416,8 +437,19 @@ function rt.Label:_parse()
                     throw_parse_error("trying to close an monospace region, but one is not open")
                 end
                 mono = false
+            -- outlined
+            elseif tag_matches(rt.Label.OUTLINE_TAG_START) then
+                if outlined == true then
+                    throw_parse_error("trying to open an outlined region, but one is already open")
+                end
+                outlined = true
+            elseif tag_matches(rt.Label.OUTLINE_TAG_END) then
+                if outlined == false then
+                    throw_parse_error("trying to close an outlined region, but one is not open")
+                end
+                outlined = false
             -- color
-            elseif is_color_tag() then
+            elseif is_color_tag(rt.Label.COLOR_TAG_START) then
                 if is_colored == true then
                     throw_parse_error("trying to open a color region, but one is already open")
                 end

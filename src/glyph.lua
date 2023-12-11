@@ -1,21 +1,44 @@
+rt.settings.glyph = {
+    default_background_color = rt.RGBA(0, 0, 0, 1),
+    default_outline_color = rt.RGBA(0, 0, 0, 1),
+    rainbow_width = 15,    -- n characters
+    shake_offset = 6,      -- px
+    shake_period = 15,     -- shakes per second
+    wave_period = 10,      -- n chars
+    wave_function = function(x) return math.sin((x * 4 * math.pi) / (2 * rt.settings.glyph.wave_period)) end,
+    wave_offset = 10,      -- px
+    wave_speed = 0.2      -- cycles per second
+}
+
 --- @class rt.TextEffect
 rt.TextEffect = meta.new_enum({
     NONE = "TEXT_EFFECT_NONE",
     SHAKE = "TEXT_EFFECT_SHAKE",
     WAVE = "TEXT_EFFECT_WAVE",
-    RAINBOW = "TEXT_EFFECT_RAINBOW"
+    RAINBOW = "TEXT_EFFECT_RAINBOW",
+    OUTLINE = "TEXT_EFFECT_OUTLINE"
 })
 
 --- @class rt.Glyph
 --- @param font rt.Font
 --- @param content String
 --- @param font_style rt.FontStyle
---- @param color rt.RGBA
---- @param is_underlined Boolean
---- @param is_strikethrough Boolean
---- @param effects rt.TextEffect
---- @param wrap_width Number px
-rt.Glyph = meta.new_type("Glyph", function(font, content, font_style, color, is_underlined, is_strikethrough, effects, wrap_width)
+--- @param look Table
+rt.Glyph = meta.new_type("Glyph", function(
+    font,
+    content,
+    font_style,
+    look,
+    wrap_width
+)
+
+    meta.assert_table(look)
+    local color = look.color
+    local is_underlined = look.is_underlined
+    local is_strikethrough = look.is_strikethrough
+    local is_outlined = look.is_outlined
+    local outline_color = look.outline_color
+    local effects = look.effect
 
     if meta.is_nil(font_style) then font_style = rt.FontStyle.REGULAR end
     if meta.is_nil(color) then color = rt.RGBA(1, 1, 1, 1) end
@@ -23,6 +46,11 @@ rt.Glyph = meta.new_type("Glyph", function(font, content, font_style, color, is_
     if meta.is_nil(wrap_width) then wrap_width = POSITIVE_INFINITY end
     if meta.is_nil(is_underlined) then is_underlined = false end
     if meta.is_nil(is_strikethrough) then is_strikethrough = false end
+    if meta.is_nil(is_outlined) then is_outlined = false end
+    if meta.is_nil(outline_color) then outline_color = rt.settings.glyph.default_outline_color end
+    --if meta.is_nil(has_background) then has_background = false end
+    --if meta.is_nil(background_color) then background_color = rt.settings.glyph.default_outline_color end
+
 
     local out = meta.new(rt.Glyph, {
         _font = font,
@@ -31,6 +59,8 @@ rt.Glyph = meta.new_type("Glyph", function(font, content, font_style, color, is_
         _style = font_style,
         _is_underlined = is_underlined,
         _is_strikethrough = is_strikethrough,
+        _is_outlined = is_outlined,
+        _outline_color = outline_color,
         _effects = {},
         _is_animated = false,
         _elapsed_time = 0,
@@ -81,7 +111,6 @@ end
 function rt.Glyph:_initialize_character_widths()
 
     local clock = rt.Clock()
-    local now = rt.Cloc
     self._character_widths = {}
     local offset = 0
     local n_chars = #self._content
@@ -103,15 +132,28 @@ function rt.Glyph:_initialize_character_widths()
     end
 end
 
+function rt.Glyph:_draw_outline(x, y)
+    for _, x_offset in pairs({-1, 1}) do
+        for _, y_offset in pairs({-1, 1}) do
+            love.graphics.setColor(self._outline_color.r, self._outline_color.g, self._outline_color.b, self._outline_color.a)
+            self:render(self._glyph, x + x_offset, y + y_offset)
+        end
+    end
+end
+
 --- @brief [internal] draw glyph with _is_animated = false
 function rt.Glyph:_non_animated_draw()
 
     local old_r, old_g, old_b, old_a = love.graphics.getColor()
-    love.graphics.setColor(self._color.r, self._color.g, self._color.b, self._color.a)
 
     local x, y = self:get_position()
+    local w, h = self:get_size()
 
     if self._n_visible_chars >= #self._content then
+
+        if self._is_outlined then self:_draw_outline(x, y) end
+
+        love.graphics.setColor(self._color.r, self._color.g, self._color.b, self._color.a)
         self:render(self._glyph, x, y)
     elseif self:get_n_visible_characters() > 0 then
         if sizeof(self._character_widths) == 0 then
@@ -121,6 +163,10 @@ function rt.Glyph:_non_animated_draw()
         local w = self._character_offsets[self._n_visible_chars]
         local _, h = self:get_size()
         love.graphics.setScissor(x, y, w, h)
+
+        if self._is_outlined then self:_draw_outline(x, y) end
+
+        love.graphics.setColor(self._color.r, self._color.g, self._color.b, self._color.a)
         self:render(self._glyph, x, y)
         love.graphics.setScissor()
     end
@@ -128,7 +174,6 @@ function rt.Glyph:_non_animated_draw()
     local font = self._font[self._style]
     local strikethrough_base = y + 0.5 * font:getHeight() + 0.5
     local underline_base = y + font:getBaseline() - 0.5 * font:getDescent()
-    local w = select(1, self:get_size())
     love.graphics.setLineWidth(1)
 
     if self._is_strikethrough then
@@ -141,17 +186,6 @@ function rt.Glyph:_non_animated_draw()
 
     love.graphics.setColor(old_r, old_g, old_b, old_a)
 end
-
-rt.settings.glyph = {}
-rt.settings.glyph.rainbow_width = 15    -- n characters
-
-rt.settings.glyph.shake_offset = 6      -- px
-rt.settings.glyph.shake_period = 15     -- shakes per second
-
-rt.settings.glyph.wave_period = 10      -- n chars
-rt.settings.glyph.wave_function = function(x) return math.sin((x * 4 * math.pi) / (2 * rt.settings.glyph.wave_period)) end
-rt.settings.glyph.wave_offset = 10      -- px
-rt.settings.glyph.wave_speed = 0.2      -- cycles per second
 
 --- @brief [internal] draw glyph animation , much less performant
 function rt.Glyph:_animated_draw()
@@ -187,8 +221,9 @@ function rt.Glyph:_animated_draw()
         end
 
         love.graphics.setScissor(scissor.x + offset.x, scissor.y + offset.y, scissor.width, scissor.height)
-        love.graphics.setColor(color.r, color.g, color.b, color.a)
         local pos_x, pos_y = self:get_position()
+        if self._is_outlined then self:_draw_outline(pos_x + offset.x, pos_y + offset.y) end
+        love.graphics.setColor(color.r, color.g, color.b, color.a)
         self:render(self._glyph, pos_x + offset.x, pos_y + offset.y)
 
         if self._is_strikethrough or self._is_underlined then
@@ -262,8 +297,6 @@ end
 --- @brief set font style
 --- @param style rt.FontStyle
 function rt.Glyph:set_style(style)
-
-
     self._style = style
     self:_update()
 end
@@ -271,8 +304,6 @@ end
 --- @brief get font style
 --- @return rt.FontStyle
 function rt.Glyph:get_style()
-
-
     return self._style
 end
 
@@ -280,11 +311,9 @@ end
 --- @param color rt.RGBA
 function rt.Glyph:set_color(color)
 
-
     if meta.is_hsva(color) then
         color = rt.hsva_to_rgba(color)
     end
-
 
     self._color = color
     self:_update()
@@ -293,7 +322,6 @@ end
 --- @brief get color
 --- @return rt.RGBA
 function rt.Glyph:get_color(color)
-
     return self._color
 end
 
