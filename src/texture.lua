@@ -22,38 +22,22 @@ rt.Texture = meta.new_type("Texture", function(path_or_image_or_width, height)
         local path = path_or_image_or_width
         out =  meta.new(rt.Texture, {
             _native = love.graphics.newImage(path)
-        })
+        }, rt.Drawable)
     elseif meta.isa(path_or_image_or_width, rt.Image) then
-
         local image = path_or_image_or_width
         out = meta.new(rt.Texture, {
             _native = love.graphics.newImage(image._native)
-        })
+        }, rt.Drawable)
     elseif meta.is_number(path_or_image_or_width) then
-
         local width = path_or_image_or_width
         out = meta.new(rt.Texture, {
             _native = love.graphics.newImage(width, height)
-        })
+        }, rt.Drawable)
     else
-
         out = meta.new(rt.Texture, {
             _native = love.graphics.newImage()
-        })
+        }, rt.Drawable)
     end
-    out:set_scale_mode(rt.TextureScaleMode.NEAREST)
-    out:set_wrap_mode(rt.TextureWrapMode.CLAMP)
-    return out
-end)
-
---- @class rt.RenderTexture
---- @param width Number
---- @param height Number
-rt.RenderTexture = meta.new_type("RenderTexture", function(width, height, stencil)
-
-    local out = meta.new(rt.RenderTexture, {
-        _native = love.graphics.newCanvas(width, height)
-    }, rt.Texture)
     out:set_scale_mode(rt.TextureScaleMode.NEAREST)
     out:set_wrap_mode(rt.TextureWrapMode.CLAMP)
     return out
@@ -86,17 +70,12 @@ end
 --- @brief get resolution
 --- @return (Number, Number)
 function rt.Texture:get_size()
-    return self._native:getDimension()
+    return self._native:getWidth(), self._native:getHeight()
 end
 
---- @brief bind texture as render target, needs to be unbound manually later
-function rt.RenderTexture:bind_as_render_target()
-    love.graphics.setCanvas(self._native)
-end
-
---- @brief unbind texture
-function rt.RenderTexture:unbind_as_render_target()
-    love.graphics.setCanvas()
+--- @overload rt.Drawable.draw
+function rt.Texture:draw()
+    love.graphics.draw(self._native)
 end
 
 --- @brief test texture

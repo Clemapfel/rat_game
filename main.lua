@@ -20,7 +20,13 @@ glyph = rt.Glyph(rt.settings.font.default_mono, "test", rt.FontStyle.REGULAR, {
     effect = {rt.TextEffect.WAVE}
 })
 
-rt.current_scene:set_child(bt.ActionSelectionThumbnail(move))
+
+thumbnail = bt.ActionSelectionThumbnail(move)
+layout = rt.SnapshotLayout()
+layout:set_margin_left(100)
+layout:set_margin_top(100)
+layout:set_child(thumbnail)
+rt.current_scene:set_child(layout)
 
 input = rt.add_input_controller(rt.current_scene.window)
 input:signal_connect("pressed", function(self, which)

@@ -127,6 +127,13 @@ function ternary(condition, if_true, if_false)
     end
 end
 
+--- @brief get first value, or `if_nil` if first value is nil
+--- @param value any
+--- @param if_nil any
+function which(value, if_nil)
+    if value == nil then return if_nil else return value end
+end
+
 --- @brief try-catch
 --- @param to_try function
 --- @param on_fail function

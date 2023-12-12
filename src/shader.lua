@@ -25,7 +25,7 @@ function rt.Shader:bind()
 end
 
 --- @brief
-function rt.Shader:unbindg()
+function rt.Shader:unbind()
     love.graphics.setShader(nil)
 end
 

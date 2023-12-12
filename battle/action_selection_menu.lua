@@ -30,7 +30,6 @@ function bt.ActionSelectionThumbnail:size_allocate(x, y, width, height)
     self._sprite_aspect:fit_into(x, y, width, height)
 
     local label_w, label_h = self._label:measure()
-    println(label_h)
     self._label:fit_into(x + width - label_w, y + height - label_h, label_w, label_h)
 end
 
