@@ -27,7 +27,6 @@ end)
 
 --- @overload rt.Drawable.draw
 function rt.Sprite:draw()
-
     if self:get_is_visible() then
         self._shape:draw()
     end
@@ -35,8 +34,6 @@ end
 
 --- @overload rt.Widget.size_allocate
 function rt.Sprite:size_allocate(x, y, width, height)
-
-
     local w, h
     if self:get_expand_horizontally() then
         w = width - self:get_margin_left() - self:get_margin_right()
@@ -78,8 +75,6 @@ end
 
 --- @overload rt.Animation.update
 function rt.Sprite:update(delta)
-
-
     self._elapsed = self._elapsed + delta
     local frame_duration = 1 / self._spritesheet:get_fps()
     local frame_i = math.floor(self._elapsed / frame_duration)
@@ -94,9 +89,6 @@ end
 --- @brief set which frame is currently displayed
 --- @param i Number 1-based
 function rt.Sprite:set_frame(i)
-
-
-
     local n_frames = self._spritesheet:get_n_frames(self._animation_id)
     if i < 1 or i > n_frames then
         rt.error("In Sprite:set_frame: frame index `" .. tostring(i) .. "` is out of range for animation `" .. self._animation_id .. "` of spritesheet `" .. self._spritesheet.name .. "` which has `" .. tostring(n_frames) .. "` frames")
@@ -109,23 +101,18 @@ end
 --- @brief get which frame is currently displayed
 --- @return Number
 function rt.Sprite:get_frame()
-
     return self._current_frame
 end
 
 --- @brief get number of frames
 --- @return Number
 function rt.Sprite:get_n_frames()
-
     return self._spritesheet:get_n_frames(self._animation_id)
 end
 
 --- @brief set which animation is used, this resets the current frame to 1
 --- @param id String
 function rt.Sprite:set_animation(id)
-
-
-
     self._spritesheet:_assert_has_animation("Sprite:", id)
     local w, h = self._spritesheet:get_frame_size(id)
 
@@ -142,29 +129,24 @@ end
 --- @brief get frame resolution
 --- @return (Number, Number)
 function rt.Sprite:get_resolution()
-
     return self._frame_width, self._frame_height
 end
 
 --- @brief set whether sprite should loop when animated
 --- @param b Boolean
 function rt.Sprite:set_should_loop(b)
-
-
     self._should_loop = b
 end
 
 --- @brief get whether sprite loops when animated
 --- @return Boolean
 function rt.Sprite:get_should_loop()
-
     return self._should_loop
 end
 
 --- @brief set color, multiplied with texture
 --- @param color rt.RGBA (or rt.HSVA)
 function rt.Sprite:set_color(color)
-
     self._shape:set_color(color)
 end
 

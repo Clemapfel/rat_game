@@ -8,12 +8,7 @@ rt.settings.action_tooltip = {
 --- @class bt.ActionTooltip
 bt.ActionTooltip = meta.new_type("ActionTooltip", function(action)
 
-    if meta.is_nil(env.action_spritesheet) then
-        env.action_spritesheet = rt.Spritesheet("assets/sprites", "orbs")
-    end
-
     local sprite_id = "dusk"
-    local sprite_size_x, sprite_size_y = env.action_spritesheet:get_frame_size(sprite_id)
     local out = meta.new(bt.ActionTooltip, {
         _action = action,
         _tooltip = {} -- bt.BattleTooltip
@@ -24,7 +19,7 @@ bt.ActionTooltip = meta.new_type("ActionTooltip", function(action)
         out:_format_target_label(),
         rt.settings.action_tooltip.effect_prefix .. out._action.verbose_effect_text,
         out._action.flavor_text,
-        rt.Sprite(env.action_spritesheet, sprite_id)
+        action:create_sprite()
     )
 
     return out

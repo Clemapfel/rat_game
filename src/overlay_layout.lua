@@ -23,8 +23,6 @@ end
 
 --- @overlay rt.Widget.size_allocate
 function rt.OverlayLayout:size_allocate(x, y, width, height)
-
-
     x = x + self:get_margin_left()
     y = y + self:get_margin_top()
     width = clamp(width - (self:get_margin_left() + self:get_margin_right()), 0)
@@ -73,8 +71,6 @@ end
 --- @param child rt.Widget
 function rt.OverlayLayout:set_base_child(child)
 
-
-
     self:remove_base_child()
     child:set_parent(self)
     self._base_child = child
@@ -84,7 +80,6 @@ end
 
 --- @brief remove lower most child
 function rt.OverlayLayout:remove_base_child()
-
 
     if meta.is_widget(self._base_child) then
         self._base_child:set_parent(nil)
@@ -96,7 +91,6 @@ end
 --- @param child rt.Widget
 function rt.OverlayLayout:push_overlay(child)
 
-
     child:set_parent(self)
     self._overlays:push_back(child)
     if self:get_is_realized() then child:realize() end
@@ -104,7 +98,6 @@ end
 
 --- @brief remove top-most overlay
 function rt.OverlayLayout:pop_overlay()
-
 
     local child = self._overlays:pop_back()
     child:set_parent(nil)

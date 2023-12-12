@@ -101,7 +101,7 @@ function rt.Renderer:_update_view_matrix(_)
 end
 
 --- @brief update size
-function rt.Renderer:set_resolution(_, w, h)
+function rt.Renderer:set_resolution(w, h)
     rt.Renderer._resolution = { w, h }
 
     rt.Renderer.depth_buffer = {

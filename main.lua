@@ -20,7 +20,7 @@ glyph = rt.Glyph(rt.settings.font.default_mono, "test", rt.FontStyle.REGULAR, {
     effect = {rt.TextEffect.WAVE}
 })
 
-rt.current_scene:set_child(rt.Label("<o>TEST 0123456789</o>"))
+rt.current_scene:set_child(bt.ActionSelectionThumbnail(move))
 
 input = rt.add_input_controller(rt.current_scene.window)
 input:signal_connect("pressed", function(self, which)
@@ -57,8 +57,6 @@ function love.draw()
     
     -- scene rendering
     rt.current_scene:draw()
-
-    glyph:draw()
 end
 
 function love.update()

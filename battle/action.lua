@@ -118,6 +118,13 @@ bt.Action.thumbnail_id = "default"
 -- sprite for in-battle animation
 bt.Action.animation_id = "default"
 
+--- @brief
+function bt.Action:create_sprite()
+    if meta.is_nil(bt.Action.spritesheet) then
+        bt.Action.spritesheet = rt.Spritesheet("assets/sprites", "orbs")
+    end
+    return rt.Sprite(bt.Action.spritesheet, self.thumbnail_id)
+end
 
 
 
