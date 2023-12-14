@@ -139,7 +139,6 @@ end
 --- @param y Number px
 function rt.Viewport:set_offset(x, y)
 
-
     local before_x, before_y = self:get_offset()
 
     self._x_offset = x
@@ -152,8 +151,6 @@ end
 --- @param x_offset Number px
 --- @param y_offset Number px
 function rt.Viewport:translate(x_offset, y_offset)
-
-
 
     local current_x, current_y = self:get_offset()
     self:set_offset(current_x + x_offset, current_y + y_offset)

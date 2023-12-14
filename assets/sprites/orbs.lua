@@ -4,9 +4,12 @@ return {
     height = 32,
 
     animations = {
-        default = 1,
-        dusk = 2,
-        manaphy = 3,
-        rest = {4, 22}
+       default = 1,
+       protect = 2,
+       strike = 3,
+       no_action = 4,
+       analyze = 5,
+       wish = 6,
+       rest = {6, 23}
     }
 }

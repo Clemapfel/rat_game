@@ -9,7 +9,7 @@ bt.ActionSelectionThumbnail = meta.new_type("ActionSelectionThumbnail", function
         _label = rt.Label(""),
         _sprite = action:create_sprite(),
         _sprite_aspect = rt.AspectLayout(1),
-        _overlay = rt.OverlayLayout()
+        _color_transform = rt.SnapshotLayout()
     }, rt.Widget, rt.Drawable)
 
     out._label:set_alignment(rt.Alignment.END)
@@ -18,31 +18,32 @@ bt.ActionSelectionThumbnail = meta.new_type("ActionSelectionThumbnail", function
     out._sprite_aspect:set_minimum_size(2 * sprite_w, 2 * sprite_h)
 
     out._sprite_aspect:set_child(out._sprite)
-    out._overlay:set_base_child(out._sprite_aspect)
-    out._overlay:push_overlay(out._label)
+    out._color_transform:set_child(out._sprite_aspect)
     out:set_n_uses(ternary(meta.is_nil(n_uses), POSITIVE_INFINITY, n_uses))
+
     return out
 end)
 
 --- @overload rt.Widget.get_top_level_widget
 function bt.ActionSelectionThumbnail:size_allocate(x, y, width, height)
-
-    self._sprite_aspect:fit_into(x, y, width, height)
-
+    self._color_transform:fit_into(x, y, width, height)
     local label_w, label_h = self._label:measure()
-    self._label:fit_into(x + width - label_w, y + height - label_h, label_w, label_h)
+    local sprite_x, sprite_y = self._sprite:get_position()
+    local sprite_w, sprite_h = self._sprite:get_size()
+
+    self._label:fit_into(x + sprite_x + sprite_w - label_w, y + sprite_y + sprite_h - label_h, label_w, label_h)
 end
 
 --- @overload rt.Drawable.draw
 function bt.ActionSelectionThumbnail:draw()
-    self._sprite_aspect:draw()
+    self._color_transform:draw()
     self._label:draw()
 end
 
 --- @overload rt.Widget.realize
 function bt.ActionSelectionThumbnail:realize()
     self._label:realize()
-    self._sprite_aspect:realize()
+    self._color_transform:realize()
     rt.Widget.realize(self)
 end
 
@@ -55,6 +56,12 @@ function bt.ActionSelectionThumbnail:set_n_uses(n_uses)
         else
             self._label:set_text("<o><mono>" .. tostring(self._n_uses) .. " / " .. tostring(self._action.max_n_uses) .. "</mono></o>")
         end
+    end
+
+    if n_uses == 0 then
+        self._color_transform:set_offsets(nil, nil, nil, 0, -1, -0.3, -0.5)
+    else
+        self._color_transform:reset_offsets()
     end
 end
 

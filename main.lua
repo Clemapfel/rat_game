@@ -20,14 +20,32 @@ glyph = rt.Glyph(rt.settings.font.default_mono, "test", rt.FontStyle.REGULAR, {
     effect = {rt.TextEffect.WAVE}
 })
 
-
 thumbnail = bt.ActionSelectionThumbnail(move)
-layout = rt.SnapshotLayout()
-layout:set_margin_left(100)
-layout:set_margin_top(100)
-layout:set_child(thumbnail)
-rt.current_scene:set_child(layout)
 
+swipe = rt.SwipeLayout(rt.Orientation.VERTICAL)
+
+swipes = {}
+for i = 1, 3 do
+    local to_insert = rt.SwipeLayout(rt.Orientation.HORIZONTAL)
+    for _, id in pairs({"ANALYZE", "NO_ACTION", "PROTECT", "STRIKE", "WISH"}) do
+        move = bt.Action(id)
+        to_insert:push_back(bt.ActionSelectionThumbnail(move))
+    end
+    to_insert:set_show_selection(true)
+    to_insert:set_modifies_focus(false)
+    table.insert(swipes, to_insert)
+    swipe:push_back(to_insert)
+end
+
+swipe:set_show_selection(false)
+swipe:set_modifies_focus(true)
+swipe:set_allow_wrap(false)
+
+
+pixel_font = rt.Font(rt.settings.font.default_size * 2,
+"assets/fonts/ProggyTiny/ProggyTiny.ttf"
+)
+rt.current_scene:set_child(rt.Label("<o>0123456789</o>", pixel_font))
 input = rt.add_input_controller(rt.current_scene.window)
 input:signal_connect("pressed", function(self, which)
 
@@ -35,7 +53,9 @@ input:signal_connect("pressed", function(self, which)
     if which == rt.InputButton.A then
     elseif which == rt.InputButton.B then
     elseif which == rt.InputButton.X then
+        swipe:jump_to(1)
     elseif which == rt.InputButton.Y then
+        swipe:jump_to(6)
     elseif which == rt.InputButton.UP then
     elseif which == rt.InputButton.DOWN then
     elseif which == rt.InputButton.RIGHT then

@@ -341,12 +341,20 @@ function rt.Rectangle:set_corner_radius(px)
 end
 
 --- @brief TODO
-function rt.Rectangle:resize(aabb)
+function rt.Rectangle:resize(aabb, y, w, h)
 
-    self._x = aabb.x
-    self._y = aabb.y
-    self._w = aabb.width
-    self._h = aabb.height
+    if meta.is_aabb(aab) then
+        self._x = aabb.x
+        self._y = aabb.y
+        self._w = aabb.width
+        self._h = aabb.height
+    else
+        local x = aabb
+        self._x = x
+        self._y = y
+        self._w = w
+        self._h = h
+    end
 end
 
 --- @brief TODO

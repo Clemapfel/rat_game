@@ -4,6 +4,8 @@ rt.settings.tooltip = {
 }
 
 --- @class rt.TooltipLayout
+--- @brief single-child contianer that allows showing showing a widget in a separate tooltip window
+--- @param child rt.Widget
 rt.TooltipLayout = meta.new_type("TooltipLayout", function(child)
     local out = meta.new(rt.TooltipLayout, {
         _tooltip = {},
@@ -171,7 +173,6 @@ function rt.TooltipLayout:size_allocate(x, y, width, height)
 
     local child_x, child_y = x, y
     local child_w, child_h = 0, 0
-
 
     if meta.is_widget(self._child) then
         self._child:fit_into(rt.AABB(x, y, width, height))

@@ -58,7 +58,7 @@ rt.Palette = {
     YELLOW_2 = rt.RGBA("#ffe200"), -- yellow
     YELLOW_3 = rt.RGBA("#ddb60a"),
 
-    ORANGE_1 = rt.RGBA("#ffa544"), -- orange
+    ORANGE_1 = rt.RGBA("#ffad00"), -- orange
     ORANGE_2 = rt.RGBA("#ff8400"),
     ORANGE_3 = rt.RGBA("#ce6300"),
 
@@ -131,7 +131,7 @@ rt.Palette.HIGHLIGHT = rt.Palette.BLUE_2
 rt.Palette.HIGHLIGHT_OUTLINE = rt.Palette.BLUE_4
 
 rt.Palette.SELECTION = rt.Palette.YELLOW_1
-rt.Palette.SELECTION_OUTLINE = rt.Palette.YELLOW_2
+rt.Palette.SELECTION_OUTLINE = rt.Palette.ORANGE_1
 
 -- battle
 

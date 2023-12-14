@@ -10,14 +10,13 @@ rt.AnimationHandler = meta.new_type("AnimationHandler", function()
 end)
 
 rt.settings.animation = {
-    fps = 24,
+    fps = 60,
     enabled = true
 }
 
 --- @brief [internal] update all Animations
 --- @param delta Number seconds
 function rt.AnimationHandler:update(delta)
-
 
     local elapsed = self._elapsed + delta
     local frame_length = 1 / rt.settings.animation.fps
@@ -41,7 +40,6 @@ rt.Animation._is_animated = false
 
 --- @brief abstract method, must be override
 function rt.Animation:update(delta)
-
     rt.error("In " .. meta.typeof(self) .. ":update(): abstract method called")
 end
 

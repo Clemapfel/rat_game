@@ -9,7 +9,7 @@ rt.settings = {}
 
 setmetatable(rt, {
     __index = function(self, key)
-        rt.error("In rt.__index: key `" .. key .. "` does not exist")
+        rt.error("In rt.__index: key `" .. key .. "` does not exist in table `rt`")
     end
 })
 
@@ -18,7 +18,7 @@ bt = rt.battle
 
 setmetatable(bt, {
     __index = function(self, key)
-        rt.error("In bt.__index: key `" .. key .. "` does not exist")
+        rt.error("In bt.__index: key `" .. key .. "` does not exist in table `bt`")
     end
 })
 
@@ -82,6 +82,7 @@ require "transition_layout"
 require "levelbar"
 require "notch_bar"
 require "direction_indicator"
+require "swipe_layout"
 
 require "spacer"
 require "image_display"

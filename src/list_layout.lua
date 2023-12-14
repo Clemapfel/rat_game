@@ -253,6 +253,11 @@ function rt.ListLayout:get_spacing()
     return self._spacing
 end
 
+--- @brief
+function rt.ListLayout:get_n_elements()
+    return self._children:size()
+end
+
 --- @brief test ListLayout
 function rt.test.list_layout()
     error("TODO")

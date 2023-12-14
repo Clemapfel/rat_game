@@ -388,7 +388,7 @@ function string.last(str)
 end
 
 --- @brief get first character
-function string.fisrt(str)
+function string.first(str)
     return string.sub(str, 1, 1)
 end
 
@@ -441,4 +441,20 @@ function table.min_max(t)
         if value > max then max = value end
     end
     return min, max
+end
+
+--- @brief get first element of table, in iteration order
+--- @param t table
+function table.first(t)
+    for _, v in pairs(t) do return v end
+end
+
+--- @brief get last element of table, in iteration order
+--- @param t table
+function table.last(t)
+    local last = nil
+    for _, v in pairs(t) do
+        last = v
+    end
+    return last
 end

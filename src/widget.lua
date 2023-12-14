@@ -1,6 +1,6 @@
 rt.settings.widget = {
-    selection_indicator_width = 3,
-    selection_indicator_outline_width = 7,
+    selection_indicator_width = 2,
+    selection_indicator_outline_width = 5,
     selection_indicator_corner_radius = 5,
     selection_indicator_alpha = 1
 }
@@ -484,7 +484,6 @@ end
 
 --- @brief
 function rt.Widget:set_has_focus(b)
-
     self._focused = b
 end
 

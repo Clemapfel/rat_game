@@ -1,6 +1,7 @@
 rt.settings.glyph = {
     default_background_color = rt.RGBA(0, 0, 0, 1),
     default_outline_color = rt.RGBA(0, 0, 0, 1),
+    outline_thickness = 2,
     rainbow_width = 15,    -- n characters
     shake_offset = 6,      -- px
     shake_period = 15,     -- shakes per second
@@ -133,10 +134,15 @@ function rt.Glyph:_initialize_character_widths()
 end
 
 function rt.Glyph:_draw_outline(x, y)
-    for _, x_offset in pairs({-1, 1}) do
-        for _, y_offset in pairs({-1, 1}) do
+    local offsets = {}
+    for i = 1, rt.settings.glyph.outline_thickness do
+        table.insert(offsets, i)
+        table.insert(offsets, -i)
+    end
+    for _, x_offset in pairs(offsets) do
+        for _, y_offset in pairs(offsets) do
             love.graphics.setColor(self._outline_color.r, self._outline_color.g, self._outline_color.b, self._outline_color.a)
-            self:render(self._glyph, x + x_offset, y + y_offset)
+            self:render(self._glyph, math.floor(x + x_offset), math.floor(y + y_offset))
         end
     end
 end

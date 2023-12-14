@@ -94,19 +94,11 @@ end
 --- @param title rt.Widget
 --- @param child rt.Widget
 function rt.TabLayout:add_page(title, child)
-
-
-
-
     self:insert_page(self._pages:size(), title, child)
 end
 
 --- @brief
 function rt.TabLayout:insert_page(index, title, child)
-
-
-
-
 
     local to_push = {
         label = title,

@@ -27,6 +27,7 @@ end
 
 --- @overload rt.Widget.size_allocate
 function rt.Spacer:size_allocate(x, y, width, height)
+    --[[
     local w, h = self:get_minimum_size()
     if self:get_expand_horizontally() then
         w = width - self:get_margin_left() - self:get_margin_right()
@@ -38,6 +39,8 @@ function rt.Spacer:size_allocate(x, y, width, height)
 
     self._shape:set_position(x + self:get_margin_left(), y + self:get_margin_top())
     self._shape:set_size(w, h)
+    ]]--
+    self._shape:resize(x, y, width, height)
 end
 
 --- @brief set color

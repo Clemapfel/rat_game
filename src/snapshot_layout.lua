@@ -94,6 +94,7 @@ function rt.SnapshotLayout:draw()
     end
 
     self._shader:bind()
+    love.graphics.setColor(1, 1, 1, 1)
     love.graphics.draw(self._canvas._native, self._position_x, self._position_y)
     self._shader:unbind()
 end
@@ -134,6 +135,33 @@ end
 --- @brief
 function rt.SnapshotLayout:set_alpha_offset(value)
     self._alpha_offset = which(value, 0)
+    self:snapshot()
+end
+
+--- @brief
+function rt.SnapshotLayout:set_offsets(r, g, b, h, s, v, a)
+    self._rgb_offsets[1] = which(r, 0)
+    self._rgb_offsets[2] = which(g, 0)
+    self._rgb_offsets[3] = which(b, 0)
+    self._hsv_offsets[1] = which(h, 0)
+    self._hsv_offsets[2] = which(s, 0)
+    self._hsv_offsets[3] = which(v, 0)
+    self._alpha_offset = which(a, 0)
+
+    self:snapshot()
+end
+
+
+--- @brief
+function rt.SnapshotLayout:reset_offsets()
+    self._rgb_offsets[1] = 0
+    self._rgb_offsets[2] = 0
+    self._rgb_offsets[3] = 0
+    self._hsv_offsets[1] = 0
+    self._hsv_offsets[2] = 0
+    self._hsv_offsets[3] = 0
+    self._alpha_offset = 0
+
     self:snapshot()
 end
 
