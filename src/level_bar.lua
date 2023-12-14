@@ -1,5 +1,5 @@
 rt.settings.level_bar = {
-    backdrop_darken_offset = 0.4,
+    backdrop_darken_offset = 0.3,
     corner_radius = rt.settings.margin_unit
 }
 
@@ -19,7 +19,8 @@ rt.LevelBar = meta.new_type("LevelBar", function(lower, upper, value)
         _backdrop = rt.Rectangle(0, 0, 1, 1),
         _backdrop_outline = rt.Rectangle(0, 0, 1, 1),
         _color = rt.Palette.HIGHLIGHT,
-        _backdrop_color = rt.color_darken(rt.Palette.HIGHLIGHT, rt.settings.level_bar.backdrop_darken_offset)
+        _backdrop_color = rt.color_darken(rt.Palette.HIGHLIGHT, rt.settings.level_bar.backdrop_darken_offset),
+        _marks = {} -- {value, line}
     }, rt.Drawable, rt.Widget)
 
     out._backdrop_outline:set_is_outline(true)
@@ -46,6 +47,12 @@ function rt.LevelBar:_update_value()
     bounds = rt.AABB(math.round(bounds.x), math.round(bounds.y), math.round(bounds.width), math.round(bounds.height))
     self._shape:resize(bounds)
     self._shape_outline:resize(bounds.x + bounds.width, bounds.y, bounds.x + bounds.width, bounds.y + bounds.height)
+
+
+    for _, mark in pairs(self._marks) do
+        local mark_x = math.floor(x + (mark.value - self._lower) / (self._upper - self._lower) * width)
+        mark.line = {mark_x, y, mark_x, y + height}
+    end
 end
 
 --- @overload rt.Drawable.draw
@@ -62,6 +69,27 @@ function rt.LevelBar:draw()
 
     self._backdrop:draw()
     self._shape:draw()
+
+    -- draw marks with 1-px outline on each side
+    local thickness = 2
+    love.graphics.push()
+    local outline_color = self._backdrop_outline:get_color()
+    for _, mark in pairs(self._marks) do
+        --[[
+        love.graphics.setLineWidth(thickness)
+        love.graphics.setColor(outline_color.r, outline_color.g, outline_color.b, outline_color.a)
+        love.graphics.translate(-thickness, 0)
+        love.graphics.line(table.unpack(mark.line))
+        love.graphics.translate( 2 * thickness, 0)
+        love.graphics.line(table.unpack(mark.line))
+        love.graphics.translate(-thickness, 0)
+        love.graphics.setColor(1, 1, 1, 1)
+        ]]--
+        love.graphics.setColor(outline_color.r, outline_color.g, outline_color.b, outline_color.a)
+        love.graphics.line(table.unpack(mark.line))
+    end
+    love.graphics.pop()
+
     self._backdrop_outline:draw()
     self._shape_outline:draw()
 
@@ -101,4 +129,24 @@ function rt.LevelBar:set_color(color, backdrop_color)
 
     self._shape:set_color(self._color)
     self._backdrop:set_color(self._backdrop_color)
+end
+
+--- @brief
+function rt.LevelBar:add_mark(value)
+    if value < self._lower or value  > self._upper then
+        rt.error("In LevelBar:add_mark: value `" .. tostring(value) .. " is out of range for level bar with bounds `[", tostring(self._lower) .. ", " .. tostring(self._upper) .. "]")
+    end
+
+    local x, y = self._backdrop:get_position()
+    local width, height = self._backdrop:get_size()
+    local mark_x = x + (value - self._lower) / (self._upper - self._lower) * width
+    table.insert(self._marks, {
+        value = value,
+        line = {mark_x, y, mark_x, y + height}
+    })
+end
+
+--- @brief
+function rt.LevelBar:clear_marks()
+    self._marks = {}
 end

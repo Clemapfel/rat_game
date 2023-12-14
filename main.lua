@@ -44,6 +44,10 @@ bar:set_expand_vertically(false)
 bar:set_minimum_size(0, rt.settings.margin_unit)
 bar:set_margin_horizontal(rt.settings.margin_unit)
 
+bar:add_mark(25)
+bar:add_mark(50)
+bar:add_mark(75)
+
 rt.current_scene:set_child(bar)
 input = rt.add_input_controller(rt.current_scene.window)
 input:signal_connect("pressed", function(self, which)
