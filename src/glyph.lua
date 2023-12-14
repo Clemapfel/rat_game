@@ -160,7 +160,7 @@ function rt.Glyph:_non_animated_draw()
         if self._is_outlined then self:_draw_outline(x, y) end
 
         love.graphics.setColor(self._color.r, self._color.g, self._color.b, self._color.a)
-        self:render(self._glyph, x, y)
+        self:render(self._glyph, math.floor(x), math.floor(y))
     elseif self:get_n_visible_characters() > 0 then
         if sizeof(self._character_widths) == 0 then
             self:_initialize_character_widths()
@@ -173,7 +173,7 @@ function rt.Glyph:_non_animated_draw()
         if self._is_outlined then self:_draw_outline(x, y) end
 
         love.graphics.setColor(self._color.r, self._color.g, self._color.b, self._color.a)
-        self:render(self._glyph, x, y)
+        self:render(self._glyph, math.floor(x), math.floor(y))
         love.graphics.setScissor()
     end
 
@@ -230,7 +230,7 @@ function rt.Glyph:_animated_draw()
         local pos_x, pos_y = self:get_position()
         if self._is_outlined then self:_draw_outline(pos_x + offset.x, pos_y + offset.y) end
         love.graphics.setColor(color.r, color.g, color.b, color.a)
-        self:render(self._glyph, pos_x + offset.x, pos_y + offset.y)
+        self:render(self._glyph, math.floor(pos_x + offset.x), math.floor(pos_y + offset.y))
 
         if self._is_strikethrough or self._is_underlined then
             local font = self._font[self._style]

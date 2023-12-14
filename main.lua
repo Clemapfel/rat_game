@@ -42,10 +42,10 @@ swipe:set_modifies_focus(true)
 swipe:set_allow_wrap(false)
 
 
-pixel_font = rt.Font(rt.settings.font.default_size * 2,
-"assets/fonts/ProggyTiny/ProggyTiny.ttf"
+pixel_font = rt.Font(30,
+"assets/fonts/pix.ttf"
 )
-rt.current_scene:set_child(rt.Label("<o>0123456789</o>", pixel_font))
+rt.current_scene:set_child(rt.Label("<color=SPEED><o>0123456789</o></color>", pixel_font))
 input = rt.add_input_controller(rt.current_scene.window)
 input:signal_connect("pressed", function(self, which)
 
