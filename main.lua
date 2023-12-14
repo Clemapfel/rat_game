@@ -13,13 +13,6 @@ for _, action in pairs({move, consumable, intrinsic}) do
 end
 
 selection_menu = bt.ActionSelectionMenu(entity)
-
-glyph = rt.Glyph(rt.settings.font.default_mono, "test", rt.FontStyle.REGULAR, {
-    is_outlined = true,
-    outline_color = rt.RGBA(0, 0, 0, 1),
-    effect = {rt.TextEffect.WAVE}
-})
-
 thumbnail = bt.ActionSelectionThumbnail(move)
 
 swipe = rt.SwipeLayout(rt.Orientation.VERTICAL)
@@ -41,11 +34,17 @@ swipe:set_show_selection(false)
 swipe:set_modifies_focus(true)
 swipe:set_allow_wrap(false)
 
+equipment = bt.Equipment("TEST_EQUIPMENT")
+status = bt.StatusAilment("TEST_STATUS")
 
-pixel_font = rt.Font(30,
-"assets/fonts/pix.ttf"
-)
-rt.current_scene:set_child(rt.Label("<color=SPEED><o>0123456789</o></color>", pixel_font))
+bar = rt.LevelBar(0, 100, 50)
+bar:set_color(rt.Palette.HP)
+bar:set_value(45)
+bar:set_expand_vertically(false)
+bar:set_minimum_size(0, rt.settings.margin_unit)
+bar:set_margin_horizontal(rt.settings.margin_unit)
+
+rt.current_scene:set_child(bar)
 input = rt.add_input_controller(rt.current_scene.window)
 input:signal_connect("pressed", function(self, which)
 

@@ -1,5 +1,5 @@
 rt.settings.font = {
-    default_size = 50,
+    default_size = 30,
     default = {},       -- rt.Font
     default_mono = {},  -- rt.Font
     regular_fallbacks = {},     -- Table<love.Font>

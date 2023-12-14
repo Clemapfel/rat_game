@@ -64,9 +64,9 @@ bt.Equipment = meta.new_type("Equipment", function(id)
         out.flavor_text = flavor_text
     end
 
-    local thumbnail_id = config.thumbnail_id
-    meta.assert_string(thumbnail_id)
-    out.thumbnail_id = thumbnail_id
+    local sprite_id = config.sprite_id
+    meta.assert_string(sprite_id)
+    out.sprite_id = sprite_id
 
     meta.set_is_mutable(out, false)
     return out
@@ -88,4 +88,12 @@ bt.Equipment.effect_text = "No additional effect."
 bt.Equipment.flavor_text = ""
 
 -- sprite for inventory thumbnail
-bt.Equipment.thumbnail_id = "default"
+bt.Equipment.sprite_id = "default"
+
+--- @brief
+function bt.Equipment:create_sprite()
+    if meta.is_nil(bt.Equipment.spritesheet) then
+        bt.Equipment.spritesheet = rt.Spritesheet("assets/sprites", "equipment")
+    end
+    return rt.Sprite(bt.Equipment.spritesheet, self.sprite_id)
+end

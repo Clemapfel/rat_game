@@ -1,5 +1,5 @@
 return {
-    name = "test_levelbar",
+    name = "test_level_bar",
     width = 16,
     height = 16,
     animations = {

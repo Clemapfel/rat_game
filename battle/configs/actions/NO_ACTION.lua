@@ -12,6 +12,6 @@ return {
     can_target_ally = false,
     can_target_enemy = false,
 
-    thumbnail_id = "no_action",
+    sprite_id = "no_action",
     animation_id = "no_action"
 }

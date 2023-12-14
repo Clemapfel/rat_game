@@ -284,8 +284,8 @@ function rt.Label:_parse()
         table.insert(self._glyphs, rt.Glyph(
             font,
             current_word,
-            style,
             {
+                font_style = style,
                 color = rt.Palette[ternary(effect_rainbow, "TRUE_WHITE", color)],
                 is_underlined = underlined,
                 is_strikethrough = strikethrough,

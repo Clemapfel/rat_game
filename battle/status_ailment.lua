@@ -50,7 +50,7 @@ bt.StatusAilment.verbose_description = "this status ailment has no effect, it is
 bt.StatusAilment.flavor_text = "status statis"
 
 -- sprite IDs
-bt.StatusAilment.sprite = "default"
+bt.StatusAilment.sprite_id = "default"
 
 -- stats
 bt.StatusAilment.attack_factor = 1
@@ -59,3 +59,12 @@ bt.StatusAilment.speed_factor = 1
 
 -- duration
 bt.StatusAilment.max_duration = POSITIVE_INFINITY
+
+--- @brief
+function bt.StatusAilment:create_sprite()
+
+    if meta.is_nil(bt.StatusAilment.spritesheet) then
+        bt.StatusAilment.spritesheet = rt.Spritesheet("assets/sprites", "status_ailment")
+    end
+    return rt.Sprite(bt.StatusAilment.spritesheet, self.sprite_id)
+end

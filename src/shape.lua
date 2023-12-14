@@ -343,13 +343,14 @@ end
 --- @brief TODO
 function rt.Rectangle:resize(aabb, y, w, h)
 
-    if meta.is_aabb(aab) then
+    if meta.is_aabb(aabb) then
         self._x = aabb.x
         self._y = aabb.y
         self._w = aabb.width
         self._h = aabb.height
     else
         local x = aabb
+        meta.assert_number(x, y, w, h)
         self._x = x
         self._y = y
         self._w = w

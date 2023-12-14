@@ -80,9 +80,9 @@ bt.Action = meta.new_type("Action", function(id)
         out.flavor_text = flavor_text
     end
 
-    local thumbnail_id = config.thumbnail_id
+    local sprite_id = config.sprite_id
 
-    out.thumbnail_id = thumbnail_id
+    out.sprite_id = sprite_id
 
     local animation_id = config.animation_id
 
@@ -113,7 +113,7 @@ bt.Action.verbose_effect_text = "Has no additional effect"
 bt.Action.flavor_text = "flavorless"
 
 -- sprite for inventory thumbnail
-bt.Action.thumbnail_id = "default"
+bt.Action.sprite_id = "default"
 
 -- sprite for in-battle animation
 bt.Action.animation_id = "default"
@@ -123,7 +123,7 @@ function bt.Action:create_sprite()
     if meta.is_nil(bt.Action.spritesheet) then
         bt.Action.spritesheet = rt.Spritesheet("assets/sprites", "orbs")
     end
-    return rt.Sprite(bt.Action.spritesheet, self.thumbnail_id)
+    return rt.Sprite(bt.Action.spritesheet, self.sprite_id)
 end
 
 

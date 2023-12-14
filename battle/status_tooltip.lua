@@ -7,16 +7,9 @@ rt.settings.status_tooltip = {
 --- @class bt.StatusTooltip
 bt.StatusTooltip = meta.new_type("StatusTooltip", function(status)
 
-    if meta.is_nil(env.status_ailment_spritesheet) then
-        env.status_ailment_spritesheet = rt.Spritesheet("assets/sprites", "status_ailment")
-    end
-
-    local sprite_id = "default"
-    local sprite_size_x, sprite_size_y = env.status_ailment_spritesheet:get_frame_size(sprite_id)
-
     local out = meta.new(bt.StatusTooltip, {
         _status_ailment = status,
-        _sprite = rt.Sprite(env.status_ailment_spritesheet, sprite_id),
+        _sprite = status:create_sprite(),
         _tooltip = {} -- bt.BattleTooltip
     }, rt.Widget, rt.Drawable)
 

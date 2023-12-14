@@ -144,8 +144,6 @@ end
 --- @brief
 function rt.TooltipLayout:set_tooltip_visible(b)
 
-
-
     self._show_tooltip = b
     local visible = self._show_tooltip
     if not meta.is_widget(self._tooltip) then return end

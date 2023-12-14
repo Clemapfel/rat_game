@@ -12,6 +12,6 @@ return {
     can_target_ally = false,
     can_target_enemy = true,
 
-    thumbnail_id = "analyze",
+    sprite_id = "analyze",
     animation_id = "analyze"
 }

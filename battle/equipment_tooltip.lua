@@ -12,7 +12,7 @@ bt.EquipmentTooltip = meta.new_type("EquipmentTooltip", function(equipment)
 
     local out = meta.new(bt.EquipmentTooltip, {
         _equipment = equipment,
-        _sprite = rt.Sprite(env.equipment_spritesheet, sprite_id),
+        _sprite = equipment:create_sprite(),
         _tooltip = {} -- bt.BattleTooltip
     }, rt.Widget, rt.Drawable)
 

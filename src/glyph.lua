@@ -23,23 +23,18 @@ rt.TextEffect = meta.new_enum({
 --- @class rt.Glyph
 --- @param font rt.Font
 --- @param content String
---- @param font_style rt.FontStyle
 --- @param look Table
-rt.Glyph = meta.new_type("Glyph", function(
-    font,
-    content,
-    font_style,
-    look,
-    wrap_width
-)
+rt.Glyph = meta.new_type("Glyph", function(font, content, look)
 
     meta.assert_table(look)
+    local font_style = look.font_style
     local color = look.color
     local is_underlined = look.is_underlined
     local is_strikethrough = look.is_strikethrough
     local is_outlined = look.is_outlined
     local outline_color = look.outline_color
     local effects = look.effect
+    local wrap_width = look.wrap_width
 
     if meta.is_nil(font_style) then font_style = rt.FontStyle.REGULAR end
     if meta.is_nil(color) then color = rt.RGBA(1, 1, 1, 1) end
@@ -51,7 +46,6 @@ rt.Glyph = meta.new_type("Glyph", function(
     if meta.is_nil(outline_color) then outline_color = rt.settings.glyph.default_outline_color end
     --if meta.is_nil(has_background) then has_background = false end
     --if meta.is_nil(background_color) then background_color = rt.settings.glyph.default_outline_color end
-
 
     local out = meta.new(rt.Glyph, {
         _font = font,
