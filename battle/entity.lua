@@ -159,6 +159,15 @@ function bt.Entity:_get_status_ailment_elapsed(status)
     return out
 end
 
+--- @brief
+function bt.Entity:get_status_ailments()
+    local out = {}
+    for status, _ in pairs(self.status_ailments) do
+        table.insert(out, status)
+    end
+    return out
+end
+
 --- @brief add move to moveset
 function bt.Entity:add_action(action)
     entity.moveset[action] = action.max_n_use

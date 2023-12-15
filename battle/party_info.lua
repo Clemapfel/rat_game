@@ -26,7 +26,8 @@ bt.PartyInfo = meta.new_type("PartyInfo", function(entity)
         _defense_indicator = bt.StatLevelIndicator(entity:get_defense_level()),
         _speed_indicator = bt.StatLevelIndicator(entity:get_speed_level()),
         _indicator_base = rt.Spacer(),
-        _indicator_base_frame = rt.Frame()
+        _indicator_base_frame = rt.Frame(),
+        _status_area = rt.FlowLayout()
     }, rt.Drawable, rt.Widget)
 
     local hp_content = tostring(entity:get_hp()) .. " / " .. tostring(entity:get_hp_base())
@@ -65,6 +66,13 @@ bt.PartyInfo = meta.new_type("PartyInfo", function(entity)
     out._defense_indicator._sprite:set_color(rt.Palette.DEFENSE)
     out._speed_indicator._sprite:set_color(rt.Palette.SPEED)
 
+    for _, status in pairs(out._entity:get_status_ailments()) do
+        local to_push = status:create_sprite()
+        local res_x, res_y = to_push:get_resolution()
+        to_push:set_minimum_size(res_x * 2, res_y * 2)
+        out._status_area:push_back(to_push)
+    end
+
     return out
 end)
 
@@ -95,7 +103,7 @@ function bt.PartyInfo:size_allocate(x, y, width, height)
     self._h_rule:fit_into(x, h_rule_y, w, rule_thickness)
 
     local sprite_size = self._attack_indicator._sprite:get_resolution() * 3
-    local indicator_area = rt.AABB(hp_x, y + 2 * m + hp_h + rule_thickness + 0.5 * m + 0.5 * sprite_size, sprite_size, sprite_size)
+    local indicator_area = rt.AABB(hp_x, y + 2 * m + hp_h + rule_thickness + 0.5 * m, sprite_size, sprite_size)
     for _, indicator in pairs({self._attack_indicator, self._defense_indicator, self._speed_indicator}) do
         indicator:fit_into(indicator_area)
         indicator_area.x = indicator_area.x + indicator_area.width + indicator_spacing
@@ -108,6 +116,13 @@ function bt.PartyInfo:size_allocate(x, y, width, height)
     local h = select(2, self._speed_label:get_position()) + select(2, self._speed_label:get_size()) - y + 0.5 * m
     self._frame:set_thickness(rule_thickness - 2)
     self._frame:fit_into(x - rule_thickness, y - rule_thickness, w + 2 * rule_thickness, h + 2 * rule_thickness)
+
+
+    local status = self._entity:get_status_ailments()
+    if not sizeof(status) ~= 0 then
+        local status_h = select(2, self._status_area:measure())
+        self._status_area:fit_into(x - rule_thickness, y - rule_thickness - status_h, w + 2 * rule_thickness, h + 2 * rule_thickness)
+    end
 
     local v_rule_left = indicator_area.x
     local v_rule_right = select(1, self._speed_label:get_position())
@@ -179,6 +194,7 @@ function bt.PartyInfo:draw()
     self._speed_indicator:draw()
 
     self._speed_label:draw()
+    self._status_area:draw()
 end
 
 --- @overload rt.Widget.realize

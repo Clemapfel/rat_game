@@ -51,9 +51,11 @@ bar:add_mark(25)
 bar:add_mark(50)
 bar:add_mark(75)
 
+entity:add_status_ailment(status)
 info = bt.PartyInfo(entity)
 info:set_margin(10)
 info._hp_bar:set_value(75)
+info:set_margin_top(200)
 
 box = rt.SwipeLayout()
 for i = -4, 4, 1 do

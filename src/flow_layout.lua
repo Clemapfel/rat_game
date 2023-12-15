@@ -123,8 +123,7 @@ end
 --- @brief append child
 --- @param child rt.Widget
 function rt.FlowLayout:push_back(child)
-
-
+    meta.assert_widget(child)
     child:set_parent(self)
     self._children:push_back(child)
 
@@ -137,8 +136,7 @@ end
 --- @brief prepend child
 --- @param child rt.Widget
 function rt.FlowLayout:push_front(child)
-
-
+    meta.assert_widget(child)
     child:set_parent(self)
     self._children:push_back(child)
     if self:get_is_realized() then
