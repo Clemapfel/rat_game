@@ -3,8 +3,9 @@ require "include"
 rt.add_scene("debug")
 
 entity = bt.Entity("TEST_ENTITY")
-entity.attack_level = 4
-entity.defense_level = -2
+entity.attack_level = 0
+entity.defense_level = 0
+entity.speed_level = 0
 
 move = bt.Action("TEST_MOVE")
 consumable = bt.Action("TEST_CONSUMABLE")
@@ -59,7 +60,7 @@ for i = -4, 4, 1 do
     box:push_back(bt.StatLevelTooltip(rt.random.choose({bt.Stat.ATTACK, bt.Stat.DEFENSE, bt.Stat.SPEED}), i))
 end
 
-rt.current_scene:set_child(box)
+rt.current_scene:set_child(info)
 input = rt.add_input_controller(rt.current_scene.window)
 input:signal_connect("pressed", function(self, which)
 

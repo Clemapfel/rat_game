@@ -135,10 +135,8 @@ rt.Palette.SELECTION_OUTLINE = rt.Palette.ORANGE_1
 
 -- battle
 
-
-
 rt.Palette.ALLY = rt.Palette.LIGHT_BLUE_1
-rt.Palette.ENEMY = rt.Palette.RED_1
+rt.Palette.ENEMY = rt.Palette.LIGHT_RED_3
 rt.Palette.SELF = rt.Palette.PURPLE_1
 rt.Palette.FIELD = rt.Palette.ORANGE_1
 

@@ -26,6 +26,7 @@ rt.TextEffect = meta.new_enum({
 --- @param look Table
 rt.Glyph = meta.new_type("Glyph", function(font, content, look)
 
+    look = which(look, {})
     meta.assert_table(look)
     local font_style = look.font_style
     local color = look.color
