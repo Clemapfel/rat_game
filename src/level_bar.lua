@@ -1,6 +1,7 @@
 rt.settings.level_bar = {
     backdrop_darken_offset = 0.3,
-    corner_radius = rt.settings.margin_unit
+    corner_radius = rt.settings.margin_unit,
+    outline_width = 3
 }
 
 --- @class rt.LevelBar
@@ -9,6 +10,8 @@ rt.LevelBar = meta.new_type("LevelBar", function(lower, upper, value)
     if meta.is_nil(value) then
         value = mix(lower, upper, 0.5)
     end
+
+    meta.assert_number(upper)
 
     local out = meta.new(rt.LevelBar, {
         _lower = lower,
@@ -29,12 +32,16 @@ rt.LevelBar = meta.new_type("LevelBar", function(lower, upper, value)
     out._backdrop_outline:set_color(rt.Palette.BACKGROUND_OUTLINE)
     out._shape_outline:set_color(rt.Palette.BACKGROUND_OUTLINE)
 
+    out._backdrop_outline:set_line_width(rt.settings.level_bar.outline_width)
+    out._shape_outline:set_line_width(1)
+
     for _, shape in pairs({out._backdrop, out._backdrop_outline}) do
         shape:set_corner_radius(rt.settings.level_bar.corner_radius)
     end
 
     out:set_color(out._color)
     out:_update_value()
+
     return out
 end)
 
@@ -86,6 +93,7 @@ function rt.LevelBar:draw()
         love.graphics.setColor(1, 1, 1, 1)
         ]]--
         love.graphics.setColor(outline_color.r, outline_color.g, outline_color.b, outline_color.a)
+        love.graphics.setLineWidth(rt.settings.level_bar.outline_width)
         love.graphics.line(table.unpack(mark.line))
     end
     love.graphics.pop()

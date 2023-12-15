@@ -133,6 +133,11 @@ function bt.Entity:get_attack_level() return self.attack_level end
 function bt.Entity:get_defense_level() return self.defense_level end
 function bt.Entity:get_speed_level() return self.speed_level end
 
+function bt.Entity:get_hp_base() return self.hp_base end
+function bt.Entity:get_attack_base() return self.attack_base end
+function bt.Entity:get_defense_base() return self.defense_base end
+function bt.Entity:get_speed_base() return self.speed_base end
+
 
 --- @brief add new status
 function bt.Entity:add_status_ailment(status_ailment)

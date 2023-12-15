@@ -3,6 +3,8 @@ require "include"
 rt.add_scene("debug")
 
 entity = bt.Entity("TEST_ENTITY")
+entity.attack_level = 4
+entity.defense_level = -2
 
 move = bt.Action("TEST_MOVE")
 consumable = bt.Action("TEST_CONSUMABLE")
@@ -48,7 +50,11 @@ bar:add_mark(25)
 bar:add_mark(50)
 bar:add_mark(75)
 
-rt.current_scene:set_child(bar)
+info = bt.PartyInfo(entity)
+info:set_margin(10)
+info._hp_bar:set_value(75)
+
+rt.current_scene:set_child(info)
 input = rt.add_input_controller(rt.current_scene.window)
 input:signal_connect("pressed", function(self, which)
 

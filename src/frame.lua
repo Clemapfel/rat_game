@@ -121,8 +121,7 @@ end
 --- @param child rt.Widget
 function rt.Frame:set_child(child)
 
-
-
+    meta.assert_widget(child)
     if not meta.is_nil(self._child) and meta.is_widget(self._child) then
         self._child:set_parent(nil)
     end
