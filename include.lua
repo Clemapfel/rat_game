@@ -117,6 +117,7 @@ require "battle/action_tooltip"
 require "battle/action_list_item"
 require "battle/entity_tooltip"
 require "battle/status_tooltip"
+require "battle/status_thumbnail"
 require "battle/stat_level_tooltip"
 require "battle/party_info"
 
