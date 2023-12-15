@@ -40,6 +40,11 @@ function bt.StatusThumbnail:realize()
     rt.Widget.realize(self)
 end
 
+--- @overload
+function bt.StatusThumbnail:measure()
+    return self._sprite:measure()
+end
+
 --- @brief
 function bt.StatusThumbnail:set_count(n)
 

@@ -66,15 +66,21 @@ bt.PartyInfo = meta.new_type("PartyInfo", function(entity)
     out._defense_indicator._sprite:set_color(rt.Palette.DEFENSE)
     out._speed_indicator._sprite:set_color(rt.Palette.SPEED)
 
-    for _, status in pairs(out._entity:get_status_ailments()) do
-        local to_push = status:create_sprite()
-        local res_x, res_y = to_push:get_resolution()
-        to_push:set_minimum_size(res_x * 2, res_y * 2)
-        out._status_area:push_back(to_push)
-    end
-
+    out._status_area:set_horizontal_alignment(rt.Alignment.START)
+    out:_update_status_ailments()
     return out
 end)
+
+--- @brief
+function bt.PartyInfo:_update_status_ailments()
+
+    local thumbnails = {}
+    for _, status in pairs(self._entity:get_status_ailments()) do
+        table.insert(thumbnails, bt.StatusThumbnail(status, status.max_duration - self._entity:_get_status_ailment_elapsed(status)))
+    end
+
+    self._status_area:set_children(thumbnails)
+end
 
 --- @brief [internal]
 function bt.PartyInfo._format_speed(value)
@@ -84,12 +90,16 @@ end
 
 --- @overload rt.Wiget.size_allocate
 function bt.PartyInfo:size_allocate(x, y, width, height)
-    local m = rt.settings.margin_unit
 
+    local m = rt.settings.margin_unit
     local label_w, label_h = self._speed_label:get_size()
     local rule_thickness = 5 --select(2, self._h_rule:get_minimum_size())
     local indicator_spacing = 0.5 * m
     local w = 3 * select(1, self._attack_indicator:get_size()) + 2 * indicator_spacing + 2 * m + rule_thickness + label_w + 2 * m + m
+    local h = select(2, self._speed_label:get_position()) + select(2, self._speed_label:get_size()) - y + 2 * m
+
+    x = x + 0.5 * width - 0.5 * w
+    y = y + 0.5 * height - 0.5 * h
 
     local hp_label_w, hp_label_h = self._hp_label:get_size()
     local hp_x = x + m
@@ -113,16 +123,11 @@ function bt.PartyInfo:size_allocate(x, y, width, height)
 
     self._speed_label:set_position(hp_x + hp_w - label_w, indicator_area.y + 0.5 * indicator_area.height - 0.5 * label_h)
 
-    local h = select(2, self._speed_label:get_position()) + select(2, self._speed_label:get_size()) - y + 0.5 * m
     self._frame:set_thickness(rule_thickness - 2)
     self._frame:fit_into(x - rule_thickness, y - rule_thickness, w + 2 * rule_thickness, h + 2 * rule_thickness)
 
-
-    local status = self._entity:get_status_ailments()
-    if not sizeof(status) ~= 0 then
-        local status_h = select(2, self._status_area:measure())
-        self._status_area:fit_into(x - rule_thickness, y - rule_thickness - status_h, w + 2 * rule_thickness, h + 2 * rule_thickness)
-    end
+    local status_h = select(2, self._status_area:measure())
+    self._status_area:fit_into(x - rule_thickness, y - rule_thickness - status_h , w + 2 * rule_thickness, h + 2 * rule_thickness)
 
     local v_rule_left = indicator_area.x
     local v_rule_right = select(1, self._speed_label:get_position())
