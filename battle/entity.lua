@@ -88,6 +88,11 @@ rt.settings.entity.level_to_factor[ 2] = 1.5
 rt.settings.entity.level_to_factor[ 3] = 1.75
 rt.settings.entity.level_to_factor[ 4] = 2
 
+--- @brief
+function bt.stat_level_to_factor(x)
+    return rt.settings.entity.level_to_factor[x]
+end
+
 -- 1 ev to absolute offset
 rt.settings.entity.ev_to_offset = 100
 

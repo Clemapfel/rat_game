@@ -19,7 +19,6 @@ end
 --- @brief re-seed randomness
 --- @param seed Number
 function rt.random.seed(seed)
-
     love.math.setRandomSeed(seed)
 end
 
@@ -28,7 +27,6 @@ end
 --- @param max Number
 --- @return Number
 function rt.random.integer(min, max)
-
     return love.math.random(min, max)
 end
 
@@ -37,14 +35,12 @@ end
 --- @param max Number
 --- @return Number
 function rt.random.number(min, max)
-
     return min + rt.rand() * max
 end
 
 --- @brief pick random element from table
 --- @param set Table
 function rt.random.choose(set)
-
     local step = rt.random.integer(0, #set)
     local i, v = next(set)
     local n = 0

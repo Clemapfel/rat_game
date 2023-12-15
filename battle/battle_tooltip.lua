@@ -9,6 +9,11 @@ rt.settings.battle_tooltip = {
 --- @class bt.BattleTooltip
 bt.BattleTooltip = meta.new_type("BattleTooltip", function(name, status, description, flavor_text, sprite)
 
+    meta.assert_string(name)
+    status = which(status, "")
+    description = which(description, "")
+    flavor_text = which(flavor_text, "")
+
     local out = meta.new(bt.BattleTooltip, {
         _entity = entity,
         _name_label = rt.Label(rt.settings.battle_tooltip.name_prefix .. name .. rt.settings.battle_tooltip.name_suffix),
@@ -43,9 +48,18 @@ bt.BattleTooltip = meta.new_type("BattleTooltip", function(name, status, descrip
     out._name_and_sprite_box:push_back(out._name_label)
 
     out._main:push_back(out._name_and_sprite_box)
-    out._main:push_back(out._stat_label)
-    out._main:push_back(out._description_label)
-    out._main:push_back(out._flavor_text_label)
+
+    if not meta.is_nil(status) then
+        out._main:push_back(out._stat_label)
+    end
+
+    if not meta.is_nil(description) then
+        out._main:push_back(out._description_label)
+    end
+
+    if not meta.is_nil(flavor_text) then
+        out._main:push_back(out._flavor_text_label)
+    end
 
     out._sprite_frame:set_expand(false)
 

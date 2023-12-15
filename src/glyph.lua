@@ -1,7 +1,7 @@
 rt.settings.glyph = {
     default_background_color = rt.RGBA(0, 0, 0, 1),
     default_outline_color = rt.RGBA(0, 0, 0, 1),
-    outline_thickness = 2,
+    outline_thickness = 1,
     rainbow_width = 15,    -- n characters
     shake_offset = 6,      -- px
     shake_period = 15,     -- shakes per second

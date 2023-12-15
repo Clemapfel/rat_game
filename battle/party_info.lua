@@ -5,54 +5,6 @@ rt.settings.party_info = {
     frame_color = rt.Palette.GREY_5
 }
 
---- @class bt.StatLevelIndicator
-bt.StatLevelIndicator = meta.new_type("StatLevelIndicator", function(level)
-    if meta.is_nil(bt.PartyInfo.spritesheet) then
-        bt.PartyInfo.spritesheet = rt.Spritesheet("assets/sprites", "party_info")
-    end
-
-    local out = meta.new(bt.StatLevelIndicator, {
-        _sprite = rt.Sprite(bt.PartyInfo.spritesheet, "neutral")
-    }, rt.Drawable, rt.Widget)
-    out:set_level(level)
-    return out
-end)
-
---- @overload
-function bt.StatLevelIndicator:get_top_level_widget()
-    return self._sprite
-end
-
-function bt.StatLevelIndicator:draw()
-    self._sprite:draw()
-end
-
---- @brief
-function bt.StatLevelIndicator:set_level(level)
-    local id = "neutral"
-    if level > 3 then
-        id = "up_infinite"
-    elseif level == 3 then
-        id = "up_3"
-    elseif level == 2 then
-        id = "up_2"
-    elseif level == 1 then
-        id = "up_1"
-    elseif level == 0 then
-        id = "neutral"
-    elseif level == -1 then
-        id = "down_1"
-    elseif level == -2 then
-        id = "down_2"
-    elseif level == -3 then
-        id = "down_3"
-    elseif level < -4 then
-        id = "down_infinite"
-    end
-
-    self._sprite:set_animation(id)
-end
-
 --- @class bt.PartyInfo
 bt.PartyInfo = meta.new_type("PartyInfo", function(entity)
     meta.assert_isa(entity, bt.Entity)

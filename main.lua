@@ -54,7 +54,12 @@ info = bt.PartyInfo(entity)
 info:set_margin(10)
 info._hp_bar:set_value(75)
 
-rt.current_scene:set_child(info)
+box = rt.SwipeLayout()
+for i = -4, 4, 1 do
+    box:push_back(bt.StatLevelTooltip(rt.random.choose({bt.Stat.ATTACK, bt.Stat.DEFENSE, bt.Stat.SPEED}), i))
+end
+
+rt.current_scene:set_child(box)
 input = rt.add_input_controller(rt.current_scene.window)
 input:signal_connect("pressed", function(self, which)
 
