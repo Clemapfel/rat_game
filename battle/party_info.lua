@@ -3,7 +3,8 @@ rt.settings.party_info = {
     hp_font = rt.Font(30, "assets/fonts/pixel.ttf"),
     base_color = rt.Palette.GREY_6,
     frame_color = rt.Palette.GREY_5,
-    tick_speed = 100, -- 1 point per second
+    tick_speed_base = 100, -- 1 point per second
+    tick_speed_acceleration_factor = 10,
 }
 
 --- @class bt.PartyInfo
@@ -17,6 +18,7 @@ bt.PartyInfo = meta.new_type("PartyInfo", function(entity)
     local out = meta.new(bt.PartyInfo, {
         _entity = entity,
         _hp_label = {},  -- rt.Glyph
+        _hp_label_right = {},
         _hp_value = -1,
         _speed_label = {}, -- rt.Glyph
         _speed_value = -1,
@@ -34,11 +36,15 @@ bt.PartyInfo = meta.new_type("PartyInfo", function(entity)
         _elapsed = 0
     }, rt.Drawable, rt.Widget, rt.Animation)
 
-    out._hp_label = rt.Glyph(rt.settings.party_info.hp_font, out:_format_hp(entity:get_hp()), {
+    local left, right = out:_format_hp(entity:get_hp())
+    local settings = {
         is_outlined = true,
         outline_color = rt.Palette.TRUE_BLACK,
         color = rt.Palette.TRUE_WHITE
-    })
+    }
+
+    out._hp_label_left = rt.Glyph(rt.settings.party_info.hp_font, left, settings)
+    out._hp_label_right = rt.Glyph(rt.settings.party_info.hp_font, right, settings)
     out._hp_value = entity:get_hp()
 
     out._speed_label = rt.Glyph(rt.settings.party_info.spd_font, out:_format_speed(entity:get_speed()), {
@@ -102,37 +108,68 @@ function bt.PartyInfo:_format_hp(value)
     local current = tostring(value)
 
     current = string.rep(" ", (#max - #current)) .. current
-    return current .. " / " .. max
+    return current, " / " .. max
 end
 
 --- @overload
 function bt.PartyInfo:update(delta)
 
     self._elapsed = self._elapsed + delta
-    local tick_length = 1 / rt.settings.party_info.tick_speed
+    local tick_length = 1 / rt.settings.party_info.tick_speed_base
     local update_hp, update_speed = false, false
     while self._elapsed > tick_length do
-        if self._hp_value < self._entity:get_hp() then
-            self._hp_value = self._hp_value + 1
-            update_hp = true
-        elseif self._hp_value > self._entity:get_hp() then
-            self._hp_value = self._hp_value - 1
-            update_hp = true
+
+        do
+            local current = self._hp_value
+            local target = self._entity:get_hp()
+            local acceleration = 1
+            acceleration = math.round(acceleration + rt.settings.party_info.tick_speed_acceleration_factor *  math.abs(target - current) / math.abs(self._entity:get_hp_base()))
+
+            if current < target then
+                if math.abs(current - target) < acceleration then
+                    self._hp_value = target
+                else
+                    self._hp_value = self._hp_value + acceleration
+                end
+                update_hp = true
+            elseif current > target then
+                if math.abs(current - target) < acceleration then
+                    self._hp_value = target
+                else
+                    self._hp_value = self._hp_value - acceleration
+                end
+                update_hp = true
+            end
         end
 
-        if self._speed_value < self._entity:get_speed() then
-            self._speed_value = self._speed_value + 1
-            update_speed = true
-        elseif self._speed_value > self._entity:get_speed() then
-            self._speed_value = self._speed_value - 1
-            update_speed = true
+        do
+            local current = self._speed_value
+            local target = self._entity:get_speed()
+            local acceleration = 1
+            acceleration = math.round(acceleration + rt.settings.party_info.tick_speed_acceleration_factor *  math.abs(target - current) / math.abs(self._entity:get_speed_base()))
+
+            if current < target then
+                if math.abs(current - target) < acceleration then
+                    self._speed_value = target
+                else
+                    self._speed_value = self._speed_value + acceleration
+                end
+                update_speed = true
+            elseif current > target then
+                if math.abs(current - target) < acceleration then
+                    self._speed_value = target
+                else
+                    self._speed_value = self._speed_value - acceleration
+                end
+                update_speed = true
+            end
         end
 
         self._elapsed = self._elapsed - tick_length
     end
 
     if update_hp then
-        self._hp_label:set_text(self:_format_hp(self._hp_value))
+        self._hp_label_left:set_text(select(1, self:_format_hp(self._hp_value)))
     end
 
     if update_speed then
@@ -153,13 +190,20 @@ function bt.PartyInfo:size_allocate(x, y, width, height)
     x = x + 0.5 * width - 0.5 * w
     y = y + 0.5 * height - 0.5 * h
 
-    local hp_label_w, hp_label_h = self._hp_label:get_size()
+    local left_w, left_h = self._hp_label_left:get_size()
+    local right_w, right_h = self._hp_label_right:get_size()
+
+    local hp_label_w, hp_label_h = left_w + right_w, math.max(left_h, right_h)
     local hp_x = x + m
     local hp_y = y + m
     local hp_w = w - 2 * m
     local hp_h = hp_label_h + m
     self._hp_bar:fit_into(hp_x, hp_y, hp_w, hp_h)
-    self._hp_label:set_position(hp_x + 0.5 * hp_w - 0.5 * hp_label_w, hp_y + 0.5 * hp_h - 0.5 * hp_label_h)
+
+    local hp_label_x = hp_x + 0.5 * hp_w - 0.5 * hp_label_w
+    local hp_label_y = hp_y + 0.5 * hp_h - 0.5 * hp_label_h
+    self._hp_label_left:set_position(hp_label_x, hp_label_y)
+    self._hp_label_right:set_position(hp_label_x + left_w, hp_label_y)
 
     local h_rule_y = y + hp_h + 2 * m
     self._h_rule:fit_into(x, h_rule_y, w, rule_thickness)
@@ -233,7 +277,8 @@ end
 function bt.PartyInfo:draw()
     self._frame:draw()
     self._hp_bar:draw()
-    self._hp_label:draw()
+    self._hp_label_left:draw()
+    self._hp_label_right:draw()
 
     local stencil_value = 255
     love.graphics.stencil(function()
