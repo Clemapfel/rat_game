@@ -68,6 +68,13 @@ input:signal_connect("pressed", function(self, which)
 
     local speed = 0.1
     if which == rt.InputButton.A then
+        if entity.hp_current == 1 then
+            entity.hp_current = entity:get_hp_base()
+            entity.speed_level = -4
+        else
+            entity.hp_current = 1
+            entity.speed_level = 4
+        end
     elseif which == rt.InputButton.B then
     elseif which == rt.InputButton.X then
         swipe:jump_to(1)

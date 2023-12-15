@@ -2,7 +2,8 @@ rt.settings.party_info = {
     spd_font = rt.Font(40, "assets/fonts/pixel.ttf"),
     hp_font = rt.Font(30, "assets/fonts/pixel.ttf"),
     base_color = rt.Palette.GREY_6,
-    frame_color = rt.Palette.GREY_5
+    frame_color = rt.Palette.GREY_5,
+    tick_speed = 100, -- 1 point per second
 }
 
 --- @class bt.PartyInfo
@@ -16,7 +17,9 @@ bt.PartyInfo = meta.new_type("PartyInfo", function(entity)
     local out = meta.new(bt.PartyInfo, {
         _entity = entity,
         _hp_label = {},  -- rt.Glyph
+        _hp_value = -1,
         _speed_label = {}, -- rt.Glyph
+        _speed_value = -1,
         _base = rt.Spacer(),
         _frame = rt.Frame(),
         _h_rule = rt.Spacer(),
@@ -27,21 +30,23 @@ bt.PartyInfo = meta.new_type("PartyInfo", function(entity)
         _speed_indicator = bt.StatLevelIndicator(entity:get_speed_level()),
         _indicator_base = rt.Spacer(),
         _indicator_base_frame = rt.Frame(),
-        _status_area = rt.FlowLayout()
-    }, rt.Drawable, rt.Widget)
+        _status_area = rt.FlowLayout(),
+        _elapsed = 0
+    }, rt.Drawable, rt.Widget, rt.Animation)
 
-    local hp_content = tostring(entity:get_hp()) .. " / " .. tostring(entity:get_hp_base())
-    out._hp_label = rt.Glyph(rt.settings.party_info.hp_font, hp_content, {
+    out._hp_label = rt.Glyph(rt.settings.party_info.hp_font, out:_format_hp(entity:get_hp()), {
         is_outlined = true,
         outline_color = rt.Palette.TRUE_BLACK,
         color = rt.Palette.TRUE_WHITE
     })
+    out._hp_value = entity:get_hp()
 
-    out._speed_label = rt.Glyph(rt.settings.party_info.spd_font, out._format_speed(entity:get_speed()), {
+    out._speed_label = rt.Glyph(rt.settings.party_info.spd_font, out:_format_speed(entity:get_speed()), {
         is_outlined = true,
         outline_color = rt.Palette.TRUE_BLACK,
         color = rt.Palette.SPEED
     })
+    out._speed_value = entity:get_speed()
 
     out._hp_bar:set_color(rt.Palette.HP)
 
@@ -83,9 +88,56 @@ function bt.PartyInfo:_update_status_ailments()
 end
 
 --- @brief [internal]
-function bt.PartyInfo._format_speed(value)
+function bt.PartyInfo:_format_speed(value)
+    self._speed_value = value
+
     value = clamp(value, 0, 9999)
     return string.rep("0", math.abs(#tostring(value) - 4)) .. tostring(value)
+end
+
+--- @brief [internal]
+function bt.PartyInfo:_format_hp(value)
+    self._hp_bar:set_value(value)
+    local max = tostring(self._entity:get_hp_base())
+    local current = tostring(value)
+
+    current = string.rep(" ", (#max - #current)) .. current
+    return current .. " / " .. max
+end
+
+--- @overload
+function bt.PartyInfo:update(delta)
+
+    self._elapsed = self._elapsed + delta
+    local tick_length = 1 / rt.settings.party_info.tick_speed
+    local update_hp, update_speed = false, false
+    while self._elapsed > tick_length do
+        if self._hp_value < self._entity:get_hp() then
+            self._hp_value = self._hp_value + 1
+            update_hp = true
+        elseif self._hp_value > self._entity:get_hp() then
+            self._hp_value = self._hp_value - 1
+            update_hp = true
+        end
+
+        if self._speed_value < self._entity:get_speed() then
+            self._speed_value = self._speed_value + 1
+            update_speed = true
+        elseif self._speed_value > self._entity:get_speed() then
+            self._speed_value = self._speed_value - 1
+            update_speed = true
+        end
+
+        self._elapsed = self._elapsed - tick_length
+    end
+
+    if update_hp then
+        self._hp_label:set_text(self:_format_hp(self._hp_value))
+    end
+
+    if update_speed then
+        self._speed_label:set_text(self:_format_speed(self._speed_value))
+    end
 end
 
 --- @overload rt.Wiget.size_allocate
@@ -210,4 +262,5 @@ function bt.PartyInfo:realize()
         end
     end
     rt.Widget.realize(self)
+    self:set_is_animated(true)
 end

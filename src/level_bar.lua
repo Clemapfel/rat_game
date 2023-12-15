@@ -45,6 +45,18 @@ rt.LevelBar = meta.new_type("LevelBar", function(lower, upper, value)
     return out
 end)
 
+--- @brief
+function rt.LevelBar:set_lower(x)
+    self._lower = x
+    self:_update_value()
+end
+
+--- @brief
+function rt.LevelBar:set_upper(x)
+    self._upper = x
+    self:_update_value()
+end
+
 --- @brief [internal]
 function rt.LevelBar:_update_value()
     local x, y = self._backdrop:get_position()
@@ -55,7 +67,6 @@ function rt.LevelBar:_update_value()
     self._shape:resize(bounds)
     self._shape_outline:resize(bounds.x + bounds.width, bounds.y, bounds.x + bounds.width, bounds.y + bounds.height)
 
-
     for _, mark in pairs(self._marks) do
         local mark_x = math.floor(x + (mark.value - self._lower) / (self._upper - self._lower) * width)
         mark.line = {mark_x, y, mark_x, y + height}
@@ -64,7 +75,6 @@ end
 
 --- @overload rt.Drawable.draw
 function rt.LevelBar:draw()
-
     if not self:get_is_visible() then return end
 
     -- draw with rounded corners

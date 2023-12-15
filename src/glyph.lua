@@ -302,6 +302,12 @@ function rt.Glyph:set_style(style)
     self:_update()
 end
 
+--- @brief set content
+function rt.Glyph:set_text(text)
+    self._content = text
+    self:_update()
+end
+
 --- @brief get font style
 --- @return rt.FontStyle
 function rt.Glyph:get_style()
@@ -329,21 +335,18 @@ end
 --- @brief measure text size
 --- @return (Number, Number)
 function rt.Glyph:get_size()
-
     return self._glyph:getDimensions()
 end
 
 --- @brief access content as string
 --- @return String
 function rt.Glyph:get_content()
-
     return self._content
 end
 
 --- @brief get number of characters of content
 --- @return Number
 function rt.Glyph:get_n_characters()
-
     return #self._content
 end
 
@@ -351,7 +354,6 @@ end
 --- @param x Number
 --- @param y Number
 function rt.Glyph:set_position(x, y)
-
     self._position_x = math.round(x)
     self._position_y = math.round(y)
 end
@@ -359,15 +361,12 @@ end
 --- @brief get top left position
 --- @return (Number, Number)
 function rt.Glyph:get_position()
-
     return self._position_x, self._position_y
 end
 
 --- @brief set number of visible characters, used for text scrolling
 --- @param n Number
 function rt.Glyph:set_n_visible_characters(n)
-
-
     n = clamp(n, 0, self:get_n_characters())
     self._n_visible_chars = n
 
@@ -379,7 +378,6 @@ end
 --- @brief get number of visible characters
 --- @return Number
 function rt.Glyph:get_n_visible_characters()
-
     return clamp(self._n_visible_chars, 0, self:get_n_characters())
 end
 
