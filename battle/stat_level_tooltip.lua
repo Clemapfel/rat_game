@@ -37,7 +37,7 @@ end)
 
 --- @overload rt.Widget.get_top_level_widget
 function bt.StatLevelTooltip:get_top_level_widget()
-    return self._tooltip:get_top_level_widget()
+    return self._tooltip
 end
 
 --- @brief

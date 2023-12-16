@@ -53,23 +53,18 @@ function rt.Widget:get_top_level_widget()
     return nil
 end
 
+--- @brief
+function rt.Widget:_has_top_level()
+    return not meta.is_nil(self:get_top_level_widget())
+end
+
 --- @brief abstract method, returns minimum space that needs to be allocated
 --- @return (Number, Number)
 function rt.Widget:measure()
 
-    local current = self
-    local next = self:get_top_level_widget()
-
-    if not meta.is_nil(next) then
-        while next ~= nil do
-            current = next
-            next = current:get_top_level_widget()
-        end
-        return current:measure()
-    else
-        local min_w, min_h = self:get_minimum_size()
-        return min_w + self:get_margin_left() + self:get_margin_right(), min_h + self:get_margin_top() + self:get_margin_bottom()
-    end
+    if self:_has_top_level() then self = self:get_top_level_widget() end
+    local min_w, min_h = self:get_minimum_size()
+    return min_w + self:get_margin_left() + self:get_margin_right(), min_h + self:get_margin_top() + self:get_margin_bottom()
 end
 
 --- @brief realize widget
@@ -78,14 +73,11 @@ function rt.Widget:realize()
     if self._realized then return end
     self._realized = true
 
-    local current = self
-    local next = self:get_top_level_widget()
-    while next ~= nil do
-        current = next
-        next = current:get_top_level_widget()
+    if self:_has_top_level() then
+        self:get_top_level_widget():realize()
     end
-    current:realize()
-    current:reformat()
+
+    self:reformat()
 end
 
 --- @brief get whether widget was realized
@@ -138,31 +130,20 @@ function rt.Widget:reformat()
 
     -- if widget is compound widget, size_allocate top-level, else call virtual function
 
-
-    local current = self
-    local next = self:get_top_level_widget()
-    while next ~= nil do
-        current = next
-        next = current:get_top_level_widget()
+    if self:_has_top_level() then
+        self = self:get_top_level_widget()
     end
-    current:size_allocate(x, y, width, height)
+    self:size_allocate(x, y, width, height)
 end
 
 --- @brief implements rt.Drawable.draw
 function rt.Widget:draw()
     -- if widget is compound widget, draw top-level, else call virtual function
 
-    local current = self:get_top_level_widget()
-    local next = nil
-    while next ~= nil do
-        current = next
-        next = next:get_top_level_widget()
-    end
-
-    if meta.is_nil(current) then
-        rt.error("" .. meta.typeof(self) .. ":draw: abstract method called. Neither `rt.Widget.get_top_level_widget` nor `rt.Drawable.draw` are implemented for type `" .. meta.typeof(self) .. "`")
+    if self:_has_top_level() then
+        self:get_top_level_widget():draw()
     else
-        current:draw()
+        rt.error("" .. meta.typeof(self) .. ":draw: abstract method called. Neither `rt.Widget.get_top_level_widget` nor `rt.Drawable.draw` are implemented for type `" .. meta.typeof(self) .. "`")
     end
 end
 
@@ -173,14 +154,25 @@ function rt.Widget:fit_into(aabb, y, w, h)
         aabb = rt.AABB(aabb, y, w, h)
     end
 
+    if not (self._bounds.x ~= aabb.x or self._bounds.y ~= aabb.y or self._bounds.width ~= aabb.width or self._bounds.height ~= aabb.height) then return end
+
     self._bounds = aabb
-    self:reformat()
+    if self:_has_top_level() then
+        self = self:get_top_level_widget()
+        self:fit_into(aabb)
+    else
+        self:reformat()
+    end
 end
 
 --- @brief get size of allocation
 --- @return (Number, Number)
 function rt.Widget:get_size()
-    return self._bounds.width - self:get_margin_left() - self:get_margin_right(), self._bounds.height - self:get_margin_top() - self:get_margin_bottom()
+    if self:_has_top_level() then
+        return self:get_top_level_widget():get_size()
+    else
+        return self._bounds.width - self:get_margin_left() - self:get_margin_right(), self._bounds.height - self:get_margin_top() - self:get_margin_bottom()
+    end
 end
 
 --- @brief get width of size allocation
@@ -198,7 +190,11 @@ end
 --- @brief get top left of allocation
 --- @return (Number, Number)
 function rt.Widget:get_position()
-    return self._final_pos_x, self._final_pos_y ---self._bounds.x + self:get_margin_left(), self._bounds.y + self:get_margin_top()
+    if self:_has_top_level() then
+        return self:get_top_level_widget():get_position()
+    else
+        return self._final_pos_x, self._final_pos_y ---self._bounds.x + self:get_margin_left(), self._bounds.y + self:get_margin_top()
+    end
 end
 
 --- @brief get bounds
@@ -212,22 +208,30 @@ end
 --- @param margin Number
 function rt.Widget:set_margin_left(margin)
 
+    if self._margin_left == margin then return end
     self._margin_left = margin
+    if self:_has_top_level() then
+        self:get_top_level_widget():set_margin_left(margin)
+    end
+
     self:reformat()
 end
 
 --- @brief get start margin
 --- @return Number
 function rt.Widget:get_margin_left()
-
     return self._margin_left
 end
 
 --- @brief set end margin
 --- @param margin Number
 function rt.Widget:set_margin_right(margin)
+    if self._margin_right == margin then return end
 
     self._margin_right = margin
+    if self:_has_top_level() then
+        self:get_top_level_widget():set_margin_right(margin)
+    end
     self:reformat()
 end
 
@@ -241,8 +245,12 @@ end
 --- @brief set top margin
 --- @param margin Number
 function rt.Widget:set_margin_top(margin)
+    if self._margin_top == margin then return end
 
     self._margin_top = margin
+    if self:_has_top_level() then
+        self:get_top_level_widget():set_margin_top(margin)
+    end
     self:reformat()
 end
 
@@ -256,8 +264,12 @@ end
 --- @brief set bottom margin
 --- @param margin Number
 function rt.Widget:set_margin_bottom(margin)
+    if self._margin_bottom == margin then return end
 
     self._margin_bottom = margin
+    if self:_has_top_level() then
+        self:get_top_level_widget():set_margin_bottom(margin)
+    end
     self:reformat()
 end
 
@@ -271,29 +283,41 @@ end
 --- @brief set left and right margin
 --- @param margin Number
 function rt.Widget:set_margin_horizontal(margin)
+    if self._margin_left == margin and self._margin_right == margin then return end
 
     self._margin_left = margin
     self._margin_right = margin
+    if self:_has_top_level() then
+        self:get_top_level_widget():set_margin_horizontal(margin)
+    end
     self:reformat()
 end
 
 --- @brief set top and bottom margin
 --- @param margin Number
 function rt.Widget:set_margin_vertical(margin)
+    if self._margin_top == margin and self._margin_bottom == margin then return end
 
     self._margin_top = margin
     self._margin_bottom = margin
+    if self:_has_top_level() then
+        self:get_top_level_widget():set_margin_vertical(margin)
+    end
     self:reformat()
 end
 
 --- @brief set top, bottom, left, and right margin
 --- @param margin Number
 function rt.Widget:set_margin(margin)
+    if self._margin_left == margin and self._margin_right == margin and self._margin_top == margin and self._margin_bottom == margin then return end
 
     self._margin_top = margin
     self._margin_bottom = margin
     self._margin_left = margin
     self._margin_right = margin
+    if self:_has_top_level() then
+        self:get_top_level_widget():set_margin(margin)
+    end
     self:reformat()
 end
 
@@ -307,8 +331,12 @@ end
 --- @param b Boolean
 function rt.Widget:set_expand_horizontally(b)
 
+    if self._expand_horizontally == b then return end
 
     self._expand_horizontally = b
+    if self:_has_top_level() then
+        self:get_top_level_widget():set_expand_horizontally(b)
+    end
     self:reformat()
 end
 
@@ -323,8 +351,12 @@ end
 --- @param b Boolean
 function rt.Widget:set_expand_vertically(b)
 
+    if self._expand_vertically == b then return end
 
     self._expand_vertically = b
+    if self:_has_top_level() then
+        self:get_top_level_widget():set_expand_vertically(b)
+    end
     self:reformat()
 end
 
@@ -339,9 +371,13 @@ end
 --- @param b Boolean
 function rt.Widget:set_expand(b)
 
+    if self._expand_horizontally == b and self._expand_vertically == b then return end
 
     self._expand_horizontally = b
     self._expand_vertically = b
+    if self:_has_top_level() then
+        self:get_top_level_widget():set_expand(b)
+    end
     self:reformat()
 end
 
@@ -349,8 +385,12 @@ end
 --- @param alignment rt.Alignment
 function rt.Widget:set_horizontal_alignment(alignment)
 
+    if self._horizontal_alignment == alignment then return end
 
     self._horizontal_alignment = alignment
+    if self:_has_top_level() then
+        self:get_top_level_widget():set_horizontal_alignment(alignment)
+    end
     self:reformat()
 end
 
@@ -365,8 +405,12 @@ end
 --- @param alignment rt.Alignment
 function rt.Widget:set_vertical_alignment(alignment)
 
+    if self._vertical_alignment == alignment then return end
 
     self._vertical_alignment = alignment
+    if self:_has_top_level() then
+        self:get_top_level_widget():set_horizontal_vertical(alignment)
+    end
     self:reformat()
 end
 
@@ -381,9 +425,13 @@ end
 --- @param alignment rt.Alignment
 function rt.Widget:set_alignment(alignment)
 
+    if self._vertical_alignment == alignment and self._horizontal_alignment == alignment then return end
 
     self._horizontal_alignment = alignment
     self._vertical_alignment = alignment
+    if self:_has_top_level() then
+        self:get_top_level_widget():set_alignment(alignment)
+    end
     self:reformat()
 end
 
@@ -392,9 +440,13 @@ end
 --- @param height Number
 function rt.Widget:set_minimum_size(width, height)
 
+    if self._minimum_width == width and self._minimum_height == height then return end
 
     self._minimum_width = width
     self._minimum_height = height
+    if self:_has_top_level() then
+        self:get_top_level_widget():set_minimum_size(width, height)
+    end
     self:reformat()
 end
 
@@ -420,9 +472,8 @@ function rt.Widget:set_parent(other)
         return
     end
 
-
     if not meta.is_nil(self._parent) then
-        rt.warning("In Widget:set_parent: replacing parent of child `" .. meta.typeof(self) .. "`, which already has a parent")
+        rt.warning("In Widget:set_parent: replacing parent of child `" .. meta.typeof(self) .. "`, which already has a parent `" .. meta.typeof(self._parent) .. "`")
     end
 
     self._parent = other
@@ -431,7 +482,11 @@ end
 --- @brief get parent
 function rt.Widget:get_parent()
 
-    return self._parent
+    if self:_has_top_level() then
+        return self:get_top_level_widget()._parent
+    else
+        return self._parent
+    end
 end
 
 --- @brief [internal] calulcate size along one axis
@@ -491,8 +546,10 @@ end
 --- @brief
 function rt.Widget:set_is_selected(b)
 
-
     self._selected = b
+    if self:_has_top_level() then
+        self:get_top_level_widget():set_is_selected(b)
+    end
 end
 
 --- @brief
@@ -504,6 +561,9 @@ end
 --- @brief
 function rt.Widget:set_has_focus(b)
     self._focused = b
+    if self:_has_top_level() then
+        self:get_top_level_widget():set_has_focus(b)
+    end
 end
 
 --- @brief

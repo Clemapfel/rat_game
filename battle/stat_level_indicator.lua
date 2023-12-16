@@ -28,7 +28,6 @@ function bt.StatLevelIndicator:get_top_level_widget()
     return self._sprite
 end
 
-
 --- @brief
 function bt.StatLevelIndicator:set_level(level)
 

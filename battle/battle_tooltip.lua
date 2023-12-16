@@ -38,7 +38,7 @@ bt.BattleTooltip = meta.new_type("BattleTooltip", function(name, status, descrip
     out._sprite:set_minimum_size(rt.settings.battle_tooltip.sprite_size, rt.settings.battle_tooltip.sprite_size)
 
     out._sprite_overlay:set_base_child(out._sprite_backdrop)
-    out._sprite_aspect:set_child(out._sprite)
+    out._sprite_aspect:set_child(out)
     out._sprite_overlay:push_overlay(out._sprite_aspect)
     out._sprite_frame:set_child(out._sprite_overlay)
     out._sprite_frame:set_color(rt.Palette.GREY_3)
