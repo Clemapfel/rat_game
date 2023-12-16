@@ -66,14 +66,18 @@ rt.current_scene:set_child(info)
 input = rt.add_input_controller(rt.current_scene.window)
 input:signal_connect("pressed", function(self, which)
 
+    if meta.is_nil(switch) then switch = true end
+
     local speed = 0.1
     if which == rt.InputButton.A then
-        if entity.hp_current == 1 then
-            entity.hp_current = entity:get_hp_base()
-            entity.speed_level = -4
+        if switch then
+            entity:set_hp(entity:get_hp_base())
+            entity:set_speed_level(3)
+            switch = not switch
         else
-            entity.hp_current = 1
-            entity.speed_level = 4
+            entity:set_hp(1)
+            entity:set_speed_level(-3)
+            switch = not switch
         end
     elseif which == rt.InputButton.B then
     elseif which == rt.InputButton.X then

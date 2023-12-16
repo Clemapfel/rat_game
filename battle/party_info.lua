@@ -5,6 +5,7 @@ rt.settings.party_info = {
     frame_color = rt.Palette.GREY_5,
     tick_speed_base = 100, -- 1 point per second
     tick_speed_acceleration_factor = 10,
+    speed_label_width = -1
 }
 
 --- @class bt.PartyInfo
@@ -13,6 +14,14 @@ bt.PartyInfo = meta.new_type("PartyInfo", function(entity)
 
     if meta.is_nil(env.party_info_spritesheet) then
         env.party_info_spritesheet = rt.Spritesheet("assets/sprites", "party_info")
+    end
+
+    if rt.settings.party_info.speed_label_width == -1 then
+        rt.settings.party_info.speed_label_width = rt.Glyph(rt.settings.party_info.spd_font, "0000", {
+            is_outlined = true,
+            outline_color = rt.Palette.TRUE_BLACK,
+            color = rt.Palette.SPEED
+        }):get_size()
     end
 
     local out = meta.new(bt.PartyInfo, {
@@ -47,6 +56,7 @@ bt.PartyInfo = meta.new_type("PartyInfo", function(entity)
     out._hp_label_right = rt.Glyph(rt.settings.party_info.hp_font, right, settings)
     out._hp_value = entity:get_hp()
 
+
     out._speed_label = rt.Glyph(rt.settings.party_info.spd_font, out:_format_speed(entity:get_speed()), {
         is_outlined = true,
         outline_color = rt.Palette.TRUE_BLACK,
@@ -54,8 +64,7 @@ bt.PartyInfo = meta.new_type("PartyInfo", function(entity)
     })
     out._speed_value = entity:get_speed()
 
-    out._hp_bar:set_color(rt.Palette.HP)
-
+    out._hp_bar:set_color(rt.Palette.PURPLE_2, rt.Palette.PURPLE_4)
     out._frame:set_child(out._base)
 
     out._base:set_color(rt.settings.party_info.base_color)
@@ -79,6 +88,13 @@ bt.PartyInfo = meta.new_type("PartyInfo", function(entity)
 
     out._status_area:set_horizontal_alignment(rt.Alignment.START)
     out:_update_status_ailments()
+
+    out._entity:signal_connect("changed", function(entity, self)
+        self._attack_indicator:set_level(entity:get_attack_level())
+        self._defense_indicator:set_level(entity:get_defense_level())
+        self._speed_indicator:set_level(entity:get_speed_level())
+    end, out)
+
     return out
 end)
 
@@ -181,7 +197,7 @@ end
 function bt.PartyInfo:size_allocate(x, y, width, height)
 
     local m = rt.settings.margin_unit
-    local label_w, label_h = self._speed_label:get_size()
+    local label_w, label_h = rt.settings.party_info.speed_label_width, select(2, self._speed_label:get_size())
     local rule_thickness = 5 --select(2, self._h_rule:get_minimum_size())
     local indicator_spacing = 0.5 * m
     local w = 3 * select(1, self._attack_indicator:get_size()) + 2 * indicator_spacing + 2 * m + rule_thickness + label_w + 2 * m + m
@@ -306,6 +322,7 @@ function bt.PartyInfo:realize()
             widget:realize()
         end
     end
+    self._hp_bar:set_value(self._entity:get_hp())
     rt.Widget.realize(self)
     self:set_is_animated(true)
 end

@@ -298,12 +298,14 @@ end
 --- @brief set font style
 --- @param style rt.FontStyle
 function rt.Glyph:set_style(style)
+    if self._style == style then return end
     self._style = style
     self:_update()
 end
 
 --- @brief set content
 function rt.Glyph:set_text(text)
+    if self._content == text then return end
     self._content = text
     self:_update()
 end
@@ -322,6 +324,7 @@ function rt.Glyph:set_color(color)
         color = rt.hsva_to_rgba(color)
     end
 
+    if self._color == color then return end
     self._color = color
     self:_update()
 end

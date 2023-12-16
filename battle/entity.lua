@@ -13,7 +13,9 @@ bt.Entity = meta.new_type("Entity", function(id)
     local config = config_file()
     local out = meta.new(bt.Entity, {
         id = id
-    })
+    }, rt.SignalEmitter)
+
+    out:signal_add("changed")
 
     local name = config.name
     meta.assert_string(name)
@@ -78,7 +80,7 @@ bt.Entity.status_ailments = {}        -- rt.StatusAilment -> Elapsed
 
 -- stat level to factor
 rt.settings.entity.level_to_factor = {}
-rt.settings.entity.level_to_factor[-4] = 0.1
+rt.settings.entity.level_to_factor[-4] = 0
 rt.settings.entity.level_to_factor[-3] = 0.25
 rt.settings.entity.level_to_factor[-2] = 0.5
 rt.settings.entity.level_to_factor[-1] = 0.75
@@ -86,7 +88,7 @@ rt.settings.entity.level_to_factor[ 0] = 1
 rt.settings.entity.level_to_factor[ 1] = 1.25
 rt.settings.entity.level_to_factor[ 2] = 1.5
 rt.settings.entity.level_to_factor[ 3] = 1.75
-rt.settings.entity.level_to_factor[ 4] = 2
+rt.settings.entity.level_to_factor[ 4] = POSITIVE_INFINITY
 
 --- @brief
 function bt.stat_level_to_factor(x)
@@ -143,10 +145,15 @@ function bt.Entity:get_attack_base() return self.attack_base end
 function bt.Entity:get_defense_base() return self.defense_base end
 function bt.Entity:get_speed_base() return self.speed_base end
 
+--- @brief [internal]
+function bt.Entity:_emit_changed()
+    self:signal_emit("changed")
+end
 
 --- @brief add new status
 function bt.Entity:add_status_ailment(status_ailment)
     self.status_ailments[status_ailment] = 0
+    self:_emit_changed()
 end
 
 --- @brief
@@ -171,4 +178,39 @@ end
 --- @brief add move to moveset
 function bt.Entity:add_action(action)
     entity.moveset[action] = action.max_n_use
+    self:_emit_changed()
+end
+
+--- @brief modify hp
+function bt.Entity:set_hp(value)
+    self._hp_current = clamp(value, 0, self._hp_base)
+    self:_emit_changed()
+end
+
+--- @brief
+function bt.Entity:add_hp(offset)
+    self:set_hp(self:get_hp() + offset)
+end
+
+--- @brief
+function bt.Entity:reduce_hp(offset)
+    self:set_hp(self:get_hp() - offset)
+end
+
+--- @brief modify stat level
+for _, which in ipairs({"attack", "defense", "speed"}) do
+    bt.Entity["set_" .. which .. "_level"] = function(self, new_level)
+        self[which .. "_level"] = new_level
+        self:_emit_changed()
+    end
+
+    bt.Entity["raise_" .. which .. "_level"] = function(self, new_level)
+        self[ which .. "_level"] = clamp(new_level + 1, -3, 3)
+        self:_emit_changed()
+    end
+
+    bt.Entity["lower_" .. which .. "_level"] = function(self, new_level)
+        self[ which .. "_level"] = clamp(new_level - 1, -3, 3)
+        self:_emit_changed()
+    end
 end

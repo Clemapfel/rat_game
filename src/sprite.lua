@@ -5,7 +5,6 @@ rt.Sprite = meta.new_type("Sprite", function(spritesheet, animation_id)
     if meta.is_nil(animation_id) then
         animation_id = spritesheet.name
     end
-
     spritesheet:_assert_has_animation("Sprite:", animation_id)
 
     local w, h = spritesheet:get_frame_size(animation_id)
@@ -113,7 +112,7 @@ end
 --- @brief set which animation is used, this resets the current frame to 1
 --- @param id String
 function rt.Sprite:set_animation(id)
-    self._spritesheet:_assert_has_animation("Sprite:", id)
+    self._spritesheet:_assert_has_animation("Sprite:set_animation", id)
     local w, h = self._spritesheet:get_frame_size(id)
 
     self._animation_id = id
