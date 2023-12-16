@@ -57,9 +57,15 @@ end
 --- @return (Number, Number)
 function rt.Widget:measure()
 
-    local top_level = self:get_top_level_widget()
-    if not meta.is_nil(top_level) then
-        return top_level:measure()
+    local current = self
+    local next = self:get_top_level_widget()
+
+    if not meta.is_nil(next) then
+        while next ~= nil do
+            current = next
+            next = current:get_top_level_widget()
+        end
+        return current:measure()
     else
         local min_w, min_h = self:get_minimum_size()
         return min_w + self:get_margin_left() + self:get_margin_right(), min_h + self:get_margin_top() + self:get_margin_bottom()
@@ -71,11 +77,15 @@ function rt.Widget:realize()
 
     if self._realized then return end
     self._realized = true
-    local top_level = self:get_top_level_widget()
-    if not meta.is_nil(top_level) then
-        top_level:realize()
+
+    local current = self
+    local next = self:get_top_level_widget()
+    while next ~= nil do
+        current = next
+        next = current:get_top_level_widget()
     end
-    self:reformat()
+    current:realize()
+    current:reformat()
 end
 
 --- @brief get whether widget was realized
@@ -127,23 +137,32 @@ function rt.Widget:reformat()
     self._final_pos_y = y
 
     -- if widget is compound widget, size_allocate top-level, else call virtual function
-    local top_level = self:get_top_level_widget()
-    if meta.is_nil(top_level) then
-        self:size_allocate(x, y, width, height)
-    else
-        meta.assert_widget(top_level)
-        top_level:size_allocate(x, y, width, height)
+
+
+    local current = self
+    local next = self:get_top_level_widget()
+    while next ~= nil do
+        current = next
+        next = current:get_top_level_widget()
     end
+    current:size_allocate(x, y, width, height)
 end
 
 --- @brief implements rt.Drawable.draw
 function rt.Widget:draw()
     -- if widget is compound widget, draw top-level, else call virtual function
-    local top_level = self:get_top_level_widget()
-    if meta.is_nil(top_level) then
+
+    local current = self:get_top_level_widget()
+    local next = nil
+    while next ~= nil do
+        current = next
+        next = next:get_top_level_widget()
+    end
+
+    if meta.is_nil(current) then
         rt.error("" .. meta.typeof(self) .. ":draw: abstract method called. Neither `rt.Widget.get_top_level_widget` nor `rt.Drawable.draw` are implemented for type `" .. meta.typeof(self) .. "`")
     else
-        top_level:draw()
+        current:draw()
     end
 end
 

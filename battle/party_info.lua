@@ -93,6 +93,10 @@ bt.PartyInfo = meta.new_type("PartyInfo", function(entity)
         self._attack_indicator:set_level(entity:get_attack_level())
         self._defense_indicator:set_level(entity:get_defense_level())
         self._speed_indicator:set_level(entity:get_speed_level())
+
+        for _, x in ipairs({self._attack_indicator, self._defense_indicator, self._speed_indicator}) do
+            x:reformat()
+        end
     end, out)
 
     return out
