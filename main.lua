@@ -55,7 +55,12 @@ entity:add_status_ailment(status)
 info = bt.PartyInfo(entity)
 info:set_margin(10)
 info._hp_bar:set_value(75)
-info:set_alignment(rt.Alignment.CENTER)
+info:set_horizontal_alignment(rt.Alignment.CENTER)
+info:set_vertical_alignment(rt.Alignment.END)
+
+entity:set_attack_level(-1)
+entity:set_defense_level(2)
+entity:set_speed_level(4)
 
 box = rt.SwipeLayout()
 for i = -4, 4, 1 do

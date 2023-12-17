@@ -1,3 +1,7 @@
+rt.settings.entity = {
+    infinity_display_value = 9999
+}
+
 --- @class bt.Entity
 bt.Entity = meta.new_type("Entity", function(id)
 
@@ -123,6 +127,7 @@ function bt.Entity:_calculate_stat(which)
     end
 
     local out = base * rt.settings.entity.level_to_factor[level]
+    if level >= 4 then out = rt.settings.entity.infinity_display_value end
 
     for status, _ in pairs(self.status_ailments) do
         out = out * status[which .. "_factor"]

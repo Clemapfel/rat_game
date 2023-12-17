@@ -75,13 +75,17 @@ function meta._new(typename)
 
 
     metatable.__tostring = function(this)
-        return "(" .. getmetatable(this).__name .. ") " .. serialize(this)
+        return "(" .. getmetatable(this).__name .. ") " .. meta.serialize(this)
     end
 
     metatable.__eq = function(self, other)
         return getmetatable(self).__hash == getmetatable(other).__hash
     end
     setmetatable(out, metatable)
+
+    metatable.__pairs = function(self)
+        return pairs(getmetatable(self).properties)
+    end
 
     return out, metatable
 end
@@ -520,4 +524,21 @@ end
 --- @brief hash object, each instance has a unique ID
 function meta.hash(x)
     return getmetatable(x).__hash
+end
+
+
+--- @brief serialize meta.Object
+function meta.serialize(x, skip_functions)
+    meta.assert_object(x)
+    skip_functions = which(skip_functions, true)
+    local out = {}
+    table.insert(out, "#" .. tostring(meta.hash(x)) .. " = {\n")
+    for key, value in pairs(getmetatable(x).properties) do
+        if not meta.is_function(value) then
+            table.insert(out, "\t" .. tostring(key)  .. " = " .. serialize(value) .. "\n")
+        end
+    end
+
+    table.insert(out, "}\n")
+    return table.concat(out)
 end

@@ -122,7 +122,6 @@ function rt.Sprite:set_animation(id)
 
     self:set_minimum_size(w, h)
     self:set_frame(1)
-    self:reformat()
 end
 
 --- @brief get frame resolution

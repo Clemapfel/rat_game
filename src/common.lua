@@ -33,6 +33,16 @@ function println(...)
     io.flush()
 end
 
+function dbg(...)
+    for _, x in pairs({...}) do
+        io.write(tostring(x))
+        io.write(" ")
+    end
+
+    io.write("\n")
+    io.flush()
+end
+
 --- @brief print to stderr
 --- @param str string
 function printerr(message)

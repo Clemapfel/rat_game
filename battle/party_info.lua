@@ -5,8 +5,13 @@ rt.settings.party_info = {
     frame_color = rt.Palette.GREY_5,
     tick_speed_base = 100, -- 1 point per second
     tick_speed_acceleration_factor = 10,
-    speed_label_width = -1
+    speed_label_width = -1,
+
+    bounce_function = function(x) return -1 * (math.mod(2 / math.pi * x, 2) - 1)^2 + 1 end,
+    bounce_offset = 50,
+    bounce_frequency = 3.5,
 }
+
 
 --- @class bt.PartyInfo
 bt.PartyInfo = meta.new_type("PartyInfo", function(entity)
@@ -42,7 +47,10 @@ bt.PartyInfo = meta.new_type("PartyInfo", function(entity)
         _indicator_base = rt.Spacer(),
         _indicator_base_frame = rt.Frame(),
         _status_area = rt.FlowLayout(),
-        _elapsed = 0
+        _elapsed = 0,
+        _bounce_offset = 0,
+        _bounce_elapsed = 0,
+        _is_bouncing = true
     }, rt.Drawable, rt.Widget, rt.Animation)
 
     local left, right = out:_format_hp(entity:get_hp())
@@ -131,10 +139,10 @@ end
 function bt.PartyInfo:update(delta)
 
     self._elapsed = self._elapsed + delta
+
     local tick_length = 1 / rt.settings.party_info.tick_speed_base
     local update_hp, update_speed = false, false
     while self._elapsed > tick_length do
-
         do
             local current = self._hp_value
             local target = self._entity:get_hp()
@@ -191,6 +199,9 @@ function bt.PartyInfo:update(delta)
     if update_speed then
         self._speed_label:set_text(self:_format_speed(self._speed_value))
     end
+
+    self._bounce_elapsed = self._bounce_elapsed + delta
+    self._bounce_offset = -1 * rt.settings.party_info.bounce_function(self._bounce_elapsed * rt.settings.party_info.bounce_frequency) * rt.settings.party_info.bounce_offset
 end
 
 --- @overload rt.Wiget.size_allocate
@@ -201,10 +212,24 @@ function bt.PartyInfo:size_allocate(x, y, width, height)
     local rule_thickness = 5 --select(2, self._h_rule:get_minimum_size())
     local indicator_spacing = 0.5 * m
     local w = 3 * select(1, self._attack_indicator:get_size()) + 2 * indicator_spacing + 2 * m + rule_thickness + label_w + 2 * m + m
-    local h = select(2, self._speed_label:get_position()) + select(2, self._speed_label:get_size()) - y + 2 * m
+    local h = (label_h + 2 * m) * 2 - m
 
-    x = x + 0.5 * width - 0.5 * w
-    y = y + 0.5 * height - 0.5 * h
+    local h_align, v_align = self:get_horizontal_alignment(), self:get_vertical_alignment()
+    if h_align == rt.Alignment.START then
+        x = x
+    elseif h_align == rt.Alignment.CENTER then
+        x = x + 0.5 * width - 0.5 * w
+    elseif h_align == rt.Alignment.END then
+        x = x + width - w
+    end
+
+    if v_align == rt.Alignment.START then
+        y = y
+    elseif v_align == rt.Alignment.CENTER then
+        y = y + 0.5 * height - 0.5 * h
+    elseif v_align == rt.Alignment.END then
+        y = y + height - h
+    end
 
     local left_w, left_h = self._hp_label_left:get_size()
     local right_w, right_h = self._hp_label_right:get_size()
@@ -245,52 +270,17 @@ function bt.PartyInfo:size_allocate(x, y, width, height)
     local v_rule_right = select(1, self._speed_label:get_position())
     local v_rule_x = v_rule_left + 0.5 * (v_rule_right - v_rule_left) - 0.5 * rule_thickness
     self._v_rule:fit_into(v_rule_x, h_rule_y, rule_thickness, y + h - h_rule_y )
-
-    --[[
-    self._base:fit_into(x, y, width, height)
-    self._frame:fit_into(x, y, width, height)
-
-    local m = rt.settings.margin_unit
-    self._hp_bar:fit_into(x + m, y + m, width - 2 * m, rt.settings.party_info.spd_font:get_size() )
-    local hp_x, hp_y = self._hp_bar:get_position()
-    local hp_w, hp_h = self._hp_bar:get_size()
-    local label_w, label_h = self._hp_label:get_size()
-    self._hp_label:set_position(hp_x + 0.5 * hp_w - 0.5 * label_w, hp_y + 0.5 * hp_h - 0.5 * label_h)
-
-    self._h_rule:set_expand_vertically(false)
-    local h_rule_y = hp_y + hp_h + m
-    self._h_rule:fit_into(x, h_rule_y, width, select(2, self._h_rule:get_minimum_size()))
-
-    local sprite_size = self._attack_indicator._sprite:get_resolution() * 3
-    local indicator_area = rt.AABB(x + m, y + height -  m - sprite_size, sprite_size, sprite_size)
-    local indicator_base_x = indicator_area.x
-
-    self._attack_indicator:fit_into(indicator_area)
-    indicator_area.x = indicator_area.x + sprite_size
-    self._defense_indicator:fit_into(indicator_area)
-    indicator_area.x = indicator_area.x + sprite_size
-    self._speed_indicator:fit_into(indicator_area)
-    indicator_area.x = indicator_area.x + sprite_size
-
-    self._indicator_base_frame:fit_into(indicator_base_x - m, indicator_area.y - m, indicator_area.width * 3 + 2 * m, indicator_area.height + 2 * m)
-
-    label_w, label_h = self._speed_label:get_size()
-    self._speed_label:set_position(x + width - label_w - 2 * m, y + height - label_h - m)
-
-    self._v_rule:set_expand_horizontally(false)
-
-    local indicator_right = select(1, self._speed_indicator:get_position()) + select(1, self._speed_indicator:get_size())
-    local speed_left = select(1, self._speed_label:get_position())
-    local v_rule_w = select(2, self._h_rule:get_minimum_size())
-    local v_rule_h = select(2, self._speed_label:get_position()) + v_rule_w + select(2, self._speed_label:get_size()) - select(2, self._h_rule:get_position())
-
-    local v_rule_x = x + 0.5 * width - 0.5 * v_rule_w
-    self._v_rule:fit_into(v_rule_x, h_rule_y + v_rule_w , v_rule_w, v_rule_h)
-    ]]--
 end
 
 --- @overload rt.Drawable.draw
 function bt.PartyInfo:draw()
+
+    love.graphics.push()
+
+    if self._is_bouncing then
+        love.graphics.translate(0, self._bounce_offset)
+    end
+
     self._frame:draw()
     self._hp_bar:draw()
     self._hp_label_left:draw()
@@ -313,6 +303,13 @@ function bt.PartyInfo:draw()
 
     self._speed_label:draw()
     self._status_area:draw()
+
+    if self:get_is_selected() then
+        self._base:draw_selection_indicator()
+    end
+
+    love.graphics.pop()
+
 end
 
 --- @overload rt.Widget.realize
