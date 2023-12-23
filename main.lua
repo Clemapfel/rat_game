@@ -2,73 +2,6 @@ require "include"
 
 rt.add_scene("debug")
 
-
-entity = bt.Entity("TEST_ENTITY")
-entity.attack_level = 0
-entity.defense_level = 0
-entity.speed_level = 0
-
-move = bt.Action("TEST_MOVE")
-consumable = bt.Action("TEST_CONSUMABLE")
-intrinsic = bt.Action("TEST_INTRINSIC")
-
-for _, action in pairs({move, consumable, intrinsic}) do
-    entity:add_action(action)
-end
-
-selection_menu = bt.ActionSelectionMenu(entity)
-thumbnail = bt.ActionSelectionThumbnail(move)
-
-swipe = rt.SwipeLayout(rt.Orientation.VERTICAL)
-
-swipes = {}
-for i = 1, 3 do
-    local to_insert = rt.SwipeLayout(rt.Orientation.HORIZONTAL)
-    for _, id in pairs({"ANALYZE", "NO_ACTION", "PROTECT", "STRIKE", "WISH"}) do
-        move = bt.Action(id)
-        to_insert:push_back(bt.ActionSelectionThumbnail(move))
-    end
-    to_insert:set_show_selection(true)
-    to_insert:set_modifies_focus(false)
-    table.insert(swipes, to_insert)
-    swipe:push_back(to_insert)
-end
-
-swipe:set_show_selection(false)
-swipe:set_modifies_focus(true)
-swipe:set_allow_wrap(false)
-
-equipment = bt.Equipment("TEST_EQUIPMENT")
-status = bt.StatusAilment("TEST_STATUS")
-
-bar = rt.LevelBar(0, 100, 50)
-bar:set_color(rt.Palette.HP)
-bar:set_value(45)
-bar:set_expand_vertically(false)
-bar:set_minimum_size(0, rt.settings.margin_unit)
-bar:set_margin_horizontal(rt.settings.margin_unit)
-
-bar:add_mark(25)
-bar:add_mark(50)
-bar:add_mark(75)
-
-entity:add_status_ailment(status)
-info = bt.PartyInfo(entity)
-info:set_margin(10)
-info._hp_bar:set_value(75)
-info:set_horizontal_alignment(rt.Alignment.CENTER)
-info:set_vertical_alignment(rt.Alignment.END)
-
-entity:set_attack_level(-1)
-entity:set_defense_level(2)
-entity:set_speed_level(4)
-
-box = rt.SwipeLayout()
-for i = -4, 4, 1 do
-    box:push_back(bt.StatLevelTooltip(rt.random.choose({bt.Stat.ATTACK, bt.Stat.DEFENSE, bt.Stat.SPEED}), i))
-end
-
-rt.current_scene:set_child(info)
 input = rt.add_input_controller(rt.current_scene.window)
 input:signal_connect("pressed", function(self, which)
 
@@ -93,8 +26,23 @@ input:signal_connect("pressed", function(self, which)
     end
 end)
 
-bg = bt.BattleBackground("wing_flap")
-rt.current_scene:set_child(bg)
+
+mapping = {}
+mapping[rt.InputButton.A] = "Press A"
+mapping[rt.InputButton.B] = "Press B"
+mapping[rt.InputButton.X] = "Press X"
+mapping[rt.InputButton.Y] = "Press Y"
+mapping[rt.InputButton.L] = "Press L"
+mapping[rt.InputButton.R] = "Press R"
+mapping[rt.InputButton.START] = "Press Plus"
+mapping[rt.InputButton.SELECT] = "Press Minus"
+mapping[rt.InputButton.UP] = "Press Up"
+mapping[rt.InputButton.DOWN] = "Press Down"
+mapping[rt.InputButton.LEFT] = "Press Left"
+mapping[rt.InputButton.RIGHT] = "Press Right"
+
+indicator = rt.KeymapIndicator(mapping)
+rt.current_scene:set_child(indicator)
 
 function love.load()
     rt.current_scene:realize()

@@ -572,7 +572,6 @@ end
 --- @param formatted_text String supports formatting tags
 function rt.Label:set_text(formatted_text)
 
-
     self._raw = formatted_text
     self:_parse()
     self:_update_default_size()

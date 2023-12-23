@@ -33,42 +33,7 @@ end
 
 --- @overload rt.Widget.size_allocate
 function rt.Sprite:size_allocate(x, y, width, height)
-    local w, h
-    if self:get_expand_horizontally() then
-        w = width - self:get_margin_left() - self:get_margin_right()
-    else
-        w = self._frame_width
-    end
-
-    if self:get_expand_vertically() then
-        h = height - self:get_margin_top() - self:get_margin_bottom()
-    else
-        h = self._frame_height
-    end
-
-    local x_align = self:get_horizontal_alignment()
-    local y_align = self:get_vertical_alignment()
-
-    if x_align == rt.Alignment.START and y_align == rt.Alignment.START then
-        self._shape:resize(x, y, w, h)
-    elseif x_align == rt.Alignment.START and y_align == rt.Alignment.CENTER then
-        self._shape:resize(x, y + 0.5 * h - 0.5 * h, w, h)
-    elseif x_align == rt.Alignment.START and y_align == rt.Alignment.END then
-        self._shape:resize(x, y + h - h, w, h)
-    elseif x_align == rt.Alignment.CENTER and y_align == rt.Alignment.START then
-        self._shape:resize(x + 0.5 * w - 0.5 * w, y, w, h)
-    elseif x_align == rt.Alignment.CENTER and y_align == rt.Alignment.CENTER then
-        self._shape:resize(x + 0.5 * w - 0.5 * w, y + 0.5 * h - 0.5 * h, w, h)
-    elseif x_align == rt.Alignment.CENTER and y_align == rt.Alignment.END then
-        self._shape:resize(x + 0.5 * w - 0.5 * w, y + h - h, w, h)
-    elseif x_align == rt.Alignment.END and y_align == rt.Alignment.START then
-        self._shape:resize(x + w - w, y, w, h)
-    elseif x_align == rt.Alignment.END and y_align == rt.Alignment.CENTER then
-        self._shape:resize(x + w - w, y + 0.5 * h - 0.5 * h, w, h)
-    elseif x_align == rt.Alignment.END and y_align == rt.Alignment.END then
-        self._shape:resize(x + w - w, y + h - h, w, h)
-    end
-
+    self._shape:resize(x, y, width, height)
     self._shape:set_texture_rectangle(self._spritesheet:get_frame(self._animation_id, self._current_frame))
 end
 
