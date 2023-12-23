@@ -89,7 +89,6 @@ end
 --- @return any result last callback
 function rt.SignalComponent:emit(name, ...)
 
-
     rt._assert_has_signal("emit", self, name)
 
     local metatable = getmetatable(self._instance)
@@ -114,8 +113,6 @@ end
 --- @param callback Function With signature (Instance, ...) -> Any
 --- @return Number handler ID
 function rt.SignalComponent:connect(name, callback, data)
-
-
 
     rt._assert_has_signal("connect", self, name)
 
@@ -254,7 +251,7 @@ function rt.SignalEmitter:signal_set_is_blocked(name, b)
 end
 
 --- @see rt.SignalComponent.get_is_blocked
-function rt.SignalEmitter:signalgset_is_blocked(name)
+function rt.SignalEmitter:signal_set_is_blocked(name)
 
     local component = rt.get_signal_component(self)
     if meta.is_nil(component) then component = rt.add_signal_component(self) end

@@ -66,6 +66,8 @@ end
 --- @brief
 function rt.SwipeLayout:jump_to(index)
 
+    if sizeof(self._slot_positions) == 0 then return end
+
     local n = self._children:size()
     if self._allow_wrap then
         if index < 1 then

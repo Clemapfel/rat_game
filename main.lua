@@ -2,6 +2,7 @@ require "include"
 
 rt.add_scene("debug")
 
+
 entity = bt.Entity("TEST_ENTITY")
 entity.attack_level = 0
 entity.defense_level = 0
@@ -71,26 +72,17 @@ rt.current_scene:set_child(info)
 input = rt.add_input_controller(rt.current_scene.window)
 input:signal_connect("pressed", function(self, which)
 
-    if meta.is_nil(switch) then switch = true end
-
     local speed = 0.1
     if which == rt.InputButton.A then
-        if switch then
-            entity:set_hp(entity:get_hp_base())
-            entity:set_speed_level(3)
-            switch = not switch
-        else
-            entity:set_hp(1)
-            entity:set_speed_level(-3)
-            switch = not switch
-        end
     elseif which == rt.InputButton.B then
     elseif which == rt.InputButton.X then
-        swipe:jump_to(1)
     elseif which == rt.InputButton.Y then
-        swipe:jump_to(6)
     elseif which == rt.InputButton.UP then
+        rt.settings.battle_background.dampening = rt.settings.battle_background.dampening + 0.1
+        rt.settings.battle_background.dampening = clamp(rt.settings.battle_background.dampening, 0, 1)
     elseif which == rt.InputButton.DOWN then
+        rt.settings.battle_background.dampening = rt.settings.battle_background.dampening - 0.1
+        rt.settings.battle_background.dampening = clamp(rt.settings.battle_background.dampening, 0, 1)
     elseif which == rt.InputButton.RIGHT then
     elseif which == rt.InputButton.LEFT then
     elseif which == rt.InputButton.R then
@@ -100,6 +92,9 @@ input:signal_connect("pressed", function(self, which)
     if which == rt.InputButton.A then
     end
 end)
+
+bg = bt.BattleBackground("wing_flap")
+rt.current_scene:set_child(bg)
 
 function love.load()
     rt.current_scene:realize()

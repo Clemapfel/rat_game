@@ -466,9 +466,9 @@ end
 --- @brief set the parent property of the child. If it already has a parent, print a warning
 function rt.Widget:set_parent(other)
 
-
     if meta.is_nil(other) then
         self._parent = nil
+        self:set_has_focus(false)
         return
     end
 
