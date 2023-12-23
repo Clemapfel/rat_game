@@ -22,6 +22,7 @@ float f(float x, float t)
 
 float g(float x, float t)
 {
+
     return -1 * sqrt(exp(t * x)) + 1;
 }
 
@@ -38,15 +39,23 @@ vec4 effect(vec4 vertex_color, Image texture, vec2 texture_coords, vec2 vertex_p
     pos -= vec2(0.5);
     pos *= 10;
 
+    pos.y = rotate_point(pos, vec2(0, 0), mod((time * 360 / 10), 360)).y;
+
     float t = sin(time) * 10;
+    float x = pos.x;
 
-    bool a = abs(pos.y - f(pos.x, t)) < 0.01 || abs(pos.y - g(pos.x, t)) < 0.01;
+    float value = 0;
+    if (t < 0)
+        value = x > 0 ? f(x, t) : g(x, t);
+    else if (t > 0)
+        value = x > 0 ? g(x, t) : f(x, t);
 
-    pos = rotate_point(pos, vec2(0), t * 2);
-    bool b = abs(pos.y - f(pos.x, t)) < 0.01 || abs(pos.y - g(pos.x, t)) < 0.01;
+    bool line = abs(pos.y - value) < 0.01;
 
-    if (a || b)
+    if (line)
         return vec4(vec3(1), 1);
     else
         return vec4(vec3(0), 1);
+
+
 }
