@@ -267,11 +267,9 @@ end
 --- @return String "#RRGGBB" or "#RRGGBBAA" if `use_alpha`
 function rt.color_to_html_code(rgba, use_alpha)
 
-
     if meta.is_nil(use_alpha) then
         use_alpha = false
     end
-
 
     rgba.r = clamp(rgba.r, 0, 1)
     rgba.g = clamp(rgba.g, 0, 1)
@@ -304,7 +302,6 @@ function rt.color_darken(color, offset)
     if meta.is_hsva(color) then
         return rt.HSVA(color.h, color.s, color.v - offset, color.a)
     else
-
         return rt.RGBA(color.r - offset, color.g - offset, color.b - offset, color.a)
     end
 end

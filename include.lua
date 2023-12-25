@@ -122,6 +122,7 @@ require "battle/stat_level_tooltip"
 require "battle/party_info"
 
 require "battle/action_selection_menu"
+require "battle/inventory_menu"
 
 require "scene"
 -- require "test

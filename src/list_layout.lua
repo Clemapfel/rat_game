@@ -167,8 +167,6 @@ end
 --- @brief prepend child
 --- @param child rt.Widget
 function rt.ListLayout:push_front(child)
-
-
     child:set_parent(self)
     self._children:push_back(child)
     if self:get_is_realized() then
@@ -180,7 +178,6 @@ end
 --- @brief remove first child
 --- @return rt.Widget
 function rt.ListLayout:pop_front()
-
     local out = self._children:pop_front()
     out:set_parent(nil)
     self:reformat()
@@ -190,7 +187,6 @@ end
 --- @brief remove last child
 --- @return rt.Widget
 function rt.ListLayout:pop_back()
-
     local out = self._children:pop_back()
     out:set_parent(nil)
     self:reformat()
@@ -218,6 +214,11 @@ function rt.ListLayout:erase(index)
     local child = self._children:erase(index)
     child:set_parent(nil)
     self:reformat()
+end
+
+--- @brief
+function rt.ListLayout:get_children()
+    return self._children;
 end
 
 --- @brief set orientation

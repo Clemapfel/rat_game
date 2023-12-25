@@ -3,7 +3,6 @@
 --- @field input rt.InputController
 rt.Scene = meta.new_type("Scene", function()
     local scene = meta.new(rt.Scene)
-
     scene.window = rt.WindowLayout()
     scene.skybox = rt.Palette.BACKGROUND --TRUE_MAGENTA
     scene.animation_handler = rt.AnimationHandler()
@@ -39,9 +38,6 @@ end
 
 --- @brief update all regular handlers
 function rt.Scene:update(delta)
-
-
-
 
     self.animation_handler:update(delta)
     self.animation_timer_handler:update(delta)
@@ -101,7 +97,6 @@ end
 --- @brief
 function rt.set_current_scene(name)
 
-
     if meta.is_nil(rt.scenes[name]) then
         rt.error("In rt.set_current_scene: no scene with ID `" .. name "` available")
     end
@@ -113,5 +108,10 @@ function rt.set_current_scene(name)
     love.graphics.clear(0, 0, 0, 0)
     rt.current_scene = rt.scenes[name]
     env = rt.current_scene.env
+end
+
+function rt.Scene:run()
+    self.window:realize()
+    self.window:fit_into(0, 0, love.graphics.getWidth(), love.graphics.getHeight())
 end
 

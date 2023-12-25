@@ -1,7 +1,7 @@
 rt.settings.notch_bar = {
     notch_spacing = 0.1,              -- radius factor
-    notch_center_radius_factor = 0.2, -- outer radius of middle peg
-    notch_frame_radius_factor = 0.8,  -- inner radius of outer ring
+    notch_center_radius_factor = 0.6, -- outer radius of middle peg
+    notch_frame_radius_factor = 8,  -- inner radius of outer ring
     min_frame_thickness = 3,    -- minimum peg and ring thickness, px
     indicator_radius = 0.8,     -- times notch radius
 }
@@ -14,8 +14,9 @@ rt.Notch = meta.new_type("Notch", function()
         _shape = rt.Circle(0, 0, 1),
         _frame = rt.Circle(0, 0, 1),
         _frame_outline_inner = rt.Circle(0, 0, 1),
-        _frame_outline_outer = rt.Circle(0, 0, 1)
-    }, rt.Drawable) -- sic, no widget
+        _frame_outline_outer = rt.Circle(0, 0, 1),
+        _color = rt.RGBA(1, 1, 1, 1)
+    }, rt.Widget, rt.Drawable)
 
     out._center_outline:set_is_outline(true)
     out._frame_outline_inner:set_is_outline(true)
@@ -27,33 +28,35 @@ rt.Notch = meta.new_type("Notch", function()
     out._frame_outline_inner:set_color(rt.Palette.BASE_OUTLINE)
     out._frame_outline_inner:set_line_width(2)
     out._frame_outline_outer:set_color(rt.Palette.BASE_OUTLINE)
+    out._frame_outline_outer:set_line_width(2)
 
     out._shape:set_color(rt.Palette.BASE)
     return out
 end)
 
-function rt.Notch:set_color(color)
-
-
-    self._shape:set_color(color)
+--- @brief
+function rt.Notch:set_color(color, darker)
+    self._color = color
+    self._center:set_color(self._color)
+    self._shape:set_color(ternary(
+        meta.is_nil(darker),
+        rt.color_darken(color, 0.5),
+        darker)
+    )
 end
 
 --- @overload rt.Drawable.draw
 function rt.Notch:draw()
-
     if not self:get_is_visible() then return end
-
     self._frame:draw()
     self._shape:draw()
     self._center:draw()
-    self._center_outline:draw()
-    self._frame_outline_inner:draw()
     self._frame_outline_outer:draw()
+    self._center_outline:draw()
 end
 
 --- @overload rt.Widget.size_allocate
-function rt.Notch:fit_into(x, y, width, height)
-
+function rt.Notch:size_allocate(x, y, width, height)
 
     local radius = math.min(width, height) / 2
     local center_x, center_y = x + 0.5 * width, y + 0.5 * height
@@ -62,6 +65,8 @@ function rt.Notch:fit_into(x, y, width, height)
     local center_radius = math.max(rt.settings.notch_bar.notch_center_radius_factor * radius, min_frame_thickness)
     local frame_radius = math.min(rt.settings.notch_bar.notch_frame_radius_factor * radius, radius - min_frame_thickness) -- inner
     local eps = 1 / 400
+
+    println(center_radius)
 
     self._center:resize(center_x, center_y, center_radius)
     self._center_outline:resize(center_x, center_y, center_radius + eps)
