@@ -69,6 +69,8 @@ All moves and mechanics in battle shall be exclusively deterministic, meaning th
 
 Secondly, moves and consumables were delibirately designed as generic as possible, meaning any and all effects could happen from a move. In competitive pokemon, the format played in real-life tournaments with actual prizes and titles on the line, most moves from insie the games are useless. Only a limited subset of them have any competitive utilitiy, indeed, some moves have only a competitive utilitiy, while being basically useless in-game. `rat_game` aims to have its set of moves and consumables be 100% non-redundant. A move collected in the early part of the story should be viable until th every end, and it is better to have 50 interesting moves that combo well with all other 50 moves, than going the pokemon route and having 1000 different attacks, only 50 of which will be used in serious competitive play.
 
+### Example Intrinic Moves
+
 A non-exhaustive list of intrinsic moves, and their hosts:
 
 | id      | User                 | Effect                                                                                                                                                                                     |
@@ -81,32 +83,103 @@ A non-exhaustive list of intrinsic moves, and their hosts:
 | WAR_DANCE | $RAT | Raise attack by 1, speed by 1, lower defense by 2. If defense is lowered past -3, set to negative infinity                                                                                 |
 | GORE  | $WILDCARD | Deal 1 * user.attack to target enemy, same as STRIKE, except if the enemy is KO'd by this attack, it instead dies immediately                                                              |
 
+### Example Status Ailments
 
 A non-exhaustive list of status ailments
 
-| id      | last for                            | effect                                                         |
-|---------|-------------------------------------|----------------------------------------------------------------|
-| STUNNED | 1 Turn                              | Entity may not move this turn                                  |
-| CHILLED | Until Removed                       | Speed is always treated as 0                                   
-| FROZEN  | Becomes CHILLED after taking damage | Speed is always treated as 0, Priority is always treated as -1 |
-| BURNED  | Until Removed  | Defense level is always treated as -2 |
-| POISONED | Until Removed | Loose 1/16th of user.max_hp at the end of each turn. Does not KO'd |
-| AT_RISK | Until Removed | If target would be KO'd, it immedaitely dies instead |
-| ASLEEP | 3 Turns, removed after taking damage | Target may not move this turn |
-| BLINDED | Until Removed | Attack level is always treated as -1
+| id      | last for                            | effect                                                                                                                                  |
+|---------|-------------------------------------|-----------------------------------------------------------------------------------------------------------------------------------------|
+| STUNNED | 1 Turn                              | Entity may not move this turn                                                                                                           |
+| CHILLED | Until Removed                       | Speed is always treated as 0                                                                                                            |
+| FROZEN  | Becomes CHILLED after taking damage | Speed is always treated as 0, Priority is always treated as -1                                                                          |
+| BURNED  | Until Removed  | Defense level is always treated as -2                                                                                                   |
+| POISONED | Until Removed | Loose 1/16th of user.max_hp at the end of each turn. Does not KO'd                                                                      |
+| AT_RISK | Until Removed | If target would be KO'd, it immedaitely dies instead                                                                                    |
+| ASLEEP | 3 Turns, removed after taking damage | Target may not move this turn                                                                                                           |
+| BLINDED | Until Removed | Attack level is always treated as -1                                                                                                    |
+| PROTECTED | 1 Turn | If the target would take damage, instead takes 0 damage, if the target would gain a status ailment, it does not                         |
 
 Recall that, when an entity is KO'd, it's status ailments are reset. In this way, a player may choose to KO'd their own party member, then immediately revivie them in order to restore their status. This is why `STRIKE` can target enemies or allies, but is, of course, impossible with $WIDLCARDs GORE, which has story relevance.
 
-Lastly, a non-exhaustive list of field effects, these apply to all entites at all times
 
-| ID | last for | effect                                                                                                                              |
-|-----|-------|-------------------------------------------------------------------------------------------------------------------------------------|
-| BLIZZARD | Whole Battle | At the end of a turn, if an entity is not currently BURNED, afflict it with CHILLED. If an entity is CHILLD, afflict it with FROZEN |
-| SANDSTORM | Whole Battle | At the end of a turn, afflict all entities with BLINDED                                                                             |
-| VIRAL_STORM | 3 Turns | All healing instead damages a target for the same amount. This cannot cause a target that is KO'd to dei                            |
-| HAIL | Whole Battle | Dealt 1/16th of entites max hp as damage, this cannot cause the target to die                                                       |
-| TRICK_ROOM | 5 turns | Reverse the order of actions, meaning the entity with the lower priority or lowest speed if same priority, moves first              |
-| MIRROR_ROOM | 1 turn | Swap the attack and defense of all entities |
+### Example Field Effects 
+
+A non-exhaustive list of field effects, these apply to all entites at all times
+
+| ID          | last for     | effect                                                                                                                              |
+|-------------|--------------|-------------------------------------------------------------------------------------------------------------------------------------|
+| BLIZZARD    | Whole Battle | At the end of a turn, if an entity is not currently BURNED, afflict it with CHILLED. If an entity is CHILLD, afflict it with FROZEN |
+| SANDSTORM   | Whole Battle | At the end of a turn, afflict all entities with BLINDED                                                                             |
+| VIRAL_STORM | 3 Turns      | All healing instead damages a target for the same amount. This cannot cause a target that is KO'd to dei                            |
+| HAIL        | Whole Battle | Dealt 1/16th of entites max hp as damage, this cannot cause the target to die                                                       |
+| TRICK_ROOM  | 5 turns      | Reverse the order of actions, meaning the entity with the lower priority or lowest speed if same priority, moves first              |
+| MIRROR_ROOM | 1 turn       | Swap the attack and defense of all entities |
+| HAZE        | 3 turns      | While active, attack, defense, and speed levels are not factored into calculation (though they still persist) |
+ | PREMONITION | 3 turns      | All moves performed by entites with +1 or high priority will fail |
+
+### Example Moves
+
+| ID                   | Mode   | Targets                    | PP                                    | Effect                                                                                                                                                      |
+|----------------------|--------|----------------------------|---------------------------------------|-------------------------------------------------------------------------------------------------------------------------------------------------------------|
+| FIRE_BALL            | SINGLE | all enemies                | 3                                     | If target has taken damage this turn afflict BURNED, then deal 3 * user.attack damage                                                                       |
+| STAT_SWAP            | SINGLE | single enemy               | 2                                     | Swap target.attack_level with user.attack_level, target.defense_level with user.defense_level                                                               |
+| OUTRUN               | SINGLE | self                       | 2                                     | Swap user.speed_level with user.attack_level                                                                                                                |
+| HAMSTER_FOR_THE_EYES | SINGLE | single enemy               | 5                                     | arget loose -1 attack per turn. If this move is used 3 turns in a row, attack is instead set to negative infinity                                           |
+| HEAL_WAVE            | MULTI  | all allies and all enemies | 1                                     | Heal target of target.max_Hp                                                                                                                                |
+| INVERSION            | SINGLE | self                       | 5                                     | Swap all attack, defense, and speed debuffs with buffs, buffs with debuffs                                                                                  |
+| TOUGH_LOVE           | SINGLE | self or ally or enemy | 3                                     | Deal 1.5 * user.attack damage, then heal for 2 * user.attack                                                                                                |
+| SIDE_SWIPE_SNIPE     | MULTIE | all enemies | 5                                     | For n-th target, if n <= 4 do (4 - n) * user.attack_damage, f if n 4 heal for (n - 4) * user.attack_damage                                                |
+| ARROY_OF_DEATH | SINGLE | single enemy | Deals 1 damage, then afflicts AT_RISK |
+| ECHO | SINGLE | singl ally | 1                                     | If user acts after target, will perform same attack as target without consuming PP                                                                          |                               | 
+ | JUGULAR | SINGLE | single enemey | 5                                     | Deal 1 damage to enemy. If this kills the enemey because it was KO'd, user may choose a new target to attack with JUGULAR this same turn, if it has PP left | 
+
+##### Example Combos: SIDE_SWIPE_SNIPE
+
+SIDE_SWIPE_LIPE: Example: Targeting 7 enemies:
+
+| enemey n | damage or heal                    |
+|----------|-----------------------------------|
+| 1        | damages (4 - 1) = 3 * user.attack |
+| 2        | damages (4 - 2) = 2 * user.attack |
+| 3        | damages (4 - 1) = 1 * user.attack |
+| 4        | 0 |
+| 5        | heals (5 - 4) = 1 * user.attack   |
+| 6        | heals (6 - 4) = 2 * user.attack   |
+| 7        | heals (7 - 4) = 3 * user.attack   |
+| 8        | heals (8 - 4) = 4 * user.attack   |
+| ...      | heals (n - 4) user.attack         |
+| 12       | heals (12 - 4) = 8 * user.attack  |
+
+For exactly 3 mobs, this attack is amazing, but imagine a boss who are usually in the middle spawn 6 mobss right of it, those will all get healed massively. If your party has 6 members, the player may elect to target their own party, protecting the first three such that the 5th and 6th member will get healing
+
+
+##### Example Combo: HEALWAVE x VIRAL_STORM
+
+If VIRAL_STORM is active, an entity being heald equal to it's max HP will instead deal that as damage, meaning it will kill every entity in play, even bosses. To avoid KO'ing your own party and loosing, if at least one of them protects you win the fight, if all of them except the HEAL_WAVE use protects, you wipe all enemies with multiple people still standing.
+
+##### Example Comboe: WAR_DANCE x INVERSION
+
+Set $RATs defense to negative infinity using WAR_DANCE repeadetly, then use INVERSION with $RAT, setting its attack and speed to -3 but your DEFENSE to postive infinity, which means $RAT will always take 0 damage, and any subsequent WAR_DANCE will raise attack but never lower defense
+
+
+
+### Example Consumables
+
+| ID                | Mode   | Effect                                                                                     |
+|-------------------|--------|--------------------------------------------------------------------------------------------|
+| MOLOTOV_SHOTGLASS | SINGLE | Dead 3 * target.defense damage, afflicts BURNED                                            |
+| BLOOD_VIAL        | SINGLE | Deal 25% user.max_hp damage to user, heal target for 50% user.max_hp                       |  
+| LEECH_ON_A_LEASH  | SINGLE | Afflict target enemy with LEECH: Heals user for 1/8th * target.max_hp every turn           |
+| THROWING_SPEAR    | SINGLE | Deal 200 damage to single target                                                           |
+| THROWING_SHIELD   | SINGLE | Afflict target with PROTECTED, unlike PROTECT move, can be used two turns in a row         |
+| CALTROPS          | MULTI  | All enemies that move before user this turn take 1 * user.attack damage, lasts 3 turns     |
+| GLUE_BOMB         | SINGLE | Lasts 1 turn: All entites that move after target (or self) will get -1 speed before acting |
+| LIT_FUSE | SINGLE | Afflicts: READY_TO_ROCKET: Gain +1 speed at the start of each turn. If Speed would become +4, immediately KO'd at the start of the turn
+
+
+In the examples in this sectino, not how there is no move that can just heal someone. Healing always comes at some downside, some minor like `BLOOD_VIAL`, but most of the times to actual heal someone who isn't KO'd, you will have to pull of at least a 2-person combo.
+
+
 
 # Settings
 
