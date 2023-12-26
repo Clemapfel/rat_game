@@ -13,58 +13,56 @@ function bt.BattleTransition:size_allocate(x, y, width, height)
     local y_step = height / n_steps
 
     local vertices = {}
-    for x_i = 0, n_steps + 1 do
-        local to_insert = {}
-        for y_i = 0, n_steps + 1 do
-            if x_i % 2 == 1 then
-                table.insert(to_insert, {x_i * x_step , y_i * y_step + 0.5 * y_step })
+    local step = 1
+    local half_step = 1 / 6
+    local h = math.sin(math.pi / 3)
+
+    local vertices = {}
+    for x_i = -1, n_steps, 3 do
+        for y_i = -1, math.floor(n_steps / h) + 1 do
+
+            -- source: https://alexwlchan.net/2016/tiling-the-plane-with-pillow/
+            local x_pos
+            if y_i % 2 == 0 then
+                x_pos = x_i
             else
-                table.insert(to_insert, {x_i * x_step , y_i * y_step})
+                x_pos = x_i + 1.5
+            end
+
+            for _, v in pairs({
+                {x_pos,        y_i * h},
+                {x_pos + 1,    y_i * h},
+                {x_pos + 1.5, (y_i + 1) * h},
+                {x_pos + 1,   (y_i + 2) * h},
+                {x_pos,       (y_i + 2) * h},
+                {x_pos - 0.5, (y_i + 1) * h},
+            }) do
+                table.insert(vertices, v)
             end
         end
-        table.insert(vertices, to_insert)
     end
-    for row_i = 1, n_steps + 1, 2 do
-        for col_i = 1, n_steps + 1, 1 do
-            local x, y = table.unpack(vertices[row_i][col_i])
-            vertices[row_i][col_i][1] = x + rt.random.integer(-16, 16)
-            vertices[row_i][col_i][2] = y + rt.random.integer(-16, 16)
-        end
+
+    local pixel_size_x = 1 / width
+    local pixel_size_y = 1 / height
+    local offset = -0.5
+    for _, v in ipairs(vertices) do
+        v[1] = v[1] + rt.random.number(-offset, offset)
+        v[2] = v[2] + rt.random.number(-offset, offset)
     end
 
     self._triangles = {}
-    for row_i = 1, n_steps + 1, 1 do
-        for col_i = 1, n_steps + 1, 1 do
-
-            if row_i % 2 == 1 then
-                local a = vertices[row_i][col_i]
-                local b = vertices[row_i + 1][col_i]
-                local c = vertices[row_i][col_i + 1]
-                table.insert(self._triangles, rt.Triangle(
-                        a[1], a[2],
-                        b[1], b[2],
-                        c[1], c[2]
-                ))
-
-                a = vertices[row_i + 1][col_i]
-                b = vertices[row_i + 1][col_i + 1]
-                c = vertices[row_i][col_i + 1]
-                table.insert(self._triangles, rt.Triangle(
-                        a[1], a[2],
-                        b[1], b[2],
-                        c[1], c[2]
-                ))
-            else
-                local a = vertices[row_i+1][col_i]
-                local b = vertices[row_i][col_i]
-                local c = vertices[row_i+1][col_i+1]
-                table.insert(self._triangles, rt.Triangle(
-                        a[1], a[2],
-                        b[1], b[2],
-                        c[1], c[2]
-                ))
-            end
-        end
+    for i = 1, #vertices, 6 do
+        local v = vertices
+        local w = math.max(width / n_steps, height / n_steps)
+        local h = w
+        table.insert(self._triangles, rt.Polygon(
+            v[i+0][1] * w, v[i+0][2] * h,
+            v[i+1][1] * w, v[i+1][2] * h,
+            v[i+2][1] * w, v[i+2][2] * h,
+            v[i+3][1] * w, v[i+3][2] * h,
+            v[i+4][1] * w, v[i+4][2] * h,
+            v[i+5][1] * w, v[i+5][2] * h
+        ))
     end
 
     for _, shape in pairs(self._triangles) do
@@ -75,7 +73,6 @@ end
 
 --- @overload
 function bt.BattleTransition:draw()
-    love.graphics.scale(0.9)
     for _, shape in pairs(self._triangles) do
         shape:draw()
     end

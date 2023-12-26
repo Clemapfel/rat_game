@@ -536,7 +536,6 @@ rt.Dot = meta.new_type("Dot", function(x, y)
     }, rt.Shape, rt.Drawable)
 end)
 
-
 --- @overload
 function rt.Dot:draw()
     self:_bind()
