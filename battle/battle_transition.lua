@@ -46,7 +46,10 @@ function bt.BattleTransition:size_allocate(x, y, width, height)
     local pixel_size_y = 1 / height
     local offset = -0.5
     for _, v in ipairs(vertices) do
+        rt.random.seed(v[1])
         v[1] = v[1] + rt.random.number(-offset, offset)
+
+        rt.random.seed(v[2])
         v[2] = v[2] + rt.random.number(-offset, offset)
     end
 
