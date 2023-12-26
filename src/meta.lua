@@ -213,9 +213,14 @@ end
 --- @brief [internal] add a property, set to intial value
 --- @param x meta.Object
 --- @param property_name String
-function meta._uninstall_property(x, property_name)
+function meta.uninstall_property(x, property_name)
     local metatable = getmetatable(x)
     metatable.properties[property_name] = nil
+end
+
+--- @brief add property after construction
+function meta.install_property(x, name, value)
+    getmetatable(x).properties[name] = value
 end
 
 --- @brief get whether property is installed

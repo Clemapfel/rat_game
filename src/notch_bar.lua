@@ -66,8 +66,6 @@ function rt.Notch:size_allocate(x, y, width, height)
     local frame_radius = math.min(rt.settings.notch_bar.notch_frame_radius_factor * radius, radius - min_frame_thickness) -- inner
     local eps = 1 / 400
 
-    println(center_radius)
-
     self._center:resize(center_x, center_y, center_radius)
     self._center_outline:resize(center_x, center_y, center_radius + eps)
     self._shape:resize(center_x, center_y, frame_radius)

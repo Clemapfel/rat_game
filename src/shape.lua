@@ -66,7 +66,6 @@ end
 --- @brief set rotation
 function rt.Shape:set_rotation(angle, origin_x, origin_y)
 
-
     self._rotation = angle:as_radians()
     self._use_origin = false
 
@@ -417,7 +416,6 @@ end
 --- @brief
 function rt.Ellipse:resize(center_x, center_y, radius_x, radius_y)
 
-
     if not meta.is_nil(radius_y) then
 
     end
@@ -476,7 +474,6 @@ end
 --- @class rt.Polygon
 rt.Polygon = meta.new_type("Polygon", function(a_x, a_y, b_x, b_y, c_x, c_y, ...)
 
-
     local vertices =  {a_x, a_y, b_x, b_y, c_x, c_y, ...}
     local outer_hull = love.math.triangulate(vertices)
     for _, triangle in pairs(outer_hull) do
@@ -495,7 +492,6 @@ rt.Polygon = meta.new_type("Polygon", function(a_x, a_y, b_x, b_y, c_x, c_y, ...
 end)
 
 function rt.Polygon:resize(a_x, a_y, b_x, b_y, c_x, c_y, ...)
-
     local vertices =  {a_x, a_y, b_x, b_y, c_x, c_y, ...}
     local outer_hull = love.math.triangulate(vertices)
     for _, triangle in pairs(outer_hull) do
@@ -532,6 +528,22 @@ function rt.Polygon:draw()
     love.graphics.polygon(self:_get_draw_mode(), table.unpack(self._vertices))
     self._unbind()
 end
+
+rt.Dot = meta.new_type("Dot", function(x, y)
+    return meta.new(rt.Dot, {
+        _x = x,
+        _y = y
+    }, rt.Shape, rt.Drawable)
+end)
+
+
+--- @overload
+function rt.Dot:draw()
+    self:_bind()
+    love.graphics.points(self._x, self._y)
+    self:_unbind()
+end
+
 
 --- @brief test shapes
 function rt.test.shapes()

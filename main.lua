@@ -2,8 +2,9 @@ require "include"
 
 rt.add_scene("debug")
 menu = bt.InventoryMenu()
-rt.current_scene:set_child(menu)
 
+transition = bt.BattleTransition()
+rt.current_scene:set_child(transition)
 
 input = rt.add_input_controller(rt.current_scene.window)
 input:signal_connect("pressed", function(self, which)

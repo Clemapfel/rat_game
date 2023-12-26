@@ -123,6 +123,7 @@ require "battle/party_info"
 
 require "battle/action_selection_menu"
 require "battle/inventory_menu"
+require "battle/battle_transition"
 
 require "scene"
 -- require "test

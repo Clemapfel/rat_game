@@ -42,11 +42,12 @@ rt.Palette = {
     PINK_4 = rt.RGBA("#c20c83"),
     PINK_5 = rt.RGBA("#7a1056"),
 
-    PURPLE_1 = rt.RGBA("#e565ff"),
-    PURPLE_2 = rt.RGBA("#cc34e1"),
-    PURPLE_3 = rt.RGBA("#ae00c6"), -- purple
-    PURPLE_4 = rt.RGBA("#7b048a"),
-    PURPLE_5 = rt.RGBA("#53065d"),
+    PURPLE_1 = rt.RGBA("ec8cff"),
+    PURPLE_2 = rt.RGBA("#e565ff"),
+    PURPLE_3 = rt.RGBA("#cc34e1"),
+    PURPLE_4 = rt.RGBA("#ae00c6"), -- purple
+    PURPLE_5 = rt.RGBA("#7b048a"),
+    PURPLE_6 = rt.RGBA("#53065d"),
 
     LILAC_1 = rt.RGBA("#b674f7"),
     LILAC_2 = rt.RGBA("#9b53e2"),
@@ -143,7 +144,7 @@ rt.Palette.FIELD = rt.Palette.ORANGE_1
 rt.Palette.ATTACK = rt.Palette.ENEMY
 rt.Palette.DEFENSE = rt.Palette.ALLY
 rt.Palette.SPEED = rt.Palette.LIGHT_GREEN_2
-rt.Palette.HP = rt.Palette.SELF
+rt.Palette.HP = rt.Palette.PURPLE_1
 
 --- @brief save palette to assets/palette.png
 function rt.Palette:export()
@@ -186,6 +187,8 @@ function rt.Palette:export()
         "PURPLE_2",
         "PURPLE_3",
         "PURPLE_4",
+        "PURPLE_4",
+        "PURPLE_6",
 
         "PINK_1",
         "PINK_2",

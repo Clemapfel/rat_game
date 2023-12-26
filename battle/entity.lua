@@ -100,7 +100,7 @@ function bt.stat_level_to_factor(x)
 end
 
 -- 1 ev to absolute offset
-rt.settings.entity.ev_to_offset = 100
+rt.settings.entity.ev_to_offset = 10
 
 --- @brief calculate base
 function bt.Entity:_calculate_base(which)

@@ -125,10 +125,12 @@ function rt.Label:size_allocate(x, y, width, height)
         for _, glyph in ipairs(rows[i]) do
             if meta.isa(glyph, rt.Glyph) then
                 local position_x, position_y = glyph:get_position()
-                if self._justify_mode == rt.JustifyMode.CENTER then
-                    position_x = position_x + (width - row_widths[i]) * 0.5
+                if self._justify_mode == rt.JustifyMode.LEFT then
+                    position_x = position_x + self:get_margin_left() + self:get_margin_right()
+                elseif self._justify_mode == rt.JustifyMode.CENTER then
+                    position_x = position_x + (width - row_widths[i] - self:get_margin_left() - self:get_margin_right()) * 0.5
                 elseif self._justify_mode == rt.JustifyMode.RIGHT then
-                    position_x = position_x + (width - row_widths[i])
+                    position_x = position_x + (width - row_widths[i] - self:get_margin_left() - self:get_margin_right())
                 end
 
                 local w, h = glyph:get_size()
@@ -188,8 +190,8 @@ end
 
 --- @overload rt.Widget.measure
 function rt.Label:measure()
-
-    return self._current_width + self:get_margin_left() + self:get_margin_right(), self._current_height + self:get_margin_top() + self:get_margin_bottom()
+    return math.max(self._current_width, select(1, self:get_minimum_size())) + self:get_margin_left() + self:get_margin_right(),
+           math.max(self._current_height, select(2, self:get_minimum_size())) + self:get_margin_top() + self:get_margin_bottom()
 end
 
 -- control characters used for wrap hinting
@@ -552,9 +554,6 @@ end
 --- @brief set text justification
 --- @param mode rt.JustifyMode
 function rt.Label:set_justify_mode(mode)
-
-
-
     if self._justify_mode ~= mode then
         self._justify_mode = mode
         self:reformat()
