@@ -1,13 +1,21 @@
 --- @class bt.BattleTransition
 bt.BattleTransition = meta.new_type("BattleTransition", function()
     local out = meta.new(bt.BattleTransition, {
-        _triangles = {} -- Table<rt.Shape>
+        _triangles = {}, -- Table<rt.Shape>
+        _width = 1,
+        _height = 1,
+        _offset = 0.1
     }, rt.Widget, rt.Drawable, rt.Animation)
+
+    out:set_is_animated(true)
     return out
 end)
 
 --- @overload
 function bt.BattleTransition:size_allocate(x, y, width, height)
+
+    self._width = width
+    self._height = height
 
     local n_steps = 10
     local x_step = width / n_steps
@@ -33,21 +41,6 @@ function bt.BattleTransition:size_allocate(x, y, width, height)
         end
     end
 
-    local offset = 1
-    for x_i = 1, n_steps, 1 do
-        for y_i = 1, n_steps, 1 do
-
-            local v = vertices:get(x_i, y_i)
-            if v[1] == 0 or v[1] == width or v[2] == 0 or v[2] == height then
-                goto continue
-            end
-
-            v[1] = clamp(v[1] + rt.random.number(-offset, offset), 0, width)
-            v[2] = clamp(v[2] + rt.random.number(-offset, offset), 0, height)
-
-            ::continue::
-        end
-    end
 
     local x_scale = width / n_steps
     local y_scale = height / n_steps
@@ -180,6 +173,36 @@ end
 --- @overload
 function bt.BattleTransition:update(delta)
     for _, polygon in pairs(self._triangles) do
+        for i = 1, #polygon._vertices - 2, 2 do
+            local x = polygon._vertices[i]
+            local y = polygon._vertices[i+1]
 
+            x = x + rt.random.number(-self._offset, self._offset)
+            y = y + rt.random.number(-self._offset, self._offset)
+
+            x = clamp(x, 0, self._width)
+            y = clamp(y, 0, self._height)
+
+            polygon._vertices[i] = x
+            polygon._vertices[i+1] = y
+        end
     end
+
+--[[
+    local offset = 1
+    for x_i = 1, n_steps, 1 do
+        for y_i = 1, n_steps, 1 do
+
+            local v = vertices:get(x_i, y_i)
+            if v[1] == 0 or v[1] == width or v[2] == 0 or v[2] == height then
+                goto continue
+            end
+
+            v[1] = clamp(v[1] + rt.random.number(-offset, offset), 0, width)
+            v[2] = clamp(v[2] + rt.random.number(-offset, offset), 0, height)
+
+            ::continue::
+        end
+    end
+    ]]--
 end
