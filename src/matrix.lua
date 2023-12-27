@@ -1,7 +1,7 @@
 rt.settings.matrix.default_value = INFINITY
 
 --- @class rt.Matrix
---- @brief n-dimensional matrix, stored linearly in column major order
+--- @brief fixed-size n-dimensional matrix, stored linearly in column major order
 --- @vararg dimensions
 rt.Matrix = meta.new_type("Matrix", function(dimension, ...)
 
@@ -32,17 +32,17 @@ end
 --- @brief [internal]
 function rt.Matrix:_to_linear_index(indices)
 
-    -- source: https://github.com/Clemapfel/jluna/blob/master/.src/array.inl#L265
     if #indices ~= #self._dimensions then
         rt.error("In rt.Matrix: incorrect number of indices `" .. tostring(#indices)  .. "` for a matrix of rank `" .. tostring(#self._dimensions) .. "`")
     end
 
     for i, index in ipairs(indices) do
         if index > self:get_dimension(i) then
-            rt.error("In rt.Matrix: index `" .. tostring(index) .. "` is out of bounds for a matrix with size `" .. tostring(self:get_dimension()) .. "` in dimension `" .. i .. "`")
+            rt.error("In rt.Matrix: index `" .. tostring(index) .. "` is out of bounds for a matrix with size `" .. tostring(self:get_dimension(i)) .. "` in dimension `" .. i .. "`")
         end
     end
 
+    -- source: https://github.com/Clemapfel/jluna/blob/master/.src/array.inl#L265
     local index = 1;
     local mul = 1;
 

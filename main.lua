@@ -2,10 +2,10 @@ require "include"
 
 rt.add_scene("debug")
 menu = bt.InventoryMenu()
+rt.current_scene:set_child(menu)
 
 transition = bt.BattleTransition()
 rt.current_scene:set_child(transition)
-
 
 input = rt.add_input_controller(rt.current_scene.window)
 input:signal_connect("pressed", function(self, which)
@@ -31,19 +31,16 @@ input:signal_connect("pressed", function(self, which)
     end
 end)
 
--- ## MAIN
-rt.current_scene:run()
-
 -- ######################
 
 love.load = function()
-    rt.current_scene:run()
     love.window.setMode(800, 600, {
         vsync = 1,
         msaa = 8,
         stencil = true,
         resizable = true
     })
+    rt.current_scene:run()
 end
 
 love.draw = function()

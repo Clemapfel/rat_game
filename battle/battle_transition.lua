@@ -9,8 +9,7 @@ end)
 --- @overload
 function bt.BattleTransition:size_allocate(x, y, width, height)
 
-    --[[
-    local n_steps = 15
+    local n_steps = 10
     local x_step = width / n_steps
     local y_step = height / n_steps
 
@@ -19,31 +18,19 @@ function bt.BattleTransition:size_allocate(x, y, width, height)
     local half_step = 1 / 6
     local h = math.sin(math.pi / 3)
 
-    local vertices = {{}}
-    local matrix_x = 1
-    local matrix_y = 1
-
-    for x_i = -1, n_steps, 3 do
-        for y_i = -1, math.floor(n_steps / h) + 1 do
-
-            -- source: https://alexwlchan.net/2016/tiling-the-plane-with-pillow/
-            local x_pos
-            if y_i % 2 == 0 then
+    local vertices = rt.Matrix(n_steps + 2, n_steps + 2)
+    for x_i = 0, n_steps, 1 do
+        for y_i = 0, n_steps, 1 do
+            local x_pos, y_pos
+            if x_i % 2 == 0 then
                 x_pos = x_i
+                y_pos = y_i + 0.5
             else
-                x_pos = x_i + 1.5
+                x_pos = x_i
+                y_pos = y_i
             end
-
-
-            for _, v in pairs({
-                {x_pos,        y_i * h},
-                {x_pos + 1,    y_i * h}
-            }) do
-                table.insert(vertices, v)
-            end
-            matrix_y = matrix_y + 1
+            vertices:set(x_i + 1, y_i + 1, {x_pos, y_pos})
         end
-        matrix_x = matrix_x + 1
     end
 
     local pixel_size_x = 1 / width
@@ -54,35 +41,122 @@ function bt.BattleTransition:size_allocate(x, y, width, height)
         --v[2] = v[2] + rt.random.number(-offset, offset)
     end
 
-    local temp = 1
-    local n = sizeof(vertices)
+    local x_scale = width / n_steps
+    local y_scale = height / n_steps
+    
     self._triangles = {}
-    for i = 1, #vertices-2, 2 do
-        local v = vertices
-        local w = math.max(width / n_steps, height / n_steps)
-        local h = w
 
-        local a_x, a_y = v[i+0][1] * w, v[i+0][2] * h
-        local b_x, b_y = v[i+1][1] * w, v[i+1][2] * h
-        local c_x, c_y = v[i+2][1] * w, v[i+2][2] * h
-        local d_x, d_y = v[i+3][1] * w, v[i+3][2] * h
-        local to_push = rt.Polygon(
-            a_x, a_y,
-            b_x, b_y,
-            c_x, c_y,
-            d_x, d_y
-        )
+    -- upper most row
+    for x_i = 1, n_steps + 1 - 1, 1 do
 
+        local a = vertices:get(x_i, 1)
+        local b = vertices:get(x_i + 1, 1)
+        local c = {a[1], 0}
 
-        table.insert(self._triangles, to_push)
-        ::continue::
+        table.insert(self._triangles, rt.Polygon(
+                a[1] * x_scale, a[2] * y_scale,
+                b[1] * x_scale, b[2] * y_scale,
+                c[1] * x_scale, c[2] * y_scale
+        ))
+
+        a = vertices:get(x_i + 1, 1)
+        b = vertices:get(x_i, 1)
+        c = {a[1], 0}
+
+        table.insert(self._triangles, rt.Polygon(
+                a[1] * x_scale, a[2] * y_scale,
+                b[1] * x_scale, b[2] * y_scale,
+                c[1] * x_scale, c[2] * y_scale
+        ))
     end
 
+    -- tiling
+    for y_i = 1, n_steps + 1 - 1 , 1 do
+        for x_i = 1, n_steps + 1 - 1, 1 do
+
+            local a, b, c
+            local color
+            if x_i % 2 == 0 then
+                a = vertices:get(x_i, y_i)
+                b = vertices:get(x_i + 1, y_i)
+                c = vertices:get(x_i, y_i + 1)
+
+                table.insert(self._triangles, rt.Polygon(
+                        a[1] * x_scale, a[2] * y_scale,
+                        b[1] * x_scale, b[2] * y_scale,
+                        c[1] * x_scale, c[2] * y_scale
+                ))
+
+                a = vertices:get(x_i + 1, y_i)
+                b = vertices:get(x_i + 1, y_i + 1)
+                c = vertices:get(x_i, y_i + 1)
+
+                table.insert(self._triangles, rt.Polygon(
+                        a[1] * x_scale, a[2] * y_scale,
+                        b[1] * x_scale, b[2] * y_scale,
+                        c[1] * x_scale, c[2] * y_scale
+                ))
+
+            else
+                a = vertices:get(x_i, y_i)
+                b = vertices:get(x_i + 1, y_i)
+                c = vertices:get(x_i + 1, y_i + 1)
+
+                table.insert(self._triangles, rt.Polygon(
+                        a[1] * x_scale, a[2] * y_scale,
+                        b[1] * x_scale, b[2] * y_scale,
+                        c[1] * x_scale, c[2] * y_scale
+                ))
+
+                a = vertices:get(x_i, y_i)
+                b = vertices:get(x_i + 1, y_i + 1)
+                c = vertices:get(x_i, y_i + 1)
+
+                table.insert(self._triangles, rt.Polygon(
+                        a[1] * x_scale, a[2] * y_scale,
+                        b[1] * x_scale, b[2] * y_scale,
+                        c[1] * x_scale, c[2] * y_scale
+                ))
+            end
+        end
+    end
+
+    -- lower most row
+    for x_i = 1, n_steps + 1 - 1, 1 do
+
+        local y_index = n_steps + 1
+
+        if x_i % 2 == 1 then
+
+            local a = vertices:get(x_i, y_index)
+            local b = vertices:get(x_i + 1, y_index)
+            local c = {b[1], a[2]}
+
+            table.insert(self._triangles, rt.Polygon(
+                    a[1] * x_scale, a[2] * y_scale,
+                    b[1] * x_scale, b[2] * y_scale,
+                    c[1] * x_scale, c[2] * y_scale
+            ))
+        else
+            local a = vertices:get(x_i, y_index)
+            local b = vertices:get(x_i + 1, y_index)
+            local c = {a[1], b[2]}
+
+            table.insert(self._triangles, rt.Polygon(
+                a[1] * x_scale, a[2] * y_scale,
+                b[1] * x_scale, b[2] * y_scale,
+                c[1] * x_scale, c[2] * y_scale
+            ))
+        end
+    end
+
+    local i = 0
     for _, shape in pairs(self._triangles) do
-        shape:set_is_outline(true)
+        shape:set_is_outline(false)
         shape:set_line_width(3)
+        shape:set_color(rt.HSVA(i / #self._triangles), 1, 1, 1)
+        i = i + 1
     end
-    ]]--
 end
 
 --- @overload
