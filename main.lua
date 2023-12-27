@@ -6,6 +6,10 @@ menu = bt.InventoryMenu()
 transition = bt.BattleTransition()
 rt.current_scene:set_child(transition)
 
+matrix = rt.Matrix2D(100, 20)
+matrix.data[1][3] = 4
+println(matrix)
+
 input = rt.add_input_controller(rt.current_scene.window)
 input:signal_connect("pressed", function(self, which)
 

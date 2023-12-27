@@ -529,17 +529,16 @@ function rt.Polygon:draw()
     self._unbind()
 end
 
-rt.Dot = meta.new_type("Dot", function(x, y)
-    return meta.new(rt.Dot, {
-        _x = x,
-        _y = y
+rt.Dots = meta.new_type("Dots", function(x, y, ...)
+    return meta.new(rt.Dots, {
+        _points = {x, y, ...}
     }, rt.Shape, rt.Drawable)
 end)
 
 --- @overload
-function rt.Dot:draw()
+function rt.Dots:draw()
     self:_bind()
-    love.graphics.points(self._x, self._y)
+    love.graphics.points(table.unpack(self._points))
     self:_unbind()
 end
 
