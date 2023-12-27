@@ -33,12 +33,20 @@ function bt.BattleTransition:size_allocate(x, y, width, height)
         end
     end
 
-    local pixel_size_x = 1 / width
-    local pixel_size_y = 1 / height
-    local offset = -0.5
-    for _, v in ipairs(vertices) do
-        --v[1] = v[1] + rt.random.number(-offset, offset)
-        --v[2] = v[2] + rt.random.number(-offset, offset)
+    local offset = 1
+    for x_i = 1, n_steps, 1 do
+        for y_i = 1, n_steps, 1 do
+
+            local v = vertices:get(x_i, y_i)
+            if v[1] == 0 or v[1] == width or v[2] == 0 or v[2] == height then
+                goto continue
+            end
+
+            v[1] = clamp(v[1] + rt.random.number(-offset, offset), 0, width)
+            v[2] = clamp(v[2] + rt.random.number(-offset, offset), 0, height)
+
+            ::continue::
+        end
     end
 
     local x_scale = width / n_steps
@@ -152,7 +160,7 @@ function bt.BattleTransition:size_allocate(x, y, width, height)
 
     local i = 0
     for _, shape in pairs(self._triangles) do
-        shape:set_is_outline(false)
+        shape:set_is_outline(true)
         shape:set_line_width(3)
         shape:set_color(rt.HSVA(i / #self._triangles), 1, 1, 1)
         i = i + 1
@@ -161,7 +169,17 @@ end
 
 --- @overload
 function bt.BattleTransition:draw()
+    love.graphics.translate(300, 300)
+    love.graphics.scale(0.8)
+    love.graphics.translate(-300, -300)
     for _, shape in pairs(self._triangles) do
         shape:draw()
+    end
+end
+
+--- @overload
+function bt.BattleTransition:update(delta)
+    for _, polygon in pairs(self._triangles) do
+
     end
 end
