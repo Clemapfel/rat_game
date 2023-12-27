@@ -1,7 +1,7 @@
 --- @class bt.BattleTransition
 bt.BattleTransition = meta.new_type("BattleTransition", function()
     local out = meta.new(bt.BattleTransition, {
-        _triangles = {}, -- Table<rt.Shape>
+        _mesh = {}, -- rt.VertexShape
         _width = 1,
         _height = 1,
         _offset = 0.1
@@ -44,8 +44,13 @@ function bt.BattleTransition:size_allocate(x, y, width, height)
 
     local x_scale = width / n_steps
     local y_scale = height / n_steps
-    
-    self._triangles = {}
+
+    local triangles = {}
+    function push(...)
+        for _, x in pairs({...}) do
+            table.insert(triangles, x)
+        end
+    end
 
     -- upper most row
     for x_i = 1, n_steps + 1 - 1, 1 do
@@ -54,21 +59,21 @@ function bt.BattleTransition:size_allocate(x, y, width, height)
         local b = vertices:get(x_i + 1, 1)
         local c = {a[1], 0}
 
-        table.insert(self._triangles, rt.Polygon(
-                a[1] * x_scale, a[2] * y_scale,
-                b[1] * x_scale, b[2] * y_scale,
-                c[1] * x_scale, c[2] * y_scale
-        ))
+        push(
+                {a[1] * x_scale, a[2] * y_scale},
+                 {b[1] * x_scale, b[2] * y_scale},
+                  {c[1] * x_scale, c[2] * y_scale}
+        )
 
         a = vertices:get(x_i + 1, 1)
         b = vertices:get(x_i, 1)
         c = {a[1], 0}
 
-        table.insert(self._triangles, rt.Polygon(
-                a[1] * x_scale, a[2] * y_scale,
-                b[1] * x_scale, b[2] * y_scale,
-                c[1] * x_scale, c[2] * y_scale
-        ))
+        push(
+            {a[1] * x_scale, a[2] * y_scale},
+            {b[1] * x_scale, b[2] * y_scale},
+            {c[1] * x_scale, c[2] * y_scale}
+        )
     end
 
     -- tiling
@@ -82,42 +87,42 @@ function bt.BattleTransition:size_allocate(x, y, width, height)
                 b = vertices:get(x_i + 1, y_i)
                 c = vertices:get(x_i, y_i + 1)
 
-                table.insert(self._triangles, rt.Polygon(
-                        a[1] * x_scale, a[2] * y_scale,
-                        b[1] * x_scale, b[2] * y_scale,
-                        c[1] * x_scale, c[2] * y_scale
-                ))
+                push(
+                    {a[1] * x_scale, a[2] * y_scale},
+                    {b[1] * x_scale, b[2] * y_scale},
+                    {c[1] * x_scale, c[2] * y_scale}
+                )
 
                 a = vertices:get(x_i + 1, y_i)
                 b = vertices:get(x_i + 1, y_i + 1)
                 c = vertices:get(x_i, y_i + 1)
 
-                table.insert(self._triangles, rt.Polygon(
-                        a[1] * x_scale, a[2] * y_scale,
-                        b[1] * x_scale, b[2] * y_scale,
-                        c[1] * x_scale, c[2] * y_scale
-                ))
+                push(
+                    {a[1] * x_scale, a[2] * y_scale},
+                    {b[1] * x_scale, b[2] * y_scale},
+                    {c[1] * x_scale, c[2] * y_scale}
+                )
 
             else
                 a = vertices:get(x_i, y_i)
                 b = vertices:get(x_i + 1, y_i)
                 c = vertices:get(x_i + 1, y_i + 1)
 
-                table.insert(self._triangles, rt.Polygon(
-                        a[1] * x_scale, a[2] * y_scale,
-                        b[1] * x_scale, b[2] * y_scale,
-                        c[1] * x_scale, c[2] * y_scale
-                ))
+                push(
+                    {a[1] * x_scale, a[2] * y_scale},
+                    {b[1] * x_scale, b[2] * y_scale},
+                    {c[1] * x_scale, c[2] * y_scale}
+                )
 
                 a = vertices:get(x_i, y_i)
                 b = vertices:get(x_i + 1, y_i + 1)
                 c = vertices:get(x_i, y_i + 1)
 
-                table.insert(self._triangles, rt.Polygon(
-                        a[1] * x_scale, a[2] * y_scale,
-                        b[1] * x_scale, b[2] * y_scale,
-                        c[1] * x_scale, c[2] * y_scale
-                ))
+                push(
+                    {a[1] * x_scale, a[2] * y_scale},
+                    {b[1] * x_scale, b[2] * y_scale},
+                    {c[1] * x_scale, c[2] * y_scale}
+                )
             end
         end
     end
@@ -133,30 +138,29 @@ function bt.BattleTransition:size_allocate(x, y, width, height)
             local b = vertices:get(x_i + 1, y_index)
             local c = {b[1], a[2]}
 
-            table.insert(self._triangles, rt.Polygon(
-                    a[1] * x_scale, a[2] * y_scale,
-                    b[1] * x_scale, b[2] * y_scale,
-                    c[1] * x_scale, c[2] * y_scale
-            ))
+            push(
+                {a[1] * x_scale, a[2] * y_scale},
+                {b[1] * x_scale, b[2] * y_scale},
+                {c[1] * x_scale, c[2] * y_scale}
+            )
         else
             local a = vertices:get(x_i, y_index)
             local b = vertices:get(x_i + 1, y_index)
             local c = {a[1], b[2]}
 
-            table.insert(self._triangles, rt.Polygon(
-                a[1] * x_scale, a[2] * y_scale,
-                b[1] * x_scale, b[2] * y_scale,
-                c[1] * x_scale, c[2] * y_scale
-            ))
+            push(
+                {a[1] * x_scale, a[2] * y_scale},
+                {b[1] * x_scale, b[2] * y_scale},
+                {c[1] * x_scale, c[2] * y_scale}
+            )
         end
     end
 
-    local i = 0
-    for _, shape in pairs(self._triangles) do
-        shape:set_is_outline(true)
-        shape:set_line_width(3)
-        shape:set_color(rt.HSVA(i / #self._triangles), 1, 1, 1)
-        i = i + 1
+    self._mesh = rt.VertexShape(triangles)
+    self._mesh:set_draw_mode(rt.MeshDrawMode.TRIANGLES)
+
+    for i = 1, #triangles do
+        self._mesh:set_vertex_color(i, rt.HSVA(i / #triangles, 1, 1, 1))
     end
 end
 
@@ -165,13 +169,13 @@ function bt.BattleTransition:draw()
     love.graphics.translate(300, 300)
     love.graphics.scale(0.8)
     love.graphics.translate(-300, -300)
-    for _, shape in pairs(self._triangles) do
-        shape:draw()
-    end
+    self._mesh:draw()
 end
 
 --- @overload
 function bt.BattleTransition:update(delta)
+
+    --[[
     for _, polygon in pairs(self._triangles) do
         for i = 1, #polygon._vertices - 2, 2 do
             local x = polygon._vertices[i]
@@ -187,6 +191,7 @@ function bt.BattleTransition:update(delta)
             polygon._vertices[i+1] = y
         end
     end
+    ]]--
 
 --[[
     local offset = 1

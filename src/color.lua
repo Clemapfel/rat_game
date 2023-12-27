@@ -84,7 +84,6 @@ end
 --- @return rt.HSVA
 function rt.rgba_to_hsva(rgba)
 
-
     -- cf. https://github.com/Clemapfel/mousetrap/blob/main/src/color.cpp#L112
     local r = rgba.r
     local g = rgba.g

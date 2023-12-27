@@ -68,7 +68,6 @@ end)
 --- @brief get number of vertices
 --- @return Number
 function rt.VertexShape:get_n_vertices()
-
     return self._native:getVertexCount()
 end
 
