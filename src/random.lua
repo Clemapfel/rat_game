@@ -41,7 +41,7 @@ end
 --- @brief pick random element from table
 --- @param set Table
 function rt.random.choose(set)
-    local step = rt.random.integer(0, #set)
+    local step = rt.random.integer(1, #set)
     local i, v = next(set)
     local n = 0
     while i ~= nil do

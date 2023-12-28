@@ -1,10 +1,15 @@
 --- @class bt.BattleTransition
-bt.BattleTransition = meta.new_type("BattleTransition", function()
+bt.BattleTransition = meta.new_type("BattleTransition", function(n_tiles)
     local out = meta.new(bt.BattleTransition, {
         _mesh = {}, -- rt.VertexShape
+        _n_steps = which(n_tiles, 5),
         _width = 1,
         _height = 1,
-        _offset = 0.1
+        _offset = 0.1,
+        _shader = rt.Shader("assets/shaders/battle_background.glsl"),
+        _elapsed = 0,
+        _triangles = {},
+        _texture = nil
     }, rt.Widget, rt.Drawable, rt.Animation)
 
     out:set_is_animated(true)
@@ -17,7 +22,7 @@ function bt.BattleTransition:size_allocate(x, y, width, height)
     self._width = width
     self._height = height
 
-    local n_steps = 10
+    local n_steps = self._n_steps
     local x_step = width / n_steps
     local y_step = height / n_steps
 
@@ -60,9 +65,9 @@ function bt.BattleTransition:size_allocate(x, y, width, height)
         local c = {a[1], 0}
 
         push(
-                {a[1] * x_scale, a[2] * y_scale},
-                 {b[1] * x_scale, b[2] * y_scale},
-                  {c[1] * x_scale, c[2] * y_scale}
+            {a[1] * x_scale, a[2] * y_scale},
+             {b[1] * x_scale, b[2] * y_scale},
+              {c[1] * x_scale, c[2] * y_scale}
         )
 
         a = vertices:get(x_i + 1, 1)
@@ -158,23 +163,49 @@ function bt.BattleTransition:size_allocate(x, y, width, height)
 
     self._mesh = rt.VertexShape(triangles)
     self._mesh:set_draw_mode(rt.MeshDrawMode.TRIANGLES)
+    self._mesh:set_texture(rt.Texture("assets/temp_wave.png"))
 
-    for i = 1, #triangles do
-        self._mesh:set_vertex_color(i, rt.HSVA(i / #triangles, 1, 1, 1))
+    local colors = {
+        --rt.Palette.LIGHT_BLUE_1,
+        rt.Palette.LIGHT_BLUE_2,
+        rt.Palette.BLUE_1,
+        rt.Palette.BLUE_2,
+        rt.Palette.BLUE_3,
+        rt.Palette.BLUE_4,
+        rt.Palette.BLUE_5,
+        --rt.Palette.BLUE_6
+    }
+
+    for i = 1, #triangles, 3 do
+        --self._mesh:set_vertex_color(i, rt.HSVA(i / #triangles, 1, 1, 1))
+
+        local color = colors[rt.random.integer(1, #colors)]
+        for j = i, i + 2 do
+            self._mesh:set_vertex_color(j, color)
+        end
+    end
+
+    self._triangles = {}
+    for _, p in pairs(triangles) do
+        table.insert(self._triangles, p[1])
+        table.insert(self._triangles, p[2])
     end
 end
 
 --- @overload
 function bt.BattleTransition:draw()
-    love.graphics.translate(300, 300)
-    love.graphics.scale(0.8)
-    love.graphics.translate(-300, -300)
+    self._shader:bind()
+    --love.graphics.setLineWidth(3)
+    --love.graphics.setWireframe(true)
     self._mesh:draw()
+    self._shader:unbind()
 end
 
 --- @overload
 function bt.BattleTransition:update(delta)
 
+    self._elapsed = self._elapsed + delta
+    self._shader:send("_time", self._elapsed)
     --[[
     for _, polygon in pairs(self._triangles) do
         for i = 1, #polygon._vertices - 2, 2 do
@@ -210,4 +241,9 @@ function bt.BattleTransition:update(delta)
         end
     end
     ]]--
+end
+
+--- @brief
+function bt.BattleTransition:set_texture(texture)
+    self._mesh:set_texture(texture)
 end

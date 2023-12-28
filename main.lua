@@ -4,14 +4,17 @@ rt.add_scene("debug")
 menu = bt.InventoryMenu()
 rt.current_scene:set_child(menu)
 
-transition = bt.BattleTransition()
+transition = bt.BattleTransition(16)
 rt.current_scene:set_child(transition)
 
+local wireframe = false;
 input = rt.add_input_controller(rt.current_scene.window)
 input:signal_connect("pressed", function(self, which)
 
     local speed = 0.1
     if which == rt.InputButton.A then
+        wireframe = not wireframe;
+        love.graphics.setWireframe(wireframe)
     elseif which == rt.InputButton.B then
     elseif which == rt.InputButton.X then
     elseif which == rt.InputButton.Y then
@@ -40,6 +43,7 @@ love.load = function()
         stencil = true,
         resizable = true
     })
+    love.window.setTitle("rat_game")
     rt.current_scene:run()
 end
 
