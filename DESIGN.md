@@ -2,6 +2,36 @@
 
 ## 2.1 Entities
 
+## 2.1.x Stats
+
+Each entity has four properties associated with it, called ATK (attack), DEF (defense), SPD (speed), HP (hit points), and a hidden priority stat. At the start of each turn, all entites in the battle are sorted by SPD, descending, then that turns action order is determined. The fastest entity acts first within its priority bracket. If the priority of two entities is the same, the entity with the higher SPD stat acts first. If the priority is different, the entity with the higher priority acts first.
+
+If two entities have the same SPD and priority, the entity whos cleartext-name is lexicographically less than the other acts first.
+
+ATK, DEF and SPD have an associated level, which is one of `(-infinity, -3, -2, -1, 0, +1, +2, +3, +infinity)`. A stats level modifies the actual value that will be used for calculations like so:
+
+| level     | factor   |
+|-----------|----------|
+| -3        | 1 - 3/4  |
+| -2        | 1 - 1/2  |
+| -1        | 1 - 1/4  |
+| 0         | 1        |
+| +1        | 1.25     |
+| +2        | 1.5      |
+| +3        | 2        |
+| +infinity | infinity |
+| -infinity | 0        |
+
+Stats may only be modified mid-battle by means of these levels. Outside of battle, an entites stat depends on other properties: the stats base, the stats allocated EV, and equipment modification.
+
+The base level is unique to each entity and cannot be modified by items, equipments, or in-battle effects, it is chosen by the developer. This is the easiest way to modify an entites power level, by choosing higher base stats the entity is strong and faster. 
+
+For party members only, each stat has an associated EV level which is a number in `{0, 1, ..., 15}`. For each point, the entity gets a +10 to its base. For example, for an entity with a base hp of 150, allocated 3 EVs to hp ill increase the base hp to 180. Each entity has a fixed number of EVs, that can be allocated to any stat (up to the maximum). In this way, the player can choose to specialize certain characters into roles they are needed. EVs can be reallocated at all times, therefore rewarding the player with an EV for a specific character essentially buffs that character, making EVs a sought-after reward.
+
+## 2.1.x UI
+
+For each party member, the current and maximum HP, the current SPD stat, the curren
+
 ## 2.1.x Status Ailments
 
 
@@ -18,8 +48,6 @@ If an entities HP reaches 0, it is knocked out. All other status ailments are cu
 While an entity is knocked out, if it receives any amount of healing the enemey is restored with an HP value equal to the healing amount. 
 
 Outside of battle, an entity cannot have a status ailment and all are healed when a battle ends. This includes `KNOCKED_OUT`: after the battle the entites HP is set to 1.
-
-
 
 ### 2.1.4 Example Status Conditions
 
