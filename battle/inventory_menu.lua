@@ -1,5 +1,6 @@
 rt.settings.inventory_menu = {
-    max_n_evs = 15
+    max_n_evs = 15,
+    n_equipment_slots = 3
 }
 
 bt.InventorySortMode = meta.new_enum({
@@ -25,27 +26,36 @@ bt.InventoryMenuState = meta.new_type("InventoyMenuState", function(entity)
 end)
 
 --- @class bt.InventoryControlDisplay
-bt.InventoryMenu = meta.new_type("InventoryMenu", function(state)
-
+bt.InventoryMenuPage = meta.new_type("InventoryMenu", function(state)
     state = (function()
-        local state = bt.InventoryMenuState("debug")
-        state.entity = bt.Entity("TEST_ENTITY")
-        state.hp_ev = 5
-        state.attack_ev = 7
-        state.defense_ev = 3
-        state.speed_ev = 15
-        return state
+        local out = bt.InventoryMenuState("debug")
+        out.entity = bt.Entity("TEST_ENTITY")
+        out.hp_ev = 5
+        out.attack_ev = 7
+        out.defense_ev = 3
+        out.speed_ev = 15
+        return out
     end)()
 
     local font = rt.settings.party_info.spd_font
-    local out = meta.new(bt.InventoryMenu, {
+    local out = meta.new(bt.InventoryMenuPage, {
         _main = rt.ListLayout(rt.Orientation.VERTICAL),
         _current_state = state,
+
+        _entity_portrait = bt.EntityPortrait(state.entity),
+
+        _equipment_row = rt.ListLayout(rt.Orientation.HORIZONTAL),
+        _equipment_slots = {}, -- Table<bt.EquipmentSlot>
 
         _hp_notch_bar = rt.ListLayout(rt.Orientation.HORIZONTAL),
         _attack_notch_bar = rt.ListLayout(rt.Orientation.HORIZONTAL),
         _defense_notch_bar = rt.ListLayout(rt.Orientation.HORIZONTAL),
         _speed_notch_bar = rt.ListLayout(rt.Orientation.HORIZONTAL),
+
+        _hp_label = rt.Label("<mono><o>HP </o></mono>"),
+        _attack_label = rt.Label("<mono><o>ATK</o></mono>"),
+        _defense_label = rt.Label("<mono><o>DEF</o></mono>"),
+        _speed_label = rt.Label("<mono><o>SPD</o></mono>"),
 
         _hp_base_label = rt.Label("", font),
         _attack_base_label = rt.Label("", font),
@@ -65,11 +75,10 @@ bt.InventoryMenu = meta.new_type("InventoryMenu", function(state)
         _input = {}
     }, rt.Widget, rt.Drawable, rt.Animation)
 
-    --- calculate absolute size for all labels
+    -- ### EVs
+
     local label_w, label_h = (function()
-        local label = rt.Label("9999", font)
-        label:realize()
-        return label._default_width, label._default_height
+        return rt.Label("9999", font):get_default_size()
     end)()
 
     function format_stat_label(label)
@@ -77,7 +86,7 @@ bt.InventoryMenu = meta.new_type("InventoryMenu", function(state)
         label:set_minimum_size(label_w, label_h)
     end
 
-    for _, label in pairs({out._hp_base_label, out._attack_base_label, out._defense_base_label, out._speed_base_label}) do
+    for _, label in pairs({out._hp_base_label, out._attack_base_label, out._defense_base_label, out._speed_base_label, out._hp_label, out._attack_label, out._defense_label, out._speed_label}) do
         label:set_expand_horizontally(false)
         label:set_horizontal_alignment(rt.Alignment.START)
         label:set_justify_mode(rt.JustifyMode.RIGHT)
@@ -91,7 +100,6 @@ bt.InventoryMenu = meta.new_type("InventoryMenu", function(state)
         format_stat_label(label)
     end
 
-
     local separator = function()
         local out = rt.Spacer()
         out:set_minimum_size(rt.settings.margin_unit / 2, 0)
@@ -103,6 +111,7 @@ bt.InventoryMenu = meta.new_type("InventoryMenu", function(state)
 
     local notch = function(column, row)
         local out = rt.Notch()
+        out:set_minimum_size(0.5 * label_h, 0.5 * label_h)
         meta.install_property(out, "ev_column", column)
         meta.install_property(out, "ev_row", row)
         meta.install_property(out, "input", rt.add_input_controller(out))
@@ -129,6 +138,7 @@ bt.InventoryMenu = meta.new_type("InventoryMenu", function(state)
 
     for _, which in pairs({"hp", "attack", "defense", "speed"}) do
         out["_" .. which .. "_row"]:set_children({
+            out["_" .. which .. "_label"],
             separator(),
             out["_" .. which .. "_base_label"],
             separator(),
@@ -140,14 +150,32 @@ bt.InventoryMenu = meta.new_type("InventoryMenu", function(state)
         out["_" .. which .. "_notch_bar"]:set_margin_horizontal(rt.settings.margin_unit)
     end
 
-    out._main:set_children({out._hp_row, out._attack_row, out._defense_row, out._speed_row})
+    -- ## entity
+
+    out._equipment_row:push_back(out._entity_portrait)
+
+    -- ## equipment
+
+    for i = 1, rt.settings.inventory_menu.n_equipment_slots do
+        local slot = bt.EquipmentSlot(out._current_state.equipment[i])
+        table.insert(out._equipment_slots, slot)
+        out._equipment_row:push_back(slot)
+    end
+
+    -- ## input
 
     out._input = rt.add_input_controller(out)
     out._input:signal_connect("pressed", function(_, which, self)
         -- TODO
     end, out)
 
-
+    out._main:set_children({
+        out._equipment_row,
+        out._hp_row,
+        out._attack_row,
+        out._defense_row,
+        out._speed_row
+    })
     out:_update_labels()
     out:_update_notches()
     return out
@@ -155,12 +183,12 @@ end)
 
 
 --- @overload
-function bt.InventoryMenu:get_top_level_widget()
+function bt.InventoryMenuPage:get_top_level_widget()
     return self._main
 end
 
 --- @brief [internal]
-function bt.InventoryMenu:_update_notches()
+function bt.InventoryMenuPage:_update_notches()
 
     local state = self._current_state
     function reset_notch(notch)
@@ -218,7 +246,7 @@ end
 
 
 --- @brief [internal]
-function bt.InventoryMenu:_update_labels()
+function bt.InventoryMenuPage:_update_labels()
     local prefix = "<o><color="
     local postfix = "</color></o>"
     local state = self._current_state

@@ -12,7 +12,7 @@ rt.GradientDirection = meta.new_enum({
 
 --- @class rt.Gradient
 --- @brief 2-tone gradient
-rt.Gradient = meta.new_type("Gradient", function(x, y, width, height, color_from, color_to, type)
+rt.Gradient = meta.new_type("Gradient", function(x, y, width, height, color_from, color_to, direction)
     if not meta.is_hsva(color_from) then  end
     if not meta.is_hsva(color_to) then  end
 
@@ -24,18 +24,15 @@ rt.Gradient = meta.new_type("Gradient", function(x, y, width, height, color_from
         color_to = rt.hsva_to_rgba(color_to)
     end
 
-    if meta.is_nil(type) then
-        type = rt.GradientDirection.LEFT_TO_RIGHT
+    if meta.is_nil(direction) then
+        direction = rt.GradientDirection.LEFT_TO_RIGHT
     end
-
-
-
 
     local out = meta.new(rt.Gradient, {
         _shape = rt.VertexRectangle(x, y, width, height),
         _color_from = color_from,
         _color_to = color_to,
-        _type = type,
+        _type = direction,
         _x = x,
         _y = y,
         _width = width,
@@ -45,9 +42,17 @@ rt.Gradient = meta.new_type("Gradient", function(x, y, width, height, color_from
     return out
 end)
 
+--- @brief
+function rt.Gradient:resize(x, y, width, height)
+    self._x = x
+    self._y = y
+    self._width = width
+    self._height = height
+    self._shape:resize(x, y, width, height)
+end
+
 --- @brief [internal]
 function rt.Gradient:_update_color()
-
 
     local set_color = function(i, color)
         self._shape:set_vertex_color(i, color)
@@ -106,9 +111,7 @@ end
 
 --- @overload rt.Drawable.draw
 function rt.Gradient:draw()
-
     if not self:get_is_visible() then return end
-
     self._shape:draw()
 end
 
@@ -171,14 +174,12 @@ end
 --- @class rt.CircularGradient
 rt.CircularGradient = meta.new_type("CircularGradient", function(center_x, center_y, radius, color_from, color_to, n_outer_vertices)
 
-
     if not meta.is_hsva(color_from) then  end
     if not meta.is_hsva(color_to) then  end
 
     if meta.is_nil(n_outer_vertices) then
         n_outer_vertices = 64
     end
-
 
     if meta.is_hsva(color_from) then
         color_from = rt.hsva_to_rgba(color_from)
@@ -228,7 +229,6 @@ end
 --- @brief
 function rt.CircularGradient:_update_shape()
 
-
     local radius_x = self._radius_x
     local radius_y = self._radius_y
 
@@ -256,7 +256,6 @@ end
 
 --- @brief
 function rt.CircularGradient:set_position(center_x, center_y)
-
 
     self._center_x = center_x
     self._center_y = center_y

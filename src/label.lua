@@ -588,7 +588,6 @@ end
 --- @param font rt.Font
 function rt.Label:set_font(font)
 
-
     self._font = font
     self:reformat();
 end
@@ -644,6 +643,12 @@ end
 function rt.Label:get_font()
 
     return self._font
+end
+
+--- @brief
+function rt.Label:get_default_size()
+    if not self:get_is_realized() then self:realize() end
+    return self._default_width, self._default_height
 end
 
 --- @brief [internal]

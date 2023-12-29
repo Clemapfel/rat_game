@@ -109,6 +109,7 @@ require "battle/equipment"
 require "battle/status_ailment"
 require "battle/entity"
 
+require "battle/entity_portrait"
 require "battle/battle_background"
 require "battle/equipment_tooltip"
 require "battle/equipment_slot"

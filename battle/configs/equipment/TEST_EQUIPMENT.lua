@@ -8,5 +8,5 @@ return {
     effect_text = "This equipment is used for testing.",
     flavor_text = "test well, my son",
 
-    sprite_id = "default"
+    sprite_id = "sword"
 }
