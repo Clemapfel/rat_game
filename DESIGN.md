@@ -4,7 +4,100 @@
 
 ## 2.1.x Status Ailments
 
-volatile vs non-volatile
+
+An entity can have any number of status ailments while in battle. While afflicted by a status condition, an emblem representing it is shown next to the entities HP bar, or below the enemy sprite if the entity is an enemy. Part of the emble is a numerical symbol, which displays the number of turns left until the status is cured automatically.
+
+The game keeps track of how many turns have passed since the entity was first afflicted with a specific status condition. This number is incremented at the start of each turn, if the number is equal to or exceeds the maximum duration of a status ailment, it is cured automatically. Other than this, status ailments may be cured by items or moves.
+
+### 2.1.1 Knocked Out
+
+Status ailments can have a wide variety of effects, with one special case, the `KNOCKED_OUT` status ailment.
+
+If an entities HP reaches 0, it is knocked out. All other status ailments are cured and for the rest of that turn, the entity is invulnerable to all damage. Starting the next turn, if the entity takes any amount of damage it is killed. If this happens to an enemy, that enemy is removed from the battle permanently. If a party member is killed, the player receives a game over. If all alive enemies are currently knocked out and no enemy has died so far, the battle ends in non-standard way, usually rewarding the player with an achievement or bonus item.
+
+While an entity is knocked out, if it receives any amount of healing the enemey is restored with an HP value equal to the healing amount. 
+
+Outside of battle, an entity cannot have a status ailment and all are healed when a battle ends. This includes `KNOCKED_OUT`: after the battle the entites HP is set to 1.
+
+
+
+### 2.1.4 Example Status Conditions
+
+Where the effect text is written for the purposes of being clear to the developer, the actual in-game text will be more brief and less technical.
+
+> ``STUNNED``<br>
+> Duraton: 1 Turn<br>
+> Target may not act this turn.
+
+> ``BLEEDING``<br>
+> Duraton: 5 Turns<br>
+> Target takes 1/8 * target.max_hp damage at the end of each turn. If the target is healed by any amount, this status is removed.
+
+> ``POISONED``<br>
+> Duraton: Infinite<br>
+> Target takes 1/16 * target.max_hp damage at the end of each turn. If the target would be knocked out, this status is cured instead and target.current_hp is set to 1
+
+> ``BURNED``<br>
+> Duraton: Infinite<br>
+> Reduces DEF by 50%. Target receives 1/16 * target.max_hp damage at the end of each turn. If target would receive the `CHILLED` status, `BURNED` is cured instead.
+
+> ``CHILLED``<br>
+> Duraton: Infinite<br>
+> SPD is reduced by 50%. If the `CHILLED` status would be added while a target is already chilled, `CHILLED` is cured and the `FROZEN` status will be added. If target would receive the `BURNED` status, `CHILLED`is cured instead.
+
+> ``FROZEN``<br>
+> Duraton: Infinite<br>
+> Target SPD is treated as negative infinity at all times. If target would receive the `BURNED` status, `FROZEN` is cured instead.
+
+> ``BLINDED``<br>
+> Duraton: 1 Turn<br>
+> Target ATK is treated as 0 at all times.
+
+> ``AT_RISK``<br>
+> Duraton: 3 Turns<br>
+> If target would be knocked out by any means, it instead immediately dies.
+
+> ``ACCELERATED_STATUS``<br>
+> Duraton: Infinite<br>
+> At the start of a turn, if the elapsed turn counter of any status ailment is increased, it is instead increased by 2
+
+> ``DECELERATED_STATUS`` <br>
+> Duration: 3 Turns
+> At the start of any even-numbered turn count (turn 2, 4, ...), elapsed turn counter of any status ailment other than `DELECERATE_STATUS` is not increased.
+
+> ``PARALYZED``<br>
+> Duraton: Infinite<br>
+> Raises SPD by 50%. Every 2nd turn, after `PARALYZED` is gained, target may not act that turn.
+
+Note that since `PARALYZED` technically has a beneficial effect on the first turn, it may be a good strategy to inflict this status ailment on one of our party members. In a similar way, knocking out one of the party members and immediately healing them that turn is a sneaky way to cure all status ailments, since being knocked out removes all others. This technique is not taught to the player, but is rewarded due to the inherent properties of being knocked out.
+
+### 2.1.5 Status Ailment Implementation
+
+The class representing volatile and non-volatile status conditions has the following gameplay-relevant fields.
+
+```c
+class StatusAilment {
+    unsigned int max_duration       // maximum duration, may be infinite
+    unsigned int elapsed_duration   // current elapsed time
+    
+    float attack_modifier       // in [0, n], where 1 is no change
+    float defense_modifier
+    float speed_modifier
+    
+    Function on_turn_start      // (self) -> void
+    Function on_turn_end        // (self) -> void
+    
+    Function on_action_taken    // (self, action, origin, damage) -> void
+    Function on_action_dealt    // (self, action, target, damage) -> void
+    
+    Function on_status_given    // (self) -> void
+    Function on_status_removed  // (self) -> void
+}
+```
+
+Where `on_status_given` activates when the entity receives this status condition, which can be used to apply permanent effects, `on_status_removed` is called after the current status ailment was removed in any way, including being knocked out.
+
+The `elapsed_duration` is updated automatically at the end of each turn. If `elapsed` is equal to or higher than `max_duration`, the status is removed automatically. 
 
 ## 2.2 Moves
 
@@ -113,17 +206,17 @@ class Equipment {
     int defense_modifier
     int speed_modifier
     
-    Function on_action_taken    // (self, origin, damage) -> void
-    Function on_action_dealt    // (self, target, damage) -> void
+    Function on_action_taken    // (self, action, origin, damage) -> void
+    Function on_action_dealt    // (self, action, target, damage) -> void
     Function on_turn_start      // (self) -> void
     Function on_turn_end        // (self) -> void
     
-    Function on_equip     // (self) -> void
+    Function on_equip           // (self) -> void
 }
 ```
 
 Where `on_action_taken` is called anytime the wearer of the equipment takes damage or is otherwise affected by an enemies move, while `on_action_dealt` activates when the wearer does the same to a target.
 
-`on_equp` modifies a non-battle properties of the wearer when it is equipped in the inventory menu. Changes include modifying the number of move / equipment slots, adding / disabling an intrinsic move, applying a non-flat stat buff, etc.
+`on_equip` modifies a non-battle properties of the wearer when it is equipped in the inventory menu. Changes include modifying the number of move / equipment slots, adding / disabling an intrinsic move, applying a non-flat stat buff, etc.
 
 ## 2.x AI & Enemy Design
