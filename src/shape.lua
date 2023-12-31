@@ -208,8 +208,6 @@ end
 --- @brief [internal] compute vertex for shape with _vertices
 function rt.Shape:_compute_centroid()
 
-
-
     local x_sum = 0
     local y_sum = 0
     local n = sizeof(self._vertices)

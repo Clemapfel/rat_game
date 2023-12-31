@@ -1,8 +1,9 @@
-require "include"
+require("include")
 
 rt.add_scene("debug")
 menu = bt.InventoryMenuPage()
-rt.current_scene:set_child(menu)
+queue = bt.OrderQueue()
+rt.current_scene:set_child(queue)
 
 local wireframe = false;
 input = rt.add_input_controller(rt.current_scene.window)
