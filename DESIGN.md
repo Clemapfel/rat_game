@@ -28,12 +28,7 @@ The base level is unique to each entity and cannot be modified by items, equipme
 
 For party members only, each stat has an associated EV level which is a number in `{0, 1, ..., 15}`. For each point, the entity gets a +10 to its base. For example, for an entity with a base hp of 150, allocated 3 EVs to hp ill increase the base hp to 180. Each entity has a fixed number of EVs, that can be allocated to any stat (up to the maximum). In this way, the player can choose to specialize certain characters into roles they are needed. EVs can be reallocated at all times, therefore rewarding the player with an EV for a specific character essentially buffs that character, making EVs a sought-after reward.
 
-## 2.1.x UI
-
-For each party member, the current and maximum HP, the current SPD stat, the curren
-
 ## 2.1.x Status Ailments
-
 
 An entity can have any number of status ailments while in battle. While afflicted by a status condition, an emblem representing it is shown next to the entities HP bar, or below the enemy sprite if the entity is an enemy. Part of the emble is a numerical symbol, which displays the number of turns left until the status is cured automatically.
 
@@ -127,13 +122,69 @@ Where `on_status_given` activates when the entity receives this status condition
 
 The `elapsed_duration` is updated automatically at the end of each turn. If `elapsed` is equal to or higher than `max_duration`, the status is removed automatically. 
 
-## 2.2 Moves
+## 2.2 Actions
+
+Actions are a serious of commands that entities can execute. During each turn of the battle, an entity chooses exactly one action, which is resolved when it is that entities turn during the turn order.
+
+Actions can have any effect, though most related to modifying properties of another entity, such as their HP stat for healing / damaging moves, or adding a status condition.
+
+Actions can be classified into three camps: moves, intrinsic moves, and consumables. Again, an entity may choose exactly one of any of these actions each turn. The classification is based on how the resource system for that type of action works.
+
+Moves and intrinsic moves have a number of PP (power points), which works exactly as in pokémon. Each move has a set number of maximum PP. When the move is first equipped to a specific entity, that entity will have an associated number of current PP, which are decremented any time the move is used. If a move has 0 PP, it cannot be used. PP are restored at each overworld savepoints, making managing PP part of gameplay.
+
+Intrinsic moves are move with an infinte number of PP. This means they cannot be exhausted under any circumstances and the play may always choose an intrinsic moves. 
+
+Intrisic moves act as a fail-safe, if all PP of all other moves are exhausted, an entity would have no way of acting. Furthermore, intrinsic moves offer an opportunity for character development, as each party member and many of the enemies will have intrinsic moves unique to them.
+
+All entities share the following intrinsic move
+
+> `STRIKE`<br>
+> Deal 1 * user.attack to single target
+
+It's purpose is obvious. Additionally, all party members except for $WILDCARD and $GIRL share the following intrinsic move (note that this description is for developers, the actual in-game text will be much less technical):
+
+> `PROTECT`<br>
+> Self or target ally is invulnerable to all damage and status conditions for the rest of the turn. Continous conditions that activate at the end of a turn still active. Moves that would increase an entites stat level are still applied, but only if they do not deal damage or add a status ailment. If an entity is targeted by `PROTECT` for two turns in a row, `PROTECT` will fail.
+
+This move is similar to an traditional jRPGs block command, but in reality is modeled off of the [pokémon move of the same name](https://bulbapedia.bulbagarden.net/wiki/Protect_(move)). `PROTECT` is a necessary part of rat_games battle system, as it allows players to strategically avoid the effect of powerful moves, while the not-twice-in-a-row restriction prevents overly defensive play. Note also that if an entity is protecting another entity, it may not protect itself, meaning for any party with a member that does not have `PROTECT`, it is impossible to prevent all damage to all party members for a turn.
+
+Another intrinsic move that is expected to be relevant in almost any battle is $PROFs signature move:
+
+> `ANALYZE`<br>
+> Singular target enemy gains a permanent, hidden status condition. While afflicted, that enemies HP fraction (target.hp / target.hp_base) is shown through the battle UI
+
+By default, an enemies HP is completely hidden from the player. After `ANALYZE`, the exact value of both the current and maximum number of HP is still obfuscated, but a simple level bar gives the player some amount of information as to how much HP a specific entity has left. Party members have their exact HP value displayed at all times.
+
+Note that the effect of `ANALYZE` can be modified through equipment, adding effects such as activating automatically once per turn without taking that turn, revealing the enemies exact speed stat, the PP of all moves used at least once this battle, or being applied to all enemies instead of just one. 
+
+$GIRLs signature move is (recall that she does not have `PROTECT` available)
+
+> `WISH`<br>
+> Self or single target ally will be healed for 0.5 * user.hp_base at the start of the second turn after activation
+
+To clarify, if girl has 300 max HP and her target has 200 max HP, then the turn wish is used nothing happens. Then, the turn after, that target is healed for 150 HP
+
+This move is special in terms of game design, as rat_game has extremely limited healing. No move will just restore health, and if it does it's PP will be severly limited, such as being exactly 1. This is intended to avoid the old jRPG problem of having on healer character which does nothing but heal and buff the party. 
+
+While no move the player will ever be able to use will have the effect of "just" healing an entity, the third class of actions will have this effect semi-frequently.
 
 ## 2.3 Consumables
 
-Consumables are identical to moves in terms of effect and function, with two main differences. Rather than having a fixed number of PP, consumables are consumed when used. An entity may have up to a.
+Consumables are identical to moves in terms of effect and function, with two main differences. Rather than having a fixed number of PP, consumables are permanently consumed upon use. Each entity can carry a fixed number of consumables, and consumables may stack, meaning if an entity has 3 potions, it can use that consumable up to three times.
 
-Consumables can be equipped in place of equipment
+> `POTION`<br>
+> User gains +2 priority until the end of turn. Heal target ally or enemy for 1 HP.
+
+While `POTION` may at first seem like a joke, restoring only 1 HP, it is actually extremely useful for avoiding game overs. Because of + 2 priority, an ally that is currently knocked out will be healed at the start of the turn before an enemy has the chance to kill them permanently. If the enemy still chooses to attack, the ally is knocked out again but thus made invulnerable until the end of the turn. This combined with being able to target a knocked out ally with `PROTECT` is the main mechanism of avoiding game overs by party member death.
+
+While consumables have the same design space as actions in terms of their effect, as a designer it is easier to justify putting a very powerful ability on a consumable, as opposed to a move, meaning the player will only ever get to use it once.
+
+> `STUTTER_POTION`<br>
+> Choose one of users moves that has 0 PP. Set it's PP to 3, regardless of the max PP of that move
+
+A common problem with permanent consumables like this is that players are disincentivized to use them at all, since the player does not know what enemies they may have to face in the future. To address this, rat_game includes what will surely be a contentious. Everytime the player saves the game at a savepoint, which, during a first play-through, is non-optional, all consumables will loose a point of durability. If the durability reaches 0, the consumable will be automatically discarded at the end of the next battle. Because the consumable only decays in the next battle, saving right before a big boss will not punish the player, as they can still use the consumables. If saving in a regular area however, players will not be able stock up on consumables and hoard them. This mechanics also eliminates potential exploits where a consumable that is received very early in the game can't be used to break a later boss fight. Because of this, rat_games design is able to supply extremely powerful consumables without affecting game-balance.
+
+All consumables have the same durability, and its exact value will be chosen during the playtesting phase.
 
 ## 2.4 Equipment
 
@@ -248,3 +299,31 @@ Where `on_action_taken` is called anytime the wearer of the equipment takes dama
 `on_equip` modifies a non-battle properties of the wearer when it is equipped in the inventory menu. Changes include modifying the number of move / equipment slots, adding / disabling an intrinsic move, applying a non-flat stat buff, etc.
 
 ## 2.x AI & Enemy Design
+
+
+
+## 2.x UI
+
+### 2.x.1 In-Battle UI
+
+During any point in battle, the following information should be available to the player.
+
+For each party member:
+
++ current hp and max hp
++ exact speed stat
++ current attack, defense and speed level
++ priority
++ list of all status ailments
+
+For each enemy:
+
++ current attack, defense, and speed level, unless it is 0
++ priority
++ list of all status ailments
+
+By using $PROFs `ANALYZE`, the following information also becomes available
+
++ current hp divided by max hp, in %
+
+One one side of the screen, the priority queue should be shown. This is the 
