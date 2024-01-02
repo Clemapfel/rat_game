@@ -16,11 +16,8 @@ bt.BattleLog = meta.new_type("BattleLog", function()
         _viewport_scrollbar_layout = rt.ListLayout(rt.Orientation.HORIZONTAL),
 
         _lines = {}, -- Table<String>
-        _n_lines = 0,
-        _offset = 0,
-        _line_width = 1,
-
         _labels = {}, -- Table<rt.Label>
+        _labels_layout = rt.ListLayout(rt.Orientation.VERTICAL),
 
         _input = {} -- rt.InputController
     }, rt.Widget, rt.Drawable)
@@ -60,10 +57,7 @@ bt.BattleLog = meta.new_type("BattleLog", function()
     out._backdrop_overlay:set_base_child(out._backdrop)
     out._backdrop_overlay:push_overlay(out._viewport_scrollbar_layout)
     out._frame:set_child(out._backdrop_overlay)
-
-    local temp = rt.Spacer()
-    temp:set_color(rt.Palette.YELLOW)
-    out._viewport:set_child(temp)
+    out._viewport:set_child(out._labels_layout)
 
     out._scrollbar:signal_connect("value_changed", function(_, value, self)
         local line_i = value * self._n_lines
@@ -98,11 +92,10 @@ end
 --- @overload
 function bt.BattleLog:push_back(line)
     local label = rt.Label(line)
-    local x, y = 0, 0--self._viewport:get_position()
+
     local w, h = self._viewport:get_size()
-    label:realize()
-    label:fit_into(x, y, w, h)
+    label:set_alignment(rt.Alignment.START)
     label:set_is_animated(true)
     table.insert(self._labels, label)
-    println(line)
+    self._labels_layout:push_back(label)
 end
