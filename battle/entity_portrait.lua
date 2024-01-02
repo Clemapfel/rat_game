@@ -44,7 +44,9 @@ bt.EntityPortrait = meta.new_type("EntityPortrait", function(entity)
             rt.GradientDirection.TOP_TO_BOTTOM,
             color_from,
             color_to
-        )
+        ),
+        _priority_label = rt.Label("<o>+1</o>"),
+        _emblem_layout = rt.EmblemLayout()
     }, rt.Widget, rt.Drawable)
 
     out._backdrop:set_color(rt.Palette.BASE)
@@ -54,11 +56,19 @@ bt.EntityPortrait = meta.new_type("EntityPortrait", function(entity)
     out._frame:set_child(out._overlay)
     out._aspect:set_child(out._frame)
 
+    local spacer = rt.Spacer()
+    spacer:set_minimum_size(32, 32)
+
+    out._emblem_layout:set_child(out._aspect)
+    out._emblem_layout:set_emblem(spacer)
+    out._priority_label:set_horizontal_alignment(rt.Alignment.START)
+    out._priority_label:set_vertical_alignment(rt.Alignment.END)
+
     out._frame:set_thickness(2)
     return out
 end)
 
 --- @overload
 function bt.EntityPortrait:get_top_level_widget()
-    return self._aspect
+    return self._emblem_layout
 end
