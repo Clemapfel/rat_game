@@ -97,7 +97,6 @@ rt.Spritesheet.name = ""
 --- @param animation_id String
 function rt.Spritesheet:_assert_has_animation(scope, animation_id)
 
-
     if meta.is_nil(self._name_to_frame[animation_id]) then
         rt.error("in rt." .. scope .. ": Spritesheet `" .. self.name .. "` has no animation with id `" .. animation_id .. "`")
     end
@@ -107,8 +106,6 @@ end
 --- @param id String
 --- @return Boolean
 function rt.Spritesheet:has_animation(animation_id)
-
-
     return not meta.is_nil(self._name_to_frame[animation_id])
 end
 

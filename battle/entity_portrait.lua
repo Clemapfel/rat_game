@@ -12,10 +12,30 @@ bt.EntityPortrait = meta.new_type("EntityPortrait", function(entity)
     color_from = rt.Palette.GREY_6
     color_to = rt.Palette.GREY_4
 
-    local sprite_id = "test"
+    local sprite_id = entity.portrait
+    local sprite
+    if env.entity_portrait_spritesheet:has_animation(sprite_id) then
+        sprite = rt.Sprite(env.entity_portrait_spritesheet)
+    else
+        local letter_seen = false
+        local abbreviation = ""
+        for i = 1, #entity.name do
+            local c = string.sub(entity.name, i, i)
+            if string.find(c, "[A-Z]") ~= nil then
+                if not letter_seen then
+                    abbreviation = abbreviation ..  c
+                    letter_seen = true
+                end
+            elseif string.find(c, "[0-9]") ~= nil then
+                abbreviation = abbreviation ..  c
+            end
+        end
+        sprite = rt.Viewport(rt.Label("<o><b>" .. abbreviation .. "</o></b>"))
+    end
+
     local out = meta.new(bt.EntityPortrait, {
         _entity = entity,
-        _sprite = rt.Sprite(env.entity_portrait_spritesheet, sprite_id),
+        _sprite = sprite,
         _aspect = rt.AspectLayout(1),
         _backdrop = rt.Spacer(),
         _overlay = rt.OverlayLayout(),

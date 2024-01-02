@@ -389,7 +389,7 @@ end
 --- @brief check if character is lower case
 function string.is_upper(str)
     assert(type(str) == "string" and #str == 1)
-    return not string.is_lower(str)
+    return string.find(str, "[A-Z1-9]") ~= nil
 end
 
 --- @brief get last character

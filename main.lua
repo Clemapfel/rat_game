@@ -1,9 +1,18 @@
 require("include")
 
 rt.add_scene("debug")
-menu = bt.InventoryMenuPage()
-queue = bt.OrderQueue()
-rt.current_scene:set_child(queue)
+
+local entities = rt.Queue()
+local state = {}
+for i = 1, 6 + 4 do
+    local entity = bt._generate_debug_entity()
+    entities:push_back(entity)
+    state[i] = entity
+end
+
+order = bt.OrderQueue()
+order:set_state(state)
+rt.current_scene:set_child(order)
 
 local wireframe = false;
 input = rt.add_input_controller(rt.current_scene.window)

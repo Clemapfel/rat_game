@@ -28,17 +28,14 @@ rt.Font = meta.new_type("Font", function(size, regular_path, bold_path, italic_p
     })
 
     if not meta.is_nil(bold_path) then
-
         out._bold_path = bold_path
     end
 
     if not meta.is_nil(italic_path) then
-
         out._italic_path = italic_path
     end
 
     if not meta.is_nil(bold_italic_path) then
-
         out._bold_italic_path = bold_italic_path
     end
 
@@ -106,21 +103,18 @@ end
 --- @brief get bold version of font
 --- @return love.Font
 function rt.Font:get_bold()
-
     return self[rt.FontStyle.BOLD]
 end
 
 --- @brief get italic version of font
 --- @return love.Font
 function rt.Font:get_italic()
-
     return self[rt.FontStyle.ITALIC]
 end
 
 --- @brief get bold-italic version of font
 --- @return love.Font
 function rt.Font:get_bold_italic()
-
     return self[rt.FontStyle.BOLD_ITALIC]
 end
 

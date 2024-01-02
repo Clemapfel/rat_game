@@ -43,6 +43,29 @@ bt.Entity = meta.new_type("Entity", function(id)
     return out
 end)
 
+--- @brief [internal]
+rt.settings.entity._debug_id = 1
+function bt._generate_debug_entity()
+    local id = rt.settings.entity._debug_id
+    local entity = meta.new(bt.Entity, {
+        id = "DEBUG_" .. ternary(id < 10, "0", "") .. tostring(id)
+    })
+    rt.settings.entity._debug_id = rt.settings.entity._debug_id + 1
+
+    entity.name = "Debug Entity #" .. tostring(id)
+    entity.hp_base = rt.random.integer(10, 150)
+    entity.hp_ev = 0
+    entity.hp_current = rt.random.integer(10, entity.hp_base)
+
+    for _, which in pairs({"attack", "defense", "speed"}) do
+        entity[which .. "_base"] = rt.random.integer(1, 100)
+        entity[which .. "_ev"] = 0
+        entity[which .. "_level"] = rt.random.choose({0, 0, 0, 0, -1, 1})
+    end
+
+    return entity
+end
+
 -- cleartext name
 bt.Entity.name = ""
 bt.Entity.description = "(no description)"
