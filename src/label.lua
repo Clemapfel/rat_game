@@ -529,7 +529,6 @@ end
 --- @brief [internal] calculate size given infinite area
 function rt.Label:_update_default_size()
 
-
     self:size_allocate(0, 0, 2^32, 2^32)
     local min_x = POSITIVE_INFINITY
     local min_y = POSITIVE_INFINITY

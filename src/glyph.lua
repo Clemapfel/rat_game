@@ -129,6 +129,8 @@ function rt.Glyph:_initialize_character_widths()
 end
 
 function rt.Glyph:_draw_outline(x, y)
+    return
+    --[[
     local offsets = {}
     for i = 1, rt.settings.glyph.outline_thickness do
         table.insert(offsets, i)
@@ -140,6 +142,7 @@ function rt.Glyph:_draw_outline(x, y)
             self:render(self._glyph, math.floor(x + x_offset), math.floor(y + y_offset))
         end
     end
+    ]]--
 end
 
 --- @brief [internal] draw glyph with _is_animated = false

@@ -99,10 +99,10 @@ end
 function bt.BattleLog:push_back(line)
     local label = rt.Label(line)
     local x, y = 0, 0--self._viewport:get_position()
-    local w = select(1, self._viewport:get_size())
+    local w, h = self._viewport:get_size()
     label:realize()
-    label:fit_into(x, y, w, 100)
+    label:fit_into(x, y, w, h)
     label:set_is_animated(true)
-    self._viewport:set_child(label)
+    table.insert(self._labels, label)
     println(line)
 end
