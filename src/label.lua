@@ -43,6 +43,7 @@ function rt.Label:realize()
         self:_parse()
         self:_update_default_size()
         rt.Widget.realize(self)
+        self:set_is_animated(self._is_animated)
     end
 end
 
@@ -620,9 +621,6 @@ end
 --- @brief set whether the glyphs of the label are animated
 --- @param b Boolean
 function rt.Label:set_is_animated(b)
-
-
-
     self._is_animated = b
     for _, glyph in pairs(self._glyphs) do
         if meta.isa(glyph, rt.Glyph) then
@@ -634,7 +632,6 @@ end
 --- @brief get whether the glyphs of the label are animated
 --- @return Boolean
 function rt.Label:get_is_animated()
-
     return self._is_animated
 end
 

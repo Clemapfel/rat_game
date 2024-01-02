@@ -34,7 +34,7 @@ rt.Glyph = meta.new_type("Glyph", function(font, content, look)
     local is_strikethrough = look.is_strikethrough
     local is_outlined = look.is_outlined
     local outline_color = look.outline_color
-    local effects = look.effect
+    local effects = look.effects
     local wrap_width = look.wrap_width
 
     if meta.is_nil(font_style) then font_style = rt.FontStyle.REGULAR end

@@ -28,13 +28,25 @@ function rt.SplitLayout:draw()
 
     if not self:get_is_visible() then return end
 
-    self._start_child:draw()
-    self._end_child:draw()
+    if meta.is_widget(self._start_child) then
+        self._start_child:draw()
+    end
+
+    if meta.is_widget(self._end_child) then
+        self._end_child:draw()
+    end
 
     if self._draw_divider == true then
         self._divider_base:draw()
         self._divider_outline:draw()
     end
+end
+
+--- @brief
+function rt.SplitLayout:set_divider_visible(b)
+    if self._draw_divider == b then return end
+    self._draw_divider = b
+    self:reformat()
 end
 
 --- @overload rt.Widget.size_allocate

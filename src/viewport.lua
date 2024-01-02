@@ -12,7 +12,10 @@ rt.Viewport = meta.new_type("Viewport", function(child)
         _width = 0,
         _height = 0
     }, rt.Widget, rt.Drawable)
-    out:set_child(child)
+
+    if not meta.is_nil(child) then
+        out:set_child(child)
+    end
     return out
 end)
 

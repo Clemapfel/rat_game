@@ -54,7 +54,6 @@ function rt.ListLayout:size_allocate(x, y, width, height)
         local child_y = y
         for _, child in pairs(self._children) do
             local w, h = child:measure()
-
             local child_h = ternary(self:get_expand_vertically(), height, math.max(child_max_h, height))
             local child_w = ternary(child:get_expand_horizontally(), expand_child_width, w)
             child:fit_into(rt.AABB(child_x, child_y, child_w, child_h))
@@ -107,10 +106,13 @@ function rt.ListLayout:measure()
         h_max = math.max(h_max, h)
     end
 
+    local h_m = 0--self:get_margin_left() + self:get_margin_right()
+    local v_m = 0 --self:get_margin_top() + self:get_margin_bottom()
+
     if self:get_orientation() == rt.Orientation.HORIZONTAL then
-        return w_sum + (self._children:size() - 1) * self._spacing, h_max
+        return w_sum + (self._children:size() - 1) * self._spacing + h_m, h_max + v_m
     else
-        return w_max, h_sum + (self._children:size() - 1) * self._spacing
+        return w_max + h_m, h_sum + (self._children:size() - 1) * self._spacing + v_m
     end
 end
 

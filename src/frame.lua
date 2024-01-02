@@ -185,7 +185,6 @@ end
 
 --- @brief
 function rt.Frame:get_thickness()
-
     return self._thickness
 end
 

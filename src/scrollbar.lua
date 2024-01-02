@@ -8,12 +8,11 @@ rt.Scrollbar = meta.new_type("Scrollbar", function(orientation, n_steps)
         n_steps = 10
     end
 
-    local corner_radius = 10
     local out = meta.new(rt.Scrollbar, {
         _base = rt.Rectangle(0, 0, 1, 1),
         _base_outline = rt.Rectangle(0, 0, 1, 1),
-        _cursor = rt.Rectangle(0, 0, 1, 1, corner_radius),
-        _cursor_outline = rt.Rectangle(0, 0, 1, 1, corner_radius),
+        _cursor = rt.Rectangle(0, 0, 1, 1),
+        _cursor_outline = rt.Rectangle(0, 0, 1, 1),
         _orientation = orientation,
         _value = 0.5,
         _n_steps = n_steps
@@ -86,11 +85,16 @@ function rt.Scrollbar:scroll_up(offset)
     self:_emit_value_changed()
 end
 
+--- @brief
+function rt.Scrollbar:set_n_steps(n)
+    if self._n_steps == n then return end
+    self._n_steps = n
+    self:reformat()
+end
+
 --- @overload rt.Drawable.draw
 function rt.Scrollbar:draw()
-
     if not self:get_is_visible() then return end
-
     if self:get_is_visible() then
         self._base:draw()
         self._base_outline:draw()
@@ -106,13 +110,13 @@ function rt.Scrollbar:size_allocate(x, y, width, height)
     self._base_outline:resize(rt.AABB(x, y, width, height))
 
     if self._orientation == rt.Orientation.HORIZONTAL then
-        local cursor_w = width / self._n_steps
-        local cursor_x = math.min(x + self._value * width, x + width - cursor_w)
+        local cursor_w = width /  math.max(self._n_steps - 1, 1)
+        local cursor_x = math.min(x + self._value * (width - cursor_w), x + width - 2 * cursor_w)
         self._cursor:resize(rt.AABB(cursor_x, y, cursor_w, height))
         self._cursor_outline:resize(rt.AABB(cursor_x, y, cursor_w, height))
     else
-        local cursor_h = height / self._n_steps
-        local cursor_y = math.min(y + self._value * height, x + height - cursor_h)
+        local cursor_h = height / math.max(self._n_steps - 1, 1)
+        local cursor_y = math.min(y + self._value * (height - cursor_h), x + height - 2 * cursor_h)
         self._cursor:resize(rt.AABB(x, cursor_y, width, cursor_h))
         self._cursor_outline:resize(rt.AABB(x, cursor_y, width, cursor_h))
     end

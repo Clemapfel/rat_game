@@ -409,7 +409,7 @@ function rt.Widget:set_vertical_alignment(alignment)
 
     self._vertical_alignment = alignment
     if self:_has_top_level() then
-        self:get_top_level_widget():set_horizontal_vertical(alignment)
+        self:get_top_level_widget():set_vertical_alignment(alignment)
     end
     self:reformat()
 end
@@ -575,7 +575,7 @@ end
 --- @brief [internal] draw allocation component as wireframe
 function rt.Widget:draw_bounds()
 
-    local x, y = self:get_position()
+    local x, y = self._final_pos_x, self._final_pos_y
     local w, h = self:get_size()
 
     love.graphics.setLineWidth(1)

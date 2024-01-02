@@ -139,6 +139,7 @@ require "battle/stat_level_indicator"
 require "battle/stat_level_tooltip"
 require "battle/party_info"
 
+require "battle/battle_log"
 require "battle/action_selection_menu"
 require "battle/inventory_menu"
 require "battle/order_queue"
