@@ -57,14 +57,14 @@ function rt.Spacer:set_color(color, outline_color)
 
     local rgba = color
     if meta.is_hsva(color) then
-        rgba = rt.hsav_to_rgba(color)
+        rgba = rt.hsva_to_rgba(color)
     end
 
     self._shape:set_color(rgba)
 
     local rgba = outline_color
     if meta.is_hsva(outline_color) then
-        rgba = rt.hsav_to_rgba(outline_color)
+        rgba = rt.hsva_to_rgba(outline_color)
     end
 
     for _, outline in pairs({self._outline_top, self._outline_right, self._outline_bottom, self._outline_left}) do

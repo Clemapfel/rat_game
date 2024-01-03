@@ -32,7 +32,7 @@ input:signal_connect("pressed", function(self, which)
             table.insert(str, rt.random.string(rt.random.integer(4, 7)))
             table.insert(str, " ")
         end
-        log:push_back("<o>" .. table.concat(str) .. "</o>")
+        log:push_back("<o><wave>" .. table.concat(str) .. "</wave></o>")
     elseif which == rt.InputButton.B then
     elseif which == rt.InputButton.X then
     elseif which == rt.InputButton.Y then

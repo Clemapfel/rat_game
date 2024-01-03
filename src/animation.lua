@@ -46,7 +46,6 @@ end
 --- @brief get whether animation is active
 --- @return Boolean
 function rt.Animation:get_is_animated()
-
     return self._is_animated
 end
 
