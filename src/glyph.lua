@@ -221,7 +221,12 @@ function rt.Glyph:_animated_draw()
             offset = self._effects_data.offsets[i]
         end
 
-        love.graphics.setScissor(scissor.x + offset.x, scissor.y + offset.y, scissor.width, scissor.height)
+        local stencil_value = 255
+        love.graphics.stencil(function()
+            love.graphics.rectangle("fill", scissor.x + offset.x, scissor.y + offset.y, scissor.width, scissor.height)
+        end, "replace", stencil_value, false)
+        love.graphics.setStencilTest("equal", stencil_value)
+
         local pos_x, pos_y = self:get_position()
         if self._is_outlined then self:_draw_outline(pos_x + offset.x, pos_y + offset.y) end
         love.graphics.setColor(color.r, color.g, color.b, color.a)
@@ -248,7 +253,8 @@ function rt.Glyph:_animated_draw()
 
     love.graphics.pop()
     love.graphics.setColor(old_r, old_g, old_b, old_a)
-    love.graphics.setScissor()
+
+    love.graphics.stencil(function() end, "replace", 0, true)
 end
 
 --- @overload rt.Drawable.draw

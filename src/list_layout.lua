@@ -90,7 +90,6 @@ end
 
 --- @overload rt.Widget.measure
 function rt.ListLayout:measure()
-
     if self._children:is_empty() then return rt.Widget.measure(self) end
 
     local w_sum = 0
@@ -106,13 +105,10 @@ function rt.ListLayout:measure()
         h_max = math.max(h_max, h)
     end
 
-    local h_m = 0--self:get_margin_left() + self:get_margin_right()
-    local v_m = 0 --self:get_margin_top() + self:get_margin_bottom()
-
     if self:get_orientation() == rt.Orientation.HORIZONTAL then
-        return w_sum + (self._children:size() - 1) * self._spacing + h_m, h_max + v_m
+        return w_sum + (self._children:size() - 1) * self._spacing, h_max
     else
-        return w_max + h_m, h_sum + (self._children:size() - 1) * self._spacing + v_m
+        return w_max, h_sum + (self._children:size() - 1) * self._spacing
     end
 end
 

@@ -123,42 +123,42 @@ function bt.OrderQueue:size_allocate(x, y, width, height)
     local arrow_base =  math3d.vec2(arrow_center.x, arrow_center.y + 0.25 * arrow_m)
 
     self._arrow_head:resize(
-            arrow_top.x, arrow_top.y,
-            arrow_bottom_right.x, arrow_bottom_right.y,
-            arrow_base.x, arrow_base.y,
-            arrow_bottom_left.x, arrow_bottom_left.y
+        arrow_top.x, arrow_top.y,
+        arrow_bottom_right.x, arrow_bottom_right.y,
+        arrow_base.x, arrow_base.y,
+        arrow_bottom_left.x, arrow_bottom_left.y
     )
 
     for _, outline in pairs({self._arrow_head_outline, self._arrow_head_outline_outline}) do
         outline:resize(
-                arrow_top.x, arrow_top.y,
-                arrow_bottom_right.x, arrow_bottom_right.y,
-                arrow_base.x, arrow_base.y,
-                arrow_bottom_left.x, arrow_bottom_right.y,
-                arrow_top.x, arrow_top.y
+            arrow_top.x, arrow_top.y,
+            arrow_bottom_right.x, arrow_bottom_right.y,
+            arrow_base.x, arrow_base.y,
+            arrow_bottom_left.x, arrow_bottom_right.y,
+            arrow_top.x, arrow_top.y
         )
     end
 
     local body_width, body_height = 0.5 * m, height - 2.5 * m
     local body_top_left = math3d.vec2(arrow_center.x - 0.5 * body_width, arrow_center.y)
     self._arrow_body:resize(
-            body_top_left.x, body_top_left.y,
-            body_width, body_height
+        body_top_left.x, body_top_left.y,
+        body_width, body_height
     )
 
     for _, outline in pairs({self._arrow_body_outline, self._arrow_body_outline_outline}) do
         outline:resize(
-                body_top_left.x, body_top_left.y + body_height,
-                body_top_left.x, body_top_left.y,
-                body_top_left.x + body_width, body_top_left.y,
-                body_top_left.x + body_width, body_top_left.y + body_height
+            body_top_left.x, body_top_left.y + body_height,
+            body_top_left.x, body_top_left.y,
+            body_top_left.x + body_width, body_top_left.y,
+            body_top_left.x + body_width, body_top_left.y + body_height
         )
     end
 
     for _, bottom in pairs({self._arrow_bottom, self._arrow_bottom_outline, self._arrow_bottom_outline_outline}) do
         bottom:resize(
-                body_top_left.x + 0.5 * body_width, body_top_left.y + body_height,
-                0.5 * body_width
+            body_top_left.x + 0.5 * body_width, body_top_left.y + body_height,
+            0.5 * body_width
         )
     end
 

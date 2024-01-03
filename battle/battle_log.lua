@@ -125,8 +125,8 @@ bt.BattleLog = meta.new_type("BattleLog", function()
     out._scrollbar_layout:set_spacing(rt.settings.margin_unit)
 
     local outer_margin = rt.settings.margin_unit + out._frame:get_thickness()
-    out._scrollbar_layout:set_margin_vertical(outer_margin)
-    out._scrollbar_layout:set_margin_horizontal(outer_margin)
+    --out._scrollbar_layout:set_margin_vertical(outer_margin)
+    --out._scrollbar_layout:set_margin_horizontal(outer_margin)
     out._scrollbar_layout:set_horizontal_alignment(rt.Alignment.END)
 
     for _, indicator in pairs({out._up_indicator, out._down_indicator}) do
@@ -146,7 +146,14 @@ bt.BattleLog = meta.new_type("BattleLog", function()
     out._backdrop_overlay:set_base_child(out._backdrop)
     out._backdrop_overlay:push_overlay(out._viewport_scrollbar_layout)
     out._frame:set_child(out._backdrop_overlay)
+
     out._viewport:set_child(out._labels_layout)
+
+    local lspacer, rspacer = rt.Spacer(), rt.Spacer()
+    lspacer:set_color(rt.Palette.YELLOW)
+    rspacer:set_color(rt.Palette.RED)
+
+    out._viewport_scrollbar_layout:set_children({lspacer, out._scrollbar_layout})
 
     out._scrollbar:signal_connect("value_changed", function(_, value, self)
         local line_i = value * self._n_lines
@@ -167,13 +174,13 @@ end)
 
 --- @overload
 function bt.BattleLog:get_top_level_widget()
-    return self._labels_layout
+    return self._frame
 end
 
 --- @overload
 function bt.BattleLog:push_back(line)
     local label = rt.Label(line)
     label:set_alignment(rt.Alignment.START)
-    --label:set_is_animated(true)
+    label:set_is_animated(true)
     self._labels_layout:push_back(label)
 end
