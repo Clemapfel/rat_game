@@ -4,22 +4,21 @@ uniform vec2 _texture_resolution;
 
 #define PI 355/113
 
-// value of gaussian blur (radius+1 * radius+1) sized kernel at position x, y
-float gaussian(int x, int y, int radius)
+// value of gaussian blur (size * size)-sized kernel at position x, y
+float gaussian(int x, int y, int size)
 {
-    float sigma_sq = float(radius);
-    float gauss_factor = 1.f / sqrt(2 * PI + sigma_sq);
-    float center = radius / 2;
-
+    // source: https://github.com/Clemapfel/crisp/blob/main/.src/spatial_filter.inl#L337
+    float sigma_sq = float(size);
+    float center = size / 2;
     float length = sqrt((x - center) * (x - center) + (y - center) * (y - center));
-    return exp(-0.4 * (length / sigma_sq));
+    return exp(-1.f / sqrt(2 * PI + sigma_sq) * (length / sigma_sq));
 }
 
 vec4 effect(vec4 color, Image tex, vec2 texture_coords, vec2 screen_coords)
 {
-    const float eps = 0.1;
-    const int radius = 3;
-    const vec3 outline_color = vec3(0, 0, 0);
+    const int radius = 1;                       // blur radius, application is o((2 * radius + 1)^2)
+    const vec3 outline_color = vec3(0, 0, 0);   // outline color
+    const float outline_intensity = 3;          // opacity multiplier
 
     vec4 self = Texel(tex, texture_coords);
     vec2 pixel_size = vec2(1) / _texture_resolution;
@@ -30,11 +29,11 @@ vec4 effect(vec4 color, Image tex, vec2 texture_coords, vec2 screen_coords)
     {
         for (int y = -1 * radius; y <= +1 * radius; ++y)
         {
-            float kernel_value = gaussian(x + radius, y + radius, radius);
+            float kernel_value = gaussian(x + radius, y + radius, 2 * radius);
             sum += Texel(tex, texture_coords + vec2(x * pixel_size.x, y * pixel_size.y)) * kernel_value;
             kernel_sum += kernel_value;
         }
     }
 
-    return vec4(outline_color, sum.a / kernel_sum * 2);
+    return vec4(outline_color, sum.a / kernel_sum) * vec4(1, 1, 1, outline_intensity);
 }
