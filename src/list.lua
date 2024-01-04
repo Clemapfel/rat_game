@@ -279,8 +279,21 @@ function rt.test.list()
         i = i + 1
     end
 
-    for i, value in pairs(list) do
-        assert(i.index == value)
+    list = rt.List()
+    list:push_back("abc")
+    list:push_back({"empty"})
+    list:push_back(1234)
+
+    i = 1
+    for key, value in pairs(list) do
+        if i == 1 then assert(value == "abc") end
+        if i == 2 then assert( value[1] == "empty") end
+        if i == 3 then assert(value == 1234) end
+        i = i + 1
     end
 end
+
+local major, minor = love.getVersion()
+println(major, ".", minor, " : ", jit.version)
+rt.test.list()
 

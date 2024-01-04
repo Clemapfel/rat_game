@@ -2,7 +2,7 @@ require("include")
 
 rt.add_scene("debug")
 
-local entities = rt.Queue()
+local entities = rt.List()
 local state = {}
 for i = 1, 6 + 4 do
     local entity = bt._generate_debug_entity()
@@ -20,6 +20,7 @@ log:set_margin_horizontal(200)
 log:set_margin_bottom(200)
 
 rt.current_scene:set_child(log)
+rt.current_scene:set_child(rt.Label("<o>TäT,</o>"))
 
 local wireframe = false;
 input = rt.add_input_controller(rt.current_scene.window)

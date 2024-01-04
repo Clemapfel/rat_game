@@ -125,13 +125,15 @@ bt.BattleLog = meta.new_type("BattleLog", function()
     out._scrollbar_layout:set_spacing(rt.settings.margin_unit)
 
     local outer_margin = rt.settings.margin_unit + out._frame:get_thickness()
-    --out._scrollbar_layout:set_margin_vertical(outer_margin)
-    --out._scrollbar_layout:set_margin_horizontal(outer_margin)
+    out._scrollbar_layout:set_margin_vertical(outer_margin)
+    out._scrollbar_layout:set_margin_horizontal(outer_margin)
     out._scrollbar_layout:set_horizontal_alignment(rt.Alignment.END)
 
     for _, indicator in pairs({out._up_indicator, out._down_indicator}) do
         indicator:set_minimum_size(m, m)
     end
+
+    out._viewport_scrollbar_layout:set_spacing(0.5 * m) -- TODO: why is this necessary?
 
     out._viewport_scrollbar_layout:push_back(out._viewport)
     out._viewport_scrollbar_layout:push_back(out._scrollbar_layout)
@@ -148,12 +150,6 @@ bt.BattleLog = meta.new_type("BattleLog", function()
     out._frame:set_child(out._backdrop_overlay)
 
     out._viewport:set_child(out._labels_layout)
-
-    local lspacer, rspacer = rt.Spacer(), rt.Spacer()
-    lspacer:set_color(rt.Palette.YELLOW)
-    rspacer:set_color(rt.Palette.RED)
-
-    out._viewport_scrollbar_layout:set_children({lspacer, out._scrollbar_layout})
 
     out._scrollbar:signal_connect("value_changed", function(_, value, self)
         local line_i = value * self._n_lines

@@ -2,7 +2,7 @@
 rt.OverlayLayout = meta.new_type("OverlayLayout", function()
     return meta.new(rt.OverlayLayout, {
         _base_child = {},
-        _overlays = rt.Queue()
+        _overlays = rt.List()
     }, rt.Drawable, rt.Widget)
 end)
 
@@ -43,8 +43,10 @@ function rt.OverlayLayout:realize()
     self._realized = true
     self._base_child:realize()
 
+    local i = 1
     for _, child in pairs(self._overlays) do
         child:realize()
+        i = i + 1
     end
 end
 

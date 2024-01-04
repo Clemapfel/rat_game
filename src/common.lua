@@ -468,3 +468,5 @@ function table.last(t)
     end
     return last
 end
+
+if table.unpack == nil then table.unpack = unpack end

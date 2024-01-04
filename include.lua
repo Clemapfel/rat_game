@@ -22,7 +22,7 @@ setmetatable(bt, {
     end
 })
 
-math3d = require("submodules/cpml")
+math3d = require("submodules.cpml")
 
 require "common"
 
@@ -54,7 +54,6 @@ require "geometry"
 require "angle"
 require "random"
 require "signals"
-require "queue"
 require "list"
 require "set"
 require "color"
@@ -115,35 +114,31 @@ require "frame"
 require "keymap_indicator"
 require "list_view"
 
-require "overworld/snow_effect"
-require "overworld/rain_effect"
+require "battle.battle_tooltip"
+require "battle.action"
+require "battle.equipment"
+require "battle.status_ailment"
+require "battle.entity"
 
-require "battle/battle_tooltip"
+require "battle.entity_portrait"
+require "battle.battle_background"
+require "battle.equipment_tooltip"
+require "battle.equipment_slot"
+require "battle.equipment_list_item"
+require "battle.action_tooltip"
+require "battle.action_list_item"
+require "battle.entity_tooltip"
+require "battle.status_tooltip"
+require "battle.status_thumbnail"
+require "battle.stat_level_indicator"
+require "battle.stat_level_tooltip"
+require "battle.party_info"
 
-require "battle/action"
-require "battle/equipment"
-require "battle/status_ailment"
-require "battle/entity"
-
-require "battle/entity_portrait"
-require "battle/battle_background"
-require "battle/equipment_tooltip"
-require "battle/equipment_slot"
-require "battle/equipment_list_item"
-require "battle/action_tooltip"
-require "battle/action_list_item"
-require "battle/entity_tooltip"
-require "battle/status_tooltip"
-require "battle/status_thumbnail"
-require "battle/stat_level_indicator"
-require "battle/stat_level_tooltip"
-require "battle/party_info"
-
-require "battle/battle_log"
-require "battle/action_selection_menu"
-require "battle/inventory_menu"
-require "battle/order_queue"
-require "battle/battle_transition"
+require "battle.battle_log"
+require "battle.action_selection_menu"
+require "battle.inventory_menu"
+require "battle.order_queue"
+require "battle.battle_transition"
 
 require "scene"
 -- require "test

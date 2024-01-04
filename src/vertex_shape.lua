@@ -20,11 +20,19 @@ rt.VertexAttribute = meta.new_enum({
     COLOR = "VertexColor"
 })
 
-rt.VertexFormat = {
-    {"VertexPosition", "float", 3},
-    {"VertexTexCoord","float", 2},
-    {"VertexColor", "float", 4},
-}
+if love.getVersion() >= 12 then
+    rt.VertexFormat = {
+        {name = "VertexPosition", format = "floatvec3"},
+        {name = "VertexTexCoord", format = "floatvec3"},
+        {name = "VertexColor", format = "floatvec3"},
+    }
+else
+    rt.VertexFormat = {
+        {"VertexPosition", "float", 3},
+        {"VertexTexCoord","float", 2},
+        {"VertexColor", "float", 4},
+    }
+end
 
 --- @class rt.Vertex
 --- @param x Number in px

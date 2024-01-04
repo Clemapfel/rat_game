@@ -128,18 +128,22 @@ function rt.Glyph:_initialize_character_widths()
     end
 end
 
+outline_shader = rt.Shader("assets/shaders/outline_blur.glsl")
+temp = rt.Texture("assets/temp_wave.png")
+
 function rt.Glyph:_draw_outline(x, y)
-    local offsets = {}
-    for i = 1, rt.settings.glyph.outline_thickness do
-        table.insert(offsets, i)
-        table.insert(offsets, -i)
-    end
-    for _, x_offset in pairs(offsets) do
-        for _, y_offset in pairs(offsets) do
-            love.graphics.setColor(self._outline_color.r, self._outline_color.g, self._outline_color.b, self._outline_color.a)
-            self:render(self._glyph, math.floor(x + x_offset), math.floor(y + y_offset))
-        end
-    end
+
+    local w, h = self:get_size()
+    local offset = 3;
+    canvas = rt.RenderTexture(w + 2 * offset, h + 2 * offset)
+    canvas:bind_as_render_target()
+    self:render(self._glyph, offset, offset)
+    canvas:unbind_as_render_target()
+
+    outline_shader:bind()
+    outline_shader:send("_texture_resolution", {w + 2 * offset, h + 2 * offset})
+    self:render(canvas._native, x - offset, y - offset)
+    outline_shader:unbind()
 end
 
 --- @brief [internal] draw glyph with _is_animated = false
