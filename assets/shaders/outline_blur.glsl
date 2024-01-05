@@ -11,12 +11,12 @@ float gaussian(int x, int y, int size)
     float sigma_sq = float(size);
     float center = size / 2;
     float length = sqrt((x - center) * (x - center) + (y - center) * (y - center));
-    return exp(-1.f / sqrt(2 * PI + sigma_sq) * (length / sigma_sq));
+    return exp((-1.f * (length / sigma_sq)) / sqrt(2 * PI + sigma_sq));
 }
 
 vec4 effect(vec4 color, Image tex, vec2 texture_coords, vec2 screen_coords)
 {
-    const int radius = 1;                       // blur radius, application is o((2 * radius + 1)^2)
+    const int radius = 1;                       // blur radius, runtime is O((2 * radius + 1)^2)
     const vec3 outline_color = vec3(0, 0, 0);   // outline color
     const float outline_intensity = 3;          // opacity multiplier
 

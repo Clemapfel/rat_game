@@ -20,7 +20,6 @@ log:set_margin_horizontal(200)
 log:set_margin_bottom(200)
 
 rt.current_scene:set_child(log)
-rt.current_scene:set_child(rt.Label("<o>TäT,</o>"))
 
 local wireframe = false;
 input = rt.add_input_controller(rt.current_scene.window)
@@ -33,7 +32,7 @@ input:signal_connect("pressed", function(self, which)
             table.insert(str, rt.random.string(rt.random.integer(4, 7)))
             table.insert(str, " ")
         end
-        log:push_back("<o><wave>" .. table.concat(str) .. "</wave></o>")
+        log:push_back("<wave>" .. string.rep("T#", #str)  .. "</wave>")
     elseif which == rt.InputButton.B then
     elseif which == rt.InputButton.X then
     elseif which == rt.InputButton.Y then

@@ -2,6 +2,7 @@ rt.settings.glyph = {
     default_background_color = rt.RGBA(0, 0, 0, 1),
     default_outline_color = rt.RGBA(0, 0, 0, 1),
     outline_thickness = 1,
+    outline_render_texture_padding = 3,
     rainbow_width = 15,    -- n characters
     shake_offset = 6,      -- px
     shake_period = 15,     -- shakes per second
@@ -45,8 +46,6 @@ rt.Glyph = meta.new_type("Glyph", function(font, content, look)
     if meta.is_nil(is_strikethrough) then is_strikethrough = false end
     if meta.is_nil(is_outlined) then is_outlined = false end
     if meta.is_nil(outline_color) then outline_color = rt.settings.glyph.default_outline_color end
-    --if meta.is_nil(has_background) then has_background = false end
-    --if meta.is_nil(background_color) then background_color = rt.settings.glyph.default_outline_color end
 
     local out = meta.new(rt.Glyph, {
         _font = font,
@@ -66,7 +65,8 @@ rt.Glyph = meta.new_type("Glyph", function(font, content, look)
         _n_visible_chars = POSITIVE_INFINITY,
         _character_widths = {},
         _character_offsets = {},
-        _effects_data = {}
+        _effects_data = {},
+        _outline_render_texture = {} -- rt.RenderTexture
     }, rt.Drawable, rt.Animation)
 
     for _, effect in pairs(effects) do
@@ -75,6 +75,9 @@ rt.Glyph = meta.new_type("Glyph", function(font, content, look)
     out:_update()
     return out
 end)
+
+rt.Glyph._outline_shader = rt.Shader("assets/shaders/outline_blur.glsl")
+rt.Glyph._outline_color = rt.RGBA(0, 0, 0, 1)
 
 --- @brief [internal] update held graphical object
 function rt.Glyph:_update()
@@ -100,6 +103,21 @@ function rt.Glyph:_update()
         for i = 1, #self._content do
             self._effects_data.offsets[i] = rt.Vector2(0, 0)
         end
+    end
+
+    if self._is_outlined == true then
+        local w, h = self:get_size()
+        local offset = rt.settings.glyph.outline_render_texture_padding;
+        self._outline_render_texture = rt.RenderTexture(w + 2 * offset, h + 2 * offset)
+
+        love.graphics.push()
+        love.graphics.reset()
+
+        self._outline_render_texture:bind_as_render_target()
+        self:render(self._glyph, offset, offset)
+        self._outline_render_texture:unbind_as_render_target()
+
+        love.graphics.pop()
     end
 end
 
@@ -128,22 +146,15 @@ function rt.Glyph:_initialize_character_widths()
     end
 end
 
-outline_shader = rt.Shader("assets/shaders/outline_blur.glsl")
-temp = rt.Texture("assets/temp_wave.png")
-
+--- @brief [internal]
 function rt.Glyph:_draw_outline(x, y)
 
-    local w, h = self:get_size()
-    local offset = 3;
-    canvas = rt.RenderTexture(w + 2 * offset, h + 2 * offset)
-    canvas:bind_as_render_target()
-    self:render(self._glyph, offset, offset)
-    canvas:unbind_as_render_target()
+    local offset = rt.settings.glyph.outline_render_texture_padding;
 
-    outline_shader:bind()
-    outline_shader:send("_texture_resolution", {w + 2 * offset, h + 2 * offset})
-    self:render(canvas._native, x - offset, y - offset)
-    outline_shader:unbind()
+    self._outline_shader:bind()
+    self._outline_shader:send("_texture_resolution", {self._outline_render_texture:get_size()})
+    self:render(self._outline_render_texture._native, x - offset, y - offset)
+    self._outline_shader:unbind()
 end
 
 --- @brief [internal] draw glyph with _is_animated = false

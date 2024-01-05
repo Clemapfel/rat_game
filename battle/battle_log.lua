@@ -142,19 +142,18 @@ bt.BattleLog = meta.new_type("BattleLog", function()
     out._scrollbar_layout:set_expand_horizontally(false)
 
     out._viewport:set_margin_left(outer_margin)
-    out._viewport:set_margin_top(outer_margin)
-    out._viewport:set_margin_bottom(outer_margin)
 
     out._backdrop_overlay:set_base_child(out._backdrop)
     out._backdrop_overlay:push_overlay(out._viewport_scrollbar_layout)
     out._frame:set_child(out._backdrop_overlay)
 
     out._viewport:set_child(out._labels_layout)
-
     out._scrollbar:signal_connect("value_changed", function(_, value, self)
         local line_i = value * self._n_lines
         -- TODO
     end, out)
+
+    out._up_indicator:set_color(rt.Palette.GREY_2)
 
     out._input = rt.add_input_controller(out)
     out._input:signal_connect("pressed", function(_, which, self)
