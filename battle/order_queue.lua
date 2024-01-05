@@ -28,7 +28,7 @@ bt.OrderQueue = meta.new_type("OrderQueue", function()
         out._arrow_body,
         out._arrow_bottom
     }) do
-        base:set_color(rt.Palette.GREY_5)
+        base:set_color(rt.Palette.GRAY_5)
     end
 
     for _, outline in pairs({
@@ -36,7 +36,7 @@ bt.OrderQueue = meta.new_type("OrderQueue", function()
         out._arrow_body_outline,
         out._arrow_bottom_outline
     }) do
-        outline:set_color(rt.Palette.GREY_1)
+        outline:set_color(rt.Palette.GRAY_1)
         outline:set_line_width(rt.settings.order_queue.outline_width)
         outline:set_is_outline(true)
     end

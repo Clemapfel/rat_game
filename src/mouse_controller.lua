@@ -40,8 +40,6 @@ end)
 --- @param x Number
 --- @param y Number
 function rt.MouseController:is_cursor_in_bounds(x, y)
-
-
     local bounds = self.instance:get_bounds()
     return x >= bounds.x and x <= bounds.x + bounds.width and y >= bounds.y and y <= bounds.y + bounds.height
 end
@@ -97,11 +95,11 @@ function rt.MouseHandler.handle_motion(x, y, dx, dy, is_touch)
 
     for _, component in pairs(rt.MouseHandler._components) do
         local instance = component.instance
-        local current = component._is_active
+        local current = component._active
         local next = component:is_cursor_in_bounds(x, y)
-
+        
         if current == false and next == true then
-            component._is_active = true
+            component._active = true
             component:signal_emit("motion_enter", x, y)
         end
 
@@ -110,7 +108,7 @@ function rt.MouseHandler.handle_motion(x, y, dx, dy, is_touch)
         end
 
         if current == true and next == false then
-            component._is_active = false
+            component._active = false
             component:signal_emit("motion_leave", x, y)
         end
     end

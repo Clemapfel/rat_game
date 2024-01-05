@@ -9,8 +9,8 @@ bt.EntityPortrait = meta.new_type("EntityPortrait", function(entity)
     local color_from = rt.RGBA(color.r, color.g, color.b, 1)
     local color_to = rt.RGBA(color.r, color.g, color.b, 0)
 
-    color_from = rt.Palette.GREY_6
-    color_to = rt.Palette.GREY_4
+    color_from = rt.Palette.GRAY_6
+    color_to = rt.Palette.GRAY_4
 
     local sprite_id = entity.portrait
     local sprite

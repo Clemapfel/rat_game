@@ -49,7 +49,7 @@ function bt.ActionTooltip:_format_target_label()
     end
 
     local function _field()
-        return "<color=GREY_2>" .. " ――― " .. "</color>"
+        return "<color=GRAY_2>" .. " ――― " .. "</color>"
     end
 
     local function _everyone(str)

@@ -1,8 +1,8 @@
 rt.settings.party_info = {
     spd_font = rt.Font(40, "assets/fonts/pixel.ttf"),
     hp_font = rt.Font(30, "assets/fonts/pixel.ttf"),
-    base_color = rt.Palette.GREY_6,
-    frame_color = rt.Palette.GREY_5,
+    base_color = rt.Palette.GRAY_6,
+    frame_color = rt.Palette.GRAY_5,
     tick_speed_base = 100, -- 1 point per second
     tick_speed_acceleration_factor = 10,
     speed_label_width = -1,
@@ -87,8 +87,8 @@ bt.PartyInfo = meta.new_type("PartyInfo", function(entity)
     out._v_rule:set_minimum_size(out._frame:get_thickness(), 0)
 
     out._indicator_base_frame:set_child(out._indicator_base)
-    out._indicator_base:set_color(rt.Palette.GREY_5)
-    out._indicator_base_frame:set_color(rt.Palette.GREY_4)
+    out._indicator_base:set_color(rt.Palette.GRAY_5)
+    out._indicator_base_frame:set_color(rt.Palette.GRAY_4)
 
     out._attack_indicator._sprite:set_color(rt.Palette.ATTACK)
     out._defense_indicator._sprite:set_color(rt.Palette.DEFENSE)

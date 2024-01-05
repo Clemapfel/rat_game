@@ -1,7 +1,7 @@
 rt.settings.battle_tooltip = {
     name_prefix = "<b>",
     name_suffix = "</b>",
-    flavor_text_prefix = "<color=GREY_2><i>(",
+    flavor_text_prefix = "<color=GRAY_2><i>(",
     flavor_text_suffix = ")</color></i>",
     sprite_size = 64
 }
@@ -34,14 +34,14 @@ bt.BattleTooltip = meta.new_type("BattleTooltip", function(name, status, descrip
 
     out._name_label:set_expand_horizontally(true)
 
-    out._sprite_backdrop:set_color(rt.Palette.GREY_5)
+    out._sprite_backdrop:set_color(rt.Palette.GRAY_5)
     out._sprite:set_minimum_size(rt.settings.battle_tooltip.sprite_size, rt.settings.battle_tooltip.sprite_size)
 
     out._sprite_overlay:set_base_child(out._sprite_backdrop)
     out._sprite_aspect:set_child(out)
     out._sprite_overlay:push_overlay(out._sprite_aspect)
     out._sprite_frame:set_child(out._sprite_overlay)
-    out._sprite_frame:set_color(rt.Palette.GREY_3)
+    out._sprite_frame:set_color(rt.Palette.GRAY_3)
     out._sprite_frame:set_thickness(2)
 
     out._name_and_sprite_box:push_back(out._sprite_frame)

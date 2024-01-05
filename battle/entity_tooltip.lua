@@ -1,7 +1,7 @@
 rt.settings.entity_tooltip = {
     no_status_label = "none",
     status_prefix = "<b>Status Effects:</b> ",
-    status_duration_prefix = "  <color=GREY_2>(<mono>",
+    status_duration_prefix = "  <color=GRAY_2>(<mono>",
     status_duration_suffix = "</mono> turns left)</color>"
 }
 

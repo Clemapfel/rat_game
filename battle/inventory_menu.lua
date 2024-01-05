@@ -192,7 +192,7 @@ function bt.InventoryMenuPage:_update_notches()
 
     local state = self._current_state
     function reset_notch(notch)
-        notch:set_color(rt.Palette.GREY_5, rt.Palette.GREY_6)
+        notch:set_color(rt.Palette.GRAY_5, rt.Palette.GRAY_6)
     end
 
     local i = 1

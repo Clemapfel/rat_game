@@ -86,13 +86,13 @@ rt.Palette = {
     DARK_SKIN_4 = rt.RGBA("#1f1717"),
 
     WHITE = rt.RGBA("#fafaff"),
-    GREY_1 = rt.RGBA("#dcdce1"),
-    GREY_2 = rt.RGBA("#c0c0c5"),
-    GREY_3 = rt.RGBA("#a0a0a7"), -- grey
-    GREY_4 = rt.RGBA("#737378"),
-    GREY_5 = rt.RGBA("#404045"),
-    GREY_6 = rt.RGBA("#202025"),
-    GREY_7 = rt.RGBA("#101013"),
+    GRAY_1 = rt.RGBA("#dcdce1"),
+    GRAY_2 = rt.RGBA("#c0c0c5"),
+    GRAY_3 = rt.RGBA("#a0a0a7"), -- gray
+    GRAY_4 = rt.RGBA("#737378"),
+    GRAY_5 = rt.RGBA("#404045"),
+    GRAY_6 = rt.RGBA("#202025"),
+    GRAY_7 = rt.RGBA("#101013"),
     BLACK = rt.RGBA("#0b0b10"),
 
     TRUE_WHITE = rt.RGBA("#ffffff"),
@@ -115,15 +115,15 @@ rt.Palette.TEAL = rt.Palette.TEAL_2
 rt.Palette.YELLOW = rt.Palette.YELLOW_2
 rt.Palette.ORANGE = rt.Palette.ORANGE_1
 rt.Palette.BROWN = rt.Palette.BROWN_2
-rt.Palette.GREY = rt.Palette.GREY_3
+rt.Palette.GRAY = rt.Palette.GRAY_3
 
-rt.Palette.BACKGROUND = rt.Palette.GREY_6
+rt.Palette.BACKGROUND = rt.Palette.GRAY_6
 rt.Palette.BACKGROUND_OUTLINE = rt.Palette.BLACK
 
-rt.Palette.BASE = rt.Palette.GREY_5
+rt.Palette.BASE = rt.Palette.GRAY_5
 rt.Palette.BASE_OUTLINE = rt.Palette.BLACK
 
-rt.Palette.FOREGROUND = rt.Palette.GREY_1
+rt.Palette.FOREGROUND = rt.Palette.GRAY_1
 rt.Palette.FOREGROUND_OUTLINE = rt.Palette.BLACK
 
 rt.Palette.TEXT = rt.Palette.WHITE
@@ -233,12 +233,12 @@ function rt.Palette:export()
         "DARK_SKIN_4",
 
         "WHITE",
-        "GREY_1",
-        "GREY_2",
-        "GREY_3",
-        "GREY_4",
-        "GREY_5",
-        "GREY_6",
+        "GRAY_1",
+        "GRAY_2",
+        "GRAY_3",
+        "GRAY_4",
+        "GRAY_5",
+        "GRAY_6",
         "BLACK",
 
         "TRUE_WHITE",

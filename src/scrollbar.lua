@@ -5,7 +5,7 @@
 rt.Scrollbar = meta.new_type("Scrollbar", function(orientation, n_steps)
 
     if meta.is_nil(n_steps) then
-        n_steps = 10
+        n_steps = 0
     end
 
     local out = meta.new(rt.Scrollbar, {
@@ -53,34 +53,16 @@ function rt.Scrollbar:get_value()
     return self._value
 end
 
---- @brief 
-function rt.Scrollbar:scroll_down(offset)
-    if meta.is_nil(offset) then
-        local w, h = self:measure()
-        if self._orientation == rt.Orientation.HORIZONTAL then
-            offset = 1 / w
-        else
-            offset = 1 / h
-        end
-    end
-
-    self._value = self._value + offset
+--- @brief
+function rt.Scrollbar:scroll_down()
+    self._value = self._value + 1 / self._n_steps
     self._value = clamp(self._value, 0, 1)
     self:_emit_value_changed()
 end
 
 --- @brief
-function rt.Scrollbar:scroll_up(offset)
-    if meta.is_nil(offset) then
-        local w, h = self:measure()
-        if self._orientation == rt.Orientation.HORIZONTAL then
-            offset = 1 / w
-        else
-            offset = 1 / h
-        end
-    end
-
-    self._value = self._value - offset
+function rt.Scrollbar:scroll_up()
+    self._value = self._value - 1 / self._n_steps
     self._value = clamp(self._value, 0, 1)
     self:_emit_value_changed()
 end
@@ -90,6 +72,11 @@ function rt.Scrollbar:set_n_steps(n)
     if self._n_steps == n then return end
     self._n_steps = n
     self:reformat()
+end
+
+--- @brief
+function rt.Scrollbar:get_n_steps()
+    return self._n_steps
 end
 
 --- @overload rt.Drawable.draw

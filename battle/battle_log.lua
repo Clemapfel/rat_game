@@ -1,5 +1,7 @@
 rt.settings.battle_log = {
     scrollbar_width = 3 * rt.settings.margin_unit,
+    indicator_idle_color = rt.Palette.GRAY_4,
+    indicator_active_color = rt.Palette.GRAY_1
 }
 
 --- @class BattleLogTextLayout
@@ -102,13 +104,17 @@ bt.BattleLog = meta.new_type("BattleLog", function()
         _down_indicator = rt.DirectionIndicator(rt.Direction.DOWN),
         _scrollbar = rt.Scrollbar(rt.Orientation.VERTICAL),
         _scrollbar_layout = rt.ListLayout(rt.Orientation.VERTICAL),
+        _scrollbar_layout_revealer = rt.RevealLayout(),
         _viewport = rt.Viewport(),
         _viewport_scrollbar_layout = rt.ListLayout(rt.Orientation.HORIZONTAL),
 
         _lines = {}, -- Table<String>
         _labels_layout = bt.BattleLogTextLayout(),
 
-        _input = {} -- rt.InputController
+        _input = {}, -- rt.InputController
+
+        _scrollbar_visible = true,
+        _scrollbar_offset = 0
     }, rt.Widget, rt.Drawable)
 
     out._scrollbar_layout:push_back(out._up_indicator)
@@ -123,10 +129,11 @@ bt.BattleLog = meta.new_type("BattleLog", function()
     local m = rt.settings.battle_log.scrollbar_width
     out._scrollbar:set_minimum_size(m, 0)
     out._scrollbar_layout:set_spacing(rt.settings.margin_unit)
+    out._scrollbar_layout_revealer:set_child(out._scrollbar_layout)
 
     local outer_margin = rt.settings.margin_unit + out._frame:get_thickness()
-    out._scrollbar_layout:set_margin_vertical(outer_margin)
-    out._scrollbar_layout:set_margin_horizontal(outer_margin)
+    out._scrollbar_layout_revealer:set_margin_vertical(outer_margin)
+    out._scrollbar_layout_revealer:set_margin_horizontal(outer_margin)
     out._scrollbar_layout:set_horizontal_alignment(rt.Alignment.END)
 
     for _, indicator in pairs({out._up_indicator, out._down_indicator}) do
@@ -136,7 +143,7 @@ bt.BattleLog = meta.new_type("BattleLog", function()
     out._viewport_scrollbar_layout:set_spacing(0.5 * m) -- TODO: why is this necessary?
 
     out._viewport_scrollbar_layout:push_back(out._viewport)
-    out._viewport_scrollbar_layout:push_back(out._scrollbar_layout)
+    out._viewport_scrollbar_layout:push_back(out._scrollbar_layout_revealer)
 
     out._viewport:set_expand_horizontally(true)
     out._scrollbar_layout:set_expand_horizontally(false)
@@ -148,20 +155,52 @@ bt.BattleLog = meta.new_type("BattleLog", function()
     out._frame:set_child(out._backdrop_overlay)
 
     out._viewport:set_child(out._labels_layout)
-    out._scrollbar:signal_connect("value_changed", function(_, value, self)
-        local line_i = value * self._n_lines
-        -- TODO
-    end, out)
+    out._labels_layout:set_margin_left(outer_margin)
+    out._labels_layout:set_margin_vertical(2 * outer_margin)
 
-    out._up_indicator:set_color(rt.Palette.GREY_2)
+    for _, indicator in pairs({out._up_indicator, out._down_indicator, out._scrollbar._cursor}) do
+        indicator:set_color(rt.settings.battle_log.indicator_idle_color)
+    end
+    out._scrollbar:set_value(0)
 
     out._input = rt.add_input_controller(out)
     out._input:signal_connect("pressed", function(_, which, self)
+
+        local before = self._labels_layout._index
         if which == rt.InputButton.UP then
             self._labels_layout:scroll_up()
+            if self._labels_layout._index ~= before then
+                self._scrollbar._cursor:set_color(rt.settings.battle_log.indicator_active_color)
+                self._up_indicator:set_color(rt.settings.battle_log.indicator_active_color)
+                self._scrollbar:set_value((self._labels_layout._index - 1) / (#self._labels_layout._children - 1))
+            end
         elseif which == rt.InputButton.DOWN then
             self._labels_layout:scroll_down()
+            if self._labels_layout._index ~= before then
+                self._scrollbar._cursor:set_color(rt.settings.battle_log.indicator_active_color)
+                self._down_indicator:set_color(rt.settings.battle_log.indicator_active_color)
+                self._scrollbar:set_value((self._labels_layout._index - 1) / (#self._labels_layout._children - 1))
+            end
         end
+    end, out)
+
+    out._input:signal_connect("released", function(_, which, self)
+        if which == rt.InputButton.UP then
+            self._scrollbar._cursor:set_color(rt.settings.battle_log.indicator_idle_color)
+            self._up_indicator:set_color(rt.settings.battle_log.indicator_idle_color)
+        elseif which == rt.InputButton.DOWN then
+            self._scrollbar._cursor:set_color(rt.settings.battle_log.indicator_idle_color)
+            self._down_indicator:set_color(rt.settings.battle_log.indicator_idle_color)
+        end
+    end, out)
+
+    out._input:signal_connect("enter", function(_, x, y, self)
+        println("called")
+        self._scrollbar_layout_revealer:set_is_revealed(true)
+    end, out)
+
+    out._input:signal_connect("motion", function(_, x, y, dt, dy, self)
+        self._scrollbar_layout_revealer:set_is_revealed(false)
     end, out)
 
     return out
@@ -178,4 +217,5 @@ function bt.BattleLog:push_back(line)
     label:set_alignment(rt.Alignment.START)
     label:set_is_animated(true)
     self._labels_layout:push_back(label)
+    self._scrollbar:set_n_steps(self._scrollbar:get_n_steps() + 1)
 end
