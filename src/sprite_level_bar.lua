@@ -31,14 +31,14 @@ rt.SpriteLevelbar = meta.new_type("SpriteLevelbar", function(spritesheet, lower,
 
 
     local use_overlay = true
-    for _, id in pairs({
+    for id in range(
         rt.settings.sprite_level_bar.overlay_left_id,
         rt.settings.sprite_level_bar.overlay_left_right_id,
         rt.settings.sprite_level_bar.overlay_right_id,
         rt.settings.sprite_level_bar.overlay_top_id,
         rt.settings.sprite_level_bar.overlay_top_bottom_id,
         rt.settings.sprite_level_bar.overlay_bottom_id
-    }) do
+    ) do
         if not spritesheet:has_animation(id) then
             use_overlay = false
             rt.log("In rt.SpriteLevelbar: Spritesheet `" .. spritesheet.name .. "` is missing bar overlay animations, disabling overlay...")

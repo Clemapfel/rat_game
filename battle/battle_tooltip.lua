@@ -63,7 +63,7 @@ bt.BattleTooltip = meta.new_type("BattleTooltip", function(name, status, descrip
 
     out._sprite_frame:set_expand(false)
 
-    for _, element in pairs({out._name_and_sprite_box, out._stat_label, out._description_label, out._flavor_text_label}) do
+    for element in range(out._name_and_sprite_box, out._stat_label, out._description_label, out._flavor_text_label) do
         element:set_alignment(rt.Alignment.START)
         element:set_expand_vertically(false)
     end

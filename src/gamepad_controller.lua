@@ -139,7 +139,7 @@ function rt.GamepadHandler.get_axes(controller_id, ...)
     axes[rt.GamepadAxis.RIGHT_TRIGGER] = raw[6]
 
     local out = {}
-    for _, which in pairs({...}) do
+    for which in range(...) do
         table.insert(out, axes[which])
     end
     return table.unpack(out)

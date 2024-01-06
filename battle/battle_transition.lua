@@ -52,7 +52,7 @@ function bt.BattleTransition:size_allocate(x, y, width, height)
 
     local triangles = {}
     function push(...)
-        for _, x in pairs({...}) do
+        for x in range(...) do
             table.insert(triangles, x)
         end
     end

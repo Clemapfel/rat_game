@@ -25,13 +25,13 @@ bt.Entity = meta.new_type("Entity", function(id)
     meta.assert_string(name)
     out.name = name
 
-    for _, which in pairs({"hp", "attack", "defense", "speed"}) do
+    for which in range("hp", "attack", "defense", "speed") do
         local value = config[which .. "_base"]
         meta.assert_number(value)
         out[which .. "_base"] = value
     end
 
-    for _, which in pairs({"portrait", "battle_sprite", "description"}) do
+    for which in range("portrait", "battle_sprite", "description") do
         local value = config[which]
         if not meta.is_nil(value) then
             meta.assert_string(value)
@@ -57,7 +57,7 @@ function bt._generate_debug_entity()
     entity.hp_ev = 0
     entity.hp_current = rt.random.integer(10, entity.hp_base)
 
-    for _, which in pairs({"attack", "defense", "speed"}) do
+    for which in range("attack", "defense", "speed") do
         entity[which .. "_base"] = rt.random.integer(1, 100)
         entity[which .. "_ev"] = 0
         entity[which .. "_level"] = rt.random.choose({0, 0, 0, 0, -1, 1})
@@ -226,7 +226,7 @@ function bt.Entity:reduce_hp(offset)
 end
 
 --- @brief modify stat level
-for _, which in ipairs({"attack", "defense", "speed"}) do
+for which in range("attack", "defense", "speed") do
     bt.Entity["set_" .. which .. "_level"] = function(self, new_level)
         self[which .. "_level"] = new_level
         self:_emit_changed()

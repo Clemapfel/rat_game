@@ -15,7 +15,7 @@ bt.StatusAilment = meta.new_type("StatusAilment", function(id)
         id = id
     })
 
-    for _, which in pairs({"attack", "defense", "speed"}) do
+    for which in range("attack", "defense", "speed") do
         local value = config[which .. "_factor"]
         if not meta.is_nil(value) then
             meta.assert_number(value)
@@ -31,7 +31,7 @@ bt.StatusAilment = meta.new_type("StatusAilment", function(id)
     meta.assert_number(duration)
     out.max_duration = duration
 
-    for _, which in pairs({"description", "verbose_description", "sprite"}) do
+    for which in range("description", "verbose_description", "sprite") do
         local value = config[which]
         if not meta.is_nil(value) then
             meta.assert_string(value)

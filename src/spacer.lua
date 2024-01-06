@@ -20,7 +20,7 @@ rt.Spacer = meta.new_type("Spacer", function(color)
 
     out._shape:set_color(out._color)
 
-    for _, outline in pairs({out._outline_top, out._outline_right, out._outline_bottom, out._outline_left}) do
+    for outline in range(out._outline_top, out._outline_right, out._outline_bottom, out._outline_left) do
         outline:set_color(rt.RGBA(0, 0, 0, 1))
         outline:set_is_outline(true)
     end
@@ -67,7 +67,7 @@ function rt.Spacer:set_color(color, outline_color)
         rgba = rt.hsva_to_rgba(outline_color)
     end
 
-    for _, outline in pairs({self._outline_top, self._outline_right, self._outline_bottom, self._outline_left}) do
+    for outline in range(self._outline_top, self._outline_right, self._outline_bottom, self._outline_left) do
         outline:set_color(outline_color)
     end
 end

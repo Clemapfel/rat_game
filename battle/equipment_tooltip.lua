@@ -42,7 +42,7 @@ function bt.EquipmentTooltip:_format_stat_label()
     end
 
     local n_digits = 0
-    for _, modifier in pairs({self._equipment.attack_modifier, self._equipment.defense_modifier, self._equipment.speed, self._equipment.hp}) do
+    for modifier in range(self._equipment.attack_modifier, self._equipment.defense_modifier, self._equipment.speed, self._equipment.hp) do
         n_digits = math.max(n_digits, get_n_digits(modifier))
     end
 

@@ -43,7 +43,7 @@ bt.EquipmentListItem = meta.new_type("EquipmentListItem", function(equipment, co
     out._sprite_aspect:set_child(out._sprite)
     out._sprite_overlay:push_overlay(out._sprite_aspect)
 
-    for _, spacer in pairs({out._sprite_spacer, out._name_spacer, out._count_spacer, out._end_spacer}) do
+    for spacer in range(out._sprite_spacer, out._name_spacer, out._count_spacer, out._end_spacer) do
         spacer:set_expand_horizontally(false)
         spacer:set_expand_vertically(true)
         spacer:set_minimum_size(3, 0)
@@ -58,7 +58,7 @@ bt.EquipmentListItem = meta.new_type("EquipmentListItem", function(equipment, co
     out._name_label:set_horizontal_alignment(rt.Alignment.START)
     out._name_label:set_margin_left(rt.settings.margin_unit)
 
-    for _, indicator in pairs({out._attack_indicator, out._defense_indicator, out._speed_indicator, out._hp_indicator}) do
+    for indicator in range(out._attack_indicator, out._defense_indicator, out._speed_indicator, out._hp_indicator) do
         out._indicator_hbox:push_back(indicator)
         indicator:set_minimum_size(sprite_size_x, sprite_size_y)
         indicator:set_expand(false)
@@ -111,7 +111,7 @@ function bt.EquipmentListItem:update_indicators(entity)
         end
     end
 
-    for _, which in pairs({"attack", "defense", "speed", "hp"}) do
+    for which in range("attack", "defense", "speed", "hp") do
         update_direction(self["_" .. which .. "_indicator"], self._equipment[which .. "_modifier"])
     end
 end

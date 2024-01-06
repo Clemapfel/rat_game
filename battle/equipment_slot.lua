@@ -67,7 +67,7 @@ bt.EquipmentSlot = meta.new_type("EquipmentSlot", function(equipment)
         _indicator_box_frame = rt.Frame(rt.FrameType.RECTANGULAR)
     }, rt.Widget)
 
-    for _, stat in pairs({"hp", "attack", "defense", "speed"}) do
+    for stat in range("hp", "attack", "defense", "speed") do
         local backdrop = out["_" .. stat .. "_backdrop"]
         local indicator = out["_" .. stat .. "_indicator"]
         local overlay = out["_" .. stat .. "_overlay"]

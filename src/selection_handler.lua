@@ -1,7 +1,7 @@
 --- @class rt.SelectionNode
 rt.SelectionNode = meta.new_type("SelectionNode", function(self, up, right, down, left)
 
-    for _, widget in pairs({up, right, down, left}) do
+    for widget in range(up, right, down, left) do
         if not meta.is_nil(widget) then
 
         end
@@ -64,7 +64,7 @@ function rt.SelectionHandler:draw()
     end
 
     for _, node in pairs(self._nodes) do
-        for _, to in pairs({node.top, node.right, node.bottom, node.left}) do
+        for to in range(node.top, node.right, node.bottom, node.left) do
             if not meta.is_nil(to.self) then
                 local to_x, to_y = center(to.self)
                 local from_x, from_y = center(node.self)

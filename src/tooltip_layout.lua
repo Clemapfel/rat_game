@@ -23,7 +23,7 @@ rt.TooltipLayout = meta.new_type("TooltipLayout", function(child)
     out._tooltip_frame:set_color(rt.Palette.BASE)
     out._tooltip_frame_outline:set_color(rt.Palette.BASE_OUTLINE)
 
-    for _, frame in pairs({out._tooltip_frame, out._tooltip_frame_outline}) do
+    for frame in range(out._tooltip_frame, out._tooltip_frame_outline) do
         frame:set_corner_radius(rt.settings.margin_unit)
         frame:set_is_outline(true)
     end
@@ -47,7 +47,7 @@ end)
 --- @brief
 function rt.TooltipLayout:_set_tooltip_opacity(alpha)
 
-    for _, shape in pairs({self._tooltip_backdrop, self._tooltip_frame, self._tooltip_frame_outline}) do
+    for shape in range(self._tooltip_backdrop, self._tooltip_frame, self._tooltip_frame_outline) do
         local color = shape:get_color()
         color.a = alpha
         shape:set_color(color)

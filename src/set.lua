@@ -32,7 +32,7 @@ rt.Set = meta.new_type("Set", function(...)
         return true
     end
 
-    for _, x in pairs({...}) do
+    for x in range(...) do
         out:push(x)
     end
     return out

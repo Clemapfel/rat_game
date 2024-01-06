@@ -58,7 +58,7 @@ function bt.EntityTooltip:_format_stat_label()
     local speed = self._entity:get_speed()
 
     local n_digits = 0
-    for _, modifier in pairs({hp, attack, defense, speed}) do
+    for modifier in range(hp, attack, defense, speed) do
         n_digits = math.max(n_digits, get_n_digits(modifier))
     end
 

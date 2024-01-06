@@ -27,12 +27,12 @@ rt.Switch = meta.new_type("Switch", function()
     out._slider:set_color(rt.Palette.FOREGROUND)
     out._slider_outline:set_color(rt.Palette.FOREGROUND_OUTLINE)
 
-    for _, outline in pairs({
+    for outline in pairs(
         out._start_outline,
         out._center_outline_top,
         out._center_outline_bottom,
         out._end_outline
-    }) do
+    ) do
         outline:set_is_outline(true)
         outline:set_color(rt.Palette.BACKGROUND_OUTLINE)
     end
@@ -107,11 +107,11 @@ function rt.Switch:size_allocate(x, y, width, height)
     x = x + 0.5 * width - 0.5 * length
     y = y + 0.5 * height - 1 * slider_radius
 
-    for _, shape in pairs({self._start, self._start_outline}) do
+    for shape in range(self._start, self._start_outline) do
         shape:resize(x + slider_radius, y + slider_radius, slider_radius)
     end
 
-    for _, shape in pairs({self._end, self._end_outline}) do
+    for shape in range(self._end, self._end_outline) do
         shape:resize(x + length - slider_radius, y + slider_radius, slider_radius)
     end
 

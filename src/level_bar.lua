@@ -35,7 +35,7 @@ rt.LevelBar = meta.new_type("LevelBar", function(lower, upper, value)
     out._backdrop_outline:set_line_width(rt.settings.level_bar.outline_width)
     out._shape_outline:set_line_width(1)
 
-    for _, shape in pairs({out._backdrop, out._backdrop_outline}) do
+    for shape in range(out._backdrop, out._backdrop_outline) do
         shape:set_corner_radius(rt.settings.level_bar.corner_radius)
     end
 

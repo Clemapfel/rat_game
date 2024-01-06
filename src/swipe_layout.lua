@@ -31,7 +31,7 @@ rt.SwipeLayout = meta.new_type("SwipeLayout", function(orientation)
     out._right_indicator:set_margin_right(mu)
     out._up_indicator:set_margin_top(mu)
     out._down_indicator:set_margin_bottom(mu)
-    for _, indicator in pairs({out._left_indicator, out._up_indicator, out._right_indicator, out._down_indicator}) do
+    for indicator in range(out._left_indicator, out._up_indicator, out._right_indicator, out._down_indicator) do
         indicator:set_margin(rt.settings.margin_unit)
     end
 
@@ -162,7 +162,7 @@ function rt.SwipeLayout:realize()
         child:realize()
     end
 
-    for _, indicator in pairs({self._left_indicator, self._up_indicator, self._right_indicator, self._down_indicator}) do
+    for indicator in range(self._left_indicator, self._up_indicator, self._right_indicator, self._down_indicator) do
         indicator:realize()
     end
 

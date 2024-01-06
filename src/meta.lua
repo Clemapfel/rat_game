@@ -144,7 +144,7 @@ end
 --- @param x any
 function meta.assert_boolean(x, ...)
     meta._assert_aux(meta.is_boolean(x), x, "boolean")
-    for _, n in pairs({...}) do
+    for n in range(...) do
         meta._assert_aux(meta.is_boolean(n), n, "boolean")
     end
 end
@@ -153,7 +153,7 @@ end
 --- @param x any
 function meta.assert_table(x, ...)
     meta._assert_aux(meta.is_table(x), x, "table")
-    for _, n in pairs({...}) do
+    for n in range(...) do
         meta._assert_aux(meta.is_table(n), n, "table")
     end
 end
@@ -162,7 +162,7 @@ end
 --- @param x any
 function meta.assert_function(x, ...)
     meta._assert_aux(meta.is_function(x), x, "function")
-    for _, n in pairs({...}) do
+    for n in range(...) do
         meta._assert_aux(meta.is_function(n), n, "function")
     end
 end
@@ -177,7 +177,7 @@ end
 --- @param x any
 function meta.assert_number(x, ...)
     meta._assert_aux(meta.is_number(x), x, "number")
-    for _, number in pairs({...}) do
+    for number in range(...) do
         meta._assert_aux(meta.is_number(number), number, "number")
     end
 end
@@ -186,7 +186,7 @@ end
 --- @param x any
 function meta.assert_nil(x, ...)
     meta._assert_aux(meta.is_nil(x), x, "typeof(nil)")
-    for _, number in pairs({...}) do
+    for number in range(...) do
         meta._assert_aux(meta.is_nil(number), number, "typeof(nil)")
     end
 end
@@ -195,7 +195,7 @@ end
 --- @param x any
 function meta.assert_object(x, ...)
     meta._assert_aux(meta.is_object(x), x, "meta.Object")
-    for _, number in pairs({...}) do
+    for number in range(...) do
         meta._assert_aux(meta.is_object(number), number, "meta.Object")
     end
 end
@@ -296,7 +296,7 @@ function meta.new(type, fields, ...)
 
     metatable.super[type._typename] = true
 
-    for _, super in pairs({...}) do
+    for super in range(...) do
         metatable.super[super._typename] = true
         for key, value in pairs(getmetatable(super).properties) do
             if metatable.properties[key] == nil then

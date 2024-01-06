@@ -53,7 +53,7 @@ bt.Action = meta.new_type("Action", function(id)
         out.targeting_mode = targeting_mode
     end
 
-    for _, which in pairs({"self", "ally", "enemy"}) do
+    for which in range("self", "ally", "enemy") do
         local value = config["can_target_" .. which]
         if not meta.is_nil(value) then
 

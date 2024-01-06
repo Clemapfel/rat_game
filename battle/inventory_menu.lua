@@ -86,14 +86,14 @@ bt.InventoryMenuPage = meta.new_type("InventoryMenu", function(state)
         label:set_minimum_size(label_w, label_h)
     end
 
-    for _, label in pairs({out._hp_base_label, out._attack_base_label, out._defense_base_label, out._speed_base_label, out._hp_label, out._attack_label, out._defense_label, out._speed_label}) do
+    for label in range(out._hp_base_label, out._attack_base_label, out._defense_base_label, out._speed_base_label, out._hp_label, out._attack_label, out._defense_label, out._speed_label) do
         label:set_expand_horizontally(false)
         label:set_horizontal_alignment(rt.Alignment.START)
         label:set_justify_mode(rt.JustifyMode.RIGHT)
         format_stat_label(label)
     end
 
-    for _, label in pairs({out._hp_final_label, out._attack_final_label, out._defense_final_label, out._speed_final_label}) do
+    for label in range(out._hp_final_label, out._attack_final_label, out._defense_final_label, out._speed_final_label) do
         label:set_expand_horizontally(false)
         label:set_horizontal_alignment(rt.Alignment.END)
         label:set_justify_mode(rt.JustifyMode.LEFT)
@@ -125,7 +125,7 @@ bt.InventoryMenuPage = meta.new_type("InventoryMenu", function(state)
     end
 
     local j = 1
-    for _, bar in pairs({out._hp_notch_bar, out._attack_notch_bar, out._defense_notch_bar, out._speed_notch_bar}) do
+    for bar in range(out._hp_notch_bar, out._attack_notch_bar, out._defense_notch_bar, out._speed_notch_bar) do
         for i = 1, rt.settings.inventory_menu.max_n_evs do
             if i % 5 == 1 and i > 5 then
                 bar:push_back(separator())
@@ -136,7 +136,7 @@ bt.InventoryMenuPage = meta.new_type("InventoryMenu", function(state)
         j = j + 1
     end
 
-    for _, which in pairs({"hp", "attack", "defense", "speed"}) do
+    for which in range("hp", "attack", "defense", "speed") do
         out["_" .. which .. "_row"]:set_children({
             out["_" .. which .. "_label"],
             separator(),

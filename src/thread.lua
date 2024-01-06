@@ -282,7 +282,7 @@ function rt.test.thread()
     assert(future:get_value() == 1234 + 1111)
 
     thread:restart()
-    for _, var in pairs({"f", "test_nil", "test_f", "test_table"}) do
+    for var in range("f", "test_nil", "test_f", "test_table") do
         assert(meta.is_nil(thread:get(var)))
     end
 

@@ -23,29 +23,29 @@ bt.OrderQueue = meta.new_type("OrderQueue", function()
         _portraits = {}         -- Table<entity.id, bt.EntityPortrait>
     }, rt.Widget, rt.Drawable, rt.Animation)
 
-    for _, base in pairs({
+    for base in range(
         out._arrow_head,
         out._arrow_body,
         out._arrow_bottom
-    }) do
+    ) do
         base:set_color(rt.Palette.GRAY_5)
     end
 
-    for _, outline in pairs({
+    for outline in range(
         out._arrow_head_outline,
         out._arrow_body_outline,
         out._arrow_bottom_outline
-    }) do
+    ) do
         outline:set_color(rt.Palette.GRAY_1)
         outline:set_line_width(rt.settings.order_queue.outline_width)
         outline:set_is_outline(true)
     end
 
-    for _, outline in pairs({
+    for outline in range(
         out._arrow_head_outline_outline,
         out._arrow_body_outline_outline,
         out._arrow_bottom_outline_outline
-    }) do
+    ) do
         outline:set_color(rt.Palette.BLACK)
         outline:set_line_width(rt.settings.order_queue.outline_width + 4)
         outline:set_is_outline(true)
@@ -129,7 +129,7 @@ function bt.OrderQueue:size_allocate(x, y, width, height)
         arrow_bottom_left.x, arrow_bottom_left.y
     )
 
-    for _, outline in pairs({self._arrow_head_outline, self._arrow_head_outline_outline}) do
+    for outline in range(self._arrow_head_outline, self._arrow_head_outline_outline) do
         outline:resize(
             arrow_top.x, arrow_top.y,
             arrow_bottom_right.x, arrow_bottom_right.y,
@@ -146,7 +146,7 @@ function bt.OrderQueue:size_allocate(x, y, width, height)
         body_width, body_height
     )
 
-    for _, outline in pairs({self._arrow_body_outline, self._arrow_body_outline_outline}) do
+    for outline in range(self._arrow_body_outline, self._arrow_body_outline_outline) do
         outline:resize(
             body_top_left.x, body_top_left.y + body_height,
             body_top_left.x, body_top_left.y,
@@ -155,7 +155,7 @@ function bt.OrderQueue:size_allocate(x, y, width, height)
         )
     end
 
-    for _, bottom in pairs({self._arrow_bottom, self._arrow_bottom_outline, self._arrow_bottom_outline_outline}) do
+    for bottom in range(self._arrow_bottom, self._arrow_bottom_outline, self._arrow_bottom_outline_outline) do
         bottom:resize(
             body_top_left.x + 0.5 * body_width, body_top_left.y + body_height,
             0.5 * body_width

@@ -136,7 +136,7 @@ bt.BattleLog = meta.new_type("BattleLog", function()
     out._scrollbar_layout_revealer:set_margin_horizontal(outer_margin)
     out._scrollbar_layout:set_horizontal_alignment(rt.Alignment.END)
 
-    for _, indicator in pairs({out._up_indicator, out._down_indicator}) do
+    for indicator in range(out._up_indicator, out._down_indicator) do
         indicator:set_minimum_size(m, m)
     end
 
@@ -158,7 +158,7 @@ bt.BattleLog = meta.new_type("BattleLog", function()
     out._labels_layout:set_margin_left(outer_margin)
     out._labels_layout:set_margin_vertical(2 * outer_margin)
 
-    for _, indicator in pairs({out._up_indicator, out._down_indicator, out._scrollbar._cursor}) do
+    for indicator in range(out._up_indicator, out._down_indicator, out._scrollbar._cursor) do
         indicator:set_color(rt.settings.battle_log.indicator_idle_color)
     end
 

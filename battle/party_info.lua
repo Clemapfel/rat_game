@@ -78,7 +78,7 @@ bt.PartyInfo = meta.new_type("PartyInfo", function(entity)
     out._base:set_color(rt.settings.party_info.base_color)
     out._frame:set_color(rt.settings.party_info.frame_color)
 
-    for _, rule in pairs({out._h_rule, out._v_rule}) do
+    for rule in range(out._h_rule, out._v_rule) do
         rule:set_color(rt.settings.party_info.frame_color)
         rule:set_color(out._frame._frame:get_color(), out._frame._frame_outline:get_color())
     end
@@ -251,7 +251,7 @@ function bt.PartyInfo:size_allocate(x, y, width, height)
 
     local sprite_size = self._attack_indicator._sprite:get_resolution() * 3
     local indicator_area = rt.AABB(hp_x, y + 2 * m + hp_h + rule_thickness + 0.5 * m, sprite_size, sprite_size)
-    for _, indicator in pairs({self._attack_indicator, self._defense_indicator, self._speed_indicator}) do
+    for indicator in range(self._attack_indicator, self._defense_indicator, self._speed_indicator) do
         indicator:fit_into(indicator_area)
         indicator_area.x = indicator_area.x + indicator_area.width + indicator_spacing
     end

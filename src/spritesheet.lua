@@ -7,7 +7,7 @@ rt.Spritesheet = meta.new_type("Spritesheet", function(path, id)
     local config_path = path .. "/" .. id .. ".lua"
     local image_path = path .. "/" .. id .. ".png"
 
-    for _, path in ipairs({config_path, image_path}) do
+    for path in range(config_path, image_path) do
         if meta.is_nil(love.filesystem.getInfo(path)) then
             rt.error("In Spritesheet:create_from_file: file `" .. path .. "` does not exist")
         end

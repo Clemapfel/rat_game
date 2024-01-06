@@ -45,37 +45,37 @@ rt.Scale = meta.new_type("Scale", function(lower, upper, increment, value)
     out._slider_outline:set_color(rt.Palette.FOREGROUND_OUTLINE)
     out._slider_outline:set_is_outline(true)
 
-    for _, rail in pairs({out._rail, out._rail_start, out._rail_end}) do
+    for rail in range(out._rail, out._rail_start, out._rail_end) do
         rail:set_color(rt.Palette.BASE)
     end
 
-    for _, outline in pairs({
+    for outline in range(
         out._rail_outline_top,
         out._rail_outline_bottom,
         out._rail_start_outline,
         out._rail_end_outline
-    }) do
+    ) do
         outline:set_color(rt.Palette.BASE_OUTLINE)
     end
     out._rail_start_outline:set_is_outline(true)
     out._rail_end_outline:set_is_outline(true)
 
-    for _, trough in pairs({out._trough, out._trough_start, out._trough_end}) do
+    for trough in range(out._trough, out._trough_start, out._trough_end) do
         trough:set_color(rt.Palette.BACKGROUND)
     end
 
-    for _, outline in pairs({
+    for outline in range(
         out._trough_outline_top,
         out._trough_outline_bottom,
         out._trough_start_outline,
         out._trough_end_outline
-    }) do
+    ) do
         outline:set_color(rt.Palette.BACKGROUND_OUTLINE)
     end
     out._trough_start_outline:set_is_outline(true)
     out._trough_end_outline:set_is_outline(true)
 
-    for _, shape in pairs({out._fill_start, out._fill, out._fill_end}) do
+    for shape in range(out._fill_start, out._fill, out._fill_end) do
         shape:set_is_visible(true)
     end
 

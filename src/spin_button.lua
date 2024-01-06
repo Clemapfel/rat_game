@@ -51,7 +51,7 @@ rt.SpinButton = meta.new_type("SpinButton", function(lower, upper, increment, va
     out._decrease_button_disabled_overlay:set_color(rt.RGBA(0, 0, 0, 0.5))
     out._decrease_button_disabled_overlay:set_is_visible(value <= out._lower)
 
-    for _, outline in pairs({out._backdrop_outline, out._increase_button_outline, out._decrease_button_outline}) do
+    for outline in range(out._backdrop_outline, out._increase_button_outline, out._decrease_button_outline) do
         outline:set_is_outline(true)
     end
 

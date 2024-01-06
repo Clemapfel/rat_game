@@ -88,7 +88,7 @@ function benchmark(f, duration)
     local sigma = to_time_unit(stddev(runs))
 
     local n_digits = 0
-    for _, label in pairs({mean, median, minimum, maximum, sigma}) do
+    for label in range(mean, median, minimum, maximum, sigma) do
         n_digits = math.max(n_digits, #label)
     end
 

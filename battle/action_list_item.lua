@@ -40,7 +40,7 @@ bt.ActionListItem = meta.new_type("ActionListItem", function(action, count)
     out._sprite_aspect:set_child(out._sprite)
     out._sprite_overlay:push_overlay(out._sprite_aspect)
 
-    for _, spacer in pairs({out._sprite_spacer, out._name_spacer, out._n_uses_spacer, out._effect_spacer, out._end_spacer}) do
+    for spacer in range(out._sprite_spacer, out._name_spacer, out._n_uses_spacer, out._effect_spacer, out._end_spacer) do
         spacer:set_expand_horizontally(false)
         spacer:set_expand_vertically(true)
         spacer:set_minimum_size(3, 0)
