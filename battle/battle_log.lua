@@ -14,7 +14,7 @@ bt.BattleLogTextLayout = meta.new_type("BattleLogTextLayout", function()
         _index = 1,
         _n_children = 0
     }, rt.Widget, rt.Drawable)
-    out._cumulative_children_heights[0] = 0
+    out._cumulative_children_heights[0] = 0 -- sic
     return out
 end)
 
@@ -161,6 +161,7 @@ bt.BattleLog = meta.new_type("BattleLog", function()
     for _, indicator in pairs({out._up_indicator, out._down_indicator, out._scrollbar._cursor}) do
         indicator:set_color(rt.settings.battle_log.indicator_idle_color)
     end
+
     out._scrollbar:set_value(0)
 
     out._input = rt.add_input_controller(out)
@@ -170,17 +171,17 @@ bt.BattleLog = meta.new_type("BattleLog", function()
         if which == rt.InputButton.UP then
             self._labels_layout:scroll_up()
             if self._labels_layout._index ~= before then
-                self._scrollbar._cursor:set_color(rt.settings.battle_log.indicator_active_color)
                 self._up_indicator:set_color(rt.settings.battle_log.indicator_active_color)
                 self._scrollbar:set_value((self._labels_layout._index - 1) / (#self._labels_layout._children - 1))
             end
         elseif which == rt.InputButton.DOWN then
             self._labels_layout:scroll_down()
             if self._labels_layout._index ~= before then
-                self._scrollbar._cursor:set_color(rt.settings.battle_log.indicator_active_color)
                 self._down_indicator:set_color(rt.settings.battle_log.indicator_active_color)
                 self._scrollbar:set_value((self._labels_layout._index - 1) / (#self._labels_layout._children - 1))
             end
+        elseif which == rt.InputButton.B then
+            self._scrollbar_layout_revealer:set_is_revealed(not self._scrollbar_layout_revealer:get_is_revealed())
         end
     end, out)
 
@@ -195,11 +196,10 @@ bt.BattleLog = meta.new_type("BattleLog", function()
     end, out)
 
     out._input:signal_connect("enter", function(_, x, y, self)
-        println("called")
         self._scrollbar_layout_revealer:set_is_revealed(true)
     end, out)
 
-    out._input:signal_connect("motion", function(_, x, y, dt, dy, self)
+    out._input:signal_connect("leave", function(_, x, y, self)
         self._scrollbar_layout_revealer:set_is_revealed(false)
     end, out)
 

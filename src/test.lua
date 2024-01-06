@@ -56,6 +56,60 @@ function rt.test.common()
     local snake = "camel_case_test"
 
     assert(string.to_snake_case(camel) == snake)
+
+    -- step_range
+    local t = {}
+    for i in step_range(0, 5, 1) do
+        table.insert(t, i)
+    end
+    assert(table.compare(t, {0, 1, 2, 3, 4, 5}))
+
+    t = {}
+    for i in step_range(5, 0, -1) do
+        table.insert(t, i)
+    end
+    assert(table.compare(t, {5, 4, 3, 2, 1, 0}))
+
+    t = {}
+    for i in step_range(0, 3, 2) do
+        table.insert(t, i)
+    end
+    assert(table.compare(t, {0, 2}))
+
+    t = {}
+    for i in step_range(3, 0, -2) do
+        table.insert(t, i)
+    end
+    assert(table.compare(t, {3, 1}))
+
+    t = {}
+    for i in step_range(0, 0, 1) do
+        table.insert(t, i)
+    end
+    assert(table.compare(t, {0}))
+
+    t = {}
+    for i in step_range(0, 0, -1) do
+        table.insert(t, i)
+    end
+    assert(table.compare(t, {0}))
+
+    t = {}
+    for i in step_range(0, 0, 0) do
+        table.insert(t, i)
+    end
+    assert(table.compare(t, {}))
+
+    --- range
+    local i = 1
+    for x in range(nil, "test", nil, 1234, nil, {1}, nil) do
+        if i == 1 then assert(x == "test")
+        elseif i == 2 then assert(x == 1234)
+        elseif i == 3 then assert(x[1] == 1)
+        end
+        i = i + 1
+    end
+    assert(i == 4)
 end
 
 

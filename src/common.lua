@@ -177,9 +177,9 @@ function slurp(...)
     return {...}
 end
 
-base_select = select
+_G._select = _G.select
 
---- @brief get n-th element of varag
+--- @brief get n-th element of varag, overrides _G.select
 --- @param n number
 --- @vararg
 function select(n, ...)
@@ -469,4 +469,76 @@ function table.last(t)
     return last
 end
 
-if table.unpack == nil then table.unpack = unpack end
+--- @brief check if two tables have contents that compare equally
+--- @param left table
+--- @param right table
+--- @return boolean
+function table.compare(left, right)
+    if #left ~= #right then return false end
+
+    for key, value in pairs(left) do
+        if right[key] ~= value then return false end
+    end
+
+    return true
+end
+
+if table.unpack == nil then -- reassign on some luajit versions
+    assert(unpack ~= nil)
+    table.unpack = unpack
+end
+
+--- @brief iterate integer range
+--- @param range_start number
+--- @param range_end number
+--- @param increment number or nil
+function step_range(range_start, range_end, step)
+    if step == nil then step = 1 end
+
+    local start = range_start
+    if step == 0 then start = nil end -- causes _range_iterator to drop out before the first iteration
+
+    local state = {range_start, range_end, step, start}
+    return _step_range_iterator, state
+end
+
+_step_range_iterator = function(state)
+    local range_start, range_end, step, current = state[1], state[2], state[3], state[4]
+    if current == nil then return nil end
+
+    local next = current + step
+    if (step > 0 and next > range_end) or (step < 0 and next < range_end) then
+        next = nil
+    end
+
+    state[4] = next
+    return current, state
+end
+
+--- @brief iterate arbitrary number of elements, if vararg contains nils, they will be skipped
+--- @vararg any
+function range(...)
+    local elements = {...}
+    local n_elements = _G._select('#', ...)
+
+    local state = {}
+    for i = 1, n_elements do
+        state[i] = elements[i]
+    end
+
+    state.index = 1
+    state.n_elements = n_elements
+
+    return _range_iterator, state
+end
+
+_range_iterator = function(state)
+    local index, n_elements = state.index, state.n_elements
+    if index > n_elements then return nil end
+
+    while state[index] == nil and index <= n_elements do
+        index = index + 1
+    end
+    state.index = index + 1
+    return state[index], state
+end
