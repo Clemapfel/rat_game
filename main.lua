@@ -38,6 +38,17 @@ particle_system:setLinearAcceleration(-100, -100, 100, 100)
 particle_system:setPosition(love.graphics.getWidth() / 2, love.graphics.getHeight() / 2)
 particle_system:start()
 
+local m = 100
+local w, h = love.graphics.getWidth() - 2 * m, love.graphics.getHeight() - 2 * m
+
+curve = rt.Spline({
+    m, m,
+    m + w, m,
+    m + w, m + h,
+    m, m + h,
+    m, m, 0
+})
+
 local wireframe = false;
 input = rt.add_input_controller(rt.current_scene.window)
 input:signal_connect("pressed", function(self, which)
@@ -86,12 +97,10 @@ love.draw = function()
     --love.graphics.clear(1, 0, 1, 1)
     --rt.current_scene:draw()
 
-    love.graphics.draw(particle_system) -- TODO
+    curve:draw()
 end
 
 love.update = function()
     local delta = love.timer.getDelta()
     rt.current_scene:update(delta)
-
-    particle_system:update(delta) -- TODO
 end

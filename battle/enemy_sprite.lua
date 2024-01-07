@@ -18,7 +18,6 @@ end)
 
 --- @overload
 function bt.EnemySprite:size_allocate(x, y, width, height)
-    println(width, " x ", height)
     self._sprite:fit_into(x, y, width, height)
 end
 
