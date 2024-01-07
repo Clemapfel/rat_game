@@ -1,21 +1,31 @@
 --- @class rt.Spline
+--- @brief catmull-rom spline, c1 continuous and goes through every control point
 rt.Spline = meta.new_type("Spline", function(points)
-    
-    local vertices, distances, total_length, n_vertices = rt.Spline._catmull_rom(points, 20)
+    local vertices, distances, total_length = rt.Spline._catmull_rom(points, 20)
     local out = meta.new(rt.Spline, {
         _vertices = vertices,
         _distances = distances,
         _length = total_length
     }, rt.Drawable)
+
     return out
 end)
 
+--- @brief
+function rt.Spline:get_length()
+    return self._length
+end
+
+--- @brief
+--- @param
 --- @return Number, Number
 function rt.Spline:at(t)
     t = clamp(t, 0, 1)
     local i = 1
 
-    local length = t * self._length
+    local max_length = self._length
+    local length = t * max_length
+
     while length > 0 and i <= #self._distances do
         local distance = self._distances[i]
         if length - distance <= 0 then
@@ -40,6 +50,16 @@ function rt.Spline:at(t)
     return math3d.utils.lerp(previous_x, current_x, fraction), math3d.utils.lerp(previous_y, current_y, fraction)
 end
 
+--- @brief [internal]
+function rt.Spline._range(tbl, index, count)
+    count = count or #tbl-index+1
+    local output = {}
+    for i=index, index+count-1 do
+        output[#output+1] = tbl[i]
+    end
+    return output
+end
+
 --- @param points Table<Number>
 --- @param steprate Number n steps per segment
 function rt.Spline._catmull_rom(points, steprate)
@@ -47,19 +67,6 @@ function rt.Spline._catmull_rom(points, steprate)
     -- source: https://gist.github.com/HoraceBury/4afb0e68cd807d8ead220a709219db2e
 
     steprate = clamp(steprate, 1)
-    function _range(tbl, index, count)
-        count = count or #tbl-index+1
-        local output = {}
-        for i=index, index+count-1 do
-            output[#output+1] = tbl[i]
-        end
-        return output
-    end
-
-    function _length_of(ax, ay, bx, by)
-        local width, height = bx - ax, by - ay
-        return math.sqrt(width*width + height*height)
-    end
 
     if #points % 2 ~= 0 then
         rt.error("In rt.Spline._catmull_rom: number of point vertices have to be a multiple of 2")
@@ -69,8 +76,8 @@ function rt.Spline._catmull_rom(points, steprate)
         return points
     end
 
-    local firstX, firstY, secondX, secondY = splat(_range(points, 1, 4))
-    local penultX, penultY, lastX, lastY = splat(_range(points, #points-3, 4))
+    local firstX, firstY, secondX, secondY = splat(rt.Spline._range(points, 1, 4))
+    local penultX, penultY, lastX, lastY = splat(rt.Spline._range(points, #points-3, 4))
 
     local spline = {}
     local distances = {0}
@@ -84,10 +91,10 @@ function rt.Spline._catmull_rom(points, steprate)
         if i == 1 then
             p0x, p0y, p1x, p1y, p2x, p2y, p3x, p3y = points[i], points[i+1], points[i], points[i+1], points[i+2], points[i+3], points[i+4], points[i+5]
         elseif i == count-1 then
-            p0x, p0y, p1x, p1y, p2x, p2y = splat(_range(points, #points-5, 6))
+            p0x, p0y, p1x, p1y, p2x, p2y = splat(rt.Spline._range(points, #points-5, 6))
             p3x, p3y = points[#points-1], points[#points]
         else
-            p0x, p0y, p1x, p1y, p2x, p2y, p3x, p3y = splat(_range(points, i-2, 8))
+            p0x, p0y, p1x, p1y, p2x, p2y, p3x, p3y = splat(rt.Spline._range(points, i-2, 8))
         end
 
         for t = 0, 1, 1 / steprate do
@@ -102,7 +109,8 @@ function rt.Spline._catmull_rom(points, steprate)
                 local n = #spline
                 if n > 2 then
                     local x1, y1, x2, y2 = spline[n-3], spline[n-2], spline[n-1], spline[n]
-                    local distance = _length_of(x1, y1, x2, y2)
+                    local width, height = x2 - x1, y2 - y1
+                    local distance = math.sqrt(width*width + height*height)
                     table.insert(distances, distance)
                     total_length = total_length + distance
                 end

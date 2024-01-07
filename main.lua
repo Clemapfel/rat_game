@@ -50,9 +50,19 @@ points = {
 
 points = {}
 rt.random.seed(os.time(os.date("!*t")))
-for i = 1, 6 do
-    table.insert(points, rt.random.number(m, m + w))
-    table.insert(points, rt.random.number(m, m + h))
+
+local n_points = 20
+for i = 1, n_points do
+
+    local r = rt.random.number(0, 300)
+
+    local x, y = love.graphics.getWidth() / 2, love.graphics.getHeight() / 2
+    local angle = (i / n_points) * 360
+    x = x + math.cos(rt.degrees(angle):as_radians()) * r
+    y = y + math.sin(rt.degrees(angle):as_radians()) * r
+
+    table.insert(points, x)
+    table.insert(points, y)
 end
 
 local elapsed = 0
