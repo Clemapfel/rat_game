@@ -13,7 +13,7 @@ end)
 --- @return Number, Number
 function rt.Spline:at(t)
     t = clamp(t, 0, 1)
-    local i = math.floor(t * (#self._vertices / 2)) + 1
+    local i = 1
 
     local length = t * self._length
     while length > 0 and i <= #self._distances do
@@ -26,12 +26,18 @@ function rt.Spline:at(t)
         i = i + 1
     end
 
-    local current = math3d.vec2(self._vertices[i*2-1], self._vertices[i*2])
-    local previous = ternary(i > 2, current, math3d.vec2(self._vertices[i*2-3], self._vertices[i*2-2]))
+    if i >= #self._distances then
+        local n = #self._vertices
+        return self._vertices[n-1], self._vertices[n]
+    end
 
-    local fraction = ternary(i > #self._distances, 1, length / self._distances[i])
-    local final = previous + math3d.vec2(fraction * (current.x - previous.x), fraction * (current.y - previous.y))
-    return final.x, final.y
+    local current_x, current_y = self._vertices[i*2-1], self._vertices[i*2]
+    local previous_x, previous_y = self._vertices[i*2-3], self._vertices[i*2-2]
+
+    if i == 1 then previous_x, previous_y = current_x, current_y end
+
+    local fraction = length / self._distances[i]
+    return math3d.utils.lerp(previous_x, current_x, fraction), math3d.utils.lerp(previous_y, current_y, fraction)
 end
 
 --- @param points Table<Number>
@@ -67,7 +73,7 @@ function rt.Spline._catmull_rom(points, steprate)
     local penultX, penultY, lastX, lastY = splat(_range(points, #points-3, 4))
 
     local spline = {}
-    local distances = {}
+    local distances = {0}
     local total_length = 0
 
     local start, count = 1, #points-2
