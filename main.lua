@@ -120,5 +120,5 @@ love.update = function()
     rt.current_scene:update(delta)
 
     elapsed = elapsed + delta
-    pos_x, pos_y = curve:at(math.fmod(elapsed / 10, 10))
+    pos_x, pos_y = curve:at(math.fmod(elapsed / 100, 10))
 end

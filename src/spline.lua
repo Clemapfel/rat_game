@@ -12,14 +12,26 @@ end)
 
 --- @return Number, Number
 function rt.Spline:at(t)
-    t = math.fmod(t, 1)
+    t = clamp(t, 0, 1)
     local i = math.floor(t * (#self._vertices / 2)) + 1
 
     local length = t * self._length
+    while length > 0 and i <= #self._distances do
+        local distance = self._distances[i]
+        if length - distance <= 0 then
+            break
+        end
 
+        length = length - distance
+        i = i + 1
+    end
 
-    i = clamp(i, 1, (#self._vertices / 2) - 1)
-    return self._vertices[i*2-1], self._vertices[i*2]
+    local current = math3d.vec2(self._vertices[i*2-1], self._vertices[i*2])
+    local previous = ternary(i > 2, current, math3d.vec2(self._vertices[i*2-3], self._vertices[i*2-2]))
+
+    local fraction = ternary(i > #self._distances, 1, length / self._distances[i])
+    local final = previous + math3d.vec2(fraction * (current.x - previous.x), fraction * (current.y - previous.y))
+    return final.x, final.y
 end
 
 --- @param points Table<Number>
