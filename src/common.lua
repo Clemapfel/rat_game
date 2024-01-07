@@ -421,7 +421,12 @@ end
 --- @param pattern string
 --- @return boolean
 function string.contains(str, pattern)
-    return type(string.find(str, pattern)) ~= "nil"
+    return string.find(str, pattern) ~= nil
+end
+
+--- @brief replace expression in string
+function string.replace(str, pattern, replacement)
+    return string.gsub(str, pattern, replacement)
 end
 
 --- @brief map string to 64-bit signed integer
@@ -435,6 +440,55 @@ function string.hash(str)
     end
     return hash
 end
+
+--- @brief interpolate variables from table into string
+--- @param str string
+--- @param environment table
+function string.interpolate(str, environment)
+
+    local values = {}
+    local formatted_string = {}
+    local i = 1
+    while i < #str do
+        local c = string.sub(str, i, i)
+        if c == "$" then
+            local start = i
+
+            i = i + 1
+            if string.sub(str, i, i) ~= "(" then
+                error("In string.interpolate: Invalid interpolation sequence, expected `(`, got `" .. string.sub(str, i, i)  .. "`")
+            end
+
+            while string.sub(str, i, i) ~= ")" do
+                i = i + 1
+                if i > #str then
+                    error("In string.interpolate: Unfinished interpolation sequence, missing `)` in `" .. string.sub(str, start, #str) .. "`")
+                end
+            end
+
+            local expression = string.sub(str, start + 2, i - 1)
+            expression = string.replace(expression, "\\", "")
+
+            local run, error_maybe = load("return " .. expression)
+            if error_maybe ~= nil then
+                error("In string.interpolate: Error evaluating expression `" .. expression .. "`: " .. error_maybe)
+            end
+            table.insert(values, run())
+            table.insert(formatted_string, "%s")
+        else
+            table.insert(formatted_string, c)
+        end
+        i = i + 1
+    end
+
+    return string.format(table.concat(formatted_string), table.unpack(values))
+end
+
+env = {
+    test = 1234
+}
+
+println(string.interpolate("abc $(1234 * 2) tedf $(2 + 4)", env))
 
 --- @brief round to nearest integer
 --- @param i number
