@@ -19,7 +19,24 @@ log:set_margin_top(rt.settings.margin_unit * 2)
 log:set_margin_horizontal(200)
 log:set_margin_bottom(200)
 
-rt.current_scene:set_child(log)
+enemy = bt._generate_debug_entity()
+sprite = bt.EnemySprite(enemy)
+--sprite:set_margin(200)
+rt.current_scene:set_child(sprite)
+
+local size = 10
+image = rt.Image(10, 10)
+for x = 1, size do
+    for y = 1, size do
+        image:set_pixel(x, y, rt.HSVA(x / size, 1, 1, 1))
+    end
+end
+particle_system = love.graphics.newParticleSystem(rt.Texture(image)._native)
+particle_system:setParticleLifetime(0.1, 10)
+particle_system:setEmissionRate(10)
+particle_system:setLinearAcceleration(-100, -100, 100, 100)
+particle_system:setPosition(love.graphics.getWidth() / 2, love.graphics.getHeight() / 2)
+particle_system:start()
 
 local wireframe = false;
 input = rt.add_input_controller(rt.current_scene.window)
@@ -66,10 +83,15 @@ love.load = function()
 end
 
 love.draw = function()
-    love.graphics.clear(1, 0, 1, 1)
-    rt.current_scene:draw()
+    --love.graphics.clear(1, 0, 1, 1)
+    --rt.current_scene:draw()
+
+    love.graphics.draw(particle_system) -- TODO
 end
 
 love.update = function()
-    rt.current_scene:update(love.timer.getDelta())
+    local delta = love.timer.getDelta()
+    rt.current_scene:update(delta)
+
+    particle_system:update(delta) -- TODO
 end

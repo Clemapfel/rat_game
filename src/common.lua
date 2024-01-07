@@ -168,8 +168,12 @@ end
 
 --- @brief expand table to tuple
 function splat(t)
-    assert(type(t) == "table")
-    return table.unpack(t)
+    if table.unpack == nil then
+        assert(unpack ~= nil)
+        return unpack(t)
+    else
+        return table.unpack(t)
+    end
 end
 
 --- @brief wrap tuple in table
@@ -441,17 +445,22 @@ function string.hash(str)
     return hash
 end
 
---- @brief interpolate variables from table into string
+--- @brief evalue all substrings of the form `$(statement)` as code and replace the sequence with the result. If `environment` is specified, that able will be used as each sequences entire environment, otherwise _G is used
 --- @param str string
---- @param environment table
+--- @param environment table or nil
 function string.interpolate(str, environment)
 
     local values = {}
     local formatted_string = {}
     local i = 1
+
     while i < #str do
         local c = string.sub(str, i, i)
-        if c == "$" then
+
+        if c == string._interpolation_escape_character then
+            i = i + 1
+            table.insert(formatted_string, string.sub(str, i, i))
+        elseif c == string._interpolation_character then
             local start = i
 
             i = i + 1
@@ -459,7 +468,21 @@ function string.interpolate(str, environment)
                 error("In string.interpolate: Invalid interpolation sequence, expected `(`, got `" .. string.sub(str, i, i)  .. "`")
             end
 
-            while string.sub(str, i, i) ~= ")" do
+            -- find last bracket of expression
+            local bracket_weight = 0
+            while true do
+                local current = string.sub(str, i, i)
+
+                if current == string._interpolation_escape_character then
+                    -- continue
+                elseif current == ")" then
+                    bracket_weight = bracket_weight - 1
+                elseif current == "(" then
+                    bracket_weight = bracket_weight + 1
+                end
+
+                if bracket_weight <= 0 then break end
+
                 i = i + 1
                 if i > #str then
                     error("In string.interpolate: Unfinished interpolation sequence, missing `)` in `" .. string.sub(str, start, #str) .. "`")
@@ -467,28 +490,31 @@ function string.interpolate(str, environment)
             end
 
             local expression = string.sub(str, start + 2, i - 1)
-            expression = string.replace(expression, "\\", "")
-
             local run, error_maybe = load("return " .. expression)
             if error_maybe ~= nil then
                 error("In string.interpolate: Error evaluating expression `" .. expression .. "`: " .. error_maybe)
             end
-            table.insert(values, run())
-            table.insert(formatted_string, "%s")
+
+            if environment ~= nil then
+                debug.setfenv(run, environment)
+            end
+
+            local value = run()
+            if value ~= nil then
+                table.insert(values, value)
+                table.insert(formatted_string, "%s")
+            end
         else
             table.insert(formatted_string, c)
         end
         i = i + 1
     end
 
-    return string.format(table.concat(formatted_string), table.unpack(values))
+    return string.format(table.concat(formatted_string), splat(values))
 end
 
-env = {
-    test = 1234
-}
-
-println(string.interpolate("abc $(1234 * 2) tedf $(2 + 4)", env))
+string._interpolation_character = "$"
+string._interpolation_escape_character = "//"
 
 --- @brief round to nearest integer
 --- @param i number
@@ -500,7 +526,7 @@ end
 --- @brief get minimum and maximum of table
 function table.min_max(t)
     local min, max = POSITIVE_INFINITY, NEGATIVE_INFINITY
-    for key, value in pairs(t) do
+    for _, value in pairs(t) do
         if value < min then min = value end
         if value > max then max = value end
     end
@@ -535,11 +561,6 @@ function table.compare(left, right)
     end
 
     return true
-end
-
-if table.unpack == nil then -- reassign on some luajit versions
-    assert(unpack ~= nil)
-    table.unpack = unpack
 end
 
 --- @brief iterate integer range

@@ -201,7 +201,7 @@ end)
 function rt.Points:draw()
     if not self:get_is_visible() then return end
     self:_bind()
-    love.graphics.points(table.unpack(self._vertices))
+    love.graphics.points(splat(self._vertices))
     self:_unbind()
 end
 
@@ -271,9 +271,9 @@ function rt.LineStrip:draw()
         end
         table.insert(vertices, self._vertices[1])
         table.insert(vertices, self._vertices[2])
-        love.graphics.line(table.unpack(vertices))
+        love.graphics.line(splat(vertices))
     else
-        love.graphics.line(table.unpack(self._vertices))
+        love.graphics.line(splat(self._vertices))
     end
     self._unbind()
 end
@@ -523,7 +523,7 @@ end
 function rt.Polygon:draw()
     if not self:get_is_visible() then return end
     self:_bind()
-    love.graphics.polygon(self:_get_draw_mode(), table.unpack(self._vertices))
+    love.graphics.polygon(self:_get_draw_mode(), splat(self._vertices))
     self._unbind()
 end
 
@@ -536,7 +536,7 @@ end)
 --- @overload
 function rt.Dots:draw()
     self:_bind()
-    love.graphics.points(table.unpack(self._points))
+    love.graphics.points(splat(self._points))
     self:_unbind()
 end
 

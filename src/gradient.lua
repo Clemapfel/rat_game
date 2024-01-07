@@ -213,7 +213,7 @@ rt.CircularGradient = meta.new_type("CircularGradient", function(center_x, cente
         angle = angle + step
     end
 
-    out._shape = rt.VertexShape(table.unpack(vertices))
+    out._shape = rt.VertexShape(splat(vertices))
     out:_update_color()
     return out
 end)

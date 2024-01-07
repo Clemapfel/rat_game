@@ -110,6 +110,14 @@ function rt.test.common()
         i = i + 1
     end
     assert(i == 4)
+
+    --- string.interpolate
+    local env = {
+        user = {
+            attack = 1234
+        }
+    }
+    assert(string.interpolate("$(user.attack * 2)", env) == "2468")
 end
 
 

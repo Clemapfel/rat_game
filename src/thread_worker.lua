@@ -54,9 +54,6 @@ while true do
         end
     elseif message.type == rt.MessageType.INVOKE then
 
-
-
-
         local value = {}
         local error_occurred = false
         local error_maybe = nil

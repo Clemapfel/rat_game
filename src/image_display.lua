@@ -37,17 +37,9 @@ function rt.ImageDisplay:size_allocate(x, y, width, height)
     self._shape:set_texture_rectangle(rt.AABB(0, 0, 1, 1))
 end
 
---- @overload rt.Widget.measure
-function rt.ImageDisplay:measure()
-    return math.max(self._resolution.x, self._minimum_width) + self:get_margin_left() + self:get_margin_right(),
-           math.max(self._resolution.y, self._minimum_height) + self:get_margin_top() + self:get_margin_bottom()
-end
-
 --- @brief update texture
 --- @param image rt.Image
 function rt.ImageDisplay:create_from_image(image)
-
-
     self._texture:create_from_image(image)
     local w, h = image:get_size()
     self._resolution = rt.Vector2(w, h)

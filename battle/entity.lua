@@ -16,7 +16,47 @@ bt.Entity = meta.new_type("Entity", function(id)
 
     local config = config_file()
     local out = meta.new(bt.Entity, {
-        id = id
+        id = id,
+
+        -- cleartext name
+        name = "",
+        description = "(no description)",
+        is_enemy = false,
+
+        -- sprite IDs
+        portrait = "default",
+        battle_sprite = "default",
+
+        -- HP stat
+        hp_base = 1,
+        hp_ev = 0,
+        hp_current = 1,
+
+        -- ATK stat
+        attack_base = 0,
+        attack_ev = 0,
+        attack_level = 0,
+
+        -- DEF stat
+        defense_base = 0,
+        defense_ev = 0,
+        defense_level = 0,
+
+        -- SPD stat
+        speed_base = 0,
+        speed_ev = 0,
+        speed_level = 0,
+
+        -- moves
+        moveset = {},                -- bt.Action -> n_uses
+        n_move_slots = POSITIVE_INFINITY,
+
+        -- equipment
+        n_equip_slots = 2,
+        equipment = {},              -- slot_index -> rt.Equipment
+
+        -- status
+        status_ailments = {}        -- rt.StatusAilment -> Elapsed
     }, rt.SignalEmitter)
 
     out:signal_add("changed")
@@ -63,47 +103,9 @@ function bt._generate_debug_entity()
         entity[which .. "_level"] = rt.random.choose({0, 0, 0, 0, -1, 1})
     end
 
+    entity.is_enemy = true
     return entity
 end
-
--- cleartext name
-bt.Entity.name = ""
-bt.Entity.description = "(no description)"
-
--- sprite IDs
-bt.Entity.portrait = "default"
-bt.Entity.battle_sprite = "default"
-
--- HP stat
-bt.Entity.hp_base = 1
-bt.Entity.hp_ev = 0
-bt.Entity.hp_current = 1
-
--- ATK stat
-bt.Entity.attack_base = 0
-bt.Entity.attack_ev = 0
-bt.Entity.attack_level = 0
-
--- DEF stat
-bt.Entity.defense_base = 0
-bt.Entity.defense_ev = 0
-bt.Entity.defense_level = 0
-
--- SPD stat
-bt.Entity.speed_base = 0
-bt.Entity.speed_ev = 0
-bt.Entity.speed_level = 0
-
--- moves
-bt.Entity.moveset = {}                -- bt.Action -> n_uses
-bt.Entity.n_move_slots = POSITIVE_INFINITY
-
--- equipment
-bt.Entity.n_equip_slots = 2
-bt.Entity.equipment = {}              -- slot_index -> rt.Equipment
-
--- status
-bt.Entity.status_ailments = {}        -- rt.StatusAilment -> Elapsed
 
 -- stat level to factor
 rt.settings.entity.level_to_factor = {}

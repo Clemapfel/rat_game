@@ -139,6 +139,7 @@ require "battle.action_selection_menu"
 require "battle.inventory_menu"
 require "battle.order_queue"
 require "battle.battle_transition"
+require "battle.enemy_sprite"
 
 require "scene"
 -- require "test

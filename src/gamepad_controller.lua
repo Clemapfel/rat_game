@@ -142,7 +142,7 @@ function rt.GamepadHandler.get_axes(controller_id, ...)
     for which in range(...) do
         table.insert(out, axes[which])
     end
-    return table.unpack(out)
+    return splat(out)
 end
 
 --- @brief add a gamepad controller

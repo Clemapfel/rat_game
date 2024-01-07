@@ -1,10 +1,9 @@
 --- @class rt.FlowLayout
---- @brief container that automatically redistributes it's children across as many rows/columns as necessary
+--- @brief container that automatically redistributes its children across as many rows/columns as necessary
 rt.FlowLayout = meta.new_type("FlowLayout", function(orientation)
     if meta.is_nil(orientation) then
         orientation = rt.Orientation.VERTICAL
     end
-
 
     return meta.new(rt.FlowLayout, {
         _children = rt.List(),

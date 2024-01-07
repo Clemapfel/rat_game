@@ -96,15 +96,15 @@ function rt.LevelBar:draw()
         love.graphics.setLineWidth(thickness)
         love.graphics.setColor(outline_color.r, outline_color.g, outline_color.b, outline_color.a)
         love.graphics.translate(-thickness, 0)
-        love.graphics.line(table.unpack(mark.line))
+        love.graphics.line(splat(mark.line))
         love.graphics.translate( 2 * thickness, 0)
-        love.graphics.line(table.unpack(mark.line))
+        love.graphics.line(splat(mark.line))
         love.graphics.translate(-thickness, 0)
         love.graphics.setColor(1, 1, 1, 1)
         ]]--
         love.graphics.setColor(outline_color.r, outline_color.g, outline_color.b, outline_color.a)
         love.graphics.setLineWidth(rt.settings.level_bar.outline_width)
-        love.graphics.line(table.unpack(mark.line))
+        love.graphics.line(splat(mark.line))
     end
     love.graphics.pop()
 

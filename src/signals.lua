@@ -103,7 +103,7 @@ function rt.SignalComponent:emit(name, ...)
     for id, callback in pairs(signal.callbacks) do
         local args = {...}
         table.insert(args, signal.data[id])
-        res = callback(self._instance, table.unpack(args))
+        res = callback(self._instance, splat(args))
     end
     return res
 end
