@@ -38,16 +38,27 @@ particle_system:setLinearAcceleration(-100, -100, 100, 100)
 particle_system:setPosition(love.graphics.getWidth() / 2, love.graphics.getHeight() / 2)
 particle_system:start()
 
-local m = 100
+local m = 50
 local w, h = love.graphics.getWidth() - 2 * m, love.graphics.getHeight() - 2 * m
 
-curve = rt.Spline({
-    m, m,
-    m + w, m,
-    m + w, m + h,
-    m, m + h,
-    m, m, 0
-})
+points = {
+   m, m,
+   m + w, m,
+   m + w, m + h,
+   m, m + h,
+}
+
+points = {}
+rt.random.seed(os.time(os.date("!*t")))
+for i = 1, 6 do
+    table.insert(points, rt.random.number(m, m + w))
+    table.insert(points, rt.random.number(m, m + h))
+end
+
+local elapsed = 0
+local pos_x, pos_y = points[1], points[2]
+curve = rt.Spline(points)
+
 
 local wireframe = false;
 input = rt.add_input_controller(rt.current_scene.window)
@@ -97,10 +108,17 @@ love.draw = function()
     --love.graphics.clear(1, 0, 1, 1)
     --rt.current_scene:draw()
 
+    love.graphics.setLineWidth(1)
     curve:draw()
+
+    love.graphics.setPointSize(10)
+    love.graphics.points(pos_x, pos_y)
 end
 
 love.update = function()
     local delta = love.timer.getDelta()
     rt.current_scene:update(delta)
+
+    elapsed = elapsed + delta
+    pos_x, pos_y = curve:at(math.fmod(elapsed / 10, 10))
 end

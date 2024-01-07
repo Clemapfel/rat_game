@@ -35,7 +35,8 @@ end
 --- @param max Number
 --- @return Number
 function rt.random.number(min, max)
-    return min + rt.rand() * max
+    local lower, upper = math.min(min, max), math.max(min, max)
+    return lower + rt.rand() * (upper - lower)
 end
 
 --- @brief pick random element from table
