@@ -62,10 +62,11 @@ end
 
 --- @param points Table<Number>
 --- @param steprate Number n steps per segment
-function rt.Spline._catmull_rom(points, steprate)
+function rt.Spline._catmull_rom(points, steprate, loop)
 
     -- source: https://gist.github.com/HoraceBury/4afb0e68cd807d8ead220a709219db2e
 
+    loop = which(loop, false)
     steprate = clamp(steprate, 1)
 
     if #points % 2 ~= 0 then

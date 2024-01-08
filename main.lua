@@ -57,49 +57,30 @@ for i = 1, n_points do
     table.insert(points, x)
     table.insert(points, y)
 end
+local n = #points
+previous = rt.Spline(points)
 
-local a1_x, a1_y = points[1], points[2]
-local a2_x, a2_y = points[3], points[4]
+function update_spline(offset)
 
-local b1_x, b1_y = points[#points-1], points[#points]
-local b2_x, b2_y = points[#points-3], points[#points-2]
+    if offset == 0 then current = rt.Spline(points); return end
 
-points_a = {}
-points_b = {}
+    final_points = {}
+    for x in step_range(offset * 2, 1, -1) do
+        table.insert(final_points, points[n - (x-1)])
+    end
 
-local n = #points / 2
-local indices = {}--{n-1, n}
-for i in step_range(1, n, 2) do
-    table.insert(indices, i)
+    for _, x in pairs(points) do
+        --table.insert(final_points, x)
+    end
+
+    for x in step_range(1, offset*2, 1) do
+        table.insert(final_points, points[x])
+    end
+
+    current = rt.Spline(final_points)
 end
-
-for _, i in pairs(indices) do
-    table.insert(points_a, points[i])
-    table.insert(points_a, points[i+1])
-end
-
-points_b = {}
-indices = {}
-for i in step_range(1, n, 2) do
-    table.insert(indices, i)
-end
-
-for _, i in pairs(indices) do
-    table.insert(points_b, points[i])
-    table.insert(points_b, points[i+1])
-end
-
---[[
-table.insert(points_b, points[1])
-table.insert(points_b, points[2])
-]]--
-
-for x in range(b2_x, b2_y, b1_x, b1_y) do
-    table.insert(points_b, x)
-end
-
-curve_a = rt.Spline(points_a)
-curve_b = rt.Spline(points_b)
+current_offset = 0
+update_spline(current_offset)
 
 local wireframe = false;
 input = rt.add_input_controller(rt.current_scene.window)
@@ -107,12 +88,8 @@ input:signal_connect("pressed", function(self, which)
 
     local speed = 0.1
     if which == rt.InputButton.A then
-        local str = {}
-        for i = 1, rt.random.integer(4) do
-            table.insert(str, rt.random.string(rt.random.integer(4, 7)))
-            table.insert(str, " ")
-        end
-        log:push_back("<wave>" .. string.rep("_", #str)  .. "</wave>")
+        current_offset = current_offset + 1
+        update_spline(current_offset)
     elseif which == rt.InputButton.B then
     elseif which == rt.InputButton.X then
     elseif which == rt.InputButton.Y then
@@ -149,13 +126,22 @@ love.draw = function()
     --love.graphics.clear(1, 0, 1, 1)
     --rt.current_scene:draw()
 
-    love.graphics.setLineWidth(1)
-
-    love.graphics.setColor(1, 0, 1, 0.5)
-    curve_a:draw()
-
+    love.graphics.setLineWidth(3)
     love.graphics.setColor(0, 1, 1, 0.5)
-    curve_b:draw()
+    previous:draw()
+
+    love.graphics.setLineWidth(5)
+    love.graphics.setColor(1, 0, 0, 0.5)
+    current:draw()
+
+    love.graphics.setPointSize(3)
+    love.graphics.setColor(1, 1, 1, 1)
+    love.graphics.points(splat(points))
+
+    love.graphics.setPointSize(5)
+    love.graphics.setColor(1, 0, 0, 1)
+    love.graphics.points(points[1], points[2], points[#points-1], points[#points])
+
 end
 
 love.update = function()
