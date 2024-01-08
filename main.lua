@@ -58,7 +58,7 @@ for i = 1, n_points do
     table.insert(points, y)
 end
 local n = #points
-previous = rt.Spline(points)
+previous = rt.Spline(points, true)
 
 function update_spline(offset)
 

@@ -1,7 +1,7 @@
 --- @class rt.Spline
 --- @brief catmull-rom spline, c1 continuous and goes through every control point
-rt.Spline = meta.new_type("Spline", function(points)
-    local vertices, distances, total_length = rt.Spline._catmull_rom(points, 20)
+rt.Spline = meta.new_type("Spline", function(points, loop)
+    local vertices, distances, total_length = rt.Spline._catmull_rom(points, 20, loop)
     local out = meta.new(rt.Spline, {
         _vertices = vertices,
         _distances = distances,
@@ -62,6 +62,7 @@ end
 
 --- @param points Table<Number>
 --- @param steprate Number n steps per segment
+--- @param loop Boolean
 function rt.Spline._catmull_rom(points, steprate, loop)
 
     -- source: https://gist.github.com/HoraceBury/4afb0e68cd807d8ead220a709219db2e
@@ -117,6 +118,29 @@ function rt.Spline._catmull_rom(points, steprate, loop)
                 end
             end
         end
+    end
+
+    if loop then
+        local offset = 5
+        local loop_points = {}
+
+        for x in step_range(offset * 2, 1, -1) do
+            table.insert(loop_points, points[#points - (x-1)])
+        end
+
+        for x in step_range(1, offset*2, 1) do
+            table.insert(loop_points, points[x])
+        end
+
+        local loop_splines = rt.Spline(loop_points, false)
+
+        for i = 1, #loop_splines._distances do
+            table.insert(spline, loop_splines._vertices[i * 2])
+            table.insert(spline, loop_splines._vertices[i * 2 - 1])
+            table.insert(distances, loop_splines._distances)
+        end
+
+        total_length = total_length + loop_splines._length
     end
 
     return spline, distances, total_length
