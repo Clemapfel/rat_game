@@ -41,20 +41,13 @@ particle_system:start()
 local m = 50
 local w, h = love.graphics.getWidth() - 2 * m, love.graphics.getHeight() - 2 * m
 
-points = {
-   m, m,
-   m + w, m,
-   m + w, m + h,
-   m, m + h,
-}
-
 points = {}
 rt.random.seed(os.time(os.date("!*t")))
 
 local n_points = 20
 for i = 1, n_points do
 
-    local r = rt.random.number(0, 300)
+    local r = rt.random.number(200, 300)
 
     local x, y = love.graphics.getWidth() / 2, love.graphics.getHeight() / 2
     local angle = (i / n_points) * 360
@@ -65,10 +58,48 @@ for i = 1, n_points do
     table.insert(points, y)
 end
 
-local elapsed = 0
-local pos_x, pos_y = points[1], points[2]
-curve = rt.Spline(points)
+local a1_x, a1_y = points[1], points[2]
+local a2_x, a2_y = points[3], points[4]
 
+local b1_x, b1_y = points[#points-1], points[#points]
+local b2_x, b2_y = points[#points-3], points[#points-2]
+
+points_a = {}
+points_b = {}
+
+local n = #points / 2
+local indices = {}--{n-1, n}
+for i in step_range(1, n, 2) do
+    table.insert(indices, i)
+end
+
+for _, i in pairs(indices) do
+    table.insert(points_a, points[i])
+    table.insert(points_a, points[i+1])
+end
+
+points_b = {}
+indices = {}
+for i in step_range(1, n, 2) do
+    table.insert(indices, i)
+end
+
+for _, i in pairs(indices) do
+    table.insert(points_b, points[i])
+    table.insert(points_b, points[i+1])
+end
+
+--[[
+table.insert(points_b, points[1])
+table.insert(points_b, points[2])
+]]--
+
+for x in range(b2_x, b2_y, b1_x, b1_y) do
+    table.insert(points_b, x)
+end
+
+curve_a = rt.Spline(points_a)
+curve_b = rt.Spline(points_b)
 
 local wireframe = false;
 input = rt.add_input_controller(rt.current_scene.window)
@@ -119,16 +150,15 @@ love.draw = function()
     --rt.current_scene:draw()
 
     love.graphics.setLineWidth(1)
-    curve:draw()
 
-    love.graphics.setPointSize(10)
-    love.graphics.points(pos_x, pos_y)
+    love.graphics.setColor(1, 0, 1, 0.5)
+    curve_a:draw()
+
+    love.graphics.setColor(0, 1, 1, 0.5)
+    curve_b:draw()
 end
 
 love.update = function()
     local delta = love.timer.getDelta()
     rt.current_scene:update(delta)
-
-    elapsed = elapsed + delta
-    pos_x, pos_y = curve:at(elapsed)
 end
