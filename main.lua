@@ -119,7 +119,7 @@ love.draw = function()
     love.graphics.setColor(1, 0, 0, 1)
     love.graphics.points(points[1], points[2], points[#points-1], points[#points])
 
-    local pos_x, pos_y = curve:at(math.fmod(elapsed / 10sp, 1))
+    local pos_x, pos_y = curve:at(math.fmod(elapsed / 10, 1))
     love.graphics.circle("fill", pos_x, pos_y, 10)
 end
 

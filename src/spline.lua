@@ -1,9 +1,12 @@
-rt.settings.spline.loop_interpolation_quality = 5 -- number of vertices used to compute the loop-closing segment
+rt.settings.spline = {
+    steprate = 1, -- number of vertices per spline segment
+    loop_interpolation_quality = 5, -- number of vertices used to compute the loop-closing segment
+}
 
 --- @class rt.Spline
 --- @brief catmull-rom spline, c1 continuous and goes through every control point
 rt.Spline = meta.new_type("Spline", function(points, loop)
-    local vertices, distances, total_length = rt.Spline._catmull_rom(points, 20, loop)
+    local vertices, distances, total_length = rt.Spline._catmull_rom(points, loop)
     local out = meta.new(rt.Spline, {
         _vertices = vertices,
         _distances = distances,
@@ -65,10 +68,11 @@ end
 --- @param points Table<Number>
 --- @param steprate Number n steps per segment
 --- @param loop Boolean
-function rt.Spline._catmull_rom(points, steprate, loop)
+function rt.Spline._catmull_rom(points, loop)
 
     -- source: https://gist.github.com/HoraceBury/4afb0e68cd807d8ead220a709219db2e
 
+    meta.assert_boolean(loop)
 
     function _length_of(x1, y1, x2, y2)
         local width, height = x2 - x1, y2 - y1
@@ -76,7 +80,7 @@ function rt.Spline._catmull_rom(points, steprate, loop)
     end
 
     loop = which(loop, false)
-    steprate = clamp(steprate, 1)
+    local steprate = clamp(rt.settings.spline.steprate, 1)
 
     if #points % 2 ~= 0 then
         rt.error("In rt.Spline._catmull_rom: number of point vertices have to be a multiple of 2")
