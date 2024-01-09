@@ -1,12 +1,14 @@
-
-if package.path == nil then package.path = "" end
 RESOURCE_PATH = love.filesystem.getSource()
-package.path = package.path .. ";" .. RESOURCE_PATH .. "/src/?.lua"
-package.path = package.path .. ";" .. RESOURCE_PATH .. "/battle/?.lua"
-package.path = package.path .. ";" .. RESOURCE_PATH .. "/?.lua"
-
-package.path = package.path .. ";" .. RESOURCE_PATH .. "/submodules/luafft/src/?.lua"
-love.filesystem.setRequirePath(package.path)
+do
+    local paths = {
+        ";?.lua",
+        ";src/?.lua",
+        ";battle/?.lua",
+        ";submodules/?/init.lua",
+        ";submodules/luafft/src/?.lua"
+    }
+    love.filesystem.setRequirePath(love.filesystem.getRequirePath() .. table.concat(paths))
+end
 
 rt = {}
 rt.test = {}
@@ -29,7 +31,6 @@ setmetatable(bt, {
 
 -- submodules
 math3d = require "submodules.cpml"
-
 fft = require "luafft"
 complex = require "complex"
 
