@@ -227,3 +227,46 @@ end
 function rt.Spline:draw()
     love.graphics.line(splat(self._vertices))
 end
+
+--- @brief [internal]
+function rt.test.spline()
+
+    local m = 50
+    local w, h = love.graphics.getWidth() - 2 * m, love.graphics.getHeight() - 2 * m
+
+    points = {}
+    rt.random.seed(os.time(os.date("!*t")))
+
+    local n_points = 20
+    for i = 1, n_points do
+
+        local r = rt.random.number(200, 300)
+
+        local x, y = love.graphics.getWidth() / 2, love.graphics.getHeight() / 2
+        local angle = (i / n_points) * 360
+        x = x + math.cos(rt.degrees(angle):as_radians()) * r
+        y = y + math.sin(rt.degrees(angle):as_radians()) * r
+
+        table.insert(points, x)
+        table.insert(points, y)
+    end
+
+    local loop = false
+    curve = rt.Spline(points, loop)
+
+
+    love.graphics.setLineWidth(3)
+    love.graphics.setColor(0, 1, 1, 0.5)
+    curve:draw()
+
+    love.graphics.setPointSize(3)
+    love.graphics.setColor(1, 1, 1, 1)
+    love.graphics.points(splat(points))
+
+    love.graphics.setPointSize(5)
+    love.graphics.setColor(1, 0, 0, 1)
+    love.graphics.points(points[1], points[2], points[#points-1], points[#points])
+
+    local pos_x, pos_y = curve:at(math.fmod(elapsed / 10, 1))
+    love.graphics.circle("fill", pos_x, pos_y, 10)
+end

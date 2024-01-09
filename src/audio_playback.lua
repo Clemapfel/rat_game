@@ -10,7 +10,6 @@ rt.AudioPlaybackMode = meta.new_enum({
 rt.AudioPlayback = meta.new_type("AudioPlayback", function(filename_or_audio, mode)
     if meta.is_nil(mode) then mode = rt.AudioPlaybackMode.FROM_MEMORY end
 
-
     local native, data = {}, {}
     if meta.is_string(filename_or_audio) then
         native = love.audio.newSource(filename_or_audio, mode)
@@ -29,19 +28,16 @@ end)
 
 --- @brief start playback from current position
 function rt.AudioPlayback:play()
-
     self._native:play()
 end
 
 --- @brief pause playback, retains current position
 function rt.AudioPlayback:pause()
-
     self._native:pause()
 end
 
 --- @brief stop playback, rewinds to start
 function rt.AudioPlayback:reset()
-
     self._native:seek(0)
 end
 
@@ -81,8 +77,6 @@ end
 --- @brief set volume
 --- @param v Number in [0, 1]
 function rt.AudioPlayback:set_volume(value)
-
-
     if value < 0 or value > 1 then
         rt.error("In AudioPlayback:set_volume: Value `" .. tostring(value) .. "` is outside [0, 1]")
     end
@@ -92,6 +86,11 @@ end
 --- @brief get volume
 --- @return Number in [0, 1]
 function rt.AudioPlayback:get_volume()
-
     return self._native:getVolume()
+end
+
+--- @brief get whether currently playing
+--- @return Boolean
+function rt.AudioPlayback:get_is_playing()
+    return self._native:isPlaying()
 end

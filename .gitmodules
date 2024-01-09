@@ -4,3 +4,6 @@
 [submodule "cpml"]
 	path = cpml
 	url = https://github.com/excessive/cpml
+[submodule "submodules/luafft"]
+	path = submodules/luafft
+	url = https://github.com/h4rm/luafft

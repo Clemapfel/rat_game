@@ -35,8 +35,6 @@ end)
 --- @brief load from file
 --- @param file String
 function rt.Audio:create_from_file(file)
-
-
     self._native = love.sound.newSoundData(file)
 end
 
@@ -51,7 +49,6 @@ function rt.Audio:create(duration_or_n_samples)
             rt.settings.audio.data_n_channels
         )
     else
-
         self._native = love.sound.newSoundData(
             duration_or_n_samples,
             rt.settings.audio.default_sample_rate,
@@ -65,8 +62,6 @@ end
 --- @param index Number 1-based
 --- @param value Number in [-1, 1]
 function rt.Audio:set_sample(i, value)
-
-
 
     if value < -1 or value > 1 then
         rt.warning("In rt.Audio.set_sample: Value `".. tostring(value) .. "` is outside of [-1, 1]")
@@ -85,8 +80,6 @@ end
 --- @param index Number 1-based
 --- @return Number
 function rt.Audio:get_sample(i)
-
-
 
     local n_samples = self:get_n_samples()
     if i < 1 or i > n_samples then

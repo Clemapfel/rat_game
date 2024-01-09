@@ -1,7 +1,12 @@
+
+if package.path == nil then package.path = "" end
 RESOURCE_PATH = love.filesystem.getSource()
 package.path = package.path .. ";" .. RESOURCE_PATH .. "/src/?.lua"
 package.path = package.path .. ";" .. RESOURCE_PATH .. "/battle/?.lua"
 package.path = package.path .. ";" .. RESOURCE_PATH .. "/?.lua"
+
+package.path = package.path .. ";" .. RESOURCE_PATH .. "/submodules/luafft/src/?.lua"
+love.filesystem.setRequirePath(package.path)
 
 rt = {}
 rt.test = {}
@@ -22,7 +27,11 @@ setmetatable(bt, {
     end
 })
 
-math3d = require("submodules.cpml")
+-- submodules
+math3d = require "submodules.cpml"
+
+fft = require "luafft"
+complex = require "complex"
 
 require "common"
 
@@ -74,6 +83,7 @@ require "font"
 require "glyph"
 require "audio"
 require "audio_playback"
+require "fourier_transform"
 require "spline"
 require "gamepad_controller"
 require "keyboard_controller"
