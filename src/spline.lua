@@ -1,3 +1,5 @@
+rt.settings.spline.loop_interpolation_quality = 5 -- number of vertices used to compute the loop-closing segment
+
 --- @class rt.Spline
 --- @brief catmull-rom spline, c1 continuous and goes through every control point
 rt.Spline = meta.new_type("Spline", function(points, loop)
@@ -67,6 +69,12 @@ function rt.Spline._catmull_rom(points, steprate, loop)
 
     -- source: https://gist.github.com/HoraceBury/4afb0e68cd807d8ead220a709219db2e
 
+
+    function _length_of(x1, y1, x2, y2)
+        local width, height = x2 - x1, y2 - y1
+        return math.sqrt(width*width + height*height)
+    end
+
     loop = which(loop, false)
     steprate = clamp(steprate, 1)
 
@@ -75,8 +83,27 @@ function rt.Spline._catmull_rom(points, steprate, loop)
     end
 
     if (#points < 6) then
-        return points
+        local distances = {}
+        local total_length = 0
+
+        local i = 1
+        local x1 = points[i]
+        local y1 = points[i+1]
+        local x2 = points[i+2]
+        local y2 = points[i+3]
+
+        local distances = {
+            0,
+            _length_of(x1, y1, x2, y2)
+        }
+
+        local total_length = 0
+        for _, k in pairs(distances) do
+            total_length = total_length + k
+        end
+        return points, distances, total_length
     end
+
 
     local firstX, firstY, secondX, secondY = splat(rt.Spline._range(points, 1, 4))
     local penultX, penultY, lastX, lastY = splat(rt.Spline._range(points, #points-3, 4))
@@ -111,8 +138,7 @@ function rt.Spline._catmull_rom(points, steprate, loop)
                 local n = #spline
                 if n > 2 then
                     local x1, y1, x2, y2 = spline[n-3], spline[n-2], spline[n-1], spline[n]
-                    local width, height = x2 - x1, y2 - y1
-                    local distance = math.sqrt(width*width + height*height)
+                    local distance = _length_of(x1, y1, x2, y2)
                     table.insert(distances, distance)
                     total_length = total_length + distance
                 end
@@ -121,27 +147,74 @@ function rt.Spline._catmull_rom(points, steprate, loop)
     end
 
     if loop then
-        local offset = 5
+        local offset = rt.settings.spline.loop_interpolation_quality
         local loop_points = {}
 
-        for x in step_range(offset * 2, 1, -1) do
-            table.insert(loop_points, points[#points - (x-1)])
+        for i in step_range(offset * 2, 1, -1) do
+            table.insert(loop_points, points[#points - (i-1)])
         end
 
-        for x in step_range(1, offset*2, 1) do
-            table.insert(loop_points, points[x])
+        for i in step_range(1, offset*2, 1) do
+            table.insert(loop_points, points[i])
         end
 
-        local loop_splines = rt.Spline(loop_points, false)
+        local loop_spline = rt.Spline(loop_points, false)
 
-        for i = 1, #loop_splines._distances do
-            table.insert(spline, loop_splines._vertices[i * 2])
-            table.insert(spline, loop_splines._vertices[i * 2 - 1])
-            table.insert(distances, loop_splines._distances)
+        for i = 1, steprate * 2, 1 do
+
+            -- replace first segment
+            spline[i] = loop_spline._vertices[#(loop_spline._vertices) - (offset - 1) * (2 * steprate) + i]
+
+            if i % 2 == 0 then
+                local current = distances[i / 2]
+                local next = loop_spline._distances[#(loop_spline._distances) - (offset - 1) * steprate + i / 2]
+                distances[i / 2] = next
+                total_length = total_length - current + next
+            end
+
+            -- replace last segment
+            spline[#spline - 2 * steprate + i] = loop_spline._vertices[#loop_spline._vertices - (offset + 1) * (2 * steprate) + i]
+
+            if i % 2 == 0 then
+                local distance_i = #distances - steprate + i / 2
+                local current = distances[distance_i]
+                local next = loop_spline._distances[#loop_spline._distances - (offset + 1) * steprate + i / 2]
+                distances[distance_i] = next
+                total_length = total_length - current + next
+            end
         end
 
-        total_length = total_length + loop_splines._length
+        -- append final, loop-closing segment
+        for i = 1, steprate * 2 do
+
+            local vertex_i = #loop_spline._vertices - (offset + 0) * (2 * steprate) + i;
+            table.insert(spline, loop_spline._vertices[vertex_i])
+
+            if i % 2 == 0 then
+                local distance = loop_spline._distances[vertex_i / 2]
+                table.insert(distances, distance)
+                total_length = total_length + distance
+            end
+        end
     end
+
+    --[[ tests
+    local sum = 0
+    for _, d in pairs(distances) do
+        sum = sum + d
+    end
+    assert(sum == total_length)
+
+    local new_distances = {0}
+    for i = 1, #spline - 2, 2 do
+        local x1, y1 = spline[i], spline[i+1]
+        local x2, y2 = spline[i+2], spline[i+3]
+        table.insert(new_distances, _length_of(x1, y1, x2, y2))
+    end
+
+    assert(#new_distances == #distances)
+    assert(table.compare(distances, new_distances))
+    ]]--
 
     return spline, distances, total_length
 end

@@ -57,30 +57,11 @@ for i = 1, n_points do
     table.insert(points, x)
     table.insert(points, y)
 end
-local n = #points
-previous = rt.Spline(points, true)
 
-function update_spline(offset)
+local loop = false
+curve = rt.Spline(points, loop)
 
-    if offset == 0 then current = rt.Spline(points); return end
-
-    final_points = {}
-    for x in step_range(offset * 2, 1, -1) do
-        table.insert(final_points, points[n - (x-1)])
-    end
-
-    for _, x in pairs(points) do
-        --table.insert(final_points, x)
-    end
-
-    for x in step_range(1, offset*2, 1) do
-        table.insert(final_points, points[x])
-    end
-
-    current = rt.Spline(final_points)
-end
-current_offset = 0
-update_spline(current_offset)
+elapsed = 0
 
 local wireframe = false;
 input = rt.add_input_controller(rt.current_scene.window)
@@ -88,8 +69,8 @@ input:signal_connect("pressed", function(self, which)
 
     local speed = 0.1
     if which == rt.InputButton.A then
-        current_offset = current_offset + 1
-        update_spline(current_offset)
+        loop = not loop
+        curve = rt.Spline(points, not loop)
     elseif which == rt.InputButton.B then
     elseif which == rt.InputButton.X then
     elseif which == rt.InputButton.Y then
@@ -128,11 +109,7 @@ love.draw = function()
 
     love.graphics.setLineWidth(3)
     love.graphics.setColor(0, 1, 1, 0.5)
-    previous:draw()
-
-    love.graphics.setLineWidth(5)
-    love.graphics.setColor(1, 0, 0, 0.5)
-    current:draw()
+    curve:draw()
 
     love.graphics.setPointSize(3)
     love.graphics.setColor(1, 1, 1, 1)
@@ -142,9 +119,13 @@ love.draw = function()
     love.graphics.setColor(1, 0, 0, 1)
     love.graphics.points(points[1], points[2], points[#points-1], points[#points])
 
+    local pos_x, pos_y = curve:at(math.fmod(elapsed / 10sp, 1))
+    love.graphics.circle("fill", pos_x, pos_y, 10)
 end
 
 love.update = function()
     local delta = love.timer.getDelta()
     rt.current_scene:update(delta)
+
+    elapsed = elapsed + delta
 end
