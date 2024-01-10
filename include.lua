@@ -32,7 +32,7 @@ setmetatable(bt, {
 
 -- submodules
 math3d = require "submodules.cpml"
-fft = require "luafft" --require "submodules.zorg-fft.src.love.zfft"
+ffi = require "ffi"
 
 require "common"
 

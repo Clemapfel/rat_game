@@ -168,7 +168,13 @@ function profiler.report(n)
         local count = row[3]
         local time = row[4]
 
-        local location = string.sub(row[5], string.find(row[5], "[A-Za-z_.]*.lua:.*"))
+        local where = string.find(row[5], "[A-Za-z_.]*.lua:.*")
+        local location;
+        if where ~= nil then
+            location = string.sub(row[5], ternary(where == nil, "(unknown)", where))
+        else
+            location = row[5]
+        end
 
         row[5] = time / count
         row[6] = time / total_time * 100

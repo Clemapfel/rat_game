@@ -2,29 +2,18 @@ require("include")
 
 rt.add_scene("debug")
 
-local ffi = require "ffi"
-local fftw = ffi.load("/usr/lib64/libfftw3f.so")
-local fftw_cdef = love.filesystem.read("submodules/fftw/cdef.c")
-ffi.cdef(fftw_cdef)
+audio = rt.Audio("assets/sound/test_sound_effect_mono.mp3")
+transform = rt.FourierTransform()
 
-local size = 256
+clock = rt.Clock()
+transform:compute_from_audio(audio, 256, 1, 1, nil)
+println("transform: ", clock:restart():as_seconds())
 
-local input = fftw.fftwf_alloc_real(size)
-local output = fftw.fftwf_alloc_complex(size)
-local plan = fftw.fftwf_plan_dft_r2c_1d(size, input, output, 64)
+image = transform:as_image()
+println("image: ", clock:restart():as_seconds())
 
-local input_ptr = ffi.cast("float*", input)
-for i = 1, size do
-    input_ptr[i] = rt.random.number(-1, 1)
-end
-
-fftw.fftwf_execute(plan)
-
-local output_ptr = ffi.cast("float*", output)
-for i = 1, size do
-    local complex = ffi.cast("float*", output_ptr[i])
-    println(complex[0], " ", complex[1])
-end
+display = rt.ImageDisplay(image)
+rt.current_scene:set_child(display)
 
 -- ######################
 

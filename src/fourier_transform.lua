@@ -12,6 +12,16 @@ rt.FourierTransform = meta.new_type("FourierTransform", function()
     return out
 end)
 
+rt.FourierTransform._fftw_cdef = [[
+extern double*fftw_alloc_real(size_t n);
+extern void* fftw_alloc_complex(size_t n);
+extern void* fftw_plan_dft_r2c_1d(int n, double* in, void* out, unsigned int flags);
+extern void fftw_execute(const void* plan);
+]]
+
+rt.FourierTransform._fftw = ffi.load("/usr/lib64/libfftw3.so") -- TODO use local lib
+ffi.cdef(rt.FourierTransform._fftw_cdef)
+
 rt.FourierTransform.transform_direction = meta.new_enum({
     TIME_DOMAIN_TO_SIGNAL_DOMAIN = false,
     SIGNAL_DOMAIN_TO_TIME_DOMAIN = true
@@ -33,10 +43,15 @@ function rt.FourierTransform:compute_from_audio(audio, window_size, window_overl
 
     first_sample = which(first_sample, 1)
     local n_samples = which(max_n_samples, audio:get_n_samples())
-
+    local audio_n_samples = audio:get_n_samples()
+    local audio_native = audio._native
     local step_i = 1
 
     window_size = which(window_size, 2^8)
+
+    local window_data = self._fftw.fftw_alloc_real(window_size)
+    local transformed_data = self._fftw.fftw_alloc_complex(window_size)
+    local plan = self._fftw.fftw_plan_dft_r2c_1d(window_size, window_data, transformed_data, 64)
 
     local window_overlap = which(window_overlap_factor, 128 / window_size) * window_size
     local n_windows = math.round(n_samples / (window_size / window_overlap))
@@ -45,28 +60,36 @@ function rt.FourierTransform:compute_from_audio(audio, window_size, window_overl
     local window_i = 1
     while window_i < n_windows do
 
-        local window = {}
+        local window = ffi.cast("double*", window_data)
+
         local sample_i = offset
+        local data_i = 0
         while (sample_i < offset + window_size and sample_i < n_samples) do
             local weight = gauss_window((sample_i - offset) / window_size)
-            local n = audio:get_sample(sample_i) * weight
-            table.insert(window, n)
+
+            local sample = 0
+            if sample_i < audio_n_samples then
+                sample = audio_native:getSample(sample_i - 1) * weight
+            end
+
+            window[data_i] = sample
             sample_i = sample_i + 1
+            data_i = data_i + 1
         end
 
-        while #window < window_size do
-            table.insert(window, 0)
-        end
+        self._fftw.fftw_execute(plan)
 
-        local transformed = fft.fft(window)
+        local transformed = ffi.cast("double(*)[2]", transformed_data)
 
-        -- cut out symmetrical section and normalize into [0, 1]
+        -- cut out symmetrical section, flip, then normalize into [0, 1]
         local data = {}
-        local half = math.floor(0.5 * #transformed)
+        local half = math.floor(0.5 * window_size)
+        local normalize_factor = 1 / math.sqrt(window_size)
         for i = 1, half do
-            local value = transformed[i + half]
+            local complex = ffi.cast("double*", transformed[half - i - 1])
+            local value = {complex[0], complex[1]}
             local magnitude = math.sqrt(value[1] * value[1] + value[2] * value[2]) -- take complex magnitude
-            magnitude = magnitude / math.sqrt(window_size) -- project into [0, 1]
+            magnitude = magnitude * normalize_factor -- project into [0, 1]
             data[i] = magnitude
         end
         table.insert(self._data_out, data)

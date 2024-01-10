@@ -80,12 +80,6 @@ end
 --- @param index Number 1-based
 --- @return Number
 function rt.Audio:get_sample(i)
-
-    local n_samples = self:get_n_samples()
-    if i < 1 or i > n_samples then
-        rt.error("In rt.Audio.get_sample: Index `" .. tostring(i) .. "` is out of range for audio data with `" .. tostring(n_samples) .. "`")
-    end
-
     return self._native:getSample(i - 1)
 end
 

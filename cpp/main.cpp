@@ -35,21 +35,26 @@ int main()
     // fftwf
 
 
-    float* in = fftwf_alloc_real(size);
-    float (*out)[2] = fftwf_alloc_complex(size);
-    auto plan = fftwf_plan_dft_r2c_1d(size, in, out, FFTW_ESTIMATE);
+    auto in = fftw_alloc_real(size);
+    //auto out = (float(*)[2]) ;
+    //float (*out)[2] = fftwf_alloc_complex(size);
+    //auto out = (float(*)[2]) fftwf_alloc_complex(size);
+    auto out = (double(*)[2]) fftw_alloc_complex(size);
+    auto plan = fftw_plan_dft_r2c_1d(size, in, out, FFTW_ESTIMATE);
 
     for (size_t i = 0; i < size; ++i)
         in[i] = i < lua_size ? (float) lua_data[i+1] : float(0);
 
     auto now = std::chrono::system_clock::now();
-    fftwf_execute(plan);
+
+    fftw_execute(plan);
+
     std::cout << "fftw: " << std::chrono::duration_cast<std::chrono::microseconds>(std::chrono::system_clock::now() - now).count() << " µs" << std::endl;
 
     for (size_t i = 1; i < size; ++i)
     {
-        float* complex = out[i];
-        std::cout << complex[0] << " " << complex[1] << std::endl;c
+        auto complex = out[i];
+        std::cout << complex[0] << " " << complex[1] << std::endl;
     }
 
     float sum = 0;
