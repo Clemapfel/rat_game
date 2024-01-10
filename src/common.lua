@@ -112,7 +112,7 @@ function clamp(x, lower_bound, upper_bound)
 end
 
 --- @brief TODO
-function project(lower, upper, value)
+function project(value, lower, upper)
     return value * math.abs(upper - lower) + math.min(lower, upper);
 end
 
