@@ -71,7 +71,7 @@ end
 --- @return Boolean
 function rt.AudioPlayback:set_should_loop(b)
 
-    self._native:getLooping()
+    self._native:isLooping()
 end
 
 --- @brief set volume

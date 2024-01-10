@@ -92,6 +92,12 @@ end
 --- @brief get number of samples
 --- @return Number
 function rt.Audio:get_n_samples()
-
+    local n = self._native:getSampleCount()
     return self._native:getSampleCount()
+end
+
+--- @brief get number of channels
+--- @return Number
+function rt.Audio:get_n_channels()
+    return self._native:getChannelCount()
 end

@@ -3,15 +3,17 @@ require("include")
 rt.add_scene("debug")
 
 
-local audio = rt.Audio("assets/test_music.mp3")
+local audio = rt.Audio("assets/sound/test_soundeffect.wav")
+local transform = rt.FourierTransform()
+transform:compute_from_audio(audio)
 
 local playback = rt.AudioPlayback(audio)
 playback:set_should_loop(true)
 
-rt.current_scene:set_child(image)
+local image = transform:as_image()
+rt.current_scene:set_child(rt.ImageDisplay(image))
 
-input = rt.add_input_controller(rt.current_scene.window)
-input:signal_connect("pressed", function(_, which)
+rt.current_scene.input:signal_connect("pressed", function(_, which)
     if which == rt.InputButton.A then
         local current = playback:get_is_playing()
         if current then
@@ -43,6 +45,4 @@ end
 love.update = function()
     local delta = love.timer.getDelta()
     rt.current_scene:update(delta)
-
-    elapsed = elapsed + delta
 end

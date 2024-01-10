@@ -2,13 +2,17 @@
 --- @field env Table mutable environment, contains all variables, scene itself is immutable
 --- @field input rt.InputController
 rt.Scene = meta.new_type("Scene", function()
-    local scene = meta.new(rt.Scene)
-    scene.window = rt.WindowLayout()
-    scene.skybox = rt.Palette.BACKGROUND --TRUE_MAGENTA
-    scene.animation_handler = rt.AnimationHandler()
-    scene.animation_timer_handler = rt.AnimationTimerHandler()
+    local scene = meta.new(rt.Scene, {
+        env = {},
+        window = rt.WindowLayout(),
+        skybox = rt.Palette.BACKGROUND,
+        animation_handler = rt.AnimationHandler(),
+        animation_timer_handler = rt.AnimationTimerHandler(),
+        elapsed = rt.seconds(0),
+        input = {}
+    })
+
     scene.input = rt.add_input_controller(scene.window)
-    scene.env = {}
     meta.set_is_mutable(scene, false)
     return scene
 end)
