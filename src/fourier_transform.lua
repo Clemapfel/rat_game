@@ -19,8 +19,11 @@ rt.FourierTransform.transform_direction = meta.new_enum({
 
 --- @brief
 --- @param audio rt.Audio
---- @param window_size Number results in 2^window_size samples
-function rt.FourierTransform:compute_from_audio(audio, window_size_exponent, window_overlap_factor)
+--- @param window_size Number sliding window size
+--- @param window_overlap_factor Number
+--- @param first_sample Number index of first sample in audio clip
+--- @param max_n_samples Number count of samples, starting at `first_sample`
+function rt.FourierTransform:compute_from_audio(audio, window_size, window_overlap_factor, first_sample, max_n_samples)
 
     self._data_out = {}
 
@@ -28,16 +31,17 @@ function rt.FourierTransform:compute_from_audio(audio, window_size_exponent, win
         return math.exp(-4 * (2 * x - 1)^2);
     end
 
-    local n_samples = audio:get_n_samples()
+    first_sample = which(first_sample, 1)
+    local n_samples = which(max_n_samples, audio:get_n_samples())
+
     local step_i = 1
 
-    window_size_exponent = which(window_size_exponent, 10)
-    local window_size = 2^window_size_exponent
+    window_size = which(window_size, 2^8)
 
     local window_overlap = which(window_overlap_factor, 128 / window_size) * window_size
     local n_windows = math.round(n_samples / (window_size / window_overlap))
 
-    local offset = 1
+    local offset = first_sample
     local window_i = 1
     while window_i < n_windows do
 
@@ -54,7 +58,6 @@ function rt.FourierTransform:compute_from_audio(audio, window_size_exponent, win
             table.insert(window, 0)
         end
 
-        assert(#window == window_size)
         local transformed = fft.fft(window)
 
         -- cut out symmetrical section and normalize into [0, 1]

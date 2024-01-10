@@ -4,8 +4,18 @@ rt.add_scene("debug")
 
 local audio = rt.Audio("assets/sound/test_sound_effect_mono.mp3")
 
+--[[
+clock = rt.Clock()
 local transform = rt.FourierTransform()
-transform:compute_from_audio(audio)
+transform:compute_from_audio(audio, 32, 1, 1)
+println(clock:get_elapsed():as_seconds())
+]]--
+
+local serialized = {}
+for i = 1, audio:get_n_samples() do
+    table.insert(serialized, audio:get_sample(i))
+end
+println(serialize(serialized))
 
 local playback = rt.AudioPlayback(audio)
 playback:set_should_loop(true)
