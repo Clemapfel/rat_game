@@ -2,13 +2,7 @@ require("include")
 
 rt.add_scene("debug")
 
-local audio = rt.Audio("assets/sound/test_soundeffect.wav")
-
-local data = {}
-for i = 1, audio:get_n_samples() do
-    table.insert(data, audio:get_sample(i))
-end
-println(serialize(data))
+local audio = rt.Audio("assets/sound/test_sound_effect_mono.mp3")
 
 local transform = rt.FourierTransform()
 transform:compute_from_audio(audio)

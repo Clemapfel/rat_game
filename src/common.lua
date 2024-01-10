@@ -111,6 +111,11 @@ function clamp(x, lower_bound, upper_bound)
     return x
 end
 
+--- @brief TODO
+function project(lower, upper, value)
+    return value * math.abs(upper - lower) + math.min(lower, upper);
+end
+
 --- @brief linear interpolate between two values
 --- @param lower number
 --- @param upper number
