@@ -2,8 +2,14 @@ require("include")
 
 rt.add_scene("debug")
 
-
 local audio = rt.Audio("assets/sound/test_soundeffect.wav")
+
+local data = {}
+for i = 1, audio:get_n_samples() do
+    table.insert(data, audio:get_sample(i))
+end
+println(serialize(data))
+
 local transform = rt.FourierTransform()
 transform:compute_from_audio(audio)
 
@@ -11,7 +17,13 @@ local playback = rt.AudioPlayback(audio)
 playback:set_should_loop(true)
 
 local image = transform:as_image()
-rt.current_scene:set_child(rt.ImageDisplay(image))
+local display = rt.ImageDisplay(image)
+
+println(image:get_width(), " ", image:get_height())
+local frame = rt.AspectLayout(display:get_width() / display:get_height())
+frame:set_child(display)
+
+rt.current_scene:set_child(display)
 
 rt.current_scene.input:signal_connect("pressed", function(_, which)
     if which == rt.InputButton.A then

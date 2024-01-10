@@ -24,25 +24,46 @@ function rt.FourierTransform:compute_from_audio(audio, step_size)
     step_size = rt.settings.fourier_transform.step_size
     self._data_out = {}
 
+    function gauss_window(x)
+        return math.exp(-4 * (2 * x - 1)^2);
+    end
+
     local n_samples = audio:get_n_samples()
     local step_i = 1
-    local sample_i = 1
-    while sample_i < n_samples do
 
-        local samples = {}
-        local c = 0
-        for _ = 1, step_size do
-            if sample_i <= n_samples then
-                table.insert(samples, audio:get_sample(sample_i))
-            else
-                table.insert(samples, 0)
-            end
+    local window_size = 128
+    local window_overlap = 100
+    local n_windows = math.round(n_samples / (window_size / window_overlap))
+
+    local offset = 1
+    local window_i = 1
+    while window_i < n_windows do
+
+        local window = {}
+        local sample_i = offset
+        while (sample_i < offset + window_size and sample_i < n_samples) do
+            local weight = gauss_window((sample_i - offset) / window_size)
+            local n = audio:get_sample(sample_i) * weight
+            table.insert(window, n)
             sample_i = sample_i + 1
         end
 
-        local transformed = fft.fft(samples)
-        table.insert(self._data_out, transformed)
-        step_i = step_i + 1
+        while #window < window_size do
+            table.insert(window, 0)
+        end
+
+        assert(#window == window_size)
+        local transformed = fft.fft(window)
+
+        local data = {}
+        local half = math.floor(0.5 * #transformed)
+        for i = half, #transformed do
+            data[i - half] = transformed[i]
+        end
+        table.insert(self._data_out, data)
+
+        offset = offset + math.round(window_size / window_overlap)
+        window_i = window_i + 1
     end
 end
 
