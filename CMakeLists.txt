@@ -7,5 +7,7 @@ find_library(fftwl REQUIRED NAMES fftw3l)
 set(FFTW_LIBRARIES "${fftw};${fftwf};${fftwl}")
 find_package(Lua REQUIRED)
 
+message(WARNING ${FFTW_LIBRARIES})
+
 add_executable(rat_game_test cpp/main.cpp)
 target_link_libraries(rat_game_test PRIVATE ${FFTW_LIBRARIES} ${LUA_LIBRARIES})

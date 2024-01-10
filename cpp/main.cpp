@@ -19,6 +19,7 @@ int main()
         sol::lib::table
     );
 
+
     state.do_file("/home/clem/Workspace/rat_game/cpp/data.lua");
     auto size = 5400;
     state["size"] = size;
@@ -33,8 +34,9 @@ int main()
 
     // fftwf
 
-    auto* in = fftwf_alloc_real(size);
-    auto* out = fftwf_alloc_complex(size);
+
+    float* in = fftwf_alloc_real(size);
+    float (*out)[2] = fftwf_alloc_complex(size);
     auto plan = fftwf_plan_dft_r2c_1d(size, in, out, FFTW_ESTIMATE);
 
     for (size_t i = 0; i < size; ++i)
@@ -43,6 +45,12 @@ int main()
     auto now = std::chrono::system_clock::now();
     fftwf_execute(plan);
     std::cout << "fftw: " << std::chrono::duration_cast<std::chrono::microseconds>(std::chrono::system_clock::now() - now).count() << " µs" << std::endl;
+
+    for (size_t i = 1; i < size; ++i)
+    {
+        float* complex = out[i];
+        std::cout << complex[0] << " " << complex[1] << std::endl;c
+    }
 
     float sum = 0;
     for (size_t i = 0; i < size; ++i)

@@ -2,43 +2,29 @@ require("include")
 
 rt.add_scene("debug")
 
-local audio = rt.Audio("assets/sound/test_sound_effect_mono.mp3")
+local ffi = require "ffi"
+local fftw = ffi.load("/usr/lib64/libfftw3f.so")
+local fftw_cdef = love.filesystem.read("submodules/fftw/cdef.c")
+ffi.cdef(fftw_cdef)
 
---[[
-clock = rt.Clock()
-local transform = rt.FourierTransform()
-transform:compute_from_audio(audio, 32, 1, 1)
-println(clock:get_elapsed():as_seconds())
-]]--
+local size = 256
 
-local serialized = {}
-for i = 1, audio:get_n_samples() do
-    table.insert(serialized, audio:get_sample(i))
+local input = fftw.fftwf_alloc_real(size)
+local output = fftw.fftwf_alloc_complex(size)
+local plan = fftw.fftwf_plan_dft_r2c_1d(size, input, output, 64)
+
+local input_ptr = ffi.cast("float*", input)
+for i = 1, size do
+    input_ptr[i] = rt.random.number(-1, 1)
 end
-println(serialize(serialized))
 
-local playback = rt.AudioPlayback(audio)
-playback:set_should_loop(true)
+fftw.fftwf_execute(plan)
 
-local image = transform:as_image()
-local display = rt.ImageDisplay(image)
-
-println(image:get_width(), " ", image:get_height())
-local frame = rt.AspectLayout(display:get_width() / display:get_height())
-frame:set_child(display)
-
-rt.current_scene:set_child(display)
-
-rt.current_scene.input:signal_connect("pressed", function(_, which)
-    if which == rt.InputButton.A then
-        local current = playback:get_is_playing()
-        if current then
-            playback:pause()
-        else
-            playback:play()
-        end
-    end
-end)
+local output_ptr = ffi.cast("float*", output)
+for i = 1, size do
+    local complex = ffi.cast("float*", output_ptr[i])
+    println(complex[0], " ", complex[1])
+end
 
 -- ######################
 
