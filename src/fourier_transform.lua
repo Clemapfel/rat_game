@@ -1,4 +1,5 @@
 rt.settings.fourier_transform = {
+    use_high_precision = true, -- if false, use float32, else use float64
     step_size = 64,
     overlap = 0
 }
@@ -12,15 +13,54 @@ rt.FourierTransform = meta.new_type("FourierTransform", function()
     return out
 end)
 
-rt.FourierTransform._fftw_cdef = [[
-extern double*fftw_alloc_real(size_t n);
-extern void* fftw_alloc_complex(size_t n);
-extern void* fftw_plan_dft_r2c_1d(int n, double* in, void* out, unsigned int flags);
-extern void fftw_execute(const void* plan);
-]]
 
-rt.FourierTransform._fftw = ffi.load("/usr/lib64/libfftw3.so") -- TODO use local lib
-ffi.cdef(rt.FourierTransform._fftw_cdef)
+do
+    if rt.settings.fourier_transform.use_high_precision then
+        rt.FourierTransform._fftw_cdef = [[
+        extern double* fftw_alloc_real(size_t n);
+        extern void* fftw_alloc_complex(size_t n);
+        extern void* fftw_plan_dft_r2c_1d(int n, double* in, void* out, unsigned int flags);
+        extern void fftw_execute(const void* plan);
+        ]]
+
+        local fftw = ffi.load("/usr/lib64/libfftw3.so")
+
+        rt.FourierTransform._fftw = fftw
+        ffi.cdef(rt.FourierTransform._fftw_cdef)
+
+        rt.FourierTransform._alloc_real = fftw.fftw_alloc_real
+        rt.FourierTransform._alloc_complex = fftw.fftw_alloc_complex
+        rt.FourierTransform._plan_dft_r2c_1d = fftw.fftw_plan_dft_r2c_1d
+        rt.FourierTransform._plan_mode = 64 -- FFTW_ESTIMATE
+        rt.FourierTransform._execute = fftw.fftw_execute
+
+        rt.FourierTransform._real_data_t = "double*"
+        rt.FourierTransform._complex_data_t = "double(*)[2]"
+        rt.FourierTransform._complex_t = "double*"
+    else
+        rt.FourierTransform._fftw_cdef = [[
+        extern float* fftwf_alloc_real(size_t n);
+        extern void* fftwf_alloc_complex(size_t n);
+        extern void* fftwf_plan_dft_r2c_1d(int n, float* in, void* out, unsigned int flags);
+        extern void fftwf_execute(const void* plan);
+        ]]
+
+        local fftwf = ffi.load("/usr/lib64/libfftw3f.so")
+
+        rt.FourierTransform._fftw = fftwf
+        ffi.cdef(rt.FourierTransform._fftw_cdef)
+
+        rt.FourierTransform._alloc_real = fftwf.fftwf_alloc_real
+        rt.FourierTransform._alloc_complex = fftwf.fftwf_alloc_complex
+        rt.FourierTransform._plan_dft_r2c_1d = fftwf.fftwf_plan_dft_r2c_1d
+        rt.FourierTransform._plan_mode = 64 -- FFTW_ESTIMATE
+        rt.FourierTransform._execute = fftwf.fftwf_execute
+
+        rt.FourierTransform._real_data_t = "float*"
+        rt.FourierTransform._complex_data_t = "float(*)[2]"
+        rt.FourierTransform._complex_t = "float*"
+    end
+end
 
 rt.FourierTransform.transform_direction = meta.new_enum({
     TIME_DOMAIN_TO_SIGNAL_DOMAIN = false,
@@ -30,10 +70,10 @@ rt.FourierTransform.transform_direction = meta.new_enum({
 --- @brief
 --- @param audio rt.Audio
 --- @param window_size Number sliding window size
---- @param window_overlap_factor Number
+--- @param window_overlap Number
 --- @param first_sample Number index of first sample in audio clip
 --- @param max_n_samples Number count of samples, starting at `first_sample`
-function rt.FourierTransform:compute_from_audio(audio, window_size, window_overlap_factor, first_sample, max_n_samples)
+function rt.FourierTransform:compute_from_audio(audio, window_size, window_overlap, first_sample, max_n_samples)
 
     self._data_out = {}
 
@@ -49,18 +89,19 @@ function rt.FourierTransform:compute_from_audio(audio, window_size, window_overl
 
     window_size = which(window_size, 2^8)
 
-    local window_data = self._fftw.fftw_alloc_real(window_size)
-    local transformed_data = self._fftw.fftw_alloc_complex(window_size)
-    local plan = self._fftw.fftw_plan_dft_r2c_1d(window_size, window_data, transformed_data, 64)
+    local window_data = self._alloc_real(window_size)
+    local transformed_data = self._alloc_complex(window_size)
+    local plan = self._plan_dft_r2c_1d(window_size, window_data, transformed_data, self._plan_mode)
 
-    local window_overlap = which(window_overlap_factor, 128 / window_size) * window_size
-    local n_windows = math.round(n_samples / (window_size / window_overlap))
+    local n_windows = math.ceil(n_samples / (window_size / window_overlap))
+
+    if n_windows < 2 then n_windows = 2 end
 
     local offset = first_sample
-    local window_i = 1
+    local window_i = 0
     while window_i < n_windows do
 
-        local window = ffi.cast("double*", window_data)
+        local window = ffi.cast(self._real_data_t, window_data)
 
         local sample_i = offset
         local data_i = 0
@@ -77,16 +118,16 @@ function rt.FourierTransform:compute_from_audio(audio, window_size, window_overl
             data_i = data_i + 1
         end
 
-        self._fftw.fftw_execute(plan)
+        self._execute(plan)
 
-        local transformed = ffi.cast("double(*)[2]", transformed_data)
+        local transformed = ffi.cast(self._complex_data_t, transformed_data)
 
         -- cut out symmetrical section, flip, then normalize into [0, 1]
         local data = {}
         local half = math.floor(0.5 * window_size)
         local normalize_factor = 1 / math.sqrt(window_size)
         for i = 1, half do
-            local complex = ffi.cast("double*", transformed[half - i - 1])
+            local complex = ffi.cast(self._complex_t, transformed[half - i - 1])
             local value = {complex[0], complex[1]}
             local magnitude = math.sqrt(value[1] * value[1] + value[2] * value[2]) -- take complex magnitude
             magnitude = magnitude * normalize_factor -- project into [0, 1]
@@ -108,7 +149,7 @@ function rt.FourierTransform:as_image()
     for x = 1, w do
         for y = 1, h do
             local value = self._data_out[x][y]
-            out:set_pixel(x, y, rt.HSVA(value,  1, value, 1))
+            out:set_pixel(x, y, rt.HSVA(0,  0, value, 1))
         end
     end
 

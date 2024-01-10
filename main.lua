@@ -6,7 +6,7 @@ audio = rt.Audio("assets/sound/test_sound_effect_mono.mp3")
 transform = rt.FourierTransform()
 
 clock = rt.Clock()
-transform:compute_from_audio(audio, 256, 1, 1, nil)
+transform:compute_from_audio(audio, 2^10, 20, 1, nil)
 println("transform: ", clock:restart():as_seconds())
 
 image = transform:as_image()
