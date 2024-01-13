@@ -14,7 +14,6 @@ rt.settings.frame = {
 rt.Frame = meta.new_type("Frame", function(type)
     if meta.is_nil(type) then type = rt.FrameType.RECTANGULAR end
 
-
     local out = meta.new(rt.Frame, {
         _type = type,
         _child = {},
@@ -44,7 +43,6 @@ rt.Frame = meta.new_type("Frame", function(type)
     end
     return out
 end)
-
 
 --- @overload rt.Drawable.draw
 function rt.Frame:draw()
@@ -88,6 +86,10 @@ function rt.Frame:size_allocate(x, y, width, height)
 
     local pos_x, pos_y = self._child:get_position()
     local w, h = self._child:get_size()
+
+    w = math.max(w, select(1, self:get_minimum_size()))
+    h = math.max(h, select(2, self:get_minimum_size()))
+
     local thickness = self._thickness
 
     if self._type == rt.FrameType.RECTANGULAR then
@@ -110,7 +112,6 @@ end
 
 --- @overload rt.Widget.realize
 function rt.Frame:realize()
-
     if meta.is_widget(self._child) then
         self._child:realize()
     end
@@ -120,7 +121,6 @@ end
 --- @brief set singular child
 --- @param child rt.Widget
 function rt.Frame:set_child(child)
-
     meta.assert_widget(child)
     if not meta.is_nil(self._child) and meta.is_widget(self._child) then
         self._child:set_parent(nil)
@@ -138,13 +138,11 @@ end
 --- @brief get singular child
 --- @return rt.Widget
 function rt.Frame:get_child()
-
     return self._child
 end
 
 --- @brief remove child
 function rt.Frame:remove_child()
-
     if not meta.is_nil(self._child) then
         self._child:set_parent(nil)
         self._child = nil
@@ -153,7 +151,6 @@ end
 
 --- @brief
 function rt.Frame:set_color(color)
-
     if meta.is_hsva(color) then
         color = rt.rgba_to_hsva(color)
     end
@@ -164,14 +161,11 @@ end
 
 --- @brief
 function rt.Frame:get_color()
-
     return self._frame
 end
 
 --- @brief
 function rt.Frame:set_thickness(thickness)
-
-
     if thickness < 0 then
         rt.error("In rt.Frame.set_thickness: value `" .. tostring(thickness) .. "` is out of range")
     end
@@ -190,8 +184,6 @@ end
 
 --- @brief
 function rt.Frame:set_corner_radius(radius)
-
-
     if radius < 0 then
         rt.error("In rt.Frame.set_corner_radius: value `" .. tostring(radius) .. "` is out of range")
     end
@@ -209,6 +201,9 @@ end
 function rt.Frame:measure()
     if meta.is_widget(self._child) then
         local w, h = self._child:measure()
+        w = math.max(w, select(1, self:get_minimum_size()))
+        h = math.max(h, select(2, self:get_minimum_size()))
+
         return w + self._thickness * 2, h + self._thickness * 2
     else
         return rt.Widget.measure(self)
