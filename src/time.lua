@@ -6,15 +6,18 @@ rt.Time = meta.new_type("Time", function(microseconds)
     })
     local metatable = getmetatable(out)
     metatable.__add = function(self, other)
-
-
         return rt.Time(self._mys + other._mys)
     end
     metatable.__sub = function(self, other)
-
-
         return rt.Time(self._mys - other._mys)
     end
+    metatable.__mul = function(self, other)
+        return rt.Time(self._mys * other._mys)
+    end
+    metatable.__div = function(self, other)
+        return rt.Time(self._mys / other._mys)
+    end
+
     return out
 end)
 

@@ -95,3 +95,9 @@ end
 function rt.Audio:get_n_channels()
     return self._native:getChannelCount()
 end
+
+--- @brief get duration, in seconds
+--- @return rt.Time
+function rt.Audio:get_duration()
+    return rt.seconds(self._native:getDuration("seconds"))
+end

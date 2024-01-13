@@ -32,7 +32,6 @@ end
 --- @brief access signal component
 --- @return rt.SignalComponent
 function rt.get_signal_component(object)
-
     return getmetatable(object).components.signal
 end
 
@@ -228,7 +227,6 @@ end
 
 --- @see rt.SignalComponent.connect
 function rt.SignalEmitter:signal_connect(name, callback, data)
-
     local component = rt.get_signal_component(self)
     if meta.is_nil(component) then component = rt.add_signal_component(self) end
     return component:connect(name, callback, data)

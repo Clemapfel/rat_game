@@ -56,7 +56,6 @@ end
 --- @brief get playback position
 --- @return rt.Time
 function rt.AudioPlayback:get_position()
-
     return rt.seconds(self._native:tell("seconds"))
 end
 

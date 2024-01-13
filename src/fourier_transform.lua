@@ -101,19 +101,21 @@ function rt.FourierTransform:compute_from_audio(audio, window_size, window_overl
     local window_i = 0
     while window_i < n_windows do
 
+        println(window_i, " / ", n_windows)
+
         local window = ffi.cast(self._real_data_t, window_data)
 
         local sample_i = offset
-        local data_i = 0
-        while (sample_i < offset + window_size and sample_i < n_samples) do
+        local data_i = 1
+        while (sample_i < offset + window_size) and sample_i < n_samples do
             local weight = gauss_window((sample_i - offset) / window_size)
 
             local sample = 0
-            if sample_i < audio_n_samples then
+            if sample_i < audio_n_samples and sample_i > 1 then
                 sample = audio_native:getSample(sample_i - 1) * weight
             end
 
-            window[data_i] = sample
+            window[data_i - 1] = sample
             sample_i = sample_i + 1
             data_i = data_i + 1
         end

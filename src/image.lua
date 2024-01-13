@@ -36,8 +36,6 @@ end
 --- @brief save to file
 --- @param file String
 function rt.Image:save_to_file(file)
-
-
     return self._native:encode("png", file)
 end
 
