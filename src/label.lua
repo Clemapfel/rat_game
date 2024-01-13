@@ -9,7 +9,6 @@ rt.JustifyMode = meta.new_enum({
 --- @param text String
 --- @param font rt.Font (or nil)
 rt.Label = meta.new_type("Label", function(text, font, monospace_font)
-
     if meta.is_nil(text) then
         text = ""
     end
@@ -32,8 +31,10 @@ rt.Label = meta.new_type("Label", function(text, font, monospace_font)
         _default_width = 0,
         _default_height = 0,
         _current_width = 0,
-        _current_height = 0
+        _current_height = 0,
+        _n_visible_characters = 0
     }, rt.Widget, rt.Drawable)
+
     return out
 end)
 
@@ -49,7 +50,6 @@ end
 
 --- @overload rt.Drawable.draw
 function rt.Label:draw()
-
     if not self:get_is_visible() then return end
     for _, glyph in pairs(self._glyphs) do
         if meta.isa(glyph, rt.Glyph) then
@@ -237,8 +237,12 @@ rt.Label.MONOSPACE_TAG_END = rt.Set("</tt>", "</mono>")
 --- @brief [internal] transform _raw into set of glyphs
 function rt.Label:_parse()
 
+    local first_parse = sizeof(self._glyphs) == 0
+    local animation_necessary = false
+
     self._glyphs = {}
     self._n_characters = 0
+    self._n_visible_characters = 0
 
     local bold = false
     local italic = false
@@ -300,6 +304,10 @@ function rt.Label:_parse()
 
         self._n_characters = self._n_characters + #current_word
         current_word = ""
+
+        if effect_rainbow or effect_shake or effect_wave then
+            animation_necessary = true
+        end
     end
 
     -- throw error, with guides
@@ -524,6 +532,17 @@ function rt.Label:_parse()
     if effect_shake then throw_parse_error("reached end of text, but effect shake region is still open") end
     if effect_wave then throw_parse_error("reached end of text, but effect wave region is still open") end
     if effect_rainbow then throw_parse_error("reached end of text, but effect rainbow region is still open") end
+
+    if first_parse then
+
+        -- automatically start animations only for labels that have an animated effect
+        if animation_necessary then
+            self:set_is_animated(true)
+        end
+
+        -- set initial value for n visible characters
+        self._n_visible_characters = self._n_characters
+    end
 end
 
 --- @brief [internal] calculate size given infinite area
@@ -599,6 +618,7 @@ function rt.Label:set_n_visible_characters(n)
     local n_left =  clamp(n, 0, self._n_characters)
     local n_glyphs = sizeof(self._glyphs)
     local glyph_i = 1
+    local n_visible = 0
 
     while glyph_i <= n_glyphs do
         local glyph = self._glyphs[glyph_i]
@@ -608,13 +628,35 @@ function rt.Label:set_n_visible_characters(n)
             if n_left >= n_chars then
                 glyph:set_n_visible_characters(n_chars)
                 n_left = n_left - n_chars
+                n_visible = n_visible + n_chars
             else
                 glyph:set_n_visible_characters(n_left)
+                n_visible = n_visible + n_left
                 n_left = 0
             end
         end
         glyph_i = glyph_i + 1
     end
+
+    self._n_visible_characters = n_visible
+end
+
+--- @brief
+function rt.Label:get_n_visible_characters()
+    return self._n_visible_characters
+    --[[
+    local n = 0
+    local n_glyphs = sizeof(self._glyphs)
+    local glyph_i = 1
+
+    while glyph_i <= n_glyphs do
+        local glyph = self._glyphs[glyph_i]
+        n = n + glyph:get_n_characters()
+        glyph_i = glyph_i + 1
+    end
+
+    return n
+    ]]
 end
 
 --- @brief set whether the glyphs of the label are animated
@@ -637,7 +679,6 @@ end
 --- @brief get font
 --- @retun rt.Font
 function rt.Label:get_font()
-
     return self._font
 end
 

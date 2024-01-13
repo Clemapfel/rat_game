@@ -101,8 +101,6 @@ function rt.FourierTransform:compute_from_audio(audio, window_size, window_overl
     local window_i = 0
     while window_i < n_windows do
 
-        println(window_i, " / ", n_windows)
-
         local window = ffi.cast(self._real_data_t, window_data)
 
         local sample_i = offset

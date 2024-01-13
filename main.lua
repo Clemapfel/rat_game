@@ -6,13 +6,13 @@ log:set_margin_horizontal(100)
 log:set_margin_top(20)
 log:set_vertical_alignment(rt.Alignment.START)
 log:set_expand_vertically(false)
-log:set_expand_horizontally(false)
 
-log._frame:set_minimum_size(500, 500)
+log._frame:set_minimum_size(0, 250)
 rt.current_scene:set_child(log)
 
 rt.current_scene.input:signal_connect("pressed", function(_, which)
     if which == rt.InputButton.A then
+        log:push_back("<wave>" .. rt.random.string(16) .. "</wave>")
     elseif which == rt.InputButton.B then
     elseif which == rt.InputButton.X then
     elseif which == rt.InputButton.Y then

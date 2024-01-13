@@ -112,10 +112,8 @@ bt.BattleLog = meta.new_type("BattleLog", function()
         _labels_layout = bt.BattleLogTextLayout(),
 
         _input = {}, -- rt.InputController
-
-        _scrollbar_visible = true,
         _scrollbar_offset = 0
-    }, rt.Widget, rt.Drawable)
+    }, rt.Widget, rt.Drawable, rt.Animation)
 
     out._scrollbar_layout:push_back(out._up_indicator)
     out._scrollbar_layout:push_back(out._scrollbar)
@@ -142,11 +140,12 @@ bt.BattleLog = meta.new_type("BattleLog", function()
 
     out._viewport_scrollbar_layout:set_spacing(0.5 * m) -- TODO: why is this necessary?
 
+    local spacer = rt.Spacer()
+    spacer:set_color(rt.Palette.YELLOW)
     out._viewport_scrollbar_layout:push_back(out._viewport)
     out._viewport_scrollbar_layout:push_back(out._scrollbar_layout_revealer)
 
     out._viewport:set_expand_horizontally(true)
-    out._scrollbar_layout:set_expand_horizontally(false)
 
     out._viewport:set_margin_left(outer_margin)
 
@@ -163,6 +162,9 @@ bt.BattleLog = meta.new_type("BattleLog", function()
     end
 
     out._scrollbar:set_value(0)
+    out._scrollbar_layout_revealer:set_is_revealed(false)
+    out._scrollbar_layout_revealer:set_expand_horizontally(false)
+    out._scrollbar_layout_revealer:set_margin_horizontal(2 * rt.settings.margin_unit)
 
     out._input = rt.add_input_controller(out)
     out._input:signal_connect("pressed", function(_, which, self)
@@ -212,10 +214,26 @@ function bt.BattleLog:get_top_level_widget()
 end
 
 --- @overload
+function bt.BattleLog:update(delta)
+
+end
+
+--- @overload
 function bt.BattleLog:push_back(line)
+
+    if not self:get_is_animated() then
+        self:set_is_animated(true)
+    end
+
     local label = rt.Label(line)
     label:set_alignment(rt.Alignment.START)
-    label:set_is_animated(true)
+
     self._labels_layout:push_back(label)
     self._scrollbar:set_n_steps(self._scrollbar:get_n_steps() + 1)
+end
+
+-- TODO
+function bt.BattleLog:draw()
+    self._frame:draw()
+    self._scrollbar_layout_revealer:draw_bounds()
 end
