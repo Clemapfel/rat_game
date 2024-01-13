@@ -136,42 +136,39 @@ end
 
 --- @brief
 function rt.Shape:set_rotation(angle)
-
-
     self._rotation = angle:as_radians()
 end
 
 --- @brief
 --- @return rt.Angle
 function rt.Shape:get_rotation()
-
     return rt.radians(self._rotation)
 end
 
 --- @brief set whether the shape should be rendered without a volume
 --- @param b Boolean
 function rt.Shape:set_is_outline(b)
-
     self._is_outline = b
 end
 
 --- @brief get whether the shape should be rendered without a volume
 --- @return Boolean
 function rt.Shape:get_is_outline()
-
     return self._is_outline
 end
 
 --- @brief [internal] convert to love.graphics.DrawMode
 --- @return String
 function rt.Shape:_get_draw_mode()
-
-    if self._is_outline then return "line" else return "fill" end
+    if self._is_outline then
+        return "line"
+    else
+        return "fill"
+    end
 end
 
 --- @class rt.Point
 rt.Point = meta.new_type("Point", function(x, y)
-
     return meta.new(rt.Point, {
         _vertices = {x, y}
     }, rt.Shape, rt.Drawable)
@@ -182,6 +179,7 @@ function rt.Point:get_centroid()
     return self._vertices.x, self._vertices.y
 end
 
+--- @overload
 function rt.Point:draw()
     if not self:get_is_visible() then return end
     self:_bind()
@@ -191,13 +189,13 @@ end
 
 --- @class rt.Points
 rt.Points = meta.new_type("Points", function(x, y, ...)
-
     assert(sizeof({...}) % 2 == 0)
     return meta.new(rt.Points, {
         _vertices = {...}
     }, rt.Shape, rt.Drawable)
 end)
 
+--- @overload
 function rt.Points:draw()
     if not self:get_is_visible() then return end
     self:_bind()
@@ -223,7 +221,6 @@ end
 
 --- @class rt.LineStrip
 rt.LineStrip = meta.new_type("LineStrip", function(a_x, a_y, b_x, b_y, ...)
-
     assert(sizeof({...}) % 2 == 0)
     local out = meta.new(rt.LineStrip, {
         _vertices = {a_x, a_y, b_x, b_y, ...},
@@ -237,7 +234,6 @@ end)
 
 --- @overload rt.Shape:get_centroid
 function rt.LineStrip:get_centroid()
-
     return self._centroid_x, self._centroid_y
 end
 
@@ -255,7 +251,6 @@ end
 
 --- @brief
 function rt.LineStrip:resize(a_x, a_y, b_x, b_y, ...)
-
     self._vertices = {a_x, a_y, b_x, b_y, ...}
     self:_compute_centroid()
 end
@@ -282,7 +277,6 @@ end
 rt.Rectangle = meta.new_type("Rectangle", function(top_left_x, top_left_y, width, height, corner_radius)
     if meta.is_nil(corner_radius) then corner_radius = 0 end
 
-
     return meta.new(rt.Rectangle, {
         _x = top_left_x,
         _y = top_left_y,
@@ -294,7 +288,7 @@ end)
 
 --- @overload rt.Shape.get_centroid()
 function rt.Rectangle:get_centroid()
-    return self._x + 0.5 * self._width, self._y + 0.5 * self._height
+    return self._x + 0.5 * self._w, self._y + 0.5 * self._h
 end
 
 --- @class rt.Square
@@ -311,35 +305,28 @@ end
 
 --- @brief TODO
 function rt.Rectangle:set_position(x, y)
-
-
     self._x = x
     self._y = y
 end
 
 --- @brief TODO
 function rt.Rectangle:set_size(width, height)
-
-
     self._w = width
     self._h = height
 end
 
 --- @brief TODO
 function rt.Rectangle:get_size()
-
     return self._w, self._h
 end
 
 --- @brief TODO
 function rt.Rectangle:set_corner_radius(px)
-
     self._corner_radius = px
 end
 
 --- @brief TODO
 function rt.Rectangle:resize(aabb, y, w, h)
-
     if meta.is_aabb(aabb) then
         self._x = aabb.x
         self._y = aabb.y
@@ -374,12 +361,7 @@ end
 
 --- @class rt.Ellipse
 rt.Ellipse = meta.new_type("Ellipse", function(center_x, center_y, x_radius, y_radius, n_outer_vertices)
-
-    if meta.is_nil(n_outer_vertices) then
-        n_outer_vertices = 0
-    end
-
-
+    if meta.is_nil(n_outer_vertices) then n_outer_vertices = 0 end
     return meta.new(rt.Ellipse, {
         _center_x = center_x,
         _center_y = center_y,
@@ -391,7 +373,6 @@ end)
 
 --- @overload rt.Shape:get_centroid
 function rt.Ellipse:get_centroid()
-
     return self._center_x, self._center_y
 end
 
@@ -402,7 +383,6 @@ end
 
 --- @brief
 function rt.Ellipse:set_radius(radius_x, radius_y)
-
     if not meta.is_nil(radius_y) then
         radius_y = radius_x
     end
@@ -413,7 +393,6 @@ end
 
 --- @brief
 function rt.Ellipse:resize(center_x, center_y, radius_x, radius_y)
-
     if not meta.is_nil(radius_y) then
 
     end
@@ -426,28 +405,22 @@ end
 
 --- @brief
 function rt.Ellipse:get_center()
-
     return self._center_x, self._center_y
 end
 
 --- @brief
 function rt.Ellipse:set_center(x, y)
-
-
     self._center_x = x
     self._center_y = y
 end
 
 --- @brief
 function rt.Ellipse:get_radius()
-
     return self._radius_x, self._radius_y
 end
 
 --- @brief
 function rt.Ellipse:set_radius(radius_x, radius_y)
-
-
     if not meta.is_nil(radius_y) then  end
 
     self._radius_x = radius_x
@@ -456,7 +429,6 @@ end
 
 --- @brief
 function rt.Ellipse:draw()
-
     if not self:get_is_visible() then return end
     self:_bind()
 
@@ -471,7 +443,6 @@ end
 
 --- @class rt.Polygon
 rt.Polygon = meta.new_type("Polygon", function(a_x, a_y, b_x, b_y, c_x, c_y, ...)
-
     local vertices =  {a_x, a_y, b_x, b_y, c_x, c_y, ...}
     local outer_hull = love.math.triangulate(vertices)
     for _, triangle in pairs(outer_hull) do
@@ -503,7 +474,6 @@ end
 
 --- @overload rt.Shape.get_centroid
 function rt.Polygon:get_centroid()
-
     local x_sum = 0
     local y_sum = 0
     local n = sizeof(self._vertices)
@@ -513,7 +483,6 @@ function rt.Polygon:get_centroid()
     end
     return x_sum / n, y_sum / n
 end
-
 
 --- @class rt.Triangle
 function rt.Triangle(a_x, a_y, b_x, b_y, c_x, c_y)
@@ -539,7 +508,6 @@ function rt.Dots:draw()
     love.graphics.points(splat(self._points))
     self:_unbind()
 end
-
 
 --- @brief test shapes
 function rt.test.shapes()

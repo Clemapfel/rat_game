@@ -243,6 +243,18 @@ function meta.get_property_names(x)
     return out
 end
 
+--- @brief get single property
+--- @return Table
+function meta.get_property(x, name)
+    return getmetatable(x).properties[name]
+end
+
+--- @brief get list of properties
+--- @return Table
+function meta.get_properties(x)
+    return getmetatable(x).properties
+end
+
 --- @brief make object immutable, this should be done inside the objects constructor
 --- @param x meta.Object
 --- @param b Boolean

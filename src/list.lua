@@ -237,6 +237,18 @@ function rt.List:is_empty()
     return self._n_elements == 0
 end
 
+--- @brief
+function rt.List:front()
+    if self._n_elements == 0 then return nil end
+    return self._first_node.value
+end
+
+--- @brief
+function rt.List:back()
+    if self._n_elements == 0 then return nil end
+    return self._last_node.value
+end
+
 --- @brief [internal] test list
 function rt.test.list()
     local list = rt.List()
