@@ -98,7 +98,7 @@ function rt.RevealLayout:size_allocate(x, y, width, height)
     if meta.is_widget(self._child) then
         self._child:fit_into(rt.AABB(x, y, width, height))
     end
-    self._max_offset = 0.5 * width
+    self._max_offset = width
 end
 
 --- @overload rt.Widget.measure

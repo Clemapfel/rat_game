@@ -1,7 +1,8 @@
 rt.settings.battle_log = {
     scrollbar_width = 3 * rt.settings.margin_unit,
     indicator_idle_color = rt.Palette.GRAY_4,
-    indicator_active_color = rt.Palette.GRAY_1
+    indicator_active_color = rt.Palette.GRAY_1,
+    scroll_speed = 10, -- letters per second
 }
 
 --- @class BattleLogTextLayout
@@ -112,7 +113,10 @@ bt.BattleLog = meta.new_type("BattleLog", function()
         _labels_layout = bt.BattleLogTextLayout(),
 
         _input = {}, -- rt.InputController
-        _scrollbar_offset = 0
+        _scrollbar_offset = 0,
+
+        _active_label = {}, -- rt.Label
+        _elapsed = 0
     }, rt.Widget, rt.Drawable, rt.Animation)
 
     out._scrollbar_layout:push_back(out._up_indicator)
@@ -205,6 +209,7 @@ bt.BattleLog = meta.new_type("BattleLog", function()
         self._scrollbar_layout_revealer:set_is_revealed(false)
     end, out)
 
+    out:set_is_animated(true)
     return out
 end)
 
@@ -215,7 +220,18 @@ end
 
 --- @overload
 function bt.BattleLog:update(delta)
+    self._elapsed = self._elapsed + delta
+    local step = 1 / rt.settings.battle_log.scroll_speed
 
+    local n_letters = 0
+    while self._elapsed >= step do
+        self._elapsed = self._elapsed - step
+        n_letters = n_letters + 1
+    end
+
+    if meta.is_label(self._active_label) then
+        self._active_label:set_n_visible_characters(self._active_label:get_n_visible_characters() + n_letters)
+    end
 end
 
 --- @overload
@@ -227,6 +243,12 @@ function bt.BattleLog:push_back(line)
 
     local label = rt.Label(line)
     label:set_alignment(rt.Alignment.START)
+    label:set_n_visible_characters(0)
+
+    if meta.is_label(self._active_label) then
+        self._active_label:set_n_visible_characters(POSITIVE_INFINITY)
+    end
+    self._active_label = label
 
     self._labels_layout:push_back(label)
     self._scrollbar:set_n_steps(self._scrollbar:get_n_steps() + 1)

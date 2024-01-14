@@ -32,7 +32,7 @@ rt.Label = meta.new_type("Label", function(text, font, monospace_font)
         _default_height = 0,
         _current_width = 0,
         _current_height = 0,
-        _n_visible_characters = 0
+        _n_visible_characters = -1
     }, rt.Widget, rt.Drawable)
 
     return out
@@ -50,6 +50,7 @@ end
 
 --- @overload rt.Drawable.draw
 function rt.Label:draw()
+
     if not self:get_is_visible() then return end
     for _, glyph in pairs(self._glyphs) do
         if meta.isa(glyph, rt.Glyph) then
@@ -533,15 +534,18 @@ function rt.Label:_parse()
     if effect_wave then throw_parse_error("reached end of text, but effect wave region is still open") end
     if effect_rainbow then throw_parse_error("reached end of text, but effect rainbow region is still open") end
 
-    if first_parse then
+    -- if all chars are visible or n visibile character not yet set
+    if self._n_visible_characters == -1 or self._n_visible_characters == self._n_characters then
+        self._n_visible_characters = self._n_characters
+    else
+        self:set_n_visible_characters(self._n_visible_characters)
+    end
 
+    if first_parse then
         -- automatically start animations only for labels that have an animated effect
         if animation_necessary then
             self:set_is_animated(true)
         end
-
-        -- set initial value for n visible characters
-        self._n_visible_characters = self._n_characters
     end
 end
 
