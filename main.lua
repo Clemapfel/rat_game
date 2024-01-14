@@ -10,10 +10,11 @@ log:set_expand_vertically(false)
 log._frame:set_minimum_size(0, 250)
 rt.current_scene:set_child(log)
 
+
 rt.current_scene.input:signal_connect("pressed", function(_, which)
 
     if which == rt.InputButton.A then
-        log:push_back("<wave>" .. rt.random.string(16) .. "</wave>")
+        log:push_back("<wave><rainbow>" .. rt.random.string(16) .. "</rainbow></wave>")
     elseif which == rt.InputButton.B then
     elseif which == rt.InputButton.X then
     elseif which == rt.InputButton.Y then

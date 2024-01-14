@@ -129,14 +129,17 @@ bt.BattleLog = meta.new_type("BattleLog", function()
     out._down_indicator:set_vertical_alignment(rt.Alignment.END)
 
     local m = rt.settings.battle_log.scrollbar_width
+    local outer_margin = rt.settings.margin_unit + out._frame:get_thickness()
+
     out._scrollbar:set_minimum_size(m, 0)
     out._scrollbar_layout:set_spacing(rt.settings.margin_unit)
+    out._scrollbar_layout:set_horizontal_alignment(rt.Alignment.END)
+    out._scrollbar_layout:set_margin_horizontal(outer_margin)
+
     out._scrollbar_layout_revealer:set_child(out._scrollbar_layout)
 
-    local outer_margin = rt.settings.margin_unit + out._frame:get_thickness()
     out._scrollbar_layout_revealer:set_margin_vertical(outer_margin)
     out._scrollbar_layout_revealer:set_margin_horizontal(outer_margin)
-    out._scrollbar_layout:set_horizontal_alignment(rt.Alignment.END)
 
     for indicator in range(out._up_indicator, out._down_indicator) do
         indicator:set_minimum_size(m, m)
@@ -252,6 +255,8 @@ function bt.BattleLog:push_back(line)
 
     self._labels_layout:push_back(label)
     self._scrollbar:set_n_steps(self._scrollbar:get_n_steps() + 1)
+
+    self._labels_layout:scroll_down()
 end
 
 -- TODO

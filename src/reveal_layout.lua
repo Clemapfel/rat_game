@@ -9,7 +9,8 @@ rt.RevealLayout = meta.new_type("RevealLayout", function(child)
         _is_revealed = true,
         _current_offset = 0,
         _max_offset = 0,
-        _area = rt.AABB(0, 0, 1, 1)
+        _area = rt.AABB(0, 0, 1, 1),
+        _scissor = rt.AABB(0, 0, 1, 1)
     }, rt.Drawable, rt.Widget, rt.Animation)
 
     if not meta.is_nil(child) then out:set_child(child) end
@@ -30,15 +31,14 @@ end
 function rt.RevealLayout:update(delta)
 
     local target = ternary(self._is_revealed, 0, self._max_offset)
-
     local speed = rt.settings.revealer_layout.speed
 
     if math.abs(self._current_offset - target) >= 1 then
-        if self._current_offset > target then
+        if self._current_offset >= target then
             speed = speed * (1 + (math.abs(self._current_offset - self._max_offset) / math.abs(self._current_offset)))
             self._current_offset = self._current_offset - speed * delta
             self._current_offset = clamp(self._current_offset, 0, self._max_offset)
-        elseif self._current_offset < target then
+        elseif self._current_offset <= target then
             speed = speed * (1 + (math.abs(self._current_offset) / math.abs(self._current_offset - self._max_offset)))
             self._current_offset = self._current_offset + speed * delta
             self._current_offset = clamp(self._current_offset, 0, self._max_offset)
@@ -84,17 +84,20 @@ end
 function rt.RevealLayout:draw()
 
     love.graphics.push()
+    love.graphics.setScissor(self._scissor.x, self._scissor.y, self._scissor.width, self._scissor.height)
     love.graphics.translate(self._current_offset, 0)
 
-    if self:get_is_visible() and meta.is_widget(self._child) then
+    if self:get_is_visible() and meta.is_widget(self._child) and self._current_offset ~= self._max_offset then
         self._child:draw()
     end
 
+    love.graphics.setScissor()
     love.graphics.pop()
 end
 
 --- @overload rt.Widget.size_allocate
 function rt.RevealLayout:size_allocate(x, y, width, height)
+    self._scissor = rt.AABB(math.floor(x), math.floor(y), math.ceil(width), math.ceil(height))
     if meta.is_widget(self._child) then
         self._child:fit_into(rt.AABB(x, y, width, height))
     end
