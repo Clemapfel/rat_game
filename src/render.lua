@@ -54,7 +54,7 @@ rt.Renderer._2d_shape._native:setTexture(rt.Renderer._2d_canvas)
 
 -- camera
 rt.Renderer.camera = {
-    position = math3d.vec3(0, 0, 0.424), -- distance what is the expression for this value?
+    position = math3d.vec3(0, 0, 0.0), -- distance what is the expression for this value?
     rotation = math3d.vec2(0, 0),
 
     direction = nil,

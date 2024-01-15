@@ -382,6 +382,115 @@ POSITIVE_INFINITY = INFINITY
 --- @brief negative infinity
 NEGATIVE_INFINITY = -1/0
 
+--- @brief round to nearest integer
+--- @param i number
+--- @return number
+function math.round(i)
+    return math.floor(i + 0.5)
+end
+
+--- @brief get minimum and maximum of table
+function table.min_max(t)
+    local min, max = POSITIVE_INFINITY, NEGATIVE_INFINITY
+    for _, value in pairs(t) do
+        if value < min then min = value end
+        if value > max then max = value end
+    end
+    return min, max
+end
+
+--- @brief get first element of table, in iteration order
+--- @param t table
+function table.first(t)
+    for _, v in pairs(t) do return v end
+end
+
+--- @brief get last element of table, in iteration order
+--- @param t table
+function table.last(t)
+    local last = nil
+    for _, v in pairs(t) do
+        last = v
+    end
+    return last
+end
+
+--- @brief check if two tables have contents that compare equally
+--- @param left table
+--- @param right table
+--- @return boolean
+function table.compare(left, right)
+    if #left ~= #right then return false end
+
+    for key, value in pairs(left) do
+        if right[key] ~= value then return false end
+    end
+
+    return true
+end
+
+--- @brief iterate integer range
+--- @param range_start number
+--- @param range_end number
+--- @param increment number or nil
+function step_range(range_start, range_end, step)
+    if step == nil then step = 1 end
+
+    local start = range_start
+    if step == 0 then start = nil end -- causes _range_iterator to drop out before the first iteration
+
+    local state = {range_start, range_end, step, start}
+    return _step_range_iterator, state
+end
+
+_step_range_iterator = function(state)
+    local range_start, range_end, step, current = state[1], state[2], state[3], state[4]
+    if current == nil then return nil end
+
+    local next = current + step
+    if (step > 0 and next > range_end) or (step < 0 and next < range_end) then
+        next = nil
+    end
+
+    state[4] = next
+    return current, state
+end
+
+--- @brief iterate arbitrary number of elements, if vararg contains nils, they will be skipped
+--- @vararg any
+function range(...)
+    local elements = {...}
+    local n_elements = _G._select('#', ...)
+
+    local state = {}
+    for i = 1, n_elements do
+        state[i] = elements[i]
+    end
+
+    state.index = 1
+    state.n_elements = n_elements
+
+    return _range_iterator, state
+end
+
+_range_iterator = function(state)
+    local index, n_elements = state.index, state.n_elements
+    if index > n_elements then return nil end
+
+    while state[index] == nil and index <= n_elements do
+        index = index + 1
+    end
+    state.index = index + 1
+    return state[index], state
+end
+
+--- @brief
+function utf8.sub(str, i, j)
+    i = utf8.offset(str, i)
+    j = utf8.offset(str,j + 1) - 1
+    return string.sub(str, i, j)
+end
+
 --- @brief make first letter capital
 --- @param str string
 function string.capitalize(str)
@@ -520,105 +629,3 @@ end
 
 string._interpolation_character = "$"
 string._interpolation_escape_character = "//"
-
---- @brief round to nearest integer
---- @param i number
---- @return number
-function math.round(i)
-    return math.floor(i + 0.5)
-end
-
---- @brief get minimum and maximum of table
-function table.min_max(t)
-    local min, max = POSITIVE_INFINITY, NEGATIVE_INFINITY
-    for _, value in pairs(t) do
-        if value < min then min = value end
-        if value > max then max = value end
-    end
-    return min, max
-end
-
---- @brief get first element of table, in iteration order
---- @param t table
-function table.first(t)
-    for _, v in pairs(t) do return v end
-end
-
---- @brief get last element of table, in iteration order
---- @param t table
-function table.last(t)
-    local last = nil
-    for _, v in pairs(t) do
-        last = v
-    end
-    return last
-end
-
---- @brief check if two tables have contents that compare equally
---- @param left table
---- @param right table
---- @return boolean
-function table.compare(left, right)
-    if #left ~= #right then return false end
-
-    for key, value in pairs(left) do
-        if right[key] ~= value then return false end
-    end
-
-    return true
-end
-
---- @brief iterate integer range
---- @param range_start number
---- @param range_end number
---- @param increment number or nil
-function step_range(range_start, range_end, step)
-    if step == nil then step = 1 end
-
-    local start = range_start
-    if step == 0 then start = nil end -- causes _range_iterator to drop out before the first iteration
-
-    local state = {range_start, range_end, step, start}
-    return _step_range_iterator, state
-end
-
-_step_range_iterator = function(state)
-    local range_start, range_end, step, current = state[1], state[2], state[3], state[4]
-    if current == nil then return nil end
-
-    local next = current + step
-    if (step > 0 and next > range_end) or (step < 0 and next < range_end) then
-        next = nil
-    end
-
-    state[4] = next
-    return current, state
-end
-
---- @brief iterate arbitrary number of elements, if vararg contains nils, they will be skipped
---- @vararg any
-function range(...)
-    local elements = {...}
-    local n_elements = _G._select('#', ...)
-
-    local state = {}
-    for i = 1, n_elements do
-        state[i] = elements[i]
-    end
-
-    state.index = 1
-    state.n_elements = n_elements
-
-    return _range_iterator, state
-end
-
-_range_iterator = function(state)
-    local index, n_elements = state.index, state.n_elements
-    if index > n_elements then return nil end
-
-    while state[index] == nil and index <= n_elements do
-        index = index + 1
-    end
-    state.index = index + 1
-    return state[index], state
-end

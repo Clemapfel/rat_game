@@ -61,7 +61,6 @@ rt.Font[rt.FontStyle.BOLD_ITALIC] = love.graphics.getFont()
 --- @brief [internal] update held fonts
 function rt.Font:_update()
 
-
     self[rt.FontStyle.REGULAR] = love.graphics.newFont(self._regular_path, self._size)
     self[rt.FontStyle.BOLD] = love.graphics.newFont(self._bold_path, self._size)
     self[rt.FontStyle.ITALIC] = love.graphics.newFont(self._italic_path, self._size)

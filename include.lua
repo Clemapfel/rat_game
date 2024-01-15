@@ -4,9 +4,7 @@ do
         ";?.lua",
         ";src/?.lua",
         ";battle/?.lua",
-        ";submodules/?/init.lua",
-
-        ";submodules/luafft/src/?.lua"  -- bc luafft doesnt
+        ";submodules/?/init.lua"
     }
     love.filesystem.setRequirePath(love.filesystem.getRequirePath() .. table.concat(paths))
 end
@@ -30,9 +28,12 @@ setmetatable(bt, {
     end
 })
 
+-- standard libs
+ffi = require "ffi"
+utf8 = require "utf8"
+
 -- submodules
 math3d = require "submodules.cpml"
-ffi = require "ffi"
 
 require "common"
 
