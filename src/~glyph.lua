@@ -79,24 +79,6 @@ end)
 rt.Glyph._outline_shader = rt.Shader("assets/shaders/outline_blur.glsl")
 rt.Glyph._outline_color = rt.RGBA(0, 0, 0, 1)
 
---- @brief [internal]
-function rt.Glyph:_update_outline()
-    if self._is_outlined == true then
-        local w, h = self:get_size()
-        local offset = rt.settings.glyph.outline_render_texture_padding;
-        self._outline_render_texture = rt.RenderTexture(w + 2 * offset, h + 2 * offset)
-
-        love.graphics.push()
-        love.graphics.reset()
-
-        self._outline_render_texture:bind_as_render_target()
-        self:render(self._glyph, offset, offset)
-        self._outline_render_texture:unbind_as_render_target()
-
-        love.graphics.pop()
-    end
-end
-
 --- @brief [internal] update held graphical object
 function rt.Glyph:_update()
 
@@ -123,17 +105,32 @@ function rt.Glyph:_update()
         end
     end
 
-    self:_update_outline()
+    if self._is_outlined == true then
+        local w, h = self:get_size()
+        local offset = rt.settings.glyph.outline_render_texture_padding;
+        self._outline_render_texture = rt.RenderTexture(w + 2 * offset, h + 2 * offset)
+
+        love.graphics.push()
+        love.graphics.reset()
+
+        self._outline_render_texture:bind_as_render_target()
+        self:render(self._glyph, offset, offset)
+        self._outline_render_texture:unbind_as_render_target()
+
+        love.graphics.pop()
+    end
 end
 
 --- @brief [internal] initialize data needed for `set_n_visible_characters`
 function rt.Glyph:_initialize_character_widths()
 
+    local clock = rt.Clock()
     self._character_widths = {}
     local offset = 0
     local n_chars = utf8.len(self._content)
     local font = self._font[self._style]
     for i = 1, n_chars  do
+
         local c = utf8.sub(self._content, i, i)
         local width;
         if i == 1 then
@@ -161,21 +158,34 @@ function rt.Glyph:_draw_outline(x, y)
 end
 
 --- @brief [internal] draw glyph with _is_animated = false
-function rt.Glyph:draw()
+function rt.Glyph:_non_animated_draw()
+
+    local old_r, old_g, old_b, old_a = love.graphics.getColor()
+
     local x, y = self:get_position()
     local w, h = self:get_size()
 
-    if sizeof(self._character_widths) == 0 then
-        self:_initialize_character_widths()
+    if self._n_visible_chars >= utf8.len(self._content) then
+
+        if self._is_outlined then self:_draw_outline(x, y) end
+
+        love.graphics.setColor(self._color.r, self._color.g, self._color.b, self._color.a)
+        self:render(self._glyph, math.floor(x), math.floor(y))
+    elseif self:get_n_visible_characters() > 0 then
+        if sizeof(self._character_widths) == 0 then
+            self:_initialize_character_widths()
+        end
+
+        local w = self._character_offsets[self._n_visible_chars]
+        local _, h = self:get_size()
+        love.graphics.setScissor(x, y, w, h)
+
+        if self._is_outlined then self:_draw_outline(x, y) end
+
+        love.graphics.setColor(self._color.r, self._color.g, self._color.b, self._color.a)
+        self:render(self._glyph, math.floor(x), math.floor(y))
+        love.graphics.setScissor()
     end
-
-    local w = self._character_offsets[self._n_visible_chars]
-    local _, h = self:get_size()
-
-    if self._is_outlined then self:_draw_outline(x, y) end
-
-    love.graphics.setColor(self._color.r, self._color.g, self._color.b, self._color.a)
-    self:render(self._glyph, math.floor(x), math.floor(y))
 
     local font = self._font[self._style]
     local strikethrough_base = y + 0.5 * font:getHeight() + 0.5
@@ -189,17 +199,96 @@ function rt.Glyph:draw()
     if self._is_underlined then
         love.graphics.line(x, underline_base, x + w, underline_base)
     end
+
+    love.graphics.setColor(old_r, old_g, old_b, old_a)
+end
+
+--- @brief [internal] draw glyph animation , much less performant
+function rt.Glyph:_animated_draw()
+
+    if sizeof(self._character_widths) == 0 then
+        self:_initialize_character_widths()
+    end
+
+    local old_r, old_g, old_b, old_a = love.graphics.getColor()
+    love.graphics.setColor(self._color.r, self._color.g, self._color.b, self._color.a)
+    love.graphics.push()
+
+    local x, y = self:get_position()
+    local _, h = self:get_size()
+
+    local w = 0
+    for i = 1, utf8.len(self._content) do
+
+        if i > self._n_visible_chars then break end
+
+        w = self._character_widths[i]
+        local scissor = rt.AABB(x, y, w, h)
+        local color = self._color
+
+        if self._effects[rt.TextEffect.RAINBOW] == true then
+            color = self._effects_data.rainbow[i]
+        end
+
+        local offset = rt.Vector2(0, 0)
+
+        if self._effects[rt.TextEffect.WAVE] == true or self._effects[rt.TextEffect.SHAKE] == true then
+            offset = self._effects_data.offsets[i]
+        end
+
+        local stencil_value = 255
+        love.graphics.stencil(function()
+            love.graphics.rectangle("fill", scissor.x + offset.x, scissor.y + offset.y, scissor.width, scissor.height)
+        end, "replace", stencil_value, false)
+        love.graphics.setStencilTest("equal", stencil_value)
+
+        local pos_x, pos_y = self:get_position()
+        if self._is_outlined then self:_draw_outline(pos_x + offset.x, pos_y + offset.y) end
+        love.graphics.setColor(color.r, color.g, color.b, color.a)
+        self:render(self._glyph, math.floor(pos_x + offset.x), math.floor(pos_y + offset.y))
+
+        if self._is_strikethrough or self._is_underlined then
+            local font = self._font[self._style]
+            local strikethrough_base = pos_y + offset.y + 0.5 * font:getHeight() + 0.5
+            local underline_base = pos_y + offset.y + font:getBaseline() - 0.5 * font:getDescent()
+            local w = select(1, self:get_size())
+            love.graphics.setLineWidth(1)
+
+            if self._is_strikethrough then
+                love.graphics.line(pos_x + offset.x, strikethrough_base, pos_x + offset.x + w, strikethrough_base)
+            end
+
+            if self._is_underlined then
+                love.graphics.line(pos_x + offset.x, underline_base, pos_x + offset.x + w, underline_base)
+            end
+        end
+
+        x = x + w
+    end
+
+    love.graphics.pop()
+    love.graphics.setColor(old_r, old_g, old_b, old_a)
+
+    love.graphics.stencil(function() end, "replace", 0, true)
+end
+
+--- @overload rt.Drawable.draw
+function rt.Glyph:draw()
+
+    if not self:get_is_visible() then return end
+
+    if self:get_is_animated() then
+        self:_animated_draw()
+    else
+        self:_non_animated_draw()
+    end
 end
 
 --- @overload rt.Animation.update
 function rt.Glyph:update(delta)
     self._elapsed_time = self._elapsed_time + delta
 
-    local font = self._font[self._style]
-    self._glyph = love.graphics.newText(font, {{self._color.r, self._color.g, self._color.b}, ""})
-
-    local width = 0
-    for i = 1, math.min(utf8.len(self._content), self._n_visible_chars) do
+    for i = 1, utf8.len(self._content) do
 
         local x_offset = 0
         local y_offset = 0
@@ -225,24 +314,6 @@ function rt.Glyph:update(delta)
         if use_offset then
             self._effects_data.offsets[i] = rt.Vector2(x_offset, y_offset)
         end
-
-        local current = utf8.sub(self._content, i, i)
-        local kerning = 0
-        if i > 1 then
-            local previous = utf8.sub(self._content, i - 1, i - 1)
-            kerning = font:getKerning(previous, current)
-        end
-
-        self._glyph:add(
-            utf8.sub(self._content, i, i),
-            width + kerning + x_offset, y_offset,  -- pos
-            0,                           -- rotation (rad)
-            1, 1,                        -- scale
-            0, 0,                        -- origin offset
-            0, 0                         -- shear
-        )
-
-        width = width + font:getWidth(current) + kerning
     end
 end
 
@@ -270,6 +341,7 @@ end
 --- @brief set font color
 --- @param color rt.RGBA
 function rt.Glyph:set_color(color)
+
     if meta.is_hsva(color) then
         color = rt.hsva_to_rgba(color)
     end
@@ -320,13 +392,11 @@ end
 --- @brief set number of visible characters, used for text scrolling
 --- @param n Number
 function rt.Glyph:set_n_visible_characters(n)
-    if n ~= self._n_visible_chars then
-        n = clamp(n, 0, self:get_n_characters())
-        self._n_visible_chars = n
+    n = clamp(n, 0, self:get_n_characters())
+    self._n_visible_chars = n
 
-        local font = self._font[self._style]
-        self._glyph = love.graphics.newText(font, {{self._color.r, self._color.g, self._color.b}, utf8.sub(self._content, 1, n)})
-        self:_update_outline()
+    if sizeof(self._character_widths) == 0 then
+        self:_initialize_character_widths()
     end
 end
 
@@ -340,3 +410,4 @@ end
 function rt.test.glyph()
     error("TODO")
 end
+

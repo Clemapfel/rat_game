@@ -406,12 +406,12 @@ end
 --- @brief [internal] add meta.is_* and meta.assert_* given type
 function meta._define_type_assertion(typename)
 
-    if #typename == 0 or typename == "nil" or typename == "number" or typename == "table" or typename == "boolean" or typename == "function" or typename == "userdata" then return end
+    if string.len(typename) == 0 or typename == "nil" or typename == "number" or typename == "table" or typename == "boolean" or typename == "function" or typename == "userdata" then return end
 
     function string.to_snake_case(str, screaming)
         local out = {""}
         table.insert(out, string.lower(string.sub(str, 1, 1)))
-        for i = 2, #str do
+        for i = 2, string.len(str) do
             local c = string.sub(str, i, i)
             if string.is_upper(c) then
                 table.insert(out, "_")

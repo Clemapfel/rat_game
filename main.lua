@@ -12,20 +12,16 @@ rt.current_scene:set_child(log)
 
 
 local font = rt.settings.font.default[rt.FontStyle.REGULAR]
-local str = "<wave><rainbow>" .. "∞" .. "</rainbow></wave>"
-for i = 1, utf8.len(str) do
-    local c = utf8.sub(str, i, i)
-    println(c, " ", font:getWidth(c))
-end
+local str = "<o><rainbow>" .. "TojjyP_To∞" .. "</rainbow></o>"
 
 label = rt.Label(str)
-label:set_n_visible_characters(0)
+--label:set_n_visible_characters(0)
 rt.current_scene:set_child(label)
 
 rt.current_scene.input:signal_connect("pressed", function(_, which)
 
     if which == rt.InputButton.A then
-        log:push_back("<wave><rainbow><mono>" .. "TojjyP_To" .. "</mono></rainbow></wave>")
+        log:push_back("<mono>" .. "TojjyP_To" .. "</mono>")
     elseif which == rt.InputButton.B then
     elseif which == rt.InputButton.X then
     elseif which == rt.InputButton.Y then
@@ -35,6 +31,7 @@ rt.current_scene.input:signal_connect("pressed", function(_, which)
     elseif which == rt.InputButton.RIGHT then
         label:set_n_visible_characters(label:get_n_visible_characters() + 1)
     elseif which == rt.InputButton.LEFT then
+        label:set_n_visible_characters(label:get_n_visible_characters() - 1)
     elseif which == rt.InputButton.DOWN then
     end
 end)

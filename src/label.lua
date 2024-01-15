@@ -303,7 +303,7 @@ function rt.Label:_parse()
             }
         ))
 
-        self._n_characters = self._n_characters + #current_word
+        self._n_characters = self._n_characters + string.len(current_word)
         current_word = ""
 
         if effect_rainbow or effect_shake or effect_wave then
@@ -330,7 +330,7 @@ function rt.Label:_parse()
         local sequence = ""
         local sequence_i = 0
         repeat
-            if i + sequence_i > #self._raw then
+            if i + sequence_i > string.len(self._raw) then
                 throw_parse_error("malformed tag, reached end of text")
             end
             local sequence_s = string.sub(self._raw, i + sequence_i, i + sequence_i)
@@ -340,7 +340,7 @@ function rt.Label:_parse()
 
         for tag in pairs(tags) do
             if not meta.is_nil(string.find(sequence, tag)) then
-                step(#sequence)
+                step(string.len(sequence))
                 return true
             end
         end
@@ -352,7 +352,7 @@ function rt.Label:_parse()
         local sequence = ""
         local color_i = 0
         repeat
-            if i + color_i > #self._raw then
+            if i + color_i > string.len(self._raw) then
                 throw_parse_error("malformed color tag, reached end of text")
             end
             local color_s = string.sub(self._raw, i + color_i, i + color_i)
@@ -367,14 +367,14 @@ function rt.Label:_parse()
                     throw_parse_error("malformed color tag: color `" .. new_color .. "` unknown")
                 end
                 color = new_color
-                step(#sequence)
+                step(string.len(sequence))
                 return true
             end
         end
         return false
     end
 
-    while i <= #self._raw do
+    while i <= string.len(self._raw) do
         if s == rt.Label.ESCAPE_CHARACTER then
             current_word = current_word .. s
             step(1)
@@ -509,7 +509,7 @@ function rt.Label:_parse()
                 local sequence = ""
                 local sequence_i = 0
                 repeat
-                    if i + sequence_i > #self._raw then
+                    if i + sequence_i > string.len(self._raw) then
                         throw_parse_error("malformed tag, reached end of text")
                     end
                     local sequence_s = string.sub(self._raw, i + sequence_i, i + sequence_i)

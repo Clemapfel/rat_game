@@ -4,7 +4,7 @@
 function print(...)
 
     local values = {...}
-    if #values == 0 then
+    if string.len(values) == 0 then
         io.write("nil")
         return
     end
@@ -289,7 +289,7 @@ function serialize(object_identifier, object, inject_sourcecode)
         file:close()
 
         -- remove last newline
-        local n = #str_buffer
+        local n = string.len(str_buffer)
         str_buffer[n] = string.sub(str_buffer[n], 1, string.len(str_buffer[n]) - 1)
 
         return table.concat(str_buffer)
@@ -500,13 +500,13 @@ end
 
 --- @brief check if character is upper case or non-letter
 function string.is_lower(str)
-    assert(type(str) == "string" and #str == 1)
+    assert(type(str) == "string" and string.len(str) == 1)
     return string.find(str, "[a-z]") ~= nil
 end
 
 --- @brief check if character is lower case
 function string.is_upper(str)
-    assert(type(str) == "string" and #str == 1)
+    assert(type(str) == "string" and string.len(str) == 1)
     return string.find(str, "[A-Z1-9]") ~= nil
 end
 
@@ -557,6 +557,11 @@ function string.hash(str)
         hash = (bit.lshift(hash, 5) + hash) + string.byte(string.sub(str, i, i))
     end
     return hash
+end
+
+--- @brief get number of bits in string
+function string.len(str)
+    return #str
 end
 
 --- @brief evalue all substrings of the form `$(statement)` as code and replace the sequence with the result. If `environment` is specified, that able will be used as each sequences entire environment, otherwise _G is used

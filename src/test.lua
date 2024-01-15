@@ -27,7 +27,7 @@ function rt.test.common()
         abc = 1234
     }
     recursive["recursive"] = recursive
-    assert(#serialize(recursive) ~= 0)
+    assert(string.len(serialize(recursive)) ~= 0)
 
     assert(INFINITY > 2^64)
     assert(INFINITY == INFINITY)
