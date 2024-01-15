@@ -12,7 +12,7 @@ rt.current_scene:set_child(log)
 
 
 local font = rt.settings.font.default[rt.FontStyle.REGULAR]
-local str = "<o><rainbow>" .. "TojjyP_To∞" .. "</rainbow></o>"
+local str = "<o><wave><shake>" .. "TojjyP_To∞" .. "</wave></shake></o>"
 
 label = rt.Label(str)
 --label:set_n_visible_characters(0)

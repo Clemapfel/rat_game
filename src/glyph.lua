@@ -65,6 +65,7 @@ rt.Glyph = meta.new_type("Glyph", function(font, content, look)
         _n_visible_chars = POSITIVE_INFINITY,
         _character_widths = {},
         _character_offsets = {},
+        _current_width = 0,
         _effects_data = {},
         _outline_render_texture = {} -- rt.RenderTexture
     }, rt.Drawable, rt.Animation)
@@ -82,14 +83,24 @@ rt.Glyph._outline_color = rt.RGBA(0, 0, 0, 1)
 --- @brief [internal]
 function rt.Glyph:_update_outline()
     if self._is_outlined == true then
-        local w, h = self:get_size()
+        local w, h = self._current_width, self._glyph:getHeight()
         local offset = rt.settings.glyph.outline_render_texture_padding;
-        self._outline_render_texture = rt.RenderTexture(w + 2 * offset, h + 2 * offset)
+        w, h = w + 2 * offset, h + 2 * offset
+
+        if self._effects[rt.TextEffect.WAVE] or self._effects[rt.TextEffect.SHAKE] then
+            w = w + 2 * math.max(rt.settings.glyph.wave_offset, rt.settings.glyph.shake_offset)
+            h = h + 2 * math.max(rt.settings.glyph.wave_offset, rt.settings.glyph.shake_offset)
+        end
+
+        if not meta.isa(self._outline_render_texture, rt.RenderTexture) or self._outline_render_texture:get_width() ~= w or self._outline_render_texture:get_height() ~= h then
+            self._outline_render_texture = rt.RenderTexture(w, h)
+        end
 
         love.graphics.push()
         love.graphics.reset()
 
         self._outline_render_texture:bind_as_render_target()
+        love.graphics.clear()
         self:render(self._glyph, offset, offset)
         self._outline_render_texture:unbind_as_render_target()
 
@@ -123,6 +134,7 @@ function rt.Glyph:_update()
         end
     end
 
+    self._current_width = self._glyph:getWidth()
     self:_update_outline()
 end
 
@@ -174,8 +186,24 @@ function rt.Glyph:draw()
 
     if self._is_outlined then self:_draw_outline(x, y) end
 
-    love.graphics.setColor(self._color.r, self._color.g, self._color.b, self._color.a)
-    self:render(self._glyph, math.floor(x), math.floor(y))
+    if self._effects[rt.TextEffect.RAINBOW] or self._effects[rt.TextEffect.OUTLINE] then
+
+        --[[
+        local stencil_value = 255
+        love.graphics.stencil(function()
+            love.graphics.rectangle("fill", scissor.x + offset.x, scissor.y + offset.y, scissor.width, scissor.height)
+        end, "replace", stencil_value, false)
+        love.graphics.setStencilTest("equal", stencil_value)
+
+        color = self._effects_data.rainbow[i]
+
+        love.graphics.setColor(color.r, color.g, color.b, color.a)
+        self:render(self._glyph, math.floor(pos_x + offset.x), math.floor(pos_y + offset.y))
+        ]]--
+    else
+        love.graphics.setColor(self._color.r, self._color.g, self._color.b, self._color.a)
+        self:render(self._glyph, math.floor(x), math.floor(y))
+    end
 
     local font = self._font[self._style]
     local strikethrough_base = y + 0.5 * font:getHeight() + 0.5
@@ -193,6 +221,7 @@ end
 
 --- @overload rt.Animation.update
 function rt.Glyph:update(delta)
+
     self._elapsed_time = self._elapsed_time + delta
 
     local font = self._font[self._style]
@@ -235,15 +264,18 @@ function rt.Glyph:update(delta)
 
         self._glyph:add(
             utf8.sub(self._content, i, i),
-            width + kerning + x_offset, y_offset,  -- pos
-            0,                           -- rotation (rad)
-            1, 1,                        -- scale
-            0, 0,                        -- origin offset
-            0, 0                         -- shear
+            width + kerning + x_offset, y_offset,
+            0,     -- rotation (rad)
+            1, 1,  -- scale
+            0, 0,  -- origin offset
+            0, 0   -- shear
         )
 
         width = width + font:getWidth(current) + kerning
     end
+
+    self._current_width = width
+    self:_update_outline()
 end
 
 --- @brief set font style

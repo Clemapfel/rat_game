@@ -73,6 +73,18 @@ function rt.Texture:get_size()
     return self._native:getWidth(), self._native:getHeight()
 end
 
+--- @brief get width
+--- @return Number
+function rt.Texture:get_width()
+    return self._native:getWidth()
+end
+
+--- @brief get height
+--- @return Number
+function rt.Texture:get_height()
+    return self._native:getHeight()
+end
+
 --- @overload rt.Drawable.draw
 function rt.Texture:draw()
     love.graphics.draw(self._native)
