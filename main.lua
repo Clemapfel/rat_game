@@ -10,7 +10,6 @@ log:set_expand_vertically(false)
 log._frame:set_minimum_size(0, 250)
 rt.current_scene:set_child(log)
 
-
 local font = rt.settings.font.default[rt.FontStyle.REGULAR]
 local str = "<rainbow>" .. "TojjyP_To∞" .. "</rainbow>"
 
@@ -49,7 +48,7 @@ love.load = function()
 end
 
 love.draw = function()
-    love.graphics.clear(0, 0, 0, 1)
+    love.graphics.clear(0.75, 0, 0.75, 1)
     rt.current_scene:draw()
 end
 

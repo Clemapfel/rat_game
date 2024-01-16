@@ -92,50 +92,39 @@ float random(float x)
     return random(vec2(x));
 }
 
+// ###############################
+
+uniform bool _shake_active;
+uniform float _shake_offset; // rt.settings.glyph.shake_offset
+uniform float _shake_period; // rt.settings.glyph.shake_period
+
+uniform bool _wave_active;
+uniform float _wave_period; // rt.settings.glyph.wave_period
+uniform float _wave_offset; // rt.settings.glyph.wave_offset
+uniform float _wave_speed;  // rt.settings.glyph.wave_speed
+
+uniform bool _rainbow_active;
+
+uniform int _n_visible_characters;
+
 #ifdef VERTEX
 
-flat varying int _vertex_id;
-
-uniform float _time;
+flat varying int _letter_index;
 
 vec4 position(mat4 transform, vec4 vertex_position)
 {
-    const float shake_offset = 6;
-    const float shake_period = 15;
-
-    _vertex_id = gl_VertexID;
-    int letter_id = _vertex_id / 4;
-    vec4 position = vertex_position;
-
-    float i_offset = round(_time / (1 / shake_period));
-    position.x += random(letter_id + i_offset) * shake_offset;
-    position.y += random(letter_id + i_offset + 3.14159) * shake_offset;
-
-    return transform * position;
+    return transform * vertex_position;
 }
 
 #endif
 
 #ifdef PIXEL
 
-uniform vec4 _text_color_rgba;
-uniform float _rainbow_width;
-uniform float _time;
+flat varying int _letter_index;
 
-flat varying int _vertex_id;
-
-vec4 effect(vec4 vertex_color, Image tex, vec2 texture_coords, vec2 vertex_position)
+vec4 effect(vec4 vertex_color, Image image, vec2 texture_coords, vec2 vertex_position)
 {
-    vec4 self = Texel(tex, texture_coords) * vertex_color;
-    vec4 text_color = _text_color_rgba;
-    float error = sum(abs(self.rgba - text_color.rgba));
-    vec3 target = self.rgb * (1 - error);
-    float time = _time;
-
-    float hue = (_vertex_id / 4);
-    hue /= _rainbow_width;
-    vec3 rainbow = hsv_to_rgb(vec3(hue + time, 1, 1));
-    return vec4(target * rainbow, self.a);
+    return Texel(image, texture_coords) * vertex_color;
 }
 
 #endif
