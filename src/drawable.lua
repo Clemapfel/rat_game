@@ -31,7 +31,6 @@ function rt.Drawable:render(love_drawable, x, y, transform)
     if meta.is_nil(transform) then
         love.graphics.draw(love_drawable, x, y)
     else
-
         love.graphics.draw(love_drawable,
             x,
             y,

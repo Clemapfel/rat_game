@@ -38,7 +38,6 @@ float sum(vec4 arg)
     return arg.x + arg.y + arg.z + arg.w;
 }
 
-// random
 vec3 mod289(vec3 x) {
     return x - floor(x * (1.0 / 289.0)) * 289.0;
 }
@@ -104,8 +103,10 @@ uniform float _wave_offset; // rt.settings.glyph.wave_offset
 uniform float _wave_speed;  // rt.settings.glyph.wave_speed
 
 uniform bool _rainbow_active;
+uniform int _rainbow_width; // rt.settings.glyph.rainbow_width
 
 uniform int _n_visible_characters;
+uniform float _time;
 
 #ifdef VERTEX
 
@@ -113,6 +114,7 @@ flat varying int _letter_index;
 
 vec4 position(mat4 transform, vec4 vertex_position)
 {
+    _letter_index = gl_VertexID / 4;
     return transform * vertex_position;
 }
 
@@ -124,7 +126,20 @@ flat varying int _letter_index;
 
 vec4 effect(vec4 vertex_color, Image image, vec2 texture_coords, vec2 vertex_position)
 {
-    return Texel(image, texture_coords) * vertex_color;
+    if (_letter_index >= _n_visible_characters)
+        discard;
+
+    vec4 color = Texel(image, texture_coords) * vertex_color;
+
+    if (_rainbow_active)
+    {
+        float time = _time;
+        float hue = float(_letter_index) / _rainbow_width;
+        vec3 rainbow = hsv_to_rgb(vec3(hue + time, 1, 1));
+        color.rgb = color.rgb * rainbow;
+    }
+
+    return color;
 }
 
 #endif

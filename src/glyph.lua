@@ -3,7 +3,7 @@ rt.settings.glyph = {
     default_outline_color = rt.RGBA(0, 0, 0, 1),
     outline_thickness = 1,
     outline_render_texture_padding = 3,
-    rainbow_width = 15,    -- n characters
+    rainbow_width = 10,    -- n characters
     shake_offset = 6,      -- px
     shake_period = 15,     -- shakes per second
     wave_period = 10,      -- n chars
@@ -101,7 +101,7 @@ function rt.Glyph:_update()
         local x_offset = rt.settings.glyph.outline_render_texture_padding
         local y_offset = rt.settings.glyph.outline_render_texture_padding
 
-        w, h = w + 2 * offset, h + 2 * offset
+        w, h = w + 2 * x_offset, h + 2 * y_offset
 
         if self._effects[rt.TextEffect.WAVE] then
             w = w + 2 * rt.settings.glyph.wave_offset
@@ -137,11 +137,13 @@ function rt.Glyph:draw()
     self._render_shader:send("_wave_period", rt.settings.glyph.wave_period)
     self._render_shader:send("_wave_offset", rt.settings.glyph.wave_offset)
     self._render_shader:send("_wave_speed", rt.settings.glyph.wave_speed)
+    ]]--
 
-    self._render_shader:send("_rainbow_active", self._effects[rt.TextEffect.RAINBOW])
+    self._render_shader:send("_rainbow_active", self._effects[rt.TextEffect.RAINBOW] == true)
+    self._render_shader:send("_rainbow_width", rt.settings.glyph.rainbow_width)
+
     self._render_shader:send("_n_visible_characters", self._n_visible_characters)
     self._render_shader:send("_time", self._elapsed_time)
-    ]]--
 
     function draw_glyph(x, y)
         self._render_shader:bind()
@@ -180,7 +182,7 @@ function rt.Glyph:draw()
         -- render product using outline shader
         self._outline_shader:bind()
         self._outline_shader:send("_texture_resolution", {self._outline_render_texture:get_size()})
-        self:render(self._outline_render_texture, x - self._outline_render_offset_x, y - self._outline_render_offset_y)
+        self:render(self._outline_render_texture._native, x - self._outline_render_offset_x, y - self._outline_render_offset_y)
         self._outline_shader:unbind()
     end
 
@@ -191,7 +193,6 @@ end
 function rt.Glyph:update(delta)
     self._elapsed_time = self._elapsed_time + delta
 end
-
 
 --- @brief set font style
 --- @param style rt.FontStyle
