@@ -118,6 +118,8 @@ uniform float _time;
 
 flat varying int _letter_index;
 
+#define PI (355.f / 113.f)
+
 vec4 position(mat4 transform, vec4 vertex_position)
 {
     _letter_index = gl_VertexID / 4;
@@ -128,7 +130,15 @@ vec4 position(mat4 transform, vec4 vertex_position)
     {
         float i_offset = round(_time / (1 / _shake_period));
         position.x += project(random(_letter_index + i_offset), -1, 1) * _shake_offset;
-        position.y += project(random(_letter_index + i_offset + 1234567), -1, 1) * _shake_offset; // arbitary offset
+        position.y += project(random(_letter_index + i_offset + 123.4567), -1, 1) * _shake_offset;
+        // arbitary offset, just get any number different from the x result
+    }
+
+    if (_wave_active)
+    {
+        float x = ((_time / _wave_speed) + _letter_index);
+        position.y += sin((x * 2 * PI) / _wave_period) * _wave_offset;
+        // f(x) = sin((frequency * x * 2 * pi) / period) * amplitude
     }
 
     return transform * position;

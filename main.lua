@@ -11,15 +11,15 @@ log._frame:set_minimum_size(0, 250)
 rt.current_scene:set_child(log)
 
 local font = rt.settings.font.default[rt.FontStyle.REGULAR]
-local str = "<o><rainbow><shake>" .. "TojjyP_To∞" .. "</shake></rainbow></o>"
+local str = "<s><o><rainbow><wave><shake>" .. "To_jyäü" .. "</shake></wave></rainbow></o></s>"
 
 label = rt.Label(str)
---label:set_n_visible_characters(0)
 rt.current_scene:set_child(label)
 
 rt.current_scene.input:signal_connect("pressed", function(_, which)
 
     if which == rt.InputButton.A then
+        label:set_n_visible_characters(10000)
     elseif which == rt.InputButton.B then
     elseif which == rt.InputButton.X then
     elseif which == rt.InputButton.Y then
@@ -49,7 +49,9 @@ end
 
 love.draw = function()
     love.graphics.clear(0.75, 0, 0.75, 1)
-    rt.current_scene:draw()
+    --rt.current_scene:draw()
+
+    label:draw()
 end
 
 love.update = function()

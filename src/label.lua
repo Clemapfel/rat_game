@@ -50,7 +50,6 @@ end
 
 --- @overload rt.Drawable.draw
 function rt.Label:draw()
-
     if not self:get_is_visible() then return end
     for _, glyph in pairs(self._glyphs) do
         if meta.isa(glyph, rt.Glyph) then
@@ -243,7 +242,6 @@ function rt.Label:_parse()
 
     self._glyphs = {}
     self._n_characters = 0
-    self._n_visible_characters = 0
 
     local bold = false
     local italic = false
@@ -618,7 +616,6 @@ end
 --- @brief set number of visible characters, used for text scrolling
 --- @param n Number
 function rt.Label:set_n_visible_characters(n)
-
     local n_left =  clamp(n, 0, self._n_characters)
     local n_glyphs = sizeof(self._glyphs)
     local glyph_i = 1

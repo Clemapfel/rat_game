@@ -44,12 +44,10 @@ rt.Glyph = meta.new_type("Glyph", function(font, content, look)
     local is_outlined = look.is_outlined
     local outline_color = look.outline_color
     local effects = look.effects
-    local wrap_width = look.wrap_width
 
     if meta.is_nil(font_style) then font_style = rt.FontStyle.REGULAR end
     if meta.is_nil(color) then color = rt.RGBA(1, 1, 1, 1) end
     if meta.is_nil(effects) then effects = {} end
-    if meta.is_nil(wrap_width) then wrap_width = POSITIVE_INFINITY end
     if meta.is_nil(is_underlined) then is_underlined = false end
     if meta.is_nil(is_strikethrough) then is_strikethrough = false end
     if meta.is_nil(is_outlined) then is_outlined = false end
@@ -67,7 +65,7 @@ rt.Glyph = meta.new_type("Glyph", function(font, content, look)
         _glyph = {},        -- love.Text
         _position_x = 0,
         _position_y = 0,
-        _n_visible_characters = POSITIVE_INFINITY,
+        _n_visible_characters = utf8.len(content),
 
         _is_outlined = is_outlined,
         _outline_color = outline_color,
@@ -128,16 +126,14 @@ end
 --- @overload
 function rt.Glyph:draw()
 
-    self._render_shader:send("_shake_active", self._effects[rt.TextEffect.SHAKE])
+    self._render_shader:send("_shake_active", self._effects[rt.TextEffect.SHAKE] == true)
     self._render_shader:send("_shake_offset", rt.settings.glyph.shake_offset)
     self._render_shader:send("_shake_period", rt.settings.glyph.shake_period)
 
-    --[[
-    self._render_shader:send("_wave_active", self._effects[rt.TextEffect.WAVE])
+    self._render_shader:send("_wave_active", self._effects[rt.TextEffect.WAVE] == true)
     self._render_shader:send("_wave_period", rt.settings.glyph.wave_period)
     self._render_shader:send("_wave_offset", rt.settings.glyph.wave_offset)
     self._render_shader:send("_wave_speed", rt.settings.glyph.wave_speed)
-    ]]--
 
     self._render_shader:send("_rainbow_active", self._effects[rt.TextEffect.RAINBOW] == true)
     self._render_shader:send("_rainbow_width", rt.settings.glyph.rainbow_width)
@@ -227,7 +223,6 @@ function rt.Glyph:set_color(color)
     self._color = color
     self:_update()
 end
-
 
 --- @brief get color
 --- @return rt.RGBA
