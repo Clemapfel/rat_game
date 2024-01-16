@@ -12,7 +12,7 @@ rt.current_scene:set_child(log)
 
 
 local font = rt.settings.font.default[rt.FontStyle.REGULAR]
-local str = "<o><rainbow" .. "TojjyP_To∞" .. "</rainbow></o>"
+local str = "<rainbow>" .. "TojjyP_To∞" .. "</rainbow>"
 
 label = rt.Label(str)
 --label:set_n_visible_characters(0)
@@ -49,7 +49,7 @@ love.load = function()
 end
 
 love.draw = function()
-    love.graphics.clear(1, 0, 1, 1)
+    love.graphics.clear(0, 0, 0, 1)
     rt.current_scene:draw()
 end
 

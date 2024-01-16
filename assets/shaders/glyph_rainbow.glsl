@@ -18,9 +18,9 @@ vec3 hsv_to_rgb(vec3 c)
     return c.z * mix(K.xxx, clamp(p - K.xxx, 0.0, 1.0), c.y);
 }
 
-float sum(vec1 arg)
+float sum(float arg)
 {
-    return arg.x;
+    return arg;
 }
 
 float sum(vec2 arg)
@@ -87,17 +87,30 @@ float random(vec2 v)
     return 130.0 * dot(m, g);
 }
 
+float random(float x)
+{
+    return random(vec2(x));
+}
+
 #ifdef VERTEX
 
 flat varying int _vertex_id;
 
+uniform float _time;
+
 vec4 position(mat4 transform, vec4 vertex_position)
 {
-    const float shake_offset = 6;
+    const float shake_offset = 100;
     const float shake_period = 15;
 
     _vertex_id = gl_VertexID;
-    return transform * vertex_position;
+    vec4 position = vertex_position;
+
+    float i_offset = round(_time / (1 / shake_period));
+    position.x += random(_vertex_id + i_offset) * shake_offset;
+    position.y += random(_vertex_id + i_offset + 3.14159) * shake_offset;
+
+    return transform * position;
 }
 
 #endif
@@ -105,8 +118,8 @@ vec4 position(mat4 transform, vec4 vertex_position)
 #ifdef PIXEL
 
 uniform vec4 _text_color_rgba;
-uniform float _time;
 uniform float _rainbow_width;
+uniform float _time;
 
 flat varying int _vertex_id;
 

@@ -108,7 +108,7 @@ function rt.Glyph:_update_outline()
         love.graphics.reset()
 
         self._outline_render_texture:bind_as_render_target()
-        love.graphics.clear(0, 0, 0, 0.2)
+        love.graphics.clear(0, 0, 0, 0)
         self:render(self._glyph, offset, offset)
         self._outline_render_texture:unbind_as_render_target()
 
