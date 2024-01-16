@@ -3,7 +3,7 @@ rt.settings.glyph = {
     default_outline_color = rt.RGBA(0, 0, 0, 1),
     outline_thickness = 1,
     outline_render_texture_padding = 3,
-    rainbow_width = 15,    -- n characters
+    rainbow_width = 10,    -- n characters per cycle
     shake_offset = 6,      -- px
     shake_period = 15,     -- shakes per second
     wave_period = 10,      -- n chars
@@ -59,7 +59,7 @@ rt.Glyph = meta.new_type("Glyph", function(font, content, look)
         _effects = {},
         _is_animated = false,
         _elapsed_time = 0,
-        _glyph = {},
+        _glyph = {}, -- love.Text
         _position_x = 0,
         _position_y = 0,
         _n_visible_chars = POSITIVE_INFINITY,
@@ -77,8 +77,9 @@ rt.Glyph = meta.new_type("Glyph", function(font, content, look)
     return out
 end)
 
-rt.Glyph._outline_shader = rt.Shader("assets/shaders/outline_blur.glsl")
+rt.Glyph._outline_shader = rt.Shader("assets/shaders/glyph_outline.glsl")
 rt.Glyph._outline_color = rt.RGBA(0, 0, 0, 1)
+rt.Glyph._rainbow_shader = rt.Shader("assets/shaders/glyph_rainbow.glsl")
 
 --- @brief [internal]
 function rt.Glyph:_update_outline()
@@ -87,9 +88,16 @@ function rt.Glyph:_update_outline()
         local offset = rt.settings.glyph.outline_render_texture_padding;
         w, h = w + 2 * offset, h + 2 * offset
 
-        if self._effects[rt.TextEffect.WAVE] or self._effects[rt.TextEffect.SHAKE] then
-            w = w + 2 * math.max(rt.settings.glyph.wave_offset, rt.settings.glyph.shake_offset)
-            h = h + 2 * math.max(rt.settings.glyph.wave_offset, rt.settings.glyph.shake_offset)
+        if self._effects[rt.TextEffect.WAVE] then
+            w = w + 2 * rt.settings.glyph.wave_offset
+            h = h + 2 * rt.settings.glyph.wave_offset
+            offset = offset + rt.settings.glyph.wave_offset
+        end
+
+        if self._effects[rt.TextEffect.SHAKE] then
+            w = w + 2 * rt.settings.glyph.shake_offset
+            h = h + 2 * rt.settings.glyph.shake_offset
+            offset = offset + rt.settings.glyph.shake_offset
         end
 
         if not meta.isa(self._outline_render_texture, rt.RenderTexture) or self._outline_render_texture:get_width() ~= w or self._outline_render_texture:get_height() ~= h then
@@ -100,7 +108,7 @@ function rt.Glyph:_update_outline()
         love.graphics.reset()
 
         self._outline_render_texture:bind_as_render_target()
-        love.graphics.clear()
+        love.graphics.clear(0, 0, 0, 0.2)
         self:render(self._glyph, offset, offset)
         self._outline_render_texture:unbind_as_render_target()
 
@@ -111,7 +119,7 @@ end
 --- @brief [internal] update held graphical object
 function rt.Glyph:_update()
 
-    local font = self._font[self._style]
+    local font = self:_get_font()
     self._glyph = love.graphics.newText(font, {{self._color.r, self._color.g, self._color.b}, self._content})
 
     if not sizeof(self._character_widths) == 0 then
@@ -144,7 +152,7 @@ function rt.Glyph:_initialize_character_widths()
     self._character_widths = {}
     local offset = 0
     local n_chars = utf8.len(self._content)
-    local font = self._font[self._style]
+    local font = self:_get_font()
     for i = 1, n_chars  do
         local c = utf8.sub(self._content, i, i)
         local width;
@@ -186,26 +194,21 @@ function rt.Glyph:draw()
 
     if self._is_outlined then self:_draw_outline(x, y) end
 
-    if self._effects[rt.TextEffect.RAINBOW] or self._effects[rt.TextEffect.OUTLINE] then
-
-        --[[
-        local stencil_value = 255
-        love.graphics.stencil(function()
-            love.graphics.rectangle("fill", scissor.x + offset.x, scissor.y + offset.y, scissor.width, scissor.height)
-        end, "replace", stencil_value, false)
-        love.graphics.setStencilTest("equal", stencil_value)
-
-        color = self._effects_data.rainbow[i]
-
-        love.graphics.setColor(color.r, color.g, color.b, color.a)
-        self:render(self._glyph, math.floor(pos_x + offset.x), math.floor(pos_y + offset.y))
-        ]]--
-    else
-        love.graphics.setColor(self._color.r, self._color.g, self._color.b, self._color.a)
-        self:render(self._glyph, math.floor(x), math.floor(y))
+    if self._effects[rt.TextEffect.RAINBOW] then
+        self._rainbow_shader:send("_text_color_rgba", {self._color.r, self._color.g, self._color.b, self._color.a})
+        self._rainbow_shader:send("_time", self._elapsed_time)
+        self._rainbow_shader:send("_rainbow_width", rt.settings.glyph.rainbow_width)
+        self._rainbow_shader:bind()
     end
 
-    local font = self._font[self._style]
+    love.graphics.setColor(self._color.r, self._color.g, self._color.b, self._color.a)
+    self:render(self._glyph, math.floor(x), math.floor(y))
+
+    if self._effects[rt.TextEffect.RAINBOW] then
+        self._rainbow_shader:unbind()
+    end
+
+    local font = self:_get_font()
     local strikethrough_base = y + 0.5 * font:getHeight() + 0.5
     local underline_base = y + font:getBaseline() - 0.5 * font:getDescent()
     love.graphics.setLineWidth(1)
@@ -224,9 +227,8 @@ function rt.Glyph:update(delta)
 
     self._elapsed_time = self._elapsed_time + delta
 
-    local font = self._font[self._style]
-    self._glyph = love.graphics.newText(font, {{self._color.r, self._color.g, self._color.b}, ""})
-
+    self._glyph = love.graphics.newText(self:_get_font(), {{self._color.r, self._color.g, self._color.b}, ""})
+    local font = self:_get_font()
     local width = 0
     for i = 1, math.min(utf8.len(self._content), self._n_visible_chars) do
 
@@ -355,9 +357,7 @@ function rt.Glyph:set_n_visible_characters(n)
     if n ~= self._n_visible_chars then
         n = clamp(n, 0, self:get_n_characters())
         self._n_visible_chars = n
-
-        local font = self._font[self._style]
-        self._glyph = love.graphics.newText(font, {{self._color.r, self._color.g, self._color.b}, utf8.sub(self._content, 1, n)})
+        self._glyph = love.graphics.newText(self:_get_font(), {{self._color.r, self._color.g, self._color.b}, utf8.sub(self._content, 1, n)})
         self:_update_outline()
     end
 end
@@ -366,6 +366,11 @@ end
 --- @return Number
 function rt.Glyph:get_n_visible_characters()
     return clamp(self._n_visible_chars, 0, self:get_n_characters())
+end
+
+--- @brief [internal]
+function rt.Glyph:_get_font()
+    return self._font[self._style]
 end
 
 --- @brief [internal] test glyph

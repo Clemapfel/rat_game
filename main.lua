@@ -12,7 +12,7 @@ rt.current_scene:set_child(log)
 
 
 local font = rt.settings.font.default[rt.FontStyle.REGULAR]
-local str = "<o><wave><shake>" .. "TojjyP_To∞" .. "</wave></shake></o>"
+local str = "<o><rainbow><wave>" .. "TojjyP_To∞" .. "</wave></rainbow></o>"
 
 label = rt.Label(str)
 --label:set_n_visible_characters(0)
@@ -21,7 +21,6 @@ rt.current_scene:set_child(label)
 rt.current_scene.input:signal_connect("pressed", function(_, which)
 
     if which == rt.InputButton.A then
-        log:push_back("<mono>" .. "TojjyP_To" .. "</mono>")
     elseif which == rt.InputButton.B then
     elseif which == rt.InputButton.X then
     elseif which == rt.InputButton.Y then
