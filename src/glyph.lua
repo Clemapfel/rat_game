@@ -71,7 +71,10 @@ rt.Glyph = meta.new_type("Glyph", function(font, content, look)
         _outline_color = outline_color,
         _outline_render_texture = {}, -- rt.RenderTexture
         _outline_render_offset_x = 0,
-        _outline_render_offset_y = 0
+        _outline_render_offset_y = 0,
+
+        _underline = {},
+        _strikethrough = {}
     }, rt.Drawable, rt.Animation)
 
     for _, effect in pairs(effects) do
@@ -121,6 +124,64 @@ function rt.Glyph:_update()
         self._outline_render_offset_x = x_offset
         self._outline_render_offset_y = y_offset
     end
+
+    if self._is_underlined or self._is_strikethrough then
+        local font = self:_get_font()
+        local underline_y = font:getBaseline() - 0.5 * font:getDescent()
+        local strikethrough_y = 0.5 * font:getHeight() + 0.5
+
+        local underline_vertices = {}
+        local strikethrough_vertices = {}
+
+        local x = 0
+        local previous_length = 0
+        local text = ""
+        for i = 1, self:get_n_characters() do
+            text = text .. utf8.sub(self._content, i, i)
+            local current_length = font:getWidth(text)
+            local width = current_length - previous_length
+
+            for p in range(x, underline_y) do
+                table.insert(underline_vertices, p)
+            end
+
+            for p in range(x, strikethrough_y) do
+                table.insert(strikethrough_vertices, p)
+            end
+
+            x = x + width
+            previous_length = current_length
+        end
+
+        for p in range(x, underline_y) do
+            table.insert(underline_vertices, p)
+        end
+
+        for p in range(x, strikethrough_y) do
+            table.insert(strikethrough_vertices, p)
+        end
+
+        self._underline = underline_vertices
+        self._strikethrough = strikethrough_vertices
+    end
+end
+
+--- @brief [internal]
+function rt.Glyph:_draw_underline(x, y)
+    love.graphics.push()
+    love.graphics.translate(x, y)
+    love.graphics.setLineWidth(3)
+    love.graphics.line(self._underline)
+    love.graphics.pop()
+end
+
+--- @brief [internal]
+function rt.Glyph:_draw_strikethrough(x, y)
+    love.graphics.push()
+    love.graphics.translate(x, y)
+    love.graphics.setLineWidth(3)
+    love.graphics.line(self._strikethrough)
+    love.graphics.pop()
 end
 
 --- @overload
@@ -149,13 +210,11 @@ function rt.Glyph:draw()
         local w = self._glyph:getWidth()
 
         if self._is_strikethrough then
-            local strikethrough_base = y + 0.5 * font:getHeight() + 0.5
-            love.graphics.line(x, strikethrough_base, x + w, strikethrough_base)
+            self:_draw_strikethrough(x, y)
         end
 
         if self._is_underlined then
-            local underline_base = y + font:getBaseline() - 0.5 * font:getDescent()
-            love.graphics.line(x, underline_base, x + w, underline_base)
+            self:_draw_underline(x, y)
         end
 
         self._render_shader:unbind()

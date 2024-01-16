@@ -56,7 +56,6 @@ end
 --- @param vararg rt.Vector2
 rt.VertexShape = meta.new_type("VertexShape", function(points)
     local vertices = {}
-
     for _, pos in pairs(points) do
         table.insert(vertices, rt.Vertex(pos[1], pos[2], pos[3], 0, 0))
     end
