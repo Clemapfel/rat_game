@@ -91,6 +91,12 @@ float random(float x)
     return random(vec2(x));
 }
 
+float project(float value, float lower, float upper)
+{
+    return value * abs(upper - lower) + min(lower, upper);
+}
+
+
 // ###############################
 
 uniform bool _shake_active;
@@ -115,7 +121,17 @@ flat varying int _letter_index;
 vec4 position(mat4 transform, vec4 vertex_position)
 {
     _letter_index = gl_VertexID / 4;
-    return transform * vertex_position;
+
+    vec4 position = vertex_position;
+
+    if (_shake_active)
+    {
+        float i_offset = round(_time / (1 / _shake_period));
+        position.x += project(random(_letter_index + i_offset), -1, 1) * _shake_offset;
+        position.y += project(random(_letter_index + i_offset + 1234567), -1, 1) * _shake_offset; // arbitary offset
+    }
+
+    return transform * position;
 }
 
 #endif

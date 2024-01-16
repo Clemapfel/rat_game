@@ -4,8 +4,8 @@ rt.settings.glyph = {
     outline_thickness = 1,
     outline_render_texture_padding = 3,
     rainbow_width = 10,    -- n characters
-    shake_offset = 6,      -- px
-    shake_period = 15,     -- shakes per second
+    shake_offset = 1,      -- px
+    shake_period = 10,     -- shakes per second
     wave_period = 10,      -- n chars
     wave_offset = 10,      -- px
     wave_speed = 0.2       -- cycles per second
@@ -128,11 +128,11 @@ end
 --- @overload
 function rt.Glyph:draw()
 
-    --[[
     self._render_shader:send("_shake_active", self._effects[rt.TextEffect.SHAKE])
     self._render_shader:send("_shake_offset", rt.settings.glyph.shake_offset)
     self._render_shader:send("_shake_period", rt.settings.glyph.shake_period)
 
+    --[[
     self._render_shader:send("_wave_active", self._effects[rt.TextEffect.WAVE])
     self._render_shader:send("_wave_period", rt.settings.glyph.wave_period)
     self._render_shader:send("_wave_offset", rt.settings.glyph.wave_offset)
@@ -148,7 +148,6 @@ function rt.Glyph:draw()
     function draw_glyph(x, y)
         self._render_shader:bind()
         self:render(self._glyph, math.floor(x), math.floor(y))
-        self._render_shader:unbind()
 
         local font = self:_get_font()
         local w = self._glyph:getWidth()
@@ -162,6 +161,8 @@ function rt.Glyph:draw()
             local underline_base = y + font:getBaseline() - 0.5 * font:getDescent()
             love.graphics.line(x, underline_base, x + w, underline_base)
         end
+
+        self._render_shader:unbind()
     end
 
     local x, y = self._position_x, self._position_y
