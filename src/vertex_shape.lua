@@ -209,59 +209,67 @@ function rt.VertexLine(thickness, ...)
        rt.error("In rt.VertexLine: TODO")
     end
 
-    local translate_by_angle = function (origin_x, origin_y, angle_dg)
-        local angle_rad = rt.degrees(angle_dg):as_radians()
-        return origin_x + math.cos(angle_rad) * thickness, origin_y + math.sin(angle_rad) * thickness
-    end
-
     local vertices_out = {}
+    local last_x1, last_y1, last_x2, last_y2
 
-    local angle_between_lines = function (x1, y1, x2, y2, x3, y3, x4, y4)
-        local m1 = (y2 - y1) / (x2 - x1)
-        local m2 = (y4 - y3) / (x4 - x3)
-        local angle = math.atan((m2 - m1) / (1 + m1 * m2))
-        return rt.radians(angle):as_degrees()
-    end
+    for i = 1, n_vertices - 2, 2 do
+        local a = math3d.vec2(vertices[i+0], vertices[i+1])
+        local b = math3d.vec2(vertices[i+2], vertices[i+3])
 
-    for i = 1, n_vertices - 4, 1 do
-        local a_x, a_y = vertices[i+0], vertices[i+1]
-        local b_x, b_y = vertices[i+2], vertices[i+3]
-        local c_x, c_y = vertices[i+4], vertices[i+5]
+        if i == 1 then
 
-        local current_angle = 180
-        if c_y ~= nil and c_y ~= nil then
-            current_angle = angle_between_lines(a_x, a_y, b_x, b_y, b_x, b_y, c_x, c_y)
         end
 
-        local x1, y1, x2, y2, x3, y3, x4, y4
-        if (current_angle >= 0 + 45 and current_angle <= 90 + 45) or (current_angle >= 180 + 45 or current_angle <= 360 - 45) then
-            -- horizontally oriented
-            x1, y1 = translate_by_angle(a_x, a_y, -90)
-            x2, y2 = translate_by_angle(b_x, b_y, -90)
-            x3, y3 = translate_by_angle(b_x, b_y,  90)
-            x4, y4 = translate_by_angle(a_x, a_y,  90)
+        local ab = math3d.vec2(b.x - a.x, b.y - a.y)
+        local angle = math.atan2(ab.y, ab.x)
+
+        local angle_dg = ((angle * 180 / math.pi) + 360) % 360;
+
+        local is_vertical = (angle_dg > 90 - 45 and angle_dg < 90 + 45) or (angle_dg > 270 - 45 and angle_dg < 270 + 45)
+        dbg(i, angle_dg, is_vertical)
+
+        if a.y == b.y then
+            -- horizontally in line
+            local x1, y1 = a.x, a.y - thickness
+            local x2, y2 = b.x, b.y - thickness
+            local x3, y3 = b.x, b.y + thickness
+            local x4, y4 = a.x, a.y + thickness
 
             for p in range(
-                    {x1, y1, 0},
-                    {x2, y2, 0},
-                    {x3, y3, 0}
+                {x1, y1, 0},
+                {x2, y2, 0},
+                {x3, y3, 0},
+
+                {x1, y1, 0},
+                {x3, y3, 0},
+                {x4, y4, 0}
             ) do
                 table.insert(vertices_out, p)
             end
+        elseif a.x == b.x then
+            -- vertically in line
+            local x1, y1 = a.x - thickness, a.y
+            local x2, y2 = a.x + thickness, a.y
+            local x3, y3 = b.x + thickness, b.y
+            local x4, y4 = b.x - thickness, b.y
 
             for p in range(
-                    {x1, y1, 0},
-                    {x3, y3, 0},
-                    {x4, y4, 0}
+                {x1, y1, 0},
+                {x2, y2, 0},
+                {x3, y3, 0},
+
+                {x1, y1, 0},
+                {x3, y3, 0},
+                {x4, y4, 0}
             ) do
                 table.insert(vertices_out, p)
             end
         else
-            -- vertically oriented
 
         end
     end
 
+    vertices_out = {{0, 0, 0}}
     local out = rt.VertexShape(vertices_out)
     out:set_draw_mode(rt.MeshDrawMode.TRIANGLES)
     return out

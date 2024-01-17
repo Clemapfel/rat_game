@@ -12,9 +12,26 @@ rt.current_scene:set_child(log)
 
 local x, y, w, h = 100, 100, 400, 300
 local thickness = 20
-local points =  {x, y - y / 2, x + w, y, x + w + 100, y + h + 20, x, y + h - 50}
+local points =  {x, y - y / 2, x + w, y, x + w + 100, y + h + 20, x - 10, y + h - 50}
 table.insert(points, points[1])
 table.insert(points, points[2])
+
+--[[
+points = {x, y,
+          x + w, y,
+          x + w, y + h,
+          x, y + h,
+            x, y}
+            ]]--
+
+local a_x, a_y = -50, 50
+local b_x, b_y = 50, 50
+local vec = math3d.vec2(b_x - a_x, b_y - a_y)
+println(rt.radians(vec:angle_to(math3d.vec2(0, 1))):as_degrees())
+
+--horizontally_aligned: 90 or -90
+--vertically aligned: 180 or 0
+
 
 shape = rt.VertexLine(thickness, splat(points))
 
@@ -58,6 +75,8 @@ love.draw = function()
     love.graphics.clear()
     --rt.current_scene:draw()
     shape:draw()
+
+    love.graphics.line(splat(points))
 
     love.graphics.setColor(1, 0, 0, 1)
     love.graphics.setPointSize(3)
