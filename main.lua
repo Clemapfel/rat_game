@@ -11,7 +11,7 @@ log._frame:set_minimum_size(0, 250)
 rt.current_scene:set_child(log)
 
 local font = rt.settings.font.default[rt.FontStyle.REGULAR]
-local str = "<s><o><rainbow><wave><shake>" .. "To_jyäü" .. "</shake></wave></rainbow></o></s>"
+local str = "<s><u><o><wave><shake>" .. "To_jyäü al balsu bldasiu ba" .. "</shake></wave></o></u></s>"
 
 label = rt.Label(str)
 rt.current_scene:set_child(label)

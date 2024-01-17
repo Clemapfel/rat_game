@@ -73,8 +73,8 @@ rt.Glyph = meta.new_type("Glyph", function(font, content, look)
         _outline_render_offset_x = 0,
         _outline_render_offset_y = 0,
 
-        _underline = {},
-        _strikethrough = {}
+        _underline = {},        -- rt.VertexShape
+        _strikethrough = {}     -- rt.VertexShape
     }, rt.Drawable, rt.Animation)
 
     for _, effect in pairs(effects) do
@@ -141,28 +141,18 @@ function rt.Glyph:_update()
             local current_length = font:getWidth(text)
             local width = current_length - previous_length
 
-            for p in range(x, underline_y) do
-                table.insert(underline_vertices, p)
-            end
+            table.insert(underline_vertices, x)
+            table.insert(underline_vertices, underline_y)
 
-            for p in range(x, strikethrough_y) do
-                table.insert(strikethrough_vertices, p)
-            end
+            table.insert(strikethrough_vertices, x)
+            table.insert(strikethrough_vertices, strikethrough_y)
 
             x = x + width
             previous_length = current_length
         end
 
-        for p in range(x, underline_y) do
-            table.insert(underline_vertices, p)
-        end
-
-        for p in range(x, strikethrough_y) do
-            table.insert(strikethrough_vertices, p)
-        end
-
-        self._underline = underline_vertices
-        self._strikethrough = strikethrough_vertices
+        --self._underline = rt.VertexLine(underline_vertices)
+        --self._strikethrough = rt.VertexLine(strikethrough_vertices)
     end
 end
 
@@ -170,8 +160,9 @@ end
 function rt.Glyph:_draw_underline(x, y)
     love.graphics.push()
     love.graphics.translate(x, y)
-    love.graphics.setLineWidth(3)
-    love.graphics.line(self._underline)
+    for _, shape in pairs(self._underline) do
+        shape:draw()
+    end
     love.graphics.pop()
 end
 
@@ -179,8 +170,9 @@ end
 function rt.Glyph:_draw_strikethrough(x, y)
     love.graphics.push()
     love.graphics.translate(x, y)
-    love.graphics.setLineWidth(3)
-    love.graphics.line(self._strikethrough)
+    for _, shape in pairs(self._strikethrough) do
+        shape:draw()
+    end
     love.graphics.pop()
 end
 

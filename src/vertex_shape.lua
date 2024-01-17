@@ -192,37 +192,41 @@ end
 --- @param width Number in px
 --- @param height Number in px
 function rt.VertexRectangle(x, y, width, height)
-    local out = rt.VertexShape({
+    return rt.VertexShape({
         { x, y, 0 },
         { x + width, y, 0 },
         { x + width, y + height, 0 },
         { x, y + height }
     })
-    return out
 end
 
---- @brief reformat vertex shape
---- @param x Number in px
---- @param y Number in px
---- @param width Number in px
---- @param height Number in px
-function rt.VertexShape:resize(x, y, width, height)
+--- @brief
+function rt.VertexLine(thickness, ...)
+    local vertices = {...}
+    local n_vertices = _G._select('#', ...)
 
-    if meta.is_aabb(x) then
-        local aabb = x
-        x = aabb.x
-        y = aabb.y
-        width = aabb.width
-        height = aabb.height
-    else
-
+    if not (n_vertices >= 4 and n_vertices % 2 == 0) then
+       rt.error("In rt.VertexLine: TODO")
     end
 
-    assert(self:get_n_vertices() == 4) -- TODO: generalize to all shapes
-    self:set_vertex_position(1, x, y)
-    self:set_vertex_position(2, x + width, y)
-    self:set_vertex_position(3, x + width, y + height)
-    self:set_vertex_position(4, x, y + height)
+    local angle_offset = rt.degrees(90):as_radians()
+    local translate_by_angle = function (origin_x, origin_y, angle_rad)
+        return origin_x + math.cos(angle_rad) * thickness, origin_y + math.sin(angle_rad) * thickness
+    end
+
+    for i = 1, n_vertices - 5, 2 do
+        local a_x, a_y = vertices[i+0], vertices[i+1]
+        local b_x, b_y = vertices[i+2], vertices[i+3]
+        local c_x, c_y = vertices[i+4], vertices[i+5]
+
+        local a = math3d.vec2(b_x - a_x, b_y - a_y)
+        local b = math3d.vec2(c_x - b_x, c_y - b_y)
+        local angle = math.atan(b.y - a.y, b.x - a.x)
+
+        local one_x, one_y = translate_by_angle(a_x, a_y, )
+    end
+
+    return rt.VertexShape(vertices)
 end
 
 --- @brief test VertexShape
