@@ -216,6 +216,13 @@ function rt.VertexLine(thickness, ...)
 
     local vertices_out = {}
 
+    local angle_between_lines = function (x1, y1, x2, y2, x3, y3, x4, y4)
+        local m1 = (y2 - y1) / (x2 - x1)
+        local m2 = (y4 - y3) / (x4 - x3)
+        local angle = math.atan((m2 - m1) / (1 + m1 * m2))
+        return rt.radians(angle):as_degrees()
+    end
+
     for i = 1, n_vertices - 4, 1 do
         local a_x, a_y = vertices[i+0], vertices[i+1]
         local b_x, b_y = vertices[i+2], vertices[i+3]
@@ -223,12 +230,8 @@ function rt.VertexLine(thickness, ...)
 
         local current_angle = 180
         if c_y ~= nil and c_y ~= nil then
-            local a = math3d.vec2(b_x - a_x, b_y - a_y)
-            local b = math3d.vec2(c_x - b_x, c_y - b_y)
-            current_angle = rt.radians(math.atan(b.y - a.y, b.x - a.x)):as_degrees()
+            current_angle = angle_between_lines(a_x, a_y, b_x, b_y, b_x, b_y, c_x, c_y)
         end
-
-
 
         local x1, y1, x2, y2, x3, y3, x4, y4
         if (current_angle >= 0 + 45 and current_angle <= 90 + 45) or (current_angle >= 180 + 45 or current_angle <= 360 - 45) then
