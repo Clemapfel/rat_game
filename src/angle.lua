@@ -7,14 +7,18 @@ rt.Angle = meta.new_type("Angle", function(rads)
     })
     local metatable = getmetatable(out)
     metatable.__add = function(self, other)
-
-
         return rt.Angle(math.fmod(self._rads + other._rads, 2 * math.pi))
     end
     metatable.__sub = function(self, other)
-
-
         return rt.Angle(math.fmod(self._rads - other._rads, 2 * math.pi))
+    end
+    metatable.__mul = function(self, scalar)
+        meta.assert_number(scalar)
+        return rt.Angle(math.fmod(self._rads * scalar, 2 * math.pi))
+    end
+    metatable.__div = function(self, scalar)
+        meta.assert_number(scalar)
+        return rt.Angle(math.fmod(self._rads / scalar, 2 * math.pi))
     end
     return out
 end)

@@ -209,24 +209,59 @@ function rt.VertexLine(thickness, ...)
        rt.error("In rt.VertexLine: TODO")
     end
 
-    local angle_offset = rt.degrees(90):as_radians()
-    local translate_by_angle = function (origin_x, origin_y, angle_rad)
+    local translate_by_angle = function (origin_x, origin_y, angle_dg)
+        local angle_rad = rt.degrees(angle_dg):as_radians()
         return origin_x + math.cos(angle_rad) * thickness, origin_y + math.sin(angle_rad) * thickness
     end
 
-    for i = 1, n_vertices - 5, 2 do
+    local vertices_out = {}
+
+    for i = 1, n_vertices - 4, 1 do
         local a_x, a_y = vertices[i+0], vertices[i+1]
         local b_x, b_y = vertices[i+2], vertices[i+3]
         local c_x, c_y = vertices[i+4], vertices[i+5]
 
-        local a = math3d.vec2(b_x - a_x, b_y - a_y)
-        local b = math3d.vec2(c_x - b_x, c_y - b_y)
-        local angle = math.atan(b.y - a.y, b.x - a.x)
+        local current_angle = 180
+        if c_y ~= nil and c_y ~= nil then
+            local a = math3d.vec2(b_x - a_x, b_y - a_y)
+            local b = math3d.vec2(c_x - b_x, c_y - b_y)
+            current_angle = rt.radians(math.atan(b.y - a.y, b.x - a.x)):as_degrees()
+        end
 
-        local one_x, one_y = translate_by_angle(a_x, a_y, )
+
+
+        local x1, y1, x2, y2, x3, y3, x4, y4
+        if (current_angle >= 0 + 45 and current_angle <= 90 + 45) or (current_angle >= 180 + 45 or current_angle <= 360 - 45) then
+            -- horizontally oriented
+            x1, y1 = translate_by_angle(a_x, a_y, -90)
+            x2, y2 = translate_by_angle(b_x, b_y, -90)
+            x3, y3 = translate_by_angle(b_x, b_y,  90)
+            x4, y4 = translate_by_angle(a_x, a_y,  90)
+
+            for p in range(
+                    {x1, y1, 0},
+                    {x2, y2, 0},
+                    {x3, y3, 0}
+            ) do
+                table.insert(vertices_out, p)
+            end
+
+            for p in range(
+                    {x1, y1, 0},
+                    {x3, y3, 0},
+                    {x4, y4, 0}
+            ) do
+                table.insert(vertices_out, p)
+            end
+        else
+            -- vertically oriented
+
+        end
     end
 
-    return rt.VertexShape(vertices)
+    local out = rt.VertexShape(vertices_out)
+    out:set_draw_mode(rt.MeshDrawMode.TRIANGLES)
+    return out
 end
 
 --- @brief test VertexShape

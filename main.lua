@@ -10,16 +10,25 @@ log:set_expand_vertically(false)
 log._frame:set_minimum_size(0, 250)
 rt.current_scene:set_child(log)
 
+local x, y, w, h = 100, 100, 400, 300
+local thickness = 20
+local points =  {x, y - y / 2, x + w, y, x + w + 100, y + h + 20, x, y + h - 50}
+table.insert(points, points[1])
+table.insert(points, points[2])
+
+shape = rt.VertexLine(thickness, splat(points))
+
+--[[
 local font = rt.settings.font.default[rt.FontStyle.REGULAR]
 local str = "<s><u><o><wave><shake>" .. "To_jyäü al balsu bldasiu ba" .. "</shake></wave></o></u></s>"
 
 label = rt.Label(str)
 rt.current_scene:set_child(label)
+]]--
 
 rt.current_scene.input:signal_connect("pressed", function(_, which)
 
     if which == rt.InputButton.A then
-        label:set_n_visible_characters(10000)
     elseif which == rt.InputButton.B then
     elseif which == rt.InputButton.X then
     elseif which == rt.InputButton.Y then
@@ -27,9 +36,7 @@ rt.current_scene.input:signal_connect("pressed", function(_, which)
     elseif which == rt.InputButton.L then
     elseif which == rt.InputButton.UP then
     elseif which == rt.InputButton.RIGHT then
-        label:set_n_visible_characters(label:get_n_visible_characters() + 1)
     elseif which == rt.InputButton.LEFT then
-        label:set_n_visible_characters(label:get_n_visible_characters() - 1)
     elseif which == rt.InputButton.DOWN then
     end
 end)
@@ -48,10 +55,13 @@ love.load = function()
 end
 
 love.draw = function()
-    love.graphics.clear(0.75, 0, 0.75, 1)
+    love.graphics.clear()
     --rt.current_scene:draw()
+    shape:draw()
 
-    label:draw()
+    love.graphics.setColor(1, 0, 0, 1)
+    love.graphics.setPointSize(3)
+    love.graphics.points(splat(points))
 end
 
 love.update = function()
