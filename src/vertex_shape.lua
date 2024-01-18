@@ -78,6 +78,11 @@ function rt.VertexShape:get_n_vertices()
     return self._native:getVertexCount()
 end
 
+--- @brief
+function rt.VertexShape:set_vertex_order(map)
+    self._native:setVertexMap(map)
+end
+
 --- @brief set color of one vertex
 --- @param i Number 1-based
 --- @param rgba rt.RGBA
@@ -230,7 +235,7 @@ function rt.VertexLine(thickness, ...)
     end
 
     local vertices_out = {}
-    local last_vertex_up, last_vertex_down -- math3d.vec2, shared vertices of last rectangle segment
+    local vertex_map = {}
 
     for i = 1, n_vertices - 2, 2 do
         local a = math3d.vec2(vertices[i+0], vertices[i+1])
@@ -247,8 +252,11 @@ function rt.VertexLine(thickness, ...)
         local bc_angle_dg = ((bc_angle * 180 / math.pi) + 360) % 360;
 
         if i == 1 then
-            last_vertex_up = math3d.vec2(translate_point(a, thickness, ab_angle_dg - 90))
-            last_vertex_down = math3d.vec2(translate_point(a, thickness, ab_angle_dg + 90))
+            local last_vertex_up = math3d.vec2(translate_point(a, thickness, ab_angle_dg - 90))
+            local last_vertex_down = math3d.vec2(translate_point(a, thickness, ab_angle_dg + 90))
+
+            table.insert(vertices_out, {last_vertex_up.x, last_vertex_up.y, 0})
+            table.insert(vertices_out, {last_vertex_down.x, last_vertex_down.y, 0})
         end
 
         -- create two edges parallel ab and bc, shifted by thickness up/down, then find intersection to solve for vertices
@@ -274,27 +282,23 @@ function rt.VertexLine(thickness, ...)
             down_intersect = math3d.vec2(translate_point(b, thickness, ab_angle_dg + 90))
         end
 
-        local p1, p2, p3, p4 = last_vertex_up, up_intersect, down_intersect, last_vertex_down
+        table.insert(vertices_out, {up_intersect.x, up_intersect.y, 0})
+        table.insert(vertices_out, {down_intersect.x, down_intersect.y, 0})
 
-        for p in range(
-            {p1.x, p1.y, 0},
-            {p2.x, p2.y, 0},
-            {p3.x, p3.y, 0},
+        local n = #vertices_out
+        local p1, p2, p3, p4 = n-3, n-1, n, n-2
 
-            {p1.x, p1.y, 0},
-            {p3.x, p3.y, 0},
-            {p4.x, p4.y, 0}
+        for i in range(
+            p1, p2, p3,
+            p1, p3, p4
         ) do
-            table.insert(vertices_out, p)
+            table.insert(vertex_map, i)
         end
-
-        last_vertex_up = up_intersect
-        last_vertex_down = down_intersect
-
     end
 
     local out = rt.VertexShape(vertices_out)
     out:set_draw_mode(rt.MeshDrawMode.TRIANGLES)
+    out:set_vertex_order(vertex_map)
     return out
 end
 

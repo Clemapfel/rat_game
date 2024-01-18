@@ -96,7 +96,7 @@ love.draw = function()
     love.graphics.clear()
     --rt.current_scene:draw()
 
-    love.graphics.setWireframe(true)
+    love.graphics.setWireframe(false)
     shape:draw()
 
     love.graphics.setColor(1, 0, 0, 0.5)
