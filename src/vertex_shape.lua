@@ -206,7 +206,7 @@ function rt.VertexLine(thickness, ...)
     local n_vertices = _G._select('#', ...)
 
     if not (n_vertices >= 4 and n_vertices % 2 == 0) then
-        rt.error("In rt.VertexLine: TODO")
+        rt.error("In rt.VertexLine: Need at least 2 vertices")
     end
 
     function translate_point(point, distance, angle_dg)
@@ -230,7 +230,6 @@ function rt.VertexLine(thickness, ...)
     end
 
     local vertices_out = {}
-
     local last_vertex_up, last_vertex_down -- math3d.vec2, shared vertices of last rectangle segment
 
     for i = 1, n_vertices - 2, 2 do
@@ -248,91 +247,54 @@ function rt.VertexLine(thickness, ...)
         local bc_angle_dg = ((bc_angle * 180 / math.pi) + 360) % 360;
 
         if i == 1 then
-            last_vertex_up = math3d.vec2(translate_point(a, thickness, ab_angle - 90))
-            last_vertex_down = math3d.vec2(translate_point(a, thickness,ab_angle + 90))
+            last_vertex_up = math3d.vec2(translate_point(a, thickness, ab_angle_dg - 90))
+            last_vertex_down = math3d.vec2(translate_point(a, thickness, ab_angle_dg + 90))
         end
 
-        if a.y == b.y then
-            -- horizontally in line
-            local x1, y1 = last_vertex_up.x, last_vertex_down.y
-            local x2, y2 = b.x, b.y - thickness
-            local x3, y3 = b.x, b.y + thickness
-            local x4, y4 = last_vertex_down.x, last_vertex_down.y
+        -- create two edges parallel ab and bc, shifted by thickness up/down, then find intersection to solve for vertices
 
-            for p in range(
-                {x1, y1, 0},
-                {x2, y2, 0},
-                {x3, y3, 0},
+        local up_offset = -90
+        local ab_start_up = translate_point(a, thickness, ab_angle_dg + up_offset)
+        local ab_end_up = translate_point(b, thickness, ab_angle_dg + up_offset)
+        local bc_start_up = translate_point(b, thickness, bc_angle_dg + up_offset)
+        local bc_end_up = translate_point(c, thickness, bc_angle_dg + up_offset)
 
-                {x1, y1, 0},
-                {x3, y3, 0},
-                {x4, y4, 0}
-            ) do
-                table.insert(vertices_out, p)
-            end
+        local down_offset = 90
+        local ab_start_down = translate_point(a, thickness, ab_angle_dg + down_offset)
+        local ab_end_down = translate_point(b, thickness, ab_angle_dg + down_offset)
+        local bc_start_down = translate_point(b, thickness, bc_angle_dg + down_offset)
+        local bc_end_down = translate_point(c, thickness, bc_angle_dg + down_offset)
 
-            last_vertex_up = math3d.vec2(x2, y2)
-            last_vertex_down = math3d.vec2(x3, y3)
-        elseif a.x == b.x then
-            -- vertically in line
-            local x1, y1 = a.x - thickness, a.y
-            local x2, y2 = a.x + thickness, a.y
-            local x3, y3 = last_vertex_up.x, last_vertex_up.y
-            local x4, y4 = last_vertex_down.x, last_vertex_down.y
+        local up_intersect = intersect(ab_start_up, ab_end_up, bc_start_up, bc_end_up)
+        local down_intersect = intersect(ab_start_down, ab_end_down, bc_start_down, bc_end_down)
 
-            for p in range(
-                {x1, y1, 0},
-                {x2, y2, 0},
-                {x3, y3, 0},
-
-                {x1, y1, 0},
-                {x3, y3, 0},
-                {x4, y4, 0}
-            ) do
-                table.insert(vertices_out, p)
-            end
-
-            last_vertex_up = math3d.vec2(x3, y3)
-            last_vertex_down = math3d.vec2(x4, y4)
-        elsestashi
-            -- create two edges parallel through line, shifted by thickness, then find intersection to solve for vertices
-
-            local up_offset = -90
-            local ab_start_up = translate_point(a, thickness, ab_angle_dg + up_offset)
-            local ab_end_up = translate_point(b, thickness, ab_angle_dg + up_offset)
-            local bc_start_up = translate_point(b, thickness, bc_angle_dg + up_offset)
-            local bc_end_up = translate_point(c, thickness, bc_angle_dg + up_offset)
-
-
-            local down_offset = 90
-            local ab_start_down = translate_point(a, thickness, ab_angle_dg + down_offset)
-            local ab_end_down = translate_point(b, thickness, ab_angle_dg + down_offset)
-            local bc_start_down = translate_point(b, thickness, bc_angle_dg + down_offset)
-            local bc_end_down = translate_point(c, thickness, bc_angle_dg + down_offset)
-            
-            local up_intersect = intersect(ab_start_up, ab_end_up, bc_start_up, bc_end_up)
-            local down_intersect = intersect(ab_start_down, ab_end_down, bc_start_down, bc_end_down)
-
-            local p1, p2, p3, p4 = last_vertex_up, up_intersect, down_intersect, last_vertex_down
-
-            for p in range(
-                {p2.x, p2.y, 0},
-                {p3.x, p3.y, 0},
-                {p4.x, p4.y, 0}
-            ) do
-                table.insert(vertices_out, p)
-            end
-            
-            last_vertex_up = up_intersect
-            last_vertex_down = down_intersect
+        -- last node, since c does not exist
+        if i >= n_vertices - 3 then
+            up_intersect = math3d.vec2(translate_point(b, thickness, ab_angle_dg - 90))
+            down_intersect = math3d.vec2(translate_point(b, thickness, ab_angle_dg + 90))
         end
 
-        --table.insert(vertices_out, {last_vertex_up.x, last_vertex_up.y, 0})
-        --table.insert(vertices_out, {last_vertex_down.x, last_vertex_down.y, 0})
+        local p1, p2, p3, p4 = last_vertex_up, up_intersect, down_intersect, last_vertex_down
+
+        for p in range(
+            {p1.x, p1.y, 0},
+            {p2.x, p2.y, 0},
+            {p3.x, p3.y, 0},
+
+            {p1.x, p1.y, 0},
+            {p3.x, p3.y, 0},
+            {p4.x, p4.y, 0}
+        ) do
+            table.insert(vertices_out, p)
+        end
+
+        last_vertex_up = up_intersect
+        last_vertex_down = down_intersect
+
     end
 
     local out = rt.VertexShape(vertices_out)
-    out:set_draw_mode(rt.MeshDrawMode.POINTS)
+    out:set_draw_mode(rt.MeshDrawMode.TRIANGLES)
     return out
 end
 
@@ -342,7 +304,7 @@ function rt.VertexRectangleSegments(thickness, ...)
     local n_vertices = _G._select('#', ...)
 
     if not (n_vertices >= 4 and n_vertices % 2 == 0) then
-        rt.error("In rt.VertexLine: Need at least 2 vertices")
+        rt.error("In rt.VertexRectangleSegments: Need at least 2 vertices")
     end
 
     function translate_point(point, distance, angle_dg)

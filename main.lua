@@ -23,13 +23,13 @@ local points =  {
 --table.insert(points, points[1])
 --table.insert(points, points[2])
 
---[[
+
 points = {}
-for i = 1, 3, 1 do
-    table.insert(points, rt.random.number(100, 500))
-    table.insert(points, rt.random.number(100, 500))
-    table.insert(points, rt.random.number(100, 500))
-    table.insert(points, rt.random.number(100, 500))
+for i = 1, 2, 1 do
+    table.insert(points, rt.random.number(50, love.graphics.getWidth() - 50))
+    table.insert(points, rt.random.number(50, love.graphics.getHeight() - 50))
+    table.insert(points, rt.random.number(50, love.graphics.getWidth() - 50))
+    table.insert(points, rt.random.number(50, love.graphics.getHeight() - 50))
 end
 
 --[[
@@ -44,7 +44,7 @@ points = {x, y,
 --vertically aligned: 180 or 0
 
 
-shape = rt.VertexLine(50, splat(points))
+shape = rt.VertexLine(5, splat(points))
 
 --[[
 local font = rt.settings.font.default[rt.FontStyle.REGULAR]
@@ -54,9 +54,19 @@ label = rt.Label(str)
 rt.current_scene:set_child(label)
 ]]--
 
+local i = rt.random.seed(os.time(os.date("!*t")))
 rt.current_scene.input:signal_connect("pressed", function(_, which)
 
     if which == rt.InputButton.A then
+        points = {}
+        for i = 1, 2, 1 do
+            table.insert(points, rt.random.number(50, love.graphics.getWidth() - 50))
+            table.insert(points, rt.random.number(50, love.graphics.getHeight() - 50))
+            table.insert(points, rt.random.number(50, love.graphics.getWidth() - 50))
+            table.insert(points, rt.random.number(50, love.graphics.getHeight() - 50))
+        end
+        shape = rt.VertexLine(5, splat(points))
+
     elseif which == rt.InputButton.B then
     elseif which == rt.InputButton.X then
     elseif which == rt.InputButton.Y then
@@ -85,6 +95,8 @@ end
 love.draw = function()
     love.graphics.clear()
     --rt.current_scene:draw()
+
+    love.graphics.setWireframe(true)
     shape:draw()
 
     love.graphics.setColor(1, 0, 0, 0.5)
