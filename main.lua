@@ -12,9 +12,25 @@ rt.current_scene:set_child(log)
 
 local x, y, w, h = 100, 100, 400, 300
 local thickness = 20
-local points =  {x, y - y / 2, x + w, y, x + w + 100, y + h + 20, x - 10, y + h - 50}
-table.insert(points, points[1])
-table.insert(points, points[2])
+local points =  {
+    x, y - y / 2,
+    x + w, y,
+    x + w + 100, y + h + 20,
+    x - 10, y + h - 50,
+    x - 10, y + h + 150,
+    x + w + 10, y + h + 150
+}
+--table.insert(points, points[1])
+--table.insert(points, points[2])
+
+--[[
+points = {}
+for i = 1, 3, 1 do
+    table.insert(points, rt.random.number(100, 500))
+    table.insert(points, rt.random.number(100, 500))
+    table.insert(points, rt.random.number(100, 500))
+    table.insert(points, rt.random.number(100, 500))
+end
 
 --[[
 points = {x, y,
@@ -24,16 +40,11 @@ points = {x, y,
             x, y}
             ]]--
 
-local a_x, a_y = -50, 50
-local b_x, b_y = 50, 50
-local vec = math3d.vec2(b_x - a_x, b_y - a_y)
-println(rt.radians(vec:angle_to(math3d.vec2(0, 1))):as_degrees())
-
 --horizontally_aligned: 90 or -90
 --vertically aligned: 180 or 0
 
 
-shape = rt.VertexLine(thickness, splat(points))
+shape = rt.VertexLine(50, splat(points))
 
 --[[
 local font = rt.settings.font.default[rt.FontStyle.REGULAR]
@@ -76,9 +87,10 @@ love.draw = function()
     --rt.current_scene:draw()
     shape:draw()
 
+    love.graphics.setColor(1, 0, 0, 0.5)
     love.graphics.line(splat(points))
 
-    love.graphics.setColor(1, 0, 0, 1)
+    love.graphics.setColor(1, 0, 1, 1)
     love.graphics.setPointSize(3)
     love.graphics.points(splat(points))
 end

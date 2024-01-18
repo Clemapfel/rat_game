@@ -16,11 +16,6 @@ function rt.AxisAlignedRectangle(top_left_x, top_left_y, width, height)
         height = 0
     end
 
-
-
-
-
-
     return {
         x = top_left_x,
         y = top_left_y,
@@ -48,8 +43,6 @@ end
 --- @param y Number
 --- @return Boolean
 function rt.aabb_contains(self, x, y)
-
-
     return x >= self.x and x <= (self.x + self.width) and y >= self.y and y <= (self.y + self.height)
 end
 
