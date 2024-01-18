@@ -168,7 +168,6 @@ end
 --- @param texture rt.Texture
 function rt.VertexShape:set_texture(texture)
     if not meta.is_nil(texture) then
-
         self._native:setTexture(texture._native)
     else
         self._native:setTexture(nil)
@@ -259,7 +258,7 @@ function rt.VertexLine(thickness, ...)
             table.insert(vertices_out, {last_vertex_down.x, last_vertex_down.y, 0})
         end
 
-        -- create two edges parallel ab and bc, shifted by thickness up/down, then find intersection to solve for vertices
+        -- create two edges parallel to ab and bc, shifted by thickness up/down, then find intersection to solve for vertices
 
         local up_offset = -90
         local ab_start_up = translate_point(a, thickness, ab_angle_dg + up_offset)
@@ -273,8 +272,17 @@ function rt.VertexLine(thickness, ...)
         local bc_start_down = translate_point(b, thickness, bc_angle_dg + down_offset)
         local bc_end_down = translate_point(c, thickness, bc_angle_dg + down_offset)
 
-        local up_intersect = intersect(ab_start_up, ab_end_up, bc_start_up, bc_end_up)
-        local down_intersect = intersect(ab_start_down, ab_end_down, bc_start_down, bc_end_down)
+        local up_intersect, down_intersect;
+
+        if ab.x == bc.x or ab.y == bc.y then
+            -- if in line, infinitely many intersections
+            up_intersect = ab_end_up
+            down_intersect = ab_end_down
+        else
+            -- otherwise, intersect always exists because pre-shifted lines shared a vertex
+            up_intersect = intersect(ab_start_up, ab_end_up, bc_start_up, bc_end_up)
+            down_intersect = intersect(ab_start_down, ab_end_down, bc_start_down, bc_end_down)
+        end
 
         -- last node, since c does not exist
         if i >= n_vertices - 3 then
@@ -317,6 +325,7 @@ function rt.VertexRectangleSegments(thickness, ...)
     end
 
     local vertices_out = {}
+    local vertex_map = {}
     for i = 1, n_vertices - 2, 2 do
         local a = math3d.vec2(vertices[i+0], vertices[i+1])
         local b = math3d.vec2(vertices[i+2], vertices[i+3])
@@ -334,17 +343,26 @@ function rt.VertexRectangleSegments(thickness, ...)
             {p1.x, p1.y, 0},
             {p2.x, p2.y, 0},
             {p3.x, p3.y, 0},
-
-            {p1.x, p1.y, 0},
-            {p3.x, p3.y, 0},
             {p4.x, p4.y, 0}
         ) do
             table.insert(vertices_out, p)
+        end
+
+        local n = #vertices_out
+        local p1_i = n-3
+        local p2_i = n-2
+        local p3_i = n-1
+        local p4_i = n
+
+        local n = #vertices_out
+        for i in range(p1_i, p2_i, p3_i, p1_i, p3_i, p4_i) do
+            table.insert(vertex_map, i)
         end
     end
 
     local out = rt.VertexShape(vertices_out)
     out:set_draw_mode(rt.MeshDrawMode.TRIANGLES)
+    out:set_vertex_order(vertex_map)
     return out
 end
 

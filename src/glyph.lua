@@ -60,7 +60,7 @@ rt.Glyph = meta.new_type("Glyph", function(font, content, look)
         _style = font_style,
         _is_underlined = is_underlined,
         _is_strikethrough = is_strikethrough,
-        _effects = {},      -- Set<rt.TextEffect>
+        _effects = {},      -- Table<rt.TextEffect, Boolean>
         _elapsed_time = 0,  -- seconds
         _glyph = {},        -- love.Text
         _position_x = 0,
@@ -73,8 +73,8 @@ rt.Glyph = meta.new_type("Glyph", function(font, content, look)
         _outline_render_offset_x = 0,
         _outline_render_offset_y = 0,
 
-        _underline = {},        -- rt.VertexShape
-        _strikethrough = {}     -- rt.VertexShape
+        _underline = {},        -- rt.VertexRectangleSegments
+        _strikethrough = {}     -- rt.VertexRectangleSegments
     }, rt.Drawable, rt.Animation)
 
     for _, effect in pairs(effects) do
@@ -137,22 +137,36 @@ function rt.Glyph:_update()
         local previous_length = 0
         local text = ""
         for i = 1, self:get_n_characters() do
-            text = text .. utf8.sub(self._content, i, i)
+            local c = utf8.sub(self._content, i, i)
+            text = text .. c
             local current_length = font:getWidth(text)
             local width = current_length - previous_length
 
-            table.insert(underline_vertices, x)
-            table.insert(underline_vertices, underline_y)
+            if self._is_underlined then
+                table.insert(underline_vertices, x)
+                table.insert(underline_vertices, underline_y)
+            end
 
-            table.insert(strikethrough_vertices, x)
-            table.insert(strikethrough_vertices, strikethrough_y)
+            if self._is_strikethrough then
+                table.insert(strikethrough_vertices, x)
+                table.insert(strikethrough_vertices, strikethrough_y)
+            end
 
             x = x + width
             previous_length = current_length
         end
 
-        --self._underline = rt.VertexLine(underline_vertices)
-        --self._strikethrough = rt.VertexLine(strikethrough_vertices)
+        if self._is_underlined then
+            table.insert(underline_vertices, x)
+            table.insert(underline_vertices, underline_y)
+            self._underline = rt.VertexRectangleSegments(1, splat(underline_vertices))
+        end
+
+        if self._is_strikethrough then
+            table.insert(strikethrough_vertices, x)
+            table.insert(strikethrough_vertices, strikethrough_y)
+            self._strikethrough = rt.VertexRectangleSegments(1, splat(strikethrough_vertices))
+        end
     end
 end
 
@@ -160,9 +174,7 @@ end
 function rt.Glyph:_draw_underline(x, y)
     love.graphics.push()
     love.graphics.translate(x, y)
-    for _, shape in pairs(self._underline) do
-        shape:draw()
-    end
+    self._underline:draw()
     love.graphics.pop()
 end
 
@@ -170,9 +182,7 @@ end
 function rt.Glyph:_draw_strikethrough(x, y)
     love.graphics.push()
     love.graphics.translate(x, y)
-    for _, shape in pairs(self._strikethrough) do
-        shape:draw()
-    end
+    self._strikethrough:draw()
     love.graphics.pop()
 end
 

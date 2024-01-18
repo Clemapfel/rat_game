@@ -43,16 +43,11 @@ points = {x, y,
 --horizontally_aligned: 90 or -90
 --vertically aligned: 180 or 0
 
-
-shape = rt.VertexLine(5, splat(points))
-
---[[
 local font = rt.settings.font.default[rt.FontStyle.REGULAR]
-local str = "<s><u><o><wave><shake>" .. "To_jyäü al balsu bldasiu ba" .. "</shake></wave></o></u></s>"
+local str = "<u><o><shake><wave><rainbow>" .. "To_jyäü al balsu bldasiu ba" .. "</shake></wave></rainbow></o></u>"
 
 label = rt.Label(str)
 rt.current_scene:set_child(label)
-]]--
 
 local i = rt.random.seed(os.time(os.date("!*t")))
 rt.current_scene.input:signal_connect("pressed", function(_, which)
@@ -65,7 +60,7 @@ rt.current_scene.input:signal_connect("pressed", function(_, which)
             table.insert(points, rt.random.number(50, love.graphics.getWidth() - 50))
             table.insert(points, rt.random.number(50, love.graphics.getHeight() - 50))
         end
-        shape = rt.VertexLine(5, splat(points))
+        shape = rt.VertexRectangleSegments(5, splat(points))
 
     elseif which == rt.InputButton.B then
     elseif which == rt.InputButton.X then
@@ -74,7 +69,9 @@ rt.current_scene.input:signal_connect("pressed", function(_, which)
     elseif which == rt.InputButton.L then
     elseif which == rt.InputButton.UP then
     elseif which == rt.InputButton.RIGHT then
+        label:set_n_visible_characters(label:get_n_visible_characters() + 1)
     elseif which == rt.InputButton.LEFT then
+        label:set_n_visible_characters(label:get_n_visible_characters() - 1)
     elseif which == rt.InputButton.DOWN then
     end
 end)
@@ -93,18 +90,8 @@ love.load = function()
 end
 
 love.draw = function()
-    love.graphics.clear()
-    --rt.current_scene:draw()
-
-    love.graphics.setWireframe(false)
-    shape:draw()
-
-    love.graphics.setColor(1, 0, 0, 0.5)
-    love.graphics.line(splat(points))
-
-    love.graphics.setColor(1, 0, 1, 1)
-    love.graphics.setPointSize(3)
-    love.graphics.points(splat(points))
+    love.graphics.clear(1, 0, 1, 1)
+    rt.current_scene:draw()
 end
 
 love.update = function()
