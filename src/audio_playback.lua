@@ -4,7 +4,7 @@ rt.AudioPlaybackMode = meta.new_enum({
     FROM_DISK = "stream"
 })
 
---- @class AudioPlayback
+--- @class rt.AudioPlayback
 --- @param filename_or_audio rt.Audio (or String)
 --- @param mode rt.AudioPlaybackMode (or nil)
 rt.AudioPlayback = meta.new_type("AudioPlayback", function(filename_or_audio, mode)

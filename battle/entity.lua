@@ -61,6 +61,12 @@ bt.Entity = meta.new_type("Entity", function(id)
 
     out:signal_add("changed")
 
+    local metatable = getmetatable(out)
+    metatable.__newindex = function(self, name, value)
+        rt.error("In bt.Entity.__newindex: Entity properties cannot be modified directly, use one of its member functions instead.")
+        meta.get_properties(self)[name] = value
+    end
+
     local name = config.name
     meta.assert_string(name)
     out.name = name

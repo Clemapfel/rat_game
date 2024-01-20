@@ -65,6 +65,7 @@ require "geometry"
 require "angle"
 require "random"
 require "signals"
+require "notify"
 require "list"
 require "set"
 require "color"
@@ -156,4 +157,6 @@ require "battle.battle_transition"
 require "battle.enemy_sprite"
 
 require "scene"
+require "battle.battle_scene"
+
 -- require "test

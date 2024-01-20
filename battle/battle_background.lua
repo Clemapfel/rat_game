@@ -1,6 +1,6 @@
 rt.settings.battle_background.dampening = 1 -- in [0, 1], where 1 = no dampening
 
---- @class BattleBackground
+--- @class bt.BattleBackground
 bt.BattleBackground = meta.new_type("BattleBackground", function(id)
     local out = meta.new(bt.BattleBackground, {
         _id = id,

@@ -538,7 +538,6 @@ function meta.hash(x)
     return getmetatable(x).__hash
 end
 
-
 --- @brief serialize meta.Object
 function meta.serialize(x, skip_functions)
     meta.assert_object(x)

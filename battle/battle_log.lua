@@ -5,7 +5,7 @@ rt.settings.battle_log = {
     scroll_speed = 10, -- letters per second
 }
 
---- @class BattleLogTextLayout
+--- @class bt.BattleLogTextLayout
 bt.BattleLogTextLayout = meta.new_type("BattleLogTextLayout", function()
     local out = meta.new(bt.BattleLogTextLayout, {
         _children = {},                    -- Table<rt.Widget>
@@ -95,7 +95,7 @@ function bt.BattleLogTextLayout:scroll_down()
     end
 end
 
---- @class BattleLog
+--- @class bt.BattleLog
 bt.BattleLog = meta.new_type("BattleLog", function()
     local out = meta.new(bt.BattleLog, {
         _frame = rt.Frame(rt.FrameType.RECTANGULAR),
