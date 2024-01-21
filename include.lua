@@ -156,6 +156,8 @@ require "battle.order_queue"
 require "battle.battle_transition"
 require "battle.enemy_sprite"
 
+require "battle.animations.hp_gained_animation"
+
 require "scene"
 require "battle.battle_scene"
 

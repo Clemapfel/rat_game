@@ -15,67 +15,21 @@ rt.SnapshotLayout = meta.new_type("SnapshotLayout", function()
     return out
 end)
 
-rt.SnapshotLayout._shader_source = [[
-#pragma glsl3
-
-vec3 rgb_to_hsv(vec3 c)
-{
-    vec4 K = vec4(0.0, -1.0 / 3.0, 2.0 / 3.0, -1.0);
-    vec4 p = mix(vec4(c.bg, K.wz), vec4(c.gb, K.xy), step(c.b, c.g));
-    vec4 q = mix(vec4(p.xyw, c.r), vec4(c.r, p.yzx), step(p.x, c.r));
-
-    float d = q.x - min(q.w, q.y);
-    float e = 1.0e-10;
-    return vec3(abs(q.z + (q.w - q.y) / (6.0 * d + e)), d / (q.x + e), q.x);
-}
-
-vec3 hsv_to_rgb(vec3 c)
-{
-    vec4 K = vec4(1.0, 2.0 / 3.0, 1.0 / 3.0, 3.0);
-    vec3 p = abs(fract(c.xxx + K.xyz) * 6.0 - K.www);
-    return c.z * mix(K.xxx, clamp(p - K.xxx, 0.0, 1.0), c.y);
-}
-
-uniform float _r_offset;
-uniform float _g_offset;
-uniform float _b_offset;
-uniform float _h_offset;
-uniform float _s_offset;
-uniform float _v_offset;
-uniform float _a_offset;
-
-vec4 effect(vec4 vertex_color, Image texture, vec2 texture_coordinates, vec2 vertex_position)
-{
-    vec4 color = Texel(texture, texture_coordinates);
-
-    vec3 as_rgb = color.rgb;
-    as_rgb.r += _r_offset;
-    as_rgb.g += _g_offset;
-    as_rgb.b += _b_offset;
-
-    as_rgb = clamp(as_rgb, vec3(0), vec3(1));
-
-    vec3 as_hsv = rgb_to_hsv(as_rgb);
-    as_hsv.x += _h_offset;
-    as_hsv.y += _s_offset;
-    as_hsv.z += _v_offset;
-
-    as_hsv = clamp(as_hsv, vec3(0), vec3(1));
-
-    as_rgb = hsv_to_rgb(as_hsv);
-    return vec4(as_rgb, color.a + _a_offset) * vertex_color;
-}
-]]
+rt.SnapshotLayout._shader_source = love.filesystem.read("assets/shaders/snapshot_layout.glsl")
 
 --- @brief update internally held render canvas
 function rt.SnapshotLayout:snapshot()
-
     if meta.is_widget(self._child) then
         self._canvas:bind_as_render_target()
+        love.graphics.clear(0, 0, 0, 0)
         self._child:draw()
         self._canvas:unbind_as_render_target()
     end
+end
 
+--- @overload rt.Drawable.draw
+function rt.SnapshotLayout:draw()
+    self._shader:bind()
     self._shader:send("_r_offset", self._rgb_offsets[1])
     self._shader:send("_g_offset", self._rgb_offsets[2])
     self._shader:send("_b_offset", self._rgb_offsets[3])
@@ -83,19 +37,9 @@ function rt.SnapshotLayout:snapshot()
     self._shader:send("_s_offset", self._hsv_offsets[2])
     self._shader:send("_v_offset", self._hsv_offsets[3])
     self._shader:send("_a_offset", self._alpha_offset)
-end
 
---- @overload rt.Drawable.draw
-function rt.SnapshotLayout:draw()
-    
-    if not self._canvas_initialized then
-        self:snapshot()
-        self._canvas_initialized = true
-    end
-
-    self._shader:bind()
     love.graphics.setColor(1, 1, 1, 1)
-    love.graphics.draw(self._canvas._native, self._position_x, self._position_y)
+    self:render(self._canvas._native, self._position_x, self._position_y)
     self._shader:unbind()
 end
 
@@ -111,9 +55,9 @@ function rt.SnapshotLayout:size_allocate(x, y, width, height)
             self._child:fit_into(rt.AABB(0, 0, width, height))
         end
         self._canvas = rt.RenderTexture(width, height)
+        self:snapshot()
     end
 
-    self:snapshot()
 end
 
 --- @brief
@@ -121,7 +65,6 @@ function rt.SnapshotLayout:set_rgb_offset(r, g, b)
     self._rgb_offsets[1] = which(r, 0)
     self._rgb_offsets[2] = which(g, 0)
     self._rgb_offsets[3] = which(b, 0)
-    self:snapshot()
 end
 
 --- @brief
@@ -129,13 +72,11 @@ function rt.SnapshotLayout:set_hsv_offset(h, s, v)
     self._hsv_offsets[1] = which(h, 0)
     self._hsv_offsets[2] = which(s, 0)
     self._hsv_offsets[3] = which(v, 0)
-    self:snapshot()
 end
 
 --- @brief
-function rt.SnapshotLayout:set_alpha_offset(value)
+function rt.SnapshotLayout:set_opacity_offset(value)
     self._alpha_offset = which(value, 0)
-    self:snapshot()
 end
 
 --- @brief
@@ -147,10 +88,7 @@ function rt.SnapshotLayout:set_offsets(r, g, b, h, s, v, a)
     self._hsv_offsets[2] = which(s, 0)
     self._hsv_offsets[3] = which(v, 0)
     self._alpha_offset = which(a, 0)
-
-    self:snapshot()
 end
-
 
 --- @brief
 function rt.SnapshotLayout:reset_offsets()
@@ -161,8 +99,6 @@ function rt.SnapshotLayout:reset_offsets()
     self._hsv_offsets[2] = 0
     self._hsv_offsets[3] = 0
     self._alpha_offset = 0
-
-    self:snapshot()
 end
 
 --- @brief

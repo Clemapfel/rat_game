@@ -300,9 +300,68 @@ Where `on_action_taken` is called anytime the wearer of the equipment takes dama
 
 ## 2.x AI & Enemy Design
 
+### 2.x Tutorial Fights
+
+rat_game contains no explicit tutorials, instead, all gameplay mechanics should be conveyed through gameplay only.
+
+### 2.x AI
+
+AI aims to be sophisticated yet fair. Enemies will have 3 levels of AI, called random, memory, and no-memory. An overview of how these three versions act will be given here.
+
+One turn of battle will resolve as following:
+
+1. Apply effects that trigger at the start of the turn
+2. Sort all entites by speed / priority
+3. Ask each entity to choose an action to perform, if the entity is player controlled, the player picks the action. If it is not, AI picks the action.
+4. In order of priority, resolve each entites action.
+5. Apply effects that trigger at the end of the turn
+
+We see that the AIs job is to choose exactly one action from a list of actions. During choosing, the AI has access to the following information about the player character:
+
++ current and max HP
++ Stat alterations
++ status ailments
++ PP count of moves at least used once this battle
+
+For "memory"-type AI only, the following are also available
+
++ for each turn so far, the state of the entire battle that turn
++ history of which moves the player used on which character so far
++ moves that are chosen by other enemies during this and all previous turns
+
+Notably, the AI is not aware of which moves the player has chosen the current turn, it has to make a decision solely based on the battles history and parts of the player entities state. The idea is that memory-type AI can make use only of all "public information".
+
+#### Decision Making Algorithms
+
+Each turn, the AI has the following task: given the current state of the battle and all other information available, choose exactly 1 move from each enemy entities moveset. 
+
+For multiple enemies, "memory"-type AI will choose all enemies moves wholistically, meaning each enemy does not think indepednently, they are planning as a group. This is similar to how the player acts, choosing multiple moves as a combination, while "random"- and "no-memry"-type AI does not take into account the actions of other enemies.
+
+#### Random AI
+
+"Random"-type AI is the most simple AI, it will choose a move from the enemy moveset randomly, where each moves occurence is weighted by the number of PP:
+
+```lua
+available_moves = {}
+for move in moveset do
+    for i = 1, move.current_pp do
+        table.insert(available_moves, move)
+    end
+end 
+
+which_index = rt.random.integer(1, sizeof(available_moves))
+return available_moves[which_index]
+```
+
+By inserting multiple copies of the same move into `moveset`, choosing a uniformly distributed number between 1 and the number of moves times the number of available PP, each moves probability is weighted by its available PP. This has two reason, for one it prevents the AI from choosing a move that has 0 PP left. Furthermore, moves that have a higher number of max PP will be more likely to be chosen at the start of the battle, while rare, one-time moves will be rarely chosen at the start, but as the total number of PP decrease each turn, their likelihood increases.
+
+Note that, like all randomness in rat_game, the actual result of `rt.random.integer` is determinstic, meaning if the player chooses the same actions after they start the battle, the battle will resolve in exactly the same way. Player actions advance the RNG state in order to prevent enemies from always picking the same actions every turn. This way, the RNG is is still wholly determinstic and in the players control, but each battle will be different.
+
+Random-type AI is limited to enemies with a very small moveset, or lesser enemies such as adds spawned next to bosses, or enemies in fights at the start of the game.
+
+#### No-Memory AI
 
 
-## 2.x UI
 
 ### 2.x.1 In-Battle UI
 

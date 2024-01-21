@@ -40,7 +40,7 @@ rt.AnimationTimerHandler._timing_functions = (function()
     end
 
     out[rt.AnimationTimingFunction.EASE_IN_OUT] = function(x)
-        return -0.5 * (math.cos(math.pi * x) - 1);
+        return -0.5 * math.cos(math.pi * x) + 0.5;
     end
     return out
 end)()
@@ -142,8 +142,6 @@ end
 --- @param self rt.AnimationTimer
 --- @param duration_s rt.Time
 function rt.AnimationTimer:set_duration(duration)
-
-
     self._duration = duration:as_seconds()
 end
 
@@ -159,7 +157,6 @@ end
 --- @param self rt.AnimationTimer
 --- @param f rt.AnimationTimingFunction
 function rt.AnimationTimer:set_timing_function(f)
-
 
     self._timing_function = f
 end

@@ -12,9 +12,30 @@ rt.Spline = meta.new_type("Spline", function(points, loop)
         _distances = distances,
         _length = total_length
     }, rt.Drawable)
-
     return out
 end)
+
+--- @brief easement functions, defined in [0, 1] with f(0) = 0, f(1) = 1
+
+rt.sinoid_ease_in = function(x)
+    return -1.0 * math.cos(x * (math.pi / 2)) + 1.0;
+end
+
+rt.sinoid_ease_out = function(x)
+    return math.sin(x * (math.pi / 2));
+end
+
+rt.sinoid_ease_in_out = function(x)
+    return -0.5 * math.cos(math.pi * x) + 0.5;
+end
+
+rt.exponential_acceleration = function(x)
+    return math.exp((x - 1) * math.pi) - math.exp(-1 * math.pi)
+end
+
+rt.exponential_plateau = function(x)
+    return math.exp((10 / 13 * math.pi * x - 1 - math.pi / 6)^3) / 2
+end
 
 --- @brief
 function rt.Spline:get_length()
@@ -41,10 +62,12 @@ function rt.Spline:at(t)
         i = i + 1
     end
 
+    --[[
     if i >= #self._distances then
         local n = #self._vertices
         return self._vertices[n-1], self._vertices[n]
     end
+    ]]--
 
     local current_x, current_y = self._vertices[i*2-1], self._vertices[i*2]
     local previous_x, previous_y = self._vertices[i*2-3], self._vertices[i*2-2]
@@ -72,6 +95,7 @@ function rt.Spline._catmull_rom(points, loop)
 
     -- source: https://gist.github.com/HoraceBury/4afb0e68cd807d8ead220a709219db2e
 
+    if meta.is_nil(loop) then loop = false end
     meta.assert_boolean(loop)
 
     function _length_of(x1, y1, x2, y2)
@@ -107,7 +131,6 @@ function rt.Spline._catmull_rom(points, loop)
         end
         return points, distances, total_length
     end
-
 
     local firstX, firstY, secondX, secondY = splat(rt.Spline._range(points, 1, 4))
     local penultX, penultY, lastX, lastY = splat(rt.Spline._range(points, #points-3, 4))
@@ -201,24 +224,6 @@ function rt.Spline._catmull_rom(points, loop)
             end
         end
     end
-
-    --[[ tests
-    local sum = 0
-    for _, d in pairs(distances) do
-        sum = sum + d
-    end
-    assert(sum == total_length)
-
-    local new_distances = {0}
-    for i = 1, #spline - 2, 2 do
-        local x1, y1 = spline[i], spline[i+1]
-        local x2, y2 = spline[i+2], spline[i+3]
-        table.insert(new_distances, _length_of(x1, y1, x2, y2))
-    end
-
-    assert(#new_distances == #distances)
-    assert(table.compare(distances, new_distances))
-    ]]--
 
     return spline, distances, total_length
 end

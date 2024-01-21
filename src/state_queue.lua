@@ -5,11 +5,8 @@ rt.CallbackResult = meta.new_enum({
 })
 
 --- @class rt.StateQueueState
---- @param id String
 --- @param args Table<Function> `update` function mandatory, while `start`, `finish`, and `draw` optional
-rt.StateQueueState = meta.new_type("StateQueueState", function(id, args)
-    meta.assert_string(id)
-
+rt.StateQueueState = meta.new_type("StateQueueState", function(args)
     local start, update, finish, draw
     for key, value in pairs(args) do
         if key == "start" then
@@ -26,9 +23,6 @@ rt.StateQueueState = meta.new_type("StateQueueState", function(id, args)
     end
 
     local out = meta.new(rt.StateQueueState, {
-        _started = false,
-        _finished = false,
-        _id = id
     }, rt.Drawable)
 
     if not meta.is_nil(start) then out.start = start end
@@ -39,14 +33,12 @@ rt.StateQueueState = meta.new_type("StateQueueState", function(id, args)
     return out
 end)
 
+rt.StateQueueState._started = false
+rt.StateQueueState._finished = false
+
 --- @brief
 function rt.StateQueueState:get_is_done()
     return self._started == true and self._finished == true
-end
-
---- @brief
-function rt.StateQueueState:get_id()
-    return self._id
 end
 
 --- @brief
@@ -103,7 +95,6 @@ end
 function rt.StateQueue:update(delta)
     local current_action = self._actions:front()
     if not meta.is_nil(current_action) then
-
         if current_action._started == false then
             current_action._started = true
             current_action:start()
@@ -119,7 +110,7 @@ function rt.StateQueue:update(delta)
             current_action:finish()
             self._actions:pop_front()
         else
-            rt.error("In rt.StateQueue:update: StateQueueState `" .. current_action._id .. "`s `update` does not return rt.StateQueueResult")
+            rt.error("In rt.StateQueue:update: StateQueueState `" .. meta.typeof(current_action) .. "`s `update` does not return rt.StateQueueResult")
         end
     end
 end
@@ -171,8 +162,8 @@ end
 function rt.test.state_queue()
 
     queue = rt.StateQueue()
-    function new_closure(id)
-        return rt.StateQueueState(id, {
+    function new_closure()
+        return rt.StateQueueState({
             start = function(self)
                 assert(self:get_is_started())
                 self.elapsed = 0
