@@ -2,6 +2,7 @@ rt.settings.particle_emitter = {
     default_emission_rate = 10,
     default_count = 100,
     default_particle_lifetime = 1,
+    default_speed = 100
 }
 
 --- @class rt.ParticleEmitter
@@ -11,36 +12,42 @@ rt.ParticleEmitter = meta.new_type("ParticleEmitter", function(particle)
         _particle = particle,
         _particle_texture = rt.RenderTexture(),
         _native = {}, -- love.ParticleSystem
-        _bounds = rt.AABB(0, 0, 1, 1)
+        _bounds = rt.AABB(0, 0, 1, 1),
+        _direction = rt.Direction.UP,
+        _speed = rt.settings.particle_emitter.default_speed,
+        _color = rt.RGBA(1, 1, 1, 1)
     }, rt.Drawable, rt.Animation, rt.Widget)
 
     out:_snapshot_particle()
     out._native = love.graphics.newParticleSystem(out._particle_texture._native)
-
     out._native:setEmissionRate(rt.settings.particle_emitter.default_emission_rate)
+
     out._native:setParticleLifetime(rt.settings.particle_emitter.default_particle_lifetime)
     out._native:setSpeed(0, 0)
     out._native:setSpread(rt.degrees_to_radians(0))
     out._native:setDirection(rt.degrees_to_radians(-90))
-    out._native:setLinearAcceleration(0, -100)
+
+    local r, g, b, a = out._color.r, out._color.g, out._color.b, out._color.a
     out._native:setColors(
-        1, 1, 1, 0, -- 1 : 5 : 1, ratio determines how long the particle will stay at given opacity
-        1, 1, 1, 1,
-        1, 1, 1, 1,
-        1, 1, 1, 1,
-        1, 1, 1, 1,
-        1, 1, 1, 1,
-        1, 1, 1, 0
+        r, g, b, 0, -- 1 : 5 : 1, ratio determines how long the particle will stay at given opacity
+        r, g, b, a,
+        r, g, b, a,
+        r, g, b, a,
+        r, g, b, a,
+        r, g, b, a,
+        r, g, b, 0
     )
     out._native:setSizes(1, 1)
     out._native:setInsertMode("bottom")
+    out:set_direction(out._direction)
+
     return out
 end)
 
 --- @brief [internal]
 function rt.ParticleEmitter:_snapshot_particle()
     local particle = self._particle
-    local w, h = particle:measure()
+    local w, h = particle:get_size()
     if w ~= self._particle_texture:get_width() or h ~= self._particle_texture:get_height() then
         self._particle_texture = rt.RenderTexture(clamp(w, 1), clamp(h, 1))
         self._particle_texture:set_scale_mode(rt.TextureScaleMode.LINEAR)
@@ -77,6 +84,26 @@ function rt.ParticleEmitter:set_particle_lifetime(seconds)
     self._native:setParticleLifetime(seconds)
 end
 
+--- @brief
+--- @param direction rt.Direction
+function rt.ParticleEmitter:set_direction(direction)
+    self._direction = direction
+    local x, y = 0, 0
+    if direction == rt.Direction.UP then
+        x, y = 0, -1
+    elseif direction == rt.Direction.RIGHT then
+        x, y = 1, 0
+    elseif direction == rt.Direction.DOWN then
+        x, y = 0, 1
+    elseif direction == rt.Direction.LEFT then
+        x, y = -1, 0
+    elseif direction == rt.Direction.NONE then
+        x, y = 0, 0
+    end
+
+    self._native:setLinearAcceleration(x * self._speed, y * self._speed)
+end
+
 --- @overload
 function rt.ParticleEmitter:draw()
     love.graphics.draw(self._native)
@@ -92,6 +119,11 @@ end
 
 --- @overload
 function rt.ParticleEmitter:realize()
+    if meta.is_widget(self._particle) and not self._particle:get_is_realized() then
+        self._particle:realize()
+        self:_snapshot_particle()
+    end
+
     self:set_is_animated(true)
     self._native:start()
     rt.Widget.realize(self)

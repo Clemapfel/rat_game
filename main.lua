@@ -19,11 +19,11 @@ end
 
 state_queue = rt.StateQueue()
 
-local label = rt.Label("<color=GREEN><mono><b>+</b></color></mono>")
+local label = rt.Spacer()
 label:realize()
+label:fit_into(0, 0, 100, 100)
 emitter = rt.ParticleEmitter(label)
-emitter:set_scale(1, 2)
-emitter:set_speed(100)
+emitter:set_speed(200)
 emitter:set_particle_lifetime(1)
 rt.current_scene:set_child(emitter)
 

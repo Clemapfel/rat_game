@@ -50,7 +50,6 @@ end
 --- @overload rt.Widget.size_allocate
 function rt.DirectionIndicator:size_allocate(x, y, width, height)
 
-
     local center_x, center_y = x + 0.5 * width, y + 0.5 * height
     local radius = math.min(width, height) / 2
     local ring_thickness = 0.4 * radius
@@ -125,22 +124,19 @@ end
 
 --- @brief
 function rt.DirectionIndicator:set_direction(direction)
-
-
-
-    self._direction = direction
-    self:reformat()
+    if self._direction ~= direction then
+        self._direction = direction
+        self:reformat()
+    end
 end
 
 --- @brief
 function rt.DirectionIndicator:get_direction()
-
     return self._direction
 end
 
 --- @brief
 function rt.DirectionIndicator:set_color(color)
-
     if meta.is_hsva(color) then
         color = rt.hsva_to_rgba(color)
     end
@@ -152,6 +148,5 @@ end
 
 --- @brief
 function rt.DirectionIndicator:get_color()
-
     return self._color
 end
