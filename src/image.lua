@@ -1,16 +1,25 @@
 --- @class rt.Image
 --- @param width_or_filename Number (or string)
 --- @param height Number (or nil)
-rt.Image = meta.new_type("Image", function(width_or_filename, height)
+rt.Image = meta.new_type("Image", function(width_or_filename, height, color)
     if meta.is_string(width_or_filename) then
         return meta.new(rt.Image, {
             _native = love.image.newImageData(width_or_filename)
         })
     else
-
-        return meta.new(rt.Image, {
+        local out = meta.new(rt.Image, {
             _native = love.image.newImageData(width_or_filename, height, rt.Image.FORMAT)
         })
+
+        if not meta.is_nil(color) then
+            for x = 1, width_or_filename do
+                for y = 1, height do
+                    out:set_pixel(x, y, color)
+                end
+            end
+        end
+
+        return out
     end
 end)
 
@@ -19,8 +28,6 @@ rt.Image.FORMAT = "rgba16"
 --- @brief load from file
 --- @param file String
 function rt.Image:create_from_file(file)
-
-
     self._native = love.image.newImageData(file)
 end
 

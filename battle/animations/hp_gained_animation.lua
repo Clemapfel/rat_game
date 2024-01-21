@@ -18,9 +18,9 @@ bt.HPGainedAnimation = meta.new_type("HPGainedAnimation", function(targets, valu
         _targets = targets,
         _values = values,
         _n_targets = n_targets,
-        _labels = {}, -- Table<rt.Label>
-        _paths = {},   -- Table<rt.Spline>
-        _elapsed = 0, -- seconds
+        _labels = {},   -- Table<rt.Label>
+        _paths = {},    -- Table<rt.Spline>
+        _elapsed = 0,   -- seconds
     }, rt.StateQueueState)
 
     out._labels = {}

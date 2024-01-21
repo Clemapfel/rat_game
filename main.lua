@@ -19,6 +19,14 @@ end
 
 state_queue = rt.StateQueue()
 
+local label = rt.Label("<color=GREEN><mono><b>+</b></color></mono>")
+label:realize()
+emitter = rt.ParticleEmitter(label)
+emitter:set_scale(1, 2)
+emitter:set_speed(100)
+emitter:set_particle_lifetime(1)
+rt.current_scene:set_child(emitter)
+
 rt.current_scene.input:signal_connect("pressed", function(_, which)
 
     if which == rt.InputButton.A then
@@ -56,11 +64,15 @@ love.draw = function()
     love.graphics.clear(1, 0, 1, 1)
     rt.current_scene:draw()
 
+    --[[
     for _, sprite in pairs(sprites) do
         sprite:draw()
     end
 
     state_queue:draw()
+    ]]--
+
+    emitter:draw()
 end
 
 love.update = function()
