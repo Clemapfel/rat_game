@@ -87,6 +87,7 @@ end
 
 --- @overload rt.Drawable.draw
 function rt.Texture:draw()
+    love.graphics.setColor(1, 1, 1, 1)
     love.graphics.draw(self._native)
 end
 

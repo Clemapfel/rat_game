@@ -19,12 +19,14 @@ end
 
 state_queue = rt.StateQueue()
 
-local label = rt.Spacer()
+local label = rt.DirectionIndicator(rt.Direction.UP)
 label:realize()
 label:fit_into(0, 0, 100, 100)
+label:set_color(rt.RGBA(1, 1, 0, 1))
 emitter = rt.ParticleEmitter(label)
 emitter:set_speed(200)
 emitter:set_particle_lifetime(1)
+emitter:realize()
 rt.current_scene:set_child(emitter)
 
 rt.current_scene.input:signal_connect("pressed", function(_, which)
@@ -62,6 +64,7 @@ end
 
 love.draw = function()
     love.graphics.clear(1, 0, 1, 1)
+    emitter._particle_texture:draw()
     rt.current_scene:draw()
 
     --[[
@@ -72,7 +75,7 @@ love.draw = function()
     state_queue:draw()
     ]]--
 
-    emitter:draw()
+    --emitter:draw()
 end
 
 love.update = function()
