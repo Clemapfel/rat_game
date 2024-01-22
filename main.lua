@@ -3,7 +3,7 @@ require("include")
 rt.current_scene = rt.add_scene("debug")
 
 sprites = {}
-for i = 1, 1 do table.insert(sprites, rt.Spacer()) end
+for i = 1, 4 do table.insert(sprites, rt.Spacer()) end
 local x, y, w, h = 0, 150, love.graphics.getWidth() / #sprites - 25, 100
 local m = (love.graphics.getWidth() - #sprites * w) / (#sprites + 1)
 x = x + m
@@ -19,15 +19,6 @@ end
 
 state_queue = rt.StateQueue()
 
-local label = rt.DirectionIndicator(rt.Direction.UP)
-label:realize()
-label:fit_into(0, 0, 100, 100)
-label:set_color(rt.RGBA(1, 1, 0, 1))
-emitter = rt.ParticleEmitter(label)
-emitter:set_speed(200)
-emitter:set_particle_lifetime(1)
-emitter:realize()
-rt.current_scene:set_child(emitter)
 
 rt.current_scene.input:signal_connect("pressed", function(_, which)
 
@@ -64,18 +55,12 @@ end
 
 love.draw = function()
     love.graphics.clear(1, 0, 1, 1)
-    emitter._particle_texture:draw()
     rt.current_scene:draw()
 
-    --[[
     for _, sprite in pairs(sprites) do
         sprite:draw()
     end
-
     state_queue:draw()
-    ]]--
-
-    --emitter:draw()
 end
 
 love.update = function()

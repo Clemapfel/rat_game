@@ -104,8 +104,14 @@ function rt.ParticleEmitter:set_direction(direction)
     self._native:setLinearAcceleration(x * self._speed, y * self._speed)
 end
 
+--- @brief
+function rt.ParticleEmitter:burst()
+    self._native:emit(100)
+end
+
 --- @overload
 function rt.ParticleEmitter:draw()
+    love.graphics.setColor(1, 1, 1, 1)
     love.graphics.draw(self._native)
 end
 

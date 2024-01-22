@@ -218,8 +218,8 @@ function rt.test.renderer()
 
                 local point = math3d.vec3.unit_y
                 local rotation =
-                math3d.quat.from_angle_axis(z, math3d.vec3.unit_z) *
-                        math3d.quat.from_angle_axis(x, math3d.vec3.unit_x)
+                    math3d.quat.from_angle_axis(z, math3d.vec3.unit_z) *
+                    math3d.quat.from_angle_axis(x, math3d.vec3.unit_x)
 
                 point = rotation * point
                 table.insert(vertices, {

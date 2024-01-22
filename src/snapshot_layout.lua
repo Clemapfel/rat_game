@@ -22,6 +22,7 @@ function rt.SnapshotLayout:snapshot()
     if meta.is_widget(self._child) then
         self._canvas:bind_as_render_target()
         love.graphics.clear(0, 0, 0, 0)
+        love.graphics.setColor(1, 1, 1, 1)
         self._child:draw()
         self._canvas:unbind_as_render_target()
     end
@@ -38,7 +39,6 @@ function rt.SnapshotLayout:draw()
     self._shader:send("_v_offset", self._hsv_offsets[3])
     self._shader:send("_a_offset", self._alpha_offset)
 
-    love.graphics.setColor(1, 1, 1, 1)
     self:render(self._canvas._native, self._position_x, self._position_y)
     self._shader:unbind()
 end
