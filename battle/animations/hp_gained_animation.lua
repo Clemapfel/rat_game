@@ -1,7 +1,6 @@
 rt.settings.hp_gained_animation = {
-    font = rt.Font(40, "assets/fonts/pixel.ttf"),
-    fade_out_fraction = 0.9,    -- in [0, 1], interval after which fade-out beings
     duration = 2, -- seconds
+    offset = 50
 }
 
 --- @class
@@ -27,8 +26,7 @@ bt.HPGainedAnimation = meta.new_type("HPGainedAnimation", function(targets, valu
 
         _elapsed = 0,
 
-        _label_paths = {},  -- Table<rt.Spline>
-        _target_paths = {}, -- Table<rt.Spline>
+        _label_paths = {}  -- Table<rt.Spline>
     }, rt.StateQueueState)
 
     local particle = rt.Label("<o><color=HP>+</color></o>")
@@ -81,16 +79,17 @@ function bt.HPGainedAnimation:start()
 
         local label = self._labels[i]
         local label_w = label:get_width() * 0.5
-        local start_x, start_y = bounds.x + bounds.width * 1/2, bounds.y + bounds.height * 0.5
-        local finish_x, finish_y = bounds.x + bounds.width * 1/2, bounds.y - bounds.height * 1/3
+        local start_x, start_y = bounds.x + bounds.width * 0.5, bounds.y + bounds.height * 0.5
+        local finish_x, finish_y = bounds.x + bounds.width * 0.5, bounds.y - bounds.height * 1/3
         table.insert(self._label_paths, rt.Spline({start_x, start_y, finish_x, finish_y}))
 
         local left_x, left_y = bounds.x + bounds.width * 0.5 - label_w, bounds.y
         local right_x, right_y = bounds.x + bounds.width * 0.5 + label_w, bounds.y
+        local offset = rt.settings.hp_gained_animation.offset
         table.insert(self._target_paths, rt.Spline({
               0, 0,
-            -50, 0,
-             50, 0,
+            -1 * offset, 0,
+             offset, 0,
               0, 0,
         }))
 
@@ -118,7 +117,7 @@ function bt.HPGainedAnimation:update(delta)
         local pos_x, pos_y = self._label_paths[i]:at(rt.exponential_plateau(fraction * 0.9))
         label:fit_into(pos_x - 0.5 * w, pos_y, w, h)
 
-        local fade_out_target = rt.settings.hp_gained_animation.fade_out_fraction
+        local fade_out_target = 0.9
         if fraction > fade_out_target then
             local v = 1 - clamp((1 - fraction) / (1 - fade_out_target), 0, 1)
             self._label_snapshot[i]:set_opacity_offset(-v)

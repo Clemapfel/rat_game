@@ -2,6 +2,8 @@
 
 --- @brief linear, maps [0, 1] to [min, max]
 rt.linear = function(x, min, max)
+    min = which(min, 0)
+    max = which(max, 1)
     return x * (max - min) + min
 end
 
@@ -29,4 +31,14 @@ end
 rt.symmetrical_linear = function(x, peak)
     peak = which(peak, 1)
     return (1 - math.abs(2 * (x - 0.5))) / (1 / peak)
+end
+
+--- @brief 1 to 0 strictly decreasing, x² parabolic
+rt.parabolic_drop = function(x)
+    return -(x^2) + 1
+end
+
+--- @brief 0 to 1 strictly increasing x² parabolic
+rt.parabolic_increase = function(x)
+    return x^2
 end

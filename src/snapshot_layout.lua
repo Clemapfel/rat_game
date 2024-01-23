@@ -12,6 +12,7 @@ rt.SnapshotLayout = meta.new_type("SnapshotLayout", function()
         _position_y = 0,
         _x_offset = 0,
         _y_offset = 0,
+        _invert = false,
         _mix_color = rt.RGBA(1, 1, 1, 1),
         _mix_weight = 0
     }, rt.Drawable, rt.Widget)
@@ -52,6 +53,7 @@ function rt.SnapshotLayout:draw()
     self._shader:send("_y_offset", self._y_offset)
     self._shader:send("_mix_color", {self._mix_color.r, self._mix_color.g, self._mix_color.b, self._mix_color.a})
     self._shader:send("_mix_weight", self._mix_weight)
+    self._shader:send("_invert", self._invert)
 
     self:render(self._canvas._native, self._position_x, self._position_y)
     self._shader:unbind()
@@ -149,6 +151,16 @@ end
 --- @param weight Number 0 for only original, 1 for only mix
 function rt.SnapshotLayout:set_mix_weight(weight)
     self._mix_weight = weight
+end
+
+--- @brief
+function rt.SnapshotLayout:set_invert(b)
+    self._invert = b
+end
+
+--- @brief
+function rt.SnapshotLayout:get_invert()
+    return self._invert
 end
 
 --- @brief set singular child

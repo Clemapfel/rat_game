@@ -31,6 +31,8 @@ uniform float _y_offset;
 uniform vec4 _mix_color;
 uniform float _mix_weight;
 
+uniform bool _invert;
+
 #ifdef VERTEX
 vec4 position(mat4 transform, vec4 vertex_position)
 {
@@ -46,6 +48,9 @@ vec4 position(mat4 transform, vec4 vertex_position)
 vec4 effect(vec4 vertex_color, Image texture, vec2 texture_coordinates, vec2 vertex_position)
 {
     vec4 color = Texel(texture, texture_coordinates);
+
+    if (_invert)
+        color.rgb = vec3(1) - color.rgb;
 
     vec3 as_rgb = color.rgb;
     as_rgb.r += _r_offset;
@@ -68,7 +73,8 @@ vec4 effect(vec4 vertex_color, Image texture, vec2 texture_coordinates, vec2 ver
         color = vec4(0);
 
     vec4 result = vec4(as_rgb, alpha) * vertex_color;
-    result = mix(result, _mix_color, _mix_weight);
+    result = mix(result, _mix_color, clamp(_mix_weight, 0, 1));
+
     return result;
 }
 

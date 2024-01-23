@@ -160,6 +160,7 @@ require "battle.battle_transition"
 require "battle.enemy_sprite"
 
 require "battle.animations.hp_gained_animation"
+require "battle.animations.hp_lost_animation"
 
 require "scene"
 require "battle.battle_scene"

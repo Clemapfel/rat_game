@@ -21,14 +21,15 @@ state_queue = rt.StateQueue()
 
 
 rt.current_scene.input:signal_connect("pressed", function(_, which)
+    local values = {}
+    for i = 1, #sprites do
+        table.insert(values, rt.random.integer(9, 9999))
+    end
 
     if which == rt.InputButton.A then
-        local values = {}
-        for i = 1, #sprites do
-            table.insert(values, rt.random.integer(9, 9999))
-        end
         state_queue:push_back(bt.HPGainedAnimation(sprites, values))
     elseif which == rt.InputButton.B then
+        state_queue:push_back(bt.HPLostAnimation(sprites, values))
     elseif which == rt.InputButton.X then
     elseif which == rt.InputButton.Y then
     elseif which == rt.InputButton.R then
