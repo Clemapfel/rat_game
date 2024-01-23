@@ -41,7 +41,10 @@ end
 function rt.OverlayLayout:realize()
 
     self._realized = true
-    self._base_child:realize()
+
+    if meta.is_widget(self._base_child) then
+        self._base_child:realize()
+    end
 
     local i = 1
     for _, child in pairs(self._overlays) do

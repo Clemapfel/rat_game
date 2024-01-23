@@ -25,6 +25,20 @@ uniform float _h_offset;
 uniform float _s_offset;
 uniform float _v_offset;
 uniform float _a_offset;
+uniform float _x_offset;
+uniform float _y_offset;
+
+#ifdef VERTEX
+vec4 position(mat4 transform, vec4 vertex_position)
+{
+    vec4 pos = vertex_position;
+    pos.x += _x_offset;
+    pos.y += _y_offset;
+    return transform * pos;
+}
+#endif
+
+#ifdef PIXEL
 
 vec4 effect(vec4 vertex_color, Image texture, vec2 texture_coordinates, vec2 vertex_position)
 {
@@ -52,3 +66,5 @@ vec4 effect(vec4 vertex_color, Image texture, vec2 texture_coordinates, vec2 ver
     else
         return vec4(as_rgb, alpha) * vertex_color;
 }
+
+#endif

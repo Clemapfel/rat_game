@@ -4,13 +4,14 @@ rt.SnapshotLayout = meta.new_type("SnapshotLayout", function()
     local out = meta.new(rt.SnapshotLayout, {
         _child = {},
         _canvas = rt.RenderTexture(1, 1),
-        _canvas_initialized = false,
         _shader = rt.Shader(rt.SnapshotLayout._shader_source),
         _rgb_offsets = {0, 0, 0},
         _hsv_offsets = {0, 0, 0},
         _alpha_offset = 0,
         _position_x = 0,
-        _position_y = 0
+        _position_y = 0,
+        _x_offset = 0,
+        _y_offset = 0
     }, rt.Drawable, rt.Widget)
     return out
 end)
@@ -18,14 +19,21 @@ end)
 rt.SnapshotLayout._shader_source = love.filesystem.read("assets/shaders/snapshot_layout.glsl")
 
 --- @brief update internally held render canvas
-function rt.SnapshotLayout:snapshot()
-    if meta.is_widget(self._child) then
-        self._canvas:bind_as_render_target()
-        love.graphics.clear(0, 0, 0, 0)
+function rt.SnapshotLayout:snapshot(to_draw)
+
+    if to_draw == nil then to_draw = self._child end
+    self._canvas:bind_as_render_target()
+    love.graphics.clear(0, 0, 0, 0)
+    if meta.is_widget(to_draw) then
+        love.graphics.push()
+        local m = rt.settings.margin_unit
+        local x, y = to_draw:get_position()
+        love.graphics.translate(-x, -y)
         love.graphics.setColor(1, 1, 1, 1)
-        self._child:draw()
-        self._canvas:unbind_as_render_target()
+        to_draw:draw()
+        love.graphics.pop()
     end
+    self._canvas:unbind_as_render_target()
 end
 
 --- @overload rt.Drawable.draw
@@ -38,6 +46,8 @@ function rt.SnapshotLayout:draw()
     self._shader:send("_s_offset", self._hsv_offsets[2])
     self._shader:send("_v_offset", self._hsv_offsets[3])
     self._shader:send("_a_offset", self._alpha_offset)
+    self._shader:send("_x_offset", self._x_offset)
+    self._shader:send("_y_offset", self._y_offset)
 
     self:render(self._canvas._native, self._position_x, self._position_y)
     self._shader:unbind()
@@ -50,14 +60,13 @@ function rt.SnapshotLayout:size_allocate(x, y, width, height)
     self._position_x = x
     self._position_y = y
 
-    if canvas_w ~= width or canvas_h ~= height or self._canvas_initialized == false then
-        if meta.is_widget(self._child) and not self._is_locked then
-            self._child:fit_into(rt.AABB(0, 0, width, height))
-        end
-        self._canvas = rt.RenderTexture(width, height)
-        self:snapshot()
+    if meta.is_widget(self._child) and not self._is_locked then
+        self._child:fit_into(rt.AABB(0, 0, width, height))
     end
 
+    local m = rt.settings.margin_unit
+    self._canvas = rt.RenderTexture(width, height)
+    self:snapshot()
 end
 
 --- @brief
@@ -80,7 +89,7 @@ function rt.SnapshotLayout:set_opacity_offset(value)
 end
 
 --- @brief
-function rt.SnapshotLayout:set_offsets(r, g, b, h, s, v, a)
+function rt.SnapshotLayout:set_color_offsets(r, g, b, h, s, v, a)
     self._rgb_offsets[1] = which(r, 0)
     self._rgb_offsets[2] = which(g, 0)
     self._rgb_offsets[3] = which(b, 0)
@@ -88,6 +97,12 @@ function rt.SnapshotLayout:set_offsets(r, g, b, h, s, v, a)
     self._hsv_offsets[2] = which(s, 0)
     self._hsv_offsets[3] = which(v, 0)
     self._alpha_offset = which(a, 0)
+end
+
+--- @brief
+function rt.SnapshotLayout:set_position_offsets(x, y)
+    self._x_offset = x
+    self._y_offset = y
 end
 
 --- @brief
@@ -99,6 +114,8 @@ function rt.SnapshotLayout:reset_offsets()
     self._hsv_offsets[2] = 0
     self._hsv_offsets[3] = 0
     self._alpha_offset = 0
+    self._x_offset = 0
+    self._y_offset = 0
 end
 
 --- @brief
@@ -152,7 +169,7 @@ end
 
 --- @overload rt.Widget.measure
 function rt.SnapshotLayout:measure()
-    if meta.is_nil(self._child) then return 0, 0 end
+    if not meta.is_widget(self._child) then return 0, 0 end
     return self._child:measure()
 end
 
@@ -164,5 +181,7 @@ function rt.SnapshotLayout:realize()
     end
 
     rt.Widget.realize(self)
-    self:snapshot()
+    if meta.is_widget(self._child) then
+        self:snapshot()
+    end
 end

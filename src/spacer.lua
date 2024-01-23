@@ -45,10 +45,15 @@ function rt.Spacer:size_allocate(x, y, width, height)
     local o = 1 -- outline width
     self._shape:resize(x , y, width, height)
 
-    self._outline_top:resize(x + o, y, x + width, y)
-    self._outline_right:resize(x + width, y + o, x + width, y + height)
-    self._outline_bottom:resize(x + width - o, y + height, x, y + height)
-    self._outline_left:resize(x, y + height + o, x, y)
+    local top_left_x, top_left_y = x + o, y + o
+    local top_right_x, top_right_y = x + width - o, y + o
+    local bottom_right_x, bottom_right_y = x + width - o, y + height - o
+    local bottom_left_x, bottom_left_y = x + o, y + height - o
+
+    self._outline_top:resize(top_left_x, top_left_y, top_right_x, top_right_y)
+    self._outline_right:resize(top_right_x, top_right_y, bottom_right_x, bottom_right_y)
+    self._outline_bottom:resize(bottom_left_x, bottom_left_y, bottom_right_x, bottom_right_y)
+    self._outline_left:resize(bottom_left_x, bottom_left_y, top_left_x, top_left_y)
 end
 
 --- @brief set color

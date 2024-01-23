@@ -17,6 +17,10 @@ end)
 
 --- @brief easement functions, defined in [0, 1] with f(0) = 0, f(1) = 1
 
+rt.linear = function(x)
+    return x
+end
+
 rt.sinoid_ease_in = function(x)
     return -1.0 * math.cos(x * (math.pi / 2)) + 1.0;
 end

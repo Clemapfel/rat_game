@@ -66,7 +66,9 @@ end
 --- @brief determines how many particles are emitted
 function rt.ParticleEmitter:set_density(emissions_per_second, max_number_of_particles)
     self._native:setEmissionRate(emissions_per_second)
-    self._native:setBufferSize(max_number_of_particles)
+    if not meta.is_nil(max_number_of_particles) then
+        self._native:setBufferSize(max_number_of_particles)
+    end
 end
 
 --- @brief
@@ -80,8 +82,8 @@ function rt.ParticleEmitter:set_speed(speed)
 end
 
 --- @brief
-function rt.ParticleEmitter:set_particle_lifetime(seconds)
-    self._native:setParticleLifetime(seconds)
+function rt.ParticleEmitter:set_particle_lifetime(min, max)
+    self._native:setParticleLifetime(min, which(max, min))
 end
 
 --- @brief
@@ -102,11 +104,6 @@ function rt.ParticleEmitter:set_direction(direction)
     end
 
     self._native:setLinearAcceleration(x * self._speed, y * self._speed)
-end
-
---- @brief
-function rt.ParticleEmitter:burst()
-    self._native:emit(100)
 end
 
 --- @overload
