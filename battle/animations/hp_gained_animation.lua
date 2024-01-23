@@ -52,6 +52,8 @@ bt.HPGainedAnimation = meta.new_type("HPGainedAnimation", function(targets, valu
         table.insert(out._target_snapshots, target_snapshot)
 
         label_snapshot:set_child(label)
+        target_snapshot:set_mix_color(rt.Palette.HP)
+        target_snapshot:set_mix_weight(0)
 
         overlay:push_overlay(target_snapshot)
         overlay:push_overlay(emitter)
@@ -129,6 +131,7 @@ function bt.HPGainedAnimation:update(delta)
         current.x = current.x + offset_x
         current.y = current.y + offset_y
         target:set_position_offsets(offset_x, offset_y)
+        target:set_mix_weight(rt.symmetrical_linear(fraction, 0.3))
     end
 
     return self._elapsed < duration

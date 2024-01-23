@@ -28,6 +28,9 @@ uniform float _a_offset;
 uniform float _x_offset;
 uniform float _y_offset;
 
+uniform vec4 _mix_color;
+uniform float _mix_weight;
+
 #ifdef VERTEX
 vec4 position(mat4 transform, vec4 vertex_position)
 {
@@ -62,9 +65,11 @@ vec4 effect(vec4 vertex_color, Image texture, vec2 texture_coordinates, vec2 ver
     float alpha = clamp(color.a + _a_offset, 0, 1);
 
     if (color.a < 0.01)
-        return vec4(0);
-    else
-        return vec4(as_rgb, alpha) * vertex_color;
+        color = vec4(0);
+
+    vec4 result = vec4(as_rgb, alpha) * vertex_color;
+    result = mix(result, _mix_color, _mix_weight);
+    return result;
 }
 
 #endif

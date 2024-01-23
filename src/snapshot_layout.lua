@@ -11,7 +11,9 @@ rt.SnapshotLayout = meta.new_type("SnapshotLayout", function()
         _position_x = 0,
         _position_y = 0,
         _x_offset = 0,
-        _y_offset = 0
+        _y_offset = 0,
+        _mix_color = rt.RGBA(1, 1, 1, 1),
+        _mix_weight = 0
     }, rt.Drawable, rt.Widget)
     return out
 end)
@@ -48,6 +50,8 @@ function rt.SnapshotLayout:draw()
     self._shader:send("_a_offset", self._alpha_offset)
     self._shader:send("_x_offset", self._x_offset)
     self._shader:send("_y_offset", self._y_offset)
+    self._shader:send("_mix_color", {self._mix_color.r, self._mix_color.g, self._mix_color.b, self._mix_color.a})
+    self._shader:send("_mix_weight", self._mix_weight)
 
     self:render(self._canvas._native, self._position_x, self._position_y)
     self._shader:unbind()
@@ -55,7 +59,6 @@ end
 
 --- @overload rt.Widget.size_allocate
 function rt.SnapshotLayout:size_allocate(x, y, width, height)
-
     local canvas_w, canvas_h = self._canvas:get_size()
     self._position_x = x
     self._position_y = y
@@ -131,6 +134,21 @@ end
 --- @brief
 function rt.SnapshotLayout:get_alpha_offset()
     return self._alpha_offset
+end
+
+--- @brief
+function rt.SnapshotLayout:set_mix_color(color)
+    if meta.is_hsva(color) then
+        color = rt.hsva_to_rgba(color)
+    end
+
+    self._mix_color = color
+end
+
+--- @brief
+--- @param weight Number 0 for only original, 1 for only mix
+function rt.SnapshotLayout:set_mix_weight(weight)
+    self._mix_weight = weight
 end
 
 --- @brief set singular child

@@ -15,32 +15,6 @@ rt.Spline = meta.new_type("Spline", function(points, loop)
     return out
 end)
 
---- @brief easement functions, defined in [0, 1] with f(0) = 0, f(1) = 1
-
-rt.linear = function(x)
-    return x
-end
-
-rt.sinoid_ease_in = function(x)
-    return -1.0 * math.cos(x * (math.pi / 2)) + 1.0;
-end
-
-rt.sinoid_ease_out = function(x)
-    return math.sin(x * (math.pi / 2));
-end
-
-rt.sinoid_ease_in_out = function(x)
-    return -0.5 * math.cos(math.pi * x) + 0.5;
-end
-
-rt.exponential_acceleration = function(x)
-    return math.exp((x - 1) * math.pi) - math.exp(-1 * math.pi)
-end
-
-rt.exponential_plateau = function(x)
-    return math.exp((10 / 13 * math.pi * x - 1 - math.pi / 6)^3) / 2
-end
-
 --- @brief
 function rt.Spline:get_length()
     return self._length
