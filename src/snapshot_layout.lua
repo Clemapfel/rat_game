@@ -105,7 +105,9 @@ function rt.SnapshotLayout:set_color_offsets(r, g, b, h, s, v, a)
 end
 
 --- @brief
-function rt.SnapshotLayout:set_position_offsets(x, y)
+function rt.SnapshotLayout:set_position_offset(x, y)
+    x = which(x, 0)
+    y = which(y, 0)
     self._x_offset = x
     self._y_offset = y
 end

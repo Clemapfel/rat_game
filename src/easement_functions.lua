@@ -23,6 +23,10 @@ rt.exponential_acceleration = function(x)
     return math.exp((x - 1) * math.pi) - math.exp(-1 * math.pi)
 end
 
+rt.exponential_deceleration = function(x)
+    return (1 - 1.5 * math.exp(-x * math.pi) - 0.5 * math.exp(-1 * math.pi) + 0.5) / (math.pi / 2 - 0.1)
+end
+
 rt.exponential_plateau = function(x)
     return math.exp((10 / 13 * math.pi * x - 1 - math.pi / 6)^3) / 2
 end

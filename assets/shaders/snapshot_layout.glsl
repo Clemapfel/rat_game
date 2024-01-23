@@ -56,7 +56,6 @@ vec4 effect(vec4 vertex_color, Image texture, vec2 texture_coordinates, vec2 ver
     as_rgb.r += _r_offset;
     as_rgb.g += _g_offset;
     as_rgb.b += _b_offset;
-
     as_rgb = clamp(as_rgb, vec3(0), vec3(1));
 
     vec3 as_hsv = rgb_to_hsv(as_rgb);
@@ -72,7 +71,7 @@ vec4 effect(vec4 vertex_color, Image texture, vec2 texture_coordinates, vec2 ver
     if (color.a < 0.01)
         color = vec4(0);
 
-    vec4 result = vec4(as_rgb, alpha) * vertex_color;
+    vec4 result = vec4(as_rgb, alpha) * vec4(1);
     result = mix(result, _mix_color, clamp(_mix_weight, 0, 1));
 
     return result;

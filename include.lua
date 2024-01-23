@@ -159,8 +159,9 @@ require "battle.order_queue"
 require "battle.battle_transition"
 require "battle.enemy_sprite"
 
-require "battle.animations.hp_gained_animation"
-require "battle.animations.hp_lost_animation"
+require "battle.animations.hp_gained"
+require "battle.animations.hp_lost"
+require "battle.animations.enemy_appeared"
 
 require "scene"
 require "battle.battle_scene"
