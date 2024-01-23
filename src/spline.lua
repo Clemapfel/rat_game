@@ -27,6 +27,11 @@ function rt.Spline:at(t)
     t = clamp(t, 0, 1)
     local i = 1
 
+    if self._length == 0 then
+        local n = #self._vertices
+        return self._vertices[n-1], self._vertices[n]
+    end
+
     local max_length = self._length
     local length = t * max_length
 
