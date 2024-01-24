@@ -1,6 +1,6 @@
 rt.settings.stat_changed_animation = {
     duration = 3,
-    particle_size = 40
+    particle_size = 100
 }
 
 --- @class
@@ -19,7 +19,10 @@ bt.StatChangedAnimation = meta.new_type("StatChangedAnimation", function(targets
 
         _emitters = {},         -- Table<rt.ParticleEmitter>
         _overlays = {},         -- Table<rt.OverlayLayout>
-        _target_snapshots = {}, -- Table<rt.SnapshotLayout>
+        _snapshots = {}, -- Table<rt.SnapshotLayout>
+
+        _scale_paths = {},   -- Table<rt.Spline>
+        _offset_paths = {},  -- Table<rt.Spline>
 
         _elapsed = 0,
     }, rt.StateQueueState)
@@ -30,6 +33,16 @@ bt.StatChangedAnimation = meta.new_type("StatChangedAnimation", function(targets
         table.insert(out._overlays, overlay)
 
         local particle = rt.DirectionIndicator(out._directions[i])
+
+        local stat = out._which_stats[i]
+        if stat == bt.Stat.ATTACK then
+            particle:set_color(rt.Palette.ATTACK)
+        elseif stat == bt.Stat.SPEED then
+            particle:set_color(rt.Palette.DEFENSE)
+        elseif stat == bt.Stat.SPEED then
+            particle:set_color(rt.Palette.SPEED)
+        end
+
         particle:realize()
         particle:fit_into(0, 0, particle_size, particle_size)
 
@@ -37,7 +50,7 @@ bt.StatChangedAnimation = meta.new_type("StatChangedAnimation", function(targets
         table.insert(out._emitters, emitter)
 
         local target_snapshot = rt.SnapshotLayout()
-        table.insert(out._target_snapshots, target_snapshot)
+        table.insert(out._snapshots, target_snapshot)
 
         target_snapshot:set_mix_color(rt.Palette.HP)
         target_snapshot:set_mix_weight(0)
@@ -46,7 +59,7 @@ bt.StatChangedAnimation = meta.new_type("StatChangedAnimation", function(targets
         overlay:push_overlay(emitter)
 
         emitter:set_speed(50)
-        emitter:set_particle_lifetime(0, rt.settings.hp_gained_animation.duration)
+        emitter:set_particle_lifetime(0, rt.settings.stat_changed_animation.duration)
         emitter:set_scale(1, 1)
         emitter:set_color(rt.RGBA(1, 1, 1, 0.5))
         emitter:set_density(0)
@@ -66,21 +79,42 @@ function bt.StatChangedAnimation:start()
 
         local emitter = self._emitters[i]
         emitter:set_is_animated(true)
-        --emitter._native:emit(6)
+        if self._directions[i] ~= rt.Direction.NONE then
+            emitter._native:emit(1)
+        end
 
         local target = self._targets[i]
-        self._target_snapshots[i]:snapshot(target)
+        target:set_is_visible(true)
+        self._snapshots[i]:snapshot(target)
         target:set_is_visible(false)
+
+        local direction = self._directions[i]
+        local scale
+        if direction == rt.Direction.UP then
+            local up_offset = 0.3
+            scale = rt.Spline({1, 1, 1 + up_offset, 1 + up_offset, 1, 1})
+        elseif direction == rt.Direction.DOWN then
+            local down_offset = 0.3
+            scale = rt.Spline({1, 1, 1 - down_offset, 1 - down_offset, 1, 1})
+        else
+            scale = rt.Spline({1, 1, 1, 1})
+        end
+        table.insert(self._scale_paths, scale)
     end
 end
 
 --- @overload
 function bt.StatChangedAnimation:update(delta)
-    local duration = rt.settings.hp_gained_animation.duration
+    local duration = rt.settings.stat_changed_animation.duration
     self._elapsed = self._elapsed + delta
     local fraction = self._elapsed / duration
-
     for i = 1, self._n_targets do
+        local snapshot = self._snapshots[i]
+
+        local scale_x, scale_y = self._scale_paths[i]:at(rt.exponential_plateau(fraction))
+        local snapshot = self._snapshots[i]
+        snapshot:set_origin(0.5, 1)
+        snapshot:set_scale(scale_x, scale_y)
     end
 
     return self._elapsed < duration
@@ -96,7 +130,8 @@ end
 
 --- @overload
 function bt.StatChangedAnimation:draw()
+    local fraction = self._elapsed / rt.settings.stat_changed_animation.duration
     for i = 1, self._n_targets do
-        self._overlays[i]:draw()
+       self._overlays[i]:draw()
     end
 end

@@ -22,8 +22,6 @@ end)
 --- @param transform rt.Transform
 function rt.Drawable:render(love_drawable, x, y, transform)
 
-
-
     if self._is_visible == false then
         return
     end

@@ -25,8 +25,6 @@ uniform float _h_offset;
 uniform float _s_offset;
 uniform float _v_offset;
 uniform float _a_offset;
-uniform float _x_offset;
-uniform float _y_offset;
 
 uniform vec4 _mix_color;
 uniform float _mix_weight;
@@ -37,8 +35,6 @@ uniform bool _invert;
 vec4 position(mat4 transform, vec4 vertex_position)
 {
     vec4 pos = vertex_position;
-    pos.x += _x_offset;
-    pos.y += _y_offset;
     return transform * pos;
 }
 #endif

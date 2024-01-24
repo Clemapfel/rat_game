@@ -5,7 +5,12 @@ rt.current_scene = rt.add_scene("debug")
 sprites = {}
 for i = 1, 5 do
     local color = rt.random.choose({"RED", "GREEN", "BLUE", "PINK", "PURPLE"})
-    table.insert(sprites, rt.Label("<o><color=" .. color .. ">####</color></o>"))
+    local label = rt.Label("<o><color=" .. color .. ">####</color></o>")
+    local spacer = rt.Spacer()
+    local overlay = rt.OverlayLayout()
+    overlay:push_overlay(spacer)
+    overlay:push_overlay(label)
+    table.insert(sprites, overlay)
 end
 local x, y, w, h = 200, 150, love.graphics.getWidth() / #sprites - 25, 100
 local m = (love.graphics.getWidth() - #sprites * w) / (#sprites + 1)
@@ -15,6 +20,7 @@ local hue = 0.05
 for _, sprite in pairs(sprites) do
     sprite:realize()
     sprite:fit_into(x, rt.random.number(y, y + 50), w, h)
+    sprite:set_is_visible(true)
     x = x + w + m
     hue = hue + (0.9 / #sprites)
 end

@@ -12,6 +12,10 @@ rt.SnapshotLayout = meta.new_type("SnapshotLayout", function()
         _position_y = 0,
         _x_offset = 0,
         _y_offset = 0,
+        _scale_x = 1,
+        _scale_y = 1,
+        _origin_x = 0.5,
+        _origin_y = 0.5,
         _invert = false,
         _mix_color = rt.RGBA(1, 1, 1, 1),
         _mix_weight = 0
@@ -23,7 +27,6 @@ rt.SnapshotLayout._shader_source = love.filesystem.read("assets/shaders/snapshot
 
 --- @brief update internally held render canvas
 function rt.SnapshotLayout:snapshot(to_draw)
-
     if to_draw == nil then to_draw = self._child end
     self._canvas:bind_as_render_target()
     love.graphics.clear(0, 0, 0, 0)
@@ -48,14 +51,22 @@ function rt.SnapshotLayout:draw()
     self._shader:send("_s_offset", self._hsv_offsets[2])
     self._shader:send("_v_offset", self._hsv_offsets[3])
     self._shader:send("_a_offset", self._alpha_offset)
-    self._shader:send("_x_offset", self._x_offset)
-    self._shader:send("_y_offset", self._y_offset)
     self._shader:send("_mix_color", {self._mix_color.r, self._mix_color.g, self._mix_color.b, self._mix_color.a})
     self._shader:send("_mix_weight", self._mix_weight)
     self._shader:send("_invert", self._invert)
 
-    self:render(self._canvas._native, self._position_x, self._position_y)
+    local bounds = self:get_bounds()
+    dbg(self._origin_x, self._origin_y)
+    local x_offset, y_offset = bounds.x + self._origin_x * bounds.width, bounds.y + self._origin_y * bounds.height
+    love.graphics.push()
+    love.graphics.translate(x_offset, y_offset)
+    love.graphics.scale(self._scale_x, self._scale_y)
+    love.graphics.translate(-1 * x_offset, -1 * y_offset)
+
+    love.graphics.draw(self._canvas._native, self._position_x + self._x_offset, self._position_y + self._y_offset)
+    love.graphics.pop()
     self._shader:unbind()
+
 end
 
 --- @overload rt.Widget.size_allocate
@@ -69,7 +80,10 @@ function rt.SnapshotLayout:size_allocate(x, y, width, height)
     end
 
     local m = rt.settings.margin_unit
-    self._canvas = rt.RenderTexture(width, height, true)
+
+    if width ~= canvas_w or height ~= canvas_h then
+        self._canvas = rt.RenderTexture(width, height, true)
+    end
     self:snapshot()
 end
 
@@ -105,10 +119,22 @@ end
 
 --- @brief
 function rt.SnapshotLayout:set_position_offset(x, y)
-    x = which(x, 0)
-    y = which(y, 0)
-    self._x_offset = x
-    self._y_offset = y
+    self._x_offset = which(x, 0)
+    self._y_offset = which(y, 0)
+end
+
+--- @brief
+--- @param x Number in [0, 1]
+--- @param y Number in [0, 1]
+function rt.SnapshotLayout:set_origin(x, y)
+    self._origin_x = which(x, 0.5)
+    self._origin_y = which(y, 0.5)
+end
+
+--- @brief
+function rt.SnapshotLayout:set_scale(x, y)
+    self._scale_x = which(x, 1)
+    self._scale_y = which(y, 1)
 end
 
 --- @brief
