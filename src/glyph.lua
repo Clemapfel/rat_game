@@ -226,15 +226,10 @@ function rt.Glyph:draw()
 
     if self._is_outlined then
         -- paste glyph to render texture
-        love.graphics.push()
-
         self._outline_render_texture:bind_as_render_target()
-        self._render_shader:bind()
         love.graphics.clear(0, 0, 0, 0)
         draw_glyph(self._outline_render_offset_x, self._outline_render_offset_y)
         self._outline_render_texture:unbind_as_render_target()
-
-        love.graphics.pop()
 
         -- render product using outline shader
         self._outline_shader:bind()

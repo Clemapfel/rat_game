@@ -136,3 +136,19 @@ end
 function rt.ParticleEmitter:update(delta)
     self._native:update(delta)
 end
+
+--- @brief
+function rt.ParticleEmitter:set_color(color)
+    if meta.is_hsva(color) then color = rt.hvsa_to_rgba(color) end
+    self._color = color
+    local r, g, b, a = self._color.r, self._color.g, self._color.b, self._color.a
+    self._native:setColors(
+        r, g, b, 0, -- 1 : 5 : 1, ratio determines how long the particle will stay at given opacity
+        r, g, b, a,
+        r, g, b, a,
+        r, g, b, a,
+        r, g, b, a,
+        r, g, b, a,
+        r, g, b, 0
+    )
+end

@@ -22,7 +22,7 @@ bt.HPGainedAnimation = meta.new_type("HPGainedAnimation", function(targets, valu
         _label_snapshot = {},   -- Table<rt.SnapshotLayout>
         _emitters = {},         -- Table<rt.ParticleEmitter>
         _overlays = {},         -- Table<rt.OverlayLayout>
-        _target_snapshots = {},
+        _target_snapshots = {}, -- Table<rt.SnapshotLayout>
 
         _elapsed = 0,
 
@@ -106,11 +106,10 @@ end
 --- @overload
 function bt.HPGainedAnimation:update(delta)
     local duration = rt.settings.hp_gained_animation.duration
-
     self._elapsed = self._elapsed + delta
     local fraction = self._elapsed / duration
-    for i = 1, self._n_targets do
 
+    for i = 1, self._n_targets do
         -- label animation
         local label = self._label_snapshot[i]
         local w, h = label:get_size()

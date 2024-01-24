@@ -3,15 +3,9 @@ require("include")
 rt.current_scene = rt.add_scene("debug")
 
 sprites = {}
-
-local keys = {}
-for key, _ in pairs(rt.Palette) do
-    table.insert(keys, key)
-end
-
 for i = 1, 5 do
-    local color = rt.random.choose(keys)
-    table.insert(sprites, rt.Label("<o><color=" .. color .. ">######</color></o>"))
+    local color = rt.random.choose({"RED", "GREEN", "BLUE", "PINK", "PURPLE"})
+    table.insert(sprites, rt.Label("<o><color=" .. color .. ">####</color></o>"))
 end
 local x, y, w, h = 200, 150, love.graphics.getWidth() / #sprites - 25, 100
 local m = (love.graphics.getWidth() - #sprites * w) / (#sprites + 1)
@@ -42,6 +36,13 @@ rt.current_scene.input:signal_connect("pressed", function(_, which)
     elseif which == rt.InputButton.Y then
         state_queue:push_back(bt.EnemyDisappearedAnimation(sprites))
     elseif which == rt.InputButton.R then
+        local directions = {}
+        local stats = {}
+        for i = 1, #sprites do
+            table.insert(directions, rt.random.choose({rt.Direction.UP, rt.Direction.DOWN, rt.Direction.NONE}))
+            table.insert(stats, rt.random.choose({bt.Stat.ATTACK, bt.Stat.DEFENCE, bt.Stat.SPEED}))
+        end
+        state_queue:push_back(bt.StatChangedAnimation(sprites, directions, stats))
     elseif which == rt.InputButton.L then
     elseif which == rt.InputButton.UP then
     elseif which == rt.InputButton.RIGHT then

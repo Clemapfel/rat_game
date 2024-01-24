@@ -42,6 +42,16 @@ end
 --- @brief pick random element from table
 --- @param set Table
 function rt.random.choose(set)
+
+    local n = sizeof(set)
+    local i = rt.random.integer(1, n)
+    local n_seen = 1
+    for key, value in pairs(set) do
+        if n_seen == i then return value end
+        n_seen = n_seen + 1
+    end
+    return nil -- unreachable
+--[[
     local step = rt.random.integer(1, #set)
     local i, v = next(set)
     local n = 0
@@ -53,6 +63,7 @@ function rt.random.choose(set)
         i, v = next(set, i)
     end
     return v
+    ]]--
 end
 
 rt.random.CHAR_LIST = {

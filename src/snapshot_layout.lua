@@ -3,7 +3,7 @@
 rt.SnapshotLayout = meta.new_type("SnapshotLayout", function()
     local out = meta.new(rt.SnapshotLayout, {
         _child = {},
-        _canvas = rt.RenderTexture(1, 1),
+        _canvas = rt.RenderTexture(1, 1, true),
         _shader = rt.Shader(rt.SnapshotLayout._shader_source),
         _rgb_offsets = {0, 0, 0},
         _hsv_offsets = {0, 0, 0},
@@ -29,7 +29,6 @@ function rt.SnapshotLayout:snapshot(to_draw)
     love.graphics.clear(0, 0, 0, 0)
     if meta.is_widget(to_draw) then
         love.graphics.push()
-        local m = rt.settings.margin_unit
         local x, y = to_draw:get_position()
         love.graphics.translate(-x, -y)
         love.graphics.setColor(1, 1, 1, 1)
@@ -70,7 +69,7 @@ function rt.SnapshotLayout:size_allocate(x, y, width, height)
     end
 
     local m = rt.settings.margin_unit
-    self._canvas = rt.RenderTexture(width, height)
+    self._canvas = rt.RenderTexture(width, height, true)
     self:snapshot()
 end
 

@@ -35,31 +35,20 @@ function bt.EnemyDisappearedAnimation:start()
         snapshot:snapshot(target)
         target:set_is_visible(false)
 
-        local bounds = target:get_bounds()
         local tiles = {}
-        local tile_size = rt.settings.enemy_disappeared.tile_size
-        local bounds = self._targets[i]:get_bounds()
-        local n_columns = bounds.width / tile_size
-        local n_rows = bounds.height / tile_size
-
-        local row_overlap = bounds.width - n_rows
-        local column_overlap = bounds.height - n_columns
-
-        n_rows, n_columns = math.ceil(n_rows), math.ceil(n_columns)
-
-        local x_start, y_start = bounds.x, bounds.y
-        local x, y = x_start, y_start
-        for y_i = 1, tile_size do
+        local n_columns = 2--32
+        local n_rows = 2--32
+        local bounds = target:get_bounds()
+        local sum = 0
+        for y_i = 1, n_rows do
             for x_i = 1, n_columns do
-                local to_insert = rt.VertexRectangle(x, y, tile_size, tile_size)
+                local to_insert = rt.VertexRectangle(bounds.x + x_i / n_columns * bounds.width, bounds.y + y_i / n_rows * bounds.height, bounds.width / n_columns, bounds.height / n_rows)
                 to_insert:set_texture(snapshot._canvas)
                 to_insert:set_texture_rectangle(rt.AABB(x_i / n_columns, y_i / n_rows, 1 / n_columns, 1 / n_rows))
-                --to_insert:set_color(rt.HSVA(rt.random.number(0, 1), 1, 1, 1))
+                --to_insert:set_color(rt.HSVA(sum / (n_rows * n_columns), 1, 1, 1))
                 table.insert(tiles, to_insert)
-                x = x + tile_size
+                sum = sum + 1
             end
-            y = y + tile_size
-            x = x_start
         end
         table.insert(self._tiles, tiles)
     end

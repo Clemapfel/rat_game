@@ -1,10 +1,3 @@
---- @class bt.Stat
-bt.Stat = meta.new_enum({
-    ATTACK = "ATTACK",
-    DEFENSE = "DEFENSE",
-    SPEED = "SPEED"
-})
-
 --- @class bt.StatLevelIndicator
 bt.StatLevelIndicator = meta.new_type("StatLevelIndicator", function(level, which)
     if meta.is_nil(bt.PartyInfo.spritesheet) then
