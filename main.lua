@@ -3,7 +3,16 @@ require("include")
 rt.current_scene = rt.add_scene("debug")
 
 sprites = {}
-for i = 1, 1 do table.insert(sprites, rt.Spacer()) end
+
+local keys = {}
+for key, _ in pairs(rt.Palette) do
+    table.insert(keys, key)
+end
+
+for i = 1, 5 do
+    local color = rt.random.choose(keys)
+    table.insert(sprites, rt.Label("<o><color=" .. color .. ">######</color></o>"))
+end
 local x, y, w, h = 200, 150, love.graphics.getWidth() / #sprites - 25, 100
 local m = (love.graphics.getWidth() - #sprites * w) / (#sprites + 1)
 x = x + m
@@ -11,8 +20,7 @@ x = x + m
 local hue = 0.05
 for _, sprite in pairs(sprites) do
     sprite:realize()
-    sprite:fit_into(x, rt.random.number(y, y + 200), w, h)
-    sprite:set_color(rt.HSVA(hue, 1, 1, 1))
+    sprite:fit_into(x, rt.random.number(y, y + 50), w, h)
     x = x + w + m
     hue = hue + (0.9 / #sprites)
 end

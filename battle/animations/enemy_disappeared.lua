@@ -49,7 +49,7 @@ function bt.EnemyDisappearedAnimation:start()
 
         local x_start, y_start = bounds.x, bounds.y
         local x, y = x_start, y_start
-        for y_i = 1, n_rows do
+        for y_i = 1, tile_size do
             for x_i = 1, n_columns do
                 local to_insert = rt.VertexRectangle(x, y, tile_size, tile_size)
                 to_insert:set_texture(snapshot._canvas)
