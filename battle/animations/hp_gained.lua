@@ -18,10 +18,10 @@ bt.HPGainedAnimation = meta.new_type("HPGainedAnimation", function(targets, valu
         _values = values,
         _n_targets = n_targets,
 
-        _labels = {},       -- Table<rt.Label>
-        _label_snapshot = {},    -- Table<rt.SnapshotLayout>
-        _emitters = {},     -- Table<rt.ParticleEmitter>
-        _overlays = {},      -- Table<rt.OverlayLayout>
+        _labels = {},           -- Table<rt.Label>
+        _label_snapshot = {},   -- Table<rt.SnapshotLayout>
+        _emitters = {},         -- Table<rt.ParticleEmitter>
+        _overlays = {},         -- Table<rt.OverlayLayout>
         _target_snapshots = {},
 
         _elapsed = 0,

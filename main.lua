@@ -3,7 +3,7 @@ require("include")
 rt.current_scene = rt.add_scene("debug")
 
 sprites = {}
-for i = 1, 4 do table.insert(sprites, rt.Spacer()) end
+for i = 1, 1 do table.insert(sprites, rt.Spacer()) end
 local x, y, w, h = 200, 150, love.graphics.getWidth() / #sprites - 25, 100
 local m = (love.graphics.getWidth() - #sprites * w) / (#sprites + 1)
 x = x + m
@@ -13,13 +13,11 @@ for _, sprite in pairs(sprites) do
     sprite:realize()
     sprite:fit_into(x, rt.random.number(y, y + 200), w, h)
     sprite:set_color(rt.HSVA(hue, 1, 1, 1))
-    sprite:set_is_visible(false)
     x = x + w + m
     hue = hue + (0.9 / #sprites)
 end
 
 state_queue = rt.StateQueue()
-
 
 rt.current_scene.input:signal_connect("pressed", function(_, which)
     local values = {}
@@ -34,6 +32,7 @@ rt.current_scene.input:signal_connect("pressed", function(_, which)
     elseif which == rt.InputButton.X then
         state_queue:push_back(bt.EnemyAppearedAnimation(sprites))
     elseif which == rt.InputButton.Y then
+        state_queue:push_back(bt.EnemyDisappearedAnimation(sprites))
     elseif which == rt.InputButton.R then
     elseif which == rt.InputButton.L then
     elseif which == rt.InputButton.UP then

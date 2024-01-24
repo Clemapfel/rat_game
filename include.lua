@@ -162,6 +162,7 @@ require "battle.enemy_sprite"
 require "battle.animations.hp_gained"
 require "battle.animations.hp_lost"
 require "battle.animations.enemy_appeared"
+require "battle.animations.enemy_disappeared"
 
 require "scene"
 require "battle.battle_scene"
