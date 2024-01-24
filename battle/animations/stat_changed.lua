@@ -100,6 +100,22 @@ function bt.StatChangedAnimation:start()
             scale = rt.Spline({1, 1, 1, 1})
         end
         table.insert(self._scale_paths, scale)
+
+        local shake
+        if direction == rt.Direction.DOWN then
+            shake = rt.Spline({
+                 0, 0,
+                -1, 0,
+                 1, 0,
+                -1, 0,
+                 1, 0,
+                -1, 0,
+                 0, 0
+            })
+        else
+            shake = rt.Spline({0, 0, 0, 0})
+        end
+        table.insert(self._offset_paths, shake)
     end
 end
 
@@ -111,10 +127,21 @@ function bt.StatChangedAnimation:update(delta)
     for i = 1, self._n_targets do
         local snapshot = self._snapshots[i]
 
-        local scale_x, scale_y = self._scale_paths[i]:at(rt.exponential_plateau(fraction))
-        local snapshot = self._snapshots[i]
+        -- scale
         snapshot:set_origin(0.5, 1)
-        snapshot:set_scale(scale_x, scale_y)
+        snapshot:set_scale(self._scale_paths[i]:at(rt.exponential_plateau(fraction)))
+
+        -- shake only during middle of scale animation
+        local shake_left = 0.45
+        local shake_right = 0.55
+        if fraction > shake_left and fraction < shake_right then
+            local shake_fraction = (fraction - shake_left) / (shake_right - shake_left)
+            local offset_x, offset_y = self._offset_paths[i]:at(rt.linear(shake_fraction))
+            offset_x = offset_x * snapshot:get_bounds().width * 0.1
+            snapshot:set_position_offset(offset_x, offset_y)
+        else
+            snapshot:set_position_offset(0, 0)
+        end
     end
 
     return self._elapsed < duration
