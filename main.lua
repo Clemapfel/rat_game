@@ -45,7 +45,7 @@ rt.current_scene.input:signal_connect("pressed", function(_, which)
         local directions = {}
         local stats = {}
         for i = 1, #sprites do
-            table.insert(directions, rt.random.choose({rt.Direction.UP, rt.Direction.DOWN, rt.Direction.NONE}))
+            table.insert(directions, rt.random.choose({rt.Direction.UP, rt.Direction.DOWN}))
             table.insert(stats, rt.random.choose({bt.Stat.ATTACK, bt.Stat.DEFENCE, bt.Stat.SPEED}))
         end
         state_queue:push_back(bt.StatChangedAnimation(sprites, directions, stats))

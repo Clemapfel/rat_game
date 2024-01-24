@@ -1,6 +1,5 @@
 rt.settings.stat_changed_animation = {
-    duration = 3,
-    particle_size = 100
+    duration = 3
 }
 
 --- @class
@@ -17,52 +16,49 @@ bt.StatChangedAnimation = meta.new_type("StatChangedAnimation", function(targets
         _directions = directions,
         _which_stats = which_stats,
 
-        _emitters = {},         -- Table<rt.ParticleEmitter>
-        _overlays = {},         -- Table<rt.OverlayLayout>
-        _snapshots = {}, -- Table<rt.SnapshotLayout>
+        _direction_sprites = {},       -- Table<rt.ParticleEmitter>
+        _overlays = {},       -- Table<rt.OverlayLayout>
+        _direction_snapshots = {},
+        _target_snapshots = {},     -- Table<rt.SnapshotLayout>
 
         _scale_paths = {},   -- Table<rt.Spline>
         _offset_paths = {},  -- Table<rt.Spline>
+        _direction_alpha_paths = {}, -- Table<rt.Spline>
+        _direction_paths = {}, -- Table<rt.Spline>
 
         _elapsed = 0,
     }, rt.StateQueueState)
 
-    local particle_size = rt.settings.stat_changed_animation.particle_size
     for i = 1, out._n_targets do
         local overlay = rt.OverlayLayout()
         table.insert(out._overlays, overlay)
 
-        local particle = rt.DirectionIndicator(out._directions[i])
+        local direction = out._directions[i]
+        local particle = rt.DirectionIndicator(direction)
+        assert(direction == rt.Direction.UP or direction == rt.Direction.DOWN)
 
         local stat = out._which_stats[i]
+        local color
         if stat == bt.Stat.ATTACK then
-            particle:set_color(rt.Palette.ATTACK)
+            color = rt.Palette.ATTACK
         elseif stat == bt.Stat.SPEED then
-            particle:set_color(rt.Palette.DEFENSE)
+            color = rt.Palette.DEFENSE
         elseif stat == bt.Stat.SPEED then
-            particle:set_color(rt.Palette.SPEED)
+            color = rt.Palette.SPEED
         end
+        particle:set_color(color)
 
-        particle:realize()
-        particle:fit_into(0, 0, particle_size, particle_size)
-
-        local emitter = rt.ParticleEmitter(particle)
-        table.insert(out._emitters, emitter)
-
+        table.insert(out._direction_sprites, particle)
+        local direction_snapshot = rt.SnapshotLayout()
+        table.insert(out._direction_snapshots, direction_snapshot)
+        
         local target_snapshot = rt.SnapshotLayout()
-        table.insert(out._snapshots, target_snapshot)
-
-        target_snapshot:set_mix_color(rt.Palette.HP)
+        table.insert(out._target_snapshots, target_snapshot)
+        target_snapshot:set_mix_color(color)
         target_snapshot:set_mix_weight(0)
 
         overlay:push_overlay(target_snapshot)
-        overlay:push_overlay(emitter)
-
-        emitter:set_speed(50)
-        emitter:set_particle_lifetime(0, rt.settings.stat_changed_animation.duration)
-        emitter:set_scale(1, 1)
-        emitter:set_color(rt.RGBA(1, 1, 1, 0.5))
-        emitter:set_density(0)
+        overlay:push_overlay(direction_snapshot)
     end
     return out
 end)
@@ -77,16 +73,16 @@ function bt.StatChangedAnimation:start()
         local bounds = self._targets[i]:get_bounds()
         overlay:fit_into(bounds)
 
-        local emitter = self._emitters[i]
-        emitter:set_is_animated(true)
-        if self._directions[i] ~= rt.Direction.NONE then
-            emitter._native:emit(1)
-        end
-
         local target = self._targets[i]
         target:set_is_visible(true)
-        self._snapshots[i]:snapshot(target)
+        local target_snapshot = self._target_snapshots[i]
+        target_snapshot:snapshot(target)
         target:set_is_visible(false)
+
+        local direction = self._direction_sprites[i]
+        direction:realize()
+        direction:fit_into(bounds)
+        self._direction_snapshots[i]:snapshot(direction)
 
         local direction = self._directions[i]
         local scale
@@ -96,8 +92,6 @@ function bt.StatChangedAnimation:start()
         elseif direction == rt.Direction.DOWN then
             local down_offset = 0.3
             scale = rt.Spline({1, 1, 1 - down_offset, 1 - down_offset, 1, 1})
-        else
-            scale = rt.Spline({1, 1, 1, 1})
         end
         table.insert(self._scale_paths, scale)
 
@@ -116,6 +110,25 @@ function bt.StatChangedAnimation:start()
             shake = rt.Spline({0, 0, 0, 0})
         end
         table.insert(self._offset_paths, shake)
+
+        local max_alpha = 0.3
+        table.insert(self._direction_alpha_paths, rt.Spline({
+            0, 0, max_alpha, max_alpha, 0, 0
+        }))
+
+        if direction == rt.Direction.UP then
+            table.insert(self._direction_paths, rt.Spline({
+                0, 0.5,
+                0, -0.5,
+                0, -1
+            }))
+        elseif direction == rt.Direction.DOWN then
+            table.insert(self._direction_paths, rt.Spline({
+                0, 0,
+                0, 0.5,
+                0, 1
+            }))
+        end
     end
 end
 
@@ -125,7 +138,7 @@ function bt.StatChangedAnimation:update(delta)
     self._elapsed = self._elapsed + delta
     local fraction = self._elapsed / duration
     for i = 1, self._n_targets do
-        local snapshot = self._snapshots[i]
+        local snapshot = self._target_snapshots[i]
 
         -- scale
         snapshot:set_origin(0.5, 1)
@@ -142,6 +155,17 @@ function bt.StatChangedAnimation:update(delta)
         else
             snapshot:set_position_offset(0, 0)
         end
+        snapshot:set_mix_weight(rt.symmetrical_linear(fraction, 0.1))
+
+        -- slide direction indicator
+        local direction = self._direction_snapshots[i]
+        local bounds = direction:get_bounds()
+        local opacity_offset = -1 * (1 - self._direction_alpha_paths[i]:at(rt.linear(fraction)))
+        direction:set_opacity_offset(opacity_offset)
+        local offset_x, offset_y = self._direction_paths[i]:at(rt.linear(fraction))
+        offset_x = offset_x * 0.5 * bounds.width
+        offset_y = offset_y * 0.5 * bounds.height
+        direction:set_position_offset(offset_x, offset_y)
     end
 
     return self._elapsed < duration
@@ -151,7 +175,6 @@ end
 function bt.StatChangedAnimation:finish()
     for i = 1, self._n_targets do
         self._targets[i]:set_is_visible(true)
-        self._emitters[i]:set_is_animated(false)
     end
 end
 

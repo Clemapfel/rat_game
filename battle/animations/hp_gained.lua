@@ -1,6 +1,5 @@
 rt.settings.hp_gained_animation = {
     duration = 2, -- seconds
-    offset = 50
 }
 
 --- @class
@@ -85,7 +84,7 @@ function bt.HPGainedAnimation:start()
 
         local left_x, left_y = bounds.x + bounds.width * 0.5 - label_w, bounds.y
         local right_x, right_y = bounds.x + bounds.width * 0.5 + label_w, bounds.y
-        local offset = rt.settings.hp_gained_animation.offset
+        local offset = 0.05
         table.insert(self._target_paths, rt.Spline({
               0, 0,
             -1 * offset, 0,
@@ -126,6 +125,8 @@ function bt.HPGainedAnimation:update(delta)
         local target = self._target_snapshots[i]
         local current = target:get_bounds()
         local offset_x, offset_y = self._target_paths[i]:at(rt.sinoid_ease_in_out(fraction))
+        offset_x = offset_x * current.width
+        offset_y = offset_y * current.height
         current.x = current.x + offset_x
         current.y = current.y + offset_y
         target:set_position_offset(offset_x, offset_y)
