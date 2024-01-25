@@ -5,14 +5,15 @@ rt.current_scene = rt.add_scene("debug")
 sprites = {}
 for i = 1, 5 do
     local color = rt.random.choose({"RED", "GREEN", "BLUE", "PINK", "PURPLE"})
-    local label = rt.Label("<o><color=" .. color .. ">####</color></o>")
+    local label = rt.Label("<o><color=" .. color .. ">" .. rt.random.string(5) .. "</color></o>")
     local spacer = rt.Spacer()
+    spacer:set_color(rt.color_darken(rt.Palette[rt.random.choose({"RED", "GREEN", "BLUE", "PINK", "PURPLE"})], 0.4))
     local overlay = rt.OverlayLayout()
     overlay:push_overlay(spacer)
     overlay:push_overlay(label)
     table.insert(sprites, overlay)
 end
-local x, y, w, h = 200, 150, love.graphics.getWidth() / #sprites - 25, 100
+local x, y, w, h = 50, 150, love.graphics.getWidth() / #sprites - 25, 100
 local m = (love.graphics.getWidth() - #sprites * w) / (#sprites + 1)
 x = x + m
 

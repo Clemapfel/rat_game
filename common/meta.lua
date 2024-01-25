@@ -330,7 +330,7 @@ function meta.new_enum(fields)
     end
 
     local out, metatable = meta._new(meta.Enum)
-    local used_values = {}
+    --local used_values = {}
 
     local i = 0
     for name, value in pairs(fields) do
@@ -339,10 +339,10 @@ function meta.new_enum(fields)
             rt.error("In meta.new_enum: Enum value for key `" .. name .. "` is a `" .. meta.typeof(value) .. "`, which is not a primitive.")
         end
 
-        if used_values[value] ~= nil then
-            rt.error("In meta.new_enum: Duplicate value, key `" .. name .. "` and `" .. used_values[value] .. "` both have the same value `" .. tostring(value) .. "`")
-        end
-        used_values[value] = name
+        --if used_values[value] ~= nil then
+        --    rt.error("In meta.new_enum: Duplicate value, key `" .. name .. "` and `" .. used_values[value] .. "` both have the same value `" .. tostring(value) .. "`")
+        --end
+        --used_values[value] = name
 
         metatable.properties[name] = value
     end

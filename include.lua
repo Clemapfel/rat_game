@@ -12,6 +12,8 @@ end
 rt = {}
 rt.test = {}
 rt.settings = {}
+rt.physics = {}
+rt.battle = {}
 
 setmetatable(rt, {
     __index = function(self, key)
@@ -19,9 +21,7 @@ setmetatable(rt, {
     end
 })
 
-rt.battle = {}
 bt = rt.battle
-
 setmetatable(bt, {
     __index = function(self, key)
         rt.error("In bt.__index: key `" .. key .. "` does not exist in table `bt`")
@@ -131,6 +131,10 @@ require "particle_emitter"
 require "frame"
 require "keymap_indicator"
 require "list_view"
+
+require "physics_world"
+require "physics_shape"
+require "collider"
 
 require "battle.stat"
 require "battle.battle_tooltip"
