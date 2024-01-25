@@ -26,7 +26,6 @@ for _, sprite in pairs(sprites) do
 end
 
 state_queue = rt.StateQueue()
-
 rt.current_scene.input:signal_connect("pressed", function(_, which)
     local values = {}
     for i = 1, #sprites do

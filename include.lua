@@ -2,7 +2,7 @@ RESOURCE_PATH = love.filesystem.getSource()
 do
     local paths = {
         ";?.lua",
-        ";src/?.lua",
+        ";common/?.lua",
         ";battle/?.lua",
         ";submodules/?/init.lua"
     }
