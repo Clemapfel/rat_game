@@ -1,14 +1,15 @@
 rt.settings.enemy_disappeared_animation = {
     duration = 10,
-    tile_size = 10
+    tile_size = 10 -- n particles: tile_size^2
 }
 
 --- @class
 --- @param targets Table<rt.Widget>
 bt.EnemyDisappearedAnimation = meta.new_type("EnemyDisappearedAnimation", function(targets)
+    local n_targets = sizeof(targets)
     local out = meta.new(bt.EnemyDisappearedAnimation, {
         _targets = targets,
-        _n_targets = sizeof(targets),
+        _n_targets = n_targets,
         _snapshots = {}, -- Table<rt.SnapshotLayout>
 
         _grounds = {},          -- Table<rt.LineCollider>
@@ -16,8 +17,9 @@ bt.EnemyDisappearedAnimation = meta.new_type("EnemyDisappearedAnimation", functi
         _particle_shapes = {},  -- Table<Table<rt.VertexShape>>
         _particle_width = 1,
         _particle_height = 1,
-        _impulse_send = false,
+        _impulse_send = {},     -- Table<Boolean>
 
+        _shake_paths = {}, -- Table<rt.Spline>
         _elapsed = 0,
     }, rt.StateQueueState)
 
@@ -36,7 +38,7 @@ function bt.EnemyDisappearedAnimation:start()
     self._particles = {}
     self._world = rt.PhysicsWorld(0, 0)
 
-    self._impulse_send = false
+    self._impulse_send = table.rep(false, self._n_targets)
 
     for i = 1, self._n_targets do
         local target = self._targets[i]
@@ -58,21 +60,23 @@ function bt.EnemyDisappearedAnimation:start()
         local particle_shapes = {}
         local tile_size = rt.settings.enemy_disappeared_animation.tile_size
         local w, h = bounds.width / tile_size, bounds.height / tile_size
+
         self._particle_width = w
         self._particle_height = h
         for y_i = 0, tile_size - 1 do
             for x_i = 0, tile_size - 1 do
+                local mx, my = 1 / 6, 1 / 6
                 local x = bounds.x + x_i / tile_size * bounds.width
                 local y = bounds.y + y_i / tile_size * bounds.height
                 local particle = rt.RectangleCollider(self._world, rt.ColliderType.DYNAMIC,
-                        x, y, w, h
+                        x + mx, y + my, w - 2 * mx, h - 2 * my
                 )
-                particle:set_restitution(1)
+                particle:set_restitution(0.8)
                 particle:set_mass(1)
+                particle:set_disabled(true)
                 table.insert(particles, particle)
 
                 local shape = rt.VertexRectangle(x, y, w, h)
-                --shape:set_color(rt.HSVA(rt.random.number(0, 1), 1, 1, 1))
                 shape:set_texture(snapshot._canvas)
                 shape:set_texture_rectangle(rt.AABB(
                     x_i / tile_size, y_i / tile_size, 1 / tile_size, 1 / tile_size
@@ -82,6 +86,15 @@ function bt.EnemyDisappearedAnimation:start()
         end
         table.insert(self._particles, particles)
         table.insert(self._particle_shapes, particle_shapes)
+
+        local vertices = {0, 0}
+        local n_shakes = 7
+        for _ = 1, n_shakes do
+            for p in range(-1, 0, 1, 0, 0, 0) do
+                table.insert(vertices, p)
+            end
+        end
+        table.insert(self._shake_paths, rt.Spline(vertices))
     end
 end
 
@@ -91,51 +104,72 @@ function bt.EnemyDisappearedAnimation:update(delta)
 
     self._elapsed = self._elapsed + delta
     local fraction = self._elapsed / duration
+    local explosion_time = 2
+    local explosion_delay_between_targets = 0.8
+    local impulse_strength = 5
+    local max_gravity = 2000
 
     local left_screen = true
     for i = 1, self._n_targets do
+
+        -- pre-explosion shake
+        local shake_offset_x, shake_offset_y = 0, 0
+        if fraction * duration < explosion_time then
+            local shake_fraction = (fraction * duration) / explosion_time
+            shake_offset_x, shake_offset_y = self._shake_paths[i]:at(explosion_time * rt.exponential_acceleration(shake_fraction))
+            local bounds = self._targets[i]:get_bounds()
+
+            local shake_amplitude = 0.05
+            shake_offset_x = shake_offset_x * bounds.width * shake_amplitude
+            shake_offset_y = shake_offset_y * bounds.height * shake_amplitude
+        end
+
+        -- update particle from physics sim
         for particle_i = 1, #self._particles[i] do
             local particle = self._particles[i][particle_i]
             local shape = self._particle_shapes[i][particle_i]
 
             local x, y = particle:get_center_of_mass()
-            x = x - self._particle_width * 0.5
-            y = y - self._particle_height * 0.5
+            x = x - self._particle_width * 0.5 + shake_offset_x
+            y = y - self._particle_height * 0.5 + shake_offset_y
 
             local w, h = self._particle_width, self._particle_height
 
             shape:set_vertex_position(1, x + 0, y + 0)
-            shape:set_vertex_position(2, x + w, y + 0 )
+            shape:set_vertex_position(2, x + w, y + 0)
             shape:set_vertex_position(3, x + w, y + h)
             shape:set_vertex_position(4, x + 0, y + h)
 
             if y < love.graphics.getHeight() then
                 left_screen = false
+            else
+                particle:set_disabled(true) -- disable particles that leave the screen to ease load on simulation
             end
         end
-    end
 
-    local impulse_strength = 5
-    local max_gravity = 2000
-
-    if fraction * duration > 2 and not self._impulse_send then
-        for i = 1, self._n_targets do
+        -- after delay, explode all particles, animation waits for the last particle to leave the screen falling
+        if fraction * duration > explosion_time + (i-1) * explosion_delay_between_targets and not self._impulse_send[i] then
             self._grounds[i]:set_disabled(true)
             local bounds = self._targets[i]:get_bounds()
             local center_x, center_y = bounds.x + 0.5 * bounds.width, bounds.y + 0.5 * bounds.height
-            for _, particle in pairs(self._particles[i]) do
+            for particle_i = 1, #self._particles[i] do
+                local particle = self._particles[i][particle_i]
                 local x, y = particle:get_center_of_mass()
+                particle:set_disabled(false)
                 particle:apply_linear_impulse(
                     rt.random.number(1, 2) * impulse_strength * (x - center_x),
                     rt.random.number(1, 2) * impulse_strength * (y - center_y)
                 )
             end
+            self._impulse_send[i] = true
         end
-        self._impulse_send = true
     end
 
-    self._world:update(0.5 * delta)
-    self._world:set_gravity(0,  rt.exponential_acceleration(3 * fraction) * max_gravity)
+    if fraction * duration > explosion_time then
+        self._world:update(0.5 * delta, 0, 0)
+        self._world:set_gravity(0,  clamp(rt.exponential_acceleration(3 * fraction) * max_gravity, 0, 1.5 * max_gravity))
+    end
+
     return not left_screen -- last particle left the screen
 end
 
@@ -155,16 +189,8 @@ end
 --- @overload
 function bt.EnemyDisappearedAnimation:draw()
     for i = 1, self._n_targets do
-        --self._snapshots[i]:draw()
         for _, shape in pairs(self._particle_shapes[i]) do
             shape:draw()
         end
-
-        --[[
-        self._grounds[i]:draw()
-        for _, particle in pairs(self._particles[i]) do
-            particle:draw()
-        end
-        ]]--
     end
 end

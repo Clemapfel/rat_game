@@ -1,6 +1,8 @@
 require("include")
 
 rt.current_scene = rt.add_scene("debug")
+background = bt.BattleBackground("mint_wave")
+rt.current_scene:set_child(background)
 
 sprites = {}
 for i = 1, 5 do
@@ -21,7 +23,6 @@ local hue = 0.05
 for _, sprite in pairs(sprites) do
     sprite:realize()
     sprite:fit_into(x, rt.random.number(y, y + 50), w, h)
-    sprite:set_is_visible(true)
     x = x + w + m
     hue = hue + (0.9 / #sprites)
 end
@@ -34,7 +35,7 @@ rt.current_scene.input:signal_connect("pressed", function(_, which)
     end
 
     if which == rt.InputButton.A then
-        state_queue:push_back(bt.HPGainedAnimation(sprites, values))
+        state_queue:push_back(bt.Animation.HP_GAINED(sprites, values))
     elseif which == rt.InputButton.B then
         state_queue:push_back(bt.HPLostAnimation(sprites, values))
     elseif which == rt.InputButton.X then

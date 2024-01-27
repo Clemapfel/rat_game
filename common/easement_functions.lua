@@ -19,6 +19,16 @@ rt.sinoid_ease_in_out = function(x)
     return -0.5 * math.cos(math.pi * x) + 0.5;
 end
 
+rt.sinoid_resonance_increase = function(x, n_periods)
+    n_periods = which(n_periods, 3)
+    return math.sin(math.pi * 2 * n_periods * x) * x
+end
+
+rt.sinoid_resonance_decrease = function(x, n_periods)
+    n_periods = which(n_periods, 3)
+    return math.sin(math.pi * 2 * n_periods * (1 - x)) * (1 - x)
+end
+
 rt.exponential_acceleration = function(x)
     return math.exp((x - 1) * math.pi) - math.exp(-1 * math.pi)
 end
@@ -45,4 +55,16 @@ end
 --- @brief 0 to 1 strictly increasing x² parabolic
 rt.parabolic_increase = function(x)
     return x^2
+end
+
+--- @brief gaussian distribution with 0.99 percentile in [0, 1], peak at 0.5
+rt.symmetrical_gaussian = function(x, peak)
+    peak = which(peak, 1)
+    return (math.exp(-1 * ((4 * math.pi / 3) * (x - 0.5))^2))
+end
+
+--- @brief gaussian distribution with 0.99 percentile in [0, 1], peak at 1
+rt.gaussian_increase = function(x, peak)
+    peak = which(peak, 1)
+    return (math.exp(-1 * ((2 * math.pi / 3) * (x - 1))^2))
 end

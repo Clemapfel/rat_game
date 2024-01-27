@@ -230,7 +230,7 @@ function rt.Glyph:draw()
 
         -- paste glyph to render texture
         self._outline_render_texture:bind_as_render_target()
-        love.graphics.clear(0, 0, 0, 0)
+        --love.graphics.clear(0, 0, 0, 0)
         love.graphics.setColor(1, 1, 1, 1)
         draw_glyph(self._outline_render_offset_x, self._outline_render_offset_y)
         self._outline_render_texture:unbind_as_render_target()

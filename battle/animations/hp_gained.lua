@@ -1,18 +1,18 @@
-rt.settings.hp_gained_animation = {
+rt.settings.animation.hp_gained = {
     duration = 2, -- seconds
 }
 
 --- @class
 --- @param targets Table<rt.Widget>
 --- @param values Table<Number>
-bt.HPGainedAnimation = meta.new_type("HPGainedAnimation", function(targets, values)
+bt.Animation.HP_GAINED = meta.new_type("Animation_HP_GAINED", function(targets, values)
     local n_targets = sizeof(targets)
     if n_targets > 1 then
         meta.assert_table(values)
         assert(sizeof(targets) == sizeof(values))
     end
 
-    local out = meta.new(bt.HPGainedAnimation, {
+    local out = meta.new(bt.Animation.HP_GAINED, {
         _targets = targets,
         _values = values,
         _n_targets = n_targets,
@@ -57,7 +57,7 @@ bt.HPGainedAnimation = meta.new_type("HPGainedAnimation", function(targets, valu
         overlay:push_overlay(label_snapshot)
 
         emitter:set_speed(50)
-        emitter:set_particle_lifetime(0, rt.settings.hp_gained_animation.duration)
+        emitter:set_particle_lifetime(0, rt.settings.animation.hp_gained.duration)
         emitter:set_scale(1, 1.5)
         emitter:set_density(0)
     end
@@ -65,7 +65,7 @@ bt.HPGainedAnimation = meta.new_type("HPGainedAnimation", function(targets, valu
 end)
 
 -- @overload
-function bt.HPGainedAnimation:start()
+function bt.Animation.HP_GAINED:start()
     self._label_paths = {}
     self._target_paths = {}
 
@@ -103,8 +103,8 @@ function bt.HPGainedAnimation:start()
 end
 
 --- @overload
-function bt.HPGainedAnimation:update(delta)
-    local duration = rt.settings.hp_gained_animation.duration
+function bt.Animation.HP_GAINED:update(delta)
+    local duration = rt.settings.animation.hp_gained.duration
     self._elapsed = self._elapsed + delta
     local fraction = self._elapsed / duration
 
@@ -137,7 +137,7 @@ function bt.HPGainedAnimation:update(delta)
 end
 
 --- @overload
-function bt.HPGainedAnimation:finish()
+function bt.Animation.HP_GAINED:finish()
     for i = 1, self._n_targets do
         self._targets[i]:set_is_visible(true)
         self._emitters[i]:set_is_animated(false)
@@ -145,7 +145,7 @@ function bt.HPGainedAnimation:finish()
 end
 
 --- @overload
-function bt.HPGainedAnimation:draw()
+function bt.Animation.HP_GAINED:draw()
     for i = 1, self._n_targets do
         self._overlays[i]:draw()
     end

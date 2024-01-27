@@ -101,7 +101,7 @@ end
 
 --- @overload
 function bt.HPLostAnimation:update(delta)
-    local duration = rt.settings.hp_gained_animation.duration
+    local duration = rt.settings.animation.hp_gained.duration
 
     self._elapsed = self._elapsed + delta
     local fraction = self._elapsed / duration

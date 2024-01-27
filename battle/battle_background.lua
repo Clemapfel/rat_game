@@ -31,7 +31,11 @@ end
 
 --- @overload rt.Widget.size_allocate
 function bt.BattleBackground:size_allocate(x, y, width, height)
-    self._vertex_shape:resize(x, y, width, height)
+
+    self._vertex_shape:set_vertex_position(1, x + 0, y + 0)
+    self._vertex_shape:set_vertex_position(2, x + width, y + 0 )
+    self._vertex_shape:set_vertex_position(3, x + width, y + height)
+    self._vertex_shape:set_vertex_position(4, x + 0, y + height)
     self._area = rt.AABB(x, y, width, height)
 end
 

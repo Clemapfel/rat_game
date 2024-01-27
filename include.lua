@@ -22,6 +22,7 @@ setmetatable(rt, {
 })
 
 bt = rt.battle
+rt.battle.Animation = {}
 setmetatable(bt, {
     __index = function(self, key)
         rt.error("In bt.__index: key `" .. key .. "` does not exist in table `bt`")

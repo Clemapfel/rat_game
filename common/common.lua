@@ -415,6 +415,18 @@ function table.last(t)
     return last
 end
 
+--- @brief create a table with n copies of object
+--- @param x any
+--- @param n Number
+--- @return table
+function table.rep(x, n)
+    local out = {}
+    for i = 1, n do
+        table.insert(out, x)
+    end
+    return out
+end
+
 --- @brief check if two tables have contents that compare equally
 --- @param left table
 --- @param right table
