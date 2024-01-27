@@ -1,16 +1,16 @@
-rt.settings.stat_changed_animation = {
+rt.settings.battle_animation.STAT_CHANGED = {
     duration = 3
 }
 
 --- @class
 --- @param targets Table<rt.Widget>
 --- @param values Table<Number>
-bt.StatChangedAnimation = meta.new_type("StatChangedAnimation", function(targets, directions, which_stats)
+bt.Animation.STAT_CHANGED = meta.new_type("STAT_CHANGED", function(targets, directions, which_stats)
     local n_targets = sizeof(targets)
     local n_targets = sizeof(targets)
     assert(sizeof(directions) == n_targets and sizeof(which_stats) == n_targets)
 
-    local out = meta.new(bt.StatChangedAnimation, {
+    local out = meta.new(bt.Animation.STAT_CHANGED, {
         _n_targets = n_targets,
         _targets = targets,
         _directions = directions,
@@ -64,7 +64,7 @@ bt.StatChangedAnimation = meta.new_type("StatChangedAnimation", function(targets
 end)
 
 -- @overload
-function bt.StatChangedAnimation:start()
+function bt.Animation.STAT_CHANGED:start()
 
     for i = 1, self._n_targets do
 
@@ -133,8 +133,8 @@ function bt.StatChangedAnimation:start()
 end
 
 --- @overload
-function bt.StatChangedAnimation:update(delta)
-    local duration = rt.settings.stat_changed_animation.duration
+function bt.Animation.STAT_CHANGED:update(delta)
+    local duration = rt.settings.battle_animation.STAT_CHANGED.duration
     self._elapsed = self._elapsed + delta
     local fraction = self._elapsed / duration
     for i = 1, self._n_targets do
@@ -172,15 +172,15 @@ function bt.StatChangedAnimation:update(delta)
 end
 
 --- @overload
-function bt.StatChangedAnimation:finish()
+function bt.Animation.STAT_CHANGED:finish()
     for i = 1, self._n_targets do
         self._targets[i]:set_is_visible(true)
     end
 end
 
 --- @overload
-function bt.StatChangedAnimation:draw()
-    local fraction = self._elapsed / rt.settings.stat_changed_animation.duration
+function bt.Animation.STAT_CHANGED:draw()
+    local fraction = self._elapsed / rt.settings.battle_animation.STAT_CHANGED.duration
     for i = 1, self._n_targets do
        self._overlays[i]:draw()
     end

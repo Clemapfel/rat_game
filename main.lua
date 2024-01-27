@@ -35,13 +35,13 @@ rt.current_scene.input:signal_connect("pressed", function(_, which)
     end
 
     if which == rt.InputButton.A then
-        state_queue:push_back(bt.Animation.HP_GAINED(sprites, values))
+        state_queue:push_back(bt.Animation.PROTECT(sprites))
     elseif which == rt.InputButton.B then
-        state_queue:push_back(bt.HPLostAnimation(sprites, values))
+        state_queue:push_back(bt.Animation.HP_LOST(sprites, values))
     elseif which == rt.InputButton.X then
-        state_queue:push_back(bt.EnemyAppearedAnimation(sprites))
+        state_queue:push_back(bt.Animation.ENEMY_APPEARED(sprites))
     elseif which == rt.InputButton.Y then
-        state_queue:push_back(bt.EnemyDisappearedAnimation(sprites))
+        state_queue:push_back(bt.Animation.ENEMY_DIED(sprites))
     elseif which == rt.InputButton.R then
         local directions = {}
         local stats = {}
@@ -49,7 +49,7 @@ rt.current_scene.input:signal_connect("pressed", function(_, which)
             table.insert(directions, rt.random.choose({rt.Direction.UP, rt.Direction.DOWN}))
             table.insert(stats, rt.random.choose({bt.Stat.ATTACK, bt.Stat.DEFENCE, bt.Stat.SPEED}))
         end
-        state_queue:push_back(bt.StatChangedAnimation(sprites, directions, stats))
+        state_queue:push_back(bt.Animation.STAT_CHANGED(sprites, directions, stats))
     elseif which == rt.InputButton.L then
     elseif which == rt.InputButton.UP then
     elseif which == rt.InputButton.RIGHT then

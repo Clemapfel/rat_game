@@ -165,11 +165,10 @@ require "battle.order_queue"
 require "battle.battle_transition"
 require "battle.enemy_sprite"
 
-require "battle.animations.hp_gained"
-require "battle.animations.hp_lost"
-require "battle.animations.enemy_appeared"
-require "battle.animations.enemy_disappeared"
-require "battle.animations.stat_changed"
+for _, name in pairs(love.filesystem.getDirectoryItems("battle/animations")) do
+    name = string.sub(name, 1, #name - 4) -- remove `.lua`
+    require("battle.animations." .. name)
+end
 
 require "scene"
 require "battle.battle_scene"

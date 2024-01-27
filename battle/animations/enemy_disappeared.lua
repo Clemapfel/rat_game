@@ -1,13 +1,13 @@
-rt.settings.enemy_disappeared_animation = {
+rt.settings.battle_animation.enemy_died = {
     duration = 10,
     tile_size = 10 -- n particles: tile_size^2
 }
 
 --- @class
 --- @param targets Table<rt.Widget>
-bt.EnemyDisappearedAnimation = meta.new_type("EnemyDisappearedAnimation", function(targets)
+bt.Animation.ENEMY_DIED = meta.new_type("ENEMY_DIED", function(targets)
     local n_targets = sizeof(targets)
-    local out = meta.new(bt.EnemyDisappearedAnimation, {
+    local out = meta.new(bt.Animation.ENEMY_DIED, {
         _targets = targets,
         _n_targets = n_targets,
         _snapshots = {}, -- Table<rt.SnapshotLayout>
@@ -30,10 +30,10 @@ bt.EnemyDisappearedAnimation = meta.new_type("EnemyDisappearedAnimation", functi
     return out
 end)
 
-bt.EnemyDisappearedAnimation._world = rt.PhysicsWorld()
+bt.Animation.ENEMY_DIED._world = rt.PhysicsWorld()
 
 -- @overload
-function bt.EnemyDisappearedAnimation:start()
+function bt.Animation.ENEMY_DIED:start()
     self._grounds = {}
     self._particles = {}
     self._world = rt.PhysicsWorld(0, 0)
@@ -58,7 +58,7 @@ function bt.EnemyDisappearedAnimation:start()
 
         local particles = {}
         local particle_shapes = {}
-        local tile_size = rt.settings.enemy_disappeared_animation.tile_size
+        local tile_size = rt.settings.battle_animation.enemy_died.tile_size
         local w, h = bounds.width / tile_size, bounds.height / tile_size
 
         self._particle_width = w
@@ -99,8 +99,8 @@ function bt.EnemyDisappearedAnimation:start()
 end
 
 --- @overload
-function bt.EnemyDisappearedAnimation:update(delta)
-    local duration = rt.settings.enemy_disappeared_animation.duration
+function bt.Animation.ENEMY_DIED:update(delta)
+    local duration = rt.settings.battle_animation.enemy_died.duration
 
     self._elapsed = self._elapsed + delta
     local fraction = self._elapsed / duration
@@ -174,7 +174,7 @@ function bt.EnemyDisappearedAnimation:update(delta)
 end
 
 --- @overload
-function bt.EnemyDisappearedAnimation:finish()
+function bt.Animation.ENEMY_DIED:finish()
     for i = 1, self._n_targets do
         local target = self._targets[i]
         target:set_is_visible(true)
@@ -187,7 +187,7 @@ function bt.EnemyDisappearedAnimation:finish()
 end
 
 --- @overload
-function bt.EnemyDisappearedAnimation:draw()
+function bt.Animation.ENEMY_DIED:draw()
     for i = 1, self._n_targets do
         for _, shape in pairs(self._particle_shapes[i]) do
             shape:draw()

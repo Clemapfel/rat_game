@@ -1,18 +1,18 @@
-rt.settings.hp_lost_animation = {
+rt.settings.battle_animation.hp_lost = {
     duration = 1, -- seconds
 }
 
 --- @class
 --- @param targets Table<rt.Widget>
 --- @param values Table<Number>
-bt.HPLostAnimation = meta.new_type("HPLostAnimation", function(targets, values)
+bt.Animation.HP_LOST = meta.new_type("HP_LOST", function(targets, values)
     local n_targets = sizeof(targets)
     if n_targets > 1 then
         meta.assert_table(values)
         assert(sizeof(targets) == sizeof(values))
     end
 
-    local out = meta.new(bt.HPLostAnimation, {
+    local out = meta.new(bt.Animation.HP_LOST, {
         _targets = targets,
         _values = values,
         _n_targets = n_targets,
@@ -52,7 +52,7 @@ bt.HPLostAnimation = meta.new_type("HPLostAnimation", function(targets, values)
 end)
 
 -- @overload
-function bt.HPLostAnimation:start()
+function bt.Animation.HP_LOST:start()
     self._label_paths = {}
     self._target_paths = {}
 
@@ -100,7 +100,7 @@ function bt.HPLostAnimation:start()
 end
 
 --- @overload
-function bt.HPLostAnimation:update(delta)
+function bt.Animation.HP_LOST:update(delta)
     local duration = rt.settings.animation.hp_gained.duration
 
     self._elapsed = self._elapsed + delta
@@ -142,7 +142,7 @@ function bt.HPLostAnimation:update(delta)
 end
 
 --- @overload
-function bt.HPLostAnimation:finish()
+function bt.Animation.HP_LOST:finish()
     for i = 1, self._n_targets do
         local target = self._targets[i]
         target:set_is_visible(true)
@@ -153,7 +153,7 @@ function bt.HPLostAnimation:finish()
 end
 
 --- @overload
-function bt.HPLostAnimation:draw()
+function bt.Animation.HP_LOST:draw()
     for i = 1, self._n_targets do
         self._overlays[i]:draw()
     end

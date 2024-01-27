@@ -309,6 +309,12 @@ function rt.Rectangle:set_position(x, y)
     self._y = y
 end
 
+--- @brief
+function rt.Rectangle:set_centroid(x, y)
+    self._x = x - self._w * 0.5
+    self._y = y - self._h * 0.5
+end
+
 --- @brief TODO
 function rt.Rectangle:set_size(width, height)
     self._w = width
@@ -469,7 +475,6 @@ function rt.Polygon:resize(a_x, a_y, b_x, b_y, c_x, c_y, ...)
         end
     end
     self._vertices = vertices
-    self:_compute_centroid()
 end
 
 --- @overload rt.Shape.get_centroid
@@ -482,6 +487,16 @@ function rt.Polygon:get_centroid()
         y_sum = y_sum + self._vertices[i+1]
     end
     return x_sum / n, y_sum / n
+end
+
+--- @brief move entire shape such that centroid is at new position
+function rt.Polygon:set_centroid(x, y)
+    local centroid_x, centroid_y = self:get_centroid()
+    local offset_x, offset_y = x - centroid_x, y - centroid_y
+    for i = 1, #self._vertices, 2 do
+        self._vertices[i] = self._vertices[i] + offset_x
+        self._vertices[i+1] = self._vertices[i+1] + offset_y
+    end
 end
 
 --- @class rt.Triangle

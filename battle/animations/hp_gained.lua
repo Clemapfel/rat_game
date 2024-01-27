@@ -1,11 +1,11 @@
-rt.settings.animation.hp_gained = {
+rt.settings.battle_animation.hp_gained = {
     duration = 2, -- seconds
 }
 
 --- @class
 --- @param targets Table<rt.Widget>
 --- @param values Table<Number>
-bt.Animation.HP_GAINED = meta.new_type("Animation_HP_GAINED", function(targets, values)
+bt.Animation.HP_GAINED = meta.new_type("HP_GAINED", function(targets, values)
     local n_targets = sizeof(targets)
     if n_targets > 1 then
         meta.assert_table(values)
@@ -57,7 +57,7 @@ bt.Animation.HP_GAINED = meta.new_type("Animation_HP_GAINED", function(targets, 
         overlay:push_overlay(label_snapshot)
 
         emitter:set_speed(50)
-        emitter:set_particle_lifetime(0, rt.settings.animation.hp_gained.duration)
+        emitter:set_particle_lifetime(0, rt.settings.battle_animation.hp_gained.duration)
         emitter:set_scale(1, 1.5)
         emitter:set_density(0)
     end
@@ -104,7 +104,7 @@ end
 
 --- @overload
 function bt.Animation.HP_GAINED:update(delta)
-    local duration = rt.settings.animation.hp_gained.duration
+    local duration = rt.settings.battle_animation.hp_gained.duration
     self._elapsed = self._elapsed + delta
     local fraction = self._elapsed / duration
 

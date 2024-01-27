@@ -1,12 +1,12 @@
-rt.settings.enemy_appeared = {
+rt.settings.battle_animation.enemy_appeared = {
     duration = 3
 }
 
 --- @class
 --- @param targets Table<rt.Widget>
-bt.EnemyAppearedAnimation = meta.new_type("EnemyAppearedAnimation", function(targets)
+bt.Animation.ENEMY_APPEARED = meta.new_type("ENEMY_APPEARED", function(targets)
 
-    local out = meta.new(bt.EnemyAppearedAnimation, {
+    local out = meta.new(bt.Animation.ENEMY_APPEARED, {
         _targets = targets,
         _n_targets = sizeof(targets),
 
@@ -24,7 +24,7 @@ bt.EnemyAppearedAnimation = meta.new_type("EnemyAppearedAnimation", function(tar
 end)
 
 -- @overload
-function bt.EnemyAppearedAnimation:start()
+function bt.Animation.ENEMY_APPEARED:start()
     self._paths = {}
     for i = 1, self._n_targets do
 
@@ -46,14 +46,16 @@ function bt.EnemyAppearedAnimation:start()
 end
 
 --- @overload
-function bt.EnemyAppearedAnimation:update(delta)
-    local duration = rt.settings.enemy_appeared.duration
+function bt.Animation.ENEMY_APPEARED:update(delta)
+    local duration = rt.settings.battle_animation.enemy_appeared.duration
 
     self._elapsed = self._elapsed + delta
     local fraction = self._elapsed / duration
     for i = 1, self._n_targets do
         local target = self._snapshots[i]
         local fade_out_end = 0.4
+
+        -- slide in from the left
         target:set_position_offset(self._paths[i]:at(rt.exponential_deceleration(2 * fraction), 0))
 
         -- fade-in ramp
@@ -76,7 +78,7 @@ function bt.EnemyAppearedAnimation:update(delta)
 end
 
 --- @overload
-function bt.EnemyAppearedAnimation:finish()
+function bt.Animation.ENEMY_APPEARED:finish()
     for i = 1, self._n_targets do
         local target = self._targets[i]
         target:set_is_visible(true)
@@ -84,7 +86,7 @@ function bt.EnemyAppearedAnimation:finish()
 end
 
 --- @overload
-function bt.EnemyAppearedAnimation:draw()
+function bt.Animation.ENEMY_APPEARED:draw()
     for i = 1, self._n_targets do
         self._snapshots[i]:draw()
     end

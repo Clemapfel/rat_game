@@ -213,7 +213,7 @@ function rt.VertexLine(thickness, ...)
         rt.error("In rt.VertexLine: Need at least 2 vertices")
     end
 
-    function translate_point(point, distance, angle_dg)
+    local function translate_point(point, distance, angle_dg)
         local rad = angle_dg * math.pi / 180
         return math3d.vec2(point.x + distance * math.cos(rad), point.y + distance * math.sin(rad))
     end
