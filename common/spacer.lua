@@ -32,7 +32,6 @@ end)
 function rt.Spacer:draw()
     if not self:get_is_visible() then return end
     self._shape:draw()
-
     self._outline_top:draw()
     self._outline_bottom:draw()
     self._outline_left:draw()
@@ -59,7 +58,6 @@ end
 --- @brief set color
 --- @param color rt.RGBA
 function rt.Spacer:set_color(color, outline_color)
-
     local rgba = color
     if meta.is_hsva(color) then
         rgba = rt.hsva_to_rgba(color)
@@ -67,13 +65,15 @@ function rt.Spacer:set_color(color, outline_color)
 
     self._shape:set_color(rgba)
 
-    local rgba = outline_color
-    if meta.is_hsva(outline_color) then
-        rgba = rt.hsva_to_rgba(outline_color)
-    end
+    if not meta.is_nil(outline_color) then
+        rgba = outline_color
+        if meta.is_hsva(outline_color) then
+            rgba = rt.hsva_to_rgba(outline_color)
+        end
 
-    for outline in range(self._outline_top, self._outline_right, self._outline_bottom, self._outline_left) do
-        outline:set_color(outline_color)
+        for outline in range(self._outline_top, self._outline_right, self._outline_bottom, self._outline_left) do
+            outline:set_color(outline_color)
+        end
     end
 end
 

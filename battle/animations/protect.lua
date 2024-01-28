@@ -1,5 +1,5 @@
 rt.settings.battle_animation.protect = {
-    duration = 1,
+    duration = 5,
     shield_color = rt.Palette.GRAY_4,
     shield_outline_color = rt.Palette.GRAY_2,
     sheen_color = rt.Palette.WHITE
@@ -49,14 +49,14 @@ function bt.Animation.PROTECT:start()
         local d = translate_point(bounds.x, bounds.y, 0.5 * sheen_width, 180 - 45)
 
         local sheen = rt.Polygon(
-            a.x, a.y, b.x, b.y, c.x, c.y--, d.x, d.y
+            a.x, a.y, b.x, b.y, c.x, c.y, d.x, d.y
         )
         sheen:set_is_outline(false)
         sheen:set_color(settings.sheen_color)
         table.insert(self._sheens, sheen)
 
-        local first = translate_point(bounds.x + bounds.width, bounds.y, sheen_width, -45)
-        local last = translate_point(bounds.x, bounds.y + bounds.height, sheen_width, 180 - 45)
+        local first = math3d.vec2(0, 0) --bounds.x, bounds.y)--translate_point(bounds.x + bounds.width, bounds.y, sheen_width, -45)
+        local last = math3d.vec2(500, 800) --bounds.x + bounds.width, bounds.y + bounds.height)--translate_point(bounds.x, bounds.y + bounds.height, sheen_width, 180 - 45)
         local sheen_path = rt.Spline({first.x, first.y, last.x, last.y})
         table.insert(self._sheen_paths, sheen_path)
     end
@@ -70,7 +70,10 @@ function bt.Animation.PROTECT:update(delta)
     for i = 1, self._n_targets do
         local sheen = self._sheens[i]
         local x, y = self._sheen_paths[i]:at(rt.linear(fraction))
-        sheen:set_centroid(x, y)
+        --x, y = sheen:get_centroid()
+        --x = x + 1
+        --y = y + 1
+        self._sheens[i]:set_centroid(x, y)
     end
     return self._elapsed < duration
 end
@@ -86,12 +89,14 @@ end
 --- @overload
 function bt.Animation.PROTECT:draw()
     for i = 1, self._n_targets do
-        self._shields[i]:draw()
-        self._shield_outlines[i]:draw()
+        --self._shields[i]:draw()
+        --self._shield_outlines[i]:draw()
 
         local bounds = self._targets[i]:get_bounds()
         --love.graphics.setScissor(bounds.x, bounds.y, bounds.width, bounds.height)
         self._sheens[i]:draw()
         --love.graphics.setScissor()
+
+        self._sheen_paths[i]:draw()
     end
 end
