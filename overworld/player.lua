@@ -1,6 +1,9 @@
 rt.settings.overworld.player = {
     radius = 50,
-    velocity = 400
+    mass = 0,
+    velocity = 400,
+    sprinting_velocity_factor = 2,
+    acceleration_delay = 5, -- seconds
 }
 
 --- @class ow.Player
@@ -10,18 +13,17 @@ ow.Player = meta.new_type("Player", function(world)
         _world = world,
         _collider = rt.CircleCollider(world, rt.ColliderType.DYNAMIC, 0, 0, radius),
         _shape = rt.Circle(0, 0, radius),
-        _input = {}, -- rt.InputController,
-        _input_direction = {}           -- Table<rt.Direction, Boolean>
+        _input = {}, -- rt.InputController
+        _is_sprinting = false,
+        _acceleration_timer = 0
     }, rt.Drawable, rt.Animation, rt.Widget)
+
+    out._collider:set_mass(rt.settings.overworld.player.mass)
 
     out._input = rt.add_input_controller(out)
     out._input:signal_connect("pressed", ow.Player._handle_button_pressed, out)
     out._input:signal_connect("released", ow.Player._handle_button_released, out)
     out._input:signal_connect("joystick", ow.Player._handle_joystick, out)
-
-    for direction in range(rt.Direction.UP, rt.Direction.RIGHT, rt.Direction.DOWN, rt.Direction.LEFT) do
-        out._input_direction[direction] = false
-    end
 
     out:set_is_animated(true)
     return out
@@ -29,7 +31,13 @@ end)
 
 --- @brief [internal]
 function ow.Player:set_velocity(x, y)
+
     self._collider:set_linear_velocity(x, y)
+
+    local eps = 0.001
+    if math.abs(x) < eps and math.abs(y) < eps then
+        self._acceleration_timer = 0
+    end
 end
 
 --- @brief
@@ -40,62 +48,82 @@ end
 
 --- @brief [internal]
 function ow.Player._handle_button_pressed(_, button, self)
-    local left_velocity, y_velocity = 0, 0--self:get_velocity()
-    local target_velocity = rt.settings.overworld.player.velocity
-
     if button == rt.InputButton.A then
     end
 
+    -- movement
+    --if button == rt.InputButton.L or button == rt.InputButton.R then
+
+    local sprinting_factor = rt.settings.overworld.player.sprinting_velocity_factor
+    if button == rt.InputButton.A then
+        self._is_sprinting = true
+        local x, y = self:get_velocity()
+        self:set_velocity(x * sprinting_factor, y * sprinting_factor)
+    end
+
+    local up, right, down, left = 0, 0, 0, 0
+    local target = rt.settings.overworld.player.velocity
+    if self._is_sprinting then target = target * sprinting_factor end
+
     if button == rt.InputButton.UP then
-        self._input_direction[rt.Direction.UP] = true
-        y_velocity = y_velocity - target_velocity
+        up = target
     end
 
     if button == rt.InputButton.RIGHT then
-        self._input_direction[rt.Direction.RIGHT] = true
-        x_velocity = x_velocity + target_velocity
+        right = target
     end
 
     if button == rt.InputButton.DOWN then
-        self._input_direction[rt.Direction.DOWN] = true
-        y_velocity = y_velocity + target_velocity
+        down = target
     end
 
     if button == rt.InputButton.LEFT then
-        self._input_direction[rt.Direction.LEFT] = true
-        x_velocity = x_velocity - target_velocity
+        left = target
     end
-    self:set_velocity(x_velocity, y_velocity)
+
+    local x_velocity, y_velocity = self:get_velocity()
+    self:set_velocity(
+        x_velocity + right - left,
+        y_velocity + down - up
+    )
 end
 
 --- @brief [internal]
 function ow.Player._handle_button_released(_, button, self)
-    local x_velocity, y_velocity = self:get_velocity()
-    local target_velocity = rt.settings.overworld.player.velocity
 
     if button == rt.InputButton.A then
-    elseif button == rt.InputButton.UP then
-        if self._input_direction[rt.Direction.UP] then
-            y_velocity = 0
-            self._input_direction[rt.Direction.UP] = false
-        end
-    elseif button == rt.InputButton.RIGHT then
-        if self._input_direction[rt.Direction.RIGHT] then
-            x_velocity = 0
-            self._input_direction[rt.Direction.RIGHT] = false
-        end
-    elseif button == rt.InputButton.DOWN then
-        if self._input_direction[rt.Direction.DOWN] then
-            y_velocity = 0
-            self._input_direction[rt.Direction.DOWN] = false
-        end
-    elseif button == rt.InputButton.LEFT then
-        if self._input_direction[rt.Direction.LEFT] then
-            x_velocity = 0
-            self._input_direction[rt.Direction.LEFT] = false
-        end
     end
-    self:set_velocity(x_velocity, y_velocity)
+
+    -- movement
+    local sprinting_factor = rt.settings.overworld.player.sprinting_velocity_factor
+    if button == rt.InputButton.A then
+        self._is_sprinting = false
+        local x, y = self:get_velocity()
+        self:set_velocity(x / sprinting_factor, y / sprinting_factor)
+    end
+
+    local up, right, down, left = 0, 0, 0, 0
+    local target = rt.settings.overworld.player.velocity
+    if self._is_sprinting then target = target * sprinting_factor end
+
+    if button == rt.InputButton.UP then
+        up = -1 * target
+    end
+
+    if button == rt.InputButton.RIGHT then
+        right = -1 * target
+    end
+
+    if button == rt.InputButton.DOWN then
+        down = -1 * target
+    end
+
+    if button == rt.InputButton.LEFT then
+        left = -1 * target
+    end
+
+    local x_velocity, y_velocity = self:get_velocity()
+    self:set_velocity(x_velocity + right - left, y_velocity + down - up)
 end
 
 --- @brief [internal]
@@ -110,6 +138,19 @@ end
 
 --- @overload
 function ow.Player:update(delta)
+
+    local x_velocity, y_velocity = self:get_velocity()
+    local eps = 0.01
+    if math.abs(x_velocity) > eps or math.abs(y_velocity) > eps then
+        self._acceleration_timer = self._acceleration_timer + delta
+        local duration = rt.settings.overworld.player.acceleration_delay
+        local fraction = clamp(self._acceleration_timer / duration, 0, 1)
+        local max_dampening = 0.01
+        --self._collider:set_linear_dampening(fraction * max_dampening, fraction * max_dampening)
+    else
+        self._acceleration_timer = 0
+    end
+
     local x, y = self._collider:get_centroid()
     self._shape:set_centroid(x, y)
 end

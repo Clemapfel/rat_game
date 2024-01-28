@@ -49,6 +49,11 @@ function rt.Collider:apply_linear_impulse(x, y)
 end
 
 --- @brief
+function rt.Collider:apply_force(x, y)
+    self._body:applyForce(x, y)
+end
+
+--- @brief
 function rt.Collider:get_position()
     return self._body:getPosition()
 end
@@ -61,6 +66,16 @@ end
 --- @brief
 function rt.Collider:get_linear_velocity()
     return self._body:getLinearVelocity()
+end
+
+--- @brief
+function rt.Collider:set_linear_dampening(x, y)
+    self._body:setLinearVelocity(x, y)
+end
+
+--- @brief
+function rt.Collider:get_linear_dampening()
+    return self._body:getLinearDampening()
 end
 
 --- @brief
