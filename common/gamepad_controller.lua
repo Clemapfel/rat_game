@@ -33,6 +33,7 @@ rt.GamepadAxis = meta.new_enum({
 rt.GamepadHandler = {}
 rt.GamepadHandler._hash = 0
 rt.GamepadHandler._components = {}
+rt.GamepadHandler._deadzone = 0.05
 meta.make_weak(rt.GamepadHandler._components, false, true)
 
 --- @class rt.GamepadController
@@ -106,7 +107,6 @@ love.gamepadreleased = rt.GamepadHandler.handle_button_released
 --- @param axis rt.GamepadAxis
 --- @param value Number
 function rt.GamepadHandler.handle_axis_changed(joystick, axis, value)
-
     for _, component in pairs(rt.GamepadHandler._components) do
         component:signal_emit("axis_changed", joystick:getID(), axis, value)
     end

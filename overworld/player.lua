@@ -4,6 +4,7 @@ rt.settings.overworld.player = {
     velocity = 400,
     sprinting_velocity_factor = 2,
     acceleration_delay = 5, -- seconds
+    deadzone = 0.05
 }
 
 --- @class ow.Player
@@ -22,6 +23,7 @@ ow.Player = meta.new_type("Player", function(world)
 
         _input = {}, -- rt.InputController
         _direction = 0, -- radians
+        _direction_active = false,
         _is_sprinting = false
     }, rt.Drawable, rt.Animation, rt.Widget)
 
@@ -62,6 +64,16 @@ function ow.Player:get_velocity()
     return self._collider:get_linear_velocity()
 end
 
+--- @brief
+function ow.Player:set_is_sprinting(b)
+    self._is_sprinting = b
+end
+
+--- @brief
+function ow.Player:get_is_sprinting()
+    return self._is_sprinting
+end
+
 --- @brief [internal]
 function ow.Player._handle_button_pressed(_, button, self)
     if button == rt.InputButton.A then
@@ -72,14 +84,14 @@ function ow.Player._handle_button_pressed(_, button, self)
 
     local sprinting_factor = rt.settings.overworld.player.sprinting_velocity_factor
     if button == rt.InputButton.A then
-        self._is_sprinting = true
+        self:set_is_sprinting(true)
         local x, y = self:get_velocity()
         self:set_velocity(x * sprinting_factor, y * sprinting_factor)
     end
 
     local up, right, down, left = 0, 0, 0, 0
     local target = rt.settings.overworld.player.velocity
-    if self._is_sprinting then target = target * sprinting_factor end
+    if self:get_is_sprinting() then target = target * sprinting_factor end
 
     if button == rt.InputButton.UP then
         up = target
@@ -113,14 +125,14 @@ function ow.Player._handle_button_released(_, button, self)
     -- movement
     local sprinting_factor = rt.settings.overworld.player.sprinting_velocity_factor
     if button == rt.InputButton.A then
-        self._is_sprinting = false
+        self:set_is_sprinting(false)
         local x, y = self:get_velocity()
         self:set_velocity(x / sprinting_factor, y / sprinting_factor)
     end
 
     local up, right, down, left = 0, 0, 0, 0
     local target = rt.settings.overworld.player.velocity
-    if self._is_sprinting then target = target * sprinting_factor end
+    if self:get_is_sprinting() then target = target * sprinting_factor end
 
     if button == rt.InputButton.UP then
         up = -1 * target
@@ -145,15 +157,28 @@ end
 --- @brief [internal]
 function ow.Player._handle_joystick(_, x, y, which, self)
 
+    -- if right joystick is not held, left overwrites direction, otherwise right always decides direction
+    local magnitude = rt.magnitude(x, y)
+    local deadzone = rt.settings.overworld.player.deadzone
+
+    if which == rt.JoystickPosition.RIGHT then
+        if magnitude > deadzone then
+            self._direction = rt.angle(x, y)
+            self._direction_active = true
+        else
+            self._direction_active = false
+        end
+    end
+
     if which == rt.JoystickPosition.LEFT then
         local target = rt.settings.overworld.player.velocity
-        if self._is_sprinting then
+        if self:get_is_sprinting() then
             target = target * rt.settings.overworld.player.sprinting_velocity_factor
         end
         self:set_velocity(target * x, target * y)
-    elseif which == rt.JoystickPosition.RIGHT then
-        self._direction = rt.angle(x, y)
-
+        if self._direction_active == false and magnitude > deadzone then
+            self._direction = rt.angle(x, y)
+        end
     end
 end
 
@@ -184,11 +209,9 @@ function ow.Player._on_physics_update(_, self)
     local velocity_magnitude = rt.magnitude(velocity_x, velocity_y)
     local magnitude_fraction = velocity_magnitude / max_velocity * radius
     local indicator_radius_fraction = 0.25
-    local tip_x, tip_y = rt.translate_point_by_angle(
-        x, y,
-        clamp(magnitude_fraction, indicator_radius_fraction * radius),
-        angle
-    )
+    local velocity_indicator_magnitude = clamp(magnitude_fraction, indicator_radius_fraction * radius, radius)
+
+    local tip_x, tip_y = rt.translate_point_by_angle(x, y, velocity_indicator_magnitude, angle)
 
     local angle_offset = rt.degrees(90):as_radians()
     local direction_triangle_radius = rt.settings.overworld.player.radius * indicator_radius_fraction
@@ -200,9 +223,10 @@ function ow.Player._on_physics_update(_, self)
 
     -- direction indicator
     direction_triangle_radius = direction_triangle_radius * 0.5
+    local direction_indicator_magnitude = 0.5 * radius--clamp(velocity_indicator_magnitude, 0.5 * radius)
     tip_x, tip_y = rt.translate_point_by_angle(
             x, y,
-            0.5 * radius,
+            direction_indicator_magnitude,
             self._direction
     )
 
