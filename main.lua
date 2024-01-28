@@ -4,6 +4,43 @@ rt.current_scene = rt.add_scene("debug")
 background = bt.BattleBackground("mint_wave")
 rt.current_scene:set_child(background)
 
+world = rt.PhysicsWorld(0, 0)
+player = ow.Player(world)
+
+
+-- ######################
+
+love.load = function()
+    love.window.setMode(800, 600, {
+        vsync = 1,
+        msaa = 8,
+        stencil = true,
+        resizable = true
+    })
+    love.window.setTitle("rat_game")
+    rt.current_scene:run()
+end
+
+love.draw = function()
+    love.graphics.clear(1, 0, 1, 1)
+    rt.current_scene:draw()
+
+    player:draw()
+end
+
+love.update = function()
+    local delta = love.timer.getDelta()
+    rt.current_scene:update(delta)
+
+    world:update(delta)
+end
+
+--[[
+
+rt.current_scene = rt.add_scene("debug")
+background = bt.BattleBackground("mint_wave")
+rt.current_scene:set_child(background)
+
 sprites = {}
 for i = 1, 5 do
     local color = rt.random.choose({"RED", "GREEN", "BLUE", "PINK", "PURPLE"})
@@ -58,7 +95,6 @@ rt.current_scene.input:signal_connect("pressed", function(_, which)
     end
 end)
 
--- ######################
 
 love.load = function()
     love.window.setMode(800, 600, {
@@ -86,3 +122,4 @@ love.update = function()
     rt.current_scene:update(delta)
     state_queue:update(delta)
 end
+]]--

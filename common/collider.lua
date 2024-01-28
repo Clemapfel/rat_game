@@ -64,7 +64,7 @@ function rt.Collider:get_linear_velocity()
 end
 
 --- @brief
-function rt.Collider:get_center_of_mass()
+function rt.Collider:get_centroid()
     local local_x, local_y = self._body:getLocalCenter()
     local x, y = self._body:getPosition()
     return x + local_x, y + local_y

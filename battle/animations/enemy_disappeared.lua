@@ -129,7 +129,7 @@ function bt.Animation.ENEMY_DIED:update(delta)
             local particle = self._particles[i][particle_i]
             local shape = self._particle_shapes[i][particle_i]
 
-            local x, y = particle:get_center_of_mass()
+            local x, y = particle:get_centroid()
             x = x - self._particle_width * 0.5 + shake_offset_x
             y = y - self._particle_height * 0.5 + shake_offset_y
 
@@ -154,7 +154,7 @@ function bt.Animation.ENEMY_DIED:update(delta)
             local center_x, center_y = bounds.x + 0.5 * bounds.width, bounds.y + 0.5 * bounds.height
             for particle_i = 1, #self._particles[i] do
                 local particle = self._particles[i][particle_i]
-                local x, y = particle:get_center_of_mass()
+                local x, y = particle:get_centroid()
                 particle:set_disabled(false)
                 particle:apply_linear_impulse(
                     rt.random.number(1, 2) * impulse_strength * (x - center_x),
