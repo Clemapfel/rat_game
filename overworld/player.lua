@@ -25,6 +25,7 @@ ow.Player = meta.new_type("Player", function(world)
     out._input:signal_connect("released", ow.Player._handle_button_released, out)
     out._input:signal_connect("joystick", ow.Player._handle_joystick, out)
 
+    out._world:signal_connect("update", ow.Player._on_physics_update, out)
     out:set_is_animated(true)
     return out
 end)
@@ -127,13 +128,24 @@ function ow.Player._handle_button_released(_, button, self)
 end
 
 --- @brief [internal]
-function ow.Player._handle_joystick(_, x, y, self)
+function ow.Player._handle_joystick(_, x, y, which, self)
 
+    if which == rt.JoystickPosition.LEFT then
+        local target = rt.settings.overworld.player.velocity
+        if self._is_sprinting then target = target * rt.settings.overworld.player.sprinting_factor end
+        self:set_velocity(target * x, target * y)
+    end
 end
 
 --- @overload
 function ow.Player:draw()
     self._shape:draw()
+end
+
+--- @brief [internal]
+function ow.Player._on_physics_update(_, self)
+    local x, y = self._collider:get_centroid()
+    self._shape:set_centroid(x, y)
 end
 
 --- @overload
@@ -151,6 +163,5 @@ function ow.Player:update(delta)
         self._acceleration_timer = 0
     end
 
-    local x, y = self._collider:get_centroid()
-    self._shape:set_centroid(x, y)
+
 end

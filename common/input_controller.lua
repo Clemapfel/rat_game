@@ -2,8 +2,8 @@ rt.settings.input = {}
 rt.settings.input = {
     trigger_threshold = 0.1,
     deadzone = 0.05,
-    convert_left_trigger_to_dpad = true,
-    convert_right_trigger_to_dpad = true
+    convert_left_trigger_to_dpad = false,
+    convert_right_trigger_to_dpad = false
 }
 
 rt.InputHandler = {}
@@ -22,6 +22,13 @@ rt.InputButton = meta.new_enum({
     SELECT = "INPUT_BUTTON_SELECT",
     L = "INPUT_BUTTON_L",
     R = "INPUT_BUTTON_R"
+})
+
+--- @class
+rt.JoystickPosition = meta.new_enum({
+    LEFT = "LEFT",
+    RIGHT = "RIGHT",
+    UNKNOWN = "UNKNON"
 })
 
 --- @brief
@@ -175,7 +182,7 @@ end
 --- @brief combines all input methods into one, fully abstracted controller
 --- @signal pressed   (self, rt.InputButton) -> nil
 --- @signal released  (self, rt.InputButton) -> nil
---- @signal joystick  (self, x, y) -> nil
+--- @signal joystick  (self, x, y, rt.JoystickPosition) -> nil
 --- @signal enter     (self, x, y) -> nil
 --- @signal motion    (self, x, y, dx, dy) -> nil
 --- @signal leave     (self, x, y) -> nil
@@ -240,7 +247,7 @@ rt.InputController = meta.new_type("InputController", function(holder)
         if which_axis == rt.GamepadAxis.LEFT_X or which_axis == rt.GamepadAxis.LEFT_Y then
             local x, y = rt.GamepadHandler.get_axes(id, rt.GamepadAxis.LEFT_X, rt.GamepadAxis.LEFT_Y)
             if not self._is_disabled then
-                self:signal_emit("joystick", x, y)
+                self:signal_emit("joystick", x, y, rt.JoystickPosition.LEFT)
             end
 
             if rt.settings.input.convert_left_trigger_to_dpad then
@@ -297,7 +304,7 @@ rt.InputController = meta.new_type("InputController", function(holder)
             local x, y = rt.GamepadHandler.get_axes(id, rt.GamepadAxis.RIGHT_X, rt.GamepadAxis.RIGHT_Y)
 
             if not self._is_disabled then
-                self:signal_emit("joystick", x, y)
+                self:signal_emit("joystick", x, y, rt.JoystickPosition.RIGHT)
             end
 
             if rt.settings.input.convert_right_trigger_to_dpad then
