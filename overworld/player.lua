@@ -12,11 +12,18 @@ ow.Player = meta.new_type("Player", function(world)
     local out = meta.new(ow.Player, {
         _world = world,
         _collider = rt.CircleCollider(world, rt.ColliderType.DYNAMIC, 0, 0, radius),
-        _shape = rt.Circle(0, 0, radius),
+        _debug_body = rt.Circle(0, 0, radius),
+        _debug_outline = rt.Circle(0, 0, radius),
+        _direction_line = rt.Line(0, 0, 0, 0),
         _input = {}, -- rt.InputController
         _is_sprinting = false,
         _acceleration_timer = 0
     }, rt.Drawable, rt.Animation, rt.Widget)
+
+    out._debug_body:set_is_outline(false)
+    out._debug_outline:set_is_outline(true)
+    out._debug_body:set_color(rt.Palette.PURPLE_4)
+    out._debug_outline:set_color(rt.Palette.PURPLE_6)
 
     out._collider:set_mass(rt.settings.overworld.player.mass)
 
@@ -27,6 +34,7 @@ ow.Player = meta.new_type("Player", function(world)
 
     out._world:signal_connect("update", ow.Player._on_physics_update, out)
     out:set_is_animated(true)
+
     return out
 end)
 
@@ -132,20 +140,43 @@ function ow.Player._handle_joystick(_, x, y, which, self)
 
     if which == rt.JoystickPosition.LEFT then
         local target = rt.settings.overworld.player.velocity
-        if self._is_sprinting then target = target * rt.settings.overworld.player.sprinting_factor end
+        if self._is_sprinting then
+            target = target * rt.settings.overworld.player.sprinting_velocity_factor
+        end
         self:set_velocity(target * x, target * y)
     end
 end
 
 --- @overload
 function ow.Player:draw()
-    self._shape:draw()
+    self._debug_body:draw()
+    self._debug_outline:draw()
+    self._direction_line:draw()
 end
 
 --- @brief [internal]
 function ow.Player._on_physics_update(_, self)
     local x, y = self._collider:get_centroid()
-    self._shape:set_centroid(x, y)
+    self._debug_body:set_centroid(x, y)
+    self._debug_outline:set_centroid(x, y)
+
+    local function translate_point(point_x, point_y, distance, angle)
+        return point_x + distance * math.cos(angle), point_y + distance * math.sin(angle)
+    end
+
+    local max_velocity = rt.settings.overworld.player.velocity
+    local velocity_x, velocity_y = self:get_velocity()
+    local angle = math.atan2(velocity_y, velocity_x)
+
+    local radius = self._debug_body:get_radius()
+    local velocity_magnitude = math.sqrt(velocity_x^2 + velocity_y^2)
+    local point_x, point_y = translate_point(
+        x, y,
+        velocity_magnitude / max_velocity * radius,
+        angle
+    )
+
+    self._direction_line:resize(x, y, point_x, point_y)
 end
 
 --- @overload
