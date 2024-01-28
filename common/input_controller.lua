@@ -156,17 +156,11 @@ function rt.InputHandler._load_input_mapping()
     local keyboard_mapping = {}
 
     for key, binding in pairs(rt.InputHandler._mapping) do
-
-
-
         for _, gamepad_button in pairs(binding.gamepad) do
-
             gamepad_mapping[gamepad_button] = key
         end
 
-
         for _, keyboard_key in pairs(binding.keyboard) do
-
             keyboard_mapping[keyboard_key] = key
         end
     end

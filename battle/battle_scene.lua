@@ -37,6 +37,11 @@ ActionClosures:
     + End of Battle
 ]]--
 
+--[[
+Turn Step:
+
+]]--
+
 --- @brief
 function bt.BattleScene:get_entity(id)
     return self.entities[id]

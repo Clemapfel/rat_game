@@ -14,6 +14,7 @@ rt.test = {}
 rt.settings = {}
 rt.physics = {}
 rt.battle = {}
+rt.overworld = {}
 
 setmetatable(rt, {
     __index = function(self, key)
@@ -26,6 +27,13 @@ rt.battle.Animation = {}
 setmetatable(bt, {
     __index = function(self, key)
         rt.error("In bt.__index: key `" .. key .. "` does not exist in table `bt`")
+    end
+})
+
+ow = rt.overworld
+setmetatable(bt, {
+    __index = function(self, key)
+        rt.error("In ow.__index: key `" .. key .. "` does not exist in table `ow`")
     end
 })
 
@@ -170,7 +178,10 @@ for _, name in pairs(love.filesystem.getDirectoryItems("battle/animations")) do
     require("battle.animations." .. name)
 end
 
+require "overworld.player"
+
 require "scene"
 require "battle.battle_scene"
+
 
 -- require "test

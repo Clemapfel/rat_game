@@ -82,7 +82,6 @@ end
 
 --- @brief
 function rt.Collider:set_restitution(x, fixture_index)
-
     if meta.is_nil(fixture_index) then
         for _, fixture in pairs(self._fixtures) do
             fixture:setRestitution(x)
