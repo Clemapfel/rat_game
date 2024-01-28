@@ -14,26 +14,19 @@ ow.Player = meta.new_type("Player", function(world)
         _collider = rt.CircleCollider(world, rt.ColliderType.DYNAMIC, 0, 0, radius),
         _debug_body = rt.Circle(0, 0, radius),
         _debug_body_outline = rt.Circle(0, 0, radius),
-
-        _debug_velocity = rt.Polygon(0, 0, 0, 0, 0, 0, 0, 0),
-        _debug_velocity_outline = rt.Polygon(0, 0, 0, 0, 0, 0, 0, 0),
         _debug_direction = rt.Polygon(0, 0, 0, 0, 0, 0, 0, 0),
         _debug_direction_outline = rt.Polygon(0, 0, 0, 0, 0, 0, 0, 0),
 
         _input = {}, -- rt.InputController
-        _direction = 0, -- radians
-        _is_sprinting = false
+        _direction = rt.radians(0),
+        _is_sprinting = false,
+        _acceleration_timer = 0
     }, rt.Drawable, rt.Animation, rt.Widget)
 
     out._debug_body:set_is_outline(false)
     out._debug_body_outline:set_is_outline(true)
     out._debug_body:set_color(rt.Palette.PURPLE_5)
     out._debug_body_outline:set_color(rt.Palette.PURPLE_6)
-
-    out._debug_velocity:set_color(rt.Palette.PURPLE_4)
-    out._debug_velocity_outline:set_color(rt.Palette.PURPLE_6)
-    out._debug_velocity_outline:set_is_outline(true)
-
     out._debug_direction:set_color(rt.Palette.PURPLE_3)
     out._debug_direction_outline:set_color(rt.Palette.PURPLE_6)
     out._debug_direction_outline:set_is_outline(true)
@@ -53,7 +46,14 @@ end)
 
 --- @brief [internal]
 function ow.Player:set_velocity(x, y)
+
     self._collider:set_linear_velocity(x, y)
+
+    local eps = 0.001
+    if math.abs(x) < eps and math.abs(y) < eps then
+        self._acceleration_timer = 0
+        self._direction = rt.angle(x, y)
+    end
 end
 
 --- @brief
@@ -99,8 +99,8 @@ function ow.Player._handle_button_pressed(_, button, self)
 
     local x_velocity, y_velocity = self:get_velocity()
     self:set_velocity(
-            x_velocity + right - left,
-            y_velocity + down - up
+        x_velocity + right - left,
+        y_velocity + down - up
     )
 end
 
@@ -152,8 +152,8 @@ function ow.Player._handle_joystick(_, x, y, which, self)
         end
         self:set_velocity(target * x, target * y)
     elseif which == rt.JoystickPosition.RIGHT then
-        self._direction = rt.angle(x, y)
-
+        local new_direction = rt.angle(x, y)
+        local magnitude = rt.magnitude(self:get_velocity())
     end
 end
 
@@ -161,10 +161,6 @@ end
 function ow.Player:draw()
     self._debug_body:draw()
     self._debug_body_outline:draw()
-
-    self._debug_velocity:draw()
-    self._debug_velocity_outline:draw()
-
     self._debug_direction:draw()
     self._debug_direction_outline:draw()
 end
@@ -175,7 +171,7 @@ function ow.Player._on_physics_update(_, self)
     self._debug_body:set_centroid(x, y)
     self._debug_body_outline:set_centroid(x, y)
 
-    -- velocity indicator
+    -- direction indicator: 4-vertex polygon pointing in direction of velocity
     local max_velocity = rt.settings.overworld.player.velocity
     local velocity_x, velocity_y = self:get_velocity()
     local angle = rt.angle(velocity_x, velocity_y)
@@ -184,36 +180,30 @@ function ow.Player._on_physics_update(_, self)
     local velocity_magnitude = rt.magnitude(velocity_x, velocity_y)
     local magnitude_fraction = velocity_magnitude / max_velocity * radius
     local indicator_radius_fraction = 0.25
-    local tip_x, tip_y = rt.translate_point_by_angle(
-        x, y,
-        clamp(magnitude_fraction, indicator_radius_fraction * radius),
-        angle
-    )
+    local tip_x, tip_y = rt.translate_point_by_angle(x, y,  clamp(magnitude_fraction, indicator_radius_fraction * radius + 10), angle)
 
     local angle_offset = rt.degrees(90):as_radians()
     local direction_triangle_radius = rt.settings.overworld.player.radius * indicator_radius_fraction
     local up_x, up_y = rt.translate_point_by_angle(x, y, direction_triangle_radius , angle - angle_offset)
     local down_x, down_y = rt.translate_point_by_angle(x, y, direction_triangle_radius, angle + angle_offset)
     local back_x, back_y = rt.translate_point_by_angle(x, y, direction_triangle_radius, angle - 2 * angle_offset)
-    self._debug_velocity:resize(up_x, up_y, tip_x, tip_y, down_x, down_y, back_x, back_y)
-    self._debug_velocity_outline:resize(up_x, up_y, tip_x, tip_y, down_x, down_y, back_x, back_y)
-
-    -- direction indicator
-    direction_triangle_radius = direction_triangle_radius * 0.5
-    tip_x, tip_y = rt.translate_point_by_angle(
-            x, y,
-            0.5 * radius,
-            self._direction
-    )
-
-    up_x, up_y = rt.translate_point_by_angle(x, y, direction_triangle_radius , self._direction - angle_offset)
-    down_x, down_y = rt.translate_point_by_angle(x, y, direction_triangle_radius, self._direction + angle_offset)
-    back_x, back_y = rt.translate_point_by_angle(x, y, direction_triangle_radius, self._direction - 2 * angle_offset)
     self._debug_direction:resize(up_x, up_y, tip_x, tip_y, down_x, down_y, back_x, back_y)
     self._debug_direction_outline:resize(up_x, up_y, tip_x, tip_y, down_x, down_y, back_x, back_y)
 end
 
 --- @overload
 function ow.Player:update(delta)
+
+    local x_velocity, y_velocity = self:get_velocity()
+    local eps = 0.01
+    if math.abs(x_velocity) > eps or math.abs(y_velocity) > eps then
+        self._acceleration_timer = self._acceleration_timer + delta
+        local duration = rt.settings.overworld.player.acceleration_delay
+        local fraction = clamp(self._acceleration_timer / duration, 0, 1)
+        local max_dampening = 0.01
+        --self._collider:set_linear_dampening(fraction * max_dampening, fraction * max_dampening)
+    else
+        self._acceleration_timer = 0
+    end
 
 end
