@@ -178,7 +178,9 @@ for _, name in pairs(love.filesystem.getDirectoryItems("battle/animations")) do
     require("battle.animations." .. name)
 end
 
+require "overworld.overworld_scene"
 require "overworld.player"
+require "overworld.interactable"
 
 require "scene"
 require "battle.battle_scene"

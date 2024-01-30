@@ -34,6 +34,25 @@ function rt.Collider:set_position(x, y)
 end
 
 --- @brief
+function rt.Collider:get_bounds(i)
+    if meta.is_nil(i) then
+        local min_x, min_y = POSITIVE_INFINITY, POSITIVE_INFINITY
+        local max_x, max_y = NEGATIVE_INFINITY, NEGATIVE_INFINITY
+        for j = 1, #self._fixtures do
+            local x, y, bx, by = self._fixtures[j]:getShape():computeAABB(0, 0, 0)
+            min_x = math.min(min_x, x)
+            min_y = math.min(min_y, y)
+            max_x = math.max(max_x, bx)
+            max_y = math.max(max_y, by)
+        end
+        return rt.AABB(min_x, min_y, max_x - min_x, max_y - min_y)
+    else
+        local shape = self._fixtures[i]:getShape()
+        return rt.AABB(shape:computeAABB(0, 0, 0))
+    end
+end
+
+--- @brief
 function rt.Collider:destroy()
     self._body:destroy()
 end

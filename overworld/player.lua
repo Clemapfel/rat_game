@@ -12,7 +12,10 @@ ow.Player = meta.new_type("Player", function(world)
     local radius = rt.settings.overworld.player.radius
     local out = meta.new(ow.Player, {
         _world = world,
-        _collider = rt.CircleCollider(world, rt.ColliderType.DYNAMIC, 0, 0, radius),
+        _collider = rt.CircleCollider(world, rt.ColliderType.KINEMATIC, 0, 0, radius),
+        _sensor = rt.CircleCollider(world, rt.ColliderType.KINEMATIC, 0, 0, radius),
+        _sensor_active = false,
+
         _debug_body = rt.Circle(0, 0, radius),
         _debug_body_outline = rt.Circle(0, 0, radius),
 
@@ -20,6 +23,9 @@ ow.Player = meta.new_type("Player", function(world)
         _debug_velocity_outline = rt.Polygon(0, 0, 0, 0, 0, 0, 0, 0),
         _debug_direction = rt.Polygon(0, 0, 0, 0, 0, 0, 0, 0),
         _debug_direction_outline = rt.Polygon(0, 0, 0, 0, 0, 0, 0, 0),
+
+        _debug_sensor = rt.Circle(0, 0, 1),
+        _debug_sensor_outline = rt.Circle(0, 0, 1),
 
         _input = {}, -- rt.InputController
         _direction = 0, -- radians
@@ -39,6 +45,14 @@ ow.Player = meta.new_type("Player", function(world)
     out._debug_direction:set_color(rt.Palette.PURPLE_3)
     out._debug_direction_outline:set_color(rt.Palette.PURPLE_6)
     out._debug_direction_outline:set_is_outline(true)
+
+    local sensor_color = rt.RGBA(0.4, 0.4, 0.4, 1)
+    out._debug_sensor_outline:set_color(sensor_color)
+    out._debug_sensor_outline:set_is_outline(true)
+
+    sensor_color.a = 0.25
+    out._debug_sensor:set_color(sensor_color)
+    out._debug_sensor:set_is_outline(false)
 
     out._collider:set_mass(rt.settings.overworld.player.mass)
 
@@ -76,7 +90,9 @@ end
 
 --- @brief [internal]
 function ow.Player._handle_button_pressed(_, button, self)
+
     if button == rt.InputButton.A then
+        self._sensor_active = true
     end
 
     -- movement
@@ -111,8 +127,8 @@ function ow.Player._handle_button_pressed(_, button, self)
 
     local x_velocity, y_velocity = self:get_velocity()
     self:set_velocity(
-            x_velocity + right - left,
-            y_velocity + down - up
+        x_velocity + right - left,
+        y_velocity + down - up
     )
 end
 
@@ -120,6 +136,7 @@ end
 function ow.Player._handle_button_released(_, button, self)
 
     if button == rt.InputButton.A then
+        self._sensor_active = false
     end
 
     -- movement
@@ -192,6 +209,13 @@ function ow.Player:draw()
 
     self._debug_direction:draw()
     self._debug_direction_outline:draw()
+
+    if self._sensor_active == true then
+        love.graphics.setBlendMode("add", "premultiplied")
+        self._debug_sensor:draw()
+        love.graphics.setBlendMode("alpha")
+        self._debug_sensor_outline:draw()
+    end
 end
 
 --- @brief [internal]
@@ -235,6 +259,11 @@ function ow.Player._on_physics_update(_, self)
     back_x, back_y = rt.translate_point_by_angle(x, y, direction_triangle_radius, self._direction - 2 * angle_offset)
     self._debug_direction:resize(up_x, up_y, tip_x, tip_y, down_x, down_y, back_x, back_y)
     self._debug_direction_outline:resize(up_x, up_y, tip_x, tip_y, down_x, down_y, back_x, back_y)
+
+    -- sensor location
+    local center_x, center_y = rt.translate_point_by_angle(x, y, radius, self._direction)
+    self._debug_sensor:resize(center_x, center_y, radius)
+    self._debug_sensor_outline:resize(center_x, center_y, radius)
 end
 
 --- @overload

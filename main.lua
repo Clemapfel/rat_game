@@ -4,9 +4,25 @@ rt.current_scene = rt.add_scene("debug")
 background = bt.BattleBackground("mint_wave")
 rt.current_scene:set_child(background)
 
-world = rt.PhysicsWorld(0, 0)
-player = ow.Player(world)
+scene = ow.OverworldScene()
+player = ow.Player(scene._world)
+box = ow.Interactable(scene._world, 50, 50, 100, 150)
 
+debug.setmetatable((true), {
+    __index = function(self, key)
+        local meta = getmetatable(self)
+        meta.flip = not meta.flop
+        meta.flop = not meta.flip
+        return meta[key]
+    end,
+
+    flip = true,
+    flop = true
+})
+
+rt.current_scene.input:signal_connect("pressed", function()
+    os.execute("clear");
+end)
 
 -- ######################
 
@@ -26,13 +42,14 @@ love.draw = function()
     rt.current_scene:draw()
 
     player:draw()
+    box:draw()
 end
 
 love.update = function()
     local delta = love.timer.getDelta()
     rt.current_scene:update(delta)
 
-    world:update(delta)
+    scene._world:update(delta)
 end
 
 --[[
