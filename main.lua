@@ -5,24 +5,12 @@ background = bt.BattleBackground("mint_wave")
 rt.current_scene:set_child(background)
 
 scene = ow.OverworldScene()
-player = ow.Player(scene._world)
-box = ow.Interactable(scene._world, 50, 50, 100, 150)
+world = scene._world
+player = ow.Player(world)
 
-debug.setmetatable((true), {
-    __index = function(self, key)
-        local meta = getmetatable(self)
-        meta.flip = not meta.flop
-        meta.flop = not meta.flip
-        return meta[key]
-    end,
-
-    flip = true,
-    flop = true
-})
-
-rt.current_scene.input:signal_connect("pressed", function()
-    os.execute("clear");
-end)
+local geometry = {
+    rt.RectangleCollider(world, rt.ColliderType.STATIC, 150, 150, 100, 100)
+}
 
 -- ######################
 
@@ -42,17 +30,19 @@ love.draw = function()
     rt.current_scene:draw()
 
     player:draw()
-    box:draw()
+    for _, geometry in pairs(geometry) do
+        geometry:draw()
+    end
 end
 
 love.update = function()
     local delta = love.timer.getDelta()
     rt.current_scene:update(delta)
-
-    scene._world:update(delta)
+    world:update(delta)
 end
 
 --[[
+
 
 rt.current_scene = rt.add_scene("debug")
 background = bt.BattleBackground("mint_wave")

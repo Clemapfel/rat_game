@@ -16,6 +16,7 @@ ow.Interactable = meta.new_type("Interactable", function(world, x, y, width, hei
         which(x, 0), which(y, 0),
         which(width, 0), which(height, 0)
     )
+    out._collider:set_userdata(out)
 
     out:signal_add("interact")
     out:signal_add("intersect")
@@ -30,5 +31,6 @@ end
 
 --- @overload
 function ow.Interactable:draw()
-    --love.graphics.rectangle("fill", bounds.x, bounds.y, bounds.width, bounds.height)
+
+    love.graphics.rectangle("fill", bounds.x, bounds.y, bounds.width, bounds.height)
 end

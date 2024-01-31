@@ -453,15 +453,11 @@ end)
 
 --- @brief
 function rt.InputController:is_down(key)
-
-
     return self._state[key] == true
 end
 
 --- @brief
 function rt.InputController:is_up(key)
-
-
     return self._state[key] == false
 end
 

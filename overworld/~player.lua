@@ -13,7 +13,7 @@ ow.Player = meta.new_type("Player", function(world)
     local out = meta.new(ow.Player, {
         _world = world,
         _collider = rt.CircleCollider(world, rt.ColliderType.DYNAMIC, 0, 0, radius),
-        _sensor = rt.CircleCollider(world, rt.ColliderType.KINEMATIC, 0, 0, radius),
+        --_sensor = rt.CircleCollider(world, rt.ColliderType.KINEMATIC, 0, 0, radius),
         _sensor_active = false,
 
         _debug_body = rt.Circle(0, 0, radius),
@@ -30,14 +30,10 @@ ow.Player = meta.new_type("Player", function(world)
         _input = {}, -- rt.InputController
         _direction = 0, -- radians
         _direction_active = false,
-        _is_sprinting = false,
-
-        _velocity_magnitude = 0,
-        _velocity_angle = 0, -- radians
+        _is_sprinting = false
     }, rt.Drawable, rt.Animation, rt.Widget)
 
-    out._sensor:set_disabled(false)
-    out._sensor:set_is_sensor(true)
+    --out._sensor:set_disabled(true)
 
     out._debug_body:set_is_outline(false)
     out._debug_body_outline:set_is_outline(true)
@@ -73,36 +69,16 @@ ow.Player = meta.new_type("Player", function(world)
     return out
 end)
 
-function ow.Player:_update_velocity_from_dpad()
-    local up = ternary(self._input:is_down(rt.InputButton.UP), -1, 0)
-    local right = ternary(self._input:is_down(rt.InputButton.RIGHT), 1, 0)
-    local down = ternary(self._input:is_down(rt.InputButton.DOWN), 1, 0)
-    local left = ternary(self._input:is_down(rt.InputButton.LEFT), -1, 0)
-
-    local x, y = (left + right), (up + down)
-
-    local angle = rt.angle(x, y)
-    local target = rt.settings.overworld.player.velocity
-    if self:get_is_sprinting() then
-        target = target * rt.settings.overworld.player.sprinting_velocity_factor
-    end
-
-    self._velocity_magnitude = rt.magnitude(x, y) * target
-    self._velocity_angle = angle
-    self:_update_velocity()
-end
-
 --- @brief [internal]
-function ow.Player:_update_velocity()
-    local x, y = rt.translate_point_by_angle(0, 0, self._velocity_magnitude, self._velocity_angle)
+function ow.Player:set_velocity(x, y)
     self._collider:set_linear_velocity(x, y)
-    self._sensor:set_linear_velocity(x, y)
 end
 
 --- @brief
 --- @return Number, Number
 function ow.Player:get_velocity()
-    return self._collider:get_linear_velocity()
+    return 0, 0
+    --return self._collider:get_linear_velocity()
 end
 
 --- @brief
@@ -117,17 +93,46 @@ end
 
 --- @brief [internal]
 function ow.Player._handle_button_pressed(_, button, self)
+
     if button == rt.InputButton.A then
         self._sensor_active = true
     end
 
-    if button == rt.InputButton.B then
-        self._is_sprinting = true
+    -- movement
+    --if button == rt.InputButton.L or button == rt.InputButton.R then
+
+    local sprinting_factor = rt.settings.overworld.player.sprinting_velocity_factor
+    if button == rt.InputButton.A then
+        self:set_is_sprinting(true)
+        local x, y = self:get_velocity()
+        self:set_velocity(x * sprinting_factor, y * sprinting_factor)
     end
 
-    if button == rt.InputButton.UP or button == rt.InputButton.RIGHT or button == rt.InputButton.DOWN or button == rt.InputButton.LEFT then
-        self:_update_velocity_from_dpad()
+    local up, right, down, left = 0, 0, 0, 0
+    local target = rt.settings.overworld.player.velocity
+    if self:get_is_sprinting() then target = target * sprinting_factor end
+
+    if button == rt.InputButton.UP then
+        up = target
     end
+
+    if button == rt.InputButton.RIGHT then
+        right = target
+    end
+
+    if button == rt.InputButton.DOWN then
+        down = target
+    end
+
+    if button == rt.InputButton.LEFT then
+        left = target
+    end
+
+    local x_velocity, y_velocity = self:get_velocity()
+    self:set_velocity(
+        x_velocity + right - left,
+        y_velocity + down - up
+    )
 end
 
 --- @brief [internal]
@@ -137,13 +142,36 @@ function ow.Player._handle_button_released(_, button, self)
         self._sensor_active = false
     end
 
-    if button == rt.InputButton.B then
-        self._is_sprinting = false
+    -- movement
+    local sprinting_factor = rt.settings.overworld.player.sprinting_velocity_factor
+    if button == rt.InputButton.A then
+        self:set_is_sprinting(false)
+        local x, y = self:get_velocity()
+        self:set_velocity(x / sprinting_factor, y / sprinting_factor)
     end
 
-    if button == rt.InputButton.UP or button == rt.InputButton.RIGHT or button == rt.InputButton.DOWN or button == rt.InputButton.LEFT then
-        self:_update_velocity_from_dpad()
+    local up, right, down, left = 0, 0, 0, 0
+    local target = rt.settings.overworld.player.velocity
+    if self:get_is_sprinting() then target = target * sprinting_factor end
+
+    if button == rt.InputButton.UP then
+        up = -1 * target
     end
+
+    if button == rt.InputButton.RIGHT then
+        right = -1 * target
+    end
+
+    if button == rt.InputButton.DOWN then
+        down = -1 * target
+    end
+
+    if button == rt.InputButton.LEFT then
+        left = -1 * target
+    end
+
+    local x_velocity, y_velocity = self:get_velocity()
+    self:set_velocity(x_velocity + right - left, y_velocity + down - up)
 end
 
 --- @brief [internal]
@@ -167,15 +195,10 @@ function ow.Player._handle_joystick(_, x, y, which, self)
         if self:get_is_sprinting() then
             target = target * rt.settings.overworld.player.sprinting_velocity_factor
         end
-
-        local angle = rt.angle(x, y)
+        self:set_velocity(target * x, target * y)
         if self._direction_active == false and magnitude > deadzone then
-            self._direction = angle
+            self._direction = rt.angle(x, y)
         end
-
-        self._velocity_magnitude = magnitude * target
-        self._velocity_angle = angle
-        self:_update_velocity()
     end
 end
 
@@ -191,10 +214,9 @@ function ow.Player:draw()
     self._debug_direction_outline:draw()
 
     if self._sensor_active == true then
-        love.graphics.push()
         love.graphics.setBlendMode("add", "premultiplied")
         self._debug_sensor:draw()
-        love.graphics.pop()
+        love.graphics.setBlendMode("alpha")
         self._debug_sensor_outline:draw()
     end
 end
@@ -242,9 +264,7 @@ function ow.Player._on_physics_update(_, self)
     self._debug_direction_outline:resize(up_x, up_y, tip_x, tip_y, down_x, down_y, back_x, back_y)
 
     -- sensor location
-    self._sensor:set_centroid(rt.translate_point_by_angle(x, y, radius, self._direction))
-
-    local center_x, center_y = self._sensor:get_centroid()
+    local center_x, center_y = rt.translate_point_by_angle(x, y, radius, self._direction)
     self._debug_sensor:resize(center_x, center_y, radius)
     self._debug_sensor_outline:resize(center_x, center_y, radius)
 end

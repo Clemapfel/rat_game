@@ -180,7 +180,7 @@ end
 
 require "overworld.overworld_scene"
 require "overworld.player"
-require "overworld.interactable"
+require "overworld.solid"
 
 require "scene"
 require "battle.battle_scene"

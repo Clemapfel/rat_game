@@ -68,3 +68,14 @@ rt.gaussian_increase = function(x, peak)
     peak = which(peak, 1)
     return (math.exp(-1 * ((2 * math.pi / 3) * (x - 1))^2))
 end
+
+--- @brief calculate skewed gaussian distribution propability
+--- @param x Number
+--- @param variance Number sqrt(sigma^2), unsigned number
+--- @param skewedness Number signed number
+--- @return Number p(x) under this distribution
+--- @see `https://www.desmos.com/calculator/olusu3ps3b`
+function rt.skewed_gaussian(x, mean, variance, skewedness)
+    x = (x - mean) / variance
+    return 2 * ((1 / (variance * math.sqrt(2 * math.pi))) * math.exp(-0.5 * x * x)) * (0.5 * (1 + math.erf(skewedness * x) / math.sqrt(2)))
+end

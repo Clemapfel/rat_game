@@ -44,6 +44,11 @@ end)
 --- @param body_x Number
 --- @param body_y Number
 function rt.PhysicsShape._draw(shape, body_x, body_y)
+
+    love.graphics.push()
+    love.graphics.setBlendMode("alpha")
+    love.graphics.setColor(1, 1, 1, 1)
+
     local type = shape:type()
     if type == "PolygonShape" then
         local local_points = {shape:getPoints()}
@@ -73,4 +78,6 @@ function rt.PhysicsShape._draw(shape, body_x, body_y)
         end
         love.graphics.lines(table.unpack(local_points))
     end
+
+    love.graphics.pop()
 end

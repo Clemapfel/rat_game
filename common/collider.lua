@@ -8,17 +8,19 @@ rt.ColliderType = meta.new_enum({
 --- @class rt.Collider
 --- @param world rt.PhysicsWorld
 --- @param type rt.ColliderType
---- @param shape rt.Shape
-rt.Collider = meta.new_type("Collider", function(world, type, shape, pos_x, pos_y)
+--- @param shape rt.PhysicsShape
+rt.Collider = meta.new_type("Collider", function(world, type, shapes, pos_x, pos_y)
     local out = meta.new(rt.Collider, {
         _shape_type = shape_type,
-        _body = {},       -- love.physics.Body
-        _fixtures = {},   -- Table<love.physics.Fixture>
+        _shapes = shapes,  -- Table<love.physics.Shape>
+        _fixtures = {},    -- Table<love.physics.Fixture>
         _world = world
     }, rt.Drawable)
 
     out._body = love.physics.newBody(world._native, pos_x, pos_y, type)
-    table.insert(out._fixtures, love.physics.newFixture(out._body, shape._native, 1))
+    for _, shape in pairs(shapes) do
+        table.insert(out._fixtures, love.physics.newFixture(out._body, shape._native, 1))
+    end
     return out
 end)
 
@@ -55,6 +57,18 @@ end
 --- @brief
 function rt.Collider:destroy()
     self._body:destroy()
+end
+
+--- @brief
+function rt.Collider:set_is_sensor(b)
+    for _, fixture in pairs(self._fixtures) do
+        fixture:setSensor(b)
+    end
+end
+
+--- @brief
+function rt.Collider:set_userdata(x)
+    self._body:set_userdata(x)
 end
 
 --- @brief
@@ -105,6 +119,11 @@ function rt.Collider:get_centroid()
 end
 
 --- @brief
+function rt.Collider:set_centroid(x, y)
+    self._body:setPosition(x, y)
+end
+
+--- @brief
 function rt.Collider:set_mass(x)
     self._body:setMass(x)
 end
@@ -141,7 +160,7 @@ function rt.RectangleCollider(world, type, top_left_x, top_left_y, width, height
         0, 0,
         width, height
     )
-    return rt.Collider(world, type, shape, center_x, center_y)
+    return rt.Collider(world, type, {shape}, center_x, center_y)
 end
 
 --- @brief triangle, centroid is origin
@@ -153,14 +172,14 @@ function rt.TriangleCollider(world, type, ax, ay, bx, by, cx, cy)
         bx - center_x, by - center_y,
         cx - center_x, by - center_y
     )
-    return rt.Collider(world, type, shape, center_x, center_y)
+    return rt.Collider(world, type, {shape}, center_x, center_y)
 end
 
 --- @brief circle collider, center is origin
 --- @return rt.Collider
 function rt.CircleCollider(world, type, center_x, center_y, radius)
     local shape = rt.PhysicsShape(rt.PhysicsShapeType.CIRCLE, 0, 0, radius)
-    return rt.Collider(world, type, shape, center_x, center_y)
+    return rt.Collider(world, type, {shape}, center_x, center_y)
 end
 
 --- @brief line segment, centroid is origin
@@ -171,5 +190,8 @@ function rt.LineCollider(world, type, ax, ay, bx, by)
         ax - center_x, ay - center_y,
         bx - center_x, by - center_y
     )
-    return rt.Collider(world, type, shape, center_x, center_y)
+    return rt.Collider(world, type, {shape}, center_x, center_y)
 end
+
+
+
