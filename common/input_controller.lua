@@ -1,7 +1,7 @@
 rt.settings.input = {}
 rt.settings.input = {
     trigger_threshold = 0.1,
-    deadzone = 0.05,
+    deadzone = 0.25,
     convert_left_trigger_to_dpad = false,
     convert_right_trigger_to_dpad = false
 }
@@ -246,54 +246,54 @@ rt.InputController = meta.new_type("InputController", function(holder)
 
         if which_axis == rt.GamepadAxis.LEFT_X or which_axis == rt.GamepadAxis.LEFT_Y then
             local x, y = rt.GamepadHandler.get_axes(id, rt.GamepadAxis.LEFT_X, rt.GamepadAxis.LEFT_Y)
+            if rt.magnitude(x, y) < rt.settings.input.deadzone then
+                x, y = 0, 0
+            end
+
             if not self._is_disabled then
                 self:signal_emit("joystick", x, y, rt.JoystickPosition.LEFT)
             end
 
             if rt.settings.input.convert_left_trigger_to_dpad then
-                local distance = math.sqrt((x - 0)^2 + (y - 0)^2)
-                local angle = rt.radians(math.atan2(x - 0, y - 0)):as_degrees()
-
-                if distance >= rt.settings.input.deadzone then
-                    if in_range(angle, 180 - 45, 180) or in_range(angle, -180 + 45, -180) then -- top
-                        if self._state[rt.InputButton.UP] == false then
-                            self._state[rt.InputButton.UP] = true
-                            self._state[rt.InputButton.DOWN] = false
-                            self._state[rt.InputButton.LEFT] = false
-                            self._state[rt.InputButton.RIGHT] = false
-                            if not self._is_disabled then
-                                self:signal_emit("pressed", rt.InputButton.UP)
-                            end
+                local angle = rt.radians(rt.angle(x, y)):as_degrees()
+                if in_range(angle, 180 - 45, 180) or in_range(angle, -180 + 45, -180) then -- top
+                    if self._state[rt.InputButton.UP] == false then
+                        self._state[rt.InputButton.UP] = true
+                        self._state[rt.InputButton.DOWN] = false
+                        self._state[rt.InputButton.LEFT] = false
+                        self._state[rt.InputButton.RIGHT] = false
+                        if not self._is_disabled then
+                            self:signal_emit("pressed", rt.InputButton.UP)
                         end
-                    elseif in_range(angle, 90 + 45, 90 - 45) then -- right
-                        if self._state[rt.InputButton.RIGHT] == false then
-                            self._state[rt.InputButton.UP] = false
-                            self._state[rt.InputButton.DOWN] = false
-                            self._state[rt.InputButton.LEFT] = false
-                            self._state[rt.InputButton.RIGHT] = true
-                            if not self._is_disabled then
-                                self:signal_emit("pressed", rt.InputButton.RIGHT)
-                            end
+                    end
+                elseif in_range(angle, 90 + 45, 90 - 45) then -- right
+                    if self._state[rt.InputButton.RIGHT] == false then
+                        self._state[rt.InputButton.UP] = false
+                        self._state[rt.InputButton.DOWN] = false
+                        self._state[rt.InputButton.LEFT] = false
+                        self._state[rt.InputButton.RIGHT] = true
+                        if not self._is_disabled then
+                            self:signal_emit("pressed", rt.InputButton.RIGHT)
                         end
-                    elseif in_range(angle, 0 - 45, 0 + 45) then -- bottom
-                        if self._state[rt.InputButton.DOWN] == false then
-                            self._state[rt.InputButton.UP] = false
-                            self._state[rt.InputButton.DOWN] = true
-                            self._state[rt.InputButton.LEFT] = false
-                            self._state[rt.InputButton.RIGHT] = false
-                            if not self._is_disabled then
-                                self:signal_emit("pressed", rt.InputButton.DOWN)
-                            end
+                    end
+                elseif in_range(angle, 0 - 45, 0 + 45) then -- bottom
+                    if self._state[rt.InputButton.DOWN] == false then
+                        self._state[rt.InputButton.UP] = false
+                        self._state[rt.InputButton.DOWN] = true
+                        self._state[rt.InputButton.LEFT] = false
+                        self._state[rt.InputButton.RIGHT] = false
+                        if not self._is_disabled then
+                            self:signal_emit("pressed", rt.InputButton.DOWN)
                         end
-                    elseif  in_range(angle, -90 - 45, -90 + 45) then -- left
-                        if self._state[rt.InputButton.LEFT] == false then
-                            self._state[rt.InputButton.UP] = false
-                            self._state[rt.InputButton.DOWN] = false
-                            self._state[rt.InputButton.LEFT] = true
-                            self._state[rt.InputButton.RIGHT] = false
-                            if not self._is_disabled then
-                                self:signal_emit("pressed", rt.InputButton.LEFT)
-                            end
+                    end
+                elseif  in_range(angle, -90 - 45, -90 + 45) then -- left
+                    if self._state[rt.InputButton.LEFT] == false then
+                        self._state[rt.InputButton.UP] = false
+                        self._state[rt.InputButton.DOWN] = false
+                        self._state[rt.InputButton.LEFT] = true
+                        self._state[rt.InputButton.RIGHT] = false
+                        if not self._is_disabled then
+                            self:signal_emit("pressed", rt.InputButton.LEFT)
                         end
                     end
                 end
@@ -302,6 +302,10 @@ rt.InputController = meta.new_type("InputController", function(holder)
 
         if which_axis == rt.GamepadAxis.RIGHT_X or which_axis == rt.GamepadAxis.RIGHT_Y then
             local x, y = rt.GamepadHandler.get_axes(id, rt.GamepadAxis.RIGHT_X, rt.GamepadAxis.RIGHT_Y)
+
+            if rt.magnitude(x, y) < rt.settings.input.deadzone then
+                x, y = 0, 0
+            end
 
             if not self._is_disabled then
                 self:signal_emit("joystick", x, y, rt.JoystickPosition.RIGHT)

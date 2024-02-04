@@ -8,8 +8,17 @@ scene = ow.OverworldScene()
 world = scene._world
 player = ow.Player(world)
 
+player._collider:set_allow_sleeping(false)
+player._sensor:set_allow_sleeping(false)
+
 local geometry = {
-    rt.RectangleCollider(world, rt.ColliderType.STATIC, 150, 150, 100, 100)
+    ow.InteractTrigger(world, 150, 150, 100, 100, function(self, player)
+        self._shape:set_color(rt.HSVA(rt.random.number(0, 1), 1, 1, 1))
+    end),
+
+    ow.IntersectTrigger(world, 300, 150, 100, 100, function(self, player)
+        self._shape:set_color(rt.HSVA(rt.random.number(0, 1), 1, 1, 1))
+    end)
 }
 
 -- ######################

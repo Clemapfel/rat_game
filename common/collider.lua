@@ -6,6 +6,7 @@ rt.ColliderType = meta.new_enum({
 })
 
 --- @class rt.Collider
+--- @signal contact (self, rt.Collider, rt.ContactInfo) ->
 --- @param world rt.PhysicsWorld
 --- @param type rt.ColliderType
 --- @param shape rt.PhysicsShape
@@ -14,15 +15,42 @@ rt.Collider = meta.new_type("Collider", function(world, type, shapes, pos_x, pos
         _shape_type = shape_type,
         _shapes = shapes,  -- Table<love.physics.Shape>
         _fixtures = {},    -- Table<love.physics.Fixture>
-        _world = world
-    }, rt.Drawable)
+        _is_sensor = false,
+        _world = world,
+        _userdata = {}
+    }, rt.Drawable, rt.SignalEmitter)
 
     out._body = love.physics.newBody(world._native, pos_x, pos_y, type)
     for _, shape in pairs(shapes) do
         table.insert(out._fixtures, love.physics.newFixture(out._body, shape._native, 1))
     end
+
+    out:signal_add("contact_begin")
+    out:signal_add("contact_end")
+
+    out._userdata.self = out
+    out:_update_userdata()
     return out
 end)
+
+--- @brief [internal]
+function rt.Collider:_update_userdata()
+    self._body:setUserData(self._userdata)
+end
+
+--- @brief
+function rt.Collider:add_userdata(key, value)
+    if key == "self" then
+        rt.warning("In rt.Collider: overriding key `self`, which is reserved for rt.Collider")
+    end
+    self._userdata[key] = value
+    self:_update_userdata()
+end
+
+--- @brief
+function rt.Collider:get_userdata(key)
+    return self._userdata[key]
+end
 
 --- @brief
 --- @return Number, Number
@@ -33,6 +61,11 @@ end
 --- @brief
 function rt.Collider:set_position(x, y)
     self._body:setPosition(x, y)
+end
+
+--- @brief
+function rt.Collider:set_allow_sleeping(b)
+    self._body:isSleepingAllowed(b)
 end
 
 --- @brief
@@ -61,14 +94,15 @@ end
 
 --- @brief
 function rt.Collider:set_is_sensor(b)
+    self._is_sensor = b
     for _, fixture in pairs(self._fixtures) do
         fixture:setSensor(b)
     end
 end
 
 --- @brief
-function rt.Collider:set_userdata(x)
-    self._body:set_userdata(x)
+function rt.Collider:get_is_sensor()
+    return self._is_sensor
 end
 
 --- @brief

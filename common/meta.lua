@@ -44,7 +44,7 @@ function meta.is_function(x)
     end
 end
 
-meta._hash = 2^16
+meta._hash = 1
 
 --- @brief [internal] Create new empty object
 --- @param typename String

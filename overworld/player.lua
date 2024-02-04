@@ -13,7 +13,7 @@ ow.Player = meta.new_type("Player", function(world)
     local out = meta.new(ow.Player, {
         _world = world,
         _collider = rt.CircleCollider(world, rt.ColliderType.DYNAMIC, 0, 0, radius),
-        _sensor = rt.CircleCollider(world, rt.ColliderType.KINEMATIC, 0, 0, radius),
+        _sensor = rt.CircleCollider(world, rt.ColliderType.DYNAMIC, 0, 0, radius),
         _sensor_active = false,
 
         _debug_body = rt.Circle(0, 0, radius),
@@ -36,7 +36,7 @@ ow.Player = meta.new_type("Player", function(world)
         _velocity_angle = 0, -- radians
     }, rt.Drawable, rt.Animation, rt.Widget)
 
-    out._sensor:set_disabled(false)
+    out._sensor:set_disabled(true)
     out._sensor:set_is_sensor(true)
 
     out._debug_body:set_is_outline(false)
@@ -70,26 +70,46 @@ ow.Player = meta.new_type("Player", function(world)
     out._world:signal_connect("update", ow.Player._on_physics_update, out)
     out:set_is_animated(true)
 
+    out._sensor:set_allow_sleeping(false)
+
+    -- sensor: triggers InteractTrigger
+    out._sensor:signal_connect("contact_begin", function(_, other, self)
+        if other ~= out._collider then -- prevent sensor and player colliding
+            local instance = other:get_userdata("instance")
+            if meta.isa(instance, ow.InteractTrigger) then
+                if self._sensor_active then
+                    instance:signal_emit("activate", self)
+                    self._sensor_active = false
+                end
+            end
+        end
+    end, out)
+
+    -- body: triggers IntersectTrigger
+    local on_intersect = function(_, other, self)
+        if other ~= out._sensor then
+            local instance = other:get_userdata("instance")
+            if meta.isa(instance, ow.IntersectTrigger) then
+                instance:signal_emit("activate", self)
+            end
+        end
+    end
+    out._collider:signal_connect("contact_begin", on_intersect, out)
+    out._collider:signal_connect("contact_end", on_intersect, out)
+
     return out
 end)
 
-function ow.Player:_update_velocity_from_dpad()
-    local up = ternary(self._input:is_down(rt.InputButton.UP), -1, 0)
-    local right = ternary(self._input:is_down(rt.InputButton.RIGHT), 1, 0)
-    local down = ternary(self._input:is_down(rt.InputButton.DOWN), 1, 0)
-    local left = ternary(self._input:is_down(rt.InputButton.LEFT), -1, 0)
+--- @brief [internal]
+function ow.Player._on_contact(_, other, self)
 
-    local x, y = (left + right), (up + down)
+end
 
-    local angle = rt.angle(x, y)
-    local target = rt.settings.overworld.player.velocity
-    if self:get_is_sprinting() then
-        target = target * rt.settings.overworld.player.sprinting_velocity_factor
-    end
-
-    self._velocity_magnitude = rt.magnitude(x, y) * target
-    self._velocity_angle = angle
-    self:_update_velocity()
+--- @brief [internal]
+function ow.Player:_set_sensor_active(b)
+    self._sensor_active = b
+    self._sensor:set_disabled(not b)
+    self._sensor:set_linear_velocity(0, 0)
 end
 
 --- @brief [internal]
@@ -115,10 +135,34 @@ function ow.Player:get_is_sprinting()
     return self._is_sprinting
 end
 
+function ow.Player:_update_velocity_from_dpad()
+    local up = ternary(self._input:is_down(rt.InputButton.UP), -1, 0)
+    local right = ternary(self._input:is_down(rt.InputButton.RIGHT), 1, 0)
+    local down = ternary(self._input:is_down(rt.InputButton.DOWN), 1, 0)
+    local left = ternary(self._input:is_down(rt.InputButton.LEFT), -1, 0)
+
+    local x, y = (left + right), (up + down)
+
+    local angle = rt.angle(x, y)
+    local target = rt.settings.overworld.player.velocity
+    if self:get_is_sprinting() then
+        target = target * rt.settings.overworld.player.sprinting_velocity_factor
+    end
+
+    self._velocity_magnitude = rt.magnitude(x, y) * target
+    self._velocity_angle = angle
+
+    if x + y ~= 0 then
+        self._direction = angle
+    end
+    self:_update_velocity()
+end
+
+
 --- @brief [internal]
 function ow.Player._handle_button_pressed(_, button, self)
     if button == rt.InputButton.A then
-        self._sensor_active = true
+        self:_set_sensor_active(true)
     end
 
     if button == rt.InputButton.B then
@@ -134,7 +178,7 @@ end
 function ow.Player._handle_button_released(_, button, self)
 
     if button == rt.InputButton.A then
-        self._sensor_active = false
+        self:_set_sensor_active(false)
     end
 
     if button == rt.InputButton.B then
@@ -175,6 +219,10 @@ function ow.Player._handle_joystick(_, x, y, which, self)
 
         self._velocity_magnitude = magnitude * target
         self._velocity_angle = angle
+
+        if magnitude > 0.01 then
+            self._direction = angle
+        end
         self:_update_velocity()
     end
 end
@@ -194,6 +242,7 @@ function ow.Player:draw()
         love.graphics.push()
         love.graphics.setBlendMode("add", "premultiplied")
         self._debug_sensor:draw()
+        love.graphics.setBlendMode("alpha")
         love.graphics.pop()
         self._debug_sensor_outline:draw()
     end
@@ -247,6 +296,7 @@ function ow.Player._on_physics_update(_, self)
     local center_x, center_y = self._sensor:get_centroid()
     self._debug_sensor:resize(center_x, center_y, radius)
     self._debug_sensor_outline:resize(center_x, center_y, radius)
+
 end
 
 --- @overload
