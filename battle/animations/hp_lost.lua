@@ -112,7 +112,7 @@ function bt.Animation.HP_LOST:update(delta)
         local w, h = label:get_size()
         local cutoff = 0.4 -- hold at position 0 for 0.3 * duration, then simulate exponential fall
         local post_cutoff_acceleration = 1.5
-        local label_fraction = ternary(fraction < cutoff, 0, rt.exponential_acceleration((fraction - cutoff) * post_cutoff_acceleration))
+        local label_fraction = ternary(fraction < cutoff, 0, rt.exponential_acceleration((fraction - cutoff) / (1 - cutoff) * post_cutoff_acceleration))
         local pos_x, pos_y = self._label_paths[i]:at(label_fraction)
         label:fit_into(pos_x - 0.5 * w, pos_y, w, h)
 

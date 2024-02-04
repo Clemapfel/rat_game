@@ -1,5 +1,5 @@
 rt.settings.battle_animation.hp_lost = {
-    duration = 1, -- seconds
+    duration = 2, -- seconds
 }
 
 --- @class
@@ -15,6 +15,7 @@ bt.Animation.PLACEHOLDER = meta.new_type("PLACEHOLDER", function(targets, values
 
         _labels = {},       -- Table<rt.Label>
         _label_snapshots = {},    -- Table<rt.SnapshotLayout>
+        _color = rt.Palette.YELLOW_2,
 
         _elapsed = 0,
 
@@ -29,6 +30,7 @@ bt.Animation.PLACEHOLDER = meta.new_type("PLACEHOLDER", function(targets, values
         local label_snapshot = rt.SnapshotLayout()
         table.insert(out._label_snapshots, label_snapshot)
         label_snapshot:set_child(label)
+        label_snapshot:set_color(out._color)
     end
     return out
 end)
@@ -42,11 +44,11 @@ function bt.Animation.PLACEHOLDER:start()
         local label_w, label_h = label:get_size()
 
         local bounds = self._targets[i]:get_bounds()
-        local start_x, start_y = bounds.x + 0.5 * bounds.width - 0.5 * label_w, bounds.y + 0.75  * bounds.height - 0.5 * label_h
+        local start_x, start_y = bounds.x + 0.5 * bounds.width - 0.5 * label_w, bounds.y + 0.5  * bounds.height - 0.5 * label_h
 
         local vertices = {
             start_x, start_y,
-            start_x, start_y - bounds.height * 1.5
+            start_x, bounds.y
         }
         table.insert(self._label_paths, rt.Spline(vertices))
     end
@@ -62,9 +64,9 @@ function bt.Animation.PLACEHOLDER:update(delta)
         -- label animation
         local label = self._label_snapshots[i]
         local w, h = label:get_size()
-        local cutoff = 0.4 -- hold at position 0 for 0.3 * duration, then simulate exponential fall
+        local cutoff = 0.8
         local post_cutoff_acceleration = 1.5
-        local label_fraction = ternary(fraction < cutoff, 0, rt.exponential_acceleration((fraction - cutoff) * post_cutoff_acceleration))
+        local label_fraction = ternary(fraction < cutoff, 0, rt.linear((fraction - cutoff) / (1 - cutoff) * post_cutoff_acceleration))
         local pos_x, pos_y = self._label_paths[i]:at(label_fraction)
         label:fit_into(pos_x, pos_y, w, h)
 
@@ -75,8 +77,8 @@ function bt.Animation.PLACEHOLDER:update(delta)
         end
 
         local min_scale = 1
-        local max_scale = 2
-        self._label_snapshots[i]:set_scale(mix(min_scale, max_scale, clamp(fraction, 0, 1)))
+        local max_scale = 1.5
+        self._label_snapshots[i]:set_scale(mix(min_scale, max_scale, clamp(fraction * 3, 0, 1)))
     end
 
     return self._elapsed < duration

@@ -18,7 +18,8 @@ rt.SnapshotLayout = meta.new_type("SnapshotLayout", function()
         _origin_y = 0.5,
         _invert = false,
         _mix_color = rt.RGBA(1, 1, 1, 1),
-        _mix_weight = 0
+        _mix_weight = 0,
+        _vertex_color = rt.RGBA(1, 1, 1, 1)
     }, rt.Drawable, rt.Widget)
     return out
 end)
@@ -54,6 +55,7 @@ function rt.SnapshotLayout:draw()
     self._shader:send("_mix_color", {self._mix_color.r, self._mix_color.g, self._mix_color.b, self._mix_color.a})
     self._shader:send("_mix_weight", self._mix_weight)
     self._shader:send("_invert", self._invert)
+    self._shader:send("_vertex_color", {self._vertex_color.r, self._vertex_color.g, self._vertex_color.b, self._vertex_color.a})
 
     local bounds = self:get_bounds()
     local x_offset, y_offset = bounds.x + self._origin_x * bounds.width, bounds.y + self._origin_y * bounds.height
@@ -115,6 +117,12 @@ function rt.SnapshotLayout:set_color_offsets(r, g, b, h, s, v, a)
     self._hsv_offsets[2] = which(s, 0)
     self._hsv_offsets[3] = which(v, 0)
     self._alpha_offset = which(a, 0)
+end
+
+--- @brief sets vertex colors
+function rt.SnapshotLayout:set_color(rgba)
+    if meta.is_hsva(rgba) then rgba = rt.hsva_to_rgba(rgba) end
+    self._vertex_color = rgba
 end
 
 --- @brief
