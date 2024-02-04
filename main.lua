@@ -4,59 +4,6 @@ rt.current_scene = rt.add_scene("debug")
 background = bt.BattleBackground("mint_wave")
 rt.current_scene:set_child(background)
 
-scene = ow.OverworldScene()
-world = scene._world
-player = ow.Player(world)
-
-player._collider:set_allow_sleeping(false)
-player._sensor:set_allow_sleeping(false)
-
-local geometry = {
-    ow.InteractTrigger(world, 150, 150, 100, 100, function(self, player)
-        self._shape:set_color(rt.HSVA(rt.random.number(0, 1), 1, 1, 1))
-    end),
-
-    ow.IntersectTrigger(world, 300, 150, 100, 100, function(self, player)
-        self._shape:set_color(rt.HSVA(rt.random.number(0, 1), 1, 1, 1))
-    end)
-}
-
--- ######################
-
-love.load = function()
-    love.window.setMode(800, 600, {
-        vsync = 1,
-        msaa = 8,
-        stencil = true,
-        resizable = true
-    })
-    love.window.setTitle("rat_game")
-    rt.current_scene:run()
-end
-
-love.draw = function()
-    love.graphics.clear(1, 0, 1, 1)
-    rt.current_scene:draw()
-
-    player:draw()
-    for _, geometry in pairs(geometry) do
-        geometry:draw()
-    end
-end
-
-love.update = function()
-    local delta = love.timer.getDelta()
-    rt.current_scene:update(delta)
-    world:update(delta)
-end
-
---[[
-
-
-rt.current_scene = rt.add_scene("debug")
-background = bt.BattleBackground("mint_wave")
-rt.current_scene:set_child(background)
-
 sprites = {}
 for i = 1, 5 do
     local color = rt.random.choose({"RED", "GREEN", "BLUE", "PINK", "PURPLE"})
@@ -88,7 +35,7 @@ rt.current_scene.input:signal_connect("pressed", function(_, which)
     end
 
     if which == rt.InputButton.A then
-        state_queue:push_back(bt.Animation.PROTECT(sprites))
+        state_queue:push_back(bt.Animation.PLACEHOLDER(sprites, table.rep("TEST", #sprites)))
     elseif which == rt.InputButton.B then
         state_queue:push_back(bt.Animation.HP_LOST(sprites, values))
     elseif which == rt.InputButton.X then
@@ -137,5 +84,53 @@ love.update = function()
     local delta = love.timer.getDelta()
     rt.current_scene:update(delta)
     state_queue:update(delta)
+end
+
+--[[
+
+scene = ow.OverworldScene()
+world = scene._world
+player = ow.Player(world)
+
+player._collider:set_allow_sleeping(false)
+player._sensor:set_allow_sleeping(false)
+
+local geometry = {
+    ow.InteractTrigger(world, 150, 150, 100, 100, function(self, player)
+        self._shape:set_color(rt.HSVA(rt.random.number(0, 1), 1, 1, 1))
+    end),
+
+    ow.IntersectTrigger(world, 300, 150, 100, 100, function(self, player)
+        self._shape:set_color(rt.HSVA(rt.random.number(0, 1), 1, 1, 1))
+    end)
+}
+
+-- ######################
+
+love.load = function()
+    love.window.setMode(800, 600, {
+        vsync = 1,
+        msaa = 8,
+        stencil = true,
+        resizable = true
+    })
+    love.window.setTitle("rat_game")
+    rt.current_scene:run()
+end
+
+love.draw = function()
+    love.graphics.clear(1, 0, 1, 1)
+    rt.current_scene:draw()
+
+    player:draw()
+    for _, geometry in pairs(geometry) do
+        geometry:draw()
+    end
+end
+
+love.update = function()
+    local delta = love.timer.getDelta()
+    rt.current_scene:update(delta)
+    world:update(delta)
 end
 ]]--

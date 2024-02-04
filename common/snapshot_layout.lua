@@ -56,7 +56,6 @@ function rt.SnapshotLayout:draw()
     self._shader:send("_invert", self._invert)
 
     local bounds = self:get_bounds()
-    dbg(self._origin_x, self._origin_y)
     local x_offset, y_offset = bounds.x + self._origin_x * bounds.width, bounds.y + self._origin_y * bounds.height
     love.graphics.push()
     love.graphics.translate(x_offset, y_offset)
@@ -74,6 +73,7 @@ function rt.SnapshotLayout:size_allocate(x, y, width, height)
     local canvas_w, canvas_h = self._canvas:get_size()
     self._position_x = x
     self._position_y = y
+    self._bounds = rt.AABB(x, y, width, height)
 
     if meta.is_widget(self._child) and not self._is_locked then
         self._child:fit_into(rt.AABB(0, 0, width, height))
@@ -134,7 +134,7 @@ end
 --- @brief
 function rt.SnapshotLayout:set_scale(x, y)
     self._scale_x = which(x, 1)
-    self._scale_y = which(y, 1)
+    self._scale_y = which(y, x)
 end
 
 --- @brief
