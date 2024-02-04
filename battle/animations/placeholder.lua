@@ -17,10 +17,12 @@ bt.Animation.PLACEHOLDER = meta.new_type("PLACEHOLDER", function(targets, values
         _label_snapshots = {},    -- Table<rt.SnapshotLayout>
         _color = rt.Palette.YELLOW_2,
 
+        _target_snapshots = {},
+
         _elapsed = 0,
 
         _label_paths = {},  -- Table<rt.Spline>
-        _label_scales = {}  -- Table<rt.Spline>
+        _target_paths = {}, -- Table<rt.Spline>
     }, rt.StateQueueState)
 
     for i = 1, out._n_targets do
@@ -31,6 +33,11 @@ bt.Animation.PLACEHOLDER = meta.new_type("PLACEHOLDER", function(targets, values
         table.insert(out._label_snapshots, label_snapshot)
         label_snapshot:set_child(label)
         label_snapshot:set_color(out._color)
+
+        local target_snapshot = rt.SnapshotLayout()
+        table.insert(out._target_snapshots, target_snapshot)
+        target_snapshot:set_mix_color(out._color)
+        target_snapshot:set_mix_weight(0)
     end
     return out
 end)
@@ -51,6 +58,21 @@ function bt.Animation.PLACEHOLDER:start()
             start_x, bounds.y
         }
         table.insert(self._label_paths, rt.Spline(vertices))
+
+        local target = self._targets[i]
+        local snapshot = self._target_snapshots[i]
+        snapshot:realize()
+        snapshot:fit_into(target:get_bounds())
+        snapshot:snapshot(target)
+        target:set_is_visible(false)
+
+        local offset = 0.1
+        table.insert(self._target_paths, rt.Spline({
+            0, 0,
+            -1 * offset * bounds.width, 0,
+            offset * bounds.width, 0,
+            0, 0,
+        }))
     end
 end
 
@@ -79,6 +101,18 @@ function bt.Animation.PLACEHOLDER:update(delta)
         local min_scale = 1
         local max_scale = 1.5
         self._label_snapshots[i]:set_scale(mix(min_scale, max_scale, clamp(fraction * 3, 0, 1)))
+
+        -- target animation
+        local speed = 2
+        local target = self._target_snapshots[i]
+        local current = target:get_bounds()
+        local offset_x, offset_y = self._target_paths[i]:at(rt.linear(speed * fraction))
+        target:set_position_offset(offset_x, offset_y)
+        target:set_mix_weight(rt.symmetrical_linear(speed * fraction, 0.6))
+
+        if speed * fraction > 1 then
+            target:set_invert(false)
+        end
     end
 
     return self._elapsed < duration
@@ -86,11 +120,16 @@ end
 
 --- @overload
 function bt.Animation.PLACEHOLDER:finish()
+    for i = 1, self._n_targets do
+        local target = self._targets[i]
+        target:set_is_visible(true)
+    end
 end
 
 --- @overload
 function bt.Animation.PLACEHOLDER:draw()
     for i = 1, self._n_targets do
+        self._target_snapshots[i]:draw()
         self._label_snapshots[i]:draw()
     end
 end

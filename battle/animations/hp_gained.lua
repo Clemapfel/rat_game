@@ -82,8 +82,6 @@ function bt.Animation.HP_GAINED:start()
         local finish_x, finish_y = bounds.x + bounds.width * 0.5, bounds.y - bounds.height * 1/3
         table.insert(self._label_paths, rt.Spline({start_x, start_y, finish_x, finish_y}))
 
-        local left_x, left_y = bounds.x + bounds.width * 0.5 - label_w, bounds.y
-        local right_x, right_y = bounds.x + bounds.width * 0.5 + label_w, bounds.y
         local offset = 0.05
         table.insert(self._target_paths, rt.Spline({
               0, 0,
