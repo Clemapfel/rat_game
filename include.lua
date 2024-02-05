@@ -183,6 +183,8 @@ require "overworld.player"
 require "overworld.interact_trigger"
 require "overworld.intersect_trigger"
 
+require "overworld.tileset"
+require "overworld.map"
 
 require "scene"
 require "battle.battle_scene"

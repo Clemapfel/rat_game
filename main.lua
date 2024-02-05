@@ -1,6 +1,39 @@
 require("include")
 
 rt.current_scene = rt.add_scene("debug")
+
+debug_tileset = ow.Tileset("debug_tileset", "assets/maps/debug")
+carpet_tileset = ow.Tileset("carpet", "assets/maps/debug")
+println(serialize(meta.get_properties(debug_tileset)))
+
+love.load = function()
+    love.window.setMode(800, 600, {
+        vsync = 1,
+        msaa = 8,
+        stencil = true,
+        resizable = true
+    })
+    love.window.setTitle("rat_game")
+    rt.current_scene:run()
+end
+
+love.draw = function()
+    love.graphics.clear(1, 0, 1, 1)
+    rt.current_scene:draw()
+
+    debug_tileset:draw()
+    carpet_tileset:draw()
+end
+
+love.update = function()
+    local delta = love.timer.getDelta()
+    rt.current_scene:update(delta)
+end
+
+
+--[[
+
+rt.current_scene = rt.add_scene("debug")
 background = bt.BattleBackground("mint_wave")
 rt.current_scene:set_child(background)
 

@@ -2,8 +2,6 @@
 --- @param path String path prefix, not absolute path
 --- @param id String spritsheet ID, expects <ID>.png and <ID>.lua to be in `path`
 rt.Spritesheet = meta.new_type("Spritesheet", function(path, id)
-
-
     local config_path = path .. "/" .. id .. ".lua"
     local image_path = path .. "/" .. id .. ".png"
 

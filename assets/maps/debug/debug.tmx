@@ -1,7 +1,10 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<map version="1.10" tiledversion="1.10.2" orientation="orthogonal" renderorder="right-down" width="30" height="30" tilewidth="32" tileheight="32" infinite="0" nextlayerid="4" nextobjectid="30">
+<map version="1.10" tiledversion="1.10.2" orientation="orthogonal" renderorder="right-down" width="30" height="30" tilewidth="32" tileheight="32" infinite="0" nextlayerid="4" nextobjectid="34">
+ <editorsettings>
+  <export target="debug.lua" format="lua"/>
+ </editorsettings>
  <tileset firstgid="1" source="debug_tileset.tsx"/>
- <tileset firstgid="21" source="carpet.tsx"/>
+ <tileset firstgid="22" source="carpet.tsx"/>
  <layer id="1" name="tile_layer" width="30" height="30">
   <data encoding="csv">
 5,8,8,8,8,8,8,8,8,8,8,8,8,8,8,8,8,8,8,8,8,8,8,8,8,8,8,8,8,5,
@@ -12,11 +15,11 @@
 7,0,14,8,8,15,0,0,14,15,0,0,14,15,0,0,9,7,1,1,0,0,14,15,0,0,9,7,0,9,
 7,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,9,7,0,0,0,0,0,0,0,0,9,7,0,9,
 7,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,9,7,4,0,0,0,0,0,0,0,9,7,0,9,
-7,0,0,2,2,2,2,2,2,0,0,0,0,0,0,0,9,5,6,6,6,6,6,13,0,0,9,7,0,9,
-7,0,0,2,2,2,2,2,2,0,0,0,0,0,0,0,14,8,8,8,8,8,8,15,0,0,14,15,0,9,
+7,0,0,2,2,2,2,2,2,0,0,0,0,0,0,0,9,5,6,6,6,6,6,6,6,6,5,7,0,9,
+7,0,0,2,2,2,2,2,2,0,0,0,0,0,0,0,14,8,8,8,8,8,8,8,8,8,8,15,0,9,
 7,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1,0,9,
 7,0,0,2,2,2,2,2,2,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,9,
-7,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,9,
+7,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,2,0,9,
 7,0,0,12,6,6,6,6,13,0,0,0,0,0,0,0,0,0,0,0,0,0,12,11,11,17,0,0,0,9,
 7,0,0,14,8,8,8,8,15,0,0,0,0,0,0,0,0,0,0,0,0,0,10,0,0,0,0,0,0,9,
 7,0,0,4,0,0,0,0,4,0,0,0,0,0,0,0,0,0,0,0,0,0,10,4,0,0,0,16,0,9,
@@ -30,7 +33,7 @@
 7,0,0,12,6,6,6,13,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,9,
 7,0,0,9,0,0,1,7,0,0,12,6,6,13,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,9,
 7,0,0,9,0,3,1,7,0,0,9,3,3,7,0,0,0,12,6,13,0,0,0,0,0,0,0,0,0,9,
-7,0,0,9,0,0,0,7,0,0,9,3,3,7,0,0,0,9,3,7,0,0,0,3,0,0,0,0,0,9,
+7,0,0,9,0,0,0,7,0,0,9,3,3,7,0,0,0,9,3,7,0,0,0,3,0,0,0,2,0,9,
 7,0,0,14,8,8,8,15,0,0,14,8,8,15,0,0,0,14,8,15,0,0,0,0,0,0,0,0,0,9,
 7,4,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,4,9,
 5,6,6,6,6,6,6,6,6,6,6,6,6,6,6,6,6,6,6,6,6,6,6,6,6,6,6,6,6,5
@@ -47,18 +50,30 @@
     <property name="is_solid" type="bool" value="true"/>
    </properties>
   </object>
-  <object id="17" x="95.3333" y="362.667" width="192" height="12">
+  <object id="17" type="Collider" x="95.3333" y="362.667" width="192" height="12">
    <properties>
     <property name="is_solid" type="bool" value="true"/>
    </properties>
   </object>
-  <object id="27" gid="21" x="367.468" y="692.945" width="282" height="205.333">
+  <object id="27" type="Sprite" gid="22" x="367.468" y="692.945" width="282" height="205.333">
    <properties>
     <property name="is_solid" type="bool" value="false"/>
    </properties>
   </object>
-  <object id="28" name="spawn" x="414" y="406">
+  <object id="28" name="spawn" type="PlayerSpawnPoint" x="414" y="406">
    <point/>
+  </object>
+  <object id="31" name="teleport_bottom" type="Teleporter" gid="21" x="480.5" y="864" width="32" height="32">
+   <properties>
+    <property name="is_solid" type="bool" value="false"/>
+    <property name="teleport_to" type="object" value="33"/>
+   </properties>
+  </object>
+  <object id="33" name="teleport_up" gid="21" x="640.667" y="193.5" width="32" height="32">
+   <properties>
+    <property name="is_solid" type="bool" value="false"/>
+    <property name="teleport_to" type="object" value="31"/>
+   </properties>
   </object>
  </objectgroup>
 </map>

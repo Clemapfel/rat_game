@@ -145,7 +145,6 @@ end
 --- @param index Number 1-based
 --- @param element any
 function rt.List:insert(index, element)
-
     if index > self._n_elements or index < 0 then
         rt.error("In rt.list:erase: index `" .. tostring(index) .. "` is out of bounds for list with `" .. tostring(self._n_elements) .. "` elements")
     end

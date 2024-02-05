@@ -20,17 +20,20 @@
             }
         },
         "debug/debug_tileset.tsx": {
-            "dynamicWrapping": false,
+            "dynamicWrapping": true,
             "scaleInDock": 1,
             "scaleInEditor": 1
         }
     },
+    "last.exportedFilePath": "/home/clem/Workspace/rat_game/assets/maps/debug",
     "last.imagePath": "/home/clem/Workspace/rat_game/assets/maps/debug",
     "last.objectTemplatePath": "/home/clem/Workspace/rat_game/assets/maps/debug",
+    "lastUsedTilesetExportFilter": "All Files (*)",
+    "map.lastUsedExportFilter": "Lua files (*.lua)",
     "openFiles": [
     ],
     "project": "rat_game.tiled-project",
-    "property.type": "bool",
+    "property.type": "object",
     "recentFiles": [
         "debug/debug_tileset.tsx",
         "debug/carpet.tsx",
@@ -38,8 +41,8 @@
     ],
     "tileset.lastUsedFormat": "tsx",
     "tileset.tileSize": {
-        "height": 64,
-        "width": 128
+        "height": 32,
+        "width": 32
     },
-    "tileset.type": 1
+    "tileset.type": 0
 }

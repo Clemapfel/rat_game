@@ -1,19 +1,17 @@
-rt.settings.keymap_indicator.input_button_to_sprite_id = (function()
-    local out = {}
-    out[rt.InputButton.A] = "A"
-    out[rt.InputButton.B] = "B"
-    out[rt.InputButton.X] = "X"
-    out[rt.InputButton.Y] = "Y"
-    out[rt.InputButton.L] = "L"
-    out[rt.InputButton.R] = "R"
-    out[rt.InputButton.START] = "plus"
-    out[rt.InputButton.SELECT] = "minus"
-    out[rt.InputButton.UP] = "up"
-    out[rt.InputButton.DOWN] = "down"
-    out[rt.InputButton.LEFT] = "left"
-    out[rt.InputButton.RIGHT] = "right"
-    return out
-end)()
+rt.settings.keymap_indicator.input_button_to_sprite_id = {
+    [rt.InputButton.A] = "A",
+    [rt.InputButton.B] = "B",
+    [rt.InputButton.X] = "X",
+    [rt.InputButton.Y] = "Y",
+    [rt.InputButton.L] = "L",
+    [rt.InputButton.R] = "R",
+    [rt.InputButton.START] = "plus",
+    [rt.InputButton.SELECT] = "minus",
+    [rt.InputButton.UP] = "up",
+    [rt.InputButton.DOWN] = "down",
+    [rt.InputButton.LEFT] = "left",
+    [rt.InputButton.RIGHT] = "right"
+}
 
 --- @class rt.KeymapIndicator
 --- @param button_to_label Table<rt.InputButton, String>
