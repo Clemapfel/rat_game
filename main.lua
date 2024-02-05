@@ -2,9 +2,10 @@ require("include")
 
 rt.current_scene = rt.add_scene("debug")
 
-debug_tileset = ow.Tileset("debug_tileset", "assets/maps/debug")
-carpet_tileset = ow.Tileset("carpet", "assets/maps/debug")
-println(serialize(meta.get_properties(debug_tileset)))
+map = ow.Map("debug", "assets/maps/debug")
+--debug_tileset = ow.Tileset("debug_tileset", "assets/maps/debug")
+--carpet_tileset = ow.Tileset("carpet", "assets/maps/debug")
+--println(serialize(meta.get_properties(debug_tileset)))
 
 love.load = function()
     love.window.setMode(800, 600, {
@@ -21,8 +22,7 @@ love.draw = function()
     love.graphics.clear(1, 0, 1, 1)
     rt.current_scene:draw()
 
-    debug_tileset:draw()
-    carpet_tileset:draw()
+    map._tilesets[1]:draw()
 end
 
 love.update = function()

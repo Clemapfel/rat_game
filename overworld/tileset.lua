@@ -5,12 +5,13 @@ ow.Tileset = meta.new_type("Tileset", function(name, path_prefix)
     local out = meta.new(ow.Tileset, {
         _path_prefix = path_prefix,
         _name = name,
+        _id_offset = 0,
         _tiles = {},    -- Table<Number, ow.Tile>
         _texture = {},  -- rt.Texture
         _batch = nil    -- love.SpriteBatch
     }, rt.Drawable)
 
-    out:create_from()
+    out:_create()
     return out
 end)
 
@@ -38,7 +39,7 @@ function ow.Tile(texture, tile_w, tile_h, column_index, row_index)
 end
 
 --- @brief [internal]
-function ow.Tileset:create_from()
+function ow.Tileset:_create()
     local config_path = self._path_prefix .. "/" .. self._name .. ".lua"
     local chunk, error_maybe = love.filesystem.load(config_path)
     if not meta.is_nil(error_maybe) then
@@ -101,5 +102,15 @@ function ow.Tileset:draw()
         end
     end
     love.graphics.draw(self._batch)
+end
+
+--- @brief
+function ow.Tileset:set_id_offset(offset)
+    self._id_offset = offset
+end
+
+--- @brief
+function ow.Tileset:get_id_offset()
+    return self._id_offset
 end
 
