@@ -28,6 +28,7 @@ function ow.Tile(texture, tile_w, tile_h, column_index, row_index)
     local x = (column_index) * tile_w
     local y =  (row_index) * tile_h
 
+
     if x < 0 or x > texture:get_width() or y < 0 or y > texture:get_height() then
         rt.error("In ow.Tile: texture position `" .. x .. ", " .. y .. "` is out of bounds for a texture of size " .. texture:get_width() .. "x" .. texture:get_height())
     end
@@ -58,22 +59,26 @@ function ow.Tileset:_create()
 
     self._texture = rt.Texture(self._path_prefix .. "/" .. x.name .. ".png")
 
-    for _, config in pairs(x.tiles) do
-        local i = config.id
+    for tile_i = 1, x.tilecount do
+        local id = tile_i - 1
         local tile = ow.Tile(
             self._texture,
             self._tile_width, self._tile_height,
-            i, 0
+            id, 0
         )
-        tile.id = config.id
 
-        if not meta.is_nil(config.properties) then
-            for name, value in pairs(config.properties) do
-                assert(name ~= "id" and name ~= "quad")
-                tile[name] = value
+        local config_maybe = x.tiles[tile_i]
+        if not meta.is_nil(config_maybe) then
+            if not meta.is_nil(config_maybe.properties) then
+                for name, value in pairs(config_maybe.properties) do
+                    assert(name ~= "id" and name ~= "quad")
+                    tile[name] = value
+                end
             end
         end
-        self._tiles[i] = tile
+
+        tile.id = id
+        self._tiles[id] = tile
     end
 
     return self
@@ -84,7 +89,7 @@ function ow.Tileset:draw()
     if meta.is_nil(self._batch) then
         self._batch = love.graphics.newSpriteBatch(self._texture._native, self._n_tiles)
 
-        local max_n_sprites_per_row = 5
+        local max_n_sprites_per_row = 0
         local start_x, start_y = 0, 0
 
         local x, y = start_x, start_y
@@ -112,11 +117,6 @@ end
 --- @brief
 function ow.Tileset:get_id_offset()
     return self._id_offset
-end
-
---- @brief
-function ow.Tileset:has_id(id)
-    return id <= self._id_offset + self._n_tiles
 end
 
 --- @brief

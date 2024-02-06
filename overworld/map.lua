@@ -76,15 +76,17 @@ function ow.Map:_create_tile_layer(layer)
     local x, y = start_x, start_y
     for row_i = 1, n_rows do
         for col_i = 1, n_columns do
-            local id = layer.data[row_i * n_rows + col_i]
+            local index = (row_i - 1) * n_rows + col_i
+            local id = layer.data[index]
             local pushed = false
             for tileset_i, tileset in pairs(self._tilesets) do
                 local tile = tileset:get_tile(id)
                 if not meta.is_nil(tile) then -- else, try next tileset
                     table.insert(tiles, tile)
-                    --batch[tileset_i]:add(tile.quad, col_i * self._tile_width, row_i * self._tile_height)
+                    batch[tileset_i]:add(tile.quad, col_i * self._tile_width, row_i * self._tile_height)
+                    local glyph = rt.Glyph(rt.settings.font.default, tostring(id))
+                    batch[tileset_i]:add(glyph._glyph, col_i * self._tile_width, row_i * self._tile_height)
                     pushed = true
-                    dbg(id, " ", tile)
                 end
             end
 
@@ -95,6 +97,11 @@ function ow.Map:_create_tile_layer(layer)
     end
 
     table.insert(self._tile_layers, ow.TileLayer(tiles, batch))
+end
+
+--- @brief [internal]
+function ow.Map:_create_object_layer(layer)
+
 end
 
 --- @brief

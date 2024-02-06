@@ -20,7 +20,7 @@
             }
         },
         "debug/debug_tileset.tsx": {
-            "dynamicWrapping": true,
+            "dynamicWrapping": false,
             "scaleInDock": 1,
             "scaleInEditor": 1
         }

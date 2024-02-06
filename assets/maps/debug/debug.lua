@@ -22,7 +22,8 @@ return {
     {
       name = "carpet",
       firstgid = 22,
-      filename = "carpet.tsx"
+      filename = "carpet.tsx",
+      exportfilename = "carpet.lua"
     }
   },
   layers = {
