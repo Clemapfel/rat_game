@@ -21,6 +21,32 @@ rt.Matrix = meta.new_type("Matrix", function(dimension, ...)
         out._data[i] = INFINITY
     end
 
+    getmetatable(out).__tostring = function(self)
+        local res = {}
+        local push = function(x) 
+            table.insert(res, tostring(x))
+        end
+
+        push("rt.Matrix(")
+        for i = 1, #self._dimensions do
+            push(tostring(self._dimensions[i]))
+            if i ~= #self._dimensions then
+                push("x")
+            end
+        end
+        push(", {\n")
+
+        for j = 1, self._dimensions[1] do
+            push("\t")
+            for i = 1, self._dimensions[2] do
+                push(tostring(self:get(i, j) .. " "))
+            end
+            push("\n")
+        end
+        push("}")
+        return table.concat(res)
+    end
+
     return out
 end)
 
