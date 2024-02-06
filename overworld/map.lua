@@ -1,10 +1,26 @@
+rt.settings.overworld.map = {
+    tile_layer_id = "tilelayer",
+    object_layer_id = "objectgroup"
+}
+
+--- @class TileLayer
+--- @field tiles Table<ow.Tile>
+--- @field batches Table<love.SpriteBatch>
+function ow.TileLayer(tiles, sprite_batches)
+    return {
+        tiles = tiles,
+        batches = sprite_batches
+    }
+end
+
 --- @class ow.Map
 ow.Map = meta.new_type("Map", function(name, path_prefix)
     local out = meta.new(ow.Map, {
         _path_prefix = path_prefix,
         _name = name,
         _tilesets = {},     -- Table<ow.Tileset>
-    })
+        _tile_layers = {},  -- Table<ow.TileLayer>
+    }, rt.Drawable)
     out:_create()
     return out
 end)
@@ -27,11 +43,68 @@ function ow.Map:_create()
     for _, tileset in pairs(x.tilesets) do
         meta.assert(not meta.is_nil(tileset.name))
         local to_push = ow.Tileset(tileset.name, self._path_prefix)
-        to_push:set_id_offset(tileset.firstgid)
+        to_push:set_id_offset(tileset.firstgid - 1)
         table.insert(self._tilesets, to_push)
+    end
+
+    for _, layer in pairs(x.layers) do
+        if layer.type == rt.settings.overworld.map.tile_layer_id then
+            self:_create_tile_layer(layer)
+        elseif layer.type == rt.settings.overworld.map.object_layer_id then
+            self:_create_object_layer()
+        end
     end
 
     return self
 end
+
+--- @brief [internal]
+function ow.Map:_create_tile_layer(layer)
+    local start_x, start_y, offset_x, offset_y = layer.x, layer.y, layer.offsetx, layer.offsety
+
+    local w, h = self._tile_width, self._tile_height
+    local n_columns = layer.width
+    local n_rows = layer.height
+
+    local tiles = {}    -- Table<ow.Tile>
+    local batch = {}    -- Table<love.SpriteBatch>
+
+    for _, tileset in pairs(self._tilesets) do
+        table.insert(batch, love.graphics.newSpriteBatch(tileset._texture._native))
+    end
+
+    local x, y = start_x, start_y
+    for row_i = 1, n_rows do
+        for col_i = 1, n_columns do
+            local id = layer.data[row_i * n_rows + col_i]
+            local pushed = false
+            for tileset_i, tileset in pairs(self._tilesets) do
+                local tile = tileset:get_tile(id)
+                if not meta.is_nil(tile) then -- else, try next tileset
+                    table.insert(tiles, tile)
+                    --batch[tileset_i]:add(tile.quad, col_i * self._tile_width, row_i * self._tile_height)
+                    pushed = true
+                    dbg(id, " ", tile)
+                end
+            end
+
+            if not pushed then
+                rt.error("In ow.Map:_create_tile_layer: No tileset with tile id `" .. id .. "`")
+            end
+        end
+    end
+
+    table.insert(self._tile_layers, ow.TileLayer(tiles, batch))
+end
+
+--- @brief
+function ow.Map:draw()
+    for _, layer in pairs(self._tile_layers) do
+        for _, batch in pairs(layer.batches) do
+            love.graphics.draw(batch)
+        end
+    end
+end
+
 
 

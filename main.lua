@@ -22,7 +22,7 @@ love.draw = function()
     love.graphics.clear(1, 0, 1, 1)
     rt.current_scene:draw()
 
-    map._tilesets[1]:draw()
+    map:draw()
 end
 
 love.update = function()

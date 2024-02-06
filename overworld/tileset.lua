@@ -114,3 +114,13 @@ function ow.Tileset:get_id_offset()
     return self._id_offset
 end
 
+--- @brief
+function ow.Tileset:has_id(id)
+    return id <= self._id_offset + self._n_tiles
+end
+
+--- @brief
+function ow.Tileset:get_tile(id)
+    return self._tiles[id - self._id_offset]
+end
+
