@@ -248,6 +248,11 @@ function ow.Player:draw()
     end
 end
 
+--- @brief
+function ow.Player:get_position()
+    return self._collider:get_centroid()
+end
+
 --- @brief [internal]
 function ow.Player._on_physics_update(_, self)
     local x, y = self._collider:get_centroid()

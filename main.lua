@@ -2,16 +2,15 @@ require("include")
 
 rt.current_scene = rt.add_scene("debug")
 
-map = ow.Map("debug", "assets/maps/debug")
+map = ow.Map("debug_map", "assets/maps/debug")
 --debug_tileset = ow.Tileset("debug_tileset", "assets/maps/debug")
 --carpet_tileset = ow.Tileset("carpet", "assets/maps/debug")
 --println(serialize(meta.get_properties(debug_tileset)))
 
-scene = ow.OverworldScene()
-player = ow.Player(scene._world)
+player = ow.Player(map._world)
 
 love.load = function()
-    love.window.setMode(800, 600, {
+    love.window.setMode(1000, 800, {
         vsync = 1,
         msaa = 8,
         stencil = true,
@@ -24,14 +23,20 @@ end
 love.draw = function()
     love.graphics.clear(1, 0, 1, 1)
     rt.current_scene:draw()
+
+    love.graphics.push()
+    local x, y = player:get_position()
+    --love.graphics.translate(x, y)
     map:draw()
     player:draw()
+
+    love.graphics.pop()
 end
 
 love.update = function()
     local delta = love.timer.getDelta()
     rt.current_scene:update(delta)
-    scene._world:update(delta)
+    map._world:update(delta)
 end
 
 

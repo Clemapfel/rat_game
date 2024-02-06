@@ -6,11 +6,14 @@ ow.Tileset = meta.new_type("Tileset", function(name, path_prefix)
         _path_prefix = path_prefix,
         _name = name,
         _id_offset = 0,
+        _tile_width = -1,
+        _tile_height = -1,
+        _n_columns = -1,
+        _n_tiles = -1,
         _tiles = {},    -- Table<Number, ow.Tile>
         _texture = {},  -- rt.Texture
         _batch = nil    -- love.SpriteBatch
     }, rt.Drawable)
-
     out:_create()
     return out
 end)
@@ -27,7 +30,6 @@ function ow.Tile(texture, tile_w, tile_h, column_index, row_index)
 
     local x = (column_index) * tile_w
     local y =  (row_index) * tile_h
-
 
     if x < 0 or x > texture:get_width() or y < 0 or y > texture:get_height() then
         rt.error("In ow.Tile: texture position `" .. x .. ", " .. y .. "` is out of bounds for a texture of size " .. texture:get_width() .. "x" .. texture:get_height())
@@ -53,9 +55,6 @@ function ow.Tileset:_create()
     self._tile_height = x.tileheight
     self._n_columns = x.columns
     self._n_tiles = x.tilecount
-
-    self._tile_offset_x = x.tileoffset[1]
-    self._tile_offset_y = x.tileoffset[2]
 
     self._texture = rt.Texture(self._path_prefix .. "/" .. x.name .. ".png")
 
@@ -123,5 +122,18 @@ end
 --- @brief
 function ow.Tileset:get_tile(id)
     return self._tiles[id - self._id_offset]
+end
+
+--- @brief
+function ow.Tileset:get_texture_rectangle(id)
+    local w, h = self._texture:get_size()
+    local tile_w = self._tile_width / w
+    local tile_h = self._tile_height / h
+
+    local col_i = id - self._id_offset
+    return rt.AABB(
+        col_i * tile_w, 0,
+            tile_w, tile_h
+    )
 end
 

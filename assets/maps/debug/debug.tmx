@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <map version="1.10" tiledversion="1.10.2" orientation="orthogonal" renderorder="right-down" width="30" height="30" tilewidth="32" tileheight="32" infinite="0" nextlayerid="4" nextobjectid="34">
  <editorsettings>
-  <export target="debug.lua" format="lua"/>
+  <export target="debug_map.lua" format="lua"/>
  </editorsettings>
  <tileset firstgid="1" source="debug_tileset.tsx"/>
  <tileset firstgid="22" source="carpet.tsx"/>
@@ -60,16 +60,16 @@
     <property name="is_solid" type="bool" value="false"/>
    </properties>
   </object>
-  <object id="28" name="spawn" type="PlayerSpawnPoint" x="414" y="406">
+  <object id="28" name="spawn" type="PlayerSpawnPoint" x="178" y="815.333">
    <point/>
   </object>
-  <object id="31" name="teleport_bottom" type="Teleporter" gid="21" x="480.5" y="864" width="32" height="32">
+  <object id="31" name="teleport_bottom" type="Teleporter" gid="21" x="481.5" y="864" width="32" height="32">
    <properties>
     <property name="is_solid" type="bool" value="false"/>
     <property name="teleport_to" type="object" value="33"/>
    </properties>
   </object>
-  <object id="33" name="teleport_up" gid="21" x="640.667" y="193.5" width="32" height="32">
+  <object id="33" name="teleport_up" gid="21" x="444.667" y="292.167" width="32" height="32">
    <properties>
     <property name="is_solid" type="bool" value="false"/>
     <property name="teleport_to" type="object" value="31"/>

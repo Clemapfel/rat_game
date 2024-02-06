@@ -39,7 +39,7 @@
     "openFiles": [
     ],
     "project": "rat_game.tiled-project",
-    "property.type": "object",
+    "property.type": "bool",
     "recentFiles": [
         "debug/debug_tileset.tsx",
         "debug/carpet.tsx",

@@ -31,115 +31,127 @@ return {
     {
       id = 0,
       properties = {
-        ["solid"] = true
+        ["is_solid"] = false
       }
     },
     {
       id = 1,
       properties = {
-        ["solid"] = true
+        ["is_solid"] = false
       }
     },
     {
       id = 2,
       properties = {
-        ["solid"] = true
+        ["is_solid"] = false
       }
     },
     {
       id = 3,
       properties = {
-        ["solid"] = true
+        ["is_solid"] = false
       }
     },
     {
       id = 4,
       properties = {
-        ["solid"] = true
+        ["is_solid"] = true
       }
     },
     {
       id = 5,
       properties = {
-        ["solid"] = true
+        ["is_solid"] = true
       }
     },
     {
       id = 6,
       properties = {
-        ["solid"] = true
+        ["is_solid"] = true
       }
     },
     {
       id = 7,
       properties = {
-        ["solid"] = true
+        ["is_solid"] = true
       }
     },
     {
       id = 8,
       properties = {
-        ["solid"] = true
+        ["is_solid"] = true
       }
     },
     {
       id = 9,
       properties = {
-        ["solid"] = true
+        ["is_solid"] = true
       }
     },
     {
       id = 10,
       properties = {
-        ["solid"] = true
+        ["is_solid"] = true
       }
     },
     {
       id = 11,
       properties = {
-        ["solid"] = true
+        ["is_solid"] = true
       }
     },
     {
       id = 12,
       properties = {
-        ["solid"] = true
+        ["is_solid"] = true
       }
     },
     {
       id = 13,
       properties = {
-        ["solid"] = true
+        ["is_solid"] = true
       }
     },
     {
       id = 14,
       properties = {
-        ["solid"] = true
+        ["is_solid"] = true
       }
     },
     {
       id = 15,
       properties = {
-        ["solid"] = true
+        ["is_solid"] = true
       }
     },
     {
       id = 16,
       properties = {
-        ["solid"] = true
+        ["is_solid"] = true
       }
     },
     {
       id = 17,
       properties = {
-        ["solid"] = true
+        ["is_solid"] = true
       }
     },
     {
       id = 18,
       properties = {
-        ["solid"] = true
+        ["is_solid"] = true
+      }
+    },
+    {
+      id = 19,
+      properties = {
+        ["is_solid"] = true
+      }
+    },
+    {
+      id = 20,
+      properties = {
+        ["is_solid"] = false
       }
     }
   }

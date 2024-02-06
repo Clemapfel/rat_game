@@ -56,13 +56,22 @@ function rt.PhysicsShape._draw(shape, body_x, body_y)
             local_points[i+0] = local_points[i+0] + body_x
             local_points[i+1] = local_points[i+1] + body_y
         end
+
+        love.graphics.setColor(1, 1, 1, 0.5)
         love.graphics.polygon("fill", table.unpack(local_points))
+        love.graphics.setColor(1, 1, 1, 1)
+        love.graphics.polygon("line", table.unpack(local_points))
+
     elseif type == "CircleShape" then
         local x, y = shape:getPoint()
         x = x + body_x
         y = y + body_y
         local radius = shape:getRadius()
+        love.graphics.setColor(1, 1, 1, 0.5)
         love.graphics.circle("fill", x, y, radius)
+        love.graphics.setColor(1, 1, 1, 1)
+        love.graphics.circle("line", x, y, radius)
+
     elseif type == "EdgeShape" then
         local ax, ay, bx, by = shape:getPoints()
         ax = ax + body_x

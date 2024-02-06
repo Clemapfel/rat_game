@@ -112,9 +112,6 @@ end
 --- @param index_maybe Number
 --- @return rt.AxisAlignedRectangle
 function rt.Spritesheet:get_frame(animation_id, index_maybe)
-
-
-
     self:_assert_has_animation("Spritesheet.get_frame", animation_id)
 
     local start_end = self._name_to_frame[animation_id]
