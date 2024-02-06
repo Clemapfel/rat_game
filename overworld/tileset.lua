@@ -60,15 +60,16 @@ function ow.Tileset:_create()
     self._texture = rt.Texture(self._path_prefix .. "/" .. x.name .. ".png")
 
     for tile_i = 1, x.tilecount do
-        local id = tile_i - 1
         local tile = ow.Tile(
             self._texture,
             self._tile_width, self._tile_height,
-            id, 0
+            tile_i - 1, 0
         )
 
         local config_maybe = x.tiles[tile_i]
+        local id = tile_i - 1
         if not meta.is_nil(config_maybe) then
+            id = config_maybe.id
             if not meta.is_nil(config_maybe.properties) then
                 for name, value in pairs(config_maybe.properties) do
                     assert(name ~= "id" and name ~= "quad")

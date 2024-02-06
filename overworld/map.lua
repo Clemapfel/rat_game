@@ -43,7 +43,7 @@ function ow.Map:_create()
     for _, tileset in pairs(x.tilesets) do
         meta.assert(not meta.is_nil(tileset.name))
         local to_push = ow.Tileset(tileset.name, self._path_prefix)
-        to_push:set_id_offset(tileset.firstgid - 1)
+        to_push:set_id_offset(tileset.firstgid)
         table.insert(self._tilesets, to_push)
     end
 
@@ -84,8 +84,6 @@ function ow.Map:_create_tile_layer(layer)
                 if not meta.is_nil(tile) then -- else, try next tileset
                     table.insert(tiles, tile)
                     batch[tileset_i]:add(tile.quad, col_i * self._tile_width, row_i * self._tile_height)
-                    local glyph = rt.Glyph(rt.settings.font.default, tostring(id))
-                    batch[tileset_i]:add(glyph._glyph, col_i * self._tile_width, row_i * self._tile_height)
                     pushed = true
                 end
             end
@@ -106,11 +104,15 @@ end
 
 --- @brief
 function ow.Map:draw()
+    love.graphics.push()
+    love.graphics.reset()
     for _, layer in pairs(self._tile_layers) do
         for _, batch in pairs(layer.batches) do
             love.graphics.draw(batch)
         end
     end
+
+    love.graphics.pop()
 end
 
 

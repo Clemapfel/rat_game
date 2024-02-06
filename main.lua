@@ -7,6 +7,9 @@ map = ow.Map("debug", "assets/maps/debug")
 --carpet_tileset = ow.Tileset("carpet", "assets/maps/debug")
 --println(serialize(meta.get_properties(debug_tileset)))
 
+scene = ow.OverworldScene()
+player = ow.Player(scene._world)
+
 love.load = function()
     love.window.setMode(800, 600, {
         vsync = 1,
@@ -21,14 +24,14 @@ end
 love.draw = function()
     love.graphics.clear(1, 0, 1, 1)
     rt.current_scene:draw()
-
-    map._tilesets[1]:draw()
-    --map:draw()
+    map:draw()
+    player:draw()
 end
 
 love.update = function()
     local delta = love.timer.getDelta()
     rt.current_scene:update(delta)
+    scene._world:update(delta)
 end
 
 

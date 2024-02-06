@@ -1,4 +1,8 @@
 {
+    "Map/SizeTest": {
+        "height": 4300,
+        "width": 2
+    },
     "activeFile": "",
     "expandedProjectPaths": [
         "debug",
@@ -12,11 +16,11 @@
             "scaleInEditor": 1
         },
         "debug/debug.tmx": {
-            "scale": 0.5858333333333333,
-            "selectedLayer": 1,
+            "scale": 1,
+            "selectedLayer": 0,
             "viewCenter": {
-                "x": 480.5120910384068,
-                "y": 577.8093883357042
+                "x": 576.5,
+                "y": 428.5
             }
         },
         "debug/debug_tileset.tsx": {
@@ -29,7 +33,9 @@
     "last.imagePath": "/home/clem/Workspace/rat_game/assets/maps/debug",
     "last.objectTemplatePath": "/home/clem/Workspace/rat_game/assets/maps/debug",
     "lastUsedTilesetExportFilter": "All Files (*)",
+    "map.height": 5,
     "map.lastUsedExportFilter": "Lua files (*.lua)",
+    "map.width": 5,
     "openFiles": [
     ],
     "project": "rat_game.tiled-project",
