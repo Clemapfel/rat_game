@@ -99,10 +99,12 @@ function ow.Map:_create_tile_layer(layer)
     local tile_hitbox = rt.Matrix(n_columns, n_rows)
 
     local x, y = start_x, start_y
+    local i = 1
     for row_i = 1, n_rows do
         for col_i = 1, n_columns do
-            local index = (row_i - 1) * n_rows + col_i
+            local index = (row_i - 1) * n_columns + col_i
             local id = layer.data[index]
+            assert(not meta.is_nil(id))
             local pushed = false
             for tileset_i, tileset in pairs(self._tilesets) do
                 local tile = tileset:get_tile(id)
@@ -235,22 +237,26 @@ end
 --- @brief [internal]
 function ow.Map._generate_tile_colliders(matrix)
 
+
     local clock = rt.Clock()
     local out = {}
 
     local seen = rt.Matrix(matrix:get_dimension(1), matrix:get_dimension(2))
     seen:clear(false)
 
+    local row_to_aabbs = {}
     local aabb = rt.AABB(1, 1, 0, 0)
     local active = false
-    for row_i = 1, matrix:get_dimension(1) do
-        for col_i = 1, matrix:get_dimension(2) do
+    for row_i = 1, matrix:get_dimension(2) do
+        table.insert(row_to_aabbs, {})
+        for col_i = 1, matrix:get_dimension(1) do
             local solid = matrix:get(col_i, row_i) ~= 0
 
             if solid then
                 -- open
                 if not active then
                     aabb = rt.AABB(col_i, row_i, 0, 1)
+                    aabb.merged = false
                     active = true
                 end
 
@@ -261,7 +267,7 @@ function ow.Map._generate_tile_colliders(matrix)
             else
                 if active then
                     -- close
-                    table.insert(out, aabb)
+                    table.insert(row_to_aabbs[row_i], aabb)
                     active = false
                 else
                     -- continue
@@ -272,12 +278,21 @@ function ow.Map._generate_tile_colliders(matrix)
 
         if active then
             -- close at end of line
-            table.insert(out, aabb)
+            table.insert(row_to_aabbs[row_i], aabb)
             active = false
         end
     end
 
-    println(serialize(out))
+    local out = {}
+    for _, row in pairs(row_to_aabbs) do
+        for _, shape in pairs(row) do
+            local already_merged = which(shape.merged, false)
+            if not already_merged then
+                table.insert(out, shape)
+            end
+        end
+    end
+
     return out
 end
 

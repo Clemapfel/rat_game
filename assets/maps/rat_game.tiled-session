@@ -16,11 +16,14 @@
             "scaleInEditor": 1
         },
         "debug/debug.tmx": {
-            "scale": 1,
-            "selectedLayer": 0,
+            "expandedObjectLayers": [
+                2
+            ],
+            "scale": 0.75,
+            "selectedLayer": 1,
             "viewCenter": {
-                "x": 576.5,
-                "y": 428.5
+                "x": 392.6666666666666,
+                "y": 75.33333333333326
             }
         },
         "debug/debug_tileset.tsx": {
