@@ -43,6 +43,7 @@ ow.Map = meta.new_type("Map", function(name, path_prefix)
         _tilesets = {},     -- Table<ow.Tileset>
         _tile_layers = {},  -- Table<ow.TileLayer>
         _object_layers = {},    -- Table<ow.ObjectLayer>
+        _debug_draw_enabled = true
     }, rt.Drawable)
     out:_create()
     return out
@@ -214,7 +215,9 @@ end
 --- @brief
 function ow.Map:draw()
     love.graphics.push()
-    love.graphics.reset()
+
+    love.graphics.setColor(1, 1, 1, 1)
+    love.graphics.setBlendMode("alpha")
     for _, layer in pairs(self._tile_layers) do
         for _, batch in pairs(layer.batches) do
             love.graphics.draw(batch)
@@ -226,8 +229,10 @@ function ow.Map:draw()
             sprite.shape:draw()
         end
 
-        for _, collider in pairs(layer.colliders) do
-            collider:draw()
+        if self._debug_draw_enabled then
+            for _, collider in pairs(layer.colliders) do
+                collider:draw()
+            end
         end
     end
 

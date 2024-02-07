@@ -25,13 +25,14 @@ love.draw = function()
     love.graphics.clear(1, 0, 1, 1)
     rt.current_scene:draw()
 
-    love.graphics.push()
+    --love.graphics.push()
     local x, y = player:get_position()
-    --love.graphics.translate(x, y)
+    love.graphics.translate(0.5 * math.abs(x - love.graphics.getWidth()), 0.5 * math.abs(y - love.graphics.getHeight()))
+
     map:draw()
     player:draw()
 
-    love.graphics.pop()
+    --love.graphics.pop()
 end
 
 love.update = function()
