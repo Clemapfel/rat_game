@@ -283,6 +283,31 @@ function ow.Map._generate_tile_colliders(matrix)
         end
     end
 
+    -- merge step
+    local current_row = 1
+    for _, row in pairs(row_to_aabbs) do
+        for _, shape in pairs(row) do
+            if not shape.merged and current_row < #row_to_aabbs then
+                for row_i = current_row + 1, #row_to_aabbs do
+                    local merge_successfull = false
+                    for _, other_shape in pairs(row_to_aabbs[row_i]) do
+                        if not other_shape.merged then
+                            if shape.x == other_shape.x and shape.width == other_shape.width then
+                                shape.height = shape.height + 1
+                                other_shape.merged = true
+                                merge_successfull = true
+                            end
+                        end
+                    end
+                    if not merge_successfull then break end
+                end
+            end
+        end
+
+        current_row = current_row + 1
+    end
+
+
     local out = {}
     for _, row in pairs(row_to_aabbs) do
         for _, shape in pairs(row) do
