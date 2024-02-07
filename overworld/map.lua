@@ -247,7 +247,6 @@ function ow.Map._generate_tile_colliders(matrix)
         for col_i = 1, matrix:get_dimension(2) do
             local solid = matrix:get(col_i, row_i) ~= 0
 
-            dbg(col_i, row_i, solid, active)
             if solid then
                 -- open
                 if not active then
@@ -268,7 +267,6 @@ function ow.Map._generate_tile_colliders(matrix)
                     -- continue
                 end
             end
-
             --seen:set(col_i, row_i, true)
         end
 

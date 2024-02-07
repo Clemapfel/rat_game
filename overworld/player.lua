@@ -155,6 +155,7 @@ function ow.Player:_update_velocity_from_dpad()
     if x + y ~= 0 then
         self._direction = angle
     end
+
     self:_update_velocity()
 end
 
