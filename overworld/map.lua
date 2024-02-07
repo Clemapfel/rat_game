@@ -96,7 +96,7 @@ function ow.Map:_create_tile_layer(layer)
         table.insert(batch, love.graphics.newSpriteBatch(tileset._texture._native))
     end
 
-    local hitbox_map = rt.Matrix(n_columns, n_rows)
+    local tile_hitbox = rt.Matrix(n_columns, n_rows)
 
     local x, y = start_x, start_y
     for row_i = 1, n_rows do
@@ -109,8 +109,7 @@ function ow.Map:_create_tile_layer(layer)
                 if not meta.is_nil(tile) then -- else, try next tileset
                     table.insert(tiles, tile)
                     batch[tileset_i]:add(tile.quad, (col_i - 1) * self._tile_width, (row_i - 1) * self._tile_height)
-
-                    hitbox_map:set(col_i, row_i, ternary(which(tile[rt.settings.overworld.map.is_solid_id], false), 1, 0))
+                    tile_hitbox:set(col_i, row_i, ternary(which(tile[rt.settings.overworld.map.is_solid_id], false), 1, 0))
                     pushed = true
                     break
                 end
@@ -123,6 +122,20 @@ function ow.Map:_create_tile_layer(layer)
     end
 
     table.insert(self._tile_layers, ow.TileLayer(tiles, batch))
+
+    -- generate hitboxes for solid tiles
+    local bounds = ow.Map._generate_tile_colliders(tile_hitbox)
+    --table.insert(bounds, rt.AABB(3, 5, 15, 13))
+
+    local colliders = {}
+    for _, aabb in pairs(bounds) do
+        table.insert(colliders, rt.RectangleCollider(self._world, rt.ColliderType.STATIC,
+                (aabb.x - 1) * w, (aabb.y - 1) * h,
+                aabb.width * w, aabb.height * h
+        ))
+    end
+
+    table.insert(self._object_layers, ow.ObjectLayer({}, colliders))
 end
 
 --- @brief [internal]
@@ -161,7 +174,7 @@ function ow.Map:_create_object_layer(layer)
             end
 
             if not love.math.isConvex(vertices) then
-                rt.warning("In ow.Map:_create_object_layer: polygon shape with id `" .. object.id .. "` of object layer `" .. layer.id .. "` is non-convex, it will be transformed its outer hull")
+                rt.warning("In ow.Map:_create_object_layer: polygon shape with id `" .. object.id .. "` of object layer `" .. layer.id .. "` is non-convex, its outer hull will be used instead")
             end
 
             to_push = rt.PolygonCollider(self._world, rt.ColliderType.STATIC, splat(vertices))
@@ -217,6 +230,31 @@ function ow.Map:draw()
     end
 
     love.graphics.pop()
+end
+
+--- @brief [internal]
+function ow.Map._generate_tile_colliders(matrix)
+
+    local clock = rt.Clock()
+    local out = {}
+
+    local seen = rt.Matrix(matrix:get_dimension(1), matrix:get_dimension(2))
+    seen:clear(false)
+
+    for row_i = 1, matrix:get_dimension(1) do
+        for col_i = 1, matrix:get_dimension(2) do
+            if not seen:get(col_i, row_i) then
+
+                --seen:set(col_i, row_i, true)
+            end
+        end
+    end
+
+    println(clock:get_elapsed():as_seconds(), 1 / 60)
+
+    println(seen)
+
+    return out
 end
 
 
