@@ -48,7 +48,7 @@ function ow.Tileset:_create()
 
     clock = rt.Clock()
     do -- generate array texture, unless already exported version is available as a folder of individual images
-        local export_dir = self._path_prefix .. "/" .. self._name
+        local export_dir = "spritesheets/" .. x.name
         local info = love.filesystem.getInfo(export_dir)
         if not meta.is_nil(info) and info.type == "directory" then
             local slices = love.filesystem.getDirectoryItems(export_dir)
@@ -73,14 +73,11 @@ function ow.Tileset:_create()
                 end
             end
 
-            -- export
-            --[[
+            -- export to .local/share/love/rat_game, so it can be loaded next time instead
             love.filesystem.createDirectory("spritesheets/" .. x.name)
             for i, slice in ipairs(slices) do
                 local data = slice:encode("png", "spritesheets/" .. x.name .. "/" .. x.name .. "_" .. ternary(i < 10, "0", "") .. i .. ".png")
-                println(love.filesystem.getAppdataDirectory() .. "rat_game/" .. data:getFilename())
             end
-            ]]--
 
             self._array_texture = love.graphics.newArrayImage(slices)
         end
