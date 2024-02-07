@@ -9,6 +9,9 @@ do
     love.filesystem.setRequirePath(love.filesystem.getRequirePath() .. table.concat(paths))
 end
 
+local major, minor = love.getVersion()
+print("Love2D " .. major .. "." .. minor .. " | " .. jit.version)
+
 rt = {}
 rt.test = {}
 rt.settings = {}

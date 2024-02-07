@@ -304,7 +304,5 @@ function rt.test.list()
     end
 end
 
-local major, minor = love.getVersion()
-println(major, ".", minor, " : ", jit.version)
 rt.test.list()
 
