@@ -1,5 +1,5 @@
 rt.settings.overworld.player = {
-    radius = 32 / 2,
+    radius = 32 / 2.5,
     mass = 0,
     velocity = 400,
     sprinting_velocity_factor = 2,
@@ -251,6 +251,12 @@ end
 --- @brief
 function ow.Player:get_position()
     return self._collider:get_centroid()
+end
+
+--- @brief
+function ow.Player:set_position(x, y)
+    self._collider:set_centroid(x, y)
+    self._on_physics_update(_, self)
 end
 
 --- @brief [internal]

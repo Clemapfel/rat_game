@@ -241,19 +241,45 @@ function ow.Map._generate_tile_colliders(matrix)
     local seen = rt.Matrix(matrix:get_dimension(1), matrix:get_dimension(2))
     seen:clear(false)
 
+    local aabb = rt.AABB(1, 1, 0, 0)
+    local active = false
     for row_i = 1, matrix:get_dimension(1) do
         for col_i = 1, matrix:get_dimension(2) do
-            if not seen:get(col_i, row_i) then
+            local solid = matrix:get(col_i, row_i) ~= 0
 
-                --seen:set(col_i, row_i, true)
+            dbg(col_i, row_i, solid, active)
+            if solid then
+                -- open
+                if not active then
+                    aabb = rt.AABB(col_i, row_i, 0, 1)
+                    active = true
+                end
+
+                -- extend
+                if active then
+                    aabb.width = aabb.width + 1
+                end
+            else
+                if active then
+                    -- close
+                    table.insert(out, aabb)
+                    active = false
+                else
+                    -- continue
+                end
             end
+
+            --seen:set(col_i, row_i, true)
+        end
+
+        if active then
+            -- close at end of line
+            table.insert(out, aabb)
+            active = false
         end
     end
 
-    println(clock:get_elapsed():as_seconds(), 1 / 60)
-
-    println(seen)
-
+    println(serialize(out))
     return out
 end
 

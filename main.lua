@@ -8,6 +8,7 @@ map = ow.Map("debug_map", "assets/maps/debug")
 --println(serialize(meta.get_properties(debug_tileset)))
 
 player = ow.Player(map._world)
+player:set_position(love.graphics.getWidth() / 2, love.graphics.getHeight() / 2)
 
 love.load = function()
     love.window.setMode(1000, 800, {
