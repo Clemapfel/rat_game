@@ -135,16 +135,40 @@ function ow.Map:_create_object_layer(layer)
     for _, object in pairs(layer.objects) do
         local solid = which(object.properties[rt.settings.overworld.map.is_solid_id], false)
         local x, y, w, h = math.round(object.x), math.round(object.y), math.round(object.width), math.round(object.height)
+        local is_sprite = not meta.is_nil(object.gid)
+
+        if is_sprite then y = y - h end -- TODO: why is this necessary?
+
+        local to_push
         if object.shape == "rectangle" then
-            local to_push = rt.RectangleCollider(self._world, rt.ColliderType.STATIC, x, y, w, h)
-            to_push:add_userdata("id", object.id)
-            --to_push:set_is_sensor(not solid)
-            table.insert(colliders, to_push)
+            to_push = rt.RectangleCollider(self._world, rt.ColliderType.STATIC, x, y, w, h)
+        elseif object.shape == "circle" or object.shape == "ellipse" then
+            local x_radius, y_radius = w / 2, h / 2
+            local center_x, center_y = x + x_radius, y + y_radius
+            to_push = rt.CircleCollider(self._world, rt.ColliderType.STATIC, center_x, center_y, mix(x_radius, y_radius, 0.5))
         elseif object.shape == "point" then
-            local to_push = rt.CircleCollider(self._world, rt.ColliderType.STATC, x, y, rt.settings.overworld.player.radius)
-            --to_push:set_is_sensor(not solid)
-            table.insert(colliders, to_push)
+            to_push = rt.CircleCollider(self._world, rt.ColliderType.STATC, x, y, 1 / 6 * 32) --rt.settings.overworld.player.radius)
+        elseif object.shape == "polygon" then
+            if #object.polygon > 16 then
+                rt.error("In ow.Map:_create_object_layer: polygon shape with id `" .. object.id .. "` of object layer `" .. layer.id .. "`: has `" .. tostring(#object.polygon / 2) .. "` vertices, but only up to 8 vertices are allowed")
+            end
+
+            local vertices = {}
+            for _, xy in pairs(object.polygon) do
+                -- convert to global coordinates
+                table.insert(vertices, xy.x + x)
+                table.insert(vertices, xy.y + y)
+            end
+
+            if not love.math.isConvex(vertices) then
+                rt.warning("In ow.Map:_create_object_layer: polygon shape with id `" .. object.id .. "` of object layer `" .. layer.id .. "` is non-convex, it will be transformed its outer hull")
+            end
+
+            to_push = rt.PolygonCollider(self._world, rt.ColliderType.STATIC, splat(vertices))
         end
+
+        to_push:add_userdata("id", object.id)
+        table.insert(colliders, to_push)
 
         local id = object.gid
         if not meta.is_nil(object.gid) then

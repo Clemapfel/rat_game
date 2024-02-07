@@ -209,6 +209,44 @@ function rt.TriangleCollider(world, type, ax, ay, bx, by, cx, cy)
     return rt.Collider(world, type, {shape}, center_x, center_y)
 end
 
+
+--- @brief triangle, centroid is origin
+--- @return rt.Collider
+function rt.PolygonCollider(world, type, ax, ay, bx, by, cx, cy, ...)
+    local center_x, center_y = 0, 0
+    local input = {ax, ay, bx, by, cx, cy, ...}
+    for i = 1, #input, 2 do
+        center_x = center_x + input[i+0]
+        center_y = center_y + input[i+1]
+    end
+    center_x = center_x / (#input / 2)
+    center_y = center_y / (#input / 2)
+
+    local vertices = {}
+    for i = 1, #input, 2 do
+        vertices[i] = input[i] - center_x
+        vertices[i+1] = input[i+1] - center_y
+    end
+
+    local shape = rt.PhysicsShape(rt.PhysicsShapeType.POLYGON, splat(vertices))
+    return rt.Collider(world, type, {shape}, center_x, center_y)
+end
+
+--- @brief ellipse, centroid is origin
+function rt.EllipseCollider(world, type, center_x, center_y, x_radius, y_radius, n_outer_vertices)
+    n_outer_vertices = which(n_outer_vertices, 8)
+    local step = 360 / n_outer_vertices
+    local vertices = {}
+    for angle = 0, 360, step do
+        for p in range(
+            0 + x_radius * math.cos(rt.degrees(angle):as_radians()),
+            0 + y_radius * math.sin(rt.degrees(angle):as_radians())
+        ) do table.insert(vertices, p) end
+    end
+    local shape = rt.PhysicsShape(rt.PhysicsShapeType.POLYGON, splat(vertices))
+    return rt.Collider(world, type, {shape}, center_x, center_y)
+end
+
 --- @brief circle collider, center is origin
 --- @return rt.Collider
 function rt.CircleCollider(world, type, center_x, center_y, radius)

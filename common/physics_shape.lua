@@ -1,10 +1,10 @@
 --- @class rt.ShapeType
 rt.PhysicsShapeType = meta.new_enum({
     RECTANGLE = 1,
-    POLYGON = 1,
-    CIRCLE = 2,
-    LINE = 3,
-    LINE_SEGMENTS = 4,
+    POLYGON = 2,
+    CIRCLE = 3,
+    LINE = 4,
+    LINE_SEGMENTS = 5,
 })
 
 --- @class rt.PhysicsShape
@@ -35,6 +35,8 @@ rt.PhysicsShape = meta.new_type("PhysicsShape", function(type, ...)
     elseif type == rt.PhysicsShapeType.POLYGON then
         assert(n_varargs % 2 == 0 and n_varargs >= 6)
         out._native = love.physics.newPolygonShape(...)
+    else
+        meta.assert_enum(type, rt.PhysicsShapeType)
     end
     return out
 end)
