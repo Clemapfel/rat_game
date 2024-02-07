@@ -94,7 +94,7 @@ function ow.Map:_create_tile_layer(layer)
     local batch = {}    -- Table<love.SpriteBatch>
 
     for _, tileset in pairs(self._tilesets) do
-        table.insert(batch, love.graphics.newSpriteBatch(tileset._texture._native))
+        table.insert(batch, love.graphics.newSpriteBatch(tileset._array_texture))
     end
 
     local tile_hitbox = rt.Matrix(n_columns, n_rows)
@@ -218,6 +218,7 @@ function ow.Map:draw()
 
     love.graphics.setColor(1, 1, 1, 1)
     love.graphics.setBlendMode("alpha")
+
     for _, layer in pairs(self._tile_layers) do
         for _, batch in pairs(layer.batches) do
             love.graphics.draw(batch)
@@ -235,6 +236,7 @@ function ow.Map:draw()
             end
         end
     end
+
 
     love.graphics.pop()
 end

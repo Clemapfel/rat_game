@@ -11,6 +11,7 @@ ow.Tileset = meta.new_type("Tileset", function(name, path_prefix)
         _n_columns = -1,
         _n_tiles = -1,
         _tiles = {},    -- Table<Number, ow.Tile>
+        _array_texture = {},
         _texture = {},  -- rt.Texture
         _batch = nil    -- love.SpriteBatch
     }, rt.Drawable)
@@ -20,24 +21,11 @@ end)
 
 --- @class ow.Tile
 --- @field id String
---- @field quad love.Quad
---- @param texture rt.Texture
---- @param column_index Number 0-based
---- @param row_index Number 0-based
-function ow.Tile(texture, tile_w, tile_h, column_index, row_index)
-    column_index = which(column_index, 1)
-    row_index = which(row_index, 1)
 
-    local x = (column_index) * tile_w
-    local y =  (row_index) * tile_h
-
-    if x < 0 or x > texture:get_width() or y < 0 or y > texture:get_height() then
-        rt.error("In ow.Tile: texture position `" .. x .. ", " .. y .. "` is out of bounds for a texture of size " .. texture:get_width() .. "x" .. texture:get_height())
-    end
-
+function ow.Tile(texture)
     return {
-       quad = love.graphics.newQuad(x, y, tile_w, tile_h, texture._native),
-       id = -1
+       quad = love.graphics.newQuad(0, 0, texture:getWidth(), texture:getHeight(), texture),
+       id = id
     }
 end
 
@@ -56,14 +44,54 @@ function ow.Tileset:_create()
     self._n_columns = x.columns
     self._n_tiles = x.tilecount
 
-    self._texture = rt.Texture(self._path_prefix .. "/" .. x.name .. ".png")
+    local image = rt.Image(self._path_prefix .. "/" .. x.name .. ".png")
+
+    clock = rt.Clock()
+    do -- generate array texture, unless already exported version is available as a folder of individual images
+        local export_dir = self._path_prefix .. "/" .. self._name
+        local info = love.filesystem.getInfo(export_dir)
+        if not meta.is_nil(info) and info.type == "directory" then
+            local slices = love.filesystem.getDirectoryItems(export_dir)
+            for i = 1, #slices do
+                slices[i] = export_dir .. "/" .. slices[i]
+            end
+            self._array_texture = love.graphics.newArrayImage(slices)
+        else
+            local image = image._native
+            local tile_w, tile_h = self._tile_width, self._tile_height
+            local slices = {}
+            for tile_x = 1, image:getWidth() / tile_w do
+                for tile_y = 1, image:getHeight() / tile_h do
+                    local data = love.image.newImageData(tile_w, tile_h, rt.Image.FORMAT) -- rgba16
+                    for x_offset = 1, tile_w do
+                        for y_offset = 1, tile_h do
+                            local r, g, b, a = image:getPixel((tile_x - 1) * tile_w + x_offset - 1, (tile_y - 1) * tile_h + y_offset - 1)
+                            data:setPixel(x_offset - 1, y_offset - 1, r, g, b, a)
+                        end
+                    end
+                    table.insert(slices, data)
+                end
+            end
+
+            -- export
+            --[[
+            love.filesystem.createDirectory("spritesheets/" .. x.name)
+            for i, slice in ipairs(slices) do
+                local data = slice:encode("png", "spritesheets/" .. x.name .. "/" .. x.name .. "_" .. ternary(i < 10, "0", "") .. i .. ".png")
+                println(love.filesystem.getAppdataDirectory() .. "rat_game/" .. data:getFilename())
+            end
+            ]]--
+
+            self._array_texture = love.graphics.newArrayImage(slices)
+        end
+    end
+    println(clock:get_elapsed():as_seconds())
+    self._texture = rt.Texture(image)
 
     for tile_i = 1, x.tilecount do
-        local tile = ow.Tile(
-            self._texture,
-            self._tile_width, self._tile_height,
-            tile_i - 1, 0
-        )
+        local tile = ow.Tile(self._array_texture)
+        tile.id = id
+        tile.quad:setLayer(tile_i)
 
         local config_maybe = x.tiles[tile_i]
         local id = tile_i - 1
@@ -77,7 +105,6 @@ function ow.Tileset:_create()
             end
         end
 
-        tile.id = id
         self._tiles[id] = tile
     end
 

@@ -35,8 +35,6 @@ end
 --- @param width Number
 --- @param height Number
 function rt.Image:create(width, height)
-
-
     self._native = love.image.newImageData(width, height, rt.Image.FORMAT)
 end
 
