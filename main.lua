@@ -27,7 +27,8 @@ love.draw = function()
 
     --love.graphics.push()
     local x, y = player:get_position()
-    love.graphics.translate(0.5 * math.abs(x - love.graphics.getWidth()), 0.5 * math.abs(y - love.graphics.getHeight()))
+    love.graphics.translate(-x, -y)
+    love.graphics.translate(love.graphics.getWidth() * 0.5, love.graphics.getHeight() * 0.5)
 
     map:draw()
     player:draw()

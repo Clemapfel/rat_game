@@ -44,16 +44,25 @@ function ow.Tileset:_create()
     self._n_columns = x.columns
     self._n_tiles = x.tilecount
 
+    local image_path = self._path_prefix .. "/" .. x.name .. ".png"
     local image = rt.Image(self._path_prefix .. "/" .. x.name .. ".png")
 
-    clock = rt.Clock()
     do -- generate array texture, unless already exported version is available as a folder of individual images
         local export_dir = "spritesheets/" .. x.name
         local info = love.filesystem.getInfo(export_dir)
-        if not meta.is_nil(info) and info.type == "directory" then
-            local slices = love.filesystem.getDirectoryItems(export_dir)
-            for i = 1, #slices do
-                slices[i] = export_dir .. "/" .. slices[i]
+
+        -- check whether the current input file is different from the one last used to generate the individual images
+        local sha256_filename = "sha256.txt"
+        local current_hash = rt.filesystem.hash(image_path, true)
+        local old_hash = love.filesystem.read(export_dir .. "/" .. sha256_filename)
+
+        if not meta.is_nil(info) and info.type == "directory" and old_hash == current_hash then
+            local files = love.filesystem.getDirectoryItems(export_dir)
+            local slices = {}
+            for i = 1, #files do
+                if files[i] ~= sha256_filename then
+                    table.insert(slices, export_dir .. "/" .. files[i])
+                end
             end
             self._array_texture = love.graphics.newArrayImage(slices)
         else
@@ -74,15 +83,16 @@ function ow.Tileset:_create()
             end
 
             -- export to .local/share/love/rat_game, so it can be loaded next time instead
-            love.filesystem.createDirectory("spritesheets/" .. x.name)
+            local spritesheet_prefix = "spritesheets/" .. x.name
+            love.filesystem.createDirectory(spritesheet_prefix)
             for i, slice in ipairs(slices) do
-                local data = slice:encode("png", "spritesheets/" .. x.name .. "/" .. x.name .. "_" .. ternary(i < 10, "0", "") .. i .. ".png")
+                local data = slice:encode("png", spritesheet_prefix.. "/" .. x.name .. "_" .. ternary(i < 10, "0", "") .. i .. ".png")
             end
 
+            love.filesystem.write(spritesheet_prefix .. "/" .. sha256_filename, current_hash)
             self._array_texture = love.graphics.newArrayImage(slices)
         end
     end
-    println(clock:get_elapsed():as_seconds())
     self._texture = rt.Texture(image)
 
     for tile_i = 1, x.tilecount do
