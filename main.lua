@@ -13,11 +13,21 @@ player = ow.Player(map._world)
 player:set_position(love.graphics.getWidth() / 2, love.graphics.getHeight() / 2)
 
 local input = rt.add_input_controller(player)
-
 local flip = true
+
+local x, y = 100, 100
+local w, h, offset = love.graphics.getWidth() - x, love.graphics.getHeight() - y, 0
+
+camera:signal_connect("reached", function(self)
+    local random_pos_x, random_pos_y =
+    ternary(flip, rt.random.integer(x - offset, x + offset), rt.random.integer(x + w - offset, x + offset), rt.random.integer(y + h- offset, y + offset)),
+    ternary(flip, rt.random.integer(x - offset, x + offset), rt.random.integer(x + w - offset, x + offset), rt.random.integer(y + h- offset, y + offset))
+    flip = not flip
+    self:move_to(random_pos_x, random_pos_y)
+    println("called")
+end)
+
 rt.current_scene.input:signal_connect("pressed", function(_, which)
-    local x, y = 100, 100
-    local w, h, offset = love.graphics.getWidth() - x, love.graphics.getHeight() - y, 0
 
    local random_pos_x, random_pos_y =
     ternary(flip, rt.random.integer(x - offset, x + offset), rt.random.integer(x + w - offset, x + offset), rt.random.integer(y + h- offset, y + offset)),

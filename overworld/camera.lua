@@ -1,10 +1,12 @@
 rt.settings.overworld.camera = {
+    collider_radius = 10,
     collider_mass = 50,        -- mass of the camera center physics object
     collider_speed = 2000,      -- magnitude of force impulse in the direction of camera centers target
     max_velocity = 500          -- maximum camera velocity during panning
 }
 
---- ow.Camera
+--- @class ow.Camera
+--- @signal reached (self) -> nil emitted when camera reaches a position specified by `move_to`
 ow.Camera = meta.new_type("Camera", function()
     local out = meta.new(ow.Camera, {
         _scale = 1,
@@ -14,13 +16,16 @@ ow.Camera = meta.new_type("Camera", function()
         _target_y = 0,
 
         _world = rt.PhysicsWorld(0, 0),
-        _collider = {} -- rt.CircleCollider
-    }, rt.Animation)
+        _collider = {}, -- rt.CircleCollider
+        _is_moving = false
+    }, rt.SignalEmitter, rt.Animation)
 
-    out._collider = rt.CircleCollider(out._world, rt.ColliderType.DYNAMIC, 0, 0, 10)
+    out._collider = rt.CircleCollider(out._world, rt.ColliderType.DYNAMIC, 0, 0, rt.settings.overworld.camera.collider_radius)
     out._collider:set_mass(rt.settings.overworld.camera.collider_mass)
     out:_set_target_positions(0, 0)
     out:set_is_animated(true)
+
+    out:signal_add("reached")
     return out
 end)
 
@@ -53,6 +58,11 @@ function ow.Camera:update(delta)
     local damping = magnitude / (4 * distance)
     self._collider:set_linear_damping(damping)
 
+    if distance < rt.settings.overworld.camera.collider_radius and self._is_moving then
+        self._is_moving = false
+        self:signal_emit("reached")
+    end
+
     self._world:update(delta)
 
     -- clamp velocity to set maximum
@@ -73,6 +83,7 @@ end
 --- @brief initiate for the camera to move to center a certain point
 function ow.Camera:move_to(x, y)
     self:_set_target_positions(x, y)
+    self._is_moving = true
 end
 
 --- @brief teleport the camera such that immediately shows point
