@@ -18,18 +18,20 @@ local flip = true
 rt.current_scene.input:signal_connect("pressed", function(_, which)
     local x, y = 100, 100
     local w, h, offset = love.graphics.getWidth() - x, love.graphics.getHeight() - y, 0
+
+   local random_pos_x, random_pos_y =
+    ternary(flip, rt.random.integer(x - offset, x + offset), rt.random.integer(x + w - offset, x + offset), rt.random.integer(y + h- offset, y + offset)),
+    ternary(flip, rt.random.integer(x - offset, x + offset), rt.random.integer(x + w - offset, x + offset), rt.random.integer(y + h- offset, y + offset))
+    flip = not flip
+
     if which == rt.InputButton.A then
-        camera:center_on(
-            ternary(flip, rt.random.integer(x - offset, x + offset), rt.random.integer(x + w - offset, x + offset), rt.random.integer(y + h- offset, y + offset)),
-            ternary(flip, rt.random.integer(x - offset, x + offset), rt.random.integer(x + w - offset, x + offset), rt.random.integer(y + h- offset, y + offset))
-        )
-        flip = not flip
+        camera:center_on(random_pos_x, random_pos_y)
     elseif which == rt.InputButton.B then
-        camera:center_on(50, 400)
+        camera:center_on(player:get_position())
     elseif which == rt.InputButton.X then
-        camera:center_on(400, 400)
+        camera:move_to(random_pos_x, random_pos_y)
     elseif which == rt.InputButton.Y then
-        camera:center_on(400, 50)
+        camera:move_to(player:get_position())
     elseif which == rt.InputButton.R then
        camera:rotate(rt.degrees(5))
     elseif which == rt.InputButton.L then
@@ -60,10 +62,9 @@ love.draw = function()
     love.graphics.clear(1, 0, 1, 1)
     rt.current_scene:draw()
 
-    --camera:center_on(player:get_position())
     camera:bind()
-    --map:draw()
-    --player:draw()
+    map:draw()
+    player:draw()
 
     camera:unbind()
     camera:draw()
@@ -73,6 +74,10 @@ love.update = function()
     local delta = love.timer.getDelta()
     rt.current_scene:update(delta)
     map._world:update(delta)
+
+    if input:is_down(rt.InputButton.B) then
+        camera:center_on(player:get_position())
+    end
 end
 
 
