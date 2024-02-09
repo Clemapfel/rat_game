@@ -2,16 +2,51 @@ require("include")
 
 rt.current_scene = rt.add_scene("debug")
 
+
 map = ow.Map("debug_map", "assets/maps/debug")
 --debug_tileset = ow.Tileset("debug_tileset", "assets/maps/debug")
 --carpet_tileset = ow.Tileset("carpet", "assets/maps/debug")
 --println(serialize(meta.get_properties(debug_tileset)))
 
+camera = ow.Camera()
 player = ow.Player(map._world)
 player:set_position(love.graphics.getWidth() / 2, love.graphics.getHeight() / 2)
 
+local input = rt.add_input_controller(player)
+
+local flip = true
+rt.current_scene.input:signal_connect("pressed", function(_, which)
+    local x, y, w, h, offset  = 100, 100, 800, 800, 50
+    if which == rt.InputButton.A then
+
+        camera:center_on(
+            ternary(flip, rt.random.integer(x - offset, x + offset), rt.random.integer(x + w - offset, x + offset), rt.random.integer(y + h- offset, y + offset)),
+            ternary(flip, rt.random.integer(x - offset, x + offset), rt.random.integer(x + w - offset, x + offset), rt.random.integer(y + h- offset, y + offset))
+        )
+        flip = not flip
+    elseif which == rt.InputButton.B then
+        camera:center_on(50, 400)
+    elseif which == rt.InputButton.X then
+        camera:center_on(400, 400)
+    elseif which == rt.InputButton.Y then
+        camera:center_on(400, 50)
+    elseif which == rt.InputButton.R then
+       camera:rotate(rt.degrees(5))
+    elseif which == rt.InputButton.L then
+        camera:rotate(rt.degrees(-5))
+    elseif which == rt.InputButton.UP then
+    elseif which == rt.InputButton.RIGHT then
+    elseif which == rt.InputButton.LEFT then
+    elseif which == rt.InputButton.DOWN then
+    end
+end)
+
+-- ##
+
+-- ##
+
 love.load = function()
-    love.window.setMode(1000, 800, {
+    love.window.setMode(800, 600, {
         vsync = 1,
         msaa = 8,
         stencil = true,
@@ -25,15 +60,13 @@ love.draw = function()
     love.graphics.clear(1, 0, 1, 1)
     rt.current_scene:draw()
 
-    --love.graphics.push()
-    local x, y = player:get_position()
-    love.graphics.translate(-x, -y)
-    love.graphics.translate(love.graphics.getWidth() * 0.5, love.graphics.getHeight() * 0.5)
+    --camera:center_on(player:get_position())
+    camera:bind()
+    --map:draw()
+    --player:draw()
 
-    map:draw()
-    player:draw()
-
-    --love.graphics.pop()
+    camera:unbind()
+    camera:draw()
 end
 
 love.update = function()

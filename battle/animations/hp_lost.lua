@@ -157,4 +157,5 @@ function bt.Animation.HP_LOST:draw()
     for i = 1, self._n_targets do
         self._overlays[i]:draw()
     end
+
 end

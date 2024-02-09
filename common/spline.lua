@@ -1,5 +1,5 @@
 rt.settings.spline = {
-    steprate = 1, -- number of vertices per spline segment
+    steprate = 15, -- number of vertices per spline segment
     loop_interpolation_quality = 5, -- number of vertices used to compute the loop-closing segment
 }
 
