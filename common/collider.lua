@@ -136,13 +136,13 @@ function rt.Collider:get_linear_velocity()
 end
 
 --- @brief
-function rt.Collider:set_linear_dampening(x, y)
-    self._body:setLinearVelocity(x, y)
+function rt.Collider:set_linear_damping(x, y)
+    self._body:setLinearDamping(x, y)
 end
 
 --- @brief
-function rt.Collider:get_linear_dampening()
-    return self._body:getLinearDampening()
+function rt.Collider:get_linear_damping()
+    return self._body:getLinearDamping()
 end
 
 --- @brief

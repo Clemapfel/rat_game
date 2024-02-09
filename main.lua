@@ -16,9 +16,9 @@ local input = rt.add_input_controller(player)
 
 local flip = true
 rt.current_scene.input:signal_connect("pressed", function(_, which)
-    local x, y, w, h, offset  = 100, 100, 800, 800, 50
+    local x, y = 100, 100
+    local w, h, offset = love.graphics.getWidth() - x, love.graphics.getHeight() - y, 0
     if which == rt.InputButton.A then
-
         camera:center_on(
             ternary(flip, rt.random.integer(x - offset, x + offset), rt.random.integer(x + w - offset, x + offset), rt.random.integer(y + h- offset, y + offset)),
             ternary(flip, rt.random.integer(x - offset, x + offset), rt.random.integer(x + w - offset, x + offset), rt.random.integer(y + h- offset, y + offset))
