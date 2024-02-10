@@ -13,7 +13,6 @@ rt.FourierTransform = meta.new_type("FourierTransform", function()
     return out
 end)
 
-
 do
     if rt.settings.fourier_transform.use_high_precision then
         rt.FourierTransform._fftw_cdef = [[

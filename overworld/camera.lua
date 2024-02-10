@@ -5,6 +5,39 @@ rt.settings.overworld.camera = {
     max_velocity = 500          -- maximum camera velocity during panning
 }
 
+--- @class ow.CameraScript
+ow.CameraScript = meta.new_type("CameraScript", function(positions, zoom, rotation)
+
+    -- use splines to interpolate between 1-dimensional values by setting second dimension to 0
+
+    -- xy component is center
+    local vertices = {}
+    for i = 1, #positions, 2 do
+        table.insert(vertices, positions[i+0])
+        table.insert(vertices, positions[i+1])
+    end
+
+    -- x, y component is scale
+    local scales = {self._scale, self._scale}
+    for i = 1, #zoom, 1 do
+        table.insert(scales, zoom[i])
+        table.insert(scales, zoom[i])
+    end
+
+    -- x component is rotation
+    local rotations = {0, 0}
+    for i = 1, #rotations do
+        table.insert(rotations, rotation[i]:as_radians())
+        table.insert(rotations, 0)
+    end
+
+    local out = meta.new(ow.CameraScript, {
+        _position = rt.Spline(vertices),
+        _rotation = rt.Spline(rotations),
+        _zoom = rt.Spline(scales)
+    })
+end)
+
 --- @class ow.Camera
 --- @signal reached (self) -> nil emitted when camera reaches a position specified by `move_to`
 ow.Camera = meta.new_type("Camera", function()
@@ -58,7 +91,7 @@ function ow.Camera:update(delta)
     local damping = magnitude / (4 * distance)
     self._collider:set_linear_damping(damping)
 
-    if distance < rt.settings.overworld.camera.collider_radius and self._is_moving then
+    if distance < 1 and self._is_moving then
         self._is_moving = false
         self:signal_emit("reached")
     end

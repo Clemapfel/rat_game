@@ -6,6 +6,11 @@ rt.settings.spline = {
 --- @class rt.Spline
 --- @brief catmull-rom spline, c1 continuous and goes through every control point
 rt.Spline = meta.new_type("Spline", function(points, loop)
+
+    if #points == 2 then
+        points = {points[1], points[2], points[1], points[2]}
+    end
+
     local vertices, distances, total_length = rt.Spline._catmull_rom(points, loop)
     local out = meta.new(rt.Spline, {
         _vertices = vertices,
