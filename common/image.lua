@@ -49,7 +49,6 @@ end
 --- @param y Number 1-based
 --- @param rgba rt.RGBA
 function rt.Image:set_pixel(x, y, rgba)
-
     if meta.is_hsva(rgba) then rgba = rt.hsva_to_rgba(rgba) end
 
     if x < 1 or x > self:get_width() or y < 1 or y > self:get_height() then

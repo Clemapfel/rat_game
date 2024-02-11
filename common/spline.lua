@@ -5,13 +5,15 @@ rt.settings.spline = {
 
 --- @class rt.Spline
 --- @brief catmull-rom spline, c1 continuous and goes through every control point
-rt.Spline = meta.new_type("Spline", function(points, loop)
+rt.Spline = meta.new_type("Spline", function(points, loop, steprate)
+
+    steprate = which(steprate, rt.settings.spline.steprate)
 
     if #points == 2 then
         points = {points[1], points[2], points[1], points[2]}
     end
 
-    local vertices, distances, total_length = rt.Spline._catmull_rom(points, loop)
+    local vertices, distances, total_length = rt.Spline._catmull_rom(points, loop, steprate)
     local out = meta.new(rt.Spline, {
         _vertices = vertices,
         _distances = distances,
@@ -83,7 +85,8 @@ end
 --- @param points Table<Number>
 --- @param steprate Number n steps per segment
 --- @param loop Boolean
-function rt.Spline._catmull_rom(points, loop)
+--- @param quality Number n subdivisions per vertex
+function rt.Spline._catmull_rom(points, loop, quality)
 
     -- source: https://gist.github.com/HoraceBury/4afb0e68cd807d8ead220a709219db2e
 
@@ -96,7 +99,7 @@ function rt.Spline._catmull_rom(points, loop)
     end
 
     loop = which(loop, false)
-    local steprate = clamp(rt.settings.spline.steprate, 1)
+    local steprate = clamp(which(quality, rt.settings.spline.steprate), 1)
 
     if #points % 2 ~= 0 then
         rt.error("In rt.Spline._catmull_rom: number of point vertices have to be a multiple of 2")

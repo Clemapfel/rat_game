@@ -33,8 +33,37 @@ local n, nc = 256, 20
 local wavelet = gsl.gsl_wavelet_alloc(gsl.gsl_wavelet_daubechies, 4)
 local workspace = gsl.gsl_wavelet_workspace_alloc(n);
 
+local data_n = 50
+local data = rt.Matrix(data_n)
+for i = 1, data_n do
+    data:set(i, rt.random.integer(-50, 50))
+end
 
+rt.current_scene = rt.Scene("debug")
+rt.current_scene:set_child(rt.LinePlot(data))
 
+-- ##
+
+love.load = function()
+    love.window.setMode(800, 600, {
+        vsync = 1,
+        msaa = 8,
+        stencil = true,
+        resizable = true
+    })
+    love.window.setTitle("rat_game")
+    rt.current_scene:run()
+end
+
+love.draw = function()
+    love.graphics.clear(1, 0, 1, 1)
+    rt.current_scene:draw()
+end
+
+love.update = function()
+    local delta = love.timer.getDelta()
+    rt.current_scene:update(delta)
+end
 
 
 

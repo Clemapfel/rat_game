@@ -1,4 +1,4 @@
-rt.settings.matrix.default_value = INFINITY
+rt.settings.matrix.default_value = 0
 
 rt.Matrix = function(dimension, ...)
 
@@ -80,13 +80,25 @@ rt.Matrix = function(dimension, ...)
     function out:set(...)
 
         local args = {...}
+        if #args == 2 then
+            -- linear indexing
+
+            local i = args[1]
+            local value = args[2]
+
+            if i > #self._data then
+                rt.error("In rt.Matrix:set: linear index `" .. i .. "` is out of bounds for a matrix of size `" .. #self._data .. "`")
+            end
+
+            self._data[i] = value
+            return
+        end
 
         if #args ~= #self._dimensions + 1 then
-            rt.error("In rt.Matrix:set incorrect number of arguments, expected `" .. tostring(#self._dimensions) .. "` indices, one value. Got  `" .. #args .. "`")
+            rt.error("In rt.Matrix:set: incorrect number of arguments, expected `" .. tostring(#self._dimensions) .. "` indices, one value. Got  `" .. #args .. "`")
         end
 
         local indices = {}
-
         for i = 1, #self._dimensions do
             table.insert(indices, args[i])
         end
@@ -110,6 +122,9 @@ rt.Matrix = function(dimension, ...)
         for i = 1, #self._data do
             self._data[i] = value
         end
+
+        self._min = value
+        self._max = value
     end
 
     return out

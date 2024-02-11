@@ -159,13 +159,13 @@ function rt.Glyph:_update()
         if self._is_underlined then
             table.insert(underline_vertices, x)
             table.insert(underline_vertices, underline_y)
-            self._underline = rt.VertexRectangleSegments(1, splat(underline_vertices))
+            self._underline = rt.VertexRectangleSegments(1, underline_vertices)
         end
 
         if self._is_strikethrough then
             table.insert(strikethrough_vertices, x)
             table.insert(strikethrough_vertices, strikethrough_y)
-            self._strikethrough = rt.VertexRectangleSegments(1, splat(strikethrough_vertices))
+            self._strikethrough = rt.VertexRectangleSegments(1, strikethrough_vertices)
         end
     end
 end

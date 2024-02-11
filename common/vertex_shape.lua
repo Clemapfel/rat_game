@@ -105,7 +105,7 @@ end
 --- @param x Number in px
 --- @param y Number in px
 function rt.VertexShape:set_vertex_position(i, x, y, z)
-    self._native:setVertexAttribute(i, 1, x, y, z)
+    self._native:setVertexAttribute(i, 1, x, y, which(z, 0))
 end
 
 --- @brief get position of vertex
@@ -181,7 +181,6 @@ end
 
 --- @overload rt.Drawable.draw
 function rt.VertexShape:draw()
-
     if not self:get_is_visible() then return end
 
     if self:get_is_visible() then
@@ -311,9 +310,8 @@ function rt.VertexLine(thickness, ...)
 end
 
 --- @brief
-function rt.VertexRectangleSegments(thickness, ...)
-    local vertices = {...}
-    local n_vertices = _G._select('#', ...)
+function rt.VertexRectangleSegments(thickness, vertices)
+    local n_vertices = #vertices
 
     if not (n_vertices >= 4 and n_vertices % 2 == 0) then
         rt.error("In rt.VertexRectangleSegments: Need at least 2 vertices")
@@ -363,6 +361,31 @@ function rt.VertexRectangleSegments(thickness, ...)
     local out = rt.VertexShape(vertices_out)
     out:set_draw_mode(rt.MeshDrawMode.TRIANGLES)
     out:set_vertex_order(vertex_map)
+    return out
+end
+
+--- @brief
+function rt.VertexCircle(x, y, x_radius, y_radius, n_outer_vertices)
+
+    y_radius = which(y_radius, x_radius)
+    n_outer_vertices = which(n_outer_vertices, 8)
+    local vertices = {}
+    local indices = {}
+
+    local step = 360 / n_outer_vertices
+    for angle in step_range(0, 360, step) do
+        local as_radians = rt.degrees_to_radians(angle)
+        table.insert(vertices, {x + math.cos(as_radians) * x_radius, y + math.sin(as_radians) * y_radius, 0})
+    end
+
+    for i = 1, #vertices do
+        table.insert(indices, i)
+    end
+    table.insert(indices, 1)
+
+    local out = rt.VertexShape(vertices)
+    out:set_draw_mode(rt.MeshDrawMode.TRIANGLE_FAN)
+    out:set_vertex_order(indices)
     return out
 end
 
