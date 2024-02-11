@@ -34,13 +34,13 @@ local wavelet = gsl.gsl_wavelet_alloc(gsl.gsl_wavelet_daubechies, 4)
 local workspace = gsl.gsl_wavelet_workspace_alloc(n);
 
 local data_n = 50
-local data = rt.Matrix(data_n)
-for i = 1, data_n do
+local data = rt.Matrix(data_n, data_n)
+for i = 1, data_n * data_n do
     data:set(i, rt.random.integer(-50, 50))
 end
 
 rt.current_scene = rt.Scene("debug")
-rt.current_scene:set_child(rt.LinePlot(data))
+rt.current_scene:set_child(rt.Plot2D(data))
 
 -- ##
 

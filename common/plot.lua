@@ -1,48 +1,9 @@
---- @class rt.HeatMap
---- @param data rt.Matrix
-rt.HeatMap = meta.new_type("HeatMap", function(data)
-    local out = meta.new(rt.HeatMap, {
-        _texture = {},
-        _shape = rt.VertexRectangle(0, 0, 1, 1),
-        _width = data:get_dimension(1),
-        _height = data:get_dimension(2)
-    }, rt.Widget, rt.Drawable)
-
-    local image = rt.Image(out._width, out._height)
-    local min, max = table.min_max(data._data)
-    for row_i = 1, out._height do
-        for col_i = 1, out._width do
-            local value = data:get(col_i, row_i)
-            image:set_pixel(col_i, row_i, rt.HSVA((value - min) / (max - min), 1, 1, 1))
-        end
-    end
-
-    out._texture = rt.Texture(image)
-    out._texture:set_scale_mode(rt.TextureScaleMode.LINEAR)
-    out._texture:set_wrap_mode(rt.TextureWrapMode.CLAMP)
-    out._shape:set_texture(out._texture)
-    return out
-end)
-
---- @overload
-function rt.HeatMap:size_allocate(x, y, width, height)
-    self._shape:set_vertex_position(1, x, y)
-    self._shape:set_vertex_position(2, x + width, y)
-    self._shape:set_vertex_position(3, x + width, y + height)
-    self._shape:set_vertex_position(4, x, y + height)
-end
-
---- @overload
-function rt.HeatMap:draw()
-    self._shape:draw()
-end
-
---- @class rt.LinePlot
-rt.LinePlot = meta.new_type("LinePlot", function(data, interpolate)
+--- @class rt.Plot1D
+rt.Plot1D = meta.new_type("Plot1D", function(data, interpolate)
     interpolate = which(interpolate, true)
 
     local min, max = table.min_max(data._data)
-    local out = meta.new(rt.LinePlot, {
+    local out = meta.new(rt.Plot1D, {
         _spline = {}, -- rt.Spline
         _shape = {}, -- rt.VertexShape
         _zero = {},  -- rt.VertexShape
@@ -61,18 +22,44 @@ rt.LinePlot = meta.new_type("LinePlot", function(data, interpolate)
     return out
 end)
 
+--- @class rt.Plot2D
+--- @param data rt.Matrix
+rt.Plot2D = meta.new_type("Plot2D", function(data)
+    local out = meta.new(rt.Plot2D, {
+        _texture = {},
+        _shape = rt.VertexRectangle(0, 0, 1, 1),
+        _width = data:get_dimension(1),
+        _height = data:get_dimension(2)
+    }, rt.Widget, rt.Drawable)
+
+    local image = rt.Image(out._width, out._height)
+    local min, max = table.min_max(data._data)
+    for row_i = 1, out._height do
+        for col_i = 1, out._width do
+            local value = data:get(col_i, row_i)
+            image:set_pixel(col_i, row_i, rt.HSVA((value - min) / (max - min), 1, 1, 1))
+        end
+    end
+
+    out._texture = rt.Texture(image)
+    out._texture:set_scale_mode(rt.TextureScaleMode.NEAREST)
+    out._texture:set_wrap_mode(rt.TextureWrapMode.CLAMP)
+    out._shape:set_texture(out._texture)
+    return out
+end)
+
 --- @brief
-function rt.LinePlot:set_line_visible(b)
+function rt.Plot1D:set_line_visible(b)
     self._line_visible = b
 end
 
 --- @brief
-function rt.LinePlot:set_points_visible(b)
+function rt.Plot1D:set_points_visible(b)
     self._points_visible = b
 end
 
 --- @overload
-function rt.LinePlot:draw()
+function rt.Plot1D:draw()
     self._background:draw()
     self._zero:draw()
 
@@ -88,7 +75,7 @@ function rt.LinePlot:draw()
 end
 
 --- @overload
-function rt.LinePlot:size_allocate(x, y, width, height)
+function rt.Plot1D:size_allocate(x, y, width, height)
 
     self._background:set_vertex_position(1, x, y)
     self._background:set_vertex_position(2, x + width, y)
@@ -121,4 +108,17 @@ function rt.LinePlot:size_allocate(x, y, width, height)
     self._zero:set_color(rt.Palette.GRAY_3)
     self._spline = rt.Spline(vertices, false, ternary(self._interpolate, 5, 1))
     self._shape = rt.VertexRectangleSegments(1, self._spline._vertices)
+end
+
+--- @overload
+function rt.Plot2D:size_allocate(x, y, width, height)
+    self._shape:set_vertex_position(1, x, y)
+    self._shape:set_vertex_position(2, x + width, y)
+    self._shape:set_vertex_position(3, x + width, y + height)
+    self._shape:set_vertex_position(4, x, y + height)
+end
+
+--- @overload
+function rt.Plot2D:draw()
+    self._shape:draw()
 end
