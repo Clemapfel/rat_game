@@ -13,6 +13,7 @@ rt.Sprite = meta.new_type("Sprite", function(spritesheet, animation_id)
         _animation_id = animation_id,
         _shape = rt.VertexRectangle(0, 0, 0, 0),
         _current_frame = 1,
+        _texture_aabb = rt.AABB(0, 0, 1, 1), -- texture coordinates
         _frame_width = w,
         _frame_height = h,
         _elapsed = 0,
@@ -33,8 +34,12 @@ end
 
 --- @overload rt.Widget.size_allocate
 function rt.Sprite:size_allocate(x, y, width, height)
-    self._shape:resize(x, y, width, height)
-    self._shape:set_texture_rectangle(self._spritesheet:get_frame(self._animation_id, self._current_frame))
+    self._temp = rt.AABB(x, y, width, height)
+    self._shape:set_vertex_position(1, x, y)
+    self._shape:set_vertex_position(2, x + width, y)
+    self._shape:set_vertex_position(3, x + width, y + height)
+    self._shape:set_vertex_position(4, x, y + height)
+    self:set_frame(self._current_frame)
 end
 
 --- @overload rt.Animation.update
@@ -59,7 +64,9 @@ function rt.Sprite:set_frame(i)
     end
 
     self._current_frame = i
-    self._shape:set_texture_rectangle(self._spritesheet:get_frame(self._animation_id, i))
+    local rect = self._spritesheet:get_frame(self._animation_id, i)
+    self._texture_aabb = rect
+    self._shape:set_texture_rectangle(rect)
 end
 
 --- @brief get which frame is currently displayed
