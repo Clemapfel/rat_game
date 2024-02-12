@@ -159,7 +159,6 @@ function ow.Player:_update_velocity_from_dpad()
     self:_update_velocity()
 end
 
-
 --- @brief [internal]
 function ow.Player._handle_button_pressed(_, button, self)
     if button == rt.InputButton.A then

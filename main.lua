@@ -5,6 +5,7 @@ local scene = ow.OverworldScene()
 rt.current_scene:set_child(scene)
 
 rt.current_scene.input:signal_connect("pressed", function(_, which)
+
     if which == rt.InputButton.A then
     elseif which == rt.InputButton.B then
     elseif which == rt.InputButton.X then
