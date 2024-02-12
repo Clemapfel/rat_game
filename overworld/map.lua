@@ -44,7 +44,7 @@ ow.Map = meta.new_type("Map", function(name, path_prefix)
         _tile_layers = {},  -- Table<ow.TileLayer>
         _object_layers = {},    -- Table<ow.ObjectLayer>
         _debug_draw_enabled = true
-    }, rt.Drawable)
+    }, rt.Drawable, rt.Animation)
     out:_create()
     return out
 end)
@@ -328,5 +328,8 @@ function ow.Map._generate_tile_colliders(matrix)
     return out
 end
 
-
+--- @brief
+function ow.Map:update(delta)
+    self._world:update(delta)
+end
 
