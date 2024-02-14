@@ -1,11 +1,7 @@
 --- @class ow.OverworldEntity
 ow.OverworldEntity = meta._new_abstract_type("OverworldEntity",
-    rt.Drawable, rt.Animation, rt.SignalEmitter,
-    {
-        _is_realized = false,
-    }
+    rt.Drawable, rt.Animation, rt.SignalEmitter
 )
-
 
 --- @overload called when player interacts with object
 function ow.OverworldEntity:on_interact() end

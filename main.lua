@@ -1,22 +1,18 @@
 require("include")
 
-
 ow.Test = meta._new_type("Test", ow.OverworldEntity, function()
     return meta.new(ow.Test)
 end)
 
-dbg(ow.OverworldEntity.properties)
+dbg(meta.get_properties(ow.OverworldEntity))
 
 instance = ow.Test()
-dbg(meta.get_supertypes(instance))
-dbg(instance._is_realized)
 
 rt.current_scene = rt.add_scene("debug")
 local scene = ow.OverworldScene()
 rt.current_scene:set_child(scene)
 
 rt.current_scene.input:signal_connect("pressed", function(_, which)
-
     if which == rt.InputButton.A then
     elseif which == rt.InputButton.B then
     elseif which == rt.InputButton.X then

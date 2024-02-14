@@ -255,6 +255,15 @@ function meta.get_properties(x)
     return getmetatable(x).properties
 end
 
+--- @brief add list of properties, useful for types
+--- @param x meta.Type
+--- @param properties Table
+function meta.add_properties(x, properties)
+    for name, value in pairs(properties) do
+        meta.install_property(x, name, value)
+    end
+end
+
 --- @brief make object immutable, this should be done inside the objects constructor
 --- @param x meta.Object
 --- @param b Boolean
@@ -461,6 +470,10 @@ function meta.new_type(typename, ctor, ...)
 end
 
 -- TODO
+function meta._default_ctor(self)
+    return meta.new(self)
+end
+
 function meta._new_type(typename, ...)
     local out = meta._new("Type")
     local metatable = getmetatable(out)
@@ -494,9 +507,7 @@ function meta._new_type(typename, ...)
         end
     else
         -- default constructor
-        metatable.__call = function(self, ...)
-            return meta.new(self)
-        end
+        metatable.__call = meta._default_ctor
     end
 
     if not meta.is_nil(meta.types[typename]) then
