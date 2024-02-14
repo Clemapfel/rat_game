@@ -1,5 +1,16 @@
 require("include")
 
+
+ow.Test = meta._new_type("Test", ow.OverworldEntity, function()
+    return meta.new(ow.Test)
+end)
+
+dbg(ow.OverworldEntity.properties)
+
+instance = ow.Test()
+dbg(meta.get_supertypes(instance))
+dbg(instance._is_realized)
+
 rt.current_scene = rt.add_scene("debug")
 local scene = ow.OverworldScene()
 rt.current_scene:set_child(scene)

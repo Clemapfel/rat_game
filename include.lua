@@ -186,6 +186,7 @@ end
 
 require "overworld.overworld_scene"
 require "overworld.player"
+require "overworld.overworld_entity"
 require "overworld.interact_trigger"
 require "overworld.intersect_trigger"
 

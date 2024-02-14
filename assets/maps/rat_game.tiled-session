@@ -23,10 +23,10 @@
                 2
             ],
             "scale": 0.75,
-            "selectedLayer": 1,
+            "selectedLayer": 0,
             "viewCenter": {
-                "x": 356.6666666666666,
-                "y": 420.66666666666674
+                "x": 351.33333333333337,
+                "y": 547.3333333333333
             }
         },
         "debug/debug_tileset.tsx": {
@@ -40,6 +40,7 @@
             "scaleInEditor": 1
         }
     },
+    "frame.defaultDuration": 70,
     "last.exportedFilePath": "/home/clem/Workspace/rat_game/assets/maps/debug",
     "last.imagePath": "/home/clem/Workspace/rat_game/assets/maps/debug",
     "last.objectTemplatePath": "/home/clem/Workspace/rat_game/assets/maps/debug",

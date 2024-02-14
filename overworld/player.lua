@@ -290,9 +290,9 @@ function ow.Player._on_physics_update(_, self)
     direction_triangle_radius = direction_triangle_radius * 0.5
     local direction_indicator_magnitude = 0.5 * radius--clamp(velocity_indicator_magnitude, 0.5 * radius)
     tip_x, tip_y = rt.translate_point_by_angle(
-            x, y,
-            direction_indicator_magnitude,
-            self._direction
+        x, y,
+        direction_indicator_magnitude,
+        self._direction
     )
 
     up_x, up_y = rt.translate_point_by_angle(x, y, direction_triangle_radius , self._direction - angle_offset)

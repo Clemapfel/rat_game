@@ -35,7 +35,7 @@ end
 
 function dbg(...)
     for _, x in pairs({...}) do
-        io.write(tostring(x))
+        io.write(serialize(x))
         io.write(" ")
     end
 
@@ -397,6 +397,11 @@ function table.min_max(t)
         if value > max then max = value end
     end
     return min, max
+end
+
+--- @brief
+function table.push(t, v)
+    table.insert(t, v)
 end
 
 --- @brief get first element of table, in iteration order

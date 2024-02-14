@@ -290,31 +290,31 @@ function meta.new(type, fields, ...)
         end
     end
 
-    --[[
-    local metatable = getmetatable(instance)
-    metatable.super[type._typename] = true
-
-    for key, value in pairs(getmetatable(type).properties) do
-        if instance[key] == nil then
-            metatable.properties[key] = value
-        end
-    end
-    ]]--
-
     local installed = {}
     for key, value in pairs(getmetatable(type).properties) do
         metatable.properties[key] = value
     end
 
-    metatable.super[type._typename] = true
+    -- recursively install all types and super types of types
+    local function install_super(super)
+        if metatable.super[super._typename] ~= true then
+            metatable.super[super._typename] = true
+            for key, value in pairs(getmetatable(super).properties) do
+                if metatable.properties[key] == nil then
+                    metatable.properties[key] = value
+                end
+            end
 
-    for super in range(...) do
-        metatable.super[super._typename] = true
-        for key, value in pairs(getmetatable(super).properties) do
-            if metatable.properties[key] == nil then
-                metatable.properties[key] = value
+            for _, supersuper in pairs(super._super) do
+                install_super(supersuper)
             end
         end
+    end
+
+    install_super(type)
+
+    for super in range(...) do
+        install_super(super)
     end
     return out
 end
@@ -330,20 +330,12 @@ function meta.new_enum(fields)
     end
 
     local out, metatable = meta._new(meta.Enum)
-    --local used_values = {}
 
     local i = 0
     for name, value in pairs(fields) do
-
         if meta.is_table(value) then
             rt.error("In meta.new_enum: Enum value for key `" .. name .. "` is a `" .. meta.typeof(value) .. "`, which is not a primitive.")
         end
-
-        --if used_values[value] ~= nil then
-        --    rt.error("In meta.new_enum: Duplicate value, key `" .. name .. "` and `" .. used_values[value] .. "` both have the same value `" .. tostring(value) .. "`")
-        --end
-        --used_values[value] = name
-
         metatable.properties[name] = value
     end
 
@@ -443,13 +435,14 @@ end
 --- @brief create a new type with given constructor, this also defines `meta.is_*` and `meta.assert_*` for typename
 --- @param typename String
 --- @param ctor Function
-function meta.new_type(typename, ctor)
+--- @vararg meta.Type
+function meta.new_type(typename, ctor, ...)
     local out = meta._new("Type")
     local metatable = getmetatable(out)
 
-    local type_id = string.hash(typename)
     rawset(metatable.properties, "_typename", typename)
-    rawset(metatable.properties, "_type_id", type_id)
+    rawset(metatable.properties, "_type_id", string.hash(typename))
+    rawset(metatable.properties, "_super", {...})
 
     metatable.__call = function(self, ...)
         local out = ctor(...)
@@ -467,13 +460,108 @@ function meta.new_type(typename, ctor)
     return out
 end
 
+-- TODO
+function meta._new_type(typename, ...)
+    local out = meta._new("Type")
+    local metatable = getmetatable(out)
+
+    -- if last arg is function, use as constructor, use rest as super types
+    local super, ctor = nil, nil
+    if _G._select("#", ...) ~= 0 then
+        local args = {...}
+        if meta.is_function(args[#args]) then
+            ctor = args[#args]
+            args[#args] = nil
+            super = args
+        else
+            ctor = nil
+            super = args
+        end
+    end
+
+    rawset(metatable.properties, "_typename", typename)
+    rawset(metatable.properties, "_type_id", string.hash(typename))
+    rawset(metatable.properties, "_super", which(super, {}))
+
+    if not meta.is_nil(ctor) then
+        -- custom constructor
+        metatable.__call = function(self, ...)
+            local out = ctor(...)
+            if not meta.isa(out, self) then
+                rt.error("In " .. self._typename .. ".__call: Constructor does not return object of type `" .. self._typename .. "`.")
+            end
+            return out
+        end
+    else
+        -- default constructor
+        metatable.__call = function(self, ...)
+            return meta.new(self)
+        end
+    end
+
+    if not meta.is_nil(meta.types[typename]) then
+        rt.error("In meta.new_type: A type with name `" .. typename .. "` already exists.")
+    end
+    meta.types[typename] = out
+    meta._define_type_assertion(typename)
+    return out
+end
+
 --- @brief declare abstract type, this is a type that cannot be instanced
 --- @param name String
-function meta.new_abstract_type(name)
+--- @param fields Table
+--- @vararg meta.Type
+function meta.new_abstract_type(name, fields, ...)
     local out = meta.new_type(name, function()
         rt.error("In " .. name .. "._call: Type `" .. name .. "` is abstract, it cannot be instanced")
-    end)
+    end, ...)
+
+    if not meta.is_nil(table) then
+        for key, value in pairs(table) do
+            out[key] = value
+        end
+    end
     return out
+end
+
+-- TODO
+function meta._new_abstract_type(name, ...)
+
+    -- if last arg is table, use to populate fields, use rest as super types
+    local super, fields = nil, nil
+    if _G._select("#", ...) ~= 0 then
+        local args = {...}
+        if not meta.is_type(args[#args]) then
+            fields = args[#args]
+            args[#args] = nil
+            super = args
+        else
+            fields = nil
+            super = args
+        end
+    end
+
+    local to_splat = {}
+    for _, v in pairs(super) do
+        table.insert(to_splat, v)
+    end
+
+    table.insert(to_splat, function()
+        rt.error("In " .. name .. "._call: Type `" .. name .. "` is abstract, it cannot be instantiated")
+    end)
+
+    local out = meta._new_type(name, splat(to_splat))
+    if not meta.is_nil(fields) then
+        for key, value in pairs(fields) do
+            out[key] = value
+        end
+    end
+    return out
+end
+
+--- @brief get all super types of instance or type
+function meta.get_supertypes(instance)
+    return getmetatable(instance).super
 end
 
 --- @class meta.Type
