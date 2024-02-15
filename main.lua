@@ -11,6 +11,9 @@ ow.Sub = meta._new_type("Sub", ow.Super, {
     return meta.new(ow.Sub)
 end)
 
+frame = rt.Frame()
+frame:set_child(rt.Label("test"))
+
 instance = ow.Sub()
 dbg(instance.super_property, instance.sub_property)
 
@@ -31,6 +34,8 @@ rt.current_scene.input:signal_connect("pressed", function(_, which)
     elseif which == rt.InputButton.DOWN then
     end
 end)
+
+rt.current_scene:set_child(frame)
 
 -- ##
 

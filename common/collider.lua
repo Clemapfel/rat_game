@@ -5,6 +5,15 @@ rt.ColliderType = meta.new_enum({
     KINEMATIC = "kinematic"
 })
 
+-- compat for love12
+function rt._fixture_get_shape(fixture)
+    if love.getVersion() >= 12 then
+        return fixture
+    else
+        return fixture:getShape()
+    end
+end
+
 --- @class rt.Collider
 --- @signal contact (self, rt.Collider, rt.ContactInfo) ->
 --- @param world rt.PhysicsWorld
@@ -13,7 +22,6 @@ rt.ColliderType = meta.new_enum({
 rt.Collider = meta.new_type("Collider", function(world, type, shapes, pos_x, pos_y)
     local out = meta.new(rt.Collider, {
         _shape_type = shape_type,
-        _shapes = shapes,  -- Table<love.physics.Shape>
         _fixtures = {},    -- Table<love.physics.Fixture>
         _is_sensor = false,
         _world = world,
@@ -74,7 +82,7 @@ function rt.Collider:get_bounds(i)
         local min_x, min_y = POSITIVE_INFINITY, POSITIVE_INFINITY
         local max_x, max_y = NEGATIVE_INFINITY, NEGATIVE_INFINITY
         for j = 1, #self._fixtures do
-            local x, y, bx, by = self._fixtures[j]:getShape():computeAABB(0, 0, 0)
+            local x, y, bx, by = rt._fixture_get_shape(self._fixtures[j]):computeAABB(0, 0, 0)
             min_x = math.min(min_x, x)
             min_y = math.min(min_y, y)
             max_x = math.max(max_x, bx)
@@ -82,7 +90,7 @@ function rt.Collider:get_bounds(i)
         end
         return rt.AABB(min_x, min_y, max_x - min_x, max_y - min_y)
     else
-        local shape = self._fixtures[i]:getShape()
+        local shape = rt._fixture_get_shape(self._fixtures[i])
         return rt.AABB(shape:computeAABB(0, 0, 0))
     end
 end
@@ -181,7 +189,7 @@ end
 --- @overload
 function rt.Collider:draw()
     for i = 1, #self._fixtures do
-        local shape = self._fixtures[i]:getShape()
+        local shape = rt._fixture_get_shape(self._fixtures[i])
         local pos_x, pos_y = self._body:getPosition()
         rt.PhysicsShape._draw(shape, pos_x, pos_y)
     end

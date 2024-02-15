@@ -68,6 +68,10 @@ require "meta"
 require "settings"
 require "log"
 
+test = meta.new_enum({
+    TEST = 1
+})
+
 require "time"
 require "benchmark"
 require "vector"
@@ -110,6 +114,7 @@ require "input_controller"
 require "thread"
 require "state_queue"
 require "filesystem"
+
 
 require "widget"
 

@@ -67,6 +67,16 @@ function rt.Shape:get_bounds()
     rt.error("In rt.Shape:get_bounds: abstract method called")
 end
 
+--- @brief
+function rt.Shape:set_line_width(width)
+    self._line_width = width
+end
+
+--- @brief
+function rt.Shape:get_line_width()
+    return self._line_width
+end
+
 for _, name in pairs(love.filesystem.getDirectoryItems("common/shapes")) do
     name = string.sub(name, 1, #name - 4) -- remove `.lua`
     require("common.shapes." .. name)

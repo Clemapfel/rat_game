@@ -1,3 +1,17 @@
+
+-- luajit compat
+_G._pairs = pairs
+function pairs(x)
+    local meta = getmetatable(x)
+    if meta ~= nil and meta.__pairs ~= nil then
+        return meta.__pairs(x)
+    else
+        return _G._pairs(x)
+    end
+end
+
+if table.unpack == nil then table.unpack = unpack end
+
 --- @brief print, arguments are concatenated
 --- @param vararg any
 --- @return nil
