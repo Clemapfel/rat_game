@@ -73,7 +73,6 @@ function meta._new(typename)
         metatable.properties[property_name] = property_value
     end
 
-
     metatable.__tostring = function(this)
         return "(" .. getmetatable(this).__name .. ") " .. meta.serialize(this)
     end
@@ -299,7 +298,6 @@ function meta.new(type, fields, ...)
         end
     end
 
-    local installed = {}
     for key, value in pairs(getmetatable(type).properties) do
         metatable.properties[key] = value
     end
@@ -321,7 +319,6 @@ function meta.new(type, fields, ...)
     end
 
     install_super(type)
-
     for super in range(...) do
         install_super(super)
     end
@@ -446,8 +443,8 @@ end
 --- @param ctor Function
 --- @vararg meta.Type
 function meta.new_type(typename, ctor, ...)
-    local out = meta._new("Type")
-    local metatable = getmetatable(out)
+    local out, metatable = meta._new("Type")
+    setmetatable(out, metatable)
 
     rawset(metatable.properties, "_typename", typename)
     rawset(metatable.properties, "_type_id", string.hash(typename))
@@ -469,7 +466,7 @@ function meta.new_type(typename, ctor, ...)
     return out
 end
 
--- TODO
+--- @brief [internal]
 function meta._default_ctor(self)
     return meta.new(self)
 end
@@ -477,24 +474,36 @@ end
 function meta._new_type(typename, ...)
     local out = meta._new("Type")
     local metatable = getmetatable(out)
+    metatable.__name = "Type"
+    metatable.super = {
+        ["Type"] = true
+    }
 
-    -- if last arg is function, use as constructor, use rest as super types
-    local super, ctor = nil, nil
-    if _G._select("#", ...) ~= 0 then
-        local args = {...}
-        if meta.is_function(args[#args]) then
-            ctor = args[#args]
-            args[#args] = nil
-            super = args
+    local super, fields, ctor = {}, {}, nil
+    local fields_seen, ctor_seen = false, false
+    for _, value in pairs({...}) do
+        if meta.is_type(value) then
+            table.insert(super, value)
+        elseif meta.is_function(value) then
+            ctor = value
+            if ctor_seen then
+                rt.error("In meta.new_type: more than one constructor in variadic argument")
+            end
+            ctor_seen = true
+        elseif meta.is_table(value) then
+            fields = value
+            if fields_seen then
+                rt.error("In meta.new_type: more than one property table in variadic argument")
+            end
+            fields_seen = true
         else
-            ctor = nil
-            super = args
+            rt.error("In meta.new_type: Unrecognized variadic argument `" .. tostring(value) .. "` of type `" .. meta.typeof(value) .. "`")
         end
     end
 
-    rawset(metatable.properties, "_typename", typename)
-    rawset(metatable.properties, "_type_id", string.hash(typename))
-    rawset(metatable.properties, "_super", which(super, {}))
+    metatable.properties._typename = typename
+    metatable.properties._type_id = string.hash(typename)
+    metatable.properties._super = which(super, {})
 
     if not meta.is_nil(ctor) then
         -- custom constructor
@@ -515,7 +524,24 @@ function meta._new_type(typename, ...)
     end
     meta.types[typename] = out
     meta._define_type_assertion(typename)
+
+    for key, value in pairs(fields) do
+        meta.install_property(out, key, value)
+    end
     return out
+end
+
+function meta._new_abstract_type(name, ...)
+    local to_splat = {}
+    table.insert(to_splat, function()
+        rt.error("In " .. name .. "._call: Type `" .. name .. "` is abstract, it cannot be instanced")
+    end)
+
+    for value in range(...) do
+        table.insert(to_splat, value)
+    end
+
+    return meta._new_type(name, splat(to_splat))
 end
 
 --- @brief declare abstract type, this is a type that cannot be instanced
@@ -535,40 +561,6 @@ function meta.new_abstract_type(name, fields, ...)
     return out
 end
 
--- TODO
-function meta._new_abstract_type(name, ...)
-
-    -- if last arg is table, use to populate fields, use rest as super types
-    local super, fields = nil, nil
-    if _G._select("#", ...) ~= 0 then
-        local args = {...}
-        if not meta.is_type(args[#args]) then
-            fields = args[#args]
-            args[#args] = nil
-            super = args
-        else
-            fields = nil
-            super = args
-        end
-    end
-
-    local to_splat = {}
-    for _, v in pairs(super) do
-        table.insert(to_splat, v)
-    end
-
-    table.insert(to_splat, function()
-        rt.error("In " .. name .. "._call: Type `" .. name .. "` is abstract, it cannot be instantiated")
-    end)
-
-    local out = meta._new_type(name, splat(to_splat))
-    if not meta.is_nil(fields) then
-        for key, value in pairs(fields) do
-            out[key] = value
-        end
-    end
-    return out
-end
 
 --- @brief get all super types of instance or type
 function meta.get_supertypes(instance)

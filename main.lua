@@ -1,12 +1,18 @@
 require("include")
 
-ow.Test = meta._new_type("Test", ow.OverworldEntity, function()
-    return meta.new(ow.Test)
+ow.Super = meta._new_abstract_type("Super", {
+    super_property = 1234
+}, meta._abstract_ctor)
+
+ow.Sub = meta._new_type("Sub", ow.Super, {
+    sub_property = 4567
+}, function()
+    println("called")
+    return meta.new(ow.Sub)
 end)
 
-dbg(meta.get_properties(ow.OverworldEntity))
-
-instance = ow.Test()
+instance = ow.Sub()
+dbg(instance.super_property, instance.sub_property)
 
 rt.current_scene = rt.add_scene("debug")
 local scene = ow.OverworldScene()
