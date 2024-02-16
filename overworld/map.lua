@@ -35,7 +35,7 @@ function ow.ObjectLayer(sprites, colliders)
 end
 
 --- @class ow.Map
-ow.Map = meta.new_type("Map", function(name, path_prefix)
+ow.Map = meta.new_type("Map", rt.Drawable, rt.Animation, function(name, path_prefix)
     local out = meta.new(ow.Map, {
         _path_prefix = path_prefix,
         _name = name,
@@ -44,7 +44,7 @@ ow.Map = meta.new_type("Map", function(name, path_prefix)
         _tile_layers = {},  -- Table<ow.TileLayer>
         _object_layers = {},    -- Table<ow.ObjectLayer>
         _debug_draw_enabled = true
-    }, rt.Drawable, rt.Animation)
+    })
     out:_create()
     return out
 end)

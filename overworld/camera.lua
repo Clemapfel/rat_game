@@ -40,7 +40,7 @@ end)
 
 --- @class ow.Camera
 --- @signal reached (self) -> nil emitted when camera reaches a position specified by `move_to`
-ow.Camera = meta.new_type("Camera", function()
+ow.Camera = meta.new_type("Camera", rt.SignalEmitter, rt.Animation, function()
     local out = meta.new(ow.Camera, {
         _scale = 1,
         _angle = rt.radians(0),
@@ -51,7 +51,7 @@ ow.Camera = meta.new_type("Camera", function()
         _world = rt.PhysicsWorld(0, 0),
         _collider = {}, -- rt.CircleCollider
         _is_moving = false
-    }, rt.SignalEmitter, rt.Animation)
+    })
 
     out._collider = rt.CircleCollider(out._world, rt.ColliderType.DYNAMIC, 0, 0, rt.settings.overworld.camera.collider_radius)
     out._collider:set_mass(rt.settings.overworld.camera.collider_mass)

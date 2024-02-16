@@ -1,14 +1,14 @@
 --- @class ow.IntersectTrigger
 --- @brief interactable solid, triggered by ow.Player._on_contact
 --- @signal activate (self, player) -> nil
-ow.IntersectTrigger = meta.new_type("IntersectTrigger", function(world, x, y, width, height, on_activate)
+ow.IntersectTrigger = meta.new_type("IntersectTrigger", rt.SignalEmitter, rt.Drawable, function(world, x, y, width, height, on_activate)
     local out = meta.new(ow.IntersectTrigger, {
         _world = world,
         _collider = {}, -- rt.RectangleCollider
         _shape = {},     -- rt.Rectangle
         _trigger_on_enter = true,
         _trigger_on_leave = true
-    }, rt.SignalEmitter, rt.Drawable)
+    })
 
     x = which(x, 0)
     y = which(y, 0)

@@ -1,12 +1,12 @@
 --- @class ow.InteractTrigger
 --- @brief interactable solid, triggered by ow.Player._on_contact
 --- @signal activate (self, player) -> nil
-ow.InteractTrigger = meta.new_type("InteractTrigger", function(world, x, y, width, height, on_activate)
+ow.InteractTrigger = meta.new_type("InteractTrigger", rt.SignalEmitter, rt.Drawable, function(world, x, y, width, height, on_activate)
     local out = meta.new(ow.InteractTrigger, {
         _world = world,
         _collider = {}, -- rt.RectangleCollider
         _shape = {}     -- rt.Rectangle
-    }, rt.SignalEmitter, rt.Drawable)
+    })
 
     x = which(x, 0)
     y = which(y, 0)

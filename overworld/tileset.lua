@@ -1,7 +1,7 @@
 --- @class ow.Tileset
 --- @param name String Tileset ID "debug_tileset
 --- @param path_prefix String "assets/maps/debug"
-ow.Tileset = meta.new_type("Tileset", function(name, path_prefix)
+ow.Tileset = meta.new_type("Tileset", rt.Drawable, function(name, path_prefix)
     local out = meta.new(ow.Tileset, {
         _path_prefix = path_prefix,
         _name = name,
@@ -14,14 +14,13 @@ ow.Tileset = meta.new_type("Tileset", function(name, path_prefix)
         _array_texture = {},
         _texture = {},  -- rt.Texture
         _batch = nil    -- love.SpriteBatch
-    }, rt.Drawable)
+    })
     out:_create()
     return out
 end)
 
 --- @class ow.Tile
 --- @field id String
-
 function ow.Tile(texture)
     return {
        quad = love.graphics.newQuad(0, 0, texture:getWidth(), texture:getHeight(), texture),

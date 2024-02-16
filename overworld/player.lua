@@ -8,7 +8,7 @@ rt.settings.overworld.player = {
 }
 
 --- @class ow.Player
-ow.Player = meta.new_type("Player", function(world)
+ow.Player = meta.new_type("Player", rt.Widget, rt.Animation, function(world)
     local radius = rt.settings.overworld.player.radius
     local out = meta.new(ow.Player, {
         _world = world,
@@ -34,7 +34,7 @@ ow.Player = meta.new_type("Player", function(world)
 
         _velocity_magnitude = 0,
         _velocity_angle = 0, -- radians
-    }, rt.Drawable, rt.Animation, rt.Widget)
+    })
 
     out._sensor:set_disabled(true)
     out._sensor:set_is_sensor(true)

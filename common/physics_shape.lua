@@ -46,7 +46,6 @@ end)
 --- @param body_x Number
 --- @param body_y Number
 function rt.PhysicsShape._draw(shape, body_x, body_y)
-
     love.graphics.push()
     rt.graphics.set_blend_mode(rt.BlendMode.NORMAL)
     love.graphics.setColor(1, 1, 1, 1)

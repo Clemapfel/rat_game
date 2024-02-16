@@ -6,7 +6,7 @@ ow.CameraMode = meta.new_enum({
 })
 
 --- @class
-ow.OverworldScene = meta.new_type("OverworldScene", function()
+ow.OverworldScene = meta.new_type("OverworldScene", rt.Widget, rt.Animation, function()
     local map = ow.Map("debug_map", "assets/maps/debug")
     local out = meta.new(ow.OverworldScene, {
         _player = ow.Player(map._world),
@@ -15,7 +15,7 @@ ow.OverworldScene = meta.new_type("OverworldScene", function()
         _camera_target_x = 0,
         _camera_target_y = 0,
         _map = map
-    }, rt.Widget, rt.Animation)
+    })
     return out
 end)
 
