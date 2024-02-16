@@ -16,7 +16,6 @@ ow.OverworldScene = meta.new_type("OverworldScene", function()
         _camera_target_y = 0,
         _map = map
     }, rt.Widget, rt.Animation)
-
     return out
 end)
 

@@ -109,7 +109,7 @@ function rt.set_current_scene(name)
         rt.current_scene.thread_pool:restart()
     end
 
-    love.graphics.clear(0, 0, 0, 0)
+    rt.graphics.clear(0, 0, 0, 0)
     rt.current_scene = rt.scenes[name]
     env = rt.current_scene.env
 end

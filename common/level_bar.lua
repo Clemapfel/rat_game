@@ -59,7 +59,7 @@ end
 
 --- @brief [internal]
 function rt.LevelBar:_update_value()
-    local x, y = self._backdrop:get_position()
+    local x, y = self._backdrop:get_top_left()
     local width, height = self._backdrop:get_size()
     local bounds = rt.AABB(x, y, ((self._value - self._lower) / (self._upper - self._lower)) * width, height)
 
@@ -79,10 +79,8 @@ function rt.LevelBar:draw()
 
     -- draw with rounded corners
     local stencil_value = 255
-    love.graphics.stencil(function()
-        self._backdrop:draw()
-    end, "replace", stencil_value, true)
-    love.graphics.setStencilTest("equal", stencil_value)
+    rt.graphics.stencil(stencil_value, self._backdrop)
+    rt.graphics.set_stencil_test(rt.StencilCompareMode.EQUAL, stencil_value)
 
     self._backdrop:draw()
     self._shape:draw()
@@ -95,11 +93,11 @@ function rt.LevelBar:draw()
         --[[
         love.graphics.setLineWidth(thickness)
         love.graphics.setColor(outline_color.r, outline_color.g, outline_color.b, outline_color.a)
-        love.graphics.translate(-thickness, 0)
+        rt.graphics.translate(-thickness, 0)
         love.graphics.line(splat(mark.line))
-        love.graphics.translate( 2 * thickness, 0)
+        rt.graphics.translate( 2 * thickness, 0)
         love.graphics.line(splat(mark.line))
-        love.graphics.translate(-thickness, 0)
+        rt.graphics.translate(-thickness, 0)
         love.graphics.setColor(1, 1, 1, 1)
         ]]--
         love.graphics.setColor(outline_color.r, outline_color.g, outline_color.b, outline_color.a)
@@ -111,8 +109,8 @@ function rt.LevelBar:draw()
     self._backdrop_outline:draw()
     self._shape_outline:draw()
 
-    love.graphics.stencil(function() end, "replace", 0, false) -- reset stencil value
-    love.graphics.setStencilTest()
+    rt.graphics.stencil()
+    rt.graphics.set_stencil_test()
 end
 
 --- @overload rt.Widget.size_allocate
@@ -155,7 +153,7 @@ function rt.LevelBar:add_mark(value)
         rt.error("In LevelBar:add_mark: value `" .. tostring(value) .. " is out of range for level bar with bounds `[", tostring(self._lower) .. ", " .. tostring(self._upper) .. "]")
     end
 
-    local x, y = self._backdrop:get_position()
+    local x, y = self._backdrop:get_top_left()
     local width, height = self._backdrop:get_size()
     local mark_x = x + (value - self._lower) / (self._upper - self._lower) * width
     table.insert(self._marks, {

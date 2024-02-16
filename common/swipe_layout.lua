@@ -124,9 +124,9 @@ function rt.SwipeLayout:draw()
 
     love.graphics.push()
     if self._orientation == rt.Orientation.HORIZONTAL then
-        love.graphics.translate(-self._offset, 0)
+        rt.graphics.translate(-self._offset, 0)
     else
-        love.graphics.translate(0, -self._offset)
+        rt.graphics.translate(0, -self._offset)
     end
 
     local i = 1

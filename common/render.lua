@@ -140,7 +140,7 @@ function rt.Renderer:render()
     local bg_color = rt.Palette.PURPLE_2
 
     love.graphics.setCanvas(self._2d_canvas)
-    love.graphics.clear(bg_color.r, bg_color.g, bg_color.b, 1)
+    rt.graphics.clear(bg_color.r, bg_color.g, bg_color.b, 1)
     love.graphics.setLineWidth(10)
     love.graphics.rectangle("line", 0, 0, love.graphics.getWidth(), love.graphics.getHeight())
     love.graphics.print("text abada", 200, 200)
@@ -156,7 +156,7 @@ function rt.Renderer:render()
     love.graphics.setMeshCullMode("none")
 
     love.graphics.setShader(self.shader)
-    love.graphics.clear(bg_color.r, bg_color.g, bg_color.b, 1)
+    rt.graphics.clear(bg_color.r, bg_color.g, bg_color.b, 1)
 
     if not meta.is_nil(mesh) then
         mesh:draw()
@@ -169,7 +169,7 @@ function rt.Renderer:draw_2d(callback)
         self._2d_canvas,
         stencil = true
     })
-    love.graphics.clear(0, 0, 0, 0)
+    rt.graphics.clear(0, 0, 0, 0)
     callback()
     love.graphics.setCanvas()
 end
@@ -184,7 +184,7 @@ function rt.Renderer:draw_3d(callback)
     love.graphics.setCanvas(rt.Renderer.depth_buffer.canvas)
     love.graphics.setMeshCullMode("none")
 
-    love.graphics.clear(0, 0, 0, 0)
+    rt.graphics.clear(0, 0, 0, 0)
     self._2d_shape:draw()
     callback()
 

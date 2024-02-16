@@ -102,9 +102,9 @@ function rt.Shape:_bind()
         if not self._use_origin then
             center_x, center_y = self:get_centroid()
         end
-        love.graphics.translate(center_x, center_y)
-        love.graphics.rotate(self._rotation)
-        love.graphics.translate(-1 * center_x, -1 * center_y)
+        rt.graphics.translate(center_x, center_y)
+        rt.graphics.rotate(self._rotation)
+        rt.graphics.translate(-1 * center_x, -1 * center_y)
     end
 end
 

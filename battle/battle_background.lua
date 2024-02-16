@@ -21,11 +21,11 @@ function bt.BattleBackground:draw()
     self._vertex_shape:draw()
     self._shader:unbind()
 
-    love.graphics.setBlendMode("multiply", "premultiplied")
+    rt.graphics.set_blend_mode(rt.BlendMode.MULTIPLY)
     local dampening = rt.settings.battle_background.dampening
     love.graphics.setColor(dampening, dampening, dampening, 1)
     love.graphics.rectangle("fill", self._area.x, self._area.y, self._area.width, self._area.height)
-    love.graphics.setBlendMode("alpha")
+    rt.graphics.set_blend_mode(rt.BlendMode.NORMAL)
     love.graphics.pop()
 end
 

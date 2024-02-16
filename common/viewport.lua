@@ -28,12 +28,12 @@ function rt.Viewport:draw()
         local x, y = self:get_position()
         love.graphics.setScissor(x, y, self._width, self._height)
 
-        love.graphics.translate(self._x_offset, self._y_offset)
+        rt.graphics.translate(self._x_offset, self._y_offset)
         love.graphics.scale(self._x_scale, self._y_scale)
 
-        love.graphics.translate(self._width * 0.5, self._height * 0.5)
-        love.graphics.rotate(self._rotation:as_radians())
-        love.graphics.translate(self._width * -0.5, self._height * -0.5)
+        rt.graphics.translate(self._width * 0.5, self._height * 0.5)
+        rt.graphics.rotate(self._rotation:as_radians())
+        rt.graphics.translate(self._width * -0.5, self._height * -0.5)
 
         self._child:draw()
 

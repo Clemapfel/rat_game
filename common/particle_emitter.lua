@@ -58,7 +58,7 @@ function rt.ParticleEmitter:_snapshot_particle()
     end
 
     self._particle_texture:bind_as_render_target()
-    love.graphics.clear(0, 0, 0, 0)
+    rt.graphics.clear(0, 0, 0, 0)
     particle:draw()
     self._particle_texture:unbind_as_render_target()
 end

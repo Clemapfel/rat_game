@@ -26,9 +26,9 @@ rt.BlendMode = meta.new_enum({
 --- @brief
 function rt.graphics.set_blend_mode(blend_mode)
     if blend_mode == rt.BlendMode.NONE then
-        love.graphics.setBlendMode("replace", "premultiplied")
+        love.graphics.setBlendMode("replace", "alphamultiply")
     elseif blend_mode == rt.BlendMode.NORMAL then
-        love.graphics.setBlendMode("alpha", "premultiplied")
+        love.graphics.setBlendMode("alpha", "alphamultiply")
     elseif blend_mode == rt.BlendMode.ADD then
         love.graphics.setBlendMode("add", "alphamultiply")
     elseif blend_mode == rt.BlendMode.SUBTRACT then
@@ -45,11 +45,17 @@ end
 function rt.graphics.stencil(new_value, ...)
     local n_drawables = _G._select("#", ...)
     if love.getVersion() >= 12 then
-        love.graphics.setStencilState("replace", "always", new_value)
-        for to_draw in range(...) do
-            to_draw:draw()
+        if n_drawables > 0 then
+            love.graphics.setStencilState("replace", "always", which(new_value, 255))
+            for to_draw in range(...) do
+                to_draw:draw()
+            end
+            love.graphics.setStencilMode()
+        else
+            love.graphics.setStencilMode("draw", new_value)
+            love.graphics.rectangle("fill", 0, 0, love.graphics.getWidth(), love.graphics.getHeight())
+            love.graphics.setStencilMode()
         end
-        love.graphics.setStencilState("keep", "always")
     else
         if n_drawables > 0 then
             local drawables = {...}
@@ -71,15 +77,20 @@ rt.StencilCompareMode = meta.new_enum({
     LESS_THAN = "less",
     LESS_THAN_OR_EUAL = "lequal",
     GREATER_THAN = "greater",
-    GREATER_THAN_OR_EQUAL = "gequal"
+    GREATER_THAN_OR_EQUAL = "gequal",
+    ALWAYS = "always"
 })
 
 --- @brief
 function rt.graphics.set_stencil_test(mode, value)
     if love.getVersion() >= 12 then
-        love.graphics.setStencilState("keep", which(mode, "always"), value, 0, 0)
+        if mode == nil then
+            love.graphics.setStencilMode()
+        else
+            love.graphics.setStencilState("keep", which(mode, "always"), which(value, 0))
+        end
     else
-        love.graphics.setStencilTest(mode, value)
+        love.graphics.setStencilTest(which(mode, "always"), which(value, 0))
     end
 end
 

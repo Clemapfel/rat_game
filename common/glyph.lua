@@ -173,7 +173,7 @@ end
 --- @brief [internal]
 function rt.Glyph:_draw_underline(x, y)
     love.graphics.push()
-    love.graphics.translate(x, y)
+    rt.graphics.translate(x, y)
     self._underline:draw()
     love.graphics.pop()
 end
@@ -181,7 +181,7 @@ end
 --- @brief [internal]
 function rt.Glyph:_draw_strikethrough(x, y)
     love.graphics.push()
-    love.graphics.translate(x, y)
+    rt.graphics.translate(x, y)
     self._strikethrough:draw()
     love.graphics.pop()
 end
@@ -230,7 +230,7 @@ function rt.Glyph:draw()
 
         -- paste glyph to render texture
         self._outline_render_texture:bind_as_render_target()
-        --love.graphics.clear(0, 0, 0, 0)
+        --rt.graphics.clear(0, 0, 0, 0)
         love.graphics.setColor(1, 1, 1, 1)
         draw_glyph(self._outline_render_offset_x, self._outline_render_offset_y)
         self._outline_render_texture:unbind_as_render_target()

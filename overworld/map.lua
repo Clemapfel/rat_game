@@ -217,7 +217,7 @@ function ow.Map:draw()
     love.graphics.push()
 
     love.graphics.setColor(1, 1, 1, 1)
-    love.graphics.setBlendMode("alpha")
+    rt.graphics.set_blend_mode(rt.BlendMode.NORMAL)
 
     for _, layer in pairs(self._tile_layers) do
         for _, batch in pairs(layer.batches) do

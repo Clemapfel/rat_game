@@ -151,6 +151,5 @@ function rt.FourierTransform:as_image()
             out:set_pixel(x, y, rt.HSVA(0,  0, value, 1))
         end
     end
-
     return out
 end

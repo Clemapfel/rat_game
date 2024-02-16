@@ -1,12 +1,14 @@
 --- @class
 rt.Rectangle = meta.new_type("Rectangle", function(top_left_x, top_left_y, width, height)
-    return meta.new(rt.Rectangle, {
+    local out = meta.new(rt.Rectangle, {
         _x = top_left_x,
         _y = top_left_y,
         _width = width,
         _height = height,
         _corner_radius = 0
     }, rt.Shape, rt.Drawable)
+
+    return out
 end)
 
 --- @overload
@@ -38,10 +40,18 @@ end
 
 --- @brief
 function rt.Rectangle:resize(x, y, width, height)
-    self._x = x
-    self._y = y
-    self._width = width
-    self._height = height
+    if meta.is_aabb(x) then
+        local aabb = x
+        self._x = aabb.x
+        self._y = aabb.y
+        self._width = aabb.width
+        self._height = aabb.height
+    else
+        self._x = x
+        self._y = y
+        self._width = width
+        self._height = height
+    end
 end
 
 --- @brief

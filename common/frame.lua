@@ -35,7 +35,7 @@ rt.Frame = meta.new_type("Frame", function(type)
     out._frame_outline:set_color(rt.Palette.BASE_OUTLINE)
 
     out._frame:set_line_width(out._thickness)
-    if out._type == rt.FrameType.RECTANGULAR and out._corner_radius ~= radius then
+    if out._type == rt.FrameType.RECTANGULAR then
         local corner_radius = out._corner_radius
         out._frame:set_corner_radius(corner_radius)
         out._frame_outline:set_corner_radius(corner_radius)
@@ -57,15 +57,10 @@ function rt.Frame:draw()
 
         -- draw child with corners masked away
         local stencil_value = 255
-        love.graphics.stencil(function()
-            self._stencil_mask:draw()
-        end, "replace", stencil_value, true)
-        love.graphics.setStencilTest("equal", stencil_value)
-
+        rt.graphics.stencil(stencil_value, self._stencil_mask)
+        rt.graphics.set_stencil_test(rt.StencilCompareMode.EQUAL, stencil_value)
         self._child:draw()
-
-        love.graphics.stencil(function() end, "replace", 0, false) -- reset stencil value
-        love.graphics.setStencilTest()
+        rt.graphics.set_stencil_test()
 
         if self._thickness > 0 then
             if self._thickness > 1 then
@@ -73,6 +68,7 @@ function rt.Frame:draw()
             end
             self._frame:draw()
         end
+
     end
 end
 

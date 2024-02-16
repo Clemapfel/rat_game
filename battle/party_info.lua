@@ -278,7 +278,7 @@ function bt.PartyInfo:draw()
     love.graphics.push()
 
     if self._is_bouncing then
-        love.graphics.translate(0, self._bounce_offset)
+        rt.graphics.translate(0, self._bounce_offset)
     end
 
     self._frame:draw()
@@ -287,14 +287,14 @@ function bt.PartyInfo:draw()
     self._hp_label_right:draw()
 
     local stencil_value = 255
-    love.graphics.stencil(function()
-        self._frame._frame:draw()
-    end, "replace", stencil_value, true)
-    love.graphics.setStencilTest("notequal", stencil_value)
+    rt.graphics.stencil(stencil_value, self._frame._frame)
+    rt.graphics.set_stencil_test(rt.StencilCompareMode.NOT_EQUAL, stencil_value)
+
     self._v_rule:draw()
     self._h_rule:draw()
-    love.graphics.stencil(function() end, "replace", 0, false) -- reset stencil value
-    love.graphics.setStencilTest()
+
+    rt.graphics.stencil()
+    rt.graphics.set_stencil_text()
 
     --self._indicator_base_frame:draw()
     self._attack_indicator:draw()

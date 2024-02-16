@@ -85,7 +85,7 @@ function rt.RevealLayout:draw()
 
     love.graphics.push()
     love.graphics.setScissor(self._scissor.x, self._scissor.y, self._scissor.width, self._scissor.height)
-    love.graphics.translate(self._current_offset, 0)
+    rt.graphics.translate(self._current_offset, 0)
 
     if self:get_is_visible() and meta.is_widget(self._child) and self._current_offset ~= self._max_offset then
         self._child:draw()

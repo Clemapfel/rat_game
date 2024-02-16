@@ -56,7 +56,7 @@ love.load = function()
 end
 
 love.draw = function()
-    love.graphics.clear(1, 0, 1, 1)
+    rt.graphics.clear(1, 0, 1, 1)
     rt.current_scene:draw()
 end
 

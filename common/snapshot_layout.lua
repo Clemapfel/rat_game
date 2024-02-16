@@ -30,11 +30,11 @@ rt.SnapshotLayout._shader_source = love.filesystem.read("assets/shaders/snapshot
 function rt.SnapshotLayout:snapshot(to_draw)
     if to_draw == nil then to_draw = self._child end
     self._canvas:bind_as_render_target()
-    love.graphics.clear(0, 0, 0, 0)
+    rt.graphics.clear(0, 0, 0, 0)
     if meta.is_widget(to_draw) then
         love.graphics.push()
         local x, y = to_draw:get_position()
-        love.graphics.translate(-x, -y)
+        rt.graphics.translate(-x, -y)
         love.graphics.setColor(1, 1, 1, 1)
         to_draw:draw()
         love.graphics.pop()
@@ -60,9 +60,9 @@ function rt.SnapshotLayout:draw()
     local bounds = self:get_bounds()
     local x_offset, y_offset = bounds.x + self._origin_x * bounds.width, bounds.y + self._origin_y * bounds.height
     love.graphics.push()
-    love.graphics.translate(x_offset, y_offset)
+    rt.graphics.translate(x_offset, y_offset)
     love.graphics.scale(self._scale_x, self._scale_y)
-    love.graphics.translate(-1 * x_offset, -1 * y_offset)
+    rt.graphics.translate(-1 * x_offset, -1 * y_offset)
 
     love.graphics.draw(self._canvas._native, self._position_x + self._x_offset, self._position_y + self._y_offset)
     love.graphics.pop()

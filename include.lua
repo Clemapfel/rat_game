@@ -14,6 +14,7 @@ print("Love2D " .. major .. "." .. minor .. " | " .. jit.version)
 
 rt = {}
 rt.test = {}
+rt.graphics = {}
 rt.settings = {}
 rt.physics = {}
 rt.battle = {}
@@ -88,6 +89,7 @@ require "color"
 require "palette"
 require "image"
 require "animation_timer"
+require "graphics"
 require "drawable"
 require "animation"
 require "texture"

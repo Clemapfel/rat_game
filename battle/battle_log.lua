@@ -28,7 +28,7 @@ function bt.BattleLogTextLayout:draw()
     local h = 0
 
     local offset = ternary(i > 1, -1 * self._cumulative_children_heights[i-1], 0)
-    love.graphics.translate(0, offset)
+    rt.graphics.translate(0, offset)
 
     while i <= self._n_children and h <= self._area.height do
         self._children[i]:draw()

@@ -240,9 +240,9 @@ function ow.Player:draw()
 
     if self._sensor_active == true then
         love.graphics.push()
-        love.graphics.setBlendMode("add", "premultiplied")
+        rt.graphics.set_blend_mode(rt.BlendMode.ADD)
         self._debug_sensor:draw()
-        love.graphics.setBlendMode("alpha")
+        rt.graphics.set_blend_mode(rt.BlendMode.NORMAL)
         love.graphics.pop()
         self._debug_sensor_outline:draw()
     end

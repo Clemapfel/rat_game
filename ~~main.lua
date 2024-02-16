@@ -283,7 +283,7 @@ function love.draw()
 
     if use_3d then
         render_texture:bind_as_render_target()
-        love.graphics.clear(purple.r, purple.g, purple.b, 1)
+        rt.graphics.clear(purple.r, purple.g, purple.b, 1)
         draw_scene()
         render_texture:unbind_as_render_target()
 
@@ -294,14 +294,14 @@ function love.draw()
         love.graphics.setShader(rt._3d.shader)
         love.graphics.setDepthMode("lequal", true)
         love.graphics.setCanvas(rt._3d.depth_buffer.canvas)
-        love.graphics.clear(0, 0, 0, 0, true, 1)
+        rt.graphics.clear(0, 0, 0, 0, true, 1)
         love.graphics.setMeshCullMode("none")
         love.graphics.setPointSize(3)
 
         rt._3d.shader:send("model_matrix", "column", model_matrix)
 
         love.graphics.setShader(rt._3d.shader)
-        love.graphics.clear(purple.r, purple.g, purple.b, 1)
+        rt.graphics.clear(purple.r, purple.g, purple.b, 1)
         sprite._shape:draw()
         --rt.current_scene:draw()
 
