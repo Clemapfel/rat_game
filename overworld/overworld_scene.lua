@@ -25,7 +25,6 @@ end
 
 --- @overload
 function ow.OverworldScene:size_allocate(x, y, width, height)
-
 end
 
 --- @brief

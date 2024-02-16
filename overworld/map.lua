@@ -133,8 +133,8 @@ function ow.Map:_create_tile_layer(layer)
     local colliders = {}
     for _, aabb in pairs(bounds) do
         table.insert(colliders, rt.RectangleCollider(self._world, rt.ColliderType.STATIC,
-                (aabb.x - 1) * w, (aabb.y - 1) * h,
-                aabb.width * w, aabb.height * h
+            (aabb.x - 1) * w, (aabb.y - 1) * h,
+            aabb.width * w, aabb.height * h
         ))
     end
 

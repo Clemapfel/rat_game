@@ -6,6 +6,7 @@ rt.current_scene:set_child(scene)
 
 rt.current_scene.input:signal_connect("pressed", function(_, which)
     if which == rt.InputButton.A then
+        scene._player:set_position(350, 330)
     elseif which == rt.InputButton.B then
     elseif which == rt.InputButton.X then
     elseif which == rt.InputButton.Y then
@@ -39,4 +40,5 @@ end
 love.update = function()
     local delta = love.timer.getDelta()
     rt.current_scene:update(delta)
+    scene:update(delta)
 end

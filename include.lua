@@ -155,7 +155,6 @@ require "keymap_indicator"
 require "list_view"
 
 require "physics_world"
-require "physics_shape"
 require "collider"
 
 require "battle.stat"

@@ -5,33 +5,21 @@ rt.ColliderType = meta.new_enum({
     KINEMATIC = "kinematic"
 })
 
--- compat for love12
-function rt._fixture_get_shape(fixture)
-    if love.getVersion() >= 12 then
-        return fixture
-    else
-        return fixture:getShape()
-    end
-end
-
 --- @class rt.Collider
 --- @signal contact (self, rt.Collider, rt.ContactInfo) ->
 --- @param world rt.PhysicsWorld
 --- @param type rt.ColliderType
 --- @param shape rt.PhysicsShape
-rt.Collider = meta.new_type("Collider", rt.Drawable, rt.SignalEmitter, function(world, type, shapes, pos_x, pos_y)
+rt.Collider = meta.new_type("Collider", rt.Drawable, rt.SignalEmitter, function(world, type, pos_x, pos_y)
     local out = meta.new(rt.Collider, {
-        _shape_type = shape_type,
         _fixtures = {},    -- Table<love.physics.Fixture>
         _is_sensor = false,
         _world = world,
-        _userdata = {}
+        _userdata = {},
+        _body = {}
     })
 
     out._body = love.physics.newBody(world._native, pos_x, pos_y, type)
-    for _, shape in pairs(shapes) do
-        table.insert(out._fixtures, love.physics.newFixture(out._body, shape._native, 1))
-    end
 
     out:signal_add("contact_begin")
     out:signal_add("contact_end")
@@ -40,6 +28,191 @@ rt.Collider = meta.new_type("Collider", rt.Drawable, rt.SignalEmitter, function(
     out:_update_userdata()
     return out
 end)
+
+--- @brief
+function rt.Collider:add_rectangle(x, y, width, height, angle)
+    if love.getVersion() >= 12 then
+        table.insert(self._fixtures, love.physics.newRectangleShape(self._body, x, y, width, height, angle))
+    else
+        local shape = love.physics.newRectangleShape(x, y, width, height, angle)
+        table.insert(self._fixtures, love.physics.newFixture(self._body, shape, 1))
+    end
+end
+
+--- @brief
+function rt.RectangleCollider(world, type, x, y, width, height, angle)
+    local center_x, center_y = x + 0.5 * width, y + 0.5 * height
+    local out = rt.Collider(world, type, center_x, center_y)
+    out:add_rectangle(0, 0, width, height)
+    return out
+end
+
+--- @brief
+function rt.Collider:add_circle(x, y, radius)
+    if love.getVersion() >= 12 then
+        table.insert(self._fixtures, love.physics.newCircleShape(self._body, x, y, radius))
+    else
+        local shape = love.physics.newCircleShape(x, y, radius)
+        table.insert(self._fixtures, love.physics.newFixture(self._body, shape, 1))
+    end
+end
+
+--- @brief
+function rt.CircleCollider(world, type, center_x, center_y, radius)
+    local out = rt.Collider(world, type, center_x, center_y)
+    out:add_circle(0, 0, radius)
+    return out
+end
+
+--- @brief 
+function rt.Collider:add_line(ax, ay, bx, by, ...)
+    if _G._select("#", ...) == 0 then
+        if love.getVersion() >= 12 then
+            table.insert(self._fixtures, love.physics.newEdgeShape(self._body, ax, ay, bx, by))
+        else
+            local shape = love.physics.newEdgeShape(ax, ay, bx, by)
+            table.insert(self._fixtures, love.physics.newFixture(self._body, shape, 1))
+        end
+    else
+        if love.getVersion() >= 12 then
+            table.insert(self._fixtures, love.physics.newChainShape(self._body, false, ax, ay, bx, by, ...))
+        else
+            local shape = love.physics.newChainShape(false, ax, ay, bx, by, ...)
+            table.insert(self._fixtures, love.physics.newFixture(self._body, shape, 1))
+        end
+    end
+end
+
+--- @brief line segment, centroid is origin
+--- @return rt.Collider
+function rt.LineCollider(world, type, ax, ay, bx, by, ...)
+    local center_x, center_y = 0, 0
+    local input = {ax, ay, bx, by, ...}
+    for i = 1, #input, 2 do
+        center_x = center_x + input[i+0]
+        center_y = center_y + input[i+1]
+    end
+    center_x = center_x / (#input / 2)
+    center_y = center_y / (#input / 2)
+
+    local vertices = {}
+    for i = 1, #input, 2 do
+        vertices[i] = input[i] - center_x
+        vertices[i+1] = input[i+1] - center_y
+    end
+
+    local out = rt.Collider(world, type, center_x, center_y)
+    out:add_line(splat(vertices))
+    return out
+end
+
+--- @brief
+function rt.Collider:add_polygon(...)
+    if love.getVersion() >= 12 then
+        table.insert(self._fixtures, love.physics.newPolygonShape(self._body,...))
+    else
+        local shape = love.physics.newPolygonShape(...)
+        table.insert(self._fixtures, love.physics.newFixture(self._body, shape, 1))
+    end
+end
+
+--- @brief
+function rt.TriangleCollider(world, type, ax, ay, bx, by, cx, cy)
+    local center_x, center_y = (ax + bx + by) / 3, (ay + by + cy) / 3
+    local out = rt.Collider(world, type, center_x, center_y)
+    out:add_polygon(
+        ax - center_x, ay - center_y,
+        bx - center_x, by - center_y,
+        cx - center_x, by - center_y
+    )
+    return out
+end
+
+--- @brief triangle, centroid is origin
+--- @return rt.Collider
+function rt.PolygonCollider(world, type, ax, ay, bx, by, cx, cy, ...)
+    local center_x, center_y = 0, 0
+    local input = {ax, ay, bx, by, cx, cy, ...}
+    for i = 1, #input, 2 do
+        center_x = center_x + input[i+0]
+        center_y = center_y + input[i+1]
+    end
+    center_x = center_x / (#input / 2)
+    center_y = center_y / (#input / 2)
+
+    local vertices = {}
+    for i = 1, #input, 2 do
+        vertices[i] = input[i] - center_x
+        vertices[i+1] = input[i+1] - center_y
+    end
+
+    local out = rt.Collider(world, type, center_x, center_y)
+    out:add_polygon(splat(vertices))
+    return out
+end
+
+--- @brief
+function rt.Collider:_draw_shape(shape)
+    local body_x, body_y = self:get_position()
+
+    love.graphics.push()
+    rt.graphics.set_blend_mode(rt.BlendMode.NORMAL)
+    love.graphics.setColor(1, 1, 1, 1)
+
+    local type = shape:type()
+    if type == "PolygonShape" then
+        local local_points = {shape:getPoints()}
+        for i = 1, #local_points, 2 do
+            local_points[i+0] = local_points[i+0] + body_x
+            local_points[i+1] = local_points[i+1] + body_y
+        end
+
+        love.graphics.setColor(1, 1, 1, 0.5)
+        love.graphics.polygon("fill", table.unpack(local_points))
+        love.graphics.setColor(1, 1, 1, 1)
+        love.graphics.polygon("line", table.unpack(local_points))
+
+    elseif type == "CircleShape" then
+        local x, y = shape:getPoint()
+        x = x + body_x
+        y = y + body_y
+        local radius = shape:getRadius()
+        love.graphics.setColor(1, 1, 1, 0.5)
+        love.graphics.circle("fill", x, y, radius)
+        love.graphics.setColor(1, 1, 1, 1)
+        love.graphics.circle("line", x, y, radius)
+    elseif type == "EdgeShape" then
+        local ax, ay, bx, by = shape:getPoints()
+        ax = ax + body_x
+        ay = ay + body_y
+        bx = bx + body_x
+        by = by + body_y
+        love.graphics.line(ax, ay, bx, by)
+    elseif type == "ChainShape" then
+        local local_points = {shape:getPoints()}
+        for i = 1, #local_points, 2 do
+            local_points[i+0] = local_points[i+0] + body_x
+            local_points[i+1] = local_points[i+1] + body_y
+        end
+        love.graphics.line(table.unpack(local_points))
+    end
+
+    love.graphics.pop()
+end
+
+--- @overload
+function rt.Collider:draw()
+    if love.getVersion() >= 12 then
+        for _, shape in pairs(self._fixtures) do
+            self:_draw_shape(shape)
+        end
+    else
+        for i = 1, #self._fixtures do
+            local shape = self._fixtures[i]:getShape()
+            self:_draw_shape(shape)
+        end
+    end
+end
 
 --- @brief [internal]
 function rt.Collider:_update_userdata()
@@ -76,24 +249,6 @@ function rt.Collider:set_allow_sleeping(b)
     self._body:isSleepingAllowed(b)
 end
 
---- @brief
-function rt.Collider:get_bounds(i)
-    if meta.is_nil(i) then
-        local min_x, min_y = POSITIVE_INFINITY, POSITIVE_INFINITY
-        local max_x, max_y = NEGATIVE_INFINITY, NEGATIVE_INFINITY
-        for j = 1, #self._fixtures do
-            local x, y, bx, by = rt._fixture_get_shape(self._fixtures[j]):computeAABB(0, 0, 0)
-            min_x = math.min(min_x, x)
-            min_y = math.min(min_y, y)
-            max_x = math.max(max_x, bx)
-            max_y = math.max(max_y, by)
-        end
-        return rt.AABB(min_x, min_y, max_x - min_x, max_y - min_y)
-    else
-        local shape = rt._fixture_get_shape(self._fixtures[i])
-        return rt.AABB(shape:computeAABB(0, 0, 0))
-    end
-end
 
 --- @brief
 function rt.Collider:destroy()
@@ -185,93 +340,4 @@ function rt.Collider:set_restitution(x, fixture_index)
         self._fixtures[fixture_index]:setRestitution(x)
     end
 end
-
---- @overload
-function rt.Collider:draw()
-    for i = 1, #self._fixtures do
-        local shape = rt._fixture_get_shape(self._fixtures[i])
-        local pos_x, pos_y = self._body:getPosition()
-        rt.PhysicsShape._draw(shape, pos_x, pos_y)
-    end
-end
-
---- @brief rectangle, centroid is origin
-function rt.RectangleCollider(world, type, top_left_x, top_left_y, width, height)
-    local center_x, center_y = top_left_x + 0.5 * width, top_left_y + 0.5 * height
-    local shape = rt.PhysicsShape(rt.PhysicsShapeType.RECTANGLE,
-        0, 0,
-        width, height
-    )
-    return rt.Collider(world, type, {shape}, center_x, center_y)
-end
-
---- @brief triangle, centroid is origin
---- @return rt.Collider
-function rt.TriangleCollider(world, type, ax, ay, bx, by, cx, cy)
-    local center_x, center_y = (ax + bx + by) / 3, (ay + by + cy) / 3
-    local shape = rt.PhysicsShape(rt.PhysicsShapeType.POLYGON,
-        ax - center_x, ay - center_y,
-        bx - center_x, by - center_y,
-        cx - center_x, by - center_y
-    )
-    return rt.Collider(world, type, {shape}, center_x, center_y)
-end
-
-
---- @brief triangle, centroid is origin
---- @return rt.Collider
-function rt.PolygonCollider(world, type, ax, ay, bx, by, cx, cy, ...)
-    local center_x, center_y = 0, 0
-    local input = {ax, ay, bx, by, cx, cy, ...}
-    for i = 1, #input, 2 do
-        center_x = center_x + input[i+0]
-        center_y = center_y + input[i+1]
-    end
-    center_x = center_x / (#input / 2)
-    center_y = center_y / (#input / 2)
-
-    local vertices = {}
-    for i = 1, #input, 2 do
-        vertices[i] = input[i] - center_x
-        vertices[i+1] = input[i+1] - center_y
-    end
-
-    local shape = rt.PhysicsShape(rt.PhysicsShapeType.POLYGON, splat(vertices))
-    return rt.Collider(world, type, {shape}, center_x, center_y)
-end
-
---- @brief ellipse, centroid is origin
-function rt.EllipseCollider(world, type, center_x, center_y, x_radius, y_radius, n_outer_vertices)
-    n_outer_vertices = which(n_outer_vertices, 8)
-    local step = 360 / n_outer_vertices
-    local vertices = {}
-    for angle = 0, 360, step do
-        for p in range(
-            0 + x_radius * math.cos(rt.degrees(angle):as_radians()),
-            0 + y_radius * math.sin(rt.degrees(angle):as_radians())
-        ) do table.insert(vertices, p) end
-    end
-    local shape = rt.PhysicsShape(rt.PhysicsShapeType.POLYGON, splat(vertices))
-    return rt.Collider(world, type, {shape}, center_x, center_y)
-end
-
---- @brief circle collider, center is origin
---- @return rt.Collider
-function rt.CircleCollider(world, type, center_x, center_y, radius)
-    local shape = rt.PhysicsShape(rt.PhysicsShapeType.CIRCLE, 0, 0, radius)
-    return rt.Collider(world, type, {shape}, center_x, center_y)
-end
-
---- @brief line segment, centroid is origin
---- @return rt.Collider
-function rt.LineCollider(world, type, ax, ay, bx, by)
-    local center_x, center_y = (ax + bx) / 2, (ay + by) / 2
-    local shape = rt.PhysicsShape(rt.PhysicsShapeType.LINE,
-        ax - center_x, ay - center_y,
-        bx - center_x, by - center_y
-    )
-    return rt.Collider(world, type, {shape}, center_x, center_y)
-end
-
-
 
