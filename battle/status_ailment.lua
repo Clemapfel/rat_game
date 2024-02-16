@@ -1,6 +1,5 @@
 --- @class bt.Stats
 bt.StatusAilment = meta.new_type("StatusAilment", function(id)
-
     local path = "battle/configs/status_ailments/" .. id .. ".lua"
     if meta.is_nil(love.filesystem.getInfo(path)) then
         rt.error("In StatusAilment(\"" .. id .. "\"): path `" .. path .. "` does not exist")

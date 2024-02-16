@@ -97,7 +97,6 @@ end
 --- @brief remove element from end of list, O(1)
 --- @return any
 function rt.List:pop_back()
-
     local out = self._last_node
     if not meta.is_nil(out.previous) then
         out.previous.next = nil
@@ -112,7 +111,6 @@ end
 --- @param index Number 1-based
 --- @return any removed value
 function rt.List:erase(index)
-
     if index > self._n_elements or index < 1 then
         rt.error("In rt.list:erase: index `" .. tostring(index) .. "` is out of bounds for list with `" .. tostring(self._n_elements) .. "` elements")
     end
@@ -185,7 +183,6 @@ end
 --- @param index Number 1-based
 --- @return any
 function rt.List:at(index)
-
     if index > self._n_elements then
         rt.error("In rt.list:at: index `" .. tostring(index) .. "` is out of bounds for list with `" .. tostring(self._n_elements) .. "` elements")
     end
@@ -203,7 +200,6 @@ end
 --- @param index Number 1-based
 --- @param new_value any
 function rt.List:set(index, new_value)
-
     if index > self._n_elements then
         rt.error("In rt.list:set: index `" .. tostring(index) .. "` is out of bounds for list with `" .. tostring(self._n_elements) .. "` elements")
     end

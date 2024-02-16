@@ -6,7 +6,7 @@ rt.settings.particle_emitter = {
 }
 
 --- @class rt.ParticleEmitter
-rt.ParticleEmitter = meta.new_type("ParticleEmitter", function(particle)
+rt.ParticleEmitter = meta.new_type("ParticleEmitter", rt.Widget, rt.Animation, function(particle)
     meta.assert_isa(particle, rt.Drawable)
     local out = meta.new(rt.ParticleEmitter, {
         _particle = particle,
@@ -16,7 +16,7 @@ rt.ParticleEmitter = meta.new_type("ParticleEmitter", function(particle)
         _direction = rt.Direction.UP,
         _speed = rt.settings.particle_emitter.default_speed,
         _color = rt.RGBA(1, 1, 1, 1)
-    }, rt.Drawable, rt.Animation, rt.Widget)
+    })
 
     out:_snapshot_particle()
     out._native = love.graphics.newParticleSystem(out._particle_texture._native)

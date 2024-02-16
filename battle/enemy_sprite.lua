@@ -1,11 +1,11 @@
 --- @class bt.EnemySprite
-bt.EnemySprite = meta.new_type("EnemySprite", function(entity)
+bt.EnemySprite = meta.new_type("EnemySprite", rt.Widget, rt.Animation, function(entity)
     assert(meta.isa(entity, bt.Entity) and entity.is_enemy == true)
     local out = meta.new(bt.EnemySprite, {
         _sprite = rt.ImageDisplay("assets/favicon.png"),
         _shader = rt.Shader("assets/shaders/enemy_sprite.glsl"),
         _elapsed = 0
-    }, rt.Drawable, rt.Widget, rt.Animation)
+    })
 
     out._shader:send("_pulse_active", true) -- todo
     out._shader:send("_pulse_frequency", 0.75)

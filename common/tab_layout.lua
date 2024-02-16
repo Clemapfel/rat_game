@@ -3,14 +3,14 @@ rt.settings.tab_layout = {
 }
 
 --- @class rt.TabLayout
-rt.TabLayout = meta.new_type("TabLayout", function()
+rt.TabLayout = meta.new_type("TabLayout", rt.Widget, function()
     local out = meta.new(rt.TabLayout, {
         _pages = rt.List(),
         _content_area_backdrop = rt.Rectangle(0, 0, 1, 1),
         _content_area_backdrop_outline = rt.Rectangle(0, 0, 1, 1),
         _tab_content_area_divider = rt.Line(0, 0, 1, 1),
         _current_page = 1,
-    }, rt.Drawable, rt.Widget)
+    })
 
     out._content_area_backdrop:set_color(rt.Palette.BACKGROUND)
     out._content_area_backdrop_outline:set_color(rt.Palette.BACKGROUND_OUTLINE)
@@ -22,7 +22,6 @@ end)
 
 --- @overload rt.Drawable.draw
 function rt.TabLayout:draw()
-
     if not self:get_is_visible() then return end
 
     if self:get_is_visible() then
@@ -52,8 +51,6 @@ end
 
 --- @overload rt.Widget.size_allocate
 function rt.TabLayout:size_allocate(x, y, width, height)
-
-
     local tab_height = NEGATIVE_INFINITY
     for _, page in pairs(self._pages) do
         local w, h = page.label:measure()
@@ -99,7 +96,6 @@ end
 
 --- @brief
 function rt.TabLayout:insert_page(index, title, child)
-
     local to_push = {
         label = title,
         content = child,
@@ -126,7 +122,6 @@ end
 
 --- @brief
 function rt.TabLayout:remove_page(index)
-
     if index > self._pages:size() or index < 1 then
         rt.error("In rt.TabLayout.remove_page: index `" .. tostring(index) .. "` is out of bounds for a TabLayout with `" .. tostring(self._pages:size()) .. "` pages")
     end
@@ -138,7 +133,6 @@ end
 
 --- @brief
 function rt.TabLayout:set_page(index)
-
     if index > self._pages:size() or index < 1 then
         rt.error("In rt.TabLayout.set_page: index `" .. tostring(index) .. "` is out of bounds for a TabLayout with `" .. tostring(self._pages:size()) .. "` pages")
     end
@@ -149,7 +143,6 @@ end
 
 --- @brief
 function rt.TabLayout:next_page()
-
     if self._pages:size() <= 1 then return end
 
     local next = self._current_page + 1
@@ -160,7 +153,6 @@ end
 
 --- @brief
 function rt.TabLayout:previous_page()
-
     if self._pages:size() <= 1 then return end
 
     local next = self._current_page - 1
@@ -171,6 +163,5 @@ end
 
 --- @brief
 function rt.TabLayout:get_n_pages_size()
-
     return self._pages:size()
 end

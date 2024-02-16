@@ -18,7 +18,6 @@ rt.Audio = meta.new_type("Audio", function(filename_or_duration_or_n_samples)
             rt.settings.audio.data_n_channels
         )
     else -- n samples
-
         native = love.sound.newSoundData(
             arg,
             rt.settings.audio.default_sample_rate,
@@ -62,7 +61,6 @@ end
 --- @param index Number 1-based
 --- @param value Number in [-1, 1]
 function rt.Audio:set_sample(i, value)
-
     if value < -1 or value > 1 then
         rt.warning("In rt.Audio.set_sample: Value `".. tostring(value) .. "` is outside of [-1, 1]")
         value = clamp(value, -1, 1)

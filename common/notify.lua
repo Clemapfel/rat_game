@@ -1,10 +1,10 @@
 --- @class rt.NotifyComponent
 --- @signal notify (self, property_name, before, after) -> nil
-rt.NotifyComponent = meta.new_type("NotifyComponent", function(instance)
+rt.NotifyComponent = meta.new_type("NotifyComponent", rt.SignalEmitter, function(instance)
     meta.assert_object(instance)
     local out = meta.new(rt.NotifyComponent, {
         _instance = instance
-    }, rt.SignalEmitter)
+    })
 
     out:_inject(instance)
     out:signal_add("notify")

@@ -3,7 +3,7 @@ rt.settings.split_layout = {
 }
 
 --- @class rt.SplitLayout
-rt.SplitLayout = meta.new_type("SplitLayout", function()
+rt.SplitLayout = meta.new_type("SplitLayout", rt.Widget, function()
     local out = meta.new(rt.SplitLayout, {
         _start_child = {},
         _end_child = {},
@@ -12,7 +12,7 @@ rt.SplitLayout = meta.new_type("SplitLayout", function()
         _divider_base = rt.Rectangle(0, 0, 1, 1),
         _divider_outline = rt.Rectangle(0, 0, 1, 1),
         _ratio = 0.5, -- start to end child
-    }, rt.Drawable, rt.Widget)
+    })
 
     out._divider_base:set_color(rt.Palette.BASE)
     out._divider_outline:set_color(rt.Palette.BASE_OUTLINE)
@@ -25,7 +25,6 @@ end)
 
 --- @overload rt.Drawable.draw
 function rt.SplitLayout:draw()
-
     if not self:get_is_visible() then return end
 
     if meta.is_widget(self._start_child) then
@@ -51,7 +50,6 @@ end
 
 --- @overload rt.Widget.size_allocate
 function rt.SplitLayout:size_allocate(x, y, width, height)
-
     local has_start = meta.isa(self._start_child, rt.Widget)
     local has_end = meta.isa(self._end_child, rt.Widget)
     if has_start and not has_end then
@@ -82,7 +80,6 @@ end
 
 --- @overload rt.Widget.measure
 function rt.SplitLayout:measure()
-
     local has_start = meta.isa(self._start_child, rt.Widget)
     local has_end = meta.isa(self._end_child, rt.Widget)
     if has_start and not has_end then
@@ -104,7 +101,6 @@ end
 
 --- @overload rt.Widget.realize
 function rt.SplitLayout:realize()
-
     self._realized = true
 
     if meta.isa(self._start_child, rt.Widget) then
@@ -119,9 +115,6 @@ end
 --- @brief set first child
 --- @param child rt.Widget
 function rt.SplitLayout:set_start_child(child)
-
-
-
     self:remove_start_child()
     child:set_parent(self)
     self._start_child = child
@@ -133,13 +126,11 @@ end
 --- @param child rt.Widget
 --- @return rt.Widget
 function rt.SplitLayout:get_start_child()
-
     return self._start_child
 end
 
 --- @brief remove first child
 function rt.SplitLayout:remove_start_child()
-
     if meta.isa(self._start_child, rt.Widget) then
         self._start_child:set_parent(nil)
         self._start_child = nil
@@ -149,9 +140,6 @@ end
 --- @brief set last child
 --- @param child rt.Widget
 function rt.SplitLayout:set_end_child(child)
-
-
-
     self:remove_end_child()
     child:set_parent(self)
     self._end_child = child
@@ -162,13 +150,11 @@ end
 --- @brief get last child
 --- @return rt.Widget
 function rt.SplitLayout:get_end_child()
-
     return self._end_child
 end
 
 --- @brief remove last child
 function rt.SplitLayout:remove_end_child()
-
     if meta.isa(self._end_child, rt.Widget) then
         self._end_child:set_parent(nil)
         self._end_child = nil
@@ -178,8 +164,6 @@ end
 --- @brief set ratio between first and last child, width if horizontal, height if vertical
 --- @param ratio Number
 function rt.SplitLayout:set_ratio(ratio)
-
-
     if ratio < 0 or ratio > 1 then
         rt.error("In rt.SplitLayout.set_ratio: ratio `" .. tostring(ratio) .. "` has to be inside [0, 1]")
     end
@@ -190,14 +174,12 @@ end
 --- @brief get ratio
 --- @return Number
 function rt.SplitLayout:get_ratio()
-
     return self._ratio
 end
 
 --- @brief set orientation, causes reformat
 --- @param orientation rt.Orientation
 function rt.SplitLayout:set_orientation(orientation)
-
     if self._orientation == orientation then return end
     self._orientation = orientation
     self:reformat()
@@ -206,7 +188,6 @@ end
 --- @brief get orientation
 --- @return rt.Orientation
 function rt.SplitLayout:get_orientation()
-
     return self._orientation
 end
 

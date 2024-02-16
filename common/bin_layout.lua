@@ -1,9 +1,9 @@
 --- @class rt.BinLayout
 --- @brief Single-child container that assumes the dimensions of its singular child
-rt.BinLayout = meta.new_type("BinLayout", function()
+rt.BinLayout = meta.new_type("BinLayout", rt.Widget, function()
     local out = meta.new(rt.BinLayout, {
         _child = {}
-    }, rt.Drawable, rt.Widget)
+    })
     return out
 end)
 

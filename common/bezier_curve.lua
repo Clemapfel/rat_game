@@ -1,10 +1,10 @@
 --- @class BezierCurve
-rt.BezierCurve = meta.new_type("BezierCurve", function(points)
+rt.BezierCurve = meta.new_type("BezierCurve", rt.Drawable, function(points)
     return meta.new(rt.BezierCurve, {
         _native = love.math.newBezierCurve(points),
         _points = points,
         _length = {},
-    }, rt.Drawable)
+    })
 end)
 
 --- @brief

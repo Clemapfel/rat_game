@@ -4,7 +4,6 @@
 --- @param b Number (or nil)
 --- @param a Number (or nil)
 rt.RGBA = function(r_or_string, g, b, a)
-
     if type(r_or_string) == "string" then --meta.is_string(r_or_string) then
         local code = r_or_string
         return rt.html_code_to_color(code)
@@ -83,7 +82,6 @@ end
 --- @param rgba rt.RGBA
 --- @return rt.HSVA
 function rt.rgba_to_hsva(rgba)
-
     -- cf. https://github.com/Clemapfel/mousetrap/blob/main/src/color.cpp#L112
     local r = rgba.r
     local g = rgba.g
@@ -133,8 +131,7 @@ end
 --- @param hsva rt.HSVA
 --- @return rt.RGBA
 function rt.hsva_to_rgba(hsva)
-
-    --- cf https://github.com/Clemapfel/mousetrap/blob/main/src/color.cpp#L151
+    -- cf. https://github.com/Clemapfel/mousetrap/blob/main/src/color.cpp#L151
     local h = hsva.h * 360
     local s = hsva.s
     local v = hsva.v
@@ -174,8 +171,6 @@ end
 --- @param c2 rt.RGBA
 --- @return Boolean
 function rt.compare_rgba(c1, c2)
-
-
     return c1.r == c2.r and c1.g == c2.g and c1.b == c2.b and c1.a == c2.a
 end
 
@@ -184,8 +179,6 @@ end
 --- @param c2 rt.HSVA
 --- @return Boolean
 function rt.compare_hsva(c1, c2)
-
-
     local hue_matches = ternary(math.abs(c1.h - c2.h) == 1, true, c1.h == c2.h)
     return hue_matches and c1.s == c2.s and c1.v == c2.v and c1.a == c2.a
 end
@@ -194,8 +187,6 @@ end
 --- @param code String "#RRGGBB(AA)"
 --- @return rt.RGBA
 function rt.html_code_to_color(code)
-
-
     function hex_char_to_int(c)
         c = string.upper(c)
         if c == '0' then return 0
@@ -265,7 +256,6 @@ end
 --- @param use_alpha Boolean (or nil)
 --- @return String "#RRGGBB" or "#RRGGBBAA" if `use_alpha`
 function rt.color_to_html_code(rgba, use_alpha)
-
     if meta.is_nil(use_alpha) then
         use_alpha = false
     end
@@ -296,7 +286,6 @@ end
 
 --- @brief
 function rt.color_darken(color, offset)
-
     offset = clamp(offset, 0, 1)
     if meta.is_hsva(color) then
         return rt.HSVA(color.h, color.s, color.v - offset, color.a)

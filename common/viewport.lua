@@ -1,5 +1,5 @@
 --- @class rt.Viewport
-rt.Viewport = meta.new_type("Viewport", function(child)
+rt.Viewport = meta.new_type("Viewport", rt.Widget, function(child)
     local out = meta.new(rt.Viewport, {
         _child = {},
         _x_offset = 0,
@@ -11,7 +11,7 @@ rt.Viewport = meta.new_type("Viewport", function(child)
         _propagate_height = false,
         _width = 0,
         _height = 0
-    }, rt.Widget, rt.Drawable)
+    })
 
     if not meta.is_nil(child) then
         out:set_child(child)

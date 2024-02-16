@@ -22,7 +22,6 @@ end)
 
 --- @class rt.Thread
 rt.Thread = meta.new_type("Thread", function(id)
-
     assert(id > 0)
     if not meta.is_nil(rt.current_scene.thread_pool._threads[id]) then
         rt.error("In Thread(): thread with ID `" .. tostring(id) .. "` already registered")
@@ -43,8 +42,6 @@ end)
 --- @brief restart the thread with a fresh environment
 --- @param wait Boolean
 function rt.Thread:restart()
-
-    ::try_again::
     local message = love.thread.getChannel(self:get_id()):push({
         type = rt.MessageType.KILL
     })
@@ -55,7 +52,6 @@ end
 
 --- @brief
 function rt.ThreadPool:restart()
-
     for _, thread in pairs(self._thread) do
         thread:restart()
     end
@@ -63,7 +59,6 @@ end
 
 --- @brief
 function rt.Thread:get_id()
-
     return self._id
 end
 
@@ -83,25 +78,21 @@ end)
 
 --- @brief
 function rt.Future:get_id()
-
     return self._id
 end
 
 --- @brief
 function rt.Future:has_value()
-
     return self._value_delivered
 end
 
 --- @brief
 function rt.Future:get_value()
-
     return ternary(self:has_value(), self._value, nil)
 end
 
 --- @brief clear the delivery message queue and supply all futures
 function rt.ThreadPool:update_futures()
-
     local in_channel = love.thread.getChannel(0)
     while in_channel:getCount() > 0 do
         local message = in_channel:pop()
@@ -133,7 +124,6 @@ end
 
 --- @return rt.Future
 function rt.Thread.execute(self, code)
-
     local future = rt.Future()
     if meta.is_string(code) then
         love.thread.getChannel(self:get_id()):push({
@@ -154,9 +144,6 @@ end
 
 --- @return rt.Future
 function rt.Thread.invoke(self, function_id, ...)
-
-
-
     local future = rt.Future()
     love.thread.getChannel(self:get_id()):push({
         type = rt.MessageType.INVOKE,
@@ -169,8 +156,6 @@ end
 
 --- @return nil
 function rt.Thread.deliver(future_id, value, error_occurred, error)
-
-
     love.thread.getChannel(0):push({
         type = rt.MessageType.DELIVER,
         thread_id = rt.get_thread_id(),
@@ -181,9 +166,6 @@ end
 
 --- @return nil
 function rt.Thread.error(future_id, error_message)
-
-
-
     love.thread.getChannel(0):push({
         type = rt.MessageType.ERROR,
         future_id = future_id,
@@ -194,9 +176,6 @@ end
 
 --- @return nil
 function rt.Thread:set(variable_name, value)
-
-
-
     if meta.is_nil(value) then
         love.thread.getChannel(self:get_id()):push({
             type = rt.MessageType.SET,
@@ -226,16 +205,12 @@ end
 
 --- @return any
 function rt.Thread:get(variable_name)
-
-
-
     love.thread.getChannel(self:get_id()):push({
         type = rt.MessageType.GET,
         name = variable_name
     })
     local channel = love.thread.getChannel(self:get_id() + 256)
     local message = channel:demand()
-
 
     assert(message.type == rt.MessageType.RETURN)
     if message.is_function then

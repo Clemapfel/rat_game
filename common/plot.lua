@@ -1,5 +1,5 @@
 --- @class rt.Plot1D
-rt.Plot1D = meta.new_type("Plot1D", function(data, interpolate)
+rt.Plot1D = meta.new_type("Plot1D", rt.Widget, function(data, interpolate)
     interpolate = which(interpolate, true)
 
     local min, max = table.min_max(data._data)
@@ -16,7 +16,7 @@ rt.Plot1D = meta.new_type("Plot1D", function(data, interpolate)
         _height = data:get_dimension(2),
         _line_visible = true,
         _points_visible = true
-    }, rt.Widget, rt.Drawable)
+    })
 
     out._background:set_color(rt.Palette.BACKGROUND)
     return out
@@ -24,13 +24,13 @@ end)
 
 --- @class rt.Plot2D
 --- @param data rt.Matrix
-rt.Plot2D = meta.new_type("Plot2D", function(data)
+rt.Plot2D = meta.new_type("Plot2D", rt.Widget, function(data)
     local out = meta.new(rt.Plot2D, {
         _texture = {},
         _shape = rt.VertexRectangle(0, 0, 1, 1),
         _width = data:get_dimension(1),
         _height = data:get_dimension(2)
-    }, rt.Widget, rt.Drawable)
+    })
 
     local image = rt.Image(out._width, out._height)
     local min, max = table.min_max(data._data)
@@ -76,7 +76,6 @@ end
 
 --- @overload
 function rt.Plot1D:size_allocate(x, y, width, height)
-
     self._background:set_vertex_position(1, x, y)
     self._background:set_vertex_position(2, x + width, y)
     self._background:set_vertex_position(3, x + width, y + height)

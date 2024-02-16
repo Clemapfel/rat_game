@@ -5,7 +5,7 @@ rt.settings.swipe_layout = {
 }
 
 --- @class rt.SwipeLayout
-rt.SwipeLayout = meta.new_type("SwipeLayout", function(orientation)
+rt.SwipeLayout = meta.new_type("SwipeLayout", rt.Widget, rt.Animation, function(orientation)
     orientation = which(orientation, rt.Orientation.HORIZONTAL)
     local out = meta.new(rt.SwipeLayout, {
         _children = rt.List(),
@@ -24,7 +24,7 @@ rt.SwipeLayout = meta.new_type("SwipeLayout", function(orientation)
         _modifies_focus = true,
         _allow_wrap = true,
         _input = {}
-    }, rt.Drawable, rt.Widget, rt.Animation)
+    })
 
     local mu = rt.settings.margin_unit
     out._left_indicator:set_margin_left(mu)
@@ -42,7 +42,6 @@ end)
 
 --- @brief [internal]
 function rt.SwipeLayout:_on_button_pressed(which, self)
-
     local element_offset = 0
     if self._orientation == rt.Orientation.HORIZONTAL then
         if which == rt.InputButton.LEFT then
@@ -65,7 +64,6 @@ end
 
 --- @brief
 function rt.SwipeLayout:jump_to(index)
-
     if sizeof(self._slot_positions) == 0 then return end
 
     local n = self._children:size()
@@ -119,7 +117,6 @@ end
 
 --- @overload rt.Drawable.draw
 function rt.SwipeLayout:draw()
-
     if not self:get_is_visible() then return end
 
     love.graphics.push()
@@ -172,7 +169,6 @@ end
 
 --- @overload rt.Widget.size_allocate
 function rt.SwipeLayout:size_allocate(x, y, width, height)
-
     self._area = rt.AABB(x, y, width, height)
     local radius = rt.settings.swipe_layout.indicator_radius
     self._slot_positions = {}

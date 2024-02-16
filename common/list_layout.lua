@@ -1,7 +1,7 @@
 --- @class rt.ListLayout
 --- @param orientation rt.Orientation
 --- @varag rt.Widget
-rt.ListLayout = meta.new_type("ListLayout", function(orientation, ...)
+rt.ListLayout = meta.new_type("ListLayout", rt.Widget, function(orientation, ...)
     if meta.is_nil(orientation) then
         orientation = rt.Orientation.HORIZONTAL
     end
@@ -10,7 +10,7 @@ rt.ListLayout = meta.new_type("ListLayout", function(orientation, ...)
         _children = rt.List(),
         _orientation = orientation,
         _spacing = 0
-    }, rt.Drawable, rt.Widget)
+    })
 
     for x in range(...) do
         out:push_back(x)
@@ -21,7 +21,6 @@ rt.BoxLayout = rt.ListLayout
 
 --- @overload rt.Drawable.draw
 function rt.ListLayout:draw()
-
     if not self:get_is_visible() or self._children:size() == 0 then return end
     for _, child in pairs(self._children) do
         child:draw()
@@ -30,9 +29,7 @@ end
 
 --- @overlay rt.Widget.size_allocate
 function rt.ListLayout:size_allocate(x, y, width, height)
-
     local n_children = self._children:size()
-
     if self._orientation == rt.Orientation.HORIZONTAL then
         local child_min_w = 0
         local child_max_h = NEGATIVE_INFINITY
@@ -134,7 +131,6 @@ end
 --- @brief replace all children
 --- @param children Table<rt.Widget>
 function rt.ListLayout:set_children(children)
-
     for _, child in pairs(self._children) do
         if meta.is_widget(child) then
             child:set_parent(nil)
@@ -195,7 +191,6 @@ end
 --- @param index Number 1-based
 --- @param child rt.Widget
 function rt.ListLayout:insert(index, child)
-
     child:set_parent(self)
     self._children:insert(index, child)
     if self:get_is_realized() then
@@ -208,7 +203,6 @@ end
 --- @brief remove child at position
 --- @param index Number 1-based
 function rt.ListLayout:erase(index)
-
     local child = self._children:erase(index)
     child:set_parent(nil)
     self:reformat()
@@ -222,7 +216,6 @@ end
 --- @brief set orientation
 --- @param orientation rt.Orientation
 function rt.ListLayout:set_orientation(orientation)
-
     if self._orientation == orientation then return end
     self._orientation = orientation
     self:reformat()
@@ -231,14 +224,11 @@ end
 --- @brief get orientation
 --- @return rt.Orientation
 function rt.ListLayout:get_orientation()
-
     return self._orientation
 end
 
 --- @brief set spacing
 function rt.ListLayout:set_spacing(spacing)
-
-
     spacing = clamp(spacing, 0)
     if self._spacing ~= spacing then
         self._spacing = spacing
@@ -248,7 +238,6 @@ end
 
 --- @brief get spacing
 function rt.ListLayout:get_spacing()
-
     return self._spacing
 end
 

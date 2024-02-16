@@ -1,13 +1,12 @@
 --- @class
-rt.Rectangle = meta.new_type("Rectangle", function(top_left_x, top_left_y, width, height)
+rt.Rectangle = meta.new_type("Rectangle", rt.Shape, function(top_left_x, top_left_y, width, height)
     local out = meta.new(rt.Rectangle, {
         _x = top_left_x,
         _y = top_left_y,
         _width = width,
         _height = height,
         _corner_radius = 0
-    }, rt.Shape, rt.Drawable)
-
+    })
     return out
 end)
 

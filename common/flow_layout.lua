@@ -1,6 +1,6 @@
 --- @class rt.FlowLayout
 --- @brief container that automatically redistributes its children across as many rows/columns as necessary
-rt.FlowLayout = meta.new_type("FlowLayout", function(orientation)
+rt.FlowLayout = meta.new_type("FlowLayout", rt.Widget, function(orientation)
     if meta.is_nil(orientation) then
         orientation = rt.Orientation.VERTICAL
     end
@@ -12,13 +12,11 @@ rt.FlowLayout = meta.new_type("FlowLayout", function(orientation)
         _min_n_cols = 0,
         _row_spacing = 0,
         _column_spacing = 0
-    }, rt.Drawable, rt.Widget)
+    })
 end)
 
 --- @overload rt.Widget.size_allocate
 function rt.FlowLayout:size_allocate(x, y, width, height)
-
-
     local tile_w = 0
     local tile_h = 0
 
@@ -84,7 +82,6 @@ end
 
 --- @overload rt.Drawable.draw
 function rt.FlowLayout:draw()
-
     if not self:get_is_visible() then return end
     for _, child in pairs(self._children) do
         child:draw()
@@ -93,7 +90,6 @@ end
 
 --- @overload rt.Widget.realize
 function rt.FlowLayout:realize()
-
     if self:get_is_realized() == true then return end
     self._realized = true
     for _, child in pairs(self._children) do
@@ -104,7 +100,6 @@ end
 --- @brief replace all children at once
 --- @param children Table<rt.Widget>
 function rt.FlowLayout:set_children(children)
-
     for child in pairs(self._children) do
         child:set_parent(nil)
     end
@@ -147,7 +142,6 @@ end
 --- @brief remove first child
 --- @return rt.Widget (or nil)
 function rt.FlowLayout:pop_front()
-
     local out = self._children:pop_front()
     out:set_parent(nil)
     self:reformat()
@@ -157,7 +151,6 @@ end
 --- @brief remove last child
 --- @return rt.Widget (or nil)
 function rt.FlowLayout:pop_back()
-
     local out = self._children:pop_back()
     out:set_parent(nil)
     self:reformat()
@@ -168,10 +161,6 @@ end
 --- @param index Number 1-based
 --- @param child rt.Widget
 function rt.FlowLayout:insert(index, child)
-
-
-
-
     child:set_parent(self)
     self._children:insert(index, child)
     if self:get_is_realized() then
@@ -184,9 +173,6 @@ end
 --- @brief remove child at position
 --- @param index Number 1-based
 function rt.FlowLayout:erase(index)
-
-
-
     local child = self._children:erase(index)
     child:set_parent(nil)
     self:reformat()
@@ -195,7 +181,6 @@ end
 --- @brief set orientation, causes reformat
 --- @param orientation rt.Orientation
 function rt.FlowLayout:set_orientation(orientation)
-
     if self._orientation == orientation then return end
     self._orientation = orientation
     self:reformat()
@@ -204,37 +189,30 @@ end
 --- @brief get orientation
 --- @return rt.Orientation
 function rt.FlowLayout:get_orientation()
-
     return self._orientation
 end
 
 --- @brief set spacing in-between rows
 --- @param x Number
 function rt.FlowLayout:set_row_spacing(x)
-
-
     self._row_spacing = x
 end
 
 --- @brief get spacing in-between rows
 --- @return Number
 function rt.FlowLayout:get_row_spacing()
-
     return self._row_spacing
 end
 
 --- @brief set spacing in-between columns
 --- @param x Number
 function rt.FlowLayout:set_column_spacing(x)
-
-
     self._column_spacing = x
 end
 
 --- @brief get spacing in-between columns
 --- @return Number
 function rt.FlowLayout:get_column_spacing()
-
     return self._column_spacing
 end
 

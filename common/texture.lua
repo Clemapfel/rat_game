@@ -16,27 +16,27 @@ rt.TextureWrapMode = meta.new_enum({
 --- @class rt.Texture
 --- @param pathor_width String (or Number)
 --- @param height Number (or nil)
-rt.Texture = meta.new_type("Texture", function(path_or_image_or_width, height)
+rt.Texture = meta.new_type("Texture", rt.Drawable, function(path_or_image_or_width, height)
     local out
     if meta.is_string(path_or_image_or_width) then
         local path = path_or_image_or_width
         out =  meta.new(rt.Texture, {
             _native = love.graphics.newImage(path)
-        }, rt.Drawable)
+        })
     elseif meta.isa(path_or_image_or_width, rt.Image) then
         local image = path_or_image_or_width
         out = meta.new(rt.Texture, {
             _native = love.graphics.newImage(image._native)
-        }, rt.Drawable)
+        })
     elseif meta.is_number(path_or_image_or_width) then
         local width = path_or_image_or_width
         out = meta.new(rt.Texture, {
             _native = love.graphics.newImage(width, height)
-        }, rt.Drawable)
+        })
     else
         out = meta.new(rt.Texture, {
             _native = love.graphics.newImage()
-        }, rt.Drawable)
+        })
     end
     out:set_scale_mode(rt.TextureScaleMode.NEAREST)
     out:set_wrap_mode(rt.TextureWrapMode.CLAMP)

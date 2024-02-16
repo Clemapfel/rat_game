@@ -1,5 +1,5 @@
 --- @class bt.EntityPortrait
-bt.EntityPortrait = meta.new_type("EntityPortrait", function(entity)
+bt.EntityPortrait = meta.new_type("EntityPortrait", rt.Widget, function(entity)
 
     if meta.is_nil(env.entity_portrait_spritesheet) then
         env.entity_portrait_spritesheet = rt.Spritesheet("assets/sprites", "entity_portrait")
@@ -45,7 +45,7 @@ bt.EntityPortrait = meta.new_type("EntityPortrait", function(entity)
             color_from,
             color_to
         )
-    }, rt.Widget, rt.Drawable)
+    })
 
     out._backdrop:set_color(rt.Palette.BASE)
     out._overlay:set_base_child(out._backdrop)

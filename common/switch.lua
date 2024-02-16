@@ -5,7 +5,7 @@ rt.settings.switch = {
 
 --- @class rt.Switch
 --- @signal switched (self, current_state) -> nil
-rt.Switch = meta.new_type("Switch", function()
+rt.Switch = meta.new_type("Switch", rt.Widget, rt.SignalEmitter, function()
     local out = meta.new(rt.Switch, {
         _input = {},
         _slider = rt.Circle(0, 0, 1),
@@ -20,7 +20,7 @@ rt.Switch = meta.new_type("Switch", function()
         _is_on = false,
         _on_color = rt.Palette.HIGHLIGHT,
         _off_color = rt.Palette.BACKGROUND
-    }, rt.Drawable, rt.Widget, rt.SignalEmitter)
+    })
 
     out._input = rt.InputController(out)
 
@@ -48,13 +48,11 @@ rt.Switch = meta.new_type("Switch", function()
             self:set_is_on(not self:get_is_on())
         end
     end, out)
-
     return out
 end)
 
 --- @brief
 function rt.Switch:_update_slider()
-
     if self._is_on == false then
         local pos_x, pos_y = self._start:get_center()
         local radius = self._start:get_radius()
@@ -80,9 +78,7 @@ end
 
 --- @overload rt.Drawable.draw
 function rt.Switch:draw()
-
     if not self:get_is_visible() then return end
-
 
     self._start:draw()
     self._end:draw()
@@ -97,8 +93,6 @@ end
 
 --- @overload rt.Widget.size_allocate()
 function rt.Switch:size_allocate(x, y, width, height)
-
-
     local slider_radius = rt.settings.switch.slider_radius
     self._slider:set_radius(slider_radius)
     self._slider_outline:set_radius(slider_radius)
@@ -126,7 +120,6 @@ end
 
 --- @brief
 function rt.Switch:set_is_on(b)
-
     local before = self._is_on
     self._is_on = b
 
@@ -138,6 +131,5 @@ end
 
 --- @brief
 function rt.Switch:get_is_on()
-
     return self._is_on
 end

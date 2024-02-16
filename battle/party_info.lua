@@ -12,9 +12,8 @@ rt.settings.party_info = {
     bounce_frequency = 3.5,
 }
 
-
 --- @class bt.PartyInfo
-bt.PartyInfo = meta.new_type("PartyInfo", function(entity)
+bt.PartyInfo = meta.new_type("PartyInfo", rt.Widget, rt.Animation, function(entity)
     meta.assert_isa(entity, bt.Entity)
 
     if meta.is_nil(env.party_info_spritesheet) then
@@ -51,7 +50,7 @@ bt.PartyInfo = meta.new_type("PartyInfo", function(entity)
         _bounce_offset = 0,
         _bounce_elapsed = 0,
         _is_bouncing = true
-    }, rt.Drawable, rt.Widget, rt.Animation)
+    })
 
     local left, right = out:_format_hp(entity:get_hp())
     local settings = {

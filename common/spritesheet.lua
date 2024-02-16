@@ -1,7 +1,7 @@
 --- @class rt.Spritesheet
 --- @param path String path prefix, not absolute path
 --- @param id String spritsheet ID, expects <ID>.png and <ID>.lua to be in `path`
-rt.Spritesheet = meta.new_type("Spritesheet", function(path, id)
+rt.Spritesheet = meta.new_type("Spritesheet", rt.Texture, function(path, id)
     local config_path = path .. "/" .. id .. ".lua"
     local image_path = path .. "/" .. id .. ".png"
 
@@ -21,14 +21,10 @@ rt.Spritesheet = meta.new_type("Spritesheet", function(path, id)
     local config = code()
 
     local name = config.name
-
-
     local width, height = config.width, config.height
-
 
     local fps = config.fps
     if meta.is_nil(fps) then fps = 24 end
-
 
     local image_width = image:getWidth()
     local n_frames = math.floor(image_width / width)
@@ -79,7 +75,7 @@ rt.Spritesheet = meta.new_type("Spritesheet", function(path, id)
         _n_frames = n_frames,
         _native = image,
         _fps = fps
-    }, rt.Texture)
+    })
 
     out.name = name
 
@@ -94,7 +90,6 @@ rt.Spritesheet.name = ""
 --- @param scope String scope for error message
 --- @param animation_id String
 function rt.Spritesheet:_assert_has_animation(scope, animation_id)
-
     if meta.is_nil(self._name_to_frame[animation_id]) then
         rt.error("in rt." .. scope .. ": Spritesheet `" .. self.name .. "` has no animation with id `" .. animation_id .. "`")
     end
@@ -113,7 +108,6 @@ end
 --- @return rt.AxisAlignedRectangle
 function rt.Spritesheet:get_frame(animation_id, index_maybe)
     self:_assert_has_animation("Spritesheet.get_frame", animation_id)
-
     local start_end = self._name_to_frame[animation_id]
     local i = (start_end[1] - 1) + (index_maybe - 1)
     return rt.AABB(i / self._n_frames, 0, 1 / self._n_frames, 1)
@@ -123,8 +117,6 @@ end
 --- @param animation_id String
 --- @return (Number, Number)
 function rt.Spritesheet:get_frame_size(animation_id)
-
-
     self:_assert_has_animation("Spritesheet.get_frame_size", animation_id)
     return self._frame_width, self._frame_height
 end
@@ -133,8 +125,6 @@ end
 --- @param animation_id String
 --- @return Number
 function rt.Spritesheet:get_frame_height(animation_id)
-
-
     self:_assert_has_animation("Spritesheet.get_frame_size", animation_id)
     return self._frame_height
 end
@@ -143,8 +133,6 @@ end
 --- @param animation_id String
 --- @return Number
 function rt.Spritesheet:get_frame_width(animation_id)
-
-
     self:_assert_has_animation("Spritesheet.get_frame_size", animation_id)
     return self._frame_width
 end
@@ -153,8 +141,6 @@ end
 --- @param animation_id String
 --- @return Number
 function rt.Spritesheet:get_n_frames(animation_id)
-
-
     self:_assert_has_animation("Spritesheet.get_n_frames", animation_id)
     local start_end = self._name_to_frame[animation_id]
     return start_end[2] - start_end[1] + 1
@@ -163,7 +149,6 @@ end
 --- @brief list animation ids
 --- @return Table<String>
 function rt.Spritesheet:get_animation_ids()
-
     local out = {}
     for id, _ in pairs(self._name_to_frame) do
         table.insert(out, id)
@@ -173,7 +158,6 @@ end
 
 --- @brief get target fps
 function rt.Spritesheet:get_fps()
-
     return self._fps
 end
 

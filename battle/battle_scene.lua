@@ -1,8 +1,8 @@
 --- @class bt.BattleScene
-bt.BattleScene = meta.new_type("BattleScene", function(config)
+bt.BattleScene = meta.new_type("BattleScene", rt.Scene, function(config)
     local out = meta.new(bt.BattleScene, {
         _entites = {}   --- @field _entities Table<String, bt.Entity>
-    }, rt.Scene)
+    })
     return out
 end)
 

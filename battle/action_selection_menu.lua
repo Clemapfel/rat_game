@@ -1,7 +1,7 @@
 rt.settings.action_selection_thumbnail.infinity = "∞"
 
 --- @class bt.ActionSelectionThumbnail
-bt.ActionSelectionThumbnail = meta.new_type("ActionSelectionThumbnail", function(action, n_uses)
+bt.ActionSelectionThumbnail = meta.new_type("ActionSelectionThumbnail", rt.Widget, function(action, n_uses)
     if meta.is_nil(n_uses) then n_uses = POSITIVE_INFINITY end
     local out = meta.new(bt.ActionSelectionThumbnail, {
         _action = action,
@@ -10,7 +10,7 @@ bt.ActionSelectionThumbnail = meta.new_type("ActionSelectionThumbnail", function
         _sprite = action:create_sprite(),
         _sprite_aspect = rt.AspectLayout(1),
         _color_transform = rt.SnapshotLayout()
-    }, rt.Widget, rt.Drawable)
+    })
 
     out._label:set_alignment(rt.Alignment.END)
 

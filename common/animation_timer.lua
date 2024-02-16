@@ -49,7 +49,6 @@ end)()
 --- @signal tick    (self, [0, 1]) -> nil
 --- @signal done    (self) -> nil
 rt.AnimationTimer = meta.new_type("AnimationTimer", function(duration)
-
     if duration:as_seconds() < 0 then
         rt.error("In AnimationTimer(): Duration `" .. string(duration) .. "` cannot be negative")
     end
@@ -60,7 +59,7 @@ rt.AnimationTimer = meta.new_type("AnimationTimer", function(duration)
         _time = 0,
         _timing_function = rt.AnimationTimingFunction.LINEAR,
         _loop = false
-    }, rt.SignalEmitter)
+    })
 
     rt.current_scene.animation_timer_handler._components[meta.hash(out)] = out
 
@@ -68,7 +67,7 @@ rt.AnimationTimer = meta.new_type("AnimationTimer", function(duration)
     out:signal_add("done")
 
     return out
-end)
+end, rt.SignalEmitter)
 
 --- @brief advance all animation timers, this uses a stable clock independent of fps
 --- @param delta Number duration of last frame, in seconds

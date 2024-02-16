@@ -14,7 +14,6 @@ rt.settings.font = {
 --- @param italic_path String (or nil)
 --- @param bold_italic_path String (or nil)
 rt.Font = meta.new_type("Font", function(size, regular_path, bold_path, italic_path, bold_italic_path)
-
     local out = meta.new(rt.Font, {
         _regular_path = regular_path,
         _italic_path = regular_path,
@@ -60,7 +59,6 @@ rt.Font[rt.FontStyle.BOLD_ITALIC] = love.graphics.getFont()
 
 --- @brief [internal] update held fonts
 function rt.Font:_update()
-
     self[rt.FontStyle.REGULAR] = love.graphics.newFont(self._regular_path, self._size)
     self[rt.FontStyle.BOLD] = love.graphics.newFont(self._bold_path, self._size)
     self[rt.FontStyle.ITALIC] = love.graphics.newFont(self._italic_path, self._size)
@@ -80,7 +78,6 @@ end
 --- @brief set font size, in px
 --- @param px Number
 function rt.Font:set_size(px)
-
     self._size = px
     self:_update()
 end
@@ -88,14 +85,12 @@ end
 --- @brief get font size, in px
 --- @return Number
 function rt.Font:get_size()
-
     return self._size
 end
 
 --- @brief get regular version of font
 --- @return love.Font
 function rt.Font:get_regular()
-
     return self[rt.FontStyle.REGULAR]
 end
 

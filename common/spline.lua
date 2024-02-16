@@ -5,10 +5,8 @@ rt.settings.spline = {
 
 --- @class rt.Spline
 --- @brief catmull-rom spline, c1 continuous and goes through every control point
-rt.Spline = meta.new_type("Spline", function(points, loop, steprate)
-
+rt.Spline = meta.new_type("Spline", rt.Drawable, function(points, loop, steprate)
     steprate = which(steprate, rt.settings.spline.steprate)
-
     if #points == 2 then
         points = {points[1], points[2], points[1], points[2]}
     end
@@ -18,7 +16,7 @@ rt.Spline = meta.new_type("Spline", function(points, loop, steprate)
         _vertices = vertices,
         _distances = distances,
         _length = total_length
-    }, rt.Drawable)
+    })
     return out
 end)
 

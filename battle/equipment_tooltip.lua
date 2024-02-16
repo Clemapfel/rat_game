@@ -1,7 +1,7 @@
 rt.settings.equipment_tooltip.no_effect_label = "(no additional effect)"
 
 --- @class bt.EquipmentTooltip
-bt.EquipmentTooltip = meta.new_type("EquipmentTooltip", function(equipment)
+bt.EquipmentTooltip = meta.new_type("EquipmentTooltip", rt.Widget, function(equipment)
 
     if meta.is_nil(env.equipment_spritesheet) then
         env.equipment_spritesheet = rt.Spritesheet("assets/sprites", "equipment")
@@ -14,7 +14,7 @@ bt.EquipmentTooltip = meta.new_type("EquipmentTooltip", function(equipment)
         _equipment = equipment,
         _sprite = equipment:create_sprite(),
         _tooltip = {} -- bt.BattleTooltip
-    }, rt.Widget, rt.Drawable)
+    })
 
     out._tooltip = bt.BattleTooltip(
         out._equipment.name,

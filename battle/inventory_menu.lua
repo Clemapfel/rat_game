@@ -26,7 +26,7 @@ bt.InventoryMenuState = meta.new_type("InventoyMenuState", function(entity)
 end)
 
 --- @class bt.InventoryControlDisplay
-bt.InventoryMenuPage = meta.new_type("InventoryMenu", function(state)
+bt.InventoryMenuPage = meta.new_type("InventoryMenu", rt.Widget, rt.Animation, function(state)
     state = (function()
         local out = bt.InventoryMenuState("debug")
         out.entity = bt.Entity("TEST_ENTITY")
@@ -73,7 +73,7 @@ bt.InventoryMenuPage = meta.new_type("InventoryMenu", function(state)
         _speed_row = rt.ListLayout(rt.Orientation.HORIZONTAL),
 
         _input = {}
-    }, rt.Widget, rt.Drawable, rt.Animation)
+    })
 
     -- ### EVs
 

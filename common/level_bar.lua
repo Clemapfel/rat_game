@@ -5,7 +5,7 @@ rt.settings.level_bar = {
 }
 
 --- @class rt.LevelBar
-rt.LevelBar = meta.new_type("LevelBar", function(lower, upper, value)
+rt.LevelBar = meta.new_type("LevelBar", rt.Widget, function(lower, upper, value)
 
     if meta.is_nil(value) then
         value = mix(lower, upper, 0.5)
@@ -24,7 +24,7 @@ rt.LevelBar = meta.new_type("LevelBar", function(lower, upper, value)
         _color = rt.Palette.HIGHLIGHT,
         _backdrop_color = rt.color_darken(rt.Palette.HIGHLIGHT, rt.settings.level_bar.backdrop_darken_offset),
         _marks = {} -- {value, line}
-    }, rt.Drawable, rt.Widget)
+    })
 
     out._backdrop_outline:set_is_outline(true)
     out._shape_outline:set_is_outline(true)
@@ -115,7 +115,6 @@ end
 
 --- @overload rt.Widget.size_allocate
 function rt.LevelBar:size_allocate(x, y, width, height)
-
     local w, h = width, height
     if not self:get_expand_vertically() then
         h = rt.settings.font.default_size

@@ -8,15 +8,12 @@ require "log"
 require "meta"
 require "thread"
 
-
 assert(rt.get_thread_id() > 0)
 local out_channel = love.thread.getChannel(0)
 local in_channel = love.thread.getChannel(rt.get_thread_id())
 
 while true do
     local message = in_channel:demand()
-
-
     if message.type == rt.MessageType.KILL then
         break
     end

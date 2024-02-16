@@ -149,8 +149,6 @@ rt.Palette.HP = rt.Palette.PURPLE_1
 
 --- @brief save palette to assets/palette.png
 function rt.Palette:export()
-
-
     local ordered = {
         "LIGHT_GREEN_1",
         "LIGHT_GREEN_2",

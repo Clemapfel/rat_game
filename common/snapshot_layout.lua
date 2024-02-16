@@ -1,6 +1,6 @@
 --- @class rt.SnapshotLayout
 --- @brief caches rendered child to a canvas, this can be used to apply color transforms or reduce load during rendering
-rt.SnapshotLayout = meta.new_type("SnapshotLayout", function()
+rt.SnapshotLayout = meta.new_type("SnapshotLayout", rt.Widget, function()
     local out = meta.new(rt.SnapshotLayout, {
         _child = {},
         _canvas = rt.RenderTexture(1, 1, true),
@@ -20,7 +20,7 @@ rt.SnapshotLayout = meta.new_type("SnapshotLayout", function()
         _mix_color = rt.RGBA(1, 1, 1, 1),
         _mix_weight = 0,
         _vertex_color = rt.RGBA(1, 1, 1, 1)
-    }, rt.Drawable, rt.Widget)
+    })
     return out
 end)
 
@@ -67,7 +67,6 @@ function rt.SnapshotLayout:draw()
     love.graphics.draw(self._canvas._native, self._position_x + self._x_offset, self._position_y + self._y_offset)
     love.graphics.pop()
     self._shader:unbind()
-
 end
 
 --- @overload rt.Widget.size_allocate
@@ -178,7 +177,6 @@ function rt.SnapshotLayout:set_mix_color(color)
     if meta.is_hsva(color) then
         color = rt.hsva_to_rgba(color)
     end
-
     self._mix_color = color
 end
 

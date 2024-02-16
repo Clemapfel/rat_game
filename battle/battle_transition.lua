@@ -1,5 +1,5 @@
 --- @class bt.BattleTransition
-bt.BattleTransition = meta.new_type("BattleTransition", function(n_tiles)
+bt.BattleTransition = meta.new_type("BattleTransition", rt.Widget, rt.Animation, function(n_tiles)
     local out = meta.new(bt.BattleTransition, {
         _mesh = {}, -- rt.VertexShape
         _n_steps = which(n_tiles, 5),
@@ -10,7 +10,7 @@ bt.BattleTransition = meta.new_type("BattleTransition", function(n_tiles)
         _elapsed = 0,
         _triangles = {},
         _texture = nil
-    }, rt.Widget, rt.Drawable, rt.Animation)
+    })
 
     out:set_is_animated(true)
     return out
@@ -18,7 +18,6 @@ end)
 
 --- @overload
 function bt.BattleTransition:size_allocate(x, y, width, height)
-
     self._width = width
     self._height = height
 

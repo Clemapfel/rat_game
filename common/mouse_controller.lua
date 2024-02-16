@@ -18,13 +18,11 @@ meta.make_weak(rt.MouseHandler._components, false, true)
 --- @signal motion_enter    (self, x, y) -> nil 
 --- @signal motion          (self, x, y, dx, dy) -> nil
 --- @signal motion_leave    (self, x, y) -> nil
-rt.MouseController = meta.new_type("MouseController", function(instance)
-
-
+rt.MouseController = meta.new_type("MouseController", rt.SignalEmitter, function(instance)
     local out = meta.new(rt.MouseController, {
         instance = instance,
         _active = false
-    }, rt.SignalEmitter)
+    })
 
     out:signal_add("click_pressed")
     out:signal_add("click_released")

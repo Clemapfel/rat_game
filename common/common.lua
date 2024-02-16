@@ -1,4 +1,3 @@
-
 -- luajit compat
 _G._pairs = pairs
 function pairs(x)

@@ -2,14 +2,13 @@
 --- @brief Makes sure its singular child conforms to given width-to-height ratio
 --- @param ratio Number
 --- @param child rt.Widget (or nil)
-rt.AspectLayout = meta.new_type("AspectLayout", function(ratio, child)
-
+rt.AspectLayout = meta.new_type("AspectLayout", rt.Widget, function(ratio, child)
     local out = meta.new(rt.AspectLayout, {
         _child = {},
         _ratio = ratio,
         _width = 0,
         _height = 0
-    }, rt.Widget, rt.Drawable)
+    })
 
     if not meta.is_nil(child) then
 

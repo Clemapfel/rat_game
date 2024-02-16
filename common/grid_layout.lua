@@ -14,11 +14,8 @@ end)
 
 --- @overlay rt.Widget.size_allocate
 function rt.GridLayout:size_allocate(x, y, width, height)
-
-
     local tile_w = 0
     local tile_h = 0
-
     for _, child in pairs(self._children) do
         local w, h = child:measure()
         tile_w = math.max(tile_w, w)
@@ -111,7 +108,6 @@ end
 
 --- @overload rt.Drawable.draw
 function rt.GridLayout:draw()
-
     if not self:get_is_visible() then return end
     for _, child in pairs(self._children) do
         child:draw()
@@ -120,7 +116,6 @@ end
 
 --- @overload rt.Drawable.realize
 function rt.GridLayout:realize()
-
     if self:get_is_realized() == true then return end
     self._realized = true
     for _, child in pairs(self._children) do
@@ -131,9 +126,6 @@ end
 --- @brief replace children
 --- @param children Table<rt.Widget>
 function rt.GridLayout:set_children(children)
-
-
-
     for child in pairs(self._children) do
         child:set_parent(nil)
     end
@@ -150,8 +142,6 @@ end
 --- @brief append child
 --- @param child rt.Widget
 function rt.GridLayout:push_back(child)
-
-
     child:set_parent(self)
     self._children:push_back(child)
     if self:get_is_realized() then
@@ -163,8 +153,6 @@ end
 --- @brief prepend child
 --- @param child rt.Widget
 function rt.GridLayout:push_front(child)
-
-
     child:set_parent(self)
     self._children:push_back(child)
     if self:get_is_realized() then
@@ -176,7 +164,6 @@ end
 --- @brief remove first child
 --- @return rt.Widget
 function rt.GridLayout:pop_front()
-
     local out = self._children:pop_front()
     out:set_parent(nil)
     self:reformat()
@@ -186,7 +173,6 @@ end
 --- @brief remove last child
 --- @return rt.Widget
 function rt.GridLayout:pop_back()
-
     local out = self._children:pop_back()
     out:set_parent(nil)
     self:reformat()
@@ -197,10 +183,6 @@ end
 --- @param index Number 1-based
 --- @param child rt.Widget
 function rt.GridLayout:insert(index, child)
-
-
-
-
     child:set_parent(self)
     self._children:insert(index, child)
     if self:get_is_realized() then
@@ -213,9 +195,6 @@ end
 --- @brief remove child at position
 --- @param index Number 1-based
 function rt.GridLayout:erase(index)
-
-
-
     local child = self._children:erase(index)
     child:set_parent(nil)
     self:reformat()
@@ -224,7 +203,6 @@ end
 --- @brief set orientation, causes reformat
 --- @param orientation rt.Orientation
 function rt.GridLayout:set_orientation(orientation)
-
     if self._orientation == orientation then return end
     self._orientation = orientation
     self:reformat()
@@ -233,15 +211,12 @@ end
 --- @brief get orientation
 --- @return rt.Orientation
 function rt.GridLayout:get_orientation()
-
     return self._orientation
 end
 
 --- @brief set spacing between rows
 --- @param x Number px
 function rt.GridLayout:set_row_spacing(x)
-
-
     if self._row_spacing ~= x then
         self._row_spacing = x
         self:reformat()
@@ -251,15 +226,12 @@ end
 --- @brief get spacing between rows
 --- @return Number px
 function rt.GridLayout:get_row_spacing()
-
     return self._row_spacing
 end
 
 --- @brief set spacing between columns
 --- @param x Number px
 function rt.GridLayout:set_column_spacing(x)
-
-
     if self._column_spacing ~= x then
         self._column_spacing = x
         self:reformat();
@@ -269,14 +241,12 @@ end
 --- @brief get spacing between columns
 --- @param Number px
 function rt.GridLayout:get_column_spacing()
-
     return self._column_spacing
 end
 
 --- @brief set lower bound for rows
 --- @param n Number
 function rt.GridLayout:set_min_n_rows(n)
-
     if self._min_n_rows ~= n then
         self._min_n_rows = n
         self:reformat()
@@ -286,7 +256,6 @@ end
 --- @brief set upper bound for rows
 --- @param n Number
 function rt.GridLayout:set_max_n_rows(n)
-
     if self._max_n_rows ~= n then
         self._max_n_rows = n
         self:reformat()
@@ -296,7 +265,6 @@ end
 --- @brief set lower bound for columns
 --- @param n Number
 function rt.GridLayout:set_min_n_columns(n)
-
     if self._min_n_cols ~= n then
         self._min_n_cols = n
         self:reformat()
@@ -306,7 +274,6 @@ end
 --- @brief set upper bound for columns
 --- @param n Number
 function rt.GridLayout:set_max_n_columns(n)
-
     if self._max_n_cols ~= n then
         self._max_n_cols = n
         self:reformat()

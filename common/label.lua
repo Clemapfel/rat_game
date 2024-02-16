@@ -8,7 +8,7 @@ rt.JustifyMode = meta.new_enum({
 --- @class rt.Label
 --- @param text String
 --- @param font rt.Font (or nil)
-rt.Label = meta.new_type("Label", function(text, font, monospace_font)
+rt.Label = meta.new_type("Label", rt.Widget, function(text, font, monospace_font)
     if meta.is_nil(text) then
         text = ""
     end
@@ -33,8 +33,7 @@ rt.Label = meta.new_type("Label", function(text, font, monospace_font)
         _current_width = 0,
         _current_height = 0,
         _n_visible_characters = -1
-    }, rt.Widget, rt.Drawable)
-
+    })
     return out
 end)
 
@@ -60,7 +59,6 @@ end
 
 --- @overload rt.Widget.size_allocate
 function rt.Label:size_allocate(x, y, width, height)
-
     -- apply wrapping
     local space = self._font:get_bold_italic():getWidth(rt.Label.SPACE)
     local tab = self._font:get_bold_italic():getWidth(rt.Label.TAB)
@@ -236,7 +234,6 @@ rt.Label.MONOSPACE_TAG_END = rt.Set("</tt>", "</mono>")
 
 --- @brief [internal] transform _raw into set of glyphs
 function rt.Label:_parse()
-
     local first_parse = sizeof(self._glyphs) == 0
     local animation_necessary = false
 
@@ -311,14 +308,12 @@ function rt.Label:_parse()
 
     -- throw error, with guides
     local function throw_parse_error(reason)
-
         rt.error("[rt] In rt.Label._parse: Error at position `" .. tostring(i) .. "`: " .. reason)
     end
 
     -- advance n characters
     local function step(n)
         if meta.is_nil(n) then n = 1 end
-
         i = i + n
         s = string.sub(self._raw, i, i)
     end
@@ -549,7 +544,6 @@ end
 
 --- @brief [internal] calculate size given infinite area
 function rt.Label:_update_default_size()
-
     self:size_allocate(0, 0, 2^32, 2^32)
     local min_x = POSITIVE_INFINITY
     local min_y = POSITIVE_INFINITY

@@ -4,7 +4,7 @@ rt.settings.order_queue = {
 }
 
 --- @class bt.OrderQueue
-bt.OrderQueue = meta.new_type("OrderQueue", function()
+bt.OrderQueue = meta.new_type("OrderQueue", rt.Widget, rt.Animation, function()
     local out = meta.new(bt.OrderQueue, {
         _current_state = {},    -- rt.Queue<bt.Entity>
         _next_state = {},       -- rt.Queue<bt.Entity>
@@ -21,7 +21,7 @@ bt.OrderQueue = meta.new_type("OrderQueue", function()
         _turn_separator_outline = rt.Rectangle(0, 0, 1, 1),
         _turn_separator_outline_outline = rt.Rectangle(0, 0, 1, 1),
         _portraits = {}         -- Table<entity.id, bt.EntityPortrait>
-    }, rt.Widget, rt.Drawable, rt.Animation)
+    })
 
     for base in range(
         out._arrow_head,
@@ -101,7 +101,6 @@ end
 
 --- @overload
 function bt.OrderQueue:size_allocate(x, y, width, height)
-
     local m = 48
     local arrow_m = 0.8 * m
 

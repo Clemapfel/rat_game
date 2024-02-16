@@ -186,7 +186,7 @@ end
 --- @signal enter     (self, x, y) -> nil
 --- @signal motion    (self, x, y, dx, dy) -> nil
 --- @signal leave     (self, x, y) -> nil
-rt.InputController = meta.new_type("InputController", function(holder)
+rt.InputController = meta.new_type("InputController", rt.SignalEmitter, function(holder)
     local out = meta.new(rt.InputController, {
         _instance = holder,
         _gamepad = rt.GamepadController(holder),
@@ -195,7 +195,7 @@ rt.InputController = meta.new_type("InputController", function(holder)
         _state = {},
         _axis_state = {},
         _is_disabled = false
-    }, rt.SignalEmitter)
+    })
 
     if sizeof(rt.InputHandler._mapping) == 0 then
         rt.InputHandler._mapping = rt.InputHandler._load_input_mapping()
@@ -468,27 +468,23 @@ end
 --- @brief
 --- @return Number, Number
 function rt.InputController:get_left_joystick()
-
     return self._axis_state[rt.GamepadAxis.LEFT_X], self._axis_state[rt.GamepadAxis.LEFT_Y]
 end
 
 --- @brief
 --- @return Number, Number
 function rt.InputController:get_right_joystick()
-
     return self._axis_state[rt.GamepadAxis.RIGHT_X], self._axis_state[rt.GamepadAxis.RIGHT_Y]
 end
 
 --- @brief
 --- @return Number, Number
 function rt.InputController:get_cursor_position()
-
     return self._mouse:get_cursor_position()
 end
 
 --- @brief
 function rt.add_input_controller(object)
-
     local to_add = rt.InputController(object)
     getmetatable(object).components.input = to_add
     return to_add
@@ -496,19 +492,16 @@ end
 
 --- @brief
 function rt.get_input_controller(object)
-
     return getmetatable(object).components.input
 end
 
 --- @brief
 function rt.InputController:set_is_disabled(b)
-
     self._is_disabled = b
 end
 
 --- @brief
 function rt.InputController:get_is_disabled()
-
     return self._is_disabled
 end
 

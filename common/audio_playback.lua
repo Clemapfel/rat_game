@@ -44,11 +44,9 @@ end
 --- @brief set playback position
 --- @param time_or_sample rt.Time (or Number) duration or sample index
 function rt.AudioPlayback:set_position(time_or_sample)
-
     if meta.isa(time_or_sample, rt.Time) then
         self._native:seek(time_or_sample:as_seconds(), "seconds")
     else
-
         self._native:seek(time_or_sample, "samples")
     end
 end
@@ -62,14 +60,12 @@ end
 --- @brief set whether audio should loop
 --- @param b Boolean
 function rt.AudioPlayback:set_should_loop(b)
-
     self._native:setLooping(b)
 end
 
 --- @brief set whether audio should loop
 --- @return Boolean
 function rt.AudioPlayback:set_should_loop(b)
-
     self._native:isLooping()
 end
 

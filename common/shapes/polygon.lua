@@ -6,13 +6,13 @@ rt.PolygonType = meta.new_enum({
 })
 
 --- @class
-rt.Polygon = meta.new_type("Polygon", function(...)
+rt.Polygon = meta.new_type("Polygon", rt.Shape, function(...)
     local out = meta.new(rt.Polygon, {
         _vertices = {...},
         _type = rt.PolygonType.POLYGON,
         _centroid_x = 0,
         _centroid_y = 0
-    }, rt.Shape, rt.Drawable)
+    })
     out:_update_centroid()
     return out
 end)

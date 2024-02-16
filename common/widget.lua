@@ -19,25 +19,26 @@ rt.Orientation = meta.new_enum({
 })
 
 --- @class rt.Widget
-rt.Widget = meta.new_abstract_type("Widget")
-rt.Widget._bounds = rt.AxisAlignedRectangle()     -- maximum area
-rt.Widget._margin_top = 0
-rt.Widget._margin_bottom = 0
-rt.Widget._margin_left = 0
-rt.Widget._margin_right = 0
-rt.Widget._expand_horizontally = true
-rt.Widget._expand_vertically = true
-rt.Widget._horizontal_alignment = rt.Alignment.CENTER
-rt.Widget._vertical_alignment = rt.Alignment.CENTER
-rt.Widget._minimum_width = 1
-rt.Widget._minimum_height = 1
-rt.Widget._realized = false
-rt.Widget._focused = true
-rt.Widget._parent = nil
-rt.Widget._selected = false
-rt.Widget._is_hidden = false
-rt.Widget._final_pos_x = 0
-rt.Widget._final_pos_y = 0
+rt.Widget = meta.new_abstract_type("Widget", rt.Drawable, {
+    _bounds = rt.AxisAlignedRectangle(), -- maximum area
+    _margin_top = 0,
+    _margin_bottom = 0,
+    _margin_left = 0,
+    _margin_right = 0,
+    _expand_horizontally = true,
+    _expand_vertically = true,
+    _horizontal_alignment = rt.Alignment.CENTER,
+    _vertical_alignment = rt.Alignment.CENTER,
+    _minimum_width = 1,
+    _minimum_height = 1,
+    _realized = false,
+    _focused = true,
+    _parent = nil,
+    _selected = false,
+    _is_hidden = false,
+    _final_pos_x = 0,
+    _final_pos_y = 0
+})
 
 --- @brief abstract method, emitted when widgets bounds should change
 --- @param x Number
@@ -257,7 +258,6 @@ end
 --- @brief get top margin
 --- @return Number
 function rt.Widget:get_margin_top()
-
     return self._margin_top
 end
 
@@ -276,7 +276,6 @@ end
 --- @brief get bottom margin
 --- @return Number
 function rt.Widget:get_margin_bottom()
-
     return self._margin_bottom
 end
 
@@ -330,7 +329,6 @@ end
 --- @brief set expansion along x-axis
 --- @param b Boolean
 function rt.Widget:set_expand_horizontally(b)
-
     if self._expand_horizontally == b then return end
 
     self._expand_horizontally = b
@@ -343,14 +341,12 @@ end
 --- @brief get expansion along x-axis
 --- @return Number
 function rt.Widget:get_expand_horizontally()
-
     return self._expand_horizontally
 end
 
 --- @brief set expansion along y-axis
 --- @param b Boolean
 function rt.Widget:set_expand_vertically(b)
-
     if self._expand_vertically == b then return end
 
     self._expand_vertically = b
@@ -363,14 +359,12 @@ end
 --- @brief get expansion along y-axis
 --- @return Boolean
 function rt.Widget:get_expand_vertically()
-
     return self._expand_vertically
 end
 
 --- @brief set expansion along both axes
 --- @param b Boolean
 function rt.Widget:set_expand(b)
-
     if self._expand_horizontally == b and self._expand_vertically == b then return end
 
     self._expand_horizontally = b
@@ -384,7 +378,6 @@ end
 --- @brief set alignment along x-axis
 --- @param alignment rt.Alignment
 function rt.Widget:set_horizontal_alignment(alignment)
-
     if self._horizontal_alignment == alignment then return end
 
     self._horizontal_alignment = alignment
@@ -397,14 +390,12 @@ end
 --- @brief get alignment along x-axis
 --- @return rt.Alignment
 function rt.Widget:get_horizontal_alignment()
-
     return self._horizontal_alignment
 end
 
 --- @brief set alignment along y-axis
 --- @param alignment rt.Alignment
 function rt.Widget:set_vertical_alignment(alignment)
-
     if self._vertical_alignment == alignment then return end
 
     self._vertical_alignment = alignment
@@ -417,14 +408,12 @@ end
 --- @brief get alignment along y-axis
 --- @return rt.Alignment
 function rt.Widget:get_vertical_alignment()
-
     return self._vertical_alignment
 end
 
 --- @brief set alignment among both axes
 --- @param alignment rt.Alignment
 function rt.Widget:set_alignment(alignment)
-
     if self._vertical_alignment == alignment and self._horizontal_alignment == alignment then return end
 
     self._horizontal_alignment = alignment
@@ -439,7 +428,6 @@ end
 --- @param width Number
 --- @param height Number
 function rt.Widget:set_minimum_size(width, height)
-
     if self._minimum_width == width and self._minimum_height == height then return end
 
     self._minimum_width = width
@@ -453,19 +441,16 @@ end
 --- @brief get size request
 --- @return Number, Number
 function rt.Widget:get_minimum_size()
-
     return self._minimum_width, self._minimum_height
 end
 
 --- @brief get whether widget currently holds input focus
 function rt.Widget:get_has_focus()
-
     return self._focused
 end
 
 --- @brief set the parent property of the child. If it already has a parent, print a warning
 function rt.Widget:set_parent(other)
-
     if meta.is_nil(other) then
         self._parent = nil
         self:set_has_focus(false)
@@ -481,7 +466,6 @@ end
 
 --- @brief get parent
 function rt.Widget:get_parent()
-
     if self:_has_top_level() then
         return self:get_top_level_widget()._parent
     else
@@ -500,7 +484,6 @@ end
 --- @param range_size Number maximum width
 --- @return (Number, Number) x, width
 function rt.Widget._calculate_size(self, width, margin_start, margin_end, align, expand, range_start, range_size)
-
     local x = range_start
     local w = width
     local m0 = margin_start
@@ -525,7 +508,6 @@ end
 
 --- @brief
 function rt.Widget:draw_selection_indicator()
-
     local x, y = self:get_position()
     local w, h = self:get_size()
 
@@ -545,7 +527,6 @@ end
 
 --- @brief
 function rt.Widget:set_is_selected(b)
-
     self._selected = b
     if self:_has_top_level() then
         self:get_top_level_widget():set_is_selected(b)
@@ -554,7 +535,6 @@ end
 
 --- @brief
 function rt.Widget:get_is_selected()
-
     return self._selected
 end
 
@@ -568,13 +548,11 @@ end
 
 --- @brief
 function rt.Widget:get_has_focus()
-
     return self._focused
 end
 
 --- @brief [internal] draw allocation component as wireframe
 function rt.Widget:draw_bounds()
-
     local x, y = self._final_pos_x, self._final_pos_y
     local w, h = self:get_size()
 

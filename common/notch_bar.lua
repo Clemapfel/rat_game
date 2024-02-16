@@ -7,7 +7,7 @@ rt.settings.notch_bar = {
 }
 
 --- @class rt.Notch
-rt.Notch = meta.new_type("Notch", function()
+rt.Notch = meta.new_type("Notch", rt.Widget, function()
     local out = meta.new(rt.Notch, {
         _center = rt.Circle(0, 0, 1),
         _center_outline = rt.Circle(0, 0, 1),
@@ -16,7 +16,7 @@ rt.Notch = meta.new_type("Notch", function()
         _frame_outline_inner = rt.Circle(0, 0, 1),
         _frame_outline_outer = rt.Circle(0, 0, 1),
         _color = rt.RGBA(1, 1, 1, 1)
-    }, rt.Widget, rt.Drawable)
+    })
 
     out._center_outline:set_is_outline(true)
     out._frame_outline_inner:set_is_outline(true)
@@ -57,7 +57,6 @@ end
 
 --- @overload rt.Widget.size_allocate
 function rt.Notch:size_allocate(x, y, width, height)
-
     local radius = math.min(width, height) / 2
     local center_x, center_y = x + 0.5 * width, y + 0.5 * height
 
@@ -75,7 +74,7 @@ function rt.Notch:size_allocate(x, y, width, height)
 end
 
 --- @class rt.NotchBar
-rt.NotchBar = meta.new_type("NotchBar", function(n_notches)
+rt.NotchBar = meta.new_type("NotchBar", rt.Widget, function(n_notches)
     if meta.is_nil(n_notches) then n_notches = 1 end
     local out = meta.new(rt.NotchBar, {
         _notches = rt.List(),
@@ -85,7 +84,7 @@ rt.NotchBar = meta.new_type("NotchBar", function(n_notches)
         _right_indicator_frame = rt.Circle(0, 0, 1, 3),
         _base_color = rt.Palette.BACKGROUND,
         _highlight_color = rt.Palette.HIGHLIGHT
-    }, rt.Drawable, rt.Widget)
+    })
 
     while out._notches:size() <= n_notches do
         out._notches:push_back(rt.Notch())
@@ -108,7 +107,6 @@ end)
 
 --- @overload rt.Drawable.draw
 function rt.NotchBar:draw()
-
     if not self:get_is_visible() then return end
 
     for _, notch in pairs(self._notches) do
@@ -124,7 +122,6 @@ end
 
 --- @overload rt.Widget.size_allocate
 function rt.NotchBar:size_allocate(x, y, width, height)
-
     local n_notches = self._notches:size()
     local notch_diameter = width / (n_notches + 2)
 
@@ -148,7 +145,6 @@ end
 --- @brief fill all notches up to position
 function rt.NotchBar:set_n_filled(n)
     n = clamp(n, 0, self._notches:size())
-
     local i = 1
     for _, notch in pairs(self._notches) do
         if i + 1 > n then
@@ -165,7 +161,6 @@ end
 --- @param index Number or 0 for none filled
 function rt.NotchBar:set_filled(index)
     index = clamp(index, 0, self._notches:size() - 1)
-
     local i = 1
     for _, notch in pairs(self._notches) do
         if i == index then

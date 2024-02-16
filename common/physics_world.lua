@@ -4,14 +4,14 @@ rt.settings.physics.world = {
 
 --- @class rt.PhysicsWorld
 --- @signal update (self) -> nil
-rt.PhysicsWorld = meta.new_type("PhysicsWorld", function(x_gravity, y_gravity)
+rt.PhysicsWorld = meta.new_type("PhysicsWorld", rt.SignalEmitter, function(x_gravity, y_gravity)
     local out = meta.new(rt.PhysicsWorld, {
         _native = love.physics.newWorld(
             which(x_gravity, 0),
             which(y_gravity, rt.settings.physics.world.default_gravity),
             false
         )
-    }, rt.SignalEmitter)
+    })
     out:signal_add("update")
 
     out._native:setCallbacks(
@@ -22,7 +22,6 @@ rt.PhysicsWorld = meta.new_type("PhysicsWorld", function(x_gravity, y_gravity)
     )
     return out
 end)
-
 
 --- @brief [internal]
 function rt.PhysicsWorld._on_begin_contact(fixture_a, fixture_b, contact)

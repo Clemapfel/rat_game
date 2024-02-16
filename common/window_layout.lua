@@ -4,10 +4,10 @@ meta.make_weak(rt.WindowHandler._components, false, true)
 
 --- @class rt.WindowLayout
 --- @brief Single-child container, resized with window
-rt.WindowLayout = meta.new_type("WindowLayout", function()
+rt.WindowLayout = meta.new_type("WindowLayout", rt.Widget, function()
     local out = meta.new(rt.WindowLayout, {
         _child = {}
-    }, rt.Drawable, rt.Widget)
+    })
     rt.WindowHandler._components[meta.hash(out)] = out
     return out
 end)

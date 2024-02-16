@@ -5,13 +5,12 @@ rt.settings.status_tooltip = {
 }
 
 --- @class bt.StatusTooltip
-bt.StatusTooltip = meta.new_type("StatusTooltip", function(status)
-
+bt.StatusTooltip = meta.new_type("StatusTooltip", rt.Widget, function(status)
     local out = meta.new(bt.StatusTooltip, {
         _status_ailment = status,
         _sprite = status:create_sprite(),
         _tooltip = {} -- bt.BattleTooltip
-    }, rt.Widget, rt.Drawable)
+    })
 
     out._tooltip = bt.BattleTooltip(
         out._status_ailment.name,

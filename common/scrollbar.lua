@@ -2,8 +2,7 @@
 --- @param orientation rt.Orientation
 --- @param n_steps Number (or nil)
 --- @signal value_changed: (::Scrollbar, value::Number) -> nil
-rt.Scrollbar = meta.new_type("Scrollbar", function(orientation, n_steps)
-
+rt.Scrollbar = meta.new_type("Scrollbar", rt.Widget, rt.SignalEmitter, function(orientation, n_steps)
     if meta.is_nil(n_steps) then
         n_steps = 0
     end
@@ -16,7 +15,7 @@ rt.Scrollbar = meta.new_type("Scrollbar", function(orientation, n_steps)
         _orientation = orientation,
         _value = 0.5,
         _n_steps = n_steps
-    }, rt.Drawable, rt.Widget, rt.SignalEmitter)
+    })
 
     out._base:set_color(rt.Palette.BACKGROUND)
     out._base_outline:set_color(rt.Palette.BACKGROUND_OUTLINE)
@@ -33,7 +32,6 @@ end)
 
 --- @brief [internal] emit signal and reformat
 function rt.Scrollbar:_emit_value_changed()
-
     self:signal_emit("value_changed", self._value)
     self:reformat()
 end
@@ -92,7 +90,6 @@ end
 
 --- @overload rt.Widget.size_allocate
 function rt.Scrollbar:size_allocate(x, y, width, height)
-
     self._base:resize(rt.AABB(x, y, width, height))
     self._base_outline:resize(rt.AABB(x, y, width, height))
 

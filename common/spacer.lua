@@ -1,6 +1,6 @@
 --- @class rt.Space
 --- @param is_transparent Boolean (or nil)
-rt.Spacer = meta.new_type("Spacer", function(color)
+rt.Spacer = meta.new_type("Spacer", rt.Widget, function(color)
     if meta.is_nil(color) then
         color = rt.Palette.BACKGROUND
     end
@@ -16,7 +16,7 @@ rt.Spacer = meta.new_type("Spacer", function(color)
         _outline_right = rt.Line(0, 0, 1, 1),
         _outline_bottom = rt.Line(0, 0, 1, 1),
         _color = color
-    }, rt.Drawable, rt.Widget)
+    })
 
     out._shape:set_color(out._color)
 

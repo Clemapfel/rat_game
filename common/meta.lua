@@ -283,8 +283,10 @@ meta.Object = "Object"
 --- @brief create a new object instance
 --- @param type meta.Type
 --- @param fields Table property_name -> property_value
---- @vararg meta.Type
-function meta.new(type, fields, ...)
+function meta.new(type, fields, vararg)
+    -- TODO
+    meta.assert_nil(vararg)
+
     if meta.is_nil(fields) then
         fields = {}
     end
@@ -319,9 +321,12 @@ function meta.new(type, fields, ...)
     end
 
     install_super(type)
+
+    --[[
     for super in range(...) do
         install_super(super)
     end
+    ]]--
     return out
 end
 
@@ -438,40 +443,12 @@ function meta._type_id_to_typename(id)
     return meta._typenames[id]
 end
 
---- @brief create a new type with given constructor, this also defines `meta.is_*` and `meta.assert_*` for typename
---- @param typename String
---- @param ctor Function
---- @vararg meta.Type
-function meta.new_type(typename, ctor, ...)
-    local out, metatable = meta._new("Type")
-    setmetatable(out, metatable)
-
-    rawset(metatable.properties, "_typename", typename)
-    rawset(metatable.properties, "_type_id", string.hash(typename))
-    rawset(metatable.properties, "_super", {...})
-
-    metatable.__call = function(self, ...)
-        local out = ctor(...)
-        if not meta.isa(out, self) then
-            rt.error("In " .. self._typename .. ".__call: Constructor does not return object of type `" .. self._typename .. "`.")
-        end
-        return out
-    end
-
-    if not meta.is_nil(meta.types[typename]) then
-        rt.error("In meta.new_type: A type with name `" .. typename .. "` already exists.")
-    end
-    meta.types[typename] = out
-    meta._define_type_assertion(typename)
-    return out
-end
-
 --- @brief [internal]
 function meta._default_ctor(self)
     return meta.new(self)
 end
 
-function meta._new_type(typename, ...)
+function meta.new_type(typename, ...)
     local out = meta._new("Type")
     local metatable = getmetatable(out)
     metatable.__name = "Type"
@@ -482,7 +459,7 @@ function meta._new_type(typename, ...)
     local super, fields, ctor = {}, {}, nil
     local fields_seen, ctor_seen = false, false
     for _, value in pairs({...}) do
-        if meta.is_type(value) then
+        if meta.isa(value, meta.Type) then
             table.insert(super, value)
         elseif meta.is_function(value) then
             ctor = value
@@ -531,7 +508,7 @@ function meta._new_type(typename, ...)
     return out
 end
 
-function meta._new_abstract_type(name, ...)
+function meta.new_abstract_type(name, ...)
     local to_splat = {}
     table.insert(to_splat, function()
         rt.error("In " .. name .. "._call: Type `" .. name .. "` is abstract, it cannot be instanced")
@@ -541,14 +518,44 @@ function meta._new_abstract_type(name, ...)
         table.insert(to_splat, value)
     end
 
-    return meta._new_type(name, splat(to_splat))
+    return meta.new_type(name, splat(to_splat))
+end
+
+--[[
+
+--- @brief create a new type with given constructor, this also defines `meta.is_*` and `meta.assert_*` for typename
+--- @param typename String
+--- @param ctor Function
+--- @vararg meta.Type
+function meta._new_type(typename, ctor, ...)
+    local out, metatable = meta._new("Type")
+    setmetatable(out, metatable)
+
+    rawset(metatable.properties, "_typename", typename)
+    rawset(metatable.properties, "_type_id", string.hash(typename))
+    rawset(metatable.properties, "_super", {...})
+
+    metatable.__call = function(self, ...)
+        local out = ctor(...)
+        if not meta.isa(out, self) then
+            rt.error("In " .. self._typename .. ".__call: Constructor does not return object of type `" .. self._typename .. "`.")
+        end
+        return out
+    end
+
+    if not meta.is_nil(meta.types[typename]) then
+        rt.error("In meta.new_type: A type with name `" .. typename .. "` already exists.")
+    end
+    meta.types[typename] = out
+    meta._define_type_assertion(typename)
+    return out
 end
 
 --- @brief declare abstract type, this is a type that cannot be instanced
 --- @param name String
 --- @param fields Table
 --- @vararg meta.Type
-function meta.new_abstract_type(name, fields, ...)
+function meta._new_abstract_type(name, fields, ...)
     local out = meta.new_type(name, function()
         rt.error("In " .. name .. "._call: Type `" .. name .. "` is abstract, it cannot be instanced")
     end, ...)
@@ -561,6 +568,7 @@ function meta.new_abstract_type(name, fields, ...)
     return out
 end
 
+]]--
 
 --- @brief get all super types of instance or type
 function meta.get_supertypes(instance)

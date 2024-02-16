@@ -42,14 +42,12 @@ end
 
 --- @brief update all regular handlers
 function rt.Scene:update(delta)
-
     self.animation_handler:update(delta)
     self.animation_timer_handler:update(delta)
     self.thread_pool:update_futures()
 end
 
 function rt.Scene:_set_property(key, new_value)
-
     local properties = getmetatable(self).properties
     if meta.is_nil(properties[key]) then
         rt.error("In Scene:_set_property: scene has no property with name `" .. key .. "`")
@@ -59,8 +57,6 @@ end
 
 --- @brief
 function rt.Scene:set_skybox(color)
-
-
     if meta.is_hsva(color) then
         color = rt.hsva_to_rgba(color)
     end
@@ -70,7 +66,6 @@ end
 
 --- @brief add variable in scene scope
 function rt.Scene:add(key, value)
-
     self.env[key] = value
     return value
 end
@@ -100,7 +95,6 @@ end
 
 --- @brief
 function rt.set_current_scene(name)
-
     if meta.is_nil(rt.scenes[name]) then
         rt.error("In rt.set_current_scene: no scene with ID `" .. name "` available")
     end

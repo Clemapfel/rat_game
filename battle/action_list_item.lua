@@ -1,5 +1,5 @@
 --- @class bt.ActionListItem
-bt.ActionListItem = meta.new_type("ActionListItem", function(action, count)
+bt.ActionListItem = meta.new_type("ActionListItem", rt.Widget, function(action, count)
     if meta.is_nil(env.action_spritesheet) then
         env.action_spritesheet = rt.Spritesheet("assets/sprites", "orbs")
     end
@@ -34,7 +34,7 @@ bt.ActionListItem = meta.new_type("ActionListItem", function(action, count)
 
         _tooltip = bt.ActionTooltip(action),
         _tooltip_layout = rt.TooltipLayout()
-    }, rt.Widget, rt.Drawable)
+    })
 
     out._sprite_overlay:set_base_child(out._sprite_backdrop)
     out._sprite_aspect:set_child(out._sprite)
@@ -89,12 +89,10 @@ end
 
 --- @brief
 function bt.ActionListItem:update_n_uses(n_uses)
-
     local max_n_uses = self._action.max_n_uses
     n_uses = clamp(n_uses, 0, max_n_uses)
     self._n_uses_label:set_text("<mono>" .. tostring(n_uses) .. "/" .. tostring(max_n_uses) .. "</mono>")
 end
-
 
 --- @brief
 function bt.ActionListItem:set_count(n)

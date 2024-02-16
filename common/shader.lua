@@ -10,7 +10,6 @@ end)
 --- @param name String
 --- @param value
 function rt.Shader:send(name, value)
-
     local to_send = value
     if meta.is_vector2(value) then
         to_send = {value.x, value.y}
@@ -30,18 +29,3 @@ end
 function rt.Shader:unbind()
     love.graphics.setShader(self._before)
 end
-
-rt.settings.default_fragment_shader = [[
-vec4 effect(vec4 vertex_color, Image texture, vec2 texture_coords, vec2 vertex_position)
-{
-    vec2 screen_size = love_ScreenSize.xy;
-    return Texel(texture, texture_coords) * vertex_color;
-}
-]]
-
-rt.settings.default_vertex_shader = [[
-vec4 position(mat4 transform, vec4 vertex_position)
-{
-    return transform * vertex_position;
-}
-]]

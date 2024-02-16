@@ -4,7 +4,7 @@ rt.settings.direction_indicator = {
 }
 
 --- @class rt.DirectionIndicator
-rt.DirectionIndicator = meta.new_type("DirectionIndicator", function(direction)
+rt.DirectionIndicator = meta.new_type("DirectionIndicator", rt.Widget, function(direction)
     if meta.is_nil(direction) then
         direction = rt.Direction.NONE
     end
@@ -17,7 +17,7 @@ rt.DirectionIndicator = meta.new_type("DirectionIndicator", function(direction)
         _ring_outline_inner = rt.Circle(0, 0, 1),
         _arrow = rt.Polygon(0, 0, 1, 1, 2, 2, 3, 3),
         _arrow_outline = rt.LineLoop(0, 0, 1, 1)
-    }, rt.Drawable, rt.Widget)
+    })
 
     out:set_color(rt.Palette.FOREGROUND)
 
@@ -49,7 +49,6 @@ end
 
 --- @overload rt.Widget.size_allocate
 function rt.DirectionIndicator:size_allocate(x, y, width, height)
-
     local center_x, center_y = x + 0.5 * width, y + 0.5 * height
     local radius = math.min(width, height) / 2
     local ring_thickness = 0.4 * radius

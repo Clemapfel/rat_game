@@ -15,13 +15,13 @@ rt.settings.keymap_indicator.input_button_to_sprite_id = {
 
 --- @class rt.KeymapIndicator
 --- @param button_to_label Table<rt.InputButton, String>
-rt.KeymapIndicator = meta.new_type("KeymapIndicator", function(button_to_label)
+rt.KeymapIndicator = meta.new_type("KeymapIndicator", rt.Widget, function(button_to_label)
     local out = meta.new(rt.KeymapIndicator, {
         _box = rt.ListLayout(rt.Orientation.HORIZONTAL),
         _sprites = {},  -- rt.InputButton -> rt.Sprite
         _labels = {},    -- rt.InputButton -> rt.Label
         _backdrop_sprite = {}
-    }, rt.Widget, rt.Drawable)
+    })
 
     for button, text in pairs(button_to_label) do
         local sprite = rt.Sprite(out._spritesheet, rt.settings.keymap_indicator.input_button_to_sprite_id[button])
@@ -39,7 +39,6 @@ rt.KeymapIndicator = meta.new_type("KeymapIndicator", function(button_to_label)
 
     return out
 end)
-
 rt.KeymapIndicator._spritesheet = rt.Spritesheet("assets/sprites", "controller_buttons")
 
 --- @overload

@@ -19,14 +19,14 @@ end
 --- @param world rt.PhysicsWorld
 --- @param type rt.ColliderType
 --- @param shape rt.PhysicsShape
-rt.Collider = meta.new_type("Collider", function(world, type, shapes, pos_x, pos_y)
+rt.Collider = meta.new_type("Collider", rt.Drawable, rt.SignalEmitter, function(world, type, shapes, pos_x, pos_y)
     local out = meta.new(rt.Collider, {
         _shape_type = shape_type,
         _fixtures = {},    -- Table<love.physics.Fixture>
         _is_sensor = false,
         _world = world,
         _userdata = {}
-    }, rt.Drawable, rt.SignalEmitter)
+    })
 
     out._body = love.physics.newBody(world._native, pos_x, pos_y, type)
     for _, shape in pairs(shapes) do

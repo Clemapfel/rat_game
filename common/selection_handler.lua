@@ -1,12 +1,5 @@
 --- @class rt.SelectionNode
 rt.SelectionNode = meta.new_type("SelectionNode", function(self, up, right, down, left)
-
-    for widget in range(up, right, down, left) do
-        if not meta.is_nil(widget) then
-
-        end
-    end
-
     local out = meta.new(rt.SelectionNode, {})
     out.self = self
     out.up = ternary(meta.is_nil(up), {}, up)
@@ -24,14 +17,13 @@ rt.SelectionNode.left = {}
 
 --- @class rt.SelectionHandler
 --- @signal selection_changed (self, previous_widget, next_widget) -> nil
-rt.SelectionHandler = meta.new_type("SelectionHandler", function(child)
-
+rt.SelectionHandler = meta.new_type("SelectionHandler", rt.Widget, rt.SignalEmitter, function(child)
     local out = meta.new(rt.SelectionHandler, {
         _nodes = {},        -- meta.hash(self) -> rt.SelectionNode(self, ...)
         _current_node = {}, -- meta.hash
         _input = {},
         _child = child
-    }, rt.SignalEmitter, rt.Drawable, rt.Widget)
+    })
 
     out._input = rt.add_input_controller(out)
     out._input:signal_connect("pressed", function(_, button, self)
@@ -52,9 +44,7 @@ end)
 
 --- @overload rt.Drawable.draw
 function rt.SelectionHandler:draw()
-
     if not self:get_is_visible() then return end
-
     self._child:draw()
 
     local center = function(widget)
@@ -79,8 +69,6 @@ end
 
 --- @brief [internal]
 function rt.SelectionHandler:_validate_node_map()
-
-
     local n_nodes = sizeof(self._nodes)
     local error_message, error_occurred = false
     for _, node in pairs(self._nodes) do
@@ -136,9 +124,6 @@ end
 
 --- @brief
 function rt.SelectionHandler:move(direction)
-
-
-
     if not meta.isa(self._current_node, rt.SelectionNode) then return end
 
     local current = self._current_node
@@ -174,10 +159,6 @@ end
 
 --- @bief
 function rt.SelectionHandler:connect(direction, from, to)
-
-
-
-
     if from == to then
         rt.error("In rt.SelectionHandler:connect: trying to connect `" .. meta.typeof(from) .. "` with itself, this would create an infinite loop")
         return
@@ -219,16 +200,12 @@ end
 --- @brief
 --- @return rt.Widget
 function rt.SelectionHandler:get_selected()
-
     return self._current_node.self
 end
 
 --- @brief
 --- @param rt.Widget
 function rt.SelectionHandler:set_selected(widget)
-
-
-
     local next = self._nodes[meta.hash(widget)]
     if meta.is_nil(next) then
         rt.error("In SelectionHandler:set_selected: object `" .. meta.typeof(widget) .. "` is not registered with the selection handler")

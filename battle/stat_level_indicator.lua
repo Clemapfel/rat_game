@@ -1,5 +1,5 @@
 --- @class bt.StatLevelIndicator
-bt.StatLevelIndicator = meta.new_type("StatLevelIndicator", function(level, which)
+bt.StatLevelIndicator = meta.new_type("StatLevelIndicator", rt.Widget, function(level, which)
     if meta.is_nil(bt.PartyInfo.spritesheet) then
         bt.StatLevelIndicator.spritesheet = rt.Spritesheet("assets/sprites", "party_info")
     end
@@ -7,7 +7,7 @@ bt.StatLevelIndicator = meta.new_type("StatLevelIndicator", function(level, whic
     local out = meta.new(bt.StatLevelIndicator, {
         _sprite = rt.Sprite(bt.StatLevelIndicator.spritesheet , "neutral"),
         _level = 0
-    }, rt.Widget, rt.Drawable)
+    })
     out:set_level(level)
 
     if not meta.is_nil(which) and level ~= 0 then

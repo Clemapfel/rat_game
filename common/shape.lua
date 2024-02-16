@@ -6,11 +6,12 @@ rt.LineJoin = meta.new_enum({
 })
 
 --- @class rt.Shape
-rt.Shape = meta.new_abstract_type("Shape")
-rt.Shape._color = rt.RGBA(1, 1, 1, 1)
-rt.Shape._is_outline = false
-rt.Shape._use_anti_aliasing = true
-rt.Shape._line_width = 1
+rt.Shape = meta.new_abstract_type("Shape", rt.Drawable, {
+    _color = rt.RGBA(1, 1, 1, 1),
+    _is_outline = false,
+    _use_anti_aliasing = true,
+    _line_width = 1,
+})
 
 --- @brief [internal]
 function rt.Shape:_bind_properties(callback, data)

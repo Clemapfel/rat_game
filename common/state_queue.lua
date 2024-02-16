@@ -6,7 +6,7 @@ rt.CallbackResult = meta.new_enum({
 
 --- @class rt.StateQueueState
 --- @param args Table<Function> `update` function mandatory, while `start`, `finish`, and `draw` optional
-rt.StateQueueState = meta.new_type("StateQueueState", function(args)
+rt.StateQueueState = meta.new_type("StateQueueState", rt.Drawable, function(args)
     local start, update, finish, draw
     for key, value in pairs(args) do
         if key == "start" then
@@ -22,8 +22,7 @@ rt.StateQueueState = meta.new_type("StateQueueState", function(args)
         end
     end
 
-    local out = meta.new(rt.StateQueueState, {
-    }, rt.Drawable)
+    local out = meta.new(rt.StateQueueState)
 
     if not meta.is_nil(start) then out.start = start end
     if not meta.is_nil(update) then out.update = update end

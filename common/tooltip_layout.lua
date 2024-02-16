@@ -6,7 +6,7 @@ rt.settings.tooltip = {
 --- @class rt.TooltipLayout
 --- @brief single-child contianer that allows showing showing a widget in a separate tooltip window
 --- @param child rt.Widget
-rt.TooltipLayout = meta.new_type("TooltipLayout", function(child)
+rt.TooltipLayout = meta.new_type("TooltipLayout", rt.Widget, function(child)
     local out = meta.new(rt.TooltipLayout, {
         _tooltip = {},
         _tooltip_backdrop = rt.Rectangle(0, 0, 1, 1),
@@ -15,7 +15,7 @@ rt.TooltipLayout = meta.new_type("TooltipLayout", function(child)
         _show_tooltip = false,
         _child = ternary(meta.is_nil(child), {}, child),
         _input = {}
-    }, rt.Widget, rt.Drawable)
+    })
 
     out._tooltip_backdrop:set_color(rt.Palette.BACKGROUND)
     out._tooltip_backdrop:set_corner_radius(rt.settings.margin_unit)
@@ -46,7 +46,6 @@ end)
 
 --- @brief
 function rt.TooltipLayout:_set_tooltip_opacity(alpha)
-
     for shape in range(self._tooltip_backdrop, self._tooltip_frame, self._tooltip_frame_outline) do
         local color = shape:get_color()
         color.a = alpha
@@ -57,9 +56,6 @@ end
 --- @brief set singular child
 --- @param child rt.Widget
 function rt.TooltipLayout:set_child(child)
-
-
-
     if not meta.is_nil(self._child) and meta.is_widget(self._child) then
         self._child:set_parent(nil)
     end
@@ -76,13 +72,11 @@ end
 --- @brief get singular child
 --- @return rt.Widget
 function rt.TooltipLayout:get_child()
-
     return self._child
 end
 
 --- @brief remove child
 function rt.TooltipLayout:remove_child()
-
     if not meta.is_nil(self._child) then
         self._child:set_parent(nil)
         self._child = nil
@@ -92,9 +86,6 @@ end
 --- @brief set singular child
 --- @param child rt.Widget
 function rt.TooltipLayout:set_tooltip(child)
-
-
-
     if not meta.is_nil(self._tooltip) and meta.isa(self._tooltip, rt.Widget) then
         self._tooltip:set_parent(nil)
     end
@@ -111,13 +102,11 @@ end
 --- @brief get singular child
 --- @return rt.Widget
 function rt.TooltipLayout:get_tooltip()
-
     return self._tooltip
 end
 
 --- @brief remove child
 function rt.TooltipLayout:remove_tooltip()
-
     if not meta.is_nil(self._tooltip) then
         self._tooltip:set_parent(nil)
         self._tooltip = nil
@@ -126,9 +115,7 @@ end
 
 --- @overload rt.Drawable.draw
 function rt.TooltipLayout:draw()
-
     if not self:get_is_visible() then return end
-
     if meta.isa(self._child, rt.Widget) then
         self._child:draw()
     end
@@ -143,7 +130,6 @@ end
 
 --- @brief
 function rt.TooltipLayout:set_tooltip_visible(b)
-
     self._show_tooltip = b
     local visible = self._show_tooltip
     if not meta.is_widget(self._tooltip) then return end
@@ -162,13 +148,11 @@ end
 
 --- @brief
 function rt.TooltipLayout:get_tooltip_visible()
-
     return self._show_tooltip
 end
 
 --- @overload rt.Widget.size_allocate
 function rt.TooltipLayout:size_allocate(x, y, width, height)
-
     local child_x, child_y = x, y
     local child_w, child_h = 0, 0
 

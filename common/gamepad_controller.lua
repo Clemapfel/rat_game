@@ -43,15 +43,14 @@ meta.make_weak(rt.GamepadHandler._components, false, true)
 --- @signal disconnected    (self, controller_id) -> nil
 --- @signal axis_changed    (self, controller_id, rt.GamepadAxis, Number) -> nil
 --- @param instance meta.Object
-rt.GamepadController = meta.new_type("GamepadController", function(instance)
-
+rt.GamepadController = meta.new_type("GamepadController", rt.SignalEmitter, function(instance)
     local hash = rt.GamepadHandler._hash
     rt.GamepadHandler._hash = rt.GamepadHandler._hash + 1
 
     local out = meta.new(rt.GamepadController, {
         instance = instance,
         _hash = hash
-    }, rt.SignalEmitter)
+    })
     out:signal_add("button_pressed")
     out:signal_add("button_released")
     out:signal_add("connected")
@@ -84,7 +83,6 @@ love.joystickremoved = rt.GamepadHandler.handle_joystick_removed
 --- @param joystick love.Joystick
 --- @param button rt.GamepadButton
 function rt.GamepadHandler.handle_button_pressed(joystick, button)
-
     for _, component in pairs(rt.GamepadHandler._components) do
         component:signal_emit("button_pressed", joystick:getID(), button)
     end
@@ -95,7 +93,6 @@ love.gamepadpressed = rt.GamepadHandler.handle_button_pressed
 --- @param joystick love.Joystick
 --- @param button rt.GamepadButton
 function rt.GamepadHandler.handle_button_released(joystick, button)
-
     for _, component in pairs(rt.GamepadHandler._components) do
         component:signal_emit("button_released", joystick:getID(), button)
     end
@@ -149,7 +146,6 @@ end
 --- @param target meta.Object
 --- @return rt.GamepadController
 function rt.add_gamepad_controller(target)
-
     getmetatable(target).components.gamepad = rt.GamepadController(target)
     return getmetatable(target).components.gamepad
 end
@@ -158,7 +154,6 @@ end
 --- @param target meta.Object
 --- @return rt.GamepadController (or nil)
 function rt.get_gamepad_controller(target)
-
     local components = getmetatable(target).components
     if meta.is_nil(components) then
         return nil

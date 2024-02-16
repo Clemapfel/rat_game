@@ -11,9 +11,8 @@ rt.settings.frame = {
 }
 
 --- @class rt.Frame
-rt.Frame = meta.new_type("Frame", function(type)
+rt.Frame = meta.new_type("Frame", rt.Widget, function(type)
     if meta.is_nil(type) then type = rt.FrameType.RECTANGULAR end
-
     local out = meta.new(rt.Frame, {
         _type = type,
         _child = {},
@@ -24,7 +23,7 @@ rt.Frame = meta.new_type("Frame", function(type)
         _color = rt.Palette.FOREGROUND,
         _thickness = rt.settings.frame.thickness,
         _corner_radius = rt.settings.frame.corner_radius
-    }, rt.Drawable, rt.Widget)
+    })
 
     out._frame:set_is_outline(true)
     out._frame:set_line_width(out._frame_thickness)
@@ -46,7 +45,6 @@ end)
 
 --- @overload rt.Drawable.draw
 function rt.Frame:draw()
-
     if not self:get_is_visible() then return end
 
     if meta.is_widget(self._child) then

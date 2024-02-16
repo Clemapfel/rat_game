@@ -6,13 +6,13 @@ rt.settings.action_tooltip = {
 }
 
 --- @class bt.ActionTooltip
-bt.ActionTooltip = meta.new_type("ActionTooltip", function(action)
+bt.ActionTooltip = meta.new_type("ActionTooltip", rt.Widget, function(action)
 
     local sprite_id = "dusk"
     local out = meta.new(bt.ActionTooltip, {
         _action = action,
         _tooltip = {} -- bt.BattleTooltip
-    }, rt.Widget, rt.Drawable)
+    })
 
     out._tooltip = bt.BattleTooltip(
         out._action.name,

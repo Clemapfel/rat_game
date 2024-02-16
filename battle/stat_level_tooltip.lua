@@ -1,5 +1,5 @@
 --- @class bt.StatLevelTooltip
-bt.StatLevelTooltip = meta.new_type("StatLevelTooltip", function(which, level)
+bt.StatLevelTooltip = meta.new_type("StatLevelTooltip", rt.Widget, function(which, level)
 
     meta.assert_enum(which, bt.Stat)
     local out = meta.new(bt.StatLevelTooltip, {
@@ -7,7 +7,7 @@ bt.StatLevelTooltip = meta.new_type("StatLevelTooltip", function(which, level)
         _which = which,
         _sprite = bt.StatLevelIndicator(level, which),
         _tooltip = {} -- bt.BattleTooltip
-    }, rt.Widget, rt.Drawable)
+    })
 
     local title = "Stat Level "
 

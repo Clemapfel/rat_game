@@ -1,6 +1,6 @@
 --- @class rt.Button
 --- @signal clicked (::Button) -> nil
-rt.Button = meta.new_type("Button", function(child)
+rt.Button = meta.new_type("Button", rt.Widget, rt.SignalEmitter, function(child)
     local out = meta.new(rt.Button, {
         _base = rt.Rectangle(0, 0, 1, 1),
         _outline = rt.Rectangle(0, 0, 1, 1, 10),
@@ -8,7 +8,7 @@ rt.Button = meta.new_type("Button", function(child)
         _depressed = false,
         _child = {},
         _input = {}
-    }, rt.Drawable, rt.Widget, rt.SignalEmitter)
+    })
 
     out:signal_add("clicked")
 

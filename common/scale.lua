@@ -6,8 +6,7 @@ rt.settings.scale = {
 
 --- @class rt.Scale
 --- @signal value_changed   (self, new_value) -> nil
-rt.Scale = meta.new_type("Scale", function(lower, upper, increment, value)
-
+rt.Scale = meta.new_type("Scale", rt.Widget, rt.SignalEmitter, function(lower, upper, increment, value)
     value = ternary(meta.is_nil(value), mix(lower, upper, 0.5), value)
     local out = meta.new(rt.Scale, {
         _lower = math.min(lower, upper),
@@ -39,7 +38,7 @@ rt.Scale = meta.new_type("Scale", function(lower, upper, increment, value)
         _value_label = rt.Label(tostring(value)),
         _input = {},
         _mouse = {}
-    }, rt.Drawable, rt.Widget, rt.SignalEmitter)
+    })
 
     out._slider:set_color(rt.Palette.FOREGROUND)
     out._slider_outline:set_color(rt.Palette.FOREGROUND_OUTLINE)
@@ -127,9 +126,7 @@ end)
 
 --- @overload rt.Drawable.draw
 function rt.Scale:draw()
-
     if not self:get_is_visible() then return end
-
 
     self._rail_start:draw()
     self._rail_start_outline:draw()
@@ -162,8 +159,6 @@ end
 
 --- @overload rt.Widget.size_allocate
 function rt.Scale:size_allocate(x, y, width, height)
-
-
     local slider_radius = rt.settings.scale.slider_radius
     local rail_radius = slider_radius * 0.5
     local rail_x = x + rail_radius
@@ -200,8 +195,6 @@ end
 
 --- @brief [internal]
 function rt.Scale:_update_slider()
-
-
     local x, y = self._rail:get_position()
     local w = select(1, self._rail:get_size())
 
@@ -226,7 +219,6 @@ end
 
 --- @brief
 function rt.Scale:set_value(x)
-
     if self._value == x then return end
 
     -- round to nearest step increment
@@ -245,13 +237,11 @@ end
 
 --- @brief
 function rt.Scale:get_value()
-
     return self._value
 end
 
 --- @brief
 function rt.Scale:set_color(color)
-
     if meta.is_hsva(color) then
         color = rt.hsva_to_rgba(color)
     end
@@ -264,9 +254,6 @@ end
 
 --- @brief
 function rt.Scale:set_show_value(b)
-
-
-
     if b == true and not self._value_label:get_is_realized() then
         self._value_label:realize()
     end

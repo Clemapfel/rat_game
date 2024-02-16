@@ -12,7 +12,7 @@ rt.GradientDirection = meta.new_enum({
 
 --- @class rt.Gradient
 --- @brief 2-tone gradient
-rt.Gradient = meta.new_type("Gradient", function(x, y, width, height, color_from, color_to, direction)
+rt.Gradient = meta.new_type("Gradient", rt.Drawable, function(x, y, width, height, color_from, color_to, direction)
     if not meta.is_hsva(color_from) then  end
     if not meta.is_hsva(color_to) then  end
 
@@ -37,7 +37,7 @@ rt.Gradient = meta.new_type("Gradient", function(x, y, width, height, color_from
         _y = y,
         _width = width,
         _height = height
-    }, rt.Drawable)
+    })
     out:_update_color()
     return out
 end)
@@ -53,7 +53,6 @@ end
 
 --- @brief [internal]
 function rt.Gradient:_update_color()
-
     local set_color = function(i, color)
         self._shape:set_vertex_color(i, color)
     end
@@ -116,14 +115,11 @@ function rt.Gradient:draw()
 end
 
 function rt.Gradient:_update_shape()
-
     self._shape:resize(rt.AABB(self._x, self._y, self._width, self._height))
 end
 
 --- @brief
 function rt.Gradient:set_position(x, y)
-
-
     self._x = x
     self._y = y
     self:_update_shape()
@@ -131,8 +127,6 @@ end
 
 --- @brief
 function rt.Gradient:set_size(width, height)
-
-
     self._width = width
     self._height = height
     self:_update_shape()
@@ -140,7 +134,6 @@ end
 
 --- @bief
 function rt.Gradient:resize(x, y, width, height)
-
     self._x = x
     self._y = y
     self._width = width
@@ -150,15 +143,6 @@ end
 
 --- @brief
 function rt.Gradient:set_color(color_from, color_to)
-
-    if not meta.is_hsva(color_from) then
-
-    end
-
-    if not meta.is_hsva(color_to) then
-
-    end
-
     self._color_from = ternary(meta.is_hsva(color_from), rt.hsva_to_rgba(color_from), color_from)
     self._color_to = ternary(meta.is_hsva(color_to), rt.hsva_to_rgba(color_to), color_to)
     self:_update_color()
@@ -167,13 +151,11 @@ end
 --- @brief
 --- @return (rt.RGBA, rt.RGBA)
 function rt.Gradient:get_color()
-
     return self._color_from, self._color_to
 end
 
 --- @class rt.CircularGradient
-rt.CircularGradient = meta.new_type("CircularGradient", function(center_x, center_y, radius, color_from, color_to, n_outer_vertices)
-
+rt.CircularGradient = meta.new_type("CircularGradient", rt.Drawable, function(center_x, center_y, radius, color_from, color_to, n_outer_vertices)
     if not meta.is_hsva(color_from) then  end
     if not meta.is_hsva(color_to) then  end
 
@@ -197,7 +179,7 @@ rt.CircularGradient = meta.new_type("CircularGradient", function(center_x, cente
         _center_y = center_y,
         _radius_x = radius,
         _radius_y = radius
-    }, rt.Drawable)
+    })
 
     local step = 360 / n_outer_vertices
     local vertices = {}
@@ -220,7 +202,6 @@ end)
 
 --- @overload rt.Drawable.draw
 function rt.CircularGradient:draw()
-
     if self:get_is_visible() then
         self._shape:draw()
     end
@@ -228,10 +209,8 @@ end
 
 --- @brief
 function rt.CircularGradient:_update_shape()
-
     local radius_x = self._radius_x
     local radius_y = self._radius_y
-
     local step = 360 / (self._shape:get_n_vertices() - 2)
     local vertices = {}
     self._shape:set_vertex_position(1, self._center_x, self._center_y)
@@ -249,14 +228,12 @@ end
 
 --- @brief
 function rt.CircularGradient:_update_color()
-
     self._shape:set_color(self._color_to)
     self._shape:set_vertex_color(1, self._color_from)
 end
 
 --- @brief
 function rt.CircularGradient:set_position(center_x, center_y)
-
     self._center_x = center_x
     self._center_y = center_y
     self:_update_shape()
@@ -264,9 +241,7 @@ end
 
 --- @brief
 function rt.CircularGradient:set_radius(radius_x, radius_y)
-
     if meta.is_nil(radius_y) then radius_y = radius_y end
-
 
     self._radius_x = radius_x
     self._radius_y = radius_y
@@ -275,7 +250,7 @@ end
 
 --- @brief [internal]
 function rt.test.gradient()
-    gradient = rt.CircularGradient(love.graphics.getWidth() * 0.5, love.graphics.getHeight() * 0.5, 200, rt.RGBA(0, 0, 0, 1), rt.RGBA(0, 0, 0, 0))
+    local gradient = rt.CircularGradient(love.graphics.getWidth() * 0.5, love.graphics.getHeight() * 0.5, 200, rt.RGBA(0, 0, 0, 1), rt.RGBA(0, 0, 0, 0))
     gradient = rt.Gradient(200, 200, 400, 500, rt.RGBA(0, 0, 0, 1), rt.RGBA(0, 0, 0, 0))
     gradient:set_position(200, 300)
     error("TODO")

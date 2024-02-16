@@ -1,13 +1,13 @@
 rt.settings.status_thumbnail.count_font = rt.Font(30, "assets/fonts/pixel.ttf")
 
 --- @class bt.StatusThumbnail
-bt.StatusThumbnail = meta.new_type("StatusThumbanil", function(status, count)
+bt.StatusThumbnail = meta.new_type("StatusThumbanil", rt.Widget, function(status, count)
     local out = meta.new(bt.StatusThumbnail, {
         _sprite = status:create_sprite(),
         _aspect = rt.AspectLayout(1),
         _count = count,
         _count_label = rt.Glyph(rt.settings.status_thumbnail.count_font, tostring(count), { is_outlined = true })
-    }, rt.Drawable, rt.Widget)
+    })
 
     out._aspect:set_child(out._sprite)
     out:set_count(count)
@@ -47,7 +47,6 @@ end
 
 --- @brief
 function bt.StatusThumbnail:set_count(n)
-
     local pos_x, pos_y = self._count_label:get_position()
     self._count = n
     self._count_label = rt.Glyph(rt.settings.status_thumbnail.count_font, tostring(n), {

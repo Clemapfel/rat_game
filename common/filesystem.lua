@@ -1,7 +1,6 @@
 rt.filesystem = {}
 
 --- @brief get sha256 hash of file
----
 --- @return Number or String if as_string is true
 function rt.filesystem.hash(path, as_string)
     as_string = which(as_string, true)

@@ -3,7 +3,7 @@ rt.settings.equipment_slot = {
 }
 
 --- @class bt.EquipmentSlot
-bt.EquipmentSlot = meta.new_type("EquipmentSlot", function(equipment)
+bt.EquipmentSlot = meta.new_type("EquipmentSlot", rt.Widget, function(equipment)
 
     if meta.is_nil(env.equipment_spritesheet) then
         env.equipment_spritesheet = rt.Spritesheet("assets/sprites", "equipment")
@@ -65,7 +65,7 @@ bt.EquipmentSlot = meta.new_type("EquipmentSlot", function(equipment)
 
         _indicator_box = rt.BoxLayout(rt.Orientation.VERTICAL),
         _indicator_box_frame = rt.Frame(rt.FrameType.RECTANGULAR)
-    }, rt.Widget)
+    })
 
     for stat in range("hp", "attack", "defense", "speed") do
         local backdrop = out["_" .. stat .. "_backdrop"]

@@ -6,7 +6,7 @@ rt.settings.battle_log = {
 }
 
 --- @class bt.BattleLogTextLayout
-bt.BattleLogTextLayout = meta.new_type("BattleLogTextLayout", function()
+bt.BattleLogTextLayout = meta.new_type("BattleLogTextLayout", rt.Widget, function()
     local out = meta.new(bt.BattleLogTextLayout, {
         _children = {},                    -- Table<rt.Widget>
         _children_heights = {},            -- Table<Number>
@@ -14,7 +14,7 @@ bt.BattleLogTextLayout = meta.new_type("BattleLogTextLayout", function()
         _area = rt.AABB(0, 0, 1, 1),
         _index = 1,
         _n_children = 0
-    }, rt.Widget, rt.Drawable)
+    })
     out._cumulative_children_heights[0] = 0 -- sic
     return out
 end)
@@ -96,7 +96,7 @@ function bt.BattleLogTextLayout:scroll_down()
 end
 
 --- @class bt.BattleLog
-bt.BattleLog = meta.new_type("BattleLog", function()
+bt.BattleLog = meta.new_type("BattleLog", rt.Widget, rt.Animation, function()
     local out = meta.new(bt.BattleLog, {
         _frame = rt.Frame(rt.FrameType.RECTANGULAR),
         _backdrop = rt.Spacer(),
@@ -117,7 +117,7 @@ bt.BattleLog = meta.new_type("BattleLog", function()
 
         _active_label = {}, -- rt.Label
         _elapsed = 0
-    }, rt.Widget, rt.Drawable, rt.Animation)
+    })
 
     out._scrollbar_layout:push_back(out._up_indicator)
     out._scrollbar_layout:push_back(out._scrollbar)

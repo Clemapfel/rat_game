@@ -6,13 +6,13 @@ rt.EmblemPosition = meta.new_enum({
 })
 
 --- @class rt.EmblemLayout
-rt.EmblemLayout = meta.new_type("EmblemLayout", function(position)
+rt.EmblemLayout = meta.new_type("EmblemLayout", rt.Widget, function(position)
     position = which(position, rt.EmblemPosition.TOP_RIGHT)
     return meta.new(rt.EmblemLayout, {
         _child = {},
         _emblem = {},
         _emblem_position = position
-    }, rt.Widget, rt.Drawable)
+    })
 end)
 
 --- @brief set singular child

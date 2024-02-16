@@ -6,12 +6,12 @@ rt.settings.entity_tooltip = {
 }
 
 --- @class bt.EntityTooltip
-bt.EntityTooltip = meta.new_type("EntityTooltip", function(entity)
+bt.EntityTooltip = meta.new_type("EntityTooltip", rt.Widget, function(entity)
     meta.assert_entity(entity)
     local out = meta.new(bt.EntityTooltip, {
         _entity = entity,
         _tooltip = {} -- bt.BattleTooltip
-    }, rt.Widget, rt.Drawable)
+    })
 
     out._tooltip = bt.BattleTooltip(
         out._entity.name,

@@ -10,7 +10,7 @@ rt.settings.sprite_frame = {
 }
 
 --- @class rt.SpriteFrame
-rt.SpriteFrame = meta.new_type("SpriteFrame", function(spritesheet)
+rt.SpriteFrame = meta.new_type("SpriteFrame", rt.Widget, function(spritesheet)
 
     local out = meta.new(rt.SpriteFrame, {
         _spritesheet = spritesheet,
@@ -24,7 +24,7 @@ rt.SpriteFrame = meta.new_type("SpriteFrame", function(spritesheet)
         _left = rt.Sprite(spritesheet, rt.settings.sprite_frame.left_id),
         _child = {},
         _width = 30
-    }, rt.Drawable, rt.Widget)
+    })
 
     return out
 end)
@@ -32,9 +32,6 @@ end)
 --- @brief set singular child
 --- @param child rt.Widget
 function rt.SpriteFrame:set_child(child)
-
-
-
     if not meta.is_nil(self._child) and meta.is_widget(self._child) then
         self._child:set_parent(nil)
     end
@@ -51,13 +48,11 @@ end
 --- @brief get singular child
 --- @return rt.Widget
 function rt.SpriteFrame:get_child()
-
     return self._child
 end
 
 --- @brief remove child
 function rt.SpriteFrame:remove_child()
-
     if not meta.is_nil(self._child) then
         self._child:set_parent(nil)
         self._child = nil
@@ -66,7 +61,6 @@ end
 
 --- @overload rt.e.draw
 function rt.SpriteFrame:draw()
-
     if self:get_is_visible() and meta.is_widget(self._child) then
         self._child:draw()
     end
@@ -83,8 +77,6 @@ end
 
 --- @overload rt.Widget.size_allocate
 function rt.SpriteFrame:size_allocate(x, y, width, height)
-
-
     local fw, fh = self._spritesheet:get_frame_size(rt.settings.sprite_frame.top_left_id)
 
     if self._width ~= 0 then
@@ -108,14 +100,12 @@ end
 
 --- @overload rt.Widget.measure
 function rt.SpriteFrame:measure()
-
     if meta.is_nil(self._child) then return 0, 0 end
     return self._child:measure()
 end
 
 --- @overload rt.Widget.realize
 function rt.SpriteFrame:realize()
-
     if self:get_is_realized() then return end
     self._realized = true
     self._top_left:realize()
@@ -134,15 +124,12 @@ end
 
 --- @param width Number in px, or 0 for default width
 function rt.Spritesheet:set_width(number)
-
     self._width = number
     self:reformat()
 end
 
 --- @brief multiple color of frame sprites
 function rt.SpriteFrame:set_color(color)
-
-
     self._top_left:set_color(color)
     self._top:set_color(color)
     self._top_right:set_color(color)

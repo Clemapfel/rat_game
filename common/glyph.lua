@@ -19,22 +19,11 @@ rt.TextEffect = meta.new_enum({
     RAINBOW = "TEXT_EFFECT_RAINBOW"
 })
 
---[[ TODO
-outline
-outline color
-rainbow
-shake
-wave
-strikethrough
-outline
-]]--
-
 --- @class rt.Glyph
 --- @param font rt.Font
 --- @param content String
 --- @param look Table
-rt.Glyph = meta.new_type("Glyph", function(font, content, look)
-
+rt.Glyph = meta.new_type("Glyph", rt.Drawable, rt.Animation, function(font, content, look)
     look = which(look, {})
     meta.assert_table(look)
     local font_style = look.font_style
@@ -75,7 +64,7 @@ rt.Glyph = meta.new_type("Glyph", function(font, content, look)
 
         _underline = {},        -- rt.VertexRectangleSegments
         _strikethrough = {}     -- rt.VertexRectangleSegments
-    }, rt.Drawable, rt.Animation)
+    })
 
     for _, effect in pairs(effects) do
         out._effects[effect] = true
@@ -188,7 +177,6 @@ end
 
 --- @overload
 function rt.Glyph:draw()
-
     if self:get_is_visible() == false then return end
 
     self._render_shader:send("_shake_active", self._effects[rt.TextEffect.SHAKE] == true)

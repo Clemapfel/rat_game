@@ -9,7 +9,6 @@ rt.KeyMap = {
 
 --- @brief TODO
 function rt.KeyMap.should_trigger(keymap_id, event)
-
     if rt.KEYMAP[keymap_id] == nil then return false end
     for _, value in pairs(rt.KEYMAP) do
         if event == value then return true end

@@ -3,7 +3,7 @@ rt.settings.revealer_layout = {
 }
 
 --- @class RevealLayout
-rt.RevealLayout = meta.new_type("RevealLayout", function(child)
+rt.RevealLayout = meta.new_type("RevealLayout", rt.Widget, rt.Animation, function(child)
     local out = meta.new(rt.RevealLayout, {
         _child = {},
         _is_revealed = true,
@@ -11,7 +11,7 @@ rt.RevealLayout = meta.new_type("RevealLayout", function(child)
         _max_offset = 0,
         _area = rt.AABB(0, 0, 1, 1),
         _scissor = rt.AABB(0, 0, 1, 1)
-    }, rt.Drawable, rt.Widget, rt.Animation)
+    })
 
     if not meta.is_nil(child) then out:set_child(child) end
     return out
@@ -29,7 +29,6 @@ end
 
 --- @overload
 function rt.RevealLayout:update(delta)
-
     local target = ternary(self._is_revealed, 0, self._max_offset)
     local speed = rt.settings.revealer_layout.speed
 
@@ -82,7 +81,6 @@ end
 
 --- @overload rt.Drawable.draw
 function rt.RevealLayout:draw()
-
     love.graphics.push()
     love.graphics.setScissor(self._scissor.x, self._scissor.y, self._scissor.width, self._scissor.height)
     rt.graphics.translate(self._current_offset, 0)
@@ -112,7 +110,6 @@ end
 
 --- @overload rt.Widget.realize
 function rt.RevealLayout:realize()
-
     if self:get_is_realized() then return end
 
     self._realized = true

@@ -1,5 +1,5 @@
 --- @class bt.EquipmentListItem
-bt.EquipmentListItem = meta.new_type("EquipmentListItem", function(equipment, count)
+bt.EquipmentListItem = meta.new_type("EquipmentListItem", rt.Widget, function(equipment, count)
 
     if meta.is_nil(env.equipment_spritesheet) then
         env.equipment_spritesheet = rt.Spritesheet("assets/sprites", "equipment")
@@ -37,7 +37,7 @@ bt.EquipmentListItem = meta.new_type("EquipmentListItem", function(equipment, co
 
         _tooltip = bt.EquipmentTooltip(equipment),
         _tooltip_layout = rt.TooltipLayout()
-    }, rt.Widget, rt.Drawable)
+    })
 
     out._sprite_overlay:set_base_child(out._sprite_backdrop)
     out._sprite_aspect:set_child(out._sprite)

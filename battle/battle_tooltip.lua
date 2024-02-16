@@ -7,7 +7,7 @@ rt.settings.battle_tooltip = {
 }
 
 --- @class bt.BattleTooltip
-bt.BattleTooltip = meta.new_type("BattleTooltip", function(name, status, description, flavor_text, sprite)
+bt.BattleTooltip = meta.new_type("BattleTooltip", rt.Widget, function(name, status, description, flavor_text, sprite)
 
     meta.assert_string(name)
     status = which(status, "")
@@ -30,7 +30,7 @@ bt.BattleTooltip = meta.new_type("BattleTooltip", function(name, status, descrip
 
         _name_and_sprite_box = rt.BoxLayout(rt.Orientation.HORIZONTAL),
         _main = rt.BoxLayout(rt.Orientation.VERTICAL)
-    }, rt.Widget, rt.Drawable)
+    })
 
     out._name_label:set_expand_horizontally(true)
 

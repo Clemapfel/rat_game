@@ -1,11 +1,11 @@
 --- @class rt.Ellipse
-rt.Ellipse = meta.new_type("Ellipse", function(x, y, x_radius, y_radius)
+rt.Ellipse = meta.new_type("Ellipse", rt.Shape, function(x, y, x_radius, y_radius)
     return meta.new(rt.Ellipse, {
         _x = x,
         _y = y,
         _x_radius = x_radius,
         _y_radius = which(y_radius, x_radius)
-    }, rt.Shape)
+    })
 end)
 rt.Circle = rt.Ellipse
 

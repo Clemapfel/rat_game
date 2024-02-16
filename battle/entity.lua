@@ -3,7 +3,7 @@ rt.settings.entity = {
 }
 
 --- @class bt.Entity
-bt.Entity = meta.new_type("Entity", function(id)
+bt.Entity = meta.new_type("Entity", rt.SignalEmitter, function(id)
 
     local path = "battle/configs/entities/" .. id .. ".lua"
     if meta.is_nil(love.filesystem.getInfo(path)) then
@@ -57,7 +57,7 @@ bt.Entity = meta.new_type("Entity", function(id)
 
         -- status
         status_ailments = {}        -- rt.StatusAilment -> Elapsed
-    }, rt.SignalEmitter)
+    })
 
     out:signal_add("changed")
 

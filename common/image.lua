@@ -62,7 +62,6 @@ end
 --- @param y Number 1-based
 --- @return rt.RGBA
 function rt.Image:get_pixel(x, y)
-
     if x < 1 or x > self:get_width() or y < 1 or y > self:get_height() then
         rt.error("In Image:get_pixel: index (" .. tostring(x) .. ", " .. tostring(y) .. ") is out of range for image of size `" .. tostring(self:get_width()) .. " x " .. tostring(self:get_height()) .. "`")
     end
@@ -73,14 +72,12 @@ end
 --- @brief get image resolution
 --- @return (Number, Number)
 function rt.Image:get_size()
-
     return self._native:getDimensions()
 end
 
 --- @brief get horizontal resolution
 --- @return Number
 function rt.Image:get_width()
-
     local w, h = self:get_size()
     return w
 end
@@ -88,7 +85,6 @@ end
 --- @brief get vertical resolution
 --- @return Number
 function rt.Image:get_height()
-
     local w, h = self:get_size()
     return h
 end

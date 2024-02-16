@@ -5,8 +5,7 @@ rt.settings.spin_button = {
 }
 
 --- @class rt.SpinButton
-rt.SpinButton = meta.new_type("SpinButton", function(lower, upper, increment, value)
-
+rt.SpinButton = meta.new_type("SpinButton", rt.Widget, rt.SignalEmitter, function(lower, upper, increment, value)
     value = ternary(meta.is_nil(value), mix(lower, upper, 0.5), value)
     local out = meta.new(rt.SpinButton, {
         _lower = math.min(lower, upper),
@@ -27,7 +26,7 @@ rt.SpinButton = meta.new_type("SpinButton", function(lower, upper, increment, va
         _decrease_button_label = rt.Label(rt.settings.spin_button.decrease_label, rt.settings.font.default_mono),
         _decrease_button_disabled_overlay = rt.Rectangle(0, 0, 1, 1),
         _input = {}
-    }, rt.Drawable, rt.Widget, rt.SignalEmitter)
+    })
 
     out._backdrop:set_color(rt.Palette.BASE)
     out._backdrop_outline:set_color(rt.Palette.BASE_OUTLINE)

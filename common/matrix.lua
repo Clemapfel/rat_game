@@ -1,7 +1,7 @@
 rt.settings.matrix.default_value = 0
 
+--- @class rt.Matrix
 rt.Matrix = function(dimension, ...)
-
     local dimensions = {dimension, ...}
     local n_elements = 1
     for _, dim in pairs(dimensions) do

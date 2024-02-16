@@ -1,14 +1,14 @@
 rt.settings.battle_background.dampening = 1 -- in [0, 1], where 1 = no dampening
 
 --- @class bt.BattleBackground
-bt.BattleBackground = meta.new_type("BattleBackground", function(id)
+bt.BattleBackground = meta.new_type("BattleBackground", rt.Widget, rt.Animation, function(id)
     local out = meta.new(bt.BattleBackground, {
         _id = id,
         _shader = rt.Shader("assets/shaders/" .. id .. ".glsl"),
         _elapsed = 0,
         _vertex_shape = rt.VertexRectangle(0, 0, 1, 1),
         _area = rt.AABB(0, 0, 1, 1)
-    }, rt.Drawable, rt.Widget, rt.Animation)
+    })
     out:set_is_animated(true)
     return out
 end)
@@ -31,7 +31,6 @@ end
 
 --- @overload rt.Widget.size_allocate
 function bt.BattleBackground:size_allocate(x, y, width, height)
-
     self._vertex_shape:set_vertex_position(1, x + 0, y + 0)
     self._vertex_shape:set_vertex_position(2, x + width, y + 0 )
     self._vertex_shape:set_vertex_position(3, x + width, y + height)

@@ -1,7 +1,7 @@
 --- @class rt.Sprite
 --- @param spritesheet rt.Spritesheet
 --- @param animation_id String
-rt.Sprite = meta.new_type("Sprite", function(spritesheet, animation_id)
+rt.Sprite = meta.new_type("Sprite", rt.Drawable, rt.Animation, function(spritesheet, animation_id)
     if meta.is_nil(animation_id) then
         animation_id = spritesheet.name
     end
@@ -18,7 +18,7 @@ rt.Sprite = meta.new_type("Sprite", function(spritesheet, animation_id)
         _frame_height = h,
         _elapsed = 0,
         _should_loop = false
-    }, rt.Drawable, rt.Widget, rt.Animation)
+    })
 
     out:set_minimum_size(w, h)
     out._shape:set_texture(out._spritesheet)
