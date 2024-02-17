@@ -1,9 +1,9 @@
 rt.settings.overworld.player = {
     radius = 32 / 2.5,
     mass = 0,
-    velocity = 400,
+    velocity = 250,
     sprinting_velocity_factor = 2,
-    acceleration_delay = 5, -- seconds
+    acceleration_delay = 0.3, -- seconds
     deadzone = 0.05
 }
 
@@ -34,6 +34,8 @@ ow.Player = meta.new_type("Player", rt.Widget, rt.Animation, function(world)
 
         _velocity_magnitude = 0,
         _velocity_angle = 0, -- radians
+
+        _movement_timer = 0
     })
 
     out._sensor:set_disabled(true)
@@ -114,9 +116,22 @@ end
 
 --- @brief [internal]
 function ow.Player:_update_velocity()
-    local x, y = rt.translate_point_by_angle(0, 0, self._velocity_magnitude, self._velocity_angle)
-    self._collider:set_linear_velocity(x, y)
-    self._sensor:set_linear_velocity(x, y)
+
+    local damping = clamp(0, 1, self._movement_timer / rt.settings.overworld.player.acceleration_delay)
+    damping = rt.exponential_acceleration(damping)
+    local x, y = rt.translate_point_by_angle(
+        0, 0,
+            self._velocity_magnitude * damping,
+            self._velocity_angle
+    )
+
+    for collider in range(self._collider, self._sensor) do
+        collider:set_linear_velocity(x, y)
+    end
+
+    if self._velocity_magnitude <= rt.settings.overworld.player.deadzone then
+        self._movement_timer = 0
+    end
 end
 
 --- @brief
@@ -136,6 +151,7 @@ function ow.Player:get_is_sprinting()
 end
 
 function ow.Player:_update_velocity_from_dpad()
+
     local up = ternary(self._input:is_down(rt.InputButton.UP), -1, 0)
     local right = ternary(self._input:is_down(rt.InputButton.RIGHT), 1, 0)
     local down = ternary(self._input:is_down(rt.InputButton.DOWN), 1, 0)
@@ -155,8 +171,6 @@ function ow.Player:_update_velocity_from_dpad()
     if x + y ~= 0 then
         self._direction = angle
     end
-
-    self:_update_velocity()
 end
 
 --- @brief [internal]
@@ -223,7 +237,6 @@ function ow.Player._handle_joystick(_, x, y, which, self)
         if magnitude > 0.01 then
             self._direction = angle
         end
-        self:_update_velocity()
     end
 end
 
@@ -308,9 +321,13 @@ function ow.Player._on_physics_update(_, self)
     self._debug_sensor:resize(center_x, center_y, radius)
     self._debug_sensor_outline:resize(center_x, center_y, radius)
 
+    -- velocity
+    self:_update_velocity()
 end
 
 --- @overload
 function ow.Player:update(delta)
-
+    if self._velocity_magnitude > rt.settings.overworld.player.deadzone then
+        self._movement_timer = self._movement_timer + delta
+    end
 end

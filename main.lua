@@ -1,5 +1,7 @@
 require("include")
 
+local processor = rt.AudioProcessor("assets/sound/test_music.mp3")
+
 rt.current_scene = rt.add_scene("debug")
 local scene = ow.OverworldScene()
 rt.current_scene:set_child(scene)
@@ -40,5 +42,5 @@ end
 love.update = function()
     local delta = love.timer.getDelta()
     rt.current_scene:update(delta)
-    scene:update(delta)
+    processor:update()
 end

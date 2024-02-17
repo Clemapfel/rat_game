@@ -30,11 +30,11 @@ rt.sinoid_resonance_decrease = function(x, n_periods)
 end
 
 rt.exponential_acceleration = function(x)
-    return math.exp((x - 1) * math.pi) - math.exp(-1 * math.pi)
+    return 0.045 * math.exp(math.log(1 / 0.045 + 1) * x) - 0.045
 end
 
 rt.exponential_deceleration = function(x)
-    return (1 - 1.5 * math.exp(-x * math.pi) - 0.5 * math.exp(-1 * math.pi) + 0.5) / (math.pi / 2 - 0.1)
+    return rt.exponential_acceleration(-1 * x + 1)
 end
 
 rt.exponential_plateau = function(x)

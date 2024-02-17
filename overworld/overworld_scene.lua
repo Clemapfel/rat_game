@@ -35,6 +35,10 @@ end
 
 --- @overload
 function ow.OverworldScene:draw()
+    if self._camera_mode == ow.CameraMode.FOLLOW_PLAYER then
+        self._camera:center_on(self._player:get_position())
+    end
+
     self._camera:bind()
     self._map:draw()
     self._player:draw()
@@ -45,10 +49,6 @@ end
 function ow.OverworldScene:update(delta)
     self._map:update(delta)
     self._player:update(delta)
-
-    if self._camera_mode == ow.CameraMode.FOLLOW_PLAYER then
-        self._camera:center_on(self._player:get_position())
-    end
 end
 
 --- @overload
