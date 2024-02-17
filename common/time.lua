@@ -18,6 +18,10 @@ rt.Time = meta.new_type("Time", function(microseconds)
         return rt.Time(self._mys / other._mys)
     end
 
+    metatable.__tostring = function(self)
+        return tostring(self:as_seconds()) .. "s"
+    end
+
     return out
 end)
 
