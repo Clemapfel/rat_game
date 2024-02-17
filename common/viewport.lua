@@ -29,7 +29,7 @@ function rt.Viewport:draw()
         love.graphics.setScissor(x, y, self._width, self._height)
 
         rt.graphics.translate(self._x_offset, self._y_offset)
-        love.graphics.scale(self._x_scale, self._y_scale)
+        rt.graphics.scale(self._x_scale, self._y_scale)
 
         rt.graphics.translate(self._width * 0.5, self._height * 0.5)
         rt.graphics.rotate(self._rotation:as_radians())

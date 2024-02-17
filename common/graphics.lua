@@ -11,6 +11,11 @@ function rt.graphics.rotate(angle)
 end
 
 --- @brief
+function rt.graphics.scale(x, y)
+    love.graphics.scale(x, y)
+end
+
+--- @brief
 function rt.graphics.clear(r, g, b, a)
     love.graphics.clear(r, g, b, a, true, true)
 end

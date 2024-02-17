@@ -61,7 +61,7 @@ function rt.SnapshotLayout:draw()
     local x_offset, y_offset = bounds.x + self._origin_x * bounds.width, bounds.y + self._origin_y * bounds.height
     love.graphics.push()
     rt.graphics.translate(x_offset, y_offset)
-    love.graphics.scale(self._scale_x, self._scale_y)
+    rt.graphics.scale(self._scale_x, self._scale_y)
     rt.graphics.translate(-1 * x_offset, -1 * y_offset)
 
     love.graphics.draw(self._canvas._native, self._position_x + self._x_offset, self._position_y + self._y_offset)

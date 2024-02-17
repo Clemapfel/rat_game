@@ -179,7 +179,7 @@ function ow.Camera:bind()
 
     rt.graphics.translate(0.5 * w, 0.5 * h)
     rt.graphics.rotate(self._angle:as_radians())
-    love.graphics.scale(self._scale, self._scale)
+    rt.graphics.scale(self._scale, self._scale)
     rt.graphics.translate(-0.5 * w, -0.5 * h)
 
     local x, y = self._collider:get_centroid()
