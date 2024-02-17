@@ -1,6 +1,6 @@
 require("include")
 
-local processor = rt.AudioProcessor("assets/sound/test_music.mp3")
+local processor = rt.AudioProcessor("test_music.mp3", "assets/sound")
 
 rt.current_scene = rt.add_scene("debug")
 local scene = ow.OverworldScene()
