@@ -99,3 +99,13 @@ end
 function rt.Audio:get_duration()
     return rt.seconds(self._native:getDuration("seconds"))
 end
+
+--- @brief
+function rt.Audio:get_sample_rate()
+    return self._native:getSampleRate()
+end
+
+--- @brief
+function rt.Audio:get_bit_depth()
+    return self._native:getBitDepth()
+end
