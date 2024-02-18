@@ -73,9 +73,7 @@ rt.FourierTransform.transform_direction = meta.new_enum({
 --- @param first_sample Number index of first sample in audio clip
 --- @param max_n_samples Number count of samples, starting at `first_sample`
 function rt.FourierTransform:compute_from_audio(audio, window_size, window_overlap, first_sample, max_n_samples)
-
     self._data_out = {}
-
     function gauss_window(x)
         return math.exp(-4 * (2 * x - 1)^2);
     end
@@ -141,7 +139,6 @@ end
 
 --- @brief convert to image
 function rt.FourierTransform:as_image()
-
     local w, h = #self._data_out, #(self._data_out[1])
     local out = rt.Image(w, h)
 

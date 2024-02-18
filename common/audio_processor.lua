@@ -3,9 +3,37 @@ rt.settings.audio_processor = {
     export_prefix = "audio"
 }
 
+function rt.AudioProcessorFilter(window_size)
+    local out = {}
+    out.transform = rt.FourierTransform()
+    local ft = out.transform
+
+    out.data_in = ft._alloc_real(window_size)
+    out.data_out = ft._alloc_complex(window_size)
+    out.plan = ft._plan_dft_r2c_1d(
+        window_size,
+        out.data_in,
+        out.data_out,
+        ft._plan_mode
+    )
+
+    out.compute = function(self, from, offset, length)
+        local from = ffi.cast("double*", from)
+        local to = ffi.cast("double*", self.data_in)
+        for i = offset, offset + length - 1, 1 do
+            to[i] = from[i]
+        end
+
+        out.transform._execute(out.transform.plan)
+    end
+
+    return out
+end
+
 --- @class rt.AudioProcessor
 rt.AudioProcessor = meta.new_type("AudioProcessor", rt.SignalEmitter, function(id, path)
     local data = love.sound.newSoundData(path .. "/" .. id)
+    local step_size = rt.settings.audio_processor.step_size
     local out = meta.new(rt.AudioProcessor, {
         _id = id,
         _data = data,
@@ -18,18 +46,17 @@ rt.AudioProcessor = meta.new_type("AudioProcessor", rt.SignalEmitter, function(i
         ),
         _playing = false,
         _playing_offset = 0,
-        _step_size = rt.settings.audio_processor.step_size,
-        _is_mono = data:getChannelCount() == 1
+        _step_size = step_size,
+        _is_mono = data:getChannelCount() == 1,
+        
+        _filter = rt.AudioProcessorFilter(step_size)
     })
 
     if data:getChannelCount() > 2 then
         rt.error("In rt.AudioProcessor: audio file at `" .. path .. "` is neither mono nor stereo, more than 2 channels are not supported")
     end
 
-    clock = rt.Clock()
     out:_initialize_data()
-    println(clock:get_elapsed())
-
     out:signal_add("update")
     return out
 end)
@@ -37,6 +64,7 @@ end)
 --- @brief [internal] pre-compute mono version of signal as C-doubles, to be used with fftw
 function rt.AudioProcessor:_initialize_data()
 
+    -- store computed version on disk to avoid doing the work every time
     local prefix = rt.settings.audio_processor.export_prefix
     if love.filesystem.getInfo(prefix) == nil then
         love.filesystem.createDirectory(prefix)
@@ -56,7 +84,7 @@ function rt.AudioProcessor:_initialize_data()
     local bit_depth = self._data:getBitDepth()
     local sample_t = ternary(bit_depth == 16, "int16_t*", "uint8_t*")
 
-    -- project in [-1, 1]
+    -- project into [-1, 1]
     local normalize = function(x)
         if bit_depth == 8 then
             return (x - 2^8) / (2^8 - 1)
@@ -105,13 +133,6 @@ once = true
 --- @brief
 function rt.AudioProcessor:update()
     if self._source:getFreeBufferCount() > 0 then
-        local chunk = ffi.cast("double*", self._signal:getFFIPointer())
-        local chunk_table = {}
-        local sum = 0
-        for i = self._playing_offset, self._playing_offset + self._step_size - 1 do
-            table.insert(chunk_table, chunk[i])
-            sum = sum + chunk[i]
-        end
 
         self._source:queue(
             self._data:getPointer(),
