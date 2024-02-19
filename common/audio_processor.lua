@@ -48,13 +48,11 @@ function rt.AudioProcessorTransform(ft, window_size)
 
         local out = {}
         for i = 1, half do
-            local complex = ffi.cast(ft._complex_t, to[half - i - 1])
-            local length, angle = rt.to_polar(complex[0], complex[1])
-
-            --ffi.cast("double*", magnitude:getFFIPointer())[i - 1] = normalize_factor * length
-            --ffi.cast("double*", phase_angle:getFFIPointer())[i - 1] = angle
-
-            table.insert(out, normalize_factor * length)
+            local complex = ffi.cast(self.ft._complex_t, to[half - i - 1])
+            local value = {complex[0], complex[1]}
+            local magnitude = math.sqrt(value[1] * value[1] + value[2] * value[2]) -- take complex magnitude
+            magnitude = magnitude * normalize_factor -- project into [0, 1]
+            table.insert(out, magnitude)
         end
 
         return out -- magnitude, phase_angle

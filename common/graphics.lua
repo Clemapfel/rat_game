@@ -20,6 +20,16 @@ function rt.graphics.clear(r, g, b, a)
     love.graphics.clear(r, g, b, a, true, true)
 end
 
+--- @brief
+function rt.graphics.get_width()
+    return love.graphics.getWidth()
+end
+
+--- @brief
+function rt.graphics.get_height()
+    return love.graphics.getHeight()
+end
+
 rt.BlendMode = meta.new_enum({
     NONE = -1,
     NORMAL = 0,
