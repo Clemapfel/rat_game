@@ -114,7 +114,9 @@ rt.AudioProcessor = meta.new_type("AudioProcessor", rt.SignalEmitter, function(i
             nil
         ),
         _playing = false,
-        _playing_offset = 0,
+        _buffer_offset = 0,     -- position of already queued buffers
+        _playing_offset = 0,    -- position of currently playing sample
+        _previous_tell = 0,
         _window_size = window_size,
         _is_mono = data:getChannelCount() == 1,
 
@@ -203,7 +205,6 @@ end
 --- @brief
 function rt.AudioProcessor:update()
     if self._source:getFreeBufferCount() > 0 then
-
         if self.on_update ~= nil then
             local spectrum, angle = self.transform:signal_to_spectrum(self._signal, self._playing_offset)
             self.on_update(spectrum, angle)
@@ -211,7 +212,7 @@ function rt.AudioProcessor:update()
 
         self._source:queue(
             self._data:getPointer(),
-            self._playing_offset,
+            self._buffer_offset,
             self._window_size,
             self._data:getSampleRate(),
             self._data:getBitDepth(),
@@ -219,8 +220,14 @@ function rt.AudioProcessor:update()
         )
 
         self._source:play()
-        self._playing_offset = self._playing_offset + self._window_size
+        self._buffer_offset = self._buffer_offset + self._window_size
     end
+
+    local tell = self._source:tell("samples")
+    self._playing_offset = self._playing_offset + math.abs(tell - self._previous_tell)
+    self._previous_tell = tell
+
+    println(self._playing_offset, " ", self._buffer_offset)
 end
 
 
