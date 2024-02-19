@@ -1,5 +1,5 @@
 rt.settings.audio_processor = {
-    window_size = 2^13,
+    window_size = 2^11, --2^13,
     export_prefix = "audio"
 }
 
@@ -111,12 +111,13 @@ rt.AudioProcessor = meta.new_type("AudioProcessor", rt.SignalEmitter, function(i
             data:getSampleRate(),
             data:getBitDepth(),
             data:getChannelCount(),
-            nil
+            8
         ),
         _playing = false,
         _buffer_offset = 0,     -- position of already queued buffers
         _playing_offset = 0,    -- position of currently playing sample
-        _previous_tell = 0,
+        _last_update = -1,
+        _n_transformed = 0,       -- number of samples processing by fourier transform
         _window_size = window_size,
         _is_mono = data:getChannelCount() == 1,
 
@@ -202,14 +203,10 @@ function rt.AudioProcessor:stop()
     self._playing = false
 end
 
+local once = false
 --- @brief
 function rt.AudioProcessor:update()
     if self._source:getFreeBufferCount() > 0 then
-        if self.on_update ~= nil then
-            local spectrum, angle = self.transform:signal_to_spectrum(self._signal, self._playing_offset)
-            self.on_update(spectrum, angle)
-        end
-
         self._source:queue(
             self._data:getPointer(),
             self._buffer_offset,
@@ -218,16 +215,28 @@ function rt.AudioProcessor:update()
             self._data:getBitDepth(),
             self._data:getChannelCount()
         )
-
         self._source:play()
+        self._playing = true
+        self._last_update = love.timer.getDelta()
         self._buffer_offset = self._buffer_offset + self._window_size
     end
 
-    local tell = self._source:tell("samples")
-    self._playing_offset = self._playing_offset + math.abs(tell - self._previous_tell)
-    self._previous_tell = tell
+    if self._playing then
+        local previous = self._last_update
+        self._last_update = love.timer.getDelta()
+        local delta = self._last_update - previous
+        self._playing_offset = self._playing_offset + self._last_update * self._data:getSampleRate()
 
-    println(self._playing_offset, " ", self._buffer_offset)
+        while self._n_transformed <= self._playing_offset do
+            if self.on_update ~= nil then
+                local spectrum, angle = self.transform:signal_to_spectrum(self._signal, self._n_transformed)
+                self.on_update(spectrum, angle)
+            end
+            self._n_transformed = self._n_transformed + self._window_size
+        end
+    end
+
+    self._last_update = love.timer.getTime()
 end
 
 
