@@ -19,6 +19,7 @@ do
         extern double* fftw_alloc_real(size_t n);
         extern void* fftw_alloc_complex(size_t n);
         extern void* fftw_plan_dft_r2c_1d(int n, double* in, void* out, unsigned int flags);
+        extern void* fftw_plan_dft_c2r_1d(int n, void* in, double* out, unsigned int flags);
         extern void fftw_execute(const void* plan);
         ]]
 
@@ -30,6 +31,7 @@ do
         rt.FourierTransform._alloc_real = fftw.fftw_alloc_real
         rt.FourierTransform._alloc_complex = fftw.fftw_alloc_complex
         rt.FourierTransform._plan_dft_r2c_1d = fftw.fftw_plan_dft_r2c_1d
+        rt.FourierTransform._plan_dft_c2r_1d = fftw.fftw_plan_dft_c2r_1d
         rt.FourierTransform._plan_mode = 64 -- FFTW_ESTIMATE
         rt.FourierTransform._execute = fftw.fftw_execute
 
@@ -41,6 +43,7 @@ do
         extern float* fftwf_alloc_real(size_t n);
         extern void* fftwf_alloc_complex(size_t n);
         extern void* fftwf_plan_dft_r2c_1d(int n, float* in, void* out, unsigned int flags);
+        extern void* fftw_plan_dft_c2r_1d(int n, void* in, float* out, unsigned flags);
         extern void fftwf_execute(const void* plan);
         ]]
 

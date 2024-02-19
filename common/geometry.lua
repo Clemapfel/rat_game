@@ -61,6 +61,16 @@ function rt.magnitude(x, y)
     return math.sqrt(x^2 + y^2)
 end
 
+--- @brief
+function rt.to_polar(x, y)
+    return rt.magnitude(x, y), math.atan2(y, x)
+end
+
+--- @brief
+function rt.from_polar(magnitude, angle)
+    return rt.translate_point_by_angle(0, 0, magnitude, angle)
+end
+
 --[[
 
 --- @brief get size

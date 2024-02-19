@@ -1,39 +1,110 @@
 rt.settings.audio_processor = {
-    step_size = 2^12,
+    window_size = 2^13,
     export_prefix = "audio"
 }
 
-function rt.AudioProcessorFilter(window_size)
+--- @brief efficiently compute fourier transform of bytedata
+function rt.AudioProcessorTransform(ft, window_size)
     local out = {}
-    out.transform = rt.FourierTransform()
-    local ft = out.transform
+    out.ft = ft
+    out.window_size = window_size
+    out.fourier_normalize_factor = 1 / math.sqrt(window_size)
 
-    out.data_in = ft._alloc_real(window_size)
-    out.data_out = ft._alloc_complex(window_size)
-    out.plan = ft._plan_dft_r2c_1d(
+    out.fftw_real = ft._alloc_real(window_size)
+    out.fftw_complex = ft._alloc_complex(window_size)
+    out.plan_signal_to_spectrum = ft._plan_dft_r2c_1d(
         window_size,
-        out.data_in,
-        out.data_out,
+        out.fftw_real,
+        out.fftw_complex,
         ft._plan_mode
     )
 
-    out.compute = function(self, from, offset, length)
-        local from = ffi.cast("double*", from)
-        local to = ffi.cast("double*", self.data_in)
-        for i = offset, offset + length - 1, 1 do
-            to[i] = from[i]
+    out.plan_spectrum_to_signal = ft._plan_dft_c2r_1d(
+        window_size,
+        out.fftw_complex,
+        out.fftw_real,
+        ft._plan_mode
+    )
+
+    --- @param data love.ByteData<double>
+    --- @param offset Number
+    --- @return love.ByteData<double>, love.ByteData<double>
+    function out:signal_to_spectrum(data, offset)
+
+        local data_ptr = ffi.cast(self.ft._real_data_t, data:getFFIPointer())
+        local from = ffi.cast(self.ft._real_data_t, self.fftw_real)
+
+        -- memcpy from data into fourier transform input
+        ffi.copy(from, data_ptr + offset, self.window_size * ffi.sizeof("double"))
+        self.ft._execute(self.plan_signal_to_spectrum)
+
+        -- convert complex to magnitude, also take first half only and flip
+        local to = ffi.cast(self.ft._complex_data_t, self.fftw_complex)
+        local half = math.floor(0.5 * self.window_size)
+        local normalize_factor = self.fourier_normalize_factor
+
+        --local magnitude = love.data.newByteData(half * ffi.sizeof("double"))
+        --local phase_angle = love.data.newByteData(half * ffi.sizeof("double"))
+
+        local out = {}
+        for i = 1, half do
+            local complex = ffi.cast(ft._complex_t, to[half - i - 1])
+            local length, angle = rt.to_polar(complex[0], complex[1])
+
+            --ffi.cast("double*", magnitude:getFFIPointer())[i - 1] = normalize_factor * length
+            --ffi.cast("double*", phase_angle:getFFIPointer())[i - 1] = angle
+
+            table.insert(out, normalize_factor * length)
         end
 
-        out.transform._execute(out.transform.plan)
+        return out -- magnitude, phase_angle
+    end
+
+
+    --- @param magnitude love.ByteData<double>
+    --- @param phase_angle love.ByteData<double>
+    --- @return Table<Number>
+    function out:spectrum_to_signal(magnitude, phase_angle)
+        rt.error("UNTESTED")
+        local from_magnitude = ffi.cast("double*", magnitude:getFFIPointer())
+        local from_angle = ffi.cast("double*", phase_angle:getFFIPointer())
+
+        local from = ffi.cast(self.ft._complex_data_t, self.fftw_complex)
+
+        -- convert magnitude / phase angle to complex
+        local half = math.floor(0.5 * self.window_size)
+        local normalize_factor = 1 / self.fourier_normalize_factor
+        for i = 1, half do
+            local re, im = rt.to_polar(
+                from_magnitude[i-1] * normalize_factor,
+                from_angle[i-1]
+            )
+
+            for complex in range(
+                ffi.cast(self.ft._complex_t, from[half - i - 1]),
+                ffi.cast(self.ft._complex_t, from[self.window_size  - half - i - 1]))
+            do
+                complex[0] = re
+                complex[1] = im
+            end
+        end
+
+        self.ft._execute(self.plan_spectrum_to_signal)
+
+        local to = ffi.cast(self.ft._real_data_t, self.fftw_real)
+        local out = love.data.newByteData(window_size * ffi.sizeof("double"))
+        ffi.copy(to, out, window_size * ffi.sizeof("double"))
+        return out
     end
 
     return out
 end
 
 --- @class rt.AudioProcessor
+--- @signal update (self, Table<Number>) -> nil
 rt.AudioProcessor = meta.new_type("AudioProcessor", rt.SignalEmitter, function(id, path)
     local data = love.sound.newSoundData(path .. "/" .. id)
-    local step_size = rt.settings.audio_processor.step_size
+    local window_size = rt.settings.audio_processor.window_size
     local out = meta.new(rt.AudioProcessor, {
         _id = id,
         _data = data,
@@ -46,10 +117,10 @@ rt.AudioProcessor = meta.new_type("AudioProcessor", rt.SignalEmitter, function(i
         ),
         _playing = false,
         _playing_offset = 0,
-        _step_size = step_size,
+        _window_size = window_size,
         _is_mono = data:getChannelCount() == 1,
-        
-        _filter = rt.AudioProcessorFilter(step_size)
+
+        on_update = nil
     })
 
     if data:getChannelCount() > 2 then
@@ -60,6 +131,9 @@ rt.AudioProcessor = meta.new_type("AudioProcessor", rt.SignalEmitter, function(i
     out:signal_add("update")
     return out
 end)
+
+rt.AudioProcessor.ft = rt.FourierTransform()
+rt.AudioProcessor.transform = rt.AudioProcessorTransform(rt.AudioProcessor.ft, rt.settings.audio_processor.window_size)
 
 --- @brief [internal] pre-compute mono version of signal as C-doubles, to be used with fftw
 function rt.AudioProcessor:_initialize_data()
@@ -128,22 +202,27 @@ function rt.AudioProcessor:stop()
     self._playing = false
 end
 
-once = true
-
 --- @brief
 function rt.AudioProcessor:update()
     if self._source:getFreeBufferCount() > 0 then
 
+        if self.on_update ~= nil then
+            local spectrum, angle = self.transform:signal_to_spectrum(self._signal, self._playing_offset)
+            self.on_update(spectrum, angle)
+        end
+
         self._source:queue(
             self._data:getPointer(),
             self._playing_offset,
-            self._step_size,
+            self._window_size,
             self._data:getSampleRate(),
             self._data:getBitDepth(),
             self._data:getChannelCount()
         )
+
         self._source:play()
-        self._playing_offset = self._playing_offset + self._step_size
+        self._playing_offset = self._playing_offset + self._window_size
     end
 end
+
 
