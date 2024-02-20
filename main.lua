@@ -3,7 +3,7 @@ require("include")
 local texture_w = rt.settings.audio_processor.window_size / 2
 local texture_h = 100
 local shader = rt.Shader("assets/shaders/fourier_transform_visualization.glsl")
-local image_data_format = "r8"
+local image_data_format = "rg16"
 local image = love.image.newImageData(texture_w, texture_h, image_data_format)
 local texture = love.graphics.newImage(image)
 texture:setFilter("linear", "linear", 2)
@@ -14,21 +14,23 @@ texture_shape._native:setTexture(texture)
 
 local col_i = 0
 local processor = rt.AudioProcessor("test_music_mono.mp3", "assets/sound")
-processor.on_update = function(spectrum, angle)
+processor.on_update = function(magnitude, angle)
     if col_i >= texture_h then
-        clock = rt.Clock()
         image = love.image.newImageData(texture_w, texture_h, image_data_format)
         col_i = 0
-        println(clock:get_elapsed())
     end
 
-    for i = 1, #spectrum do
-        local value = spectrum[i]
-        image:setPixel(i-1, col_i, value, value, value, 1)
+    for i = 1, #magnitude do
+        image:setPixel(i-1, col_i,
+            magnitude[i],
+            angle[i],
+            0, 0
+        )
     end
 
     texture:replacePixels(image)
     shader:send("_spectrum", texture)
+    --shader:send("_window_size", processor._window_size)
     col_i = col_i + 1
 end
 

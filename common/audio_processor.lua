@@ -43,21 +43,17 @@ function rt.AudioProcessorTransform(ft, window_size)
         local half = math.floor(0.5 * self.window_size)
         local normalize_factor = self.fourier_normalize_factor
 
-        --local magnitude = love.data.newByteData(half * ffi.sizeof("double"))
-        --local phase_angle = love.data.newByteData(half * ffi.sizeof("double"))
-
-        local out = {}
+        local magnitude_out, angle_out = {}, {}
         for i = 1, half do
             local complex = ffi.cast(self.ft._complex_t, to[half - i - 1])
-            local value = {complex[0], complex[1]}
-            local magnitude = math.sqrt(value[1] * value[1] + value[2] * value[2]) -- take complex magnitude
+            local magnitude, angle = rt.to_polar(complex[0], complex[1])
             magnitude = magnitude * normalize_factor -- project into [0, 1]
-            table.insert(out, magnitude)
+            table.insert(magnitude_out, magnitude)
+            table.insert(angle_out, angle)
         end
 
-        return out -- magnitude, phase_angle
+        return magnitude_out, angle_out
     end
-
 
     --- @param magnitude love.ByteData<double>
     --- @param phase_angle love.ByteData<double>
@@ -229,8 +225,8 @@ function rt.AudioProcessor:update()
 
         while self._n_transformed <= self._playing_offset do
             if self.on_update ~= nil then
-                local spectrum, angle = self.transform:signal_to_spectrum(self._signal, self._n_transformed)
-                self.on_update(spectrum, angle)
+                local magnitude, angle = self.transform:signal_to_spectrum(self._signal, self._n_transformed)
+                self.on_update(magnitude, angle)
             end
             self._n_transformed = self._n_transformed + self._window_size
         end
