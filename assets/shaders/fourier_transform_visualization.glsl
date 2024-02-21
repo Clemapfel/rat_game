@@ -5,6 +5,7 @@
 /// @brief normal distribution with peak at 0, 99 percentile in [-1, 1]
 float gaussian(float x, float ramp)
 {
+    // e^{-\frac{4\pi}{3}\left(r\cdot\left(x-c\right)\right)^{2}}
     return exp(((-4 * PI) / 3) * (ramp * x) * (ramp * x));
 }
 
@@ -47,9 +48,15 @@ float gaussian_lowboost(float x, float cutoff, float ramp)
     if (x < cutoff)
         return 1.0;
     else
-        return gaussian(x - cutoff, ramp);
+        return gaussian(x + cutoff, ramp);
 }
 
+
+/// @brief
+float inverse_logboost(float x, float ramp)
+{
+    return log(ramp / x) - log(ramp) + 1;
+}
 
 /// @brief mean
 float mean(float x) { return x; }
@@ -60,6 +67,7 @@ float mean(vec4 a) { return (a.x + a.y + a.z + a.w) / 4; }
 uniform Image _spectrum;
 
 uniform vec2 _texture_size;
+uniform float _boost;
 
 vec4 effect(vec4 color, Image tex, vec2 texture_coords, vec2 screen_coords)
 {
@@ -69,9 +77,10 @@ vec4 effect(vec4 color, Image tex, vec2 texture_coords, vec2 screen_coords)
     vec4 current = Texel(_spectrum, vec2(texture_coords.x, texture_coords.y));
     vec4 previous = Texel(_spectrum, vec2(texture_coords.x - pixel_size.x, texture_coords.y));
 
-    const float boost_cutoff = 0.3;
-    const float ramp = 1;
-    current.x = current.x * (1 + 2 * gaussian_lowboost(current.x, boost_cutoff, ramp));
+    const float boost_cutoff = 0;
+    const float ramp = 7;
+    const float amplitude = 3;
+    current.x = current.x * inverse_logboost(current.x, 9);
     current.x = clamp(current.x, 0, 1);
 
     previous.y = abs(previous.y) / (2 * PI);

@@ -1,5 +1,5 @@
 rt.settings.audio_processor = {
-    window_size = (2^10 + 2^11) / 2, --2^13,
+    window_size = 2^11, --2^13,
     export_prefix = "audio"
 }
 
@@ -10,8 +10,8 @@ function rt.AudioProcessorTransform(ft, window_size)
     out.window_size = window_size
     out.fourier_normalize_factor = 1 / math.sqrt(window_size)
 
-    out.fftw_real = ft._alloc_real(window_size)
-    out.fftw_complex = ft._alloc_complex(window_size)
+    out.fftw_real = ft._alloc_real(window_size * 2)
+    out.fftw_complex = ft._alloc_complex(window_size * 2)
     out.plan_signal_to_spectrum = ft._plan_dft_r2c_1d(
         window_size,
         out.fftw_real,
