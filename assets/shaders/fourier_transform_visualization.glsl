@@ -1,35 +1,84 @@
 #pragma language glsl3
 
-#define PI 355/113
+#define PI 3.141592653
 
-float atan2(in float y, in float x)
+/// @brief normal distribution with peak at 0, 99 percentile in [-1, 1]
+float gaussian(float x, float ramp)
 {
-    // https://stackoverflow.com/questions/26070410/robust-atany-x-on-glsl-for-converting-xy-coordinate-to-angle
-    bool s = (abs(x) > abs(y));
-    return mix(PI / 2.0 - atan(x,y), atan(y,x), s);
+    return exp(((-4 * PI) / 3) * (ramp * x) * (ramp * x));
 }
 
-vec2 to_polar(in vec2 xy)
+float gaussian(float x)
 {
-    return vec2(length(xy), atan2(xy.y, xy.x));
+    return gaussian(x, 2);
 }
 
-vec2 from_polar(vec2 xy)
+/// @brief attenuates values towards 0 and 1, with gaussian ramp
+/// @param factor the higher, the sharper the ramp
+float gaussian_bandpass(float x, float factor)
 {
-    float magnitude = xy.x;
-    float angle = xy.y;
-    return vec2(magnitude * cos(angle), magnitude * sin(angle));
+    // e^{-\frac{4\pi}{3}\left(ax\right)^{2}}
+    return 1 - gaussian(factor * x) + gaussian(factor * (x - 1));
 }
+
+/// @brief attenuates values towards 0
+float gaussian_lowpass(float x, float factor)
+{
+    return 1 - gaussian(factor * (x - 1));
+}
+
+/// @brief attenuates values towards 1
+float gaussian_highpass(float x, float factor)
+{
+    return 1 - gaussian(factor * x);
+}
+
+/// @brief butterworth, same norm as gaussian
+/// @param n integer, the higher the closer to box
+float butterworth(float x, float factor, int n)
+{
+    // B\left(x\right)=\frac{1}{\left(1+\left(2x\right)^{2n}\right)}
+    return 1 / (1 + pow(factor * x, 2 * n));
+}
+
+/// @brief
+float gaussian_lowboost(float x, float cutoff, float ramp)
+{
+    if (x < cutoff)
+        return 1.0;
+    else
+        return gaussian(x - cutoff, ramp);
+}
+
+
+/// @brief mean
+float mean(float x) { return x; }
+float mean(vec2 a) { return (a.x + a.y) / 2; }
+float mean(vec3 a) { return (a.x + a.y + a.z) / 3; }
+float mean(vec4 a) { return (a.x + a.y + a.z + a.w) / 4; }
 
 uniform Image _spectrum;
-uniform float _window_size;
+
+uniform vec2 _texture_size;
 
 vec4 effect(vec4 color, Image tex, vec2 texture_coords, vec2 screen_coords)
 {
     texture_coords.xy = texture_coords.yx;
-    vec4 value = Texel(_spectrum, vec2(texture_coords.x, texture_coords.y));
-    vec2 as_polar = value.rg;
-    vec2 as_complex = from_polar(value.rg);
+    vec2 pixel_size = vec2(1) / _texture_size;
 
-    return vec4(vec3(as_polar.x), 1);
+    vec4 current = Texel(_spectrum, vec2(texture_coords.x, texture_coords.y));
+    vec4 previous = Texel(_spectrum, vec2(texture_coords.x - pixel_size.x, texture_coords.y));
+
+    const float boost_cutoff = 0.3;
+    const float ramp = 1;
+    current.x = current.x * (1 + 2 * gaussian_lowboost(current.x, boost_cutoff, ramp));
+    current.x = clamp(current.x, 0, 1);
+
+    previous.y = abs(previous.y) / (2 * PI);
+    current.y = abs(current.y) / (2 * PI);
+
+    float value = current.x;
+    float alpha = 1;
+
+    return vec4(vec3(value), alpha);
 }

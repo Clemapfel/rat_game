@@ -60,7 +60,7 @@ end
 --- @brief gaussian distribution with 0.99 percentile in [0, 1], peak at 0.5
 rt.symmetrical_gaussian = function(x, peak)
     peak = which(peak, 1)
-    return (math.exp(-1 * ((4 * math.pi / 3) * (x - 0.5))^2))
+    return (math.exp(-1 * ((4 * math.pi / 3) * (2 * x - 1))^2))
 end
 
 --- @brief gaussian distribution with 0.99 percentile in [0, 1], peak at 1

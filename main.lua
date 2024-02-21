@@ -7,10 +7,13 @@ local image_data_format = "rg16"
 local image = love.image.newImageData(texture_w, texture_h, image_data_format)
 local texture = love.graphics.newImage(image)
 texture:setFilter("linear", "linear", 2)
+texture:setWrap("clampzero", "clampzero")
 
 --shader:send("_spectrum_size", {texture_w, rt.settings.audio_processor.window_size / texture_w})
 local texture_shape = rt.VertexRectangle(0, 0, rt.graphics.get_width(), rt.graphics.get_height())
 texture_shape._native:setTexture(texture)
+
+--shader:send("_texture_size", {image:getWidth(), image:getHeight()})
 
 local col_i = 0
 local processor = rt.AudioProcessor("test_music_mono.mp3", "assets/sound")
@@ -30,6 +33,7 @@ processor.on_update = function(magnitude, angle)
 
     texture:replacePixels(image)
     shader:send("_spectrum", texture)
+    --shader:send("_col_offset", col_i)
     --shader:send("_window_size", processor._window_size)
     col_i = col_i + 1
 end
@@ -40,7 +44,6 @@ rt.current_scene:set_child(scene)
 
 rt.current_scene.input:signal_connect("pressed", function(_, which)
     if which == rt.InputButton.A then
-        scene._player:set_position(350, 330)
     elseif which == rt.InputButton.B then
     elseif which == rt.InputButton.X then
     elseif which == rt.InputButton.Y then

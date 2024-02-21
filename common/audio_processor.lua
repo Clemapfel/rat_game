@@ -1,5 +1,5 @@
 rt.settings.audio_processor = {
-    window_size = 2^11, --2^13,
+    window_size = (2^10 + 2^11) / 2, --2^13,
     export_prefix = "audio"
 }
 
