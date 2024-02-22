@@ -1,5 +1,5 @@
 rt.settings.audio_processor = {
-    window_size = 2^11, --2^13,
+    window_size = 2^12, --2^13,
     export_prefix = "audio"
 }
 
@@ -43,16 +43,19 @@ function rt.AudioProcessorTransform(ft, window_size)
         local half = math.floor(0.5 * self.window_size)
         local normalize_factor = self.fourier_normalize_factor
 
-        local magnitude_out, angle_out = {}, {}
+        local magnitude_out = {}
+        local min = POSITIVE_INFINITY
+        local max = NEGATIVE_INFINITY
         for i = 1, half do
             local complex = ffi.cast(self.ft._complex_t, to[half - i - 1])
-            local magnitude, angle = rt.to_polar(complex[0], complex[1])
+            local magnitude = rt.magnitude(complex[0], complex[1])
             magnitude = magnitude * normalize_factor -- project into [0, 1]
+            min = math.min(min, magnitude)
+            max = math.max(max, magnitude)
             table.insert(magnitude_out, magnitude)
-            table.insert(angle_out, angle)
         end
 
-        return magnitude_out, angle_out
+        return magnitude_out, min, max
     end
 
     --- @param magnitude love.ByteData<double>
@@ -131,6 +134,7 @@ end)
 
 rt.AudioProcessor.ft = rt.FourierTransform()
 rt.AudioProcessor.transform = rt.AudioProcessorTransform(rt.AudioProcessor.ft, rt.settings.audio_processor.window_size)
+rt.AudioProcessor._log_once = true
 
 --- @brief [internal] pre-compute mono version of signal as C-doubles, to be used with fftw
 function rt.AudioProcessor:_initialize_data()
@@ -147,6 +151,10 @@ function rt.AudioProcessor:_initialize_data()
     if not meta.is_nil(info) then
         self._signal = love.data.newByteData(love.filesystem.read(export_path))
         return
+    end
+
+    if self._log_once then
+        rt.log("[rt][INFO] In rt.AudioProcessor:_initialize_data: Exporting `" .. self._id .. "` to `" .. export_path .. "`")
     end
 
     -- cf. https://github.com/love2d/love/blob/main/src/modules/sound/wrap_SoundData.lua#L41
@@ -184,9 +192,6 @@ function rt.AudioProcessor:_initialize_data()
 
     -- export
     local res = love.filesystem.write(export_path, self._signal:getString())
-    if res == true then
-        rt.log("[rt][INFO] In rt.AudioProcesser._initialize_data: exporting `" .. self._id .. "` to `" .. export_path .. "`")
-    end
 end
 
 --- @brief
@@ -225,8 +230,7 @@ function rt.AudioProcessor:update()
 
         while self._n_transformed <= self._playing_offset do
             if self.on_update ~= nil then
-                local magnitude, angle = self.transform:signal_to_spectrum(self._signal, self._n_transformed)
-                self.on_update(magnitude, angle)
+                self.on_update(self.transform:signal_to_spectrum(self._signal, self._n_transformed))
             end
             self._n_transformed = self._n_transformed + self._window_size
         end

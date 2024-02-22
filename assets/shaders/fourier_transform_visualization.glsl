@@ -67,27 +67,59 @@ float mean(vec4 a) { return (a.x + a.y + a.z + a.w) / 4; }
 uniform Image _spectrum;
 
 uniform vec2 _texture_size;
-uniform float _boost;
+uniform float _index;
+uniform int _on;
+
+float gaussian(int x, int y, int size)
+{
+    float sigma_sq = float(size);
+    float center = size / 2;
+    float length = sqrt((x - center) * (x - center) + (y - center) * (y - center));
+    return exp((-1.f * (length / sigma_sq)) / sqrt(2 * PI + sigma_sq));
+}
+
+float laplacian_of_gaussian(int x, int y, int sigma)
+{
+    float sigma_4 = sigma * sigma * sigma * sigma;
+    float sigma_2 = sigma * sigma;
+    return 1 / (PI * sigma_4) * (1 - (x * x + y * y) / (2 * sigma_2)) * exp(-1 * (x*x + y*y) / (2 * sigma_2));
+}
+
+float laplacian(int x, int y, int sigma)
+{
+    if (x == 1 || x == -1)
+        return -1.0;
+    else if (x == 0)
+        return 2.0;
+    else
+        return 0.0;
+}
 
 vec4 effect(vec4 color, Image tex, vec2 texture_coords, vec2 screen_coords)
 {
+    vec2 screen_size = love_ScreenSize.xy;
     texture_coords.xy = texture_coords.yx;
     vec2 pixel_size = vec2(1) / _texture_size;
 
-    vec4 current = Texel(_spectrum, vec2(texture_coords.x, texture_coords.y));
-    vec4 previous = Texel(_spectrum, vec2(texture_coords.x - pixel_size.x, texture_coords.y));
+    float value = Texel(_spectrum, texture_coords).x;
 
-    const float boost_cutoff = 0;
-    const float ramp = 7;
-    const float amplitude = 3;
-    current.x = current.x * inverse_logboost(current.x, 9);
-    current.x = clamp(current.x, 0, 1);
+    if (_on == 1)
+    {
+        float step = 2 / _texture_size.x;
+        const int n = 10;
+        float sum = 0;
+        float filter_response = 0;
+        for (int i = -1 * n; i < n; i = i + 1)
+        {
+            float px = Texel(_spectrum, vec2(texture_coords.x, texture_coords.y + step * i)).x;
+            float g = laplacian_of_gaussian(i, 0, n);
+            filter_response = filter_response + g;
+            sum = sum + px * g;
+        }
 
-    previous.y = abs(previous.y) / (2 * PI);
-    current.y = abs(current.y) / (2 * PI);
+        value = sum / filter_response;
+    }
 
-    float value = current.x;
     float alpha = 1;
-
-    return vec4(vec3(value), alpha);
+    return vec4(vec3(abs(value)), alpha);
 }
