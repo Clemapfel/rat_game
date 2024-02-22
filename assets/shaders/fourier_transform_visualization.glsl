@@ -87,10 +87,10 @@ float laplacian_of_gaussian(int x, int y, int sigma)
 
 float laplacian(int x, int y, int sigma)
 {
-    if (x == 1 || x == -1)
+    if (x < 0)
         return -1.0;
     else if (x == 0)
-        return 2.0;
+        return float(sigma);
     else
         return 0.0;
 }
@@ -109,15 +109,17 @@ vec4 effect(vec4 color, Image tex, vec2 texture_coords, vec2 screen_coords)
         const int n = 10;
         float sum = 0;
         float filter_response = 0;
+
         for (int i = -1 * n; i < n; i = i + 1)
         {
             float px = Texel(_spectrum, vec2(texture_coords.x, texture_coords.y + step * i)).x;
-            float g = laplacian_of_gaussian(i, 0, n);
-            filter_response = filter_response + g;
+            float g = laplacian(i, 0, n);
+            filter_response = filter_response + abs(g);
             sum = sum + px * g;
         }
 
-        value = sum / filter_response;
+        value = sum; // / filter_response;
+
     }
 
     float alpha = 1;
