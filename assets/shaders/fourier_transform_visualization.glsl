@@ -103,14 +103,15 @@ vec4 effect(vec4 color, Image tex, vec2 texture_coords, vec2 screen_coords)
 
     float value = Texel(_spectrum, texture_coords).x;
 
+    /*
     if (_on == 1)
     {
-        float step = 2 / _texture_size.x;
+        float step = 1 / _texture_size.y;
         const int n = 10;
         float sum = 0;
         float filter_response = 0;
 
-        for (int i = -1 * n; i < n; i = i + 1)
+        for (int i = -1 * n; i <= n; i = i + 1)
         {
             float px = Texel(_spectrum, vec2(texture_coords.x, texture_coords.y + step * i)).x;
             float g = laplacian(i, 0, n);
@@ -118,9 +119,13 @@ vec4 effect(vec4 color, Image tex, vec2 texture_coords, vec2 screen_coords)
             sum = sum + px * g;
         }
 
-        value = sum; // / filter_response;
+        value = sum / filter_response;
 
+        float left = Texel(_spectrum, vec2(texture_coords.x, texture_coords.y - step * 1)).x;
+        float right = Texel(_spectrum, texture_coords).x;
+        value = abs(right - left);
     }
+    */
 
     float alpha = 1;
     return vec4(vec3(abs(value)), alpha);

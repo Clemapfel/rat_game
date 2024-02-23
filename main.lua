@@ -48,6 +48,8 @@ processor.on_update = function(magnitude, min, max)
         col_i = 0
     end
 
+    -- compress by frequency
+    local compressed = {}
     local current_i = 1
     for bin_i = 1, #bins, 1 do
         local bin = bins[#bins - bin_i + 1]
@@ -60,17 +62,30 @@ processor.on_update = function(magnitude, min, max)
             n = n + 1
         end
         sum = sum / n
-
-        --sum = sum * inverse_logboost(sum, n)
-        --sum = (sum - min) / (max - min)
-        sum = project(sum, min, max)
-        image:setPixel(bin_i - 1, col_i, sum / n, 0, 0, 1)
+        table.insert(compressed, project(sum, min, max))
     end
 
+
+    -- smooth distrbution
+    if active then
+        local smoothed = rt.math.kernel_density_estimation(
+            compressed,
+            rt.math.gaussian_kernel,
+            5
+        )
+
+        for i = 1, #smoothed do
+            image:setPixel(i - 1, col_i, smoothed[i], 0, 0, 1)
+        end
+    else
+        for i = 1, #compressed do
+            image:setPixel(i - 1, col_i, compressed[i], 0, 0, 1)
+        end
+    end
     texture:replacePixels(image)
     shader:send("_spectrum", texture)
-    shader:send("_on", ternary(active, 1, 0))
-    shader:send("_texture_size", {image:getWidth(), image:getHeight()})
+    --shader:send("_on", ternary(active, 1, 0))
+    --shader:send("_texture_size", {image:getWidth(), image:getHeight()})
     --shader:send("_boost", boost)
     --shader:send("_col_offset", col_i)
     --shader:send("_window_size", processor._window_size)

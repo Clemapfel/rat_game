@@ -14,6 +14,7 @@ print("Love2D " .. major .. "." .. minor .. " | " .. jit.version)
 
 rt = {}
 rt.test = {}
+rt.math = {}
 rt.graphics = {}
 rt.settings = {}
 rt.physics = {}
@@ -81,6 +82,7 @@ require "direction"
 require "geometry"
 require "angle"
 require "random"
+require "statistics"
 require "signals"
 require "notify"
 require "list"
@@ -105,7 +107,6 @@ require "glyph"
 require "fourier_transform"
 require "audio"
 require "audio_playback"
-require "audio_filter"
 require "audio_processor"
 require "easement_functions"
 require "spline"
