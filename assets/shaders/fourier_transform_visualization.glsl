@@ -51,7 +51,6 @@ float gaussian_lowboost(float x, float cutoff, float ramp)
         return gaussian(x + cutoff, ramp);
 }
 
-
 /// @brief
 float inverse_logboost(float x, float ramp)
 {
@@ -63,6 +62,21 @@ float mean(float x) { return x; }
 float mean(vec2 a) { return (a.x + a.y) / 2; }
 float mean(vec3 a) { return (a.x + a.y + a.z) / 3; }
 float mean(vec4 a) { return (a.x + a.y + a.z + a.w) / 4; }
+
+
+/// @brief convert hsv to rgb
+vec3 hsv_to_rgb(vec3 c)
+{
+    vec4 K = vec4(1.0, 2.0 / 3.0, 1.0 / 3.0, 3.0);
+    vec3 p = abs(fract(c.xxx + K.xyz) * 6.0 - K.www);
+    return c.z * mix(K.xxx, clamp(p - K.xxx, 0.0, 1.0), c.y);
+}
+
+/// @brief convert hsva to rgba
+vec4 hsva_to_rgba(vec4 hsva)
+{
+    return vec4(hsv_to_rgb(hsva.xyz), hsva.a);
+}
 
 uniform Image _spectrum;
 
@@ -101,7 +115,15 @@ vec4 effect(vec4 color, Image tex, vec2 texture_coords, vec2 screen_coords)
     texture_coords.xy = texture_coords.yx;
     vec2 pixel_size = vec2(1) / _texture_size;
 
-    float value = Texel(_spectrum, texture_coords).x;
+    float value = Texel(_spectrum, texture_coords).x; //vec2(texture_coords.x, _index * pixel_size.y)).x;
+    float gray = value;
+
+    float cutoff = 0.6;
+    float ramp = 5;
+    value = value * (1 - gaussian_lowboost(value, cutoff, ramp));
+    gray = gray * gaussian_lowboost(value, cutoff, ramp);
     float alpha = 1;
-    return vec4(vec3(abs(value)), alpha);
+
+    vec3 result = hsv_to_rgb(vec3(value));
+    return vec4(result.xyz, 1);
 }

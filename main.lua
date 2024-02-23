@@ -17,21 +17,24 @@ local image, texture, texture_shape
 local active = false
 
 local col_i = 0
-local processor = rt.AudioProcessor("test_music_02.mp3", "assets/sound")
+local processor = rt.AudioProcessor("test_music.mp3", "assets/sound")
 processor.on_update = function(magnitude, min, max)
 
     if is_empty(bins) then
         -- initialize bins on first time
+        local n_unit_bins = 30
+        local bin_i = 1
         local size = 1
         local sum = 0
         while sum < #magnitude do
-            local final_size = math.floor(size)
+            local final_size = ternary(bin_i < n_unit_bins, 1, math.floor(size))
             if sum + final_size > #magnitude then break end -- toss out last few high-frequency components
             table.insert(bins, clamp(final_size, 0, math.abs(sum - #magnitude)))
             sum = sum + final_size
-            size = size * (1 + 1 / 400)
+            size = size * (1 + 1 / math.sqrt(#magnitude))
+            bin_i = bin_i + 1
         end
-        println(#magnitude, " -> ", #bins)
+        dbg(bins)
 
         image = love.image.newImageData(#bins, texture_h, image_data_format)
         texture = love.graphics.newImage(image)
@@ -60,14 +63,16 @@ processor.on_update = function(magnitude, min, max)
             current_i = current_i + 1
             n = n + 1
         end
-        sum = sum / n
+        sum = sum
         image:setPixel(bin_i - 1, col_i, sum, 0, 0, 1)
     end
 
     texture:replacePixels(image)
     shader:send("_spectrum", texture)
-    --shader:send("_on", ternary(active, 1, 0))
+    --shader:send("_index", col_i)
     --shader:send("_texture_size", {image:getWidth(), image:getHeight()})
+
+    --shader:send("_on", ternary(active, 1, 0))
     --shader:send("_boost", boost)
     --shader:send("_col_offset", col_i)
     --shader:send("_window_size", processor._window_size)
