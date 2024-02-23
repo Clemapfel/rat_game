@@ -17,20 +17,19 @@ end
 --- @brief kernel density estimation, takes 1d data and returns a smoothed distribution curve
 --- @param kernel Function (rt.math.gaussian_kernel by default)
 function rt.math.kernel_density_estimation(data, kernel, kernel_width)
-    local out = {}
-    local n = #data
-
-    kernel = which(kernel, rt.math.gaussian_kernel)
-    kernel_width = which(kernel_width, 1)
-
-    for data_i = 1, n do
-        local sum = 0
-        for kernel_i = -kernel_width, kernel_width, 1 do
-            local value = which(data[data_i + (kernel_i + kernel_width + 1)], 0)
-            sum = sum + kernel(kernel_i, 0, kernel_width * 2) * value
-        end
-        out[data_i] = sum / (kernel_width * 2 + 1)
+    function gaussian_kernel(x, h)
+        local var = h * h
+        return math.exp(-(x * x) / (2 * var)) / (2 * math.pi * var)^0.5
     end
 
-    return out
+    -- This function performs kernel density estimation for a given data set
+    local density = {}
+    for i = 1, #data do
+        density[i] = 0
+        for j = 1, #data do
+            local distance = math.abs(data[i] - data[j])
+            density[i] = density[i] + gaussian_kernel(distance, kernel_width) / (#data - 1)
+        end
+    end
+    return density
 end
