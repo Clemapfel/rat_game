@@ -18,7 +18,7 @@ local magnitude_image, magnitude_texture, energy_image, energy_texture, texture_
 local active = false
 local min_energy = POSITIVE_INFINITY
 local max_energy = NEGATIVE_INFINITY
-local n_energy_bins = 2
+local n_energy_bins = 4
 
 local col_i = 0
 local processor = rt.AudioProcessor("test_music.mp3", "assets/sound")
@@ -99,11 +99,12 @@ processor.on_update = function(magnitude, min, max, energy_sum)
     magnitude_texture:replacePixels(magnitude_image)
     energy_texture:replacePixels(energy_image)
 
+
     shader:send("_energy", energy_texture)
     shader:send("_spectrum", magnitude_texture)
 
     shader:send("_on", ternary(active, 1, 0))
-    shader:send("_spectrum_size", {magnitude_image:getWidth(), magnitude_image:getHeight()})
+    --shader:send("_spectrum_size", {magnitude_image:getWidth(), magnitude_image:getHeight()})
     shader:send("_energy_size", {energy_image:getWidth(), energy_image:getHeight()})
 
     --shader:send("_min_energy", min_energy)

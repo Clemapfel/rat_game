@@ -114,39 +114,34 @@ vec4 effect(vec4 color, Image tex, vec2 texture_coords, vec2 screen_coords)
 
     float step = 1 / _energy_size.x;
     float energy =
-        //Texel(_energy, vec2(texture_coords.x + 2 * step, texture_coords.y)).x +
-        //Texel(_energy, vec2(texture_coords.x + 1 * step, texture_coords.y)).x +
-        Texel(_energy, vec2(texture_coords.x + 0 * step, texture_coords.y)).x +
+        Texel(_energy, vec2(texture_coords.x + +1 * step, texture_coords.y)).x +
+        Texel(_energy, vec2(texture_coords.x + +0 * step, texture_coords.y)).x +
         Texel(_energy, vec2(texture_coords.x + -1 * step, texture_coords.y)).x
     ;
-
-    energy = energy / 5;
+    energy = energy / 3;
 
     if (_on == 1)
     {
-        float step = 1 / _spectrum_size.x;
-        float before = Texel(_spectrum, vec2(texture_coords.x + 0, texture_coords.y)).x;
-        float now = Texel(_spectrum, vec2(texture_coords.x + step, texture_coords.y)).x;
+        step = 1 / _spectrum_size.x;
+        float now =
+            Texel(_spectrum, vec2(texture_coords.x - 1 * step, texture_coords.y)).x +
+            Texel(_spectrum, vec2(texture_coords.x - 0 * step, texture_coords.y)).x;
+        now = now / 2;
+        //float before = Texel(_spectrum, vec2(texture_coords.x - step, texture_coords.y)).x;
 
-        // normalize weaker frequencies
-        float amplitude = 0.5;
-        float ramp = 4;
-        float weight = mix(
-            amplitude * gaussian_lowpass(texture_coords.y, ramp),           // high frequency normalization strength
-            amplitude * gaussian_lowpass(texture_coords.y + 0.4, ramp),     // mid frequency
-        0.5);
+        float high_frequency_boost_weight = 0.9 * (1 - gaussian_lowpass(1 - texture_coords.y + 0.0, 0.9));
+        float mid_fequency_boost_weight =   0.4 * (1 - gaussian_lowpass(1 - texture_coords.y + 0.6, 1.5));
+        float low_frequency_boost_weight =  0.6 * (1 - gaussian_lowpass(1 - texture_coords.y + 1.0, 1.5));
 
-        before = mix(before, before / energy, weight);
-        before = clamp(before, 0, 1);
-
-        now = mix(now, now / energy, weight);
-        now = clamp(now, 0, 1);
+        float total_weight = (high_frequency_boost_weight + mid_fequency_boost_weight + low_frequency_boost_weight) / 3;
 
         magnitude = now;
+        magnitude = mix(magnitude, magnitude / energy, total_weight);
 
-        //float delta = magnitude - energy;
-        //magnitude *= (1 - gaussian_lowpass(delta, 1));
+        magnitude *= (1 - (1 * gaussian_lowpass(magnitude, 0.5)));
     }
 
-    return vec4(vec3(magnitude), 1);
+    float gray = Texel(_spectrum, texture_coords).x;
+    float hsv = clamp(magnitude, 0, 1);
+    return vec4(hsv_to_rgb(vec3(clamp(hsv, 0.8, 1), 1, hsv)), 1);
 }
