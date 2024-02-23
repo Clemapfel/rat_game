@@ -1,6 +1,7 @@
 require("include")
 
 local bins = {}
+local energy_bins = {}
 
 function inverse_logboost(x, ramp)
     return math.log(ramp / x) - math.log(ramp) + 1;
@@ -8,17 +9,20 @@ end
 
 local texture_h = 200
 local shader = rt.Shader("assets/shaders/fourier_transform_visualization.glsl")
-local image_data_format = "rg16"
+local image_data_format = "r16"
 
-local image, texture, texture_shape
+local magnitude_image, magnitude_texture, energy_image, energy_texture, texture_shape
 
 --shader:send("_texture_size", {image:getWidth(), image:getHeight()})
 
 local active = false
+local min_energy = POSITIVE_INFINITY
+local max_energy = NEGATIVE_INFINITY
+local n_energy_bins = 2
 
 local col_i = 0
 local processor = rt.AudioProcessor("test_music.mp3", "assets/sound")
-processor.on_update = function(magnitude, min, max)
+processor.on_update = function(magnitude, min, max, energy_sum)
 
     if is_empty(bins) then
         -- initialize bins on first time
@@ -34,45 +38,79 @@ processor.on_update = function(magnitude, min, max)
             size = size * (1 + 1 / math.sqrt(#magnitude))
             bin_i = bin_i + 1
         end
-        dbg(bins)
 
-        image = love.image.newImageData(#bins, texture_h, image_data_format)
-        texture = love.graphics.newImage(image)
-        texture:setFilter("linear", "linear", 2)
-        texture:setWrap("clampzero", "clampzero")
+        magnitude_image = love.image.newImageData(texture_h, #bins, image_data_format)
+        magnitude_texture = love.graphics.newImage(magnitude_image)
+
+        for texture in range(magnitude_texture, energy_texture) do
+            texture:setFilter("linear", "linear", 2)
+            texture:setWrap("clampzero", "clampzero")
+        end
 
         --shader:send("_spectrum_size", {texture_w, rt.settings.audio_processor.window_size / texture_w})
         texture_shape = rt.VertexRectangle(0, 0, rt.graphics.get_width(), rt.graphics.get_height())
-        texture_shape._native:setTexture(texture)
+        texture_shape._native:setTexture(magnitude_texture)
+
+        energy_image = love.image.newImageData(texture_h, n_energy_bins, image_data_format)
+        energy_texture = love.graphics.newImage(energy_image)
     end
 
     if col_i >= texture_h then
-        image = love.image.newImageData(#bins, texture_h, image_data_format)
+        magnitude_image:release()
+        magnitude_image = love.image.newImageData(texture_h, #bins, image_data_format)
+        energy_image:release()
+        energy_image = love.image.newImageData(texture_h, 1, image_data_format)
         col_i = 0
     end
 
     -- compress by frequency
     local current_i = 1
+    local compressed = {}
     for bin_i = 1, #bins, 1 do
         local bin = bins[#bins - bin_i + 1]
         local sum = 0
-        local n = 0
         local start = current_i
         while current_i < start + bin do
             sum = sum + magnitude[current_i]
             current_i = current_i + 1
-            n = n + 1
         end
-        sum = sum
-        image:setPixel(bin_i - 1, col_i, sum, 0, 0, 1)
+
+        sum = sum / bin
+        table.insert(compressed, sum)
+        magnitude_image:setPixel(col_i, bin_i - 1, sum, 0, 0, 1)
     end
 
-    texture:replacePixels(image)
-    shader:send("_spectrum", texture)
-    --shader:send("_index", col_i)
-    --shader:send("_texture_size", {image:getWidth(), image:getHeight()})
+    -- calculate energy
+    local current_i = 1
+    for bin_i = 1, n_energy_bins, 1 do
+        println(#compressed)
+        local bin = math.floor(#compressed / n_energy_bins)
+        local sum = 0
+        local start = current_i
+        while current_i < start + bin do
+            sum = sum + compressed[current_i]
+            current_i = current_i + 1
+        end
 
-    --shader:send("_on", ternary(active, 1, 0))
+        sum = sum / bin
+        energy_image:setPixel(col_i, bin_i - 1, sum, 0, 0, 1)
+    end
+
+    magnitude_texture:replacePixels(magnitude_image)
+    energy_texture:replacePixels(energy_image)
+
+    shader:send("_energy", energy_texture)
+    shader:send("_spectrum", magnitude_texture)
+
+    shader:send("_on", ternary(active, 1, 0))
+    shader:send("_spectrum_size", {magnitude_image:getWidth(), magnitude_image:getHeight()})
+    shader:send("_energy_size", {energy_image:getWidth(), energy_image:getHeight()})
+
+    --shader:send("_min_energy", min_energy)
+    --shader:send("_max_energy", max_energy)
+    ---:send("_index", col_i)
+    --shader:send("_spectrum_size", #bins)
+
     --shader:send("_boost", boost)
     --shader:send("_col_offset", col_i)
     --shader:send("_window_size", processor._window_size)

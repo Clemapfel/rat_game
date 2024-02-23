@@ -79,18 +79,14 @@ vec4 hsva_to_rgba(vec4 hsva)
 }
 
 uniform Image _spectrum;
+uniform vec2 _spectrum_size;
+
+uniform Image _energy;
+uniform vec2 _energy_size;
 
 uniform vec2 _texture_size;
 uniform float _index;
 uniform int _on;
-
-float gaussian(int x, int y, int size)
-{
-    float sigma_sq = float(size);
-    float center = size / 2;
-    float length = sqrt((x - center) * (x - center) + (y - center) * (y - center));
-    return exp((-1.f * (length / sigma_sq)) / sqrt(2 * PI + sigma_sq));
-}
 
 float laplacian_of_gaussian(int x, int y, int sigma)
 {
@@ -112,18 +108,45 @@ float laplacian(int x, int y, int sigma)
 vec4 effect(vec4 color, Image tex, vec2 texture_coords, vec2 screen_coords)
 {
     vec2 screen_size = love_ScreenSize.xy;
-    texture_coords.xy = texture_coords.yx;
     vec2 pixel_size = vec2(1) / _texture_size;
 
-    float value = Texel(_spectrum, texture_coords).x; //vec2(texture_coords.x, _index * pixel_size.y)).x;
-    float gray = value;
+    float magnitude = Texel(_spectrum, texture_coords).x;
 
-    float cutoff = 0.6;
-    float ramp = 5;
-    value = value * (1 - gaussian_lowboost(value, cutoff, ramp));
-    gray = gray * gaussian_lowboost(value, cutoff, ramp);
-    float alpha = 1;
+    float step = 1 / _energy_size.x;
+    float energy =
+        //Texel(_energy, vec2(texture_coords.x + 2 * step, texture_coords.y)).x +
+        //Texel(_energy, vec2(texture_coords.x + 1 * step, texture_coords.y)).x +
+        Texel(_energy, vec2(texture_coords.x + 0 * step, texture_coords.y)).x +
+        Texel(_energy, vec2(texture_coords.x + -1 * step, texture_coords.y)).x
+    ;
 
-    vec3 result = hsv_to_rgb(vec3(value));
-    return vec4(result.xyz, 1);
+    energy = energy / 5;
+
+    if (_on == 1)
+    {
+        float step = 1 / _spectrum_size.x;
+        float before = Texel(_spectrum, vec2(texture_coords.x + 0, texture_coords.y)).x;
+        float now = Texel(_spectrum, vec2(texture_coords.x + step, texture_coords.y)).x;
+
+        // normalize weaker frequencies
+        float amplitude = 0.5;
+        float ramp = 4;
+        float weight = mix(
+            amplitude * gaussian_lowpass(texture_coords.y, ramp),           // high frequency normalization strength
+            amplitude * gaussian_lowpass(texture_coords.y + 0.4, ramp),     // mid frequency
+        0.5);
+
+        before = mix(before, before / energy, weight);
+        before = clamp(before, 0, 1);
+
+        now = mix(now, now / energy, weight);
+        now = clamp(now, 0, 1);
+
+        magnitude = now;
+
+        //float delta = magnitude - energy;
+        //magnitude *= (1 - gaussian_lowpass(delta, 1));
+    }
+
+    return vec4(vec3(magnitude), 1);
 }

@@ -34,8 +34,6 @@ function rt.AudioProcessorTransform(ft, window_size)
         local data_ptr = ffi.cast(self.ft._real_data_t, data:getFFIPointer())
         local from = ffi.cast(self.ft._real_data_t, self.fftw_real)
 
-        TODO safegarud against reading past end of data
-
         -- memcpy from data into fourier transform input
         ffi.copy(from, data_ptr + offset, self.window_size * ffi.sizeof("double"))
         self.ft._execute(self.plan_signal_to_spectrum)
@@ -48,16 +46,18 @@ function rt.AudioProcessorTransform(ft, window_size)
         local magnitude_out = {}
         local min = POSITIVE_INFINITY
         local max = NEGATIVE_INFINITY
+        local sum = 0
         for i = 1, half do
             local complex = ffi.cast(self.ft._complex_t, to[half - i - 1 - 1])
             local magnitude = rt.magnitude(complex[0], complex[1])
             magnitude = magnitude * normalize_factor -- project into [0, 1]
             min = math.min(min, magnitude)
             max = math.max(max, magnitude)
+            sum = sum + magnitude
             table.insert(magnitude_out, magnitude)
         end
 
-        return magnitude_out, min, max
+        return magnitude_out, min, max, sum
     end
 
     --- @param magnitude love.ByteData<double>
@@ -112,7 +112,7 @@ rt.AudioProcessor = meta.new_type("AudioProcessor", rt.SignalEmitter, function(i
             data:getSampleRate(),
             data:getBitDepth(),
             data:getChannelCount(),
-            8
+            3
         ),
         _playing = false,
         _buffer_offset = 0,     -- position of already queued buffers
