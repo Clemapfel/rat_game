@@ -67,6 +67,7 @@ rt.Spritesheet = meta.new_type("Spritesheet", rt.Texture, function(path, id)
     end
 
     local out = meta.new(rt.Spritesheet, {
+        _name = id,
         _config_path = config_path,
         _image_path = image_path,
         _name_to_frame = animations,

@@ -521,55 +521,6 @@ function meta.new_abstract_type(name, ...)
     return meta.new_type(name, splat(to_splat))
 end
 
---[[
-
---- @brief create a new type with given constructor, this also defines `meta.is_*` and `meta.assert_*` for typename
---- @param typename String
---- @param ctor Function
---- @vararg meta.Type
-function meta._new_type(typename, ctor, ...)
-    local out, metatable = meta._new("Type")
-    setmetatable(out, metatable)
-
-    rawset(metatable.properties, "_typename", typename)
-    rawset(metatable.properties, "_type_id", string.hash(typename))
-    rawset(metatable.properties, "_super", {...})
-
-    metatable.__call = function(self, ...)
-        local out = ctor(...)
-        if not meta.isa(out, self) then
-            rt.error("In " .. self._typename .. ".__call: Constructor does not return object of type `" .. self._typename .. "`.")
-        end
-        return out
-    end
-
-    if not meta.is_nil(meta.types[typename]) then
-        rt.error("In meta.new_type: A type with name `" .. typename .. "` already exists.")
-    end
-    meta.types[typename] = out
-    meta._define_type_assertion(typename)
-    return out
-end
-
---- @brief declare abstract type, this is a type that cannot be instanced
---- @param name String
---- @param fields Table
---- @vararg meta.Type
-function meta._new_abstract_type(name, fields, ...)
-    local out = meta.new_type(name, function()
-        rt.error("In " .. name .. "._call: Type `" .. name .. "` is abstract, it cannot be instanced")
-    end, ...)
-
-    if not meta.is_nil(table) then
-        for key, value in pairs(table) do
-            out[key] = value
-        end
-    end
-    return out
-end
-
-]]--
-
 --- @brief get all super types of instance or type
 function meta.get_supertypes(instance)
     return getmetatable(instance).super

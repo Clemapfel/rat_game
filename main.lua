@@ -1,6 +1,33 @@
 require("include")
 
-local processor = rt.AudioProcessor("assets/sound/test_sound_effect.mp3")
+local scene = ow.OverworldScene()
+
+-- TODO
+local spritesheet = rt.Spritesheet("assets/sprites/debug", "bouncy_ball")
+scene:add_entity(ow.OverworldSprite(spritesheet, "bounce"), 50, 75)
+-- TODO
+
+love.load = function()
+    love.window.setMode(800, 600, {
+        vsync = 1,
+        msaa = 8,
+        stencil = true,
+        resizable = true
+    })
+    love.window.setTitle("rat_game")
+    scene:realize()
+end
+
+love.draw = function()
+    love.graphics.clear(0.8, 0, 0.8, 1)
+    scene:draw()
+end
+
+love.update = function()
+    local delta = love.timer.getDelta()
+    scene:update(delta)
+end
+
 
 --[[
 local bins = {}
@@ -21,10 +48,10 @@ local magnitude_image, magnitude_texture, energy_image, energy_texture, texture_
 local active = false
 local min_energy = POSITIVE_INFINITY
 local max_energy = NEGATIVE_INFINITY
-local n_energy_bins = 4
+local n_energy_bins = 16
 
 local col_i = 0
-local processor = rt.AudioProcessor("assets/sound/test_sound_effect.mp3")
+local processor = rt.AudioProcessor("assets/sound/test_music_02.mp3")
 processor.on_update = function(magnitude, min, max, energy_sum)
 
     if is_empty(bins) then
@@ -46,7 +73,7 @@ processor.on_update = function(magnitude, min, max, energy_sum)
         magnitude_texture = love.graphics.newImage(magnitude_image)
 
         for texture in range(magnitude_texture, energy_texture) do
-            texture:setFilter("linear", "linear", 2)
+            texture:setFilter("nearest", "linear", 16)
             texture:setWrap("clampzero", "clampzero")
         end
 
@@ -119,7 +146,6 @@ processor.on_update = function(magnitude, min, max, energy_sum)
     --shader:send("_window_size", processor._window_size)
     col_i = col_i + 1
 end
-]]--
 
 rt.current_scene = rt.add_scene("debug")
 local scene = ow.OverworldScene()
@@ -145,7 +171,7 @@ end)
 -- ##
 
 love.load = function()
-    love.window.setMode(800, 600, {
+    love.window.setMode(1200, 800, {
         vsync = 1,
         msaa = 8,
         stencil = true,
@@ -159,16 +185,15 @@ love.draw = function()
     love.graphics.clear(0.8, 0, 0.8, 1)
     rt.current_scene:draw()
 
-    --[[
     shader:bind()
     texture_shape:draw()
     shader:unbind()
-    ]]--
 end
 
 love.update = function()
     local delta = love.timer.getDelta()
     rt.current_scene:update(delta)
-
     processor:update()
 end
+
+]]--

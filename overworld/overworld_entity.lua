@@ -1,22 +1,22 @@
+
 --- @class ow.OverworldEntity
-ow.OverworldEntity = meta.new_abstract_type("OverworldEntity", rt.Drawable, rt.Animation, rt.SignalEmitter)
+ow.OverworldEntity = meta.new_abstract_type("OverworldEntity", rt.Drawable, {
+    _position_x = 0,
+    _position_y = 0,
+    _is_realized = false,
+})
 
---- @overload called when player interacts with object
-function ow.OverworldEntity:on_interact() end
+--- @brief
+function ow.OverworldEntity:get_position()
+    return self._position_x, self._position_y
+end
 
---- @overload called when player intersects
-function ow.OverworldEntity:on_intersect() end
-
---- @overload
-function ow.OverworldEntity:draw() end
+--- @brief
+function ow.OverworldEntity:set_position(x, y)
+    self._position_x, self._position_y = x, y
+end
 
 --- @overload
 function ow.OverworldEntity:realize()
     rt.error("In ow.OverworldEntity:realize: abstract method called")
 end
-
---- @overload
-function ow.OverworldEntity:unrealize()
-    rt.error("In ow.OverworldEntity:unrealize: abstract method called")
-end
-

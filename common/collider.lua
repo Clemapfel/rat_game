@@ -249,7 +249,6 @@ function rt.Collider:set_allow_sleeping(b)
     self._body:isSleepingAllowed(b)
 end
 
-
 --- @brief
 function rt.Collider:destroy()
     self._body:destroy()

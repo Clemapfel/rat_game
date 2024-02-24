@@ -102,9 +102,9 @@ function rt.AudioProcessor:_signal_to_spectrum(data, offset, window_size)
 
         for i = 1, self._window_size do
             if offset + i < data_n then
-                from[i - 1] = ffi.cast("double", normalize(data_ptr[offset + i - 1]))
+                from[i - 1] = normalize(data_ptr[offset + i - 1])
             else
-                from[i - 1] = ffi.cast("double", 0)
+                from[i - 1] = 0
             end
         end
     else -- stereo
@@ -174,7 +174,7 @@ function rt.AudioProcessor:update()
 
         while self._n_transformed <= self._playing_offset do
             if self.on_update ~= nil then
-                self.on_update({1, 2, 3}) --self:_signal_to_spectrum(self._data, self._n_transformed, self._window_size))
+                self.on_update(self:_signal_to_spectrum(self._data, self._n_transformed, self._window_size))
             end
             self._n_transformed = self._n_transformed + self._window_size
         end

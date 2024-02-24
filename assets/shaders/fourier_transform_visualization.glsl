@@ -127,23 +127,25 @@ vec4 effect(vec4 color, Image tex, vec2 texture_coords, vec2 screen_coords)
             Texel(_spectrum, vec2(texture_coords.x - 1 * step, texture_coords.y)).x +
             Texel(_spectrum, vec2(texture_coords.x - 0 * step, texture_coords.y)).x;
         now = now / 2;
-        //float before = Texel(_spectrum, vec2(texture_coords.x - step, texture_coords.y)).x;
+
 
         float high_frequency_boost_weight = 0.9 * (1 - gaussian_lowpass(1 - texture_coords.y + 0.0, 0.9));
         float mid_fequency_boost_weight =   0.4 * (1 - gaussian_lowpass(1 - texture_coords.y + 0.6, 1.5));
         float low_frequency_boost_weight =  0.6 * (1 - gaussian_lowpass(1 - texture_coords.y + 1.0, 1.5));
 
-        float total_weight = (high_frequency_boost_weight + mid_fequency_boost_weight + low_frequency_boost_weight) / 3;
+        float total_offset = 1.1;
+        float total_weight = (total_offset * high_frequency_boost_weight + total_offset * mid_fequency_boost_weight + total_offset * low_frequency_boost_weight) / 3;
 
         magnitude = now;
         magnitude = mix(magnitude, magnitude / energy, total_weight);
 
         magnitude *= (1 - (1 * gaussian_lowpass(magnitude, 0.5)));
-
         magnitude = magnitude + 2 * gaussian_highpass(magnitude, 0.6);
     }
 
-    float gray = Texel(_spectrum, texture_coords).x;
+    float energy_delta = Texel(_energy, vec2(texture_coords.x + +1 * step, 1)).x - Texel(_energy, vec2(texture_coords.x + +0 * step, 1)).x;
+    energy_delta = clamp(-1 * energy_delta, 0, 1);
+    float gray = energy_delta * 0.5 * energy;
     float hsv = clamp(magnitude, 0, 1);
-    return vec4(hsv_to_rgb(vec3(clamp(hsv, 0.8, 1), 1, hsv)), 1);
+    return clamp(vec4(vec3(gray * 0.5) + hsv_to_rgb(vec3(clamp(hsv, 0.8, 1), 1, hsv)), 1), 0, 1);
 }

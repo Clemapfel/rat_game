@@ -1,57 +1,41 @@
---- @class CameraMode
-ow.CameraMode = meta.new_enum({
-    MANUAL = "MANUAL",
-    FOLLOW_PLAYER = "FOLLOW_PLAYER",
-    STATIONARY = "STATIONARY"
-})
-
---- @class
-ow.OverworldScene = meta.new_type("OverworldScene", rt.Widget, rt.Animation, function()
-    local map = ow.Map("debug_map", "assets/maps/debug")
+--- @class ow.OverworldScene
+ow.OverworldScene = meta.new_type("OverworldScene", function()
+    -- redundant tables for faster access and optimization
     local out = meta.new(ow.OverworldScene, {
-        _player = ow.Player(map._world),
-        _camera = ow.Camera(),
-        _camera_mode = ow.CameraMode.FOLLOW_PLAYER,
-        _camera_target_x = 0,
-        _camera_target_y = 0,
-        _map = map
+        _entities = {},     -- Table<ow.OverworldEntitiy>
+        _to_update = {},    -- Table<ow.OverEntity>
     })
+
+    meta.make_weak(out._to_update, true, true)
     return out
 end)
 
---- @overload
+--- @brief
 function ow.OverworldScene:realize()
-end
-
---- @overload
-function ow.OverworldScene:size_allocate(x, y, width, height)
+    for _, entity in pairs(self._entities) do
+        entity:realize()
+    end
 end
 
 --- @brief
-function ow.OverworldScene:set_camera_mode(mode)
-    meta.assert_enum(mode, ow.CameraMode)
-    self._camera_mode = mode
-end
-
---- @overload
-function ow.OverworldScene:draw()
-    if self._camera_mode == ow.CameraMode.FOLLOW_PLAYER then
-        self._camera:center_on(self._player:get_position())
+function ow.OverworldScene:add_entity(entity, x, y)
+    table.insert(self._entities, entity)
+    if meta.isa(entity, rt.Animation) then
+        table.insert(self._to_update, entity)
     end
-
-    self._camera:bind()
-    self._map:draw()
-    self._player:draw()
-    self._camera:unbind()
+    entity:set_position(which(x, 0), which(y, 0))
 end
 
---- @overload
+--- @brief
+function ow.OverworldScene:draw()
+    for _, entity in pairs(self._entities) do
+        entity:draw()
+    end
+end
+
+--- @brief
 function ow.OverworldScene:update(delta)
-    self._map:update(delta)
-    self._player:update(delta)
-end
-
---- @overload
-function ow.OverworldScene:size_allocate(x, y, width, height)
-
+    for _, entity in pairs(self._to_update) do
+        entity:update(delta)
+    end
 end
