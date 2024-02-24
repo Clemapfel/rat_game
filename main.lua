@@ -1,5 +1,8 @@
 require("include")
 
+local processor = rt.AudioProcessor("assets/sound/test_sound_effect.mp3")
+
+--[[
 local bins = {}
 local energy_bins = {}
 
@@ -21,7 +24,7 @@ local max_energy = NEGATIVE_INFINITY
 local n_energy_bins = 4
 
 local col_i = 0
-local processor = rt.AudioProcessor("test_music.mp3", "assets/sound")
+local processor = rt.AudioProcessor("assets/sound/test_sound_effect.mp3")
 processor.on_update = function(magnitude, min, max, energy_sum)
 
     if is_empty(bins) then
@@ -59,7 +62,7 @@ processor.on_update = function(magnitude, min, max, energy_sum)
         magnitude_image:release()
         magnitude_image = love.image.newImageData(texture_h, #bins, image_data_format)
         energy_image:release()
-        energy_image = love.image.newImageData(texture_h, 1, image_data_format)
+        energy_image = love.image.newImageData(texture_h, n_energy_bins, image_data_format)
         col_i = 0
     end
 
@@ -83,7 +86,6 @@ processor.on_update = function(magnitude, min, max, energy_sum)
     -- calculate energy
     local current_i = 1
     for bin_i = 1, n_energy_bins, 1 do
-        println(#compressed)
         local bin = math.floor(#compressed / n_energy_bins)
         local sum = 0
         local start = current_i
@@ -117,6 +119,7 @@ processor.on_update = function(magnitude, min, max, energy_sum)
     --shader:send("_window_size", processor._window_size)
     col_i = col_i + 1
 end
+]]--
 
 rt.current_scene = rt.add_scene("debug")
 local scene = ow.OverworldScene()
@@ -156,13 +159,16 @@ love.draw = function()
     love.graphics.clear(0.8, 0, 0.8, 1)
     rt.current_scene:draw()
 
+    --[[
     shader:bind()
     texture_shape:draw()
     shader:unbind()
+    ]]--
 end
 
 love.update = function()
     local delta = love.timer.getDelta()
     rt.current_scene:update(delta)
+
     processor:update()
 end

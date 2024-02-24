@@ -139,6 +139,8 @@ vec4 effect(vec4 color, Image tex, vec2 texture_coords, vec2 screen_coords)
         magnitude = mix(magnitude, magnitude / energy, total_weight);
 
         magnitude *= (1 - (1 * gaussian_lowpass(magnitude, 0.5)));
+
+        magnitude = magnitude + 2 * gaussian_highpass(magnitude, 0.6);
     }
 
     float gray = Texel(_spectrum, texture_coords).x;

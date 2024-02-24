@@ -33,7 +33,6 @@ mesh = nil
 function set_polyhedron(n_steps)
 
     n_steps = clamp(1, n_steps)
-    println(n_steps)
 
     local vertices = {}
     local lower, upper = rt.degrees(-180):as_radians(), rt.degrees(180):as_radians()

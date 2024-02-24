@@ -163,10 +163,8 @@ function rt.test.fourier_transform()
 
     clock = rt.Clock()
     transform:compute_from_audio(audio, 1024, 128, 1, nil)
-    println("transform: ", clock:restart():as_seconds())
 
     image = transform:as_image()
-    println("image: ", clock:restart():as_seconds())
 
     display = rt.ImageDisplay(image)
     rt.current_scene:set_child(display)
