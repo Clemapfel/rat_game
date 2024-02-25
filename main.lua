@@ -5,7 +5,7 @@ rt.current_scene = ow.OverworldScene()
 -- TODO
 local spritesheet = rt.Spritesheet("assets/sprites/debug", "bouncy_ball")
 
-for i = 1, 1500 do
+for i = 1, 100 do
     local x, y = rt.random.integer(50, 800 - 200), rt.random.integer(50, 600 - 200)
     rt.current_scene:add_entity(ow.OverworldSprite(spritesheet, "bounce"), x, y)
 end
@@ -33,14 +33,19 @@ end
 love.draw = function()
     love.graphics.clear(0.8, 0, 0.8, 1)
     rt.current_scene:draw()
+
+    do -- show fps
+        local fps = tostring(love.timer.getFPS())
+        local margin = 3
+        love.graphics.setColor(1, 1, 1, 0.75)
+        love.graphics.print(fps, love.graphics.getWidth() - love.graphics.getFont():getWidth(fps) - 2 * margin, 0.5 * margin)
+    end
 end
 
 love.update = function()
     local delta = love.timer.getDelta()
     rt.AnimationHandler:update(delta)
     rt.current_scene:update(delta)
-
-    love.window.setTitle("rat_game (" .. love.timer.getFPS() .. ")")
 end
 
 love.quit = function()
