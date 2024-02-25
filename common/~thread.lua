@@ -7,7 +7,7 @@ rt.MessageType = meta.new_enum({
     SET = "SET",            -- master -> thread: set a thread-side global with master-side value
     GET = "GET",            -- master -> thread: request thread-side value
     RETURN = "RETURN",      -- thread -> master: send `GET` request thread -> master
-    KILL = "KILL"          -- master -> thread: cause termination
+    KILL = "KILL"           -- master -> thread: cause termination
 })
 
 rt.ThreadPool = meta.new_type("ThreadPool", function()
