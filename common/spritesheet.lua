@@ -67,7 +67,8 @@ rt.Spritesheet = meta.new_type("Spritesheet", rt.Texture, function(path, id)
     end
 
     local out = meta.new(rt.Spritesheet, {
-        _name = id,
+        _id = id,
+        _name = config.name,
         _config_path = config_path,
         _image_path = image_path,
         _name_to_frame = animations,
@@ -78,14 +79,10 @@ rt.Spritesheet = meta.new_type("Spritesheet", rt.Texture, function(path, id)
         _fps = fps
     })
 
-    out.name = name
-
     out:set_scale_mode(rt.TextureScaleMode.NEAREST)
     out:set_wrap_mode(rt.TextureWrapMode.REPEAT)
     return out
 end)
-
-rt.Spritesheet.name = ""
 
 --- @brief [internal] check whether spritesheet has animation with given id
 --- @param scope String scope for error message
@@ -105,12 +102,10 @@ end
 
 --- @brief get bounds of frame
 --- @param animation_id String
---- @param index_maybe Number
 --- @return rt.AxisAlignedRectangle
-function rt.Spritesheet:get_frame(animation_id, index_maybe)
-    self:_assert_has_animation("Spritesheet.get_frame", animation_id)
+function rt.Spritesheet:get_frame(animation_id, frame_i)
     local start_end = self._name_to_frame[animation_id]
-    local i = (start_end[1] - 1) + (index_maybe - 1)
+    local i = (start_end[1] - 1) + (frame_i - 1)
     return rt.AABB(i / self._n_frames, 0, 1 / self._n_frames, 1)
 end
 
@@ -118,7 +113,6 @@ end
 --- @param animation_id String
 --- @return (Number, Number)
 function rt.Spritesheet:get_frame_size(animation_id)
-    self:_assert_has_animation("Spritesheet.get_frame_size", animation_id)
     return self._frame_width, self._frame_height
 end
 
@@ -126,7 +120,6 @@ end
 --- @param animation_id String
 --- @return Number
 function rt.Spritesheet:get_frame_height(animation_id)
-    self:_assert_has_animation("Spritesheet.get_frame_size", animation_id)
     return self._frame_height
 end
 
@@ -134,7 +127,6 @@ end
 --- @param animation_id String
 --- @return Number
 function rt.Spritesheet:get_frame_width(animation_id)
-    self:_assert_has_animation("Spritesheet.get_frame_size", animation_id)
     return self._frame_width
 end
 
@@ -142,7 +134,6 @@ end
 --- @param animation_id String
 --- @return Number
 function rt.Spritesheet:get_n_frames(animation_id)
-    self:_assert_has_animation("Spritesheet.get_n_frames", animation_id)
     local start_end = self._name_to_frame[animation_id]
     return start_end[2] - start_end[1] + 1
 end

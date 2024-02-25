@@ -426,7 +426,7 @@ rt.InputController = meta.new_type("InputController", rt.SignalEmitter, function
 
         local current = self._state[rt.InputButton.A]
         self._state[rt.InputButton.A] = true
-        if current == false and not self._is_disabled and rt.aabb_contains(self._instance:get_bounds(), x, y) then
+        if current == false and not self._is_disabled and (meta.is_nil(self._instance) or rt.aabb_contains(self._instance:get_bounds(), x, y)) then
             self:signal_emit("pressed", rt.InputButton.A)
         end
     end, out)
@@ -435,7 +435,7 @@ rt.InputController = meta.new_type("InputController", rt.SignalEmitter, function
 
         local current = self._state[rt.InputButton.A]
         self._state[rt.InputButton.A] = false
-        if current == true and not self._is_disabled and rt.aabb_contains(self._instance:get_bounds(), x, y) then
+        if current == true and not self._is_disabled and (meta.is_nil(self._instance) or rt.aabb_contains(self._instance:get_bounds(), x, y)) then
             self:signal_emit("released", rt.InputButton.A)
         end
     end, out)

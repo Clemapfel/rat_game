@@ -8,6 +8,7 @@ rt.AnimationHandler = meta.new_type("AnimationHandler", function()
     meta.make_weak(out._components, false, true)
     return out
 end)
+rt.AnimationHandler = rt.AnimationHandler() -- singleton instance
 
 rt.settings.animation = {
     fps = 60,
@@ -17,7 +18,6 @@ rt.settings.animation = {
 --- @brief [internal] update all Animations
 --- @param delta Number seconds
 function rt.AnimationHandler:update(delta)
-
     local elapsed = self._elapsed + delta
     local frame_length = 1 / rt.settings.animation.fps
     while elapsed >= frame_length do
@@ -52,14 +52,13 @@ end
 --- @brief set whether animation is active
 --- @param b Boolean
 function rt.Animation:set_is_animated(b)
-
     if b == self._is_animated then return end
     self._is_animated = b
 
     if b then
-        rt.current_scene.animation_handler._components[meta.hash(self)] = self
+        rt.AnimationHandler._components[meta.hash(self)] = self
     else
-        rt.current_scene.animation_handler._components[meta.hash(self)] = nil
+        rt.AnimationHandler._components[meta.hash(self)] = nil
     end
 end
 

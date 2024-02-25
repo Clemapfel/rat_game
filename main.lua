@@ -1,11 +1,30 @@
 require("include")
 
-local scene = ow.OverworldScene()
+rt.current_scene = ow.OverworldScene()
 
 -- TODO
 local spritesheet = rt.Spritesheet("assets/sprites/debug", "bouncy_ball")
-scene:add_entity(ow.OverworldSprite(spritesheet, "bounce"), 50, 75)
+
+for i = 1, 1 do
+    local x, y = rt.random.integer(50, 800 - 200), rt.random.integer(50, 600 - 200)
+    rt.current_scene:add_entity(ow.OverworldSprite(spritesheet, "bounce"), x, y)
+end
+
+sprite = ow.OverworldSprite(spritesheet, "bounce")
+sprite:set_position(400, 300)
+sprite:realize()
+rt.current_scene:add_entity(sprite)
+
 -- TODO
+
+local input_component = rt.InputController()
+input_component:signal_connect("pressed", function(self, which)
+    if which == rt.InputButton.UP then
+        sprite:set_frame(sprite:get_frame() + 1)
+    elseif which == rt.InputButton.DOWN then
+        sprite:set_frame(sprite:get_frame() - 1)
+    end
+end)
 
 love.load = function()
     love.window.setMode(800, 600, {
@@ -15,17 +34,24 @@ love.load = function()
         resizable = true
     })
     love.window.setTitle("rat_game")
-    scene:realize()
+    rt.current_scene:realize()
 end
 
 love.draw = function()
     love.graphics.clear(0.8, 0, 0.8, 1)
-    scene:draw()
+    rt.current_scene:draw()
 end
 
 love.update = function()
     local delta = love.timer.getDelta()
-    scene:update(delta)
+    rt.AnimationHandler:update(delta)
+    rt.current_scene:update(delta)
+
+    love.window.setTitle("rat_game (" .. love.timer.getFPS() .. ")")
+end
+
+love.quit = function()
+
 end
 
 

@@ -164,7 +164,7 @@ end)
 --- @param key String
 function rt.KeyboardHandler.handle_key_pressed(key)
     for _, component in pairs(rt.KeyboardHandler._components) do
-        if component.instance:get_has_focus() then
+        if meta.is_nil(component.instance) or component.instance:get_has_focus() then
             component:signal_emit("key_pressed", key)
         end
     end
@@ -175,7 +175,7 @@ love.keypressed = function(key) rt.KeyboardHandler.handle_key_pressed(key) end
 --- @param key String
 function rt.KeyboardHandler.handle_key_released(key)
     for _, component in pairs(rt.KeyboardHandler._components) do
-        if component.instance:get_has_focus() then
+        if meta.is_nil(component.instance) or component.instance:get_has_focus() then
             component:signal_emit("key_released", key)
         end
     end

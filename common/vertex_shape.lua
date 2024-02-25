@@ -389,6 +389,16 @@ function rt.VertexCircle(x, y, x_radius, y_radius, n_outer_vertices)
     return out
 end
 
+--- @brief
+function rt.VertexShape:reformat(...)
+    local coords = {...}
+    local vertex_i = 1
+    for i = 1, #coords, 2 do
+        self:set_vertex_position(vertex_i, coords[i], coords[i+1])
+        vertex_i = vertex_i + 1
+    end
+end
+
 --- @brief test VertexShape
 function rt.test.vertex_shape()
     error("TODO")
