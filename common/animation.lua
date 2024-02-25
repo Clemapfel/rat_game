@@ -1,3 +1,7 @@
+rt.settings.animation_handler = {
+    fps = 60
+}
+
 --- @class rt.AnimationHandler
 rt.AnimationHandler = meta.new_type("AnimationHandler", function()
     local out = meta.new(rt.AnimationHandler, {
@@ -10,10 +14,6 @@ rt.AnimationHandler = meta.new_type("AnimationHandler", function()
 end)
 rt.AnimationHandler = rt.AnimationHandler() -- singleton instance
 
-rt.settings.animation_handler = {
-    fps = 60
-}
-
 --- @brief [internal] update all Animations
 --- @param delta Number seconds
 function rt.AnimationHandler:update(delta)
@@ -21,7 +21,7 @@ function rt.AnimationHandler:update(delta)
     local frame_duration = 1 / rt.settings.animation_handler.fps
     while self._elapsed >= frame_duration do
         self._elapsed = self._elapsed - frame_duration
-        for _, drawable in pairs(self._components) do
+        for _, drawable in _G._pairs(self._components) do
             drawable:update(frame_duration)
         end
     end
