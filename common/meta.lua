@@ -288,13 +288,13 @@ function meta._install_super(super)
     if metatable.super[super._typename] ~= true then
         metatable.super[super._typename] = true
         for key, value in _G._pairs(super[1][1]) do  -- getmetatable(super).properties
-            if metatable[1][key] == nil then
+            if metatable[1][key] == nil then -- properties[key]
                 metatable[1][key] = value
             end
         end
 
         for _, supersuper in _G._pairs(super._super) do
-            install_super(supersuper)
+            meta._install_super(supersuper)
         end
     end
 end
