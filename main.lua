@@ -5,24 +5,17 @@ rt.current_scene = ow.OverworldScene()
 -- TODO
 local spritesheet = rt.Spritesheet("assets/sprites/debug", "bouncy_ball")
 
-for i = 1, 1 do
+for i = 1, 1000 do
     local x, y = rt.random.integer(50, 800 - 200), rt.random.integer(50, 600 - 200)
     rt.current_scene:add_entity(ow.OverworldSprite(spritesheet, "bounce"), x, y)
 end
-
-sprite = ow.OverworldSprite(spritesheet, "bounce")
-sprite:set_position(400, 300)
-sprite:realize()
-rt.current_scene:add_entity(sprite)
 
 -- TODO
 
 local input_component = rt.InputController()
 input_component:signal_connect("pressed", function(self, which)
     if which == rt.InputButton.UP then
-        sprite:set_frame(sprite:get_frame() + 1)
     elseif which == rt.InputButton.DOWN then
-        sprite:set_frame(sprite:get_frame() - 1)
     end
 end)
 

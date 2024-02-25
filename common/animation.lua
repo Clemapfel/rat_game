@@ -10,28 +10,21 @@ rt.AnimationHandler = meta.new_type("AnimationHandler", function()
 end)
 rt.AnimationHandler = rt.AnimationHandler() -- singleton instance
 
-rt.settings.animation = {
-    fps = 60,
-    enabled = true
+rt.settings.animation_handler = {
+    fps = 60
 }
 
 --- @brief [internal] update all Animations
 --- @param delta Number seconds
 function rt.AnimationHandler:update(delta)
-    local elapsed = self._elapsed + delta
-    local frame_length = 1 / rt.settings.animation.fps
-    while elapsed >= frame_length do
-        elapsed = elapsed - frame_length
-        local now = love.timer.getTime()
-        if rt.settings.animation.enabled then
-            local delta = now - self._last_update
-            for _, drawable in pairs(self._components) do
-                drawable:update(delta)
-            end
+    self._elapsed = self._elapsed + delta
+    local frame_duration = 1 / rt.settings.animation_handler.fps
+    while self._elapsed >= frame_duration do
+        self._elapsed = self._elapsed - frame_duration
+        for _, drawable in pairs(self._components) do
+            drawable:update(frame_duration)
         end
-        self._last_update = now
     end
-    self._elapsed = elapsed
 end
 
 --- @class rt.Animation

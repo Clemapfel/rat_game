@@ -39,7 +39,6 @@ end)
 --- @param y Number
 function rt.MouseController:is_cursor_in_bounds(x, y)
     if meta.is_nil(self.instance) then return true end
-
     local bounds = self.instance:get_bounds()
     return x >= bounds.x and x <= bounds.x + bounds.width and y >= bounds.y and y <= bounds.y + bounds.height
 end
