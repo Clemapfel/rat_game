@@ -514,6 +514,8 @@ _range_iterator = function(state)
     return state[index], state
 end
 
+if utf8 == nil then utf8 = require "utf8" end
+
 --- @brief
 function utf8.sub(str, i, j)
     i = utf8.offset(str, i)

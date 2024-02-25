@@ -2,7 +2,7 @@
 meta = {}
 meta.types = {}
 
-if _G._pairs == nil then _G._pairs = pairs end
+--if pairs == nil then pairs = pairs end
 
 --- @brief is x a lua string?
 --- @param x any
@@ -85,7 +85,7 @@ function meta._new(typename)
     end
 
     metatable.__pairs = function(self)
-        return _G._pairs(self[1][1])
+        return pairs(self[1][1])
     end
 
     setmetatable(out, metatable)
@@ -115,7 +115,7 @@ end
 --- @brief check if instance has type as super
 function meta.inherits(x, super)
     if meta.is_object(x) then
-        for _, name in _G._pairs(x[1].super) do
+        for _, name in pairs(x[1].super) do
             if name == super._typename then
                 return true
             end
@@ -239,7 +239,7 @@ end
 --- @return Table
 function meta.get_property_names(x)
     local out = {}
-    for name, _ in _G._pairs(x[1][1]) do
+    for name, _ in pairs(x[1][1]) do
         table.insert(out, name)
     end
     return out
@@ -261,7 +261,7 @@ end
 --- @param x meta.Type
 --- @param properties Table
 function meta.add_properties(x, properties)
-    for name, value in _G._pairs(properties) do
+    for name, value in pairs(properties) do
         meta.install_property(x, name, value)
     end
 end
@@ -287,13 +287,13 @@ meta.Object = "Object"
 function meta._install_super(super)
     if metatable.super[super._typename] ~= true then
         metatable.super[super._typename] = true
-        for key, value in _G._pairs(super[1][1]) do  -- getmetatable(super).properties
+        for key, value in pairs(super[1][1]) do  -- getmetatable(super).properties
             if metatable[1][key] == nil then -- properties[key]
                 metatable[1][key] = value
             end
         end
 
-        for _, supersuper in _G._pairs(super._super) do
+        for _, supersuper in pairs(super._super) do
             meta._install_super(supersuper)
         end
     end
@@ -307,12 +307,12 @@ function meta.new(type, fields)
     metatable[2] = true -- out:set_mutable
 
     if fields ~= nil then
-        for name, value in _G._pairs(fields) do
+        for name, value in pairs(fields) do
             metatable[1][name] = value
         end
     end
 
-    for key, value in _G._pairs(type[1][1]) do   -- getmetatable(type).properties
+    for key, value in pairs(type[1][1]) do   -- getmetatable(type).properties
         metatable[1][key] = value
     end
 
@@ -341,7 +341,7 @@ function meta.new_enum(fields)
     end
 
     metatable.__pairs = function(this)
-        return _G._pairs(this[1][1])
+        return pairs(this[1][1])
     end
     metatable.__ipairs = function(this)
         return ipairs(this[1][1])
@@ -372,7 +372,7 @@ end
 --- @param x any
 --- @param enum meta.Enum
 function meta.is_enum_value(x, enum)
-    for _, value in _G._pairs(enum) do
+    for _, value in pairs(enum) do
         if x == value then
             return true
         end
@@ -448,7 +448,7 @@ function meta.new_type(typename, ...)
 
     local super, fields, ctor = {}, {}, nil
     local fields_seen, ctor_seen = false, false
-    for _, value in _G._pairs({...}) do
+    for _, value in pairs({...}) do
         if meta.isa(value, meta.Type) then
             table.insert(super, value)
         elseif meta.is_function(value) then
@@ -492,7 +492,7 @@ function meta.new_type(typename, ...)
     meta.types[typename] = out
     meta._define_type_assertion(typename)
 
-    for key, value in _G._pairs(fields) do
+    for key, value in pairs(fields) do
         meta.install_property(out, key, value)
     end
     return out
@@ -584,7 +584,7 @@ function meta.serialize(x, skip_functions)
     skip_functions = which(skip_functions, true)
     local out = {}
     table.insert(out, "#" .. tostring(meta.hash(x)) .. " = {\n")
-    for key, value in _G._pairs(x[1][1]) do
+    for key, value in pairs(x[1][1]) do
         if not meta.is_function(value) then
             table.insert(out, "\t" .. tostring(key)  .. " = " .. serialize(value) .. "\n")
         end

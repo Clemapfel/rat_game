@@ -1,6 +1,5 @@
 --- @class ow.OverworldScene
 ow.OverworldScene = meta.new_type("OverworldScene", function()
-    -- redundant tables for faster access and optimization
     local out = meta.new(ow.OverworldScene, {
         _entities = {},     -- Table<ow.OverworldEntitiy>
     })
@@ -22,12 +21,12 @@ end
 
 --- @brief
 function ow.OverworldScene:draw()
-    for _, entity in _G._pairs(self._entities) do
+    for _, entity in pairs(self._entities) do
         entity:draw()
     end
 end
 
 --- @brief
 function ow.OverworldScene:update(delta)
-    -- entites are updated automatically through rt.Animation
+    -- entities are updated automatically through rt.Animation
 end

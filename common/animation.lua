@@ -21,7 +21,7 @@ function rt.AnimationHandler:update(delta)
     local frame_duration = 1 / rt.settings.animation_handler.fps
     while self._elapsed >= frame_duration do
         self._elapsed = self._elapsed - frame_duration
-        for _, drawable in _G._pairs(self._components) do
+        for _, drawable in pairs(self._components) do
             drawable:update(frame_duration)
         end
     end
