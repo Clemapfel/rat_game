@@ -2,6 +2,8 @@
 meta = {}
 meta.types = {}
 
+if _G._pairs == nil then _G._pairs = pairs end
+
 --- @brief is x a lua string?
 --- @param x any
 function meta.is_string(x)
@@ -49,28 +51,29 @@ meta._hash = 1
 --- @brief [internal] Create new empty object
 --- @param typename String
 function meta._new(typename)
+    -- uses indices instead of proper names or getmetatable for micro optimization
     local out = {}
-    out[1] = {}         -- for optimization
+    out[1] = {}  -- metatable
     metatable = out[1]
 
     metatable.__name = typename._typename
     metatable.__hash = meta._hash
     meta._hash = meta._hash + 1
-    metatable.properties = {}
-    metatable.is_mutable = true
-    metatable.super = {}
+    metatable[1] = {}       -- properties
+    metatable[2] = true     -- is_mutable
     metatable.components = {}
+    metatable.super = {}
 
     metatable.__index = function(this, property_name)
-        return this[1].properties[property_name]
+        return this[1][1][property_name]
     end
 
     metatable.__newindex = function(this, property_name, property_value)
         local metatable = this[1]
-        if not metatable.is_mutable then
+        if not metatable[2] then
             rt.error("In " .. metatable.__name .. ".__newindex: Cannot set property `" .. property_name .. "`, because the object was declared immutable.")
         end
-        metatable.properties[property_name] = property_value
+        metatable[1][property_name] = property_value
     end
 
     metatable.__tostring = function(this)
@@ -82,7 +85,7 @@ function meta._new(typename)
     end
 
     metatable.__pairs = function(self)
-        return pairs(self[1].properties)
+        return _G._pairs(self[1][1])
     end
 
     setmetatable(out, metatable)
@@ -112,7 +115,7 @@ end
 --- @brief check if instance has type as super
 function meta.inherits(x, super)
     if meta.is_object(x) then
-        for _, name in pairs(x[1].super) do
+        for _, name in _G._pairs(x[1].super) do
             if name == super._typename then
                 return true
             end
@@ -215,12 +218,12 @@ end
 --- @param x meta.Object
 --- @param property_name String
 function meta.uninstall_property(x, property_name)
-    x[1].properties[property_name] = nil
+    x[1][1][property_name] = nil
 end
 
 --- @brief add property after construction
 function meta.install_property(x, name, value)
-    x[1].properties[name] = value
+    x[1][1][name] = value
 end
 
 --- @brief get whether property is installed
@@ -228,7 +231,7 @@ end
 --- @param property_name String
 --- @return Boolean
 function meta.has_property(x, property_name)
-    return not meta.is_nil(x[1].properties[property_name])
+    return not meta.is_nil(x[1][1][property_name])
 end
 
 --- @brief get list of all property names
@@ -236,7 +239,7 @@ end
 --- @return Table
 function meta.get_property_names(x)
     local out = {}
-    for name, _ in pairs(x[1].properties) do
+    for name, _ in _G._pairs(x[1][1]) do
         table.insert(out, name)
     end
     return out
@@ -245,20 +248,20 @@ end
 --- @brief get single property
 --- @return Table
 function meta.get_property(x, name)
-    return x[1].properties[name]
+    return x[1][1][name]
 end
 
 --- @brief get list of properties
 --- @return Table
 function meta.get_properties(x)
-    return x[1].properties
+    return x[1][1]
 end
 
 --- @brief add list of properties, useful for types
 --- @param x meta.Type
 --- @param properties Table
 function meta.add_properties(x, properties)
-    for name, value in pairs(properties) do
+    for name, value in _G._pairs(properties) do
         meta.install_property(x, name, value)
     end
 end
@@ -267,60 +270,53 @@ end
 --- @param x meta.Object
 --- @param b Boolean
 function meta.set_is_mutable(x, b)
-    x[1].is_mutable = b
+    x[1][2] = b
 end
 
 --- @brief check if object is immutable
 --- @param x meta.Object
 --- @return Boolean
 function meta.get_is_mutable(x)
-    return x[1].is_mutable
+    return x[1][2]
 end
 
 --- @class meta.Object
 meta.Object = "Object"
 
+--- @brief [internal] recursively install all types and super types of types, used in meta.new
+function meta._install_super(super)
+    if metatable.super[super._typename] ~= true then
+        metatable.super[super._typename] = true
+        for key, value in _G._pairs(super[1][1]) do  -- getmetatable(super).properties
+            if metatable[1][key] == nil then
+                metatable[1][key] = value
+            end
+        end
+
+        for _, supersuper in _G._pairs(super._super) do
+            install_super(supersuper)
+        end
+    end
+end
+
 --- @brief create a new object instance
 --- @param type meta.Type
 --- @param fields Table property_name -> property_value
-function meta.new(type, fields, vararg)
-    -- TODO
-    meta.assert_nil(vararg)
-
-    if meta.is_nil(fields) then
-        fields = {}
-    end
-
+function meta.new(type, fields)
     out, metatable = meta._new(type)
-    meta.set_is_mutable(out, true)
+    metatable[2] = true -- out:set_mutable
 
-    if meta.is_table(fields) then
-        for name, value in pairs(fields) do
-            metatable.properties[name] = value
+    if fields ~= nil then
+        for name, value in _G._pairs(fields) do
+            metatable[1][name] = value
         end
     end
 
-    for key, value in pairs(getmetatable(type).properties) do
-        metatable.properties[key] = value
+    for key, value in _G._pairs(type[1][1]) do   -- getmetatable(type).properties
+        metatable[1][key] = value
     end
 
-    -- recursively install all types and super types of types
-    local function install_super(super)
-        if metatable.super[super._typename] ~= true then
-            metatable.super[super._typename] = true
-            for key, value in pairs(getmetatable(super).properties) do
-                if metatable.properties[key] == nil then
-                    metatable.properties[key] = value
-                end
-            end
-
-            for _, supersuper in pairs(super._super) do
-                install_super(supersuper)
-            end
-        end
-    end
-
-    install_super(type)
+    meta._install_super(type)
     return out
 end
 
@@ -337,21 +333,21 @@ function meta.new_enum(fields)
     local out, metatable = meta._new(meta.Enum)
 
     local i = 0
-    for name, value in pairs(fields) do
+    for name, value in _G.pairs(fields) do
         if meta.is_table(value) then
             rt.error("In meta.new_enum: Enum value for key `" .. name .. "` is a `" .. meta.typeof(value) .. "`, which is not a primitive.")
         end
-        metatable.properties[name] = value
+        metatable[1][name] = value
     end
 
     metatable.__pairs = function(this)
-        return pairs(this[1].properties)
+        return _G._pairs(this[1][1])
     end
     metatable.__ipairs = function(this)
-        return ipairs(this[1].properties)
+        return ipairs(this[1][1])
     end
     metatable.__index = function(this, key)
-        return this[1].properties[key]
+        return this[1][1][key]
     end
 
     meta.set_is_mutable(out, false)
@@ -376,7 +372,7 @@ end
 --- @param x any
 --- @param enum meta.Enum
 function meta.is_enum_value(x, enum)
-    for _, value in pairs(enum) do
+    for _, value in _G._pairs(enum) do
         if x == value then
             return true
         end
@@ -389,7 +385,7 @@ end
 --- @param enum meta.Enum
 function meta.assert_enum(x, enum)
     if not meta.is_enum_value(x, enum) then
-        rt.error("In assert_enum: Value `" .. meta.typeof(x) .. "` is not a value of enum `" .. serialize(enum[1].properties) .. "`")
+        rt.error("In assert_enum: Value `" .. meta.typeof(x) .. "` is not a value of enum `" .. serialize(enum[1][1]) .. "`")
     end
 end
 
@@ -452,7 +448,7 @@ function meta.new_type(typename, ...)
 
     local super, fields, ctor = {}, {}, nil
     local fields_seen, ctor_seen = false, false
-    for _, value in pairs({...}) do
+    for _, value in _G._pairs({...}) do
         if meta.isa(value, meta.Type) then
             table.insert(super, value)
         elseif meta.is_function(value) then
@@ -472,9 +468,9 @@ function meta.new_type(typename, ...)
         end
     end
 
-    metatable.properties._typename = typename
-    metatable.properties._type_id = string.hash(typename)
-    metatable.properties._super = which(super, {})
+    metatable[1]._typename = typename
+    metatable[1]._type_id = string.hash(typename)
+    metatable[1]._super = which(super, {})
 
     if not meta.is_nil(ctor) then
         -- custom constructor
@@ -496,7 +492,7 @@ function meta.new_type(typename, ...)
     meta.types[typename] = out
     meta._define_type_assertion(typename)
 
-    for key, value in pairs(fields) do
+    for key, value in _G._pairs(fields) do
         meta.install_property(out, key, value)
     end
     return out
@@ -588,7 +584,7 @@ function meta.serialize(x, skip_functions)
     skip_functions = which(skip_functions, true)
     local out = {}
     table.insert(out, "#" .. tostring(meta.hash(x)) .. " = {\n")
-    for key, value in pairs(x[1].properties) do
+    for key, value in _G._pairs(x[1][1]) do
         if not meta.is_function(value) then
             table.insert(out, "\t" .. tostring(key)  .. " = " .. serialize(value) .. "\n")
         end

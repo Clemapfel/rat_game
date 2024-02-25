@@ -10,25 +10,25 @@ end)
 --- @brief [internal] access signal component
 --- @param object meta.Object
 function rt.get_signal_component(object)
-    return getmetatable(object).components.signal
+    return object[1].components.signal
 end
 
 --- @brief add a signal component to object, use `object.signal:add_signal` to add new signals
 --- @param object meta.Object
 function rt.add_signal_component(object)
-    if not meta.is_nil(getmetatable(object).components.signal) then
+    if not meta.is_nil(object[1].components.signal) then
         rt.error("In add_signal_component: Object already has a signal component")
     end
 
     local component = rt.SignalComponent(object)
-    getmetatable(object).components.signal = component
+    object[1].components.signal = component
     return component
 end
 
 --- @brief access signal component
 --- @return rt.SignalComponent
 function rt.get_signal_component(object)
-    return getmetatable(object).components.signal
+    return object[1].components.signal
 end
 
 --- @brief [internal] initialize signal of given name
