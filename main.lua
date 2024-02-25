@@ -8,7 +8,7 @@ local spritesheet = rt.Spritesheet("assets/sprites/debug", "bouncy_ball")
 
 for i = 1, 100 do
     local x, y = rt.random.integer(50, 800 - 200), rt.random.integer(50, 600 - 200)
-    rt.current_scene:add_entity(ow.OverworldSprite(spritesheet, "bounce"), x, y)
+    rt.current_scene:add_entity(ow.OverworldSprite(spritesheet, "bounce"), x, y, rt.random.integer(-5, 5))
 end
 
 local main_to_worker_channel, worker_to_main_channel = love.thread.newChannel(), love.thread.newChannel()

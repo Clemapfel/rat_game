@@ -1,5 +1,5 @@
 rt.settings.overworld.player = {
-    radius = 32 / 2.5,
+    radius = 32 / 2,
     mass = 0,
     velocity = 250,
     sprinting_velocity_factor = 2,
