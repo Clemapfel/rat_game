@@ -1,6 +1,9 @@
 require("include")
 
 rt.current_scene = ow.OverworldScene()
+player = ow.Player(rt.current_scene._world, 0, 0)
+player:realize()
+
 
 -- TODO
 local spritesheet = rt.Spritesheet("assets/sprites/debug", "bouncy_ball")
@@ -36,7 +39,6 @@ println(t.result)
 local input_component = rt.InputController()
 input_component:signal_connect("pressed", function(self, which)
     if which == rt.InputButton.A then
-        channel:supply("test")
     elseif which == rt.InputButton.UP then
     elseif which == rt.InputButton.DOWN then
     end
@@ -57,6 +59,8 @@ love.draw = function()
     love.graphics.clear(0.8, 0, 0.8, 1)
     rt.current_scene:draw()
 
+    player:draw()
+
     do -- show fps
         local fps = tostring(love.timer.getFPS())
         local margin = 3
@@ -69,6 +73,8 @@ love.update = function()
     local delta = love.timer.getDelta()
     rt.AnimationHandler:update(delta)
     rt.current_scene:update(delta)
+
+    player:update(delta)
 end
 
 love.quit = function()

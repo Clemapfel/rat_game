@@ -1,6 +1,7 @@
 --- @class ow.OverworldScene
 ow.OverworldScene = meta.new_type("OverworldScene", function()
     local out = meta.new(ow.OverworldScene, {
+        _world = rt.PhysicsWorld(0, 0),
         _entities = {},     -- Table<ow.OverworldEntitiy>
     })
     return out
@@ -28,5 +29,6 @@ end
 
 --- @brief
 function ow.OverworldScene:update(delta)
+    self._world:update(delta)
     -- entities are updated automatically through rt.Animation
 end
