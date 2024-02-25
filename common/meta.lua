@@ -50,8 +50,8 @@ meta._hash = 1
 --- @param typename String
 function meta._new(typename)
     local out = {}
-    out.__metatable = {}
-    metatable = out.__metatable
+    out[1] = {}         -- for optimization
+    metatable = out[1]
 
     metatable.__name = typename._typename
     metatable.__hash = meta._hash
@@ -62,11 +62,11 @@ function meta._new(typename)
     metatable.components = {}
 
     metatable.__index = function(this, property_name)
-        return getmetatable(this).properties[property_name]
+        return this[1].properties[property_name]
     end
 
     metatable.__newindex = function(this, property_name, property_value)
-        local metatable = getmetatable(this)
+        local metatable = this[1]
         if not metatable.is_mutable then
             rt.error("In " .. metatable.__name .. ".__newindex: Cannot set property `" .. property_name .. "`, because the object was declared immutable.")
         end
@@ -74,18 +74,18 @@ function meta._new(typename)
     end
 
     metatable.__tostring = function(this)
-        return "(" .. getmetatable(this).__name .. ") " .. meta.serialize(this)
+        return "(" .. this[1].__name .. ") " .. meta.serialize(this)
     end
 
     metatable.__eq = function(self, other)
-        return getmetatable(self).__hash == getmetatable(other).__hash
+        return self[1].__hash == other[1].__hash
     end
-    setmetatable(out, metatable)
 
     metatable.__pairs = function(self)
-        return pairs(getmetatable(self).properties)
+        return pairs(self[1].properties)
     end
 
+    setmetatable(out, metatable)
     return out, metatable
 end
 
@@ -103,7 +103,7 @@ end
 --- @brief get typename identifier
 function meta.typeof(x)
     if meta.is_object(x) then
-        return getmetatable(x).__name
+        return x[1].__name
     else
         return type(x)
     end
@@ -111,9 +111,11 @@ end
 
 --- @brief check if instance has type as super
 function meta.inherits(x, super)
-    for _, name in pairs(getmetatable(x).super) do
-        if name == super._typename then
-            return true
+    if meta.is_object(x) then
+        for _, name in pairs(x[1].super) do
+            if name == super._typename then
+                return true
+            end
         end
     end
     return false
@@ -213,13 +215,12 @@ end
 --- @param x meta.Object
 --- @param property_name String
 function meta.uninstall_property(x, property_name)
-    local metatable = getmetatable(x)
-    metatable.properties[property_name] = nil
+    x[1].properties[property_name] = nil
 end
 
 --- @brief add property after construction
 function meta.install_property(x, name, value)
-    getmetatable(x).properties[name] = value
+    x[1].properties[name] = value
 end
 
 --- @brief get whether property is installed
@@ -227,8 +228,7 @@ end
 --- @param property_name String
 --- @return Boolean
 function meta.has_property(x, property_name)
-    local metatable = getmetatable(x)
-    return not meta.is_nil(metatable.properties[property_name])
+    return not meta.is_nil(x[1].properties[property_name])
 end
 
 --- @brief get list of all property names
@@ -236,7 +236,7 @@ end
 --- @return Table
 function meta.get_property_names(x)
     local out = {}
-    for name, _ in pairs(getmetatable(x).properties) do
+    for name, _ in pairs(x[1].properties) do
         table.insert(out, name)
     end
     return out
@@ -245,13 +245,13 @@ end
 --- @brief get single property
 --- @return Table
 function meta.get_property(x, name)
-    return getmetatable(x).properties[name]
+    return x[1].properties[name]
 end
 
 --- @brief get list of properties
 --- @return Table
 function meta.get_properties(x)
-    return getmetatable(x).properties
+    return x[1].properties
 end
 
 --- @brief add list of properties, useful for types
@@ -267,14 +267,14 @@ end
 --- @param x meta.Object
 --- @param b Boolean
 function meta.set_is_mutable(x, b)
-    getmetatable(x).is_mutable = b
+    x[1].is_mutable = b
 end
 
 --- @brief check if object is immutable
 --- @param x meta.Object
 --- @return Boolean
 function meta.get_is_mutable(x)
-    return getmetatable(x).is_mutable
+    return x[1].is_mutable
 end
 
 --- @class meta.Object
@@ -321,12 +321,6 @@ function meta.new(type, fields, vararg)
     end
 
     install_super(type)
-
-    --[[
-    for super in range(...) do
-        install_super(super)
-    end
-    ]]--
     return out
 end
 
@@ -351,13 +345,13 @@ function meta.new_enum(fields)
     end
 
     metatable.__pairs = function(this)
-        return pairs(getmetatable(this).properties)
+        return pairs(this[1].properties)
     end
     metatable.__ipairs = function(this)
-        return ipairs(getmetatable(this).properties)
+        return ipairs(this[1].properties)
     end
     metatable.__index = function(this, key)
-        return getmetatable(this).properties[key]
+        return this[1].properties[key]
     end
 
     meta.set_is_mutable(out, false)
@@ -395,7 +389,7 @@ end
 --- @param enum meta.Enum
 function meta.assert_enum(x, enum)
     if not meta.is_enum_value(x, enum) then
-        rt.error("In assert_enum: Value `" .. meta.typeof(x) .. "` is not a value of enum `" .. serialize(getmetatable(enum).properties) .. "`")
+        rt.error("In assert_enum: Value `" .. meta.typeof(x) .. "` is not a value of enum `" .. serialize(enum[1].properties) .. "`")
     end
 end
 
@@ -450,7 +444,7 @@ end
 
 function meta.new_type(typename, ...)
     local out = meta._new("Type")
-    local metatable = getmetatable(out)
+    local metatable = out[1]
     metatable.__name = "Type"
     metatable.super = {
         ["Type"] = true
@@ -523,7 +517,7 @@ end
 
 --- @brief get all super types of instance or type
 function meta.get_supertypes(instance)
-    return getmetatable(instance).super
+    return instance[1].super
 end
 
 --- @class meta.Type
@@ -585,7 +579,7 @@ end
 
 --- @brief hash object, each instance has a unique ID
 function meta.hash(x)
-    return getmetatable(x).__hash
+    return x[1].__hash
 end
 
 --- @brief serialize meta.Object
@@ -594,7 +588,7 @@ function meta.serialize(x, skip_functions)
     skip_functions = which(skip_functions, true)
     local out = {}
     table.insert(out, "#" .. tostring(meta.hash(x)) .. " = {\n")
-    for key, value in pairs(getmetatable(x).properties) do
+    for key, value in pairs(x[1].properties) do
         if not meta.is_function(value) then
             table.insert(out, "\t" .. tostring(key)  .. " = " .. serialize(value) .. "\n")
         end

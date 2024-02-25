@@ -5,7 +5,7 @@ rt.current_scene = ow.OverworldScene()
 -- TODO
 local spritesheet = rt.Spritesheet("assets/sprites/debug", "bouncy_ball")
 
-for i = 1, 1000 do
+for i = 1, 1500 do
     local x, y = rt.random.integer(50, 800 - 200), rt.random.integer(50, 600 - 200)
     rt.current_scene:add_entity(ow.OverworldSprite(spritesheet, "bounce"), x, y)
 end
