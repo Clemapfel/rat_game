@@ -20,6 +20,7 @@ ow.Player = meta.new_type("Player", ow.OverworldEntity, rt.Animation, function(w
         _sensor = {},    -- rt.CircleCollider
         _sensor_active = false,
 
+        _debug_draw_active = true,
         _debug_body = {},               -- rt.Circle
         _debug_body_outline = {},       -- rt.Circle
         _debug_velocity = {},           -- rt.Polygon
@@ -39,24 +40,6 @@ ow.Player = meta.new_type("Player", ow.OverworldEntity, rt.Animation, function(w
     })
     return out
 end)
-
---- @brief
-function ow.Player:set_spawn_position(x, y)
-    self._spawn_x = x
-    self._spawn_y = y
-end
-
---- @breif
-function ow.Player:get_bounds()
-    local x, y = self._collider:get_position()
-    local radius = self._radius
-    return rt.AABB(x - radius, y - radius, 2 * radius, 2 * radius)
-end
-
---- @brief
-function ow.Player:get_has_focus()
-    return self._is_realized
-end
 
 --- @override
 function ow.Player:realize()
@@ -112,9 +95,8 @@ function ow.Player:realize()
     self._input:signal_connect("pressed", ow.Player._handle_button_pressed, self)
     self._input:signal_connect("released", ow.Player._handle_button_released, self)
     self._input:signal_connect("joystick", ow.Player._handle_joystick, self)
-    self._world:signal_connect("update", ow.Player._on_physics_update, self)
-    self:set_is_animated(true)
 
+    self._world:signal_connect("update", ow.Player._on_physics_update, self)
     self._sensor:set_allow_sleeping(false)
 
     self:set_is_animated(true)
@@ -122,23 +104,100 @@ function ow.Player:realize()
     return self
 end
 
+--- @overload
+function ow.Player:draw()
+    if self._is_realized then
+        self._debug_body:draw()
+        self._debug_body_outline:draw()
 
---- @brief [internal]
-function ow.Player:_set_sensor_active(b)
-    self._sensor_active = b
-    self._sensor:set_disabled(not b)
-    self._sensor:set_linear_velocity(0, 0)
+        self._debug_velocity:draw()
+        self._debug_velocity_outline:draw()
+
+        self._debug_direction:draw()
+        self._debug_direction_outline:draw()
+
+        if self._sensor_active == true then
+            love.graphics.push()
+            rt.graphics.set_blend_mode(rt.BlendMode.ADD)
+            self._debug_sensor:draw()
+            rt.graphics.set_blend_mode(rt.BlendMode.NORMAL)
+            love.graphics.pop()
+            self._debug_sensor_outline:draw()
+        end
+    end
+end
+
+function ow.Player._on_physics_update(_, self)
+    if self._is_realized then
+        local x, y = self._collider:get_centroid()
+        self._sensor:set_centroid(rt.translate_point_by_angle(x, y, self._radius, self._direction))
+        self:_update_velocity()
+    end
+end
+
+--- @override
+function ow.Player:update(delta)
+    if not self._is_realized then return end
+
+    if self._velocity_magnitude > rt.settings.overworld.player.deadzone then
+        self._movement_timer = self._movement_timer + delta
+    end
+
+    if self._debug_draw_active then
+        local x, y = self._collider:get_centroid()
+        local max_velocity = rt.settings.overworld.player.velocity
+        local velocity_x, velocity_y = self._collider:get_linear_velocity()
+        local angle = rt.angle(velocity_x, velocity_y)
+
+        self._debug_body:set_centroid(x, y)
+        self._debug_body_outline:set_centroid(x, y)
+
+        -- velocity indicator
+        local radius = self._debug_body:get_radius()
+        local velocity_magnitude = rt.magnitude(velocity_x, velocity_y)
+        local magnitude_fraction = velocity_magnitude / max_velocity * radius
+        local indicator_radius_fraction = 0.25
+        local velocity_indicator_magnitude = clamp(magnitude_fraction, indicator_radius_fraction * radius, radius)
+
+        local tip_x, tip_y = rt.translate_point_by_angle(x, y, velocity_indicator_magnitude, angle)
+
+        local angle_offset = rt.degrees(90):as_radians()
+        local direction_triangle_radius = rt.settings.overworld.player.radius * indicator_radius_fraction
+        local up_x, up_y = rt.translate_point_by_angle(x, y, direction_triangle_radius , angle - angle_offset)
+        local down_x, down_y = rt.translate_point_by_angle(x, y, direction_triangle_radius, angle + angle_offset)
+        local back_x, back_y = rt.translate_point_by_angle(x, y, direction_triangle_radius, angle - 2 * angle_offset)
+        self._debug_velocity:resize(up_x, up_y, tip_x, tip_y, down_x, down_y, back_x, back_y)
+        self._debug_velocity_outline:resize(up_x, up_y, tip_x, tip_y, down_x, down_y, back_x, back_y)
+
+        -- direction indicator
+        direction_triangle_radius = direction_triangle_radius * 0.5
+        local direction_indicator_magnitude = 0.5 * radius
+        tip_x, tip_y = rt.translate_point_by_angle(
+            x, y,
+            direction_indicator_magnitude,
+            self._direction
+        )
+
+        up_x, up_y = rt.translate_point_by_angle(x, y, direction_triangle_radius , self._direction - angle_offset)
+        down_x, down_y = rt.translate_point_by_angle(x, y, direction_triangle_radius, self._direction + angle_offset)
+        back_x, back_y = rt.translate_point_by_angle(x, y, direction_triangle_radius, self._direction - 2 * angle_offset)
+        self._debug_direction:resize(up_x, up_y, tip_x, tip_y, down_x, down_y, back_x, back_y)
+        self._debug_direction_outline:resize(up_x, up_y, tip_x, tip_y, down_x, down_y, back_x, back_y)
+
+        local center_x, center_y = self._sensor:get_centroid()
+        self._debug_sensor:resize(center_x, center_y, radius)
+        self._debug_sensor_outline:resize(center_x, center_y, radius)
+    end
 end
 
 --- @brief [internal]
 function ow.Player:_update_velocity()
-
     local damping = clamp(0, 1, self._movement_timer / rt.settings.overworld.player.acceleration_delay)
     damping = rt.exponential_acceleration(damping)
     local x, y = rt.translate_point_by_angle(
-            0, 0,
-            self._velocity_magnitude * damping,
-            self._velocity_angle
+        0, 0,
+        self._velocity_magnitude * damping,
+        self._velocity_angle
     )
 
     for collider in range(self._collider, self._sensor) do
@@ -150,24 +209,8 @@ function ow.Player:_update_velocity()
     end
 end
 
---- @brief
---- @return Number, Number
-function ow.Player:get_velocity()
-    return self._collider:get_linear_velocity()
-end
-
---- @brief
-function ow.Player:set_is_sprinting(b)
-    self._is_sprinting = b
-end
-
---- @brief
-function ow.Player:get_is_sprinting()
-    return self._is_sprinting
-end
-
+--- @brief [internal]
 function ow.Player:_update_velocity_from_dpad()
-
     local up = ternary(self._input:is_down(rt.InputButton.UP), -1, 0)
     local right = ternary(self._input:is_down(rt.InputButton.RIGHT), 1, 0)
     local down = ternary(self._input:is_down(rt.InputButton.DOWN), 1, 0)
@@ -177,7 +220,7 @@ function ow.Player:_update_velocity_from_dpad()
 
     local angle = rt.angle(x, y)
     local target = rt.settings.overworld.player.velocity
-    if self:get_is_sprinting() then
+    if self._is_sprinting then
         target = target * rt.settings.overworld.player.sprinting_velocity_factor
     end
 
@@ -187,6 +230,13 @@ function ow.Player:_update_velocity_from_dpad()
     if x + y ~= 0 then
         self._direction = angle
     end
+end
+
+--- @brief [internal]
+function ow.Player:_set_sensor_active(b)
+    self._sensor_active = b
+    self._sensor:set_disabled(not b)
+    self._sensor:set_linear_velocity(0, 0)
 end
 
 --- @brief [internal]
@@ -238,7 +288,7 @@ function ow.Player._handle_joystick(_, x, y, which, self)
 
     if which == rt.JoystickPosition.LEFT then
         local target = rt.settings.overworld.player.velocity
-        if self:get_is_sprinting() then
+        if self._is_sprinting then
             target = target * rt.settings.overworld.player.sprinting_velocity_factor
         end
 
@@ -256,98 +306,20 @@ function ow.Player._handle_joystick(_, x, y, which, self)
     end
 end
 
---- @overload
-function ow.Player:draw()
-    if self._is_realized then
-        self._debug_body:draw()
-        self._debug_body_outline:draw()
-
-        self._debug_velocity:draw()
-        self._debug_velocity_outline:draw()
-
-        self._debug_direction:draw()
-        self._debug_direction_outline:draw()
-
-        if self._sensor_active == true then
-            love.graphics.push()
-            rt.graphics.set_blend_mode(rt.BlendMode.ADD)
-            self._debug_sensor:draw()
-            rt.graphics.set_blend_mode(rt.BlendMode.NORMAL)
-            love.graphics.pop()
-            self._debug_sensor_outline:draw()
-        end
-    end
+--- @brief
+function ow.Player:get_bounds()
+    local x, y = self._collider:get_position()
+    local radius = self._radius
+    return rt.AABB(x - radius, y - radius, 2 * radius, 2 * radius)
 end
 
 --- @brief
-function ow.Player:get_position()
-    return self._collider:get_centroid()
+function ow.Player:get_has_focus()
+    return self._is_realized
 end
 
 --- @brief
-function ow.Player:set_position(x, y)
-    self._collider:set_centroid(x, y)
-    self._on_physics_update(_, self)
+function ow.Player:set_spawn_position(x, y)
+    self._spawn_x = x
+    self._spawn_y = y
 end
-
---- @brief [internal]
-function ow.Player._on_physics_update(_, self)
-    local x, y = self._collider:get_centroid()
-    self._debug_body:set_centroid(x, y)
-    self._debug_body_outline:set_centroid(x, y)
-
-    -- velocity indicator
-    local max_velocity = rt.settings.overworld.player.velocity
-    local velocity_x, velocity_y = self:get_velocity()
-    local angle = rt.angle(velocity_x, velocity_y)
-
-    local radius = self._debug_body:get_radius()
-    local velocity_magnitude = rt.magnitude(velocity_x, velocity_y)
-    local magnitude_fraction = velocity_magnitude / max_velocity * radius
-    local indicator_radius_fraction = 0.25
-    local velocity_indicator_magnitude = clamp(magnitude_fraction, indicator_radius_fraction * radius, radius)
-
-    local tip_x, tip_y = rt.translate_point_by_angle(x, y, velocity_indicator_magnitude, angle)
-
-    local angle_offset = rt.degrees(90):as_radians()
-    local direction_triangle_radius = rt.settings.overworld.player.radius * indicator_radius_fraction
-    local up_x, up_y = rt.translate_point_by_angle(x, y, direction_triangle_radius , angle - angle_offset)
-    local down_x, down_y = rt.translate_point_by_angle(x, y, direction_triangle_radius, angle + angle_offset)
-    local back_x, back_y = rt.translate_point_by_angle(x, y, direction_triangle_radius, angle - 2 * angle_offset)
-    self._debug_velocity:resize(up_x, up_y, tip_x, tip_y, down_x, down_y, back_x, back_y)
-    self._debug_velocity_outline:resize(up_x, up_y, tip_x, tip_y, down_x, down_y, back_x, back_y)
-
-    -- direction indicator
-    direction_triangle_radius = direction_triangle_radius * 0.5
-    local direction_indicator_magnitude = 0.5 * radius--clamp(velocity_indicator_magnitude, 0.5 * radius)
-    tip_x, tip_y = rt.translate_point_by_angle(
-            x, y,
-            direction_indicator_magnitude,
-            self._direction
-    )
-
-    up_x, up_y = rt.translate_point_by_angle(x, y, direction_triangle_radius , self._direction - angle_offset)
-    down_x, down_y = rt.translate_point_by_angle(x, y, direction_triangle_radius, self._direction + angle_offset)
-    back_x, back_y = rt.translate_point_by_angle(x, y, direction_triangle_radius, self._direction - 2 * angle_offset)
-    self._debug_direction:resize(up_x, up_y, tip_x, tip_y, down_x, down_y, back_x, back_y)
-    self._debug_direction_outline:resize(up_x, up_y, tip_x, tip_y, down_x, down_y, back_x, back_y)
-
-    -- sensor location
-    self._sensor:set_centroid(rt.translate_point_by_angle(x, y, radius, self._direction))
-
-    local center_x, center_y = self._sensor:get_centroid()
-    self._debug_sensor:resize(center_x, center_y, radius)
-    self._debug_sensor_outline:resize(center_x, center_y, radius)
-
-    -- velocity
-    self:_update_velocity()
-end
-
---- @overload
-function ow.Player:update(delta)
-    if self._velocity_magnitude > rt.settings.overworld.player.deadzone then
-        self._movement_timer = self._movement_timer + delta
-    end
-end
-
-
