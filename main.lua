@@ -10,11 +10,34 @@ for i = 1, 100 do
     rt.current_scene:add_entity(ow.OverworldSprite(spritesheet, "bounce"), x, y)
 end
 
--- TODO
+local main_to_worker_channel, worker_to_main_channel = love.thread.newChannel(), love.thread.newChannel()
+local thread_code = [[
+    require "love.math"
+    require "common.common"
+    local main_to_worker_channel, worker_to_main_channel = ...
+    while true do
+        local message = main_to_worker_channel:demand()
+        message.result = love.math.random()
+        worker_to_main_channel:push(message)
+    end
+]]
+
+local thread = love.thread.newThread(thread_code)
+thread:start(main_to_worker_channel, worker_to_main_channel)
+
+local t = {
+    result = "abcdef"
+}
+main_to_worker_channel:push(t)
+t = worker_to_main_channel:demand()
+println(t.result)
+
 
 local input_component = rt.InputController()
 input_component:signal_connect("pressed", function(self, which)
-    if which == rt.InputButton.UP then
+    if which == rt.InputButton.A then
+        channel:supply("test")
+    elseif which == rt.InputButton.UP then
     elseif which == rt.InputButton.DOWN then
     end
 end)
