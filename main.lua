@@ -13,11 +13,12 @@ for i = 1, 100 do
 end
 
 local trigger = ow.Trigger(rt.current_scene, 200, 200, 120, 50)
+trigger:set_is_solid(true)
 trigger:signal_connect("interact", function(self, player)
     println("interact: " .. meta.hash(self) .. " " .. meta.hash(player))
 end)
 trigger:signal_connect("intersect", function(self, player)
-    println("intersect: " .. meta.hash(self) .. " " .. meta.hash(player))
+    --println("intersect: " .. meta.hash(self) .. " " .. meta.hash(player))
 end)
 trigger:set_is_solid(false)
 

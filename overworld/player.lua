@@ -8,7 +8,7 @@ rt.settings.overworld.player = {
 
     is_player_key = "is_player",
     is_player_sensor_key = "is_player_sensor",
-    player_instance_key = "instance"
+    player_instance_key = "instance",
 }
 
 --- @class ow.Player
@@ -24,6 +24,7 @@ ow.Player = meta.new_type("Player", ow.OverworldEntity, rt.Animation, function(s
         _collider = {},  -- rt.CircleCollider
         _sensor = {},    -- rt.CircleCollider
         _sensor_active = false,
+        _sensor_consumed = false,
 
         _debug_body = {},               -- rt.Circle
         _debug_body_outline = {},       -- rt.Circle
@@ -62,8 +63,9 @@ function ow.Player:realize()
 
     local keys = rt.settings.overworld.player
     self._collider:add_userdata(keys.is_player_key, true)
-    self._sensor:add_userdata(keys.is_player_sensor_key, true)
     self._collider:add_userdata("instance", self)
+
+    self._sensor:add_userdata(keys.is_player_sensor_key, true)
     self._sensor:add_userdata("instance", self)
 
     self._debug_body = rt.Circle(0, 0, radius)
@@ -249,8 +251,16 @@ end
 --- @brief [internal]
 function ow.Player:_set_sensor_active(b)
     self._sensor_active = b
+    self._sensor_consumed = false
     self._sensor:set_disabled(not b)
     self._sensor:set_linear_velocity(0, 0)
+end
+
+--- @bref [internal] called by ow.Trigger, makes it so the sensor can only trigger one object per button press
+function ow.Player:_try_consume_sensor()
+    local out = self._sensor_consumed == false
+    self._sensor_consumed = true
+    return out
 end
 
 --- @brief [internal]

@@ -41,33 +41,44 @@ function ow.Trigger:realize()
     self._debug_state_overlay:set_color(rt.RGBA(color.r + offset, color.g + offset, color.b + offset, 0.9))
     self:_update_collider()
 
-    self._collider:signal_connect("contact_begin", function(_, other, contact, self)
-        if not self._active then return end
-        local keys = rt.settings.overworld.player
-        if other:get_userdata(keys.is_player_key) then
-            self._intersect_active = true
-        end
-
-        if other:get_userdata(keys.is_player_sensor_key) then
-            self._interact_active = true
-        end
-    end, self)
-
-    self._collider:signal_connect("contact_end", function(_, other, contact, self)
-        if not self._active then return end
-        local keys = rt.settings.overworld.player
-        if other:get_userdata(keys.is_player_key) then
-            self._intersect_active = false
-        end
-
-        if other:get_userdata(keys.is_player_sensor_key) then
-            self._interact_active = false
-        end
-    end, self)
+    self._collider:signal_connect("contact_begin", ow.Trigger._on_collider_contact_begin, self)
+    self._collider:signal_connect("contact_end", ow.Trigger._on_collider_contact_end, self)
 
     self._is_realized = true
 end
 
+--- @brief [internal]
+function ow.Trigger._on_collider_contact_begin(_, other, contact, self)
+    if not self._active then return end
+    local keys = rt.settings.overworld.player
+    local player = other:get_userdata("instance")
+    if other:get_userdata(keys.is_player_key) then
+        self._intersect_active = true
+        self:signal_emit("intersect", player)
+    end
+
+    if other:get_userdata(keys.is_player_sensor_key) then
+        if player:_try_consume_sensor() then
+            self._interact_active = true
+            self:signal_emit("interact", player)
+        end
+    end
+end
+
+--- @brief [internal]
+function ow.Trigger._on_collider_contact_end(_, other, contact, self)
+    if not self._active then return end
+    local keys = rt.settings.overworld.player
+    if other:get_userdata(keys.is_player_key) then
+        self._intersect_active = false
+    end
+
+    if other:get_userdata(keys.is_player_sensor_key) then
+        self._interact_active = false
+    end
+end
+
+--- @brief
 function ow.Trigger:set_is_solid(b)
     if b ~= self._is_solid then
         self._is_solid = b
@@ -77,27 +88,13 @@ end
 
 --- @brief [internal]
 function ow.Trigger:_update_collider()
-    self._collider:set_is_active(self._active)
-    self._collider:set_is_sensor(not self._is_solid)
+    if self._is_realized then
+        self._collider:set_is_active(self._active)
+        self._collider:set_is_sensor(not self._is_solid)
 
-    local keys = rt.settings.overworld.trigger
-    self._collider:add_userdata(keys.is_trigger_key, true)
-    self._collider:add_userdata("instance", self)
-
-    self._collider:signal_connect("contact_begin", ow.Trigger._on_collider_contact, self)
-end
-
---- @brief [internal]
-function ow.Trigger._on_collider_contact(_, other, contact, self)
-    if not self._active then return end
-    local keys = rt.settings.overworld.player
-
-    if other:get_userdata(keys.is_player_key) then
-        self:signal_emit("intersect", other:get_userdata("instance"))
-    end
-
-    if other:get_userdata(keys.is_player_sensor_key)  then
-        self:signal_emit("interact", other:get_userdata("instance"))
+        local keys = rt.settings.overworld.trigger
+        self._collider:add_userdata(keys.is_trigger_key, true)
+        self._collider:add_userdata("instance", self)
     end
 end
 
@@ -114,7 +111,7 @@ function ow.Trigger:draw()
         if self._scene:get_debug_draw_enabled() then
             self._debug_shape:draw()
 
-            if self._intersect_active or self._intersect_active then
+            if self._intersect_active or self._interact_active then
                 self._debug_state_overlay:draw()
             end
 
