@@ -222,6 +222,8 @@ function ow.Player:_update_velocity()
 
     if self._velocity_magnitude <= rt.settings.overworld.player.deadzone then
         self._movement_timer = 0
+    else
+        self:_set_sensor_active(false) -- disable sensor so it can't be carried while moving
     end
 end
 
