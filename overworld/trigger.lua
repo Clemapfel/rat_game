@@ -15,7 +15,8 @@ ow.Trigger = meta.new_type("Trigger", ow.OverworldEntity, rt.SignalEmitter, func
         _debug_shape = {}, -- rt.Rectangle
         _debug_shape_outline = {}, -- rt.Rectangle
         _debug_state_overlay = {}, -- rt.Rectangle
-        _currently_triggered = false
+        _intersect_active = false,
+        _interact_active = false
     })
     out:signal_add("interact")
     out:signal_add("intersect")
@@ -43,16 +44,24 @@ function ow.Trigger:realize()
     self._collider:signal_connect("contact_begin", function(_, other, contact, self)
         if not self._active then return end
         local keys = rt.settings.overworld.player
-        if other:get_userdata(keys.is_player_key) or other:get_userdata(keys.is_player_sensor_key) then
-            self._currently_triggered = true
+        if other:get_userdata(keys.is_player_key) then
+            self._intersect_active = true
+        end
+
+        if other:get_userdata(keys.is_player_sensor_key) then
+            self._interact_active = true
         end
     end, self)
 
     self._collider:signal_connect("contact_end", function(_, other, contact, self)
         if not self._active then return end
         local keys = rt.settings.overworld.player
-        if other:get_userdata(keys.is_player_key) or other:get_userdata(keys.is_player_sensor_key) then
-            self._currently_triggered = false
+        if other:get_userdata(keys.is_player_key) then
+            self._intersect_active = false
+        end
+
+        if other:get_userdata(keys.is_player_sensor_key) then
+            self._interact_active = false
         end
     end, self)
 
@@ -105,7 +114,7 @@ function ow.Trigger:draw()
         if self._scene:get_debug_draw_enabled() then
             self._debug_shape:draw()
 
-            if self._currently_triggered then
+            if self._intersect_active or self._intersect_active then
                 self._debug_state_overlay:draw()
             end
 
