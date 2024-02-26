@@ -89,3 +89,8 @@ function rt.Rectangle:get_centroid()
     return self._x + 0.5 * self._width, self._y + 0.5 * self._height
 end
 
+--- @breif
+function rt.Rectangle:set_size(w, h)
+    self._width = which(w, 1)
+    self._height = which(h, 1)
+end

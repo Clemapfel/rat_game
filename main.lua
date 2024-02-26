@@ -6,10 +6,14 @@ rt.current_scene = ow.OverworldScene()
 -- TODO
 local spritesheet = rt.Spritesheet("assets/sprites/debug", "bouncy_ball")
 
+
 for i = 1, 100 do
     local x, y = rt.random.integer(50, 800 - 200), rt.random.integer(50, 600 - 200)
-    rt.current_scene:add_entity(ow.OverworldSprite(spritesheet, "bounce"), x, y, rt.random.integer(-5, 5))
+    --rt.current_scene:add_entity(ow.OverworldSprite(rt.current_scene, spritesheet, "bounce"), x, y, rt.random.integer(-5, 5))
 end
+
+local trigger = ow.Trigger(rt.current_scene, 200, 200, 120, 50)
+rt.current_scene:add_entity(trigger)
 
 local main_to_worker_channel, worker_to_main_channel = love.thread.newChannel(), love.thread.newChannel()
 local thread_code = [[
@@ -54,7 +58,7 @@ love.load = function()
 end
 
 love.draw = function()
-    love.graphics.clear(0.8, 0, 0.8, 1)
+    love.graphics.clear(0.5, 0.5, 0.5, 1)
     rt.current_scene:draw()
 
     do -- show fps

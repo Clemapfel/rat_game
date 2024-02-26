@@ -1,12 +1,19 @@
+rt.settings.overworld.sprite = {
+    debug_color = rt.Palette.LIGHT_GREEN_2
+}
+
 --- @class ow.OveworldSprite
 ow.OverworldSprite = meta.new_type("OverworldSprite", ow.OverworldEntity, rt.Animation,
-function(spritesheet, animation_id)
+function(scene, spritesheet, animation_id)
     local out = meta.new(ow.OverworldSprite, {
+        _scene = scene,
         _spritesheet = spritesheet,
         _animation_id = animation_id,
         _width = 0, -- 0 -> use frame resolution
         _height = 0,
         _shape = rt.VertexRectangle(0, 0, 1, 1),
+        _debug_shape = {}, -- rt.Rectangle
+        _debug_shape_outline = {}, -- rt.Rectangle
         _current_frame = 1,
         _elapsed = 0,
         _should_loop = true,
@@ -23,6 +30,15 @@ function ow.OverworldSprite:realize()
     if not self._is_realized then
         self._is_realized = true
         self._shape:set_texture(self._spritesheet)
+
+        self._debug_shape = rt.Rectangle(0, 0, 1, 1)
+        self._debug_shape_outline = rt.Rectangle(0, 0, 1, 1)
+        self._debug_shape_outline:set_is_outline(true)
+
+        local color = rt.settings.overworld.sprite.debug_color
+        self._debug_shape:set_color(rt.RGBA(color.r, color.g, color.b, 0.5))
+        self._debug_shape_outline:set_color(rt.RGBA(color.r, color.g, color.b, 0.9))
+
         self:set_position(self:get_position())
         self:set_size(self._width, self._height)
         self:set_frame(self._current_frame)
@@ -32,7 +48,12 @@ end
 --- @override
 function ow.OverworldSprite:set_position(x, y)
     ow.OverworldEntity.set_position(self, x, y)
-    self:set_size(self._width, self._height) -- updates _shape vertices
+
+    if self._is_realized then
+        self:set_size(self._width, self._height) -- updates _shape vertices
+        self._debug_shape:set_top_left(x, y)
+        self._debug_shape_outline:set_top_left(x, y)
+    end
 end
 
 --- @brief
@@ -53,6 +74,8 @@ function ow.OverworldSprite:set_size(width, height)
             x + w, y + h,
             x, y + h
         )
+        self._debug_shape:set_size(w, h)
+        self._debug_shape_outline:set_size(w, h)
     end
 end
 
@@ -101,6 +124,10 @@ end
 --- @override
 function ow.OverworldSprite:draw()
     if self._is_realized then
+        if self._scene:get_debug_draw_enabled() then
+            self._debug_shape:draw()
+            self._debug_shape_outline:draw()
+        end
         self._shape:draw()
     end
 end

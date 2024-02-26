@@ -6,6 +6,7 @@ rt.settings.overworld.overworld_scene = {
 ow.OverworldScene = meta.new_type("OverworldScene", function()
     local out = meta.new(ow.OverworldScene, {
         _world = rt.PhysicsWorld(0, 0),
+        _debug_draw_enabled = true,
         _player_spawn_x = 0,
         _player_spawn_y = 0,
         _player = {},
@@ -14,7 +15,7 @@ ow.OverworldScene = meta.new_type("OverworldScene", function()
         _render_priorities_set = {[0] = true} -- Set<RenderPriority>
     })
 
-    out._player = ow.Player(out._world, 0, 0)
+    out._player = ow.Player(out, 0, 0)
     return out
 end)
 
@@ -45,7 +46,9 @@ function ow.OverworldScene:add_entity(entity, x, y, render_priority)
     end
 
     table.insert(self._entities[render_priority], entity)
-    entity:set_position(which(x, 0), which(y, 0))
+    if not meta.is_nil(x) and not meta.is_nil(y) then
+        entity:set_position(x, y)
+    end
 end
 
 --- @brief
@@ -62,4 +65,14 @@ end
 function ow.OverworldScene:update(delta)
     self._world:update(delta)
     -- entities are updated automatically through rt.Animation
+end
+
+--- @brief
+function ow.OverworldScene:get_debug_draw_enabled()
+    return self._debug_draw_enabled
+end
+
+--- @brief
+function ow.OverworldScene:set_debug_draw_enabled(b)
+    self._debug_draw_enabled = b
 end

@@ -8,9 +8,10 @@ rt.settings.overworld.player = {
 }
 
 --- @class ow.Player
-ow.Player = meta.new_type("Player", ow.OverworldEntity, rt.Animation, function(world, spawn_x, spawn_y)
+ow.Player = meta.new_type("Player", ow.OverworldEntity, rt.Animation, function(scene, spawn_x, spawn_y)
     local out = meta.new(ow.Player, {
-        _world = world,
+        _scene = scene,
+        _world = scene._world,
 
         _radius = rt.settings.overworld.player.radius,
         _spawn_x = which(spawn_x, 0),
@@ -20,7 +21,6 @@ ow.Player = meta.new_type("Player", ow.OverworldEntity, rt.Animation, function(w
         _sensor = {},    -- rt.CircleCollider
         _sensor_active = false,
 
-        _debug_draw_active = true,
         _debug_body = {},               -- rt.Circle
         _debug_body_outline = {},       -- rt.Circle
         _debug_velocity = {},           -- rt.Polygon
@@ -107,14 +107,17 @@ end
 --- @overload
 function ow.Player:draw()
     if self._is_realized then
-        self._debug_body:draw()
-        self._debug_body_outline:draw()
 
-        self._debug_velocity:draw()
-        self._debug_velocity_outline:draw()
+        if self._scene:get_debug_draw_enabled() then
+            self._debug_body:draw()
+            self._debug_body_outline:draw()
 
-        self._debug_direction:draw()
-        self._debug_direction_outline:draw()
+            self._debug_velocity:draw()
+            self._debug_velocity_outline:draw()
+
+            self._debug_direction:draw()
+            self._debug_direction_outline:draw()
+        end
 
         if self._sensor_active == true then
             love.graphics.push()
@@ -143,7 +146,7 @@ function ow.Player:update(delta)
         self._movement_timer = self._movement_timer + delta
     end
 
-    if self._debug_draw_active then
+    if self._scene:get_debug_draw_enabled() then
         local x, y = self._collider:get_centroid()
         local max_velocity = rt.settings.overworld.player.velocity
         local velocity_x, velocity_y = self._collider:get_linear_velocity()
@@ -161,7 +164,7 @@ function ow.Player:update(delta)
 
         local tip_x, tip_y = rt.translate_point_by_angle(x, y, velocity_indicator_magnitude, angle)
 
-        local angle_offset = rt.degrees(90):as_radians()
+        local angle_offset = math.pi / 2
         local direction_triangle_radius = rt.settings.overworld.player.radius * indicator_radius_fraction
         local up_x, up_y = rt.translate_point_by_angle(x, y, direction_triangle_radius , angle - angle_offset)
         local down_x, down_y = rt.translate_point_by_angle(x, y, direction_triangle_radius, angle + angle_offset)

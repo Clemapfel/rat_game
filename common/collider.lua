@@ -30,6 +30,12 @@ rt.Collider = meta.new_type("Collider", rt.Drawable, rt.SignalEmitter, function(
 end)
 
 --- @brief
+function rt.Collider:add_userdata(key, value)
+    self._userdata[key] = value
+    self._update_userdata()
+end
+
+--- @brief
 function rt.Collider:add_rectangle(x, y, width, height, angle)
     if love.getVersion() >= 12 then
         table.insert(self._fixtures, love.physics.newRectangleShape(self._body, x, y, width, height, angle))
@@ -338,5 +344,15 @@ function rt.Collider:set_restitution(x, fixture_index)
     else
         self._fixtures[fixture_index]:setRestitution(x)
     end
+end
+
+--- @brief
+function rt.Collider:set_is_active(b)
+    self._body:setActive(b)
+end
+
+--- @brief
+function rt.Collider:get_is_active()
+    return self._body:getActive()
 end
 
