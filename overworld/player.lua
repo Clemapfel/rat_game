@@ -4,7 +4,11 @@ rt.settings.overworld.player = {
     velocity = 250,
     sprinting_velocity_factor = 2,
     acceleration_delay = 0.3, -- seconds
-    deadzone = 0.05
+    deadzone = 0.05,
+
+    is_player_key = "is_player",
+    is_player_sensor_key = "is_player_sensor",
+    player_instance_key = "instance"
 }
 
 --- @class ow.Player
@@ -55,6 +59,12 @@ function ow.Player:realize()
     )
 
     self._sensor = rt.CircleCollider(self._world, rt.ColliderType.DYNAMIC, 0, 0, radius)
+
+    local keys = rt.settings.overworld.player
+    self._collider:add_userdata(keys.is_player_key, true)
+    self._sensor:add_userdata(keys.is_player_sensor_key, true)
+    self._collider:add_userdata("instance", self)
+    self._sensor:add_userdata("instance", self)
 
     self._debug_body = rt.Circle(0, 0, radius)
     self._debug_body_outline = rt.Circle(0, 0, radius)
@@ -197,6 +207,7 @@ end
 function ow.Player:_update_velocity()
     local damping = clamp(0, 1, self._movement_timer / rt.settings.overworld.player.acceleration_delay)
     damping = rt.exponential_acceleration(damping)
+
     local x, y = rt.translate_point_by_angle(
         0, 0,
         self._velocity_magnitude * damping,

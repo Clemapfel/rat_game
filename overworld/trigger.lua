@@ -1,28 +1,21 @@
 rt.settings.overworld.trigger = {
-    debug_color = rt.Palette.RED_1
+    debug_color = rt.Palette.RED_1,
+    is_trigger_key = "is_trigger"
 }
-
-ow.TriggerType = meta.new_enum({
-    ON_PLAYER_INTERACT,
-    ON_PLAYER_INTERSECT,
-    NEVER
-})
 
 --- @class ow.Trigger
 --- @brief object that invokes a callback when the player interacts with it
-ow.Trigger = meta.new_type("Trigger", ow.OverworldEntity, rt.SignalEmitter, function(scene, trigger_type, x, y, width, height)
+ow.Trigger = meta.new_type("Trigger", ow.OverworldEntity, rt.SignalEmitter, function(scene, x, y, width, height)
     local out = meta.new(ow.Trigger, {
         _scene = scene,
         _active = true,
-        _trigger_type = trigger_type,
+        _is_solid = false,
         _collider_bounds = rt.AABB(x, y, width, height),
         _collider = {}, -- rt.RectangleCollider
         _debug_shape = {}, -- rt.Rectangle
         _debug_shape_outline = {}, -- rt.Rectangle
         _debug_state_overlay = {}, -- rt.Rectangle
-        _currently_triggered = false,
-        _on_interact = function() println("interacted") end,
-        _on_intersect = function() println("intersected") end
+        _currently_triggered = false
     })
     out:signal_add("interact")
     out:signal_add("intersect")
@@ -43,26 +36,60 @@ function ow.Trigger:realize()
     local color = rt.settings.overworld.trigger.debug_color
     self._debug_shape:set_color(rt.RGBA(color.r, color.g, color.b, 0.5))
     self._debug_shape_outline:set_color(rt.RGBA(color.r, color.g, color.b, 0.9))
-    self._debug_state_overlay:set_color(rt.RGBA(1.5, 1.5, 1.5, 0.8)) -- sic
+    local offset = 0.4
+    self._debug_state_overlay:set_color(rt.RGBA(color.r + offset, color.g + offset, color.b + offset, 0.9))
+    self:_update_collider()
+
+    self._collider:signal_connect("contact_begin", function(_, other, contact, self)
+        if not self._active then return end
+        local keys = rt.settings.overworld.player
+        if other:get_userdata(keys.is_player_key) or other:get_userdata(keys.is_player_sensor_key) then
+            self._currently_triggered = true
+        end
+    end, self)
+
+    self._collider:signal_connect("contact_end", function(_, other, contact, self)
+        if not self._active then return end
+        local keys = rt.settings.overworld.player
+        if other:get_userdata(keys.is_player_key) or other:get_userdata(keys.is_player_sensor_key) then
+            self._currently_triggered = false
+        end
+    end, self)
 
     self._is_realized = true
 end
 
+function ow.Trigger:set_is_solid(b)
+    if b ~= self._is_solid then
+        self._is_solid = b
+        self:_update_collider()
+    end
+end
+
 --- @brief [internal]
 function ow.Trigger:_update_collider()
-    if self._trigger_type == ow.TriggerType.NEVER then
-        self._collider:set_active(false)
-    elseif self._trigger_type == ow.TriggerType.ON_PLAYER_INTERACT then
-        self._collider:set_active(true)
-        self._collider:set_sensor(false)
-    elseif self._trigger_type == ow.TriggerTyoe.ON_PLAYER_INTERSECT then
-        self._collider:set_active(true)
-        self._collider:set_sensor(true)
+    self._collider:set_is_active(self._active)
+    self._collider:set_is_sensor(not self._is_solid)
+
+    local keys = rt.settings.overworld.trigger
+    self._collider:add_userdata(keys.is_trigger_key, true)
+    self._collider:add_userdata("instance", self)
+
+    self._collider:signal_connect("contact_begin", ow.Trigger._on_collider_contact, self)
+end
+
+--- @brief [internal]
+function ow.Trigger._on_collider_contact(_, other, contact, self)
+    if not self._active then return end
+    local keys = rt.settings.overworld.player
+
+    if other:get_userdata(keys.is_player_key) then
+        self:signal_emit("intersect", other:get_userdata("instance"))
     end
-    
-    self._collider:add_userdata("is_trigger", true)
-    self._collider:add_userdata("trigger_type", self._trigger_type)
-    self._collider:add_userdata("self", self)
+
+    if other:get_userdata(keys.is_player_sensor_key)  then
+        self:signal_emit("interact", other:get_userdata("instance"))
+    end
 end
 
 --- @override
@@ -77,13 +104,12 @@ function ow.Trigger:draw()
     if self._is_realized then
         if self._scene:get_debug_draw_enabled() then
             self._debug_shape:draw()
-            self._debug_shape_outline:draw()
 
             if self._currently_triggered then
-                rt.graphics.set_blend_mode(rt.BlendMode.MULTIPLY)
                 self._debug_state_overlay:draw()
-                rt.graphics.set_blend_mode()
             end
+
+            self._debug_shape_outline:draw()
         end
     end
 end

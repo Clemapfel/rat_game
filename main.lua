@@ -13,29 +13,17 @@ for i = 1, 100 do
 end
 
 local trigger = ow.Trigger(rt.current_scene, 200, 200, 120, 50)
+trigger:signal_connect("interact", function(self, player)
+    println("interact: " .. meta.hash(self) .. " " .. meta.hash(player))
+end)
+trigger:signal_connect("intersect", function(self, player)
+    println("intersect: " .. meta.hash(self) .. " " .. meta.hash(player))
+end)
+trigger:set_is_solid(false)
+
+
 rt.current_scene:add_entity(trigger)
 
-local main_to_worker_channel, worker_to_main_channel = love.thread.newChannel(), love.thread.newChannel()
-local thread_code = [[
-    require "love.math"
-    require "common.common"
-    local main_to_worker_channel, worker_to_main_channel = ...
-    while true do
-        local message = main_to_worker_channel:demand()
-        message.result = love.math.random()
-        worker_to_main_channel:push(message)
-    end
-]]
-
-local thread = love.thread.newThread(thread_code)
-thread:start(main_to_worker_channel, worker_to_main_channel)
-
-local t = {
-    result = "abcdef"
-}
-main_to_worker_channel:push(t)
-t = worker_to_main_channel:demand()
-println(t.result)
 
 
 local input_component = rt.InputController()

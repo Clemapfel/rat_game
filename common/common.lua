@@ -514,6 +514,14 @@ _range_iterator = function(state)
     return state[index], state
 end
 
+--- @brief
+function equal_to_one_of(value, ...)
+    for _, which in pairs({...}) do
+        if value == which then return true end
+    end
+    return false
+end
+
 if utf8 == nil then utf8 = require "utf8" end
 
 --- @brief

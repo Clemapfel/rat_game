@@ -40,6 +40,7 @@ rt.BlendMode = meta.new_enum({
 
 --- @brief
 function rt.graphics.set_blend_mode(blend_mode)
+    blend_mode = which(blend_mode, rt.BlendMode.NORMAL)
     if blend_mode == rt.BlendMode.NONE then
         love.graphics.setBlendMode("replace", "alphamultiply")
     elseif blend_mode == rt.BlendMode.NORMAL then

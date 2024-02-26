@@ -6,7 +6,8 @@ rt.ColliderType = meta.new_enum({
 })
 
 --- @class rt.Collider
---- @signal contact (self, rt.Collider, rt.ContactInfo) ->
+--- @signal contact_begin (self, rt.Collider, rt.ContactInfo) -> nil
+--- @signal contact_end (self, rt.Collider, rt.ContactInfo) -> nil
 --- @param world rt.PhysicsWorld
 --- @param type rt.ColliderType
 --- @param shape rt.PhysicsShape
@@ -31,8 +32,21 @@ end)
 
 --- @brief
 function rt.Collider:add_userdata(key, value)
+    if key == "self" then
+        rt.error("In rt.Collider:add_userdata: key `self` is reserved and cannot be overriden")
+    end
     self._userdata[key] = value
     self._update_userdata()
+end
+
+--- @brief
+function rt.Collider:get_userdata(key)
+    return self._userdata[key]
+end
+
+--- @brief
+function rt.Collider:has_userdata(key)
+    return self._userdata[key] ~= nil
 end
 
 --- @brief

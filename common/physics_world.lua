@@ -23,6 +23,14 @@ rt.PhysicsWorld = meta.new_type("PhysicsWorld", rt.SignalEmitter, function(x_gra
     return out
 end)
 
+--- @class PhysicsContactInfo
+rt.PhysicsContactInfo = meta.new_type("PhysicsContactInfo", function(love_contact)
+    return meta.new(rt.PhysicsContactInfo, {
+        _native = love_contact
+    })
+end)
+
+
 --- @brief [internal]
 function rt.PhysicsWorld._on_begin_contact(fixture_a, fixture_b, contact)
     local a_userdata = fixture_a:getBody():getUserData()
@@ -30,7 +38,8 @@ function rt.PhysicsWorld._on_begin_contact(fixture_a, fixture_b, contact)
     local a = a_userdata.self
     local b = b_userdata.self
 
-    b:signal_emit("contact_begin", a)
+    b:signal_emit("contact_begin", a, rt.PhysicsContactInfo(contact))
+    a:signal_emit("contact_begin", b, rt.PhysicsContactInfo(contact))
 end
 
 --- @brief
@@ -40,7 +49,8 @@ function rt.PhysicsWorld._on_end_contact(fixture_a, fixture_b, contact)
     local a = a_userdata.self
     local b = b_userdata.self
 
-    b:signal_emit("contact_end", a)
+    b:signal_emit("contact_end", a, rt.PhysicsContactInfo(contact))
+    a:signal_emit("contact_end", b, rt.PhysicsContactInfo(contact))
 end
 
 --- @brief
