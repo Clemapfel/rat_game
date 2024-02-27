@@ -10,7 +10,7 @@ ow.Tileset = meta.new_type("Tileset", rt.Drawable, function(name, path_prefix)
     local out = meta.new(ow.Tileset, {
         _path_prefix = path_prefix,
         _name = name,
-        _realized = false,
+        _is_realized = false,
         _id_offset = 0,
         _tile_width = -1,
         _tile_height = -1,
@@ -123,7 +123,6 @@ function ow.Tileset:realize()
         local config_maybe = x.tiles[tile_i]
         local id = tile_i - 1
         if not meta.is_nil(config_maybe) then
-            id = config_maybe.id
             if not meta.is_nil(config_maybe.properties) then
                 for name, value in pairs(config_maybe.properties) do
                     assert(name ~= "id" and name ~= "quad")
@@ -136,6 +135,7 @@ function ow.Tileset:realize()
     end
 
     self._texture =  rt.Texture(self._path_prefix .. "/" .. self._name .. ".png")
+    self._is_realized = true
 end
 
 --- @brief

@@ -255,7 +255,6 @@ function ow.Stage:_create_tile_layer(layer)
     table.insert(self._object_layers, ow.ObjectLayer({}, colliders))
 end
 
-
 --- @brief [internal] parse tile object layer, objects without a `class` field will be parsed as basic sprites / colliders
 function ow.Stage:_create_object_layer(layer)
     local colliders = {}
@@ -265,7 +264,7 @@ function ow.Stage:_create_object_layer(layer)
     for _, object in pairs(layer.objects) do
         local class_id = object.type
 
-        -- basic collider or sprite
+        -- basic collider or sprite, not a custom class
         if class_id == nil or class_id == "" then
             local is_solid = which(object.properties[rt.settings.overworld.stage.is_solid_id], true)
             local is_sprite = meta.is_number(object.gid)
@@ -306,9 +305,9 @@ function ow.Stage:_create_object_layer(layer)
                     local tile = tileset:get_tile(object.gid)
                     if not meta.is_nil(tile) then -- else, try next tileset
                         local to_push = ow.ObjectSprite(
-                                tileset._texture,
-                                tileset:get_texture_rectangle(object.gid),
-                                x, y, w, h
+                            tileset._texture,
+                            tileset:get_texture_rectangle(object.gid),
+                            x, y, w, h
                         )
                         to_push.id = object.id
                         table.insert(sprites, to_push)
