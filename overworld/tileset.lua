@@ -119,19 +119,18 @@ function ow.Tileset:realize()
     for tile_i = 1, x.tilecount do
         local tile = ow.Tile(self._array_texture)
         tile.quad:setLayer(tile_i)
+        self._tiles[tile_i] = tile
+    end
 
-        local config_maybe = x.tiles[tile_i]
-        local id = tile_i - 1
+    for _, properties in pairs(x.tiles) do
+        local tile_i = properties.id
+        local config_maybe = properties["properties"]
         if not meta.is_nil(config_maybe) then
-            if not meta.is_nil(config_maybe.properties) then
-                for name, value in pairs(config_maybe.properties) do
-                    assert(name ~= "id" and name ~= "quad")
-                    tile[name] = value
-                end
+            for name, value in pairs(config_maybe) do
+                assert(name ~= "id" and name ~= "quad")
+                self._tiles[tile_i][name] = value
             end
         end
-
-        self._tiles[id] = tile
     end
 
     self._texture =  rt.Texture(self._path_prefix .. "/" .. self._name .. ".png")
@@ -150,7 +149,11 @@ end
 
 --- @brief
 function ow.Tileset:get_tile(id)
-    return self._tiles[id - self._id_offset]
+    local out = self._tiles[id - self._id_offset + 1]
+    if out == nil then
+        rt.error("In ow.Tileset:get_tile: no tile with id `" .. id .. "` available")
+    end
+    return out
 end
 
 --- @brief
