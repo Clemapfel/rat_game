@@ -2,10 +2,18 @@ require("include")
 
 rt.current_scene = ow.OverworldScene()
 
+local input = rt.InputController()
+input:signal_connect("pressed", function(self, key)
+    println("pressed: " .. key)
+end)
 
+input:signal_connect("released", function(self, key)
+    println("released: " .. key)
+end)
+
+--[[
 -- TODO
 local spritesheet = rt.Spritesheet("assets/sprites/debug", "bouncy_ball")
-
 
 for i = 1, 100 do
     local x, y = rt.random.integer(50, 800 - 200), rt.random.integer(50, 600 - 200)
@@ -15,18 +23,14 @@ end
 local trigger = ow.Trigger(rt.current_scene, 200, 200, 120, 50)
 trigger:set_is_solid(true)
 trigger:signal_connect("interact", function(self, player)
-    println("interact: " .. meta.hash(self) .. " " .. meta.hash(player))
-    player:_set_sensor_active()
+    self:set_is_active(true)
 end)
 trigger:signal_connect("intersect", function(self, player)
-    --println("intersect: " .. meta.hash(self) .. " " .. meta.hash(player))
+    self:set_is_active(false)
 end)
-trigger:set_is_solid(false)
-
+trigger:set_is_solid(true)
 
 rt.current_scene:add_entity(trigger)
-
-
 
 local input_component = rt.InputController()
 input_component:signal_connect("pressed", function(self, which)
@@ -35,6 +39,7 @@ input_component:signal_connect("pressed", function(self, which)
     elseif which == rt.InputButton.DOWN then
     end
 end)
+]]--
 
 love.load = function()
     love.window.setMode(800, 600, {
