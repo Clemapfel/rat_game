@@ -5,7 +5,6 @@ ow.Tileset = meta.new_type("Tileset", rt.Drawable, function(name, path_prefix)
     local out = meta.new(ow.Tileset, {
         _path_prefix = path_prefix,
         _name = name,
-        _realized = false,
         _id_offset = 0,
         _tile_width = -1,
         _tile_height = -1,
@@ -16,8 +15,7 @@ ow.Tileset = meta.new_type("Tileset", rt.Drawable, function(name, path_prefix)
         _texture = {},  -- rt.Texture
         _batch = nil    -- love.SpriteBatch
     })
-
-    out._config_path = self._path_prefix .. "/" .. self._name .. ".lua"
+    out:_create()
     return out
 end)
 
@@ -25,12 +23,13 @@ end)
 --- @field id String
 function ow.Tile(texture)
     return {
-        quad = love.graphics.newQuad(0, 0, texture:getWidth(), texture:getHeight(), texture)
+       quad = love.graphics.newQuad(0, 0, texture:getWidth(), texture:getHeight(), texture),
+       id = id
     }
 end
 
---- @brief
-function ow.Tileset:realize()
+--- @brief [internal]
+function ow.Tileset:_create()
     local config_path = self._path_prefix .. "/" .. self._name .. ".lua"
     local chunk, error_maybe = love.filesystem.load(config_path)
     if not meta.is_nil(error_maybe) then
@@ -119,6 +118,31 @@ function ow.Tileset:realize()
 end
 
 --- @brief
+function ow.Tileset:draw()
+    if meta.is_nil(self._batch) then
+        self._batch = love.graphics.newSpriteBatch(self._texture._native, self._n_tiles)
+
+        local max_n_sprites_per_row = 0
+        local start_x, start_y = 0, 0
+
+        local x, y = start_x, start_y
+        local row_width = 0
+        for id, tile in pairs(self._tiles) do
+            self._batch:add(tile.quad, x, y)
+            x = x + self._tile_width
+
+            row_width = row_width + 1
+            if row_width > max_n_sprites_per_row then
+                row_width = 0
+                y = y + self._tile_height
+                x = start_x
+            end
+        end
+    end
+    love.graphics.draw(self._batch)
+end
+
+--- @brief
 function ow.Tileset:set_id_offset(offset)
     self._id_offset = offset
 end
@@ -127,7 +151,6 @@ end
 function ow.Tileset:get_id_offset()
     return self._id_offset
 end
-
 
 --- @brief
 function ow.Tileset:get_tile(id)
@@ -142,7 +165,8 @@ function ow.Tileset:get_texture_rectangle(id)
 
     local col_i = id - self._id_offset
     return rt.AABB(
-            col_i * tile_w, 0,
+        col_i * tile_w, 0,
             tile_w, tile_h
     )
 end
+

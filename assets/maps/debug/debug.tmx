@@ -60,20 +60,5 @@
     <property name="is_solid" type="bool" value="false"/>
    </properties>
   </object>
-  <object id="28" name="spawn" type="PlayerSpawnPoint" x="178" y="815.333">
-   <point/>
-  </object>
-  <object id="31" name="teleport_bottom" type="Teleporter" gid="21" x="481.5" y="864" width="32" height="32">
-   <properties>
-    <property name="is_solid" type="bool" value="false"/>
-    <property name="teleport_to" type="object" value="33"/>
-   </properties>
-  </object>
-  <object id="33" name="teleport_up" gid="21" x="640.667" y="193.5" width="32" height="32">
-   <properties>
-    <property name="is_solid" type="bool" value="false"/>
-    <property name="teleport_to" type="object" value="31"/>
-   </properties>
-  </object>
  </objectgroup>
 </map>

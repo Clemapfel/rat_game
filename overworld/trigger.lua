@@ -5,6 +5,8 @@ rt.settings.overworld.trigger = {
 
 --- @class ow.Trigger
 --- @brief object that invokes a callback when the player interacts with it
+--- @signal interact (ow.Trigger, ow.Player) -> nil
+--- @signal intersect (ow.Trigger, ow.Player) -> nil
 ow.Trigger = meta.new_type("Trigger", ow.OverworldEntity, rt.SignalEmitter, function(scene, x, y, width, height)
     local out = meta.new(ow.Trigger, {
         _scene = scene,
@@ -49,9 +51,21 @@ function ow.Trigger:realize()
     self._collider:signal_connect("contact_begin", ow.Trigger._on_collider_contact_begin, self)
     self._collider:signal_connect("contact_end", ow.Trigger._on_collider_contact_end, self)
 
+    -- update with world instead of animation so signals are emitted the same physics tick as the trigger is touched
+    local previous = love.timer.getTime()
     self._scene._world:signal_connect("update", function(_, self)
-        self:update(0)
+        local current = love.timer.getTime()
+        self:update(current - previous)
+        previous = current
     end, self)
+
+    self:set_is_active(self._active)
+end
+
+--- @brief
+function ow.Trigger:set_is_active(b)
+    self._active = b
+    self._collider:set_is_active(b)
 end
 
 --- @brief [internal]
@@ -131,12 +145,12 @@ end
 function ow.Trigger:draw()
     if self._is_realized then
         if self._scene:get_debug_draw_enabled() then
-            self._debug_shape:draw()
-
-            if self._intersect_active or self._interact_active then
-                self._debug_state_overlay:draw()
+            if self._active then
+                self._debug_shape:draw()
+                if self._intersect_active or self._interact_active then
+                    self._debug_state_overlay:draw()
+                end
             end
-
             self._debug_shape_outline:draw()
         end
     end

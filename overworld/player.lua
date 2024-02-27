@@ -208,7 +208,7 @@ end
 --- @brief [internal]
 function ow.Player:_update_velocity()
     local damping = clamp(0, 1, self._movement_timer / rt.settings.overworld.player.acceleration_delay)
-    damping = clamp(0.25, rt.exponential_acceleration(damping))
+    damping = clamp(0.3, rt.exponential_acceleration(damping))
 
     local x, y = rt.translate_point_by_angle(
         0, 0,
