@@ -10,7 +10,7 @@ return {
   tilewidth = 32,
   tileheight = 32,
   nextlayerid = 4,
-  nextobjectid = 44,
+  nextobjectid = 47,
   properties = {},
   tilesets = {
     {
@@ -22,8 +22,7 @@ return {
     {
       name = "carpet",
       firstgid = 22,
-      filename = "carpet.tsx",
-      exportfilename = "carpet.lua"
+      filename = "carpet.tsx"
     }
   },
   layers = {
@@ -53,7 +52,7 @@ return {
         7, 1, 14, 8, 8, 15, 1, 1, 14, 15, 1, 1, 14, 15, 1, 1, 9, 7, 1, 1, 1, 1, 14, 15, 1, 1, 9, 7, 1, 9,
         7, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 9, 7, 1, 1, 1, 1, 1, 1, 1, 1, 9, 7, 1, 9,
         7, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 9, 7, 4, 1, 1, 1, 1, 1, 1, 1, 9, 7, 1, 9,
-        7, 1, 1, 2, 2, 2, 2, 2, 2, 1, 1, 20, 1, 1, 1, 1, 9, 5, 6, 6, 6, 6, 6, 6, 6, 6, 5, 7, 1, 9,
+        7, 1, 1, 2, 2, 2, 2, 2, 2, 1, 1, 1, 1, 1, 1, 1, 9, 5, 6, 6, 6, 6, 6, 6, 6, 6, 5, 7, 1, 9,
         7, 1, 1, 2, 2, 2, 2, 2, 2, 1, 1, 1, 1, 1, 1, 1, 14, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 15, 1, 9,
         7, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 9,
         7, 1, 1, 2, 2, 2, 2, 2, 2, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 9,
@@ -102,9 +101,7 @@ return {
           height = 12,
           rotation = 0,
           visible = true,
-          properties = {
-            ["is_solid"] = true
-          }
+          properties = {}
         },
         {
           id = 5,
@@ -117,14 +114,12 @@ return {
           height = 12,
           rotation = 0,
           visible = true,
-          properties = {
-            ["is_solid"] = true
-          }
+          properties = {}
         },
         {
           id = 17,
           name = "",
-          type = "Collider",
+          type = "",
           shape = "rectangle",
           x = 95.3333,
           y = 362.667,
@@ -132,9 +127,7 @@ return {
           height = 12,
           rotation = 0,
           visible = true,
-          properties = {
-            ["is_solid"] = true
-          }
+          properties = {}
         },
         {
           id = 27,
@@ -148,56 +141,7 @@ return {
           rotation = 0,
           gid = 22,
           visible = true,
-          properties = {
-            ["is_solid"] = false
-          }
-        },
-        {
-          id = 28,
-          name = "spawn",
-          type = "PlayerSpawnPoint",
-          shape = "point",
-          x = 178,
-          y = 815.333,
-          width = 0,
-          height = 0,
-          rotation = 0,
-          visible = true,
           properties = {}
-        },
-        {
-          id = 31,
-          name = "teleport_bottom",
-          type = "Teleporter",
-          shape = "rectangle",
-          x = 481.5,
-          y = 864,
-          width = 32,
-          height = 32,
-          rotation = 0,
-          gid = 21,
-          visible = true,
-          properties = {
-            ["is_solid"] = false,
-            ["teleport_to"] = { id = 33 }
-          }
-        },
-        {
-          id = 33,
-          name = "teleport_up",
-          type = "",
-          shape = "rectangle",
-          x = 640.667,
-          y = 193.5,
-          width = 32,
-          height = 32,
-          rotation = 0,
-          gid = 21,
-          visible = true,
-          properties = {
-            ["is_solid"] = false,
-            ["teleport_to"] = { id = 31 }
-          }
         }
       }
     }

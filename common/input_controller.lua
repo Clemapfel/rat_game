@@ -222,11 +222,11 @@ end
 --- @brief
 function rt.add_input_controller(object)
     local to_add = rt.InputController(object)
-    object[1].components.input = to_add
+    rawget(object, 1).components.input = to_add
     return to_add
 end
 
 --- @brief
 function rt.get_input_controller(object)
-    return object[1].components.input
+    return rawget(object, 1).components.input
 end

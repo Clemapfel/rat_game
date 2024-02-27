@@ -7,8 +7,7 @@ ow.OverworldScene = meta.new_type("OverworldScene", function()
     local out = meta.new(ow.OverworldScene, {
         _world = rt.PhysicsWorld(0, 0),
         _debug_draw_enabled = true,
-        _player_spawn_x = 0,
-        _player_spawn_y = 0,
+        _stages = {},    -- Table<ow.Stage>
         _player = {},
         _entities = {[0] = {}},             -- Table<RenderPriority, Table<ow.OverworldEntitiy>>
         _render_priorities_in_order = {0},  -- Table<RenderPriority> (sorted)
@@ -21,7 +20,9 @@ end)
 
 --- @brief
 function ow.OverworldScene:realize()
-    self._player:set_spawn_position(self._player_spawn_x, self._player_spawn_y)
+    for _, stage in pairs(self._stages) do
+        stage:realize()
+    end
     self._player:realize()
 
     for _, prio in ipairs(self._render_priorities_in_order) do
@@ -52,7 +53,18 @@ function ow.OverworldScene:add_entity(entity, x, y, render_priority)
 end
 
 --- @brief
+function ow.OverworldScene:add_stage(name, prefix)
+    prefix = which(prefix, "assets/stages")
+    local stage = ow.Stage(rt.current_scene._world, name, prefix)
+    table.insert(self._stages, stage)
+end
+
+--- @brief
 function ow.OverworldScene:draw()
+    for _, stage in pairs(self._stages) do
+        stage:draw()
+    end
+
     for _, prio in ipairs(self._render_priorities_in_order) do
         for _, entity in pairs(self._entities[prio]) do
             entity:draw()

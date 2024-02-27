@@ -1,18 +1,18 @@
 require("include")
 
 rt.current_scene = ow.OverworldScene()
+rt.current_scene._player:set_position(150, 150)
 
 local input = rt.InputController()
-input:signal_connect("pressed", function(self, key)
-    println("pressed: " .. key)
+input:signal_connect("pressed", function(_, which)
+    if which == rt.InputButton.B then
+        rt.current_scene._player:set_position(150, 150)
+    end
 end)
 
-input:signal_connect("released", function(self, key)
-    println("released: " .. key)
-end)
+rt.current_scene:add_stage("debug_map", "assets/stages/debug")
 
 --[[
--- TODO
 local spritesheet = rt.Spritesheet("assets/sprites/debug", "bouncy_ball")
 
 for i = 1, 100 do

@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<map version="1.10" tiledversion="1.10.2" orientation="orthogonal" renderorder="right-down" width="30" height="30" tilewidth="32" tileheight="32" infinite="0" nextlayerid="4" nextobjectid="44">
+<map version="1.10" tiledversion="1.10.2" orientation="orthogonal" renderorder="right-down" width="30" height="30" tilewidth="32" tileheight="32" infinite="0" nextlayerid="4" nextobjectid="47">
  <editorsettings>
   <export target="debug_map.lua" format="lua"/>
  </editorsettings>
@@ -40,25 +40,9 @@
 </data>
  </layer>
  <objectgroup id="2" name="object_layer">
-  <object id="4" x="96" y="266" width="192" height="12">
-   <properties>
-    <property name="is_solid" type="bool" value="true"/>
-   </properties>
-  </object>
-  <object id="5" x="96.6667" y="298" width="192" height="12">
-   <properties>
-    <property name="is_solid" type="bool" value="true"/>
-   </properties>
-  </object>
-  <object id="17" type="Collider" x="95.3333" y="362.667" width="192" height="12">
-   <properties>
-    <property name="is_solid" type="bool" value="true"/>
-   </properties>
-  </object>
-  <object id="27" gid="22" x="364.801" y="734.278" width="282" height="209.33">
-   <properties>
-    <property name="is_solid" type="bool" value="false"/>
-   </properties>
-  </object>
+  <object id="4" x="96" y="266" width="192" height="12"/>
+  <object id="5" x="96.6667" y="298" width="192" height="12"/>
+  <object id="17" x="95.3333" y="362.667" width="192" height="12"/>
+  <object id="27" gid="22" x="364.801" y="734.278" width="282" height="209.33"/>
  </objectgroup>
 </map>

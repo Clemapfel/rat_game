@@ -193,6 +193,8 @@ require "overworld.overworld_entity"
 require "overworld.player"
 require "overworld.trigger"
 require "overworld.overworld_sprite"
+require "overworld.tileset"
+require "overworld.stage"
 
 
 require "scene"

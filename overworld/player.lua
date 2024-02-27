@@ -113,6 +113,8 @@ function ow.Player:realize()
 
     self:set_is_animated(true)
     self._is_realized = true
+
+    self:set_position(self._spawn_x, self._spawn_y)
     return self
 end
 
@@ -345,7 +347,12 @@ function ow.Player:get_has_focus()
 end
 
 --- @brief
-function ow.Player:set_spawn_position(x, y)
-    self._spawn_x = x
-    self._spawn_y = y
+function ow.Player:set_position(x, y)
+    if self._is_realized then
+        self._collider:set_centroid(x, y)
+        ow.Player._on_physics_update(0, self)
+    else
+        self._spawn_x = x
+        self._spawn_y = y
+    end
 end

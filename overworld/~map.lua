@@ -34,9 +34,9 @@ function ow.ObjectLayer(sprites, colliders)
     }
 end
 
---- @class ow.Map
-ow.Map = meta.new_type("Map", rt.Drawable, rt.Animation, function(name, path_prefix)
-    local out = meta.new(ow.Map, {
+--- @class ow.Stage
+ow.Stage = meta.new_type("Stage", rt.Drawable, rt.Animation, function(name, path_prefix)
+    local out = meta.new(ow.Stage, {
         _path_prefix = path_prefix,
         _name = name,
         _world = rt.PhysicsWorld(0, 0),
@@ -50,11 +50,11 @@ ow.Map = meta.new_type("Map", rt.Drawable, rt.Animation, function(name, path_pre
 end)
 
 --- @brief [internal]
-function ow.Map:_create()
+function ow.Stage:_create()
     local config_path = self._path_prefix .. "/" .. self._name .. ".lua"
     local chunk, error_maybe = love.filesystem.load(config_path)
     if not meta.is_nil(error_maybe) then
-        rt.error("In ow.Map:create_from: Error when loading file at `" .. config_path .. "`: " .. error_maybe)
+        rt.error("In ow.Stage:create_from: Error when loading file at `" .. config_path .. "`: " .. error_maybe)
     end
 
     local x = chunk()
@@ -83,7 +83,7 @@ function ow.Map:_create()
 end
 
 --- @brief [internal]
-function ow.Map:_create_tile_layer(layer)
+function ow.Stage:_create_tile_layer(layer)
     local start_x, start_y, offset_x, offset_y = layer.x, layer.y, layer.offsetx, layer.offsety
 
     local w, h = self._tile_width, self._tile_height
@@ -119,7 +119,7 @@ function ow.Map:_create_tile_layer(layer)
             end
 
             if not pushed then
-                rt.error("In ow.Map:_create_tile_layer: No tileset with tile id `" .. id .. "` available")
+                rt.error("In ow.Stage:_create_tile_layer: No tileset with tile id `" .. id .. "` available")
             end
         end
     end
@@ -127,7 +127,7 @@ function ow.Map:_create_tile_layer(layer)
     table.insert(self._tile_layers, ow.TileLayer(tiles, batch))
 
     -- generate hitboxes for solid tiles
-    local bounds = ow.Map._generate_tile_colliders(tile_hitbox)
+    local bounds = ow.Stage._generate_tile_colliders(tile_hitbox)
     --table.insert(bounds, rt.AABB(3, 5, 15, 13))
 
     local colliders = {}
@@ -142,7 +142,7 @@ function ow.Map:_create_tile_layer(layer)
 end
 
 --- @brief [internal]
-function ow.Map:_create_object_layer(layer)
+function ow.Stage:_create_object_layer(layer)
     local colliders = {}
     local sprites = {}
 
@@ -166,7 +166,7 @@ function ow.Map:_create_object_layer(layer)
             to_push = rt.CircleCollider(self._world, rt.ColliderType.STATC, x, y, 1 / 6 * 32) --rt.settings.overworld.player.radius)
         elseif object.shape == "polygon" then
             if #object.polygon > 16 then
-                rt.error("In ow.Map:_create_object_layer: polygon shape with id `" .. object.id .. "` of object layer `" .. layer.id .. "`: has `" .. tostring(#object.polygon / 2) .. "` vertices, but only up to 8 vertices are allowed")
+                rt.error("In ow.Stage:_create_object_layer: polygon shape with id `" .. object.id .. "` of object layer `" .. layer.id .. "`: has `" .. tostring(#object.polygon / 2) .. "` vertices, but only up to 8 vertices are allowed")
             end
 
             local vertices = {}
@@ -177,7 +177,7 @@ function ow.Map:_create_object_layer(layer)
             end
 
             if not love.math.isConvex(vertices) then
-                rt.warning("In ow.Map:_create_object_layer: polygon shape with id `" .. object.id .. "` of object layer `" .. layer.id .. "` is non-convex, its outer hull will be used instead")
+                rt.warning("In ow.Stage:_create_object_layer: polygon shape with id `" .. object.id .. "` of object layer `" .. layer.id .. "` is non-convex, its outer hull will be used instead")
             end
 
             to_push = rt.PolygonCollider(self._world, rt.ColliderType.STATIC, splat(vertices))
@@ -204,7 +204,7 @@ function ow.Map:_create_object_layer(layer)
             end
 
             if not pushed then
-                rt.error("In ow.Map:_create_object_layer: No tileset with tile id `" .. id .. "` available")
+                rt.error("In ow.Stage:_create_object_layer: No tileset with tile id `" .. id .. "` available")
             end
         end
     end
@@ -213,7 +213,7 @@ function ow.Map:_create_object_layer(layer)
 end
 
 --- @brief
-function ow.Map:draw()
+function ow.Stage:draw()
     love.graphics.push()
 
     love.graphics.setColor(1, 1, 1, 1)
@@ -242,7 +242,7 @@ function ow.Map:draw()
 end
 
 --- @brief [internal]
-function ow.Map._generate_tile_colliders(matrix)
+function ow.Stage._generate_tile_colliders(matrix)
 
 
     local clock = rt.Clock()
@@ -329,7 +329,7 @@ function ow.Map._generate_tile_colliders(matrix)
 end
 
 --- @brief
-function ow.Map:update(delta)
+function ow.Stage:update(delta)
     self._world:update(delta)
 end
 

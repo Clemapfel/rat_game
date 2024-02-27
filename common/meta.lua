@@ -106,7 +106,7 @@ end
 --- @brief get typename identifier
 function meta.typeof(x)
     if meta.is_object(x) then
-        return x[1].__name
+        return rawget(x, 1).__name
     else
         return type(x)
     end
@@ -115,7 +115,7 @@ end
 --- @brief check if instance has type as super
 function meta.inherits(x, super)
     if meta.is_object(x) then
-        for _, name in pairs(x[1].super) do
+        for _, name in pairs(rawget(x, 1).super) do
             if name == super._typename then
                 return true
             end
@@ -218,12 +218,12 @@ end
 --- @param x meta.Object
 --- @param property_name String
 function meta.uninstall_property(x, property_name)
-    x[1][1][property_name] = nil
+    rawget(x, 1)[1][property_name] = nil
 end
 
 --- @brief add property after construction
 function meta.install_property(x, name, value)
-    x[1][1][name] = value
+    rawget(x, 1)[1][name] = value
 end
 
 --- @brief get whether property is installed
@@ -231,7 +231,7 @@ end
 --- @param property_name String
 --- @return Boolean
 function meta.has_property(x, property_name)
-    return not meta.is_nil(x[1][1][property_name])
+    return not meta.is_nil(rawget(x, 1)[1][property_name])
 end
 
 --- @brief get list of all property names
@@ -239,7 +239,7 @@ end
 --- @return Table
 function meta.get_property_names(x)
     local out = {}
-    for name, _ in pairs(x[1][1]) do
+    for name, _ in pairs(rawget(x, 1)[1]) do
         table.insert(out, name)
     end
     return out
@@ -248,13 +248,13 @@ end
 --- @brief get single property
 --- @return Table
 function meta.get_property(x, name)
-    return x[1][1][name]
+    return rawget(x, 1)[1][name]
 end
 
 --- @brief get list of properties
 --- @return Table
 function meta.get_properties(x)
-    return x[1][1]
+    return rawget(x, 1)[1]
 end
 
 --- @brief add list of properties, useful for types
@@ -270,14 +270,14 @@ end
 --- @param x meta.Object
 --- @param b Boolean
 function meta.set_is_mutable(x, b)
-    x[1][2] = b
+    rawget(x, 1)[2] = b
 end
 
 --- @brief check if object is immutable
 --- @param x meta.Object
 --- @return Boolean
 function meta.get_is_mutable(x)
-    return x[1][2]
+    return rawget(x, 1)[2]
 end
 
 --- @class meta.Object
@@ -575,7 +575,7 @@ end
 
 --- @brief hash object, each instance has a unique ID
 function meta.hash(x)
-    return x[1].__hash
+    return rawget(x, 1).__hash
 end
 
 --- @brief serialize meta.Object
@@ -584,7 +584,7 @@ function meta.serialize(x, skip_functions)
     skip_functions = which(skip_functions, true)
     local out = {}
     table.insert(out, "#" .. tostring(meta.hash(x)) .. " = {\n")
-    for key, value in pairs(x[1][1]) do
+    for key, value in pairs(rawget(x, 1)[1]) do
         if not meta.is_function(value) then
             table.insert(out, "\t" .. tostring(key)  .. " = " .. serialize(value) .. "\n")
         end

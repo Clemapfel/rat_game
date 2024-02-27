@@ -1,3 +1,8 @@
+rt.settings.overworld.tileset = {
+    export_prefix = "spritesheets/",
+    sha256_filename = "sha256.txt"
+}
+
 --- @class ow.Tileset
 --- @param name String Tileset ID "debug_tileset
 --- @param path_prefix String "assets/maps/debug"
@@ -17,7 +22,7 @@ ow.Tileset = meta.new_type("Tileset", rt.Drawable, function(name, path_prefix)
         _batch = nil    -- love.SpriteBatch
     })
 
-    out._config_path = self._path_prefix .. "/" .. self._name .. ".lua"
+    out._config_path = out._path_prefix .. "/" .. out._name .. ".lua"
     return out
 end)
 
@@ -29,6 +34,67 @@ function ow.Tile(texture)
     }
 end
 
+--- @brief [internal]
+function ow.Tileset:_check_should_export(name)
+    local export_dir = rt.settings.overworld.tileset.export_prefix .. name
+    local info = love.filesystem.getInfo(export_dir)
+    if info == nil then return true end
+    
+    local image_path = self._path_prefix .. "/" .. name .. ".png"
+    local current_hash = rt.filesystem.hash(image_path, true)
+    local old_hash = love.filesystem.read(export_dir .. "/" .. rt.settings.overworld.tileset.sha256_filename)
+    return old_hash ~= current_hash
+end
+
+--- @brief
+--- @return love.graphics.ArrayImage
+function ow.Tileset:_load_from_export(name)
+    local export_dir = rt.settings.overworld.tileset.export_prefix .. name
+    local sha256_filename = rt.settings.overworld.tileset.sha256_filename
+    local files = love.filesystem.getDirectoryItems(export_dir)
+    local slices = {}
+    for i = 1, #files do
+        if files[i] ~= sha256_filename then
+            table.insert(slices, export_dir .. "/" .. files[i])
+        end
+    end
+    return love.graphics.newArrayImage(slices)
+end
+
+--- @brief
+--- @return love.graphics.ArrayImage
+function ow.Tileset:_export(name)
+    local image_path = self._path_prefix .. "/" .. name .. ".png"
+    local current_hash = rt.filesystem.hash(image_path, true)
+    local sha256_filename = rt.settings.overworld.tileset.sha256_filename
+
+    local image = love.image.newImageData(image_path)
+    local tile_w, tile_h = self._tile_width, self._tile_height
+    local slices = {}
+    for tile_x = 1, image:getWidth() / tile_w do
+        for tile_y = 1, image:getHeight() / tile_h do
+            local data = love.image.newImageData(tile_w, tile_h, rt.Image.FORMAT) -- rgba16
+            for x_offset = 1, tile_w do
+                for y_offset = 1, tile_h do
+                    local r, g, b, a = image:getPixel((tile_x - 1) * tile_w + x_offset - 1, (tile_y - 1) * tile_h + y_offset - 1)
+                    data:setPixel(x_offset - 1, y_offset - 1, r, g, b, a)
+                end
+            end
+            table.insert(slices, data)
+        end
+    end
+
+    -- export to .local/share/love/rat_game, so it can be loaded next time instead of generating slices
+    local spritesheet_prefix = "spritesheets/" .. name
+    love.filesystem.createDirectory(spritesheet_prefix)
+    for i, slice in ipairs(slices) do
+        local data = slice:encode("png", spritesheet_prefix.. "/" .. name .. "_" .. ternary(i < 10, "0", "") .. i .. ".png")
+    end
+
+    love.filesystem.write(spritesheet_prefix .. "/" .. sha256_filename, current_hash)
+    return love.graphics.newArrayImage(slices)
+end
+
 --- @brief
 function ow.Tileset:realize()
     local config_path = self._path_prefix .. "/" .. self._name .. ".lua"
@@ -38,66 +104,20 @@ function ow.Tileset:realize()
     end
 
     local x = chunk()
-
     self._tile_width = x.tilewidth
     self._tile_height = x.tileheight
     self._n_columns = x.columns
     self._n_tiles = x.tilecount
 
-    local image_path = self._path_prefix .. "/" .. x.name .. ".png"
-    local image = rt.Image(self._path_prefix .. "/" .. x.name .. ".png")
-
-    do -- generate array texture, unless already exported version is available as a folder of individual images
-        local export_dir = "spritesheets/" .. x.name
-        local info = love.filesystem.getInfo(export_dir)
-
-        -- check whether the current input file is different from the one last used to generate the individual images
-        local sha256_filename = "sha256.txt"
-        local current_hash = rt.filesystem.hash(image_path, true)
-        local old_hash = love.filesystem.read(export_dir .. "/" .. sha256_filename)
-
-        if not meta.is_nil(info) and info.type == "directory" and old_hash == current_hash then
-            local files = love.filesystem.getDirectoryItems(export_dir)
-            local slices = {}
-            for i = 1, #files do
-                if files[i] ~= sha256_filename then
-                    table.insert(slices, export_dir .. "/" .. files[i])
-                end
-            end
-            self._array_texture = love.graphics.newArrayImage(slices)
-        else
-            local image = image._native
-            local tile_w, tile_h = self._tile_width, self._tile_height
-            local slices = {}
-            for tile_x = 1, image:getWidth() / tile_w do
-                for tile_y = 1, image:getHeight() / tile_h do
-                    local data = love.image.newImageData(tile_w, tile_h, rt.Image.FORMAT) -- rgba16
-                    for x_offset = 1, tile_w do
-                        for y_offset = 1, tile_h do
-                            local r, g, b, a = image:getPixel((tile_x - 1) * tile_w + x_offset - 1, (tile_y - 1) * tile_h + y_offset - 1)
-                            data:setPixel(x_offset - 1, y_offset - 1, r, g, b, a)
-                        end
-                    end
-                    table.insert(slices, data)
-                end
-            end
-
-            -- export to .local/share/love/rat_game, so it can be loaded next time instead
-            local spritesheet_prefix = "spritesheets/" .. x.name
-            love.filesystem.createDirectory(spritesheet_prefix)
-            for i, slice in ipairs(slices) do
-                local data = slice:encode("png", spritesheet_prefix.. "/" .. x.name .. "_" .. ternary(i < 10, "0", "") .. i .. ".png")
-            end
-
-            love.filesystem.write(spritesheet_prefix .. "/" .. sha256_filename, current_hash)
-            self._array_texture = love.graphics.newArrayImage(slices)
-        end
+    if self:_check_should_export(self._name) then
+        self._array_texture = self:_export(self._name)
+    else
+        self._array_texture = self:_load_from_export(self._name)
     end
-    self._texture = rt.Texture(image)
 
+    self._tiles = {}
     for tile_i = 1, x.tilecount do
         local tile = ow.Tile(self._array_texture)
-        tile.id = id
         tile.quad:setLayer(tile_i)
 
         local config_maybe = x.tiles[tile_i]
@@ -115,7 +135,7 @@ function ow.Tileset:realize()
         self._tiles[id] = tile
     end
 
-    return self
+    self._texture =  rt.Texture(self._path_prefix .. "/" .. self._name .. ".png")
 end
 
 --- @brief
@@ -127,7 +147,6 @@ end
 function ow.Tileset:get_id_offset()
     return self._id_offset
 end
-
 
 --- @brief
 function ow.Tileset:get_tile(id)
