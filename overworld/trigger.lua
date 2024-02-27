@@ -16,7 +16,11 @@ ow.Trigger = meta.new_type("Trigger", ow.OverworldEntity, rt.SignalEmitter, func
         _debug_shape_outline = {}, -- rt.Rectangle
         _debug_state_overlay = {}, -- rt.Rectangle
         _intersect_active = false,
-        _interact_active = false
+        _interact_active = false,
+        _should_emit_interact = false,
+        _should_emit_interact_data = nil,
+        _should_emit_intersect = false,
+        _should_emit_intersect_data = nil
     })
     out:signal_add("interact")
     out:signal_add("intersect")
@@ -25,6 +29,7 @@ end)
 
 --- @override
 function ow.Trigger:realize()
+    self._is_realized = true
     local x, y, w, h = self._collider_bounds.x, self._collider_bounds.y, self._collider_bounds.width, self._collider_bounds.height
     self._collider = rt.RectangleCollider(self._scene._world, rt.ColliderType.STATIC, x, y, w, h)
 
@@ -44,7 +49,9 @@ function ow.Trigger:realize()
     self._collider:signal_connect("contact_begin", ow.Trigger._on_collider_contact_begin, self)
     self._collider:signal_connect("contact_end", ow.Trigger._on_collider_contact_end, self)
 
-    self._is_realized = true
+    self._scene._world:signal_connect("update", function(_, self)
+        self:update(0)
+    end, self)
 end
 
 --- @brief [internal]
@@ -52,15 +59,19 @@ function ow.Trigger._on_collider_contact_begin(_, other, contact, self)
     if not self._active then return end
     local keys = rt.settings.overworld.player
     local player = other:get_userdata("instance")
+
+    -- delay signal emission to update, because the physics world is locked during contacts
     if other:get_userdata(keys.is_player_key) then
         self._intersect_active = true
-        self:signal_emit("intersect", player)
+        self._should_emit_intersect = true
+        self._should_emit_intersect_data = player
     end
 
     if other:get_userdata(keys.is_player_sensor_key) then
         if player:_try_consume_sensor() then
             self._interact_active = true
-            self:signal_emit("interact", player)
+            self._should_emit_interact = true
+            self._should_emit_interact_data = player
         end
     end
 end
@@ -80,9 +91,9 @@ end
 
 --- @brief
 function ow.Trigger:set_is_solid(b)
-    if b ~= self._is_solid then
-        self._is_solid = b
-        self:_update_collider()
+    self._is_solid = b
+    if self._is_realized then
+        self._collider:set_is_sensor(not b)
     end
 end
 
@@ -91,6 +102,7 @@ function ow.Trigger:_update_collider()
     if self._is_realized then
         self._collider:set_is_active(self._active)
         self._collider:set_is_sensor(not self._is_solid)
+        println(self._collider:get_is_sensor())
 
         local keys = rt.settings.overworld.trigger
         self._collider:add_userdata(keys.is_trigger_key, true)
@@ -101,7 +113,17 @@ end
 --- @override
 function ow.Trigger:update(delta)
     if self._is_realized then
-        -- noop
+        if self._should_emit_intersect then
+            self:signal_emit("intersect", self._should_emit_intersect_data)
+            self._should_emit_intersect = false
+            self._should_emit_intersect_data = nil
+        end
+
+        if self._should_emit_interact then
+            self:signal_emit("interact", self._should_emit_interact_data)
+            self._should_emit_interact = false
+            self._should_emit_interact_data = nil
+        end
     end
 end
 
