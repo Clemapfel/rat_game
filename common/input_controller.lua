@@ -52,7 +52,7 @@ function rt.InputController:get_axis(joystick_position)
         local x = rt.InputHandler.axis_state[rt.GamepadAxis.LEFT_X]
         local y = rt.InputHandler.axis_state[rt.GamepadAxis.LEFT_Y]
         return x, y
-    elseif joystick_position == rt.joystickPosition.RIGHT then
+    elseif joystick_position == rt.JoystickPosition.RIGHT then
         local x = rt.InputHandler.axis_state[rt.GamepadAxis.RIGHT_X]
         local y = rt.InputHandler.axis_state[rt.GamepadAxis.RIGHT_Y]
         return x, y
@@ -69,7 +69,6 @@ love.keypressed = function (key)
     if button ~= nil then
         rt.InputHandler.state[button] = true
         for _, component in pairs(rt.InputHandler.components) do
-            println(meta.hash(component))
             if component._is_disabled == false then
                 component:signal_emit("pressed", button)
             end

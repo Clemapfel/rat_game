@@ -63,7 +63,8 @@ end
 
 --- @brief
 function ow.OverworldScene:draw()
-    self._camera:center_on(self._player:get_position())
+    local center_x, center_y = self._player:get_camera_anchor()
+    self._camera:center_on(math.floor(center_x), math.floor(center_y))
     self._camera:bind()
 
     for _, stage in pairs(self._stages) do

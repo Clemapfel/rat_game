@@ -5,6 +5,7 @@ rt.settings.overworld.player = {
     sprinting_velocity_factor = 2,
     acceleration_delay = 0.3, -- seconds
     deadzone = 0.05,
+    max_camera_offset = math.min(love.graphics.getWidth(), love.graphics.getHeight()) / 4,
 
     is_player_key = "is_player",
     is_player_sensor_key = "is_player_sensor",
@@ -42,6 +43,10 @@ ow.Player = meta.new_type("Player", ow.OverworldEntity, rt.Animation, function(s
         _velocity_magnitude = 0,
         _velocity_angle = 0, -- radians
         _movement_timer = 0, -- seconds
+
+        _camera_anchor_x = 0,
+        _camera_anchor_y = 0,
+        _camera_offset = 0,
     })
     return out
 end)
@@ -150,6 +155,7 @@ function ow.Player._on_physics_update(_, self)
         local x, y = self._collider:get_centroid()
         self._sensor:set_centroid(rt.translate_point_by_angle(x, y, self._radius, self._direction))
         self:_update_velocity()
+        self:update(0)
     end
 end
 
@@ -205,6 +211,17 @@ function ow.Player:update(delta)
         local center_x, center_y = self._sensor:get_centroid()
         self._debug_sensor:resize(center_x, center_y, radius)
         self._debug_sensor_outline:resize(center_x, center_y, radius)
+
+        -- update camera position
+        if self._direction_active then
+            local camera_x, camera_y = rt.translate_point_by_angle(x, y, self._camera_offset, self._direction)
+            local w_step, h_step = love.graphics.getWidth() / 4, love.graphics.getHeight() / 4
+            self._camera_anchor_x = math.round(camera_x * w_step) / w_step
+            self._camera_anchor_y = math.round(camera_y * h_step) / h_step
+        else
+            self._camera_anchor_x = math.floor(x)
+            self._camera_anchor_y = math.floor(y)
+        end
     end
 end
 
@@ -306,20 +323,23 @@ function ow.Player._handle_joystick(_, x, y, which, self)
     local magnitude = rt.magnitude(x, y)
     local deadzone = rt.settings.overworld.player.deadzone
 
-    if which == rt.JoystickPosition.RIGHT then
-        if magnitude > deadzone then
-            self._direction = rt.angle(x, y)
-            self._direction_active = true
-        else
-            self._direction_active = false
-        end
+    local right_x, right_y = self._input:get_axis(rt.JoystickPosition.RIGHT)
+    local right_magnitude = rt.magnitude(right_x, right_y)
+    self._direction_active = right_magnitude > deadzone
+    if self._direction_active then
+        self._direction = rt.angle(right_x, right_y)
+        --self._camera_offset = right_magnitude * rt.settings.overworld.player.max_camera_offset
+    else
+        --self._camera_offset = 0
     end
+
 
     if which == rt.JoystickPosition.LEFT then
         local target = rt.settings.overworld.player.velocity
         if self._is_sprinting then
             target = target * rt.settings.overworld.player.sprinting_velocity_factor
         end
+
 
         local angle = rt.angle(x, y)
         if self._direction_active == false and magnitude > deadzone then
@@ -328,10 +348,6 @@ function ow.Player._handle_joystick(_, x, y, which, self)
 
         self._velocity_magnitude = magnitude * target
         self._velocity_angle = angle
-
-        if magnitude > 0.01 then
-            self._direction = angle
-        end
     end
 end
 
@@ -369,5 +385,14 @@ function ow.Player:set_collision_enabled(b)
         self._collider:set_collision_group(rt.ColliderCollisionGroup.ALL)
     else
         self._collider:set_collision_group(rt.ColliderCollisionGroup.NONE)
+    end
+end
+
+--- @brief
+function ow.Player:get_camera_anchor()
+    if self._direction_active then
+        return rt.translate_point_by_angle(self._camera_anchor_x, self._camera_anchor_y, rt.settings.overworld.player.max_camera_offset, self._direction)
+    else
+        return self._camera_anchor_x, self._camera_anchor_y
     end
 end
