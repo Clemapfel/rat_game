@@ -2,32 +2,7 @@ require("include")
 
 rt.current_scene = ow.OverworldScene()
 rt.current_scene._player:set_position(150, 150)
-
-local input = rt.InputController()
-input:signal_connect("pressed", function(_, which)
-    if which == rt.InputButton.B then
-        rt.current_scene._player:set_position(150, 150)
-    end
-end)
-
 rt.current_scene:add_stage("debug_map", "assets/stages/debug")
-
-local input_component = rt.InputController()
-input_component:signal_connect("pressed", function(self, which)
-    if which == rt.InputButton.X then
-        rt.current_scene._player:set_collision_enabled(false)
-    elseif which == rt.InputButton.Y then
-        rt.current_scene._player:set_collision_enabled(true)
-    elseif which == rt.InputButton.L then
-        --rt.current_scene._player._collider:set_collision_group(group)
-        --group = group + 1
-    elseif which == rt.InputButton.R then
-        --rt.current_scene._player._collider:set_collision_group(group)
-        --group = group - 1
-    end
-end)
-
---rt.current_scene:add_stage("debug_infinite_map", "assets/stages/debug")
 
 --[[
 local spritesheet = rt.Spritesheet("assets/sprites/debug", "bouncy_ball")

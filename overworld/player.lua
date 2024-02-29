@@ -123,7 +123,6 @@ end
 --- @overload
 function ow.Player:draw()
     if self._is_realized then
-
         if self._scene:get_debug_draw_enabled() then
             self._debug_body:draw()
             self._debug_body_outline:draw()

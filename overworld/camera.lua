@@ -180,18 +180,19 @@ function ow.Camera:bind()
     local translate_x, translate_y = 0.5 * w, 0.5 * h
     local x, y = self._collider:get_centroid()
 
-    translate_x = math.round(translate_x)
-    translate_y = math.round(translate_y)
-    x = math.round(x)
-    y = math.round(y)
+    --[[
+    translate_x = math.floor(translate_x)
+    translate_y = math.floor(translate_y)
+    x = math.floor(x)
+    y = math.floor(y)
+    ]]--
 
     rt.graphics.translate(translate_x, translate_y)
     rt.graphics.rotate(self._angle:as_radians())
     rt.graphics.scale(self._scale, self._scale)
     rt.graphics.translate(-1 * translate_x, -1 * translate_y)
 
-    rt.graphics.translate(-1 * x, - 1 * y)
-    rt.graphics.translate(0.5 * w, 0.5 * h)
+    rt.graphics.translate(-1 * x + 0.5 * w, -1 * y + 0.5 * h)
 end
 
 --- @brief

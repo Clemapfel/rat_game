@@ -69,6 +69,7 @@ love.keypressed = function (key)
     if button ~= nil then
         rt.InputHandler.state[button] = true
         for _, component in pairs(rt.InputHandler.components) do
+            println(meta.hash(component))
             if component._is_disabled == false then
                 component:signal_emit("pressed", button)
             end

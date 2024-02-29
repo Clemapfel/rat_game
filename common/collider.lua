@@ -400,14 +400,20 @@ function rt.Collider:set_collision_group(group)
             if group == rt.ColliderCollisionGroup.ALL then
                 shape:setFilterData(0xFFFF, 0xFFFF, 0)
             elseif group == rt.ColliderCollisionGroup.NONE then
-                shape:setFilterData(0x0, 0x0, 0)
+                shape:setFilterData(0x0000, 0x0000, 0)
             else
                 shape:setFilterData(group, group, 0)
             end
         end
     else
         for _, shape in pairs(self._body:getFixtures()) do
-            shape:setFilterData(group, group, 0)
+            if group == rt.ColliderCollisionGroup.ALL then
+                shape:setFilterData(0xFFFF, 0xFFFF, 0)
+            elseif group == rt.ColliderCollisionGroup.NONE then
+                shape:setFilterData(0x0000, 0x0000, 0)
+            else
+                shape:setFilterData(group, group, 0)
+            end
         end
     end
 end

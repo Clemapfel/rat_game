@@ -60,10 +60,12 @@ function ow.OverworldScene:add_stage(name, prefix)
     table.insert(self._stages, stage)
 end
 
+
 --- @brief
 function ow.OverworldScene:draw()
     self._camera:center_on(self._player:get_position())
     self._camera:bind()
+
     for _, stage in pairs(self._stages) do
         stage:draw()
     end
