@@ -250,7 +250,7 @@ end
 
 --- @brief [internal]
 function rt.test.gradient()
-    local gradient = rt.CircularGradient(love.graphics.getWidth() * 0.5, love.graphics.getHeight() * 0.5, 200, rt.RGBA(0, 0, 0, 1), rt.RGBA(0, 0, 0, 0))
+    local gradient = rt.CircularGradient(love.graphics.getWidth() * 0.5, rt.graphics.get_height() * 0.5, 200, rt.RGBA(0, 0, 0, 1), rt.RGBA(0, 0, 0, 0))
     gradient = rt.Gradient(200, 200, 400, 500, rt.RGBA(0, 0, 0, 1), rt.RGBA(0, 0, 0, 0))
     gradient:set_position(200, 300)
     error("TODO")

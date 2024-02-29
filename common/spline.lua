@@ -230,7 +230,7 @@ end
 function rt.test.spline()
 
     local m = 50
-    local w, h = love.graphics.getWidth() - 2 * m, love.graphics.getHeight() - 2 * m
+    local w, h = rt.graphics.get_width() - 2 * m, rt.graphics.get_height() - 2 * m
 
     points = {}
     rt.random.seed(os.time(os.date("!*t")))
@@ -240,7 +240,7 @@ function rt.test.spline()
 
         local r = rt.random.number(200, 300)
 
-        local x, y = love.graphics.getWidth() / 2, love.graphics.getHeight() / 2
+        local x, y = rt.graphics.get_width() / 2, rt.graphics.get_height() / 2
         local angle = (i / n_points) * 360
         x = x + math.cos(rt.degrees(angle):as_radians()) * r
         y = y + math.sin(rt.degrees(angle):as_radians()) * r

@@ -5,7 +5,7 @@ rt.settings.overworld.player = {
     sprinting_velocity_factor = 2,
     acceleration_delay = 0.3, -- seconds
     deadzone = 0.05,
-    max_camera_offset = math.min(love.graphics.getWidth(), love.graphics.getHeight()) / 4,
+    max_camera_offset = math.min(rt.graphics.get_width(), rt.graphics.get_height()) / 4,
 
     is_player_key = "is_player",
     is_player_sensor_key = "is_player_sensor",
@@ -214,10 +214,7 @@ function ow.Player:update(delta)
 
         -- update camera position
         if self._direction_active then
-            local camera_x, camera_y = rt.translate_point_by_angle(x, y, self._camera_offset, self._direction)
-            local w_step, h_step = love.graphics.getWidth() / 4, love.graphics.getHeight() / 4
-            self._camera_anchor_x = math.round(camera_x * w_step) / w_step
-            self._camera_anchor_y = math.round(camera_y * h_step) / h_step
+            self._camera_anchor_x, self._camera_anchor_y = rt.translate_point_by_angle(x, y, self._camera_offset, self._direction)
         else
             self._camera_anchor_x = math.floor(x)
             self._camera_anchor_y = math.floor(y)

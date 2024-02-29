@@ -76,13 +76,6 @@ function ow.Camera:update(delta)
     local angle = rt.angle(self._target_x - current_x, self._target_y - current_y)
     local magnitude = rt.settings.overworld.camera.collider_speed
 
-    -- distance between camera and diagonal
-    function distance(x1, y1, x2, y2, x0, y0)
-        local num = math.abs((y2 - y1) * x0 - (x2 - x1) * y0 + x2 * y1 - y2 * x1)
-        local den = math.sqrt((y2 - y1)^2 + (x2 - x1)^2)
-        return num / den
-    end
-
     local distance = rt.magnitude(self._target_x - current_x, self._target_y - current_y)
     local vx, vy = rt.translate_point_by_angle(0, 0, magnitude, angle)
     self._collider:apply_linear_impulse(vx, vy)
@@ -114,13 +107,13 @@ function ow.Camera:reset()
 end
 
 --- @brief initiate for the camera to move to center a certain point
-function ow.Camera:move_to(x, y)
+function ow.Camera:center_on(x, y)
     self:_set_target_positions(x, y)
     self._is_moving = true
 end
 
 --- @brief teleport the camera such that immediately shows point
-function ow.Camera:center_on(x, y)
+function ow.Camera:jump_to(x, y)
     self._target_x = x
     self._target_y = y
     self._collider:set_position(x, y)
@@ -130,8 +123,8 @@ end
 --- @brief
 function ow.Camera:reset_position()
     self:_set_target_positions(
-        love.graphics.getWidth() / 2,
-        love.graphics.getHeight() / 2
+        rt.graphics.get_width() / 2,
+        rt.graphics.get_height() / 2
     )
 end
 
@@ -172,7 +165,7 @@ end
 
 --- @brief
 function ow.Camera:bind()
-    local w, h = love.graphics.getWidth(), love.graphics.getHeight()
+    local w, h = rt.graphics.get_width(), rt.graphics.get_height()
 
     love.graphics.push()
     love.graphics.origin()

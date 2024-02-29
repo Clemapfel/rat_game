@@ -31,6 +31,8 @@ function ow.OverworldScene:realize()
             entity:realize()
         end
     end
+
+    self._camera:jump_to(self._player:get_position())
 end
 
 --- @brief

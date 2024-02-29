@@ -140,7 +140,7 @@ function bt.Animation.ENEMY_DIED:update(delta)
             shape:set_vertex_position(3, x + w, y + h)
             shape:set_vertex_position(4, x + 0, y + h)
 
-            if y < love.graphics.getHeight() then
+            if y < rt.graphics.get_height() then
                 left_screen = false
             else
                 particle:set_disabled(true) -- disable particles that leave the screen to ease load on simulation

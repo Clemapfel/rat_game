@@ -168,8 +168,8 @@ function rt.test.state_queue()
                 self.elapsed = 0
                 local size = 100
 
-                local w = love.graphics.getWidth() / 2
-                local h = love.graphics.getHeight() / 2
+                local w = rt.graphics.get_width() / 2
+                local h = rt.graphics.get_height() / 2
                 local x = rt.random.number(w - 200, w + 200)
                 local y = rt.random.number(h - 200, h + 200)
 

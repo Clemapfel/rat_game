@@ -52,7 +52,7 @@ love.draw = function()
         local fps = tostring(love.timer.getFPS())
         local margin = 3
         love.graphics.setColor(1, 1, 1, 0.75)
-        love.graphics.print(fps, love.graphics.getWidth() - love.graphics.getFont():getWidth(fps) - 2 * margin, 0.5 * margin)
+        love.graphics.print(fps, rt.graphics.get_width() - love.graphics.getFont():getWidth(fps) - 2 * margin, 0.5 * margin)
     end
 end
 

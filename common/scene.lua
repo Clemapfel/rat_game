@@ -30,9 +30,9 @@ end
 --- @overload rt.Widget.realize
 function rt.Scene:realize()
     self.window:realize()
-    self.window:fit_into(rt.AABB(0, 0, love.graphics.getWidth(), love.graphics.getHeight()))
+    self.window:fit_into(rt.AABB(0, 0, rt.graphics.get_width(), rt.graphics.get_height()))
 
-    love.window.setMode(love.graphics.getWidth(), love.graphics.getHeight(), {
+    love.window.setMode(rt.graphics.get_width(), rt.graphics.get_height(), {
         resizable = true
     })
     love.window.setTitle("rat_game")
@@ -108,6 +108,6 @@ end
 
 function rt.Scene:run()
     self.window:realize()
-    self.window:fit_into(0, 0, love.graphics.getWidth(), love.graphics.getHeight())
+    self.window:fit_into(0, 0, rt.graphics.get_width(), rt.graphics.get_height())
 end
 

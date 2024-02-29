@@ -168,15 +168,15 @@ function rt.TooltipLayout:size_allocate(x, y, width, height)
         local tooltip_x, tooltip_y = child_x + child_w + rt.settings.margin_unit + frame_thickness, child_y --+ frame_thickness
 
         -- prefer right of chlid, if not enough space, display left of child
-        local space_right = (tooltip_x + tooltip_w + rt.settings.margin_unit + 2 * frame_thickness) < love.graphics.getWidth()
+        local space_right = (tooltip_x + tooltip_w + rt.settings.margin_unit + 2 * frame_thickness) < rt.graphics.get_width()
         if not space_right then
             tooltip_x = child_x - tooltip_w - rt.settings.margin_unit - 2 * frame_thickness
         end
 
         -- prefer top left of tooltip aligned with child_y, if not enough space, shift tooltip up
-        local space_bottom = tooltip_y + tooltip_h + rt.settings.margin_unit + frame_thickness < love.graphics.getHeight()
+        local space_bottom = tooltip_y + tooltip_h + rt.settings.margin_unit + frame_thickness < rt.graphics.get_height()
         if not space_bottom then
-            tooltip_y = child_y - ((tooltip_y + tooltip_h + 2 * frame_thickness + rt.settings.margin_unit) - love.graphics.getHeight())
+            tooltip_y = child_y - ((tooltip_y + tooltip_h + 2 * frame_thickness + rt.settings.margin_unit) - rt.graphics.get_height())
         end
 
         local margin = 0
