@@ -207,15 +207,35 @@ function ow.Stage:_create_tile_layer(layer)
     local batch = {}    -- Table<love.SpriteBatch>
     local w, h = self._tile_width, self._tile_height
 
+    for _, tileset in pairs(self._tilesets) do
+        table.insert(batch, love.graphics.newSpriteBatch(tileset._array_texture))
+    end
+
+    function add_tile(row_i, col_i, id)
+        local pushed = false
+        local tile
+        for tileset_i, tileset in pairs(self._tilesets) do
+            tile = tileset:get_tile(id)
+            if tile.is_empty then
+                pushed = true
+                break
+            else
+                if not meta.is_nil(tile) then -- else, try next tileset
+                    table.insert(tiles, tile)
+                    batch[tileset_i]:add(tile.quad, (col_i - 1) * self._tile_width, (row_i - 1) * self._tile_height)
+                    pushed = true
+                    break
+                end
+            end
+        end
+        return tile
+    end
+
     if layer.data ~= nil then -- non-infinite map
         local start_x, start_y, offset_x, offset_y = layer.x, layer.y, layer.offsetx, layer.offsety
 
         local n_columns = layer.width
         local n_rows = layer.height
-
-        for _, tileset in pairs(self._tilesets) do
-            table.insert(batch, love.graphics.newSpriteBatch(tileset._array_texture))
-        end
 
         tile_hitbox = rt.Matrix(n_columns, n_rows)
 
@@ -225,27 +245,54 @@ function ow.Stage:_create_tile_layer(layer)
             for col_i = 1, n_columns do
                 local index = (row_i - 1) * n_columns + col_i
                 local id = layer.data[index]
-                assert(not meta.is_nil(id))
-                local pushed = false
-                for tileset_i, tileset in pairs(self._tilesets) do
-                    local tile = tileset:get_tile(id)
-                    if tile.is_empty then
-                        pushed = true
-                        break
-                    else
-                        if not meta.is_nil(tile) then -- else, try next tileset
-                            table.insert(tiles, tile)
-                            batch[tileset_i]:add(tile.quad, (col_i - 1) * self._tile_width, (row_i - 1) * self._tile_height)
-                            tile_hitbox:set(col_i, row_i, ternary(which(tile[rt.settings.overworld.stage.is_solid_id], false), 1, 0))
-                            pushed = true
-                            break
-                        end
+                local tile = add_tile(col_i, row_i, id)
+                if tile == nil then
+                    rt.error("In ow.Stage:_create_tile_layer: No tileset with tile id `" .. layer.data[index] .. "` available")
+                end
+                tile_hitbox:set(col_i, row_i, ternary(which(tile[rt.settings.overworld.stage.is_solid_id], false), 1, 0))
+            end
+        end
+    else
+        if not meta.is_table(layer.chunks) then
+            rt.error("In ow.Stage:_create_tile_layer: unsupported map layout, expected `data` or `chunks` key in tile layer")
+        end
+
+        local matrix = rt.SparseMatrix()
+        local chunk_min_x, chunk_min_y = POSITIVE_INFINITY, POSITIVE_INFINITY
+        for _, chunk in pairs(layer.chunks) do
+            chunk_min_x = math.min(chunk_min_x, chunk.x)
+            chunk_min_y = math.min(chunk_min_y, chunk.y)
+        end
+
+        dbg(chunk_min_x, chunk_min_y)
+
+        for _, chunk in pairs(layer.chunks) do
+            local n_columns = chunk.width
+            local n_rows = chunk.height
+
+            for row_i = 1, n_rows do
+                for col_i = 1, n_columns do
+                    local index = (row_i - 1) * n_columns + col_i
+                    local tile_x = col_i + chunk.x - chunk_min_x
+                    local tile_y = row_i + chunk.y - chunk_min_y
+                    local id = chunk.data[index]
+                    local tile = add_tile(tile_x, tile_y, id)
+                    if meta.is_nil(tile) then
+                        rt.error("In ow.Stage:_create_tile_layer: No tileset with tile id `" .. chunk.data[index] .. "` available")
+                    end
+                    if tile[rt.settings.overworld.stage.is_solid_id] == true then
+                        matrix:set(chunk.x + col_i, chunk.y + row_i, true)
                     end
                 end
+            end
+        end
 
-                if not pushed then
-                    rt.error("In ow.Stage:_create_tile_layer: No tileset with tile id `" .. id .. "` available")
-                end
+        local min_x, max_x, min_y, max_y = matrix:get_boundaries()
+        tile_hitbox = rt.Matrix(math.abs(max_x - min_x) + 1, math.abs(max_y - min_y) + 1)
+        for y = min_y, max_y, 1 do
+            for x = min_x, max_x, 1 do
+                local matrix_x, matrix_y = x - min_x + 1, y - min_y + 1
+                tile_hitbox:set(matrix_x, matrix_y, ternary(matrix:get(x, y) ~= nil, 1, 0))
             end
         end
     end

@@ -9,6 +9,7 @@ ow.OverworldScene = meta.new_type("OverworldScene", function()
         _debug_draw_enabled = true,
         _stages = {},    -- Table<ow.Stage>
         _player = {},
+        _camera = ow.Camera(),
         _entities = {[0] = {}},             -- Table<RenderPriority, Table<ow.OverworldEntitiy>>
         _render_priorities_in_order = {0},  -- Table<RenderPriority> (sorted)
         _render_priorities_set = {[0] = true} -- Set<RenderPriority>
@@ -61,6 +62,8 @@ end
 
 --- @brief
 function ow.OverworldScene:draw()
+    self._camera:center_on(self._player:get_position())
+    self._camera:bind()
     for _, stage in pairs(self._stages) do
         stage:draw()
     end
@@ -71,11 +74,13 @@ function ow.OverworldScene:draw()
         end
         if prio == 0 then self._player:draw() end
     end
+    self._camera:unbind()
 end
 
 --- @brief
 function ow.OverworldScene:update(delta)
     self._world:update(delta)
+    self._camera:update(delta)
     -- entities are updated automatically through rt.Animation
 end
 

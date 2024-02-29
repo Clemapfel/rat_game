@@ -14,6 +14,31 @@ rt.SparseMatrix = function()
     local metatable = {}
     setmetatable(out, metatable)
 
+    metatable.__tostring = function(self)
+        local res = {}
+        local push = function(x)
+            table.insert(res, tostring(x))
+        end
+
+        push("rt.SparseMatrix {\n")
+        local n_cols = self._max_x - self._min_x
+        local n_rows = self._max_y - self._min_y
+        for row_i = self._min_y, self._max_y, 1 do
+            for col_i = self._min_x, self._max_x, 1 do
+                push("\t")
+                local value = self:get(col_i, row_i)
+                if value == nil then
+                    push("∙")
+                else
+                    push(value)
+                end
+            end
+            push("\n")
+        end
+        push("}")
+        return table.concat(res, "")
+    end
+
     function out:set(x, y, value)
         if self._data[y] == nil then
             self._data[y] = {}
@@ -45,5 +70,9 @@ rt.SparseMatrix = function()
         self._max_y = 0
     end
 
+    --- @return min_x, max_x, min_y, max_y
+    function out:get_boundaries()
+        return self._min_x, self._max_x, self._min_y, self._max_y
+    end
     return out
 end

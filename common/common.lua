@@ -141,6 +141,11 @@ function mix(lower, upper, ratio)
     return x * (1 - ratio) + y * ratio
 end
 
+--- @brief
+function fract(x)
+    return math.fmod(x, 1.0)
+end
+
 --- @brief ternary
 --- @param condition boolean
 --- @param if_true any returned if condition == true

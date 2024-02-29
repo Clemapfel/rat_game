@@ -356,3 +356,8 @@ function ow.Player:set_position(x, y)
         self._spawn_y = y
     end
 end
+
+--- @brief
+function ow.Player:get_position()
+    return self._collider:get_position()
+end
