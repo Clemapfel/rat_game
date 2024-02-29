@@ -201,47 +201,51 @@ end
 
 --- @brief [internal]
 function ow.Stage:_create_tile_layer(layer)
-    local start_x, start_y, offset_x, offset_y = layer.x, layer.y, layer.offsetx, layer.offsety
 
-    local w, h = self._tile_width, self._tile_height
-    local n_columns = layer.width
-    local n_rows = layer.height
-
+    local tile_hitbox   -- rt.Matrix
     local tiles = {}    -- Table<ow.Tile>
     local batch = {}    -- Table<love.SpriteBatch>
+    local w, h = self._tile_width, self._tile_height
 
-    for _, tileset in pairs(self._tilesets) do
-        table.insert(batch, love.graphics.newSpriteBatch(tileset._array_texture))
-    end
+    if layer.data ~= nil then -- non-infinite map
+        local start_x, start_y, offset_x, offset_y = layer.x, layer.y, layer.offsetx, layer.offsety
 
-    local tile_hitbox = rt.Matrix(n_columns, n_rows)
+        local n_columns = layer.width
+        local n_rows = layer.height
 
-    local x, y = start_x, start_y
-    local i = 1
-    for row_i = 1, n_rows do
-        for col_i = 1, n_columns do
-            local index = (row_i - 1) * n_columns + col_i
-            local id = layer.data[index]
-            assert(not meta.is_nil(id))
-            local pushed = false
-            for tileset_i, tileset in pairs(self._tilesets) do
-                local tile = tileset:get_tile(id)
-                if tile.is_empty then
-                    pushed = true
-                    break
-                else
-                    if not meta.is_nil(tile) then -- else, try next tileset
-                        table.insert(tiles, tile)
-                        batch[tileset_i]:add(tile.quad, (col_i - 1) * self._tile_width, (row_i - 1) * self._tile_height)
-                        tile_hitbox:set(col_i, row_i, ternary(which(tile[rt.settings.overworld.stage.is_solid_id], false), 1, 0))
+        for _, tileset in pairs(self._tilesets) do
+            table.insert(batch, love.graphics.newSpriteBatch(tileset._array_texture))
+        end
+
+        tile_hitbox = rt.Matrix(n_columns, n_rows)
+
+        local x, y = start_x, start_y
+        local i = 1
+        for row_i = 1, n_rows do
+            for col_i = 1, n_columns do
+                local index = (row_i - 1) * n_columns + col_i
+                local id = layer.data[index]
+                assert(not meta.is_nil(id))
+                local pushed = false
+                for tileset_i, tileset in pairs(self._tilesets) do
+                    local tile = tileset:get_tile(id)
+                    if tile.is_empty then
                         pushed = true
                         break
+                    else
+                        if not meta.is_nil(tile) then -- else, try next tileset
+                            table.insert(tiles, tile)
+                            batch[tileset_i]:add(tile.quad, (col_i - 1) * self._tile_width, (row_i - 1) * self._tile_height)
+                            tile_hitbox:set(col_i, row_i, ternary(which(tile[rt.settings.overworld.stage.is_solid_id], false), 1, 0))
+                            pushed = true
+                            break
+                        end
                     end
                 end
-            end
 
-            if not pushed then
-                rt.error("In ow.Stage:_create_tile_layer: No tileset with tile id `" .. id .. "` available")
+                if not pushed then
+                    rt.error("In ow.Stage:_create_tile_layer: No tileset with tile id `" .. id .. "` available")
+                end
             end
         end
     end
