@@ -11,6 +11,22 @@ input:signal_connect("pressed", function(_, which)
 end)
 
 rt.current_scene:add_stage("debug_map", "assets/stages/debug")
+
+local input_component = rt.InputController()
+input_component:signal_connect("pressed", function(self, which)
+    if which == rt.InputButton.X then
+        rt.current_scene._player:set_collision_enabled(false)
+    elseif which == rt.InputButton.Y then
+        rt.current_scene._player:set_collision_enabled(true)
+    elseif which == rt.InputButton.L then
+        --rt.current_scene._player._collider:set_collision_group(group)
+        --group = group + 1
+    elseif which == rt.InputButton.R then
+        --rt.current_scene._player._collider:set_collision_group(group)
+        --group = group - 1
+    end
+end)
+
 --rt.current_scene:add_stage("debug_infinite_map", "assets/stages/debug")
 
 --[[

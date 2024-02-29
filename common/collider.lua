@@ -5,6 +5,29 @@ rt.ColliderType = meta.new_enum({
     KINEMATIC = "kinematic"
 })
 
+--- @class rt.ColliderCollisionGroup
+--- @brief only objects in the same group collide
+rt.ColliderCollisionGroup = meta.new_enum({
+    NONE = -1,
+    ALL = 0,
+    GROUP_01 = bit.lshift(1, 0),
+    GROUP_02 = bit.lshift(1, 1),
+    GROUP_03 = bit.lshift(1, 2),
+    GROUP_04 = bit.lshift(1, 3),
+    GROUP_05 = bit.lshift(1, 4),
+    GROUP_06 = bit.lshift(1, 5),
+    GROUP_07 = bit.lshift(1, 6),
+    GROUP_08 = bit.lshift(1, 7),
+    GROUP_09 = bit.lshift(1, 8),
+    GROUP_10 = bit.lshift(1, 9),
+    GROUP_11 = bit.lshift(1, 10),
+    GROUP_12 = bit.lshift(1, 11),
+    GROUP_13 = bit.lshift(1, 12),
+    GROUP_14 = bit.lshift(1, 13),
+    GROUP_15 = bit.lshift(1, 14),
+    GROUP_16 = bit.lshift(1, 15)
+})
+
 --- @class rt.Collider
 --- @signal contact_begin (self, rt.Collider, rt.ContactInfo) -> nil
 --- @signal contact_end (self, rt.Collider, rt.ContactInfo) -> nil
@@ -370,3 +393,21 @@ function rt.Collider:get_is_active()
     return self._body:getActive()
 end
 
+--- @brief
+function rt.Collider:set_collision_group(group)
+    if love.getVersion() >= 12 then
+        for _, shape in pairs(self._body:getShapes()) do
+            if group == rt.ColliderCollisionGroup.ALL then
+                shape:setFilterData(0xFFFF, 0xFFFF, 0)
+            elseif group == rt.ColliderCollisionGroup.NONE then
+                shape:setFilterData(0x0, 0x0, 0)
+            else
+                shape:setFilterData(group, group, 0)
+            end
+        end
+    else
+        for _, shape in pairs(self._body:getFixtures()) do
+            shape:setFilterData(group, group, 0)
+        end
+    end
+end

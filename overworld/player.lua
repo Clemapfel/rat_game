@@ -114,6 +114,8 @@ function ow.Player:realize()
     self:set_is_animated(true)
     self._is_realized = true
 
+    self._collider:set_collision_group(rt.ColliderCollisionGroup.ALL)
+    self._sensor:set_collision_group(rt.ColliderCollisionGroup.ALL)
     self:set_position(self._spawn_x, self._spawn_y)
     return self
 end
@@ -360,4 +362,13 @@ end
 --- @brief
 function ow.Player:get_position()
     return self._collider:get_position()
+end
+
+--- @brief
+function ow.Player:set_collision_enabled(b)
+    if b == true then
+        self._collider:set_collision_group(rt.ColliderCollisionGroup.ALL)
+    else
+        self._collider:set_collision_group(rt.ColliderCollisionGroup.NONE)
+    end
 end

@@ -45,6 +45,7 @@ setmetatable(bt, {
 -- standard libs
 ffi = require "ffi"
 utf8 = require "utf8"
+bit = require "bit"
 
 -- submodules
 math3d = require "submodules.cpml"

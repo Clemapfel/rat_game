@@ -354,6 +354,11 @@ function meta.new_enum(fields)
     return out
 end
 
+--- @brief
+function meta.instances(enum)
+    return enum[1][1]
+end
+
 
 --- @brief check if type of object is as given
 --- @param type meta.Type (or String)
