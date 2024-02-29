@@ -264,8 +264,6 @@ function ow.Stage:_create_tile_layer(layer)
             chunk_min_y = math.min(chunk_min_y, chunk.y)
         end
 
-        dbg(chunk_min_x, chunk_min_y)
-
         for _, chunk in pairs(layer.chunks) do
             local n_columns = chunk.width
             local n_rows = chunk.height

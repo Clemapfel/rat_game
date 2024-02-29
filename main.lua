@@ -10,7 +10,7 @@ input:signal_connect("pressed", function(_, which)
     end
 end)
 
-rt.current_scene:add_stage("debug_infinite_map", "assets/stages/debug")
+rt.current_scene:add_stage("debug_map", "assets/stages/debug")
 --rt.current_scene:add_stage("debug_map", "assets/stages/debug")
 
 --[[
