@@ -3,12 +3,12 @@
 rt.SparseMatrix = function()
     local out = {
         _data = {
-            [0] = {0}
+            [1] = {0}
         },
-        _min_x = 0,
-        _min_y = 0,
-        _max_x = 0,
-        _max_y = 0
+        _min_x = 1,
+        _min_y = 1,
+        _max_x = 1,
+        _max_y = 1
     }
 
     local metatable = {}
@@ -40,6 +40,8 @@ rt.SparseMatrix = function()
     end
 
     function out:set(x, y, value)
+        x = math.round(x)
+        y = math.round(y)
         if self._data[y] == nil then
             self._data[y] = {}
         end

@@ -114,95 +114,9 @@ function ow.Stage:realize()
 end
 
 --- @brief [internal]
-function ow.Stage._generate_tile_colliders(matrix)
-
-    local clock = rt.Clock()
-    local out = {}
-
-    local seen = rt.Matrix(matrix:get_dimension(1), matrix:get_dimension(2))
-    seen:clear(false)
-
-    local row_to_aabbs = {}
-    local aabb = rt.AABB(1, 1, 0, 0)
-    local active = false
-    for row_i = 1, matrix:get_dimension(2) do
-        table.insert(row_to_aabbs, {})
-        for col_i = 1, matrix:get_dimension(1) do
-            local solid = matrix:get(col_i, row_i) ~= 0
-
-            if solid then
-                -- open
-                if not active then
-                    aabb = rt.AABB(col_i, row_i, 0, 1)
-                    aabb.merged = false
-                    active = true
-                end
-
-                -- extend
-                if active then
-                    aabb.width = aabb.width + 1
-                end
-            else
-                if active then
-                    -- close
-                    table.insert(row_to_aabbs[row_i], aabb)
-                    active = false
-                else
-                    -- continue
-                end
-            end
-            --seen:set(col_i, row_i, true)
-        end
-
-        if active then
-            -- close at end of line
-            table.insert(row_to_aabbs[row_i], aabb)
-            active = false
-        end
-    end
-
-    -- merge step
-    local current_row = 1
-    for _, row in pairs(row_to_aabbs) do
-        for _, shape in pairs(row) do
-            if not shape.merged and current_row < #row_to_aabbs then
-                for row_i = current_row + 1, #row_to_aabbs do
-                    local merge_successfull = false
-                    for _, other_shape in pairs(row_to_aabbs[row_i]) do
-                        if not other_shape.merged then
-                            if shape.x == other_shape.x and shape.width == other_shape.width then
-                                shape.height = shape.height + 1
-                                other_shape.merged = true
-                                merge_successfull = true
-                            end
-                        end
-                    end
-                    if not merge_successfull then break end
-                end
-            end
-        end
-
-        current_row = current_row + 1
-    end
-
-
-    local out = {}
-    for _, row in pairs(row_to_aabbs) do
-        for _, shape in pairs(row) do
-            local already_merged = which(shape.merged, false)
-            if not already_merged then
-                table.insert(out, shape)
-            end
-        end
-    end
-
-    return out
-end
-
---- @brief [internal]
 function ow.Stage:_create_tile_layer(layer)
 
-    local tile_hitbox   -- rt.Matrix
+    local tile_hitbox = rt.SparseMatrix()
     local tiles = {}    -- Table<ow.Tile>
     local batch = {}    -- Table<love.SpriteBatch>
     local w, h = self._tile_width, self._tile_height
@@ -211,7 +125,7 @@ function ow.Stage:_create_tile_layer(layer)
         table.insert(batch, love.graphics.newSpriteBatch(tileset._array_texture))
     end
 
-    function add_tile(row_i, col_i, id)
+    function add_tile(col_i, row_i, id)
         local pushed = false
         local tile
         for tileset_i, tileset in pairs(self._tilesets) do
@@ -237,8 +151,6 @@ function ow.Stage:_create_tile_layer(layer)
         local n_columns = layer.width
         local n_rows = layer.height
 
-        tile_hitbox = rt.Matrix(n_columns, n_rows)
-
         local x, y = start_x, start_y
         local i = 1
         for row_i = 1, n_rows do
@@ -249,19 +161,14 @@ function ow.Stage:_create_tile_layer(layer)
                 if tile == nil then
                     rt.error("In ow.Stage:_create_tile_layer: No tileset with tile id `" .. layer.data[index] .. "` available")
                 end
-                tile_hitbox:set(col_i, row_i, ternary(which(tile[rt.settings.overworld.stage.is_solid_id], false), 1, 0))
+                if tile[rt.settings.overworld.stage.is_solid_id] then
+                    tile_hitbox:set(col_i, row_i, true)
+                end
             end
         end
-    else
+    else -- infinite map
         if not meta.is_table(layer.chunks) then
             rt.error("In ow.Stage:_create_tile_layer: unsupported map layout, expected `data` or `chunks` key in tile layer")
-        end
-
-        local matrix = rt.SparseMatrix()
-        local chunk_min_x, chunk_min_y = POSITIVE_INFINITY, POSITIVE_INFINITY
-        for _, chunk in pairs(layer.chunks) do
-            chunk_min_x = math.min(chunk_min_x, chunk.x)
-            chunk_min_y = math.min(chunk_min_y, chunk.y)
         end
 
         for _, chunk in pairs(layer.chunks) do
@@ -271,26 +178,17 @@ function ow.Stage:_create_tile_layer(layer)
             for row_i = 1, n_rows do
                 for col_i = 1, n_columns do
                     local index = (row_i - 1) * n_columns + col_i
-                    local tile_x = col_i + chunk.x - chunk_min_x
-                    local tile_y = row_i + chunk.y - chunk_min_y
+                    local tile_x = col_i + chunk.x
+                    local tile_y = row_i + chunk.y
                     local id = chunk.data[index]
                     local tile = add_tile(tile_x, tile_y, id)
                     if meta.is_nil(tile) then
                         rt.error("In ow.Stage:_create_tile_layer: No tileset with tile id `" .. chunk.data[index] .. "` available")
                     end
                     if tile[rt.settings.overworld.stage.is_solid_id] == true then
-                        matrix:set(chunk.x + col_i, chunk.y + row_i, true)
+                        tile_hitbox:set(chunk.x + col_i, chunk.y + row_i, true)
                     end
                 end
-            end
-        end
-
-        local min_x, max_x, min_y, max_y = matrix:get_boundaries()
-        tile_hitbox = rt.Matrix(math.abs(max_x - min_x) + 1, math.abs(max_y - min_y) + 1)
-        for y = min_y, max_y, 1 do
-            for x = min_x, max_x, 1 do
-                local matrix_x, matrix_y = x - min_x + 1, y - min_y + 1
-                tile_hitbox:set(matrix_x, matrix_y, ternary(matrix:get(x, y) ~= nil, 1, 0))
             end
         end
     end
@@ -308,6 +206,90 @@ function ow.Stage:_create_tile_layer(layer)
     table.insert(self._tile_layers, ow.TileLayer(tiles, batch))
     table.insert(self._object_layers, ow.ObjectLayer({}, colliders))
 end
+
+
+--- @brief [internal]
+function ow.Stage._generate_tile_colliders(matrix)
+
+    local clock = rt.Clock()
+    local out = {}
+
+    local row_to_aabbs = {}
+    local aabb = rt.AABB(1, 1, 0, 0)
+    local active = false
+    local min_x, max_x, min_y, max_y = matrix:get_boundaries()
+    for row_i = min_y, max_y do
+        row_to_aabbs[row_i] = {}
+        for col_i = min_x, max_x do
+            local solid = matrix:get(col_i, row_i) == true
+            if solid then
+                -- open
+                if not active then
+                    aabb = rt.AABB(col_i, row_i, 0, 1)
+                    aabb.merged = false
+                    active = true
+                end
+
+                -- extend
+                if active then
+                    aabb.width = aabb.width + 1
+                end
+            else
+                if active then
+                    -- close
+                    table.insert(row_to_aabbs[row_i], aabb)
+                    active = false
+                else
+                    -- continue
+                end
+            end
+        end
+
+        if active then
+            -- close at end of line
+            table.insert(row_to_aabbs[row_i], aabb)
+            active = false
+        end
+    end
+
+    -- merge step
+    local current_row
+    for i, row in pairs(row_to_aabbs) do
+        if current_row == nil then current_row = i end
+        for _, shape in pairs(row) do
+            if not shape.merged and current_row < #row_to_aabbs then
+                for row_i = current_row + 1, #row_to_aabbs do
+                    local merge_successfull = false
+                    for _, other_shape in pairs(row_to_aabbs[row_i]) do
+                        if not other_shape.merged then
+                            if shape.x == other_shape.x and shape.width == other_shape.width then
+                                shape.height = shape.height + 1
+                                other_shape.merged = true
+                                merge_successfull = true
+                            end
+                        end
+                    end
+                    if not merge_successfull then break end
+                end
+            end
+        end
+
+        current_row = current_row + 1
+    end
+
+    local out = {}
+    for _, row in pairs(row_to_aabbs) do
+        for _, shape in pairs(row) do
+            local already_merged = which(shape.merged, false)
+            if not already_merged then
+                table.insert(out, shape)
+            end
+        end
+    end
+
+    return out
+end
+
 
 --- @brief [internal] parse tile object layer, objects without a `class` field will be parsed as basic sprites / colliders
 function ow.Stage:_create_object_layer(layer)
