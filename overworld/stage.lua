@@ -226,12 +226,17 @@ function ow.Stage:_create_tile_layer(layer)
             local pushed = false
             for tileset_i, tileset in pairs(self._tilesets) do
                 local tile = tileset:get_tile(id)
-                if not meta.is_nil(tile) then -- else, try next tileset
-                    table.insert(tiles, tile)
-                    batch[tileset_i]:add(tile.quad, (col_i - 1) * self._tile_width, (row_i - 1) * self._tile_height)
-                    tile_hitbox:set(col_i, row_i, ternary(which(tile[rt.settings.overworld.stage.is_solid_id], false), 1, 0))
+                if tile.is_empty then
                     pushed = true
                     break
+                else
+                    if not meta.is_nil(tile) then -- else, try next tileset
+                        table.insert(tiles, tile)
+                        batch[tileset_i]:add(tile.quad, (col_i - 1) * self._tile_width, (row_i - 1) * self._tile_height)
+                        tile_hitbox:set(col_i, row_i, ternary(which(tile[rt.settings.overworld.stage.is_solid_id], false), 1, 0))
+                        pushed = true
+                        break
+                    end
                 end
             end
 

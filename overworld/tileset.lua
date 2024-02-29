@@ -30,7 +30,8 @@ end)
 --- @field id String
 function ow.Tile(texture)
     return {
-        quad = love.graphics.newQuad(0, 0, texture:getWidth(), texture:getHeight(), texture)
+        quad = love.graphics.newQuad(0, 0, texture:getWidth(), texture:getHeight(), texture),
+        is_empty = false
     }
 end
 
@@ -116,6 +117,11 @@ function ow.Tileset:realize()
     end
 
     self._tiles = {}
+    local empty_tile = ow.Tile(self._array_texture)
+    empty_tile.quad:setViewport(0, 0, 0, 0) -- default transparent tile
+    empty_tile.is_empty = true
+    self._tiles[0] = empty_tile
+
     for tile_i = 1, x.tilecount do
         local tile = ow.Tile(self._array_texture)
         tile.quad:setLayer(tile_i)
@@ -134,6 +140,10 @@ function ow.Tileset:realize()
     end
 
     self._texture =  rt.Texture(self._path_prefix .. "/" .. self._name .. ".png")
+
+    self._array_texture:setWrap(rt.TextureWrapMode.ZERO, rt.TextureWrapMode.ZERO)
+    self._texture:set_wrap_mode(rt.TextureWrapMode.ZERO)
+
     self._is_realized = true
 end
 
@@ -150,9 +160,6 @@ end
 --- @brief
 function ow.Tileset:get_tile(id)
     local out = self._tiles[id - self._id_offset + 1]
-    if out == nil then
-        rt.error("In ow.Tileset:get_tile: no tile with id `" .. id .. "` available")
-    end
     return out
 end
 
@@ -164,7 +171,7 @@ function ow.Tileset:get_texture_rectangle(id)
 
     local col_i = id - self._id_offset
     return rt.AABB(
-            col_i * tile_w, 0,
-            tile_w, tile_h
+        col_i * tile_w, 0,
+        tile_w, tile_h
     )
 end

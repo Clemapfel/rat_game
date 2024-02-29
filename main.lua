@@ -53,7 +53,7 @@ love.load = function()
 end
 
 love.draw = function()
-    love.graphics.clear(0.5, 0.5, 0.5, 1)
+    love.graphics.clear(0.8, 0.2, 0.8, 1)
     rt.current_scene:draw()
 
     do -- show fps
