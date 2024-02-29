@@ -219,7 +219,7 @@ function ow.Stage._generate_tile_colliders(matrix)
     local active = false
     local min_x, max_x, min_y, max_y = matrix:get_boundaries()
     for row_i = min_y, max_y do
-        row_to_aabbs[row_i] = {}
+        row_to_aabbs[row_i - min_y + 1] = {}
         for col_i = min_x, max_x do
             local solid = matrix:get(col_i, row_i) == true
             if solid then
@@ -237,7 +237,7 @@ function ow.Stage._generate_tile_colliders(matrix)
             else
                 if active then
                     -- close
-                    table.insert(row_to_aabbs[row_i], aabb)
+                    table.insert(row_to_aabbs[row_i - min_y + 1], aabb)
                     active = false
                 else
                     -- continue
@@ -247,15 +247,14 @@ function ow.Stage._generate_tile_colliders(matrix)
 
         if active then
             -- close at end of line
-            table.insert(row_to_aabbs[row_i], aabb)
+            table.insert(row_to_aabbs[row_i - min_y + 1], aabb)
             active = false
         end
     end
 
     -- merge step
-    local current_row
+    local current_row = 1
     for i, row in pairs(row_to_aabbs) do
-        if current_row == nil then current_row = i end
         for _, shape in pairs(row) do
             if not shape.merged and current_row < #row_to_aabbs then
                 for row_i = current_row + 1, #row_to_aabbs do
