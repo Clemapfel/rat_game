@@ -1,6 +1,9 @@
 require("include")
 
-local texture_h = 200
+require "common.mel_frequency_cepstrum"
+
+local texture_h = 100
+local shader_i = 0
 local shader = rt.Shader("assets/shaders/fourier_transform_visualization.glsl")
 local image_data_format = "r16"
 
@@ -10,9 +13,9 @@ local magnitude_image, magnitude_texture, energy_image, energy_texture, texture_
 local col_i = 0
 local processor = rt.AudioProcessor("assets/sound/test_music_02.mp3")
 processor.on_update = function(magnitude)
-
+    local spectrum_size = #magnitude / 2.75
     if not initialized then
-        magnitude_image = love.image.newImageData(texture_h, #magnitude, image_data_format)
+        magnitude_image = love.image.newImageData(texture_h, spectrum_size, image_data_format)
         magnitude_texture = love.graphics.newImage(magnitude_image)
 
         for texture in range(magnitude_texture) do
@@ -28,16 +31,17 @@ processor.on_update = function(magnitude)
 
     if col_i >= texture_h then
         magnitude_image:release()
-        magnitude_image = love.image.newImageData(texture_h, #bins, image_data_format)
+        magnitude_image = love.image.newImageData(texture_h, spectrum_size, image_data_format)
         col_i = 0
     end
 
-    for i, m in ipairs(magnitude) do
-        magnitude_image:setPixel(col_i, i - 1, m, 0, 0, 1)
+    for i = 1, spectrum_size do
+        magnitude_image:setPixel(col_i, spectrum_size - i, magnitude[#magnitude - i], 0, 0, 1)
     end
 
     magnitude_texture:replacePixels(magnitude_image)
     shader:send("_spectrum", magnitude_texture)
+    --shader:send("_index", col_i)
     col_i = col_i + 1
 end
 

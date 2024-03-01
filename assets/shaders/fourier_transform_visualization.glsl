@@ -86,7 +86,7 @@ uniform vec2 _energy_size;
 
 uniform vec2 _texture_size;
 uniform float _index;
-uniform int _on;
+uniform float _max_index;
 
 float laplacian_of_gaussian(int x, int y, int sigma)
 {
@@ -105,13 +105,22 @@ float laplacian(int x, int y, int sigma)
         return 0.0;
 }
 
+float project(float lower, float upper, float value)
+{
+    return value * abs(upper - lower) + min(lower, upper);
+}
+
 vec4 effect(vec4 color, Image tex, vec2 texture_coords, vec2 screen_coords)
 {
     vec2 screen_size = love_ScreenSize.xy;
     vec2 pixel_size = vec2(1) / _texture_size;
 
+    //texture_coords.x /= (10 / _texture_size.x);
+
     float magnitude = Texel(_spectrum, texture_coords).x;
-    return vec4(vec3(magnitude), 1);
+
+    vec3 as_hsv = vec3(magnitude, 1, magnitude);
+    return vec4(hsv_to_rgb(as_hsv), 1);
 
     /*
     float step = 1 / _energy_size.x;
