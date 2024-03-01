@@ -6,8 +6,6 @@ rt.Scene = meta.new_type("Scene", function()
         env = {},
         window = rt.WindowLayout(),
         skybox = rt.Palette.BACKGROUND,
-        animation_handler = rt.AnimationHandler(),
-        animation_timer_handler = rt.AnimationTimerHandler(),
         elapsed = rt.seconds(0),
         input = {}
     })

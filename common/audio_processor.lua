@@ -24,8 +24,8 @@ rt.AudioProcessor = meta.new_type("AudioProcessor", function(file_path, window_s
         _buffer_offset = 0,     -- position of already queued buffers
         _playing_offset = 0,    -- position of currently playing sample
         _last_update = -1,
-        _n_transformed = 0,       -- number of samples processed by fourier transform
-        _window_size = window_size, -- window used for queing audio and fourier transform
+        _n_transformed = 0,         -- number of samples processed by fourier transform
+        _window_size = window_size, -- window used for queueing audio and fourier transform
 
         transform = {},
         on_update = nil
@@ -41,7 +41,33 @@ rt.AudioProcessor = meta.new_type("AudioProcessor", function(file_path, window_s
     return out
 end)
 
-rt.AudioProcessor.ft = rt.FourierTransform()
+-- fftw interface
+rt.AudioProcessor.ft = (function()
+    local fftw = ffi.load("/usr/lib64/libfftw3.so")
+    local ft = {}
+    ft.fftw = fftw
+    ft.fftw_cdef = [[
+        extern double* fftw_alloc_real(size_t n);
+        extern void* fftw_alloc_complex(size_t n);
+        extern void* fftw_plan_dft_r2c_1d(int n, double* in, void* out, unsigned int flags);
+        extern void* fftw_plan_dft_c2r_1d(int n, void* in, double* out, unsigned int flags);
+        extern void fftw_execute(const void* plan);
+    ]]
+    ffi.cdef(ft.fftw_cdef)
+
+    ft.alloc_real = fftw.fftw_alloc_real
+    ft.alloc_complex = fftw.fftw_alloc_complex
+    ft.plan_dft_r2c_1d = fftw.fftw_plan_dft_r2c_1d
+    ft.plan_dft_c2r_1d = fftw.fftw_plan_dft_c2r_1d
+    ft.plan_mode = 64 -- FFTW_ESTIMATE
+    ft.execute = fftw.fftw_execute
+
+    ft.real_data_t = "double*"
+    ft.complex_data_t = "double(*)[2]"
+    ft.complex_t = "double*"
+
+    return ft
+end)()
 
 --- @brief
 function rt.AudioProcessor:start()
@@ -60,39 +86,38 @@ end
 --- @param sample_offset Number
 --- @param window_size Number
 function rt.AudioProcessor:_signal_to_spectrum(data, offset, window_size)
-
     -- initialize transform memory for window size
-    local tf = self.transform
+    local tf
     if meta.is_nil(self.transform) or self.transform.window_size ~= window_size then
         self.transform = {
             window_size = window_size,
             fourier_normalize_factor = 1 / math.sqrt(window_size),
-            fftw_real = self.ft._alloc_real(window_size),
-            fftw_complex = self.ft._alloc_complex(window_size),
+            fftw_real = self.ft.alloc_real(window_size),
+            fftw_complex = self.ft.alloc_complex(window_size),
             plan_signal_to_spectrum = {},
             plan_spectrum_to_signal = {}
         }
 
         tf = self.transform
 
-        tf.plan_signal_to_spectrum = self.ft._plan_dft_r2c_1d(
+        tf.plan_signal_to_spectrum = self.ft.plan_dft_r2c_1d(
             window_size,
             tf.fftw_real,
             tf.fftw_complex,
-            self.ft._plan_mode
+            self.ft.plan_mode
         )
 
-        tf.plan_spectrum_to_signal = self.ft._plan_dft_c2r_1d(
+        tf.plan_spectrum_to_signal = self.ft.plan_dft_c2r_1d(
             window_size,
             tf.fftw_complex,
             tf.fftw_real,
-            self.ft._plan_mode
+            self.ft.plan_mode
         )
     end
 
     local data_n = data:getSampleCount() * data:getChannelCount()
     local data_ptr = ffi.cast(self._data_t .. "*", self._data:getFFIPointer())
-    local from = ffi.cast(self.ft._real_data_t, tf.fftw_real)
+    local from = ffi.cast(self.ft.real_data_t, tf.fftw_real)
 
     -- convert audio signal to doubles
     if self._data:getChannelCount() == 1 then
@@ -124,16 +149,16 @@ function rt.AudioProcessor:_signal_to_spectrum(data, offset, window_size)
         end
     end
 
-    self.ft._execute(tf.plan_signal_to_spectrum)
+    self.ft.execute(tf.plan_signal_to_spectrum)
 
     -- convert complex to magnitude, also take first half only and flip
-    local to = ffi.cast(self.ft._complex_data_t, tf.fftw_complex)
+    local to = ffi.cast(self.ft.complex_data_t, tf.fftw_complex)
     local half = math.floor(0.5 * tf.window_size)
     local normalize_factor = tf.fourier_normalize_factor
 
     local magnitude_out = {}
     for i = 1, half do
-        local complex = ffi.cast(self.ft._complex_t, to[half - i - 1 - 1])
+        local complex = ffi.cast(self.ft.complex_t, to[half - i - 1 - 1])
         local magnitude = rt.magnitude(complex[0], complex[1])
         magnitude = magnitude * normalize_factor -- project into [0, 1]
         table.insert(magnitude_out, magnitude)

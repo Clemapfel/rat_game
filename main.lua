@@ -1,73 +1,5 @@
 require("include")
 
-rt.current_scene = ow.OverworldScene()
-rt.current_scene._player:set_position(150, 150)
-rt.current_scene:add_stage("debug_map", "assets/stages/debug")
-
---[[
-local spritesheet = rt.Spritesheet("assets/sprites/debug", "bouncy_ball")
-
-for i = 1, 100 do
-    local x, y = rt.random.integer(50, 800 - 200), rt.random.integer(50, 600 - 200)
-    --rt.current_scene:add_entity(ow.OverworldSprite(rt.current_scene, spritesheet, "bounce"), x, y, rt.random.integer(-5, 5))
-end
-
-local trigger = ow.Trigger(rt.current_scene, 200, 200, 120, 50)
-trigger:set_is_solid(true)
-trigger:signal_connect("interact", function(self, player)
-    self:set_is_active(true)
-end)
-trigger:signal_connect("intersect", function(self, player)
-    self:set_is_active(false)
-end)
-trigger:set_is_solid(true)
-
-rt.current_scene:add_entity(trigger)
-
-local input_component = rt.InputController()
-input_component:signal_connect("pressed", function(self, which)
-    if which == rt.InputButton.A then
-    elseif which == rt.InputButton.UP then
-    elseif which == rt.InputButton.DOWN then
-    end
-end)
-]]--
-
-love.load = function()
-    love.window.setMode(800, 600, {
-        vsync = 1,
-        msaa = 8,
-        stencil = true,
-        resizable = true
-    })
-    love.window.setTitle("rat_game")
-    rt.current_scene:realize()
-end
-
-love.draw = function()
-    love.graphics.clear(0.8, 0.2, 0.8, 1)
-    rt.current_scene:draw()
-
-    do -- show fps
-        local fps = tostring(love.timer.getFPS())
-        local margin = 3
-        love.graphics.setColor(1, 1, 1, 0.75)
-        love.graphics.print(fps, rt.graphics.get_width() - love.graphics.getFont():getWidth(fps) - 2 * margin, 0.5 * margin)
-    end
-end
-
-love.update = function()
-    local delta = love.timer.getDelta()
-    rt.AnimationHandler:update(delta)
-    rt.current_scene:update(delta)
-end
-
-love.quit = function()
-
-end
-
-
---[[
 local bins = {}
 local energy_bins = {}
 
@@ -83,7 +15,7 @@ local magnitude_image, magnitude_texture, energy_image, energy_texture, texture_
 
 --shader:send("_texture_size", {image:getWidth(), image:getHeight()})
 
-local active = false
+local active = true
 local min_energy = POSITIVE_INFINITY
 local max_energy = NEGATIVE_INFINITY
 local n_energy_bins = 16
@@ -185,29 +117,6 @@ processor.on_update = function(magnitude, min, max, energy_sum)
     col_i = col_i + 1
 end
 
-rt.current_scene = rt.add_scene("debug")
-local scene = ow.OverworldScene()
-rt.current_scene:set_child(scene)
-
-rt.current_scene.input:signal_connect("pressed", function(_, which)
-    if which == rt.InputButton.A then
-        active = not active
-    elseif which == rt.InputButton.B then
-    elseif which == rt.InputButton.X then
-    elseif which == rt.InputButton.Y then
-    elseif which == rt.InputButton.R then
-    elseif which == rt.InputButton.L then
-    elseif which == rt.InputButton.UP then
-        boost = boost + 0.5
-    elseif which == rt.InputButton.RIGHT then
-    elseif which == rt.InputButton.LEFT then
-    elseif which == rt.InputButton.DOWN then
-        boost = boost - 0.5
-    end
-end)
-
--- ##
-
 love.load = function()
     love.window.setMode(1200, 800, {
         vsync = 1,
@@ -216,13 +125,10 @@ love.load = function()
         resizable = true
     })
     love.window.setTitle("rat_game")
-    rt.current_scene:run()
 end
 
 love.draw = function()
     love.graphics.clear(0.8, 0, 0.8, 1)
-    rt.current_scene:draw()
-
     shader:bind()
     texture_shape:draw()
     shader:unbind()
@@ -230,8 +136,45 @@ end
 
 love.update = function()
     local delta = love.timer.getDelta()
-    rt.current_scene:update(delta)
     processor:update()
 end
 
+
+--[[
+rt.current_scene = ow.OverworldScene()
+rt.current_scene._player:set_position(150, 150)
+rt.current_scene:add_stage("debug_map", "assets/stages/debug")
+
+love.load = function()
+    love.window.setMode(800, 600, {
+        vsync = 1,
+        msaa = 8,
+        stencil = true,
+        resizable = true
+    })
+    love.window.setTitle("rat_game")
+    rt.current_scene:realize()
+end
+
+love.draw = function()
+    love.graphics.clear(0.8, 0.2, 0.8, 1)
+    rt.current_scene:draw()
+
+    do -- show fps
+        local fps = tostring(love.timer.getFPS())
+        local margin = 3
+        love.graphics.setColor(1, 1, 1, 0.75)
+        love.graphics.print(fps, rt.graphics.get_width() - love.graphics.getFont():getWidth(fps) - 2 * margin, 0.5 * margin)
+    end
+end
+
+love.update = function()
+    local delta = love.timer.getDelta()
+    rt.AnimationHandler:update(delta)
+    rt.current_scene:update(delta)
+end
+
+love.quit = function()
+
+end
 ]]--
