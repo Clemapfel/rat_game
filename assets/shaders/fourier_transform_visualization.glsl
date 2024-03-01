@@ -111,7 +111,9 @@ vec4 effect(vec4 color, Image tex, vec2 texture_coords, vec2 screen_coords)
     vec2 pixel_size = vec2(1) / _texture_size;
 
     float magnitude = Texel(_spectrum, texture_coords).x;
+    return vec4(vec3(magnitude), 1);
 
+    /*
     float step = 1 / _energy_size.x;
     float energy =
         Texel(_energy, vec2(texture_coords.x + +1 * step, texture_coords.y)).x +
@@ -148,4 +150,5 @@ vec4 effect(vec4 color, Image tex, vec2 texture_coords, vec2 screen_coords)
     float gray = energy_delta * 0.5 * energy;
     float hsv = clamp(magnitude, 0, 1);
     return clamp(vec4(vec3(gray * 0.5) + hsv_to_rgb(vec3(clamp(hsv, 0.8, 1), 1, hsv)), 1), 0, 1);
+    */
 }

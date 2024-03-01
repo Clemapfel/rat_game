@@ -87,7 +87,7 @@ end
 --- @param window_size Number
 function rt.AudioProcessor:_signal_to_spectrum(data, offset, window_size)
     -- initialize transform memory for window size
-    local tf
+    local tf = self.transform
     if meta.is_nil(self.transform) or self.transform.window_size ~= window_size then
         self.transform = {
             window_size = window_size,
