@@ -33,13 +33,13 @@ rt.Texture = meta.new_type("Texture", rt.Drawable, function(path_or_image_or_wid
         out = meta.new(rt.Texture, {
             _native = love.graphics.newImage(width, height)
         })
-    elseif path_or_image_or_width:typeof() == "ImageData" then
-        out = meta.new(rt.Texture, {
-            _native = love.graphics.newImage(path_or_image_or_width)
-        })
-    else
+    elseif meta.is_nil(path_or_image_or_width) then
         out = meta.new(rt.Texture, {
             _native = love.graphics.newImage()
+        })
+    else -- love.ImageData
+        out = meta.new(rt.Texture, {
+            _native = love.graphics.newImage(path_or_image_or_width)
         })
     end
     out:set_scale_mode(rt.TextureScaleMode.NEAREST)

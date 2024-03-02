@@ -141,7 +141,7 @@ function ow.Tileset:realize()
 
     self._texture =  rt.Texture(self._path_prefix .. "/" .. self._name .. ".png")
 
-    self._array_texture:setWrap(rt.TextureWrapMode.ZERO, rt.TextureWrapMode.ZERO)
+    self._array_texture:setWrap(rt.TextureWrapMode.CLAMP, rt.TextureWrapMode.CLAMP)
     self._texture:set_wrap_mode(rt.TextureWrapMode.ZERO)
 
     self._is_realized = true
