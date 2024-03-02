@@ -87,49 +87,63 @@ uniform vec2 _energy_size;
 uniform vec2 _texture_size;
 uniform float _index;
 uniform float _max_index;
-
-float laplacian_of_gaussian(int x, int y, int sigma)
-{
-    float sigma_4 = sigma * sigma * sigma * sigma;
-    float sigma_2 = sigma * sigma;
-    return 1 / (PI * sigma_4) * (1 - (x * x + y * y) / (2 * sigma_2)) * exp(-1 * (x*x + y*y) / (2 * sigma_2));
-}
-
-float laplacian(int x, int y, int sigma)
-{
-    if (x < 0)
-        return -1.0;
-    else if (x == 0)
-        return float(sigma);
-    else
-        return 0.0;
-}
-
-float project(float lower, float upper, float value)
-{
-    return value * abs(upper - lower) + min(lower, upper);
-}
+uniform float _index_delta;
 
 vec4 effect(vec4 color, Image tex, vec2 texture_coords, vec2 screen_coords)
 {
     vec2 screen_size = love_ScreenSize.xy;
     vec2 pixel_size = vec2(1) / _texture_size;
 
+    // smoothly scroll from the right
     float playhead = float(_index) / float(_max_index);
-
-    float diff = abs(texture_coords.x - playhead);
-    //if (diff < 0.001)
-      //  return vec4(1);
-
-    //texture_coords.x = texture_coords.x - playhead + 0.5;
     float scale = float(100) / _max_index;
     texture_coords.x = texture_coords.x * scale - (1 * scale - playhead);
     float magnitude = Texel(_spectrum, texture_coords).x;
+
+    // gradient
+    const int kernel_size = 1;
+    float energy = 0;
+    float n = 0;
+    int i = 0;
+    int j = 0;
+    //for (int i = -kernel_size; i <= kernel_size; ++i) {
+        for (int j = -kernel_size; j <= kernel_size; ++j) {
+            float x_coord = texture_coords.x + i * pixel_size.x;
+            float y_coord = texture_coords.y + j * pixel_size.y;
+            float x = Texel(_spectrum, vec2(x_coord, y_coord)).x;
+            energy = energy + x;
+            n = n + 1;
+        }
+    //}
+
+    magnitude = energy / n;
 
     vec3 as_hsv = vec3(magnitude, 1, magnitude);
     return vec4(hsv_to_rgb(as_hsv), 1);
 
     /*
+    float laplacian_of_gaussian(int x, int y, int sigma)
+    {
+        float sigma_4 = sigma * sigma * sigma * sigma;
+        float sigma_2 = sigma * sigma;
+        return 1 / (PI * sigma_4) * (1 - (x * x + y * y) / (2 * sigma_2)) * exp(-1 * (x*x + y*y) / (2 * sigma_2));
+    }
+
+    float laplacian(int x, int y, int sigma)
+    {
+        if (x < 0)
+            return -1.0;
+        else if (x == 0)
+            return float(sigma);
+        else
+            return 0.0;
+    }
+
+    float project(float lower, float upper, float value)
+    {
+        return value * abs(upper - lower) + min(lower, upper);
+    }
+
     float step = 1 / _energy_size.x;
     float energy =
         Texel(_energy, vec2(texture_coords.x + +1 * step, texture_coords.y)).x +
