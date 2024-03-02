@@ -24,6 +24,5 @@ return {
         backdrop_right = 19,
         backdrop = 20,
         spacer = 21
-
     }
 }

@@ -115,8 +115,15 @@ vec4 effect(vec4 color, Image tex, vec2 texture_coords, vec2 screen_coords)
     vec2 screen_size = love_ScreenSize.xy;
     vec2 pixel_size = vec2(1) / _texture_size;
 
-    //texture_coords.x /= (10 / _texture_size.x);
+    float playhead = float(_index) / float(_max_index);
 
+    float diff = abs(texture_coords.x - playhead);
+    //if (diff < 0.001)
+      //  return vec4(1);
+
+    //texture_coords.x = texture_coords.x - playhead + 0.5;
+    float scale = float(100) / _max_index;
+    texture_coords.x = texture_coords.x * scale - (1 * scale - playhead);
     float magnitude = Texel(_spectrum, texture_coords).x;
 
     vec3 as_hsv = vec3(magnitude, 1, magnitude);

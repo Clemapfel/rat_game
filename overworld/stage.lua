@@ -355,6 +355,11 @@ function ow.Stage:_create_object_layer(layer)
                     rt.error("In ow.Stage:_create_object_layer: No tileset with tile id `" .. id .. "` available")
                 end
             end
+        elseif class_id == "AnimatedSprite" then
+            local id = object.animation_id
+            if meta.is_nil(id) then
+                --rt.error("In ow.Stage.")
+            end
         else
             rt.error("In ow.Stage._create_object_layer: unhandled type `" .. object.type .. "`")
         end

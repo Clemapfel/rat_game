@@ -3,11 +3,23 @@
         "height": 4300,
         "width": 2
     },
-    "activeFile": "",
+    "activeFile": "debug_map.tmx",
     "expandedProjectPaths": [
     ],
     "file.lastUsedOpenFilter": "All Files (*)",
     "fileStates": {
+        "": {
+            "scaleInDock": 1,
+            "scaleInEditor": 1
+        },
+        "/home/clem/Workspace/rat_game/assets/sprites/debug/bouncy_ball.tsx": {
+            "scaleInDock": 1,
+            "scaleInEditor": 1
+        },
+        "bouncy_ball.tsx": {
+            "scaleInDock": 1,
+            "scaleInEditor": 1
+        },
         "debug.tsx": {
             "dynamicWrapping": false,
             "scaleInDock": 1,
@@ -25,15 +37,23 @@
             }
         },
         "debug_map.tmx": {
-            "scale": 0.33,
-            "selectedLayer": 0,
+            "scale": 1,
+            "selectedLayer": 1,
             "viewCenter": {
-                "x": 1353.030303030303,
-                "y": 68.18181818181802
+                "x": 424.5,
+                "y": 248.5
             }
+        },
+        "debug_map.tmx#debug_tileset": {
+            "scaleInDock": 1
+        },
+        "debug_tileset.tsx": {
+            "scaleInDock": 1
         }
     },
     "last.exportedFilePath": "/home/clem/Workspace/rat_game/assets/stages/debug",
+    "last.imagePath": "/home/clem/Workspace/rat_game/assets/sprites/debug",
+    "last.objectTemplatePath": "/home/clem/Workspace/rat_game/assets/stages/debug",
     "lastUsedTilesetExportFilter": "All Files (*)",
     "map.fixedSize": false,
     "map.height": 32,
@@ -41,13 +61,23 @@
     "map.lastUsedFormat": "tmx",
     "map.width": 32,
     "openFiles": [
+        "debug_map.tmx",
+        "debug_infinite_map.tmx",
+        "bouncy_ball.tsx"
     ],
     "project": "rat_game.tiled-project",
     "property.type": "object",
     "recentFiles": [
+        "bouncy_ball.tsx",
         "debug_infinite_map.tmx",
         "debug_map.tmx",
+        "/home/clem/Workspace/rat_game/assets/sprites/debug/bouncy_ball.tsx",
         "debug.tsx"
     ],
-    "resizeMap.removeObjects": false
+    "resizeMap.removeObjects": false,
+    "tileset.lastUsedFormat": "tsx",
+    "tileset.tileSize": {
+        "height": 64,
+        "width": 64
+    }
 }
