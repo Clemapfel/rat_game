@@ -4,11 +4,11 @@ rt.settings.overworld.sprite = {
 
 --- @class ow.OveworldSprite
 ow.OverworldSprite = meta.new_type("OverworldSprite", ow.OverworldEntity, rt.Animation,
-function(scene, spritesheet, animation_id)
+function(scene, id)
     local out = meta.new(ow.OverworldSprite, {
         _scene = scene,
-        _spritesheet = spritesheet,
-        _animation_id = animation_id,
+        _id = id,
+        _spritesheet = {}, -- rt.SpriteAtlasEntry
         _width = 0, -- 0 -> use frame resolution
         _height = 0,
         _shape = rt.VertexRectangle(0, 0, 1, 1),
@@ -17,8 +17,8 @@ function(scene, spritesheet, animation_id)
         _current_frame = 1,
         _elapsed = 0,
         _should_loop = true,
-        _frame_duration = 1 / spritesheet:get_fps(),
-        _n_frames = spritesheet:get_n_frames(animation_id)
+        _frame_duration = 0,
+        _n_frames = 0
     })
 
     out:set_is_animated(true)
@@ -29,7 +29,13 @@ end)
 function ow.OverworldSprite:realize()
     if not self._is_realized then
         self._is_realized = true
-        self._shape:set_texture(self._spritesheet)
+
+        self._spritesheet = rt.SpriteAtlas:get(self._id)
+        self._frame_duration = 1 / self._spritesheet:get_fps()
+        self._n_frames = self._spritesheet:get_n_frames()
+        self._width, self._height = self._spritesheet:get_frame_size()
+
+        self._shape:set_texture(self._spritesheet:get_texture())
 
         self._debug_shape = rt.Rectangle(0, 0, 1, 1)
         self._debug_shape_outline = rt.Rectangle(0, 0, 1, 1)
@@ -39,7 +45,7 @@ function ow.OverworldSprite:realize()
         self._debug_shape:set_color(rt.RGBA(color.r, color.g, color.b, 0.5))
         self._debug_shape_outline:set_color(rt.RGBA(color.r, color.g, color.b, 0.9))
 
-        self:set_position(self:get_position())
+        self:set_position(self._position_x, self._position_y)
         self:set_size(self._width, self._height)
         self:set_frame(self._current_frame)
     end
@@ -65,7 +71,7 @@ function ow.OverworldSprite:set_size(width, height)
 
     if self._is_realized then
         local x, y = self:get_position()
-        local res_x, res_y = self._spritesheet:get_frame_size(self._animation_id)
+        local res_x, res_y = self._spritesheet:get_frame_size()
         local w = ternary(width == 0, res_x, width)
         local h = ternary(height == 0, res_y, height)
         self._shape:reformat(
@@ -81,7 +87,7 @@ end
 
 --- @brief
 function ow.OverworldSprite:get_size()
-    local res_x, res_y = self._spritesheet:get_frame_size(self._animation_id)
+    local res_x, res_y = self._spritesheet:get_frame_size()
     return
         ternary(self._width == 0, res_x, self._width),
         ternary(self._height == 0, res_x, self._height)
@@ -99,9 +105,10 @@ end
 
 --- @brief
 function ow.OverworldSprite:set_frame(i)
-    self._current_frame = i % self._n_frames
+    self._current_frame = i % self._n_frames + 1
     if self._is_realized then
-        local frame = self._spritesheet:get_frame(self._animation_id, self._current_frame, i)
+        local frame = self._spritesheet:get_frame(self._current_frame)
+        dbg(frame)
         self._shape:reformat_texture_coordinates(
             frame.x, frame.y,
             frame.x + frame.width, frame.y,
@@ -146,7 +153,9 @@ function ow.OverworldSprite:update(delta)
 
         if frame_i ~= self._current_frame then
             self:set_frame(frame_i)
+            self._current_frame = frame_i
         end
+
     end
 end
 

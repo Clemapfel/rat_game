@@ -74,6 +74,9 @@ function rt.SpriteAtlasEntry:load()
         self.fps = config.fps
     end
 
+    self.frame_width = config.width
+    self.frame_height = config.height
+
     local min_frame_i = POSITIVE_INFINITY
     local max_frame_i = NEGATIVE_INFINITY
     local frames_seen = {}
@@ -110,7 +113,7 @@ function rt.SpriteAtlasEntry:load()
         self.frame_to_name[index] = name
         self.name_to_frame[name] = index
         self.texture_rectangles[index] = rt.AABB(
-            index / self.n_frames, 0,
+                (index - 1) / self.n_frames, 0,
                 1 / self.n_frames, 1
         )
     end
@@ -146,20 +149,38 @@ function rt.SpriteAtlasEntry:get_frame_size()
 end
 
 --- @brief
-function rt.SpriteAtlasEntry:get_texture_rectangle(index)
-    return self.texture_rectangles[index]
+function rt.SpriteAtlasEntry:get_fps()
+    return self.fps
+end
+
+--- @brief
+--- @return rt.AABB
+function rt.SpriteAtlasEntry:get_frame(index)
+    local out = self.texture_rectangles[index]
+    if out == nil then
+        rt.error("In rt.SpriteAtlasEntry:get_frame: animation `" .. self.path .. "/" .. self.id .. "` does not have frame `" .. index .. "`")
+    end
+    return out
+end
+
+--- @brief
+function rt.SpriteAtlasEntry:get_n_frames()
+    return #self.frame_to_name
 end
 
 --- @class rt.SpriteAtlas
-rt.SpriteAtlas = meta.new_type("SpriteAtlas", function(folder)
+rt.SpriteAtlas = meta.new_type("SpriteAtlas", function()
     return meta.new(rt.SpriteAtlas, {
-        _folder = folder,
+        _folder = "",
         _data = {}  -- Table<String, rt.SpriteAtlasEntry>
     })
 end)
 
 --- @class
-function rt.SpriteAtlas:initialize()
+function rt.SpriteAtlas:initialize(folder)
+    self._folder = folder
+    self._data = {}
+
     local sprites = {}
     local seen = {}
 
@@ -190,7 +211,7 @@ end
 
 --- @brief
 function rt.SpriteAtlas:get(id)
-    local out = self._data[id]
+    local out = self._data[self._folder .. "/" .. id]
     if meta.is_nil(out) then
         rt.error("In rt.SpriteAtlas: no spritesheet with id `" .. id .. "`")
     end

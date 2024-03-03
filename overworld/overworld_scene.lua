@@ -37,6 +37,7 @@ end
 
 --- @brief
 function ow.OverworldScene:add_entity(entity, x, y, render_priority)
+    meta.assert_number(x, y)
     render_priority = which(render_priority, 0)
 
     if self._render_priorities_set[render_priority] ~= true then
