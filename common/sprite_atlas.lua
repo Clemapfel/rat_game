@@ -46,19 +46,28 @@ function rt.SpriteAtlasEntry:load()
         end
     end
 
-    local width_available = config.width
-
-    -- if unable to load, treat entire image as sprite
+    -- deduce width or n_frames if one but not the other is available
     config.name = which(config.name, self.id)
-    config.width = which(config.width, data:getWidth())
-    config.height = which(config.height, data:getHeight())
-
-    if config.animations == nil then
+    if config.width ~= nil and config.n_frames == nil then
+        config.n_frames = data:getWidth() / config.width
+        if fract(config.n_frames) ~= 0 then
+            rt.error("In rt.SpriteAtlasEntry:load: incorrect frame width for sprite at `" .. image_path .. "`: image of size `" .. data:getWidth() .. "` is not vidibles by number of frames `" .. config.n_frames .. "`")
+        end
+    elseif config.n_frames ~= nil and config.width == nil then
+        config.width = data:getWidth() / config.n_frames
+        if fract(config.width) ~= 0 then
+            rt.error("In rt.SpriteAtlasEntry:load: incorrect frame width for sprite at `" .. image_path .. "`: image of size `" .. data:getWidth() .. "` is not vidibles by number of frames `" .. config.n_frames .. "`")
+        end
+    else -- treat entire spritesheet as frame
+        config.width = data:getWidth()
+        config.height = data:getHeight()
         config.animations = {
             ["default"] = {1, 1}
         }
         config.n_frames = 1
     end
+
+    config.height = which(config.height, data:getHeight())
 
     local min_frame_i = POSITIVE_INFINITY
     local max_frame_i = NEGATIVE_INFINITY
@@ -89,7 +98,7 @@ function rt.SpriteAtlasEntry:load()
     self.texture = rt.Texture(self.data)
 
     local function add_frame(name, index)
-        if self.frame_to_name[index] ~= nil or self.name_to_frame[name] ~= nil then
+        if self.frame_to_name[index] ~= nil then
             rt.error("In rt.SpriteAtlasEntry:realize: animation at `" .. config_path .. "` maps both `" .. name .. "` and `".. self.frame_to_name[index] .. "` to index " .. index)
         end
 
@@ -105,37 +114,53 @@ function rt.SpriteAtlasEntry:load()
         if meta.is_number(value) then
             add_frame(key, value)
         else
-            if #value == 2 and value[1] == value[2] then
-                add_frame(key, value[1])
+            local left = value[1]
+            local right = value[2]
+            if left == right then
+                add_frame(key, left)
             else
-                for _, frame_i in pairs(value) do
-                    add_frame(key, frame_i)
+                for i = left, right do
+                    add_frame(key, i)
                 end
             end
         end
     end
 
-    -- fill potential gaps
-    for i = min_frame_i, max_frame_i do
-        if self.frame_to_name[i] == nil then
-            self.frame_to_name[i] = self.frame_to_name[i-1]
-            self.name_to_frame[i] = self.name_to_frame[i-1]
-
-            local before = self.texture_rectangles[i]
-            self.texture_rectangles[i] = rt.AABB(
-                before.x, before.y, before.width, before.height
-            )
-        end
-    end
-
+    assert(#self.frame_to_name == #self.texture_rectangles)
     self.is_realized = true
 end
 
 --- @class rt.SpriteAtlas
 rt.SpriteAtlas = meta.new_type("SpriteAtlas", function(folder)
     return meta.new(rt.SpriteAtlas, {
-        _folder = folder,
-
+        _folder = folder
     })
 end)
 
+--- @class
+function rt.SpriteAtlas:initialize()
+    local sprites = {}
+    local seen = {}
+
+    local function parse(prefix)
+        local names = love.filesystem.getDirectoryItems(prefix)
+        for _, name in pairs(names) do
+            local filename = prefix .. "/" .. name
+            local info = love.filesystem.getInfo(filename)
+            if info.type == "directory" then
+                parse(filename)
+            elseif info.type == "file" then
+                local name, extension = rt.filesystem.get_name_and_extension(filename)
+                if seen[name] ~= true then
+                    if extension == "png" then
+                        local to_insert =  rt.SpriteAtlasEntry(prefix, name)
+                        table.insert(sprites, to_insert)
+                        seen[name] = true
+                    end
+                end
+            end
+        end
+    end
+
+    parse(self._folder)
+end

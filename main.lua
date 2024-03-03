@@ -2053,6 +2053,10 @@ local signal = {
     0
 }
 
+atlas = rt.SpriteAtlas("assets/sprites")
+atlas:initialize()
+
+--[[
 sprite = rt.SpriteAtlasEntry("assets/sprites", "controller_buttons")
 sprite:load()
 dbg(sprite.texture_rectangles)
@@ -2095,6 +2099,8 @@ end
 love.quit = function()
 
 end
+
+]]--
 
 --[[
 local texture_h = 10000

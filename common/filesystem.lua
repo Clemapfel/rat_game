@@ -21,3 +21,21 @@ function rt.filesystem.hash(path, as_string)
         end
     end
 end
+
+--- @brief
+--- @return String, String filename, extension
+function rt.filesystem.get_name_and_extension(path)
+    return string.match(path, "^.+/(.+)%.(.+)$")
+end
+
+--- @brief
+function rt.filesystem.get_name(path)
+    local name, extension = rt.filesystem.get_name_and_extension(path)
+    return name
+end
+
+--- @brief
+function rt.filesystem.get_extension(path)
+    local name, extension = rt.filesystem.get_name_and_extension(path)
+    return extension
+end

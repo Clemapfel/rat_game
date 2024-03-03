@@ -10,6 +10,6 @@ return {
        no_action = 4,
        analyze = 5,
        wish = 6,
-       rest = {6, 23}
+       rest = {7, 23}
     }
 }
