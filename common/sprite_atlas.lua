@@ -9,6 +9,7 @@ rt.SpriteAtlasEntry = meta.new_type("SpriteAtlasEntry", function(path, id)
         path = path,
         texture = {},  -- rt.Texture
         data = {},     -- love.ImageData
+        fps = rt.settings.sprite_atlas.default_fps,
         n_frames = -1,
         frame_width = -1,
         frame_height = -1,
@@ -68,6 +69,10 @@ function rt.SpriteAtlasEntry:load()
     end
 
     config.height = which(config.height, data:getHeight())
+
+    if not meta.is_nil(config.fps) and config.fps > 0 then
+        self.fps = config.fps
+    end
 
     local min_frame_i = POSITIVE_INFINITY
     local max_frame_i = NEGATIVE_INFINITY
@@ -130,11 +135,26 @@ function rt.SpriteAtlasEntry:load()
     self.is_realized = true
 end
 
+-- @brief
+function rt.SpriteAtlasEntry:get_texture()
+    return self.texture
+end
+
+--- @brief
+function rt.SpriteAtlasEntry:get_frame_size()
+    return self.frame_width, self.frame_height
+end
+
+--- @brief
+function rt.SpriteAtlasEntry:get_texture_rectangle(index)
+    return self.texture_rectangles[index]
+end
+
 --- @class rt.SpriteAtlas
 rt.SpriteAtlas = meta.new_type("SpriteAtlas", function(folder)
     return meta.new(rt.SpriteAtlas, {
         _folder = folder,
-        _
+        _data = {}  -- Table<String, rt.SpriteAtlasEntry>
     })
 end)
 
@@ -143,7 +163,6 @@ function rt.SpriteAtlas:initialize()
     local sprites = {}
     local seen = {}
 
-    --- @vararg subfolder names
     local function parse(prefix)
         local names = love.filesystem.getDirectoryItems(prefix)
         for _, name in pairs(names) do
@@ -155,9 +174,11 @@ function rt.SpriteAtlas:initialize()
                 local name, extension = rt.filesystem.get_name_and_extension(filename)
                 if seen[name] ~= true then
                     if extension == "png" then
-                        local to_insert =  rt.SpriteAtlasEntry(prefix, name)
-                        table.insert(sprites, to_insert)
-                        seen[name] = true
+                        local id = prefix .. "/" .. name
+                        if self._data[id] == nil then
+                            self._data[id] = rt.SpriteAtlasEntry(prefix, name)
+                            seen[name] = true
+                        end
                     end
                 end
             end
@@ -165,4 +186,17 @@ function rt.SpriteAtlas:initialize()
     end
 
     parse(self._folder)
+end
+
+--- @brief
+function rt.SpriteAtlas:get(id)
+    local out = self._data[id]
+    if meta.is_nil(out) then
+        rt.error("In rt.SpriteAtlas: no spritesheet with id `" .. id .. "`")
+    end
+
+    if out.is_realized == false then
+        out:load()
+    end
+    return out
 end

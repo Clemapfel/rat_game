@@ -226,12 +226,14 @@ end
 function ow.Player:_update_velocity()
     local damping = clamp(0, 1, self._movement_timer / rt.settings.overworld.player.acceleration_delay)
     damping = clamp(0.3, rt.exponential_acceleration(damping))
+    local sprinting = ternary(self._is_sprinting, rt.settings.overworld.player.sprinting_velocity_factor, 1)
 
     local x, y = rt.translate_point_by_angle(
         0, 0,
-        self._velocity_magnitude * damping,
+        self._velocity_magnitude * damping * sprinting,
         self._velocity_angle
     )
+
 
     for collider in range(self._collider, self._sensor) do
         collider:set_linear_velocity(x, y)
@@ -255,9 +257,6 @@ function ow.Player:_update_velocity_from_dpad()
 
     local angle = rt.angle(x, y)
     local target = rt.settings.overworld.player.velocity
-    if self._is_sprinting then
-        target = target * rt.settings.overworld.player.sprinting_velocity_factor
-    end
 
     self._velocity_magnitude = rt.magnitude(x, y) * target
     self._velocity_angle = angle
@@ -288,7 +287,7 @@ function ow.Player._handle_button_pressed(_, button, self)
         self:_set_sensor_active(true)
     end
 
-    if button == rt.InputButton.B then
+    if button == rt.InputButton.R or button == rt.InputButton.L then
         self._is_sprinting = true
     end
 
@@ -304,7 +303,7 @@ function ow.Player._handle_button_released(_, button, self)
         self:_set_sensor_active(false)
     end
 
-    if button == rt.InputButton.B then
+    if button == rt.InputButton.R or button == rt.InputButton.L then
         self._is_sprinting = false
     end
 
@@ -333,11 +332,6 @@ function ow.Player._handle_joystick(_, x, y, which, self)
 
     if which == rt.JoystickPosition.LEFT then
         local target = rt.settings.overworld.player.velocity
-        if self._is_sprinting then
-            target = target * rt.settings.overworld.player.sprinting_velocity_factor
-        end
-
-
         local angle = rt.angle(x, y)
         if self._direction_active == false and magnitude > deadzone then
             self._direction = angle
