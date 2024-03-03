@@ -133,7 +133,8 @@ end
 --- @class rt.SpriteAtlas
 rt.SpriteAtlas = meta.new_type("SpriteAtlas", function(folder)
     return meta.new(rt.SpriteAtlas, {
-        _folder = folder
+        _folder = folder,
+        _
     })
 end)
 
@@ -142,6 +143,7 @@ function rt.SpriteAtlas:initialize()
     local sprites = {}
     local seen = {}
 
+    --- @vararg subfolder names
     local function parse(prefix)
         local names = love.filesystem.getDirectoryItems(prefix)
         for _, name in pairs(names) do

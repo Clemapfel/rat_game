@@ -2053,8 +2053,164 @@ local signal = {
     0
 }
 
-atlas = rt.SpriteAtlas("assets/sprites")
-atlas:initialize()
+local texture_h = 10000
+local shader_i = 0
+local shader = rt.Shader("assets/shaders/fourier_transform_visualization.glsl")
+local image_data_format = "r16"
+
+local initialized = false
+local magnitude_image, magnitude_texture, texture_shape
+
+function hz_to_mel(hz)
+    return 2595 * math.log10(1 + (hz / 700))
+end
+
+local bins = {}
+local bin_compress = true
+
+local col_i = 0
+local index_delta = 0
+local processor = rt.AudioProcessor("assets/sound/test_music_02.mp3", 2056)
+processor.on_update = function(magnitude)
+    -- discard high frequency component
+    local n_discarded = 0
+    local to_be_distarded = 0 * #magnitude
+    while n_discarded < to_be_distarded do
+        table.remove(magnitude, 1)
+        n_discarded = n_discarded + 1
+    end
+
+    local spectrum_size = #magnitude
+
+    if not initialized then
+        if bin_compress then
+            local n_unit_bins = 30
+            local bin_i = 1
+            local size = 1
+            local sum = 0
+            while sum < spectrum_size do
+                local final_size = ternary(bin_i < n_unit_bins, 1, math.floor(size))
+                if sum + final_size > spectrum_size then break end -- toss out last few high-frequency components
+                table.insert(bins, clamp(final_size, 0, math.abs(sum - spectrum_size)))
+                sum = sum + final_size
+                size = size * (1 + 1 / math.sqrt(spectrum_size))
+                bin_i = bin_i + 1
+            end
+
+            magnitude_image = love.image.newImageData(texture_h, #bins, image_data_format)
+            magnitude_texture = love.graphics.newImage(magnitude_image)
+        else
+            magnitude_image = love.image.newImageData(texture_h, #magnitude, image_data_format)
+            magnitude_texture = love.graphics.newImage(magnitude_image)
+        end
+
+        texture_shape = rt.VertexRectangle(0, 0, rt.graphics.get_width(), rt.graphics.get_height())
+        texture_shape._native:setTexture(magnitude_texture)
+        for texture in range(magnitude_texture) do
+            texture:setFilter("nearest", "linear", 16)
+            texture:setWrap("clampzero", "clampzero")
+        end
+
+        initialized = true
+    end
+
+    if col_i >= texture_h then
+        magnitude_image:release()
+        magnitude_image = love.image.newImageData(texture_h, #bins, image_data_format)
+        col_i = 0
+    end
+
+    -- non-linearly compress
+    if bin_compress then
+        local current_i = 1
+        local compressed = {}
+        for bin_i = 1, #bins, 1 do
+            local bin = bins[#bins - bin_i + 1]
+            local sum = 0
+            local start = current_i
+            while current_i < start + bin do
+                sum = sum + magnitude[current_i]
+                current_i = current_i + 1
+            end
+
+            sum = sum
+            table.insert(compressed, sum)
+            magnitude_image:setPixel(col_i, bin_i - 1, sum, 0, 0, 1)
+        end
+    else
+        for i, magnitude in ipairs(magnitude) do
+            magnitude_image:setPixel(col_i, i - 1, magnitude, 0, 0, 1)
+        end
+    end
+
+    magnitude_texture:replacePixels(magnitude_image)
+    shader:send("_spectrum", magnitude_texture)
+    shader:send("_index", col_i)
+    shader:send("_max_index", texture_h)
+    col_i = col_i + 1
+end
+
+love.load = function()
+    love.window.setMode(1200, 800, {
+        vsync = 1,
+        msaa = 8,
+        stencil = true,
+        resizable = true
+    })
+    love.window.setTitle("rat_game")
+end
+
+love.draw = function()
+    love.graphics.clear(0.8, 0, 0.8, 1)
+
+
+    shader:bind()
+    texture_shape:draw()
+    shader:unbind()
+end
+
+love.update = function()
+    local delta = love.timer.getDelta()
+    processor:update(delta)
+end
+
+--[[
+rt.current_scene = ow.OverworldScene()
+rt.current_scene._player:set_position(150, 150)
+rt.current_scene:add_stage("debug_map", "assets/stages/debug")
+
+love.load = function()
+    love.window.setMode(800, 600, {
+        vsync = 1,
+        msaa = 8,
+        stencil = true,
+        resizable = true
+    })
+    love.window.setTitle("rat_game")
+    rt.current_scene:realize()
+end
+
+love.draw = function()
+    love.graphics.clear(0.8, 0.2, 0.8, 1)
+    rt.current_scene:draw()
+
+    do -- show fps
+        local fps = tostring(love.timer.getFPS())
+        local margin = 3
+        love.graphics.setColor(1, 1, 1, 0.75)
+        love.graphics.print(fps, rt.graphics.get_width() - love.graphics.getFont():getWidth(fps) - 2 * margin, 0.5 * margin)
+    end
+end
+
+love.update = function()
+    local delta = love.timer.getDelta()
+    rt.AnimationHandler:update(delta)
+    rt.current_scene:update(delta)
+end
+
+love.quit = function()
+
+end
 
 --[[
 sprite = rt.SpriteAtlasEntry("assets/sprites", "controller_buttons")
