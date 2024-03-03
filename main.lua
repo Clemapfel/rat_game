@@ -1,14 +1,13 @@
 require("include")
 
-require "common.mel_frequency_cepstrum"
-
 local texture_h = 10000
 local shader_i = 0
-local shader = rt.Shader("assets/shaders/fourier_transform_visualization.glsl")
-local image_data_format = "r16"
+local shader = rt.Shader("assets/shaders/audio_processor_visualization.glsl")
+local image_data_format = "rg16"
 
 local initialized = false
 local magnitude_image, magnitude_texture, texture_shape
+local energy_image, energy_texture
 
 function hz_to_mel(hz)
     return 2595 * math.log10(1 + (hz / 700))
@@ -16,9 +15,17 @@ end
 
 local col_i = 0
 local index_delta = 0
-local window_size = 2^12
-processor = rt.AudioProcessor("assets/sound/test_music.mp3", window_size)
-processor:set_cutoff(12000)
+
+-- parameters
+local window_size = 2^12   -- window size of fourier transform, results in window_size / 2 coefficients
+local n_mel_frequencies = 100             -- mel spectrum compression, number of mel frequencies for cutoff spectrum
+local one_to_one_frequency_threshold = 100                      -- compression override, the first n coefficients are kept one-to-one
+local use_compression = true
+local cutoff = 12000
+local n_energy_bins = 50
+
+processor = rt.AudioProcessor("assets/sound/test_music_02.mp3", window_size)
+processor:set_cutoff(cutoff)
 local sample_rate = processor:get_sample_rate()
 
 local bins = {} -- Table<Integer, Integer>, range of magnitude coefficients to sum
@@ -40,16 +47,15 @@ local bins = {} -- Table<Integer, Integer>, range of magnitude coefficients to s
        return math.round(hz / (sample_rate / (window_size / 2)) + 1)
     end
 
-    local n_mel_filters_to_frequency_range_ratio = (150 / 8000) -- https://dsp.stackexchange.com/a/75802
-    local n_mel_filters = n_mel_filters_to_frequency_range_ratio * processor:get_cutoff() + 10
+    local n_mel_filters = n_mel_frequencies
     local bin_i_center_frequency = {}
     local mel_lower = 0
-    local mel_upper = hz_to_mel(processor:get_cutoff())
+    local mel_upper = math.max(hz_to_mel(math.max(processor:get_cutoff(), bin_to_hz(one_to_one_frequency_threshold))))
     for mel in step_range(mel_lower, mel_upper, (mel_upper - mel_lower) / n_mel_filters) do
         table.insert(bin_i_center_frequency, hz_to_bin(mel_to_hz(mel)))
     end
 
-    local one_to_one_frequency_threshold = clamp(80, 0, hz_to_bin(mel_to_hz(mel_upper))) --hz_to_bin(60)
+    one_to_one_frequency_threshold = clamp(one_to_one_frequency_threshold, 0, hz_to_bin(mel_to_hz(mel_upper))) --hz_to_bin(60)
     for i = 1, one_to_one_frequency_threshold do
         table.insert(bins, {i, i})
     end
@@ -66,10 +72,6 @@ local bins = {} -- Table<Integer, Integer>, range of magnitude coefficients to s
 
 --end
 
-println(window_size, " -> ", #bins)
-
-local use_compression = true
-
 processor.on_update = function(magnitude)
     local spectrum_size = #magnitude
 
@@ -77,6 +79,8 @@ processor.on_update = function(magnitude)
         if use_compression then
             magnitude_image = love.image.newImageData(texture_h, #bins, image_data_format)
             magnitude_texture = love.graphics.newImage(magnitude_image)
+            energy_image = love.image.newImageData(texture_h, n_energy_bins, image_data_format)
+            energy_texture = love.graphics.newImage(energy_image)
         else
             magnitude_image = love.image.newImageData(texture_h, #magnitude, image_data_format)
             magnitude_texture = love.graphics.newImage(magnitude_image)
@@ -98,7 +102,9 @@ processor.on_update = function(magnitude)
         col_i = 0
     end
 
+
     if use_compression then
+        local coefficients = {}
         for bin_i, bin in ipairs(bins) do
             local sum = 0
             local n = 1
@@ -106,8 +112,15 @@ processor.on_update = function(magnitude)
                 sum = sum + magnitude[i]
                 n = n + 1
             end
-            magnitude_image:setPixel(col_i, bin_i - 1, sum / n, 0, 0, 1)
+            sum = sum / n
+            table.insert(coefficients, sum)
         end
+
+        for bin_i, sum in ipairs(coefficients) do
+            magnitude_image:setPixel(col_i, bin_i - 1, sum, 0, 0, 1)
+        end
+
+
     else
         for i, magnitude in ipairs(magnitude) do
             magnitude_image:setPixel(col_i, i - 1, magnitude, 0, 0, 1)
@@ -115,7 +128,10 @@ processor.on_update = function(magnitude)
     end
 
     magnitude_texture:replacePixels(magnitude_image)
-    shader:send("_spectrum", magnitude_texture)
+    energy_texture:replacePixels(energy_image)
+
+    --shader:send("_spectrum", magnitude_texture)
+    shader:send("_energy", energy_texture)
     shader:send("_index", col_i)
     shader:send("_max_index", texture_h)
     col_i = col_i + 1

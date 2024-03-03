@@ -99,26 +99,10 @@ vec4 effect(vec4 color, Image tex, vec2 texture_coords, vec2 screen_coords)
     float scale = float(100) / _max_index;
     texture_coords.x = texture_coords.x * scale - (1 * scale - playhead);
     float magnitude = Texel(_spectrum, texture_coords).x;
+    float energy = Texel(_energy, texture_coords).x;
+    float max_energy = Texel(_energy, texture_coords).y;
 
-    // gradient
-    const int kernel_size = 1;
-    float energy = 0;
-    float n = 0;
-    int i = 0;
-    int j = 0;
-    //for (int i = -kernel_size; i <= kernel_size; ++i) {
-        for (int j = -kernel_size; j <= kernel_size; ++j) {
-            float x_coord = texture_coords.x + i * pixel_size.x;
-            float y_coord = texture_coords.y + j * pixel_size.y;
-            float x = Texel(_spectrum, vec2(x_coord, y_coord)).x;
-            energy = energy + x;
-            n = n + 1;
-        }
-    //}
-
-    magnitude = energy / n;
-
-    vec3 as_hsv = vec3(magnitude, 1, magnitude);
+    vec3 as_hsv = vec3(energy, 1, energy);
     return vec4(hsv_to_rgb(as_hsv), 1);
 
     /*

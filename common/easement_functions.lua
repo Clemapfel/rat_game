@@ -29,6 +29,11 @@ rt.sinoid_resonance_decrease = function(x, n_periods)
     return math.sin(math.pi * 2 * n_periods * (1 - x)) * (1 - x)
 end
 
+rt.symmetrical_sinoid = function(x)
+    -- \frac{-\cos\left(-2\pi x\right)}{2}+0.5
+    return (-1 * math.cos(-2 * math.pi * x) + 1) / 2
+end
+
 rt.exponential_acceleration = function(x)
     return 0.045 * math.exp(math.log(1 / 0.045 + 1) * x) - 0.045
 end
