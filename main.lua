@@ -16,8 +16,8 @@ end
 
 local col_i = 0
 local index_delta = 0
-local window_size = 2^13
-processor = rt.AudioProcessor("assets/sound/test_music_02.mp3", window_size)
+local window_size = 2^12
+processor = rt.AudioProcessor("assets/sound/test_music.mp3", window_size)
 processor:set_cutoff(12000)
 local sample_rate = processor:get_sample_rate()
 
@@ -49,7 +49,7 @@ local bins = {} -- Table<Integer, Integer>, range of magnitude coefficients to s
         table.insert(bin_i_center_frequency, hz_to_bin(mel_to_hz(mel)))
     end
 
-    local one_to_one_frequency_threshold = 150 --hz_to_bin(60)
+    local one_to_one_frequency_threshold = clamp(80, 0, hz_to_bin(mel_to_hz(mel_upper))) --hz_to_bin(60)
     for i = 1, one_to_one_frequency_threshold do
         table.insert(bins, {i, i})
     end
@@ -63,9 +63,11 @@ local bins = {} -- Table<Integer, Integer>, range of magnitude coefficients to s
             })
         end
     end
+
 --end
 
 println(window_size, " -> ", #bins)
+
 local use_compression = true
 
 processor.on_update = function(magnitude)

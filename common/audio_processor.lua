@@ -178,12 +178,12 @@ function rt.AudioProcessor:_signal_to_spectrum(data, offset, window_size)
 
     -- discard frequencies above cutoff
     half = math.round(self._cutoff / (self:get_sample_rate() / (window_size / 2)) + 1)
-
     local magnitude_out = {}
     for i = 1, half do
         local complex = ffi.cast(self.ft.complex_t, to[half - i - 1 - 1])
         local magnitude = rt.magnitude(complex[0], complex[1])
         magnitude = magnitude * normalize_factor -- project into [0, 1]
+        println(magnitude)
         table.insert(magnitude_out, magnitude)
     end
 
