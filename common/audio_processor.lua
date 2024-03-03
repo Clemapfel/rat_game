@@ -101,20 +101,6 @@ function rt.AudioProcessor:set_cutoff(cutoff_hz)
     self._cutoff = cutoff_hz
 end
 
-
-
-
---- @brief discard any frequencies higher than cutoff to be useful
---- @param sample_rate
---- @param cutoff Number in hertz
-function rt.AudioProcessor.discard_frequencies(magnitude, window_size, sample_rate, cutoff)
-    local cutoff = which(cutoff, 16000) -- in hz
-    local n = math.floor(cutoff / (sample_rate / (window_size / 2)))
-    while #magnitude > n do
-        table.remove(magnitude, 1)
-    end
-end
-
 --- @brief
 --- @param data love.AudioData
 --- @param sample_offset Number
@@ -191,7 +177,7 @@ function rt.AudioProcessor:_signal_to_spectrum(data, offset, window_size)
     local normalize_factor = tf.fourier_normalize_factor
 
     -- discard frequencies above cutoff
-    half = math.floor(self._cutoff / (self:get_sample_rate() / (self._window_size / 2)))
+    half = math.round(self._cutoff / (self:get_sample_rate() / (window_size / 2)) + 1)
 
     local magnitude_out = {}
     for i = 1, half do

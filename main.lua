@@ -2068,11 +2068,12 @@ end
 local col_i = 0
 local index_delta = 0
 local window_size = 2^11
-processor = rt.AudioProcessor("assets/sound/test_music_02.mp3", window)
+processor = rt.AudioProcessor("assets/sound/test_music_02.mp3", window_size)
+processor:set_cutoff(12000)
 local sample_rate = processor:get_sample_rate()
 
--- mel filter bank
-do
+local bin_sizes = {}
+--do
     function mel_to_hz(mel)
         return 700 * (10^(mel / 2595) - 1)
     end
@@ -2087,20 +2088,28 @@ do
     end
 
     function hz_to_bin(hz)
-       return math.floor(hz / (sample_rate / (window_size / 2)))
+       return math.round(hz / (sample_rate / (window_size / 2)) + 1)
     end
 
-    local n_mel_filters = 40
-    local center_frequencies_hz = {}
+    local n_mel_filters_to_frequency_range_ratio = (42 / 8000)
+    local n_mel_filters = n_mel_filters_to_frequency_range_ratio * processor:get_cutoff()
+    local bin_i_center_frequency = {}
     local mel_lower = 0
     local mel_upper = hz_to_mel(processor:get_cutoff())
     for mel in step_range(mel_lower, mel_upper, (mel_upper - mel_lower) / n_mel_filters) do
-        table.insert(center_frequencies_hz, mel_to_hz(mel))
+        table.insert(bin_i_center_frequency, hz_to_bin(mel_to_hz(mel)))
     end
-end
+
+    dbg(bin_i_center_frequency)
+    --println(bin_to_hz(hz_to_bin(processor:get_cutoff())))
+--end
 
 processor.on_update = function(magnitude)
     local spectrum_size = #magnitude
+
+    for i = 1, spectrum_size do
+        --println(bin_to_hz(i))
+    end
 
     if not initialized then
         magnitude_image = love.image.newImageData(texture_h, #magnitude, image_data_format)
