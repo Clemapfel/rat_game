@@ -109,6 +109,7 @@ function rt.AudioProcessor:_signal_to_spectrum(data, offset, window_size)
     -- initialize transform memory for window size
     local tf = self.transform
     if meta.is_nil(self.transform) or self.transform.window_size ~= window_size then
+
         self.transform = {
             window_size = window_size,
             fourier_normalize_factor = 1 / math.sqrt(window_size),
@@ -137,7 +138,9 @@ function rt.AudioProcessor:_signal_to_spectrum(data, offset, window_size)
 
     local data_n = data:getSampleCount() * data:getChannelCount()
     local data_ptr = ffi.cast(self._data_t .. "*", self._data:getFFIPointer())
+
     local from = ffi.cast(self.ft.real_data_t, tf.fftw_real)
+    local to = ffi.cast(self.ft.complex_data_t, tf.fftw_complex)
 
     -- convert audio signal to doubles
     if self._data:getChannelCount() == 1 then
@@ -145,7 +148,7 @@ function rt.AudioProcessor:_signal_to_spectrum(data, offset, window_size)
             return (x - 2^8) / (2^8 - 1)
         end
 
-        for i = 1, self._window_size do
+        for i = 1, window_size do
             if offset + i < data_n then
                 from[i - 1] = normalize(data_ptr[offset + i - 1])
             else
@@ -157,33 +160,32 @@ function rt.AudioProcessor:_signal_to_spectrum(data, offset, window_size)
             return x / (2^16 / 2 - 1)
         end
 
-        for i = 1, tf.window_size * 2, 2 do
+        for i = 1, window_size * 2, 2 do
             local index = offset * 2 + i - 1
+            local index_out = math.floor((i - 1) / 2)
             if offset + index < data_n then
                 local left = normalize(data_ptr[index + 0])
                 local right = normalize(data_ptr[index + 1])
-                from[(i / 2) - 1] = left + right / 2.0
+                from[index_out] = left + right / 2.0
             else
-                from[(i / 2) - 1] = 0
+                from[index_out] = 0
             end
         end
     end
 
+    -- convert complex to magnitude, also take first half only and flip
     self.ft.execute(tf.plan_signal_to_spectrum)
 
-    -- convert complex to magnitude, also take first half only and flip
-    local to = ffi.cast(self.ft.complex_data_t, tf.fftw_complex)
-    local half = math.floor(0.5 * tf.window_size)
+    local half = math.floor(0.5 * window_size)
     local normalize_factor = tf.fourier_normalize_factor
 
     -- discard frequencies above cutoff
     half = math.round(self._cutoff / (self:get_sample_rate() / (window_size / 2)) + 1)
     local magnitude_out = {}
     for i = 1, half do
-        local complex = ffi.cast(self.ft.complex_t, to[half - i - 1 - 1])
+        local complex = ffi.cast(self.ft.complex_t, to[half - i - 1])
         local magnitude = rt.magnitude(complex[0], complex[1])
         magnitude = magnitude * normalize_factor -- project into [0, 1]
-        println(magnitude)
         table.insert(magnitude_out, magnitude)
     end
 
