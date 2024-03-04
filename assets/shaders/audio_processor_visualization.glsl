@@ -79,10 +79,12 @@ vec4 hsva_to_rgba(vec4 hsva)
 }
 
 uniform Image _spectrum;
-uniform vec2 _spectrum_size;
+uniform int _spectrum_size;
 
 uniform Image _energy;
-uniform vec2 _energy_size;
+uniform int _energy_size;
+
+uniform bool _active;
 
 uniform vec2 _texture_size;
 uniform float _index;
@@ -92,17 +94,30 @@ uniform float _index_delta;
 vec4 effect(vec4 color, Image tex, vec2 texture_coords, vec2 screen_coords)
 {
     vec2 screen_size = love_ScreenSize.xy;
-    vec2 pixel_size = vec2(1) / _texture_size;
 
     // smoothly scroll from the right
     float playhead = float(_index) / float(_max_index);
     float scale = float(100) / _max_index;
     texture_coords.x = texture_coords.x * scale - (1 * scale - playhead);
     float magnitude = Texel(_spectrum, texture_coords).x;
-    float energy = Texel(_energy, texture_coords).x;
-    float max_energy = Texel(_energy, texture_coords).y;
 
-    vec3 as_hsv = vec3(energy, 1, energy);
+    /*
+    float energy_step = 1.f / float(_energy_size);
+    float energy_previous = Texel(_energy, vec2(texture_coords.x - energy_step, texture_coords.y)).x;
+    float energy_current = Texel(_energy, vec2(texture_coords.x, texture_coords.y)).x;
+    float energy_delta = clamp(energy_previous - energy_current, 0, 1);
+
+    float spectrum_step = 1.f / _spectrum_size;
+    float spectrum_previous = Texel(_spectrum, vec2(texture_coords.x - spectrum_step, texture_coords.y)).x;
+    float spectrum_current = Texel(_spectrum, vec2(texture_coords.x, texture_coords.y)).x;
+    float spectrum_delta = abs(spectrum_previous - spectrum_current);
+    */
+
+    float energy = Texel(_energy, texture_coords).x;
+    float energy_delta = (Texel(_energy, texture_coords).y * 2) - 1;
+
+    float value = !_active ? energy : clamp(energy_delta, 0, 1);
+    vec3 as_hsv = vec3(0, 0, value);
     return vec4(hsv_to_rgb(as_hsv), 1);
 
     /*

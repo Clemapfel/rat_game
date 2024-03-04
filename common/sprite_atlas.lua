@@ -113,8 +113,8 @@ function rt.SpriteAtlasEntry:load()
         self.frame_to_name[index] = name
         self.name_to_frame[name] = index
         self.texture_rectangles[index] = rt.AABB(
-                (index - 1) / self.n_frames, 0,
-                1 / self.n_frames, 1
+            (index - 1) / self.n_frames, 0,
+            1 / self.n_frames, 1
         )
     end
 

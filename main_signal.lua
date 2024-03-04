@@ -7,7 +7,7 @@ local image_data_format = "rg16"
 
 local initialized = false
 local magnitude_image, magnitude_texture, texture_shape
-local energy_image, energy_texture
+local energy_image, energy_texture, energy_derivative_image, energy_derivative_texture
 
 function hz_to_mel(hz)
     return 2595 * math.log10(1 + (hz / 700))
@@ -18,11 +18,11 @@ local index_delta = 0
 
 -- parameters
 local window_size = 2^12   -- window size of fourier transform, results in window_size / 2 coefficients
-local n_mel_frequencies = 100             -- mel spectrum compression, number of mel frequencies for cutoff spectrum
-local one_to_one_frequency_threshold = 100                      -- compression override, the first n coefficients are kept one-to-one
+local n_mel_frequencies = window_size / 16            -- mel spectrum compression, number of mel frequencies for cutoff spectrum
+local one_to_one_frequency_threshold = 0                      -- compression override, the first n coefficients are kept one-to-one
 local use_compression = true
 local cutoff = 12000
-local n_energy_bins = 50
+local n_energy_bins = 16
 
 processor = rt.AudioProcessor("assets/sound/test_music_02.mp3", window_size)
 processor:set_cutoff(cutoff)
@@ -69,8 +69,9 @@ local bins = {} -- Table<Integer, Integer>, range of magnitude coefficients to s
             })
         end
     end
-
 --end
+
+local active = true
 
 processor.on_update = function(magnitude)
     local spectrum_size = #magnitude
@@ -81,10 +82,13 @@ processor.on_update = function(magnitude)
             magnitude_texture = love.graphics.newImage(magnitude_image)
             energy_image = love.image.newImageData(texture_h, n_energy_bins, image_data_format)
             energy_texture = love.graphics.newImage(energy_image)
+
         else
             magnitude_image = love.image.newImageData(texture_h, #magnitude, image_data_format)
             magnitude_texture = love.graphics.newImage(magnitude_image)
         end
+
+        energy_texture:setFilter("nearest")
 
         texture_shape = rt.VertexRectangle(0, 0, rt.graphics.get_width(), rt.graphics.get_height())
         texture_shape._native:setTexture(magnitude_texture)
@@ -99,12 +103,14 @@ processor.on_update = function(magnitude)
     if col_i >= texture_h then
         magnitude_image:release()
         magnitude_image = love.image.newImageData(texture_h, #bins, image_data_format)
+        energy_image:release()
+        energy_image = love.image.newImageData(texture_h, n_energy_bins, image_data_format)
+
         col_i = 0
     end
 
-
+    local coefficients = {}
     if use_compression then
-        local coefficients = {}
         for bin_i, bin in ipairs(bins) do
             local sum = 0
             local n = 1
@@ -119,23 +125,56 @@ processor.on_update = function(magnitude)
         for bin_i, sum in ipairs(coefficients) do
             magnitude_image:setPixel(col_i, bin_i - 1, sum, 0, 0, 1)
         end
-
-
     else
         for i, magnitude in ipairs(magnitude) do
             magnitude_image:setPixel(col_i, i - 1, magnitude, 0, 0, 1)
         end
     end
 
+    local energy_bin_size = math.floor(#coefficients / n_energy_bins)
+    local energies = {}
+    local total_energy = 0
+    for bin_i = 1, n_energy_bins do
+        local sum = 0
+        local start = (bin_i - 1) * energy_bin_size
+        for i = start, start + energy_bin_size do
+            sum = sum + coefficients[i + 1]
+        end
+
+        table.insert(energies, sum)
+        total_energy = total_energy + sum
+    end
+
+    for i, energy in ipairs(energies) do
+        local current = energy / total_energy
+        local previous = energy_image:getPixel(clamp(col_i - 1, 0), i - 1)
+        local delta = ((current - previous) + 1) / 2
+        energy_image:setPixel(col_i, i - 1, current, delta, total_energy, 1)
+    end
+
     magnitude_texture:replacePixels(magnitude_image)
     energy_texture:replacePixels(energy_image)
 
-    --shader:send("_spectrum", magnitude_texture)
+    --[[
+    shader:send("_spectrum", magnitude_texture)
+    shader:send("_spectrum_size", magnitude_image:getHeight())
+    ]]--
+
     shader:send("_energy", energy_texture)
+    --shader:send("_energy_size", n_energy_bins)
     shader:send("_index", col_i)
     shader:send("_max_index", texture_h)
+    shader:send("_active", active)
     col_i = col_i + 1
 end
+
+input = rt.InputController()
+input:signal_connect("pressed", function(_, which)
+    if which == rt.InputButton.A then
+        active = not active
+        println(active)
+    end
+end)
 
 love.load = function()
     love.window.setMode(1200, 800, {
@@ -149,7 +188,6 @@ end
 
 love.draw = function()
     love.graphics.clear(0.8, 0, 0.8, 1)
-
 
     shader:bind()
     texture_shape:draw()
