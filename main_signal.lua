@@ -3,7 +3,7 @@ require("include")
 local texture_h = 10000
 local shader_i = 0
 local shader = rt.Shader("assets/shaders/audio_processor_visualization.glsl")
-local image_data_format = "rg16"
+local image_data_format = "rgba16"
 
 local initialized = false
 local magnitude_image, magnitude_texture, texture_shape
@@ -78,9 +78,9 @@ processor.on_update = function(magnitude)
 
     if not initialized then
         if use_compression then
-            magnitude_image = love.image.newImageData(texture_h, #bins, image_data_format)
+            magnitude_image = love.image.newImageData(texture_h, #bins, "r16")
             magnitude_texture = love.graphics.newImage(magnitude_image)
-            energy_image = love.image.newImageData(texture_h, n_energy_bins, image_data_format)
+            energy_image = love.image.newImageData(texture_h, n_energy_bins, "rgba16")
             energy_texture = love.graphics.newImage(energy_image)
 
         else
@@ -88,11 +88,9 @@ processor.on_update = function(magnitude)
             magnitude_texture = love.graphics.newImage(magnitude_image)
         end
 
-        energy_texture:setFilter("nearest")
-
         texture_shape = rt.VertexRectangle(0, 0, rt.graphics.get_width(), rt.graphics.get_height())
         texture_shape._native:setTexture(magnitude_texture)
-        for texture in range(magnitude_texture) do
+        for texture in range(magnitude_texture, energy_texture) do
             texture:setFilter("nearest", "linear", 16)
             texture:setWrap("clampzero", "clampzero")
         end
@@ -146,25 +144,30 @@ processor.on_update = function(magnitude)
     end
 
     for i, energy in ipairs(energies) do
+
+        local previous, previous_delta, previous_delta_delta = energy_image:getPixel(clamp(col_i - 1, 0), i - 1)
+
         local current = energy / total_energy
-        local previous = energy_image:getPixel(clamp(col_i - 1, 0), i - 1)
-        local delta = ((current - previous) + 1) / 2
-        energy_image:setPixel(col_i, i - 1, current, delta, total_energy, 1)
+        local current_delta = ((current - previous) + 1) / 2
+        local current_delta_delta = ((current_delta - previous_delta) + 1) / 2
+
+        energy_image:setPixel(col_i, i - 1,
+            current,                -- energy
+            current_delta,          -- 1st derivative
+            current_delta_delta,     -- 2nd derivative
+            total_energy / n_energy_bins
+        )
     end
 
     magnitude_texture:replacePixels(magnitude_image)
     energy_texture:replacePixels(energy_image)
 
-    --[[
-    shader:send("_spectrum", magnitude_texture)
-    shader:send("_spectrum_size", magnitude_image:getHeight())
-    ]]--
-
+    --shader:send("_spectrum", magnitude_texture)
     shader:send("_energy", energy_texture)
-    --shader:send("_energy_size", n_energy_bins)
+    shader:send("_energy_size", n_energy_bins)
     shader:send("_index", col_i)
     shader:send("_max_index", texture_h)
-    shader:send("_active", active)
+    --shader:send("_active", active)
     col_i = col_i + 1
 end
 

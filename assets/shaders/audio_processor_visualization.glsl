@@ -99,7 +99,6 @@ vec4 effect(vec4 color, Image tex, vec2 texture_coords, vec2 screen_coords)
     float playhead = float(_index) / float(_max_index);
     float scale = float(100) / _max_index;
     texture_coords.x = texture_coords.x * scale - (1 * scale - playhead);
-    float magnitude = Texel(_spectrum, texture_coords).x;
 
     /*
     float energy_step = 1.f / float(_energy_size);
@@ -113,12 +112,17 @@ vec4 effect(vec4 color, Image tex, vec2 texture_coords, vec2 screen_coords)
     float spectrum_delta = abs(spectrum_previous - spectrum_current);
     */
 
+    float magnitude = Texel(_spectrum, texture_coords).x;
+
     float energy = Texel(_energy, texture_coords).x;
     float energy_delta = (Texel(_energy, texture_coords).y * 2) - 1;
+    float energy_delta_delta = (Texel(_energy, texture_coords).z * 2) - 1;
+    float energy_total = Texel(_energy, texture_coords).w * _energy_size;
 
-    float value = !_active ? energy : clamp(energy_delta, 0, 1);
-    vec3 as_hsv = vec3(0, 0, value);
-    return vec4(hsv_to_rgb(as_hsv), 1);
+    float value = energy_delta * energy_total;
+    float mid_boost = 1; //1 - gaussian_bandpass(texture_coords.y - 0.5, 1);
+    value = value * (1 + mid_boost);
+    return vec4(hsv_to_rgb(vec3(value, 0, value)), 1);
 
     /*
     float laplacian_of_gaussian(int x, int y, int sigma)
