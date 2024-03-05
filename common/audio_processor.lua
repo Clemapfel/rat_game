@@ -142,6 +142,7 @@ function rt.AudioProcessor:_signal_to_spectrum(data, offset, window_size)
     local from = ffi.cast(self.ft.real_data_t, tf.fftw_real)
     local to = ffi.cast(self.ft.complex_data_t, tf.fftw_complex)
 
+    local signal = {}
     -- convert audio signal to doubles
     if self._data:getChannelCount() == 1 then
         local normalize = function(x)
@@ -150,9 +151,9 @@ function rt.AudioProcessor:_signal_to_spectrum(data, offset, window_size)
 
         for i = 1, window_size do
             if offset + i < data_n then
-                from[i - 1] = normalize(data_ptr[offset + i - 1])
+                signal[i - 1] = normalize(data_ptr[offset + i - 1])
             else
-                from[i - 1] = 0
+                signal[i - 1] = 0
             end
         end
     else -- stereo
@@ -166,32 +167,46 @@ function rt.AudioProcessor:_signal_to_spectrum(data, offset, window_size)
             if offset + index < data_n then
                 local left = normalize(data_ptr[index + 0])
                 local right = normalize(data_ptr[index + 1])
-                from[index_out] = left + right / 2.0
+                signal[index_out] = left + right / 2.0
             else
-                from[index_out] = 0
+                signal[index_out] = 0
             end
         end
     end
 
-    -- pre-emphasize high frequencies
+    function cosine_windowing(n, alpha)
+        return alpha - (1 - alpha) * math.cos((2 * math.pi * n) / (window_size - 1))
+    end
+    -- https://en.wikipedia.org/wiki/Window_function#Hann_and_Hamming_windows
+    local hann_alpha = 0.5
+    local hamming_alpha = 25 / 46
 
+    -- pre-emphasize high frequencies, first order high pass filter
+    local highpass_factor = 1;
+    from[0] = signal[0]
+    for i = 1, window_size - 1 do
+        from[i] = highpass_factor * (from[i - 1] + signal[i] - signal[i - 1])
+        --from[i] = from[i] * cosine_windowing(i, hann_alpha)
+    end
 
-    -- convert complex to magnitude, also take first half only and flip
+    -- fouier transform
     self.ft.execute(tf.plan_signal_to_spectrum)
 
+    -- convert complex to magnitude, also take first half only and flip
     local half = math.floor(0.5 * window_size)
     local normalize_factor = tf.fourier_normalize_factor
 
     -- discard frequencies above cutoff
     half = math.round(self._cutoff / (self:get_sample_rate() / (window_size / 2)) + 1)
     local magnitude_out = {}
+    local max = NEGATIVE_INFINITY
     for i = 1, half do
         local complex = ffi.cast(self.ft.complex_t, to[half - i - 1])
         local magnitude = rt.magnitude(complex[0], complex[1])
         magnitude = magnitude * normalize_factor -- project into [0, 1]
+        max = math.max(max, magnitude)
         table.insert(magnitude_out, magnitude)
     end
-
     return magnitude_out
 end
 

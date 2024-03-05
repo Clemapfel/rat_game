@@ -119,12 +119,12 @@ vec4 effect(vec4 color, Image tex, vec2 texture_coords, vec2 screen_coords)
     float energy_delta_delta = (Texel(_energy, texture_coords).z * 2) - 1;
     float energy_total = Texel(_energy, texture_coords).w * _energy_size;
 
-    float value = energy_delta * energy_total;
-    float mid_boost = 1; //1 - gaussian_bandpass(texture_coords.y - 0.5, 1);
-    value = value * (1 + mid_boost);
+    float value = energy;
 
-    value = magnitude;
-    return vec4(hsv_to_rgb(vec3(value, 0, value)), 1);
+    if (!_active)
+        value = magnitude;
+
+    return vec4(hsv_to_rgb(vec3(value, 1, value)), 1);
 
     /*
     float laplacian_of_gaussian(int x, int y, int sigma)

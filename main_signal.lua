@@ -16,13 +16,15 @@ end
 local col_i = 0
 local index_delta = 0
 
+-- source: https://haythamfayek.com/2016/04/21/speech-processing-for-machine-learning.html
+
 -- parameters
 local window_size = 2^12   -- window size of fourier transform, results in window_size / 2 coefficients
-local n_mel_frequencies = window_size / 16            -- mel spectrum compression, number of mel frequencies for cutoff spectrum
+local n_mel_frequencies = window_size / 32           -- mel spectrum compression, number of mel frequencies for cutoff spectrum
 local one_to_one_frequency_threshold = 0                      -- compression override, the first n coefficients are kept one-to-one
 local use_compression = true
 local cutoff = 12000
-local n_energy_bins = 16
+local n_energy_bins = 32
 
 processor = rt.AudioProcessor("assets/sound/test_music_02.mp3", window_size)
 processor:set_cutoff(cutoff)
@@ -65,7 +67,7 @@ local bins = {} -- Table<Integer, Integer>, range of magnitude coefficients to s
             local left, center, right = bin_i_center_frequency[i-1], bin_i_center_frequency[i], bin_i_center_frequency[i+1]
             table.insert(bins, {
                 math.floor(mix(left, center, 0.5)),
-                math.ceil(mix(center, right, 0.5))
+                math.floor(mix(center, right, 0.5))
             })
         end
     end
@@ -86,6 +88,8 @@ processor.on_update = function(magnitude)
         else
             magnitude_image = love.image.newImageData(texture_h, #magnitude, image_data_format)
             magnitude_texture = love.graphics.newImage(magnitude_image)
+            energy_image = love.image.newImageData(texture_h, n_energy_bins, "rgba16")
+            energy_texture = love.graphics.newImage(energy_image)
         end
 
         texture_shape = rt.VertexRectangle(0, 0, rt.graphics.get_width(), rt.graphics.get_height())
@@ -103,7 +107,6 @@ processor.on_update = function(magnitude)
         magnitude_image = love.image.newImageData(texture_h, #bins, image_data_format)
         energy_image:release()
         energy_image = love.image.newImageData(texture_h, n_energy_bins, image_data_format)
-
         col_i = 0
     end
 
@@ -124,8 +127,12 @@ processor.on_update = function(magnitude)
             magnitude_image:setPixel(col_i, bin_i - 1, sum, 0, 0, 1)
         end
     else
-        for i, magnitude in ipairs(magnitude) do
-            magnitude_image:setPixel(col_i, i - 1, magnitude, 0, 0, 1)
+        for _, value in pairs(magnitude) do
+            table.insert(coefficients, value)
+        end
+
+        for i, value in ipairs(magnitude) do
+            magnitude_image:setPixel(col_i, i - 1, value, 0, 0, 1)
         end
     end
 
@@ -143,15 +150,14 @@ processor.on_update = function(magnitude)
         total_energy = total_energy + sum
     end
 
-    for i, energy in ipairs(energies) do
+    for bin_i, energy in ipairs(energies) do
+        local previous, previous_delta, previous_delta_delta = energy_image:getPixel(clamp(col_i - 1, 0), bin_i - 1)
 
-        local previous, previous_delta, previous_delta_delta = energy_image:getPixel(clamp(col_i - 1, 0), i - 1)
-
-        local current = energy / total_energy
+        local current = ternary(use_compression, energy, energy / total_energy)
         local current_delta = ((current - previous) + 1) / 2
         local current_delta_delta = ((current_delta - previous_delta) + 1) / 2
 
-        energy_image:setPixel(col_i, i - 1,
+        energy_image:setPixel(col_i, bin_i - 1,
             current,                -- energy
             current_delta,          -- 1st derivative
             current_delta_delta,    -- 2nd derivative
@@ -163,11 +169,11 @@ processor.on_update = function(magnitude)
     energy_texture:replacePixels(energy_image)
 
     shader:send("_spectrum", magnitude_texture)
-    --shader:send("_energy", energy_texture)
+    shader:send("_energy", energy_texture)
     --shader:send("_energy_size", n_energy_bins)
     shader:send("_index", col_i)
     shader:send("_max_index", texture_h)
-    --shader:send("_active", active)
+    shader:send("_active", active)
     col_i = col_i + 1
 end
 
