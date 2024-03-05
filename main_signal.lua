@@ -78,7 +78,7 @@ processor.on_update = function(magnitude)
 
     if not initialized then
         if use_compression then
-            magnitude_image = love.image.newImageData(texture_h, #bins, "r16")
+            magnitude_image = love.image.newImageData(texture_h, #bins, "r8")
             magnitude_texture = love.graphics.newImage(magnitude_image)
             energy_image = love.image.newImageData(texture_h, n_energy_bins, "rgba16")
             energy_texture = love.graphics.newImage(energy_image)
@@ -154,7 +154,7 @@ processor.on_update = function(magnitude)
         energy_image:setPixel(col_i, i - 1,
             current,                -- energy
             current_delta,          -- 1st derivative
-            current_delta_delta,     -- 2nd derivative
+            current_delta_delta,    -- 2nd derivative
             total_energy / n_energy_bins
         )
     end
@@ -162,9 +162,9 @@ processor.on_update = function(magnitude)
     magnitude_texture:replacePixels(magnitude_image)
     energy_texture:replacePixels(energy_image)
 
-    --shader:send("_spectrum", magnitude_texture)
-    shader:send("_energy", energy_texture)
-    shader:send("_energy_size", n_energy_bins)
+    shader:send("_spectrum", magnitude_texture)
+    --shader:send("_energy", energy_texture)
+    --shader:send("_energy_size", n_energy_bins)
     shader:send("_index", col_i)
     shader:send("_max_index", texture_h)
     --shader:send("_active", active)

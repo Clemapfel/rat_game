@@ -173,6 +173,9 @@ function rt.AudioProcessor:_signal_to_spectrum(data, offset, window_size)
         end
     end
 
+    -- pre-emphasize high frequencies
+
+
     -- convert complex to magnitude, also take first half only and flip
     self.ft.execute(tf.plan_signal_to_spectrum)
 
