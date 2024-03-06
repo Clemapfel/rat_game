@@ -66,8 +66,8 @@ local bins = {} -- Table<Integer, Integer>, range of magnitude coefficients to s
         if bin_i_center_frequency[i] > one_to_one_frequency_threshold then
             local left, center, right = bin_i_center_frequency[i-1], bin_i_center_frequency[i], bin_i_center_frequency[i+1]
             table.insert(bins, {
-                math.floor(mix(left, center, 0.5)),
-                math.floor(mix(center, right, 0.5))
+                math.floor(left),--mix(left, center, 0.5)),
+                math.floor(right)--mix(center, right, 0.5))
             })
         end
     end
@@ -80,7 +80,7 @@ processor.on_update = function(magnitude)
 
     if not initialized then
         if use_compression then
-            magnitude_image = love.image.newImageData(texture_h, #bins, "r8")
+            magnitude_image = love.image.newImageData(texture_h, #bins, "rgba16")
             magnitude_texture = love.graphics.newImage(magnitude_image)
             energy_image = love.image.newImageData(texture_h, n_energy_bins, "rgba16")
             energy_texture = love.graphics.newImage(energy_image)
@@ -115,9 +115,12 @@ processor.on_update = function(magnitude)
         for bin_i, bin in ipairs(bins) do
             local sum = 0
             local n = 1
+            local width = bin[2] - bin[1]
             for i = bin[1], bin[2] do
-                sum = sum + magnitude[i]
-                n = n + 1
+                if i > 0 and i <= #magnitude  then
+                    sum = sum + magnitude[i] * rt.symmetrical_linear((i - bin[1]) / width)
+                    n = n + 1
+                end
             end
             sum = sum / n
             table.insert(coefficients, sum)
