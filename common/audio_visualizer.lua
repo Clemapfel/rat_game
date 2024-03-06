@@ -138,7 +138,7 @@ end
 function rt.AudioVisualizer:_calulate_spectrum()
 
     -- initialize C-side memory
-    if #self._transform == 0 or self._transform.window_size ~= self._config.window_size then
+    if self._transform.window_size == nil or self._transform.window_size ~= self._config.window_size then
         local window_size = self._config.window_size
         self._transform = {
             window_size = window_size,
@@ -222,7 +222,7 @@ function rt.AudioVisualizer:_calulate_spectrum()
     local normalize_factor = 1 / math.sqrt(window_size)
     local magnitudes = {}
     for i = 1, half do
-        local complex = ffi.cast(self._fftw.complex_t, to[half - i - 1]) -- also flip
+        local complex = ffi.cast(self._fftw.complex_t, to[half - i]) -- also flip
         local magnitude = rt.magnitude(complex[0], complex[1]) * normalize_factor
         table.insert(magnitudes, magnitude)
     end
@@ -299,16 +299,5 @@ function rt.AudioVisualizer:_calulate_spectrum()
         energies[i] = energy / energies_sum
     end
 
-    if #self._debug_draw ~= 0 then
-
-    end
-
     return coefficients, energies
-end
-
---- @brief
-function rt.AudioVisualizer:draw()
-    if #self._debug_draw == 0 then
-
-    end
 end

@@ -12,9 +12,11 @@ local texture_h = 10e3
 
 local shader = rt.Shader("assets/shaders/audio_visualizer_debug.glsl")
 local shape = {}
+local active = false
 
 audio.on_update = function(coefficients, energies)
     if not visualizer_initialized then
+
         spectrum_image = love.image.newImageData(texture_h, #coefficients, spectrum_format)
         spectrum_texture = love.graphics.newImage(spectrum_image)
 
