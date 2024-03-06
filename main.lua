@@ -1,6 +1,6 @@
 require "include"
 
-audio = rt.AudioVisualizer("assets/sound/test_music_02.mp3")
+audio = rt.AudioVisualizer("assets/sound/test_music.mp3")
 audio:play()
 
 local visualizer_initialized = false
@@ -14,14 +14,10 @@ local shader = rt.Shader("assets/shaders/audio_visualizer_debug.glsl")
 local shape = {}
 local active = false
 
-audio.on_update = function(coefficients, energies)
-    println(#coefficients)
+audio.on_update = function(coefficients)
     if not visualizer_initialized then
         spectrum_image = love.image.newImageData(texture_h, #coefficients, spectrum_format)
         spectrum_texture = love.graphics.newImage(spectrum_image)
-
-        energy_image = love.image.newImageData(texture_h, #energies, energy_format)
-        energy_texture = love.graphics.newImage(energy_image)
 
         shape = rt.VertexRectangle(0, 0, rt.graphics.get_width(), rt.graphics.get_height())
         visualizer_initialized = true
@@ -37,12 +33,7 @@ audio.on_update = function(coefficients, energies)
         spectrum_image:setPixel(col_i, i - 1, value, value, value, 1)
     end
 
-    for i, value in ipairs(energies) do
-        energy_image:setPixel(col_i, i - 1, value, 0, 0, 1)
-    end
-
     spectrum_texture:replacePixels(spectrum_image)
-    energy_texture:replacePixels(energy_image)
 
     shader:send("_coefficients", spectrum_texture)
     --shader:send("_energies", energy_texture)

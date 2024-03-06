@@ -1,7 +1,8 @@
 rt.settings.audio_visualizer = {
     n_queueable_source_buffers = 3,
     default_window_size = 2^11,
-    default_frequency_cutoff = 10000, -- Hz
+    default_frequency_cutoff = 11000, -- Hz
+    pre_emphasis_factor = 0.9
 }
 
 --- @brief
@@ -10,13 +11,8 @@ rt.AudioVisualizer = meta.new_type("AudioVisualizer", function(audio_file, confi
     -- algorithm configuration
     config = which(config, {})
     config.window_size = which(config.window_size, rt.settings.audio_visualizer.default_window_size)
-    config.n_mel_frequency_bins = which(config.window_size / 12)
+    config.n_mel_frequency_bins = which(config.window_size / 16)
     config.frequency_cutoff = which(config.frequency_cutoff, rt.settings.audio_visualizer.default_frequency_cutoff)
-    config.energy_bins = which(config.energy_bins, {
-        {0, 0.7},
-        {0.7, 0.9},
-        {0.9, 1}
-    })
 
     local data = love.sound.newSoundData(audio_file)
     local fftw = ffi.load(which(config.fftw3_path, "fftw3"))
@@ -46,7 +42,6 @@ rt.AudioVisualizer = meta.new_type("AudioVisualizer", function(audio_file, confi
         _last_update = -1,
         _n_transformed = 0,         -- number of samples processed by fourier transform
         _window_size = config.window_size, -- window used for queueing audio and fourier transform
-        _cutoff = 16e3, -- anything above this in hz is discarded
         _is_playing = false,
         
         _fftw = {
@@ -205,7 +200,7 @@ function rt.AudioVisualizer:_calulate_spectrum()
     local to = ffi.cast(self._fftw.complex_data_t, self._transform.fftw_complex)
 
     -- pre-emphasize high frequencies with first order high pass filter while writing to C arrays
-    local highpass_factor = 0.9;
+    local highpass_factor = rt.settings.audio_visualizer.pre_emphasis_factor;
     from[0] = signal[0]
     for i = 1, window_size - 1 do
         from[i] = highpass_factor * (from[i - 1] + signal[i] - signal[i - 1])
@@ -216,7 +211,7 @@ function rt.AudioVisualizer:_calulate_spectrum()
     self._fftw.execute(self._transform.plan_signal_to_spectrum)
 
     -- discard upper half, including anything above frequency cutoff (in Hz)
-    local half = math.round(hz_to_bin(self._cutoff))
+    local half = math.round(hz_to_bin(self._config.frequency_cutoff))
 
     -- compute complex magnitude
     local normalize_factor = 1 / math.sqrt(window_size)
@@ -245,7 +240,7 @@ function rt.AudioVisualizer:_calulate_spectrum()
         local n_mel_filters = self._mel_compression.n_bins
         local bin_i_center_frequency = {}
         local mel_lower = 0
-        local mel_upper = hz_to_mel(math.max(self._cutoff))
+        local mel_upper = hz_to_mel(math.max(self._config.frequency_cutoff))
         for mel in step_range(mel_lower, mel_upper, (mel_upper - mel_lower) / n_mel_filters) do
             table.insert(bin_i_center_frequency, hz_to_bin(mel_to_hz(mel)))
         end
@@ -266,11 +261,17 @@ function rt.AudioVisualizer:_calulate_spectrum()
 
         local n = #self._mel_compression.bins
         self._mel_compression.bins[n][2] = bin_i_center_frequency[#bin_i_center_frequency]
+        self._mel_compression.last_result = table.rep(0, #(self._mel_compression.bins))
     end
 
     -- apply mel compression
     local coefficients = {}
     local total_energy = 0
+
+    local bass_energy = 0
+    local mid_energy = 0
+    local high_energy = 0
+
     for bin_i, bin in ipairs(self._mel_compression.bins) do
         local sum = 0
         local n = 1
@@ -286,30 +287,28 @@ function rt.AudioVisualizer:_calulate_spectrum()
         table.insert(coefficients, sum)
     end
 
-    local
+    -- compute first derivative
+    local delta = {}
+    local total_delta = 0
+    for i = 1, #coefficients do
+        local value = clamp(coefficients[i] - self._mel_compression.last_result[i], 0)
+        -- clamp because only low energy -> high energy events are relevant
 
-    --[[
-    local mean = total_energy / #coefficients
-
-    for i, value in ipairs(coefficients) do
-        coefficients[i] = value / total_energy;
-    end
-    ]]--
-
-
-    -- apply energy compression
-    local energies = {}
-    local energies_sum = 0
-    for bin_i, bin in ipairs(self._config.energy_bins) do
-        local sum = 0
-        for i = math.floor(bin[1] * #coefficients), math.ceil(bin[2] * #coefficients) do
-            if i > 0 and i <= #coefficients then
-                sum = sum + coefficients[i]
-            end
-        end
-        table.insert(energies, sum)
-        energies_sum = energies_sum + sum
+        delta[i] = value
+        total_delta = total_delta + value
     end
 
-    return coefficients, energies
+    for i = 1, #delta do
+        delta[i] = delta[i] / total_delta
+    end
+
+    local sum = 0
+    for i = 1, #coefficients do
+        self._mel_compression.last_result[i] = coefficients[i]
+        local value = coefficients[i]
+        sum = sum + value
+        coefficients[i] = value
+    end
+
+    return coefficients
 end

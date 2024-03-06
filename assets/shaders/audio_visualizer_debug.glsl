@@ -6,8 +6,6 @@ vec3 hsv_to_rgb(vec3 c)
 }
 
 uniform Image _coefficients;
-uniform Image _energies;
-
 uniform float _index;
 uniform float _max_index;
 
@@ -18,8 +16,7 @@ vec4 effect(vec4 color, Image tex, vec2 texture_coords, vec2 screen_coords)
     texture_coords.x = texture_coords.x * scale - (1 * scale - playhead);
 
     float coefficient = Texel(_coefficients, texture_coords).x;
-    float energy = Texel(_energies, texture_coords).x;
 
     float value = coefficient;
-    return vec4(hsv_to_rgb(vec3(value, 1, value)), 1);
+    return vec4(hsv_to_rgb(vec3(0, 0, value)), 1);
 }
