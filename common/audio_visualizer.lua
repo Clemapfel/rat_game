@@ -1,7 +1,7 @@
 rt.settings.audio_visualizer = {
     n_queueable_source_buffers = 3,
-    default_window_size = (2^11 + 2^12),
-    default_frequency_cutoff = 12e3, -- Hz
+    default_window_size = 2^11,
+    default_frequency_cutoff = 10000, -- Hz
 }
 
 --- @brief
@@ -10,7 +10,7 @@ rt.AudioVisualizer = meta.new_type("AudioVisualizer", function(audio_file, confi
     -- algorithm configuration
     config = which(config, {})
     config.window_size = which(config.window_size, rt.settings.audio_visualizer.default_window_size)
-    config.n_mel_frequency_bins = which(config.window_size / 16)
+    config.n_mel_frequency_bins = which(config.window_size / 12)
     config.frequency_cutoff = which(config.frequency_cutoff, rt.settings.audio_visualizer.default_frequency_cutoff)
     config.energy_bins = which(config.energy_bins, {
         {0, 0.7},
@@ -228,7 +228,7 @@ function rt.AudioVisualizer:_calulate_spectrum()
     end
 
     -- initialize mel compression
-    if #self._mel_compression == 0 or self._mel_compression.n_bins ~= self._config.n_mel_frequency_bins then
+    if self._mel_compression.n_bins == nil or self._mel_compression.n_bins ~= self._config.n_mel_frequency_bins then
         function mel_to_hz(mel)
             return 700 * (10^(mel / 2595) - 1)
         end
@@ -249,17 +249,22 @@ function rt.AudioVisualizer:_calulate_spectrum()
         for mel in step_range(mel_lower, mel_upper, (mel_upper - mel_lower) / n_mel_filters) do
             table.insert(bin_i_center_frequency, hz_to_bin(mel_to_hz(mel)))
         end
-        
+
         for i = 2, #bin_i_center_frequency - 1 do
             local left, center, right = bin_i_center_frequency[i-1], bin_i_center_frequency[i], bin_i_center_frequency[i+1]
-            table.insert(self._mel_compression.bins, {
-                math.floor(left),
-                math.floor(right)
-            })
+
+            if left < (#bin_i_center_frequency - 1) / 4 then
+                -- for low frequencies, keep 1:1 or even n:1 ratio
+                table.insert(self._mel_compression.bins, {left, left})
+            else
+                table.insert(self._mel_compression.bins, {
+                    math.floor(mix(left, center, 0.5)),
+                    math.floor(mix(center, right, 0.5))
+                })
+            end
         end
 
         local n = #self._mel_compression.bins
-        self._mel_compression.bins[1][1] = 1
         self._mel_compression.bins[n][2] = bin_i_center_frequency[#bin_i_center_frequency]
     end
 
@@ -293,10 +298,6 @@ function rt.AudioVisualizer:_calulate_spectrum()
         end
         table.insert(energies, sum)
         energies_sum = energies_sum + sum
-    end
-
-    for i, energy in ipairs(energies) do
-        energies[i] = energy / energies_sum
     end
 
     return coefficients, energies
