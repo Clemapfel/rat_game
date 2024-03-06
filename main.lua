@@ -15,8 +15,8 @@ local shape = {}
 local active = false
 
 audio.on_update = function(coefficients, energies)
+    println(#coefficients)
     if not visualizer_initialized then
-
         spectrum_image = love.image.newImageData(texture_h, #coefficients, spectrum_format)
         spectrum_texture = love.graphics.newImage(spectrum_image)
 

@@ -286,6 +286,17 @@ function rt.AudioVisualizer:_calulate_spectrum()
         table.insert(coefficients, sum)
     end
 
+    local
+
+    --[[
+    local mean = total_energy / #coefficients
+
+    for i, value in ipairs(coefficients) do
+        coefficients[i] = value / total_energy;
+    end
+    ]]--
+
+
     -- apply energy compression
     local energies = {}
     local energies_sum = 0
