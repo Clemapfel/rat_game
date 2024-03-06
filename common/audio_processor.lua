@@ -22,7 +22,7 @@ rt.AudioProcessor = meta.new_type("AudioProcessor", function(file_path, window_s
             data:getChannelCount()
         ),
         _buffer_offset = 0,     -- position of already queued buffers
-        _playing_offset = 0,    -- position of currently playing sample
+        _is_playing_offset = 0,    -- position of currently playing sample
         _last_update = -1,
         _n_transformed = 0,         -- number of samples processed by fourier transform
         _window_size = window_size, -- window used for queueing audio and fourier transform
@@ -71,13 +71,13 @@ end)()
 
 --- @brief
 function rt.AudioProcessor:start()
-    self._playing = true
+    self._is_playing = true
     self._source:play()
 end
 
 --- @brief
 function rt.AudioProcessor:stop()
-    self._playing = false
+    self._is_playing = false
     self._source:stop()
 end
 
@@ -224,23 +224,23 @@ function rt.AudioProcessor:update()
                 self._data:getChannelCount()
             ))
             self._source:play()
-            self._playing = true
+            self._is_playing = true
             self._buffer_offset = self._buffer_offset + n_samples_to_push
         else
-            self._playing = false
+            self._is_playing = false
             self._buffer_offset = self._data:getSampleCount()
         end
 
         self._last_update = love.timer.getDelta()
     end
 
-    if self._playing then
+    if self._is_playing then
         local previous = self._last_update
         self._last_update = love.timer.getDelta()
         local delta = self._last_update - previous
-        self._playing_offset = self._playing_offset + self._last_update * self._data:getSampleRate()
+        self._is_playing_offset = self._is_playing_offset + self._last_update * self._data:getSampleRate()
 
-        while self._n_transformed <= self._playing_offset do
+        while self._n_transformed <= self._is_playing_offset do
             if self.on_update ~= nil then
                 self.on_update(self:_signal_to_spectrum(self._data, self._n_transformed, self._window_size))
             end

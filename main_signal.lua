@@ -164,10 +164,11 @@ processor.on_update = function(magnitude)
                 n = n + 1
             end
         end
-        -- todo: scale to [0, 1]
+        sum = sum / (#coefficients * (bin[2] - bin[1]))
+        println(sum)
 
         local previous, previous_delta = total_energy_image:getPixel(clamp(col_i - 1, 0), bin_i - 1)
-        local current = sum / #coefficients
+        local current = sum
         local current_delta = current - previous
         total_energy_image:setPixel(col_i, bin_i - 1, current, current_delta, 0, 0)
     end

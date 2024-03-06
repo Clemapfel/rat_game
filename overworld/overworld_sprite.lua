@@ -108,7 +108,6 @@ function ow.OverworldSprite:set_frame(i)
     self._current_frame = i % self._n_frames + 1
     if self._is_realized then
         local frame = self._spritesheet:get_frame(self._current_frame)
-        dbg(frame)
         self._shape:reformat_texture_coordinates(
             frame.x, frame.y,
             frame.x + frame.width, frame.y,
