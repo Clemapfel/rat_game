@@ -182,7 +182,7 @@ function rt.AudioProcessor:_signal_to_spectrum(data, offset, window_size)
     local hamming_alpha = 25 / 46
 
     -- pre-emphasize high frequencies, first order high pass filter
-    local highpass_factor = 1;
+    local highpass_factor = 0.9;
     from[0] = signal[0]
     for i = 1, window_size - 1 do
         from[i] = highpass_factor * (from[i - 1] + signal[i] - signal[i - 1])

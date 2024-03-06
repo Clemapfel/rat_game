@@ -81,8 +81,7 @@ vec4 hsva_to_rgba(vec4 hsva)
 uniform Image _spectrum;
 uniform int _spectrum_size;
 
-uniform Image _energy;
-uniform int _energy_size;
+uniform Image _total_energy;
 
 uniform bool _active;
 
@@ -100,30 +99,21 @@ vec4 effect(vec4 color, Image tex, vec2 texture_coords, vec2 screen_coords)
     float scale = float(100) / _max_index;
     texture_coords.x = texture_coords.x * scale - (1 * scale - playhead);
 
-    /*
-    float energy_step = 1.f / float(_energy_size);
-    float energy_previous = Texel(_energy, vec2(texture_coords.x - energy_step, texture_coords.y)).x;
-    float energy_current = Texel(_energy, vec2(texture_coords.x, texture_coords.y)).x;
-    float energy_delta = clamp(energy_previous - energy_current, 0, 1);
+    float energy = Texel(_spectrum, texture_coords).x;
+    float energy_delta = (Texel(_spectrum, texture_coords).y * 2) - 1;
+    float energy_delta_delta = (Texel(_spectrum, texture_coords).z * 2) - 1;
 
-    float spectrum_step = 1.f / _spectrum_size;
-    float spectrum_previous = Texel(_spectrum, vec2(texture_coords.x - spectrum_step, texture_coords.y)).x;
-    float spectrum_current = Texel(_spectrum, vec2(texture_coords.x, texture_coords.y)).x;
-    float spectrum_delta = abs(spectrum_previous - spectrum_current);
-    */
+    float total = Texel(_total_energy, texture_coords).x;
+    float total_delta = Texel(_total_energy, texture_coords).y;
 
-    float magnitude = Texel(_spectrum, texture_coords).x;
+    float value = clamp(energy_delta, 0, 1);
+    float high_boost = (1 + gaussian(texture_coords.y - 0.25, 1));
+    if (_active)
+        value = energy * high_boost * (1 + energy_delta);
+    else
+        value = total * (1 + total_delta);
 
-    float energy = Texel(_energy, texture_coords).x;
-    float energy_delta = (Texel(_energy, texture_coords).y * 2) - 1;
-    float energy_delta_delta = (Texel(_energy, texture_coords).z * 2) - 1;
-    float energy_total = Texel(_energy, texture_coords).w * _energy_size;
-
-    float value = energy;
-
-    if (!_active)
-        value = magnitude;
-
+    //value = value * (10 + (1 - texture_coords.y));
     return vec4(hsv_to_rgb(vec3(value, 1, value)), 1);
 
     /*
