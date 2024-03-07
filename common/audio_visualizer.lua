@@ -2,7 +2,7 @@ rt.settings.audio_visualizer = {
     n_queueable_source_buffers = 3,
     default_window_size = 2^11,
     default_frequency_cutoff = 11000, -- Hz
-    pre_emphasis_factor = 1
+    pre_emphasis_factor = 0.8
 }
 
 --- @brief
@@ -158,6 +158,48 @@ function rt.AudioVisualizer:_calulate_spectrum()
         return math.round(hz / (self._data:getSampleRate() / (self._transform.window_size / 2)) + 1)
     end
 
+    -- initialize mel compression
+    if self._mel_compression.n_bins == nil or self._mel_compression.n_bins ~= self._config.n_mel_frequency_bins then
+        function mel_to_hz(mel)
+            return 700 * (10^(mel / 2595) - 1)
+        end
+
+        function hz_to_mel(hz)
+            return 2595 * math.log10(1 + (hz / 700))
+        end
+
+        self._mel_compression = {
+            n_bins = self._config.n_mel_frequency_bins,
+            bins = {}
+        }
+
+        local n_mel_filters = self._mel_compression.n_bins
+        local bin_i_center_frequency = {}
+        local mel_lower = 0
+        local mel_upper = hz_to_mel(math.max(self._config.frequency_cutoff))
+        for mel in step_range(mel_lower, mel_upper, (mel_upper - mel_lower) / n_mel_filters) do
+            table.insert(bin_i_center_frequency, hz_to_bin(mel_to_hz(mel)))
+        end
+
+        for i = 2, #bin_i_center_frequency - 1 do
+            local left, center, right = bin_i_center_frequency[i-1], bin_i_center_frequency[i], bin_i_center_frequency[i+1]
+
+            if left < (#bin_i_center_frequency - 1) / 4 then
+                -- for low frequencies, keep 1:1 or even n:1 ratio
+                table.insert(self._mel_compression.bins, {left, left})
+            else
+                table.insert(self._mel_compression.bins, {
+                    math.floor(mix(left, center, 0.5)),
+                    math.floor(mix(center, right, 0.5))
+                })
+            end
+        end
+
+        local n = #self._mel_compression.bins
+        self._mel_compression.bins[n][2] = bin_i_center_frequency[#bin_i_center_frequency]
+        self._mel_compression.last_result = table.rep(0, #(self._mel_compression.bins))
+    end
+
     local data_n = self._data:getSampleCount() * self._data:getChannelCount()
     local data_ptr = ffi.cast(self._data_t .. "*", self._data:getFFIPointer())
     local window_size = self._transform.window_size
@@ -218,58 +260,9 @@ function rt.AudioVisualizer:_calulate_spectrum()
     -- discard upper half, including anything above frequency cutoff (in Hz)
     local half = math.round(hz_to_bin(self._config.frequency_cutoff))
 
-    -- compute complex magnitude
-    local normalize_factor = 1 / math.sqrt(window_size)
-    local magnitudes = {}
-    for i = 1, half do
-        local complex = ffi.cast(self._fftw.complex_t, to[half - i]) -- also flip
-        local magnitude = rt.magnitude(complex[0], complex[1]) * normalize_factor
-        table.insert(magnitudes, magnitude)
-    end
+    -- compute complex magnitude, apply mel compression
+    local normalize_factor = 1 / math.sqrt(window_size) / highpass_factor
 
-    -- initialize mel compression
-    if self._mel_compression.n_bins == nil or self._mel_compression.n_bins ~= self._config.n_mel_frequency_bins then
-        function mel_to_hz(mel)
-            return 700 * (10^(mel / 2595) - 1)
-        end
-
-        function hz_to_mel(hz)
-            return 2595 * math.log10(1 + (hz / 700))
-        end
-
-        self._mel_compression = {
-            n_bins = self._config.n_mel_frequency_bins,
-            bins = {}
-        }
-
-        local n_mel_filters = self._mel_compression.n_bins
-        local bin_i_center_frequency = {}
-        local mel_lower = 0
-        local mel_upper = hz_to_mel(math.max(self._config.frequency_cutoff))
-        for mel in step_range(mel_lower, mel_upper, (mel_upper - mel_lower) / n_mel_filters) do
-            table.insert(bin_i_center_frequency, hz_to_bin(mel_to_hz(mel)))
-        end
-
-        for i = 2, #bin_i_center_frequency - 1 do
-            local left, center, right = bin_i_center_frequency[i-1], bin_i_center_frequency[i], bin_i_center_frequency[i+1]
-
-            if left < (#bin_i_center_frequency - 1) / 4 then
-                -- for low frequencies, keep 1:1 or even n:1 ratio
-                table.insert(self._mel_compression.bins, {left, left})
-            else
-                table.insert(self._mel_compression.bins, {
-                    math.floor(mix(left, center, 0.5)),
-                    math.floor(mix(center, right, 0.5))
-                })
-            end
-        end
-
-        local n = #self._mel_compression.bins
-        self._mel_compression.bins[n][2] = bin_i_center_frequency[#bin_i_center_frequency]
-        self._mel_compression.last_result = table.rep(0, #(self._mel_compression.bins))
-    end
-
-    -- apply mel compression
     local coefficients = {}
     local total_energy = 0
 
@@ -282,8 +275,10 @@ function rt.AudioVisualizer:_calulate_spectrum()
         local n = 1
         local width = bin[2] - bin[1]
         for i = bin[1], bin[2] do
-            if i > 0 and i <= #magnitudes  then
-                sum = sum + magnitudes[i]
+            if i > 0 and i <= half  then
+                local complex = ffi.cast(self._fftw.complex_t, to[half - i]) -- also flip
+                local magnitude = rt.magnitude(complex[0], complex[1]) * normalize_factor
+                sum = sum + magnitude
                 n = n + 1
             end
         end
