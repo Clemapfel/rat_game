@@ -2,7 +2,7 @@ rt.settings.audio_visualizer = {
     n_queueable_source_buffers = 3,
     default_window_size = 2^11,
     default_frequency_cutoff = 11000, -- Hz
-    pre_emphasis_factor = 0.9
+    pre_emphasis_factor = 1
 }
 
 --- @brief
@@ -165,11 +165,20 @@ function rt.AudioVisualizer:_calulate_spectrum()
 
     -- convert audio signal to doubles
     local signal = {}
-    if self._data:getChannelCount() == 1 then
-        local normalize = function(x)
+    local bit_depth = self._data:getBitDepth()
+    local normalize
+
+    if self._data:getBitDepth() == 8 then
+        normalize = function(x)
             return (x - 2^8) / (2^8 - 1)
         end
+    elseif self._data:getBitDepth() == 16 then
+        normalize = function(x)
+            return x / (2^16 / 2 - 1)
+        end
+    end
 
+    if self._data:getChannelCount() == 1 then
         for i = 1, window_size do
             if offset + i < data_n then
                 signal[i - 1] = normalize(data_ptr[offset + i - 1])
@@ -178,10 +187,6 @@ function rt.AudioVisualizer:_calulate_spectrum()
             end
         end
     else -- stereo
-        local normalize = function(x)
-            return x / (2^16 / 2 - 1)
-        end
-
         for i = 1, window_size * 2, 2 do
             local index = offset * 2 + i - 1
             local index_out = math.floor((i - 1) / 2)
@@ -285,29 +290,6 @@ function rt.AudioVisualizer:_calulate_spectrum()
         sum = sum / n
         total_energy = total_energy + sum
         table.insert(coefficients, sum)
-    end
-
-    -- compute first derivative
-    local delta = {}
-    local total_delta = 0
-    for i = 1, #coefficients do
-        local value = clamp(coefficients[i] - self._mel_compression.last_result[i], 0)
-        -- clamp because only low energy -> high energy events are relevant
-
-        delta[i] = value
-        total_delta = total_delta + value
-    end
-
-    for i = 1, #delta do
-        delta[i] = delta[i] / total_delta
-    end
-
-    local sum = 0
-    for i = 1, #coefficients do
-        self._mel_compression.last_result[i] = coefficients[i]
-        local value = coefficients[i]
-        sum = sum + value
-        coefficients[i] = value
     end
 
     return coefficients

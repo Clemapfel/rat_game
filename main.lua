@@ -1,6 +1,6 @@
 require "include"
 
-audio = rt.AudioVisualizer("assets/sound/test_music.mp3")
+audio = rt.AudioVisualizer("assets/sound/test_music_03.mp3")
 audio:play()
 
 local visualizer_initialized = false
@@ -18,6 +18,7 @@ audio.on_update = function(coefficients)
     if not visualizer_initialized then
         spectrum_image = love.image.newImageData(texture_h, #coefficients, spectrum_format)
         spectrum_texture = love.graphics.newImage(spectrum_image)
+        spectrum_texture:setFilter("nearest", "nearest")
 
         shape = rt.VertexRectangle(0, 0, rt.graphics.get_width(), rt.graphics.get_height())
         visualizer_initialized = true
@@ -25,7 +26,6 @@ audio.on_update = function(coefficients)
 
     if col_i >= texture_h then
         spectrum_image = love.image.newImageData(texture_h, #coefficients, spectrum_format)
-        energy_image = love.image.newImageData(texture_h, #energies, energy_format)
         col_i = 0
     end
 
