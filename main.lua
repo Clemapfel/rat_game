@@ -1,6 +1,6 @@
 require "include"
 
-audio = rt.AudioVisualizer("assets/sound/test_music_01.mp3")
+audio = rt.AudioVisualizer("assets/sound/test_music_03.mp3")
 audio:play()
 
 local visualizer_initialized = false
@@ -11,9 +11,10 @@ local col_i = 0
 local texture_h = 10e3
 
 local shader = rt.Shader("assets/shaders/audio_visualizer_debug.glsl")
-local shape = {}
+local shape
 local active = false
 
+--[[
 audio.on_update = function(coefficients)
     if not visualizer_initialized then
         spectrum_image = love.image.newImageData(texture_h, #coefficients, spectrum_format)
@@ -42,6 +43,7 @@ audio.on_update = function(coefficients)
 
     col_i = col_i + 1
 end
+]]--
 
 rt.SpriteAtlas = rt.SpriteAtlas()
 rt.SpriteAtlas:initialize("assets/sprites")
@@ -80,9 +82,11 @@ love.draw = function()
     love.graphics.clear(0.8, 0.2, 0.8, 1)
     rt.current_scene:draw()
 
-    shader:bind()
-    shape:draw()
-    shader:unbind()
+    if shader ~= nil and shape ~= nil then
+        shader:bind()
+        shape:draw()
+        shader:unbind()
+    end
 
     do -- show fps
         local fps = tostring(love.timer.getFPS())

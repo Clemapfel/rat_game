@@ -1,6 +1,6 @@
 rt.settings.audio_visualizer = {
     n_queueable_source_buffers = 3,
-    default_window_size = 2^11,
+    default_window_size = (2^10 + 2^11) / 2,
     default_frequency_cutoff = 11000, -- Hz
     pre_emphasis_factor = 0.6
 }
@@ -270,12 +270,10 @@ function rt.AudioVisualizer:_calulate_spectrum()
     local normalize_factor = 1 / math.sqrt(window_size) / highpass_factor
 
     local coefficients = {}
-    local deltas = {}
     local last_result = self._mel_compression.last_result
     local total_energy = 0
     local total_delta = 0
     local last_total_energy = 0
-
 
     local bass_energy = 0
     local mid_energy = 0
@@ -294,23 +292,20 @@ function rt.AudioVisualizer:_calulate_spectrum()
             end
         end
         local coefficient = sum / n
-        total_energy = total_energy + coefficient
-        last_total_energy = last_total_energy + last_result[bin_i]
-
-        -- compute 1st derivative, discard < 0 as only low energy -> high energy events are relevant to rhythm
         local delta = clamp( coefficient - last_result[bin_i], 0)
-        total_delta = total_delta + delta
+        coefficient = mix(coefficient, delta, 1 - 0.8) * 4
+        last_result[bin_i] = coefficient
 
         table.insert(coefficients, coefficient)
-        table.insert(deltas, delta)
-        self._mel_compression.last_result[bin_i] = coefficient
+        total_energy = total_energy + coefficient
+        total_delta = total_delta + delta
     end
 
     -- normalize first derivative, also divide by total energy cf. webers law
-    for i, delta in ipairs(deltas) do
-        local value = (total_delta / #deltas) / (total_delta / total_energy)
-        deltas[i] = value
+    for i, value in ipairs(coefficients) do
+        value = total_delta / #coefficients --(total_delta / #coefficients) / (total_delta / total_energy)
+        coefficients[i] = value
     end
 
-    return deltas
+    return coefficients
 end
