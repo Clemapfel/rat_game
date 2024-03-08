@@ -3,6 +3,7 @@ require "include"
 audio = rt.AudioVisualizer("assets/sound/test_music_03.mp3")
 audio:play()
 
+
 local visualizer_initialized = false
 local spectrum_image, spectrum_texture, energy_image, energy_texture
 local spectrum_format = "rgba16"
