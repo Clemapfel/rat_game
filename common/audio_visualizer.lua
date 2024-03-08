@@ -2,7 +2,7 @@ rt.settings.audio_visualizer = {
     n_queueable_source_buffers = 3,
     default_window_size = 2^11,
     default_frequency_cutoff = 11000, -- Hz
-    pre_emphasis_factor = 0.8
+    pre_emphasis_factor = 0.6
 }
 
 --- @brief
@@ -132,6 +132,8 @@ end
 --- @return
 function rt.AudioVisualizer:_calulate_spectrum()
 
+    local start = rt.Clock()
+
     -- initialize C-side memory
     if self._transform.window_size == nil or self._transform.window_size ~= self._config.window_size then
         local window_size = self._config.window_size
@@ -211,34 +213,15 @@ function rt.AudioVisualizer:_calulate_spectrum()
     local normalize
 
     if self._data:getBitDepth() == 8 then
+        local max_value = 2^8
+        local factor = 1 / (max_value - 1)
         normalize = function(x)
-            return (x - 2^8) / (2^8 - 1)
+            return (x - max_value) * factor
         end
     elseif self._data:getBitDepth() == 16 then
+        local factor = 1 / (2^15 - 1)
         normalize = function(x)
-            return x / (2^16 / 2 - 1)
-        end
-    end
-
-    if self._data:getChannelCount() == 1 then
-        for i = 1, window_size do
-            if offset + i < data_n then
-                signal[i - 1] = normalize(data_ptr[offset + i - 1])
-            else
-                signal[i - 1] = 0
-            end
-        end
-    else -- stereo
-        for i = 1, window_size * 2, 2 do
-            local index = offset * 2 + i - 1
-            local index_out = math.floor((i - 1) / 2)
-            if offset + index < data_n then
-                local left = normalize(data_ptr[index + 0])
-                local right = normalize(data_ptr[index + 1])
-                signal[index_out] = left + right / 2.0
-            else
-                signal[index_out] = 0
-            end
+            return x * factor
         end
     end
 
@@ -246,25 +229,53 @@ function rt.AudioVisualizer:_calulate_spectrum()
     local from = ffi.cast(self._fftw.real_data_t, self._transform.fftw_real)
     local to = ffi.cast(self._fftw.complex_data_t, self._transform.fftw_complex)
 
-    -- pre-emphasize high frequencies with first order high pass filter while writing to C arrays
+    -- also pre-emphasize high frequencies with first order highpass filter
+    -- cf. https://en.wikipedia.org/wiki/High-pass_filter#Algorithmic_implementation
     local highpass_factor = rt.settings.audio_visualizer.pre_emphasis_factor;
-    from[0] = signal[0]
-    for i = 1, window_size - 1 do
-        from[i] = highpass_factor * (from[i - 1] + signal[i] - signal[i - 1])
-        -- cf. https://en.wikipedia.org/wiki/High-pass_filter#Algorithmic_implementation
+    if self._data:getChannelCount() == 1 then
+        from[0] = normalize(data_ptr[offset - 1])
+        local last_value = 0
+        for i = 2, window_size do
+            local value = 0
+            if offset + i < data_n then
+                value = normalize(data_ptr[offset + i - 1])
+            end
+            from[i - 1] = highpass_factor * (from[i - 2] + value - last_value)
+            last_value = value
+        end
+    else -- stereo
+        from[0] = (normalize(data_ptr[offset + 0]) + normalize(data_ptr[offset + 1])) / 2
+        local last_value = 0
+        for i = 2, window_size * 2, 2 do
+            local index = offset * 2 + i - 1
+            local index_out = math.floor((i - 1) / 2)
+            local value = 0
+            if offset + index < data_n then
+                local left = normalize(data_ptr[index + 0])
+                local right = normalize(data_ptr[index + 1])
+                value = (left + right) / 2
+                from[index_out] = highpass_factor * (from[index_out - 1] + value - last_value)
+            end
+            last_value = value
+        end
     end
 
     -- apply fourier transform
     self._fftw.execute(self._transform.plan_signal_to_spectrum)
 
-    -- discard upper half, including anything above frequency cutoff (in Hz)
+    -- discard upper half, including anything above frequency cutoff
     local half = math.round(hz_to_bin(self._config.frequency_cutoff))
 
     -- compute complex magnitude, apply mel compression
     local normalize_factor = 1 / math.sqrt(window_size) / highpass_factor
 
     local coefficients = {}
+    local deltas = {}
+    local last_result = self._mel_compression.last_result
     local total_energy = 0
+    local total_delta = 0
+    local last_total_energy = 0
+
 
     local bass_energy = 0
     local mid_energy = 0
@@ -282,10 +293,24 @@ function rt.AudioVisualizer:_calulate_spectrum()
                 n = n + 1
             end
         end
-        sum = sum / n
-        total_energy = total_energy + sum
-        table.insert(coefficients, sum)
+        local coefficient = sum / n
+        total_energy = total_energy + coefficient
+        last_total_energy = last_total_energy + last_result[bin_i]
+
+        -- compute 1st derivative, discard < 0 as only low energy -> high energy events are relevant to rhythm
+        local delta = clamp( coefficient - last_result[bin_i], 0)
+        total_delta = total_delta + delta
+
+        table.insert(coefficients, coefficient)
+        table.insert(deltas, delta)
+        self._mel_compression.last_result[bin_i] = coefficient
     end
 
-    return coefficients
+    -- normalize first derivative, also divide by total energy cf. webers law
+    for i, delta in ipairs(deltas) do
+        local value = (total_delta / #deltas) / (total_delta / total_energy)
+        deltas[i] = value
+    end
+
+    return deltas
 end

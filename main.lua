@@ -1,6 +1,6 @@
 require "include"
 
-audio = rt.AudioVisualizer("assets/sound/test_music_03.mp3")
+audio = rt.AudioVisualizer("assets/sound/test_music_01.mp3")
 audio:play()
 
 local visualizer_initialized = false
