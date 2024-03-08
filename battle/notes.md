@@ -2,25 +2,85 @@
 moves used: attack (kills), protect, attack (blocked), add status
 
 ```
+struct MoveSelection {
+    user = Entity
+    target = Table<Entity>
+    move = Move
+}
+
 struct Status {
-    attack_modifier     = Float
-    defense_modified    = Float 
-    speed_modifier      = Float
+    attack_modifier     = Integer
+    defense_modified    = Integer
+    speed_modifier      = Integer
+    
+    attack_factor   = Float
+    defense_factor  = Float
+    speed_factor    = Float
+    
+    max_duration        = Integer
+    is_field_effect     = Bool
     
     on_start_of_turn    = (self, user) -> nil
-    on_gained           = (self, user) -> nil
-    on_lost             = (self, user) -> nil
-    on_damage_taken     = (self, damage_taker, damage_dealer) -> new_damage
-    on_damage_dealt     = (self, damage_dealer, damage_taker) -> new_damage
-    on_status_gained    = (self, user, other_status) -> nil
-    on_status_lost      = (self, user, other_status) -> nil
     on_end_of_turn      = (self, user) -> nil
+    on_before_action    = (self, user, target, move_selection) -> altered_selection
+    on_after_action     = (self, user, target, move_selection) -> nil
+    on_damage_taken     = (self, damage_taker, damage_dealer) -> new_damage
+    on_damage_dealt     = (self, damage_dealer, damage_taker) -> nil
+    on_status_gained    = (self, user, other_status) -> allow_gaining_status
+    on_status_lost      = (self, user, other_status) -> nil
+    on_knock_out        = (self, user) -> allow_knockout
+    on_death            = (self, user) -> allow_death
+    on_switch           = (self, user) -> allow_switch
+    on_before_consumable = (self, user, consumable) -> allow_consumable
+    on_after_consumable  = (self, user, consumable) -> nil
+    on_battle_start     = (self, user) -> nil
+    on_battle_end       = (self, user) -> nil
+    
+    id   = String
+    name = String
+    icon = String or nil
+    
+    -- mutable
+    originator   = Entity
+    target       = Entity
+    duration    = Integer
+}
+
+struct Consumable {
+    hp_offset   = Integer
+    effect  = (self, user) -> nil
+}
+
+struct Equippable {
+    hp_base_offset = Integer
+    attack_offset     = Integer
+    defense_offset    = Integer
+    speed_offset      = Integer
+    
+    attack_factor   = Float
+    defense_factor  = Float
+    speed_factor    = Float
+   
+    effect = Status
+}
+
+struct Move {
+    max_n_uses  = Integer
+    
+    can_target_multiple = Bool
+    can_target_self  = Bool
+    can_target_enemy = Bool
+    can_target_ally  = Bool
+    
+    effect  = (self, user, target) -> nil
 }
 
 struct Entity {
     -- immutable
     id      = string
     name    = string
+    gender  = Gender
+    
     moveset = immutable Table<ID, Move>
     moveset_uses = mutable Table<ID, Integer>
     
@@ -46,7 +106,138 @@ struct BattleState {
     party = Table<Entity*>
     enemy = Table<Entity*>
     turn_count = Integer
+    
+    priority_order_reversed = Bool
+    
+    background   = BackgroundID
+    music        = MusicID
 }
+```
+
+# Atomic Actions
+```
+-- ### mutating
+
+knock_out   Entity -> nil
+help_up     Entity -> nil
+kill        Entity -> nil
+revive      Entity -> nil
+
+add_hp          Entity  UInt -> nil
+reduce_hp       Entity  UInt -> nil
+set_hp          Entity  Uint -> nil
+
+increase_attack     Entity Modifier -> nil
+decrease_attack     Entity Modifier -> nil
+reset_attack        Entity -> nil
+
+increase_defense    Entity Modifier -> nil
+decrease_defense    Entity Modifier -> nil
+reset_defense       Entity -> nil
+
+increase_speed      Entity Modifier -> nil
+decrease_speed      Entity Modifier -> nil
+reset_speed         Entity -> nil
+
+set_attack_override     Entity Value -> nil
+reset_attack_override   Entity -> nil
+set_defense_override    Entity Value -> nil
+reset_defense_override  Entity -> nil
+set_speed_override      Entity Value -> nil
+reset_speed_override    Entity -> nil
+
+set_priority    Entity Priority -> nil
+reset_priority  Entity Priority -> nil
+
+add_status      Entity  StatusID  -> nil
+remove_status   Entity  StatusID  -> nil
+
+get_custom_field Entity FieldID -> Value
+add_custom_field Entity FieldID Value -> nil
+set_custom_field Entity FieldID Value -> nil
+
+add_field_effect    FieldEffectID -> nil
+remove_field_effect FieldEffectID -> nil
+
+set_move_n_uses_override Entity MoveID n_uses -> nil
+reset_move_n_uses_override Entity MoveID -> nil
+
+switch          Entity Entity -> nil
+try_escape      nil -> nil
+
+set_priority_order_reversed Bool -> nil
+
+set_ignore_equipment Bool -> nil
+set_ignore_stat_modifiers Bool -> nil
+
+set_prevent_animation Bool -> nil
+set_prevent_messages Bool -> nil
+
+-- ### non-mutating
+
+get_enemies     nil -> Table<Entity>
+get_party       nil -> Table<Entity>
+get_entities    nil -> Table<Entity>
+
+get_left_of     Entity -> Entity or nil
+get_rght_of     Entity -> Entity or nil
+get_position    Entity -> Integer
+
+get_in_order            nil -> Table<Entity>
+get_party_in_oder       nil -> Table<Entity>
+get_enemies_in_order    nil -> Table>Entity>
+
+is_faster_than  faster slower -> Bool
+
+has_status          Entity StatusID -> Bool
+get_status          Entity -> Table<StatusID>
+
+has_field_effect    FieldEffectID -> Bool
+get_field_effect    nil -> Table<FieldEffectID>
+
+get_hp                  Entity -> Integer
+get_hp_base             Entity -> Integer
+get_priority            Entity -> Priority
+
+get_attack              Entity -> Integer
+get_attack_base         Entity -> Integer
+get_attack_modifier     Entity -> Modifier
+get_defense             Entity -> Integer
+get_defense_base        Entity -> Integer
+get_defense_modifier    Entity -> Modifier
+get_speed               Entity -> Integer
+get_speed_base          Entity -> Integer
+get_speed_modifier      Entity -> Modifier
+
+get_attack_override_active  Entity -> Bool
+get_defense_override_active Entity -> Bool
+get_speed_override_active   Entity -> Bool
+
+get_move_n_uses_override_active Entity MoveID -> Bool
+
+get_is_knocked_out  Entity -> Bool
+get_is_dead         Entity -> Bool
+get_is_enemy        Entity -> Bool
+
+get_moveset     Entity -> Table<MoveID>
+get_has_move    Entity MoveID -> Bool
+get_n_uses      Entity MoveID -> Integer 
+get_max_n_uses  Entity MoveID -> Integer
+
+get_turn_count          nil -> Integer         number of times a turn has started so far
+get_turn_index          Entity -> Integer      number of entites acted before arg
+
+get_name                Entity -> String
+get_grammatical_gender  Entity -> Gender
+
+get_history nil -> BattleHistory
+get_move    MoveID -> Move
+
+get_priority_order_reversed nil -> Bool
+get_ignore_equipment -> Bool
+
+get_prevent_animation  nil -> Bool
+get_prevent_message   nil -> Bool
 ```
 
 # loading 
@@ -59,13 +250,25 @@ struct PartyState {
     inventory = Table<ID, Table<Usables>>
     move_uses = Table<ID, Integer>
 }
-```
 
-```
 struct EnemyPartyState {
     in_oder = Table<UInt, Entity>
     background = ID
     music = ID
+}
+
+struct BattleHistory {
+    struct BattleHistoryNode {
+        turn_count = Integer
+        turn_index = Integer
+        
+        user = Entity
+        targets = Table<Entity>
+        move = MoveID
+        was_succesfull = Bool
+    }
+    
+    in_order = Table<TurnIndex, EntityIndex, BattleHistoryNode>
 }
 ```
 
@@ -98,11 +301,6 @@ end
 ## . Move Selection
 
 ```
-struct MoveSelection {
-    user = Entity
-    target = Table<Entity>
-    move = Move
-}
 
 -- in BattleState
 move_selection = Queue<MoveSelection>
@@ -119,61 +317,6 @@ In order of speed, ask player to choose a move and target
 
 ### Atomic Actions
 
-```
--- ### mutating
-
-add_hp          Entity  UInt    -> nil
-reduce_hp       Entity  UInt    -> nil  
-add_status      Entity  Status  -> nil
-remove_status   Entity  Status  -> nil
-
-knock_out   Entity -> nil
-help_up     Entity -> nil
-kill        Entity -> nil
-revive      Entity -> nil
-
-increase_attack     Entity Modifier -> nil
-decrease_attack     Entity Modifier -> nil
-reset_attack        Entity -> nil
-
-increase_defense    Entity Modifier -> nil
-decrease_defense    Entity Modifier -> nil
-reset_defense       Entity -> nil
-
-increase_speed      Entity Modifier -> nil
-decrease_speed      Entity Modifier -> nil
-reset_speed         Entity -> nil
-
-set_priority    Entity Priority -> nil
-reset_priority  Entity Priority
-
--- ### non-mutating
-
-get_enemies     nil -> Table<Entity>
-get_party       nil -> Table<Entity>
-get_left_of     Entity -> Entity or nil
-get_rght_of     Entity -> Entity or nil
-get_in_order            nil -> Table<Entity>
-get_party_in_oder       nil -> Table<Entity>
-get_enemies_in_order    nil -> Table>Entity>
-
-get_hp                  Entity -> Integer
-get_hp_base             Entity -> Integer
-get_priority            Entity -> Priority
-
-get_attack              Entity -> Integer
-get_attack_base         Entity -> Integer
-get_attack_modifier     Entity -> Modifier
-get_defense             Entity -> Integer
-get_defense_base        Entity -> Integer
-get_defense_modifier    Entity -> Modifier
-get_speed               Entity -> Integer
-get_speed_base          Entity -> Integer
-get_speed_modifier      Entity -> Modifier
-
-get_is_knocked_out  Entity -> Bool
-get_is_dead         Entity -> Bool
-```
 
 ## . Resolve End of Turn
 
@@ -184,6 +327,10 @@ for entity in state.entities do
     for status in entity.status do
         status:on_end_of_turn(entity)
     end
+end
+
+for status in state.field_status do
+    status:on_start_of_turn()
 end
 ```
 

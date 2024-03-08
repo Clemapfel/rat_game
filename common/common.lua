@@ -9,7 +9,18 @@ function pairs(x)
     end
 end
 
+_G._ipairs = ipairs
+function ipairs(x)
+    local meta = getmetatable(x)
+    if meta ~= nil and meta.__pairs ~= nil then
+        return meta.__ipairs(x)
+    else
+        return _G._ipairs(x)
+    end
+end
+
 if table.unpack == nil then table.unpack = unpack end
+assert(table.unpack ~= nil)
 
 --- @brief print, arguments are concatenated
 --- @param vararg any
