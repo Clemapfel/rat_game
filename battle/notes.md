@@ -117,6 +117,64 @@ In order of speed, ask player to choose a move and target
 
 ## . Simulation
 
+### Atomic Actions
+
+```
+-- ### mutating
+
+add_hp          Entity  UInt    -> nil
+reduce_hp       Entity  UInt    -> nil  
+add_status      Entity  Status  -> nil
+remove_status   Entity  Status  -> nil
+
+knock_out   Entity -> nil
+help_up     Entity -> nil
+kill        Entity -> nil
+revive      Entity -> nil
+
+increase_attack     Entity Modifier -> nil
+decrease_attack     Entity Modifier -> nil
+reset_attack        Entity -> nil
+
+increase_defense    Entity Modifier -> nil
+decrease_defense    Entity Modifier -> nil
+reset_defense       Entity -> nil
+
+increase_speed      Entity Modifier -> nil
+decrease_speed      Entity Modifier -> nil
+reset_speed         Entity -> nil
+
+set_priority    Entity Priority -> nil
+reset_priority  Entity Priority
+
+-- ### non-mutating
+
+get_enemies     nil -> Table<Entity>
+get_party       nil -> Table<Entity>
+get_left_of     Entity -> Entity or nil
+get_rght_of     Entity -> Entity or nil
+get_in_order            nil -> Table<Entity>
+get_party_in_oder       nil -> Table<Entity>
+get_enemies_in_order    nil -> Table>Entity>
+
+get_hp                  Entity -> Integer
+get_hp_base             Entity -> Integer
+get_priority            Entity -> Priority
+
+get_attack              Entity -> Integer
+get_attack_base         Entity -> Integer
+get_attack_modifier     Entity -> Modifier
+get_defense             Entity -> Integer
+get_defense_base        Entity -> Integer
+get_defense_modifier    Entity -> Modifier
+get_speed               Entity -> Integer
+get_speed_base          Entity -> Integer
+get_speed_modifier      Entity -> Modifier
+
+get_is_knocked_out  Entity -> Bool
+get_is_dead         Entity -> Bool
+```
+
 ## . Resolve End of Turn
 
 In order of current priority, apply end-of-turn effects
@@ -138,4 +196,3 @@ for entity in state.party do
     end
 end
 ```
-
