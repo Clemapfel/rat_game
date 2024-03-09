@@ -56,7 +56,7 @@ struct Equippable {
     hp_base_offset = Integer
     attack_offset     = Integer
     defense_offset    = Integer
-    speed_offset      = Integer
+    speed_offset      = Integern
     
     attack_factor   = Float
     defense_factor  = Float
