@@ -22,6 +22,9 @@ end
 if table.unpack == nil then table.unpack = unpack end
 assert(table.unpack ~= nil)
 
+if debug.setfenv == nil then debug.setfenv = setfenv end
+assert(debug.setfenv ~= nil)
+
 --- @brief print, arguments are concatenated
 --- @param vararg any
 --- @return nil

@@ -159,6 +159,14 @@ require "list_view"
 require "physics_world"
 require "collider"
 
+require "battle.battle_state"
+
+
+for _, name in pairs(love.filesystem.getDirectoryItems("battle")) do
+    require("battle." .. string.gsub(name, "%.lua$", ""))
+end
+
+--[[
 require "battle.stat"
 require "battle.battle_tooltip"
 require "battle.action"
@@ -191,6 +199,7 @@ for _, name in pairs(love.filesystem.getDirectoryItems("battle/animations")) do
     name = string.sub(name, 1, #name - 4) -- remove `.lua`
     require("battle.animations." .. name)
 end
+]]--
 
 require "overworld.overworld_entity"
 require "overworld.camera"
@@ -203,7 +212,7 @@ require "overworld.stage"
 
 require "scene"
 require "overworld.overworld_scene"
-require "battle.battle_scene"
+--require "battle.battle_scene"
 
 
 -- require "test

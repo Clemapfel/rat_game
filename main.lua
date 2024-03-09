@@ -3,6 +3,14 @@ require "include"
 audio = rt.AudioVisualizer("assets/sound/test_music_03.mp3")
 audio:play()
 
+local original = bt.Entity("test")
+local entity = bt.EntityProxy(original)
+
+bt.State:_run(function(self)
+    self:set_hp("test")
+    dbg(self:get_hp())
+end, entity)
+
 
 local visualizer_initialized = false
 local spectrum_image, spectrum_texture, energy_image, energy_texture
@@ -12,7 +20,6 @@ local col_i = 0
 local texture_h = 10e3
 
 local shader = rt.Shader("assets/shaders/audio_visualizer_debug.glsl")
-local shape
 local active = false
 
 --[[
@@ -84,9 +91,10 @@ love.draw = function()
     rt.current_scene:draw()
 
     if shader ~= nil and shape ~= nil then
-        shader:bind()
+        --[[shader:bind()
         shape:draw()
         shader:unbind()
+        ]]--
     end
 
     do -- show fps

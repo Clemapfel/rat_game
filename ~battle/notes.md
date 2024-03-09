@@ -20,6 +20,8 @@ struct Status {
     max_duration        = Integer
     is_field_effect     = Bool
     
+    on_gained           = (self, user) -> nil
+    on_lost             = (self, user) -> nil
     on_start_of_turn    = (self, user) -> nil
     on_end_of_turn      = (self, user) -> nil
     on_before_action    = (self, user, target, move_selection) -> altered_selection
@@ -29,6 +31,7 @@ struct Status {
     on_status_gained    = (self, user, other_status) -> allow_gaining_status
     on_status_lost      = (self, user, other_status) -> nil
     on_knock_out        = (self, user) -> allow_knockout
+    on_wake_up          = (self, user -> nil
     on_death            = (self, user) -> allow_death
     on_switch           = (self, user) -> allow_switch
     on_before_consumable = (self, user, consumable) -> allow_consumable
