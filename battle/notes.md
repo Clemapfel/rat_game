@@ -40,9 +40,10 @@ struct Status {
     name = String
     icon = String or nil
     
-    -- mutable
     originator   = Entity
     target       = Entity
+    
+    -- mutable
     duration    = Integer
 }
 
@@ -72,6 +73,7 @@ struct Move {
     can_target_enemy = Bool
     can_target_ally  = Bool
     
+    priority = Priority
     effect  = (self, user, target) -> nil
 }
 
@@ -161,6 +163,8 @@ remove_field_effect FieldEffectID -> nil
 
 set_move_n_uses_override Entity MoveID n_uses -> nil
 reset_move_n_uses_override Entity MoveID -> nil
+reduce_move_n_uses Entity MoveID Integer -> nil
+increase_move_n_uses Entity MoveID Integer -> nil
 
 switch          Entity Entity -> nil
 try_escape      nil -> nil
@@ -169,6 +173,10 @@ set_priority_order_reversed Bool -> nil
 
 set_ignore_equipment Bool -> nil
 set_ignore_stat_modifiers Bool -> nil
+set_prevent_consumable Bool -> nil
+
+force_consume_consumable nil -> nil
+force_remove_consumable nil -> nil
 
 set_prevent_animation Bool -> nil
 set_prevent_messages Bool -> nil
@@ -313,7 +321,67 @@ If move is unselectable, query for another
 ### Party
 In order of speed, ask player to choose a move and target
 
-## . Simulation
+Queue: ABXY
+
+Party A chose {
+    move: ATTACK
+    user: A
+    target: Y
+}
+
+Party B choose {
+    move: PROTECT
+    user: B
+    target: B
+}
+
+Enemy X chooses {
+    move: ATTACK
+    user: X
+    target: B
+}
+
+Enemy Y chooses {
+    move: ADD_STATUS, 
+    user: Y,
+    target: A
+}
+
+Priority Resolution
+
+A = 0
+B = +2
+X = 0
+Y = 0
+
+Battle Phase
+Queue: BAXY
+
+B uses Protect
+    Animation("PROTECT", B, B)
+    add_status(B, "PROTECT")
+        animation: status add
+        send_message("$B protects itself")
+
+A uses ATTACK
+    Animation("ATTACK", A, Y)
+    reduce_hp(Y, get_attack(self) * 1)
+        animation: loose hp get_hp(Y)
+        send_message("$Y took 100 damage")
+        knock_out(Y)
+            animation: knock out 
+            send_message("$Y was knocked out")
+
+X uses ATTACK
+    Animation("ATTACK", X, B)
+    reduce_hp(Y, get_attack(self) * 1)
+    B.status.protect.on_before_damage -> 0
+        send_message("$B is protecting itself)
+        
+Y uses ADD_STATUS
+    Animation("ADD_STATUS", Y, A)
+    add_status(Y, "status")
+        send_message("Y is now statused")
 
 ### Atomic Actions
 
