@@ -5,7 +5,7 @@ bt.BattleUI = meta.new_abstract_type("BattleUI", rt.Widget, rt.Animation, {
 })
 
 --- @abstract
-function bt.BattleUI:synch()
+function bt.BattleUI:sync()
     rt.error("In bt.BattleUI:synch: pure abstract method called")
 end
 

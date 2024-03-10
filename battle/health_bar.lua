@@ -16,7 +16,6 @@ bt.HealthBar = meta.new_type("HealthBar", bt.BattleUI, function(entity)
         _elapsed = 1,   -- sic, makes it so `update` is invoked immediately
 
         _hp_value = -1,
-        _hp_value_max = entity:get_hp_base(),
         _hp_bar = rt.LevelBar(0, entity:get_hp_base(), entity:get_hp_base()),
         _hp_label = {}, -- rt.Glyph,
         _hp_label_right = {}, -- rt.Glyph
@@ -41,7 +40,7 @@ end
 function bt.HealthBar:realize()
     if self._is_realized then return end
 
-    local left, right = self._format_hp(self._hp_value, self._hp_value_max)
+    local left, right = self._format_hp(self._hp_value, self._entity:get_hp_base())
     local settings = {
         is_outlined = true,
         outline_color = rt.Palette.TRUE_BLACK,
@@ -111,3 +110,9 @@ function bt.HealthBar:draw()
     end
 end
 
+--- @override
+function bt.HealthBar:sync()
+    self._hp_value = self._entity:get_hp()
+    self._hp_label_left:set_text(select(1, self._format_hp(self._hp_value, self._entity:get_hp_base())))
+    self._hp_bar:set_value(self._hp_value)
+end

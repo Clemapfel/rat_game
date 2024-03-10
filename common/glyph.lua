@@ -113,7 +113,6 @@ function rt.Glyph:_update()
 
         if not meta.isa(self._outline_render_texture, rt.RenderTexture) or self._outline_render_texture:get_width() ~= w or self._outline_render_texture:get_height() ~= h then
             self._outline_render_texture = rt.RenderTexture(w, h)
-            --self._outline_render_texture:set_scale_mode(rt.TextureScaleMode.LINEAR)
         end
 
         self._outline_render_offset_x = x_offset
@@ -257,7 +256,9 @@ end
 --- @brief set content
 function rt.Glyph:set_text(text)
     if self._content == text then return end
+    local current = self._content
     self._content = text
+    if self._n_visible_characters == #current then self._n_visible_characters = #self._content end
     self:_update()
 end
 

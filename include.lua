@@ -36,7 +36,7 @@ setmetatable(bt, {
 })
 
 ow = rt.overworld
-setmetatable(bt, {
+setmetatable(ow, {
     __index = function(self, key)
         rt.error("In ow.__index: key `" .. key .. "` does not exist in table `ow`")
     end

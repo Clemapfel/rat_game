@@ -55,6 +55,10 @@ local hp_bar = bt.HealthBar(entity)
 hp_bar:realize()
 hp_bar:fit_into(50, 50, 350, 50)
 
+local speed_label = bt.SpeedValue(entity)
+speed_label:realize()
+speed_label:fit_into(50, 50, 350, 50)
+
 rt.current_scene = ow.OverworldScene()
 rt.current_scene._player:set_position(150, 150)
 rt.current_scene:add_stage("debug_map", "assets/stages/debug")
@@ -66,7 +70,9 @@ input = rt.InputController()
 input:signal_connect("pressed", function(_, which)
     if which == rt.InputButton.A then
         entity.hp_current = rt.random.integer(0, entity.hp_base)
-        println(entity.hp_current)
+        speed_label._speed_value = rt.random.integer(0, entity.speed_base)
+    elseif which == rt.InputButton.B then
+        hp_bar:sync()
     elseif which == rt.InputButton.LEFT then
         hp_bar._hp_value = hp_bar._hp_value - 10
     elseif which == rt.InputButton.RIGHT then
@@ -110,6 +116,7 @@ love.draw = function()
     end
 
     hp_bar:draw()
+    speed_label:draw()
 end
 
 love.update = function()

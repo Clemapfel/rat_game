@@ -23,7 +23,7 @@ end, {
 
     attack_base = 0,
     defense_base = 0,
-    speed_base = 0,
+    speed_base = 100,
 
     attack_modifier = 0,
     defense_modifier = 0,
@@ -35,8 +35,7 @@ end, {
 --- @brief
 function bt.Entity:realize()
     if self._is_realized then return end
-
-    --meta.set_is_mutable(self, true)
+    meta.set_is_mutable(self, true)
 
     local chunk, error_maybe = love.filesystem.load(self._path)
     if error_maybe ~= nil then
@@ -44,8 +43,6 @@ function bt.Entity:realize()
     end
 
     local config = chunk()
-    --meta.set_is_mutable(self, true)
-
 
     self._is_realized = true
     meta.set_is_mutable(self, false)
@@ -59,4 +56,14 @@ end
 --- @brief
 function bt.Entity:get_hp_base()
     return self.hp_base
+end
+
+--- @brief
+function bt.Entity:get_speed()
+    return self.speed_base
+end
+
+--- @brief
+function bt.Entity:get_speed_base()
+    return self.speed_base
 end
