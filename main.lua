@@ -65,7 +65,12 @@ rt.current_scene:add_entity(sprite, 50, 50)
 input = rt.InputController()
 input:signal_connect("pressed", function(_, which)
     if which == rt.InputButton.A then
-        hp_bar._hp_value = rt.random.integer(0, entity:get_hp_base())
+        entity.hp_current = rt.random.integer(0, entity.hp_base)
+        println(entity.hp_current)
+    elseif which == rt.InputButton.LEFT then
+        hp_bar._hp_value = hp_bar._hp_value - 10
+    elseif which == rt.InputButton.RIGHT then
+        hp_bar._hp_value = hp_bar._hp_value + 10
     elseif which == rt.InputButton.R then
         audio:play()
     elseif which == rt.InputButton.L then

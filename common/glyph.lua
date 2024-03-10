@@ -113,6 +113,7 @@ function rt.Glyph:_update()
 
         if not meta.isa(self._outline_render_texture, rt.RenderTexture) or self._outline_render_texture:get_width() ~= w or self._outline_render_texture:get_height() ~= h then
             self._outline_render_texture = rt.RenderTexture(w, h)
+            --self._outline_render_texture:set_scale_mode(rt.TextureScaleMode.LINEAR)
         end
 
         self._outline_render_offset_x = x_offset

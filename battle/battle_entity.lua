@@ -12,7 +12,7 @@ bt.Entity = meta.new_type("BattleEntity", function(id)
         _path = path,
         _is_realized = false
     })
-    meta.set_is_mutable(out, false)
+    --meta.set_is_mutable(out, false)
     return out
 end, {
     sprite_id = "",
@@ -36,7 +36,7 @@ end, {
 function bt.Entity:realize()
     if self._is_realized then return end
 
-    meta.set_is_mutable(self, true)
+    --meta.set_is_mutable(self, true)
 
     local chunk, error_maybe = love.filesystem.load(self._path)
     if error_maybe ~= nil then
@@ -44,7 +44,7 @@ function bt.Entity:realize()
     end
 
     local config = chunk()
-    meta.set_is_mutable(self, true)
+    --meta.set_is_mutable(self, true)
 
 
     self._is_realized = true

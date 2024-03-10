@@ -21,7 +21,7 @@ float box(int x, int y, int size)
 
 vec4 effect(vec4 color, Image tex, vec2 texture_coords, vec2 screen_coords)
 {
-    const int radius = 1;                       // blur radius, runtime is O((2 * radius + 1)^2)
+    const int radius = 2;                       // blur radius, runtime is O((2 * radius + 1)^2)
     const vec3 outline_color = vec3(0, 0, 0);   // outline color
     const float outline_intensity = 3;          // opacity multiplier
 
