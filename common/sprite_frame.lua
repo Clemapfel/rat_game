@@ -107,7 +107,7 @@ end
 --- @overload rt.Widget.realize
 function rt.SpriteFrame:realize()
     if self:get_is_realized() then return end
-    self._realized = true
+    self._is_realized = true
     self._top_left:realize()
     self._top:realize()
     self._top_right:realize()

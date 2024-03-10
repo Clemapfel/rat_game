@@ -62,9 +62,6 @@ function rt.SpriteAtlasEntry:load()
     else -- treat entire spritesheet as frame
         config.width = data:getWidth()
         config.height = data:getHeight()
-        config.animations = {
-            ["default"] = {1, 1}
-        }
         config.n_frames = 1
     end
 
@@ -80,6 +77,13 @@ function rt.SpriteAtlasEntry:load()
     local min_frame_i = POSITIVE_INFINITY
     local max_frame_i = NEGATIVE_INFINITY
     local frames_seen = {}
+
+    if config.animations == nil then
+        config.animations = {
+            ["default"] = {1, config.n_frames}
+        }
+    end
+
     for key, value in pairs(config.animations) do
         if meta.is_number(value) then
             min_frame_i = math.min(min_frame_i, value)

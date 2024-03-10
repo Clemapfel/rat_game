@@ -31,7 +31,7 @@ rt.Widget = meta.new_abstract_type("Widget", rt.Drawable, {
     _vertical_alignment = rt.Alignment.CENTER,
     _minimum_width = 1,
     _minimum_height = 1,
-    _realized = false,
+    _is_realized = false,
     _focused = true,
     _parent = nil,
     _selected = false,
@@ -71,8 +71,8 @@ end
 --- @brief realize widget
 function rt.Widget:realize()
 
-    if self._realized then return end
-    self._realized = true
+    if self._is_realized then return end
+    self._is_realized = true
 
     if self:_has_top_level() then
         self:get_top_level_widget():realize()
@@ -83,12 +83,12 @@ end
 
 --- @brief get whether widget was realized
 function rt.Widget:get_is_realized()
-    return self._realized
+    return self._is_realized
 end
 
 --- @brief resize widget
 function rt.Widget:reformat()
-    if not self._realized then
+    if not self._is_realized then
         return
     end
 

@@ -101,7 +101,7 @@ end
 
 --- @overload rt.Widget.realize
 function rt.SplitLayout:realize()
-    self._realized = true
+    self._is_realized = true
 
     if meta.isa(self._start_child, rt.Widget) then
         self._start_child:realize()

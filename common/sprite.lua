@@ -1,133 +1,81 @@
 --- @class rt.Sprite
---- @param spritesheet rt.Spritesheet
---- @param animation_id String
-rt.Sprite = meta.new_type("Sprite", rt.Drawable, rt.Animation, rt.Widget, function(spritesheet, animation_id)
-    if meta.is_nil(animation_id) then
-        animation_id = spritesheet.name
-    end
-    spritesheet:_assert_has_animation("Sprite:", animation_id)
-
-    local w, h = spritesheet:get_frame_size(animation_id)
-    local out = meta.new(rt.Sprite, {
-        _spritesheet = spritesheet,
-        _animation_id = animation_id,
-        _shape = rt.VertexRectangle(0, 0, 0, 0),
+rt.Sprite = meta.new_type("Sprite", rt.Widget, rt.Animation, function(id)
+    return meta.new(rt.Sprite, {
+        _id = id,
+        _spritesheet = {}, -- rt.SpriteAtlasEntry
+        _width = 0, -- 0 -> use frame resolution
+        _height = 0,
+        _shape = rt.VertexRectangle(0, 0, 1, 1),
         _current_frame = 1,
-        _texture_aabb = rt.AABB(0, 0, 1, 1), -- texture coordinates
-        _frame_width = w,
-        _frame_height = h,
         _elapsed = 0,
-        _should_loop = true
+        _should_loop = true,
+        _frame_duration = 0,
+        _n_frames = 0
     })
-
-    out:set_minimum_size(w, h)
-    out._shape:set_texture(out._spritesheet)
-    return out
 end)
 
---- @overload rt.Drawable.draw
+--- @override
+function rt.Sprite:realize()
+    if not self._is_realized then
+        self._is_realized = true
+
+        self._spritesheet = rt.SpriteAtlas:get(self._id)
+        self._frame_duration = 1 / self._spritesheet:get_fps()
+        self._n_frames = self._spritesheet:get_n_frames()
+        self._width, self._height = self._spritesheet:get_frame_size()
+        self._shape:set_texture(self._spritesheet:get_texture())
+
+        self:reformat()
+        self:set_frame(self._current_frame)
+    end
+end
+
+--- @override
 function rt.Sprite:draw()
-    if self:get_is_visible() then
+    if self._is_realized then
         self._shape:draw()
     end
 end
 
---- @overload rt.Widget.size_allocate
-function rt.Sprite:size_allocate(x, y, width, height)
-    self._temp = rt.AABB(x, y, width, height)
-    self._shape:set_vertex_position(1, x, y)
-    self._shape:set_vertex_position(2, x + width, y)
-    self._shape:set_vertex_position(3, x + width, y + height)
-    self._shape:set_vertex_position(4, x, y + height)
-    self:set_frame(self._current_frame)
-end
-
---- @overload rt.Animation.update
+--- @override
 function rt.Sprite:update(delta)
-    self._elapsed = self._elapsed + delta
-    local frame_duration = 1 / self._spritesheet:get_fps()
-    local frame_i = math.floor(self._elapsed / frame_duration)
+    if self._is_realized then
+        self._elapsed = self._elapsed + delta
+        local frame_i = math.floor(self._elapsed / self._frame_duration)
 
-    if self:get_should_loop() then
-        self:set_frame((frame_i % self:get_n_frames()) + 1)
-    else
-        self:set_frame(clamp(frame_i, 1, self:get_n_frames()))
+        if self._should_loop then
+            frame_i = (frame_i % self._n_frames) + 1
+        else
+            frame_i = clamp(frame_i, 1, self._n_frames)
+        end
+
+        if frame_i ~= self._current_frame then
+            self:set_frame(frame_i)
+            self._current_frame = frame_i
+        end
     end
 end
 
---- @brief set which frame is currently displayed
---- @param i Number 1-based
 function rt.Sprite:set_frame(i)
-    local n_frames = self._spritesheet:get_n_frames(self._animation_id)
-    if i < 1 or i > n_frames then
-        rt.error("In Sprite:set_frame: frame index `" .. tostring(i) .. "` is out of range for animation `" .. self._animation_id .. "` of spritesheet `" .. self._spritesheet.name .. "` which has `" .. tostring(n_frames) .. "` frames")
+    self._current_frame = i % self._n_frames + 1
+    if self._is_realized then
+        local frame = self._spritesheet:get_frame(self._current_frame)
+        self._shape:reformat_texture_coordinates(
+            frame.x, frame.y,
+            frame.x + frame.width, frame.y,
+            frame.x + frame.width, frame.y + frame.height,
+            frame.x, frame.y + frame.height
+        )
     end
-
-    self._current_frame = i
-    local rect = self._spritesheet:get_frame(self._animation_id, i)
-    self._texture_aabb = rect
-    self._shape:set_texture_rectangle(rect)
 end
 
---- @brief get which frame is currently displayed
---- @return Number
-function rt.Sprite:get_frame()
-    return self._current_frame
-end
-
---- @brief get number of frames
---- @return Number
-function rt.Sprite:get_n_frames()
-    return self._spritesheet:get_n_frames(self._animation_id)
-end
-
---- @brief set which animation is used, this resets the current frame to 1
---- @param id String
-function rt.Sprite:set_animation(id)
-    self._spritesheet:_assert_has_animation("Sprite:set_animation", id)
-    local w, h = self._spritesheet:get_frame_size(id)
-
-    self._animation_id = id
-    self._current_frame = 1
-    self._frame_width = w
-    self._frame_height = h
-
-    self:set_minimum_size(w, h)
-    self:set_frame(1)
-end
-
---- @brief get frame resolution
---- @return (Number, Number)
-function rt.Sprite:get_resolution()
-    return self._frame_width, self._frame_height
-end
-
---- @brief set whether sprite should loop when animated
---- @param b Boolean
-function rt.Sprite:set_should_loop(b)
-    self._should_loop = b
-end
-
---- @brief get whether sprite loops when animated
---- @return Boolean
-function rt.Sprite:get_should_loop()
-    return self._should_loop
-end
-
---- @brief set color, multiplied with texture
---- @param color rt.RGBA (or rt.HSVA)
-function rt.Sprite:set_color(color)
-    self._shape:set_color(color)
-end
-
---- @brief test sprite
-function rt.test.sprite()
-    error("TODO")
-    --[[
-    spritesheet = rt.Spritesheet("assets/sprites", "test_animation")
-    sprite = rt.Sprite(spritesheet)
-    sprite:set_should_loop(true)
-    sprite:set_is_animated(true)
-    sprite:set_expand(false)
-    ]]
+--- @override
+function rt.Sprite:size_allocate(x, y, width, height)
+    if self._is_realized then
+        self._shape:set_vertex_position(1, x, y)
+        self._shape:set_vertex_position(2, x + width, y)
+        self._shape:set_vertex_position(3, x + width, y + height)
+        self._shape:set_vertex_position(4, x, y + height)
+        self:set_frame(self._current_frame)
+    end
 end

@@ -94,7 +94,7 @@ end
 function rt.AspectLayout:realize()
     local should_reformat = self:get_is_realized() == false
 
-    self._realized = true
+    self._is_realized = true
 
     if meta.is_widget(self._child) then
         self._child:realize()

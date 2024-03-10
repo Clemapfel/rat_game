@@ -112,7 +112,7 @@ end
 function rt.RevealLayout:realize()
     if self:get_is_realized() then return end
 
-    self._realized = true
+    self._is_realized = true
     if meta.is_widget(self._child) then
         self._child:realize()
     end

@@ -46,7 +46,10 @@ end
 rt.SpriteAtlas = rt.SpriteAtlas()
 rt.SpriteAtlas:initialize("assets/sprites")
 
-local enemy_sprite = rt.SpriteAtlas:get("battle/debug_enemy_sprite_02")
+local enemy_sprite = rt.Sprite("battle/debug_enemy_sprite_02")
+enemy_sprite:realize()
+enemy_sprite:set_is_animated(true)
+enemy_sprite:fit_into(50, 50, 150, 100)
 
 rt.current_scene = ow.OverworldScene()
 rt.current_scene._player:set_position(150, 150)

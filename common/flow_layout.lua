@@ -91,7 +91,7 @@ end
 --- @overload rt.Widget.realize
 function rt.FlowLayout:realize()
     if self:get_is_realized() == true then return end
-    self._realized = true
+    self._is_realized = true
     for _, child in pairs(self._children) do
         child:realize()
     end

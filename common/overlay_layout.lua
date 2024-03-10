@@ -39,7 +39,7 @@ end
 
 --- @overload rt.Widget.realize
 function rt.OverlayLayout:realize()
-    self._realized = true
+    self._is_realized = true
 
     if meta.is_widget(self._base_child) then
         self._base_child:realize()
