@@ -1,17 +1,8 @@
 require "include"
 
-audio = rt.AudioVisualizer("assets/sound/test_music_03.mp3")
-audio:play()
-
-local original = bt.Entity("test")
-local entity = bt.EntityProxy(original)
-
-bt.State:_run(function(self)
-    self:set_hp("test")
-    dbg(self:get_hp())
-end, entity)
 
 
+--[[
 local visualizer_initialized = false
 local spectrum_image, spectrum_texture, energy_image, energy_texture
 local spectrum_format = "rgba16"
@@ -22,7 +13,6 @@ local texture_h = 10e3
 local shader = rt.Shader("assets/shaders/audio_visualizer_debug.glsl")
 local active = false
 
---[[
 audio.on_update = function(coefficients)
     if not visualizer_initialized then
         spectrum_image = love.image.newImageData(texture_h, #coefficients, spectrum_format)
@@ -55,6 +45,8 @@ end
 
 rt.SpriteAtlas = rt.SpriteAtlas()
 rt.SpriteAtlas:initialize("assets/sprites")
+
+local enemy_sprite = rt.SpriteAtlas:get("battle/debug_enemy_sprite_02")
 
 rt.current_scene = ow.OverworldScene()
 rt.current_scene._player:set_position(150, 150)
@@ -104,7 +96,7 @@ love.draw = function()
         love.graphics.print(fps, rt.graphics.get_width() - love.graphics.getFont():getWidth(fps) - 2 * margin, 0.5 * margin)
     end
 
-    love.graphics.draw(shape)
+    enemy_sprite:draw()
 end
 
 love.update = function()
@@ -112,7 +104,7 @@ love.update = function()
     rt.AnimationHandler:update(delta)
     rt.current_scene:update(delta)
 
-    audio:update()
+    --audio:update()
 end
 
 love.quit = function()

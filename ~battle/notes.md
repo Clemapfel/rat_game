@@ -415,3 +415,19 @@ for entity in state.party do
     end
 end
 ```
+
+-----------
+
+## graphics
+move: set_hp(E, 1234)
+    entity: self.hp = 1234
+    sprite: update
+        if old.hp < self.hp then
+            self:add_animatino(TAKE_DAMAGE)
+        else
+            self:add_animation(HEAL_DAMAGE)
+        end
+    end 
+    while displayed.hp ~= entity.hp do
+        displayed.hp = eps * (displayed.hp - entity.hp)
+    end
