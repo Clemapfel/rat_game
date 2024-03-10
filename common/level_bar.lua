@@ -19,6 +19,7 @@ rt.LevelBar = meta.new_type("LevelBar", rt.Widget, function(lower, upper, value)
         _value = value,
         _shape = rt.Rectangle(0, 0, 1, 1),
         _shape_outline = rt.Line(0, 0, 1, 1),   -- right edge of bar, to avoid overlap with `_backdrop_outline`
+        _corner_radius = rt.settings.level_bar.corner_radius,
         _backdrop = rt.Rectangle(0, 0, 1, 1),
         _backdrop_outline = rt.Rectangle(0, 0, 1, 1),
         _color = rt.Palette.HIGHLIGHT,
@@ -35,15 +36,21 @@ rt.LevelBar = meta.new_type("LevelBar", rt.Widget, function(lower, upper, value)
     out._backdrop_outline:set_line_width(rt.settings.level_bar.outline_width)
     out._shape_outline:set_line_width(1)
 
-    for shape in range(out._backdrop, out._backdrop_outline) do
-        shape:set_corner_radius(rt.settings.level_bar.corner_radius)
-    end
+    out:set_corner_radius(out._corner_radius)
 
     out:set_color(out._color)
     out:_update_value()
 
     return out
 end)
+
+--- @brief
+function rt.LevelBar:set_corner_radius(radius)
+    self._corner_radius = radius
+    for shape in range(self._backdrop, self._backdrop_outline) do
+        shape:set_corner_radius(radius)
+    end
+end
 
 --- @brief
 function rt.LevelBar:set_lower(x)

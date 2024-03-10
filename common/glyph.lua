@@ -83,7 +83,12 @@ end
 
 --- @brief update held object
 function rt.Glyph:_update()
-    self._glyph = love.graphics.newText(self:_get_font(), {{self._color.r, self._color.g, self._color.b}, self._content})
+
+    if love.getVersion() >= 12 then
+        self._glyph = love.graphics.newTextBatch(self:_get_font(), {{self._color.r, self._color.g, self._color.b}, self._content})
+    else
+        self._glyph = love.graphics.newText(self:_get_font(), {{self._color.r, self._color.g, self._color.b}, self._content})
+    end
     self:set_is_animated(sizeof(self._effects) > 0)
 
     if self._is_outlined == true then
@@ -196,7 +201,7 @@ function rt.Glyph:draw()
 
     function draw_glyph(x, y)
         self._render_shader:bind()
-        self:render(self._glyph, math.floor(x), math.floor(y))
+        love.graphics.draw(self._glyph, math.floor(x), math.floor(y))
 
         local font = self:_get_font()
         local w = self._glyph:getWidth()
@@ -218,7 +223,7 @@ function rt.Glyph:draw()
 
         -- paste glyph to render texture
         self._outline_render_texture:bind_as_render_target()
-        --rt.graphics.clear(0, 0, 0, 0)
+        love.graphics.clear(0, 0, 0, 0)
         love.graphics.setColor(1, 1, 1, 1)
         draw_glyph(self._outline_render_offset_x, self._outline_render_offset_y)
         self._outline_render_texture:unbind_as_render_target()

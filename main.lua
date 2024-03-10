@@ -46,10 +46,14 @@ end
 rt.SpriteAtlas = rt.SpriteAtlas()
 rt.SpriteAtlas:initialize("assets/sprites")
 
+local entity = bt.Entity("test")
 local enemy_sprite = rt.Sprite("battle/debug_enemy_sprite_02")
 enemy_sprite:realize()
 enemy_sprite:set_is_animated(true)
-enemy_sprite:fit_into(50, 50, 150, 100)
+
+local hp_bar = bt.HealthBar(entity)
+hp_bar:realize()
+hp_bar:fit_into(50, 50, 350, 50)
 
 rt.current_scene = ow.OverworldScene()
 rt.current_scene._player:set_position(150, 150)
@@ -60,8 +64,9 @@ rt.current_scene:add_entity(sprite, 50, 50)
 
 input = rt.InputController()
 input:signal_connect("pressed", function(_, which)
-    println(which)
-    if which == rt.InputButton.R then
+    if which == rt.InputButton.A then
+        hp_bar._hp_value = rt.random.integer(0, entity:get_hp_base())
+    elseif which == rt.InputButton.R then
         audio:play()
     elseif which == rt.InputButton.L then
         audio:pause()
@@ -99,7 +104,7 @@ love.draw = function()
         love.graphics.print(fps, rt.graphics.get_width() - love.graphics.getFont():getWidth(fps) - 2 * margin, 0.5 * margin)
     end
 
-    enemy_sprite:draw()
+    hp_bar:draw()
 end
 
 love.update = function()

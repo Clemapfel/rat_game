@@ -16,7 +16,20 @@ bt.Entity = meta.new_type("BattleEntity", function(id)
     return out
 end, {
     sprite_id = "",
-    is_enemy = true
+    is_enemy = true,
+
+    hp_base = 100,
+    hp_current = 100,
+
+    attack_base = 0,
+    defense_base = 0,
+    speed_base = 0,
+
+    attack_modifier = 0,
+    defense_modifier = 0,
+    speed_modifier = 0,
+
+    priority = 0
 })
 
 --- @brief
@@ -36,4 +49,14 @@ function bt.Entity:realize()
 
     self._is_realized = true
     meta.set_is_mutable(self, false)
+end
+
+--- @brief
+function bt.Entity:get_hp()
+    return self.hp_current
+end
+
+--- @brief
+function bt.Entity:get_hp_base()
+    return self.hp_base
 end

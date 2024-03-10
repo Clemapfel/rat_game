@@ -14,6 +14,11 @@ float gaussian(int x, int y, int size)
     return exp((-1.f * (length / sigma_sq)) / sqrt(2 * PI + sigma_sq));
 }
 
+float box(int x, int y, int size)
+{
+    return 1 / float(size * size);
+}
+
 vec4 effect(vec4 color, Image tex, vec2 texture_coords, vec2 screen_coords)
 {
     const int radius = 1;                       // blur radius, runtime is O((2 * radius + 1)^2)
@@ -29,7 +34,7 @@ vec4 effect(vec4 color, Image tex, vec2 texture_coords, vec2 screen_coords)
     {
         for (int y = -1 * radius; y <= +1 * radius; ++y)
         {
-            float kernel_value = gaussian(x + radius, y + radius, 2 * radius);
+            float kernel_value = box(x + radius, y + radius, 2 * radius);
             sum += Texel(tex, texture_coords + vec2(x * pixel_size.x, y * pixel_size.y)) * kernel_value;
             kernel_sum += kernel_value;
         }

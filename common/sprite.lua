@@ -27,6 +27,7 @@ function rt.Sprite:realize()
 
         self:reformat()
         self:set_frame(self._current_frame)
+        self:set_minimum_size(self._width, self._height)
     end
 end
 
@@ -56,6 +57,7 @@ function rt.Sprite:update(delta)
     end
 end
 
+--- @brief
 function rt.Sprite:set_frame(i)
     self._current_frame = i % self._n_frames + 1
     if self._is_realized then
@@ -78,4 +80,10 @@ function rt.Sprite:size_allocate(x, y, width, height)
         self._shape:set_vertex_position(4, x, y + height)
         self:set_frame(self._current_frame)
     end
+end
+
+--- @brief
+function rt.Sprite:get_resolution()
+    if not self._is_realized then self:realize() end
+    return self._width, self._height
 end
