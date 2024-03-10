@@ -12,8 +12,8 @@ bt.HealthBar = meta.new_type("HealthBar", bt.BattleUI, function(entity)
     local out = meta.new(bt.HealthBar, {
         _entity = entity,
         _is_realized = false,
-        
-        _elapsed = 0,
+
+        _elapsed = 1,   -- sic, makes it so `update` is invoked immediately
 
         _hp_value = -1,
         _hp_value_max = entity:get_hp_base(),
@@ -53,6 +53,7 @@ function bt.HealthBar:realize()
     self._hp_bar:realize()
 
     self:set_is_animated(true)
+    self:update(0)
     self._is_realized = true
 end
 
@@ -79,29 +80,24 @@ end
 --- @override
 function bt.HealthBar:update(delta)
     if self._is_realized then
-        local current = self._hp_value
-        local target = self._entity:get_hp()
-        local diff = (current - target)
-
         self._elapsed = self._elapsed + delta
 
-        local max_hp = self._entity:get_hp_base()
-        local speed = (1 + rt.settings.battle.health_bar.tick_acceleration * (math.abs(diff) / max_hp))
+        local diff = (self._hp_value - self._entity:get_hp())
+        local speed = (1 + rt.settings.battle.health_bar.tick_acceleration * (math.abs(diff) / self._entity:get_hp_base()))
         local tick_duration = 1 / (rt.settings.battle.health_bar.tick_speed * speed)
-        local should_update = false
-        while self._elapsed > tick_duration do
+        if self._elapsed > tick_duration then
+            local offset = math.modf(self._elapsed, self._tick_duration)
             if diff > 0 then
-                self._hp_value = self._hp_value - 1
+                self._hp_value = self._hp_value - offset
             elseif diff < 0 then
-                self._hp_value = self._hp_value + 1
+                self._hp_value = self._hp_value + offset
             end
-            self._elapsed = self._elapsed - tick_duration
-            should_update = true
-        end
+            self._elapsed = self._elapsed - offset * tick_duration
 
-        if should_update then
-            self._hp_label_left:set_text(select(1, self._format_hp(self._hp_value, self._entity:get_hp_base())))
-            self._hp_bar:set_value(self._hp_value)
+            if diff ~= 0 then
+                self._hp_label_left:set_text(select(1, self._format_hp(self._hp_value, self._entity:get_hp_base())))
+                self._hp_bar:set_value(self._hp_value)
+            end
         end
     end
 end
