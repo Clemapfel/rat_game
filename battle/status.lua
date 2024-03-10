@@ -157,14 +157,13 @@ function bt.Status:realize()
     if self._is_realized then return end
 
     local chunk, error_maybe = love.filesystem.load(self._path)
-
     if error_maybe ~= nil then
         rt.error("In bt.Status:realize: error when loading config at `" .. self._path .. "`: " .. error_maybe)
     end
 
     -- load properties if specified, assert correct type, use default if left unspecified
     local config = chunk()
-    meta.set_is_mutable(self, false)
+    meta.set_is_mutable(self, true)
 
     local strings = {
         "name"
@@ -228,6 +227,6 @@ function bt.Status:realize()
         meta.assert_function(self[key])
     end
 
-    meta.set_is_mutable(self, true)
     self._is_realized = true
+    meta.set_is_mutable(self, false)
 end

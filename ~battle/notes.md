@@ -51,7 +51,6 @@ struct Status {
 }
 
 struct Consumable {
-    hp_offset   = Integer
     effect  = (self, user) -> nil
 }
 
@@ -76,7 +75,7 @@ struct Move {
     can_target_enemy = Bool
     can_target_ally  = Bool
     
-    priority = Priority
+    priority = Integer
     effect  = (self, user, target) -> nil
 }
 
@@ -118,6 +117,8 @@ struct BattleState {
     music        = MusicID
 }
 ```
+
+Move: if all can_target_* are false, target 
 
 # Atomic Actions
 ```

@@ -103,6 +103,8 @@ love.draw = function()
         love.graphics.setColor(1, 1, 1, 0.75)
         love.graphics.print(fps, rt.graphics.get_width() - love.graphics.getFont():getWidth(fps) - 2 * margin, 0.5 * margin)
     end
+
+    love.graphics.draw(shape)
 end
 
 love.update = function()
