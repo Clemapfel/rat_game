@@ -1,5 +1,5 @@
 rt.settings.battle.entity = {
-    config_path = "assets/battle/entity"
+    config_path = "assets/battle/entities"
 }
 
 --- @class
@@ -7,15 +7,16 @@ bt.Entity = meta.new_type("BattleEntity", function(id)
     local path = rt.settings.battle.entity.config_path .. "/" .. id .. ".lua"
     local out = meta.new(bt.Entity, {
         id = id,
+        id_offset = 0,
         name = "UNINITIALIZED ENTITY @" .. path,
 
         _path = path,
         _is_realized = false
     })
+    out:realize()
     --meta.set_is_mutable(out, false)
     return out
 end, {
-    sprite_id = "",
     is_enemy = true,
 
     hp_base = 100,
@@ -29,7 +30,10 @@ end, {
     defense_modifier = 0,
     speed_modifier = 0,
 
-    priority = 0
+    priority = 0,
+
+    -- non simulation
+    sprite_id = "",
 })
 
 --- @brief
@@ -44,8 +48,37 @@ function bt.Entity:realize()
 
     local config = chunk()
 
+    local strings = {
+        "name",
+        "sprite_id"
+    }
+
+    for _, key in ipairs(strings) do
+        if config[key] ~= nil then
+            self[key] = config[key]
+        end
+        meta.assert_string(self[key])
+    end
+
     self._is_realized = true
     meta.set_is_mutable(self, false)
+end
+
+--- @brief
+function bt.Entity:get_is_enemy()
+    return self.is_enemy
+end
+
+--- @brief
+function bt.Entity:set_id_offset(n)
+    self.id_offset = n
+end
+
+--- @brief
+function bt.Entity:get_id()
+    local offset = self.id_offset
+    if offset == 0 then return self.id end
+    return self.id .. "_" .. ternary(self.id_offset < 10, "0" .. offset,  offset)
 end
 
 --- @brief

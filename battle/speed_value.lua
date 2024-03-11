@@ -12,13 +12,10 @@ bt.SpeedValue = meta.new_type("SpeedValue", bt.BattleUI, function(entity)
     local out = meta.new(bt.SpeedValue, {
         _entity = entity,
         _is_realized = false,
-
         _elapsed = 1,   -- sic, makes it so `update` is invoked immediately
-
         _speed_value = -1,
         _label = {},  -- rt.Glyph,
     })
-    
     return out
 end)
 

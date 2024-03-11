@@ -4,15 +4,12 @@ rt.settings.battle_animation.enemy_appeared = {
 
 --- @class
 --- @param targets Table<rt.Widget>
-bt.Animation.ENEMY_APPEARED = meta.new_type("ENEMY_APPEARED", function(targets)
-
+bt.Animation.ENEMY_APPEARED = meta.new_type("ENEMY_APPEARED", function(targets) 
     local out = meta.new(bt.Animation.ENEMY_APPEARED, {
         _targets = targets,
         _n_targets = sizeof(targets),
-
         _snapshots = {}, -- Table<rt.SnapshotLayout>
         _paths = {},            -- Table<rt.Spline>
-
         _elapsed = 0,
     }, rt.StateQueueState)
 
