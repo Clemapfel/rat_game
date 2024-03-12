@@ -33,7 +33,7 @@ end
 
 --- @override
 function rt.Sprite:draw()
-    if self._is_realized then
+    if self._is_realized and self:get_is_visible() then
         self._shape:draw()
     end
 end

@@ -3,13 +3,13 @@ rt.settings.battle.entity = {
 }
 
 --- @class
-bt.Entity = meta.new_type("BattleEntity", function(id)
+bt.Entity = meta.new_type("BattleEntity", function(scene, id)
     local path = rt.settings.battle.entity.config_path .. "/" .. id .. ".lua"
     local out = meta.new(bt.Entity, {
         id = id,
         id_offset = 0,
         name = "UNINITIALIZED ENTITY @" .. path,
-
+        scene = scene,
         _path = path,
         _is_realized = false
     })
@@ -31,6 +31,11 @@ end, {
     speed_modifier = 0,
 
     priority = 0,
+
+    status = {}, -- Table<bt.Status>
+
+    is_knocked_out = false,
+    is_dead = false,
 
     -- non simulation
     sprite_id = "",

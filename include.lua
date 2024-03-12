@@ -159,12 +159,26 @@ require "list_view"
 require "physics_world"
 require "collider"
 
+require "battle.battle_entity"
 require "battle.battle_state"
+require "battle.consumable"
+require "battle.equippable"
+require "battle.move"
+require "battle.move_selection"
+require "battle.status"
+require "battle.entity_proxy"
 
+require "battle.battle_ui"
+require "battle.enemy_sprite"
+require "battle.health_bar"
+require "battle.speed_value"
 
-for _, name in pairs(love.filesystem.getDirectoryItems("battle")) do
-    require("battle." .. string.gsub(name, "%.lua$", ""))
+require "battle.battle_animation"
+for _, name in pairs(love.filesystem.getDirectoryItems("battle/animations")) do
+    require("battle.animations." .. string.gsub(name, "%.lua$", ""))
 end
+
+require "battle.battle_scene"
 
 --[[
 require "battle.stat"

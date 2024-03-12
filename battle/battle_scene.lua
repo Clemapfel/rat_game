@@ -3,26 +3,49 @@ rt.settings.battle.scene = {
     horizontal_margin = 100,
 }
 
+--- @class bt.EnemySpriteAlignmentMode
+bt.EnemySpriteAlignmentMode = meta.new_enum({
+    EQUIDISTANT = 1,
+    BOSS_CENTERED = 2
+})
+
 --- @class bt.BattleScene
-bt.BattleScene = meta.new_type("BattleScene", function()
+bt.BattleScene = meta.new_type("BattleScene", rt.Widget, function()
     local out = meta.new(bt.BattleScene, {
         _debug_draw_enabled = true,
-        _enemy_sprites = {}, -- Table<bt.EnemySprite>
+
+        _enemy_sprites = {},              -- Table<bt.EnemySprite>
+        _enemy_sprite_render_order = {},  -- Queue<Number>
+        _enemy_sprite_alignment_mode = bt.EnemySpriteAlignmentMode.EQUIDISTANT,
 
         _enemy_alignment_line = {}, -- rt.Line
         _margin_left_line = {},
         _margin_center_line = {},
         _margin_right_line = {}
     })
-
     return out
 end)
 
 --- @brief
+function bt.BattleScene:get_sprite(entity)
+    for _, sprite in pairs(self._enemy_sprites) do
+        if sprite._entity:get_id() == entity:get_id() then
+            return sprite
+        end
+    end
+end
+
+--- @brief
 function bt.BattleScene:realize()
+    self._is_realized = true
     for _, sprite in pairs(self._enemy_sprites) do
         sprite:realize()
     end
+    self:reformat()
+end
+
+--- @brief
+function bt.BattleScene:size_allocate(x, y, width, height)
     self:_reformat_enemy_sprites()
 
     local enemy_y = rt.settings.battle.scene.enemy_alignment_y
@@ -42,8 +65,8 @@ end
 
 --- @brief
 function bt.BattleScene:draw()
-    for _, sprite in pairs(self._enemy_sprites) do
-        sprite:draw()
+    for _, i in pairs(self._enemy_sprite_render_order) do
+        self._enemy_sprites[i]:draw()
     end
 
     if self._debug_draw_enabled then
@@ -56,9 +79,9 @@ end
 
 --- @brief
 function bt.BattleScene:update(delta)
-    self._world:update(delta)
-    self._camera:update(delta)
-    -- entities are updated automatically through rt.Animation
+    for _, sprite in ipairs(self._enemy_sprites) do
+        sprite:update(delta)
+    end
 end
 
 --- @brief
@@ -71,18 +94,54 @@ function bt.BattleScene:set_debug_draw_enabled(b)
     self._debug_draw_enabled = b
 end
 
+--- @brief
+function bt.BattleScene:play_animation(entity, animation)
+    local sprite = self:get_sprite(entity)
+    sprite:add_animation(animation)
+end
+
 --- @brief [internal]
 function bt.BattleScene:_reformat_enemy_sprites()
+    if #self._enemy_sprites == 0 then
+        rt.error("In bt.BattleScene:_reformat_enemy_sprites: number of enemy sprites is 0")
+    end
     local target_y = rt.settings.battle.scene.enemy_alignment_y
     local mx = rt.settings.battle.scene.horizontal_margin
 
-    local total_w = rt.graphics.get_width() - 2 * mx
+    local alignment_mode = self._enemy_sprite_alignment_mode
+    if alignment_mode == bt.EnemySpriteAlignmentMode.EQUIDISTANT then
+        local total_w = rt.graphics.get_width() - 2 * mx
+        local step = total_w / (#self._enemy_sprites - 1)
+        for sprite_i, sprite in ipairs(self._enemy_sprites) do
+            local target_x = mx + (sprite_i - 1) * step
+            local w, h = sprite:measure()
+            local x, y = target_x - 0.5 * w, target_y - 0.5 * h
+            sprite:fit_into(x, y, w, h)
+        end
+    elseif alignment_mode == bt.EnemySpriteAlignmentMode.BOSS_CENTERED then
+        local center_x = 0.5 * rt.graphics.get_width()
+        local boss_w, boss_h = self._enemy_sprites[1]:measure()
+        self._enemy_sprites[1]:fit_into(center_x - 0.5 * boss_w, target_y - 0.5 * boss_h)
 
-    local step = total_w / (#self._enemy_sprites - 1)
-    for sprite_i, sprite in ipairs(self._enemy_sprites) do
-        local target_x = mx + (sprite_i - 1) * step
-        local w, h = sprite:measure()
-        local x, y = target_x - 0.5 * w, target_y - 0.5 * h
-        sprite:fit_into(x, y, w, h)
+        local total_w = rt.graphics.get_width() - 2 * mx
+        local step = total_w / (#self._enemy_sprites - 1)
+        for sprite_i = 2, #self._enemy_sprites do
+            local sprite = self._enemy_sprites[sprite_i]
+            local target_x = mx + (sprite_i - 1) * step
+            local w, h = sprite:measure()
+            local x, y = target_x - 0.5 * w, target_y - 0.5 * h
+            sprite:fit_into(x, y, w, h)
+        end
     end
+
+    -- render order: largest to smallest by width, minimizes occlusion on overlap
+    self._enemy_sprite_render_order = {}
+    for i = 1, #self._enemy_sprites do
+        table.insert(self._enemy_sprite_render_order, i)
+    end
+    table.sort(self._enemy_sprite_render_order, function(a, b)
+        local left_w = select(1, self._enemy_sprites[a]:measure())
+        local right_w = select(1, self._enemy_sprites[b]:measure())
+        return left_w > right_w
+    end)
 end

@@ -22,6 +22,9 @@ end, {
     defense_factor = 1,
     speed_factor = 1,
 
+    damage_factor = 1,
+    heal_factor = 1,
+
     max_duration = POSITIVE_INFINITY,
     is_field_effect = false,
 

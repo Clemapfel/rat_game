@@ -6,21 +6,24 @@ rt.SpriteAtlas:initialize("assets/sprites")
 local scene = bt.BattleScene()
 rt.current_scene = scene
 
-local small_ufo = bt.Entity("SMALL_UFO")
-local boulder = bt.Entity("BALL_WITH_FACE")
-local sprout = bt.Entity("WALKING_SPROUT")
+local small_ufo = bt.Entity(scene, "SMALL_UFO")
+local boulder = bt.Entity(scene, "BALL_WITH_FACE")
+local sprout = bt.Entity(scene, "WALKING_SPROUT")
 
 scene._enemy_sprites = {
+    bt.EnemySprite(scene, boulder),
     bt.EnemySprite(scene, sprout),
     bt.EnemySprite(scene, small_ufo),
     bt.EnemySprite(scene, sprout),
-    bt.EnemySprite(scene, boulder),
     bt.EnemySprite(scene, sprout)
 }
 
 input = rt.InputController()
 input:signal_connect("pressed", function(_, which)
     if which == rt.InputButton.A then
+        local i = rt.random.integer(1, #scene._enemy_sprites)
+        local sprite = scene._enemy_sprites[i]
+        sprite:add_animation(bt.Animation.HP_GAINED(sprite, rt.random.integer(0, 100)))
     elseif which == rt.InputButton.B then
     elseif which == rt.InputButton.LEFT then
     elseif which == rt.InputButton.RIGHT then
@@ -56,6 +59,11 @@ end
 love.update = function()
     local delta = love.timer.getDelta()
     rt.AnimationHandler:update(delta)
+    rt.current_scene:update(delta)
+end
+
+love.resize = function()
+    rt.current_scene:size_allocate(0, 0, love.graphics.getWidth(), love.graphics.getHeight())
 end
 
 love.quit = function()

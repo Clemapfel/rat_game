@@ -9,6 +9,8 @@ bt.EnemySprite = meta.new_type("EnemySprite", rt.Widget, rt.Animation, function(
 
         _debug_bounds = {}, -- rt.Rectangle
         _debug_sprite = {}, -- rt.Rectangle
+
+        _animations = {}, -- Table<Table<bt.Animation>>
     })
 end)
 
@@ -22,6 +24,32 @@ function bt.EnemySprite:realize()
     self._sprite:realize()
 
     self:reformat()
+end
+
+--- @override
+function bt.EnemySprite:update(delta)
+    self._sprite:update(delta)
+
+    do -- animation queue
+        local current = self._animations[1]
+        if current ~= nil then
+            if current._is_started ~= true then
+                current._is_started = true
+                current:start()
+            end
+
+            local result = current:update(delta)
+            if result == bt.AnimationResult.DISCONTINUE then
+                current._is_finished = true
+                current:finish()
+                table.remove(self._animations, 1)
+            elseif result == bt.AnimationResult.CONTINUE then
+                -- noop
+            else
+                rt.error("In bt.EnemySprite:update: animation `" .. meta.typeof(current) .. "`s upate function does not return a value")
+            end
+        end
+    end
 end
 
 --- @override
@@ -52,5 +80,28 @@ function bt.EnemySprite:draw()
             self._debug_bounds:draw()
             self._debug_sprite:draw()
         end
+
+        for _, animation in pairs(self._animations) do
+            if animation._is_started == true then
+                animation:draw()
+            end
+        end
     end
+end
+
+--- @override
+function bt.EnemySprite:set_is_visible(b)
+    if self._is_realized then
+        self._sprite:set_is_visible(b)
+    end
+end
+
+--- @override
+function bt.EnemySprite:get_is_visible()
+    return self._sprite:get_is_visible()
+end
+
+--- @brief
+function bt.EnemySprite:add_animation(animation)
+    table.insert(self._animations, animation)
 end
