@@ -41,7 +41,7 @@ function bt.Animation.HP_LOST:start()
 
     local label = self._label
     local label_w = label:get_width() * 0.5
-    local start_x, start_y = bounds.x + bounds.width * 0.5, bounds.y
+    local start_x, start_y = bounds.x + bounds.width * 0.75, bounds.y + bounds.height * 0.25
     local vertices = {}
     do -- path of label, simulates object accelerating as it is falling
         local n = 10
@@ -97,7 +97,7 @@ function bt.Animation.HP_LOST:update(delta)
     end
 
     -- target animation
-    local speed = 5
+    local speed = 6
     local target = self._target_snapshot
     local current = target:get_bounds()
     local offset_x, offset_y = self._target_path:at(rt.linear(speed * fraction))

@@ -61,8 +61,8 @@ function bt.Animation.HP_GAINED:start()
 
     local label = self._label
     local label_w = label:get_width() * 0.5
-    local start_x, start_y = bounds.x + bounds.width * 0.5, bounds.y + bounds.height * 0.5
-    local finish_x, finish_y = bounds.x + bounds.width * 0.5, bounds.y - bounds.height
+    local start_x, start_y = bounds.x + bounds.width * 0.75, bounds.y + bounds.height * 0.5
+    local finish_x, finish_y = bounds.x + bounds.width * 0.75, bounds.y - bounds.height
     self._label_path = rt.Spline({
         start_x, start_y,
         finish_x, finish_y
