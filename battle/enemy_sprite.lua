@@ -6,6 +6,8 @@ bt.EnemySprite = meta.new_type("EnemySprite", rt.Widget, rt.Animation, function(
         _is_realized = false,
 
         _sprite = rt.Sprite(entity.sprite_id),
+        _hp_bar = bt.HealthBar(entity),
+        _show_hp_bar = true,
 
         _debug_bounds = {}, -- rt.Rectangle
         _debug_sprite = {}, -- rt.Rectangle
@@ -22,6 +24,7 @@ function bt.EnemySprite:realize()
     local sprite_w, sprite_h = self._sprite:get_resolution()
     self._sprite:set_minimum_size(sprite_w * 3, sprite_h * 3)
     self._sprite:realize()
+    self._hp_bar:realize()
 
     self:reformat()
 end
@@ -29,6 +32,7 @@ end
 --- @override
 function bt.EnemySprite:update(delta)
     self._sprite:update(delta)
+    self._hp_bar:update(delta)
 
     do -- animation queue
         local current = self._animations[1]
@@ -62,6 +66,9 @@ function bt.EnemySprite:size_allocate(x, y, width, height)
 
     self._debug_sprite = rt.Rectangle(sprite_x, sprite_y, sprite_w, sprite_h)
 
+    local m = 0.5 * rt.settings.margin_unit
+    self._hp_bar:size_allocate(sprite_x, sprite_y + sprite_h + m, sprite_w, rt.settings.battle.health_bar.hp_font:get_size() + 2 * m)
+
     for debug in range(self._debug_bounds, self._debug_sprite) do
         debug:set_is_outline(true)
     end
@@ -76,6 +83,7 @@ end
 function bt.EnemySprite:draw()
     if self._is_realized then
         self._sprite:draw()
+        self._hp_bar:draw()
         if self._scene:get_debug_draw_enabled() then
             self._debug_bounds:draw()
             self._debug_sprite:draw()

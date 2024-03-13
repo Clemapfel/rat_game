@@ -62,7 +62,7 @@ function bt.Animation.HP_GAINED:start()
     local label = self._label
     local label_w = label:get_width() * 0.5
     local start_x, start_y = bounds.x + bounds.width * 0.5, bounds.y + bounds.height * 0.5
-    local finish_x, finish_y = bounds.x + bounds.width * 0.5, bounds.y - bounds.height * 1/3
+    local finish_x, finish_y = bounds.x + bounds.width * 0.5, bounds.y - bounds.height
     self._label_path = rt.Spline({
         start_x, start_y,
         finish_x, finish_y
@@ -88,6 +88,12 @@ end
 --- @override
 function bt.Animation.HP_GAINED:update(delta)
     if not self._is_started then return end
+
+    -- update once per update for animated battle sprites
+    local target = self._target
+    target:set_is_visible(true)
+    self._target_snapshot:snapshot(target)
+    target:set_is_visible(false)
 
     local duration = rt.settings.battle.animations.hp_gained.duration
     self._elapsed = self._elapsed + delta

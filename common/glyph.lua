@@ -42,6 +42,7 @@ rt.Glyph = meta.new_type("Glyph", rt.Drawable, rt.Animation, function(font, cont
     if meta.is_nil(is_outlined) then is_outlined = false end
     if meta.is_nil(outline_color) then outline_color = rt.settings.glyph.default_outline_color end
 
+    if not meta.is_string(content) then content = tostring(content) end
     local out = meta.new(rt.Glyph, {
         _font = font,
         _content = content,
@@ -255,6 +256,7 @@ end
 
 --- @brief set content
 function rt.Glyph:set_text(text)
+    text = tostring(text)
     if self._content == text then return end
     local current = self._content
     self._content = text
@@ -290,6 +292,18 @@ end
 --- @return (Number, Number)
 function rt.Glyph:get_size()
     return self._glyph:getDimensions()
+end
+
+--- @brief
+function rt.Glyph:get_width()
+    local w, _ = self:get_size()
+    return w
+end
+
+--- @brief
+function rt.Glyph:get_Height()
+    local _, h = self:get_size()
+    return h
 end
 
 --- @brief access content as string

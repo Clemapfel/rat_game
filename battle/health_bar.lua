@@ -1,5 +1,5 @@
 rt.settings.battle.health_bar = {
-    hp_font = rt.Font(30, "assets/fonts/pixel.ttf"),
+    hp_font = rt.Font(20, "assets/fonts/DejaVuSansMono/DejaVuSansMono-Bold.ttf"),
     hp_color = rt.Palette.LIGHT_GREEN_2,
     hp_background_color = rt.Palette.GREEN_3,
     corner_radius = 7,
@@ -17,8 +17,11 @@ bt.HealthBar = meta.new_type("HealthBar", bt.BattleUI, function(entity)
 
         _hp_value = -1,
         _hp_bar = rt.LevelBar(0, entity:get_hp_base(), entity:get_hp_base()),
-        _hp_label = {}, -- rt.Glyph,
-        _hp_label_right = {}, -- rt.Glyph
+        _hp_label = {},         -- rt.Glyph,
+        _hp_label_center = {},  -- rt.Glyph
+        _hp_label_right = {},   -- rt.Glyph
+
+        _use_percentage = false
     })
     out._hp_bar:set_color(
         rt.settings.battle.health_bar.hp_color,
@@ -26,21 +29,24 @@ bt.HealthBar = meta.new_type("HealthBar", bt.BattleUI, function(entity)
     )
     out._hp_bar:set_corner_radius(rt.settings.battle.health_bar.corner_radius)
     return out
-end)
+end, {
+    _min_width = rt.Glyph(rt.settings.battle.health_bar.hp_font, "100 / 100"):get_width()
+})
 
 --- @brief [internal]
-function bt.HealthBar._format_hp(value, max)
-    max = tostring(max)
-    local current = tostring(value)
-    current = string.rep(" ", (#max - #current)) .. current
-    return current, "  / " .. max
+function bt.HealthBar:_format_hp(value, max)
+    if self._use_percentage then
+        return math.round((value / max) * 1000) / 10 .. " ", ""
+    else
+        return tostring(value), " / ", tostring(max)
+    end
 end
 
 --- @override
 function bt.HealthBar:realize()
     if self._is_realized then return end
 
-    local left, right = self._format_hp(self._hp_value, self._entity:get_hp_base())
+    local left, center, right = self:_format_hp(self._hp_value, self._entity:get_hp_base())
     local settings = {
         is_outlined = true,
         outline_color = rt.Palette.TRUE_BLACK,
@@ -48,6 +54,7 @@ function bt.HealthBar:realize()
     }
 
     self._hp_label_left = rt.Glyph(rt.settings.battle.health_bar.hp_font, left, settings)
+    self._hp_label_center = rt.Glyph(rt.settings.battle.health_bar.hp_font, center, settings)
     self._hp_label_right = rt.Glyph(rt.settings.battle.health_bar.hp_font, right, settings)
     self._hp_bar:realize()
 
@@ -58,22 +65,18 @@ end
 
 --- @override
 function bt.HealthBar:size_allocate(x, y, width, height)
-    local left_w, left_h = self._hp_label_left:get_size()
-    local right_w, right_h = self._hp_label_right:get_size()
+    local old_center_x = x + 0.5 * width
+    if width < self._min_width then width = self._min_width end
+    x = old_center_x - 0.5 * width
+    self._hp_bar:fit_into(x, y, width, height)
 
-    local m = rt.settings.margin_unit
-    local w, h = width, height
-    local hp_label_w, hp_label_h = left_w + right_w, math.max(left_h, right_h)
-    local hp_x = x + m
-    local hp_y = y + m
-    local hp_w = w - 2 * m
-    local hp_h = hp_label_h + m
-    self._hp_bar:fit_into(hp_x, hp_y, hp_w, hp_h)
+    local w, h = self._hp_label_center:get_size()
+    local label_x = x + 0.5 * width - 0.5 * w
+    local label_y = y + 0.5 * height - 0.5 * h
 
-    local hp_label_x = hp_x + 0.5 * hp_w - 0.5 * hp_label_w
-    local hp_label_y = hp_y + 0.5 * hp_h - 0.5 * hp_label_h
-    self._hp_label_left:set_position(hp_label_x, hp_label_y)
-    self._hp_label_right:set_position(hp_label_x + left_w, hp_label_y)
+    self._hp_label_left:set_position(label_x, label_y)
+    self._hp_label_center:set_position(label_x, label_y)
+    self._hp_label_right:set_position(label_x, label_y)
 end
 
 --- @override
@@ -94,7 +97,7 @@ function bt.HealthBar:update(delta)
             self._elapsed = self._elapsed - offset * tick_duration
 
             if diff ~= 0 then
-                self._hp_label_left:set_text(select(1, self._format_hp(self._hp_value, self._entity:get_hp_base())))
+                self._hp_label_left:set_text(select(1, self:_format_hp(self._hp_value, self._entity:get_hp_base())))
                 self._hp_bar:set_value(self._hp_value)
             end
         end
@@ -106,6 +109,7 @@ function bt.HealthBar:draw()
     if self._is_realized then
         self._hp_bar:draw()
         self._hp_label_left:draw()
+        self._hp_label_center:draw()
         self._hp_label_right:draw()
     end
 end
@@ -113,6 +117,6 @@ end
 --- @override
 function bt.HealthBar:sync()
     self._hp_value = self._entity:get_hp()
-    self._hp_label_left:set_text(select(1, self._format_hp(self._hp_value, self._entity:get_hp_base())))
+    self._hp_label_left:set_text(select(1, self:_format_hp(self._hp_value, self._entity:get_hp_base())))
     self._hp_bar:set_value(self._hp_value)
 end
