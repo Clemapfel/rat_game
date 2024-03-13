@@ -1,4 +1,5 @@
 return {
-    n_frames = 3,
+    width = 41,
+    height = 34,
     fps = 5
 }

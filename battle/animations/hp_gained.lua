@@ -122,9 +122,6 @@ function bt.Animation.HP_GAINED:update(delta)
     target:set_position_offset(offset_x, offset_y)
     target:set_mix_weight(rt.symmetrical_linear(fraction, 0.3))
 
-    dbg(self._target_snapshot:get_bounds())
-    dbg(self._target:get_bounds())
-
     return self._elapsed < duration
 end
 

@@ -60,6 +60,7 @@ function rt.SnapshotLayout:draw()
     local bounds = self:get_bounds()
     local x_offset, y_offset = bounds.x + self._origin_x * bounds.width, bounds.y + self._origin_y * bounds.height
     love.graphics.push()
+    love.graphics.setCanvas(nil)
     rt.graphics.translate(x_offset, y_offset)
     rt.graphics.scale(self._scale_x, self._scale_y)
     rt.graphics.translate(-1 * x_offset, -1 * y_offset)

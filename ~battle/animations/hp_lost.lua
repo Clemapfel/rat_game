@@ -1,4 +1,4 @@
-rt.settings.battle_animation.hp_lost = {
+rt.settings.battle.animations.hp_lost = {
     duration = 1, -- seconds
 }
 

@@ -21,5 +21,5 @@ end
 
 --- @brief unbind texture
 function rt.RenderTexture:unbind_as_render_target()
-    love.graphics.setCanvas(self._before)
+    love.graphics.setCanvas({self._before, stencil = true})
 end

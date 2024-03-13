@@ -1,5 +1,5 @@
 rt.settings.battle.speed_value = {
-    hp_font = rt.Font(40, "assets/fonts/pixel.ttf"),
+    hp_font = rt.Font(25, "assets/fonts/pixel.ttf"),
     hp_color = rt.Palette.LIGHT_GREEN_2,
     hp_background_color = rt.Palette.GREEN_3,
     corner_radius = 7,
@@ -45,6 +45,11 @@ end
 function bt.SpeedValue:size_allocate(x, y, width, height)
     local label_w, label_h = self._label:get_size()
     self._label:set_position(x + 0.5 * width - 0.5 * label_w, y + 0.5 * height - 0.5 * label_h)
+end
+
+--- @override
+function bt.SpeedValue:measure()
+    return self._label:get_size()
 end
 
 --- @override

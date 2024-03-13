@@ -12,7 +12,7 @@ bt.EnemySpriteAlignmentMode = meta.new_enum({
 --- @class bt.BattleScene
 bt.BattleScene = meta.new_type("BattleScene", rt.Widget, function()
     local out = meta.new(bt.BattleScene, {
-        _debug_draw_enabled = true,
+        _debug_draw_enabled = false,
 
         _enemy_sprites = {},              -- Table<bt.EnemySprite>
         _enemy_sprite_render_order = {},  -- Queue<Number>

@@ -219,9 +219,9 @@ function rt.Glyph:draw()
     end
 
     local x, y = self._position_x, self._position_y
+    local before = love.graphics.getShader()
 
     if self._is_outlined then
-
         -- paste glyph to render texture
         self._outline_render_texture:bind_as_render_target()
         love.graphics.clear(0, 0, 0, 0)
