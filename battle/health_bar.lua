@@ -69,8 +69,6 @@ function bt.HealthBar:size_allocate(x, y, width, height)
     local right_w, h3 = self._label_right:get_size()
     local label_h = math.max(h1, h2, h3)
 
-    println(self._label_center._content)
-
     local old_center_x = x + 0.5 * width
     local total_w = left_w + center_w + right_w
     if width < total_w + rt.settings.margin_unit then width = total_w + rt.settings.margin_unit end

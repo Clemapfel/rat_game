@@ -11,11 +11,19 @@ local boulder = bt.Entity(scene, "BALL_WITH_FACE")
 local sprout = bt.Entity(scene, "WALKING_SPROUT")
 
 scene._enemy_sprites = {
-    bt.EnemySprite(scene, sprout),
-    bt.EnemySprite(scene, small_ufo),
     bt.EnemySprite(scene, boulder),
     bt.EnemySprite(scene, sprout),
+    bt.EnemySprite(scene, small_ufo),
+    bt.EnemySprite(scene, sprout),
+    --[[
+    bt.EnemySprite(scene, sprout),
+    bt.EnemySprite(scene, sprout),
+    bt.EnemySprite(scene, sprout),
+    bt.EnemySprite(scene, sprout),
+    bt.EnemySprite(scene, sprout),
+    bt.EnemySprite(scene, sprout),
     bt.EnemySprite(scene, sprout)
+    ]]--
 }
 
 input = rt.InputController()

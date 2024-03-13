@@ -1,5 +1,5 @@
 rt.settings.battle.scene = {
-    enemy_alignment_y = rt.graphics.get_height() * 0.5,
+    enemy_alignment_y = 0.5,
     horizontal_margin = 100,
 }
 
@@ -16,7 +16,7 @@ bt.BattleScene = meta.new_type("BattleScene", rt.Widget, function()
 
         _enemy_sprites = {},              -- Table<bt.EnemySprite>
         _enemy_sprite_render_order = {},  -- Queue<Number>
-        _enemy_sprite_alignment_mode = bt.EnemySpriteAlignmentMode.EQUIDISTANT,
+        _enemy_sprite_alignment_mode = bt.EnemySpriteAlignmentMode.BOSS_CENTERED,
 
         _enemy_alignment_line = {}, -- rt.Line
         _margin_left_line = {},
@@ -48,7 +48,7 @@ end
 function bt.BattleScene:size_allocate(x, y, width, height)
     self:_reformat_enemy_sprites()
 
-    local enemy_y = rt.settings.battle.scene.enemy_alignment_y
+    local enemy_y = rt.graphics.get_height() * rt.settings.battle.scene.enemy_alignment_y
     self._enemy_alignment_line = rt.Line(0, enemy_y, rt.graphics.get_width(), enemy_y)
     local mx = rt.settings.battle.scene.horizontal_margin
     self._margin_left_line = rt.Line(mx, 0, mx, rt.graphics.get_height())
@@ -105,7 +105,7 @@ function bt.BattleScene:_reformat_enemy_sprites()
     if #self._enemy_sprites == 0 then
         rt.error("In bt.BattleScene:_reformat_enemy_sprites: number of enemy sprites is 0")
     end
-    local target_y = rt.settings.battle.scene.enemy_alignment_y
+    local target_y = rt.graphics.get_height() * rt.settings.battle.scene.enemy_alignment_y
     local mx = rt.settings.battle.scene.horizontal_margin
 
     local alignment_mode = self._enemy_sprite_alignment_mode
@@ -119,18 +119,38 @@ function bt.BattleScene:_reformat_enemy_sprites()
             sprite:fit_into(x, y, w, h)
         end
     elseif alignment_mode == bt.EnemySpriteAlignmentMode.BOSS_CENTERED then
-        local center_x = 0.5 * rt.graphics.get_width()
-        local boss_w, boss_h = self._enemy_sprites[1]:measure()
-        self._enemy_sprites[1]:fit_into(center_x - 0.5 * boss_w, target_y - 0.5 * boss_h)
+        local max_h = 0
+        local total_w = 0
+        for i = 1, #self._enemy_sprites do
+            local w, h = self._enemy_sprites[i]:measure()
+            max_h = math.max(max_h, h)
+            total_w = total_w + w
+        end
 
-        local total_w = rt.graphics.get_width() - 2 * mx
-        local step = total_w / (#self._enemy_sprites - 1)
-        for sprite_i = 2, #self._enemy_sprites do
-            local sprite = self._enemy_sprites[sprite_i]
-            local target_x = mx + (sprite_i - 1) * step
-            local w, h = sprite:measure()
-            local x, y = target_x - 0.5 * w, target_y - 0.5 * h
-            sprite:fit_into(x, y, w, h)
+        -- y-alignment of sprite based on sprite height
+        function h_to_y(h)
+            return target_y - h-- + 0.25 * max_h
+        end
+
+        local center_x = 0.5 * rt.graphics.get_width()
+        local w, h = self._enemy_sprites[1]:measure()
+        self._enemy_sprites[1]:fit_into(center_x - 0.5 * w, h_to_y(h) )
+        local left_offset, right_offset = w * 0.5, h * 0.5
+
+        local m = math.min( -- if enemy don't fit on screen, stagger without violating outer margins
+            rt.settings.margin_unit * 2,
+                (rt.graphics.get_width() - 2 * rt.settings.battle.scene.horizontal_margin - total_w) / #self._enemy_sprites
+        )
+        for i = 2, #self._enemy_sprites do
+            local sprite = self._enemy_sprites[i]
+            w, h = sprite:measure()
+            if i % 2 == 0 then
+                left_offset = left_offset + w + m
+                sprite:fit_into(center_x - left_offset, h_to_y(h))
+            else
+                sprite:fit_into(center_x + right_offset + m, h_to_y(h))
+                right_offset = right_offset + w + m
+            end
         end
     end
 

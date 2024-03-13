@@ -152,7 +152,13 @@ end
 --- @param aabb rt.AxisAlignedRectangle
 function rt.Widget:fit_into(aabb, y, w, h)
     if meta.is_number(aabb) then
-        aabb = rt.AABB(aabb, y, w, h)
+        local x = aabb
+        if w == nil or h == nil then
+            local target_w, target_h = self:measure()
+            w = which(w, target_w)
+            h = which(h, target_h)
+        end
+        aabb = rt.AABB(x, y, w, h)
     end
 
     if not (self._bounds.x ~= aabb.x or self._bounds.y ~= aabb.y or self._bounds.width ~= aabb.width or self._bounds.height ~= aabb.height) then return end

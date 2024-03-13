@@ -76,15 +76,7 @@ function rt.SnapshotLayout:size_allocate(x, y, width, height)
     self._position_y = y
     self._bounds = rt.AABB(x, y, width, height)
 
-    if meta.is_widget(self._child) and not self._is_locked then
-        self._child:fit_into(rt.AABB(0, 0, width, height))
-    end
-
-    local m = rt.settings.margin_unit
-
-    if width ~= canvas_w or height ~= canvas_h then
-        self._canvas = rt.RenderTexture(width, height, true)
-    end
+    self._canvas = rt.RenderTexture(width, height, true)
     self:snapshot()
 end
 
