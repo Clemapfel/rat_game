@@ -67,7 +67,7 @@ function bt.EnemySprite:size_allocate(x, y, width, height)
     self._debug_sprite = rt.Rectangle(sprite_x, sprite_y, sprite_w, sprite_h)
 
     local m = 0.5 * rt.settings.margin_unit
-    self._hp_bar:size_allocate(sprite_x, sprite_y + sprite_h + m, sprite_w, rt.settings.battle.health_bar.hp_font:get_size() + 2 * m)
+    self._hp_bar:fit_into(sprite_x, sprite_y + sprite_h + m, sprite_w, rt.settings.battle.health_bar.hp_font:get_size() + 2 * m)
 
     for debug in range(self._debug_bounds, self._debug_sprite) do
         debug:set_is_outline(true)
