@@ -6,11 +6,13 @@ bt.EnemySprite = meta.new_type("EnemySprite", rt.Widget, rt.Animation, function(
         _is_realized = false,
 
         _sprite = rt.Sprite(entity.sprite_id),
+        _sprite_is_animated = true,
+
         _hp_bar = bt.HealthBar(entity),
-        _hp_bar_visible = true,
+        _hp_bar_is_visible = true,
 
         _speed_value = bt.SpeedValue(entity),
-        _speed_value_visible = true,
+        _speed_value_is_visible = true,
 
         _debug_bounds = {}, -- rt.Rectangle
         _debug_sprite = {}, -- rt.Rectangle
@@ -96,8 +98,8 @@ function bt.EnemySprite:draw()
     if self._is_realized then
         self._sprite:draw()
 
-        if self._hp_bar_visible then self._hp_bar:draw() end
-        if self._speed_value_visible then self._speed_value:draw() end
+        if self._hp_bar_is_visible then self._hp_bar:draw() end
+        if self._speed_value_is_visible then self._speed_value:draw() end
 
         if self._scene:get_debug_draw_enabled() then
             self._debug_bounds:draw()

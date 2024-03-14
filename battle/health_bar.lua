@@ -18,15 +18,13 @@ bt.HealthBar = meta.new_type("HealthBar", bt.BattleUI, function(entity)
         _hp_value = -1,
         _hp_bar = rt.LevelBar(0, entity:get_hp_base(), entity:get_hp_base()),
         _hp_label = {},         -- rt.Glyph,
+
         _label_center = {},  -- rt.Glyph
         _label_right = {},   -- rt.Glyph
 
-        _use_percentage = true
+        _use_percentage = true,
+        _knock_out_override = true
     })
-    out._hp_bar:set_color(
-        rt.settings.battle.health_bar.hp_color,
-        rt.settings.battle.health_bar.hp_background_color
-    )
     out._hp_bar:set_corner_radius(rt.settings.battle.health_bar.corner_radius)
     return out
 end)
@@ -55,6 +53,18 @@ function bt.HealthBar:realize()
     self._label_center = rt.Glyph(rt.settings.battle.health_bar.hp_font, center, settings)
     self._label_right = rt.Glyph(rt.settings.battle.health_bar.hp_font, right, settings)
     self._hp_bar:realize()
+
+    if self._knock_out_override then
+        self._hp_bar:set_color(
+            rt.Palette.GRAY_3,
+            rt.Palette.GRAY_4
+        )
+    else
+        self._hp_bar:set_color(
+            rt.settings.battle.health_bar.hp_color,
+            rt.settings.battle.health_bar.hp_background_color
+        )
+    end
 
     self:set_is_animated(true)
     self:update(0)

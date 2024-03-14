@@ -166,7 +166,7 @@ require "battle.equippable"
 require "battle.move"
 require "battle.move_selection"
 require "battle.status"
-require "battle.entity_proxy"
+require "battle.battle_entity_interface"
 
 require "battle.battle_ui"
 require "battle.enemy_sprite"

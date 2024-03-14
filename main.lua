@@ -36,6 +36,10 @@ input:signal_connect("pressed", function(_, which)
         local i = rt.random.integer(1, #scene._enemy_sprites)
         local sprite = scene._enemy_sprites[i]
         sprite:add_animation(bt.Animation.HP_LOST(sprite, rt.random.integer(0, 100)))
+    elseif which == rt.InputButton.X then
+        local i = rt.random.integer(1, #scene._enemy_sprites)
+        local sprite = scene._enemy_sprites[i]
+        sprite:add_animation(bt.Animation.PLACEHOLDER_MESSAGE(sprite, "ALREADY DEAD"))
     elseif which == rt.InputButton.LEFT then
     elseif which == rt.InputButton.RIGHT then
     elseif which == rt.InputButton.R then

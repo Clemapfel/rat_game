@@ -31,7 +31,7 @@ function rt.SnapshotLayout:snapshot(to_draw)
     if to_draw == nil then to_draw = self._child end
     self._canvas:bind_as_render_target()
     rt.graphics.clear(0, 0, 0, 0)
-    if meta.is_widget(to_draw) then
+    if meta.is_drawable(to_draw) then
         love.graphics.push()
         local x, y = to_draw:get_position()
         rt.graphics.translate(-x, -y)

@@ -1,7 +1,7 @@
---- @class bt.EntityProxy
+--- @class bt.EntityInterface
 --- @field hp Number
 --- @field
-bt.EntityProxy = meta.new_type("EntityProxy", function (entity)
+bt.EntityInterface = meta.new_type("EntityInterface", function (entity)
     local self = {}
     local metatable = {}
     setmetatable(self, metatable)
@@ -13,14 +13,14 @@ bt.EntityProxy = meta.new_type("EntityProxy", function (entity)
         if key == "hp" then
             return entity:get_hp()
         else
-            rt.error("In bt:EntityProxy: attempting to access field `" .. key .. "`, which does not exist or was declared private")
+            rt.error("In bt:EntityInterface: attempting to access field `" .. key .. "`, which does not exist or was declared private")
         end
     end
 
     metatable.__newindex = function(self, key, new_value)
         local entity = getmetatable(self).entity
         if true then
-            rt.error("In bt:EntityProxy: attempting to mutate field `" .. key .. "`, which does not exist or cannot be mutated directly")
+            rt.error("In bt:EntityInterface: attempting to mutate field `" .. key .. "`, which does not exist or cannot be mutated directly")
         end
     end
 
@@ -28,7 +28,7 @@ bt.EntityProxy = meta.new_type("EntityProxy", function (entity)
 end)
 
 --- @brief
-function bt.EntityProxy:raise_hp(value)
+function bt.EntityInterface:raise_hp(value)
     if value < 0 then self:lower_hp(math.abs(value)) end
     if value == 0 then return end
 
@@ -53,7 +53,7 @@ function bt.EntityProxy:raise_hp(value)
 end
 
 --- @brief
-function bt.EntityProxy:lower_hp(value)
+function bt.EntityInterface:lower_hp(value)
     if value < 0 then self:raise_hp(math.abs(value)) end
     if value == 0 then return end
 
