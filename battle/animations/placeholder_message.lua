@@ -30,8 +30,6 @@ function bt.Animation.PLACEHOLDER_MESSAGE:start()
         outline_color = rt.Palette.TRUE_BLACK,
         color = rt.Palette.TRUE_WHITE
     })
-    self._label_snapshot = rt.SnapshotLayout()
-    self._label_snapshot:realize()
     self._label_path = {}
 
     self._target_snapshot = rt.SnapshotLayout()
@@ -43,13 +41,8 @@ function bt.Animation.PLACEHOLDER_MESSAGE:start()
     local bounds = self._target:get_bounds()
     self._target_snapshot:fit_into(bounds)
 
-    local label_x, label_y = self._label:get_position()
-    local label_w, label_h = self._label:get_size()
-    self._label_snapshot:fit_into(label_x, label_y, label_w, label_h)
-    self._label_snapshot:snapshot(self._label)
-
     local label = self._label
-    label_w = label:get_width() * 0.5
+    local label_w = label:get_width() * 0.5
     local start_x, start_y = bounds.width * 0.75, bounds.height * 0.5
     local finish_x, finish_y = bounds.width * 0.75, bounds.height
     self._label_path = rt.Spline({
@@ -88,18 +81,16 @@ function bt.Animation.PLACEHOLDER_MESSAGE:update(delta)
     target:set_is_visible(false)
 
     -- label animation
-    local label = self._label_snapshot
-    local label_w, label_h = label:get_size()
+    local label_w, label_h =self._label:get_size()
     local _, pos_y = self._label_path:at(rt.exponential_plateau(fraction * 0.9))
 
     local bounds = self._target:get_bounds()
-    self._label_snapshot:fit_into(bounds.x + 0.5 * bounds.width - 0.5 * label_w, bounds.y + bounds.height - pos_y - 0.5 * label_h, label_w, label_h)
-    self._label_snapshot:snapshot(self._label)
+    self._label:set_position(bounds.x + 0.5 * bounds.width - 0.5 * label_w, bounds.y + bounds.height - pos_y - 0.5 * label_h)
 
     local fade_out_target = 0.9
     if fraction > fade_out_target then
-        local v = 1 - clamp((1 - fraction) / (1 - fade_out_target), 0, 1)
-        self._label_snapshot:set_opacity_offset(-v)
+        local v = clamp((1 - fraction) / (1 - fade_out_target), 0, 1)
+        self._label:set_opacity(v)
     end
 
     -- target animation
@@ -125,5 +116,5 @@ end
 function bt.Animation.PLACEHOLDER_MESSAGE:draw()
     love.graphics.setCanvas(nil)
     self._target_snapshot:draw()
-    self._label_snapshot:draw()
+    self._label:draw()
 end

@@ -48,6 +48,7 @@ rt.Glyph = meta.new_type("Glyph", rt.Drawable, rt.Animation, function(font, cont
         _content = content,
         _color = color,
         _style = font_style,
+        _opacity = 1,
         _is_underlined = is_underlined,
         _is_strikethrough = is_strikethrough,
         _effects = {},      -- Table<rt.TextEffect, Boolean>
@@ -184,7 +185,7 @@ end
 --- @overload
 function rt.Glyph:draw(opacity)
     if self:get_is_visible() == false then return end
-    opacity = which(opacity, 1)
+    opacity = which(opacity, self._opacity)
 
     self._render_shader:send("_shake_active", self._effects[rt.TextEffect.SHAKE] == true)
     self._render_shader:send("_shake_offset", rt.settings.glyph.shake_offset)
@@ -234,6 +235,7 @@ function rt.Glyph:draw(opacity)
         self._outline_shader:bind()
         love.graphics.setColor(1, 1, 1, opacity)
         self._outline_shader:send("_texture_resolution", {self._outline_render_texture:get_size()})
+        self._outline_shader:send("_opacity", opacity)
         love.graphics.draw(self._outline_render_texture._native, x - self._outline_render_offset_x, y - self._outline_render_offset_y)
         self._outline_shader:unbind()
     end
@@ -347,6 +349,11 @@ end
 --- @brief [internal]
 function rt.Glyph:_get_font()
     return self._font[self._style]
+end
+
+--- @brief
+function rt.Glyph:set_opacity(alpha)
+    self._opacity = alpha
 end
 
 --- @brief [internal] test glyph

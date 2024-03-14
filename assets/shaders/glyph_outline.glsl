@@ -1,6 +1,7 @@
 #pragma language glsl3
 
 uniform vec2 _texture_resolution;
+uniform float _opacity;
 
 #define PI 355/113
 
@@ -40,5 +41,5 @@ vec4 effect(vec4 color, Image tex, vec2 texture_coords, vec2 screen_coords)
         }
     }
 
-    return vec4(outline_color, sum.a / kernel_sum) * vec4(1, 1, 1, outline_intensity);
+    return vec4(outline_color, sum.a / kernel_sum) * vec4(1, 1, 1, outline_intensity * _opacity);
 }
