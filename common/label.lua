@@ -27,6 +27,7 @@ rt.Label = meta.new_type("Label", rt.Widget, function(text, font, monospace_font
         _monospace_font = monospace_font,
         _justify_mode = rt.JustifyMode.LEFT,
         _glyphs = {},
+        _opacity = 1,
         _n_characters = 0,
         _default_width = 0,
         _default_height = 0,
@@ -52,7 +53,7 @@ function rt.Label:draw()
     if not self:get_is_visible() then return end
     for _, glyph in pairs(self._glyphs) do
         if meta.isa(glyph, rt.Glyph) then
-            glyph:draw()
+            glyph:draw(self._opacity)
         end
     end
 end
@@ -638,6 +639,11 @@ function rt.Label:set_n_visible_characters(n)
 end
 
 --- @brief
+function rt.Label:set_opacity(alpha)
+    self._opacity = alpha
+end
+
+--- @brief
 function rt.Label:get_n_visible_characters()
     return self._n_visible_characters
     --[[
@@ -652,7 +658,7 @@ function rt.Label:get_n_visible_characters()
     end
 
     return n
-    ]]
+    ]]--
 end
 
 --- @brief set whether the glyphs of the label are animated

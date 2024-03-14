@@ -182,8 +182,9 @@ function rt.Glyph:_draw_strikethrough(x, y)
 end
 
 --- @overload
-function rt.Glyph:draw()
+function rt.Glyph:draw(opacity)
     if self:get_is_visible() == false then return end
+    opacity = which(opacity, 1)
 
     self._render_shader:send("_shake_active", self._effects[rt.TextEffect.SHAKE] == true)
     self._render_shader:send("_shake_offset", rt.settings.glyph.shake_offset)
@@ -225,20 +226,20 @@ function rt.Glyph:draw()
         -- paste glyph to render texture
         self._outline_render_texture:bind_as_render_target()
         love.graphics.clear(0, 0, 0, 0)
-        love.graphics.setColor(1, 1, 1, 1)
+        love.graphics.setColor(1, 1, 1, opacity)
         draw_glyph(self._outline_render_offset_x, self._outline_render_offset_y)
         self._outline_render_texture:unbind_as_render_target()
 
         -- render product using outline shader
         self._outline_shader:bind()
-        love.graphics.setColor(1, 1, 1, 1)
+        love.graphics.setColor(1, 1, 1, opacity)
         self._outline_shader:send("_texture_resolution", {self._outline_render_texture:get_size()})
         love.graphics.draw(self._outline_render_texture._native, x - self._outline_render_offset_x, y - self._outline_render_offset_y)
         self._outline_shader:unbind()
     end
 
     -- render regular glyph on top of outline
-    love.graphics.setColor(1, 1, 1, 1)
+    love.graphics.setColor(1, 1, 1, opacity)
     draw_glyph(x, y)
 end
 

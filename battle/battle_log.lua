@@ -1,7 +1,8 @@
 rt.settings.battle.log = {
     scroll_speed = 10, -- letters per second
-    hold_duration = 3, -- seconds
-    n_active_lines = 1,
+    hold_duration = 0, -- seconds
+    fade_duration = 1, -- seconds
+    n_scrolling_labels = 1,
     font = rt.Font(30, "assets/fonts/DejaVuSans/DejaVuSans-Regular.ttf")
 }
 
@@ -11,11 +12,10 @@ bt.BattleLog = meta.new_type("BattleLog", rt.Widget, rt.Animation, function()
         _labels = {},       -- Table<rt.Label>
         _bounds = rt.AABB(0, 0, 1, 1),
 
-        _waiting_labels = {}, -- Table<rt.Label>
-        _active_labels = {}, -- Set<rt.Label>
-        _n_active_labels = 0,
-        _hold_labels = {},  -- Set<{rt.Label, Number}>
-
+        _waiting_labels = {},       -- Fifo<rt.Label>
+        _scrolling_labels = {},     -- Table<rt.Label, true>
+        _holding_labels = {},       -- Table<rt.Label, elapsed>
+        _fading_labels = {},        -- Table<rt.Label, elapsed>
         _elapsed = 0,
         _label_height = 0,
         _backdrop = rt.Spacer()
@@ -50,11 +50,15 @@ end
 function bt.BattleLog:draw()
     self._backdrop:draw()
 
-    for label in pairs(self._active_labels) do
+    for label in pairs(self._scrolling_labels) do
         label:draw()
     end
 
-    for label in pairs(self._hold_labels) do
+    for label in pairs(self._holding_labels) do
+        label:draw()
+    end
+
+    for label in pairs(self._fading_labels) do
         label:draw()
     end
 end
@@ -74,40 +78,63 @@ function bt.BattleLog:update(delta)
     -- if label spend hold duration in hold, remove from drawing
     -- when remove, move all later labels up
 
-    local move_to_hold = {}
-    for label in pairs(self._active_labels) do
+    -- move from queue to active
+    while #self._scrolling_labels < rt.settings.battle.log.n_scrolling_labels and not (#self._waiting_labels == 0) do
+        self._scrolling_labels[self._waiting_labels[1]] = true
+        table.remove(self._waiting_labels, 1)
+    end
+
+    -- scroll active, if scrolling is done, move to holding
+    local remove_from_active = {}
+    for label, _ in pairs(self._scrolling_labels) do
         local new_n = label:get_n_visible_characters() + n_letters
         label:set_n_visible_characters(new_n)
         if new_n >= label:get_n_characters() then
-            table.insert(move_to_hold, label)
+            self._holding_labels[label] = 0
+            table.insert(remove_from_active, label)
         end
     end
 
-    local hold_duration = rt.settings.battle.log.hold_duration
-    local move_to_remove = {}
-    for label, elapsed in pairs(self._hold_labels) do
-        self._hold_labels[label] = elapsed + delta
-        if elapsed > hold_duration then
-            table.insert(move_to_remove, label)
+    for _, label in pairs(remove_from_active) do
+        self._scrolling_labels[label] = nil
+    end
+
+    -- keep holding labels on screen, then move to fade out
+    local remove_from_holding = {}
+    for label, elapsed in pairs(self._holding_labels) do
+        self._holding_labels[label] = elapsed + delta
+        if elapsed + delta > rt.settings.battle.log.hold_duration then
+            self._fading_labels[label] = 0
+            table.insert(remove_from_holding, label)
         end
     end
 
-    for _, label in pairs(move_to_hold) do
-        self._active_labels[label] = nil
-        self._n_active_labels = self._n_active_labels - 1
-        self._hold_labels[label] = 0
+    for _, label in pairs(remove_from_holding) do
+        self._holding_labels[label] = nil
+    end
+
+    -- keep holding labels on screen, then move to fade out
+    local remove_from_fading = {}
+    local fade_duration = rt.settings.battle.log.fade_duration
+    for label, elapsed in pairs(self._fading_labels) do
+        self._fading_labels[label] = elapsed + delta
+        label:set_opacity(1 - (elapsed + delta) / fade_duration)
+        if elapsed + delta > fade_duration then
+            table.insert(remove_from_fading, label)
+        end
     end
 
     local should_reformat = false
-    for _, label in pairs(move_to_remove) do
-        self._hold_labels[label] = nil
+    for _, label in pairs(remove_from_fading) do
         should_reformat = true
+        self._fading_labels[label] = nil
     end
 
+    -- scroll all visible labels if one dissapeared
     if should_reformat then
         self._label_height = 0
         for _, label in pairs(self._labels) do
-            if self._active_labels[label] ~= nil or self._hold_labels[label] ~= nil then
+            if self._scrolling_labels[label] ~= nil or self._holding_labels[label] ~= nil or self._fading_labels[label] ~= nil then
                 self:_format_label(label)
                 self._label_height = self._label_height + select(2, label:measure())
             end
@@ -135,11 +162,5 @@ function bt.BattleLog:push_back(str)
     self:_format_label(label)
     self._label_height = self._label_height + select(2, label:measure())
     label:set_n_visible_characters(0)
-
-    if self._n_active_labels < rt.settings.battle.log.n_active_lines then
-        self._active_labels[label] = true
-        self._n_active_labels = self._n_active_labels + 1
-    else
-        table.insert(self._waiting_labels, label)
-    end
+    table.insert(self._waiting_labels, label)
 end

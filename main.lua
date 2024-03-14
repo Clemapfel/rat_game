@@ -6,7 +6,6 @@ rt.SpriteAtlas:initialize("assets/sprites")
 local scene = bt.BattleScene()
 rt.current_scene = scene
 
-
 local small_ufo = bt.BattleEntity(scene, "SMALL_UFO")
 local boulder = bt.BattleEntity(scene, "BALL_WITH_FACE")
 local sprout = bt.BattleEntity(scene, "WALKING_SPROUT")
@@ -67,7 +66,6 @@ end
 love.draw = function()
     love.graphics.clear(0.8, 0.2, 0.8, 1)
     rt.current_scene:draw()
-
     do -- show fps
         local fps = tostring(love.timer.getFPS())
         local margin = 3
