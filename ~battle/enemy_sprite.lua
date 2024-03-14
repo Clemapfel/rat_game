@@ -1,6 +1,6 @@
 --- @class bt.EnemySprite
 bt.EnemySprite = meta.new_type("EnemySprite", rt.Widget, rt.Animation, function(entity)
-    assert(meta.isa(entity, bt.Entity) and entity.is_enemy == true)
+    assert(meta.isa(entity, bt.BattleEntity) and entity.is_enemy == true)
     local out = meta.new(bt.EnemySprite, {
         _sprite = rt.ImageDisplay("assets/favicon.png"),
         _shader = rt.Shader("assets/shaders/enemy_sprite.glsl"),

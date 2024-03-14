@@ -1,5 +1,5 @@
---- @class bt.EntityPortrait
-bt.EntityPortrait = meta.new_type("EntityPortrait", rt.Widget, function(entity)
+--- @class bt.BattleEntityPortrait
+bt.BattleEntityPortrait = meta.new_type("EntityPortrait", rt.Widget, function(entity)
 
     if meta.is_nil(env.entity_portrait_spritesheet) then
         env.entity_portrait_spritesheet = rt.Spritesheet("assets/sprites", "entity_portrait")
@@ -33,7 +33,7 @@ bt.EntityPortrait = meta.new_type("EntityPortrait", rt.Widget, function(entity)
         sprite = rt.Viewport(rt.Label("<o><b>" .. abbreviation .. "</o></b>"))
     end
 
-    local out = meta.new(bt.EntityPortrait, {
+    local out = meta.new(bt.BattleEntityPortrait, {
         _entity = entity,
         _sprite = sprite,
         _aspect = rt.AspectLayout(1),
@@ -62,6 +62,6 @@ bt.EntityPortrait = meta.new_type("EntityPortrait", rt.Widget, function(entity)
 end)
 
 --- @overload
-function bt.EntityPortrait:get_top_level_widget()
+function bt.BattleEntityPortrait:get_top_level_widget()
     return self._aspect
 end

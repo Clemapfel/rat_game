@@ -6,8 +6,8 @@ rt.settings.order_queue = {
 --- @class bt.OrderQueue
 bt.OrderQueue = meta.new_type("OrderQueue", rt.Widget, rt.Animation, function()
     local out = meta.new(bt.OrderQueue, {
-        _current_state = {},    -- rt.Queue<bt.Entity>
-        _next_state = {},       -- rt.Queue<bt.Entity>
+        _current_state = {},    -- rt.Queue<bt.BattleEntity>
+        _next_state = {},       -- rt.Queue<bt.BattleEntity>
         _arrow_body = rt.Rectangle(0, 0, 1, 1),
         _arrow_body_outline = rt.LineStrip(0, 0, 1, 1),
         _arrow_body_outline_outline = rt.LineStrip(0, 0, 1, 1),
@@ -20,7 +20,7 @@ bt.OrderQueue = meta.new_type("OrderQueue", rt.Widget, rt.Animation, function()
         _turn_separator_body = rt.Rectangle(0, 0, 1, 1),
         _turn_separator_outline = rt.Rectangle(0, 0, 1, 1),
         _turn_separator_outline_outline = rt.Rectangle(0, 0, 1, 1),
-        _portraits = {}         -- Table<entity.id, bt.EntityPortrait>
+        _portraits = {}         -- Table<entity.id, bt.BattleEntityPortrait>
     })
 
     for base in range(
@@ -81,7 +81,7 @@ function bt.OrderQueue:set_state(state)
     for _, entity in pairs(self._current_state) do
         local id = entity.id
         if meta.is_nil(self._portraits[id]) then
-            self._portraits[id] = bt.EntityPortrait(entity)
+            self._portraits[id] = bt.BattleEntityPortrait(entity)
             if self:get_is_realized() then
                 self._portraits[id]:realize()
             end

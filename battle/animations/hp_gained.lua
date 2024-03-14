@@ -3,8 +3,9 @@ rt.settings.battle.animations.hp_gained = {
 }
 
 --- @class bt.Animation.HP_GAINED
-bt.Animation.HP_GAINED = meta.new_type("HP_GAINED", bt.Animation, function(target, value)
+bt.Animation.HP_GAINED = meta.new_type("HP_GAINED", bt.Animation, function(scene, target, value)
     return meta.new(bt.Animation.HP_GAINED, {
+        _scene = scene,
         _target = target,
         _value = value,
 
@@ -83,6 +84,8 @@ function bt.Animation.HP_GAINED:start()
     local target = self._target
     self._target_snapshot:snapshot(target)
     target:set_is_visible(false)
+
+
 end
 
 --- @override
@@ -114,7 +117,7 @@ function bt.Animation.HP_GAINED:update(delta)
     -- target animation
     local target = self._target_snapshot
     local current = target:get_bounds()
-    local offset_x, offset_y = self._target_path:at(rt.sinoid_ease_in_out(fraction))
+    local offset_x, offset_y = self._target_path:at(rt.sinusoid_ease_in_out(fraction))
     offset_x = offset_x * current.width
     offset_y = offset_y * current.height
     current.x = current.x + offset_x

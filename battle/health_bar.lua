@@ -1,6 +1,13 @@
 rt.settings.battle.health_bar = {
     hp_font = rt.Font(20, "assets/fonts/pixel.ttf"),--"assets/fonts/DejaVuSansMono/DejaVuSansMono-Bold.ttf"),
-    hp_color = rt.Palette.LIGHT_GREEN_2,
+
+    hp_color_100 = rt.Palette.LIGHT_GREEN_2,
+    hp_color_75 = rt.Palette.GREEN_1,
+    hp_color_50 = rt.Palette.YELLOW_2,
+    hp_color_25 = rt.Palette.ORANGE_2,
+    hp_color_10 = rt.Palette.RED_2,
+    hp_color_0 = rt.Palette.GRAY_2,
+
     hp_background_color = rt.Palette.GREEN_3,
     corner_radius = 7,
     tick_speed = 10, -- ticks per second
@@ -23,7 +30,7 @@ bt.HealthBar = meta.new_type("HealthBar", bt.BattleUI, function(entity)
         _label_right = {},   -- rt.Glyph
 
         _use_percentage = true,
-        _knock_out_override = true
+        _knock_out_override = false
     })
     out._hp_bar:set_corner_radius(rt.settings.battle.health_bar.corner_radius)
     return out
@@ -36,6 +43,24 @@ function bt.HealthBar:_format_hp(value, max)
     else
         return tostring(value), "/", tostring(max)
     end
+end
+
+--- @brief
+function bt.HealthBar:_update_color_from_precentage(value)
+    local settings = rt.settings.battle.health_bar
+    local color
+    if value < 0.01 then
+        color = settings.hp_color_0
+    elseif value < 0.10 then
+        color = settings.hp_color_10
+    elseif value < 0.50 then
+        color = settings.hp_color_50
+    elseif value < 1 then
+        color = settings.hp_color_75
+    else
+        color = settings.hp_color_100
+    end
+    self._hp_bar:set_color(color, rt.color_darken(color, 0.25))
 end
 
 --- @override
@@ -53,18 +78,6 @@ function bt.HealthBar:realize()
     self._label_center = rt.Glyph(rt.settings.battle.health_bar.hp_font, center, settings)
     self._label_right = rt.Glyph(rt.settings.battle.health_bar.hp_font, right, settings)
     self._hp_bar:realize()
-
-    if self._knock_out_override then
-        self._hp_bar:set_color(
-            rt.Palette.GRAY_3,
-            rt.Palette.GRAY_4
-        )
-    else
-        self._hp_bar:set_color(
-            rt.settings.battle.health_bar.hp_color,
-            rt.settings.battle.health_bar.hp_background_color
-        )
-    end
 
     self:set_is_animated(true)
     self:update(0)
@@ -115,6 +128,7 @@ function bt.HealthBar:update(delta)
                 self._label_center:set_text(center)
                 self._label_right:set_text(right)
                 self._hp_bar:set_value(self._hp_value)
+                self:_update_color_from_precentage(self._hp_value / self._entity:get_hp_base())
                 self:reformat()
             end
         end

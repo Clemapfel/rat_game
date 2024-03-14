@@ -59,6 +59,7 @@ end
 
 --- @overload rt.Widget.size_allocate
 function rt.Label:size_allocate(x, y, width, height)
+
     -- apply wrapping
     local space = self._font:get_bold_italic():getWidth(rt.Label.SPACE)
     local tab = self._font:get_bold_italic():getWidth(rt.Label.TAB)
@@ -681,6 +682,11 @@ end
 function rt.Label:get_default_size()
     if not self:get_is_realized() then self:realize() end
     return self._default_width, self._default_height
+end
+
+--- @brief
+function rt.Label:get_n_characters()
+    return self._n_characters
 end
 
 --- @brief [internal]

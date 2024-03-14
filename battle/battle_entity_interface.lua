@@ -1,7 +1,7 @@
---- @class bt.EntityInterface
+--- @class bt.BattleEntityInterface
 --- @field hp Number
 --- @field
-bt.EntityInterface = meta.new_type("EntityInterface", function (entity)
+bt.BattleEntityInterface = meta.new_type("EntityInterface", function (entity)
     local self = {}
     local metatable = {}
     setmetatable(self, metatable)
@@ -28,7 +28,7 @@ bt.EntityInterface = meta.new_type("EntityInterface", function (entity)
 end)
 
 --- @brief
-function bt.EntityInterface:raise_hp(value)
+function bt.BattleEntityInterface:raise_hp(value)
     if value < 0 then self:lower_hp(math.abs(value)) end
     if value == 0 then return end
 
@@ -53,7 +53,7 @@ function bt.EntityInterface:raise_hp(value)
 end
 
 --- @brief
-function bt.EntityInterface:lower_hp(value)
+function bt.BattleEntityInterface:lower_hp(value)
     if value < 0 then self:raise_hp(math.abs(value)) end
     if value == 0 then return end
 

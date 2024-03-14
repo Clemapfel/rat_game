@@ -26,8 +26,8 @@ end, {
     priority = 0,
     effect = function(user, targets)
         meta.assert_isa(self, bt.Move)
-        meta.assert_isa(user, bt.Entity)
-        meta.assert_isa(targets, bt.Entity)
+        meta.assert_isa(user, bt.BattleEntity)
+        meta.assert_isa(targets, bt.BattleEntity)
     end
 })
 

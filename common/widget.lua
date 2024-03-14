@@ -420,8 +420,8 @@ end
 --- @brief set alignment among both axes
 --- @param alignment rt.Alignment
 function rt.Widget:set_alignment(alignment)
+    meta.assert_enum(alignment, rt.Alignment)
     if self._vertical_alignment == alignment and self._horizontal_alignment == alignment then return end
-
     self._horizontal_alignment = alignment
     self._vertical_alignment = alignment
     if self:_has_top_level() then
@@ -496,20 +496,33 @@ function rt.Widget._calculate_size(self, width, margin_start, margin_end, align,
     local m1 = margin_end
     local L = range_size
 
-    if align == rt.Alignment.START and expand == false then
-        return x + m0, w
-    elseif align == rt.Alignment.CENTER and expand == false then
-        return x + (L - w) / 2, w
-    elseif align == rt.Alignment.END and expand == false then
-        return x + L - m1 - w, w
-    elseif align == rt.Alignment.START and expand == true then
-        return x + m0, L - m0 - m1
-    elseif align == rt.Alignment.CENTER and expand == true then
-        return x + m0, math.max(w, L - m0 - m1)
-    elseif align == rt.Alignment.END and expand == true then
-        local w_out = math.max(w, (L - m0 - m1) / 2)
-        return x + L - m1 - w_out, w_out
+    local out_x, out_y
+
+    if align == rt.Alignment.START then
+        if expand == false then
+            out_x, out_y = x + m0, w
+        else
+            out_x, out_y =  x + m0, L - m0 - m1
+        end
+    elseif align == rt.Alignment.CENTER then
+        if expand == false then
+            out_x, out_y =  x + (L - w) / 2, w
+        else
+            out_x, out_y =  x + m0, math.max(w, L - m0 - m1)
+        end
+    elseif align == rt.Alignment.END then
+        if expand == false then
+            out_x, out_y =  x + L - m1 - w, w
+        else
+            local w_out = math.max(w, (L - m0 - m1) / 2)
+            out_x, out_y =  x + L - m1 - w_out, w_out
+        end
+    else
+        meta.assert_enum(align, rt.Alignment)
     end
+
+    assert(out_x ~= nil and out_y ~= nil)
+    return out_x, out_y
 end
 
 --- @brief

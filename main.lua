@@ -6,9 +6,10 @@ rt.SpriteAtlas:initialize("assets/sprites")
 local scene = bt.BattleScene()
 rt.current_scene = scene
 
-local small_ufo = bt.Entity(scene, "SMALL_UFO")
-local boulder = bt.Entity(scene, "BALL_WITH_FACE")
-local sprout = bt.Entity(scene, "WALKING_SPROUT")
+
+local small_ufo = bt.BattleEntity(scene, "SMALL_UFO")
+local boulder = bt.BattleEntity(scene, "BALL_WITH_FACE")
+local sprout = bt.BattleEntity(scene, "WALKING_SPROUT")
 
 scene._enemy_sprites = {
     bt.EnemySprite(scene, boulder),
@@ -31,15 +32,19 @@ input:signal_connect("pressed", function(_, which)
     if which == rt.InputButton.A then
         local i = rt.random.integer(1, #scene._enemy_sprites)
         local sprite = scene._enemy_sprites[i]
-        sprite:add_animation(bt.Animation.HP_GAINED(sprite, rt.random.integer(0, 100)))
+        sprite:add_animation(bt.Animation.HP_GAINED(scene, sprite, rt.random.integer(0, 100)))
     elseif which == rt.InputButton.B then
         local i = rt.random.integer(1, #scene._enemy_sprites)
         local sprite = scene._enemy_sprites[i]
-        sprite:add_animation(bt.Animation.HP_LOST(sprite, rt.random.integer(0, 100)))
+        sprite:add_animation(bt.Animation.HP_LOST(scene, sprite, rt.random.integer(0, 100)))
     elseif which == rt.InputButton.X then
         local i = rt.random.integer(1, #scene._enemy_sprites)
         local sprite = scene._enemy_sprites[i]
-        sprite:add_animation(bt.Animation.PLACEHOLDER_MESSAGE(sprite, "ALREADY DEAD"))
+        sprite:add_animation(bt.Animation.PLACEHOLDER_MESSAGE(scene, sprite, "ALREADY DEAD"))
+    elseif which == rt.InputButton.Y then
+        local i = rt.random.integer(1, #scene._enemy_sprites)
+        local sprite = scene._enemy_sprites[i]
+        sprite:add_animation(bt.Animation.ENEMY_APPEARED(scene, sprite))
     elseif which == rt.InputButton.LEFT then
     elseif which == rt.InputButton.RIGHT then
     elseif which == rt.InputButton.R then

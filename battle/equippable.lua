@@ -25,7 +25,7 @@ end, {
 
    effect = function(holder)
        meta.assert_isa(self, bt.Equippable)
-       meta.assert_isa(holder, bt.Entity)
+       meta.assert_isa(holder, bt.BattleEntity)
    end
 })
 

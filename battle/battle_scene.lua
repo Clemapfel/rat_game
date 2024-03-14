@@ -18,6 +18,8 @@ bt.BattleScene = meta.new_type("BattleScene", rt.Widget, function()
         _enemy_sprite_render_order = {},  -- Queue<Number>
         _enemy_sprite_alignment_mode = bt.EnemySpriteAlignmentMode.BOSS_CENTERED,
 
+        _log = {}, -- bt.BattleLog
+
         _enemy_alignment_line = {}, -- rt.Line
         _margin_left_line = {},
         _margin_center_line = {},
@@ -38,8 +40,14 @@ end
 --- @brief
 function bt.BattleScene:realize()
     self._is_realized = true
+
+    self._log = bt.BattleLog()
+    self._log:realize()
+
     for _, sprite in pairs(self._enemy_sprites) do
         sprite:realize()
+        sprite:set_is_visible(false)
+        sprite:add_animation(bt.Animation.ENEMY_APPEARED(self, sprite))
     end
     self:reformat()
 end
@@ -54,6 +62,9 @@ function bt.BattleScene:size_allocate(x, y, width, height)
     self._margin_left_line = rt.Line(mx, 0, mx, rt.graphics.get_height())
     self._margin_center_line = rt.Line(mx + 0.5 * (rt.graphics.get_width() - 2 * mx), 0, mx + 0.5 * (rt.graphics.get_width() - 2 * mx), rt.graphics.get_height())
     self._margin_right_line = rt.Line(rt.graphics.get_width() - mx, 0, rt.graphics.get_width() - mx, rt.graphics.get_height())
+
+    local my = rt.settings.margin_unit
+    self._log:fit_into(mx, my, rt.graphics.get_width() - 2 * mx, 5 * my)
 end
 
 --- @brief
@@ -75,6 +86,8 @@ function bt.BattleScene:draw()
         self._margin_center_line:draw()
         self._margin_right_line:draw()
     end
+
+    self._log:draw()
 end
 
 --- @brief
@@ -82,6 +95,8 @@ function bt.BattleScene:update(delta)
     for _, sprite in ipairs(self._enemy_sprites) do
         sprite:update(delta)
     end
+
+    self._log:update(delta)
 end
 
 --- @brief
@@ -98,6 +113,11 @@ end
 function bt.BattleScene:play_animation(entity, animation)
     local sprite = self:get_sprite(entity)
     sprite:add_animation(animation)
+end
+
+--- @brief
+function bt.BattleScene:send_message(message)
+    self._log:push_back(message)
 end
 
 --- @brief [internal]

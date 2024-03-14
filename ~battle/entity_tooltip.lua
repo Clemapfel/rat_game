@@ -5,10 +5,10 @@ rt.settings.entity_tooltip = {
     status_duration_suffix = "</mono> turns left)</color>"
 }
 
---- @class bt.EntityTooltip
-bt.EntityTooltip = meta.new_type("EntityTooltip", rt.Widget, function(entity)
+--- @class bt.BattleEntityTooltip
+bt.BattleEntityTooltip = meta.new_type("EntityTooltip", rt.Widget, function(entity)
     meta.assert_entity(entity)
-    local out = meta.new(bt.EntityTooltip, {
+    local out = meta.new(bt.BattleEntityTooltip, {
         _entity = entity,
         _tooltip = {} -- bt.BattleTooltip
     })
@@ -23,18 +23,18 @@ bt.EntityTooltip = meta.new_type("EntityTooltip", rt.Widget, function(entity)
     return out
 end)
 
-bt.EntityTooltip._censor_attack = true
-bt.EntityTooltip._censor_defense = false
-bt.EntityTooltip._censor_speed = true
-bt.EntityTooltip._censor_hp = true
+bt.BattleEntityTooltip._censor_attack = true
+bt.BattleEntityTooltip._censor_defense = false
+bt.BattleEntityTooltip._censor_speed = true
+bt.BattleEntityTooltip._censor_hp = true
 
 --- @overload rt.Widget.get_top_level_widget
-function bt.EntityTooltip:get_top_level_widget()
+function bt.BattleEntityTooltip:get_top_level_widget()
     return self._tooltip:get_top_level_widget()
 end
 
 --- @brief [internal]
-function bt.EntityTooltip:_format_stat_label()
+function bt.BattleEntityTooltip:_format_stat_label()
 
     local level_to_arrow = function(level)
         if level > 0 then
@@ -91,7 +91,7 @@ function bt.EntityTooltip:_format_stat_label()
 end
 
 --- @brief [internal]
-function bt.EntityTooltip:_format_status_ailment_label()
+function bt.BattleEntityTooltip:_format_status_ailment_label()
 
     if sizeof(self._entity.status_ailments) == 0 then
         return rt.settings.entity_tooltip.status_prefix .. rt.settings.entity_tooltip.no_status_label

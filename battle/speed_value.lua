@@ -1,8 +1,5 @@
 rt.settings.battle.speed_value = {
-    hp_font = rt.Font(25, "assets/fonts/pixel.ttf"),
-    hp_color = rt.Palette.LIGHT_GREEN_2,
-    hp_background_color = rt.Palette.GREEN_3,
-    corner_radius = 7,
+    font = rt.Font(25, "assets/fonts/pixel.ttf"),
     tick_speed = 1, -- ticks per second
     tick_acceleration = 10, -- modifies how much distance should affect tick speed, more distance = higher speed factor
 }
@@ -14,14 +11,26 @@ bt.SpeedValue = meta.new_type("SpeedValue", bt.BattleUI, function(entity)
         _is_realized = false,
         _elapsed = 1,   -- sic, makes it so `update` is invoked immediately
         _speed_value = -1,
-        _label = {},  -- rt.Glyph,
+        _speed_label = {}  -- rt.Glyph
     })
     return out
 end)
 
 --- @brief [internal]
-function bt.SpeedValue._format_value(value)
-    return tostring(value)
+function bt.SpeedValue:_format_value()
+    local value = self._speed_value
+
+    --[[
+    local priority = self._priority_value
+    local priority_string = ""
+    if priority < 0 then 
+        priority_string = string.rep("-", math.abs(priority))
+    elseif priority > 0 then 
+        priority_string = string.rep("+", math.abs.priority)
+    end
+    ]]
+    
+    return tostring(value)--, priority_string
 end
 
 --- @override
@@ -34,8 +43,8 @@ function bt.SpeedValue:realize()
         color = rt.Palette.TRUE_WHITE
     }
 
-    self._label = rt.Glyph(rt.settings.battle.speed_value.hp_font, self._format_value(self._speed_value), settings)
-    
+    local speed_string, priority_string = self:_format_value()
+    self._speed_label = rt.Glyph(rt.settings.battle.speed_value.font, speed_string, settings)
     self:set_is_animated(true)
     self:update(0)
     self._is_realized = true
@@ -43,13 +52,13 @@ end
 
 --- @override
 function bt.SpeedValue:size_allocate(x, y, width, height)
-    local label_w, label_h = self._label:get_size()
-    self._label:set_position(x + 0.5 * width - 0.5 * label_w, y + 0.5 * height - 0.5 * label_h)
+    local label_w, label_h = self._speed_label:get_size()
+    self._speed_label:set_position(x + 0.5 * width - 0.5 * label_w, y + 0.5 * height - 0.5 * label_h)
 end
 
 --- @override
 function bt.SpeedValue:measure()
-    return self._label:get_size()
+    return self._speed_label:get_size()
 end
 
 --- @override
@@ -71,7 +80,7 @@ function bt.SpeedValue:update(delta)
             self._elapsed = self._elapsed - offset * tick_duration
 
             if diff ~= 0 then
-                self._label:set_text(self._format_value(self._speed_value))
+                self._speed_label:set_text(self:_format_value())
             end
         end
     end
@@ -80,12 +89,12 @@ end
 --- @override
 function bt.SpeedValue:draw()
     if self._is_realized then
-        self._label:draw()
+        self._speed_label:draw()
     end
 end
 
 --- @override
 function bt.SpeedValue:sync()
     self._speed_value = self._entity:get_speed()
-    self._label_left:set_text(self._format_value(self._speed_value))
+    self._speed_label_left:set_text(self._format_value(self._speed_value))
 end

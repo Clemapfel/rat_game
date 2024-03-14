@@ -14,7 +14,7 @@ rt.settings.party_info = {
 
 --- @class bt.PartyInfo
 bt.PartyInfo = meta.new_type("PartyInfo", rt.Widget, rt.Animation, function(entity)
-    meta.assert_isa(entity, bt.Entity)
+    meta.assert_isa(entity, bt.BattleEntity)
 
     if meta.is_nil(env.party_info_spritesheet) then
         env.party_info_spritesheet = rt.Spritesheet("assets/sprites", "party_info")

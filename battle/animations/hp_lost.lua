@@ -3,8 +3,9 @@ rt.settings.battle.animations.hp_lost = {
 }
 
 --- @class bt.Animation.HP_LOST
-bt.Animation.HP_LOST = meta.new_type("HP_LOST", bt.Animation, function(target, value)
+bt.Animation.HP_LOST = meta.new_type("HP_LOST", bt.Animation, function(scene, target, value)
     return meta.new(bt.Animation.HP_LOST, {
+        _scene = scene,
         _target = target,
         _value = value,
 

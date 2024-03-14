@@ -1,10 +1,11 @@
 rt.settings.battle.animations.placeholder_message = {
-    duration = 2
+    duration = 1
 }
 
 --- @class bt.Animation.PLACEHOLDER_MESSAGE
-bt.Animation.PLACEHOLDER_MESSAGE = meta.new_type("PLACEHOLDER_MESSAGE", bt.Animation, function(target, message)
+bt.Animation.PLACEHOLDER_MESSAGE = meta.new_type("PLACEHOLDER_MESSAGE", bt.Animation, function(scene, target, message)
     return meta.new(bt.Animation.PLACEHOLDER_MESSAGE, {
+        _scene = scene,
         _target = target,
         _message = message,
 
@@ -58,9 +59,11 @@ function bt.Animation.PLACEHOLDER_MESSAGE:start()
 
     local offset = 0.05
     self._target_path = rt.Spline({
+        --[[
         0, 0,
         -1 * offset, 0,
         offset, 0,
+        ]]--
         0, 0,
     })
 
@@ -100,14 +103,15 @@ function bt.Animation.PLACEHOLDER_MESSAGE:update(delta)
     end
 
     -- target animation
+    target = self._target_snapshot
     local current = target:get_bounds()
-    local offset_x, offset_y = self._target_path:at(rt.sinoid_ease_in_out(fraction))
+    local offset_x, offset_y = self._target_path:at(rt.sinusoid_ease_in_out(fraction))
     offset_x = offset_x * current.width
     offset_y = offset_y * current.height
     current.x = current.x + offset_x
     current.y = current.y + offset_y
     target:set_position_offset(offset_x, offset_y)
-    target:set_mix_weight(rt.symmetrical_linear(fraction, 0.3))
+    target:set_mix_weight(rt.symmetrical_linear(fraction, 0.5))
 
     return self._elapsed < duration
 end

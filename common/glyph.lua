@@ -238,6 +238,7 @@ function rt.Glyph:draw()
     end
 
     -- render regular glyph on top of outline
+    love.graphics.setColor(1, 1, 1, 1)
     draw_glyph(x, y)
 end
 

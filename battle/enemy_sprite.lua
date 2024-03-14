@@ -79,8 +79,8 @@ function bt.EnemySprite:size_allocate(x, y, width, height)
 
     local speed_value_w, speed_value_h = self._speed_value:measure()
     self._speed_value:fit_into(
-        sprite_x + sprite_w - speed_value_w,
-        sprite_y + sprite_h - speed_value_h
+        hp_bar_bounds.x + 0.5 * hp_bar_bounds.width - speed_value_w,
+        hp_bar_bounds.y + hp_bar_bounds.height
     )
 
     for debug in range(self._debug_bounds, self._debug_sprite) do

@@ -30,52 +30,52 @@ end, {
 
     on_gained = function(afflicted)
         meta.asssert_isa(self, bt.Status)
-        meta.assert_isa(afflicted, bt.Entity)
+        meta.assert_isa(afflicted, bt.BattleEntity)
         return nil
     end,
 
     on_lost = function(afflicted)
         meta.asssert_isa(self, bt.Status)
-        meta.assert_isa(afflicted, bt.Entity)
+        meta.assert_isa(afflicted, bt.BattleEntity)
         return nil
     end,
 
     on_start_of_turn = function(afflicted)
         meta.asssert_isa(self, bt.Status)
-        meta.assert_isa(afflicted, bt.Entity)
+        meta.assert_isa(afflicted, bt.BattleEntity)
         return nil
     end,
 
     on_end_of_turn = function(afflicted)
         meta.asssert_isa(self, bt.Status)
-        meta.assert_isa(afflicted, bt.Entity)
+        meta.assert_isa(afflicted, bt.BattleEntity)
         return nil
     end,
 
     on_battle_start = function(afflcted)
         meta.asssert_isa(self, bt.Status)
-        meta.assert_isa(afflcted, bt.Entity)
+        meta.assert_isa(afflcted, bt.BattleEntity)
         return nil
     end,
 
     on_battle_end = function(afflcted)
         meta.asssert_isa(self, bt.Status)
-        meta.assert_isa(afflcted, bt.Entity)
+        meta.assert_isa(afflcted, bt.BattleEntity)
         return nil
     end,
 
     on_before_action = function(afflicted, target, move_selection)
         meta.asssert_isa(self, bt.Status)
-        meta.assert_isa(afflicted, bt.Entity)
-        meta.assert_isa(target, bt.Entity)
+        meta.assert_isa(afflicted, bt.BattleEntity)
+        meta.assert_isa(target, bt.BattleEntity)
         meta.assert_isa(move_selection, bt.MoveSelection)
         return true -- allow move
     end,
 
     on_after_action = function(afflicted, target, move_selection)
         meta.asssert_isa(self, bt.Status)
-        meta.assert_isa(afflicted, bt.Entity)
-        meta.assert_isa(target, bt.Entity)
+        meta.assert_isa(afflicted, bt.BattleEntity)
+        meta.assert_isa(target, bt.BattleEntity)
         meta.assert_isa(move_selection, bt.MoveSelection)
         return nil
     end,
@@ -83,7 +83,7 @@ end, {
     on_damage_taken = function(afflicted, damage_dealer, damage)
         meta.asssert_isa(self, bt.Status)
         for entity in range(afflicted, damage_dealer) do
-            meta.assert_isa(entity, bt.Entity)
+            meta.assert_isa(entity, bt.BattleEntity)
         end
         meta.assert_number(damage)
         return damage -- new damage
@@ -92,7 +92,7 @@ end, {
     on_damage_dealt = function(afflicted, damage_taker, damage)
         meta.asssert_isa(self, bt.Status)
         for entity in range(afflicted, damage_taker) do
-            meta.assert_isa(entity, bt.Entity)
+            meta.assert_isa(entity, bt.BattleEntity)
         end
         meta.assert_number(damage)
         return nil
@@ -100,28 +100,28 @@ end, {
     
     on_status_gained = function(afflicted, gained_status)
         meta.asssert_isa(self, bt.Status)
-        meta.assert_isa(afflicted, bt.Entity)
+        meta.assert_isa(afflicted, bt.BattleEntity)
         meta.assert_isa(gained_status, bt.Status)
         return true -- allow applying status
     end,
 
     on_status_lost = function(afflicted, lost_status)
         meta.asssert_isa(self, bt.Status)
-        meta.assert_isa(afflicted, bt.Entity)
+        meta.assert_isa(afflicted, bt.BattleEntity)
         meta.assert_isa(lost_status, bt.Status)
         return nil
     end,
 
     on_before_consumable = function(afflicted, consumable)
         meta.asssert_isa(self, bt.Status)
-        meta.assert_isa(afflicted, bt.Entity)
+        meta.assert_isa(afflicted, bt.BattleEntity)
         meta.assert_isa(consumable, bt.Consumable)
         return true -- allow consuming
     end,
 
     on_after_consumable = function(afflicted, consumable)
         meta.asssert_isa(self, bt.Status)
-        meta.assert_isa(afflicted, bt.Entity)
+        meta.assert_isa(afflicted, bt.BattleEntity)
         meta.assert_isa(consumable, bt.Consumable)
         return nil
     end,
@@ -129,28 +129,28 @@ end, {
     on_knocked_out = function(afflicted, knock_out_causer)
         meta.asssert_isa(self, bt.Status)
         for entity in range(afflicted, knock_out_causer) do
-            meta.assert_isa(entity, bt.Entity)
+            meta.assert_isa(entity, bt.BattleEntity)
         end
         return true -- allow knock out
     end,
 
     on_helped_up = function(afflicted)
         meta.asssert_isa(self, bt.Status)
-        meta.assert_isa(afflicted, bt.Entity)
+        meta.assert_isa(afflicted, bt.BattleEntity)
         return nil
     end,
     
     on_death = function(afflicted, death_causer)
         meta.asssert_isa(self, bt.Status)
         for entity in range(afflicted, death_causer) do
-            meta.assert_isa(entity, bt.Entity)
+            meta.assert_isa(entity, bt.BattleEntity)
         end
         return true -- allow death
     end,
 
     on_switch = function(afflicated)
         meta.asssert_isa(self, bt.Status)
-        meta.assert_isa(afflicated, bt.Entity)
+        meta.assert_isa(afflicated, bt.BattleEntity)
         return true -- allow switch
     end
 })

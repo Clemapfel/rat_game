@@ -122,7 +122,7 @@ function bt.Animation.HP_GAINED:update(delta)
         -- target animation
         local target = self._target_snapshots[i]
         local current = target:get_bounds()
-        local offset_x, offset_y = self._target_paths[i]:at(rt.sinoid_ease_in_out(fraction))
+        local offset_x, offset_y = self._target_paths[i]:at(rt.sinusoid_ease_in_out(fraction))
         offset_x = offset_x * current.width
         offset_y = offset_y * current.height
         current.x = current.x + offset_x

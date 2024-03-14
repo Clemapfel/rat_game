@@ -3,9 +3,9 @@ rt.settings.battle.entity = {
 }
 
 --- @class
-bt.Entity = meta.new_type("BattleEntity", function(scene, id)
+bt.BattleEntity = meta.new_type("BattleEntity", function(scene, id)
     local path = rt.settings.battle.entity.config_path .. "/" .. id .. ".lua"
-    local out = meta.new(bt.Entity, {
+    local out = meta.new(bt.BattleEntity, {
         id = id,
         id_offset = 0,
         name = "UNINITIALIZED ENTITY @" .. path,
@@ -42,13 +42,13 @@ end, {
 })
 
 --- @brief
-function bt.Entity:realize()
+function bt.BattleEntity:realize()
     if self._is_realized then return end
     meta.set_is_mutable(self, true)
 
     local chunk, error_maybe = love.filesystem.load(self._path)
     if error_maybe ~= nil then
-        rt.error("In bt.Entity:realize: error when loading config at `" .. self._path .. "`: " .. error_maybe)
+        rt.error("In bt.BattleEntity:realize: error when loading config at `" .. self._path .. "`: " .. error_maybe)
     end
 
     local config = chunk()
@@ -70,38 +70,43 @@ function bt.Entity:realize()
 end
 
 --- @brief
-function bt.Entity:get_is_enemy()
+function bt.BattleEntity:get_is_enemy()
     return self.is_enemy
 end
 
 --- @brief
-function bt.Entity:set_id_offset(n)
+function bt.BattleEntity:set_id_offset(n)
     self.id_offset = n
 end
 
 --- @brief
-function bt.Entity:get_id()
+function bt.BattleEntity:get_id()
     local offset = self.id_offset
     if offset == 0 then return self.id end
     return self.id .. "_" .. ternary(self.id_offset < 10, "0" .. offset,  offset)
 end
 
 --- @brief
-function bt.Entity:get_hp()
+function bt.BattleEntity:get_hp()
     return self.hp_current
 end
 
 --- @brief
-function bt.Entity:get_hp_base()
+function bt.BattleEntity:get_hp_base()
     return self.hp_base
 end
 
 --- @brief
-function bt.Entity:get_speed()
+function bt.BattleEntity:get_speed()
     return self.speed_base
 end
 
 --- @brief
-function bt.Entity:get_speed_base()
+function bt.BattleEntity:get_speed_base()
     return self.speed_base
+end
+
+--- @brief
+function bt.BattleEntity:get_name()
+    return self.name
 end

@@ -29,7 +29,7 @@ end)
 bt.InventoryMenuPage = meta.new_type("InventoryMenu", rt.Widget, rt.Animation, function(state)
     state = (function()
         local out = bt.InventoryMenuState("debug")
-        out.entity = bt.Entity("TEST_ENTITY")
+        out.entity = bt.BattleEntity("TEST_ENTITY")
         out.hp_ev = 5
         out.attack_ev = 7
         out.defense_ev = 3
@@ -42,7 +42,7 @@ bt.InventoryMenuPage = meta.new_type("InventoryMenu", rt.Widget, rt.Animation, f
         _main = rt.ListLayout(rt.Orientation.VERTICAL),
         _current_state = state,
 
-        _entity_portrait = bt.EntityPortrait(state.entity),
+        _entity_portrait = bt.BattleEntityPortrait(state.entity),
 
         _equipment_row = rt.ListLayout(rt.Orientation.HORIZONTAL),
         _equipment_slots = {}, -- Table<bt.EquipmentSlot>

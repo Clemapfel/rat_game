@@ -178,6 +178,7 @@ for _, name in pairs(love.filesystem.getDirectoryItems("battle/animations")) do
     require("battle.animations." .. string.gsub(name, "%.lua$", ""))
 end
 
+require "battle.battle_log"
 require "battle.battle_scene"
 
 --[[

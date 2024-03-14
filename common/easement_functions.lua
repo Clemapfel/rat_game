@@ -7,29 +7,29 @@ rt.linear = function(x, min, max)
     return x * (max - min) + min
 end
 
-rt.sinoid_ease_in = function(x)
+rt.sinusoid_ease_in = function(x)
     return -1.0 * math.cos(x * (math.pi / 2)) + 1.0;
 end
 
-rt.sinoid_ease_out = function(x)
+rt.sinusoid_ease_out = function(x)
     return math.sin(x * (math.pi / 2));
 end
 
-rt.sinoid_ease_in_out = function(x)
+rt.sinusoid_ease_in_out = function(x)
     return -0.5 * math.cos(math.pi * x) + 0.5;
 end
 
-rt.sinoid_resonance_increase = function(x, n_periods)
+rt.sinusoid_resonance_increase = function(x, n_periods)
     n_periods = which(n_periods, 3)
     return math.sin(math.pi * 2 * n_periods * x) * x
 end
 
-rt.sinoid_resonance_decrease = function(x, n_periods)
+rt.sinusoid_resonance_decrease = function(x, n_periods)
     n_periods = which(n_periods, 3)
     return math.sin(math.pi * 2 * n_periods * (1 - x)) * (1 - x)
 end
 
-rt.symmetrical_sinoid = function(x)
+rt.symmetrical_sinusoid = function(x)
     -- \frac{-\cos\left(-2\pi x\right)}{2}+0.5
     return (-1 * math.cos(-2 * math.pi * x) + 1) / 2
 end

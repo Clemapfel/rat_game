@@ -110,3 +110,12 @@ function rt.graphics.set_stencil_test(mode, value)
     end
 end
 
+--- @brief
+function rt.graphics.push()
+    love.graphics.push()
+end
+
+--- @brief
+function rt.graphics.pop()
+    love.graphics.pop()
+end

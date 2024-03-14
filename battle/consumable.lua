@@ -16,7 +16,7 @@ bt.Consumable = meta.new_type("Consumable", function(id)
 end, {
     effect = function(consumer)
         meta.assert_isa(self, bt.Consumable)
-        meta.assert_isa(consumer, bt.Entity)
+        meta.assert_isa(consumer, bt.BattleEntity)
     end
 })
 
