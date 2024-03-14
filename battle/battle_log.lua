@@ -1,6 +1,7 @@
 rt.settings.battle.log = {
     scroll_speed = 10, -- letters per second
     hold_duration = 3, -- seconds
+    n_active_lines = 1,
     font = rt.Font(30, "assets/fonts/DejaVuSans/DejaVuSans-Regular.ttf")
 }
 
@@ -9,8 +10,10 @@ bt.BattleLog = meta.new_type("BattleLog", rt.Widget, rt.Animation, function()
     return meta.new(bt.BattleLog, {
         _labels = {},       -- Table<rt.Label>
         _bounds = rt.AABB(0, 0, 1, 1),
-        
+
+        _waiting_labels = {}, -- Table<rt.Label>
         _active_labels = {}, -- Set<rt.Label>
+        _n_active_labels = 0,
         _hold_labels = {},  -- Set<{rt.Label, Number}>
 
         _elapsed = 0,
@@ -91,6 +94,7 @@ function bt.BattleLog:update(delta)
 
     for _, label in pairs(move_to_hold) do
         self._active_labels[label] = nil
+        self._n_active_labels = self._n_active_labels - 1
         self._hold_labels[label] = 0
     end
 
@@ -130,7 +134,12 @@ function bt.BattleLog:push_back(str)
     label:set_alignment(rt.Alignment.START)
     self:_format_label(label)
     self._label_height = self._label_height + select(2, label:measure())
-
     label:set_n_visible_characters(0)
-    self._active_labels[label] = true
+
+    if self._n_active_labels < rt.settings.battle.log.n_active_lines then
+        self._active_labels[label] = true
+        self._n_active_labels = self._n_active_labels + 1
+    else
+        table.insert(self._waiting_labels, label)
+    end
 end
