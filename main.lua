@@ -8,13 +8,22 @@ rt.current_scene = scene
 
 local small_ufo = bt.BattleEntity(scene, "SMALL_UFO")
 local boulder = bt.BattleEntity(scene, "BALL_WITH_FACE")
-local sprout = bt.BattleEntity(scene, "WALKING_SPROUT")
+local sprout_01 = bt.BattleEntity(scene, "WALKING_SPROUT")
+local sprout_02 = bt.BattleEntity(scene, "WALKING_SPROUT")
+
+scene._entities = {
+    small_ufo,
+    boulder,
+    sprout_01,
+    sprout_02
+}
+scene:_update_id_offsets()
 
 scene._enemy_sprites = {
     bt.EnemySprite(scene, boulder),
-    bt.EnemySprite(scene, sprout),
+    bt.EnemySprite(scene, sprout_01),
     bt.EnemySprite(scene, small_ufo),
-    bt.EnemySprite(scene, sprout),
+    bt.EnemySprite(scene, sprout_02),
     --[[
     bt.EnemySprite(scene, sprout),
     bt.EnemySprite(scene, sprout),

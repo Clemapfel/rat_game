@@ -13,6 +13,7 @@ bt.EnemySpriteAlignmentMode = meta.new_enum({
 bt.BattleScene = meta.new_type("BattleScene", rt.Widget, function()
     local out = meta.new(bt.BattleScene, {
         _debug_draw_enabled = false,
+        _entities = {}, -- Table<bt.Entity>
 
         _enemy_sprites = {},              -- Table<bt.EnemySprite>
         _enemy_sprite_render_order = {},  -- Queue<Number>
@@ -149,7 +150,7 @@ function bt.BattleScene:_reformat_enemy_sprites()
 
         -- y-alignment of sprite based on sprite height
         function h_to_y(h)
-            return target_y - h-- + 0.25 * max_h
+            return target_y - h -- + 0.25 * max_h
         end
 
         local center_x = 0.5 * rt.graphics.get_width()
@@ -184,4 +185,24 @@ function bt.BattleScene:_reformat_enemy_sprites()
         local right_w = select(1, self._enemy_sprites[b]:measure())
         return left_w > right_w
     end)
+end
+
+--- @brief [internal]
+function bt.BattleScene:_update_id_offsets()
+    local boxes = {}
+    for _, entity in pairs(self._entities) do
+        local type = entity._config_id
+        if boxes[type] == nil then boxes[type] = {} end
+        table.insert(boxes[type], entity)
+    end
+
+    for _, box in pairs(boxes) do
+        if #box > 1 then
+            for i, entity in ipairs(box) do
+                entity:set_id_offset(i)
+            end
+        else
+            box[1]:set_id_offset(0)
+        end
+    end
 end

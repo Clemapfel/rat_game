@@ -11,10 +11,11 @@ bt.BattleEntity = meta.new_type("BattleEntity", function(scene, id)
         name = "UNINITIALIZED ENTITY @" .. path,
         scene = scene,
         _path = path,
+        _config_id = id,
         _is_realized = false
     })
     out:realize()
-    --meta.set_is_mutable(out, false)
+    meta.set_is_mutable(out, false)
     return out
 end, {
     is_enemy = true,
@@ -76,7 +77,9 @@ end
 
 --- @brief
 function bt.BattleEntity:set_id_offset(n)
+    meta.set_is_mutable(self, true)
     self.id_offset = n
+    meta.set_is_mutable(self, false)
 end
 
 --- @brief
@@ -108,5 +111,19 @@ end
 
 --- @brief
 function bt.BattleEntity:get_name()
-    return self.name
+
+    function entity_id_offset_to_suffix(index)
+        if index == 0 then
+            return ""
+        else
+            return " " .. utf8.char(index + 0x03B1 - 1) -- lowercase greek letters
+        end
+    end
+
+    local index = self.id_offset
+    if index == 0 then
+        return self.name
+    else
+        return self.name .. entity_id_offset_to_suffix(index)
+    end
 end

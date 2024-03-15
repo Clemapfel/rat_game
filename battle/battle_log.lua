@@ -1,8 +1,9 @@
 rt.settings.battle.log = {
-    scroll_speed = 10, -- letters per second
-    hold_duration = 0, -- seconds
-    fade_duration = 1, -- seconds
-    n_scrolling_labels = 1,
+    scroll_speed = 25, -- letters per second
+    hold_duration = 3, -- seconds
+    fade_duration = 0, -- seconds
+    n_scrolling_labels = 4,
+    box_expansion_speed = 10, -- px per second
     font = rt.Font(30, "assets/fonts/DejaVuSans/DejaVuSans-Regular.ttf")
 }
 
@@ -16,8 +17,16 @@ bt.BattleLog = meta.new_type("BattleLog", rt.Widget, rt.Animation, function()
         _scrolling_labels = {},     -- Table<rt.Label, true>
         _holding_labels = {},       -- Table<rt.Label, elapsed>
         _fading_labels = {},        -- Table<rt.Label, elapsed>
-        _elapsed = 0,
+
+        _bounds = rt.AABB(0, 0, 1, 1),
+        _current_y = 0,
+        _target_y = 0,      -- intended y coordinate for bottom
+
+        _label_scroll_elapsed = 0,
+        _box_expand_elapsed = 0,
+        
         _label_height = 0,
+        _should_reformat = true,    -- should labels be realigned next update cycle
         _backdrop = rt.Spacer()
     })
 end)
@@ -41,9 +50,12 @@ function bt.BattleLog:size_allocate(x, y, width, height)
 
     self._label_height = 0
     for i, label in pairs(self._labels) do
-        self:_format_label(label)
+        self:_format_label(label, self._label_height)
         self._label_height = self._label_height + select(2, label:get_size())
     end
+
+    self._bounds = rt.AABB(x, y, width, height)
+    self._should_reformat = true
 end
 
 --- @override
@@ -65,23 +77,20 @@ end
 
 --- @override
 function bt.BattleLog:update(delta)
-    self._elapsed = self._elapsed + delta
+    self._label_scroll_elapsed = self._label_scroll_elapsed + delta
+    self._box_expand_elapsed = self._box_expand_elapsed + delta
+
     local step = 1 / rt.settings.battle.log.scroll_speed
+    local n_letters = math.floor(self._label_scroll_elapsed / step)
+    self._label_scroll_elapsed = self._label_scroll_elapsed % step
 
-    local n_letters = 0
-    while self._elapsed >= step do
-        self._elapsed = self._elapsed - step
-        n_letters = n_letters + 1
-    end
-
-    -- if label is fully scrolled, move to hold
-    -- if label spend hold duration in hold, remove from drawing
-    -- when remove, move all later labels up
-
-    -- move from queue to active
-    while #self._scrolling_labels < rt.settings.battle.log.n_scrolling_labels and not (#self._waiting_labels == 0) do
+    -- move from queue to active if not enough messages are on screen
+    local n = sizeof(self._scrolling_labels) + sizeof(self._holding_labels) + sizeof(self._fading_labels) - rt.settings.battle.log.n_scrolling_labels
+    while n < 0 and sizeof(self._fading_labels) == 0 and not (#self._waiting_labels == 0) do
         self._scrolling_labels[self._waiting_labels[1]] = true
         table.remove(self._waiting_labels, 1)
+        self._should_reformat = true
+        n = n + 1
     end
 
     -- scroll active, if scrolling is done, move to holding
@@ -113,7 +122,7 @@ function bt.BattleLog:update(delta)
         self._holding_labels[label] = nil
     end
 
-    -- keep holding labels on screen, then move to fade out
+    -- after fade is done, hide label
     local remove_from_fading = {}
     local fade_duration = rt.settings.battle.log.fade_duration
     for label, elapsed in pairs(self._fading_labels) do
@@ -124,30 +133,67 @@ function bt.BattleLog:update(delta)
         end
     end
 
-    local should_reformat = false
     for _, label in pairs(remove_from_fading) do
-        should_reformat = true
+        self._should_reformat = true
         self._fading_labels[label] = nil
     end
 
-    -- scroll all visible labels if one dissapeared
-    if should_reformat then
+    -- scroll all visible labels. if one dissapeared, resize box
+    if self._should_reformat then
+        local h = 0
+        for _, label in pairs(self._labels) do
+            self:_format_label(label, h)
+            if self._scrolling_labels[label] ~= nil or self._holding_labels[label] ~= nil or self._fading_labels[label] ~= nil then
+                h = h + select(2, label:measure())
+            end
+        end
+
         self._label_height = 0
         for _, label in pairs(self._labels) do
             if self._scrolling_labels[label] ~= nil or self._holding_labels[label] ~= nil or self._fading_labels[label] ~= nil then
-                self:_format_label(label)
                 self._label_height = self._label_height + select(2, label:measure())
             end
+        end
+
+        self._target_y = self._label_height
+        self._should_reformat = false
+        self._should_reformat = false
+    end
+
+    local step = 1 / rt.settings.battle.log.box_expansion_speed
+    local n_steps = math.floor(self._box_expand_elapsed / step)
+    self._box_expand_elapsed = self._box_expand_elapsed % step
+    local diff = clamp(n_steps * rt.settings.battle.log.box_expansion_speed, 0, math.abs(self._target_y - self._current_y))
+    local reformat = false
+    if self._current_y < self._target_y then
+        self._current_y = self._target_y -- jump to full when expanding
+        reformat = true
+    elseif self._current_y > self._target_y then
+        self._current_y = self._current_y - diff
+        reformat = true
+    end
+
+    if reformat then
+        local margin = 3 * rt.settings.margin_unit
+        if self._current_y  == 0 then
+            self._backdrop:set_is_visible(false)
+        else
+            self._backdrop:set_is_visible(true)
+            self._backdrop:fit_into(
+                self._bounds.x, self._bounds.y,
+                self._bounds.width,
+                self._current_y - self._bounds.y + ternary(self._target_y > margin, margin, 0)
+            )
         end
     end
 end
 
 --- @brief [internal]
-function bt.BattleLog:_format_label(label)
+function bt.BattleLog:_format_label(label, h)
     local m = rt.settings.margin_unit
     label:fit_into(
         self._bounds.x + m,
-        self._bounds.y + self._label_height + m,
+        self._bounds.y + h + m,
         self._bounds.width,
         1
     )
@@ -159,7 +205,7 @@ function bt.BattleLog:push_back(str)
     table.insert(self._labels, label)
     label:realize()
     label:set_alignment(rt.Alignment.START)
-    self:_format_label(label)
+    self:_format_label(label, self._label_height)
     self._label_height = self._label_height + select(2, label:measure())
     label:set_n_visible_characters(0)
     table.insert(self._waiting_labels, label)
