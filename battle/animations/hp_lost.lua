@@ -73,6 +73,9 @@ function bt.Animation.HP_LOST:start()
     snapshot:snapshot(target)
     target:set_is_visible(false)
     snapshot:set_invert(true)
+
+    local sc = self._scene;
+    sc:send_message(sc:format_name(self._target:get_entity()) .. " lost " .. sc:format_damage(self._value))
 end
 
 --- @override

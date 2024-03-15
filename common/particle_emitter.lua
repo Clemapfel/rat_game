@@ -15,7 +15,8 @@ rt.ParticleEmitter = meta.new_type("ParticleEmitter", rt.Widget, rt.Animation, f
         _bounds = rt.AABB(0, 0, 1, 1),
         _direction = rt.Direction.UP,
         _speed = rt.settings.particle_emitter.default_speed,
-        _color = rt.RGBA(1, 1, 1, 1)
+        _color = rt.RGBA(1, 1, 1, 1),
+        _opacity = 1
     })
 
     out:_snapshot_particle()
@@ -27,16 +28,7 @@ rt.ParticleEmitter = meta.new_type("ParticleEmitter", rt.Widget, rt.Animation, f
     out._native:setSpread(rt.degrees_to_radians(0))
     out._native:setDirection(rt.degrees_to_radians(-90))
 
-    local r, g, b, a = out._color.r, out._color.g, out._color.b, out._color.a
-    out._native:setColors(
-        r, g, b, 0, -- 1 : 5 : 1, ratio determines how long the particle will stay at given opacity
-        r, g, b, a,
-        r, g, b, a,
-        r, g, b, a,
-        r, g, b, a,
-        r, g, b, a,
-        r, g, b, 0
-    )
+    out:_update_colors()
     out._native:setSizes(1, 1)
     out._native:setInsertMode("bottom")
     out:set_direction(out._direction)
@@ -141,14 +133,25 @@ end
 function rt.ParticleEmitter:set_color(color)
     if meta.is_hsva(color) then color = rt.hvsa_to_rgba(color) end
     self._color = color
+    self._update_colors()
+end
+
+--- @brief [internal]
+function rt.ParticleEmitter:_update_colors()
     local r, g, b, a = self._color.r, self._color.g, self._color.b, self._color.a
     self._native:setColors(
         r, g, b, 0, -- 1 : 5 : 1, ratio determines how long the particle will stay at given opacity
-        r, g, b, a,
-        r, g, b, a,
-        r, g, b, a,
-        r, g, b, a,
-        r, g, b, a,
+        r, g, b, a * self._opacity,
+        r, g, b, a * self._opacity,
+        r, g, b, a * self._opacity,
+        r, g, b, a * self._opacity,
+        r, g, b, a * self._opacity,
         r, g, b, 0
     )
+end
+
+--- @override
+function rt.ParticleEmitter:set_opacity(alpha)
+    self._opacity = alpha
+    self:_update_colors()
 end

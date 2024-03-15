@@ -105,6 +105,9 @@ function rt.Frame:size_allocate(x, y, width, height)
         self._frame_outline:resize(pos_x + 0.5 * w, pos_y + 0.5 * h, x_radius, y_radius)
         self._stencil_mask:resize(pos_x + 0.5 * w, pos_y + 0.5 * h, x_radius, y_radius)
     end
+
+    self._frame:set_opacity(self._opacity)
+    self._frame_outline:set_opacity(self._opacity)
 end
 
 --- @overload rt.Widget.realize
@@ -210,6 +213,7 @@ end
 --- @override
 function rt.Frame:set_opacity(alpha)
     self._opacity = alpha
+    if meta.is_widget(self._child) then self._child:set_opacity(self._opacity) end
     self._frame:set_opacity(self._opacity)
     self._frame_outline:set_opacity(self._opacity)
 end

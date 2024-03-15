@@ -53,6 +53,12 @@ function rt.Spacer:size_allocate(x, y, width, height)
     self._outline_right:resize(top_right_x, top_right_y, bottom_right_x, bottom_right_y)
     self._outline_bottom:resize(bottom_left_x, bottom_left_y, bottom_right_x, bottom_right_y)
     self._outline_left:resize(bottom_left_x, bottom_left_y, top_left_x, top_left_y)
+
+    self._shape:set_opacity(self._opacity)
+    self._outline_top:set_opacity(self._opacity)
+    self._outline_right:set_opacity(self._opacity)
+    self._outline_bottom:set_opacity(self._opacity)
+    self._outline_left:set_opacity(self._opacity)
 end
 
 --- @override

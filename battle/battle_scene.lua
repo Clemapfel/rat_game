@@ -206,3 +206,29 @@ function bt.BattleScene:_update_id_offsets()
         end
     end
 end
+
+--- @brief
+function bt.BattleScene:format_name(entity)
+    local name
+    if meta.isa(entity, bt.BattleEntity) then
+        name = entity:get_name()
+        if entity.is_enemy == true then
+            name = "<color=ENEMY><b><o>" .. name .. "</o></b></color> "
+        end
+    else
+        rt.error("In bt.BattleScene:get_formatted_name: unhandled entity type `" .. meta.typeof(entity) .. "`")
+    end
+    return name
+end
+
+--- @brief
+function bt.BattleScene:format_hp(value)
+    -- same as rt.settings.battle.health_bar.hp_color_100
+    return "<color=LIGHT_GREEN_2><mono><b>" .. tostring(value) .. "</b></mono></color> HP"
+end
+
+--- @brief
+function bt.BattleScene:format_damage(value)
+    -- same as rt.settings.battle.health_bar.hp_color_10
+    return "<color=RED><mono><b>" .. tostring(value) .. "</b></mono></color> HP"
+end

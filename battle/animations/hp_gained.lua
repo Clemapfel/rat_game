@@ -85,7 +85,8 @@ function bt.Animation.HP_GAINED:start()
     self._target_snapshot:snapshot(target)
     target:set_is_visible(false)
 
-
+    local sc = self._scene;
+    sc:send_message(sc:format_name(self._target:get_entity()) .. " gained " .. sc:format_hp(self._value))
 end
 
 --- @override

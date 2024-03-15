@@ -16,6 +16,7 @@ bt.EnemySprite = meta.new_type("EnemySprite", rt.Widget, rt.Animation, function(
 
         _debug_bounds = {}, -- rt.Rectangle
         _debug_sprite = {}, -- rt.Rectangle
+        _ui_visible = false,
 
         _animations = {}, -- Table<Table<bt.Animation>>
     })
@@ -79,8 +80,8 @@ function bt.EnemySprite:size_allocate(x, y, width, height)
 
     local speed_value_w, speed_value_h = self._speed_value:measure()
     self._speed_value:fit_into(
-        hp_bar_bounds.x + 0.5 * hp_bar_bounds.width - speed_value_w,
-        hp_bar_bounds.y + hp_bar_bounds.height
+        sprite_x + sprite_w - speed_value_w * 1.5,
+        sprite_y + sprite_h - speed_value_h
     )
 
     for debug in range(self._debug_bounds, self._debug_sprite) do
@@ -115,6 +116,14 @@ function bt.EnemySprite:draw()
 end
 
 --- @override
+function bt.EnemySprite:snapshot()
+    local before = self._sprite:get_is_visible()
+    self._sprite:set_is_visible(true)
+    self._sprite:draw()
+    self._sprite:set_is_visible(before)
+end
+
+--- @override
 function bt.EnemySprite:set_is_visible(b)
     if self._is_realized then
         self._sprite:set_is_visible(b)
@@ -129,4 +138,9 @@ end
 --- @brief
 function bt.EnemySprite:add_animation(animation)
     table.insert(self._animations, animation)
+end
+
+--- @brief
+function bt.EnemySprite:get_entity()
+    return self._entity
 end

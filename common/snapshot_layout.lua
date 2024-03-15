@@ -35,8 +35,8 @@ function rt.SnapshotLayout:snapshot(to_draw)
         love.graphics.push()
         local x, y = to_draw:get_position()
         rt.graphics.translate(-x, -y)
-        love.graphics.setColor(1, 1, 1, 1)
-        to_draw:draw()
+        love.graphics.setColor(1, 1, 1, self._opacity)
+        if to_draw.snapshot ~= nil then to_draw:snapshot() else to_draw:draw() end
         love.graphics.pop()
     end
     self._canvas:unbind_as_render_target()
@@ -240,4 +240,9 @@ function rt.SnapshotLayout:realize()
     if meta.is_widget(self._child) then
         self:snapshot()
     end
+end
+
+--- @override
+function rt.SnapshotLayout:set_opacity(alpha)
+    self._opacity = alpha
 end

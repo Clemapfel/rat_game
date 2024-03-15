@@ -2,8 +2,9 @@ rt.settings.battle.log = {
     scroll_speed = 25, -- letters per second
     hold_duration = 3, -- seconds
     fade_duration = 0, -- seconds
-    n_scrolling_labels = 2, -- number of labels displayed at the same time
-    box_expansion_speed = 10, -- px per second
+    n_scrolling_labels = 5, -- number of labels displayed at the same time
+    box_expansion_speed = 15, -- px per second
+    frame_thickness = 2,
     hiding_speed = 50, -- px per second
     font = rt.Font(30, "assets/fonts/DejaVuSans/DejaVuSans-Regular.ttf")
 }
@@ -30,7 +31,8 @@ bt.BattleLog = meta.new_type("BattleLog", rt.Widget, rt.Animation, function()
 
         _label_height = 0,
         _should_reformat = true,    -- should labels be realigned next update cycle
-        _backdrop = rt.Spacer()
+        _backdrop = {}, -- rt.Frame
+        _backdrop_backing = {}, -- rt.Spacer
     })
 end)
 
@@ -42,7 +44,16 @@ function bt.BattleLog:realize()
         self._label_height = self._label_height + label:get_height()
     end
     self:set_is_animated(true)
+
+    self._backdrop_backing = rt.Spacer()
+    self._backdrop = rt.Frame()
+    self._backdrop:set_child(self._backdrop_backing)
+    self._backdrop:set_thickness(rt.settings.battle.log.frame_thickness)
+    self._backdrop:set_color(rt.Palette.FOREGROUND)
+
+    self._backdrop_backing:realize()
     self._backdrop:realize()
+    self._backdrop:set_opacity(1)
     self._is_realized = true
 end 
 
@@ -180,7 +191,6 @@ function bt.BattleLog:update(delta)
 
     local margin = 3 * rt.settings.margin_unit
     if reformat then
-        self._backdrop:set_is_visible(true)
         self._backdrop:fit_into(
             self._bounds.x, self._bounds.y,
             self._bounds.width,
@@ -191,23 +201,24 @@ function bt.BattleLog:update(delta)
     -- if all labels are gone, fade out box in addition to shrinking
     local n_total_now = sizeof(self._scrolling_labels) + sizeof(self._holding_labels) + sizeof(self._fading_labels)
     if n_total_now == 0 then
-        self._box_box_fadeout_elapsed = self._box_box_fadeout_elapsed + delta
+        self._box_fadeout_elapsed = self._box_fadeout_elapsed + delta
         local fraction = (self._current_y) / (margin) - 0.4
         local v = clamp(fraction, 0, 1)
         self._backdrop:set_opacity(v)
-    elseif self._box_box_fadeout_elapsed ~= 0 then
-        self._box_box_fadeout_elapsed = 0
+    elseif self._box_fadeout_elapsed ~= 0 then
+        self._box_fadeout_elapsed = 0
         self._backdrop:set_opacity(1)
     end
 end
 
 --- @brief [internal]
 function bt.BattleLog:_format_label(label, h)
-    local m = rt.settings.margin_unit
+    local ym = rt.settings.margin_unit
+    local xm = rt.settings.margin_unit * 2
     label:fit_into(
-        self._bounds.x + m,
-        self._bounds.y + h + m,
-        self._bounds.width,
+        self._bounds.x + xm,
+        self._bounds.y + h + ym,
+        self._bounds.width - 2 * xm,
         1
     )
 end

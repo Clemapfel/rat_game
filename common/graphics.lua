@@ -56,34 +56,26 @@ function rt.graphics.set_blend_mode(blend_mode)
     end
 end
 
---- @brief no args to reset whole buffer to 0
+--- @brief write a stencil value to an area on screen occupied by drawables
+--- @param new_value Number new stencil value
 --- @vararg rt.Drawable
 function rt.graphics.stencil(new_value, ...)
-    local n_drawables = _G._select("#", ...)
+    local drawables = {...}
     if love.getVersion() >= 12 then
-        if n_drawables > 0 then
-            love.graphics.setStencilState("replace", "always", which(new_value, 255))
-            for to_draw in range(...) do
+        local mask_r, mask_g, mask_b, mask_a = love.graphics.getColorMask()
+        love.graphics.setStencilState("replace", "always", new_value, 255)
+        love.graphics.setColorMask(false, false, false, false)
+        for _, to_draw in pairs(drawables) do
+            to_draw:draw()
+        end
+        love.graphics.setColorMask(mask_r, mask_g, mask_b, mask_a)
+        love.graphics.setStencilState()
+    else
+        love.graphics.stencil(function()
+            for _, to_draw in pairs(drawables) do
                 to_draw:draw()
             end
-            love.graphics.setStencilMode()
-        else
-            love.graphics.setStencilMode("draw", new_value)
-            love.graphics.rectangle("fill", 0, 0, love.graphics.getWidth(), love.graphics.getHeight())
-            love.graphics.setStencilMode()
-        end
-    else
-        if n_drawables > 0 then
-            local drawables = {...}
-            love.graphics.stencil(function()
-                for _, to_draw in pairs(drawables) do
-                    to_draw:draw()
-                end
-            end, "replace", new_value, true)
-        else
-            -- reset whole screen
-            love.graphics.stencil(function() end, "replace", new_value, false)
-        end
+        end, "replace", new_value, true)
     end
 end
 
@@ -100,11 +92,7 @@ rt.StencilCompareMode = meta.new_enum({
 --- @brief
 function rt.graphics.set_stencil_test(mode, value)
     if love.getVersion() >= 12 then
-        if mode == nil then
-            love.graphics.setStencilMode()
-        else
-            love.graphics.setStencilState("keep", which(mode, "always"), which(value, 0))
-        end
+        love.graphics.setStencilState("keep", which(mode, "always"), which(value, 0))
     else
         love.graphics.setStencilTest(which(mode, "always"), which(value, 0))
     end

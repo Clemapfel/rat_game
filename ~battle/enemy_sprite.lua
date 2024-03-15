@@ -5,6 +5,7 @@ bt.EnemySprite = meta.new_type("EnemySprite", rt.Widget, rt.Animation, function(
         _sprite = rt.ImageDisplay("assets/favicon.png"),
         _shader = rt.Shader("assets/shaders/enemy_sprite.glsl"),
         _elapsed = 0
+
     })
 
     out._shader:send("_pulse_active", true) -- todo
