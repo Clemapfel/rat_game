@@ -76,7 +76,10 @@ function rt.Frame:size_allocate(x, y, width, height)
         return
     end
 
-    self._child:fit_into(rt.AABB(x, y, width, height))
+    if meta.is_widget(self._child) then
+        self._child:fit_into(rt.AABB(x, y, width, height))
+        self._child:set_opacity(self._opacity)
+    end
 
     local pos_x, pos_y = self._child:get_position()
     local w, h = self._child:get_size()
@@ -202,4 +205,11 @@ function rt.Frame:measure()
     else
         return rt.Widget.measure(self)
     end
+end
+
+--- @override
+function rt.Frame:set_opacity(alpha)
+    self._opacity = alpha
+    self._frame:set_opacity(self._opacity)
+    self._frame_outline:set_opacity(self._opacity)
 end

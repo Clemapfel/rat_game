@@ -34,6 +34,7 @@ function rt.OverlayLayout:size_allocate(x, y, width, height)
 
     for _, child in pairs(self._overlays) do
         child:fit_into(rt.AABB(x, y, width, height))
+        child:set_opacity(self._opacity)
     end
 end
 
@@ -101,6 +102,19 @@ function rt.OverlayLayout:pop_overlay()
     local child = self._overlays:pop_back()
     child:set_parent(nil)
     return child
+end
+
+--- @brief
+function rt.OverlayLayout:set_opacity(alpha)
+    self._opacity = alpha
+
+    if meta.is_widget(self._base_child) then
+        self._base_child:set_opacity(self._opacity)
+    end
+
+    for _, child in pairs(self._overlays) do
+        child:set_opacity(self._opacity)
+    end
 end
 
 --- @brief test OverlayLayout

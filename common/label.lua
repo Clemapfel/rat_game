@@ -646,19 +646,6 @@ end
 --- @brief
 function rt.Label:get_n_visible_characters()
     return self._n_visible_characters
-    --[[
-    local n = 0
-    local n_glyphs = sizeof(self._glyphs)
-    local glyph_i = 1
-
-    while glyph_i <= n_glyphs do
-        local glyph = self._glyphs[glyph_i]
-        n = n + glyph:get_n_characters()
-        glyph_i = glyph_i + 1
-    end
-
-    return n
-    ]]--
 end
 
 --- @brief set whether the glyphs of the label are animated

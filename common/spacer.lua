@@ -55,6 +55,16 @@ function rt.Spacer:size_allocate(x, y, width, height)
     self._outline_left:resize(bottom_left_x, bottom_left_y, top_left_x, top_left_y)
 end
 
+--- @override
+function rt.Spacer:set_opacity(alpha)
+    self._opacity = alpha
+    self._shape:set_opacity(alpha)
+    self._outline_left:set_opacity(alpha)
+    self._outline_top:set_opacity(alpha)
+    self._outline_right:set_opacity(alpha)
+    self._outline_bottom:set_opacity(alpha)
+end
+
 --- @brief set color
 --- @param color rt.RGBA
 function rt.Spacer:set_color(color, outline_color)

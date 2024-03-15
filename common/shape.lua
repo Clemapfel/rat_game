@@ -11,12 +11,13 @@ rt.Shape = meta.new_abstract_type("Shape", rt.Drawable, {
     _is_outline = false,
     _use_anti_aliasing = true,
     _line_width = 1,
+    _opacity = 1
 })
 
 --- @brief [internal]
 function rt.Shape:_bind_properties(callback, data)
     love.graphics.push()
-    love.graphics.setColor(self._color.r, self._color.g, self._color.b, self._color.a)
+    love.graphics.setColor(self._color.r, self._color.g, self._color.b, self._color.a * self._opacity)
     love.graphics.setLineWidth(self._line_width)
     love.graphics.setPointSize(self._line_width)
 end
@@ -51,6 +52,16 @@ end
 --- @brief
 function rt.Shape:get_is_outline()
     return self._is_outline
+end
+
+--- @brief
+function rt.Shape:set_opacity(alpha)
+    self._opacity = alpha
+end
+
+--- @brief
+function rt.Shape:get_opacity()
+    return self._opacity
 end
 
 --- @brief virutal

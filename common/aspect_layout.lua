@@ -11,7 +11,6 @@ rt.AspectLayout = meta.new_type("AspectLayout", rt.Widget, function(ratio, child
     })
 
     if not meta.is_nil(child) then
-
         out:set_child(child)
     end
     return out
@@ -20,9 +19,6 @@ end)
 --- @brief set singular child
 --- @param child rt.Widget
 function rt.AspectLayout:set_child(child)
-
-
-
     if meta.is_widget(self._child) then
         self._child:set_parent(nil)
     end

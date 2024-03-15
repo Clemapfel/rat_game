@@ -37,7 +37,8 @@ rt.Widget = meta.new_abstract_type("Widget", rt.Drawable, {
     _selected = false,
     _is_hidden = false,
     _final_pos_x = 0,
-    _final_pos_y = 0
+    _final_pos_y = 0,
+    _opacity = 0
 })
 
 --- @brief abstract method, emitted when widgets bounds should change
@@ -612,6 +613,15 @@ function rt.Widget:draw_bounds()
     love.graphics.setColor(0, 1, 0, 1)
     love.graphics.setPointSize(4)
     love.graphics.points(x + w / 2, y + h / 2)
+end
+
+--- @override
+function rt.Widget:set_opacity()
+    rt.error("In " .. meta.typeof(self) .. ":set_opacity: abstract method called")
+end
+
+function rt.Widget:get_opacity()
+    return self._opacity
 end
 
 --- @brief [internal] test widget

@@ -356,6 +356,11 @@ function rt.Glyph:set_opacity(alpha)
     self._opacity = alpha
 end
 
+--- @brief
+function rt.Glyph:get_opacity()
+    return self._opacity
+end
+
 --- @brief [internal] test glyph
 function rt.test.glyph()
     error("TODO")
