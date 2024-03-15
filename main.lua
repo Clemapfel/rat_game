@@ -22,8 +22,8 @@ scene:_update_id_offsets()
 scene._enemy_sprites = {
     bt.EnemySprite(scene, boulder),
     bt.EnemySprite(scene, sprout_01),
-    bt.EnemySprite(scene, small_ufo),
-    bt.EnemySprite(scene, sprout_02),
+    --bt.EnemySprite(scene, small_ufo),
+    --bt.EnemySprite(scene, sprout_02),
     --[[
     bt.EnemySprite(scene, sprout),
     bt.EnemySprite(scene, sprout),
@@ -38,9 +38,11 @@ scene._enemy_sprites = {
 input = rt.InputController()
 input:signal_connect("pressed", function(_, which)
     if which == rt.InputButton.A then
+        --[[
         local i = rt.random.integer(1, #scene._enemy_sprites)
         local sprite = scene._enemy_sprites[i]
         sprite:add_animation(bt.Animation.HP_GAINED(scene, sprite, rt.random.integer(0, 100)))
+        ]]--
     elseif which == rt.InputButton.B then
         local i = rt.random.integer(1, #scene._enemy_sprites)
         local sprite = scene._enemy_sprites[i]

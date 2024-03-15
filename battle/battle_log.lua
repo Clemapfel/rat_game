@@ -2,10 +2,12 @@ rt.settings.battle.log = {
     scroll_speed = 25, -- letters per second
     hold_duration = 3, -- seconds
     fade_duration = 0, -- seconds
-    n_scrolling_labels = 4,
+    n_scrolling_labels = 2, -- number of labels displayed at the same time
     box_expansion_speed = 10, -- px per second
+    hiding_speed = 50, -- px per second
     font = rt.Font(30, "assets/fonts/DejaVuSans/DejaVuSans-Regular.ttf")
 }
+
 
 --- @class bt.BattleLog
 bt.BattleLog = meta.new_type("BattleLog", rt.Widget, rt.Animation, function()  
@@ -24,7 +26,8 @@ bt.BattleLog = meta.new_type("BattleLog", rt.Widget, rt.Animation, function()
 
         _label_scroll_elapsed = 0,
         _box_expand_elapsed = 0,
-        
+        _box_fadeout_elapsed = 0,
+
         _label_height = 0,
         _should_reformat = true,    -- should labels be realigned next update cycle
         _backdrop = rt.Spacer()
@@ -84,8 +87,10 @@ function bt.BattleLog:update(delta)
     local n_letters = math.floor(self._label_scroll_elapsed / step)
     self._label_scroll_elapsed = self._label_scroll_elapsed % step
 
+    local n_total_before =  sizeof(self._scrolling_labels) + sizeof(self._holding_labels) + sizeof(self._fading_labels)
+
     -- move from queue to active if not enough messages are on screen
-    local n = sizeof(self._scrolling_labels) + sizeof(self._holding_labels) + sizeof(self._fading_labels) - rt.settings.battle.log.n_scrolling_labels
+    local n = n_total_before - rt.settings.battle.log.n_scrolling_labels
     while n < 0 and sizeof(self._fading_labels) == 0 and not (#self._waiting_labels == 0) do
         self._scrolling_labels[self._waiting_labels[1]] = true
         table.remove(self._waiting_labels, 1)
@@ -173,18 +178,26 @@ function bt.BattleLog:update(delta)
         reformat = true
     end
 
+    local margin = 3 * rt.settings.margin_unit
     if reformat then
-        local margin = 3 * rt.settings.margin_unit
-        if self._current_y  == 0 then
-            self._backdrop:set_is_visible(false)
-        else
-            self._backdrop:set_is_visible(true)
-            self._backdrop:fit_into(
-                self._bounds.x, self._bounds.y,
-                self._bounds.width,
-                self._current_y - self._bounds.y + ternary(self._target_y > margin, margin, 0)
-            )
-        end
+        self._backdrop:set_is_visible(true)
+        self._backdrop:fit_into(
+            self._bounds.x, self._bounds.y,
+            self._bounds.width,
+            self._current_y - self._bounds.y + ternary(self._target_y > margin, margin, 0)
+        )
+    end
+
+    -- if all labels are gone, fade out box in addition to shrinking
+    local n_total_now = sizeof(self._scrolling_labels) + sizeof(self._holding_labels) + sizeof(self._fading_labels)
+    if n_total_now == 0 then
+        self._box_box_fadeout_elapsed = self._box_box_fadeout_elapsed + delta
+        local fraction = (self._current_y) / (margin) - 0.4
+        local v = clamp(fraction, 0, 1)
+        self._backdrop:set_opacity(v)
+    elseif self._box_box_fadeout_elapsed ~= 0 then
+        self._box_box_fadeout_elapsed = 0
+        self._backdrop:set_opacity(1)
     end
 end
 
