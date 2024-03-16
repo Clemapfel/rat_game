@@ -18,7 +18,8 @@ bt.EnemySprite = meta.new_type("EnemySprite", rt.Widget, rt.Animation, function(
         _debug_sprite = {}, -- rt.Rectangle
         _ui_visible = false,
 
-        _animations = {}, -- Table<Table<bt.Animation>>
+        _animations = {}, -- Fifo<bt.Animation>
+        _continuous_animations = {}, -- Set<bt.Animation>
     })
 end)
 
@@ -58,7 +59,45 @@ function bt.EnemySprite:update(delta)
             elseif result == bt.AnimationResult.CONTINUE then
                 -- noop
             else
-                rt.error("In bt.EnemySprite:update: animation `" .. meta.typeof(current) .. "`s upate function does not return a value")
+                rt.error("In bt.EnemySprite:update: animation `" .. meta.typeof(current) .. "`s update function does not return a value")
+            end
+        end
+    end
+
+    do -- continuous animation all run in paralell
+        local current = self._animations[1]
+        if current ~= nil then
+            if current._is_started ~= true then
+                current._is_started = true
+                current:start()
+            end
+
+            local result = current:update(delta)
+            if result == bt.AnimationResult.DISCONTINUE then
+                current._is_finished = true
+                current:finish()
+                table.remove(self._animations, 1)
+            elseif result == bt.AnimationResult.CONTINUE then
+                -- noop
+            else
+                rt.error("In bt.EnemySprite:update: animation `" .. meta.typeof(current) .. "`s update function does not return a value")
+            end
+        end
+    end
+    do
+        local to_remove = {}
+        for current, _ in pairs(self._continuous_animations) do
+            if current._is_started then
+                local result = current:update(delta)
+                if result == bt.AnimationResult.DISCONTINUE then
+                    current._is_finished = true
+                    current:finish()
+                    self._continuous_animations[current] = nil
+                elseif result == bt.AnimationResult.CONTINUE then
+                    -- noop
+                else
+                    rt.error("In bt.EnemySprite:update: animation `" .. meta.typeof(current) .. "`s update function does not return a value")
+                end
             end
         end
     end
@@ -107,6 +146,12 @@ function bt.EnemySprite:draw()
             self._debug_sprite:draw()
         end
 
+        for animation, _ in pairs(self._continuous_animations) do
+            if animation._is_started == true then
+                animation:draw()
+            end
+        end
+
         for _, animation in pairs(self._animations) do
             if animation._is_started == true then
                 animation:draw()
@@ -138,6 +183,16 @@ end
 --- @brief
 function bt.EnemySprite:add_animation(animation)
     table.insert(self._animations, animation)
+end
+
+--- @brief
+function bt.EnemySprite:add_continuous_animation(animation, start_immediately)
+    self._continuous_animations[animation] = true
+    start_immediately = which(start_immediately, true)
+    if start_immediately == true then
+        animation:start()
+        animation._is_started = true
+    end
 end
 
 --- @brief

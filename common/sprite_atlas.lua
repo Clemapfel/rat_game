@@ -2,7 +2,7 @@ rt.settings.sprite_atlas = {
     default_fps = 12
 }
 
---- @class rt.SpriteShett
+--- @class rt.SpriteAtlasEntry
 rt.SpriteAtlasEntry = meta.new_type("SpriteAtlasEntry", function(path, id)
     return meta.new(rt.SpriteAtlasEntry, {
         id = id,
@@ -22,7 +22,7 @@ end)
 
 --- @brief
 function rt.SpriteAtlasEntry:load()
-    if self._is_realized == true then return end
+    if self.is_realized == true then return end
 
     -- load image data
     local image_path = self.path .. "/" .. self.id .. ".png"
@@ -176,18 +176,16 @@ end
 rt.SpriteAtlas = meta.new_type("SpriteAtlas", function()
     return meta.new(rt.SpriteAtlas, {
         _folder = "",
-        _data = {}  -- Table<String, rt.SpriteAtlasEntry>
+        _data = {}  -- Table<ID, rt.SpriteAtlasEntry>
     })
 end)
 
---- @class
+--- @brief
 function rt.SpriteAtlas:initialize(folder)
     self._folder = folder
     self._data = {}
 
-    local sprites = {}
     local seen = {}
-
     local function parse(prefix)
         local names = love.filesystem.getDirectoryItems(prefix)
         for _, name in pairs(names) do

@@ -39,3 +39,8 @@ function rt.filesystem.get_extension(path)
     local name, extension = rt.filesystem.get_name_and_extension(path)
     return extension
 end
+
+--- @brief
+function rt.filesystem.exists(path)
+    return love.filesystem.getInfo(path) ~= nil
+end

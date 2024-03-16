@@ -9,7 +9,6 @@ rt.settings.battle.log = {
     font = rt.Font(30, "assets/fonts/DejaVuSans/DejaVuSans-Regular.ttf")
 }
 
-
 --- @class bt.BattleLog
 bt.BattleLog = meta.new_type("BattleLog", rt.Widget, rt.Animation, function()  
     return meta.new(bt.BattleLog, {
