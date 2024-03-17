@@ -56,35 +56,38 @@ function bt.PriorityQueueElement:size_allocate(x, y, width, height)
         self._shape:set_vertex_position(3, x + width, y + height)
         self._shape:set_vertex_position(4, x, y + height)
 
-        -- align texture
-        local frame_w, frame_h = self._spritesheet:get_frame_size()
-        local res = 25
-        local res_w, res_h = (1 - res / frame_w) / 2, (1 - res / frame_h) / 2
-        if frame_w > frame_h then
-            local offset = (1 - (frame_h / frame_w)) / 2
-            self._shape:set_vertex_texture_coordinate(1, offset, 0)
-            self._shape:set_vertex_texture_coordinate(2, 1 - offset, 0)
-            self._shape:set_vertex_texture_coordinate(3, 1 - offset, 1)
-            self._shape:set_vertex_texture_coordinate(4, offset, 1)
-        elseif frame_h > frame_w then
-            local offset = (1 - (frame_w / frame_h)) / 2
-            self._shape:set_vertex_texture_coordinate(1, 0, offset)
-            self._shape:set_vertex_texture_coordinate(2, 1, offset)
-            self._shape:set_vertex_texture_coordinate(3, 1, 1 - offset)
-            self._shape:set_vertex_texture_coordinate(4, 0, 1 - offset)
-        else
-            self._shape:set_vertex_texture_coordinate(1, 0, 0)
-            self._shape:set_vertex_texture_coordinate(2, 1, 0)
-            self._shape:set_vertex_texture_coordinate(3, 1, 1)
-            self._shape:set_vertex_texture_coordinate(4, 0, 1)
-        end
 
+
+        -- align texture
+        -- choose smaller of each site, then align square in the middle of frame position
+        local frame = self._spritesheet:get_frame(1)
+        local frame_x, frame_y, frame_w, frame_h = frame.x, frame.y, frame.width, frame.height
+        local frame_res_w, frame_res_h = self._spritesheet:get_frame_size()
+
+        if frame_res_w > frame_res_h then
+            local x_offset = ((1 - frame_res_h / frame_res_w) * frame_w) / 2
+            self._shape:set_vertex_texture_coordinate(1, frame_x + x_offset, frame_y)
+            self._shape:set_vertex_texture_coordinate(2, frame_x + frame_w - x_offset, frame_y)
+            self._shape:set_vertex_texture_coordinate(3, frame_x + frame_w - x_offset, frame_y + frame_h)
+            self._shape:set_vertex_texture_coordinate(4, frame_x + x_offset, frame_y + frame_h)
+        elseif frame_res_h > frame_res_w then
+            local y_offset = ((1 - frame_res_w / frame_res_h) * frame_h) / 2
+            self._shape:set_vertex_texture_coordinate(1, frame_x, frame_y + y_offset)
+            self._shape:set_vertex_texture_coordinate(2, frame_x + frame_w, frame_y + y_offset)
+            self._shape:set_vertex_texture_coordinate(3, frame_x + frame_w, frame_y + frame_h - y_offset)
+            self._shape:set_vertex_texture_coordinate(4, frame_x, frame_y + frame_h - y_offset)
+        else
+            self._shape:set_vertex_texture_coordinate(1, frame_x, frame_y)
+            self._shape:set_vertex_texture_coordinate(2, frame_x + frame_w, frame_y)
+            self._shape:set_vertex_texture_coordinate(3, frame_x + frame_w, frame_y + frame_h)
+            self._shape:set_vertex_texture_coordinate(4, frame_x, frame_y + frame_h)
+        end
         -- align label
         local label_w, label_h = self._id_offset_label:get_size()
         local label_offset = 0.75
         self._id_offset_label:set_position(
-            x + width - label_offset * label_w,
-            y + height - label_offset * label_h
+                x + width - label_offset * label_w,
+                y + height - label_offset * label_h
         )
     end
 end
