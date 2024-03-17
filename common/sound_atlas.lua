@@ -50,11 +50,10 @@ function rt.SoundAtlas:initialize(folder)
             elseif info.type == "file" then
                 local name, extension = rt.filesystem.get_name_and_extension(filename)
                 if seen[name] ~= true then
-                    if extension == "mp3" or extension == "wav" or extension == "ogg" then
+                    if extension == "mp3" or extension == "wav" or extension == "ogg" or extension == "flac" then
                         local id = prefix .. "/" .. name
                         if self._data[id] == nil then
                             self._data[id] = rt.SoundAtlasEntry(prefix, name, extension)
-                            println(id)
                             seen[name] = true
                         end
                     end

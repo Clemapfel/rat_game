@@ -6,8 +6,6 @@ rt.SpriteAtlas:initialize("assets/sprites")
 rt.SoundAtlas = rt.SoundAtlas()
 rt.SoundAtlas:initialize("assets/sound_effects")
 
-rt.SoundAtlas:play("watershallow")
-
 local scene = bt.BattleScene()
 rt.current_scene = scene
 
@@ -15,30 +13,29 @@ local small_ufo = bt.BattleEntity(scene, "SMALL_UFO")
 local boulder = bt.BattleEntity(scene, "BALL_WITH_FACE")
 local sprout_01 = bt.BattleEntity(scene, "WALKING_SPROUT")
 local sprout_02 = bt.BattleEntity(scene, "WALKING_SPROUT")
+local mole = bt.BattleEntity(scene, "GAMBLER_MOLE")
 
 scene._entities = {
     small_ufo,
     boulder,
     sprout_01,
-    sprout_02
+    sprout_02,
+    mole
 }
 scene:_update_id_offsets()
 
 scene._enemy_sprites = {
     bt.EnemySprite(scene, boulder),
     bt.EnemySprite(scene, sprout_01),
-    --bt.EnemySprite(scene, small_ufo),
-    --bt.EnemySprite(scene, sprout_02),
-    --[[
-    bt.EnemySprite(scene, sprout),
-    bt.EnemySprite(scene, sprout),
-    bt.EnemySprite(scene, sprout),
-    bt.EnemySprite(scene, sprout),
-    bt.EnemySprite(scene, sprout),
-    bt.EnemySprite(scene, sprout),
-    bt.EnemySprite(scene, sprout)
-    ]]--
+    bt.EnemySprite(scene, small_ufo),
+    bt.EnemySprite(scene, sprout_02),
+    bt.EnemySprite(scene, mole)
 }
+
+local prio_sprout_02 = bt.PriorityQueueElement(scene, mole)
+prio_sprout_02:realize()
+prio_sprout_02:size_allocate(50, 50, 100, 200)
+
 
 input = rt.InputController()
 input:signal_connect("pressed", function(_, which)
@@ -87,6 +84,8 @@ love.draw = function()
         love.graphics.setColor(1, 1, 1, 0.75)
         love.graphics.print(fps, rt.graphics.get_width() - love.graphics.getFont():getWidth(fps) - 2 * margin, 0.5 * margin)
     end
+
+    prio_sprout_02:draw()
 end
 
 love.update = function()

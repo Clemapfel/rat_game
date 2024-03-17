@@ -180,6 +180,7 @@ for _, name in pairs(love.filesystem.getDirectoryItems("battle/animations")) do
 end
 
 require "battle.battle_log"
+require "battle.priority_queue"
 require "battle.battle_scene"
 
 --[[

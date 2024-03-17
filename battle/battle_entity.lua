@@ -110,20 +110,20 @@ function bt.BattleEntity:get_speed_base()
 end
 
 --- @brief
-function bt.BattleEntity:get_name()
-
-    function entity_id_offset_to_suffix(index)
-        if index == 0 then
-            return ""
-        else
-            return " " .. utf8.char(index + 0x03B1 - 1) -- lowercase greek letters
-        end
-    end
-
-    local index = self.id_offset
-    if index == 0 then
-        return self.name
+function bt.BattleEntity:get_id_offset_suffix()
+    if self.id_offset == 0 then
+        return ""
     else
-        return self.name .. entity_id_offset_to_suffix(index)
+        return " " .. utf8.char(self.id_offset + 0x03B1 - 1) -- lowercase greek letters
     end
+end
+
+--- @brief
+function bt.BattleEntity:get_name()
+    return self.name .. self:get_id_offset_suffix()
+end
+
+--- @brief
+function bt.BattleEntity:get_sprite_id()
+    return self.sprite_id
 end

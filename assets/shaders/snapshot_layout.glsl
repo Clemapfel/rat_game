@@ -26,6 +26,14 @@ uniform float _s_offset;
 uniform float _v_offset;
 uniform float _a_offset;
 
+uniform float _r_factor;
+uniform float _g_factor;
+uniform float _b_factor;
+uniform float _h_factor;
+uniform float _s_factor;
+uniform float _v_factor;
+uniform float _a_factor;
+
 uniform vec4 _mix_color;
 uniform float _mix_weight;
 
@@ -51,12 +59,14 @@ vec4 effect(vec4 _, Image texture, vec2 texture_coordinates, vec2 vertex_positio
         color.rgb = vec3(1) - color.rgb;
 
     vec3 as_rgb = color.rgb;
+    as_rgb *= vec3(_r_factor, _g_factor, _b_factor);
     as_rgb.r += _r_offset;
     as_rgb.g += _g_offset;
     as_rgb.b += _b_offset;
     as_rgb = clamp(as_rgb, vec3(0), vec3(1));
 
     vec3 as_hsv = rgb_to_hsv(as_rgb);
+    as_hsv *= vec3(_h_factor, _s_factor, _v_factor);
     as_hsv.x += _h_offset;
     as_hsv.y += _s_offset;
     as_hsv.z += _v_offset;
@@ -64,7 +74,7 @@ vec4 effect(vec4 _, Image texture, vec2 texture_coordinates, vec2 vertex_positio
     as_hsv = clamp(as_hsv, vec3(0), vec3(1));
 
     as_rgb = hsv_to_rgb(as_hsv);
-    float alpha = clamp(color.a + _a_offset, 0, 1);
+    float alpha = clamp((color.a * _a_factor) + _a_offset, 0, 1);
 
     if (color.a < 1 / 256.f)
         return vec4(0);

@@ -7,6 +7,7 @@ bt.EnemySprite = meta.new_type("EnemySprite", rt.Widget, rt.Animation, function(
 
         _sprite = rt.Sprite(entity.sprite_id),
         _sprite_is_animated = true,
+        _snapshot = rt.SnapshotLayout(),
 
         _hp_bar = bt.HealthBar(entity),
         _hp_bar_is_visible = true,
@@ -33,6 +34,9 @@ function bt.EnemySprite:realize()
     self._sprite:realize()
     self._hp_bar:realize()
     self._speed_value:realize()
+
+    self._snapshot = rt.SnapshotLayout()
+    self._snapshot:realize()
 
     self:reformat()
 end
@@ -101,11 +105,15 @@ function bt.EnemySprite:update(delta)
             end
         end
     end
+
+    -- snapshot, can be modified by animations
+    self._snapshot:snapshot(self._sprite)
 end
 
 --- @override
 function bt.EnemySprite:size_allocate(x, y, width, height)
     self._sprite:fit_into(x, y, width, height)
+    self._snapshot:fit_into(x, y, width, height)
 
     self._debug_bounds = rt.Rectangle(x, y, width, height)
     local sprite_x, sprite_y = self._sprite:get_position()
@@ -136,7 +144,7 @@ end
 --- @override
 function bt.EnemySprite:draw()
     if self._is_realized then
-        self._sprite:draw()
+        self._snapshot:draw()
 
         if self._hp_bar_is_visible then self._hp_bar:draw() end
         if self._speed_value_is_visible then self._speed_value:draw() end
@@ -199,3 +207,9 @@ end
 function bt.EnemySprite:get_entity()
     return self._entity
 end
+
+--- @brief
+function bt.EnemySprite:get_snapshot()
+    return self._snapshot
+end
+

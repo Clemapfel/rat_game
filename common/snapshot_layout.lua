@@ -7,7 +7,10 @@ rt.SnapshotLayout = meta.new_type("SnapshotLayout", rt.Widget, function()
         _shader = rt.Shader(rt.SnapshotLayout._shader_source),
         _rgb_offsets = {0, 0, 0},
         _hsv_offsets = {0, 0, 0},
+        _rgb_factors = {1, 1, 1},
+        _hsv_factors = {1, 1, 1},
         _alpha_offset = 0,
+        _alpha_factor = 1,
         _position_x = 0,
         _position_y = 0,
         _x_offset = 0,
@@ -52,6 +55,15 @@ function rt.SnapshotLayout:draw()
     self._shader:send("_s_offset", self._hsv_offsets[2])
     self._shader:send("_v_offset", self._hsv_offsets[3])
     self._shader:send("_a_offset", self._alpha_offset)
+
+    self._shader:send("_r_factor", self._rgb_factors[1])
+    self._shader:send("_g_factor", self._rgb_factors[2])
+    self._shader:send("_b_factor", self._rgb_factors[3])
+    self._shader:send("_h_factor", self._hsv_factors[1])
+    self._shader:send("_s_factor", self._hsv_factors[2])
+    self._shader:send("_v_factor", self._hsv_factors[3])
+    self._shader:send("_a_factor", self._alpha_factor)
+
     self._shader:send("_mix_color", {self._mix_color.r, self._mix_color.g, self._mix_color.b, self._mix_color.a})
     self._shader:send("_mix_weight", self._mix_weight)
     self._shader:send("_invert", self._invert)
@@ -138,7 +150,7 @@ function rt.SnapshotLayout:set_scale(x, y)
 end
 
 --- @brief
-function rt.SnapshotLayout:reset_offsets()
+function rt.SnapshotLayout:reset()
     self._rgb_offsets[1] = 0
     self._rgb_offsets[2] = 0
     self._rgb_offsets[3] = 0
@@ -146,6 +158,15 @@ function rt.SnapshotLayout:reset_offsets()
     self._hsv_offsets[2] = 0
     self._hsv_offsets[3] = 0
     self._alpha_offset = 0
+
+    self._rgb_factors[1] = 1
+    self._rgb_factors[2] = 1
+    self._rgb_factors[3] = 1
+    self._hsv_factors[1] = 1
+    self._hsv_factors[2] = 1
+    self._hsv_factors[3] = 1
+    self._alpha_factor = 1
+
     self._x_offset = 0
     self._y_offset = 0
 end

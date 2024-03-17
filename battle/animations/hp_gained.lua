@@ -10,10 +10,10 @@ bt.Animation.HP_GAINED = meta.new_type("HP_GAINED", bt.Animation, function(scene
         _value = value,
 
         _target_snapshot = {}, -- rt.SnapshotLayout
-        _label = {},          -- rt.Label
-        _label_snapshot = {}, -- rt.SnapshotLayout
-        _emitter = {},        -- rt.ParticleEmitter
-        _overlays = {},       -- rt.OverlayLayout
+        _label = {},           -- rt.Label
+        _label_snapshot = {},  -- rt.SnapshotLayout
+        _emitter = {},         -- rt.ParticleEmitter
+        _overlays = {},        -- rt.OverlayLayout
 
         _elapsed = 0,
         _label_path = {},  -- rt.Spline
