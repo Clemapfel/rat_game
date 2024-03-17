@@ -13,6 +13,8 @@ rt.SpriteAtlasEntry = meta.new_type("SpriteAtlasEntry", function(path, id)
         n_frames = -1,
         frame_width = -1,
         frame_height = -1,
+        origin_x = 0.5,
+        origin_y = 0.5,
         frame_to_name = {},     -- Table<Number, String>
         name_to_frame = {},     -- Table<String, Number>
         texture_rectangles = {}, -- Table<rt.AABB>
@@ -104,6 +106,10 @@ function rt.SpriteAtlasEntry:load()
     for _ in pairs(frames_seen) do
         self.n_frames = self.n_frames + 1
     end
+
+    self.origin_x = which(config.origin_x, 0.5)
+    self.origin_y = which(config.origin_y, 0.5)
+    meta.assert_number(self.origin_x, self.origin_y)
 
     -- initialize
     self.data = data

@@ -32,7 +32,7 @@ scene._enemy_sprites = {
     bt.EnemySprite(scene, mole)
 }
 
-local prio_sprout_02 = bt.PriorityQueueElement(scene, sprout_01)
+local prio_sprout_02 = bt.PriorityQueueElement(scene, boulder)
 prio_sprout_02:realize()
 prio_sprout_02:size_allocate(50, 50, 100, 200)
 
