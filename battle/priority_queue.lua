@@ -98,14 +98,20 @@ function bt.PriorityQueueElement:size_allocate(x, y, width, height)
             x + width - label_offset * label_w,
             y + height - label_offset * label_h
         )
+
+        self._debug_frame = rt.Rectangle(x, y, width, height)
+        self._debug_frame:set_is_outline(true)
     end
 end
 
 --- @override
 function bt.PriorityQueueElement:draw()
     if self._is_realized then
-        self._frame:draw()
         self._shape:draw()
         self._id_offset_label:draw()
+
+        if self._scene:get_debug_draw_enabled() then
+            self._debug_frame:draw()
+        end
     end
 end

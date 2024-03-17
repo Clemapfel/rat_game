@@ -12,7 +12,7 @@ bt.EnemySpriteAlignmentMode = meta.new_enum({
 --- @class bt.BattleScene
 bt.BattleScene = meta.new_type("BattleScene", rt.Widget, function()
     local out = meta.new(bt.BattleScene, {
-        _debug_draw_enabled = false,
+        _debug_draw_enabled = true,
         _entities = {}, -- Table<bt.Entity>
 
         _enemy_sprites = {},              -- Table<bt.EnemySprite>
@@ -156,7 +156,7 @@ function bt.BattleScene:_reformat_enemy_sprites()
         local center_x = 0.5 * rt.graphics.get_width()
         local w, h = self._enemy_sprites[1]:measure()
         self._enemy_sprites[1]:fit_into(center_x - 0.5 * w, h_to_y(h) )
-        local left_offset, right_offset = w * 0.5, h * 0.5
+        local left_offset, right_offset = w * 0.5, w * 0.5
 
         local m = math.min( -- if enemy don't fit on screen, stagger without violating outer margins
             rt.settings.margin_unit * 2,

@@ -30,7 +30,7 @@ function bt.EnemySprite:realize()
     self._is_realized = true
 
     local sprite_w, sprite_h = self._sprite:get_resolution()
-    self._sprite:set_minimum_size(sprite_w * 3, sprite_h * 3)
+    self._sprite:set_minimum_size(sprite_w * 4, sprite_h * 4)
     self._sprite:realize()
     self._hp_bar:realize()
     self._speed_value:realize()
@@ -123,6 +123,9 @@ function bt.EnemySprite:size_allocate(x, y, width, height)
 
     local m = 0.5 * rt.settings.margin_unit
     local hp_bar_bounds = rt.AABB(sprite_x, sprite_y + sprite_h + m, sprite_w, rt.settings.battle.health_bar.hp_font:get_size() + 2 * m)
+
+    hp_bar_bounds.x = hp_bar_bounds.x + rt.settings.margin_unit
+    hp_bar_bounds.width = hp_bar_bounds.width - 2 * rt.settings.margin_unit -- why 2?
     self._hp_bar:fit_into(hp_bar_bounds)
 
     local speed_value_w, speed_value_h = self._speed_value:measure()
