@@ -19,12 +19,10 @@ bt.BattleScene = meta.new_type("BattleScene", rt.Widget, function()
         _enemy_sprite_render_order = {},  -- Queue<Number>
         _enemy_sprite_alignment_mode = bt.EnemySpriteAlignmentMode.BOSS_CENTERED,
 
+        _priority_queue = {}, -- bt.PriorityQueue
         _log = {}, -- bt.BattleLog
 
-        _enemy_alignment_line = {}, -- rt.Line
-        _margin_left_line = {},
-        _margin_center_line = {},
-        _margin_right_line = {}
+        _debug_layout_lines = {}, -- Table<rt.Line>
     })
     return out
 end)
@@ -44,6 +42,9 @@ function bt.BattleScene:realize()
 
     self._log = bt.BattleLog()
     self._log:realize()
+
+    self._priority_queue = bt.PriorityQueue(self)
+    self._priority_queue:realize()
 
     for _, sprite in pairs(self._enemy_sprites) do
         sprite:realize()
@@ -66,6 +67,25 @@ function bt.BattleScene:size_allocate(x, y, width, height)
 
     local my = rt.settings.margin_unit
     self._log:fit_into(mx, my, rt.graphics.get_width() - 2 * mx, 5 * my)
+    self._priority_queue:fit_into(0, 0, 500, 500)
+
+    local length = width
+    self._debug_layout_lines = {
+        -- margin_left
+        rt.Line(x + (0.5/16) * width, y, x + (0.5/16) * width, y + height),
+        -- marign right
+        rt.Line(x + (1 - 0.5/16) * width, y, x + (1 - 0.5/16) * width, y + height),
+        -- margin top
+        rt.Line(x, y + (0.5/9) * height, x + width, y + (0.5/9) * height),
+        -- margin bottom
+        rt.Line(x, y + (1 - 0.5/9) * height, x + width, y + (1 - 0.5/9) * height),
+        -- left 4:3
+        rt.Line(x + (3/16) * width, y, x + (3/16) * width, y + height),
+        -- right 4:3
+        rt.Line(x + (1 - 3/16) * width, y, x + (1 - 3/16) * width, y + height),
+        -- horizontal center
+        rt.Line(x, y + 0.5 * height, x + width, y + 0.5 * height)
+    }
 end
 
 --- @brief
@@ -82,12 +102,12 @@ function bt.BattleScene:draw()
     end
 
     if self._debug_draw_enabled then
-        self._enemy_alignment_line:draw()
-        self._margin_left_line:draw()
-        self._margin_center_line:draw()
-        self._margin_right_line:draw()
+        for _, line in pairs(self._debug_layout_lines) do
+            line:draw()
+        end
     end
 
+    self._priority_queue:draw()
     self._log:draw()
 end
 
@@ -208,6 +228,11 @@ function bt.BattleScene:_update_id_offsets()
 end
 
 --- @brief
+function bt.BattleScene:get_entities()
+    return self._entities
+end
+
+--- @brief
 function bt.BattleScene:format_name(entity)
     local name
     if meta.isa(entity, bt.BattleEntity) then
@@ -232,3 +257,4 @@ function bt.BattleScene:format_damage(value)
     -- same as rt.settings.battle.health_bar.hp_color_10
     return "<color=RED><mono><b>" .. tostring(value) .. "</b></mono></color> HP"
 end
+

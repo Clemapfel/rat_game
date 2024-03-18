@@ -48,44 +48,31 @@ function rt.Frame:draw()
     if not self:get_is_visible() then return end
 
     if meta.is_widget(self._child) then
-
-        local pos_x, pos_y = self._child:get_position()
-        local w, h = self._child:get_size()
-        local thickness = rt.settings.frame.thickness
-
-        -- draw child with corners masked away
-        local stencil_value = 255
+        local stencil_value = 255 -- draw child with corners masked away
         rt.graphics.stencil(stencil_value, self._stencil_mask)
         rt.graphics.set_stencil_test(rt.StencilCompareMode.EQUAL, stencil_value)
         self._child:draw()
         rt.graphics.set_stencil_test()
+    end
 
-        if self._thickness > 0 then
-            if self._thickness > 1 then
-                self._frame_outline:draw()
-            end
-            self._frame:draw()
+    if self._thickness > 0 then
+        if self._thickness > 1 then
+            self._frame_outline:draw()
         end
-
+        self._frame:draw()
     end
 end
 
 --- @overload rt.Widget.size_allocate
 function rt.Frame:size_allocate(x, y, width, height)
-    if not meta.is_widget(self._child) then
-        return
-    end
+
+
+    local pos_x, pos_y, w, h = x, y, width, height
 
     if meta.is_widget(self._child) then
         self._child:fit_into(rt.AABB(x, y, width, height))
         self._child:set_opacity(self._opacity)
     end
-
-    local pos_x, pos_y = self._child:get_position()
-    local w, h = self._child:get_size()
-
-    w = math.max(w, select(1, self:get_minimum_size()))
-    h = math.max(h, select(2, self:get_minimum_size()))
 
     local thickness = self._thickness
 

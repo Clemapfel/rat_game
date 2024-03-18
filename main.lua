@@ -32,11 +32,6 @@ scene._enemy_sprites = {
     bt.EnemySprite(scene, mole)
 }
 
-local prio_sprout_02 = bt.PriorityQueueElement(scene, boulder)
-prio_sprout_02:realize()
-prio_sprout_02:size_allocate(50, 50, 100, 200)
-
-
 input = rt.InputController()
 input:signal_connect("pressed", function(_, which)
     if which == rt.InputButton.A then
@@ -65,7 +60,7 @@ input:signal_connect("pressed", function(_, which)
 end)
 
 love.load = function()
-    love.window.setMode(800, 600, {
+    love.window.setMode(1600 / 1.5, 900 / 1.5, {
         vsync = 1,
         msaa = 8,
         stencil = true,
@@ -84,8 +79,6 @@ love.draw = function()
         love.graphics.setColor(1, 1, 1, 0.75)
         love.graphics.print(fps, rt.graphics.get_width() - love.graphics.getFont():getWidth(fps) - 2 * margin, 0.5 * margin)
     end
-
-    prio_sprout_02:draw()
 end
 
 love.update = function()
