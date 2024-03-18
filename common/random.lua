@@ -66,6 +66,17 @@ function rt.random.choose(set)
     ]]--
 end
 
+--- @brief reorder table
+function rt.random.shuffle(t)
+    for i = 1, #t do
+        local j = rt.random.integer(1, #t)
+        local temp = t[i]
+        t[i] = t[j]
+        t[j] = temp
+    end
+    return t
+end
+
 rt.random.CHAR_LIST = {
     "a", "b", "c", "d", "e", "f", "g", "h", "i", "j", "k", "l", "m", "n", "o", "p", "q", "r", "s", "t", "u", "v", "w", "x", "y", "z",
     "A", "B", "C", "D", "E", "F", "G", "H", "I", "J", "K", "L", "M", "N", "O", "P", "Q", "R", "S", "T", "U", "V", "W", "X", "Y", "Z",

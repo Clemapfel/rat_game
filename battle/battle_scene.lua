@@ -12,7 +12,7 @@ bt.EnemySpriteAlignmentMode = meta.new_enum({
 --- @class bt.BattleScene
 bt.BattleScene = meta.new_type("BattleScene", rt.Widget, function()
     local out = meta.new(bt.BattleScene, {
-        _debug_draw_enabled = true,
+        _debug_draw_enabled = false,
         _entities = {}, -- Table<bt.Entity>
 
         _enemy_sprites = {},              -- Table<bt.EnemySprite>
@@ -40,17 +40,22 @@ end
 function bt.BattleScene:realize()
     self._is_realized = true
 
+    self:_update_id_offsets()
     self._log = bt.BattleLog()
     self._log:realize()
 
     self._priority_queue = bt.PriorityQueue(self)
     self._priority_queue:realize()
 
-    for _, sprite in pairs(self._enemy_sprites) do
+    for _, entity in pairs(self._entities) do
+        entity:realize()
+        local sprite = bt.EnemySprite(self, entity)
+        table.insert(self._enemy_sprites, sprite)
         sprite:realize()
-        sprite:set_is_visible(false)
         sprite:add_animation(bt.Animation.ENEMY_APPEARED(self, sprite))
+        self._priority_queue:add_entity(entity)
     end
+
     self:reformat()
 end
 
@@ -68,6 +73,8 @@ function bt.BattleScene:size_allocate(x, y, width, height)
     local my = rt.settings.margin_unit
     self._log:fit_into(mx, my, rt.graphics.get_width() - 2 * mx, 5 * my)
     self._priority_queue:fit_into(0, 0, 500, 500)
+    self._priority_queue:reorder(self._entities)
+
 
     local length = width
     self._debug_layout_lines = {
@@ -89,10 +96,23 @@ function bt.BattleScene:size_allocate(x, y, width, height)
 end
 
 --- @brief
-function bt.BattleScene:add_stage(name, prefix)
-    prefix = which(prefix, "assets/stages")
-    local stage = bt.Stage(rt.current_scene._world, name, prefix)
-    table.insert(self._stages, stage)
+function bt.BattleScene:add_entity(entity)
+    table.insert(self._entities, entity)
+    self:_update_id_offsets()
+
+    if self._is_realized then
+        if entity:get_is_enemy() then
+            local sprite = bt.EnemySprite(self, entity)
+            table.insert(self._enemy_sprites, sprite)
+            sprite:realize()
+            sprite:add_animation(bt.Animation.ENEMY_APPEARED(self, sprite))
+        end
+
+        self._priority_queue:add_entity(entity)
+        self._priority_queue:reorder(self._entities)
+
+        self:_reformat_enemy_sprites()
+    end
 end
 
 --- @brief
@@ -108,7 +128,7 @@ function bt.BattleScene:draw()
     end
 
     self._priority_queue:draw()
-    self._log:draw()
+    --self._log:draw()
 end
 
 --- @brief

@@ -66,6 +66,10 @@ function bt.BattleEntity:realize()
         meta.assert_string(self[key])
     end
 
+    -- TODO
+    self.speed_base = rt.random.integer(1, 99)
+    -- TODO
+
     self._is_realized = true
     meta.set_is_mutable(self, false)
 end

@@ -1,4 +1,4 @@
---- @class rt.Scene
+ --- @class rt.Scene
 --- @field env Table mutable environment, contains all variables, scene itself is immutable
 --- @field input rt.InputController
 rt.Scene = meta.new_type("Scene", function()

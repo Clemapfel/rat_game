@@ -86,8 +86,7 @@ function bt.PriorityQueueElement:size_allocate(x, y, width, height)
         self._frame_outline:set_line_width(frame_outline_thickness)
 
         self._frame:resize(x + frame_thickness / 2, y + frame_thickness / 2, width - frame_thickness , height - frame_thickness )
-        self._frame_outline:resize(x + frame_outline_thickness / 2, y + frame_outline_thickness / 2, width - frame_outline_thickness , height - frame_outline_thickness )
-
+        self._frame_outline:resize(x + frame_thickness / 2, y + frame_thickness / 2, width - frame_thickness , height - frame_thickness )
 
         -- align texture
 

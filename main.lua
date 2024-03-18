@@ -15,30 +15,20 @@ local sprout_01 = bt.BattleEntity(scene, "WALKING_SPROUT")
 local sprout_02 = bt.BattleEntity(scene, "WALKING_SPROUT")
 local mole = bt.BattleEntity(scene, "GAMBLER_MOLE")
 
-scene._entities = {
-    small_ufo,
-    boulder,
-    sprout_01,
-    sprout_02,
-    mole
-}
-scene:_update_id_offsets()
-
-scene._enemy_sprites = {
-    bt.EnemySprite(scene, boulder),
-    bt.EnemySprite(scene, sprout_01),
-    bt.EnemySprite(scene, small_ufo),
-    bt.EnemySprite(scene, sprout_02),
-    bt.EnemySprite(scene, mole)
-}
+for entity in range(small_ufo, boulder, sprout_01, sprout_02, mole) do
+    scene:add_entity(entity)
+end
 
 input = rt.InputController()
 input:signal_connect("pressed", function(_, which)
     if which == rt.InputButton.A then
+        --[[
         local i = rt.random.integer(1, #scene._enemy_sprites)
         local sprite = scene._enemy_sprites[i]
         --sprite:add_animation(bt.Animation.HP_GAINED(scene, sprite, rt.random.integer(0, 100)))
         sprite:add_continuous_animation(bt.Animation.KNOCKED_OUT_SUSTAIN(scene, sprite))
+        ]]--
+        scene:add_entity(bt.BattleEntity(scene, "SMALL_UFO"))
     elseif which == rt.InputButton.B then
         local i = rt.random.integer(1, #scene._enemy_sprites)
         local sprite = scene._enemy_sprites[i]
