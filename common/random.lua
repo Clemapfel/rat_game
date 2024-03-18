@@ -77,6 +77,12 @@ function rt.random.shuffle(t)
     return t
 end
 
+--- @brief
+function rt.random.toss_coin(success_chance)
+    success_chance = which(success_chance, 0.5)
+    return rt.rand() <= success_chance
+end
+
 rt.random.CHAR_LIST = {
     "a", "b", "c", "d", "e", "f", "g", "h", "i", "j", "k", "l", "m", "n", "o", "p", "q", "r", "s", "t", "u", "v", "w", "x", "y", "z",
     "A", "B", "C", "D", "E", "F", "G", "H", "I", "J", "K", "L", "M", "N", "O", "P", "Q", "R", "S", "T", "U", "V", "W", "X", "Y", "Z",

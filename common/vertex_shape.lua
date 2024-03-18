@@ -66,7 +66,8 @@ rt.VertexShape = meta.new_type("VertexShape", rt.Drawable, function(points)
             vertices,
             rt.MeshDrawMode.TRIANGLE_FAN,
             rt.SpriteBatchUsage.DYNAMIC
-        )
+        ),
+        _opacity = 1
     })
     out:set_texture_rectangle(rt.AABB(0, 0, 1, 1))
     return out
@@ -86,9 +87,15 @@ end
 --- @brief set color of one vertex
 --- @param i Number 1-based
 --- @param rgba rt.RGBA
-function rt.VertexShape:set_vertex_color(i, rgba)
-    if meta.is_hsva(rgba) then rgba = rt.hsva_to_rgba(rgba) end
-    self._native:setVertexAttribute(i, 3, rgba.r, rgba.g, rgba.b, rgba.a)
+function rt.VertexShape:set_vertex_color(i, r_or_rgba, g, b, a)
+    if meta.is_number(r_or_rgba) then
+        local r = r_or_rgba
+        self._native:setVertexAttribute(i, 3, r, g, b, a * self._opacity)
+    else
+        local rgba = r_or_rgba
+        if meta.is_hsva(rgba) then rgba = rt.hsva_to_rgba(rgba) end
+        self._native:setVertexAttribute(i, 3, rgba.r, rgba.g, rgba.b, rgba.a * self._opacity)
+    end
 end
 
 --- @brief get color of one vertex
@@ -404,6 +411,15 @@ function rt.VertexShape:reformat_texture_coordinates(...)
     for i = 1, #coords, 2 do
         self:set_vertex_texture_coordinate(vertex_i, coords[i], coords[i+1])
         vertex_i = vertex_i + 1
+    end
+end
+
+--- @brief
+function rt.VertexShape:set_opacity(alpha)
+    self._opacity = alpha
+    for i = 1, self:get_n_vertices() do
+        local r, g, b, a = self:get_vertex_color(i)
+        self:set_vertex_color(i, r, g, b, a) -- applies alpha
     end
 end
 

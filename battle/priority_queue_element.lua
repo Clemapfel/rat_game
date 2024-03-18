@@ -4,11 +4,13 @@ rt.settings.battle.priority_queue_element = {
     frame_thickness = 5,
     base_color = rt.Palette.GRAY_4,
     frame_color = rt.Palette.GRAY_3,
-    corner_radius = 10
+    selected_frame_color = rt.Palette.YELLOW_2,
+    knocked_out_base_color = rt.Palette.RED_2,
+    corner_radius = 10,
 }
 
 --- @class bt.PriorityQueueElement
-bt.PriorityQueueElement = meta.new_type("PriorityQueueElement", rt.Widget, function(scene, entity)
+bt.PriorityQueueElement = meta.new_type("PriorityQueueElement", rt.Widget, rt.Animation, function(scene, entity)
     return meta.new(bt.PriorityQueueElement, {
         _entity = entity,
         _scene = scene,
@@ -21,6 +23,11 @@ bt.PriorityQueueElement = meta.new_type("PriorityQueueElement", rt.Widget, funct
         _debug_backdrop = rt.Rectangle(0, 0, 1, 1),
 
         _id_offset_label = {}, -- rt.Glyph
+
+        _is_selected = rt.random.toss_coin(),
+        _is_disabled = rt.random.toss_coin(),
+        _is_knocked_out = rt.random.toss_coin(),
+        _elapsed = 0
     })
 end)
 
@@ -35,10 +42,10 @@ function bt.PriorityQueueElement:realize()
     self._spritesheet:get_texture():set_wrap_mode(rt.TextureWrapMode.ZERO)
     local frame = self._spritesheet:get_frame(1)
     self._shape:reformat_texture_coordinates(
-            frame.x, frame.y,
-            frame.x + frame.width, frame.y,
-            frame.x + frame.width, frame.y + frame.height,
-            frame.x, frame.y + frame.height
+        frame.x, frame.y,
+        frame.x + frame.width, frame.y,
+        frame.x + frame.width, frame.y + frame.height,
+        frame.x, frame.y + frame.height
     )
 
     self._backdrop:set_is_outline(false)
@@ -62,6 +69,10 @@ function bt.PriorityQueueElement:realize()
             font_style = rt.FontStyle.BOLD
         }
     )
+
+    self:set_is_selected(self._is_selected)
+    self:set_is_disabled(self._is_disabled)
+    self:set_is_knocked_out(self._is_knocked_out)
 end
 
 --- @override
@@ -139,10 +150,48 @@ function bt.PriorityQueueElement:draw()
         self._shape:draw()
         self._frame_outline:draw()
         self._frame:draw()
-        self._id_offset_label:draw()
 
         if self._scene:get_debug_draw_enabled() then
             self._debug_backdrop:draw()
         end
+
+        self._id_offset_label:draw()
     end
+end
+
+--- @brief
+function bt.PriorityQueueElement:set_is_selected(b)
+    self._is_selected = b
+    if self._is_realized then
+        if self._is_selected then
+            self._frame:set_color(rt.settings.battle.priority_queue_element.selected_frame_color)
+        else
+            self._frame:set_color(rt.settings.battle.priority_queue_element.frame_color)
+        end
+    end
+end
+
+--- @brief
+function bt.PriorityQueueElement:set_is_disabled(b)
+    self._is_disabled = b
+    if self._is_realized then
+        self._shape:set_opacity(ternary(self._is_disabled, 1, 0.4))
+        self._id_offset_label:set_opacity(ternary(self._is_disabled, 1, 0.8))
+    end
+end
+
+--- @brief
+function bt.PriorityQueueElement:set_is_knocked_out(b)
+    self._is_knocked_out = b
+    if self._is_realized then
+        if self._is_knocked_out then
+            self._backdrop:set_color(rt.settings.battle.priority_queue_element.knocked_out_base_color)
+        else
+            self._backdrop:set_color(rt.settings.battle.priority_queue_element.base_color)
+        end
+    end
+end
+
+--- @override
+function bt.PriorityQueueElement:update(delta)
 end
