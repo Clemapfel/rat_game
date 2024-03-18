@@ -228,7 +228,10 @@ function rt.Glyph:draw(opacity)
         self._outline_render_texture:bind_as_render_target()
         love.graphics.clear(0, 0, 0, 0)
         love.graphics.setColor(1, 1, 1, opacity)
+        love.graphics.push()
+        love.graphics.origin()
         draw_glyph(self._outline_render_offset_x, self._outline_render_offset_y)
+        love.graphics.pop()
         self._outline_render_texture:unbind_as_render_target()
 
         -- render product using outline shader
