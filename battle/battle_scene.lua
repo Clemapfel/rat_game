@@ -72,7 +72,7 @@ function bt.BattleScene:size_allocate(x, y, width, height)
 
     local my = rt.settings.margin_unit
     self._log:fit_into(mx, my, rt.graphics.get_width() - 2 * mx, 5 * my)
-    self._priority_queue:fit_into(0, 0, 500, 500)
+    self._priority_queue:fit_into(rt.graphics.get_width() - 100, 0, 100, rt.graphics.get_height())
     self._priority_queue:reorder(self._entities)
 
 

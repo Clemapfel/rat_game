@@ -35,6 +35,7 @@ rt.symmetrical_sinusoid = function(x)
 end
 
 rt.exponential_acceleration = function(x)
+    -- a\ \cdot\exp\left(\ln\left(1+\frac{1}{a}\right)x\right)-a
     return 0.045 * math.exp(math.log(1 / 0.045 + 1) * x) - 0.045
 end
 
@@ -64,6 +65,7 @@ end
 
 --- @brief gaussian distribution with 0.99 percentile in [0, 1], peak at 0.5
 rt.symmetrical_gaussian = function(x, peak)
+    -- e^{-\left(4\cdot\frac{\pi}{3}\right)\left(2x-1\right)^{2}}
     peak = which(peak, 1)
     return (math.exp(-1 * ((4 * math.pi / 3) * (2 * x - 1))^2))
 end
@@ -83,4 +85,28 @@ end
 function rt.skewed_gaussian(x, mean, variance, skewedness)
     x = (x - mean) / variance
     return 2 * ((1 / (variance * math.sqrt(2 * math.pi))) * math.exp(-0.5 * x * x)) * (0.5 * (1 + math.erf(skewedness * x) / math.sqrt(2)))
+end
+
+--- @brief heartbeat-like impulse, from [0, 1] to [-1, 1]
+rt.heartbeat = function(x)
+    -- https://www.desmos.com/calculator/m0xym3uknp
+    function rt.heartbeat_aux_sine(x)
+        return 0.5 * math.sin(12 * math.pi * (x / 2)) * math.sin(2 * math.pi * (x / 2))
+    end
+
+    function rt.heartbeat_aux_gaussian(x)
+        return math.exp(-((4 * math.pi / 3) * (2 * x - 1)^2))
+    end
+
+    return rt.heartbeat_aux_sine(x + 1.9) * 2.3 * rt.heartbeat_aux_gaussian(x)
+end
+
+--- @brief sine wave with amptliude 1 and given frequency
+rt.sine_wave = function(x, frequency)
+    return (math.sin(2 * math.pi * x * frequency - math.pi / 2) + 1) * 0.5
+end
+
+--- @brief triangle wave with amplitude 1 and given frequency
+rt.triangle_wave = function(x)
+    return 4 * math.abs((x / math.pi) + 0.25 - math.floor((x / math.pi) + 0.75)) - 1
 end

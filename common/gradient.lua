@@ -39,6 +39,7 @@ rt.Gradient = meta.new_type("Gradient", rt.Drawable, function(x, y, width, heigh
         _height = height
     })
     out:_update_color()
+    out:_update_shape()
     return out
 end)
 
@@ -59,6 +60,7 @@ function rt.Gradient:_update_color()
 
     local a = self._color_from
     local b = self._color_to
+
     local mix = rt.RGBA(
         mix(a.r, b.r, 0.5),
         mix(a.g, b.g, 0.5),
@@ -106,6 +108,7 @@ function rt.Gradient:_update_color()
         set_color(3, mix)
         set_color(4, a)
     end
+
 end
 
 --- @overload rt.Drawable.draw
@@ -115,7 +118,11 @@ function rt.Gradient:draw()
 end
 
 function rt.Gradient:_update_shape()
-    self._shape:resize(rt.AABB(self._x, self._y, self._width, self._height))
+    local x, y, w, h = self._x, self._y, self._width, self._height
+    self._shape:set_vertex_position(1, x, y)
+    self._shape:set_vertex_position(2, x + w, y)
+    self._shape:set_vertex_position(3, x + w, y + h)
+    self._shape:set_vertex_position(4, x, y + h)
 end
 
 --- @brief

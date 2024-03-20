@@ -54,7 +54,8 @@ love.load = function()
         vsync = 1,
         msaa = 8,
         stencil = true,
-        resizable = true
+        resizable = true,
+        borderless = false
     })
     love.window.setTitle("rat_game")
     rt.current_scene:realize()

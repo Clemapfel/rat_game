@@ -143,6 +143,7 @@ require "swipe_layout"
 require "reveal_layout"
 
 require "spacer"
+require "gradient_spacer"
 require "image_display"
 require "label"
 require "button"

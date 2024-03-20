@@ -105,7 +105,7 @@ function rt.rgba_to_hsva(rgba)
     if delta == 0 then
         h = 0
     elseif max == r then
-        h = 60 * (fmod(((g - b) / delta), 6))
+        h = 60 * (math.fmod(((g - b) / delta), 6))
     elseif max == g then
         h = 60 * (((b - r) / delta) + 2)
     elseif max == b then

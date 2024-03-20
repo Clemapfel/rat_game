@@ -73,6 +73,8 @@ function bt.PriorityQueueElement:realize()
     self:set_is_selected(self._is_selected)
     self:set_is_disabled(self._is_disabled)
     self:set_is_knocked_out(self._is_knocked_out)
+
+    self:set_is_animated(true)
 end
 
 --- @override
@@ -100,7 +102,6 @@ function bt.PriorityQueueElement:size_allocate(x, y, width, height)
         self._frame_outline:resize(x + frame_thickness / 2, y + frame_thickness / 2, width - frame_thickness , height - frame_thickness )
 
         -- align texture
-
         local frame = self._spritesheet:get_frame(1)
         local frame_x, frame_y, frame_w, frame_h = frame.x, frame.y, frame.width, frame.height
         local frame_res_w, frame_res_h = self._spritesheet:get_frame_size()
@@ -130,6 +131,7 @@ function bt.PriorityQueueElement:size_allocate(x, y, width, height)
             self._shape:set_vertex_texture_coordinate(3, frame_x + frame_w - size_offset_x+ origin_offset_x, frame_y + frame_h - y_offset - size_offset_y + origin_offset_y)
             self._shape:set_vertex_texture_coordinate(4, frame_x + size_offset_x+ origin_offset_x, frame_y + frame_h - y_offset - size_offset_y + origin_offset_y)
         end
+
         -- align label
         local label_w, label_h = self._id_offset_label:get_size()
         local label_offset = 0.75
@@ -194,4 +196,16 @@ end
 
 --- @override
 function bt.PriorityQueueElement:update(delta)
+    self._elapsed = self._elapsed + delta
+    if self._is_selected then
+
+    end
+
+    if self._is_knocked_out then
+        -- pulsing red animation
+        local offset = (rt.sine_wave(self._elapsed, 1 / 3) - 0.5) * 0.3
+        local color = rt.rgba_to_hsva(rt.settings.battle.priority_queue_element.knocked_out_base_color)
+        color.v = clamp(color.v + offset, 0, 1)
+        self._backdrop:set_color(color)
+    end
 end
