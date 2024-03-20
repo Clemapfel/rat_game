@@ -26,7 +26,6 @@ function bt.PriorityQueue:reorder(order)
         return
     end
 
-    println(#order)
     self._current_order = {}
 
     -- generate or remove new elements if entity or entity multiplicity is seen for the first time
@@ -83,17 +82,13 @@ function bt.PriorityQueue:reorder(order)
         end
 
         while #entry.colliders > n do
-            table.remove(entry.elements, #(entry.elements))
-            table.remove(entry.colliders, #(entry.colliders))
-            table.remove(entry.target_positions, #(entry.target_positions))
+            table.remove(entry.elements, 1) --#(entry.elements))
+            table.remove(entry.colliders, 1) --#(entry.colliders))
+            table.remove(entry.target_positions, 1)--#(entry.target_positions))
         end
     end
 
     self:reformat()
-
-    for _, v in pairs(self._current_order) do
-        println(v:get_id())
-    end
 end
 
 --- @override
@@ -206,7 +201,9 @@ function bt.PriorityQueue:draw()
         local max_scale = rt.settings.battle.priority_queue.first_element_scale_factor
         local scaled_offset = 0
 
-        for i, t in ipairs(self._render_order) do
+        for i = 1, #self._render_order do
+            local t = self._render_order[i]
+
             local entry = self._entries[t[1]]
             local element = entry.elements[t[2]]
             local collider = entry.colliders[t[2]]
@@ -224,8 +221,6 @@ function bt.PriorityQueue:draw()
             rt.graphics.push()
             rt.graphics.translate((scale - 1) * -1 * size, 0)
             rt.graphics.scale(scale, scale)
-
-            element:draw()
 
             rt.graphics.pop()
             rt.graphics.translate(-1 * pos_x, -1 * (pos_y + scaled_offset))

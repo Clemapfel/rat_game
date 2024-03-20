@@ -39,7 +39,7 @@ input:signal_connect("pressed", function(_, which)
     elseif which == rt.InputButton.B then
 
         for i = 1, #scene._entities do
-            table.insert(order, scene._entities[rt.random.integer(1, #scene._entities)])
+            table.insert(order, scene._entities[2])
         end
         scene._priority_queue:reorder(order)
 
