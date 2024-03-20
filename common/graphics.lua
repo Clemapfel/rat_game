@@ -36,6 +36,8 @@ rt.BlendMode = meta.new_enum({
     ADD = 1,
     SUBTRACT = 2,
     MULTIPLY = 3,
+    DARKEN = 4,
+    LIGHTEN = 5
 })
 
 --- @brief
@@ -51,6 +53,10 @@ function rt.graphics.set_blend_mode(blend_mode)
         love.graphics.setBlendMode("subtract", "alphamultiply")
     elseif blend_mode == rt.BlendMode.MULTIPLY then
         love.graphics.setBlendMode("multiply", "premultiplied")
+    elseif blend_mode == rt.BlendMode.DARKEN then
+        love.graphics.setBlendMode("darken", "premultiplied")
+    elseif blend_mode == rt.BlendMode.LIGHTEN then
+        love.graphics.setBlendMode("lighten", "premultiplied")
     else
         rt.error("In rt.graphics.set_blend_mode: invalid blend mode `" .. tostring(blend_mode) .. "`")
     end
@@ -60,6 +66,22 @@ end
 --- @param new_value Number new stencil value
 --- @vararg rt.Drawable
 function rt.graphics.stencil(new_value, ...)
+
+    if new_value == nil then
+        if love.getVersion() >= 12 then
+            local mask_r, mask_g, mask_b, mask_a = love.graphics.getColorMask()
+            love.graphics.setStencilState("replace", "always", new_value, 0)
+            love.graphics.setColorMask(false, false, false, false)
+            love.graphics.rectangle("fill", NEGATIVE_INFINITY, NEGATIVE_INFINITY, POSITIVE_INFINITY, POSITIVE_INFINITY)
+            love.graphics.setColorMask(mask_r, mask_g, mask_b, mask_a)
+            love.graphics.setStencilState()
+        else
+            love.graphics.stencil(function()
+                love.graphics.rectangle("fill", NEGATIVE_INFINITY, NEGATIVE_INFINITY, POSITIVE_INFINITY, POSITIVE_INFINITY)
+            end, "replace", new_value, true)
+        end
+    end
+
     local drawables = {...}
     if love.getVersion() >= 12 then
         local mask_r, mask_g, mask_b, mask_a = love.graphics.getColorMask()

@@ -1,6 +1,7 @@
 rt.settings.battle.scene = {
     enemy_alignment_y = 0.5,
-    horizontal_margin = 100,
+    priority_queue_width = 100,
+    gradient_alpha = 0.4
 }
 
 --- @class bt.EnemySpriteAlignmentMode
@@ -23,6 +24,9 @@ bt.BattleScene = meta.new_type("BattleScene", rt.Widget, function()
         _log = {}, -- bt.BattleLog
 
         _debug_layout_lines = {}, -- Table<rt.Line>
+
+        _gradient_right = {}, -- rt.LogGradient
+        _gradient_left = {},  -- rt.LogGradient
     })
     return out
 end)
@@ -45,7 +49,23 @@ function bt.BattleScene:realize()
     self._log:realize()
 
     self._priority_queue = bt.PriorityQueue(self)
+    self._priority_queue:reorder(self._entities)
     self._priority_queue:realize()
+
+    local to = 1 - rt.settings.battle.scene.gradient_alpha
+    local to_color = rt.RGBA(to, to, to, 1)
+    local from_color = rt.RGBA(1, 1, 1, 1)
+
+    local gradient_alpha = rt.settings.battle.scene.gradient_alpha
+    self._gradient_left = rt.LogGradient(
+        rt.RGBA(from_color.r, from_color.g, from_color.b, from_color.a),
+        rt.RGBA(to_color.r, to_color.g, to_color.b, to_color.a)
+    )
+
+    self._gradient_right = rt.LogGradient(
+        rt.RGBA(to_color.r, to_color.g, to_color.b, to_color.a),
+        rt.RGBA(from_color.r, from_color.g, from_color.b, from_color.a)
+    )
 
     for _, entity in pairs(self._entities) do
         entity:realize()
@@ -53,7 +73,6 @@ function bt.BattleScene:realize()
         table.insert(self._enemy_sprites, sprite)
         sprite:realize()
         sprite:add_animation(bt.Animation.ENEMY_APPEARED(self, sprite))
-        self._priority_queue:add_entity(entity)
     end
 
     self:reformat()
@@ -63,18 +82,22 @@ end
 function bt.BattleScene:size_allocate(x, y, width, height)
     self:_reformat_enemy_sprites()
 
+
     local enemy_y = rt.graphics.get_height() * rt.settings.battle.scene.enemy_alignment_y
     self._enemy_alignment_line = rt.Line(0, enemy_y, rt.graphics.get_width(), enemy_y)
-    local mx = rt.settings.battle.scene.horizontal_margin
+    local mx = rt.graphics.get_width() * 1 / 16
     self._margin_left_line = rt.Line(mx, 0, mx, rt.graphics.get_height())
     self._margin_center_line = rt.Line(mx + 0.5 * (rt.graphics.get_width() - 2 * mx), 0, mx + 0.5 * (rt.graphics.get_width() - 2 * mx), rt.graphics.get_height())
     self._margin_right_line = rt.Line(rt.graphics.get_width() - mx, 0, rt.graphics.get_width() - mx, rt.graphics.get_height())
 
     local my = rt.settings.margin_unit
+    local priority_queue_width = rt.settings.battle.scene.priority_queue_width
     self._log:fit_into(mx, my, rt.graphics.get_width() - 2 * mx, 5 * my)
-    self._priority_queue:fit_into(rt.graphics.get_width() - 100, 0, 100, rt.graphics.get_height())
-    self._priority_queue:reorder(self._entities)
+    self._priority_queue:fit_into(rt.graphics.get_width() - priority_queue_width, 0, priority_queue_width, rt.graphics.get_height())
 
+    local gradient_width = 1.5 * mx
+    self._gradient_left:resize(0, 0, gradient_width, rt.graphics.get_height())
+    self._gradient_right:resize(rt.graphics.get_width() - gradient_width, 0, gradient_width, rt.graphics.get_height())
 
     local length = width
     self._debug_layout_lines = {
@@ -108,15 +131,23 @@ function bt.BattleScene:add_entity(entity)
             sprite:add_animation(bt.Animation.ENEMY_APPEARED(self, sprite))
         end
 
-        self._priority_queue:add_entity(entity)
         self._priority_queue:reorder(self._entities)
-
         self:_reformat_enemy_sprites()
     end
 end
 
 --- @brief
 function bt.BattleScene:draw()
+
+    love.graphics.clear(0, 0, 0, 0)
+    love.graphics.setColor(0.5, 0.5, 0.5, 1)
+    love.graphics.rectangle("fill", 0, 0, love.graphics.getWidth(), love.graphics.getHeight())
+
+    rt.graphics.set_blend_mode(rt.BlendMode.MULTIPLY)
+    self._gradient_left:draw()
+    self._gradient_right:draw()
+    rt.graphics.set_blend_mode()
+
     for _, i in pairs(self._enemy_sprite_render_order) do
         self._enemy_sprites[i]:draw()
     end
@@ -167,7 +198,7 @@ function bt.BattleScene:_reformat_enemy_sprites()
         rt.error("In bt.BattleScene:_reformat_enemy_sprites: number of enemy sprites is 0")
     end
     local target_y = rt.graphics.get_height() * rt.settings.battle.scene.enemy_alignment_y
-    local mx = rt.settings.battle.scene.horizontal_margin
+    local mx = rt.graphics.get_width() * 1 / 16
 
     local alignment_mode = self._enemy_sprite_alignment_mode
     if alignment_mode == bt.EnemySpriteAlignmentMode.EQUIDISTANT then
@@ -200,7 +231,7 @@ function bt.BattleScene:_reformat_enemy_sprites()
 
         local m = math.min( -- if enemy don't fit on screen, stagger without violating outer margins
             rt.settings.margin_unit * 2,
-                (rt.graphics.get_width() - 2 * rt.settings.battle.scene.horizontal_margin - total_w) / #self._enemy_sprites
+                (rt.graphics.get_width() - 2 * mx - total_w) / #self._enemy_sprites
         )
         for i = 2, #self._enemy_sprites do
             local sprite = self._enemy_sprites[i]

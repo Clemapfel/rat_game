@@ -19,6 +19,11 @@ for entity in range(small_ufo, boulder, sprout_01, sprout_02, mole) do
     scene:add_entity(entity)
 end
 
+local order = {}
+for i = 1, #scene._entities do
+    table.insert(order, scene._entities[i])
+end
+
 input = rt.InputController()
 input:signal_connect("pressed", function(_, which)
     if which == rt.InputButton.A then
@@ -28,7 +33,10 @@ input:signal_connect("pressed", function(_, which)
         --sprite:add_animation(bt.Animation.HP_GAINED(scene, sprite, rt.random.integer(0, 100)))
         sprite:add_continuous_animation(bt.Animation.KNOCKED_OUT_SUSTAIN(scene, sprite))
         ]]--
-        scene:add_entity(bt.BattleEntity(scene, "SMALL_UFO"))
+
+        table.remove(order, 1)
+        scene._priority_queue:reorder(order)
+
     elseif which == rt.InputButton.B then
         local i = rt.random.integer(1, #scene._enemy_sprites)
         local sprite = scene._enemy_sprites[i]

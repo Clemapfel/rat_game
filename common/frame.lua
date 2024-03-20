@@ -65,8 +65,6 @@ end
 
 --- @overload rt.Widget.size_allocate
 function rt.Frame:size_allocate(x, y, width, height)
-
-
     local pos_x, pos_y, w, h = x, y, width, height
 
     if meta.is_widget(self._child) then

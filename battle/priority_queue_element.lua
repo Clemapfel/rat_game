@@ -2,7 +2,7 @@ rt.settings.battle.priority_queue_element = {
     font = rt.settings.font.default,
     thumbnail_size = 32, -- resolution of subimage
     frame_thickness = 5,
-    base_color = rt.Palette.GRAY_4,
+    base_color = rt.color_darken(rt.Palette.GRAY_4, 0.05),
     frame_color = rt.Palette.GRAY_3,
     selected_frame_color = rt.Palette.YELLOW_2,
     knocked_out_base_color = rt.Palette.RED_2,
@@ -20,13 +20,14 @@ bt.PriorityQueueElement = meta.new_type("PriorityQueueElement", rt.Widget, rt.An
         _backdrop = rt.Rectangle(0, 0, 1, 1),
         _frame = rt.Rectangle(0, 0, 1, 1),
         _frame_outline = rt.Rectangle(0, 0, 1, 1),
+        _frame_gradient = {}, -- rt.LogGradient
         _debug_backdrop = rt.Rectangle(0, 0, 1, 1),
 
         _id_offset_label = {}, -- rt.Glyph
 
-        _is_selected = rt.random.toss_coin(),
-        _is_disabled = rt.random.toss_coin(),
-        _is_knocked_out = rt.random.toss_coin(),
+        _is_selected = false, --rt.random.toss_coin(),
+        _is_disabled = false, --rt.random.toss_coin(),
+        _is_knocked_out = false, --rt.random.toss_coin(),
         _elapsed = 0
     })
 end)
@@ -55,6 +56,12 @@ function bt.PriorityQueueElement:realize()
     self._backdrop:set_color(rt.settings.battle.priority_queue_element.base_color)
     self._frame:set_color(rt.settings.battle.priority_queue_element.frame_color)
     self._frame_outline:set_color(rt.Palette.BACKGROUND)
+
+    self._frame_gradient = rt.LogGradient(
+        rt.RGBA(0.8, 0.8, 0.8, 1),
+        rt.RGBA(1, 1, 1, 1)
+    )
+    self._frame_gradient:set_is_vertical(true)
 
     for shape in range(self._backdrop, self._frame, self._frame_outline) do
         shape:set_corner_radius(rt.settings.battle.priority_queue_element.corner_radius)
@@ -98,8 +105,10 @@ function bt.PriorityQueueElement:size_allocate(x, y, width, height)
         self._frame:set_line_width(frame_thickness)
         self._frame_outline:set_line_width(frame_outline_thickness)
 
-        self._frame:resize(x + frame_thickness / 2, y + frame_thickness / 2, width - frame_thickness , height - frame_thickness )
-        self._frame_outline:resize(x + frame_thickness / 2, y + frame_thickness / 2, width - frame_thickness , height - frame_thickness )
+        local frame_aabb = rt.AABB(x + frame_thickness / 2, y + frame_thickness / 2, width - frame_thickness , height - frame_thickness)
+        self._frame:resize(frame_aabb.x, frame_aabb.y, frame_aabb.width, frame_aabb.height)
+        self._frame_outline:resize(frame_aabb.x, frame_aabb.y, frame_aabb.width, frame_aabb.height)
+        self._frame_gradient:resize(x, y, width, height)
 
         -- align texture
         local frame = self._spritesheet:get_frame(1)
@@ -136,8 +145,8 @@ function bt.PriorityQueueElement:size_allocate(x, y, width, height)
         local label_w, label_h = self._id_offset_label:get_size()
         local label_offset = 0.75
         self._id_offset_label:set_position(
-                x + width - label_offset * label_w,
-                y + height - label_offset * label_h
+            x + width - label_offset * label_w,
+            y + height - label_offset * label_h
         )
 
         self._debug_backdrop:resize(x, y, width, height)
@@ -149,9 +158,23 @@ end
 function bt.PriorityQueueElement:draw()
     if self._is_realized then
         self._backdrop:draw()
+
+        -- stencil away overlapping corners of shape
+        rt.graphics.stencil(1, self._backdrop)
+        rt.graphics.set_stencil_test(rt.StencilCompareMode.EQUAL, 1)
         self._shape:draw()
+        rt.graphics.set_stencil_test()
+        rt.graphics.stencil()
+
         self._frame_outline:draw()
         self._frame:draw()
+
+        rt.graphics.stencil(2, self._frame)
+        rt.graphics.set_stencil_test(rt.StencilCompareMode.EQUAL, 2)
+        rt.graphics.set_blend_mode(rt.BlendMode.MULTIPLY)
+        self._frame_gradient:draw()
+        rt.graphics.set_blend_mode()
+        rt.graphics.set_stencil_test()
 
         if self._scene:get_debug_draw_enabled() then
             self._debug_backdrop:draw()
@@ -177,8 +200,8 @@ end
 function bt.PriorityQueueElement:set_is_disabled(b)
     self._is_disabled = b
     if self._is_realized then
-        self._shape:set_opacity(ternary(self._is_disabled, 1, 0.4))
-        self._id_offset_label:set_opacity(ternary(self._is_disabled, 1, 0.8))
+        self._shape:set_opacity(ternary(not self._is_disabled, 1, 0.4))
+        self._id_offset_label:set_opacity(ternary(not self._is_disabled, 1, 0.8))
     end
 end
 

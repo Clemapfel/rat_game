@@ -262,3 +262,42 @@ function rt.test.gradient()
     gradient:set_position(200, 300)
     error("TODO")
 end
+
+--- ##################
+
+
+--- @class rt.LogGradient
+rt.LogGradient = meta.new_type("LogGradient", rt.Drawable, function(left_color, right_color)
+    left_color = which(left_color, rt.RGBA(0, 0, 0, 0))
+    right_color = which(right_color, rt.RGBA(0, 0, 0, 1))
+    return meta.new(rt.LogGradient, {
+        _shape = rt.VertexRectangle(0, 0, 1, 1),
+        _shader = rt.Shader("assets/shaders/log_gradient.glsl"),
+        _left_color = left_color,
+        _right_color = right_color,
+        _is_vertical = false
+    })
+end)
+
+--- @brief
+function rt.LogGradient:resize(x, y, width, height)
+    self._shape:set_vertex_position(1, x, y)
+    self._shape:set_vertex_position(2, x + width, y)
+    self._shape:set_vertex_position(3, x + width, y + height)
+    self._shape:set_vertex_position(4, x, y + height)
+end
+
+--- @brief
+function rt.LogGradient:draw()
+    self._shader:bind()
+    self._shader:send("_left_color", {self._left_color.r, self._left_color.g, self._left_color.b, self._left_color.a})
+    self._shader:send("_right_color", {self._right_color.r, self._right_color.g, self._right_color.b, self._right_color.a})
+    self._shader:send("_is_vertical", ternary(self._is_vertical == true, 1, 0))
+    self._shape:draw()
+    self._shader:unbind()
+end
+
+--- @brief
+function rt.LogGradient:set_is_vertical(b)
+    self._is_vertical = b
+end
