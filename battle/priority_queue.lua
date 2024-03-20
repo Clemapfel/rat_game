@@ -1,7 +1,7 @@
 rt.settings.battle.priority_queue = {
     element_size = 75,
     first_element_scale_factor = 1.3,
-
+    first_element_scale_speed = 0.4, -- duration from 1.0 to 1.3, in seconds
     collider_mass = 50,
     collider_speed = 2000
 }
@@ -13,7 +13,7 @@ bt.PriorityQueue = meta.new_type("PriorityQueue", rt.Widget, rt.Animation, funct
         _world = rt.PhysicsWorld(0, 0),
         _entries = {}, -- Table<EntityID, bt.PriorityQueue.ElementEntry>
         _current_order = {}, -- Table<Entity>
-        _render_order = {} -- Table<{bt.PriorityQueueElement, Collider}>
+        _render_order = {} -- Table<{entity_key, multiplicity_index}>
     })
 end)
 
@@ -26,6 +26,7 @@ function bt.PriorityQueue:reorder(order)
         return
     end
 
+    println(#order)
     self._current_order = {}
 
     -- generate or remove new elements if entity or entity multiplicity is seen for the first time
@@ -63,11 +64,10 @@ function bt.PriorityQueue:reorder(order)
                 -- if called before first size_allocate
             end
 
+            local collider_x = bounds.x + bounds.width + 2 * element_size
+            local collider_y = bounds.y + bounds.height * mix(0.25, 0.75, rt.rand())
             local collider = rt.CircleCollider(
-                self._world, rt.ColliderType.DYNAMIC,
-                    bounds.x + bounds.width + 2 * element_size,
-                    bounds.y + bounds.height * mix(0.25, 0.75, rt.rand()),
-                    element_size / 2
+                self._world, rt.ColliderType.DYNAMIC, collider_x, collider_y, element_size / 2
             )
             collider:set_collision_group(rt.ColliderCollisionGroup.NONE)
             collider:set_mass(rt.settings.battle.priority_queue.collider_mass)
@@ -79,6 +79,7 @@ function bt.PriorityQueue:reorder(order)
             if self._is_realized then
                 queue_element:realize()
             end
+            queue_element:fit_into(0, 0, element_size, element_size)
         end
 
         while #entry.colliders > n do
@@ -89,6 +90,10 @@ function bt.PriorityQueue:reorder(order)
     end
 
     self:reformat()
+
+    for _, v in pairs(self._current_order) do
+        println(v:get_id())
+    end
 end
 
 --- @override
@@ -114,9 +119,6 @@ function bt.PriorityQueue:size_allocate(x, y, width, height)
 
         -- first element is larger
         local factor = rt.settings.battle.priority_queue.first_element_scale_factor
-        local align_center = false
-        local y_offset_factor = ternary(align_center, 2, 1)
-        local offset = (element_size - element_size * factor) / y_offset_factor
 
         self._render_order = {}
 
@@ -131,15 +133,16 @@ function bt.PriorityQueue:size_allocate(x, y, width, height)
             }
             element_y = element_y + element_size + m
 
-            -- scale first element, then offset all other elements by size difference
-            -- all anchored at 0, 0, actual position is set during draw
-            if #self._render_order == 0 then
-                entry.elements[i]:fit_into(offset, 0, element_size * factor, element_size * factor)
-            else
-                entry.elements[i]:fit_into(0, -1 * y_offset_factor * offset, element_size, element_size)
+            -- store scale animation in collider userdata, scale is applied during draw
+            local is_first = is_empty(self._render_order)
+            local collider = entry.colliders[i]
+
+            if collider:get_userdata("is_first") ~= is_first then
+                collider:add_userdata("scale", 1)
+                collider:add_userdata("is_first", is_first)
             end
 
-            table.insert(self._render_order, 1, {entry.elements[i], entry.colliders[i]})
+            table.insert(self._render_order, 1, {entity, n_seen[entity]}) -- sic, reverse order
         end
     end
 end
@@ -177,6 +180,17 @@ function bt.PriorityQueue:update(delta)
             local distance = rt.magnitude(target_x - current_x, target_y - current_y)
             local damping = magnitude / (4 * distance)
             collider:set_linear_damping(damping)
+
+            if collider:get_userdata("is_first") == true then
+                local max_factor = rt.settings.battle.priority_queue.first_element_scale_factor
+                local step = delta / rt.settings.battle.priority_queue.first_element_scale_speed
+
+                if collider:contains_point(target_x, target_y) then
+                    step = step * 2
+                end
+
+                collider:add_userdata("scale", clamp(collider:get_userdata("scale") + step, 1, max_factor))
+            end
         end
     end
 
@@ -189,18 +203,32 @@ function bt.PriorityQueue:draw()
         rt.graphics.push()
 
         local size = rt.settings.battle.priority_queue.element_size
-        local first_scale = 1.2
-        local first_offset_x, first_offset_y = 0, 0
+        local max_scale = rt.settings.battle.priority_queue.first_element_scale_factor
+        local scaled_offset = 0
+
         for i, t in ipairs(self._render_order) do
-            local element = t[1]
-            local collider = t[2]
+            local entry = self._entries[t[1]]
+            local element = entry.elements[t[2]]
+            local collider = entry.colliders[t[2]]
+
             local pos_x, pos_y = collider:get_position()
             pos_x = math.floor(pos_x - 0.5 * size)
             pos_y = math.floor(pos_y - 0.5 * size)
 
-            rt.graphics.translate(pos_x, pos_y)
+            -- offset all elements except first scaled one
+            local scale = collider:get_userdata("scale")
+            scaled_offset = ternary(math.abs(scale - 1) < 0.001, (max_scale - 1) * size, 0)
+
+            rt.graphics.translate(pos_x, pos_y + scaled_offset)
+
+            rt.graphics.push()
+            rt.graphics.translate((scale - 1) * -1 * size, 0)
+            rt.graphics.scale(scale, scale)
+
             element:draw()
-            rt.graphics.translate(-1 * pos_x, -1 * pos_y)
+
+            rt.graphics.pop()
+            rt.graphics.translate(-1 * pos_x, -1 * (pos_y + scaled_offset))
         end
 
         rt.graphics.pop()

@@ -62,6 +62,11 @@ function rt.magnitude(x, y)
 end
 
 --- @brief
+function rt.distance(x1, y1, x2, y2)
+    return math.sqrt((x2 - x1)^2 + (y2 - y1)^2)
+end
+
+--- @brief
 function rt.to_polar(x, y)
     return rt.magnitude(x, y), math.atan2(y, x)
 end

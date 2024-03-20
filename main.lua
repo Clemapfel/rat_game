@@ -33,14 +33,21 @@ input:signal_connect("pressed", function(_, which)
         --sprite:add_animation(bt.Animation.HP_GAINED(scene, sprite, rt.random.integer(0, 100)))
         sprite:add_continuous_animation(bt.Animation.KNOCKED_OUT_SUSTAIN(scene, sprite))
         ]]--
-
         table.remove(order, 1)
         scene._priority_queue:reorder(order)
 
     elseif which == rt.InputButton.B then
+
+        for i = 1, #scene._entities do
+            table.insert(order, scene._entities[rt.random.integer(1, #scene._entities)])
+        end
+        scene._priority_queue:reorder(order)
+
+        --[[
         local i = rt.random.integer(1, #scene._enemy_sprites)
         local sprite = scene._enemy_sprites[i]
         sprite:add_animation(bt.Animation.HP_LOST(scene, sprite, rt.random.integer(0, 100)))
+        ]]--
     elseif which == rt.InputButton.X then
         local i = rt.random.integer(1, #scene._enemy_sprites)
         local sprite = scene._enemy_sprites[i]

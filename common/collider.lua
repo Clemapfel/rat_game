@@ -417,3 +417,22 @@ function rt.Collider:set_collision_group(group)
         end
     end
 end
+
+--- @brief
+function rt.Collider:contains_point(point_x, point_y)
+    if love.getVersion() >= 12 then
+        for _, shape in pairs(self._body:getShapes()) do
+            if shape:testPoint(point_x, point_y) == true then
+                return true
+            end
+        end
+        return false
+    else
+        for _, shape in pairs(self._body:getFixtures()) do
+            if shape:testPoint(point_x, point_y) == true then
+                return true
+            end
+        end
+        return false
+    end
+end
