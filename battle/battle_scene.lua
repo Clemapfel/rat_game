@@ -82,7 +82,6 @@ end
 function bt.BattleScene:size_allocate(x, y, width, height)
     self:_reformat_enemy_sprites()
 
-
     local enemy_y = rt.graphics.get_height() * rt.settings.battle.scene.enemy_alignment_y
     self._enemy_alignment_line = rt.Line(0, enemy_y, rt.graphics.get_width(), enemy_y)
     local mx = rt.graphics.get_width() * 1 / 16

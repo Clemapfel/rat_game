@@ -220,10 +220,6 @@ end
 --- @override
 function bt.PriorityQueueElement:update(delta)
     self._elapsed = self._elapsed + delta
-    if self._is_selected then
-
-    end
-
     if self._is_knocked_out then
         -- pulsing red animation
         local offset = (rt.sine_wave(self._elapsed, 1 / 3) - 0.5) * 0.3

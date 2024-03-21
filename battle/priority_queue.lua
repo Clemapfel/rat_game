@@ -103,18 +103,16 @@ function bt.PriorityQueue:size_allocate(x, y, width, height)
         end
 
         local n_seen = {}
-
         local outer_margin = 1.5 * rt.settings.margin_unit
+        local factor = rt.settings.battle.priority_queue.first_element_scale_factor
         local m = math.min(
             rt.settings.margin_unit,
-            ((height - 2 * outer_margin - element_size) - (#self._current_order * element_size)) / (#self._current_order + 1)
+            ((height - 2 * outer_margin) - ((#self._current_order) * element_size) - (element_size * factor)) / (#self._current_order + 1)
         )
         local center_x = x + width - 2 * outer_margin
         local element_x, element_y = center_x, y + 2 * outer_margin + 0.5 * element_size + 0.5 * element_size
 
         -- first element is larger
-        local factor = rt.settings.battle.priority_queue.first_element_scale_factor
-
         self._render_order = {}
 
         for _, entity in pairs(self._current_order) do
@@ -221,7 +219,7 @@ function bt.PriorityQueue:draw()
             rt.graphics.push()
             rt.graphics.translate((scale - 1) * -1 * size, 0)
             rt.graphics.scale(scale, scale)
-
+            element:draw()
             rt.graphics.pop()
             rt.graphics.translate(-1 * pos_x, -1 * (pos_y + scaled_offset))
         end
