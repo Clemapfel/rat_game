@@ -598,3 +598,6 @@ function meta.serialize(x, skip_functions)
     table.insert(out, "}\n")
     return table.concat(out)
 end
+
+--- @brief internal test
+

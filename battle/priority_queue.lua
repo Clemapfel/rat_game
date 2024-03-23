@@ -11,34 +11,43 @@ bt.PriorityQueue = meta.new_type("PriorityQueue", rt.Widget, rt.Animation, funct
     return meta.new(bt.PriorityQueue, {
         _scene = scene,
         _world = rt.PhysicsWorld(0, 0),
-        _entries = {}, -- Table<EntityID, bt.PriorityQueue.ElementEntry>
-        _current_order = {}, -- Table<Entity>
-        _render_order = {} -- Table<{entity_key, multiplicity_index}>
+        _current = {
+            entries = {},       -- Table<EntityID, bt.PriorityQueue.ElementEntry>
+            order = {},         -- Table<Entity>
+            render_order = {}   -- Table<{entity_key, multiplicity_index}>
+        },
+        _next = {
+            entries = {},       -- Table<EntityID, bt.PriorityQueue.ElementEntry>
+            order = {},         -- Table<Entity>
+            render_order = {}   -- Table<{entity_key, multiplicity_index}>
+        },
+        _next_visible = false
     })
 end)
 
 --- @brief
 --- @param order Table<bt.Entity>
-function bt.PriorityQueue:reorder(order)
+function bt.PriorityQueue:reorder(order, next_order)
 
+    next_order = which(next_order, {})
     if not self._is_realized then
-        self._current_order = order
+        self._current.order = order
         return
     end
 
-    self._current_order = {}
+    self._current.order = {}
 
     -- generate or remove new elements if entity or entity multiplicity is seen for the first time
     local n_seen = {}
     for _, entity in pairs(order) do
         if n_seen[entity] == nil then n_seen[entity] = 0 end
         n_seen[entity] = n_seen[entity] + 1
-        table.insert(self._current_order, entity)
+        table.insert(self._current.order, entity)
     end
 
     for entity, n in pairs(n_seen) do
-        if self._entries[entity] == nil then
-            self._entries[entity] = {
+        if self._current.entries[entity] == nil then
+            self._current.entries[entity] = {
                 id = entity,
                 elements = {},  -- Table<rt.PriorityQueue>
                 colliders = {}, -- Table<rt.Collider>
@@ -47,7 +56,7 @@ function bt.PriorityQueue:reorder(order)
             }
         end
 
-        local entry = self._entries[entity]
+        local entry = self._current.entries[entity]
         local element_size = rt.settings.battle.priority_queue.element_size
 
         while #entry.colliders < n do
@@ -96,7 +105,7 @@ function bt.PriorityQueue:size_allocate(x, y, width, height)
     local element_size = rt.settings.battle.priority_queue.element_size
     local off_screen_pos_x, off_screen_pos_y = x + width + 2 * element_size, 0
     if self._is_realized then
-        for _, entry in pairs(self._entries) do
+        for _, entry in pairs(self._current.entries) do
             for i, element in ipairs(entry.elements) do
                 entry.target_positions[i][1] = off_screen_pos_x
             end
@@ -107,19 +116,19 @@ function bt.PriorityQueue:size_allocate(x, y, width, height)
         local factor = rt.settings.battle.priority_queue.first_element_scale_factor
         local m = math.min(
             rt.settings.margin_unit,
-            ((height - 2 * outer_margin) - ((#self._current_order) * element_size) - (element_size * factor)) / (#self._current_order + 1)
+            ((height - 2 * outer_margin) - ((#self._current.order) * element_size) - (element_size * factor)) / (#self._current.order + 1)
         )
         local center_x = x + width - 2 * outer_margin
         local element_x, element_y = center_x, y + 2 * outer_margin + 0.5 * element_size + 0.5 * element_size
 
         -- first element is larger
-        self._render_order = {}
+        self._current.render_order = {}
 
-        for _, entity in pairs(self._current_order) do
+        for _, entity in pairs(self._current.order) do
             if n_seen[entity] == nil then n_seen[entity] = 0 end
             n_seen[entity] = n_seen[entity] + 1
 
-            local entry = self._entries[entity]
+            local entry = self._current.entries[entity]
             local i = n_seen[entity]
             entry.target_positions[i] = {
                 element_x - element_size / 2, element_y - element_size / 2
@@ -127,7 +136,7 @@ function bt.PriorityQueue:size_allocate(x, y, width, height)
             element_y = element_y + element_size + m
 
             -- store scale animation in collider userdata, scale is applied during draw
-            local is_first = is_empty(self._render_order)
+            local is_first = is_empty(self._current.render_order)
             local collider = entry.colliders[i]
 
             if collider:get_userdata("is_first") ~= is_first then
@@ -135,7 +144,7 @@ function bt.PriorityQueue:size_allocate(x, y, width, height)
                 collider:add_userdata("is_first", is_first)
             end
 
-            table.insert(self._render_order, 1, {entity, n_seen[entity]}) -- sic, reverse order
+            table.insert(self._current.render_order, 1, {entity, n_seen[entity]}) -- sic, reverse order
         end
     end
 end
@@ -144,10 +153,10 @@ end
 function bt.PriorityQueue:realize()
     if self._is_realized then return end
     self._is_realized = true
-    self._entries = {}
-    self:reorder(self._current_order)
+    self._current.entries = {}
+    self:reorder(self._current.order)
 
-    for _, entry in pairs(self._entries) do
+    for _, entry in pairs(self._current.entries) do
         for _, element in pairs(entry.elements) do
             element:realize()
         end
@@ -158,7 +167,7 @@ end
 
 --- @override
 function bt.PriorityQueue:update(delta)
-    for _, entry in pairs(self._entries) do
+    for _, entry in pairs(self._current.entries) do
         for i, collider in ipairs(entry.colliders) do
             local current_x, current_y = collider:get_centroid()
             local target = entry.target_positions[i]
@@ -199,10 +208,10 @@ function bt.PriorityQueue:draw()
         local max_scale = rt.settings.battle.priority_queue.first_element_scale_factor
         local scaled_offset = 0
 
-        for i = 1, #self._render_order do
-            local t = self._render_order[i]
+        for i = 1, #self._current.render_order do
+            local t = self._current.render_order[i]
 
-            local entry = self._entries[t[1]]
+            local entry = self._current.entries[t[1]]
             local element = entry.elements[t[2]]
             local collider = entry.colliders[t[2]]
 
