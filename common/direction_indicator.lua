@@ -116,7 +116,15 @@ function rt.DirectionIndicator:size_allocate(x, y, width, height)
             end
         end
 
+        for i = 1, #vertices do
+            vertices[i] = math.round(vertices[i])
+        end
+
         self._arrow:resize(splat(vertices))
+
+        -- duplicate last vertex for loop
+        table.insert(vertices, vertices[1])
+        table.insert(vertices, vertices[2])
         self._arrow_outline:resize(splat(vertices))
     end
 end

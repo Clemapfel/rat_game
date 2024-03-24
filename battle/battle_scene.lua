@@ -49,7 +49,8 @@ function bt.BattleScene:realize()
     self._log:realize()
 
     self._priority_queue = bt.PriorityQueue(self)
-    self._priority_queue:reorder(self._entities)
+    self._priority_queue:set_order(self._entities)
+    self._priority_queue:set_preview_order(rt.random.shuffle(self._entities)) -- TODO: remove
     self._priority_queue:realize()
 
     local to = 1 - rt.settings.battle.scene.gradient_alpha
@@ -131,6 +132,7 @@ function bt.BattleScene:add_entity(entity)
         end
 
         self._priority_queue:reorder(self._entities)
+        self._priority_queue:set_preview_order(rt.random.shuffle(self._entities))
         self:_reformat_enemy_sprites()
     end
 end

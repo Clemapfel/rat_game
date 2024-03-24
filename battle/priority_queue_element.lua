@@ -9,7 +9,7 @@ rt.settings.battle.priority_queue_element = {
     corner_radius = 10,
     change_indicator_up_color = rt.Palette.GREEN,
     change_indicator_down_color = rt.Palette.RED,
-    change_indicator_none_color = rt.Palette.GRAY_4
+    change_indicator_none_color = rt.Palette.GRAY_2
 }
 
 --- @class bt.PriorityQueueElement
@@ -30,6 +30,7 @@ bt.PriorityQueueElement = meta.new_type("PriorityQueueElement", rt.Widget, rt.An
 
         _change_direction = rt.Direction.NONE,
         _change_indicator = {}, -- rt.DirectionIndicator
+        _change_indicator_visible = false,
 
         _is_selected = false, --rt.random.toss_coin(),
         _is_disabled = false, --rt.random.toss_coin(),
@@ -41,14 +42,26 @@ end)
 --- @brief
 function bt.PriorityQueueElement:set_change_indicator(direction)
 
-    self._direction = direction
+    self._change_direction = direction
     if self._is_realized then
         self._change_indicator:set_direction(direction)
+        if direction == rt.Direction.UP then
+            self._change_indicator:set_color(rt.settings.battle.priority_queue_element.change_indicator_up_color)
+        elseif direction == rt.Direction.DOWN then
+            self._change_indicator:set_color(rt.settings.battle.priority_queue_element.change_indicator_down_color)
+        elseif direction == rt.Direction.NONE then
+            self._change_indicator:set_color(rt.settings.battle.priority_queue_element.change_indicator_none_color)
+        end
     end
 
     if not (direction == rt.Direction.NONE or direction == rt.Direction.UP or direction == rt.Direction.DOWN) then
         rt.error("In bt.PriorityQueueElement: direction `" .. direction .. "` is not UP, DOWN or NONE")
     end
+end
+
+--- @brief
+function bt.PriorityQueueElement:set_change_indicator_visible(b)
+    self._change_indicator_visible = b
 end
 
 --- @override
@@ -98,6 +111,7 @@ function bt.PriorityQueueElement:realize()
 
     self._change_indicator = rt.DirectionIndicator(self._change_direction)
     self._change_indicator:realize()
+    self:set_change_indicator(self._change_direction)
 
     self:set_is_selected(self._is_selected)
     self:set_is_disabled(self._is_disabled)
@@ -213,7 +227,9 @@ function bt.PriorityQueueElement:draw()
 
         self._id_offset_label:draw()
 
-        self._change_indicator:draw()
+        if self._change_indicator_visible and self._change_direction ~= rt.Direction.NONE then
+            self._change_indicator:draw()
+        end
     end
 end
 

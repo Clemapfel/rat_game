@@ -25,6 +25,24 @@ assert(table.unpack ~= nil)
 if debug.setfenv == nil then debug.setfenv = setfenv end
 assert(debug.setfenv ~= nil)
 
+--- @brief iterate over values of table
+function values(t)
+    local k, v
+    return function()
+        k, v = next(t, k)
+        return v
+    end
+end
+
+--- @brief iterate over keys of tbale
+function keys(t)
+    local k, v
+    return function()
+        k, v = next(t, k)
+        return k
+    end
+end
+
 --- @brief print, arguments are concatenated
 --- @param vararg any
 --- @return nil
