@@ -54,7 +54,7 @@ require "common"
 
 function connect_emmy_lua_debugger()
     -- entry point for JetBrains IDE debugger
-    package.cpath = package.cpath .. ';/home/clem/.local/share/JetBrains/CLion2023.2/EmmyLua/debugger/emmy/linux/?.so'
+    package.cpath = package.cpath .. ';/home/clem/.local/share/JetBrains/CLion2023.3/EmmyLua/debugger/emmy/linux/?.so'
     local dbg = require('emmy_core')
     dbg.tcpConnect('localhost', 8172)
 

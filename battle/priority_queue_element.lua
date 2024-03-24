@@ -7,6 +7,9 @@ rt.settings.battle.priority_queue_element = {
     selected_frame_color = rt.Palette.YELLOW_2,
     knocked_out_base_color = rt.Palette.RED_2,
     corner_radius = 10,
+    change_indicator_up_color = rt.Palette.GREEN,
+    change_indicator_down_color = rt.Palette.RED,
+    change_indicator_none_color = rt.Palette.GRAY_4
 }
 
 --- @class bt.PriorityQueueElement
@@ -25,12 +28,28 @@ bt.PriorityQueueElement = meta.new_type("PriorityQueueElement", rt.Widget, rt.An
 
         _id_offset_label = {}, -- rt.Glyph
 
+        _change_direction = rt.Direction.NONE,
+        _change_indicator = {}, -- rt.DirectionIndicator
+
         _is_selected = false, --rt.random.toss_coin(),
         _is_disabled = false, --rt.random.toss_coin(),
         _is_knocked_out = false, --rt.random.toss_coin(),
         _elapsed = 0
     })
 end)
+
+--- @brief
+function bt.PriorityQueueElement:set_change_indicator(direction)
+
+    self._direction = direction
+    if self._is_realized then
+        self._change_indicator:set_direction(direction)
+    end
+
+    if not (direction == rt.Direction.NONE or direction == rt.Direction.UP or direction == rt.Direction.DOWN) then
+        rt.error("In bt.PriorityQueueElement: direction `" .. direction .. "` is not UP, DOWN or NONE")
+    end
+end
 
 --- @override
 function bt.PriorityQueueElement:realize()
@@ -76,6 +95,9 @@ function bt.PriorityQueueElement:realize()
             font_style = rt.FontStyle.BOLD
         }
     )
+
+    self._change_indicator = rt.DirectionIndicator(self._change_direction)
+    self._change_indicator:realize()
 
     self:set_is_selected(self._is_selected)
     self:set_is_disabled(self._is_disabled)
@@ -149,6 +171,15 @@ function bt.PriorityQueueElement:size_allocate(x, y, width, height)
             y + height - label_offset * label_h
         )
 
+        -- align direction
+        local direction_size = rt.settings.battle.priority_queue_element.font:get_size()
+        local direction_offset = -0.4
+        self._change_indicator:fit_into(
+            x + direction_offset * direction_size,
+            y + direction_offset * direction_size,
+            direction_size, direction_size
+        )
+
         self._debug_backdrop:resize(x, y, width, height)
         self._debug_backdrop:set_is_outline(true)
     end
@@ -181,6 +212,8 @@ function bt.PriorityQueueElement:draw()
         end
 
         self._id_offset_label:draw()
+
+        self._change_indicator:draw()
     end
 end
 

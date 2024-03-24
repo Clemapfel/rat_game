@@ -67,7 +67,8 @@ function rt.random.choose(set)
 end
 
 --- @brief reorder table
-function rt.random.shuffle(t)
+function rt.random.shuffle_in_place(t)
+
     for i = 1, #t do
         local j = rt.random.integer(1, #t)
         local temp = t[i]
@@ -75,6 +76,21 @@ function rt.random.shuffle(t)
         t[j] = temp
     end
     return t
+end
+
+--- @brief reorder table
+function rt.random.shuffle(t)
+    local indices = {}
+    for i = 1, sizeof(t) do
+        table.insert(indices, i)
+    end
+    rt.random.shuffle_in_place(indices)
+
+    local out = {}
+    for i, j in pairs(indices) do
+        out[i] = t[j]
+    end
+    return out
 end
 
 --- @brief

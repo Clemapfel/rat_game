@@ -20,28 +20,19 @@ for entity in range(small_ufo, boulder, sprout_01, sprout_02, mole) do
 end
 
 local order = {}
+local next_order = {}
 for i = 1, #scene._entities do
     table.insert(order, scene._entities[i])
+    table.insert(next_order, scene._entities[rt.random.integer(1, #scene._entities)])
 end
 
 input = rt.InputController()
 input:signal_connect("pressed", function(_, which)
     if which == rt.InputButton.A then
-        --[[
-        local i = rt.random.integer(1, #scene._enemy_sprites)
-        local sprite = scene._enemy_sprites[i]
-        --sprite:add_animation(bt.Animation.HP_GAINED(scene, sprite, rt.random.integer(0, 100)))
-        sprite:add_continuous_animation(bt.Animation.KNOCKED_OUT_SUSTAIN(scene, sprite))
-        ]]--
-        table.remove(order, 1)
-        scene._priority_queue:reorder(order)
-
+        scene._priority_queue:set_preview_visible(not scene._priority_queue:get_preview_visible())
     elseif which == rt.InputButton.B then
 
-        for i = 1, #scene._entities do
-            table.insert(order, scene._entities[2])
-        end
-        scene._priority_queue:reorder(order)
+        scene._priority_queue:reorder(rt.random.shuffle(order), rt.random.shuffle(next_order))
 
         --[[
         local i = rt.random.integer(1, #scene._enemy_sprites)
