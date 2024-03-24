@@ -14,7 +14,10 @@ bt.PriorityQueue = meta.new_type("PriorityQueue", rt.Widget, rt.Animation, funct
         _entries = {},        -- Table<Entity, cf. line 37>
         _current_order = {},  -- Table<Entity>
         _preview_order = {},  -- Table<Entity>
+        _selected_entities = {}, -- Set<Entity>
+        _knocked_out_entities = {}, -- Set<Entity>
         _render_order = {},   -- Table<{entity_key, multiplicity_index}>
+        _is_hidden = false,
         _is_preview_active = false
     })
 end)
@@ -23,11 +26,6 @@ end)
 function bt.PriorityQueue:size_allocate(x, y, width, height)
     -- generate new entries if needed
     local order = ternary(self._is_preview_active, self._preview_order, self._current_order)
-
-    println(" ")
-    for v in values(order) do
-        println(v:get_id())
-    end
 
     local n_seen = {}
     for _, entity in pairs(order) do
@@ -85,6 +83,7 @@ function bt.PriorityQueue:size_allocate(x, y, width, height)
     end
 
     -- update entry priority labels
+    -- also set selected / knocked out
     local current_first_occurence = {}
     for i, entity in ipairs(self._current_order) do
         if current_first_occurence[entity] == nil then
@@ -128,9 +127,9 @@ function bt.PriorityQueue:size_allocate(x, y, width, height)
             if before == nil and after == nil then
                 -- noop
             elseif before == nil and after ~= nil then
-
+                -- noop?
             elseif before ~= nil and after == nil then
-
+                -- noop?
             elseif before < after then
                 element:set_change_indicator(rt.Direction.DOWN)
             elseif before > after then
@@ -140,7 +139,8 @@ function bt.PriorityQueue:size_allocate(x, y, width, height)
             end
 
             element:set_change_indicator_visible(self._is_preview_active)
-
+            element:set_is_selected(self._selected_entities[entity] == true)
+            element:set_is_knocked_out(self._knocked_out_entities[entity] == true)
             if before_entry ~= nil then
                 before_entry.offset = before_entry.offset + 1
             end
@@ -166,7 +166,13 @@ function bt.PriorityQueue:size_allocate(x, y, width, height)
         rt.settings.margin_unit,
         ((height - 2 * outer_margin) - ((#order) * element_size) - (element_size * factor)) / (#order + 1)
     )
+
     local center_x = x + width - 2 * outer_margin
+    if self._is_hidden then
+        -- hide just offscreen
+        center_x = rt.graphics.get_width() + element_size * factor + m
+    end
+
     local element_x, element_y = center_x, y + 2 * outer_margin + 0.5 * element_size + 0.5 * element_size
     -- first element is larger
     local entity_index = {}
@@ -193,6 +199,28 @@ function bt.PriorityQueue:size_allocate(x, y, width, height)
 
         table.insert(self._render_order, 1, { entity, entity_index[entity] }) -- sic, reverse order
     end
+end
+
+--- @brief
+function bt.PriorityQueue:set_selected(entities)
+    entities = which(entities, {})
+    if meta.isa(entities, bt.BattleEntity) then entities = { entities } end
+    self._selected_entities = {}
+    for entity in values(entities) do
+        self._selected_entities[entity] = true
+    end
+    self:reformat()
+end
+
+--- @brief
+function bt.PriorityQueue:set_knocked_out(entities)
+    entities = which(entities, {})
+    if meta.isa(entities, bt.BattleEntity) then entities = { entities } end
+    self._knocked_out_entities = {}
+    for entity in values(entities) do
+        self._knocked_out_entities[entity] = true
+    end
+    self:reformat()
 end
 
 --- @brief
@@ -224,7 +252,23 @@ end
 --- @brief
 function bt.PriorityQueue:get_is_preview_active(b)
     return self._is_preview_active
-end 
+end
+
+--- @brief
+function bt.PriorityQueue:set_is_hidden(b)
+    if self._is_hidden ~= b then
+        self._is_hidden = b
+
+        if self._is_realized then
+            self:reformat()
+        end
+    end
+end
+
+--- @brief
+function bt.PriorityQueue:get_is_hidden()
+    return self._is_hidden
+end
 
 --- @override
 function bt.PriorityQueue:realize()

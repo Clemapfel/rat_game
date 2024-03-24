@@ -33,19 +33,13 @@ input:signal_connect("pressed", function(_, which)
         scene._priority_queue:set_preview_order(next_order)
         scene._priority_queue:set_is_preview_active(not scene._priority_queue:get_is_preview_active())
     elseif which == rt.InputButton.B then
-        --[[
-        local i = rt.random.integer(1, #scene._enemy_sprites)
-        local sprite = scene._enemy_sprites[i]
-        sprite:add_animation(bt.Animation.HP_LOST(scene, sprite, rt.random.integer(0, 100)))
-        ]]--
+        scene._priority_queue:set_selected({rt.random.choose(scene._entities)})
+        scene._priority_queue:set_knocked_out({rt.random.choose(scene._entities)})
     elseif which == rt.InputButton.X then
-        local i = rt.random.integer(1, #scene._enemy_sprites)
-        local sprite = scene._enemy_sprites[i]
-        sprite:add_animation(bt.Animation.PLACEHOLDER_MESSAGE(scene, sprite, "ALREADY DEAD"))
+        scene._priority_queue:set_selected()
+        scene._priority_queue:set_knocked_out()
     elseif which == rt.InputButton.Y then
-        local i = rt.random.integer(1, #scene._enemy_sprites)
-        local sprite = scene._enemy_sprites[i]
-        sprite:add_animation(bt.Animation.ENEMY_APPEARED(scene, sprite))
+        scene._priority_queue:set_is_hidden(not scene._priority_queue:get_is_hidden())
     elseif which == rt.InputButton.LEFT then
     elseif which == rt.InputButton.RIGHT then
     elseif which == rt.InputButton.R then

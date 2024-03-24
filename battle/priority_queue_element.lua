@@ -6,6 +6,7 @@ rt.settings.battle.priority_queue_element = {
     frame_color = rt.Palette.GRAY_3,
     selected_frame_color = rt.Palette.YELLOW_2,
     knocked_out_base_color = rt.Palette.RED_2,
+    knocked_out_shape_alpha = 0.7,
     corner_radius = 10,
     change_indicator_up_color = rt.Palette.GREEN,
     change_indicator_down_color = rt.Palette.RED,
@@ -41,7 +42,6 @@ end)
 
 --- @brief
 function bt.PriorityQueueElement:set_change_indicator(direction)
-
     self._change_direction = direction
     if self._is_realized then
         self._change_indicator:set_direction(direction)
@@ -260,8 +260,14 @@ function bt.PriorityQueueElement:set_is_knocked_out(b)
     if self._is_realized then
         if self._is_knocked_out then
             self._backdrop:set_color(rt.settings.battle.priority_queue_element.knocked_out_base_color)
+            for i = 1, 4 do
+                self._shape:set_vertex_color(i, rt.RGBA(1, 1,1, rt.settings.battle.priority_queue_element.knocked_out_shape_alpha))
+            end
         else
             self._backdrop:set_color(rt.settings.battle.priority_queue_element.base_color)
+            for i = 1, 4 do
+                self._shape:set_vertex_color(i, rt.RGBA(1, 1,1, 1))
+            end
         end
     end
 end
