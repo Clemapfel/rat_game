@@ -69,11 +69,13 @@ function bt.PriorityQueueElement:realize()
     if self._is_realized then return end
     self._is_realized = true
 
-    self._spritesheet = rt.SpriteAtlas:get(self._entity:get_sprite_id())
+    local sprite_id, sprite_index = self._entity:get_sprite_id()
+    sprite_index = which(sprite_index, 1)
+    self._spritesheet = rt.SpriteAtlas:get(sprite_id)
     self._shape = rt.VertexRectangle(0, 0, 1, 1)
     self._shape:set_texture(self._spritesheet:get_texture())
     self._spritesheet:get_texture():set_wrap_mode(rt.TextureWrapMode.ZERO)
-    local frame = self._spritesheet:get_frame(1)
+    local frame = self._spritesheet:get_frame(sprite_index)
     self._shape:reformat_texture_coordinates(
         frame.x, frame.y,
         frame.x + frame.width, frame.y,

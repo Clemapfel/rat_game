@@ -1,4 +1,7 @@
-require "include"
+require "include"-- Initializes color values
+
+rt.Palette:export()
+assert(love.filesystem.write("test.txt", "test"))
 
 rt.SpriteAtlas = rt.SpriteAtlas()
 rt.SpriteAtlas:initialize("assets/sprites")
@@ -22,13 +25,7 @@ end
 input = rt.InputController()
 input:signal_connect("pressed", function(_, which)
     if which == rt.InputButton.A then
-        --[[
-        local current = scene._priority_queue:get_preview_active()
-        local next = not current
-        if next == true then
-            scene._priority_queue:set_preview_order(rt.random.shuffle(order))
-        end
-        ]]--
+
         local next_order = rt.random.shuffle(scene._entities)
         scene._priority_queue:set_preview_order(next_order)
         scene._priority_queue:set_is_preview_active(not scene._priority_queue:get_is_preview_active())
@@ -57,6 +54,7 @@ love.load = function()
         borderless = false
     })
     love.window.setTitle("rat_game")
+    love.filesystem.setIdentity("rat_game")
     rt.current_scene:realize()
 end
 
@@ -83,61 +81,3 @@ end
 
 love.quit = function()
 end
-
---[[
-rt.current_scene = ow.OverworldScene()
-rt.current_scene._player:set_position(150, 150)
-rt.current_scene:add_stage("debug_map", "assets/stages/debug")
-
-sprite = ow.OverworldSprite(rt.current_scene, "debug/bouncy_ball")
-rt.current_scene:add_entity(sprite, 50, 50)
-
-]]--
-
---[[
-local visualizer_initialized = false
-local spectrum_image, spectrum_texture, energy_image, energy_texture
-local spectrum_format = "rgba16"
-local energy_format = "rgba16"
-local col_i = 0
-local texture_h = 10e3
-
-local shader = rt.Shader("assets/shaders/audio_visualizer_debug.glsl")
-local active = false
-
-audio.on_update = function(coefficients)
-    if not visualizer_initialized then
-        spectrum_image = love.image.newImageData(texture_h, #coefficients, spectrum_format)
-        spectrum_texture = love.graphics.newImage(spectrum_image)
-        spectrum_texture:setFilter("nearest", "nearest")
-
-        shape = rt.VertexRectangle(0, 0, rt.graphics.get_width(), rt.graphics.get_height())
-        visualizer_initialized = true
-    end
-
-    if col_i >= texture_h then
-        spectrum_image = love.image.newImageData(texture_h, #coefficients, spectrum_format)
-        col_i = 0
-    end
-
-    for i, value in ipairs(coefficients) do
-        spectrum_image:setPixel(col_i, i - 1, value, value, value, 1)
-    end
-
-    spectrum_texture:replacePixels(spectrum_image)
-
-    shader:send("_coefficients", spectrum_texture)
-    --shader:send("_energies", energy_texture)
-    shader:send("_index", col_i)
-    shader:send("_max_index", texture_h)
-
-    col_i = col_i + 1
-end
-
- if shader ~= nil and shape ~= nil then
-shader:bind()
-        shape:draw()
-        shader:unbind()
-
-end
-]]--

@@ -11,6 +11,7 @@ end
 
 local major, minor = love.getVersion()
 print("Love2D " .. major .. "." .. minor .. " | " .. jit.version)
+love.filesystem.setIdentity("rat_game")
 
 rt = {}
 rt.test = {}
@@ -183,6 +184,8 @@ require "battle.party_info"
 require "battle.battle_log"
 require "battle.priority_queue_element"
 require "battle.priority_queue"
+require "battle.status_bar_element"
+require "battle.status_bar"
 require "battle.battle_scene"
 
 --[[

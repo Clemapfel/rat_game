@@ -33,7 +33,7 @@ end, {
 
     priority = 0,
 
-    status = {}, -- Table<bt.Status>
+    status = {}, -- Table<bt.Status, {elapsed}>
 
     is_knocked_out = false,
     is_dead = false,
@@ -130,4 +130,9 @@ end
 --- @brief
 function bt.BattleEntity:get_sprite_id()
     return self.sprite_id
+end
+
+--- @brief
+function bt.BattleEntity:get_status_n_turns_elapsed(status)
+    return self._status[status].elapsed
 end
