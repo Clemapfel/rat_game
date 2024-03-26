@@ -2,7 +2,8 @@
 rt.JointType = meta.new_enum({
     PIVOT = "PIVOT",
     FIXED = "FIXED",
-    MAX_DISTANCE = "MAX_DISTANCE"
+    MAX_DISTANCE = "MAX_DISTANCE",
+    FRICTION = "FRICTION"
 })
 
 --- @class rt.Joint
@@ -28,7 +29,7 @@ rt.Joint = meta.new_type("Joint", rt.Drawable, function(joint_type, collider_a, 
         out._native = love.physics.newWeldJoint(
             collider_a._body,
             collider_b._body,
-            x1, y1, x2, y1
+            x1, y1, x2, y2
         )
     elseif out._type == rt.JointType.MAX_DISTANCE then
         local distance = _G._select(1, ...)
@@ -36,8 +37,16 @@ rt.Joint = meta.new_type("Joint", rt.Drawable, function(joint_type, collider_a, 
         out._native = love.physics.newRopeJoint(
             collider_a._body,
             collider_b._body,
-            x1, y1, x2, y1,
+            x1, y1, x2, y2,
             distance
+        )
+    elseif out._type == rt.JointType.FRICTION then
+        local distance = _G._select(1, ...)
+        distance = which(distance, 0)
+        out._native = love.physics.newFrictionJoint(
+            collider_a._body,
+            collider_b._body,
+            x1, y1, x2, y2
         )
     else
         rt.error("In rt.Joint: unhandled joint type `" .. joint_type .. "`")

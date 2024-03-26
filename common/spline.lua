@@ -223,7 +223,9 @@ end
 
 --- @overload
 function rt.Spline:draw()
-    love.graphics.line(splat(self._vertices))
+    if #self._vertices > 2 then
+        love.graphics.line(splat(self._vertices))
+    end
 end
 
 --- @brief [internal]
