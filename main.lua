@@ -22,6 +22,26 @@ for entity in range(small_ufo, boulder, sprout_01, sprout_02, mole) do
     scene:add_entity(entity)
 end
 
+local status_entity = boulder
+local status_01 = bt.Status("TEST")
+local status_02 = bt.Status("OTHER_TEST")
+
+for status in range(status_01, status_02) do
+    status:realize()
+end
+
+status_entity.status[status_01] = 0
+status_entity.status[status_02] = 2
+
+local status_01_element = bt.StatusBarElement(small_ufo, status_01)
+local status_02_element = bt.StatusBarElement(small_ufo, status_01)
+
+status_01_element:realize()
+status_01_element:fit_into(50, 50, 50, 50)
+
+status_02_element:realize()
+status_02_element:fit_into(100, 50, 50, 50)
+
 input = rt.InputController()
 input:signal_connect("pressed", function(_, which)
     if which == rt.InputButton.A then
@@ -67,6 +87,10 @@ love.draw = function()
         love.graphics.setColor(1, 1, 1, 0.75)
         love.graphics.print(fps, rt.graphics.get_width() - love.graphics.getFont():getWidth(fps) - 2 * margin, 0.5 * margin)
     end
+
+    -- TODO
+    status_01_element:draw()
+    status_02_element:draw()
 end
 
 love.update = function()

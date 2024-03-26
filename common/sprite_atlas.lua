@@ -82,7 +82,7 @@ function rt.SpriteAtlasEntry:load()
 
     if config.animations == nil then
         config.animations = {
-            ["default"] = {1, config.n_frames}
+            ["default"] = { 1, config.n_frames }
         }
     end
 

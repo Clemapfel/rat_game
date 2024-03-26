@@ -40,6 +40,7 @@ end, {
 
     -- non simulation
     sprite_id = "",
+    sprite_index = 1
 })
 
 --- @brief
@@ -64,6 +65,17 @@ function bt.BattleEntity:realize()
             self[key] = config[key]
         end
         meta.assert_string(self[key])
+    end
+
+    local numbers = {
+        "sprite_index"
+    }
+
+    for _, key in ipairs(numbers) do
+        if config[key] ~= nil then
+            self[key] = config[key]
+        end
+        meta.assert_number(self[key])
     end
 
     -- TODO
@@ -129,7 +141,7 @@ end
 
 --- @brief
 function bt.BattleEntity:get_sprite_id()
-    return self.sprite_id
+    return self.sprite_id, self._sprite_index
 end
 
 --- @brief

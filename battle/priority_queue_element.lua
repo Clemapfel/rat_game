@@ -149,7 +149,7 @@ function bt.PriorityQueueElement:size_allocate(x, y, width, height)
         self._frame_gradient:resize(x, y, width, height)
 
         -- align texture
-        local frame = self._spritesheet:get_frame(1)
+        local frame = self._spritesheet:get_frame(self._entity.sprite_index)
         local frame_x, frame_y, frame_w, frame_h = frame.x, frame.y, frame.width, frame.height
         local frame_res_w, frame_res_h = self._spritesheet:get_frame_size()
 

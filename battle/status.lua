@@ -14,9 +14,9 @@ bt.Status = meta.new_type("Status", function(id)
     meta.set_is_mutable(out, false)
     return out
 end, {
-    attack_modifier = 0,
-    defense_modifier = 0,
-    speed_modifier = 0,
+    attack_offset = 0,
+    defense_offset = 0,
+    speed_offset = 0,
 
     attack_factor = 1,
     defense_factor = 1,
@@ -152,7 +152,10 @@ end, {
         meta.asssert_isa(self, bt.Status)
         meta.assert_isa(afflicated, bt.BattleEntity)
         return true -- allow switch
-    end
+    end,
+
+    sprite_id = "",
+    sprite_index = 1
 })
 
 --- @brief
@@ -180,9 +183,9 @@ function bt.Status:realize()
     end
 
     local numbers = {
-        "attack_modifier",
-        "defense_modifier",
-        "speed_modifier",
+        "attack_offset",
+        "defense_offset",
+        "speed_offset",
         "max_duration"
     }
 
@@ -217,7 +220,7 @@ function bt.Status:realize()
         "on_status_lost",
         "on_before_consumable",
         "on_after_consumable",
-        "on_knock_out",
+        "on_knocked_out",
         "on_helped_up",
         "on_death",
         "on_switch"
@@ -230,6 +233,18 @@ function bt.Status:realize()
         meta.assert_function(self[key])
     end
 
+    self.sprite_id = config.sprite_id
+    meta.assert_string(self.sprite_id)
+
+    if config.sprite_index ~= nil then
+        self.sprite_index = config.sprite_index
+    end
+
     self._is_realized = true
     meta.set_is_mutable(self, false)
+end
+
+--- @brief
+function bt.Status:get_sprite_id()
+    return self.sprite_id, self.sprite_index
 end

@@ -415,6 +415,16 @@ function rt.VertexShape:reformat_texture_coordinates(...)
 end
 
 --- @brief
+function rt.VertexShape:reformat_vertex_positions(...)
+    local coords = {...}
+    local vertex_i = 1
+    for i = 1, #coords, 2 do
+        self:set_vertex_position(vertex_i, coords[i], coords[i+1])
+        vertex_i = vertex_i + 1
+    end
+end
+
+--- @brief
 function rt.VertexShape:set_opacity(alpha)
     self._opacity = alpha
     for i = 1, self:get_n_vertices() do
