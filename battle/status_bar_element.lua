@@ -99,3 +99,11 @@ function bt.StatusBarElement:draw()
         end
     end
 end
+
+--- @brief
+function bt.StatusBarElement:set_opacity(alpha)
+    self._shape:set_opacity(alpha)
+    if self._n_turns_left_label_visible then
+        self._n_turns_left_label:set_opacity(alpha)
+    end
+end

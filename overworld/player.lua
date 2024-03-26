@@ -220,6 +220,8 @@ function ow.Player:update(delta)
             self._camera_anchor_y = math.floor(y)
         end
     end
+
+    self:_update_velocity()
 end
 
 --- @brief [internal]
@@ -234,7 +236,6 @@ function ow.Player:_update_velocity()
         self._velocity_angle
     )
 
-
     for collider in range(self._collider, self._sensor) do
         collider:set_linear_velocity(x, y)
     end
@@ -244,6 +245,8 @@ function ow.Player:_update_velocity()
     else
         self:_set_sensor_active(false) -- disable sensor so it can't be carried while moving
     end
+
+    self._collider:set_angle(self._direction)
 end
 
 --- @brief [internal]

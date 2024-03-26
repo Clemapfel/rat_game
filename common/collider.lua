@@ -195,7 +195,7 @@ function rt.PolygonCollider(world, type, ax, ay, bx, by, cx, cy, ...)
 end
 
 --- @brief
-function rt.Collider:_draw_shape(shape)
+function rt.Collider:_draw_shape(shape, angle)
     local body_x, body_y = self:get_position()
 
     love.graphics.push()
@@ -204,16 +204,12 @@ function rt.Collider:_draw_shape(shape)
 
     local type = shape:type()
     if type == "PolygonShape" then
-        local local_points = {shape:getPoints()}
-        for i = 1, #local_points, 2 do
-            local_points[i+0] = local_points[i+0] + body_x
-            local_points[i+1] = local_points[i+1] + body_y
-        end
 
         love.graphics.setColor(1, 1, 1, 0.5)
-        love.graphics.polygon("fill", table.unpack(local_points))
+        love.graphics.setLineWidth(1)
+        love.graphics.polygon("fill", self._body:getWorldPoints(shape:getPoints()))
         love.graphics.setColor(1, 1, 1, 1)
-        love.graphics.polygon("line", table.unpack(local_points))
+        love.graphics.polygon("line", self._body:getWorldPoints(shape:getPoints()))
 
     elseif type == "CircleShape" then
         local x, y = shape:getPoint()
@@ -247,7 +243,7 @@ end
 function rt.Collider:draw()
     if love.getVersion() >= 12 then
         for _, shape in pairs(self._fixtures) do
-            self:_draw_shape(shape)
+            self:_draw_shape(shape, self._body:getAngle())
         end
     else
         for i = 1, #self._fixtures do
@@ -435,4 +431,19 @@ function rt.Collider:contains_point(point_x, point_y)
         end
         return false
     end
+end
+
+--- @brief
+function rt.Collider:set_is_angle_fixed(b)
+    self._body:setFixedRotation(b)
+end
+
+--- @brief
+function rt.Collider:get_angle()
+    return self._body:getAngle()
+end
+
+--- @brief
+function rt.Collider:set_angle(angle)
+    self._body:setAngle(angle)
 end

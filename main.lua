@@ -1,8 +1,5 @@
 require "include"-- Initializes color values
 
-rt.Palette:export()
-assert(love.filesystem.write("test.txt", "test"))
-
 rt.SpriteAtlas = rt.SpriteAtlas()
 rt.SpriteAtlas:initialize("assets/sprites")
 
@@ -45,7 +42,6 @@ status_02_element:fit_into(100, 50, 50, 50)
 input = rt.InputController()
 input:signal_connect("pressed", function(_, which)
     if which == rt.InputButton.A then
-
         local next_order = rt.random.shuffle(scene._entities)
         scene._priority_queue:set_preview_order(next_order)
         scene._priority_queue:set_is_preview_active(not scene._priority_queue:get_is_preview_active())

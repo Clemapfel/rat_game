@@ -161,6 +161,7 @@ require "list_view"
 
 require "physics_world"
 require "collider"
+require "joint"
 
 require "battle.battle_entity"
 require "battle.battle_state"
