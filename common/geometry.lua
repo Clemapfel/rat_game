@@ -67,6 +67,13 @@ function rt.distance(x1, y1, x2, y2)
 end
 
 --- @brief
+function rt.normalize(x, y)
+    local magnitude = rt.magnitude(x, y)
+    if magnitude == 0 then return 0, 0 end
+    return x / magnitude, y / magnitude
+end
+
+--- @brief
 function rt.to_polar(x, y)
     return rt.magnitude(x, y), math.atan2(y, x)
 end

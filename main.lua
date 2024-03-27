@@ -39,12 +39,17 @@ rt.current_scene:set_debug_draw_enabled(true)
 input = rt.InputController()
 input:signal_connect("pressed", function(_, which)
     if which == rt.InputButton.A then
-        local next_order = rt.random.shuffle(scene._entities)
-        scene._priority_queue:set_preview_order(next_order)
-        scene._priority_queue:set_is_preview_active(not scene._priority_queue:get_is_preview_active())
+        if rt.random.toss_coin() then
+            bar:add(small_ufo, status_01)
+        else
+            bar:remove(small_ufo, status_01)
+        end
     elseif which == rt.InputButton.B then
-        scene._priority_queue:set_selected({rt.random.choose(scene._entities)})
-        scene._priority_queue:set_knocked_out({rt.random.choose(scene._entities)})
+        if rt.random.toss_coin() then
+            bar:add(small_ufo, status_02)
+        else
+            bar:remove(small_ufo, status_02)
+        end
     elseif which == rt.InputButton.X then
         scene._priority_queue:set_selected()
         scene._priority_queue:set_knocked_out()

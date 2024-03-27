@@ -248,3 +248,8 @@ end
 function bt.Status:get_sprite_id()
     return self.sprite_id, self.sprite_index
 end
+
+--- @brief
+function bt.Status:get_id()
+    return self.id
+end
