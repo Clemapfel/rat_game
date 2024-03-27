@@ -90,11 +90,11 @@ end
 function rt.VertexShape:set_vertex_color(i, r_or_rgba, g, b, a)
     if meta.is_number(r_or_rgba) then
         local r = r_or_rgba
-        self._native:setVertexAttribute(i, 3, r, g, b, a * self._opacity)
+        self._native:setVertexAttribute(i, 3, r, g, b, self._opacity)
     else
         local rgba = r_or_rgba
         if meta.is_hsva(rgba) then rgba = rt.hsva_to_rgba(rgba) end
-        self._native:setVertexAttribute(i, 3, rgba.r, rgba.g, rgba.b, rgba.a * self._opacity)
+        self._native:setVertexAttribute(i, 3, rgba.r, rgba.g, rgba.b, self._opacity)
     end
 end
 
@@ -102,8 +102,7 @@ end
 --- @param i Number 1-based
 --- @return rt.RGBA
 function rt.VertexShape:get_vertex_color(i)
-    local r, g, b, a
-    r, g, b, a = self._native:getVertexAttribute(i, 3)
+    local r, g, b, a = self._native:getVertexAttribute(i, 3)
     return rt.RGBA(r, g, b, a)
 end
 
@@ -428,9 +427,21 @@ end
 function rt.VertexShape:set_opacity(alpha)
     self._opacity = alpha
     for i = 1, self:get_n_vertices() do
-        local r, g, b, a = self:get_vertex_color(i)
+        local r, g, b, a = self._native:getVertexAttribute(i, 3)
         self:set_vertex_color(i, r, g, b, a) -- applies alpha
     end
+end
+
+--- @brief
+function rt.VertexShape:get_centroid()
+    local sum_x, sum_y = 0, 0
+    local n = self:get_n_vertices()
+    for i = 1, n do
+        local x, y = self:get_vertex_position(i)
+        sum_x = sum_x + x
+        sum_y = sum_y + y
+    end
+    return sum_x / n, sum_y / n
 end
 
 --- @brief test VertexShape

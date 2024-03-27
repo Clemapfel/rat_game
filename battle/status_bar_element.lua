@@ -8,11 +8,15 @@ bt.StatusBarElement = meta.new_type("StatusBarElement", rt.Widget, function(enti
         _entity = entity,
         _status = status,
 
-        _shape = {},      -- rt.Shape
+        _shape = {},      -- rt.VertexShape
         _spritesheet = {}, -- rt.SpriteAtlasEntry
 
         _n_turns_left_label_visible = true,
         _n_turns_left_label = {}, -- rt.Glyph
+
+        _opacity = 1,
+        _scale = 1,
+        _hide_n_turns = 1,
 
         _tooltip = {
             is_realized = false
@@ -63,12 +67,14 @@ function bt.StatusBarElement:realize()
         )
         self:_update_n_turns_left_label()
     end
+
+    self:set_opacity(self:get_opacity())
+    self:set_scale(self:get_scale())
 end
 
 --- @brief
 function bt.StatusBarElement:size_allocate(x, y, width, height)
     if self._is_realized then
-
         -- display icon centered at original resolution to avoid artifacting
         local res_x, res_y = self._spritesheet:get_frame_size()
         local center_x, center_y = x + 0.5 * width, y + 0.5 * height
@@ -94,7 +100,7 @@ end
 function bt.StatusBarElement:draw()
     if self._is_realized then
         self._shape:draw()
-        if self._n_turns_left_label_visible then
+        if self._n_turns_left_label_visible and not self._hide_n_turns then
             self._n_turns_left_label:draw()
         end
     end
@@ -102,8 +108,47 @@ end
 
 --- @brief
 function bt.StatusBarElement:set_opacity(alpha)
-    self._shape:set_opacity(alpha)
-    if self._n_turns_left_label_visible then
-        self._n_turns_left_label:set_opacity(alpha)
+    self._opacity = clamp(alpha, 0, 1)
+
+    if self._is_realized then
+        self._shape:set_opacity(self._opacity)
+        if self._n_turns_left_label_visible then
+            self._n_turns_left_label:set_opacity(self._opacity)
+        end
     end
+end
+
+--- @brief
+function bt.StatusBarElement:get_opacity()
+    return self._opacity
+end
+
+--- @brief
+function bt.StatusBarElement:set_scale(scale)
+    self._scale = clamp(scale, 0)
+    if self._is_realized then
+        local center_x, center_y = self._shape:get_centroid()
+        local res_x, res_y = self._spritesheet:get_frame_size()
+        self._shape:reformat_vertex_positions(
+            center_x - 0.5 * res_x * scale, center_y - 0.5 * res_y * scale,
+            center_x + 0.5 * res_x * scale, center_y - 0.5 * res_y * scale,
+            center_x + 0.5 * res_x * scale, center_y + 0.5 * res_y * scale,
+            center_x - 0.5 * res_x * scale, center_y + 0.5 * res_y * scale
+        )
+    end
+end
+
+--- @brief
+function bt.StatusBarElement:get_scale()
+    return self._scale
+end
+
+--- @brief
+function bt.StatusBarElement:set_hide_n_turns_left(b)
+    self._hide_n_turns = b
+end
+
+--- @brief
+function bt.StatusBarElement:get_hide_n_turns_left()
+    return self._hide_n_turns
 end

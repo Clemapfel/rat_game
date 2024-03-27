@@ -30,14 +30,11 @@ end
 status_entity.status[status_01] = 0
 status_entity.status[status_02] = 2
 
-local status_01_element = bt.StatusBarElement(small_ufo, status_01)
-local status_02_element = bt.StatusBarElement(small_ufo, status_01)
+local bar = bt.StatusBar()
+bar:add(small_ufo, status_01)
+bar:add(small_ufo, status_02)
 
-status_01_element:realize()
-status_01_element:fit_into(50, 50, 50, 50)
-
-status_02_element:realize()
-status_02_element:fit_into(100, 50, 50, 50)
+rt.current_scene:set_debug_draw_enabled(true)
 
 input = rt.InputController()
 input:signal_connect("pressed", function(_, which)
@@ -53,6 +50,10 @@ input:signal_connect("pressed", function(_, which)
         scene._priority_queue:set_knocked_out()
     elseif which == rt.InputButton.Y then
         scene._priority_queue:set_is_hidden(not scene._priority_queue:get_is_hidden())
+    elseif which == rt.InputButton.UP then
+
+    elseif which == rt.InputButton.DOWN then
+
     elseif which == rt.InputButton.LEFT then
     elseif which == rt.InputButton.RIGHT then
     elseif which == rt.InputButton.R then
@@ -72,6 +73,10 @@ love.load = function()
     love.window.setTitle("rat_game")
     love.filesystem.setIdentity("rat_game")
     rt.current_scene:realize()
+
+    bar:realize()
+    bar:fit_into(0, 0, rt.graphics.get_width(), 100)
+
 end
 
 love.draw = function()
@@ -84,15 +89,15 @@ love.draw = function()
         love.graphics.print(fps, rt.graphics.get_width() - love.graphics.getFont():getWidth(fps) - 2 * margin, 0.5 * margin)
     end
 
-    -- TODO
-    status_01_element:draw()
-    status_02_element:draw()
+    bar:draw()
 end
 
 love.update = function()
     local delta = love.timer.getDelta()
     rt.AnimationHandler:update(delta)
     rt.current_scene:update(delta)
+
+    bar:update(delta)
 end
 
 love.resize = function()

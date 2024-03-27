@@ -18,7 +18,7 @@ table.insert(boundaries, rt.LineCollider(world, rt.ColliderType.STATIC, 0, h, 0,
 local tail = {}
 local joints = {}
 local x, y, w, h = 100, 100, 250, 10
-local total_w = 500
+local total_w = 100
 local n = 50
 local w = total_w / n
 local overlap = 0.1
@@ -30,6 +30,7 @@ for i = 0, n do
         x + i * w - overlap * w, y, ternary(i == n, w * 2, w), h
     )
     collider:set_mass(0)
+    collider:set_collision_group(rt.ColliderCollisionGroup.NONE)
     table.insert(tail, collider)
 
     if i > 0 and i <= n then
@@ -54,14 +55,23 @@ joint_x, joint_y = x + (#joints) * w - overlap * w + w, y + 0.5 * h
 local player = ow.Player(scene_dummy, joint_x, joint_y)
 player:realize()
 
---[[
 table.insert(joints, rt.Joint(
     rt.JointType.FIXED,
     player._collider,
     tail[#tail],
     joint_x, joint_y
 ))
-]]--
+
+local history = {}
+local last_position_x, last_position_y = player:get_position()
+
+for i = 1, n+1 do
+    table.insert(history, last_position_x)
+    table.insert(history, last_position_y)
+end
+
+local elapsed = 0
+local step = 1 / 10
 
 spline = nil
 function update_spline()
@@ -71,25 +81,17 @@ function update_spline()
         table.insert(vertices, x)
         table.insert(vertices, y)
     end
+
     --[[
-    local x, y = player:get_position()
-    table.insert(vertices, x)
-    table.insert(vertices, y)
+    local mix_weight = 0.5
+    for i = 1, #vertices, 2 do
+        vertices[i] = mix(vertices[i], history[i], mix_weight)
+        vertices[i+1] = mix(vertices[i+1], history[i+1], mix_weight)
+    end
     ]]--
     spline = rt.Spline(vertices)
 end
 update_spline()
-
-local history = {}
-local last_position_x, last_position_y = player:get_position()
-
-for i = 1, n do
-    table.insert(history, last_position_x)
-    table.insert(history, last_position_y)
-end
-
-local elapsed = 0
-local step = 1 / 10
 
 love.load = function()
     love.window.setMode(800, 600, {
