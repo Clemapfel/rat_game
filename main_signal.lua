@@ -1,18 +1,85 @@
 require("include")
 
 --
+
+rt.settings.music_visualizer = {
+    collider_mass = 2000,
+    gravity = 7500,
+    magnitude_weight = 0.75
+}
 rt.MusicVisualizer = meta.new_type("MusicVisualizer", rt.Drawable, function()
     return meta.new(rt.MusicVisualizer, {
-        spline = rt.Spline()
+        spline = {}, -- rt.Spline
+        world = rt.PhysicsWorld(0, rt.settings.music_visualizer.gravity),
+        colliders = {}, -- Table<rt.Collider>
+        ground = {}, -- rt.Collider
+        last_update = love.timer.getTime(),
     })
 end)
 
 function rt.MusicVisualizer:update(magnitudes)
-    self.spline = rt.Spline()
+
+    local delta = love.timer.getDelta()
+    self.world:update(delta)
+
+    local points = {}
+    local weight = 0.75
+    local width, height, n = rt.graphics.get_width(), rt.graphics.get_height(), #magnitudes
+    for i = 1, n do
+        local x = width - (i - 1) / n * width
+        local y = height - weight * magnitudes[i] * height
+        table.insert(points, x)
+        table.insert(points, y)
+    end
+    local dup_x, dup_y = points[#points-1], points[#points]
+    table.insert(points, 0)
+    table.insert(points, height)
+    self.spline = rt.Spline(points)
+
+    if #self.colliders ~= n then
+        self.ground = {
+            rt.LineCollider(self.world, rt.ColliderType.STATIC, 0, 0, width, 0),
+            rt.LineCollider(self.world, rt.ColliderType.STATIC, 0, height, width, height),
+            rt.LineCollider(self.world, rt.ColliderType.STATIC, width, 0, width, height),
+            rt.LineCollider(self.world, rt.ColliderType.STATIC, 0, 0, 0, height)
+        }
+
+        self.colliders = {}
+        local radius = width / n / 2
+        for i = 1, n do
+            local x = width - (i - 1) / n * width - radius
+            local collider = rt.CircleCollider(self.world, rt.ColliderType.DYNAMIC, x, height, radius)
+            collider:set_collision_filter(2, 2) -- collide with everything except other balls
+            collider:set_mass(rt.settings.music_visualizer.collider_mass)
+            table.insert(self.colliders, collider)
+        end
+    else
+        local radius = width / n / 2
+        for i = 1, n do
+            local x = width - (i - 1) / n * width - radius
+            local y = height - weight * magnitudes[i] * height
+            local collider = self.colliders[i]
+
+            local pos_x, pos_y = collider:get_position()
+            if pos_y > y then
+                collider:set_position(x, clamp(y, 2 * radius, height))
+            end
+        end
+    end
 end
 
 function rt.MusicVisualizer:draw()
-    self.spline:draw()
+    if meta.isa(self.spline, rt.Spline) then
+        self.spline:draw()
+    end
+
+    for collider in values(self.colliders) do
+        --collider:draw()
+    end
+
+    for ground in values(self.ground) do
+        ground:draw()
+    end
 end
 
 --
@@ -38,7 +105,7 @@ local index_delta = 0
 
 -- parameters
 local window_size = mix(2^11, 2^12, 0.5)   -- window size of fourier transform, results in window_size / 2 coefficients
-local n_mel_frequencies = window_size / 12           -- mel spectrum compression, number of mel frequencies for cutoff spectrum
+local n_mel_frequencies = 256 --window_size / 12           -- mel spectrum compression, number of mel frequencies for cutoff spectrum
 local one_to_one_frequency_threshold = 0                      -- compression override, the first n coefficients are kept one-to-one
 local use_compression = true
 local cutoff = 12000
@@ -105,7 +172,6 @@ local visualizer = rt.MusicVisualizer()
 processor.on_update = function(magnitude)
     local spectrum_size = #magnitude
     if not initialized then
-        dbg(spectrum_size)
         if use_compression then
             magnitude_image = love.image.newImageData(texture_h, #bins, "rgba16")
             magnitude_texture = love.graphics.newImage(magnitude_image)
@@ -182,7 +248,7 @@ processor.on_update = function(magnitude)
             end
         end
         sum = sum / (#coefficients * (bin[2] - bin[1]))
-        assert(clamp(sum, 0, 1) == sum)
+        if sum > 1 then println(sum) end
         local previous, previous_delta = total_energy_image:getPixel(clamp(col_i - 1, 0), bin_i - 1)
         local current = sum
         local current_delta = current - previous
@@ -200,6 +266,9 @@ processor.on_update = function(magnitude)
     shader:send("_max_index", texture_h)
 
     col_i = col_i + 1
+
+
+    visualizer:update(coefficients)
 end
 
 input = rt.InputController()
@@ -224,8 +293,10 @@ love.draw = function()
     love.graphics.clear(0.8, 0, 0.8, 1)
 
     shader:bind()
-    texture_shape:draw()
+    --texture_shape:draw()
     shader:unbind()
+
+    visualizer:draw()
 end
 
 local frame_measure_clock = rt.Clock()

@@ -415,6 +415,21 @@ function rt.Collider:set_collision_group(group)
 end
 
 --- @brief
+function rt.Collider:set_collision_filter(category, mask)
+    if love.getVersion() >= 12 then
+        for _, shape in pairs(self._body:getShapes()) do
+            shape:setCategory(category)
+            shape:setMask(mask)
+        end
+    else
+        for _, shape in pairs(self._body:getFixtures()) do
+            shape:setCategory(category)
+            shape:setMask(mask)
+        end
+    end
+end
+
+--- @brief
 function rt.Collider:contains_point(point_x, point_y)
     if love.getVersion() >= 12 then
         for _, shape in pairs(self._body:getShapes()) do

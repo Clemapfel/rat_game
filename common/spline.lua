@@ -223,8 +223,10 @@ end
 
 --- @overload
 function rt.Spline:draw()
-    if #self._vertices > 2 then
-        love.graphics.line(splat(self._vertices))
+    if not (#self._vertices > 2) then return end
+    for i = 1, #self._vertices - 2, 2 do
+        local x1, y1, x2, y2 = self._vertices[i], self._vertices[i+1], self._vertices[i+2], self._vertices[i+3]
+        love.graphics.line(x1, y1, x2, y2)
     end
 end
 

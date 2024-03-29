@@ -77,6 +77,7 @@ function bt.StatusBar:update(delta)
     end
 
     local removed = false
+    table.sort(to_remove, function(a, b) return a > b end)
     for i in values(to_remove) do
         table.remove(self._elements, i)
         removed = true

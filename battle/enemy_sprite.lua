@@ -89,7 +89,6 @@ function bt.EnemySprite:update(delta)
         end
     end
     do
-        local to_remove = {}
         for current, _ in pairs(self._continuous_animations) do
             if current._is_started then
                 local result = current:update(delta)
