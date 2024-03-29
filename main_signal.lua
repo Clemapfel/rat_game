@@ -52,7 +52,7 @@ end)
 function rt.MusicVisualizer:update(magnitudes)
 
     local delta = love.timer.getDelta()
-    self.world:update(delta)
+    --self.world:update(delta)
 
     local points = {}
     local weight = rt.settings.music_visualizer.magnitude_weight
@@ -74,7 +74,7 @@ function rt.MusicVisualizer:update(magnitudes)
 
     local x, y = vertices_in[1], vertices_in[2]
     local polygons = {{
-        0, height,
+        0, y,
         x, y,
         x, height,
         0, height
@@ -166,7 +166,7 @@ local index_delta = 0
 
 -- parameters
 local window_size = mix(2^11, 2^12, 0.5)   -- window size of fourier transform, results in window_size / 2 coefficients
-local n_mel_frequencies = 32 --window_size / 12           -- mel spectrum compression, number of mel frequencies for cutoff spectrum
+local n_mel_frequencies = 64 --window_size / 12           -- mel spectrum compression, number of mel frequencies for cutoff spectrum
 local one_to_one_frequency_threshold = 0                      -- compression override, the first n coefficients are kept one-to-one
 local use_compression = true
 local cutoff = 12000
