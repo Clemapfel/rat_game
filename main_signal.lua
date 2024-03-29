@@ -1,5 +1,22 @@
 require("include")
 
+--
+rt.MusicVisualizer = meta.new_type("MusicVisualizer", rt.Drawable, function()
+    return meta.new(rt.MusicVisualizer, {
+        spline = rt.Spline()
+    })
+end)
+
+function rt.MusicVisualizer:update(magnitudes)
+    self.spline = rt.Spline()
+end
+
+function rt.MusicVisualizer:draw()
+    self.spline:draw()
+end
+
+--
+
 local texture_h = 10000
 local shader_i = 0
 local shader = rt.Shader("assets/shaders/audio_processor_visualization.glsl")
@@ -32,12 +49,12 @@ local energy_bins = {
     {0.9, 1}
 }
 
-processor = rt.AudioProcessor("assets/sound/test_music_02.mp3", window_size)
+processor = rt.AudioProcessor("assets/music/test_music_04.mp3", window_size)
 processor:set_cutoff(cutoff)
 local sample_rate = processor:get_sample_rate()
 
 local bins = {} -- Table<Integer, Integer>, range of magnitude coefficients to sum
---do
+do
     function mel_to_hz(mel)
         return 700 * (10^(mel / 2595) - 1)
     end
@@ -80,10 +97,10 @@ local bins = {} -- Table<Integer, Integer>, range of magnitude coefficients to s
 
     bins[1][1] = 1
     bins[#bins][2] = bin_i_center_frequency[#bin_i_center_frequency]
---end
-
+end
 
 local active = true
+local visualizer = rt.MusicVisualizer()
 
 processor.on_update = function(magnitude)
     local spectrum_size = #magnitude
@@ -165,8 +182,7 @@ processor.on_update = function(magnitude)
             end
         end
         sum = sum / (#coefficients * (bin[2] - bin[1]))
-        println(sum)
-
+        assert(clamp(sum, 0, 1) == sum)
         local previous, previous_delta = total_energy_image:getPixel(clamp(col_i - 1, 0), bin_i - 1)
         local current = sum
         local current_delta = current - previous
@@ -177,9 +193,9 @@ processor.on_update = function(magnitude)
     total_energy_texture:replacePixels(total_energy_image)
 
     shader:send("_spectrum", magnitude_texture)
-    shader:send("_total_energy", total_energy_texture)
+    --shader:send("_total_energy", total_energy_texture)
     --shader:send("_spectrum_size", #coefficients)
-    shader:send("_active", active)
+    --shader:send("_active", active)
     shader:send("_index", col_i)
     shader:send("_max_index", texture_h)
 
@@ -212,9 +228,14 @@ love.draw = function()
     shader:unbind()
 end
 
+local frame_measure_clock = rt.Clock()
+
 love.update = function()
     local delta = love.timer.getDelta()
+
+    frame_measure_clock:restart()
     processor:update(delta)
+    println(math.round(frame_measure_clock:get_elapsed():as_seconds() / (1 / love.timer.getFPS()) * 100), " %")
 end
 
 --[[
