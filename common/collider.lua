@@ -200,12 +200,12 @@ function rt.Collider:_draw_shape(shape, angle)
 
     love.graphics.push()
     rt.graphics.set_blend_mode(rt.BlendMode.NORMAL)
-    love.graphics.setColor(1, 1, 1, 1)
 
+    local r, g, b = love.graphics.getColor()
     local type = shape:type()
     if type == "PolygonShape" then
 
-        love.graphics.setColor(1, 1, 1, 0.5)
+        love.graphics.setColor(r, g, b, 0.5)
         love.graphics.setLineWidth(1)
         love.graphics.polygon("fill", self._body:getWorldPoints(shape:getPoints()))
         love.graphics.setColor(1, 1, 1, 1)
@@ -216,9 +216,9 @@ function rt.Collider:_draw_shape(shape, angle)
         x = x + body_x
         y = y + body_y
         local radius = shape:getRadius()
-        love.graphics.setColor(1, 1, 1, 0.5)
+        love.graphics.setColor(r, g, b, 0.5)
         love.graphics.circle("fill", x, y, radius)
-        love.graphics.setColor(1, 1, 1, 1)
+        love.graphics.setColor(r, g, b, 1)
         love.graphics.circle("line", x, y, radius)
     elseif type == "EdgeShape" then
         local ax, ay, bx, by = shape:getPoints()

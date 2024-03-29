@@ -4,9 +4,11 @@ do
         ";?.lua",
         ";common/?.lua",
         ";battle/?.lua",
-        ";submodules/?/init.lua"
     }
+
     love.filesystem.setRequirePath(love.filesystem.getRequirePath() .. table.concat(paths))
+    assert(love.filesystem.mountFullPath("/usr/lib64/lua/5.4/", "", "read", true))
+    ts = require "tinysplinelua51"
 end
 
 local major, minor = love.getVersion()

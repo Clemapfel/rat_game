@@ -174,19 +174,26 @@ function rt.AudioProcessor:_signal_to_spectrum(data, offset, window_size)
         end
     end
 
+    local hann_alpha = 0.5
+    local hamming_alpha = 25 / 46
+    -- https://en.wikipedia.org/wiki/Window_function#Hann_and_Hamming_windows
     function cosine_windowing(n, alpha)
         return alpha - (1 - alpha) * math.cos((2 * math.pi * n) / (window_size - 1))
     end
-    -- https://en.wikipedia.org/wiki/Window_function#Hann_and_Hamming_windows
-    local hann_alpha = 0.5
-    local hamming_alpha = 25 / 46
+
+    function flattop_windowing(n)
+        -- https://www.mathworks.com/help/signal/ref/flattopwin.html
+        local a0, a1, a2, a3, a4 = 0.21557895, 0.41663158, 0.277263158, 0.083578947, 0.006947368
+        local pi = math.pi
+        return a0 - a1 * math.cos(2 * pi * n / (window_size - 1)) + a2 * math.cos(4 * pi * n / (window_size - 1)) + a3 * math.cos(6 * pi * n / (window_size - 1)) + a4 * math.cos(8 * pi * n / (window_size - 1))
+    end
 
     -- pre-emphasize high frequencies, first order high pass filter
-    local highpass_factor = 0.9;
+    local highpass_factor = 0.98;
     from[0] = signal[0]
     for i = 1, window_size - 1 do
         from[i] = highpass_factor * (from[i - 1] + signal[i] - signal[i - 1])
-        --from[i] = from[i] * cosine_windowing(i, hann_alpha)
+        from[i] = from[i] * flattop_windowing(i, hann_alpha)
     end
 
     -- fouier transform

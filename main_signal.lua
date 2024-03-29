@@ -1,19 +1,51 @@
 require("include")
 
---
+rt.BSpline = meta.new_type("BSpline", rt.Drawable, function()
+    local out = meta.new(rt.BSpline, {
+        _vertices = {},
+        _native = {}
+    })
+    return out
+end)
+
+function rt.BSpline:create_from(points)
+    -- https://github.com/msteinbeck/tinyspline/blob/master/examples/lua/quickstart.lua
+    local ts = require("tinysplinelua51")
+    local spline = ts.BSpline(#points / 2)
+    spline.control_points = points
+    self._native = spline
+
+    self._vertices = {}
+    for i = 1, #points do
+        local result = self._native:eval((i - 1) / #points).result
+        table.insert(self._vertices, result[1])
+        table.insert(self._vertices, result[2])
+    end
+
+end
+
+function rt.BSpline:draw()
+    if not (#self._vertices > 2) then return end
+    for i = 1, #self._vertices - 2, 2 do
+        local x1, y1, x2, y2 = self._vertices[i], self._vertices[i+1], self._vertices[i+2], self._vertices[i+3]
+        love.graphics.line(x1, y1, x2, y2)
+    end
+end
 
 rt.settings.music_visualizer = {
     collider_mass = 2000,
     gravity = 7500,
-    magnitude_weight = 0.75
+    magnitude_weight = 1
 }
 rt.MusicVisualizer = meta.new_type("MusicVisualizer", rt.Drawable, function()
     return meta.new(rt.MusicVisualizer, {
-        spline = {}, -- rt.Spline
+        bspline = rt.BSpline(),
+        spline = {},
+        spline_shape = {}, -- rt.VertexShape
         world = rt.PhysicsWorld(0, rt.settings.music_visualizer.gravity),
         colliders = {}, -- Table<rt.Collider>
         ground = {}, -- rt.Collider
-        last_update = love.timer.getTime(),
+        last_update = love.timer.getTime()
     })
 end)
 
@@ -23,7 +55,7 @@ function rt.MusicVisualizer:update(magnitudes)
     self.world:update(delta)
 
     local points = {}
-    local weight = 0.75
+    local weight = rt.settings.music_visualizer.magnitude_weight
     local width, height, n = rt.graphics.get_width(), rt.graphics.get_height(), #magnitudes
     for i = 1, n do
         local x = width - (i - 1) / n * width
@@ -34,7 +66,28 @@ function rt.MusicVisualizer:update(magnitudes)
     local dup_x, dup_y = points[#points-1], points[#points]
     table.insert(points, 0)
     table.insert(points, height)
+
     self.spline = rt.Spline(points)
+    self.bspline:create_from(points)
+
+    local vertices_in = self.spline._vertices
+
+    local x, y = vertices_in[1], vertices_in[2]
+    local polygons = {{
+        0, height,
+        x, y,
+        x, height,
+        0, height
+    }}
+    for i = 1, #vertices_in - 2, 2 do
+        table.insert(polygons, {
+            vertices_in[i+0], vertices_in[i+1],
+            vertices_in[i+2], vertices_in[i+3],
+            vertices_in[i+2], height,
+            vertices_in[i+0], height
+        })
+    end
+    self.spline_shape = polygons
 
     if #self.colliders ~= n then
         self.ground = {
@@ -69,14 +122,22 @@ function rt.MusicVisualizer:update(magnitudes)
 end
 
 function rt.MusicVisualizer:draw()
-    if meta.isa(self.spline, rt.Spline) then
-        self.spline:draw()
+
+    local hue_step = 1 / #self.spline_shape
+    for i, t in ipairs(self.spline_shape) do
+        local color = rt.hsva_to_rgba(rt.HSVA(hue_step * (i - 1), 1, 1, 1))
+        love.graphics.setColor(color.r, color.g, color.b, 1)
+        love.graphics.polygon("fill", splat(t))
     end
 
-    for collider in values(self.colliders) do
-        --collider:draw()
+    hue_step = 1 / #self.colliders
+    for i, collider in ipairs(self.colliders) do
+        local color = rt.hsva_to_rgba(rt.HSVA(hue_step * (i - 1), 1, 1, 1))
+        love.graphics.setColor(color.r, color.g, color.b, 1)
+        collider:draw()
     end
 
+    love.graphics.setColor(0, 0, 0, 1)
     for ground in values(self.ground) do
         ground:draw()
     end
@@ -105,7 +166,7 @@ local index_delta = 0
 
 -- parameters
 local window_size = mix(2^11, 2^12, 0.5)   -- window size of fourier transform, results in window_size / 2 coefficients
-local n_mel_frequencies = 256 --window_size / 12           -- mel spectrum compression, number of mel frequencies for cutoff spectrum
+local n_mel_frequencies = 32 --window_size / 12           -- mel spectrum compression, number of mel frequencies for cutoff spectrum
 local one_to_one_frequency_threshold = 0                      -- compression override, the first n coefficients are kept one-to-one
 local use_compression = true
 local cutoff = 12000
@@ -293,7 +354,7 @@ love.draw = function()
     love.graphics.clear(0.8, 0, 0.8, 1)
 
     shader:bind()
-    --texture_shape:draw()
+    texture_shape:draw()
     shader:unbind()
 
     visualizer:draw()
@@ -306,7 +367,7 @@ love.update = function()
 
     frame_measure_clock:restart()
     processor:update(delta)
-    println(math.round(frame_measure_clock:get_elapsed():as_seconds() / (1 / love.timer.getFPS()) * 100), " %")
+    --println(math.round(frame_measure_clock:get_elapsed():as_seconds() / (1 / love.timer.getFPS()) * 100), " %")
 end
 
 --[[
