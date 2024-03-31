@@ -76,8 +76,9 @@ rt.gaussian_increase = function(x, peak)
     return (math.exp(-1 * ((2 * math.pi / 3) * (x - 1))^2))
 end
 
---- @brief calculate skewed gaussian distribution propability
+--- @brief calculate skewed gaussian distribution probability
 --- @param x Number
+--- @param mean Number
 --- @param variance Number sqrt(sigma^2), unsigned number
 --- @param skewedness Number signed number
 --- @return Number p(x) under this distribution

@@ -81,7 +81,6 @@ love.load = function()
 
     bar:realize()
     bar:fit_into(0, 0, rt.graphics.get_width(), 100)
-
 end
 
 love.draw = function()

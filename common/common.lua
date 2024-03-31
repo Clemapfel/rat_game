@@ -445,6 +445,29 @@ function math.round(i)
     return math.floor(i + 0.5)
 end
 
+--- @brief evaluate erf integral
+--- @param x number
+--- @return number
+function math.erf(x)
+    -- src: https://hewgill.com/picomath/lua/erf.lua.html
+    local a1 =  0.254829592
+    local a2 = -0.284496736
+    local a3 =  1.421413741
+    local a4 = -1.453152027
+    local a5 =  1.061405429
+    local p  =  0.3275911
+
+    local sign = 1
+    if x < 0 then
+        sign = -1
+    end
+    x = math.abs(x)
+
+    local t = 1.0 / (1.0 + p * x)
+    local y = 1.0 - (((((a5 * t + a4) * t) + a3) * t + a2) * t + a1) * t * math.exp(-x * x)
+    return sign * y
+end
+
 --- @brief get minimum and maximum of table
 function table.min_max(t)
     local min, max = POSITIVE_INFINITY, NEGATIVE_INFINITY

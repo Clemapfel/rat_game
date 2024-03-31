@@ -16,8 +16,8 @@ function rt.BSpline:create_from(points)
     self._native = spline
 
     self._vertices = {}
-    for i = 1, #points do
-        local result = self._native:eval((i - 1) / #points).result
+    for i = 1, #points + 1 do
+        local result = self._native:eval((i-1) / #points).result
         table.insert(self._vertices, result[1])
         table.insert(self._vertices, result[2])
     end
@@ -70,6 +70,7 @@ function rt.MusicVisualizer:update(magnitudes)
     self.spline = rt.Spline(points)
     self.bspline:create_from(points)
 
+    --[[
     local vertices_in = self.spline._vertices
 
     local x, y = vertices_in[1], vertices_in[2]
@@ -88,6 +89,7 @@ function rt.MusicVisualizer:update(magnitudes)
         })
     end
     self.spline_shape = polygons
+    ]]--
 
     if #self.colliders ~= n then
         self.ground = {
@@ -123,6 +125,7 @@ end
 
 function rt.MusicVisualizer:draw()
 
+    --[[
     local hue_step = 1 / #self.spline_shape
     for i, t in ipairs(self.spline_shape) do
         local color = rt.hsva_to_rgba(rt.HSVA(hue_step * (i - 1), 1, 1, 1))
@@ -136,6 +139,17 @@ function rt.MusicVisualizer:draw()
         love.graphics.setColor(color.r, color.g, color.b, 1)
         collider:draw()
     end
+    ]]--
+
+    local vertices = self.bspline._vertices
+    local hue_step = 1 / #vertices
+    if not (#vertices > 2) then return end
+    for i = 1, #vertices - 2, 2 do
+        local color = rt.hsva_to_rgba(rt.HSVA(hue_step * (i - 1), 1, 1, 1))
+        love.graphics.setColor(color.r, color.g, color.b, 1)
+        local x1, y1, x2, y2 = vertices[i], vertices[i+1], vertices[i+2], vertices[i+3]
+        love.graphics.line(x1, y1, x2, y2)
+    end
 
     love.graphics.setColor(0, 0, 0, 1)
     for ground in values(self.ground) do
@@ -144,6 +158,9 @@ function rt.MusicVisualizer:draw()
 end
 
 --
+
+println("called:",  rt.skewed_gaussian(0.5, 0.5, 1, 0))
+
 
 local texture_h = 10000
 local shader_i = 0
@@ -166,7 +183,7 @@ local index_delta = 0
 
 -- parameters
 local window_size = mix(2^11, 2^12, 0.5)   -- window size of fourier transform, results in window_size / 2 coefficients
-local n_mel_frequencies = 64 --window_size / 12           -- mel spectrum compression, number of mel frequencies for cutoff spectrum
+local n_mel_frequencies = 96 --window_size / 12           -- mel spectrum compression, number of mel frequencies for cutoff spectrum
 local one_to_one_frequency_threshold = 0                      -- compression override, the first n coefficients are kept one-to-one
 local use_compression = true
 local cutoff = 12000
@@ -341,7 +358,7 @@ input:signal_connect("pressed", function(_, which)
 end)
 
 love.load = function()
-    love.window.setMode(1200, 800, {
+    love.window.setMode(1920 / 2, 1080 / 2, {
         vsync = 1,
         msaa = 8,
         stencil = true,
