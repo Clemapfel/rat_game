@@ -1,5 +1,17 @@
 require "include"-- Initializes color values
 
+println(1)
+    for i = 1, 12 do
+        (function()
+            print(i)
+            break
+        end)()
+        do
+            print(i)
+            break
+        end
+    end
+
 rt.SpriteAtlas = rt.SpriteAtlas()
 rt.SpriteAtlas:initialize("assets/sprites")
 
