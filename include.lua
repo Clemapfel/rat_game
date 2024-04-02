@@ -80,6 +80,7 @@ test = meta.new_enum({
 
 require "time"
 require "benchmark"
+require "thread_pool"
 require "vector"
 require "matrix"
 require "sparse_matrix"

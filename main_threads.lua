@@ -1,4 +1,13 @@
-require "thread_pool"
+require "include"
+
+input = rt.InputController()
+input:signal_connect("pressed", function(_, which)
+    if which == rt.InputButton.A then
+        thread_pool:block_all()
+    else
+        thread_pool:unblock_all()
+    end
+end)
 
 love.load = function()
     love.window.setMode(1920 / 2, 1080 / 2, {
@@ -41,6 +50,10 @@ end
 
 love.update = function()
     local delta = love.timer.getDelta()
+
+    for i = 1, 5 do
+        thread_pool:request_debug_print(rt.random.string(16))
+    end
 
     -- one or more times per frame, the threadpool needs to be updated
     -- this will set the values of our `futures`, if their value becomes available
