@@ -11,6 +11,7 @@ bt.SpeedValue = meta.new_type("SpeedValue", bt.BattleUI, function(entity)
         _is_realized = false,
         _elapsed = 1,   -- sic, makes it so `update` is invoked immediately
         _speed_value = -1,
+        _speed_target = -1,
         _speed_label = {}  -- rt.Glyph
     })
     return out
@@ -66,7 +67,7 @@ function bt.SpeedValue:update(delta)
     if self._is_realized then
         self._elapsed = self._elapsed + delta
 
-        local diff = (self._speed_value - self._entity:get_speed())
+        local diff = (self._speed_value - self._speed_target)
         local speed = (1 + rt.settings.battle.speed_value.tick_acceleration * (math.abs(diff) / 10))
 
         local tick_duration = 1 / (rt.settings.battle.speed_value.tick_speed * speed)
@@ -95,6 +96,14 @@ end
 
 --- @override
 function bt.SpeedValue:sync()
-    self._speed_value = self._entity:get_speed()
-    self._speed_label_left:set_text(self._format_value(self._speed_value))
+    self._speed_target = self._entity:get_speed()
+
+    if self._is_realized then
+        self._speed_label:set_text(self:_format_value(self._speed_value))
+    end
+end
+
+--- @brief
+function bt.SpeedValue:set_value(value)
+    self._speed_target = value
 end

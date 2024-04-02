@@ -11,12 +11,15 @@ bt.StatusBarElement = meta.new_type("StatusBarElement", rt.Widget, function(enti
         _shape = {},      -- rt.VertexShape
         _spritesheet = {}, -- rt.SpriteAtlasEntry
 
+        _n_turns_left = 0,
         _n_turns_left_label_visible = true,
         _n_turns_left_label = {}, -- rt.Glyph
 
         _opacity = 1,
         _scale = 1,
         _hide_n_turns = 1,
+
+        _debug_shape = {}, -- rt.Shape
 
         _tooltip = {
             is_realized = false
@@ -25,16 +28,19 @@ bt.StatusBarElement = meta.new_type("StatusBarElement", rt.Widget, function(enti
 end)
 
 --- @brief [internal]
-function bt.StatusBarElement:_update_n_turns_left_label()
+function bt.StatusBarElement:set_elapsed(n)
+    self._n_turns_left = n
     local max = self._status.max_duration
-    local current = self._entity.status[self._status]
-
+    local current = self._n_turns_left
     local text = tostring(max - current)
     if max - current < 0 then
         text = ""
-        rt.warning("In bt.StatusBarElement:_update_n_turns_left_label: number of leftover for status `" .. self._status.id .. "` on entity `" .. self._entity:get_id() .. "`) turns is less than 0")
+        rt.warning("In bt.StatusBarElement:set_elapsed: number of leftover for status `" .. self._status.id .. "` on entity `" .. self._entity:get_id() .. "`) turns is less than 0")
     end
-    self._n_turns_left_label:set_text(text)
+
+    if self._is_realized then
+        self._n_turns_left_label:set_text(text)
+    end
 end
 
 --- @brief
@@ -65,7 +71,7 @@ function bt.StatusBarElement:realize()
                 font_style = rt.FontStyle.BOLD
             }
         )
-        self:_update_n_turns_left_label()
+        self:set_elapsed(self._n_turns_left)
     end
 
     self:set_opacity(self:get_opacity())
@@ -89,10 +95,13 @@ function bt.StatusBarElement:size_allocate(x, y, width, height)
             -- label should be entirely within bounds to avoid overlap in box
             local label_w, label_h = self._n_turns_left_label:get_size()
             self._n_turns_left_label:set_position(
-                x + width - 1.1 * label_w,
-                y + height - 1 * label_h
+                x + width - 0.8 * label_w,
+                y + height - 0.6 * label_h
             )
         end
+
+        self._debug_shape = rt.Rectangle(x, y, width, height)
+        self._debug_shape:set_is_outline(true)
     end
 end
 
@@ -103,6 +112,28 @@ function bt.StatusBarElement:draw()
         if self._n_turns_left_label_visible and not self._hide_n_turns then
             self._n_turns_left_label:draw()
         end
+
+        if rt.current_scene:get_debug_draw_enabled() then
+            self._debug_shape:draw()
+        end
+    end
+end
+
+--- @brief
+function bt.StatusBarElement:_draw_sprite()
+    if self._is_realized then
+        self._shape:draw()
+    end
+
+    if rt.current_scene:get_debug_draw_enabled() then
+        self._debug_shape:draw()
+    end
+end
+
+--- @brief
+function bt.StatusBarElement:_draw_label()
+    if self._n_turns_left_label_visible and not self._hide_n_turns then
+        self._n_turns_left_label:draw()
     end
 end
 

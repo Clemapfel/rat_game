@@ -12,8 +12,10 @@ bt.BattleEntity = meta.new_type("BattleEntity", function(scene, id)
         scene = scene,
         _path = path,
         _config_id = id,
-        _is_realized = false
+        _is_realized = false,
     })
+
+    out.status = {}
     out:realize()
     meta.set_is_mutable(out, false)
     return out
@@ -33,7 +35,7 @@ end, {
 
     priority = 0,
 
-    status = {}, -- Table<bt.Status, {elapsed}>
+    status = {}, -- Table<bt.Status, Number>
 
     is_knocked_out = false,
     is_dead = false,

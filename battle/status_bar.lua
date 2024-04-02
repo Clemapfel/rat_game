@@ -1,15 +1,16 @@
 rt.settings.battle.status_bar = {
-    element_size = 50,
+    element_size = 32,
     element_velocity = 150, -- px per seconds
     add_animation_max_scale = 5,
     add_animation_duration = 1, -- seconds
     hide_animation_duration = 2, -- seconds
-    element_alignment = rt.Alignment.END
+    element_alignment = rt.Alignment.CENTER
 }
 
 --- @class bt.StatusBar
 bt.StatusBar = meta.new_type("StatusBar", rt.Widget, rt.Animation, function(entity)
     return meta.new(bt.StatusBar, {
+        _entity = entity,
         _elements = {}, -- cf :add
         _debug_shape = {}, -- rt.Shape
         _world = rt.PhysicsWorld(),
@@ -27,8 +28,7 @@ function bt.StatusBar:update(delta)
     local max_scale = rt.settings.battle.status_bar.add_animation_max_scale
     local hide_duration = rt.settings.battle.status_bar.hide_animation_duration
 
-    for i, e in ipairs(self._elements) do
-
+    for which, e in pairs(self._elements) do
         -- move towards correct place animation
         if e.initialized == false then
             e.current_x = e.target_x
@@ -70,16 +70,15 @@ function bt.StatusBar:update(delta)
                 e.element:set_opacity(1 - value)
                 if e.elapsed > hide_duration then
                     e.is_hiding = false
-                    table.insert(to_remove, i)
+                    table.insert(to_remove, which)
                 end
             end
         end
     end
 
     local removed = false
-    table.sort(to_remove, function(a, b) return a > b end)
     for i in values(to_remove) do
-        table.remove(self._elements, i)
+        self._elements[i] = nil
         removed = true
     end
 
@@ -102,15 +101,15 @@ end
 function bt.StatusBar:size_allocate(x, y, width, height)
     if self._is_realized then
         local size = rt.settings.battle.status_bar.element_size
-        local m = 2
         local n = sizeof(self._elements)
-        local total_size = n * size + (n - 1) * m
+        local total_size = n * size
+        local m = math.min(2, (width - total_size) / (n - 1))
 
         local alignment = rt.settings.battle.status_bar.element_alignment
         local start_x, start_y = nil, y + height * 0.5 - size * 0.5
 
         if alignment == rt.Alignment.CENTER then
-            start_x = x + 0.5 * width - total_size * 0.5
+            start_x = x + 0.5 * width - (total_size + (n - 1) * m) * 0.5
         elseif alignment == rt.Alignment.START then
             start_x = x
         elseif alignment == rt.Alignment.END then
@@ -119,14 +118,16 @@ function bt.StatusBar:size_allocate(x, y, width, height)
             rt.error("In bt.StatusBar:size_allocate: unreachable reached")
         end
 
-        for i, t in ipairs(self._elements) do
-            local element_x, element_y, w, h = start_x + (i - 1) * (size + m), start_y, size, size
+        local element_x, element_y, w, h = start_x, start_y, size, size
+        for status, t in pairs(self._elements) do
             t.target_x = element_x
             t.target_y = element_y
             t.size = size
             t.element:fit_into(0, 0, w, h)
             t.debug_shape = rt.Rectangle(element_x, element_y, w, h)
             t.debug_shape:set_is_outline(true)
+
+            element_x = element_x + size + m
         end
     end
 
@@ -143,30 +144,35 @@ function bt.StatusBar:draw()
         self._debug_shape:draw()
     end
 
+    -- draw labels separate in case of overlap
     for e in values(self._elements) do
-
         rt.graphics.push()
         rt.graphics.translate(e.current_x, e.current_y)
-        e.element:draw()
+        e.element:_draw_sprite()
         rt.graphics.pop()
+    end
 
-        if debug_draw then
-            e.debug_shape:draw()
-        end
+    for e in values(self._elements) do
+        rt.graphics.push()
+        rt.graphics.translate(e.current_x, e.current_y)
+        e.element:_draw_label()
+        rt.graphics.pop()
     end
 end
 
 --- @brief
-function bt.StatusBar:add(entity, status)
-    local element = bt.StatusBarElement(entity, status)
+function bt.StatusBar:add(status, elapsed)
+    local element = bt.StatusBarElement(self._entity, status)
     element:set_hide_n_turns_left(true)
+    element:set_elapsed(elapsed)
     element:set_scale(rt.settings.battle.status_bar.add_animation_max_scale)
     element:set_opacity(0)
 
     if self._is_realized then
         element:realize()
     end
-    table.insert(self._elements, {
+
+    self._elements[status] = {
         element = element,
         elapsed = 0,
         is_revealing = true,
@@ -177,16 +183,14 @@ function bt.StatusBar:add(entity, status)
         target_x = 0,
         target_y = 0,
         debug_shape = {}
-    })
-
-    self:reformat()
+    }
 end
 
 --- @brief
-function bt.StatusBar:remove(entity, status)
+function bt.StatusBar:remove(status)
     local seen = false
     for e in values(self._elements) do
-        if e.element._entity == entity and e.element._status == status then
+        if e.element._entity == self._entity and e.element._status == status then
             e.is_revealing = false
             e.element:set_scale(1)
             e.element:set_opacity(1)
@@ -200,4 +204,29 @@ function bt.StatusBar:remove(entity, status)
     if not seen then
         rt.warning("In bt.StatusBar:remove: status `" .. status:get_id() .. "` of entity `" .. entity:get_id() .. "` was not yet added to StatusBar")
     end
+end
+
+--- @brief
+--- @param statuses Table<bt.Status, Number> status to elapsed
+function bt.StatusBar:create_from(statuses)
+    for status, elapsed in pairs(statuses) do
+        if self._elements[status] == nil then
+            self:add(status, elapsed)
+        else
+            self._elements[status].element:set_elapsed(elapsed)
+        end
+    end
+
+    for status, element in pairs(self._elements) do
+        if statuses[status] == nil then
+            self:remove(status)
+        end
+    end
+
+    self:reformat()
+end
+
+--- @brief
+function bt.StatusBar:sync()
+    self:create_from(self._entity.status)
 end

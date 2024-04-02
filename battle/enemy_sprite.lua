@@ -15,6 +15,9 @@ bt.EnemySprite = meta.new_type("EnemySprite", rt.Widget, rt.Animation, function(
         _speed_value = bt.SpeedValue(entity),
         _speed_value_is_visible = true,
 
+        _status_bar = bt.StatusBar(entity),
+        _status_bar_is_visible = true,
+
         _debug_bounds = {}, -- rt.Rectangle
         _debug_sprite = {}, -- rt.Rectangle
         _ui_visible = false,
@@ -32,8 +35,15 @@ function bt.EnemySprite:realize()
     local sprite_w, sprite_h = self._sprite:get_resolution()
     self._sprite:set_minimum_size(sprite_w * 4, sprite_h * 4)
     self._sprite:realize()
+
     self._hp_bar:realize()
+    self._hp_bar:sync()
+
     self._speed_value:realize()
+    self._speed_value:sync()
+
+    self._status_bar:realize()
+    self._status_bar:sync()
 
     self._snapshot = rt.SnapshotLayout()
     self._snapshot:realize()
@@ -46,6 +56,7 @@ function bt.EnemySprite:update(delta)
     self._sprite:update(delta)
     self._hp_bar:update(delta)
     self._speed_value:update(delta)
+    self._status_bar:update(delta)
 
     do -- animation queue
         local current = self._animations[1]
@@ -127,6 +138,11 @@ function bt.EnemySprite:size_allocate(x, y, width, height)
     hp_bar_bounds.width = hp_bar_bounds.width - 2 * rt.settings.margin_unit -- why 2?
     self._hp_bar:fit_into(hp_bar_bounds)
 
+    self._status_bar:fit_into(
+        sprite_x, hp_bar_bounds.y + ternary(self._hp_bar_is_visible, hp_bar_bounds.height, 0),
+        math.max(sprite_w, hp_bar_bounds.width), hp_bar_bounds.height
+    )
+
     local speed_value_w, speed_value_h = self._speed_value:measure()
     self._speed_value:fit_into(
         sprite_x + sprite_w - speed_value_w * 1.5,
@@ -150,6 +166,7 @@ function bt.EnemySprite:draw()
 
         if self._hp_bar_is_visible then self._hp_bar:draw() end
         if self._speed_value_is_visible then self._speed_value:draw() end
+        if self._status_bar_is_visible then self._status_bar:draw() end
 
         if self._scene:get_debug_draw_enabled() then
             self._debug_bounds:draw()

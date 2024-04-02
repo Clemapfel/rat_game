@@ -23,6 +23,8 @@ bt.HealthBar = meta.new_type("HealthBar", bt.BattleUI, function(entity)
         _elapsed = 1,   -- sic, makes it so `update` is invoked immediately
 
         _hp_value = -1,
+        _hp_target = -1,
+        _hp_max = -1,
         _hp_bar = rt.LevelBar(0, entity:get_hp_base(), entity:get_hp_base()),
         _hp_label = {},         -- rt.Glyph,
 
@@ -30,7 +32,9 @@ bt.HealthBar = meta.new_type("HealthBar", bt.BattleUI, function(entity)
         _label_right = {},   -- rt.Glyph
 
         _use_percentage = true,
-        _knock_out_override = false
+        _knock_out_override = false,
+
+        _debug_outline = {}
     })
     out._hp_bar:set_corner_radius(rt.settings.battle.health_bar.corner_radius)
     return out
@@ -67,7 +71,7 @@ end
 function bt.HealthBar:realize()
     if self._is_realized then return end
 
-    local left, center, right = self:_format_hp(self._hp_value, self._entity:get_hp_base())
+    local left, center, right = self:_format_hp(self._hp_value, self._hp_max)
     local settings = {
         is_outlined = true,
         outline_color = rt.Palette.TRUE_BLACK,
@@ -103,6 +107,11 @@ function bt.HealthBar:size_allocate(x, y, width, height)
     self._label_center:set_position(x + 0.5 * width - 0.5 * center_w, label_y)
     self._label_left:set_position(x + 0.5 * width - 0.5 * center_w - left_w, label_y)
     self._label_right:set_position(x + 0.5 * width + 0.5 * center_w, label_y)
+
+    self._debug_outline = rt.Rectangle(
+        x, y, width, height
+    )
+    self._debug_outline:set_is_outline(true)
 end
 
 --- @override
@@ -110,8 +119,8 @@ function bt.HealthBar:update(delta)
     if self._is_realized then
         self._elapsed = self._elapsed + delta
 
-        local diff = (self._hp_value - self._entity:get_hp())
-        local speed = (1 + rt.settings.battle.health_bar.tick_acceleration * (math.abs(diff) / self._entity:get_hp_base()))
+        local diff = (self._hp_value - self._hp_target)
+        local speed = (1 + rt.settings.battle.health_bar.tick_acceleration * (math.abs(diff) / self._hp_max))
         local tick_duration = 1 / (rt.settings.battle.health_bar.tick_speed * speed)
         if self._elapsed > tick_duration then
             local offset = math.modf(self._elapsed, self._tick_duration)
@@ -123,12 +132,12 @@ function bt.HealthBar:update(delta)
             self._elapsed = self._elapsed - offset * tick_duration
 
             if diff ~= 0 then
-                local left, center, right = self:_format_hp(self._hp_value, self._entity:get_hp_base())
+                local left, center, right = self:_format_hp(self._hp_value, self._hp_max)
                 self._label_left:set_text(left)
                 self._label_center:set_text(center)
                 self._label_right:set_text(right)
                 self._hp_bar:set_value(self._hp_value)
-                self:_update_color_from_precentage(self._hp_value / self._entity:get_hp_base())
+                self:_update_color_from_precentage(self._hp_value / self._hp_max)
                 self:reformat()
             end
         end
@@ -142,12 +151,22 @@ function bt.HealthBar:draw()
         self._label_left:draw()
         self._label_center:draw()
         self._label_right:draw()
+
+        if rt.current_scene:get_debug_draw_enabled() then
+            self._debug_outline:draw()
+        end
     end
 end
 
 --- @override
 function bt.HealthBar:sync()
-    self._hp_value = self._entity:get_hp()
-    self._label_left:set_text(select(1, self:_format_hp(self._hp_value, self._entity:get_hp_base())))
-    self._hp_bar:set_value(self._hp_value)
+    self:set_value(self._entity:get_hp(), self._entity:get_hp_base())
+end
+
+--- @brief
+function bt.HealthBar:set_value(hp, hp_max)
+    self._hp_target = hp
+    if hp_max ~= nil then
+        self._hp_max = hp_max
+    end
 end

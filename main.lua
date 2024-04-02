@@ -1,17 +1,5 @@
 require "include"-- Initializes color values
 
-println(1)
-    for i = 1, 12 do
-        (function()
-            print(i)
-            break
-        end)()
-        do
-            print(i)
-            break
-        end
-    end
-
 rt.SpriteAtlas = rt.SpriteAtlas()
 rt.SpriteAtlas:initialize("assets/sprites")
 
@@ -31,37 +19,40 @@ for entity in range(small_ufo, boulder, sprout_01, sprout_02, mole) do
     scene:add_entity(entity)
 end
 
-local status_entity = boulder
-local status_01 = bt.Status("TEST")
-local status_02 = bt.Status("OTHER_TEST")
+function distribute_status()
+    local statuses = {}
+    for i = 1, 10 do
+        if rt.random.toss_coin(0.7) then
+            table.insert(statuses, bt.Status("TEST"))
+        else
+            table.insert(statuses, bt.Status("OTHER_TEST"))
+        end
+    end
 
-for status in range(status_01, status_02) do
-    status:realize()
+    for entity in values(scene._entities) do
+        for key in keys(entity.status) do
+            entity.status[key] = nil
+        end
+    end
+
+    for status in values(statuses) do
+        status:realize()
+        local status_entity = rt.random.choose(scene._entities)
+        status_entity.status[status] = rt.random.integer(0, 5)
+    end
 end
 
-status_entity.status[status_01] = 0
-status_entity.status[status_02] = 2
-
-local bar = bt.StatusBar()
-bar:add(small_ufo, status_01)
-bar:add(small_ufo, status_02)
 
 rt.current_scene:set_debug_draw_enabled(true)
 
 input = rt.InputController()
 input:signal_connect("pressed", function(_, which)
     if which == rt.InputButton.A then
-        if rt.random.toss_coin() then
-            bar:add(small_ufo, status_01)
-        else
-            bar:remove(small_ufo, status_01)
+        distribute_status()
+        for sprite in values(scene._enemy_sprites) do
+            sprite._status_bar:sync()
         end
     elseif which == rt.InputButton.B then
-        if rt.random.toss_coin() then
-            bar:add(small_ufo, status_02)
-        else
-            bar:remove(small_ufo, status_02)
-        end
     elseif which == rt.InputButton.X then
         scene._priority_queue:set_selected()
         scene._priority_queue:set_knocked_out()
@@ -90,9 +81,6 @@ love.load = function()
     love.window.setTitle("rat_game")
     love.filesystem.setIdentity("rat_game")
     rt.current_scene:realize()
-
-    bar:realize()
-    bar:fit_into(0, 0, rt.graphics.get_width(), 100)
 end
 
 love.draw = function()
@@ -104,16 +92,12 @@ love.draw = function()
         love.graphics.setColor(1, 1, 1, 0.75)
         love.graphics.print(fps, rt.graphics.get_width() - love.graphics.getFont():getWidth(fps) - 2 * margin, 0.5 * margin)
     end
-
-    bar:draw()
 end
 
 love.update = function()
     local delta = love.timer.getDelta()
     rt.AnimationHandler:update(delta)
     rt.current_scene:update(delta)
-
-    bar:update(delta)
 end
 
 love.resize = function()
