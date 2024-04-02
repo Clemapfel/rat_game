@@ -183,7 +183,6 @@ require "battle.battle_animation"
 for _, name in pairs(love.filesystem.getDirectoryItems("battle/animations")) do
     require("battle.animations." .. string.gsub(name, "%.lua$", ""))
 end
-require "battle.enemy_sprite"
 require "battle.party_info"
 require "battle.battle_log"
 require "battle.priority_queue_element"
@@ -191,6 +190,9 @@ require "battle.priority_queue"
 require "battle.status_bar_element"
 require "battle.status_bar"
 require "battle.battle_scene"
+require "battle.enemy_sprite"
+require "battle.party_sprite"
+
 
 --[[
 require "battle.stat"

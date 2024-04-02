@@ -114,7 +114,12 @@ function bt.BattleScene:size_allocate(x, y, width, height)
         -- right 4:3
         rt.Line(x + (1 - 3/16) * width, y, x + (1 - 3/16) * width, y + height),
         -- horizontal center
-        rt.Line(x, y + 0.5 * height, x + width, y + 0.5 * height)
+        rt.Line(x, y + 0.5 * height, x + width, y + 0.5 * height),
+
+        -- TODO
+        rt.Line(0.25 * width, 0, 0.25 * width, height),
+        rt.Line(0.75 * width, 0, 0.75 * width, height),
+
     }
 end
 

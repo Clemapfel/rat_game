@@ -386,3 +386,13 @@ By using $PROFs `ANALYZE`, the following information also becomes available
 + current hp divided by max hp, in %
 
 One one side of the screen, the priority queue should be shown. This is the 
+
+
+## Verbose Info Panel
+
+Entity:
+
+| stat | format     | as party | as enemy |
+|------|------------|----------|----------|
+| name | TestEntity | yes      | yes      |
+| hp current | 98 / 100 | 

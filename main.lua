@@ -19,6 +19,9 @@ for entity in range(small_ufo, boulder, sprout_01, sprout_02, mole) do
     scene:add_entity(entity)
 end
 
+local party_sprite = bt.PartySprite(scene, boulder)
+
+
 function distribute_status()
     local statuses = {}
     for i = 1, 10 do
@@ -43,7 +46,7 @@ function distribute_status()
 end
 
 
-rt.current_scene:set_debug_draw_enabled(true)
+rt.current_scene:set_debug_draw_enabled(false)
 
 input = rt.InputController()
 input:signal_connect("pressed", function(_, which)
@@ -81,6 +84,11 @@ love.load = function()
     love.window.setTitle("rat_game")
     love.filesystem.setIdentity("rat_game")
     rt.current_scene:realize()
+
+    -- TODO
+    party_sprite:realize()
+    local w, h, size = rt.graphics.get_width(), rt.graphics.get_height(), 100
+    party_sprite:fit_into(w / 2 - 2 * 0.5 * size, h - size, 2 * size, size)
 end
 
 love.draw = function()
@@ -92,6 +100,8 @@ love.draw = function()
         love.graphics.setColor(1, 1, 1, 0.75)
         love.graphics.print(fps, rt.graphics.get_width() - love.graphics.getFont():getWidth(fps) - 2 * margin, 0.5 * margin)
     end
+
+    party_sprite:draw()
 end
 
 love.update = function()
