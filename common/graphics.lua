@@ -2,7 +2,7 @@ rt.graphics = {}
 
 --- @brief
 function rt.graphics.translate(x, y)
-    love.graphics.translate(x, y)
+    love.graphics.translate(math.round(x), math.round(y))
 end
 
 --- @brief
