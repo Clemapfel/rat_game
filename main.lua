@@ -45,8 +45,9 @@ function distribute_status()
     end
 end
 
-
 rt.current_scene:set_debug_draw_enabled(false)
+
+local info = bt.VerboseInfoBackdrop()
 
 input = rt.InputController()
 input:signal_connect("pressed", function(_, which)
@@ -89,6 +90,9 @@ love.load = function()
     party_sprite:realize()
     local w, h, size = rt.graphics.get_width(), rt.graphics.get_height(), 100
     party_sprite:fit_into(w / 2 - 2 * 0.5 * size, h - size, 2 * size, size)
+
+    info:realize()
+    info:fit_into(50, 50, 200, 300)
 end
 
 love.draw = function()
@@ -102,6 +106,7 @@ love.draw = function()
     end
 
     party_sprite:draw()
+    info:draw()
 end
 
 love.update = function()
