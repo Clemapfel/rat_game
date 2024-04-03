@@ -11,6 +11,7 @@ bt.Status = meta.new_type("Status", function(id)
         _path = path,
         _is_realized = false
     })
+    out:realize()
     meta.set_is_mutable(out, false)
     return out
 end, {
