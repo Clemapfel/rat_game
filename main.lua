@@ -92,7 +92,7 @@ input:signal_connect("pressed", function(_, which)
 end)
 
 love.load = function()
-    love.window.setMode(1920, 1080, {
+    love.window.setMode(1600 / 1.5, 900 / 1.5, {
         vsync = 1,
         msaa = 8,
         stencil = true,

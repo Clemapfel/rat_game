@@ -159,14 +159,16 @@ function bt.VerboseInfo.EntityPage:create_from(config)
 end
 
 function bt.VerboseInfo.EntityPage:reformat(aabb)
-    local x, y, width, height = aabb.x, aabb.y, aabb.width, aabb.height
+    local x, y, width, height = aabb.x, aabb.y, aabb.width , aabb.height
+    local once = true
+    ::restart::
     local current_x, current_y = 0, 0
     local m = rt.settings.margin_unit
 
     self.name_label:fit_into(current_x, current_y, width, height)
     current_y = current_y + select(2, self.name_label:measure()) + m
 
-    local stat_align = current_x + 0.25 * width
+    local stat_align = current_x + 4 * self.name_label:get_font():get_size()
 
     local stance_sprite_size = select(2, self.stance_sprite:measure())
     local stance_label_height = select(2, self.stance_label_left:measure())
@@ -199,24 +201,36 @@ function bt.VerboseInfo.EntityPage:reformat(aabb)
     self.status_label_right:fit_into(stat_align, current_y, width, height)
     current_y = current_y + select(2, self.status_label_left:measure()) + m
 
+    local max_width = 0
     for item in values(self.status_items) do
         local sprite_size = select(2, item.sprite:measure())
         item.sprite:set_horizontal_alignment(rt.Alignment.START)
         item.sprite:set_vertical_alignment(rt.Alignment.CENTER)
         item.sprite:fit_into(current_x + m, current_y, sprite_size, sprite_size)
 
+        -- run resize twice, to properly gaige label height after wrapping
         local label_height = select(2, item.left:measure())
         local label_y = current_y + 0.5 * sprite_size - 0.25 * label_height
-        item.left:fit_into(current_x + sprite_size + 2 * m, label_y, width, sprite_size)
-        item.right:fit_into(current_x + width - 2 * stat_align, label_y, width, sprite_size)
-        current_y = current_y + math.min(sprite_size, label_height)
+        local label_left_width = 2 * stat_align + m
+        item.left:fit_into(current_x + sprite_size + 2 * m, label_y, label_left_width - 4 * m, sprite_size)
+        item.right:fit_into(label_left_width, label_y, width, sprite_size)
+
+        label_height = select(2, item.left:measure())
+        label_y = current_y + 0.5 * sprite_size - 0.5 * label_height
+        item.left:fit_into(current_x + sprite_size + 2 * m, label_y, label_left_width - 4 * m, sprite_size)
+        item.right:fit_into(label_left_width, label_y, width, sprite_size)
+
+        -- max width will be reached here
+        local right_bounds = item.right:get_bounds()
+        max_width = math.max(max_width, right_bounds.x + right_bounds.width - current_x)
+        current_y = current_y + math.max(sprite_size, select(2, item.left:measure()))
     end
 
-    x, y, width, height = 0, 0, width, current_y - y
+    x, y, width, height = 0, 0, max_width, current_y - y
 
     x = x - 2 * m
     y = y - 2 * m
-    width = width
+    width = width + 4 * m
     height = height + math.max(2 * self.name_label:get_font():get_size(), 5 * m)
     self.backdrop:fit_into(x, y, width, height)
 end

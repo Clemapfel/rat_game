@@ -1,5 +1,5 @@
 return {
-    name = "Other Status",
+    name = "A",
 
     max_duration = POSITIVE_INFINITY,
 
