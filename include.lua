@@ -186,6 +186,7 @@ for _, name in pairs(love.filesystem.getDirectoryItems("battle/animations")) do
 end
 
 require "battle.party_info"
+require "battle.backdrop"
 require "battle.battle_log"
 require "battle.priority_queue_element"
 require "battle.priority_queue"
@@ -195,6 +196,8 @@ require "battle.battle_scene"
 require "battle.enemy_sprite"
 require "battle.party_sprite"
 require "battle.verbose_info_panel"
+require "battle.verbose_info_panel.entity_page"
+require "battle.verbose_info_panel.status_page"
 
 
 --[[

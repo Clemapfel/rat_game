@@ -17,7 +17,9 @@ bt.Stance = meta.new_type("Stance", function(id)
     return out
 end, {
     color_id = rt.settings.battle.stance.default_color_id,
-    color = rt.Palette[rt.settings.battle.stance.default_color_id]
+    color = rt.Palette[rt.settings.battle.stance.default_color_id],
+    sprite_id = "",
+    sprite_index = 1
 })
 
 --- @brief
@@ -38,6 +40,15 @@ function bt.Stance:realize()
     if config.color ~= nil then
         self.color_id = config.color
         self.color = rt.Palette[config.color]
+    end
+
+    if config.sprite_id ~= nil then
+        self.sprite_id = config.sprite_id
+        meta.assert_string(self.sprite_id)
+    end
+
+    if config.sprite_index ~= nil then
+        self.sprite_index = config.sprite_index
     end
 
     self._is_realized = false

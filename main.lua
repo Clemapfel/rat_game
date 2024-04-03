@@ -52,9 +52,28 @@ local info_hidden = false
 input = rt.InputController()
 input:signal_connect("pressed", function(_, which)
     if which == rt.InputButton.A then
-        info_hidden = not info_hidden
-        info:set_is_hidden(info_hidden)
+        local entity = rt.random.choose(scene._entities)
+        local entity_config = {
+            name = "Overly Longly Named Boulder",
+            hp_current = entity:get_hp(),
+            hp_base = entity:get_hp_base(),
+            should_censor = false,
+            attack_current = entity.attack_base,
+            attack_preview = nil,
+            defense_current = entity.defense_base,
+            defense_preview = nil,
+            speed_current = entity.speed_base,
+            speed_preview = nil,
+            status = {
+                [bt.Status("TEST")] = 2,
+                [bt.Status("OTHER_TEST")] = 3
+            },
+            stance = bt.Stance("TEST")
+        }
+        info:_create_entity_page(entity, entity_config)
     elseif which == rt.InputButton.B then
+        local status = bt.Status("TEST")
+        info:_create_status_page(status)
     elseif which == rt.InputButton.X then
         scene._priority_queue:set_selected()
         scene._priority_queue:set_knocked_out()
@@ -73,7 +92,7 @@ input:signal_connect("pressed", function(_, which)
 end)
 
 love.load = function()
-    love.window.setMode(1600 / 1.5, 900 / 1.5, {
+    love.window.setMode(1920, 1080, {
         vsync = 1,
         msaa = 8,
         stencil = true,
@@ -90,26 +109,7 @@ love.load = function()
     party_sprite:fit_into(w / 2 - 2 * 0.5 * size, h - size, 2 * size, size)
 
     info:realize()
-    info:fit_into(20, 20, 2 * 3/16 * rt.graphics.get_width(), rt.graphics.get_height())
-
-    local entity_config = {
-        name = "Overly Longly Named Boulder",
-        hp_current = boulder:get_hp(),
-        hp_base = boulder:get_hp_base(),
-        should_censor = false,
-        attack_current = boulder.attack_base,
-        attack_preview = boulder.attack_base * 1.5,
-        defense_current = boulder.defense_base,
-        defense_preview = nil,
-        speed_current = boulder.speed_base,
-        speed_preview = boulder.speed_base,
-        status = {
-            [bt.Status("TEST")] = 2,
-            [bt.Status("OTHER_TEST")] = 3
-        },
-        stance = bt.Stance("TEST")
-    }
-    info:_create_entity_page(entity_config)
+    info:fit_into(20, 20, 3/16 * rt.graphics.get_width(), rt.graphics.get_height())
 end
 
 love.draw = function()

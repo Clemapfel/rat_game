@@ -173,7 +173,8 @@ function bt.Status:realize()
     meta.set_is_mutable(self, true)
 
     local strings = {
-        "name"
+        "name",
+        "description"
     }
 
     for _, key in ipairs(strings) do

@@ -10,7 +10,10 @@ rt.Sprite = meta.new_type("Sprite", rt.Widget, rt.Animation, function(id)
         _elapsed = 0,
         _should_loop = true,
         _frame_duration = 0,
-        _n_frames = 0
+        _n_frames = 0,
+        _animation_id = "",
+        _frame_range_start = 1,
+        _frame_range_end = 1
     })
 end)
 
@@ -28,6 +31,13 @@ function rt.Sprite:realize()
         self:reformat()
         self:set_frame(self._current_frame)
         self:set_minimum_size(self._width, self._height)
+
+        if self._animation_id == "" then
+            self._frame_range_start = 1
+            self._frame_range_end = self._spritesheet:get_n_frames()
+        else
+            self:set_animation(self._animation_id)
+        end
     end
 end
 
@@ -41,6 +51,7 @@ end
 --- @override
 function rt.Sprite:update(delta)
     if self._is_realized then
+
         self._elapsed = self._elapsed + delta
         local frame_i = math.floor(self._elapsed / self._frame_duration)
 
@@ -53,6 +64,9 @@ function rt.Sprite:update(delta)
         if frame_i ~= self._current_frame then
             self:set_frame(frame_i)
             self._current_frame = frame_i
+            if self._animation_id ~= "" then
+                rt.error("In rt.Sprite:update: TODO: make update loop over specific frame range for sub-animation loops")
+            end
         end
     end
 end
@@ -69,6 +83,12 @@ function rt.Sprite:set_frame(i)
             frame.x, frame.y + frame.height
         )
     end
+end
+
+--- @brief
+function rt.Sprite:set_animation(id)
+    self._animation_id = id
+    self:set_frame(self._spritesheet.name_to_frame[id][1])
 end
 
 --- @override

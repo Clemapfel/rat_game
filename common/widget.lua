@@ -620,8 +620,13 @@ function rt.Widget:snapshot()
 end
 
 --- @override
-function rt.Widget:set_opacity()
-    rt.error("In " .. meta.typeof(self) .. ":set_opacity: abstract method called")
+function rt.Widget:set_opacity(alpha)
+    local toplevel = self:get_top_level_widget()
+    if toplevel ~= nil then
+        toplevel:set_opacity(alpha)
+    else
+        rt.error("In " .. meta.typeof(self) .. ":set_opacity: abstract method called")
+    end
 end
 
 function rt.Widget:get_opacity()

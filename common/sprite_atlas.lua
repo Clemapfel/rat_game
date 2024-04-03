@@ -61,10 +61,16 @@ function rt.SpriteAtlasEntry:load()
         if fract(config.width) ~= 0 then
             rt.error("In rt.SpriteAtlasEntry:load: incorrect frame width for sprite at `" .. image_path .. "`: image of size `" .. data:getWidth() .. "` is not vidibles by number of frames `" .. config.n_frames .. "`")
         end
-    else -- treat entire spritesheet as frame
-        config.width = data:getWidth()
-        config.height = data:getHeight()
-        config.n_frames = 1
+    else
+        if config.animations ~= nil then
+            config.n_frames = sizeof(config.animations)
+            config.width = data:getWidth() / config.n_frames
+        else
+            -- treat entire spritesheet as frame
+            config.width = data:getWidth()
+            config.height = data:getHeight()
+            config.n_frames = 1
+        end
     end
 
     config.height = which(config.height, data:getHeight())
@@ -121,7 +127,18 @@ function rt.SpriteAtlasEntry:load()
         end
 
         self.frame_to_name[index] = name
-        self.name_to_frame[name] = index
+
+        if self.name_to_frame[name] == nil then
+            self.name_to_frame[name] = {index, index}
+        else
+            local current = self.name_to_frame[name]
+            if index < current[1] - 1 or index > current[2] + 1 then
+                rt.error("In rt.SpriteAtlasEntry:realize: animation at `" .. config_path .. "` specifies non-consecutive frame range for animation with `" .. name .. "`")
+            end
+
+            current[1] = math.min(index, current[1])
+            current[2] = math.max(index, current[2])
+        end
         self.texture_rectangles[index] = rt.AABB(
             (index - 1) / self.n_frames, 0,
             1 / self.n_frames, 1

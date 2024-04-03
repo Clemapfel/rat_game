@@ -4,7 +4,6 @@ rt.settings.battle.log = {
     fade_duration = 0, -- seconds
     n_scrolling_labels = 5, -- number of labels displayed at the same time
     box_expansion_speed = 15, -- px per second
-    frame_thickness = 2,
     hiding_speed = 50, -- px per second
     font = rt.Font(30, "assets/fonts/DejaVuSans/DejaVuSans-Regular.ttf")
 }
@@ -30,29 +29,22 @@ bt.BattleLog = meta.new_type("BattleLog", rt.Widget, rt.Animation, function()
 
         _label_height = 0,
         _should_reformat = true,    -- should labels be realigned next update cycle
-        _backdrop = {}, -- rt.Frame
-        _backdrop_backing = {}, -- rt.Spacer
+
+        _backdrop = bt.Backdrop()
     })
 end)
 
 --- @override
 function bt.BattleLog:realize()
+    if self._is_realized then return end
+
     self._label_height = 0
     for _, label in pairs(self._labels) do
         label:realize()
         self._label_height = self._label_height + label:get_height()
     end
     self:set_is_animated(true)
-
-    self._backdrop_backing = rt.Spacer()
-    self._backdrop = rt.Frame()
-    self._backdrop:set_child(self._backdrop_backing)
-    self._backdrop:set_thickness(rt.settings.battle.log.frame_thickness)
-    self._backdrop:set_color(rt.Palette.FOREGROUND)
-
-    self._backdrop_backing:realize()
     self._backdrop:realize()
-    self._backdrop:set_opacity(1)
     self._is_realized = true
 end 
 
