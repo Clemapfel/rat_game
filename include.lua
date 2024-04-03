@@ -173,6 +173,7 @@ require "battle.equippable"
 require "battle.move"
 require "battle.move_selection"
 require "battle.status"
+require "battle.stance"
 require "battle.battle_entity_interface"
 
 require "battle.battle_ui"

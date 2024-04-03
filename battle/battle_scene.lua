@@ -165,7 +165,7 @@ function bt.BattleScene:draw()
     end
 
     self._priority_queue:draw()
-    --self._log:draw()
+    self._log:draw()
 end
 
 --- @brief

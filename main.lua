@@ -21,7 +21,6 @@ end
 
 local party_sprite = bt.PartySprite(scene, boulder)
 
-
 function distribute_status()
     local statuses = {}
     for i = 1, 10 do
@@ -47,15 +46,14 @@ end
 
 rt.current_scene:set_debug_draw_enabled(false)
 
-local info = bt.VerboseInfoBackdrop()
+local info = bt.VerboseInfo()
+local info_hidden = false
 
 input = rt.InputController()
 input:signal_connect("pressed", function(_, which)
     if which == rt.InputButton.A then
-        distribute_status()
-        for sprite in values(scene._enemy_sprites) do
-            sprite._status_bar:sync()
-        end
+        info_hidden = not info_hidden
+        info:set_is_hidden(info_hidden)
     elseif which == rt.InputButton.B then
     elseif which == rt.InputButton.X then
         scene._priority_queue:set_selected()
@@ -92,7 +90,26 @@ love.load = function()
     party_sprite:fit_into(w / 2 - 2 * 0.5 * size, h - size, 2 * size, size)
 
     info:realize()
-    info:fit_into(50, 50, 200, 300)
+    info:fit_into(20, 20, 2 * 3/16 * rt.graphics.get_width(), rt.graphics.get_height())
+
+    local entity_config = {
+        name = "Overly Longly Named Boulder",
+        hp_current = boulder:get_hp(),
+        hp_base = boulder:get_hp_base(),
+        should_censor = false,
+        attack_current = boulder.attack_base,
+        attack_preview = boulder.attack_base * 1.5,
+        defense_current = boulder.defense_base,
+        defense_preview = nil,
+        speed_current = boulder.speed_base,
+        speed_preview = boulder.speed_base,
+        status = {
+            [bt.Status("TEST")] = 2,
+            [bt.Status("OTHER_TEST")] = 3
+        },
+        stance = bt.Stance("TEST")
+    }
+    info:_create_entity_page(entity_config)
 end
 
 love.draw = function()
@@ -105,7 +122,7 @@ love.draw = function()
         love.graphics.print(fps, rt.graphics.get_width() - love.graphics.getFont():getWidth(fps) - 2 * margin, 0.5 * margin)
     end
 
-    party_sprite:draw()
+    --party_sprite:draw()
     info:draw()
 end
 

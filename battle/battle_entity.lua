@@ -29,12 +29,7 @@ end, {
     defense_base = 0,
     speed_base = 100,
 
-    attack_modifier = 0,
-    defense_modifier = 0,
-    speed_modifier = 0,
-
     priority = 0,
-
     status = {}, -- Table<bt.Status, Number>
 
     is_knocked_out = false,
