@@ -54,7 +54,7 @@ input:signal_connect("pressed", function(_, which)
     if which == rt.InputButton.A then
         local entity = rt.random.choose(scene._entities)
         local entity_config = {
-            name = "Overly Longly Named Boulder",
+            name = entity:get_name(),
             hp_current = entity:get_hp(),
             hp_base = entity:get_hp_base(),
             should_censor = false,
@@ -109,7 +109,7 @@ love.load = function()
     party_sprite:fit_into(w / 2 - 2 * 0.5 * size, h - size, 2 * size, size)
 
     info:realize()
-    info:fit_into(20, 20, 3/16 * rt.graphics.get_width(), rt.graphics.get_height())
+    info:fit_into(20, 20, 2 * 3/16 * rt.graphics.get_width(), rt.graphics.get_height())
 end
 
 love.draw = function()

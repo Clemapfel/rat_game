@@ -160,8 +160,10 @@ end
 
 function bt.VerboseInfo.EntityPage:reformat(aabb)
     local x, y, width, height = aabb.x, aabb.y, aabb.width , aabb.height
+
     local once = true
     ::restart::
+
     local current_x, current_y = 0, 0
     local m = rt.settings.margin_unit
 
@@ -213,17 +215,19 @@ function bt.VerboseInfo.EntityPage:reformat(aabb)
         local label_y = current_y + 0.5 * sprite_size - 0.25 * label_height
         local label_left_width = 2 * stat_align + m
         item.left:fit_into(current_x + sprite_size + 2 * m, label_y, label_left_width - 4 * m, sprite_size)
-        item.right:fit_into(label_left_width, label_y, width, sprite_size)
-
-        label_height = select(2, item.left:measure())
-        label_y = current_y + 0.5 * sprite_size - 0.5 * label_height
-        item.left:fit_into(current_x + sprite_size + 2 * m, label_y, label_left_width - 4 * m, sprite_size)
-        item.right:fit_into(label_left_width, label_y, width, sprite_size)
+        item.right:fit_into(label_left_width, label_y,  label_left_width - 4 * m, sprite_size)
 
         -- max width will be reached here
         local right_bounds = item.right:get_bounds()
         max_width = math.max(max_width, right_bounds.x + right_bounds.width - current_x)
         current_y = current_y + math.max(sprite_size, select(2, item.left:measure()))
+    end
+
+    -- restart size negotiation
+    if max_width > width and once then
+        once = false
+        width = max_width
+        goto restart
     end
 
     x, y, width, height = 0, 0, max_width, current_y - y

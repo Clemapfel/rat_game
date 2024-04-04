@@ -28,7 +28,7 @@ function bt.VerboseInfo.StatusPage:create_from(config)
     local number_prefix = "<b><color=" .. grey .. ">:</color></b>    <mono>"
     local number_postfix = "</mono>"
 
-    self.duration_label_left = new_label("<b>Duration</b>")
+    self.duration_label_left = new_label("Duration")
     self.duration_label_right = new_label(number_prefix, ternary(config.max_duration == POSITIVE_INFINITY, "∞", config.max_duration), number_postfix)
 
     self.effect_label = new_label("<u>Effect</u>: " .. config.description)
@@ -46,13 +46,12 @@ function bt.VerboseInfo.StatusPage:reformat(aabb)
     self.name_label:fit_into(current_x, current_y, width, height)
     current_y = current_y + select(2, self.name_label:measure()) + m
 
-    local stat_align = current_x + 0.25 * width
     self.duration_label_left:fit_into(current_x, current_y, width, height)
-    self.duration_label_right:fit_into(stat_align, current_y, width, height)
+    self.duration_label_right:fit_into(select(1, self.duration_label_left:measure()) + 2 * m, current_y, width, height)
     current_y = current_y + select(2, self.duration_label_left:measure())
     current_y = current_y + m
 
-    self.effect_label:fit_into(current_x, current_y, width, height)
+    self.effect_label:fit_into(current_x, current_y, width - 2 * m, height)
     current_y = current_y + select(2, self.effect_label:measure())
 
     x, y, width, height = 0, 0, width, current_y - y
