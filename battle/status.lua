@@ -188,6 +188,9 @@ function bt.Status:realize()
         "attack_offset",
         "defense_offset",
         "speed_offset",
+        "attack_factor",
+        "defense_factor",
+        "speed_factor",
         "max_duration"
     }
 
