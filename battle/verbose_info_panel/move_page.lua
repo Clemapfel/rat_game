@@ -26,8 +26,8 @@ function bt.VerboseInfo.MovePage:create_from(config, current_stance)
     self.sprite = rt.Sprite(config.sprite_id)
     self.sprite:realize()
     
-    local grey = "GRAY_3"
-    local number_prefix = "<b><color=" .. grey .. ">:</color></b>    <mono>"
+    local gray = "GRAY_3"
+    local number_prefix = "<b><color=" .. gray .. ">:</color></b>    <mono>"
     local number_postfix = "</mono>"
 
     local function format_priority(x)
@@ -39,7 +39,7 @@ function bt.VerboseInfo.MovePage:create_from(config, current_stance)
     if config.stance_alignment == bt.StanceAlignment.ALL then
         self.stance_label_right = new_label(number_prefix, "<rainbow>" .. "ALL" .. "</rainbow>", number_postfix)
     elseif config.stance_alignment == bt.StanceAlignment.NONE then
-        self.stance_label_right = new_label(number_prefix, "<color=" .. grey .. ">" .. "None" .. "</color>", number_postfix)
+        self.stance_label_right = new_label(number_prefix, "<color=" .. gray .. ">" .. "None" .. "</color>", number_postfix)
     else
         self.stance_label_right = new_label(number_prefix, "", number_postfix)
         local stance = bt.Stance(config.stance_alignment)
@@ -118,7 +118,17 @@ function bt.VerboseInfo.MovePage:create_from(config, current_stance)
     self.target_label_left = new_label("<u>Targets</u>")
     self.target_label_right = new_label(number_prefix, "</mono>", target_str, "<mono>", number_postfix)
 
+    self.effect_label = new_label("<u>Effect</u>: " .. config.description)
 
+    local bonus_prefix, bonus_postfix = "", ""
+    if not current_stance:matches_alignment(config.stance_alignment) then
+        bonus_prefix = "<color=" .. "GRAY_4" .. "><s>Bonus: "
+        bonus_postfix = "</color></s>"
+    else
+        bonus_prefix = "<rainbow><b>Bonus</b></rainbow>: "
+        bonus_postfix = ""
+    end
+    self.bonus_effect_label = new_label(bonus_prefix, config.bonus_description, bonus_postfix)
 end
 
 --- @brief
@@ -173,6 +183,13 @@ function bt.VerboseInfo.MovePage:reformat(aabb)
         goto restart
     end
 
+    self.effect_label:fit_into(current_x, current_y, width - 2 * m, height)
+    current_y = current_y + select(2, self.effect_label:measure())
+
+    self.bonus_effect_label:fit_into(current_x, current_y, width - 2 * m, height)
+    current_y = current_y + select(2, self.bonus_effect_label:measure())
+
+
     x, y, width, height = 0, 0, width, current_y - y
     x = x - 2 * m
     y = y - 2 * m
@@ -180,7 +197,6 @@ function bt.VerboseInfo.MovePage:reformat(aabb)
     height = height + math.max(2 * self.name_label:get_font():get_size(), 5 * m)
     self.backdrop:fit_into(x, y, width, height)
     self.sprite:fit_into(x + width - sprite_size - 1 * m, y + 1 * m, sprite_size, sprite_size)
-
 end
 
 --- @brief
@@ -202,4 +218,7 @@ function bt.VerboseInfo.MovePage:draw()
 
     self.target_label_left:draw()
     self.target_label_right:draw()
+
+    self.effect_label:draw()
+    self.bonus_effect_label:draw()
 end

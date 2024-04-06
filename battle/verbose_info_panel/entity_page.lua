@@ -41,8 +41,8 @@ function bt.VerboseInfo.EntityPage:create_from(config)
 
     self.name_label = new_label("<u><b>", config.name, "</b></u>")
 
-    local grey = "GRAY_3"
-    local number_prefix = "<b><color=" .. grey .. ">:</color></b>    <mono>"
+    local gray = "GRAY_3"
+    local number_prefix = "<b><color=" .. gray .. ">:</color></b>    <mono>"
     local number_postfix = "</mono>"
 
     local create_stat_prefix = function(label)

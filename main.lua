@@ -76,7 +76,7 @@ input:signal_connect("pressed", function(_, which)
         info:_create_status_page(status)
     elseif which == rt.InputButton.X then
         local move = bt.Move("TEST_MOVE")
-        info:_create_move_page(move)
+        info:_create_move_page(move, bt.Stance("NEUTRAL"))
     elseif which == rt.InputButton.Y then
         scene._priority_queue:set_is_hidden(not scene._priority_queue:get_is_hidden())
     elseif which == rt.InputButton.UP then

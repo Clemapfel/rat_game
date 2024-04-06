@@ -163,7 +163,7 @@ function rt.Glyph:_update()
             table.insert(strikethrough_vertices, x)
             table.insert(strikethrough_vertices, strikethrough_y)
             self._strikethrough = rt.VertexRectangleSegments(1, strikethrough_vertices)
-            self._underline:set_color(self._color)
+            self._strikethrough:set_color(self._color)
         end
     end
 end

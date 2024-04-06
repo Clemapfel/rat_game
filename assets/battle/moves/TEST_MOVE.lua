@@ -14,7 +14,7 @@ return {
 
     priority = 1,
 
-    description = "Deals 1x <color=ATK>user.ATK</color> to single target enemy",
+    description = "Deal damage equal to 1× <color=ATTACK>ATK</color>",
     bonus_description = "+50% damage",
 
     effect = function(user, targets)

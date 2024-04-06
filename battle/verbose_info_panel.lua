@@ -115,13 +115,13 @@ function bt.VerboseInfo:_create_status_page(status)
 end
 
 --- @brief
-function bt.VerboseInfo:_create_move_page(move)
+function bt.VerboseInfo:_create_move_page(move, current_stance)
     local page = self._pages[move]
     if page == nil then
         page = bt.VerboseInfo.MovePage()
         self._pages[move] = page
     end
-    page:create_from(move)
+    page:create_from(move, current_stance)
     page:reformat(self:get_bounds())
 
     self._current_page = page

@@ -57,11 +57,11 @@ end)
 
 --- @brief
 function rt.Joint:draw()
-    local grey = 0.5
-    love.graphics.setColor(grey, grey, grey, 0.75)
+    local gray = 0.5
+    love.graphics.setColor(gray, gray, gray, 0.75)
     local x1, y1, x2, y2 = self._native:getAnchors()
     love.graphics.circle("line", x1, y1, 3)
 
-    love.graphics.setColor(grey, grey, grey, 0.5)
+    love.graphics.setColor(gray, gray, gray, 0.5)
     love.graphics.circle("fill", x1, y1, 3)
 end
