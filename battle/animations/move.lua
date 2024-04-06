@@ -1,0 +1,1 @@
+-- target is either single sprite, all enemies, all allies, or entire screen

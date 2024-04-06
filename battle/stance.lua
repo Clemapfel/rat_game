@@ -3,6 +3,12 @@ rt.settings.battle.stance = {
     default_color_id = "GRAY_1"
 }
 
+--- @class bt.StanceAlignment
+bt.StanceAlignment = meta.new_enum({
+    ALL = "ALL",
+    NONE = "NONE",
+})
+
 --- @class bt.Stance
 bt.Stance = meta.new_type("Stance", function(id)
     local path = rt.settings.battle.stance.config_path .. "/" .. id .. ".lua"
@@ -63,4 +69,9 @@ end
 --- @brief
 function bt.Stance:get_name()
     return self.name
+end
+
+--- @brief
+function bt.Stance:matches_alignment(alignment)
+    return self.id == alignment
 end

@@ -40,7 +40,6 @@ function bt.VerboseInfo.StatusPage:create_from(config)
     end
 
     local function create_factor_label(x)
-
         if x > 1 then
             return "+" .. tostring(math.round((x - 1) * 100)) .. "%"
         elseif x < 1 then

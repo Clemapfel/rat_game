@@ -31,6 +31,7 @@ end, {
 
     priority = 0,
     status = {}, -- Table<bt.Status, Number>
+    stance = bt.Stance("NEUTRAL"),
 
     is_knocked_out = false,
     is_dead = false,
@@ -143,5 +144,10 @@ end
 
 --- @brief
 function bt.BattleEntity:get_status_n_turns_elapsed(status)
-    return self._status[status].elapsed
+    return self.status[status].elapsed
+end
+
+--- @brief
+function bt.BattleEntity:get_stance()
+    return self.stance
 end

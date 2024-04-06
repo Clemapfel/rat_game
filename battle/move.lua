@@ -11,10 +11,12 @@ bt.Move = meta.new_type("Move", function(id)
         _path = path,
         _is_realized = false
     })
+    out:realize()
     meta.set_is_mutable(out, false)
     return out
 end, {
     max_n_uses = POSITIVE_INFINITY,
+    stance_alignment = bt.StanceAlignment.NONE,
 
     can_target_multiple = false,
 
@@ -24,11 +26,20 @@ end, {
     -- targets_field = not (can_target_self or can_target_enemy or can_target_ally)
 
     priority = 0,
+
     effect = function(user, targets)
         meta.assert_isa(self, bt.Move)
         meta.assert_isa(user, bt.BattleEntity)
         meta.assert_isa(targets, bt.BattleEntity)
-    end
+    end,
+
+    sprite_id = "",
+    sprite_index = 1,
+    animation_id = "",
+    animation_index = 1,
+
+    description = "<No Effect>",
+    bonus_description = "<No Bonus>"
 })
 
 --- @brief
@@ -44,35 +55,75 @@ function bt.Move:realize()
     local config = chunk()
     meta.set_is_mutable(self, true)
 
-    if config.max_n_uses ~= nil then
-        self.max_n_uses = config.max_n_uses
+    -- numbers
+    for which in range(
+        "max_n_uses",
+        "priority"
+    ) do
+        if config[which] ~= nil then
+            self[which] = config[which]
+            meta.assert_number(self[which])
+        end
     end
-    meta.assert_number(self.max_n_uses)
-    assert(self.max_n_uses > 0)
 
-    local booleans = {
+    -- booleans
+    for which in range(
         "can_target_multiple",
         "can_target_self",
-        "can_target_ally",
-        "can_target_self"
-    }
-
-    for _, key in ipairs(booleans) do
-        if config[key] ~= nil then
-            self[key] = config[key]
+        "can_target_enemy",
+        "can_target_ally"
+    ) do
+        if config[which] ~= nil then
+            self[which] = config[which]
+            meta.assert_boolean(self[which])
         end
-        meta.assert_boolean(self[key])
     end
 
-    if config.priority ~= nil then
-        self.priority = 0
+    meta.assert_string(config.sprite_id)
+    self.sprite_id = config.sprite_id
+    if config.sprite_index ~= nil then
+        self.sprite_index = config.sprite_index
     end
-    meta.assert_number(self.priority)
 
+    meta.assert_string(config.animation_id)
+    self.animation_id = config.animation_id
+    if config.animation_index ~= nil then
+        self.animation_index = config.animation_index
+    end
 
+    -- strings
+    for which in range(
+        "name",
+        "description",
+        "bonus_description",
+        "stance_alignment"
+    ) do
+        if config[which] ~= nil then
+            self[which] = config[which]
+            meta.assert_string(self[which])
+        end
+    end
+
+    -- behavior
     meta.assert_function(config.effect)
     self.effect = config.effect
 
+    if config.bonus_effect ~= nil then
+        self.bonus_effect = config.bonus_effect
+        meta.assert_function(self.bonus_effect)
+    end
+
     self._is_realized = true
     meta.set_is_mutable(self, false)
+end
+
+--- @brief
+function bt.Move:stance_matches(entity)
+    if self.stance_alignment == bt.StanceAlignment.ALL then
+        return true
+    elseif self.stance_alignment == bt.StanceAlignment.NONE then
+        return false
+    else
+        return entity:get_stance():matches_alignment(self.stance_alignment)
+    end
 end

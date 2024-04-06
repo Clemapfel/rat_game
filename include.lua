@@ -166,14 +166,15 @@ require "physics_world"
 require "collider"
 require "joint"
 
-require "battle.battle_entity"
-require "battle.battle_state"
+require "battle.stance"
+require "battle.move_selection"
+require "battle.status"
 require "battle.consumable"
 require "battle.equippable"
 require "battle.move"
-require "battle.move_selection"
-require "battle.status"
-require "battle.stance"
+
+require "battle.battle_entity"
+require "battle.battle_state"
 require "battle.battle_entity_interface"
 
 require "battle.battle_ui"
@@ -198,6 +199,7 @@ require "battle.party_sprite"
 require "battle.verbose_info_panel"
 require "battle.verbose_info_panel.entity_page"
 require "battle.verbose_info_panel.status_page"
+require "battle.verbose_info_panel.move_page"
 
 
 --[[

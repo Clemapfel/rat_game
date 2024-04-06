@@ -17,8 +17,7 @@ bt.VerboseInfo = meta.new_type("VerboseInfo", rt.Widget, rt.Animation, function(
         _slide_collider = {}, -- rt.RectangleCollider
 
         _current_page = {}, -- rt.Drawable
-        _entity_pages = {}, -- Table<bt.Entity, bt.VerboseInfo.EntityPage>
-        _status_pages = {}  -- Table<bt.Entity, bt.VerboseInfo.StatusPage>
+        _pages = {}, -- Table<bt.Entity, bt.VerboseInfo.EntityPage / StatusPage / MovePage>
     })
 end)
 
@@ -91,31 +90,39 @@ end
 
 --- @brief
 function bt.VerboseInfo:_create_entity_page(entity, config)
-    local page = self._entity_pages[entity]
+    local page = self._pages[entity]
     if page == nil then
         page = bt.VerboseInfo.EntityPage()
-        self._entity_pages[entity] = page
+        self._pages[entity] = page
     end
     page:create_from(config)
     page:reformat(self:get_bounds())
 
-    self._current_page = self._entity_pages[entity] -- TODO
+    self._current_page = page
 end
 
 --- @brief
 function bt.VerboseInfo:_create_status_page(status)
-    local page = self._entity_pages[status]
+    local page = self._pages[status]
     if page == nil then
         page = bt.VerboseInfo.StatusPage()
-        self._status_pages[status] = page
+        self._pages[status] = page
     end
     page:create_from(status)
     page:reformat(self:get_bounds())
 
-    self._current_page = self._status_pages[status] -- TODO
+    self._current_page = page
 end
 
 --- @brief
-function bt.VerboseInfo:_create_move_page()
+function bt.VerboseInfo:_create_move_page(move)
+    local page = self._pages[move]
+    if page == nil then
+        page = bt.VerboseInfo.MovePage()
+        self._pages[move] = page
+    end
+    page:create_from(move)
+    page:reformat(self:get_bounds())
 
+    self._current_page = page
 end

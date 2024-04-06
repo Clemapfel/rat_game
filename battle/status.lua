@@ -201,6 +201,12 @@ function bt.Status:realize()
         meta.assert_number(self[key])
     end
 
+    for factor in range(self.attack_factor, self.defense_factor, self.speed_factor) do
+        if factor < 0 then
+            rt.error("In bt.Status:realize: error when loading config at `" .. self._path .. "`: `attack_factor`, `defense_factor`, or `speed_factor` property < 0")
+        end
+    end
+
     local bools = {
         "is_field_effect",
     }

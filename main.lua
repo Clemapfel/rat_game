@@ -75,8 +75,8 @@ input:signal_connect("pressed", function(_, which)
         local status = bt.Status("TEST")
         info:_create_status_page(status)
     elseif which == rt.InputButton.X then
-        scene._priority_queue:set_selected()
-        scene._priority_queue:set_knocked_out()
+        local move = bt.Move("TEST_MOVE")
+        info:_create_move_page(move)
     elseif which == rt.InputButton.Y then
         scene._priority_queue:set_is_hidden(not scene._priority_queue:get_is_hidden())
     elseif which == rt.InputButton.UP then
