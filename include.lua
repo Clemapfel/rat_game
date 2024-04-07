@@ -182,9 +182,14 @@ require "battle.health_bar"
 require "battle.speed_value"
 
 require "battle.battle_animation"
+-- TODO
 for _, name in pairs(love.filesystem.getDirectoryItems("battle/animations")) do
-    require("battle.animations." .. string.gsub(name, "%.lua$", ""))
+    if name ~= "status" and name ~= "move" then
+        local path = "battle.animations." .. string.gsub(name, "%.lua$", "")
+        require(path)
+    end
 end
+-- TODO
 
 require "battle.party_info"
 require "battle.backdrop"

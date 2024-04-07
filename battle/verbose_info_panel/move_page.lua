@@ -30,10 +30,6 @@ function bt.VerboseInfo.MovePage:create_from(config, current_stance)
     local number_prefix = "<b><color=" .. gray .. ">:</color></b>    <mono>"
     local number_postfix = "</mono>"
 
-    local function format_priority(x)
-        return ternary(x > 0, "+", "") .. tostring(x)
-    end
-
     self.stance_label_left = new_label("Alignment")
     self.stance_sprite = nil
     if config.stance_alignment == bt.StanceAlignment.ALL then
@@ -47,10 +43,6 @@ function bt.VerboseInfo.MovePage:create_from(config, current_stance)
         self.stance_sprite:realize()
         self.stance_sprite:set_animation(stance.sprite_index)
     end
-
-    self.priority_label_visible = false -- config.priority ~= 0
-    self.priority_label_left = new_label("Priority")
-    self.priority_label_right = new_label(number_prefix, format_priority(config.priority), number_postfix)
 
     -- target
     local me, enemy, ally = config.can_target_self, config.can_target_enemy, config.can_target_ally
@@ -120,16 +112,29 @@ function bt.VerboseInfo.MovePage:create_from(config, current_stance)
 
     self.effect_label = new_label("<u>Effect</u>: " .. config.description .. ".")
 
-    local bonus_prefix, bonus_postfix = "", ""
+    local bonus_color, bonus_prefix, bonus_postfix = "", "", ""
+    local text = config.bonus_description
+
     if not current_stance:matches_alignment(config.stance_alignment) then
-        bonus_prefix = "<color=" .. "GRAY_4" .. "><s>If Aligned: "
-        bonus_postfix = "</color></s>"
+        bonus_color = "<color=GRAY_3>"
+        bonus_prefix = "<s>If Aligned: "
+        bonus_postfix = "</s></color>"
+
+        -- remove all color tags
+        text = text:gsub("<color=[a-zA-Z0-9_]*>", "")
+        text = text:gsub("</color>", "")
     else
-        bonus_prefix = "<color=" .. "TEAL_1" .. ">Aligned: "
+        bonus_color = "<color=TEAL_1>"
+        bonus_prefix = "<i>Aligned</i>: "
         bonus_postfix = "</color>"
+
+        -- surround color tags, so only untagged regions become colored
+        text = text:gsub("<color=(.-)>", "<§/color><color=%1>") -- use § to prevent later gsubs affecting </color> inserted by this step
+        text = text:gsub("</color>", "</color>" .. bonus_color)
+        text = text:gsub("§", "")
     end
 
-    self.bonus_effect_label = new_label(bonus_prefix, config.bonus_description, bonus_postfix)
+    self.bonus_effect_label = new_label(bonus_color, bonus_prefix, text, bonus_postfix)
 end
 
 --- @brief
@@ -167,14 +172,6 @@ function bt.VerboseInfo.MovePage:reformat(aabb)
 
     self.bonus_effect_label:fit_into(current_x, current_y, width - 2 * m, height)
     current_y = current_y + select(2, self.bonus_effect_label:measure())
-
-
-    if self.priority_label_visible then
-        self.priority_label_left:fit_into(current_x, current_y, width, height)
-        self.priority_label_right:fit_into(math.max(select(1, self.priority_label_left:measure()) + 2 * m, stat_align), current_y, width, height)
-        current_y = current_y + select(2, self.priority_label_left:measure())
-    end
-
     current_y = current_y + m
 
     self.target_label_left:fit_into(current_x, current_y, width, height)
@@ -209,11 +206,6 @@ function bt.VerboseInfo.MovePage:draw()
     self.stance_label_right:draw()
     if self.stance_sprite ~= nil then
         self.stance_sprite:draw()
-    end
-
-    if self.priority_label_visible then
-        self.priority_label_left:draw()
-        self.priority_label_right:draw()
     end
 
     self.target_label_left:draw()

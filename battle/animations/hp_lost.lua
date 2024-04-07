@@ -1,5 +1,5 @@
 rt.settings.battle.animations.hp_lost = {
-    duration = 1
+    duration = 2
 }
 
 --- @class bt.Animation.HP_LOST
@@ -50,7 +50,7 @@ function bt.Animation.HP_LOST:start()
         local f = function(x)
             return (x - 0.3)^2 * 2
         end
-        for j = 1, n+10 do
+        for j = 1, n + 10 do
             local x = j / n
             local y = f(x)
             table.insert(vertices, start_x + 2 * factor * x)

@@ -14,8 +14,8 @@ return {
 
     priority = 1,
 
-    description = "Deal damage equal to 1× <color=ATTACK>ATK</color>, always hits first, unless we have to add even more text",
-    bonus_description = "<color=ATTACK>A</color> B <color=DEFENSE>C</color>",
+    description = "Deal damage equal to 1× <color=ATTACK>ATK</color>",
+    bonus_description = "50% more damage, priorty",
 
     effect = function(user, targets)
         local damage = user:get_attack()

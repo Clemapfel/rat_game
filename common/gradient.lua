@@ -275,7 +275,8 @@ rt.LogGradient = meta.new_type("LogGradient", rt.Drawable, function(left_color, 
         _shader = rt.Shader("assets/shaders/log_gradient.glsl"),
         _left_color = left_color,
         _right_color = right_color,
-        _is_vertical = false
+        _is_vertical = false,
+        _opacity = 1,
     })
 end)
 
@@ -293,6 +294,7 @@ function rt.LogGradient:draw()
     self._shader:send("_left_color", {self._left_color.r, self._left_color.g, self._left_color.b, self._left_color.a})
     self._shader:send("_right_color", {self._right_color.r, self._right_color.g, self._right_color.b, self._right_color.a})
     self._shader:send("_is_vertical", ternary(self._is_vertical == true, 1, 0))
+    self._shader:send("_opacity", self._opacity)
     self._shape:draw()
     self._shader:unbind()
 end
@@ -300,4 +302,9 @@ end
 --- @brief
 function rt.LogGradient:set_is_vertical(b)
     self._is_vertical = b
+end
+
+--- @brief
+function rt.LogGradient:set_opacity(alpha)
+    self._opacity = alpha
 end

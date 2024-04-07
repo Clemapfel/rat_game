@@ -1,0 +1,1 @@
+-- called when entity changes stance

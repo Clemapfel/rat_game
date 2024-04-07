@@ -20,7 +20,10 @@ bt.BattleScene = meta.new_type("BattleScene", rt.Widget, function()
         _enemy_sprite_render_order = {},  -- Queue<Number>
         _enemy_sprite_alignment_mode = bt.EnemySpriteAlignmentMode.BOSS_CENTERED,
 
+        _priority_queue_is_visible = true,
         _priority_queue = {}, -- bt.PriorityQueue
+
+        _log_is_visible = false,
         _log = {}, -- bt.BattleLog
 
         _debug_layout_lines = {}, -- Table<rt.Line>
@@ -164,8 +167,13 @@ function bt.BattleScene:draw()
         end
     end
 
-    self._priority_queue:draw()
-    self._log:draw()
+    if self._priority_queue_is_visible then
+        self._priority_queue:draw()
+    end
+
+    if self._log_is_visible then
+        self._log:draw()
+    end
 end
 
 --- @brief
@@ -188,9 +196,11 @@ function bt.BattleScene:set_debug_draw_enabled(b)
 end
 
 --- @brief
-function bt.BattleScene:play_animation(entity, animation)
-    local sprite = self:get_sprite(entity)
-    sprite:add_animation(animation)
+--- @param animation_id String all caps, eg. "PLACEHOLDER_MESSAGE"
+function bt.BattleScene:play_animation(entity, animation_id, ...)
+    local target = self:get_sprite(entity)
+    local animation = bt.Animation[animation_id](self, target, ...)
+    target:add_animation(animation)
 end
 
 --- @brief

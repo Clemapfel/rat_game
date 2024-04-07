@@ -369,6 +369,8 @@ function rt.Label:_parse()
         return false
     end
 
+
+
     while i <= string.len(self._raw) do
         if s == rt.Label.ESCAPE_CHARACTER then
             current_word = current_word .. s

@@ -1,5 +1,5 @@
 rt.settings.battle.priority_queue = {
-    element_size = 75,
+    element_size = 100,
     first_element_scale_factor = 1.3,
     first_element_scale_speed = 0.4, -- duration from 1.0 to 1.3, in seconds
     collider_mass = 50,

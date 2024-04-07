@@ -81,11 +81,11 @@ input:signal_connect("pressed", function(_, which)
         local move = bt.Move("TEST_MOVE")
         info:_create_move_page(move, bt.Stance("TEST"))
     elseif which == rt.InputButton.UP then
-
+        scene:play_animation(boulder, "STATUS_LOST", bt.Status("TEST"))
     elseif which == rt.InputButton.DOWN then
-
     elseif which == rt.InputButton.LEFT then
     elseif which == rt.InputButton.RIGHT then
+        scene:play_animation(boulder, "TURN_START")
     elseif which == rt.InputButton.R then
     elseif which == rt.InputButton.L then
     elseif which == rt.InputButton.SELECT then

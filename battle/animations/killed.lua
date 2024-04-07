@@ -1,0 +1,1 @@
+-- called when an entity is_dead flag is set

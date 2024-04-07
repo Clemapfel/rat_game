@@ -3,6 +3,7 @@
 uniform vec4 _left_color;
 uniform vec4 _right_color;
 uniform int _is_vertical;
+uniform float _opacity;
 
 float shape(float x, float a)
 {
@@ -17,5 +18,6 @@ vec4 effect(vec4 _, Image tex, vec2 texture_coords, vec2 screen_coords)
 
     float which = texture_coords.x * (1 - _is_vertical) + texture_coords.y * _is_vertical;
     vec4 color = mix(_left_color, _right_color, shape(smoothstep(0, 1, 1 - which), 0.6));
+    color.a *= _opacity;
     return color;
 }

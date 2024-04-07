@@ -47,6 +47,11 @@ rt.exponential_plateau = function(x)
     return math.exp((10 / 13 * math.pi * x - 1 - math.pi / 6)^3) / 2
 end
 
+rt.sigmoid = function(x, slope)
+    slope = which(slope, 9)
+    return 1 / (1 + math.exp(-1 * slope * (x - 0.5)))
+end
+
 --- @brief maps [0, 0.5] to [0, peak], [0.5, 1] to [peak, 0], linear in both sections
 rt.symmetrical_linear = function(x, peak)
     peak = which(peak, 1)
