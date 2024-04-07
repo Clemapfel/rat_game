@@ -73,5 +73,11 @@ end
 
 --- @brief
 function bt.Stance:matches_alignment(alignment)
-    return self.id == alignment
+    if alignment == bt.StanceAlignment.NONE then
+        return false
+    elseif alignment == bt.StanceAlignment.ALL then
+        return true
+    else
+        return self.id == alignment
+    end
 end

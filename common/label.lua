@@ -528,6 +528,9 @@ function rt.Label:_parse()
     if effect_shake then throw_parse_error("reached end of text, but effect shake region is still open") end
     if effect_wave then throw_parse_error("reached end of text, but effect wave region is still open") end
     if effect_rainbow then throw_parse_error("reached end of text, but effect rainbow region is still open") end
+    if underlined then throw_parse_error("reached end of text, but effect underlined region is still open") end
+    if strikethrough then throw_parse_error("reached end of text, but effect strikethrough region is still open") end
+    if is_outlined then throw_parse_error("reached end of text, but effect outline region is still open") end
 
     -- if all chars are visible or n visibile character not yet set
     if self._n_visible_characters == -1 or self._n_visible_characters == self._n_characters then

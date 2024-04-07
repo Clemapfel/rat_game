@@ -115,6 +115,11 @@ function bt.Move:realize()
 
     self._is_realized = true
     meta.set_is_mutable(self, false)
+
+    local last = string.last(self.description)
+    if last == "." or last == ":" or last == ";" or last == "?" or last == "!" then
+        rt.warning("In bt.Move:realize: error when loading config at `" .. self._path .. "`: `description` field should not end in punctuation")
+    end
 end
 
 --- @brief

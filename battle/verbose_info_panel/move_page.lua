@@ -21,7 +21,7 @@ function bt.VerboseInfo.MovePage:create_from(config, current_stance)
         return out
     end
 
-    self.name_label = new_label("<u><b>", config.name, "</b></u>")
+    self.name_label = new_label("<u><b>", config.name, "</b></u> (", ternary(config.max_n_uses == POSITIVE_INFINITY, "∞", tostring(config.max_n_uses)), ")")
 
     self.sprite = rt.Sprite(config.sprite_id)
     self.sprite:realize()
@@ -37,7 +37,7 @@ function bt.VerboseInfo.MovePage:create_from(config, current_stance)
     self.stance_label_left = new_label("Alignment")
     self.stance_sprite = nil
     if config.stance_alignment == bt.StanceAlignment.ALL then
-        self.stance_label_right = new_label(number_prefix, "<rainbow>" .. "ALL" .. "</rainbow>", number_postfix)
+        self.stance_label_right = new_label(number_prefix, "<color=" .. gray .. ">" .. "ALL" .. "</color>", number_postfix)
     elseif config.stance_alignment == bt.StanceAlignment.NONE then
         self.stance_label_right = new_label(number_prefix, "<color=" .. gray .. ">" .. "None" .. "</color>", number_postfix)
     else
@@ -48,7 +48,7 @@ function bt.VerboseInfo.MovePage:create_from(config, current_stance)
         self.stance_sprite:set_animation(stance.sprite_index)
     end
 
-    self.priority_label_visible = config.priority ~= 0
+    self.priority_label_visible = false -- config.priority ~= 0
     self.priority_label_left = new_label("Priority")
     self.priority_label_right = new_label(number_prefix, format_priority(config.priority), number_postfix)
 
@@ -64,7 +64,7 @@ function bt.VerboseInfo.MovePage:create_from(config, current_stance)
     end
 
     local function _me(str)
-        return "<b>" .. str "</b>" --"<color=SELF>" .. str .. "</color>"
+        return "<b>" .. str .. "</b>" --"<color=SELF>" .. str .. "</color>"
     end
 
     local function _field()
@@ -72,7 +72,7 @@ function bt.VerboseInfo.MovePage:create_from(config, current_stance)
     end
 
     local function _everyone(str)
-        return "<b>" .. str "<b>"--"<color=FIELD>" .. str .. "</color>"
+        return "<b>" .. str .. "<b>"--"<color=FIELD>" .. str .. "</color>"
     end
 
     local target_str = ""
@@ -115,19 +115,20 @@ function bt.VerboseInfo.MovePage:create_from(config, current_stance)
         end
     end
 
-    self.target_label_left = new_label("<u>Targets</u>")
-    self.target_label_right = new_label(number_prefix, "</mono>", target_str, "<mono>", number_postfix)
+    self.target_label_left = new_label("<u>Targets</u> <color=" .. gray .. "><b>:</b></color> ", target_str)
+    self.target_label_right = new_label("") --number_prefix, "</mono>", target_str, "<mono>", number_postfix)
 
-    self.effect_label = new_label("<u>Effect</u>: " .. config.description)
+    self.effect_label = new_label("<u>Effect</u>: " .. config.description .. ".")
 
     local bonus_prefix, bonus_postfix = "", ""
     if not current_stance:matches_alignment(config.stance_alignment) then
-        bonus_prefix = "<color=" .. "GRAY_4" .. "><s>Bonus: "
+        bonus_prefix = "<color=" .. "GRAY_4" .. "><s>If Aligned: "
         bonus_postfix = "</color></s>"
     else
-        bonus_prefix = "<rainbow><b>Bonus</b></rainbow>: "
-        bonus_postfix = ""
+        bonus_prefix = "<color=" .. "TEAL_1" .. ">Aligned: "
+        bonus_postfix = "</color>"
     end
+
     self.bonus_effect_label = new_label(bonus_prefix, config.bonus_description, bonus_postfix)
 end
 
@@ -143,7 +144,7 @@ function bt.VerboseInfo.MovePage:reformat(aabb)
 
     local sprite_size = 2 * select(1, self.sprite:get_resolution())
     self.name_label:fit_into(current_x, current_y, width - 2 * m - sprite_size - m, height)
-    current_y = current_y + select(2, self.name_label:measure()) + m
+    current_y = current_y + select(2, self.name_label:measure())
 
     self.sprite:fit_into(x + width - sprite_size - 1 * m, y + 1 * m, sprite_size, sprite_size)
 
@@ -160,20 +161,26 @@ function bt.VerboseInfo.MovePage:reformat(aabb)
         self.stance_sprite:fit_into(math.max(select(1, self.stance_label_left:measure()) + 6 * m, stat_align), stance_label_y, resolution, resolution)
     end
     current_y = current_y + stance_sprite_size
-    current_y = current_y + m
+
+    self.effect_label:fit_into(current_x, current_y, width - 2 * m, height)
+    current_y = current_y + select(2, self.effect_label:measure())
+
+    self.bonus_effect_label:fit_into(current_x, current_y, width - 2 * m, height)
+    current_y = current_y + select(2, self.bonus_effect_label:measure())
+
 
     if self.priority_label_visible then
         self.priority_label_left:fit_into(current_x, current_y, width, height)
         self.priority_label_right:fit_into(math.max(select(1, self.priority_label_left:measure()) + 2 * m, stat_align), current_y, width, height)
         current_y = current_y + select(2, self.priority_label_left:measure())
-        current_y = current_y + m
     end
+
+    current_y = current_y + m
 
     self.target_label_left:fit_into(current_x, current_y, width, height)
     local target_right_align = math.max(select(1, self.target_label_left:measure()) + 2 * m)
     self.target_label_right:fit_into(target_right_align, current_y, width, height)
     current_y = current_y + select(2, self.target_label_left:measure())
-    current_y = current_y + m
 
     local max_length = select(1, self.target_label_left:measure()) + select(1, self.target_label_right:measure()) + 6 * m
 
@@ -182,13 +189,6 @@ function bt.VerboseInfo.MovePage:reformat(aabb)
         once = false
         goto restart
     end
-
-    self.effect_label:fit_into(current_x, current_y, width - 2 * m, height)
-    current_y = current_y + select(2, self.effect_label:measure())
-
-    self.bonus_effect_label:fit_into(current_x, current_y, width - 2 * m, height)
-    current_y = current_y + select(2, self.bonus_effect_label:measure())
-
 
     x, y, width, height = 0, 0, width, current_y - y
     x = x - 2 * m

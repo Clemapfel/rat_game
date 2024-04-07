@@ -78,7 +78,8 @@ input:signal_connect("pressed", function(_, which)
         local move = bt.Move("TEST_MOVE")
         info:_create_move_page(move, bt.Stance("NEUTRAL"))
     elseif which == rt.InputButton.Y then
-        scene._priority_queue:set_is_hidden(not scene._priority_queue:get_is_hidden())
+        local move = bt.Move("TEST_MOVE")
+        info:_create_move_page(move, bt.Stance("TEST"))
     elseif which == rt.InputButton.UP then
 
     elseif which == rt.InputButton.DOWN then
@@ -93,7 +94,7 @@ end)
 
 love.load = function()
     love.window.setMode(1600 / 1.5, 900 / 1.5, {
-        vsync = 1,
+        vsync = -1, -- adaptive vsync, may tear but tries to stay as close to 60hz as possible
         msaa = 8,
         stencil = true,
         resizable = true,
