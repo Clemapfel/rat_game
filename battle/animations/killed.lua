@@ -23,7 +23,7 @@ function bt.Animation.KILLED:start()
         self._target:realize()
     end
 
-    self._label = rt.Label("<o><b><color=TRUE_WHITE>KILLED</color></b></o>")
+    self._label = rt.Label("<o><b><outline_color=TRUE_WHITE><color=BLACK>KILLED</color></b></o></outline_color>")
     self._label:realize()
     self._label_path = {}
 

@@ -62,8 +62,9 @@ end
 function rt.Label:size_allocate(x, y, width, height)
 
     -- apply wrapping
-    local space = self._font:get_bold_italic():getWidth(rt.Label.SPACE)
-    local tab = self._font:get_bold_italic():getWidth(rt.Label.TAB)
+    local syntax = rt.Label._syntax
+    local space = self._font:get_bold_italic():getWidth(syntax.SPACE)
+    local tab = self._font:get_bold_italic():getWidth(syntax.TAB)
     local line_height = self._font:get_bold_italic():getHeight()
 
     local glyph_x = x
@@ -76,16 +77,16 @@ function rt.Label:size_allocate(x, y, width, height)
     local one_word_mode = true -- avoids wrapping of one-word labels
 
     for _, glyph in pairs(self._glyphs) do
-        if glyph == rt.Label.SPACE then
+        if glyph == syntax.SPACE then
             -- do not advance position, actual space is appended to glyphs
-            table.insert(rows[row_i], rt.Label.SPACE)
+            table.insert(rows[row_i], syntax.SPACE)
             one_word_mode = false
-        elseif glyph == rt.Label.TAB then
+        elseif glyph == syntax.TAB then
             glyph_x = glyph_x + tab
             line_width = line_width + tab
-            table.insert(rows[row_i], rt.Label.TAB)
+            table.insert(rows[row_i], syntax.TAB)
             one_word_mode = false
-        elseif glyph == rt.Label.NEWLINE then
+        elseif glyph == syntax.NEWLINE then
             glyph_x = x
             glyph_y = glyph_y + line_height
 
@@ -196,43 +197,49 @@ function rt.Label:measure()
 end
 
 -- control characters used for wrap hinting
-rt.Label.SPACE = " "
-rt.Label.NEWLINE = "\n"
-rt.Label.TAB = "    "
-rt.Label.ESCAPE_CHARACTER = "\\"
-rt.Label.BEAT = "|" -- pause when text scrolling
+rt.Label._syntax = {
+    SPACE = " ",
+    NEWLINE = "\n",
+    TAB = "    ",
+    ESCAPE_CHARACTER = "\\",
+    BEAT = "|", -- pause when text scrolling
 
--- regex patterns to match tags
-rt.Label.BOLD_TAG_START = rt.Set("<b>", "<bold>")
-rt.Label.BOLD_TAG_END = rt.Set("</b>", "</bold>")
+    -- regex patterns to match tags
+    BOLD_TAG_START = rt.Set("<b>", "<bold>"),
+    BOLD_TAG_END = rt.Set("</b>", "</bold>"),
 
-rt.Label.ITALIC_TAG_START = rt.Set("<i>", "<italic>")
-rt.Label.ITALIC_TAG_END = rt.Set("</i>", "</italic>")
+    ITALIC_TAG_START = rt.Set("<i>", "<italic>"),
+    ITALIC_TAG_END = rt.Set("</i>", "</italic>"),
 
-rt.Label.UNDERLINED_TAG_START = rt.Set("<u>", "<underlined>")
-rt.Label.UNDERLINED_TAG_END = rt.Set("</u>", "</underlined>")
+    UNDERLINED_TAG_START = rt.Set("<u>", "<underlined>"),
+    UNDERLINED_TAG_END = rt.Set("</u>", "</underlined>"),
 
-rt.Label.STRIKETHROUGH_TAG_START = rt.Set("<s>", "<strikethrough>")
-rt.Label.STRIKETHROUGH_TAG_END = rt.Set("</s>", "</strikethrough>")
+    STRIKETHROUGH_TAG_START = rt.Set("<s>", "<strikethrough>"),
+    STRIKETHROUGH_TAG_END = rt.Set("</s>", "</strikethrough>"),
 
-rt.Label.COLOR_TAG_START = rt.Set("<col=(.*)>", "<color=(.*)>")
-rt.Label.COLOR_TAG_END = rt.Set("</col>", "</color>")
+    COLOR_TAG_START = rt.Set("<col=(.*)>", "<color=(.*)>"),
+    COLOR_TAG_END = rt.Set("</col>", "</color>"),
 
-rt.Label.OUTLINE_TAG_START = rt.Set("<o>", "<outline>")
-rt.Label.OUTLINE_TAG_END = rt.Set("</o>", "</outline>")
+    OUTLINE_COLOR_TAG_START = rt.Set("<ocol=(.*)>", "<outline_color=(.*)>"),
+    OUTLINE_COLOR_TAG_END = rt.Set("</ocol>", "</outline_color>"),
 
-rt.Label.BACKGROUND_TAG_START = rt.Set("<bg=(.*)>", "<background=(.*)>")
-rt.Label.BACKGROUND_TAG_END = rt.Set("</bg>", "</background>")
+    OUTLINE_TAG_START = rt.Set("<o>", "<outline>"),
+    OUTLINE_TAG_END = rt.Set("</o>", "</outline>"),
 
-rt.Label.EFFECT_SHAKE_TAG_START = rt.Set("<shake>", "<fx_shake>")
-rt.Label.EFFECT_SHAKE_TAG_END = rt.Set("</shake>", "</fx_shake>")
-rt.Label.EFFECT_WAVE_TAG_START = rt.Set("<wave>", "<fx_wave>")
-rt.Label.EFFECT_WAVE_TAG_END = rt.Set("</wave", "</fx_wave>")
-rt.Label.EFFECT_RAINBOW_TAG_START = rt.Set("<rainbow>", "<fx_rainbow>")
-rt.Label.EFFECT_RAINBOW_TAG_END = rt.Set("</rainbow>", "</fx_rainbow>")
+    BACKGROUND_TAG_START = rt.Set("<bg=(.*)>", "<background=(.*)>"),
+    BACKGROUND_TAG_END = rt.Set("</bg>", "</background>"),
 
-rt.Label.MONOSPACE_TAG_START = rt.Set("<tt>", "<mono>")
-rt.Label.MONOSPACE_TAG_END = rt.Set("</tt>", "</mono>")
+    EFFECT_SHAKE_TAG_START = rt.Set("<shake>", "<fx_shake>"),
+    EFFECT_SHAKE_TAG_END = rt.Set("</shake>", "</fx_shake>"),
+    EFFECT_WAVE_TAG_START = rt.Set("<wave>", "<fx_wave>"),
+    EFFECT_WAVE_TAG_END = rt.Set("</wave", "</fx_wave>"),
+    EFFECT_RAINBOW_TAG_START = rt.Set("<rainbow>", "<fx_rainbow>"),
+    EFFECT_RAINBOW_TAG_END = rt.Set("</rainbow>", "</fx_rainbow>"),
+
+    MONOSPACE_TAG_START = rt.Set("<tt>", "<mono>"),
+    MONOSPACE_TAG_END = rt.Set("</tt>", "</mono>")
+}
+
 
 --- @brief [internal] transform _raw into set of glyphs
 function rt.Label:_parse()
@@ -247,9 +254,9 @@ function rt.Label:_parse()
     local is_colored = false
     local is_outlined = false
     local is_background = false
-    local color = "TRUE_WHITE"
-    local background_color = "TRUE_BLACK"
-    local outline_color = "TRUE_BLACK"
+    local color = {"TRUE_WHITE"} -- string reference
+    local outline_color = {"TRUE_BLACK"}
+    local outline_color_active = false
     local mono = false
     local underlined = false
     local strikethrough = false
@@ -291,11 +298,11 @@ function rt.Label:_parse()
             current_word,
             {
                 font_style = style,
-                color = rt.Palette[ternary(effect_rainbow, "TRUE_WHITE", color)],
+                color = rt.Palette[ternary(effect_rainbow, "TRUE_WHITE", color[1])],
                 is_underlined = underlined,
                 is_strikethrough = strikethrough,
                 is_outlined = outlined,
-                outline_color = nil,
+                outline_color = ternary(outline_color_active, rt.Palette[outline_color[1]], nil),
                 effects = effects
             }
         ))
@@ -342,8 +349,8 @@ function rt.Label:_parse()
         return false
     end
 
-    -- test if upcoming control sequence matches rt.Label.COLOR_TAG_START
-    local function is_color_tag(which)
+    -- test if upcoming control sequence matches COLOR_TAG_START
+    local function color_tag_matches(which, to_assign)
         local sequence = ""
         local color_i = 0
         repeat
@@ -361,7 +368,7 @@ function rt.Label:_parse()
                 if not meta.is_rgba(rt.Palette[new_color]) then
                     throw_parse_error("malformed color tag: color `" .. new_color .. "` unknown")
                 end
-                color = new_color
+                to_assign[1] = new_color
                 step(string.len(sequence))
                 return true
             end
@@ -369,135 +376,147 @@ function rt.Label:_parse()
         return false
     end
 
-
+    local syntax = rt.Label._syntax
 
     while i <= string.len(self._raw) do
-        if s == rt.Label.ESCAPE_CHARACTER then
+        if s == syntax.ESCAPE_CHARACTER then
             current_word = current_word .. s
             step(1)
             goto continue;
         elseif s == " " then
             current_word = current_word .. " "
             push_glyph()
-            table.insert(self._glyphs, rt.Label.SPACE)
+            table.insert(self._glyphs, syntax.SPACE)
         elseif s == "\n" then
             push_glyph()
-            table.insert(self._glyphs, rt.Label.NEWLINE)
+            table.insert(self._glyphs, syntax.NEWLINE)
         elseif s == "\t" then
             push_glyph()
-            table.insert(self._glyphs, rt.Label.TAB)
-        elseif s == rt.Label.BEAT then
+            table.insert(self._glyphs, syntax.TAB)
+        elseif s == syntax.BEAT then
             push_glyph()
-            table.insert(self._glyphs, rt.Label.BEAT)
+            table.insert(self._glyphs, syntax.BEAT)
         elseif s == "<" then
             push_glyph()
             -- bold
-            if tag_matches(rt.Label.BOLD_TAG_START) then
+            if tag_matches(syntax.BOLD_TAG_START) then
                 if bold == true then
                     throw_parse_error("trying to open a bold region, but one is already open")
                 end
                 bold = true
-            elseif tag_matches(rt.Label.BOLD_TAG_END) then
+            elseif tag_matches(syntax.BOLD_TAG_END) then
                 if bold == false then
                     throw_parse_error("trying to close a bold region, but one is not open")
                 end
                 bold = false
             -- italic
-            elseif tag_matches(rt.Label.ITALIC_TAG_START) then
+            elseif tag_matches(syntax.ITALIC_TAG_START) then
                 if italic == true then
                     throw_parse_error("trying to open an italic region, but one is already open")
                 end
                 italic = true
-            elseif tag_matches(rt.Label.ITALIC_TAG_END) then
+            elseif tag_matches(syntax.ITALIC_TAG_END) then
                 if italic == false then
                     throw_parse_error("trying to close an italic region, but one is not open")
                 end
                 italic = false
             -- underlined
-            elseif tag_matches(rt.Label.UNDERLINED_TAG_START) then
+            elseif tag_matches(syntax.UNDERLINED_TAG_START) then
                 if underlined == true then
                     throw_parse_error("trying to open an underlined region, but one is already open")
                 end
                 underlined = true
-            elseif tag_matches(rt.Label.UNDERLINED_TAG_END) then
+            elseif tag_matches(syntax.UNDERLINED_TAG_END) then
                 if underlined == false then
                     throw_parse_error("trying to close an underlined region, but one is not open")
                 end
                 underlined = false
             -- strikethrough
-            elseif tag_matches(rt.Label.STRIKETHROUGH_TAG_START) then
+            elseif tag_matches(syntax.STRIKETHROUGH_TAG_START) then
                 if strikethrough == true then
                     throw_parse_error("trying to open an strikethrough region, but one is already open")
                 end
                 strikethrough = true
-            elseif tag_matches(rt.Label.STRIKETHROUGH_TAG_END) then
+            elseif tag_matches(syntax.STRIKETHROUGH_TAG_END) then
                 if strikethrough == false then
                     throw_parse_error("trying to close an strikethrough region, but one is not open")
                 end
                 strikethrough = false
             -- mono
-            elseif tag_matches(rt.Label.MONOSPACE_TAG_START) then
+            elseif tag_matches(syntax.MONOSPACE_TAG_START) then
                 if mono == true then
                     throw_parse_error("trying to open an monospace region, but one is already open")
                 end
                 mono = true
-            elseif tag_matches(rt.Label.MONOSPACE_TAG_END) then
+            elseif tag_matches(syntax.MONOSPACE_TAG_END) then
                 if mono == false then
                     throw_parse_error("trying to close an monospace region, but one is not open")
                 end
                 mono = false
             -- outlined
-            elseif tag_matches(rt.Label.OUTLINE_TAG_START) then
+            elseif tag_matches(syntax.OUTLINE_TAG_START) then
                 if outlined == true then
                     throw_parse_error("trying to open an outlined region, but one is already open")
                 end
                 outlined = true
-            elseif tag_matches(rt.Label.OUTLINE_TAG_END) then
+            elseif tag_matches(syntax.OUTLINE_TAG_END) then
                 if outlined == false then
                     throw_parse_error("trying to close an outlined region, but one is not open")
                 end
                 outlined = false
             -- color
-            elseif is_color_tag(rt.Label.COLOR_TAG_START) then
+            elseif color_tag_matches(syntax.COLOR_TAG_START, color) then
                 if is_colored == true then
                     throw_parse_error("trying to open a color region, but one is already open")
                 end
                 is_colored = true
-            elseif tag_matches(rt.Label.COLOR_TAG_END) then
+            elseif tag_matches(syntax.COLOR_TAG_END) then
                 if is_colored == false then
                     throw_parse_error("trying to close a color region, but one is not open")
                 end
                 is_colored = false
-                color = "TRUE_WHITE"
+                color[1] = "TRUE_WHITE"
+            -- outline color
+            elseif color_tag_matches(syntax.OUTLINE_COLOR_TAG_START, outline_color) then
+                if outline_color_active == true then
+                    throw_parse_error("trying to open a outline color region, but one is already open")
+                end
+                outline_color_active = true
+            elseif tag_matches(syntax.OUTLINE_COLOR_TAG_END) then
+                if outline_color_active == false then
+                    throw_parse_error("trying to close a outline color region, but one is not open")
+                end
+                outline_color_active = false
+                color[1] = "TRUE_BLACK"
             -- effect: shake
-            elseif tag_matches(rt.Label.EFFECT_SHAKE_TAG_START) then
+            elseif tag_matches(syntax.EFFECT_SHAKE_TAG_START) then
                 if effect_shake == true then
                     throw_parse_error("trying to open an effect shake region, but one is already open")
                 end
                 effect_shake = true
-            elseif tag_matches(rt.Label.EFFECT_SHAKE_TAG_END) then
+            elseif tag_matches(syntax.EFFECT_SHAKE_TAG_END) then
                 if effect_shake == false then
                     throw_parse_error("trying to close an effect shake region, but one is not open")
                 end
                 effect_shake = false
             -- effect: wave
-            elseif tag_matches(rt.Label.EFFECT_WAVE_TAG_START) then
+            elseif tag_matches(syntax.EFFECT_WAVE_TAG_START) then
                 if effect_wave == true then
                     throw_parse_error("trying to open an effect wave region, but one is already open")
                 end
                 effect_wave = true
-            elseif tag_matches(rt.Label.EFFECT_WAVE_TAG_END) then
+            elseif tag_matches(syntax.EFFECT_WAVE_TAG_END) then
                 if effect_wave == false then
                     throw_parse_error("trying to close an effect wave region, but one is not open")
                 end
                 effect_wave = false
             -- effect: rainbow
-            elseif tag_matches(rt.Label.EFFECT_RAINBOW_TAG_START) then
+            elseif tag_matches(syntax.EFFECT_RAINBOW_TAG_START) then
                 if effect_rainbow == true then
                     throw_parse_error("trying to open an effect rainbow region, but one is already open")
                 end
                 effect_rainbow = true
-            elseif tag_matches(rt.Label.EFFECT_RAINBOW_TAG_END) then
+            elseif tag_matches(syntax.EFFECT_RAINBOW_TAG_END) then
                 if effect_rainbow == false then
                     throw_parse_error("trying to close an effect rainbow region, but one is not open")
                 end
@@ -527,6 +546,7 @@ function rt.Label:_parse()
     if bold then throw_parse_error("reached end of text, but bold region is still open") end
     if italic then throw_parse_error("reached end of text, but italic region is still open") end
     if is_colored then throw_parse_error("reached end of text, but colored region is still open") end
+    if outline_color_active then throw_parse_error("reached end of text, but outline color region is still open") end
     if effect_shake then throw_parse_error("reached end of text, but effect shake region is still open") end
     if effect_wave then throw_parse_error("reached end of text, but effect wave region is still open") end
     if effect_rainbow then throw_parse_error("reached end of text, but effect rainbow region is still open") end

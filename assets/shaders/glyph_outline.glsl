@@ -2,6 +2,7 @@
 
 uniform vec2 _texture_resolution;
 uniform float _opacity;
+uniform vec4 _outline_color;
 
 #define PI 355/113
 
@@ -23,7 +24,6 @@ float box(int x, int y, int size)
 vec4 effect(vec4 color, Image tex, vec2 texture_coords, vec2 screen_coords)
 {
     const int radius = 2;                       // blur radius, runtime is O((2 * radius + 1)^2)
-    const vec3 outline_color = vec3(0, 0, 0);   // outline color
     const float outline_intensity = 3;          // opacity multiplier
 
     vec4 self = Texel(tex, texture_coords);
@@ -41,5 +41,5 @@ vec4 effect(vec4 color, Image tex, vec2 texture_coords, vec2 screen_coords)
         }
     }
 
-    return vec4(outline_color, sum.a / kernel_sum) * vec4(1, 1, 1, outline_intensity * _opacity);
+    return vec4(_outline_color.rgb, sum.a / kernel_sum) * vec4(1, 1, 1, outline_intensity * _opacity * _outline_color.a);
 }

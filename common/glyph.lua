@@ -241,6 +241,7 @@ function rt.Glyph:draw(opacity)
         love.graphics.setColor(1, 1, 1, opacity)
         self._outline_shader:send("_texture_resolution", {self._outline_render_texture:get_size()})
         self._outline_shader:send("_opacity", opacity)
+        self._outline_shader:send("_outline_color", {self._outline_color.r, self._outline_color.g, self._outline_color.b, self._outline_color.a})
         love.graphics.draw(self._outline_render_texture._native, x - self._outline_render_offset_x, y - self._outline_render_offset_y)
         self._outline_shader:unbind()
     end
