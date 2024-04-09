@@ -33,9 +33,15 @@ function bt.BattleScene:get_entity(id)
 end
 
 --- @brief
+function bt.BattleScene:end_turn()
+    -- TODO: remove dead entities from priority queue and enemy sprites, also resolve game over
+end
+
+--- @brief
 function bt.BattleScene:kill(target_id)
     local target = self:get_entity(target_id)
     self:play_animation(target, "KILLED")
+
     table.clear(target.status)
     target.hp_current = 0
     target.priority = 0

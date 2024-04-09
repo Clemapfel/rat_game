@@ -5,8 +5,15 @@ rt.settings.battle.priority_queue_element = {
     base_color = rt.color_darken(rt.Palette.GRAY_4, 0.05),
     frame_color = rt.Palette.GRAY_3,
     selected_frame_color = rt.Palette.YELLOW_2,
-    knocked_out_base_color = rt.Palette.RED_2,
+
+    knocked_out_base_color = rt.Palette.RED_3,
     knocked_out_shape_alpha = 0.7,
+    knocked_out_frame_color = rt.Palette.LIGHT_RED_2,
+
+    dead_base_color = rt.Palette.GRAY_6,
+    dead_shape_alpha = 1,
+    dead_frame_color = rt.Palette.GRAY_5,
+
     corner_radius = 10,
     change_indicator_up_color = rt.Palette.GREEN,
     change_indicator_down_color = rt.Palette.RED,
@@ -21,6 +28,8 @@ bt.PriorityQueueElement = meta.new_type("PriorityQueueElement", rt.Widget, rt.An
 
         _shape = {}, -- rt.Shape
         _spritesheet = {}, -- rt.SpriteAtlasEntry
+        _shader = rt.Shader("assets/shaders/priority_queue_element.glsl"),
+
         _backdrop = rt.Rectangle(0, 0, 1, 1),
         _frame = rt.Rectangle(0, 0, 1, 1),
         _frame_outline = rt.Rectangle(0, 0, 1, 1),
@@ -36,6 +45,8 @@ bt.PriorityQueueElement = meta.new_type("PriorityQueueElement", rt.Widget, rt.An
         _is_selected = false, --rt.random.toss_coin(),
         _is_disabled = false, --rt.random.toss_coin(),
         _is_knocked_out = false, --rt.random.toss_coin(),
+        _is_dead = false,
+
         _elapsed = 0
     })
 end)
@@ -118,6 +129,7 @@ function bt.PriorityQueueElement:realize()
     self:set_is_selected(self._is_selected)
     self:set_is_disabled(self._is_disabled)
     self:set_is_knocked_out(self._is_knocked_out)
+    self:set_is_dead(self._is_dead)
 
     self:set_is_animated(true)
 end
@@ -209,7 +221,11 @@ function bt.PriorityQueueElement:draw()
         -- stencil away overlapping corners of shape
         rt.graphics.stencil(1, self._backdrop)
         rt.graphics.set_stencil_test(rt.StencilCompareMode.EQUAL, 1)
+        self._shader:bind()
+        self._shader:send("_is_knocked_out", ternary(self._is_knocked_out, 1, 0))
+        self._shader:send("_is_dead", ternary(self._is_dead, 1, 0))
         self._shape:draw()
+        self._shader:unbind()
         rt.graphics.set_stencil_test()
         rt.graphics.stencil()
 
@@ -226,12 +242,21 @@ function bt.PriorityQueueElement:draw()
         if self._scene:get_debug_draw_enabled() then
             self._debug_backdrop:draw()
         end
-
         self._id_offset_label:draw()
 
         if self._change_indicator_visible and self._change_direction ~= rt.Direction.NONE then
             self._change_indicator:draw()
         end
+    end
+end
+
+function bt.PriorityQueueElement:_update_frame_color()
+    if self._is_dead then
+        self._frame:set_color(rt.settings.battle.priority_queue_element.dead_frame_color)
+    elseif self._is_knocked_out then
+        self._frame:set_color(rt.settings.battle.priority_queue_element.knocked_out_frame_color)
+    else
+        self._frame:set_color(rt.settings.battle.priority_queue_element.frame_color)
     end
 end
 
@@ -242,7 +267,7 @@ function bt.PriorityQueueElement:set_is_selected(b)
         if self._is_selected then
             self._frame:set_color(rt.settings.battle.priority_queue_element.selected_frame_color)
         else
-            self._frame:set_color(rt.settings.battle.priority_queue_element.frame_color)
+            self:_update_frame_color()
         end
     end
 end
@@ -271,6 +296,26 @@ function bt.PriorityQueueElement:set_is_knocked_out(b)
                 self._shape:set_vertex_color(i, rt.RGBA(1, 1,1, 1))
             end
         end
+        self:_update_frame_color()
+    end
+end
+
+--- @brief
+function bt.PriorityQueueElement:set_is_dead(b)
+    self._is_dead = b
+    if self._is_realized then
+        if self._is_dead then
+            self._backdrop:set_color(rt.settings.battle.priority_queue_element.dead_base_color)
+            for i = 1, 4 do
+                self._shape:set_vertex_color(i, rt.RGBA(1, 1,1, rt.settings.battle.priority_queue_element.dead_shape_alpha))
+            end
+        else
+            self._backdrop:set_color(rt.settings.battle.priority_queue_element.base_color)
+            for i = 1, 4 do
+                self._shape:set_vertex_color(i, rt.RGBA(1, 1,1, 1))
+            end
+        end
+        self:_update_frame_color()
     end
 end
 

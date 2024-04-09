@@ -16,6 +16,7 @@ bt.PriorityQueue = meta.new_type("PriorityQueue", rt.Widget, rt.Animation, funct
         _preview_order = {},  -- Table<Entity>
         _selected_entities = {}, -- Set<Entity>
         _knocked_out_entities = {}, -- Set<Entity>
+        _dead_entities = {},  -- Set<Entity>
         _render_order = {},   -- Table<{entity_key, multiplicity_index}>
         _is_hidden = false,
         _is_preview_active = false
@@ -141,6 +142,7 @@ function bt.PriorityQueue:size_allocate(x, y, width, height)
             element:set_change_indicator_visible(self._is_preview_active)
             element:set_is_selected(self._selected_entities[entity] == true)
             element:set_is_knocked_out(self._knocked_out_entities[entity] == true)
+            element:set_is_dead(self._dead_entities[entity] == true)
             if before_entry ~= nil then
                 before_entry.offset = before_entry.offset + 1
             end
@@ -219,6 +221,17 @@ function bt.PriorityQueue:set_knocked_out(entities)
     self._knocked_out_entities = {}
     for entity in values(entities) do
         self._knocked_out_entities[entity] = true
+    end
+    self:reformat()
+end
+
+--- @brief
+function bt.PriorityQueue:set_dead(entities)
+    entities = which(entities, {})
+    if meta.isa(entities, bt.BattleEntity) then entities = { entities } end
+    self._dead_entities = {}
+    for entity in values(entities) do
+        self._dead_entities[entity] = true
     end
     self:reformat()
 end

@@ -53,6 +53,7 @@ input = rt.InputController()
 input:signal_connect("pressed", function(_, which)
     if which == rt.InputButton.A then
         scene:play_animation(boulder, "KILLED")
+        scene._priority_queue:set_knocked_out({small_ufo, boulder})
     elseif which == rt.InputButton.B then
     elseif which == rt.InputButton.X then
     elseif which == rt.InputButton.Y then
