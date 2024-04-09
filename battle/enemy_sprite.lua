@@ -20,10 +20,10 @@ bt.EnemySprite = meta.new_type("EnemySprite", rt.Widget, rt.Animation, function(
 
         _debug_bounds = {}, -- rt.Rectangle
         _debug_sprite = {}, -- rt.Rectangle
-        _ui_visible = false,
+        _ui_is_visible = true,
+        _opacity = 1,
 
-        _animations = {}, -- Fifo<bt.Animation>
-        _continuous_animations = {}, -- Set<bt.Animation>
+        _animation_queue = bt.AnimationQueue()
     })
 end)
 
@@ -57,64 +57,7 @@ function bt.EnemySprite:update(delta)
     self._hp_bar:update(delta)
     self._speed_value:update(delta)
     self._status_bar:update(delta)
-
-    do -- animation queue
-        local current = self._animations[1]
-        if current ~= nil then
-            if current._is_started ~= true then
-                current._is_started = true
-                current:start()
-            end
-
-            local result = current:update(delta)
-            if result == bt.AnimationResult.DISCONTINUE then
-                current._is_finished = true
-                current:finish()
-                table.remove(self._animations, 1)
-            elseif result == bt.AnimationResult.CONTINUE then
-                -- noop
-            else
-                rt.error("In bt.EnemySprite:update: animation `" .. meta.typeof(current) .. "`s update function does not return a value")
-            end
-        end
-    end
-
-    do -- continuous animation all run in paralell
-        local current = self._animations[1]
-        if current ~= nil then
-            if current._is_started ~= true then
-                current._is_started = true
-                current:start()
-            end
-
-            local result = current:update(delta)
-            if result == bt.AnimationResult.DISCONTINUE then
-                current._is_finished = true
-                current:finish()
-                table.remove(self._animations, 1)
-            elseif result == bt.AnimationResult.CONTINUE then
-                -- noop
-            else
-                rt.error("In bt.EnemySprite:update: animation `" .. meta.typeof(current) .. "`s update function does not return a value")
-            end
-        end
-    end
-    do
-        for current, _ in pairs(self._continuous_animations) do
-            if current._is_started then
-                local result = current:update(delta)
-                if result == bt.AnimationResult.DISCONTINUE then
-                    current._is_finished = true
-                    current:finish()
-                    self._continuous_animations[current] = nil
-                elseif result == bt.AnimationResult.CONTINUE then
-                    -- noop
-                else
-                    rt.error("In bt.EnemySprite:update: animation `" .. meta.typeof(current) .. "`s update function does not return a value")
-                end
-            end
-        end
-    end
+    self._animation_queue:update(delta)
 
     -- snapshot, can be modified by animations
     self._snapshot:snapshot(self._sprite)
@@ -152,6 +95,12 @@ function bt.EnemySprite:size_allocate(x, y, width, height)
     for debug in range(self._debug_bounds, self._debug_sprite) do
         debug:set_is_outline(true)
     end
+
+    for _, animation in pairs(self._animation_queue.animations) do
+        if animation:get_is_started() == true then
+            animation:start()
+        end
+    end
 end
 
 --- @override
@@ -159,31 +108,32 @@ function bt.EnemySprite:measure()
     return self._sprite:measure()
 end
 
---- @override
-function bt.EnemySprite:draw()
-    if self._is_realized then
-        self._snapshot:draw()
-
+--- @brief
+function bt.EnemySprite:_draw()
+    self._snapshot:draw()
+    
+    if self._ui_is_visible then
         if self._hp_bar_is_visible then self._hp_bar:draw() end
         if self._speed_value_is_visible then self._speed_value:draw() end
         if self._status_bar_is_visible then self._status_bar:draw() end
+    end
 
-        if self._scene:get_debug_draw_enabled() then
-            self._debug_bounds:draw()
-            self._debug_sprite:draw()
-        end
+    if self._scene:get_debug_draw_enabled() then
+        self._debug_bounds:draw()
+        self._debug_sprite:draw()
+    end
+end
 
-        for animation, _ in pairs(self._continuous_animations) do
-            if animation._is_started == true then
-                animation:draw()
-            end
-        end
+--- @brief [internal]
+function bt.EnemySprite:_draw_animations()
+    self._animation_queue:draw()
+end
 
-        for _, animation in pairs(self._animations) do
-            if animation._is_started == true then
-                animation:draw()
-            end
-        end
+--- @override
+function bt.EnemySprite:draw()
+    if self._is_realized then
+        self:_draw()
+        self._draw_animations()
     end
 end
 
@@ -209,17 +159,7 @@ end
 
 --- @brief
 function bt.EnemySprite:add_animation(animation)
-    table.insert(self._animations, animation)
-end
-
---- @brief
-function bt.EnemySprite:add_continuous_animation(animation, start_immediately)
-    self._continuous_animations[animation] = true
-    start_immediately = which(start_immediately, true)
-    if start_immediately == true then
-        animation:start()
-        animation._is_started = true
-    end
+    self._animation_queue:add_animation(animation)
 end
 
 --- @brief
@@ -232,3 +172,13 @@ function bt.EnemySprite:get_snapshot()
     return self._snapshot
 end
 
+--- @brief
+function bt.EnemySprite:set_opacity(alpha)
+    self._opacity = alpha
+    self._sprite:set_opacity(alpha)
+end
+
+--- @brief
+function bt.EnemySprite:set_ui_is_visible(b)
+    self._ui_is_visible = b
+end

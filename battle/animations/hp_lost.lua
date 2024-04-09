@@ -1,5 +1,5 @@
 rt.settings.battle.animations.hp_lost = {
-    duration = 2
+    duration = 1
 }
 
 --- @class bt.Animation.HP_LOST

@@ -46,6 +46,11 @@ function meta.is_function(x)
     end
 end
 
+--- @brief
+function meta.is_raw_table(x)
+    return getmetatable(x) == nil and typeof(x) == "table" and sizeof(x) == #x
+end
+
 meta._hash = 1
 
 --- @brief [internal] Create new empty object
@@ -597,6 +602,15 @@ function meta.serialize(x, skip_functions)
 
     table.insert(out, "}\n")
     return table.concat(out)
+end
+
+--- @brief
+function meta.is_love_type(x, which)
+    if which == nil then
+        return x.type ~= nil
+    else
+        return x.type ~= nil and x:type() == which
+    end
 end
 
 --- @brief internal test

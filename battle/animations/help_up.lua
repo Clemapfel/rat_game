@@ -1,13 +1,12 @@
-rt.settings.battle.animations.stance_changed = {
+rt.settings.battle.animations.helped_up = {
     duration = 2
 }
 
---- @class bt.Animation.STANCE_CHANGED
-bt.Animation.STANCE_CHANGED = meta.new_type("STANCE_CHANGED", bt.Animation, function(scene, target, stance)
-    return meta.new(bt.Animation.STANCE_CHANGED, {
+--- @class bt.Animation.HELPED_UP
+bt.Animation.HELPED_UP = meta.new_type("HELPED_UP", bt.Animation, function(scene, target)
+    return meta.new(bt.Animation.HELPED_UP, {
         _scene = scene,
         _target = target,
-        _stance = stance,
 
         _target_snapshot = {}, -- rt.SnapshotLayout
         _label = {},          -- rt.Label
@@ -19,19 +18,19 @@ bt.Animation.STANCE_CHANGED = meta.new_type("STANCE_CHANGED", bt.Animation, func
 end)
 
 --- @override
-function bt.Animation.STANCE_CHANGED:start()
+function bt.Animation.HELPED_UP:start()
     if not self._target:get_is_realized() then
         self._target:realize()
     end
 
-    self._label = rt.Label("<o>Stance Changed: <b><mono>" .. self._stance.id .. "</mono></b></o>")
-    self._label:set_alignment(rt.Alignment.CENTER)
+    self._label = rt.Label("<o><b><color=LIGHT_GREEN_1>No Longer\nKnocked Out</color></b></o>")
+    self._label:set_justify_mode(rt.JustifyMode.CENTER)
     self._label:realize()
     self._label_path = {}
 
     self._target_snapshot = rt.SnapshotLayout()
     self._target_snapshot:realize()
-    self._target_snapshot:set_mix_color(rt.Palette.FOREGROUND)
+    self._target_snapshot:set_mix_color(rt.Palette.HP)
     self._target_snapshot:set_mix_weight(0)
     self._target_path = {}
 
@@ -64,10 +63,10 @@ function bt.Animation.STANCE_CHANGED:start()
 end
 
 --- @override
-function bt.Animation.STANCE_CHANGED:update(delta)
+function bt.Animation.HELPED_UP:update(delta)
     if not self._is_started then return end
 
-    local duration = rt.settings.battle.animations.stance_changed.duration
+    local duration = rt.settings.battle.animations.helped_up.duration
     self._elapsed = self._elapsed + delta
     local fraction = self._elapsed / duration
 
@@ -83,10 +82,10 @@ function bt.Animation.STANCE_CHANGED:update(delta)
 
     local bounds = self._target:get_bounds()
     self._label:fit_into(
-        bounds.x + 0.5 * bounds.width - 0.5 * label_w,
-        bounds.y + bounds.height - pos_y - 0.5 * label_h,
-        rt.graphics.get_width(),
-        rt.graphics.get_height()
+            bounds.x + 0.5 * bounds.width - 0.5 * label_w,
+            bounds.y + bounds.height - pos_y - 0.5 * label_h,
+            rt.graphics.get_width(),
+            rt.graphics.get_height()
     )
 
     local fade_out_target = 0.9
@@ -110,12 +109,12 @@ function bt.Animation.STANCE_CHANGED:update(delta)
 end
 
 --- @override
-function bt.Animation.STANCE_CHANGED:finish()
+function bt.Animation.HELPED_UP:finish()
     self._target:set_is_visible(true)
 end
 
 --- @override
-function bt.Animation.STANCE_CHANGED:draw()
+function bt.Animation.HELPED_UP:draw()
     love.graphics.setCanvas(nil)
     self._target_snapshot:draw()
     self._label:draw()

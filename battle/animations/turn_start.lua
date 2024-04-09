@@ -1,5 +1,5 @@
-rt.settings.battle.animations.status_gained = {
-    duration = 3
+rt.settings.battle.animations.turn_start = {
+    duration = 2
 }
 
 --- @class bt.Animation.TURN_START
@@ -49,7 +49,7 @@ end
 function bt.Animation.TURN_START:update(delta)
     if not self._is_started then return end
 
-    local duration = rt.settings.battle.animations.status_gained.duration
+    local duration = rt.settings.battle.animations.turn_start.duration
     self._elapsed = self._elapsed + delta
     local fraction = self._elapsed / duration
 
@@ -79,13 +79,7 @@ function bt.Animation.TURN_START:update(delta)
     -- tunnel fade
     local fade_duration = 0.1
     local function tunnel_alpha(x)
-        if x < fade_duration then
-            return x / fade_duration
-        elseif x <= 1 - fade_duration then
-            return 1
-        else
-            return (1 - x) / fade_duration
-        end
+        return rt.fade_ramp(x, duration)
     end
 
     self._tunnel_top:set_opacity(tunnel_alpha(fraction))

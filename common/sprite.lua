@@ -13,7 +13,8 @@ rt.Sprite = meta.new_type("Sprite", rt.Widget, rt.Animation, function(id)
         _n_frames = 0,
         _animation_id = "",
         _frame_range_start = 1,
-        _frame_range_end = 1
+        _frame_range_end = 1,
+        _opacity = 1
     })
 end)
 
@@ -38,6 +39,8 @@ function rt.Sprite:realize()
         else
             self:set_animation(self._animation_id)
         end
+
+        self:set_opacity(self._opacity)
     end
 end
 
@@ -106,4 +109,13 @@ end
 function rt.Sprite:get_resolution()
     if not self._is_realized then self:realize() end
     return self._width, self._height
+end
+
+--- @brief
+function rt.Sprite:set_opacity(alpha)
+    self._opacity = alpha
+
+    if self._is_realized then
+        self._shape:set_opacity(self._opacity)
+    end
 end

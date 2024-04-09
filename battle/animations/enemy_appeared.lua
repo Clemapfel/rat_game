@@ -1,9 +1,9 @@
 rt.settings.battle.animations.enemy_appeared = {
-    duration = 2.5
+    duration = 0.1--2.5
 }
 
 --- @class bt.Animation.ENEMY_APPEARED
-bt.Animation.ENEMY_APPEARED = meta.new_type("ENEMY_APPEARED", function(scene, target)
+bt.Animation.ENEMY_APPEARED = meta.new_type("ENEMY_APPEARED", bt.Animation, function(scene, target)
     return meta.new(bt.Animation.ENEMY_APPEARED, {
         _scene = scene,
         _target = target,

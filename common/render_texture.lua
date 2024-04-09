@@ -23,3 +23,12 @@ end
 function rt.RenderTexture:unbind_as_render_target()
     love.graphics.setCanvas({self._before, stencil = true})
 end
+
+--- @brief
+function rt.RenderTexture:as_image()
+    if love.getVersion() >= 12 then
+        return rt.Image(love.graphics.readbackTexture(self._native))
+    else
+        return rt.Image(self._native:newImageData())
+    end
+end

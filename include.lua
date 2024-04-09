@@ -182,6 +182,7 @@ require "battle.health_bar"
 require "battle.speed_value"
 
 require "battle.battle_animation"
+
 -- TODO
 for _, name in pairs(love.filesystem.getDirectoryItems("battle/animations")) do
     if name ~= "status" and name ~= "move" then
@@ -191,6 +192,7 @@ for _, name in pairs(love.filesystem.getDirectoryItems("battle/animations")) do
 end
 -- TODO
 
+require "battle.animation_queue"
 require "battle.party_info"
 require "battle.backdrop"
 require "battle.battle_log"
@@ -199,13 +201,13 @@ require "battle.priority_queue"
 require "battle.status_bar_element"
 require "battle.status_bar"
 require "battle.battle_scene"
+require "battle.simulation"
 require "battle.enemy_sprite"
 require "battle.party_sprite"
 require "battle.verbose_info_panel"
 require "battle.verbose_info_panel.entity_page"
 require "battle.verbose_info_panel.status_page"
 require "battle.verbose_info_panel.move_page"
-
 
 --[[
 require "battle.stat"

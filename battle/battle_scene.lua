@@ -30,18 +30,12 @@ bt.BattleScene = meta.new_type("BattleScene", rt.Widget, function()
 
         _gradient_right = {}, -- rt.LogGradient
         _gradient_left = {},  -- rt.LogGradient
+
+        _animation_queue = bt.AnimationQueue()
     })
     return out
 end)
 
---- @brief
-function bt.BattleScene:get_sprite(entity)
-    for _, sprite in pairs(self._enemy_sprites) do
-        if sprite._entity:get_id() == entity:get_id() then
-            return sprite
-        end
-    end
-end
 
 --- @brief
 function bt.BattleScene:realize()
@@ -122,7 +116,6 @@ function bt.BattleScene:size_allocate(x, y, width, height)
         -- TODO
         rt.Line(0.25 * width, 0, 0.25 * width, height),
         rt.Line(0.75 * width, 0, 0.75 * width, height),
-
     }
 end
 
@@ -158,7 +151,11 @@ function bt.BattleScene:draw()
     rt.graphics.set_blend_mode()
 
     for _, i in pairs(self._enemy_sprite_render_order) do
-        self._enemy_sprites[i]:draw()
+        self._enemy_sprites[i]:_draw()
+    end
+
+    for _, i in pairs(self._enemy_sprite_render_order) do
+        self._enemy_sprites[i]:_draw_animations()
     end
 
     if self._debug_draw_enabled then
@@ -182,6 +179,7 @@ function bt.BattleScene:update(delta)
         sprite:update(delta)
     end
 
+    self._animation_queue:update(delta)
     self._log:update(delta)
 end
 
@@ -193,14 +191,6 @@ end
 --- @brief
 function bt.BattleScene:set_debug_draw_enabled(b)
     self._debug_draw_enabled = b
-end
-
---- @brief
---- @param animation_id String all caps, eg. "PLACEHOLDER_MESSAGE"
-function bt.BattleScene:play_animation(entity, animation_id, ...)
-    local target = self:get_sprite(entity)
-    local animation = bt.Animation[animation_id](self, target, ...)
-    target:add_animation(animation)
 end
 
 --- @brief
@@ -324,4 +314,3 @@ function bt.BattleScene:format_damage(value)
     -- same as rt.settings.battle.health_bar.hp_color_10
     return "<color=RED><mono><b>" .. tostring(value) .. "</b></mono></color> HP"
 end
-

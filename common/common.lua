@@ -525,6 +525,15 @@ function table.compare(left, right)
     return true
 end
 
+--- @brief clear all values from table
+--- @param t Table
+--- @return nil
+function table.clear(t)
+    for key, _ in pairs(t) do
+        t[key] = nil
+    end
+end
+
 --- @brief iterate integer range
 --- @param range_start number
 --- @param range_end number

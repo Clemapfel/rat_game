@@ -132,3 +132,13 @@ function bt.Move:stance_matches(entity)
         return entity:get_stance():matches_alignment(self.stance_alignment)
     end
 end
+
+--- @brief
+function bt.Move:get_id()
+    return self.id
+end
+
+--- @brief
+function bt.Move:get_name()
+    return self.name
+end

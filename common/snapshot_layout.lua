@@ -22,7 +22,8 @@ rt.SnapshotLayout = meta.new_type("SnapshotLayout", rt.Widget, function()
         _invert = false,
         _mix_color = rt.RGBA(1, 1, 1, 1),
         _mix_weight = 0,
-        _vertex_color = rt.RGBA(1, 1, 1, 1)
+        _vertex_color = rt.RGBA(1, 1, 1, 1),
+        _opacity = 1,
     })
     return out
 end)
@@ -38,7 +39,6 @@ function rt.SnapshotLayout:snapshot(to_draw)
         love.graphics.push()
         local x, y = to_draw:get_position()
         rt.graphics.translate(-x, -y)
-        love.graphics.setColor(1, 1, 1, self._opacity)
         if to_draw.snapshot ~= nil then to_draw:snapshot() else to_draw:draw() end
         love.graphics.pop()
     end
@@ -68,6 +68,7 @@ function rt.SnapshotLayout:draw()
     self._shader:send("_mix_weight", self._mix_weight)
     self._shader:send("_invert", self._invert)
     self._shader:send("_vertex_color", {self._vertex_color.r, self._vertex_color.g, self._vertex_color.b, self._vertex_color.a})
+    self._shader:send("_opacity", self._opacity)
 
     local bounds = self:get_bounds()
     local x_offset, y_offset = bounds.x + self._origin_x * bounds.width, bounds.y + self._origin_y * bounds.height

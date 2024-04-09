@@ -29,3 +29,8 @@ end
 function bt.Animation:draw()
     rt.error("In bt.Animation.draw: abstract method called")
 end
+
+--- @brief
+function bt.Animation:get_is_started()
+    return self._is_started
+end

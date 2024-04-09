@@ -47,6 +47,18 @@ rt.exponential_plateau = function(x)
     return math.exp((10 / 13 * math.pi * x - 1 - math.pi / 6)^3) / 2
 end
 
+rt.fade_ramp = function(x, duration, target)
+    duration = which(duration, 0.1)
+    target = which(target, 1)
+    if x < duration then
+        return x / duration
+    elseif x <= target - duration then
+        return target
+    else
+        return (target - x) / duration
+    end
+end
+
 rt.sigmoid = function(x, slope)
     slope = which(slope, 9)
     return 1 / (1 + math.exp(-1 * slope * (x - 0.5)))
@@ -105,6 +117,12 @@ rt.heartbeat = function(x)
     end
 
     return rt.heartbeat_aux_sine(x + 1.9) * 2.3 * rt.heartbeat_aux_gaussian(x)
+end
+
+--- @brief squish function in [0, 1], still stays in [0, 1]
+rt.squish = function(factor, f, x, ...)
+    -- https://www.desmos.com/calculator/jiprt2qimb
+    return f(x * factor - factor / 2 + 0.5, ...)
 end
 
 --- @brief sine wave with amptliude 1 and given frequency

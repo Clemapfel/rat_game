@@ -146,7 +146,11 @@ end
 
 --- @brief replace texture coordinates of all vertices
 --- @param rectangle rt.AxisAlignedRectangle
-function rt.VertexShape:set_texture_rectangle(rectangle)
+function rt.VertexShape:set_texture_rectangle(rectangle, y, w, h)
+    if meta.is_number(rectangle) then
+        rectangle = rt.AABB(rectangle, y, w, h)
+    end
+
     local min_x = POSITIVE_INFINITY
     local min_y = POSITIVE_INFINITY
     local max_x = NEGATIVE_INFINITY

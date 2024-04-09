@@ -62,8 +62,8 @@ function bt.Animation.HP_GAINED:start()
 
     local label = self._label
     local label_w = label:get_width() * 0.5
-    local start_x, start_y = bounds.x + bounds.width * 0.75, bounds.y + bounds.height * 0.5
-    local finish_x, finish_y = bounds.x + bounds.width * 0.75, bounds.y - bounds.height
+    local start_x, start_y = bounds.x + bounds.width * 0.75, bounds.y + bounds.height * (1 - 0.25)
+    local finish_x, finish_y = bounds.x + bounds.width * 0.75, bounds.y
     self._label_path = rt.Spline({
         start_x, start_y,
         finish_x, finish_y
@@ -84,9 +84,6 @@ function bt.Animation.HP_GAINED:start()
     local target = self._target
     self._target_snapshot:snapshot(target)
     target:set_is_visible(false)
-
-    local sc = self._scene;
-    sc:send_message(sc:format_name(self._target:get_entity()) .. " gained " .. sc:format_hp(self._value))
 end
 
 --- @override

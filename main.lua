@@ -52,6 +52,20 @@ local info_hidden = false
 input = rt.InputController()
 input:signal_connect("pressed", function(_, which)
     if which == rt.InputButton.A then
+        scene:play_animation(boulder, "KILLED")
+    elseif which == rt.InputButton.B then
+    elseif which == rt.InputButton.X then
+    elseif which == rt.InputButton.Y then
+    elseif which == rt.InputButton.UP then
+    elseif which == rt.InputButton.DOWN then
+    elseif which == rt.InputButton.LEFT then
+    elseif which == rt.InputButton.RIGHT then
+    elseif which == rt.InputButton.R then
+    elseif which == rt.InputButton.L then
+    elseif which == rt.InputButton.SELECT then
+    end
+    --[[
+    if which == rt.InputButton.A then
         local entity = rt.random.choose(scene._entities)
         local entity_config = {
             name = entity:get_name(),
@@ -84,12 +98,14 @@ input:signal_connect("pressed", function(_, which)
         scene:play_animation(boulder, "STATUS_LOST", bt.Status("TEST"))
     elseif which == rt.InputButton.DOWN then
     elseif which == rt.InputButton.LEFT then
+        scene:play_animation(boulder, "MOVE", boulder)
     elseif which == rt.InputButton.RIGHT then
-        scene:play_animation(boulder, "TURN_START")
+        scene:play_animation(boulder, "HELPED_UP")
     elseif which == rt.InputButton.R then
     elseif which == rt.InputButton.L then
     elseif which == rt.InputButton.SELECT then
     end
+    ]]--
 end)
 
 love.load = function()
