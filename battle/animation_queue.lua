@@ -20,6 +20,11 @@ function bt.AnimationQueue:update(delta)
     if current ~= nil then
         if current._is_started ~= true then
             current._is_started = true
+            if current._start_callbacks ~= nil then
+                for callback in values(current._start_callbacks) do
+                    callback()
+                end
+            end
             current:start()
         end
 
@@ -27,6 +32,12 @@ function bt.AnimationQueue:update(delta)
         if result == bt.AnimationResult.DISCONTINUE then
             current._is_finished = true
             current:finish()
+            if current._finish_callbacks ~= nil then
+                for callback in values(current._finish_callbacks) do
+                    callback()
+                end
+            end
+
             table.remove(self.animations, 1)
         elseif result == bt.AnimationResult.CONTINUE then
             -- noop

@@ -22,6 +22,7 @@ bt.EnemySprite = meta.new_type("EnemySprite", rt.Widget, rt.Animation, function(
         _debug_sprite = {}, -- rt.Rectangle
         _ui_is_visible = true,
         _opacity = 1,
+        _state = bt.BattleEntityState.ALIVE,
 
         _animation_queue = bt.AnimationQueue()
     })
@@ -181,4 +182,35 @@ end
 --- @brief
 function bt.EnemySprite:set_ui_is_visible(b)
     self._ui_is_visible = b
+end
+
+--- @brief
+function bt.EnemySprite:set_hp(value, value_max)
+    self._hp_bar:set_value(value, value_max)
+end
+
+--- @brief
+function bt.EnemySprite:add_status(status)
+    self._status_bar:add(status)
+end
+
+--- @brief
+function bt.EnemySprite:remove_status(status)
+    self._status_bar:remove(status)
+end
+
+--- @brief
+function bt.EnemySprite:set_priority(priority)
+    -- noop for now
+end
+
+--- @brief
+function bt.EnemySprite:set_state(state)
+    self._state = state
+    -- noop for now
+end
+
+--- @brief
+function bt.EnemySprite:get_scene()
+    return self._scene
 end

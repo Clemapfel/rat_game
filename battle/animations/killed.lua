@@ -22,6 +22,9 @@ function bt.Animation.KILLED:start()
     if not self._target:get_is_realized() then
         self._target:realize()
     end
+    self._target:set_ui_is_visible(true)
+
+    self._scene:send_message(self._scene:format_name(self._target:get_entity()) .. " was <b>killed</b>")
 
     self._label = rt.Label("<o><b><outline_color=TRUE_WHITE><color=BLACK>KILLED</color></b></o></outline_color>")
     self._label:realize()
@@ -43,16 +46,6 @@ function bt.Animation.KILLED:start()
     self._label_path = rt.Spline({
         start_x, start_y,
         finish_x, finish_y
-    })
-
-    local offset = 0.05
-    self._target_path = rt.Spline({
-        --[[
-        0, 0,
-        -1 * offset, 0,
-        offset, 0,
-        ]]--
-        0, 0,
     })
 
     local target = self._target
@@ -81,10 +74,10 @@ function bt.Animation.KILLED:update(delta)
 
     local bounds = self._target:get_bounds()
     self._label:fit_into(
-            bounds.x + 0.5 * bounds.width - 0.5 * label_w,
-            bounds.y + bounds.height - pos_y - 0.5 * label_h,
-            rt.graphics.get_width(),
-            rt.graphics.get_height()
+        bounds.x + 0.5 * bounds.width - 0.5 * label_w,
+        bounds.y + bounds.height - pos_y - 0.5 * label_h,
+        rt.graphics.get_width(),
+        rt.graphics.get_height()
     )
 
     local fade_out_target = 0.9
@@ -96,16 +89,7 @@ function bt.Animation.KILLED:update(delta)
     -- fade out happens, then "KILLED" stays on screen
     fraction = fraction * 1.4
 
-    -- target animation
-    target = self._target_snapshot
-    local current = target:get_bounds()
-    local offset_x, offset_y = self._target_path:at(rt.sinusoid_ease_in_out(fraction))
-    offset_x = offset_x * current.width
-    offset_y = offset_y * current.height
-    current.x = current.x + offset_x
-    current.y = current.y + offset_y
-    target:set_position_offset(offset_x, offset_y)
-    target:set_mix_weight(rt.sigmoid(fraction))
+    self._target_snapshot:set_mix_weight(fraction)
 
     local opacity = rt.squish(4, rt.exponential_deceleration, fraction - (0.99 - 0.5))
     target:set_opacity(opacity)
@@ -120,8 +104,7 @@ end
 
 --- @override
 function bt.Animation.KILLED:finish()
-    self._target:set_is_visible(false)
-    self._target:set_ui_is_visible(false)
+
 end
 
 --- @override

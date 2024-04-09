@@ -2,6 +2,12 @@ rt.settings.battle.entity = {
     config_path = "assets/battle/entities"
 }
 
+bt.BattleEntityState = meta.new_enum({
+    ALIVE = "ALIVE",
+    KNOCKED_OUT = "KNOCKED_OUT",
+    DEAD = "DEAD"
+})
+
 --- @class
 bt.BattleEntity = meta.new_type("BattleEntity", function(scene, id)
     local path = rt.settings.battle.entity.config_path .. "/" .. id .. ".lua"
@@ -33,8 +39,7 @@ end, {
     status = {}, -- Table<bt.Status, Number>
     stance = bt.Stance("NEUTRAL"),
 
-    is_knocked_out = false,
-    is_dead = false,
+    state = bt.BattleEntityState.ALIVE,
 
     -- non simulation
     sprite_id = "",

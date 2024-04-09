@@ -18,25 +18,23 @@ vec3 hsv_to_rgb(vec3 c)
     return c.z * mix(K.xxx, clamp(p - K.xxx, 0.0, 1.0), c.y);
 }
 
-uniform int _is_knocked_out;
-uniform int _is_dead;
+uniform int _state;
 
 vec4 effect(vec4 vertex_color, Image tex, vec2 texture_coords, vec2 vertex_position)
 {
     vec4 color = Texel(tex, texture_coords) * vertex_color;
-    if (_is_dead + _is_knocked_out == 0)
-            return color;
-
     vec3 as_hsv = rgb_to_hsv(color.rgb);
 
-    if (_is_dead == 1)
+    if (_state == 1) // ALIVE
+        return color;
+    if (_state == 3) // DEAD
     {
         // dead: grayscale + darken
         as_hsv.y = 0;
         as_hsv.z = clamp(as_hsv.z - 0.2, 0, 1);
         return vec4(hsv_to_rgb(as_hsv), color.a);
     }
-    else if (_is_knocked_out == 1)
+    else if (_state == 2) // KNOCKED_OUT
     {
         // knocked out: monochrome red
         as_hsv.x = 0;
@@ -44,7 +42,5 @@ vec4 effect(vec4 vertex_color, Image tex, vec2 texture_coords, vec2 vertex_posit
         return vec4(hsv_to_rgb(as_hsv), color.a);
     }
     else
-    {
-        return color; // unreachable
-    }
+        discard;
 }

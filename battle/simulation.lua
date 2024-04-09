@@ -16,7 +16,9 @@ function bt.BattleScene:play_animation(entity, animation_id, ...)
     end
 
     local sprite = self:get_sprite(entity)
-    sprite:add_animation(bt.Animation[animation_id](self, sprite, ...))
+    local animation = bt.Animation[animation_id](self, sprite, ...)
+    sprite:add_animation(animation)
+    return animation, sprite
 end
 
 --- @brief
@@ -32,6 +34,12 @@ function bt.BattleScene:get_entity(id)
     return nil
 end
 
+function bt.mutate_entity(entity, f, ...)
+    meta.set_is_mutable(entity, true) -- lock
+    f(entity, ...)
+    meta.set_is_mutable(entity, false) -- unlock
+end
+
 --- @brief
 function bt.BattleScene:end_turn()
     -- TODO: remove dead entities from priority queue and enemy sprites, also resolve game over
@@ -39,18 +47,82 @@ end
 
 --- @brief
 function bt.BattleScene:kill(target_id)
+    -- assertion
     local target = self:get_entity(target_id)
-    self:play_animation(target, "KILLED")
+    if not target._is_knocked_out then
+        rt.warning("In bt.BattleScene:kill: entity `" .. target_id .. "` was not knocked out before being killed")
+    end
 
-    table.clear(target.status)
-    target.hp_current = 0
-    target.priority = 0
-    target.is_knocked_out = false
-    target.is_dead = true
+    if target._is_dead then
+        rt.warning("In bt.BattleScene:kill: entity `" .. target_id .. "` is already dead")
+    end
+
+    -- animation
+    local animation, sprite = self:play_animation(target, "KILLED")
+    local statuses = {}
+    for status, _ in pairs(target.status) do
+        table.insert(statuses, status)
+    end
+
+    animation:register_finish_callback(function()
+        sprite:set_hp(0, target.hp_base)
+        for status in values(statuses) do
+            sprite:remove_status(status)
+        end
+        sprite:set_priority(0)
+        sprite:set_state(bt.BattleEntityState.DEAD)
+
+        sprite:set_is_visible(false)
+        sprite:set_ui_is_visible(false)
+        self:get_priority_queue():set_state(sprite:get_entity(), bt.BattleEntityState.DEAD)
+    end)
+
+    -- simulation
+    bt.mutate_entity(target, function(target)
+        target.hp_current = 0
+        table.clear(target.status)
+        target.priority = 0
+        target.state = bt.BattleEntityState.DEAD
+    end)
 end
 
 --- @brief
 function bt.BattleScene:knock_out(target_id)
+    -- assertion
     local target = self:get_entity(target_id)
+    if not target._is_knocked_out then
+        rt.warning("In bt.BattleScene:knock_out: entity `" .. target_id .. "` is already knocked out")
+    end
 
+    if target._is_dead then
+        rt.warning("In bt.BattleScene:knock_out: entity `" .. target_id .. "` is already dead")
+    end
+
+    -- animation
+    local animation, sprite = self:play_animation(target, "KNOCKED_OUT")
+    local statuses = {}
+    for status, _ in pairs(target.status) do
+        table.insert(statuses, status)
+    end
+
+    animation:register_finish_callback(function()
+        sprite:set_hp(0, target.hp_base)
+        for status in values(statuses) do
+            sprite:remove_status(status)
+        end
+        sprite:set_priority(0)
+        sprite:set_state(bt.BattleEntityState.KNOCKED_OUT)
+
+        sprite:set_is_visible(true)
+        sprite:set_ui_is_visible(true)
+        self:get_priority_queue():set_state(sprite:get_entity(), bt.BattleEntityState.KNOCKED_OUT)
+    end)
+
+    -- simulation
+    bt.mutate_entity(target, function(target)
+        target.hp_current = 0
+        table.clear(target.status)
+        target.priority = 0
+        target.state = bt.BattleEntityState.KNOCKED_OUT
+    end)
 end

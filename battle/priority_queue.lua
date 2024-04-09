@@ -14,9 +14,6 @@ bt.PriorityQueue = meta.new_type("PriorityQueue", rt.Widget, rt.Animation, funct
         _entries = {},        -- Table<Entity, cf. line 37>
         _current_order = {},  -- Table<Entity>
         _preview_order = {},  -- Table<Entity>
-        _selected_entities = {}, -- Set<Entity>
-        _knocked_out_entities = {}, -- Set<Entity>
-        _dead_entities = {},  -- Set<Entity>
         _render_order = {},   -- Table<{entity_key, multiplicity_index}>
         _is_hidden = false,
         _is_preview_active = false
@@ -35,14 +32,15 @@ function bt.PriorityQueue:size_allocate(x, y, width, height)
     end
 
     local element_size = rt.settings.battle.priority_queue.element_size
-
     for entity, n in pairs(n_seen) do
         if self._entries[entity] == nil then
             self._entries[entity] = {
                 id = entity,
                 elements = {},  -- Table<rt.PriorityQueue>
                 colliders = {}, -- Table<rt.Collider>
-                target_positions = {} -- Table<Table<X, Y>>
+                target_positions = {}, -- Table<Table<X, Y>>
+                is_selected = false,
+                state = bt.BattleEntityState.ALIVE
             }
         end
 
@@ -140,9 +138,9 @@ function bt.PriorityQueue:size_allocate(x, y, width, height)
             end
 
             element:set_change_indicator_visible(self._is_preview_active)
-            element:set_is_selected(self._selected_entities[entity] == true)
-            element:set_is_knocked_out(self._knocked_out_entities[entity] == true)
-            element:set_is_dead(self._dead_entities[entity] == true)
+            element:set_state(entry.state)
+            element:set_is_selected(entry.is_selected)
+
             if before_entry ~= nil then
                 before_entry.offset = before_entry.offset + 1
             end
@@ -204,36 +202,36 @@ function bt.PriorityQueue:size_allocate(x, y, width, height)
 end
 
 --- @brief
-function bt.PriorityQueue:set_selected(entities)
-    entities = which(entities, {})
-    if meta.isa(entities, bt.BattleEntity) then entities = { entities } end
-    self._selected_entities = {}
+function bt.PriorityQueue:override_selected(entities)
+    local set = {}
     for entity in values(entities) do
-        self._selected_entities[entity] = true
+        set[entity] = true
     end
-    self:reformat()
+
+    for entity, entry in pairs(self._entries) do
+        entry.is_selected = set[entity] == true
+        for element in values(entry.elements) do
+            element:set_is_selected(entry.is_selected)
+        end
+    end
 end
 
 --- @brief
-function bt.PriorityQueue:set_knocked_out(entities)
-    entities = which(entities, {})
-    if meta.isa(entities, bt.BattleEntity) then entities = { entities } end
-    self._knocked_out_entities = {}
-    for entity in values(entities) do
-        self._knocked_out_entities[entity] = true
+function bt.PriorityQueue:set_selected(entity, b)
+    local entry = self._entries[entity]
+    entry.is_selected = b
+    for element in values(entry.elements) do
+        element:set_is_selected(entry.is_selected)
     end
-    self:reformat()
 end
 
 --- @brief
-function bt.PriorityQueue:set_dead(entities)
-    entities = which(entities, {})
-    if meta.isa(entities, bt.BattleEntity) then entities = { entities } end
-    self._dead_entities = {}
-    for entity in values(entities) do
-        self._dead_entities[entity] = true
+function bt.PriorityQueue:set_state(entity, state)
+    local entry = self._entries[entity]
+    entry.state = state
+    for element in values(entry.elements) do
+        element:set_state(entry.state)
     end
-    self:reformat()
 end
 
 --- @brief

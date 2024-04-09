@@ -44,8 +44,9 @@ bt.PriorityQueueElement = meta.new_type("PriorityQueueElement", rt.Widget, rt.An
 
         _is_selected = false,
         _is_disabled = false,
+        _is_knocked_out = false,
+        _is_dead = false,
 
-        _state = bt.BattleEntityState.ALIVE,
         _elapsed = 0
     })
 end)
@@ -67,132 +68,6 @@ function bt.PriorityQueueElement:set_change_indicator(direction)
     if not (direction == rt.Direction.NONE or direction == rt.Direction.UP or direction == rt.Direction.DOWN) then
         rt.error("In bt.PriorityQueueElement: direction `" .. direction .. "` is not UP, DOWN or NONE")
     end
-end
-
-
---- @brief
-function bt.PriorityQueueElement:set_change_indicator_visible(b)
-    self._change_indicator_visible = b
-end
-
-
---- @brief
-function bt.PriorityQueueElement:set_is_knocked_out(b)
-    self._is_knocked_out = b
-    if self._is_realized then
-        if self._is_knocked_out then
-
-        else
-            self._backdrop:set_color(rt.settings.battle.priority_queue_element.base_color)
-            for i = 1, 4 do
-                self._shape:set_vertex_color(i, rt.RGBA(1, 1,1, 1))
-            end
-        end
-        self:_update_frame_color()
-    end
-end
-
-function bt.PriorityQueueElement:set_state(state)
-    if self._state ~= state then
-        self._state = state
-        self:_update_state()
-    end
-end
-
-function bt.PriorityQueueElement:set_is_selected(b)
-    self._is_selected = b
-    self:_update_state()
-end
-
-function bt.PriorityQueueElement:_update_frame_color()
-    if self._is_selected then
-        self._frame:set_color(rt.settings.battle.priority_queue_element.selected_frame_color)
-    elseif self._state == bt.BattleEntityState.ALIVE then
-        self._frame:set_color(rt.settings.battle.priority_queue_element.frame_color)
-    elseif self._state == bt.BattleEntityState.KNOCKED_OUT then
-        self._frame:set_color(rt.settings.battle.priority_queue_element.knocked_out_frame_color)
-    elseif self._state == bt.BattleEntityState.DEAD then
-        self._frame:set_color(rt.settings.battle.priority_queue_element.dead_frame_color)
-    end
-end
-
---- @brief
-function bt.PriorityQueueElement:_update_state()
-    if self._state == bt.BattleEntityState.ALIVE then
-        self._backdrop:set_color(rt.settings.battle.priority_queue_element.base_color)
-        for i = 1, 4 do
-            self._shape:set_vertex_color(i, rt.RGBA(1, 1,1, 1))
-        end
-    elseif self._state == bt.BattleEntityState.KNOCKED_OUT then
-        self._backdrop:set_color(rt.settings.battle.priority_queue_element.knocked_out_base_color)
-        for i = 1, 4 do
-            self._shape:set_vertex_color(i, rt.RGBA(1, 1,1, rt.settings.battle.priority_queue_element.knocked_out_shape_alpha))
-        end
-    elseif self._is_disabled then
-        self._shape:set_opacity(ternary(not self._is_disabled, 1, 0.4))
-        self._id_offset_label:set_opacity(ternary(not self._is_disabled, 1, 0.8))
-    elseif self._state == bt.BattleEntityState.DEAD then
-        self._backdrop:set_color(rt.settings.battle.priority_queue_element.dead_base_color)
-        for i = 1, 4 do
-            self._shape:set_vertex_color(i, rt.RGBA(1, 1,1, rt.settings.battle.priority_queue_element.dead_shape_alpha))
-        end
-    end
-    self:_update_frame_color()
-end
-
---- @override
-function bt.PriorityQueueElement:realize()
-    if self._is_realized then return end
-    self._is_realized = true
-
-    local sprite_id, sprite_index = self._entity:get_sprite_id()
-    sprite_index = which(sprite_index, 1)
-    self._spritesheet = rt.SpriteAtlas:get(sprite_id)
-    self._shape = rt.VertexRectangle(0, 0, 1, 1)
-    self._shape:set_texture(self._spritesheet:get_texture())
-    self._spritesheet:get_texture():set_wrap_mode(rt.TextureWrapMode.ZERO)
-    local frame = self._spritesheet:get_frame(sprite_index)
-    self._shape:reformat_texture_coordinates(
-            frame.x, frame.y,
-            frame.x + frame.width, frame.y,
-            frame.x + frame.width, frame.y + frame.height,
-            frame.x, frame.y + frame.height
-    )
-
-    self._backdrop:set_is_outline(false)
-    self._frame:set_is_outline(true)
-    self._frame_outline:set_is_outline(true)
-
-    self._backdrop:set_color(rt.settings.battle.priority_queue_element.base_color)
-    self._frame:set_color(rt.settings.battle.priority_queue_element.frame_color)
-    self._frame_outline:set_color(rt.Palette.BACKGROUND)
-
-    self._frame_gradient = rt.LogGradient(
-            rt.RGBA(0.8, 0.8, 0.8, 1),
-            rt.RGBA(1, 1, 1, 1)
-    )
-    self._frame_gradient:set_is_vertical(true)
-
-    for shape in range(self._backdrop, self._frame, self._frame_outline) do
-        shape:set_corner_radius(rt.settings.battle.priority_queue_element.corner_radius)
-    end
-
-    self._id_offset_label = rt.Glyph(
-        rt.settings.battle.priority_queue_element.font,
-        self._entity:get_id_offset_suffix(),
-        {
-            is_outlined = true,
-            outline_color = rt.Palette.BLACK,
-            font_style = rt.FontStyle.BOLD
-        }
-    )
-
-    self._change_indicator = rt.DirectionIndicator(self._change_direction)
-    self._change_indicator:realize()
-    self:set_change_indicator(self._change_direction)
-
-    self:_update_state()
-    self:set_is_animated(true)
 end
 
 --- @brief
@@ -250,7 +125,12 @@ function bt.PriorityQueueElement:realize()
     self._change_indicator = rt.DirectionIndicator(self._change_direction)
     self._change_indicator:realize()
     self:set_change_indicator(self._change_direction)
-    self:_update_state()
+
+    self:set_is_selected(self._is_selected)
+    self:set_is_disabled(self._is_disabled)
+    self:set_is_knocked_out(self._is_knocked_out)
+    self:set_is_dead(self._is_dead)
+
     self:set_is_animated(true)
 end
 
@@ -342,15 +222,8 @@ function bt.PriorityQueueElement:draw()
         rt.graphics.stencil(1, self._backdrop)
         rt.graphics.set_stencil_test(rt.StencilCompareMode.EQUAL, 1)
         self._shader:bind()
-
-        if self._state == bt.BattleEntityState.ALIVE then
-            self._shader:send("_state", 1)
-        elseif self._state == bt.BattleEntityState.KNOCKED_OUT then
-            self._shader:send("_state", 2)
-        elseif self._state == bt.BattleEntityState.DEAD then
-            self._shader:send("_state", 3)
-        end
-
+        self._shader:send("_is_knocked_out", ternary(self._is_knocked_out, 1, 0))
+        self._shader:send("_is_dead", ternary(self._is_dead, 1, 0))
         self._shape:draw()
         self._shader:unbind()
         rt.graphics.set_stencil_test()
@@ -377,11 +250,41 @@ function bt.PriorityQueueElement:draw()
     end
 end
 
+function bt.PriorityQueueElement:_update_frame_color()
+    if self._is_dead then
+    elseif self._is_knocked_out then
+        self._frame:set_color(rt.settings.battle.priority_queue_element.knocked_out_frame_color)
+    else
+        self._frame:set_color(rt.settings.battle.priority_queue_element.frame_color)
+    end
+end
+
+--- @brief
+function bt.PriorityQueueElement:set_is_selected(b)
+    self._is_selected = b
+    if self._is_realized then
+        if self._is_selected then
+            self._frame:set_color(rt.settings.battle.priority_queue_element.selected_frame_color)
+        else
+            self:_update_frame_color()
+        end
+    end
+end
+
+--- @brief
+function bt.PriorityQueueElement:set_is_disabled(b)
+    self._is_disabled = b
+    if self._is_realized then
+        self._shape:set_opacity(ternary(not self._is_disabled, 1, 0.4))
+        self._id_offset_label:set_opacity(ternary(not self._is_disabled, 1, 0.8))
+    end
+end
+
 
 --- @override
 function bt.PriorityQueueElement:update(delta)
     self._elapsed = self._elapsed + delta
-    if self._state == bt.BattleEntityState.KNOCKED_OUT then
+    if self._is_knocked_out then
         -- pulsing red animation
         local offset = (rt.sine_wave(self._elapsed, 1 / 3) - 0.5) * 0.3
         local color = rt.rgba_to_hsva(rt.settings.battle.priority_queue_element.knocked_out_base_color)

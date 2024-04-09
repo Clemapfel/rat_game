@@ -34,3 +34,19 @@ end
 function bt.Animation:get_is_started()
     return self._is_started
 end
+
+--- @brief
+function bt.Animation:register_finish_callback(callback)
+    if self._finish_callbacks == nil then
+        self._finish_callbacks = {}
+    end
+    table.insert(self._finish_callbacks, callback)
+end
+
+--- @brief
+function bt.Animation:register_start_callback(callback)
+    if self._start_callbacks == nil then
+        self._start_callbacks = {}
+    end
+    table.insert(self._start_callbacks, callback)
+end

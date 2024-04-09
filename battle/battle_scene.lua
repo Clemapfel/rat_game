@@ -23,7 +23,7 @@ bt.BattleScene = meta.new_type("BattleScene", rt.Widget, function()
         _priority_queue_is_visible = true,
         _priority_queue = {}, -- bt.PriorityQueue
 
-        _log_is_visible = false,
+        _log_is_visible = true,
         _log = {}, -- bt.BattleLog
 
         _debug_layout_lines = {}, -- Table<rt.Line>
@@ -35,7 +35,6 @@ bt.BattleScene = meta.new_type("BattleScene", rt.Widget, function()
     })
     return out
 end)
-
 
 --- @brief
 function bt.BattleScene:realize()
@@ -295,7 +294,7 @@ function bt.BattleScene:format_name(entity)
     if meta.isa(entity, bt.BattleEntity) then
         name = entity:get_name()
         if entity.is_enemy == true then
-            name = "<color=ENEMY><b><o>" .. name .. "</o></b></color> "
+            name = "<color=ENEMY><b>" .. name .. "</b></color> "
         end
     else
         rt.error("In bt.BattleScene:get_formatted_name: unhandled entity type `" .. meta.typeof(entity) .. "`")
@@ -313,4 +312,9 @@ end
 function bt.BattleScene:format_damage(value)
     -- same as rt.settings.battle.health_bar.hp_color_10
     return "<color=RED><mono><b>" .. tostring(value) .. "</b></mono></color> HP"
+end
+
+--- @brief
+function bt.BattleScene:get_priority_queue()
+    return self._priority_queue
 end
