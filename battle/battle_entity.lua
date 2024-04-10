@@ -43,7 +43,13 @@ end, {
 
     -- non simulation
     sprite_id = "",
-    sprite_index = 1
+    sprite_index = 1,
+
+    knocked_out_sprite_id = nil,
+    knocked_out_sprite_index = nil,
+
+    dead_sprite_id = nil,
+    dead_sprite_index = nil,
 })
 
 --- @brief
@@ -60,26 +66,41 @@ function bt.BattleEntity:realize()
 
     local strings = {
         "name",
-        "sprite_id"
+        "sprite_id",
+        "knocked_out_sprite_id",
+        "dead_sprite_id"
     }
 
     for _, key in ipairs(strings) do
         if config[key] ~= nil then
             self[key] = config[key]
         end
-        meta.assert_string(self[key])
+
+        if self[key] ~= nil then
+            meta.assert_string(self[key])
+        end
     end
 
     local numbers = {
-        "sprite_index"
+        "sprite_index",
+        "knocked_out_index",
+        "dead_sprite_index"
     }
 
     for _, key in ipairs(numbers) do
         if config[key] ~= nil then
             self[key] = config[key]
         end
-        meta.assert_number(self[key])
+
+        if self[key] ~= nil then
+            meta.assert_number(self[key])
+        end
     end
+
+    self.knocked_out_sprite_id = which(self.knocked_out_sprite_id, self.sprite_id)
+    self.knocked_out_index = which(self.knocked_out_sprite_index, self.sprite_index)
+    self.dead_sprite_id = which(self.dead_sprite_id, self.sprite_id)
+    self.dead_index = which(self.dead_sprite_index, self.sprite_index)
 
     -- TODO
     self.speed_base = rt.random.integer(1, 99)
@@ -155,4 +176,19 @@ end
 --- @brief
 function bt.BattleEntity:get_stance()
     return self.stance
+end
+
+--- @brief
+function bt.BattleEntity:get_state()
+    return self.state
+end
+
+--- @brief
+function bt.BattleEntity:get_is_knocked_out()
+    return self.state == bt.BattleEntityState.KNOCKED_OUT
+end
+
+--- @brief
+function bt.BattleEntity:get_is_dead()
+    return self.state == bt.BattleEntityState.DEAD
 end

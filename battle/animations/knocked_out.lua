@@ -31,7 +31,7 @@ function bt.Animation.KNOCKED_OUT:start()
 
     self._target_snapshot = rt.SnapshotLayout()
     self._target_snapshot:realize()
-    self._target_snapshot:set_mix_color(rt.settings.battle.priority_queue_element.knocked_out_base_color)
+    self._target_snapshot:set_mix_color(rt.Palette.KNOCKED_OUT)
     self._target_snapshot:set_mix_weight(0)
     self._target_path = {}
 
@@ -112,7 +112,6 @@ end
 --- @override
 function bt.Animation.KNOCKED_OUT:finish()
     self._target:set_is_visible(true)
-    self._scene:get_priority_queue():set_knocked_out(self._target:get_entity(), true)
 end
 
 --- @override

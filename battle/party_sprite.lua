@@ -10,7 +10,7 @@ bt.PartySprite = meta.new_type("PartySprite", rt.Widget, rt.Animation, function(
         _scene = scene,
         _is_realized = false,
 
-        _hp_bar = bt.HealthBar(entity),
+        _hp_bar = bt.HealthBar(scene, entity),
         _hp_bar_is_visible = true,
 
         _speed_value = bt.SpeedValue(entity),

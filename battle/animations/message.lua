@@ -1,13 +1,14 @@
-rt.settings.battle.animations.placeholder_message = {
+rt.settings.battle.animations.message = {
     duration = 1
 }
 
---- @class bt.Animation.PLACEHOLDER_MESSAGE
-bt.Animation.PLACEHOLDER_MESSAGE = meta.new_type("PLACEHOLDER_MESSAGE", bt.Animation, function(scene, target, message)
-    return meta.new(bt.Animation.PLACEHOLDER_MESSAGE, {
+--- @class bt.Animation.MESSAGE
+bt.Animation.MESSAGE = meta.new_type("MESSAGE", bt.Animation, function(scene, target, label_message, log_message)
+    return meta.new(bt.Animation.MESSAGE, {
         _scene = scene,
         _target = target,
-        _message = message,
+        _label_message = label_message,
+        _log_message = log_message,
 
         _target_snapshot = {}, -- rt.SnapshotLayout
         _label = {},          -- rt.Glyph
@@ -19,12 +20,12 @@ bt.Animation.PLACEHOLDER_MESSAGE = meta.new_type("PLACEHOLDER_MESSAGE", bt.Anima
 end)
 
 --- @override
-function bt.Animation.PLACEHOLDER_MESSAGE:start()
+function bt.Animation.MESSAGE:start()
     if not self._target:get_is_realized() then
         self._target:realize()
     end
 
-    self._label = rt.Glyph(rt.settings.font.default_mono, tostring(self._message), {
+    self._label = rt.Glyph(rt.settings.font.default, tostring(self._label_message), {
         is_outlined = true,
         font_style = rt.FontStyle.BOLD,
         outline_color = rt.Palette.TRUE_BLACK,
@@ -52,11 +53,6 @@ function bt.Animation.PLACEHOLDER_MESSAGE:start()
 
     local offset = 0.05
     self._target_path = rt.Spline({
-        --[[
-        0, 0,
-        -1 * offset, 0,
-        offset, 0,
-        ]]--
         0, 0,
     })
 
@@ -64,13 +60,17 @@ function bt.Animation.PLACEHOLDER_MESSAGE:start()
     self._target:set_is_visible(true)
     self._target_snapshot:snapshot(target)
     target:set_is_visible(false)
+
+    if #self._log_message ~= 0 then
+        self._scene:send_message(self._log_message)
+    end
 end
 
 --- @override
-function bt.Animation.PLACEHOLDER_MESSAGE:update(delta)
+function bt.Animation.MESSAGE:update(delta)
     if not self._is_started then return end
 
-    local duration = rt.settings.battle.animations.placeholder_message.duration
+    local duration = rt.settings.battle.animations.message.duration
     self._elapsed = self._elapsed + delta
     local fraction = self._elapsed / duration
 
@@ -108,12 +108,12 @@ function bt.Animation.PLACEHOLDER_MESSAGE:update(delta)
 end
 
 --- @override
-function bt.Animation.PLACEHOLDER_MESSAGE:finish()
+function bt.Animation.MESSAGE:finish()
     self._target:set_is_visible(true)
 end
 
 --- @override
-function bt.Animation.PLACEHOLDER_MESSAGE:draw()
+function bt.Animation.MESSAGE:draw()
     love.graphics.setCanvas(nil)
     self._target_snapshot:draw()
     self._label:draw()

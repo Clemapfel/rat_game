@@ -1,12 +1,12 @@
 rt.settings.battle.health_bar = {
-    hp_font = rt.Font(20, "assets/fonts/pixel.ttf"),--"assets/fonts/DejaVuSansMono/DejaVuSansMono-Bold.ttf"),
+    hp_font = rt.settings.font.default_mono_small, --rt.Font(20, "assets/fonts/pixel.ttf"),--"assets/fonts/DejaVuSansMono/DejaVuSansMono-Bold.ttf"),
 
     hp_color_100 = rt.Palette.LIGHT_GREEN_2,
     hp_color_75 = rt.Palette.GREEN_1,
     hp_color_50 = rt.Palette.YELLOW_2,
-    hp_color_25 = rt.Palette.ORANGE_2,
-    hp_color_10 = rt.Palette.RED_2,
-    hp_color_0 = rt.Palette.GRAY_2,
+    hp_color_25 = rt.Palette.YELLOW_2,
+    hp_color_10 = rt.Palette.YELLOW_2,
+    hp_color_0 = rt.Palette.YELLOW_2,
 
     hp_background_color = rt.Palette.GREEN_3,
     corner_radius = 7,
@@ -15,9 +15,10 @@ rt.settings.battle.health_bar = {
 }
 
 --- @class bt.HealthBar
-bt.HealthBar = meta.new_type("HealthBar", bt.BattleUI, function(entity)
+bt.HealthBar = meta.new_type("HealthBar", bt.BattleUI, function(scene, entity)
     local out = meta.new(bt.HealthBar, {
         _entity = entity,
+        _scene = scene,
         _is_realized = false,
 
         _elapsed = 1,   -- sic, makes it so `update` is invoked immediately
@@ -32,7 +33,7 @@ bt.HealthBar = meta.new_type("HealthBar", bt.BattleUI, function(entity)
         _label_right = {},   -- rt.Glyph
 
         _use_percentage = true,
-        _knock_out_override = false,
+        _state = bt.BattleEntityState.ALIVE,
 
         _debug_outline = {}
     })
@@ -42,7 +43,9 @@ end)
 
 --- @brief [internal]
 function bt.HealthBar:_format_hp(value, max)
-    if self._use_percentage then
+    if self._state == bt.BattleEntityState.KNOCKED_OUT then
+        return "", "KNOCKED OUT", ""
+    elseif self._use_percentage then
         return "", value .. " %", ""
     else
         return tostring(value), "/", tostring(max)
@@ -141,6 +144,14 @@ function bt.HealthBar:update(delta)
                 self:reformat()
             end
         end
+
+        if self._state == bt.BattleEntityState.KNOCKED_OUT then
+            -- pulsing red animation
+            local offset = rt.settings.battle.priority_queue_element.knocked_out_pulse(self._scene:get_elapsed())
+            local color = rt.rgba_to_hsva(rt.Palette.KNOCKED_OUT)
+            color.v = clamp(color.v + offset, 0, 1)
+            self._hp_bar:set_color(rt.color_darken(color, 0.15), color) -- sic, keep background lighter
+        end
     end
 end
 
@@ -152,7 +163,7 @@ function bt.HealthBar:draw()
         self._label_center:draw()
         self._label_right:draw()
 
-        if rt.current_scene:get_debug_draw_enabled() then
+        if self._scene:get_debug_draw_enabled() then
             self._debug_outline:draw()
         end
     end
@@ -168,5 +179,13 @@ function bt.HealthBar:set_value(hp, hp_max)
     self._hp_target = hp
     if hp_max ~= nil then
         self._hp_max = hp_max
+    end
+end
+
+--- @brief
+function bt.HealthBar:set_state(state)
+    self._state = state
+    if self._is_realized then
+        self:_update_color_from_precentage(self._hp_value)
     end
 end

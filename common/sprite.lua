@@ -54,7 +54,6 @@ end
 --- @override
 function rt.Sprite:update(delta)
     if self._is_realized then
-
         self._elapsed = self._elapsed + delta
         local frame_i = math.floor(self._elapsed / self._frame_duration)
 
@@ -90,8 +89,17 @@ end
 
 --- @brief
 function rt.Sprite:set_animation(id)
-    self._animation_id = id
-    self:set_frame(self._spritesheet.name_to_frame[id][1])
+    if id == "" then
+        self:set_frame(1)
+    else
+        self._animation_id = id
+        self:set_frame(self._spritesheet.name_to_frame[id][1])
+    end
+end
+
+--- @brief
+function rt.Sprite:get_animation()
+    return self._animation_id
 end
 
 --- @override

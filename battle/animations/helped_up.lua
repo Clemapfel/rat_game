@@ -30,7 +30,7 @@ function bt.Animation.HELPED_UP:start()
 
     self._target_snapshot = rt.SnapshotLayout()
     self._target_snapshot:realize()
-    self._target_snapshot:set_mix_color(rt.Palette.HP)
+    self._target_snapshot:set_mix_color(rt.Palette.LIGHT_GREEN_1)
     self._target_snapshot:set_mix_weight(0)
     self._target_path = {}
 
@@ -46,14 +46,11 @@ function bt.Animation.HELPED_UP:start()
         finish_x, finish_y
     })
 
-    local offset = 0.05
+    local offset = 0.1
     self._target_path = rt.Spline({
-        --[[
         0, 0,
-        -1 * offset, 0,
-        offset, 0,
-        ]]--
-        0, 0,
+        0, -1 * offset,
+        0, 0
     })
 
     local target = self._target
@@ -82,10 +79,8 @@ function bt.Animation.HELPED_UP:update(delta)
 
     local bounds = self._target:get_bounds()
     self._label:fit_into(
-            bounds.x + 0.5 * bounds.width - 0.5 * label_w,
-            bounds.y + bounds.height - pos_y - 0.5 * label_h,
-            rt.graphics.get_width(),
-            rt.graphics.get_height()
+        bounds.x, bounds.y + bounds.height * 0.5 - pos_y,
+        bounds.width, bounds.height
     )
 
     local fade_out_target = 0.9
@@ -97,14 +92,16 @@ function bt.Animation.HELPED_UP:update(delta)
     -- target animation
     target = self._target_snapshot
     local current = target:get_bounds()
-    local offset_x, offset_y = self._target_path:at(rt.sinusoid_ease_in_out(fraction))
-    offset_x = offset_x * current.width
-    offset_y = offset_y * current.height
-    current.x = current.x + offset_x
-    current.y = current.y + offset_y
-    target:set_position_offset(offset_x, offset_y)
-    target:set_mix_weight(rt.symmetrical_linear(fraction, 0.5))
 
+    local jump_duration = 0.1
+    if fraction < jump_duration then
+        local offset_x, offset_y = self._target_path:at(fraction / jump_duration)
+        offset_x = offset_x * current.width
+        offset_y = offset_y * current.height
+        target:set_position_offset(offset_x, offset_y)
+    end
+
+    target:set_mix_weight(rt.symmetrical_linear(fraction, 0.5))
     return self._elapsed < duration
 end
 

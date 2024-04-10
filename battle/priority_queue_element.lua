@@ -6,9 +6,8 @@ rt.settings.battle.priority_queue_element = {
     frame_color = rt.Palette.GRAY_3,
     selected_frame_color = rt.Palette.YELLOW_2,
 
-    knocked_out_base_color = rt.Palette.RED_3,
     knocked_out_shape_alpha = 0.7,
-    knocked_out_frame_color = rt.Palette.LIGHT_RED_2,
+    knocked_out_pulse = function(x) return (rt.sine_wave(x, 1 / 3) - 0.5) * 0.3 end,
 
     dead_base_color = rt.Palette.GRAY_6,
     dead_shape_alpha = 1,
@@ -110,7 +109,7 @@ function bt.PriorityQueueElement:_update_frame_color()
     elseif self._state == bt.BattleEntityState.ALIVE then
         self._frame:set_color(rt.settings.battle.priority_queue_element.frame_color)
     elseif self._state == bt.BattleEntityState.KNOCKED_OUT then
-        self._frame:set_color(rt.settings.battle.priority_queue_element.knocked_out_frame_color)
+        self._frame:set_color(rt.color_lighten(rt.Palette.KNOCKED_OUT, 0.15))
     elseif self._state == bt.BattleEntityState.DEAD then
         self._frame:set_color(rt.settings.battle.priority_queue_element.dead_frame_color)
     end
@@ -124,7 +123,7 @@ function bt.PriorityQueueElement:_update_state()
             self._shape:set_vertex_color(i, rt.RGBA(1, 1,1, 1))
         end
     elseif self._state == bt.BattleEntityState.KNOCKED_OUT then
-        self._backdrop:set_color(rt.settings.battle.priority_queue_element.knocked_out_base_color)
+        self._backdrop:set_color(rt.Palette.KNOCKED_OUT)
         for i = 1, 4 do
             self._shape:set_vertex_color(i, rt.RGBA(1, 1,1, rt.settings.battle.priority_queue_element.knocked_out_shape_alpha))
         end
@@ -383,8 +382,8 @@ function bt.PriorityQueueElement:update(delta)
     self._elapsed = self._elapsed + delta
     if self._state == bt.BattleEntityState.KNOCKED_OUT then
         -- pulsing red animation
-        local offset = (rt.sine_wave(self._elapsed, 1 / 3) - 0.5) * 0.3
-        local color = rt.rgba_to_hsva(rt.settings.battle.priority_queue_element.knocked_out_base_color)
+        local offset = rt.settings.battle.priority_queue_element.knocked_out_pulse(self._scene:get_elapsed())
+        local color = rt.rgba_to_hsva(rt.Palette.KNOCKED_OUT)
         color.v = clamp(color.v + offset, 0, 1)
         self._backdrop:set_color(color)
     end

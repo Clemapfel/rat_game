@@ -6,10 +6,9 @@ bt.EnemySprite = meta.new_type("EnemySprite", rt.Widget, rt.Animation, function(
         _is_realized = false,
 
         _sprite = rt.Sprite(entity.sprite_id),
-        _sprite_is_animated = true,
         _snapshot = rt.SnapshotLayout(),
 
-        _hp_bar = bt.HealthBar(entity),
+        _hp_bar = bt.HealthBar(scene, entity),
         _hp_bar_is_visible = true,
 
         _speed_value = bt.SpeedValue(entity),
@@ -36,6 +35,7 @@ function bt.EnemySprite:realize()
     local sprite_w, sprite_h = self._sprite:get_resolution()
     self._sprite:set_minimum_size(sprite_w * 4, sprite_h * 4)
     self._sprite:realize()
+    self._sprite:set_is_animated(true)
 
     self._hp_bar:realize()
     self._hp_bar:sync()
@@ -54,7 +54,7 @@ end
 
 --- @override
 function bt.EnemySprite:update(delta)
-    self._sprite:update(delta)
+
     self._hp_bar:update(delta)
     self._speed_value:update(delta)
     self._status_bar:update(delta)
@@ -207,7 +207,15 @@ end
 --- @brief
 function bt.EnemySprite:set_state(state)
     self._state = state
-    -- noop for now
+    self._hp_bar:set_state(state)
+
+    if state == bt.BattleEntityState.KNOCKED_OUT then
+        self._sprite:set_is_animated(false)
+        self._sprite:set_frame(4)
+    elseif state == bt.BattleEntityState.DEAD then
+    else
+        self._sprite:set_is_animated(true)
+    end
 end
 
 --- @brief

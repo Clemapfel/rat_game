@@ -7,6 +7,13 @@ function bt.BattleScene:get_sprite(entity)
     end
 end
 
+--- @brief [internal]
+function bt.BattleScene:_fizzle_on_dead()
+    self:play_animation(target, "MESSAGE",
+        "Already Dead"
+    )
+end
+
 --- @brief
 --- @param animation_id String all caps, eg. "PLACEHOLDER_MESSAGE"
 function bt.BattleScene:play_animation(entity, animation_id, ...)
@@ -49,12 +56,13 @@ end
 function bt.BattleScene:kill(target_id)
     -- assertion
     local target = self:get_entity(target_id)
-    if not target._is_knocked_out then
+    if not target:get_is_knocked_out() then
         rt.warning("In bt.BattleScene:kill: entity `" .. target_id .. "` was not knocked out before being killed")
     end
 
-    if target._is_dead then
-        rt.warning("In bt.BattleScene:kill: entity `" .. target_id .. "` is already dead")
+    if target:get_is_dead() then
+        self:_fizzle_on_dead(target)
+        return
     end
 
     -- animation
@@ -90,12 +98,17 @@ end
 function bt.BattleScene:knock_out(target_id)
     -- assertion
     local target = self:get_entity(target_id)
-    if not target._is_knocked_out then
-        rt.warning("In bt.BattleScene:knock_out: entity `" .. target_id .. "` is already knocked out")
+    if target:get_is_knocked_out() then
+        self:play_animation(target, "MESSAGE",
+            "Already Knocked Out!",
+            self:format_name(target) .. " is already knocked out"
+        )
+        return
     end
 
-    if target._is_dead then
-        rt.warning("In bt.BattleScene:knock_out: entity `" .. target_id .. "` is already dead")
+    if target:get_is_dead() then
+        self:_fizzle_on_dead(target)
+        return
     end
 
     -- animation
@@ -105,17 +118,19 @@ function bt.BattleScene:knock_out(target_id)
         table.insert(statuses, status)
     end
 
-    animation:register_finish_callback(function()
+    animation:register_start_callback(function()
         sprite:set_hp(0, target.hp_base)
+        self:get_priority_queue():set_state(sprite:get_entity(), bt.BattleEntityState.KNOCKED_OUT)
         for status in values(statuses) do
             sprite:remove_status(status)
         end
         sprite:set_priority(0)
         sprite:set_state(bt.BattleEntityState.KNOCKED_OUT)
+    end)
 
+    animation:register_finish_callback(function()
         sprite:set_is_visible(true)
         sprite:set_ui_is_visible(true)
-        self:get_priority_queue():set_state(sprite:get_entity(), bt.BattleEntityState.KNOCKED_OUT)
     end)
 
     -- simulation
@@ -126,3 +141,57 @@ function bt.BattleScene:knock_out(target_id)
         target.state = bt.BattleEntityState.KNOCKED_OUT
     end)
 end
+
+--- @brief
+function bt.BattleScene:help_up(target_id)
+    -- assertion
+    local target = self:get_entity(target_id)
+    
+    if not target:get_is_knocked_out() then
+        -- fizzle
+        self:play_animation(target, "MESSAGE",
+            "Not Knocked Out!",
+            self:format_name(target) .. " is not knocked out and can't be helped up"
+        )
+        return
+    end
+
+    if target:get_is_dead() then
+        self:_fizzle_on_dead(target)
+        return
+    end
+
+    local animation, sprite = self:play_animation(target, "HELPED_UP")
+    animation:register_start_callback(function()  
+        sprite:set_ui_is_visible(true)
+        self:send_message(self:format_name(target) .. " is no longer knocked out")
+        sprite:set_hp(1, target.hp_base)
+        self:get_priority_queue():set_state(sprite:get_entity(), bt.BattleEntityState.ALIVE)
+        sprite:set_priority(0)
+        sprite:set_state(bt.BattleEntityState.ALIVE)
+    end)
+    
+    -- simulation
+    bt.mutate_entity(target, function(target)
+        target.hp_current = 1
+        table.clear(target.status)
+        target.priority = 0
+        target.state = bt.BattleEntityState.ALIVE
+    end)
+    
+    --self:add_hp(target_id, 1)
+end
+
+--- @brief
+function bt.BattleScene:add_hp(target_id, value)
+    if value < 0 then self:reduce_hp(target_id, math.abs(value)) end
+
+    local target = self:get_entity(target_id)
+    if target:get_is_knocked_out() or target:get_is_dead() then
+        rt.warning("In bt.BattleScene:help_up: entity `" .. target_id .. "` is not knocked out")
+    end
+
+    if target:get_is_dead() then
+        rt.warning("In bt.BattleScene:help_up: entity `" .. target_id .. "` is dead and can't be helped up")
+    end
+end 

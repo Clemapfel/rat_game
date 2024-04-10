@@ -31,7 +31,8 @@ bt.BattleScene = meta.new_type("BattleScene", rt.Widget, function()
         _gradient_right = {}, -- rt.LogGradient
         _gradient_left = {},  -- rt.LogGradient
 
-        _animation_queue = bt.AnimationQueue()
+        _animation_queue = bt.AnimationQueue(),
+        _elapsed = 0,
     })
     return out
 end)
@@ -174,12 +175,18 @@ end
 
 --- @brief
 function bt.BattleScene:update(delta)
+    self._elapsed = self._elapsed + delta
     for _, sprite in ipairs(self._enemy_sprites) do
         sprite:update(delta)
     end
 
     self._animation_queue:update(delta)
     self._log:update(delta)
+end
+
+--- @brief
+function bt.BattleScene:get_elapsed()
+    return self._elapsed
 end
 
 --- @brief

@@ -10,12 +10,13 @@ local scene = bt.BattleScene()
 rt.current_scene = scene
 
 local small_ufo = bt.BattleEntity(scene, "SMALL_UFO")
+
 local boulder = bt.BattleEntity(scene, "BALL_WITH_FACE")
 local sprout_01 = bt.BattleEntity(scene, "WALKING_SPROUT")
 local sprout_02 = bt.BattleEntity(scene, "WALKING_SPROUT")
 local mole = bt.BattleEntity(scene, "GAMBLER_MOLE")
 
-for entity in range(small_ufo, boulder, sprout_01, sprout_02, mole) do
+for entity in range(small_ufo) do
     scene:add_entity(entity)
 end
 
@@ -52,8 +53,9 @@ local info_hidden = false
 input = rt.InputController()
 input:signal_connect("pressed", function(_, which)
     if which == rt.InputButton.A then
-        scene:kill(boulder:get_id())
+        scene:knock_out(small_ufo:get_id())
     elseif which == rt.InputButton.B then
+        scene:help_up(small_ufo:get_id())
     elseif which == rt.InputButton.X then
     elseif which == rt.InputButton.Y then
     elseif which == rt.InputButton.UP then
