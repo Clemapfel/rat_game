@@ -1,3 +1,8 @@
+rt.settings.battle.enemy_sprite = {
+    idle_animation_id = "idle",
+    knocked_out_animation_id = "knocked_out"
+}
+
 --- @class bt.EnemySprite
 bt.EnemySprite = meta.new_type("EnemySprite", rt.Widget, rt.Animation, function(scene, entity)
     return meta.new(bt.EnemySprite, {
@@ -36,6 +41,7 @@ function bt.EnemySprite:realize()
     self._sprite:set_minimum_size(sprite_w * 4, sprite_h * 4)
     self._sprite:realize()
     self._sprite:set_is_animated(true)
+    self._sprite:set_animation(rt.settings.battle.enemy_sprite.idle_animation_id)
 
     self._hp_bar:realize()
     self._hp_bar:sync()
@@ -50,6 +56,13 @@ function bt.EnemySprite:realize()
     self._snapshot:realize()
 
     self:reformat()
+end
+
+--- @brief
+function bt.EnemySprite:sync()
+    self._hp_bar:sync()
+    self._speed_value:sync()
+    self._status_bar:sync()
 end
 
 --- @override
@@ -210,11 +223,10 @@ function bt.EnemySprite:set_state(state)
     self._hp_bar:set_state(state)
 
     if state == bt.BattleEntityState.KNOCKED_OUT then
-        self._sprite:set_is_animated(false)
-        self._sprite:set_frame(4)
+        self._sprite:set_animation(rt.settings.battle.enemy_sprite.knocked_out_animation_id)
     elseif state == bt.BattleEntityState.DEAD then
     else
-        self._sprite:set_is_animated(true)
+        self._sprite:set_animation(rt.settings.battle.enemy_sprite.idle_animation_id)
     end
 end
 

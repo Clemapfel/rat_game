@@ -258,3 +258,6 @@ require "overworld.overworld_scene"
 
 
 -- require "test
+
+
+meta.make_auto_extend(rt.settings, false)

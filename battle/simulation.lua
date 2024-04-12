@@ -1,3 +1,8 @@
+rt.settings.battle.simulation = {
+    does_healing_cure_knock_out = true,
+    help_up_hp_value = 1
+}
+
 --- @brief
 function bt.BattleScene:get_sprite(entity)
     for _, sprite in pairs(self._enemy_sprites) do
@@ -8,9 +13,16 @@ function bt.BattleScene:get_sprite(entity)
 end
 
 --- @brief [internal]
-function bt.BattleScene:_fizzle_on_dead()
+function bt.BattleScene:_fizzle_on_dead(target)
     self:play_animation(target, "MESSAGE",
         "Already Dead"
+    )
+end
+
+--- @brief [internal]
+function bt.BattleScene:_fizzle_on_knocked_out(target)
+    self:play_animation(target, "MESSAGE",
+        "Already Knocked Out"
     )
 end
 
@@ -161,11 +173,12 @@ function bt.BattleScene:help_up(target_id)
         return
     end
 
+    local value = rt.settings.battle.simulation.help_up_hp_value
     local animation, sprite = self:play_animation(target, "HELPED_UP")
     animation:register_start_callback(function()  
         sprite:set_ui_is_visible(true)
         self:send_message(self:format_name(target) .. " is no longer knocked out")
-        sprite:set_hp(1, target.hp_base)
+        sprite:set_hp(value, target.hp_base)
         self:get_priority_queue():set_state(sprite:get_entity(), bt.BattleEntityState.ALIVE)
         sprite:set_priority(0)
         sprite:set_state(bt.BattleEntityState.ALIVE)
@@ -173,25 +186,48 @@ function bt.BattleScene:help_up(target_id)
     
     -- simulation
     bt.mutate_entity(target, function(target)
-        target.hp_current = 1
+        target.hp_current = value
         table.clear(target.status)
         target.priority = 0
         target.state = bt.BattleEntityState.ALIVE
     end)
-    
-    --self:add_hp(target_id, 1)
 end
 
 --- @brief
 function bt.BattleScene:add_hp(target_id, value)
     if value < 0 then self:reduce_hp(target_id, math.abs(value)) end
+    if value == 0 then return end
 
     local target = self:get_entity(target_id)
-    if target:get_is_knocked_out() or target:get_is_dead() then
-        rt.warning("In bt.BattleScene:help_up: entity `" .. target_id .. "` is not knocked out")
-    end
 
     if target:get_is_dead() then
-        rt.warning("In bt.BattleScene:help_up: entity `" .. target_id .. "` is dead and can't be helped up")
+        self:_fizzle_on_dead(target)
+        return
     end
+
+    if target:get_is_knocked_out() then
+        if rt.settings.battle.simulation.does_healing_cure_knock_out == true then
+            self:help_up(target_id)
+        else
+            local she, her, hers, is = self:format_pronouns(target)
+            self:play_animation(target, "MESSAGE", "Already Knocked Out",
+                self:format_name(target) .. " can't be healed because " .. she .. " " .. is .. " knocked out")
+            return
+        end
+    end
+
+    local current = target:get_hp_current()
+    local max = target:get_hp_base()
+    local after = clamp(current + value, 1, max)
+
+    local animation, sprite = self:play_animation(target, "HP_GAINED", value)
+    animation:register_start_callback(function()
+        sprite:set_ui_is_visible(true)
+        sprite:set_hp(after, max)
+        self:send_message(self:format_name(target) .. " gained " .. self:format_hp(value))
+    end)
+
+    bt.mutate_entity(target, function(target)
+        target.hp_current = after
+    end)
 end 

@@ -8,6 +8,14 @@ bt.BattleEntityState = meta.new_enum({
     DEAD = "DEAD"
 })
 
+bt.Gender = meta.new_enum({
+    NEUTRAL = "NEUTRAL",
+    MALE = "MALE",
+    FEMALE = "FEMALE",
+    MULTIPLE = "MULTIPLE",
+    UNKNOWN = "UNKNOWN"
+})
+
 --- @class
 bt.BattleEntity = meta.new_type("BattleEntity", function(scene, id)
     local path = rt.settings.battle.entity.config_path .. "/" .. id .. ".lua"
@@ -50,6 +58,8 @@ end, {
 
     dead_sprite_id = nil,
     dead_sprite_index = nil,
+
+    gender = bt.Gender.UNKNOWN
 })
 
 --- @brief
@@ -91,16 +101,17 @@ function bt.BattleEntity:realize()
         if config[key] ~= nil then
             self[key] = config[key]
         end
-
-        if self[key] ~= nil then
-            meta.assert_number(self[key])
-        end
     end
 
     self.knocked_out_sprite_id = which(self.knocked_out_sprite_id, self.sprite_id)
     self.knocked_out_index = which(self.knocked_out_sprite_index, self.sprite_index)
     self.dead_sprite_id = which(self.dead_sprite_id, self.sprite_id)
     self.dead_index = which(self.dead_sprite_index, self.sprite_index)
+
+    if config.gender ~= nil then
+        self.gender = config.gender
+        meta.assert_enum(self.gender, bt.Gender)
+    end
 
     -- TODO
     self.speed_base = rt.random.integer(1, 99)
@@ -191,4 +202,14 @@ end
 --- @brief
 function bt.BattleEntity:get_is_dead()
     return self.state == bt.BattleEntityState.DEAD
+end
+
+--- @brief
+function bt.BattleEntity:get_hp_current()
+    return self.hp_current
+end
+
+--- @brief
+function bt.BattleEntity:get_hp_base()
+    return self.hp_base
 end

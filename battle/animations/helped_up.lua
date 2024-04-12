@@ -23,8 +23,7 @@ function bt.Animation.HELPED_UP:start()
         self._target:realize()
     end
 
-    self._label = rt.Label("<o><b><color=LIGHT_GREEN_1>No Longer\nKnocked Out</color></b></o>")
-    self._label:set_justify_mode(rt.JustifyMode.CENTER)
+    self._label = rt.Label("<o><b><color=LIGHT_GREEN_1>Got Up</color></b></o>")
     self._label:realize()
     self._label_path = {}
 
@@ -73,7 +72,22 @@ function bt.Animation.HELPED_UP:update(delta)
     self._target_snapshot:snapshot(target)
     target:set_is_visible(false)
 
+    -- target animation
+    target = self._target_snapshot
+    local current = target:get_bounds()
+
+    local jump_duration = 0.1
+    if fraction < jump_duration then
+        local offset_x, offset_y = self._target_path:at(fraction / jump_duration)
+        offset_x = offset_x * current.width
+        offset_y = offset_y * current.height
+        target:set_position_offset(offset_x, offset_y)
+    end
+
+    target:set_mix_weight(rt.symmetrical_linear(fraction, 0.5))
+
     -- label animation
+    fraction = fraction * 4
     local label_w, label_h = self._label:get_size()
     local _, pos_y = self._label_path:at(rt.exponential_plateau(fraction * 0.9))
 
@@ -88,20 +102,6 @@ function bt.Animation.HELPED_UP:update(delta)
         local v = clamp((1 - fraction) / (1 - fade_out_target), 0, 1)
         self._label:set_opacity(v)
     end
-
-    -- target animation
-    target = self._target_snapshot
-    local current = target:get_bounds()
-
-    local jump_duration = 0.1
-    if fraction < jump_duration then
-        local offset_x, offset_y = self._target_path:at(fraction / jump_duration)
-        offset_x = offset_x * current.width
-        offset_y = offset_y * current.height
-        target:set_position_offset(offset_x, offset_y)
-    end
-
-    target:set_mix_weight(rt.symmetrical_linear(fraction, 0.5))
     return self._elapsed < duration
 end
 

@@ -55,27 +55,22 @@ end
 function rt.Sprite:update(delta)
     if self._is_realized then
         self._elapsed = self._elapsed + delta
-        local frame_i = math.floor(self._elapsed / self._frame_duration)
+        local start = self._frame_range_start
+        local n_frames = self._frame_range_end - self._frame_range_start + 1
 
+        local offset = math.round(self._elapsed / self._frame_duration)
         if self._should_loop then
-            frame_i = (frame_i % self._n_frames) + 1
+            offset = offset % n_frames
         else
-            frame_i = clamp(frame_i, 1, self._n_frames)
+            offset = math.min(offset, n_frames)
         end
-
-        if frame_i ~= self._current_frame then
-            self:set_frame(frame_i)
-            self._current_frame = frame_i
-            if self._animation_id ~= "" then
-                rt.error("In rt.Sprite:update: TODO: make update loop over specific frame range for sub-animation loops")
-            end
-        end
+        self:set_frame(start + offset)
     end
 end
 
 --- @brief
 function rt.Sprite:set_frame(i)
-    self._current_frame = i % self._n_frames + 1
+    self._current_frame = i
     if self._is_realized then
         local frame = self._spritesheet:get_frame(self._current_frame)
         self._shape:reformat_texture_coordinates(
@@ -91,9 +86,14 @@ end
 function rt.Sprite:set_animation(id)
     if id == "" then
         self:set_frame(1)
+        self._frame_range_start = 1
+        self._frame_range_end = self._spritesheet:get_n_frames()
     else
         self._animation_id = id
-        self:set_frame(self._spritesheet.name_to_frame[id][1])
+        local frame_range = self._spritesheet:get_frame_range(self._animation_id)
+        self:set_frame(frame_range[1])
+        self._frame_range_start = frame_range[1]
+        self._frame_range_end = frame_range[2]
     end
 end
 

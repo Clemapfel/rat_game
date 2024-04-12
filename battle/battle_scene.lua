@@ -321,7 +321,32 @@ function bt.BattleScene:format_damage(value)
     return "<color=RED><mono><b>" .. tostring(value) .. "</b></mono></color> HP"
 end
 
+--- @brief formated message insertions based on grammatical gender
+function bt.BattleScene:format_pronouns(entity)
+    local gender = entity.gender
+    if gender == bt.Gender.NEUTRAL then
+        return "it", "it", "its", "is"
+    elseif gender == bt.Gender.MALE then
+        return "he", "him", "his", "is"
+    elseif gender == bt.Gender.FEMALE then
+        return "she", "her", "hers", "is"
+    elseif gender == bt.Gender.MULTIPLE or gender == bt.Gender.UNKNOWN then
+        return "they", "their", "them", "are"
+    else
+        rt.error("In bt.BattleScene:format_prounouns: unhandled gender `" .. gender .. "` of entity `" .. entity:get_id() .. "`")
+        return "error", "error", "error", "error"
+    end
+end
+
 --- @brief
 function bt.BattleScene:get_priority_queue()
     return self._priority_queue
+end
+
+--- @brief
+function bt.BattleScene:skip()
+    rt.AnimationQueue.skip()
+    for sprite in values(self._enemy_sprites) do
+        sprite:sync()
+    end
 end

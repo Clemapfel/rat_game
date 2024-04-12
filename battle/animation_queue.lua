@@ -1,9 +1,14 @@
 --- @class
 bt.AnimationQueue = meta.new_type("AnimationQueue", rt.Drawable, function()
-    return meta.new(bt.AnimationQueue, {
+    local out = meta.new(bt.AnimationQueue, {
         animations = {}, -- Fifo<bt.Animation>
     })
+    bt.AnimationQueue._all_instances[meta.hash(out)] = out
+    return out
 end)
+
+bt.AnimationQueue._all_instances = {}
+meta.make_weak(bt.AnimationQueue._all_instances, false, true)
 
 --- @brief
 function bt.AnimationQueue:draw()
@@ -52,6 +57,30 @@ function bt.AnimationQueue:add_animation(animation)
     table.insert(self.animations, animation)
 end
 
+--- @brief
+--- @return Boolean true if at least one animation was skipped
+function bt.AnimationQueue:skip()
+    local skipped = false
+    for instance in values(bt.AnimationQueue._all_instances) do
+        if instance ~= nil then
+            local current = instance.animations[1]
+            if current ~= nil then
+                if current._is_started == true then
+                    current:update(0)
+                    current:finish()
+                    if current._finish_callbacks ~= nil then
+                        for callback in values(current._finish_callbacks) do
+                            callback()
+                        end
+                    end
+                    table.remove(instance.animations, 1)
+                    skipped = true
+                end
+            end
+        end
+    end
+    return skipped
+end
 
 --[[
 --- @brief

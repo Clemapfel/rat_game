@@ -574,6 +574,30 @@ function meta.weak_table(weak_keys, weak_values)
     return out
 end
 
+--- @brief
+function meta.make_auto_extend(x, recursive)
+    if recursive == nil then recursive = false end
+    local metatable = getmetatable(table)
+    if metatable == nil then
+        metatable = {}
+        setmetatable(x, metatable)
+    end
+
+    if metatable.__index ~= nil then
+        error("In make_auto_extend_table: table already has a metatable with an __index method")
+    end
+
+    metatable.__index = function(self, key)
+        local out = {}
+        self[key] = out
+
+        if recursive then
+            meta.make_auto_extend(out, recursive)
+        end
+        return out
+    end
+end
+
 --- @brief Add abstract method that needs to be overloaded or an assertion is raised
 --- @param super meta.Type
 --- @param name String

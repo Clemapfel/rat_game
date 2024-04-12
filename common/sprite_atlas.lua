@@ -123,7 +123,7 @@ function rt.SpriteAtlasEntry:load()
 
     local function add_frame(name, index)
         if self.frame_to_name[index] ~= nil then
-            rt.error("In rt.SpriteAtlasEntry:realize: animation at `" .. config_path .. "` maps both `" .. name .. "` and `".. self.frame_to_name[index] .. "` to index " .. index)
+            rt.error("In rt.SpriteAtlasEntry:realize: animation at `" .. config_path .. "` maps both `" .. name .. "` and `" .. self.frame_to_name[index] .. "` to index " .. index)
         end
 
         self.frame_to_name[index] = name
@@ -161,6 +161,12 @@ function rt.SpriteAtlasEntry:load()
         end
     end
 
+    for i = 1, self.n_frames do
+        if self.frame_to_name[i] == nil or self.frame_to_name[i] == "" then
+            rt.error("In rt.SpriteAtlasEntry:realize: animation at `" .. config_path .. "` does not assign an animation id to frame #" .. tostring(i))
+        end
+    end
+
     assert(#self.frame_to_name == #self.texture_rectangles)
     self.is_realized = true
 end
@@ -183,6 +189,10 @@ end
 --- @brief
 --- @return rt.AABB
 function rt.SpriteAtlasEntry:get_frame(index)
+    if meta.typeof(index) == "string" then
+        index = self.name_to_frame[index][1]
+    end
+
     local out = self.texture_rectangles[index]
     if out == nil then
         rt.error("In rt.SpriteAtlasEntry:get_frame: animation `" .. self.path .. "/" .. self.id .. "` does not have frame `" .. index .. "`")
@@ -193,6 +203,15 @@ end
 --- @brief
 function rt.SpriteAtlasEntry:get_n_frames()
     return #self.frame_to_name
+end
+
+--- @brief
+function rt.SpriteAtlasEntry:get_frame_range(id)
+    local out = self.name_to_frame[id]
+    if out == nil then
+        rt.error("In rt.SpriteAtlasEntry: spritesheet at `" .. self.path .. "` has no animation with id `" .. id .. "`")
+    end
+    return out
 end
 
 --- @class rt.SpriteAtlas
