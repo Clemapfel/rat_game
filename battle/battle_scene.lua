@@ -345,7 +345,7 @@ end
 
 --- @brief
 function bt.BattleScene:skip()
-    rt.AnimationQueue.skip()
+    bt.AnimationQueue.skip()
     for sprite in values(self._enemy_sprites) do
         sprite:sync()
     end

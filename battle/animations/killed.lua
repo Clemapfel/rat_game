@@ -24,8 +24,6 @@ function bt.Animation.KILLED:start()
     end
     self._target:set_ui_is_visible(true)
 
-    self._scene:send_message(self._scene:format_name(self._target:get_entity()) .. " was <b>killed</b>")
-
     self._label = rt.Label("<o><b><outline_color=TRUE_WHITE><color=BLACK>KILLED</color></b></o></outline_color>")
     self._label:realize()
     self._label_path = {}
@@ -95,7 +93,7 @@ function bt.Animation.KILLED:update(delta)
     target:set_opacity(opacity)
 
     if fraction >= 1 then
-        self._target:set_is_visible(false)
+        self._target:set_is_visible(true)
         self._target:set_ui_is_visible(false)
     end
 
@@ -104,7 +102,7 @@ end
 
 --- @override
 function bt.Animation.KILLED:finish()
-
+    self._target:set_is_visible(true)
 end
 
 --- @override

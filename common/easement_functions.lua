@@ -64,6 +64,12 @@ rt.sigmoid = function(x, slope)
     return 1 / (1 + math.exp(-1 * slope * (x - 0.5)))
 end
 
+rt.sigmoid_hold = function(x, hold)
+    hold = which(hold, 0.7)
+    return math.atan(hold * math.tan(4 * math.pi * (x - 0.5)^3)) / math.pi + 0.5
+end
+
+
 --- @brief maps [0, 0.5] to [0, peak], [0.5, 1] to [peak, 0], linear in both sections
 rt.symmetrical_linear = function(x, peak)
     peak = which(peak, 1)

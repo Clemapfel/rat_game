@@ -29,7 +29,7 @@ end)
 function bt.Animation.MOVE:start()
     do
         local bounds = self._target:get_bounds()
-        local label = rt.Label("<o>" .. self._move:get_name() .. "</o>")
+        local label = rt.Label("<o>SPIN</o>")--"<o>" .. self._move:get_name() .. "</o>")
         label:realize()
         label:set_alignment(rt.Alignment.START)
         label:fit_into(0, 0, bounds.width, bounds.height)
@@ -112,16 +112,12 @@ function bt.Animation.MOVE:update(delta)
     self._elapsed = self._elapsed + delta
     local fraction = self._elapsed / duration
 
-    local hold = 3
-    function f_lambda(x)
+    local hold = 0.7
+    local function spin(x)
         return math.atan(hold * math.tan(4 * math.pi * (x - 0.5)^3)) / math.pi + 0.5
     end
-    function f_lambda2(x)
-        return 0.5 + math.atan((hold * math.tan(4 * math.pi * (x - 0.5)^3))^3) / math.pi
-    end
 
-
-    self._angle = f_lambda2(fraction)
+    self._angle = spin(fraction)
     self._angle = self._angle * 2 * math.pi * rt.settings.battle.animations.move.n_rotations
 
     self._entity_shape:set_opacity(rt.fade_ramp(fraction, 0.05))

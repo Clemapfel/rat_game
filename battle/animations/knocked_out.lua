@@ -23,8 +23,6 @@ function bt.Animation.KNOCKED_OUT:start()
         self._target:realize()
     end
 
-    self._scene:send_message(self._scene:format_name(self._target:get_entity()) .. " was <b><color=LIGHT_RED_3>knocked out</color></b>")
-
     self._label = rt.Label("<o><b><color=LIGHT_RED_3>Knocked Out</color></b></o>")
     self._label:realize()
     self._label_path = {}

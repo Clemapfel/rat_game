@@ -172,10 +172,10 @@ function bt.BattleLog:update(delta)
     self._box_expand_elapsed = self._box_expand_elapsed % step
     local diff = clamp(n_steps * rt.settings.battle.log.box_expansion_speed, 0, math.abs(self._target_y - self._current_y))
     local reformat = false
-    if self._current_y < self._target_y then
+    if self._current_y <= self._target_y then
         self._current_y = self._target_y -- jump to full when expanding
         reformat = true
-    elseif self._current_y > self._target_y then
+    elseif self._current_y >= self._target_y then
         self._current_y = self._current_y - diff
         reformat = true
     end

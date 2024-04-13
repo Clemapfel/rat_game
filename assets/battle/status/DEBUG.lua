@@ -1,67 +1,51 @@
-rt.settings.battle.status = {
-    config_path = "assets/battle/status"
-}
-
---- @brief Status
-bt.Status = meta.new_type("Status", function(id)
-    local path = rt.settings.battle.status.config_path .. "/" .. id .. ".lua"
-    local out = meta.new(bt.Status, {
-        id = id,
-        name = "UNINITIALIZED STATUS @" .. path,
-        _path = path,
-        _is_realized = false
-    })
-    out:realize()
-    meta.set_is_mutable(out, false)
-    return out
-end, {
-    attack_offset = 0,
-    defense_offset = 0,
-    speed_offset = 0,
-
-    attack_factor = 1,
-    defense_factor = 1,
-    speed_factor = 1,
-
-    damage_factor = 1,
-    heal_factor = 1,
+return {
+    name = "Debug Status",
 
     max_duration = POSITIVE_INFINITY,
-    is_field_effect = false,
+
+    sprite_id = "status_ailment",
+    sprite_index = 2,
+    description = "Prints messages for every trigger payload",
 
     on_gained = function(afflicted)
         meta.asssert_isa(self, bt.Status)
         meta.assert_isa(afflicted, bt.BattleEntity)
+        println("[STATUS][" .. self:get_id() .. "] " .. afflicted:get_id() .. " gained `" .. self:get_id() .. "`")
         return nil
     end,
 
     on_lost = function(afflicted)
         meta.asssert_isa(self, bt.Status)
         meta.assert_isa(afflicted, bt.BattleEntity)
+        println("[STATUS][" .. self:get_id() .. "] " .. afflicted:get_id() .. " lost `" .. self:get_id() .. "`")
         return nil
     end,
 
     on_start_of_turn = function(afflicted)
         meta.asssert_isa(self, bt.Status)
         meta.assert_isa(afflicted, bt.BattleEntity)
+        println("[STATUS][" .. self:get_id() .. "] " .. afflicted:get_id() .. " turn start")
         return nil
     end,
 
     on_end_of_turn = function(afflicted)
         meta.asssert_isa(self, bt.Status)
         meta.assert_isa(afflicted, bt.BattleEntity)
+        println("[STATUS][" .. self:get_id() .. "] " .. afflicted:get_id() .. " changed stance `" .. old_stance:get_id() .. "` to `" .. new_stance:get_id() .. "`")
         return nil
     end,
 
     on_battle_start = function(afflicted)
         meta.asssert_isa(self, bt.Status)
         meta.assert_isa(afflicted, bt.BattleEntity)
+        println("[STATUS][" .. self:get_id() .. "] " .. afflicted:get_id() .. " battle start")
         return nil
     end,
 
     on_battle_end = function(afflicted)
         meta.asssert_isa(self, bt.Status)
         meta.assert_isa(afflicted, bt.BattleEntity)
+        println("[STATUS][" .. self:get_id() .. "] " .. afflicted:get_id() .. " battle end")
         return nil
     end,
 
@@ -71,6 +55,7 @@ end, {
             meta.assert_isa(entity, bt.BattleEntity)
         end
         meta.assert_number(damage)
+        println("[STATUS][" .. self:get_id() .. "] " .. afflicted:get_id() .. " takes `" .. tostring(damage) .. "` damage from `" .. damage_dealer:get_id() .. "`")
         return damage -- new damage
     end,
 
@@ -80,13 +65,15 @@ end, {
             meta.assert_isa(entity, bt.BattleEntity)
         end
         meta.assert_number(damage)
+        println("[STATUS][" .. self:get_id() .. "] " .. afflicted:get_id() .. " deals `" .. tostring(damage) .. "` damage to `" .. damage_taker:get_id() .. "`")
         return nil
     end,
-    
+
     on_other_status_gained = function(afflicted, gained_status)
         meta.asssert_isa(self, bt.Status)
         meta.assert_isa(afflicted, bt.BattleEntity)
         meta.assert_isa(gained_status, bt.Status)
+        println("[STATUS][" .. self:get_id() .. "] " .. afflicted:get_id() .. " gained other status `" .. gained_status:get_id() .. "`")
         return true -- allow applying status
     end,
 
@@ -94,28 +81,32 @@ end, {
         meta.asssert_isa(self, bt.Status)
         meta.assert_isa(afflicted, bt.BattleEntity)
         meta.assert_isa(lost_status, bt.Status)
+        println("[STATUS][" .. self:get_id() .. "] " .. afflicted:get_id() .. " lost other status `" .. lost_status:get_id() .. "`")
         return nil
     end,
-    
+
     on_knocked_out = function(afflicted, knock_out_causer)
         meta.asssert_isa(self, bt.Status)
         for entity in range(afflicted, knock_out_causer) do
             meta.assert_isa(entity, bt.BattleEntity)
         end
+        println("[STATUS][" .. self:get_id() .. "] " .. afflicted:get_id() .. " was knocked out by `" .. knock_out_causer:get_id() .. "`")
         return true -- allow knock out
     end,
 
     on_helped_up = function(afflicted, help_up_causer)
         meta.asssert_isa(self, bt.Status)
         meta.assert_isa(afflicted, bt.BattleEntity)
+        println("[STATUS][" .. self:get_id() .. "] " .. afflicted:get_id() .. " was helped up by `" .. help_up_causer:get_id() .. "`")
         return true -- allow help up
     end,
-    
+
     on_death = function(afflicted, death_causer)
         meta.asssert_isa(self, bt.Status)
         for entity in range(afflicted, death_causer) do
             meta.assert_isa(entity, bt.BattleEntity)
         end
+        println("[STATUS][" .. self:get_id() .. "] " .. afflicted:get_id() .. " was killed by `" .. death_causer:get_id() .. "`")
         return true -- allow death
     end,
 
@@ -124,6 +115,7 @@ end, {
         for entity in range(afflicted, entity_at_old_position) do
             meta.assert_isa(entity, bt.BattleEntity)
         end
+        println("[STATUS][" .. self:get_id() .. "] " .. afflicted:get_id() .. " switched positions with `" .. entity_at_old_position:get_id() .. "`")
         return true -- allow switch
     end,
 
@@ -132,6 +124,7 @@ end, {
         for stance in range(old_stance, new_stance) do
             meta.assert_isa(stance, bt.Stance)
         end
+        println("[STATUS][" .. self:get_id() .. "] " .. afflicted:get_id() .. " changed stance `" .. old_stance:get_id() .. "` to `" .. new_stance:get_id() .. "`")
         return true -- allow change
     end,
 
@@ -140,6 +133,7 @@ end, {
         meta.assert_isa(afflicted, bt.BattleEntity)
         meta.assert_isa(target, bt.BattleEntity)
         meta.assert_isa(move_selection, bt.MoveSelection)
+        -- TODO
         return true -- allow move
     end,
 
@@ -148,6 +142,7 @@ end, {
         meta.assert_isa(afflicted, bt.BattleEntity)
         meta.assert_isa(target, bt.BattleEntity)
         meta.assert_isa(move_selection, bt.MoveSelection)
+        -- TODO
         return nil
     end,
 
@@ -155,6 +150,7 @@ end, {
         meta.asssert_isa(self, bt.Status)
         meta.assert_isa(afflicted, bt.BattleEntity)
         meta.assert_isa(consumable, bt.Consumable)
+        -- TODO
         return true -- allow consuming
     end,
 
@@ -162,118 +158,7 @@ end, {
         meta.asssert_isa(self, bt.Status)
         meta.assert_isa(afflicted, bt.BattleEntity)
         meta.assert_isa(consumable, bt.Consumable)
+        -- TODO
         return nil
     end,
-
-    sprite_id = "",
-    sprite_index = 1
-})
-
---- @brief
-function bt.Status:realize()
-    if self._is_realized then return end
-
-    local chunk, error_maybe = love.filesystem.load(self._path)
-    if error_maybe ~= nil then
-        rt.error("In bt.Status:realize: error when loading config at `" .. self._path .. "`: " .. error_maybe)
-    end
-
-    -- load properties if specified, assert correct type, use default if left unspecified
-    local config = chunk()
-    meta.set_is_mutable(self, true)
-
-    local strings = {
-        "name",
-        "description"
-    }
-
-    for _, key in ipairs(strings) do
-        if config[key] ~= nil then
-            self[key] = config[key]
-        end
-        meta.assert_string(self[key])
-    end
-
-    local numbers = {
-        "attack_offset",
-        "defense_offset",
-        "speed_offset",
-        "attack_factor",
-        "defense_factor",
-        "speed_factor",
-        "max_duration"
-    }
-
-    for _, key in ipairs(numbers) do
-        if config[key] ~= nil then
-            self[key] = config[key]
-        end
-        meta.assert_number(self[key])
-    end
-
-    for factor in range(self.attack_factor, self.defense_factor, self.speed_factor) do
-        if factor < 0 then
-            rt.error("In bt.Status:realize: error when loading config at `" .. self._path .. "`: `attack_factor`, `defense_factor`, or `speed_factor` property < 0")
-        end
-    end
-
-    local bools = {
-        "is_field_effect",
-    }
-
-    for _, key in ipairs(bools) do
-        if config[key] ~= nil then
-            self[key] = config[key]
-        end
-        meta.assert_boolean(self[key])
-    end
-
-    local functions = {
-        "on_gained",
-        "on_lost",
-        "on_start_of_turn",
-        "on_end_of_turn",
-        "on_battle_start",
-        "on_battle_end",
-        "on_damage_taken",
-        "on_damage_dealt",
-        "on_other_status_gained",
-        "on_other_status_lost",
-        "on_knocked_out",
-        "on_helped_up",
-        "on_death",
-        "on_switch",
-        "on_stance_change",
-        "on_before_move",
-        "on_after_move",
-        "on_before_consumable",
-        "on_after_consumable",
-    }
-
-    for _, key in ipairs(functions) do
-        if config[key] ~= nil then
-            self[key] = config[key]
-        end
-        meta.assert_function(self[key])
-    end
-
-    self.sprite_id = config.sprite_id
-    meta.assert_string(self.sprite_id)
-
-    if config.sprite_index ~= nil then
-        self.sprite_index = config.sprite_index
-    end
-
-    self._is_realized = true
-    meta.set_is_mutable(self, false)
-end
-
---- @brief
-function bt.Status:get_sprite_id()
-    return self.sprite_id, self.sprite_index
-end
-
---- @brief
-function bt.Status:get_id()
-    return self.id
-end
+}

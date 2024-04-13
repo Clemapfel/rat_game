@@ -16,8 +16,10 @@ local sprout_01 = bt.BattleEntity(scene, "WALKING_SPROUT")
 local sprout_02 = bt.BattleEntity(scene, "WALKING_SPROUT")
 local mole = bt.BattleEntity(scene, "GAMBLER_MOLE")
 
+local test_status = bt.Status("DEBUG")
 for entity in range(small_ufo) do
     scene:add_entity(entity)
+    entity.status[test_status] = 0
 end
 
 local party_sprite = bt.PartySprite(scene, boulder)
@@ -53,19 +55,17 @@ local info_hidden = false
 input = rt.InputController()
 input:signal_connect("pressed", function(_, which)
     if which == rt.InputButton.A then
-        --scene:knock_out(small_ufo:get_id())
-        scene:play_animation(small_ufo, "MOVE", bt.Move("TEST_MOVE"))
+        scene:skip()
     elseif which == rt.InputButton.B then
-        scene:help_up(small_ufo:get_id())
     elseif which == rt.InputButton.X then
-        scene:add_hp(small_ufo:get_id(), 30)
     elseif which == rt.InputButton.Y then
     elseif which == rt.InputButton.UP then
+        scene:add_hp(small_ufo:get_id(), 30)
     elseif which == rt.InputButton.DOWN then
+        scene:reduce_hp(small_ufo:get_id(), 27)
     elseif which == rt.InputButton.LEFT then
     elseif which == rt.InputButton.RIGHT then
     elseif which == rt.InputButton.R then
-        bt.AnimationQueue.skip()
     elseif which == rt.InputButton.L then
     elseif which == rt.InputButton.SELECT then
     end

@@ -1,5 +1,5 @@
 return {
-    name = "Test Move",
+    name = "Spin",
     effect_text = "This is a move used for testing",
     verbose_effect_text = "moves have a set number of uses that can be replenished",
     flavor_text = "Truly useless",
