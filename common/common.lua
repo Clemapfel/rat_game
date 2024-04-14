@@ -43,6 +43,35 @@ function keys(t)
     end
 end
 
+
+--- @brief iterate arbitrary number of elements, if vararg contains nils, they will be skipped
+--- @vararg any
+function range(...)
+    local elements = {...}
+    local n_elements = _G._select('#', ...)
+
+    local state = {}
+    for i = 1, n_elements do
+        state[i] = elements[i]
+    end
+
+    state.index = 1
+    state.n_elements = n_elements
+
+    return _range_iterator, state
+end
+
+_range_iterator = function(state)
+    local index, n_elements = state.index, state.n_elements
+    if index > n_elements then return nil end
+
+    while state[index] == nil and index <= n_elements do
+        index = index + 1
+    end
+    state.index = index + 1
+    return state[index], state
+end
+
 --- @brief print, arguments are concatenated
 --- @param vararg any
 --- @return nil
@@ -205,22 +234,6 @@ function which(value, if_nil)
     if value == nil then return if_nil else return value end
 end
 
---- @brief try-catch
---- @param to_try function
---- @param on_fail function
-function try_catch(to_try, on_fail)
-    local status, out = pcall(to_try)
-    if status == true then
-        return out
-    else
-        if type(on_fail) == "nil" then
-            return nil
-        else
-            return on_fail(out)
-        end
-    end
-end
-
 --- @brief invoke function with arguments
 function invoke(f, ...)
     assert(type(f) == "function")
@@ -351,7 +364,7 @@ function serialize(object_identifier, object, inject_sourcecode)
         return table.concat(str_buffer)
     end
 
-    serialize_inner = function (buffer, object, n_indent_tabs, seen)
+    local serialize_inner = function (buffer, object, n_indent_tabs, seen)
 
         if type(object) == "number" then
             insert(buffer, object)
@@ -559,34 +572,6 @@ _step_range_iterator = function(state)
 
     state[4] = next
     return current, state
-end
-
---- @brief iterate arbitrary number of elements, if vararg contains nils, they will be skipped
---- @vararg any
-function range(...)
-    local elements = {...}
-    local n_elements = _G._select('#', ...)
-
-    local state = {}
-    for i = 1, n_elements do
-        state[i] = elements[i]
-    end
-
-    state.index = 1
-    state.n_elements = n_elements
-
-    return _range_iterator, state
-end
-
-_range_iterator = function(state)
-    local index, n_elements = state.index, state.n_elements
-    if index > n_elements then return nil end
-
-    while state[index] == nil and index <= n_elements do
-        index = index + 1
-    end
-    state.index = index + 1
-    return state[index], state
 end
 
 --- @brief

@@ -19,11 +19,9 @@ local mole = bt.BattleEntity(scene, "GAMBLER_MOLE")
 local test_status = bt.Status("DEBUG")
 for entity in range(small_ufo) do
     scene:add_entity(entity)
-    entity.status[test_status] = 0
 end
 
 local party_sprite = bt.PartySprite(scene, boulder)
-
 function distribute_status()
     local statuses = {}
     for i = 1, 10 do
@@ -57,12 +55,13 @@ input:signal_connect("pressed", function(_, which)
     if which == rt.InputButton.A then
         scene:skip()
     elseif which == rt.InputButton.B then
+        scene:use_move(small_ufo:get_id(), "TEST_MOVE")
     elseif which == rt.InputButton.X then
     elseif which == rt.InputButton.Y then
     elseif which == rt.InputButton.UP then
-        scene:add_hp(small_ufo:get_id(), 30)
+        scene:add_status(small_ufo:get_id(), "DEBUG")
     elseif which == rt.InputButton.DOWN then
-        scene:reduce_hp(small_ufo:get_id(), 27)
+        scene:remove_status(small_ufo:get_id(), "DEBUG")
     elseif which == rt.InputButton.LEFT then
     elseif which == rt.InputButton.RIGHT then
     elseif which == rt.InputButton.R then

@@ -636,6 +636,3 @@ function meta.is_love_type(x, which)
         return x.type ~= nil and x:type() == which
     end
 end
-
---- @brief internal test
-

@@ -204,7 +204,7 @@ end
 
 --- @brief
 function bt.EnemySprite:add_status(status)
-    self._status_bar:add(status)
+    self._status_bar:add(status, 0)
 end
 
 --- @brief

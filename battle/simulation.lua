@@ -29,7 +29,6 @@ end
 --- @brief
 --- @param animation_id String all caps, eg. "PLACEHOLDER_MESSAGE"
 function bt.BattleScene:play_animation(entity, animation_id, ...)
-
     if bt.Animation[animation_id] == nil then
         rt.error("In bt.BattleScene:play_animation: no animation with id `" .. animation_id .. "`")
     end
@@ -53,15 +52,121 @@ function bt.BattleScene:get_entity(id)
     return nil
 end
 
+--- @brief [internal] unlock entity, mutate, then lock again
 function bt.mutate_entity(entity, f, ...)
-    meta.set_is_mutable(entity, true) -- lock
+    meta.set_is_mutable(entity, true)
     f(entity, ...)
-    meta.set_is_mutable(entity, false) -- unlock
+    meta.set_is_mutable(entity, false)
+end
+
+--- @brief [internal] invoke script callback in sandboxed environment
+function bt.safe_invoke(callback, ...)
+    -- setup sandbox fenv
+    if self._sandbox_env == nil then
+        self._sandbox_env = {}
+        local env = self._sandbox_env
+        for common in range(
+            "pairs",
+            "ipairs",
+            "values",
+            "keys",
+            "range",
+            "print",
+            "println",
+            "dbg",
+
+            "sizeof",
+            "is_empty",
+            "clamp",
+            "project",
+            "mix",
+            "smoothstep",
+            "fract",
+            "ternary",
+            "which",
+            "splat",
+            "slurp",
+            "select",
+            "serialize",
+
+            "INFINITY",
+            "POSITIVE_INFINITY",
+            "NEGATIVE_INFINITY"
+        ) do
+            assert(_G[common] ~= nil)
+            env[common] = _G[common]
+        end
+
+        env.rand = rt.rand
+        env.random = {}
+        env.math = math
+        env.table = table
+        env.string = string
+
+        -- blacklist
+        for no in range(
+            "assert",
+            "collectgarbage",
+            "dofile",
+            "error",
+            "getmetatable",
+            "setmetatable",
+            "load",
+            "loadfile",
+            "require",
+            --"loadstring",
+            "rawequal",
+            "rawget",
+            "rawset",
+            "setfenv",
+            "getfenv"
+        ) do
+            env[no] = nil
+        end
+    end
+
+    debug.setfenv(callback, self._sandbox_env)
+    callback(...)
 end
 
 --- @brief
 function bt.BattleScene:end_turn()
     -- TODO: remove dead entities from priority queue and enemy sprites, also resolve game over
+end
+
+--- @brief
+function bt.BattleScene:use_move(target_id, move_id)
+    local target = self:get_entity(target_id)
+    local move = target:get_move(move_id)
+
+    if move == nil then
+        rt.error("In bt.Battlescene:use_move: entity `" .. target_id .. "` does not have move `" .. move_id .. "` in moveset")
+        return
+    end
+
+    self._current_move_user = target
+    self._current_move = move
+
+    local n_left = target:get_move_n_uses_left(move_id)
+
+    if n_left < 1 then
+        self:play_animation(target, "MESSAGE",
+            move:get_name() .. " FAILED",
+            self:format_name(target) .. " tried to use <b>" .. move:get_name() .. "</b> but it has no uses left"
+        )
+        return
+    end
+
+    self:play_animation(target, "MESSAGE",
+        move:get_name() .. " FAILED",
+        self:format_name(target) .. " used <b>" .. move:get_name() .. "</b>"
+    )
+
+    bt.mutate_entity(target, function(target)
+        target.moveset[move_id].n_uses = n_left - 1
+    end)
+
+    -- TODO: apply move script
 end
 
 --- @brief
@@ -277,4 +382,55 @@ function bt.BattleScene:reduce_hp(target_id, value)
             end
         end
     end
+end
+
+--- @brief
+function bt.BattleScene:add_status(target_id, status_id)
+    local target = self:get_entity(target_id)
+    local status = bt.Status(status_id)
+
+    if target:get_status(status_id) ~= nil then
+        if not status.is_silent then
+            self:send_message(self:format_name(target) .. " already has " .. status:get_name())
+        end
+        return
+    end
+
+    if not status.is_silent then
+        local animation, sprite = self:play_animation(target, "STATUS_GAINED", status)
+        animation:register_start_callback(function()
+            sprite:add_status(status)
+            self:send_message(self:format_name(target) .. " gained " .. status:get_name())
+        end)
+    end
+
+    bt.mutate_entity(target, function(target)
+        target:add_status(status)
+    end)
+
+    bt.safe_invoke(status.on_gained, bt.BattleEntityInterface(self,))
+end
+
+--- @brief
+function bt.BattleScene:remove_status(target_id, status_id)
+    local target = self:get_entity(target_id)
+    local status = target:get_status(status_id)
+
+    if status == nil then
+        status = bt.Status(status_id)
+        self:send_message(self:format_name(target) .. " does not have " .. status:get_name())
+        return
+    end
+
+    if not status.is_silent then
+        local animation, sprite = self:play_animation(target, "STATUS_LOST", status)
+        animation:register_start_callback(function()
+            sprite:remove_status(status)
+            self:send_message(self:format_name(target) .. " lost " .. status:get_name())
+        end)
+    end
+
+    bt.mutate_entity(target, function(target)
+        target:remove_status(status)
+    end)
 end

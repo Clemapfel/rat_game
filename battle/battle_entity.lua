@@ -30,6 +30,8 @@ bt.BattleEntity = meta.new_type("BattleEntity", function(scene, id)
     })
 
     out.status = {}
+    out.moveset = {}
+
     out:realize()
     meta.set_is_mutable(out, false)
     return out
@@ -45,6 +47,7 @@ end, {
 
     priority = 0,
     status = {}, -- Table<bt.Status, Number>
+    move = {}, -- Table<MoveID, {move: bt:move, n_uses: Number}>
     stance = bt.Stance("NEUTRAL"),
 
     state = bt.BattleEntityState.ALIVE,
@@ -117,6 +120,15 @@ function bt.BattleEntity:realize()
     self.speed_base = rt.random.integer(1, 99)
     -- TODO
 
+    config.moveset = which(config.moveset, {})
+    for move_id in values(config.moveset) do
+        local move = bt.Move(move_id)
+        self.moveset[move_id] = {
+            move = move,
+            n_uses = move.max_n_uses
+        }
+    end
+
     self._is_realized = true
     meta.set_is_mutable(self, false)
 end
@@ -181,7 +193,27 @@ end
 
 --- @brief
 function bt.BattleEntity:get_status_n_turns_elapsed(status)
-    return self.status[status].elapsed
+    local id = status:get_id()
+    return self.status[id].elapsed
+end
+
+--- @brief
+function bt.BattleEntity:get_status(status_id)
+    if self.status[status_id] == nil then return nil end
+    return self.status[status_id].status
+end
+
+--- @brief
+function bt.BattleEntity:add_status(status)
+    self.status[status:get_id()] = {
+        elapsed = 0,
+        status = status
+    }
+end
+
+--- @brief
+function bt.BattleEntity:remove_status(status)
+    self.status[status:get_id()] = nil
 end
 
 --- @brief
@@ -212,4 +244,15 @@ end
 --- @brief
 function bt.BattleEntity:get_hp_base()
     return self.hp_base
+end
+
+--- @brief
+function bt.BattleEntity:get_move(move_id)
+    if self.status[move_id] == nil then return nil end
+    return self.moveset[move_id].move
+end
+
+--- @brief
+function bt.BattleEntity:get_move_n_uses_left(id)
+    return self.moveset[id].n_uses
 end

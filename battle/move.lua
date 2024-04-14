@@ -3,16 +3,21 @@ rt.settings.battle.move = {
 }
 
 --- @class bt.Move
+--- @brief cached instancing, moves with the same ID will always return the same instance
 bt.Move = meta.new_type("Move", function(id)
-    local path = rt.settings.battle.move.config_path .. "/" .. id .. ".lua"
-    local out = meta.new(bt.Move, {
-        id = id,
-        name = "UNINITIALIZED MOVE @" .. path,
-        _path = path,
-        _is_realized = false
-    })
-    out:realize()
-    meta.set_is_mutable(out, false)
+    local out = bt.Move._atlas[id]
+    if out == nil then
+        local path = rt.settings.battle.move.config_path .. "/" .. id .. ".lua"
+        out = meta.new(bt.Move, {
+            id = id,
+            name = "UNINITIALIZED MOVE @" .. path,
+            _path = path,
+            _is_realized = false
+        })
+        out:realize()
+        meta.set_is_mutable(out, false)
+        bt.Move._atlas[id] = out
+    end
     return out
 end, {
     max_n_uses = POSITIVE_INFINITY,
@@ -41,6 +46,7 @@ end, {
     description = "<No Effect>",
     bonus_description = "<No Bonus>"
 })
+bt.Move._atlas = {}
 
 --- @brief
 function bt.Move:realize()

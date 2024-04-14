@@ -3,16 +3,21 @@ rt.settings.battle.status = {
 }
 
 --- @brief Status
+--- @brief cached instancing, moves with the same ID will always return the same instance
 bt.Status = meta.new_type("Status", function(id)
-    local path = rt.settings.battle.status.config_path .. "/" .. id .. ".lua"
-    local out = meta.new(bt.Status, {
-        id = id,
-        name = "UNINITIALIZED STATUS @" .. path,
-        _path = path,
-        _is_realized = false
-    })
-    out:realize()
-    meta.set_is_mutable(out, false)
+    local out = bt.Status._atlas[id]
+    if out == nil then
+        local path = rt.settings.battle.status.config_path .. "/" .. id .. ".lua"
+        out = meta.new(bt.Status, {
+            id = id,
+            name = "UNINITIALIZED STATUS @" .. path,
+            _path = path,
+            _is_realized = false
+        })
+        out:realize()
+        meta.set_is_mutable(out, false)
+        bt.Status._atlas[id] = out
+    end
     return out
 end, {
     attack_offset = 0,
@@ -165,9 +170,12 @@ end, {
         return nil
     end,
 
+    is_silent = false,
+
     sprite_id = "",
     sprite_index = 1
 })
+bt.Status._atlas = {}
 
 --- @brief
 function bt.Status:realize()
@@ -276,4 +284,9 @@ end
 --- @brief
 function bt.Status:get_id()
     return self.id
+end
+
+--- @brief
+function bt.Status:get_name()
+    return self.name
 end

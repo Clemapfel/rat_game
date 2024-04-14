@@ -24,7 +24,7 @@ function bt.Animation.STATUS_GAINED:start()
         self._target:realize()
     end
 
-    self._label = rt.Label("<o>Status Gained: <b><mono>" .. self._status.id .. "</mono></b></o>")
+    self._label = rt.Label("<o>Status Gained:\n<b><mono>" .. self._status.id .. "</mono></b></o>")
     self._label:realize()
     self._label_path = {}
 

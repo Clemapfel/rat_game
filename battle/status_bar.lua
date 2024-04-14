@@ -184,6 +184,7 @@ function bt.StatusBar:add(status, elapsed)
         target_y = 0,
         debug_shape = {}
     }
+    self:reformat()
 end
 
 --- @brief
