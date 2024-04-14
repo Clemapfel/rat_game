@@ -66,7 +66,7 @@ function connect_emmy_lua_debugger()
         return nil -- exit
     end
 end
-try_catch(connect_emmy_lua_debugger)
+pcall(connect_emmy_lua_debugger)
 io.stdout:setvbuf("no") -- makes it so love2d error message is printed to console immediately
 
 require "profiler"
@@ -175,7 +175,6 @@ require "battle.move"
 
 require "battle.battle_entity"
 require "battle.battle_state"
-require "battle.battle_entity_interface"
 
 require "battle.battle_ui"
 require "battle.health_bar"
@@ -201,7 +200,10 @@ require "battle.priority_queue"
 require "battle.status_bar_element"
 require "battle.status_bar"
 require "battle.battle_scene"
+
+require "battle.interface"
 require "battle.simulation"
+
 require "battle.enemy_sprite"
 require "battle.party_sprite"
 require "battle.verbose_info_panel"

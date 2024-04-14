@@ -59,88 +59,17 @@ function bt.mutate_entity(entity, f, ...)
     meta.set_is_mutable(entity, false)
 end
 
---- @brief [internal] invoke script callback in sandboxed environment
-function bt.safe_invoke(callback, ...)
-    -- setup sandbox fenv
-    if self._sandbox_env == nil then
-        self._sandbox_env = {}
-        local env = self._sandbox_env
-        for common in range(
-            "pairs",
-            "ipairs",
-            "values",
-            "keys",
-            "range",
-            "print",
-            "println",
-            "dbg",
-
-            "sizeof",
-            "is_empty",
-            "clamp",
-            "project",
-            "mix",
-            "smoothstep",
-            "fract",
-            "ternary",
-            "which",
-            "splat",
-            "slurp",
-            "select",
-            "serialize",
-
-            "INFINITY",
-            "POSITIVE_INFINITY",
-            "NEGATIVE_INFINITY"
-        ) do
-            assert(_G[common] ~= nil)
-            env[common] = _G[common]
-        end
-
-        env.rand = rt.rand
-        env.random = {}
-        env.math = math
-        env.table = table
-        env.string = string
-
-        -- blacklist
-        for no in range(
-            "assert",
-            "collectgarbage",
-            "dofile",
-            "error",
-            "getmetatable",
-            "setmetatable",
-            "load",
-            "loadfile",
-            "require",
-            --"loadstring",
-            "rawequal",
-            "rawget",
-            "rawset",
-            "setfenv",
-            "getfenv"
-        ) do
-            env[no] = nil
-        end
-    end
-
-    debug.setfenv(callback, self._sandbox_env)
-    callback(...)
-end
-
 --- @brief
 function bt.BattleScene:end_turn()
     -- TODO: remove dead entities from priority queue and enemy sprites, also resolve game over
 end
 
 --- @brief
-function bt.BattleScene:use_move(target_id, move_id)
-    local target = self:get_entity(target_id)
+function bt.BattleScene:use_move(target, move_id)
     local move = target:get_move(move_id)
 
     if move == nil then
-        rt.error("In bt.Battlescene:use_move: entity `" .. target_id .. "` does not have move `" .. move_id .. "` in moveset")
+        rt.error("In bt.Battlescene:use_move: entity `" .. target:get_id() .. "` does not have move `" .. move_id .. "` in moveset")
         return
     end
 
@@ -170,11 +99,10 @@ function bt.BattleScene:use_move(target_id, move_id)
 end
 
 --- @brief
-function bt.BattleScene:kill(target_id)
+function bt.BattleScene:kill(target)
     -- assertion
-    local target = self:get_entity(target_id)
     if not target:get_is_knocked_out() then
-        rt.warning("In bt.BattleScene:kill: entity `" .. target_id .. "` was not knocked out before being killed")
+        rt.warning("In bt.BattleScene:kill: entity `" .. target:get_id() .. "` was not knocked out before being killed")
     end
 
     if target:get_is_dead() then
@@ -215,9 +143,8 @@ function bt.BattleScene:kill(target_id)
 end
 
 --- @brief
-function bt.BattleScene:knock_out(target_id)
+function bt.BattleScene:knock_out(target)
     -- assertion
-    local target = self:get_entity(target_id)
     if target:get_is_knocked_out() then
         self:play_animation(target, "MESSAGE",
             "Already Knocked Out!",
@@ -264,10 +191,7 @@ function bt.BattleScene:knock_out(target_id)
 end
 
 --- @brief
-function bt.BattleScene:help_up(target_id)
-    -- assertion
-    local target = self:get_entity(target_id)
-    
+function bt.BattleScene:help_up(target)
     if not target:get_is_knocked_out() then
         -- fizzle
         self:play_animation(target, "MESSAGE",
@@ -303,15 +227,13 @@ function bt.BattleScene:help_up(target_id)
 end
 
 --- @brief
-function bt.BattleScene:add_hp(target_id, value)
+function bt.BattleScene:add_hp(target, value)
     if value < 0 then
-        self:reduce_hp(target_id, math.abs(value))
+        self:reduce_hp(target, math.abs(value))
         return
     end
 
     if value == 0 then return end
-
-    local target = self:get_entity(target_id)
 
     if target:get_is_dead() then
         self:_fizzle_on_dead(target)
@@ -320,7 +242,7 @@ function bt.BattleScene:add_hp(target_id, value)
 
     if target:get_is_knocked_out() then
         if rt.settings.battle.simulation.does_healing_cure_knock_out == true then
-            self:help_up(target_id)
+            self:help_up(target)
             -- no return
         else
             local she, her, hers, is = self:format_pronouns(target)
@@ -335,11 +257,11 @@ function bt.BattleScene:add_hp(target_id, value)
     local after = clamp(current + value, 1, max)
     local offset = math.abs(after - current)
 
-    local animation, sprite = self:play_animation(target, "HP_GAINED", offset)
+    local animation, sprite = self:play_animation(target, "HP_GAINED", value)
     animation:register_start_callback(function()
         sprite:set_ui_is_visible(true)
         sprite:set_hp(after, max)
-        self:send_message(self:format_name(target) .. " gained " .. self:format_hp(offset))
+        self:send_message(self:format_name(target) .. " gained " .. self:format_hp(value))
     end)
 
     bt.mutate_entity(target, function(target)
@@ -348,14 +270,13 @@ function bt.BattleScene:add_hp(target_id, value)
 end
 
 --- @brief
-function bt.BattleScene:reduce_hp(target_id, value)
+function bt.BattleScene:reduce_hp(target, value)
     if value < 0 then
         self:add_hp(math.abs(value))
         return
     end
     if value == 0 then return end
 
-    local target = self:get_entity(target_id)
     local current = target:get_hp()
     local after = clamp(target:get_hp() - value, 0)
     local offset = math.abs(current - after)
@@ -371,10 +292,10 @@ function bt.BattleScene:reduce_hp(target_id, value)
         end)
 
         if target:get_is_knocked_out() then
-            self:kill(target_id)
+            self:kill(target)
         else
             if after <= 0 then
-                self:knock_out(target_id)
+                self:knock_out(target)
             else
                 bt.mutate_entity(target, function(target)
                     target.hp_current = after
@@ -385,8 +306,7 @@ function bt.BattleScene:reduce_hp(target_id, value)
 end
 
 --- @brief
-function bt.BattleScene:add_status(target_id, status_id)
-    local target = self:get_entity(target_id)
+function bt.BattleScene:add_status(target, status_id)
     local status = bt.Status(status_id)
 
     if target:get_status(status_id) ~= nil then
@@ -408,12 +328,11 @@ function bt.BattleScene:add_status(target_id, status_id)
         target:add_status(status)
     end)
 
-    bt.safe_invoke(status.on_gained, bt.BattleEntityInterface(self,))
+    --bt.safe_invoke(status.on_gained, bt.BattleEntityInterface(self,))
 end
 
 --- @brief
-function bt.BattleScene:remove_status(target_id, status_id)
-    local target = self:get_entity(target_id)
+function bt.BattleScene:remove_status(target, status_id)
     local status = target:get_status(status_id)
 
     if status == nil then

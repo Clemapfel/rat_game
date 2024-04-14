@@ -18,12 +18,10 @@ return {
     bonus_description = "50% more damage, priorty",
 
     effect = function(user, targets)
-        local damage = user:get_attack()
-        if user:stance_matches(self.alignment) then
-            damage = damage * 1.5
+        println(_G.global)
+        if user:get_hp() == user:get_hp_base() then
+            _G.global = 1234
         end
-        for target in targets do
-            target:deal_damage(damage)
-        end
+        user:reduce_hp(30)
     end
 }

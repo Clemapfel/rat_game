@@ -95,7 +95,7 @@ function println(...)
 
     local values = {...}
     if #values == 0 then
-        io.write("nil")
+        io.write("nil\n")
         return
     end
 
@@ -364,7 +364,7 @@ function serialize(object_identifier, object, inject_sourcecode)
         return table.concat(str_buffer)
     end
 
-    local serialize_inner = function (buffer, object, n_indent_tabs, seen)
+    serialize_inner = function (buffer, object, n_indent_tabs, seen)
 
         if type(object) == "number" then
             insert(buffer, object)

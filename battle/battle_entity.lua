@@ -133,6 +133,53 @@ function bt.BattleEntity:realize()
     meta.set_is_mutable(self, false)
 end
 
+--- @brief calculate value of state, takes into account all statuses
+function bt.BattleEntity:_calculate_stat(which)
+    local value = self[which .. "_base"]
+
+    -- additive
+    for entry in values(self.status) do
+        local status = entry.status
+        value = value + status[which .. "_offset"]
+    end
+
+    -- multiplicative
+    for entry in values(self.status) do
+        local status = entry.status
+        value = value * status[which .. "_factor"]
+    end
+end
+
+--- @brief
+function bt.BattleEntity:get_attack()
+    return self:_calculate_stat("attack")
+end
+
+--- @brief
+function bt.BattleEntity:get_attack_base()
+    return self.attack_base
+end
+
+--- @brief
+function bt.BattleEntity:get_defense()
+    return self:_calculate_stat("defense")
+end
+
+--- @brief
+function bt.BattleEntity:get_defense_base()
+    return self.defense_base
+end
+
+--- @brief
+function bt.BattleEntity:get_speed()
+    return self:_calculate_stat("speed")
+end
+
+--- @brief
+function bt.BattleEntity:get_speed_base()
+    return self.speed_base
+end
+
 --- @brief
 function bt.BattleEntity:get_is_enemy()
     return self.is_enemy
@@ -217,6 +264,15 @@ function bt.BattleEntity:remove_status(status)
 end
 
 --- @brief
+function bt.BattleEntity:list_statuses()
+    local out = {}
+    for entry in values(self.status) do
+        table.insert(out, entry.status)
+    end
+    return out
+end
+
+--- @brief
 function bt.BattleEntity:get_stance()
     return self.stance
 end
@@ -234,6 +290,11 @@ end
 --- @brief
 function bt.BattleEntity:get_is_dead()
     return self.state == bt.BattleEntityState.DEAD
+end
+
+--- @brief
+function bt.BattleEntity:get_is_alive()
+    return (not self:get_is_knocked_out()) and (not self:get_is_dead())
 end
 
 --- @brief

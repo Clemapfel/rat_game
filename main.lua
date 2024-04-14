@@ -1,5 +1,21 @@
 require "include"-- Initializes color values
 
+--[[
+function callback()
+    println(global)
+    global = 1234
+end
+
+local env = {
+    println = _G.println
+}
+debug.setfenv(callback, env)
+callback()
+callback()
+
+dbg(env)
+]]--
+
 rt.SpriteAtlas = rt.SpriteAtlas()
 rt.SpriteAtlas:initialize("assets/sprites")
 
@@ -55,7 +71,11 @@ input:signal_connect("pressed", function(_, which)
     if which == rt.InputButton.A then
         scene:skip()
     elseif which == rt.InputButton.B then
-        scene:use_move(small_ufo:get_id(), "TEST_MOVE")
+        local status_proxy = bt.StatusInterface(scene, small_ufo, test_status)
+        local proxy = bt.EntityInterface(scene, small_ufo)
+        local move = bt.Move("TEST_MOVE")
+        scene:play_animation(small_ufo, "MESSAGE", "Test Move", scene:format_name(small_ufo) .. " used Test Move")
+        bt.safe_invoke(move, "effect", proxy, proxy)
     elseif which == rt.InputButton.X then
     elseif which == rt.InputButton.Y then
     elseif which == rt.InputButton.UP then

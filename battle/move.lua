@@ -114,11 +114,6 @@ function bt.Move:realize()
     meta.assert_function(config.effect)
     self.effect = config.effect
 
-    if config.bonus_effect ~= nil then
-        self.bonus_effect = config.bonus_effect
-        meta.assert_function(self.bonus_effect)
-    end
-
     self._is_realized = true
     meta.set_is_mutable(self, false)
 
