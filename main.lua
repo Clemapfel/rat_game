@@ -67,6 +67,8 @@ local info = bt.VerboseInfo()
 local info_hidden = false
 
 small_ufo:add_move(bt.Move("TEST_MOVE"))
+small_ufo:add_equip(bt.Equip("TEST_EQUIP"))
+dbg(bt.EquipInterface(scene, bt.Equip("TEST_EQUIP")))
 
 input = rt.InputController()
 input:signal_connect("pressed", function(_, which)
@@ -84,7 +86,6 @@ input:signal_connect("pressed", function(_, which)
         --scene:use_move(small_ufo, "TEST_MOVE", small_ufo)
         --scene:add_status(small_ufo, "DEBUG_STATUS")
         --scene:start_turn()
-        scene:add_status(scene, "DEBUG_STATUS")
     elseif which == rt.InputButton.X then
     elseif which == rt.InputButton.Y then
     elseif which == rt.InputButton.UP then

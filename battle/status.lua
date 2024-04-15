@@ -2,7 +2,7 @@ rt.settings.battle.status = {
     config_path = "assets/battle/status"
 }
 
---- @brief Status
+--- @class Status
 --- @brief cached instancing, moves with the same ID will always return the same instance
 bt.Status = meta.new_type("Status", function(id)
     local out = bt.Status._atlas[id]
@@ -169,6 +169,7 @@ end, {
 
     is_silent = false,
 
+    description = "",
     sprite_id = "",
     sprite_index = 1
 })

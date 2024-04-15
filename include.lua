@@ -170,7 +170,7 @@ require "battle.stance"
 require "battle.move_selection"
 require "battle.status"
 require "battle.consumable"
-require "battle.equippable"
+require "battle.equip"
 require "battle.move"
 
 require "battle.battle_entity"

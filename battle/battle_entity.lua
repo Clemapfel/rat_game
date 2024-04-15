@@ -46,9 +46,11 @@ end, {
     speed_base = 100,
 
     priority = 0,
-    status = {}, -- Table<bt.Status, Number>
-    move = {}, -- Table<MoveID, {move: bt:move, n_uses: Number}>
     stance = bt.Stance("NEUTRAL"),
+
+    status = {}, -- Table<bt.Status, {status: bt.Status, elapsed: Number}>
+    move = {}, -- Table<MoveID, {move: bt:move, n_uses: Number}>
+    equips = {}, -- Table<EquipID, {equip: bt.Equip}>
 
     state = bt.BattleEntityState.ALIVE,
 
@@ -132,7 +134,7 @@ end
 
 --- @brief calculate value of state, takes into account all statuses
 function bt.BattleEntity:_calculate_stat(which)
-    local value = self[which .. "_base"]
+    local value = self["get_" .. which .. "_base"](self)
 
     -- additive
     for entry in values(self.status) do
@@ -145,6 +147,55 @@ function bt.BattleEntity:_calculate_stat(which)
         local status = entry.status
         value = value * status[which .. "_factor"]
     end
+
+    for entry in values(self.equips) do
+        local equip = entry.equip
+        value = value * equip[which .. "_factor"]
+    end
+
+    return value
+end
+
+--- @brief
+function bt.BattleEntity:_calculate_stat_base(which)
+    local value = self[which .. "_base"]
+    for entry in values(self.equips) do
+        local equip = entry.equip
+        value = value + equip[which .. "_base_offset"]
+    end
+
+    if value < 0 then value = 1 end
+    return value
+end
+
+--- @brief
+function bt.BattleEntity:get_attack_base_raw()
+    return self.attack_base
+end
+
+--- @brief
+function bt.BattleEntity:get_defense_base_raw()
+    return self.defense_base
+end
+
+--- @brief
+function bt.BattleEntity:get_speed_base_raw()
+    return self.speed_base
+end
+
+--- @brief
+function bt.BattleEntity:get_attack_base()
+    return self:_calculate_stat_base("attack")
+end
+
+--- @brief
+function bt.BattleEntity:get_defense_base()
+    return self:_calculate_stat_base("defense")
+end
+
+--- @brief
+function bt.BattleEntity:get_speed_base()
+    return self:_calculate_stat_base("speed")
 end
 
 --- @brief
@@ -153,28 +204,13 @@ function bt.BattleEntity:get_attack()
 end
 
 --- @brief
-function bt.BattleEntity:get_attack_base()
-    return self.attack_base
-end
-
---- @brief
 function bt.BattleEntity:get_defense()
     return self:_calculate_stat("defense")
 end
 
 --- @brief
-function bt.BattleEntity:get_defense_base()
-    return self.defense_base
-end
-
---- @brief
 function bt.BattleEntity:get_speed()
     return self:_calculate_stat("speed")
-end
-
---- @brief
-function bt.BattleEntity:get_speed_base()
-    return self.speed_base
 end
 
 --- @brief
@@ -203,17 +239,19 @@ end
 
 --- @brief
 function bt.BattleEntity:get_hp_base()
+    local value = self.hp_base
+    for entry in values(self.equippables) do
+        local equip = entry.equip
+        value = value + equip.hp_base_offset
+    end
+
+    if value < 0 then value = 1 end
+    return value
+end
+
+--- @brief
+function bt.BattleEntity:get_hp_base_raw()
     return self.hp_base
-end
-
---- @brief
-function bt.BattleEntity:get_speed()
-    return self.speed_base
-end
-
---- @brief
-function bt.BattleEntity:get_speed_base()
-    return self.speed_base
 end
 
 --- @brief
@@ -321,4 +359,21 @@ function bt.BattleEntity:add_move(move)
         move = move,
         n_uses = move.max_n_uses
     }
+end
+
+--- @brief
+function bt.BattleEntity:add_equip(equip)
+    self.equips[equip:get_id()] = {
+        equip = equip
+    }
+end
+
+--- @brief
+function bt.BattleEntity:get_equip(equip_id)
+    local entry = self.equips[equip_id]
+    if entry == nil then
+        return nil
+    else
+        return entry.equip
+    end
 end

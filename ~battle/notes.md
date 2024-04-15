@@ -54,7 +54,7 @@ struct Consumable {
     effect  = (self, user) -> nil
 }
 
-struct Equippable {
+struct Equip {
     hp_base_offset = Integer
     attack_offset     = Integer
     defense_offset    = Integer
