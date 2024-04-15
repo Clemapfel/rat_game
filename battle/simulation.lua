@@ -32,12 +32,20 @@ function bt.BattleScene:play_animation(entity, animation_id, ...)
     if bt.Animation[animation_id] == nil then
         rt.error("In bt.BattleScene:play_animation: no animation with id `" .. animation_id .. "`")
     end
+    local sprite
+    if meta.isa(entity, bt.BattleEntity) then
+        sprite = self:get_sprite(entity)
+    elseif meta.isa(entity, bt.BattleScene) then
+        sprite = self
+    else
+        rt.error("In bt.BattleScene:play_animation: unhandled animation target `" .. meta.typeof(entity) .. "`")
+    end
 
-    local sprite = self:get_sprite(entity)
     local animation = bt.Animation[animation_id](self, sprite, ...)
     sprite:add_animation(animation)
     return animation, sprite
 end
+
 
 --- @brief
 function bt.BattleScene:get_entity(id)
@@ -84,19 +92,16 @@ end
 
 --- @brief
 function bt.BattleScene:start_turn()
-    self:play_animation(table.first(self._entities), "TURN_START")
+    self:play_animation(self, "TURN_START")
     for target in values(self._entities) do
         for status in values(target:list_statuses()) do
-            println(target:get_id(), status:get_id())
-            if status.on_turn_start ~= nil then
-                if not status.is_silent then
-                    local animation, _ = self:play_animation(target, "STATUS_APPLIED", status)
-                    animation:register_start_callback(function()
-                        self:send_message(self:format_name(status) .. " activated on turn start")
-                    end)
-                end
-                self:_invoke_status_callback(target, status, "on_turn_start")
+            if not status.is_silent then
+                local animation, _ = self:play_animation(target, "STATUS_APPLIED", status)
+                animation:register_start_callback(function()
+                    self:send_message(self:format_name(status) .. " activated on turn start")
+                end)
             end
+            self:_invoke_status_callback(target, status, "on_turn_start")
         end
     end
 end

@@ -192,6 +192,7 @@ end
 -- TODO
 
 require "battle.animation_queue"
+require "battle.battle_animation_target"
 require "battle.party_info"
 require "battle.backdrop"
 require "battle.battle_log"

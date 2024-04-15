@@ -11,7 +11,7 @@ bt.EnemySpriteAlignmentMode = meta.new_enum({
 })
 
 --- @class bt.BattleScene
-bt.BattleScene = meta.new_type("BattleScene", rt.Widget, function()
+bt.BattleScene = meta.new_type("BattleScene", rt.Widget, bt.BattleAnimationTarget, function()
     local out = meta.new(bt.BattleScene, {
         _debug_draw_enabled = false,
         _entities = {}, -- Table<bt.Entity>
@@ -32,6 +32,7 @@ bt.BattleScene = meta.new_type("BattleScene", rt.Widget, function()
         _gradient_left = {},  -- rt.LogGradient
 
         _animation_queue = bt.AnimationQueue(),
+        _ui_is_visible = true,
         _elapsed = 0,
     })
     return out
@@ -164,7 +165,9 @@ function bt.BattleScene:draw()
         end
     end
 
-    if self._priority_queue_is_visible then
+    self._animation_queue:draw()
+
+    if self._priority_queue_is_visible and self._ui_is_visible == true then
         self._priority_queue:draw()
     end
 
@@ -352,4 +355,19 @@ function bt.BattleScene:skip()
     for sprite in values(self._enemy_sprites) do
         sprite:sync()
     end
+end
+
+--- @brief
+function bt.BattleScene:set_ui_is_visible(b)
+    self._ui_is_visible = b
+end
+
+--- @brief
+function bt.BattleScene:measure()
+    return rt.graphics.get_width(), rt.graphics.get_height()
+end
+
+--- @brief
+function bt.BattleScene:get_bounds()
+    return rt.AABB(0, 0, rt.graphics.get_width(), rt.graphics.get_height())
 end

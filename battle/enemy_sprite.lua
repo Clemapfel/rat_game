@@ -4,7 +4,7 @@ rt.settings.battle.enemy_sprite = {
 }
 
 --- @class bt.EnemySprite
-bt.EnemySprite = meta.new_type("EnemySprite", rt.Widget, rt.Animation, function(scene, entity)
+bt.EnemySprite = meta.new_type("EnemySprite", rt.Widget, rt.Animation, bt.BattleAnimationTarget, function(scene, entity)
     return meta.new(bt.EnemySprite, {
         _entity = entity,
         _scene = scene,

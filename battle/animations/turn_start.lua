@@ -3,9 +3,10 @@ rt.settings.battle.animations.turn_start = {
 }
 
 --- @class bt.Animation.TURN_START
-bt.Animation.TURN_START = meta.new_type("TURN_START", bt.Animation, function(scene)
+bt.Animation.TURN_START = meta.new_type("TURN_START", bt.Animation, function(scene, target)
     return meta.new(bt.Animation.TURN_START, {
         _scene = scene,
+        _target = target,
 
         _label = {},          -- rt.Glyph
         _tunnel_top = {}, -- rt.LogGradient
@@ -68,10 +69,10 @@ function bt.Animation.TURN_START:update(delta)
     -- label animation
     local label_w, label_h = self._label:measure()
     local pos_x = label_pos(fraction)
-
+    local w, h = self._target:measure()
     self._label:fit_into(
-        pos_x * rt.graphics.get_width() - 0.5 * label_w,
-        0.5 * rt.graphics.get_height() - 0.5 * label_h,
+        pos_x * w - 0.5 * label_w,
+        0.5 * h - 0.5 * label_h,
         label_w, label_h
     )
 
