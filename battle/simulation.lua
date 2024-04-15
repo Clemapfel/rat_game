@@ -91,6 +91,23 @@ end
 -- ### SIMULATION ACTIONS ###
 
 --- @brief
+function bt.BattleScene:start_battle()
+    for entity in values(self._entities) do
+        for equip in values(entity:list_equips()) do
+            if equip.effect ~= nil then
+                local holder_proxy = bt.EntityInterface(self, entity)
+                local equip_proxy = bt.EquipInterface(self, equip)
+                self:play_animation(entity, "MESSAGE",
+                    equip:get_name(),
+                    self:format_name(entity) .. "s " .. self:format_name(equip) .. " activates"
+                )
+                bt.safe_invoke(self, equip, "effect", equip_proxy, holder_proxy)
+            end
+        end
+    end
+end
+
+--- @brief
 function bt.BattleScene:start_turn()
     self:play_animation(self, "TURN_START")
     for target in values(self._entities) do

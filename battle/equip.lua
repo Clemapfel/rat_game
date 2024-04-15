@@ -28,6 +28,7 @@ end, {
    defense_factor = 1,
    speed_factor = 1,
 
+   is_silent = true,
    effect = function(self, holder)
        meta.assert_is_equip_interface(self)
        meta.assert_is_entity_interface(holder)
@@ -52,6 +53,18 @@ function bt.Equip:realize()
     local config = chunk()
     meta.set_is_mutable(self, true)
 
+    local strings = {
+        "name",
+        "description"
+    }
+
+    for _, key in ipairs(strings) do
+        if config[key] ~= nil then
+            self[key] = config[key]
+        end
+        meta.assert_string(self[key])
+    end
+
     local numbers = {
         "hp_base_offset",
         "attack_base_offset",
@@ -69,6 +82,11 @@ function bt.Equip:realize()
         end
         meta.assert_number(self[key])
     end
+
+    if config.is_silent ~= nil then
+        self.is_silent = config.is_silent
+    end
+    meta.assert_boolean(self.is_silent)
 
     if config.effect ~= nil then
         self.effect = config.effect

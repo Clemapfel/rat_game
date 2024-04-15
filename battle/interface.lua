@@ -68,7 +68,11 @@ function bt.safe_invoke(scene, instance, callback_id, ...)
         "is_status_interface",
         "assert_is_status_interface",
         "is_entity_interface",
-        "assert_is_entity_interface"
+        "assert_is_entity_interface",
+        "is_equip_interface",
+        "assert_is_equip_interface",
+        "is_consumable_interface",
+        "assert_is_consumable_interface"
     ) do
         env.meta[yes] = meta[yes]
     end

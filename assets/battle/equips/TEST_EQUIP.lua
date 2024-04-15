@@ -11,6 +11,8 @@ return {
     speed_factor = 1,
 
     effect = function(self, holder)
-
+        meta.assert_is_equip_interface(self)
+        meta.assert_is_entity_interface(holder)
+        println("[EQUIP] In " .. self:get_id() .. ".effect: effect applied to `" .. holder:get_id() .. "`")
     end
 }

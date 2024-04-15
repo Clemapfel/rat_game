@@ -377,3 +377,12 @@ function bt.BattleEntity:get_equip(equip_id)
         return entry.equip
     end
 end
+
+--- @brief
+function bt.BattleEntity:list_equips()
+    local out = {}
+    for entry in values(self.equips) do
+        table.insert(out, entry.equip)
+    end
+    return out
+end
