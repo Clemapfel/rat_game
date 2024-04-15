@@ -85,7 +85,7 @@ function bt.BattleScene:_invoke_status_callback(entity, status, callback_id, ...
         end
     end
 
-    return bt.safe_invoke(status, callback_id, status_proxy, holder_proxy, table.unpack(targets))
+    return bt.safe_invoke(self, status, callback_id, status_proxy, holder_proxy, table.unpack(targets))
 end
 
 -- ### SIMULATION ACTIONS ###
@@ -150,7 +150,7 @@ function bt.BattleScene:use_move(user, move_id, targets)
         table.insert(target_proxies, bt.EntityInterface(self, target))
     end
 
-    bt.safe_invoke(move, "effect", user_proxy, table.unpack(target_proxies))
+    bt.safe_invoke(self, move, "effect", user_proxy, table.unpack(target_proxies))
 end
 
 --- @brief

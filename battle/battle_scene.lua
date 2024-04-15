@@ -33,7 +33,8 @@ bt.BattleScene = meta.new_type("BattleScene", rt.Widget, bt.BattleAnimationTarge
 
         _animation_queue = bt.AnimationQueue(),
         _ui_is_visible = true,
-        _elapsed = 0,
+
+        _elapsed = 0
     })
     return out
 end)
@@ -370,4 +371,32 @@ end
 --- @brief
 function bt.BattleScene:get_bounds()
     return rt.AABB(0, 0, rt.graphics.get_width(), rt.graphics.get_height())
+end
+
+--- @brief
+function bt.BattleScene:get_global_status(status_id)
+    if self.status[status_id] == nil then return nil end
+    return self.status[status_id].status
+end
+
+--- @brief
+function bt.BattleScene:add_global_status(status)
+    self.status[status:get_id()] = {
+        elapsed = 0,
+        status = status
+    }
+end
+
+--- @brief
+function bt.BattleScene:remove_global_status(status)
+    self.status[status:get_id()] = nil
+end
+
+--- @brief
+function bt.BattleScene:list_global_statuses()
+    local out = {}
+    for entry in values(self.status) do
+        table.insert(out, entry.status)
+    end
+    return out
 end

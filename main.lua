@@ -84,7 +84,7 @@ input:signal_connect("pressed", function(_, which)
         --scene:use_move(small_ufo, "TEST_MOVE", small_ufo)
         --scene:add_status(small_ufo, "DEBUG_STATUS")
         --scene:start_turn()
-        scene:play_animation(scene, "STATUS_GAINED", bt.Status("DEBUG_STATUS"))
+        scene:add_status(scene, "DEBUG_STATUS")
     elseif which == rt.InputButton.X then
     elseif which == rt.InputButton.Y then
     elseif which == rt.InputButton.UP then

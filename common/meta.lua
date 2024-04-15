@@ -364,7 +364,6 @@ function meta.instances(enum)
     return enum[1][1]
 end
 
-
 --- @brief check if type of object is as given
 --- @param type meta.Type (or String)
 --- @return Boolean
@@ -375,7 +374,6 @@ function meta.isa(x, type)
     else
         return metatable.super[type._typename] == true
     end
-
 end
 
 --- @brief check if value is part of enum

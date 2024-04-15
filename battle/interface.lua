@@ -1,8 +1,7 @@
-bt._safe_invoke_shared = {}
 bt._safe_invoke_catch_errors = false
 
 --- @brief invoke a script callback in a safe, sandboxed environment
-function bt.safe_invoke(instance, callback_id, ...)
+function bt.safe_invoke(scene, instance, callback_id, ...)
     -- setup fenv, done everytime to reset any globals
     local env = {}
     for common in range(
@@ -75,7 +74,8 @@ function bt.safe_invoke(instance, callback_id, ...)
     end
 
     -- shared environment, not reset between calls
-    env._G = bt._safe_invoke_shared
+    if scene._safe_invoke_shared == nil then scene._safe_invoke_shared = {} end
+    env._G = scene._safe_invoke_shared
 
     setmetatable(env, {})
     local metatable = getmetatable(env)
