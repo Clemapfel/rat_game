@@ -66,22 +66,25 @@ rt.current_scene:set_debug_draw_enabled(false)
 local info = bt.VerboseInfo()
 local info_hidden = false
 
+small_ufo:add_move(bt.Move("TEST_MOVE"))
+
 input = rt.InputController()
 input:signal_connect("pressed", function(_, which)
     if which == rt.InputButton.A then
         scene:skip()
     elseif which == rt.InputButton.B then
+        --[[
         local status_proxy = bt.StatusInterface(scene, small_ufo, test_status)
         local proxy = bt.EntityInterface(scene, small_ufo)
         local move = bt.Move("TEST_MOVE")
         scene:play_animation(small_ufo, "MESSAGE", "Test Move", scene:format_name(small_ufo) .. " used Test Move")
         bt.safe_invoke(move, "effect", proxy, proxy)
+        ]]--
+        scene:use_move(small_ufo, "TEST_MOVE", small_ufo)
     elseif which == rt.InputButton.X then
     elseif which == rt.InputButton.Y then
     elseif which == rt.InputButton.UP then
-        scene:add_status(small_ufo:get_id(), "DEBUG")
     elseif which == rt.InputButton.DOWN then
-        scene:remove_status(small_ufo:get_id(), "DEBUG")
     elseif which == rt.InputButton.LEFT then
     elseif which == rt.InputButton.RIGHT then
     elseif which == rt.InputButton.R then

@@ -59,43 +59,54 @@ function bt.mutate_entity(entity, f, ...)
     meta.set_is_mutable(entity, false)
 end
 
+-- ### SIMULATION ACTIONS ###
+
 --- @brief
 function bt.BattleScene:end_turn()
     -- TODO: remove dead entities from priority queue and enemy sprites, also resolve game over
 end
 
 --- @brief
-function bt.BattleScene:use_move(target, move_id)
-    local move = target:get_move(move_id)
-
+function bt.BattleScene:use_move(user, move_id, targets)
+    local move = user:get_move(move_id)
     if move == nil then
-        rt.error("In bt.Battlescene:use_move: entity `" .. target:get_id() .. "` does not have move `" .. move_id .. "` in moveset")
+        rt.error("In bt.Battlescene:use_move: entity `" .. user:get_id() .. "` does not have move `" .. move_id .. "` in moveset")
         return
     end
 
-    self._current_move_user = target
+    self._current_move_user = user
     self._current_move = move
 
-    local n_left = target:get_move_n_uses_left(move_id)
+    local n_left = user:get_move_n_uses_left(move_id)
 
     if n_left < 1 then
-        self:play_animation(target, "MESSAGE",
+        self:play_animation(user, "MESSAGE",
             move:get_name() .. " FAILED",
-            self:format_name(target) .. " tried to use <b>" .. move:get_name() .. "</b> but it has no uses left"
+            self:format_name(user) .. " tried to use <b>" .. move:get_name() .. "</b> but it has no uses left"
         )
         return
     end
 
-    self:play_animation(target, "MESSAGE",
-        move:get_name() .. " FAILED",
-        self:format_name(target) .. " used <b>" .. move:get_name() .. "</b>"
+    self:play_animation(user, "MESSAGE",
+        move:get_name(),
+        self:format_name(user) .. " used <b>" .. move:get_name() .. "</b>"
     )
 
-    bt.mutate_entity(target, function(target)
+    bt.mutate_entity(user, function(target)
         target.moveset[move_id].n_uses = n_left - 1
     end)
 
-    -- TODO: apply move script
+    local user_proxy = bt.EntityInterface(self, user)
+    if meta.isa(targets, bt.BattleEntity) then
+        targets = {targets}
+    end
+
+    local target_proxies = {}
+    for target in values(targets) do
+        table.insert(target_proxies, bt.EntityInterface(self, target))
+    end
+
+    bt.safe_invoke(move, "effect", user_proxy, table.unpack(target_proxies))
 end
 
 --- @brief

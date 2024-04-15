@@ -123,10 +123,7 @@ function bt.BattleEntity:realize()
     config.moveset = which(config.moveset, {})
     for move_id in values(config.moveset) do
         local move = bt.Move(move_id)
-        self.moveset[move_id] = {
-            move = move,
-            n_uses = move.max_n_uses
-        }
+        self:add_move(move)
     end
 
     self._is_realized = true
@@ -309,11 +306,19 @@ end
 
 --- @brief
 function bt.BattleEntity:get_move(move_id)
-    if self.status[move_id] == nil then return nil end
+    if self.moveset[move_id] == nil then return nil end
     return self.moveset[move_id].move
 end
 
 --- @brief
 function bt.BattleEntity:get_move_n_uses_left(id)
     return self.moveset[id].n_uses
+end
+
+--- @brief
+function bt.BattleEntity:add_move(move)
+    self.moveset[move:get_id()] = {
+        move = move,
+        n_uses = move.max_n_uses
+    }
 end

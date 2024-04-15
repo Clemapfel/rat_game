@@ -18,10 +18,6 @@ return {
     bonus_description = "50% more damage, priorty",
 
     effect = function(user, targets)
-        println(_G.global)
-        if user:get_hp() == user:get_hp_base() then
-            _G.global = 1234
-        end
         user:reduce_hp(30)
     end
 }
