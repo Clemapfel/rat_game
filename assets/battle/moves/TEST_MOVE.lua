@@ -18,6 +18,6 @@ return {
     bonus_description = "50% more damage, priorty",
 
     effect = function(user, targets)
-        user:reduce_hp(30)
+        user:reduce_hp(150)
     end
 }

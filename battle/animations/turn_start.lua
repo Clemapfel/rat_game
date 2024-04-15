@@ -27,7 +27,6 @@ function bt.Animation.TURN_START:start()
     local x, y = 0, 0.5 * h
     local tunnel_height = 0.25 * h
 
-
     local r, g, b, a = 0, 0, 0, 0.75
     self._tunnel_top = rt.LogGradient(rt.RGBA(r, g, b, a), rt.RGBA(r, g, b, 0))
     self._tunnel_bottom = rt.LogGradient(rt.RGBA(r, g, b, 0), rt.RGBA(r, g, b, a))
@@ -77,9 +76,16 @@ function bt.Animation.TURN_START:update(delta)
     )
 
     -- tunnel fade
-    local fade_duration = 0.1
+    local fade_duration = 0.2
     local function tunnel_alpha(x)
-        return rt.fade_ramp(x, duration)
+        local order = 2
+        if x < fade_duration then
+            return rt.butterworth_highpass(x / fade_duration, order)
+        elseif x > 1 - fade_duration then
+            return rt.butterworth_lowpass((1 - x) / fade_duration, order)
+        else
+            return 1
+        end
     end
 
     self._tunnel_top:set_opacity(tunnel_alpha(fraction))

@@ -24,9 +24,11 @@ function bt.Animation.STATUS_APPLIED:start()
         self._target:realize()
     end
 
-    self._label = rt.Label("<o>Status Gained: <b><mono>" .. self._status.id .. "</mono></b></o>")
+    self._label = rt.Label("<o>Status Applied: <b><mono>" .. self._status:get_name() .. "</mono></b></o>")
     self._label:realize()
     self._label_path = {}
+
+    self._target:activate_status(self._status)
 
     self._target_snapshot = rt.SnapshotLayout()
     self._target_snapshot:realize()

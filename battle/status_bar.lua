@@ -4,6 +4,8 @@ rt.settings.battle.status_bar = {
     add_animation_max_scale = 5,
     add_animation_duration = 1, -- seconds
     hide_animation_duration = 2, -- seconds
+    activate_animation_duration = 1,
+    activate_scale_peak = 3,
     element_alignment = rt.Alignment.CENTER
 }
 
@@ -27,6 +29,7 @@ function bt.StatusBar:update(delta)
     local add_duration = rt.settings.battle.status_bar.add_animation_duration
     local max_scale = rt.settings.battle.status_bar.add_animation_max_scale
     local hide_duration = rt.settings.battle.status_bar.hide_animation_duration
+    local activate_duration = rt.settings.battle.status_bar.activate_animation_duration
 
     for which, e in pairs(self._elements) do
         -- move towards correct place animation
@@ -52,8 +55,8 @@ function bt.StatusBar:update(delta)
             end
         end
 
-        -- add / hide animation
         if e.is_revealing or e.is_hiding then
+            -- add / hide animation
             e.elapsed = e.elapsed + delta
             if e.is_revealing then
                 local value = e.elapsed / add_duration
@@ -72,6 +75,17 @@ function bt.StatusBar:update(delta)
                     e.is_hiding = false
                     table.insert(to_remove, which)
                 end
+            end
+        elseif e.is_activating then
+            -- activate animation
+            e.activating_elapsed = e.activating_elapsed + delta
+            local scale = e.element:get_scale()
+            local fraction = e.activating_elapsed / activate_duration
+            e.element:set_scale(1 + rt.symmetrical_linear(fraction, rt.settings.battle.status_bar.activate_scale_peak - 1))
+            if fraction > 1 then
+                e.activating_elapsed = 0
+                e.is_activating = false
+                e.element:set_scale(1)
             end
         end
     end
@@ -175,8 +189,10 @@ function bt.StatusBar:add(status, elapsed)
     self._elements[status] = {
         element = element,
         elapsed = 0,
+        activating_elapsed = 0,
         is_revealing = true,
         is_hiding = false,
+        is_activating = false,
         initialized = false,
         current_x = 0,
         current_y = 0,
@@ -203,14 +219,26 @@ function bt.StatusBar:remove(status)
     end
 
     if not seen then
-        rt.warning("In bt.StatusBar:remove: status `" .. status:get_id() .. "` of entity `" .. entity:get_id() .. "` was not yet added to StatusBar")
+        rt.warning("In bt.StatusBar:remove: status `" .. status:get_id() .. "` of entity `" .. self._entity:get_id() .. "` was not yet added to StatusBar")
+    end
+end
+
+--- @brief
+function bt.StatusBar:activate(status)
+    for e in values(self._elements) do
+        if e.element._entity == self._entity and e.element._status == status then
+            e.is_activating = true
+            e.activating_elapsed = 0
+        end
     end
 end
 
 --- @brief
 --- @param statuses Table<bt.Status, Number> status to elapsed
 function bt.StatusBar:create_from(statuses)
-    for status, elapsed in pairs(statuses) do
+    for entry in values(statuses) do
+        local status = entry.status
+        local elapsed = entry.elapsed
         if self._elements[status] == nil then
             self:add(status, elapsed)
         else

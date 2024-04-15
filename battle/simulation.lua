@@ -59,7 +59,47 @@ function bt.mutate_entity(entity, f, ...)
     meta.set_is_mutable(entity, false)
 end
 
+--- @brief [internal]
+function bt.BattleScene:_invoke_status_callback(entity, status, callback_id, ...)
+    local scene = self
+
+    local holder_proxy = bt.EntityInterface(scene, entity)
+    local status_proxy = bt.StatusInterface(scene, entity, status)
+    local targets = {}
+
+    for target in values({...}) do
+        if meta.isa(target, bt.BattleEntity) then
+            table.insert(targets, bt.EntityInterface(scene, target))
+        elseif meta.isa(target, bt.Status) then
+            table.insert(targets, bt.StatusInterface(scene, entity, target))
+        else
+            rt.error("In bt.invoke_status_callback: no interface available for unhandled argument type `" .. meta.typeof(target) .. "`")
+        end
+    end
+
+    return bt.safe_invoke(status, callback_id, status_proxy, holder_proxy, table.unpack(targets))
+end
+
 -- ### SIMULATION ACTIONS ###
+
+--- @brief
+function bt.BattleScene:start_turn()
+    self:play_animation(table.first(self._entities), "TURN_START")
+    for target in values(self._entities) do
+        for status in values(target:list_statuses()) do
+            println(target:get_id(), status:get_id())
+            if status.on_turn_start ~= nil then
+                if not status.is_silent then
+                    local animation, _ = self:play_animation(target, "STATUS_APPLIED", status)
+                    animation:register_start_callback(function()
+                        self:send_message(self:format_name(status) .. " activated on turn start")
+                    end)
+                end
+                self:_invoke_status_callback(target, status, "on_turn_start")
+            end
+        end
+    end
+end
 
 --- @brief
 function bt.BattleScene:end_turn()
@@ -78,7 +118,6 @@ function bt.BattleScene:use_move(user, move_id, targets)
     self._current_move = move
 
     local n_left = user:get_move_n_uses_left(move_id)
-
     if n_left < 1 then
         self:play_animation(user, "MESSAGE",
             move:get_name() .. " FAILED",
@@ -123,10 +162,7 @@ function bt.BattleScene:kill(target)
 
     -- animation
     local animation, sprite = self:play_animation(target, "KILLED")
-    local statuses = {}
-    for status, _ in pairs(target.status) do
-        table.insert(statuses, status)
-    end
+    local statuses = target:list_statuses()
 
     animation:register_start_callback(function()
         self:send_message(self:format_name(target) .. " was <b>killed</b>")
@@ -171,10 +207,7 @@ function bt.BattleScene:knock_out(target)
 
     -- animation
     local animation, sprite = self:play_animation(target, "KNOCKED_OUT")
-    local statuses = {}
-    for status, _ in pairs(target.status) do
-        table.insert(statuses, status)
-    end
+    local statuses = target:list_statuses()
 
     animation:register_start_callback(function()
         self:send_message(self:format_name(target) .. " was <b><color=LIGHT_RED_3>knocked out</color></b>")
@@ -339,7 +372,15 @@ function bt.BattleScene:add_status(target, status_id)
         target:add_status(status)
     end)
 
-    --bt.safe_invoke(status.on_gained, bt.BattleEntityInterface(self,))
+    if status.on_gained ~= nil then
+        if not status.is_silent then
+            local animation, _ = self:play_animation(target, "STATUS_APPLIED", status)
+            animation:register_start_callback(function()
+                self:send_message(self:format_name(status) .. " activated on being acquired")
+            end)
+        end
+        self:_invoke_status_callback(target, status, "on_gained")
+    end
 end
 
 --- @brief
@@ -363,4 +404,14 @@ function bt.BattleScene:remove_status(target, status_id)
     bt.mutate_entity(target, function(target)
         target:remove_status(status)
     end)
+
+    if status.on_lost ~= nil then
+        if not status.is_silent then
+            local animation, _ = self:play_animation(target, "STATUS_APPLIED", status)
+            animation:register_start_callback(function()
+                self:send_message(self:format_name(status) .. " activated when fading")
+            end)
+        end
+        self:_invoke_status_callback(target, status, "on_lost")
+    end
 end

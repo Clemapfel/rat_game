@@ -73,6 +73,7 @@ end
 --- @brief maps [0, 0.5] to [0, peak], [0.5, 1] to [peak, 0], linear in both sections
 rt.symmetrical_linear = function(x, peak)
     peak = which(peak, 1)
+    if x < 0 or x > 1 then return 0 end
     return (1 - math.abs(2 * (x - 0.5))) / (1 / peak)
 end
 
@@ -139,4 +140,22 @@ end
 --- @brief triangle wave with amplitude 1 and given frequency
 rt.triangle_wave = function(x)
     return 4 * math.abs((x / math.pi) + 0.25 - math.floor((x / math.pi) + 0.75)) - 1
+end
+
+--- @brief
+rt.butterworth_bandpass = function(x, order)
+    order = which(order, 4)
+    return 1 / (1 + (4 * (x - 0.5)) ^ (2 * order))
+end
+
+--- @brief
+rt.butterworth_highpass = function(x, order)
+    order = which(order, 4)
+    if x > 1 then return 1 end
+    return 1 / (1 + (2 * (x - 1)) ^ (2 * order))
+end
+
+--- @brief
+rt.butterworth_lowpass = function(x, order)
+    return 1 - rt.butterworth_highpass(1 - x, order)
 end

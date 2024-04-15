@@ -7,28 +7,28 @@ return {
     sprite_index = 2,
     description = "Prints messages for every trigger payload",
 
-    on_gained = function(afflicted)
-        meta.asssert_isa(self, bt.Status)
-        meta.assert_isa(afflicted, bt.BattleEntity)
-        println("[STATUS][" .. self:get_id() .. "] " .. afflicted:get_id() .. " gained `" .. self:get_id() .. "`")
+    on_gained = function(self, afflicted)
+        meta.assert_is_status_interface(self)
+        meta.assert_is_entity_interface(afflicted)
+        println("[STATUS] In Status " .. self:get_id() .. ".on_gained: `" .. afflicted:get_id() .. "` gained `" .. self:get_id() .. "`")
         return nil
     end,
 
-    on_lost = function(afflicted)
-        meta.asssert_isa(self, bt.Status)
-        meta.assert_isa(afflicted, bt.BattleEntity)
-        println("[STATUS][" .. self:get_id() .. "] " .. afflicted:get_id() .. " lost `" .. self:get_id() .. "`")
+    on_lost = function(self, afflicted)
+        meta.assert_is_status_interface(self)
+        meta.assert_is_entity_interface(afflicted)
+        println("[STATUS] In Status " .. self:get_id() .. ".on_lost: `" .. afflicted:get_id() .. "` lost `" .. self:get_id() .. "`")
         return nil
     end,
 
-    on_start_of_turn = function(afflicted)
-        meta.asssert_isa(self, bt.Status)
-        meta.assert_isa(afflicted, bt.BattleEntity)
-        println("[STATUS][" .. self:get_id() .. "] " .. afflicted:get_id() .. " turn start")
+    on_turn_start = function(self, afflicted)
+        meta.assert_is_status_interface(self)
+        meta.assert_is_entity_interface(afflicted)
+        println("[STATUS] In Status " .. self:get_id() .. ".on_turn_start: `" .. afflicted:get_id() .. "` new turn start")
         return nil
     end,
 
-    on_end_of_turn = function(afflicted)
+    on_turn_end = function(afflicted)
         meta.asssert_isa(self, bt.Status)
         meta.assert_isa(afflicted, bt.BattleEntity)
         println("[STATUS][" .. self:get_id() .. "] " .. afflicted:get_id() .. " changed stance `" .. old_stance:get_id() .. "` to `" .. new_stance:get_id() .. "`")

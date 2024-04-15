@@ -32,7 +32,7 @@ local sprout_01 = bt.BattleEntity(scene, "WALKING_SPROUT")
 local sprout_02 = bt.BattleEntity(scene, "WALKING_SPROUT")
 local mole = bt.BattleEntity(scene, "GAMBLER_MOLE")
 
-local test_status = bt.Status("DEBUG")
+local test_status = bt.Status("DEBUG_STATUS")
 for entity in range(small_ufo) do
     scene:add_entity(entity)
 end
@@ -80,7 +80,10 @@ input:signal_connect("pressed", function(_, which)
         scene:play_animation(small_ufo, "MESSAGE", "Test Move", scene:format_name(small_ufo) .. " used Test Move")
         bt.safe_invoke(move, "effect", proxy, proxy)
         ]]--
-        scene:use_move(small_ufo, "TEST_MOVE", small_ufo)
+        --scene:add_status(small_ufo, "DEBUG_STATUS")
+        --scene:use_move(small_ufo, "TEST_MOVE", small_ufo)
+        scene:add_status(small_ufo, "DEBUG_STATUS")
+        scene:start_turn()
     elseif which == rt.InputButton.X then
     elseif which == rt.InputButton.Y then
     elseif which == rt.InputButton.UP then

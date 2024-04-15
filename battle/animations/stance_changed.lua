@@ -24,7 +24,7 @@ function bt.Animation.STANCE_CHANGED:start()
         self._target:realize()
     end
 
-    self._label = rt.Label("<o>Stance Changed: <b><mono>" .. self._stance.id .. "</mono></b></o>")
+    self._label = rt.Label("<o>Stance Changed: <b><mono>" .. self._status:get_name() .. "</mono></b></o>")
     self._label:set_alignment(rt.Alignment.CENTER)
     self._label:realize()
     self._label_path = {}

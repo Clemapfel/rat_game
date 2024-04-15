@@ -31,9 +31,9 @@ end, {
     max_duration = POSITIVE_INFINITY,
     is_field_effect = false,
 
-    on_gained = function(afflicted)
-        meta.asssert_isa(self, bt.Status)
-        meta.assert_isa(afflicted, bt.BattleEntity)
+    on_gained = function(self, afflicted)
+        meta.assert_is_status_interface(self)
+        meta.assert_is_entity_interface(afflicted)
         return nil
     end,
 
@@ -43,13 +43,13 @@ end, {
         return nil
     end,
 
-    on_start_of_turn = function(afflicted)
+    on_turn_start = function(afflicted)
         meta.asssert_isa(self, bt.Status)
         meta.assert_isa(afflicted, bt.BattleEntity)
         return nil
     end,
 
-    on_end_of_turn = function(afflicted)
+    on_turn_end = function(afflicted)
         meta.asssert_isa(self, bt.Status)
         meta.assert_isa(afflicted, bt.BattleEntity)
         return nil
@@ -236,8 +236,8 @@ function bt.Status:realize()
     local functions = {
         "on_gained",
         "on_lost",
-        "on_start_of_turn",
-        "on_end_of_turn",
+        "on_turn_start",
+        "on_turn_end",
         "on_battle_start",
         "on_battle_end",
         "on_damage_taken",

@@ -303,6 +303,9 @@ function bt.BattleScene:format_name(entity)
         if entity.is_enemy == true then
             name = "<color=ENEMY><b>" .. name .. "</b></color> "
         end
+    elseif meta.isa(entity, bt.Status) then
+        name = "<b><i>" .. entity:get_name() .. "</b></i>"
+
     else
         rt.error("In bt.BattleScene:get_formatted_name: unhandled entity type `" .. meta.typeof(entity) .. "`")
     end

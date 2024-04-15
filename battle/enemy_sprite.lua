@@ -208,6 +208,11 @@ function bt.EnemySprite:add_status(status)
 end
 
 --- @brief
+function bt.EnemySprite:activate_status(status)
+    self._status_bar:activate(status)
+end
+
+--- @brief
 function bt.EnemySprite:remove_status(status)
     self._status_bar:remove(status)
 end
