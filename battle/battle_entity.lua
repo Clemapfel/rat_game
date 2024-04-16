@@ -51,6 +51,7 @@ end, {
     status = {}, -- Table<bt.Status, {status: bt.Status, elapsed: Number}>
     move = {}, -- Table<MoveID, {move: bt:move, n_uses: Number}>
     equips = {}, -- Table<EquipID, {equip: bt.Equip}>
+    consumables = {}, --Table<ConsumableID, {consumable: bt.Consumable, n_consumed: Number}
 
     state = bt.BattleEntityState.ALIVE,
 
@@ -308,6 +309,29 @@ function bt.BattleEntity:list_statuses()
 end
 
 --- @brief
+function bt.BattleEntity:get_status_elapsed(status)
+    local entry = self.status[status:get_id()]
+    if entry == nil then
+        return nil
+    else
+        return entry.elapsed
+    end
+end
+
+--- @brief
+--- @return Boolean true if status is past its intended duration, false otherwise
+function bt.BattleEntity:increase_status_elapsed(status)
+    local entry = self.status[status:get_id()]
+    if entry == nil then
+        rt.warning("In bt.BattleEntity:increase_status_elapsed: entity `" .. self:get_id() .. "` does not have status `" .. status:get_id() .. "`")
+        return false
+    else
+        entry.elapsed = entry.elapsed + 1
+        return entry.elapsed >= status:get_max_duration()
+    end
+end
+
+--- @brief
 function bt.BattleEntity:get_stance()
     return self.stance
 end
@@ -385,4 +409,38 @@ function bt.BattleEntity:list_equips()
         table.insert(out, entry.equip)
     end
     return out
+end
+
+--- @brief
+function bt.BattleEntity:add_consumable(consumable)
+    self.consumables[consumable:get_id()] = {
+        consumable = consumable,
+        n_consumed = 0
+    }
+end
+
+--- @brief
+function bt.BattleEntity:get_consumable(consumable_id)
+    return self.consumables[consumable_id].consumable
+end
+
+--- @brief
+function bt.BattleEntity:list_consumables()
+    local out = {}
+    for entry in values(self.consumables) do
+        table.insert(out, entry.consumables)
+    end
+    return out
+end
+
+--- @brief
+function bt.BattleEntity:consume(consumable)
+    local entry = self.consumables[consumable:get_id()]
+    if entry == nil then
+        rt.warning("In bt.BattleEntity:consume: entity `" .. self:get_id() .. "` does not have consumable `" .. consumable.get_id() .. "` equipped")
+        return false
+    else
+        entry.n_consumed = entry.n_consumed + 1
+        return entry.n_consumed >= consumable:get_max_n_uses()
+    end
 end

@@ -125,7 +125,22 @@ end
 
 --- @brief
 function bt.BattleScene:end_turn()
-    -- TODO: remove dead entities from priority queue and enemy sprites, also resolve game over
+    self:play_animation(self, "TURN_END")
+    for target in values(self._entities) do
+        for status in values(target:list_statuses()) do
+            if not status.is_silent then
+                local animation, _ = self:play_animation(target, "STATUS_APPLIED", status)
+                animation:register_start_callback(function()
+                    self:send_message(self:format_name(status) .. " activated on turn end")
+                end)
+            end
+            self:_invoke_status_callback(target, status, "on_turn_end")
+
+            if target:increase_status_elapsed(status) then
+                self:remove_status(target, status)
+            end
+        end
+    end
 end
 
 --- @brief

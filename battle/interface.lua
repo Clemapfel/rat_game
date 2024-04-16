@@ -249,17 +249,6 @@ function bt.EntityInterface(scene, entity)
     return self
 end
 
-function meta.is_entity_interface(x)
-    local metatable = getmetatable(x)
-    return metatable ~= nil and metatable.type == "bt.EntityInterface"
-end
-
-function meta.assert_is_entity_interface(x)
-    if not meta.is_entity_interface(x) then
-        rt.error("In " .. debug.getinfo(2, "n").name .. ": Expected `bt.EntityInterface`, got `" .. meta.typeof(x) .. "`")
-    end
-end
-
 --- @class bt.StatusInterface
 function bt.StatusInterface(scene, entity, status)
     meta.assert_isa(scene, bt.BattleScene)
@@ -318,7 +307,7 @@ function bt.StatusInterface(scene, entity, status)
         else
             local out = rawget(self, key)
             if out == nil then
-                rt.warning("In bt.EntityInterface:__index: trying to access property `" .. key .. "` of Entity `" .. getmetatable(self).entity:get_id() .. "`, but it does not exist")
+                rt.warning("In bt.StatusInterface:__index: trying to access property `" .. key .. "` of Status `" .. getmetatable(self).original:get_id() .. "`, but it does not exist")
             end
             return out
         end
@@ -329,17 +318,6 @@ function bt.StatusInterface(scene, entity, status)
         return
     end
     return self
-end
-
-function meta.is_status_interface(x)
-    local metatable = getmetatable(x)
-    return metatable ~= nil and metatable.type == "bt.StatusInterface"
-end
-
-function meta.assert_is_status_interface(x)
-    if not meta.is_status_interface(x) then
-        rt.error("In " .. debug.getinfo(2, "n").name .. ": Expected `bt.StatusInterface`, got `" .. meta.typeof(x) .. "`")
-    end
 end
 
 --- @class bt.EquipInterface
@@ -405,7 +383,7 @@ function bt.EquipInterface(scene, equip)
         else
             local out = rawget(self, key)
             if out == nil then
-                rt.warning("In bt.EntityInterface:__index: trying to access property `" .. key .. "` of Entity `" .. getmetatable(self).entity:get_id() .. "`, but it does not exist")
+                rt.warning("In bt.EquipInterface:__index: trying to access property `" .. key .. "` of Equip `" .. getmetatable(self).original:get_id() .. "`, but it does not exist")
             end
             return out
         end
@@ -418,14 +396,78 @@ function bt.EquipInterface(scene, equip)
     return self
 end
 
-function meta.is_equip_interface(x)
-    local metatable = getmetatable(x)
-    return metatable ~= nil and metatable.type == "bt.EquipInterface"
+--- @class bt.ConsumableInterface
+function bt.ConsumableInterface(scene, entity, consumable)
+    meta.assert_isa(scene, bt.BattleScene)
+    meta.assert_isa(entity, bt.BattleEntity)
+    meta.assert_isa(consumable, bt.Consumable)
+
+    local self, metatable = {}, {}
+    setmetatable(self, metatable)
+
+    metatable.type = "bt.ConsumableInterface"
+    metatable.scene = scene
+    metatable.entity = entity
+    metatable.original = consumable
+
+    self.get_id = function(self)
+        return getmetatable(self).original:get_id()
+    end
+
+    self.get_name = function(self)
+        return getmetatable(self).original:get_name()
+    end
+
+    self.get_max_n_uses = function(self)
+        return getmetatable(self).original:get_max_n_uses()
+    end
+
+    metatable.getter_mapping = {
+        ["id"] = self.get_id,
+        ["name"] = self.get_name,
+        ["max_n_uses"] = self.get_max_n_uses
+    }
+
+    metatable.__index = function(self, key)
+        local getter = getmetatable(self).getter_mapping[key]
+        if getter ~= nil then
+            return getter(self)
+        else
+            local out = rawget(self, key)
+            if out == nil then
+                rt.warning("In bt.ConsumableInterface:__index: trying to access property `" .. key .. "` of Entity `" .. getmetatable(self).original:get_id() .. "`, but it does not exist")
+            end
+            return out
+        end
+    end
+
+    metatable.__newindex = function(self, key, value)
+        rt.warning("In bt.ConsumableInterface:__newindex: trying to set property `" .. key .. "` of Consumable `" .. getmetatable(self).original:get_id() .. "` to `" .. serialize(value) .. "`, but interface is immutable")
+        return
+    end
+    return self
 end
 
-function meta.assert_is_equip_interface(x)
-    if not meta.is_equip_interface(x) then
-        rt.error("In " .. debug.getinfo(2, "n").name .. ": Expected `bt.EquipInterface`, got `" .. meta.typeof(x) .. "`")
+-- generate meta assertions
+for which in values({
+    {"entity", "bt.EntityInterface"},
+    {"status", "bt.StatusInterface"},
+    {"equip", "bt.EquipInterface"},
+    {"consumable", "bt.ConsumableInterface"},
+}) do
+    local is_name = "is_" .. which[1] .. "_interface"
+
+    --- @brief get whether type is interface
+    meta[is_name] = function(x)
+        local metatable = getmetatable(x)
+        return metatable ~= nil and metatable.type == which[2]
+    end
+
+    --- @brief throw if type is not interface
+    meta["assert_" .. is_name] = function(x)
+        if not meta[is_name](x) then
+            rt.error("In " .. debug.getinfo(2, "n").name .. ": Expected `" .. which[2] .. "`, got `" .. meta.typeof(x) .. "`")
+        end
     end
 end
 

@@ -210,7 +210,7 @@ function bt.Status:realize()
         "max_duration"
     }
 
-    for _, key in ipairs(numbers) do
+    for key in values(numbers) do
         if config[key] ~= nil then
             self[key] = config[key]
         end
@@ -221,17 +221,6 @@ function bt.Status:realize()
         if factor < 0 then
             rt.error("In bt.Status:realize: error when loading config at `" .. self._path .. "`: `attack_factor`, `defense_factor`, or `speed_factor` property < 0")
         end
-    end
-
-    local bools = {
-        "is_field_effect",
-    }
-
-    for _, key in ipairs(bools) do
-        if config[key] ~= nil then
-            self[key] = config[key]
-        end
-        meta.assert_boolean(self[key])
     end
 
     local functions = {
@@ -256,7 +245,7 @@ function bt.Status:realize()
         "on_after_consumable",
     }
 
-    for _, key in ipairs(functions) do
+    for key in values(functions) do
         if config[key] ~= nil then
             self[key] = config[key]
         end
