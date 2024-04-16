@@ -276,7 +276,7 @@ function bt.StatusInterface(scene, entity, status)
     end
 
     self.get_n_turns_elapsed = function(self)
-        return getmetatable(self).original:get_status_n_turns_elapsed(status)
+        return getmetatable(self).entity:get_status_n_turns_elapsed(status)
     end
 
     metatable.getter_mapping = {
@@ -448,12 +448,82 @@ function bt.ConsumableInterface(scene, entity, consumable)
     return self
 end
 
+--- @class bt.GlobalStatusInterface
+function bt.GlobalStatusInterface(scene, status)
+    meta.assert_isa(scene, bt.BattleScene)
+    meta.assert_isa(status, bt.GlobalStatus)
+
+    local self, metatable = {}, {}
+    setmetatable(self, metatable)
+
+    metatable.type = "bt.GlobalStatusInterface"
+    metatable.scene = scene
+    metatable.original = status
+
+    self.get_id = function(self)
+        return getmetatable(self).original:get_id()
+    end
+
+    self.get_name = function(self)
+        return getmetatable(self).original:get_name()
+    end
+
+    self.get_max_duration = function(self)
+        return getmetatable(self).original:get_max_duration()
+    end
+
+    self.get_n_turns_elapsed = function(self)
+        return getmetatable(self).scene:get_global_status_n_turns_elapsed(status)
+    end
+
+    metatable.getter_mapping = {
+        ["id"] = self.get_id,
+        ["name"] = self.get_name,
+        ["max_duration"] = self.get_max_duration,
+        ["n_turns_elapsed"] = self.get_n_turns_elapsed
+    }
+
+    for which in range("attack", "defense", "speed") do
+        local offset_name = which .. "_offset"
+        self["get_" .. offset_name] = function(self)
+            return getmetatable(self).original[offset_name]
+        end
+        metatable.getter_mapping[offset_name] = self["get_" .. offset_name]
+
+        local factor_name = which .. "_factor"
+        self["get_" .. factor_name] = function(self)
+            return getmetatable(self).original[factor_name]
+        end
+        metatable.getter_mapping[factor_name] = self["get_" .. factor_name]
+    end
+
+    metatable.__index = function(self, key)
+        local getter = getmetatable(self).getter_mapping[key]
+        if getter ~= nil then
+            return getter(self)
+        else
+            local out = rawget(self, key)
+            if out == nil then
+                rt.warning("In bt.GlobalStatusInterface:__index: trying to access property `" .. key .. "` of GlobalStatus `" .. getmetatable(self).original:get_id() .. "`, but it does not exist")
+            end
+            return out
+        end
+    end
+
+    metatable.__newindex = function(self, key, value)
+        rt.warning("In bt.GlobalStatusInterface:__newindex: trying to set property `" .. key .. "` of GlobalStatus `" .. getmetatable(self).original:get_id() .. "` to `" .. serialize(value) .. "`, but interface is immutable")
+        return
+    end
+    return self
+end
+
 -- generate meta assertions
 for which in values({
     {"entity", "bt.EntityInterface"},
     {"status", "bt.StatusInterface"},
     {"equip", "bt.EquipInterface"},
     {"consumable", "bt.ConsumableInterface"},
+    {"global_status", "bt.GlobalStatusInterface"},
 }) do
     local is_name = "is_" .. which[1] .. "_interface"
 

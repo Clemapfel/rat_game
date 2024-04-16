@@ -110,7 +110,6 @@ function bt.Animation.CONSUMABLE_APPLIED:update(delta)
     target:set_mix_weight(rt.symmetrical_linear(fraction, 0.5))
 
     -- sprite animation
-    -- tunnel fade
     local fade_duration = 0.5
     local fade_peak = 0.75
     local function opacity(x)

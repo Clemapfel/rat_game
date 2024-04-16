@@ -1,5 +1,5 @@
 rt.settings.battle.stance = {
-    config_path = "assets/battle/stances",
+    config_path = "battle/configs/stances",
     default_color_id = "GRAY_1"
 }
 

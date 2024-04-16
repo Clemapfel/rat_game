@@ -160,10 +160,16 @@ rt.butterworth_lowpass = function(x, order)
     return 1 - rt.butterworth_highpass(1 - x, order)
 end
 
+--- @brief
+rt.discontinuous_step = function(x, n_steps)
+    return math.floor(n_steps * x + 0.5) / n_steps
+end
+
 --- @brief n steps in [0, 1], monotonically increasing, continuous, trends towards discontinuous step for smoothness towards infinity
-rt.continuous_step = function(x, n_steps)
+rt.continuous_step = function(x, n_steps, smoothness)
     -- https://www.desmos.com/calculator/ggoaqtlh7c
-    local smoothness = 11.5
-    local a, h = smoothness, 1 / n_steps
+    smoothness = which(smoothness, 11.5)
+    local a, h = smoothness, ternary(n_steps > 0, 1 / n_steps, 2)
     return h * ((math.tanh((a * x / h) - a * math.floor(x / h) - a / 2) / (2 * math.tanh(a / 2)) + 0.5 + math.floor(x / h)))
 end
+

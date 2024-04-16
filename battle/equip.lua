@@ -1,5 +1,5 @@
 rt.settings.battle.equip = {
-    config_path = "assets/battle/equips"
+    config_path = "battle/configs/equips"
 }
 
 --- @class bt.Equip

@@ -88,6 +88,41 @@ function bt.BattleScene:_invoke_status_callback(entity, status, callback_id, ...
     return bt.safe_invoke(self, status, callback_id, status_proxy, holder_proxy, table.unpack(targets))
 end
 
+
+--- @brief
+function bt.BattleScene:get_global_status_n_turns_elapsed(global_status)
+    local id = global_status:get_id()
+    return self.global_status[id].elapsed
+end
+
+--- @brief
+function bt.BattleScene:get_global_status(global_status_id)
+    if self.global_status[global_status_id] == nil then return nil end
+    return self.global_status[global_status_id].global_status
+end
+
+--- @brief
+function bt.BattleScene:add_global_status(global_status)
+    self.global_status[global_status:get_id()] = {
+        elapsed = 0,
+        global_status = global_status
+    }
+end
+
+--- @brief
+function bt.BattleScene:remove_global_status(global_status)
+    self.global_status[global_status:get_id()] = nil
+end
+
+--- @brief
+function bt.BattleScene:list_global_statuses()
+    local out = {}
+    for entry in values(self.global_status) do
+        table.insert(out, entry.global_status)
+    end
+    return out
+end
+
 -- ### SIMULATION ACTIONS ###
 
 --- @brief

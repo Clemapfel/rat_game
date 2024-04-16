@@ -1,5 +1,5 @@
 rt.settings.battle.move = {
-    config_path = "assets/battle/moves"
+    config_path = "battle/configs/moves"
 }
 
 --- @class bt.Move

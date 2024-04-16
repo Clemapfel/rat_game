@@ -28,11 +28,11 @@ struct Status {
     on_after_action     = (self, user, target, move_selection) -> nil
     on_damage_taken     = (self, damage_taker, damage_dealer) -> new_damage
     on_damage_dealt     = (self, damage_dealer, damage_taker) -> nil
-    on_status_gained    = (self, user, other_status) -> allow_gaining_status
-    on_status_lost      = (self, user, other_status) -> nil
+    on_status_gained    = (self, user, status) -> allow_gaining_status
+    on_status_lost      = (self, user, status) -> nil
     on_knock_out        = (self, user) -> allow_knockout
     on_wake_up          = (self, user -> nil
-    on_death            = (self, user) -> allow_death
+    on_killed            = (self, user) -> allow_death
     on_switch           = (self, user) -> allow_switch
     on_before_consumable = (self, user, consumable) -> allow_consumable
     on_after_consumable  = (self, user, consumable) -> nil

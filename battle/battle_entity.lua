@@ -1,5 +1,5 @@
 rt.settings.battle.entity = {
-    config_path = "assets/battle/entities"
+    config_path = "battle/configs/entities"
 }
 
 bt.BattleEntityState = meta.new_enum({
@@ -31,6 +31,8 @@ bt.BattleEntity = meta.new_type("BattleEntity", function(scene, id)
 
     out.status = {}
     out.moveset = {}
+    out.equips = {}
+    out.consumables = {}
 
     out:realize()
     meta.set_is_mutable(out, false)
@@ -49,7 +51,7 @@ end, {
     stance = bt.Stance("NEUTRAL"),
 
     status = {}, -- Table<bt.Status, {status: bt.Status, elapsed: Number}>
-    move = {}, -- Table<MoveID, {move: bt:move, n_uses: Number}>
+    moveset = {}, -- Table<MoveID, {move: bt:move, n_uses: Number}>
     equips = {}, -- Table<EquipID, {equip: bt.Equip}>
     consumables = {}, --Table<ConsumableID, {consumable: bt.Consumable, n_consumed: Number}
 
@@ -308,15 +310,6 @@ function bt.BattleEntity:list_statuses()
     return out
 end
 
---- @brief
-function bt.BattleEntity:get_status_elapsed(status)
-    local entry = self.status[status:get_id()]
-    if entry == nil then
-        return nil
-    else
-        return entry.elapsed
-    end
-end
 
 --- @brief
 --- @return Boolean true if status is past its intended duration, false otherwise

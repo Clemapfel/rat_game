@@ -34,6 +34,9 @@ bt.BattleScene = meta.new_type("BattleScene", rt.Widget, bt.BattleAnimationTarge
         _animation_queue = bt.AnimationQueue(),
         _ui_is_visible = true,
 
+        -- simulation,
+        global_status = {},
+
         _elapsed = 0
     })
     return out
