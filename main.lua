@@ -68,6 +68,7 @@ local info_hidden = false
 
 small_ufo:add_move(bt.Move("TEST_MOVE"))
 small_ufo:add_equip(bt.Equip("TEST_EQUIP"))
+small_ufo:add_consumable(bt.Consumable("DEBUG_CONSUMABLE"))
 
 input = rt.InputController()
 input:signal_connect("pressed", function(_, which)
@@ -85,7 +86,10 @@ input:signal_connect("pressed", function(_, which)
         --scene:use_move(small_ufo, "TEST_MOVE", small_ufo)
         --scene:add_status(small_ufo, "DEBUG_STATUS")
         --scene:start_turn()
-        scene:start_battle()
+        --scene:start_battle()
+
+        scene:use_consumable(small_ufo, "DEBUG_CONSUMABLE")
+
     elseif which == rt.InputButton.X then
     elseif which == rt.InputButton.Y then
     elseif which == rt.InputButton.UP then

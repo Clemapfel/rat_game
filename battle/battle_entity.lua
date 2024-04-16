@@ -425,6 +425,16 @@ function bt.BattleEntity:get_consumable(consumable_id)
 end
 
 --- @brief
+function bt.BattleEntity:get_consumable_n_consumed(consumable_id)
+    local entry = self.consumables[consumable_id]
+    if entry == nil then
+        return 0
+    else
+        return entry.n_consumed
+    end
+end
+
+--- @brief
 function bt.BattleEntity:list_consumables()
     local out = {}
     for entry in values(self.consumables) do
@@ -434,13 +444,13 @@ function bt.BattleEntity:list_consumables()
 end
 
 --- @brief
-function bt.BattleEntity:consume(consumable)
-    local entry = self.consumables[consumable:get_id()]
+function bt.BattleEntity:consume(consumable_id)
+    local entry = self.consumables[consumable_id]
     if entry == nil then
         rt.warning("In bt.BattleEntity:consume: entity `" .. self:get_id() .. "` does not have consumable `" .. consumable.get_id() .. "` equipped")
         return false
     else
         entry.n_consumed = entry.n_consumed + 1
-        return entry.n_consumed >= consumable:get_max_n_uses()
+        return entry.n_consumed >= entry.consumable:get_max_n_uses()
     end
 end

@@ -19,7 +19,6 @@ bt.Consumable = meta.new_type("Consumable", function(id)
     end
     return out
 end, {
-
     max_n_uses = POSITIVE_INFINITY,
 
     on_turn_start = function(holder)
@@ -166,6 +165,7 @@ function bt.Consumable:realize()
     meta.set_is_mutable(self, true)
 
     local strings = {
+        "name",
         "sprite_id",
         "description"
     }
@@ -178,8 +178,7 @@ function bt.Consumable:realize()
     end
 
     local numbers = {
-        "max_n_uses",
-        "sprite_index"
+        "max_n_uses"
     }
 
     for key in values(numbers) do
@@ -187,6 +186,10 @@ function bt.Consumable:realize()
             self[key] = config[key]
         end
         meta.assert_number(self[key])
+    end
+
+    if config.sprite_index ~= nil then
+        self.sprite_index = config.sprite_index
     end
 
     local functions = {
@@ -233,4 +236,9 @@ end
 --- @brief
 function bt.Consumable:get_max_n_uses()
     return self.max_n_uses
+end
+
+--- @brief
+function bt.Consumable:get_sprite_id()
+    return self.sprite_id, self.sprite_index
 end

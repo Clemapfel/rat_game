@@ -311,6 +311,8 @@ function bt.BattleScene:format_name(entity)
         name = "<b><i>" .. entity:get_name() .. "</b></i>"
     elseif meta.isa(entity, bt.Equip) then
         name = "<b>" .. entity:get_name() .. "</b>"
+    elseif meta.isa(entity, bt.Consumable) then
+        name = "<b>" .. entity:get_name() .. "</b>"
     else
         rt.error("In bt.BattleScene:get_formatted_name: unhandled entity type `" .. meta.typeof(entity) .. "`")
     end

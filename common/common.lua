@@ -481,6 +481,32 @@ function math.erf(x)
     return sign * y
 end
 
+--- @brief hyperbolic tangent
+--- @param x number
+--- @return number
+function math.tanh(x)
+    -- src: http://lua-users.org/wiki/HyperbolicFunctions
+    if x == 0 then return 0.0 end
+    local neg = false
+    if x < 0 then x = -x; neg = true end
+    if x < 0.54930614433405 then
+        local y = x * x
+        x = x + x * y *
+        ((-0.96437492777225469787e0 * y +
+                -0.99225929672236083313e2) * y +
+                -0.16134119023996228053e4) /
+        (((0.10000000000000000000e1 * y +
+                0.11274474380534949335e3) * y +
+                0.22337720718962312926e4) * y +
+                0.48402357071988688686e4)
+    else
+        x = math.exp(x)
+        x = 1.0 - 2.0 / (x * x + 1.0)
+    end
+    if neg then x = -x end
+    return x
+end
+
 --- @brief get minimum and maximum of table
 function table.min_max(t)
     local min, max = POSITIVE_INFINITY, NEGATIVE_INFINITY

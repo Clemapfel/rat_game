@@ -186,6 +186,40 @@ function bt.BattleScene:use_move(user, move_id, targets)
 end
 
 --- @brief
+function bt.BattleScene:use_consumable(holder, consumable_id)
+    local consumable = holder:get_consumable(consumable_id)
+    if consumable == nil then
+        rt.error("In bt.Battlescene:use_consumable: entity `" .. user:get_id() .. "` does not have consumable `" .. consumable_id .. "` in equipped")
+        return
+    end
+
+    local n_consumed = holder:get_consumable_n_consumed(consumable_id)
+    local max_n_consumed = consumable:get_max_n_uses()
+
+    if n_consumed >= max_n_consumed then
+        -- do not activate
+        return
+    end
+
+    local should_remove = false
+    local animation, _ = self:play_animation(holder, "CONSUMABLE_APPLIED", consumable)
+    animation:register_start_callback(function()
+        self:send_message(self:format_name(holder) .. "s " .. self:format_name(consumable) .. " activated")
+    end)
+
+    bt.mutate_entity(holder, function(target)
+        should_remove = target:consume(consumable_id)
+    end)
+
+    if should_remove then
+        animation, _ = self:play_animation(holder, "CONSUMABLE_CONSUMED", consumable)
+        animation:register_start_callback(function()
+            self:send_message(self:format_name(holder) .. "s " .. self:format_name(consumable) .. " was consumed")
+        end)
+    end
+end
+
+--- @brief
 function bt.BattleScene:kill(target)
     -- assertion
     if not target:get_is_knocked_out() then
