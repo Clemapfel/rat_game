@@ -23,7 +23,6 @@ function bt.Animation.ENEMY_APPEARED:start()
 
     local bounds = target:get_bounds()
     self._path = rt.Spline({-1 * bounds.width * 2, 0, 0, 0})
-    self._scene:send_message(self._scene:format_name(self._target:get_entity()) .. " appeared!")
 end
 
 --- @override

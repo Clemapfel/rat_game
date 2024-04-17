@@ -201,9 +201,9 @@ require "battle.priority_queue"
 require "battle.status_bar_element"
 require "battle.status_bar"
 require "battle.battle_scene"
+require "battle.simulation"
 
 require "battle.interface"
-require "battle.simulation"
 
 require "battle.enemy_sprite"
 require "battle.party_sprite"

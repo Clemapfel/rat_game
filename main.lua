@@ -4,26 +4,20 @@ love.load = function()
     rt.current_scene = bt.BattleScene()
 
     local scene = rt.current_scene
-    local small_ufo = bt.BattleEntity(state, "SMALL_UFO")
-    local boulder = bt.BattleEntity(state, "BALL_WITH_FACE")
-    local sprout_01 = bt.BattleEntity(state, "WALKING_SPROUT")
-    local sprout_02 = bt.BattleEntity(state, "WALKING_SPROUT")
-    local mole = bt.BattleEntity(state, "GAMBLER_MOLE")
-
-    for entity in range(small_ufo) do
-        scene:add_entity(entity)
-    end
 
     -- TODO
-    local input = rt.InputController()
+    input = rt.InputController()
     input:signal_connect("pressed", function(self, which)
         if which == rt.InputButton.A then
-            scene._ui:send_message("test")
+            scene:skip_animation()
+        elseif which == rt.InputButton.B then
+            scene:play_animation(scene, "MESSAGE", "test animation", "test message")
         end
     end)
     -- TODO
 
     rt.current_scene:realize()
+    scene:start_battle()
 end
 
 rt.graphics.frame_duration = {
@@ -94,6 +88,9 @@ love.run = function()
         table.insert(rt.graphics.frame_duration.past_frames, frame_duration)
         rt.graphics.frame_duration.n_frames_saved = rt.graphics.frame_duration.n_frames_saved + 1
         rt.graphics.frame_duration.max = math.max(rt.graphics.frame_duration.max, frame_duration)
+
+        -- force gc
+        collectgarbage("collect")
 
         if love.timer then love.timer.sleep(0.001) end
     end

@@ -131,3 +131,27 @@ function bt.BattleScene:format_pronouns(entity)
         return "error", "error", "error", "error"
     end
 end
+
+--- @brief
+function bt.BattleScene:skip_animation()
+    self._ui:skip()
+end
+
+--- @brief
+--- @param animation_id String all caps, eg. "PLACEHOLDER_MESSAGE"
+function bt.BattleScene:play_animation(entity, animation_id, ...)
+    if bt.Animation[animation_id] == nil then
+        rt.error("In bt.BattleScene:play_animation: no animation with id `" .. animation_id .. "`")
+    end
+
+    local sprite = self._ui:get_sprite(entity)
+    if sprite == nil then
+        rt.error("In bt.BattleScene:play_animation: unhandled animation target `" .. meta.typeof(entity) .. "`")
+    end
+
+    local animation = bt.Animation[animation_id](self, sprite, ...)
+    sprite:add_animation(animation)
+    return animation, sprite
+end
+
+

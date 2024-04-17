@@ -41,7 +41,11 @@ function bt.EnemySprite:realize()
     self._sprite:set_minimum_size(sprite_w * 4, sprite_h * 4)
     self._sprite:realize()
     self._sprite:set_is_animated(true)
-    self._sprite:set_animation(rt.settings.battle.enemy_sprite.idle_animation_id)
+
+    local animation_id = rt.settings.battle.enemy_sprite.idle_animation_id
+    if self._sprite:has_animation(animation_id) then
+        self._sprite:set_animation(animation_id)
+    end
 
     self._hp_bar:realize()
     self._hp_bar:sync()
@@ -72,7 +76,6 @@ function bt.EnemySprite:update(delta)
     self._hp_bar:update(delta)
     self._speed_value:update(delta)
     self._status_bar:update(delta)
-    self._animation_queue:update(delta)
 
     -- snapshot, can be modified by animations
     self._snapshot:snapshot(self._sprite)
@@ -239,4 +242,9 @@ end
 --- @brief
 function bt.EnemySprite:get_scene()
     return self._scene
+end
+
+--- @brief
+function bt.EnemySprite:get_entity()
+    return self._entity
 end

@@ -102,6 +102,16 @@ function bt.BattleUI:size_allocate(x, y, width, height)
     self._gradient_right:resize(rt.graphics.get_width() - gradient_width, 0, gradient_width, rt.graphics.get_height())
 end
 
+--- @override
+function bt.BattleUI:measure()
+    return rt.graphics.get_width(), rt.graphics.get_height()
+end
+
+--- @override
+function bt.BattleUI:get_bounds()
+    return rt.AABB(0, 0, rt.graphics.get_width(), rt.graphics.get_height())
+end
+
 --- @brief
 function bt.BattleUI:draw()
     love.graphics.clear(0, 0, 0, 0)
@@ -222,3 +232,29 @@ end
 function bt.BattleUI:set_priority_order(order)
     self._priority_queue:set_order(order)
 end
+
+--- @brief
+function bt.BattleUI:get_sprite(entity)
+    if meta.isa(entity, bt.BattleEntity) then
+        if entity:get_is_enemy() then
+            for sprite in values(self._enemy_sprites) do
+                if sprite:get_entity() == entity then
+                    return sprite
+                end
+            end
+            return nil
+        else
+            for sprite in values(self._party_sprites) do
+                if sprite:get_entity() == entity then
+                    return sprite
+                end
+            end
+            return nil
+        end
+    elseif meta.isa(entity, bt.BattleScene) then
+        return self
+    else
+        rt.error("In bt.BattleUI:get_sprite: unhandled entity type `" .. meta.typeof(entity) .. "`")
+    end
+end
+

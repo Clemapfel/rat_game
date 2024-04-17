@@ -214,6 +214,11 @@ function rt.SpriteAtlasEntry:get_frame_range(id)
     return out
 end
 
+--- @brief
+function rt.SpriteAtlasEntry:has_frame(id)
+    return self.name_to_frame[id] ~= nil
+end
+
 --- @class rt.SpriteAtlas
 rt.SpriteAtlas = meta.new_type("SpriteAtlas", function()
     return meta.new(rt.SpriteAtlas, {

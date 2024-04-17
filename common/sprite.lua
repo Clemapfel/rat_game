@@ -102,6 +102,11 @@ function rt.Sprite:get_animation()
     return self._animation_id
 end
 
+--- @brief
+function rt.Sprite:has_animation(id)
+    return self._spritesheet:has_frame(id)
+end
+
 --- @override
 function rt.Sprite:size_allocate(x, y, width, height)
     if self._is_realized then

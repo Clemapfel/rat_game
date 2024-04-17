@@ -62,7 +62,7 @@ function bt.Animation.MESSAGE:start()
     target:set_is_visible(false)
 
     if self._log_message ~= nil and self._log_message ~= 0 then
-        self._scene:send_message(self._log_message)
+        self._scene._ui:send_message(self._log_message)
     end
 end
 

@@ -142,6 +142,7 @@ function bt.PriorityQueue:size_allocate(x, y, width, height)
             element:set_change_indicator_visible(self._is_preview_active)
             element:set_state(entry.state)
             element:set_is_selected(entry.is_selected)
+            element:set_id_offset_label_visible(entity:get_id_offset() > 0)
 
             if before_entry ~= nil then
                 before_entry.offset = before_entry.offset + 1

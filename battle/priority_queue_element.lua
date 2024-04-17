@@ -35,6 +35,7 @@ bt.PriorityQueueElement = meta.new_type("PriorityQueueElement", rt.Widget, rt.An
         _frame_gradient = {}, -- rt.LogGradient
         _debug_backdrop = rt.Rectangle(0, 0, 1, 1),
 
+        _id_offset_label_visible = false,
         _id_offset_label = {}, -- rt.Glyph
 
         _change_direction = rt.Direction.NONE,
@@ -152,10 +153,10 @@ function bt.PriorityQueueElement:realize()
     self._spritesheet:get_texture():set_wrap_mode(rt.TextureWrapMode.ZERO)
     local frame = self._spritesheet:get_frame(sprite_index)
     self._shape:reformat_texture_coordinates(
-            frame.x, frame.y,
-            frame.x + frame.width, frame.y,
-            frame.x + frame.width, frame.y + frame.height,
-            frame.x, frame.y + frame.height
+        frame.x, frame.y,
+        frame.x + frame.width, frame.y,
+        frame.x + frame.width, frame.y + frame.height,
+        frame.x, frame.y + frame.height
     )
 
     self._backdrop:set_is_outline(false)
@@ -167,8 +168,8 @@ function bt.PriorityQueueElement:realize()
     self._frame_outline:set_color(rt.Palette.BACKGROUND)
 
     self._frame_gradient = rt.LogGradient(
-            rt.RGBA(0.8, 0.8, 0.8, 1),
-            rt.RGBA(1, 1, 1, 1)
+        rt.RGBA(0.8, 0.8, 0.8, 1),
+        rt.RGBA(1, 1, 1, 1)
     )
     self._frame_gradient:set_is_vertical(true)
 
@@ -266,7 +267,6 @@ function bt.PriorityQueueElement:size_allocate(x, y, width, height)
         self._shape:set_vertex_position(2, x + width, y)
         self._shape:set_vertex_position(3, x + width, y + height)
         self._shape:set_vertex_position(4, x, y + height)
-
         self._backdrop:resize(x, y, width, height)
 
         local frame_thickness = rt.settings.battle.priority_queue_element.frame_thickness
@@ -368,14 +368,16 @@ function bt.PriorityQueueElement:draw()
         if self._scene:get_debug_draw_enabled() then
             self._debug_backdrop:draw()
         end
-        self._id_offset_label:draw()
+
+        if self._id_offset_label_visible then
+            self._id_offset_label:draw()
+        end
 
         if self._change_indicator_visible and self._change_direction ~= rt.Direction.NONE then
             self._change_indicator:draw()
         end
     end
 end
-
 
 --- @override
 function bt.PriorityQueueElement:update(delta)
@@ -386,5 +388,14 @@ function bt.PriorityQueueElement:update(delta)
         local color = rt.rgba_to_hsva(rt.Palette.KNOCKED_OUT)
         color.v = clamp(color.v + offset, 0, 1)
         self._backdrop:set_color(color)
+    end
+end
+
+--- @brief
+function bt.PriorityQueueElement:set_id_offset_label_visible(b)
+    if b ~= self._id_offset_label_visible then
+        self._id_offset_label_visible = b
+        self._id_offset_label:set_text(self._entity:get_id_offset_suffix())
+        self:reformat()
     end
 end

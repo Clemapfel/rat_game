@@ -267,6 +267,11 @@ function bt.BattleEntity:get_id_offset_suffix()
 end
 
 --- @brief
+function bt.BattleEntity:get_id_offset()
+    return self.id_offset
+end
+
+--- @brief
 function bt.BattleEntity:get_name()
     return self.name .. self:get_id_offset_suffix()
 end
