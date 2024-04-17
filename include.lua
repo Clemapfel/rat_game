@@ -176,12 +176,12 @@ require "battle.move"
 
 require "battle.battle_entity"
 require "battle.battle_state"
-
-require "battle.battle_ui"
+require "battle.battle_animation"
 require "battle.health_bar"
 require "battle.speed_value"
+require "battle.battle_animation_target"
 
-require "battle.battle_animation"
+require "battle.battle_ui"
 
 -- TODO
 for _, name in pairs(love.filesystem.getDirectoryItems("battle/animations")) do
@@ -193,7 +193,6 @@ end
 -- TODO
 
 require "battle.animation_queue"
-require "battle.battle_animation_target"
 require "battle.party_info"
 require "battle.backdrop"
 require "battle.battle_log"
@@ -263,5 +262,11 @@ require "overworld.overworld_scene"
 
 -- require "test
 
+
+rt.SpriteAtlas = rt.SpriteAtlas()
+rt.SpriteAtlas:initialize("assets/sprites")
+
+rt.SoundAtlas = rt.SoundAtlas()
+rt.SoundAtlas:initialize("assets/sound_effects")
 
 meta.make_auto_extend(rt.settings, false)

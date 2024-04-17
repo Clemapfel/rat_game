@@ -15,7 +15,7 @@ rt.settings.battle.health_bar = {
 }
 
 --- @class bt.HealthBar
-bt.HealthBar = meta.new_type("HealthBar", bt.BattleUI, function(scene, entity)
+bt.HealthBar = meta.new_type("HealthBar", rt.Widget, rt.Animation, function(scene, entity)
     local out = meta.new(bt.HealthBar, {
         _entity = entity,
         _scene = scene,

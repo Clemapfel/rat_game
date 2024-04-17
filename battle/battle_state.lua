@@ -1,57 +1,111 @@
---- @brief
-bt.State = meta.new_type("BattleState", {
-    -- sandboxed script running utilities
-    sandbox = {
-        env = nil
-    },
-})
+--- @class bt.BattleState
+bt.BattleState = meta.new_type("BattleState", function(scene)
+    return meta.new(bt.BattleState, {
+        _scene = scene,
+        _entities = {},      -- Table<bt.Entity>
+        _status = {},        -- Table<GlobalStatusId, {status: bt.GlobalStatus, elapsed: Number}
+    })
+end)
 
 --- @brief
-function bt.State:_setup_context()
-    self.sandbox.env = {}
-    local env = self.sandbox.env
-    for common in range(
-        "pairs",
-        "ipairs",
-        "dbg",
-        "sizeof",
-        "is_empty",
-        "ternary",
-        "which",
-        "splat",
-        "slurp",
-        "select",
-
-        "range",
-        "step_range",
-
-        "clamp",
-        "project",
-        "mix",
-        "smoothstep",
-        "fract",
-
-        "INFINITY",
-        "POSITIVE_INFINITY",
-        "NEGATIVE_INFINITY"
-    ) do
-        assert(_G[common] ~= nil)
-        env[common] = _G[common]
+function bt.BattleState:list_entities()
+    local out = {}
+    for entity in values(self._entities) do
+        table.insert(out, entity)
     end
-
-    env.rand = rt.rand
-    env.random = {}
-    env.math = math
-    env.table = table
-    env.string = string
+    return out
 end
 
 --- @brief
-function bt.State:_run(f, ...)
-    if meta.is_nil(self.sandbox.env) then
-        self:_setup_context()
+function bt.BattleState:get_entity(entity_id)
+    for entity in values(self._entities) do
+        if entity == entity_id then
+            return entity
+        end
     end
 
-    debug.setfenv(f, self.sandbox.env)
-    f(...)
+    return nil
 end
+
+--- @brief [internal]
+function bt.BattleState:update_entity_id_offsets()
+    local boxes = {}
+    for entity in values(self._entities) do
+        local type = entity._config_id
+        if boxes[type] == nil then boxes[type] = {} end
+        table.insert(boxes[type], entity)
+    end
+
+    for _, box in pairs(boxes) do
+        if #box > 1 then
+            for i, entity in ipairs(box) do
+                entity:set_id_offset(i)
+            end
+        else
+            box[1]:set_id_offset(0)
+        end
+    end
+end
+
+--- @brief
+function bt.BattleState:add_entity(entity)
+    table.insert(self._entities, entity)
+    self:update_entity_id_offsets()
+end
+
+--- @brief
+function bt.BattleState:remove_entity(entity_id)
+    local removed = false
+    for i, entity in ipairs(self._entities) do
+        if entity:get_id() == entity_id then
+            table.remove(self._entities, i)
+            removed = true
+            break
+        end
+    end
+
+    if not removed then
+        rt.warning("In bt.BattleState:remove_entity: trying to remove entity `" .. entity_id .. "` but no such entity is available")
+    end
+end
+
+--- @brief
+function bt.BattleState:list_global_statuses()
+    local out = {}
+    for entry in values(self._status) do
+        table.insert(out, entry._status)
+    end
+    return out
+end
+
+--- @brief
+function bt.BattleState:get_global_status(status_id)
+    if self._status[status_id] == nil then return nil end
+    return self._status[status_id]._status
+end
+
+--- @brief
+function bt.BattleState:add_global_status(status)
+    self._status[status:get_id()] = {
+        elapsed = 0,
+        status = status
+    }
+end
+
+--- @brief
+function bt.BattleState:remove_global_status(status)
+    local status_id = status:get_id()
+    if self._status[status_id] == nil then
+        rt.warning("In bt.BattleState:remove_global_status: trying to remove global status `" .. status_id .. "`, but no such status is available")
+    end
+    self._status[status_id] = nil
+end
+
+--- @brief [internal] unlock entity, mutate, then lock again
+function bt.BattleState:mutate_entity(entity, f, ...)
+    meta.set_is_mutable(entity, true)
+    f(entity, ...)
+    meta.set_is_mutable(entity, false)
+end
+
+

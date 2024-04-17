@@ -55,6 +55,7 @@ function bt.EnemySprite:realize()
     self._snapshot = rt.SnapshotLayout()
     self._snapshot:realize()
 
+    self:set_is_animated(true)
     self:reformat()
 end
 

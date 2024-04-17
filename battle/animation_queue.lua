@@ -1,9 +1,10 @@
 --- @class
-bt.AnimationQueue = meta.new_type("AnimationQueue", rt.Drawable, function()
+bt.AnimationQueue = meta.new_type("AnimationQueue", rt.Drawable, rt.Animation, function()
     local out = meta.new(bt.AnimationQueue, {
         animations = {}, -- Fifo<bt.Animation>
     })
     bt.AnimationQueue._all_instances[meta.hash(out)] = out
+    out:set_is_animated(true)
     return out
 end)
 

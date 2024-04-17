@@ -310,7 +310,6 @@ function bt.BattleEntity:list_statuses()
     return out
 end
 
-
 --- @brief
 --- @return Boolean true if status is past its intended duration, false otherwise
 function bt.BattleEntity:increase_status_elapsed(status)

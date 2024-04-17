@@ -22,6 +22,8 @@ end)
 
 --- @override
 function bt.PriorityQueue:size_allocate(x, y, width, height)
+    if not self._is_realized then return end
+
     -- generate new entries if needed
     local order = ternary(self._is_preview_active, self._preview_order, self._current_order)
 

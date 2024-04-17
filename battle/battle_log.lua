@@ -9,8 +9,9 @@ rt.settings.battle.log = {
 }
 
 --- @class bt.BattleLog
-bt.BattleLog = meta.new_type("BattleLog", rt.Widget, rt.Animation, function()  
+bt.BattleLog = meta.new_type("BattleLog", rt.Widget, rt.Animation, function(scene)
     return meta.new(bt.BattleLog, {
+        _scene = scene,
         _labels = {},       -- Table<rt.Label>
         _bounds = rt.AABB(0, 0, 1, 1),
 

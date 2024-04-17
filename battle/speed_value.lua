@@ -5,7 +5,7 @@ rt.settings.battle.speed_value = {
 }
 
 --- @class bt.SpeedValue
-bt.SpeedValue = meta.new_type("SpeedValue", bt.BattleUI, function(entity)
+bt.SpeedValue = meta.new_type("SpeedValue", rt.Widget, rt.Animation, function(entity)
     local out = meta.new(bt.SpeedValue, {
         _entity = entity,
         _is_realized = false,
