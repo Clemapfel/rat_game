@@ -217,6 +217,11 @@ function bt.BattleEntity:get_speed()
 end
 
 --- @brief
+function bt.BattleEntity:get_priority()
+    return self.priority
+end
+
+--- @brief
 function bt.BattleEntity:get_is_enemy()
     return self.is_enemy
 end

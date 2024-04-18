@@ -1,6 +1,5 @@
 --- @brief
 function bt.BattleScene:start_battle()
-
     -- TODO load battle config instead of hardcoded
     local state = self._state
     local entities = {

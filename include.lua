@@ -69,10 +69,10 @@ end
 pcall(connect_emmy_lua_debugger)
 io.stdout:setvbuf("no") -- makes it so love2d error message is printed to console immediately
 
-require "profiler"
 require "meta"
 require "settings"
 require "log"
+require "profiler"
 
 test = meta.new_enum({
     TEST = 1

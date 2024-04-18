@@ -54,6 +54,7 @@ end
 
 --- @brief
 function bt.BattleScene:draw()
+    if not self._is_realized then return end
     self._ui:draw()
 
     if self._debug_draw_enabled then

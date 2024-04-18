@@ -1,5 +1,5 @@
 rt.settings.battle.animations.enemy_appeared = {
-    duration = 0.1--2.5
+    duration = 2.5
 }
 
 --- @class bt.Animation.ENEMY_APPEARED

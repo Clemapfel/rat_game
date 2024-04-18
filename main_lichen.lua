@@ -1,164 +1,103 @@
 require "include"
 
 lt = {}
-lt.VertexFormat = {
-    {name = "VertexPosition", format = "floatvec2"},
-    {name = "VertexColor", format = "floatvec3"}
-}
 
-lt.Automaton = {}
-function lt.Automaton.new(x1, y1, x2, y2, age)
+-- https://gist.github.com/slime73/079ef5d4e76cec6498ab7472b4f384d9
+lt._step_shader = love.graphics.newComputeShader("lichen/step.glsl")
+--lt._render_shader = love.graphics.newShader("lichen/render.glsl")
 
-    local out = {}
-    local metatable = {
-        __index = lt.Automaton
-    }
-    setmetatable(out, metatable)
+lt._image_format = "rgba32f"
+lt._lattice_size = {}   -- Tuple<Number, Numbre>
 
-    local width = 5
-    local mx = (x1 + x2) / 2
-    local my = (y1 + y2) / 2
+lt._step_textures = {}  -- Tuple<love.Image, love.Image>
+lt._step_input_order = true
+lt._should_filter_step_textures = true
 
-    local dx = x2 - x1
-    local dy = y2 - y1
-    local length = math.sqrt(dx * dx + dy * dy)
-    local angle = math.atan2(dy, dx)
+lt._render_shape = {} -- rt.VertexRectangle
 
-    local halfLength = length / 2
-    local halfWidth = width / 2
+function lt.initialize(size_x, size_y)
+    lt._lattice_size = { size_x, size_y }
+    lt._step_input_order = true
 
-    local vertices = {}
-    for i = -1, 1, 2 do
-        for j = -1, 1, 2 do
-            local lx = i * halfLength * math.cos(angle) - j * halfWidth * math.sin(angle)
-            local ly = i * halfLength * math.sin(angle) + j * halfWidth * math.cos(angle)
-            table.insert(vertices, {
-                mx + lx, -- vertex x
-                my + ly, -- vertex y
-                1, 1, 1 --age -- age
-            })
+    local initial_data = love.image.newImageData(size_x, size_x, lt._image_format)
+    for x = 1, size_x do
+        for y = 1, size_y do
+            local hue = rt.random.number(0, 1)
+            initial_data:setPixel(x - 1, y - 1, hue, hue, hue, 1)
         end
     end
 
-    out._mesh = love.graphics.newMesh(
-        lt.VertexFormat,
-        vertices,
-        "strip",
-        "static"
-    )
-    out._positions = {x1, y1, x2, y2}
-    out._angle = angle
-    out._age = 0
-    return out
-end
+    local texture_config = { computewrite = true }
+    lt._step_textures[1] = love.graphics.newImage(initial_data, texture_config)
+    lt._step_textures[2] = love.graphics.newImage(initial_data, texture_config)
 
-setmetatable(lt.Automaton, {
-    __call = function(self, x1, y1, x2, y2, age)
-        if age == nil then age = 0 end
-        return lt.Automaton.new(x1, y1, x2, y2, age)
-    end
-})
-
-lt.Automaton._shader = love.graphics.newShader("main_lichen.glsl")
-function lt.Automaton:draw()
-    love.graphics.draw(self._mesh)
-end
-
-function lt.Automaton:get_position()
-    return self._mesh:getVertexAttribute(1, 1)
-end
-
-function lt.Automaton:set_position(x, y)
-    return self._mesh:setVertexAttribute(1, x, y)
-end
-
-function lt.Automaton:get_age()
-    local age, _ = self._mesh:getVertexAttribute(2, 2)
-    return age
-end
-
-function lt.Automaton:set_age(age)
-    local _, angle = self._mesh:getVertexAttribute(2, 2)
-    self._mesh:setVertexAttribute(2, age, angle)
-end
-
-function lt.Automaton:get_angle(point)
-    local _, angle = self._mesh:getVertexAttribute(2, 2)
-    return angle
-end
-
-function lt.Automaton:set_age(angle)
-    local age, _ = self._mesh:getVertexAttribute(2, 2)
-    self._mesh:setVertexAttribute(2, age, angle)
-end
-
-lt.active_points = {}
-lt.spritebatch = {}
-lt.step_speed = 100 -- px per second
-
-local test = lt.Automaton.new(50, 20, 300, 500)
-dbg(test:get_position())
-
-function lt.add_point(x1, y1, x2, y2, age)
-    local to_add = lt.Automaton(x1, y1, x2, y2, age)
-    lt.active_points[to_add] = true
-    return to_add
-end
-
-function lt.add_seed(x, y)
-    local angle = love.math.random(0, 2 * math.pi)
-    local x2, y2 = rt.translate_point_by_angle(x, y, lt.step_speed, angle)
-    lt.add_point(x, y, x2, y2)
-end
-
-lt.angle_width = 0.5 * math.pi
-function lt.step(delta)
-    local gaussian = function(x) return math.exp(-1 * 4 * x^2) end
-    local step_distance = delta / 60 * lt.step_speed
-
-    local points = {}
-    for point, _ in pairs(lt.active_points) do
-        table.insert(points, point)
+    for i = 1, 2 do
+        if lt._should_filter_step_textures == true then
+            lt._step_textures[i]:setFilter("linear", "linear")
+        else
+            lt._step_textures[i]:setFilter("nearest", "nearest")
+        end
     end
 
-    for _, point in pairs(points) do
-        local x1, y1 = point._positions[3], point._positions[4]
-        local angle = point._angle + love.math.random(-0.5 * lt.angle_width, 0.5 * lt.angle_width)
-        angle = angle * gaussian(love.math.random(-1, 1))
-        local age = point._age + delta
-        local x2, y2 = rt.translate_point_by_angle(x1, y1, step_distance, angle)
-        lt.add_point(x1, y1, x2, y2)
-        table.insert(lt.spritebatch, point)
-        lt.active_points[point] = nil
-    end
+    lt._render_shape = rt.VertexRectangle(0, 0, rt.graphics.get_width(), rt.graphics.get_height())
+    lt._render_shape._native:setTexture(lt._step_textures[1])
 end
 
--- ################
+--- @brief step simulation
+function lt.step()
+    -- apply compute shader, swap input and output such that each
+    -- step can be applied to itself to iteratively advance simulation
+    local computer = lt._step_shader
+    local group_count = (lt._lattice_size[1] * lt._lattice_size[2])
+
+    local input, output
+    if lt._step_input_order == true then
+        computer:send("image_in", lt._step_textures[1])
+        computer:send("image_out", lt._step_textures[2])
+    else
+        computer:send("image_in", lt._step_textures[2])
+        computer:send("image_out", lt._step_textures[1])
+    end
+
+    love.graphics.dispatchThreadgroups(computer, lt._lattice_size[1], lt._lattice_size[2])
+
+    if lt._step_input_order == true then
+        lt._render_shape._native:setTexture(lt._step_textures[1])
+    else
+        lt._render_shape._native:setTexture(lt._step_textures[2])
+    end
+
+    lt._step_input_order = not lt._step_input_order
+end
+
+-- ### MAIN
 
 love.load = function()
-    local w, h = love.graphics.getWidth(), love.graphics.getHeight()
-    local min_x, min_y, max_x, max_y = 0.1 * w, 0.1 * h, 0.9 * w, 0.9 * h
-    lt.add_seed(w / 2, h / 2) --love.math.random(min_x, max_x), love.math.random(max_x, max_y))
-    lt.canvas = love.graphics.newCanvas(love.graphics.getWidth(), love.graphics.getWidth(), {
-        msaa = true
+    love.window.setMode(1600 / 1.5, 900 / 1.5, {
+        vsync = -1, -- adaptive vsync, may tear but tries to stay as close to 60hz as possible
+        msaa = 8,
+        stencil = true,
+        resizable = true,
+        borderless = false
     })
+    love.window.setTitle("rat_game: lichen")
+    love.filesystem.setIdentity("rat_game")
+
+    lt.initialize(64, 64)
 end
 
 love.keypressed = function(which)
-    lt.step(10)
-end
-
-love.mousepressed = function(x, y, _, _)
-    lt.add_seed(x, y)
+    lt.step()
 end
 
 love.draw = function()
-    --love.graphics.setShader(lt.Automaton._shader)
-    for _, point in pairs(lt.spritebatch) do
-        point:draw()
-    end
+    lt._render_shape:draw()
 end
 
-love.update = function()
-
+love.resize = function()
+    local w, h = love.graphics.getWidth(), love.graphics.getHeight()
+    lt._render_shape:set_vertex_position(1, 0, 0)
+    lt._render_shape:set_vertex_position(2, w, 0)
+    lt._render_shape:set_vertex_position(3, w, h)
+    lt._render_shape:set_vertex_position(4, 0, h)
 end

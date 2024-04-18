@@ -1,8 +1,8 @@
 require "include"
-
 love.load = function()
-    rt.current_scene = bt.BattleScene()
+    profiler.activate()
 
+    rt.current_scene = bt.BattleScene()
     local scene = rt.current_scene
 
     -- TODO
@@ -14,10 +14,9 @@ love.load = function()
             scene:play_animation(scene, "MESSAGE", "test animation", "test message")
         end
     end)
-    -- TODO
 
     rt.current_scene:realize()
-    scene:start_battle()
+    rt.current_scene:start_battle()
 end
 
 rt.graphics.frame_duration = {
@@ -25,6 +24,41 @@ rt.graphics.frame_duration = {
     n_frames_saved = 144,
     max = 0
 }
+
+love.draw = function()
+    local before = love.timer.getTime()
+    love.graphics.clear(0.8, 0.2, 0.8, 1)
+
+    rt.current_scene:draw()
+
+    do -- show fps and frame usage
+        local fps = love.timer.getFPS()
+        local frame_usage = math.round(rt.graphics.frame_duration.max / (1 / fps) * 100)
+        local label = tostring(fps) .. " (" .. string.rep("0", math.abs(3 - #tostring(frame_usage))) .. frame_usage .. "%)"
+        local margin = 3
+        love.graphics.setColor(1, 1, 1, 0.75)
+        love.graphics.print(label, rt.graphics.get_width() - love.graphics.getFont():getWidth(label) - 2 * margin, 0.5 * margin)
+    end
+end
+
+love.update = function(delta)
+    rt.AnimationHandler:update(delta)
+
+    profiler.push("update")
+    rt.current_scene:update(delta)
+    profiler.pop()
+    profiler.dump("update")
+end
+
+love.resize = function()
+    rt.current_scene:size_allocate(0, 0, love.graphics.getWidth(), love.graphics.getHeight())
+end
+
+love.quit = function()
+    if profiler.get_is_active() then
+        profiler.deactivate()
+    end
+end
 
 love.run = function()
     love.window.setMode(1600 / 1.5, 900 / 1.5, {
@@ -94,29 +128,4 @@ love.run = function()
 
         if love.timer then love.timer.sleep(0.001) end
     end
-end
-
-love.draw = function()
-    local before = love.timer.getTime()
-    love.graphics.clear(0.8, 0.2, 0.8, 1)
-
-    rt.current_scene:draw()
-
-    do -- show fps and frame usage
-        local fps = love.timer.getFPS()
-        local frame_usage = math.round(rt.graphics.frame_duration.max / (1 / fps) * 100)
-        local label = tostring(fps) .. " (" .. string.rep("0", math.abs(3 - #tostring(frame_usage))) .. frame_usage .. "%)"
-        local margin = 3
-        love.graphics.setColor(1, 1, 1, 0.75)
-        love.graphics.print(label, rt.graphics.get_width() - love.graphics.getFont():getWidth(label) - 2 * margin, 0.5 * margin)
-    end
-end
-
-love.update = function(delta)
-    rt.AnimationHandler:update(delta)
-    rt.current_scene:update(delta)
-end
-
-love.resize = function()
-    rt.current_scene:size_allocate(0, 0, love.graphics.getWidth(), love.graphics.getHeight())
 end

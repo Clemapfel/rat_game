@@ -116,6 +116,9 @@ struct BattleState {
     background   = BackgroundID
     music        = MusicID
 }
+
+struct Battle {
+}
 ```
 
 Move: if all can_target_* are false, target 
