@@ -4,29 +4,60 @@ lt = {}
 
 -- https://gist.github.com/slime73/079ef5d4e76cec6498ab7472b4f384d9
 lt._step_shader = love.graphics.newComputeShader("lichen/step.glsl")
---lt._render_shader = love.graphics.newShader("lichen/render.glsl")
+lt._render_shader = love.graphics.newShader("lichen/render.glsl")
 
 lt._image_format = "rgba32f"
 lt._lattice_size = {}   -- Tuple<Number, Numbre>
 
+lt._initialized = false
 lt._step_textures = {}  -- Tuple<love.Image, love.Image>
 lt._step_input_order = true
 lt._should_filter_step_textures = true
 
 lt._render_shape = {} -- rt.VertexRectangle
 
-function lt.initialize(size_x, size_y)
-    lt._lattice_size = { size_x, size_y }
+lt._cell_size = 1
+lt._max_state = 10
+lt._max_growth = 75
+lt._step_count = 0
+
+function lt.initialize(width, height)
+    lt._lattice_size = { width, height }
     lt._step_input_order = true
 
-    local initial_data = love.image.newImageData(size_x, size_x, lt._image_format)
-    for x = 1, size_x do
-        for y = 1, size_y do
-            local hue = rt.random.number(0, 1)
-            initial_data:setPixel(x - 1, y - 1, hue, hue, hue, 1)
+    -- initial lattice state
+    local initial_data = love.image.newImageData(width, width, lt._image_format)
+    for x = 1, width do
+        for y = 1, height do
+            initial_data:setPixel(x - 1, y - 1,
+                0, -- state
+                0, -- vector x
+                0, -- vector y
+                0 -- age
+            )
         end
     end
 
+    -- seed, cf. https://github.com/sleepokay/lichen/blob/1e3837aa8396521e5b46cf97a122e74504520f0c/lichen.pde#L39
+    local pos_x = math.round(width / 2)
+    local pos_y = math.round(height / 2)
+
+    local cell_size = lt._cell_size
+    local growth = 0
+    local width_center = width / cell_size / 2
+    local height_center = width / cell_size / 2
+
+    local function set(x, y, state, vector_x, vector_y)
+        initial_data:setPixel(x - 1, y - 1, state, vector_x, vector_y, 0)
+    end
+
+    local max_state = lt._max_state
+    set(width_center - 1, height_center + 0, max_state, 1, 0)
+    set(width_center + 1, height_center + 0, max_state, -1, 0)
+    set(width_center + 0, height_center - 1, max_state, 0, 1)
+    set(width_center + 0, height_center + 1, max_state, 0, -1)
+
+    -- setup textures
     local texture_config = { computewrite = true }
     lt._step_textures[1] = love.graphics.newImage(initial_data, texture_config)
     lt._step_textures[2] = love.graphics.newImage(initial_data, texture_config)
@@ -49,6 +80,7 @@ function lt.step()
     -- step can be applied to itself to iteratively advance simulation
     local computer = lt._step_shader
     local group_count = (lt._lattice_size[1] * lt._lattice_size[2])
+    lt._step_count = lt._step_count + 1
 
     local input, output
     if lt._step_input_order == true then
@@ -58,6 +90,12 @@ function lt.step()
         computer:send("image_in", lt._step_textures[2])
         computer:send("image_out", lt._step_textures[1])
     end
+
+    computer:send("cell_size", lt._cell_size)
+    computer:send("max_state", lt._max_state)
+    computer:send("time", lt._step_count)
+
+--    computer:send("max_growth", lt._max_growth)
 
     love.graphics.dispatchThreadgroups(computer, lt._lattice_size[1], lt._lattice_size[2])
 
@@ -91,6 +129,7 @@ love.keypressed = function(which)
 end
 
 love.draw = function()
+    love.graphics.setShader(lt._render_shader)
     lt._render_shape:draw()
 end
 
