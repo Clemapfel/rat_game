@@ -6,13 +6,13 @@ lt = {}
 lt._step_shader = love.graphics.newComputeShader("lichen/step.glsl")
 lt._render_shader = love.graphics.newShader("lichen/render.glsl")
 
-lt._image_format = "rgba32f"
+lt._image_format = "rgba16f"
 lt._lattice_size = {}   -- Tuple<Number, Numbre>
 
 lt._initialized = false
 lt._step_textures = {}  -- Tuple<love.Image, love.Image>
 lt._step_input_order = true
-lt._should_filter_step_textures = true
+lt._should_filter_step_textures = false
 
 lt._render_shape = {} -- rt.VertexRectangle
 
@@ -45,17 +45,30 @@ function lt.initialize(width, height)
     local cell_size = lt._cell_size
     local growth = 0
     local width_center = width / cell_size / 2
-    local height_center = width / cell_size / 2
+    local height_center = height / cell_size / 2
 
     local function set(x, y, state, vector_x, vector_y)
-        initial_data:setPixel(x - 1, y - 1, state, vector_x, vector_y, 0)
+        initial_data:setPixel(
+            x - 1, y - 1,
+            vector_x,
+            vector_y,
+            state,
+            0
+        )
     end
 
     local max_state = lt._max_state
-    set(width_center - 1, height_center + 0, max_state, 1, 0)
-    set(width_center + 1, height_center + 0, max_state, -1, 0)
-    set(width_center + 0, height_center - 1, max_state, 0, 1)
-    set(width_center + 0, height_center + 1, max_state, 0, -1)
+    set(width_center - 1, height_center + 0, max_state, -1, 0)
+    set(width_center + 1, height_center + 0, max_state, 1, 0)
+    set(width_center + 0, height_center - 1, max_state, 0, -1)
+    set(width_center + 0, height_center + 1, max_state, 0, 1)
+    set(width_center, height_center, max_state, 0, 0)
+
+    for x = -1, 1, 2 do
+        for y = -1, 1, 2 do
+            dbg(x, y, (rt.angle(x, y) + math.pi) / (2 * math.pi))
+        end
+    end
 
     -- setup textures
     local texture_config = { computewrite = true }
@@ -91,7 +104,7 @@ function lt.step()
         computer:send("image_out", lt._step_textures[1])
     end
 
-    computer:send("cell_size", lt._cell_size)
+    --computer:send("cell_size", lt._cell_size)
     computer:send("max_state", lt._max_state)
     computer:send("time", lt._step_count)
 
@@ -130,6 +143,7 @@ end
 
 love.draw = function()
     love.graphics.setShader(lt._render_shader)
+    lt._render_shader:send("max_state", lt._max_state)
     lt._render_shape:draw()
 end
 
