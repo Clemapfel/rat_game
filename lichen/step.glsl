@@ -68,6 +68,8 @@ float random(vec2 v, float offset)
     return 130.0 * dot(m, g);
 }
 
+// ###
+
 layout(rgba16f) uniform image2D image_in;
 layout(rgba16f) uniform image2D image_out;
 
