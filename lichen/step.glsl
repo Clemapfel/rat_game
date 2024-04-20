@@ -68,6 +68,67 @@ float random(vec2 v, float offset)
     return 130.0 * dot(m, g);
 }
 
+layout(rgba16f) uniform image2D image_in;
+layout(rgba16f) uniform image2D image_out;
+
+float activation_function(float x)
+{
+    return x;
+}
+
+uniform float time;
+uniform mat3x3 kernel;
+
+uniform int allow_wrapping;
+
+layout (local_size_x = 1, local_size_y = 1, local_size_z = 1) in;
+void computemain()
+{
+    ivec2 image_size = imageSize(image_in);
+    float rng_offset = 13 * time;
+
+    int x = int(gl_GlobalInvocationID.x);
+    int y = int(gl_GlobalInvocationID.y);
+    int width = image_size.x;
+    int height = image_size.y;
+
+    int x_minus = x == 0 ? width : x - 1;
+    int y_minus = y == 0 ? height : y - 1;
+    int x_plus = x == width ? 0 : x + 1;
+    int y_plus = y == height ? 0 : y + 1;
+
+    ivec2 top_left = ivec2(x_minus, y_minus);
+    ivec2 top_center = ivec2(x, y_minus);
+    ivec2 top_right = ivec2(x_plus, y_minus);
+    ivec2 center_left = ivec2(x_minus, y);
+    ivec2 center_center = ivec2(x, y);
+    ivec2 center_right = ivec2(x_plus, y);
+    ivec2 bottom_left = ivec2(x_minus, y_plus);
+    ivec2 bottom_center = ivec2(x, y_plus);
+    ivec2 bottom_right = ivec2(x_plus, y_plus);
+
+    float sum = 0 +
+        imageLoad(image_in, top_left).z * kernel[0][0] +
+        imageLoad(image_in, top_center).z * kernel[1][0] +
+        imageLoad(image_in, top_right).z * kernel[2][0] +
+        imageLoad(image_in, center_left).z * kernel[0][1] +
+        imageLoad(image_in, center_center).z * kernel[1][1] +
+        imageLoad(image_in, center_right).z * kernel[2][1] +
+        imageLoad(image_in, bottom_left).z * kernel[0][2] +
+        imageLoad(image_in, bottom_center).z * kernel[1][2] +
+        imageLoad(image_in, bottom_right).z * kernel[2][2]
+    ;
+
+    sum = sum / (
+        kernel[0][0] + kernel[1][0] + kernel[2][0] +
+        kernel[0][1] + kernel[1][1] + kernel[1][2] +
+        kernel[0][2] + kernel[1][2] + kernel[2][2]
+    ) * random(vec2(x, y), time);
+
+    imageStore(image_out, ivec2(x, y), vec4(activation_function(sum)));
+}
+
+/*
 // ##
 
 layout(rgba16f) uniform image2D image_in;
@@ -100,7 +161,7 @@ void computemain()
     vec2 new_vector = vec2(0, 0);
 
     // config
-    float excited_neighbors_threshold = 3;
+    float excited_neighbors_threshold = 5;
     float growth_perturbation = 0.0;
     float max_angle_offset = 0.3;
 
@@ -151,7 +212,7 @@ void computemain()
         vec4 to_store = imageLoad(image_in, ivec2(x, y));
 
         // increase state
-        to_store.z = clamp(to_store.z - 1, 1, MAX_STATE);
+        to_store.z = clamp(to_store.z - 0.5, 1, MAX_STATE);
 
         // export
         imageStore(image_out, ivec2(x, y), to_store);

@@ -1,4 +1,4 @@
-#ifdef PIXEL
+#pragma language glsl4
 
 #define PI 3.1415926535897932384626433832795
 
@@ -22,16 +22,32 @@ vec3 hsv_to_rgb(vec3 c)
 
 // ###
 
-uniform float max_state;
+#ifdef VERTEX
+
+uniform int instance_count;
+varying vec3 color;
+
+vec4 position(mat4 transform_projection, vec4 vertex_position)
+{
+    vec2 screen_size = love_ScreenSize.xy;
+    int instance_id = love_InstanceID;
+    int vertex_id = gl_VertexID;
+
+    color = hsv_to_rgb(vec3(float(id) / float(instance_count), 1, 1));
+    return transform_projection * vertex_position;
+}
+
+#endif
+
+#ifdef PIXEL
+
+varying vec3 color;
 
 vec4 effect(vec4 vertex_color, Image image, vec2 texture_coords, vec2 vertex_position)
 {
-    vec4 value = Texel(image, texture_coords);
-    vec3 as_hsv = vec3(value.z, 1, 1);
+    return vec4(color, 1);
 
-    return vec4(hsv_to_rgb(as_hsv), 1);
-
-    /*
+/*
     vec2 vector = value.xy;
     float state = value.z / max_state;
     float age = value.w;

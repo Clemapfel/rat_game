@@ -2,23 +2,56 @@ require "include"
 
 lt = {}
 
+-- config
+lt._lattice_size = { 400, 400 }
+
+lt._kernel = {
+    { 1, -0.5, 1},
+    { 1, 0, 1 },
+    { 1, -0.5, 1 }
+}
+
+
 -- https://gist.github.com/slime73/079ef5d4e76cec6498ab7472b4f384d9
 lt._step_shader = love.graphics.newComputeShader("lichen/step.glsl")
-lt._render_shader = love.graphics.newShader("lichen/render.glsl")
+lt._render_texture_shader = love.graphics.newShader("lichen/render.glsl")
+lt._render_instance_shader = love.graphics.newShader("lichen/render_instanced.glsl")
 
 lt._image_format = "rgba16f"
-lt._lattice_size = {}   -- Tuple<Number, Numbre>
 
 lt._initialized = false
 lt._step_textures = {}  -- Tuple<love.Image, love.Image>
 lt._step_input_order = true
 lt._should_filter_step_textures = false
 
-lt._render_shape = {} -- rt.VertexRectangle
+lt.VertexFormat = {
+    { name = "VertexPosition", format = "floatvec2" },
+    { name = "VertexTexCoord", format = "floatvec2" },
+    { name = "VertexColor",    format = "floatvec4" }
+}
+lt._lattice_shape = {} -- love.Mesh
+lt._particle_shape = {} -- love.Mesh
 
-lt._cell_size = 1
-lt._max_state = 10
-lt._max_growth = 75
+--- @brief create new rectangle
+lt.VertexRectangle = function(x, y, width, height)
+    local w, h = width, height
+    local out = love.graphics.newMesh(
+        lt.VertexFormat,
+        {
+            { x + 0, y + 0,   0, 0,   1, 1, 1, 1 },
+            { x + w, y + 0,   1, 0,   1, 1, 1, 1 },
+            { x + w, y + h,   1, 1,   1, 1, 1, 1 },
+            { x + 0, y + h,   0, 1,   1, 1, 1, 1 }
+        },
+        "triangles",
+        "dynamic"
+    )
+    out:setVertexMap({
+        1, 2, 3, 1, 3, 4
+    })
+    return out
+end
+
 lt._step_count = 0
 
 function lt.initialize(width, height)
@@ -30,14 +63,15 @@ function lt.initialize(width, height)
     for x = 1, width do
         for y = 1, height do
             initial_data:setPixel(x - 1, y - 1,
-                0, -- state
-                0, -- vector x
-                0, -- vector y
-                0 -- age
+                rt.random.number(0, 1),
+                rt.random.number(0, 1),
+                rt.random.number(0, 1),
+                rt.random.number(0, 1)
             )
         end
     end
 
+    --[[
     -- seed, cf. https://github.com/sleepokay/lichen/blob/1e3837aa8396521e5b46cf97a122e74504520f0c/lichen.pde#L39
     local pos_x = math.round(width / 2)
     local pos_y = math.round(height / 2)
@@ -69,11 +103,12 @@ function lt.initialize(width, height)
             dbg(x, y, (rt.angle(x, y) + math.pi) / (2 * math.pi))
         end
     end
+    ]]--
 
     -- setup textures
     local texture_config = { computewrite = true }
     lt._step_textures[1] = love.graphics.newImage(initial_data, texture_config)
-    lt._step_textures[2] = love.graphics.newImage(initial_data, texture_config)
+    lt._step_textures[2] = lt._step_textures[1] --love.graphics.newImage(initial_data, texture_config)
 
     for i = 1, 2 do
         if lt._should_filter_step_textures == true then
@@ -83,8 +118,15 @@ function lt.initialize(width, height)
         end
     end
 
-    lt._render_shape = rt.VertexRectangle(0, 0, rt.graphics.get_width(), rt.graphics.get_height())
-    lt._render_shape._native:setTexture(lt._step_textures[1])
+    -- setup meshes
+    lt._lattice_shape = lt.VertexRectangle(0, 0, rt.graphics.get_width(), rt.graphics.get_height())
+    lt._lattice_shape:setTexture(lt._step_textures[1])
+
+    lt._particle_shape = lt.VertexRectangle(
+        0, 0,
+            rt.graphics.get_width() / lt._lattice_size[1],
+    rt.graphics.get_height() / lt._lattice_size[2]
+    )
 end
 
 --- @brief step simulation
@@ -104,18 +146,14 @@ function lt.step()
         computer:send("image_out", lt._step_textures[1])
     end
 
-    --computer:send("cell_size", lt._cell_size)
-    computer:send("max_state", lt._max_state)
+    computer:send("kernel", lt._kernel)
     computer:send("time", lt._step_count)
-
---    computer:send("max_growth", lt._max_growth)
-
     love.graphics.dispatchThreadgroups(computer, lt._lattice_size[1], lt._lattice_size[2])
 
     if lt._step_input_order == true then
-        lt._render_shape._native:setTexture(lt._step_textures[1])
+        lt._lattice_shape:setTexture(lt._step_textures[1])
     else
-        lt._render_shape._native:setTexture(lt._step_textures[2])
+        lt._lattice_shape:setTexture(lt._step_textures[2])
     end
 
     lt._step_input_order = not lt._step_input_order
@@ -134,23 +172,57 @@ love.load = function()
     love.window.setTitle("rat_game: lichen")
     love.filesystem.setIdentity("rat_game")
 
-    lt.initialize(64, 64)
+    lt.initialize(lt._lattice_size[1], lt._lattice_size[2])
 end
 
+lt._is_stepping = false
+lt._step_elapsed = 0
+lt._steps_per_second = 10
+
 love.keypressed = function(which)
-    lt.step()
+    if which == "space" then
+        lt._is_stepping = true
+    else
+        lt.step()
+    end
+end
+
+love.keyreleased = function(which)
+    if which == "space" then
+        lt._is_stepping = false
+        lt._step_elapsed = 0
+    end
+end
+
+love.update = function(delta)
+    if lt._is_stepping then
+        lt._step_elapsed = lt._step_elapsed + delta
+        while lt._step_elapsed > 1 / lt._steps_per_second do
+            lt.step()
+            lt._step_elapsed = lt._step_elapsed - 1 / lt._steps_per_second
+        end
+    end
 end
 
 love.draw = function()
-    love.graphics.setShader(lt._render_shader)
-    lt._render_shader:send("max_state", lt._max_state)
-    lt._render_shape:draw()
+    --[[
+    -- draw texture directly
+    love.graphics.setShader(lt._render_texture_shader)
+    love.graphics.draw(lt._lattice_shape)
+    ]]--
+
+
+    local instance_count = 200 --lt._lattice_size[1] * lt._lattice_size[2]
+    love.graphics.setShader(lt._render_instance_shader)
+    lt._render_instance_shader:send("instance_count", instance_count)
+    love.graphics.drawInstanced(lt._particle_shape, instance_count)
 end
 
 love.resize = function()
+    -- resize to screen size
     local w, h = love.graphics.getWidth(), love.graphics.getHeight()
-    lt._render_shape:set_vertex_position(1, 0, 0)
-    lt._render_shape:set_vertex_position(2, w, 0)
-    lt._render_shape:set_vertex_position(3, w, h)
-    lt._render_shape:set_vertex_position(4, 0, h)
+    lt._lattice_shape:setVertexAttribute(1, 1, 0, 0)
+    lt._lattice_shape:setVertexAttribute(2, 1, w, 0)
+    lt._lattice_shape:setVertexAttribute(3, 1, w, h)
+    lt._lattice_shape:setVertexAttribute(4, 1, 0, h)
 end
