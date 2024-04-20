@@ -6,11 +6,10 @@ lt = {}
 lt._lattice_size = { 400, 400 }
 
 lt._kernel = {
-    { 1, -0.5, 1},
-    { 1, 0, 1 },
-    { 1, -0.5, 1 }
+    {1, 1, 1},
+    {1, 1, 1},
+    {1, 1, 1}
 }
-
 
 -- https://gist.github.com/slime73/079ef5d4e76cec6498ab7472b4f384d9
 lt._step_shader = love.graphics.newComputeShader("lichen/step.glsl")
@@ -20,10 +19,11 @@ lt._render_texture_shader = love.graphics.newShader("lichen/render.glsl")
 lt._initialized = false
 lt._state_textures = {}  -- Tuple<love.Image, love.Image>
 lt._step_input_order = true
-lt._should_filter_state_textures = false
+lt._should_filter_state_textures = true
 
 lt._state_textures = {}
 lt._state_texture_format = "rgba16f"
+lt._transform_in_place = true
 
 lt.VertexFormat = {
     { name = "VertexPosition", format = "floatvec2" },
@@ -60,6 +60,7 @@ function lt.initialize(width, height)
 
     -- initial lattice state
     local initial_data = love.image.newImageData(width, width, lt._state_texture_format)
+    --[[
     for x = 1, width do
         for y = 1, height do
             if rt.random.toss_coin(0.05) then
@@ -72,6 +73,12 @@ function lt.initialize(width, height)
             end
         end
     end
+    ]]--
+
+    initial_data:setPixel(width / 2 - 1, height / 2 - 1,
+        1, 1,   -- vector x, y
+        1,      -- state
+    0)          -- unused
 
     --[[
     -- seed, cf. https://github.com/sleepokay/lichen/blob/1e3837aa8396521e5b46cf97a122e74504520f0c/lichen.pde#L39
@@ -110,7 +117,12 @@ function lt.initialize(width, height)
     -- setup textures
     local texture_config = { computewrite = true }
     lt._state_textures[1] = love.graphics.newImage(initial_data, texture_config)
-    lt._state_textures[2] = lt._state_textures[1] --love.graphics.newImage(initial_data, texture_config)
+
+    if lt._transform_in_place then
+        lt._state_textures[2] = lt._state_textures[1]
+    else
+        lt._state_textures[2] = love.graphics.newImage(initial_data, texture_config)
+    end
 
     for i = 1, 2 do
         if lt._should_filter_state_textures == true then
@@ -118,6 +130,8 @@ function lt.initialize(width, height)
         else
             lt._state_textures[i]:setFilter("nearest", "nearest")
         end
+
+        lt._state_textures[i]:setWrap("clampzero", "clampzero")
     end
 
     -- setup meshes
@@ -149,7 +163,9 @@ function lt.step()
     end
 
     computer:send("kernel", lt._kernel)
-    --computer:send("time", lt._step_count)
+    local rng = rt.random.number(0, 1)
+    computer:send("rng", rng)
+
     love.graphics.dispatchThreadgroups(computer, lt._lattice_size[1], lt._lattice_size[2])
 
     if lt._step_input_order == true then
