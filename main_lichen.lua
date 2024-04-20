@@ -62,12 +62,14 @@ function lt.initialize(width, height)
     local initial_data = love.image.newImageData(width, width, lt._state_texture_format)
     for x = 1, width do
         for y = 1, height do
-            initial_data:setPixel(x - 1, y - 1,
-                rt.random.number(0, 1),
-                rt.random.number(0, 1),
-                rt.random.number(0, 1),
-                rt.random.number(0, 1)
-            )
+            if rt.random.toss_coin(0.05) then
+                initial_data:setPixel(x - 1, y - 1,
+                    rt.random.number(0, 1),
+                    rt.random.number(0, 1),
+                    rt.random.number(0, 1),
+                    rt.random.number(0, 1)
+                )
+            end
         end
     end
 
@@ -147,7 +149,7 @@ function lt.step()
     end
 
     computer:send("kernel", lt._kernel)
-    computer:send("time", lt._step_count)
+    --computer:send("time", lt._step_count)
     love.graphics.dispatchThreadgroups(computer, lt._lattice_size[1], lt._lattice_size[2])
 
     if lt._step_input_order == true then

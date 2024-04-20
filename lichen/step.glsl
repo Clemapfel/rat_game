@@ -75,7 +75,7 @@ layout(rgba16f) uniform image2D image_out;
 
 float activation_function(float x)
 {
-    return x;
+    return sin(x);
 }
 
 uniform float time;
@@ -109,6 +109,8 @@ void computemain()
     ivec2 bottom_center = ivec2(x, y_plus);
     ivec2 bottom_right = ivec2(x_plus, y_plus);
 
+    float perturbation = 0;
+
     float sum = 0 +
         imageLoad(image_in, top_left).z * kernel[0][0] +
         imageLoad(image_in, top_center).z * kernel[1][0] +
@@ -121,11 +123,13 @@ void computemain()
         imageLoad(image_in, bottom_right).z * kernel[2][2]
     ;
 
+
     sum = sum / (
         kernel[0][0] + kernel[1][0] + kernel[2][0] +
         kernel[0][1] + kernel[1][1] + kernel[1][2] +
         kernel[0][2] + kernel[1][2] + kernel[2][2]
-    ) * random(vec2(x, y), time);
+    );
+
 
     imageStore(image_out, ivec2(x, y), vec4(activation_function(sum)));
 }

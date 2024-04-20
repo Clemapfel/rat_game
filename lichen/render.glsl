@@ -29,7 +29,7 @@ vec4 effect(vec4 vertex_color, Image image, vec2 texture_coords, vec2 vertex_pos
     vec4 value = Texel(image, texture_coords);
     vec3 as_hsv = vec3(value.z, 1, 1);
 
-    return vec4(hsv_to_rgb(as_hsv), 1);
+    return vec4(vec3(value.z), 1);
 
     /*
     vec2 vector = value.xy;
