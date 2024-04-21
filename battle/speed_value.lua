@@ -36,7 +36,7 @@ end
 
 --- @override
 function bt.SpeedValue:realize()
-    if self._is_realized then return end
+    if self._is_realized == true then return end
 
     local settings = {
         is_outlined = true,
@@ -64,7 +64,7 @@ end
 
 --- @override
 function bt.SpeedValue:update(delta)
-    if self._is_realized then
+    if self._is_realized == true then
         self._elapsed = self._elapsed + delta
 
         local diff = (self._speed_value - self._speed_target)
@@ -89,7 +89,7 @@ end
 
 --- @override
 function bt.SpeedValue:draw()
-    if self._is_realized then
+    if self._is_realized == true then
         self._speed_label:draw()
     end
 end
@@ -98,7 +98,7 @@ end
 function bt.SpeedValue:sync()
     self._speed_target = self._entity:get_speed()
 
-    if self._is_realized then
+    if self._is_realized == true then
         self._speed_label:set_text(self:_format_value(self._speed_value))
     end
 end

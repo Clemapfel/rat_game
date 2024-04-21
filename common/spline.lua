@@ -272,3 +272,41 @@ function rt.test.spline()
     local pos_x, pos_y = curve:at(math.fmod(elapsed / 10, 1))
     love.graphics.circle("fill", pos_x, pos_y, 10)
 end
+
+-- ###
+
+
+rt.BSpline = meta.new_type("BSpline", rt.Drawable, function(points)
+    local out = meta.new(rt.BSpline, {
+        _vertices = {},
+        _native = {}
+    })
+
+    if points ~= nil then out:create_from(points) end
+    return out
+end)
+
+function rt.BSpline:create_from(points)
+    if #points < 6 then return end
+
+    -- https://github.com/msteinbeck/tinyspline/blob/master/examples/lua/quickstart.lua
+    local ts = require("tinysplinelua51")
+    local spline = ts.BSpline(#points / 2)
+    spline.control_points = points
+    self._native = spline
+
+    self._vertices = {}
+    for i = 1, #points + 1 do
+        local result = self._native:eval((i-1) / #points).result
+        table.insert(self._vertices, result[1])
+        table.insert(self._vertices, result[2])
+    end
+end
+
+function rt.BSpline:draw()
+    if not (#self._vertices > 2) then return end
+    for i = 1, #self._vertices - 2, 2 do
+        local x1, y1, x2, y2 = self._vertices[i], self._vertices[i+1], self._vertices[i+2], self._vertices[i+3]
+        love.graphics.line(x1, y1, x2, y2)
+    end
+end

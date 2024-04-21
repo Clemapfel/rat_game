@@ -152,6 +152,7 @@ function sizeof(x)
         return 1
     end
 end
+table.sizeof = sizeof
 
 --- @brief is table empty
 --- @param x any
@@ -163,6 +164,7 @@ function is_empty(x)
         return next(x) == nil
     end
 end
+table.is_empty = is_empty
 
 --- @brief clamp
 --- @param x number

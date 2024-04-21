@@ -30,7 +30,7 @@ end, {
 
 --- @brief
 function bt.Stance:realize()
-    if self._is_realized then return end
+    if self._is_realized == true then return end
 
     local chunk, error_maybe = love.filesystem.load(self._path)
     if error_maybe ~= nil then

@@ -54,7 +54,7 @@ end)
 --- @brief
 function bt.PriorityQueueElement:set_change_indicator(direction)
     self._change_direction = direction
-    if self._is_realized then
+    if self._is_realized == true then
         self._change_indicator:set_direction(direction)
         if direction == rt.Direction.UP then
             self._change_indicator:set_color(rt.settings.battle.priority_queue_element.change_indicator_up_color)
@@ -77,7 +77,7 @@ end
 
 --- @override
 function bt.PriorityQueueElement:realize()
-    if self._is_realized then return end
+    if self._is_realized == true then return end
     self._is_realized = true
 
     local sprite_id, sprite_index = self._entity:get_sprite_id()
@@ -136,7 +136,7 @@ end
 
 --- @override
 function bt.PriorityQueueElement:size_allocate(x, y, width, height)
-    if self._is_realized then
+    if self._is_realized == true then
         -- make shape square
         local min = math.min(width, height)
         x = x + (width - min) / 2
@@ -215,7 +215,7 @@ end
 
 --- @override
 function bt.PriorityQueueElement:draw()
-    if self._is_realized then
+    if self._is_realized == true then
         self._backdrop:draw()
 
         -- stencil away overlapping corners of shape
@@ -262,7 +262,7 @@ end
 --- @brief
 function bt.PriorityQueueElement:set_is_selected(b)
     self._is_selected = b
-    if self._is_realized then
+    if self._is_realized == true then
         if self._is_selected then
             self._frame:set_color(rt.settings.battle.priority_queue_element.selected_frame_color)
         else
@@ -274,7 +274,7 @@ end
 --- @brief
 function bt.PriorityQueueElement:set_is_disabled(b)
     self._is_disabled = b
-    if self._is_realized then
+    if self._is_realized == true then
         self._shape:set_opacity(ternary(not self._is_disabled, 1, 0.4))
         self._id_offset_label:set_opacity(ternary(not self._is_disabled, 1, 0.8))
     end

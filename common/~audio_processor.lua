@@ -229,6 +229,7 @@ function rt.AudioProcessor:stop()
 end
 
 local once = false
+
 --- @brief
 function rt.AudioProcessor:update()
     if self._source:getFreeBufferCount() > 0 then

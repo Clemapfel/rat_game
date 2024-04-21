@@ -34,7 +34,7 @@ end)
 
 --- @override
 function bt.EnemySprite:realize()
-    if self._is_realized then return end
+    if self._is_realized == true then return end
     self._is_realized = true
 
     local sprite_w, sprite_h = self._sprite:get_resolution()
@@ -149,7 +149,7 @@ end
 
 --- @override
 function bt.EnemySprite:draw()
-    if self._is_realized then
+    if self._is_realized == true then
         self:_draw()
         self._draw_animations()
     end
@@ -165,7 +165,7 @@ end
 
 --- @override
 function bt.EnemySprite:set_is_visible(b)
-    if self._is_realized then
+    if self._is_realized == true then
         self._sprite:set_is_visible(b)
     end
 end

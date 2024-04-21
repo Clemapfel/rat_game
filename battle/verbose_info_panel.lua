@@ -23,7 +23,7 @@ end)
 
 --- @override
 function bt.VerboseInfo:realize()
-    if self._is_realized then return end
+    if self._is_realized == true then return end
     self._is_realized = true
 
     self:set_is_animated(true)
@@ -44,7 +44,7 @@ end
 
 --- @override
 function bt.VerboseInfo:draw()
-    if self._is_realized then
+    if self._is_realized == true then
         local x, y = self._slide_collider:get_position()
         rt.graphics.push()
         rt.graphics.translate(x, y)
@@ -59,7 +59,7 @@ end
 
 --- @override
 function bt.VerboseInfo:update(delta)
-    if self._is_realized then
+    if self._is_realized == true then
         local collider = self._slide_collider;
         local current_x, current_y = collider:get_centroid()
         local target_x = self._target_x

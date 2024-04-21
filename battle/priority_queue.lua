@@ -248,7 +248,7 @@ end
 --- @brief
 function bt.PriorityQueue:set_order(order)
     self._current_order = order
-    if self._is_realized then
+    if self._is_realized == true then
         self:reformat()
     end
 end
@@ -257,7 +257,7 @@ end
 function bt.PriorityQueue:set_is_preview_active(b)
     if self._is_preview_active ~= b then
         self._is_preview_active = b
-        if self._is_realized then
+        if self._is_realized == true then
             self:reformat()
         end
     end
@@ -273,7 +273,7 @@ function bt.PriorityQueue:set_is_hidden(b)
     if self._is_hidden ~= b then
         self._is_hidden = b
 
-        if self._is_realized then
+        if self._is_realized == true then
             self:reformat()
         end
     end
@@ -286,7 +286,7 @@ end
 
 --- @override
 function bt.PriorityQueue:realize()
-    if self._is_realized then return end
+    if self._is_realized == true then return end
     self._is_realized = true
     self._entries = {}
     self:reformat()
@@ -329,7 +329,7 @@ end
 
 --- @override
 function bt.PriorityQueue:draw()
-    if self._is_realized then
+    if self._is_realized == true then
         rt.graphics.push()
         local size = rt.settings.battle.priority_queue.element_size
         local max_scale = rt.settings.battle.priority_queue.first_element_scale_factor

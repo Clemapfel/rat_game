@@ -53,7 +53,7 @@ end
 
 --- @override
 function rt.Sprite:update(delta)
-    if self._is_realized then
+    if self._is_realized == true then
         self._elapsed = self._elapsed + delta
         local start = self._frame_range_start
         local n_frames = self._frame_range_end - self._frame_range_start + 1
@@ -71,7 +71,7 @@ end
 --- @brief
 function rt.Sprite:set_frame(i)
     self._current_frame = i
-    if self._is_realized then
+    if self._is_realized == true then
         local frame = self._spritesheet:get_frame(self._current_frame)
         self._shape:reformat_texture_coordinates(
             frame.x, frame.y,
@@ -109,7 +109,7 @@ end
 
 --- @override
 function rt.Sprite:size_allocate(x, y, width, height)
-    if self._is_realized then
+    if self._is_realized == true then
         self._shape:set_vertex_position(1, x, y)
         self._shape:set_vertex_position(2, x + width, y)
         self._shape:set_vertex_position(3, x + width, y + height)
@@ -128,7 +128,7 @@ end
 function rt.Sprite:set_opacity(alpha)
     self._opacity = alpha
 
-    if self._is_realized then
+    if self._is_realized == true then
         self._shape:set_opacity(self._opacity)
     end
 end

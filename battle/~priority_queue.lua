@@ -94,7 +94,7 @@ function bt.PriorityQueue:reorder(order)
                 table.insert(entry.target_positions, { 0, 0 })
 
                 local element_size = rt.settings.battle.priority_queue.element_size
-                if self._is_realized then
+                if self._is_realized == true then
                     queue_element:realize()
                 end
                 queue_element:fit_into(0, 0, element_size, element_size)
@@ -118,7 +118,7 @@ end
 function bt.PriorityQueue:size_allocate(x, y, width, height)
     local element_size = rt.settings.battle.priority_queue.element_size
     local off_screen_pos_x, off_screen_pos_y = x + width + 2 * element_size, 0
-    if self._is_realized then
+    if self._is_realized == true then
         local function handle(which, offset)
             for _, entry in pairs(which.entries) do
                 for i, element in ipairs(entry.elements) do
@@ -172,7 +172,7 @@ end
 
 --- @override
 function bt.PriorityQueue:realize()
-    if self._is_realized then return end
+    if self._is_realized == true then return end
     self._is_realized = true
     self._current.entries = {}
     self._next.entries = {}
@@ -233,7 +233,7 @@ end
 
 --- @override
 function bt.PriorityQueue:draw()
-    if self._is_realized then
+    if self._is_realized == true then
         local function handle(which)
             -- draw current
             rt.graphics.push()

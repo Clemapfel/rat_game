@@ -113,7 +113,7 @@ end
 
 --- @override
 function bt.StatusBar:size_allocate(x, y, width, height)
-    if self._is_realized then
+    if self._is_realized == true then
         local size = rt.settings.battle.status_bar.element_size
         local n = sizeof(self._elements)
         local total_size = n * size
@@ -182,7 +182,7 @@ function bt.StatusBar:add(status, elapsed)
     element:set_scale(rt.settings.battle.status_bar.add_animation_max_scale)
     element:set_opacity(0)
 
-    if self._is_realized then
+    if self._is_realized == true then
         element:realize()
     end
 

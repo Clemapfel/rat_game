@@ -12,7 +12,7 @@ end)
 
 --- @override
 function bt.Backdrop:realize()
-    if self._is_realized then return end
+    if self._is_realized == true then return end
     self._is_realized = true
 
     self._backdrop_backing = rt.Spacer()

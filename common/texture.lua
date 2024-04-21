@@ -95,6 +95,13 @@ function rt.Texture:draw()
     love.graphics.draw(self._native)
 end
 
+if love.getVersion() >= 12 then
+    --- @overload
+    function rt.Texture:download()
+        return love.graphics.readbackTexture(self._native)
+    end
+end
+
 --- @brief test texture
 function rt.test.texture()
     error("TODO")

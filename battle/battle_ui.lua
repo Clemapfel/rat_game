@@ -146,7 +146,7 @@ end
 function bt.BattleUI:add_entity(entity)
     self._entities[entity] = false
 
-    if self._is_realized then
+    if self._is_realized == true then
         if entity:get_is_enemy() then
             local sprite = bt.EnemySprite(self._scene, entity)
             table.insert(self._enemy_sprites, sprite)

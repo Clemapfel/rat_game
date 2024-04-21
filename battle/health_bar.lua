@@ -72,7 +72,7 @@ end
 
 --- @override
 function bt.HealthBar:realize()
-    if self._is_realized then return end
+    if self._is_realized == true then return end
 
     local left, center, right = self:_format_hp(self._hp_value, self._hp_max)
     local settings = {
@@ -119,7 +119,7 @@ end
 
 --- @override
 function bt.HealthBar:update(delta)
-    if self._is_realized then
+    if self._is_realized == true then
         self._elapsed = self._elapsed + delta
 
         local diff = (self._hp_value - self._hp_target)
@@ -157,7 +157,7 @@ end
 
 --- @override
 function bt.HealthBar:draw()
-    if self._is_realized then
+    if self._is_realized == true then
         self._hp_bar:draw()
         self._label_left:draw()
         self._label_center:draw()
@@ -185,7 +185,7 @@ end
 --- @brief
 function bt.HealthBar:set_state(state)
     self._state = state
-    if self._is_realized then
+    if self._is_realized == true then
         self:_update_color_from_precentage(self._hp_value)
     end
 end

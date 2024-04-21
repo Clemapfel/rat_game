@@ -127,7 +127,7 @@ end
 
 --- @overload
 function ow.Player:draw()
-    if self._is_realized then
+    if self._is_realized == true then
         if self._scene:get_debug_draw_enabled() then
             self._debug_body:draw()
             self._debug_body_outline:draw()
@@ -151,7 +151,7 @@ function ow.Player:draw()
 end
 
 function ow.Player._on_physics_update(_, self)
-    if self._is_realized then
+    if self._is_realized == true then
         local x, y = self._collider:get_centroid()
         self._sensor:set_centroid(rt.translate_point_by_angle(x, y, self._radius, self._direction))
         self:_update_velocity()
@@ -359,7 +359,7 @@ end
 
 --- @brief
 function ow.Player:set_position(x, y)
-    if self._is_realized then
+    if self._is_realized == true then
         self._collider:set_centroid(x, y)
         ow.Player._on_physics_update(0, self)
     else

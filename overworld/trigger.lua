@@ -106,14 +106,14 @@ end
 --- @brief
 function ow.Trigger:set_is_solid(b)
     self._is_solid = b
-    if self._is_realized then
+    if self._is_realized == true then
         self._collider:set_is_sensor(not b)
     end
 end
 
 --- @brief [internal]
 function ow.Trigger:_update_collider()
-    if self._is_realized then
+    if self._is_realized == true then
         self._collider:set_is_active(self._active)
         self._collider:set_is_sensor(not self._is_solid)
         println(self._collider:get_is_sensor())
@@ -126,7 +126,7 @@ end
 
 --- @override
 function ow.Trigger:update(delta)
-    if self._is_realized then
+    if self._is_realized == true then
         if self._should_emit_intersect then
             self:signal_emit("intersect", self._should_emit_intersect_data)
             self._should_emit_intersect = false
@@ -143,7 +143,7 @@ end
 
 --- @override
 function ow.Trigger:draw()
-    if self._is_realized then
+    if self._is_realized == true then
         if self._scene:get_debug_draw_enabled() then
             if self._active then
                 self._debug_shape:draw()

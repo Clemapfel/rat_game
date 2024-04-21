@@ -15,6 +15,10 @@ love.load = function()
         end
     end)
 
+    background = bt.BattleBackground("TEST_BACKGROUND")
+    background:realize()
+    background:fit_into(0, 0, rt.graphics.get_width(), rt.graphics.get_height())
+
     rt.current_scene:realize()
     rt.current_scene:start_battle()
 end
@@ -29,8 +33,9 @@ love.draw = function()
     local before = love.timer.getTime()
     love.graphics.clear(0.8, 0.2, 0.8, 1)
 
-    rt.current_scene:draw()
+    --rt.current_scene:draw()
 
+    background:draw()
     do -- show fps and frame usage
         local fps = love.timer.getFPS()
         local frame_usage = math.round(rt.graphics.frame_duration.max / (1 / fps) * 100)
@@ -43,11 +48,8 @@ end
 
 love.update = function(delta)
     rt.AnimationHandler:update(delta)
-
-    profiler.push("update")
     rt.current_scene:update(delta)
-    profiler.pop()
-    profiler.dump("update")
+    background:update(delta)
 end
 
 love.resize = function()

@@ -42,7 +42,7 @@ bt.Equip._atlas = {}
 
 --- @brief
 function bt.Equip:realize()
-    if self._is_realized then return end
+    if self._is_realized == true then return end
     meta.set_is_mutable(self, true)
 
     local chunk, error_maybe = love.filesystem.load(self._path)

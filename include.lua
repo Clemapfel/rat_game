@@ -173,6 +173,7 @@ require "battle.global_status"
 require "battle.consumable"
 require "battle.equip"
 require "battle.move"
+require "battle.battle_config"
 
 require "battle.battle_entity"
 require "battle.battle_state"
@@ -181,13 +182,16 @@ require "battle.health_bar"
 require "battle.speed_value"
 require "battle.battle_animation_target"
 
+require "battle.battle_background"
 require "battle.battle_ui"
 
 -- TODO
-for _, name in pairs(love.filesystem.getDirectoryItems("battle/animations")) do
-    if name ~= "status" and name ~= "move" then
-        local path = "battle.animations." .. string.gsub(name, "%.lua$", "")
-        require(path)
+for folder in range("animations", "backgrounds") do
+    for _, name in pairs(love.filesystem.getDirectoryItems("battle/" .. folder)) do
+        if name ~= "status" and name ~= "move" then
+            local path = "battle." .. folder .. "." .. string.gsub(name, "%.lua$", "")
+            require(path)
+        end
     end
 end
 -- TODO

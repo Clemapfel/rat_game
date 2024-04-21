@@ -38,14 +38,14 @@ function bt.StatusBarElement:set_elapsed(n)
         rt.warning("In bt.StatusBarElement:set_elapsed: number of leftover for status `" .. self._status.id .. "` on entity `" .. self._entity:get_id() .. "`) turns is less than 0")
     end
 
-    if self._is_realized then
+    if self._is_realized == true then
         self._n_turns_left_label:set_text(text)
     end
 end
 
 --- @brief
 function bt.StatusBarElement:realize()
-    if self._is_realized then return end
+    if self._is_realized == true then return end
     self._is_realized = true
 
     local sprite_id, sprite_index = self._status:get_sprite_id()
@@ -80,7 +80,7 @@ end
 
 --- @brief
 function bt.StatusBarElement:size_allocate(x, y, width, height)
-    if self._is_realized then
+    if self._is_realized == true then
         -- display icon centered at original resolution to avoid artifacting
         local res_x, res_y = self._spritesheet:get_frame_size()
         local center_x, center_y = x + 0.5 * width, y + 0.5 * height
@@ -107,7 +107,7 @@ end
 
 --- @brief
 function bt.StatusBarElement:draw()
-    if self._is_realized then
+    if self._is_realized == true then
         self._shape:draw()
         if self._n_turns_left_label_visible and not self._hide_n_turns then
             self._n_turns_left_label:draw()
@@ -121,7 +121,7 @@ end
 
 --- @brief
 function bt.StatusBarElement:_draw_sprite()
-    if self._is_realized then
+    if self._is_realized == true then
         self._shape:draw()
     end
 
@@ -141,7 +141,7 @@ end
 function bt.StatusBarElement:set_opacity(alpha)
     self._opacity = clamp(alpha, 0, 1)
 
-    if self._is_realized then
+    if self._is_realized == true then
         self._shape:set_opacity(self._opacity)
         if self._n_turns_left_label_visible then
             self._n_turns_left_label:set_opacity(self._opacity)
@@ -157,7 +157,7 @@ end
 --- @brief
 function bt.StatusBarElement:set_scale(scale)
     self._scale = clamp(scale, 0)
-    if self._is_realized then
+    if self._is_realized == true then
         local center_x, center_y = self._shape:get_centroid()
         local res_x, res_y = self._spritesheet:get_frame_size()
         self._shape:reformat_vertex_positions(

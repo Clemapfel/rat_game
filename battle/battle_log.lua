@@ -37,7 +37,7 @@ end)
 
 --- @override
 function bt.BattleLog:realize()
-    if self._is_realized then return end
+    if self._is_realized == true then return end
 
     self._label_height = 0
     for _, label in pairs(self._labels) do

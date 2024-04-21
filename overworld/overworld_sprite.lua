@@ -55,7 +55,7 @@ end
 function ow.OverworldSprite:set_position(x, y)
     ow.OverworldEntity.set_position(self, x, y)
 
-    if self._is_realized then
+    if self._is_realized == true then
         self:set_size(self._width, self._height) -- updates _shape vertices
         self._debug_shape:set_top_left(x, y)
         self._debug_shape_outline:set_top_left(x, y)
@@ -69,7 +69,7 @@ function ow.OverworldSprite:set_size(width, height)
     self._width = width
     self._height = height
 
-    if self._is_realized then
+    if self._is_realized == true then
         local x, y = self:get_position()
         local res_x, res_y = self._spritesheet:get_frame_size()
         local w = ternary(width == 0, res_x, width)
@@ -106,7 +106,7 @@ end
 --- @brief
 function ow.OverworldSprite:set_frame(i)
     self._current_frame = i % self._n_frames + 1
-    if self._is_realized then
+    if self._is_realized == true then
         local frame = self._spritesheet:get_frame(self._current_frame)
         self._shape:reformat_texture_coordinates(
             frame.x, frame.y,
@@ -129,7 +129,7 @@ end
 
 --- @override
 function ow.OverworldSprite:draw()
-    if self._is_realized then
+    if self._is_realized == true then
         if self._scene:get_debug_draw_enabled() then
             self._debug_shape:draw()
             self._debug_shape_outline:draw()
@@ -140,7 +140,7 @@ end
 
 --- @override
 function ow.OverworldSprite:update(delta)
-    if self._is_realized then
+    if self._is_realized == true then
         self._elapsed = self._elapsed + delta
         local frame_i = math.floor(self._elapsed / self._frame_duration)
 

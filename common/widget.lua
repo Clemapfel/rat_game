@@ -72,7 +72,7 @@ end
 --- @brief realize widget
 function rt.Widget:realize()
 
-    if self._is_realized then return end
+    if self._is_realized == true then return end
     self._is_realized = true
 
     if self:_has_top_level() then

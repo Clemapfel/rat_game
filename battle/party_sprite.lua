@@ -31,7 +31,7 @@ end)
 
 --- @override
 function bt.PartySprite:realize()
-    if self._is_realized then return end
+    if self._is_realized == true then return end
     self._is_realized = true
 
     self._backdrop:set_is_outline(false)
@@ -74,7 +74,7 @@ end
 
 --- @override
 function bt.PartySprite:size_allocate(x, y, width, height)
-    if self._is_realized then
+    if self._is_realized == true then
         local m = 0.5 * rt.settings.margin_unit
         local hp_height = rt.settings.battle.health_bar.hp_font:get_size() + 2 * m
 

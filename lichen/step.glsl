@@ -82,7 +82,8 @@ uniform float rng;
 
 float activation_function(float x)
 {
-    return x;
+    //return tanh(3 * (x - 0.5));
+    return 2 * (x - 0.5);
 }
 
 layout (local_size_x = 1, local_size_y = 1, local_size_z = 1) in;
@@ -119,8 +120,11 @@ void computemain()
     }
 
     neighborhood_sum = neighborhood_sum / kernel_sum;
-    neighborhood_sum = activation_function(neighborhood_sum);
 
-    if (n_active_neighbors > 1)
-        imageStore(image_out, ivec2(x, y), vec4(current.xy, neighborhood_sum + 1 + rng, 0));
+    float offset = activation_function(rng);
+    if (offset * neighborhood_sum * (1 / n_active_neighbors) > 0)
+        neighborhood_sum += offset;
+
+
+    imageStore(image_out, ivec2(x, y), vec4(current.xy, clamp(neighborhood_sum, 0, 1), 0));
 }
