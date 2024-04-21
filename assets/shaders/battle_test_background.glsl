@@ -48,7 +48,7 @@ vec4 effect(vec4 vertex_color, Image image, vec2 texture_coords, vec2 vertex_pos
     vec2 size = love_ScreenSize.xy;
     float factor = 100;
     vec3 as_hsv = vec3(
-        sine_wave(time + distance(vec2(x, y) / factor, size * 0.5 / factor), 0.2) * (1 + intensity),
+        sine_wave(-1 * time + distance(vec2(x, y) / factor, size * 0.5 / factor), 0.2) * (1 + intensity),
         project(sigmoid(1.5 * (1 - ((y + intensity) / size.y))), 0.2, 1),
         1
     );
