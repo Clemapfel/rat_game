@@ -6,7 +6,9 @@ bt.BattleBackground.TEST_BACKGROUND = meta.new_type("TEST_BACKGROUND", bt.Battle
         _shader = {},
         _bounds = rt.AABB(0, 0, 1, 1),
         _is_realized = false,
-        _elapsed = 0
+        _elapsed = 0,
+        _line_elapsed = 0,
+        _line_duration = 4 / 60,
     })
 end)
 
@@ -51,6 +53,9 @@ function bt.BattleBackground.TEST_BACKGROUND:draw()
         self._shader:bind()
         self._shape:draw()
         self._shader:unbind()
+
+        rt.graphics.set_color(rt.Palette.NEON_RED_3)
+        love.graphics.setLineWidth(5)
         self._spline:draw()
     end
 end
@@ -75,7 +80,12 @@ function bt.BattleBackground.TEST_BACKGROUND:step(delta, magnitudes)
     table.insert(points, x)
     table.insert(points, h)
 
-    self._spline = rt.BSpline(points)
+    self._line_elapsed = self._line_elapsed + delta
+    if self._line_elapsed > self._line_duration then
+        self._spline = rt.BSpline(points)
+        self._line_elapsed = 0
+    end
+
     self._shader:send("time", self._elapsed)
     self._shader:send("intensity", intensity / #magnitudes)
 end

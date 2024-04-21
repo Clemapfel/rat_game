@@ -22,6 +22,20 @@ float sine_wave(float x, float frequency) {
     return (sin(2.0 * 3.14159 * x * frequency - 3.14159 / 2.0) + 1.0) * 0.5;
 }
 
+float project(float lower, float upper, float value)
+{
+    return value * abs(upper - lower) + min(lower, upper);
+}
+
+float exponential_acceleration(float x) {
+    float a = 0.045;
+    return a * exp(log(1.0 / a + 1.0) * x) - a;
+}
+
+float sigmoid(float x) {
+    return 1.0 / (1.0 + exp(-1.0 * 9 * (x - 0.5)));
+}
+
 #ifdef PIXEL
 
 uniform float time;
@@ -29,7 +43,16 @@ uniform float intensity;
 
 vec4 effect(vec4 vertex_color, Image image, vec2 texture_coords, vec2 vertex_position)
 {
-    vec3 as_hsv = vec3(sine_wave(time, 0.2), 1, intensity);
+    float x = vertex_position.x;
+    float y = vertex_position.y;
+    vec2 size = love_ScreenSize.xy;
+    float factor = 100;
+    vec3 as_hsv = vec3(
+        sine_wave(time + distance(vec2(x, y) / factor, size * 0.5 / factor), 0.2) * (1 + intensity),
+        project(sigmoid(1.5 * (1 - ((y + intensity) / size.y))), 0.2, 1),
+        1
+    );
+    as_hsv.x = project(as_hsv.x, 0.5, 0.9);
     return vec4(hsv_to_rgb(as_hsv), 1);
 }
 

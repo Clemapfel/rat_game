@@ -62,6 +62,19 @@ function rt.graphics.set_blend_mode(blend_mode)
     end
 end
 
+--- @brief
+function rt.graphics.set_color(color)
+    local r, g, b, a = color, g, b, a
+    if meta.is_rgba(color) then
+        r, g, b, a = color.r, color.g, color.b, color.a
+    elseif meta.is_hsva(color) then
+        color = rt.hsva_to_rgba(color)
+        r, g, b, a = color.r, color.g, color.b, color.a
+    end
+
+    love.graphics.setColor(r, g, b, a)
+end
+
 --- @brief write a stencil value to an area on screen occupied by drawables
 --- @param new_value Number new stencil value
 --- @vararg rt.Drawable
