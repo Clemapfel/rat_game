@@ -15,7 +15,7 @@ love.load = function()
         end
     end)
 
-    background = bt.BattleBackground("TEST_BACKGROUND")
+    background = bt.BattleBackground("TEST_BACKGROUND", "assets/music/test_music_04.mp3")
     background:realize()
     background:fit_into(0, 0, rt.graphics.get_width(), rt.graphics.get_height())
 

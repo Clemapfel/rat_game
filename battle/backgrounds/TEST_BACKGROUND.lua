@@ -55,6 +55,7 @@ function bt.BattleBackground.TEST_BACKGROUND:draw()
         self._shader:unbind()
 
         rt.graphics.set_color(rt.Palette.NEON_RED_3)
+        love.graphics.setLineJoin("miter")
         love.graphics.setLineWidth(5)
         self._spline:draw()
     end

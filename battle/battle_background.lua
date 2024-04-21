@@ -24,8 +24,14 @@ end
 
 --- ###
 
+rt.settings.battle_background = {
+    fourier_transform_window_size = 2^11,   -- window size, the smaller the faster
+    n_transforms_per_second = 30            -- transform fps, the smaller the less load
+}
+
+
 --- @class bt.BattleBackground
-bt.BattleBackground = meta.new_type("BattleBackground", bt.Animation, rt.Widget, function(id)
+bt.BattleBackground = meta.new_type("BattleBackground", bt.Animation, rt.Widget, function(id, music_path)
     local implementation = bt.BattleBackground[id]
     if implementation == nil then
         rt.error("In bt.BattleBackground: no background implementation with id `" .. id .. "` available")
@@ -34,6 +40,10 @@ bt.BattleBackground = meta.new_type("BattleBackground", bt.Animation, rt.Widget,
     return meta.new(bt.BattleBackground, {
         _implementation_id = id,
         _implementation = {}, -- bt.BattleBackgroundImplementation
+        _audio = rt.MonitoredAudioPlayback(music_path),
+
+        _transform_elapsed = 0,
+        _transforms_per_second = 30,
     })
 end)
 
@@ -42,6 +52,7 @@ function bt.BattleBackground:realize()
     if self._is_realized == true then return end
     self._implementation = bt.BattleBackground[self._implementation_id]()
     self._implementation:realize()
+    self._audio:start()
     self._is_realized = true
 end
 
@@ -58,10 +69,15 @@ end
 
 --- @brief
 function bt.BattleBackground:update(delta)
-    local _magnitudes = {}
-    local n_magnitudes = 148
-    for i = 1, n_magnitudes do
-        table.insert(_magnitudes, rt.random.number(0, 1) * rt.skewed_gaussian(i / n_magnitudes, 0.2, 1, 0))
+
+    self._audio:update(delta)
+
+    local window_size = rt.settings.battle_background.fourier_transform_window_size
+    self._transform_elapsed = self._transform_elapsed + delta
+    if _magnitudes == nil or self._transform_elapsed > 1 / rt.settings.battle_background.n_transforms_per_second then
+        _magnitudes = self._audio:get_current_spectrum(window_size, 256)
+        self._transform_elapsed = 0
     end
+
     self._implementation:step(delta, _magnitudes)
 end
