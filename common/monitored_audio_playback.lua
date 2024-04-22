@@ -1,4 +1,8 @@
-rt.MonitoredAudioPlayback = meta.new_type("MonitoredAudioPlayback", function(file_path, window_size)
+rt.settings.monitored_audio_playback = {
+    default_window_size = 2^11
+}
+
+rt.MonitoredAudioPlayback = meta.new_type("MonitoredAudioPlayback", function(file_path)
     local data = love.sound.newSoundData(file_path)
     return meta.new(rt.MonitoredAudioPlayback, {
         _data = data,
@@ -237,6 +241,7 @@ end
 
 --- @brief
 function rt.MonitoredAudioPlayback:update()
+    if self._last_update == -1 then self._last_update = love.timer.getTime() end
 
     local function round(n)
         if self._data:getChannelCount() == 2 then
@@ -267,23 +272,19 @@ function rt.MonitoredAudioPlayback:update()
             self._is_playing = false
             self._buffer_offset = self._data:getSampleCount()
         end
-
-        self._last_update = love.timer.getTime()
     end
 
     if self._is_playing then
-        local previous = self._last_update
-        self._last_update = love.timer.getDelta()
-        local delta = self._last_update - previous
-        self._is_playing_offset = math.round(self._is_playing_offset + self._last_update * self._data:getSampleRate())
+        local delta = love.timer.getTime() - self._last_update
+        self._is_playing_offset = self._is_playing_offset + delta * self._data:getSampleRate()
     end
+
     self._last_update = love.timer.getTime()
 end
 
 --- @brief get spectrum of last window_size samples
 function rt.MonitoredAudioPlayback:get_current_spectrum(window_size, n_mel_frequencies)
     n_mel_frequencies = math.round(which(window_size / 16))
-    dbg(self._is_playing_offset)
     return self:_signal_to_spectrum(self._data, clamp(self._is_playing_offset, 0), window_size, n_mel_frequencies)
 end
 

@@ -1,7 +1,8 @@
 --- @brief
 function bt.BattleScene:start_battle(battle_config)
 
-    -- TODO load battle config instead of hardcoded
+    self._ui:set_music("assets/music/test_music_04.mp3")
+    self._ui:set_background("TEST_BACKGROUND")
     local state = self._state
     local entities = {
         bt.BattleEntity(state, "SMALL_UFO"),

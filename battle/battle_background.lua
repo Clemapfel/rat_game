@@ -26,9 +26,8 @@ end
 
 rt.settings.battle_background = {
     fourier_transform_window_size = 2^11,   -- window size, the smaller the faster
-    n_transforms_per_second = 30            -- transform fps, the smaller the less load
+    n_transforms_per_second = 60            -- transform fps, the smaller the less load
 }
-
 
 --- @class bt.BattleBackground
 bt.BattleBackground = meta.new_type("BattleBackground", bt.Animation, rt.Widget, function(id, music_path)
@@ -40,7 +39,6 @@ bt.BattleBackground = meta.new_type("BattleBackground", bt.Animation, rt.Widget,
     return meta.new(bt.BattleBackground, {
         _implementation_id = id,
         _implementation = {}, -- bt.BattleBackgroundImplementation
-        _audio = rt.MonitoredAudioPlayback(music_path),
 
         _transform_elapsed = 0,
         _transforms_per_second = 30,
@@ -52,7 +50,6 @@ function bt.BattleBackground:realize()
     if self._is_realized == true then return end
     self._implementation = bt.BattleBackground[self._implementation_id]()
     self._implementation:realize()
-    self._audio:start()
     self._is_realized = true
 end
 
@@ -68,16 +65,6 @@ function bt.BattleBackground:draw()
 end
 
 --- @brief
-function bt.BattleBackground:update(delta)
-
-    self._audio:update(delta)
-
-    local window_size = rt.settings.battle_background.fourier_transform_window_size
-    self._transform_elapsed = self._transform_elapsed + delta
-    if _magnitudes == nil or self._transform_elapsed > 1 / rt.settings.battle_background.n_transforms_per_second then
-        _magnitudes = self._audio:get_current_spectrum(window_size, 256)
-        self._transform_elapsed = 0
-    end
-
-    self._implementation:step(delta, _magnitudes)
+function bt.BattleBackground:update(delta, magnitudes)
+    self._implementation:step(delta, magnitudes)
 end

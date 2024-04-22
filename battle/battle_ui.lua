@@ -11,7 +11,7 @@ bt.EnemySpriteAlignmentMode = meta.new_enum({
 })
 
 --- @class bt.BattleUI
-bt.BattleUI = meta.new_type("BattleUI", rt.Widget, bt.BattleAnimationTarget, function(scene)
+bt.BattleUI = meta.new_type("BattleUI", rt.Widget, rt.Animation, bt.BattleAnimationTarget, function(scene)
     return meta.new(bt.BattleUI, {
         
         _scene = scene,
@@ -35,6 +35,12 @@ bt.BattleUI = meta.new_type("BattleUI", rt.Widget, bt.BattleAnimationTarget, fun
         _gradient_left = {},  -- rt.LogGradient
 
         _animation_queue = bt.AnimationQueue(),
+
+        _music_path = "",
+        _music_playback = {}, --
+
+        _spectrum = {},
+        _spectrum_elapsed = 0,
     })
 end)
 
@@ -48,6 +54,7 @@ end
 
 --- @override
 function bt.BattleUI:realize()
+    if self._is_realized then return end
     self._is_realized = true
 
     self._log = bt.BattleLog(self._scene)
@@ -79,7 +86,41 @@ function bt.BattleUI:realize()
         self._entities[entity] = true
     end
 
+    if self._music_path ~= "" then
+        self._music_playback = rt.MonitoredAudioPlayback(self._music_path)
+    end
+
+    if meta.is_object(self._music_playback) then
+        self._music_playback:play()
+    end
+
+    if meta.is_object(self._background) then
+        self._background:realize()
+        self._background:fit_into(self:get_bounds())
+    end
+
+    self:set_is_animated(true)
     self:reformat()
+end
+
+--- @override
+function bt.BattleUI:update(delta)
+    if self._is_realized then
+        if meta.is_object(self._music_playback) then
+            self._music_playback:update(delta)
+        end
+
+        if meta.is_object(self._background) then
+            -- only fourier transforms at 30fps
+            self._spectrum_elapsed = self._spectrum_elapsed + delta
+            if #self._spectrum == 0 or self._spectrum_elapsed > 1 / 30 then
+                self._spectrum = self._music_playback:get_current_spectrum(rt.settings.monitored_audio_playback.default_window_size, 128)
+                self._spectrum_elapsed = 0
+            end
+
+            self._background:update(delta, self._spectrum)
+        end
+    end
 end
 
 --- @brief
@@ -100,6 +141,10 @@ function bt.BattleUI:size_allocate(x, y, width, height)
     local gradient_width = 1.5 * mx
     self._gradient_left:resize(0, 0, gradient_width, rt.graphics.get_height())
     self._gradient_right:resize(rt.graphics.get_width() - gradient_width, 0, gradient_width, rt.graphics.get_height())
+
+    if meta.is_object(self._background) then
+        self._background:fit_into(self:get_bounds())
+    end
 end
 
 --- @override
@@ -117,6 +162,10 @@ function bt.BattleUI:draw()
     love.graphics.clear(0, 0, 0, 0)
     love.graphics.setColor(0.5, 0.5, 0.5, 1)
     love.graphics.rectangle("fill", 0, 0, love.graphics.getWidth(), love.graphics.getHeight())
+
+    if meta.is_object(self._background) then
+        self._background:draw()
+    end
 
     rt.graphics.set_blend_mode(rt.BlendMode.MULTIPLY)
     self._gradient_left:draw()
@@ -258,3 +307,20 @@ function bt.BattleUI:get_sprite(entity)
     end
 end
 
+--- @brief
+function bt.BattleUI:set_music(music_path)
+    self._music_path = music_path
+    self._music_playback = rt.MonitoredAudioPlayback(self._music_path)
+    if self._is_realized then
+        self._music_playback:start()
+    end
+end
+
+--- @brief
+function bt.BattleUI:set_background(id)
+    self._background = bt.BattleBackground(id)
+    if self._is_realized then
+        self._background:realize()
+        self._background:fit_into(self:get_bounds())
+    end
+end
