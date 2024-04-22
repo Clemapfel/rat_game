@@ -131,6 +131,22 @@ function bt.BattleEntity:realize()
         self:add_move(move)
     end
 
+    if not meta.is_table(config.equips) then config.equips = {config.equips} end
+    for equip_id in values(config.equips) do
+        if not meta.is_string(equip_id) then
+            rt.error("In bt.BattleEntity:realize: error when loading config at `" .. self._path .. "`, expected string for id in `equip`, got: `" .. meta.typeof(equip_id) .. "`")
+        end
+        self:add_equip(bt.Equip(equip_id))
+    end
+
+    if not meta.is_table(config.consumables) then config.consumables = {config.consumables} end
+    for consumable_id in values(config.consumables) do
+        if not meta.is_string(consumable_id) then
+            rt.error("In bt.BattleEntity:realize: error when loading config at `" .. self._path .. "`, expected string for id in `consumables`, got: `" .. meta.typeof(equip_id) .. "`")
+        end
+        self:add_consumable(bt.Consumable(consumable_id))
+    end
+
     self._is_realized = true
     meta.set_is_mutable(self, false)
 end
@@ -440,8 +456,9 @@ end
 function bt.BattleEntity:list_consumables()
     local out = {}
     for entry in values(self.consumables) do
-        table.insert(out, entry.consumables)
+        table.insert(out, entry.consumable)
     end
+
     return out
 end
 

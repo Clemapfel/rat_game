@@ -29,6 +29,8 @@ end, {
    speed_factor = 1,
 
    is_silent = true,
+
+   -- (EquipInterface, EntityInterface) -> nil
    effect = function(self, holder)
        meta.assert_is_equip_interface(self)
        meta.assert_is_entity_interface(holder)

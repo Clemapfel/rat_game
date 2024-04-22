@@ -1,7 +1,9 @@
 bt._safe_invoke_catch_errors = false
 
 --- @brief invoke a script callback in a safe, sandboxed environment
-function bt.safe_invoke(scene, instance, callback_id, ...)
+function bt.BattleScene._safe_invoke(scene, instance, callback_id, ...)
+    meta.assert_isa(scene, bt.BattleScene)
+
     -- setup fenv, done everytime to reset any globals
     local env = {}
     for common in range(
@@ -62,24 +64,21 @@ function bt.safe_invoke(scene, instance, callback_id, ...)
         env[no] = nil
     end
 
-    -- whitelist
+    -- whitelist assertions
     env.meta = {}
     for yes in range(
-        "is_status_interface",
-        "assert_is_status_interface",
-        "is_entity_interface",
-        "assert_is_entity_interface",
-        "is_equip_interface",
-        "assert_is_equip_interface",
-        "is_consumable_interface",
-        "assert_is_consumable_interface"
+        "status", "global_status", "entity", "equip", "consumable"
     ) do
-        env.meta[yes] = meta[yes]
+        local is_name = "is_" .. yes .. "_interface"
+        env.meta[is_name] = meta[is_name]
+        env.meta["assert_" .. is_name] = meta["assert_" .. is_name]
     end
 
     -- shared environment, not reset between calls
     if scene._safe_invoke_shared == nil then scene._safe_invoke_shared = {} end
     env._G = scene._safe_invoke_shared
+
+    scene:_load_scene_interface(env)
 
     setmetatable(env, {})
     local metatable = getmetatable(env)
@@ -111,6 +110,17 @@ function bt.safe_invoke(scene, instance, callback_id, ...)
         res = callback(table.unpack(args))
     end
     return res
+end
+
+--- @brief add non-interface global methods
+function bt.BattleScene:_load_scene_interface(env)
+    env.add_global_status = function(id)
+        self:add_global_status(id)
+    end
+
+    env.remove_global_status = function(id)
+        self:remove_global_status(id)
+    end
 end
 
 --- @class bt.EntityInterface

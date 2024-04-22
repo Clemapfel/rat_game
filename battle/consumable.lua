@@ -28,11 +28,6 @@ end, {
     on_turn_end = function(self, holder)
         return nil
     end,
-
-    on_battle_start = function(self, holder)
-        return nil
-    end,
-
     on_battle_end = function(self, holder)
         return nil
     end,
@@ -58,6 +53,7 @@ end, {
         return nil
     end,
 
+    -- (ConsumableInterface, EntityInterface, GlobalStatusInterface) -> nil
     on_global_status_lost = function(self, holder, lost_global_status)
         return nil
     end,
@@ -150,7 +146,6 @@ function bt.Consumable:realize()
         "on_lost",
         "on_turn_start",
         "on_turn_end",
-        "on_battle_start",
         "on_battle_end",
         "on_before_damage_taken",
         "on_before_damage_dealt",

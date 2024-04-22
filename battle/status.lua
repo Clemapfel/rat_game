@@ -55,13 +55,6 @@ end, {
         return nil
     end,
 
-    -- (StatusInterface, EntityInterface) -> nil
-    on_battle_start = function(self, afflicted)
-        meta.assert_is_status_interface(self)
-        meta.assert_is_entity_interface(afflicted)
-        return nil
-    end,
-
     on_battle_end = function(self, afflicted)
         meta.assert_is_status_interface(self)
         meta.assert_is_entity_interface(afflicted)
@@ -114,7 +107,7 @@ end, {
         return nil
     end,
 
-    -- (StatusInterface, EntityInterface, GlobalStatusInterface)
+    -- (StatusInterface, EntityInterface, GlobalStatusInterface) -> nil
     on_global_status_gained = function(self, afflicted, gained_status)
         meta.assert_is_status_interface(self)
         meta.assert_is_entity_interface(afflicted)
@@ -122,6 +115,7 @@ end, {
         return nil
     end,
 
+    -- (StatusInterface, EntityInterface, GlobalStatusInterface) -> nil
     on_global_status_lost = function(self, afflicted, lost_status)
         meta.assert_is_status_interface(self)
         meta.assert_is_entity_interface(afflicted)
@@ -258,7 +252,6 @@ function bt.Status:realize()
         "on_lost",
         "on_turn_start",
         "on_turn_end",
-        "on_battle_start",
         "on_battle_end",
         "on_before_damage_taken",
         "on_before_damage_dealt",

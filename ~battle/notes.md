@@ -36,7 +36,6 @@ struct Status {
     on_switch           = (self, user) -> allow_switch
     on_before_consumable = (self, user, consumable) -> allow_consumable
     on_after_consumable  = (self, user, consumable) -> nil
-    on_battle_start     = (self, user) -> nil
     on_battle_end       = (self, user) -> nil
     
     id   = String

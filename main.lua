@@ -9,9 +9,9 @@ love.load = function()
     input = rt.InputController()
     input:signal_connect("pressed", function(self, which)
         if which == rt.InputButton.A then
-            scene:skip_animation()
+            scene:add_global_status(bt.GlobalStatus("DEBUG_GLOBAL_STATUS"))
         elseif which == rt.InputButton.B then
-            scene:play_animation(scene, "MESSAGE", "test animation", "test message")
+            scene:remove_global_status(bt.GlobalStatus("DEBUG_GLOBAL_STATUS"))
         end
     end)
 
@@ -121,6 +121,6 @@ love.run = function()
         -- force gc
         collectgarbage("collect")
 
-        if love.timer then love.timer.sleep(0.001) end
+        if love.timer then love.timer.sleep(0.001) end -- limit max tick rate of while true
     end
 end

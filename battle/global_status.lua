@@ -31,6 +31,7 @@ end, {
         return nil
     end,
 
+    -- (GlobalStatusInterface, Table<EntityInterface>) -> nil
     on_lost = function(self, entities)
         meta.assert_is_global_status_interface(self)
         for entity in values(entities) do
@@ -48,15 +49,6 @@ end, {
     end,
 
     on_turn_end = function(self, entities)
-        meta.assert_is_global_status_interface(self)
-        for entity in values(entities) do
-            meta.assert_is_entity_interface(entity)
-        end
-        return nil
-    end,
-
-    -- (GlobalStatusInterface, Table<EntityInterface>) -> nil
-    on_battle_start = function(self, entities)
         meta.assert_is_global_status_interface(self)
         for entity in values(entities) do
             meta.assert_is_entity_interface(entity)
@@ -128,7 +120,8 @@ end, {
         return nil
     end,
 
-    on_global_status_lost = function(self, lost_status)
+    -- (GlobalStatusInterface, GlobalStatusInterface, Table<Entity>) -> nil
+    on_global_status_lost = function(self, lost_status, entities)
         meta.assert_is_global_status_interface(self)
         meta.assert_is_global_status_interface(lost_status)
         return nil
@@ -251,7 +244,6 @@ function bt.GlobalStatus:realize()
         "on_lost",
         "on_turn_start",
         "on_turn_end",
-        "on_battle_start",
         "on_battle_end",
         "on_before_damage_taken",
         "on_before_damage_dealt",

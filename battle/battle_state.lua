@@ -85,7 +85,7 @@ end
 function bt.BattleState:list_global_statuses()
     local out = {}
     for entry in values(self._status) do
-        table.insert(out, entry._status)
+        table.insert(out, entry.status)
     end
     return out
 end
@@ -93,7 +93,7 @@ end
 --- @brief
 function bt.BattleState:get_global_status(status_id)
     if self._status[status_id] == nil then return nil end
-    return self._status[status_id]._status
+    return self._status[status_id].status
 end
 
 --- @brief

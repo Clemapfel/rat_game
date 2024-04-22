@@ -13,6 +13,12 @@ return {
         for entity in values(entities) do
             meta.assert_is_entity_interface(entity)
         end
+
+        local ids = ""
+        for entity in values(entities) do
+            ids = ids .. entity.id .. " "
+        end
+        println("[DBG] In " .. self.id .. ".on_gained: applied to ", ids)
         return nil
     end,
 
@@ -21,6 +27,11 @@ return {
         for entity in values(entities) do
             meta.assert_is_entity_interface(entity)
         end
+        local ids = ""
+        for entity in values(entities) do
+            ids = ids .. entity.id .. " "
+        end
+        println("[DBG] In " .. self.id .. ".on_lost: applied to ", ids)
         return nil
     end,
 
@@ -29,6 +40,11 @@ return {
         for entity in values(entities) do
             meta.assert_is_entity_interface(entity)
         end
+        local ids = ""
+        for entity in values(entities) do
+            ids = ids .. entity.id .. " "
+        end
+        println("[DBG] In " .. self.id .. ".on_turn_start: applied to ", ids)
         return nil
     end,
 
@@ -37,14 +53,11 @@ return {
         for entity in values(entities) do
             meta.assert_is_entity_interface(entity)
         end
-        return nil
-    end,
-
-    on_battle_start = function(self, entities)
-        meta.assert_is_global_status_interface(self)
+        local ids = ""
         for entity in values(entities) do
-            meta.assert_is_entity_interface(entity)
+            ids = ids .. entity.id .. " "
         end
+        println("[DBG] In " .. self.id .. ".on_turn-end: applied to ", ids)
         return nil
     end,
 
@@ -53,6 +66,11 @@ return {
         for entity in values(entities) do
             meta.assert_is_entity_interface(entity)
         end
+        local ids = ""
+        for entity in values(entities) do
+            ids = ids .. entity.id .. " "
+        end
+        println("[DBG] In " .. self.id .. ".on_battle_end: applied to ", ids)
         return nil
     end,
 
@@ -61,6 +79,7 @@ return {
         meta.assert_is_entity_interface(damage_taker)
         meta.assert_is_entity_interface(damage_dealer)
         meta.assert_number(damage)
+        println("[DBG] In " .. self.id .. ".on_before_damage_taken: " .. damage_taker.id .. " will take " .. damage .. " damage from " .. damage_dealer)
         return damage -- new damage
     end,
 
@@ -69,6 +88,7 @@ return {
         meta.assert_is_entity_interface(damage_taker)
         meta.assert_is_entity_interface(damage_dealer)
         meta.assert_number(damage)
+        println("[DBG] In " .. self.id .. ".on_after_damage_taken: " .. damage_taker.id .. " took " .. damage .. " damage from " .. damage_dealer)
         return nil
     end,
 
@@ -77,6 +97,7 @@ return {
         meta.assert_is_entity_interface(damage_dealer)
         meta.assert_is_entity_interface(damage_taker)
         meta.assert_number(damage)
+        println("[DBG] In " .. self.id .. ".on_before_damage_dealt: " .. damage_dealer.id .. " will deal " .. damage .. " damage to " .. damage_taker)
         return damage -- new damage
     end,
 
@@ -85,6 +106,7 @@ return {
         meta.assert_is_entity_interface(damage_dealer)
         meta.assert_is_entity_interface(damage_taker)
         meta.assert_number(damage)
+        println("[DBG] In " .. self.id .. ".on_after_damage_dealt: " .. damage_dealer.id .. " dealt " .. damage .. " damage to " .. damage_taker)
         return nil
     end,
 
@@ -92,6 +114,7 @@ return {
         meta.assert_is_global_status_interface(self)
         meta.assert_is_entity_interface(afflicted)
         meta.assert_is_status_interface(gained_status)
+        println("[DBG] In " .. self.id .. ".on_status_gained: " .. afflicted.id .. " gained " .. gained_status.id)
         return nil
     end,
 
@@ -99,18 +122,37 @@ return {
         meta.assert_is_global_status_interface(self)
         meta.assert_is_entity_interface(afflicted)
         meta.assert_is_status_interface(lost_status)
+        println("[DBG] In " .. self.id .. ".on_status_lost: " .. afflicted.id .. " lost " .. lost_status.id)
         return nil
     end,
 
-    on_global_status_gained = function(self, gained_status)
+    on_global_status_gained = function(self, gained_status, entities)
         meta.assert_is_global_status_interface(self)
         meta.assert_is_global_status_interface(gained_status)
+        for entity in values(entities) do
+            meta.assert_is_entity_interface(entity)
+        end
+
+        local ids = ""
+        for entity in values(entities) do
+            ids = ids .. entity.id .. " "
+        end
+        println("[DBG] In " .. self.id .. ".on_global_status_gained: global status ", gained_status.id, " gained for " .. ids)
         return nil
     end,
 
-    on_global_status_lost = function(self, lost_status)
+    on_global_status_lost = function(self, lost_status, entities)
         meta.assert_is_global_status_interface(self)
-        meta.assert_is_global_status_interface(lost_status)
+        meta.assert_is_global_status_interface(gained_status)
+        for entity in values(entities) do
+            meta.assert_is_entity_interface(entity)
+        end
+
+        local ids = ""
+        for entity in values(entities) do
+            ids = ids .. entity.id .. " "
+        end
+        println("[DBG] In " .. self.id .. ".on_global_status_lost: global status ", lost_status.id, " gained for " .. ids)
         return nil
     end,
 
@@ -118,6 +160,7 @@ return {
         meta.assert_is_global_status_interface(self)
         meta.assert_is_entity_interface(knocked_out_entity)
         meta.assert_is_status_interface(knock_out_causer)
+        println("[DBG] In " .. self.id .. ".on_knocked_out: " .. knocked_out_entity.id .. " was knocked out by " .. knock_out_causer.id)
         return nil
     end,
 
@@ -125,6 +168,7 @@ return {
         meta.assert_is_global_status_interface(self)
         meta.assert_is_entity_interface(helped_up_entity)
         meta.assert_is_status_interface(help_up_causer)
+        println("[DBG] In " .. self.id .. ".on_helped_up: " .. helped_up_entity.id .. " was helped up by " .. help_up_causer.id)
         return nil
     end,
 
@@ -132,6 +176,7 @@ return {
         meta.assert_is_global_status_interface(self)
         meta.assert_is_entity_interface(killed_entity)
         meta.assert_is_status_interface(death_causer)
+        println("[DBG] In " .. self.id .. ".on_killed: " .. killed_entity.id .. " was killed up by " .. death_causer.id)
         return nil
     end,
 
@@ -139,14 +184,16 @@ return {
         meta.assert_is_global_status_interface(self)
         meta.assert_is_entity_interface(switched_entity)
         meta.assert_is_entity_interface(entity_at_old_position)
+        println("[DBG] In " .. self.id .. ".on_switch: " .. switched_entity.id .. " switched positions with " .. entity_at_old_position.id)
         return nil
     end,
 
     on_stance_changed = function(self, stance_changer, old_stance, new_stance)
         meta.assert_is_global_status_interface(self)
         meta.assert_is_entity_interface(stance_changer)
-        meta.assert_is_stance_interface(old_stance)
-        meta.assert_is_stance_interface(new_stance)
+        meta.assert_is_string(old_stance)
+        meta.assert_is_string(new_stance)
+        println("[DBG] In " .. self.id .. ".on_stance_changed: " .. stance_changer.id .. " changed stance from " .. old_stance .. " to " .. new_stance)
         return nil
     end,
 
@@ -174,6 +221,7 @@ return {
         meta.assert_is_global_status_interface(self)
         meta.assert_is_entity_interface(holder)
         meta.assert_is_consumable_interface(consumable)
+        println("[DBG] In " .. self.id .. ".on_before_consumable: " .. holder.id .. " is about to consume " .. consumable.id)
         return true -- allow consuming
     end,
 
@@ -181,6 +229,7 @@ return {
         meta.assert_is_global_status_interface(self)
         meta.assert_is_entity_interface(holder)
         meta.assert_is_consumable_interface(consumable)
+        println("[DBG] In " .. self.id .. ".on_after_consumable: " .. holder.id .. " consumed " .. consumable.id)
         return nil
     end,
 }
