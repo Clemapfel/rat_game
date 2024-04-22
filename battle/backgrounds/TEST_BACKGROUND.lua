@@ -52,15 +52,21 @@ function bt.BattleBackground.TEST_BACKGROUND:resize(x, y, width, height)
     self._lines_a = {}
     self._lines_b = {}
     local line_color = rt.Palette.NEON_RED_4
+    local line_width = 2
+    width = width - line_width
+    x = x + 0.5 * line_width
+    y = y + 0.5 * line_width
     for x_offset = 0, width, width / n_tiles do
         for y_offset = 0, height, width / n_tiles do -- sic
 
             local a = rt.Line(x + x_offset, y, x + x_offset, y + height)
             a:set_color(line_color)
+            a:set_line_width(line_width)
             table.insert(self._lines_a, a)
 
             local b = rt.Line(x, y + y_offset, x + width, y + y_offset)
             b:set_color(line_color)
+            b:set_line_width(line_width)
             table.insert(self._lines_b, b)
         end
     end

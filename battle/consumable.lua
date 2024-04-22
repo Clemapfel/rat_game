@@ -53,8 +53,9 @@ end, {
         return nil
     end,
 
+    -- (ConsumableInterface, EntityInterface, GlobalStatusInterface) -> nil
     on_global_status_gained = function(self, holder, gained_global_status)
-        return true -- allow applying global_status
+        return nil
     end,
 
     on_global_status_lost = function(self, holder, lost_global_status)

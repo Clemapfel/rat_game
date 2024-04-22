@@ -55,6 +55,7 @@ end, {
         return nil
     end,
 
+    -- (StatusInterface, EntityInterface) -> nil
     on_battle_start = function(self, afflicted)
         meta.assert_is_status_interface(self)
         meta.assert_is_entity_interface(afflicted)
@@ -113,6 +114,7 @@ end, {
         return nil
     end,
 
+    -- (StatusInterface, EntityInterface, GlobalStatusInterface)
     on_global_status_gained = function(self, afflicted, gained_status)
         meta.assert_is_status_interface(self)
         meta.assert_is_entity_interface(afflicted)
@@ -283,6 +285,8 @@ function bt.Status:realize()
             if not meta.is_function(self[name]) then
                 rt.error("In bt.Status:realize: key `" .. name .. "` of config at `" .. self._path .. "` has wrong type: expected `function`, got `" .. meta.typeof(self[name]) .. "`")
             end
+        else
+            self[name] = nil
         end
     end
 

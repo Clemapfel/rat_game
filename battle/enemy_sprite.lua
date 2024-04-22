@@ -128,6 +128,7 @@ end
 
 --- @brief
 function bt.EnemySprite:_draw()
+
     self._snapshot:draw()
     
     if self._ui_is_visible then

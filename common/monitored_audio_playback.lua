@@ -135,13 +135,21 @@ function rt.MonitoredAudioPlayback:_signal_to_spectrum(data, offset, window_size
     local from = ffi.cast(self.ft.real_data_t, tf.fftw_real)
     local to = ffi.cast(self.ft.complex_data_t, tf.fftw_complex)
 
+    local bit_depth = self._data:getBitDepth()
+    local normalize
+    if bit_depth == 16 then
+        normalize = function(x)
+            return x / (2^16 / 2 - 1)
+        end
+    else
+        normalize = function(x)
+            return (x + 2^8) / (2^8 - 1)
+        end
+    end
+
     local signal = {}
     -- convert audio signal to doubles
     if self._data:getChannelCount() == 1 then
-        local normalize = function(x)
-            return (x - 2^8) / (2^8 - 1)
-        end
-
         for i = 1, window_size do
             if offset + i < data_n then
                 signal[i - 1] = normalize(data_ptr[offset + i - 1])
@@ -150,10 +158,6 @@ function rt.MonitoredAudioPlayback:_signal_to_spectrum(data, offset, window_size
             end
         end
     else -- stereo
-        local normalize = function(x)
-            return x / (2^16 / 2 - 1)
-        end
-
         for i = 1, window_size * 2, 2 do
             local index = offset * 2 + i - 1
             local index_out = math.floor((i - 1) / 2)

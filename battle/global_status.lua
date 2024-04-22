@@ -22,6 +22,7 @@ end, {
     max_duration = POSITIVE_INFINITY,
     is_silent = false,
 
+    -- (GlobalStatusInterface, Table<EntityInterface>) -> nil
     on_gained = function(self, entities)
         meta.assert_is_global_status_interface(self)
         for entity in values(entities) do
@@ -54,6 +55,7 @@ end, {
         return nil
     end,
 
+    -- (GlobalStatusInterface, Table<EntityInterface>) -> nil
     on_battle_start = function(self, entities)
         meta.assert_is_global_status_interface(self)
         for entity in values(entities) do
@@ -116,9 +118,13 @@ end, {
         return nil
     end,
 
-    on_global_status_gained = function(self, gained_status)
+    -- (GlobalStatusInterface, GlobalStatusInterface, Table<Entity>) -> nil
+    on_global_status_gained = function(self, gained_status, entities)
         meta.assert_is_global_status_interface(self)
         meta.assert_is_global_status_interface(gained_status)
+        for entity in values(entities) do
+            meta.assert_is_entity_interface(entity)
+        end
         return nil
     end,
 
@@ -272,6 +278,8 @@ function bt.GlobalStatus:realize()
             if not meta.is_function(self[name]) then
                 rt.error("In bt.Status:realize: key `" .. name .. "` of config at `" .. self._path .. "` has wrong type: expected `function`, got `" .. meta.typeof(self[name]) .. "`")
             end
+        else
+            self[name] = nil
         end
     end
 

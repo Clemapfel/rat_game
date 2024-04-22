@@ -41,12 +41,12 @@ end
 --- @param texture_coordinate_x Number in [0, 1]
 --- @param texture_coordinate_y Number in [0, 1]
 --- @param color rt.RGBA
-function rt.Vertex(x, y, z, texture_coordinate_x, texture_coordinate_y, color)
+function rt.Vertex(x, y, texture_coordinate_x, texture_coordinate_y, color)
     if meta.is_nil(color) then
         color = rt.RGBA(1, 1, 1, 1)
     end
     return {
-        x, y, z,
+        x, y,
         texture_coordinate_x, texture_coordinate_y,
         color.r, color.g, color.b, color.a
     }
@@ -57,7 +57,7 @@ end
 rt.VertexShape = meta.new_type("VertexShape", rt.Drawable, function(points)
     local vertices = {}
     for _, pos in pairs(points) do
-        table.insert(vertices, rt.Vertex(pos[1], pos[2], pos[3], 0, 0))
+        table.insert(vertices, rt.Vertex(pos[1], pos[2], 0, 0))
     end
 
     local out = meta.new(rt.VertexShape, {
@@ -110,8 +110,8 @@ end
 --- @param i Number 1-based
 --- @param x Number in px
 --- @param y Number in px
-function rt.VertexShape:set_vertex_position(i, x, y, z)
-    self._native:setVertexAttribute(i, 1, x, y, which(z, 0))
+function rt.VertexShape:set_vertex_position(i, x, y)
+    self._native:setVertexAttribute(i, 1, x, y)
 end
 
 --- @brief get position of vertex

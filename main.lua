@@ -5,7 +5,7 @@ love.load = function()
     rt.current_scene = bt.BattleScene()
     local scene = rt.current_scene
 
-    -- TODO
+    -- TODO move this to update
     input = rt.InputController()
     input:signal_connect("pressed", function(self, which)
         if which == rt.InputButton.A then
@@ -16,7 +16,7 @@ love.load = function()
     end)
 
     rt.current_scene:realize()
-    rt.current_scene:start_battle()
+    rt.current_scene:start_battle(bt.BattleConfig("TEST_BATTLE"))
 end
 
 rt.graphics.frame_duration = {
