@@ -22,13 +22,13 @@ rt.VertexAttribute = meta.new_enum({
 
 if love.getVersion() >= 12 then
     rt.VertexFormat = {
-        {name = "VertexPosition", format = "floatvec3"},
+        {name = "VertexPosition", format = "floatvec2"},
         {name = "VertexTexCoord", format = "floatvec2"},
         {name = "VertexColor", format = "floatvec4"},
     }
 else
     rt.VertexFormat = {
-        {"VertexPosition", "float", 3},
+        {"VertexPosition", "float", 2},
         {"VertexTexCoord","float", 2},
         {"VertexColor", "float", 4},
     }
