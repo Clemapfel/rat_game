@@ -1,8 +1,8 @@
 rt.settings.battle.log = {
-    scroll_speed = 25, -- letters per second
+    scroll_speed = 200, -- letters per second
     hold_duration = 3, -- seconds
     fade_duration = 0, -- seconds
-    n_scrolling_labels = 5, -- number of labels displayed at the same time
+    n_scrolling_labels = 3, -- number of labels displayed at the same time
     box_expansion_speed = 15, -- px per second
     hiding_speed = 50, -- px per second
     font = rt.Font(30, "assets/fonts/DejaVuSans/DejaVuSans-Regular.ttf")

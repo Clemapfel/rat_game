@@ -32,8 +32,8 @@ end, {
 
    -- (EquipInterface, EntityInterface) -> nil
    effect = function(self, holder)
-       meta.assert_is_equip_interface(self)
-       meta.assert_is_entity_interface(holder)
+       meta.assert_equip_interface(self)
+       meta.assert_entity_interface(holder)
    end,
 
    description = "",

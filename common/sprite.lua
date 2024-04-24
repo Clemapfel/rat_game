@@ -89,6 +89,11 @@ function rt.Sprite:set_animation(id)
         self._frame_range_start = 1
         self._frame_range_end = self._spritesheet:get_n_frames()
     else
+        if self._spritesheet:has_frame(id) == false then
+            rt.warning("In rt.Sprite:set_animation: sprite at `" .. self._spritesheet.path .. "` has no animation with id `" .. id .. "`")
+            return
+        end
+
         self._animation_id = id
         local frame_range = self._spritesheet:get_frame_range(self._animation_id)
         self:set_frame(frame_range[1])

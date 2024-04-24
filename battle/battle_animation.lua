@@ -37,6 +37,7 @@ end
 
 --- @brief
 function bt.Animation:register_finish_callback(callback)
+    meta.assert_function(callback)
     if self._finish_callbacks == nil then
         self._finish_callbacks = {}
     end
@@ -45,6 +46,7 @@ end
 
 --- @brief
 function bt.Animation:register_start_callback(callback)
+    meta.assert_function(callback)
     if self._start_callbacks == nil then
         self._start_callbacks = {}
     end

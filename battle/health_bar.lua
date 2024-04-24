@@ -45,6 +45,8 @@ end)
 function bt.HealthBar:_format_hp(value, max)
     if self._state == bt.BattleEntityState.KNOCKED_OUT then
         return "", "KNOCKED OUT", ""
+    elseif self._state == bt.BattleEntityState.DEAD then
+        return "", "DEAD", ""
     elseif self._use_percentage then
         return "", value .. " %", ""
     else

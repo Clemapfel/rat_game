@@ -3,12 +3,12 @@ rt.settings.battle.animations.message = {
 }
 
 --- @class bt.Animation.MESSAGE
-bt.Animation.MESSAGE = meta.new_type("MESSAGE", bt.Animation, function(scene, target, label_message, log_message)
+bt.Animation.MESSAGE = meta.new_type("MESSAGE", bt.Animation, function(scene, target, label_message, last)
+    meta.assert_nil(last)
     return meta.new(bt.Animation.MESSAGE, {
         _scene = scene,
         _target = target,
         _label_message = label_message,
-        _log_message = log_message,
 
         _target_snapshot = {}, -- rt.SnapshotLayout
         _label = {},          -- rt.Glyph
@@ -25,12 +25,7 @@ function bt.Animation.MESSAGE:start()
         self._target:realize()
     end
 
-    self._label = rt.Glyph(rt.settings.font.default, tostring(self._label_message), {
-        is_outlined = true,
-        font_style = rt.FontStyle.BOLD,
-        outline_color = rt.Palette.TRUE_BLACK,
-        color = rt.Palette.TRUE_WHITE
-    })
+    self._label = rt.Label(self._label_message)
     self._label_path = {}
 
     self._target_snapshot = rt.SnapshotLayout()
@@ -60,10 +55,6 @@ function bt.Animation.MESSAGE:start()
     self._target:set_is_visible(true)
     self._target_snapshot:snapshot(target)
     target:set_is_visible(false)
-
-    if self._log_message ~= nil and self._log_message ~= 0 then
-        self._scene._ui:send_message(self._log_message)
-    end
 end
 
 --- @override
@@ -81,11 +72,16 @@ function bt.Animation.MESSAGE:update(delta)
     target:set_is_visible(false)
 
     -- label animation
-    local label_w, label_h =self._label:get_size()
+    local label_w, label_h = self._label:measure()
     local _, pos_y = self._label_path:at(rt.exponential_plateau(fraction * 0.9))
 
     local bounds = self._target:get_bounds()
-    self._label:set_position(bounds.x + 0.5 * bounds.width - 0.5 * label_w, bounds.y + bounds.height - pos_y - 0.5 * label_h)
+    self._label:fit_into(
+        bounds.x + 0.5 * bounds.width - 0.5 * label_w,
+        bounds.y + bounds.height - pos_y - 0.5 * label_h,
+        label_w,
+        label_h
+    )
 
     local fade_out_target = 0.9
     if fraction > fade_out_target then

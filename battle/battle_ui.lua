@@ -1,5 +1,5 @@
 rt.settings.battle.battle_ui = {
-    enemy_alignment_y = 0.5,
+    enemy_alignment_y = 0.75,
     priority_queue_width = 100,
     gradient_alpha = 0.4
 }
@@ -136,6 +136,7 @@ function bt.BattleUI:size_allocate(x, y, width, height)
 
     local my = rt.settings.margin_unit
     local priority_queue_width = rt.settings.battle.battle_ui.priority_queue_width
+    local log_height = 5 * my
     self._log:fit_into(mx, my, rt.graphics.get_width() - 2 * mx, 5 * my)
     self._priority_queue:fit_into(rt.graphics.get_width() - priority_queue_width, 0, priority_queue_width, rt.graphics.get_height())
     local gradient_width = 1.5 * mx
@@ -323,4 +324,10 @@ function bt.BattleUI:set_background(id)
         self._background:realize()
         self._background:fit_into(self:get_bounds())
     end
+end
+
+--- @brief
+function bt.BattleUI:set_state(entity, state)
+    self._priority_queue:set_state(entity, state)
+    self:get_sprite(entity):set_state(state)
 end

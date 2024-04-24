@@ -337,6 +337,18 @@ function bt.BattleEntity:list_statuses()
 end
 
 --- @brief
+function bt.BattleEntity:clear_statuses()
+    for id in keys(self.status) do
+        self.status[id] = nil
+    end
+end
+
+--- @brief
+function bt.BattleEntity:has_status(status)
+    return self.status[status:get_id()] ~= nil
+end
+
+--- @brief
 --- @return Boolean true if status is past its intended duration, false otherwise
 function bt.BattleEntity:increase_status_elapsed(status)
     local entry = self.status[status:get_id()]
@@ -430,6 +442,11 @@ function bt.BattleEntity:list_equips()
 end
 
 --- @brief
+function bt.BattleEntity:has_equip(equip)
+    return self.equips[equip:get_id()] ~= nil
+end
+
+--- @brief
 function bt.BattleEntity:add_consumable(consumable)
     self.consumables[consumable:get_id()] = {
         consumable = consumable,
@@ -450,6 +467,11 @@ function bt.BattleEntity:get_consumable_n_consumed(consumable_id)
     else
         return entry.n_consumed
     end
+end
+
+--- @brief
+function bt.BattleEntity:has_consumable(consumable)
+    return self.consumables[consumable:get_id()] ~= nil
 end
 
 --- @brief

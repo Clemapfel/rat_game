@@ -17,181 +17,178 @@ return {
     description = "Prints messages for every trigger payload",
 
     on_gained = function(self, afflicted)
-        meta.assert_is_status_interface(self)
-        meta.assert_is_entity_interface(afflicted)
+        meta.assert_status_interface(self)
+        meta.assert_entity_interface(afflicted)
         println("[DBG] In " .. self.id .. ".on_gained: " .. afflicted.id .. " gained self")
         return nil
     end,
 
     on_lost = function(self, afflicted)
-        meta.assert_is_status_interface(self)
-        meta.assert_is_entity_interface(afflicted)
+        meta.assert_status_interface(self)
+        meta.assert_entity_interface(afflicted)
         println("[DBG] In " .. self.id .. ".on_gained: " .. afflicted.id .. " gained self")
         return nil
     end,
 
     on_turn_start = function(self, afflicted)
-        meta.assert_is_status_interface(self)
-        meta.assert_is_entity_interface(afflicted)
+        meta.assert_status_interface(self)
+        meta.assert_entity_interface(afflicted)
         println("[DBG] In " .. self.id .. ".on_turn_start: start turn while " .. afflicted.id .. " is afflicted")
         return nil
     end,
 
     on_turn_end = function(self, afflicted)
-        meta.assert_is_status_interface(self)
-        meta.assert_is_entity_interface(afflicted)
+        meta.assert_status_interface(self)
+        meta.assert_entity_interface(afflicted)
         println("[DBG] In " .. self.id .. ".on_turn_end: end turn while " .. afflicted.id .. " is afflicted")
         return nil
     end,
 
     on_battle_end = function(self, afflicted)
-        meta.assert_is_status_interface(self)
-        meta.assert_is_entity_interface(afflicted)
+        meta.assert_status_interface(self)
+        meta.assert_entity_interface(afflicted)
         println("[DBG] In " .. self.id .. ".on_battle_end: battle ended while " .. holder.id .. " is afflicted")
         return nil
     end,
 
     on_before_damage_taken = function(self, afflicted, damage_dealer, damage)
-        meta.assert_is_status_interface(self)
-        meta.assert_is_entity_interface(afflicted)
-        meta.assert_is_entity_interface(damage_dealer)
+        meta.assert_status_interface(self)
+        meta.assert_entity_interface(afflicted)
+        meta.assert_entity_interface(damage_dealer)
         meta.assert_number(damage)
         println("[DBG] In " .. self.id .. ".on_before_damage_taken: " .. afflicted.id .. " will take " .. damage .. " damage from " .. damage_dealer)
         return damage -- new damage
     end,
 
     on_after_damage_taken = function(self, afflicted, damage_dealer, damage)
-        meta.assert_is_status_interface(self)
-        meta.assert_is_entity_interface(afflicted)
-        meta.assert_is_entity_interface(damage_dealer)
+        meta.assert_status_interface(self)
+        meta.assert_entity_interface(afflicted)
+        meta.assert_entity_interface(damage_dealer)
         meta.assert_number(damage)
         println("[DBG] In " .. self.id .. ".on_after_damage_taken: " .. afflicted.id .. " took " .. damage .. " damage from " .. damage_dealer)
         return nil
     end,
 
     on_before_damage_dealt = function(self, afflicted, damage_taker, damage)
-        meta.assert_is_status_interface(self)
-        meta.assert_is_entity_interface(afflicted)
-        meta.assert_is_entity_interface(damage_taker)
+        meta.assert_status_interface(self)
+        meta.assert_entity_interface(afflicted)
+        meta.assert_entity_interface(damage_taker)
         meta.assert_number(damage)
         println("[DBG] In " .. self.id .. ".on_before_damage_dealt: " .. afflicted.id .. " will deal " .. damage .. " damage to " .. damage_taker)
         return damage -- new damage
     end,
 
     on_after_damage_dealt = function(self, afflicted, damage_taker, damage)
-        meta.assert_is_status_interface(self)
-        meta.assert_is_entity_interface(afflicted)
-        meta.assert_is_entity_interface(damage_taker)
+        meta.assert_status_interface(self)
+        meta.assert_entity_interface(afflicted)
+        meta.assert_entity_interface(damage_taker)
         meta.assert_number(damage)
         println("[DBG] In " .. self.id .. ".on_after_damage_dealt: " .. afflicted.id .. " dealt " .. damage .. " damage to " .. damage_taker)
         return nil
     end,
 
     on_status_gained = function(self, afflicted, gained_status)
-        meta.assert_is_status_interface(self)
-        meta.assert_is_entity_interface(afflicted)
-        meta.assert_is_status_interface(gained_status)
+        meta.assert_status_interface(self)
+        meta.assert_entity_interface(afflicted)
+        meta.assert_status_interface(gained_status)
         println("[DBG] In " .. self.id .. ".on_status_gained: " .. afflicted.id .. " gained other status " .. gained_status.id)
         return nil
     end,
 
     on_status_lost = function(self, afflicted, lost_status)
-        meta.assert_is_status_interface(self)
-        meta.assert_is_entity_interface(afflicted)
-        meta.assert_is_status_interface(lost_status)
+        meta.assert_status_interface(self)
+        meta.assert_entity_interface(afflicted)
+        meta.assert_status_interface(lost_status)
         println("[DBG] In " .. self.id .. ".on_status_lost: " .. afflicted.id .. " lost " .. lost_status.id)
         return nil
     end,
 
     on_global_status_gained = function(self, afflicted, gained_status)
-        meta.assert_is_status_interface(self)
-        meta.assert_is_entity_interface(afflicted)
-        meta.assert_is_global_status_interface(gained_status)
+        meta.assert_status_interface(self)
+        meta.assert_entity_interface(afflicted)
+        meta.assert_global_status_interface(gained_status)
         println("[DBG] In " .. self.id .. ".on_global_status_gained: " .. afflicted.id .. " was afflicted by self when " .. gained_status.id .. " was added")
         return nil
     end,
 
     on_global_status_lost = function(self, afflicted, lost_status)
-        meta.assert_is_status_interface(self)
-        meta.assert_is_entity_interface(afflicted)
-        meta.assert_is_global_status_interface(lost_status)
+        meta.assert_status_interface(self)
+        meta.assert_entity_interface(afflicted)
+        meta.assert_global_status_interface(lost_status)
         println("[DBG] In " .. self.id .. ".on_global_status_gained: " .. afflicted.id .. " was afflicted by self when " .. lost_status.id .. " was lost")
         return nil
     end,
 
-    on_knocked_out = function(self, afflicted, knock_out_causer)
-        meta.assert_is_status_interface(self)
-        meta.assert_is_entity_interface(afflicted)
-        meta.assert_is_status_interface(knock_out_causer)
-        println("[DBG] In " .. self.id .. ".on_knocked_out: " .. afflicted.id .. " was knocked out by " .. knock_out_causer.id)
+    on_knocked_out = function(self, afflicted)
+        meta.assert_status_interface(self)
+        meta.assert_entity_interface(afflicted)
+        println("[DBG] In " .. self.id .. ".on_knocked_out: " .. afflicted.id .. " was knocked out")
         return nil
     end,
 
-    on_helped_up = function(self, afflicted, help_up_causer)
-        meta.assert_is_status_interface(self)
-        meta.assert_is_entity_interface(afflicted)
-        meta.assert_is_status_interface(help_up_causer)
-        println("[DBG] In " .. self.id .. ".on_helped_up: " .. afflicted.id .. " was helped up by " .. help_up_causer.id)
+    on_helped_up = function(self, afflicted)
+        meta.assert_status_interface(self)
+        meta.assert_entity_interface(afflicted)
+        println("[DBG] In " .. self.id .. ".on_helped_up: " .. afflicted.id .. " was helped up")
         return nil
     end,
 
-    on_killed = function(self, afflicted, death_causer)
-        meta.assert_is_status_interface(self)
-        meta.assert_is_entity_interface(afflicted)
-        meta.assert_is_status_interface(death_causer)
-        println("[DBG] In " .. self.id .. ".on_killed: " .. afflicted.id .. " was killed up by " .. death_causer.id)
+    on_killed = function(self, afflicted)
+        meta.assert_status_interface(self)
+        meta.assert_entity_interface(afflicted)
+        println("[DBG] In " .. self.id .. ".on_killed: " .. afflicted.id .. " was killed")
         return nil
     end,
 
     on_switch = function(self, afflicted, entity_at_old_position)
-        meta.assert_is_status_interface(self)
-        meta.assert_is_entity_interface(afflicted)
-        meta.assert_is_entity_interface(entity_at_old_position)
+        meta.assert_status_interface(self)
+        meta.assert_entity_interface(afflicted)
+        meta.assert_entity_interface(entity_at_old_position)
         println("[DBG] In " .. self.id .. ".on_switch: " .. afflicted.id .. " switched positions with " .. entity_at_old_position.id)
         return nil
     end,
 
     on_stance_changed = function(self, afflicted, old_stance, new_stance)
-        meta.assert_is_status_interface(self)
-        meta.assert_is_entity_interface(afflicted)
-        meta.assert_is_stance_interface(old_stance)
-        meta.assert_is_stance_interface(new_stance)
+        meta.assert_status_interface(self)
+        meta.assert_entity_interface(afflicted)
+        meta.assert_stance_interface(old_stance)
+        meta.assert_stance_interface(new_stance)
         println("[DBG] In " .. self.id .. ".on_stance_changed: " .. afflicted.id .. " changed stance from " .. old_stance .. " to " .. new_stance)
         return nil
     end,
 
     on_before_move = function(self, afflicted, move, targets)
-        meta.assert_is_status_interface(self)
-        meta.assert_is_entity_interface(afflicted)
-        meta.assert_is_move_interface(move)
+        meta.assert_status_interface(self)
+        meta.assert_entity_interface(afflicted)
+        meta.assert_move_interface(move)
         for target in values(targets) do
-            meta.assert_is_move_interface(targets)
+            meta.assert_move_interface(targets)
         end
         return true -- allow move
     end,
 
     on_after_move = function(self, afflicted, move, targets)
-        meta.assert_is_status_interface(self)
-        meta.assert_is_entity_interface(afflicted)
-        meta.assert_is_move_interface(move)
+        meta.assert_status_interface(self)
+        meta.assert_entity_interface(afflicted)
+        meta.assert_move_interface(move)
         for target in values(targets) do
-            meta.assert_is_move_interface(targets)
+            meta.assert_move_interface(targets)
         end
         return nil
     end,
 
     on_before_consumable = function(self, afflicted, consumable)
-        meta.assert_is_status_interface(self)
-        meta.assert_is_entity_interface(afflicted)
-        meta.assert_is_consumable_interface(consumable)
+        meta.assert_status_interface(self)
+        meta.assert_entity_interface(afflicted)
+        meta.assert_consumable_interface(consumable)
         println("[DBG] In " .. self.id .. ".on_before_consumable: " .. afflicted.id .. " is about to consume other consumable " .. consumable.id)
         return true -- allow consuming
     end,
 
     on_after_consumable = function(self, afflicted, consumable)
-        meta.assert_is_status_interface(self)
-        meta.assert_is_entity_interface(afflicted)
-        meta.assert_is_consumable_interface(consumable)
+        meta.assert_status_interface(self)
+        meta.assert_entity_interface(afflicted)
+        meta.assert_consumable_interface(consumable)
         println("[DBG] In " .. self.id .. ".on_before_consumable: " .. afflicted.id .. " consumed other consumable " .. consumable.id)
         return nil
     end,

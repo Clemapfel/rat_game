@@ -762,3 +762,10 @@ end
 
 string._interpolation_character = "$"
 string._interpolation_escape_character = "//"
+
+--- @brief
+function exit(status)
+    if status == nil then status = 0 end
+    love.event.push("quit", status)
+end
+

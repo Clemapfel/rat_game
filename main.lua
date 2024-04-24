@@ -1,4 +1,30 @@
 require "include"
+
+
+rt.prettyprint(
+    {
+        "nevermind ",
+        bold = true,
+        color = "red"
+    },
+
+    {
+        "this",
+        underline = true,
+        italic = true
+    },
+
+    " ",
+
+    {
+        "took like 10mins",
+        reverse = true,
+        color = "yellow"
+    },
+
+    "\n"
+)
+
 love.load = function()
     profiler.activate()
 
@@ -9,9 +35,13 @@ love.load = function()
     input = rt.InputController()
     input:signal_connect("pressed", function(self, which)
         if which == rt.InputButton.A then
-            scene:add_global_status(bt.GlobalStatus("DEBUG_GLOBAL_STATUS"))
+            --scene:add_status(scene._state:list_entities()[1], bt.Status("DEBUG_STATUS"))
+            scene:knock_out(scene._state:list_entities()[1])
         elseif which == rt.InputButton.B then
-            scene:remove_global_status(bt.GlobalStatus("DEBUG_GLOBAL_STATUS"))
+            --scene:remove_status(scene._state:list_entities()[1], bt.Status("DEBUG_STATUS"))
+            scene:help_up(scene._state:list_entities()[1])
+        elseif which == rt.InputButton.X then
+            scene:kill(scene._state:list_entities()[1])
         end
     end)
 

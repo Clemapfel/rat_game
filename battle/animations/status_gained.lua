@@ -4,6 +4,7 @@ rt.settings.battle.animations.status_gained = {
 
 --- @class bt.Animation.STATUS_GAINED
 bt.Animation.STATUS_GAINED = meta.new_type("STATUS_GAINED", bt.Animation, function(scene, target, status)
+    meta.assert_isa(status, bt.Status)
     return meta.new(bt.Animation.STATUS_GAINED, {
         _scene = scene,
         _target = target,
