@@ -31,15 +31,25 @@ love.load = function()
     rt.current_scene = bt.BattleScene()
     local scene = rt.current_scene
 
+    local to_synch_with = {}
+
     -- TODO move this to update
     input = rt.InputController()
     input:signal_connect("pressed", function(self, which)
         if which == rt.InputButton.A then
             --scene:add_status(scene._state:list_entities()[1], bt.Status("DEBUG_STATUS"))
-            scene:knock_out(scene._state:list_entities()[1])
+            --scene:knock_out(scene._state:list_entities()[1])
+            local entities = scene._state:list_entities()
+            ---scene:switch(entities[1], entities[2])
+            scene:play_animation(entities[1], "MESSAGE", "TEST")
+            scene:play_animation(entities[1], "MESSAGE", "TEST")
+            local animation_a = scene:play_animation(entities[1], "SWITCH")
+            local animation_b = scene:play_animation(entities[2], "SWITCH")
+            animation_a:synch_with(animation_b)
         elseif which == rt.InputButton.B then
             --scene:remove_status(scene._state:list_entities()[1], bt.Status("DEBUG_STATUS"))
-            scene:help_up(scene._state:list_entities()[1])
+            --scene:help_up(scene._state:list_entities()[1])
+            scene:skip_animation()
         elseif which == rt.InputButton.X then
             scene:kill(scene._state:list_entities()[1])
         end

@@ -39,7 +39,9 @@ function bt.StatusBarElement:set_elapsed(n)
     end
 
     if self._is_realized == true then
-        self._n_turns_left_label:set_text(text)
+        if meta.isa(self._n_turns_left_label, rt.Glyph) then
+            self._n_turns_left_label:set_text(text)
+        end
     end
 end
 

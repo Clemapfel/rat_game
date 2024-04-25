@@ -1,7 +1,9 @@
 --- @class bt.Animation
 bt.Animation = meta.new_abstract_type("BattleAnimation", {
     _is_started = false,
-    _is_finished = false
+    _is_finished = false,
+    _is_ready_for_synch = false,
+    _synch_targets = {} -- Table<bt.Animation>
 })
 
 --- @class bt.AnimationResult
@@ -51,4 +53,14 @@ function bt.Animation:register_start_callback(callback)
         self._start_callbacks = {}
     end
     table.insert(self._start_callbacks, callback)
+end
+
+--- @brief
+function bt.Animation:synch_with(other)
+    if #self._synch_targets == 0 then self._synch_targets = {} end
+    self._synch_targets[other] = true
+
+    if #other._synch_targets == 0 then other._synch_targets = {} end
+    other._synch_targets[self] = true
+
 end

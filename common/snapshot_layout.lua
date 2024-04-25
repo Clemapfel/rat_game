@@ -170,6 +170,16 @@ function rt.SnapshotLayout:reset()
 
     self._x_offset = 0
     self._y_offset = 0
+    self._scale_x = 1
+    self._scale_y = 1
+    self._origin_x = 0.5
+    self._origin_y = 0.5
+
+    self._invert = false
+    self._mix_color = rt.RGBA(1, 1, 1, 1)
+    self._mix_weight = 0
+
+    self._opacity = 1
 end
 
 --- @brief

@@ -584,3 +584,39 @@ function bt.BattleScene:kill(entity)
     entity:clear_statuses()
     meta.set_is_mutable(entity, false)
 end
+
+--- @brief
+function bt.BattleScene:switch(entity_a, entity_b)
+    meta.assert_isa(entity_a, bt.BattleEntity)
+    meta.assert_isa(entity_b, bt.BattleEntity)
+
+    -- avoid redundant switch
+    if entity_a == entity_b then return end
+
+    -- entity cannot switch between ally and enemy
+    if not (entity_a:get_is_enemy() == entity_b:get_is_enemy()) then
+        rt.warning("In bt.BattleScene:switch: trying to switch entities `" .. entity_a:get_id() .. "` and `" .. entity_b:get_id() .. "`, which are a mix of enemies and allies, this operation is not permitted")
+        return
+    end
+
+    -- get positions of entities
+    local a_i, b_i = -1, -1
+    do
+        local i = 1
+        for entity in values(self._state:list_entities()) do
+            if entity == entity_a then a_i = i end
+            if entity == entity_b then b_i = i end
+            if a_i ~= -1 and b_i ~= -1 then break end
+        end
+    end
+
+    -- swap entities
+    self._state:swap(a_i, b_i)
+
+    -- animation
+    local a_animation, _ = self:play_animation(entity_a, "SWITCH")
+    local b_animation, _ = self:play_anmation(entity_b, "SWITCH")
+
+    a_animation:synch_with(b_animation)
+    b_animation:synch_with(a_animation)
+end

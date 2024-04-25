@@ -159,4 +159,12 @@ function bt.BattleState:get_entities_in_order()
     return entities
 end
 
+--- @brief
+function bt.BattleState:swap(left_i, right_i)
+    local left = self._entities[left_i]
+    local right = self._entities[right_i]
+
+    self._entities[right_i] = left
+    self._entities[left_i] = right
+end
 

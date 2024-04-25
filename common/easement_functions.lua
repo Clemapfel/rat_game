@@ -77,14 +77,19 @@ rt.symmetrical_linear = function(x, peak)
     return (1 - math.abs(2 * (x - 0.5))) / (1 / peak)
 end
 
---- @brief 1 to 0 strictly decreasing, x² parabolic
-rt.parabolic_drop = function(x)
-    return -(x^2) + 1
-end
-
 --- @brief 0 to 1 strictly increasing x² parabolic
 rt.parabolic_increase = function(x)
     return x^2
+end
+
+--- @brief
+rt.reverse_parabolic_increase = function(x)
+    return -x^2 + 2 * x
+end
+
+--- @brief
+rt.parabolic_sigmoid = function(x)
+    return 0.5 * (2 * x - 1)^3 + 0.5
 end
 
 --- @brief gaussian distribution with 0.99 percentile in [0, 1], peak at 0.5
