@@ -185,14 +185,8 @@ end, {
         return nil
     end,
 
-    on_before_consumable = function(self, holder, consumable)
-        meta.assert_global_status_interface(self)
-        meta.assert_entity_interface(holder)
-        meta.assert_consumable_interface(consumable)
-        return true -- allow consuming
-    end,
-
-    on_after_consumable = function(self, holder, consumable)
+    -- (GlobalStatusInterface, EntityInterface, ConsumableInterface)
+    on_consumable_consumed = function(self, holder, consumable)
         meta.assert_global_status_interface(self)
         meta.assert_entity_interface(holder)
         meta.assert_consumable_interface(consumable)
@@ -262,8 +256,7 @@ function bt.GlobalStatus:realize()
         "on_stance_changed",
         "on_before_move",
         "on_after_move",
-        "on_before_consumable",
-        "on_after_consumable"
+        "on_consumable_consumed"
     }
 
     for name in values(functions) do

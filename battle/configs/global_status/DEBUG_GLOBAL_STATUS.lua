@@ -215,19 +215,12 @@ return {
         return nil
     end,
 
-    on_before_consumable = function(self, holder, consumable)
+    on_consumable_consumed = function(self, holder, consumable)
         meta.assert_global_status_interface(self)
         meta.assert_entity_interface(holder)
         meta.assert_consumable_interface(consumable)
-        println("[DBG] In " .. self.id .. ".on_before_consumable: " .. holder.id .. " is about to consume " .. consumable.id)
-        return true -- allow consuming
-    end,
-
-    on_after_consumable = function(self, holder, consumable)
-        meta.assert_global_status_interface(self)
-        meta.assert_entity_interface(holder)
-        meta.assert_consumable_interface(consumable)
-        println("[DBG] In " .. self.id .. ".on_after_consumable: " .. holder.id .. " consumed " .. consumable.id)
+        println("[DBG] In " .. self.id .. ".on_consumable_consumed: " .. holder.id .. " consumed " .. consumable.id)
         return nil
     end,
+
 }

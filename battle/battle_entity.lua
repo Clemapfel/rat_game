@@ -455,6 +455,11 @@ function bt.BattleEntity:add_consumable(consumable)
 end
 
 --- @brief
+function bt.BattleEntity:remove_consumable(consumable)
+    self.consumables[consumable:get_id()] = nil
+end
+
+--- @brief
 function bt.BattleEntity:get_consumable(consumable_id)
     return self.consumables[consumable_id].consumable
 end

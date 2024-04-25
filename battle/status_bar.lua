@@ -247,12 +247,10 @@ function bt.StatusBar:create_from(statuses)
     end
 
     for status, element in pairs(self._elements) do
-        if statuses[status] == nil then
+        if statuses[status:get_id()] == nil then
             self:remove(status)
         end
     end
-
-    self:reformat()
 end
 
 --- @brief

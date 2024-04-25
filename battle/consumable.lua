@@ -159,20 +159,14 @@ end, {
         return nil
     end,
 
-    on_before_consumable = function(self, holder, consumable)
+    -- (ConsumableInterface, EntityInterface, ConsumableInterface)
+    on_consumable_consumed = function(self, holder, other_consumable)
         meta.assert_consumable_interface(self)
         meta.assert_entity_interface(holder)
-        meta.assert_consumable_interface(consumable)
-        return true -- allow consuming
-    end,
-
-    on_after_consumable = function(self, holder, consumable)
-        meta.assert_consumable_interface(self)
-        meta.assert_entity_interface(holder)
-        meta.assert_consumable_interface(consumable)
+        meta.assert_consumable_interface(other_consumable)
         return nil
     end,
-    
+
     description = "",
     sprite_id = "",
     sprite_index = 1
@@ -241,8 +235,7 @@ function bt.Consumable:realize()
         "on_stance_changed",
         "on_before_move",
         "on_after_move",
-        "on_before_consumable",
-        "on_after_consumable"
+        "on_consumable_consumed"
     }
 
     for name in values(functions) do

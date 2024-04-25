@@ -110,6 +110,10 @@ function bt.BattleScene._safe_invoke(scene, instance, callback_id, ...)
     else
         res = callback(table.unpack(args))
     end
+
+    if res ~= nil then
+        rt.warning("In bt.safe_invoke: In " .. instance:get_id() .. "." .. callback_id .. ": callback returns `" .. serialize(res) .. "`, but it should return nil")
+    end
     return res
 end
 
