@@ -331,3 +331,28 @@ function bt.BattleUI:set_state(entity, state)
     self._priority_queue:set_state(entity, state)
     self:get_sprite(entity):set_state(state)
 end
+
+--- @brief
+function bt.BattleUI:swap(entity_a, entity_b)
+    assert(entity_a ~= entity_b)
+    assert(entity_a:get_is_enemy() == entity_b:get_is_enemy())
+    if entity_a:get_is_enemy() and entity_b:get_is_enemy() then
+        local a_i, b_i = -1, -1
+        do
+            local i = 1
+            for sprite in values(self._enemy_sprites) do
+                if sprite:get_entity() == entity_a then a_i = i end
+                if sprite:get_entity() == entity_b then b_i = i end
+                if a_i ~= -1 and b_i ~= -1 then break end
+                i = i + 1
+            end
+        end
+
+        local a = self._enemy_sprites[a_i]
+        local b = self._enemy_sprites[b_i]
+
+        self._enemy_sprites[a_i] = b
+        self._enemy_sprites[b_i] = a
+        self:_reformat_enemy_sprites()
+    end
+end

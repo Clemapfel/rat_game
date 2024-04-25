@@ -607,6 +607,7 @@ function bt.BattleScene:switch(entity_a, entity_b)
             if entity == entity_a then a_i = i end
             if entity == entity_b then b_i = i end
             if a_i ~= -1 and b_i ~= -1 then break end
+            i = i + 1
         end
     end
 
@@ -614,9 +615,55 @@ function bt.BattleScene:switch(entity_a, entity_b)
     self._state:swap(a_i, b_i)
 
     -- animation
-    local a_animation, _ = self:play_animation(entity_a, "SWITCH")
-    local b_animation, _ = self:play_anmation(entity_b, "SWITCH")
-
+    local a_animation, a_sprite = self:play_animation(entity_a, "SWITCH")
+    local b_animation, b_sprite = self:play_animation(entity_b, "SWITCH")
     a_animation:synch_with(b_animation)
-    b_animation:synch_with(a_animation)
+    a_animation:register_finish_callback(function()
+        self._ui:send_message(self:format_name(entity_a) .. " and " .. self:format_name(entity_b) .. " swapped places")
+        self._ui:swap(entity_a, entity_b)
+    end)
+
+    -- invoke callbacks
+    local callback_id = "on_switch"
+    local a_proxy = bt.EntityInterface(self, entity_a)
+    local b_proxy = bt.EntityInterface(self, entity_b)
+
+    for status in values(self._state:list_global_statuses()) do
+        if status[callback_id] ~= nil then
+            local self_proxy = bt.GlobalStatusInterface(self, status)
+            self:_safe_invoke(status, callback_id, self_proxy, a_proxy, b_proxy)
+        end
+    end
+
+    for both in range(
+        {entity_a, entity_b},
+        {entity_b, entity_a}
+    ) do
+        local this = both[1]
+        local other = both[2]
+        for status in values(this:list_statuses()) do
+            if status[callback_id] ~= nil then
+                local self_proxy = bt.StatusInterface(self, this, status)
+                local afflicted_proxy = bt.EntityInterface(self, this)
+                local other_proxy = bt.EntityInterface(self, other)
+                self:_safe_invoke(status, callback_id, self_proxy, afflicted_proxy, other_proxy)
+            end
+        end
+    end
+
+    for both in range(
+        {entity_a, entity_b},
+        {entity_b, entity_a}
+    ) do
+        local this = both[1]
+        local other = both[2]
+        for consumable in values(this:list_consumables()) do
+            if consumable[callback_id] ~= nil then
+                local self_proxy = bt.ConsumableInterface(self, this, consumable)
+                local afflicted_proxy = bt.EntityInterface(self, this)
+                local other_proxy = bt.EntityInterface(self, other)
+                self:_safe_invoke(consumable, callback_id, self_proxy, afflicted_proxy, other_proxy)
+            end
+        end
+    end
 end

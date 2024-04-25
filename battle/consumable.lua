@@ -123,6 +123,7 @@ end, {
         return nil
     end,
 
+    -- (ConsumableInterface, EntityInterface, EntityInterface) -> nil
     on_switch = function(self, holder, entity_at_old_position)
         meta.assert_consumable_interface(self)
         meta.assert_entity_interface(holder)

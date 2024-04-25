@@ -36,7 +36,6 @@ end
 --- @override
 function bt.Animation.SWITCH:finish()
     self._target:get_snapshot():reset()
-    self._target:set_is_visible(false)
 end
 
 --- @override

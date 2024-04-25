@@ -149,6 +149,7 @@ end, {
         return nil
     end,
 
+    -- (GlobalStatusInterface, EntityInterface, EntityInterface) -> nil
     on_switch = function(self, switched_entity, entity_at_old_position)
         meta.assert_global_status_interface(self)
         meta.assert_entity_interface(switched_entity)

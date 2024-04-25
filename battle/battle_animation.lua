@@ -3,7 +3,8 @@ bt.Animation = meta.new_abstract_type("BattleAnimation", {
     _is_started = false,
     _is_finished = false,
     _is_ready_for_synch = false,
-    _synch_targets = {} -- Table<bt.Animation>
+    _synch_targets = {}, -- Table<bt.Animation>
+    _wait_for_queues = {}
 })
 
 --- @class bt.AnimationResult
@@ -55,12 +56,16 @@ function bt.Animation:register_start_callback(callback)
     table.insert(self._start_callbacks, callback)
 end
 
---- @brief
+--- @brief make it so both animation wait for each other, starting at the same time only when both are ready
 function bt.Animation:synch_with(other)
     if #self._synch_targets == 0 then self._synch_targets = {} end
     self._synch_targets[other] = true
 
     if #other._synch_targets == 0 then other._synch_targets = {} end
     other._synch_targets[self] = true
+end
+
+--- @brief make it so animation will only play when all other animation queues are empty
+function bt.Animation:wait_for(queue)
 
 end

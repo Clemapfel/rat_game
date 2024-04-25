@@ -147,6 +147,7 @@ end, {
         return nil
     end,
 
+    -- (StatusInterface, EntityInterface, EntityInterface) -> nil
     on_switch = function(self, afflicted, entity_at_old_position)
         meta.assert_status_interface(self)
         meta.assert_entity_interface(afflicted)
