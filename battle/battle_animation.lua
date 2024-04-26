@@ -4,8 +4,9 @@ bt.Animation = meta.new_abstract_type("BattleAnimation", {
     _is_finished = false,
     _is_ready_for_synch = false,
     _synch_targets = {}, -- Table<bt.Animation>
-    _wait_for_queues = {}
+    _wait_for = {}
 })
+bt.Animation._blocking_animation = {}
 
 --- @class bt.AnimationResult
 bt.AnimationResult = {
@@ -66,6 +67,16 @@ function bt.Animation:synch_with(other)
 end
 
 --- @brief make it so animation will only play when all other animation queues are empty
-function bt.Animation:wait_for(queue)
+function bt.Animation:wait_for(other)
+    if #self._wait_for == 0 then
+        self._wait_for = {}
+        meta.make_weak(self._wait_for, true, true)
+    end
+    self._wait_for[other] = true
+end
 
+--- @brief
+function bt.Animation:make_blocking()
+    self._is_blocking = true
+    bt.Animation._blocking_animation = self
 end

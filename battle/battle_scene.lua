@@ -154,7 +154,22 @@ function bt.BattleScene:play_animation(entity, animation_id, ...)
 
     local animation = bt.Animation[animation_id](self, sprite, ...)
     sprite:add_animation(animation)
+
+    if self._blocking_animation ~= nil then
+        animation:wait_for(self._blocking_animation)
+    end
+
     return animation, sprite
+end
+
+--- @brief make it so all other animations have to wait for this one to be finished
+function bt.BattleScene:_set_blocking_animation(animation)
+    self._blocking_animation = animation
+    animation:register_finish_callback(function()
+        if self._blocking_animation == animation then
+            self._blocking_animation = nil
+        end
+    end)
 end
 
 

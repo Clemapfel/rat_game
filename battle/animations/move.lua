@@ -29,7 +29,7 @@ end)
 function bt.Animation.MOVE:start()
     do
         local bounds = self._target:get_bounds()
-        local label = rt.Label("<o>SPIN</o>")--"<o>" .. self._move:get_name() .. "</o>")
+        local label = rt.Label("<o>" .. self._move:get_name() .. "</o>")
         label:realize()
         label:set_alignment(rt.Alignment.START)
         label:fit_into(0, 0, bounds.width, bounds.height)

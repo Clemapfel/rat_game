@@ -24,6 +24,7 @@ function bt.Animation.STATUS_APPLIED:start()
         self._target:realize()
     end
 
+    --[[
     self._label = rt.Label("<o>Status Applied: <b><mono>" .. self._status:get_name() .. "</mono></b></o>")
     self._label:realize()
     self._label_path = {}
@@ -50,11 +51,9 @@ function bt.Animation.STATUS_APPLIED:start()
 
     local offset = 0.05
     self._target_path = rt.Spline({
-        --[[
         0, 0,
         -1 * offset, 0,
         offset, 0,
-        ]]--
         0, 0,
     })
 
@@ -62,6 +61,9 @@ function bt.Animation.STATUS_APPLIED:start()
     self._target:set_is_visible(true)
     self._target_snapshot:snapshot(target)
     target:set_is_visible(false)
+    ]]--
+
+    self._target:activate_status(self._status)
 end
 
 --- @override
@@ -72,6 +74,7 @@ function bt.Animation.STATUS_APPLIED:update(delta)
     self._elapsed = self._elapsed + delta
     local fraction = self._elapsed / duration
 
+    --[[
     -- update once per update for animated battle sprites
     local target = self._target
     target:set_is_visible(true)
@@ -106,18 +109,17 @@ function bt.Animation.STATUS_APPLIED:update(delta)
     current.y = current.y + offset_y
     target:set_position_offset(offset_x, offset_y)
     target:set_mix_weight(rt.symmetrical_linear(fraction, 0.5))
-
+    ]]--
     return self._elapsed < duration
 end
 
 --- @override
 function bt.Animation.STATUS_APPLIED:finish()
-    self._target:set_is_visible(true)
+    --self._target:set_is_visible(true)
 end
 
 --- @override
 function bt.Animation.STATUS_APPLIED:draw()
-    love.graphics.setCanvas(nil)
-    self._target_snapshot:draw()
-    self._label:draw()
+    --self._target_snapshot:draw()
+    --self._label:draw()
 end

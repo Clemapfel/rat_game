@@ -32,6 +32,7 @@ love.load = function()
     local scene = rt.current_scene
 
     local to_synch_with = {}
+    local move = bt.Move("TEST_MOVE")
 
     -- TODO move this to update
     input = rt.InputController()
@@ -42,6 +43,11 @@ love.load = function()
             local entities = scene._state:list_entities()
             ---scene:switch(entities[1], entities[2])
             --scene:switch(entities[1], entities[2])
+            local animation = scene:play_animation(scene, "MOVE", move)
+            scene:_set_blocking_animation(animation)
+            scene._blocking_animation = animation
+            scene:switch(entities[1], entities[2])
+
             scene:consume(entities[1], bt.Consumable("DEBUG_CONSUMABLE"))
         elseif which == rt.InputButton.B then
             --scene:remove_status(scene._state:list_entities()[1], bt.Status("DEBUG_STATUS"))

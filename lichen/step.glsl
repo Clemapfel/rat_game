@@ -33,11 +33,8 @@ vec3 permute(vec3 x) {
     return mod289(((x*34.0)+1.0)*x);
 }
 
-float random(vec2 v, float offset)
+float random(vec2 v)
 {
-    v.x += offset;
-    v.y += offset;
-
     const vec4 C = vec4(0.211324865405187,  // (3.0-sqrt(3.0))/6.0
                         0.366025403784439,  // 0.5*(sqrt(3.0)-1.0)
                         -0.577350269189626,  // -1.0 + 2.0 * C.x
@@ -82,8 +79,7 @@ uniform float rng;
 
 float activation_function(float x)
 {
-    //return tanh(3 * (x - 0.5));
-    return 2 * (x - 0.5);
+    return sin(x);// 0.5 * pow((2 * x - 1), 3) + 0.5;
 }
 
 layout (local_size_x = 1, local_size_y = 1, local_size_z = 1) in;
@@ -108,6 +104,7 @@ void computemain()
         kernel[0][1] + kernel[1][1] + kernel[1][2] +
         kernel[0][2] + kernel[1][2] + kernel[2][2]
     ;
+    //kernel_sum = (1 + rng * 2);
 
     for (int ix = -1; ix <= +1; ix++) {
         for (int iy = -1; iy <= +1; iy++) {
@@ -119,12 +116,6 @@ void computemain()
         }
     }
 
-    neighborhood_sum = neighborhood_sum / kernel_sum;
-
-    float offset = activation_function(rng);
-    if (offset * neighborhood_sum * (1 / n_active_neighbors) > 0)
-        neighborhood_sum += offset;
-
-
+    neighborhood_sum = activation_function(neighborhood_sum / kernel_sum) ;
     imageStore(image_out, ivec2(x, y), vec4(current.xy, clamp(neighborhood_sum, 0, 1), 0));
 }

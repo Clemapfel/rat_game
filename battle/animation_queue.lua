@@ -25,12 +25,20 @@ function bt.AnimationQueue:update(delta)
     local current = self.animations[1]
     if current ~= nil then
         if current._is_started ~= true then
-
             -- if synching, wait for all other synching to be ready
             current._is_ready_for_synch = true
-            if sizeof(current._synch_targets) > 0 then
-                for target in keys(current._synch_targets) do
+            if sizeof(current._synch_with) > 0 then
+                for target in keys(current._synch_with) do
                     if target._is_ready_for_synch ~= true then
+                        return
+                    end
+                end
+            end
+            
+            -- if waiting, wait for all others to be done
+            if sizeof(current._wait_for) > 0 then
+                for target in keys(current._wait_for) do
+                    if target._is_finished ~= true then
                         return
                     end
                 end

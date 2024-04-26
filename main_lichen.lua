@@ -6,9 +6,9 @@ lt = {}
 lt._lattice_size = { 400, 400 }
 
 lt._kernel = {
-    {1, 1, 1},
-    {1, 1, 1},
-    {1, 1, 1}
+    {-1 / 2, 1, -1 / 2},
+    {1, 6, 1},
+    {-1 / 2, 1, -1 / 2}
 }
 
 -- https://gist.github.com/slime73/079ef5d4e76cec6498ab7472b4f384d9
@@ -60,7 +60,13 @@ function lt.initialize(width, height)
 
     -- initial lattice state
     local initial_data = love.image.newImageData(width, width, lt._state_texture_format)
-    --[[
+    local pos_x = math.round(width / 2)
+    local pos_y = math.round(height / 2)
+
+    local growth = 0
+    local width_center = width / 2 * rt.random.number(0.25, 0.75)
+    local height_center = height / 2 * rt.random.number(0.25, 0.75)
+
     for x = 1, width do
         for y = 1, height do
             if rt.random.toss_coin(0.05) then
@@ -73,29 +79,13 @@ function lt.initialize(width, height)
             end
         end
     end
-    ]]--
-
-    initial_data:setPixel(width / 2 - 1, height / 2 - 1,
-        1, 1,   -- vector x, y
-        1,      -- state
-    0)          -- unused
-
-    --[[
-    -- seed, cf. https://github.com/sleepokay/lichen/blob/1e3837aa8396521e5b46cf97a122e74504520f0c/lichen.pde#L39
-    local pos_x = math.round(width / 2)
-    local pos_y = math.round(height / 2)
-
-    local cell_size = lt._cell_size
-    local growth = 0
-    local width_center = width / cell_size / 2
-    local height_center = height / cell_size / 2
 
     local function set(x, y, state, vector_x, vector_y)
         initial_data:setPixel(
             x - 1, y - 1,
             vector_x,
             vector_y,
-            state,
+            1,
             0
         )
     end
@@ -106,13 +96,6 @@ function lt.initialize(width, height)
     set(width_center + 0, height_center - 1, max_state, 0, -1)
     set(width_center + 0, height_center + 1, max_state, 0, 1)
     set(width_center, height_center, max_state, 0, 0)
-
-    for x = -1, 1, 2 do
-        for y = -1, 1, 2 do
-            dbg(x, y, (rt.angle(x, y) + math.pi) / (2 * math.pi))
-        end
-    end
-    ]]--
 
     -- setup textures
     local texture_config = { computewrite = true }
@@ -164,7 +147,7 @@ function lt.step()
 
     computer:send("kernel", lt._kernel)
     local rng = rt.random.number(0, 1)
-    computer:send("rng", rng)
+    --computer:send("rng", rng)
 
     love.graphics.dispatchThreadgroups(computer, lt._lattice_size[1], lt._lattice_size[2])
 
@@ -200,6 +183,11 @@ lt._steps_per_second = 10
 love.keypressed = function(which)
     if which == "space" then
         lt._is_stepping = true
+    elseif which == "up" then
+        lt._steps_per_second = lt._steps_per_second + 10
+        println(lt._steps_per_second)
+    elseif which == "down" then
+        lt._steps_per_second = lt._steps_per_second + 1
     else
         lt.step()
     end
