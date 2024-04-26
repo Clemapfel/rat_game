@@ -738,7 +738,7 @@ function bt.BattleScene:consume(holder, to_consume)
         return
     end
 
-    local should_deplete = holder:consume(to_consume:get_id())
+    local should_deplete = holder:consume_consumable(to_consume)
 
     if should_deplete then
         -- animation
@@ -783,4 +783,37 @@ function bt.BattleScene:consume(holder, to_consume)
         -- remove from inventory
         holder:remove_consumable(to_consume)
     end
+end
+
+--- @brief
+function bt.BattleScene:use_move(user, move, ...)
+    meta.assert_isa(user, bt.BattleEntity)
+    meta.assert_isa(move, bt.Move)
+    local targets = {...}
+    for target in values(targets) do
+        meta.assert_isa(target, bt.BattleEntity)
+    end
+
+    -- make current move, reduce stacks
+    self._state:set_current_move_selection(user, move, targets)
+    user:consume_move(move)
+
+    -- animation
+    local animation = self:play_animation(self, "MOVE", move)
+    self:_set_blocking_animation(animation)
+    animation:register_start_callback(function()
+        self._ui:send_message(self:format_name(user) .. " used " .. self:format_name(move))
+    end)
+
+    -- invoke effect
+    local self_proxy = bt.MoveInterface(self, move)
+    local user_proxy = bt.EntityInterface(self, user)
+    local target_proxies = {}
+    for target in values(targets) do
+        table.insert(target_proxies, bt.EntityInterface(self, target))
+    end
+    self:_safe_invoke(move, "effect", self_proxy, user_proxy, target_proxies)
+
+    -- trigger callbacks
+    local callback_id = TODO: before and after move
 end

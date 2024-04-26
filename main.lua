@@ -38,17 +38,8 @@ love.load = function()
     input = rt.InputController()
     input:signal_connect("pressed", function(self, which)
         if which == rt.InputButton.A then
-            --scene:add_status(scene._state:list_entities()[1], bt.Status("DEBUG_STATUS"))
-            --scene:knock_out(scene._state:list_entities()[1])
             local entities = scene._state:list_entities()
-            ---scene:switch(entities[1], entities[2])
-            --scene:switch(entities[1], entities[2])
-            local animation = scene:play_animation(scene, "MOVE", move)
-            scene:_set_blocking_animation(animation)
-            scene._blocking_animation = animation
-            scene:switch(entities[1], entities[2])
-
-            scene:consume(entities[1], bt.Consumable("DEBUG_CONSUMABLE"))
+            scene:use_move(entities[1], move, entities[2])
         elseif which == rt.InputButton.B then
             --scene:remove_status(scene._state:list_entities()[1], bt.Status("DEBUG_STATUS"))
             --scene:help_up(scene._state:list_entities()[1])

@@ -4,6 +4,11 @@ bt.BattleState = meta.new_type("BattleState", function(scene)
         _scene = scene,
         _entities = {},      -- Table<bt.Entity>
         _status = {},        -- Table<GlobalStatusId, {status: bt.GlobalStatus, elapsed: Number}
+        _current_move_selection = {
+            user = nil,
+            move = nil,
+            targets = {}
+        }
     })
 end)
 
@@ -166,5 +171,18 @@ function bt.BattleState:swap(left_i, right_i)
 
     self._entities[right_i] = left
     self._entities[left_i] = right
+end
+
+--- @brief
+function bt.BattleState:set_current_move_selection(user, move, targets)
+    self._current_move_selection.user = user
+    self._current_move_selection.move = move
+    table.clear(self._current_move_selection.targets)
+    while #self._current_move_selection.targets > 0 do
+        table.remove(self._current_move_selection.targets)
+    end
+    for entity in values(targets) do
+        table.insert(self._current_move_selection.targets, entity)
+    end
 end
 

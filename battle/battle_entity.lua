@@ -30,7 +30,7 @@ bt.BattleEntity = meta.new_type("BattleEntity", function(scene, id)
     })
 
     out.status = {}
-    out.moveset = {}
+    out.moves = {}
     out.equips = {}
     out.consumables = {}
 
@@ -51,7 +51,7 @@ end, {
     stance = bt.Stance("NEUTRAL"),
 
     status = {}, -- Table<bt.Status, {status: bt.Status, elapsed: Number}>
-    moveset = {}, -- Table<MoveID, {move: bt:move, n_uses: Number}>
+    moves = {}, -- Table<MoveID, {move: bt:move, n_uses: Number}>
     equips = {}, -- Table<EquipID, {equip: bt.Equip}>
     consumables = {}, --Table<ConsumableID, {consumable: bt.Consumable, n_consumed: Number}
 
@@ -125,8 +125,8 @@ function bt.BattleEntity:realize()
     self.speed_base = rt.random.integer(1, 99)
     -- TODO
 
-    config.moveset = which(config.moveset, {})
-    for move_id in values(config.moveset) do
+    config.moves = which(config.moves, {})
+    for move_id in values(config.moves) do
         local move = bt.Move(move_id)
         self:add_move(move)
     end
@@ -398,23 +398,40 @@ end
 
 --- @brief
 function bt.BattleEntity:get_move(move_id)
-    if self.moveset[move_id] == nil then return nil end
-    return self.moveset[move_id].move
+    if self.moves[move_id] == nil then return nil end
+    return self.moves[move_id].move
 end
 
 --- @brief
 function bt.BattleEntity:get_move_n_uses_left(id)
-    return self.moveset[id].n_uses
+    return self.moves[id].n_uses
 end
 
 --- @brief
 function bt.BattleEntity:add_move(move)
-    self.moveset[move:get_id()] = {
+    self.moves[move:get_id()] = {
         move = move,
         n_uses = move.max_n_uses
     }
 end
 
+--- @brief
+function bt.BattleEntity:has_move(move)
+    return self.moves[move:get_id()] ~= nil
+end
+
+--- @brief
+--- @return Boolean true if move is depleted, false otherwise
+function bt.BattleEntity:consume_move(move)
+    local entry = self.moves[move:get_id()]
+    if entry == nil then
+        rt.warning("In bt.BattleEntity:consume_move: entity `" .. self:get_id() .. "` does not have move `" .. move:get_id() .. "` equipped")
+        return false
+    else
+        entry.n_uses = entry.n_uses - 1
+        return entry.n_uses <= 0
+    end
+end
 --- @brief
 function bt.BattleEntity:add_equip(equip)
     self.equips[equip:get_id()] = {
@@ -490,10 +507,10 @@ function bt.BattleEntity:list_consumables()
 end
 
 --- @brief
-function bt.BattleEntity:consume(consumable_id)
-    local entry = self.consumables[consumable_id]
+function bt.BattleEntity:consume_consumable(consumable)
+    local entry = self.consumables[consumable:get_id()]
     if entry == nil then
-        rt.warning("In bt.BattleEntity:consume: entity `" .. self:get_id() .. "` does not have consumable `" .. consumable.get_id() .. "` equipped")
+        rt.warning("In bt.BattleEntity:consume_move: entity `" .. self:get_id() .. "` does not have consumable `" .. consumable:get_id() .. "` equipped")
         return false
     else
         entry.n_consumed = entry.n_consumed + 1

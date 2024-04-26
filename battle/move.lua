@@ -32,10 +32,12 @@ end, {
 
     priority = 0,
 
-    effect = function(user, targets)
-        meta.assert_isa(self, bt.Move)
-        meta.assert_isa(user, bt.BattleEntity)
-        meta.assert_isa(targets, bt.BattleEntity)
+    effect = function(self, user, targets)
+        meta.assert_move_interface(self)
+        meta.assert_entity_interface(user)
+        for target in values(targets) do
+            meta.assert_entity_interface(target)
+        end
     end,
 
     sprite_id = "",

@@ -13,6 +13,7 @@ function bt.BattleScene._safe_invoke(scene, instance, callback_id, ...)
         "values",
         "keys",
         "range",
+        "tostring",
         "print",
         "println",
         "dbg",
@@ -68,7 +69,7 @@ function bt.BattleScene._safe_invoke(scene, instance, callback_id, ...)
     -- whitelist assertions
     env.meta = {}
     for yes in range(
-        "status", "global_status", "entity", "equip", "consumable"
+        "status", "global_status", "entity", "equip", "consumable", "move"
     ) do
         local is_name = "is_" .. yes .. "_interface"
         env.meta[is_name] = meta[is_name]
@@ -540,6 +541,57 @@ function bt.GlobalStatusInterface(scene, status)
     return self
 end
 
+
+--- @class bt.MoveInterface
+function bt.MoveInterface(scene, move)
+    meta.assert_isa(scene, bt.BattleScene)
+    meta.assert_isa(move, bt.Move)
+
+    local self, metatable = {}, {}
+    setmetatable(self, metatable)
+
+    metatable.type = "bt.MoveInterface"
+    metatable.scene = scene
+    metatable.original = move
+
+    self.get_id = function(self)
+        return getmetatable(self).original:get_id()
+    end
+
+    self.get_name = function(self)
+        return getmetatable(self).original:get_name()
+    end
+
+    self.get_max_n_uses = function(self)
+        return getmetatable(self).original:get_max_duration()
+    end
+
+    metatable.getter_mapping = {
+        ["id"] = self.get_id,
+        ["name"] = self.get_name,
+        ["max_n_uses"] = self.get_max_duration
+    }
+
+    metatable.__index = function(self, key)
+        local getter = getmetatable(self).getter_mapping[key]
+        if getter ~= nil then
+            return getter(self)
+        else
+            local out = rawget(self, key)
+            if out == nil then
+                rt.warning("In bt.MoveInterface:__index: trying to access property `" .. key .. "` of Move `" .. getmetatable(self).original:get_id() .. "`, but it does not exist")
+            end
+            return out
+        end
+    end
+
+    metatable.__newindex = function(self, key, value)
+        rt.warning("In bt.MoveInterface:__newindex: trying to set property `" .. key .. "` of Move `" .. getmetatable(self).original:get_id() .. "` to `" .. serialize(value) .. "`, but interface is immutable")
+        return
+    end
+    return self
+end
+
 -- generate meta assertions
 for which in values({
     {"entity", "bt.EntityInterface"},
@@ -547,6 +599,7 @@ for which in values({
     {"equip", "bt.EquipInterface"},
     {"consumable", "bt.ConsumableInterface"},
     {"global_status", "bt.GlobalStatusInterface"},
+    {"move", "bt.MoveInterface"}
 }) do
     local is_name = "is_" .. which[1] .. "_interface"
 
