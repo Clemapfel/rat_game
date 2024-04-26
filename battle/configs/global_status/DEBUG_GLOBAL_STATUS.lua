@@ -75,39 +75,11 @@ return {
         return nil
     end,
 
-    on_before_damage_taken = function(self, damage_taker, damage_dealer, damage)
+    on_hp_gained = function(self, entity, hp_gained)
         meta.assert_global_status_interface(self)
-        meta.assert_entity_interface(damage_taker)
-        meta.assert_entity_interface(damage_dealer)
-        meta.assert_number(damage)
-        println("[DBG] In " .. self.id .. ".on_before_damage_taken: " .. damage_taker.id .. " will take " .. damage .. " damage from " .. damage_dealer)
-        return damage -- new damage
-    end,
-
-    on_after_damage_taken = function(self, damage_taker, damage_dealer, damage)
-        meta.assert_global_status_interface(self)
-        meta.assert_entity_interface(damage_taker)
-        meta.assert_entity_interface(damage_dealer)
-        meta.assert_number(damage)
-        println("[DBG] In " .. self.id .. ".on_after_damage_taken: " .. damage_taker.id .. " took " .. damage .. " damage from " .. damage_dealer)
-        return nil
-    end,
-
-    on_before_damage_dealt = function(self, damage_dealer, damage_taker, damage)
-        meta.assert_global_status_interface(self)
-        meta.assert_entity_interface(damage_dealer)
-        meta.assert_entity_interface(damage_taker)
-        meta.assert_number(damage)
-        println("[DBG] In " .. self.id .. ".on_before_damage_dealt: " .. damage_dealer.id .. " will deal " .. damage .. " damage to " .. damage_taker)
-        return damage -- new damage
-    end,
-
-    on_after_damage_dealt = function(self, damage_dealer, damage_taker, damage)
-        meta.assert_global_status_interface(self)
-        meta.assert_entity_interface(damage_dealer)
-        meta.assert_entity_interface(damage_taker)
-        meta.assert_number(damage)
-        println("[DBG] In " .. self.id .. ".on_after_damage_dealt: " .. damage_dealer.id .. " dealt " .. damage .. " damage to " .. damage_taker)
+        meta.assert_entity_interface(entity)
+        meta.assert_number(hp_gained)
+        println("[DBG] In " .. self.id .. ".on_hp_gained: " .. self:get_id() .. " gained " .. hp_gained .. " hp")
         return nil
     end,
 
@@ -195,23 +167,14 @@ return {
         return nil
     end,
 
-    on_before_move = function(self, move_user, move, targets)
+    on_move = function(self, move_user, move, targets)
         meta.assert_global_status_interface(self)
         meta.assert_entity_interface(move_user)
         meta.assert_move_interface(move)
         for target in values(targets) do
-            meta.assert_move_interface(targets)
+            meta.assert_entity_interface(target)
         end
-        return true -- allow move
-    end,
-
-    on_after_move = function(self, move_user, move, targets)
-        meta.assert_global_status_interface(self)
-        meta.assert_entity_interface(move_user)
-        meta.assert_move_interface(move)
-        for target in values(targets) do
-            meta.assert_move_interface(targets)
-        end
+        println("[DBG] In " .. self.id .. ".on_move: " .. move_user:get_id() .. " used move " .. move:get_id() .. "")
         return nil
     end,
 

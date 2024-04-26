@@ -28,6 +28,14 @@ return {
         return nil
     end,
 
+    on_hp_gained = function(self, holder, value)
+        meta.assert_consumable_interface(self)
+        meta.assert_entity_interface(holder)
+        meta.assert_number(value)
+        println("[DBG] In " .. self.id .. ".on_hp_gained: " .. self:get_id() .. " gained " .. value .. " hp")
+        return nil
+    end,
+
     on_before_damage_taken = function(self, holder, damage_dealer, damage)
         meta.assert_consumable_interface(self)
         meta.assert_entity_interface(holder)
@@ -134,23 +142,14 @@ return {
         return nil
     end,
 
-    on_before_move = function(self, holder, move, targets)
+    on_move = function(self, holder, move, targets)
         meta.assert_consumable_interface(self)
         meta.assert_entity_interface(holder)
         meta.assert_move_interface(move)
         for target in values(targets) do
-            meta.assert_move_interface(targets)
+            meta.assert_entity_interface(target)
         end
-        return true -- allow move
-    end,
-
-    on_after_move = function(self, holder, move, targets)
-        meta.assert_consumable_interface(self)
-        meta.assert_entity_interface(holder)
-        meta.assert_move_interface(move)
-        for target in values(targets) do
-            meta.assert_move_interface(targets)
-        end
+        println("[DBG] In " .. self.id .. ".on_move: " .. holder:get_id() .. " used move " .. move:get_id() .. "")
         return nil
     end,
 

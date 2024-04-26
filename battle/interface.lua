@@ -8,33 +8,33 @@ function bt.BattleScene._safe_invoke(scene, instance, callback_id, ...)
     -- setup fenv, done everytime to reset any globals
     local env = {}
     for common in range(
-        "pairs",
-        "ipairs",
-        "values",
-        "keys",
-        "range",
-        "tostring",
-        "print",
-        "println",
-        "dbg",
+            "pairs",
+            "ipairs",
+            "values",
+            "keys",
+            "range",
+            "tostring",
+            "print",
+            "println",
+            "dbg",
 
-        "sizeof",
-        "is_empty",
-        "clamp",
-        "project",
-        "mix",
-        "smoothstep",
-        "fract",
-        "ternary",
-        "which",
-        "splat",
-        "slurp",
-        "select",
-        "serialize",
+            "sizeof",
+            "is_empty",
+            "clamp",
+            "project",
+            "mix",
+            "smoothstep",
+            "fract",
+            "ternary",
+            "which",
+            "splat",
+            "slurp",
+            "select",
+            "serialize",
 
-        "INFINITY",
-        "POSITIVE_INFINITY",
-        "NEGATIVE_INFINITY"
+            "INFINITY",
+            "POSITIVE_INFINITY",
+            "NEGATIVE_INFINITY"
     ) do
         assert(_G[common] ~= nil)
         env[common] = _G[common]
@@ -74,6 +74,13 @@ function bt.BattleScene._safe_invoke(scene, instance, callback_id, ...)
         local is_name = "is_" .. yes .. "_interface"
         env.meta[is_name] = meta[is_name]
         env.meta["assert_" .. yes .. "_interface"] = meta["assert_" .. yes .. "_interface"]
+    end
+
+    for yes in range(
+        "number", "string", "function", "nil"
+    ) do
+        env.meta["is_" .. yes] = meta["is_" .. yes]
+        env.meta["assert_" .. yes] = meta["assert_" .. yes]
     end
 
     -- shared environment, not reset between calls

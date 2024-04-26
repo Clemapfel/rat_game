@@ -39,35 +39,11 @@ end, {
         return nil
     end,
 
-    on_before_damage_taken = function(self, holder, damage_dealer, damage)
+    -- (ConsumableInterface, EntityInterface, Unsigned) -> nil
+    on_hp_gained = function(self, holder, value)
         meta.assert_consumable_interface(self)
         meta.assert_entity_interface(holder)
-        meta.assert_entity_interface(damage_dealer)
-        meta.assert_number(damage)
-        return damage -- new damage
-    end,
-
-    on_after_damage_taken = function(self, holder, damage_dealer, damage)
-        meta.assert_consumable_interface(self)
-        meta.assert_entity_interface(holder)
-        meta.assert_entity_interface(damage_dealer)
-        meta.assert_number(damage)
-        return nil
-    end,
-
-    on_before_damage_dealt = function(self, holder, damage_taker, damage)
-        meta.assert_consumable_interface(self)
-        meta.assert_entity_interface(holder)
-        meta.assert_entity_interface(damage_taker)
-        meta.assert_number(damage)
-        return damage -- new damage
-    end,
-
-    on_after_damage_dealt = function(self, holder, damage_taker, damage)
-        meta.assert_consumable_interface(self)
-        meta.assert_entity_interface(holder)
-        meta.assert_entity_interface(damage_taker)
-        meta.assert_number(damage)
+        meta.assert_number(value)
         return nil
     end,
 
@@ -117,6 +93,7 @@ end, {
         return nil
     end,
 
+    -- (ConsumableInterface, EntityInterface) -> nil
     on_killed = function(self, holder)
         meta.assert_consumable_interface(self)
         meta.assert_entity_interface(holder)
@@ -139,22 +116,13 @@ end, {
         return nil
     end,
 
-    on_before_move = function(self, holder, move, targets)
+    -- (ConsumableInterface, EntityInterface, MoveInterface, Table<EntityInterface>)
+    on_move = function(self, holding_user, move, targets)
         meta.assert_consumable_interface(self)
-        meta.assert_entity_interface(holder)
+        meta.assert_entity_interface(holding_user)
         meta.assert_move_interface(move)
         for target in values(targets) do
-            meta.assert_move_interface(targets)
-        end
-        return true -- allow move
-    end,
-
-    on_after_move = function(self, holder, move, targets)
-        meta.assert_consumable_interface(self)
-        meta.assert_entity_interface(holder)
-        meta.assert_move_interface(move)
-        for target in values(targets) do
-            meta.assert_move_interface(targets)
+            meta.assert_entity_interface(target)
         end
         return nil
     end,
@@ -220,10 +188,7 @@ function bt.Consumable:realize()
         "on_turn_start",
         "on_turn_end",
         "on_battle_end",
-        "on_before_damage_taken",
-        "on_before_damage_dealt",
-        "on_after_damage_taken",
-        "on_after_damage_dealt",
+        "on_hp_gained",
         "on_status_gained",
         "on_status_lost",
         "on_global_status_gained",

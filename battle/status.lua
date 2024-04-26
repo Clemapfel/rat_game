@@ -2,8 +2,12 @@ rt.settings.battle.status = {
     config_path = "battle/configs/status"
 }
 
---- @class Status
+--- @class bt.Status
 --- @brief cached instancing, moves with the same ID will always return the same instance
+--- @field id String
+--- @field name String
+--- @field attack_offset Unsigned
+--- @field defense_offset Unsigned
 bt.Status = meta.new_type("Status", function(id)
     local out = bt.Status._atlas[id]
     if out == nil then
@@ -63,35 +67,11 @@ end, {
         return nil
     end,
 
-    on_before_damage_taken = function(self, afflicted, damage_dealer, damage)
+    -- (StatusInterface, EntityInterface, Unsigned) -> nil
+    on_hp_gained = function(self, afflicted, value)
         meta.assert_status_interface(self)
         meta.assert_entity_interface(afflicted)
-        meta.assert_entity_interface(damage_dealer)
-        meta.assert_number(damage)
-        return damage -- new damage
-    end,
-
-    on_after_damage_taken = function(self, afflicted, damage_dealer, damage)
-        meta.assert_status_interface(self)
-        meta.assert_entity_interface(afflicted)
-        meta.assert_entity_interface(damage_dealer)
-        meta.assert_number(damage)
-        return nil
-    end,
-
-    on_before_damage_dealt = function(self, afflicted, damage_taker, damage)
-        meta.assert_status_interface(self)
-        meta.assert_entity_interface(afflicted)
-        meta.assert_entity_interface(damage_taker)
-        meta.assert_number(damage)
-        return damage -- new damage
-    end,
-
-    on_after_damage_dealt = function(self, afflicted, damage_taker, damage)
-        meta.assert_status_interface(self)
-        meta.assert_entity_interface(afflicted)
-        meta.assert_entity_interface(damage_taker)
-        meta.assert_number(damage)
+        meta.assert_number(value)
         return nil
     end,
 
@@ -141,6 +121,7 @@ end, {
         return nil
     end,
 
+    -- (StatusInterface, EntityInterface)
     on_killed = function(self, afflicted)
         meta.assert_status_interface(self)
         meta.assert_entity_interface(afflicted)
@@ -163,22 +144,13 @@ end, {
         return nil
     end,
 
-    on_before_move = function(self, afflicted, move, targets)
+    -- (StatusInterface, EntityInterface, MoveInterface, Table<EntityInterface>)
+    on_move = function(self, afflicted_user, move, targets)
         meta.assert_status_interface(self)
-        meta.assert_entity_interface(afflicted)
+        meta.assert_entity_interface(afflicted_user)
         meta.assert_move_interface(move)
         for target in values(targets) do
-            meta.assert_move_interface(targets)
-        end
-        return true -- allow move
-    end,
-
-    on_after_move = function(self, afflicted, move, targets)
-        meta.assert_status_interface(self)
-        meta.assert_entity_interface(afflicted)
-        meta.assert_move_interface(move)
-        for target in values(targets) do
-            meta.assert_move_interface(targets)
+            meta.assert_entity_interface(target)
         end
         return nil
     end,
@@ -251,10 +223,7 @@ function bt.Status:realize()
         "on_turn_start",
         "on_turn_end",
         "on_battle_end",
-        "on_before_damage_taken",
-        "on_before_damage_dealt",
-        "on_after_damage_taken",
-        "on_after_damage_dealt",
+        "on_hp_gained",
         "on_status_gained",
         "on_status_lost",
         "on_global_status_gained",

@@ -64,35 +64,11 @@ end, {
         return nil
     end,
 
-    on_before_damage_taken = function(self, damage_taker, damage_dealer, damage)
+    -- (GlobalStatus, EntityInterface, Unsigned) -> nil
+    on_hp_gained = function(self, entity, hp_gained)
         meta.assert_global_status_interface(self)
-        meta.assert_entity_interface(damage_taker)
-        meta.assert_entity_interface(damage_dealer)
-        meta.assert_number(damage)
-        return damage -- new damage
-    end,
-
-    on_after_damage_taken = function(self, damage_taker, damage_dealer, damage)
-        meta.assert_global_status_interface(self)
-        meta.assert_entity_interface(damage_taker)
-        meta.assert_entity_interface(damage_dealer)
-        meta.assert_number(damage)
-        return nil
-    end,
-
-    on_before_damage_dealt = function(self, damage_dealer, damage_taker, damage)
-        meta.assert_global_status_interface(self)
-        meta.assert_entity_interface(damage_dealer)
-        meta.assert_entity_interface(damage_taker)
-        meta.assert_number(damage)
-        return damage -- new damage
-    end,
-
-    on_after_damage_dealt = function(self, damage_dealer, damage_taker, damage)
-        meta.assert_global_status_interface(self)
-        meta.assert_entity_interface(damage_dealer)
-        meta.assert_entity_interface(damage_taker)
-        meta.assert_number(damage)
+        meta.assert_entity_interface(entity)
+        meta.assert_number(hp_gained)
         return nil
     end,
 
@@ -143,6 +119,7 @@ end, {
         return nil
     end,
 
+    -- (GlobalStatusInterface, EntityInterface) -> nil
     on_killed = function(self, killed_entity)
         meta.assert_global_status_interface(self)
         meta.assert_entity_interface(killed_entity)
@@ -165,22 +142,13 @@ end, {
         return nil
     end,
 
-    on_before_move = function(self, move_user, move, targets)
+    -- (GlobalStatusInterface, EntityInterface, MoveInterface, Table<EntityInterface>) -> nil
+    on_move = function(self, move_user, move, targets)
         meta.assert_global_status_interface(self)
         meta.assert_entity_interface(move_user)
         meta.assert_move_interface(move)
         for target in values(targets) do
-            meta.assert_move_interface(targets)
-        end
-        return true -- allow move
-    end,
-
-    on_after_move = function(self, move_user, move, targets)
-        meta.assert_global_status_interface(self)
-        meta.assert_entity_interface(move_user)
-        meta.assert_move_interface(move)
-        for target in values(targets) do
-            meta.assert_move_interface(targets)
+            meta.assert_entity_interface(target)
         end
         return nil
     end,
@@ -241,10 +209,7 @@ function bt.GlobalStatus:realize()
         "on_turn_start",
         "on_turn_end",
         "on_battle_end",
-        "on_before_damage_taken",
-        "on_before_damage_dealt",
-        "on_after_damage_taken",
-        "on_after_damage_dealt",
+        "on_hp_gained",
         "on_status_gained",
         "on_status_lost",
         "on_global_status_gained",
@@ -254,8 +219,7 @@ function bt.GlobalStatus:realize()
         "on_killed",
         "on_switch",
         "on_stance_changed",
-        "on_before_move",
-        "on_after_move",
+        "on_move",
         "on_consumable_consumed"
     }
 
