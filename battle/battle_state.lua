@@ -118,6 +118,16 @@ function bt.BattleState:remove_global_status(status)
     self._status[status_id] = nil
 end
 
+--- @brief
+function bt.BattleState:get_global_status_n_turns_elapsed(status)
+    local entry = self._status[status:get_id()]
+    if entry ~= nil then
+        return entry.elapsed
+    else
+        return 0
+    end
+end
+
 --- @brief [internal] unlock entity, mutate, then lock again
 function bt.BattleState:mutate_entity(entity, f, ...)
     meta.set_is_mutable(entity, true)
@@ -174,6 +184,26 @@ function bt.BattleState:swap(left_i, right_i)
 end
 
 --- @brief
+function bt.BattleState:clear_current_move_selection()
+    self._current_move_selection_before = self._current_move_selection
+    self._current_move_selection = {
+        user = nil,
+        move = nil,
+        targets = {}
+    }
+end
+
+--- @brief
+function bt.BattleState:restore_current_move_selection()
+    self._current_move_selection = self._current_move_selection_before
+    self._current_move_selection_before  = {
+        user = nil,
+        move = nil,
+        targets = {}
+    }
+end
+
+--- @brief
 function bt.BattleState:set_current_move_selection(user, move, targets)
     self._current_move_selection.user = user
     self._current_move_selection.move = move
@@ -184,5 +214,20 @@ function bt.BattleState:set_current_move_selection(user, move, targets)
     for entity in values(targets) do
         table.insert(self._current_move_selection.targets, entity)
     end
+end
+
+--- @brief
+function bt.BattleState:get_current_move_user()
+    return self._current_move_selection.user
+end
+
+--- @brief
+function bt.BattleState:get_current_move_targets()
+    return self._current_move_selection.targets
+end
+
+--- @brief
+function bt.BattleState:get_current_move()
+    return self._current_move_selection.move
 end
 

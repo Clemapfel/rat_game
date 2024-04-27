@@ -14,14 +14,14 @@ love.load = function()
     input:signal_connect("pressed", function(self, which)
         if which == rt.InputButton.A then
             local entities = scene._state:list_entities()
-            --scene:use_move(entities[1], move, entities[2])
-            scene:add_hp(entities[1], 15)
+            scene:reduce_hp(entities[1], 50)
         elseif which == rt.InputButton.B then
             --scene:remove_status(scene._state:list_entities()[1], bt.Status("DEBUG_STATUS"))
             --scene:help_up(scene._state:list_entities()[1])
             scene:skip_animation()
         elseif which == rt.InputButton.X then
-            scene:kill(scene._state:list_entities()[1])
+            local entities = scene._state:list_entities()
+            scene:add_hp(entities[1], 50)
         end
     end)
 

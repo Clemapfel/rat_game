@@ -40,9 +40,35 @@ end, {
     end,
 
     -- (ConsumableInterface, EntityInterface, Unsigned) -> nil
-    on_hp_gained = function(self, holder, value)
+    on_healing_received = function(self, holder, value)
         meta.assert_consumable_interface(self)
         meta.assert_entity_interface(holder)
+        meta.assert_number(value)
+        return nil
+    end,
+
+    -- (ConsumableInterface, EntityInterface, EntityInterface, Unsigned) -> nil
+    on_healing_performed = function(self, holder, receiver, value)
+        meta.assert_consumable_interface(self)
+        meta.assert_entity_interface(holder)
+        meta.assert_entity_interface(receiver)
+        meta.assert_number(value)
+        return nil
+    end,
+
+    -- (ConsumableInterface, EntityInterface, Unsigned) -> nil
+    on_damage_taken = function(self, holder, hp_lost)
+        meta.assert_global_status_interface(self)
+        meta.assert_entity_interface(holder)
+        meta.assert_number(hp_lost)
+        return nil
+    end,
+
+    -- (ConsumableInterface, EntityInterface, EntityInterface, Unsigned) -> nil
+    on_damage_dealt = function(self, holder, damage_taker, value)
+        meta.assert_global_status_interface(self)
+        meta.assert_entity_interface(holder)
+        meta.assert_entity_interface(damage_taker)
         meta.assert_number(value)
         return nil
     end,
@@ -117,7 +143,7 @@ end, {
     end,
 
     -- (ConsumableInterface, EntityInterface, MoveInterface, Table<EntityInterface>)
-    on_move = function(self, holding_user, move, targets)
+    on_move_used= function(self, holding_user, move, targets)
         meta.assert_consumable_interface(self)
         meta.assert_entity_interface(holding_user)
         meta.assert_move_interface(move)
@@ -188,7 +214,10 @@ function bt.Consumable:realize()
         "on_turn_start",
         "on_turn_end",
         "on_battle_end",
-        "on_hp_gained",
+        "on_healing_received",
+        "on_healing_performed",
+        "on_damage_taken",
+        "on_damage_dealt",
         "on_status_gained",
         "on_status_lost",
         "on_global_status_gained",

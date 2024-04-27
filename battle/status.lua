@@ -32,6 +32,18 @@ end, {
     defense_factor = 1,
     speed_factor = 1,
 
+    damage_dealt_factor = 1,
+    damage_dealt_offset = 0,
+
+    damage_received_factor = 1,
+    damage_received_offset = 0,
+
+    healing_performed_factor = 1,
+    healing_performed_offset = 0,
+
+    healing_received_factor = 1,
+    healing_received_offset = 0,
+
     max_duration = POSITIVE_INFINITY,
     is_silent = false,
 
@@ -68,9 +80,35 @@ end, {
     end,
 
     -- (StatusInterface, EntityInterface, Unsigned) -> nil
-    on_hp_gained = function(self, afflicted, value)
+    on_healing_received = function(self, afflicted, value)
         meta.assert_status_interface(self)
         meta.assert_entity_interface(afflicted)
+        meta.assert_number(value)
+        return nil
+    end,
+
+    -- (StatusInterface, EntityInterface, EntityInterface, Unsigned) -> nil
+    on_healing_performed = function(self, afflicted, receiver, value)
+        meta.assert_status_interface(self)
+        meta.assert_entity_interface(afflicted)
+        meta.assert_entity_interface(receiver)
+        meta.assert_number(value)
+        return nil
+    end,
+
+    -- (StatusInterface, EntityInterface, Unsigned) -> nil
+    on_damage_taken = function(self, afflicted, hp_lost)
+        meta.assert_global_status_interface(self)
+        meta.assert_entity_interface(afflicted)
+        meta.assert_number(hp_lost)
+        return nil
+    end,
+
+    -- (StatusInterface, EntityInterface, EntityInterface, Unsigned) -> nil
+    on_damage_dealt = function(self, afflicted, damage_taker, value)
+        meta.assert_global_status_interface(self)
+        meta.assert_entity_interface(afflicted)
+        meta.assert_entity_interface(damage_taker)
         meta.assert_number(value)
         return nil
     end,
@@ -136,16 +174,8 @@ end, {
         return nil
     end,
 
-    on_stance_changed = function(self, afflicted, old_stance, new_stance)
-        meta.assert_status_interface(self)
-        meta.assert_entity_interface(afflicted)
-        meta.assert_stance_interface(old_stance)
-        meta.assert_stance_interface(new_stance)
-        return nil
-    end,
-
     -- (StatusInterface, EntityInterface, MoveInterface, Table<EntityInterface>)
-    on_move = function(self, afflicted_user, move, targets)
+    on_move_used= function(self, afflicted_user, move, targets)
         meta.assert_status_interface(self)
         meta.assert_entity_interface(afflicted_user)
         meta.assert_move_interface(move)
@@ -155,7 +185,7 @@ end, {
         return nil
     end,
 
-    --- (StatusInterface, EntityInterface, ConsumableInterface)
+    -- (StatusInterface, EntityInterface, ConsumableInterface) -> nil
     on_consumable_consumed = function(self, afflicted, consumable)
         meta.assert_status_interface(self)
         meta.assert_entity_interface(afflicted)
@@ -201,7 +231,15 @@ function bt.Status:realize()
         "attack_factor",
         "defense_factor",
         "speed_factor",
-        "max_duration"
+        "max_duration",
+        "damage_dealt_factor",
+        "damage_dealt_offset",
+        "damage_received_factor",
+        "damage_received_offset",
+        "healing_performed_factor",
+        "healing_performed_offset",
+        "healing_received_factor",
+        "healing_received_offset",
     }
 
     for key in values(numbers) do
@@ -223,7 +261,10 @@ function bt.Status:realize()
         "on_turn_start",
         "on_turn_end",
         "on_battle_end",
-        "on_hp_gained",
+        "on_healing_received",
+        "on_healing_performed",
+        "on_damage_taken",
+        "on_damage_dealt",
         "on_status_gained",
         "on_status_lost",
         "on_global_status_gained",

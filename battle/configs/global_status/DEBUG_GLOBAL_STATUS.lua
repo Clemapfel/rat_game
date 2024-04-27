@@ -75,11 +75,37 @@ return {
         return nil
     end,
 
-    on_hp_gained = function(self, entity, hp_gained)
+    on_healing_received = function(self, entity, hp_gained)
         meta.assert_global_status_interface(self)
         meta.assert_entity_interface(entity)
         meta.assert_number(hp_gained)
-        println("[DBG] In " .. self.id .. ".on_hp_gained: " .. self:get_id() .. " gained " .. hp_gained .. " hp")
+        println("[DBG] In " .. self.id .. ".on_healing_received: " .. entity:get_id() .. " gained " .. hp_gained .. " hp")
+        return nil
+    end,
+
+    on_healing_performed = function(self, healing_performer, healing_receiver, hp_gained)
+        meta.assert_global_status_interface(self)
+        meta.assert_entity_interface(healing_performer)
+        meta.assert_entity_interface(healing_receiver)
+        meta.assert_number(hp_gained)
+        println("[DBG] In " .. self.id .. ".on_healing_performed: " .. healing_performer:get_id() .. " restored " .. healing_receiver:get_id() .. " for " .. hp_gained .. " hp")
+        return nil
+    end,
+
+    on_damage_taken = function(self, entity, hp_lost)
+        meta.assert_global_status_interface(self)
+        meta.assert_entity_interface(entity)
+        meta.assert_number(hp_lost)
+        println("[DBG] In " .. self.id .. ".on_damage_taken: " .. entity:get_id() .. " took " .. hp_lost .. " damage")
+        return nil
+    end,
+
+    on_damage_dealt = function(self, damage_dealer, damage_taker, value)
+        meta.assert_global_status_interface(self)
+        meta.assert_entity_interface(damage_dealer)
+        meta.assert_entity_interface(damage_taker)
+        meta.assert_number(value)
+        println("[DBG] In " .. self.id .. ".on_damage_dealt: " .. damage_dealer:get_id() .. " dealt " .. value .. " damage to " .. damage_taker:get_id())
         return nil
     end,
 
@@ -167,7 +193,7 @@ return {
         return nil
     end,
 
-    on_move = function(self, move_user, move, targets)
+    on_move_used= function(self, move_user, move, targets)
         meta.assert_global_status_interface(self)
         meta.assert_entity_interface(move_user)
         meta.assert_move_interface(move)

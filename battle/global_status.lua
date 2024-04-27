@@ -64,14 +64,40 @@ end, {
         return nil
     end,
 
-    -- (GlobalStatus, EntityInterface, Unsigned) -> nil
-    on_hp_gained = function(self, entity, hp_gained)
+    -- (GlobalStatusInterface, EntityInterface, Unsigned) -> nil
+    on_healing_received = function(self, entity, hp_gained)
         meta.assert_global_status_interface(self)
         meta.assert_entity_interface(entity)
         meta.assert_number(hp_gained)
         return nil
     end,
 
+    -- (GlobalStatusInterface, EntityInterface, EntityInterface, Unsigned) -> nil
+    on_healing_performed = function(self, healing_performer, healing_receiver, hp_gained)
+        meta.assert_global_status_interface(self)
+        meta.assert_entity_interface(healing_performer)
+        meta.assert_entity_interface(healing_receiver)
+        meta.assert_number(hp_gained)
+        return nil
+    end,
+
+    -- (GlobalStatusInterface, EntityInterface, Unsigned) -> nil
+    on_damage_taken = function(self, entity, hp_lost)
+        meta.assert_global_status_interface(self)
+        meta.assert_entity_interface(entity)
+        meta.assert_number(hp_lost)
+        return nil
+    end,
+
+    -- (GlobalStatusInterface, EntityInterface, EntityInterface, Unsigned) -> nil
+    on_damage_dealt = function(self, damage_dealer, damage_taker, value)
+        meta.assert_global_status_interface(self)
+        meta.assert_entity_interface(damage_dealer)
+        meta.assert_entity_interface(damage_taker)
+        meta.assert_number(value)
+        return nil
+    end,
+    
     -- (GlobalStatusInterface, EntityInterface, StatusInterface) -> nil
     on_status_gained = function(self, afflicted, gained_status)
         meta.assert_global_status_interface(self)
@@ -143,7 +169,7 @@ end, {
     end,
 
     -- (GlobalStatusInterface, EntityInterface, MoveInterface, Table<EntityInterface>) -> nil
-    on_move = function(self, move_user, move, targets)
+    on_move_used= function(self, move_user, move, targets)
         meta.assert_global_status_interface(self)
         meta.assert_entity_interface(move_user)
         meta.assert_move_interface(move)
@@ -209,7 +235,10 @@ function bt.GlobalStatus:realize()
         "on_turn_start",
         "on_turn_end",
         "on_battle_end",
-        "on_hp_gained",
+        "on_healing_received",
+        "on_healing_performed",
+        "on_damage_taken",
+        "on_damage_dealt",
         "on_status_gained",
         "on_status_lost",
         "on_global_status_gained",
@@ -219,7 +248,7 @@ function bt.GlobalStatus:realize()
         "on_killed",
         "on_switch",
         "on_stance_changed",
-        "on_move",
+        "on_move_used",
         "on_consumable_consumed"
     }
 

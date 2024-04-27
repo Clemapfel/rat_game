@@ -819,7 +819,7 @@ function bt.BattleScene:use_move(user, move, ...)
     self._state:set_current_move_selection(nil, nil, {})
 
     -- trigger callbacks
-    local callback_id = "on_move"
+    local callback_id = "on_move_used"
     for status in values(self._state:list_global_statuses()) do
         if status[callback_id] ~= nil then
             local self_proxy = bt.GlobalStatusInterface(self, status)
@@ -873,17 +873,20 @@ function bt.BattleScene:add_hp(entity, value)
     local after = clamp(current + value, 1, max)
     local offset = math.abs(after - current)
 
+    -- mutate entity
+    meta.set_is_mutable(entity, true)
+    entity.hp_current = after
+    meta.set_is_mutable(entity, false)
+
     local animation, sprite = self:play_animation(entity, "HP_GAINED", value)
     animation:register_start_callback(function()
         sprite:set_hp(after, max)
         self._ui:send_message(self:format_name(entity) .. " gained " .. self:format_hp(value) .. " hp")
     end)
 
-    TODO: HEALING INFLICTED
-
     if offset > 0 then
-        -- invoke callbacks
-        local callback_id = "on_hp_gained"
+        -- invoke callbacks on target
+        local callback_id = "on_healing_received"
         for status in values(self._state:list_global_statuses()) do
             if status[callback_id] ~= nil then
                 local self_proxy = bt.GlobalStatusInterface(self, status)
@@ -910,5 +913,147 @@ function bt.BattleScene:add_hp(entity, value)
                 self:_apply_consumable(entity, consumable)
             end
         end
+
+        -- invoke callbacks on user
+        local move_user = self._state:get_current_move_user()
+        if move_user ~= nil then
+            local callback_id = "on_healing_performed"
+            for status in values(self._state:list_global_statuses()) do
+                if status[callback_id] ~= nil then
+                    local self_proxy = bt.GlobalStatusInterface(self, status)
+                    local performer_proxy = bt.EntityInterface(self, move_user)
+                    local receiver_proxy = bt.EntityInterface(self, entity)
+                    self:_safe_invoke(status, callback_id, self_proxy, performer_proxy, receiver_proxy, value)
+                    self:_apply_global_status(status)
+                end
+            end
+
+            for status in values(move_user:list_statuses()) do
+                if status[callback_id] ~= nil then
+                    local self_proxy = bt.StatusInterface(self, move_user, status)
+                    local afflicted_proxy = bt.EntityInterface(self, move_user)
+                    local receiver_proxy = bt.EntityInterface(self, entity)
+                    self:_safe_invoke(status, callback_id, self_proxy, afflicted_proxy, receiver_proxy, value)
+                    self:_apply_status(move_user, status)
+                end
+            end
+
+            for consumable in values(move_user:list_consumables()) do
+                if consumable[callback_id] ~= nil then
+                    local self_proxy = bt.ConsumableInterface(self, move_user, consumable)
+                    local holder_proxy = bt.EntityInterface(self, move_user)
+                    local receiver_proxy = bt.EntityInterface(self, entity)
+                    self:_safe_invoke(consumable, callback_id, self_proxy, holder_proxy, receiver_proxy, value)
+                    self:_apply_consumable(move_user, consumable)
+                end
+            end
+        end
+    end
+end
+
+--- @brief
+function bt.BattleScene:reduce_hp(entity, value)
+    meta.assert_isa(entity, bt.BattleEntity)
+    meta.assert_number(value)
+
+    -- only allow hp loss
+    if value == 0 then
+        return
+    elseif value < 0 then
+        self:add_hp(entity, math.abs(value))
+    end
+
+    -- fizzle on death
+    if entity:get_is_dead() then return end
+
+    -- kill if knocked out
+    if entity:get_is_knocked_out() then
+        self:kill(entity)
+        return
+    end
+
+    local current = entity:get_hp()
+    local after = clamp(current - value, 0)
+    local offset = current - after
+
+    -- mutate entity
+    meta.set_is_mutable(entity, true)
+    entity.hp_current = after
+    meta.set_is_mutable(entity, false)
+
+    -- animation
+    local animation, sprite = self:play_animation(entity, "HP_LOST", value)
+    animation:register_start_callback(function()
+        sprite:set_hp(after)
+        self._ui:send_message(self:format_name(entity) .. " lost " .. self:format_damage(value) .. " hp")
+    end)
+
+    -- invoke damage taken callbacks
+    local callback_id = "on_damage_taken"
+    for status in values(self._state:list_global_statuses()) do
+        if status[callback_id] ~= nil then
+            local self_proxy = bt.GlobalStatusInterface(self, status)
+            local taker_proxy = bt.EntityInterface(self, entity)
+            self:_safe_invoke(status, callback_id, self_proxy, taker_proxy, offset)
+            self:_apply_global_status(status)
+        end
+    end
+
+    for status in values(entity:list_statuses()) do
+        if status[callback_id] ~= nil then
+            local self_proxy = bt.StatusInterface(self, entity, status)
+            local afflicted_proxy = bt.EntityInterface(self, entity)
+            self:_safe_invoke(status, callback_id, self_proxy, afflicted_proxy, offset)
+            self:_apply_status(entity, status)
+        end
+    end
+
+    for consumable in values(entity:list_consumables()) do
+        if consumable[callback_id] ~= nil then
+            local self_proxy = bt.ConsumableInterface(self, entity, consumable)
+            local holder_proxy = bt.EntityInterface(self, entity)
+            self:_safe_invoke(consumable, callback_id, self_proxy, holder_proxy, offset)
+            self:_apply_consumable(entity, consumable)
+        end
+    end
+
+    -- invoke damage dealt callbacks
+    local damage_dealer = self._state:get_current_move_user()
+    if damage_dealer ~= nil then
+        callback_id = "on_damage_dealt"
+        for status in values(self._state:list_global_statuses()) do
+            if status[callback_id] ~= nil then
+                local self_proxy = bt.GlobalStatusInterface(self, status)
+                local dealer_proxy = bt.EntityInterface(self, damage_dealer)
+                local taker_proxy = bt.EntityInterface(self, entity)
+                self:_safe_invoke(status, callback_id, self_proxy, taker_proxy, offset)
+                self:_apply_global_status(status)
+            end
+        end
+
+        for status in values(damage_dealer:list_statuses()) do
+            if status[callback_id] ~= nil then
+                local self_proxy = bt.StatusInterface(self, damage_dealer, status)
+                local dealer_proxy = bt.EntityInterface(self, damage_dealer)
+                local taker_proxy = bt.EntityInterface(self, entity)
+                self:_safe_invoke(status, callback_id, self_proxy, dealer_proxy, offset)
+                self:_apply_status(damage_dealer, status)
+            end
+        end
+
+        for consumable in values(damage_dealer:list_consumables()) do
+            if consumable[callback_id] ~= nil then
+                local self_proxy = bt.ConsumableInterface(self, damage_dealer, consumable)
+                local dealer_proxy = bt.EntityInterface(self, damage_dealer)
+                local taker_proxy = bt.EntityInterface(self, entity)
+                self:_safe_invoke(consumable, callback_id, self_proxy, dealer_proxy, taker_proxy)
+                self:_apply_consumable(damage_dealer, consumable)
+            end
+        end
+    end
+
+    -- knock out if depleted
+    if after <= 0 then
+        self:knock_out(entity)
     end
 end

@@ -28,47 +28,37 @@ return {
         return nil
     end,
 
-    on_hp_gained = function(self, holder, value)
+    on_healing_received = function(self, holder, value)
         meta.assert_consumable_interface(self)
         meta.assert_entity_interface(holder)
         meta.assert_number(value)
-        println("[DBG] In " .. self.id .. ".on_hp_gained: " .. self:get_id() .. " gained " .. value .. " hp")
+        println("[DBG] In " .. self.id .. ".on_healing_received: " .. self:get_id() .. " gained " .. value .. " hp")
         return nil
     end,
 
-    on_before_damage_taken = function(self, holder, damage_dealer, damage)
+    on_healing_performed = function(self, holder, receiver, value)
         meta.assert_consumable_interface(self)
         meta.assert_entity_interface(holder)
-        meta.assert_entity_interface(damage_dealer)
-        meta.assert_number(damage)
-        println("[DBG] In " .. self.id .. ".on_before_damage_taken: " .. holder.id .. " will take " .. damage .. " damage from " .. damage_dealer)
-        return damage -- new damage
-    end,
-
-    on_after_damage_taken = function(self, holder, damage_dealer, damage)
-        meta.assert_consumable_interface(self)
-        meta.assert_entity_interface(holder)
-        meta.assert_entity_interface(damage_dealer)
-        meta.assert_number(damage)
-        println("[DBG] In " .. self.id .. ".on_after_damage_taken: " .. holder.id .. " took " .. damage .. " damage from " .. damage_dealer)
+        meta.assert_entity_interface(receiver)
+        meta.assert_number(value)
+        println("[DBG] In " .. self.id .. ".on_healing_performed: " .. holder:get_id() .. " restored " .. receiver:get_id() .. " for " .. value .. " hp")
         return nil
     end,
 
-    on_before_damage_dealt = function(self, holder, damage_taker, damage)
+    on_damage_taken = function(self, afflicted, value)
         meta.assert_consumable_interface(self)
-        meta.assert_entity_interface(holder)
-        meta.assert_entity_interface(damage_taker)
-        meta.assert_number(damage)
-        println("[DBG] In " .. self.id .. ".on_before_damage_dealt: " .. holder.id .. " will deal " .. damage .. " damage to " .. damage_taker)
-        return damage -- new damage
+        meta.assert_entity_interface(afflicted)
+        meta.assert_number(value)
+        println("[DBG] In " .. self.id .. ".on_damage_taken: " .. self:get_id() .. " lost " .. value .. " hp")
+        return nil
     end,
 
-    on_after_damage_dealt = function(self, holder, damage_taker, damage)
+    on_damage_dealt = function(self, afflicted, receiver, value)
         meta.assert_consumable_interface(self)
-        meta.assert_entity_interface(holder)
-        meta.assert_entity_interface(damage_taker)
-        println("[DBG] In " .. self.id .. ".on_after_damage_dealt: " .. holder.id .. " dealt " .. damage .. " damage to " .. damage_taker)
-        meta.assert_number(damage)
+        meta.assert_entity_interface(afflicted)
+        meta.assert_entity_interface(receiver)
+        meta.assert_number(value)
+        println("[DBG] In " .. self.id .. ".on_damage_dealt: " .. afflicted:get_id() .. " damaged " .. receiver:get_id() .. " for " .. value .. " hp")
         return nil
     end,
 
@@ -142,7 +132,7 @@ return {
         return nil
     end,
 
-    on_move = function(self, holder, move, targets)
+    on_move_used= function(self, holder, move, targets)
         meta.assert_consumable_interface(self)
         meta.assert_entity_interface(holder)
         meta.assert_move_interface(move)
