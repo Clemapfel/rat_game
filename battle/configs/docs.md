@@ -33,58 +33,58 @@ GlobalStatus {
     sprite_id = "",     -- const String
     sprite_index = 1,   -- const Union<String, Unsigned>
 
-    -- (GlobalStatusInterface, Table<EntityInterface>) -> nil
+    -- (GlobalStatus, Table<Entity>) -> nil
     on_gained(self, all_entities),
 
-    -- (GlobalStatusInterface, Table<EntityInterface>) -> nil
+    -- (GlobalStatus, Table<Entity>) -> nil
     on_lost(self, all_entities),
 
-    -- (GlobalStatusInterface, Table<EntityInterface>) -> nil
+    -- (GlobalStatus, Table<Entity>) -> nil
     on_turn_start(self, all_entities),
 
-    -- (GlobalStatusInterface, Table<EntityInterface>) -> nil
+    -- (GlobalStatus, Table<Entity>) -> nil
     on_turn_end(self, all_entities),
 
-    -- (GlobalStatusInterface, EntityInterface, Unsigned) -> nil
+    -- (GlobalStatus, Entity, Unsigned) -> nil
     on_healing_received(self, entity, value),
 
-    -- (GlobalStatusInterface, EntityInterface, EntityInterface, Unsigned) -> nil
+    -- (GlobalStatus, Entity, Entity, Unsigned) -> nil
     on_healing_performed(self, entity, receiver, value),
 
-    -- (GlobalStatusInterface, EntityInterface, Unsigned) -> nil
+    -- (GlobalStatus, Entity, Unsigned) -> nil
     on_damage_taken(self, entity, value),
 
-    -- (GlobalStatusInterface, EntityInterface, EntityInterface, Unsigned) -> nil
+    -- (GlobalStatus, Entity, Entity, Unsigned) -> nil
     on_damage_dealt(self, damage_dealer, damage_taker, value),
 
-    -- (GlobalStatusInterface, EntityInterface, StatusInterface) -> nil
+    -- (GlobalStatus, Entity, Status) -> nil
     on_status_gained(self, entity, status),
 
-    -- (GlobalStatusInterface, EntityInterface, StatusInterface) -> nil
+    -- (GlobalStatus, Entity, Status) -> nil
     on_status_lost(self, entity, status),
 
-    -- (GlobalStatusInterface, GlobalStatusInterface, Table<EntityInterface>) -> nil
+    -- (GlobalStatus, GlobalStatus, Table<Entity>) -> nil
     on_global_status_gained(self, global_status, all_entities),
 
-    -- (GlobalStatusInterface, GlobalStatusInterface, Table<EntityInterface>) -> nil
+    -- (GlobalStatus, GlobalStatus, Table<Entity>) -> nil
     on_global_status_lost(self, global_status, all_entities),
 
-    -- (GlobalStatusInterface, EntityInterface) -> nil
+    -- (GlobalStatus, Entity) -> nil
     on_knocked_out(self, afflicted),
 
-    -- (GlobalStatusInterface, EntityInterface) -> nil
+    -- (GlobalStatus, Entity) -> nil
     on_helped_up(self, entity),
 
-    -- (GlobalStatusInterface, EntityInterface) -> nil
+    -- (GlobalStatus, Entity) -> nil
     on_killed(self, entity),
 
-    -- (GlobalStatusInterface, EntityInterface, EntityInterface) -> nil
+    -- (GlobalStatus, Entity, Entity) -> nil
     on_switch(self, entity_a, entity_b),
 
-    -- (GlobalStatusInterface, EntityInterface, MoveInterface, Table<EntityInterface>) -> nil
+    -- (GlobalStatus, Entity, Move, Table<Entity>) -> nil
     on_move_used(self, entity, move, targets),
 
-    -- (GlobalStatusInterface, EntityInterface, ConsumableInterface) -> nil
+    -- (GlobalStatus, Entity, Consumable) -> nil
     on_consumable_consumed(self, entity, consumable),
 }
 ```
@@ -194,58 +194,58 @@ Status {
     max_duration = POSITIVE_INFINITY, -- const Unsigned
     is_silent = false,                -- const Boolean
 
-    -- (StatusInterface, EntityInterface) -> nil
+    -- (Status, Entity) -> nil
     on_gained(self, afflicted),
     
-    -- (StatusInterface, EntityInterface) -> nil
+    -- (Status, Entity) -> nil
     on_lost(self, afflicted),
     
-    -- (StatusInterface, EntityInterface) -> nil
+    -- (Status, Entity) -> nil
     on_turn_start(self, afflicted),
     
-    -- (StatusInterface, EntityInterface) -> nil
+    -- (Status, Entity) -> nil
     on_turn_end(self, affclited),
 
-    -- (StatusInterface, EntityInterface, Unsigned) -> nil
+    -- (Status, Entity, Unsigned) -> nil
     on_healing_received(self, afflicted, value),
 
-    -- (StatusInterface, EntityInterface, EntityInterface, Unsigned) -> nil
+    -- (Status, Entity, Entity, Unsigned) -> nil
     on_healing_performed(self, afflicted, receiver, value),
 
-    -- (StatusInterface, EntityInterface, Unsigned) -> nil
+    -- (Status, Entity, Unsigned) -> nil
     on_damage_taken(self, afflicted, value),
 
-    -- (StatusInterface, EntityInterface, EntityInterface, Unsigned) -> nil
+    -- (Status, Entity, Entity, Unsigned) -> nil
     on_damage_dealt(self, afflicted, damage_taker, value),
 
-    -- (StatusInterface, EntityInterface, StatusInterface) -> nil
+    -- (Status, Entity, Status) -> nil
     on_status_gained(self, afflicted, status),
 
-    -- (StatusInterface, EntityInterface, StatusInterface) -> nil
+    -- (Status, Entity, Status) -> nil
     on_status_lost(self, afflicted, status),
 
-    -- (StatusInterface, EntityInterface, GlobalStatusInterface) -> nil
+    -- (Status, Entity, GlobalStatus) -> nil
     on_global_status_gained(self, afflicted, global_status),
 
-    -- (StatusInterface, EntityInterface, GlobalStatusInterface) -> nil
+    -- (Status, Entity, GlobalStatus) -> nil
     on_global_status_lost(self, afflicted, global_status),
 
-    -- (StatusInterface, EntityInterface) -> nil
+    -- (Status, Entity) -> nil
     on_knocked_out(self, afflicted),
 
-    -- (StatusInterface, EntityInterface) -> nil
+    -- (Status, Entity) -> nil
     on_helped_up(self, afflicted),
     
-    -- (StatusInterface, EntityInterface) -> nil
+    -- (Status, Entity) -> nil
     on_killed(self, afflicted),
     
-    -- (StatusInterface, EntityInterface, EntityInterface) -> nil
+    -- (Status, Entity, Entity) -> nil
     on_switch(self, afflicted, entity_at_old_position),
 
-    -- (StatusInterface, EntityInterface, MoveInterface, Table<EntityInterface>) -> nil
+    -- (Status, Entity, Move, Table<Entity>) -> nil
     on_move_used(self, afflicted, move, targets),
 
-    -- (StatusInterface, EntityInterface, ConsumableInterface) -> nil
+    -- (Status, Entity, Consumable) -> nil
     on_consumable_consumed(self, afflicted, consumable), 
 }
 ```
@@ -285,52 +285,52 @@ Consumable {
     sprite_id = "",     -- String
     sprite_index = 1,   -- Union<String, Unsigned>
 
-    -- (ConsumableInterface, EntityInterface) -> nil
+    -- (Consumable, Entity) -> nil
     on_turn_start(self, afflicted),
 
-    -- (ConsumableInterface, EntityInterface) -> nil
+    -- (Consumable, Entity) -> nil
     on_turn_end(self, afflicted),
 
-    -- (ConsumableInterface, EntityInterface, Unsigned) -> nil
+    -- (Consumable, Entity, Unsigned) -> nil
     on_healing_received(self, afflicted, value),
 
-    -- (ConsumableInterface, EntityInterface, EntityInterface, Unsigned) -> nil
+    -- (Consumable, Entity, Entity, Unsigned) -> nil
     on_healing_performed(self, afflicted, receiver, value),
 
-    -- (ConsumableInterface, EntityInterface, Unsigned) -> nil
+    -- (Consumable, Entity, Unsigned) -> nil
     on_damage_taken(self, afflicted, value),
 
-    -- (ConsumableInterface, EntityInterface, EntityInterface, Unsigned) -> nil
+    -- (Consumable, Entity, Entity, Unsigned) -> nil
     on_damage_dealt(self, afflicted, damage_taker, value),
 
-    -- (ConsumableInterface, EntityInterface, StatusInterface) -> nil
+    -- (Consumable, Entity, Status) -> nil
     on_status_gained(self, afflicted, status),
 
-    -- (ConsumableInterface, EntityInterface, StatusInterface) -> nil
+    -- (Consumable, Entity, Status) -> nil
     on_status_lost(self, afflicted, status),
 
-    -- (ConsumableInterface, EntityInterface, GlobalStatusInterface) -> nil
+    -- (Consumable, Entity, GlobalStatus) -> nil
     on_global_status_gained(self, afflicted, global_status),
 
-    -- (ConsumableInterface, EntityInterface, GlobalStatusInterface) -> nil
+    -- (Consumable, Entity, GlobalStatus) -> nil
     on_global_status_lost(self, afflicted, global_status),
 
-    -- (ConsumableInterface, EntityInterface) -> nil
+    -- (Consumable, Entity) -> nil
     on_knocked_out(self, afflicted),
 
-    -- (ConsumableInterface, EntityInterface) -> nil
+    -- (Consumable, Entity) -> nil
     on_helped_up(self, afflicted),
 
-    -- (ConsumableInterface, EntityInterface) -> nil
+    -- (Consumable, Entity) -> nil
     on_killed(self, afflicted),
 
-    -- (ConsumableInterface, EntityInterface, EntityInterface) -> nil
+    -- (Consumable, Entity, Entity) -> nil
     on_switch(self, afflicted, entity_at_old_position),
 
-    -- (ConsumableInterface, EntityInterface, MoveInterface, Table<EntityInterface>) -> nil
+    -- (Consumable, Entity, Move, Table<Entity>) -> nil
     on_move_used(self, afflicted, move, targets),
 
-    -- (ConsumableInterface, EntityInterface, ConsumableInterface) -> nil
+    -- (Consumable, Entity, Consumable) -> nil
     on_consumable_consumed(self, afflicted, consumable),
 }
 ```
@@ -396,7 +396,7 @@ Move {
     animation_id = "",   -- String
     animation_index = 1, -- Union<String, Unsigned>
     
-    -- (MoveInterface, EntityInterface, Table<EntityInterface>) -> nil
+    -- (Move, Entity, Table<Entity>) -> nil
     effect(self, user, targets),
 }
 ```
@@ -457,7 +457,7 @@ Equip {
     sprite_id = "",      -- String
     sprite_index = 1,    -- Union<String, Unsigned>
 
-    -- (Equip, EntityInterface) -> nil
+    -- (Equip, Entity) -> nil
     effect(self, holder),
 }
 ```

@@ -19,26 +19,26 @@ bt.Equip = meta.new_type("Equip", function(id)
     end
     return out
 end, {
-   hp_base_offset = 0,
-   attack_base_offset = 0,
-   defense_base_offset = 0,
-   speed_base_offset = 0,
+    hp_base_offset = 0,
+    attack_base_offset = 0,
+    defense_base_offset = 0,
+    speed_base_offset = 0,
 
-   attack_factor = 1,
-   defense_factor = 1,
-   speed_factor = 1,
+    attack_factor = 1,
+    defense_factor = 1,
+    speed_factor = 1,
 
-   is_silent = true,
+    is_silent = true,
 
-   -- (EquipInterface, EntityInterface) -> nil
-   effect = function(self, holder)
-       meta.assert_equip_interface(self)
-       meta.assert_entity_interface(holder)
-   end,
+    -- (EquipInterface, EntityInterface) -> nil
+    effect = function(self, holder)
+        meta.assert_equip_interface(self)
+        meta.assert_entity_interface(holder)
+    end,
 
-   description = "",
-   sprite_id = "",
-   sprite_index = 1
+    description = "",
+    sprite_id = "",
+    sprite_index = 1
 })
 bt.Equip._atlas = {}
 
