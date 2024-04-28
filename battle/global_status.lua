@@ -215,7 +215,9 @@ function bt.GlobalStatus:realize()
         if config[key] ~= nil then
             self[key] = config[key]
         end
-        meta.assert_string(self[key])
+        if not meta.is_string(config[key]) then
+            rt.error("In bt.GlobalStatus:realize: error when loading config at `" .. self._path .. "`: expected string for field `" .. key .. "`, got: `" .. meta.typeof(config[key]))
+        end
     end
 
     local numbers = {

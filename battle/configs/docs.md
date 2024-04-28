@@ -4,6 +4,11 @@
 meta {
     TODO
 }
+
+-- (Entity, Entity) -> Unsigned
+get_weighted_attack(attacking_entity, defending_entity)
+
+
 ```
 
 # GlobalStatus (bt.GlobalStatusInterface)
@@ -339,8 +344,35 @@ Consumable {
 
 ```lua
 Entity {
+    -- ### Instance Fields ### --
+    id = "EXAMPLE_ENTITY", -- const String
+    name = "Example Entity", -- const String
     
-    -- TODO: has_ for move, consumable, etc.
+    attack = 0,  -- const Unsigned
+    defense = 0, -- const Unsigned
+    speed = 0,   -- const Unsigned
+    
+    priority = 0, -- const Signed
+    
+    is_enemy = true, -- const Boolean
+    
+    -- ### Instance Methods ### --
+    get_id_multiplicity(self), -- (Entity) -> 
+    
+    get_attack(self), -- (Entity) -> Unsigned
+    get_attack_base(self), -- (Entity) -> Unsigned
+    get_attack_raw(self), -- (Entity) -> Unsigned
+    
+    add_status(self, status_id),
+    remove_status(self, status_id),
+    
+    get_priority(self), -- (Entity) -> Signed
+
+    list_statuses(self),
+    list_equips(self),
+    list_consumables(self),
+    list_moves(self)
+    
 }
 ```
 
