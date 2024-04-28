@@ -52,7 +52,7 @@ function bt.Equip:realize()
         is_silent = rt.BOOLEAN,
         description = rt.STRING,
         sprite_id = rt.STRING,
-        sprite_index = rt.UNSIGNED,
+        sprite_index = { rt.UNSIGNED, rt.STRING },
 
         hp_base_offset = rt.SIGNED,
         attack_base_offset = rt.SIGNED,

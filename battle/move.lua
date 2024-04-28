@@ -67,7 +67,7 @@ function bt.Move:realize()
         priority = rt.SIGNED,
         description = rt.STRING,
         sprite_id = rt.STRING,
-        sprite_index = rt.UNSIGNED,
+        sprite_index = { rt.UNSIGNED, rt.STRING },
         animation_id = rt.STRING,
         animation_index = rt.UNSIGNED,
         effect = rt.FUNCTION

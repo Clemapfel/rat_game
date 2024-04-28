@@ -16,7 +16,7 @@ bt.Gender = meta.new_enum({
     UNKNOWN = "UNKNOWN"
 })
 
---- @class
+--- @class bt.BattleEntity
 bt.BattleEntity = meta.new_type("BattleEntity", function(scene, id)
     local path = rt.settings.battle.entity.config_path .. "/" .. id .. ".lua"
     local out = meta.new(bt.BattleEntity, {

@@ -16,7 +16,7 @@ function bt.StatusInterface(scene, entity, status)
         return getmetatable(self).original:get_id()
     end
 
-    self.get_id = function(self)
+    self.get_name = function(self)
         return getmetatable(self).original:get_name()
     end
 

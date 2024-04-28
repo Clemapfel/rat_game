@@ -224,7 +224,7 @@ function bt.Status:realize()
     local template = {
         description = rt.STRING,
         sprite_id = rt.STRING,
-        sprite_index = rt.UNSIGNED,
+        sprite_index = { rt.UNSIGNED, rt.STRING },
         id = rt.STRING,
         name = rt.STRING,
         max_duration = rt.UNSIGNED,

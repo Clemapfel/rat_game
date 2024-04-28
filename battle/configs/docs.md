@@ -351,20 +351,44 @@ Entity {
     -- ### Instance Methods ### --
     get_id_multiplicity(self), -- (Entity) -> 
     
+    get_hp(self),
+    get_hp_current(self),
+    get_hp_base(self),
+    
+    
     get_attack(self), -- (Entity) -> Unsigned
     get_attack_base(self), -- (Entity) -> Unsigned
     get_attack_raw(self), -- (Entity) -> Unsigned
+    get_attack_base_raw(self),
+
+    get_defense(self), -- (Entity) -> Unsigned
+    get_defense_base(self), -- (Entity) -> Unsigned
+    get_defense_raw(self), -- (Entity) -> Unsigned
+    get_defense_base_raw(self),
+
+    get_speed(self), -- (Entity) -> Unsigned
+    get_speed_base(self), -- (Entity) -> Unsigned
+    get_speed_raw(self), -- (Entity) -> Unsigned
+    get_speed_base_raw(self),
+    
+    get_priority(self),
+    set_priority(self), -- TODO: when is priority resolved?
+    
     
     add_status(self, status_id),
     remove_status(self, status_id),
     
     get_priority(self), -- (Entity) -> Signed
+    
+    get_is_knocked_out(self),
+    get_is_dead(self),
+    get_is_alive(self),
+    get_is_enemy(self),
 
     list_statuses(self),
     list_equips(self),
     list_consumables(self),
     list_moves(self)
-    
 }
 ```
 

@@ -195,7 +195,7 @@ function bt.Consumable:realize()
         name = rt.STRING,
         description = rt.STRING,
         sprite_id = rt.STRING,
-        sprite_index = rt.UNSIGNED,
+        sprite_index = { rt.UNSIGNED, rt.STRING },
         max_n_uses = rt.UNSIGNED,
         is_silent = rt.BOOLEAN,
     }
