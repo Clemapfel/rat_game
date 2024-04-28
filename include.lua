@@ -78,6 +78,7 @@ test = meta.new_enum({
     TEST = 1
 })
 
+require "config"
 require "time"
 require "benchmark"
 require "thread_pool"
@@ -207,6 +208,11 @@ require "battle.battle_scene"
 require "battle.simulation"
 
 require "battle.interface"
+require "battle.global_status_interface"
+require "battle.status_interface"
+require "battle.consumable_interface"
+require "battle.move_interface"
+require "battle.equip_interface"
 
 require "battle.enemy_sprite"
 require "battle.party_sprite"

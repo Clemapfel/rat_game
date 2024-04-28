@@ -53,75 +53,33 @@ bt.Move._atlas = {}
 --- @brief
 function bt.Move:realize()
     if self._is_realized == true then return end
+
+    self.effect = nil
+
+    local template = {
+        id = rt.STRING,
+        name = rt.STRING,
+        max_n_uses = rt.UNSIGNED,
+        can_target_multiple = rt.BOOLEAN,
+        can_target_self = rt.BOOLEAN,
+        can_target_enemy = rt.BOOLEAN,
+        can_target_ally = rt.BOOLEAN,
+        priority = rt.SIGNED,
+        description = rt.STRING,
+        sprite_id = rt.STRING,
+        sprite_index = rt.UNSIGNED,
+        animation_id = rt.STRING,
+        animation_index = rt.UNSIGNED,
+        effect = rt.FUNCTION
+    }
+
     meta.set_is_mutable(self, true)
-
-    local chunk, error_maybe = love.filesystem.load(self._path)
-    if error_maybe ~= nil then
-        rt.error("In bt.Move:realize: error when loading config at `" .. self._path .. "`: " .. error_maybe)
-    end
-
-    local config = chunk()
-    meta.set_is_mutable(self, true)
-
-    -- numbers
-    for which in range(
-        "max_n_uses",
-        "priority"
-    ) do
-        if config[which] ~= nil then
-            self[which] = config[which]
-            meta.assert_number(self[which])
-        end
-    end
-
-    -- booleans
-    for which in range(
-        "can_target_multiple",
-        "can_target_self",
-        "can_target_enemy",
-        "can_target_ally"
-    ) do
-        if config[which] ~= nil then
-            self[which] = config[which]
-            meta.assert_boolean(self[which])
-        end
-    end
-
-    meta.assert_string(config.sprite_id)
-    self.sprite_id = config.sprite_id
-    if config.sprite_index ~= nil then
-        self.sprite_index = config.sprite_index
-    end
-
-    meta.assert_string(config.animation_id)
-    self.animation_id = config.animation_id
-    if config.animation_index ~= nil then
-        self.animation_index = config.animation_index
-    end
-
-    -- strings
-    for which in range(
-        "name",
-        "description",
-        "bonus_description",
-        "stance_alignment"
-    ) do
-        if config[which] ~= nil then
-            self[which] = config[which]
-            meta.assert_string(self[which])
-        end
-    end
-
-    -- behavior
-    meta.assert_function(config.effect)
-    self.effect = config.effect
-
+    rt.load_config(self._path, self, template)
     self._is_realized = true
     meta.set_is_mutable(self, false)
 
-    local last = string.last(self.description)
-    if last == "." or last == ":" or last == ";" or last == "?" or last == "!" then
-        rt.warning("In bt.Move:realize: error when loading config at `" .. self._path .. "`: `description` field should not end in punctuation")
+    if self.effect == nil then
+        rt.error("In bt.Move:realize: config at `" .. self._path .. "` does not implement `effect`, value is left nil")
     end
 end
 
@@ -144,4 +102,29 @@ end
 --- @brief
 function bt.Move:get_name()
     return self.name
+end
+
+--- @brief
+function bt.Move:get_max_n_uses()
+    return self.max_n_uses
+end
+
+--- @brief
+function bt.Move:get_can_target_multiple()
+    return self.can_target_multiple
+end
+
+--- @brief
+function bt.Move:get_can_target_self()
+    return self.can_target_self
+end
+
+--- @brief
+function bt.Move:get_can_target_ally()
+    return self.can_target_ally
+end
+
+--- @brief
+function bt.Move:get_can_target_enemy()
+    return self.can_target_enemy
 end

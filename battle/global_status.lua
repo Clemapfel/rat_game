@@ -197,46 +197,10 @@ bt.GlobalStatus._atlas = {}
 function bt.GlobalStatus:realize()
     if self._is_realized == true then return end
 
-    local chunk, error_maybe = love.filesystem.load(self._path)
-    if error_maybe ~= nil then
-        rt.error("In bt.GlobalStatus:realize: error when loading config at `" .. self._path .. "`: " .. error_maybe)
-    end
-
-    -- load properties if specified, assert correct type, use default if left unspecified
-    local config = chunk()
-    meta.set_is_mutable(self, true)
-
-    local strings = {
-        "name",
-        "description"
-    }
-
-    for _, key in ipairs(strings) do
-        if config[key] ~= nil then
-            self[key] = config[key]
-        end
-        if not meta.is_string(config[key]) then
-            rt.error("In bt.GlobalStatus:realize: error when loading config at `" .. self._path .. "`: expected string for field `" .. key .. "`, got: `" .. meta.typeof(config[key]))
-        end
-    end
-
-    local numbers = {
-        "max_duration"
-    }
-
-    for key in values(numbers) do
-        if config[key] ~= nil then
-            self[key] = config[key]
-        end
-        meta.assert_number(self[key])
-    end
-
     local functions = {
         "on_gained",
         "on_lost",
-        "on_turn_start",
         "on_turn_end",
-        "on_battle_end",
         "on_healing_received",
         "on_healing_performed",
         "on_damage_taken",
@@ -249,29 +213,27 @@ function bt.GlobalStatus:realize()
         "on_helped_up",
         "on_killed",
         "on_switch",
-        "on_stance_changed",
         "on_move_used",
         "on_consumable_consumed"
     }
 
-    for name in values(functions) do
-        if config[name] ~= nil then
-            self[name] = config[name]
-            if not meta.is_function(self[name]) then
-                rt.error("In bt.Status:realize: key `" .. name .. "` of config at `" .. self._path .. "` has wrong type: expected `function`, got `" .. meta.typeof(self[name]) .. "`")
-            end
-        else
-            self[name] = nil
-        end
+    local template = {
+        description = rt.STRING,
+        sprite_id = rt.STRING,
+        sprite_index = rt.UNSIGNED,
+        id = rt.STRING,
+        name = rt.STRING,
+        max_duration = rt.UNSIGNED,
+        is_silent = rt.BOOLEAN
+    }
+
+    for key in values(functions) do
+        self[key] = nil  -- set functions to nil if unassigned
+        template[key] = rt.FUNCTION
     end
 
-    self.sprite_id = config.sprite_id
-    meta.assert_string(self.sprite_id)
-
-    if config.sprite_index ~= nil then
-        self.sprite_index = config.sprite_index
-    end
-
+    meta.set_is_mutable(self, true)
+    rt.load_config(self._path, self, template)
     self._is_realized = true
     meta.set_is_mutable(self, false)
 end
@@ -289,6 +251,11 @@ end
 --- @brief
 function bt.GlobalStatus:get_name()
     return self.name
+end
+
+--- @brief
+function bt.GlobalStatus:get_is_silent()
+    return self.is_silent
 end
 
 --- @brief

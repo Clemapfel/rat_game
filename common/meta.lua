@@ -22,6 +22,22 @@ function meta.is_number(x)
     return type(x) == "number"
 end
 
+--- @brief
+function meta.is_signed(x)
+    return meta.is_number(x) and math.fmod(x, 1) == 0
+end
+
+--- @brief
+function meta.is_unsigned(x)
+    return meta.is_number(x) and math.fmod(x, 1) == 0 and x >= 0
+end
+
+--- @brief
+function meta.is_inf(x)
+    if not meta.is_number(x) then return false end
+    return x == POSITIVE_INFINITY or x == NEGATIVE_INFINITY
+end
+
 --- @brief is x a lua boolean?
 --- @param x any
 function meta.is_boolean(x)

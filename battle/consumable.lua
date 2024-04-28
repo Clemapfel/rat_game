@@ -170,50 +170,10 @@ bt.Consumable._atlas = {}
 --- @brief
 function bt.Consumable:realize()
     if self._is_realized == true then return end
-    meta.set_is_mutable(self, true)
-
-    local chunk, error_maybe = love.filesystem.load(self._path)
-    if error_maybe ~= nil then
-        rt.error("In bt.Consumable:realize: error when loading config at `" .. self._path .. "`: " .. error_maybe)
-    end
-
-    local config = chunk()
-    meta.set_is_mutable(self, true)
-
-    local strings = {
-        "name",
-        "sprite_id",
-        "description"
-    }
-
-    for key in values(strings) do
-        if config[key] ~= nil then
-            self[key] = config[key]
-        end
-        meta.assert_string(self[key])
-    end
-
-    local numbers = {
-        "max_n_uses"
-    }
-
-    for key in values(numbers) do
-        if config[key] ~= nil then
-            self[key] = config[key]
-        end
-        meta.assert_number(self[key])
-    end
-
-    if config.sprite_index ~= nil then
-        self.sprite_index = config.sprite_index
-    end
 
     local functions = {
-        "on_gained",
-        "on_lost",
         "on_turn_start",
         "on_turn_end",
-        "on_battle_end",
         "on_healing_received",
         "on_healing_performed",
         "on_damage_taken",
@@ -226,21 +186,27 @@ function bt.Consumable:realize()
         "on_helped_up",
         "on_killed",
         "on_switch",
-        "on_stance_changed",
-        "on_before_move",
-        "on_after_move",
+        "on_move_used",
         "on_consumable_consumed"
     }
 
-    for name in values(functions) do
-        if config[name] ~= nil then
-            self[name] = config[name]
-            if not meta.is_function(self[name]) then
-                rt.error("In bt.Consumable:realize: key `" .. name .. "` of config at `" .. self._path .. "` has wrong type: expected `function`, got `" .. meta.typeof(self[name]) .. "`")
-            end
-        end
+    local template = {
+        id = rt.STRING,
+        name = rt.STRING,
+        description = rt.STRING,
+        sprite_id = rt.STRING,
+        sprite_index = rt.UNSIGNED,
+        max_n_uses = rt.UNSIGNED,
+        is_silent = rt.BOOLEAN,
+    }
+
+    for key in values(functions) do
+        self[key] = nil  -- set functions to nil if unassigned
+        template[key] = rt.FUNCTION
     end
 
+    meta.set_is_mutable(self, true)
+    rt.load_config(self._path, self, template)
     self._is_realized = true
     meta.set_is_mutable(self, false)
 end
@@ -263,4 +229,9 @@ end
 --- @brief
 function bt.Consumable:get_sprite_id()
     return self.sprite_id, self.sprite_index
+end
+
+--- @brief
+function bt.Consumable:get_is_silent()
+    return self.is_silent
 end

@@ -492,6 +492,13 @@ function bt.BattleEntity:get_consumable_n_consumed(consumable_id)
 end
 
 --- @brief
+function bt.BattleEntity:get_consumable_n_uses_left(consumable)
+    local entry = self.consumables[consumable:get_id()]
+    if entry == nil then return 0 end
+    return clamp(consumable:get_max_n_uses() - entry.n_consumed, 0)
+end
+
+--- @brief
 function bt.BattleEntity:has_consumable(consumable)
     return self.consumables[consumable:get_id()] ~= nil
 end

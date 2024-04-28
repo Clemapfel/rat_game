@@ -45,56 +45,30 @@ bt.Equip._atlas = {}
 --- @brief
 function bt.Equip:realize()
     if self._is_realized == true then return end
-    meta.set_is_mutable(self, true)
 
-    local chunk, error_maybe = love.filesystem.load(self._path)
-    if error_maybe ~= nil then
-        rt.error("In bt.Equip:realize: error when loading config at `" .. self._path .. "`: " .. error_maybe)
-    end
+    local template = {
+        id = rt.STRING,
+        name = rt.STRING,
+        is_silent = rt.BOOLEAN,
+        description = rt.STRING,
+        sprite_id = rt.STRING,
+        sprite_index = rt.UNSIGNED,
 
-    local config = chunk()
-    meta.set_is_mutable(self, true)
+        hp_base_offset = rt.SIGNED,
+        attack_base_offset = rt.SIGNED,
+        defense_base_offset = rt.SIGNED,
+        speed_base_offset = rt.SIGNED,
 
-    local strings = {
-        "name",
-        "description"
+        hp_base_factor = rt.FLOAT,
+        attack_base_factor = rt.FLOAT,
+        defense_base_factor = rt.FLOAT,
+        speed_base_factor = rt.FLOAT,
+
+        effect = rt.FUNCTION
     }
 
-    for _, key in ipairs(strings) do
-        if config[key] ~= nil then
-            self[key] = config[key]
-        end
-        meta.assert_string(self[key])
-    end
-
-    local numbers = {
-        "hp_base_offset",
-        "attack_base_offset",
-        "defense_base_offset",
-        "speed_base_offset",
-
-        "attack_factor",
-        "defense_factor",
-        "speed_factor",
-    }
-
-    for _, key in ipairs(numbers) do
-        if config[key] ~= nil then
-            self[key] = config[key]
-        end
-        meta.assert_number(self[key])
-    end
-
-    if config.is_silent ~= nil then
-        self.is_silent = config.is_silent
-    end
-    meta.assert_boolean(self.is_silent)
-
-    if config.effect ~= nil then
-        self.effect = config.effect
-    end
-    meta.assert_function(self.effect)
-
+    meta.set_is_mutable(self, true)
+    rt.load_config(self._path, self, template)
     self._is_realized = true
     meta.set_is_mutable(self, false)
 end
@@ -130,18 +104,23 @@ function bt.Equip:get_speed_base_offset()
 end
 
 --- @brief
-function bt.Equip:get_attack_factor()
-    return self.attack_factor
+function bt.Equip:get_hp_base_factor()
+    return self.hp_base_factor
 end
 
 --- @brief
-function bt.Equip:get_defense_factor()
-    return self.defense_factor
+function bt.Equip:get_attack_base_factor()
+    return self.attack_base_factor
 end
 
 --- @brief
-function bt.Equip.get_speed_factor()
-    return self.speed_factor
+function bt.Equip:get_defense_base_factor()
+    return self.defense_base_factor
+end
+
+--- @brief
+function bt.Equip:get_speed_base_factor()
+    return self.speed_base_factor
 end
 
 

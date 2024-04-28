@@ -33,6 +33,12 @@ GlobalStatus {
     get_n_turns_elapsed(self),  -- (GlobalStatus) -> Unsigned
     
     -- ### Config Fields ### --
+
+    id = "GLOBAL_STATUS_ID",        -- const String
+    name = "Example Global Status", -- const String
+    
+    max_duration = POSITIVE_INFINITY, -- const Unsigned
+    is_silent = false,   -- const Boolean
     
     description = "<no description>",   -- const String
     sprite_id = "",     -- const String
@@ -103,23 +109,23 @@ Status {
     id = "STATUS_ID",        -- const String
     name = "Example Status", -- const String
     
-    attack_offset = 0,   -- Signed
-    defense_offset = 0,  -- Signed
-    speed_offset = 0,    -- Signed
+    attack_offset = 0,   -- const Signed
+    defense_offset = 0,  -- const Signed
+    speed_offset = 0,    -- const Signed
     
-    attack_factor = 1,   -- Float >= 0
-    defense_factor = 1,  -- Float >= 0
-    speed_factor = 1,    -- Float >= 0
+    attack_factor = 1,   -- const Float >= 0
+    defense_factor = 1,  -- const Float >= 0
+    speed_factor = 1,    -- const Float >= 0
 
-    damage_dealt_factor = 1,      -- Float >= 0
-    damage_received_factor = 1,   -- Float >= 0
-    healing_performed_factor = 1, -- Float >= 0
-    healing_received_factor = 1,  -- Float >= 0
+    damage_dealt_factor = 1,      -- const Float >= 0
+    damage_received_factor = 1,   -- const Float >= 0
+    healing_performed_factor = 1, -- const Float >= 0
+    healing_received_factor = 1,  -- const Float >= 0
     
-    damage_dealt_offset = 0,      -- Unsigned
-    damage_received_offset = 0,   -- Unsigned
-    healing_performed_offset = 0, -- Unsigned
-    healing_received_offset = 0,  -- Unsigned
+    damage_dealt_offset = 0,      -- const Unsigned
+    damage_received_offset = 0,   -- const Unsigned
+    healing_performed_offset = 0, -- const Unsigned
+    healing_received_offset = 0,  -- const Unsigned
     
     max_duration = POSITIVE_INFINITY, -- const Unsigned
     is_silent = false,                -- const Boolean
@@ -134,39 +140,25 @@ Status {
     get_is_silent(self),        -- (Status) -> Boolean
     get_n_turns_elapsed(self),  -- (Status) -> Unsigned
 
-    set_attack_offset(self, value), -- (Status, Unsigned) -> nil
     get_attack_offset(self),        -- (Status) -> Unsigned
-    set_attack_factor(self, value), -- (Status, Float) -> nil
     get_attack_factor(self),        -- (Status) -> Float
 
-    set_defense_offset(self, value), -- (Status, Unsigned) -> nil
     get_defense_offset(self),        -- (Status) -> Unsigned
-    set_defense_factor(self, value), -- (Status, Float) -> nil
     get_defense_factor(self),        -- (Status) -> Float
 
-    set_speed_offset(self, value), -- (Status, Unsigned) -> nil
     get_speed_offset(self),        -- (Status) -> Unsigned
-    set_speed_factor(self, value), -- (Status, Float) -> nil
     get_speed_factor(self),        -- (Status) -> Float
 
-    set_damage_dealt_offset(self, value), -- (Status, Unsigned) -> nil
     get_damage_dealt_offset(self),        -- (Status) -> Unsigned
-    set_damage_dealt_factor(self, value), -- (Status, Float) -> nil
     get_damage_dealt_factor(self),        -- (Status) -> Float
 
-    set_damage_received_offset(self, value), -- (Status, Unsigned) -> nil
     get_damage_received_offset(self),        -- (Status) -> Unsigned
-    set_damage_received_factor(self, value), -- (Status, Float) -> nil
     get_damage_received_factor(self),        -- (Status) -> Float
 
-    set_healing_performed_offset(self, value), -- (Status, Unsigned) -> nil
     get_healing_performed_offset(self),        -- (Status) -> Unsigned
-    set_healing_performed_factor(self, value), -- (Status, Float) -> nil
     get_healing_performed_factor(self),        -- (Status) -> Float
     
-    set_healing_received_offset(self, value),   -- (Status, Unsigned) -> nil
     get_healing_received_offset(self),          -- (Status) -> Unsigned
-    set_healing_received_factor(self, value),   -- (Status, Float) -> nil
     get_healing_received_factor(self),          -- (Status) -> Float
     
     -- ### Config Fields ### --
@@ -178,9 +170,9 @@ Status {
     id = "STATUS_ID",        -- const String
     name = "Example Status", -- const String
 
-    attack_offset = 0,   -- Unsigned
-    defense_offset = 0,  -- Unsigned
-    speed_offset = 0,    -- Unsigned
+    attack_offset = 0,   -- Signed
+    defense_offset = 0,  -- Signed
+    speed_offset = 0,    -- Signed
 
     attack_factor = 1,   -- Float >= 0
     defense_factor = 1,  -- Float >= 0
@@ -191,10 +183,10 @@ Status {
     healing_performed_factor = 1, -- Float >= 0
     healing_received_factor = 1,  -- Float >= 0
 
-    damage_dealt_offset = 0,      -- Unsigned
-    damage_received_offset = 0,   -- Unsigned
-    healing_performed_offset = 0, -- Unsigned
-    healing_received_offset = 0,  -- Unsigned
+    damage_dealt_offset = 0,      -- Signed
+    damage_received_offset = 0,   -- Signed
+    healing_performed_offset = 0, -- Signed
+    healing_received_offset = 0,  -- Signed
 
     max_duration = POSITIVE_INFINITY, -- const Unsigned
     is_silent = false,                -- const Boolean
@@ -386,6 +378,7 @@ Move {
     name = "Example Move", -- const String
     
     max_n_uses = POSITIVE_INFINITY, -- const Unsigned
+    -- n uses left is entity property
     
     can_target_multiple = false, -- const Boolean
     can_target_self = true,      -- const Boolean
@@ -447,10 +440,11 @@ Equip {
     defense_base_offset = 0, -- const Signed
     speed_base_offset = 0,   -- const Signed
     
-    attack_factor = 1,  -- const Float >= 0
-    defense_factor = 1, -- const Float >= 0
-    speed_factor = 1,   -- const Float >= 0
-    
+    hp_base_factor = 1,      -- const Float >= 0
+    attack_base_factor = 1,  -- const Float >= 0
+    defense_base_factor = 1, -- const Float >= 0
+    speed_base_factor = 1,  -- const Float >= 0
+
     is_silent = true, -- const Boolean
 
     -- ### Instance Methods ### --

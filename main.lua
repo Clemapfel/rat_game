@@ -1,5 +1,8 @@
 require "include"
 
+local test = bt.GlobalStatus("DEBUG_GLOBAL_STATUS")
+test = bt.Status("DEBUG_STATUS")
+
 love.load = function()
     profiler.activate()
 
