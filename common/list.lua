@@ -83,8 +83,9 @@ end
 --- @brief remove element from front of list, O(1)
 --- @return any
 function rt.List:pop_front()
-
     local out = self._first_node
+    if out == nil then return end
+
     if not meta.is_nil(out.next) then
         out.next.previous = nil
     end
@@ -229,18 +230,18 @@ end
 
 --- @brief
 function rt.List:is_empty()
-    return self._n_elements == 0
+    return self._n_elements <= 0
 end
 
 --- @brief
 function rt.List:front()
-    if self._n_elements == 0 then return nil end
+    if self._n_elements <= 0 then return nil end
     return self._first_node.value
 end
 
 --- @brief
 function rt.List:back()
-    if self._n_elements == 0 then return nil end
+    if self._n_elements <= 0 then return nil end
     return self._last_node.value
 end
 

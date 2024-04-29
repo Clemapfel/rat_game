@@ -12,6 +12,8 @@ rt.graphics.frame_duration = {
     max = 0
 }
 
+rt.test.animation_queue()
+
 love.draw = function()
     local before = love.timer.getTime()
     love.graphics.clear(0.8, 0.2, 0.8, 1)

@@ -76,6 +76,7 @@ require "common.input_controller"
 require "common.graphics"
 require "common.drawable"
 require "common.animation"
+require "common.animation_queue"
 
 require "common.color"
 require "common.palette"
@@ -98,6 +99,8 @@ require "common.label"
 require "common.sprite"
 require "common.frame"
 require "common.spacer"
+
+require "common.scene"
 
 require "common.audio_playback"
 require "common.monitored_audio_playback"
