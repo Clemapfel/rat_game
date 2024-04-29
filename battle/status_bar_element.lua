@@ -51,6 +51,7 @@ function bt.StatusBarElement:realize()
     self._is_realized = true
 
     local sprite_id, sprite_index = self._status:get_sprite_id()
+
     self._spritesheet = rt.SpriteAtlas:get(sprite_id)
     self._shape = rt.VertexRectangle(0, 0, 1, 1)
     self._shape:set_texture(self._spritesheet:get_texture())

@@ -1,7 +1,8 @@
-function bt.BattleScene:safe_invoke(scene, instance, callback_id, ...)
+function bt.BattleScene:safe_invoke(instance, callback_id, ...)
     self._state:clear_current_move_selection()
-    meta.assert_isa(scene, bt.BattleScene)
+    meta.assert_isa(self, bt.BattleScene)
     meta.assert_string(callback_id)
+    local scene = self
 
     -- setup fenv, done everytime to reset any globals
     local env = {}
@@ -447,13 +448,14 @@ function bt.BattleScene:add_status(entity, to_add)
     -- add status
     entity:add_status(to_add)
 
-    if not is_silent then
-        local animation, sprite = self:play_animation(entity, "STATUS_GAINED", to_add)
-        animation:register_start_callback(function()
+    local animation, sprite = self:play_animation(entity, "STATUS_GAINED", to_add)
+    animation:register_start_callback(function()
+        if not to_add.is_silent then
             self._ui:send_message(self:format_name(entity) .. " gained status " .. self:format_name(to_add))
-            sprite:add_status(to_add)
-        end)
-    end
+        end
+        sprite:add_status(to_add)
+        self._ui:set_is_stunned(entity, entity:get_is_stunned())
+    end)
 
     -- invoke callback on self
     local callback_id = "on_gained"
@@ -511,13 +513,14 @@ function bt.BattleScene:remove_status(entity, to_remove)
 
     -- play animation, actual removal is delayed until after all the callbacks are invoked
     local is_silent = to_remove.is_silent
-    if not is_silent then
-        local animation, sprite = self:play_animation(entity, "STATUS_LOST", to_remove)
-        animation:register_start_callback(function()
+    local animation, sprite = self:play_animation(entity, "STATUS_LOST", to_remove)
+    animation:register_start_callback(function()
+        if not is_silent then
             self._ui:send_message(self:format_name(entity) .. " lost status " .. self:format_name(to_remove))
-            sprite:remove_status(to_remove)
-        end)
-    end
+        end
+        sprite:remove_status(to_remove)
+        self._ui:set_is_stunned(entity, entity:get_is_stunned())
+    end)
 
     -- invoke lost callback on self
     local callback_id = "on_lost"
@@ -919,6 +922,22 @@ function bt.BattleScene:use_move(user, move, ...)
     local targets = { ... }
     for target in values(targets) do
         meta.assert_isa(target, bt.BattleEntity)
+    end
+
+    -- check if stunned
+    local is_stunned = false
+    for status in values(user:list_statuses()) do
+        if status.is_stun == true then
+            is_stunned = true
+            break
+        end
+    end
+
+    if is_stunned then
+        local animation = self:play_animation(user, "STUNNED")
+        animation:register_start_callback(function()
+            self._ui:send_message(self:format_name(user) .. " <b>couldn't move</b>")
+        end)
     end
 
     -- make current move, reduce stacks

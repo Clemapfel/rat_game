@@ -80,20 +80,9 @@ vec4 effect(vec4 vertex_color, Image image, vec2 texture_coords, vec2 vertex_pos
     float x = vertex_position.x;
     float y = vertex_position.y;
     vec4 value = Texel(image, texture_coords);
-    vec3 as_hsv = vec3(value.z, 1, 1);
 
-    float oob[1] = float[](0.0);
-    return vec4(vec3(fract(oob[int(PI * 123212312 * x * y)])), 1);
-
-    /*
-    vec2 vector = value.xy;
-    float state = value.z / max_state;
-    float age = value.w;
-
-    float hue = (atan(vector.x, vector.y) + PI) / (2 * PI); // map angle to [0, 1]
-
-    return vec4(hsv_to_rgb(as_hsv), state == 0 ? 0 : 1);
-*/
+    float hue = (atan(value.x, value.y) + PI) / (2 * PI); // map angle to [0, 1]
+    return vec4(hsv_to_rgb(vec3(value.z, 1, 1)), value.z > 0 ? 1 : 0);
 }
 
 #endif

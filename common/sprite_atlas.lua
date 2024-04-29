@@ -262,7 +262,8 @@ end
 function rt.SpriteAtlas:get(id)
     local out = self._data[self._folder .. "/" .. id]
     if meta.is_nil(out) then
-        rt.error("In rt.SpriteAtlas: no spritesheet with id `" .. id .. "`")
+        rt.warning("In rt.SpriteAtlas: no spritesheet with id `" .. id .. "`")
+        return self._fallback
     end
 
     if out.is_realized == false then

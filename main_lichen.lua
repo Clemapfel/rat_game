@@ -3,12 +3,12 @@ require "include"
 lt = {}
 
 -- config
-lt._lattice_size = { 400, 400 }
+lt._lattice_size = { 300, 300 }
 
 lt._kernel = {
-    {-1 / 2, 1, -1 / 2},
-    {1, 6, 1},
-    {-1 / 2, 1, -1 / 2}
+    {1, 1, 1},
+    {1, 2, 1},
+    {1, 1, 1}
 }
 
 -- https://gist.github.com/slime73/079ef5d4e76cec6498ab7472b4f384d9
@@ -67,9 +67,10 @@ function lt.initialize(width, height)
     local width_center = width / 2 * rt.random.number(0.25, 0.75)
     local height_center = height / 2 * rt.random.number(0.25, 0.75)
 
+    --[[
     for x = 1, width do
         for y = 1, height do
-            if rt.random.toss_coin(0.05) then
+            if rt.random.toss_coin(0.005) then
                 initial_data:setPixel(x - 1, y - 1,
                     rt.random.number(0, 1),
                     rt.random.number(0, 1),
@@ -79,23 +80,20 @@ function lt.initialize(width, height)
             end
         end
     end
+    ]]--
 
-    local function set(x, y, state, vector_x, vector_y)
-        initial_data:setPixel(
-            x - 1, y - 1,
-            vector_x,
-            vector_y,
-            1,
-            0
-        )
+    local function seed(x, y)
+        x = x - 1
+        y = y - 1
+        for xi = -1, 1, 1 do
+            for yi = -1, 1, 1 do
+                initial_data:setPixel(x + xi, y + yi, xi, -1 * yi, 1, 0)
+            end
+        end
     end
 
-    local max_state = lt._max_state
-    set(width_center - 1, height_center + 0, max_state, -1, 0)
-    set(width_center + 1, height_center + 0, max_state, 1, 0)
-    set(width_center + 0, height_center - 1, max_state, 0, -1)
-    set(width_center + 0, height_center + 1, max_state, 0, 1)
-    set(width_center, height_center, max_state, 0, 0)
+    seed(0.33 * width, 0.33 * height)
+    seed(0.66 * width, 0.66 * height)
 
     -- setup textures
     local texture_config = { computewrite = true }
@@ -145,9 +143,9 @@ function lt.step()
         computer:send("image_out", lt._state_textures[1])
     end
 
-    computer:send("kernel", lt._kernel)
+    --computer:send("kernel", lt._kernel)
     local rng = rt.random.number(0, 1)
-    --computer:send("rng", rng)
+    computer:send("rng", rng)
 
     love.graphics.dispatchThreadgroups(computer, lt._lattice_size[1], lt._lattice_size[2])
 
@@ -178,7 +176,7 @@ end
 
 lt._is_stepping = false
 lt._step_elapsed = 0
-lt._steps_per_second = 10
+lt._steps_per_second = 15
 
 love.keypressed = function(which)
     if which == "space" then

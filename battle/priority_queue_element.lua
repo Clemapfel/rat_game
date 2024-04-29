@@ -43,7 +43,7 @@ bt.PriorityQueueElement = meta.new_type("PriorityQueueElement", rt.Widget, rt.An
         _change_indicator_visible = false,
 
         _is_selected = false,
-        _is_disabled = false,
+        _is_stunned = false,
 
         _state = bt.BattleEntityState.ALIVE,
         _elapsed = 0
@@ -75,28 +75,16 @@ function bt.PriorityQueueElement:set_change_indicator_visible(b)
     self._change_indicator_visible = b
 end
 
-
---- @brief
-function bt.PriorityQueueElement:set_is_knocked_out(b)
-    self._is_knocked_out = b
-    if self._is_realized == true then
-        if self._is_knocked_out then
-
-        else
-            self._backdrop:set_color(rt.settings.battle.priority_queue_element.base_color)
-            for i = 1, 4 do
-                self._shape:set_vertex_color(i, rt.RGBA(1, 1,1, 1))
-            end
-        end
-        self:_update_frame_color()
-    end
-end
-
 function bt.PriorityQueueElement:set_state(state)
     if self._state ~= state then
         self._state = state
         self:_update_state()
     end
+end
+
+function bt.PriorityQueueElement:set_is_stunned(b)
+    self._is_stunned = b
+    self:_update_state()
 end
 
 function bt.PriorityQueueElement:set_is_selected(b)
@@ -128,15 +116,18 @@ function bt.PriorityQueueElement:_update_state()
         for i = 1, 4 do
             self._shape:set_vertex_color(i, rt.RGBA(1, 1,1, rt.settings.battle.priority_queue_element.knocked_out_shape_alpha))
         end
-    elseif self._is_disabled then
-        self._shape:set_opacity(ternary(not self._is_disabled, 1, 0.4))
-        self._id_offset_label:set_opacity(ternary(not self._is_disabled, 1, 0.8))
     elseif self._state == bt.BattleEntityState.DEAD then
         self._backdrop:set_color(rt.settings.battle.priority_queue_element.dead_base_color)
         for i = 1, 4 do
             self._shape:set_vertex_color(i, rt.RGBA(1, 1,1, rt.settings.battle.priority_queue_element.dead_shape_alpha))
         end
     end
+
+    if self._is_stunned then
+        self._shape:set_opacity(ternary(not self._is_stunned, 1, 0.4))
+        self._id_offset_label:set_opacity(ternary(not self._is_stunned, 1, 0.8))
+    end
+
     self:_update_frame_color()
 end
 

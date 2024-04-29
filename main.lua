@@ -17,7 +17,7 @@ love.load = function()
     input:signal_connect("pressed", function(self, which)
         if which == rt.InputButton.A then
             local entities = scene._state:list_entities()
-            scene:reduce_hp(entities[1], 50)
+            scene:add_status(entities[1], bt.Status("ONE_TURN_STUN"))
         elseif which == rt.InputButton.B then
             --scene:remove_status(scene._state:list_entities()[1], bt.Status("DEBUG_STATUS"))
             --scene:help_up(scene._state:list_entities()[1])

@@ -109,6 +109,8 @@ Status {
     id = "STATUS_ID",        -- const String
     name = "Example Status", -- const String
     
+    is_stun = false, -- const Boolean
+    
     attack_offset = 0,   -- const Signed
     defense_offset = 0,  -- const Signed
     speed_offset = 0,    -- const Signed
@@ -188,6 +190,7 @@ Status {
     healing_performed_offset = 0, -- Signed
     healing_received_offset = 0,  -- Signed
 
+    is_stun = false, -- const Boolean
     max_duration = POSITIVE_INFINITY, -- const Unsigned
     is_silent = false,                -- const Boolean
 
@@ -349,12 +352,12 @@ Entity {
     is_enemy = true, -- const Boolean
     
     -- ### Instance Methods ### --
+    
     get_id_multiplicity(self), -- (Entity) -> 
     
     get_hp(self),
     get_hp_current(self),
     get_hp_base(self),
-    
     
     get_attack(self), -- (Entity) -> Unsigned
     get_attack_base(self), -- (Entity) -> Unsigned
@@ -374,7 +377,7 @@ Entity {
     get_priority(self),
     set_priority(self), -- TODO: when is priority resolved?
     
-    
+    get_is_stunned(self),
     add_status(self, status_id),
     remove_status(self, status_id),
     

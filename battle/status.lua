@@ -42,6 +42,8 @@ end, {
     healing_performed_offset = 0, -- Signed
     healing_received_offset = 0,  -- Signed
 
+    is_stun = false, -- Boolean
+
     max_duration = POSITIVE_INFINITY,
     is_silent = false,
 
@@ -192,7 +194,7 @@ end, {
     end,
 
     description = "",
-    sprite_id = "",
+    sprite_id = "status_ailment",
     sprite_index = 1
 })
 bt.Status._atlas = {}
@@ -229,6 +231,7 @@ function bt.Status:realize()
         name = rt.STRING,
         max_duration = rt.UNSIGNED,
         is_silent = rt.BOOLEAN,
+        is_stun = rt.BOOLEAN
     }
 
     for key in values(functions) do

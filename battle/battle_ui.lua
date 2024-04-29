@@ -333,6 +333,11 @@ function bt.BattleUI:set_state(entity, state)
 end
 
 --- @brief
+function bt.BattleUI:set_is_stunned(entity, b)
+    self._priority_queue:set_is_stunned(entity, b)
+end
+
+--- @brief
 function bt.BattleUI:swap(entity_a, entity_b)
     assert(entity_a ~= entity_b)
     assert(entity_a:get_is_enemy() == entity_b:get_is_enemy())

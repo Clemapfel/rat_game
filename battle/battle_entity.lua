@@ -349,6 +349,16 @@ function bt.BattleEntity:has_status(status)
 end
 
 --- @brief
+function bt.BattleEntity:get_is_stunned(status)
+    for entry in values(self.status) do
+        if entry.status.is_stun == true then
+            return true
+        end
+    end
+    return false
+end
+
+--- @brief
 --- @return Boolean true if status is past its intended duration, false otherwise
 function bt.BattleEntity:increase_status_elapsed(status)
     local entry = self.status[status:get_id()]

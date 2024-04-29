@@ -10,7 +10,13 @@ float angle_between(vec2 v1, vec2 v2) {
 // get angle of vector
 float angle(vec2 v)
 {
-    return (atan(v.x, v.y) + PI) / (2 * PI);
+    return atan(v.x, v.y) + PI;
+}
+
+// translate by angle
+vec2 translate_point_by_angle(vec2 xy, float distance, float angle)
+{
+    return xy + vec2(cos(angle), sin(angle)) * distance;
 }
 
 // rotate vector
@@ -79,7 +85,7 @@ uniform float rng;
 
 float activation_function(float x)
 {
-    return sin(x);// 0.5 * pow((2 * x - 1), 3) + 0.5;
+    return x;
 }
 
 layout (local_size_x = 1, local_size_y = 1, local_size_z = 1) in;
@@ -94,28 +100,57 @@ void computemain()
     float activation_threshold = 0.00;
 
     vec4 current = imageLoad(image_in, ivec2(x, y));
-    float current_angle = angle(current.xy);
-
-    float neighborhood_sum = 0;
-    int n_active_neighbors = 0;
 
     float kernel_sum =
         kernel[0][0] + kernel[1][0] + kernel[2][0] +
         kernel[0][1] + kernel[1][1] + kernel[1][2] +
         kernel[0][2] + kernel[1][2] + kernel[2][2]
     ;
-    //kernel_sum = (1 + rng * 2);
 
-    for (int ix = -1; ix <= +1; ix++) {
-        for (int iy = -1; iy <= +1; iy++) {
-            float value = imageLoad(image_in, ivec2(x + ix, y + iy)).z;
-            if (value > 0) {
-                n_active_neighbors = n_active_neighbors + 1;
+    float n_neighbors = 0;
+    float max_angle = -1. / 0.;
+    float neighborhood_sum = 0;
+
+    vec2 vector = vec2(0);
+    for (int xx = x - 1; xx <= x + 1; xx++) {
+        for (int yy = y - 1; yy <= y + 1; yy++) {
+            //if (xx == x || yy == y) continue;
+
+            vec4 current = imageLoad(image_in, ivec2(xx, yy));
+            if (current.z > 0.97)
+                n_neighbors++;
+
+            for (int xxx = x-1; xxx <= x+1; xxx++) {
+                for (int yyy = y - 1; yyy < y + 1; yyy++) {
+                    vec4 other = imageLoad(image_in, ivec2(xxx, yyy));
+                    max_angle = max(max_angle, angle_between(current.xy, other.xy) + PI);
+                }
             }
-            neighborhood_sum += value * kernel[ix + 1][iy + 1];
+
+            vec2 came_from = normalize(vec2(xx - x, yy - y));
+            vector = current.z * (current.xy + came_from) / 2;
+            vector = normalize(vector);
+
+            neighborhood_sum = neighborhood_sum + current.z * kernel[xx - x + 1][yy - y + 1];
         }
     }
 
-    neighborhood_sum = activation_function(neighborhood_sum / kernel_sum) ;
-    imageStore(image_out, ivec2(x, y), vec4(current.xy, clamp(neighborhood_sum, 0, 1), 0));
+    neighborhood_sum = neighborhood_sum / kernel_sum;
+    float rng_offset = random(vec2(x, y) + vec2(rng, -rng)) * 2;
+
+    if (current.z <= 0 && n_neighbors > 1 * rng_offset && n_neighbors < 2 * rng_offset) {
+        imageStore(image_out, ivec2(x, y), vec4(
+            vector,
+            1,
+            0
+        ));
+    }
+    else
+    {
+        imageStore(image_out, ivec2(x, y), vec4(
+            vector,
+            clamp(current.z - 0.01, 0, 1),//activation_function(neighborhood_sum) - 0.01,
+            0
+        ));
+    }
 }

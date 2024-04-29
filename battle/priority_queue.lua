@@ -42,6 +42,7 @@ function bt.PriorityQueue:size_allocate(x, y, width, height)
                 colliders = {}, -- Table<rt.Collider>
                 target_positions = {}, -- Table<Table<X, Y>>
                 is_selected = false,
+                is_stunned = false,
                 state = bt.BattleEntityState.ALIVE
             }
         end
@@ -142,6 +143,7 @@ function bt.PriorityQueue:size_allocate(x, y, width, height)
             element:set_change_indicator_visible(self._is_preview_active)
             element:set_state(entry.state)
             element:set_is_selected(entry.is_selected)
+            element:set_is_stunned(entry.is_stunned)
             element:set_id_offset_label_visible(entity:get_id_offset() > 0)
 
             if before_entry ~= nil then
@@ -220,11 +222,20 @@ function bt.PriorityQueue:override_selected(entities)
 end
 
 --- @brief
-function bt.PriorityQueue:set_selected(entity, b)
+function bt.PriorityQueue:set_is_selected(entity, b)
     local entry = self._entries[entity]
     entry.is_selected = b
     for element in values(entry.elements) do
         element:set_is_selected(entry.is_selected)
+    end
+end
+
+--- @brief
+function bt.PriorityQueue:set_is_stunned(entity, b)
+    local entry = self._entries[entity]
+    entry.is_stunned = b
+    for element in values(entry.elements) do
+        element:set_is_stunned(entry.is_stunned)
     end
 end
 
