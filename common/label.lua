@@ -43,8 +43,8 @@ function rt.Label:realize()
     if not self:get_is_realized() then
         self:_parse()
         self:_update_default_size()
-        rt.Widget.realize(self)
         self:set_is_animated(self._is_animated)
+        self._is_realized = true
     end
 end
 
@@ -149,22 +149,6 @@ function rt.Label:size_allocate(x, y, width, height)
     local w, h = max_x - min_x, max_y - min_y
     local x_offset, y_offset = 0, 0
 
-    if self:get_horizontal_alignment() == rt.Alignment.START then
-        -- noop
-    elseif self:get_horizontal_alignment() == rt.Alignment.CENTER then
-        x_offset = 0.5 * width - 0.5 * w
-    elseif self:get_horizontal_alignment() == rt.Alignment.END then
-        -- noop
-    end
-
-    if self:get_vertical_alignment() == rt.Alignment.START then
-        -- noop
-    elseif self:get_vertical_alignment() == rt.Alignment.CENTER then
-        y_offset = 0.5 * height - 0.5 * h
-    elseif self:get_vertical_alignment() == rt.Alignment.END then
-        -- noop
-    end
-
     if x_offset ~= 0 or y_offset ~= 0 then
 
         min_x = POSITIVE_INFINITY
@@ -193,7 +177,7 @@ end
 --- @overload rt.Widget.measure
 function rt.Label:measure()
     return math.max(self._current_width, select(1, self:get_minimum_size())) + self:get_margin_left() + self:get_margin_right(),
-           math.max(self._current_height, select(2, self:get_minimum_size())) + self:get_margin_top() + self:get_margin_bottom()
+    math.max(self._current_height, select(2, self:get_minimum_size())) + self:get_margin_top() + self:get_margin_bottom()
 end
 
 -- control characters used for wrap hinting
@@ -294,17 +278,17 @@ function rt.Label:_parse()
         if effect_wave then table.insert(effects, rt.TextEffect.WAVE) end
 
         table.insert(self._glyphs, rt.Glyph(
-            font,
-            current_word,
-            {
-                font_style = style,
-                color = rt.Palette[ternary(effect_rainbow, "TRUE_WHITE", color[1])],
-                is_underlined = underlined,
-                is_strikethrough = strikethrough,
-                is_outlined = outlined,
-                outline_color = ternary(outline_color_active, rt.Palette[outline_color[1]], nil),
-                effects = effects
-            }
+                font,
+                current_word,
+                {
+                    font_style = style,
+                    color = rt.Palette[ternary(effect_rainbow, "TRUE_WHITE", color[1])],
+                    is_underlined = underlined,
+                    is_strikethrough = strikethrough,
+                    is_outlined = outlined,
+                    outline_color = ternary(outline_color_active, rt.Palette[outline_color[1]], nil),
+                    effects = effects
+                }
         ))
 
         self._n_characters = self._n_characters + string.len(current_word)
@@ -409,7 +393,7 @@ function rt.Label:_parse()
                     throw_parse_error("trying to close a bold region, but one is not open")
                 end
                 bold = false
-            -- italic
+                -- italic
             elseif tag_matches(syntax.ITALIC_TAG_START) then
                 if italic == true then
                     throw_parse_error("trying to open an italic region, but one is already open")
@@ -420,7 +404,7 @@ function rt.Label:_parse()
                     throw_parse_error("trying to close an italic region, but one is not open")
                 end
                 italic = false
-            -- underlined
+                -- underlined
             elseif tag_matches(syntax.UNDERLINED_TAG_START) then
                 if underlined == true then
                     throw_parse_error("trying to open an underlined region, but one is already open")
@@ -431,7 +415,7 @@ function rt.Label:_parse()
                     throw_parse_error("trying to close an underlined region, but one is not open")
                 end
                 underlined = false
-            -- strikethrough
+                -- strikethrough
             elseif tag_matches(syntax.STRIKETHROUGH_TAG_START) then
                 if strikethrough == true then
                     throw_parse_error("trying to open an strikethrough region, but one is already open")
@@ -442,7 +426,7 @@ function rt.Label:_parse()
                     throw_parse_error("trying to close an strikethrough region, but one is not open")
                 end
                 strikethrough = false
-            -- mono
+                -- mono
             elseif tag_matches(syntax.MONOSPACE_TAG_START) then
                 if mono == true then
                     throw_parse_error("trying to open an monospace region, but one is already open")
@@ -453,7 +437,7 @@ function rt.Label:_parse()
                     throw_parse_error("trying to close an monospace region, but one is not open")
                 end
                 mono = false
-            -- outlined
+                -- outlined
             elseif tag_matches(syntax.OUTLINE_TAG_START) then
                 if outlined == true then
                     throw_parse_error("trying to open an outlined region, but one is already open")
@@ -464,7 +448,7 @@ function rt.Label:_parse()
                     throw_parse_error("trying to close an outlined region, but one is not open")
                 end
                 outlined = false
-            -- color
+                -- color
             elseif color_tag_matches(syntax.COLOR_TAG_START, color) then
                 if is_colored == true then
                     throw_parse_error("trying to open a color region, but one is already open")
@@ -476,7 +460,7 @@ function rt.Label:_parse()
                 end
                 is_colored = false
                 color[1] = "TRUE_WHITE"
-            -- outline color
+                -- outline color
             elseif color_tag_matches(syntax.OUTLINE_COLOR_TAG_START, outline_color) then
                 if outline_color_active == true then
                     throw_parse_error("trying to open a outline color region, but one is already open")
@@ -488,7 +472,7 @@ function rt.Label:_parse()
                 end
                 outline_color_active = false
                 color[1] = "TRUE_BLACK"
-            -- effect: shake
+                -- effect: shake
             elseif tag_matches(syntax.EFFECT_SHAKE_TAG_START) then
                 if effect_shake == true then
                     throw_parse_error("trying to open an effect shake region, but one is already open")
@@ -499,7 +483,7 @@ function rt.Label:_parse()
                     throw_parse_error("trying to close an effect shake region, but one is not open")
                 end
                 effect_shake = false
-            -- effect: wave
+                -- effect: wave
             elseif tag_matches(syntax.EFFECT_WAVE_TAG_START) then
                 if effect_wave == true then
                     throw_parse_error("trying to open an effect wave region, but one is already open")
@@ -510,7 +494,7 @@ function rt.Label:_parse()
                     throw_parse_error("trying to close an effect wave region, but one is not open")
                 end
                 effect_wave = false
-            -- effect: rainbow
+                -- effect: rainbow
             elseif tag_matches(syntax.EFFECT_RAINBOW_TAG_START) then
                 if effect_rainbow == true then
                     throw_parse_error("trying to open an effect rainbow region, but one is already open")

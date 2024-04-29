@@ -1,24 +1,27 @@
 rt.settings.log = {
-    rt_prefix = "[rt]",
-    log_prefix = "[LOG]",
-    warning_prefix = "[WARNING]",
-    error_prefix = "[ERROR]"
+    rt_prefix = {
+        "[rt]",
+        bold = true
+    },
+
+    log_prefix = {
+        "[LOG]",
+        color = "green",
+        bold = true
+    },
+
+    warning_prefix = {
+        "[WARNING]",
+        color = "yellow",
+        bold = true
+    },
+
+    error_prefix = {
+        "[ERROR]",
+        color = "red",
+        bold = true
+    }
 }
-
---- @brief
-function rt.log(message)
-    println(rt.settings.log.rt_prefix, rt.settings.log.log_prefix, " ", message)
-end
-
---- @brief
-function rt.warning(message)
-    println(rt.settings.log.rt_prefix, rt.settings.log.warning_prefix, " ", message)
-end
-
---- @brief
-function rt.error(message)
-    error(rt.settings.log.rt_prefix .. rt.settings.log.error_prefix .. " " .. message)
-end
 
 --- @brief pretty print to the console, supports colors and boldness
 function printstyled(message, config)
@@ -80,6 +83,7 @@ function printstyled(message, config)
     end
 end
 
+--- @brief
 function rt.prettyprint(...)
     for word in values({...}) do
         if meta.is_string(word) then
@@ -89,4 +93,19 @@ function rt.prettyprint(...)
             printstyled(word[1], word)
         end
     end
+end
+
+--- @brief
+function rt.log(message)
+    rt.prettyprint(rt.settings.log.rt_prefix, rt.settings.log.log_prefix, " ", message)
+end
+
+--- @brief
+function rt.warning(message)
+    rt.prettyprint(rt.settings.log.rt_prefix, rt.settings.log.warning_prefix, " ", message)
+end
+
+--- @brief
+function rt.error(message)
+    error(rt.settings.log.rt_prefix[1] .. rt.settings.log.error_prefix[1] .. " " .. message)
 end

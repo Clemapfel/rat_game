@@ -43,7 +43,6 @@ function keys(t)
     end
 end
 
-
 --- @brief iterate arbitrary number of elements, if vararg contains nils, they will be skipped
 --- @vararg any
 function range(...)
@@ -76,7 +75,6 @@ end
 --- @param vararg any
 --- @return nil
 function print(...)
-
     local values = {...}
     if string.len(values) == 0 then
         io.write("nil")
@@ -92,7 +90,6 @@ end
 --- @param vararg any
 --- @return nil
 function println(...)
-
     local values = {...}
     if #values == 0 then
         io.write("nil\n")
@@ -107,6 +104,7 @@ function println(...)
     io.flush()
 end
 
+--- @brief
 function dbg(...)
     for _, x in pairs({...}) do
         io.write(serialize(x))
@@ -115,13 +113,6 @@ function dbg(...)
 
     io.write("\n")
     io.flush()
-end
-
---- @brief print to stderr
---- @param str string
-function printerr(message)
-    io.stderr:write(string.format("\27[38;5;9m%s\27[38;5;7m", message), "\n")
-    io.stderr:flush()
 end
 
 --- @brief concatenate vararg into string
@@ -187,7 +178,7 @@ function clamp(x, lower_bound, upper_bound)
     return x
 end
 
---- @brief TODO
+--- @brief
 function project(value, lower, upper)
     return value * math.abs(upper - lower) + math.min(lower, upper);
 end
@@ -494,13 +485,13 @@ function math.tanh(x)
     if x < 0.54930614433405 then
         local y = x * x
         x = x + x * y *
-        ((-0.96437492777225469787e0 * y +
-                -0.99225929672236083313e2) * y +
-                -0.16134119023996228053e4) /
-        (((0.10000000000000000000e1 * y +
-                0.11274474380534949335e3) * y +
-                0.22337720718962312926e4) * y +
-                0.48402357071988688686e4)
+                ((-0.96437492777225469787e0 * y +
+                        -0.99225929672236083313e2) * y +
+                        -0.16134119023996228053e4) /
+                (((0.10000000000000000000e1 * y +
+                        0.11274474380534949335e3) * y +
+                        0.22337720718962312926e4) * y +
+                        0.48402357071988688686e4)
     else
         x = math.exp(x)
         x = 1.0 - 2.0 / (x * x + 1.0)
@@ -602,14 +593,6 @@ _step_range_iterator = function(state)
     return current, state
 end
 
---- @brief
-function equal_to_one_of(value, ...)
-    for _, which in pairs({...}) do
-        if value == which then return true end
-    end
-    return false
-end
-
 if utf8 == nil then utf8 = require "utf8" end
 
 --- @brief
@@ -691,77 +674,6 @@ end
 function string.len(str)
     return #str
 end
-
---- @brief evalue all substrings of the form `$(statement)` as code and replace the sequence with the result. If `environment` is specified, that able will be used as each sequences entire environment, otherwise _G is used
---- @param str string
---- @param environment table or nil
-function string.interpolate(str, environment)
-
-    local values = {}
-    local formatted_string = {}
-    local i = 1
-
-    while i < #str do
-        local c = string.sub(str, i, i)
-
-        if c == string._interpolation_escape_character then
-            i = i + 1
-            table.insert(formatted_string, string.sub(str, i, i))
-        elseif c == string._interpolation_character then
-            local start = i
-
-            i = i + 1
-            if string.sub(str, i, i) ~= "(" then
-                error("In string.interpolate: Invalid interpolation sequence, expected `(`, got `" .. string.sub(str, i, i)  .. "`")
-            end
-
-            -- find last bracket of expression
-            local bracket_weight = 0
-            while true do
-                local current = string.sub(str, i, i)
-
-                if current == string._interpolation_escape_character then
-                    -- continue
-                elseif current == ")" then
-                    bracket_weight = bracket_weight - 1
-                elseif current == "(" then
-                    bracket_weight = bracket_weight + 1
-                end
-
-                if bracket_weight <= 0 then break end
-
-                i = i + 1
-                if i > #str then
-                    error("In string.interpolate: Unfinished interpolation sequence, missing `)` in `" .. string.sub(str, start, #str) .. "`")
-                end
-            end
-
-            local expression = string.sub(str, start + 2, i - 1)
-            local run, error_maybe = load("return " .. expression)
-            if error_maybe ~= nil then
-                error("In string.interpolate: Error evaluating expression `" .. expression .. "`: " .. error_maybe)
-            end
-
-            if environment ~= nil then
-                debug.setfenv(run, environment)
-            end
-
-            local value = run()
-            if value ~= nil then
-                table.insert(values, value)
-                table.insert(formatted_string, "%s")
-            end
-        else
-            table.insert(formatted_string, c)
-        end
-        i = i + 1
-    end
-
-    return string.format(table.concat(formatted_string), splat(values))
-end
-
-string._interpolation_character = "$"
-string._interpolation_escape_character = "//"
 
 --- @brief
 function exit(status)

@@ -290,6 +290,8 @@ function rt.BSpline:create_from(points)
     if #points < 6 then return end
 
     -- https://github.com/msteinbeck/tinyspline/blob/master/examples/lua/quickstart.lua
+    love.filesystem.setRequirePath(love.filesystem.getRequirePath() .. table.concat(paths))
+    assert(love.filesystem.mountFullPath("/usr/lib64/lua/5.4/", "", "read", true))
     local ts = require("tinysplinelua51")
     local spline = ts.BSpline(#points / 2)
     spline.control_points = points

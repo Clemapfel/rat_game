@@ -27,10 +27,10 @@ end
 --- @param object any
 function meta.is_rgba(object)
     return sizeof(object) == 4 and
-        meta.is_number(object.r) and
-        meta.is_number(object.g) and
-        meta.is_number(object.b) and
-        meta.is_number(object.a)
+            meta.is_number(object.r) and
+            meta.is_number(object.g) and
+            meta.is_number(object.b) and
+            meta.is_number(object.a)
 end
 
 --- @brief [internal] throw if object is not rt.RGBA
@@ -64,10 +64,10 @@ end
 --- @return Boolean
 function meta.is_hsva(object)
     return sizeof(object) == 4 and
-        meta.is_number(object.h) and
-        meta.is_number(object.s) and
-        meta.is_number(object.v) and
-        meta.is_number(object.a)
+            meta.is_number(object.h) and
+            meta.is_number(object.s) and
+            meta.is_number(object.v) and
+            meta.is_number(object.a)
 end
 
 --- @brief [internal] throw if object is not rt.HSVA
@@ -156,7 +156,7 @@ function rt.hsva_to_rgba(hsva)
     else
         r, g, b  = c, 0, x
     end
-    
+
     local m = v - c
 
     r = r + m

@@ -168,8 +168,8 @@ function rt.VertexShape:set_texture_rectangle(rectangle, y, w, h)
     for i = 1, self:get_n_vertices() do
         local x, y = self:get_vertex_position(i)
         self:set_vertex_texture_coordinate(i,
-            (x - min_x) / (width / rectangle.width) + rectangle.x,
-            (y - min_y) / (height / rectangle.height) + rectangle.y
+                (x - min_x) / (width / rectangle.width) + rectangle.x,
+                (y - min_y) / (height / rectangle.height) + rectangle.y
         )
     end
 end
@@ -304,8 +304,8 @@ function rt.VertexLine(thickness, ...)
         local p1, p2, p3, p4 = n-3, n-1, n, n-2
 
         for i in range(
-            p1, p2, p3,
-            p1, p3, p4
+                p1, p2, p3,
+                p1, p3, p4
         ) do
             table.insert(vertex_map, i)
         end
@@ -374,7 +374,6 @@ end
 
 --- @brief
 function rt.VertexCircle(x, y, x_radius, y_radius, n_outer_vertices)
-
     y_radius = which(y_radius, x_radius)
     n_outer_vertices = which(n_outer_vertices, 8)
     local vertices = {}

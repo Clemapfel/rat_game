@@ -2,8 +2,6 @@
 meta = {}
 meta.types = {}
 
---if pairs == nil then pairs = pairs end
-
 --- @brief is x a lua string?
 --- @param x any
 function meta.is_string(x)
@@ -301,9 +299,6 @@ function meta.get_is_mutable(x)
     return rawget(x, 1)[2]
 end
 
---- @class meta.Object
-meta.Object = "Object"
-
 --- @brief [internal] recursively install all types and super types of types, used in meta.new
 function meta._install_super(super)
     if metatable.super[super._typename] ~= true then
@@ -462,6 +457,7 @@ function meta._default_ctor(self)
     return meta.new(self)
 end
 
+--- @brief
 function meta.new_type(typename, ...)
     local out = meta._new("Type")
     local metatable = out[1]
@@ -551,6 +547,10 @@ end)
 --- @class Table
 --- @class Boolean
 --- @class Number
+--- @class Signed
+--- @class Unsigned
+--- @class Integer
+--- @class Float
 
 --- @brief make table weak, meaning it does not increase the reference count of its values
 --- @param x Table

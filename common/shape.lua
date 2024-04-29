@@ -88,8 +88,3 @@ end
 function rt.Shape:get_line_width()
     return self._line_width
 end
-
-for _, name in pairs(love.filesystem.getDirectoryItems("common/shapes")) do
-    name = string.sub(name, 1, #name - 4) -- remove `.lua`
-    require("common.shapes." .. name)
-end

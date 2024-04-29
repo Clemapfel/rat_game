@@ -1,4 +1,3 @@
-rt.random = {}
 rt.random.DEFAULT_SEED = os.time()
 if not meta.is_nil(love) then
     love.math.setRandomSeed(rt.random.DEFAULT_SEED)
@@ -52,7 +51,6 @@ end
 
 --- @brief reorder table
 function rt.random.shuffle_in_place(t)
-
     for i = 1, #t do
         local j = rt.random.integer(1, #t)
         local temp = t[i]
@@ -104,7 +102,3 @@ function rt.random.string(length, set)
     return table.concat(out, "")
 end
 
---- @brief test random
-function rt.test.random()
-   error("TODO")
-end

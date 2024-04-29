@@ -30,12 +30,6 @@ rt.Shader._common = {
 --- @param name String
 --- @param value
 function rt.Shader:send(name, value)
-    local to_send = value
-    if meta.is_vector2(value) then
-        to_send = {value.x, value.y}
-    elseif meta.is_vector3(value) then
-        to_send = {value.x, value.y, value.z}
-    end
     self._native:send(name, value)
 end
 

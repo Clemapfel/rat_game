@@ -1,3 +1,12 @@
+--- @class rt.Direction
+rt.Direction = meta.new_enum({
+    UP = "up",
+    RIGHT = "right",
+    DOWN = "down",
+    LEFT = "left",
+    NONE = "none"
+})
+
 --- @class rt.AxisAlignedRectangle
 function rt.AxisAlignedRectangle(top_left_x, top_left_y, width, height)
     if meta.is_nil(top_left_x) then
@@ -83,98 +92,16 @@ function rt.from_polar(magnitude, angle)
     return rt.translate_point_by_angle(0, 0, magnitude, angle)
 end
 
---[[
-
---- @brief get size
---- @param self rt.AxisAlignedRectangle
---- @return (Number, Number)
-function rt.AxisAlignedRectangle:get_size(self)
-
-    return self.width, self.height
+--- @brief convert radians to degrees
+--- @param rads Number
+--- @return Number
+function rt.radians_to_degrees(rads)
+    return rads * (180 / math.pi)
 end
 
---- @brief get top left
---- @param self rt.AxisAlignedRectangle
---- @return (Number, Number)
-function rt.AxisAlignedRectangle:get_top_left(self)
-
-    return self.x, self.y
+--- @brief convert degrees to radians
+--- @param dgs Number
+--- @return Number
+function rt.degrees_to_radians(dgs)
+    return dgs * (math.pi / 180)
 end
-
---- @brief get top center
---- @param self rt.AxisAlignedRectangle
---- @return (Number, Number)
-function rt.AxisAlignedRectangle:get_top_center(self)
-
-    return (self.x + 0.5 * self.width), self.x
-end
-
---- @brief get top right
---- @param self rt.AxisAlignedRectangle
---- @return (Number, Number)
-function rt.AxisAlignedRectangle:get_top_right(self)
-
-    return self.x + self.width, self.y
-end
-
---- @brief get center left
---- @param self rt.AxisAlignedRectangle
---- @return (Number, Number)
-function rt.AxisAlignedRectangle:get_center_left(self)
-
-    return self.x, self.y + self.height * 0.5
-end
-
---- @brief get center center
---- @param self rt.AxisAlignedRectangle
---- @return (Number, Number)
-function rt.AxisAlignedRectangle:get_center(self)
-
-    return self.x + self.width * 0.5, self.y + self.height * 0.5
-end
-
---- @brief get center right
---- @param self rt.AxisAlignedRectangle
---- @return (Number, Number)
-function rt.AxisAlignedRectangle:get_center_right(self)
-
-    return self.x + self.width, self.y + self.height * 0.5
-end
-
---- @brief get bottom left
---- @return (Number, Number)
-function rt.AxisAlignedRectangle:get_bottom_left(self)
-
-    return self.x, self.y + self.height
-end
-
---- @brief get bottom center
---- @param self rt.AxisAlignedRectangle
---- @return (Number, Number)
-function rt.AxisAlignedRectangle:get_bottom_center(self)
-
-    return self.x + self.width * 0.5, self.y + self.height
-end
-
---- @brief get bottom right
---- @param self rt.AxisAlignedRectangle
---- @return (Number, Number)
-function rt.AxisAlignedRectangle:get_bottom_right(self)
-
-    return self.x + self.width, self.y + self.height
-end
-
---- @brief is point inside rectangles bounds
---- @param x Number
---- @param y Number
---- @return Boolean
-function rt.AxisAlignedRectangle:contains(x, y)
-    return x >= self.x and x <= (self.x + self.width) and y >= self.y and y <= (self.y + self.height)
-end
-
---- @brief test aabb
-function rt.test.geometry()
-    -- TODO
-end
-]]--
-

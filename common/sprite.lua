@@ -74,10 +74,10 @@ function rt.Sprite:set_frame(i)
     if self._is_realized == true then
         local frame = self._spritesheet:get_frame(self._current_frame)
         self._shape:reformat_texture_coordinates(
-            frame.x, frame.y,
-            frame.x + frame.width, frame.y,
-            frame.x + frame.width, frame.y + frame.height,
-            frame.x, frame.y + frame.height
+                frame.x, frame.y,
+                frame.x + frame.width, frame.y,
+                frame.x + frame.width, frame.y + frame.height,
+                frame.x, frame.y + frame.height
         )
     end
 end

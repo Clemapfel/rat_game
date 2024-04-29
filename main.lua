@@ -1,35 +1,9 @@
 require "include"
 
-local test = bt.GlobalStatus("DEBUG_GLOBAL_STATUS")
-test = bt.Status("DEBUG_STATUS")
-
 love.load = function()
-    profiler.activate()
-
-    rt.current_scene = bt.BattleScene()
-    local scene = rt.current_scene
-
-    local to_synch_with = {}
-    local move = bt.Move("TEST_MOVE")
-
-    -- TODO move this to update
-    input = rt.InputController()
-    input:signal_connect("pressed", function(self, which)
-        if which == rt.InputButton.A then
-            local entities = scene._state:list_entities()
-            scene:add_status(entities[1], bt.Status("ONE_TURN_STUN"))
-        elseif which == rt.InputButton.B then
-            --scene:remove_status(scene._state:list_entities()[1], bt.Status("DEBUG_STATUS"))
-            --scene:help_up(scene._state:list_entities()[1])
-            scene:skip_animation()
-        elseif which == rt.InputButton.X then
-            local entities = scene._state:list_entities()
-            scene:add_hp(entities[1], 50)
-        end
-    end)
-
+    rt.current_scene = rt.Label("iau dliusan ldia unlsaiu dnliau dnlai udsnlaiusdnali usdnlaid nalisudnalisudnlaisudnliusndliausnd liausnd liaudslna")
     rt.current_scene:realize()
-    rt.current_scene:start_battle(bt.BattleConfig("TEST_BATTLE"))
+    love.resize()
 end
 
 rt.graphics.frame_duration = {
@@ -42,7 +16,10 @@ love.draw = function()
     local before = love.timer.getTime()
     love.graphics.clear(0.8, 0.2, 0.8, 1)
 
-    rt.current_scene:draw()
+    if rt.current_scene ~= nil then
+        rt.current_scene:draw()
+    end
+
     do -- show fps and frame usage
         local fps = love.timer.getFPS()
         local frame_usage = math.round(rt.graphics.frame_duration.max / (1 / fps) * 100)
@@ -54,17 +31,14 @@ love.draw = function()
 end
 
 love.update = function(delta)
-    rt.AnimationHandler:update(delta)
-    rt.current_scene:update(delta)
+    if rt.current_scene ~= nil and rt.current_scene.update ~= nil then
+        rt.current_scene:update(delta)
+    end
 end
 
 love.resize = function()
-    rt.current_scene:size_allocate(0, 0, love.graphics.getWidth(), love.graphics.getHeight())
-end
-
-love.quit = function()
-    if profiler.get_is_active() then
-        profiler.deactivate()
+    if rt.current_scene ~= nil then
+        rt.current_scene:fit_into(0, 0, love.graphics.getWidth(), love.graphics.getHeight())
     end
 end
 
@@ -137,3 +111,4 @@ love.run = function()
         if love.timer then love.timer.sleep(0.001) end -- limit max tick rate of while true
     end
 end
+

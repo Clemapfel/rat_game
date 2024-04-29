@@ -236,14 +236,14 @@ rt.InputMapping = {
 
     -- L
     [rt.InputButton.L] = {
-      rt.GamepadButton.LEFT_SHOULDER,
-      rt.KeyboardKey.L
+        rt.GamepadButton.LEFT_SHOULDER,
+        rt.KeyboardKey.L
     },
 
     -- R
     [rt.InputButton.R] = {
-      rt.GamepadButton.RIGHT_SHOULDER,
-      rt.KeyboardKey.R
+        rt.GamepadButton.RIGHT_SHOULDER,
+        rt.KeyboardKey.R
     },
 
     -- START

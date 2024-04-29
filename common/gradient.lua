@@ -62,10 +62,10 @@ function rt.Gradient:_update_color()
     local b = self._color_to
 
     local mix = rt.RGBA(
-        mix(a.r, b.r, 0.5),
-        mix(a.g, b.g, 0.5),
-        mix(a.b, b.b, 0.5),
-        mix(a.a, b.a, 0.5)
+            mix(a.r, b.r, 0.5),
+            mix(a.g, b.g, 0.5),
+            mix(a.b, b.b, 0.5),
+            mix(a.a, b.a, 0.5)
     )
     if self._type == rt.GradientDirection.LEFT_TO_RIGHT then
         set_color(1, a)
@@ -196,8 +196,8 @@ rt.CircularGradient = meta.new_type("CircularGradient", rt.Drawable, function(ce
     while angle <= 360 + step do
         local as_radians = angle * math.pi / 180
         table.insert(vertices, rt.Vector2(
-            center_x + math.cos(as_radians) * out._radius_x,
-            center_y + math.sin(as_radians) * out._radius_y
+                center_x + math.cos(as_radians) * out._radius_x,
+                center_y + math.sin(as_radians) * out._radius_y
         ))
         angle = angle + step
     end
@@ -226,8 +226,8 @@ function rt.CircularGradient:_update_shape()
     for i = 2, self._shape:get_n_vertices() do
         local as_radians = angle * math.pi / 180
         self._shape:set_vertex_position(i,
-            self._center_x + math.cos(as_radians) * self._radius_x,
-            self._center_y + math.sin(as_radians) * self._radius_y
+                self._center_x + math.cos(as_radians) * self._radius_x,
+                self._center_y + math.sin(as_radians) * self._radius_y
         )
         angle = angle + step
     end

@@ -19,8 +19,3 @@ end
 function rt.Drawable:get_is_visible()
     return self._is_visible
 end
-
---- @brief [internal] test drawable
-function rt.test.drawable()
-
-end

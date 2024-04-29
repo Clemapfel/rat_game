@@ -93,16 +93,22 @@ rt.parabolic_sigmoid = function(x)
 end
 
 --- @brief gaussian distribution with 0.99 percentile in [0, 1], peak at 0.5
-rt.symmetrical_gaussian = function(x, peak)
+rt.gaussian_bandpass = function(x, peak)
     -- e^{-\left(4\cdot\frac{\pi}{3}\right)\left(2x-1\right)^{2}}
     peak = which(peak, 1)
     return (math.exp(-1 * ((4 * math.pi / 3) * (2 * x - 1))^2))
 end
 
---- @brief gaussian distribution with 0.99 percentile in [0, 1], peak at 1
-rt.gaussian_increase = function(x, peak)
+rt.gaussian_highpass = function(x, peak)
     peak = which(peak, 1)
-    return (math.exp(-1 * ((2 * math.pi / 3) * (x - 1))^2))
+    if x > 1 then return 1 end
+    return rt.gaussian_bandpass(x / 2, peak)
+end
+
+rt.gaussian_lowpass = function(x, peak)
+    peak = which(peak, 1)
+    if x < 0 then return 1 end
+    return rt.gaussian_bandpass(x / 2 + 1, peak)
 end
 
 --- @brief calculate skewed gaussian distribution probability

@@ -27,7 +27,7 @@ function rt.SoundAtlasEntry:load()
 end
 
 --- @class rt.SoundAtlas
-rt.SoundAtlas = meta.new_type("SoundAtlas", function()  
+rt.SoundAtlas = meta.new_type("SoundAtlas", function()
     return meta.new(rt.SoundAtlas, {
         _folder = "",
         _data = {}, -- Table<ID, rt.SoundAtlasEntry>
@@ -38,7 +38,7 @@ end)
 function rt.SoundAtlas:initialize(folder)
     self._folder = folder
     self._data = {}
-    
+
     local seen = {}
     local function parse(prefix)
         local names = love.filesystem.getDirectoryItems(prefix)
@@ -89,3 +89,7 @@ function rt.SoundAtlas:stop(id)
     local sound = self:_get(id)
     sound.source:stop()
 end
+
+-- initialize global singleton
+rt.SoundAtlas = rt.SoundAtlas()
+rt.SoundAtlas:initialize("assets/sound_effects")
