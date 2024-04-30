@@ -55,6 +55,12 @@ function rt.aabb_contains(self, x, y)
     return x >= self.x and x <= (self.x + self.width) and y >= self.y and y <= (self.y + self.height)
 end
 
+--- @brief
+--- @return x, y, w, h
+function rt.aabb_unpack(self)
+    return self.x, self.y, self.width, self.height
+end
+
 --- @brief translate point along vector with angle relative to x axis
 function rt.translate_point_by_angle(point_x, point_y, distance, angle)
     return point_x + distance * math.cos(angle), point_y + distance * math.sin(angle)

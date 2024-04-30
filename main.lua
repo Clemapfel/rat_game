@@ -1,7 +1,36 @@
 require "include"
+textbox = rt.TextBox()
+rt.current_scene = textbox
+
+input_controller = rt.InputController()
+input_controller:signal_connect("pressed", function(self, which)
+    if which == rt.InputButton.A then
+        local text = ""
+        for i = 1, rt.random.number(10, 20) do
+            text = text .. rt.random.string(rt.random.number(2, 4))
+            if rt.random.toss_coin(0.5) then
+                text = text .. "\n"
+            end
+        end
+        textbox:append("<b>" .. text .. "</b>")
+    elseif which == rt.InputButton.UP then
+        local current = textbox:get_first_visible_line()
+        textbox:set_first_visible_line(current - 1)
+    elseif which == rt.InputButton.DOWN then
+        local current = textbox:get_first_visible_line()
+        textbox:set_first_visible_line(current + 1)
+    elseif which == rt.InputButton.RIGHT then
+        local current = textbox:get_n_visible_lines()
+        textbox:set_n_visible_lines(current + 1)
+    elseif which == rt.InputButton.LEFT then
+        local current = textbox:get_n_visible_lines()
+        textbox:set_n_visible_lines(current - 1)
+    end
+end)
+
+--- ###
 
 love.load = function()
-    rt.current_scene = rt.Label("iau dliusan ldia unlsaiu dnliau dnlai udsnlaiusdnali usdnlaid nalisudnalisudnlaisudnliusndliausnd liausnd liaudslna")
     rt.current_scene:realize()
     love.resize()
 end
@@ -11,8 +40,6 @@ rt.graphics.frame_duration = {
     n_frames_saved = 144,
     max = 0
 }
-
-rt.test.animation_queue()
 
 love.draw = function()
     local before = love.timer.getTime()

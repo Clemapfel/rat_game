@@ -24,7 +24,8 @@ end
 
 --- @brief realize widget
 function rt.Widget:realize()
-    rt.error("" .. meta.typeof(self) .. ":realize: abstract method called")
+    --rt.error("" .. meta.typeof(self) .. ":realize: abstract method called")
+    self._is_realized = true
 end
 
 --- @brief draw widget

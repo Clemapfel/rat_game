@@ -6,7 +6,7 @@ rt.FrameType = meta.new_enum({
 })
 
 rt.settings.frame = {
-    thickness = 4, -- px
+    thickness = 2, -- px
     corner_radius = 10
 }
 
@@ -17,6 +17,7 @@ rt.Frame = meta.new_type("Frame", rt.Widget, function(type)
         _type = type,
         _child = {},
         _stencil_mask = ternary(type == rt.FrameType.RECTANGULAR, rt.Rectangle(0, 0, 1, 1), rt.Circle(0, 0, 1)),
+        _stencil_mask_stencil_value = rt.Frame.stencil_id,
         _frame_thickness = rt.settings.frame.thickness,
         _frame = ternary(type == rt.FrameType.RECTANGULAR, rt.Rectangle(0, 0, 1, 1), rt.Circle(0, 0, 1)),
         _frame_outline = ternary(type == rt.FrameType.RECTANGULAR, rt.Rectangle(0, 0, 1, 1), rt.Circle(0, 0, 1)),
@@ -24,6 +25,8 @@ rt.Frame = meta.new_type("Frame", rt.Widget, function(type)
         _thickness = rt.settings.frame.thickness,
         _corner_radius = rt.settings.frame.corner_radius
     })
+
+    rt.Frame.stencil_id = rt.Frame.stencil_id + 1
 
     out._frame:set_is_outline(true)
     out._frame:set_line_width(out._frame_thickness)
@@ -41,14 +44,16 @@ rt.Frame = meta.new_type("Frame", rt.Widget, function(type)
         out._stencil_mask:set_corner_radius(corner_radius)
     end
     return out
-end)
+end, {
+    stencil_id = 128
+})
 
 --- @overload rt.Drawable.draw
 function rt.Frame:draw()
     if not self:get_is_visible() then return end
 
     if meta.is_widget(self._child) then
-        local stencil_value = 255 -- draw child with corners masked away
+        local stencil_value = meta.hash(self._stencil_mask) -- draw child with corners masked away
         rt.graphics.stencil(stencil_value, self._stencil_mask)
         rt.graphics.set_stencil_test(rt.StencilCompareMode.EQUAL, stencil_value)
         self._child:draw()
@@ -107,12 +112,7 @@ end
 --- @param child rt.Widget
 function rt.Frame:set_child(child)
     meta.assert_widget(child)
-    if not meta.is_nil(self._child) and meta.is_widget(self._child) then
-        self._child:set_parent(nil)
-    end
-
     self._child = child
-    child:set_parent(self)
 
     if self:get_is_realized() then
         self._child:realize()
@@ -188,7 +188,6 @@ function rt.Frame:measure()
         local w, h = self._child:measure()
         w = math.max(w, select(1, self:get_minimum_size()))
         h = math.max(h, select(2, self:get_minimum_size()))
-
         return w + self._thickness * 2, h + self._thickness * 2
     else
         return rt.Widget.measure(self)

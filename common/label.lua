@@ -33,7 +33,8 @@ rt.Label = meta.new_type("Label", rt.Widget, function(text, font, monospace_font
         _default_height = 0,
         _current_width = 0,
         _current_height = 0,
-        _n_visible_characters = -1
+        _n_visible_characters = -1,
+        _n_rows = 0
     })
     return out
 end)
@@ -54,6 +55,15 @@ function rt.Label:draw()
     for _, glyph in pairs(self._glyphs) do
         if meta.isa(glyph, rt.Glyph) then
             glyph:draw(self._opacity)
+        end
+    end
+end
+
+--- @overload rt.Animation.update
+function rt.Label:update(delta)
+    for _, glyph in pairs(self._glyphs) do
+        if meta.isa(glyph, rt.Glyph) then
+            glyph:update(delta)
         end
     end
 end
@@ -172,6 +182,7 @@ function rt.Label:size_allocate(x, y, width, height)
 
     self._current_width = max_x - min_x
     self._current_height = max_y - min_y
+    self._n_rows = #rows
 end
 
 --- @overload rt.Widget.measure
@@ -689,6 +700,16 @@ end
 --- @brief
 function rt.Label:get_n_characters()
     return self._n_characters
+end
+
+--- @brief
+function rt.Label:get_n_lines()
+    return self._n_rows
+end
+
+--- @brief
+function rt.Label:get_line_height()
+    return self._font:get_bold_italic():getHeight()
 end
 
 --- @brief [internal]

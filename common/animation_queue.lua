@@ -34,7 +34,7 @@ end
 
 --- @overload
 function rt.QueueableAnimation:draw()
-    rt.error("In rt.QueueableAnimation.draw: abstract method called")
+    -- noop
 end
 
 --- @brief

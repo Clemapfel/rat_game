@@ -99,6 +99,9 @@ require "common.label"
 require "common.sprite"
 require "common.frame"
 require "common.spacer"
+require "common.direction_indicator"
+require "common.scrollbar"
+require "common.textbox"
 
 require "common.scene"
 

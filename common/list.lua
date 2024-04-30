@@ -15,7 +15,7 @@ rt.List = meta.new_type("List", function()
             local value = state.node.value
 
             if state.node == state.node.next then
-                rt.error("In ListView:__pairs: nfinite loop detected")
+                rt.error("In ListView:__pairs: infinite loop detected")
             end
             state.node = state.node.next
             return state, value
