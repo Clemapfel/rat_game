@@ -157,3 +157,13 @@ end
 function rt.DirectionIndicator:get_color()
     return self._color
 end
+
+--- @brief
+function rt.DirectionIndicator:set_opacity(alpha)
+    self._opacity = alpha
+    self._ring:set_opacity(alpha)
+    self._ring_outline_outer:set_opacity(alpha)
+    self._ring_outline_inner:set_opacity(alpha)
+    self._arrow:set_opacity(alpha)
+    self._arrow_outline:set_opacity(alpha)
+end

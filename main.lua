@@ -1,30 +1,33 @@
 require "include"
 textbox = rt.TextBox()
+textbox:update(123)
 rt.current_scene = textbox
+
+local i = 0
 
 input_controller = rt.InputController()
 input_controller:signal_connect("pressed", function(self, which)
     if which == rt.InputButton.A then
-        local text = ""
+        local text = string.rep(tostring(i) .. " ", 50)
+        --[[
         for i = 1, rt.random.number(10, 20) do
             text = text .. rt.random.string(rt.random.number(2, 4))
             if rt.random.toss_coin(0.5) then
-                text = text .. "\n"
+                text = text .. " "
             end
         end
-        textbox:append("<b>" .. text .. "</b>")
+        if i % 2 == 0 then
+            textbox:append("<b>" .. text .. "</b>")
+        else
+            textbox:append("<mono>" .. text .. "</mono>")
+        end
+        ]]--
+        textbox:append(text)
+        i = i + 1
     elseif which == rt.InputButton.UP then
-        local current = textbox:get_first_visible_line()
-        textbox:set_first_visible_line(current - 1)
+        textbox._first_visible_line = textbox._first_visible_line + 1
     elseif which == rt.InputButton.DOWN then
-        local current = textbox:get_first_visible_line()
-        textbox:set_first_visible_line(current + 1)
-    elseif which == rt.InputButton.RIGHT then
-        local current = textbox:get_n_visible_lines()
-        textbox:set_n_visible_lines(current + 1)
-    elseif which == rt.InputButton.LEFT then
-        local current = textbox:get_n_visible_lines()
-        textbox:set_n_visible_lines(current - 1)
+        textbox._first_visible_line = textbox._first_visible_line - 1
     end
 end)
 
@@ -63,6 +66,8 @@ love.update = function(delta)
     if rt.current_scene ~= nil and rt.current_scene.update ~= nil then
         rt.current_scene:update(delta)
     end
+
+    rt.TextBox.update(textbox, delta)
 end
 
 love.resize = function()

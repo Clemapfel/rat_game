@@ -6,6 +6,11 @@ function rt.graphics.translate(x, y)
 end
 
 --- @brief
+function rt.graphics.origin()
+    love.graphics.origin()
+end
+
+--- @brief
 function rt.graphics.rotate(angle)
     love.graphics.rotate(angle)
 end
