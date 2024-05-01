@@ -1,3 +1,7 @@
+rt.settings.scrollbar = {
+    corner_radius = 2
+}
+
 --- @class
 rt.Scrollbar = meta.new_type("Scrollbar", rt.Widget, function()
     return meta.new(rt.Scrollbar, {
@@ -22,6 +26,10 @@ function rt.Scrollbar:realize()
     self._cursor:set_color(rt.Palette.FOREGROUND)
     self._cursor_outline:set_color(rt.Palette.FOREGROUND_OUTLINE)
     self._cursor_outline:set_is_outline(true)
+
+    for shape in range(self._base, self._base_outline, self._cursor, self._cursor_outline) do
+        shape:set_corner_radius(rt.settings.scrollbar.corner_radius)
+    end
     self._is_realized = true
 end
 
@@ -61,8 +69,8 @@ function rt.Scrollbar:draw()
     if self:get_is_visible() then
         self._base:draw()
         self._base_outline:draw()
-        self._cursor:draw()
         self._cursor_outline:draw()
+        self._cursor:draw()
     end
 end
 

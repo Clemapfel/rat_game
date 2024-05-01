@@ -27,7 +27,7 @@ rt.TextBox = meta.new_type("TextBox", rt.Widget, rt.Animation, function()
         _n_lines = 0,
         _line_i_to_label_i = {}, -- Table<Unsigned, <Unsigned, Offset>>
 
-        _alignment = rt.TextBoxAlignment.TOP,
+        _alignment = rt.TextBoxAlignment.BOTTOM,
 
         _continue_indicator_visible = true,
         _continue_indicator = rt.DirectionIndicator(rt.Direction.DOWN),
@@ -42,6 +42,7 @@ rt.TextBox = meta.new_type("TextBox", rt.Widget, rt.Animation, function()
         _backdrop_target_height = 100,
 
         _scrolling_labels = {}, -- Stack<{label, elapsed}>
+        _n_scrolling_labels = 0,
     })
 end)
 
@@ -72,10 +73,17 @@ function rt.TextBox:realize()
     self:set_is_animated(true)
 end
 
+--- @brief [internal]
 function rt.TextBox:_backdrop_height_from_n_lines(n_lines)
     local frame_size = self._backdrop:get_thickness()
     local m = rt.settings.margin_unit
     return n_lines * self._line_height + 2 * frame_size + 2 * m
+end
+
+--- @brief [internal]
+function rt.TextBox:_calculate_n_visible_lines()
+    if self._first_visible_line > self._n_lines then return 0 end
+    return math.min(math.min(self._first_visible_line + self._max_n_visible_lines - 1, self._n_lines) - self._first_visible_line + 1, self._n_lines)
 end
 
 --- @brief
@@ -93,16 +101,11 @@ function rt.TextBox:size_allocate(x, y, width, height)
         x + frame_size + m,
         y + frame_size + m,
         width - 2 * frame_size - 2 * m,
-        self._max_n_visible_lines * self._line_height
+        math.min(self._max_n_visible_lines, rt.graphics.get_height()) * self._line_height
     )
 
-    if self._backdrop_should_resize == false then
-        self._backdrop:fit_into(x, y, width, self:_backdrop_height_from_n_lines(self._max_n_visible_lines))
-    else
-        self._backdrop:fit_into(x, y, width, self._backdrop_current_height)
-    end
-
-    self._backdrop_target_height = self._max_n_visible_lines * self._line_height + 2 * frame_size + 2 * m
+    self._backdrop:fit_into(x, y, width, self._backdrop_current_height)
+    self._backdrop_target_height = self:_calculate_n_visible_lines() * self._line_height + 2 * frame_size + 2 * m
 
     if width ~= self._labels_aabb.width then
         -- reformat everything
@@ -134,6 +137,10 @@ end
 function rt.TextBox:update(delta)
     if not self._is_realized then return end
 
+    local frame_size = self._backdrop:get_thickness()
+    local m = rt.settings.margin_unit
+    self._backdrop_target_height = self:_calculate_n_visible_lines() * self._line_height + 2 * frame_size + 2 * m
+
     -- text scrolling
     local step = 1 / rt.settings.textbox.scroll_speed
     do
@@ -144,6 +151,7 @@ function rt.TextBox:update(delta)
             node.label:set_n_visible_characters(n_letters)
             if n_letters >= node.label:get_n_characters() then
                 table.remove(self._scrolling_labels, 1)
+                self._n_scrolling_labels = self._n_scrolling_labels - 1
             end
         end
     end
@@ -185,6 +193,18 @@ function rt.TextBox:update(delta)
         if should_reformat then
             local x, y, width = rt.aabb_unpack(self._bounds)
             self._backdrop:fit_into(x, y, width, self._backdrop_current_height)
+
+            local scrollbar_margin = 0
+            local scrollbar_width = 10
+            local scrollbar_height = self._backdrop_current_height
+            local height = self:_calculate_n_visible_lines() * self._line_height
+
+            self._scrollbar:fit_into(
+                x + width - frame_size - m - scrollbar_width,
+                self._labels_aabb.y + scrollbar_margin,
+                scrollbar_width,
+                height - 2 * scrollbar_margin
+            )
         end
     end
 end
@@ -213,18 +233,21 @@ function rt.TextBox:append(text)
     local label_i = self._n_labels
     local line_i = self._n_lines
     for i = 1, entry.n_lines do
-        self._line_i_to_label_i[self._n_lines + 1] = {
+        self._line_i_to_label_i[line_i + 1] = {
             label_i = label_i,
             offset = i - 1
         }
-        self._n_lines = self._n_lines + 1
+        line_i = line_i + 1
     end
+
+    self._n_lines = self._n_lines + entry.n_lines
 
     table.insert(self._scrolling_labels, {
         label = entry.label,
         entry = entry,
         elapsed = 0
     })
+    self._n_scrolling_labels = self._n_scrolling_labels + 1
     entry.label:set_n_visible_characters(0)
 
     if self._n_lines < self._max_n_visible_lines then
@@ -237,7 +260,22 @@ function rt.TextBox:draw()
     if self._n_labels == 0 then return end
     rt.graphics.push()
 
+    if self._alignment == rt.TextBoxAlignment.BOTTOM then
+        rt.graphics.translate(0,
+            self._bounds.height - self._backdrop_current_height
+        )
+    end
+
     self._backdrop:draw()
+
+    --[[
+    TODO: when is scrollbar visible
+    hide / show scrollbar animation
+    hide / show direction indicator
+    continue indicator
+    waiting for advance, advance, auto advance
+    auto scroll beats
+    ]]--
 
     rt.graphics.stencil(128, self._labels_stencil_mask)
     rt.graphics.set_stencil_test(rt.StencilCompareMode.EQUAL, 128)
@@ -266,7 +304,11 @@ function rt.TextBox:draw()
         n_lines_drawn = n_lines_drawn + 1
     end
 
-
     rt.graphics.set_stencil_test()
     rt.graphics.pop()
+end
+
+--- @brief get whether all text was scrolled completely
+function rt.TextBox:get_is_finished()
+    return self._n_scrolling_labels == 0
 end

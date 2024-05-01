@@ -61,6 +61,11 @@ function rt.aabb_unpack(self)
     return self.x, self.y, self.width, self.height
 end
 
+--- @brief
+function rt.aabb_equals(a, b)
+    return a.x == b.x and a.y == b.y and a.width == b.width and a.height == b.height
+end
+
 --- @brief translate point along vector with angle relative to x axis
 function rt.translate_point_by_angle(point_x, point_y, distance, angle)
     return point_x + distance * math.cos(angle), point_y + distance * math.sin(angle)

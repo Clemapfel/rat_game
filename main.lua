@@ -8,8 +8,8 @@ local i = 0
 input_controller = rt.InputController()
 input_controller:signal_connect("pressed", function(self, which)
     if which == rt.InputButton.A then
-        for _ = 1, 10 do
-            local text = string.rep(tostring(i) .. " ", 50)
+        for _ = 1, 1 do
+            local text = string.rep(tostring(i) .. " | ", 50)
             --[[
             for i = 1, rt.random.number(10, 20) do
                 text = text .. rt.random.string(rt.random.number(2, 4))
