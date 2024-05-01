@@ -1,5 +1,5 @@
 rt.settings.textbox = {
-    scroll_speed = 40, -- letters per second
+    scroll_speed = 75, -- letters per second
     backdrop_opacity = 0.8
 }
 rt.settings.textbox.backdrop_expand_speed = rt.settings.textbox.scroll_speed * 25 -- px per second
@@ -41,7 +41,7 @@ rt.TextBox = meta.new_type("TextBox", rt.Widget, rt.Animation, function()
         _backdrop_current_height = 0,
         _backdrop_target_height = 100,
 
-        _scrolling_labels = {}
+        _scrolling_labels = {}, -- Stack<{label, elapsed}>
     })
 end)
 
@@ -115,11 +115,6 @@ function rt.TextBox:size_allocate(x, y, width, height)
             entry.height = select(2, entry.label:measure())
             entry.line_height = entry.label:get_line_height()
             entry.n_lines = entry.label:get_n_lines()
-            entry.line_i_to_y = {}
-            for i = 1, entry.n_lines do
-                entry.line_i_to_y[i] = current_offset
-                current_offset = current_offset + entry.line_height
-            end
 
             for i = 1, entry.n_lines do
                 self._line_i_to_label_i[line_i] = {
@@ -141,21 +136,16 @@ function rt.TextBox:update(delta)
 
     -- text scrolling
     local step = 1 / rt.settings.textbox.scroll_speed
-    local to_remove = {}
-    for label, elapsed in pairs(self._scrolling_labels) do
-        local new_elapsed = elapsed + delta
-        local n_letters = math.floor(new_elapsed / step)
-        label:set_n_visible_characters(n_letters)
-        if n_letters > label:get_n_characters() then
-            table.insert(to_remove, label)
-        else
-            self._scrolling_labels[label] = new_elapsed
+    do
+        local node = table.first(self._scrolling_labels)
+        if node ~= nil and node.entry.seen == true then
+            node.elapsed = node.elapsed + delta
+            local n_letters = math.floor(node.elapsed / step)
+            node.label:set_n_visible_characters(n_letters)
+            if n_letters >= node.label:get_n_characters() then
+                table.remove(self._scrolling_labels, 1)
+            end
         end
-        self._scrolling_labels[label] = new_elapsed
-    end
-
-    for label in values(to_remove) do
-        self._scrolling_labels[label] = nil
     end
 
     -- text animation, only update visible labels
@@ -204,10 +194,10 @@ function rt.TextBox:append(text)
     local entry = {
         raw = text,
         label = rt.Label(text),
-        height = -1,
-        n_lines = -1,
-        line_height = -1,
-        line_i_to_y = {}
+        height = -1,             -- total heigh
+        n_lines = -1,            -- number of rows
+        line_height = -1,        -- height of one line
+        seen = false,            -- has been rendered at least once
     }
 
     entry.text = text
@@ -216,11 +206,6 @@ function rt.TextBox:append(text)
     entry.height = select(2, entry.label:measure())
     entry.line_height = entry.label:get_line_height()
     entry.n_lines = entry.label:get_n_lines()
-    entry.line_i_to_y = {}
-    for i = 1, entry.n_lines do
-        entry.line_i_to_y[i] = self._total_height
-        self._total_height = self._total_height + entry.line_height
-    end
 
     table.insert(self._labels, entry)
     self._n_labels = self._n_labels + 1
@@ -235,8 +220,16 @@ function rt.TextBox:append(text)
         self._n_lines = self._n_lines + 1
     end
 
-    self._scrolling_labels[entry.label] = 0
+    table.insert(self._scrolling_labels, {
+        label = entry.label,
+        entry = entry,
+        elapsed = 0
+    })
     entry.label:set_n_visible_characters(0)
+
+    if self._n_lines < self._max_n_visible_lines then
+        entry.seen = true
+    end
 end
 
 --- @brief
@@ -263,12 +256,14 @@ function rt.TextBox:draw()
         if already_drawn[label_i_entry.label_i] ~= true then
             rt.graphics.translate(0, -1 * label_i_entry.offset * label_entry.line_height)
             label_entry.label:draw()
+            label_entry.seen = true
             rt.graphics.translate(0,  1 * label_i_entry.offset * label_entry.line_height)
             already_drawn[label_i_entry.label_i] = true
         end
 
         rt.graphics.translate(0, label_entry.line_height)
         line_i = line_i + 1
+        n_lines_drawn = n_lines_drawn + 1
     end
 
 
