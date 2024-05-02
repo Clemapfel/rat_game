@@ -676,6 +676,11 @@ function string.len(str)
 end
 
 --- @brief
+function string.at(str, i)
+    return string.sub(str, i, i)
+end
+
+--- @brief
 function exit(status)
     if status == nil then status = 0 end
     love.event.push("quit", status)

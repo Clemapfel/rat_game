@@ -80,7 +80,10 @@ function rt.Widget:fit_into(aabb, y, w, h)
 
     if rt.aabb_equals(self._bounds, aabb) then return end
 
-    self._bounds = aabb
+    self._bounds = rt.AABB(
+        math.round(aabb.x), math.round(aabb.y),
+        math.round(aabb.width), math.round(aabb.height)
+    )
     self:reformat()
 end
 

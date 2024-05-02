@@ -1,6 +1,6 @@
 rt.settings.textbox = {
     scroll_speed = 75, -- letters per second
-    backdrop_opacity = 0.8
+    backdrop_opacity = 0.8,
 }
 rt.settings.textbox.backdrop_expand_speed = rt.settings.textbox.scroll_speed * 25 -- px per second
 
@@ -86,6 +86,54 @@ function rt.TextBox:_calculate_n_visible_lines()
     return math.min(math.min(self._first_visible_line + self._max_n_visible_lines - 1, self._n_lines) - self._first_visible_line + 1, self._n_lines)
 end
 
+--- @brief [internal]
+function rt.TextBox:_get_indicator_radius()
+    return self._line_height * 0.5
+end
+
+--- @brief [internal]
+function rt.TextBox:_reformat_indicators()
+    local frame_size = self._backdrop:get_thickness()
+    local m = rt.settings.margin_unit
+    local x, y, width = rt.aabb_unpack(self._bounds)
+    self._backdrop:fit_into(x, y, width, self._backdrop_current_height)
+
+    local scrollbar_margin = 5
+    local scrollbar_height = self._backdrop_current_height
+    local height = self:_calculate_n_visible_lines() * self._line_height
+    local indicator_radius = self:_get_indicator_radius()
+    local scrollbar_width = indicator_radius
+
+    self._scrollbar:fit_into(
+        x + width - frame_size - m - 0.5 * indicator_radius - 0.5 * scrollbar_width,
+        self._labels_aabb.y + indicator_radius + scrollbar_margin,
+        scrollbar_width, height - 2 * indicator_radius - 2 * scrollbar_margin
+    )
+
+    self._scroll_up_indicator:fit_into(
+        x + width - frame_size - m - indicator_radius,
+        self._labels_aabb.y,
+        indicator_radius, indicator_radius
+    )
+
+    self._scroll_down_indicator:fit_into(
+        x + width - frame_size - m - indicator_radius,
+        self._labels_aabb.y + height - indicator_radius,
+        indicator_radius, indicator_radius
+    )
+
+    self:_update_indicators()
+end
+
+--- @brief [internal]
+function rt.TextBox:_update_indicators()
+    local off_opacity = 0.1
+    self._scroll_up_indicator:set_opacity(ternary(self:_can_scroll_up(), 1, off_opacity))
+    self._scroll_down_indicator:set_opacity(ternary(self:_can_scroll_down(), 1, off_opacity))
+    self._scrollbar:set_page_index(self._first_visible_line, self._n_lines - self:_calculate_n_visible_lines() + 1)
+    self._scrollbar:set_is_visible(self:_calculate_n_visible_lines() < self._n_lines)
+end
+
 --- @brief
 function rt.TextBox:size_allocate(x, y, width, height)
     local frame_size = self._backdrop:get_thickness()
@@ -93,7 +141,7 @@ function rt.TextBox:size_allocate(x, y, width, height)
     self._labels_aabb = rt.AABB(
         x + frame_size + m,
         y + frame_size + m,
-        width - 2 * frame_size - 2 * m,
+        width - 2 * frame_size - 2 * m - self:_get_indicator_radius(),
         height - 2 * frame_size - 2 * m
     )
 
@@ -131,6 +179,8 @@ function rt.TextBox:size_allocate(x, y, width, height)
             label_i = label_i + 1
         end
     end
+
+    self:_reformat_indicators()
 end
 
 --- @brief
@@ -142,14 +192,12 @@ function rt.TextBox:update(delta)
     self._backdrop_target_height = self:_calculate_n_visible_lines() * self._line_height + 2 * frame_size + 2 * m
 
     -- text scrolling
-    local step = 1 / rt.settings.textbox.scroll_speed
     do
         local node = table.first(self._scrolling_labels)
         if node ~= nil and node.entry.seen == true then
             node.elapsed = node.elapsed + delta
-            local n_letters = math.floor(node.elapsed / step)
-            node.label:set_n_visible_characters(n_letters)
-            if n_letters >= node.label:get_n_characters() then
+            local is_done = node.label:update_n_visible_characters_from_elapsed(node.elapsed, 10) --rt.settings.textbox.scroll_speed)
+            if is_done then
                 table.remove(self._scrolling_labels, 1)
                 self._n_scrolling_labels = self._n_scrolling_labels - 1
             end
@@ -199,12 +247,7 @@ function rt.TextBox:update(delta)
             local scrollbar_height = self._backdrop_current_height
             local height = self:_calculate_n_visible_lines() * self._line_height
 
-            self._scrollbar:fit_into(
-                x + width - frame_size - m - scrollbar_width,
-                self._labels_aabb.y + scrollbar_margin,
-                scrollbar_width,
-                height - 2 * scrollbar_margin
-            )
+            self:_reformat_indicators()
         end
     end
 end
@@ -253,6 +296,8 @@ function rt.TextBox:append(text)
     if self._n_lines < self._max_n_visible_lines then
         entry.seen = true
     end
+
+    self:_update_indicators()
 end
 
 --- @brief
@@ -267,6 +312,10 @@ function rt.TextBox:draw()
     end
 
     self._backdrop:draw()
+
+    self._scrollbar:draw()
+    self._scroll_up_indicator:draw()
+    self._scroll_down_indicator:draw()
 
     --[[
     TODO: when is scrollbar visible
@@ -311,4 +360,28 @@ end
 --- @brief get whether all text was scrolled completely
 function rt.TextBox:get_is_finished()
     return self._n_scrolling_labels == 0
+end
+
+function rt.TextBox:_can_scroll_up()
+    return self._first_visible_line > 1
+end
+
+function rt.TextBox:_can_scroll_down()
+    return not (self._first_visible_line + self:_calculate_n_visible_lines() > self._n_lines)
+end
+
+--- @brief
+function rt.TextBox:scroll_up()
+    if self:_can_scroll_up() then
+        self._first_visible_line = self._first_visible_line - 1
+        self:_update_indicators()
+    end
+end
+
+--- @brief
+function rt.TextBox:scroll_down()
+    if self:_can_scroll_down() then
+        self._first_visible_line = self._first_visible_line + 1
+        self:_update_indicators()
+    end
 end

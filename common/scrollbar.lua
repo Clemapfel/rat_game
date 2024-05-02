@@ -43,13 +43,19 @@ function rt.Scrollbar:set_n_pages(value)
 end
 
 --- @brief
-function rt.Scrollbar:set_page_index(value)
-    if self._page_index == value then return end
+function rt.Scrollbar:set_page_index(value, n_pages_maybe)
+
+    local i_before, n_before = self._page_index, self._n_pages
+
     self._page_index = value
-    if self._is_realized then
+    if n_pages_maybe ~= nil then
+        self._n_pages = n_pages_maybe
+    end
+
+    if self._is_realized and i_before ~= self._page_index or n_before ~= self._n_pages then
         self:reformat()
     end
-end 
+end
 
 --- @brief
 function rt.Scrollbar:size_allocate(x, y, w, h)

@@ -9,27 +9,13 @@ input_controller = rt.InputController()
 input_controller:signal_connect("pressed", function(self, which)
     if which == rt.InputButton.A then
         for _ = 1, 1 do
-            local text = string.rep(tostring(i) .. " | ", 50)
-            --[[
-            for i = 1, rt.random.number(10, 20) do
-                text = text .. rt.random.string(rt.random.number(2, 4))
-                if rt.random.toss_coin(0.5) then
-                    text = text .. " "
-                end
-            end
-            if i % 2 == 0 then
-                textbox:append("<b>" .. text .. "</b>")
-            else
-                textbox:append("<mono>" .. text .. "</mono>")
-            end
-            ]]--
-            textbox:append(text)
+            textbox:append("this is.. a test? test")
             i = i + 1
         end
     elseif which == rt.InputButton.UP then
-        textbox._first_visible_line = textbox._first_visible_line + 1
+        textbox:scroll_up()
     elseif which == rt.InputButton.DOWN then
-        textbox._first_visible_line = textbox._first_visible_line - 1
+        textbox:scroll_down()
     end
 end)
 
