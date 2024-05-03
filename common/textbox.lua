@@ -1,7 +1,7 @@
 rt.settings.textbox = {
-    scroll_speed = 75, -- letters per second
+    scroll_speed = 50, -- letters per second
     backdrop_opacity = 0.8,
-    inactive_indicator_opacity = 0.25,
+    inactive_indicator_opacity = 0.25
 }
 rt.settings.textbox.backdrop_expand_speed = rt.settings.textbox.scroll_speed * 25 -- px per second
 
@@ -11,8 +11,9 @@ rt.TextBoxAlignment = meta.new_enum({
 })
 
 --- @class rt.TextBox
-rt.TextBox = meta.new_type("TextBox", rt.Widget, rt.Animation, function()
-    return meta.new(rt.TextBox, {
+--- @signal scrolling_done (TextBox) -> nil
+rt.TextBox = meta.new_type("TextBox", rt.Widget, rt.Animation, rt.SignalEmitter, function()
+    local out = meta.new(rt.TextBox, {
         _backdrop = {}, -- rt.Frame
         _backdrop_backing = {}, -- rt.Spacer
 
@@ -28,9 +29,10 @@ rt.TextBox = meta.new_type("TextBox", rt.Widget, rt.Animation, function()
         _n_lines = 0,
         _line_i_to_label_i = {}, -- Table<Unsigned, <Unsigned, Offset>>
 
-        _alignment = rt.TextBoxAlignment.BOTTOM,
-
+        _alignment = rt.TextBoxAlignment.TOP,
         _scrollbar_visible = true,
+        _is_closed = false,
+
         _scrollbar = rt.Scrollbar(),
         _scroll_up_indicator = rt.DirectionIndicator(rt.Direction.UP),
         _scroll_down_indicator = rt.DirectionIndicator(rt.Direction.DOWN),
@@ -43,6 +45,8 @@ rt.TextBox = meta.new_type("TextBox", rt.Widget, rt.Animation, function()
         _scrolling_labels = {}, -- Stack<{label, elapsed}>
         _n_scrolling_labels = 0,
     })
+    out:signal_add("scrolling_done")
+    return out
 end)
 
 --- @brief
@@ -173,6 +177,7 @@ function rt.TextBox:size_allocate(x, y, width, height)
 
     self._backdrop:fit_into(x, y, width, self._backdrop_current_height)
     self._backdrop_target_height = self:_calculate_n_visible_lines() * self._line_height + 2 * frame_size + 2 * m
+    if self._is_closed then self._backdrop_target_height = 0 end
 
     if width ~= self._labels_aabb.width then
         -- reformat everything
@@ -209,17 +214,19 @@ function rt.TextBox:update(delta)
     local frame_size = self._backdrop:get_thickness()
     local m = rt.settings.margin_unit
     self._backdrop_target_height = self:_calculate_n_visible_lines() * self._line_height + 2 * frame_size + 2 * m
+    if self._is_closed then self._backdrop_target_height = 0 end
 
     -- text scrolling
     do
         local node = table.first(self._scrolling_labels)
         if node ~= nil and node.entry.seen == true then
             node.elapsed = node.elapsed + delta
-            local is_done = node.label:update_n_visible_characters_from_elapsed(node.elapsed, 10) --rt.settings.textbox.scroll_speed)
+            local is_done = node.label:update_n_visible_characters_from_elapsed(node.elapsed, rt.settings.textbox.scroll_speed)
             if is_done then
                 table.remove(self._scrolling_labels, 1)
                 self._n_scrolling_labels = self._n_scrolling_labels - 1
                 self:_update_advance_indicator()
+                if self._n_scrolling_labels == 0 then self:_emit_scrolling_done() end
             end
         end
     end
@@ -273,7 +280,8 @@ function rt.TextBox:update(delta)
 end
 
 --- @brief
-function rt.TextBox:append(text)
+--- @param jump_to Boolean if true, fully scroll down so new line is visible
+function rt.TextBox:append(text, jump_to)
     local entry = {
         raw = text,
         label = rt.Label(text),
@@ -317,12 +325,18 @@ function rt.TextBox:append(text)
         entry.seen = true
     end
 
+    if jump_to then
+        self:advance()
+    end
+
     self:_update_indicators()
 end
 
 --- @brief
 function rt.TextBox:draw()
     if self._n_labels == 0 then return end
+    if self._backdrop_current_height < 0.5 * self._line_height then return end -- prevent artifacting when frame is very thin
+
     rt.graphics.push()
 
     if self._alignment == rt.TextBoxAlignment.BOTTOM then
@@ -333,19 +347,17 @@ function rt.TextBox:draw()
 
     self._backdrop:draw()
 
-    self._scrollbar:draw()
-    self._scroll_up_indicator:draw()
-    self._scroll_down_indicator:draw()
-    self._advance_indicator:draw()
+    if self._is_closed then
+        rt.graphics.pop()
+        return
+    end
 
-    --[[
-    TODO: when is scrollbar visible
-    hide / show scrollbar animation
-    hide / show direction indicator
-    continue indicator
-    waiting for advance, advance, auto advance
-    auto scroll beats
-    ]]--
+    if self._scrollbar_visible then
+        self._scrollbar:draw()
+        self._scroll_up_indicator:draw()
+        self._scroll_down_indicator:draw()
+    end
+    self._advance_indicator:draw()
 
     rt.graphics.stencil(128, self._labels_stencil_mask)
     rt.graphics.set_stencil_test(rt.StencilCompareMode.EQUAL, 128)
@@ -378,16 +390,13 @@ function rt.TextBox:draw()
     rt.graphics.pop()
 end
 
---- @brief get whether all text was scrolled completely
-function rt.TextBox:get_is_finished()
-    return self._n_scrolling_labels == 0
-end
-
 function rt.TextBox:_can_scroll_up()
+    if self._scrollbar_visible ~= true then return false end
     return self._first_visible_line > 1
 end
 
 function rt.TextBox:_can_scroll_down()
+    if self._scrollbar_visible ~= true then return false end
     return not (self._first_visible_line + self:_calculate_n_visible_lines() > self._n_lines)
 end
 
@@ -407,13 +416,64 @@ function rt.TextBox:scroll_down()
     end
 end
 
---- @brief
+--- @brief finish all text scrolling, skip to the newest line
 function rt.TextBox:advance()
     local current = self._scrolling_labels[1]
-    if current ~= nil then
+    while current ~= nil do
         current.label:set_n_visible_characters(POSITIVE_INFINITY)
         table.remove(self._scrolling_labels, 1)
         self._n_scrolling_labels = self._n_scrolling_labels - 1
-        self:_update_advance_indicator()
+        current = self._scrolling_labels[1]
     end
+    self:_emit_scrolling_done()
+    
+    -- scroll down as far as possible
+    while not (self._first_visible_line + self:_calculate_n_visible_lines() > self._n_lines) do
+    self._first_visible_line = self._first_visible_line + 1
+    end
+    self:_update_indicators()
+end
+
+--- @brief
+function rt.TextBox:is_scrolling_done()
+    return #self._n_scrolling_labels == 0
+end
+
+--- @brief
+function rt.TextBox:set_n_visible_lines(n)
+    self._max_n_visible_lines = n
+    self:reformat()
+end
+
+--- @brief hide scrollbar and scoll indicators, but not advance indicator
+function rt.TextBox:set_scrollbar_visible(b)
+    if b ~= self._scrollbar_visible then
+        self._scrollbar_visible = b
+    end
+end
+
+--- @brief
+function rt.TextBox:get_scrollbar_visible()
+    return self._scrollbar_visible
+end
+
+--- @brief
+function rt.TextBox:_emit_scrolling_done()
+    self:signal_emit("scrolling_done")
+end
+
+--- @brief
+function rt.TextBox:get_is_scrolling_done()
+    return self._is_closed or self._n_scrolling_labels == 0
+end
+
+--- @brief start animation of hiding entire box
+function rt.TextBox:set_is_closed(b)
+    self._is_closed = b
+    self:reformat()
+end
+
+--- @brief
+function rt.TextBox:get_is_closed()
+    return self._is_closed
 end

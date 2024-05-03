@@ -1,6 +1,9 @@
 require "include"
 textbox = rt.TextBox()
 textbox:update(123)
+textbox:signal_connect("scrolling_done", function(self)
+    println(meta.typeof(self))
+end)
 rt.current_scene = textbox
 
 local i = 0
@@ -9,11 +12,19 @@ input_controller = rt.InputController()
 input_controller:signal_connect("pressed", function(self, which)
     if which == rt.InputButton.A then
         for _ = 1, 1 do
-            textbox:append("t||hi||\\||s is.. a test? test")
+            textbox:append(rt.random.string(32))
             i = i + 1
         end
     elseif which == rt.InputButton.B then
         textbox:advance()
+    elseif which == rt.InputButton.X then
+        textbox:set_n_visible_lines(10)
+    elseif which == rt.InputButton.Y then
+        textbox:set_n_visible_lines(4)
+    elseif which == rt.InputButton.L then
+        textbox:set_scrollbar_visible(not textbox:set_scrollbar_visible())
+    elseif which == rt.InputButton.R then
+        textbox:set_is_closed(not textbox:get_is_closed())
     elseif which == rt.InputButton.UP then
         textbox:scroll_up()
     elseif which == rt.InputButton.DOWN then
