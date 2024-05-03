@@ -644,7 +644,7 @@ end
 --- @brief set number of visible characters, does not respect beats
 --- @param n Number
 function rt.Label:set_n_visible_characters(n)
-    local n_left =  clamp(n, 0, self._n_characters)
+    local n_left = clamp(n, 0, self._n_characters)
     local n_glyphs = sizeof(self._glyphs)
     local glyph_i = 1
     local n_visible = 0
@@ -681,6 +681,7 @@ function rt.Label:update_n_visible_characters_from_elapsed(elapsed, letters_per_
 
     local weights = rt.Label._syntax.BEAT_WEIGHTS
     local beat_character = rt.Label._syntax.BEAT
+
 
     while glyph_i <= #self._glyphs and so_far < elapsed do
         local glyph = self._glyphs[glyph_i]

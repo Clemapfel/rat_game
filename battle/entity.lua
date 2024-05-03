@@ -48,7 +48,6 @@ end, {
     speed_base = 100,
 
     priority = 0,
-    stance = bt.Stance("NEUTRAL"),
 
     status = {}, -- Table<bt.Status, {status: bt.Status, elapsed: Number}>
     moves = {}, -- Table<MoveID, {move: bt:move, n_uses: Number}>
@@ -369,11 +368,6 @@ function bt.Entity:increase_status_elapsed(status)
         entry.elapsed = entry.elapsed + 1
         return entry.elapsed >= status:get_max_duration()
     end
-end
-
---- @brief
-function bt.Entity:get_stance()
-    return self.stance
 end
 
 --- @brief

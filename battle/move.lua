@@ -21,7 +21,6 @@ bt.Move = meta.new_type("Move", function(id)
     return out
 end, {
     max_n_uses = POSITIVE_INFINITY,
-    stance_alignment = bt.StanceAlignment.NONE,
 
     can_target_multiple = false,
 
@@ -80,17 +79,6 @@ function bt.Move:realize()
 
     if self.effect == nil then
         rt.error("In bt.Move:realize: config at `" .. self._path .. "` does not implement `effect`, value is left nil")
-    end
-end
-
---- @brief
-function bt.Move:stance_matches(entity)
-    if self.stance_alignment == bt.StanceAlignment.ALL then
-        return true
-    elseif self.stance_alignment == bt.StanceAlignment.NONE then
-        return false
-    else
-        return entity:get_stance():matches_alignment(self.stance_alignment)
     end
 end
 

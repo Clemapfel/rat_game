@@ -160,14 +160,6 @@ end, {
         return nil
     end,
 
-    on_stance_changed = function(self, stance_changer, old_stance, new_stance)
-        meta.assert_global_status_interface(self)
-        meta.assert_entity_interface(stance_changer)
-        meta.assert_stance_interface(old_stance)
-        meta.assert_stance_interface(new_stance)
-        return nil
-    end,
-
     -- (GlobalStatusInterface, EntityInterface, MoveInterface, Table<EntityInterface>) -> nil
     on_move_used= function(self, move_user, move, targets)
         meta.assert_global_status_interface(self)

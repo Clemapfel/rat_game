@@ -25,7 +25,7 @@ rt.TextBox = meta.new_type("TextBox", rt.Widget, rt.Animation, rt.SignalEmitter,
         _labels_stencil_mask = rt.Rectangle(0, 0, 1, 1),
 
         _first_visible_line = 1,
-        _max_n_visible_lines = 4,
+        _max_n_visible_lines = POSITIVE_INFINITY,
         _n_lines = 0,
         _line_i_to_label_i = {}, -- Table<Unsigned, <Unsigned, Offset>>
 
@@ -44,6 +44,8 @@ rt.TextBox = meta.new_type("TextBox", rt.Widget, rt.Animation, rt.SignalEmitter,
 
         _scrolling_labels = {}, -- Stack<{label, elapsed}>
         _n_scrolling_labels = 0,
+
+        _only_show_newest_line = true
     })
     out:signal_add("scrolling_done")
     return out
@@ -281,7 +283,7 @@ end
 
 --- @brief
 --- @param jump_to Boolean if true, fully scroll down so new line is visible
-function rt.TextBox:append(text, jump_to)
+function rt.TextBox:append(text)
     local entry = {
         raw = text,
         label = rt.Label(text),
@@ -323,10 +325,6 @@ function rt.TextBox:append(text, jump_to)
 
     if self._n_lines < self._max_n_visible_lines then
         entry.seen = true
-    end
-
-    if jump_to then
-        self:advance()
     end
 
     self:_update_indicators()
@@ -429,7 +427,7 @@ function rt.TextBox:advance()
     
     -- scroll down as far as possible
     while not (self._first_visible_line + self:_calculate_n_visible_lines() > self._n_lines) do
-    self._first_visible_line = self._first_visible_line + 1
+        self._first_visible_line = self._first_visible_line + 1
     end
     self:_update_indicators()
 end
@@ -469,11 +467,20 @@ end
 
 --- @brief start animation of hiding entire box
 function rt.TextBox:set_is_closed(b)
-    self._is_closed = b
-    self:reformat()
+    if b ~= self._is_closed then
+        self._is_closed = b
+        self:reformat()
+    end
 end
 
 --- @brief
 function rt.TextBox:get_is_closed()
     return self._is_closed
+end
+
+--- @brief scroll down to hide all labels except current most
+function rt.TextBox:jump_to_newest()
+    local newest_label = self._labels[self._n_labels]
+    self:advance()
+    self._first_visible_line = self._n_lines + 1
 end

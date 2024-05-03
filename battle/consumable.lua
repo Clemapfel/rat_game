@@ -134,14 +134,6 @@ end, {
         return nil
     end,
 
-    on_stance_changed = function(self, holder, old_stance, new_stance)
-        meta.assert_consumable_interface(self)
-        meta.assert_entity_interface(holder)
-        meta.assert_stance_interface(old_stance)
-        meta.assert_stance_interface(new_stance)
-        return nil
-    end,
-
     -- (ConsumableInterface, EntityInterface, MoveInterface, Table<EntityInterface>)
     on_move_used= function(self, holding_user, move, targets)
         meta.assert_consumable_interface(self)

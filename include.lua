@@ -96,6 +96,7 @@ require "common.glyph"
 require "common.spline"
 require "common.widget"
 require "common.label"
+require "common.sprite_atlas"
 require "common.sprite"
 require "common.frame"
 require "common.spacer"
@@ -109,6 +110,32 @@ require "common.audio_playback"
 require "common.monitored_audio_playback"
 require "common.sound_atlas"
 
+-- battle
 
-require "common.sprite_atlas"
+require "battle.entity"
+require "battle.entity_interface"
+require "battle.consumable"
+require "battle.consumable_interface"
+require "battle.status"
+require "battle.status_interface"
+require "battle.global_status"
+require "battle.global_status_interface"
+require "battle.equip"
+require "battle.equip_interface"
+require "battle.move"
+require "battle.move_interface"
+
+
+
+require "battle.battle_ui"
+require "battle.scene"
+
+for folder in range("animations") do
+    for _, name in pairs(love.filesystem.getDirectoryItems("battle/" .. folder)) do
+        if name ~= "status" and name ~= "move" then
+            local path = "battle." .. folder .. "." .. string.gsub(name, "%.lua$", "")
+            require(path)
+        end
+    end
+end
 

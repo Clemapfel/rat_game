@@ -12,7 +12,7 @@ rt.QueueableAnimationState = {
 }
 
 --- @class rt.QueueableAnimation
-rt.QueueableAnimation = meta.new_abstract_type("BattleAnimation", rt.Drawable, rt.SignalEmitter, {
+rt.QueueableAnimation = meta.new_abstract_type("QueueableAnimation", rt.Drawable, rt.SignalEmitter, {
     _state = rt.QueueableAnimationState.IDLE
 })
 
@@ -42,6 +42,24 @@ function rt.QueueableAnimation:get_state()
     return self._state
 end
 
+--- @brief
+function rt.QueueableAnimation:register_finish_callback(callback)
+    meta.assert_function(callback)
+    if self._finish_callbacks == nil then
+        self._finish_callbacks = {}
+    end
+    table.insert(self._finish_callbacks, callback)
+end
+
+--- @brief
+function rt.QueueableAnimation:register_start_callback(callback)
+    meta.assert_function(callback)
+    if self._start_callbacks == nil then
+        self._start_callbacks = {}
+    end
+    table.insert(self._start_callbacks, callback)
+end
+
 --- #############
 
 --- @class
@@ -66,6 +84,11 @@ end
 --- @brief add animations to last node, without creating a new one
 function rt.AnimationQueue:append(animation, ...)
     local node = self._animations[#self._animations]
+    if node == nil then
+        self:push(animation, ...)
+        return
+    end
+
     for animation in values({animation, ...}) do
         meta.assert_isa(animation, rt.QueueableAnimation)
         table.insert(node, animation)
@@ -73,28 +96,11 @@ function rt.AnimationQueue:append(animation, ...)
 end
 
 --- @brief
-function rt.AnimationQueue:register_finish_callback(callback)
-    meta.assert_function(callback)
-    if self._finish_callbacks == nil then
-        self._finish_callbacks = {}
-    end
-    table.insert(self._finish_callbacks, callback)
-end
-
---- @brief
-function rt.AnimationQueue:register_start_callback(callback)
-    meta.assert_function(callback)
-    if self._start_callbacks == nil then
-        self._start_callbacks = {}
-    end
-    table.insert(self._start_callbacks, callback)
-end
-
---- @brief
 function rt.AnimationQueue:_start_animation(animation)
     if animation._state ~= rt.QueueableAnimationState.IDLE then return end
     animation._state = rt.QueueableAnimationState.STARTED
 
+    animation:start()
     if animation._start_callbacks ~= nil then
         for callback in values(animation._start_callbacks) do
             callback()
@@ -114,11 +120,11 @@ function rt.AnimationQueue:_finish_animation(animation)
             callback()
         end
     end
+    animation:finish()
 end
 
 --- @brief
 function rt.AnimationQueue:skip()
-    println(#self._animations)
     local node = self._animations[1]
     if node == nil then return end
     for animation in values(node) do
@@ -153,7 +159,7 @@ function rt.AnimationQueue:update(delta)
 
     local depleted = true
     for animation in values(node) do
-        if animation._state == rt.QueueableAnimationResult.IDLE then
+        if animation._state == rt.QueueableAnimationState.IDLE then
             self:_start_animation(animation)
         end
 

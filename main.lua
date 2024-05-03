@@ -1,34 +1,31 @@
 require "include"
-textbox = rt.TextBox()
-textbox:update(123)
-textbox:signal_connect("scrolling_done", function(self)
-    println(meta.typeof(self))
-end)
-rt.current_scene = textbox
 
-local i = 0
+rt.current_scene = bt.Scene()
+local scene = rt.current_scene
 
 input_controller = rt.InputController()
 input_controller:signal_connect("pressed", function(self, which)
     if which == rt.InputButton.A then
-        for _ = 1, 1 do
-            textbox:append(rt.random.string(32))
-            i = i + 1
-        end
+        --[[
+        local animation = bt.Animation.LOG_MESSAGE(scene, {}, "<b>this is a test <wave><rainbow>MESSAGE</rainbow></wave></b>")
+        local animation2 = bt.Animation.LOG_MESSAGE(scene, {}, "<b>01\n02\n03\n04\n</b>")
+        scene._ui:get_animation_queue():push(animation)
+        ]]--
+        scene._ui:get_log():set_is_closed(false)
+
+        if i == nil then i = 1 end
+        scene._ui:get_log():jump_to_newest()
+        scene._ui:get_log():append(string.rep(string.rep(tostring(i), 16) .. " ", 16))
+        i = i + 1
     elseif which == rt.InputButton.B then
-        textbox:advance()
     elseif which == rt.InputButton.X then
-        textbox:set_n_visible_lines(10)
     elseif which == rt.InputButton.Y then
-        textbox:set_n_visible_lines(4)
     elseif which == rt.InputButton.L then
-        textbox:set_scrollbar_visible(not textbox:set_scrollbar_visible())
     elseif which == rt.InputButton.R then
-        textbox:set_is_closed(not textbox:get_is_closed())
     elseif which == rt.InputButton.UP then
-        textbox:scroll_up()
+        scene._ui:get_log():scroll_up()
     elseif which == rt.InputButton.DOWN then
-        textbox:scroll_down()
+        scene._ui:get_log():scroll_down()
     end
 end)
 
@@ -67,8 +64,6 @@ love.update = function(delta)
     if rt.current_scene ~= nil and rt.current_scene.update ~= nil then
         rt.current_scene:update(delta)
     end
-
-    rt.TextBox.update(textbox, delta)
 end
 
 love.resize = function()
