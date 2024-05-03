@@ -204,8 +204,8 @@ rt.Label._syntax = {
     BEAT = "|", -- pause when text scrolling
 
     BEAT_WEIGHTS = { -- factor, takes n times longer than a regular character
-        ["|"] = 6,
-        ["."] = 6,
+        ["|"] = 20,
+        ["."] = 10,
         [","] = 4,
         ["!"] = 10,
         ["?"] = 10
@@ -301,17 +301,17 @@ function rt.Label:_parse()
         if effect_wave then table.insert(effects, rt.TextEffect.WAVE) end
 
         table.insert(self._glyphs, rt.Glyph(
-                font,
-                current_word,
-                {
-                    font_style = style,
-                    color = rt.Palette[ternary(effect_rainbow, "TRUE_WHITE", color[1])],
-                    is_underlined = underlined,
-                    is_strikethrough = strikethrough,
-                    is_outlined = outlined,
-                    outline_color = ternary(outline_color_active, rt.Palette[outline_color[1]], nil),
-                    effects = effects
-                }
+            font,
+            current_word,
+            {
+                font_style = style,
+                color = rt.Palette[ternary(effect_rainbow, "TRUE_WHITE", color[1])],
+                is_underlined = underlined,
+                is_strikethrough = strikethrough,
+                is_outlined = outlined,
+                outline_color = ternary(outline_color_active, rt.Palette[outline_color[1]], nil),
+                effects = effects
+            }
         ))
 
         self._n_characters = self._n_characters + string.len(current_word)
@@ -387,6 +387,7 @@ function rt.Label:_parse()
 
     while i <= string.len(self._raw) do
         if s == syntax.ESCAPE_CHARACTER then
+            step(1)
             current_word = current_word .. s
             step(1)
             goto continue;
@@ -641,7 +642,7 @@ function rt.Label:set_font(font)
     self:reformat();
 end
 
---- @brief set number of visible characters, used for text scrolling
+--- @brief set number of visible characters, does not respect beats
 --- @param n Number
 function rt.Label:set_n_visible_characters(n)
     local n_left =  clamp(n, 0, self._n_characters)
@@ -651,7 +652,6 @@ function rt.Label:set_n_visible_characters(n)
 
     while glyph_i <= n_glyphs do
         local glyph = self._glyphs[glyph_i]
-
         if meta.isa(glyph, rt.Glyph) then
             local n_chars = glyph:get_n_characters()
             if n_left >= n_chars then
@@ -670,39 +670,50 @@ function rt.Label:set_n_visible_characters(n)
     self._n_visible_characters = n_visible
 end
 
-once = true
-
---- @brief
+--- @brief calculaten visible characters from scroll speed, respects beats and pauses on punctuation
 function rt.Label:update_n_visible_characters_from_elapsed(elapsed, letters_per_second)
     local step = 1 / letters_per_second
     local n_letters = math.floor(elapsed / step)
-
     local so_far = 0
     local glyph_i = 1
     local n_visible = 0
     local beat_weight = rt.Label._syntax.BEAT_WEIGHTS[rt.Label._syntax.BEAT]
+    local already_done_scrolling = false
+
+    local weights = rt.Label._syntax.BEAT_WEIGHTS
+    local beat_character = rt.Label._syntax.BEAT
+
     while glyph_i <= #self._glyphs and so_far < elapsed do
         local glyph = self._glyphs[glyph_i]
         if meta.isa(glyph, rt.Glyph) then
-            local text = glyph:get_content()
-            for i = 1, #text do
-                local weight = rt.Label._syntax.BEAT_WEIGHTS[string.at(text, i - 1)] -- sic, pause after pausing char is already rendered
-                if weight == nil then
-                    so_far = so_far + step
-                else
-                    so_far = so_far + weight * step
-                end
+            if already_done_scrolling then
+                glyph:set_n_visible_characters(0)
+            else
+                local text = glyph:get_content()
+                local n_seen = 1
+                for i = 1, #text do
+                    local weight = weights[string.at(text, i)]
+                    if weight == nil then
+                        so_far = so_far + step
+                    else
+                        so_far = so_far + weight * step
+                    end
 
-                if so_far > elapsed then break end
-                n_visible = n_visible + 1
+                    if so_far > elapsed then
+                        already_done_scrolling = false -- mark so all subsequent glyphs can be skipped
+                        break
+                    end
+                    n_visible = n_visible + 1
+                    n_seen = n_seen + 1
+                end
+                glyph:set_n_visible_characters(n_seen)
             end
-        elseif glyph == rt.Label._syntax.BEAT then
+        elseif glyph == weights then
             so_far = so_far + beat_weight * step
         end
         glyph_i = glyph_i + 1
     end
 
-    self:set_n_visible_characters(n_visible)
     return n_visible >= self._n_characters
 end
 

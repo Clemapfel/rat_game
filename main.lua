@@ -9,7 +9,7 @@ input_controller = rt.InputController()
 input_controller:signal_connect("pressed", function(self, which)
     if which == rt.InputButton.A then
         for _ = 1, 1 do
-            textbox:append("this is.. a test? test")
+            textbox:append("t||hi||\\||s is.. a test? test")
             i = i + 1
         end
     elseif which == rt.InputButton.UP then
