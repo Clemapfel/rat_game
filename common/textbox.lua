@@ -1,6 +1,7 @@
 rt.settings.textbox = {
     scroll_speed = 75, -- letters per second
     backdrop_opacity = 0.8,
+    inactive_indicator_opacity = 0.25,
 }
 rt.settings.textbox.backdrop_expand_speed = rt.settings.textbox.scroll_speed * 25 -- px per second
 
@@ -29,13 +30,11 @@ rt.TextBox = meta.new_type("TextBox", rt.Widget, rt.Animation, function()
 
         _alignment = rt.TextBoxAlignment.BOTTOM,
 
-        _continue_indicator_visible = true,
-        _continue_indicator = rt.DirectionIndicator(rt.Direction.DOWN),
-
         _scrollbar_visible = true,
         _scrollbar = rt.Scrollbar(),
         _scroll_up_indicator = rt.DirectionIndicator(rt.Direction.UP),
         _scroll_down_indicator = rt.DirectionIndicator(rt.Direction.DOWN),
+        _advance_indicator = rt.DirectionIndicator(rt.Direction.DOWN),
 
         _backdrop_should_resize = true,
         _backdrop_current_height = 0,
@@ -62,13 +61,22 @@ function rt.TextBox:realize()
     self._backdrop_backing:set_opacity(rt.settings.textbox.backdrop_opacity)
 
     for widget in range(
-        self._continue_indicator,
+        self._advance_indicator,
         self._scroll_up_indicator,
         self._scroll_down_indicator,
         self._scrollbar
     ) do
         widget:realize()
     end
+
+    for muted in range(
+        self._scroll_up_indicator,
+        self._scroll_down_indicator,
+        self._scrollbar
+    ) do
+        muted:set_color(rt.Palette.GRAY_3)
+    end
+    self._advance_indicator:set_color(rt.Palette.WHITE)
 
     self:set_is_animated(true)
 end
@@ -122,16 +130,27 @@ function rt.TextBox:_reformat_indicators()
         indicator_radius, indicator_radius
     )
 
+    self._advance_indicator:fit_into(
+        x + width - frame_size - m - indicator_radius,
+        self._labels_aabb.y + height - indicator_radius,
+        indicator_radius, indicator_radius
+    )
+
     self:_update_indicators()
+end
+
+function rt.TextBox:_update_advance_indicator()
+    self._advance_indicator:set_is_visible(#self._scrolling_labels > 0)
 end
 
 --- @brief [internal]
 function rt.TextBox:_update_indicators()
-    local off_opacity = 0.1
+    local off_opacity = rt.settings.textbox.inactive_indicator_opacity
     self._scroll_up_indicator:set_opacity(ternary(self:_can_scroll_up(), 1, off_opacity))
     self._scroll_down_indicator:set_opacity(ternary(self:_can_scroll_down(), 1, off_opacity))
     self._scrollbar:set_page_index(self._first_visible_line, self._n_lines - self:_calculate_n_visible_lines() + 1)
     self._scrollbar:set_is_visible(self:_calculate_n_visible_lines() < self._n_lines)
+    self:_update_advance_indicator()
 end
 
 --- @brief
@@ -200,6 +219,7 @@ function rt.TextBox:update(delta)
             if is_done then
                 table.remove(self._scrolling_labels, 1)
                 self._n_scrolling_labels = self._n_scrolling_labels - 1
+                self:_update_advance_indicator()
             end
         end
     end
@@ -316,6 +336,7 @@ function rt.TextBox:draw()
     self._scrollbar:draw()
     self._scroll_up_indicator:draw()
     self._scroll_down_indicator:draw()
+    self._advance_indicator:draw()
 
     --[[
     TODO: when is scrollbar visible
@@ -383,5 +404,16 @@ function rt.TextBox:scroll_down()
     if self:_can_scroll_down() then
         self._first_visible_line = self._first_visible_line + 1
         self:_update_indicators()
+    end
+end
+
+--- @brief
+function rt.TextBox:advance()
+    local current = self._scrolling_labels[1]
+    if current ~= nil then
+        current.label:set_n_visible_characters(POSITIVE_INFINITY)
+        table.remove(self._scrolling_labels, 1)
+        self._n_scrolling_labels = self._n_scrolling_labels - 1
+        self:_update_advance_indicator()
     end
 end

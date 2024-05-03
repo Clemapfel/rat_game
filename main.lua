@@ -12,6 +12,8 @@ input_controller:signal_connect("pressed", function(self, which)
             textbox:append("t||hi||\\||s is.. a test? test")
             i = i + 1
         end
+    elseif which == rt.InputButton.B then
+        textbox:advance()
     elseif which == rt.InputButton.UP then
         textbox:scroll_up()
     elseif which == rt.InputButton.DOWN then

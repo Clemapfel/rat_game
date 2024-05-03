@@ -88,3 +88,9 @@ function rt.Scrollbar:set_opacity(alpha)
     self._cursor:set_opacity(alpha)
     self._cursor_outline:set_opacity(alpha)
 end
+
+--- @brief
+function rt.Scrollbar:set_color(color)
+    if meta.is_hsva(color) then color = rt.hsva_to_rgba(color) end
+    self._cursor:set_color(color)
+end

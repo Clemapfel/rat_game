@@ -195,16 +195,15 @@ function rt.Label:measure()
     math.max(self._current_height, select(2, self:get_minimum_size())) + self:get_margin_top() + self:get_margin_bottom()
 end
 
--- control characters used for wrap hinting
+-- control characters
 rt.Label._syntax = {
     SPACE = " ",
     NEWLINE = "\n",
     TAB = "    ",
     ESCAPE_CHARACTER = "\\",
     BEAT = "|", -- pause when text scrolling
-
-    BEAT_WEIGHTS = { -- factor, takes n times longer than a regular character
-        ["|"] = 20,
+    BEAT_WEIGHTS = { -- factor, takes n times longer to scroll than a regular character
+        ["|"] = 10,
         ["."] = 10,
         [","] = 4,
         ["!"] = 10,
