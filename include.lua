@@ -124,8 +124,7 @@ require "battle.equip"
 require "battle.equip_interface"
 require "battle.move"
 require "battle.move_interface"
-
-
+require "battle.battle"
 
 require "battle.battle_ui"
 require "battle.scene"

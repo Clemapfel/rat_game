@@ -1,5 +1,5 @@
 rt.settings.battle.global_status = {
-    config_path = "battle/configs/global_status"
+    config_path = "battle/configs/global_statuses"
 }
 
 --- @class GlobalStatus

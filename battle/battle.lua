@@ -14,6 +14,9 @@ bt.Battle = meta.new_type("Battle", function(id)
     meta.set_is_mutable(out, false)
     return out
 end, {
+    background_id = "default",
+    music_id = "default",
+
     entities = {},
     global_status = {},
     current_move_selection = {
@@ -41,7 +44,7 @@ function bt.Battle:realize()
     end
 
     local function throw_if_not_id(key, value)
-        if not meta.string(self[id]) then
+        if not meta.is_string(value) then
             rt.error("In rt.Battle:realize: error when loading config at `" .. path .. "` for key `" .. key .. "`, expected ID, got `" .. tostring(key) .. "`")
         end
     end
@@ -59,25 +62,22 @@ function bt.Battle:realize()
         throw_if_not_id(key_id, id)
         self:add_global_status(bt.GlobalStatus(id))
     end
-    
+
     self.entities = {}
     key_id = "entities"
     if config[key_id] == nil or sizeof(config[key_id]) == 0 then
-        rt.error("In rt.Battle:realize: error when loading config at `" .. path .. "`: `entity` table is empty")
+        rt.error("In rt.Battle:realize: error when loading config at `" .. path .. "`: `entities` table is empty")
     end
 
     local i = 1
-    for id in values(config[key_id]) do
-        if meta.is_string(id) then
+    for id, entry in pairs(config[key_id]) do
+        if meta.is_string(entry) then
             self:add_entity(bt.Entity(id))
         else
-            local entry = id
-
-            if not meta.is_table(entry) and meta.is_string(entry.id) then
-                rt.error("In rt.Battle:realize: error when loading config at `" .. path .. "`: `entity` table entry at `" .. i .. "` is not a table with key `id` that is an entity id")
+            if not meta.is_string(id) or not meta.is_table(entry) then
+                rt.error("In rt.Battle:realize: error when loading config at `" .. path .. "`: `entities` table is malformatted, expected EntityID -> Table")
             end
-
-            local entity = bt.Entity(entry.id)
+            local entity = bt.Entity(id)
             for status_id in values(entry.status) do
                 entity:add_status(bt.Status(status_id))
             end
@@ -93,17 +93,20 @@ function bt.Battle:realize()
             for move_id in values(entry.moveset) do
                 entity:add_move(bt.Move(move_id))
             end
+
+            self:add_entity(entity)
         end
 
         i = i + 1
     end
 
+    self:update_entity_id_offsets()
     self._is_realized = true
 end
 
 
 --- @brief
-function bt.BattleState:list_global_statuses()
+function bt.Battle:list_global_statuses()
     local out = {}
     for entry in values(self.global_status) do
         table.insert(out, entry.status)
@@ -112,13 +115,13 @@ function bt.BattleState:list_global_statuses()
 end
 
 --- @brief
-function bt.BattleState:get_global_status(status_id)
+function bt.Battle:get_global_status(status_id)
     if self.global_status[status_id] == nil then return nil end
     return self.global_status[status_id].status
 end
 
 --- @brief
-function bt.BattleState:add_global_status(status)
+function bt.Battle:add_global_status(status)
     self.global_status[status:get_id()] = {
         elapsed = 0,
         status = status
@@ -126,16 +129,16 @@ function bt.BattleState:add_global_status(status)
 end
 
 --- @brief
-function bt.BattleState:remove_global_status(status)
+function bt.Battle:remove_global_status(status)
     local status_id = status:get_id()
     if self.global_status[status_id] == nil then
-        rt.warning("In bt.BattleState:remove_global_status: trying to remove global status `" .. status_id .. "`, but no such status is available")
+        rt.warning("In bt.Battle:remove_global_status: trying to remove global status `" .. status_id .. "`, but no such status is available")
     end
     self.global_status[status_id] = nil
 end
 
 --- @brief
-function bt.BattleState:get_global_status_n_turns_elapsed(status)
+function bt.Battle:get_global_status_n_turns_elapsed(status)
     local entry = self.global_status[status:get_id()]
     if entry ~= nil then
         return entry.elapsed
@@ -145,7 +148,7 @@ function bt.BattleState:get_global_status_n_turns_elapsed(status)
 end
 
 --- @brief
-function bt.BattleState:list_entities()
+function bt.Battle:list_entities()
     local out = {}
     for entity in values(self.entities) do
         table.insert(out, entity)
@@ -154,7 +157,7 @@ function bt.BattleState:list_entities()
 end
 
 --- @brief
-function bt.BattleState:get_entity(entity_id)
+function bt.Battle:get_entity(entity_id)
     for entity in values(self.entities) do
         if entity == entity_id then
             return entity
@@ -165,7 +168,7 @@ function bt.BattleState:get_entity(entity_id)
 end
 
 --- @brief [internal]
-function bt.BattleState:update_entity_id_offsets()
+function bt.Battle:update_entity_id_offsets()
     local boxes = {}
     for entity in values(self.entities) do
         local type = entity._config_id
@@ -185,7 +188,7 @@ function bt.BattleState:update_entity_id_offsets()
 end
 
 --- @brief
-function bt.BattleState:get_entity_multiplicity(entity)
+function bt.Battle:get_entity_multiplicity(entity)
     local type = entity._config_id
     local n = 0
     for entity in values(self.entities) do
@@ -197,13 +200,13 @@ function bt.BattleState:get_entity_multiplicity(entity)
 end
 
 --- @brief
-function bt.BattleState:add_entity(entity)
+function bt.Battle:add_entity(entity)
     table.insert(self.entities, entity)
     self:update_entity_id_offsets()
 end
 
 --- @brief
-function bt.BattleState:remove_entity(entity_id)
+function bt.Battle:remove_entity(entity_id)
     local removed = false
     for i, entity in ipairs(self.entities) do
         if entity:get_id() == entity_id then
@@ -214,7 +217,7 @@ function bt.BattleState:remove_entity(entity_id)
     end
 
     if not removed then
-        rt.warning("In bt.BattleState:remove_entity: trying to remove entity `" .. entity_id .. "` but no such entity is available")
+        rt.warning("In bt.Battle:remove_entity: trying to remove entity `" .. entity_id .. "` but no such entity is available")
     end
 end
 

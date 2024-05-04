@@ -17,13 +17,13 @@ bt.Gender = meta.new_enum({
 })
 
 --- @class bt.Entity
-bt.Entity = meta.new_type("BattleEntity", function(scene, id)
+bt.Entity = meta.new_type("BattleEntity", function(id)
+    meta.assert_string(id)
     local path = rt.settings.battle.entity.config_path .. "/" .. id .. ".lua"
     local out = meta.new(bt.Entity, {
         id = id,
         id_offset = 0,
         name = "UNINITIALIZED ENTITY @" .. path,
-        scene = scene,
         _path = path,
         _config_id = id,
         _is_realized = false,

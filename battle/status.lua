@@ -1,5 +1,5 @@
 rt.settings.battle.status = {
-    config_path = "battle/configs/status"
+    config_path = "battle/configs/statuses"
 }
 
 --- @class bt.Status

@@ -3,6 +3,11 @@ require "include"
 rt.current_scene = bt.Scene()
 scene = rt.current_scene
 
+battle = bt.Battle("DEBUG_BATTLE")
+for entity in values(battle:list_entities()) do
+    println(entity:get_name())
+end
+
 input_controller = rt.InputController()
 input_controller:signal_connect("pressed", function(self, which)
     if which == rt.InputButton.A then
