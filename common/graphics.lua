@@ -136,6 +136,14 @@ function rt.graphics.set_stencil_test(mode, value)
     else
         love.graphics.setStencilTest(which(mode, "always"), which(value, 0))
     end
+
+    rt.graphics._current_stencil_test_mode = mode
+    rt.graphics._current_stencil_test_value = value
+end
+
+--- @brief
+function rt.graphics.get_stencil_test()
+    return rt.graphics._current_stencil_test_mode, rt.graphics._current_stencil_test_value
 end
 
 --- @brief
