@@ -168,8 +168,8 @@ function rt.VertexShape:set_texture_rectangle(rectangle, y, w, h)
     for i = 1, self:get_n_vertices() do
         local x, y = self:get_vertex_position(i)
         self:set_vertex_texture_coordinate(i,
-                (x - min_x) / (width / rectangle.width) + rectangle.x,
-                (y - min_y) / (height / rectangle.height) + rectangle.y
+            (x - min_x) / (width / rectangle.width) + rectangle.x,
+            (y - min_y) / (height / rectangle.height) + rectangle.y
         )
     end
 end
@@ -209,6 +209,11 @@ function rt.VertexRectangle(x, y, width, height)
         { x + width, y + height, 0 },
         { x, y + height }
     })
+end
+
+math3d = {}
+math3d.vec2 = function(x, y)
+    return {x = x, y = y}
 end
 
 --- @brief

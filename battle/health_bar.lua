@@ -33,7 +33,7 @@ bt.HealthBar = meta.new_type("HealthBar", rt.Widget, rt.Animation, function(scen
         _label_right = {},   -- rt.Glyph
 
         _use_percentage = true,
-        _state = bt.BattleEntityState.ALIVE,
+        _state = bt.EntityState.ALIVE,
 
         _debug_outline = {}
     })
@@ -43,9 +43,9 @@ end)
 
 --- @brief [internal]
 function bt.HealthBar:_format_hp(value, max)
-    if self._state == bt.BattleEntityState.KNOCKED_OUT then
+    if self._state == bt.EntityState.KNOCKED_OUT then
         return "", "KNOCKED OUT", ""
-    elseif self._state == bt.BattleEntityState.DEAD then
+    elseif self._state == bt.EntityState.DEAD then
         return "", "DEAD", ""
     elseif self._use_percentage then
         return "", value .. " %", ""
@@ -147,7 +147,7 @@ function bt.HealthBar:update(delta)
             end
         end
 
-        if self._state == bt.BattleEntityState.KNOCKED_OUT then
+        if self._state == bt.EntityState.KNOCKED_OUT then
             -- pulsing red animation
             local offset = rt.settings.battle.priority_queue_element.knocked_out_pulse(self._scene:get_elapsed())
             local color = rt.rgba_to_hsva(rt.Palette.KNOCKED_OUT)

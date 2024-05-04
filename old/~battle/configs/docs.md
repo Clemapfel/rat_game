@@ -515,3 +515,41 @@ Equip {
 }
 ```
 
+# Battle (bt.Battle)
+
+```lua
+Battle {
+    -- ### Config Fields ### --
+    id = "EXAMPLE_ID",
+    
+    background_id = "",
+    music_id = "",
+    
+    initial_enemy_ids = {},     -- Table<BattleEntityID>
+    initial_global_status_ids,  -- Table<GlobalStatusID>
+}
+
+enemies = {
+    {
+        id = "SMALL_UFO",
+        status = {
+            "EXAMPLE_STATUS",
+        },
+        consumables = {
+            "EXAPLE_CONSUMABLE",
+        },
+        equips = {
+            "EXAMPLE_EQUIP",
+        },
+        moveset = {
+            "EXAMPLE_MOVE"
+        }
+    }
+}
+
+-- or
+
+enemies = {
+    "SMALL_UFO"
+}
+```

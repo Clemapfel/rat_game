@@ -156,6 +156,7 @@ function rt.Label:size_allocate(x, y, width, height)
                 max_y = math.max(max_y, position_y + h)
 
                 glyph:set_position(position_x, position_y)
+                glyph._row_index = i -- wrap hinting, used for :set_n_visible_characters_from_elapsed
             end
         end
     end
@@ -681,7 +682,7 @@ function rt.Label:update_n_visible_characters_from_elapsed(elapsed, letters_per_
 
     local weights = rt.Label._syntax.BEAT_WEIGHTS
     local beat_character = rt.Label._syntax.BEAT
-
+    local max_row = 0
 
     while glyph_i <= #self._glyphs and so_far < elapsed do
         local glyph = self._glyphs[glyph_i]
@@ -705,6 +706,7 @@ function rt.Label:update_n_visible_characters_from_elapsed(elapsed, letters_per_
                     end
                     n_visible = n_visible + 1
                     n_seen = n_seen + 1
+                    max_row = math.max(max_row, glyph._row_index)
                 end
                 glyph:set_n_visible_characters(n_seen)
             end
@@ -714,7 +716,7 @@ function rt.Label:update_n_visible_characters_from_elapsed(elapsed, letters_per_
         glyph_i = glyph_i + 1
     end
 
-    return n_visible >= self._n_characters
+    return n_visible >= self._n_characters, max_row
 end
 
 --- @brief

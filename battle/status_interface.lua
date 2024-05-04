@@ -1,7 +1,7 @@
 --- @class bt.StatusInterface
 function bt.StatusInterface(scene, entity, status)
     meta.assert_isa(scene, bt.BattleScene)
-    meta.assert_isa(entity, bt.BattleEntity)
+    meta.assert_isa(entity, bt.Entity)
     meta.assert_isa(status, bt.Status)
 
     local self, metatable = {}, {}

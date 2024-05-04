@@ -187,6 +187,7 @@ function rt.TextBox:size_allocate(x, y, width, height)
         local current_offset = 0
         local line_i = 1
         local label_i = 1
+        self._n_lines = 0
         for entry in values(self._labels) do
             entry.label:fit_into(0, 0, self._labels_aabb.width, POSITIVE_INFINITY)
             entry.height = select(2, entry.label:measure())
@@ -202,8 +203,12 @@ function rt.TextBox:size_allocate(x, y, width, height)
             end
 
             self._line_height = math.max(self._line_height, entry.line_height)
+            self._n_lines = self._n_lines + entry.n_lines
             label_i = label_i + 1
         end
+        dbg(self._backdrop_target_height)
+        self._backdrop_target_height = self:_calculate_n_visible_lines() * self._line_height + 2 * frame_size + 2 * m
+        dbg(self._backdrop_target_height)
     end
 
     self:_reformat_indicators()
@@ -223,7 +228,16 @@ function rt.TextBox:update(delta)
         local node = table.first(self._scrolling_labels)
         if node ~= nil and node.entry.seen == true then
             node.elapsed = node.elapsed + delta
-            local is_done = node.label:update_n_visible_characters_from_elapsed(node.elapsed, rt.settings.textbox.scroll_speed)
+            local is_done, n_rows_visible = node.label:update_n_visible_characters_from_elapsed(node.elapsed, rt.settings.textbox.scroll_speed)
+
+            if node.n_lines_scrolled < n_rows_visible then
+                dbg("TODO:", self._first_visible_line, n_rows_visible, self._n_lines)
+                while n_rows_visible - (self:_calculate_n_visible_lines() - 1) > self._first_visible_line do
+                    self:scroll_down()
+                    if not self:_can_scroll_down() then break end
+                end
+                node.n_lines_scrolled = n_rows_visible
+            end
             if is_done then
                 table.remove(self._scrolling_labels, 1)
                 self._n_scrolling_labels = self._n_scrolling_labels - 1
@@ -318,7 +332,8 @@ function rt.TextBox:append(text)
     table.insert(self._scrolling_labels, {
         label = entry.label,
         entry = entry,
-        elapsed = 0
+        elapsed = 0,
+        n_lines_scrolled = 0
     })
     self._n_scrolling_labels = self._n_scrolling_labels + 1
     entry.label:set_n_visible_characters(0)

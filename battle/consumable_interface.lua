@@ -2,7 +2,7 @@
 --- @class bt.ConsumableInterface
 function bt.ConsumableInterface(scene, entity, consumable)
     meta.assert_isa(scene, bt.BattleScene)
-    meta.assert_isa(entity, bt.BattleEntity)
+    meta.assert_isa(entity, bt.Entity)
     meta.assert_isa(consumable, bt.Consumable)
 
     local self, metatable = {}, {}

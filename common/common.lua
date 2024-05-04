@@ -27,6 +27,7 @@ assert(debug.setfenv ~= nil)
 
 --- @brief iterate over values of table
 function values(t)
+    if t == nil then return function() return nil end end
     local k, v
     return function()
         k, v = next(t, k)
@@ -36,6 +37,7 @@ end
 
 --- @brief iterate over keys of tbale
 function keys(t)
+    if t == nil then return function() return nil end end
     local k, v
     return function()
         k, v = next(t, k)

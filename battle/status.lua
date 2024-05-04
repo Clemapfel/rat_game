@@ -175,7 +175,7 @@ end, {
     end,
 
     -- (StatusInterface, EntityInterface, MoveInterface, Table<EntityInterface>)
-    on_move_used= function(self, afflicted_user, move, targets)
+    on_move_used = function(self, afflicted_user, move, targets)
         meta.assert_status_interface(self)
         meta.assert_entity_interface(afflicted_user)
         meta.assert_move_interface(move)

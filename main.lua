@@ -1,22 +1,13 @@
 require "include"
 
 rt.current_scene = bt.Scene()
-local scene = rt.current_scene
+scene = rt.current_scene
 
 input_controller = rt.InputController()
 input_controller:signal_connect("pressed", function(self, which)
     if which == rt.InputButton.A then
-        --[[
-        local animation = bt.Animation.LOG_MESSAGE(scene, {}, "<b>this is a test <wave><rainbow>MESSAGE</rainbow></wave></b>")
-        local animation2 = bt.Animation.LOG_MESSAGE(scene, {}, "<b>01\n02\n03\n04\n</b>")
-        scene._ui:get_animation_queue():push(animation)
-        ]]--
-        scene._ui:get_log():set_is_closed(false)
-
-        if i == nil then i = 1 end
-        scene._ui:get_log():jump_to_newest()
-        scene._ui:get_log():append(string.rep(string.rep(tostring(i), 16) .. " ", 16))
-        i = i + 1
+        local animation = bt.Animation.LOG_MESSAGE(scene, scene, "<b><outline_color=GREEN><outline>this is a test</b> message|| <b>this is a test</b> message||  <b>this is a test</b> message|| <b>this is a test</b> message|| <b>this is a test</b> message||  <b>this is a test</b> message|| <b>this is a test</b> message|| <b>this is a test</b> message||  <b>this is a test</b> message|| <b>this is a test</b> message|| <b>this is a test</b> message||  <b>this is a test</b> message||</outline></outline_color>")
+        scene._ui._animation_queue:append(animation)
     elseif which == rt.InputButton.B then
     elseif which == rt.InputButton.X then
     elseif which == rt.InputButton.Y then
