@@ -60,50 +60,38 @@ function bt.BattleUI:_reformat_enemy_sprites()
     local left_offset, right_offset = w * 0.5, w * 0.5
     local m = math.min( -- if enemy don't fit on screen, stagger without violating outer margins
         rt.settings.margin_unit * 2,
-        ((self._bounds.width * 14/16) - 2 * mx - total_w) / (#self._enemy_sprites - 1)
+        (self._bounds.width - 2 * mx - total_w) / (#self._enemy_sprites - 1)
     )
+    total_w = total_w + (#self._enemy_sprites - 1) * m
 
     local target_y = self._bounds.y + self._bounds.height * 0.5 + 0.25 * h
-    self._enemy_sprite_render_order = {}
-    table.insert(self._enemy_sprite_render_order, 1, 1)
+    local n_enemies = sizeof(self._enemy_sprites)
+    self._enemy_sprite_render_order = table.seq(n_enemies, 1, -1)
 
-    local xy_positions = {
-        [1] = {center_x - 0.5 * w, target_y - h}
-    }
-
-    local n_sprites = sizeof(self._enemy_sprites)
-    local min_x = POSITIVE_INFINITY
-    local max_x = NEGATIVE_INFINITY
-    local sum = w
-    for i = 2, n_sprites do
-        local sprite = self._enemy_sprites[i]
-        w, h = sprite:measure()
-        if i % 2 == 0 then
-            left_offset = left_offset + w + m
-            sum = sum + w + m
-            local x = center_x - left_offset
-            min_x = math.min(min_x, x)
-            xy_positions[i] = { x, target_y - h }
-            table.insert(self._enemy_sprite_render_order, i)
-        else
-            local x = center_x + right_offset + m
-            max_x = math.max(max_x, x)
-            xy_positions[i] = { x, target_y - h }
-            right_offset = right_offset + w + m
-            sum = sum + w + m
-            table.insert(self._enemy_sprite_render_order, 1, i)
+    -- order enemies with 1 at the center, subsequent distributed equally on the side
+    local enemy_sprite_indices = { 1 }
+    for i = 2, n_enemies, 2 do
+        table.insert(enemy_sprite_indices, 1, i)
+        if i < n_enemies then
+            table.insert(enemy_sprite_indices, i + 1)
         end
     end
 
-    dbg(sum, total_w)
-
+    local xy_positions = {}
     local x_offset = 0
-    if min_x < mx then
-       -- x_offset = mx - min_x
+    for i in values(enemy_sprite_indices) do
+        local sprite = self._enemy_sprites[i]
+        w, h = sprite:measure()
+        xy_positions[i] = {
+            clamp(mx + x_offset, mx),
+            target_y - h
+        }
+        x_offset = x_offset + w + m
     end
 
-    for i, position in pairs(xy_positions) do
-        self._enemy_sprites[i]:fit_into(position[1] + x_offset, position[2])
+    local x_offset = clamp(((self._bounds.width - 2 * mx) - total_w) * 0.5, 0)
+    for i, xy in pairs(xy_positions) do
+        self._enemy_sprites[i]:fit_into(xy[1] + x_offset, xy[2])
     end
 end
 

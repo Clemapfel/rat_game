@@ -50,6 +50,8 @@ love.draw = function()
         love.graphics.setColor(1, 1, 1, 0.75)
         love.graphics.print(label, rt.graphics.get_width() - love.graphics.getFont():getWidth(label) - 2 * margin, 0.5 * margin)
     end
+
+    love.graphics.line(0.5 * rt.graphics.get_width(), 0, 0.5 * rt.graphics.get_width(), rt.graphics.get_height())
 end
 
 love.update = function(delta)

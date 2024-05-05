@@ -545,6 +545,32 @@ function table.rep(x, n)
     return out
 end
 
+
+--- @brief
+function table.reverse(t)
+    local out = {}
+    local n = sizeof(table)
+    for k, v in ipairs(t) do
+        out[n + 1 - k] = v
+    end
+    return out
+end
+
+--- @brief
+function table.seq(start, finish, step)
+    local out = {}
+    if step == nil then
+        for i = start, finish do
+            table.insert(out, i)
+        end
+    else
+        for i = start, finish, step do
+            table.insert(out, i)
+        end
+    end
+    return out
+end
+
 --- @brief check if two tables have contents that compare equally
 --- @param left table
 --- @param right table
