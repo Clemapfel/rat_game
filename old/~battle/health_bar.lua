@@ -15,37 +15,36 @@ rt.settings.battle.health_bar = {
 }
 
 --- @class bt.HealthBar
-bt.HealthBar = meta.new_type("HealthBar", rt.Widget, rt.Animation, function(scene, entity)
+bt.HealthBar = meta.new_type("HealthBar", rt.Widget, rt.Animation, function(entity)
     local out = meta.new(bt.HealthBar, {
         _entity = entity,
-        _scene = scene,
         _is_realized = false,
 
         _elapsed = 1,   -- sic, makes it so `update` is invoked immediately
 
-        _hp_value = -1,
+        _hp_current = -1,
         _hp_target = -1,
         _hp_max = -1,
-        _hp_bar = rt.LevelBar(0, entity:get_hp_base(), entity:get_hp_base()),
+        _level_bar = rt.LevelBar(0, entity:get_hp_base(), entity:get_hp_base()),
         _hp_label = {},         -- rt.Glyph,
 
         _label_center = {},  -- rt.Glyph
         _label_right = {},   -- rt.Glyph
 
         _use_percentage = true,
-        _state = bt.BattleEntityState.ALIVE,
+        _state = bt.EntityState.ALIVE,
 
         _debug_outline = {}
     })
-    out._hp_bar:set_corner_radius(rt.settings.battle.health_bar.corner_radius)
+    out._level_bar:set_corner_radius(rt.settings.battle.health_bar.corner_radius)
     return out
 end)
 
 --- @brief [internal]
 function bt.HealthBar:_format_hp(value, max)
-    if self._state == bt.BattleEntityState.KNOCKED_OUT then
+    if self._state == bt.EntityState.KNOCKED_OUT then
         return "", "KNOCKED OUT", ""
-    elseif self._state == bt.BattleEntityState.DEAD then
+    elseif self._state == bt.EntityState.DEAD then
         return "", "DEAD", ""
     elseif self._use_percentage then
         return "", value .. " %", ""
@@ -69,14 +68,14 @@ function bt.HealthBar:_update_color_from_precentage(value)
     else
         color = settings.hp_color_100
     end
-    self._hp_bar:set_color(color, rt.color_darken(color, 0.25))
+    self._level_bar:set_color(color, rt.color_darken(color, 0.25))
 end
 
 --- @override
 function bt.HealthBar:realize()
     if self._is_realized == true then return end
 
-    local left, center, right = self:_format_hp(self._hp_value, self._hp_max)
+    local left, center, right = self:_format_hp(self._hp_current, self._hp_max)
     local settings = {
         is_outlined = true,
         outline_color = rt.Palette.TRUE_BLACK,
@@ -86,7 +85,7 @@ function bt.HealthBar:realize()
     self._label_left = rt.Glyph(rt.settings.battle.health_bar.hp_font, left, settings)
     self._label_center = rt.Glyph(rt.settings.battle.health_bar.hp_font, center, settings)
     self._label_right = rt.Glyph(rt.settings.battle.health_bar.hp_font, right, settings)
-    self._hp_bar:realize()
+    self._level_bar:realize()
 
     self:set_is_animated(true)
     self:update(0)
@@ -106,7 +105,7 @@ function bt.HealthBar:size_allocate(x, y, width, height)
     if width < total_w + rt.settings.margin_unit then width = total_w + rt.settings.margin_unit end
     x = old_center_x - 0.5 * width
 
-    self._hp_bar:fit_into(x, y, width, height)
+    self._level_bar:fit_into(x, y, width, height)
 
     local label_y = y + 0.5 * height - 0.5 * label_h
     self._label_center:set_position(x + 0.5 * width - 0.5 * center_w, label_y)
@@ -114,7 +113,7 @@ function bt.HealthBar:size_allocate(x, y, width, height)
     self._label_right:set_position(x + 0.5 * width + 0.5 * center_w, label_y)
 
     self._debug_outline = rt.Rectangle(
-        x, y, width, height
+            x, y, width, height
     )
     self._debug_outline:set_is_outline(true)
 end
@@ -124,35 +123,35 @@ function bt.HealthBar:update(delta)
     if self._is_realized == true then
         self._elapsed = self._elapsed + delta
 
-        local diff = (self._hp_value - self._hp_target)
+        local diff = (self._hp_current - self._hp_target)
         local speed = (1 + rt.settings.battle.health_bar.tick_acceleration * (math.abs(diff) / self._hp_max))
         local tick_duration = 1 / (rt.settings.battle.health_bar.tick_speed * speed)
         if self._elapsed > tick_duration then
             local offset = math.modf(self._elapsed, self._tick_duration)
             if diff > 0 then
-                self._hp_value = self._hp_value - offset
+                self._hp_current = self._hp_current - offset
             elseif diff < 0 then
-                self._hp_value = self._hp_value + offset
+                self._hp_current = self._hp_current + offset
             end
             self._elapsed = self._elapsed - offset * tick_duration
 
             if diff ~= 0 then
-                local left, center, right = self:_format_hp(self._hp_value, self._hp_max)
+                local left, center, right = self:_format_hp(self._hp_current, self._hp_max)
                 self._label_left:set_text(left)
                 self._label_center:set_text(center)
                 self._label_right:set_text(right)
-                self._hp_bar:set_value(self._hp_value)
-                self:_update_color_from_precentage(self._hp_value / self._hp_max)
+                self._level_bar:set_value(self._hp_current)
+                self:_update_color_from_precentage(self._hp_current / self._hp_max)
                 self:reformat()
             end
         end
 
-        if self._state == bt.BattleEntityState.KNOCKED_OUT then
+        if self._state == bt.EntityState.KNOCKED_OUT then
             -- pulsing red animation
             local offset = rt.settings.battle.priority_queue_element.knocked_out_pulse(self._scene:get_elapsed())
             local color = rt.rgba_to_hsva(rt.Palette.KNOCKED_OUT)
             color.v = clamp(color.v + offset, 0, 1)
-            self._hp_bar:set_color(rt.color_darken(color, 0.15), color) -- sic, keep background lighter
+            self._level_bar:set_color(rt.color_darken(color, 0.15), color) -- sic, keep background lighter
         end
     end
 end
@@ -160,7 +159,7 @@ end
 --- @override
 function bt.HealthBar:draw()
     if self._is_realized == true then
-        self._hp_bar:draw()
+        self._level_bar:draw()
         self._label_left:draw()
         self._label_center:draw()
         self._label_right:draw()
@@ -188,6 +187,6 @@ end
 function bt.HealthBar:set_state(state)
     self._state = state
     if self._is_realized == true then
-        self:_update_color_from_precentage(self._hp_value)
+        self:_update_color_from_precentage(self._hp_current)
     end
 end

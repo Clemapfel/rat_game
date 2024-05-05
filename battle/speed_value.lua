@@ -6,46 +6,30 @@ rt.settings.battle.speed_value = {
 
 --- @class bt.SpeedValue
 bt.SpeedValue = meta.new_type("SpeedValue", rt.Widget, rt.Animation, function(entity)
-    local out = meta.new(bt.SpeedValue, {
+    return meta.new(bt.SpeedValue, {
         _entity = entity,
-        _is_realized = false,
         _elapsed = 1,   -- sic, makes it so `update` is invoked immediately
         _speed_current = -1,
         _speed_target = -1,
         _speed_label = {}  -- rt.Glyph
     })
-    return out
 end)
 
 --- @brief [internal]
 function bt.SpeedValue:_format_value()
-    local value = self._speed_current
-
-    --[[
-    local priority = self._priority_value
-    local priority_string = ""
-    if priority < 0 then 
-        priority_string = string.rep("-", math.abs(priority))
-    elseif priority > 0 then 
-        priority_string = string.rep("+", math.abs.priority)
-    end
-    ]]
-    
-    return tostring(value)--, priority_string
+    return tostring(self._speed_current)
 end
 
---- @override
+--- @brief
 function bt.SpeedValue:realize()
-    if self._is_realized == true then return end
+    if self._is_realized then return end
 
-    local settings = {
+    local speed_string, priority_string = self:_format_value()
+    self._speed_label = rt.Glyph(rt.settings.battle.speed_value.font, speed_string, {
         is_outlined = true,
         outline_color = rt.Palette.TRUE_BLACK,
         color = rt.Palette.TRUE_WHITE
-    }
-
-    local speed_string, priority_string = self:_format_value()
-    self._speed_label = rt.Glyph(rt.settings.battle.speed_value.font, speed_string, settings)
+    })
     self:set_is_animated(true)
     self:update(0)
     self._is_realized = true
@@ -58,17 +42,12 @@ function bt.SpeedValue:size_allocate(x, y, width, height)
 end
 
 --- @override
-function bt.SpeedValue:measure()
-    return self._speed_label:get_size()
-end
-
---- @override
 function bt.SpeedValue:update(delta)
     if self._is_realized == true then
         self._elapsed = self._elapsed + delta
-
-        local diff = (self._speed_current - self._speed_target)
-        local speed = (1 + rt.settings.battle.speed_value.tick_acceleration * (math.abs(diff) / 10))
+        
+        local diff = self._speed_current - self._speed_target
+        local speed = 1 + rt.settings.battle.speed_value.tick_acceleration * (math.abs(diff) / 10)
 
         local tick_duration = 1 / (rt.settings.battle.speed_value.tick_speed * speed)
         if self._elapsed > tick_duration then
@@ -88,6 +67,11 @@ function bt.SpeedValue:update(delta)
 end
 
 --- @override
+function bt.SpeedValue:measure()
+    return self._speed_label:get_size()
+end
+
+--- @override
 function bt.SpeedValue:draw()
     if self._is_realized == true then
         self._speed_label:draw()
@@ -95,15 +79,13 @@ function bt.SpeedValue:draw()
 end
 
 --- @override
-function bt.SpeedValue:sync()
-    self._speed_target = self._entity:get_speed()
-
-    if self._is_realized == true then
-        self._speed_label:set_text(self:_format_value(self._speed_current))
-    end
+function bt.SpeedValue:set_value(value)
+    self._speed_target = value
 end
 
 --- @brief
-function bt.SpeedValue:set_value(value)
-    self._speed_target = value
+function bt.SpeedValue:synchronize(entity)
+    self._speed_current = entity:get_speed()
+    self._speed_target = entity:get_speed()
+    self._speed_label:set_text(self:_format_value())
 end

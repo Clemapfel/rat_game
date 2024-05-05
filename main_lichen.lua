@@ -183,7 +183,6 @@ love.keypressed = function(which)
         lt._is_stepping = true
     elseif which == "up" then
         lt._steps_per_second = lt._steps_per_second + 10
-        println(lt._steps_per_second)
     elseif which == "down" then
         lt._steps_per_second = lt._steps_per_second + 1
     else

@@ -206,9 +206,7 @@ function rt.TextBox:size_allocate(x, y, width, height)
             self._n_lines = self._n_lines + entry.n_lines
             label_i = label_i + 1
         end
-        dbg(self._backdrop_target_height)
         self._backdrop_target_height = self:_calculate_n_visible_lines() * self._line_height + 2 * frame_size + 2 * m
-        dbg(self._backdrop_target_height)
     end
 
     self:_reformat_indicators()

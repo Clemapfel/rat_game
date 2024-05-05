@@ -6,7 +6,6 @@ rt.settings.level_bar = {
 
 --- @class rt.LevelBar
 rt.LevelBar = meta.new_type("LevelBar", rt.Widget, function(lower, upper, value)
-
     if meta.is_nil(value) then
         value = mix(lower, upper, 0.5)
     end

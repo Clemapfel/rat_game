@@ -38,7 +38,8 @@ end
 
 --- @brief
 function bt.Scene:send_message(text)
-    self._ui:get_log():append(text)
+    self._ui:get_log():advance()
+    self._ui:get_log():append(text, true)
 end
 
 --- @brief

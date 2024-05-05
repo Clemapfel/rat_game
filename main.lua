@@ -4,24 +4,20 @@ rt.current_scene = bt.Scene()
 scene = rt.current_scene
 
 battle = bt.Battle("DEBUG_BATTLE")
-for entity in values(battle:list_entities()) do
-    println(entity:get_name())
-end
 
 input_controller = rt.InputController()
 input_controller:signal_connect("pressed", function(self, which)
     if which == rt.InputButton.A then
-        local animation = bt.Animation.LOG_MESSAGE(scene, scene, "<b><outline_color=GREEN><outline>this is a test</b> message|| <b>this is a test</b> message||  <b>this is a test</b> message|| <b>this is a test</b> message|| <b>this is a test</b> message||  <b>this is a test</b> message|| <b>this is a test</b> message|| <b>this is a test</b> message||  <b>this is a test</b> message|| <b>this is a test</b> message|| <b>this is a test</b> message||  <b>this is a test</b> message||</outline></outline_color>")
-        scene._ui._animation_queue:append(animation)
+        for entity in values(battle:list_entities()) do
+            scene._ui:_add_enemy_sprite(entity)
+        end
     elseif which == rt.InputButton.B then
     elseif which == rt.InputButton.X then
     elseif which == rt.InputButton.Y then
     elseif which == rt.InputButton.L then
     elseif which == rt.InputButton.R then
     elseif which == rt.InputButton.UP then
-        scene._ui:get_log():scroll_up()
     elseif which == rt.InputButton.DOWN then
-        scene._ui:get_log():scroll_down()
     end
 end)
 
