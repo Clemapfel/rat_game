@@ -54,32 +54,56 @@ function bt.BattleUI:_reformat_enemy_sprites()
         total_w = total_w + w
     end
 
-    local mx = rt.graphics.get_width() * 1 / 16
+    local mx = self._bounds.width * 1 / 16
     local center_x = self._bounds.x + self._bounds.width * 0.5
     local w, h = self._enemy_sprites[1]:measure()
     local left_offset, right_offset = w * 0.5, w * 0.5
     local m = math.min( -- if enemy don't fit on screen, stagger without violating outer margins
         rt.settings.margin_unit * 2,
-        (rt.graphics.get_width() - 2 * mx - total_w) / #self._enemy_sprites
+        ((self._bounds.width * 14/16) - 2 * mx - total_w) / (#self._enemy_sprites - 1)
     )
+
     local target_y = self._bounds.y + self._bounds.height * 0.5 + 0.25 * h
     self._enemy_sprite_render_order = {}
     table.insert(self._enemy_sprite_render_order, 1, 1)
 
-    self._enemy_sprites[1]:fit_into(center_x - 0.5 * w, target_y - h)
+    local xy_positions = {
+        [1] = {center_x - 0.5 * w, target_y - h}
+    }
+
     local n_sprites = sizeof(self._enemy_sprites)
+    local min_x = POSITIVE_INFINITY
+    local max_x = NEGATIVE_INFINITY
+    local sum = w
     for i = 2, n_sprites do
         local sprite = self._enemy_sprites[i]
         w, h = sprite:measure()
         if i % 2 == 0 then
             left_offset = left_offset + w + m
-            sprite:fit_into(center_x - left_offset, target_y - h)
+            sum = sum + w + m
+            local x = center_x - left_offset
+            min_x = math.min(min_x, x)
+            xy_positions[i] = { x, target_y - h }
             table.insert(self._enemy_sprite_render_order, i)
         else
-            sprite:fit_into(center_x + right_offset + m, target_y - h)
+            local x = center_x + right_offset + m
+            max_x = math.max(max_x, x)
+            xy_positions[i] = { x, target_y - h }
             right_offset = right_offset + w + m
+            sum = sum + w + m
             table.insert(self._enemy_sprite_render_order, 1, i)
         end
+    end
+
+    dbg(sum, total_w)
+
+    local x_offset = 0
+    if min_x < mx then
+       -- x_offset = mx - min_x
+    end
+
+    for i, position in pairs(xy_positions) do
+        self._enemy_sprites[i]:fit_into(position[1] + x_offset, position[2])
     end
 end
 

@@ -246,13 +246,16 @@ function bt.BattleUI:_reformat_enemy_sprites()
 
         local center_x = 0.5 * rt.graphics.get_width()
         local w, h = self._enemy_sprites[1]:measure()
-        self._enemy_sprites[1]:fit_into(center_x - 0.5 * w, h_to_y(h) )
         local left_offset, right_offset = w * 0.5, w * 0.5
 
         local m = math.min( -- if enemy don't fit on screen, stagger without violating outer margins
             rt.settings.margin_unit * 2,
             (rt.graphics.get_width() - 2 * mx - total_w) / #self._enemy_sprites
         )
+
+
+
+
         for i = 2, #self._enemy_sprites do
             local sprite = self._enemy_sprites[i]
             w, h = sprite:measure()
