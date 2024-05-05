@@ -1,5 +1,7 @@
 rt.settings.battle.battle_ui = {
-    log_n_lines_default = 3
+    log_n_lines_default = 3,
+    priority_queue_width = 100,
+    gradient_alpha = 0.4
 }
 
 bt.Animation = {}
@@ -8,11 +10,17 @@ bt.Animation = {}
 bt.BattleUI = meta.new_type("BattleUI", rt.Widget, rt.Animation, function()
     return meta.new(bt.BattleUI, {
         _log = {}, -- rt.TextBox
+        _priority_queue = {}, -- bt.PriorityQueue
         _entities = {},  -- Set<bt.Entity>
         _enemy_sprites = {},              -- Table<bt.EnemySprite>
         _enemy_sprite_render_order = {},  -- Queue<Number>
 
         _animation_queue = {}, -- rt.AnimationQueue
+
+
+        _gradient_right = {}, -- rt.LogGradient
+        _gradient_left = {},  -- rt.LogGradient
+
     })
 end)
 
@@ -22,6 +30,25 @@ function bt.BattleUI:realize()
 
     self._log = rt.TextBox()
     self._log:realize()
+
+    self._priority_queue = bt.PriorityQueue()
+    self._priority_queue:realize()
+
+    -- gradients
+    local gradient_alpha = rt.settings.battle.battle_ui.gradient_alpha
+    local to = 1 - gradient_alpha
+    local to_color = rt.RGBA(to, to, to, 1)
+    local from_color = rt.RGBA(1, 1, 1, 1)
+
+    self._gradient_left = rt.LogGradient(
+        rt.RGBA(from_color.r, from_color.g, from_color.b, from_color.a),
+        rt.RGBA(to_color.r, to_color.g, to_color.b, to_color.a)
+    )
+
+    self._gradient_right = rt.LogGradient(
+        rt.RGBA(to_color.r, to_color.g, to_color.b, to_color.a),
+        rt.RGBA(from_color.r, from_color.g, from_color.b, from_color.a)
+    )
 
     self._animation_queue = rt.AnimationQueue()
 
@@ -115,26 +142,52 @@ function bt.BattleUI:size_allocate(x, y, width, height)
     self._log:fit_into(
         log_horizontal_margin,
         log_vertical_margin,
-        self._bounds.width - 2 * log_horizontal_margin,
-        self._bounds.height * 1 / 4 - log_vertical_margin
+        width - 2 * log_horizontal_margin,
+        height * 1 / 4 - log_vertical_margin
     )
 
     self:_reformat_enemy_sprites()
+
+    local my = rt.settings.margin_unit
+    local mx = my
+    local priority_queue_width = rt.settings.battle.battle_ui.priority_queue_width
+    local log_height = 5 * my
+    self._priority_queue:fit_into(
+        width - priority_queue_width,
+        0,
+        priority_queue_width,
+        height
+    )
+    local gradient_width = 1 / 16 * width
+    self._gradient_left:resize(0, 0, gradient_width, height)
+    self._gradient_right:resize(width - gradient_width, 0, gradient_width, self._bounds.height)
 end
 
 --- @brief
 function bt.BattleUI:update(delta)
     if not self._is_realized then return end
-    self._animation_queue:update(delta)
-    self._log:update(delta)
 end
 
 --- @brief
 function bt.BattleUI:draw()
     if not self._is_realized then return end
+
+    rt.graphics.set_blend_mode(rt.BlendMode.MULTIPLY)
+    self._gradient_left:draw()
+    self._gradient_right:draw()
+    rt.graphics.set_blend_mode()
+
     self._log:draw()
 
     for i in values(self._enemy_sprite_render_order) do
         self._enemy_sprites[i]:draw()
     end
+
+    self._priority_queue:draw()
 end
+
+--- @brief
+function bt.BattleUI:set_priority_order(order)
+    self._priority_queue:reorder(order)
+end
+

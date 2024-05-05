@@ -221,3 +221,22 @@ function bt.Battle:remove_entity(entity_id)
     end
 end
 
+
+--- @brief
+function bt.Battle:get_entities_in_order()
+    local entities = self:list_entities()
+    table.sort(entities, function(a, b)
+        if a:get_priority() == b:get_priority() then
+            if a:get_speed() == b:get_speed() then
+                return meta.hash(a) < meta.hash(b)
+            else
+                return a:get_speed() > b:get_speed()
+            end
+        else
+            return a:get_priority() > b:get_priority()
+        end
+    end)
+
+    return entities
+end
+

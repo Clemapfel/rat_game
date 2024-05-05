@@ -115,7 +115,7 @@ end
 --- @override
 function bt.HealthBar:update(delta)
     if self._is_realized == true then
-        self._elapsed = self._elapesd + delta
+        self._elapsed = self._elapsed + delta
 
         local diff = self._hp_current - self._hp_target
         local speed = 1 + rt.settings.battle.health_bar.tick_acceleration * (math.abs(diff) / self._hp_max)

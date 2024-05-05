@@ -74,7 +74,6 @@ function bt.StatusBar:update(delta)
                     e.is_revealing = false
                     e.element:set_opacity(1)
                     e.element:set_scale(1)
-                    e.element:set_hide_n_turns_left(false)
                 end
             elseif e.is_hiding then
                 local value = e.elapsed / hide_duration

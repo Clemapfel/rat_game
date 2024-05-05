@@ -8,6 +8,7 @@ battle = bt.Battle("DEBUG_BATTLE")
 input_controller = rt.InputController()
 input_controller:signal_connect("pressed", function(self, which)
     if which == rt.InputButton.A then
+        scene._ui:set_priority_order(battle:get_entities_in_order())
         for entity in values(battle:list_entities()) do
             scene._ui:_add_enemy_sprite(entity)
         end
@@ -55,6 +56,7 @@ love.draw = function()
 end
 
 love.update = function(delta)
+    rt.AnimationHandler:update(delta)
     if rt.current_scene ~= nil and rt.current_scene.update ~= nil then
         rt.current_scene:update(delta)
     end
