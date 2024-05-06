@@ -62,6 +62,8 @@ function bt.StatusBar:update(delta)
                 direction_x = direction_x / magnitude
                 direction_y = direction_y / magnitude
                 local step = delta * rt.settings.battle.status_bar.element_velocity
+                local distance = rt.magnitude(target_x - current_x, target_y - current_y)
+                step = step * clamp((1 + rt.exponential_acceleration(magnitude / 150)), 0, 100)
                 e.current_x = e.current_x + direction_x * step
                 e.current_y = e.current_y + direction_y * step
 

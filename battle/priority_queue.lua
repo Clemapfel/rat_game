@@ -76,8 +76,8 @@ function bt.PriorityQueue:reorder(order, next_order)
 
             while #entry.colliders < n do
                 local queue_element = bt.PriorityQueueElement(
-                        self._scene,
-                        entity
+                    self._scene,
+                    entity
                 )
                 table.insert(entry.elements, queue_element)
 
@@ -90,7 +90,7 @@ function bt.PriorityQueue:reorder(order, next_order)
                 local collider_x = bounds.x + bounds.width + 2 * element_size
                 local collider_y = bounds.y + bounds.height * mix(0.25, 0.75, rt.rand())
                 local collider = rt.CircleCollider(
-                        self._world, rt.ColliderType.DYNAMIC, collider_x, collider_y, element_size / 2
+                    self._world, rt.ColliderType.DYNAMIC, collider_x, collider_y, element_size / 2
                 )
                 collider:set_collision_group(rt.ColliderCollisionGroup.NONE)
                 collider:set_mass(rt.settings.battle.priority_queue.collider_mass)
