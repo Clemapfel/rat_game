@@ -1,7 +1,7 @@
 rt.settings.battle.priority_queue_element = {
     font = rt.settings.font.default,
     thumbnail_size = 32, -- resolution of subimage
-    frame_thickness = 5,
+    frame_thickness = 7,
     base_color = rt.color_darken(rt.Palette.GRAY_4, 0.05),
     frame_color = rt.Palette.GRAY_3,
     selected_frame_color = rt.Palette.YELLOW_2,
@@ -143,10 +143,10 @@ function bt.PriorityQueueElement:realize()
     self._spritesheet:get_texture():set_wrap_mode(rt.TextureWrapMode.ZERO)
     local frame = self._spritesheet:get_frame(sprite_index)
     self._shape:reformat_texture_coordinates(
-            frame.x, frame.y,
-            frame.x + frame.width, frame.y,
-            frame.x + frame.width, frame.y + frame.height,
-            frame.x, frame.y + frame.height
+        frame.x, frame.y,
+        frame.x + frame.width, frame.y,
+        frame.x + frame.width, frame.y + frame.height,
+        frame.x, frame.y + frame.height
     )
 
     self._backdrop:set_is_outline(false)
@@ -158,8 +158,8 @@ function bt.PriorityQueueElement:realize()
     self._frame_outline:set_color(rt.Palette.BACKGROUND)
 
     self._frame_gradient = rt.LogGradient(
-            rt.RGBA(0.8, 0.8, 0.8, 1),
-            rt.RGBA(1, 1, 1, 1)
+        rt.RGBA(0.8, 0.8, 0.8, 1),
+        rt.RGBA(1, 1, 1, 1)
     )
     self._frame_gradient:set_is_vertical(true)
 
@@ -203,10 +203,10 @@ function bt.PriorityQueueElement:realize()
     self._spritesheet:get_texture():set_wrap_mode(rt.TextureWrapMode.ZERO)
     local frame = self._spritesheet:get_frame(sprite_index)
     self._shape:reformat_texture_coordinates(
-            frame.x, frame.y,
-            frame.x + frame.width, frame.y,
-            frame.x + frame.width, frame.y + frame.height,
-            frame.x, frame.y + frame.height
+        frame.x, frame.y,
+        frame.x + frame.width, frame.y,
+        frame.x + frame.width, frame.y + frame.height,
+        frame.x, frame.y + frame.height
     )
 
     self._backdrop:set_is_outline(false)
@@ -218,8 +218,8 @@ function bt.PriorityQueueElement:realize()
     self._frame_outline:set_color(rt.Palette.BACKGROUND)
 
     self._frame_gradient = rt.LogGradient(
-            rt.RGBA(0.8, 0.8, 0.8, 1),
-            rt.RGBA(1, 1, 1, 1)
+        rt.RGBA(0.8, 0.8, 0.8, 1),
+        rt.RGBA(1, 1, 1, 1)
     )
     self._frame_gradient:set_is_vertical(true)
 
@@ -228,13 +228,13 @@ function bt.PriorityQueueElement:realize()
     end
 
     self._id_offset_label = rt.Glyph(
-            rt.settings.battle.priority_queue_element.font,
-            self._entity:get_id_offset_suffix(),
-            {
-                is_outlined = true,
-                outline_color = rt.Palette.BLACK,
-                font_style = rt.FontStyle.BOLD
-            }
+        rt.settings.battle.priority_queue_element.font,
+        self._entity:get_id_offset_suffix(),
+        {
+            is_outlined = true,
+            outline_color = rt.Palette.BLACK,
+            font_style = rt.FontStyle.BOLD
+        }
     )
 
     self._change_indicator = rt.DirectionIndicator(self._change_direction)

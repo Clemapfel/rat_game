@@ -12,6 +12,9 @@ input_controller:signal_connect("pressed", function(self, which)
         for entity in values(battle:list_entities()) do
             scene._ui:_add_party_sprite(entity)
         end
+        for entity in values(battle:list_entities()) do
+            scene._ui:_add_enemy_sprite(entity)
+        end
     elseif which == rt.InputButton.B then
     elseif which == rt.InputButton.X then
     elseif which == rt.InputButton.Y then
