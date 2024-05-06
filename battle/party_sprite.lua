@@ -92,7 +92,7 @@ function bt.PartySprite:size_allocate(x, y, width, height)
     self._frame_outline:set_line_width(frame_outline_thickness)
     local total_frame_thickness = frame_thickness + frame_outline_thickness
 
-    height = height - 0.5 * total_frame_thickness
+    height = height - 0.5 * total_frame_thickness - 1.5 * rt.settings.margin_unit
     local current_y = y + height
 
     current_y = current_y - m

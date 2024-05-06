@@ -43,7 +43,7 @@ function bt.HealthBar:_format_hp(value, max)
     elseif self._use_percentage then
         return "", value .. " %", ""
     else
-        return tostring(value), "/", tostring(max)
+        return tostring(clamp(value, 0, max)), " / ", tostring(max)
     end
 end
 
@@ -118,7 +118,6 @@ function bt.HealthBar:size_allocate(x, y, width, height)
         x, y, width, height
     )
     self._debug_outline:set_is_outline(true)
-
 end
 
 --- @override
@@ -188,7 +187,7 @@ end
 
 --- @brief
 function bt.HealthBar:synchronize(entity)
-    self._hp_current = entity:get_hp()
+    self._hp_target = entity:get_hp()
     self._hp_max = entity:get_hp_base()
 
     local left, center, right = self:_format_hp(self._hp_current, self._hp_max)

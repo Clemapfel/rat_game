@@ -92,7 +92,7 @@ love.resize = function()
 end
 
 love.run = function()
-    love.window.setMode(1600 / 1.5, 900 / 1.5, {
+    love.window.setMode(1920 / 1.5, 1080 / 1.5, {
         vsync = -1, -- adaptive vsync, may tear but tries to stay as close to 60hz as possible
         msaa = 8,
         stencil = true,
