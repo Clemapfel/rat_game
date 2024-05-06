@@ -48,16 +48,25 @@ end, {
     stencil_id = 128
 })
 
+function rt.Frame:_bind_stencil()
+    local stencil_value = meta.hash(self._stencil_mask) -- draw child with corners masked away
+    rt.graphics.stencil(stencil_value, self._stencil_mask)
+    rt.graphics.set_stencil_test(rt.StencilCompareMode.EQUAL, stencil_value)
+end
+
+function rt.Frame:_unbind_stencil()
+    rt.graphics.set_stencil_test()
+
+end
+
 --- @overload rt.Drawable.draw
 function rt.Frame:draw()
     if not self:get_is_visible() then return end
 
     if meta.is_widget(self._child) then
-        local stencil_value = meta.hash(self._stencil_mask) -- draw child with corners masked away
-        rt.graphics.stencil(stencil_value, self._stencil_mask)
-        rt.graphics.set_stencil_test(rt.StencilCompareMode.EQUAL, stencil_value)
+        self:_bind_stencil()
         self._child:draw()
-        rt.graphics.set_stencil_test()
+        self:_unbind_stencil()
     end
 
     if self._thickness > 0 then

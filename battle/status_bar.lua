@@ -1,3 +1,9 @@
+bt.StatusBarAlignment = meta.new_enum({
+    CENTER = "center",
+    LEFT = "left",
+    RIGHT = "right",
+})
+
 rt.settings.battle.status_bar = {
     element_size = 32,
     element_velocity = 150, -- px per seconds
@@ -6,7 +12,7 @@ rt.settings.battle.status_bar = {
     hide_animation_duration = 2, -- seconds
     activate_animation_duration = 1,
     activate_scale_peak = 3,
-    element_alignment = "center", -- "left", "center", "right"
+    default_element_alignment = bt.StatusBarAlignment.CENTER
 }
 
 --- @class bt.StatusBar
@@ -14,6 +20,7 @@ bt.StatusBar = meta.new_type("StatusBar", rt.Widget, rt.Animation, function()
     return meta.new(bt.StatusBar, {
         _elements = {}, -- cf :add
         _debug_shape = {}, -- rt.Shape
+        _alignment = rt.settings.battle.status_bar.default_element_alignment,
         _world = rt.PhysicsWorld(),
     })
 end)
@@ -117,17 +124,17 @@ function bt.StatusBar:size_allocate(x, y, width, height)
     local total_size = n * size
     local m = math.min(2, (width - total_size) / (n - 1))
 
-    local alignment = rt.settings.battle.status_bar.element_alignment
+    local alignment = self._alignment
     local start_x, start_y = nil, y + height * 0.5 - size * 0.5
 
-    if alignment == "center" then
+    if alignment == bt.StatusBarAlignment.CENTER then
         start_x = x + 0.5 * width - (total_size + (n - 1) * m) * 0.5
-    elseif alignment == "left" then
+    elseif alignment == bt.StatusBarAlignment.LEFT then
         start_x = x
-    elseif alignment == "right" then
+    elseif alignment == bt.StatusBarAlignment.RIGHT then
         start_x = x + width - total_size
     else
-        rt.error("In bt.StatusBar:size_allocate: unreachable reached")
+        rt.error("In bt.StatusBar:size_allocate: unhandled alignment `" .. alignment .. "`")
     end
 
     local element_x, element_y, w, h = start_x, start_y, size, size
@@ -249,4 +256,12 @@ function bt.StatusBar:synchronize(entity)
         to_create_from[status] = entity:get_status_n_turns_elapsed(status)
     end
     self:create_from(to_create_from)
+end
+
+--- @brief
+function bt.StatusBar:set_alignment(alignment)
+    if self._alignment ~= alignment then
+        self._alignment = alignment
+        self:reformat()
+    end
 end

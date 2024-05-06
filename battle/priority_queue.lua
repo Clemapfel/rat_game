@@ -208,7 +208,7 @@ function bt.PriorityQueue:update(delta)
                 local target = entry.target_positions[i]
                 local target_x, target_y = target[1], target[2]
 
-                local angle = rt.angle( target_x- current_x, target_y - current_y)
+                local angle = rt.angle(target_x - current_x, target_y - current_y)
                 local magnitude = rt.settings.battle.priority_queue.collider_speed
                 local vx, vy = rt.translate_point_by_angle(0, 0, magnitude, angle)
                 collider:apply_linear_impulse(vx, vy)

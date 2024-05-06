@@ -15,12 +15,12 @@ bt.BattleUI = meta.new_type("BattleUI", rt.Widget, rt.Animation, function()
         _enemy_sprites = {},              -- Table<bt.EnemySprite>
         _enemy_sprite_render_order = {},  -- Queue<Number>
 
-        _animation_queue = {}, -- rt.AnimationQueue
+        _party_sprites = {},
 
+        _animation_queue = {}, -- rt.AnimationQueue
 
         _gradient_right = {}, -- rt.LogGradient
         _gradient_left = {},  -- rt.LogGradient
-
     })
 end)
 
@@ -123,6 +123,30 @@ function bt.BattleUI:_reformat_enemy_sprites()
 end
 
 --- @brief
+function bt.BattleUI:_add_party_sprite(entity)
+    local sprite = bt.PartySprite(entity)
+    table.insert(self._party_sprites, sprite)
+    sprite:realize()
+    self:_reformat_party_sprites()
+end
+
+--- @brief
+function bt.BattleUI:_reformat_party_sprites()
+    local n_sprites = sizeof(self._party_sprites)
+    local m = rt.settings.margin_unit
+    local w = (self._bounds.width - (2 / 16) * self._bounds.width - (n_sprites - 1) * m) / n_sprites
+    local h = self._bounds.height * (3 / 9)
+    local y = self._bounds.y + self._bounds.height - h
+    local x = self._bounds.x + (1 / 16) * self._bounds.width
+
+    for i = 1, n_sprites do
+        local sprite = self._party_sprites[i]
+        sprite:fit_into(x, y, w, h)
+        x = x + w + m
+    end
+end
+
+--- @brief
 function bt.BattleUI:get_log()
     return self._log
 end
@@ -147,6 +171,7 @@ function bt.BattleUI:size_allocate(x, y, width, height)
     )
 
     self:_reformat_enemy_sprites()
+    self:_reformat_party_sprites()
 
     local my = rt.settings.margin_unit
     local mx = my
@@ -181,6 +206,10 @@ function bt.BattleUI:draw()
 
     for i in values(self._enemy_sprite_render_order) do
         self._enemy_sprites[i]:draw()
+    end
+
+    for sprite in values(self._party_sprites) do
+        sprite:draw()
     end
 
     self._priority_queue:draw()

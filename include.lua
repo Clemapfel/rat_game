@@ -134,6 +134,7 @@ require "battle.speed_value"
 require "battle.status_bar_element"
 require "battle.status_bar"
 require "battle.enemy_sprite"
+require "battle.party_sprite"
 require "battle.priority_queue_element"
 require "battle.priority_queue"
 

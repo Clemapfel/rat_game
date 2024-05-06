@@ -65,6 +65,15 @@ function bt.HealthBar:_update_color_from_precentage(value)
     self._level_bar:set_color(color, rt.color_darken(color, 0.25))
 end
 
+--- @brief [internal]
+function bt.HealthBar:_update_value()
+    local left, center, right = self:_format_hp(self._hp_current, self._hp_max)
+    self._label_left:set_text(left)
+    self._label_center:set_text(center)
+    self._label_right:set_text(right)
+    self._level_bar:set_value(self._hp_current)
+end
+
 --- @override
 function bt.HealthBar:realize()
     if self._is_realized == true then return end
@@ -132,11 +141,7 @@ function bt.HealthBar:update(delta)
         end
 
         if diff ~= 0 then
-            local left, center, right = self:_format_hp(self._hp_current, self._hp_max)
-            self._label_left:set_text(left)
-            self._label_center:set_text(center)
-            self._label_right:set_text(right)
-            self._level_bar:set_value(self._hp_current)
+            self:_update_value()
             self:_update_color_from_precentage(self._hp_current / self._hp_max)
             self:reformat()
         end
@@ -193,4 +198,10 @@ function bt.HealthBar:synchronize(entity)
     self._level_bar:set_value(self._hp_current)
     self:_update_color_from_precentage(self._hp_current / self._hp_max)
     self:reformat()
+end
+
+--- @brief
+function bt.HealthBar:set_use_percentage(b)
+    self._use_percentage = b
+    self:_update_value()
 end

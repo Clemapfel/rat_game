@@ -19,8 +19,6 @@ bt.EnemySprite = meta.new_type("EnemySprite", rt.Widget, rt.Animation, function(
         _status_bar = bt.StatusBar(entity),
         _status_bar_is_visible = true,
 
-        _sprite = rt.Sprite(entity.sprite_id),
-
         _ui_is_visible = true,
         _opacity = 1,
         _state = bt.EntityState.ALIVE,
