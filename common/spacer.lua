@@ -1,3 +1,7 @@
+rt.settings.spacer = {
+    default_opacity = 0.8
+}
+
 --- @class rt.Space
 --- @param is_transparent Boolean (or nil)
 rt.Spacer = meta.new_type("Spacer", rt.Widget, function(color)
@@ -25,6 +29,7 @@ rt.Spacer = meta.new_type("Spacer", rt.Widget, function(color)
         outline:set_is_outline(true)
     end
 
+    out:set_opacity(rt.settings.spacer.default_opacity)
     return out
 end)
 

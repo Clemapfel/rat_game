@@ -425,6 +425,15 @@ function bt.Entity:has_move(move)
 end
 
 --- @brief
+function bt.Entity:list_moves()
+    local out = {}
+    for entry in values(self.moves) do
+        table.insert(out, entry.move)
+    end
+    return out
+end
+
+--- @brief
 --- @return Boolean true if move is depleted, false otherwise
 function bt.Entity:consume_move(move)
     local entry = self.moves[move:get_id()]

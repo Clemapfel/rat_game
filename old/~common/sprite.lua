@@ -84,7 +84,7 @@ end
 
 --- @brief
 function rt.Sprite:set_animation(id)
-    if id == "" then
+    if id == "" or id == nil then
         self:set_frame(1)
         self._frame_range_start = 1
         self._frame_range_end = self._spritesheet:get_n_frames()

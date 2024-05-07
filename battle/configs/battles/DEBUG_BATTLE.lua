@@ -18,7 +18,12 @@ return {
                 "DEBUG_EQUIP"
             },
             moveset = {
-                "DEBUG_MOVE"
+                "DEBUG_MOVE",
+                "INSPECT",
+                "PROTECT",
+                "STRUGGLE",
+                "SURF",
+                "WISH"
             }
         },
 
@@ -34,7 +39,12 @@ return {
                 "DEBUG_EQUIP"
             },
             moveset = {
-                "DEBUG_MOVE"
+                "DEBUG_MOVE",
+                "INSPECT",
+                "PROTECT",
+                "STRUGGLE",
+                "SURF",
+                "WISH"
             }
         },
 
@@ -49,7 +59,12 @@ return {
                 "DEBUG_EQUIP"
             },
             moveset = {
-                "DEBUG_MOVE"
+                "DEBUG_MOVE",
+                "INSPECT",
+                "PROTECT",
+                "STRUGGLE",
+                "SURF",
+                "WISH"
             }
         }
     }

@@ -1,6 +1,5 @@
 rt.settings.textbox = {
     scroll_speed = 50, -- letters per second
-    backdrop_opacity = 0.8,
     inactive_indicator_opacity = 0.25
 }
 rt.settings.textbox.backdrop_expand_speed = rt.settings.textbox.scroll_speed * 25 -- px per second
@@ -62,9 +61,7 @@ function rt.TextBox:realize()
 
     self._backdrop_backing:realize()
     self._backdrop:realize()
-
-    self._backdrop:set_opacity(rt.settings.textbox.backdrop_opacity)
-    self._backdrop_backing:set_opacity(rt.settings.textbox.backdrop_opacity)
+    self._backdrop:set_opacity(rt.settings.spacer.default_opacity)
 
     for widget in range(
         self._advance_indicator,

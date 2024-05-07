@@ -613,18 +613,17 @@ end
 --- @brief get text justification
 --- @return rt.JustifyMode
 function rt.Label:get_justify_mode()
-
     return self._justify_mode
 end
 
 --- @brief replace text and reformat
 --- @param formatted_text String supports formatting tags
 function rt.Label:set_text(formatted_text)
-
     self._raw = formatted_text
     self:_parse()
     self:_update_default_size()
     self:reformat()
+    self:set_n_visible_characters(self:get_n_characters())
 end
 
 --- @brief access raw text

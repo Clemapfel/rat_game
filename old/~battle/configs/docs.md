@@ -440,7 +440,6 @@ Move {
     can_target_ally = true,      -- const Boolean
 
     priority = 0, -- const Signed
-
     description = "<no description>",    -- String
     
     sprite_id = "",      -- String

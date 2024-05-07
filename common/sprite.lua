@@ -74,20 +74,23 @@ function rt.Sprite:set_frame(i)
     if self._is_realized == true then
         local frame = self._spritesheet:get_frame(self._current_frame)
         self._shape:reformat_texture_coordinates(
-                frame.x, frame.y,
-                frame.x + frame.width, frame.y,
-                frame.x + frame.width, frame.y + frame.height,
-                frame.x, frame.y + frame.height
+            frame.x, frame.y,
+            frame.x + frame.width, frame.y,
+            frame.x + frame.width, frame.y + frame.height,
+            frame.x, frame.y + frame.height
         )
     end
 end
 
 --- @brief
 function rt.Sprite:set_animation(id)
-    if id == "" then
+    if self._is_realized == false then self:realize() end
+    if id == "" or id == nil then
         self:set_frame(1)
         self._frame_range_start = 1
         self._frame_range_end = self._spritesheet:get_n_frames()
+    elseif meta.is_number(id) then
+        self:set_frame(id)
     else
         if self._spritesheet:has_frame(id) == false then
             rt.warning("In rt.Sprite:set_animation: sprite at `" .. self._spritesheet.path .. "` has no animation with id `" .. id .. "`")

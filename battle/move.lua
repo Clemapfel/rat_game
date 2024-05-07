@@ -116,3 +116,18 @@ end
 function bt.Move:get_can_target_enemy()
     return self.can_target_enemy
 end
+
+--- @brief
+function bt.Move:get_sprite_id()
+    return self.sprite_id, self.sprite_index
+end
+
+--- @brief
+function bt.Move:get_description()
+    return self.description
+end
+
+--- @brief
+function bt.Move:get_priority()
+    return self.priority
+end

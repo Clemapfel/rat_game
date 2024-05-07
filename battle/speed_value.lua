@@ -1,5 +1,5 @@
 rt.settings.battle.speed_value = {
-    font = rt.Font(25, "assets/fonts/pixel.ttf"),
+    font = rt.settings.font.default_mono_small,--rt.Font(25, "assets/fonts/pixel.ttf"),
     tick_speed = 1, -- ticks per second
     tick_acceleration = 10, -- modifies how much distance should affect tick speed, more distance = higher speed factor
 }

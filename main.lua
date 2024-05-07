@@ -5,6 +5,22 @@ scene = rt.current_scene
 
 battle = bt.Battle("DEBUG_BATTLE")
 
+move = bt.Move("DEBUG_MOVE")
+item = bt.MoveSelectionItem(move)
+item:set_n_uses(3, 10)
+item:realize()
+item:fit_into(50, 50, 400, 100)
+local selection = rt.SelectionIndicator()
+selection:resize(item)
+
+page = bt.MoveInfo(move)
+page:realize()
+page:fit_into(50, 50, 400, 400)
+
+selection = bt.MoveSelection()
+selection:realize()
+selection:fit_into(50, 50, 400, 400)
+
 input_controller = rt.InputController()
 input_controller:signal_connect("pressed", function(self, which)
     if which == rt.InputButton.A then
@@ -16,6 +32,9 @@ input_controller:signal_connect("pressed", function(self, which)
             scene._ui:_add_enemy_sprite(entity)
         end
     elseif which == rt.InputButton.B then
+        for move in values(battle.entities[1]:list_moves()) do
+            selection:add(move)
+        end
     elseif which == rt.InputButton.X then
     elseif which == rt.InputButton.Y then
     elseif which == rt.InputButton.L then
@@ -46,6 +65,8 @@ love.draw = function()
         rt.current_scene:draw()
     end
 
+    selection:draw()
+
     do -- show fps and frame usage
         local fps = love.timer.getFPS()
         local frame_usage = math.round(rt.graphics.frame_duration.max / (1 / fps) * 100)
@@ -55,27 +76,21 @@ love.draw = function()
         love.graphics.print(label, rt.graphics.get_width() - love.graphics.getFont():getWidth(label) - 2 * margin, 0.5 * margin)
     end
 
-    love.graphics.setLineWidth(1)
-    local intensity = 0.1
-    love.graphics.setColor(intensity, intensity, intensity, 1)
-    rt.graphics.set_blend_mode(rt.BlendMode.ADD)
-    local x, y, width, height = 0, 0, rt.graphics.get_width(), rt.graphics.get_height()
-    -- margin_left
-    love.graphics.line(x + (1/16) * width, y, x + (1/16) * width, y + height)
-    -- marign right
-    love.graphics.line(x + (1 - 1/16) * width, y, x + (1 - 1/16) * width, y + height)
-    -- margin top
-    love.graphics.line(x, y + (0.5/9) * height, x + width, y + (0.5/9) * height)
-    -- margin bottom
-    love.graphics.line(x, y + (1 - 0.5/9) * height, x + width, y + (1 - 0.5/9) * height)
-    -- left 4:3
-    love.graphics.line(x + (3/16) * width, y, x + (3/16) * width, y + height)
-    -- right 4:3
-    love.graphics.line(x + (1 - 3/16) * width, y, x + (1 - 3/16) * width, y + height)
-    -- horizontal center
-    love.graphics.line(x, y + 0.5 * height, x + width, y + 0.5 * height)
-    -- vertical center
-    love.graphics.line(x + 0.5 * width, y, x + 0.5 * width, height)
+    do -- show rulers
+        love.graphics.setLineWidth(1)
+        local intensity = 0.1
+        love.graphics.setColor(intensity, intensity, intensity, 1)
+        rt.graphics.set_blend_mode(rt.BlendMode.ADD)
+        local x, y, width, height = 0, 0, rt.graphics.get_width(), rt.graphics.get_height()
+        love.graphics.line(x + (1/16) * width, y, x + (1/16) * width, y + height)
+        love.graphics.line(x + (1 - 1/16) * width, y, x + (1 - 1/16) * width, y + height)
+        love.graphics.line(x, y + (0.5/9) * height, x + width, y + (0.5/9) * height)
+        love.graphics.line(x, y + (1 - 0.5/9) * height, x + width, y + (1 - 0.5/9) * height)
+        love.graphics.line(x + (3/16) * width, y, x + (3/16) * width, y + height)
+        love.graphics.line(x + (1 - 3/16) * width, y, x + (1 - 3/16) * width, y + height)
+        love.graphics.line(x, y + 0.5 * height, x + width, y + 0.5 * height)
+        love.graphics.line(x + 0.5 * width, y, x + 0.5 * width, height)
+    end
 end
 
 love.update = function(delta)

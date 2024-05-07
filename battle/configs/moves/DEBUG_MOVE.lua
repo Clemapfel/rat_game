@@ -1,21 +1,19 @@
 return {
-    name = "Test Move",
+    name = "Debug Move",
+    description = "Debug Move, no effect",
+
     sprite_id = "orbs",
-    sprite_index = 3,
+    sprite_index = 1,
 
     animation_id = "",
-
-    stance_alignment = "NEUTRAL",
 
     can_target_multiple = false,
     can_target_self = true,
     can_target_enemy = true,
     can_target_ally = false,
 
-    priority = 1,
-
-    description = "Deal damage equal to 1× <color=ATTACK>ATK</color>",
-    bonus_description = "50% more damage, priorty",
+    priority = 0,
+    max_n_uses = POSITIVE_INFINITY,
 
     effect = function(self, user, targets)
         meta.assert_move_interface(self)
