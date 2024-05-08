@@ -7,7 +7,8 @@ return {
     },
 
     entities = {
-        ["BALL_WITH_FACE"] = {
+        {
+            id = "BALL_WITH_FACE",
             status = {
                 "DEBUG_STATUS"
             },
@@ -27,8 +28,8 @@ return {
             }
         },
 
-
-        ["SMALL_UFO"] = {
+        {
+            id = "SMALL_UFO",
             status = {
                 "DEBUG_STATUS"
             },
@@ -48,7 +49,50 @@ return {
             }
         },
 
-        ["WALKING_SPROUT"] = {
+        {
+            id = "WALKING_SPROUT",
+            status = {
+                "DEBUG_STATUS"
+            },
+            consumables = {
+                "DEBUG_CONSUMABLE"
+            },
+            equips = {
+                "DEBUG_EQUIP"
+            },
+            moveset = {
+                "DEBUG_MOVE",
+                "INSPECT",
+                "PROTECT",
+                "STRUGGLE",
+                "SURF",
+                "WISH"
+            }
+        },
+
+        {
+            id = "GAMBLER_MOLE",
+            status = {
+                "DEBUG_STATUS"
+            },
+            consumables = {
+                "DEBUG_CONSUMABLE"
+            },
+            equips = {
+                "DEBUG_EQUIP"
+            },
+            moveset = {
+                "DEBUG_MOVE",
+                "INSPECT",
+                "PROTECT",
+                "STRUGGLE",
+                "SURF",
+                "WISH"
+            }
+        },
+
+        {
+            id = "GAMBLER_MOLE",
             status = {
                 "DEBUG_STATUS"
             },
@@ -68,5 +112,4 @@ return {
             }
         }
     }
-
 }

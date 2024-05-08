@@ -21,21 +21,27 @@ selection = bt.MoveSelection()
 selection:realize()
 selection:fit_into(50, 50, 400, 400)
 
+page = bt.EntityInfo(battle.entities[1])
+page:realize()
+page:fit_into(50, 50, 400, 400)
+
 input_controller = rt.InputController()
 input_controller:signal_connect("pressed", function(self, which)
     if which == rt.InputButton.A then
         scene._ui:set_priority_order(battle:get_entities_in_order())
         for entity in values(battle:list_entities()) do
-            scene._ui:_add_party_sprite(entity)
-        end
-        for entity in values(battle:list_entities()) do
-            scene._ui:_add_enemy_sprite(entity)
+            if not entity:get_is_enemy() then
+                scene._ui:_add_party_sprite(entity)
+            else
+                scene._ui:_add_enemy_sprite(entity)
+            end
         end
     elseif which == rt.InputButton.B then
         for move in values(battle.entities[1]:list_moves()) do
             selection:add(move)
         end
     elseif which == rt.InputButton.X then
+        scene._ui:set_selected({battle.entities[1], battle.entities[3], battle.entities[5]})
     elseif which == rt.InputButton.Y then
     elseif which == rt.InputButton.L then
     elseif which == rt.InputButton.R then
@@ -65,6 +71,7 @@ love.draw = function()
         rt.current_scene:draw()
     end
 
+    page:draw()
     selection:draw()
 
     do -- show fps and frame usage

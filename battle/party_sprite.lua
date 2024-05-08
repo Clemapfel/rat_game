@@ -17,6 +17,7 @@ bt.PartySprite = meta.new_type("PartySprite", rt.Widget, rt.Animation, function(
 
         _opacity = 1,
         _state = bt.EntityState.ALIVE,
+        _is_selected = false,
 
         _backdrop = rt.Rectangle(0, 0, 1, 1),
         _frame = rt.Rectangle(0, 0, 1, 1),
@@ -35,6 +36,10 @@ function bt.PartySprite:_update_state()
     elseif self._state == bt.EntityState.DEAD then
         self._backdrop:set_color(rt.settings.battle.priority_queue_element.dead_base_color)
         self._name:set_color(rt.RGBA(1, 1,1, rt.settings.battle.priority_queue_element.dead_shape_alpha))
+    end
+
+    if self._is_selected then
+        self._frame:set_color(rt.settings.battle.priority_queue_element.selected_frame_color)
     end
 end
 
@@ -152,4 +157,15 @@ function bt.PartySprite:update(delta)
     self._health_bar:update(delta)
     self._speed_value:update(delta)
     self._status_bar:update(delta)
+end
+
+--- @brief
+function bt.PartySprite:set_is_selected(b)
+    self._is_selected = b
+    self:_update_state()
+end
+
+--- @brief
+function bt.PartySprite:get_entity()
+    return self._entity
 end

@@ -110,6 +110,17 @@ function bt.Entity:realize()
         end
     end
 
+    local booleans = {
+        "is_enemy"
+    }
+
+    for _, key in ipairs(booleans) do
+        if config[key] ~= nil then
+            self[key] = config[key]
+        end
+    end
+    dbg(self.id, self.is_enemy)
+
     self.knocked_out_sprite_id = which(self.knocked_out_sprite_id, self.sprite_id)
     self.knocked_out_index = which(self.knocked_out_sprite_index, self.sprite_index)
     self.dead_sprite_id = which(self.dead_sprite_id, self.sprite_id)

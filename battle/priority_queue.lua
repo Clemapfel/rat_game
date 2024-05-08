@@ -1,4 +1,5 @@
 rt.settings.battle.priority_queue = {
+    outer_margin = 2 * rt.settings.margin_unit,
     element_size = 100,
     first_element_scale_factor = 1.3,
     first_element_scale_speed = 0.4, -- duration from 1.0 to 1.3, in seconds
@@ -37,6 +38,21 @@ function bt.PriorityQueue:get_preview_visible()
 end
 
 --- @brief
+function bt.PriorityQueue:set_selected(entities)
+    local is_selected = {}
+    for entity in values(entities) do
+        is_selected[entity] = true
+    end
+
+    for id, entry in pairs(self._current.entries) do
+        local element_selected = is_selected[id] == true
+        for element in values(entry.elements) do
+            element:set_is_selected(element_selected)
+        end
+    end
+end
+
+--- @brief
 --- @param order Table<bt.Entity>
 function bt.PriorityQueue:reorder(order, next_order)
 
@@ -64,7 +80,7 @@ function bt.PriorityQueue:reorder(order, next_order)
             if which.entries[entity] == nil then
                 which.entries[entity] = {
                     id = entity,
-                    elements = {},  -- Table<rt.PriorityQueue>
+                    elements = {},  -- Table<rt.PriorityQueueElement>
                     colliders = {}, -- Table<rt.Collider>
                     size = 0,
                     target_positions = {} -- Table<Table<X, Y>>
@@ -132,7 +148,7 @@ function bt.PriorityQueue:size_allocate(x, y, width, height)
             end
 
             local n_seen = {}
-            local outer_margin = 1.5 * rt.settings.margin_unit
+            local outer_margin = rt.settings.battle.priority_queue.outer_margin
             local factor = rt.settings.battle.priority_queue.first_element_scale_factor
             local size = rt.settings.battle.priority_queue.element_size
 
@@ -140,8 +156,8 @@ function bt.PriorityQueue:size_allocate(x, y, width, height)
                 rt.settings.margin_unit,
                 ((height - 2 * outer_margin) - ((#which.order) * element_size) - (element_size * factor)) / (#which.order + 1)
             )
-            local center_x = x + width - 2 * outer_margin
-            local element_x, element_y = center_x, y + 2 * outer_margin + 0.5 * element_size + 0.5 * element_size
+            local center_x = x + width - outer_margin
+            local element_x, element_y = center_x, y + outer_margin + 0.5 * element_size + 0.5 * element_size
             local x_offset = ternary(offset, -1 * size * factor + m, 0)
             -- first element is larger
             which.render_order = {}

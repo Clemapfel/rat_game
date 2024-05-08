@@ -132,7 +132,7 @@ rt.Palette.TEXT = rt.Palette.WHITE
 rt.Palette.HIGHLIGHT = rt.Palette.BLUE_2
 rt.Palette.HIGHLIGHT_OUTLINE = rt.Palette.BLUE_4
 
-rt.Palette.SELECTION = rt.Palette.YELLOW_1
+rt.Palette.SELECTION = rt.Palette.YELLOW_2
 rt.Palette.SELECTION_OUTLINE = rt.Palette.ORANGE_1
 
 -- battle

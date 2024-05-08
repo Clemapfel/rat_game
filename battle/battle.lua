@@ -70,33 +70,30 @@ function bt.Battle:realize()
     end
 
     local i = 1
-    for id, entry in pairs(config[key_id]) do
-        if meta.is_string(entry) then
-            self:add_entity(bt.Entity(id))
-        else
-            if not meta.is_string(id) or not meta.is_table(entry) then
-                rt.error("In rt.Battle:realize: error when loading config at `" .. path .. "`: `entities` table is malformatted, expected EntityID -> Table")
-            end
-            local entity = bt.Entity(id)
-            for status_id in values(entry.status) do
-                entity:add_status(bt.Status(status_id))
-            end
-
-            for consumable_id in values(entry.consumables) do
-                entity:add_consumable(bt.Consumable(consumable_id))
-            end
-
-            for equip_id in values(entry.equips) do
-                entity:add_equip(bt.Equip(equip_id))
-            end
-
-            for move_id in values(entry.moveset) do
-                entity:add_move(bt.Move(move_id))
-            end
-
-            self:add_entity(entity)
+    for entry in values(config[key_id]) do
+        if not meta.is_table(entry) or not meta.is_string(entry.id) then
+            rt.error("In rt.Battle:realize: error when loading config at `" .. path .. "`: `entities` table is malformatted, expected Table with entry `id`")
         end
 
+        local id = entry.id
+        local entity = bt.Entity(id)
+        for status_id in values(entry.status) do
+            entity:add_status(bt.Status(status_id))
+        end
+
+        for consumable_id in values(entry.consumables) do
+            entity:add_consumable(bt.Consumable(consumable_id))
+        end
+
+        for equip_id in values(entry.equips) do
+            entity:add_equip(bt.Equip(equip_id))
+        end
+
+        for move_id in values(entry.moveset) do
+            entity:add_move(bt.Move(move_id))
+        end
+
+        self:add_entity(entity)
         i = i + 1
     end
 

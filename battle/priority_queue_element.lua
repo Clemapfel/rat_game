@@ -92,14 +92,16 @@ function bt.PriorityQueueElement:set_is_selected(b)
 end
 
 function bt.PriorityQueueElement:_update_frame_color()
-    if self._is_selected then
-        self._frame:set_color(rt.settings.battle.priority_queue_element.selected_frame_color)
-    elseif self._state == bt.EntityState.ALIVE then
+    if self._state == bt.EntityState.ALIVE then
         self._frame:set_color(rt.settings.battle.priority_queue_element.frame_color)
     elseif self._state == bt.EntityState.KNOCKED_OUT then
         self._frame:set_color(rt.color_lighten(rt.Palette.KNOCKED_OUT, 0.15))
     elseif self._state == bt.EntityState.DEAD then
         self._frame:set_color(rt.settings.battle.priority_queue_element.dead_frame_color)
+    end
+
+    if self._is_selected then
+        self._frame:set_color(rt.settings.battle.priority_queue_element.selected_frame_color)
     end
 end
 

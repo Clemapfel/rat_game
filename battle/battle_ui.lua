@@ -81,7 +81,7 @@ function bt.BattleUI:_reformat_enemy_sprites()
         total_w = total_w + w
     end
 
-    local mx = self._bounds.width * 1 / 16
+    local mx = rt.settings.battle.priority_queue.outer_margin + rt.settings.battle.priority_queue.element_size
     local center_x = self._bounds.x + self._bounds.width * 0.5
     local w, h = self._enemy_sprites[1]:measure()
     local left_offset, right_offset = w * 0.5, w * 0.5
@@ -133,11 +133,12 @@ end
 --- @brief
 function bt.BattleUI:_reformat_party_sprites()
     local n_sprites = sizeof(self._party_sprites)
-    local m = rt.settings.margin_unit
-    local w = (self._bounds.width - (2 / 16) * self._bounds.width - (n_sprites - 1) * m) / n_sprites
+    local m = rt.settings.margin_unit * 2
+    local mx = rt.settings.battle.priority_queue.outer_margin + rt.settings.battle.priority_queue.element_size + m
+    local w = (self._bounds.width - 2 * mx - (n_sprites - 1) * m) / n_sprites
     local h = self._bounds.height * (3 / 9)
     local y = self._bounds.y + self._bounds.height - h
-    local x = self._bounds.x + (1 / 16) * self._bounds.width
+    local x = self._bounds.x + mx
 
     for i = 1, n_sprites do
         local sprite = self._party_sprites[i]
@@ -218,5 +219,23 @@ end
 --- @brief
 function bt.BattleUI:set_priority_order(order)
     self._priority_queue:reorder(order)
+end
+
+--- @brief
+function bt.BattleUI:set_selected(entities)
+    self._priority_queue:set_selected(entities)
+
+    local is_selected = {}
+    for entity in values(entities) do
+        is_selected[entity] = true
+    end
+
+    for sprite in values(self._party_sprites) do
+        sprite:set_is_selected(is_selected[sprite:get_entity()] == true)
+    end
+
+    for sprite in values(self._enemy_sprites) do
+        sprite:set_is_selected(is_selected[sprite:get_entity()] == true)
+    end
 end
 

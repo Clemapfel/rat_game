@@ -52,7 +52,7 @@ function bt.MoveSelectionItem:realize()
         self._sprite:set_animation(sprite_index)
     end
 
-    self._name = rt.Label("<b>" .. self._move:get_name() .. "</b>")
+    self._name = rt.Label(self._move:get_name())
     self._n_uses_label = rt.Label(self:_format_n_uses())
 
     for widget in range(self._name, self._n_uses_label) do

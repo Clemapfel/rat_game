@@ -22,6 +22,9 @@ bt.EnemySprite = meta.new_type("EnemySprite", rt.Widget, rt.Animation, function(
         _ui_is_visible = true,
         _opacity = 1,
         _state = bt.EntityState.ALIVE,
+
+        _is_selected = false,
+        _selection_frame = rt.SelectionIndicator()
     })
 end)
 
@@ -48,6 +51,8 @@ function bt.EnemySprite:realize()
 
     self._status_bar:realize()
     self._status_bar:synchronize(self._entity)
+
+    self._selection_frame:realize()
 
     self:set_is_animated(true)
     self:reformat()
@@ -89,6 +94,8 @@ function bt.EnemySprite:size_allocate(x, y, width, height)
         sprite_x + sprite_w - speed_value_w * 1.5,
         sprite_y + sprite_h - speed_value_h
     )
+
+    self._selection_frame:resize(self._sprite)
 end
 
 --- @override
@@ -98,6 +105,10 @@ function bt.EnemySprite:draw()
         if self._health_bar_is_visible then self._health_bar:draw() end
         if self._speed_value_is_visible then self._speed_value:draw() end
         if self._status_bar_is_visible then self._status_bar:draw() end
+    end
+
+    if self._is_selected then
+        self._selection_frame:draw()
     end
 end
 
@@ -177,4 +188,9 @@ end
 --- @brief
 function bt.EnemySprite:measure()
     return self._sprite:measure()
+end
+
+--- @brief
+function bt.EnemySprite:set_is_selected(b)
+    self._is_selected = b
 end

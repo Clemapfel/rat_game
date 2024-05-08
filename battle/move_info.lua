@@ -27,7 +27,7 @@ function bt.MoveInfo:realize()
         for _, v in pairs({...}) do
             str = str .. tostring(v)
         end
-        local out = rt.Label(str, rt.settings.font.default, rt.settings.font.default_mono)
+        local out = rt.Label("<o>" .. str .. "</o>", rt.settings.font.default, rt.settings.font.default_mono)
         out:realize()
         out:set_justify_mode(rt.JustifyMode.LEFT)
         return out

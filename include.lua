@@ -141,6 +141,7 @@ require "battle.priority_queue"
 require "battle.move_selection_item"
 require "battle.move_selection"
 require "battle.move_info"
+require "battle.entity_info"
 
 require "battle.battle_ui"
 require "battle.scene"

@@ -23,9 +23,24 @@ Input:
 
     ?: jump to start
 
+show consumable / equip of current user
+
 inspect mode
 select mode
     show move
+]]--
+
+--[[
+Pro Items:
++ introduces macro decision making outside of battle
+- consumables already do that
++ but you dont have control over when consumables activate
+- introduce activatable consumable
++ only one consumable per battle per character
+- have multiple consumable slots if you really want that
+
+Contra Items:
++ redundant in in-battle function
 ]]--
 
 rt.settings.battle.move_selection = {
@@ -47,8 +62,11 @@ bt.MoveSelection = meta.new_type("MoveSelection", rt.Widget, function(entity)
         _base = rt.Rectangle(0, 0, 1, 1),
         _base_gradient = rt.LogGradient(),
 
+        _heading = {}, -- rt.Label
+
         _items = {},
         _item_order = {},
+        _item_bounds = rt.AABB(0, 0, 1, 1),
 
         _sort_mode = rt.MoveSelectionSortMode.BY_NAME,
         _sortings = {}, -- Table<rt.MoveSelectionSortMode, Table<MoveID>>
@@ -126,6 +144,9 @@ function bt.MoveSelection:realize()
     self._left_vrule:set_color(rt.Palette.FOREGROUND)
     self._left_vrule_outline:set_line_width(line_width + 2)
     self._left_vrule_outline:set_color(rt.Palette.BASE_OUTLINE)
+
+    self._heading = rt.Label("<b><u>Choose Action</u></b>")
+    self._heading:realize()
 end
 
 --- @override
@@ -139,6 +160,12 @@ function bt.MoveSelection:size_allocate(x, y, width, height)
     local line_width = rt.settings.battle.move_selection.vrule_thickness * 0.5
     self._left_vrule:resize(x - line_width * 0.5, y, x, y + height)
     self._left_vrule_outline:resize(x - line_width * 0.5, y, x, y + height)
+
+    local m = rt.settings.margin_unit
+    local current_x, current_y = x + m, y + m
+    self._heading:fit_into(current_x, current_y, width, height)
+    current_y = current_y + select(2, self._heading:measure()) + m
+    self._item_bounds = rt.AABB(current_x, current_y, width, height)
 end
 
 --- @override
@@ -150,9 +177,11 @@ function bt.MoveSelection:draw()
     self._left_vrule_outline:draw()
     self._left_vrule:draw()
 
+    self._heading:draw()
+
     rt.graphics.push()
     local m = rt.settings.margin_unit
-    rt.graphics.translate(self._bounds.x + m, self._bounds.y + m)
+    rt.graphics.translate(self._item_bounds.x, self._item_bounds.y)
     local y_offset = 0
     local order = self._item_order
     if self._sort_mode ~= rt.MoveSelectionSortMode.DEFAULT then
