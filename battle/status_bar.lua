@@ -77,16 +77,16 @@ function bt.StatusBar:update(delta)
             e.elapsed = e.elapsed + delta
             if e.is_revealing then
                 local value = e.elapsed / add_duration
-                e.element:set_opacity(value)
+                e.element:set_opacity(math.min(value, self._opacity))
                 e.element:set_scale(max_scale - mix(1, max_scale, value) + 1)
                 if e.elapsed > add_duration then
                     e.is_revealing = false
-                    e.element:set_opacity(1)
+                    e.element:set_opacity(self._opacity)
                     e.element:set_scale(1)
                 end
             elseif e.is_hiding then
                 local value = e.elapsed / hide_duration
-                e.element:set_opacity(1 - value)
+                e.element:set_opacity(math.min((1 - value), self._opacity))
                 if e.elapsed > hide_duration then
                     e.is_hiding = false
                     table.insert(to_remove, which)
@@ -207,7 +207,7 @@ function bt.StatusBar:remove(status)
         if e.element._status == status then
             e.is_revealing = false
             e.element:set_scale(1)
-            e.element:set_opacity(1)
+            e.element:set_opacity(self._opacity)
             e.element:set_hide_n_turns_left(true)
             e.is_hiding = true
             seen = true
@@ -265,5 +265,13 @@ function bt.StatusBar:set_alignment(alignment)
     if self._alignment ~= alignment then
         self._alignment = alignment
         self:reformat()
+    end
+end
+
+--- @brief
+function bt.StatusBar:set_opacity(alpha)
+    self._opacity = alpha
+    for entry in values(self._elements) do
+        entry.element:set_opacity(alpha)
     end
 end

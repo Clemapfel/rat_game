@@ -69,6 +69,7 @@ require "common.random"
 require "common.easement_functions"
 require "common.list"
 require "common.set"
+require "common.graph"
 
 require "common.signals"
 require "common.input_handler"

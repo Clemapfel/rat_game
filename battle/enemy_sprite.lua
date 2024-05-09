@@ -106,6 +106,9 @@ end
 function bt.EnemySprite:set_opacity(alpha)
     self._opacity = alpha
     self._sprite:set_opacity(alpha)
+    self._health_bar:set_opacity(alpha)
+    self._status_bar:set_opacity(alpha)
+    self._speed_value:set_opacity(alpha)
 end
 
 --- @brief

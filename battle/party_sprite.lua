@@ -164,3 +164,12 @@ end
 function bt.PartySprite:get_bounds()
     return self._bounds
 end
+
+--- @brief
+function bt.PartySprite:set_opacity(alpha)
+    self._opacity = alpha
+
+    for object in range(self._health_bar, self._name, self._speed_value, self._status_bar, self._backdrop, self._frame, self._frame_outline, self._frame_gradient) do
+        object:set_opacity(alpha)
+    end
+end

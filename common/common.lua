@@ -656,8 +656,6 @@ function string.first(str)
     return string.sub(str, 1, 1)
 end
 
---- @brief convert snake_case to CamelCase
-
 --- @brief split along character
 function string.split(str, separator)
     assert(type(str) == "string")

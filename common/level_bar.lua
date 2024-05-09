@@ -99,3 +99,12 @@ function rt.LevelBar:set_corner_radius(radius)
         shape:set_corner_radius(radius)
     end
 end
+
+--- @brief
+function rt.LevelBar:set_opacity(alpha)
+    self._opacity = alpha
+    self._shape:set_opacity(alpha)
+    self._shape_outline:set_opacity(alpha)
+    self._backdrop:set_opacity(alpha)
+    self._backdrop_outline:set_opacity(alpha)
+end

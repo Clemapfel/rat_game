@@ -170,13 +170,13 @@ function bt.PriorityQueueElement:realize()
     end
 
     self._id_offset_label = rt.Glyph(
-            rt.settings.battle.priority_queue_element.font,
-            self._entity:get_id_offset_suffix(),
-            {
-                is_outlined = true,
-                outline_color = rt.Palette.BLACK,
-                font_style = rt.FontStyle.BOLD
-            }
+        rt.settings.battle.priority_queue_element.font,
+        self._entity:get_id_offset_suffix(),
+        {
+            is_outlined = true,
+            outline_color = rt.Palette.BLACK,
+            font_style = rt.FontStyle.BOLD
+        }
     )
 
     self._change_indicator = rt.DirectionIndicator(self._change_direction)
@@ -306,17 +306,17 @@ function bt.PriorityQueueElement:size_allocate(x, y, width, height)
         local label_w, label_h = self._id_offset_label:get_size()
         local label_offset = 0.75
         self._id_offset_label:set_position(
-                x + width - label_offset * label_w,
-                y + height - label_offset * label_h
+            x + width - label_offset * label_w,
+            y + height - label_offset * label_h
         )
 
         -- align direction
         local direction_size = rt.settings.battle.priority_queue_element.font:get_size()
         local direction_offset = -0.4
         self._change_indicator:fit_into(
-                x + direction_offset * direction_size,
-                y + direction_offset * direction_size,
-                direction_size, direction_size
+            x + direction_offset * direction_size,
+            y + direction_offset * direction_size,
+            direction_size, direction_size
         )
 
     end
@@ -383,5 +383,14 @@ function bt.PriorityQueueElement:set_id_offset_label_visible(b)
         self._id_offset_label_visible = b
         self._id_offset_label:set_text(self._entity:get_id_offset_suffix())
         self:reformat()
+    end
+end
+
+--- @brief
+function bt.PriorityQueueElement:set_opacity(alpha)
+    self._opacity = alpha
+
+    for object in range(self._shape, self._backdrop, self._frame, self._frame_outline, self._frame_gradient, self._change_indicator) do
+        object:set_opacity(alpha)
     end
 end

@@ -23,7 +23,7 @@ bt.HealthBar = meta.new_type("HealthBar", rt.Widget, rt.Animation, function(enti
         _hp_max = -1,
 
         _level_bar = rt.LevelBar(0, entity:get_hp(), entity:get_hp_base()),
-        _label_left = {},
+        _label_left = {},  -- rt.Glyph
         _label_center = {},
         _label_right = {},
 
@@ -203,4 +203,15 @@ end
 function bt.HealthBar:set_use_percentage(b)
     self._use_percentage = b
     self:_update_value()
+end
+
+--- @brief
+function bt.HealthBar:set_opacity(alpha)
+    self._opacity = alpha
+    self._level_bar:set_opacity(alpha)
+    for object in values(self._level_bar, self._label_left, self._label_center, self._label_right) do
+        if object.set_opacity ~= nil then
+            object:set_opacity(alpha)
+        end
+    end
 end

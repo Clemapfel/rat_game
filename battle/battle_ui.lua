@@ -234,12 +234,17 @@ function bt.BattleUI:set_selected(entities)
         is_selected[entity] = true
     end
 
-    for sprite in values(self._party_sprites) do
-        sprite:set_is_selected(is_selected[sprite:get_entity()] == true)
-    end
-
-    for sprite in values(self._enemy_sprites) do
-        sprite:set_is_selected(is_selected[sprite:get_entity()] == true)
+    local unselected_opacity = 0.5
+    for sprites in range(self._party_sprites, self._enemy_sprites) do
+        for sprite in values(sprites) do
+            if is_selected[sprite:get_entity()] == true then
+                sprite:set_is_selected(true)
+                sprite:set_opacity(1)
+            else
+                sprite:set_is_selected(false)
+                sprite:set_opacity(unselected_opacity)
+            end
+        end
     end
 end
 

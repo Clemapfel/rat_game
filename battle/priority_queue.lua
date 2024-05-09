@@ -44,10 +44,12 @@ function bt.PriorityQueue:set_selected(entities)
         is_selected[entity] = true
     end
 
+    local unselected_alpha = 0.5
     for id, entry in pairs(self._current.entries) do
         local element_selected = is_selected[id] == true
         for element in values(entry.elements) do
             element:set_is_selected(element_selected)
+            element:set_opacity(ternary(element_selected, 1, unselected_alpha))
         end
     end
 end
