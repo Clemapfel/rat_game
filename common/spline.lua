@@ -67,7 +67,7 @@ function rt.Spline:at(t)
     if i == 1 then previous_x, previous_y = current_x, current_y end
 
     local fraction = length / self._distances[i]
-    return math3d.utils.lerp(previous_x, current_x, fraction), math3d.utils.lerp(previous_y, current_y, fraction)
+    return mix(previous_x, current_x, fraction), mix(previous_y, current_y, fraction)
 end
 
 --- @brief [internal]
@@ -90,12 +90,6 @@ function rt.Spline._catmull_rom(points, loop, quality)
 
     if meta.is_nil(loop) then loop = false end
     meta.assert_boolean(loop)
-
-    function _length_of(x1, y1, x2, y2)
-        local width, height = x2 - x1, y2 - y1
-        return math.sqrt(width*width + height*height)
-    end
-
     loop = which(loop, false)
     local steprate = clamp(which(quality, rt.settings.spline.steprate), 1)
 
@@ -103,64 +97,34 @@ function rt.Spline._catmull_rom(points, loop, quality)
         rt.error("In rt.Spline._catmull_rom: number of point vertices have to be a multiple of 2")
     end
 
-    if (#points < 6) then
-        local distances = {}
-        local total_length = 0
-
-        local i = 1
-        local x1 = points[i]
-        local y1 = points[i+1]
-        local x2 = points[i+2]
-        local y2 = points[i+3]
-
-        local distances = {
-            0,
-            _length_of(x1, y1, x2, y2)
-        }
-
-        local total_length = 0
-        for _, k in pairs(distances) do
-            total_length = total_length + k
-        end
-        return points, distances, total_length
-    end
-
-    local firstX, firstY, secondX, secondY = splat(rt.Spline._range(points, 1, 4))
-    local penultX, penultY, lastX, lastY = splat(rt.Spline._range(points, #points-3, 4))
-
-    local spline = {}
     local distances = {0}
     local total_length = 0
+    local spline = {}
 
-    local start, count = 1, #points-2
+    local function _length_of(x1, y1, x2, y2)
+        return math.sqrt((x2 - x1)^2 + (y2 - y1)^2)
+    end
+
     local p0x, p0y, p1x, p1y, p2x, p2y, p3x, p3y
-    local x, y
+    local x, y, t
 
-    for i = start, count, 2 do
-        if i == 1 then
-            p0x, p0y, p1x, p1y, p2x, p2y, p3x, p3y = points[i], points[i+1], points[i], points[i+1], points[i+2], points[i+3], points[i+4], points[i+5]
-        elseif i == count-1 then
-            p0x, p0y, p1x, p1y, p2x, p2y = splat(rt.Spline._range(points, #points-5, 6))
-            p3x, p3y = points[#points-1], points[#points]
-        else
-            p0x, p0y, p1x, p1y, p2x, p2y, p3x, p3y = splat(rt.Spline._range(points, i-2, 8))
-        end
+    for i = 1, #points - 2, 2 do
+        p0x, p0y = points[i-2] or points[i], points[i-1] or points[i+1]
+        p1x, p1y = points[i], points[i+1]
+        p2x, p2y = points[i+2], points[i+3]
+        p3x, p3y = points[i+4] or points[i+2], points[i+5] or points[i+3]
 
         for t = 0, 1, 1 / steprate do
-            x = 0.5 * ((2 * p1x) + (p2x - p0x) * t + (2 * p0x - 5 * p1x + 4 * p2x - p3x) * t * t + (3 * p1x - p0x - 3 * p2x + p3x) * t * t * t)
-            y = 0.5 * ((2 * p1y) + (p2y - p0y) * t + (2 * p0y - 5 * p1y + 4 * p2y - p3y) * t * t + (3 * p1y - p0y - 3 * p2y + p3y) * t * t * t)
+            x = 0.5 * ((2 * p1x) + (p2x - p0x) * t + (2 * p0x - 5 * p1x + 4 * p2x - p3x) * t^2 + (3 * p1x - p0x - 3 * p2x + p3x) * t^3)
+            y = 0.5 * ((2 * p1y) + (p2y - p0y) * t + (2 * p0y - 5 * p1y + 4 * p2y - p3y) * t^2 + (3 * p1y - p0y - 3 * p2y + p3y) * t^3)
 
-            -- prevent duplicate entries
-            if (not (#spline > 0 and spline[#spline-1] == x and spline[#spline] == y)) then
+            if not (#spline > 0 and spline[#spline-1] == x and spline[#spline] == y) then
                 table.insert(spline, x)
                 table.insert(spline, y)
-
-                local n = #spline
-                if n > 2 then
-                    local x1, y1, x2, y2 = spline[n-3], spline[n-2], spline[n-1], spline[n]
-                    local distance = _length_of(x1, y1, x2, y2)
-                    table.insert(distances, distance)
-                    total_length = total_length + distance
+                if #spline > 2 then
+                    local dist = _length_of(spline[#spline-3], spline[#spline-2], x, y)
+                    table.insert(distances, dist)
+                    total_length = total_length + dist
                 end
             end
         end

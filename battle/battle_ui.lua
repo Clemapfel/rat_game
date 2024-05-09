@@ -15,7 +15,7 @@ bt.BattleUI = meta.new_type("BattleUI", rt.Widget, rt.Animation, function()
         _enemy_sprites = {},              -- Table<bt.EnemySprite>
         _enemy_sprite_render_order = {},  -- Queue<Number>
 
-        _party_sprites = {},
+        _party_sprites = {}, -- Table<bt.PartySprite>
 
         _animation_queue = {}, -- rt.AnimationQueue
 
@@ -81,13 +81,16 @@ function bt.BattleUI:_reformat_enemy_sprites()
         total_w = total_w + w
     end
 
+    local x = self._bounds.x
+    local width = self._bounds.width
+
     local mx = rt.settings.battle.priority_queue.outer_margin + rt.settings.battle.priority_queue.element_size
-    local center_x = self._bounds.x + self._bounds.width * 0.5
+    local center_x = x + width * 0.5
     local w, h = self._enemy_sprites[1]:measure()
     local left_offset, right_offset = w * 0.5, w * 0.5
     local m = math.min( -- if enemy don't fit on screen, stagger without violating outer margins
         rt.settings.margin_unit * 2,
-        (self._bounds.width - 2 * mx - total_w) / (#self._enemy_sprites - 1)
+        (width - 2 * mx - total_w) / (#self._enemy_sprites - 1)
     )
     total_w = total_w + (#self._enemy_sprites - 1) * m
 
@@ -116,7 +119,7 @@ function bt.BattleUI:_reformat_enemy_sprites()
         x_offset = x_offset + w + m
     end
 
-    local x_offset = clamp(((self._bounds.width - 2 * mx) - total_w) * 0.5, 0)
+    local x_offset = clamp(((width - 2 * mx) - total_w) * 0.5, 0)
     for i, xy in pairs(xy_positions) do
         self._enemy_sprites[i]:fit_into(xy[1] + x_offset, xy[2])
     end
@@ -135,15 +138,15 @@ function bt.BattleUI:_reformat_party_sprites()
     local n_sprites = sizeof(self._party_sprites)
     local m = rt.settings.margin_unit * 2
     local mx = rt.settings.battle.priority_queue.outer_margin + rt.settings.battle.priority_queue.element_size + m
-    local w = (self._bounds.width - 2 * mx - (n_sprites - 1) * m) / n_sprites
-    local h = self._bounds.height * (3 / 9)
-    local y = self._bounds.y + self._bounds.height - h
+    local width = (self._bounds.width - 2 * mx - (n_sprites - 1) * m) / n_sprites
+    local height = self._bounds.height * (3 / 9)
+    local y = self._bounds.y + self._bounds.height - height
     local x = self._bounds.x + mx
 
     for i = 1, n_sprites do
         local sprite = self._party_sprites[i]
-        sprite:fit_into(x, y, w, h)
-        x = x + w + m
+        sprite:fit_into(x, y, width, height)
+        x = x + width + m
     end
 end
 
@@ -214,6 +217,7 @@ function bt.BattleUI:draw()
     end
 
     self._priority_queue:draw()
+    self._animation_queue:draw()
 end
 
 --- @brief
@@ -236,6 +240,21 @@ function bt.BattleUI:set_selected(entities)
 
     for sprite in values(self._enemy_sprites) do
         sprite:set_is_selected(is_selected[sprite:get_entity()] == true)
+    end
+end
+
+--- @brief
+function bt.BattleUI:get_sprite(entity)
+    for sprite in values(self._enemy_sprites) do
+        if sprite:get_entity():get_id() == entity:get_id() then
+            return sprite
+        end
+    end
+
+    for sprite in values(self._party_sprites) do
+        if sprite:get_entity():get_id() == entity:get_id() then
+            return sprite
+        end
     end
 end
 

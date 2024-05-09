@@ -2,7 +2,7 @@
 rt.Snapshot = meta.new_type("Snapshot", rt.Widget, function()
     return meta.new(rt.Snapshot, {
         _canvas = rt.RenderTexture(1, 1, true),
-        _shader = rt.Shader(rt.SnapshotLayout._shader_source),
+        _shader = rt.Shader(rt.Snapshot._shader_source),
         _rgb_offsets = {0, 0, 0},
         _hsv_offsets = {0, 0, 0},
         _rgb_factors = {1, 1, 1},
@@ -25,16 +25,17 @@ rt.Snapshot = meta.new_type("Snapshot", rt.Widget, function()
     })
 end)
 
-rt.SnapshotLayout._shader_source = love.filesystem.read("assets/shaders/snapshot_layout.glsl")
+rt.Snapshot._shader_source = love.filesystem.read("assets/shaders/snapshot_layout.glsl")
 
 --- @brief
 function rt.Snapshot:snapshot(to_draw)
-    self._canvas:bind_as_render_target()
     rt.graphics.push()
+    self._canvas:bind_as_render_target()
     rt.graphics.clear(0, 0, 0, 0)
     local x, y = to_draw:get_position()
     rt.graphics.translate(-x, -y)
     if to_draw.snapshot ~= nil then to_draw:snapshot() else to_draw:draw() end
+    self._canvas:unbind_as_render_target()
     rt.graphics.pop()
 end
 
@@ -79,6 +80,8 @@ end
 function rt.Snapshot:size_allocate(x, y, width, height)
     if not self._is_realized then return end
     self._canvas = rt.RenderTexture(width, height, true)
+    self._position_x = x
+    self._position_y = y
 end
 
 --- @brief
@@ -86,28 +89,27 @@ function rt.Snapshot:set_opacity(alpha)
     self._opacity = alpha
 end
 
-
 --- @brief
-function rt.SnapshotLayout:set_rgb_offset(r, g, b)
+function rt.Snapshot:set_rgb_offset(r, g, b)
     self._rgb_offsets[1] = which(r, 0)
     self._rgb_offsets[2] = which(g, 0)
     self._rgb_offsets[3] = which(b, 0)
 end
 
 --- @brief
-function rt.SnapshotLayout:set_hsv_offset(h, s, v)
+function rt.Snapshot:set_hsv_offset(h, s, v)
     self._hsv_offsets[1] = which(h, 0)
     self._hsv_offsets[2] = which(s, 0)
     self._hsv_offsets[3] = which(v, 0)
 end
 
 --- @brief
-function rt.SnapshotLayout:set_opacity_offset(value)
+function rt.Snapshot:set_opacity_offset(value)
     self._alpha_offset = which(value, 0)
 end
 
 --- @brief
-function rt.SnapshotLayout:set_color_offsets(r, g, b, h, s, v, a)
+function rt.Snapshot:set_color_offsets(r, g, b, h, s, v, a)
     self._rgb_offsets[1] = which(r, 0)
     self._rgb_offsets[2] = which(g, 0)
     self._rgb_offsets[3] = which(b, 0)
@@ -118,13 +120,13 @@ function rt.SnapshotLayout:set_color_offsets(r, g, b, h, s, v, a)
 end
 
 --- @brief sets vertex colors
-function rt.SnapshotLayout:set_color(rgba)
+function rt.Snapshot:set_color(rgba)
     if meta.is_hsva(rgba) then rgba = rt.hsva_to_rgba(rgba) end
     self._vertex_color = rgba
 end
 
 --- @brief
-function rt.SnapshotLayout:set_position_offset(x, y)
+function rt.Snapshot:set_position_offset(x, y)
     self._x_offset = which(x, 0)
     self._y_offset = which(y, 0)
 end
@@ -132,19 +134,19 @@ end
 --- @brief
 --- @param x Number in [0, 1]
 --- @param y Number in [0, 1]
-function rt.SnapshotLayout:set_origin(x, y)
+function rt.Snapshot:set_origin(x, y)
     self._origin_x = which(x, 0.5)
     self._origin_y = which(y, 0.5)
 end
 
 --- @brief
-function rt.SnapshotLayout:set_scale(x, y)
+function rt.Snapshot:set_scale(x, y)
     self._scale_x = which(x, 1)
     self._scale_y = which(y, x)
 end
 
 --- @brief
-function rt.SnapshotLayout:reset()
+function rt.Snapshot:reset()
     self._rgb_offsets[1] = 0
     self._rgb_offsets[2] = 0
     self._rgb_offsets[3] = 0
@@ -176,22 +178,22 @@ function rt.SnapshotLayout:reset()
 end
 
 --- @brief
-function rt.SnapshotLayout:get_rgb_offset()
+function rt.Snapshot:get_rgb_offset()
     return self._rgb_offsets[1], self._rgb_offsets[2], self._rgb_offsets[3]
 end
 
 --- @brief
-function rt.SnapshotLayout:get_hsv_offset()
+function rt.Snapshot:get_hsv_offset()
     return self._hsv_offsets[1], self._hsv_offsets[2], self._hsv_offsets[3]
 end
 
 --- @brief
-function rt.SnapshotLayout:get_alpha_offset()
+function rt.Snapshot:get_alpha_offset()
     return self._alpha_offset
 end
 
 --- @brief
-function rt.SnapshotLayout:set_mix_color(color)
+function rt.Snapshot:set_mix_color(color)
     if meta.is_hsva(color) then
         color = rt.hsva_to_rgba(color)
     end
@@ -200,16 +202,16 @@ end
 
 --- @brief
 --- @param weight Number 0 for only original, 1 for only mix
-function rt.SnapshotLayout:set_mix_weight(weight)
+function rt.Snapshot:set_mix_weight(weight)
     self._mix_weight = weight
 end
 
 --- @brief
-function rt.SnapshotLayout:set_invert(b)
+function rt.Snapshot:set_invert(b)
     self._invert = b
 end
 
 --- @brief
-function rt.SnapshotLayout:get_invert()
+function rt.Snapshot:get_invert()
     return self._invert
 end

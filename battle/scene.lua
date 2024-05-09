@@ -69,6 +69,6 @@ function bt.Scene:play_animation(entity, animation_id, ...)
     end
 
     local animation = bt.Animation[animation_id](self, sprite, ...)
-    self._ui:get_animation_queue():append(animation)
+    self._ui:get_animation_queue():push(animation)
     return animation
 end

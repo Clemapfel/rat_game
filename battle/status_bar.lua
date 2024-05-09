@@ -58,7 +58,7 @@ function bt.StatusBar:update(delta)
             local target_x, target_y = e.target_x, e.target_y
             local direction_x, direction_y = target_x - current_x, target_y - current_y
             local magnitude = rt.magnitude(direction_x, direction_y)
-            if magnitude > 1 then
+            if magnitude > 1.1 then
                 direction_x = direction_x / magnitude
                 direction_y = direction_y / magnitude
                 local step = delta * rt.settings.battle.status_bar.element_velocity
@@ -67,8 +67,8 @@ function bt.StatusBar:update(delta)
                 e.current_x = e.current_x + direction_x * step
                 e.current_y = e.current_y + direction_y * step
 
-                e.current_x = math.round(e.current_x)
-                e.current_y = math.round(e.current_y)
+                e.current_x = math.floor(e.current_x)
+                e.current_y = math.floor(e.current_y)
             end
         end
 

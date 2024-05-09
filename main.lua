@@ -5,26 +5,6 @@ scene = rt.current_scene
 
 battle = bt.Battle("DEBUG_BATTLE")
 
-move = bt.Move("DEBUG_MOVE")
-item = bt.MoveSelectionItem(move)
-item:set_n_uses(3, 10)
-item:realize()
-item:fit_into(50, 50, 400, 100)
-local selection = rt.SelectionIndicator()
-selection:resize(item)
-
-page = bt.MoveInfo(move)
-page:realize()
-page:fit_into(50, 50, 400, 400)
-
-selection = bt.MoveSelection()
-selection:realize()
-selection:fit_into(50, 50, 400, 400)
-
-page = bt.EntityInfo(battle.entities[1])
-page:realize()
-page:fit_into(50, 50, 400, 400)
-
 input_controller = rt.InputController()
 input_controller:signal_connect("pressed", function(self, which)
     if which == rt.InputButton.A then
@@ -37,9 +17,14 @@ input_controller:signal_connect("pressed", function(self, which)
             end
         end
     elseif which == rt.InputButton.B then
-        for move in values(battle.entities[1]:list_moves()) do
-            selection:add(move)
+        local animations = {}
+        for target in range(
+            scene._ui._enemy_sprites[1],
+            scene._ui._party_sprites[2]
+        ) do
+            table.insert(animations, bt.Animation.CONSUMABLE_APPLIED(target, bt.Consumable("DEBUG_CONSUMABLE")))
         end
+        scene._ui:get_animation_queue():push(table.unpack(animations))
     elseif which == rt.InputButton.X then
         scene._ui:set_selected({battle.entities[1], battle.entities[3], battle.entities[5]})
     elseif which == rt.InputButton.Y then
@@ -71,9 +56,6 @@ love.draw = function()
         rt.current_scene:draw()
     end
 
-    page:draw()
-    selection:draw()
-
     do -- show fps and frame usage
         local fps = love.timer.getFPS()
         local frame_usage = math.round(rt.graphics.frame_duration.max / (1 / fps) * 100)
@@ -98,6 +80,8 @@ love.draw = function()
         love.graphics.line(x, y + 0.5 * height, x + width, y + 0.5 * height)
         love.graphics.line(x + 0.5 * width, y, x + 0.5 * width, height)
     end
+
+    love.graphics.reset()
 end
 
 love.update = function(delta)

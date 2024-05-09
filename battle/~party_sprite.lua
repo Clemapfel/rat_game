@@ -1,17 +1,23 @@
 rt.settings.battle.party_sprite = {
+    idle_animation_id = "idle",
+    knocked_out_animation_id = "knocked_out",
     font = rt.settings.font.default_small,
 }
 
 --- @class bt.PartySprite
-bt.PartySprite = meta.new_type("PartySprite", bt.BattleSprite, function(entity)
+bt.PartySprite = meta.new_type("PartySprite", rt.Widget, rt.Animation, function(entity)
     return meta.new(bt.PartySprite, {
         _entity = entity,
+        _sprite = {}, -- rt.Glyph
 
         _name = rt.Label("<b>" .. entity:get_name() .. "</b>"),
-
         _health_bar = bt.HealthBar(entity),
         _speed_value = bt.SpeedValue(entity),
         _status_bar = bt.StatusBar(entity),
+
+        _opacity = 1,
+        _state = bt.EntityState.ALIVE,
+        _is_selected = false,
 
         _backdrop = rt.Rectangle(0, 0, 1, 1),
         _frame = rt.Rectangle(0, 0, 1, 1),
@@ -20,7 +26,6 @@ bt.PartySprite = meta.new_type("PartySprite", bt.BattleSprite, function(entity)
     })
 end)
 
---- @brief
 function bt.PartySprite:_update_state()
     if self._state == bt.EntityState.ALIVE then
         self._backdrop:set_color(rt.settings.battle.priority_queue_element.base_color)
@@ -40,8 +45,10 @@ end
 
 --- @override
 function bt.PartySprite:realize()
-    if self._is_realized == true then return end
+    if self._is_realized then return end
     self._is_realized = true
+
+    -- todo: sprite?
 
     self._name = rt.Glyph(rt.settings.battle.party_sprite.font, self._entity:get_name(), {
         bold = true,
@@ -50,10 +57,14 @@ function bt.PartySprite:realize()
     })
 
     self._health_bar:realize()
-    self._speed_value:realize()
-    self._status_bar:realize()
-
     self._health_bar:set_use_percentage(false)
+    self._health_bar:synchronize(self._entity)
+
+    self._speed_value:realize()
+    self._speed_value:synchronize(self._entity)
+
+    self._status_bar:realize()
+    self._status_bar:synchronize(self._entity)
     self._status_bar:set_alignment(bt.StatusBarAlignment.LEFT)
 
     self._backdrop:set_is_outline(false)
@@ -73,16 +84,8 @@ function bt.PartySprite:realize()
         shape:set_corner_radius(rt.settings.battle.priority_queue_element.corner_radius)
     end
 
-    for to_animate in range(self, self._health_bar, self._speed_value, self._status_bar, self._sprite) do
-        to_animate:set_is_animated(true)
-    end
+    self:set_is_animated(true)
     self:reformat()
-    self:synchronize(self._entity)
-end
-
---- @override
-function bt.PartySprite:update(delta)
-    -- noop
 end
 
 --- @override
@@ -94,22 +97,12 @@ function bt.PartySprite:size_allocate(x, y, width, height)
     self._frame_outline:set_line_width(frame_outline_thickness)
     local total_frame_thickness = frame_thickness + frame_outline_thickness
 
-    self._bounds = rt.AABB(x, y, width, height)
+    height = height - 0.5 * total_frame_thickness - 1.5 * rt.settings.margin_unit
+    local current_y = y + height
 
-    x = x + total_frame_thickness
-    y = y + total_frame_thickness
-    width = width - 2 * total_frame_thickness
-    height = height - 2 * total_frame_thickness
-
-    height = height - 0.5 * total_frame_thickness - 1.5 * m
-    local current_y = y + height - m
-
+    current_y = current_y - m
     local label_w, label_h = self._name:get_size()
-    self._name:set_position(x + 0.5 * width - 0.5 * label_w, current_y - label_h)
-    local speed_value_w, speed_value_h = self._speed_value:measure()
-    self._speed_value:fit_into(x + width - m - speed_value_w, current_y - label_h - speed_value_h + 0.5 * speed_value_h + 0.5 * label_h)
-    self._status_bar:fit_into(x + m, current_y - label_h, width, label_h)
-
+    self._name:set_position(x + 1.5 * m, current_y - label_h)
     current_y = current_y - label_h - m
 
     local hp_bar_height = rt.settings.battle.health_bar.hp_font:get_size() + m
@@ -120,29 +113,27 @@ function bt.PartySprite:size_allocate(x, y, width, height)
     local backdrop_bounds = rt.AABB(x, current_y, width, y + height - current_y)
     self._backdrop:resize(backdrop_bounds)
 
+    local speed_value_w = select(1, self._speed_value:measure())
+    local status_bar_bounds = rt.AABB(x + m, current_y - hp_bar_height - 0.5 * total_frame_thickness, width - 2 * m - speed_value_w - m, hp_bar_height)
+    self._status_bar:fit_into(status_bar_bounds)
+    self._speed_value:fit_into(x + width - m - speed_value_w, status_bar_bounds.y)
+
     local frame_aabb = rt.AABB(backdrop_bounds.x, backdrop_bounds.y, backdrop_bounds.width, backdrop_bounds.height)
     self._frame:resize(rt.aabb_unpack(frame_aabb))
     self._frame_outline:resize(rt.aabb_unpack(frame_aabb))
     self._frame_gradient:resize(frame_aabb.x - 0.5 * total_frame_thickness, frame_aabb.y - 0.5 * total_frame_thickness, frame_aabb.width + total_frame_thickness, frame_aabb.height + total_frame_thickness)
-
-    -- update bounds so get_bounds only returns visible area, not allocated area
-    self._bounds.y = current_y - total_frame_thickness
-    self._bounds.height = frame_aabb.height + 2 * total_frame_thickness
-    self:_update_state()
 end
 
 --- @override
 function bt.PartySprite:draw()
     if not self._is_realized == true then return false end
-    if self._is_visible == false then return end
 
     self._backdrop:draw()
     self._frame_outline:draw()
     self._frame:draw()
 
-    local stencil_value = meta.hash(self) % 255
-    rt.graphics.stencil(stencil_value, self._frame)
-    rt.graphics.set_stencil_test(rt.StencilCompareMode.EQUAL, stencil_value)
+    rt.graphics.stencil(2, self._frame)
+    rt.graphics.set_stencil_test(rt.StencilCompareMode.EQUAL, 2)
     rt.graphics.set_blend_mode(rt.BlendMode.MULTIPLY)
     self._frame_gradient:draw()
     rt.graphics.set_blend_mode()
@@ -155,12 +146,26 @@ function bt.PartySprite:draw()
 end
 
 --- @brief
+function bt.PartySprite:synchronize(entity)
+    self._health_bar:synchronize(self._entity)
+    self._speed_value:synchronize(self._entity)
+    self._status_bar:synchronize(self._entity)
+end
+
+--- @override
+function bt.PartySprite:update(delta)
+    self._health_bar:update(delta)
+    self._speed_value:update(delta)
+    self._status_bar:update(delta)
+end
+
+--- @brief
 function bt.PartySprite:set_is_selected(b)
     self._is_selected = b
     self:_update_state()
 end
 
 --- @brief
-function bt.PartySprite:get_bounds()
-    return self._bounds
+function bt.PartySprite:get_entity()
+    return self._entity
 end

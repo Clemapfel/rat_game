@@ -8,14 +8,20 @@ rt.linear = function(x, min, max)
 end
 
 rt.sinusoid_ease_in = function(x)
+    if x < 0 then return 0 end
+    if x > 1 then return 1 end
     return -1.0 * math.cos(x * (math.pi / 2)) + 1.0;
 end
 
 rt.sinusoid_ease_out = function(x)
+    if x < 0 then return 0 end
+    if x > 1 then return 1 end
     return math.sin(x * (math.pi / 2));
 end
 
 rt.sinusoid_ease_in_out = function(x)
+    if x < 0 then return 0 end
+    if x > 1 then return 1 end
     return -0.5 * math.cos(math.pi * x) + 0.5;
 end
 

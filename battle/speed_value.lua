@@ -1,5 +1,5 @@
 rt.settings.battle.speed_value = {
-    font = rt.settings.font.default_mono_small,--rt.Font(25, "assets/fonts/pixel.ttf"),
+    font = rt.settings.font.default_mono,--rt.Font(25, "assets/fonts/pixel.ttf"),
     tick_speed = 1, -- ticks per second
     tick_acceleration = 10, -- modifies how much distance should affect tick speed, more distance = higher speed factor
 }
@@ -27,6 +27,7 @@ function bt.SpeedValue:realize()
     local speed_string, priority_string = self:_format_value()
     self._speed_label = rt.Glyph(rt.settings.battle.speed_value.font, speed_string, {
         is_outlined = true,
+        is_bold = true,
         outline_color = rt.Palette.TRUE_BLACK,
         color = rt.Palette.TRUE_WHITE
     })

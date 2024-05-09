@@ -7,7 +7,7 @@ rt.QueueableAnimationResult = {
 --- @class rt.QueueableAnimationState
 rt.QueueableAnimationState = {
     IDLE = 1,       -- not yet start
-    START = 2,      -- running
+    STARTED = 2,      -- running
     FINISHED = 3    -- done running
 }
 
@@ -98,7 +98,7 @@ end
 --- @brief
 function rt.AnimationQueue:_start_animation(animation)
     if animation._state ~= rt.QueueableAnimationState.IDLE then return end
-    animation._state = rt.QueueableAnimationState.STARTED
+    animation._state = rt.QueueableAnimationState.STARTEDED
 
     animation:start()
     if animation._start_callbacks ~= nil then
@@ -130,7 +130,7 @@ function rt.AnimationQueue:skip()
     for animation in values(node) do
         if animation._state == rt.QueueableAnimationState.IDLE then
             self:_start_animation(animation)
-        elseif animation._state == rt.QueueableAnimationState.STARTED then
+        elseif animation._state == rt.QueueableAnimationState.STARTEDED then
             self:_finish_animation(animation)
         else
             -- noop
