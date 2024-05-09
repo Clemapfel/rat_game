@@ -198,6 +198,11 @@ function mix(lower, upper, ratio)
 end
 
 --- @brief
+function lerp(low, high, progress)
+    return low * (1 - progress) + high * progress
+end
+
+--- @brief
 function smoothstep(lower, upper, ratio)
     local t = clamp((ratio - lower) / (upper - lower), 0.0, 1.0);
     return t * t * (3.0 - 2.0 * t);

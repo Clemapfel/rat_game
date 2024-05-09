@@ -127,8 +127,8 @@ end
 
 --- @brief
 function rt.Snapshot:set_position_offset(x, y)
-    self._x_offset = which(x, 0)
-    self._y_offset = which(y, 0)
+    self._x_offset = math.floor(which(x, 0))
+    self._y_offset = math.floor(which(y, 0))
 end
 
 --- @brief

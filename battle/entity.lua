@@ -119,7 +119,6 @@ function bt.Entity:realize()
             self[key] = config[key]
         end
     end
-    dbg(self.id, self.is_enemy)
 
     self.knocked_out_sprite_id = which(self.knocked_out_sprite_id, self.sprite_id)
     self.knocked_out_index = which(self.knocked_out_sprite_index, self.sprite_index)

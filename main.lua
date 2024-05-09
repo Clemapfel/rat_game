@@ -19,8 +19,8 @@ input_controller:signal_connect("pressed", function(self, which)
     elseif which == rt.InputButton.B then
         local animations = {}
         for target in range(
-            scene._ui._enemy_sprites[1],
-            scene._ui._party_sprites[2]
+            scene._ui._enemy_sprites[1]--,
+            --scene._ui._party_sprites[2]
         ) do
             table.insert(animations, bt.Animation.CONSUMABLE_APPLIED(target, bt.Consumable("DEBUG_CONSUMABLE")))
         end

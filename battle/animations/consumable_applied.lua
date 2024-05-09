@@ -57,7 +57,13 @@ function bt.Animation.CONSUMABLE_APPLIED:start()
     self._label_path = rt.Spline({start_x, start_y, finish_x, finish_y})
 
     local offset = 0.05
-    self._target_path = rt.Spline({0, 0, -1 * offset, 0, offset, 0, 0, 0})
+    self._target_path = rt.Spline({
+        0, 0,
+        -1 * offset, 0,
+        offset, 0,
+        0, 0
+    })
+
 end
 
 --- @override
@@ -91,6 +97,7 @@ function bt.Animation.CONSUMABLE_APPLIED:update(delta)
     local offset_x, offset_y = self._target_path:at(rt.sinusoid_ease_in_out(fraction))
     offset_x = offset_x * current.width
     offset_y = offset_y * current.height
+
     self._target_snapshot:set_position_offset(offset_x, offset_y)
     self._target_snapshot:set_mix_weight(rt.symmetrical_linear(fraction, 0.5))
 
