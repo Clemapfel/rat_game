@@ -67,7 +67,7 @@ function rt.Spline:at(t)
     if i == 1 then previous_x, previous_y = current_x, current_y end
 
     local fraction = length / self._distances[i]
-    return lerp(previous_x, current_x, fraction), lerp(previous_y, current_y, fraction)
+    return mix(previous_x, current_x, fraction), mix(previous_y, current_y, fraction)
 end
 
 --- @brief [internal]

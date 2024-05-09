@@ -192,14 +192,7 @@ end
 --- @return number
 function mix(lower, upper, ratio)
     -- @see https://registry.khronos.org/OpenGL-Refpages/gl4/html/mix.xhtml
-    local x = math.min(lower, upper)
-    local y = math.max(lower, upper)
-    return x * (1 - ratio) + y * ratio
-end
-
---- @brief
-function lerp(low, high, progress)
-    return low * (1 - progress) + high * progress
+    return lower * (1 - ratio) + upper * ratio
 end
 
 --- @brief
@@ -549,7 +542,6 @@ function table.rep(x, n)
     end
     return out
 end
-
 
 --- @brief
 function table.reverse(t)
