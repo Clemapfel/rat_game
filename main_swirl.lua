@@ -2,12 +2,15 @@ require "include"
 
 swirl = {}
 swirl.shader = rt.Shader("lichen/swirl.glsl")
-swirl.texture = rt.Texture("lichen/rhombus.jpg")
+swirl.texture = rt.Texture("assets/love2d.png")
+swirl.texture:set_wrap_mode(rt.TextureWrapMode.ZERO)
 swirl.shape = rt.VertexRectangle(0, 0, 1, 1)
 swirl.elapsed = 0
+swirl.direction = true
+swirl.active = false
 
 love.load = function()
-    love.window.setMode(600, 600, {
+    love.window.setMode(800, 600, {
         vsync = -1, -- adaptive vsync, may tear but tries to stay as close to 60hz as possible
         msaa = 8,
         stencil = true,
@@ -22,7 +25,20 @@ love.load = function()
 end
 
 love.update = function(delta)
-    swirl.elapsed = swirl.elapsed + delta
+    if swirl.active then
+        if swirl.direction == true then
+            swirl.elapsed = swirl.elapsed + delta
+        else
+            swirl.elapsed = swirl.elapsed - delta
+        end
+    end
+end
+
+love.keypressed = function(which)
+    if which == "space" then
+        swirl.active = true
+        swirl.direction = not swirl.direction
+    end
 end
 
 love.draw = function()
