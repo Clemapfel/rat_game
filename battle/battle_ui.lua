@@ -4,8 +4,6 @@ rt.settings.battle.battle_ui = {
     gradient_alpha = 0.4
 }
 
-bt.Animation = {}
-
 --- @class bt.BattleUI
 bt.BattleUI = meta.new_type("BattleUI", rt.Widget, rt.Animation, function()
     return meta.new(bt.BattleUI, {

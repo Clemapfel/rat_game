@@ -2,8 +2,6 @@ require "include"
 
 swirl = {}
 swirl.shader = rt.Shader("lichen/swirl.glsl")
-swirl.texture = rt.Texture("assets/love2d.png")
-swirl.texture:set_wrap_mode(rt.TextureWrapMode.ZERO)
 swirl.shape = rt.VertexRectangle(0, 0, 1, 1)
 swirl.elapsed = 0
 swirl.direction = true
@@ -45,7 +43,6 @@ love.draw = function()
     love.graphics.clear(0.5, 0.5, 0.5, 1)
     swirl.shader:bind()
     swirl.shader:send("elapsed", swirl.elapsed)
-    --swirl.shader:send("texture_size", {swirl.texture:get_size()})
     swirl.shape:draw()
     swirl.shader:unbind()
 end

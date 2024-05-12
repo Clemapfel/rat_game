@@ -147,16 +147,9 @@ require "battle.move_selection_item"
 require "battle.move_selection"
 require "battle.move_info"
 require "battle.entity_info"
+require "battle.background"
+require "battle.animation"
 
 require "battle.battle_ui"
 require "battle.scene"
-
-for folder in range("animations") do
-    for _, name in pairs(love.filesystem.getDirectoryItems("battle/" .. folder)) do
-        if name ~= "status" and name ~= "move" then
-            local path = "battle." .. folder .. "." .. string.gsub(name, "%.lua$", "")
-            require(path)
-        end
-    end
-end
 

@@ -101,7 +101,6 @@ end
 --- @brief gaussian distribution with 0.99 percentile in [0, 1], peak at 0.5
 rt.gaussian_bandpass = function(x, peak)
     -- e^{-\left(4\cdot\frac{\pi}{3}\right)\left(2x-1\right)^{2}}
-    peak = which(peak, 1)
     return (math.exp(-1 * ((4 * math.pi / 3) * (2 * x - 1))^2))
 end
 

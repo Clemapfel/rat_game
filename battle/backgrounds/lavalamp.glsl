@@ -22,13 +22,11 @@ vec3 hsv_to_rgb(vec3 c)
     return c.z * mix(K.xxx, clamp(p - K.xxx, 0.0, 1.0), c.y);
 }
 
-// get angle of vector in [0, 1]
 float angle(vec2 v)
 {
     return (atan(v.y, v.x) + PI) / (2 * PI);
 }
 
-// random
 vec3 mod289(vec3 x) {
     return x - floor(x * (1.0 / 289.0)) * 289.0;
 }
@@ -81,6 +79,15 @@ float project(float value, float lower, float upper) {
     return value * abs(upper - lower) + min(lower, upper);
 }
 
+float reverse_gaussian(float x, float c) {
+    return -exp(-pow(x - 0.5, 2.0) / c) + 1.0;
+}
+
+
+float gaussian(float x, float mean, float variance) {
+    return exp(-pow(x - mean, 2.0) / variance);
+}
+
 // ###
 
 uniform float elapsed;
@@ -96,11 +103,16 @@ vec4 effect(vec4 vertex_color, Image image, vec2 texture_coords, vec2 vertex_pos
     pos -= vec2(0.5);
     pos.x *= love_ScreenSize.x / love_ScreenSize.y;
 
+    // hue
     vec2 origin = vec2(random(pos + vec2(time, -time)), random(pos + vec2(-time, time)));
     float dist = length(pos - origin);
-    float dg = angle(pos - origin);
-    dg = fract(dg + time);
-    return vec4(hsv_to_rgb(vec3(dg, 1, 1)), 1);
+    float dg = fract(angle(pos - origin) + 0.75 + time);
+    float hue = dg; //gaussian(dg, 0.5, 0.7);
+
+    // value
+    float value = reverse_gaussian(texture_coords.y - 0.3, 0.3);
+
+    return vec4(hsv_to_rgb(vec3(hue, 1, project(value, 0.7, 1))), 1);
 }
 
 #endif
