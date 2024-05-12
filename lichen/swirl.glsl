@@ -42,34 +42,95 @@ float angle_to_radians(float v) {
     return (v * 2 * PI) - PI ;
 }
 
+
+// random
+vec3 mod289(vec3 x) {
+    return x - floor(x * (1.0 / 289.0)) * 289.0;
+}
+
+vec2 mod289(vec2 x) {
+    return x - floor(x * (1.0 / 289.0)) * 289.0;
+}
+
+vec3 permute(vec3 x) {
+    return mod289(((x*34.0)+1.0)*x);
+}
+
+float random(vec2 v)
+{
+    const vec4 C = vec4(0.211324865405187,  // (3.0-sqrt(3.0))/6.0
+                        0.366025403784439,  // 0.5*(sqrt(3.0)-1.0)
+                        -0.577350269189626,  // -1.0 + 2.0 * C.x
+                        0.024390243902439); // 1.0 / 41.0
+
+    vec2 i  = floor(v + dot(v, C.yy) );
+    vec2 x0 = v -   i + dot(i, C.xx);
+
+    vec2 i1;
+    i1 = (x0.x > x0.y) ? vec2(1.0, 0.0) : vec2(0.0, 1.0);
+    vec4 x12 = x0.xyxy + C.xxzz;
+    x12.xy -= i1;
+
+    i = mod289(i);
+    vec3 p = permute( permute( i.y + vec3(0.0, i1.y, 1.0 ))
+                      + i.x + vec3(0.0, i1.x, 1.0 ));
+
+    vec3 m = max(0.5 - vec3(dot(x0,x0), dot(x12.xy,x12.xy), dot(x12.zw,x12.zw)), 0.0);
+    m = m*m ;
+    m = m*m ;
+
+    vec3 x = 2.0 * fract(p * C.www) - 1.0;
+    vec3 h = abs(x) - 0.5;
+    vec3 ox = floor(x + 0.5);
+    vec3 a0 = x - ox;
+
+    m *= 1.79284291400159 - 0.85373472095314 * ( a0*a0 + h*h );
+
+    vec3 g;
+    g.x  = a0.x  * x0.x  + h.x  * x0.y;
+    g.yz = a0.yz * x12.xz + h.yz * x12.yw;
+    return 130.0 * dot(m, g);
+}
+
 // ###
 
 uniform float elapsed;
 uniform vec2 texture_size;
 
+float gaussian(float x) {
+    return exp(-1.0 * pow((4.0 * 3.1415926535897932384626433832795 / 3.0) * (2.0 * x - 1.0), 2.0));
+}
+
+vec3 warp(vec2 pos, vec2 origin, float time)
+{
+    float dist = length(pos - origin);
+    float dg = angle(pos - origin);
+    dg = dg + asin(time * sin(dist));
+    return vec3(translate_point_by_angle(origin, dist, angle_to_radians(dg)), dg);
+}
+
 vec4 effect(vec4 vertex_color, Image image, vec2 texture_coords, vec2 vertex_position)
 {
+    float time = elapsed;
+
     texture_coords -= vec2(0.5);
-    texture_coords *= 1.3;
+    texture_coords *= 10;
     texture_coords += vec2(0.5);
+    texture_coords -= vec2(0.5);
 
     // scale time for animation speed
-    float time = elapsed / 2;
 
-    // distance from center
-    float dist = length(texture_coords - vec2(0.5));
+    float origin_x = random(texture_coords + vec2(time, -time));
+    float origin_y = random(texture_coords + vec2(-time, time));
+    vec3 wrap_01 = warp(texture_coords, vec2(origin_x, origin_y), time);
 
-    // angle, in [0, 1]
-    float dg = angle(texture_coords - vec2(0.5));
+    origin_x = random(texture_coords);
+    origin_y = random(texture_coords);
+    vec3 wrap_02 = warp(texture_coords, vec2(origin_x, origin_y), time);
 
-    // offset angle, scaled by distance from center
-    dg = dg + time * (1 - dist);
-
-    // apply vector to original fragment position
-    vec2 warped_pos = translate_point_by_angle(vec2(0.5), dist, angle_to_radians(dg));
-    //warped_pos.x = 1 - warped_pos.x;
-    //return vec4(hsv_to_rgb(vec3(dg, 1, 1)), 1);
-    return Texel(image, warped_pos);
+    //return Texel(image, wrap_01.xy);
+    float hue =  wrap_01.z;
+    return vec4(hsv_to_rgb(vec3(hue, 1, 1)), 1);
 }
 
 #endif
