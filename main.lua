@@ -17,13 +17,15 @@ input_controller:signal_connect("pressed", function(self, which)
             end
         end
     elseif which == rt.InputButton.B then
+        local sprites = {}
+        for sprite in values(scene._ui._enemy_sprites) do table.insert(sprites, sprite) end
+        for sprite in values(scene._ui._party_sprites) do table.insert(sprites, sprite) end
+
         local animations = {}
-        for target in range(
-            scene._ui._enemy_sprites[1]--,
-            --scene._ui._party_sprites[2]
-        ) do
-            table.insert(animations, bt.Animation.CONSUMABLE_APPLIED(target, bt.Consumable("DEBUG_CONSUMABLE")))
+        for target in values(sprites) do
+            table.insert(animations, bt.Animation.STUNNED(target))
         end
+
         scene._ui:get_animation_queue():push(table.unpack(animations))
     elseif which == rt.InputButton.X then
         scene._ui:set_selected({battle.entities[1], battle.entities[3], battle.entities[5]})

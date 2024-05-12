@@ -90,6 +90,7 @@ end
 
 --- @brief
 rt.reverse_parabolic_increase = function(x)
+    if x > 1 then return 1 end
     return -x^2 + 2 * x
 end
 

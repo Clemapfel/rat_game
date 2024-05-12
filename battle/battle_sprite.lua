@@ -40,7 +40,6 @@ end
 --- @brief
 function bt.BattleSprite:set_ui_is_visible(b)
     self._ui_is_visible = b
-    rt.error("In bt.BattleSprite.TODO: pure virtual function called")
 end
 
 --- @brief

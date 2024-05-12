@@ -155,3 +155,8 @@ function rt.ParticleEmitter:set_opacity(alpha)
     self._opacity = alpha
     self:_update_colors()
 end
+
+--- @brief
+function rt.ParticleEmitter:emit(n)
+    self._native:emit(n)
+end

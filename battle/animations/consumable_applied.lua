@@ -20,10 +20,6 @@ end)
 
 --- @override
 function bt.Animation.CONSUMABLE_APPLIED:start()
-    if not self._target:get_is_realized() then
-        self._target:realize()
-    end
-
     self._label = rt.Label("<o><b>" .. self._consumable:get_name() .. "</o></b>")
     self._label:realize()
     self._label:set_justify_mode(rt.JustifyMode.CENTER)

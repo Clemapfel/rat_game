@@ -42,6 +42,7 @@ love.keypressed = function(which)
 end
 
 love.draw = function()
+    love.graphics.clear(0.5, 0.5, 0.5, 1)
     swirl.shader:bind()
     swirl.shader:send("elapsed", swirl.elapsed)
     --swirl.shader:send("texture_size", {swirl.texture:get_size()})

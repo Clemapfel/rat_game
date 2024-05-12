@@ -109,6 +109,7 @@ require "common.scrollbar"
 require "common.textbox"
 require "common.level_bar"
 require "common.gradient"
+require "common.particle_emitter"
 
 require "common.physics_world"
 require "common.collider"
