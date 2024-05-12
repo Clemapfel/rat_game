@@ -1,7 +1,5 @@
 #pragma language glsl4
 
-#ifdef PIXEL
-
 #define PI 3.1415926535897932384626433832795
 
 vec3 rgb_to_hsv(vec3 c)
@@ -92,35 +90,18 @@ float gaussian(float x, float mean, float variance) {
 
 uniform float elapsed;
 
+#ifdef PIXEL
 vec4 effect(vec4 vertex_color, Image image, vec2 texture_coords, vec2 vertex_position)
 {
-    vec2 pos = vertex_position * 0.5 + 0.5; // Transform from [-1,1] to [0,1]
-    float scale = 20.0; // Scale of the triangles
-    vec2 c = pos * scale;
-
-    // Create a hexagonal grid
-    float line_width = 0.05; // Width of the lines
-    vec2 p = mod(c, vec2(1.0, sqrt(3.0)/2.0)) - vec2(0.5, sqrt(3.0)/4.0);
-    if (p.x < 0.0) p.x += 1.0;
-    if (p.y < 0.0) p.y += sqrt(3.0)/2.0;
-
-    // Determine the region in the hexagon
-    vec2 q;
-    if (p.x > 0.75) {
-        q = p - vec2(0.75, sqrt(3.0)/4.0);
-    } else if (p.y > sqrt(3.0)/4.0) {
-        q = p - vec2(0.25, sqrt(3.0)/4.0);
-    } else {
-        q = p - vec2(0.5, 0.0);
-    }
-
-    // Draw lines
-    float dist = length(q);
-    if (dist < line_width) {
-        return vec4(0.0, 0.0, 0.0, 1.0); // Line color
-    } else {
-        return vec4(1.0, 1.0, 1.0, 1.0); // Background color
-    }
+    return vec4(hsv_to_rgb(vec3(vertex_position.y / love_ScreenSize.y + elapsed, 1, 1)), 1);
 }
 
+#endif
+
+
+#ifdef VERTEX
+vec4 position(mat4 transform_projection, vec4 vertex_position)
+{
+    return transform_projection * vertex_position;
+}
 #endif
