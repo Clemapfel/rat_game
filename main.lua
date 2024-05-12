@@ -4,7 +4,7 @@ rt.current_scene = bt.Scene()
 scene = rt.current_scene
 
 battle = bt.Battle("DEBUG_BATTLE")
-scene:set_background("LAVALAMP")
+scene:set_background("TRIANGLE_TILING")
 
 input_controller = rt.InputController()
 input_controller:signal_connect("pressed", function(self, which)
