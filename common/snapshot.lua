@@ -1,8 +1,11 @@
+rt.settings.snapshot = {
+    shader_source = "assets/shaders/snapshot_layout.glsl"
+}
+
 --- @class rt.Snapshot
 rt.Snapshot = meta.new_type("Snapshot", rt.Widget, function()
     return meta.new(rt.Snapshot, {
         _canvas = rt.RenderTexture(1, 1, true),
-        _shader = rt.Shader(rt.Snapshot._shader_source),
         _rgb_offsets = {0, 0, 0},
         _hsv_offsets = {0, 0, 0},
         _rgb_factors = {1, 1, 1},
@@ -23,9 +26,10 @@ rt.Snapshot = meta.new_type("Snapshot", rt.Widget, function()
         _vertex_color = rt.RGBA(1, 1, 1, 1),
         _opacity = 1,
     })
-end)
-
-rt.Snapshot._shader_source = love.filesystem.read("assets/shaders/snapshot_layout.glsl")
+end, {
+    -- shared static members
+    _shader = rt.Shader(rt.settings.snapshot.shader_source)
+})
 
 --- @brief
 function rt.Snapshot:snapshot(to_draw)
@@ -64,15 +68,7 @@ function rt.Snapshot:draw()
     self._shader:send("_vertex_color", {self._vertex_color.r, self._vertex_color.g, self._vertex_color.b, self._vertex_color.a})
     self._shader:send("_opacity", self._opacity)
 
-    local bounds = self:get_bounds()
-    local x_offset, y_offset = bounds.x + self._origin_x * bounds.width, bounds.y + self._origin_y * bounds.height
-    rt.graphics.push()
-    rt.graphics.translate(x_offset, y_offset)
-    rt.graphics.scale(self._scale_x, self._scale_y)
-    rt.graphics.translate(-1 * x_offset, -1 * y_offset)
-
-    love.graphics.draw(self._canvas._native, self._position_x + self._x_offset, self._position_y + self._y_offset)
-    rt.graphics.pop()
+    self:draw_canvas()
     self._shader:unbind()
 end
 
@@ -214,4 +210,17 @@ end
 --- @brief
 function rt.Snapshot:get_invert()
     return self._invert
+end
+
+--- @brief
+function rt.Snapshot:draw_canvas()
+    local bounds = self:get_bounds()
+    local x_offset, y_offset = bounds.x + self._origin_x * bounds.width, bounds.y + self._origin_y * bounds.height
+    rt.graphics.push()
+    rt.graphics.translate(x_offset, y_offset)
+    rt.graphics.scale(self._scale_x, self._scale_y)
+    rt.graphics.translate(-1 * x_offset, -1 * y_offset)
+
+    love.graphics.draw(self._canvas._native, self._position_x + self._x_offset, self._position_y + self._y_offset)
+    rt.graphics.pop()
 end

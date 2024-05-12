@@ -4,11 +4,19 @@ rt.settings.battle.background.lavalamp = {
 
 bt.Background.LAVALAMP = meta.new_type("LAVALAMP", bt.Background, function()
     return meta.new(bt.Background.LAVALAMP, {
-        _shader = rt.Shader(rt.settings.battle.background.lavalamp.shader_path),
-        _shape = rt.VertexRectangle(0, 0, 1, 1),
+        _shader = {},   -- rt.Shader
+        _shape = {},    -- rt.VertexShape
         _elapsed = 0
     })
 end)
+
+--- @override
+function bt.Background.LAVALAMP:realize()
+    if self._is_realized == true then return end
+    self._is_realized = true
+    self._shader = rt.Shader(rt.settings.battle.background.lavalamp.shader_path)
+    self._shape = rt.VertexRectangle(0, 0, 1, 1)
+end
 
 --- @override
 function bt.Background.LAVALAMP:size_allocate(x, y, width, height)

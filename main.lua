@@ -24,7 +24,7 @@ input_controller:signal_connect("pressed", function(self, which)
 
         local animations = {}
         for target in values(sprites) do
-            table.insert(animations, bt.Animation.STUNNED(target))
+            table.insert(animations, bt.Animation.SWIRL(target))
         end
 
         scene._ui:get_animation_queue():push(table.unpack(animations))
