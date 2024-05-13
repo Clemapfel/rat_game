@@ -108,8 +108,8 @@ vec4 effect(vec4 vertex_color, Image image, vec2 texture_coords, vec2 vertex_pos
     dg = dg + n_twists * sin(PI * fraction) * (1.0 - dist); // pi to twist, then untwist in 0, 1
 
     vec2 warped_pos = translate_point_by_angle(vec2(0.5), dist, angle_to_radians(dg));
-    //return Texel(image, warped_pos);
-    return vec4(hsv_to_rgb(vec3(dg, 1.0, 1.0)), 1.0); // render hue instead
+    return Texel(image, warped_pos);
+    //return vec4(hsv_to_rgb(vec3(dg, 1.0, 1.0)), 1.0); // render hue instead
 }
 
 #endif

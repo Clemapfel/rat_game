@@ -19,6 +19,7 @@ bt.Animation.SWIRL._shader = rt.Shader(rt.settings.battle.animations.swirl.shade
 function bt.Animation.SWIRL:start()
     local snapshot = rt.Snapshot()
     self._snapshot = snapshot
+    self._snapshot:set_padding(50, 50)
     snapshot:realize()
     snapshot:fit_into(self._target:get_bounds())
 
