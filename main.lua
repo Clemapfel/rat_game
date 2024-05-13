@@ -4,37 +4,25 @@ rt.current_scene = bt.Scene()
 scene = rt.current_scene
 
 battle = bt.Battle("DEBUG_BATTLE")
-scene:set_background("TRIANGLE_TILING")
+scene:set_background("LAVALAMP")
 
 input_controller = rt.InputController()
 input_controller:signal_connect("pressed", function(self, which)
     if which == rt.InputButton.A then
-        scene._ui:set_priority_order(battle:get_entities_in_order())
-        for entity in values(battle:list_entities()) do
-            if not entity:get_is_enemy() then
-                scene._ui:_add_party_sprite(entity)
-            else
-                scene._ui:_add_enemy_sprite(entity)
-            end
-        end
+        scene:start_battle(battle)
     elseif which == rt.InputButton.B then
-        local sprites = {}
-        for sprite in values(scene._ui._enemy_sprites) do table.insert(sprites, sprite) end
-        for sprite in values(scene._ui._party_sprites) do table.insert(sprites, sprite) end
-
-        local animations = {}
-        for target in values(sprites) do
-            table.insert(animations, bt.Animation.SWIRL(target))
-        end
-
-        scene._ui:get_animation_queue():push(table.unpack(animations))
+        scene:skip()
     elseif which == rt.InputButton.X then
-        scene._ui:set_selected({battle.entities[1], battle.entities[3], battle.entities[5]})
+        scene._ui:set_log_is_in_scroll_mode(not scene._ui:get_log_is_in_scroll_mode())
     elseif which == rt.InputButton.Y then
     elseif which == rt.InputButton.L then
     elseif which == rt.InputButton.R then
     elseif which == rt.InputButton.UP then
+        scene._ui._log:scroll_up()
+        dbg(scene._ui._log:_can_scroll_up(), scene._ui._log:_can_scroll_down())
     elseif which == rt.InputButton.DOWN then
+        scene._ui._log:scroll_down()
+        dbg(scene._ui._log:_can_scroll_up(), scene._ui._log:_can_scroll_down())
     end
 end)
 

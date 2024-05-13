@@ -4,6 +4,7 @@ rt.settings.battle.enemy_sprite = {
 
 --- @class bt.EnemySprite
 bt.EnemySprite = meta.new_type("EnemySprite", bt.BattleSprite, function(entity)
+    meta.assert_isa(entity, bt.Entity)
     return meta.new(bt.EnemySprite, {
         _entity = entity,
         _sprite = rt.Sprite(entity.sprite_id),

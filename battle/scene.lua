@@ -6,6 +6,7 @@ rt.settings.battle.scene = {
 bt.Scene = meta.new_type("BattleScene", rt.Widget, function()
     return meta.new(bt.Scene, {
         _ui = {}, -- rt.BattleUI
+        _state = {}, -- bt.Battle
         _background = nil, -- bt.Background
     })
 end)
@@ -53,9 +54,9 @@ function bt.Scene:update(delta)
 end
 
 --- @brief
-function bt.Scene:send_message(text)
-    self._ui:get_log():advance()
-    self._ui:get_log():append(text, true)
+function bt.Scene:send_message(text, jump_to_newest)
+    self._ui:set_log_is_in_scroll_mode(false)
+    self._ui:get_log():append(text, which(jump_to_newest, true))
 end
 
 --- @brief
@@ -74,19 +75,13 @@ function bt.Scene:hide_log()
 end
 
 --- @brief
-function bt.Scene:play_animation(entity, animation_id, ...)
-    if bt.Animation[animation_id] == nil then
-        rt.error("In bt.BattleScene:play_animation: no animation with id `" .. animation_id .. "`")
-    end
+function bt.Scene:play_animations(...)
+    self._ui:get_animation_queue():push(...)
+end
 
-    local sprite = self._ui:get_sprite(entity)
-    if sprite == nil then
-        rt.error("In bt.BattleScene:play_animation: unhandled animation target `" .. meta.typeof(entity) .. "`")
-    end
-
-    local animation = bt.Animation[animation_id](self, sprite, ...)
-    self._ui:get_animation_queue():push(animation)
-    return animation
+--- @brief
+function bt.Scene:skip()
+    self._ui:get_animation_queue():skip()
 end
 
 --- @brief
@@ -102,4 +97,28 @@ function bt.Scene:set_background(background_id)
         background:realize()
         self._background:fit_into(self._bounds)
     end
+end
+
+--- @brief
+function bt.Scene:format_name(entity)
+    local name
+    if meta.isa(entity, bt.Entity) then
+        name = entity:get_name()
+        if entity.is_enemy == true then
+            name = "<color=ENEMY><b>" .. name .. "</b></color> "
+        end
+    elseif meta.isa(entity, bt.Status) then
+        name = "<b><i>" .. entity:get_name() .. "</b></i>"
+    elseif meta.isa(entity, bt.GlobalStatus) then
+        name = "<b><i>" .. entity:get_name() .. "</b></i>"
+    elseif meta.isa(entity, bt.Equip) then
+        name = "<b>" .. entity:get_name() .. "</b>"
+    elseif meta.isa(entity, bt.Consumable) then
+        name = "<b>" .. entity:get_name() .. "</b>"
+    elseif meta.isa(entity, bt.Move) then
+        name = "<b><u>" .. entity:get_name() .. "</u></b>"
+    else
+        rt.error("In bt.BattleScene:get_formatted_name: unhandled entity type `" .. meta.typeof(entity) .. "`")
+    end
+    return name
 end

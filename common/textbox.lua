@@ -29,7 +29,7 @@ rt.TextBox = meta.new_type("TextBox", rt.Widget, rt.Animation, rt.SignalEmitter,
         _line_i_to_label_i = {}, -- Table<Unsigned, <Unsigned, Offset>>
 
         _alignment = rt.TextBoxAlignment.TOP,
-        _scrollbar_visible = true,
+        _scrollbar_visible = false,
         _is_closed = false,
 
         _scrollbar = rt.Scrollbar(),
@@ -43,6 +43,7 @@ rt.TextBox = meta.new_type("TextBox", rt.Widget, rt.Animation, rt.SignalEmitter,
 
         _scrolling_labels = {}, -- Stack<{label, elapsed}>
         _n_scrolling_labels = 0,
+        _n_lines_visible = 0,
 
         _only_show_newest_line = true
     })
@@ -223,16 +224,13 @@ function rt.TextBox:update(delta)
         local node = table.first(self._scrolling_labels)
         if node ~= nil and node.entry.seen == true then
             node.elapsed = node.elapsed + delta
-            local is_done, n_rows_visible = node.label:update_n_visible_characters_from_elapsed(node.elapsed, rt.settings.textbox.scroll_speed)
 
-            if node.n_lines_scrolled < n_rows_visible then
-                dbg("TODO:", self._first_visible_line, n_rows_visible, self._n_lines)
-                while n_rows_visible - (self:_calculate_n_visible_lines() - 1) > self._first_visible_line do
-                    self:scroll_down()
-                    if not self:_can_scroll_down() then break end
-                end
-                node.n_lines_scrolled = n_rows_visible
-            end
+            local before = self._n_lines_visible
+            local is_done, n_rows_visible = node.label:update_n_visible_characters_from_elapsed(node.elapsed, rt.settings.textbox.scroll_speed)
+            self._n_lines_visible = n_rows_visible
+
+            self._first_visible_line = clamp(node.line_i + n_rows_visible - self:_calculate_n_visible_lines(), node.line_i)
+
             if is_done then
                 table.remove(self._scrolling_labels, 1)
                 self._n_scrolling_labels = self._n_scrolling_labels - 1
@@ -292,7 +290,13 @@ end
 
 --- @brief
 --- @param jump_to Boolean if true, fully scroll down so new line is visible
-function rt.TextBox:append(text)
+function rt.TextBox:append(text, clear)
+
+    if clear == true then
+        self:advance()
+        self._first_visible_line = clamp(self._n_lines + 1, 0)
+    end
+
     local entry = {
         raw = text,
         label = rt.Label(text),
@@ -322,14 +326,15 @@ function rt.TextBox:append(text)
         line_i = line_i + 1
     end
 
-    self._n_lines = self._n_lines + entry.n_lines
-
     table.insert(self._scrolling_labels, {
         label = entry.label,
         entry = entry,
         elapsed = 0,
-        n_lines_scrolled = 0
+        n_lines_scrolled = 0,
+        line_i = self._n_lines + 1
     })
+
+    self._n_lines = self._n_lines + entry.n_lines
     self._n_scrolling_labels = self._n_scrolling_labels + 1
     entry.label:set_n_visible_characters(0)
 
@@ -405,7 +410,7 @@ end
 
 function rt.TextBox:_can_scroll_down()
     if self._scrollbar_visible ~= true then return false end
-    return not (self._first_visible_line + self:_calculate_n_visible_lines() > self._n_lines)
+    return not (self._first_visible_line + 1 > self._n_lines)
 end
 
 --- @brief
@@ -493,4 +498,17 @@ function rt.TextBox:jump_to_newest()
     local newest_label = self._labels[self._n_labels]
     self:advance()
     self._first_visible_line = self._n_lines + 1
+end
+
+--- @brief
+function rt.TextBox:clear()
+    self._total_height = 0
+    self._n_labels = 0
+    self._first_visible_line = 1
+    self._n_lines = 0
+    self._line_i_to_label_i = {}
+    self._scrolling_labels = {}
+    self._n_scrolling_labels = 0
+    self._labels = {}
+    self:reformat()
 end

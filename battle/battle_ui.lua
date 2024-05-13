@@ -1,5 +1,6 @@
 rt.settings.battle.battle_ui = {
     log_n_lines_default = 3,
+    log_n_lines_verbose = 15,
     priority_queue_width = 100,
     gradient_alpha = 0.4
 }
@@ -57,6 +58,22 @@ function bt.BattleUI:realize()
     end
 
     self._is_realized = true
+end
+
+--- @brief
+function bt.BattleUI:add_entity(entity, ...)
+    local to_add = {entity, ...}
+    for e in values(to_add) do
+        table.insert(self._entities, e)
+        if e:get_is_enemy() then
+            self:_add_enemy_sprite(e)
+        else
+            self:_add_party_sprite(e)
+        end
+    end
+
+    self:_reformat_party_sprites()
+    self:_reformat_enemy_sprites()
 end
 
 --- @brief
@@ -163,14 +180,18 @@ function bt.BattleUI:size_allocate(x, y, width, height)
     local m = rt.settings.margin_unit
     self._log:set_n_visible_lines(rt.settings.battle.battle_ui.log_n_lines_default)
 
-    local log_horizontal_margin = 2 * m
-    local log_vertical_margin = m
-    self._log:fit_into(
-        log_horizontal_margin,
-        log_vertical_margin,
-        width - 2 * log_horizontal_margin,
-        height * 1 / 4 - log_vertical_margin
-    )
+    do
+        local m = rt.settings.margin_unit * 2
+        local mx = rt.settings.battle.priority_queue.outer_margin + rt.settings.battle.priority_queue.element_size * rt.settings.battle.priority_queue.first_element_scale_factor + m
+        local log_horizontal_margin = mx
+        local log_vertical_margin = m
+        self._log:fit_into(
+            log_horizontal_margin,
+            log_vertical_margin,
+            width - 2 * log_horizontal_margin,
+            height * 1 / 4 - log_vertical_margin
+        )
+    end
 
     self:_reformat_enemy_sprites()
     self:_reformat_party_sprites()
@@ -204,7 +225,6 @@ function bt.BattleUI:draw()
     self._gradient_right:draw()
     rt.graphics.set_blend_mode()
 
-    self._log:draw()
 
     for i in values(self._enemy_sprite_render_order) do
         self._enemy_sprites[i]:draw()
@@ -216,6 +236,8 @@ function bt.BattleUI:draw()
 
     self._priority_queue:draw()
     self._animation_queue:draw()
+
+    self._log:draw()
 end
 
 --- @brief
@@ -261,3 +283,38 @@ function bt.BattleUI:get_sprite(entity)
     end
 end
 
+--- @brief
+function bt.BattleUI:set_log_is_in_scroll_mode(b)
+    self._log_scroll_mode_active = b
+    if b == true then
+        self._log:set_is_closed(false)
+        self._log:set_n_visible_lines(rt.settings.battle.battle_ui.log_n_lines_verbose)
+        self._log:set_scrollbar_visible(true)
+    elseif b == false then
+        self._log:advance()
+        self._log:set_n_visible_lines(rt.settings.battle.battle_ui.log_n_lines_default)
+        self._log:set_scrollbar_visible(false)
+    end
+end
+
+--- @brief
+function bt.BattleUI:get_log_is_in_scroll_mode()
+    return self._log_scroll_mode_active
+end
+
+--- @brief
+function bt.BattleUI:get_priority_queue()
+    return self._priority_queue
+end
+
+
+--- @brief
+function bt.BattleUI:clear()
+    self._enemy_sprites = {}
+    self._party_sprites = {}
+    self._entities = {}
+
+    --self._log:clear()
+    self._priority_queue:reorder({})
+    self._animation_queue._animations = {}
+end

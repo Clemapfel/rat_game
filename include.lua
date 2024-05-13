@@ -152,4 +152,5 @@ require "battle.animation"
 
 require "battle.battle_ui"
 require "battle.scene"
+require "battle.simulation"
 

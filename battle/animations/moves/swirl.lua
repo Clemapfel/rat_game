@@ -12,16 +12,16 @@ bt.Animation.SWIRL = meta.new_type("SWIRL", rt.QueueableAnimation, function(targ
         _elapsed = 0
     })
 end)
-
 bt.Animation.SWIRL._shader = rt.Shader(rt.settings.battle.animations.swirl.shader_path)
 
 --- @override
 function bt.Animation.SWIRL:start()
     local snapshot = rt.Snapshot()
     self._snapshot = snapshot
-    self._snapshot:set_padding(50, 50)
+    local bounds = self._target:get_bounds()
+    self._snapshot:set_padding(bounds.width * 0.1, bounds.height * 0.1)
     snapshot:realize()
-    snapshot:fit_into(self._target:get_bounds())
+    snapshot:fit_into(bounds)
 
     self._target:set_is_visible(true)
     snapshot:snapshot(self._target)
