@@ -58,10 +58,30 @@ float gaussian(float x, float mean, float variance) {
     return exp(-pow(x - mean, 2.0) / variance);
 }
 
+
+vec3 rgb_to_hsv(vec3 c)
+{
+    vec4 K = vec4(0.0, -1.0 / 3.0, 2.0 / 3.0, -1.0);
+    vec4 p = mix(vec4(c.bg, K.wz), vec4(c.gb, K.xy), step(c.b, c.g));
+    vec4 q = mix(vec4(p.xyw, c.r), vec4(c.r, p.yzx), step(p.x, c.r));
+
+    float d = q.x - min(q.w, q.y);
+    float e = 1.0e-10;
+    return vec3(abs(q.z + (q.w - q.y) / (6.0 * d + e)), d / (q.x + e), q.x);
+}
+
+vec3 hsv_to_rgb(vec3 c)
+{
+    vec4 K = vec4(1.0, 2.0 / 3.0, 1.0 / 3.0, 3.0);
+    vec3 p = abs(fract(c.xxx + K.xyz) * 6.0 - K.www);
+    return c.z * mix(K.xxx, clamp(p - K.xxx, 0.0, 1.0), c.y);
+}
+
 #ifdef PIXEL
 
-uniform float radius;
 uniform float elapsed;
+uniform float hue;
+uniform vec3 black;
 
 vec4 effect(vec4 vertex_color, Image image, vec2 texture_coords, vec2 vertex_position)
 {
@@ -71,40 +91,39 @@ vec4 effect(vec4 vertex_color, Image image, vec2 texture_coords, vec2 vertex_pos
     vec2 pos = vertex_position / love_ScreenSize.xy;
     pos.x *= aspect_factor;
 
-    float n_rows = 100;
-    float radius = 1 / n_rows;
-    float grid_size = radius * 2;
-
-    int x_i = int(floor(pos.x / grid_size));
-    int y_i = int(floor(pos.y / grid_size));
-
-    vec2 center = vec2(float(x_i) * grid_size + radius, float(y_i) * grid_size + radius);
     vec2 rng_pos = pos - vec2(0.5 * aspect_factor, 0.5);
     rng_pos.x *= 5;
     rng_pos.y *= 10;
     float rng = distance(vec2(
-        random(rng_pos + vec2(time, -time)),
-        random(rng_pos + vec2(-time, time))
+         random(rng_pos + vec2(time, -time)),
+         random(rng_pos + vec2(-time, time))
     ), rng_pos / 2);
 
     rng = gaussian(rng, 0, 1);
 
+    vec2 center = vec2(0.5);
+    center.x *= aspect_factor;
+    float eye = clamp(sin(2 * PI * (1 - gaussian(distance(pos, center), 0, 0.03))), 0, 1);
+
     float ring_x = distance(pos, vec2(0.5 * aspect_factor, 0.5));
-    rng *= (sin(8 * ring_x * 2 * PI + PI * time * 3)) + 1;
+    rng *= (sin(8 * (ring_x) * 2 * PI + PI * time * 3)) + 1;
 
-    radius = clamp(project(rng, 0.7 * radius, radius), 0, radius);
+    vec3 as_rgb = vec3(rng);
+    vec3 as_hsv = rgb_to_hsv(as_rgb);
+    float hue_offset = 0.03;
+    as_hsv.x = project(random(rng_pos), hue - hue_offset, hue + hue_offset);
+    as_hsv.y = 1;
 
-    float border = 0.005;
-    float dist = radius - distance(pos, center);
+    float pupil = gaussian(distance(pos, center), 0, 0.01);
+    as_hsv.y -= clamp(pupil, 0, 0.7);
+    as_hsv.z += 3 * pupil;
 
-    float value = 0.0;
-    if (dist > border)
-        value = 1.0;
-    else if (dist > 0.0)
-        value = dist / border;  // draw with feathered edge
+    as_rgb = hsv_to_rgb(as_hsv);
+    as_rgb -= vec3(eye);
+    as_rgb -= vec3(2 * clamp(gaussian(distance(pos, center), 0, 0.02), 0, 1));
 
-    value = value * 0.6;
-    return vec4(vec3(value), 1);
+    as_rgb = clamp(as_rgb, black, vec3(1, 1, 1));
+    return vec4(as_rgb, 1);
 }
 
 #endif

@@ -4,7 +4,7 @@ rt.current_scene = bt.Scene()
 scene = rt.current_scene
 
 battle = bt.Battle("DEBUG_BATTLE")
-scene:set_background("DOT_MATRIX")
+scene:set_background("EYE")
 
 input_controller = rt.InputController()
 input_controller:signal_connect("pressed", function(self, which)
