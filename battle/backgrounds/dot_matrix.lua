@@ -37,8 +37,8 @@ end
 --- @override
 function bt.Background.DOT_MATRIX:draw()
     self._shader:bind()
-    --self._shader:send("elapsed", self._elapsed)
-    self._shader:send("radius", self._radius)
+    self._shader:send("elapsed", self._elapsed)
+    --self._shader:send("radius", self._radius)
     self._shape:draw()
     self._shader:unbind()
 end
