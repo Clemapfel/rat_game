@@ -137,7 +137,7 @@ function bt.Scene:_animate_apply_status(holder, status)
     local sprite = self._ui:get_sprite(holder)
     local apply = bt.Animation.STATUS_APPLIED(sprite, status)
     local message = self:_message(self:format_name(holder) .. "s " .. self:format_name(status) .. " activated")
-    self:play_animations(apply, message)
+    self:play_animations({apply, message})
 end
 
 --- @brief
@@ -147,7 +147,7 @@ function bt.Scene:_animate_apply_consumable(holder, consumable)
     local sprite = self._ui:get_sprite(holder)
     local apply = bt.Animation.CONSUMABLE_APPLIED(sprite, consumable)
     local message = self:_message(self:format_name(holder) .. "s " .. self:format_name(consumable) .. " activated")
-    self:play_animations(apply, message)
+    self:play_animations({apply, message})
 end
 
 --- @brief
@@ -156,9 +156,8 @@ function bt.Scene:_animate_apply_global_status(global_status)
     if global_status.is_silent == true then return end
     local apply = bt.Animation.GLOBAL_STATUS_APPLIED(self._ui, global_status)
     local message = self:_message(self:format_name(global_status) .. " activated")
-    self:play_animations(apply, message)
+    self:play_animations({apply, message})
 end
-
 
 --- @brief
 function bt.Scene:start_battle(battle)
@@ -177,11 +176,11 @@ function bt.Scene:start_battle(battle)
             table.insert(animations, bt.Animation.ALLY_APPEARED(self._ui:get_sprite(entity)))
         end
     end
-
     table.insert(animations, self:_message(table.concat(messages, "\n")))
-    self:play_animations(table.unpack(animations))
-    animations[#animations]:register_finish_callback(function()
+
+    local on_finish = function()
         self._ui:set_priority_order(self._state:get_entities_in_order())
-        println("called")
-    end)
+    end
+
+    self:play_animations(animations, nil, on_finish)
 end
