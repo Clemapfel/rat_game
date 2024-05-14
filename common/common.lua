@@ -556,14 +556,8 @@ end
 --- @brief
 function table.seq(start, finish, step)
     local out = {}
-    if step == nil then
-        for i = start, finish do
-            table.insert(out, i)
-        end
-    else
-        for i = start, finish, step do
-            table.insert(out, i)
-        end
+    for x in range(start, finish, step) do
+        table.insert(out, x)
     end
     return out
 end
