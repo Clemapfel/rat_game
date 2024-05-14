@@ -42,6 +42,8 @@ function bt.Animation.STATUS_LOST:start()
         start_x, start_y,
         finish_x, finish_y
     })
+
+    self._target:set_speed(self._target:get_entity():get_speed())
 end
 
 --- @override

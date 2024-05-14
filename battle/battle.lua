@@ -220,8 +220,9 @@ end
 
 
 --- @brief
-function bt.Battle:get_entities_in_order()
+function bt.Battle:list_entities_in_order()
     local entities = self:list_entities()
+
     table.sort(entities, function(a, b)
         if a:get_priority() == b:get_priority() then
             if a:get_speed() == b:get_speed() then
@@ -235,5 +236,18 @@ function bt.Battle:get_entities_in_order()
     end)
 
     return entities
+end
+
+--- @brief
+function bt.Battle:list_stunned_entities()
+    local out = {}
+
+    for entity in values(self:list_entities()) do
+        if entity:get_is_stunned() then
+            table.insert(out, entity)
+        end
+    end
+
+    return out
 end
 

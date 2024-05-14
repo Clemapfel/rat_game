@@ -124,10 +124,8 @@ function bt.PriorityQueueElement:_update_state()
         end
     end
 
-    if self._is_stunned then
-        self._shape:set_opacity(ternary(not self._is_stunned, 1, 0.4))
-        self._id_offset_label:set_opacity(ternary(not self._is_stunned, 1, 0.8))
-    end
+    self._shape:set_opacity(ternary(not self._is_stunned, 1, 0.4))
+    self._id_offset_label:set_opacity(ternary(not self._is_stunned, 1, 0.8))
 
     self:_update_frame_color()
 end

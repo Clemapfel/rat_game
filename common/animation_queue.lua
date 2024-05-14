@@ -108,6 +108,14 @@ end
 function rt.AnimationQueue:skip()
     local node = self._animations[1]
     if node == nil then return end
+
+    if node._is_started == false then
+        node._is_started = true
+        if node.on_start ~= nil then
+            node.on_start()
+        end
+    end
+
     for animation in values(node.animations) do
         if animation._state == rt.QueueableAnimationState.IDLE then
             self:_start_animation(animation)

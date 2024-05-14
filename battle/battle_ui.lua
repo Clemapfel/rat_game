@@ -307,6 +307,11 @@ function bt.BattleUI:get_priority_queue()
     return self._priority_queue
 end
 
+--- @brief
+function bt.BattleUI:set_is_stunned(entity, b)
+    self:get_sprite(entity):set_is_stunned(b)
+    self._priority_queue:set_is_stunned(entity, b)
+end
 
 --- @brief
 function bt.BattleUI:clear()
@@ -317,4 +322,18 @@ function bt.BattleUI:clear()
     --self._log:clear()
     self._priority_queue:reorder({})
     self._animation_queue._animations = {}
+end
+
+--- @brief
+function bt.BattleUI:skip()
+    self._animation_queue:skip()
+    self._priority_queue:skip()
+
+    for sprite in values(self._enemy_sprites) do
+        sprite:synchronize(sprite:get_entity())
+    end
+
+    for sprite in values(self._party_sprites) do
+        sprite:synchronize(sprite:get_entity())
+    end
 end

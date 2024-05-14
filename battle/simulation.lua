@@ -191,6 +191,10 @@ function bt.Scene:start_battle(battle)
     for entity in values(self._state:list_entities()) do
         self._ui:add_entity(entity)
         if entity:get_is_enemy() then
+            self._ui:get_sprite(entity):set_ui_is_visible(false)
+        end
+
+        if entity:get_is_enemy() then
             table.insert(animations, bt.Animation.ENEMY_APPEARED(self._ui:get_sprite(entity)))
             table.insert(messages, self:format_name(entity) .. " appeared")
         else
@@ -200,39 +204,57 @@ function bt.Scene:start_battle(battle)
     table.insert(animations, bt.Animation.MESSAGE(self, table.concat(messages, "\n")))
 
     local on_finish = function()
-        self._ui:set_priority_order(self._state:get_entities_in_order())
+        for entity in values(self._state:list_entities()) do
+            if entity:get_is_enemy() then
+                self._ui:get_sprite(entity):set_ui_is_visible(true)
+            end
+        end
     end
 
     self:play_animations(animations, nil, on_finish)
 
-    for status in values(battle:list_global_statuses()) do
-        self:add_global_status(status)
+    -- wait with queue reveal until sprites are visible
+    self:play_animations(bt.Animation.REORDER_PRIORITY_QUEUE(self, self._state:list_entities_in_order()))
+
+    -- apply equips
+    for entity in values(self._entities) do
+    for equip in values(entity:list_equips()) do
+    if equip.effect ~= nil then
+    local holder_proxy = bt.EntityInterface(self, entity)
+    local equip_proxy = bt.EquipInterface(self, equip)
+    self:play_animations(bt.Animation.MESSAGE(self, self:format_name(entity) .. "s equipped " .. self:format_name(equip) .. " activated"))
+    bt.safe_invoke(self, equip, "effect", equip_proxy, holder_proxy)
+    end
+    end
     end
 
-    -- set music
-    -- set background
-    -- add global status
-    -- activate equips
-end
+    -- apply global statuses
+    for status in values(battle:list_global_statuses()) do
+    self:add_global_status(status)
+    end
 
---- @brief
-function bt.Scene:add_global_status(to_add)
+    -- TODO: set music
+    -- TODO: set background
+    end
+
+    --- @brief
+    function bt.Scene:add_global_status(to_add)
     local is_silent = to_add.is_silent
 
     -- check if status is already present
     for status in values(self._state:list_global_statuses()) do
-        if status == to_add then
-            return
-        end
+    if status == to_add then
+    return
+    end
     end
 
     -- add status
     self._state:add_global_status(to_add)
 
     if not is_silent then
-        local add = bt.Animation.GLOBAL_STATUS_GAINED(self._ui, to_add)
-        local message = bt.Animation.MESSAGE(self, self:format_name(to_add) .. " is now active globally")
-        self:play_animations({add, message})
+    local add = bt.Animation.GLOBAL_STATUS_GAINED(self._ui, to_add)
+    local message = bt.Animation.MESSAGE(self, self:format_name(to_add) .. " is now active globally")
+    self:play_animations({add, message})
     end
 
     -- invoke on_gained callbacks
@@ -240,58 +262,351 @@ function bt.Scene:add_global_status(to_add)
     local entity_proxies
 
     if to_add[callback_id] ~= nil then
-        local self_proxy = bt.GlobalStatusInterface(self, to_add)
-        if entity_proxies == nil then
-            entity_proxies = {}
-            for entity in values(self._state:list_entities()) do
-                table.insert(entity_proxies, bt.EntityInterface(self, entity))
-            end
-        end
-        self:safe_invoke(to_add, callback_id, self_proxy, entity_proxies)
-        self:_animate_apply_global_status(to_add)
+    local self_proxy = bt.GlobalStatusInterface(self, to_add)
+    if entity_proxies == nil then
+    entity_proxies = {}
+    for entity in values(self._state:list_entities()) do
+    table.insert(entity_proxies, bt.EntityInterface(self, entity))
+    end
+    end
+    self:safe_invoke(to_add, callback_id, self_proxy, entity_proxies)
+    self:_animate_apply_global_status(to_add)
     end
 
     -- invoke on_global_status_gained for all global statuses, statuses, and consumables
     callback_id = "on_global_status_gained"
 
     for status in values(self._state:list_global_statuses()) do
-        if status ~= to_add then
-            if status[callback_id] ~= nil then
-                local self_proxy = bt.GlobalStatusInterface(self, status)
-                local gained_proxy = bt.GlobalStatusInterface(self, to_add)
-                if entity_proxies == nil then
-                    entity_proxies = {}
-                    for entity in values(self._state:list_entities()) do
-                        table.insert(entity_proxies, bt.EntityInterface(self, entity))
-                    end
-                end
-                self:safe_invoke(status, callback_id, self_proxy, gained_proxy, entity_proxies)
-                self:_animate_apply_global_status(status)
-            end
-        end
+    if status ~= to_add then
+    if status[callback_id] ~= nil then
+    local self_proxy = bt.GlobalStatusInterface(self, status)
+    local gained_proxy = bt.GlobalStatusInterface(self, to_add)
+    if entity_proxies == nil then
+    entity_proxies = {}
+    for entity in values(self._state:list_entities()) do
+    table.insert(entity_proxies, bt.EntityInterface(self, entity))
+    end
+    end
+    self:safe_invoke(status, callback_id, self_proxy, gained_proxy, entity_proxies)
+    self:_animate_apply_global_status(status)
+    end
+    end
     end
 
     for entity in values(self._state:list_entities()) do
-        local afflicted_proxy = bt.EntityInterface(self, entity)
-        for status in values(entity:list_statuses()) do
-            if status[callback_id] ~= nil then
-                local self_proxy = bt.StatusInterface(self, entity, status)
-                local gained_proxy = bt.GlobalStatusInterface(self, to_add)
-                self:safe_invoke(status, callback_id, self_proxy, afflicted_proxy, gained_proxy)
-                self:_animate_apply_status(entity, status)
-            end
-        end
+    local afflicted_proxy = bt.EntityInterface(self, entity)
+    for status in values(entity:list_statuses()) do
+    if status[callback_id] ~= nil then
+    local self_proxy = bt.StatusInterface(self, entity, status)
+    local gained_proxy = bt.GlobalStatusInterface(self, to_add)
+    self:safe_invoke(status, callback_id, self_proxy, afflicted_proxy, gained_proxy)
+    self:_animate_apply_status(entity, status)
+    end
+    end
     end
 
     for entity in values(self._state:list_entities()) do
-        local holder_proxy = bt.EntityInterface(self, entity)
-        for consumable in values(entity:list_consumables()) do
-            if consumable[callback_id] ~= nil then
-                local self_proxy = bt.ConsumableInterface(self, entity, consumable)
-                local gained_proxy = bt.GlobalStatusInterface(self, to_add)
-                self:safe_invoke(consumable, callback_id, self_proxy, holder_proxy, gained_proxy)
-                self:_animate_apply_consumable(entity, consumable)
-            end
-        end
+    local holder_proxy = bt.EntityInterface(self, entity)
+    for consumable in values(entity:list_consumables()) do
+    if consumable[callback_id] ~= nil then
+    local self_proxy = bt.ConsumableInterface(self, entity, consumable)
+    local gained_proxy = bt.GlobalStatusInterface(self, to_add)
+    self:safe_invoke(consumable, callback_id, self_proxy, holder_proxy, gained_proxy)
+    self:_animate_apply_consumable(entity, consumable)
     end
-end
+    end
+    end
+    end
+
+    --- @brief
+    function bt.Scene:remove_global_status(to_remove)
+    local is_silent = to_remove.is_silent
+
+    -- check if status is present
+    local present = false
+    for status in values(self._state:list_global_statuses()) do
+    if status == to_remove then
+    present = true
+    break
+    end
+    end
+    if not present then return end
+
+    -- remove status
+    self._state:remove_global_status(to_remove)
+
+    if not is_silent then
+    local remove = bt.Animation.GLOBAL_STATUS_LOST(self._ui, to_remove)
+    local message = bt.Animation.MESSAGE(self, self:format_name(to_remove) .. " faded")
+    self:play_animations({ remove, message })
+    end
+
+    -- invoke on lost callback
+    local callback_id = "on_lost"
+    local entity_proxies
+
+    if to_remove[callback_id] ~= nil then
+    local self_proxy = bt.GlobalStatusInterface(self, to_remove)
+    if entity_proxies == nil then
+    entity_proxies = {}
+    for entity in values(self._state:list_entities()) do
+    table.insert(entity_proxies, bt.EntityInterface(self, entity))
+    end
+    end
+    self:safe_invoke(to_remove, callback_id, self_proxy, entity_proxies)
+    self:_animate_apply_global_status(to_remove)
+    end
+
+    -- invoke on_global_status_gained for all global statuses, statuses, and consumables
+    callback_id = "on_global_status_lost"
+
+    for status in values(self._state:list_global_statuses()) do
+    if status ~= to_remove then
+    if status[callback_id] ~= nil then
+    local self_proxy = bt.GlobalStatusInterface(self, status)
+    local lost_proxy = bt.GlobalStatusInterface(self, to_remove)
+    if entity_proxies == nil then
+    entity_proxies = {}
+    for entity in values(self._state:list_entities()) do
+    table.insert(entity_proxies, bt.EntityInterface(self, entity))
+    end
+    end
+    self:safe_invoke(status, callback_id, self_proxy, lost_proxy, entity_proxies)
+    self:_animate_apply_global_status(status)
+    end
+    end
+    end
+
+    for entity in values(self._state:list_entities()) do
+    local afflicted_proxy = bt.EntityInterface(self, entity)
+    for status in values(entity:list_statuses()) do
+    if status[callback_id] ~= nil then
+    local self_proxy = bt.StatusInterface(self, entity, status)
+    local lost_proxy = bt.GlobalStatusInterface(self, to_remove)
+    self:safe_invoke(status, callback_id, self_proxy, afflicted_proxy, lost_proxy)
+    self:_animate_apply_status(entity, status)
+    end
+    end
+    end
+
+    for entity in values(self._state:list_entities()) do
+    local holder_proxy = bt.EntityInterface(self, entity)
+    for consumable in values(entity:list_consumables()) do
+    if consumable[callback_id] ~= nil then
+    local self_proxy = bt.ConsumableInterface(self, entity, consumable)
+    local lost_proxy = bt.GlobalStatusInterface(self, to_remove)
+    self:safe_invoke(consumable, callback_id, self_proxy, holder_proxy, lost_proxy)
+    self:_animate_apply_consumable(entity, consumable)
+    end
+    end
+    end
+    end
+
+    --- @brief
+    function bt.Scene:add_status(entity, to_add)
+    meta.assert_isa(to_add, bt.Status)
+
+    local is_silent = to_add.is_silent
+
+    -- if entity is dead or knocked out, prevent adding status
+    if entity:get_is_dead() or entity:get_is_knocked_out() then
+    return
+    end
+
+    -- prevent double status
+    for status in values(entity:list_statuses()) do
+    if status == to_add then
+    if not is_silent then
+    self:play_animations(bt.Animation.MESSAGE(self, self:format_name(entity) .. " already has " .. self:format_name(to_add)))
+    end
+    return
+    end
+    end
+
+    -- add status
+    local stun_before = entity:get_is_stunned()
+    entity:add_status(to_add)
+    local stun_after = entity:get_is_stunned()
+
+    -- animation
+    if not is_silent then
+    local sprite = self._ui:get_sprite(entity)
+    do
+    local animation = bt.Animation.STATUS_GAINED(sprite, to_add)
+    local message = bt.Animation.MESSAGE(self, self:format_name(entity) .. " gained status " .. self:format_name(to_add))
+    local reorder = bt.Animation.REORDER_PRIORITY_QUEUE(self, self._state:list_entities_in_order())
+
+    local on_start = function()
+    sprite:add_status(to_add)
+    end
+    self:play_animations({animation, message, reorder}, on_start)
+    end
+
+    do -- newly stunned
+    if stun_after == true and stun_after ~= stun_before then
+    local animation = bt.Animation.STUNNED(sprite)
+    local message = bt.Animation.MESSAGE(self, self:format_name(entity) .. " is now stunned")
+
+    local on_start = function()
+    self._ui:set_is_stunned(entity, true)
+    end
+    self:play_animations({animation, message}, on_start)
+    end
+    end
+    end
+
+    -- invoke callback on self
+    local callback_id = "on_gained"
+    if to_add[callback_id] ~= nil then
+    local afflicted_proxy = bt.EntityInterface(self, entity)
+    local self_proxy = bt.StatusInterface(self, entity, to_add)
+    self:safe_invoke(to_add, callback_id, self_proxy, afflicted_proxy)
+    self:_animate_apply_status(entity, to_add)
+    end
+
+    -- invoke status gained for global statuses, and status / consumable of self
+    callback_id = "on_status_gained"
+    local afflicted_proxy = bt.EntityInterface(self, entity)
+    local new_status_proxy = bt.StatusInterface(self, entity, to_add)
+
+    for status in values(self._state:list_global_statuses()) do
+    if status[callback_id] ~= nil then
+    local self_proxy = bt.GlobalStatusInterface(self, status)
+    self:safe_invoke(status, callback_id, self_proxy, afflicted_proxy, new_status_proxy)
+    self:_animate_apply_global_status(status)
+    end
+    end
+
+    for status in values(entity:list_statuses()) do
+    if not (status == to_add) then
+    if status[callback_id] ~= nil then
+    local self_proxy = bt.StatusInterface(self, entity, status)
+    self:safe_invoke(status, callback_id, self_proxy, afflicted_proxy, new_status_proxy)
+    self:_animate_apply_status(entity, status)
+    end
+    end
+    end
+
+    for consumable in values(entity:list_consumables()) do
+    if consumable[callback_id] ~= nil then
+    local self_proxy = bt.ConsumableInterface(self, entity, consumable)
+    local holder_proxy = bt.EntityInterface(self, entity)
+    self:safe_invoke(consumable, callback_id, self_proxy, afflicted_proxy, new_status_proxy)
+    self:_animate_apply_consumable(entity, consumable)
+    end
+    end
+    end
+
+    --- @brief
+    function bt.Scene:remove_status(entity, to_remove)
+    meta.assert_isa(to_remove, bt.Status)
+
+    local is_silent = to_remove.is_silent
+
+    -- if entity is dead or knocked out, prevent adding status
+    if entity:get_is_dead() or entity:get_is_knocked_out() then
+    return
+    end
+
+    -- assert has status
+    local present = false
+    for status in values(entity:list_statuses()) do
+    if status == to_remove then
+    present = true
+    break
+    end
+    end
+    if not present then return end
+
+    -- add status
+    local stun_before = entity:get_is_stunned()
+    entity:remove_status(to_remove)
+    local stun_after = entity:get_is_stunned()
+
+    -- animation
+    if not is_silent then
+    local sprite = self._ui:get_sprite(entity)
+    do
+    local animation = bt.Animation.STATUS_LOST(sprite, to_remove)
+    local message = bt.Animation.MESSAGE(self, self:format_name(entity) .. " lost status " .. self:format_name(to_remove))
+    local reorder = bt.Animation.REORDER_PRIORITY_QUEUE(self, self._state:list_entities_in_order())
+
+    local on_start = function()
+    sprite:remove_status(to_remove)
+    end
+    self:play_animations({animation, message, reorder}, on_start)
+    end
+
+    do -- no longer stunned
+    if stun_after == false and stun_after ~= stun_before then
+    local animation = bt.Animation.STUNNED(sprite)
+    local message = bt.Animation.MESSAGE(self, self:format_name(entity) .. " is no longer stunned")
+
+    local on_start = function()
+    self._ui:set_is_stunned(entity, false)
+    end
+    self:play_animations({animation, message}, on_start)
+    end
+    end
+    end
+
+    -- invoke callback on self
+    local callback_id = "on_lost"
+    if to_remove[callback_id] ~= nil then
+    local afflicted_proxy = bt.EntityInterface(self, entity)
+    local self_proxy = bt.StatusInterface(self, entity, to_remove)
+    self:safe_invoke(to_remove, callback_id, self_proxy, afflicted_proxy)
+    self:_animate_apply_status(entity, to_remove)
+    end
+
+    -- invoke status lost for global statuses, and status / consumable of self
+    callback_id = "on_status_lost"
+    local afflicted_proxy = bt.EntityInterface(self, entity)
+    local new_status_proxy = bt.StatusInterface(self, entity, to_remove)
+
+    for status in values(self._state:list_global_statuses()) do
+    if status[callback_id] ~= nil then
+    local self_proxy = bt.GlobalStatusInterface(self, status)
+    self:safe_invoke(status, callback_id, self_proxy, afflicted_proxy, new_status_proxy)
+    self:_animate_apply_global_status(status)
+    end
+    end
+
+    for status in values(entity:list_statuses()) do
+    if not (status == to_remove) then
+    if status[callback_id] ~= nil then
+    local self_proxy = bt.StatusInterface(self, entity, status)
+    self:safe_invoke(status, callback_id, self_proxy, afflicted_proxy, new_status_proxy)
+    self:_animate_apply_status(entity, status)
+    end
+    end
+    end
+
+    for consumable in values(entity:list_consumables()) do
+    if consumable[callback_id] ~= nil then
+    local self_proxy = bt.ConsumableInterface(self, entity, consumable)
+    local holder_proxy = bt.EntityInterface(self, entity)
+    self:safe_invoke(consumable, callback_id, self_proxy, afflicted_proxy, new_status_proxy)
+    self:_animate_apply_consumable(entity, consumable)
+    end
+    end
+    end
+
+    --- @brief
+    function bt.Scene:use_move()
+    -- TODO
+    end
+
+
+    --- @brief
+    function bt.Scene:start_turn()
+    -- on_turn_start for consumable, status, global_status
+    end
+
+    --- @brief
+    function bt.Scene:end_turn()
+    -- on_turn_end for consumable, status, global_status
+    -- cleanup dead enemies
+    -- gameover if dead allies
+    -- advance status, global_status n turns, clear if above max duration
+    end

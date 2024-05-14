@@ -79,8 +79,7 @@ end
 
 --- @brief
 function bt.Scene:skip()
-    self._ui:get_animation_queue():skip()
-    self._ui:get_priority_queue():skip()
+    self._ui:skip()
 end
 
 --- @brief

@@ -188,6 +188,7 @@ end
 --- @brief
 function bt.HealthBar:synchronize(entity)
     self._hp_target = entity:get_hp()
+    self._hp_current = entity:get_hp()
     self._hp_max = entity:get_hp_base()
 
     local left, center, right = self:_format_hp(self._hp_current, self._hp_max)
@@ -196,7 +197,7 @@ function bt.HealthBar:synchronize(entity)
     self._label_right:set_text(right)
     self._level_bar:set_value(self._hp_current)
     self:_update_color_from_precentage(self._hp_current / self._hp_max)
-    self:reformat()
+    self:_update_value()
 end
 
 --- @brief

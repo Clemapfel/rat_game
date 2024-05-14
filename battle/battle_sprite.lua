@@ -68,6 +68,11 @@ function bt.BattleSprite:set_hp(value, value_max)
 end
 
 --- @brief
+function bt.BattleSprite:set_speed(value)
+    self._speed_value:set_value(value)
+end
+
+--- @brief
 function bt.BattleSprite:set_priority(status)
     self._priority = status
 end
@@ -101,4 +106,9 @@ end
 --- @brief
 function bt.BattleSprite:get_entity()
     return self._entity
+end
+
+--- @brief
+function bt.BattleSprite:set_is_stunned(b)
+    -- TODO
 end

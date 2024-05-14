@@ -11,12 +11,12 @@ proxy = bt.GlobalStatusInterface(scene, bt.GlobalStatus("DEBUG_GLOBAL_STATUS"))
 input_controller = rt.InputController()
 input_controller:signal_connect("pressed", function(self, which)
     if which == rt.InputButton.A then
-        scene:add_global_status(bt.GlobalStatus("DEBUG_GLOBAL_STATUS"))
     elseif which == rt.InputButton.B then
         scene:skip()
     elseif which == rt.InputButton.X then
-        scene._ui:set_log_is_in_scroll_mode(not scene._ui:get_log_is_in_scroll_mode())
+        scene:add_status(battle.entities[1], bt.Status("DEBUG_STATUS"))
     elseif which == rt.InputButton.Y then
+        scene:remove_status(battle.entities[1], bt.Status("DEBUG_STATUS"))
     elseif which == rt.InputButton.L then
     elseif which == rt.InputButton.R then
     elseif which == rt.InputButton.UP then

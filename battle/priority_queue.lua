@@ -12,7 +12,7 @@ bt.PriorityQueue = meta.new_type("PriorityQueue", rt.Widget, rt.Animation, funct
     return meta.new(bt.PriorityQueue, {
         _world = rt.PhysicsWorld(0, 0),
         _current = {
-            entries = {},       -- Table<EntityID, bt.PriorityQueue.ElementEntry>
+            entries = {},       -- Table<Entity, bt.PriorityQueue.ElementEntry>
             order = {},         -- Table<Entity>
             render_order = {}   -- Table<{entity_key, multiplicity_index}>
         },
@@ -22,6 +22,7 @@ bt.PriorityQueue = meta.new_type("PriorityQueue", rt.Widget, rt.Animation, funct
             render_order = {}
         },
         _preview_visible = false,
+        _reorder_done = false,
         _elapsed = 0
     })
 end)
@@ -51,6 +52,13 @@ function bt.PriorityQueue:set_selected(entities)
             element:set_is_selected(element_selected)
             element:set_opacity(ternary(element_selected, 1, unselected_alpha))
         end
+    end
+end
+
+--- @brief
+function bt.PriorityQueue:set_is_stunned(entity, b)
+    for element in values(self._current.entries[entity].elements) do
+        element:set_is_stunned(b)
     end
 end
 
@@ -133,6 +141,7 @@ function bt.PriorityQueue:reorder(order, next_order)
 
     handle(self._current, order)
     handle(self._next, next_order)
+    self._reorder_done = false
 
     self:reformat()
 end
@@ -219,12 +228,17 @@ end
 --- @override
 function bt.PriorityQueue:update(delta)
     self._elapsed = self._elapsed + delta
+
     local function handle(which)
         for _, entry in pairs(which.entries) do
             for i, collider in ipairs(entry.colliders) do
                 local current_x, current_y = collider:get_centroid()
                 local target = entry.target_positions[i]
                 local target_x, target_y = target[1], target[2]
+
+                if rt.distance(current_x, current_y, target_x, target_y) > 1 then
+                    self._reorder_done = false
+                end
 
                 local angle = rt.angle(target_x - current_x, target_y - current_y)
                 local magnitude = rt.settings.battle.priority_queue.collider_speed
@@ -312,4 +326,9 @@ function bt.PriorityQueue:skip()
 
     handle(self._current)
     handle(self._next)
+end
+
+--- @brief
+function bt.PriorityQueue:get_is_reorder_done()
+    return self._reorder_done
 end

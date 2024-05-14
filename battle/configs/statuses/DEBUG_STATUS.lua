@@ -3,6 +3,7 @@ return {
 
     max_duration = POSITIVE_INFINITY,
     is_silent = false,
+    is_stun = true,
 
     attack_factor = 1,
     defense_factor = 1,
@@ -10,7 +11,7 @@ return {
 
     attack_offset = 0,
     defense_offset = 0,
-    speed_offset = 0,
+    speed_offset = 123,
 
     sprite_id = "status_ailment",
     sprite_index = 2,

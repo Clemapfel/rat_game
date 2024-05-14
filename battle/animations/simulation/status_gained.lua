@@ -22,7 +22,6 @@ function bt.Animation.STATUS_GAINED:start()
     self._label:set_justify_mode(rt.JustifyMode.CENTER)
     self._label:realize()
 
-
     self._target_snapshot = rt.Snapshot()
     self._target_snapshot:realize()
     self._target_snapshot:set_mix_color(rt.Palette.FOREGROUND)
@@ -43,6 +42,8 @@ function bt.Animation.STATUS_GAINED:start()
         start_x, start_y,
         finish_x, finish_y
     })
+
+    self._target:set_speed(self._target:get_entity():get_speed())
 end
 
 --- @override

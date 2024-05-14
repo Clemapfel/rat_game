@@ -1,5 +1,5 @@
 rt.settings.battle.animation.message = {
-    hold_duration = 2, -- seconds
+    hold_duration = 0.5, -- seconds
 }
 
 --- @class bt.Animation.MESSAGE
@@ -9,7 +9,6 @@ bt.Animation.MESSAGE = meta.new_type("MESSAGE", rt.QueueableAnimation, function(
     return meta.new(bt.Animation.MESSAGE, {
         _scene = scene,
         _message = message,
-
         _is_holding = false,
         _elapsed = 0, -- time spend holding
     })

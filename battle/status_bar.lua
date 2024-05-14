@@ -208,7 +208,6 @@ function bt.StatusBar:remove(status)
             e.is_revealing = false
             e.element:set_scale(1)
             e.element:set_opacity(self._opacity)
-            e.element:set_hide_n_turns_left(true)
             e.is_hiding = true
             seen = true
             break
@@ -216,7 +215,7 @@ function bt.StatusBar:remove(status)
     end
 
     if not seen then
-        rt.warning("In bt.StatusBar:remove: status `" .. status:get_id() .. "` of entity `" .. self._entity:get_id() .. "` was not yet added to StatusBar")
+        rt.warning("In bt.StatusBar:remove: status `" .. status:get_id() .. "` of entity `" .. self:get_entity():get_id() .. "` was not yet added to StatusBar")
     end
 end
 
