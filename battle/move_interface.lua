@@ -1,7 +1,7 @@
 
 --- @class bt.MoveInterface
 function bt.MoveInterface(scene, move)
-    meta.assert_isa(scene, bt.BattleScene)
+    meta.assert_isa(scene, bt.Scene)
     meta.assert_isa(move, bt.Move)
 
     local self, metatable = {}, {}

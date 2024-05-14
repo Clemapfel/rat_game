@@ -6,10 +6,12 @@ scene = rt.current_scene
 battle = bt.Battle("DEBUG_BATTLE")
 scene:set_background("EYE")
 
+proxy = bt.GlobalStatusInterface(scene, bt.GlobalStatus("DEBUG_GLOBAL_STATUS"))
+
 input_controller = rt.InputController()
 input_controller:signal_connect("pressed", function(self, which)
     if which == rt.InputButton.A then
-        scene:start_battle(battle)
+        scene:add_global_status(bt.GlobalStatus("DEBUG_GLOBAL_STATUS"))
     elseif which == rt.InputButton.B then
         scene:skip()
     elseif which == rt.InputButton.X then
@@ -31,6 +33,8 @@ end)
 love.load = function()
     rt.current_scene:realize()
     love.resize()
+
+    rt.current_scene:start_battle(battle)
 end
 
 rt.graphics.frame_duration = {

@@ -1,6 +1,6 @@
 --- @class bt.EquipInterface
 function bt.EquipInterface(scene, equip)
-    meta.assert_isa(scene, bt.BattleScene)
+    meta.assert_isa(scene, bt.Scene)
     meta.assert_isa(equip, bt.Equip)
 
     local self, metatable = {}, {}

@@ -1,3 +1,30 @@
+bt._safe_invoke_catch_errors = true
+
+-- generate meta assertions
+for which in values({
+    {"entity", "bt.EntityInterface"},
+    {"status", "bt.StatusInterface"},
+    {"equip", "bt.EquipInterface"},
+    {"consumable", "bt.ConsumableInterface"},
+    {"global_status", "bt.GlobalStatusInterface"},
+    {"move", "bt.MoveInterface"}
+}) do
+    local is_name = "is_" .. which[1] .. "_interface"
+
+    --- @brief get whether type is interface
+    meta["is_" .. which[1] .. "_interface"] = function(x)
+        local metatable = getmetatable(x)
+        return metatable ~= nil and metatable.type == which[2]
+    end
+
+    --- @brief throw if type is not interface
+    meta["assert_" .. which[1] .. "_interface"] = function(x)
+        if not meta[is_name](x) then
+            rt.error("In " .. debug.getinfo(2, "n").name .. ": Expected `" .. which[2] .. "`, got `" .. meta.typeof(x) .. "`")
+        end
+    end
+end
+
 function bt.Scene:safe_invoke(instance, callback_id, ...)
     meta.assert_isa(self, bt.Scene)
     meta.assert_string(callback_id)
@@ -85,8 +112,6 @@ function bt.Scene:safe_invoke(instance, callback_id, ...)
     if scene._safe_invoke_shared == nil then scene._safe_invoke_shared = {} end
     env._G = scene._safe_invoke_shared
 
-    scene:_load_scene_interface(env)
-
     setmetatable(env, {})
     local metatable = getmetatable(env)
     metatable.__index = function(self, key)
@@ -102,16 +127,18 @@ function bt.Scene:safe_invoke(instance, callback_id, ...)
     -- safely invoke callback
     local callback = instance[callback_id]
     debug.setfenv(callback, env)
-    local res, error_maybe
 
     local args = {...}
+    local res
     if bt._safe_invoke_catch_errors then
-        res, error_maybe = pcall(function()
+        local success, error_maybe = pcall(function()
             return callback(table.unpack(args))
         end)
 
-        if error_maybe ~= nil then
+        if not success then
             rt.warning("In bt.safe_invoke: In " .. instance:get_id() .. "." .. callback_id .. ": Error: " .. error_maybe)
+        else
+            res = error_maybe
         end
     else
         res = callback(table.unpack(args))
@@ -123,12 +150,6 @@ function bt.Scene:safe_invoke(instance, callback_id, ...)
 
     return res
 end
-
---- @brief
-function bt.Scene:_message(string)
-    return bt.Animation.MESSAGE(self, string)
-end
-
 --- @brief
 function bt.Scene:_animate_apply_status(holder, status)
     meta.assert_isa(holder, bt.Entity)
@@ -136,7 +157,7 @@ function bt.Scene:_animate_apply_status(holder, status)
     if status.is_silent == true then return end
     local sprite = self._ui:get_sprite(holder)
     local apply = bt.Animation.STATUS_APPLIED(sprite, status)
-    local message = self:_message(self:format_name(holder) .. "s " .. self:format_name(status) .. " activated")
+    local message = bt.Animation.MESSAGE(self, self:format_name(holder) .. "s " .. self:format_name(status) .. " activated")
     self:play_animations({apply, message})
 end
 
@@ -146,7 +167,7 @@ function bt.Scene:_animate_apply_consumable(holder, consumable)
     meta.assert_isa(consumable, bt.Consumable)
     local sprite = self._ui:get_sprite(holder)
     local apply = bt.Animation.CONSUMABLE_APPLIED(sprite, consumable)
-    local message = self:_message(self:format_name(holder) .. "s " .. self:format_name(consumable) .. " activated")
+    local message = bt.Animation.MESSAGE(self, self:format_name(holder) .. "s " .. self:format_name(consumable) .. " activated")
     self:play_animations({apply, message})
 end
 
@@ -155,7 +176,7 @@ function bt.Scene:_animate_apply_global_status(global_status)
     meta.assert_isa(global_status, bt.GlobalStatus)
     if global_status.is_silent == true then return end
     local apply = bt.Animation.GLOBAL_STATUS_APPLIED(self._ui, global_status)
-    local message = self:_message(self:format_name(global_status) .. " activated")
+    local message = bt.Animation.MESSAGE(self, self:format_name(global_status) .. " activated")
     self:play_animations({apply, message})
 end
 
@@ -176,11 +197,101 @@ function bt.Scene:start_battle(battle)
             table.insert(animations, bt.Animation.ALLY_APPEARED(self._ui:get_sprite(entity)))
         end
     end
-    table.insert(animations, self:_message(table.concat(messages, "\n")))
+    table.insert(animations, bt.Animation.MESSAGE(self, table.concat(messages, "\n")))
 
     local on_finish = function()
         self._ui:set_priority_order(self._state:get_entities_in_order())
     end
 
     self:play_animations(animations, nil, on_finish)
+
+    for status in values(battle:list_global_statuses()) do
+        self:add_global_status(status)
+    end
+
+    -- set music
+    -- set background
+    -- add global status
+    -- activate equips
+end
+
+--- @brief
+function bt.Scene:add_global_status(to_add)
+    local is_silent = to_add.is_silent
+
+    -- check if status is already present
+    for status in values(self._state:list_global_statuses()) do
+        if status == to_add then
+            return
+        end
+    end
+
+    -- add status
+    self._state:add_global_status(to_add)
+
+    if not is_silent then
+        local add = bt.Animation.GLOBAL_STATUS_GAINED(self._ui, to_add)
+        local message = bt.Animation.MESSAGE(self, self:format_name(to_add) .. " is now active globally")
+        self:play_animations({add, message})
+    end
+
+    -- invoke on_gained callbacks
+    local callback_id = "on_gained"
+    local entity_proxies
+
+    if to_add[callback_id] ~= nil then
+        local self_proxy = bt.GlobalStatusInterface(self, to_add)
+        if entity_proxies == nil then
+            entity_proxies = {}
+            for entity in values(self._state:list_entities()) do
+                table.insert(entity_proxies, bt.EntityInterface(self, entity))
+            end
+        end
+        self:safe_invoke(to_add, callback_id, self_proxy, entity_proxies)
+        self:_animate_apply_global_status(to_add)
+    end
+
+    -- invoke on_global_status_gained for all global statuses, statuses, and consumables
+    callback_id = "on_global_status_gained"
+
+    for status in values(self._state:list_global_statuses()) do
+        if status ~= to_add then
+            if status[callback_id] ~= nil then
+                local self_proxy = bt.GlobalStatusInterface(self, status)
+                local gained_proxy = bt.GlobalStatusInterface(self, to_add)
+                if entity_proxies == nil then
+                    entity_proxies = {}
+                    for entity in values(self._state:list_entities()) do
+                        table.insert(entity_proxies, bt.EntityInterface(self, entity))
+                    end
+                end
+                self:safe_invoke(status, callback_id, self_proxy, gained_proxy, entity_proxies)
+                self:_animate_apply_global_status(status)
+            end
+        end
+    end
+
+    for entity in values(self._state:list_entities()) do
+        local afflicted_proxy = bt.EntityInterface(self, entity)
+        for status in values(entity:list_statuses()) do
+            if status[callback_id] ~= nil then
+                local self_proxy = bt.StatusInterface(self, entity, status)
+                local gained_proxy = bt.GlobalStatusInterface(self, to_add)
+                self:safe_invoke(status, callback_id, self_proxy, afflicted_proxy, gained_proxy)
+                self:_animate_apply_status(entity, status)
+            end
+        end
+    end
+
+    for entity in values(self._state:list_entities()) do
+        local holder_proxy = bt.EntityInterface(self, entity)
+        for consumable in values(entity:list_consumables()) do
+            if consumable[callback_id] ~= nil then
+                local self_proxy = bt.ConsumableInterface(self, entity, consumable)
+                local gained_proxy = bt.GlobalStatusInterface(self, to_add)
+                self:safe_invoke(consumable, callback_id, self_proxy, holder_proxy, gained_proxy)
+                self:_animate_apply_consumable(entity, consumable)
+            end
+        end
+    end
 end

@@ -9,8 +9,7 @@ bt.Background.EYE = meta.new_type("EYE", bt.Background, function()
         _texture = {},
         _elapsed = 0,
         _hue = rt.rgba_to_hsva(rt.Palette.RED_3).h,
-        _black = rt.Palette.GRAY_7,
-
+        _black = rt.Palette.BLACK,
     })
 end)
 

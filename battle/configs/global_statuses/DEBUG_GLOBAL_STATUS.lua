@@ -17,8 +17,8 @@ return {
         local ids = ""
         for entity in values(entities) do
             ids = ids .. entity.id .. " "
-            entity:add_status("DEBUG_STATUS")
         end
+
         println("[DBG] In " .. self.id .. ".on_gained: applied to ", ids)
         return nil
     end,

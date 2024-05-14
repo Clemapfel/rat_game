@@ -39,6 +39,7 @@ uniform float _mix_weight;
 
 uniform vec4 _vertex_color;
 uniform float _opacity;
+uniform vec4 _black;
 
 uniform bool _invert;
 
@@ -83,7 +84,9 @@ vec4 effect(vec4 _, Image texture, vec2 texture_coordinates, vec2 vertex_positio
     vec4 result = vec4(as_rgb, alpha) * vec4(1);
     result = mix(result, _mix_color, clamp(_mix_weight, 0, 1));
 
-    return result * _vertex_color * vec4(1, 1, 1, _opacity);
+    result *= _vertex_color * vec4(1, 1, 1, _opacity);
+    result = clamp(result, _black, vec4(1));
+    return result;
 }
 
 #endif

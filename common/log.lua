@@ -97,12 +97,12 @@ end
 
 --- @brief
 function rt.log(message)
-    rt.prettyprint(rt.settings.log.rt_prefix, rt.settings.log.log_prefix, " ", message)
+    rt.prettyprint(rt.settings.log.rt_prefix, rt.settings.log.log_prefix, " ", message .. "\n")
 end
 
 --- @brief
 function rt.warning(message)
-    rt.prettyprint(rt.settings.log.rt_prefix, rt.settings.log.warning_prefix, " ", message)
+    rt.prettyprint(rt.settings.log.rt_prefix, rt.settings.log.warning_prefix, " ", message .. "\n")
 end
 
 --- @brief

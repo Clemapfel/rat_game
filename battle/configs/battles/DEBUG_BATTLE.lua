@@ -3,7 +3,6 @@ return {
     music_id = "default",
 
     global_statuses = {
-        "DEBUG_GLOBAL_STATUS"
     },
 
     entities = {

@@ -1,10 +1,10 @@
-bt.BattleScene = bt.Scene --TODO
+bt.Scene = bt.Scene --TODO
 
 
 --- @brief
-function bt.BattleScene:safe_invoke(instance, callback_id, ...)
+function bt.Scene:safe_invoke(instance, callback_id, ...)
     self._state:clear_current_move_selection()
-    meta.assert_isa(self, bt.BattleScene)
+    meta.assert_isa(self, bt.Scene)
     meta.assert_string(callback_id)
     local scene = self
 

@@ -1,6 +1,6 @@
 --- @class bt.GlobalStatusInterface
 function bt.GlobalStatusInterface(scene, status)
-    meta.assert_isa(scene, bt.BattleScene)
+    meta.assert_isa(scene, bt.Scene)
     meta.assert_isa(status, bt.GlobalStatus)
 
     local self, metatable = {}, {}

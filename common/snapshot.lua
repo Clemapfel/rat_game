@@ -71,6 +71,9 @@ function rt.Snapshot:draw()
     self._shader:send("_vertex_color", {self._vertex_color.r, self._vertex_color.g, self._vertex_color.b, self._vertex_color.a})
     self._shader:send("_opacity", self._opacity)
 
+    local black = rt.Palette.BLACK
+    self._shader:send("_black", {black.r, black.g, black.b, black.a})
+
     self:draw_canvas()
     self._shader:unbind()
 end

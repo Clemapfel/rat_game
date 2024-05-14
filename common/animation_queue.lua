@@ -37,6 +37,16 @@ function rt.QueueableAnimation:draw()
     -- noop
 end
 
+--- @brief
+function rt.QueueableAnimation:get_state()
+    return self._state
+end
+
+--- @brief
+function rt.QueueableAnimation:get_is_started()
+    return self._state == rt.QueueableAnimationState.STARTED
+end
+
 -- ###
 
 --- @class
@@ -96,7 +106,20 @@ end
 
 --- @brief
 function rt.AnimationQueue:skip()
-    error("TODO")
+    local node = self._animations[1]
+    if node == nil then return end
+    for animation in values(node.animations) do
+        if animation._state == rt.QueueableAnimationState.IDLE then
+            self:_start_animation(animation)
+        end
+
+        animation:update(0)
+        self:_finish_animation(animation)
+    end
+
+    if node.on_finish ~= nil then
+        node.on_finish()
+    end
 end
 
 --- @brief
@@ -142,9 +165,9 @@ end
 --- @brief
 function rt.AnimationQueue:draw()
     local node = self._animations[1]
-    if node == nil then return end
+    if node == nil or node.is_started == false then return end
     for animation in values(node.animations) do
-        if animation._state ~= rt.QueueableAnimationState.FINISHED then
+        if animation:get_state() ~= rt.QueueableAnimationState.FINISHED then
             animation:draw()
         end
     end

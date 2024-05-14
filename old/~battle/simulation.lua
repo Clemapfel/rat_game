@@ -127,7 +127,7 @@ function bt.BattleScene:safe_invoke(instance, callback_id, ...)
 end
 
 --- @brief
-function bt.BattleScene:_apply_status(holder, status)
+function bt.BattleScene:_animate_apply_status(holder, status)
     meta.assert_isa(holder, bt.BattleEntity)
     meta.assert_isa(status, bt.Status)
     if status.is_silent == true then return end
@@ -138,7 +138,7 @@ function bt.BattleScene:_apply_status(holder, status)
 end
 
 --- @brief
-function bt.BattleScene:_apply_consumable(holder, consumable)
+function bt.BattleScene:_animate_apply_consumable(holder, consumable)
     meta.assert_isa(holder, bt.BattleEntity)
     meta.assert_isa(consumable, bt.Consumable)
     if consumable.is_silent == true then return end
@@ -149,7 +149,7 @@ function bt.BattleScene:_apply_consumable(holder, consumable)
 end
 
 --- @brief
-function bt.BattleScene:_apply_global_status(global_status)
+function bt.BattleScene:_animate_apply_global_status(global_status)
     meta.assert_isa(global_status, bt.GlobalStatus)
     if global_status.is_silent == true then return end
     local animation = self:play_animation(self, "GLOBAL_STATUS_APPLIED", global_status)
@@ -278,7 +278,7 @@ function bt.BattleScene:add_global_status(to_add)
             end
         end
         self:safe_invoke(to_add, callback_id, self_proxy, entity_proxies)
-        self:_apply_global_status(to_add)
+        self:_animate_apply_global_status(to_add)
     end
 
     -- invoke on_global_status_gained for all global statuses, statuses, and consumables
@@ -296,7 +296,7 @@ function bt.BattleScene:add_global_status(to_add)
                     end
                 end
                 self:safe_invoke(status, callback_id, self_proxy, gained_proxy, entity_proxies)
-                self:_apply_global_status(status)
+                self:_animate_apply_global_status(status)
             end
         end
     end
@@ -308,7 +308,7 @@ function bt.BattleScene:add_global_status(to_add)
                 local self_proxy = bt.StatusInterface(self, entity, status)
                 local gained_proxy = bt.GlobalStatusInterface(self, to_add)
                 self:safe_invoke(status, callback_id, self_proxy, afflicted_proxy, gained_proxy)
-                self:_apply_status(entity, status)
+                self:_animate_apply_status(entity, status)
             end
         end
     end
@@ -320,7 +320,7 @@ function bt.BattleScene:add_global_status(to_add)
                 local self_proxy = bt.ConsumableInterface(self, entity, consumable)
                 local gained_proxy = bt.GlobalStatusInterface(self, to_add)
                 self:safe_invoke(consumable, callback_id, self_proxy, holder_proxy, gained_proxy)
-                self:_apply_consumable(entity, consumable)
+                self:_animate_apply_consumable(entity, consumable)
             end
         end
     end
@@ -371,7 +371,7 @@ function bt.BattleScene:remove_global_status(to_remove)
             end
         end
         self:safe_invoke(to_remove, callback_id, self_proxy, entity_proxies)
-        self:_apply_global_status(to_remove)
+        self:_animate_apply_global_status(to_remove)
     end
 
     -- invoke on_global_status_gained for all global statuses, statuses, and consumables
@@ -389,7 +389,7 @@ function bt.BattleScene:remove_global_status(to_remove)
                     end
                 end
                 self:safe_invoke(status, callback_id, self_proxy, gained_proxy, entity_proxies)
-                self:_apply_global_status(status)
+                self:_animate_apply_global_status(status)
             end
         end
     end
@@ -401,7 +401,7 @@ function bt.BattleScene:remove_global_status(to_remove)
                 local self_proxy = bt.StatusInterface(self, entity, status)
                 local gained_proxy = bt.GlobalStatusInterface(self, to_remove)
                 self:safe_invoke(status, callback_id, self_proxy, afflicted_proxy, gained_proxy)
-                self:_apply_status(entity, status)
+                self:_animate_apply_status(entity, status)
             end
         end
     end
@@ -413,7 +413,7 @@ function bt.BattleScene:remove_global_status(to_remove)
                 local self_proxy = bt.ConsumableInterface(self, entity, consumable)
                 local gained_proxy = bt.GlobalStatusInterface(self, to_remove)
                 self:safe_invoke(consumable, callback_id, self_proxy, holder_proxy, gained_proxy)
-                self:_apply_consumable(entity, consumable)
+                self:_animate_apply_consumable(entity, consumable)
             end
         end
     end
@@ -463,7 +463,7 @@ function bt.BattleScene:add_status(entity, to_add)
         local afflicted_proxy = bt.EntityInterface(self, entity)
         local self_proxy = bt.StatusInterface(self, entity, to_add)
         self:safe_invoke(to_add, callback_id, self_proxy, afflicted_proxy)
-        self:_apply_status(entity, to_add)
+        self:_animate_apply_status(entity, to_add)
     end
 
     callback_id = "on_status_gained"
@@ -475,7 +475,7 @@ function bt.BattleScene:add_status(entity, to_add)
         if status[callback_id] ~= nil then
             local self_proxy = bt.GlobalStatusInterface(self, status)
             self:safe_invoke(status, callback_id, self_proxy, afflicted_proxy, new_status_proxy)
-            self:_apply_global_status(status)
+            self:_animate_apply_global_status(status)
         end
     end
 
@@ -484,7 +484,7 @@ function bt.BattleScene:add_status(entity, to_add)
             if status[callback_id] ~= nil then
                 local self_proxy = bt.StatusInterface(self, entity, status)
                 self:safe_invoke(status, callback_id, self_proxy, afflicted_proxy, new_status_proxy)
-                self:_apply_status(entity, status)
+                self:_animate_apply_status(entity, status)
             end
         end
     end
@@ -494,7 +494,7 @@ function bt.BattleScene:add_status(entity, to_add)
             local self_proxy = bt.ConsumableInterface(self, entity, consumable)
             local holder_proxy = bt.EntityInterface(self, entity)
             self:safe_invoke(consumable, callback_id, self_proxy, afflicted_proxy, new_status_proxy)
-            self:_apply_consumable(entity, consumable)
+            self:_animate_apply_consumable(entity, consumable)
         end
     end
 end
@@ -528,7 +528,7 @@ function bt.BattleScene:remove_status(entity, to_remove)
         local afflicted_proxy = bt.EntityInterface(self, entity)
         local self_proxy = bt.StatusInterface(self, entity, to_remove)
         self:safe_invoke(to_remove, callback_id, self_proxy, afflicted_proxy)
-        self:_apply_status(entity, to_remove)
+        self:_animate_apply_status(entity, to_remove)
     end
 
     -- invoke on_status_lost for (global) status, consumables
@@ -540,7 +540,7 @@ function bt.BattleScene:remove_status(entity, to_remove)
         if status[callback_id] ~= nil then
             local self_proxy = bt.GlobalStatusInterface(self, status)
             self:safe_invoke(status, callback_id, self_proxy, afflicted_proxy, old_status_proxy)
-            self:_apply_global_status(status)
+            self:_animate_apply_global_status(status)
         end
     end
 
@@ -549,7 +549,7 @@ function bt.BattleScene:remove_status(entity, to_remove)
             if status[callback_id] ~= nil then
                 local self_proxy = bt.StatusInterface(self, entity, status)
                 self:safe_invoke(status, callback_id, self_proxy, afflicted_proxy, old_status_proxy)
-                self:_apply_status(entity, status)
+                self:_animate_apply_status(entity, status)
             end
         end
     end
@@ -558,7 +558,7 @@ function bt.BattleScene:remove_status(entity, to_remove)
         if consumable[callback_id] ~= nil then
             local self_proxy = bt.ConsumableInterface(self, entity, consumable)
             self:safe_invoke(consumable, callback_id, self_proxy, afflicted_proxy, old_status_proxy)
-            self:_apply_consumable(entity, consumable)
+            self:_animate_apply_consumable(entity, consumable)
         end
     end
 
@@ -621,7 +621,7 @@ function bt.BattleScene:knock_out(entity)
         if status[callback_id] ~= nil then
             local self_proxy = bt.GlobalStatusInterface(self, status)
             self:safe_invoke(status, callback_id, self_proxy, knocked_out_proxy)
-            self:_apply_global_status(status)
+            self:_animate_apply_global_status(status)
         end
     end
 
@@ -629,7 +629,7 @@ function bt.BattleScene:knock_out(entity)
         if status[callback_id] ~= nil then
             local self_proxy = bt.StatusInterface(self, entity, status)
             self:safe_invoke(status, callback_id, self_proxy, knocked_out_proxy)
-            self:_apply_status(entity, status)
+            self:_animate_apply_status(entity, status)
         end
     end
 
@@ -637,7 +637,7 @@ function bt.BattleScene:knock_out(entity)
         if consumable[callback_id] ~= nil then
             local self_proxy = bt.ConsumableInterface(self, entity, consumable)
             self:safe_invoke(consumable, callback_id, self_proxy, knocked_out_proxy)
-            self:_apply_consumable(entity, consumable)
+            self:_animate_apply_consumable(entity, consumable)
         end
     end
 
@@ -683,7 +683,7 @@ function bt.BattleScene:help_up(entity)
         if status[callback_id] ~= nil then
             local self_proxy = bt.GlobalStatusInterface(self, status)
             self:safe_invoke(status, callback_id, self_proxy, helped_up_proxy)
-            self:_apply_global_status(status)
+            self:_animate_apply_global_status(status)
         end
     end
 
@@ -691,7 +691,7 @@ function bt.BattleScene:help_up(entity)
         if status[callback_id] ~= nil then
             local self_proxy = bt.StatusInterface(self, entity, status)
             self:safe_invoke(status, callback_id, self_proxy, helped_up_proxy)
-            self:_apply_status(entity, status)
+            self:_animate_apply_status(entity, status)
         end
     end
 
@@ -699,7 +699,7 @@ function bt.BattleScene:help_up(entity)
         if consumable[callback_id] ~= nil then
             local self_proxy = bt.ConsumableInterface(self, entity, consumable)
             self:safe_invoke(consumable, callback_id, self_proxy, helped_up_proxy)
-            self:_apply_consumable(entity, consumable)
+            self:_animate_apply_consumable(entity, consumable)
         end
     end
 end
@@ -745,7 +745,7 @@ function bt.BattleScene:kill(entity)
         if status[callback_id] ~= nil then
             local self_proxy = bt.GlobalStatusInterface(self, status)
             self:safe_invoke(status, callback_id, self_proxy, killed_proxy)
-            self:_apply_global_status(status)
+            self:_animate_apply_global_status(status)
         end
     end
 
@@ -753,7 +753,7 @@ function bt.BattleScene:kill(entity)
         if status[callback_id] ~= nil then
             local self_proxy = bt.StatusInterface(self, entity, status)
             self:safe_invoke(status, callback_id, self_proxy, killed_proxy)
-            self:_apply_status(entity, status)
+            self:_animate_apply_status(entity, status)
         end
     end
 
@@ -761,7 +761,7 @@ function bt.BattleScene:kill(entity)
         if consumable[callback_id] ~= nil then
             local self_proxy = bt.ConsumableInterface(self, entity, consumable)
             self:safe_invoke(consumable, callback_id, self_proxy, killed_proxy)
-            self._apply_consumable(entity, consumable)
+            self._animate_apply_consumable(entity, consumable)
         end
     end
 
@@ -819,7 +819,7 @@ function bt.BattleScene:switch(entity_a, entity_b)
         if status[callback_id] ~= nil then
             local self_proxy = bt.GlobalStatusInterface(self, status)
             self:safe_invoke(status, callback_id, self_proxy, a_proxy, b_proxy)
-            self:_apply_global_status(status)
+            self:_animate_apply_global_status(status)
         end
     end
 
@@ -835,7 +835,7 @@ function bt.BattleScene:switch(entity_a, entity_b)
                 local afflicted_proxy = bt.EntityInterface(self, this)
                 local other_proxy = bt.EntityInterface(self, other)
                 self:safe_invoke(status, callback_id, self_proxy, afflicted_proxy, other_proxy)
-                self:_apply_status(this, status)
+                self:_animate_apply_status(this, status)
             end
         end
     end
@@ -852,7 +852,7 @@ function bt.BattleScene:switch(entity_a, entity_b)
                 local afflicted_proxy = bt.EntityInterface(self, this)
                 local other_proxy = bt.EntityInterface(self, other)
                 self:safe_invoke(consumable, callback_id, self_proxy, afflicted_proxy, other_proxy)
-                self:_apply_consumable(this, consumable)
+                self:_animate_apply_consumable(this, consumable)
             end
         end
     end
@@ -886,7 +886,7 @@ function bt.BattleScene:consume(holder, to_consume)
                 local holder_proxy = bt.EntityInterface(self, holder)
                 local consumed_proxy = bt.ConsumableInterface(self, holder, to_consume)
                 self:safe_invoke(status, callback_id, self_proxy, holder_proxy, consumed_proxy)
-                self:_apply_global_status(status)
+                self:_animate_apply_global_status(status)
             end
         end
 
@@ -896,7 +896,7 @@ function bt.BattleScene:consume(holder, to_consume)
                 local holder_proxy = bt.EntityInterface(self, holder)
                 local consumed_proxy = bt.ConsumableInterface(self, holder, to_consume)
                 self:safe_invoke(status, callback_id, self_proxy, holder_proxy, consumed_proxy)
-                self:_apply_status(holder, status)
+                self:_animate_apply_status(holder, status)
             end
         end
 
@@ -906,7 +906,7 @@ function bt.BattleScene:consume(holder, to_consume)
                 local holder_proxy = bt.EntityInterface(self, holder)
                 local consumed_proxy = bt.ConsumableInterface(self, holder, to_consume)
                 self:safe_invoke(consumable, callback_id, self_proxy, holder_proxy, consumed_proxy)
-                self:_apply_consumable(holder, consumable)
+                self:_animate_apply_consumable(holder, consumable)
             end
         end
 
@@ -971,7 +971,7 @@ function bt.BattleScene:use_move(user, move, ...)
         if status[callback_id] ~= nil then
             local self_proxy = bt.GlobalStatusInterface(self, status)
             self:safe_invoke(status, callback_id, self_proxy, user_proxy, move_proxy, target_proxies)
-            self:_apply_global_status(status)
+            self:_animate_apply_global_status(status)
         end
     end
 
@@ -979,7 +979,7 @@ function bt.BattleScene:use_move(user, move, ...)
         if status[callback_id] ~= nil then
             local self_proxy = bt.StatusInterface(self, user, status)
             self:safe_invoke(status, callback_id, self_proxy, user_proxy, move_proxy, target_proxies)
-            self:_apply_status(user, status)
+            self:_animate_apply_status(user, status)
         end
     end
 
@@ -987,7 +987,7 @@ function bt.BattleScene:use_move(user, move, ...)
         if consumable[callback_id] ~= nil then
             local self_proxy = bt.ConsumableInterface(self, user, consumable)
             self:safe_invoke(consumable, callback_id, self_proxy, user_proxy, move_proxy, target_proxies)
-            self:_apply_consumable(user, consumable)
+            self:_animate_apply_consumable(user, consumable)
         end
     end
 end
@@ -1039,7 +1039,7 @@ function bt.BattleScene:add_hp(entity, value)
                 local self_proxy = bt.GlobalStatusInterface(self, status)
                 local entity_proxy = bt.EntityInterface(self, entity)
                 self:safe_invoke(status, callback_id, self_proxy, entity_proxy, offset)
-                self:_apply_global_status(status)
+                self:_animate_apply_global_status(status)
             end
         end
 
@@ -1048,7 +1048,7 @@ function bt.BattleScene:add_hp(entity, value)
                 local self_proxy = bt.StatusInterface(self, entity, status)
                 local entity_proxy = bt.EntityInterface(self, entity)
                 self:safe_invoke(status, callback_id, self_proxy, entity_proxy, offset)
-                self:_apply_status(entity, status)
+                self:_animate_apply_status(entity, status)
             end
         end
 
@@ -1057,7 +1057,7 @@ function bt.BattleScene:add_hp(entity, value)
                 local self_proxy = bt.ConsumableInterface(self, entity, consumable)
                 local entity_proxy = bt.EntityInterface(self, entity)
                 self:safe_invoke(consumable, callback_id, self_proxy, entity_proxy, offset)
-                self:_apply_consumable(entity, consumable)
+                self:_animate_apply_consumable(entity, consumable)
             end
         end
 
@@ -1071,7 +1071,7 @@ function bt.BattleScene:add_hp(entity, value)
                     local performer_proxy = bt.EntityInterface(self, move_user)
                     local receiver_proxy = bt.EntityInterface(self, entity)
                     self:safe_invoke(status, callback_id, self_proxy, performer_proxy, receiver_proxy, value)
-                    self:_apply_global_status(status)
+                    self:_animate_apply_global_status(status)
                 end
             end
 
@@ -1081,7 +1081,7 @@ function bt.BattleScene:add_hp(entity, value)
                     local afflicted_proxy = bt.EntityInterface(self, move_user)
                     local receiver_proxy = bt.EntityInterface(self, entity)
                     self:safe_invoke(status, callback_id, self_proxy, afflicted_proxy, receiver_proxy, value)
-                    self:_apply_status(move_user, status)
+                    self:_animate_apply_status(move_user, status)
                 end
             end
 
@@ -1091,7 +1091,7 @@ function bt.BattleScene:add_hp(entity, value)
                     local holder_proxy = bt.EntityInterface(self, move_user)
                     local receiver_proxy = bt.EntityInterface(self, entity)
                     self:safe_invoke(consumable, callback_id, self_proxy, holder_proxy, receiver_proxy, value)
-                    self:_apply_consumable(move_user, consumable)
+                    self:_animate_apply_consumable(move_user, consumable)
                 end
             end
         end
@@ -1142,7 +1142,7 @@ function bt.BattleScene:reduce_hp(entity, value)
             local self_proxy = bt.GlobalStatusInterface(self, status)
             local taker_proxy = bt.EntityInterface(self, entity)
             self:safe_invoke(status, callback_id, self_proxy, taker_proxy, offset)
-            self:_apply_global_status(status)
+            self:_animate_apply_global_status(status)
         end
     end
 
@@ -1151,7 +1151,7 @@ function bt.BattleScene:reduce_hp(entity, value)
             local self_proxy = bt.StatusInterface(self, entity, status)
             local afflicted_proxy = bt.EntityInterface(self, entity)
             self:safe_invoke(status, callback_id, self_proxy, afflicted_proxy, offset)
-            self:_apply_status(entity, status)
+            self:_animate_apply_status(entity, status)
         end
     end
 
@@ -1160,7 +1160,7 @@ function bt.BattleScene:reduce_hp(entity, value)
             local self_proxy = bt.ConsumableInterface(self, entity, consumable)
             local holder_proxy = bt.EntityInterface(self, entity)
             self:safe_invoke(consumable, callback_id, self_proxy, holder_proxy, offset)
-            self:_apply_consumable(entity, consumable)
+            self:_animate_apply_consumable(entity, consumable)
         end
     end
 
@@ -1174,7 +1174,7 @@ function bt.BattleScene:reduce_hp(entity, value)
                 local dealer_proxy = bt.EntityInterface(self, damage_dealer)
                 local taker_proxy = bt.EntityInterface(self, entity)
                 self:safe_invoke(status, callback_id, self_proxy, taker_proxy, offset)
-                self:_apply_global_status(status)
+                self:_animate_apply_global_status(status)
             end
         end
 
@@ -1184,7 +1184,7 @@ function bt.BattleScene:reduce_hp(entity, value)
                 local dealer_proxy = bt.EntityInterface(self, damage_dealer)
                 local taker_proxy = bt.EntityInterface(self, entity)
                 self:safe_invoke(status, callback_id, self_proxy, dealer_proxy, offset)
-                self:_apply_status(damage_dealer, status)
+                self:_animate_apply_status(damage_dealer, status)
             end
         end
 
@@ -1194,7 +1194,7 @@ function bt.BattleScene:reduce_hp(entity, value)
                 local dealer_proxy = bt.EntityInterface(self, damage_dealer)
                 local taker_proxy = bt.EntityInterface(self, entity)
                 self:safe_invoke(consumable, callback_id, self_proxy, dealer_proxy, taker_proxy)
-                self:_apply_consumable(damage_dealer, consumable)
+                self:_animate_apply_consumable(damage_dealer, consumable)
             end
         end
     end

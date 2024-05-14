@@ -1,6 +1,4 @@
-rt.settings.battle.scene = {
-
-}
+rt.settings.battle.scene = {}
 
 --- @class bt.Scene
 bt.Scene = meta.new_type("BattleScene", rt.Widget, function()
@@ -82,12 +80,13 @@ end
 --- @brief
 function bt.Scene:skip()
     self._ui:get_animation_queue():skip()
+    self._ui:get_priority_queue():skip()
 end
 
 --- @brief
 function bt.Scene:set_background(background_id)
     if bt.Background[background_id] == nil then
-        rt.error("In bt.BattleScene:set_background: no background with id `" .. background_id .. "`")
+        rt.error("In bt.Scene:set_background: no background with id `" .. background_id .. "`")
     end
 
     local background = bt.Background[background_id]()
@@ -118,7 +117,7 @@ function bt.Scene:format_name(entity)
     elseif meta.isa(entity, bt.Move) then
         name = "<b><u>" .. entity:get_name() .. "</u></b>"
     else
-        rt.error("In bt.BattleScene:get_formatted_name: unhandled entity type `" .. meta.typeof(entity) .. "`")
+        rt.error("In bt.Scene:get_formatted_name: unhandled entity type `" .. meta.typeof(entity) .. "`")
     end
     return name
 end

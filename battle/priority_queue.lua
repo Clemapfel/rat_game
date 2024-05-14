@@ -297,3 +297,19 @@ function bt.PriorityQueue:draw()
         end
     end
 end
+
+--- @brief
+function bt.PriorityQueue:skip()
+    local function handle(which)
+        for _, entry in pairs(which.entries) do
+            for i, collider in ipairs(entry.colliders) do
+                local target = entry.target_positions[i]
+                local target_x, target_y = target[1], target[2]
+                collider:set_position(target_x, target_y)
+            end
+        end
+    end
+
+    handle(self._current)
+    handle(self._next)
+end

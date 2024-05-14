@@ -48,10 +48,10 @@ function bt.Animation.GLOBAL_STATUS_GAINED:update(delta)
     local _, pos_y = self._label_path:at(rt.exponential_plateau(fraction * 0.9))
 
     self._label:fit_into(
-            bounds.x,
-            bounds.y + bounds.height - pos_y,
-            bounds.width,
-            200
+        bounds.x,
+        bounds.y + bounds.height - pos_y,
+        bounds.width,
+        200
     )
 
     local fade_out_target = 0.9
