@@ -868,6 +868,17 @@ function bt.Scene:switch(entity_a, entity_b)
 end
 
 --- @brief
+function bt.Scene:consume(holder, to_consume)
+
+    -- if not held, abort
+    if not holder:has_consumable(to_consume) then
+        return
+    end
+
+    local should_deplete = holder:consume_consumable(to_consume)
+end
+
+--- @brief
 function bt.Scene:use_move()
     -- TODO
 end

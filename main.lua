@@ -3,6 +3,19 @@ require "include"
 rt.current_scene = bt.Scene()
 scene = rt.current_scene
 
+--[[
+add_consumable
+remove_consumable
+set_consumable_n_left
+activate_consumable
+]]--
+
+
+local consumable_indicator = bt.ConsumableIndicator(bt.Consumable("DEBUG_CONSUMABLE"))
+consumable_indicator:realize()
+consumable_indicator:fit_into(50, 50, 50, 50)
+consumable_indicator:set_scale(5)
+
 battle = bt.Battle("DEBUG_BATTLE")
 scene:set_background("EYE")
 --scene:set_music("assets/music/test_music_04.mp3")
@@ -51,6 +64,8 @@ love.draw = function()
     if rt.current_scene ~= nil then
         rt.current_scene:draw()
     end
+
+    consumable_indicator:draw()
 
     do -- show fps and frame usage
         local fps = love.timer.getFPS()

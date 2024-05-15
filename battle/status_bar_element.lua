@@ -111,9 +111,6 @@ function bt.StatusBarElement:size_allocate(x, y, width, height)
                 y + height - 0.6 * label_h
             )
         end
-
-        self._debug_shape = rt.Rectangle(x, y, width, height)
-        self._debug_shape:set_is_outline(true)
     end
 end
 
