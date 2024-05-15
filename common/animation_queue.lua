@@ -68,6 +68,7 @@ function rt.AnimationQueue:push(animations, start_callback, finish_callback)
     node.on_start = start_callback
     node.on_finish = finish_callback
     node.is_started = false
+    node.is_finished = false
     node.animations = {}
     for animation in values(animations) do
         table.insert(node.animations, animation)
@@ -125,9 +126,12 @@ function rt.AnimationQueue:skip()
         self:_finish_animation(animation)
     end
 
-    if node.on_finish ~= nil then
+    if node.on_finish ~= nil and node.is_finished == false then
         node.on_finish()
+        node.is_finished = true
     end
+
+    table.remove(self._animations, 1)
 end
 
 --- @brief
@@ -154,16 +158,19 @@ function rt.AnimationQueue:update(delta)
             local res = animation:update(delta)
             if res == rt.QueueableAnimationResult.DISCONTINUE then
                 self:_finish_animation(animation)
-            else
+            elseif res == rt.QueueableAnimationResult.CONTINUE then
                 depleted = false
+            else
+                rt.error("In rt.AnimationQueue: animation `" .. meta.typeof(animation) .. "`.update does not return rt.QueueableAnimationResult, instead returns `" .. serialize(res) .. "`")
             end
         end
     end
 
     if depleted == true then
-        if node.on_finish ~= nil then
+        if node.on_finish ~= nil and node.is_finished == false then
             node.on_finish()
         end
+        node.is_finished = true
         table.remove(self._animations, 1)
         delta = 0
         goto restart
