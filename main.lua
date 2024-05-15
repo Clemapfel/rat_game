@@ -16,6 +16,15 @@ consumable_indicator:realize()
 consumable_indicator:fit_into(50, 50, 50, 50)
 consumable_indicator:set_scale(5)
 
+local box = rt.OrderedBox()
+
+for i = 1, 4 do
+    box:add(i, rt.Label("<outline_color=RED><outline>\\|0" .. i .. "</outline></outline_color>"))
+end
+
+box:realize()
+box:fit_into(50, 50, rt.graphics.get_width(), 50)
+
 battle = bt.Battle("DEBUG_BATTLE")
 scene:set_background("EYE")
 --scene:set_music("assets/music/test_music_04.mp3")
@@ -25,9 +34,10 @@ proxy = bt.GlobalStatusInterface(scene, bt.GlobalStatus("DEBUG_GLOBAL_STATUS"))
 input_controller = rt.InputController()
 input_controller:signal_connect("pressed", function(self, which)
     if which == rt.InputButton.A then
-        scene:switch(battle.entities[1], battle.entities[2])
+        box:remove(2)
     elseif which == rt.InputButton.B then
-        scene:skip()
+        box:activate(2)
+        --scene:skip()
     elseif which == rt.InputButton.X then
         scene:add_status(battle.entities[1], bt.Status("DEBUG_STATUS"))
     elseif which == rt.InputButton.Y then
@@ -48,7 +58,7 @@ end)
 love.load = function()
     rt.current_scene:realize()
     love.resize()
-    rt.current_scene:start_battle(battle)
+    --rt.current_scene:start_battle(battle)
 end
 
 rt.graphics.frame_duration = {
@@ -65,7 +75,7 @@ love.draw = function()
         rt.current_scene:draw()
     end
 
-    consumable_indicator:draw()
+    box:draw()
 
     do -- show fps and frame usage
         local fps = love.timer.getFPS()
@@ -100,6 +110,8 @@ love.update = function(delta)
     if rt.current_scene ~= nil and rt.current_scene.update ~= nil then
         rt.current_scene:update(delta)
     end
+
+    box:update(delta)
 end
 
 love.resize = function()

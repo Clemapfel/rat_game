@@ -69,7 +69,6 @@ function bt.PriorityQueue:set_state(entity, state)
     end
 end
 
-
 --- @brief
 --- @param order Table<bt.Entity>
 function bt.PriorityQueue:reorder(order, next_order)

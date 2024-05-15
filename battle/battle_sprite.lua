@@ -63,6 +63,21 @@ function bt.BattleSprite:activate_status(status)
 end
 
 --- @brief
+function bt.BattleSprite:add_consumable(consumable)
+    println("TODO: bt.BattleSprite:add_consumable")
+end
+
+--- @brief
+function bt.BattleSprite:remove_consumable(consumable)
+    println("TODO: bt.BattleSprite:remove_consumable")
+end
+
+--- @brief
+function bt.BattleSprite:activate_consumable(consumable)
+    println("TODO: bt.BattleSprite:activate_consumable")
+end
+
+--- @brief
 function bt.BattleSprite:set_hp(value, value_max)
     self._health_bar:set_value(value, value_max)
 end
