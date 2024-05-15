@@ -85,15 +85,15 @@ function bt.Animation.KILLED:update(delta)
     end
 
     -- fade out happens, then "KILLED" stays on screen
-    fraction = fraction * 1.4
 
-    self._target_snapshot:set_mix_weight(fraction)
+    fraction = fraction * 1.4
+    self._target_snapshot:set_mix_weight(rt.gaussian_bandpass(fraction))
 
     local opacity = rt.squish(4, rt.exponential_deceleration, fraction - (0.99 - 0.5))
     target:set_opacity(opacity)
 
     if fraction >= 1 then
-        self._target:set_is_visible(true)
+        self._target:set_is_visible(false)
         self._target:set_ui_is_visible(false)
     end
 

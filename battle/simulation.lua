@@ -610,14 +610,15 @@ function bt.Scene:knock_out(entity)
     end
 
     meta.set_is_mutable(entity, true)
-    entity.hp = 0
-    -- delay actual knock out to after status callbacks
+    entity.hp_current = 0
+    entity.state = bt.EntityState.KNOCKED_OUT
     entity.priority = 0
+    entity:clear_statuses()
     meta.set_is_mutable(entity, false)
 
     do -- animation and UI updates
-        local knock_out_animation = bt.Animation.KNOCKED_OUT(self._ui:get_sprite(entity))
-        local message = bt.Animation.MESSAGE(self, self:format_name(entity) .. " was knocked out")
+        local knock_out = bt.Animation.KNOCKED_OUT(self._ui:get_sprite(entity))
+        local message = bt.Animation.MESSAGE(self, self:format_name(entity) .. " was <b><color=LIGHT_RED_3><u>knocked out</u></color></b>")
 
         local on_start = function()
             local sprite = self._ui:get_sprite(entity)
@@ -627,7 +628,7 @@ function bt.Scene:knock_out(entity)
             end
             self._ui:set_state(entity, bt.EntityState.KNOCKED_OUT)
         end
-        self:play_animations({knock_out_animation, message}, on_start)
+        self:play_animations({knock_out, message}, on_start)
     end
 
     -- invoke on_knocked_out callbacks on global status, status, consumables
@@ -642,7 +643,7 @@ function bt.Scene:knock_out(entity)
         end
     end
 
-    for status in values(entity:list_statuses()) do
+    for status in values(status_before) do
         if status[callback_id] ~= nil then
             local self_proxy = bt.StatusInterface(self, entity, status)
             self:safe_invoke(status, callback_id, self_proxy, knocked_out_proxy)
@@ -657,11 +658,6 @@ function bt.Scene:knock_out(entity)
             self:_animate_apply_consumable(entity, consumable)
         end
     end
-
-    meta.set_is_mutable(entity, true)
-    entity:clear_statuses()
-    entity.state = bt.EntityState.KNOCKED_OUT
-    meta.set_is_mutable(entity, false)
 end
 
 --- @brief
@@ -673,15 +669,16 @@ function bt.Scene:help_up(entity)
 
     -- set hp to 1, restore state
     meta.set_is_mutable(entity, true)
-    entity.hp = 1
-    entity.state = bt.BattleEntityState.ALIVE
+    entity.hp_current = 1
+    entity.state = bt.EntityState.ALIVE
     entity.priority = 0
     meta.set_is_mutable(entity, false)
 
     -- animation
     do
-        local help_up = bt.Animation.HELP_UP(entity)
-        local message = bt.Animation.MESSAGE(self, self:format_name(entity) .. " got up")
+        local sprite = self._ui:get_sprite(entity)
+        local help_up = bt.Animation.HELPED_UP(sprite)
+        local message = bt.Animation.MESSAGE(self, self:format_name(entity) .. " got <b><color=LIGHT_GREEN_2><u>back up</u></color></b>")
 
         local on_start = function()
             local sprite = self._ui:get_sprite(entity)
@@ -703,13 +700,7 @@ function bt.Scene:help_up(entity)
         end
     end
 
-    for status in values(entity:list_statuses()) do
-        if status[callback_id] ~= nil then
-            local self_proxy = bt.StatusInterface(self, entity, status)
-            self:safe_invoke(status, callback_id, self_proxy, helped_up_proxy)
-            self:_animate_apply_status(entity, status)
-        end
-    end
+    -- no callbacks for self.status, because being knocked out always clears all statuses
 
     for consumable in values(entity:list_consumables()) do
         if consumable[callback_id] ~= nil then
@@ -721,10 +712,165 @@ function bt.Scene:help_up(entity)
 end
 
 --- @brief
+function bt.Scene:kill(entity)
+    -- if entity is already dead, do nothing
+    if entity:get_is_dead() then return end
+
+    local status_before = {}
+    for status in values(entity:list_statuses()) do
+        table.insert(status_before, status)
+    end
+
+    -- override all properties
+    meta.set_is_mutable(entity, true)
+    entity.hp_current = 0
+    entity.state = bt.EntityState.DEAD
+    entity.priority = 0
+    entity:clear_statuses()
+    meta.set_is_mutable(entity, false)
+
+    -- animation, announce kill, invoke all callbacks, then actually animate kill
+    do -- animation and UI updates
+        local message = bt.Animation.MESSAGE(self, self:format_name(entity) .. " was <o><b><outline_color=TRUE_WHITE><color=BLACK>KILLED</color></b></o></outline_color>")
+        self:play_animations({message})
+    end
+
+    -- invoked on_killed
+    local callback_id = "on_killed"
+    local killed_proxy = bt.EntityInterface(self, entity)
+
+    for status in values(self._state:list_global_statuses()) do
+        if status[callback_id] ~= nil then
+            local self_proxy = bt.GlobalStatusInterface(self, status)
+            self:safe_invoke(status, callback_id, self_proxy, killed_proxy)
+            self:_animate_apply_global_status(status)
+        end
+    end
+
+    for status in values(status_before) do
+        if status[callback_id] ~= nil then
+            local self_proxy = bt.StatusInterface(self, entity, status)
+            self:safe_invoke(status, callback_id, self_proxy, killed_proxy)
+            self:_animate_apply_status(entity, status)
+        end
+    end
+
+    for consumable in values(entity:list_consumables()) do
+        if consumable[callback_id] ~= nil then
+            local self_proxy = bt.ConsumableInterface(self, entity, consumable)
+            self:safe_invoke(consumable, callback_id, self_proxy, killed_proxy)
+            self:_animate_apply_consumable(entity, consumable)
+        end
+    end
+
+    -- animation, announce kill, invoke all callbacks, then actually animate kill
+    do -- animation and UI updates
+        local kill = bt.Animation.KILLED(self._ui:get_sprite(entity))
+
+        local on_start = function()
+            local sprite = self._ui:get_sprite(entity)
+            sprite:set_hp(0, entity:get_hp_base())
+            for status in values(status_before) do
+                sprite:remove_status(status)
+            end
+            self._ui:set_state(entity, bt.EntityState.DEAD)
+        end
+        self:play_animations({kill}, on_start)
+    end
+end
+
+--- @brief
+function bt.Scene:switch(entity_a, entity_b)
+    meta.assert_isa(entity_a, bt.Entity)
+    meta.assert_isa(entity_b, bt.Entity)
+
+    -- avoid redundant switch
+    if entity_a == entity_b then return end
+
+    -- entity cannot switch between ally and enemy
+    if not (entity_a:get_is_enemy() == entity_b:get_is_enemy()) then
+        rt.warning("In bt.BattleScene:switch: trying to switch entities `" .. entity_a:get_id() .. "` and `" .. entity_b:get_id() .. "`, which are a mix of enemies and allies, this operation is dissallowed")
+        return
+    end
+
+    -- get positions of entities
+    local a_i, b_i = -1, -1
+    do
+        local i = 1
+        for entity in values(self._state:list_entities()) do
+            if entity == entity_a then a_i = i end
+            if entity == entity_b then b_i = i end
+            if a_i ~= -1 and b_i ~= -1 then break end
+            i = i + 1
+        end
+    end
+
+    -- swap entities
+    self._state:swap(a_i, b_i)
+
+    -- animation
+    do
+        local swap_01 = bt.Animation.SWITCH(self._ui:get_sprite(entity_a))
+        local swap_02 = bt.Animation.SWITCH(self._ui:get_sprite(entity_b))
+        local message = bt.Animation.MESSAGE(self, self:format_name(entity_a) .. " and " .. self:format_name(entity_b) .. " switched places")
+        local on_finish = function()
+            self._ui:swap(entity_a, entity_b)
+        end
+        self:play_animations({swap_01, swap_02}, nil, on_finish)
+    end
+
+    -- invoke callbacks
+    local callback_id = "on_switch"
+    local a_proxy = bt.EntityInterface(self, entity_a)
+    local b_proxy = bt.EntityInterface(self, entity_b)
+
+    for status in values(self._state:list_global_statuses()) do
+        if status[callback_id] ~= nil then
+            local self_proxy = bt.GlobalStatusInterface(self, status)
+            self:safe_invoke(status, callback_id, self_proxy, a_proxy, b_proxy)
+            self:_animate_apply_global_status(status)
+        end
+    end
+
+    for both in range(
+        {entity_a, entity_b},
+        {entity_b, entity_a}
+    ) do
+        local this = both[1]
+        local other = both[2]
+        for status in values(this:list_statuses()) do
+            if status[callback_id] ~= nil then
+                local self_proxy = bt.StatusInterface(self, this, status)
+                local afflicted_proxy = bt.EntityInterface(self, this)
+                local other_proxy = bt.EntityInterface(self, other)
+                self:safe_invoke(status, callback_id, self_proxy, afflicted_proxy, other_proxy)
+                self:_animate_apply_status(this, status)
+            end
+        end
+    end
+
+    for both in range(
+        {entity_a, entity_b},
+        {entity_b, entity_a}
+    ) do
+        local this = both[1]
+        local other = both[2]
+        for consumable in values(this:list_consumables()) do
+            if consumable[callback_id] ~= nil then
+                local self_proxy = bt.ConsumableInterface(self, this, consumable)
+                local afflicted_proxy = bt.EntityInterface(self, this)
+                local other_proxy = bt.EntityInterface(self, other)
+                self:safe_invoke(consumable, callback_id, self_proxy, afflicted_proxy, other_proxy)
+                self:_animate_apply_consumable(this, consumable)
+            end
+        end
+    end
+end
+
+--- @brief
 function bt.Scene:use_move()
     -- TODO
 end
-
 
 --- @brief
 function bt.Scene:start_turn()

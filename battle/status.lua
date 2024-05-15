@@ -152,13 +152,6 @@ end, {
         return nil
     end,
 
-    -- (StatusInterface, EntityInterface) -> nil
-    on_helped_up = function(self, afflicted)
-        meta.assert_status_interface(self)
-        meta.assert_entity_interface(afflicted)
-        return nil
-    end,
-
     -- (StatusInterface, EntityInterface)
     on_killed = function(self, afflicted)
         meta.assert_status_interface(self)
@@ -216,7 +209,6 @@ function bt.Status:realize()
         "on_global_status_gained",
         "on_global_status_lost",
         "on_knocked_out",
-        "on_helped_up",
         "on_killed",
         "on_switch",
         "on_move_used",
@@ -240,13 +232,13 @@ function bt.Status:realize()
     end
 
     for which in  range(
-            "attack",
-            "defense",
-            "speed",
-            "damage_dealt",
-            "damage_received",
-            "healing_performed",
-            "healing_received"
+        "attack",
+        "defense",
+        "speed",
+        "damage_dealt",
+        "damage_received",
+        "healing_performed",
+        "healing_received"
     ) do
         template[which .. "_offset"] = "Signed"
         template[which .. "_factor"] = "Float"

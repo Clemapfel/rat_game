@@ -125,13 +125,6 @@ return {
         return nil
     end,
 
-    on_helped_up = function(self, afflicted)
-        meta.assert_status_interface(self)
-        meta.assert_entity_interface(afflicted)
-        println("[DBG] In " .. self.id .. ".on_helped_up: " .. afflicted.id .. " was helped up")
-        return nil
-    end,
-
     on_killed = function(self, afflicted)
         meta.assert_status_interface(self)
         meta.assert_entity_interface(afflicted)

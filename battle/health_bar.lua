@@ -171,7 +171,7 @@ end
 
 --- @brief
 function bt.HealthBar:set_value(hp, hp_max)
-    self._hp_target = hp
+    self._hp_target = math.ceil(hp)
     if hp_max ~= nil then
         self._hp_max = hp_max
     end

@@ -233,8 +233,7 @@ Status {
     -- (Status, Entity) -> nil
     on_knocked_out(self, afflicted),
 
-    -- (Status, Entity) -> nil
-    on_helped_up(self, afflicted),
+    -- on_helped_up not present
     
     -- (Status, Entity) -> nil
     on_killed(self, afflicted),

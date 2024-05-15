@@ -63,8 +63,6 @@ end
 
 --- @override
 function bt.Animation.KNOCKED_OUT:update(delta)
-    if not self._is_started then return end
-
     local duration = rt.settings.battle.animations.knocked_out.duration
     self._elapsed = self._elapsed + delta
     local fraction = self._elapsed / duration

@@ -12,7 +12,7 @@ proxy = bt.GlobalStatusInterface(scene, bt.GlobalStatus("DEBUG_GLOBAL_STATUS"))
 input_controller = rt.InputController()
 input_controller:signal_connect("pressed", function(self, which)
     if which == rt.InputButton.A then
-        scene:knock_out(battle.entities[4])
+        scene:switch(battle.entities[1], battle.entities[2])
     elseif which == rt.InputButton.B then
         scene:skip()
     elseif which == rt.InputButton.X then

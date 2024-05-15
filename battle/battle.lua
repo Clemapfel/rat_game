@@ -251,3 +251,11 @@ function bt.Battle:list_stunned_entities()
     return out
 end
 
+--- @brief
+function bt.Battle:swap(left_i, right_i)
+    local left = self.entities[left_i]
+    local right = self.entities[right_i]
+
+    self.entities[right_i] = left
+    self.entities[left_i] = right
+end

@@ -123,7 +123,10 @@ function bt.EnemySprite:set_state(state)
             self._sprite:set_animation(animation_id)
         end
     elseif state == bt.EntityState.DEAD then
-        -- noop
+        local animation_id = rt.settings.battle.battle_sprite.animation_ids.knocked_out
+        if self._sprite:has_animation(animation_id) then
+            self._sprite:set_animation(animation_id)
+        end
     else
         local animation_id = rt.settings.battle.battle_sprite.animation_ids.idle
         if self._sprite:has_animation(animation_id) then

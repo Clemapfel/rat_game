@@ -58,9 +58,9 @@ function bt.Animation.HELPED_UP:update(delta)
     local _, pos_y = self._label_path:at(rt.exponential_plateau(fraction * 0.9))
     local bounds = self._target:get_bounds()
     self._label:fit_into(
-            bounds.x,
-            bounds.y + bounds.height - pos_y - 0.5 * label_h,
-            bounds.width, bounds.height
+        bounds.x,
+        bounds.y + bounds.height - pos_y - 0.5 * label_h,
+        bounds.width, bounds.height
     )
 
     local fade_out_target = 0.9
@@ -70,6 +70,8 @@ function bt.Animation.HELPED_UP:update(delta)
     end
 
     self._target_snapshot:set_mix_weight(rt.symmetrical_linear(fraction, 0.5))
+
+    return self._elapsed < duration
 end
 
 --- @override

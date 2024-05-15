@@ -70,6 +70,7 @@ function bt.Animation.KNOCKED_OUT:update(delta)
     end
 
     self._target_snapshot:set_mix_weight(rt.symmetrical_linear(fraction, 0.5))
+    return self._elapsed <= duration
 end
 
 --- @override
