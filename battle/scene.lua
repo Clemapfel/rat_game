@@ -1,4 +1,8 @@
-rt.settings.battle.scene = {}
+rt.settings.battle.scene = {
+    fourier_window_size = rt.settings.monitored_audio_playback.default_window_size,
+    fourier_n_mel_frequencies = 32,
+    fourier_transform_fps = 30,
+}
 
 --- @class bt.Scene
 bt.Scene = meta.new_type("BattleScene", rt.Widget, function()
@@ -6,6 +10,13 @@ bt.Scene = meta.new_type("BattleScene", rt.Widget, function()
         _ui = {}, -- rt.BattleUI
         _state = {}, -- bt.Battle
         _background = nil, -- bt.Background
+
+        _playback = nil, -- rt.MonitoredAudioPlayback
+        _playback_spectrum = {},
+        _playback_intensity = 0,
+        _playback_elapsed = 0,
+
+        _elapsed = 0,
     })
 end)
 
@@ -44,10 +55,23 @@ end
 --- @brief
 function bt.Scene:update(delta)
     if not self._is_realized then return end
+    self._elapsed = self._elapsed + delta
     self._ui:update(delta)
 
     if meta.isa(self._background, bt.Background) then
-        self._background:update(delta)
+        self._background:update(delta, self._playback_intensity, self._playback_spectrum)
+    end
+
+    if self._playback ~= nil then
+        self._playback:update(delta)
+        self._playback_elapsed = self._playback_elapsed + delta
+
+        if self._playback_elapsed > 1 / rt.settings.battle.scene.fourier_transform_fps then
+            self._playback_elapsed = 0
+            local spectrum, intensity = self._playback:get_current_spectrum(rt.settings.battle.scene.fourier_window_size, rt.settings.battle.scene.fourier_n_mel_frequencies)
+            self._playback_spectrum = spectrum
+            self._playback_intensity = intensity
+        end
     end
 end
 
@@ -119,4 +143,18 @@ function bt.Scene:format_name(entity)
         rt.error("In bt.Scene:get_formatted_name: unhandled entity type `" .. meta.typeof(entity) .. "`")
     end
     return name
+end
+
+--- @brief
+function bt.Scene:set_music(path, should_start)
+    self._playback = rt.MonitoredAudioPlayback(path)
+    self._playback_elapsed = 0
+    if should_start == nil or should_start == true then
+        self._playback:start()
+    end
+end
+
+--- @brief
+function bt.Scene:get_elapsed()
+    return self._elapsed
 end

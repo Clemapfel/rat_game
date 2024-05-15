@@ -10,6 +10,9 @@ bt.Background.EYE = meta.new_type("EYE", bt.Background, function()
         _elapsed = 0,
         _hue = rt.rgba_to_hsva(rt.Palette.RED_3).h,
         _black = rt.Palette.BLACK,
+        _last_intensity = 0,
+        _current_intensity = 0,
+        _stimulus = 0
     })
 end)
 
@@ -30,8 +33,13 @@ function bt.Background.EYE:size_allocate(x, y, width, height)
 end
 
 --- @override
-function bt.Background.EYE:update(delta)
+function bt.Background.EYE:update(delta, intensity)
     self._elapsed = self._elapsed + delta
+
+    self._last_intensity = self._current_intensity
+    self._current_intensity = intensity
+    self._stimulus = self._stimulus - delta * (3 - math.abs(self._stimulus, 3))
+    self._stimulus = self._stimulus + clamp(self._current_intensity - self._last_intensity, 0)
 end
 
 --- @override
@@ -39,7 +47,7 @@ function bt.Background.EYE:draw()
     self._shader:bind()
     self._shader:send("elapsed", self._elapsed)
     self._shader:send("hue", self._hue)
-    self._shader:send("black", {self._black.r, self._black.g, self._black.g})
+    self._shader:send("gamma", clamp(self._stimulus, 1))
     self._shape:draw()
     self._shader:unbind()
 end

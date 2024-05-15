@@ -4,14 +4,15 @@ rt.current_scene = bt.Scene()
 scene = rt.current_scene
 
 battle = bt.Battle("DEBUG_BATTLE")
-scene:set_background("OVERLAP_LINES")
+scene:set_background("EYE")
+--scene:set_music("assets/music/test_music_04.mp3")
 
 proxy = bt.GlobalStatusInterface(scene, bt.GlobalStatus("DEBUG_GLOBAL_STATUS"))
 
 input_controller = rt.InputController()
 input_controller:signal_connect("pressed", function(self, which)
     if which == rt.InputButton.A then
-        rt.current_scene:start_battle(battle)
+        scene:knock_out(battle.entities[4])
     elseif which == rt.InputButton.B then
         scene:skip()
     elseif which == rt.InputButton.X then
@@ -34,7 +35,7 @@ end)
 love.load = function()
     rt.current_scene:realize()
     love.resize()
-
+    rt.current_scene:start_battle(battle)
 end
 
 rt.graphics.frame_duration = {

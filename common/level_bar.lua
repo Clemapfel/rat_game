@@ -61,7 +61,7 @@ end
 --- @override
 function rt.LevelBar:set_color(color, backdrop_color)
     if meta.is_hsva(color) then color = rt.hsva_to_rgba(color) end
-    if meta.is_hsva(backdrop_color) then backdrop_color = rt.hsva_to_rgba(color) end
+    if meta.is_hsva(backdrop_color) then backdrop_color = rt.hsva_to_rgba(backdrop_color) end
 
     self._color = color
     self._backdrop_color = ternary(meta.is_nil(backdrop_color), rt.color_darken(self._color, rt.settings.level_bar.backdrop_darken_offset), backdrop_color)

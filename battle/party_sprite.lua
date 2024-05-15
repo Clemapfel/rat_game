@@ -16,7 +16,9 @@ bt.PartySprite = meta.new_type("PartySprite", bt.BattleSprite, function(entity)
         _backdrop = rt.Rectangle(0, 0, 1, 1),
         _frame = rt.Rectangle(0, 0, 1, 1),
         _frame_outline = rt.Rectangle(0, 0, 1, 1),
-        _frame_gradient = {}, -- rt.LogGradient
+        _frame_gradient = {}, -- rt.LogGradient,
+
+        _elapsed = 0
     })
 end)
 
@@ -25,12 +27,15 @@ function bt.PartySprite:_update_state()
     if self._state == bt.EntityState.ALIVE then
         self._backdrop:set_color(rt.settings.battle.priority_queue_element.base_color)
         self._name:set_color(rt.RGBA(1, 1,1, 1))
+        self._frame:set_color(rt.settings.battle.priority_queue_element.frame_color)
     elseif self._state == bt.EntityState.KNOCKED_OUT then
-        self._backdrop:set_color(rt.Palette.KNOCKED_OUT)
+        self._backdrop:set_color(rt.color_darken(rt.Palette.KNOCKED_OUT, 0.3))
         self._name:set_color(rt.RGBA(1, 1,1, rt.settings.battle.priority_queue_element.knocked_out_shape_alpha))
+        self._frame:set_color(rt.color_lighten(rt.Palette.KNOCKED_OUT, 0.15))
     elseif self._state == bt.EntityState.DEAD then
         self._backdrop:set_color(rt.settings.battle.priority_queue_element.dead_base_color)
         self._name:set_color(rt.RGBA(1, 1,1, rt.settings.battle.priority_queue_element.dead_shape_alpha))
+        self._frame:set_color(rt.settings.battle.priority_queue_element.dead_frame_color)
     end
 
     if self._is_selected then
@@ -82,7 +87,13 @@ end
 
 --- @override
 function bt.PartySprite:update(delta)
-    -- noop
+    self._elapsed = self._elapsed + delta
+    if self._state == bt.EntityState.KNOCKED_OUT then
+        local offset = rt.settings.battle.priority_queue_element.knocked_out_pulse(self._elapsed)
+        local color = rt.rgba_to_hsva(rt.Palette.KNOCKED_OUT)
+        color.v = clamp(color.v + offset, 0, 1)
+        self._backdrop:set_color(color)
+    end
 end
 
 --- @override
@@ -172,4 +183,11 @@ function bt.PartySprite:set_opacity(alpha)
     for object in range(self._health_bar, self._name, self._speed_value, self._status_bar, self._backdrop, self._frame, self._frame_outline, self._frame_gradient) do
         object:set_opacity(alpha)
     end
+end
+
+
+--- @brief
+function bt.PartySprite:set_state(state)
+    bt.BattleSprite.set_state(self, state)
+    self:_update_state()
 end

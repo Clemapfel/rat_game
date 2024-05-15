@@ -556,7 +556,7 @@ end
 --- @brief
 function table.seq(start, finish, step)
     local out = {}
-    for x in range(start, finish, step) do
+    for x = start, finish, step do
         table.insert(out, x)
     end
     return out

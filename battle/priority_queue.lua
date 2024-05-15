@@ -63,6 +63,14 @@ function bt.PriorityQueue:set_is_stunned(entity, b)
 end
 
 --- @brief
+function bt.PriorityQueue:set_state(entity, state)
+    for element in values(self._current.entries[entity].elements) do
+        element:set_state(state)
+    end
+end
+
+
+--- @brief
 --- @param order Table<bt.Entity>
 function bt.PriorityQueue:reorder(order, next_order)
 

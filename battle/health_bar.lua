@@ -148,7 +148,7 @@ function bt.HealthBar:update(delta)
 
     -- pulsing red animation
     if self._state == bt.EntityState.KNOCKED_OUT then
-        local offset = rt.settings.battle.priority_queue_element.knocked_out_pulse(self._scene:get_elapsed())
+        local offset = rt.settings.battle.priority_queue_element.knocked_out_pulse(self._elapsed)
         local color = rt.rgba_to_hsva(rt.Palette.KNOCKED_OUT)
         color.v = clamp(color.v + offset, 0, 1)
         self._level_bar:set_color(rt.color_darken(color, 0.15), color) -- sic, keep background lighter

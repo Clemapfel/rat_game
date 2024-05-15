@@ -82,6 +82,7 @@ vec3 hsv_to_rgb(vec3 c)
 uniform float elapsed;
 uniform float hue;
 uniform vec3 black;
+uniform float gamma;
 
 vec4 effect(vec4 vertex_color, Image image, vec2 texture_coords, vec2 vertex_position)
 {
@@ -122,7 +123,12 @@ vec4 effect(vec4 vertex_color, Image image, vec2 texture_coords, vec2 vertex_pos
     as_rgb -= vec3(eye);
     as_rgb -= vec3(2 * clamp(gaussian(distance(pos, center), 0, 0.02), 0, 1));
 
-    as_rgb = clamp(as_rgb, black, vec3(1, 1, 1));
+    //as_rgb = clamp(as_rgb, black, vec3(1, 1, 1));
+
+    // gamme correction
+    float gamma = project(gamma, 1.2, 1.4);
+    as_rgb = pow(as_rgb, vec3(1 / gamma));
+
     return vec4(as_rgb, 1);
 }
 

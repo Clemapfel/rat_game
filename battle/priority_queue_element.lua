@@ -368,7 +368,7 @@ function bt.PriorityQueueElement:update(delta)
     self._elapsed = self._elapsed + delta
     if self._state == bt.EntityState.KNOCKED_OUT then
         -- pulsing red animation
-        local offset = rt.settings.battle.priority_queue_element.knocked_out_pulse(self._parent._elapsed)
+        local offset = rt.settings.battle.priority_queue_element.knocked_out_pulse(self._elapsed)
         local color = rt.rgba_to_hsva(rt.Palette.KNOCKED_OUT)
         color.v = clamp(color.v + offset, 0, 1)
         self._backdrop:set_color(color)

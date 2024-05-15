@@ -225,7 +225,6 @@ function bt.BattleUI:draw()
     self._gradient_right:draw()
     rt.graphics.set_blend_mode()
 
-
     for i in values(self._enemy_sprite_render_order) do
         self._enemy_sprites[i]:draw()
     end
@@ -316,6 +315,7 @@ end
 --- @brief
 function bt.BattleUI:clear()
     self._enemy_sprites = {}
+    self._enemy_sprite_render_order = {}
     self._party_sprites = {}
     self._entities = {}
 
@@ -336,4 +336,10 @@ function bt.BattleUI:skip()
     for sprite in values(self._party_sprites) do
         sprite:synchronize(sprite:get_entity())
     end
+end
+
+--- @brief
+function bt.BattleUI:set_state(entity, state)
+    self._priority_queue:set_state(entity, state)
+    self:get_sprite(entity):set_state(state)
 end

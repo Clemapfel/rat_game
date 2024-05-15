@@ -8,10 +8,10 @@ rt.MonitoredAudioPlayback = meta.new_type("MonitoredAudioPlayback", function(fil
         _data = data,
         _data_t = ternary(data:getBitDepth() == 16, "int16_t", "uint8_t"),
         _source = love.audio.newQueueableSource(
-                data:getSampleRate(),
-                data:getBitDepth(),
-                data:getChannelCount(),
-                3
+            data:getSampleRate(),
+            data:getBitDepth(),
+            data:getChannelCount(),
+            3
         ),
         _buffer_offset = 0,
         _is_playing_offset = 0,
@@ -74,17 +74,17 @@ function rt.MonitoredAudioPlayback:_signal_to_spectrum(data, offset, window_size
         tf = self.transform
 
         tf.plan_signal_to_spectrum = self.ft.plan_dft_r2c_1d(
-                window_size,
-                tf.fftw_real,
-                tf.fftw_complex,
-                self.ft.plan_mode
+            window_size,
+            tf.fftw_real,
+            tf.fftw_complex,
+            self.ft.plan_mode
         )
 
         tf.plan_spectrum_to_signal = self.ft.plan_dft_c2r_1d(
-                window_size,
-                tf.fftw_complex,
-                tf.fftw_real,
-                self.ft.plan_mode
+            window_size,
+            tf.fftw_complex,
+            tf.fftw_real,
+            self.ft.plan_mode
         )
 
         local sample_rate = self._data:getSampleRate()
@@ -257,17 +257,17 @@ function rt.MonitoredAudioPlayback:update()
 
     if self._source:getFreeBufferCount() > 0 then
         local n_samples_to_push = math.min(
-                round(self._data:getSampleRate() * 3 / 60),  -- push 4 frames worth of data each frame
-                clamp(self._data:getSampleCount() * self._data:getChannelCount() - self._buffer_offset)
+            round(self._data:getSampleRate() * 3 / 60),  -- push 4 frames worth of data each frame
+            clamp(self._data:getSampleCount() * self._data:getChannelCount() - self._buffer_offset)
         )
         if n_samples_to_push ~= 0 then
             assert(self._source:queue(
-                    self._data:getPointer(),
-                    self._buffer_offset * ffi.sizeof(self._data_t),
-                    n_samples_to_push * ffi.sizeof(self._data_t),
-                    self._data:getSampleRate(),
-                    self._data:getBitDepth(),
-                    self._data:getChannelCount()
+                self._data:getPointer(),
+                self._buffer_offset * ffi.sizeof(self._data_t),
+                n_samples_to_push * ffi.sizeof(self._data_t),
+                self._data:getSampleRate(),
+                self._data:getBitDepth(),
+                self._data:getChannelCount()
             ))
             self._source:play()
             self._is_playing = true
@@ -288,7 +288,8 @@ end
 
 --- @brief get spectrum of last window_size samples
 function rt.MonitoredAudioPlayback:get_current_spectrum(window_size, n_mel_frequencies)
-    n_mel_frequencies = math.round(which(window_size / 16))
+    window_size = math.round(which(window_size, rt.settings.monitored_audio_playback.default_window_size))
+    n_mel_frequencies = which(n_mel_frequencies, window_size / 16)
     return self:_signal_to_spectrum(self._data, clamp(self._is_playing_offset, 0), window_size, n_mel_frequencies)
 end
 
