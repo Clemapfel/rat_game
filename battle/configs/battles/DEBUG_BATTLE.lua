@@ -13,7 +13,7 @@ return {
         {
             id = "BALL_WITH_FACE",
             status = {
-                --"DEBUG_STATUS"
+                "DEBUG_STATUS"
             },
             consumables = {
                 "DEBUG_CONSUMABLE"
@@ -34,7 +34,7 @@ return {
         {
             id = "SMALL_UFO",
             status = {
-                --"DEBUG_STATUS"
+                "DEBUG_STATUS"
             },
             consumables = {
                 "DEBUG_CONSUMABLE"
@@ -55,7 +55,7 @@ return {
         {
             id = "WALKING_SPROUT",
             status = {
-                --"DEBUG_STATUS"
+                "DEBUG_STATUS"
             },
             consumables = {
                 "DEBUG_CONSUMABLE"
@@ -76,7 +76,7 @@ return {
         {
             id = "GAMBLER_MOLE",
             status = {
-                --"DEBUG_STATUS"
+                "DEBUG_STATUS"
             },
             consumables = {
                 "DEBUG_CONSUMABLE"
@@ -97,7 +97,7 @@ return {
         {
             id = "GAMBLER_MOLE",
             status = {
-                --"DEBUG_STATUS"
+                "DEBUG_STATUS"
             },
             consumables = {
                 "DEBUG_CONSUMABLE"

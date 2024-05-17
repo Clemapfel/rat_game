@@ -92,7 +92,7 @@ end
 --- @brief
 function rt.AnimationQueue:_start_animation(animation)
     if animation._state ~= rt.QueueableAnimationState.IDLE then return end
-    animation._state = rt.QueueableAnimationState.STARTEDED
+    animation._state = rt.QueueableAnimationState.STARTED
     animation:start()
     animation:update(0)
 end

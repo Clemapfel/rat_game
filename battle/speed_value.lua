@@ -5,9 +5,8 @@ rt.settings.battle.speed_value = {
 }
 
 --- @class bt.SpeedValue
-bt.SpeedValue = meta.new_type("SpeedValue", rt.Widget, rt.Animation, function(entity)
+bt.SpeedValue = meta.new_type("SpeedValue", rt.Widget, rt.Animation, function()
     return meta.new(bt.SpeedValue, {
-        _entity = entity,
         _elapsed = 1,   -- sic, makes it so `update` is invoked immediately
         _speed_current = -1,
         _speed_target = -1,

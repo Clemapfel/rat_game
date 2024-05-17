@@ -12,6 +12,7 @@ bt.PartySprite = meta.new_type("PartySprite", bt.BattleSprite, function(entity)
         _health_bar = bt.HealthBar(entity),
         _speed_value = bt.SpeedValue(entity),
         _status_bar = bt.StatusBar(entity),
+        _consumable_bar = bt.ConsumableBar(entity),
 
         _backdrop = rt.Rectangle(0, 0, 1, 1),
         _frame = rt.Rectangle(0, 0, 1, 1),
@@ -57,6 +58,7 @@ function bt.PartySprite:realize()
     self._health_bar:realize()
     self._speed_value:realize()
     self._status_bar:realize()
+    self._consumable_bar:realize()
 
     self._health_bar:set_use_percentage(false)
     self._status_bar:set_alignment(rt.Alignment.START)
@@ -119,7 +121,7 @@ function bt.PartySprite:size_allocate(x, y, width, height)
     self._name:set_position(x + 0.5 * width - 0.5 * label_w, current_y - label_h)
     local speed_value_w, speed_value_h = self._speed_value:measure()
     self._speed_value:fit_into(x + width - m - speed_value_w, current_y - label_h - speed_value_h + 0.5 * speed_value_h + 0.5 * label_h)
-    self._status_bar:fit_into(x + m, current_y - label_h, width, label_h)
+    self._status_bar:fit_into(x + m, current_y - label_h, width - 2 * m, label_h)
 
     current_y = current_y - label_h - m
 
@@ -135,6 +137,9 @@ function bt.PartySprite:size_allocate(x, y, width, height)
     self._frame:resize(rt.aabb_unpack(frame_aabb))
     self._frame_outline:resize(rt.aabb_unpack(frame_aabb))
     self._frame_gradient:resize(frame_aabb.x - 0.5 * total_frame_thickness, frame_aabb.y - 0.5 * total_frame_thickness, frame_aabb.width + total_frame_thickness, frame_aabb.height + total_frame_thickness)
+
+    local consumable_aabb = rt.AABB(x + m, frame_aabb.y - hp_bar_height, frame_aabb.width, hp_bar_height)
+    self._consumable_bar:fit_into(consumable_aabb)
 
     -- update bounds so get_bounds only returns visible area, not allocated area
     self._bounds.y = current_y - total_frame_thickness
@@ -162,6 +167,7 @@ function bt.PartySprite:draw()
     self._health_bar:draw()
     self._name:draw()
     self._status_bar:draw()
+    self._consumable_bar:draw()
     self._speed_value:draw()
 end
 
@@ -184,7 +190,6 @@ function bt.PartySprite:set_opacity(alpha)
         object:set_opacity(alpha)
     end
 end
-
 
 --- @brief
 function bt.PartySprite:set_state(state)

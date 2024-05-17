@@ -38,7 +38,7 @@ rt.OrderedBox = meta.new_type("OrderedBox", rt.Widget, rt.Animation, function()
         _world = rt.PhysicsWorld(0, 0),
         _order = {},   -- Array<ID>
         _entries = {}, -- Table<ID, cf. add>
-        _orientation = rt.Orientation.VERTICAL,
+        _orientation = rt.Orientation.HORIZONTAL,
         _alignment = rt.Alignment.START,
         _alignment_x_offset = 0,
         _alignment_y_offset = 0
@@ -48,6 +48,9 @@ end)
 --- @brief
 function rt.OrderedBox:add(id, element)
     meta.assert_isa(element, rt.Widget)
+
+    local present = self._entries[id]
+
     local origin_x, origin_y = self._bounds.x + 0.5 * self._bounds.width, self._bounds.y + 0.5 * self._bounds.height
     local to_insert = {
         element = element,
@@ -70,8 +73,16 @@ function rt.OrderedBox:add(id, element)
     to_insert.collider:set_position(origin_x, origin_y)
     to_insert.collider:set_collision_group(rt.ColliderCollisionGroup.NONE)
     to_insert.collider:set_mass(rt.settings.ordered_box.collider_mass)
+
+    if self._is_realized == true then
+        to_insert.element:realize()
+    end
+
     self._entries[id] = to_insert
-    table.insert(self._order, id)
+
+    if not present then
+        table.insert(self._order, id)
+    end
     self:reformat()
 end
 
@@ -180,7 +191,6 @@ function rt.OrderedBox:size_allocate(x, y, width, height)
         entry.element:realize()
         local w, h = entry.element:measure()
         entry.element:fit_into(0, 0, w, h)
-
         entry.width = w
         entry.height = h
 
@@ -192,13 +202,17 @@ function rt.OrderedBox:size_allocate(x, y, width, height)
     local m = (width - total_w) / (n - 1)
 
     local current_x, current_y = self._bounds.x, self._bounds.y
-    local origin_x, origin_y = self._bounds.x + 0.5 * self._bounds.width, self._bounds.y + 0.5 * self._bounds.height
+    local origin_x, origin_y = self._bounds.x + 0.5 * self._bounds.width, self._bounds.y
+
+    origin_x = origin_x - self._alignment_x_offset
+    origin_y = origin_y - self._alignment_y_offset
 
     for id in values(self._order) do
         local entry = self._entries[id]
         local w, h = entry.width, entry.height
         entry.target_position_x = current_x
         entry.target_position_y = current_y
+        entry.collider:set_position(origin_x, origin_y)
 
         if self._orientation == rt.Orientation.HORIZONTAL then
             entry.target_position_y = current_y + 0.5 * self._bounds.height - 0.5 * h
@@ -262,7 +276,6 @@ function rt.OrderedBox:draw()
         rt.graphics.scale(entry.current_scale)
         rt.graphics.translate(-0.5 * entry.width, -0.5 * entry.height)
         entry.element:draw()
-        entry.element:draw_bounds()
         rt.graphics.pop()
     end
     rt.graphics.pop()
@@ -337,12 +350,7 @@ end
 
 --- @brief
 function rt.OrderedBox:clear()
-    local to_remove = {}
-    for id in keys(self._entries) do
-        table.insert(to_remove(id))
-    end
-
-    for id in values(to_remove) do
-        self:remove(id)
-    end
+    self._entries = {}
+    self._order = {}
+    self:reformat()
 end

@@ -12,6 +12,7 @@ bt.EnemySprite = meta.new_type("EnemySprite", bt.BattleSprite, function(entity)
         _health_bar = bt.HealthBar(entity),
         _speed_value = bt.SpeedValue(entity),
         _status_bar = bt.StatusBar(entity),
+        _consumable_bar = bt.ConsumableBar(entity),
 
         _selection_frame = rt.SelectionIndicator()
     })
@@ -30,10 +31,14 @@ function bt.EnemySprite:realize()
     self._health_bar:realize()
     self._speed_value:realize()
     self._status_bar:realize()
+    self._consumable_bar:realize()
+
+    self._status_bar:set_alignment(rt.Alignment.START)
+    self._consumable_bar:set_alignment(rt.Alignment.END)
 
     self._selection_frame:realize()
 
-    for to_animate in range(self, self._health_bar, self._speed_value, self._status_bar, self._sprite) do
+    for to_animate in range(self, self._health_bar, self._speed_value, self._status_bar, self._consumable_bar, self._sprite) do
         to_animate:set_is_animated(true)
     end
 
@@ -56,12 +61,17 @@ function bt.EnemySprite:size_allocate(x, y, width, height)
     local m = 0.5 * rt.settings.margin_unit
     local hp_bar_bounds = rt.AABB(sprite_x, sprite_y + sprite_h + m, sprite_w, rt.settings.battle.health_bar.hp_font:get_size() + 2 * m)
     hp_bar_bounds.x = hp_bar_bounds.x + rt.settings.margin_unit
-    hp_bar_bounds.width = hp_bar_bounds.width - 2 * rt.settings.margin_unit -- why 2?
+    hp_bar_bounds.width = hp_bar_bounds.width - 2 * rt.settings.margin_unit
     self._health_bar:fit_into(hp_bar_bounds)
 
     self._status_bar:fit_into(
-        sprite_x, hp_bar_bounds.y + hp_bar_bounds.height,
-        math.max(sprite_w, hp_bar_bounds.width), hp_bar_bounds.height
+        hp_bar_bounds.x, hp_bar_bounds.y + hp_bar_bounds.height,
+        hp_bar_bounds.width, hp_bar_bounds.height
+    )
+
+    self._consumable_bar:fit_into(
+        hp_bar_bounds.x, hp_bar_bounds.y + hp_bar_bounds.height,
+        hp_bar_bounds.width, hp_bar_bounds.height
     )
 
     local speed_value_w, speed_value_h = self._speed_value:measure()
@@ -78,7 +88,7 @@ function bt.EnemySprite:draw()
     if self._is_realized ~= true then return end
 
     self._sprite:draw()
-    bt.BattleSprite.draw(self)
+    --bt.BattleSprite.draw(self)
 
     if self._is_selected then
         self._selection_frame:draw()
@@ -134,6 +144,7 @@ function bt.EnemySprite:set_state(state)
         end
     end
 end
+
 
 --- @brief
 function bt.EnemySprite:measure()

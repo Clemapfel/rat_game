@@ -523,28 +523,24 @@ function bt.Scene:remove_status(entity, to_remove)
     local stun_after = entity:get_is_stunned()
 
     -- animation
+    local sprite = self._ui:get_sprite(entity)
     if not is_silent then
-        local sprite = self._ui:get_sprite(entity)
         do
             local animation = bt.Animation.STATUS_LOST(sprite, to_remove)
             local message = bt.Animation.MESSAGE(self, self:format_name(entity) .. " lost status " .. self:format_name(to_remove))
             local reorder = bt.Animation.REORDER_PRIORITY_QUEUE(self, self._state:list_entities_in_order())
-
-            local on_start = function()
-                sprite:remove_status(to_remove)
-            end
-            self:play_animations({animation, message, reorder}, on_start)
+            self:play_animations({animation, message, reorder})
         end
 
         do -- no longer stunned
             if stun_after == false and stun_after ~= stun_before then
-                local animation = bt.Animation.STUNNED(sprite)
+                local animation = bt.Animation.NO_LONGER_STUNNED(sprite)
                 local message = bt.Animation.MESSAGE(self, self:format_name(entity) .. " is no longer stunned")
 
-                local on_start = function()
+                local on_finish = function()
                     self._ui:set_is_stunned(entity, false)
                 end
-                self:play_animations({animation, message}, on_start)
+                self:play_animations({animation, message}, nil, on_finish)
             end
         end
     end
@@ -556,6 +552,12 @@ function bt.Scene:remove_status(entity, to_remove)
         local self_proxy = bt.StatusInterface(self, entity, to_remove)
         self:safe_invoke(to_remove, callback_id, self_proxy, afflicted_proxy)
         self:_animate_apply_status(entity, to_remove)
+    end
+
+    -- delay status bar update until after status callback is invoked, so _apply_status doesn't fizzle
+    if not is_silent then
+        local on_finish = function() sprite:remove_status(to_remove) end
+        self:play_animations({}, nil, on_finish)
     end
 
     -- invoke status lost for global statuses, and status / consumable of self

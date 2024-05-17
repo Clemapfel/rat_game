@@ -234,6 +234,11 @@ function bt.BattleUI:draw()
     self._priority_queue:draw()
     self._animation_queue:draw()
 
+    -- draw ui on top of animation
+    for i in values(self._enemy_sprite_render_order) do
+        bt.BattleSprite.draw(self._enemy_sprites[i])
+    end
+
     self._log:draw()
 end
 

@@ -16,15 +16,18 @@ bt.BattleSprite = meta.new_abstract_type("BattleSprite", rt.Widget, rt.Animation
     _health_bar = nil, -- bt.HealthBar
     _speed_value = nil, -- bt.Speedvalue
     _status_bar = nil, -- bt.StatusBar
+    _consumable_bar = nil, -- bt.ConsumableBar
 
     _opacity = 1
 })
 
 --- @brief
 function bt.BattleSprite:synchronize(entity)
+    if self._is_realized ~= true then return end
     self._health_bar:synchronize(entity)
     self._speed_value:synchronize(entity)
     self._status_bar:synchronize(entity)
+    self._consumable_bar:synchronize(entity)
     self:set_state(entity:get_state())
 end
 
@@ -34,6 +37,7 @@ function bt.BattleSprite:draw()
         self._health_bar:draw()
         self._speed_value:draw()
         self._status_bar:draw()
+        self._consumable_bar:draw()
     end
 end
 
@@ -64,17 +68,17 @@ end
 
 --- @brief
 function bt.BattleSprite:add_consumable(consumable)
-    println("TODO: bt.BattleSprite:add_consumable")
+    self._consumable_bar:add(consumable, 0)
 end
 
 --- @brief
 function bt.BattleSprite:remove_consumable(consumable)
-    println("TODO: bt.BattleSprite:remove_consumable")
+    self._consumable_bar:remove(consumable)
 end
 
 --- @brief
 function bt.BattleSprite:activate_consumable(consumable)
-    println("TODO: bt.BattleSprite:activate_consumable")
+    self._consumable_bar:activate(consumable)
 end
 
 --- @brief

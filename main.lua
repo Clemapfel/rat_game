@@ -3,24 +3,6 @@ require "include"
 rt.current_scene = bt.Scene()
 scene = rt.current_scene
 
-local box = rt.OrderedBox()
-box:realize()
-
-for which in range(
-    bt.Consumable("DEBUG_CONSUMABLE"),
-    bt.Status("DEBUG_STATUS"),
-    bt.GlobalStatus("DEBUG_GLOBAL_STATUS")
-) do
-    local sprite = rt.LabeledSprite(which:get_sprite_id())
-    sprite:set_label("<o>0" .. rt.random.integer(0, 1) .. "</o>")
-    sprite:realize()
-    box:add(which, sprite)
-end
-
-box:fit_into(50, 50, 100, 50)
-box:set_orientation(rt.Orientation.HORIZONTAL)
-box:set_alignment(rt.Alignment.END)
-
 --[[
 add_consumable
 remove_consumable
@@ -35,7 +17,13 @@ scene:set_background("EYE")
 input_controller = rt.InputController()
 input_controller:signal_connect("pressed", function(self, which)
     if which == rt.InputButton.A then
-        scene:add_status(battle.entities[1], bt.Status("DEBUG_STATUS"))
+        local entity = battle.entities[1]
+        local status = bt.Status("DEBUG_STATUS")
+        if entity:has_status(status) then
+            scene:remove_status(entity, status)
+        else
+            scene:add_status(entity, status)
+        end
     elseif which == rt.InputButton.B then
         scene:skip()
     elseif which == rt.InputButton.X then
@@ -74,9 +62,6 @@ love.draw = function()
     if rt.current_scene ~= nil then
         rt.current_scene:draw()
     end
-
-    box:draw()
-    box:draw_bounds()
 
     do -- show fps and frame usage
         local fps = love.timer.getFPS()
