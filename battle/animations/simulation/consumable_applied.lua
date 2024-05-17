@@ -1,3 +1,37 @@
+--- @class bt.Animation.CONSUMABLE_APPLIED
+bt.Animation.CONSUMABLE_APPLIED = meta.new_type("CONSUMABLE_APPLIED", rt.QueueableAnimation, function(target, status)
+    return meta.new(bt.Animation.CONSUMABLE_APPLIED, {
+        _target = target,
+        _status = status,
+
+        _elapsed = 0
+    })
+end)
+
+--- @override
+function bt.Animation.CONSUMABLE_APPLIED:start()
+    self._target:activate_consumable(self._status)
+end
+
+--- @override
+function bt.Animation.CONSUMABLE_APPLIED:update(delta)
+    -- calculate scale animation duration of bt.StatusBar
+    local duration = (rt.settings.ordered_box.max_scale - 1) * 2 / rt.settings.ordered_box.scale_speed
+    self._elapsed = self._elapsed + delta
+    return self._elapsed < duration
+end
+
+--- @override
+function bt.Animation.CONSUMABLE_APPLIED:finish()
+    -- noop
+end
+
+--- @override
+function bt.Animation.CONSUMABLE_APPLIED:draw()
+    -- noop
+end
+
+--[[
 rt.settings.battle.animations.consumable_applied = {
     duration = 2
 }
@@ -126,3 +160,4 @@ function bt.Animation.CONSUMABLE_APPLIED:draw()
     self._aspect:draw()
     self._label:draw()
 end
+]]--

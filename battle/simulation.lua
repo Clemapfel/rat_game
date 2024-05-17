@@ -871,13 +871,22 @@ end
 
 --- @brief
 function bt.Scene:consume(holder, to_consume)
-
     -- if not held, abort
     if not holder:has_consumable(to_consume) then
         return
     end
 
     local should_deplete = holder:consume_consumable(to_consume)
+
+    local sprite = self._ui:get_sprite(holder)
+    local consume = bt.Animation.CONSUMABLE_CONSUMED(sprite, to_consume)
+    local on_finish = function()
+
+    end
+
+    -- reduce consumable bar count or remove from bar
+    -- invoke callbacks
+
 end
 
 --- @brief
