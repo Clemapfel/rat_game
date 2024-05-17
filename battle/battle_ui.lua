@@ -13,11 +13,8 @@ bt.BattleUI = meta.new_type("BattleUI", rt.Widget, rt.Animation, function()
         _entities = {},  -- Set<bt.Entity>
         _enemy_sprites = {},              -- Table<bt.EnemySprite>
         _enemy_sprite_render_order = {},  -- Queue<Number>
-
         _party_sprites = {}, -- Table<bt.PartySprite>
-
         _animation_queue = {}, -- rt.AnimationQueue
-
         _gradient_right = {}, -- rt.LogGradient
         _gradient_left = {},  -- rt.LogGradient
     })
@@ -109,7 +106,7 @@ function bt.BattleUI:_reformat_enemy_sprites()
     )
     total_w = total_w + (#self._enemy_sprites - 1) * m
 
-    local target_y = self._bounds.y + self._bounds.height * 0.5 + 0.25 * h
+    local target_y = self._bounds.y + self._bounds.height * 0.5 + 0.25 * max_h
     local n_enemies = sizeof(self._enemy_sprites)
     self._enemy_sprite_render_order = table.seq(n_enemies, 1, -1)
 
@@ -122,6 +119,7 @@ function bt.BattleUI:_reformat_enemy_sprites()
         end
     end
 
+
     local xy_positions = {}
     local x_offset = 0
     for i in values(enemy_sprite_indices) do
@@ -129,7 +127,7 @@ function bt.BattleUI:_reformat_enemy_sprites()
         w, h = sprite:measure()
         xy_positions[i] = {
             clamp(mx + x_offset, mx),
-            0, --target_y - h
+            target_y - h
         }
         x_offset = x_offset + w + m
     end

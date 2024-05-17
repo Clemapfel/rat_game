@@ -3,6 +3,24 @@ require "include"
 rt.current_scene = bt.Scene()
 scene = rt.current_scene
 
+local box = rt.OrderedBox()
+box:realize()
+
+for which in range(
+    bt.Consumable("DEBUG_CONSUMABLE"),
+    bt.Status("DEBUG_STATUS"),
+    bt.GlobalStatus("DEBUG_GLOBAL_STATUS")
+) do
+    local sprite = rt.LabeledSprite(which:get_sprite_id())
+    sprite:set_label("<o>0" .. rt.random.integer(0, 1) .. "</o>")
+    sprite:realize()
+    box:add(which, sprite)
+end
+
+box:fit_into(50, 50, 100, 50)
+box:set_orientation(rt.Orientation.HORIZONTAL)
+box:set_alignment(rt.Alignment.END)
+
 --[[
 add_consumable
 remove_consumable
@@ -10,34 +28,16 @@ set_consumable_n_left
 activate_consumable
 ]]--
 
-
-local consumable_indicator = bt.ConsumableIndicator(bt.Consumable("DEBUG_CONSUMABLE"))
-consumable_indicator:realize()
-consumable_indicator:fit_into(50, 50, 50, 50)
-consumable_indicator:set_scale(5)
-
-local box = rt.OrderedBox()
-
-for i = 1, 4 do
-    box:add(i, rt.Label("<outline_color=RED><outline>\\|0" .. i .. "</outline></outline_color>"))
-end
-
-box:realize()
-box:fit_into(50, 50, rt.graphics.get_width(), 50)
-
 battle = bt.Battle("DEBUG_BATTLE")
 scene:set_background("EYE")
 --scene:set_music("assets/music/test_music_04.mp3")
 
-proxy = bt.GlobalStatusInterface(scene, bt.GlobalStatus("DEBUG_GLOBAL_STATUS"))
-
 input_controller = rt.InputController()
 input_controller:signal_connect("pressed", function(self, which)
     if which == rt.InputButton.A then
-        box:remove(2)
+        scene:switch(battle.entities[1], battle.entities[2])
     elseif which == rt.InputButton.B then
-        box:activate(2)
-        --scene:skip()
+        scene:skip()
     elseif which == rt.InputButton.X then
         scene:add_status(battle.entities[1], bt.Status("DEBUG_STATUS"))
     elseif which == rt.InputButton.Y then
@@ -58,7 +58,7 @@ end)
 love.load = function()
     rt.current_scene:realize()
     love.resize()
-    --rt.current_scene:start_battle(battle)
+    rt.current_scene:start_battle(battle)
 end
 
 rt.graphics.frame_duration = {
@@ -76,6 +76,7 @@ love.draw = function()
     end
 
     box:draw()
+    box:draw_bounds()
 
     do -- show fps and frame usage
         local fps = love.timer.getFPS()
@@ -110,8 +111,6 @@ love.update = function(delta)
     if rt.current_scene ~= nil and rt.current_scene.update ~= nil then
         rt.current_scene:update(delta)
     end
-
-    box:update(delta)
 end
 
 love.resize = function()

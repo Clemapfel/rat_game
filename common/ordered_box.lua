@@ -27,12 +27,21 @@ rt.Orientation = meta.new_enum({
     VERTICAL = "VERTICAL"
 })
 
+rt.Alignment = meta.new_enum({
+    START = "START",
+    CENTER = "CENTER",
+    END = "END"
+})
+
 rt.OrderedBox = meta.new_type("OrderedBox", rt.Widget, rt.Animation, function()
     return meta.new(rt.OrderedBox, {
         _world = rt.PhysicsWorld(0, 0),
         _order = {},   -- Array<ID>
         _entries = {}, -- Table<ID, cf. add>
         _orientation = rt.Orientation.VERTICAL,
+        _alignment = rt.Alignment.START,
+        _alignment_x_offset = 0,
+        _alignment_y_offset = 0
     })
 end)
 
@@ -134,7 +143,6 @@ function rt.OrderedBox:update(delta)
             else
                 current = current + delta * rt.settings.ordered_box.scale_speed * (1 + rt.exponential_acceleration((target - current) / target))
                 if current > target then current = target end
-                dbg(1 + rt.exponential_acceleration(target - current / target))
             end
 
             entry.current_scale = current
@@ -166,24 +174,77 @@ end
 function rt.OrderedBox:size_allocate(x, y, width, height)
     if self._is_realized ~= true then return end
 
-    local current_x, current_y = self._bounds.x, self._bounds.y
+    local total_w, total_h, n = 0, 0, 0
     for id in values(self._order) do
         local entry = self._entries[id]
         entry.element:realize()
         local w, h = entry.element:measure()
         entry.element:fit_into(0, 0, w, h)
-        entry.target_position_x = current_x
-        entry.target_position_y = current_y
+
         entry.width = w
         entry.height = h
 
+        total_w = total_w + w
+        total_h = total_h + h
+        n = n + 1
+    end
+
+    local m = (width - total_w) / (n - 1)
+
+    local current_x, current_y = self._bounds.x, self._bounds.y
+    local origin_x, origin_y = self._bounds.x + 0.5 * self._bounds.width, self._bounds.y + 0.5 * self._bounds.height
+
+    for id in values(self._order) do
+        local entry = self._entries[id]
+        local w, h = entry.width, entry.height
+        entry.target_position_x = current_x
+        entry.target_position_y = current_y
+
         if self._orientation == rt.Orientation.HORIZONTAL then
-            current_x = current_x + w
+            entry.target_position_y = current_y + 0.5 * self._bounds.height - 0.5 * h
+        end
+
+        if self._orientation == rt.Orientation.VERTICAL then
+            entry.target_position_x = current_x + 0.5 * self._bounds.width - 0.5 * w
+        end
+
+        if self._orientation == rt.Orientation.HORIZONTAL then
+            current_x = current_x + w + m
             current_y = current_y + 0
         else
             current_x = current_x + 0
-            current_y = current_y + h
+            current_y = current_y + h + m
         end
+    end
+
+    if self._orientation == rt.Orientation.HORIZONTAL then
+        if self._alignment == rt.Alignment.START then
+            self._alignment_x_offset = 0
+            self._alignment_y_offset = 0
+        elseif self._alignment == rt.Alignment.CENTER then
+            self._alignment_x_offset = clamp(0.5 * width - 0.5 * total_w, 0)
+            self._alignment_y_offset = 0
+        elseif self._alignment == rt.Alignment.END then
+            self._alignment_x_offset = clamp(width - total_w, 0)
+            self._alignment_y_offset = 0
+        else
+            rt.error("In rt.OrderedBox.size_allocate: unknown alignment `" .. self._orientation .. "`")
+        end
+    elseif self._orientation == rt.Orientation.VERTICAL then
+        if self._alignment == rt.Alignment.START then
+            self._alignment_x_offset = 0
+            self._alignment_y_offset = 0
+        elseif self._alignment == rt.Alignment.CENTER then
+            self._alignment_x_offset = 0
+            self._alignment_y_offset = clamp(0.5 * height - 0.5 * total_h, 0)
+        elseif self._alignment == rt.Alignment.END then
+            self._alignment_x_offset = 0
+            self._alignment_y_offset = clamp(height - total_h, 0)
+        else
+            rt.error("In rt.OrderedBox.size_allocate: unknown alignment `" .. self._orientation .. "`")
+        end
+    else
+        rt.error("In rt.OrderedBox.size_allocate: unknown orientation `" .. self._orientation .. "`")
     end
 end
 
@@ -191,17 +252,20 @@ end
 function rt.OrderedBox:draw()
     if self._is_realized ~= true then return end
 
+    rt.graphics.push()
+    rt.graphics.translate(self._alignment_x_offset, self._alignment_y_offset)
     local bounds = self._bounds
     for _, entry in pairs(self._entries) do
-        local x, y = entry.collider:get_position()
         rt.graphics.push()
-        rt.graphics.translate(x - 0.5 * entry.width, y - 0.5 * entry.height)
+        rt.graphics.translate(entry.collider:get_position())
         rt.graphics.translate(0.5 * entry.width, 0.5 * entry.height)
         rt.graphics.scale(entry.current_scale)
         rt.graphics.translate(-0.5 * entry.width, -0.5 * entry.height)
         entry.element:draw()
+        entry.element:draw_bounds()
         rt.graphics.pop()
     end
+    rt.graphics.pop()
 end
 
 --- @brief
@@ -253,4 +317,20 @@ function rt.OrderedBox:set_order(order)
     end
     self._order = order
     self:reformat()
+end
+
+--- @brief
+function rt.OrderedBox:set_orientation(orientation)
+    self._orientation = orientation
+    if self._is_realized == true then
+        self:reformat()
+    end
+end
+
+--- @brief
+function rt.OrderedBox:set_alignment(alignment)
+    self._alignment = alignment
+    if self._is_realized == true then
+        self:reformat()
+    end
 end
