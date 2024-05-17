@@ -35,7 +35,7 @@ scene:set_background("EYE")
 input_controller = rt.InputController()
 input_controller:signal_connect("pressed", function(self, which)
     if which == rt.InputButton.A then
-        scene:switch(battle.entities[1], battle.entities[2])
+        scene:add_status(battle.entities[1], bt.Status("DEBUG_STATUS"))
     elseif which == rt.InputButton.B then
         scene:skip()
     elseif which == rt.InputButton.X then

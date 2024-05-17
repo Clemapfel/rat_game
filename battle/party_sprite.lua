@@ -59,7 +59,7 @@ function bt.PartySprite:realize()
     self._status_bar:realize()
 
     self._health_bar:set_use_percentage(false)
-    self._status_bar:set_alignment(bt.StatusBarAlignment.LEFT)
+    self._status_bar:set_alignment(rt.Alignment.START)
 
     self._backdrop:set_is_outline(false)
     self._frame:set_is_outline(true)

@@ -334,3 +334,15 @@ function rt.OrderedBox:set_alignment(alignment)
         self:reformat()
     end
 end
+
+--- @brief
+function rt.OrderedBox:clear()
+    local to_remove = {}
+    for id in keys(self._entries) do
+        table.insert(to_remove(id))
+    end
+
+    for id in values(to_remove) do
+        self:remove(id)
+    end
+end

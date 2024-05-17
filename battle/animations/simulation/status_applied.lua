@@ -15,7 +15,8 @@ end
 
 --- @override
 function bt.Animation.STATUS_APPLIED:update(delta)
-    local duration = rt.settings.battle.status_bar.activate_animation_duration
+    -- calculate scale animation duration of bt.StatusBar
+    local duration = (rt.settings.ordered_box.max_scale - 1) * 2 / rt.settings.ordered_box.scale_speed
     self._elapsed = self._elapsed + delta
     return self._elapsed < duration
 end

@@ -138,7 +138,6 @@ require "battle.battle"
 
 require "battle.health_bar"
 require "battle.speed_value"
-require "battle.status_bar_element"
 require "battle.status_bar"
 require "battle.consumable_bar_element"
 require "battle.consumable_bar"
