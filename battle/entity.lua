@@ -505,8 +505,8 @@ function bt.Entity:get_consumable(consumable_id)
 end
 
 --- @brief
-function bt.Entity:get_consumable_n_consumed(consumable_id)
-    local entry = self.consumables[consumable_id]
+function bt.Entity:get_consumable_n_consumed(consumable)
+    local entry = self.consumables[consumable:get_id()]
     if entry == nil then
         return 0
     else
@@ -530,20 +530,27 @@ end
 function bt.Entity:list_consumables()
     local out = {}
     for entry in values(self.consumables) do
-        table.insert(out, entry.consumable)
+        if entry.n_consumed < entry.consumable:get_max_n_uses() then
+            table.insert(out, entry.consumable)
+        end
     end
 
     return out
 end
 
 --- @brief
+--- @return Number n_left
 function bt.Entity:consume_consumable(consumable)
     local entry = self.consumables[consumable:get_id()]
     if entry == nil then
         rt.warning("In bt.Entity:consume_move: entity `" .. self:get_id() .. "` does not have consumable `" .. consumable:get_id() .. "` equipped")
-        return false
+        return 0
     else
         entry.n_consumed = entry.n_consumed + 1
-        return entry.n_consumed >= entry.consumable:get_max_n_uses()
+        local n_left = entry.consumable:get_max_n_uses() - entry.n_consumed
+        if n_left <= 0 then
+            self:remove_consumable(consumable)
+        end
+        return n_left
     end
 end

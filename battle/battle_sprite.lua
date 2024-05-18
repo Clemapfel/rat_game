@@ -61,9 +61,15 @@ function bt.BattleSprite:remove_status(status)
     self._status_bar:remove(status)
 end
 
+
 --- @brief
 function bt.BattleSprite:activate_status(status)
     self._status_bar:activate(status)
+end
+
+--- @brief
+function bt.BattleSprite:set_status_n_elapsed(status, elapsed)
+    self._status_bar:set_elapsed(status, elapsed)
 end
 
 --- @brief
@@ -79,6 +85,11 @@ end
 --- @brief
 function bt.BattleSprite:activate_consumable(consumable)
     self._consumable_bar:activate(consumable)
+end
+
+--- @brief
+function bt.BattleSprite:set_consumable_n_consumed(consumable, n_consumed)
+    self._consumable_bar:set_n_consumed(consumable, n_consumed)
 end
 
 --- @brief

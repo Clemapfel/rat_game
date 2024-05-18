@@ -10,6 +10,26 @@ set_consumable_n_left
 activate_consumable
 ]]--
 
+
+local box = rt.OrderedBox()
+box:realize()
+
+for which in range(
+    bt.Consumable("DEBUG_CONSUMABLE"),
+    bt.Status("DEBUG_STATUS"),
+    bt.GlobalStatus("DEBUG_GLOBAL_STATUS")
+) do
+    local sprite = rt.LabeledSprite(which:get_sprite_id())
+    sprite:set_label("<o>0" .. rt.random.integer(0, 1) .. "</o>")
+    sprite:realize()
+    box:add(which, sprite)
+end
+
+box:fit_into(50, 50, 100, 50)
+box:set_orientation(rt.Orientation.HORIZONTAL)
+box:set_alignment(rt.Alignment.END)
+
+
 battle = bt.Battle("DEBUG_BATTLE")
 scene:set_background("EYE")
 --scene:set_music("assets/music/test_music_04.mp3")
@@ -17,13 +37,7 @@ scene:set_background("EYE")
 input_controller = rt.InputController()
 input_controller:signal_connect("pressed", function(self, which)
     if which == rt.InputButton.A then
-        local entity = battle.entities[1]
-        local status = bt.Status("DEBUG_STATUS")
-        if entity:has_status(status) then
-            scene:remove_status(entity, status)
-        else
-            scene:add_status(entity, status)
-        end
+        scene:consume(battle.entities[1], bt.Consumable("DEBUG_CONSUMABLE"))
     elseif which == rt.InputButton.B then
         scene:skip()
     elseif which == rt.InputButton.X then
@@ -88,6 +102,8 @@ love.draw = function()
         love.graphics.line(x + 0.5 * width, y, x + 0.5 * width, height)
     end
 
+    box:draw()
+
     love.graphics.reset()
 end
 
@@ -96,6 +112,8 @@ love.update = function(delta)
     if rt.current_scene ~= nil and rt.current_scene.update ~= nil then
         rt.current_scene:update(delta)
     end
+
+    box:update(delta)
 end
 
 love.resize = function()

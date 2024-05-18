@@ -876,17 +876,51 @@ function bt.Scene:consume(holder, to_consume)
         return
     end
 
-    local should_deplete = holder:consume_consumable(to_consume)
-
+    -- consume 1 stack
+    local n_left = holder:consume_consumable(to_consume)
     local sprite = self._ui:get_sprite(holder)
     local consume = bt.Animation.CONSUMABLE_CONSUMED(sprite, to_consume)
+    local message = bt.Animation.MESSAGE(self, self:format_name(holder) .. " consumed their " .. self:format_name(to_consume))
     local on_finish = function()
-
+        if n_left <= 0 then
+            sprite:remove_consumable(to_consume)
+        else
+            sprite:set_consumable_n_consumed(to_consume, holder:get_consumable_n_consumed(to_consume))
+        end
     end
 
-    -- reduce consumable bar count or remove from bar
-    -- invoke callbacks
+    self:play_animations({consume, message}, nil, on_finish)
 
+    -- invoke callbacks if consumable is gone
+    if n_left <= 0 then
+        local callback_id = "on_consumable_consumed"
+        local consumable_proxy = bt.ConsumableInterface(self, holder, to_consume)
+        local holder_proxy = bt.EntityInterface(self, holder)
+
+        for status in values(self._state:list_global_statuses()) do
+            if status[callback_id] ~= nil then
+                local self_proxy = bt.GlobalStatusInterface(self, status)
+                self:safe_invoke(status, callback_id, self_proxy, holder_proxy, consumable_proxy)
+                self:_animate_apply_global_status(status)
+            end
+        end
+
+        for status in values(holder:list_statuses()) do
+            if status[callback_id] ~= nil then
+                local self_proxy = bt.StatusInterface(self, holder, status)
+                self:safe_invoke(status, callback_id, self_proxy, holder_proxy, consumable_proxy)
+                self:_animate_apply_status(holder, status)
+            end
+        end
+
+        for consumable in values(holder:list_consumables()) do
+            if consumable ~= to_consume and consumable[callback_id] ~= nil then
+                local self_proxy = bt.ConsumableInterface(holder, consumable)
+                self:safe_invoke(consumable, callback_id, self_proxy, holder_proxy, consumable_proxy)
+                self:_animate_apply_consumable(holder, consumable)
+            end
+        end
+    end
 end
 
 --- @brief

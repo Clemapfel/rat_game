@@ -46,7 +46,7 @@ end
 
 --- @override
 function bt.Animation.CONSUMABLE_CONSUMED:update(delta)
-    local duration = rt.settings.battle.animations.consumable_applied.duration
+    local duration = rt.settings.battle.animations.consumable_consumed.duration
     self._elapsed = self._elapsed + delta
     local fraction = self._elapsed / duration
 
@@ -85,7 +85,7 @@ function bt.Animation.CONSUMABLE_CONSUMED:update(delta)
     local sprite_h = select(2, self._aspect:get_child():measure())
     self._aspect:fit_into(
         bounds.x,
-        bounds.y + rt.continuous_step(fraction, 4) * bounds.height - sprite_h,
+        bounds.y + rt.continuous_step(fraction, 3) * (bounds.height - sprite_h) * 0.5 - sprite_h,
         bounds.width, bounds.height
     )
     return self._elapsed < duration

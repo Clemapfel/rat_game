@@ -19,6 +19,13 @@ end
 
 --- @brief
 function bt.StatusBar:add(status, elapsed)
+    meta.assert_number(elapsed)
+
+    if self._elements[status] ~= nil then
+        self:set_n_turns_elapsed(status, elapsed)
+        return
+    end
+
     local to_insert = {
         element = rt.LabeledSprite(status:get_sprite_id()),
         elapsed = elapsed
@@ -62,11 +69,45 @@ end
 
 --- @brief
 function bt.StatusBar:synchronize(entity)
-    self._box:clear()
+    local actually_present = {}
     for status in values(entity:list_statuses()) do
-        if status:get_is_silent() == false then
-            self:add(status, entity:get_status_n_turns_elapsed(status))
+        actually_present[status] = true
+    end
+
+    local currently_present = {}
+    for status in values(self._box:list_elements()) do
+        currently_present[status] = true
+    end
+
+    -- remove
+    for status in keys(currently_present) do
+        if actually_present[status] ~= true then
+            self:remove(status)
         end
+    end
+
+    -- add & update time
+    for status in keys(actually_present) do
+        local n_elapsed = entity:get_status_n_turns_elapsed(status)
+        if currently_present[status] ~= true then
+            self:add(status, n_elapsed)
+        else
+            self:set_n_turns_elapsed(status, n_elapsed)
+        end
+    end
+end
+
+--- @brief
+function bt.StatusBar:set_n_turns_elapsed(status, elapsed)
+    local current = self._elements[status]
+    if current == nil then
+        self:add(status, elapsed)
+    end
+
+    if current.elapsed ~= elapsed then
+        self._box:activate(status, function(sprite)
+            sprite:set_label(self:_format_elapsed(status, elapsed))
+        end)
     end
 end
 

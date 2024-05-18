@@ -64,6 +64,7 @@ function rt.OrderedBox:add(id, element)
         target_scale = 1,
         current_scale = 1,
         is_scaling = false,
+        on_scaling_peak = nil, -- function
         is_removing = false
     }
 
@@ -161,6 +162,9 @@ function rt.OrderedBox:update(delta)
             if current == target then
                 entry.target_scale = 1
                 entry.is_scaling = false
+                if entry.on_scaling_peak ~= nil then
+                    entry.on_scaling_peak(entry.element)
+                end
             end
         end
     end
@@ -294,14 +298,16 @@ function rt.OrderedBox:remove(id)
 end
 
 --- @brief
-function rt.OrderedBox:activate(id)
+--- @param on_peak Function invoked when activate peak is reached
+function rt.OrderedBox:activate(id, on_peak)
     local element = self._entries[id]
     if element == nil then
         rt.warning("In rt.OrderedBox.activate: no element with id `" .. serialize(id) .. "`")
         return
     end
 
-    element.is_activating = true
+    element.is_scaling = true
+    element.on_scaling_peak = on_peak
     element.target_scale = rt.settings.ordered_box.max_scale
 end
 
