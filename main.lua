@@ -10,25 +10,10 @@ set_consumable_n_left
 activate_consumable
 ]]--
 
-
-local box = rt.OrderedBox()
-box:realize()
-
-for which in range(
-    bt.Consumable("DEBUG_CONSUMABLE"),
-    bt.Status("DEBUG_STATUS"),
-    bt.GlobalStatus("DEBUG_GLOBAL_STATUS")
-) do
-    local sprite = rt.LabeledSprite(which:get_sprite_id())
-    sprite:set_label("<o>0" .. rt.random.integer(0, 1) .. "</o>")
-    sprite:realize()
-    box:add(which, sprite)
-end
-
-box:fit_into(50, 50, 100, 50)
-box:set_orientation(rt.Orientation.HORIZONTAL)
-box:set_alignment(rt.Alignment.END)
-
+status_bar = bt.GlobalStatusBar()
+status_bar:add(bt.GlobalStatus("DEBUG_GLOBAL_STATUS"), 0)
+status_bar:realize()
+status_bar:fit_into(50, 50, 200, 200)
 
 battle = bt.Battle("DEBUG_BATTLE")
 scene:set_background("EYE")
@@ -37,8 +22,9 @@ scene:set_background("EYE")
 input_controller = rt.InputController()
 input_controller:signal_connect("pressed", function(self, which)
     if which == rt.InputButton.A then
-        scene:remove_status(battle.entities[1], bt.Status("DEBUG_STATUS"))
+        --scene:remove_status(battle.entities[1], bt.Status("DEBUG_STATUS"))
         --scene:use_move(battle.entities[1], bt.Move("DEBUG_MOVE"))
+        status_bar:activate(bt.GlobalStatus("DEBUG_GLOBAL_STATUS"))
     elseif which == rt.InputButton.B then
         scene:skip()
     elseif which == rt.InputButton.X then
@@ -101,9 +87,10 @@ love.draw = function()
         love.graphics.line(x + (1 - 3/16) * width, y, x + (1 - 3/16) * width, y + height)
         love.graphics.line(x, y + 0.5 * height, x + width, y + 0.5 * height)
         love.graphics.line(x + 0.5 * width, y, x + 0.5 * width, height)
+        rt.graphics.set_blend_mode()
     end
 
-    box:draw()
+    status_bar:draw()
 
     love.graphics.reset()
 end
@@ -114,7 +101,7 @@ love.update = function(delta)
         rt.current_scene:update(delta)
     end
 
-    box:update(delta)
+    status_bar:update(delta)
 end
 
 love.resize = function()

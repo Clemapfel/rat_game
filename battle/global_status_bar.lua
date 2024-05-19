@@ -1,14 +1,15 @@
---- @class bt.StatusBar
-bt.StatusBar = meta.new_type("StatusBar", rt.Widget, rt.Animation, function()
-    return meta.new(bt.StatusBar, {
+--- @class bt.GlobalStatusBar
+bt.GlobalStatusBar = meta.new_type("GlobalStatusBar", rt.Widget, rt.Animation, function()
+    return meta.new(bt.GlobalStatusBar, {
         _elements = {}, -- Table<cf. add>
         _box = rt.OrderedBox(),
+        _frame = bt.GradientFrame(),
         _opacity = 1,
     })
 end)
 
 --- @brief [internal]
-function bt.StatusBar:_format_elapsed(status, elapsed)
+function bt.GlobalStatusBar:_format_elapsed(status, elapsed)
     local max = status:get_max_duration()
     if max == POSITIVE_INFINITY then
         return ""
@@ -18,7 +19,7 @@ function bt.StatusBar:_format_elapsed(status, elapsed)
 end
 
 --- @brief
-function bt.StatusBar:add(status, elapsed)
+function bt.GlobalStatusBar:add(status, elapsed)
     meta.assert_number(elapsed)
 
     if self._elements[status] ~= nil then
@@ -27,6 +28,7 @@ function bt.StatusBar:add(status, elapsed)
     end
 
     local to_insert = {
+        status = status,
         element = rt.LabeledSprite(status:get_sprite_id()),
         elapsed = elapsed
     }
@@ -41,10 +43,10 @@ function bt.StatusBar:add(status, elapsed)
 end
 
 --- @brief
-function bt.StatusBar:remove(status)
+function bt.GlobalStatusBar:remove(status)
     local entry = self._elements[status]
     if entry == nil then
-        rt.warning("In bt.StatusBar.remove: trying to remove status `" .. status:get_id() .. "`, but status is not present in status bar")
+        rt.warning("In bt.GlobalStatusBar.remove: trying to remove status `" .. status:get_id() .. "`, but status is not present in status bar")
         return
     end
 
@@ -55,10 +57,10 @@ function bt.StatusBar:remove(status)
 end
 
 --- @brief
-function bt.StatusBar:activate(status)
+function bt.GlobalStatusBar:activate(status)
     local entry = self._elements[status]
     if entry == nil then
-        rt.warning("In bt.StatusBar.activate: trying to activate status `" .. status:get_id() .. "`, but status is not present in status bar")
+        rt.warning("In bt.GlobalStatusBar.activate: trying to activate status `" .. status:get_id() .. "`, but status is not present in status bar")
         return
     end
 
@@ -68,7 +70,7 @@ function bt.StatusBar:activate(status)
 end
 
 --- @brief
-function bt.StatusBar:synchronize(entity)
+function bt.GlobalStatusBar:synchronize(entity)
     local actually_present = {}
     for status in values(entity:list_statuses()) do
         actually_present[status] = true
@@ -98,12 +100,12 @@ function bt.StatusBar:synchronize(entity)
 end
 
 --- @brief
-function bt.StatusBar:skip()
+function bt.GlobalStatusBar:skip()
     self:update(60) -- finish all animations
 end
 
 --- @brief
-function bt.StatusBar:set_n_turns_elapsed(status, elapsed)
+function bt.GlobalStatusBar:set_n_turns_elapsed(status, elapsed)
     local current = self._elements[status]
     if current == nil then
         self:add(status, elapsed)
@@ -117,7 +119,7 @@ function bt.StatusBar:set_n_turns_elapsed(status, elapsed)
 end
 
 --- @override
-function bt.StatusBar:realize()
+function bt.GlobalStatusBar:realize()
     if self._is_realized == true then return end
     self._is_realized = true
     self._box:realize()
@@ -126,27 +128,31 @@ function bt.StatusBar:realize()
         entry.element:realize()
         self._box:add(status, entry.element)
     end
+
+    self._frame:realize()
 end
 
 --- @override
-function bt.StatusBar:update(delta)
+function bt.GlobalStatusBar:update(delta)
     if self._is_realized ~= true then return end
     self._box:update(delta)
 end
 
 --- @override
-function bt.StatusBar:size_allocate(x, y, width, height)
+function bt.GlobalStatusBar:size_allocate(x, y, width, height)
     if self._is_realized ~= true then return end
     self._box:fit_into(x, y, width, height)
+    self._frame:fit_into(x, y, width, height)
 end
 
 --- @override
-function bt.StatusBar:draw()
+function bt.GlobalStatusBar:draw()
     if self._is_realized ~= true then return end
+    self._frame:draw()
     self._box:draw()
 end
 
 --- @brief
-function bt.StatusBar:set_alignment(alignment)
+function bt.GlobalStatusBar:set_alignment(alignment)
     self._box:set_alignment(alignment)
 end

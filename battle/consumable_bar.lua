@@ -122,9 +122,9 @@ function bt.ConsumableBar:realize()
     self._is_realized = true
     self._box:realize()
 
-    for entry in values(self._elements) do
+    for consumable, entry in pairs(self._elements) do
         entry.element:realize()
-        self._box:add(entry.element)
+        self._box:add(consumable, entry.element)
     end
 end
 
