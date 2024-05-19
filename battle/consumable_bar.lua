@@ -98,6 +98,11 @@ function bt.ConsumableBar:synchronize(entity)
 end
 
 --- @brief
+function bt.ConsumableBar:skip()
+    self:update(60) -- finish all animations
+end
+
+--- @brief
 function bt.ConsumableBar:set_n_consumed(consumable, n_consumed)
     local current = self._elements[consumable]
     if current == nil then

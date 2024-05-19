@@ -445,11 +445,11 @@ end
 
 --- @brief
 --- @return Boolean true if move is depleted, false otherwise
-function bt.Entity:consume_move(move)
+function bt.Entity:reduce_move_n_uses(move)
     local entry = self.moves[move:get_id()]
     if entry == nil then
         rt.warning("In bt.Entity:consume_move: entity `" .. self:get_id() .. "` does not have move `" .. move:get_id() .. "` equipped")
-        return false
+        return true
     else
         entry.n_uses = entry.n_uses - 1
         return entry.n_uses <= 0

@@ -32,6 +32,15 @@ function bt.BattleSprite:synchronize(entity)
 end
 
 --- @brief
+function bt.BattleSprite:skip(entity)
+    if self._is_realized ~= true then return end
+    self._health_bar:skip()
+    self._speed_value:skip()
+    self._status_bar:skip()
+    self._consumable_bar:skip()
+end
+
+--- @brief
 function bt.BattleSprite:draw()
     if self._ui_is_visible == true then
         self._health_bar:draw()
@@ -60,7 +69,6 @@ end
 function bt.BattleSprite:remove_status(status)
     self._status_bar:remove(status)
 end
-
 
 --- @brief
 function bt.BattleSprite:activate_status(status)

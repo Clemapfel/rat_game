@@ -57,6 +57,9 @@ end, {
 
     state = bt.BattleEntityState.ALIVE,
 
+    max_n_uses = POSITIVE_INFINITY,
+    restore_uses_after_battle = true,
+
     -- non simulation
     sprite_id = "",
     sprite_index = 1,

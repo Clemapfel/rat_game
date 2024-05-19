@@ -333,11 +333,11 @@ function bt.BattleUI:skip()
     self._priority_queue:skip()
 
     for sprite in values(self._enemy_sprites) do
-        sprite:synchronize(sprite:get_entity())
+        sprite:skip()
     end
 
     for sprite in values(self._party_sprites) do
-        sprite:synchronize(sprite:get_entity())
+        sprite:skip()
     end
 end
 

@@ -98,6 +98,11 @@ function bt.StatusBar:synchronize(entity)
 end
 
 --- @brief
+function bt.StatusBar:skip()
+    self:update(60) -- finish all animations
+end
+
+--- @brief
 function bt.StatusBar:set_n_turns_elapsed(status, elapsed)
     local current = self._elements[status]
     if current == nil then

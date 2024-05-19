@@ -23,11 +23,9 @@ end, {
     max_n_uses = POSITIVE_INFINITY,
 
     can_target_multiple = false,
-
     can_target_self = false,
     can_target_enemy = false,
     can_target_ally = false,
-    -- targets_field = not (can_target_self or can_target_enemy or can_target_ally)
 
     priority = 0,
 
@@ -131,3 +129,44 @@ end
 function bt.Move:get_priority()
     return self.priority
 end
+
+
+--[[
+self    enemy   ally
+1       0       0       SELF
+1       1       0       SELF_AND_ENEMY
+1       0       1       SELF_AND_ALLY
+1       1       1       SELF_AND_ALLY_AND_ENEMY
+0       0       0       FIELD
+0       1       0       ENEMY
+0       0       1       ALLY
+0       1       1       ENEMY_AND_ALLY
+1       1       1       SELF_AND_ENEMY_AND_ALLY
+
+bt.PossibleTargets = meta.new_enum({
+    -- single
+    SELF = "SELF",
+    ENEMY = "ENEMY",
+    ALLY = "ALLY",
+    -- multiple
+    ALLIES = "SELF_AND_ALLIES",
+    ENEMIES = "SELF_AND_ENEMIES",
+    SELF_AND_ALLIES = "SELF_AND_ALLIES",
+    SELF_AND_ENEMIES = "SELF_AND_ENEMIES",
+    ALLIES_AND_ENEMIES = "ALLIES_AND_ENEMIES",
+    ALL = "ALL",
+    -- nobody
+    FIELD = "FIELD"
+})
+
+bt.SELF = bt.PossibleTargets.SELF
+bt.ENEMY = bt.PossibleTargets.ENEMY
+bt.ALLY = bt.PossibleTargets.ALLY
+bt.ALLIES = bt.PossibleTargets.SELF_AND_ALLIES
+bt.ENEMIES = bt.PossibleTargets.SELF_AND_ENEMIES
+bt.SELF_AND_ALLIES = bt.PossibleTargets.SELF_AND_ALLIES
+bt.SELF_AND_ENEMIES = bt.PossibleTargets.SELF_AND_ENEMIES
+bt.ALLIES_AND_ENEMIES = bt.PossibleTargets.ALLIES_AND_ENEMIES
+bt.ALL = bt.PossibleTargets.ALL
+bt.FIELD = bt.PossibleTargets.FIELD
+]]--

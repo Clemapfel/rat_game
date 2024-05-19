@@ -565,6 +565,7 @@ function bt.Scene:remove_status(entity, to_remove)
     local afflicted_proxy = bt.EntityInterface(self, entity)
     local new_status_proxy = bt.StatusInterface(self, entity, to_remove)
 
+    --[[
     for status in values(self._state:list_global_statuses()) do
         if status[callback_id] ~= nil then
             local self_proxy = bt.GlobalStatusInterface(self, status)
@@ -591,6 +592,7 @@ function bt.Scene:remove_status(entity, to_remove)
             self:_animate_apply_consumable(entity, consumable)
         end
     end
+    ]]--
 end
 
 --- @brief
@@ -625,9 +627,6 @@ function bt.Scene:knock_out(entity)
         local on_start = function()
             local sprite = self._ui:get_sprite(entity)
             sprite:set_hp(0, entity:get_hp_base())
-            for status in values(status_before) do
-                sprite:remove_status(status)
-            end
             self._ui:set_state(entity, bt.EntityState.KNOCKED_OUT)
         end
         self:play_animations({knock_out, message}, on_start)
@@ -660,6 +659,14 @@ function bt.Scene:knock_out(entity)
             self:_animate_apply_consumable(entity, consumable)
         end
     end
+
+    -- clear sprite statuses bar after callbacks
+    local on_start = function()
+        for status in values(status_before) do
+            self._ui:get_sprite(entity):remove_status(status)
+        end
+    end
+    self:play_animations({bt.Animation.DELAY(0.5)}, on_start) -- delay to make status removal obvious
 end
 
 --- @brief
@@ -703,7 +710,6 @@ function bt.Scene:help_up(entity)
     end
 
     -- no callbacks for self.status, because being knocked out always clears all statuses
-
     for consumable in values(entity:list_consumables()) do
         if consumable[callback_id] ~= nil then
             local self_proxy = bt.ConsumableInterface(self, entity, consumable)
@@ -924,8 +930,283 @@ function bt.Scene:consume(holder, to_consume)
 end
 
 --- @brief
-function bt.Scene:use_move()
-    -- TODO
+function bt.Scene:increase_hp(entity, value)
+    meta.assert_number(value)
+    value = math.ceil(value)
+
+    -- only allow positive hp gain
+    if value == 0 then
+        return
+    elseif value < 0 then
+        self:reduce_hp(entity, math.abs(value))
+    end
+
+    -- fizzle on dead
+    if entity:get_is_dead() then
+        return
+    end
+
+    -- revive if knocked out
+    if entity:get_is_knocked_out() then
+        self:help_up(entity)
+        -- continue
+    end
+
+    local current = entity:get_hp()
+    local max = entity:get_hp_base()
+    local after = clamp(current + value, 1, max)
+    local offset = math.abs(after - current)
+
+    -- mutate entity
+    meta.set_is_mutable(entity, true)
+    entity.hp_current = after
+    meta.set_is_mutable(entity, false)
+
+    local sprite = self._ui:get_sprite(entity)
+    local gain = bt.Animation.HP_GAINED(sprite, value)
+    local message = bt.Animation.MESSAGE(self, self:format_name(entity) .. " gained " .. "<color=LIGHT_GREEN_2><mono><b>" .. tostring(value) .. "</b></mono></color> HP")
+    local on_start = function()
+        sprite:set_hp(after, max)
+    end
+    self:play_animations({gain, message}, on_start)
+
+    if offset <= 0 then return end
+
+    -- invoke callbacks
+    local callback_id = "on_healing_received"
+    for status in values(self._state:list_global_statuses()) do
+        if status[callback_id] ~= nil then
+            local self_proxy = bt.GlobalStatusInterface(self, status)
+            local healed_proxy = bt.EntityInterface(self, entity)
+            self:safe_invoke(status, callback_id, self_proxy, healed_proxy, value)
+            self:_animate_apply_global_status(status)
+        end
+    end
+
+    for status in values(entity:list_statuses()) do
+        if status[callback_id] ~= nil then
+            local self_proxy = bt.StatusInterface(self, entity, status)
+            local healed_proxy = bt.EntityInterface(self, entity)
+            self:safe_invoke(status, callback_id, self_proxy, healed_proxy, value)
+            self:_animate_apply_status(entity, status)
+        end
+    end
+
+    for consumable in values(entity:list_consumables()) do
+        if consumable[callback_id] ~= nil then
+            local self_proxy = bt.ConsumableInterface(self, entity, consumable)
+            local holder_proxy = bt.EntityInterface(self, entity)
+            self:safe_invoke(consumable, callback_id, self_proxy, holder_proxy, value)
+            self:_animate_apply_consumable(entity, consumable)
+        end
+    end
+
+    callback_id = "on_healing_performed"
+    local move_user = self._state:get_current_move_user()
+    if move_user ~= nil then
+        for status in values(self._state:list_global_statuses()) do
+            if status[callback_id] ~= nil then
+                local self_proxy = bt.GlobalStatusInterface(self, status)
+                local performer_proxy = bt.EntityInterface(self, move_user)
+                local receiver_proxy = bt.EntityInterface(self, entity)
+                self:safe_invoke(status, callback_id, self_proxy, performer_proxy, receiver_proxy, value)
+                self:_animate_apply_global_status(status)
+            end
+        end
+
+        for status in values(move_user:list_statuses()) do
+            if status[callback_id] ~= nil then
+                local self_proxy = bt.StatusInterface(self, move_user, status)
+                local afflicted_proxy = bt.EntityInterface(self, move_user)
+                local receiver_proxy = bt.EntityInterface(self, entity)
+                self:safe_invoke(status, callback_id, self_proxy, afflicted_proxy, receiver_proxy, value)
+                self:_animate_apply_status(move_user, status)
+            end
+        end
+
+        for consumable in values(move_user:list_consumables()) do
+            if consumable[callback_id] ~= nil then
+                local self_proxy = bt.ConsumableInterface(self, move_user, consumable)
+                local holder_proxy = bt.EntityInterface(self, move_user)
+                local receiver_proxy = bt.EntityInterface(self, entity)
+                self:safe_invoke(consumable, callback_id, self_proxy, holder_proxy, receiver_proxy, value)
+                self:_animate_apply_consumable(move_user, consumable)
+            end
+        end
+    end
+end
+
+--- @brief
+function bt.Scene:reduce_hp(entity, value)
+    meta.assert_number(value)
+    value = math.floor(value)
+
+    -- only allow hp loss
+    if value == 0 then
+        return
+    elseif value < 0 then
+        self:add_hp(entity, math.abs(value))
+    end
+
+    -- fizzle on death
+    if entity:get_is_dead() then return end
+
+    -- kill if knocked out
+    if entity:get_is_knocked_out() then
+        self:kill(entity)
+        return
+    end
+
+    local current = entity:get_hp()
+    local after = clamp(current - value, 0)
+    local offset = current - after
+
+    meta.set_is_mutable(entity, true)
+    entity.hp_current = after
+    meta.set_is_mutable(entity, false)
+
+    -- animation
+    local sprite = self._ui:get_sprite(entity)
+    local lost = bt.Animation.HP_LOST(sprite, value)
+    local message = bt.Animation.MESSAGE(self, self:format_name(entity) .. " lost " .. "<color=RED><mono><b>" .. tostring(value) .. "</b></mono></color> HP")
+    local on_start = function()
+        sprite:set_hp(after)
+    end
+
+    self:play_animations({lost, message}, on_start)
+
+    -- invoke damage taken callbacks
+    local callback_id = "on_damage_taken"
+    for status in values(self._state:list_global_statuses()) do
+        if status[callback_id] ~= nil then
+            local self_proxy = bt.GlobalStatusInterface(self, status)
+            local healed_proxy = bt.EntityInterface(self, entity)
+            self:safe_invoke(status, callback_id, self_proxy, healed_proxy, value)
+            self:_animate_apply_global_status(status)
+        end
+    end
+
+    for status in values(entity:list_statuses()) do
+        if status[callback_id] ~= nil then
+            local self_proxy = bt.StatusInterface(self, entity, status)
+            local healed_proxy = bt.EntityInterface(self, entity)
+            self:safe_invoke(status, callback_id, self_proxy, healed_proxy, value)
+            self:_animate_apply_status(entity, status)
+        end
+    end
+
+    for consumable in values(entity:list_consumables()) do
+        if consumable[callback_id] ~= nil then
+            local self_proxy = bt.ConsumableInterface(self, entity, consumable)
+            local holder_proxy = bt.EntityInterface(self, entity)
+            self:safe_invoke(consumable, callback_id, self_proxy, holder_proxy, value)
+            self:_animate_apply_consumable(entity, consumable)
+        end
+    end
+
+    callback_id = "on_damage_dealt"
+    local move_user = self._state:get_current_move_user()
+    if move_user ~= nil then
+        for status in values(self._state:list_global_statuses()) do
+            if status[callback_id] ~= nil then
+                local self_proxy = bt.GlobalStatusInterface(self, status)
+                local performer_proxy = bt.EntityInterface(self, move_user)
+                local receiver_proxy = bt.EntityInterface(self, entity)
+                self:safe_invoke(status, callback_id, self_proxy, performer_proxy, receiver_proxy, value)
+                self:_animate_apply_global_status(status)
+            end
+        end
+
+        for status in values(move_user:list_statuses()) do
+            if status[callback_id] ~= nil then
+                local self_proxy = bt.StatusInterface(self, move_user, status)
+                local afflicted_proxy = bt.EntityInterface(self, move_user)
+                local receiver_proxy = bt.EntityInterface(self, entity)
+                self:safe_invoke(status, callback_id, self_proxy, afflicted_proxy, receiver_proxy, value)
+                self:_animate_apply_status(move_user, status)
+            end
+        end
+
+        for consumable in values(move_user:list_consumables()) do
+            if consumable[callback_id] ~= nil then
+                local self_proxy = bt.ConsumableInterface(self, move_user, consumable)
+                local holder_proxy = bt.EntityInterface(self, move_user)
+                local receiver_proxy = bt.EntityInterface(self, entity)
+                self:safe_invoke(consumable, callback_id, self_proxy, holder_proxy, receiver_proxy, value)
+                self:_animate_apply_consumable(move_user, consumable)
+            end
+        end
+    end
+
+    if after <= 0 then
+        self:knock_out(entity)
+    end
+end
+
+--- @brief
+function bt.Scene:use_move(user, move, targets)
+    if meta.isa(targets, bt.Entity) then
+        targets = { targets }
+    end
+
+    -- if stunned, fizzle
+    if user:get_is_stunned() == true then
+        local stunned = bt.Animation.STUNNED(self._ui:get_sprite(user))
+        local message = bt.Animation.MESSAGE(self, self:format_name(user) .. " is stunned")
+        self:play_animations({stunned, message})
+        return
+    end
+
+    -- make current move, reduce n uses
+    local depleted = user:reduce_move_n_uses(move)
+
+    -- animation
+    local animations = {}
+    for target in values(targets) do
+        -- TODO: use move-specific animation instead of placeholder
+        table.insert(animations, bt.Animation.MOVE(self._ui:get_sprite(target), move))
+    end
+
+    table.insert(animations, bt.Animation.MESSAGE(self, self:format_name(user) .. " used " .. self:format_name(move) .. "!"))
+    self:play_animations(animations)
+
+    -- invoke effect
+    local move_proxy = bt.MoveInterface(self, move)
+    local user_proxy = bt.EntityInterface(self, user)
+    local target_proxies = {}
+    for target in values(targets) do
+        table.insert(target_proxies, bt.EntityInterface(self, target))
+    end
+
+    self._state:set_current_move_selection(user, move, targets)
+    self:safe_invoke(move, "effect", move_proxy, user_proxy, target_proxies)
+    self._state:reset_current_move_selection()
+
+    -- callbacks
+    local callback_id = "on_move_used"
+    for status in values(self._state:list_global_statuses()) do
+        if status[callback_id] ~= nil then
+            local self_proxy = bt.GlobalStatusInterface(self, status)
+            self:safe_invoke(status, callback_id, self_proxy, user_proxy, move_proxy, target_proxies)
+            self:_animate_apply_global_status(status)
+        end
+    end
+
+    for status in values(user:list_statuses()) do
+        if status[callback_id] ~= nil then
+            local self_proxy = bt.StatusInterface(self, user, status)
+            self:safe_invoke(status, callback_id, self_proxy, user_proxy, move_proxy, target_proxies)
+            self:_animate_apply_status(user, status)
+        end
+    end
+
+    for consumable in values(user:list_consumables()) do
+        if consumable[callback_id] ~= nil then
+            local self_proxy = bt.ConsumableInterface(self, user, consumable)
+            self:safe_invoke(consumable, callback_id, self_proxy, user_proxy, move_proxy, target_proxies)
+            self:_animate_apply_consumable(user, consumable)
+        end
+    end
 end
 
 --- @brief

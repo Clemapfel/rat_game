@@ -9,6 +9,7 @@ rt.NEGATIVE_FLOAT = "Float <= 0"
 rt.STRING = "String"
 rt.BOOLEAN = "Boolean"
 rt.FUNCTION = "Function"
+rt.TABLE = "Table"
 
 --[[
 Template Syntax:

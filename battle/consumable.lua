@@ -20,6 +20,7 @@ bt.Consumable = meta.new_type("Consumable", function(id)
     return out
 end, {
     max_n_uses = POSITIVE_INFINITY,
+    restore_uses_after_battle = false,
 
     on_turn_start = function(self, holder)
         meta.assert_consumable_interface(self)

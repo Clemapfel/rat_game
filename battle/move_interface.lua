@@ -12,7 +12,7 @@ function bt.MoveInterface(scene, move)
     metatable.original = move
 
     self.get_id = function(self)
-        return getmetatable(self).orignal:get_id()
+        return getmetatable(self).original:get_id()
     end
 
     self.get_name = function(self)

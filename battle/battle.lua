@@ -259,3 +259,105 @@ function bt.Battle:swap(left_i, right_i)
     self.entities[right_i] = left
     self.entities[left_i] = right
 end
+
+
+--- @brief
+function bt.Battle:clear_current_move_selection()
+    self.current_move_selection_before = self.current_move_selection
+    self.current_move_selection = {
+        user = nil,
+        move = nil,
+        targets = {}
+    }
+end
+
+--- @brief
+function bt.Battle:restore_current_move_selection()
+    self.current_move_selection = self.current_move_selection_before
+    self.current_move_selection_before  = {
+        user = nil,
+        move = nil,
+        targets = {}
+    }
+end
+
+--- @brief
+function bt.Battle:set_current_move_selection(user, move, targets)
+    self.current_move_selection.user = user
+    self.current_move_selection.move = move
+    table.clear(self.current_move_selection.targets)
+    while #self.current_move_selection.targets > 0 do
+        table.remove(self.current_move_selection.targets)
+    end
+    for entity in values(targets) do
+        table.insert(self.current_move_selection.targets, entity)
+    end
+end
+
+--- @brief
+function bt.Battle:reset_current_move_selection()
+    self:set_current_move_selection(nil, nil, {})
+end
+
+--- @brief
+function bt.Battle:get_current_move_user()
+    return self.current_move_selection.user
+end
+
+--- @brief
+function bt.Battle:get_current_move_targets()
+    return self.current_move_selection.targets
+end
+
+--- @brief
+function bt.Battle:get_current_move()
+    return self.current_move_selection.move
+end
+
+--- @brief
+--- @return Table<Table<Entity>>, all possible sets
+function bt.Battle:get_possible_targets(user, move)
+    local targets = {}
+
+    local function is_enemy(other)
+        return other:get_is_enemy() ~= user:get_is_enemy()
+    end
+
+    local function is_ally(other)
+        return other:get_is_enemy() == user:get_is_enemy()
+    end
+
+    local me, enemies, allies = move.can_target_self, move.can_target_enemy, move.can_target_ally
+
+    -- targets field
+    if me == false and enemies == false and allies == false then
+        return targets
+    end
+
+    -- targets entities
+    if move.can_target_multiple == false then
+        for entity in values(self:list_entities()) do
+            if entity == user and me then
+                table.insert(targets, {entity})
+            elseif is_enemy(entity) and enemies then
+                table.insert(targets, {entity})
+            elseif is_ally(entity) and allies then
+                table.insert(targets, {entity})
+            end
+        end
+    else
+        local to_insert = {}
+        for entity in values(self:list_entities()) do
+            if entity == user and me then
+                table.insert(to_insert, {entity})
+            elseif is_enemy(entity) and enemies then
+                table.insert(to_insert, {entity})
+            elseif is_ally(entity) and allies then
+                table.insert(to_insert, {entity})
+            end
+        end
+        table.insert(targets, to_insert)
+    end
+
+    return targets
+end

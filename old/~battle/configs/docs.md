@@ -278,7 +278,7 @@ Consumable {
     id = "CONSUMABLE_ID",        -- const String
     name = "Example Consumable", -- const String
     max_n_uses = POSITIVE_INFINITY,   -- const Unsigned
-    is_silent = false,                -- const Boolean
+    restore_uses_after_battle = true, -- const Boolean
     
     description = "<no description>",   -- String
     sprite_id = "",     -- String
@@ -432,6 +432,7 @@ Move {
     name = "Example Move", -- const String
 
     max_n_uses = POSITIVE_INFINITY, -- const Unsigned
+    restore_uses_after_battle = true,   -- const Boolean
 
     can_target_multiple = false, -- const Boolean
     can_target_self = true,      -- const Boolean

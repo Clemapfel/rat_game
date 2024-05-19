@@ -91,6 +91,12 @@ function bt.SpeedValue:synchronize(entity)
 end
 
 --- @brief
+function bt.SpeedValue:skip()
+    self._speed_current = self._speed_target
+    self._speed_label:set_text(self:_format_value())
+end
+
+--- @brief
 function bt.SpeedValue:set_opacity(alpha)
     self._speed_label:set_opacity(alpha)
 end

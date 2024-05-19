@@ -161,7 +161,7 @@ end, {
     end,
 
     -- (GlobalStatusInterface, EntityInterface, MoveInterface, Table<EntityInterface>) -> nil
-    on_move_used= function(self, move_user, move, targets)
+    on_move_used = function(self, move_user, move, targets)
         meta.assert_global_status_interface(self)
         meta.assert_entity_interface(move_user)
         meta.assert_move_interface(move)

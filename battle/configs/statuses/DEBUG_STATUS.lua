@@ -27,7 +27,7 @@ return {
     on_lost = function(self, afflicted)
         meta.assert_status_interface(self)
         meta.assert_entity_interface(afflicted)
-        println("[DBG] In " .. self.id .. ".on_gained: " .. afflicted.id .. " gained self")
+        println("[DBG] In " .. self.id .. ".on_lost: " .. afflicted.id .. " gained self")
         return nil
     end,
 
