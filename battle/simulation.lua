@@ -359,6 +359,11 @@ function bt.Scene:remove_global_status(to_remove)
         self:_animate_apply_global_status(to_remove)
     end
 
+    -- delay ui removal until after callbacks are invoked
+    self:play_animations({bt.Animation.DELAY(0.2)}, function()
+        self._ui:remove_global_status(to_remove)
+    end)
+
     -- invoke on_global_status_gained for all global statuses, statuses, and consumables
     callback_id = "on_global_status_lost"
 
@@ -402,11 +407,6 @@ function bt.Scene:remove_global_status(to_remove)
             end
         end
     end
-
-    -- delay ui removal until after callbacks are invoked
-    self:play_animations({bt.Animation.DELAY(0.2)}, function()
-        self._ui:remove_global_status(to_remove)
-    end)
 end
 
 --- @brief
