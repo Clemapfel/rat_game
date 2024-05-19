@@ -41,7 +41,7 @@ function bt.GradientFrame:size_allocate(x, y, width, height)
     self._frame_outline:set_line_width(frame_outline_thickness)
     local total_frame_thickness = frame_thickness + frame_outline_thickness
 
-    local backdrop_bounds = rt.AABB(x, y, width, y + height)
+    local backdrop_bounds = rt.AABB(x, y, width, height)
     self._backdrop:resize(backdrop_bounds)
 
     local frame_aabb = rt.AABB(backdrop_bounds.x, backdrop_bounds.y, backdrop_bounds.width, backdrop_bounds.height)
@@ -69,11 +69,27 @@ end
 
 --- @brief
 function bt.GradientFrame:set_color(frame_color, backdrop_color)
-    self._frame_color = frame_color
-    self._backdrop_color = backdrop_color
+    self._frame_color = which(frame_color, self._frame_color)
+    self._backdrop_color = which(backdrop_color, self._backdrop_color)
 
     if self._is_realized then
         self._frame:set_color(frame_color)
         self._backdrop:set_color(backdrop_color)
     end
+end
+
+--- @brief
+function bt.GradientFrame:set_opacity(alpha)
+    self._opacity = alpha
+    self._backdrop:set_opacity(alpha)
+    self._frame:set_opacity(alpha)
+    self._frame_outline:set_opacity(alpha)
+    self._frame_gradient:set_opacity(alpha)
+end
+
+--- @brief
+function bt.GradientFrame:get_frame_thickness()
+    local frame_thickness = rt.settings.battle.priority_queue_element.frame_thickness
+    local frame_outline_thickness = math.max(frame_thickness * 1.1, frame_thickness + 2)
+    return frame_thickness + frame_outline_thickness
 end

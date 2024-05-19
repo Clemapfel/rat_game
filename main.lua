@@ -11,9 +11,9 @@ activate_consumable
 ]]--
 
 status_bar = bt.GlobalStatusBar()
-status_bar:add(bt.GlobalStatus("DEBUG_GLOBAL_STATUS"), 0)
+
 status_bar:realize()
-status_bar:fit_into(50, 50, 200, 200)
+status_bar:fit_into(0, 200, 200, 200)
 
 battle = bt.Battle("DEBUG_BATTLE")
 scene:set_background("EYE")
@@ -22,13 +22,11 @@ scene:set_background("EYE")
 input_controller = rt.InputController()
 input_controller:signal_connect("pressed", function(self, which)
     if which == rt.InputButton.A then
-        --scene:remove_status(battle.entities[1], bt.Status("DEBUG_STATUS"))
-        --scene:use_move(battle.entities[1], bt.Move("DEBUG_MOVE"))
-        status_bar:activate(bt.GlobalStatus("DEBUG_GLOBAL_STATUS"))
+        scene:add_global_status(bt.GlobalStatus("DEBUG_GLOBAL_STATUS"))
     elseif which == rt.InputButton.B then
         scene:skip()
     elseif which == rt.InputButton.X then
-        scene:add_status(battle.entities[1], bt.Status("DEBUG_STATUS"))
+        scene:remove_global_status(bt.GlobalStatus("DEBUG_GLOBAL_STATUS"))
     elseif which == rt.InputButton.Y then
         scene:remove_status(battle.entities[1], bt.Status("DEBUG_STATUS"))
     elseif which == rt.InputButton.L then
@@ -101,7 +99,6 @@ love.update = function(delta)
         rt.current_scene:update(delta)
     end
 
-    status_bar:update(delta)
 end
 
 love.resize = function()

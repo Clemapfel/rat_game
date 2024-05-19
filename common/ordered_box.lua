@@ -41,7 +41,9 @@ rt.OrderedBox = meta.new_type("OrderedBox", rt.Widget, rt.Animation, function()
         _orientation = rt.Orientation.HORIZONTAL,
         _alignment = rt.Alignment.START,
         _alignment_x_offset = 0,
-        _alignment_y_offset = 0
+        _alignment_y_offset = 0,
+        _true_width = 0,
+        _true_height = 0
     })
 end)
 
@@ -65,6 +67,7 @@ function rt.OrderedBox:add(id, element)
         current_scale = 1,
         is_scaling = false,
         on_scaling_peak = nil, -- function
+        on_removing_done = nil,
         is_removing = false
     }
 
@@ -176,6 +179,10 @@ function rt.OrderedBox:update(delta)
 
     for id in values(to_remove) do
         table.remove(self._order, id[1])
+        local entry = self._entries[id[2]]
+        if entry.on_removing_done ~= nil then
+            entry.on_removing_done(entry.element)
+        end
         self._entries[id[2]] = nil
         should_reformat = true
     end
@@ -202,6 +209,8 @@ function rt.OrderedBox:size_allocate(x, y, width, height)
         total_h = total_h + h
         n = n + 1
     end
+
+    self._true_width, self._true_height = total_w, total_h
 
     local m = (width - total_w) / (n - 1)
 
@@ -286,7 +295,7 @@ function rt.OrderedBox:draw()
 end
 
 --- @brief
-function rt.OrderedBox:remove(id)
+function rt.OrderedBox:remove(id, on_remove)
     local element = self._entries[id]
     if element == nil then
         rt.warning("In rt.OrderedBox.remove: no element with id `" .. serialize(id) .. "`")
@@ -295,6 +304,7 @@ function rt.OrderedBox:remove(id)
 
     element.is_removing = true
     element.target_alpha = 0
+    element.on_removing_done = on_remove
 end
 
 --- @brief
@@ -359,4 +369,14 @@ function rt.OrderedBox:clear()
     self._entries = {}
     self._order = {}
     self:reformat()
+end
+
+--- @brief
+function rt.OrderedBox:measure()
+    return self._true_width, self._true_height
+end
+
+--- @brief
+function rt.OrderedBox:is_empty()
+    return #self._order == 0
 end

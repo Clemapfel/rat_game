@@ -17,6 +17,7 @@ rt.LabeledSprite = meta.new_type("LabeledSprite", rt.Widget, function(sprite_id,
 
         _opacity = 1,
         _scale = 1,
+        _sprite_scale = 1, -- multiplier for sprite resolution
     })
 end)
 
@@ -48,22 +49,15 @@ function rt.LabeledSprite:size_allocate(x, y, width, height)
     if self._is_realized ~= true then return end
     local res_x, res_y = self._spritesheet:get_frame_size()
     local center_x, center_y = x + 0.5 * width, y + 0.5 * height
+    local scale = self._scale * self._sprite_scale
     self._shape:reformat_vertex_positions(
-        center_x - 0.5 * res_x, center_y - 0.5 * res_y,
-        center_x + 0.5 * res_x, center_y - 0.5 * res_y,
-        center_x + 0.5 * res_x, center_y + 0.5 * res_y,
-        center_x - 0.5 * res_x, center_y + 0.5 * res_y
+        center_x - 0.5 * res_x * scale, center_y - 0.5 * res_y * scale,
+        center_x + 0.5 * res_x * scale, center_y - 0.5 * res_y * scale,
+        center_x + 0.5 * res_x * scale, center_y + 0.5 * res_y * scale,
+        center_x - 0.5 * res_x * scale, center_y + 0.5 * res_y * scale
     )
 
     local label_w, label_h = self._label:measure()
-
-    --[[
-    self._label:fit_into(
-        center_x + 0.5 * res_x - 1.0 * label_w,
-        center_y + 0.5 * res_y - 1.0 * label_h,
-        POSITIVE_INFINITY, label_h
-    )
-    ]]--
 
     self._label:fit_into(
         x + width - 0.5 * label_w,
@@ -117,5 +111,12 @@ end
 
 --- @override
 function rt.LabeledSprite:measure()
-    return self._spritesheet:get_frame_size()
+    local w, h = self._spritesheet:get_frame_size()
+    return w * self._sprite_scale, h * self._sprite_scale
+end
+
+--- @brief
+function rt.LabeledSprite:set_sprite_scale(scale)
+    self._sprite_scale = scale
+    self:reformat()
 end

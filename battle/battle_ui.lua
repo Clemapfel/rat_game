@@ -10,6 +10,7 @@ bt.BattleUI = meta.new_type("BattleUI", rt.Widget, rt.Animation, function()
     return meta.new(bt.BattleUI, {
         _log = {}, -- rt.TextBox
         _priority_queue = {}, -- bt.PriorityQueue
+        _global_status_bar = {}, -- bt.GlobalStatusBar
         _entities = {},  -- Set<bt.Entity>
         _enemy_sprites = {},              -- Table<bt.EnemySprite>
         _enemy_sprite_render_order = {},  -- Queue<Number>
@@ -29,6 +30,9 @@ function bt.BattleUI:realize()
 
     self._priority_queue = bt.PriorityQueue()
     self._priority_queue:realize()
+
+    self._global_status_bar = bt.GlobalStatusBar()
+    self._global_status_bar:realize()
 
     -- gradients
     local gradient_alpha = rt.settings.battle.battle_ui.gradient_alpha
@@ -69,8 +73,7 @@ function bt.BattleUI:add_entity(entity, ...)
         end
     end
 
-    self:_reformat_party_sprites()
-    self:_reformat_enemy_sprites()
+    self:reformat()
 end
 
 --- @brief
@@ -178,18 +181,16 @@ function bt.BattleUI:size_allocate(x, y, width, height)
     local m = rt.settings.margin_unit
     self._log:set_n_visible_lines(rt.settings.battle.battle_ui.log_n_lines_default)
 
-    do
-        local m = rt.settings.margin_unit * 2
-        local mx = rt.settings.battle.priority_queue.outer_margin + rt.settings.battle.priority_queue.element_size * rt.settings.battle.priority_queue.first_element_scale_factor + m
-        local log_horizontal_margin = mx
-        local log_vertical_margin = m
-        self._log:fit_into(
-            log_horizontal_margin,
-            log_vertical_margin,
-            width - 2 * log_horizontal_margin,
-            height * 1 / 4 - log_vertical_margin
-        )
-    end
+    local m = rt.settings.margin_unit * 2
+    local mx = rt.settings.battle.priority_queue.outer_margin + rt.settings.battle.priority_queue.element_size * rt.settings.battle.priority_queue.first_element_scale_factor + m
+    local log_horizontal_margin = mx
+    local log_vertical_margin = m
+    self._log:fit_into(
+        log_horizontal_margin,
+        log_vertical_margin,
+        width - 2 * log_horizontal_margin,
+        height * 1 / 4 - log_vertical_margin
+    )
 
     self:_reformat_enemy_sprites()
     self:_reformat_party_sprites()
@@ -204,6 +205,11 @@ function bt.BattleUI:size_allocate(x, y, width, height)
         priority_queue_width,
         height
     )
+
+    local bounds = rt.AABB(0, log_vertical_margin, log_horizontal_margin, height * 1 / 4 - log_vertical_margin)
+    self._global_status_bar:fit_into(bounds)
+
+
     local gradient_width = 1 / 16 * width
     self._gradient_left:resize(0, 0, gradient_width, height)
     self._gradient_right:resize(width - gradient_width, 0, gradient_width, self._bounds.height)
@@ -231,6 +237,7 @@ function bt.BattleUI:draw()
         sprite:draw()
     end
 
+    self._global_status_bar:draw()
     self._priority_queue:draw()
     self._animation_queue:draw()
 
@@ -370,4 +377,25 @@ function bt.BattleUI:swap(entity_a, entity_b)
         self._enemy_sprites[b_i] = a
         self:_reformat_enemy_sprites()
     end
+end
+
+
+--- @brief
+function bt.BattleUI:add_global_status(global_status)
+    self._global_status_bar:add(global_status, 0)
+end
+
+--- @brief
+function bt.BattleUI:remove_global_status(global_status)
+    self._global_status_bar:remove(global_status)
+end
+
+--- @brief
+function bt.BattleUI:activate_global_status(global_status)
+    self._global_status_bar:activate(global_status)
+end
+
+--- @brief
+function bt.BattleUI:set_global_status_n_elapsed(global_status, elapsed)
+    self._global_status_bar:set_elapsed(global_status, elapsed)
 end

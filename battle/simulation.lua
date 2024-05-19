@@ -253,7 +253,10 @@ function bt.Scene:add_global_status(to_add)
     if not is_silent then
         local add = bt.Animation.GLOBAL_STATUS_GAINED(self._ui, to_add)
         local message = bt.Animation.MESSAGE(self, self:format_name(to_add) .. " is now active globally")
-        self:play_animations({add, message})
+        local on_start = function()
+            self._ui:add_global_status(to_add)
+        end
+        self:play_animations({add, message}, on_start)
     end
 
     -- invoke on_gained callbacks
@@ -399,6 +402,11 @@ function bt.Scene:remove_global_status(to_remove)
             end
         end
     end
+
+    -- delay ui removal until after callbacks are invoked
+    self:play_animations({bt.Animation.DELAY(0.2)}, function()
+        self._ui:remove_global_status(to_remove)
+    end)
 end
 
 --- @brief

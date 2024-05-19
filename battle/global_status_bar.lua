@@ -5,6 +5,10 @@ bt.GlobalStatusBar = meta.new_type("GlobalStatusBar", rt.Widget, rt.Animation, f
         _box = rt.OrderedBox(),
         _frame = bt.GradientFrame(),
         _opacity = 1,
+        _sprite_scale = 2,
+        _target_width = 0,
+        _frame_aabb = rt.AABB(0, 0, 1, 1), -- current width
+        _elapsed = 0
     })
 end)
 
@@ -28,18 +32,19 @@ function bt.GlobalStatusBar:add(status, elapsed)
     end
 
     local to_insert = {
-        status = status,
         element = rt.LabeledSprite(status:get_sprite_id()),
         elapsed = elapsed
     }
 
     to_insert.element:set_label(self:_format_elapsed(status, elapsed))
+    to_insert.element:set_sprite_scale(self._sprite_scale)
     self._elements[status] = to_insert
 
     if self._is_realized == true then
         to_insert.element:realize()
         self._box:add(status, to_insert.element)
     end
+    self:reformat()
 end
 
 --- @brief
@@ -51,9 +56,12 @@ function bt.GlobalStatusBar:remove(status)
     end
 
     if self._is_realized == true then
-        self._box:remove(status)
+        self._box:remove(status, function(element)
+            self:reformat()
+        end)
     end
     self._elements[status] = nil
+    self:reformat()
 end
 
 --- @brief
@@ -130,19 +138,52 @@ function bt.GlobalStatusBar:realize()
     end
 
     self._frame:realize()
+    self:set_is_animated(true)
 end
 
 --- @override
 function bt.GlobalStatusBar:update(delta)
     if self._is_realized ~= true then return end
-    self._box:update(delta)
+    self._elapsed = self._elapsed + delta
+
+    local should_reformat = false
+    local current, target = self._frame_aabb.width, self._target_width
+    if current ~= target then
+        local offset = rt.settings.textbox.backdrop_expand_speed * delta
+        if current < target then
+            self._frame_aabb.width = clamp(current + offset, 0, target)
+            should_reformat = true
+        elseif current > target then
+            self._frame_aabb.width = clamp(current - offset, target)
+            should_reformat = true
+        end
+    end
+
+    if should_reformat then
+        self._frame:fit_into(self._frame_aabb)
+    end
 end
+
 
 --- @override
 function bt.GlobalStatusBar:size_allocate(x, y, width, height)
     if self._is_realized ~= true then return end
-    self._box:fit_into(x, y, width, height)
-    self._frame:fit_into(x, y, width, height)
+
+    local thickness = self._frame:get_frame_thickness()
+    local m = rt.settings.margin_unit
+    local sprite_height = 32 * self._sprite_scale
+    local box_aabb = rt.AABB(x + m, y, width - 2 * m, sprite_height)
+    self._box:fit_into(box_aabb)
+
+    local box_w, box_h = self._box:measure()
+    self._frame_aabb = rt.AABB(
+        box_aabb.x - thickness - m,
+        box_aabb.y,
+        self._frame_aabb.width,
+        box_h
+    )
+    self._target_width = ternary(self._box:is_empty(), 0, box_w + 2 * m + thickness)
+    self._frame:fit_into(self._frame_aabb)
 end
 
 --- @override
@@ -155,4 +196,13 @@ end
 --- @brief
 function bt.GlobalStatusBar:set_alignment(alignment)
     self._box:set_alignment(alignment)
+end
+
+--- @override
+function bt.GlobalStatusBar:measure()
+    local w, h = self._box:measure()
+    if self._box:is_empty() then h = self._sprite_scale * 32 end
+    h = h + 2 * self._frame:get_frame_thickness()
+    w = w + 2 * self._frame:get_frame_thickness() * 2 * rt.settings.margin_unit
+    return w, h
 end
