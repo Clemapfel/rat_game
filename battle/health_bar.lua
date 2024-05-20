@@ -48,7 +48,7 @@ function bt.HealthBar:_format_hp(value, max)
 end
 
 --- @brief
-function bt.HealthBar:_update_color_from_precentage(value)
+function bt.HealthBar:_update_color_from_percentage(value)
     local settings = rt.settings.battle.health_bar
     local color
     if value < 0.01 then
@@ -141,7 +141,7 @@ function bt.HealthBar:update(delta)
 
         if diff ~= 0 then
             self:_update_value()
-            self:_update_color_from_precentage(self._hp_current / self._hp_max)
+            self:_update_color_from_percentage(self._hp_current / self._hp_max)
             self:reformat()
         end
     end
@@ -181,7 +181,7 @@ end
 function bt.HealthBar:set_state(state)
     self._state = state
     if self._is_realized == true then
-        self:_update_color_from_precentage(self._hp_current)
+        self:_update_color_from_percentage(self._hp_current)
     end
 end
 
@@ -196,7 +196,7 @@ function bt.HealthBar:synchronize(entity)
     self._label_center:set_text(center)
     self._label_right:set_text(right)
     self._level_bar:set_value(self._hp_current)
-    self:_update_color_from_precentage(self._hp_current / self._hp_max)
+    self:_update_color_from_percentage(self._hp_current / self._hp_max)
     self:_update_value()
 end
 
@@ -208,7 +208,7 @@ function bt.HealthBar:skip()
     self._label_center:set_text(center)
     self._label_right:set_text(right)
     self._level_bar:set_value(self._hp_current)
-    self:_update_color_from_precentage(self._hp_current / self._hp_max)
+    self:_update_color_from_percentage(self._hp_current / self._hp_max)
     self:_update_value()
 end
 

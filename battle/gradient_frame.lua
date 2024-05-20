@@ -41,6 +41,9 @@ function bt.GradientFrame:size_allocate(x, y, width, height)
     self._frame_outline:set_line_width(frame_outline_thickness)
     local total_frame_thickness = frame_thickness + frame_outline_thickness
 
+    x = x + frame_outline_thickness
+    width = width - 2 * frame_outline_thickness
+
     local backdrop_bounds = rt.AABB(x, y, width, height)
     self._backdrop:resize(backdrop_bounds)
 
@@ -91,5 +94,5 @@ end
 function bt.GradientFrame:get_frame_thickness()
     local frame_thickness = rt.settings.battle.priority_queue_element.frame_thickness
     local frame_outline_thickness = math.max(frame_thickness * 1.1, frame_thickness + 2)
-    return frame_thickness + frame_outline_thickness
+    return frame_thickness + 2 * frame_outline_thickness
 end

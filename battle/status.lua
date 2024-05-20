@@ -221,7 +221,6 @@ function bt.Status:realize()
         description = rt.STRING,
         sprite_id = rt.STRING,
         sprite_index = { rt.UNSIGNED, rt.STRING },
-        id = rt.STRING,
         name = rt.STRING,
         max_duration = rt.UNSIGNED,
         is_silent = rt.BOOLEAN,

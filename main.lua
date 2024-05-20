@@ -10,11 +10,6 @@ set_consumable_n_leftg
 activate_consumable
 ]]--
 
-status_bar = bt.GlobalStatusBar()
-
-status_bar:realize()
-status_bar:fit_into(0, 200, 200, 200)
-
 battle = bt.Battle("DEBUG_BATTLE")
 scene:set_background("EYE")
 --scene:set_music("assets/music/test_music_04.mp3")
@@ -22,7 +17,7 @@ scene:set_background("EYE")
 input_controller = rt.InputController()
 input_controller:signal_connect("pressed", function(self, which)
     if which == rt.InputButton.A then
-        scene:end_turn()
+        scene:play_animations({bt.Animation.STATUS_GAINED(scene._ui:get_sprite(battle.entities[4]), bt.Status("DEBUG_STATUS"))})
     elseif which == rt.InputButton.B then
         scene:skip()
     elseif which == rt.InputButton.X then
@@ -90,8 +85,6 @@ love.draw = function()
         love.graphics.line(x + 0.5 * width, y, x + 0.5 * width, height)
         rt.graphics.set_blend_mode()
     end
-
-    status_bar:draw()
 
     love.graphics.reset()
 end

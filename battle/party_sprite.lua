@@ -79,33 +79,31 @@ end
 
 --- @override
 function bt.PartySprite:size_allocate(x, y, width, height)
-    local m = rt.settings.margin_unit
+    local xm, ym = 2 * rt.settings.margin_unit, rt.settings.margin_unit
     local frame_thickness = rt.settings.battle.priority_queue_element.frame_thickness
     local frame_outline_thickness = math.max(frame_thickness * 1.1, frame_thickness + 2)
-    local total_frame_thickness = frame_thickness + frame_outline_thickness
+    local total_frame_thickness = frame_thickness + 2 * frame_outline_thickness
 
-    self._bounds = rt.AABB(x + total_frame_thickness, y + total_frame_thickness, width - 2 * total_frame_thickness, height - 2 * total_frame_thickness)
-
-    height = height - 0.5 * total_frame_thickness - 1.5 * m
-    local current_y = y + height - m
+    height = height - 0.5 * total_frame_thickness - 1.5 * ym
+    local current_y = y + height - ym
 
     local label_w, label_h = self._name:get_size()
     self._name:set_position(x + 0.5 * width - 0.5 * label_w, current_y - label_h)
     local speed_value_w, speed_value_h = self._speed_value:measure()
-    self._speed_value:fit_into(x + width - m - speed_value_w, current_y - label_h - speed_value_h + 0.5 * speed_value_h + 0.5 * label_h)
-    self._status_bar:fit_into(x + m, current_y - label_h, width - 2 * m, label_h)
-    current_y = current_y - label_h - m
+    self._speed_value:fit_into(x + width - xm - speed_value_w, current_y - label_h - speed_value_h + 0.5 * speed_value_h + 0.5 * label_h)
+    self._status_bar:fit_into(x + xm, current_y - label_h, width - 2 * xm, label_h)
+    current_y = current_y - label_h - ym
 
-    local hp_bar_height = rt.settings.battle.health_bar.hp_font:get_size() + m
-    local hp_bar_bounds = rt.AABB(x + m, current_y - hp_bar_height, width - 2 * m, hp_bar_height)
+    local hp_bar_height = rt.settings.battle.health_bar.hp_font:get_size() + ym
+    local hp_bar_bounds = rt.AABB(x + xm, current_y - hp_bar_height, width - 2 * xm, hp_bar_height)
     self._health_bar:fit_into(hp_bar_bounds)
-    current_y = current_y - hp_bar_bounds.height - m
+    current_y = current_y - hp_bar_bounds.height - ym
 
     local backdrop_bounds = rt.AABB(x, current_y, width, y + height - current_y)
     local frame_aabb = rt.AABB(backdrop_bounds.x, backdrop_bounds.y, backdrop_bounds.width, backdrop_bounds.height)
     self._frame:fit_into(frame_aabb)
 
-    local consumable_aabb = rt.AABB(x + m, frame_aabb.y - hp_bar_height, frame_aabb.width, hp_bar_height)
+    local consumable_aabb = rt.AABB(x + xm, frame_aabb.y - hp_bar_height, frame_aabb.width, hp_bar_height)
     self._consumable_bar:fit_into(consumable_aabb)
 
     self._bounds.y = current_y - total_frame_thickness

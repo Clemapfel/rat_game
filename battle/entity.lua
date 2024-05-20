@@ -40,12 +40,12 @@ bt.Entity = meta.new_type("BattleEntity", function(id)
 end, {
     is_enemy = true,
 
-    hp_base = 100,
-    hp_current = 100,
+    hp_base = 0,
+    hp_current = 0,
 
     attack_base = 0,
     defense_base = 0,
-    speed_base = 100,
+    speed_base = 0,
 
     priority = 0,
 
@@ -64,9 +64,7 @@ end, {
     knocked_out_sprite_index = nil,
 
     dead_sprite_id = nil,
-    dead_sprite_index = nil,
-
-    gender = bt.Gender.UNKNOWN
+    dead_sprite_index = nil
 })
 
 --- @brief
@@ -74,64 +72,46 @@ function bt.Entity:realize()
     if self._is_realized == true then return end
     meta.set_is_mutable(self, true)
 
-    local chunk, error_maybe = love.filesystem.load(self._path)
-    if error_maybe ~= nil then
-        rt.error("In bt.Entity:realize: error when loading config at `" .. self._path .. "`: " .. error_maybe)
-    end
+    local template = {
+        name = rt.STRING,
 
-    local config = chunk()
+        is_enemy = rt.BOOLEAN,
+        hp_base = rt.UNSIGNED,
+        attack_base = rt.UNSIGNED,
+        defense_base = rt.UNSIGNED,
+        speed_base = rt.UNSIGNED,
 
-    local strings = {
-        "name",
-        "sprite_id",
-        "knocked_out_sprite_id",
-        "dead_sprite_id"
+        sprite_id = rt.STRING,
+        sprite_index = {rt.UNSIGNED, rt.STRING},
+
+        knocked_out_sprite_id = rt.STRING,
+        knocked_out_sprite_index = {rt.UNSIGNED, rt.STRING},
+
+        dead_sprite_id = rt.STRING,
+        dead_sprite_index = {rt.UNSIGNED, rt.STRING},
     }
 
-    for _, key in ipairs(strings) do
-        if config[key] ~= nil then
-            self[key] = config[key]
-        end
+    meta.set_is_mutable(self, true)
 
-        if self[key] ~= nil then
-            meta.assert_string(self[key])
-        end
-    end
+    -- TODO
+    rt.random.seed(meta.hash(self))
+    self.hp_base = rt.random.integer(75, 150)
+    self.attack_base = rt.random.integer(50, 100)
+    self.defense_base = rt.random.choose({70, 80, 90, 100, 110})
+    self.speed_base = rt.random.integer(5, 155)
+    -- TODO
 
-    local numbers = {
-        "sprite_index",
-        "knocked_out_index",
-        "dead_sprite_index"
-    }
-
-    for _, key in ipairs(numbers) do
-        if config[key] ~= nil then
-            self[key] = config[key]
-        end
-    end
-
-    local booleans = {
-        "is_enemy"
-    }
-
-    for _, key in ipairs(booleans) do
-        if config[key] ~= nil then
-            self[key] = config[key]
-        end
-    end
-
-    self.knocked_out_sprite_id = which(self.knocked_out_sprite_id, self.sprite_id)
-    self.knocked_out_index = which(self.knocked_out_sprite_index, self.sprite_index)
-    self.dead_sprite_id = which(self.dead_sprite_id, self.sprite_id)
-    self.dead_index = which(self.dead_sprite_index, self.sprite_index)
-
-    if config.gender ~= nil then
-        self.gender = config.gender
-        meta.assert_enum(self.gender, bt.Gender)
-    end
+    rt.load_config(self._path, self, template)
+    self.hp_current = self.hp_base
 
     self._is_realized = true
     meta.set_is_mutable(self, false)
+
+    for stat in range("hp_base", "attack_base", "defense_base", "speed_base") do
+        if self[stat] == nil then
+            rt.error("In bt.Entity.realize: config at `" .. self._path .. "` does not define `" .. stat .. "`, which is required")
+        end
+    end
 end
 
 --- @brief calculate value of state, takes into account all statuses

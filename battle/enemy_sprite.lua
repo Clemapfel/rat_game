@@ -29,6 +29,8 @@ function bt.EnemySprite:realize()
     self._sprite:realize()
 
     self._health_bar:realize()
+    self._health_bar:set_use_percentage(true)
+
     self._speed_value:realize()
     self._status_bar:realize()
     self._consumable_bar:realize()

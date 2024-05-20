@@ -137,6 +137,7 @@ end
 --- @override
 function bt.ConsumableBar:size_allocate(x, y, width, height)
     if self._is_realized ~= true then return end
+    local m = rt.settings.margin_unit
     self._box:fit_into(x, y, width, height)
 end
 

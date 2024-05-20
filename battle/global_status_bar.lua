@@ -172,15 +172,15 @@ function bt.GlobalStatusBar:size_allocate(x, y, width, height)
     local thickness = self._frame:get_frame_thickness()
     local m = rt.settings.margin_unit
     local sprite_height = 32 * self._sprite_scale
-    local box_aabb = rt.AABB(x + m, y, width - 2 * m, sprite_height)
+    local box_aabb = rt.AABB(x, y + 0.5 * m, width - 2 * m, sprite_height)
     self._box:fit_into(box_aabb)
 
     local box_w, box_h = self._box:measure()
     self._frame_aabb = rt.AABB(
         box_aabb.x - thickness - m,
-        box_aabb.y,
+        y,
         self._frame_aabb.width,
-        box_h
+        box_h + m
     )
     self._target_width = ternary(self._box:is_empty(), 0, box_w + 2 * m + thickness)
     self._frame:fit_into(self._frame_aabb)
