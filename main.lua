@@ -6,7 +6,7 @@ scene = rt.current_scene
 --[[
 add_consumable
 remove_consumable
-set_consumable_n_left
+set_consumable_n_leftg
 activate_consumable
 ]]--
 
@@ -22,7 +22,7 @@ scene:set_background("EYE")
 input_controller = rt.InputController()
 input_controller:signal_connect("pressed", function(self, which)
     if which == rt.InputButton.A then
-        scene:add_global_status(bt.GlobalStatus("DEBUG_GLOBAL_STATUS"))
+        scene:end_turn()
     elseif which == rt.InputButton.B then
         scene:skip()
     elseif which == rt.InputButton.X then
@@ -45,7 +45,10 @@ end)
 love.load = function()
     rt.current_scene:realize()
     love.resize()
-    rt.current_scene:start_battle(battle)
+    scene:start_battle(battle)
+    scene:add_global_status(bt.GlobalStatus("DEBUG_GLOBAL_STATUS"))
+    --scene:kill(battle.entities[1])
+    --scene:kill(battle.entities[2])
 end
 
 rt.graphics.frame_duration = {

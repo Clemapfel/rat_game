@@ -17,6 +17,9 @@ function bt.Animation.ENEMY_APPEARED:start()
     local snapshot = self._target:get_snapshot()
     local target = self._target
 
+    target:set_ui_is_visible(false)
+    dbg(target:get_entity():get_id(), false)
+
     target:set_is_visible(true)
     snapshot:set_opacity_offset(-1)
     snapshot:set_rgb_offset(-1, -1, -1)
@@ -59,6 +62,7 @@ end
 --- @override
 function bt.Animation.ENEMY_APPEARED:finish()
     self._target:get_snapshot():reset()
+    self._target:set_ui_is_visible(true)
 end
 
 --- @override

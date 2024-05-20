@@ -21,6 +21,8 @@ function bt.Animation.ENEMY_APPEARED:start()
     local bounds = self._target:get_bounds()
     snapshot:fit_into(bounds)
 
+    self._target:set_ui_is_visible(false)
+
     self._target:set_is_visible(true)
     snapshot:snapshot(self._target)
     self._target:set_is_visible(false)
@@ -68,6 +70,7 @@ end
 --- @override
 function bt.Animation.ENEMY_APPEARED:finish()
     self._target:set_is_visible(true)
+    self._target:set_ui_is_visible(true)
 end
 
 --- @override

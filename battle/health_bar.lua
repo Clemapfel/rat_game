@@ -222,7 +222,7 @@ end
 function bt.HealthBar:set_opacity(alpha)
     self._opacity = alpha
     self._level_bar:set_opacity(alpha)
-    for object in values(self._level_bar, self._label_left, self._label_center, self._label_right) do
+    for object in range(self._level_bar, self._label_left, self._label_center, self._label_right) do
         if object.set_opacity ~= nil then
             object:set_opacity(alpha)
         end

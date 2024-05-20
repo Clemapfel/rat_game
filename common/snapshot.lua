@@ -25,7 +25,6 @@ rt.Snapshot = meta.new_type("Snapshot", rt.Widget, function()
         _invert = false,
         _mix_color = rt.RGBA(1, 1, 1, 1),
         _mix_weight = 0,
-        _vertex_color = rt.RGBA(1, 1, 1, 1),
         _opacity = 1,
     })
 end, {
@@ -49,30 +48,29 @@ end
 --- @brief
 function rt.Snapshot:draw()
     self._shader:bind()
-    self._shader:send("_r_offset", self._rgb_offsets[1])
-    self._shader:send("_g_offset", self._rgb_offsets[2])
-    self._shader:send("_b_offset", self._rgb_offsets[3])
-    self._shader:send("_h_offset", self._hsv_offsets[1])
-    self._shader:send("_s_offset", self._hsv_offsets[2])
-    self._shader:send("_v_offset", self._hsv_offsets[3])
-    self._shader:send("_a_offset", self._alpha_offset)
+    self._shader:send("r_offset", self._rgb_offsets[1])
+    self._shader:send("g_offset", self._rgb_offsets[2])
+    self._shader:send("b_offset", self._rgb_offsets[3])
+    self._shader:send("h_offset", self._hsv_offsets[1])
+    self._shader:send("s_offset", self._hsv_offsets[2])
+    self._shader:send("v_offset", self._hsv_offsets[3])
+    --self._shader:send("_a_offset", self._alpha_offset)
 
-    self._shader:send("_r_factor", self._rgb_factors[1])
-    self._shader:send("_g_factor", self._rgb_factors[2])
-    self._shader:send("_b_factor", self._rgb_factors[3])
-    self._shader:send("_h_factor", self._hsv_factors[1])
-    self._shader:send("_s_factor", self._hsv_factors[2])
-    self._shader:send("_v_factor", self._hsv_factors[3])
-    self._shader:send("_a_factor", self._alpha_factor)
+    self._shader:send("r_factor", self._rgb_factors[1])
+    self._shader:send("g_factor", self._rgb_factors[2])
+    self._shader:send("b_factor", self._rgb_factors[3])
+    self._shader:send("h_factor", self._hsv_factors[1])
+    self._shader:send("s_factor", self._hsv_factors[2])
+    self._shader:send("v_factor", self._hsv_factors[3])
+    --self._shader:send("_a_factor", self._alpha_factor)
 
-    self._shader:send("_mix_color", {self._mix_color.r, self._mix_color.g, self._mix_color.b, self._mix_color.a})
-    self._shader:send("_mix_weight", self._mix_weight)
-    self._shader:send("_invert", self._invert)
-    self._shader:send("_vertex_color", {self._vertex_color.r, self._vertex_color.g, self._vertex_color.b, self._vertex_color.a})
-    self._shader:send("_opacity", self._opacity)
+    self._shader:send("mix_color", {self._mix_color.r, self._mix_color.g, self._mix_color.b, self._mix_color.a})
+    self._shader:send("mix_weight", self._mix_weight)
+    self._shader:send("invert", self._invert)
+    self._shader:send("opacity", self._opacity)
 
     local black = rt.Palette.BLACK
-    self._shader:send("_black", {black.r, black.g, black.b, black.a})
+    self._shader:send("black", {black.r, black.g, black.b, black.a})
 
     self:draw_canvas()
     self._shader:unbind()
@@ -119,12 +117,6 @@ function rt.Snapshot:set_color_offsets(r, g, b, h, s, v, a)
     self._hsv_offsets[2] = which(s, 0)
     self._hsv_offsets[3] = which(v, 0)
     self._alpha_offset = which(a, 0)
-end
-
---- @brief sets vertex colors
-function rt.Snapshot:set_color(rgba)
-    if meta.is_hsva(rgba) then rgba = rt.hsva_to_rgba(rgba) end
-    self._vertex_color = rgba
 end
 
 --- @brief

@@ -22,6 +22,7 @@ end, {
     max_n_uses = POSITIVE_INFINITY,
     restore_uses_after_battle = false,
 
+    -- (ConsumableInterface, EntityInterface) -> nil
     on_turn_start = function(self, holder)
         meta.assert_consumable_interface(self)
         meta.assert_entity_interface(holder)

@@ -77,7 +77,7 @@ end
 
 --- @brief
 function bt.BattleSprite:set_status_n_elapsed(status, elapsed)
-    self._status_bar:set_elapsed(status, elapsed)
+    self._status_bar:set_n_turns_elapsed(status, elapsed)
 end
 
 --- @brief

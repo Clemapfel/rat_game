@@ -21,7 +21,6 @@ end)
 function bt.Animation.TURN_END:start()
     self._label = rt.Label("<o><b>TURN END</o></b>", rt.settings.font.default_large, rt.settings.font.default_mono_large)
     self._label:realize()
-
     local r, g, b, a = 0, 0, 0, 0.75
     self._tunnel_top = rt.LogGradient(rt.RGBA(r, g, b, a), rt.RGBA(r, g, b, 0))
     self._tunnel_bottom = rt.LogGradient(rt.RGBA(r, g, b, 0), rt.RGBA(r, g, b, a))
@@ -67,7 +66,7 @@ function bt.Animation.TURN_END:update(delta)
     self._label:fit_into(
         pos_x * bounds.width - 0.5 * label_w,
         0.5 * bounds.height - 0.5 * label_h,
-        label_w, label_h
+        POSITIVE_INFINITY, label_h
     )
 
     -- tunnel fade

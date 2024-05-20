@@ -40,6 +40,7 @@ end, {
         return nil
     end,
 
+    -- (GlobalStatusInterface, Table<EntityInterface>) -> nil
     on_turn_start = function(self, entities)
         meta.assert_global_status_interface(self)
         for entity in values(entities) do
@@ -192,6 +193,7 @@ function bt.GlobalStatus:realize()
     local functions = {
         "on_gained",
         "on_lost",
+        "on_turn_start",
         "on_turn_end",
         "on_healing_received",
         "on_healing_performed",

@@ -4,7 +4,7 @@ rt.settings.ordered_box = {
     collider_mass = 50,
     collider_speed = 2000,        -- px per second
 
-    scale_speed = 1.5,      -- fraction per second
+    scale_speed = 2.5,      -- fraction per second
     opacity_speed = 1.2,    -- fraction per second
 }
 
@@ -379,4 +379,14 @@ end
 --- @brief
 function rt.OrderedBox:is_empty()
     return #self._order == 0
+end
+
+--- @brief
+function rt.OrderedBox:set_opacity(alpha)
+    self._opacity = alpha
+    if self._is_realized == true then
+        for entry in values(self._entries) do
+            entry.element:set_opacity(alpha)
+        end
+    end
 end

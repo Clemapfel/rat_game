@@ -190,10 +190,6 @@ function bt.Scene:start_battle(battle)
     for entity in values(self._state:list_entities()) do
         self._ui:add_entity(entity)
         if entity:get_is_enemy() then
-            self._ui:get_sprite(entity):set_ui_is_visible(false)
-        end
-
-        if entity:get_is_enemy() then
             table.insert(animations, bt.Animation.ENEMY_APPEARED(self._ui:get_sprite(entity)))
             table.insert(messages, self:format_name(entity) .. " appeared")
         else
@@ -789,6 +785,10 @@ function bt.Scene:kill(entity)
             for status in values(status_before) do
                 sprite:remove_status(status)
             end
+
+            for consumable in values(entity:list_consumables()) do
+                sprite:remove_consumable(consumable)
+            end
             self._ui:set_state(entity, bt.EntityState.DEAD)
         end
         self:play_animations({kill}, on_start)
@@ -1219,11 +1219,172 @@ end
 
 --- @brief
 function bt.Scene:start_turn()
-    -- on_turn_start for consumable, status, global_status
+    -- advance turn count
+    meta.set_is_mutable(self._state, true)
+    self._state.turn_count = self._state.turn_count + 1
+    meta.set_is_mutable(self._state, false)
+
+    -- animation
+    self:play_animations({
+        bt.Animation.TURN_START(self._ui),
+        bt.Animation.MESSAGE(self, "Turn <b>" .. self._state.turn_count .. "</b> start")
+    })
+
+    -- callbacks
+    local callback_id = "on_turn_start"
+    local entity_proxies = {}
+    for entity in values(self._state:list_entities()) do
+        table.insert(entity_proxies, bt.EntityInterface(self, entity))
+    end
+
+    for status in values(self._state:list_global_statuses()) do
+        if status[callback_id] ~= nil then
+            local self_proxy = bt.GlobalStatusInterface(self, status)
+            self:safe_invoke(status, callback_id, self_proxy, entity_proxies)
+            self:_animate_apply_global_status(status)
+        end
+    end
+
+    for entity in values(self._state:list_entities()) do
+        for status in values(entity:list_statuses()) do
+            if status[callback_id] ~= nil then
+                local self_proxy = bt.StatusInterface(self, entity, status)
+                local afflicted_proxy = bt.EntityInterface(self, entity)
+                self:safe_invoke(status, callback_id, self_proxy, afflicted_proxy)
+                self:_animate_apply_status(entity, status)
+            end
+        end
+    end
+
+    for entity in values(self._state:list_entities()) do
+        for consumable in values(entity:list_consumables()) do
+            if consumable[callback_id] ~= nil then
+                local self_proxy = bt.ConsumableInterface(self, entity, consumable)
+                local holder_proxy = bt.EntityInterface(self, entity)
+                self:safe_invoke(consumable, callback_id, self_proxy, holder_proxy)
+                self:_animate_apply_consumable(entity, consumable)
+            end
+        end
+    end
 end
 
 --- @brief
 function bt.Scene:end_turn()
+    -- animation
+    self:play_animations({
+        bt.Animation.TURN_END(self._ui),
+        bt.Animation.MESSAGE(self, "Turn <b>" .. self._state.turn_count .. "</b> end")
+    })
+
+    -- cleanup dead entities
+    local animations = {}
+    local to_remove = {}
+    for entity in values(self._state:list_dead_entities()) do
+        if entity:get_is_enemy() == true then
+            table.insert(animations, bt.Animation.ENEMY_DISAPPEARED(self._ui:get_sprite(entity)))
+            table.insert(to_remove, entity)
+        elseif entity:get_is_enemy() == false then
+            rt.warning("In bt.Scene.end_turn: [TODO] Gameover Detected")
+        end
+    end
+
+    if sizeof(animations) > 0 then
+        local on_start = function() end
+        local on_finish = function()
+            self._ui:remove_entity(table.unpack(to_remove))
+            self._ui:set_priority_order(self._state:list_entities_in_order())
+        end
+
+        local message = ""
+        for i, entity in ipairs(to_remove) do
+            message = message .. self:format_name(entity) .. " disappeared"
+            if i < sizeof(to_remove) then
+                message = message .. "\n"
+            end
+        end
+        table.insert(animations, bt.Animation.MESSAGE(self, message))
+
+        self:play_animations(animations, on_start, on_finish)
+    end
+
+    for entity in values(to_remove) do
+        self._state:remove_entity(entity:get_id())
+    end
+
+    -- turn end callbacks
+    local callback_id = "on_turn_end"
+    local entity_proxies = {}
+    for entity in values(self._state:list_entities()) do
+        table.insert(entity_proxies, bt.EntityInterface(self, entity))
+    end
+
+    for status in values(self._state:list_global_statuses()) do
+        if status[callback_id] ~= nil then
+            local self_proxy = bt.GlobalStatusInterface(self, status)
+            self:safe_invoke(status, callback_id, self_proxy, entity_proxies)
+            self:_animate_apply_global_status(status)
+        end
+    end
+
+    for entity in values(self._state:list_entities()) do
+        for status in values(entity:list_statuses()) do
+            if status[callback_id] ~= nil then
+                local self_proxy = bt.StatusInterface(self, entity, status)
+                local afflicted_proxy = bt.EntityInterface(self, entity)
+                self:safe_invoke(status, callback_id, self_proxy, afflicted_proxy)
+                self:_animate_apply_status(entity, status)
+            end
+        end
+    end
+
+    for entity in values(self._state:list_entities()) do
+        for consumable in values(entity:list_consumables()) do
+            if consumable[callback_id] ~= nil then
+                local self_proxy = bt.ConsumableInterface(self, entity, consumable)
+                local holder_proxy = bt.EntityInterface(self, entity)
+                self:safe_invoke(consumable, callback_id, self_proxy, holder_proxy)
+                self:_animate_apply_consumable(entity, consumable)
+            end
+        end
+    end
+
+    local advances = {}
+
+    -- advance status durations
+    for status in values(self._state:list_global_statuses()) do
+        local new_elapsed = self._state:global_status_advance(status)
+        local should_remove = new_elapsed >= status:get_max_duration()
+
+        if should_remove == false then
+            table.insert(advances, function()
+                self._ui:set_global_status_n_elapsed(status, new_elapsed)
+            end)
+        else
+            self:remove_global_status(status)
+        end
+    end
+
+    for entity in values(self._state:list_entities()) do
+        for status in values(entity:list_statuses()) do
+            local new_elapsed = entity:status_advance(status)
+            local should_remove = new_elapsed >= status:get_max_duration()
+
+            if should_remove == false then
+                table.insert(advances, function()
+                    self._ui:get_sprite(entity):set_status_n_elapsed(status, new_elapsed)
+                end)
+            else
+                self:remove_status(entity, status)
+            end
+        end
+    end
+
+    self:play_animations({}, function()
+        for closure in values(advances) do
+            closure()
+        end
+    end)
+
     -- on_turn_end for consumable, status, global_status
     -- cleanup dead enemies
     -- gameover if dead allies

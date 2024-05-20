@@ -61,6 +61,7 @@ end, {
         return nil
     end,
 
+    -- (StatusInterface, EntityInterface) -> nil
     on_turn_start = function(self, afflicted)
         meta.assert_status_interface(self)
         meta.assert_entity_interface(afflicted)
@@ -199,6 +200,7 @@ function bt.Status:realize()
     local functions = {
         "on_gained",
         "on_lost",
+        "on_turn_start",
         "on_turn_end",
         "on_healing_received",
         "on_healing_performed",

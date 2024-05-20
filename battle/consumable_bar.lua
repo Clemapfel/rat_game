@@ -151,6 +151,13 @@ function bt.ConsumableBar:set_alignment(alignment)
     self._box:set_alignment(alignment)
 end
 
+--- @brief
+function bt.ConsumableBar:set_opacity(alpha)
+    self._opacity = alpha
+    if self._is_realized then
+        self._box:set_opacity(alpha)
+    end
+end
 
 --[[
 

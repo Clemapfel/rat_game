@@ -17,8 +17,6 @@ end)
 
 --- @override
 function bt.Animation.KILLED:start()
-    self._target:set_ui_is_visible(true)
-
     self._label = rt.Label("<o><b><outline_color=TRUE_WHITE><color=BLACK>KILLED</color></b></o></outline_color>")
     self._label:set_justify_mode(rt.JustifyMode.CENTER)
     self._label:realize()
@@ -74,12 +72,10 @@ function bt.Animation.KILLED:update(delta)
     fraction = fraction * 1.4 -- fade out happens, then "KILLED" stays on screen
 
     local opacity = rt.squish(4, rt.exponential_deceleration, fraction - (0.99 - 0.5))
-    self._target_snapshot:set_opacity(opacity)
     self._target_snapshot:set_mix_weight(fraction)
 
     if fraction >= 1 then
         self._target:set_is_visible(true)
-        self._target:set_ui_is_visible(false)
     end
 
     return self._elapsed < duration
@@ -88,6 +84,7 @@ end
 --- @override
 function bt.Animation.KILLED:finish()
     self._target:set_is_visible(true)
+    self._target:set_ui_is_visible(true)
 end
 
 --- @override

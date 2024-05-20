@@ -130,32 +130,6 @@ function bt.Entity:realize()
         meta.assert_enum(self.gender, bt.Gender)
     end
 
-    -- TODO
-    self.speed_base = rt.random.integer(1, 99)
-    -- TODO
-
-    config.moves = which(config.moves, {})
-    for move_id in values(config.moves) do
-        local move = bt.Move(move_id)
-        self:add_move(move)
-    end
-
-    if not meta.is_table(config.equips) then config.equips = {config.equips} end
-    for equip_id in values(config.equips) do
-        if not meta.is_string(equip_id) then
-            rt.error("In bt.Entity:realize: error when loading config at `" .. self._path .. "`, expected string for id in `equip`, got: `" .. meta.typeof(equip_id) .. "`")
-        end
-        self:add_equip(bt.Equip(equip_id))
-    end
-
-    if not meta.is_table(config.consumables) then config.consumables = {config.consumables} end
-    for consumable_id in values(config.consumables) do
-        if not meta.is_string(consumable_id) then
-            rt.error("In bt.Entity:realize: error when loading config at `" .. self._path .. "`, expected string for id in `consumables`, got: `" .. meta.typeof(equip_id) .. "`")
-        end
-        self:add_consumable(bt.Consumable(consumable_id))
-    end
-
     self._is_realized = true
     meta.set_is_mutable(self, false)
 end
@@ -313,8 +287,7 @@ end
 
 --- @brief
 function bt.Entity:get_status_n_turns_elapsed(status)
-    local id = status:get_id()
-    return self.status[id].elapsed
+    return self.status[status:get_id()].elapsed
 end
 
 --- @brief
@@ -355,6 +328,15 @@ end
 --- @brief
 function bt.Entity:has_status(status)
     return self.status[status:get_id()] ~= nil
+end
+
+--- @brief
+function bt.Entity:status_advance(status)
+    local entry = self.status[status:get_id()]
+    if entry == nil then return end
+
+    entry.elapsed = entry.elapsed + 1
+    return entry.elapsed
 end
 
 --- @brief

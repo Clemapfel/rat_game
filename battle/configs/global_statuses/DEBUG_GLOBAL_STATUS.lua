@@ -1,7 +1,7 @@
 return {
-    name = "Debug Status",
+    name = "Debug Global Status",
 
-    max_duration = POSITIVE_INFINITY,
+    max_duration = 0,
     is_silent = false,
 
     sprite_id = "status_ailment",

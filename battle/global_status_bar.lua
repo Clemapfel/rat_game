@@ -206,3 +206,12 @@ function bt.GlobalStatusBar:measure()
     w = w + 2 * self._frame:get_frame_thickness() * 2 * rt.settings.margin_unit
     return w, h
 end
+
+--- @brief
+function bt.GlobalStatusBar:set_opacity(alpha)
+    self._opacity = alpha
+    if self._is_realized then
+        self._box:set_opacity(alpha)
+        self._frame:set_opacity(alpha)
+    end
+end

@@ -1,7 +1,7 @@
 return {
     name = "Debug Status",
 
-    max_duration = POSITIVE_INFINITY,
+    max_duration = 3,
     is_silent = false,
     is_stun = true,
 

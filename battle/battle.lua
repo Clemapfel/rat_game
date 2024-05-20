@@ -17,6 +17,7 @@ end, {
     background_id = "default",
     music_id = "default",
 
+    turn_count = 0,
     entities = {},
     global_status = {},
     current_move_selection = {
@@ -145,10 +146,32 @@ function bt.Battle:get_global_status_n_turns_elapsed(status)
 end
 
 --- @brief
+function bt.Battle:global_status_advance(status)
+    local entry = self.global_status[status:get_id()]
+    if entry == nil then return false end
+
+    entry.elapsed = entry.elapsed + 1
+    return entry.elapsed
+end
+
+--- @brief
 function bt.Battle:list_entities()
     local out = {}
     for entity in values(self.entities) do
-        table.insert(out, entity)
+        if not entity:get_is_dead() then
+            table.insert(out, entity)
+        end
+    end
+    return out
+end
+
+--- @brief
+function bt.Battle:list_dead_entities()
+    local out = {}
+    for entity in values(self.entities) do
+        if entity:get_is_dead() then
+            table.insert(out, entity)
+        end
     end
     return out
 end
@@ -203,10 +226,10 @@ function bt.Battle:add_entity(entity)
 end
 
 --- @brief
-function bt.Battle:remove_entity(entity_id)
+function bt.Battle:remove_entity(to_remove)
     local removed = false
     for i, entity in ipairs(self.entities) do
-        if entity:get_id() == entity_id then
+        if entity == to_remove then
             table.remove(self.entities, i)
             removed = true
             break

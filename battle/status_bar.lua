@@ -90,7 +90,9 @@ function bt.StatusBar:synchronize(entity)
     for status in keys(actually_present) do
         local n_elapsed = entity:get_status_n_turns_elapsed(status)
         if currently_present[status] ~= true then
-            self:add(status, n_elapsed)
+            if not status:get_is_silent() then
+                self:add(status, n_elapsed)
+            end
         else
             self:set_n_turns_elapsed(status, n_elapsed)
         end
@@ -149,4 +151,12 @@ end
 --- @brief
 function bt.StatusBar:set_alignment(alignment)
     self._box:set_alignment(alignment)
+end
+
+--- @brief
+function bt.StatusBar:set_opacity(alpha)
+    self._opacity = alpha
+    if self._is_realized then
+        self._box:set_opacity(alpha)
+    end
 end

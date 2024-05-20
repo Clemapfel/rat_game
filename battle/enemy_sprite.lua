@@ -120,6 +120,7 @@ function bt.EnemySprite:set_opacity(alpha)
     self._health_bar:set_opacity(alpha)
     self._status_bar:set_opacity(alpha)
     self._speed_value:set_opacity(alpha)
+    self._consumable_bar:set_opacity(alpha)
 end
 
 --- @brief
@@ -143,8 +144,11 @@ function bt.EnemySprite:set_state(state)
             self._sprite:set_animation(animation_id)
         end
     end
-end
 
+    local is_not_dead = state ~= bt.EntityState.DEAD
+    self._status_bar:set_is_visible(is_not_dead)
+    self._health_bar:set_is_visible(is_not_dead)
+end
 
 --- @brief
 function bt.EnemySprite:measure()

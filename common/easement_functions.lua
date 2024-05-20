@@ -53,6 +53,14 @@ rt.exponential_plateau = function(x)
     return math.exp((10 / 13 * math.pi * x - 1 - math.pi / 6)^3) / 2
 end
 
+rt.sqrt_acceleration = function(x)
+    return math.sqrt(1 / x) * x
+end
+
+rt.sqrt_deceleration = function(x)
+    return rt.sqrt_acceleration(1 - x)
+end
+
 rt.fade_ramp = function(x, duration, target)
     duration = which(duration, 0.1)
     target = which(target, 1)
@@ -74,7 +82,6 @@ rt.sigmoid_hold = function(x, hold)
     hold = which(hold, 0.7)
     return math.atan(hold * math.tan(4 * math.pi * (x - 0.5)^3)) / math.pi + 0.5
 end
-
 
 --- @brief maps [0, 0.5] to [0, peak], [0.5, 1] to [peak, 0], linear in both sections
 rt.symmetrical_linear = function(x, peak)

@@ -77,6 +77,40 @@ function bt.BattleUI:add_entity(entity, ...)
 end
 
 --- @brief
+function bt.BattleUI:remove_entity(entity, ...)
+    local should_remove = {}
+    for e in range(entity, ...) do
+        should_remove[e] = true
+        self._entities[e] = nil
+    end
+
+    local to_remove = {}
+    if entity:get_is_enemy() then
+        for i, sprite in ipairs(self._enemy_sprites) do
+            if should_remove[sprite:get_entity()] then
+                table.insert(to_remove, i)
+            end
+        end
+        table.sort(to_remove, function(a, b) return b < a end)
+        for i in values(to_remove) do
+            table.remove(self._enemy_sprites, i)
+        end
+    else
+        for i, sprite in ipairs(self._party_sprites) do
+            if should_remove[sprite:get_entity()] then
+                table.insert(to_remove, i)
+            end
+        end
+        table.sort(to_remove, function(a, b) return b < a end)
+        for i in values(to_remove) do
+            table.remove(self._party_sprites, i)
+        end
+    end
+
+    self:reformat()
+end
+
+--- @brief
 function bt.BattleUI:_add_enemy_sprite(entity)
     local sprite = bt.EnemySprite(entity)
     table.insert(self._enemy_sprites, sprite)
@@ -121,7 +155,6 @@ function bt.BattleUI:_reformat_enemy_sprites()
             table.insert(enemy_sprite_indices, i + 1)
         end
     end
-
 
     local xy_positions = {}
     local x_offset = 0
