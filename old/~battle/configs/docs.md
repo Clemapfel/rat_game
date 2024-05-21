@@ -28,6 +28,7 @@ GlobalStatus {
     
     get_id(self),       -- (GlobalStatus) -> String
     get_name(self),     -- (GlobalStatus) -> String
+    get_formatted_name(self), -- (GlobalStatus) -> String
     get_is_silent(self),    -- (GlobalStatus) -> Boolean
     get_max_duration(self),     -- (GlobalStatus) -> Unsigned
     get_n_turns_elapsed(self),  -- (GlobalStatus) -> Unsigned
@@ -271,8 +272,6 @@ Consumable {
     get_max_n_uses(self),  -- (Consumable) -> Unsigned
     get_n_uses_left(self), -- (Consumable) -> Unsigned
     
-    consume(self),  -- (Consumable) -> nil
-
     -- ### Config Fields ### --
 
     id = "CONSUMABLE_ID",        -- const String
@@ -352,7 +351,9 @@ Entity {
     
     -- ### Instance Methods ### --
     
-    get_id_multiplicity(self), -- (Entity) -> 
+    get_name(self),
+    get_formatted_name(self),
+    get_id(self),
     
     get_hp(self),
     get_hp_current(self),
@@ -360,7 +361,6 @@ Entity {
     
     get_attack(self), -- (Entity) -> Unsigned
     get_attack_base(self), -- (Entity) -> Unsigned
-    get_attack_raw(self), -- (Entity) -> Unsigned
     get_attack_base_raw(self),
 
     get_defense(self), -- (Entity) -> Unsigned
@@ -372,25 +372,67 @@ Entity {
     get_speed_base(self), -- (Entity) -> Unsigned
     get_speed_raw(self), -- (Entity) -> Unsigned
     get_speed_base_raw(self),
-    
-    get_priority(self),
-    set_priority(self), -- TODO: when is priority resolved?
-    
-    get_is_stunned(self),
-    add_status(self, status_id),
-    remove_status(self, status_id),
-    
+
     get_priority(self), -- (Entity) -> Signed
-    
+   
+    get_is_stunned(self),
     get_is_knocked_out(self),
     get_is_dead(self),
     get_is_alive(self),
     get_is_enemy(self),
+    get_is_ally(self),
+    get_is_enemy_of(self, other),
+    get_is_ally_of(self, other),
+    
+    increase_hp(self, value),
+    reduce_hp(self, value),
+    
+    help_up(self),
+    knock_out(self),
+    kill(self),
+    switch(self, other),
 
+    message(formatted_string),  -- TODO
+    
+    GlobalStatus(id),  -- TODO v
+    has_global_status(status),  
+    get_global_status_n_turns_elapsed(status),
+    get_global_status_n_turns_left(status),
+    add_global_status(status),
+    remove_global_status(status),
+    list_global_statuses(),
+    -- TODO ^
+    
+    Status(id), -- TODO
+    has_status(self, status),
+    get_status_n_turns_elapsed(self, status),
+    get_status_n_turns_left(self, status),
+    add_status(self, status),
+    remove_status(self, status),
     list_statuses(self),
+    
+    Equip(id), -- TODO
+    has_equip(self, equip),
     list_equips(self),
+    
+    Consumable(id), -- TODO
+    consume(self, consumable),
+    has_consumable(self, consumable),
+    get_consumable_n_consumed(self, consumable),
+    get_consumable_n_uses_left(self, consumable),
+    add_consumable(self, consumable),
+    remove_consumable(self, consumable),
     list_consumables(self),
-    list_moves(self)
+    
+    Move(id), -- TODO
+    has_move(self, move),
+    get_move_n_used(self, move),
+    get_move_n_uses_left(self, move),
+    list_moves(self),
+    
+    get_left_of(self),
+    get_right_of(self),
+    get_position(self),
 }
 ```
 
@@ -417,6 +459,7 @@ Move {
     
     get_id(self),         -- (Move) -> String
     get_name(self),       -- (Move) -> String
+    get_formatted_name(self), --- (Move) -> String
     get_max_n_uses(self), -- (Move) -> Unsigned
     
     get_can_target_multiple(self), -- (Move) -> Boolean
@@ -477,6 +520,8 @@ Equip {
 
     get_id(self),         -- (Equip) -> String
     get_name(self),       -- (Equip) -> String
+    get_formatted_name(self), -- (Equip) -> String
+
     get_is_silent(self),  -- (Equip) -> Boolean
 
     get_hp_base_offset(self),      -- (Equip) -> Signed

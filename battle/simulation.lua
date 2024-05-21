@@ -569,7 +569,6 @@ function bt.Scene:remove_status(entity, to_remove)
     local afflicted_proxy = bt.EntityInterface(self, entity)
     local new_status_proxy = bt.StatusInterface(self, entity, to_remove)
 
-    --[[
     for status in values(self._state:list_global_statuses()) do
         if status[callback_id] ~= nil then
             local self_proxy = bt.GlobalStatusInterface(self, status)
@@ -596,7 +595,6 @@ function bt.Scene:remove_status(entity, to_remove)
             self:_animate_apply_consumable(entity, consumable)
         end
     end
-    ]]--
 end
 
 --- @brief
@@ -1384,9 +1382,20 @@ function bt.Scene:end_turn()
             closure()
         end
     end)
-
-    -- on_turn_end for consumable, status, global_status
-    -- cleanup dead enemies
-    -- gameover if dead allies
-    -- advance status, global_status n turns, clear if above max duration
 end
+
+--- @brief
+function bt.Scene:add_consumable(entity, consumable)
+    rt.error("TODO")
+end
+
+--- @brief
+function bt.Scene:remove_consumable(entity, consumable)
+    rt.error("TODO")
+end
+
+--- @brief
+function bt.Scene:message(formatted_string)
+    self:play_animations({bt.Animation.MESSAGE(self, formatted_string)})
+end
+

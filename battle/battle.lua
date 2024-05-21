@@ -283,6 +283,43 @@ function bt.Battle:swap(left_i, right_i)
     self.entities[left_i] = right
 end
 
+--- @brief
+function bt.Battle:get_left_of(target)
+    rt.warning("In bt.Battle:get_right_of: TODO currently returns index, but sprites are out of order")
+    local i = 1
+    for entity in values(self.entities) do
+        if entity == target then
+            return self.entities[i - 1]
+        end
+        i = i + 1
+    end
+    return nil
+end
+
+--- @brief
+function bt.Battle:get_right_of(target)
+    rt.warning("In bt.Battle:get_right_of: TODO currently returns index, but sprites are out of order")
+    local i = 1
+    for entity in values(self.entities) do
+        if entity == target then
+            return self.entities[i + 1]
+        end
+        i = i + 1
+    end
+    return nil
+end
+
+--- @brief
+function bt.Battle:get_position(target)
+    local i = 1
+    for entity in values(self.entities) do
+        if entity == target then
+            return i
+        end
+        i = i + 1
+    end
+    return nil
+end
 
 --- @brief
 function bt.Battle:clear_current_move_selection()

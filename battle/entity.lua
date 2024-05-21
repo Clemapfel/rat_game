@@ -271,6 +271,11 @@ function bt.Entity:get_status_n_turns_elapsed(status)
 end
 
 --- @brief
+function bt.Entity:get_status_n_turns_left(status)
+    return clamp(status:get_max_duration() - self.status[status:get_id()].elapsed, 0)
+end
+
+--- @brief
 function bt.Entity:get_status(status_id)
     if self.status[status_id] == nil then return nil end
     return self.status[status_id].status
@@ -379,8 +384,13 @@ function bt.Entity:get_move(move_id)
 end
 
 --- @brief
-function bt.Entity:get_move_n_uses_left(id)
-    return self.moves[id].n_uses
+function bt.Entity:get_move_n_used(move)
+    return move:get_max_n_uses() - self.moves[move:get_id()].n_uses
+end
+
+--- @brief
+function bt.Entity:get_move_n_uses_left(move)
+    return self.moves[move:get_id()].n_uses
 end
 
 --- @brief
@@ -417,6 +427,7 @@ function bt.Entity:reduce_move_n_uses(move)
         return entry.n_uses <= 0
     end
 end
+
 --- @brief
 function bt.Entity:add_equip(equip)
     self.equips[equip:get_id()] = {

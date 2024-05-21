@@ -11,3 +11,9 @@ Super Smash Brothers, a competitive fighting game, at first seems entirely deter
 
 Pokémon features copious amounts of randomness, and it should, the casual game is about collecting monsters, the more variance there is between each individual pokemon, the more exciting it is to get a good one. There is a competitive branch of pokémon, however. One popular one uses the [Smogon Tiering System](<TODO>) which
 
+## Types of Randomness
+
+### Damage Rolls
+
+Each attack has a possible range of 
+

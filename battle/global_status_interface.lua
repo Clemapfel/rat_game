@@ -1,57 +1,82 @@
 --- @class bt.GlobalStatusInterface
-function bt.GlobalStatusInterface(scene, status)
-    meta.assert_isa(scene, bt.Scene)
-    meta.assert_isa(status, bt.GlobalStatus)
-
-    local self, metatable = {}, {}
-    setmetatable(self, metatable)
-
-    metatable.type = "bt.GlobalStatusInterface"
-    metatable.scene = scene
-    metatable.original = status
-
-    self.get_id = function(self)
+bt.GlobalStatusInterface = {
+    --- @brief
+    get_id = function(self)
+        meta.assert_global_status_interface(self)
         return getmetatable(self).original:get_id()
-    end
+    end,
 
-    self.get_name = function(self)
+    --- @brief
+    get_name = function(self)
+        meta.assert_global_status_interface(self)
         return getmetatable(self).original:get_name()
-    end
+    end,
 
-    self.get_is_silent = function(self)
+    --- @brief
+    get_formatted_name = function(self)
+        meta.assert_global_status_interface(self)
+        return getmetatable(self).scene:format_name(getmetatable(self).original)
+    end,
+
+    --- @brief
+    get_is_silent = function(self)
+        meta.assert_global_status_interface(self)
         return getmetatable(self).original:get_is_silent()
-    end
+    end,
 
-    self.get_max_duration = function(self)
+    --- @brief
+    get_max_duration = function(self)
+        meta.assert_global_status_interface(self)
         return getmetatable(self).original:get_max_duration()
-    end
+    end,
 
-    self.get_n_turns_elapsed = function(self)
+    --- @brief
+    get_n_turns_elapsed = function(self)
+        meta.assert_global_status_interface(self)
         local metatable = getmetatable(self)
         return metatable.scene:get_state():get_global_status_n_turns_elapsed(metatable.original)
     end
+}
 
-    local valid_fields = {
-        id = true,
-        name = true,
-        max_duration = true,
-        n_turns_elapsed = true,
-        is_silent = true
-    }
+--- @brief ctor
+setmetatable(bt.GlobalStatusInterface, {
+    __call = function(_, scene, status)
+        meta.assert_isa(scene, bt.Scene)
+        meta.assert_isa(status, bt.GlobalStatus)
 
-    metatable.__index = function(self, key)
-        if valid_fields[key] == true then
-            return self["get_" .. key](self)
-        else
-            rt.warning("In bt.GlobalStatusInterface:__index: trying to access property `" .. key .. "` of GlobalStatus `" .. getmetatable(self).original:get_id() .. "`, but no such property exists")
+        local self, metatable = {}, {}
+        setmetatable(self, metatable)
+
+        metatable.type = "bt.GlobalStatusInterface"
+        metatable.scene = scene
+        metatable.original = status
+
+        for key, value in pairs(bt.GlobalStatusInterface) do
+            self[key] = value
+        end
+
+        local valid_fields = {
+            id = true,
+            name = true,
+            max_duration = true,
+            n_turns_elapsed = true,
+            is_silent = true
+        }
+
+        metatable.__index = function(self, key)
+            if valid_fields[key] == true then
+                return self["get_" .. key](self)
+            else
+                rt.warning("In bt.GlobalStatusInterface:__index: trying to access property `" .. key .. "` of GlobalStatus `" .. getmetatable(self).original:get_id() .. "`, but no such property exists")
+                return nil
+            end
+        end
+
+        metatable.__newindex = function(self, key, value)
+            rt.warning("In bt.GlobalStatusInterface:__newindex: trying to set property `" .. key .. "` of GlobalStatus `" .. getmetatable(self).original:get_id() .. "` to `" .. serialize(value) .. "`, but interface is immutable")
             return nil
         end
-    end
 
-    metatable.__newindex = function(self, key, value)
-        rt.warning("In bt.GlobalStatusInterface:__newindex: trying to set property `" .. key .. "` of GlobalStatus `" .. getmetatable(self).original:get_id() .. "` to `" .. serialize(value) .. "`, but interface is immutable")
-        return nil
+        return self
     end
-
-    return self
-end
+})
