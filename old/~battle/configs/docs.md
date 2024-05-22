@@ -391,19 +391,7 @@ Entity {
     knock_out(self),
     kill(self),
     switch(self, other),
-
-    message(formatted_string),  -- TODO
-    
-    GlobalStatus(id),  -- TODO v
-    has_global_status(status),  
-    get_global_status_n_turns_elapsed(status),
-    get_global_status_n_turns_left(status),
-    add_global_status(status),
-    remove_global_status(status),
-    list_global_statuses(),
-    -- TODO ^
-    
-    Status(id), -- TODO
+   
     has_status(self, status),
     get_status_n_turns_elapsed(self, status),
     get_status_n_turns_left(self, status),
@@ -411,11 +399,11 @@ Entity {
     remove_status(self, status),
     list_statuses(self),
     
-    Equip(id), -- TODO
+   
     has_equip(self, equip),
     list_equips(self),
     
-    Consumable(id), -- TODO
+   
     consume(self, consumable),
     has_consumable(self, consumable),
     get_consumable_n_consumed(self, consumable),
@@ -424,7 +412,6 @@ Entity {
     remove_consumable(self, consumable),
     list_consumables(self),
     
-    Move(id), -- TODO
     has_move(self, move),
     get_move_n_used(self, move),
     get_move_n_uses_left(self, move),
@@ -564,6 +551,25 @@ Equip {
 ```lua
 Battle {
     id = "EXAMPLE_ID",
+
+    -- ### Instance Methods ### --
+
+    GlobalStatus(id),
+    Status(id),
+    Equip(id),
+    Consumable(id),
+    Move(id),
+
+    has_global_status(status),
+    get_global_status_n_turns_elapsed(status),
+    get_global_status_n_turns_left(status),
+    add_global_status(status),
+    remove_global_status(status),
+    list_global_statuses(),
+
+    message(formatted_string),
+    spawn(id, move_id, equip_id, status_id),
+    
 
     -- ### Config Fields ### --
     

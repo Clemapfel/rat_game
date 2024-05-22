@@ -135,6 +135,7 @@ require "battle.equip_interface"
 require "battle.move"
 require "battle.move_interface"
 require "battle.battle"
+require "battle.battle_interface"
 
 require "battle.health_bar"
 require "battle.speed_value"

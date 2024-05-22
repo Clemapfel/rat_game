@@ -39,7 +39,7 @@ function bt.Scene:draw()
     if self._background ~= nil then
         self._background:draw()
     end
-    self._ui:draw()
+    --self._ui:draw()
 end
 
 --- @override
