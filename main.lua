@@ -13,6 +13,35 @@ activate_consumable
 battle = bt.Battle("DEBUG_BATTLE")
 scene:set_background("WORLEY")
 --scene:set_music("assets/music/test_music_04.mp3")
+TimedAction = function(duration, on_start, on_update, on_done)
+    return {
+        _elapsed = 0,
+        _duration = duration,
+        _is_started = false,
+        _on_start = on_start,
+        _on_update = on_update,
+        _on_done = on_done,
+
+        update = function(self, dt)
+            if self._is_started == false and self.on_start ~= nil then
+                self:on_start()
+                self._is_started = true
+            end
+
+            if self._is_started == true then
+                self:on_update(dt)
+            end
+
+
+            self._elapsed = self._elapsed + dt
+            if self._elapsed >= self._duration then
+                if self.on_done ~= nil then self:on_done() end
+            end
+        end
+    }
+end
+
+
 
 input_controller = rt.InputController()
 input_controller:signal_connect("pressed", function(self, which)
@@ -94,7 +123,6 @@ love.update = function(delta)
     if rt.current_scene ~= nil and rt.current_scene.update ~= nil then
         rt.current_scene:update(delta)
     end
-
 end
 
 love.resize = function()

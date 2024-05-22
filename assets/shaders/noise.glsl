@@ -3,21 +3,11 @@ float random_1d(in vec3 pos) {
     return fract(sin(dot(pos.xyz, vec3(70.9898, 78.233, 32.4355))) * 43758.5453123);
 }
 
-/// @brief 1d discontinuous noise, in [-1, 1]
-float signed_random_1d(in vec3 pos) {
-    return -1 + 2. * random_1d(pos);
-}
-
 /// @brief 2d discontinuous noise, in [0, 1]
 vec2 random_2d(vec3 p3) {
     p3 = fract(p3 * vec3(.1031, .1030, .0973));
     p3 += dot(p3, p3.yzx + 19.19);
     return fract((p3.xx + p3.yz) * p3.zy);
-}
-
-/// @brief 2d discontinuous noise, in [-1, 1]
-vec2 signed_random_2d(vec3 p) {
-    return -1 + 2. * random_2d(p);
 }
 
 /// @brief 3d discontinuous noise, in [0, 1]
@@ -29,11 +19,6 @@ vec3 random_3d(in vec3 p) {
     ) * 43758.5453123);
 }
 
-/// @brief 3d discontinuous noise, in [-1, 1]
-vec3 signed_random_3d(in vec3 p) {
-    return -1. + 2. * random_3d(p);
-}
-
 /// @brief gradient noise
 /// @source adapted from https://github.com/patriciogonzalezvivo/lygia/blob/main/generative/gnoise.glsl
 float gradient_noise(vec3 p) {
@@ -42,14 +27,14 @@ float gradient_noise(vec3 p) {
 
     vec3 u = v * v * v * (v *(v * 6.0 - 15.0) + 10.0);
 
-    return mix( mix( mix( dot( signed_random_3d(i + vec3(0.0,0.0,0.0)), v - vec3(0.0,0.0,0.0)),
-                          dot( signed_random_3d(i + vec3(1.0,0.0,0.0)), v - vec3(1.0,0.0,0.0)), u.x),
-                     mix( dot( signed_random_3d(i + vec3(0.0,1.0,0.0)), v - vec3(0.0,1.0,0.0)),
-                          dot( signed_random_3d(i + vec3(1.0,1.0,0.0)), v - vec3(1.0,1.0,0.0)), u.x), u.y),
-                mix( mix( dot( signed_random_3d(i + vec3(0.0,0.0,1.0)), v - vec3(0.0,0.0,1.0)),
-                          dot( signed_random_3d(i + vec3(1.0,0.0,1.0)), v - vec3(1.0,0.0,1.0)), u.x),
-                     mix( dot( signed_random_3d(i + vec3(0.0,1.0,1.0)), v - vec3(0.0,1.0,1.0)),
-                          dot( signed_random_3d(i + vec3(1.0,1.0,1.0)), v - vec3(1.0,1.0,1.0)), u.x), u.y), u.z );
+    return mix( mix( mix( dot( -1 + 2 * random_3d(i + vec3(0.0,0.0,0.0)), v - vec3(0.0,0.0,0.0)),
+                          dot( -1 + 2 * random_3d(i + vec3(1.0,0.0,0.0)), v - vec3(1.0,0.0,0.0)), u.x),
+                     mix( dot( -1 + 2 * random_3d(i + vec3(0.0,1.0,0.0)), v - vec3(0.0,1.0,0.0)),
+                          dot( -1 + 2 * random_3d(i + vec3(1.0,1.0,0.0)), v - vec3(1.0,1.0,0.0)), u.x), u.y),
+                mix( mix( dot( -1 + 2 * random_3d(i + vec3(0.0,0.0,1.0)), v - vec3(0.0,0.0,1.0)),
+                          dot( -1 + 2 * random_3d(i + vec3(1.0,0.0,1.0)), v - vec3(1.0,0.0,1.0)), u.x),
+                     mix( dot( -1 + 2 * random_3d(i + vec3(0.0,1.0,1.0)), v - vec3(0.0,1.0,1.0)),
+                          dot( -1 + 2 * random_3d(i + vec3(1.0,1.0,1.0)), v - vec3(1.0,1.0,1.0)), u.x), u.y), u.z );
 }
 
 /// @brief fbm noise
