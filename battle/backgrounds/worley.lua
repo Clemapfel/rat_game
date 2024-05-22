@@ -6,6 +6,7 @@ bt.Background.WORLEY = meta.new_type("WORLEY", bt.Background, function()
     return meta.new(bt.Background.WORLEY, {
         _shader = {},   -- rt.Shader
         _shape = {},    -- rt.VertexShape
+        _canvas = rt.RenderTexture(),
         _elapsed = 0
     })
 end)
@@ -24,6 +25,8 @@ function bt.Background.WORLEY:size_allocate(x, y, width, height)
     self._shape:set_vertex_position(2, x + width, y)
     self._shape:set_vertex_position(3, x + width, y + height)
     self._shape:set_vertex_position(4, x, y + height)
+
+    self._canvas = rt.RenderTexture(width, height)
 end
 
 --- @override
@@ -35,7 +38,7 @@ end
 --- @override
 function bt.Background.WORLEY:draw()
     self._shader:bind()
-    self._shape:draw()
+    self._canvas:draw()
     self._shader:unbind()
 end
 
