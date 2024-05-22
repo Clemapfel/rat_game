@@ -1,3 +1,76 @@
+/// @brief 1d discontinuous noise, in [0, 1]
+float random_1d(in vec3 pos) {
+    return fract(sin(dot(pos.xyz, vec3(70.9898, 78.233, 32.4355))) * 43758.5453123);
+}
+
+/// @brief 1d discontinuous noise, in [-1, 1]
+float signed_random_1d(in vec3 pos) {
+    return -1 + 2. * random_1d(pos);
+}
+
+/// @brief 2d discontinuous noise, in [0, 1]
+vec2 random_2d(vec3 p3) {
+    p3 = fract(p3 * vec3(.1031, .1030, .0973));
+    p3 += dot(p3, p3.yzx + 19.19);
+    return fract((p3.xx + p3.yz) * p3.zy);
+}
+
+/// @brief 2d discontinuous noise, in [-1, 1]
+vec2 signed_random_2d(vec3 p) {
+    return -1 + 2. * random_2d(p);
+}
+
+/// @brief 3d discontinuous noise, in [0, 1]
+vec3 random_3d(in vec3 p) {
+    return fract(sin(vec3(
+        dot(p, vec3(127.1, 311.7, 74.7)),
+        dot(p, vec3(269.5, 183.3, 246.1)),
+        dot(p, vec3(113.5, 271.9, 124.6)))
+    ) * 43758.5453123);
+}
+
+/// @brief 3d discontinuous noise, in [-1, 1]
+vec3 signed_random_3d(in vec3 p) {
+    return -1. + 2. * random_3d(p);
+}
+
+/// @brief gradient noise
+/// @source adapted from https://github.com/patriciogonzalezvivo/lygia/blob/main/generative/gnoise.glsl
+float gradient_noise(vec3 p) {
+    vec3 i = floor(p);
+    vec3 v = fract(p);
+
+    vec3 u = v * v * v * (v *(v * 6.0 - 15.0) + 10.0);
+
+    return mix( mix( mix( dot( signed_random_3d(i + vec3(0.0,0.0,0.0)), v - vec3(0.0,0.0,0.0)),
+                          dot( signed_random_3d(i + vec3(1.0,0.0,0.0)), v - vec3(1.0,0.0,0.0)), u.x),
+                     mix( dot( signed_random_3d(i + vec3(0.0,1.0,0.0)), v - vec3(0.0,1.0,0.0)),
+                          dot( signed_random_3d(i + vec3(1.0,1.0,0.0)), v - vec3(1.0,1.0,0.0)), u.x), u.y),
+                mix( mix( dot( signed_random_3d(i + vec3(0.0,0.0,1.0)), v - vec3(0.0,0.0,1.0)),
+                          dot( signed_random_3d(i + vec3(1.0,0.0,1.0)), v - vec3(1.0,0.0,1.0)), u.x),
+                     mix( dot( signed_random_3d(i + vec3(0.0,1.0,1.0)), v - vec3(0.0,1.0,1.0)),
+                          dot( signed_random_3d(i + vec3(1.0,1.0,1.0)), v - vec3(1.0,1.0,1.0)), u.x), u.y), u.z );
+}
+
+/// @brief fbm noise
+/// @source adapted from https://github.com/patriciogonzalezvivo/lygia/blob/main/generative/fbm.glsl
+float fractal_brownian_motion_noise(vec3 p) {
+    const float persistence = 0.5;
+    const int n_octaves = 1;
+
+    float amplitude = 0.5;
+    float total = 0.0;
+    float normalization = 0.0;
+
+    for (int i = 0; i < n_octaves; ++i) {
+        float noiseValue = gradient_noise(p) * 0.5 + 0.5;
+        total += noiseValue * amplitude;
+        normalization += amplitude;
+        amplitude *= persistence;
+    }
+
+    return total / normalization;
+}
 
 /// @brief voronoi noise
 /// @param blur in [0, 1]
@@ -29,7 +102,7 @@ float voronoise(vec3 p, float blur) {
 
 /// @brief simplex noise
 /// @source adapted from https://github.com/patriciogonzalezvivo/lygia/blob/main/generative/snoise.glsl
-float simplex(in vec3 v) {
+float simplex_noise(in vec3 v) {
     const vec2 C = vec2(1.0/6.0, 1.0/3.0);
     const vec4 D = vec4(0.0, 0.5, 1.0, 2.0);
 
@@ -94,7 +167,7 @@ float simplex(in vec3 v) {
 
 /// @brief worley noise
 /// @source adapted from https://github.com/patriciogonzalezvivo/lygia/blob/main/generative/worley.glsl
-float worley(vec3 p) {
+float worley_noise(vec3 p) {
     vec3 n = floor(p);
     vec3 f = fract(p);
 
