@@ -1,5 +1,5 @@
 rt.settings.battle.background.worley = {
-    shader_path = "battle/backgrounds/worley.glsl"
+    shader_path = "battle/backgrounds/voroworms.glsl"
 }
 
 bt.Background.WORLEY = meta.new_type("WORLEY", bt.Background, function()

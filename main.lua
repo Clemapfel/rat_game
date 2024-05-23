@@ -69,6 +69,7 @@ love.draw = function()
         love.graphics.print(label, rt.graphics.get_width() - love.graphics.getFont():getWidth(label) - 2 * margin, 0.5 * margin)
     end
 
+    --[[
     do -- show rulers
         love.graphics.setLineWidth(1)
         local intensity = 0.1
@@ -85,6 +86,7 @@ love.draw = function()
         love.graphics.line(x + 0.5 * width, y, x + 0.5 * width, height)
         rt.graphics.set_blend_mode()
     end
+    ]]--
 
     love.graphics.reset()
 end
