@@ -1288,7 +1288,17 @@ end
 
 --- @brief
 function bt.Scene:add_consumable(entity, consumable)
-    rt.error("TODO")
+    -- if entity already has consumable, refresh
+    if entity:has_consumable(consumable) then
+        entity:remove_consumable(consumable)
+    end
+
+    local animation = bt.Animation.CONSUMABLE_GAINED(self._ui:get_sprite(entity), consumable)
+    local message = bt.Animation.MESSAGE(self, self:format_name(entity) .. " acquired " .. self:format_name(consumable))
+
+    self:play_animations({animation, message})
+
+    -- TODO: on_consumable_gained, on_consumable_lost
 end
 
 --- @brief

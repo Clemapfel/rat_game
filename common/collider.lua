@@ -200,6 +200,7 @@ function rt.Collider:_draw_shape(shape, angle)
 
     love.graphics.push()
     rt.graphics.set_blend_mode(rt.BlendMode.NORMAL)
+    love.graphics.setLineWidth(1)
 
     local r, g, b = love.graphics.getColor()
     local type = shape:type()
@@ -220,6 +221,8 @@ function rt.Collider:_draw_shape(shape, angle)
         love.graphics.circle("fill", x, y, radius)
         love.graphics.setColor(r, g, b, 1)
         love.graphics.circle("line", x, y, radius)
+        love.graphics.line(x, y, rt.translate_point_by_angle(x, y, radius, angle))
+
     elseif type == "EdgeShape" then
         local ax, ay, bx, by = shape:getPoints()
         ax = ax + body_x
@@ -319,6 +322,16 @@ end
 --- @brief
 function rt.Collider:apply_force(x, y)
     self._body:applyForce(x, y)
+end
+
+--- @brief
+function rt.Collider:apply_torque(value)
+    self._body:applyTorque(value)
+end
+
+--- @brief
+function rt.Collider:apply_angular_impulse(value)
+    self._body:applyAngularImpulse(value)
 end
 
 --- @brief
@@ -449,7 +462,7 @@ function rt.Collider:contains_point(point_x, point_y)
 end
 
 --- @brief
-function rt.Collider:set_is_angle_fixed(b)
+function rt.Collider:set_rotation_is_fixed(b)
     self._body:setFixedRotation(b)
 end
 

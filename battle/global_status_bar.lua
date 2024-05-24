@@ -164,7 +164,6 @@ function bt.GlobalStatusBar:update(delta)
     end
 end
 
-
 --- @override
 function bt.GlobalStatusBar:size_allocate(x, y, width, height)
     if self._is_realized ~= true then return end
@@ -189,8 +188,10 @@ end
 --- @override
 function bt.GlobalStatusBar:draw()
     if self._is_realized ~= true then return end
-    self._frame:draw()
-    self._box:draw()
+    if self._target_width > 1 then
+        self._frame:draw()
+        self._box:draw()
+    end
 end
 
 --- @brief

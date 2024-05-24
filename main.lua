@@ -11,13 +11,13 @@ activate_consumable
 ]]--
 
 battle = bt.Battle("DEBUG_BATTLE")
-scene:set_background("WORLEY")
+scene:set_background("EYE")
 --scene:set_music("assets/music/test_music_04.mp3")
 
 input_controller = rt.InputController()
 input_controller:signal_connect("pressed", function(self, which)
     if which == rt.InputButton.A then
-        scene:play_animations({bt.Animation.STATUS_GAINED(scene._ui:get_sprite(battle.entities[4]), bt.Status("DEBUG_STATUS"))})
+        scene:play_animations({bt.Animation.CONSUMABLE_GAINED(scene._ui:get_sprite(scene._state.entities[1]), bt.Consumable("DEBUG_CONSUMABLE"))})
     elseif which == rt.InputButton.B then
         scene:skip()
     elseif which == rt.InputButton.X then
@@ -41,7 +41,7 @@ love.load = function()
     rt.current_scene:realize()
     love.resize()
     scene:start_battle(battle)
-    scene:add_global_status(bt.GlobalStatus("DEBUG_GLOBAL_STATUS"))
+    --scene:add_global_status(bt.GlobalStatus("DEBUG_GLOBAL_STATUS"))
     --scene:kill(battle.entities[1])
     --scene:kill(battle.entities[2])
 end
