@@ -147,7 +147,7 @@ return {
         for target in values(targets) do
             meta.assert_move_interface(target)
         end
-        println("[DBG] In " .. self.id .. ".on_stance_changed: " .. afflicted_user.id .. " changed stance from " .. old_stance .. " to " .. new_stance)
+        println("[DBG] In " .. self.id .. ".on_move_used: " .. afflicted_user.id .. " used " .. move.id)
         return nil
     end,
 
@@ -155,7 +155,23 @@ return {
         meta.assert_status_interface(self)
         meta.assert_entity_interface(afflicted)
         meta.assert_consumable_interface(consumable)
-        println("[DBG] In " .. self.id .. ".on_consumable_consumed: " .. afflicted.id .. "consumed " .. consumable.id)
+        println("[DBG] In " .. self.id .. ".on_consumable_consumed: " .. afflicted.id .. " consumed " .. consumable.id)
+        return nil
+    end,
+
+    on_consumable_gained = function(self, afflicted, consumable)
+        meta.assert_status_interface(self)
+        meta.assert_entity_interface(afflicted)
+        meta.assert_consumable_interface(consumable)
+        println("[DBG] In " .. self.id .. ".on_consumable_gained: " .. afflicted.id .. " gained " .. consumable.id)
+        return nil
+    end,
+
+    on_consumable_lost = function(self, afflicted, consumable)
+        meta.assert_status_interface(self)
+        meta.assert_entity_interface(afflicted)
+        meta.assert_consumable_interface(consumable)
+        println("[DBG] In " .. self.id .. ".on_consumable_lost: " .. afflicted.id .. "consumed " .. consumable.id)
         return nil
     end,
 }

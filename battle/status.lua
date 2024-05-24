@@ -187,6 +187,22 @@ end, {
         return nil
     end,
 
+    -- (StatusInterface, EntityInterface, ConsumableInterface) -> nil
+    on_consumable_gained = function(self, afflicted, consumable)
+        meta.assert_status_interface(self)
+        meta.assert_entity_interface(afflicted)
+        meta.assert_consumable_interface(consumable)
+        return nil
+    end,
+
+    -- (StatusInterface, EntityInterface, ConsumableInterface) -> nil
+    on_consumable_lost = function(self, afflicted, consumable)
+        meta.assert_status_interface(self)
+        meta.assert_entity_interface(afflicted)
+        meta.assert_consumable_interface(consumable)
+        return nil
+    end,
+
     description = "",
     sprite_id = "status_ailment",
     sprite_index = 1
@@ -214,7 +230,9 @@ function bt.Status:realize()
         "on_killed",
         "on_switch",
         "on_move_used",
-        "on_consumable_consumed"
+        "on_consumable_consumed",
+        "on_consumable_gained",
+        "on_consumable_lost",
     }
 
     local template = {

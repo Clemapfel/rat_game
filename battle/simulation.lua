@@ -1287,23 +1287,95 @@ function bt.Scene:end_turn()
 end
 
 --- @brief
-function bt.Scene:add_consumable(entity, consumable)
+function bt.Scene:add_consumable(entity, to_add)
     -- if entity already has consumable, refresh
-    if entity:has_consumable(consumable) then
-        entity:remove_consumable(consumable)
+    if entity:has_consumable(to_add) then
+        entity:remove_consumable(to_add)
     end
 
-    local animation = bt.Animation.CONSUMABLE_GAINED(self._ui:get_sprite(entity), consumable)
-    local message = bt.Animation.MESSAGE(self, self:format_name(entity) .. " acquired " .. self:format_name(consumable))
+    entity:add_consumable(to_add)
 
-    self:play_animations({animation, message})
+    local animation = bt.Animation.CONSUMABLE_GAINED(self._ui:get_sprite(entity), to_add)
+    local message = bt.Animation.MESSAGE(self, self:format_name(entity) .. " acquired " .. self:format_name(to_add))
 
-    -- TODO: on_consumable_gained, on_consumable_lost
+    local on_start = function()
+        self._ui:get_sprite(entity):add_consumable(to_add)
+    end
+
+    self:play_animations({animation, message}, on_start, nil)
+
+    local callback_id = "on_consumable_gained"
+    local holder_proxy = bt.EntityInterface(self, entity)
+    local consumable_proxy = bt.ConsumableInterface(self, entity, to_add)
+
+    for status in values(self._state:list_global_statuses()) do
+        if status[callback_id] ~= nil then
+            local self_proxy = bt.GlobalStatusInterface(self, status)
+            self:safe_invoke(status, callback_id, self_proxy, holder_proxy, consumable_proxy)
+            self:_animate_apply_global_status(status)
+        end
+    end
+
+    for status in values(entity:list_statuses()) do
+        if status[callback_id] ~= nil then
+            local self_proxy = bt.StatusInterface(self, entity, status)
+            self:safe_invoke(status, callback_id, self_proxy, holder_proxy, consumable_proxy)
+            self:_animate_apply_status(entity, status)
+        end
+    end
+
+    for consumable in values(entity:list_consumables()) do
+        if consumable ~= to_add and consumable[callback_id] ~= nil then
+            local self_proxy = bt.ConsumableInterface(self, entity, consumable)
+            self:_animate_apply_consumable(entity, consumable)
+        end
+    end
 end
 
 --- @brief
-function bt.Scene:remove_consumable(entity, consumable)
-    rt.error("TODO")
+function bt.Scene:remove_consumable(entity, to_remove)
+    -- if consumable not present, fizzle
+    if entity:has_consumable(to_remove) == false then
+        return
+    end
+
+    entity:remove_consumable(to_remove)
+
+    local animation = bt.Animation.CONSUMABLE_LOST(self._ui:get_sprite(entity), to_remove)
+    local message = bt.Animation.MESSAGE(self, self:format_name(entity) .. " dropped " .. self:format_name(to_remove))
+
+    local on_start = function()
+        self._ui:get_sprite(entity):remove_consumable(to_remove)
+    end
+
+    self:play_animations({animation, message}, on_start)
+
+    local callback_id = "on_consumable_lost"
+    local holder_proxy = bt.EntityInterface(self, entity)
+    local consumable_proxy = bt.ConsumableInterface(self, entity, to_remove)
+
+    for status in values(self._state:list_global_statuses()) do
+        if status[callback_id] ~= nil then
+            local self_proxy = bt.GlobalStatusInterface(self, status)
+            self:safe_invoke(status, callback_id, self_proxy, holder_proxy, consumable_proxy)
+            self:_animate_apply_global_status(status)
+        end
+    end
+
+    for status in values(entity:list_statuses()) do
+        if status[callback_id] ~= nil then
+            local self_proxy = bt.StatusInterface(self, entity, status)
+            self:safe_invoke(status, callback_id, self_proxy, holder_proxy, consumable_proxy)
+            self:_animate_apply_status(entity, status)
+        end
+    end
+
+    for consumable in values(entity:list_consumables()) do
+        if consumable ~= to_add and consumable[callback_id] ~= nil then
+            local self_proxy = bt.ConsumableInterface(self, entity, consumable)
+            self:_animate_apply_consumable(entity, consumable)
+        end
+    end
 end
 
 --- @brief

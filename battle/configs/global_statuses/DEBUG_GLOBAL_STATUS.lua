@@ -203,4 +203,20 @@ return {
         return nil
     end,
 
+    on_consumable_gained = function(self, holder, consumable)
+        meta.assert_global_status_interface(self)
+        meta.assert_entity_interface(holder)
+        meta.assert_consumable_interface(consumable)
+        println("[DBG] In " .. self.id .. ".on_consumable_gained: " .. holder.id .. " gained " .. consumable.id)
+        return nil
+    end,
+
+    on_consumable_lost = function(self, holder, consumable)
+        meta.assert_global_status_interface(self)
+        meta.assert_entity_interface(holder)
+        meta.assert_consumable_interface(consumable)
+        println("[DBG] In " .. self.id .. ".on_consumable_lost: " .. holder.id .. " lost " .. consumable.id)
+        return nil
+    end,
+
 }

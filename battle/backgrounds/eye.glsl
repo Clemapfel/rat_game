@@ -1,11 +1,6 @@
 
 #define PI 3.1415926535897932384626433832795
 
-
-float unused(){
-    return foo;
-}
-
 vec3 mod289(vec3 x) {
     return x - floor(x * (1.0 / 289.0)) * 289.0;
 }

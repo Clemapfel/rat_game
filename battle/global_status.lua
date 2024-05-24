@@ -180,6 +180,22 @@ end, {
         return nil
     end,
 
+    -- (GlobalStatusInterface, EntityInterface, ConsumableInterface)
+    on_consumable_gained = function(self, holder, consumable)
+        meta.assert_global_status_interface(self)
+        meta.assert_entity_interface(holder)
+        meta.assert_consumable_interface(consumable)
+        return nil
+    end,
+
+    -- (GlobalStatusInterface, EntityInterface, ConsumableInterface)
+    on_consumable_lost = function(self, holder, consumable)
+        meta.assert_global_status_interface(self)
+        meta.assert_entity_interface(holder)
+        meta.assert_consumable_interface(consumable)
+        return nil
+    end,
+
     description = "",
     sprite_id = "",
     sprite_index = 1
@@ -208,7 +224,9 @@ function bt.GlobalStatus:realize()
         "on_killed",
         "on_switch",
         "on_move_used",
-        "on_consumable_consumed"
+        "on_consumable_consumed",
+        "on_consumable_gained",
+        "on_consumable_lost"
     }
 
     local template = {

@@ -138,7 +138,23 @@ return {
         meta.assert_consumable_interface(self)
         meta.assert_entity_interface(holder)
         meta.assert_consumable_interface(consumable)
-        println("[DBG] In " .. self.id .. ".on_before_consumable: " .. holder.id .. " is consumed " .. consumable.id)
+        println("[DBG] In " .. self.id .. ".on_consumable_consumed: " .. holder.id .. " consumed " .. consumable.id)
+        return nil
+    end,
+
+    on_consumable_gained = function(self, holder, consumable)
+        meta.assert_consumable_interface(self)
+        meta.assert_entity_interface(holder)
+        meta.assert_consumable_interface(consumable)
+        println("[DBG] In " .. self.id .. ".on_consumable_gained: " .. holder.id .. " gained " .. consumable.id)
+        return nil
+    end,
+
+    on_consumable_consumed = function(self, holder, consumable)
+        meta.assert_consumable_interface(self)
+        meta.assert_entity_interface(holder)
+        meta.assert_consumable_interface(consumable)
+        println("[DBG] In " .. self.id .. ".on_consumable_lost: " .. holder.id .. " lost " .. consumable.id)
         return nil
     end,
 }
