@@ -6,7 +6,8 @@ bt.GradientFrame = meta.new_type("GradientFrame", rt.Widget, function()
         _frame_outline = rt.Rectangle(0, 0, 1, 1),
         _frame_gradient = {}, -- rt.LogGradient
         _frame_color = rt.settings.battle.priority_queue_element.frame_color,
-        _backdrop_color = rt.settings.battle.priority_queue_element.base_color
+        _backdrop_color = rt.settings.battle.priority_queue_element.base_color,
+        _gradient_visible = true
     })
 end)
 
@@ -61,13 +62,15 @@ function bt.GradientFrame:draw()
     self._frame_outline:draw()
     self._frame:draw()
 
-    local stencil_value = meta.hash(self) % 255
-    rt.graphics.stencil(stencil_value, self._frame)
-    rt.graphics.set_stencil_test(rt.StencilCompareMode.EQUAL, stencil_value)
-    rt.graphics.set_blend_mode(rt.BlendMode.MULTIPLY)
-    self._frame_gradient:draw()
-    rt.graphics.set_blend_mode()
-    rt.graphics.set_stencil_test()
+    if self._gradient_visible == true then
+        local stencil_value = meta.hash(self) % 255
+        rt.graphics.stencil(stencil_value, self._frame)
+        rt.graphics.set_stencil_test(rt.StencilCompareMode.EQUAL, stencil_value)
+        rt.graphics.set_blend_mode(rt.BlendMode.MULTIPLY)
+        self._frame_gradient:draw()
+        rt.graphics.set_blend_mode()
+        rt.graphics.set_stencil_test()
+    end
 end
 
 --- @brief
@@ -76,8 +79,8 @@ function bt.GradientFrame:set_color(frame_color, backdrop_color)
     self._backdrop_color = which(backdrop_color, self._backdrop_color)
 
     if self._is_realized then
-        self._frame:set_color(frame_color)
-        self._backdrop:set_color(backdrop_color)
+        self._frame:set_color(self._frame_color)
+        self._backdrop:set_color(self._backdrop_color)
     end
 end
 
@@ -88,6 +91,11 @@ function bt.GradientFrame:set_opacity(alpha)
     self._frame:set_opacity(alpha)
     self._frame_outline:set_opacity(alpha)
     self._frame_gradient:set_opacity(alpha)
+end
+
+--- @brief
+function bt.GradientFrame:set_gradient_visible(b)
+    self._gradient_visible = b
 end
 
 --- @brief

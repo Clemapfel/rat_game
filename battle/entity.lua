@@ -95,14 +95,14 @@ function bt.Entity:realize()
 
     -- TODO
     rt.random.seed(meta.hash(self))
-    self.hp_base = rt.random.integer(75, 150)
+    self.hp_base = 100 --rt.random.integer(75, 150)
     self.attack_base = rt.random.integer(50, 100)
     self.defense_base = rt.random.choose({70, 80, 90, 100, 110})
     self.speed_base = rt.random.integer(5, 155)
     -- TODO
 
     rt.load_config(self._path, self, template)
-    self.hp_current = self.hp_base
+    self.hp_current = 70 --self.hp_base
 
     self._is_realized = true
     meta.set_is_mutable(self, false)

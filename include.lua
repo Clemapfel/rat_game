@@ -137,6 +137,7 @@ require "battle.move_interface"
 require "battle.battle"
 require "battle.battle_interface"
 
+require "battle.selection_state"
 require "battle.health_bar"
 require "battle.speed_value"
 require "battle.gradient_frame"
@@ -154,8 +155,8 @@ require "battle.move_info"
 require "battle.entity_info"
 require "battle.background"
 require "battle.animation"
-
+require "battle.selection_handler"
 require "battle.battle_ui"
 require "battle.scene"
-require "battle.simulation"
+require "battle.simulation_handler"
 

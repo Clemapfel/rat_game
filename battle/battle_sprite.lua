@@ -18,6 +18,7 @@ bt.BattleSprite = meta.new_abstract_type("BattleSprite", rt.Widget, rt.Animation
     _status_bar = nil, -- bt.StatusBar
     _consumable_bar = nil, -- bt.ConsumableBar
 
+    _selection_state = bt.SelectionState.INACTIVE,
     _opacity = 1
 })
 
@@ -47,6 +48,10 @@ function bt.BattleSprite:draw()
         self._speed_value:draw()
         self._status_bar:draw()
         self._consumable_bar:draw()
+    end
+
+    if self._is_selected then
+
     end
 end
 
@@ -132,13 +137,8 @@ function bt.BattleSprite:get_state()
 end
 
 --- @brief
-function bt.BattleSprite:set_is_selected(b)
-    self._is_selected = b
-end
-
---- @brief
-function bt.BattleSprite:get_is_selected()
-    return self._is_selected
+function bt.BattleSprite:set_selection_state(state)
+    rt.error("In " .. meta.typeof(self) .. ".set_selection_state: abstract method called")
 end
 
 --- @brief
@@ -150,3 +150,4 @@ end
 function bt.BattleSprite:set_is_stunned(b)
     -- TODO
 end
+

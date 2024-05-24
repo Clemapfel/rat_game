@@ -92,7 +92,7 @@ function bt.EnemySprite:draw()
     self._sprite:draw()
     --bt.BattleSprite.draw(self)
 
-    if self._is_selected then
+    if self._selection_state == bt.SelectionState.SELECTED then
         self._selection_frame:draw()
     end
 end
@@ -155,4 +155,14 @@ end
 --- @brief
 function bt.EnemySprite:measure()
     return self._sprite:measure()
+end
+
+--- @brief
+function bt.EnemySprite:set_selection_state(state)
+    self._selection_state = state
+    if state == bt.SelectionState.UNSELECTED then
+        self:set_opacity(rt.settings.battle.selection.unselected_opacity)
+    else
+        self:set_opacity(1)
+    end
 end

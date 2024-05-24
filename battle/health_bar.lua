@@ -22,7 +22,7 @@ bt.HealthBar = meta.new_type("HealthBar", rt.Widget, rt.Animation, function(enti
         _hp_target = -1,
         _hp_max = -1,
 
-        _level_bar = rt.LevelBar(0, entity:get_hp(), entity:get_hp_base()),
+        _level_bar = rt.LevelBar(entity:get_hp(), 0, entity:get_hp_base()),
         _label_left = {},  -- rt.Glyph
         _label_center = {},
         _label_right = {},
@@ -92,6 +92,7 @@ function bt.HealthBar:realize()
 
     self:set_is_animated(true)
     self:update(0)
+
     self._is_realized = true
 end
 

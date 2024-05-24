@@ -49,6 +49,7 @@ for which in range("left", "up", "right", "down") do
     end
 end
 
+--- @brief
 function rt.QuaternaryTree:link_horizontally(left, right)
     if self._nodes[left] == nil then self:add(left) end
     if self._nodes[right] == nil then self:add(right) end
@@ -59,6 +60,7 @@ function rt.QuaternaryTree:link_horizontally(left, right)
     right_node.left = left_node
 end
 
+--- @brief
 function rt.QuaternaryTree:link_vertically(up, bottom)
     if self._nodes[up] == nil then self:add(up) end
     if self._nodes[bottom] == nil then self:add(bottom) end

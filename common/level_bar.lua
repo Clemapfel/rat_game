@@ -5,7 +5,7 @@ rt.settings.level_bar = {
 }
 
 --- @class rt.LevelBar
-rt.LevelBar = meta.new_type("LevelBar", rt.Widget, function(lower, upper, value)
+rt.LevelBar = meta.new_type("LevelBar", rt.Widget, function(value, lower, upper)
     meta.assert_number(lower, upper)
     value = which(value, mix(lower, upper, 0.5))
 
@@ -28,12 +28,19 @@ rt.LevelBar = meta.new_type("LevelBar", rt.Widget, function(lower, upper, value)
         outline:set_color(rt.Palette.BACKGROUND_OUTLINE)
     end
 
-    out._backdrop_outline:set_line_width(3)
-    out._shape_outline:set_line_width(1)
+    out._backdrop_outline:set_line_width(2)
+    out._shape_outline:set_line_width(2)
 
     out:set_color(out._color)
     return out
 end)
+
+--- @override
+function rt.LevelBar:realize()
+    if self._is_realized == true then return end
+    self._is_realized = true
+    self:_update_value()
+end
 
 --- @override
 function rt.LevelBar:size_allocate(x, y, width, height)
@@ -70,13 +77,12 @@ function rt.LevelBar:set_color(color, backdrop_color)
     self._backdrop:set_color(self._backdrop_color)
 end
 
-
 --- @brief [internal]
 function rt.LevelBar:_update_value()
     local x, y = self._backdrop:get_top_left()
     local width, height = self._backdrop:get_size()
     local bounds = rt.AABB(x, y, ((self._value - self._lower) / (self._upper - self._lower)) * width, height)
-    bounds = rt.AABB(math.round(bounds.x), math.round(bounds.y), math.round(bounds.width), math.round(bounds.height))
+    bounds = rt.AABB(math.floor(bounds.x), math.floor(bounds.y), math.floor(bounds.width), math.floor(bounds.height))
     self._shape:resize(bounds)
     self._shape_outline:resize(bounds.x + bounds.width, bounds.y, bounds.x + bounds.width, bounds.y + bounds.height)
 end
@@ -95,7 +101,7 @@ end
 --- @brief
 function rt.LevelBar:set_corner_radius(radius)
     self._corner_radius = radius
-    for shape in range(self._backdrop, self._backdrop_outline) do
+    for shape in range(self._shape, self._backdrop, self._backdrop_outline) do
         shape:set_corner_radius(radius)
     end
 end

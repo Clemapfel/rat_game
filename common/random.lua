@@ -49,6 +49,25 @@ function rt.random.choose(set)
     end
 end
 
+--- @brief pick random subset, no repeats
+function rt.random.choose_multiple(set)
+    local out = {}
+    local n_indices = rt.random.integer(1, sizeof(set))
+    local indices = {}
+    for i = 1, n_indices do
+        ::retry::
+        local index = rt.random.integer(1, sizeof(set))
+        if indices[index] == true then
+            goto retry
+        end
+
+        indices[index] = true
+        table.insert(out, set[index])
+    end
+
+    return out
+end
+
 --- @brief reorder table
 function rt.random.shuffle_in_place(t)
     for i = 1, #t do

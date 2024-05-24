@@ -4,7 +4,6 @@ rt.settings.battle.priority_queue_element = {
     frame_thickness = 5,
     base_color = rt.color_darken(rt.Palette.GRAY_5, 0.05),
     frame_color = rt.Palette.GRAY_4,
-    selected_frame_color = rt.Palette.YELLOW_2,
 
     knocked_out_shape_alpha = 0.7,
     knocked_out_pulse = function(x) return (rt.sine_wave(x, 1 / 3) - 0.5) * 0.3 end,
@@ -101,7 +100,7 @@ function bt.PriorityQueueElement:_update_frame_color()
     end
 
     if self._is_selected then
-        self._frame:set_color(rt.settings.battle.priority_queue_element.selected_frame_color)
+        self._frame:set_color(rt.Palette.SELECTION_OUTLINE)
     end
 end
 

@@ -33,8 +33,14 @@ function bt.PartySprite:_update_state()
         self._name:set_color(rt.RGBA(1, 1,1, rt.settings.battle.priority_queue_element.dead_shape_alpha))
     end
 
-    if self._is_selected then
-        self._frame:set_color(rt.settings.battle.priority_queue_element.selected_frame_color)
+    if self._selection_state == bt.SelectionState.SELECTED then
+        self._frame:set_color(rt.Palette.SELECTION_OUTLINE)
+    end
+
+    if self._selection_state == bt.SelectionState.UNSELECTED then
+        self:set_opacity(rt.settings.battle.selection.unselected_opacity)
+    else
+        self:set_opacity(1)
     end
 end
 
@@ -126,8 +132,8 @@ function bt.PartySprite:draw()
 end
 
 --- @brief
-function bt.PartySprite:set_is_selected(b)
-    self._is_selected = b
+function bt.PartySprite:set_selection_state(state)
+    self._selection_state = state
     self:_update_state()
 end
 

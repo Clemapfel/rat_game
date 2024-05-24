@@ -122,6 +122,34 @@ function bt.Scene:set_background(background_id)
 end
 
 --- @brief
+function bt.Scene:set_selected(entities, unselect_others)
+    if meta.isa(entities, bt.Entity) then
+        entities = {entities}
+    end
+
+    unselect_others = which(unselect_others, true)
+    self._ui:get_priority_queue():set_selected(entities)
+
+    local is_selected = {}
+    for entity in values(entities) do
+        is_selected[entity] = true
+    end
+
+    for entity in values(self._state:list_entities()) do
+        local sprite = self._ui:get_sprite(entity)
+        if is_selected[entity] == true then
+            sprite:set_selection_state(bt.SelectionState.SELECTED)
+        else
+            if unselect_others == true then
+                sprite:set_selection_state(bt.SelectionState.UNSELECTED)
+            else
+                sprite:set_selection_state(bt.SelectionState.INACTIVE)
+            end
+        end
+    end
+end
+
+--- @brief
 function bt.Scene:format_name(entity)
     local name
     if meta.isa(entity, bt.Entity) then

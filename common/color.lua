@@ -36,7 +36,7 @@ end
 --- @brief [internal] throw if object is not rt.RGBA
 function meta.assert_rgba(object)
     if not meta.is_rgba(object) then
-        rt.error("In " .. debug.getinfo(2, "n").name .. ": Excpected `RGBA`, got `" .. meta.typeof(object) .. "`")
+        rt.error("In " .. debug.getinfo(2, "n").name .. ": Expected `RGBA`, got `" .. meta.typeof(object) .. "`")
     end
 end
 

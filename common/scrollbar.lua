@@ -44,7 +44,6 @@ end
 
 --- @brief
 function rt.Scrollbar:set_page_index(value, n_pages_maybe)
-
     local i_before, n_before = self._page_index, self._n_pages
 
     self._page_index = value
