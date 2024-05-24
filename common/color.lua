@@ -299,6 +299,15 @@ function rt.color_lighten(color, offset)
     return rt.color_darken(color, -1 * offset)
 end
 
+--- @brief
+function rt.color_unpack(color)
+    if meta.is_rgba(color) then
+        return color.r, color.g, color.b, color.a
+    else
+        return color.h, color.s, color.v, color.a
+    end
+end
+
 --- @brief [internal] test colors
 function rt.test.colors()
     local rgba_from_string = rt.RGBA("#FF00FF")

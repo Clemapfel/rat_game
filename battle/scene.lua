@@ -16,6 +16,7 @@ bt.Scene = meta.new_type("BattleScene", rt.Widget, function()
         _playback_intensity = 0,
         _playback_elapsed = 0,
 
+        _selection_handler = {}, -- bt.SelectionHandler
         _elapsed = 0,
     })
 end)
@@ -31,6 +32,7 @@ function bt.Scene:realize()
         self._background:realize()
     end
 
+    self._selection_handler = bt.SelectionHandler(self)
     self._is_realized = true
 end
 

@@ -17,7 +17,11 @@ scene:set_background("EYE")
 input_controller = rt.InputController()
 input_controller:signal_connect("pressed", function(self, which)
     if which == rt.InputButton.A then
-        scene:set_selected(rt.random.choose_multiple(scene._state.entities))
+        local entities = {}
+        for entity in values(scene._state.entities) do
+            table.insert(entities, {entity})
+        end
+        scene._selection_handler:create_from(entities)
     elseif which == rt.InputButton.B then
         scene:skip()
     elseif which == rt.InputButton.X then
@@ -59,6 +63,8 @@ love.draw = function()
     if rt.current_scene ~= nil then
         rt.current_scene:draw()
     end
+
+    rt.current_scene._selection_handler:draw()
 
     do -- show fps and frame usage
         local fps = love.timer.getFPS()
