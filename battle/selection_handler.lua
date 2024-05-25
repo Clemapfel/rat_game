@@ -23,7 +23,6 @@ bt.SelectionHandler.Direction = meta.new_enum({
     LEFT = "LEFT"
 })
 
-
 --- @param entities Table<Table<bt.Entity>>
 function bt.SelectionHandler:create_from(entities)
     self._nodes = {}
