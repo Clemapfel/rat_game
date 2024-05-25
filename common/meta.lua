@@ -65,7 +65,34 @@ function meta.is_raw_table(x)
     return getmetatable(x) == nil and typeof(x) == "table" and sizeof(x) == #x
 end
 
+-- meta._new auxiliaries
 meta._hash = 1
+meta._new_newindex = function(this, property_name, property_value)
+    local metatable = this[1]
+    if not metatable[2] then
+        rt.error("In " .. metatable[meta._name_index] .. ".__newindex: Cannot set property `" .. property_name .. "`, because the object was declared immutable.")
+    end
+    metatable[1][property_name] = property_value
+end
+
+meta._new_tostring = function(this)
+    return "(" .. this[1][meta._name_index] .. ") " .. meta.serialize(this)
+end
+
+meta._new_eq = function(self, other)
+    return self[1][meta._hash_index] == other[1][meta._hash_index]
+end
+
+meta._new_pairs = function(self)
+    return pairs(self[1][1])
+end
+
+meta._properties_index = 1
+meta._is_mutable_index = 2
+meta._hash_index = 3
+meta._name_index = 4
+meta._components_index = 5
+meta._super_index = 6
 
 --- @brief [internal] Create new empty object
 --- @param typename String
@@ -75,37 +102,20 @@ function meta._new(typename)
     out[1] = {}  -- metatable
     metatable = out[1]
 
-    metatable.__name = typename._typename
-    metatable.__hash = meta._hash
+    metatable[meta._properties_index] = {}
+    metatable[meta._is_mutable_index] = true
+    metatable[meta._name_index] = typename._typename
+    metatable[meta._hash_index] = meta._hash
     meta._hash = meta._hash + 1
-    metatable[1] = {}       -- properties
-    metatable[2] = true     -- is_mutable
-    metatable.components = {}
-    metatable.super = {}
 
-    metatable.__index = function(this, property_name)
-        return this[1][1][property_name]
-    end
+    metatable[meta._components_index] = {}
+    metatable[meta._super_index] = {}
 
-    metatable.__newindex = function(this, property_name, property_value)
-        local metatable = this[1]
-        if not metatable[2] then
-            rt.error("In " .. metatable.__name .. ".__newindex: Cannot set property `" .. property_name .. "`, because the object was declared immutable.")
-        end
-        metatable[1][property_name] = property_value
-    end
-
-    metatable.__tostring = function(this)
-        return "(" .. this[1].__name .. ") " .. meta.serialize(this)
-    end
-
-    metatable.__eq = function(self, other)
-        return self[1].__hash == other[1].__hash
-    end
-
-    metatable.__pairs = function(self)
-        return pairs(self[1][1])
-    end
+    metatable.__index = out[1][1]
+    metatable.__newindex = meta._new_newindex
+    metatable.__tostring = meta._new_tostring
+    metatable.__eq = meta._new_eq
+    metatable.__pairs = meta._new_pairs
 
     setmetatable(out, metatable)
     return out, metatable
@@ -119,13 +129,13 @@ function meta.is_object(x)
         return false
     end
     local metatable = getmetatable(x)
-    return not (metatable == nil or metatable.__name == nil)
+    return not (metatable == nil or metatable[meta._name_index] == nil)
 end
 
 --- @brief get typename identifier
 function meta.typeof(x)
     if meta.is_object(x) then
-        return rawget(x, 1).__name
+        return rawget(x, 1)[meta._name_index]
     else
         return type(x)
     end
@@ -134,7 +144,7 @@ end
 --- @brief check if instance has type as super
 function meta.inherits(x, super)
     if meta.is_object(x) then
-        for _, name in pairs(rawget(x, 1).super) do
+        for _, name in pairs(rawget(x, 1)[meta._super_index]) do
             if name == super._typename then
                 return true
             end
@@ -289,20 +299,20 @@ end
 --- @param x meta.Object
 --- @param b Boolean
 function meta.set_is_mutable(x, b)
-    rawget(x, 1)[2] = b
+    rawget(x, 1)[meta._is_mutable_index] = b
 end
 
 --- @brief check if object is immutable
 --- @param x meta.Object
 --- @return Boolean
 function meta.get_is_mutable(x)
-    return rawget(x, 1)[2]
+    return rawget(x, 1)[meta._is_mutable_index]
 end
 
 --- @brief [internal] recursively install all types and super types of types, used in meta.new
 function meta._install_super(super)
-    if metatable.super[super._typename] ~= true then
-        metatable.super[super._typename] = true
+    if metatable[meta._super_index][super._typename] ~= true then
+        metatable[meta._super_index][super._typename] = true
         for key, value in pairs(super[1][1]) do  -- getmetatable(super).properties
             if metatable[1][key] == nil then -- properties[key]
                 metatable[1][key] = value
@@ -320,7 +330,6 @@ end
 --- @param fields Table property_name -> property_value
 function meta.new(type, fields)
     out, metatable = meta._new(type)
-    metatable[2] = true -- out:set_mutable
 
     if fields ~= nil then
         for name, value in pairs(fields) do
@@ -356,16 +365,7 @@ function meta.new_enum(fields)
         metatable[1][name] = value
     end
 
-    metatable.__pairs = function(this)
-        return pairs(this[1][1])
-    end
-    metatable.__ipairs = function(this)
-        return ipairs(this[1][1])
-    end
-    metatable.__index = function(this, key)
-        return this[1][1][key]
-    end
-
+    metatable.__index = out[1][1]
     meta.set_is_mutable(out, false)
     return out
 end
@@ -380,10 +380,10 @@ end
 --- @return Boolean
 function meta.isa(x, type)
     local metatable = getmetatable(x)
-    if meta.is_nil(metatable) or meta.is_nil(metatable.super) then
+    if meta.is_nil(metatable) or meta.is_nil(metatable[meta._super_index]) then
         return false
     else
-        return metatable.super[type._typename] == true
+        return metatable[meta._super_index][type._typename] == true
     end
 end
 
@@ -417,7 +417,6 @@ end
 
 --- @brief [internal] add meta.is_* and meta.assert_* given type
 function meta._define_type_assertion(typename)
-
     if string.len(typename) == 0 or typename == "nil" or typename == "number" or typename == "table" or typename == "boolean" or typename == "function" or typename == "userdata" then return end
 
     function string.to_snake_case(str, screaming)
@@ -461,8 +460,8 @@ end
 function meta.new_type(typename, ...)
     local out = meta._new("Type")
     local metatable = out[1]
-    metatable.__name = "Type"
-    metatable.super = {
+    metatable[meta._name_index] = "Type"
+    metatable[meta._super_index] = {
         ["Type"] = true
     }
 
@@ -533,7 +532,7 @@ end
 
 --- @brief get all super types of instance or type
 function meta.get_supertypes(instance)
-    return instance[1].super
+    return instance[1][meta._super_index]
 end
 
 --- @class meta.Type
@@ -622,7 +621,7 @@ end
 
 --- @brief hash object, each instance has a unique ID
 function meta.hash(x)
-    return rawget(x, 1).__hash
+    return rawget(x, 1)[meta._hash_index]
 end
 
 --- @brief serialize meta.Object
