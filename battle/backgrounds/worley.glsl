@@ -50,52 +50,9 @@ vec2 translate_point_by_angle(vec2 xy, float dist, float angle)
     return xy + vec2(cos(angle), sin(angle)) * dist;
 }
 
-
-/// @brief 3d discontinuous noise, in [0, 1]
-vec3 random_3d(in vec3 p) {
-    return fract(sin(vec3(
-                         dot(p, vec3(127.1, 311.7, 74.7)),
-                         dot(p, vec3(269.5, 183.3, 246.1)),
-                         dot(p, vec3(113.5, 271.9, 124.6)))
-                 ) * 43758.5453123);
-}
-
-/// @brief gradient noise
-/// @source adapted from https://github.com/patriciogonzalezvivo/lygia/blob/main/generative/gnoise.glsl
-float gradient_noise(vec3 p) {
-    vec3 i = floor(p);
-    vec3 v = fract(p);
-
-    vec3 u = v * v * v * (v *(v * 6.0 - 15.0) + 10.0);
-
-    return mix( mix( mix( dot( -1 + 2 * random_3d(i + vec3(0.0,0.0,0.0)), v - vec3(0.0,0.0,0.0)),
-                          dot( -1 + 2 * random_3d(i + vec3(1.0,0.0,0.0)), v - vec3(1.0,0.0,0.0)), u.x),
-                     mix( dot( -1 + 2 * random_3d(i + vec3(0.0,1.0,0.0)), v - vec3(0.0,1.0,0.0)),
-                          dot( -1 + 2 * random_3d(i + vec3(1.0,1.0,0.0)), v - vec3(1.0,1.0,0.0)), u.x), u.y),
-                mix( mix( dot( -1 + 2 * random_3d(i + vec3(0.0,0.0,1.0)), v - vec3(0.0,0.0,1.0)),
-                          dot( -1 + 2 * random_3d(i + vec3(1.0,0.0,1.0)), v - vec3(1.0,0.0,1.0)), u.x),
-                     mix( dot( -1 + 2 * random_3d(i + vec3(0.0,1.0,1.0)), v - vec3(0.0,1.0,1.0)),
-                          dot( -1 + 2 * random_3d(i + vec3(1.0,1.0,1.0)), v - vec3(1.0,1.0,1.0)), u.x), u.y), u.z );
-}
-
-/// @brief fbm noise
-/// @source adapted from https://github.com/patriciogonzalezvivo/lygia/blob/main/generative/fbm.glsl
-float fractal_brownian_motion_noise(vec3 p) {
-    const float persistence = 0.5;
-    const int n_octaves = 4;
-
-    float amplitude = 0.5;
-    float total = 0.0;
-    float normalization = 0.0;
-
-    for (int i = 0; i < n_octaves; ++i) {
-        float noiseValue = gradient_noise(p) * 0.5 + 0.5;
-        total += noiseValue * amplitude;
-        normalization += amplitude;
-        amplitude *= persistence;
-    }
-
-    return total / normalization;
+float laplacian_of_guassian(float x, float mean, float variance) {
+    x = x - mean;
+    return (1.0 - (x * x) / (variance * variance)) * exp(-0.5 * (x * x) / (variance * variance));
 }
 
 #ifdef PIXEL
@@ -110,49 +67,12 @@ vec4 effect(vec4 vertex_color, Image image, vec2 texture_coords, vec2 vertex_pos
     pos.x *= (love_ScreenSize.x / love_ScreenSize.y);
     pos *= 1;
 
-    float weight = gaussian(distance(pos.xy, vec2(0)), 0, 3);
-    float scale = 10;
-    float rng = fractal_brownian_motion_noise(vec3(pos.xy * weight * scale, time));
+    float weight = gaussian(distance(pos.xy, vec2(0)), 0, 5);
+    float scale = 6;
+    float magnitude_01 = worley_noise(vec3(pos.xy * weight * scale, time));
+    magnitude_01 = clamp(laplacian_of_guassian(magnitude_01, 0, 1.0), 0, 1);
 
-    // compute gradient (direction of space derivative)
-    float pixel_size_x = 1 / love_ScreenSize.y;
-    float pixel_size_y = 1 / love_ScreenSize.y;
-    mat3 sobel_horizontal = mat3(
-        -1.0, 0.0, 1.0,
-        -2.0, 0.0, 2.0,
-        -1.0, 0.0, 1.0
-    );
-
-    mat3 sobel_vertical = mat3(
-        -1.0, -2.0, -1.0,
-        0.0,  0.0,  0.0,
-        1.0,  2.0,  1.0
-    );
-
-    float horizontal_sum = 0;
-    float vertical_sum = 0;
-    for (int i = -1; i <= 1; ++i)
-    {
-        for (int j = -1; j <= 1; ++j)
-        {
-            float value = fractal_brownian_motion_noise(vec3((pos.xy + vec2(i * pixel_size_x, j * pixel_size_y)) * weight * scale, time)) ;
-            vertical_sum += sobel_vertical[i + 1][j + 1] * value;
-            horizontal_sum += sobel_horizontal[i + 1][j + 1] * value;
-        }
-    }
-
-
-    float direction = angle(vec2(horizontal_sum, vertical_sum)) + PI;
-    float magnitude = length(vec2(horizontal_sum, vertical_sum));
-
-    return vec4(vec3(magnitude * 7), 1);
-
-    float value = mix(gaussian(magnitude, 0, 0.005), rng, distance(texture_coords, vec2(0.5)));
-
-    vec3 light_gold = vec3(50.6 / 360, 1, 1);
-    vec3 dark_gold = vec3(30. / 360, 0.8, 0.5);
-
-    return vec4(hsv_to_rgb(mix(dark_gold, light_gold, value)), 1);
+    return vec4(vec3(1 - magnitude_01), 1);
 }
 
 #endif

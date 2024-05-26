@@ -1,5 +1,3 @@
-
-
 bt.Background.OVERLAP_LINES = meta.new_type("OVERLAP_LINES", bt.Background, function()
     return meta.new(bt.Background.OVERLAP_LINES, {
         _shader = {},   -- rt.Shader

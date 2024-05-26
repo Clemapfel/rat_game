@@ -25,24 +25,6 @@ vec3 hsv_to_rgb(vec3 c)
 /// @see https://www.shadertoy.com/view/WtccD7
 
 
-vec3 srgb_from_linear_srgb(vec3 x) {
-
-    vec3 xlo = 12.92*x;
-    vec3 xhi = 1.055 * pow(x, vec3(0.4166666666666667)) - 0.055;
-
-    return mix(xlo, xhi, step(vec3(0.0031308), x));
-
-}
-
-vec3 linear_srgb_from_srgb(vec3 x) {
-
-    vec3 xlo = x / 12.92;
-    vec3 xhi = pow((x + 0.055)/(1.055), vec3(2.4));
-
-    return mix(xlo, xhi, step(vec3(0.04045), x));
-
-}
-
 //////////////////////////////////////////////////////////////////////
 // oklab transform and inverse from
 // https://bottosson.github.io/posts/oklab/
@@ -63,14 +45,6 @@ const mat3 invB = mat3(0.4121656120, 0.2118591070, 0.0883097947,
 const mat3 invA = mat3(0.2104542553, 1.9779984951, 0.0259040371,
                        0.7936177850, -2.4285922050, 0.7827717662,
                        -0.0040720468, 0.4505937099, -0.8086757660);
-
-vec3 oklab_from_linear_srgb(vec3 c) {
-
-    vec3 lms = invB * c;
-
-    return invA * (sign(lms)*pow(abs(lms), vec3(0.3333333333333)));
-
-}
 
 vec3 linear_srgb_from_oklab(vec3 c) {
 
@@ -153,13 +127,14 @@ float gaussian(float x, float mean, float variance) {
     return exp(-pow(x - mean, 2.0) / variance);
 }
 
+
 // ###
 
 uniform float elapsed;
 
 vec4 effect(vec4 vertex_color, Image image, vec2 texture_coords, vec2 vertex_position)
 {
-    float time = elapsed / 50;
+    float time = elapsed / 75;
     vec2 pos = vertex_position / love_ScreenSize.xy;
 
     pos -= vec2(0.5);
@@ -171,21 +146,22 @@ vec4 effect(vec4 vertex_color, Image image, vec2 texture_coords, vec2 vertex_pos
     // hue
     vec2 origin = vec2(random(pos + vec2(time, -time)), random(pos + vec2(-time, time)));
     float dist = length(pos - origin);
-    float dg = fract(angle(pos - origin) + 0.75 + time);
-    float hue = gaussian(dg, 0.5, 0.7);
+    float dg = fract(angle(pos - origin) + time);
+    float hue = gaussian(dg, 0.5, 0.36);
+    hue = mod(hue + time, 1);
 
     // value
     float value = reverse_gaussian(texture_coords.y - 0.3, 0.3);
 
-    float theta = mod(2. * PI * (hue), 2 * PI) ;
-    float L = 0.8;
-    float chroma = 0.2;
-    float a = chroma*cos(theta);
-    float b = chroma*sin(theta);
-    vec3 lab = vec3(L, a, b);
-    vec3 rgb = clamp(linear_srgb_from_oklab(lab), 0.0, 1.0);
+    // convert lab
+    float theta = clamp(hue, 0, 1) * (2 * PI);
+    float l = 0.8;
+    float chroma = 0.3;
+    float a = chroma * cos(theta);
+    float b = chroma * sin(theta);
+    vec3 rgb = clamp(linear_srgb_from_oklab(vec3(l, a, b)), 0.0, 1.0);
 
-    return vec4(lab_to_rgb, 1);
+    return vec4(rgb, 1);
 
     //return vec4(lch2rgb(vec3(0.77, 0.25, hue)), 1);
 }

@@ -177,6 +177,28 @@ function bt.Battle:list_dead_entities()
 end
 
 --- @brief
+function bt.Battle:list_party()
+    local out = {}
+    for entity in values(self.entities) do
+        if not entity:get_is_dead() and entity:get_is_enemy() == false then
+            table.insert(out, entity)
+        end
+    end
+    return out
+end
+
+--- @brief
+function bt.Battle:list_enemies()
+    local out = {}
+    for entity in values(self.entities) do
+        if not entity:get_is_dead() and entity:get_is_enemy() == true then
+            table.insert(out, entity)
+        end
+    end
+    return out
+end
+
+--- @brief
 function bt.Battle:get_entity(entity_id)
     for entity in values(self.entities) do
         if entity == entity_id then
@@ -421,3 +443,4 @@ function bt.Battle:get_possible_targets(user, move)
 
     return targets
 end
+

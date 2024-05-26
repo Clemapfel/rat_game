@@ -1,53 +1,31 @@
 
 #define PI 3.1415926535897932384626433832795
 
+/// @brief worley noise
+/// @source adapted from https://github.com/patriciogonzalezvivo/lygia/blob/main/generative/worley.glsl
+float worley_noise(vec3 p) {
+    vec3 n = floor(p);
+    vec3 f = fract(p);
 
-vec3 mod289(vec3 x) {
-    return x - floor(x * (1.0 / 289.0)) * 289.0;
-}
+    float dist = 1.0;
+    for (int k = -1; k <= 1; k++) {
+        for (int j = -1; j <= 1; j++) {
+            for (int i = -1; i <= 1; i++) {
+                vec3 g = vec3(i, j, k);
 
-vec2 mod289(vec2 x) {
-    return x - floor(x * (1.0 / 289.0)) * 289.0;
-}
+                vec3 p = n + g;
+                p = fract(p * vec3(0.1031, 0.1030, 0.0973));
+                p += dot(p, p.yxz + 19.19);
+                vec3 o = fract((p.xxy + p.yzz) * p.zyx);
 
-vec3 permute(vec3 x) {
-    return mod289(((x*34.0)+1.0)*x);
-}
+                vec3 delta = g + o - f;
+                float d = length(delta);
+                dist = min(dist, d);
+            }
+        }
+    }
 
-float random(vec2 v)
-{
-    const vec4 C = vec4(0.211324865405187,  // (3.0-sqrt(3.0))/6.0
-                        0.366025403784439,  // 0.5*(sqrt(3.0)-1.0)
-                        -0.577350269189626,  // -1.0 + 2.0 * C.x
-                        0.024390243902439); // 1.0 / 41.0
-
-    vec2 i  = floor(v + dot(v, C.yy) );
-    vec2 x0 = v -   i + dot(i, C.xx);
-
-    vec2 i1;
-    i1 = (x0.x > x0.y) ? vec2(1.0, 0.0) : vec2(0.0, 1.0);
-    vec4 x12 = x0.xyxy + C.xxzz;
-    x12.xy -= i1;
-
-    i = mod289(i);
-    vec3 p = permute( permute( i.y + vec3(0.0, i1.y, 1.0 ))
-                      + i.x + vec3(0.0, i1.x, 1.0 ));
-
-    vec3 m = max(0.5 - vec3(dot(x0,x0), dot(x12.xy,x12.xy), dot(x12.zw,x12.zw)), 0.0);
-    m = m*m ;
-    m = m*m ;
-
-    vec3 x = 2.0 * fract(p * C.www) - 1.0;
-    vec3 h = abs(x) - 0.5;
-    vec3 ox = floor(x + 0.5);
-    vec3 a0 = x - ox;
-
-    m *= 1.79284291400159 - 0.85373472095314 * ( a0*a0 + h*h );
-
-    vec3 g;
-    g.x  = a0.x  * x0.x  + h.x  * x0.y;
-    g.yz = a0.yz * x12.xz + h.yz * x12.yw;
-    return 130.0 * dot(m, g);
+    return 1 - dist;
 }
 
 float project(float value, float lower, float upper) {
@@ -79,20 +57,8 @@ vec4 effect(vec4 vertex_color, Image image, vec2 texture_coords, vec2 vertex_pos
     int y_i = int(floor(pos.y / grid_size));
 
     vec2 center = vec2(float(x_i) * grid_size + radius, float(y_i) * grid_size + radius);
-    vec2 rng_pos = pos - vec2(0.5 * aspect_factor, 0.5);
-    rng_pos.x *= 5;
-    rng_pos.y *= 10;
-    float rng = distance(vec2(
-        random(rng_pos + vec2(time, -time)),
-        random(rng_pos + vec2(-time, time))
-    ), rng_pos / 2);
 
-    rng = gaussian(rng, 0, 1);
-
-    float ring_x = distance(pos, vec2(0.5 * aspect_factor, 0.5));
-    rng *= (sin(8 * ring_x * 2 * PI + PI * time * 3)) + 1;
-
-    radius = clamp(project(rng, 0.7 * radius, radius), 0, radius);
+    radius = project(worley_noise(vec3(pos.xy * 5, time)), 0.7 * radius, 1 * radius);
 
     float border = 0.005;
     float dist = radius - distance(pos, center);

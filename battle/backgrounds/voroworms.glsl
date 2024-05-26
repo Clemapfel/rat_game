@@ -1,6 +1,5 @@
 #define PI 3.1415926535897932384626433832795
 
-
 vec3 hsv_to_rgb(vec3 c)
 {
     vec4 K = vec4(1.0, 2.0 / 3.0, 1.0 / 3.0, 3.0);
@@ -138,10 +137,11 @@ float fractal_brownian_motion_noise(vec3 p) {
 
 /// @brief voronoi noise
 /// @param blur in [0, 1]
+/// @param squareness in [0, 1], 0: square, 1: random
 /// @source adapted from https://github.com/patriciogonzalezvivo/lygia/blob/main/generative/voronoise.glsl
-float voronoise(vec3 p, float blur) {
+float voronoise(vec3 p, float blur, float squareness) {
     blur = clamp(blur, 0, 1);
-    float u = 0.55;
+    float u = squareness;
     float k = 1.0 + 63.0 * pow(1.0 - blur, 6.0);
     vec3 i = floor(p);
     vec3 f = fract(p);
@@ -186,39 +186,16 @@ vec4 effect(vec4 vertex_color, Image image, vec2 texture_coords, vec2 vertex_pos
 
     float weight = 1; // gaussian(distance(pos.xy, vec2(0)), 0, 3);
     float scale = 10;
+    float offset = 0.01;
 
-    // compute gradient (direction of space derivative)
-    float pixel_size_x = 1 / love_ScreenSize.y;
-    float pixel_size_y = 1 / love_ScreenSize.y;
-
-    mat3 sobel_horizontal = mat3(
-        -1.0, 0.0, 1.0,
-        -2.0, 0.0, 2.0,
-        -1.0, 0.0, 1.0
+    float rng = voronoise(
+        vec3(pos.xy * weight * scale, time),
+        sine_wave(time / 4, 0.4 - offset, 0.4 + offset),
+        1
     );
 
-    mat3 sobel_vertical = mat3(
-        -1.0, -2.0, -1.0,
-        0.0,  0.0,  0.0,
-        1.0,  2.0,  1.0
-    );
-
-    const float offset = 0.15;
-    float horizontal_sum = 0;
-    float vertical_sum = 0;
-    for (int i = -1; i <= 1; ++i)
-    {
-        for (int j = -1; j <= 1; ++j)
-        {
-            float value = voronoise(vec3((pos.xy + vec2(i * pixel_size_x, j * pixel_size_y)) * weight * scale, time), sine_wave(time / 4, 0.4 - offset, 0.4 + offset)) ;
-            vertical_sum += sobel_vertical[i + 1][j + 1] * value;
-            horizontal_sum += sobel_horizontal[i + 1][j + 1] * value;
-        }
-    }
-
-    vec2 first_derivative = vec2(horizontal_sum, vertical_sum);
-
-    return vec4(vec3(gaussian(length(first_derivative), 0.5, 0.15)), 1);
+    float derivative = fwidth(rng);
+    return vec4(vec3(gaussian(derivative, 0.5, 0.15)), 1);
 }
 
 #endif
