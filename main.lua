@@ -17,11 +17,13 @@ scene:set_background("LAVALAMP")
 input_controller = rt.InputController()
 input_controller:signal_connect("pressed", function(self, which)
     if which == rt.InputButton.A then
-        local entities = {}
-        for entity in values(scene._state.entities) do
-            table.insert(entities, {entity})
-        end
-        scene._selection_handler:create_from(entities)
+
+        scene._selection_handler:create_from(scene._state:list_party()[1],
+            true,
+            false,
+            true,
+            true
+        )
     elseif which == rt.InputButton.B then
         scene:skip()
     elseif which == rt.InputButton.X then

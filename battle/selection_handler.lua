@@ -23,8 +23,14 @@ bt.SelectionHandler.Direction = meta.new_enum({
     LEFT = "LEFT"
 })
 
---- @param entities Table<Table<bt.Entity>>
-function bt.SelectionHandler:create_from(all, user, move)
+--- @brief reformat selection mapping
+--- @param entities Table<bt.Entity>
+--- @param user bt.Entity
+--- @param single_target Boolean
+--- @param can_target_self Boolean
+--- @param can_target_ally Boolean
+--- @param can_target_enemy Boolean
+function bt.SelectionHandler:create_from(entities, user, single_target, can_target_self, can_target_ally, can_target_enemy)
     assert(user:get_is_enemy() == false)
 
     local self, allies, enemies
