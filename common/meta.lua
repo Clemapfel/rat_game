@@ -329,7 +329,7 @@ end
 --- @param type meta.Type
 --- @param fields Table property_name -> property_value
 function meta.new(type, fields)
-    out, metatable = meta._new(type)
+    local out, metatable = meta._new(type)
 
     if fields ~= nil then
         for name, value in pairs(fields) do
