@@ -1,6 +1,6 @@
 rt.settings.selection_indicator = {
     width = 2,
-    outline_width = 5,
+    outline_width = 10,
     corner_radius = 5,
     alpha = 1
 }
@@ -24,17 +24,18 @@ end
 --- @override
 function rt.SelectionIndicator:draw()
     local x, y, w, h = self._x, self._y, self._width, self._height
-    local color = rt.Palette.SELECTION_OUTLINE
-    local width = rt.settings.selection_indicator.outline_width
+    local color = rt.Palette.BACKGROUND
+    local width = 5
     local corner_radius = rt.settings.selection_indicator.corner_radius
     local alpha = rt.settings.selection_indicator.alpha
+    love.graphics.setLineStyle("smooth")
 
     love.graphics.setColor(color.r, color.g, color.b, alpha)
-    love.graphics.setLineWidth(width)
-    love.graphics.rectangle("line", x - 0.5 * width, y - 0.5 * width, w + width, h + width, corner_radius, corner_radius)
+    love.graphics.setLineWidth(width + 3)
+    love.graphics.rectangle("line", x - width, y - width, w + 2 * width, h + 2 * width, corner_radius, corner_radius)
 
     color = rt.Palette.SELECTION
     love.graphics.setColor(color.r, color.g, color.b, alpha)
-    love.graphics.setLineWidth(rt.settings.selection_indicator.width)
-    love.graphics.rectangle("line", x - 0.5 * width, y - 0.5 * width, w + width, h + width, corner_radius, corner_radius)
+    love.graphics.setLineWidth(width)
+    love.graphics.rectangle("line", x - width, y - width, w + 2 * width, h + 2 * width, corner_radius, corner_radius)
 end

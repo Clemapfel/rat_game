@@ -34,7 +34,10 @@ function bt.PartySprite:_update_state()
     end
 
     if self._selection_state == bt.SelectionState.SELECTED then
-        self._frame:set_color(rt.Palette.SELECTION_OUTLINE)
+        self._frame:set_color(rt.Palette.SELECTION)
+        self._frame:set_gradient_visible(false)
+    else
+        self._frame:set_gradient_visible(true)
     end
 
     if self._selection_state == bt.SelectionState.UNSELECTED then

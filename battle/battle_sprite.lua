@@ -50,8 +50,8 @@ function bt.BattleSprite:draw()
         self._consumable_bar:draw()
     end
 
-    if self._is_selected then
-
+    if self._selection_state == bt.SelectionState.SELECTED and self._selection_frame ~= nil then
+        self._selection_frame:draw()
     end
 end
 

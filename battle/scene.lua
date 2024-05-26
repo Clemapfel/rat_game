@@ -188,3 +188,8 @@ end
 function bt.Scene:get_elapsed()
     return self._elapsed
 end
+
+--- @brief
+function bt.Scene:get_sprite(entity)
+    return self._ui:get_sprite(entity)
+end

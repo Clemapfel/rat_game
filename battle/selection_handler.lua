@@ -1,169 +1,219 @@
---[[
-Nodes:
-+ Single Enemy
-+ Single Ally
-+ Ally Enemies
-+ All Allies
-+ Everyone
-+ Field
-]]--
-
 bt.SelectionHandler = meta.new_type("BattleSelectionHandler", function(scene)
     return meta.new(bt.SelectionHandler, {
         _scene = scene,
         _nodes = {}, -- cf. create_from
+        _current_node = nil,
         _is_active = true
     })
 end)
 
-bt.SelectionHandler.Direction = meta.new_enum({
-    UP = "UP",
-    RIGHT = "RIGHT",
-    DOWN = "DOWN",
-    LEFT = "LEFT"
-})
-
 --- @brief reformat selection mapping
---- @param entities Table<bt.Entity>
 --- @param user bt.Entity
 --- @param single_target Boolean
 --- @param can_target_self Boolean
 --- @param can_target_ally Boolean
 --- @param can_target_enemy Boolean
-function bt.SelectionHandler:create_from(entities, user, single_target, can_target_self, can_target_ally, can_target_enemy)
-    assert(user:get_is_enemy() == false)
-
-    local self, allies, enemies
-    for entity in values(all) do
-        if entity:get_is_enemy() ~= user:get_is_enemy() and move:get_can_target_enemies() then
-            table.insert(enemies, entity)
-        elseif entity:get_is_enemy() == user:get_is_enemy() and move:get_can_target_allies() then
-            table.insert(allies, entity)
-        else
-            assert(entity == user)
-            self = user
-        end
-    end
-
-    self._nodes = {}
-    local me, us, them = move:get_can_target_self(), move:get_can_target_allies(), move:get_can_target_enemies()
-
-    if me == false and us == false and them == false then
-        -- field
-    end
-
-    if move:get_can_target_multiple() == false then
-        if me == true and us == false and them == false then
-            -- only self
-        elseif me == true and us == true and them == false then
-            -- self or single ally
-        elseif me == true and us == false and them == true then
-            -- self or single enemy
-        elseif me == true and us == true and them == true then
-            -- self or single ally or single enemy
-        elseif me == false and us == true and them == false then
-            -- single ally, not self
-        elseif me == false and us == false and them == true then
-            -- single enemy
-        elseif me == false and us == true and them == true then
-            -- single enemy or single ally but not self
-        end
-    else
-        if me == false and us == false and them == false then
-            -- only self
-        elseif me == true and us == true and them == false then
-            -- self and allies
-        end
-    end
-
-    --[[
-    self._nodes = {}
-    self._mapping = {}
-
-    local min_centroid_x, min_centroid_y, max_centroid_x, max_centroid_y = POSITIVE_INFINITY, POSITIVE_INFINITY, NEGATIVE_INFINITY, NEGATIVE_INFINITY
-    for group in values(entities) do
-        local sprites = {}
-        local min_x, min_y, max_x, max_y = POSITIVE_INFINITY, POSITIVE_INFINITY, NEGATIVE_INFINITY, NEGATIVE_INFINITY
-        for entity in values(group) do
+function bt.SelectionHandler:create_from(user, can_target_multiple, can_target_self, can_target_ally, can_target_enemy)
+    if can_target_self == false and can_target_ally == false and can_target_enemy == false then
+        self._nodes = {{
+            entities = {},
+            sprites = {},
+            up = nil,
+            right = nil,
+            down = nil,
+            left = nil
+        }}
+    elseif can_target_multiple == false then
+        local self_sprite, ally_sprites, enemy_sprites = {}, {}, {}
+        for entity in values(self._scene._state:list_entities()) do
             local sprite = self._scene._ui:get_sprite(entity)
-            local bounds = sprite:get_bounds()
-            min_x = math.min(min_x, bounds.x)
-            max_x = math.max(max_x, bounds.x + bounds.width)
-            min_y = math.min(min_y, bounds.y)
-            max_y = math.max(max_y, bounds.y + bounds.height)
-            table.insert(sprites, sprite)
+            if entity:get_is_enemy() == user:get_is_enemy() then
+                table.insert(ally_sprites, sprite)
+            else
+                table.insert(enemy_sprites, sprite)
+            end
 
+            if entity == user then
+                self_sprite = sprite
+            end
         end
 
-        local centroid_x = min_x + (max_x - min_x) * 0.5
-        local centroid_y = min_y + (max_y - min_y) * 0.5
+        -- sort sprites left to right
+        for which in range(ally_sprites, enemy_sprites) do
+            table.sort(which, function(a, b)
+                local bounds_a = a:get_bounds()
+                local bounds_b = b:get_bounds()
+                return bounds_a.x < bounds_b.x
+            end)
+        end
 
-        table.insert(self._nodes, {
-            entities = group,
-            sprites = sprites,
-            aabb = rt.AABB(min_x, min_y, max_x - min_x, max_y - min_y),
-            centroid_x = centroid_x,
-            centroid_y = centroid_y
-        })
+        local enemies = {}
+        local allies = {}
 
-        min_centroid_x = math.min(min_centroid_x, centroid_x)
-        min_centroid_y = math.min(min_centroid_y, centroid_y)
-        max_centroid_x = math.max(max_centroid_x, centroid_x)
-        max_centroid_y = math.max(max_centroid_y, centroid_y)
-    end
+        if can_target_enemy then
+            for sprite in values(enemy_sprites) do
+                table.insert(enemies, {
+                    entities = {sprite:get_entity()},
+                    sprites = {sprite},
+                    up = nil,
+                    right = nil,
+                    down = nil,
+                    left = nil
+                })
+            end
+        end
 
-    local Direction = bt.SelectionHandler.Direction
-
-    function angle_to_direction(angle)
-        angle = (angle + math.pi) / (2 * math.pi)
-        local eights = 0.125
-        local lookup = {
-            [1] = Direction.UP,
-            [2] = Direction.RIGHT,
-            [3] = Direction.RIGHT,
-            [4] = Direction.DOWN,
-            [5] = Direction.DOWN,
-            [6] = Direction.LEFT,
-            [7] = Direction.LEFT,
-            [8] = Direction.UP,
-        }
-        return lookup[math.ceil(angle / eights)]
-    end
-
-    for node in values(self._nodes) do
-        -- find closest other node
-        local min_distances = {
-            [Direction.UP] = POSITIVE_INFINITY,
-            [Direction.RIGHT] = POSITIVE_INFINITY,
-            [Direction.DOWN] = POSITIVE_INFINITY,
-            [Direction.LEFT] = POSITIVE_INFINITY,
-        }
-
-        local closest_node = {
-            [Direction.UP] = nil,
-            [Direction.RIGHT] = nil,
-            [Direction.DOWN] = nil,
-            [Direction.LEFT] = nil,
-        }
-
-        for other in values(self._nodes) do
-            if node ~= other then
-                local distance = rt.distance(node.centroid_x, node.centroid_y, other.centroid_x, other.centroid_y)
-                local angle = rt.angle(other.centroid_x - node.centroid_x, other.centroid_y - node.centroid_y)
-                local direction = angle_to_direction(angle)
-                if distance < min_distances[direction] then
-                    closest_node[direction] = other
+        if can_target_ally then
+            for sprite in values(ally_sprites) do
+                if sprite:get_entity() ~= user or (sprite:get_entity() == user and can_target_self) then
+                    table.insert(allies, {
+                        entities = {sprite:get_entity()},
+                        sprites = {sprite},
+                        up = nil,
+                        right = nil,
+                        down = nil,
+                        left = nil
+                    })
                 end
             end
         end
 
-        self._mapping[node] = closest_node
+        for i = 1, #enemies do
+            local current = enemies[i]
+            current.right = enemies[i + 1]
+            current.left = enemies[i - 1]
+            current.up = nil
+            if #allies > 0 then
+                current.down = allies[clamp(i, 1, #allies)]
+            end
+        end
+
+        for i = 1, #allies do
+            local current = allies[i]
+            current.right = allies[i + 1]
+            current.left = allies[i - 1]
+            current.down = nil
+            if #enemies > 0 then
+                current.up = enemies[clamp(i, 1, #enemies)]
+            end
+        end
+
+        self._nodes = {}
+        for array in range(allies, enemies) do
+            for node in values(array) do
+                table.insert(self._nodes, node)
+            end
+        end
+    else -- can_target_multiple == true
+        local all_node = {
+            entities = {},
+            sprites = {},
+            up = nil,
+            right = nil,
+            down = nil,
+            left = nil
+        }
+
+        local enemy_node = {
+            entities = {},
+            sprites = {},
+            up = nil,
+            right = nil,
+            down = nil,
+            left = nil
+        }
+
+        local ally_node = {
+            entities = {},
+            sprites = {},
+            up = nil,
+            right = nil,
+            down = nil,
+            left = nil
+        }
+
+        for entity in values(self._scene._state:list_entities()) do
+            local sprite = self._scene._ui:get_sprite(entity)
+            if entity == user and can_target_self then
+                table.insert(ally_node.entities, entity)
+                table.insert(ally_node.sprites, sprite)
+
+                table.insert(all_node.entities, entity)
+                table.insert(all_node.sprites, sprite)
+            elseif entity:get_is_enemy() == user:get_is_enemy() and can_target_ally then
+                table.insert(ally_node.entities, entity)
+                table.insert(ally_node.sprites, sprite)
+
+                table.insert(all_node.entities, entity)
+                table.insert(all_node.sprites, sprite)
+            elseif entity:get_is_enemy() ~= user:get_is_enemy() then
+                table.insert(enemy_node.entities, entity)
+                table.insert(enemy_node.sprites, sprite)
+
+                table.insert(all_node.entities, entity)
+                table.insert(all_node.sprites, sprite)
+            end
+        end
+
+        self._nodes = {}
+        if can_target_enemy == true and can_target_ally == true then
+            self._nodes = {all_node}
+        elseif can_target_enemy == false and (can_target_ally == true or can_target_self == true) then
+            self._nodes = {ally_node}
+        elseif can_target_enemy == true and can_target_ally == false then
+            self._nodes = {enemy_node}
+        end
     end
-    ]]--
+
+    for node in values(self._nodes) do
+        local min_x, min_y, max_x, max_y = POSITIVE_INFINITY, POSITIVE_INFINITY, NEGATIVE_INFINITY, NEGATIVE_INFINITY
+        for sprite in values(node.sprites) do
+            local bounds = sprite:get_bounds()
+            min_x = math.min(min_x, bounds.x)
+            min_y = math.min(min_y, bounds.y)
+            max_x = math.max(max_x, bounds.x + bounds.width)
+            max_y = math.max(max_y, bounds.y + bounds.height)
+        end
+        node.aabb = rt.AABB(min_x, min_x, max_x - min_x, max_y - min_y)
+        node.centroid_x = min_x + 0.5 * (max_x - min_x)
+        node.centroid_y = min_y + 0.5 * (max_y - min_y)
+    end
+
+    self._current_node = self._nodes[1]
+    if self._is_active then
+        self:_update_selections()
+    end
 end
 
 --- @brief [internal]
 function bt.SelectionHandler:draw()
+    for node in values(self._nodes) do
+        local from_x, from_y = node.centroid_x, node.centroid_y
+        love.graphics.setColor(rt.color_unpack(rt.Palette.BLACK))
+        love.graphics.circle("fill", from_x, from_y, 7)
+
+        if node == self._current_node then
+            love.graphics.setColor(rt.color_unpack(rt.Palette.SELECTION))
+        else
+            love.graphics.setColor(rt.color_unpack(rt.Palette.WHITE))
+        end
+        love.graphics.circle("fill", from_x, from_y, 6)
+
+        for direction in range(
+            "up", "right", "down", "left"
+        ) do
+            if node[direction] ~= nil then
+                if node == self._current_node or node[direction] == self._current_node then
+                    love.graphics.setColor(rt.color_unpack(rt.Palette.SELECTION))
+                else
+                    love.graphics.setColor(rt.color_unpack(rt.Palette.WHITE))
+                end
+                local to_x, to_y = node[direction].centroid_x, node[direction].centroid_y
+                love.graphics.line(from_x, from_y, to_x, to_y)
+            end
+        end
+    end
+
     --[[
     love.graphics.setLineWidth(1)
     for node, neighbors in pairs(self._mapping) do
@@ -189,10 +239,10 @@ end
 
 --- @brief
 function bt.SelectionHandler:_update_selections()
-    if not self._is_active then
-        self._scene:set_selection({}, false)
+    if not self._is_active or self._current_node == nil then
+        self._scene:set_selected({}, false)
     else
-        self._scene.set_selection(self._current_node.entities, true)
+        self._scene:set_selected(self._current_node.entities, true)
     end
 end
 
@@ -216,7 +266,7 @@ end
 --- @brief defines move_*
 --- @return Boolean
 for which in range("up", "right", "down", "left") do
-    bt.SelectionHandler["move_" .. which] = function()
+    bt.SelectionHandler["move_" .. which] = function(self)
         if self._current_node == nil then return false end
         local next = self._current_node[which]
         if next == nil then return false end

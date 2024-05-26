@@ -100,7 +100,7 @@ function bt.PriorityQueueElement:_update_frame_color()
     end
 
     if self._is_selected then
-        self._frame:set_color(rt.Palette.SELECTION_OUTLINE)
+        self._frame:set_color(rt.Palette.SELECTION)
     end
 end
 
@@ -345,12 +345,14 @@ function bt.PriorityQueueElement:draw()
         self._frame_outline:draw()
         self._frame:draw()
 
-        rt.graphics.stencil(2, self._frame)
-        rt.graphics.set_stencil_test(rt.StencilCompareMode.EQUAL, 2)
-        rt.graphics.set_blend_mode(rt.BlendMode.MULTIPLY)
-        self._frame_gradient:draw()
-        rt.graphics.set_blend_mode()
-        rt.graphics.set_stencil_test()
+        if not self._is_selected then
+            rt.graphics.stencil(2, self._frame)
+            rt.graphics.set_stencil_test(rt.StencilCompareMode.EQUAL, 2)
+            rt.graphics.set_blend_mode(rt.BlendMode.MULTIPLY)
+            self._frame_gradient:draw()
+            rt.graphics.set_blend_mode()
+            rt.graphics.set_stencil_test()
+        end
 
         if self._id_offset_label_visible then
             self._id_offset_label:draw()

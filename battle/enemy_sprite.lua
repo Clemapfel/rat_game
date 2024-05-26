@@ -90,11 +90,7 @@ function bt.EnemySprite:draw()
     if self._is_realized ~= true then return end
 
     self._sprite:draw()
-    --bt.BattleSprite.draw(self)
-
-    if self._selection_state == bt.SelectionState.SELECTED then
-        self._selection_frame:draw()
-    end
+    -- ui is drawn by scene separately
 end
 
 --- @override

@@ -17,12 +17,11 @@ scene:set_background("LAVALAMP")
 input_controller = rt.InputController()
 input_controller:signal_connect("pressed", function(self, which)
     if which == rt.InputButton.A then
-
         scene._selection_handler:create_from(scene._state:list_party()[1],
-            true,
-            false,
-            true,
-            true
+            true,   -- multiple
+            true,   -- self
+            true,   -- allies
+            true    -- enemies
         )
     elseif which == rt.InputButton.B then
         scene:skip()
@@ -33,11 +32,13 @@ input_controller:signal_connect("pressed", function(self, which)
     elseif which == rt.InputButton.L then
     elseif which == rt.InputButton.R then
     elseif which == rt.InputButton.UP then
-        scene._ui._log:scroll_up()
-        dbg(scene._ui._log:_can_scroll_up(), scene._ui._log:_can_scroll_down())
+        scene._selection_handler:move_up()
+    elseif which == rt.InputButton.RIGHT then
+        scene._selection_handler:move_right()
     elseif which == rt.InputButton.DOWN then
-        scene._ui._log:scroll_down()
-        dbg(scene._ui._log:_can_scroll_up(), scene._ui._log:_can_scroll_down())
+        scene._selection_handler:move_down()
+    elseif which == rt.InputButton.LEFT then
+        scene._selection_handler:move_left()
     end
 end)
 
