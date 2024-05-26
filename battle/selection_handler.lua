@@ -11,8 +11,8 @@ Nodes:
 bt.SelectionHandler = meta.new_type("BattleSelectionHandler", function(scene)
     return meta.new(bt.SelectionHandler, {
         _scene = scene,
-        _nodes = {},
-        _mapping = {}
+        _nodes = {}, -- cf. create_from
+        _is_active = true
     })
 end)
 
@@ -24,7 +24,53 @@ bt.SelectionHandler.Direction = meta.new_enum({
 })
 
 --- @param entities Table<Table<bt.Entity>>
-function bt.SelectionHandler:create_from(entities)
+function bt.SelectionHandler:create_from(all, user, move)
+    assert(user:get_is_enemy() == false)
+
+    local self, allies, enemies
+    for entity in values(all) do
+        if entity:get_is_enemy() ~= user:get_is_enemy() and move:get_can_target_enemies() then
+            table.insert(enemies, entity)
+        elseif entity:get_is_enemy() == user:get_is_enemy() and move:get_can_target_allies() then
+            table.insert(allies, entity)
+        else
+            assert(entity == user)
+            self = user
+        end
+    end
+
+    self._nodes = {}
+    local me, us, them = move:get_can_target_self(), move:get_can_target_allies(), move:get_can_target_enemies()
+
+    if me == false and us == false and them == false then
+        -- field
+    end
+
+    if move:get_can_target_multiple() == false then
+        if me == true and us == false and them == false then
+            -- only self
+        elseif me == true and us == true and them == false then
+            -- self or single ally
+        elseif me == true and us == false and them == true then
+            -- self or single enemy
+        elseif me == true and us == true and them == true then
+            -- self or single ally or single enemy
+        elseif me == false and us == true and them == false then
+            -- single ally, not self
+        elseif me == false and us == false and them == true then
+            -- single enemy
+        elseif me == false and us == true and them == true then
+            -- single enemy or single ally but not self
+        end
+    else
+        if me == false and us == false and them == false then
+            -- only self
+        elseif me == true and us == true and them == false then
+            -- self and allies
+        end
+    end
+
+    --[[
     self._nodes = {}
     self._mapping = {}
 
@@ -107,10 +153,12 @@ function bt.SelectionHandler:create_from(entities)
 
         self._mapping[node] = closest_node
     end
+    ]]--
 end
 
 --- @brief [internal]
 function bt.SelectionHandler:draw()
+    --[[
     love.graphics.setLineWidth(1)
     for node, neighbors in pairs(self._mapping) do
         local from_x, from_y = node.centroid_x, node.centroid_y
@@ -129,5 +177,45 @@ function bt.SelectionHandler:draw()
                 love.graphics.line(from_x, from_y, to_x, to_y)
             end
         end
+    end
+    ]]--
+end
+
+--- @brief
+function bt.SelectionHandler:_update_selections()
+    if not self._is_active then
+        self._scene:set_selection({}, false)
+    else
+        self._scene.set_selection(self._current_node.entities, true)
+    end
+end
+
+--- @brief
+function bt.SelectionHandler:set_is_active(b)
+    if self._is_active == b then return end
+    self._is_active = b
+    self:_update_selections()
+end
+
+--- @brief
+function bt.SelectionHandler:get_is_active()
+    return self._is_active
+end
+
+--- @brief
+function bt.SelectionHandler:get_selected()
+    return self._current_node.entities
+end
+
+--- @brief defines move_*
+--- @return Boolean
+for which in range("up", "right", "down", "left") do
+    bt.SelectionHandler["move_" .. which] = function()
+        if self._current_node == nil then return false end
+        local next = self._current_node[which]
+        if next == nil then return false end
+        self._current_node = next
+        self:_update_selections()
+        return true
     end
 end

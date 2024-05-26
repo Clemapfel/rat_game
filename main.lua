@@ -11,7 +11,7 @@ activate_consumable
 ]]--
 
 battle = bt.Battle("DEBUG_BATTLE")
-scene:set_background("EYE")
+scene:set_background("LAVALAMP")
 --scene:set_music("assets/music/test_music_04.mp3")
 
 input_controller = rt.InputController()
