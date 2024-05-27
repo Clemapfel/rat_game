@@ -283,6 +283,11 @@ end
 function bt.BattleUI:update(delta)
     if not self._is_realized then return end
 
+    local ff_delta = ternary(rt.current_scene._fast_forward_active == true, delta * rt.settings.battle.scene.fast_forward_factor, delta)
+    for manual_update in range(self._global_status_bar, self._priority_queue, self._animation_queue, self._log) do
+        manual_update:update(ff_delta)
+    end
+
     self._move_selection:update(delta)
 end
 
@@ -313,6 +318,11 @@ function bt.BattleUI:draw()
     end
 
     self._log:draw()
+
+    for manual_update in range(self._global_status_bar, self._priority_queue, self._animation_queue, self._log) do
+        manual_update:set_is_animated(false)
+    end
+
     self._move_selection:draw()
 end
 

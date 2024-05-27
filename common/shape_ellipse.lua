@@ -1,10 +1,11 @@
 --- @class rt.Ellipse
-rt.Ellipse = meta.new_type("Ellipse", rt.Shape, function(x, y, x_radius, y_radius)
+rt.Ellipse = meta.new_type("Ellipse", rt.Shape, function(x, y, x_radius, y_radius, n_outer_vertices)
     return meta.new(rt.Ellipse, {
         _x = x,
         _y = y,
         _x_radius = x_radius,
-        _y_radius = which(y_radius, x_radius)
+        _y_radius = which(y_radius, x_radius),
+        _n_outer_vertices = n_outer_vertices -- may be nil
     })
 end)
 rt.Circle = rt.Ellipse
@@ -13,11 +14,12 @@ rt.Circle = rt.Ellipse
 function rt.Ellipse:draw()
     self:_bind_properties()
     love.graphics.ellipse(
-            ternary(self:get_is_outline(), "line", "fill"),
-            self._x,
-            self._y,
-            self._x_radius,
-            self._y_radius
+        ternary(self:get_is_outline(), "line", "fill"),
+        self._x,
+        self._y,
+        self._x_radius,
+        self._y_radius,
+        self._n_outer_vertices
     )
     self:_unbind_properties()
 end
@@ -25,10 +27,10 @@ end
 --- @overload
 function rt.Ellipse:get_bounds()
     return rt.AABB(
-            self._x - self._x_radius,
-            self._y - self._y_radius,
-            self._x_radius * 2,
-            self._y_radius * 2
+        self._x - self._x_radius,
+        self._y - self._y_radius,
+        self._x_radius * 2,
+        self._y_radius * 2
     )
 end
 

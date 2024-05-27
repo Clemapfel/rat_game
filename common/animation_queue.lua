@@ -54,7 +54,6 @@ rt.AnimationQueue = meta.new_type("AnimationQueue", rt.Drawable, rt.Animation, f
     local out = meta.new(rt.AnimationQueue, {
         _animations = {}, -- Table<cf. push>
     })
-    out:set_is_animated(true)
     return out
 end)
 
@@ -186,4 +185,9 @@ function rt.AnimationQueue:draw()
             animation:draw()
         end
     end
+end
+
+--- @brief
+function rt.AnimationQueue:get_is_empty()
+    return sizeof(self._animations) == 0
 end

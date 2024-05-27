@@ -7,6 +7,7 @@ bt.Battle = meta.new_type("Battle", function(id)
     local path = rt.settings.battle.battle.config_path .. "/" .. id .. ".lua"
     local out = meta.new(bt.Battle, {
         id = id,
+        config = {},
         _path = path,
         _is_realized = false
     })
@@ -40,6 +41,7 @@ function bt.Battle:realize()
     end
 
     local config = chunk()
+    self._config = config
     local throw_on_unexpected = function(key, expected, got)
         rt.error("In rt.Battle:realize: error when loading config at `" .. path .. "` for key `" .. key .. "`: expected `" .. expected .. "`, got `" .. got .. "`")
     end

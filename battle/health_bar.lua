@@ -119,6 +119,8 @@ function bt.HealthBar:size_allocate(x, y, width, height)
         x, y, width, height
     )
     self._debug_outline:set_is_outline(true)
+    self:_update_value()
+    self:_update_color_from_percentage(self._hp_current / self._hp_max)
 end
 
 --- @override

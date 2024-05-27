@@ -2,6 +2,7 @@ rt.settings.battle.scene = {
     fourier_window_size = rt.settings.monitored_audio_playback.default_window_size,
     fourier_n_mel_frequencies = 32,
     fourier_transform_fps = 30,
+    fast_forward_factor = 8
 }
 
 --- @class bt.Scene
@@ -18,6 +19,8 @@ bt.Scene = meta.new_type("BattleScene", rt.Widget, function()
 
         _entity_selection = {}, -- bt.EntitySelection
 
+        _fast_forward_active = false,
+        _fast_forward_indicator = rt.FastForwardIndicator(),
         _elapsed = 0,
     })
 end)
@@ -33,6 +36,7 @@ function bt.Scene:realize()
         self._background:realize()
     end
 
+    self._fast_forward_indicator:realize()
     self._entity_selection = bt.EntitySelection(self)
     self._is_realized = true
 end
@@ -45,12 +49,19 @@ function bt.Scene:draw()
 
     self._entity_selection:draw()
     self._ui:draw()
+
+    if self._fast_forward_active == true and self._ui._animation_queue:get_is_empty() == false then
+        self._fast_forward_indicator:draw()
+    end
 end
 
 --- @override
 function bt.Scene:size_allocate(x, y, width, height)
     if not self._is_realized then return end
     self._ui:fit_into(x, y, width, height)
+
+    local m = rt.settings.margin_unit
+    self._fast_forward_indicator:fit_into(x + m, y + m, 100, 50)
 
     if meta.isa(self._background, bt.Background) then
         self._background:fit_into(x, y, width, height)
@@ -77,6 +88,10 @@ function bt.Scene:update(delta)
             self._playback_spectrum = spectrum
             self._playback_intensity = intensity
         end
+    end
+
+    if self._fast_forward_active then
+        self._fast_forward_indicator:update(delta)
     end
 end
 
@@ -114,6 +129,11 @@ end
 --- @brief
 function bt.Scene:skip()
     self._ui:skip()
+end
+
+--- @brief
+function bt.Scene:set_fast_forward_active(b)
+    self._fast_forward_active = b
 end
 
 --- @brief

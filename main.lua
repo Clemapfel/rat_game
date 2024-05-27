@@ -3,6 +3,7 @@ require "include"
 rt.current_scene = bt.Scene()
 scene = rt.current_scene
 
+
 --[[
 add_consumable
 remove_consumable
@@ -14,29 +15,31 @@ battle = bt.Battle("DEBUG_BATTLE")
 scene:set_background("WORLEY")
 --scene:set_music("assets/music/test_music_04.mp3")
 
+local to_spawn = {
+    id = "WALKING_SPROUT",
+    status = {
+        "DEBUG_STATUS"
+    },
+    consumables = {
+        "DEBUG_CONSUMABLE"
+    },
+    equips = {
+        "DEBUG_EQUIP"
+    },
+    moveset = {
+        "DEBUG_MOVE",
+        "INSPECT",
+        "PROTECT",
+        "STRUGGLE",
+        "SURF",
+        "WISH"
+    }
+}
+
 input_controller = rt.InputController()
 input_controller:signal_connect("pressed", function(self, which)
     if which == rt.InputButton.A then
-        scene:spawn_entity({
-            id = "WALKING_SPROUT",
-            status = {
-                "DEBUG_STATUS"
-            },
-            consumables = {
-                "DEBUG_CONSUMABLE"
-            },
-            equips = {
-                "DEBUG_EQUIP"
-            },
-            moveset = {
-                "DEBUG_MOVE",
-                "INSPECT",
-                "PROTECT",
-                "STRUGGLE",
-                "SURF",
-                "WISH"
-            }
-        })
+        scene:spawn_entities(to_spawn, to_spawn, to_spawn, to_spawn, to_spawn, to_spawn)
         --[[
         scene._ui._move_selection:set_sort_mode(rt.random.choose({
             bt.MoveSelection.SortMode.DEFAULT,
@@ -52,6 +55,7 @@ input_controller:signal_connect("pressed", function(self, which)
         scene:remove_status(battle.entities[1], bt.Status("DEBUG_STATUS"))
     elseif which == rt.InputButton.L then
     elseif which == rt.InputButton.R then
+        scene:set_fast_forward_active(true)
     elseif which == rt.InputButton.UP then
         scene._selection_handler:move_up()
     elseif which == rt.InputButton.RIGHT then
@@ -60,6 +64,12 @@ input_controller:signal_connect("pressed", function(self, which)
         scene._selection_handler:move_down()
     elseif which == rt.InputButton.LEFT then
         scene._selection_handler:move_left()
+    end
+end)
+
+input_controller:signal_connect("released", function(self, which)
+    if which == rt.InputButton.R then
+        scene:set_fast_forward_active(false)
     end
 end)
 
