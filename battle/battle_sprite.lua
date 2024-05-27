@@ -56,6 +56,18 @@ function bt.BattleSprite:draw()
 end
 
 --- @brief
+function bt.BattleSprite:update(delta)
+    for widget in range(
+        self._health_bar,
+        self._speed_value,
+        self._status_bar,
+        self._consumable_bar
+    ) do
+        widget:update(delta)
+    end
+end
+
+--- @brief
 function bt.BattleSprite:set_ui_is_visible(b)
     self._ui_is_visible = b
 end

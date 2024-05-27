@@ -40,18 +40,15 @@ function bt.EnemySprite:realize()
 
     self._selection_frame:realize()
 
-    for to_animate in range(self, self._health_bar, self._speed_value, self._status_bar, self._consumable_bar, self._sprite) do
-        to_animate:set_is_animated(true)
-    end
-
-    self:set_is_animated(true)
     self:reformat()
     self:synchronize(self._entity)
 end
 
 --- @override
 function bt.EnemySprite:update(delta)
-    -- noop
+    self._sprite:update(delta)
+    self._selection_frame:update(delta)
+    bt.BattleSprite.update(self, delta)
 end
 
 --- @override

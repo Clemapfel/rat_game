@@ -81,8 +81,6 @@ function rt.TextBox:realize()
         muted:set_color(rt.Palette.GRAY_3)
     end
     self._advance_indicator:set_color(rt.Palette.WHITE)
-
-    self:set_is_animated(true)
 end
 
 --- @brief [internal]

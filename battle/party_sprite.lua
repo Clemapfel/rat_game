@@ -68,9 +68,7 @@ function bt.PartySprite:realize()
 
     self._frame:realize()
 
-    for to_animate in range(self, self._health_bar, self._speed_value, self._status_bar, self._sprite) do
-        to_animate:set_is_animated(true)
-    end
+
     self:reformat()
     self:synchronize(self._entity)
 end
@@ -78,6 +76,9 @@ end
 --- @override
 function bt.PartySprite:update(delta)
     self._elapsed = self._elapsed + delta
+
+    bt.BattleSprite.update(self, delta)
+
     if self._state == bt.EntityState.KNOCKED_OUT then
         local offset = rt.settings.battle.priority_queue_element.knocked_out_pulse(self._elapsed)
         local color = rt.rgba_to_hsva(rt.Palette.KNOCKED_OUT)

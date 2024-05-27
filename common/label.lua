@@ -49,7 +49,6 @@ function rt.Label:realize()
     if not self:get_is_realized() then
         self:_parse()
         self:_update_default_size()
-        self:set_is_animated(self._is_animated)
         self._is_realized = true
     end
 end
@@ -568,13 +567,6 @@ function rt.Label:_parse()
     else
         self:set_n_visible_characters(self._n_visible_characters)
     end
-
-    if first_parse then
-        -- automatically start animations only for labels that have an animated effect
-        if animation_necessary then
-            self:set_is_animated(true)
-        end
-    end
 end
 
 --- @brief [internal] calculate size given infinite area
@@ -726,23 +718,6 @@ end
 --- @brief
 function rt.Label:get_n_visible_characters()
     return self._n_visible_characters
-end
-
---- @brief set whether the glyphs of the label are animated
---- @param b Boolean
-function rt.Label:set_is_animated(b)
-    self._is_animated = b
-    for _, glyph in pairs(self._glyphs) do
-        if meta.isa(glyph, rt.Glyph) then
-            glyph:set_is_animated(b)
-        end
-    end
-end
-
---- @brief get whether the glyphs of the label are animated
---- @return Boolean
-function rt.Label:get_is_animated()
-    return self._is_animated
 end
 
 --- @brief get font

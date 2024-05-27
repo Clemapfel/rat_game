@@ -40,7 +40,6 @@ function bt.EnemySprite:realize()
     local sprite_w, sprite_h = self._sprite:get_resolution()
     self._sprite:set_minimum_size(sprite_w * 4, sprite_h * 4)
     self._sprite:realize()
-    self._sprite:set_is_animated(true)
 
     local animation_id = rt.settings.battle.enemy_sprite.idle_animation_id
     if self._sprite:has_animation(animation_id) then

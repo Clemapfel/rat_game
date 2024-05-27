@@ -119,7 +119,6 @@ function rt.ParticleEmitter:realize()
         self:_snapshot_particle()
     end
 
-    self:set_is_animated(true)
     self._native:start()
     rt.Widget.realize(self)
 end

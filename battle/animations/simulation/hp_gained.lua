@@ -45,7 +45,6 @@ function bt.Animation.HP_GAINED:start()
     self._emitter:set_particle_lifetime(0, rt.settings.battle.animations.hp_gained.duration)
     self._emitter:set_scale(1, 1.5)
     self._emitter:set_density(0)
-    self._emitter:set_is_animated(true)
 
     self._label_path = {}
     self._target_path = {}
@@ -80,6 +79,7 @@ function bt.Animation.HP_GAINED:update(delta)
         self._already_emitted = true
     end
 
+    self._emitter:update(delta)
     self._target:set_is_visible(true)
     self._target_snapshot:snapshot(self._target)
     self._target:set_is_visible(false)

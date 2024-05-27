@@ -135,7 +135,8 @@ function bt.initialize_sandbox(env)
         end
     end
 
-    --
+    -- globals
+
 
     return env
 end

@@ -28,7 +28,7 @@ end, {
     defense_factor = 1,
     speed_factor = 1,
 
-    is_silent = true,
+    is_silent = false,
 
     -- (EquipInterface, EntityInterface) -> nil
     effect = function(self, holder)

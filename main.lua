@@ -128,7 +128,6 @@ love.draw = function()
 end
 
 love.update = function(delta)
-    rt.AnimationHandler:update(delta)
     if rt.current_scene ~= nil and rt.current_scene.update ~= nil then
         rt.current_scene:update(delta)
     end
@@ -174,7 +173,10 @@ love.run = function()
         local frame_duration = 0
         local before = love.timer.getTime()
 
-        if love.update then love.update(delta) end
+        if love.update ~= nil then
+            love.update(delta)
+        end
+
         if love.graphics and love.graphics.isActive() then
             love.graphics.clear(love.graphics.getBackgroundColor())
             love.graphics.reset()

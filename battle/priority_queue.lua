@@ -230,8 +230,6 @@ function bt.PriorityQueue:realize()
             element:realize()
         end
     end
-
-    self:set_is_animated(true)
 end
 
 --- @override
@@ -269,6 +267,10 @@ function bt.PriorityQueue:update(delta)
 
                     collider:add_userdata("scale", clamp(collider:get_userdata("scale") + step, 1, max_factor))
                 end
+            end
+
+            for element in values(entry.elements) do
+                element:update(delta)
             end
         end
     end

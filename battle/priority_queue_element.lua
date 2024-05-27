@@ -181,7 +181,6 @@ function bt.PriorityQueueElement:realize()
     self:set_change_indicator(self._change_direction)
 
     self:_update_state()
-    self:set_is_animated(true)
 end
 
 --- @brief
@@ -240,7 +239,6 @@ function bt.PriorityQueueElement:realize()
     self._change_indicator:realize()
     self:set_change_indicator(self._change_direction)
     self:_update_state()
-    self:set_is_animated(true)
 end
 
 --- @override

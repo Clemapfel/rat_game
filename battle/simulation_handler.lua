@@ -112,16 +112,18 @@ function bt.Scene:start_battle(battle)
     self:play_animations({bt.Animation.REORDER_PRIORITY_QUEUE(self, self._state:list_entities_in_order())})
 
     -- apply equips
+    local message = ""
     for entity in values(self._state:list_entities()) do
         for equip in values(entity:list_equips()) do
-            if equip.effect ~= nil then
+            if equip.effect ~= nil and equip.is_silent == false then
                 local holder_proxy = bt.EntityInterface(self, entity)
                 local equip_proxy = bt.EquipInterface(self, equip)
-                self:play_animations(bt.Animation.MESSAGE(self, self:format_name(entity) .. "s equipped " .. self:format_name(equip) .. " activated"))
+                message = message .. self:format_name(entity) .. "s equipped " .. self:format_name(equip) .. " activated" .. "\n"
                 self:safe_invoke(equip, "effect", equip_proxy, holder_proxy)
             end
         end
     end
+    self:play_animations({self:play_animations(bt.Animation.MESSAGE(self, message))})
 
     -- apply global statuses
     for status in values(battle:list_global_statuses()) do

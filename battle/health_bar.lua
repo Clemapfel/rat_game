@@ -90,7 +90,6 @@ function bt.HealthBar:realize()
     self._label_right = rt.Glyph(rt.settings.battle.health_bar.hp_font, right, settings)
     self._level_bar:realize()
 
-    self:set_is_animated(true)
     self:update(0)
 
     self._is_realized = true

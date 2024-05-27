@@ -57,6 +57,7 @@ rt.Glyph = meta.new_type("Glyph", rt.Drawable, rt.Animation, function(font, cont
         _position_x = 0,
         _position_y = 0,
         _n_visible_characters = utf8.len(content),
+        _is_animated = false,
 
         _is_outlined = is_outlined,
         _outline_color = outline_color,
@@ -91,7 +92,7 @@ function rt.Glyph:_update()
     else
         self._glyph = love.graphics.newText(self:_get_font(), {{self._color.r, self._color.g, self._color.b}, self._content})
     end
-    self:set_is_animated(sizeof(self._effects) > 0)
+    self._is_animated = sizeof(self._effects) > 0
 
     if self._is_outlined == true then
         local w, h = self:get_size()
@@ -368,6 +369,16 @@ end
 --- @brief
 function rt.Glyph:get_opacity()
     return self._opacity
+end
+
+--- @brief
+function rt.Glyph:set_is_animated(b)
+    self._is_animated = b
+end
+
+--- @brief
+function rt.Glyph:get_is_animated()
+    return self._is_animated
 end
 
 --- @brief [internal] test glyph

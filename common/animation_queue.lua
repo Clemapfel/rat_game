@@ -70,6 +70,7 @@ function rt.AnimationQueue:push(animations, start_callback, finish_callback)
     node.is_finished = false
     node.animations = {}
     for animation in values(animations) do
+        meta.assert_isa(animation, rt.QueueableAnimation)
         table.insert(node.animations, animation)
     end
 

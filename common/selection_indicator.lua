@@ -6,7 +6,7 @@ rt.settings.selection_indicator = {
 }
 
 --- @class
-rt.SelectionIndicator = meta.new_type("SelectionIndicator", rt.Widget, function()  
+rt.SelectionIndicator = meta.new_type("SelectionIndicator", rt.Widget,  rt.Animation, function()
     return meta.new(rt.SelectionIndicator, {
         _x = 0,
         _y = 0,
@@ -19,6 +19,11 @@ end)
 function rt.SelectionIndicator:resize(other_widget)
     self._x, self._y = other_widget:get_position()
     self._width, self._height = other_widget:measure()
+end
+
+--- @override
+function rt.SelectionIndicator:update(delta)
+    -- noop for now
 end
 
 --- @override

@@ -2,7 +2,7 @@ rt.settings.ordered_box = {
     max_scale = 2,
     collider_radius = 100,
     collider_mass = 50,
-    collider_speed = 2000,        -- px per second
+    collider_speed = 4000,        -- px per second
 
     scale_speed = 2.5,      -- fraction per second
     opacity_speed = 1.2,    -- fraction per second
@@ -103,7 +103,6 @@ function rt.OrderedBox:realize()
         local origin_x, origin_y = self._bounds.x + 0.5 * self._bounds.width, self._bounds.y + 0.5 * self._bounds.height
         entry.collider:set_position(origin_x, origin_y)
     end
-    self:set_is_animated(true)
 end
 
 function rt.OrderedBox:update(delta)

@@ -138,13 +138,14 @@ function bt.GlobalStatusBar:realize()
     end
 
     self._frame:realize()
-    self:set_is_animated(true)
 end
 
 --- @override
 function bt.GlobalStatusBar:update(delta)
     if self._is_realized ~= true then return end
     self._elapsed = self._elapsed + delta
+
+    self._box:update(delta)
 
     local should_reformat = false
     local current, target = self._frame_aabb.width, self._target_width

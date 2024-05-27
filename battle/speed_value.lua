@@ -30,7 +30,6 @@ function bt.SpeedValue:realize()
         outline_color = rt.Palette.TRUE_BLACK,
         color = rt.Palette.TRUE_WHITE
     })
-    self:set_is_animated(true)
     self:update(0)
     self._is_realized = true
 end
