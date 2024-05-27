@@ -110,17 +110,14 @@ function bt.Scene:start_battle(battle)
 
     self:play_animations(animations, nil, on_finish)
 
-    -- wait with queue reveal until sprites are visible
-    self:play_animations(bt.Animation.REORDER_PRIORITY_QUEUE(self, self._state:list_entities_in_order()))
-
     -- apply equips
-    for entity in values(self._entities) do
+    for entity in values(self._state:list_entities()) do
         for equip in values(entity:list_equips()) do
             if equip.effect ~= nil then
                 local holder_proxy = bt.EntityInterface(self, entity)
                 local equip_proxy = bt.EquipInterface(self, equip)
                 self:play_animations(bt.Animation.MESSAGE(self, self:format_name(entity) .. "s equipped " .. self:format_name(equip) .. " activated"))
-                bt.safe_invoke(self, equip, "effect", equip_proxy, holder_proxy)
+                self:safe_invoke(equip, "effect", equip_proxy, holder_proxy)
             end
         end
     end
@@ -130,8 +127,120 @@ function bt.Scene:start_battle(battle)
         self:add_global_status(status)
     end
 
-    -- TODO: set music
-    -- TODO: set background
+    -- invoke on spawned
+    local callback_id = "on_entity_spawned"
+
+    for status in values(self._state:list_global_statuses()) do
+        local proxies = {}
+        for entity in values(self._state:list_entities()) do
+            table.insert(proxies, bt.EntityInterface(self, entity))
+        end
+        if status[callback_id] ~= nil then
+            local self_proxy = bt.GlobalStatusInterface(self, status)
+            self:safe_invoke(status, callback_id, self_proxy, proxies)
+            self:_animate_apply_global_status(status)
+        end
+    end
+
+    for entity in values(self._state:list_entities()) do
+        for status in values(entity:list_statuses()) do
+            if status[callback_id] ~= nil then
+                local self_proxy = bt.StatusInterface(self, entity, status)
+                local new_proxy = bt.EntityInterface(self, entity)
+                self:safe_invoke(status, callback_id, self_proxy, new_proxy)
+                self:_animate_apply_status(entity, status)
+            end
+        end
+    end
+
+    for entity in values(self._state:list_entities()) do
+        for consumable in values(entity:list_consumables()) do
+            if consumable[callback_id] ~= nil then
+                local self_proxy = bt.ConsumableInterface(self, entity, consumable)
+                local new_proxy = bt.EntityInterface(self, entity)
+                self:safe_invoke(consumable, callback_id, self_proxy, new_proxy)
+                self:_animate_apply_consumable(entity, consumable)
+            end
+        end
+    end
+end
+
+--- @brief
+function bt.Scene:spawn_entity(entry)
+
+    local id = entry.id
+    local entity = bt.Entity(id)
+    for status_id in values(entry.status) do
+        entity:add_status(bt.Status(status_id))
+    end
+
+    for consumable_id in values(entry.consumables) do
+        entity:add_consumable(bt.Consumable(consumable_id))
+    end
+
+    for equip_id in values(entry.equips) do
+        entity:add_equip(bt.Equip(equip_id))
+    end
+
+    for move_id in values(entry.moveset) do
+        entity:add_move(bt.Move(move_id))
+    end
+
+    self._state:add_entity(entity)
+
+    -- at start of animation, add new sprite, then queue animations for new sprite
+    local on_start = function()
+        local animations = {}
+        self._ui:add_entity(entity)
+        self._ui:get_sprite(entity):set_ui_is_visible(false)
+        if entity:get_is_enemy() then
+            table.insert(animations, bt.Animation.ENEMY_APPEARED(self._ui:get_sprite(entity)))
+            table.insert(animations, bt.Animation.MESSAGE(self, self:format_name(entity) .. " appeared"))
+        else
+            table.insert(animations, bt.Animation.ALLY_APPEARED(self._ui:get_sprite(entity)))
+        end
+
+        self:append_animations(animations)
+    end
+
+    local on_finish = function()
+        self._ui:get_sprite(entity):set_ui_is_visible(true)
+    end
+
+    self:play_animations({bt.Animation.DELAY(0)}, on_start, on_finish)
+
+    -- delay invokations to after animation only this time, because sprite does not yet exist
+    local after_sprite_creation = function()
+        -- invoke entity spawned for global status
+        local callback_id = "on_entity_spawned"
+        local new_proxy = bt.EntityInterface(self, entity)
+
+        for status in values(self._state:list_global_statuses()) do
+            if status[callback_id] ~= nil then
+                local self_proxy = bt.GlobalStatusInterface(self, status)
+                self:safe_invoke(status, callback_id, self_proxy, {new_proxy})
+                self:_animate_apply_global_status(status)
+            end
+        end
+
+        for status in values(entity:list_statuses()) do
+            if status[callback_id] ~= nil then
+                local self_proxy = bt.StatusInterface(self, entity, status)
+                self:safe_invoke(status, callback_id, self_proxy, new_proxy)
+                self:_animate_apply_status(entity, status)
+            end
+        end
+
+        for consumable in values(entity:list_consumables()) do
+            if consumable[callback_id] ~= nil then
+                local self_proxy = bt.ConsumableInterface(self, entity, consumable)
+                self:safe_invoke(consumable, callback_id, self_proxy, new_proxy)
+                self:_animate_apply_consumable(entity, consumable)
+            end
+        end
+    end
+
+    self:play_animations(bt.Animation.REORDER_PRIORITY_QUEUE(self, self._state:list_entities_in_order()), after_sprite_creation)
 end
 
 --- @brief

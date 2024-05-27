@@ -17,11 +17,33 @@ scene:set_background("WORLEY")
 input_controller = rt.InputController()
 input_controller:signal_connect("pressed", function(self, which)
     if which == rt.InputButton.A then
+        scene:spawn_entity({
+            id = "WALKING_SPROUT",
+            status = {
+                "DEBUG_STATUS"
+            },
+            consumables = {
+                "DEBUG_CONSUMABLE"
+            },
+            equips = {
+                "DEBUG_EQUIP"
+            },
+            moveset = {
+                "DEBUG_MOVE",
+                "INSPECT",
+                "PROTECT",
+                "STRUGGLE",
+                "SURF",
+                "WISH"
+            }
+        })
+        --[[
         scene._ui._move_selection:set_sort_mode(rt.random.choose({
             bt.MoveSelection.SortMode.DEFAULT,
             bt.MoveSelection.SortMode.BY_NAME,
             bt.MoveSelection.SortMode.BY_N_USES_LEFT,
         }))
+        ]]--
     elseif which == rt.InputButton.B then
         scene:skip()
     elseif which == rt.InputButton.X then

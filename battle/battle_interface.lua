@@ -18,7 +18,7 @@ for which in values({
     --- @brief throw if type is not interface
     meta["assert_" .. which[1] .. "_interface"] = function(x)
         if not meta[is_name](x) then
-            rt.error("In " .. debug.getinfo(2, "n").name .. ": Expected `" .. which[2] .. "`, got `" .. meta.typeof(x) .. "`")
+            rt.error("In meta." .. "assert_" .. which[1] .. "_interface" .. ": Expected `" .. which[2] .. "`, got `" .. meta.typeof(x) .. "`")
         end
     end
 end

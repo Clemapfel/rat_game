@@ -174,4 +174,11 @@ return {
         println("[DBG] In " .. self.id .. ".on_consumable_lost: " .. afflicted.id .. "consumed " .. consumable.id)
         return nil
     end,
+
+    on_entity_spawned = function(self, afflicted)
+        meta.assert_status_interface(self)
+        meta.assert_entity_interface(afflicted)
+        println("[DBG] In " .. self.id .. ".on_entity_spanwed: " .. afflicted.id .. " joined")
+        return nil
+    end
 }

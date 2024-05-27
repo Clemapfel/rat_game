@@ -203,6 +203,12 @@ end, {
         return nil
     end,
 
+    -- (StatusInterface, EntityInterface)
+    on_entity_spawned = function(self, afflicted)
+        meta.assert_status_interface(self)
+        meta.assert_entity_interface(afflicted)
+    end,
+
     description = "",
     sprite_id = "status_ailment",
     sprite_index = 1
@@ -233,6 +239,7 @@ function bt.Status:realize()
         "on_consumable_consumed",
         "on_consumable_gained",
         "on_consumable_lost",
+        "on_entity_spawned"
     }
 
     local template = {

@@ -107,6 +107,11 @@ function bt.Scene:play_animations(...)
 end
 
 --- @brief
+function bt.Scene:append_animations(...)
+    self._ui:get_animation_queue():append(...)
+end
+
+--- @brief
 function bt.Scene:skip()
     self._ui:skip()
 end

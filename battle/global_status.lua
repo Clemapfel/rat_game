@@ -196,6 +196,15 @@ end, {
         return nil
     end,
 
+    -- (GlobalStatusInterface, Table<EntityInterface>)
+    on_entity_spawned = function(self, entities)
+        meta.assert_consumable_interface(self)
+        for entity in values(entities) do
+            meta.assert_entity_interface(entity)
+        end
+        return nil
+    end,
+
     description = "",
     sprite_id = "",
     sprite_index = 1
@@ -226,7 +235,8 @@ function bt.GlobalStatus:realize()
         "on_move_used",
         "on_consumable_consumed",
         "on_consumable_gained",
-        "on_consumable_lost"
+        "on_consumable_lost",
+        "on_entity_spawned"
     }
 
     local template = {

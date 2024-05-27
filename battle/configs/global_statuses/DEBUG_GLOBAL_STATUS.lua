@@ -219,4 +219,13 @@ return {
         return nil
     end,
 
+    on_entity_spawned = function(self, entities)
+        meta.assert_global_status_interface(self)
+        for entity in values(entities) do
+            meta.assert_entity_interface(entity)
+        end
+
+        println("[DBG] In " .. self.id .. ".on_entity_spawned: " .. sizeof(entities) .. " entities joined")
+        return nil
+    end,
 }
