@@ -15,10 +15,10 @@ rt.SelectionNode.right = {}
 rt.SelectionNode.down = {}
 rt.SelectionNode.left = {}
 
---- @class rt.SelectionHandler
+--- @class rt.EntitySelection
 --- @signal selection_changed (self, previous_widget, next_widget) -> nil
-rt.SelectionHandler = meta.new_type("SelectionHandler", rt.Widget, rt.SignalEmitter, function(child)
-    local out = meta.new(rt.SelectionHandler, {
+rt.EntitySelection = meta.new_type("EntitySelection", rt.Widget, rt.SignalEmitter, function(child)
+    local out = meta.new(rt.EntitySelection, {
         _nodes = {},        -- meta.hash(self) -> rt.SelectionNode(self, ...)
         _current_node = {}, -- meta.hash
         _input = {},
@@ -43,7 +43,7 @@ rt.SelectionHandler = meta.new_type("SelectionHandler", rt.Widget, rt.SignalEmit
 end)
 
 --- @overload rt.Drawable.draw
-function rt.SelectionHandler:draw()
+function rt.EntitySelection:draw()
     if not self:get_is_visible() then return end
     self._child:draw()
 
@@ -68,7 +68,7 @@ end
 
 
 --- @brief [internal]
-function rt.SelectionHandler:_validate_node_map()
+function rt.EntitySelection:_validate_node_map()
     local n_nodes = sizeof(self._nodes)
     local error_message, error_occurred = false
     for _, node in pairs(self._nodes) do
@@ -108,22 +108,22 @@ function rt.SelectionHandler:_validate_node_map()
 
     ::error::
     if error_occurred then
-        rt.error("In SelectionHandler:_validate_node_map: " .. error_message)
+        rt.error("In EntitySelection:_validate_node_map: " .. error_message)
     end
 end
 
 --- @overload rt.Widget.size_allocate
-function rt.SelectionHandler:size_allocate(x, y, width, height)
+function rt.EntitySelection:size_allocate(x, y, width, height)
     self._child:fit_into(rt.AABB(x, y, width, height))
 end
 
 --- @overload rt.Widget.measure
-function rt.SelectionHandler:measure()
+function rt.EntitySelection:measure()
     return self._child:measure()
 end
 
 --- @brief
-function rt.SelectionHandler:move(direction)
+function rt.EntitySelection:move(direction)
     if not meta.isa(self._current_node, rt.SelectionNode) then return end
 
     local current = self._current_node
@@ -147,7 +147,7 @@ function rt.SelectionHandler:move(direction)
 end
 
 --- @overload rt.Widget.realize
-function rt.SelectionHandler:realize()
+function rt.EntitySelection:realize()
     self._child:realize()
     rt.Widget.realize(self)
 
@@ -158,9 +158,9 @@ function rt.SelectionHandler:realize()
 end
 
 --- @bief
-function rt.SelectionHandler:connect(direction, from, to)
+function rt.EntitySelection:connect(direction, from, to)
     if from == to then
-        rt.error("In rt.SelectionHandler:connect: trying to connect `" .. meta.typeof(from) .. "` with itself, this would create an infinite loop")
+        rt.error("In rt.EntitySelection:connect: trying to connect `" .. meta.typeof(from) .. "` with itself, this would create an infinite loop")
         return
     end
 
@@ -199,16 +199,16 @@ end
 
 --- @brief
 --- @return rt.Widget
-function rt.SelectionHandler:get_selected()
+function rt.EntitySelection:get_selected()
     return self._current_node.self
 end
 
 --- @brief
 --- @param rt.Widget
-function rt.SelectionHandler:set_selected(widget)
+function rt.EntitySelection:set_selected(widget)
     local next = self._nodes[meta.hash(widget)]
     if meta.is_nil(next) then
-        rt.error("In SelectionHandler:set_selected: object `" .. meta.typeof(widget) .. "` is not registered with the selection handler")
+        rt.error("In EntitySelection:set_selected: object `" .. meta.typeof(widget) .. "` is not registered with the selection handler")
         return
     end
 

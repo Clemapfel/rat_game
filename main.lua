@@ -14,22 +14,10 @@ battle = bt.Battle("DEBUG_BATTLE")
 scene:set_background("WORLEY")
 --scene:set_music("assets/music/test_music_04.mp3")
 
-move_selection = bt.MoveSelection()
-move_selection:create_from(battle.entities[1], {
-    bt.Move("STRUGGLE"),
-    bt.Move("PROTECT"),
-    bt.Move("INSPECT"),
-    bt.Move("DEBUG_MOVE"),
-    bt.Move("SURF"),
-    bt.Move("WISH")
-})
-move_selection:realize()
-move_selection:fit_into(50, 50, 500, 500)
-
 input_controller = rt.InputController()
 input_controller:signal_connect("pressed", function(self, which)
     if which == rt.InputButton.A then
-        move_selection:set_sort_mode(rt.random.choose({
+        scene._ui._move_selection:set_sort_mode(rt.random.choose({
             bt.MoveSelection.SortMode.DEFAULT,
             bt.MoveSelection.SortMode.BY_NAME,
             bt.MoveSelection.SortMode.BY_N_USES_LEFT,
@@ -59,7 +47,7 @@ love.load = function()
     rt.current_scene:realize()
     love.resize()
     scene:start_battle(battle)
-    --scene:add_global_status(bt.GlobalStatus("DEBUG_GLOBAL_STATUS"))
+    scene:add_global_status(bt.GlobalStatus("DEBUG_GLOBAL_STATUS"))
     --scene:kill(battle.entities[1])
     --scene:kill(battle.entities[2])
 end
@@ -78,9 +66,6 @@ love.draw = function()
         rt.current_scene:draw()
     end
 
-    rt.current_scene._selection_handler:draw()
-    move_selection:draw()
-
     do -- show fps and frame usage
         local fps = love.timer.getFPS()
         local frame_usage = math.round(rt.graphics.frame_duration.max / (1 / fps) * 100)
@@ -90,7 +75,6 @@ love.draw = function()
         love.graphics.print(label, rt.graphics.get_width() - love.graphics.getFont():getWidth(label) - 2 * margin, 0.5 * margin)
     end
 
-    --[[
     do -- show rulers
         love.graphics.setLineWidth(1)
         local intensity = 0.1
@@ -107,7 +91,6 @@ love.draw = function()
         love.graphics.line(x + 0.5 * width, y, x + 0.5 * width, height)
         rt.graphics.set_blend_mode()
     end
-    ]]--
 
     love.graphics.reset()
 end
@@ -117,8 +100,6 @@ love.update = function(delta)
     if rt.current_scene ~= nil and rt.current_scene.update ~= nil then
         rt.current_scene:update(delta)
     end
-
-    move_selection:update(delta)
 end
 
 love.resize = function()

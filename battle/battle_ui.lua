@@ -18,6 +18,7 @@ bt.BattleUI = meta.new_type("BattleUI", rt.Widget, rt.Animation, function()
         _animation_queue = {}, -- rt.AnimationQueue
         _gradient_right = {}, -- rt.LogGradient
         _gradient_left = {},  -- rt.LogGradient
+        _move_selection = {}, -- bt.MoveSelection
     })
 end)
 
@@ -33,6 +34,26 @@ function bt.BattleUI:realize()
 
     self._global_status_bar = bt.GlobalStatusBar()
     self._global_status_bar:realize()
+
+    self._move_selection = bt.MoveSelection()
+    self._move_selection:realize()
+
+    -- TODO
+    self._move_selection:create_from(battle.entities[1], {
+        bt.Move("STRUGGLE"),
+        bt.Move("PROTECT"),
+        bt.Move("INSPECT"),
+        bt.Move("DEBUG_MOVE"),
+        bt.Move("SURF"),
+        bt.Move("WISH"),
+        bt.Move("STRUGGLE"),
+        bt.Move("PROTECT"),
+        bt.Move("INSPECT"),
+        bt.Move("DEBUG_MOVE"),
+        bt.Move("SURF"),
+        bt.Move("WISH")
+    })
+    -- TODO
 
     -- gradients
     local gradient_alpha = rt.settings.battle.battle_ui.gradient_alpha
@@ -162,7 +183,7 @@ function bt.BattleUI:_reformat_enemy_sprites()
         local sprite = self._enemy_sprites[i]
         w, h = sprite:measure()
         xy_positions[i] = {
-            clamp(mx + x_offset, mx),
+            clamp(x + mx + x_offset, mx),
             target_y - h
         }
         x_offset = x_offset + w + m
@@ -211,6 +232,7 @@ end
 
 --- @brief
 function bt.BattleUI:size_allocate(x, y, width, height)
+
     local m = rt.settings.margin_unit
     self._log:set_n_visible_lines(rt.settings.battle.battle_ui.log_n_lines_default)
 
@@ -219,8 +241,8 @@ function bt.BattleUI:size_allocate(x, y, width, height)
     local log_horizontal_margin = mx
     local log_vertical_margin = m
     self._log:fit_into(
-        log_horizontal_margin,
-        log_vertical_margin,
+        x + log_horizontal_margin,
+        y + log_vertical_margin,
         width - 2 * log_horizontal_margin,
         height * 1 / 4 - log_vertical_margin
     )
@@ -233,24 +255,35 @@ function bt.BattleUI:size_allocate(x, y, width, height)
     local priority_queue_width = rt.settings.battle.battle_ui.priority_queue_width
     local log_height = 5 * my
     self._priority_queue:fit_into(
-        width - priority_queue_width,
-        0,
+        x + width - priority_queue_width,
+        y,
         priority_queue_width,
         height
     )
 
-    local bounds = rt.AABB(0, log_vertical_margin, log_horizontal_margin, height * 1 / 4 - log_vertical_margin)
-    self._global_status_bar:fit_into(bounds)
-
 
     local gradient_width = 1 / 16 * width
-    self._gradient_left:resize(0, 0, gradient_width, height)
-    self._gradient_right:resize(width - gradient_width, 0, gradient_width, self._bounds.height)
+    self._gradient_left:resize(x, y, gradient_width, height)
+    self._gradient_right:resize(x + width - gradient_width, y, gradient_width, self._bounds.height)
+
+    local party_min_x, party_min_y, party_max_x, party_max_y = POSITIVE_INFINITY, POSITIVE_INFINITY, NEGATIVE_INFINITY, NEGATIVE_INFINITY
+    for sprite in values(self._party_sprites) do
+        local bounds = sprite:get_bounds()
+        party_min_x = math.min(party_min_x, bounds.x)
+        party_min_y = math.min(party_min_y, bounds.y)
+        party_max_x = math.max(party_max_x, bounds.x + bounds.width)
+        party_max_y = math.max(party_max_y, bounds.y + bounds.height)
+    end
+
+    local status_h = select(2, self._global_status_bar:measure())
+    self._global_status_bar:fit_into(0, party_min_y, party_min_x, party_max_y - party_min_y)
 end
 
 --- @brief
 function bt.BattleUI:update(delta)
     if not self._is_realized then return end
+
+    self._move_selection:update(delta)
 end
 
 --- @brief
@@ -280,6 +313,7 @@ function bt.BattleUI:draw()
     end
 
     self._log:draw()
+    self._move_selection:draw()
 end
 
 --- @brief

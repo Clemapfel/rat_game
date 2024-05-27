@@ -1,5 +1,5 @@
-bt.SelectionHandler = meta.new_type("BattleSelectionHandler", function(scene)
-    return meta.new(bt.SelectionHandler, {
+bt.EntitySelection = meta.new_type("BattleEntitySelection", function(scene)
+    return meta.new(bt.EntitySelection, {
         _scene = scene,
         _nodes = {}, -- cf. create_from
         _current_node = nil,
@@ -13,7 +13,7 @@ end)
 --- @param can_target_self Boolean
 --- @param can_target_ally Boolean
 --- @param can_target_enemy Boolean
-function bt.SelectionHandler:create_from(user, can_target_multiple, can_target_self, can_target_ally, can_target_enemy)
+function bt.EntitySelection:create_from(user, can_target_multiple, can_target_self, can_target_ally, can_target_enemy)
     if can_target_self == false and can_target_ally == false and can_target_enemy == false then
         self._nodes = {{
             entities = {},
@@ -186,7 +186,7 @@ function bt.SelectionHandler:create_from(user, can_target_multiple, can_target_s
 end
 
 --- @brief [internal]
-function bt.SelectionHandler:draw()
+function bt.EntitySelection:draw()
     for node in values(self._nodes) do
         local from_x, from_y = node.centroid_x, node.centroid_y
         love.graphics.setColor(rt.color_unpack(rt.Palette.BLACK))
@@ -223,10 +223,10 @@ function bt.SelectionHandler:draw()
         love.graphics.setColor(rt.color_unpack(rt.Palette.WHITE))
         love.graphics.circle("fill", from_x, from_y, 6)
         for direction in range(
-            bt.SelectionHandler.Direction.UP,
-            bt.SelectionHandler.Direction.RIGHT,
-            bt.SelectionHandler.Direction.DOWN,
-            bt.SelectionHandler.Direction.LEFT
+            bt.EntitySelection.Direction.UP,
+            bt.EntitySelection.Direction.RIGHT,
+            bt.EntitySelection.Direction.DOWN,
+            bt.EntitySelection.Direction.LEFT
         ) do
             if neighbors[direction] ~= nil then
                 local to_x, to_y = neighbors[direction].centroid_x, neighbors[direction].centroid_y
@@ -238,7 +238,7 @@ function bt.SelectionHandler:draw()
 end
 
 --- @brief
-function bt.SelectionHandler:_update_selections()
+function bt.EntitySelection:_update_selections()
     if not self._is_active or self._current_node == nil then
         self._scene:set_selected({}, false)
     else
@@ -247,26 +247,26 @@ function bt.SelectionHandler:_update_selections()
 end
 
 --- @brief
-function bt.SelectionHandler:set_is_active(b)
+function bt.EntitySelection:set_is_active(b)
     if self._is_active == b then return end
     self._is_active = b
     self:_update_selections()
 end
 
 --- @brief
-function bt.SelectionHandler:get_is_active()
+function bt.EntitySelection:get_is_active()
     return self._is_active
 end
 
 --- @brief
-function bt.SelectionHandler:get_selected()
+function bt.EntitySelection:get_selected()
     return self._current_node.entities
 end
 
 --- @brief defines move_*
 --- @return Boolean
 for which in range("up", "right", "down", "left") do
-    bt.SelectionHandler["move_" .. which] = function(self)
+    bt.EntitySelection["move_" .. which] = function(self)
         if self._current_node == nil then return false end
         local next = self._current_node[which]
         if next == nil then return false end

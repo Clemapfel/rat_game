@@ -16,7 +16,8 @@ bt.Scene = meta.new_type("BattleScene", rt.Widget, function()
         _playback_intensity = 0,
         _playback_elapsed = 0,
 
-        _selection_handler = {}, -- bt.SelectionHandler
+        _entity_selection = {}, -- bt.EntitySelection
+
         _elapsed = 0,
     })
 end)
@@ -32,7 +33,7 @@ function bt.Scene:realize()
         self._background:realize()
     end
 
-    self._selection_handler = bt.SelectionHandler(self)
+    self._entity_selection = bt.EntitySelection(self)
     self._is_realized = true
 end
 
@@ -41,7 +42,9 @@ function bt.Scene:draw()
     if self._background ~= nil then
         self._background:draw()
     end
-    --self._ui:draw()
+
+    self._entity_selection:draw()
+    self._ui:draw()
 end
 
 --- @override

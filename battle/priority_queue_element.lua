@@ -378,8 +378,8 @@ end
 
 --- @brief
 function bt.PriorityQueueElement:set_id_offset_label_visible(b)
-    if b ~= self._id_offset_label_visible then
-        self._id_offset_label_visible = b
+    self._id_offset_label_visible = b
+    if b == true then
         self._id_offset_label:set_text(self._entity:get_id_offset_suffix())
         self:reformat()
     end
