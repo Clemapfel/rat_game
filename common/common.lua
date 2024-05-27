@@ -621,6 +621,43 @@ function utf8.sub(str, i, j)
     return string.sub(str, i, j)
 end
 
+--- @brief
+function utf8.less_than(a, b)
+    local a_len, b_len = utf8.len(a), utf8.len(b)
+    for i = 1, math.min(a_len, b_len) do
+        local ac, bc = utf8.codepoint(a, i), utf8.codepoint(b, i)
+        if ac == bc then
+            -- continue
+        else
+            return ac < bc
+        end
+    end
+
+    -- codepoints equal, but possible different lengths
+    if a_len ~= b_len then
+        return utf8.len(a) < utf8.len(b)
+    else
+        return false
+    end
+end
+
+--- @brief
+function utf8.equal(a, b)
+    if utf8.len(a) ~= utf8.len(b) then return false end
+    for i = 1, utf8.len(a) do
+        if utf8.codepoint(a, i) ~= utf8.codepoint(b, i) then
+            return false
+        end
+    end
+    return true
+end
+
+--- @brief
+function utf8.greater_than(a, b)
+    return not utf8.equal(a, b) and not utf8.less_than(a, b)
+end
+
+
 --- @brief make first letter capital
 --- @param str string
 function string.capitalize(str)
