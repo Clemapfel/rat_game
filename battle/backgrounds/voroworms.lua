@@ -1,3 +1,3 @@
-bt.Background.VOROWORM = function()
-    return bt.ShaderOnlyBackground("/battle/backgrounds/voroworms.glsl")
+bt.Background.VOROWORMS = function()
+    return bt.ShaderOnlyBackground("/battle/backgrounds/worley.glsl")
 end

@@ -110,6 +110,7 @@ vec4 effect(vec4 vertex_color, Image image, vec2 texture_coords, vec2 vertex_pos
     pos.x *= (love_ScreenSize.x / love_ScreenSize.y);
     pos *= 1;
 
+
     float weight = gaussian(distance(pos.xy, vec2(0)), 0, 5);
     float scale = 6;
     float magnitude = fwidth(gradient_noise(vec3(pos.xy * weight * scale, time)));
