@@ -397,7 +397,8 @@ end
 function bt.Entity:add_move(move)
     self.moves[move:get_id()] = {
         move = move,
-        n_uses = move.max_n_uses
+        n_uses = move.max_n_uses,
+        is_disabled = false
     }
 end
 
@@ -413,6 +414,23 @@ function bt.Entity:list_moves()
         table.insert(out, entry.move)
     end
     return out
+end
+
+--- @brief
+function bt.Entity:set_move_is_disabled(move, b)
+    local entry = self.moves[move:get_id()]
+    if entry == nil then return end
+    entry.is_disabled = b
+end
+
+--- @brief
+function bt.Entity:get_move_is_disabled()
+    local entry = self.moves[move:get_id()]
+    if entry == nil then
+        return true
+    else
+        return entry.is_disabled
+    end
 end
 
 --- @brief

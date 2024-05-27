@@ -11,18 +11,29 @@ activate_consumable
 ]]--
 
 battle = bt.Battle("DEBUG_BATTLE")
-scene:set_background("LAVALAMP")
+scene:set_background("WORLEY")
 --scene:set_music("assets/music/test_music_04.mp3")
+
+move_selection = bt.MoveSelection()
+move_selection:create_from(battle.entities[1], {
+    bt.Move("STRUGGLE"),
+    bt.Move("PROTECT"),
+    bt.Move("INSPECT"),
+    bt.Move("DEBUG_MOVE"),
+    bt.Move("SURF"),
+    bt.Move("WISH")
+})
+move_selection:realize()
+move_selection:fit_into(50, 50, 500, 500)
 
 input_controller = rt.InputController()
 input_controller:signal_connect("pressed", function(self, which)
     if which == rt.InputButton.A then
-        scene._selection_handler:create_from(scene._state:list_party()[1],
-            true,   -- multiple
-            true,   -- self
-            true,   -- allies
-            true    -- enemies
-        )
+        move_selection:set_sort_mode(rt.random.choose({
+            bt.MoveSelection.SortMode.DEFAULT,
+            bt.MoveSelection.SortMode.BY_NAME,
+            bt.MoveSelection.SortMode.BY_N_USES_LEFT,
+        }))
     elseif which == rt.InputButton.B then
         scene:skip()
     elseif which == rt.InputButton.X then
@@ -68,6 +79,7 @@ love.draw = function()
     end
 
     rt.current_scene._selection_handler:draw()
+    move_selection:draw()
 
     do -- show fps and frame usage
         local fps = love.timer.getFPS()
@@ -105,6 +117,8 @@ love.update = function(delta)
     if rt.current_scene ~= nil and rt.current_scene.update ~= nil then
         rt.current_scene:update(delta)
     end
+
+    move_selection:update(delta)
 end
 
 love.resize = function()
