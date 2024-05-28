@@ -205,7 +205,8 @@ rt.InputButton = meta.new_enum({
     START = "INPUT_BUTTON_START",
     SELECT = "INPUT_BUTTON_SELECT",
     L = "INPUT_BUTTON_L",
-    R = "INPUT_BUTTON_R"
+    R = "INPUT_BUTTON_R",
+    DEBUG = "INPUT_BUTTON_DEBUG"
 })
 
 --- @brief
@@ -284,6 +285,11 @@ rt.InputMapping = {
         rt.GamepadButton.DPAD_LEFT,
         rt.KeyboardKey.ARROW_LEFT,
         rt.KeyboardKey.A
+    },
+
+    -- DEBUG
+    [rt.InputButton.DEBUG] = {
+        rt.KeyboardKey.ESCAPE
     }
 }
 

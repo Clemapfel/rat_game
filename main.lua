@@ -36,14 +36,14 @@ local to_spawn = {
     }
 }
 
+local verbose_info = bt.VerboseInfo()
+verbose_info:realize()
+verbose_info:fit_into(50, 50, rt.graphics.get_width() - 50, rt.graphics.get_height() - 50)
+
 input_controller = rt.InputController()
 input_controller:signal_connect("pressed", function(self, which)
     if which == rt.InputButton.A then
-        scene._ui._move_selection:set_sort_mode(rt.random.choose({
-            bt.MoveSelection.SortMode.DEFAULT,
-            bt.MoveSelection.SortMode.BY_NAME,
-            bt.MoveSelection.SortMode.BY_N_USES_LEFT,
-        }))
+        verbose_info:show(rt.random.choose(scene._state.entities[1]:list_moves()))
     elseif which == rt.InputButton.B then
         scene:skip()
     elseif which == rt.InputButton.X then
@@ -61,6 +61,8 @@ input_controller:signal_connect("pressed", function(self, which)
         scene._selection_handler:move_down()
     elseif which == rt.InputButton.LEFT then
         scene._selection_handler:move_left()
+    elseif which == rt.InputButton.DEBUG then
+        love.event.quit()
     end
 end)
 
@@ -94,6 +96,8 @@ love.draw = function()
     if rt.current_scene ~= nil then
         rt.current_scene:draw()
     end
+
+    verbose_info:draw()
 
     do -- show fps and frame usage
         local fps = love.timer.getFPS()

@@ -109,7 +109,6 @@ function bt.MoveInfo:realize()
     self._target_label = new_label("<u>Targets</u> <color=" .. gray .. "><b>:</b></color> ", target_str)
     self._effect_label = new_label("<u>Effect</u>: " .. self._move:get_description() .. ".")
 
-
     local priority_str = ""
     local prio = self._move:get_priority()
     while prio > 0 do

@@ -74,7 +74,6 @@ end
 
 --- @overload rt.Widget.size_allocate
 function rt.Label:size_allocate(x, y, width, height)
-
     -- apply wrapping
     local syntax = rt.Label._syntax
     local space = self._font:get_bold_italic():getWidth(syntax.SPACE)

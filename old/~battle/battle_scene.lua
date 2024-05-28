@@ -26,7 +26,6 @@ end
 --- @brief
 function bt.BattleScene:size_allocate(x, y, width, height)
     self._ui:fit_into(x, y, width, height)
-
     local length = width
     self._debug_layout_lines = {
         -- margin_left

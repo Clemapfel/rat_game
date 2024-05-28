@@ -64,7 +64,9 @@ end, {
     knocked_out_sprite_index = nil,
 
     dead_sprite_id = nil,
-    dead_sprite_index = nil
+    dead_sprite_index = nil,
+
+    description = "Beyond description, mostly because there was none added yet"
 })
 
 --- @brief
@@ -544,4 +546,9 @@ function bt.Entity:consume_consumable(consumable)
         end
         return n_left
     end
+end
+
+--- @brief
+function bt.Entity:get_description()
+    return self.description
 end

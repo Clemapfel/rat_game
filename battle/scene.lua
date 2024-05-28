@@ -21,9 +21,18 @@ bt.Scene = meta.new_type("BattleScene", rt.Widget, function()
 
         _fast_forward_active = false,
         _fast_forward_indicator = rt.FastForwardIndicator(),
+
+        _state_machine = rt.StateMachine(),
         _elapsed = 0,
     })
 end)
+
+bt.Scene.StateID = meta.new_enum({
+    INSPECT = "INSPECT",
+    SIMULATION = "SIMULATION",
+    SELECT_MOVE = "SELECT_MOVE",
+    SELECT_TARGET = "SELECT_TARGET"
+})
 
 --- @override
 function bt.Scene:realize()
@@ -38,6 +47,14 @@ function bt.Scene:realize()
 
     self._fast_forward_indicator:realize()
     self._entity_selection = bt.EntitySelection(self)
+
+    local inspect_state = rt.StateMachine.State(bt.Scene.StateID.INSPECT)
+    inspect_state.enter = function()
+        self._ui:set_move_selection_visible(false)
+        self._ui:set_log_visible(false)
+    end
+
+
     self._is_realized = true
 end
 

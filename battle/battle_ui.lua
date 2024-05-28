@@ -8,7 +8,6 @@ rt.settings.battle.battle_ui = {
 --- @class bt.BattleUI
 bt.BattleUI = meta.new_type("BattleUI", rt.Widget, rt.Animation, function()
     return meta.new(bt.BattleUI, {
-        _log = {}, -- rt.TextBox
         _priority_queue = {}, -- bt.PriorityQueue
         _global_status_bar = {}, -- bt.GlobalStatusBar
         _entities = {},  -- Set<bt.Entity>
@@ -18,7 +17,15 @@ bt.BattleUI = meta.new_type("BattleUI", rt.Widget, rt.Animation, function()
         _animation_queue = {}, -- rt.AnimationQueue
         _gradient_right = {}, -- rt.LogGradient
         _gradient_left = {},  -- rt.LogGradient
+
+        _move_selection_visible = false,
         _move_selection = {}, -- bt.MoveSelection
+
+        _log_visible = true,
+        _log = {}, -- rt.TextBox
+
+        _entity_infos = {}, -- Table<Entity, bt.EntityInfo>
+        _move_infos = {},   -- Table<Move, bt.MoveInfo>
     })
 end)
 
@@ -334,8 +341,13 @@ function bt.BattleUI:draw()
         bt.BattleSprite.draw(self._enemy_sprites[i])
     end
 
-    self._log:draw()
-    self._move_selection:draw()
+    if self._log_visible == true then
+        self._log:draw()
+    end
+
+    if self._move_selection_visible == true then
+        self._move_selection:draw()
+    end
 end
 
 --- @brief
@@ -487,4 +499,14 @@ end
 --- @brief
 function bt.BattleUI:set_global_status_n_elapsed(global_status, elapsed)
     self._global_status_bar:set_elapsed(global_status, elapsed)
+end
+
+--- @brief
+function bt.BattleUI:set_move_selection_visible(b)
+    self._move_selection_visible = b
+end
+
+--- @brief
+function bt.BattleUI:set_log_visible(b)
+    self._log_visible = b
 end

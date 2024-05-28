@@ -12,7 +12,6 @@ bt.EntityInfo = meta.new_type("EntityInfo", rt.Widget, function(entity)
     })
 end)
 
-
 function bt.EntityInfo:realize()
     if self._is_realized then return end
     self._is_realized = true
@@ -149,7 +148,6 @@ end
 
 function bt.EntityInfo:size_allocate(x, y, width, height)
     local once = true
-
     local m = rt.settings.margin_unit
     local current_x, current_y = m, m
     ::restart::
