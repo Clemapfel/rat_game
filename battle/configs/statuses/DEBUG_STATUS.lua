@@ -5,13 +5,23 @@ return {
     is_silent = false,
     is_stun = true,
 
-    attack_factor = 1,
-    defense_factor = 1,
-    speed_factor = 1,
+    attack_factor = 1.1,
+    defense_factor = 0.9,
+    speed_factor = 1.05,
 
-    attack_offset = 0,
-    defense_offset = 0,
+    attack_offset = 1,
+    defense_offset = -2,
     speed_offset = 123,
+
+    damage_dealt_factor = 1.021,
+    damage_received_factor = 0.121,
+    healing_performed_factor = 2,
+    healing_received_factor = -1,
+
+    damage_dealt_offset = 12,
+    damage_received_offset = -15,
+    healing_performed_offset = 14,
+    healing_received_offset = 8,
 
     sprite_id = "status_ailment",
     sprite_index = 2,

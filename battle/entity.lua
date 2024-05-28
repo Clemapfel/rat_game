@@ -66,7 +66,7 @@ end, {
     dead_sprite_id = nil,
     dead_sprite_index = nil,
 
-    description = "Beyond description, mostly because there was none added yet"
+    description = "(no description)"
 })
 
 --- @brief
@@ -134,7 +134,7 @@ function bt.Entity:_calculate_stat(which)
 
     for entry in values(self.equips) do
         local equip = entry.equip
-        value = value * equip[which .. "_factor"]
+        value = value * equip[which .. "_base_factor"]
     end
 
     return value

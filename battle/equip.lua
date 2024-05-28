@@ -24,9 +24,9 @@ end, {
     defense_base_offset = 0,
     speed_base_offset = 0,
 
-    attack_factor = 1,
-    defense_factor = 1,
-    speed_factor = 1,
+    attack_base_factor = 1,
+    defense_base_factor = 1,
+    speed_base_factor = 1,
 
     is_silent = false,
 
@@ -36,7 +36,7 @@ end, {
         meta.assert_entity_interface(holder)
     end,
 
-    description = "",
+    description = "(no description)",
     sprite_id = "",
     sprite_index = 1
 })
@@ -121,4 +121,14 @@ end
 --- @brief
 function bt.Equip:get_speed_base_factor()
     return self.speed_base_factor
+end
+
+--- @brief
+function bt.Equip:get_sprite_id()
+    return self.sprite_id, self.sprite_index
+end
+
+--- @brief
+function bt.Equip:get_description()
+    return self.description
 end

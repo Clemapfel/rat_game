@@ -255,3 +255,8 @@ end
 function bt.Consumable:get_is_silent()
     return self.is_silent
 end
+
+--- @brief
+function bt.Consumable:get_description()
+    return self.description
+end

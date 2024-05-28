@@ -101,7 +101,7 @@ vec4 effect(vec4 vertex_color, Image image, vec2 texture_coords, vec2 vertex_pos
     const float eps = 0.005;
     const float cutoff = 0.5;
     if (foreground_rng >= cutoff - eps)
-        radius = square_wave(foreground_rng) *  gaussian(abs(foreground_rng - cutoff) / eps, 0, 0.7);
+        radius = square_wave(foreground_rng) * gaussian(abs(foreground_rng - cutoff) / eps, 0, 0.7);
     else
         radius *= project(background_rng, 0.3, 1.6);
 

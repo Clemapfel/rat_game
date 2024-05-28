@@ -205,7 +205,7 @@ end, {
         return nil
     end,
 
-    description = "",
+    description = "(no description)",
     sprite_id = "",
     sprite_index = 1
 })
@@ -283,4 +283,9 @@ end
 --- @brief
 function bt.GlobalStatus:get_max_duration()
     return self.max_duration
+end
+
+--- @brief
+function bt.GlobalStatus:get_description()
+    return self.description
 end

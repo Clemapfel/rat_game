@@ -209,7 +209,7 @@ end, {
         meta.assert_entity_interface(afflicted)
     end,
 
-    description = "",
+    description = "(no description)",
     sprite_id = "status_ailment",
     sprite_index = 1
 })
@@ -299,4 +299,9 @@ end
 --- @brief
 function bt.Status:get_is_silent()
     return self.is_silent
+end
+
+--- @brief
+function bt.Status:get_description()
+    return self.description
 end
