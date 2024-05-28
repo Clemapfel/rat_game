@@ -165,6 +165,12 @@ rt.triangle_wave = function(x)
     return 4 * math.abs((x / math.pi) + 0.25 - math.floor((x / math.pi) + 0.75)) - 1
 end
 
+--- @brief continuous square wave, amplitude 1 frequency 1
+rt.square_wave = function(x)
+    local smoothness = 100;
+    return math.atan(smoothness * math.sin(2 * math.pi * x)) / math.pi + 0.5
+end
+
 --- @brief
 rt.butterworth_bandpass = function(x, order)
     order = which(order, 4)
