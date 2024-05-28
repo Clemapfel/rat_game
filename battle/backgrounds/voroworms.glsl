@@ -191,7 +191,7 @@ vec4 effect(vec4 vertex_color, Image image, vec2 texture_coords, vec2 vertex_pos
     float rng = voronoise(
         vec3(pos.xy * weight * scale, time),
         sine_wave(time / 4, 0.4 - offset, 0.4 + offset),
-        1
+        0.2
     );
 
     float derivative = fwidth(rng);
