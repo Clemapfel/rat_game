@@ -130,6 +130,27 @@ return {
                 "SURF",
                 "WISH"
             }
+        },
+
+        {
+            id = "GAMBLER_MOLE",
+            status = {
+                "DEBUG_STATUS"
+            },
+            consumables = {
+                --"DEBUG_CONSUMABLE"
+            },
+            equips = {
+                "DEBUG_EQUIP"
+            },
+            moveset = {
+                "DEBUG_MOVE",
+                "INSPECT",
+                "PROTECT",
+                "STRUGGLE",
+                "SURF",
+                "WISH"
+            }
         }
     }
 }

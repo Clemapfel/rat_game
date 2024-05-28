@@ -12,7 +12,7 @@ activate_consumable
 ]]--
 
 battle = bt.Battle("DEBUG_BATTLE")
-scene:set_background("WORLEY")
+scene:set_background("DOT_MATRIX")
 --scene:set_music("assets/music/test_music_04.mp3")
 
 local to_spawn = {
@@ -39,14 +39,11 @@ local to_spawn = {
 input_controller = rt.InputController()
 input_controller:signal_connect("pressed", function(self, which)
     if which == rt.InputButton.A then
-        scene:spawn_entities(to_spawn, to_spawn, to_spawn, to_spawn, to_spawn, to_spawn)
-        --[[
         scene._ui._move_selection:set_sort_mode(rt.random.choose({
             bt.MoveSelection.SortMode.DEFAULT,
             bt.MoveSelection.SortMode.BY_NAME,
             bt.MoveSelection.SortMode.BY_N_USES_LEFT,
         }))
-        ]]--
     elseif which == rt.InputButton.B then
         scene:skip()
     elseif which == rt.InputButton.X then
@@ -113,12 +110,12 @@ love.draw = function()
         love.graphics.setColor(intensity, intensity, intensity, 1)
         rt.graphics.set_blend_mode(rt.BlendMode.ADD)
         local x, y, width, height = 0, 0, rt.graphics.get_width(), rt.graphics.get_height()
-        love.graphics.line(x + (1/16) * width, y, x + (1/16) * width, y + height)
-        love.graphics.line(x + (1 - 1/16) * width, y, x + (1 - 1/16) * width, y + height)
-        love.graphics.line(x, y + (0.5/9) * height, x + width, y + (0.5/9) * height)
-        love.graphics.line(x, y + (1 - 0.5/9) * height, x + width, y + (1 - 0.5/9) * height)
-        love.graphics.line(x + (3/16) * width, y, x + (3/16) * width, y + height)
-        love.graphics.line(x + (1 - 3/16) * width, y, x + (1 - 3/16) * width, y + height)
+        local m = 2 * rt.settings.margin_unit
+        love.graphics.line(x + m, y, x + m, y + height)
+        love.graphics.line(x + width - m, y, x + width - m, y + height)
+        love.graphics.line(x, y + m, x + width, y + m)
+        love.graphics.line(x, y + height - m, x + width, y + height - m)
+
         love.graphics.line(x, y + 0.5 * height, x + width, y + 0.5 * height)
         love.graphics.line(x + 0.5 * width, y, x + 0.5 * width, height)
         rt.graphics.set_blend_mode()

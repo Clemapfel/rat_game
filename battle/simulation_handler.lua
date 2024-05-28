@@ -89,7 +89,9 @@ function bt.Scene:start_battle(battle)
 
     local animations = {}
     local messages = {}
-    for entity in values(self._state:list_entities()) do
+
+    local entities = self._state:list_entities()
+    for entity in values(entities) do
         self._ui:add_entity(entity)
         if entity:get_is_enemy() then
             table.insert(animations, bt.Animation.ENEMY_APPEARED(self._ui:get_sprite(entity)))
@@ -101,7 +103,7 @@ function bt.Scene:start_battle(battle)
     table.insert(animations, bt.Animation.MESSAGE(self, table.concat(messages, "\n")))
 
     local on_finish = function()
-        for entity in values(self._state:list_entities()) do
+        for entity in values(entities) do
             if entity:get_is_enemy() then
                 self._ui:get_sprite(entity):set_ui_is_visible(true)
             end

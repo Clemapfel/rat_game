@@ -2,6 +2,22 @@ rt.settings.battle.move_selection = {
     sprite_icon_size = 64
 }
 
+--[[
+Information on Screen:
++ who is selecting entity
++ selecting entity hp, status
++ global status
++ priority queue
++ priority queue preview
++ already selected party member moves, + order
++ possible targets (cf. priority queue)
++ list of possible moves
++ sorting modes
++ keyboard binding: a = select, b = back, y = sort: <by>, x = inspect
+
++ turn count
+]]--
+
 bt.MoveSelection = meta.new_type("MoveSelection", rt.Widget, function()
     return meta.new(bt.MoveSelection, {
         _world = rt.PhysicsWorld(0, 0),
@@ -112,7 +128,6 @@ function bt.MoveSelection:create_from(user, moves)
     self:_regenerate_sortings()
 end
 
-
 --- @brief
 function bt.MoveSelection:size_allocate(x, y, width, height)
     if self._is_realized == false then return end
@@ -162,4 +177,6 @@ function bt.MoveSelection:draw()
         rt.graphics.pop()
     end
     rt.graphics.pop()
+
+    self:draw_bounds()
 end

@@ -13,6 +13,7 @@ rt.PhysicsWorld = meta.new_type("PhysicsWorld", rt.SignalEmitter, function(x_gra
         )
     })
     out:signal_add("update")
+    out._native:setSleepingAllowed(true)
 
     out._native:setCallbacks(
         rt.PhysicsWorld._on_begin_contact,

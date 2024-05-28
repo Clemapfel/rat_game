@@ -200,23 +200,23 @@ function bt.BattleUI:_add_party_sprite(entity)
     local sprite = bt.PartySprite(entity)
     table.insert(self._party_sprites, sprite)
     sprite:realize()
-    self:_reformat_party_sprites()
+    --self:_reformat_party_sprites()
 end
 
 --- @brief
-function bt.BattleUI:_reformat_party_sprites()
+function bt.BattleUI:_reformat_party_sprites(x, width)
     local n_sprites = sizeof(self._party_sprites)
-    local m = rt.settings.margin_unit * 2
+    local m = rt.settings.margin_unit
     local mx = rt.settings.battle.priority_queue.outer_margin + rt.settings.battle.priority_queue.element_size + m
-    local width = (self._bounds.width - 2 * mx - (n_sprites - 1) * m) / n_sprites
-    local height = self._bounds.height * (3 / 9)
-    local y = self._bounds.y + self._bounds.height - height
-    local x = self._bounds.x + mx
+    local w = (width - (n_sprites - 1) * m) / n_sprites --(width - 2 * mx - (n_sprites - 1) * m) / n_sprites
+    local h = self._bounds.height * (3 / 9)
+    local y = self._bounds.y + self._bounds.height - h
+    --local x = x --self._bounds.x + mx
 
     for i = 1, n_sprites do
         local sprite = self._party_sprites[i]
-        sprite:fit_into(x, y, width, height)
-        x = x + width + m
+        sprite:fit_into(x, y, w, h)
+        x = x + w + m
     end
 end
 
@@ -240,15 +240,14 @@ function bt.BattleUI:size_allocate(x, y, width, height)
     local mx = rt.settings.battle.priority_queue.outer_margin + rt.settings.battle.priority_queue.element_size * rt.settings.battle.priority_queue.first_element_scale_factor + m
     local log_horizontal_margin = mx
     local log_vertical_margin = m
-    self._log:fit_into(
-        x + log_horizontal_margin,
+    local log_aabb = rt.AABB(x + log_horizontal_margin,
         y + log_vertical_margin,
         width - 2 * log_horizontal_margin,
-        height * 1 / 4 - log_vertical_margin
-    )
+        height * 1 / 4 - log_vertical_margin)
+    self._log:fit_into(log_aabb)
 
     self:_reformat_enemy_sprites()
-    self:_reformat_party_sprites()
+    self:_reformat_party_sprites(log_aabb.x, log_aabb.width)
 
     local my = rt.settings.margin_unit
     local mx = my
@@ -260,7 +259,6 @@ function bt.BattleUI:size_allocate(x, y, width, height)
         priority_queue_width,
         height
     )
-
 
     local gradient_width = 1 / 16 * width
     self._gradient_left:resize(x, y, gradient_width, height)
@@ -277,6 +275,8 @@ function bt.BattleUI:size_allocate(x, y, width, height)
 
     local status_h = select(2, self._global_status_bar:measure())
     self._global_status_bar:fit_into(0, party_min_y, party_min_x, party_max_y - party_min_y)
+
+    self._move_selection:fit_into(0, log_aabb.y, party_max_x, party_min_y - log_aabb.y)
 end
 
 --- @brief
