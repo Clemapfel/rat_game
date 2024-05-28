@@ -3,14 +3,19 @@ rt.settings.battle.background.dot_matrix = {
 }
 
 bt.Background.DOT_MATRIX = meta.new_type("DOT_MATRIX", bt.Background, function()
-    return meta.new(bt.Background.DOT_MATRIX, {
+    local out = meta.new(bt.Background.DOT_MATRIX, {
         _shader = {},   -- rt.Shader
         _shape = {},
         _mesh = {},
         _radius = 60,
         _texture = {},
         _elapsed = 0,
+        _color = {}
     })
+
+    local color = rt.Palette.GRAY_2
+    out._color = {color.r, color.g, color.b}
+    return out
 end)
 
 --- @override
@@ -38,7 +43,7 @@ end
 function bt.Background.DOT_MATRIX:draw()
     self._shader:bind()
     self._shader:send("elapsed", self._elapsed)
-    --self._shader:send("radius", self._radius)
+    self._shader:send("color", self._color)
     self._shape:draw()
     self._shader:unbind()
 end
