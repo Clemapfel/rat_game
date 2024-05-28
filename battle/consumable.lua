@@ -178,7 +178,7 @@ end, {
         return nil
     end,
 
-    description = "",
+    description = "(no effect)",
     sprite_id = "",
     sprite_index = 1
 })

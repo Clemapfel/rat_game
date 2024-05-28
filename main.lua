@@ -43,7 +43,7 @@ verbose_info:fit_into(50, 50, rt.graphics.get_width() - 50, rt.graphics.get_heig
 input_controller = rt.InputController()
 input_controller:signal_connect("pressed", function(self, which)
     if which == rt.InputButton.A then
-        verbose_info:show(bt.Equip("DEBUG_EQUIP"), 2)
+        verbose_info:show(rt.random.choose(scene._state.entities))
     elseif which == rt.InputButton.B then
         scene:skip()
     elseif which == rt.InputButton.X then

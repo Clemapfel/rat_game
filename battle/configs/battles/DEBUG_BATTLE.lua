@@ -12,7 +12,7 @@ return {
                 "DEBUG_STATUS"
             },
             consumables = {
-                --"DEBUG_CONSUMABLE"
+                "DEBUG_CONSUMABLE"
             },
             equips = {
                 "DEBUG_EQUIP"
@@ -33,7 +33,7 @@ return {
                 "DEBUG_STATUS"
             },
             consumables = {
-                --"DEBUG_CONSUMABLE"
+                "DEBUG_CONSUMABLE"
             },
             equips = {
                 "DEBUG_EQUIP"
@@ -54,7 +54,7 @@ return {
                 "DEBUG_STATUS"
             },
             consumables = {
-                --"DEBUG_CONSUMABLE"
+                "DEBUG_CONSUMABLE"
             },
             equips = {
                 "DEBUG_EQUIP"
@@ -75,7 +75,7 @@ return {
                 "DEBUG_STATUS"
             },
             consumables = {
-                --"DEBUG_CONSUMABLE"
+                "DEBUG_CONSUMABLE"
             },
             equips = {
                 "DEBUG_EQUIP"
@@ -96,7 +96,7 @@ return {
                 "DEBUG_STATUS"
             },
             consumables = {
-                --"DEBUG_CONSUMABLE"
+                "DEBUG_CONSUMABLE"
             },
             equips = {
                 "DEBUG_EQUIP"
@@ -117,7 +117,7 @@ return {
                 "DEBUG_STATUS"
             },
             consumables = {
-                --"DEBUG_CONSUMABLE"
+                "DEBUG_CONSUMABLE"
             },
             equips = {
                 "DEBUG_EQUIP"
@@ -138,7 +138,7 @@ return {
                 "DEBUG_STATUS"
             },
             consumables = {
-                --"DEBUG_CONSUMABLE"
+                "DEBUG_CONSUMABLE"
             },
             equips = {
                 "DEBUG_EQUIP"

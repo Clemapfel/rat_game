@@ -137,7 +137,7 @@ function bt.Entity:_calculate_stat(which)
         value = value * equip[which .. "_base_factor"]
     end
 
-    return value
+    return math.ceil(value)
 end
 
 --- @brief
@@ -149,7 +149,7 @@ function bt.Entity:_calculate_stat_base(which)
     end
 
     if value < 0 then value = 1 end
-    return value
+    return math.ceil(value)
 end
 
 --- @brief

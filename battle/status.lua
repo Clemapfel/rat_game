@@ -209,7 +209,7 @@ end, {
         meta.assert_entity_interface(afflicted)
     end,
 
-    description = "(no description)",
+    description = "(no additional effect)",
     sprite_id = "status_ailment",
     sprite_index = 1
 })
