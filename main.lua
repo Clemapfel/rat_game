@@ -3,7 +3,6 @@ require "include"
 rt.current_scene = bt.Scene()
 scene = rt.current_scene
 
-
 --[[
 add_consumable
 remove_consumable
@@ -189,7 +188,7 @@ love.run = function()
         end
 
         -- store max duration of last number of frames
-        if rt.graphics.frame_duration.n_frames_saved > 144 * 2 then
+        if rt.graphics.frame_duration.n_frames_saved > 180 then
             local to_remove = rt.graphics.frame_duration.past_frames[1]
             table.remove(rt.graphics.frame_duration.past_frames, 1)
             rt.graphics.frame_duration.n_frames_saved = rt.graphics.frame_duration.n_frames_saved - 1

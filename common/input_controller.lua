@@ -47,6 +47,16 @@ function rt.InputController:is_up(key)
 end
 
 --- @brief
+function rt.InputController:set_is_disabled(b)
+    self._is_diabled = b
+end
+
+--- @brief
+function rt.InputController:get_is_disabled()
+    return self._is_disabled
+end
+
+--- @brief
 function rt.InputController:get_axis(joystick_position)
     if joystick_position == rt.JoystickPosition.LEFT then
         local x = rt.InputHandler.axis_state[rt.GamepadAxis.LEFT_X]
