@@ -83,7 +83,7 @@ float map( in vec3 p, int oct )
 }
 
 const int kDiv = 1; // make bigger for higher quality
-const vec3 sundir = normalize( vec3(1.0,0.0,-1.0) );
+const vec3 sundir = normalize( vec3(0.0, -1.0, 0.0) );
 
 vec4 raymarch( in vec3 ro, in vec3 rd, in vec3 bgcol, in ivec2 px )
 {
