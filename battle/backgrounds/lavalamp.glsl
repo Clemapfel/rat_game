@@ -175,17 +175,7 @@ vec4 effect(vec4 vertex_color, Image image, vec2 texture_coords, vec2 vertex_pos
 
     // value
     float value = reverse_gaussian(texture_coords.y - 0.3, 0.3);
-
-    // convert lab
-    float theta = clamp(hue, 0, 1) * (2 * PI);
-    float l = 0.8;
-    float chroma = 0.3;
-    float a = chroma * cos(theta);
-    float b = chroma * sin(theta);
-    vec3 rgb = clamp(linear_srgb_from_oklab(vec3(l, a, b)), 0.0, 1.0);
-
-
-    return vec4(oklch_to_rgb(vec3(0.8, 0.3, hue)), 1);
+    return vec4(oklch_to_rgb(vec3(0.77, 0.25, hue)), 1);
 
     //return vec4(lch2rgb(vec3(0.77, 0.25, hue)), 1);
 }
