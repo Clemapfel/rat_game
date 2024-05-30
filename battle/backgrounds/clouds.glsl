@@ -1,267 +1,148 @@
-#pragma language glsl4
+// Protean clouds by nimitz (twitter: @stormoid)
+// https://www.shadertoy.com/view/3l23Rh
+// License Creative Commons Attribution-NonCommercial-ShareAlike 3.0 Unported License
+// Contact the author for other licensing options
+
+/*
+	Technical details:
+
+	The main volume noise is generated from a deformed periodic grid, which can produce
+	a large range of noise-like patterns at very cheap evalutation cost. Allowing for multiple
+	fetches of volume gradient computation for improved lighting.
+
+	To further accelerate marching, since the volume is smooth, more than half the the density
+	information isn't used to rendering or shading but only as an underlying volume	distance to 
+	determine dynamic step size, by carefully selecting an equation	(polynomial for speed) to 
+	step as a function of overall density (not necessarily rendered) the visual results can be 
+	the	same as a naive implementation with ~40% increase in rendering performance.
+
+	Since the dynamic marching step size is even less uniform due to steps not being rendered at all
+	the fog is evaluated as the difference of the fog integral at each rendered step.
+
+*/
+
 uniform float elapsed;
 
-// 0: sunset look
-// 1: bright look
-#define LOOK 1
+mat2 rot(in float a){float c = cos(a), s = sin(a);return mat2(c,s,-s,c);}
+const mat3 m3 = mat3(0.33338, 0.56034, -0.71817, -0.87887, 0.32651, -0.15323, 0.15162, 0.69596, 0.61339)*1.93;
+float mag2(vec2 p){return dot(p,p);}
+float linstep(in float mn, in float mx, in float x){ return clamp((x - mn)/(mx - mn), 0., 1.); }
+float prm1 = 0.;
+vec2 bsMo = vec2(0);
 
-// 0: one 3d texture lookup
-// 1: two 2d texture lookups with hardware interpolation
-// 2: two 2d texture lookups with software interpolation
-#define NOISE_METHOD 1
+vec2 disp(float t){ return vec2(sin(t*0.22)*1., cos(t*0.175)*1.)*2.; }
 
-// 0: no LOD
-// 1: yes LOD
-#define USE_LOD 1
-
-mat3 setCamera( in vec3 ro, in vec3 ta, float cr )
+vec2 map(vec3 p)
 {
-    vec3 cw = normalize(ta-ro);
-    vec3 cp = vec3(sin(cr), cos(cr),0.0);
-    vec3 cu = normalize( cross(cw,cp) );
-    vec3 cv = normalize( cross(cu,cw) );
-    return mat3( cu, cv, cw );
-}
-
-
-/// @brief 3d discontinuous noise, in [0, 1]
-vec3 random_3d(in vec3 p) {
-    return fract(sin(vec3(
-                         dot(p, vec3(127.1, 311.7, 74.7)),
-                         dot(p, vec3(269.5, 183.3, 246.1)),
-                         dot(p, vec3(113.5, 271.9, 124.6)))
-                 ) * 43758.5453123);
-}
-
-/// @brief gradient noise
-/// @source adapted from https://github.com/patriciogonzalezvivo/lygia/blob/main/generative/gnoise.glsl
-float noise(vec3 p) {
-    vec3 i = floor(p);
-    vec3 v = fract(p);
-
-    vec3 u = v * v * v * (v *(v * 6.0 - 15.0) + 10.0);
-
-    return mix( mix( mix( dot( -1 + 2 * random_3d(i + vec3(0.0,0.0,0.0)), v - vec3(0.0,0.0,0.0)),
-                          dot( -1 + 2 * random_3d(i + vec3(1.0,0.0,0.0)), v - vec3(1.0,0.0,0.0)), u.x),
-                     mix( dot( -1 + 2 * random_3d(i + vec3(0.0,1.0,0.0)), v - vec3(0.0,1.0,0.0)),
-                          dot( -1 + 2 * random_3d(i + vec3(1.0,1.0,0.0)), v - vec3(1.0,1.0,0.0)), u.x), u.y),
-                mix( mix( dot( -1 + 2 * random_3d(i + vec3(0.0,0.0,1.0)), v - vec3(0.0,0.0,1.0)),
-                          dot( -1 + 2 * random_3d(i + vec3(1.0,0.0,1.0)), v - vec3(1.0,0.0,1.0)), u.x),
-                     mix( dot( -1 + 2 * random_3d(i + vec3(0.0,1.0,1.0)), v - vec3(0.0,1.0,1.0)),
-                          dot( -1 + 2 * random_3d(i + vec3(1.0,1.0,1.0)), v - vec3(1.0,1.0,1.0)), u.x), u.y), u.z );
-}
-
-
-#if LOOK==0
-float map( in vec3 p, int oct )
-{
-    vec3 q = p - vec3(0.0,0.1,1.0)*elapsed;
-    float g = 0.5+0.5*noise( q*0.3 );
-
-    float f;
-    f  = 0.50000*noise( q ); q = q*2.02;
-    #if USE_LOD==1
-    if( oct>=2 )
-    #endif
-    f += 0.25000*noise( q ); q = q*2.23;
-    #if USE_LOD==1
-    if( oct>=3 )
-    #endif
-    f += 0.12500*noise( q ); q = q*2.41;
-    #if USE_LOD==1
-    if( oct>=4 )
-    #endif
-    f += 0.06250*noise( q ); q = q*2.62;
-    #if USE_LOD==1
-    if( oct>=5 )
-    #endif
-    f += 0.03125*noise( q );
-
-    f = mix( f*0.1-0.5, f, g*g );
-
-    return 1.5*f - 0.5 - p.y;
-}
-
-const int kDiv = 1; // make bigger for higher quality
-const vec3 sundir = normalize( vec3(0.0, -1.0, 0.0) );
-
-vec4 raymarch( in vec3 ro, in vec3 rd, in vec3 bgcol, in ivec2 px )
-{
-    // bounding planes
-    const float yb = -3.0;
-    const float yt =  0.6;
-    float tb = (yb-ro.y)/rd.y;
-    float tt = (yt-ro.y)/rd.t;
-
-    // find tigthest possible raymarching segment
-    float tmin, tmax;
-    if( ro.y>yt )
+    vec3 p2 = p;
+    p2.xy -= disp(p.z).xy;
+    p.xy *= rot(sin(p.z+elapsed)*(0.1 + prm1*0.05) + elapsed*0.09);
+    float cl = mag2(p2.xy);
+    float d = 0.;
+    p *= .61;
+    float z = 1.;
+    float trk = 1.;
+    float dspAmp = 0.1 + prm1*0.2;
+    for(int i = 0; i < 5; i++)
     {
-        // above top plane
-        if( tt<0.0 ) return vec4(0.0); // early exit
-        tmin = tt;
-        tmax = tb;
+        p += sin(p.zxy*0.75*trk + elapsed*trk*.8)*dspAmp;
+        d -= abs(dot(cos(p), sin(p.yzx))*z);
+        z *= 0.57;
+        trk *= 1.4;
+        p = p*m3;
     }
-    else
+    d = abs(d + prm1*3.)+ prm1*.3 - 2.5 + bsMo.y;
+    return vec2(d + cl*.2 + 0.25, cl);
+}
+
+#define STEPS 200
+vec4 render( in vec3 ro, in vec3 rd, float time )
+{
+    vec4 rez = vec4(0);
+    const float ldst = 8.;
+    vec3 lpos = vec3(disp(time + ldst)*0.5, time + ldst);
+    float t = 1.5;
+    float fogT = 0.;
+    for(int i=0; i<STEPS; i++)
     {
-        // inside clouds slabs
-        tmin = 0.0;
-        tmax = 60.0;
-        if( tt>0.0 ) tmax = min( tmax, tt );
-        if( tb>0.0 ) tmax = min( tmax, tb );
-    }
+        if(rez.a > 0.99)break;
 
-    // dithered near distance
-    float t = tmin + 0.1*noise(px.x, px.y, px.x);
-
-    // raymarch loop
-    vec4 sum = vec4(0.0);
-    for( int i=0; i<190*kDiv; i++ )
-    {
-        // step size
-        float dt = max(0.05,0.02*t/float(kDiv));
-
-        // lod
-        #if USE_LOD==0
-       const int oct = 5;
-        #else
-       int oct = 5 - int( log2(1.0+t*0.5) );
-        #endif
-
-        // sample cloud
         vec3 pos = ro + t*rd;
-        float den = map( pos,oct );
-        if( den>0.01 ) // if inside
+        vec2 mpv = map(pos);
+        float den = clamp(mpv.x-0.3,0.,1.)*1.12;
+        float dn = clamp((mpv.x + 2.),0.,3.);
+
+        vec4 col = vec4(0);
+        if (mpv.x > 0.6)
         {
-            // do lighting
-            float dif = clamp((den - map(pos+0.3*sundir,oct))/0.25, 0.0, 1.0 );
-            vec3  lin = vec3(0.65,0.65,0.75)*1.1 + 0.8*vec3(1.0,0.6,0.3)*dif;
-            vec4  col = vec4( mix( vec3(1.0,0.93,0.84), vec3(0.25,0.3,0.4), den ), den );
-            col.xyz *= lin;
-            // fog
-            col.xyz = mix(col.xyz,bgcol, 1.0-exp2(-0.1*t));
-            // composite front to back
-            col.w    = min(col.w*8.0*dt,1.0);
-            col.rgb *= col.a;
-            sum += col*(1.0-sum.a);
+
+            col = vec4(sin(vec3(5.,0.4,0.2) + mpv.y*0.1 +sin(pos.z*0.4)*0.5 + 1.8)*0.5 + 0.5,0.08);
+            col *= den*den*den;
+            col.rgb *= linstep(4.,-2.5, mpv.x)*2.3;
+            float dif =  clamp((den - map(pos+.8).x)/9., 0.001, 1. );
+            dif += clamp((den - map(pos+.35).x)/2.5, 0.001, 1. );
+            col.xyz *= den*(vec3(0.005,.045,.075) + 1.5*vec3(0.033,0.07,0.03)*dif);
         }
-        // advance ray
-        t += dt;
-        // until far clip or full opacity
-        if( t>tmax || sum.a>0.99 ) break;
+
+        float fogC = exp(t*0.2 - 2.2);
+        col.rgba += vec4(0.06,0.11,0.11, 0.1)*clamp(fogC-fogT, 0., 1.);
+        fogT = fogC;
+        rez = rez + col*(1. - rez.a);
+        t += clamp(0.5 - dn*dn*.05, 0.09, 0.3);
     }
-
-    return clamp( sum, 0.0, 1.0 );
+    return clamp(rez, 0.0, 1.0);
 }
 
-vec4 render( in vec3 ro, in vec3 rd, in ivec2 px )
+float getsat(vec3 c)
 {
-    float sun = clamp( dot(sundir,rd), 0.0, 1.0 );
-
-    // background sky
-    vec3 col = vec3(0.76,0.75,0.95);
-    col -= 0.6*vec3(0.90,0.75,0.95)*rd.y;
-    col += 0.2*vec3(1.00,0.60,0.10)*pow( sun, 8.0 );
-
-    // clouds
-    vec4 res = raymarch( ro, rd, col, px );
-    col = col*(1.0-res.w) + res.xyz;
-
-    // sun glare
-    col += 0.2*vec3(1.0,0.4,0.2)*pow( sun, 3.0 );
-
-    // tonemap
-    col = smoothstep(0.15,1.1,col);
-
-    return vec4( col, 1.0 );
+    float mi = min(min(c.x, c.y), c.z);
+    float ma = max(max(c.x, c.y), c.z);
+    return (ma - mi)/(ma+ 1e-7);
 }
 
-#else
-
-
-float map5( in vec3 p )
+//from my "Will it blend" shader (https://www.shadertoy.com/view/lsdGzN)
+vec3 iLerp(in vec3 a, in vec3 b, in float x)
 {
-    vec3 q = p - vec3(0.0,0.1,1.0)*elapsed;
-    float f;
-    f  = 0.50000*noise( q ); q = q*2.02;
-    f += 0.25000*noise( q ); q = q*2.03;
-    f += 0.12500*noise( q ); q = q*2.01;
-    f += 0.06250*noise( q ); q = q*2.02;
-    f += 0.03125*noise( q );
-    return clamp( 1.5 - p.y - 2.0 + 1.75*f, 0.0, 1.0 );
+    vec3 ic = mix(a, b, x) + vec3(1e-6,0.,0.);
+    float sd = abs(getsat(ic) - mix(getsat(a), getsat(b), x));
+    vec3 dir = normalize(vec3(2.*ic.x - ic.y - ic.z, 2.*ic.y - ic.x - ic.z, 2.*ic.z - ic.y - ic.x));
+    float lgt = dot(vec3(1.0), ic);
+    float ff = dot(dir, normalize(ic));
+    ic += 1.5*dir*sd*ff*lgt;
+    return clamp(ic,0.,1.);
 }
-float map4( in vec3 p )
-{
-    vec3 q = p - vec3(0.0,0.1,1.0)*elapsed;
-    float f;
-    f  = 0.50000*noise( q ); q = q*2.02;
-    f += 0.25000*noise( q ); q = q*2.03;
-    f += 0.12500*noise( q ); q = q*2.01;
-    f += 0.06250*noise( q );
-    return clamp( 1.5 - p.y - 2.0 + 1.75*f, 0.0, 1.0 );
-}
-float map3( in vec3 p )
-{
-    vec3 q = p - vec3(0.0,0.1,1.0)*elapsed;
-    float f;
-    f  = 0.50000*noise( q ); q = q*2.02;
-    f += 0.25000*noise( q ); q = q*2.03;    f += 0.12500*noise( q );
-    return clamp( 1.5 - p.y - 2.0 + 1.75*f, 0.0, 1.0 );
-}
-float map2( in vec3 p )
-{
-    vec3 q = p - vec3(0.0,0.1,1.0)*elapsed;
-    float f;
-    f  = 0.50000*noise( q );
-    q = q*2.02;    f += 0.25000*noise( q );;
-    return clamp( 1.5 - p.y - 2.0 + 1.75*f, 0.0, 1.0 );
-}
-
-const vec3 sundir = vec3(-0.7071,0.0,-0.7071);
-
-#define MARCH(STEPS,MAPLOD) for(int i=0; i<STEPS; i++) { vec3 pos = ro + t*rd; if( pos.y<-3.0 || pos.y>2.0 || sum.a>0.99 ) break; float den = MAPLOD( pos ); if( den>0.01 ) { float dif = clamp((den - MAPLOD(pos+0.3*sundir))/0.6, 0.0, 1.0 ); vec3  lin = vec3(1.0,0.6,0.3)*dif+vec3(0.91,0.98,1.05); vec4  col = vec4( mix( vec3(1.0,0.95,0.8), vec3(0.25,0.3,0.35), den ), den ); col.xyz *= lin; col.xyz = mix( col.xyz, bgcol, 1.0-exp(-0.003*t*t) ); col.w *= 0.4; col.rgb *= col.a; sum += col*(1.0-sum.a); } t += max(0.06,0.05*t); }
-
-vec4 raymarch( in vec3 ro, in vec3 rd, in vec3 bgcol, in ivec2 px )
-{
-vec4 sum = vec4(0.0);
-float t = 0.05*noise(vec3(ro.x, rd.x, rd.y));
-MARCH(40,map5);
-MARCH(40,map4);
-MARCH(30,map3);
-MARCH(30,map2);
-return clamp( sum, 0.0, 1.0 );
-}
-
-vec4 render( in vec3 ro, in vec3 rd, in ivec2 px )
-{
-// background sky
-float sun = clamp( dot(sundir,rd), 0.0, 1.0 );
-vec3 col = vec3(0.6,0.71,0.75) - rd.y*0.2*vec3(1.0,0.5,1.0) + 0.15*0.5;
-col += 0.2*vec3(1.0,.6,0.1)*pow( sun, 8.0 );
-// clouds
-vec4 res = raymarch( ro, rd, col, px );
-col = col*(1.0-res.w) + res.xyz;
-// sun glare
-col += vec3(0.2,0.08,0.04)*pow( sun, 3.0 );
-return vec4( col, 1.0 );
-}
-
-#endif
-
-uniform vec2 mouse;
-
-#define PI 3.14159
 
 vec4 effect(vec4 vertex_color, Image image, vec2 texture_coords, vec2 vertex_position)
 {
-vec2 p = (2.0*vertex_position-love_ScreenSize.xy)/love_ScreenSize.y;
+    vec2 q = vertex_position.xy/love_ScreenSize.xy;
+    vec2 p = (gl_FragCoord.xy - 0.5*love_ScreenSize.xy)/love_ScreenSize.y;
+    bsMo = (vec2(0.5, 0.5) - 0.5*love_ScreenSize.xy)/love_ScreenSize.y;
 
-// camera
-vec3 ro = 2 * normalize(vec3(sin(0), 0, cos(0)));
-vec3 ta = vec3(0, -0.5, 0);
-mat3 ca = setCamera( ro, ta, 0);
-// ray
-vec3 rd = ca * normalize( vec3(p.xy,1.5));
+    float time = elapsed*3.;
+    vec3 ro = vec3(0,0,time);
 
-return render( ro, rd, ivec2(vertex_position.xy-0.5) );
+    ro += vec3(sin(elapsed)*0.5,sin(elapsed*1.)*0.,0);
+
+    float dspAmp = .85;
+    ro.xy += disp(ro.z)*dspAmp;
+    float tgtDst = 3.5;
+
+    vec3 target = normalize(ro - vec3(disp(time + tgtDst)*dspAmp, time + tgtDst));
+    ro.x -= bsMo.x*2.;
+    vec3 rightdir = normalize(cross(target, vec3(0,1,0)));
+    vec3 updir = normalize(cross(rightdir, target));
+    rightdir = normalize(cross(updir, target));
+    vec3 rd=normalize((p.x*rightdir + p.y*updir)*1. - target);
+    rd.xy *= rot(-disp(time + 3.5).x*0.2 + bsMo.x);
+    prm1 = smoothstep(-0.4, 0.4,sin(elapsed*0.3));
+    vec4 scn = render(ro, rd, time);
+
+    vec3 col = scn.rgb;
+    col = iLerp(col.bgr, col.rgb, clamp(1.-prm1,0.05,1.));
+
+    col = pow(col, vec3(.55,0.65,0.6))*vec3(1.,.97,.9);
+
+    col *= pow( 16.0*q.x*q.y*(1.0-q.x)*(1.0-q.y), 0.12)*0.7+0.3; //Vign
+
+    return vec4( col, 1.0 );
 }
