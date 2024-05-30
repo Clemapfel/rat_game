@@ -2,84 +2,16 @@ require "include"
 
 rt.current_scene = bt.Scene()
 scene = rt.current_scene
-
---[[
-add_consumable
-remove_consumable
-set_consumable_n_leftg
-activate_consumable
-]]--
-
-battle = bt.Battle("DEBUG_BATTLE")
-scene:set_background("DOT_MATRIX")
---scene:set_music("assets/music/test_music_04.mp3")
-
-local to_spawn = {
-    id = "WALKING_SPROUT",
-    status = {
-        "DEBUG_STATUS"
-    },
-    consumables = {
-        "DEBUG_CONSUMABLE"
-    },
-    equips = {
-        "DEBUG_EQUIP"
-    },
-    moveset = {
-        "DEBUG_MOVE",
-        "INSPECT",
-        "PROTECT",
-        "STRUGGLE",
-        "SURF",
-        "WISH"
-    }
-}
-
-local verbose_info = bt.VerboseInfo()
-verbose_info:realize()
-verbose_info:fit_into(50, 50, rt.graphics.get_width() - 50, rt.graphics.get_height() - 50)
-
-input_controller = rt.InputController()
-input_controller:signal_connect("pressed", function(self, which)
-    if which == rt.InputButton.A then
-        verbose_info:show(rt.random.choose(scene._state.entities))
-    elseif which == rt.InputButton.B then
-        scene:skip()
-    elseif which == rt.InputButton.X then
-        scene:remove_global_status(bt.GlobalStatus("DEBUG_GLOBAL_STATUS"))
-    elseif which == rt.InputButton.Y then
-        scene:remove_status(battle.entities[1], bt.Status("DEBUG_STATUS"))
-    elseif which == rt.InputButton.L then
-    elseif which == rt.InputButton.R then
-        scene:set_fast_forward_active(true)
-    elseif which == rt.InputButton.UP then
-        scene._selection_handler:move_up()
-    elseif which == rt.InputButton.RIGHT then
-        scene._selection_handler:move_right()
-    elseif which == rt.InputButton.DOWN then
-        scene._selection_handler:move_down()
-    elseif which == rt.InputButton.LEFT then
-        scene._selection_handler:move_left()
-    elseif which == rt.InputButton.DEBUG then
-        love.event.quit()
-    end
-end)
-
-input_controller:signal_connect("released", function(self, which)
-    if which == rt.InputButton.R then
-        scene:set_fast_forward_active(false)
-    end
-end)
+scene:realize()
+scene:set_background("CLOUDS")
+scene:start_battle(bt.Battle("DEBUG_BATTLE"))
+scene:transition(nil)
 
 --- ###
 
 love.load = function()
     rt.current_scene:realize()
     love.resize()
-    scene:start_battle(battle)
-    scene:add_global_status(bt.GlobalStatus("DEBUG_GLOBAL_STATUS"))
-    --scene:kill(battle.entities[1])
-    --scene:kill(battle.entities[2])
 end
 
 rt.graphics.frame_duration = {
@@ -88,6 +20,10 @@ rt.graphics.frame_duration = {
     max = 0
 }
 
+function love.mousemotion(x, y)
+   bt.Background.CLOUDS._shader:send("mouse", {x, y})
+end
+
 love.draw = function()
     local before = love.timer.getTime()
     love.graphics.clear(0.8, 0.2, 0.8, 1)
@@ -95,8 +31,6 @@ love.draw = function()
     if rt.current_scene ~= nil then
         rt.current_scene:draw()
     end
-
-    verbose_info:draw()
 
     do -- show fps and frame usage
         local fps = love.timer.getFPS()

@@ -8,12 +8,12 @@ end)
 
 --- @override
 function bt.Animation.REORDER_PRIORITY_QUEUE:start()
-    self._scene._ui:set_priority_order(self._new_order)
+    self._scene:set_priority_order(self._new_order)
 end
 
 --- @override
 function bt.Animation.REORDER_PRIORITY_QUEUE:update(delta)
-    return self._scene._ui:get_priority_queue():get_is_reorder_done()
+    return self._scene:get_is_priority_reorder_done()
 end
 
 --- @override

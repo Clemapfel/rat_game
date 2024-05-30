@@ -20,3 +20,13 @@ end
 function bt.SceneState:draw()
     rt.error("In " .. meta.typeof(self) .. ".draw: abstract method called")
 end
+
+--- @brief
+function bt.SceneState:handle_button_pressed(which)
+    -- noop
+end
+
+--- @brief
+function bt.SceneState:handle_button_released(which)
+    -- noop
+end

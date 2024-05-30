@@ -161,6 +161,8 @@ require "battle.battle_ui"
 
 require "battle.scene_state"
 require "battle.scene_state_inspect"
+require "battle.scene_state_simulation"
+
 require "battle.scene"
 require "battle.simulation_handler"
 

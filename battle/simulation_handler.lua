@@ -56,7 +56,7 @@ function bt.Scene:_animate_apply_status(holder, status)
     meta.assert_isa(holder, bt.Entity)
     meta.assert_isa(status, bt.Status)
     if status.is_silent == true then return end
-    local sprite = self._ui:get_sprite(holder)
+    local sprite = self:get_sprite(holder)
     local apply = bt.Animation.STATUS_APPLIED(sprite, status)
     local message = bt.Animation.MESSAGE(self, self:format_name(holder) .. "s " .. self:format_name(status) .. " activated")
     self:play_animations({apply, message})
@@ -66,7 +66,7 @@ end
 function bt.Scene:_animate_apply_consumable(holder, consumable)
     meta.assert_isa(holder, bt.Entity)
     meta.assert_isa(consumable, bt.Consumable)
-    local sprite = self._ui:get_sprite(holder)
+    local sprite = self:get_sprite(holder)
     local apply = bt.Animation.CONSUMABLE_APPLIED(sprite, consumable)
     local message = bt.Animation.MESSAGE(self, self:format_name(holder) .. "s " .. self:format_name(consumable) .. " activated")
     self:play_animations({apply, message})
@@ -76,7 +76,7 @@ end
 function bt.Scene:_animate_apply_global_status(global_status)
     meta.assert_isa(global_status, bt.GlobalStatus)
     if global_status.is_silent == true then return end
-    local apply = bt.Animation.GLOBAL_STATUS_APPLIED(self._ui, global_status)
+    local apply = bt.Animation.GLOBAL_STATUS_APPLIED(self, global_status)
     local message = bt.Animation.MESSAGE(self, self:format_name(global_status) .. " activated")
     self:play_animations({apply, message})
 end
@@ -85,19 +85,19 @@ end
 function bt.Scene:start_battle(battle)
     meta.assert_isa(battle, bt.Battle)
     self._state = battle
-    self._ui:clear()
+    self:clear()
 
     local animations = {}
     local messages = {}
 
     local entities = self._state:list_entities()
     for entity in values(entities) do
-        self._ui:add_entity(entity)
+        self:add_entity_sprite(entity)
         if entity:get_is_enemy() then
-            table.insert(animations, bt.Animation.ENEMY_APPEARED(self._ui:get_sprite(entity)))
+            table.insert(animations, bt.Animation.ENEMY_APPEARED(self:get_sprite(entity)))
             table.insert(messages, self:format_name(entity) .. " appeared")
         else
-            table.insert(animations, bt.Animation.ALLY_APPEARED(self._ui:get_sprite(entity)))
+            table.insert(animations, bt.Animation.ALLY_APPEARED(self:get_sprite(entity)))
         end
     end
     table.insert(animations, bt.Animation.MESSAGE(self, table.concat(messages, "\n")))
@@ -105,7 +105,7 @@ function bt.Scene:start_battle(battle)
     local on_finish = function()
         for entity in values(entities) do
             if entity:get_is_enemy() then
-                self._ui:get_sprite(entity):set_ui_is_visible(true)
+                self:get_sprite(entity):set_ui_is_visible(true)
             end
         end
     end
@@ -200,12 +200,12 @@ function bt.Scene:spawn_entities(...)
         local animations = {}
         local messages = {}
         for entity in values(entities) do
-            self._ui:add_entity(entity)
+            self:add_entity(entity)
             if entity:get_is_enemy() then
-                table.insert(animations, bt.Animation.ENEMY_APPEARED(self._ui:get_sprite(entity)))
+                table.insert(animations, bt.Animation.ENEMY_APPEARED(self:get_sprite(entity)))
                 table.insert(messages, self:format_name(entity) .. " appeared")
             else
-                table.insert(animations, bt.Animation.ALLY_APPEARED(self._ui:get_sprite(entity)))
+                table.insert(animations, bt.Animation.ALLY_APPEARED(self:get_sprite(entity)))
             end
         end
         table.insert(animations, bt.Animation.MESSAGE(self, table.concat(messages, "\n")))
@@ -214,7 +214,7 @@ function bt.Scene:spawn_entities(...)
 
     local on_finish = function()
         for entity in values(entities) do
-            self._ui:get_sprite(entity):set_ui_is_visible(true)
+            self:get_sprite(entity):set_ui_is_visible(true)
         end
     end
 
@@ -276,10 +276,10 @@ function bt.Scene:add_global_status(to_add)
     self._state:add_global_status(to_add)
 
     if not is_silent then
-        local add = bt.Animation.GLOBAL_STATUS_GAINED(self._ui, to_add)
+        local add = bt.Animation.GLOBAL_STATUS_GAINED(self, to_add)
         local message = bt.Animation.MESSAGE(self, self:format_name(to_add) .. " is now active globally")
         local on_start = function()
-            self._ui:add_global_status(to_add)
+            self:add_global_status(to_add)
         end
         self:play_animations({add, message}, on_start)
     end
@@ -363,7 +363,7 @@ function bt.Scene:remove_global_status(to_remove)
     self._state:remove_global_status(to_remove)
 
     if not is_silent then
-        local remove = bt.Animation.GLOBAL_STATUS_LOST(self._ui, to_remove)
+        local remove = bt.Animation.GLOBAL_STATUS_LOST(self, to_remove)
         local message = bt.Animation.MESSAGE(self, self:format_name(to_remove) .. " faded")
         self:play_animations({ remove, message })
     end
@@ -386,7 +386,7 @@ function bt.Scene:remove_global_status(to_remove)
 
     -- delay ui removal until after callbacks are invoked
     self:play_animations({bt.Animation.DELAY(0.2)}, function()
-        self._ui:remove_global_status(to_remove)
+        self:remove_global_status(to_remove)
     end)
 
     -- invoke on_global_status_gained for all global statuses, statuses, and consumables
@@ -462,7 +462,7 @@ function bt.Scene:add_status(entity, to_add)
 
     -- animation
     if not is_silent then
-        local sprite = self._ui:get_sprite(entity)
+        local sprite = self:get_sprite(entity)
         do
             local animation = bt.Animation.STATUS_GAINED(sprite, to_add)
             local message = bt.Animation.MESSAGE(self, self:format_name(entity) .. " gained status " .. self:format_name(to_add))
@@ -480,7 +480,7 @@ function bt.Scene:add_status(entity, to_add)
                 local message = bt.Animation.MESSAGE(self, self:format_name(entity) .. " is now stunned")
 
                 local on_start = function()
-                    self._ui:set_is_stunned(entity, true)
+                    self:set_is_stunned(entity, true)
                 end
                 self:play_animations({animation, message}, on_start)
             end
@@ -556,7 +556,7 @@ function bt.Scene:remove_status(entity, to_remove)
     local stun_after = entity:get_is_stunned()
 
     -- animation
-    local sprite = self._ui:get_sprite(entity)
+    local sprite = self:get_sprite(entity)
     if not is_silent then
         do
             local animation = bt.Animation.STATUS_LOST(sprite, to_remove)
@@ -571,7 +571,7 @@ function bt.Scene:remove_status(entity, to_remove)
                 local message = bt.Animation.MESSAGE(self, self:format_name(entity) .. " is no longer stunned")
 
                 local on_finish = function()
-                    self._ui:set_is_stunned(entity, false)
+                    self:set_is_stunned(entity, false)
                 end
                 self:play_animations({animation, message}, nil, on_finish)
             end
@@ -652,13 +652,13 @@ function bt.Scene:knock_out(entity)
     meta.set_is_mutable(entity, false)
 
     do -- animation and UI updates
-        local knock_out = bt.Animation.KNOCKED_OUT(self._ui:get_sprite(entity))
+        local knock_out = bt.Animation.KNOCKED_OUT(self:get_sprite(entity))
         local message = bt.Animation.MESSAGE(self, self:format_name(entity) .. " was <b><color=LIGHT_RED_3><u>knocked out</u></color></b>")
 
         local on_start = function()
-            local sprite = self._ui:get_sprite(entity)
+            local sprite = self:get_sprite(entity)
             sprite:set_hp(0, entity:get_hp_base())
-            self._ui:set_state(entity, bt.EntityState.KNOCKED_OUT)
+            self:set_state(entity, bt.EntityState.KNOCKED_OUT)
         end
         self:play_animations({knock_out, message}, on_start)
     end
@@ -694,7 +694,7 @@ function bt.Scene:knock_out(entity)
     -- clear sprite statuses bar after callbacks
     local on_start = function()
         for status in values(status_before) do
-            self._ui:get_sprite(entity):remove_status(status)
+            self:get_sprite(entity):remove_status(status)
         end
     end
     self:play_animations({bt.Animation.DELAY(0.5)}, on_start) -- delay to make status removal obvious
@@ -716,14 +716,14 @@ function bt.Scene:help_up(entity)
 
     -- animation
     do
-        local sprite = self._ui:get_sprite(entity)
+        local sprite = self:get_sprite(entity)
         local help_up = bt.Animation.HELPED_UP(sprite)
         local message = bt.Animation.MESSAGE(self, self:format_name(entity) .. " got <b><color=LIGHT_GREEN_2><u>back up</u></color></b>")
 
         local on_start = function()
-            local sprite = self._ui:get_sprite(entity)
+            local sprite = self:get_sprite(entity)
             sprite:set_hp(1, entity:get_hp_base())
-            self._ui:set_state(entity, bt.EntityState.ALIVE)
+            self:set_state(entity, bt.EntityState.ALIVE)
         end
         self:play_animations({help_up, message}, on_start)
     end
@@ -804,10 +804,10 @@ function bt.Scene:kill(entity)
 
     -- animation, announce kill, invoke all callbacks, then actually animate kill
     do -- animation and UI updates
-        local kill = bt.Animation.KILLED(self._ui:get_sprite(entity))
+        local kill = bt.Animation.KILLED(self:get_sprite(entity))
 
         local on_start = function()
-            local sprite = self._ui:get_sprite(entity)
+            local sprite = self:get_sprite(entity)
             sprite:set_hp(0, entity:get_hp_base())
             for status in values(status_before) do
                 sprite:remove_status(status)
@@ -816,7 +816,7 @@ function bt.Scene:kill(entity)
             for consumable in values(entity:list_consumables()) do
                 sprite:remove_consumable(consumable)
             end
-            self._ui:set_state(entity, bt.EntityState.DEAD)
+            self:set_state(entity, bt.EntityState.DEAD)
         end
         self:play_animations({kill}, on_start)
     end
@@ -853,11 +853,11 @@ function bt.Scene:switch(entity_a, entity_b)
 
     -- animation
     do
-        local swap_01 = bt.Animation.SWITCH(self._ui:get_sprite(entity_a))
-        local swap_02 = bt.Animation.SWITCH(self._ui:get_sprite(entity_b))
+        local swap_01 = bt.Animation.SWITCH(self:get_sprite(entity_a))
+        local swap_02 = bt.Animation.SWITCH(self:get_sprite(entity_b))
         local message = bt.Animation.MESSAGE(self, self:format_name(entity_a) .. " and " .. self:format_name(entity_b) .. " switched places")
         local on_finish = function()
-            self._ui:swap(entity_a, entity_b)
+            self:swap(entity_a, entity_b)
         end
         self:play_animations({swap_01, swap_02}, nil, on_finish)
     end
@@ -919,7 +919,7 @@ function bt.Scene:consume(holder, to_consume)
 
     -- consume 1 stack
     local n_left = holder:consume_consumable(to_consume)
-    local sprite = self._ui:get_sprite(holder)
+    local sprite = self:get_sprite(holder)
     local consume = bt.Animation.CONSUMABLE_CONSUMED(sprite, to_consume)
     local message = bt.Animation.MESSAGE(self, self:format_name(holder) .. " consumed their " .. self:format_name(to_consume))
     local on_finish = function()
@@ -997,7 +997,7 @@ function bt.Scene:increase_hp(entity, value)
     entity.hp_current = after
     meta.set_is_mutable(entity, false)
 
-    local sprite = self._ui:get_sprite(entity)
+    local sprite = self:get_sprite(entity)
     local gain = bt.Animation.HP_GAINED(sprite, value)
     local message = bt.Animation.MESSAGE(self, self:format_name(entity) .. " gained " .. "<color=LIGHT_GREEN_2><mono><b>" .. tostring(value) .. "</b></mono></color> HP")
     local on_start = function()
@@ -1101,7 +1101,7 @@ function bt.Scene:reduce_hp(entity, value)
     meta.set_is_mutable(entity, false)
 
     -- animation
-    local sprite = self._ui:get_sprite(entity)
+    local sprite = self:get_sprite(entity)
     local lost = bt.Animation.HP_LOST(sprite, value)
     local message = bt.Animation.MESSAGE(self, self:format_name(entity) .. " lost " .. "<color=RED><mono><b>" .. tostring(value) .. "</b></mono></color> HP")
     local on_start = function()
@@ -1186,7 +1186,7 @@ function bt.Scene:use_move(user, move, targets)
 
     -- if stunned, fizzle
     if user:get_is_stunned() == true then
-        local stunned = bt.Animation.STUNNED(self._ui:get_sprite(user))
+        local stunned = bt.Animation.STUNNED(self:get_sprite(user))
         local message = bt.Animation.MESSAGE(self, self:format_name(user) .. " is stunned")
         self:play_animations({stunned, message})
         return
@@ -1199,7 +1199,7 @@ function bt.Scene:use_move(user, move, targets)
     local animations = {}
     for target in values(targets) do
         -- TODO: use move-specific animation instead of placeholder
-        table.insert(animations, bt.Animation.MOVE(self._ui:get_sprite(target), move))
+        table.insert(animations, bt.Animation.MOVE(self:get_sprite(target), move))
     end
 
     table.insert(animations, bt.Animation.MESSAGE(self, self:format_name(user) .. " used " .. self:format_name(move) .. "!"))
@@ -1253,7 +1253,7 @@ function bt.Scene:start_turn()
 
     -- animation
     self:play_animations({
-        bt.Animation.TURN_START(self._ui),
+        bt.Animation.TURN_START(self),
         bt.Animation.MESSAGE(self, "Turn <b>" .. self._state.turn_count .. "</b> start")
     })
 
@@ -1299,7 +1299,7 @@ end
 function bt.Scene:end_turn()
     -- animation
     self:play_animations({
-        bt.Animation.TURN_END(self._ui),
+        bt.Animation.TURN_END(self),
         bt.Animation.MESSAGE(self, "Turn <b>" .. self._state.turn_count .. "</b> end")
     })
 
@@ -1308,7 +1308,7 @@ function bt.Scene:end_turn()
     local to_remove = {}
     for entity in values(self._state:list_dead_entities()) do
         if entity:get_is_enemy() == true then
-            table.insert(animations, bt.Animation.ENEMY_DISAPPEARED(self._ui:get_sprite(entity)))
+            table.insert(animations, bt.Animation.ENEMY_DISAPPEARED(self:get_sprite(entity)))
             table.insert(to_remove, entity)
         elseif entity:get_is_enemy() == false then
             rt.warning("In bt.Scene.end_turn: [TODO] Gameover Detected")
@@ -1318,8 +1318,8 @@ function bt.Scene:end_turn()
     if sizeof(animations) > 0 then
         local on_start = function() end
         local on_finish = function()
-            self._ui:remove_entity(table.unpack(to_remove))
-            self._ui:set_priority_order(self._state:list_entities_in_order())
+            self:remove_entity(table.unpack(to_remove))
+            self:set_priority_order(self._state:list_entities_in_order())
         end
 
         local message = ""
@@ -1384,7 +1384,7 @@ function bt.Scene:end_turn()
 
         if should_remove == false then
             table.insert(advances, function()
-                self._ui:set_global_status_n_elapsed(status, new_elapsed)
+                self:set_global_status_n_elapsed(status, new_elapsed)
             end)
         else
             self:remove_global_status(status)
@@ -1398,7 +1398,7 @@ function bt.Scene:end_turn()
 
             if should_remove == false then
                 table.insert(advances, function()
-                    self._ui:get_sprite(entity):set_status_n_elapsed(status, new_elapsed)
+                    self:get_sprite(entity):set_status_n_elapsed(status, new_elapsed)
                 end)
             else
                 self:remove_status(entity, status)
@@ -1422,11 +1422,11 @@ function bt.Scene:add_consumable(entity, to_add)
 
     entity:add_consumable(to_add)
 
-    local animation = bt.Animation.CONSUMABLE_GAINED(self._ui:get_sprite(entity), to_add)
+    local animation = bt.Animation.CONSUMABLE_GAINED(self:get_sprite(entity), to_add)
     local message = bt.Animation.MESSAGE(self, self:format_name(entity) .. " acquired " .. self:format_name(to_add))
 
     local on_start = function()
-        self._ui:get_sprite(entity):add_consumable(to_add)
+        self:get_sprite(entity):add_consumable(to_add)
     end
 
     self:play_animations({animation, message}, on_start, nil)
@@ -1468,11 +1468,11 @@ function bt.Scene:remove_consumable(entity, to_remove)
 
     entity:remove_consumable(to_remove)
 
-    local animation = bt.Animation.CONSUMABLE_LOST(self._ui:get_sprite(entity), to_remove)
+    local animation = bt.Animation.CONSUMABLE_LOST(self:get_sprite(entity), to_remove)
     local message = bt.Animation.MESSAGE(self, self:format_name(entity) .. " dropped " .. self:format_name(to_remove))
 
     local on_start = function()
-        self._ui:get_sprite(entity):remove_consumable(to_remove)
+        self:get_sprite(entity):remove_consumable(to_remove)
     end
 
     self:play_animations({animation, message}, on_start)

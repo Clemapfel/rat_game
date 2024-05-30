@@ -1,12 +1,9 @@
 --- @class bt.SceneState.INSPECT
-bt.SceneState.INSPECT = meta.new_type("BattleSceneState_INSPECT", function(scene)
+bt.SceneState.INSPECT = meta.new_type("INSPECT", function(scene)
     local out = meta.new(bt.SceneState.INSPECT, {
         _scene = scene,
-        _controller = rt.InputController()
     })
 
-    out._controller:signal_connect("pressed", out._on_pressed)
-    out._controller:set_is_disabled(true)
     return out
 end)
 
