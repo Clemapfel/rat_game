@@ -5,7 +5,7 @@ bt.Background.CLOUDS = meta.new_type("CLOUDS", bt.Background, function()
         _shader = {},   -- rt.Shader
         _shape = {},    -- rt.VertexShape
         _canvas = rt.RenderTexture(),
-        _elapsed = rt.random.number(-2^16, 2^16)
+        _elapsed = 0,
     })
 end)
 
@@ -30,6 +30,7 @@ end
 --- @override
 function bt.Background.CLOUDS:update(delta)
     self._elapsed = self._elapsed + delta
+    dbg(self._elapsed)
     self._shader:send("elapsed", self._elapsed)
 end
 
