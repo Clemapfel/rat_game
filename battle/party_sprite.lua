@@ -89,7 +89,7 @@ end
 
 --- @override
 function bt.PartySprite:size_allocate(x, y, width, height)
-    local xm, ym = 2 * rt.settings.margin_unit, rt.settings.margin_unit
+    local xm, ym = rt.settings.margin_unit, rt.settings.margin_unit
     local frame_thickness = rt.settings.battle.priority_queue_element.frame_thickness
     local frame_outline_thickness = math.max(frame_thickness * 1.1, frame_thickness + 2)
     local total_frame_thickness = frame_thickness + 2 * frame_outline_thickness

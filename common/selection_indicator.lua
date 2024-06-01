@@ -1,5 +1,5 @@
 rt.settings.selection_indicator = {
-    width = 2,
+    thickness = 5,
     outline_width = 10,
     corner_radius = 5,
     alpha = 1
@@ -8,17 +8,31 @@ rt.settings.selection_indicator = {
 --- @class
 rt.SelectionIndicator = meta.new_type("SelectionIndicator", rt.Widget,  rt.Animation, function()
     return meta.new(rt.SelectionIndicator, {
-        _x = 0,
-        _y = 0,
-        _width = 0,
-        _height = 0
+        _frame = rt.Rectangle(0, 0, 1, 1),
+        _outline = rt.Rectangle(0, 0, 1, 1),
     })
 end)
 
 --- @override
 function rt.SelectionIndicator:resize(other_widget)
-    self._x, self._y = other_widget:get_position()
-    self._width, self._height = other_widget:measure()
+    local x, y = other_widget:get_position()
+    local w, h = other_widget:measure()
+
+    self._frame = rt.Rectangle(x, y, w, h)
+    self._outline = rt.Rectangle(x, y, w, h)
+
+    self._frame:set_color(rt.Palette.SELECTION)
+    self._outline:set_color(rt.Palette.BACKGROUND)
+
+    local line_width = rt.settings.selection_indicator.thickness
+    self._frame:set_line_width(line_width)
+    self._outline:set_line_width(line_width + 3)
+
+    local corner_radius = rt.settings.selection_indicator.corner_radius
+    for which in range(self._frame, self._outline) do
+        which:set_corner_radius(corner_radius)
+        which:set_is_outline(true)
+    end
 end
 
 --- @override
@@ -28,19 +42,6 @@ end
 
 --- @override
 function rt.SelectionIndicator:draw()
-    local x, y, w, h = self._x, self._y, self._width, self._height
-    local color = rt.Palette.BACKGROUND
-    local width = 5
-    local corner_radius = rt.settings.selection_indicator.corner_radius
-    local alpha = rt.settings.selection_indicator.alpha
-    love.graphics.setLineStyle("smooth")
-
-    love.graphics.setColor(color.r, color.g, color.b, alpha)
-    love.graphics.setLineWidth(width + 3)
-    love.graphics.rectangle("line", x - width, y - width, w + 2 * width, h + 2 * width, corner_radius, corner_radius)
-
-    color = rt.Palette.SELECTION
-    love.graphics.setColor(color.r, color.g, color.b, alpha)
-    love.graphics.setLineWidth(width)
-    love.graphics.rectangle("line", x - width, y - width, w + 2 * width, h + 2 * width, corner_radius, corner_radius)
+    self._outline:draw()
+    self._frame:draw()
 end

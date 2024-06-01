@@ -5,6 +5,7 @@ bt.SceneState.INSPECT = meta.new_type("INSPECT", function(scene)
 
         _nodes = {},
         _current_node = nil,
+        _priority_order = {}
     })
 
     return out
@@ -13,6 +14,7 @@ end)
 --- @brief [internal]
 function bt.SceneState.INSPECT:_create()
     local scene = self._scene
+    self._priority_order = scene._state:list_entities_in_order()
 
     local enemy_sprites = {}
     local n_enemies, n_allies = 0, 0
@@ -35,11 +37,24 @@ function bt.SceneState.INSPECT:_create()
         end)
     end
 
+    local entities_in_order = {}
+    do
+        local i = 1
+        for entity in values(self._priority_order) do
+            if entities_in_order[entity] == nil then    -- only count first occurrence
+                entities_in_order[entity] = i
+            end
+            i = i + 1
+        end
+    end
+
     local new_node = function(sprite)
         local bounds = sprite:get_bounds()
+        local entity = sprite:get_entity()
         local out = {
             sprite = sprite,
-            entity = sprite:get_entity(),
+            entity = entity,
+            priority_position = entities_in_order[entity],
             bounds = rt.aabb_copy(bounds),
             info_position_x = bounds.x + bounds.width,
             info_position_y = bounds.y,
@@ -58,8 +73,8 @@ function bt.SceneState.INSPECT:_create()
 
         local triangle_h = rt.settings.margin_unit
         local triangle_w = rt.settings.margin_unit * 2
-        local y_offset = rt.settings.margin_unit
-        local x_offset = rt.settings.margin_unit
+        local y_offset = rt.settings.selection_indicator.thickness + 1
+        local x_offset = rt.settings.selection_indicator.thickness + 1
 
         for which in range("up_indicator", "up_indicator_outline") do
             out[which] = rt.Triangle(
@@ -142,7 +157,7 @@ function bt.SceneState.INSPECT:_create()
     self._nodes = {}
     for nodes in range(enemy_nodes, ally_nodes) do
         for node in values(nodes) do
-            table.insert(self._nodes, node)
+            self._nodes[node.entity] = node
         end
     end
     self._current_node = ally_nodes[1]
@@ -162,6 +177,7 @@ function bt.SceneState.INSPECT:handle_button_pressed(button)
     local scene = self._scene
 
     if self._current_node ~= nil then
+        -- move in spatial direction
         local move = function(direction)
             local next = self._current_node[direction]
             if next ~= nil then
@@ -172,6 +188,25 @@ function bt.SceneState.INSPECT:handle_button_pressed(button)
             return false
         end
 
+        -- move in priority queue order
+        local jump = function(direction)
+            local current_position = self._current_node.priority_position
+            local next_entity
+
+            if direction == "forward" then
+                next_entity = self._priority_order[current_position + 1]
+            elseif direction == "backward" then
+                next_entity = self._priority_order[current_position - 1]
+            else
+                return false
+            end
+
+            if next_entity == nil then return false end
+            local next_node = self._nodes[next_entity]
+            self._current_node = next_node
+            self:_update_selection()
+        end
+
         if button == rt.InputButton.UP then
             move("up")
         elseif button == rt.InputButton.RIGHT then
@@ -180,6 +215,10 @@ function bt.SceneState.INSPECT:handle_button_pressed(button)
             move("down")
         elseif button == rt.InputButton.LEFT then
             move("left")
+        elseif button == rt.InputButton.L then
+            jump("forward")
+        elseif button == rt.InputButton.R then
+            jump("backward")
         end
     end
 end
@@ -258,13 +297,9 @@ function bt.SceneState.INSPECT:draw()
             node.left_indicator_outline:draw()
             node.left_indicator:draw()
         end
-
-        local bounds = node.sprite:get_bounds()
-        love.graphics.setColor(1, 0, 1, 0.5)
-        love.graphics.rectangle("fill", bounds.x, bounds.y, bounds.width, bounds.height)
     end
 
-    --[[ DEBUG: draw selection graph
+    --[[ DEBUG draw selection graph
     for node in values(self._nodes) do
         local from_x, from_y = node.centroid_x, node.centroid_y
         love.graphics.setColor(rt.color_unpack(rt.Palette.BLACK))
