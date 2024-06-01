@@ -143,7 +143,7 @@ end
 
 --- @brief
 function bt.PartySprite:get_bounds()
-    return rt.aabb_copy(self._bounds)
+    return rt.aabb_copy(self._frame:get_bounds())
 end
 
 --- @brief

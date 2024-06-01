@@ -30,7 +30,6 @@ end
 --- @override
 function bt.Background.CLOUDS:update(delta)
     self._elapsed = self._elapsed + delta
-    dbg(self._elapsed)
     self._shader:send("elapsed", self._elapsed)
 end
 

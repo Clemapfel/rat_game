@@ -39,7 +39,9 @@ function bt.PriorityQueue:get_preview_visible()
 end
 
 --- @brief
-function bt.PriorityQueue:set_selected(entities)
+function bt.PriorityQueue:set_selected(entities, unselect_others)
+    unselect_others = which(unselect_others, true)
+
     local is_selected = {}
     for entity in values(entities) do
         is_selected[entity] = true
@@ -50,7 +52,7 @@ function bt.PriorityQueue:set_selected(entities)
         local element_selected = is_selected[id] == true
         for element in values(entry.elements) do
             element:set_is_selected(element_selected)
-            element:set_opacity(ternary(element_selected, 1, unselected_alpha))
+            element:set_opacity(ternary(not element_selected and unselect_others , unselected_alpha, 1))
         end
     end
 end

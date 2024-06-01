@@ -2,16 +2,20 @@ require "include"
 
 rt.current_scene = bt.Scene()
 scene = rt.current_scene
-scene:realize()
-scene:set_background("CLOUDS")
-scene:start_battle(bt.Battle("DEBUG_BATTLE"))
-scene:transition(nil)
+scene:set_background("WORLEY")
+
+input = rt.InputController()
+input:signal_connect("pressed", function(_, which)
+
+end)
 
 --- ###
 
 love.load = function()
     rt.current_scene:realize()
     love.resize()
+    scene:start_battle(bt.Battle("DEBUG_BATTLE"))
+    scene:transition(bt.SceneState.INSPECT)
 end
 
 rt.graphics.frame_duration = {
@@ -19,10 +23,6 @@ rt.graphics.frame_duration = {
     n_frames_saved = 144,
     max = 0
 }
-
-function love.mousemotion(x, y)
-   bt.Background.CLOUDS._shader:send("mouse", {x, y})
-end
 
 love.draw = function()
     local before = love.timer.getTime()

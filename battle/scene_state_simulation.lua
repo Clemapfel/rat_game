@@ -77,6 +77,7 @@ end
 --- @override
 function bt.SceneState.SIMULATION:draw()
     local scene = self._scene
+
     for i in values(scene._enemy_sprite_render_order) do
         scene._enemy_sprites[i]:draw()
     end

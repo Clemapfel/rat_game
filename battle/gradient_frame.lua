@@ -42,9 +42,6 @@ function bt.GradientFrame:size_allocate(x, y, width, height)
     self._frame_outline:set_line_width(frame_outline_thickness)
     local total_frame_thickness = frame_thickness + frame_outline_thickness
 
-    x = x + frame_outline_thickness
-    width = width - 2 * frame_outline_thickness
-
     local backdrop_bounds = rt.AABB(x, y, width, height)
     self._backdrop:resize(backdrop_bounds)
 

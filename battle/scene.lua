@@ -129,11 +129,18 @@ function bt.Scene:size_allocate(x, y, width, height)
     self._move_selection:fit_into(0, log_aabb.y, party_max_x, party_min_y - log_aabb.y)
 
     self._fast_forward_indicator:fit_into(x + m, y + m, 5 * m, 2.5 * m)
+
+    if self._current_state ~= nil then
+        self._current_state:exit()
+        self._current_state:enter()
+    end
 end
 
 --- @brief
 function bt.Scene:update(delta)
-    self._background:update(delta)
+    if self._background ~= nil then
+        self._background:update(delta)
+    end
 
     if self._current_state ~= nil then
         self._current_state:update(delta)
@@ -158,6 +165,10 @@ end
 
 --- @brief
 function bt.Scene:transition(new_state)
+    if self._is_realized == false then
+        self:realize()
+    end
+
     local current = self._current_state
     local next = self._states[new_state]
 
@@ -320,6 +331,35 @@ function bt.Scene:get_sprite(entity)
     for sprite in values(self._party_sprites) do
         if sprite:get_entity():get_id() == entity:get_id() then
             return sprite
+        end
+    end
+end
+
+
+--- @brief
+function bt.Scene:set_selected(entities, unselect_others)
+    if meta.isa(entities, bt.Entity) then
+        entities = {entities}
+    end
+
+    unselect_others = which(unselect_others, true)
+    self._priority_queue:set_selected(entities, unselect_others)
+
+    local is_selected = {}
+    for entity in values(entities) do
+        is_selected[entity] = true
+    end
+
+    for entity in values(self._state:list_entities()) do
+        local sprite = self:get_sprite(entity)
+        if is_selected[entity] == true then
+            sprite:set_selection_state(bt.SelectionState.SELECTED)
+        else
+            if unselect_others == true then
+                sprite:set_selection_state(bt.SelectionState.UNSELECTED)
+            else
+                sprite:set_selection_state(bt.SelectionState.INACTIVE)
+            end
         end
     end
 end

@@ -26,7 +26,7 @@ function bt.EntitySelection:create_from(user, can_target_multiple, can_target_se
     elseif can_target_multiple == false then
         local self_sprite, ally_sprites, enemy_sprites = {}, {}, {}
         for entity in values(self._scene._state:list_entities()) do
-            local sprite = self._scene._ui:get_sprite(entity)
+            local sprite = self._scene:get_sprite(entity)
             if entity:get_is_enemy() == user:get_is_enemy() then
                 table.insert(ally_sprites, sprite)
             else
@@ -133,7 +133,7 @@ function bt.EntitySelection:create_from(user, can_target_multiple, can_target_se
         }
 
         for entity in values(self._scene._state:list_entities()) do
-            local sprite = self._scene._ui:get_sprite(entity)
+            local sprite = self._scene:get_sprite(entity)
             if entity == user and can_target_self then
                 table.insert(ally_node.entities, entity)
                 table.insert(ally_node.sprites, sprite)
