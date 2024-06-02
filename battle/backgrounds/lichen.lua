@@ -52,7 +52,7 @@ function bt.Background.LICHEN:size_allocate(x, y, width, height)
     self._textures[2] = rt.RenderTexture(texture_w, texture_h, false, format)
 
     local from, to = self:_get_texture_from_to()
-    for texture in range(from) do
+    for texture in range(from, to) do
         self._shader:bind()
         self._shader:send("mode", bt.Background.ShaderMode.INITIALIZE)
         texture:bind_as_render_target()
@@ -85,7 +85,7 @@ function bt.Background.LICHEN:update(delta, intensity)
         to:unbind_as_render_target()
         self._shader:unbind()
 
-        self._shape:set_texture(to)
+        --self._shape:set_texture(to)
         self._texture_order = not self._texture_order
         rt.graphics.pop()
 

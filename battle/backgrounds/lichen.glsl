@@ -93,9 +93,15 @@ uniform vec2 texture_size;
 uniform float delta;
 uniform float elapsed;
 
+vec2 get_coords(vec2 coord, vec2 offset){
+    return coord + 1. / texture_size * offset;
+}
+
 float inverse_gaussian(float x) {
     return -1./pow(2., (0.6*pow(x, 2.)))+1.;
 }
+
+#define PI 3.14159
 
 float activation(float x) {
     return inverse_gaussian(x);
@@ -105,11 +111,7 @@ vec4 effect(vec4 vertex_color, Image _, vec2 texture_coords, vec2 vertex_positio
 {
     if (mode == SHADER_MODE_INITIALIZE)  // initialize
     {
-        float x = 0;
-        if (simplex_noise(vec3(texture_coords.xy * 100, 0)) > 0.9)
-            x = 1;
-
-        return vec4(vec3(x), 1);
+        return vec4(simplex_noise(vec3(texture_coords.xy * 10000, 0)));
     }
     else if (mode == SHADER_MODE_DRAW) // draw
     {
@@ -119,20 +121,24 @@ vec4 effect(vec4 vertex_color, Image _, vec2 texture_coords, vec2 vertex_positio
 
     // step
 
-    const mat3x3 kernel = mat3x3(
-      0.68, -0.9, 0.68,
-      -0.9, -0.66, -0.9,
-      0.68, -0.9, 0.68
-    );
+    const float kernel[9] = {
+        0.68, -0.9, 0.68,
+        -0.9, -0.4, -0.9,
+        0.68, -0.9, 0.68
+    };
 
-    vec2 pixel_size = vec2(1.f) / texture_size;
-    float sum = 0;
-    for (int i = -1; i <= 1; ++i) {
-        for (int j = -1; j <= 1; ++j) {
-            float value = Texel(texture_from, texture_coords.xy + vec2(i, j) * pixel_size).x;
-            sum += value * kernel[i + 1][j + 1];
-        }
-    }
+    vec2 pixel_size = 1.f / texture_size;
+    float sum =
+      Texel(texture_from, texture_coords + pixel_size * vec2(+1., -1.)).x * kernel[0]
+    + Texel(texture_from, texture_coords + pixel_size * vec2(+0., -1.)).x * kernel[1]
+    + Texel(texture_from, texture_coords + pixel_size * vec2(-1., -1.)).x * kernel[2]
+    + Texel(texture_from, texture_coords + pixel_size * vec2(+1., -0.)).x * kernel[3]
+    + Texel(texture_from, texture_coords + pixel_size * vec2(+0., -0.)).x * kernel[4]
+    + Texel(texture_from, texture_coords + pixel_size * vec2(-1., -0.)).x * kernel[5]
+    + Texel(texture_from, texture_coords + pixel_size * vec2(+1., -1.)).x * kernel[6]
+    + Texel(texture_from, texture_coords + pixel_size * vec2(+0., -1.)).x * kernel[7]
+    + Texel(texture_from, texture_coords + pixel_size * vec2(-1., -1.)).x * kernel[8];
 
-    return vec4(vec3(activation(sum)), 1);
+    float x = activation(sum);
+    return vec4(x);
 }
