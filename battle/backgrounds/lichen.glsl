@@ -81,6 +81,12 @@ vec3 hsv_to_rgb(vec3 c)
     return c.z * mix(K.xxx, clamp(p - K.xxx, 0.0, 1.0), c.y);
 }
 
+#define PI 3.1415926535897932384626433832795
+
+float angle_between(vec2 v1, vec2 v2) {
+    return (acos(clamp(dot(normalize(v1), normalize(v2)), -1.0, 1.0)) + PI) / (2 * PI);
+}
+
 // ###
 
 #define SHADER_MODE_INITIALIZE -1
@@ -88,57 +94,64 @@ vec3 hsv_to_rgb(vec3 c)
 #define SHADER_MODE_STEP 1
 
 uniform int mode;
+uniform float seed;
 uniform Image texture_from;
 uniform vec2 texture_size;
 uniform float delta;
 uniform float elapsed;
 
-vec2 get_coords(vec2 coord, vec2 offset){
-    return coord + 1. / texture_size * offset;
-}
-
-float inverse_gaussian(float x) {
-    return -1./pow(2., (0.6*pow(x, 2.)))+1.;
-}
-
-#define PI 3.14159
-
-float activation(float x) {
-    return inverse_gaussian(x);
-}
-
 vec4 effect(vec4 vertex_color, Image _, vec2 texture_coords, vec2 vertex_position)
 {
     if (mode == SHADER_MODE_INITIALIZE)  // initialize
     {
-        return vec4(simplex_noise(vec3(texture_coords.xy * 10000, 0)));
+        return vec4(simplex_noise(vec3(texture_coords.xy * 10000, seed)));
     }
     else if (mode == SHADER_MODE_DRAW) // draw
     {
-        float value = Texel(texture_from, texture_coords.xy).x;
-        return vec4(vec3(value), 1);
+        vec4 value = Texel(texture_from, texture_coords.xy);
+        return vec4(vec3(length(value.xy)), 1);
     }
 
-    // step
-
-    const float kernel[9] = {
-        0.68, -0.9, 0.68,
-        -0.9, -0.4, -0.9,
-        0.68, -0.9, 0.68
-    };
-
     vec2 pixel_size = 1.f / texture_size;
-    float sum =
-      Texel(texture_from, texture_coords + pixel_size * vec2(+1., -1.)).x * kernel[0]
-    + Texel(texture_from, texture_coords + pixel_size * vec2(+0., -1.)).x * kernel[1]
-    + Texel(texture_from, texture_coords + pixel_size * vec2(-1., -1.)).x * kernel[2]
-    + Texel(texture_from, texture_coords + pixel_size * vec2(+1., -0.)).x * kernel[3]
-    + Texel(texture_from, texture_coords + pixel_size * vec2(+0., -0.)).x * kernel[4]
-    + Texel(texture_from, texture_coords + pixel_size * vec2(-1., -0.)).x * kernel[5]
-    + Texel(texture_from, texture_coords + pixel_size * vec2(+1., -1.)).x * kernel[6]
-    + Texel(texture_from, texture_coords + pixel_size * vec2(+0., -1.)).x * kernel[7]
-    + Texel(texture_from, texture_coords + pixel_size * vec2(-1., -1.)).x * kernel[8];
+    vec4 current = Texel(texture_from, texture_coords.xy);
 
-    float x = activation(sum);
-    return vec4(x);
+    float n_neighbors = 0;
+    float max_angle = -1. / 0.;
+    float neighborhood_sum = 0;
+
+    int x = int(texture_coords.x / pixel_size);
+    int y = int(texture_coords.y / pixel_size);
+
+    vec2 vector = vec2(0);
+    for (int xx = x - 1; xx <= x + 1; xx++) {
+        for (int yy = y - 1; yy <= y + 1; yy++) {
+            //if (xx == x || yy == y) continue;
+
+            vec4 current = Texel(texture_from, vec2(xx, yy) * pixel_size);
+            if (current.z > 0.97)
+                n_neighbors++;
+
+            for (int xxx = x-1; xxx <= x+1; xxx++) {
+                for (int yyy = y - 1; yyy < y + 1; yyy++) {
+                    vec4 other = Texel(texture_from, vec2(xxx, yyy) * pixel_size);
+                    max_angle = max(max_angle, angle_between(current.xy, other.xy) + PI);
+                }
+            }
+
+            vec2 came_from = normalize(vec2(xx - x, yy - y));
+            vector = current.z * (current.xy + came_from) / 2;
+            vector = normalize(vector);
+        }
+    }
+
+    float rng = elapsed;
+    float rng_offset = simplex_noise(vec3(vec2(x, y) + vec2(rng, -rng), 0)) * 2;
+
+    if (current.z <= 0 && n_neighbors > 1 * rng_offset && n_neighbors < 2 * rng_offset) {
+        return vec4(vector, 1, 0);
+    }
+    else
+    {
+        return vec4(vector, clamp(current.z - 0.01, 0, 1), 0);
+    }
 }

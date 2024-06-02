@@ -1,6 +1,6 @@
 rt.settings.battle.background.lichen = {
     shader_path = "battle/backgrounds/lichen.glsl",
-    texture_format = "rg8"
+    texture_format = "r32f"
 }
 
 bt.Background.ShaderMode = meta.new_enum({
@@ -52,9 +52,13 @@ function bt.Background.LICHEN:size_allocate(x, y, width, height)
     self._textures[2] = rt.RenderTexture(texture_w, texture_h, false, format)
 
     local from, to = self:_get_texture_from_to()
+    local seed = rt.random.number(0, 2^6)
     for texture in range(from, to) do
+        texture:set_wrap_mode(rt.TextureWrapMode.REPEAT)
+        texture:set_scale_mode(rt.TextureScaleMode.LINEAR)
         self._shader:bind()
         self._shader:send("mode", bt.Background.ShaderMode.INITIALIZE)
+        self._shader:send("seed", seed)
         texture:bind_as_render_target()
         self._shape:draw()
         texture:unbind_as_render_target()
@@ -72,20 +76,19 @@ function bt.Background.LICHEN:update(delta, intensity)
     local step_duration = 1 / 30
     while (self._elapsed > step_duration) do
         rt.graphics.push()
-        rt.graphics.origin()
         local from, to = self:_get_texture_from_to()
         self._shader:bind()
         self._shader:send("mode", bt.Background.ShaderMode.STEP)
         self._shader:send("texture_from", from._native)
         --self._shader:send("delta", delta)
         --self._shader:send("elapsed", self._total_elapsed)
-        self._shader:send("texture_size", {from:get_size()})
+        ---self._shader:send("texture_size", {from:get_size()})
         to:bind_as_render_target()
-        from:draw()
+        love.graphics.draw(from._native, 0, 0)
         to:unbind_as_render_target()
         self._shader:unbind()
 
-        --self._shape:set_texture(to)
+        self._shape:set_texture(to)
         self._texture_order = not self._texture_order
         rt.graphics.pop()
 
