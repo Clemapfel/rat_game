@@ -2,7 +2,7 @@ require "include"
 
 rt.current_scene = bt.Scene()
 scene = rt.current_scene
-scene:set_background("WORLEY")
+scene:set_background("LICHEN")
 
 input = rt.InputController()
 input:signal_connect("pressed", function(_, which)
@@ -15,7 +15,7 @@ love.load = function()
     rt.current_scene:realize()
     love.resize()
     scene:start_battle(bt.Battle("DEBUG_BATTLE"))
-    scene:transition(bt.SceneState.INSPECT)
+    scene:transition(nil) --bt.SceneState.INSPECT)
 end
 
 rt.graphics.frame_duration = {
