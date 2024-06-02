@@ -83,15 +83,27 @@ vec3 hsv_to_rgb(vec3 c)
 
 // ###
 
+#define SHADER_MODE_INITIALIZE -1
+#define SHADER_MODE_DRAW 0
+#define SHADER_MODE_STEP 1
+
 uniform int mode;
 uniform Image texture_from;
 uniform vec2 texture_size;
 uniform float delta;
 uniform float elapsed;
 
+float inverse_gaussian(float x) {
+    return -1./pow(2., (0.6*pow(x, 2.)))+1.;
+}
+
+float activation(float x) {
+    return inverse_gaussian(x);
+}
+
 vec4 effect(vec4 vertex_color, Image _, vec2 texture_coords, vec2 vertex_position)
 {
-    if (mode == -1)  // initialize
+    if (mode == SHADER_MODE_INITIALIZE)  // initialize
     {
         float x = 0;
         if (simplex_noise(vec3(texture_coords.xy * 100, 0)) > 0.9)
@@ -99,7 +111,7 @@ vec4 effect(vec4 vertex_color, Image _, vec2 texture_coords, vec2 vertex_positio
 
         return vec4(vec3(x), 1);
     }
-    else if (mode == 0) // draw
+    else if (mode == SHADER_MODE_DRAW) // draw
     {
         float value = Texel(texture_from, texture_coords.xy).x;
         return vec4(vec3(value), 1);
@@ -107,21 +119,20 @@ vec4 effect(vec4 vertex_color, Image _, vec2 texture_coords, vec2 vertex_positio
 
     // step
 
+    const mat3x3 kernel = mat3x3(
+      0.68, -0.9, 0.68,
+      -0.9, -0.66, -0.9,
+      0.68, -0.9, 0.68
+    );
+
     vec2 pixel_size = vec2(1.f) / texture_size;
-    int n_active = 0;
+    float sum = 0;
     for (int i = -1; i <= 1; ++i) {
         for (int j = -1; j <= 1; ++j) {
             float value = Texel(texture_from, texture_coords.xy + vec2(i, j) * pixel_size).x;
-            if (value > 0.01)
-                n_active += 1;
+            sum += value * kernel[i + 1][j + 1];
         }
     }
 
-    const float speed = 0.1;
-    float current = Texel(texture_from, texture_coords.xy).x;
-
-    if (n_active >= 1)
-        return vec4(1, 1, 1, 1);
-    else
-        return vec4(current, 1, 1, 1);
+    return vec4(vec3(activation(sum)), 1);
 }

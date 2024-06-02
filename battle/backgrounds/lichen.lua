@@ -1,5 +1,6 @@
 rt.settings.battle.background.lichen = {
     shader_path = "battle/backgrounds/lichen.glsl",
+    texture_format = "rg8"
 }
 
 bt.Background.ShaderMode = meta.new_enum({
@@ -46,7 +47,7 @@ function bt.Background.LICHEN:size_allocate(x, y, width, height)
     self._shape:set_vertex_position(4, x, y + height)
 
     local texture_w, texture_h = width / 2, height / 2
-    local format = "r16"
+    local format = rt.settings.battle.background.lichen.pixel_format
     self._textures[1] = rt.RenderTexture(texture_w, texture_h, false, format)
     self._textures[2] = rt.RenderTexture(texture_w, texture_h, false, format)
 
@@ -62,7 +63,6 @@ function bt.Background.LICHEN:size_allocate(x, y, width, height)
 
     self._shape:set_texture(from)
 end
-
 
 --- @override
 function bt.Background.LICHEN:update(delta, intensity)
