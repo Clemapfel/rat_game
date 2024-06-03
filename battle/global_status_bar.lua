@@ -78,9 +78,9 @@ function bt.GlobalStatusBar:activate(status)
 end
 
 --- @brief
-function bt.GlobalStatusBar:synchronize(entity)
+function bt.GlobalStatusBar:synchronize(state)
     local actually_present = {}
-    for status in values(entity:list_statuses()) do
+    for status in values(state:list_global_statuses()) do
         actually_present[status] = true
     end
 
@@ -98,7 +98,7 @@ function bt.GlobalStatusBar:synchronize(entity)
 
     -- add & update time
     for status in keys(actually_present) do
-        local n_elapsed = entity:get_status_n_turns_elapsed(status)
+        local n_elapsed = state:get_global_status_n_turns_elapsed(status)
         if currently_present[status] ~= true then
             self:add(status, n_elapsed)
         else

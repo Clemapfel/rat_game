@@ -282,6 +282,9 @@ end
 --- @override
 function bt.SceneState.INSPECT:enter()
     local scene = self._scene
+
+    scene._global_status_bar:synchronize(scene._state)
+
     scene:set_priority_order(scene._state:list_entities_in_order())
     self:_create()
     self:_update_selection()
@@ -334,6 +337,7 @@ function bt.SceneState.INSPECT:draw()
     rt.graphics.translate(self._verbose_info_offset_x, self._verbose_info_offset_y)
     self._verbose_info:draw()
     rt.graphics.translate(-self._verbose_info_offset_x, -self._verbose_info_offset_y)
+
 
     if self._current_node ~= nil then
         local node = self._current_node

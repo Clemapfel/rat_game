@@ -62,6 +62,7 @@ function bt.SceneState.SIMULATION:update(delta)
         ff_delta = delta * rt.settings.battle.scene.simulation.fast_forward_factor
     end
 
+    scene._global_status_bar:update(ff_delta)
     scene._animation_queue:update(ff_delta)
     scene._priority_queue:update(ff_delta)
     scene._log:update(ff_delta)

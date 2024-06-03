@@ -262,15 +262,13 @@ function bt.Scene:spawn_entities(...)
 end
 
 --- @brief
+function bt.Scene:activate_global_status(global_status)
+    self._global_status_bar:activate(global_status)
+end
+
+--- @brief
 function bt.Scene:add_global_status(to_add)
     local is_silent = to_add.is_silent
-
-    -- check if status is already present
-    for status in values(self._state:list_global_statuses()) do
-        if status == to_add then
-            return
-        end
-    end
 
     -- add status
     self._state:add_global_status(to_add)
@@ -279,7 +277,7 @@ function bt.Scene:add_global_status(to_add)
         local add = bt.Animation.GLOBAL_STATUS_GAINED(self, to_add)
         local message = bt.Animation.MESSAGE(self, self:format_name(to_add) .. " is now active globally")
         local on_start = function()
-            self:add_global_status(to_add)
+            self._global_status_bar:add(to_add, 0)
         end
         self:play_animations({add, message}, on_start)
     end

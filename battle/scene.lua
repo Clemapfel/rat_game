@@ -382,6 +382,7 @@ end
 function bt.Scene:skip()
     self._animation_queue:skip()
     self._priority_queue:skip()
+    self._global_status_bar:skip()
 
     for sprite in values(self._enemy_sprites) do
         sprite:skip()
