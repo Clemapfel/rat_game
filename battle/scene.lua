@@ -313,6 +313,7 @@ function bt.Scene:_reformat_party_sprites(x, width)
     local w = (width - (n_sprites - 1) * (m + 2 * thickness)) / n_sprites
     local h = self._bounds.height * (3 / 9)
     local y = self._bounds.y + self._bounds.height - h
+    x = x + 0.5 * width - 0.5 * (n_sprites * w + (n_sprites - 1) * m)
 
     for i = 1, n_sprites do
         local sprite = self._party_sprites[i]
