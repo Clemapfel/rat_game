@@ -31,6 +31,11 @@ float project(float value, float lower, float upper) {
     return value * abs(upper - lower) + min(lower, upper);
 }
 
+vec2 rotate(vec2 v, float angle) {
+    float s = sin(angle);
+    float c = cos(angle);
+    return v * mat2(c, -s, s, c);
+}
 
 /// @brief 3d discontinuous noise, in [0, 1]
 vec3 random_3d(in vec3 p) {
@@ -59,11 +64,15 @@ float gradient_noise(vec3 p) {
                           dot( -1 + 2 * random_3d(i + vec3(1.0,1.0,1.0)), v - vec3(1.0,1.0,1.0)), u.x), u.y), u.z );
 }
 
-#define FBM_N_STEPS 3
+#define FBM_N_STEPS 2
 vec2 map(vec3 p, float spikyness)
 {
-    const mat3 m3 = mat3(0.33338, 0.56034, -0.71817, -0.87887, 0.32651, -0.15323, 0.15162, 0.69596, 0.61339) * 2;
-    float prm1 = spikyness * 1.5 + 0.5;
+    const mat3 m3 = mat3(
+         0.33338, 0.56034, -0.71817,
+        -0.87887, 0.32651, -0.15323,
+         0.15162, 0.69596,  0.61339
+    ) * 2.5;
+    float prm1 = spikyness + 0.5;
     float cl = length(p.xy) * length(p.xy);
     float d = 0.;
     float z = 1;
@@ -104,10 +113,9 @@ vec4 render(in vec3 ray_direction, float spikyness, float time)
             col = vec4(sin(vec3(5., 0.4, 0.2) + mpv.y * 0.1 + sin(pos.z * 0.4) * 0.5 + 1.8) * 0.5 + 0.5, 0.08);
             col *= density * density * density;
             col.rgb *= clamp(linstep(4., -2.5, mpv.x), 0, 1) * 2.3;
-            col.rgb *= density * (vec3(0.04, 0.045, 0.045));
+            col.rgb *= density * (vec3(0.045, 0.045, 0.045));
         }
 
-        col.rgb = vec3(max(max(col.r, col.g), max(col.g, col.b)));
         float fog_color = (t - 4);
         col.rgba += clamp(fog_color - fog_transparency, 0., 1.) * 0.01;
         fog_transparency = fog_color;
@@ -115,16 +123,24 @@ vec4 render(in vec3 ray_direction, float spikyness, float time)
         t += STEP_SIZE;
     }
 
+    result.xyz = vec3(max(max(result.x, result.y), max(result.y, result.z)));
     return clamp(result, 0.0, 1.0);
+}
+
+float gaussian(float x, float mean, float variance) {
+    return exp(-pow(x - mean, 2.0) / variance);
 }
 
 vec4 effect(vec4 vertex_color, Image image, vec2 texture_coords, vec2 vertex_position)
 {
     vec2 position = (vertex_position.xy - 0.5 * love_ScreenSize.xy) / love_ScreenSize.y;
 
-    float time = elapsed;
+    position *= 1.5;
+
+    float time = elapsed / 50;
     vec3 ray_direction = (position.x * vec3(1, 0, 0) + position.y * vec3(0, 1, 0)) - vec3(0, 0, 1);
     ray_direction = normalize(ray_direction);
 
-    return vec4(render(ray_direction, sin(time) * 0.4 + 0.2, time).rgb, 1.0);
+    ray_direction.xy = rotate(ray_direction.xy, time / 3);
+    return vec4(max(render(ray_direction, sin(time * 5) * 0.5, elapsed / 2).rgb, vec3(0)), 1.0);
 }
