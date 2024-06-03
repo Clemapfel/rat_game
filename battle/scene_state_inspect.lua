@@ -5,7 +5,11 @@ bt.SceneState.INSPECT = meta.new_type("INSPECT", function(scene)
 
         _nodes = {},
         _current_node = nil,
-        _priority_order = {}
+        _priority_order = {},
+
+        _verbose_info = bt.VerboseInfo(),
+        _verbose_info_offset_x = 0,
+        _verbose_info_offset_y = 0
     })
 
     return out
@@ -161,14 +165,61 @@ function bt.SceneState.INSPECT:_create()
         end
     end
     self._current_node = ally_nodes[1]
+
+    self._verbose_info:realize()
+    local m = rt.settings.margin_unit
+    local bounds = self._scene._bounds
+    self._verbose_info:fit_into(0, 0, bounds.height - 2 * m, bounds.width - 2 * m)
+    self:_update_selection()
 end
 
 --- @brief [internal]
 function bt.SceneState.INSPECT:_update_selection()
-    if self._current_node ~= nil then
-        self._scene:set_selected({self._current_node.entity}, false)
-    else
+    if self._current_node == nil then
         self._scene:set_selected({}, false)
+        self._verbose_info:show()
+    else
+        local entity = self._current_node.entity
+        self._scene:set_selected({entity}, false)
+
+        -- find all objects to show
+        local to_show = {{entity}}
+        for status in values(entity:list_statuses()) do
+            table.insert(to_show, {status, entity:get_status_n_turns_left(status)})
+        end
+
+        for consumable in values(entity:list_consumables()) do
+            table.insert(to_show, {consumable, entity:get_consumable_n_uses_left(consumable)})
+        end
+
+        self._verbose_info:show(table.unpack(to_show))
+
+        -- calculate new verbose info position
+        local sprite_bounds = self._current_node.sprite:get_bounds()
+        local scene_bounds = self._scene:get_bounds()
+
+        local m = rt.settings.margin_unit
+        scene_bounds.x = scene_bounds.x + 2 * m
+        scene_bounds.y = scene_bounds.y + 2 * m
+        scene_bounds.height = scene_bounds.height - 4 * m
+        scene_bounds.width = scene_bounds.width - 4 * m
+
+        local w, h = self._verbose_info:measure()
+        if sprite_bounds.x + sprite_bounds.width + w + m < scene_bounds.x + scene_bounds.width then
+            self._verbose_info_offset_x = sprite_bounds.x + sprite_bounds.width + m
+        else
+            self._verbose_info_offset_x = sprite_bounds.x - w
+        end
+
+        self._verbose_info_offset_y = sprite_bounds.y - 0.5 * h + 0.5 * sprite_bounds.height
+
+        if self._verbose_info_offset_y < scene_bounds.y then
+            self._verbose_info_offset_y = scene_bounds.y
+        end
+
+        if self._verbose_info_offset_y + h > scene_bounds.y + scene_bounds.height then
+            self._verbose_info_offset_y = scene_bounds.y + scene_bounds.height - h
+        end
     end
 end
 
@@ -234,6 +285,10 @@ function bt.SceneState.INSPECT:enter()
     scene:set_priority_order(scene._state:list_entities_in_order())
     self:_create()
     self:_update_selection()
+    self._verbose_info:realize()
+
+    local m = rt.settings.margin_unit
+    local bounds = self._scene:get_bounds()
 end
 
 --- @override
@@ -276,6 +331,10 @@ function bt.SceneState.INSPECT:draw()
         bt.BattleSprite.draw(scene._enemy_sprites[i])
     end
 
+    rt.graphics.translate(self._verbose_info_offset_x, self._verbose_info_offset_y)
+    self._verbose_info:draw()
+    rt.graphics.translate(-self._verbose_info_offset_x, -self._verbose_info_offset_y)
+
     if self._current_node ~= nil then
         local node = self._current_node
         if node.up ~= nil then
@@ -298,6 +357,7 @@ function bt.SceneState.INSPECT:draw()
             node.left_indicator:draw()
         end
     end
+
 
     --[[ DEBUG draw selection graph
     for node in values(self._nodes) do

@@ -4,11 +4,6 @@ rt.current_scene = bt.Scene()
 scene = rt.current_scene
 scene:set_background("CLOUDS")
 
-input = rt.InputController()
-input:signal_connect("pressed", function(_, which)
-
-end)
-
 --- ###
 
 love.load = function()

@@ -1,145 +1,147 @@
---- @class
+--- @class bt.VerboseInfo
 bt.VerboseInfo = meta.new_type("VerboseInfo", rt.Widget, function()
     return meta.new(bt.VerboseInfo, {
-        _pages = {}, -- Table<Any, bt.VerboseInfo.Page>
-        _visible_page = nil,
-        _see_also_pages = {}    -- Table<Table<bt.VerboseInfo.Page>>
-    })
-end)
-
---- @class
-bt.VerboseInfo.Page = meta.new_type("VerboseInfoPage", function()
-    return meta.new(bt.VerboseInfo.Page, {
+        _visible_pages = {}, -- Table<bt.VerboseInfo.Page>
         _position_x = 0,
         _position_y = 0,
-        _width = 1,
-        _height = 1,
-        _backdrop_initialized = false,
-        _backdrop = rt.Frame(), -- rt.Frame
-        _backdrop_backing = rt.Spacer() -- rt.Spacer
+        _final_width = 0,
+        _final_height = 0
     })
 end)
 
 --- @brief
-function bt.VerboseInfo:draw()
-    local page = self._visible_page
-    if page ~= nil then
-        page:_draw()
-    end
-
-    for column in values(self._see_also_pages) do
-        for other in values(column) do
-            other:_draw()
+--- @vararg Table<Table<bt.Any, Number?>>
+function bt.VerboseInfo:show(...)
+    self._visible_pages = {}
+    for t in range(...) do
+        local object = t[1]
+        local page
+        if meta.isa(object, bt.Entity) then
+            page = bt.VerboseInfo.Page.ENTITY(table.unpack(t))
+        elseif meta.isa(object, bt.Move) then
+            page = bt.VerboseInfo.Page.MOVE(table.unpack(t))
+        elseif meta.isa(object, bt.Status) then
+            page = bt.VerboseInfo.Page.STATUS(table.unpack(t))
+        elseif meta.isa(object, bt.GlobalStatus) then
+            page = bt.VerboseInfo.Page.GLOBAL_STATUS(table.unpack(t))
+        elseif meta.isa(object, bt.Consumable) then
+            page = bt.VerboseInfo.Page.CONSUMABLE(table.unpack(t))
+        elseif meta.isa(object, bt.Equip) then
+            page = bt.VerboseInfo.Page.EQUIP(table.unpack(t))
+        else
+            rt.error("In bt.VerboseInfo.add: unhandled entity type `" .. meta.typeof(object) .. "`")
         end
-    end
-end
 
---- @brief
-function bt.VerboseInfo:add(object, ...)
-    local new_page = bt.VerboseInfo.Page()
-    self._pages[object] = new_page
-
-    if meta.isa(object, bt.Entity) then
-        new_page:create_from_entity(object, ...)
-        new_page._backdrop:set_color(rt.Palette.SELECTION)
-    elseif meta.isa(object, bt.Move) then
-        new_page:create_from_move(object, ...)
-    elseif meta.isa(object, bt.Status) then
-        new_page:create_from_status(object, ...)
-    elseif meta.isa(object, bt.GlobalStatus) then
-        new_page:create_from_global_status(object, ...)
-    elseif meta.isa(object, bt.Consumable) then
-        new_page:create_from_consumable(object, ...)
-    elseif meta.isa(object, bt.Equip) then
-        new_page:create_from_equip(object, ...)
-    else
-        rt.error("In bt.VerboseInfo.add: unhandled entity type `" .. meta.typeof(object) .. "`")
-    end
-
-    return new_page
-end
-
---- @brief
-function bt.VerboseInfo:show(object, ...)
-    local page = self._pages[object]
-    if page == nil then
-        page = self:add(object, ...)
-    end
-
-    self._visible_page = page
-    self._see_also_pages = {}
-    if meta.isa(object, bt.Entity) then
-        local entity = object
-        for which in range(
-            entity:list_statuses(),
-            entity:list_consumables()
-        ) do
-            table.insert(self._see_also_pages, {})
-            for x in values(which) do
-                local to_add = self._pages[x]
-                if to_add == nil then
-                    if meta.isa(x, bt.Status) then
-                        to_add = self:add(x, entity:get_status_n_turns_left(x))
-                    elseif meta.isa(x, bt.Consumable) then
-                        to_add = self:add(x, entity:get_consumable_n_uses_left(x))
-                    else
-                        to_add = self:add(x)
-                    end
-                end
-                table.insert(self._see_also_pages[#(self._see_also_pages)], to_add)
-            end
-        end
+        page:realize()
+        table.insert(self._visible_pages, page)
     end
 
     self:reformat()
 end
 
-function bt.VerboseInfo.Page:_initialize_backdrop()
-    if self._backdrop_initialized ~= true then
-        self._backdrop:realize()
-        self._backdrop_backing:realize()
-        self._backdrop:set_child(self._backdrop_backing)
+--- @override
+function bt.VerboseInfo:size_allocate(x, y, width, height)
+    -- first pass, measure
+    local max_width = 0
+    for page in values(self._visible_pages) do
+        page:fit_into(0, 0, POSITIVE_INFINITY, POSITIVE_INFINITY)
+        max_width = math.max(max_width, page._requested_width)
     end
-    local xm, ym = rt.settings.margin_unit * 2, rt.settings.margin_unit
-    self._backdrop:fit_into(-xm, -ym, self._width + 2 * xm, self._height + 2 * ym)
+
+    local max_x, max_y = NEGATIVE_INFINITY, NEGATIVE_INFINITY
+
+    -- second pass, reformat to max width
+    local current_x, current_y = 0, 0
+    for page in values(self._visible_pages) do
+        local once = false
+        ::restart::
+
+        page:fit_into(current_x, current_y, max_width, POSITIVE_INFINITY)
+        local h = page._requested_height
+        page:_initialize_backdrop(max_width, h)
+        local xm, ym = page:_get_backdrop_margins()
+        local thickness = page._backdrop:get_thickness()
+        current_y = current_y + h + 2 * ym + 2 * thickness
+
+        -- realign when wrapping
+        if current_y > y + height then
+            current_x = current_x + max_width + 2 * xm + 2 * thickness
+            current_y = 0
+            if once == false then
+                once = true
+                goto restart
+            end
+        end
+
+        max_x = math.max(max_x, current_x + max_width + 2 * xm + 2 * thickness)
+        max_y = math.max(max_y, current_y)
+    end
+
+    self._position_x = x
+    self._position_y = y
+    self._final_width = max_x
+    self._final_height = max_y
+
+    if #self._visible_pages > 0 then
+        self._visible_pages[1]._backdrop:set_color(rt.Palette.SELECTION)
+    end
 end
 
-function bt.VerboseInfo.Page:_draw()
+--- @override
+function bt.VerboseInfo:draw()
     rt.graphics.push()
     rt.graphics.translate(self._position_x, self._position_y)
-    self._backdrop:draw()
-    for x in values(self._content) do
-        x:draw()
+    for page in values(self._visible_pages) do
+        page:draw()
     end
     rt.graphics.pop()
 end
 
---- @brief
-function bt.VerboseInfo:size_allocate(x, y, width, height)
-    if self._is_realized == false then return end
-    local m = rt.settings.margin_unit
-    local spacing = 2
-    local bounds = self._bounds
-    local page = self._visible_page
-    if page ~= nil then
-        page._position_x = bounds.x
-        page._position_y = bounds.y
-        page:_initialize_backdrop()
-
-        local current_x = page._position_x + page._width + 4 * m + spacing
-        local current_y = page._position_y + spacing
-        for column in values(self._see_also_pages) do
-            for other in values(column) do
-                other._position_x = current_x
-                other._position_y = current_y
-                other:_initialize_backdrop()
-                current_x = current_x + other._width + 4 * m + spacing
-            end
-        end
-    end
+--- @override
+function bt.VerboseInfo:measure()
+    return self._final_width, self._final_height
 end
 
-bt.VerboseInfo.Page._new_label = function(...)
+-- ### PAGE ###
+
+--- @class
+bt.VerboseInfo.Page = meta.new_abstract_type("VerboseInfoPage", rt.Widget, {
+    _requested_width = 0,
+    _requested_height = 0,
+    _content = {}
+})
+
+--- @brief [internal]
+function bt.VerboseInfo.Page:_get_backdrop_margins()
+    return rt.settings.margin_unit * 2, rt.settings.margin_unit
+end
+
+--- @brief [internal]
+function bt.VerboseInfo.Page:_initialize_backdrop(width, height)
+    self._backdrop = rt.Frame()
+    self._backdrop_backing = rt.Spacer()
+
+    local xm, ym = self:_get_backdrop_margins()
+    self._backdrop:set_child(self._backdrop_backing)
+    self._backdrop:realize()
+    self._backdrop:fit_into(0, 0, width + 2 * xm, height + 2 * ym)
+end
+
+--- @override
+function bt.VerboseInfo.Page:draw()
+    rt.graphics.push()
+    local bounds = self._bounds
+    local xm, ym = self:_get_backdrop_margins()
+    rt.graphics.translate(bounds.x, bounds.y)
+    self._backdrop:draw()
+    rt.graphics.translate(xm, ym)
+    for widget in values(self._content) do
+        widget:draw()
+    end
+    rt.graphics.pop()
+end
+
+function bt.VerboseInfo.Page._new_label(...)
     local str = ""
     for _, v in pairs({...}) do
         str = str .. tostring(v)
@@ -150,10 +152,53 @@ bt.VerboseInfo.Page._new_label = function(...)
     return out
 end
 
---- @brief
-function bt.VerboseInfo.Page:create_from_entity(entity)
-    local new_label = bt.VerboseInfo.Page._new_label
+bt.VerboseInfo.Page._gray = "GRAY_3"
+bt.VerboseInfo.Page._number_prefix = "<b><color=" .. bt.VerboseInfo.Page._gray .. ">:</color></b>    <mono>"
+bt.VerboseInfo.Page._number_postfix = "</mono>"
 
+bt.VerboseInfo.Page._create_stat_prefix = function(label)
+    return "<b>" .. label .. "</b>"
+end
+
+bt.VerboseInfo.Page._create_name = function(name)
+    return bt.VerboseInfo.Page._new_label("<u><b>", name, "</b></u> ")
+end
+
+function bt.VerboseInfo.Page._create_offset_label(x)
+    if x > 0 then
+        return "+" .. x
+    elseif x < 0 then
+        return "-" .. math.abs(x)
+    else
+        return "\u{00B1}" .. x -- plusminus
+    end
+end
+
+function bt.VerboseInfo.Page._create_factor_label(x)
+    x = math.abs(x)
+    if x > 1 then
+        return "+" .. math.round((x - 1) * 100) .. "%"
+    elseif x < 1 then
+        return "-" .. math.round((1 - x) * 100) .. "%"
+    else
+        return "\u{00B1}0%" -- plusminus
+    end
+end
+
+-- ### ENTITY ###
+
+bt.VerboseInfo.Page.ENTITY = meta.new_type("VerboseInfoPage_ENTITY", bt.VerboseInfo.Page, function(entity)
+    return meta.new(bt.VerboseInfo.Page.ENTITY, {
+        _entity = entity
+    })
+end)
+
+--- @override
+function bt.VerboseInfo.Page.ENTITY:realize()
+    self._is_realized = true
+
+    local entity = self._entity
+    local new_label = bt.VerboseInfo.Page._new_label
     self._name_label = bt.VerboseInfo.Page._create_name(entity:get_name())
 
     local gray = bt.VerboseInfo.Page._gray
@@ -210,8 +255,25 @@ function bt.VerboseInfo.Page:create_from_entity(entity)
         self._description_label = new_label(description_prefix .. ": " .. description .. "")
     end
 
-    -- size allocate
+    self._requested_width = 0
+    self._requested_height = 0
 
+    self._content = {
+        self._name_label,
+        self._hp_label_left,
+        self._hp_label_right,
+        self._attack_label_left,
+        self._attack_label_right,
+        self._defense_label_left,
+        self._defense_label_right,
+        self._speed_label_left,
+        self._speed_label_right,
+        self._description_label
+    }
+end
+
+--- @override
+function bt.VerboseInfo.Page.ENTITY:size_allocate(_, _, width, height)
     local current_x, current_y = 0, 0
     local m = rt.settings.margin_unit
     local max_x = NEGATIVE_INFINITY
@@ -228,7 +290,7 @@ function bt.VerboseInfo.Page:create_from_entity(entity)
     measure(self._name_label)
     current_y = current_y + h
 
-    local stat_align = current_x + 6 * self._name_label:get_font():get_size()
+    local stat_align = current_x + 7 * self._name_label:get_font():get_size()
     current_y = current_y + m
 
     self._hp_label_left:fit_into(current_x, current_y, label_w, label_h)
@@ -252,31 +314,27 @@ function bt.VerboseInfo.Page:create_from_entity(entity)
     current_y = current_y + h + m
 
     if self._description_label ~= nil then
-        self._description_label:fit_into(current_x, current_y, max_x, label_h)
+        self._description_label:fit_into(current_x, current_y, width, label_h)
         current_y = current_y + select(2, self._description_label:measure())
     end
 
-    self._width = max_x
-    self._height = current_y
-
-    self._content = {
-        self._name_label,
-        self._hp_label_left,
-        self._hp_label_right,
-        self._attack_label_left,
-        self._attack_label_right,
-        self._defense_label_left,
-        self._defense_label_right,
-        self._speed_label_left,
-        self._speed_label_right,
-        self._description_label
-    }
+    self._requested_width = max_x
+    self._requested_height = current_y
 end
 
---- @brief
-function bt.VerboseInfo.Page:create_from_move(move)
-    local new_label = bt.VerboseInfo.Page._new_label
+--- ### MOVE ###
 
+bt.VerboseInfo.Page.MOVE = meta.new_type("VerboseInfoPage_MOVE", bt.VerboseInfo.Page, function(move)
+    return meta.new(bt.VerboseInfo.Page.MOVE, {
+        _move = move
+    })
+end)
+
+function bt.VerboseInfo.Page.MOVE:realize()
+    self._is_realized = true
+    local move = self._move
+
+    local new_label = bt.VerboseInfo.Page._new_label
     self._name_label = bt.VerboseInfo.Page._create_name(move:get_name())
 
     local sprite_id, sprite_index = move:get_sprite_id()
@@ -350,7 +408,7 @@ function bt.VerboseInfo.Page:create_from_move(move)
         end
     end
 
-    self._target_label = new_label("<u>Targets</u> <color=" .. gray .. "><b>:</b></color> ", target_str)
+    self._target_label = new_label("Targets <color=" .. gray .. "><b>:</b></color> ", target_str)
     self._effect_label = new_label("<u>Effect</u> <color=" .. gray .. "><b>:</b></color> " .. move:get_description() .. ".")
 
     local prio = move:get_priority()
@@ -364,10 +422,18 @@ function bt.VerboseInfo.Page:create_from_move(move)
     end
 
     priority_str = priority_str .. prio
-    self._priority_label = new_label("<u>Priority</u> <color=" .. gray .. "><b>:</b></color> <mono><b>" .. priority_str .. "</b></mono>")
+    self._priority_label = new_label("Priority <color=" .. gray .. "><b>:</b></color> <mono><b>" .. priority_str .. "</b></mono>")
 
-    -- size allocate
+    self._content = {
+        self._sprite,
+        self._name_label,
+        self._effect_label,
+        self._priority_label,
+        self._target_label,
+    }
+end
 
+function bt.VerboseInfo.Page.MOVE:size_allocate(_, _, width, height)
     local m = rt.settings.margin_unit
     local current_x, current_y = 0, 0
 
@@ -397,11 +463,11 @@ function bt.VerboseInfo.Page:create_from_move(move)
     measure(self._target_label)
     current_y = current_y + h + m
 
-    self._effect_label:fit_into(current_x, current_y, max_x, label_h) -- _target_label determines width
-    measure(self._effect_label)
+    self._effect_label:fit_into(current_x, current_y, width, label_h)
+    w, h = self._effect_label:measure()
     current_y = current_y + h + m
 
-    self._sprite:fit_into(max_x - sprite_w, 0, sprite_w, sprite_h)
+    self._sprite:fit_into(width - sprite_w, 0, sprite_w, sprite_h)
 
     self._content = {
         self._sprite,
@@ -411,11 +477,23 @@ function bt.VerboseInfo.Page:create_from_move(move)
         self._target_label,
     }
 
-    self._width, self._height = max_x, current_y
+    self._requested_width, self._requested_height = max_x, current_y
 end
 
---- @brief
-function bt.VerboseInfo.Page:create_from_status(status, n_turns_left)
+-- ### STATUS ###
+
+bt.VerboseInfo.Page.STATUS = meta.new_type("VerboseInfoPage_STATUS", bt.VerboseInfo.Page, function(status, n_turns_left)
+    return meta.new(bt.VerboseInfo.Page.STATUS, {
+        _status = status,
+        _n_turns_left = n_turns_left
+    })
+end)
+
+function bt.VerboseInfo.Page.STATUS:realize()
+    self._is_realized = true
+    local status = self._status
+    local n_turns_left = self._n_turns_left
+
     local new_label = bt.VerboseInfo.Page._new_label
 
     self._name_label = bt.VerboseInfo.Page._create_name(status:get_name())
@@ -445,17 +523,16 @@ function bt.VerboseInfo.Page:create_from_status(status, n_turns_left)
     local create_offset_label = bt.VerboseInfo.Page._create_offset_label
     local create_factor_label = bt.VerboseInfo.Page._create_factor_label
 
-
     for property_label_color in range(
-    --[[
-    {"attack", "ATK", "ATTACK"},
-    {"defense", "DEF", "DEFENSE"},
-    {"speed", "SPD", "SPEED"},
-    {"damage_dealt", "Damage Dealt", "ATTACK"},
-    {"damage_received", "Damage Taken", "DEFENSE"},
-    {"healing_performed", "Healing Performed", "HP"},
-    {"healing_received", "Healing Received", "HP"}
-    ]]--
+        --[[
+        {"attack", "ATK", "ATTACK"},
+        {"defense", "DEF", "DEFENSE"},
+        {"speed", "SPD", "SPEED"},
+        {"damage_dealt", "Damage Dealt", "ATTACK"},
+        {"damage_received", "Damage Taken", "DEFENSE"},
+        {"healing_performed", "Healing Performed", "HP"},
+        {"healing_received", "Healing Received", "HP"}
+        ]]--
     ) do
         local property = property_label_color[1]
         local label = property_label_color[2]
@@ -485,9 +562,9 @@ function bt.VerboseInfo.Page:create_from_status(status, n_turns_left)
     self._stun_label_right = new_label(number_prefix, ternary(status.is_stun, "<b>yes</b>", "no"), number_postfix)
     table.insert(self._content, self._stun_label_left)
     table.insert(self._content, self._stun_label_right)
+end
 
-    -- size allocate
-
+function bt.VerboseInfo.Page.STATUS:size_allocate(_, _, width, height)
     local current_x, current_y = 0, 0
     local m = rt.settings.margin_unit
     local max_x = NEGATIVE_INFINITY
@@ -495,7 +572,7 @@ function bt.VerboseInfo.Page:create_from_status(status, n_turns_left)
     local sprite_w, sprite_h = self._sprite:measure()
 
     local label_w, label_h = POSITIVE_INFINITY, POSITIVE_INFINITY
-    local stat_align = current_x + 6 * self._name_label:get_font():get_size()
+    local stat_align = current_x + 7 * self._name_label:get_font():get_size()
 
     local max_x = NEGATIVE_INFINITY
     local w, h
@@ -552,17 +629,30 @@ function bt.VerboseInfo.Page:create_from_status(status, n_turns_left)
 
     if is_present then current_y = current_y + m end
 
-    self._description_label:fit_into(current_x, current_y, max_x, label_h)
+    self._description_label:fit_into(current_x, current_y, width, label_h)
     w, h = self._description_label:measure()
     current_y = current_y + h + m
 
-    self._sprite:fit_into(max_x - sprite_w, 0, sprite_w, sprite_h)
+    self._sprite:fit_into(width - sprite_w, 0, sprite_w, sprite_h)
 
-    self._width = max_x
-    self._height = current_y
+    self._requested_width = max_x
+    self._requested_height = current_y
 end
 
-function bt.VerboseInfo.Page:create_from_global_status(status, n_turns_left)
+-- ### GLOBAL STATUS ###
+
+bt.VerboseInfo.Page.GLOBAL_STATUS = meta.new_type("VerboseInfoPage_GLOBAL_STATUS", bt.VerboseInfo.Page, function(status, n_turns_left)
+    return meta.new(bt.VerboseInfo.Page.GLOBAL_STATUS, {
+        _status = status,
+        _n_turns_left = n_turns_left
+    })
+end)
+
+function bt.VerboseInfo.Page.GLOBAL_STATUS:realize()
+    self._is_realized = true
+    local status = self._status
+    local n_turns_left = self._n_turns_left
+
     local new_label = bt.VerboseInfo.Page._new_label
 
     self._name_label = bt.VerboseInfo.Page._create_name(status:get_name())
@@ -583,13 +673,16 @@ function bt.VerboseInfo.Page:create_from_global_status(status, n_turns_left)
 
     self._description_label = new_label("<u>Effect</u>: " .. status:get_description())
 
-    self._content = {}
-    for label in range(self._name_label, self._sprite, self._duration_label_left, self._duration_label_right, self._description_label) do
-        table.insert(self._content, label)
-    end
+    self._content = {
+        self._name_label,
+        self._sprite,
+        self._duration_label_left,
+        self._duration_label_right,
+        self._description_label
+    }
+end
 
-    -- size allocate
-
+function bt.VerboseInfo.Page.GLOBAL_STATUS:size_allocate(_, _, width, height)
     local current_x, current_y = 0, 0
     local m = rt.settings.margin_unit
     local max_x = NEGATIVE_INFINITY
@@ -597,7 +690,7 @@ function bt.VerboseInfo.Page:create_from_global_status(status, n_turns_left)
     local sprite_w, sprite_h = self._sprite:measure()
 
     local label_w, label_h = POSITIVE_INFINITY, POSITIVE_INFINITY
-    local stat_align = current_x + 6 * self._name_label:get_font():get_size()
+    local stat_align = current_x + 7 * self._name_label:get_font():get_size()
 
     local max_x = NEGATIVE_INFINITY
     local w, h
@@ -617,17 +710,30 @@ function bt.VerboseInfo.Page:create_from_global_status(status, n_turns_left)
     measure(self._duration_label_right)
     current_y = current_y + h + m
 
-    self._description_label:fit_into(current_x, current_y, max_x, label_h)
+    self._description_label:fit_into(current_x, current_y, width, label_h)
     w, h = self._description_label:measure()
     current_y = current_y + h + m
 
-    self._sprite:fit_into(max_x - sprite_w, 0, sprite_w, sprite_h)
+    self._sprite:fit_into(width - sprite_w, 0, sprite_w, sprite_h)
 
-    self._width = max_x
-    self._height = current_y
+    self._requested_width = max_x
+    self._requested_height = current_y
 end
 
-function bt.VerboseInfo.Page:create_from_consumable(consumable, n_uses_left)
+-- ### CONSUMABLE ###
+
+bt.VerboseInfo.Page.CONSUMABLE = meta.new_type("VerboseInfoPage_CONSUMABLE", bt.VerboseInfo.Page, function(consumable, n_uses_left)
+    return meta.new(bt.VerboseInfo.Page.CONSUMABLE, {
+        _consumable = consumable,
+        _n_uses_left = n_uses_left
+    })
+end)
+
+function bt.VerboseInfo.Page.CONSUMABLE:realize()
+    self._is_realized = true
+    local consumable = self._consumable
+    local n_uses_left = self._n_uses_left
+
     local new_label = bt.VerboseInfo.Page._new_label
 
     local n_uses_postfix = "(" .. ternary(consumable:get_max_n_uses() == POSITIVE_INFINITY, "\u{221E}", n_uses_left) .. ")"
@@ -635,18 +741,28 @@ function bt.VerboseInfo.Page:create_from_consumable(consumable, n_uses_left)
     self._sprite = rt.Sprite(consumable:get_sprite_id())
     self._sprite:realize()
 
-    if consumable:get_max_n_uses() ~= POSITIVE_INFINITY then
-        self._n_uses_label = new_label("# Uses Left: " .. bt.VerboseInfo.Page._number_prefix .. n_uses_left .. bt.VerboseInfo.Page._number_postfix)
+    self._n_uses_label_left = new_label("Duration")
+
+    local number_prefix = bt.VerboseInfo.Page._number_prefix
+    local number_postfix = bt.VerboseInfo.Page._number_postfix
+    if consumable:get_max_n_uses() == POSITIVE_INFINITY then
+        self._n_uses_label_right = new_label(number_prefix, "\u{221E}", number_postfix)
+    else
+        self._n_uses_label_right = new_label(number_prefix, n_uses_left .. " turns left", number_postfix)
     end
+
     self._description_label = new_label("<u>Effect</u>: " .. consumable:get_description())
 
-    self._content = {}
-    for label in range(self._name_label, self._sprite, self._n_uses_label, self._description_label) do
-        table.insert(self._content, label)
-    end
+    self._content = {
+        self._name_label,
+        self._sprite,
+        self._n_uses_label_left,
+        self._n_uses_label_right,
+        self._description_label
+    }
+end
 
-    -- size allocate
-
+function bt.VerboseInfo.Page.CONSUMABLE:size_allocate(_, _, width, height)
     local current_x, current_y = 0, 0
     local m = rt.settings.margin_unit
     local max_x = NEGATIVE_INFINITY
@@ -654,7 +770,7 @@ function bt.VerboseInfo.Page:create_from_consumable(consumable, n_uses_left)
     local sprite_w, sprite_h = self._sprite:measure()
 
     local label_w, label_h = POSITIVE_INFINITY, POSITIVE_INFINITY
-    local stat_align = current_x + 6 * self._name_label:get_font():get_size()
+    local stat_align = current_x + 7 * self._name_label:get_font():get_size()
 
     local max_x = NEGATIVE_INFINITY
     local w, h
@@ -669,30 +785,41 @@ function bt.VerboseInfo.Page:create_from_consumable(consumable, n_uses_left)
     measure(self._name_label)
     current_y = current_y + math.max(sprite_h, h) + m
 
-    w, h = self._n_uses_label:measure()
-    self._n_uses_label:fit_into(current_x, current_y + 0.5 * sprite_h - 0.5 * h, label_w, label_h)
-    measure(self._n_uses_label)
-    current_y = current_y + math.max(sprite_h, h) + m
+    self._n_uses_label_left:fit_into(current_x, current_y, label_w, label_h)
+    self._n_uses_label_right:fit_into(stat_align, current_y, label_w, label_h)
+    measure(self._n_uses_label_right)
+    current_y = current_y + h + m
 
-    self._description_label:fit_into(current_x, current_y, max_x, label_h)
+    self._description_label:fit_into(current_x, current_y, width, label_h)
     w, h = self._description_label:measure()
     current_y = current_y + h + m
 
-    self._sprite:fit_into(max_x - sprite_w, 0, sprite_w, sprite_h)
+    self._sprite:fit_into(width - sprite_w, 0, sprite_w, sprite_h)
 
-    self._width = max_x
-    self._height = current_y
+    self._requested_width = max_x
+    self._requested_height = current_y
 end
 
-function bt.VerboseInfo.Page:create_from_equip(equipment)
+--- ### EQUIP ###
+
+bt.VerboseInfo.Page.EQUIP = meta.new_type("VerboseInfoPage_EQUIP", bt.VerboseInfo.Page, function(equip)
+    return meta.new(bt.VerboseInfo.Page.EQUIP, {
+        _equip = equip
+    })
+end)
+
+function bt.VerboseInfo.Page.EQUIP:realize()
+    self._is_realized = true
+    local equip = self._equip
+
     local new_label = bt.VerboseInfo.Page._new_label
-    self._name_label = bt.VerboseInfo.Page._create_name(equipment:get_name())
-    self._sprite = rt.Sprite(equipment:get_sprite_id())
+    self._name_label = bt.VerboseInfo.Page._create_name(equip:get_name())
+    self._sprite = rt.Sprite(equip:get_sprite_id())
     self._sprite:realize()
 
-    local description = equipment:get_description()
+    local description = equip:get_description()
     if description ~= "" then
-    self._description_label = new_label("<u>Description</u>: " .. description)
+        self._description_label = new_label("<u>Description</u>: " .. description)
     end
 
     self._content = {}
@@ -718,7 +845,7 @@ function bt.VerboseInfo.Page:create_from_equip(equipment)
         local prefix = "<color=" .. property_label_color[3] .. ">"
         local postfix = "</color>"
 
-        local offset = equipment[property .. "_base_offset"]
+        local offset = equip[property .. "_base_offset"]
         if offset ~= 0 then
             local offset_label = "_" .. property .. "_offset_label"
             self[offset_label .. "_left"] = new_label(prefix, label, postfix)
@@ -727,7 +854,7 @@ function bt.VerboseInfo.Page:create_from_equip(equipment)
             table.insert(self._content, self[offset_label .. "_right"])
         end
 
-        local factor = equipment[property .. "_base_factor"]
+        local factor = equip[property .. "_base_factor"]
         if factor ~= 1 then
             local factor_label = "_" .. property .. "_factor_label"
             self[factor_label .. "_left"] = new_label(prefix, label, postfix)
@@ -736,9 +863,9 @@ function bt.VerboseInfo.Page:create_from_equip(equipment)
             table.insert(self._content, self[factor_label .. "_right"])
         end
     end
+end
 
-    -- size allocate
-
+function bt.VerboseInfo.Page.EQUIP:size_allocate(_, _, width, height)
     local current_x, current_y = 0, 0
     local m = rt.settings.margin_unit
     local max_x = NEGATIVE_INFINITY
@@ -746,7 +873,7 @@ function bt.VerboseInfo.Page:create_from_equip(equipment)
     local sprite_w, sprite_h = self._sprite:measure()
 
     local label_w, label_h = POSITIVE_INFINITY, POSITIVE_INFINITY
-    local stat_align = current_x + 6 * self._name_label:get_font():get_size()
+    local stat_align = current_x + 7 * self._name_label:get_font():get_size()
 
     local max_x = NEGATIVE_INFINITY
     local w, h
@@ -790,51 +917,15 @@ function bt.VerboseInfo.Page:create_from_equip(equipment)
     if is_present then current_y = current_y + m end
 
     if self._description_label ~= nil then
-        self._description_label:fit_into(current_x, current_y, max_x, label_h)
+        self._description_label:fit_into(current_x, current_y, width, label_h)
         w, h = self._description_label:measure()
         current_y = current_y + h
     end
     current_y = current_y + m
 
-    self._sprite:fit_into(max_x - sprite_w, 0, sprite_w, sprite_h)
+    self._sprite:fit_into(width - sprite_w, 0, sprite_w, sprite_h)
 
-    self._width = max_x
-    self._height = current_y
+    self._requested_width = max_x
+    self._requested_height = current_y
 end
-
--- shared formatting
-bt.VerboseInfo.Page._gray = "GRAY_3"
-bt.VerboseInfo.Page._number_prefix = "<b><color=" .. bt.VerboseInfo.Page._gray .. ">:</color></b>    <mono>"
-bt.VerboseInfo.Page._number_postfix = "</mono>"
-
-bt.VerboseInfo.Page._create_stat_prefix =  function(label)
-    return "<b>" .. label .. "</b>"
-end
-
-bt.VerboseInfo.Page._create_name = function(name)
-    return bt.VerboseInfo.Page._new_label("<u><b>", name, "</b></u> ")
-end
-
-
-function bt.VerboseInfo.Page._create_offset_label(x)
-    if x > 0 then
-        return "+" .. x
-    elseif x < 0 then
-        return "-" .. math.abs(x)
-    else
-        return "\u{00B1}" .. x -- plusminus
-    end
-end
-
-function bt.VerboseInfo.Page._create_factor_label(x)
-    x = math.abs(x)
-    if x > 1 then
-        return "+" .. math.round((x - 1) * 100) .. "%"
-    elseif x < 1 then
-        return "-" .. math.round((1 - x) * 100) .. "%"
-    else
-        return "\u{00B1}0%" -- plusminus
-    end
-end
-
 
