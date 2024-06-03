@@ -142,5 +142,5 @@ vec4 effect(vec4 vertex_color, Image image, vec2 texture_coords, vec2 vertex_pos
     ray_direction = normalize(ray_direction);
 
     ray_direction.xy = rotate(ray_direction.xy, time / 3);
-    return vec4(max(render(ray_direction, sin(time * 5) * 0.5, elapsed / 2).rgb, vec3(0)), 1.0);
+    return vec4(max(render(ray_direction, sin(time) * 0.5, elapsed / 5).rgb, vec3(0)), 1.0);
 }
