@@ -148,6 +148,12 @@ function bt.Battle:get_global_status_n_turns_elapsed(status)
 end
 
 --- @brief
+--- @brief
+function bt.Battle:get_global_status_n_turns_left(status)
+    return clamp(status:get_max_duration() - self.global_status[status:get_id()].elapsed, 0)
+end
+
+--- @brief
 function bt.Battle:global_status_advance(status)
     local entry = self.global_status[status:get_id()]
     if entry == nil then return false end

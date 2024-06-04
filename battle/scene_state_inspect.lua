@@ -26,7 +26,7 @@ end)
 --- @brief [internal]
 function bt.SceneState.INSPECT:_create()
 
-    TODO: make global status bar selectable, then move selection
+    --TODO: make global status bar selectable, then move selection
 
     local scene = self._scene
     self._priority_order = scene._state:list_entities_in_order()
@@ -65,8 +65,14 @@ function bt.SceneState.INSPECT:_create()
 
     local new_node = function(sprite)
         local bounds = sprite:get_bounds()
-        local entity = sprite:get_entity()
+        local entity = nil
+        local priority_position = nil
+        if sprite.get_entity ~= nil then
+            entity = sprite:get_entity()
+        end
+
         local out = {
+            is_global_status_node = entity == nil,
             sprite = sprite,
             entity = entity,
             priority_position = entities_in_order[entity],
@@ -86,54 +92,56 @@ function bt.SceneState.INSPECT:_create()
             left_indicator = {}
         }
 
-        local triangle_h = rt.settings.margin_unit
-        local triangle_w = rt.settings.margin_unit * 2
-        local y_offset = rt.settings.selection_indicator.thickness + 1
-        local x_offset = rt.settings.selection_indicator.thickness + 1
+        out.update = function(self)
+            local bounds = self.sprite:get_bounds()
+            local triangle_h = rt.settings.margin_unit
+            local triangle_w = rt.settings.margin_unit * 2
+            local y_offset = rt.settings.selection_indicator.thickness + 1
+            local x_offset = rt.settings.selection_indicator.thickness + 1
 
-        for which in range("up_indicator", "up_indicator_outline") do
-            out[which] = rt.Triangle(
-                bounds.x + 0.5 * bounds.width - triangle_w * 0.5, bounds.y - y_offset,
-                bounds.x + 0.5 * bounds.width + triangle_w * 0.5, bounds.y - y_offset,
-                bounds.x + 0.5 * bounds.width, bounds.y - triangle_h - y_offset
-            )
+            for which in range("up_indicator", "up_indicator_outline") do
+                self[which] = rt.Triangle(
+                    bounds.x + 0.5 * bounds.width - triangle_w * 0.5, bounds.y - y_offset,
+                    bounds.x + 0.5 * bounds.width + triangle_w * 0.5, bounds.y - y_offset,
+                    bounds.x + 0.5 * bounds.width, bounds.y - triangle_h - y_offset
+                )
+            end
+
+            for which in range("right_indicator", "right_indicator_outline") do
+                self[which] = rt.Triangle(
+                    bounds.x + bounds.width + x_offset, bounds.y + 0.5 * bounds.height - 0.5 * triangle_w,
+                    bounds.x + bounds.width + x_offset, bounds.y + 0.5 * bounds.height + 0.5 * triangle_w,
+                    bounds.x + bounds.width + triangle_h + x_offset, bounds.y + 0.5 * bounds.height
+                )
+            end
+
+            for which in range("down_indicator", "down_indicator_outline") do
+                self[which] = rt.Triangle(
+                    bounds.x + 0.5 * bounds.width - triangle_w * 0.5, bounds.y + bounds.height + y_offset,
+                    bounds.x + 0.5 * bounds.width + triangle_w * 0.5, bounds.y + bounds.height + y_offset,
+                    bounds.x + 0.5 * bounds.width, bounds.y + bounds.height + triangle_h + y_offset
+                )
+            end
+
+            for which in range("left_indicator", "left_indicator_outline") do
+                self[which] = rt.Triangle(
+                    bounds.x - x_offset, bounds.y + bounds.height * 0.5 - triangle_w * 0.5,
+                    bounds.x - x_offset, bounds.y + bounds.height * 0.5 + triangle_w * 0.5,
+                    bounds.x - triangle_h - x_offset, bounds.y + bounds.height * 0.5
+                )
+            end
+
+            for which in range("up", "right", "down", "left") do
+                local outline = self[which .. "_indicator_outline"]
+                outline:set_is_outline(true)
+                outline:set_line_width(2)
+                outline:set_color(rt.Palette.BACKGROUND_OUTLINE)
+
+                local fill = self[which .. "_indicator"]
+                fill:set_color(rt.Palette.SELECTION)
+            end
         end
-
-        for which in range("right_indicator", "right_indicator_outline") do
-            out[which] = rt.Triangle(
-                bounds.x + bounds.width + x_offset, bounds.y + 0.5 * bounds.height - 0.5 * triangle_w,
-                bounds.x + bounds.width + x_offset, bounds.y + 0.5 * bounds.height + 0.5 * triangle_w,
-                bounds.x + bounds.width + triangle_h + x_offset, bounds.y + 0.5 * bounds.height
-            )
-        end
-
-        for which in range("down_indicator", "down_indicator_outline") do
-            out[which] = rt.Triangle(
-                bounds.x + 0.5 * bounds.width - triangle_w * 0.5, bounds.y + bounds.height + y_offset,
-                bounds.x + 0.5 * bounds.width + triangle_w * 0.5, bounds.y + bounds.height + y_offset,
-                bounds.x + 0.5 * bounds.width, bounds.y + bounds.height + triangle_h + y_offset
-            )
-        end
-
-        for which in range("left_indicator", "left_indicator_outline") do
-            out[which] = rt.Triangle(
-                bounds.x - x_offset, bounds.y + bounds.height * 0.5 - triangle_w * 0.5,
-                bounds.x - x_offset, bounds.y + bounds.height * 0.5 + triangle_w * 0.5,
-                bounds.x - triangle_h - x_offset, bounds.y + bounds.height * 0.5
-            )
-        end
-
-
-        for which in range("up", "right", "down", "left") do
-            local outline = out[which .. "_indicator_outline"]
-            outline:set_is_outline(true)
-            outline:set_line_width(2)
-            outline:set_color(rt.Palette.BACKGROUND_OUTLINE)
-            
-            local fill = out[which .. "_indicator"]
-            fill:set_color(rt.Palette.SELECTION)
-        end
-
+        out:update()
         return out
     end
 
@@ -169,7 +177,16 @@ function bt.SceneState.INSPECT:_create()
         node.up = enemy_nodes[clamp(i, 1, n_enemies)]
     end
 
-    self._nodes = {}
+    local global_status_node
+    if sizeof(scene._state:list_global_statuses()) > 0 then
+        global_status_node = new_node(self._scene._global_status_bar)
+        global_status_node.right = ally_nodes[1]
+        global_status_node.up = enemy_nodes[1]
+        ally_nodes[1].left = global_status_node
+        enemy_nodes[1].left = global_status_node
+    end
+
+    self._nodes = {global_status_node}
     for nodes in range(enemy_nodes, ally_nodes) do
         for node in values(nodes) do
             self._nodes[node.entity] = node
@@ -193,22 +210,35 @@ end
 function bt.SceneState.INSPECT:_update_selection()
     if self._current_node == nil then
         self._scene:set_selected({}, false)
+        self._scene._global_status_bar:set_selection_state(bt.SelectionState.INACTIVE)
         self._verbose_info:show()
     else
-        local entity = self._current_node.entity
-        self._scene:set_selected({entity}, false)
+        if self._current_node.is_global_status_node then
+            self._scene:set_selected({}, false)
+            self._scene._global_status_bar:set_selection_state(bt.SelectionState.SELECTED)
+            local to_show = {}
+            for status in values(self._scene._state:list_global_statuses()) do
+                table.insert(to_show, {status, self._scene._state:get_global_status_n_turns_left(status)})
+            end
+            self._verbose_info:show(table.unpack(to_show))
+            self._current_node:update()
+        else
+            local entity = self._current_node.entity
+            self._scene:set_selected({entity}, false)
+            self._scene._global_status_bar:set_selection_state(bt.SelectionState.INACTIVE)
 
-        -- find all objects to show
-        local to_show = {{entity}}
-        for status in values(entity:list_statuses()) do
-            table.insert(to_show, {status, entity:get_status_n_turns_left(status)})
+            -- find all objects to show
+            local to_show = {{entity}}
+            for status in values(entity:list_statuses()) do
+                table.insert(to_show, {status, entity:get_status_n_turns_left(status)})
+            end
+
+            for consumable in values(entity:list_consumables()) do
+                table.insert(to_show, {consumable, entity:get_consumable_n_uses_left(consumable)})
+            end
+
+            self._verbose_info:show(table.unpack(to_show))
         end
-
-        for consumable in values(entity:list_consumables()) do
-            table.insert(to_show, {consumable, entity:get_consumable_n_uses_left(consumable)})
-        end
-
-        self._verbose_info:show(table.unpack(to_show))
 
         -- calculate new verbose info position
         local sprite_bounds = self._current_node.sprite:get_bounds()
@@ -254,6 +284,7 @@ function bt.SceneState.INSPECT:_update_control_indicator()
             {rt.ControlIndicatorButton.ALL_DIRECTIONS, prefix .. "Select" .. postfix},
             {rt.ControlIndicatorButton.L, prefix .. "Previous" .. postfix},
             {rt.ControlIndicatorButton.R, prefix .. "Next" .. postfix},
+            {rt.ControlIndicatorButton.Y, prefix .. "View Team TODO" .. postfix},
             {rt.ControlIndicatorButton.X, prefix .. "Hide" .. postfix},
         })
         self._control_indicator:set_opacity(1)
@@ -284,9 +315,9 @@ function bt.SceneState.INSPECT:handle_button_pressed(button)
 
         -- move in priority queue order
         local jump = function(direction)
-            local current_position = self._current_node.priority_position
+            if self._current_node.is_global_status_node then return end
             local next_entity
-
+            local current_position = self._current_node.priority_position
             if direction == "forward" then
                 next_entity = self._priority_order[current_position + 1]
             elseif direction == "backward" then
@@ -331,6 +362,7 @@ function bt.SceneState.INSPECT:enter()
     local scene = self._scene
 
     scene._global_status_bar:synchronize(scene._state)
+    scene._global_status_bar:update(100)
 
     scene:set_priority_order(scene._state:list_entities_in_order())
     self:_create()

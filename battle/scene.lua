@@ -340,10 +340,6 @@ end
 
 --- @brief
 function bt.Scene:set_selected(entities, unselect_others)
-    if meta.isa(entities, bt.Entity) then
-        entities = {entities}
-    end
-
     unselect_others = which(unselect_others, true)
     self._priority_queue:set_selected(entities, unselect_others)
 
