@@ -10,7 +10,9 @@ rt.ControlIndicator = meta.new_type("ControlIndicator", rt.Widget, function(layo
         _layout = which(layout, {}),
         _sprites = {},
         _labels = {},
-        _opacity = 1
+        _opacity = 1,
+        _final_width = 1,
+        _final_height = 1
     })
 end)
 
@@ -88,6 +90,9 @@ function rt.ControlIndicator:size_allocate(x, y, width, height)
         max_x = math.max(max_x, current_x + sprite_w + m + label_w)
         max_y = math.max(max_y, current_y + math.max(sprite_h, label_h))
     end
+
+    self._final_width = max_x - x
+    self._final_height = max_y - y
 end
 
 --- @override
@@ -107,4 +112,9 @@ function rt.ControlIndicator:set_opacity(alpha)
         sprite:set_opacity(alpha)
         label:set_opacity(alpha)
     end
+end
+
+--- @override
+function rt.ControlIndicator:measure()
+    return self._final_width, self._final_height
 end

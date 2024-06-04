@@ -25,11 +25,13 @@ end)
 
 --- @brief [internal]
 function bt.SceneState.INSPECT:_create()
-
-    --TODO: make global status bar selectable, then move selection
-
     local scene = self._scene
     self._priority_order = scene._state:list_entities_in_order()
+
+    local current_sprite
+    if self._current_node ~= nil then
+        current_sprite = self._current_node.sprite
+    end
 
     local enemy_sprites = {}
     local n_enemies, n_allies = 0, 0
@@ -150,15 +152,15 @@ function bt.SceneState.INSPECT:_create()
         table.insert(enemy_nodes, new_node(enemy_sprites[i]))
     end
 
+    local ally_nodes = {}
+    for i = 1, n_allies do
+        table.insert(ally_nodes, new_node(ally_sprites[i]))
+    end
+
     for i = 1, n_enemies do
         local node = enemy_nodes[i]
         node.left = enemy_nodes[i - 1]
         node.right = enemy_nodes[i + 1]
-    end
-
-    local ally_nodes = {}
-    for i = 1, n_allies do
-        table.insert(ally_nodes, new_node(ally_sprites[i]))
     end
 
     for i = 1, n_allies do
@@ -169,13 +171,40 @@ function bt.SceneState.INSPECT:_create()
 
     for i = 1, n_enemies do
         local node = enemy_nodes[i]
-        node.down = ally_nodes[clamp(i, 1, n_allies)]
+        local other = ally_nodes[clamp(i, 1, n_allies)]
+
+        local closest_node = other
+        local min_distance = POSITIVE_INFINITY
+        for ally_node in values(ally_nodes) do
+            local distance = math.abs(ally_node.centroid_x - node.centroid_x)
+            if distance < min_distance then
+                closest_node = ally_node
+                min_distance = distance
+            end
+        end
+
+        node.down = closest_node
+        closest_node.up = node
     end
 
     for i = 1, n_allies do
         local node = ally_nodes[i]
-        node.up = enemy_nodes[clamp(i, 1, n_enemies)]
+        local other = enemy_nodes[clamp(i, 1, n_enemies)]
+
+        local closest_node = other
+        local min_distance = POSITIVE_INFINITY
+        for enemy_node in values(enemy_nodes) do
+            local distance = math.abs(enemy_node.centroid_x - node.centroid_x)
+            if distance < min_distance then
+                closest_node = enemy_node
+                min_distance = distance
+            end
+        end
+
+        node.up = closest_node
+        closest_node.down = node
     end
+
 
     local global_status_node
     if sizeof(scene._state:list_global_statuses()) > 0 then
@@ -187,12 +216,15 @@ function bt.SceneState.INSPECT:_create()
     end
 
     self._nodes = {global_status_node}
+    self._current_node = ally_nodes[1]
     for nodes in range(enemy_nodes, ally_nodes) do
         for node in values(nodes) do
             self._nodes[node.entity] = node
+            if node.sprite == current_sprite then
+                self._current_node = node
+            end
         end
     end
-    self._current_node = ally_nodes[1]
 
     self._control_indicator = rt.ControlIndicator()
     self._control_indicator:realize()
@@ -259,8 +291,9 @@ function bt.SceneState.INSPECT:_update_selection()
 
         self._verbose_info_offset_y = sprite_bounds.y - 0.5 * h + 0.5 * sprite_bounds.height
 
-        if self._verbose_info_offset_y < scene_bounds.y then
-            self._verbose_info_offset_y = scene_bounds.y
+        local control_indicator_h = select(2, self._control_indicator:measure())
+        if self._verbose_info_offset_y < control_indicator_h then
+            self._verbose_info_offset_y = control_indicator_h
         end
 
         if self._verbose_info_offset_y + h > scene_bounds.y + scene_bounds.height then
@@ -375,8 +408,8 @@ end
 
 --- @override
 function bt.SceneState.INSPECT:exit()
-    self._current_node = nil -- unselects all
-    self:_update_selection()
+    self._scene:set_selected({}, false)
+    self._scene._global_status_bar:set_selection_state(bt.SelectionState.SELECTED)
 end
 
 --- @override
@@ -396,7 +429,6 @@ end
 
 --- @override
 function bt.SceneState.INSPECT:draw()
-
     if self._background_only then
         self._control_indicator:draw()
         return

@@ -2,6 +2,7 @@
 bt.VerboseInfo = meta.new_type("VerboseInfo", rt.Widget, function()
     return meta.new(bt.VerboseInfo, {
         _visible_pages = {}, -- Table<bt.VerboseInfo.Page>
+        _pages = {},
         _position_x = 0,
         _position_y = 0,
         _final_width = 0,
@@ -16,23 +17,43 @@ function bt.VerboseInfo:show(...)
     for t in range(...) do
         local object = t[1]
         local page
-        if meta.isa(object, bt.Entity) then
-            page = bt.VerboseInfo.Page.ENTITY(table.unpack(t))
-        elseif meta.isa(object, bt.Move) then
-            page = bt.VerboseInfo.Page.MOVE(table.unpack(t))
-        elseif meta.isa(object, bt.Status) then
-            page = bt.VerboseInfo.Page.STATUS(table.unpack(t))
-        elseif meta.isa(object, bt.GlobalStatus) then
-            page = bt.VerboseInfo.Page.GLOBAL_STATUS(table.unpack(t))
-        elseif meta.isa(object, bt.Consumable) then
-            page = bt.VerboseInfo.Page.CONSUMABLE(table.unpack(t))
-        elseif meta.isa(object, bt.Equip) then
-            page = bt.VerboseInfo.Page.EQUIP(table.unpack(t))
+
+        if t[2] == nil then
+            page = self._pages[object]
         else
-            rt.error("In bt.VerboseInfo.add: unhandled entity type `" .. meta.typeof(object) .. "`")
+            page = self._pages[object]
+            if page ~= nil then
+                page = page[t[2]]    -- page caching for new durations / n uses
+            end
         end
 
-        page:realize()
+        if page == nil then
+            if meta.isa(object, bt.Entity) then
+                page = bt.VerboseInfo.Page.ENTITY(table.unpack(t))
+            elseif meta.isa(object, bt.Move) then
+                page = bt.VerboseInfo.Page.MOVE(table.unpack(t))
+            elseif meta.isa(object, bt.Status) then
+                page = bt.VerboseInfo.Page.STATUS(table.unpack(t))
+            elseif meta.isa(object, bt.GlobalStatus) then
+                page = bt.VerboseInfo.Page.GLOBAL_STATUS(table.unpack(t))
+            elseif meta.isa(object, bt.Consumable) then
+                page = bt.VerboseInfo.Page.CONSUMABLE(table.unpack(t))
+            elseif meta.isa(object, bt.Equip) then
+                page = bt.VerboseInfo.Page.EQUIP(table.unpack(t))
+            else
+                rt.error("In bt.VerboseInfo.add: unhandled entity type `" .. meta.typeof(object) .. "`")
+            end
+
+            page:realize()
+
+            if t[2] == nil then
+                self._pages[object] = page
+            else
+                self._pages[object] = {}
+                self._pages[object][t[2]] = page
+            end
+        end
+
         table.insert(self._visible_pages, page)
     end
 

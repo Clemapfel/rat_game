@@ -2,7 +2,7 @@ require "include"
 
 rt.current_scene = bt.Scene()
 scene = rt.current_scene
-scene:set_background("CLOUDS")
+scene:set_background("WORLEY")
 
 --- ###
 
@@ -33,7 +33,7 @@ love.draw = function()
         local label = tostring(fps) .. " (" .. string.rep("0", math.abs(3 - #tostring(frame_usage))) .. frame_usage .. "%)"
         local margin = 3
         love.graphics.setColor(1, 1, 1, 0.75)
-        love.graphics.print(label, rt.graphics.get_width() - love.graphics.getFont():getWidth(label) - 2 * margin, 0.5 * margin)
+        love.graphics.print(label, math.floor(rt.graphics.get_width() - love.graphics.getFont():getWidth(label) - 2 * margin), math.floor(0.5 * margin))
     end
 
     do -- show rulers
@@ -102,18 +102,15 @@ love.run = function()
         local frame_duration = 0
         local before = love.timer.getTime()
 
-        if love.update ~= nil then
-            love.update(delta)
-        end
+        love.update(delta)
 
-        if love.graphics and love.graphics.isActive() then
+        if love.graphics.isActive() then
             love.graphics.clear(love.graphics.getBackgroundColor())
             love.graphics.reset()
-
-            if love.draw then love.draw() end
-            frame_duration = frame_duration + love.timer.getTime() - before
-
+            love.draw()
             love.graphics.present()
+
+            frame_duration = frame_duration + love.timer.getTime() - before
         end
 
         -- store max duration of last number of frames
