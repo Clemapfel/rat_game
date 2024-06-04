@@ -1,13 +1,16 @@
 rt.settings.font = {
     default_size = 28,
+    default_size_tiny = 14,
     default_size_small = 20,
     default_size_large = 40,
     default = {},       -- rt.Font
     default_large = {},
     default_small = {},
+    default_tiny = {},
     default_mono = {},  -- rt.Font
     default_mono_large = {},
     default_mono_small = {},
+    default_mono_tiny = {},
     regular_fallbacks = {},     -- Table<love.Font>
     italic_fallbacks = {},      -- Table<love.Font>
     bold_italic_fallbacks = {}, -- Table<love.Font>
@@ -172,6 +175,19 @@ function rt.load_default_fonts()
             "assets/fonts/DejaVuSansMono/DejaVuSansMono-Bold.ttf",
             "assets/fonts/DejaVuSansMono/DejaVuSansMono-Italic.ttf",
             "assets/fonts/DejaVuSansMono/DejaVuSansMono-BoldItalic.ttf"
+    )
+
+    rt.settings.font.default_tiny = rt.Font(rt.settings.font.default_size_tiny,
+        "assets/fonts/DejaVuSans/DejaVuSans-Regular.ttf",
+        "assets/fonts/DejaVuSans/DejaVuSans-Bold.ttf",
+        "assets/fonts/DejaVuSans/DejaVuSans-Italic.ttf",
+        "assets/fonts/DejaVuSans/DejaVuSans-BoldItalic.ttf"
+    )
+    rt.settings.font.default_mono_tiny = rt.Font(rt.settings.font.default_size_tiny,
+        "assets/fonts/DejaVuSansMono/DejaVuSansMono-Regular.ttf",
+        "assets/fonts/DejaVuSansMono/DejaVuSansMono-Bold.ttf",
+        "assets/fonts/DejaVuSansMono/DejaVuSansMono-Italic.ttf",
+        "assets/fonts/DejaVuSansMono/DejaVuSansMono-BoldItalic.ttf"
     )
 
     rt.settings.font.default_large = rt.Font(rt.settings.font.default_size_large,

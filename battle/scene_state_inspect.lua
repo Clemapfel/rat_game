@@ -1,3 +1,8 @@
+rt.settings.battle.scene.inspect = {
+    show_hide_button = rt.InputButton.X,
+}
+
+
 --- @class bt.SceneState.INSPECT
 bt.SceneState.INSPECT = meta.new_type("INSPECT", function(scene)
     local out = meta.new(bt.SceneState.INSPECT, {
@@ -9,7 +14,10 @@ bt.SceneState.INSPECT = meta.new_type("INSPECT", function(scene)
 
         _verbose_info = bt.VerboseInfo(),
         _verbose_info_offset_x = 0,
-        _verbose_info_offset_y = 0
+        _verbose_info_offset_y = 0,
+
+        _control_indicator = {},
+        _background_only = false
     })
 
     return out
@@ -17,6 +25,9 @@ end)
 
 --- @brief [internal]
 function bt.SceneState.INSPECT:_create()
+
+    TODO: make global status bar selectable, then move selection
+
     local scene = self._scene
     self._priority_order = scene._state:list_entities_in_order()
 
@@ -166,11 +177,16 @@ function bt.SceneState.INSPECT:_create()
     end
     self._current_node = ally_nodes[1]
 
+    self._control_indicator = rt.ControlIndicator()
+    self._control_indicator:realize()
+    self._control_indicator:fit_into(0, 0, POSITIVE_INFINITY, POSITIVE_INFINITY)
+
     self._verbose_info:realize()
     local m = rt.settings.margin_unit
     local bounds = self._scene._bounds
     self._verbose_info:fit_into(0, 0, bounds.height - 2 * m, bounds.width - 2 * m)
     self:_update_selection()
+    self:_update_control_indicator()
 end
 
 --- @brief [internal]
@@ -223,9 +239,36 @@ function bt.SceneState.INSPECT:_update_selection()
     end
 end
 
+--- @brief [internal]
+function bt.SceneState.INSPECT:_update_control_indicator()
+    local prefix, postfix = "<o>", "</o>"
+
+    if self._background_only == true then
+        self._control_indicator:create_from({
+            {rt.ControlIndicatorButton.X, prefix .. "Show" .. postfix},
+        })
+        self._control_indicator:set_opacity(0.5)
+    else
+        self._control_indicator:create_from({
+            {rt.ControlIndicatorButton.B, prefix .. "Back" .. postfix},
+            {rt.ControlIndicatorButton.ALL_DIRECTIONS, prefix .. "Select" .. postfix},
+            {rt.ControlIndicatorButton.L, prefix .. "Previous" .. postfix},
+            {rt.ControlIndicatorButton.R, prefix .. "Next" .. postfix},
+            {rt.ControlIndicatorButton.X, prefix .. "Hide" .. postfix},
+        })
+        self._control_indicator:set_opacity(1)
+    end
+end
+
 --- @override
 function bt.SceneState.INSPECT:handle_button_pressed(button)
     local scene = self._scene
+
+    if button == rt.settings.battle.scene.inspect.show_hide_button then
+        self._background_only = true
+        self:_update_control_indicator()
+        return
+    end
 
     if self._current_node ~= nil then
         -- move in spatial direction
@@ -276,7 +319,11 @@ end
 
 --- @override
 function bt.SceneState.INSPECT:handle_button_released(button)
-    -- noop
+    if button == rt.settings.battle.scene.inspect.show_hide_button then
+        self._background_only = false
+        self:_update_control_indicator()
+        return
+    end
 end
 
 --- @override
@@ -317,8 +364,13 @@ end
 
 --- @override
 function bt.SceneState.INSPECT:draw()
-    local scene = self._scene
 
+    if self._background_only then
+        self._control_indicator:draw()
+        return
+    end
+
+    local scene = self._scene
     for i in values(scene._enemy_sprite_render_order) do
         scene._enemy_sprites[i]:draw()
     end
@@ -337,7 +389,6 @@ function bt.SceneState.INSPECT:draw()
     rt.graphics.translate(self._verbose_info_offset_x, self._verbose_info_offset_y)
     self._verbose_info:draw()
     rt.graphics.translate(-self._verbose_info_offset_x, -self._verbose_info_offset_y)
-
 
     if self._current_node ~= nil then
         local node = self._current_node
@@ -362,6 +413,7 @@ function bt.SceneState.INSPECT:draw()
         end
     end
 
+    self._control_indicator:draw()
 
     --[[ DEBUG draw selection graph
     for node in values(self._nodes) do

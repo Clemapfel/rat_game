@@ -1,9 +1,9 @@
 rt.settings.battle.priority_queue_element = {
     font = rt.settings.font.default,
     thumbnail_size = 32, -- resolution of subimage
-    frame_thickness = 5,
+    frame_thickness = 3,
     base_color = rt.color_darken(rt.Palette.GRAY_5, 0.05),
-    frame_color = rt.Palette.GRAY_4,
+    frame_color = rt.Palette.GRAY_2,
 
     knocked_out_shape_alpha = 0.7,
     knocked_out_pulse = function(x) return (rt.sine_wave(x, 1 / 3) - 0.5) * 0.3 end,
