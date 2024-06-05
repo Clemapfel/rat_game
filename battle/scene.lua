@@ -329,7 +329,9 @@ function bt.Scene:_reformat_party_sprites(x, width)
     local thickness = rt.settings.battle.priority_queue_element.frame_thickness
     local m = rt.settings.margin_unit + thickness
     local mx = rt.settings.battle.priority_queue.outer_margin + rt.settings.battle.priority_queue.element_size + m
-    local w = (width - (n_sprites - 1) * (m + 2 * thickness)) / n_sprites
+
+    local default_w_n_sprites = 3
+    local w = math.min((width - (n_sprites - 1) * (m + 2 * thickness)) / n_sprites, (width - (default_w_n_sprites - 1) * (m + 2 * thickness)) / default_w_n_sprites)
     local h = self._bounds.height * (3 / 9)
     local y = self._bounds.y + self._bounds.height - h
     x = x + 0.5 * width - 0.5 * (n_sprites * w + (n_sprites - 1) * m)

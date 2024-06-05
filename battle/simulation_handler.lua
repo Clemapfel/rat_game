@@ -1518,13 +1518,16 @@ end
 function bt.Scene:trade(traded_out, traded_in)
     meta.assert_isa(traded_out, bt.Entity)
 
+    local order_before = self._state:list_entities_in_order()
+    for i = 1, #order_before do
+        if order_before[i] == traded_out then
+            table.remove(order_before, i)
+            break
+        end
+    end
+
     self._state:replace_entity(traded_out, traded_in)
     self._state:update_entity_id_offsets()
-
-    for e in values(self._state:list_party()) do
-        println(e:get_id())
-    end
-    dbg()
 
     do
         local animations = {}
@@ -1534,9 +1537,9 @@ function bt.Scene:trade(traded_out, traded_in)
             table.insert(animations, bt.Animation.ALLY_DISAPPEARED(self:get_sprite(traded_out)))
         end
         table.insert(animations, bt.Animation.MESSAGE(self, self:format_name(traded_out) .. " moved into the back"))
+        table.insert(animations, bt.Animation.REORDER_PRIORITY_QUEUE(self, order_before))
 
         local on_start = function()
-            self:set_priority_order(self._state:list_entities_in_order())
         end
 
         local on_finish = function()
@@ -1557,17 +1560,17 @@ function bt.Scene:trade(traded_out, traded_in)
                 table.insert(animations, bt.Animation.ALLY_APPEARED(self:get_sprite(traded_in)))
             end
             self:append_animations(animations)
-            self:set_priority_order(self._state:list_entities_in_order())
         end
 
         local on_finish = function()
             self:get_sprite(traded_in):set_ui_is_visible(true)
+            self:play_animations({bt.Animation.REORDER_PRIORITY_QUEUE(self, self._state:list_entities_in_order())})
         end
 
         self:play_animations({bt.Animation.DELAY(0)}, on_start, on_finish)
     end
 
-    -- TODO: callbacks, update queue
+    -- TODO: callbacks
 end
 
 --- @brief

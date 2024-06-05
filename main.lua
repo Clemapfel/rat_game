@@ -8,7 +8,7 @@ scene:set_background("WORLEY")
 input = rt.InputController()
 input:signal_connect("pressed", function(_, which)
     if which == rt.InputButton.A then
-        local to_trade_in = bt.Entity("GAMBLER_MOLE")
+        local to_trade_in = bt.Entity("WALKING_SPROUT")
         scene:trade(scene._state:list_party()[1], to_trade_in)
     end
 end)

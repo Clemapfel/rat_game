@@ -198,7 +198,7 @@ end, {
 
     -- (GlobalStatusInterface, Table<EntityInterface>)
     on_entity_spawned = function(self, entities)
-        meta.assert_consumable_interface(self)
+        meta.assert_global_status_interface(self)
         for entity in values(entities) do
             meta.assert_entity_interface(entity)
         end

@@ -12,7 +12,7 @@ bt.PriorityQueue = meta.new_type("PriorityQueue", rt.Widget, rt.Animation, funct
     return meta.new(bt.PriorityQueue, {
         _world = rt.PhysicsWorld(0, 0),
         _current = {
-            entries = {},       -- Table<Entity, bt.PriorityQueue.ElementEntry>
+            entries = {},       -- Table<EntityID, bt.PriorityQueue.ElementEntry>
             order = {},         -- Table<Entity>
             render_order = {}   -- Table<{entity_key, multiplicity_index}>
         },
@@ -59,14 +59,14 @@ end
 
 --- @brief
 function bt.PriorityQueue:set_is_stunned(entity, b)
-    for element in values(self._current.entries[entity].elements) do
+    for element in values(self._current.entries[entity:get_id()].elements) do
         element:set_is_stunned(b)
     end
 end
 
 --- @brief
 function bt.PriorityQueue:set_state(entity, state)
-    for element in values(self._current.entries[entity].elements) do
+    for element in values(self._current.entries[entity:get_id()].elements) do
         element:set_state(state)
     end
 end
@@ -96,8 +96,8 @@ function bt.PriorityQueue:reorder(order, next_order)
         end
 
         for entity, n in pairs(n_seen) do
-            if which.entries[entity] == nil then
-                which.entries[entity] = {
+            if which.entries[entity:get_id()] == nil then
+                which.entries[entity:get_id()] = {
                     id = entity,
                     elements = {},  -- Table<rt.PriorityQueueElement>
                     colliders = {}, -- Table<rt.Collider>
@@ -106,7 +106,7 @@ function bt.PriorityQueue:reorder(order, next_order)
                 }
             end
 
-            local entry = which.entries[entity]
+            local entry = which.entries[entity:get_id()]
             local element_size = rt.settings.battle.priority_queue.element_size
 
             while #entry.colliders < n do
@@ -187,7 +187,7 @@ function bt.PriorityQueue:size_allocate(x, y, width, height)
                 if n_seen[entity] == nil then n_seen[entity] = 0 end
                 n_seen[entity] = n_seen[entity] + 1
 
-                local entry = which.entries[entity]
+                local entry = which.entries[entity:get_id()]
                 local i = n_seen[entity]
                 entry.target_positions[i] = {
                     element_x - element_size / 2 + x_offset,
@@ -294,7 +294,7 @@ function bt.PriorityQueue:draw()
             for i = 1, #which.render_order do
                 local t = which.render_order[i]
 
-                local entry = which.entries[t[1]]
+                local entry = which.entries[t[1]:get_id()]
                 local element = entry.elements[t[2]]
                 local collider = entry.colliders[t[2]]
 

@@ -224,7 +224,11 @@ function rt.OrderedBox:size_allocate(x, y, width, height)
         local w, h = entry.width, entry.height
         entry.target_position_x = current_x
         entry.target_position_y = current_y
-        entry.collider:set_position(origin_x, origin_y)
+
+        if entry.is_initialized ~= true then
+            entry.collider:set_position(origin_x, origin_y)
+            entry.is_initialized = true
+        end
 
         if self._orientation == rt.Orientation.HORIZONTAL then
             entry.target_position_y = current_y + 0.5 * self._bounds.height - 0.5 * h
