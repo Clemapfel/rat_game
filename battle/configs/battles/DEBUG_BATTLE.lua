@@ -10,73 +10,10 @@ return {
         {
             id = "BALL_WITH_FACE",
             status = {
-                "DEBUG_STATUS"
+                -- "DEBUG_STATUS"
             },
             consumables = {
-                "DEBUG_CONSUMABLE"
-            },
-            equips = {
-                "DEBUG_EQUIP"
-            },
-            moveset = {
-                "DEBUG_MOVE",
-                "INSPECT",
-                "PROTECT",
-                "STRUGGLE",
-                "SURF",
-                "WISH"
-            }
-        },
-
-        {
-            id = "BALL_WITH_FACE",
-            status = {
-                "DEBUG_STATUS"
-            },
-            consumables = {
-                "DEBUG_CONSUMABLE"
-            },
-            equips = {
-                "DEBUG_EQUIP"
-            },
-            moveset = {
-                "DEBUG_MOVE",
-                "INSPECT",
-                "PROTECT",
-                "STRUGGLE",
-                "SURF",
-                "WISH"
-            }
-        },
-
-        {
-            id = "BALL_WITH_FACE",
-            status = {
-                "DEBUG_STATUS"
-            },
-            consumables = {
-                "DEBUG_CONSUMABLE"
-            },
-            equips = {
-                "DEBUG_EQUIP"
-            },
-            moveset = {
-                "DEBUG_MOVE",
-                "INSPECT",
-                "PROTECT",
-                "STRUGGLE",
-                "SURF",
-                "WISH"
-            }
-        },
-
-        {
-            id = "BALL_WITH_FACE",
-            status = {
-                "DEBUG_STATUS"
-            },
-            consumables = {
-                "DEBUG_CONSUMABLE"
+                -- "DEBUG_CONSUMABLE"
             },
             equips = {
                 "DEBUG_EQUIP"
@@ -94,10 +31,10 @@ return {
         {
             id = "SMALL_UFO",
             status = {
-                "DEBUG_STATUS"
+                -- "DEBUG_STATUS"
             },
             consumables = {
-                "DEBUG_CONSUMABLE"
+                -- "DEBUG_CONSUMABLE"
             },
             equips = {
                 "DEBUG_EQUIP"
@@ -115,10 +52,10 @@ return {
         {
             id = "WALKING_SPROUT",
             status = {
-                "DEBUG_STATUS"
+                -- "DEBUG_STATUS"
             },
             consumables = {
-                "DEBUG_CONSUMABLE"
+                -- "DEBUG_CONSUMABLE"
             },
             equips = {
                 "DEBUG_EQUIP"
@@ -136,10 +73,10 @@ return {
         {
             id = "GAMBLER_MOLE",
             status = {
-                "DEBUG_STATUS"
+                -- "DEBUG_STATUS"
             },
             consumables = {
-                "DEBUG_CONSUMABLE"
+                -- "DEBUG_CONSUMABLE"
             },
             equips = {
                 "DEBUG_EQUIP"
@@ -157,10 +94,10 @@ return {
         {
             id = "GAMBLER_MOLE",
             status = {
-                "DEBUG_STATUS"
+                -- "DEBUG_STATUS"
             },
             consumables = {
-                "DEBUG_CONSUMABLE"
+                -- "DEBUG_CONSUMABLE"
             },
             equips = {
                 "DEBUG_EQUIP"
@@ -178,10 +115,10 @@ return {
         {
             id = "GAMBLER_MOLE",
             status = {
-                "DEBUG_STATUS"
+                -- "DEBUG_STATUS"
             },
             consumables = {
-               -- "DEBUG_CONSUMABLE"
+               -- -- "DEBUG_CONSUMABLE"
             },
             equips = {
                 "DEBUG_EQUIP"
@@ -199,10 +136,10 @@ return {
         {
             id = "GAMBLER_MOLE",
             status = {
-                "DEBUG_STATUS"
+                -- "DEBUG_STATUS"
             },
             consumables = {
-                --"DEBUG_CONSUMABLE"
+                ---- "DEBUG_CONSUMABLE"
             },
             equips = {
                 "DEBUG_EQUIP"

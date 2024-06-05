@@ -223,26 +223,25 @@ function bt.Scene:remove_entity_sprite(entity, ...)
     end
 
     local to_remove = {}
-    if entity:get_is_enemy() then
-        for i, sprite in ipairs(self._enemy_sprites) do
-            if should_remove[sprite:get_entity()] then
-                table.insert(to_remove, i)
-            end
+    for i, sprite in ipairs(self._enemy_sprites) do
+        if should_remove[sprite:get_entity()] then
+            table.insert(to_remove, i)
         end
-        table.sort(to_remove, function(a, b) return b < a end)
-        for i in values(to_remove) do
-            table.remove(self._enemy_sprites, i)
+    end
+    table.sort(to_remove, function(a, b) return b < a end)
+    for i in values(to_remove) do
+        table.remove(self._enemy_sprites, i)
+    end
+
+    to_remove = {}
+    for i, sprite in ipairs(self._party_sprites) do
+        if should_remove[sprite:get_entity()] then
+            table.insert(to_remove, i)
         end
-    else
-        for i, sprite in ipairs(self._party_sprites) do
-            if should_remove[sprite:get_entity()] then
-                table.insert(to_remove, i)
-            end
-        end
-        table.sort(to_remove, function(a, b) return b < a end)
-        for i in values(to_remove) do
-            table.remove(self._party_sprites, i)
-        end
+    end
+    table.sort(to_remove, function(a, b) return b < a end)
+    for i in values(to_remove) do
+        table.remove(self._party_sprites, i)
     end
 
     self:reformat()
@@ -250,7 +249,10 @@ end
 
 --- @brief
 function bt.Scene:_reformat_enemy_sprites()
-    if not self._is_realized or #self._enemy_sprites == 0 then return end
+    if not self._is_realized or #self._enemy_sprites == 0 then
+        self._enemy_sprite_render_order = {}
+        return
+    end
 
     local max_h = 0
     local total_w = 0
@@ -451,4 +453,10 @@ end
 --- @brief
 function bt.Scene:get_is_priority_reorder_done()
     return self._priority_queue:get_is_reorder_done()
+end
+
+--- @brief
+function bt.Scene:set_state(entity, state)
+    self._priority_queue:set_state(entity, state)
+    self:get_sprite(entity):set_state(state)
 end

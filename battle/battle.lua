@@ -20,6 +20,7 @@ end, {
 
     turn_count = 0,
     entities = {},
+
     global_status = {},
     current_move_selection = {
         user = nil,
@@ -104,7 +105,6 @@ function bt.Battle:realize()
     self._is_realized = true
 end
 
-
 --- @brief
 function bt.Battle:list_global_statuses()
     local out = {}
@@ -177,7 +177,7 @@ end
 function bt.Battle:list_dead_entities()
     local out = {}
     for entity in values(self.entities) do
-        if entity:get_is_dead() then
+        if entity:get_is_dead() == true then
             table.insert(out, entity)
         end
     end
@@ -267,7 +267,7 @@ function bt.Battle:remove_entity(to_remove)
     end
 
     if not removed then
-        rt.warning("In bt.Battle:remove_entity: trying to remove entity `" .. entity_id .. "` but no such entity is available")
+        rt.warning("In bt.Battle:remove_entity: trying to remove entity `" .. to_remove:get_id() .. "` but no such entity is available")
     end
 end
 

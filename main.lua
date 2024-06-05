@@ -4,13 +4,22 @@ rt.current_scene = bt.Scene()
 scene = rt.current_scene
 scene:set_background("WORLEY")
 
+local to_trade_in = bt.Entity("BALL_WITH_FACE")
+
+input = rt.InputController()
+input:signal_connect("pressed", function(_, which)
+    if which == rt.InputButton.A then
+        scene:trade(scene._state.entities[3], to_trade_in)
+    end
+end)
+
 --- ###
 
 love.load = function()
     rt.current_scene:realize()
     love.resize()
     scene:start_battle(bt.Battle("DEBUG_BATTLE"))
-    scene:transition(bt.SceneState.INSPECT)
+    scene:transition(bt.SceneState.SIMULATION)
 end
 
 rt.graphics.frame_duration = {
