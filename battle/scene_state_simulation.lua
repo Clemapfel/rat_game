@@ -32,6 +32,8 @@ function bt.SceneState.SIMULATION:handle_button_pressed(button)
         if scene._animation_queue:get_is_empty() == false then
             self._fast_forward_active = true
         end
+    elseif button == rt.InputButton.Y then
+        self._scene:transition(bt.SceneState.INSPECT)
     end
 end
 

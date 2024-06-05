@@ -332,6 +332,8 @@ function bt.SceneState.INSPECT:handle_button_pressed(button)
         self._background_only = true
         self:_update_control_indicator()
         return
+    elseif button == rt.InputButton.Y then
+        self._scene:transition(bt.SceneState.SIMULATION)
     end
 
     if self._current_node ~= nil then
@@ -409,7 +411,7 @@ end
 --- @override
 function bt.SceneState.INSPECT:exit()
     self._scene:set_selected({}, false)
-    self._scene._global_status_bar:set_selection_state(bt.SelectionState.SELECTED)
+    self._scene._global_status_bar:set_selection_state(bt.SelectionState.INACTIVE)
 end
 
 --- @override

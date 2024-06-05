@@ -141,10 +141,12 @@ function bt.PartySprite:set_selection_state(state)
     self:_update_state()
 end
 
+--[[
 --- @brief
 function bt.PartySprite:get_bounds()
     return rt.aabb_copy(self._frame:get_bounds())
 end
+]]--
 
 --- @brief
 function bt.PartySprite:set_opacity(alpha)

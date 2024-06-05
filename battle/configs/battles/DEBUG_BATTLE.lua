@@ -49,6 +49,7 @@ return {
             }
         },
 
+        --[[
         {
             id = "WALKING_SPROUT",
             status = {
@@ -69,6 +70,7 @@ return {
                 "WISH"
             }
         },
+        ]]--
 
         {
             id = "GAMBLER_MOLE",

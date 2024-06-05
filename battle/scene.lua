@@ -97,7 +97,7 @@ function bt.Scene:size_allocate(x, y, width, height)
         height * 1 / 4 - log_vertical_margin)
     self._log:fit_into(log_aabb)
 
-    self:_reformat_enemy_sprites()
+    self:_reformat_enemy_sprites(self._bounds.x, self._bounds.width)
     self:_reformat_party_sprites(log_aabb.x, log_aabb.width)
 
     local my = rt.settings.margin_unit
@@ -212,6 +212,26 @@ function bt.Scene:add_entity_sprite(entity, ...)
         end
     end
 
+    -- keep sprite order same as entity order in state
+    local party_order = {}
+    local enemy_order = {}
+    for e in values(self._state:list_entities()) do
+        if e:get_is_enemy() then
+            enemy_order[e] = sizeof(enemy_order)
+        else
+            party_order[e] = sizeof(party_order)
+        end
+    end
+    for sprites in range(self._enemy_sprites, self._party_sprites) do
+        table.sort(sprites, function(a, b)
+            if a:get_entity():get_is_enemy() and b:get_entity():get_is_enemy() then
+                return enemy_order[a:get_entity()] < enemy_order[b:get_entity()]
+            else
+                return party_order[a:get_entity()] < party_order[b:get_entity()]
+            end
+        end)
+    end
+
     self:reformat()
 end
 
@@ -248,7 +268,7 @@ function bt.Scene:remove_entity_sprite(entity, ...)
 end
 
 --- @brief
-function bt.Scene:_reformat_enemy_sprites()
+function bt.Scene:_reformat_enemy_sprites(x, width)
     if not self._is_realized or #self._enemy_sprites == 0 then
         self._enemy_sprite_render_order = {}
         return
@@ -261,9 +281,6 @@ function bt.Scene:_reformat_enemy_sprites()
         max_h = math.max(max_h, h)
         total_w = total_w + w
     end
-
-    local x = self._bounds.x
-    local width = self._bounds.width
 
     local mx = rt.settings.battle.priority_queue.outer_margin + rt.settings.battle.priority_queue.element_size
     local center_x = x + width * 0.5

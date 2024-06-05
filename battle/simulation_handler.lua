@@ -200,7 +200,7 @@ function bt.Scene:spawn_entities(...)
         local animations = {}
         local messages = {}
         for entity in values(entities) do
-            self:add_entity(entity)
+            self:add_entity_sprite(entity)
             if entity:get_is_enemy() then
                 table.insert(animations, bt.Animation.ENEMY_APPEARED(self:get_sprite(entity)))
                 table.insert(messages, self:format_name(entity) .. " appeared")
@@ -1518,18 +1518,13 @@ end
 function bt.Scene:trade(traded_out, traded_in)
     meta.assert_isa(traded_out, bt.Entity)
 
-    local old_position = -1
-    for i = 1, #(self._state.entities) do
-        if self._state.entities[i] == traded_out then
-            old_position = i
-            break
-        end
-    end
+    self._state:replace_entity(traded_out, traded_in)
+    self._state:update_entity_id_offsets()
 
-    if old_position == -1 then
-        rt.error("In bt.Scene.trade: trying to trade out entity " .. traded_out:get_id() .. ", but that entity is not part of the battle state")
-        return
+    for e in values(self._state:list_party()) do
+        println(e:get_id())
     end
+    dbg()
 
     do
         local animations = {}
@@ -1540,35 +1535,36 @@ function bt.Scene:trade(traded_out, traded_in)
         end
         table.insert(animations, bt.Animation.MESSAGE(self, self:format_name(traded_out) .. " moved into the back"))
 
+        local on_start = function()
+            self:set_priority_order(self._state:list_entities_in_order())
+        end
+
         local on_finish = function()
             self:remove_entity_sprite(traded_out)
-            self._state.entities[old_position] = nil
-            self:set_priority_order(self._state:list_entities_in_order())
-        end
-
-        self:play_animations(animations, nil, on_finish)
-    end
-
-    do
-        local animations = {}
-        if traded_in:get_is_enemy() then
-            table.insert(animations, bt.Animation.ENEMY_APPEARED(self:get_sprite(traded_in)))
-            table.insert(animations, bt.Animation.MESSAGE(self, self:format_name(traded_in) .. " appeared"))
-        else
-            table.insert(animations, bt.Animation.ALLY_APPEARED(self:get_sprite(traded_in)))
-        end
-
-        local on_start = function()
-            self._state.entities[old_position] = traded_in
-            self._state:update_entity_id_offsets()
-            self:add_entity_sprite(traded_in)
-        end
-
-        local on_finish = function()
-            self:set_priority_order(self._state:list_entities_in_order())
         end
 
         self:play_animations(animations, on_start, on_finish)
+    end
+
+    do
+        local on_start = function()
+            local animations = {}
+            self:add_entity_sprite(traded_in)
+            if traded_in:get_is_enemy() then
+                table.insert(animations, bt.Animation.ENEMY_APPEARED(self:get_sprite(traded_in)))
+                table.insert(animations, bt.Animation.MESSAGE(self, self:format_name(traded_in) .. " appeared"))
+            else
+                table.insert(animations, bt.Animation.ALLY_APPEARED(self:get_sprite(traded_in)))
+            end
+            self:append_animations(animations)
+            self:set_priority_order(self._state:list_entities_in_order())
+        end
+
+        local on_finish = function()
+            self:get_sprite(traded_in):set_ui_is_visible(true)
+        end
+
+        self:play_animations({bt.Animation.DELAY(0)}, on_start, on_finish)
     end
 
     -- TODO: callbacks, update queue

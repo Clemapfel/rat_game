@@ -4,12 +4,12 @@ rt.current_scene = bt.Scene()
 scene = rt.current_scene
 scene:set_background("WORLEY")
 
-local to_trade_in = bt.Entity("BALL_WITH_FACE")
 
 input = rt.InputController()
 input:signal_connect("pressed", function(_, which)
     if which == rt.InputButton.A then
-        scene:trade(scene._state.entities[3], to_trade_in)
+        local to_trade_in = bt.Entity("GAMBLER_MOLE")
+        scene:trade(scene._state:list_party()[1], to_trade_in)
     end
 end)
 

@@ -20,6 +20,7 @@ end, {
 
     turn_count = 0,
     entities = {},
+    id_offsets = {},   -- Table<EntityID, Table<EntityHash>>
 
     global_status = {},
     current_move_selection = {
@@ -101,7 +102,7 @@ function bt.Battle:realize()
         i = i + 1
     end
 
-    self:update_entity_id_offsets()
+    self:update_entity_id_offsets(true)
     self._is_realized = true
 end
 
@@ -219,22 +220,27 @@ end
 
 --- @brief [internal]
 function bt.Battle:update_entity_id_offsets()
-    local boxes = {}
     for entity in values(self.entities) do
-        local type = entity._config_id
-        if boxes[type] == nil then boxes[type] = {} end
-        table.insert(boxes[type], entity)
-    end
+        if self.id_offsets[entity._config_id] == nil then
+            self.id_offsets[entity._config_id] = {}
+        end
 
-    for _, box in pairs(boxes) do
-        if #box > 1 then
-            for i, entity in ipairs(box) do
-                entity:set_id_offset(i)
-            end
-        else
-            box[1]:set_id_offset(0)
+        local offsets = self.id_offsets[entity._config_id]
+        if offsets[meta.hash(entity)] == nil then
+            offsets[meta.hash(entity)] = sizeof(offsets) + 1
         end
     end
+
+    for entity in values(self.entities) do
+        local offsets = self.id_offsets[entity._config_id]
+        if sizeof(offsets) == 1 then
+            entity:set_id_offset(0)
+        else
+            entity:set_id_offset(offsets[meta.hash(entity)])
+        end
+    end
+
+    dbg(self.id_offsets)
 end
 
 --- @brief
@@ -271,6 +277,21 @@ function bt.Battle:remove_entity(to_remove)
     end
 end
 
+--- @brief
+function bt.Battle:replace_entity(to_remove, to_add)
+    local replaced = false
+    for i = 1, #self.entities do
+        if self.entities[i] == to_remove then
+            self.entities[i] = to_add
+            replaced = true
+            break
+        end
+    end
+
+    if not replaced then
+        rt.warning("In bt.Battle:replace_entity: trying to replace entity `" .. to_remove:get_id() .. "` but no such entity is available")
+    end
+end
 
 --- @brief
 function bt.Battle:list_entities_in_order()
