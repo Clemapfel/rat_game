@@ -1,66 +1,28 @@
-/// @brief simplex noise
-/// @source adapted from https://github.com/patriciogonzalezvivo/lygia/blob/main/generative/snoise.glsl
-float simplex_noise(in vec3 v) {
-    const vec2 C = vec2(1.0/6.0, 1.0/3.0);
-    const vec4 D = vec4(0.0, 0.5, 1.0, 2.0);
+#define PI 3.1415926535897932384626433832795
 
-    vec3 i = floor(v + dot(v, C.yyy));
-    vec3 x0 = v - i + dot(i, C.xxx);
+float voronoise(vec3 p, float blur) {
+    blur = clamp(blur, 0, 1);
+    float u = 0.55;
+    float k = 1.0 + 63.0 * pow(1.0 - blur, 6.0);
+    vec3 i = floor(p);
+    vec3 f = fract(p);
 
-    vec3 g = step(x0.yzx, x0.xyz);
-    vec3 l = 1.0 - g;
-    vec3 i1 = min(g.xyz, l.zxy);
-    vec3 i2 = max(g.xyz, l.zxy);
+    float s = 1.0 + 31.0 * blur;
+    vec2 a = vec2(0.0, 0.0);
 
-    vec3 x1 = x0 - i1 + C.xxx;
-    vec3 x2 = x0 - i2 + C.yyy;
-    vec3 x3 = x0 - D.yyy;
-
-    i = i - floor(i * (1. / 289.));
-
-    vec4 p = ((i.z + vec4(0.0, i1.z, i2.z, 1.0)) * 34.0 + 1.0) * (i.z + vec4(0.0, i1.z, i2.z, 1.0)) - floor(((i.z + vec4(0.0, i1.z, i2.z, 1.0)) * 34.0 + 1.0) * (i.z + vec4(0.0, i1.z, i2.z, 1.0)) * (1. / 289.)) * 289.;
-    p = ((p + i.y + vec4(0.0, i1.y, i2.y, 1.0)) * 34.0 + 1.0) * (p + i.y + vec4(0.0, i1.y, i2.y, 1.0)) - floor(((p + i.y + vec4(0.0, i1.y, i2.y, 1.0)) * 34.0 + 1.0) * (p + i.y + vec4(0.0, i1.y, i2.y, 1.0)) * (1. / 289.)) * 289.;
-    p = ((p + i.x + vec4(0.0, i1.x, i2.x, 1.0)) * 34.0 + 1.0) * (p + i.x + vec4(0.0, i1.x, i2.x, 1.0)) - floor(((p + i.x + vec4(0.0, i1.x, i2.x, 1.0)) * 34.0 + 1.0) * (p + i.x + vec4(0.0, i1.x, i2.x, 1.0)) * (1. / 289.)) * 289.;
-
-    float n_ = 0.142857142857;
-    vec3 ns = n_ * D.wyz - D.xzx;
-
-    vec4 j = p - 49.0 * floor(p * ns.z * ns.z);
-
-    vec4 x_ = floor(j * ns.z);
-    vec4 y_ = floor(j - 7.0 * x_);
-
-    vec4 x = x_ * ns.x + ns.yyyy;
-    vec4 y = y_ * ns.x + ns.yyyy;
-    vec4 h = 1.0 - abs(x) - abs(y);
-
-    vec4 b0 = vec4(x.xy, y.xy);
-    vec4 b1 = vec4(x.zw, y.zw);
-
-    vec4 s0 = floor(b0) * 2.0 + 1.0;
-    vec4 s1 = floor(b1) * 2.0 + 1.0;
-    vec4 sh = -step(h, vec4(0.0));
-
-    vec4 a0 = b0.xzyw + s0.xzyw * sh.xxyy;
-    vec4 a1 = b1.xzyw + s1.xzyw * sh.zzww;
-
-    vec3 p0 = vec3(a0.xy, h.x);
-    vec3 p1 = vec3(a0.zw, h.y);
-    vec3 p2 = vec3(a1.xy, h.z);
-    vec3 p3 = vec3(a1.zw, h.w);
-
-    vec4 f = vec4(dot(p0, p0), dot(p1, p1), dot(p2, p2), dot(p3, p3));
-    vec4 norm = 1.79284291400159 - 0.85373472095314 * f;
-
-    p0 *= norm.x;
-    p1 *= norm.y;
-    p2 *= norm.z;
-    p3 *= norm.w;
-
-    vec4 m = max(0.6 - vec4(dot(x0, x0), dot(x1, x1), dot(x2, x2), dot(x3, x3)), 0.0);
-    m = m * m;
-
-    return 42.0 * dot(m * m, vec4(dot(p0, x0), dot(p1, x1), dot(p2, x2), dot(p3, x3)));
+    vec3 g = vec3(-2.0);
+    for (g.z = -2.0; g.z <= 2.0; g.z++)
+    for (g.y = -2.0; g.y <= 2.0; g.y++)
+    for (g.x = -2.0; g.x <= 2.0; g.x++) {
+        vec3 v = i + g;
+        v = fract(v * vec3(.1031, .1030, .0973));
+        v += dot(v, v.yxz + 19.19);
+        vec3 o = fract((v.xxy + v.yzz) * v.zyx) * vec3(u, u, 1.);
+        vec3 d = g - f + o + 0.5;
+        float w = pow(1.0 - smoothstep(0.0, 1.414, length(d)), k);
+        a += vec2(o.z * w, w);
+    }
+    return a.x / a.y;
 }
 
 vec3 rgb_to_hsv(vec3 c)
@@ -81,8 +43,45 @@ vec3 hsv_to_rgb(vec3 c)
     return c.z * mix(K.xxx, clamp(p - K.xxx, 0.0, 1.0), c.y);
 }
 
-float gaussian(float x, float variance) {
-    return exp(-pow(x, 2.0) / variance);
+// @param l lightness, [0, 1]
+// @param c chroma [0, 1]
+// @param h hue [0, 1]
+vec3 oklch_to_rgb(vec3 lch)
+{
+    float theta = clamp(lch.z, 0, 1) * (2 * PI);
+    float l = lch.x;
+    float chroma = lch.y;
+    float a = chroma * cos(theta);
+    float b = chroma * sin(theta);
+    vec3 c = vec3(l, a, b);
+
+    const mat3 fwdA = mat3(1.0, 1.0, 1.0,
+                           0.3963377774, -0.1055613458, -0.0894841775,
+                           0.2158037573, -0.0638541728, -1.2914855480);
+
+    const mat3 fwdB = mat3(4.0767245293, -1.2681437731, -0.0041119885,
+                           -3.3072168827, 2.6093323231, -0.7034763098,
+                           0.2307590544, -0.3411344290,  1.7068625689);
+    vec3 lms = fwdA * c;
+    return fwdB * (lms * lms * lms);
+}
+
+float rope(float x) {
+    if (x < 0)
+        return 0.;
+    else if (x > 1)
+        return 0.;
+    else
+        return sqrt(cos(PI * x));
+}
+
+float rope2(float x) {
+    return exp(-0.5 * (x - 0.5) * (x - 0.5));
+}
+
+float gaussian(float x, float ramp)
+{
+    return exp(((-4 * PI) / 3) * (ramp * x) * (ramp * x));
 }
 
 #ifdef PIXEL
@@ -92,17 +91,27 @@ uniform float elapsed;
 vec4 effect(vec4 vertex_color, Image image, vec2 texture_coords, vec2 vertex_position)
 {
     float line_width = 0.01;
-    float threshold = 0.01;
-    const float n_lines = 4;
+    float threshold = 0.5;
+    const float n_lines = 6;
+    float line_closeness = 4 + 2 * sin(elapsed);
+    float hue_shift_time = elapsed / 5;
 
     vec2 pos = texture_coords.xy;
 
     float m = 2;
-    float value = sin(pos.x + elapsed) / (2 * m) + 0.5;
+    float value_x = 5 * pos.x + elapsed;
+    float value = sin(value_x) / (2 * m);
+    //value *= voronoise(vec3(vec2(texture_coords.x), floor(value_x * 2)), 0.7);
+    value += 0.5; // center
 
-    float res = 0;
-    for (int i = 1; i <= n_lines; ++i)
-        res = res + gaussian(distance(pos.y + (i - 1) / n_lines - 0.5, value) / line_width, threshold / line_width);
+    vec3 res = vec3(0);
+    for (int i = 0; i < n_lines; ++i)
+    {
+        float alpha = gaussian(abs(value - (pos.y + (i / (line_closeness * n_lines)) - (n_lines / 2 / (line_closeness * n_lines)))) / line_width, threshold);
+        float hue = fract(i / n_lines + elapsed / 2);
+        res = res + alpha * oklch_to_rgb(vec3(0.9, 0.2, hue));
+        //res = res + alpha * hsv_to_rgb(vec3(hue, 1, 1));
+    }
 
     return vec4(vec3(res), 1);
 }
