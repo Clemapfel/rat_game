@@ -13,7 +13,6 @@ bt.ShaderOnlyBackground = meta.new_type("ShaderOnlyBackground", bt.Background, f
         _path = path,
         _shader = {},   -- rt.Shader
         _shape = {},    -- rt.VertexShape
-        _canvas = rt.RenderTexture(),
         _elapsed = rt.random.number(-2^16, 2^16)
     })
 end)
@@ -32,8 +31,6 @@ function bt.ShaderOnlyBackground:size_allocate(x, y, width, height)
     self._shape:set_vertex_position(2, x + width, y)
     self._shape:set_vertex_position(3, x + width, y + height)
     self._shape:set_vertex_position(4, x, y + height)
-
-    self._canvas = rt.RenderTexture(width, height)
 end
 
 --- @override
@@ -45,7 +42,7 @@ end
 --- @override
 function bt.ShaderOnlyBackground:draw()
     self._shader:bind()
-    self._canvas:draw()
+    self._shape:draw()
     self._shader:unbind()
 end
 

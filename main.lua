@@ -2,7 +2,7 @@ require "include"
 
 rt.current_scene = bt.Scene()
 scene = rt.current_scene
-scene:set_background("WORLEY")
+scene:set_background("GUITAR_STRINGS")
 
 
 input = rt.InputController()
@@ -19,7 +19,8 @@ love.load = function()
     rt.current_scene:realize()
     love.resize()
     scene:start_battle(bt.Battle("DEBUG_BATTLE"))
-    scene:transition(bt.SceneState.SIMULATION)
+    scene:transition(nil)
+    --scene:transition(bt.SceneState.SIMULATION)
 end
 
 rt.graphics.frame_duration = {
