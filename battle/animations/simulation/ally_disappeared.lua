@@ -45,6 +45,4 @@ end
 --- @override
 function bt.Animation.ALLY_DISAPPEARED:draw()
     self._snapshot:draw()
-    self._snapshot:draw_bounds()
-    self._target:draw_bounds()
 end

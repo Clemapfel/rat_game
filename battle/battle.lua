@@ -239,8 +239,6 @@ function bt.Battle:update_entity_id_offsets()
             entity:set_id_offset(offsets[meta.hash(entity)])
         end
     end
-
-    dbg(self.id_offsets)
 end
 
 --- @brief

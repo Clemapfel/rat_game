@@ -4,7 +4,6 @@ rt.current_scene = bt.Scene()
 scene = rt.current_scene
 scene:set_background("GUITAR_STRINGS")
 
-
 input = rt.InputController()
 input:signal_connect("pressed", function(_, which)
     if which == rt.InputButton.A then
@@ -19,8 +18,7 @@ love.load = function()
     rt.current_scene:realize()
     love.resize()
     scene:start_battle(bt.Battle("DEBUG_BATTLE"))
-    scene:transition(nil)
-    --scene:transition(bt.SceneState.SIMULATION)
+    scene:transition(bt.SceneState.ENTITY_SELECT)
 end
 
 rt.graphics.frame_duration = {

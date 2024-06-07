@@ -6,7 +6,8 @@ bt.Background.GUITAR_STRINGS = meta.new_type("GUITAR_STRINGS", bt.Background, fu
     return meta.new(bt.Background.GUITAR_STRINGS, {
         _shader = {},   -- rt.Shader
         _shape = {},    -- rt.VertexShape
-        _elapsed = rt.random.number(-2^16, 2^16)
+        _elapsed = rt.random.number(0, 2^16),
+        _black = rt.Palette.BLACK,
     })
 end)
 
@@ -27,9 +28,11 @@ function bt.Background.GUITAR_STRINGS:size_allocate(x, y, width, height)
 end
 
 --- @override
-function bt.Background.GUITAR_STRINGS:update(delta)
+function bt.Background.GUITAR_STRINGS:update(delta)--, intensity)
     self._elapsed = self._elapsed + delta
+    self._shader:send("black", {self._black.r, self._black.g, self._black.b})
     self._shader:send("elapsed", self._elapsed)
+    --self._shader:send("intensity", intensity)
 end
 
 --- @override

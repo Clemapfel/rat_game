@@ -4,7 +4,8 @@ rt.settings.battle.priority_queue = {
     first_element_scale_factor = 1.3,
     first_element_scale_speed = 0.4, -- duration from 1.0 to 1.3, in seconds
     collider_mass = 50,
-    collider_speed = 2000
+    collider_speed = 2000,
+    unselected_alpha = 0.5
 }
 
 --- @class bt.PriorityQueue
@@ -44,15 +45,31 @@ function bt.PriorityQueue:set_selected(entities, unselect_others)
 
     local is_selected = {}
     for entity in values(entities) do
-        is_selected[entity] = true
+        is_selected[entity:get_id()] = true
     end
 
-    local unselected_alpha = 0.5
+    local unselected_alpha = rt.settings.battle.priority_queue.unselected_alpha
     for id, entry in pairs(self._current.entries) do
         local element_selected = is_selected[id] == true
         for element in values(entry.elements) do
             element:set_is_selected(element_selected)
             element:set_opacity(ternary(not element_selected and unselect_others , unselected_alpha, 1))
+        end
+    end
+end
+
+--- @brief
+function bt.PriorityQueue:set_selection_state(entity, state)
+    for element in values(self._current.entries[entity:get_id()].elements) do
+        if state == bt.SelectionState.SELECTED then
+            element:set_is_selected(true)
+            element:set_opacity(1)
+        elseif state == bt.SelectionState.UNSELECTED then
+            element:set_is_selected(false)
+            element:set_opacity(rt.settings.battle.priority_queue.unselected_alpha)
+        else
+            element:set_is_selected(false)
+            element:set_opacity(1)
         end
     end
 end

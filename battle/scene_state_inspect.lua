@@ -28,6 +28,10 @@ function bt.SceneState.INSPECT:_create()
     local scene = self._scene
     self._priority_order = scene._state:list_entities_in_order()
 
+    while not scene._animation_queue:get_is_empty() do
+        scene._animation_queue:skip()
+    end
+
     local current_sprite
     if self._current_node ~= nil then
         current_sprite = self._current_node.sprite
@@ -286,7 +290,7 @@ function bt.SceneState.INSPECT:_update_selection()
         if sprite_bounds.x + sprite_bounds.width + w + m < scene_bounds.x + scene_bounds.width then
             self._verbose_info_offset_x = sprite_bounds.x + sprite_bounds.width + m
         else
-            self._verbose_info_offset_x = sprite_bounds.x - w
+            self._verbose_info_offset_x = sprite_bounds.x - w - m
         end
 
         self._verbose_info_offset_y = sprite_bounds.y - 0.5 * h + 0.5 * sprite_bounds.height

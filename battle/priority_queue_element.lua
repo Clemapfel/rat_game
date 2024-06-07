@@ -387,7 +387,7 @@ end
 function bt.PriorityQueueElement:set_opacity(alpha)
     self._opacity = alpha
 
-    for object in range(self._shape, self._backdrop, self._frame, self._frame_outline, self._frame_gradient, self._change_indicator) do
+    for object in range(self._shape, self._backdrop, self._frame, self._frame_outline, self._frame_gradient, self._change_indicator, self._id_offset_label) do
         object:set_opacity(alpha)
     end
 end

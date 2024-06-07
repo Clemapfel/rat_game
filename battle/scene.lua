@@ -37,9 +37,6 @@ function bt.Scene:realize()
         end
     end)
 
-    self._states[bt.SceneState.INSPECT] = bt.SceneState.INSPECT(self)
-    self._states[bt.SceneState.SIMULATION] = bt.SceneState.SIMULATION(self)
-
     self._animation_queue = rt.AnimationQueue()
 
     self._log = rt.TextBox()
@@ -171,6 +168,11 @@ function bt.Scene:transition(new_state)
 
     local current = self._current_state
     local next = self._states[new_state]
+
+    if next == nil then
+        next = new_state(self)
+        self._states[new_state] = next
+    end
 
     if current ~= nil then
         current:exit()
@@ -380,6 +382,14 @@ function bt.Scene:set_selected(entities, unselect_others)
                 sprite:set_selection_state(bt.SelectionState.INACTIVE)
             end
         end
+    end
+end
+
+--- @brief
+function bt.Scene:set_unselected(entities)
+    for entity in values(entities) do
+        local sprite = self:get_sprite(entity)
+        sprite:set_selection_state(bt.SelectionState.UNSELECTED)
     end
 end
 

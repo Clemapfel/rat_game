@@ -61,22 +61,9 @@ vec3 oklch_to_rgb(vec3 lch)
 
     const mat3 fwdB = mat3(4.0767245293, -1.2681437731, -0.0041119885,
                            -3.3072168827, 2.6093323231, -0.7034763098,
-                           0.2307590544, -0.3411344290,  1.7068625689);
+                           0.2307590544, -0.3411344290, 1.7068625689);
     vec3 lms = fwdA * c;
     return fwdB * (lms * lms * lms);
-}
-
-float rope(float x) {
-    if (x < 0)
-        return 0.;
-    else if (x > 1)
-        return 0.;
-    else
-        return sqrt(cos(PI * x));
-}
-
-float rope2(float x) {
-    return exp(-0.5 * (x - 0.5) * (x - 0.5));
 }
 
 float gaussian(float x, float ramp)
@@ -84,16 +71,23 @@ float gaussian(float x, float ramp)
     return exp(((-4 * PI) / 3) * (ramp * x) * (ramp * x));
 }
 
+float butterworth(float x, float n)
+{
+    return 1 / (1 + pow(2 * x, 2. * n));
+}
+
 #ifdef PIXEL
 
 uniform float elapsed;
+uniform vec3 black;
+uniform float intensity;
 
 vec4 effect(vec4 vertex_color, Image image, vec2 texture_coords, vec2 vertex_position)
 {
     float line_width = 0.01;
     float threshold = 0.5;
     const float n_lines = 6;
-    float line_closeness = 4 + 2 * sin(elapsed);
+    float line_closeness = 4 + 2 * sin(elapsed + texture_coords.x * 2);
     float hue_shift_time = elapsed / 5;
 
     vec2 pos = texture_coords.xy;
@@ -104,10 +98,12 @@ vec4 effect(vec4 vertex_color, Image image, vec2 texture_coords, vec2 vertex_pos
     //value *= voronoise(vec3(vec2(texture_coords.x), floor(value_x * 2)), 0.7);
     value += 0.5; // center
 
-    vec3 res = vec3(0);
+    float bloom = 1 + sin(elapsed * 2) * 0.6; //1 + ((intensity - 0.5) * 2) * 0.4;
+    float x = voronoise(vec3(texture_coords.xy * 10, elapsed), 1.0);
+    vec3 res = normalize(black) * vec3(fwidth(x)) * 30;
     for (int i = 0; i < n_lines; ++i)
     {
-        float alpha = gaussian(abs(value - (pos.y + (i / (line_closeness * n_lines)) - (n_lines / 2 / (line_closeness * n_lines)))) / line_width, threshold);
+        float alpha = butterworth(abs(value - (pos.y + (i / (line_closeness * n_lines)) - (n_lines / 2 / (line_closeness * n_lines)))) / line_width, bloom);
         float hue = fract(i / n_lines + elapsed / 2);
         res = res + alpha * oklch_to_rgb(vec3(0.9, 0.2, hue));
         //res = res + alpha * hsv_to_rgb(vec3(hue, 1, 1));
