@@ -331,7 +331,6 @@ end
 --- @override
 function bt.SceneState.INSPECT:handle_button_pressed(button)
     local scene = self._scene
-
     if button == rt.settings.battle.scene.inspect.show_hide_button then
         self._background_only = true
         self:_update_control_indicator()

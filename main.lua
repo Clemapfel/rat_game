@@ -6,10 +6,7 @@ scene:set_background("GUITAR_STRINGS")
 
 input = rt.InputController()
 input:signal_connect("pressed", function(_, which)
-    if which == rt.InputButton.A then
-        local to_trade_in = bt.Entity("WALKING_SPROUT")
-        scene:trade(scene._state:list_party()[1], to_trade_in)
-    end
+
 end)
 
 --- ###
@@ -18,7 +15,7 @@ love.load = function()
     rt.current_scene:realize()
     love.resize()
     scene:start_battle(bt.Battle("DEBUG_BATTLE"))
-    scene:transition(bt.SceneState.ENTITY_SELECT)
+    scene:transition(bt.SceneState.MOVE_SELECT)
 end
 
 rt.graphics.frame_duration = {

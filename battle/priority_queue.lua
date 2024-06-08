@@ -184,6 +184,9 @@ function bt.PriorityQueue:size_allocate(x, y, width, height)
     local off_screen_pos_x, off_screen_pos_y = x + width + 2 * element_size, 0
 
     local min_x, min_y, max_x, max_y = POSITIVE_INFINITY, POSITIVE_INFINITY, NEGATIVE_INFINITY, NEGATIVE_INFINITY
+    local outer_margin = rt.settings.battle.priority_queue.outer_margin
+    local factor = rt.settings.battle.priority_queue.first_element_scale_factor
+    local size = rt.settings.battle.priority_queue.element_size
 
     if self._is_realized == true then
         local function handle(which, offset)
@@ -194,9 +197,6 @@ function bt.PriorityQueue:size_allocate(x, y, width, height)
             end
 
             local n_seen = {}
-            local outer_margin = rt.settings.battle.priority_queue.outer_margin
-            local factor = rt.settings.battle.priority_queue.first_element_scale_factor
-            local size = rt.settings.battle.priority_queue.element_size
 
             local m = math.min(
                 rt.settings.margin_unit,
@@ -241,8 +241,12 @@ function bt.PriorityQueue:size_allocate(x, y, width, height)
 
         handle(self._current, false)
 
+        -- measure, takes scale into account
         self._final_position_x, self._final_position_y = min_x, min_y
         self._final_width, self._final_height = max_x - min_x, max_y - min_y
+        self._final_position_x = self._final_position_x - (factor - 1) * element_size
+        self._final_width = self._final_width + (factor - 1) * element_size
+        self._final_height = self._final_height + (factor - 1) * element_size
 
         handle(self._next, false)
     end
@@ -384,4 +388,9 @@ end
 --- @brief
 function bt.PriorityQueue:measure()
     return self._final_width, self._final_height
+end
+
+--- @brief
+function bt.PriorityQueue:get_position()
+    return self._final_position_x, self._final_position_y
 end

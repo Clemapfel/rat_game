@@ -1,197 +1,182 @@
---[[
-Item:
-    Icon
-    n_uses / max_n_uses or inf
-    name
-
-    make see-through if depleted
-
-List:
-    Sort by:
-        Name
-        N Uses
-        Frequently Used
-
-    deplete items can still be selected, but
-    confirmation dialog has to be clicked through
-    always show attack / defend / intrinsic at top of list
-
-Input:
-    A: select
-    B: go back to previous party member
-    up / down: navigate list
-
-    ?: jump to start
-
-show consumable / equip of current user
-
-inspect mode
-select mode
-    show move
-]]--
-
---[[
-Pro Items:
-+ introduces macro decision making outside of battle
-- consumables already do that
-+ but you dont have control over when consumables activate
-- introduce activatable consumable
-+ only one consumable per battle per character
-- have multiple consumable slots if you really want that
-
-Contra Items:
-+ redundant in in-battle function
-]]--
-
 rt.settings.battle.move_selection = {
-    list_item_margin = rt.settings.margin_unit,
-    vrule_thickness = rt.settings.frame.thickness * 1.5
+    sprite_icon_size = 64
 }
 
-rt.MoveSelectionSortMode = meta.new_enum({
-    DEFAULT = 1,
-    BY_NAME = 2,
-    BY_N_USES = 3
-})
+--[[
+Information on Screen:
++ who is selecting entity
++ selecting entity hp, status
++ global status
++ priority queue
++ priority queue preview
++ already selected party member moves, + order
++ possible targets (cf. priority queue)
++ list of possible moves
++ sorting modes
++ keyboard binding: a = select, b = back, y = sort: <by>, x = inspect
 
---- @class
-bt.MoveSelection = meta.new_type("MoveSelection", rt.Widget, function(entity)
++ turn count
+]]--
+
+bt.MoveSelection = meta.new_type("MoveSelection", rt.Widget, function()
     return meta.new(bt.MoveSelection, {
-        _left_vrule = rt.Line(0, 0, 0, 1),
-        _left_vrule_outline = rt.Line(0, 0, 0, 1),
-        _base = rt.Rectangle(0, 0, 1, 1),
-        _base_gradient = rt.LogGradient(),
-
-        _heading = {}, -- rt.Label
-
-        _items = {},
-        _item_order = {},
-        _item_bounds = rt.AABB(0, 0, 1, 1),
-
-        _sort_mode = rt.MoveSelectionSortMode.BY_NAME,
-        _sortings = {}, -- Table<rt.MoveSelectionSortMode, Table<MoveID>>
+        _world = rt.PhysicsWorld(0, 0),
+        _nodes = {},    -- cf. create_from
+        _sortings = {},  -- Table<Number>
+        _sort_mode = bt.MoveSelection.SortMode.DEFAULT,
+        _user = {},     -- bt.Entity
+        _position_x = 0,
+        _position_y = 0,
     })
 end)
 
+bt.MoveSelection.SortMode = meta.new_enum({
+    DEFAULT = 1,
+    BY_NAME = 2,
+    BY_N_USES_LEFT = 3
+})
+
 --- @brief
 function bt.MoveSelection:_regenerate_sortings()
-    -- by name
-    local by_name_sorting = {}
-    local by_n_uses_sorting = {}
-    for id in keys(self._items) do
-        table.insert(by_name_sorting, id)
-        table.insert(by_n_uses_sorting, id)
+    local default = {}
+    local by_name = {}
+    local by_n_uses_left = {}
+
+    for node_i, _ in ipairs(self._nodes) do
+        for to_insert_into in range(default, by_name, by_n_uses_left) do
+            table.insert(to_insert_into, node_i)
+        end
     end
 
-    table.sort(by_name_sorting, function(a_i, b_i)
-        local a_name = self._items[a_i].move:get_name()
-        local b_name = self._items[b_i].move:get_name()
-        return a_name < b_name
+    table.sort(by_name, function(a_i, b_i)
+        local a_node, b_node = self._nodes[a_i], self._nodes[b_i]
+        return utf8.less_than(a_node.move:get_name(), b_node.move:get_name())
     end)
-    self._sortings[rt.MoveSelectionSortMode.BY_NAME] = by_name_sorting
 
-    table.sort(by_n_uses_sorting, function(a_i, b_i)
-        local a_n_uses = self._items[a_i].n_uses
-        local b_n_uses = self._items[b_i].n_uses
-
-        if a_n_uses == b_n_uses then
-            return a_i < b_i
-        else
-            return a_n_uses < b_n_uses
-        end
+    table.sort(by_n_uses_left, function(a_i, b_i)
+        local a_node, b_node = self._nodes[a_i], self._nodes[b_i]
+        return self._user:get_move_n_uses_left(a_node.move) > self._user:get_move_n_uses_left(b_node.move)
     end)
-    self._sortings[rt.MoveSelectionSortMode.BY_N_USES] = by_n_uses_sorting
+
+    self._sortings = {}
+    self._sortings[bt.MoveSelection.SortMode.DEFAULT] = default
+    self._sortings[bt.MoveSelection.SortMode.BY_NAME] = by_name
+    self._sortings[bt.MoveSelection.SortMode.BY_N_USES_LEFT] = by_n_uses_left
 end
 
 --- @brief
-function bt.MoveSelection:add(move)
-    local to_add = {
-        move = move,
-        item = bt.MoveSelectionItem(move),
-        n_uses = move:get_max_n_uses()
-    }
+function bt.MoveSelection:set_sort_mode(mode)
+    self._sort_mode = mode
+    self:reformat()
+end
 
-    to_add.item:realize()
-    local x, y, w, h = rt.aabb_unpack(self._bounds)
-    to_add.item:fit_into(0, 0, w, h)
-    to_add.item:set_n_uses(move:get_max_n_uses(), move:get_max_n_uses())
-    to_add.height = select(2, to_add.item:measure()) + rt.settings.battle.move_selection.list_item_margin
-
-    local already_present = self._items[move:get_id()] ~= nil
-    self._items[move:get_id()] = to_add
-
-    if not already_present then
-        table.insert(self._item_order, move:get_id())
-        self:_regenerate_sortings()
+--- @brief
+function bt.MoveSelection:_format_n_uses_label(n)
+    if n == POSITIVE_INFINITY then
+        return ""
+    else
+        return "<o>" .. tostring(n) .. "</o>"
     end
 end
 
---- @override
-function bt.MoveSelection:realize()
-    if self._is_realized then return end
-    self._is_realized = true
-
-    local base_color = rt.Palette.BACKGROUND
-    base_color.a = rt.settings.spacer.default_opacity
-    self._base:set_color(base_color)
-    self._base_gradient = rt.LogGradient(
-        rt.RGBA(base_color.r, base_color.g, base_color.b, 0),
-        rt.RGBA(base_color.r, base_color.g, base_color.b, base_color.a)
-    )
-
-    local line_width = rt.settings.frame.thickness
-    self._left_vrule:set_line_width(line_width)
-    self._left_vrule:set_color(rt.Palette.FOREGROUND)
-    self._left_vrule_outline:set_line_width(line_width + 2)
-    self._left_vrule_outline:set_color(rt.Palette.BASE_OUTLINE)
-
-    self._heading = rt.Label("<b><u>Choose Action</u></b>")
-    self._heading:realize()
+--- @brief
+function bt.MoveSelection:_format_move_name(name)
+    return "<b>" .. name .. "</b>"
 end
 
---- @override
-function bt.MoveSelection:size_allocate(x, y, width, height)
-    if self._is_realized ~= true then return end
+--- @brief
+function bt.MoveSelection:create_from(user, moves)
+    meta.assert_isa(user, bt.Entity)
 
-    local base_w = 400
-    self._base:resize(x, y, base_w, height)
-    self._base_gradient:resize(x + base_w, y, 100, height)
-
-    local line_width = rt.settings.battle.move_selection.vrule_thickness * 0.5
-    self._left_vrule:resize(x - line_width * 0.5, y, x, y + height)
-    self._left_vrule_outline:resize(x - line_width * 0.5, y, x, y + height)
-
+    local w = rt.settings.battle.move_selection.sprite_icon_size
     local m = rt.settings.margin_unit
-    local current_x, current_y = x + m, y + m
-    self._heading:fit_into(current_x, current_y, width, height)
-    current_y = current_y + select(2, self._heading:measure()) + m
-    self._item_bounds = rt.AABB(current_x, current_y, width, height)
+    local origin_x, origin_y = 0, 0
+    self._user = user
+    self._nodes = {}
+    for move in values(moves) do
+        local to_insert = {
+            move = move,
+            sprite = rt.LabeledSprite(move:get_sprite_id()),
+            label = rt.Label(self:_format_move_name(move:get_name())),
+            collider = rt.CircleCollider(
+                self._world,
+                rt.ColliderType.DYNAMIC,
+                0, 0,
+                rt.settings.ordered_box.collider_radius
+            ),
+            target_position_x = origin_x,
+            target_position_y = origin_y
+        }
+
+        to_insert.collider:set_collision_group(rt.ColliderCollisionGroup.NONE)
+        to_insert.collider:set_mass(rt.settings.ordered_box.collider_mass)
+
+        local x, y = -0.5 * w, -0.5 * w
+
+        to_insert.sprite:set_label(self:_format_n_uses_label(self._user:get_move_n_uses_left(to_insert.move)))
+        to_insert.sprite:realize()
+        to_insert.sprite:set_scale(2)
+        to_insert.sprite:fit_into(x, y, w, w)
+
+        to_insert.label:realize()
+        local label_h = select(2, to_insert.label:measure())
+        to_insert.label:fit_into(x + w + m, y + 0.5 * w - 0.5 * label_h, POSITIVE_INFINITY, w)
+
+        table.insert(self._nodes, to_insert)
+    end
+
+    self:_regenerate_sortings()
 end
 
---- @override
+--- @brief
+function bt.MoveSelection:size_allocate(x, y, width, height)
+    if self._is_realized == false then return end
+    self._position_x, self._position_y = x, y
+
+    local current_x, current_y = 0, 0
+    local sorting = self._sortings[self._sort_mode]
+    for node_i in values(sorting) do
+        local node = self._nodes[node_i]
+        node.target_position_x = current_x
+        node.target_position_y = current_y
+
+        local bounds = node.sprite:get_bounds()
+        current_y = current_y + bounds.height
+    end
+end
+
+--- @brief
+function bt.MoveSelection:update(delta)
+    self._world:update(delta)
+
+    for node in values(self._nodes) do
+        local current_x, current_y = node.collider:get_position()
+        local target_x, target_y = node.target_position_x, node.target_position_y
+        local distance = rt.distance(current_x, current_y, target_x, target_y)
+        local angle = rt.angle(target_x - current_x, target_y - current_y)
+        local magnitude = rt.settings.ordered_box.collider_speed
+        local vx, vy = rt.translate_point_by_angle(0, 0, magnitude, angle)
+        node.collider:apply_linear_impulse(vx, vy)
+        local damping = magnitude / (4 * distance)
+        node.collider:set_linear_damping(damping)
+    end
+end
+
+--- @brief
 function bt.MoveSelection:draw()
-    if self._is_realized ~= true then return end
-
-    self._base:draw()
-    self._base_gradient:draw()
-    self._left_vrule_outline:draw()
-    self._left_vrule:draw()
-
-    self._heading:draw()
+    if self._is_realized == false then return end
 
     rt.graphics.push()
-    local m = rt.settings.margin_unit
-    rt.graphics.translate(self._item_bounds.x, self._item_bounds.y)
-    local y_offset = 0
-    local order = self._item_order
-    if self._sort_mode ~= rt.MoveSelectionSortMode.DEFAULT then
-        order = self._sortings[self._sort_mode]
-    end
-
-    for id in values(order) do
-        local entry = self._items[id]
-        entry.item:draw()
-        rt.graphics.translate(0, entry.height)
+    rt.graphics.translate(self._position_x, self._position_y)
+    for node in values(self._nodes) do
+        local x, y = node.collider:get_position()
+        rt.graphics.push()
+        rt.graphics.translate(x, y)
+        node.sprite:draw()
+        node.label:draw()
+        rt.graphics.pop()
     end
     rt.graphics.pop()
+
+    self:draw_bounds()
 end

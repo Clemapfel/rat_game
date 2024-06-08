@@ -249,6 +249,7 @@ function bt.Entity:get_id_offset_suffix()
         return ""
     else
         return " " .. utf8.char(self.id_offset + 0x03B1 - 1) -- lowercase greek letters
+        --return " №" .. tostring(self.id_offset)
     end
 end
 

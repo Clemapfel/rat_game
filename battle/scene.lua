@@ -8,7 +8,6 @@ bt.Scene = meta.new_type("BattleScene", rt.Widget, function()
         _log = {}, -- rt.TextBox
         _priority_queue = {}, -- bt.PriorityQueue
         _global_status_bar = {}, -- bt.GlobalStatusBar
-        _move_selection = {}, -- bt.MoveSelection
         _background = nil,  -- bt.Background
 
         _enemy_sprites = {},              -- Table<bt.EnemySprite>
@@ -47,9 +46,6 @@ function bt.Scene:realize()
 
     self._global_status_bar = bt.GlobalStatusBar()
     self._global_status_bar:realize()
-
-    self._move_selection = bt.MoveSelection()
-    self._move_selection:realize()
 
     if self._background ~= nil then
         self._background:realize()
@@ -123,7 +119,6 @@ function bt.Scene:size_allocate(x, y, width, height)
 
     local status_h = select(2, self._global_status_bar:measure())
     self._global_status_bar:fit_into(0, party_min_y, party_min_x, party_max_y - party_min_y)
-    self._move_selection:fit_into(0, log_aabb.y, party_max_x, party_min_y - log_aabb.y)
 
     self._fast_forward_indicator:fit_into(x + m, y + m, 5 * m, 2.5 * m)
 

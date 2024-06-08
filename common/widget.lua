@@ -99,9 +99,7 @@ end
 
 --- @brief
 function rt.Widget:get_bounds()
-    local x, y = self:get_position()
-    local w, h = self:get_size()
-    return rt.AABB(x, y, w, h)
+    return rt.aabb_copy(self._bounds)
 end
 
 --- @brief set start margin
