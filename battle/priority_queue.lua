@@ -22,6 +22,10 @@ bt.PriorityQueue = meta.new_type("PriorityQueue", rt.Widget, rt.Animation, funct
             order = {},
             render_order = {}
         },
+        _final_position_x = 0,
+        _final_position_y = 0,
+        _final_width = 0,
+        _final_height = 0,
         _preview_visible = false,
         _reorder_done = false,
         _elapsed = 0
@@ -178,6 +182,9 @@ end
 function bt.PriorityQueue:size_allocate(x, y, width, height)
     local element_size = rt.settings.battle.priority_queue.element_size
     local off_screen_pos_x, off_screen_pos_y = x + width + 2 * element_size, 0
+
+    local min_x, min_y, max_x, max_y = POSITIVE_INFINITY, POSITIVE_INFINITY, NEGATIVE_INFINITY, NEGATIVE_INFINITY
+
     if self._is_realized == true then
         local function handle(which, offset)
             for _, entry in pairs(which.entries) do
@@ -198,6 +205,7 @@ function bt.PriorityQueue:size_allocate(x, y, width, height)
             local center_x = x + width - outer_margin
             local element_x, element_y = center_x, y + outer_margin + 0.5 * element_size + 0.5 * element_size
             local x_offset = ternary(offset, -1 * size * factor + m, 0)
+
             -- first element is larger
             which.render_order = {}
             for _, entity in pairs(which.order) do
@@ -210,6 +218,12 @@ function bt.PriorityQueue:size_allocate(x, y, width, height)
                     element_x - element_size / 2 + x_offset,
                     element_y - element_size / 2
                 }
+
+                min_x = math.min(min_x, entry.target_positions[i][1] - element_size / 2)
+                min_y = math.min(min_y, entry.target_positions[i][2] - element_size / 2)
+                max_x = math.max(max_x, entry.target_positions[i][1] + element_size / 2)
+                max_y = math.max(max_y, entry.target_positions[i][2] + element_size / 2)
+
                 element_y = element_y + element_size + m
 
                 -- store scale animation in collider userdata, scale is applied during draw
@@ -226,6 +240,10 @@ function bt.PriorityQueue:size_allocate(x, y, width, height)
         end
 
         handle(self._current, false)
+
+        self._final_position_x, self._final_position_y = min_x, min_y
+        self._final_width, self._final_height = max_x - min_x, max_y - min_y
+
         handle(self._next, false)
     end
 end
@@ -361,4 +379,9 @@ end
 --- @brief
 function bt.PriorityQueue:get_is_reorder_done()
     return self._reorder_done
+end
+
+--- @brief
+function bt.PriorityQueue:measure()
+    return self._final_width, self._final_height
 end
