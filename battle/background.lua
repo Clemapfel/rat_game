@@ -13,7 +13,7 @@ bt.ShaderOnlyBackground = meta.new_type("ShaderOnlyBackground", bt.Background, f
         _path = path,
         _shader = {},   -- rt.Shader
         _shape = {},    -- rt.VertexShape
-        _elapsed = rt.random.number(-2^16, 2^16)
+        _elapsed = rt.random.number(0, 2^8)
     })
 end)
 

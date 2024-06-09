@@ -161,6 +161,11 @@ function bt.Scene:transition(new_state)
         self:realize()
     end
 
+    if new_state == nil then
+        self._current_state = nil
+        return
+    end
+
     local current = self._current_state
     local next = self._states[new_state]
 
