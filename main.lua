@@ -15,7 +15,7 @@ love.load = function()
     rt.current_scene:realize()
     love.resize()
     scene:start_battle(bt.Battle("DEBUG_BATTLE"))
-    scene:transition(nil) --bt.SceneState.MOVE_SELECT)
+    scene:transition(bt.SceneState.MOVE_SELECT)
 end
 
 rt.graphics.frame_duration = {

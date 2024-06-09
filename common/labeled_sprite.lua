@@ -37,7 +37,7 @@ function rt.LabeledSprite:realize()
         frame.x, frame.y + frame.height
     )
 
-    self._label = rt.Label(self._label_text, rt.settings.font.default_small)
+    self._label = rt.Label(self._label_text, rt.settings.font.default_small, rt.settings.font.default_mono_small)
     self._label:realize()
 
     self:set_opacity(self._opacity)

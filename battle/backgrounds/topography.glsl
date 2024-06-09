@@ -158,18 +158,19 @@ vec4 effect(vec4 vertex_color, Image image, vec2 texture_coords, vec2 vertex_pos
 {
     vec2 position = texture_coords.xy * 5;
     float time = elapsed / 10;
-    float value = max(simplex_noise(vec3(position.xy, time)), -1 * simplex_noise(vec3(position.yx, time)));
+    float value = simplex_noise(vec3(position.xy, time));
 
     float sigma = 0.0001;
+    float sigma_normalization = fwidth(value) * 15; // makes all lines the same width
     value = 0 +
-        value * gaussian(value, 0.0, sigma) +
-        value * gaussian(value, 0.25, sigma) +
-        value * gaussian(value, 0.5, sigma) +
-        value * gaussian(value, 0.75, sigma) +
-        value * gaussian(value, 1, sigma)
+        value * gaussian(value, 0.0, sigma * sigma_normalization) +
+        value * gaussian(value, 0.25, sigma * sigma_normalization) +
+        value * gaussian(value, 0.5, sigma * sigma_normalization) +
+        value * gaussian(value, 0.75, sigma * sigma_normalization) +
+        value * gaussian(value, 1, sigma * sigma_normalization)
     ;
 
-    value = clamp(value, 0, 1);
+    value = clamp(value, 0, 1) * 15;
 
     return vec4(vec3(value), 1);
 }

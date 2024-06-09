@@ -5,10 +5,12 @@ rt.settings.battle.scene.move_select = {
 bt.MoveSelectionItem = meta.new_type("MoveSelectionItem", rt.Widget, function(move, n_uses)
     return meta.new(bt.MoveSelectionItem, {
         _sprite = {},
-        _label = {},
-        _backdrop = rt.Rectangle(0, 0, 1, 1),
+        _name_label = {},
+        _description_label = {},
         _move = move,
         _n_uses = n_uses,
+        _final_width = 0,
+        _final_height = 0
     })
 end)
 
@@ -17,43 +19,52 @@ function bt.MoveSelectionItem:realize()
     self._is_realized = true
 
     self._sprite = rt.LabeledSprite(self._move:get_sprite_id())
-    self._label = rt.Label(self._move:get_name())
+    self._sprite:set_sprite_scale(3)
+    self._sprite:set_label("<mono><o>" .. self._n_uses .. "</o></mono>")
 
-    for widget in range(self._sprite, self._label) do
+    self._name_label = rt.Label("<b><o>" .. self._move:get_name() .. "</o></b>")
+    self._description_label = rt.Label("<o>" .. self._move:get_description() .. "</o>", rt.settings.font.default_small, rt.settings.font.default_small)
+
+    for widget in range(self._sprite, self._name_label, self._description_label) do
         widget:realize()
     end
+
+    self._name_label:set_justify_mode(rt.JustifyMode.LEFT)
+    self._description_label:set_justify_mode(rt.JustifyMode.LEFT)
 end
 
 function bt.MoveSelectionItem:size_allocate(x, y, width, height)
     local m = rt.settings.margin_unit
     self._sprite:set_sprite_scale(2)
-    local sprite_w, sprite_h = self._sprite:measure()
-    self._sprite:fit_into(x, y, sprite_w, sprite_h)
 
-    local label_w, label_h = self._label:measure()
-    self._label:fit_into(x + sprite_w + m, y + 0.5 * sprite_w - 0.5 * label_h, POSITIVE_INFINITY, POSITIVE_INFINITY)
+    local current_x, current_y = x, y
+    local sprite_w, sprite_h = self._sprite:measure()
+    self._sprite:fit_into(current_x, current_y, sprite_w, sprite_h)
+
+    current_y = current_y + sprite_w
+    self._name_label:fit_into(current_x, current_y, width, height)
+    local name_label_w, name_label_h = self._name_label:measure()
+
+    current_y = current_y + name_label_h
+
+    self._description_label:fit_into(current_x, current_y, name_label_w, height)
+    current_y = current_y + select(2, self._description_label:measure())
+
+    self._final_width = math.max(name_label_w, sprite_w)
+    self._final_height = current_y - y
 end
 
 function bt.MoveSelectionItem:draw()
     if self._is_realized ~= true then return end
     self._sprite:draw()
-    self._label:draw()
+    self._name_label:draw()
+    self._description_label:draw()
 end
 
 function bt.MoveSelectionItem:measure()
-
-    if self._is_realized ~= true then self:realize() end
-
-    local m = rt.settings.margin_unit
-    local sprite_w, sprite_h = self._sprite:measure()
-    local label_w, label_h = self._label:measure()
-
-    return sprite_w + m + label_w, math.max(sprite_h, label_h)
+    return self._final_width, self._final_height
 end
 
-function bt.MoveSelectionItem:set_selection_state(state)
-    -- TODO
-end
 
 --- @class bt.SceneState.MOVE_SELECT
 bt.SceneState.MOVE_SELECT = meta.new_type("MOVE_SELECT", function(scene)
@@ -61,8 +72,8 @@ bt.SceneState.MOVE_SELECT = meta.new_type("MOVE_SELECT", function(scene)
         _scene = scene,
         _control_indicator = {}, -- rt.ControlIndicator
         _area = rt.AABB(0, 0, 1, 1),
+
         _items = {}, -- Table<bt.MoveSelectionItem>
-        _box = {},  -- rt.OrderedBox
     })
 
     return out
@@ -98,27 +109,13 @@ function bt.SceneState.MOVE_SELECT:_create()
     local moveset = user:list_moves()
     -- TODO
 
-    self._box = rt.OrderedBox()
-
     self._items = {}
-
-    for move in values(moveset) do
-        local item = bt.MoveSelectionItem(move, user:get_move_n_uses_left(move))
-        self._box:add(move, item)
+    for move in values({bt.Move("DEBUG_MOVE")}) do
+        local to_insert = bt.MoveSelectionItem(move, user:get_move_n_uses_left(move))
+        to_insert:realize()
+        to_insert:fit_into(self._area)
+        table.insert(self._items, to_insert)
     end
-
-    self._box:set_orientation(rt.Orientation.HORIZONTAL)
-
-    self._box:realize()
-    self._box:fit_into(self._area)
-end
-
---- @brief [internal]
-function bt.SceneState.MOVE_SELECT:_update_selection()
-end
-
---- @brief [internal]
-function bt.SceneState.MOVE_SELECT:_update_control_indicator()
 end
 
 --- @override
@@ -181,9 +178,11 @@ function bt.SceneState.MOVE_SELECT:draw()
     scene._priority_queue:draw()
 
     self._control_indicator:draw()
-    self._box:draw()
-    self._box:draw_bounds()
 
     love.graphics.setColor(1, 0, 1, 0.6)
     love.graphics.rectangle("fill", self._area.x, self._area.y, self._area.width, self._area.height)
+
+    for item in values(self._items) do
+        item:draw()
+    end
 end

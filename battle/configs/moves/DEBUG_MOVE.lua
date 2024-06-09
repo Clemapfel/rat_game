@@ -1,6 +1,6 @@
 return {
     name = "Debug Move",
-    description = "Debug Move, no effect",
+    description = "Used for debugging, no effect but prints a message for every battle event",
 
     sprite_id = "orbs",
     sprite_index = 1,
