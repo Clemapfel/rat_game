@@ -172,6 +172,12 @@ float sine_wave(float x, float lower, float upper) {
     return map((sin(2 * PI * x * 2 - PI / 2) + 1) * 0.5, -1, 1, lower, upper);
 }
 
+vec2 rotate(vec2 v, float angle) {
+    float s = sin(angle);
+    float c = cos(angle);
+    return v * mat2(c, -s, s, c);
+}
+
 #ifdef PIXEL
 
 uniform float elapsed;
@@ -182,20 +188,21 @@ vec4 effect(vec4 vertex_color, Image image, vec2 texture_coords, vec2 vertex_pos
     vec2 pos = vertex_position / love_ScreenSize.xy;
     pos -= vec2(0.5);
     pos.x *= (love_ScreenSize.x / love_ScreenSize.y);
-    pos *= 2.5;
+    pos *= 1.5;
 
-    float weight = 1; // gaussian(distance(pos.xy, vec2(0)), 0, 3);
-    float scale = 10;
+    float weight = gaussian(distance(pos.xy, vec2(0)) * 2.2, 0.5, 0.5);
     float offset = 0.01;
-
+    vec2 rng_pos = pos.xy * weight * 10;
+    rng_pos = rotate(rng_pos, 2 * distance(pos.xy, vec2(0) / PI) + elapsed / 20);
     float rng = voronoise(
-        vec3(pos.xy * weight * scale, time),
+        vec3(rng_pos, time),
         sine_wave(time / 4, 0.4 - offset, 0.4 + offset),
-        0.2
+        0.7
     );
 
     float derivative = fwidth(rng);
-    return vec4(vec3(gaussian(derivative, 0.5, 0.15)), 1);
+    float value = 10 * derivative;
+    return vec4(vec3(value), 1);
 }
 
 #endif

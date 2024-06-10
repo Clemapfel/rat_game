@@ -335,8 +335,10 @@ function bt.SceneState.INSPECT:handle_button_pressed(button)
         self._background_only = true
         self:_update_control_indicator()
         return
-    elseif button == rt.InputButton.Y then
-        self._scene:transition(bt.SceneState.SIMULATION)
+    end
+
+    if button == rt.InputButton.B then
+        self._scene:transition(bt.Scene)
     end
 
     if self._current_node ~= nil then

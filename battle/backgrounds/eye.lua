@@ -37,7 +37,7 @@ function bt.Background.EYE:update(delta, intensity)
     self._elapsed = self._elapsed + delta
 
     self._last_intensity = self._current_intensity
-    self._current_intensity = intensity
+    self._current_intensity = which(intensity, 0)
     self._stimulus = self._stimulus - delta * (3 - math.abs(self._stimulus, 3))
     self._stimulus = self._stimulus + clamp(self._current_intensity - self._last_intensity, 0)
 end

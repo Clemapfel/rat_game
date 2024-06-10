@@ -60,8 +60,8 @@ function rt.LabeledSprite:size_allocate(x, y, width, height)
     local label_w, label_h = self._label:measure()
 
     self._label:fit_into(
-        x + width - 0.5 * label_w,
-        y + height - 0.8 * label_h,
+        x + res_x * scale - 1 * label_w,
+        y + res_y * scale - 1 * label_h,
         POSITIVE_INFINITY, label_h
     )
 end

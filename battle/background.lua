@@ -8,12 +8,13 @@ end
 
 -- ###
 
-bt.ShaderOnlyBackground = meta.new_type("ShaderOnlyBackground", bt.Background, function(path)
+bt.ShaderOnlyBackground = meta.new_type("ShaderOnlyBackground", bt.Background, function(path, disabled_elapsed)
     return meta.new(bt.ShaderOnlyBackground, {
         _path = path,
         _shader = {},   -- rt.Shader
         _shape = {},    -- rt.VertexShape
-        _elapsed = rt.random.number(0, 2^8)
+        _elapsed = rt.random.number(0, 2^8),
+        _disable_elapsed = disabled_elapsed
     })
 end)
 
@@ -36,7 +37,10 @@ end
 --- @override
 function bt.ShaderOnlyBackground:update(delta)
     self._elapsed = self._elapsed + delta
-    self._shader:send("elapsed", self._elapsed)
+
+    if self._disable_elapsed ~= false then
+        self._shader:send("elapsed", self._elapsed)
+    end
 end
 
 --- @override

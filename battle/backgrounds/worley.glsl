@@ -39,12 +39,6 @@ float gaussian(float x, float mean, float variance) {
     return exp(-pow(x - mean, 2.0) / variance);
 }
 
-
-float angle(vec2 v)
-{
-    return atan(v.y, v.x);
-}
-
 vec2 translate_point_by_angle(vec2 xy, float dist, float angle)
 {
     return xy + vec2(cos(angle), sin(angle)) * dist;
@@ -55,6 +49,18 @@ float laplacian_of_guassian(float x, float mean, float variance) {
     return (1.0 - (x * x) / (variance * variance)) * exp(-0.5 * (x * x) / (variance * variance));
 }
 
+// get angle of vector
+float angle(vec2 v)
+{
+    return (atan(v.y, v.x) + PI) / (2 * PI);
+}
+
+vec2 rotate(vec2 v, float angle) {
+    float s = sin(angle);
+    float c = cos(angle);
+    return v * mat2(c, -s, s, c);
+}
+
 #ifdef PIXEL
 
 uniform float elapsed;
@@ -62,17 +68,23 @@ uniform float elapsed;
 vec4 effect(vec4 vertex_color, Image image, vec2 texture_coords, vec2 vertex_position)
 {
     float time = elapsed / 5;
-    vec2 pos = vertex_position / love_ScreenSize.xy;
-    pos -= vec2(0.5);
-    pos.x *= (love_ScreenSize.x / love_ScreenSize.y);
-    pos *= 1;
+    vec2 pos = texture_coords.xy;
+    vec2 center = vec2(0.5);
 
-    float weight = gaussian(distance(pos.xy, vec2(0)), 0, 5);
-    float scale = 6;
-    float magnitude_01 = worley_noise(vec3(pos.xy * weight * scale, time));
-    magnitude_01 = clamp(laplacian_of_guassian(magnitude_01, 0, 1.0), 0, 1);
+    pos.x *= love_ScreenSize.x / love_ScreenSize.y;
+    center.x *= love_ScreenSize.x / love_ScreenSize.y;
 
-    return vec4(vec3(1 - magnitude_01), 1);
+    float factor = 1.5;
+    pos *= factor;
+    center *= factor;
+
+    float angle = atan(pos.y - center.y, pos.x - center.x);
+
+    pos.xy = rotate(pos.xy - center, elapsed / 20) + center;
+    float rng = worley_noise(vec3(pos.xy * 8, elapsed / 5)) * (((sin(elapsed) + 1) / 2 * 0.5) + 0.75);
+    float value = 1 - smoothstep(0, distance(pos.xy, center) * 5 * rng, 1);
+
+    return vec4(vec3(value), 1);
 }
 
 #endif
