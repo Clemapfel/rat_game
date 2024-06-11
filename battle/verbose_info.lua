@@ -356,10 +356,8 @@ function bt.VerboseInfo.Page.MOVE:realize()
     self._is_realized = true
     local move = self._move
 
-    local n_uses_suffix = ternary(self._n_uses == POSITIVE_INFINITY, "", "(<mono>" .. self._n_uses .. "</mono>)")
-
     local new_label = bt.VerboseInfo.Page._new_label
-    self._name_label = new_label(bt.VerboseInfo.Page._create_name(move:get_name()) .. n_uses_suffix)
+    self._name_label = new_label(bt.VerboseInfo.Page._create_name(move:get_name()))
 
     local sprite_id, sprite_index = move:get_sprite_id()
     self._sprite = rt.Sprite(sprite_id)
@@ -432,7 +430,13 @@ function bt.VerboseInfo.Page.MOVE:realize()
         end
     end
 
-    self._target_label = new_label("Targets <color=" .. gray .. "><b>:</b></color> ", target_str)
+    local stat_prefix = "<color=" .. gray .. "><b>:</b></color> "
+    self._n_uses_label_left = new_label("AP")
+    self._n_uses_label_right = new_label(stat_prefix, ternary(self._n_uses == POSITIVE_INFINITY, "unlimited", self._n_uses)) -- infinity
+
+    self._target_label_left = new_label("Targets")
+    self._target_label_right = new_label(stat_prefix, target_str)
+
     self._effect_label = new_label("<u>Effect</u> <color=" .. gray .. "><b>:</b></color> " .. move:get_description() .. ".")
 
     local prio = move:get_priority()
@@ -446,15 +450,24 @@ function bt.VerboseInfo.Page.MOVE:realize()
     end
 
     priority_str = priority_str .. prio
-    self._priority_label = new_label("Priority <color=" .. gray .. "><b>:</b></color> <mono><b>" .. priority_str .. "</b></mono>")
+    self._priority_label_left = new_label("Priority")
+    self._priority_label_right = new_label(stat_prefix, priority_str)
+    self._priority_label_visible = prio ~= 0
 
     self._content = {
         self._sprite,
         self._name_label,
         self._effect_label,
-        self._priority_label,
-        self._target_label,
+        self._n_uses_label_left,
+        self._n_uses_label_right,
+        self._target_label_left,
+        self._target_label_right,
     }
+
+    if self._priority_label_visible then
+        table.insert(self._content, self._priority_label_left)
+        table.insert(self._content, self._priority_label_right)
+    end
 end
 
 function bt.VerboseInfo.Page.MOVE:size_allocate(_, _, width, height)
@@ -479,12 +492,23 @@ function bt.VerboseInfo.Page.MOVE:size_allocate(_, _, width, height)
     max_x = math.max(max_x, w + m + sprite_w)
     current_y = current_y + sprite_h
 
-    self._priority_label:fit_into(current_x, current_y, label_w, label_h)
-    measure(self._priority_label)
+    local stat_align = current_x + 4 * self._name_label:get_font():get_size()
+
+    self._n_uses_label_left:fit_into(current_x, current_y, label_w, label_h)
+    self._n_uses_label_right:fit_into(stat_align, current_y, label_w, label_h)
+    measure(self._n_uses_label_right)
     current_y = current_y + h
 
-    self._target_label:fit_into(current_x, current_y, label_w, label_h)
-    measure(self._target_label)
+    if self._priority_label_visible then
+        self._priority_label_left:fit_into(current_x, current_y, label_w, label_h)
+        self._priority_label_right:fit_into(stat_align, current_y, label_w, label_h)
+        measure(self._priority_label_right)
+        current_y = current_y + h
+    end
+
+    self._target_label_left:fit_into(current_x, current_y, label_w, label_h)
+    self._target_label_right:fit_into(stat_align, current_y, label_w, label_h)
+    measure(self._target_label_right)
     current_y = current_y + h + m
 
     self._effect_label:fit_into(current_x, current_y, width, label_h)
