@@ -6,7 +6,8 @@ bt.VerboseInfo = meta.new_type("VerboseInfo", rt.Widget, function()
         _position_x = 0,
         _position_y = 0,
         _final_width = 0,
-        _final_height = 0
+        _final_height = 0,
+        _reformat_all = false
     })
 end)
 
@@ -77,10 +78,23 @@ end
 function bt.VerboseInfo:size_allocate(x, y, width, height)
     -- first pass, measure
     local max_width = 0
-    for pages in values(self._pages) do
-        for page in values(pages) do
-            page:fit_into(0, 0, POSITIVE_INFINITY, POSITIVE_INFINITY)
-            max_width = math.max(max_width, page._requested_width)
+
+    if self._reformat_all == true then
+        for pages in values(self._pages) do
+            if meta.isa(pages, bt.VerboseInfo.Page) then
+                pages:fit_into(0, 0, POSITIVE_INFINITY, POSITIVE_INFINITY)
+                max_width = math.max(max_width, pages._requested_width)
+            else
+                for page in values(pages) do
+                    page:fit_into(0, 0, POSITIVE_INFINITY, POSITIVE_INFINITY)
+                    max_width = math.max(max_width, page._requested_width)
+                end
+            end
+        end
+    else
+        for pages in values(self._visible_pages) do
+            pages:fit_into(0, 0, POSITIVE_INFINITY, POSITIVE_INFINITY)
+            max_width = math.max(max_width, pages._requested_width)
         end
     end
 
