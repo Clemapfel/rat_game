@@ -351,9 +351,9 @@ function bt.SceneState.ENTITY_SELECT:_update_selection()
     local prefix, postfix = "<o>", "</o>"
     if node.up ~= nil or node.right ~= nil or node.down ~= nil or node.left ~= nil then
         self._control_indicator:create_from({
+            {rt.ControlIndicatorButton.ALL_DIRECTIONS, prefix .. "Select Target" .. postfix},
             {rt.ControlIndicatorButton.B, prefix .. "Back" .. postfix},
             {rt.ControlIndicatorButton.A, prefix .. "Accept" .. postfix},
-            {rt.ControlIndicatorButton.ALL_DIRECTIONS, prefix .. "Select" .. postfix},
         })
     else
         self._control_indicator:create_from({
@@ -409,6 +409,9 @@ function bt.SceneState.ENTITY_SELECT:enter()
     self:_create()
 
     local bounds = scene:get_bounds()
+    local m = rt.settings.margin_unit
+    bounds.x = 2 * m
+    bounds.y = 2 * m
     self._control_indicator:fit_into(bounds)
 end
 

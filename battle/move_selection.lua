@@ -9,12 +9,22 @@ bt.MoveSelection = meta.new_type("MoveSelection", rt.Widget, rt.Animation, funct
         _base = rt.Spacer(),
 
         _verbose_info = bt.VerboseInfo(),
-        _current_tile_i = 1
+        _current_tile_i = 1,
+
+        _user = nil, -- bt.Entity
+        _moveset = {}, -- Table<bt.Move>
+
+        _y_offset = 0,
     })
 end)
 
 --- @brief
 function bt.MoveSelection:create_from(user, moveset)
+    self._user = user
+    self._moveset = moveset
+    self._tiles = {}
+    self._items = {}
+
     local to_show = {}
     for move in values(moveset) do
         local n_uses = user:get_move_n_uses_left(move)
@@ -38,6 +48,7 @@ function bt.MoveSelection:realize()
     self._frame:set_child(self._base)
     self._frame:realize()
     self._verbose_info:realize()
+    self._verbose_info:set_enforce_same_width_for_all(true)
 
     for item in values(self._items) do
         item:realize()
@@ -66,6 +77,9 @@ function bt.MoveSelection:size_allocate(x, y, width, height)
     local h = 5 * tile_h + 2 * m
 
     local frame_w, frame_h = w + 2 * thickness + 2 * m, h + 2 * thickness + 2 * m
+
+    self._y_offset = (y + 0.5 * height - 0.5 * frame_h) - y
+
     self._frame:fit_into(x, y, frame_w, frame_h)
     self._verbose_info:fit_into(x + frame_w + m, y, width - w, h)
 
@@ -85,7 +99,7 @@ function bt.MoveSelection:size_allocate(x, y, width, height)
     local current_x, current_y = start_x, start_y
     local tile_i = 1
     self._tiles = {}
-    while true do
+    while tile_i <= n_rows * n_columns do
         local item = self._items[tile_i]
         local move, n_uses = nil, nil
         if item ~= nil then
@@ -128,7 +142,6 @@ function bt.MoveSelection:size_allocate(x, y, width, height)
             current_y = current_y + tile_h + row_m
         end
 
-        if current_y > h then break end
         tile_i = tile_i + 1
     end
 
@@ -146,6 +159,9 @@ end
 --- @override
 function bt.MoveSelection:draw()
     if self._is_realized ~= true then return end
+
+    rt.graphics.translate(0, self._y_offset)
+
     self._frame:draw()
 
     for entry in values(self._tiles) do
@@ -162,6 +178,8 @@ function bt.MoveSelection:draw()
     end
 
     self._verbose_info:draw()
+
+    rt.graphics.translate(0, -1 * self._y_offset)
 end
 
 --- @brief [internal]
@@ -196,3 +214,12 @@ for direction in range("up", "right", "down", "left") do
     end
 end
 
+--- @brief
+function bt.MoveSelection:get_selected_move()
+    return self._tiles[self._current_tile_i].move
+end
+
+--- @brief
+function bt.MoveSelection:get_user()
+    return self._user
+end

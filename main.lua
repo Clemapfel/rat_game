@@ -2,23 +2,47 @@ require "include"
 
 rt.current_scene = bt.Scene()
 scene = rt.current_scene
-scene:set_background("WORLEY")
+scene:set_background("NOISE_BALL")
+--[[
+backgrounds = {
+    "GRADIENT_DERIVATIVE",
+    "WORLEY",
+    "CLOUDS",
+    "DOT_MATRIX",
+    "TOPOGRAPHY",
+    "VOROWORMS"
+}
+background_i = 1
+scene:set_background(backgrounds[background_i])
 
-
+input = rt.InputController()
+input:signal_connect("pressed", function(_, which)
+    if which == rt.InputButton.RIGHT then
+        background_i = background_i + 1
+        scene:set_background(backgrounds[background_i])
+    else
+        background_i = background_i - 1
+        scene:set_background(backgrounds[background_i])
+    end
+end)
+]]--
 --- ###
 
 love.load = function()
     rt.current_scene:realize()
     love.resize()
     scene:start_battle(bt.Battle("DEBUG_BATTLE"))
-    scene:transition(bt.SceneState.MOVE_SELECT)
+    scene:transition(nil) --bt.SceneState.MOVE_SELECT)
 end
+
 
 rt.graphics.frame_duration = {
     past_frames = {},
     n_frames_saved = 144,
     max = 0
 }
+rt.settings.show_rulers = false
+rt.settings.show_fps = true
 
 love.draw = function()
     local before = love.timer.getTime()
@@ -28,7 +52,7 @@ love.draw = function()
         rt.current_scene:draw()
     end
 
-    do -- show fps and frame usage
+    if rt.settings.show_fps == true then
         local fps = love.timer.getFPS()
         local frame_usage = math.round(rt.graphics.frame_duration.max / (1 / fps) * 100)
         local label = tostring(fps) .. " (" .. string.rep("0", math.abs(3 - #tostring(frame_usage))) .. frame_usage .. "%)"
@@ -37,7 +61,7 @@ love.draw = function()
         love.graphics.print(label, math.floor(rt.graphics.get_width() - love.graphics.getFont():getWidth(label) - 2 * margin), math.floor(0.5 * margin))
     end
 
-    do -- show rulers
+    if rt.settings.show_rulers == true then
         love.graphics.setLineWidth(1)
         local intensity = 0.1
         love.graphics.setColor(intensity, intensity, intensity, 1)

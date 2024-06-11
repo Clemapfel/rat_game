@@ -11,6 +11,10 @@ bt.VerboseInfo = meta.new_type("VerboseInfo", rt.Widget, function()
     })
 end)
 
+function bt.VerboseInfo:set_enforce_same_width_for_all(b)
+    self._reformat_all = b
+end
+
 function bt.VerboseInfo:_add(make_visible, ...)
     if make_visible then
         self._visible_pages = {}
@@ -461,7 +465,7 @@ function bt.VerboseInfo.Page.MOVE:realize()
 
     local stat_prefix = "<color=" .. gray .. "><b>:</b></color> "
     self._n_uses_label_left = new_label("AP")
-    self._n_uses_label_right = new_label(stat_prefix, ternary(self._n_uses == POSITIVE_INFINITY, "unlimited", self._n_uses)) -- infinity
+    self._n_uses_label_right = new_label(stat_prefix, ternary(self._n_uses == POSITIVE_INFINITY, "unlimited", self._n_uses .. " / " .. self._move:get_max_n_uses())) -- infinity
 
     self._target_label_left = new_label("Targets")
     self._target_label_right = new_label(stat_prefix, target_str)

@@ -232,10 +232,10 @@ function bt.SceneState.INSPECT:_create()
 
     self._control_indicator = rt.ControlIndicator()
     self._control_indicator:realize()
-    self._control_indicator:fit_into(0, 0, POSITIVE_INFINITY, POSITIVE_INFINITY)
+    local m = rt.settings.margin_unit
+    self._control_indicator:fit_into(2 * m, 2 * m, POSITIVE_INFINITY, POSITIVE_INFINITY)
 
     self._verbose_info:realize()
-    local m = rt.settings.margin_unit
     local bounds = self._scene._bounds
     self._verbose_info:fit_into(0, 0, bounds.height - 2 * m, bounds.width - 2 * m)
     self:_update_selection()
@@ -317,11 +317,10 @@ function bt.SceneState.INSPECT:_update_control_indicator()
         self._control_indicator:set_opacity(0.5)
     else
         self._control_indicator:create_from({
-            {rt.ControlIndicatorButton.B, prefix .. "Back" .. postfix},
             {rt.ControlIndicatorButton.ALL_DIRECTIONS, prefix .. "Select" .. postfix},
+            {rt.ControlIndicatorButton.B, prefix .. "Return" .. postfix},
             {rt.ControlIndicatorButton.L, prefix .. "Previous" .. postfix},
             {rt.ControlIndicatorButton.R, prefix .. "Next" .. postfix},
-            {rt.ControlIndicatorButton.Y, prefix .. "View Team TODO" .. postfix},
             {rt.ControlIndicatorButton.X, prefix .. "Hide" .. postfix},
         })
         self._control_indicator:set_opacity(1)
@@ -338,7 +337,7 @@ function bt.SceneState.INSPECT:handle_button_pressed(button)
     end
 
     if button == rt.InputButton.B then
-        self._scene:transition(bt.Scene)
+        self._scene:transition(bt.SceneState.MOVE_SELECT)
     end
 
     if self._current_node ~= nil then
