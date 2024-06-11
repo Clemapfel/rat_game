@@ -84,7 +84,7 @@ vec4 effect(vec4 vertex_color, Image image, vec2 texture_coords, vec2 vertex_pos
     float rng = worley_noise(vec3(pos.xy * 8, elapsed / 5)) * (((sin(elapsed) + 1) / 2 * 0.5) + 0.75);
     float value = 1 - smoothstep(0, distance(pos.xy, center) * 5 * rng, 1);
 
-    return vec4(vec3(value), 1);
+    return vec4(vec3(value * 0.2), 1);
 }
 
 #endif

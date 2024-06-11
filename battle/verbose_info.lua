@@ -182,7 +182,7 @@ bt.VerboseInfo.Page._create_stat_prefix = function(label)
 end
 
 bt.VerboseInfo.Page._create_name = function(name)
-    return bt.VerboseInfo.Page._new_label("<u><b>", name, "</b></u> ")
+    return "<u><b>" .. name .. "</b></u> "
 end
 
 function bt.VerboseInfo.Page._create_offset_label(x)
@@ -220,7 +220,7 @@ function bt.VerboseInfo.Page.ENTITY:realize()
 
     local entity = self._entity
     local new_label = bt.VerboseInfo.Page._new_label
-    self._name_label = bt.VerboseInfo.Page._create_name(entity:get_name())
+    self._name_label = new_label(bt.VerboseInfo.Page._create_name(entity:get_name()))
 
     local gray = bt.VerboseInfo.Page._gray
     local number_prefix = bt.VerboseInfo.Page._number_prefix
@@ -345,9 +345,10 @@ end
 
 --- ### MOVE ###
 
-bt.VerboseInfo.Page.MOVE = meta.new_type("VerboseInfoPage_MOVE", bt.VerboseInfo.Page, function(move)
+bt.VerboseInfo.Page.MOVE = meta.new_type("VerboseInfoPage_MOVE", bt.VerboseInfo.Page, function(move, n_uses)
     return meta.new(bt.VerboseInfo.Page.MOVE, {
-        _move = move
+        _move = move,
+        _n_uses = n_uses
     })
 end)
 
@@ -355,8 +356,10 @@ function bt.VerboseInfo.Page.MOVE:realize()
     self._is_realized = true
     local move = self._move
 
+    local n_uses_suffix = ternary(self._n_uses == POSITIVE_INFINITY, "", "(<mono>" .. self._n_uses .. "</mono>)")
+
     local new_label = bt.VerboseInfo.Page._new_label
-    self._name_label = bt.VerboseInfo.Page._create_name(move:get_name())
+    self._name_label = new_label(bt.VerboseInfo.Page._create_name(move:get_name()) .. n_uses_suffix)
 
     local sprite_id, sprite_index = move:get_sprite_id()
     self._sprite = rt.Sprite(sprite_id)
@@ -490,14 +493,6 @@ function bt.VerboseInfo.Page.MOVE:size_allocate(_, _, width, height)
 
     self._sprite:fit_into(width - sprite_w, 0, sprite_w, sprite_h)
 
-    self._content = {
-        self._sprite,
-        self._name_label,
-        self._effect_label,
-        self._priority_label,
-        self._target_label,
-    }
-
     self._requested_width, self._requested_height = max_x, current_y
 end
 
@@ -517,7 +512,7 @@ function bt.VerboseInfo.Page.STATUS:realize()
 
     local new_label = bt.VerboseInfo.Page._new_label
 
-    self._name_label = bt.VerboseInfo.Page._create_name(status:get_name())
+    self._name_label = new_label(bt.VerboseInfo.Page._create_name(status:get_name()))
     self._sprite = rt.Sprite(status:get_sprite_id())
     self._sprite:realize()
 
@@ -676,7 +671,7 @@ function bt.VerboseInfo.Page.GLOBAL_STATUS:realize()
 
     local new_label = bt.VerboseInfo.Page._new_label
 
-    self._name_label = bt.VerboseInfo.Page._create_name(status:get_name())
+    self._name_label = new_label(bt.VerboseInfo.Page._create_name(status:get_name()))
     self._sprite = rt.Sprite(status:get_sprite_id())
     self._sprite:realize()
 
@@ -758,7 +753,7 @@ function bt.VerboseInfo.Page.CONSUMABLE:realize()
     local new_label = bt.VerboseInfo.Page._new_label
 
     local n_uses_postfix = "(" .. ternary(consumable:get_max_n_uses() == POSITIVE_INFINITY, "\u{221E}", n_uses_left) .. ")"
-    self._name_label = bt.VerboseInfo.Page._create_name(consumable:get_name())
+    self._name_label = new_label(bt.VerboseInfo.Page._create_name(consumable:get_name()))
     self._sprite = rt.Sprite(consumable:get_sprite_id())
     self._sprite:realize()
 
@@ -834,7 +829,7 @@ function bt.VerboseInfo.Page.EQUIP:realize()
     local equip = self._equip
 
     local new_label = bt.VerboseInfo.Page._new_label
-    self._name_label = bt.VerboseInfo.Page._create_name(equip:get_name())
+    self._name_label = new_label(bt.VerboseInfo.Page._create_name(equip:get_name()))
     self._sprite = rt.Sprite(equip:get_sprite_id())
     self._sprite:realize()
 

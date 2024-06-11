@@ -161,6 +161,8 @@ require "battle.battle_ui"
 require "battle.scene_state"
 require "battle.scene_state_inspect"
 require "battle.scene_state_simulation"
+require "battle.move_selection_item"
+require "battle.move_selection"
 require "battle.scene_state_move_select"
 require "battle.scene_state_entity_select"
 

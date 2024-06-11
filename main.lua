@@ -2,28 +2,8 @@ require "include"
 
 rt.current_scene = bt.Scene()
 scene = rt.current_scene
-scene:set_background("CLOUDS")
+scene:set_background("WORLEY")
 
-background_i = 1
-backgrounds = {
-    "CLOUDS",
-    "DOT_MATRIX",
-    "GRADIENT_DERIVATIVE",
-    "VOROWORMS",
-    "TOPOGRAPHY",
-    "WORLEY"
-}
-
-input = rt.InputController()
-input:signal_connect("pressed", function(_, which)
-    if which == rt.InputButton.RIGHT then
-        scene:set_background(backgrounds[background_i])
-        background_i = background_i + 1
-    elseif which == rt.InputButton.LEFT then
-        scene:set_background(backgrounds[background_i])
-        background_i = background_i - 1
-    end
-end)
 
 --- ###
 
@@ -31,7 +11,7 @@ love.load = function()
     rt.current_scene:realize()
     love.resize()
     scene:start_battle(bt.Battle("DEBUG_BATTLE"))
-    scene:transition(nil) --bt.SceneState.MOVE_SELECT)
+    scene:transition(bt.SceneState.MOVE_SELECT)
 end
 
 rt.graphics.frame_duration = {
@@ -57,7 +37,6 @@ love.draw = function()
         love.graphics.print(label, math.floor(rt.graphics.get_width() - love.graphics.getFont():getWidth(label) - 2 * margin), math.floor(0.5 * margin))
     end
 
-    --[[
     do -- show rulers
         love.graphics.setLineWidth(1)
         local intensity = 0.1
@@ -74,7 +53,6 @@ love.draw = function()
         love.graphics.line(x + 0.5 * width, y, x + 0.5 * width, height)
         rt.graphics.set_blend_mode()
     end
-    ]]--
 
     love.graphics.reset()
 end
