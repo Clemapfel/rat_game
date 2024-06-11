@@ -116,39 +116,23 @@ vec4 effect(vec4 vertex_color, Image image, vec2 texture_coords, vec2 vertex_pos
     vec2 pos = texture_coords.xy;
     pos.x *= love_ScreenSize.x / love_ScreenSize.y;
 
-    float n_rows = 1;
-    float radius = 1 / n_rows;
-    float grid_size = radius * 2;
+    float radius = 0.6;
+    vec2 center = vec2(0.5, 0.5);
+    center.x *= love_ScreenSize.x / love_ScreenSize.y;
 
-    /*
-    float sum = 0;
-    for (int x_i = 1; x_i < grid_size; x_i += 1) {
-        for (int y_i = 1; y_i < grid_size; y_i += 1) {
-
-        }
-    }
-*/
-
-    int x_i = int(floor(pos.x / grid_size));
-    int y_i = int(floor(pos.y / grid_size));
-
-    float sum = 0;
-    vec2 center = vec2(float(x_i) * grid_size + radius, float(y_i) * grid_size + radius);
-
-    const float scale = 7; // spikyness of rng
-    const float amplitude = 0.05;
+    const float scale = 20; // spikyness of rng
+    const float amplitude = 0.1;
     vec2 rng_pos = translate_point_by_angle(vec2(0.5), 0.5, angle(pos - center));
-    rng_pos = rng_pos - center + vec2(x_i, y_i);
     radius = radius + project(voronoise(vec3(rng_pos * scale, time), 1), -amplitude, +amplitude);
     float dist = (radius - distance(pos, center)) * 3;
 
     float border = 0.005;
-    float value = 1 - smoothstep(dist - border, dist + border, distance(pos, center)) * 0.3;
+    float value = 1 - smoothstep(dist - border, dist + border, distance(pos, center));
+    dist += elapsed;
+    float hue = sin(worley_noise(vec3(dist, dist, dist))) * (1 - gaussian(distance(pos, center), 0, 0.4));
 
-    float hue = worley_noise(vec3(dist, dist, dist));
-    sum = max(sum, hue * value * sin(gaussian(distance(pos, center), 0, 0.05)));
-
-    return vec4(vec3(sum), 1);
+    return vec4(vec3(value * hue), 1);
+    return vec4(hsv_to_rgb(vec3(hue, 1, value)), 1);
 }
 
 #endif
