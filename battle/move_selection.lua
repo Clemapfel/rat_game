@@ -15,12 +15,16 @@ end)
 
 --- @brief
 function bt.MoveSelection:create_from(user, moveset)
+    local to_show = {}
     for move in values(moveset) do
-        local to_insert = bt.MoveSelectionItem(move, user:get_move_n_uses_left(move))
+        local n_uses = user:get_move_n_uses_left(move)
+        local to_insert = bt.MoveSelectionItem(move, n_uses)
+        table.insert(to_show, {move, n_uses})
         if self._is_realized then to_insert:realize() end
         table.insert(self._items, to_insert)
     end
 
+    self._verbose_info:add(table.unpack(to_show))
     if self._is_realized == true then
         self:reformat()
     end

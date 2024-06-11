@@ -42,8 +42,7 @@ end, {
     animation_id = "",
     animation_index = 1,
 
-    description = "<No Effect>",
-    bonus_description = "<No Bonus>"
+    description = "(no effect)",
 })
 bt.Move._atlas = {}
 

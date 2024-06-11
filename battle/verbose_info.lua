@@ -10,10 +10,10 @@ bt.VerboseInfo = meta.new_type("VerboseInfo", rt.Widget, function()
     })
 end)
 
---- @brief
---- @vararg Table<Table<bt.Any, Number?>>
-function bt.VerboseInfo:show(...)
-    self._visible_pages = {}
+function bt.VerboseInfo:_add(make_visible, ...)
+    if make_visible then
+        self._visible_pages = {}
+    end
     for t in range(...) do
         local object = t[1]
         local page
@@ -54,19 +54,34 @@ function bt.VerboseInfo:show(...)
             end
         end
 
-        table.insert(self._visible_pages, page)
+        if make_visible then
+            table.insert(self._visible_pages, page)
+        end
     end
 
     self:reformat()
+end
+
+--- @brief cache all infos immediately
+function bt.VerboseInfo:add(...)
+    self:_add(false, ...)
+end
+
+--- @brief
+--- @vararg Table<Table<bt.Any, Number?>>
+function bt.VerboseInfo:show(...)
+    self:_add(true, ...)
 end
 
 --- @override
 function bt.VerboseInfo:size_allocate(x, y, width, height)
     -- first pass, measure
     local max_width = 0
-    for page in values(self._visible_pages) do
-        page:fit_into(0, 0, POSITIVE_INFINITY, POSITIVE_INFINITY)
-        max_width = math.max(max_width, page._requested_width)
+    for pages in values(self._pages) do
+        for page in values(pages) do
+            page:fit_into(0, 0, POSITIVE_INFINITY, POSITIVE_INFINITY)
+            max_width = math.max(max_width, page._requested_width)
+        end
     end
 
     local max_x, max_y = NEGATIVE_INFINITY, NEGATIVE_INFINITY
@@ -499,17 +514,20 @@ function bt.VerboseInfo.Page.MOVE:size_allocate(_, _, width, height)
     measure(self._n_uses_label_right)
     current_y = current_y + h
 
+    self._target_label_left:fit_into(current_x, current_y, label_w, label_h)
+    self._target_label_right:fit_into(stat_align, current_y, label_w, label_h)
+    measure(self._target_label_right)
+    current_y = current_y + h
+
+
     if self._priority_label_visible then
         self._priority_label_left:fit_into(current_x, current_y, label_w, label_h)
         self._priority_label_right:fit_into(stat_align, current_y, label_w, label_h)
         measure(self._priority_label_right)
-        current_y = current_y + h
+        current_y = current_y + h + m
+    else
+        current_y = current_y + m
     end
-
-    self._target_label_left:fit_into(current_x, current_y, label_w, label_h)
-    self._target_label_right:fit_into(stat_align, current_y, label_w, label_h)
-    measure(self._target_label_right)
-    current_y = current_y + h + m
 
     self._effect_label:fit_into(current_x, current_y, width, label_h)
     w, h = self._effect_label:measure()
