@@ -116,7 +116,7 @@ vec4 effect(vec4 vertex_color, Image image, vec2 texture_coords, vec2 vertex_pos
     vec2 pos = texture_coords.xy;
     pos.x *= love_ScreenSize.x / love_ScreenSize.y;
 
-    float n_rows = 10;
+    float n_rows = 1;
     float radius = 1 / n_rows;
     float grid_size = radius * 2;
 
@@ -131,6 +131,8 @@ vec4 effect(vec4 vertex_color, Image image, vec2 texture_coords, vec2 vertex_pos
 
     int x_i = int(floor(pos.x / grid_size));
     int y_i = int(floor(pos.y / grid_size));
+
+    float sum = 0;
     vec2 center = vec2(float(x_i) * grid_size + radius, float(y_i) * grid_size + radius);
 
     const float scale = 7; // spikyness of rng
@@ -144,8 +146,9 @@ vec4 effect(vec4 vertex_color, Image image, vec2 texture_coords, vec2 vertex_pos
     float value = 1 - smoothstep(dist - border, dist + border, distance(pos, center)) * 0.3;
 
     float hue = worley_noise(vec3(dist, dist, dist));
-    return vec4(vec3(hue * value), 1);
-    return vec4(hsv_to_rgb(vec3(hue, 1, value)), 1);
+    sum = max(sum, hue * value * sin(gaussian(distance(pos, center), 0, 0.05)));
+
+    return vec4(vec3(sum), 1);
 }
 
 #endif
