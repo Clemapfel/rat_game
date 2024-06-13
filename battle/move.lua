@@ -109,9 +109,17 @@ function bt.Move:get_can_target_ally()
     return self.can_target_ally
 end
 
+function bt.Move:get_can_target_allies()
+    return self:get_can_target_ally()
+end
+
 --- @brief
 function bt.Move:get_can_target_enemy()
     return self.can_target_enemy
+end
+
+function bt.Move:get_can_target_enemies()
+    return self:get_can_target_enemy()
 end
 
 --- @brief

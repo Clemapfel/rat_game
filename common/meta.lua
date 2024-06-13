@@ -517,6 +517,7 @@ function meta.new_type(typename, ...)
     return out
 end
 
+--- @brief
 function meta.new_abstract_type(name, ...)
     local to_splat = {}
     table.insert(to_splat, function()

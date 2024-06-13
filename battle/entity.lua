@@ -8,12 +8,10 @@ bt.EntityState = meta.new_enum({
     DEAD = "DEAD"
 })
 
-bt.Gender = meta.new_enum({
-    NEUTRAL = "NEUTRAL",
-    MALE = "MALE",
-    FEMALE = "FEMALE",
-    MULTIPLE = "MULTIPLE",
-    UNKNOWN = "UNKNOWN"
+bt.AILevel = meta.new_enum({
+    RANDOM = 0,
+    LEVEL_1 = 1,
+    LEVEL_2 = 2
 })
 
 --- @class bt.Entity
@@ -66,7 +64,8 @@ end, {
     dead_sprite_id = nil,
     dead_sprite_index = nil,
 
-    description = "(no description)"
+    description = "(no description)",
+    ai_level = bt.AILevel.RANDOM,
 })
 
 --- @brief
@@ -83,6 +82,7 @@ function bt.Entity:realize()
         defense_base = rt.UNSIGNED,
         speed_base = rt.UNSIGNED,
 
+        ai_level = rt.UNSIGNED,
         sprite_id = rt.STRING,
         sprite_index = {rt.UNSIGNED, rt.STRING},
 
@@ -552,4 +552,9 @@ end
 --- @brief
 function bt.Entity:get_description()
     return self.description
+end
+
+--- @brief
+function bt.Entity:get_ai_level()
+    return self.ai_level
 end

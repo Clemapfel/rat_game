@@ -1,8 +1,8 @@
 --- @class bt.Scene
 bt.Scene = meta.new_type("BattleScene", rt.Widget, function()
     return meta.new(bt.Scene, {
-        _states = {}, -- Table<bt.SceneState>
         _current_state = nil,
+        _state_manager = {}, -- bt.SceneStateManager
         _input_controller = rt.InputController(),
 
         _log = {}, -- rt.TextBox
@@ -24,15 +24,24 @@ function bt.Scene:realize()
     if self._is_realized == true then return end
     self._is_realized = true
 
+    self._state_manager = bt.SceneStateManager(self)
     self._input_controller:signal_connect("pressed", function(_, button)
         if self._current_state ~= nil then
             self._current_state:handle_button_pressed(button)
+        end
+
+        if self._state_manager ~= nil then
+            self._state_manager:handle_button_pressed(button)
         end
     end)
 
     self._input_controller:signal_connect("released", function(_, button)
         if self._current_state ~= nil then
             self._current_state:handle_button_released(button)
+        end
+
+        if self._state_manager ~= nil then
+            self._state_manager:handle_button_released(button)
         end
     end)
 
@@ -157,30 +166,23 @@ end
 
 --- @brief
 function bt.Scene:transition(new_state)
+    meta.assert_isa(new_state, bt.SceneState)
+
     if self._is_realized == false then
         self:realize()
     end
 
-    if new_state == nil then
-        self._current_state = nil
-        return
+    local last_state = self._current_state
+    local next_state = new_state
+
+    self._current_state = next_state
+
+    if last_state ~= nil then
+        last_state:exit()
     end
 
-    local current = self._current_state
-    local next = self._states[new_state]
-
-    if next == nil then
-        next = new_state(self)
-        self._states[new_state] = next
-    end
-
-    if current ~= nil then
-        current:exit()
-    end
-
-    self._current_state = next
-    if next ~= nil then
-        next:enter()
+    if next_state ~= nil then
+        next_state:enter()
     end
 end
 

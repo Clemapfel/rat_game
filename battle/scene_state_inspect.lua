@@ -2,9 +2,8 @@ rt.settings.battle.scene.inspect = {
     show_hide_button = rt.InputButton.X,
 }
 
-
 --- @class bt.SceneState.INSPECT
-bt.SceneState.INSPECT = meta.new_type("INSPECT", function(scene)
+bt.SceneState.INSPECT = meta.new_type("INSPECT", bt.SceneState, function(scene)
     local out = meta.new(bt.SceneState.INSPECT, {
         _scene = scene,
 
@@ -316,9 +315,11 @@ function bt.SceneState.INSPECT:_update_control_indicator()
         })
         self._control_indicator:set_opacity(0.5)
     else
+        local command_prefix = rt.settings.battle.scene_state.control_indicator_command_prefix
+        local command_postfix = rt.settings.battle.scene_state.control_indicator_command_postfix
         self._control_indicator:create_from({
-            {rt.ControlIndicatorButton.ALL_DIRECTIONS, prefix .. "Select" .. postfix},
-            {rt.ControlIndicatorButton.B, prefix .. "Return" .. postfix},
+            {rt.ControlIndicatorButton.ALL_DIRECTIONS, prefix .. command_prefix .. "Inspect" .. command_postfix .. postfix},
+            {rt.ControlIndicatorButton.B, prefix .. "Back" .. postfix},
             {rt.ControlIndicatorButton.L, prefix .. "Previous" .. postfix},
             {rt.ControlIndicatorButton.R, prefix .. "Next" .. postfix},
             {rt.ControlIndicatorButton.X, prefix .. "Hide" .. postfix},
@@ -334,10 +335,6 @@ function bt.SceneState.INSPECT:handle_button_pressed(button)
         self._background_only = true
         self:_update_control_indicator()
         return
-    end
-
-    if button == rt.InputButton.B then
-        self._scene:transition(bt.SceneState.MOVE_SELECT)
     end
 
     if self._current_node ~= nil then

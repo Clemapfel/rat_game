@@ -2,39 +2,16 @@ require "include"
 
 rt.current_scene = bt.Scene()
 scene = rt.current_scene
-scene:set_background("NOISE_BALL")
---[[
-backgrounds = {
-    "GRADIENT_DERIVATIVE",
-    "WORLEY",
-    "CLOUDS",
-    "DOT_MATRIX",
-    "TOPOGRAPHY",
-    "VOROWORMS"
-}
-background_i = 1
-scene:set_background(backgrounds[background_i])
+scene:set_background("WORLEY")
 
-input = rt.InputController()
-input:signal_connect("pressed", function(_, which)
-    if which == rt.InputButton.RIGHT then
-        background_i = background_i + 1
-        scene:set_background(backgrounds[background_i])
-    else
-        background_i = background_i - 1
-        scene:set_background(backgrounds[background_i])
-    end
-end)
-]]--
 --- ###
 
 love.load = function()
     rt.current_scene:realize()
     love.resize()
     scene:start_battle(bt.Battle("DEBUG_BATTLE"))
-    scene:transition(nil) --bt.SceneState.MOVE_SELECT)
+    scene._state_manager:start_turn()
 end
-
 
 rt.graphics.frame_duration = {
     past_frames = {},

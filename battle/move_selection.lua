@@ -78,7 +78,7 @@ function bt.MoveSelection:size_allocate(x, y, width, height)
 
     local frame_w, frame_h = w + 2 * thickness + 2 * m, h + 2 * thickness + 2 * m
 
-    self._y_offset = (y + 0.5 * height - 0.5 * frame_h) - y
+    self._y_offset = 0-- (y + 0.5 * height - 0.5 * frame_h) - y
 
     self._frame:fit_into(x, y, frame_w, frame_h)
     self._verbose_info:fit_into(x + frame_w + m, y, width - w, h)

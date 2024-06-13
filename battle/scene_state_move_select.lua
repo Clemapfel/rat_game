@@ -3,12 +3,12 @@ rt.settings.battle.scene.move_select = {
 }
 
 --- @class bt.SceneState.MOVE_SELECT
-bt.SceneState.MOVE_SELECT = meta.new_type("MOVE_SELECT", function(scene)
+bt.SceneState.MOVE_SELECT = meta.new_type("MOVE_SELECT", bt.SceneState, function(scene, user)
     local out = meta.new(bt.SceneState.MOVE_SELECT, {
         _scene = scene,
         _area = rt.AABB(0, 0, 1, 1),
 
-        _user = scene._state:list_party()[1],
+        _user = user,
         _move_selection = bt.MoveSelection(),
         _control_indicator = {}, -- rt.ControlIndicator
     })
@@ -97,12 +97,6 @@ end
 function bt.SceneState.MOVE_SELECT:handle_button_pressed(button)
     local scene = self._scene
 
-    if button == rt.InputButton.A then
-        self._scene:transition(bt.SceneState.ENTITY_SELECT)
-    elseif button == rt.InputButton.Y then
-        self._scene:transition(bt.SceneState.INSPECT)
-    end
-
     local should_update = true
     if button == rt.InputButton.UP then
         self._move_selection:move_up()
@@ -139,8 +133,11 @@ function bt.SceneState.MOVE_SELECT:enter()
         self._control_indicator = rt.ControlIndicator()
         self._control_indicator:realize()
     end
+
+    local command_prefix = rt.settings.battle.scene_state.control_indicator_command_prefix
+    local command_postfix = rt.settings.battle.scene_state.control_indicator_command_postfix
     self._control_indicator:create_from({
-        {rt.ControlIndicatorButton.ALL_DIRECTIONS, prefix .. "Select Move" .. postfix},
+        {rt.ControlIndicatorButton.ALL_DIRECTIONS, prefix .. command_prefix .. "Select Move" .. command_postfix .. postfix},
         {rt.ControlIndicatorButton.A, prefix .. "Accept" .. postfix},
         {rt.ControlIndicatorButton.B, prefix .. "Back" .. postfix},
         {rt.ControlIndicatorButton.Y, prefix .. "Inspect" .. postfix}
@@ -200,4 +197,14 @@ function bt.SceneState.MOVE_SELECT:draw()
 
     self._control_indicator:draw()
     self._move_selection:draw()
+end
+
+--- @brief
+function bt.SceneState.MOVE_SELECT:get_user()
+    return self._user
+end
+
+--- @brief
+function bt.SceneState.MOVE_SELECT:get_move()
+    return self._move_selection:get_selected_move()
 end

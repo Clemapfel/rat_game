@@ -1,8 +1,9 @@
 --- @class bt.SceneState.ENTITY_SELECT
-bt.SceneState.ENTITY_SELECT = meta.new_type("ENTITY_SELECT", function(scene)
+bt.SceneState.ENTITY_SELECT = meta.new_type("ENTITY_SELECT", bt.SceneState, function(scene, user, move)
     local out = meta.new(bt.SceneState.ENTITY_SELECT, {
         _scene = scene,
-
+        _user = user,
+        _move = move,
         _nodes = {},
         _current_node = nil,
         _unselected_entities = {},
@@ -17,10 +18,8 @@ end)
 function bt.SceneState.ENTITY_SELECT:_create()
     local scene = self._scene
 
-    -- TODO
-    local user = self._scene._state:list_party()[1]
-    local move = bt.Move("DEBUG_MOVE")
-    -- TODO
+    local user = self._user
+    local move = self._move
 
     local can_target_multiple = move:get_can_target_multiple()
     local can_target_self = move:get_can_target_self()
@@ -349,18 +348,13 @@ function bt.SceneState.ENTITY_SELECT:_update_selection()
 
     local node = self._current_node
     local prefix, postfix = "<o>", "</o>"
-    if node.up ~= nil or node.right ~= nil or node.down ~= nil or node.left ~= nil then
-        self._control_indicator:create_from({
-            {rt.ControlIndicatorButton.ALL_DIRECTIONS, prefix .. "Select Target" .. postfix},
-            {rt.ControlIndicatorButton.B, prefix .. "Back" .. postfix},
-            {rt.ControlIndicatorButton.A, prefix .. "Accept" .. postfix},
-        })
-    else
-        self._control_indicator:create_from({
-            {rt.ControlIndicatorButton.B, prefix .. "Back" .. postfix},
-            {rt.ControlIndicatorButton.A, prefix .. "Accept" .. postfix},
-        })
-    end
+    local command_prefix = rt.settings.battle.scene_state.control_indicator_command_prefix
+    local command_postfix = rt.settings.battle.scene_state.control_indicator_command_postfix
+    self._control_indicator:create_from({
+        {rt.ControlIndicatorButton.ALL_DIRECTIONS, prefix .. command_prefix .. "Select Target" .. command_postfix .. postfix},
+        {rt.ControlIndicatorButton.B, prefix .. "Back" .. postfix},
+        {rt.ControlIndicatorButton.A, prefix .. "Accept" .. postfix},
+    })
 end
 
 --- @override
@@ -385,10 +379,6 @@ function bt.SceneState.ENTITY_SELECT:handle_button_pressed(button)
         move("down")
     elseif button == rt.InputButton.LEFT then
         move("left")
-    elseif button == rt.InputButton.A then
-        -- TODO: move on to next selection
-    elseif button == rt.InputButton.B then
-        scene:transition(bt.SceneState.MOVE_SELECT)
     end
 end
 
@@ -478,6 +468,7 @@ function bt.SceneState.ENTITY_SELECT:draw()
 
     self._control_indicator:draw()
 
+    --[[
     -- DEBUG draw selection graph
     for node in values(self._nodes) do
         local from_x, from_y = node.centroid_x, node.centroid_y
@@ -504,4 +495,5 @@ function bt.SceneState.ENTITY_SELECT:draw()
             end
         end
     end
+    ]]--
 end

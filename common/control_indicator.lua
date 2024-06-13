@@ -10,6 +10,8 @@ rt.ControlIndicator = meta.new_type("ControlIndicator", rt.Widget, function(layo
         _layout = which(layout, {}),
         _sprites = {},
         _labels = {},
+        _frame = rt.Frame(),
+        _base = rt.Spacer(),
         _opacity = 1,
         _final_width = 1,
         _final_height = 1
@@ -39,6 +41,9 @@ function rt.ControlIndicator:realize()
     self._is_realized = true
 
     self:create_from(self._layout)
+
+    self._frame:set_child(self._base)
+    self._frame:realize()
 end
 
 --- @brief
@@ -84,23 +89,29 @@ function rt.ControlIndicator:size_allocate(x, y, width, height)
         label:fit_into(current_x + sprite_w + m, current_y + 0.5 * math.max(sprite_h, label_h) - 0.5 * math.min(sprite_h, label_h), POSITIVE_INFINITY, label_h)
 
         --current_y = current_y + math.max(sprite_h, label_h)
-        current_x = current_x + sprite_w + m + label_w + 3 * m
-
         label_w, label_h = label:measure()
-        max_x = math.max(max_x, current_x + sprite_w + m + label_w)
+        max_x = math.max(max_x, current_x + sprite_w + label_w + 3 * m)
         max_y = math.max(max_y, current_y + math.max(sprite_h, label_h))
+
+        current_x = current_x + sprite_w + m + label_w + 3 * m
     end
 
-    self._final_width = max_x - x
-    self._final_height = max_y - y
+    local thickness = self._frame:get_thickness()
+    self._final_width = max_x - x + 2 * thickness
+    self._final_height = max_y - y + 2 * thickness
+
+    self._frame:fit_into(x, y, self._final_width, self._final_height)
 end
 
 --- @override
 function rt.ControlIndicator:draw()
+    self._frame:draw()
+
     for i = 1, #self._labels do
         local sprite, label = self._sprites[i], self._labels[i]
         sprite:draw()
         label:draw()
+        label:draw_bounds()
     end
 end
 
