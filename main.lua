@@ -4,9 +4,10 @@ rt.current_scene = bt.Scene()
 scene = rt.current_scene
 scene:set_background("WORLEY")
 
-sprite = rt.Sprite(bt.Entity("GIRL"):get_sprite_id())
-sprite:realize()
-sprite:fit_into(50, 50, 50, 50)
+input = rt.InputController()
+input:signal_connect("pressed", function(_, which)
+
+end)
 
 --- ###
 

@@ -152,6 +152,10 @@ function bt.SceneState.MOVE_SELECT:enter()
     self._control_indicator:fit_into(indicator_bounds)
     self:_create()
     self:_update_selection()
+
+    for entity in values(self._scene._state:list_party()) do
+        self._scene:get_sprite(entity):set_sprite_visible(entity == self._user)
+    end
 end
 
 --- @override
@@ -159,6 +163,10 @@ function bt.SceneState.MOVE_SELECT:exit()
     for entity in values(self._scene._state:list_entities()) do
         self._scene:get_sprite(entity):set_selection_state(bt.SelectionState.INACTIVE)
         self._scene._priority_queue:set_selection_state(entity, bt.SelectionState.INACTIVE)
+    end
+
+    for entity in values(self._scene._state:list_party()) do
+        self._scene:get_sprite(entity):set_sprite_visible(false)
     end
 end
 

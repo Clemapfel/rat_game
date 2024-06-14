@@ -60,6 +60,7 @@ function bt.SceneStateManager:start_turn()
         move_select[entity_i] = {
             state = bt.SceneState.MOVE_SELECT(scene, ally),
             [rt.InputButton.A] = function(self)
+                if self.state:get_move() == nil then return nil end
                 return {
                     -- ENTITY_SELECT (depends on previous state)
                     state = bt.SceneState.ENTITY_SELECT(scene, self.state:get_user(), self.state:get_move()),
@@ -101,8 +102,11 @@ function bt.SceneStateManager:handle_button_pressed(button)
     if self._current_node ~= nil then
         local next_f = self._current_node[button]
         if next_f ~= nil then
-            self._current_node = next_f(self._current_node)
-            self._scene:transition(self._current_node.state)
+            local next_node = next_f(self._current_node)
+            if next_node ~= nil then
+                self._current_node = next_node
+                self._scene:transition(self._current_node.state)
+            end
         end
     end
 end

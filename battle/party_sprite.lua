@@ -1,5 +1,6 @@
 rt.settings.battle.party_sprite = {
     font = rt.settings.font.default_small,
+    sprite_reveal_speed = 600, -- px per second
 }
 
 --- @class bt.PartySprite
@@ -15,6 +16,13 @@ bt.PartySprite = meta.new_type("PartySprite", bt.BattleSprite, function(entity)
         _consumable_bar = bt.ConsumableBar(entity),
 
         _frame = bt.GradientFrame(),
+
+        _sprite = rt.Sprite(entity:get_sprite_id()),
+        _sprite_stencil = {},
+        _sprite_visible = false,
+        _current_sprite_offset = 0,
+        _target_sprite_offset = 0,
+        _max_sprite_offset = 0,
 
         _elapsed = 0
     })
@@ -62,6 +70,8 @@ function bt.PartySprite:realize()
     self._speed_value:realize()
     self._status_bar:realize()
     self._consumable_bar:realize()
+    self._sprite:realize()
+    self._sprite_stencil = rt.Rectangle(0, 0, 1, 1)
 
     self._health_bar:set_use_percentage(false)
     self._status_bar:set_alignment(rt.Alignment.START)
@@ -84,6 +94,14 @@ function bt.PartySprite:update(delta)
         local color = rt.rgba_to_hsva(rt.Palette.KNOCKED_OUT)
         color.v = clamp(color.v + offset, 0, 1)
         self._frame:set_color(nil, color)
+    end
+
+    if self._sprite_visible == true and self._current_sprite_offset > 0 then
+        self._current_sprite_offset = self._current_sprite_offset - delta * rt.settings.battle.party_sprite.sprite_reveal_speed
+        self._current_sprite_offset = clamp(self._current_sprite_offset, 0, self._max_sprite_offset)
+    elseif self._sprite_visible == false and self._current_sprite_offset < self._target_sprite_offset then
+        self._current_sprite_offset = self._current_sprite_offset + delta * rt.settings.battle.party_sprite.sprite_reveal_speed
+        self._current_sprite_offset = clamp(self._current_sprite_offset, 0, self._max_sprite_offset)
     end
 end
 
@@ -116,6 +134,23 @@ function bt.PartySprite:size_allocate(x, y, width, height)
     local consumable_aabb = rt.AABB(x + xm, frame_aabb.y - hp_bar_height, frame_aabb.width, hp_bar_height)
     self._consumable_bar:fit_into(consumable_aabb)
 
+    local sprite_overlap = 0.3;
+    local sprite_w, sprite_h = self._sprite:get_resolution()
+    sprite_w = sprite_w * 3
+    sprite_h = sprite_h * 3
+    self._sprite:fit_into(
+        frame_aabb.x + 0.5 * frame_aabb.width - 0.5 * sprite_w - 0.25 * frame_aabb.width,
+        frame_aabb.y - (1 - sprite_overlap) * sprite_h,
+        sprite_w,
+        sprite_h
+    )
+
+    self._sprite_stencil:resize(frame_aabb.x, frame_aabb.y, frame_aabb.width, 1000 * frame_aabb.height) -- infinity high
+
+    self._target_sprite_offset = 0
+    self._max_sprite_offset = sprite_h
+    self._current_sprite_offset = sprite_h
+
     self._bounds.y = current_y - total_frame_thickness
     self._bounds.height = frame_aabb.height + 2 * total_frame_thickness
     self:_update_state()
@@ -125,6 +160,15 @@ end
 function bt.PartySprite:draw()
     if not self._is_realized == true then return false end
     if self._is_visible == false then return end
+
+    local stencil_value = meta.hash(self) % 255
+    rt.graphics.stencil(stencil_value, self._sprite_stencil)
+    rt.graphics.set_stencil_test(rt.StencilCompareMode.NOT_EQUAL, stencil_value)
+    rt.graphics.translate(0, self._current_sprite_offset)
+    self._sprite:draw()
+    rt.graphics.translate(0, -1 * self._current_sprite_offset)
+    rt.graphics.stencil()
+    rt.graphics.set_stencil_test()
 
     self._frame:draw()
 
@@ -152,7 +196,14 @@ end
 function bt.PartySprite:set_opacity(alpha)
     self._opacity = alpha
 
-    for object in range(self._health_bar, self._name, self._speed_value, self._status_bar, self._frame) do
+    for object in range(
+        self._health_bar,
+        self._name,
+        self._speed_value,
+        self._status_bar,
+        self._frame,
+        self._sprite
+    ) do
         object:set_opacity(alpha)
     end
 end
@@ -161,4 +212,32 @@ end
 function bt.PartySprite:set_state(state)
     bt.BattleSprite.set_state(self, state)
     self:_update_state()
+end
+
+--- @brief
+function bt.PartySprite:set_sprite_visible(b)
+    self._sprite_visible = b
+    if b == true then
+        self._target_sprite_offset = 0
+    else
+        self._target_sprite_offset = self._max_sprite_offset
+    end
+end
+
+--- @brief
+function bt.PartySprite:get_sprite_visible()
+    return self._sprite_visible
+end
+
+bt.PartySpriteSpriteState = meta.new_enum({
+    IDLE = "idle_front",
+    IDLE_BACK = "idle_back",
+    THINKING = "thinking",
+    FLINCHING = "flinching"
+})
+
+--- @brief
+function  bt.PartySprite:set_sprite_state(state)
+    meta.assert_enum(state, bt.PartySpriteSpriteState)
+    self._sprite:set_animation(state)
 end

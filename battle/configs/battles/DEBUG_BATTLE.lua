@@ -91,7 +91,6 @@ return {
                 "WISH"
             }
         },
-
         {
             id = "RAT",
             status = {
@@ -154,5 +153,6 @@ return {
                 "WISH"
             }
         }
+
     }
 }

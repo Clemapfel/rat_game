@@ -235,7 +235,7 @@ function bt.SceneState.ENTITY_SELECT:_create()
             local entities = {}
             for enemy in values(enemies) do
                 if can_target_enemy == true then
-                    table.insert(entities, new_node(enemy))
+                    table.insert(entities, enemy)
                 else
                     table.insert(self._unselected_entities, enemy)
                 end
@@ -244,13 +244,13 @@ function bt.SceneState.ENTITY_SELECT:_create()
             for entity in values(allies) do
                 if entity ~= user then
                     if can_target_ally then
-                        table.insert(entities, new_node(entity))
+                        table.insert(entities, entity)
                     else
                         table.insert(self._unselected_entities, entity)
                     end
                 else
                     if can_target_self then
-                        table.insert(entities, new_node(entity))
+                        table.insert(entities, entity)
                     else
                         table.insert(self._unselected_entities, entity)
                     end
@@ -343,6 +343,20 @@ function bt.SceneState.ENTITY_SELECT:_update_selection()
                 sprite:set_selection_state(bt.SelectionState.INACTIVE)
                 scene._priority_queue:set_selection_state(entity, bt.SelectionState.UNSELECTED) -- sic, highligh prio queue differently
             end
+
+            if entity:get_is_enemy() == false then
+                if is_unselected[entity] == true then
+                    sprite:set_sprite_visible(false)
+                else
+                    sprite:set_sprite_visible(true)
+                    if is_selected[entity] == true then
+                        sprite:set_sprite_state(bt.PartySpriteSpriteState.THINKING)
+                    else
+                        sprite:set_sprite_state(bt.PartySpriteSpriteState.IDLE)
+                    end
+                end
+
+            end
         end
     end
 
@@ -408,6 +422,11 @@ end
 --- @override
 function bt.SceneState.ENTITY_SELECT:exit()
     self._scene:set_selected({}, false)
+    for entity in values(self._scene._state:list_party()) do
+        local sprite = self._scene:get_sprite(entity)
+        sprite:set_sprite_visible(false)
+        sprite:set_sprite_state(bt.PartySpriteSpriteState.IDLE)
+    end
 end
 
 --- @override

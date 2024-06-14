@@ -76,6 +76,9 @@ function bt.PriorityQueueElement:_update_state()
 
     if self._is_selected then
         frame_color = rt.Palette.SELECTION
+        self._frame:set_gradient_visible(false)
+    else
+        self._frame:set_gradient_visible(true)
     end
 
     self._sprite:set_opacity(ternary(not self._is_stunned, 1, 0.4))
@@ -142,8 +145,6 @@ function bt.PriorityQueueElement:size_allocate(x, y, width, height)
     self._stencil:resize(x + thickness, y + thickness, width - 2 * thickness, height - 2 * thickness)
 end
 
-stencil_i = 1
-
 --- @override
 function bt.PriorityQueueElement:draw()
     if self._is_realized ~= true then return end
@@ -170,7 +171,7 @@ end
 --- @override
 function bt.PriorityQueueElement:set_opacity(alpha)
     self._opacity = alpha
-    for object in range(self._frame, self._sprite) do
+    for object in range(self._sprite) do
         object:set_opacity(alpha)
     end
 end

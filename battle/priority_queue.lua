@@ -342,6 +342,7 @@ function bt.PriorityQueue:draw()
 
                 -- offset all elements except first scaled one
                 local scale = collider:get_userdata("scale")
+                scale = math.round(scale * 4) / 4   -- prevent scale artifacting
                 scaled_offset = ternary(math.abs(scale - 1) < 0.001, (max_scale - 1) * size, 0)
 
                 rt.graphics.translate(pos_x, pos_y + scaled_offset)

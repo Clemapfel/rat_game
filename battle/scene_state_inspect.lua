@@ -243,6 +243,8 @@ end
 
 --- @brief [internal]
 function bt.SceneState.INSPECT:_update_selection()
+    local current_entity = nil
+
     if self._current_node == nil then
         self._scene:set_selected({}, false)
         self._scene._global_status_bar:set_selection_state(bt.SelectionState.INACTIVE)
@@ -259,6 +261,7 @@ function bt.SceneState.INSPECT:_update_selection()
             self._current_node:update()
         else
             local entity = self._current_node.entity
+            current_entity = entity
             self._scene:set_selected({entity}, false)
             self._scene._global_status_bar:set_selection_state(bt.SelectionState.INACTIVE)
 
@@ -301,6 +304,17 @@ function bt.SceneState.INSPECT:_update_selection()
 
         if self._verbose_info_offset_y + h > scene_bounds.y + scene_bounds.height then
             self._verbose_info_offset_y = scene_bounds.y + scene_bounds.height - h
+        end
+    end
+
+    if current_entity ~= nil then
+        for entity in values(self._scene._state:list_party()) do
+            local sprite = self._scene:get_sprite(entity)
+            if entity == current_entity then
+                sprite:set_sprite_visible(true)
+            else
+                sprite:set_sprite_visible(false)
+            end
         end
     end
 end
@@ -413,6 +427,10 @@ end
 function bt.SceneState.INSPECT:exit()
     self._scene:set_selected({}, false)
     self._scene._global_status_bar:set_selection_state(bt.SelectionState.INACTIVE)
+
+    for entity in values(self._scene._state:list_party()) do
+        self._scene:get_sprite(entity):set_sprite_visible(false)
+    end
 end
 
 --- @override
