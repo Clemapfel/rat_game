@@ -84,40 +84,33 @@ function rt.SpeechBubble:size_allocate(x, y, width, height)
     local bottom = {bubble_x, bubble_y + bubble_h - eps, bubble_x + bubble_w, bubble_y + bubble_h - eps}
     local left = {bubble_x + eps, bubble_y, bubble_x + eps, bubble_y + bubble_h}
 
-    local nearest_line = top
-    local min_distance = POSITIVE_INFINITY
+    local min_a_distance = POSITIVE_INFINITY
+    local new_a_x, new_a_y = a_x, a_y
+    local min_b_distance = POSITIVE_INFINITY
+    local new_b_x, new_b_y = b_x, b_y
+
     for line in range(top, right, bottom, left) do
-        local distance = rt.distance_point_to_line(target_x, target_y, line[1], line[2], line[3], line[4])
-        if distance < min_distance then
-            min_distance = distance
-            nearest_line = line
+        local ia_x, ia_y = rt.intersection(a_x, a_y, c_x, c_y, line[1], line[2], line[3], line[4])
+        if ia_x ~= nil and ia_y ~= nil then
+            local a_distance = rt.distance(ia_x, ia_y, c_x, c_y)
+            if a_distance < min_a_distance then
+                min_a_distance = a_distance
+                new_a_x, new_a_y = ia_x, ia_y
+            end
+        end
+
+        local ib_x, ib_y = rt.intersection(b_x, b_y, c_x, c_y, line[1], line[2], line[3], line[4])
+        if ib_x ~= nil and ib_y ~= nil then
+            local b_distance = rt.distance(ib_x, ib_y, c_x, c_y)
+            if b_distance < min_b_distance then
+                min_b_distance = b_distance
+                new_b_x, new_b_y = ib_x, ib_y
+            end
         end
     end
 
-    local ia_x, ia_y = rt.intersection(
-        nearest_line[1], nearest_line[2], nearest_line[3], nearest_line[4],
-        a_x, a_y, c_x, c_y
-    )
-
-    local ib_x, ib_y = rt.intersection(
-        nearest_line[1], nearest_line[2], nearest_line[3], nearest_line[4],
-        b_x, b_y, c_x, c_y
-    )
-
-    a_x = which(ia_x, a_x)
-    a_y = which(ia_y, a_y)
-    b_x = which(ib_x, b_x)
-    b_y = which(ib_y, b_y)
-
-    a_x = math.max(a_x, nearest_line[1])
-    a_x = math.min(a_x, nearest_line[3])
-    a_y = math.max(a_y, nearest_line[2])
-    a_y = math.min(a_y, nearest_line[4])
-
-    b_x = math.max(b_x, nearest_line[1])
-    b_x = math.min(b_x, nearest_line[3])
-    b_y = math.max(b_y, nearest_line[2])
-    b_y = math.min(b_y, nearest_line[4])
+    a_x, a_y = new_a_x, new_a_y
+    b_x, b_y = new_b_x, new_b_y
 
     self._tail_base:resize(a_x, a_y, b_x, b_y, c_x, c_y)
     self._tail_frame:resize(a_x, a_y, c_x, c_y, b_x, b_y)
