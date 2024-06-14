@@ -109,6 +109,16 @@ function rt.SpeechBubble:size_allocate(x, y, width, height)
     b_x = which(ib_x, b_x)
     b_y = which(ib_y, b_y)
 
+    a_x = math.max(a_x, nearest_line[1])
+    a_x = math.min(a_x, nearest_line[3])
+    a_y = math.max(a_y, nearest_line[2])
+    a_y = math.min(a_y, nearest_line[4])
+
+    b_x = math.max(b_x, nearest_line[1])
+    b_x = math.min(b_x, nearest_line[3])
+    b_y = math.max(b_y, nearest_line[2])
+    b_y = math.min(b_y, nearest_line[4])
+
     self._tail_base:resize(a_x, a_y, b_x, b_y, c_x, c_y)
     self._tail_frame:resize(a_x, a_y, c_x, c_y, b_x, b_y)
 

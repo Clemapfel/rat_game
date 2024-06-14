@@ -6,7 +6,7 @@ scene = rt.current_scene
 
 bubble = rt.SpeechBubble(200, 300)
 bubble:realize()
-bubble:fit_into(50, 50, 200, 100)
+bubble:fit_into(300, 300, 200, 100)
 
 input = rt.InputController()
 input:signal_connect("motion", function(_, x, y)

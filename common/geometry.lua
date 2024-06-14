@@ -130,12 +130,13 @@ function rt.normalize(x, y)
 end
 
 
-function rt.intersection(s1_x, s1_y, e1_x, e1_y, s2_x, s2_y, e2_x, e2_y)
-    local d = (s1_x - e1_x) * (s2_y - e2_y) - (s1_y - e1_y) * (s2_x - e2_x)
-    local a = s1_x * e1_y - s1_y * e1_x
-    local b = s2_x * e2_y - s2_y * e2_x
-    local x = (a * (s2_x - e2_x) - (s1_x - e1_x) * b) / d
-    local y = (a * (s2_y - e2_y) - (s1_y - e1_y) * b) / d
+function rt.intersection(l1p1x, l1p1y, l1p2x, l1p2y, l2p1x, l2p1y, l2p2x, l2p2y)
+    local d = (l1p1x - l1p2x) * (l2p1y - l2p2y) - (l1p1y - l1p2y) * (l2p1x - l2p2x)
+    local a = l1p1x * l1p2y - l1p1y * l1p2x
+    local b = l2p1x * l2p2y - l2p1y * l2p2x
+    local x = (a * (l2p1x - l2p2x) - (l1p1x - l1p2x) * b) / d
+    local y = (a * (l2p1y - l2p2y) - (l1p1y - l1p2y) * b) / d
+
     return x, y
 end
 
