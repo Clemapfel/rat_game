@@ -71,67 +71,33 @@ function rt.SpeechBubble:size_allocate(x, y, width, height)
     local target_x, target_y = self._attachment_x, self._attachment_y
     local angle = rt.angle(target_x - center_x, target_y - center_y)
 
-    local tail_width = 20
     local tail_length = rt.distance(center_x, center_y, target_x, target_y)
+    local tail_width = clamp(30 * (250 / tail_length), 15, math.min(0.5 * bubble_w, 0.5 * bubble_h))
 
     local a_x, a_y = rt.translate_point_by_angle(center_x, center_y, tail_width, angle - rt.degrees_to_radians(90))
     local b_x, b_y = rt.translate_point_by_angle(center_x, center_y, tail_width, angle + rt.degrees_to_radians(90))
     local c_x, c_y = target_x, target_y
-
-    local eps = 0
-    local top = {bubble_x, bubble_y + eps, bubble_x + bubble_w, bubble_y + eps}
-    local right = {bubble_x + bubble_w - eps, bubble_y, bubble_x + bubble_w - eps, bubble_y + bubble_h}
-    local bottom = {bubble_x, bubble_y + bubble_h - eps, bubble_x + bubble_w, bubble_y + bubble_h - eps}
-    local left = {bubble_x + eps, bubble_y, bubble_x + eps, bubble_y + bubble_h}
-
-    local min_a_distance = POSITIVE_INFINITY
-    local new_a_x, new_a_y = a_x, a_y
-    local min_b_distance = POSITIVE_INFINITY
-    local new_b_x, new_b_y = b_x, b_y
-
-    for line in range(top, right, bottom, left) do
-        local ia_x, ia_y = rt.intersection(a_x, a_y, c_x, c_y, line[1], line[2], line[3], line[4])
-        if ia_x ~= nil and ia_y ~= nil then
-            local a_distance = rt.distance(ia_x, ia_y, c_x, c_y)
-            if a_distance < min_a_distance then
-                min_a_distance = a_distance
-                new_a_x, new_a_y = ia_x, ia_y
-            end
-        end
-
-        local ib_x, ib_y = rt.intersection(b_x, b_y, c_x, c_y, line[1], line[2], line[3], line[4])
-        if ib_x ~= nil and ib_y ~= nil then
-            local b_distance = rt.distance(ib_x, ib_y, c_x, c_y)
-            if b_distance < min_b_distance then
-                min_b_distance = b_distance
-                new_b_x, new_b_y = ib_x, ib_y
-            end
-        end
-    end
-
-    a_x, a_y = new_a_x, new_a_y
-    b_x, b_y = new_b_x, new_b_y
-
-    self._tail_base:resize(a_x, a_y, b_x, b_y, c_x, c_y)
     self._tail_frame:resize(a_x, a_y, c_x, c_y, b_x, b_y)
 
-    c_x, c_y = rt.translate_point_by_angle(center_x, center_y, tail_length + 2, angle)
+    c_x, c_y = rt.translate_point_by_angle(center_x, center_y, tail_length + 1, angle) -- correct outline at point
     self._tail_frame_outline:resize(a_x, a_y, c_x, c_y, b_x, b_y)
+
+    -- shrink tail slightly so it can be rendered on top of tail outline
+    a_x, a_y = rt.translate_point_by_angle(center_x, center_y, tail_width - thickness, angle - rt.degrees_to_radians(90))
+    b_x, b_y = rt.translate_point_by_angle(center_x, center_y, tail_width - thickness, angle + rt.degrees_to_radians(90))
+    c_x, c_y = rt.translate_point_by_angle(center_x, center_y, tail_length - thickness, angle)
+    self._tail_base:resize(a_x, a_y, b_x, b_y, c_x, c_y)
 end
 
 --- @override
 function rt.SpeechBubble:draw()
     if self._is_realized ~= true then return end
-
-    self._bubble_base:draw()
     self._bubble_frame_outline:draw()
-    self._bubble_frame:draw()
-
-    self._tail_base:draw()
     self._tail_frame_outline:draw()
     self._tail_frame:draw()
-
-    love.graphics.points(self._attachment_x, self._attachment_y)
+    self._bubble_base:draw()
+    self._bubble_frame:draw()
+    self._tail_base:draw()
 end
 
 --- @brief
