@@ -132,24 +132,28 @@ love.mousereleased = function (x, y, button_id, is_touch, n_presses)
 end
 
 --- @brief MOUSE MOTION
-love.mousemotion = function (x, y, dx, dy, is_touch)
+love.mousemoved = function (x, y, dx, dy, is_touch)
     for _, component in pairs(rt.InputHandler.components) do
-        if not component._is_disabled and not meta.is_nil(component._instance) then
-            local current = component._cursor_in_bounds
-            local next = rt.aabb_contains(component._instance:get_bounds(), x, y)
+        if not component._is_disabled then
+            if not meta.is_nil(component._instance) then
+                local current = component._cursor_in_bounds
+                local next = rt.aabb_contains(component._instance:get_bounds(), x, y)
 
-            if current == false and next == true then
-                component._cursor_in_bounds = true
-                component:signal_emit("motion_enter", x, y)
-            end
+                if current == false and next == true then
+                    component._cursor_in_bounds = true
+                    component:signal_emit("motion_enter", x, y)
+                end
 
-            if next then
-                component:signal_emit("motion", x, y, dx, dy)
-            end
+                if next then
+                    component:signal_emit("motion", x, y, dx, dy)
+                end
 
-            if current == true and next == false then
-                component._cursor_in_bounds = false
-                component:signal_emit("motion_leave", x, y)
+                if current == true and next == false then
+                    component._cursor_in_bounds = false
+                    component:signal_emit("motion_leave", x, y)
+                end
+            else
+                component:signal_emit("motion", x, y)
             end
         end
     end

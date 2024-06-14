@@ -22,8 +22,8 @@ function rt.Polygon:draw()
     self:_bind_properties()
     if self._type == rt.PolygonType.POLYGON then
         love.graphics.polygon(
-                ternary(self:get_is_outline(), "line", "fill"),
-                splat(self._vertices)
+            ternary(self:get_is_outline(), "line", "fill"),
+            splat(self._vertices)
         )
     elseif self._type == rt.PolygonType.DOTS then
         love.graphics.points(splat(self._vertices))

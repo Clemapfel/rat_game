@@ -20,6 +20,10 @@ function rt.Shape:_bind_properties(callback, data)
     love.graphics.setColor(self._color.r, self._color.g, self._color.b, self._color.a * self._opacity)
     love.graphics.setLineWidth(self._line_width)
     love.graphics.setPointSize(self._line_width)
+
+    if self._line_join ~= nil then
+        love.graphics.setLineJoin(self._line_join)
+    end
 end
 
 --- @brief [internal]
@@ -87,4 +91,9 @@ end
 --- @brief
 function rt.Shape:get_line_width()
     return self._line_width
+end
+
+--- @brief
+function rt.Shape:set_line_join(line_join)
+    self._line_join = line_join
 end

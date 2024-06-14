@@ -92,10 +92,51 @@ function rt.distance(x1, y1, x2, y2)
 end
 
 --- @brief
+function rt.distance_point_to_line(x, y, x1, y1, x2, y2)
+    local a = x - x1
+    local b = y - y1
+    local c = x2 - x1
+    local d = y2 - y1
+
+    local dot = a * c + b * d
+    local len_sq = c * c + d * d
+    local param = -1
+    if len_sq ~= 0 then
+        param = dot / len_sq
+    end
+
+    local xx, yy
+    if param < 0 then
+        xx = x1
+        yy = y1
+    elseif param > 1 then
+        xx = x2
+        yy = y2
+    else
+        xx = x1 + param * c
+        yy = y1 + param * d
+    end
+
+    local dx = x - xx
+    local dy = y - yy
+    return math.sqrt(dx * dx + dy * dy)
+end
+
+--- @brief
 function rt.normalize(x, y)
     local magnitude = rt.magnitude(x, y)
     if magnitude == 0 then return 0, 0 end
     return x / magnitude, y / magnitude
+end
+
+
+function rt.intersection(s1_x, s1_y, e1_x, e1_y, s2_x, s2_y, e2_x, e2_y)
+    local d = (s1_x - e1_x) * (s2_y - e2_y) - (s1_y - e1_y) * (s2_x - e2_x)
+    local a = s1_x * e1_y - s1_y * e1_x
+    local b = s2_x * e2_y - s2_y * e2_x
+    local x = (a * (s2_x - e2_x) - (s1_x - e1_x) * b) / d
+    local y = (a * (s2_y - e2_y) - (s1_y - e1_y) * b) / d
+    return x, y
 end
 
 --- @brief

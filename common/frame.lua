@@ -18,7 +18,6 @@ rt.Frame = meta.new_type("Frame", rt.Widget, function(type)
         _child = {},
         _stencil_mask = ternary(type == rt.FrameType.RECTANGULAR, rt.Rectangle(0, 0, 1, 1), rt.Circle(0, 0, 1)),
         _stencil_mask_stencil_value = rt.Frame.stencil_id,
-        _frame_thickness = rt.settings.frame.thickness,
         _frame = ternary(type == rt.FrameType.RECTANGULAR, rt.Rectangle(0, 0, 1, 1), rt.Circle(0, 0, 1)),
         _frame_outline = ternary(type == rt.FrameType.RECTANGULAR, rt.Rectangle(0, 0, 1, 1), rt.Circle(0, 0, 1)),
         _color = rt.Palette.FOREGROUND,
@@ -29,7 +28,6 @@ rt.Frame = meta.new_type("Frame", rt.Widget, function(type)
     rt.Frame.stencil_id = rt.Frame.stencil_id + 1
 
     out._frame:set_is_outline(true)
-    out._frame:set_line_width(out._frame_thickness)
     out._frame_outline:set_line_width(rt.settings.frame.thickness + 2)
     out._frame_outline:set_is_outline(true)
 
