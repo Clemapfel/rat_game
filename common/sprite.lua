@@ -140,3 +140,10 @@ function rt.Sprite:set_opacity(alpha)
         self._shape:set_opacity(self._opacity)
     end
 end
+
+--- @brief
+function rt.Sprite:set_color(color)
+    for i = 1, 4 do
+        self._shape:set_vertex_color(i, color)
+    end
+end

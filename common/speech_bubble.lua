@@ -34,7 +34,7 @@ function rt.SpeechBubble:realize()
     self._tail_frame_outline = rt.LineStrip(0, 0, 1, 1)
 
     for base in range(self._bubble_base, self._tail_base) do
-        base:set_color(rt.Palette.BASE)
+        base:set_color(rt.Palette.BACKGROUND)
     end
 
     for frame in range(self._bubble_frame, self._tail_frame) do
@@ -58,21 +58,22 @@ end
 
 --- @override
 function rt.SpeechBubble:size_allocate(x, y, width, height)
-
     local thickness = self._thickness
     local bubble_x, bubble_y = x + thickness, y + thickness
     local bubble_w, bubble_h = width - 2 * thickness, height - 2 * thickness
+    local attachment_x, attachment_y = which(self._attachment_x, bubble_x + 0.5 * bubble_w), which(self._attachment_y, bubble_y + 0.5 * bubble_h)
 
     self._bubble_base:resize(bubble_x, bubble_y, bubble_w, bubble_h)
     self._bubble_frame:resize(bubble_x, bubble_y, bubble_w, bubble_h)
     self._bubble_frame_outline:resize(bubble_x, bubble_y, bubble_w, bubble_h)
 
     local center_x, center_y = bubble_x + 0.5 * bubble_w, bubble_y + 0.5 * bubble_h
-    local target_x, target_y = self._attachment_x, self._attachment_y
+    center_x = mix(center_x, clamp(attachment_x, bubble_x, bubble_x + bubble_w), 0.5)
+    local target_x, target_y = attachment_x, attachment_y
     local angle = rt.angle(target_x - center_x, target_y - center_y)
 
     local tail_length = rt.distance(center_x, center_y, target_x, target_y)
-    local tail_width = clamp(30 * (250 / tail_length), 15, math.min(0.5 * bubble_w, 0.5 * bubble_h))
+    local tail_width = clamp(2.5 * (30 / tail_length) * bubble_w, 15, math.min(0.5 * bubble_w, 0.5 * bubble_h))
 
     local a_x, a_y = rt.translate_point_by_angle(center_x, center_y, tail_width, angle - rt.degrees_to_radians(90))
     local b_x, b_y = rt.translate_point_by_angle(center_x, center_y, tail_width, angle + rt.degrees_to_radians(90))

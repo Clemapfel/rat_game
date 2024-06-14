@@ -23,6 +23,11 @@ rt.SpriteAtlasEntry = meta.new_type("SpriteAtlasEntry", function(path, id)
 end)
 
 --- @brief
+function rt.SpriteAtlasEntry:get_id()
+    return self.id
+end
+
+--- @brief
 function rt.SpriteAtlasEntry:load()
     if self.is_realized == true then return end
 
@@ -72,7 +77,6 @@ function rt.SpriteAtlasEntry:load()
             config.n_frames = 1
         end
     end
-
     config.height = which(config.height, data:getHeight())
 
     if not meta.is_nil(config.fps) and config.fps > 0 then

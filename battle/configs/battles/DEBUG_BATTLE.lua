@@ -49,7 +49,6 @@ return {
             }
         },
 
-        --[[
         {
             id = "WALKING_SPROUT",
             status = {
@@ -70,10 +69,10 @@ return {
                 "WISH"
             }
         },
-        ]]--
+
 
         {
-            id = "GAMBLER_MOLE",
+            id = "MC",
             status = {
                 -- "DEBUG_STATUS"
             },
@@ -94,7 +93,7 @@ return {
         },
 
         {
-            id = "GAMBLER_MOLE",
+            id = "RAT",
             status = {
                 -- "DEBUG_STATUS"
             },
@@ -115,7 +114,7 @@ return {
         },
 
         {
-            id = "GAMBLER_MOLE",
+            id = "PROF",
             status = {
                 -- "DEBUG_STATUS"
             },
@@ -136,7 +135,7 @@ return {
         },
 
         {
-            id = "GAMBLER_MOLE",
+            id = "GIRL",
             status = {
                 -- "DEBUG_STATUS"
             },

@@ -136,7 +136,6 @@ function bt.PriorityQueue:reorder(order, next_order)
                     entity
                 )
                 queue_element:realize()
-                queue_element:set_id_offset_label_visible(entity:get_id_offset() > 0)
                 table.insert(entry.elements, queue_element)
 
                 local bounds = self:get_bounds()

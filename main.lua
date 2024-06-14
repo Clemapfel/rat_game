@@ -2,16 +2,11 @@ require "include"
 
 rt.current_scene = bt.Scene()
 scene = rt.current_scene
---scene:set_background("WORLEY")
+scene:set_background("WORLEY")
 
-bubble = rt.SpeechBubble(200, 300)
-bubble:realize()
-bubble:fit_into(300, 300, 200, 100)
-
-input = rt.InputController()
-input:signal_connect("motion", function(_, x, y)
-    bubble:set_attachment_point(x, y)
-end)
+sprite = rt.Sprite(bt.Entity("GIRL"):get_sprite_id())
+sprite:realize()
+sprite:fit_into(50, 50, 50, 50)
 
 --- ###
 
@@ -19,7 +14,7 @@ love.load = function()
     rt.current_scene:realize()
     love.resize()
     scene:start_battle(bt.Battle("DEBUG_BATTLE"))
-    --scene._state_manager:start_turn()
+    scene._state_manager:start_turn()
 end
 
 rt.graphics.frame_duration = {
@@ -37,8 +32,6 @@ love.draw = function()
     if rt.current_scene ~= nil then
         rt.current_scene:draw()
     end
-
-    bubble:draw()
 
     if rt.settings.show_fps == true then
         local fps = love.timer.getFPS()
