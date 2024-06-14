@@ -147,3 +147,8 @@ function rt.Sprite:set_color(color)
         self._shape:set_vertex_color(i, color)
     end
 end
+
+--- @brief
+function rt.Sprite:get_origin()
+    return self._spritesheet.origin_x, self._spritesheet.origin_y
+end

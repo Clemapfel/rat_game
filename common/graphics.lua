@@ -86,18 +86,7 @@ end
 function rt.graphics.stencil(new_value, ...)
 
     if new_value == nil then
-        if love.getVersion() >= 12 then
-            local mask_r, mask_g, mask_b, mask_a = love.graphics.getColorMask()
-            love.graphics.setStencilState("replace", "always", new_value, 0)
-            love.graphics.setColorMask(false, false, false, false)
-            love.graphics.rectangle("fill", NEGATIVE_INFINITY, NEGATIVE_INFINITY, POSITIVE_INFINITY, POSITIVE_INFINITY)
-            love.graphics.setColorMask(mask_r, mask_g, mask_b, mask_a)
-            love.graphics.setStencilState()
-        else
-            love.graphics.stencil(function()
-                love.graphics.rectangle("fill", NEGATIVE_INFINITY, NEGATIVE_INFINITY, POSITIVE_INFINITY, POSITIVE_INFINITY)
-            end, "replace", new_value, true)
-        end
+        love.graphics.clear(false, true, false)
     end
 
     local drawables = {...}

@@ -13,9 +13,6 @@ rt.settings.battle.priority_queue_element = {
     dead_frame_color = rt.Palette.GRAY_5,
 
     corner_radius = 10,
-    change_indicator_up_color = rt.Palette.GREEN,
-    change_indicator_down_color = rt.Palette.RED,
-    change_indicator_none_color = rt.Palette.GRAY_2
 }
 
 --- @class bt.PriorityQueueElement
@@ -25,8 +22,9 @@ bt.PriorityQueueElement = meta.new_type("PriorityQueueElement", rt.Widget, rt.An
 
         _sprite = rt.Sprite(entity:get_sprite_id()),
         _shader = rt.Shader("assets/shaders/priority_queue_element.glsl"),
-
         _frame = bt.GradientFrame(),
+
+        _stencil = rt.Rectangle(),
 
         _id_offset_label_visible = false,
         _id_offset_label = {}, -- rt.Label
@@ -103,6 +101,10 @@ function bt.PriorityQueueElement:realize()
             font_style = rt.FontStyle.BOLD
         }
     )
+
+    self._stencil = rt.Rectangle(0, 0, 1, 1)
+    self._stencil:set_corner_radius(rt.settings.battle.priority_queue_element.corner_radius)
+
     self:_update_state()
 end
 
@@ -116,7 +118,17 @@ function bt.PriorityQueueElement:size_allocate(x, y, width, height)
     y = y + (height - min) / 2
     width, height = min, min
 
-    self._sprite:fit_into(x, y, width, height)
+    local sprite_w, sprite_h = self._sprite:get_resolution()
+    sprite_w = sprite_w * 3
+    sprite_h = sprite_h * 3
+    local sprite_align_x, sprite_align_y = self._sprite:get_origin()
+    local origin_offset_x, origin_offset_y = (0.5 - sprite_align_x) * sprite_w, (0.5 - sprite_align_y) * sprite_h
+    self._sprite:fit_into(
+        math.floor(x + 0.5 * width - 0.5 * sprite_w + origin_offset_x),
+        math.floor(y + 0.5 * height - 0.5 * sprite_h + origin_offset_y),
+        sprite_w,
+        sprite_h
+    )
     self._frame:fit_into(x, y, width, height)
 
     local label_w, label_h = self._id_offset_label:get_size()
@@ -125,14 +137,25 @@ function bt.PriorityQueueElement:size_allocate(x, y, width, height)
         x + width - label_offset * label_w,
         y + height - label_offset * label_h
     )
+
+    local thickness = rt.settings.battle.priority_queue_element.frame_thickness
+    self._stencil:resize(x + thickness, y + thickness, width - 2 * thickness, height - 2 * thickness)
 end
+
+stencil_i = 1
 
 --- @override
 function bt.PriorityQueueElement:draw()
     if self._is_realized ~= true then return end
 
     self._frame:draw()
+
+    local stencil_value = meta.hash(bt.PriorityQueueElement) % 255
+    rt.graphics.stencil(stencil_value, self._stencil)
+    rt.graphics.set_stencil_test(rt.StencilCompareMode.EQUAL, stencil_value)
     self._sprite:draw()
+    rt.graphics.stencil()
+    rt.graphics.set_stencil_test()
 
     if self._id_offset_label_visible then
         self._id_offset_label:draw()
