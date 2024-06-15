@@ -36,6 +36,7 @@ end
 
 --- @override
 function bt.ShaderOnlyBackground:update(delta)
+    if self._is_realized ~= true then return end
     self._elapsed = self._elapsed + delta
 
     if self._disable_elapsed ~= false then
@@ -45,6 +46,7 @@ end
 
 --- @override
 function bt.ShaderOnlyBackground:draw()
+    if self._is_realized ~= true then return end
     self._shader:bind()
     self._shape:draw()
     self._shader:unbind()
