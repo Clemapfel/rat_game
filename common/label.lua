@@ -32,6 +32,7 @@ rt.Label = meta.new_type("Label", rt.Widget, function(text, font, monospace_font
         _monospace_font = monospace_font,
         _justify_mode = rt.JustifyMode.LEFT,
         _glyphs = {},
+        _glyph_indices = {},
         _opacity = 1,
         _n_characters = 0,
         _default_width = 0,
@@ -56,10 +57,8 @@ end
 --- @overload rt.Drawable.draw
 function rt.Label:draw()
     if not self:get_is_visible() then return end
-    for _, glyph in pairs(self._glyphs) do
-        if meta.isa(glyph, rt.Glyph) then
-            glyph:draw(self._opacity)
-        end
+    for _, i in pairs(self._glyph_indices) do
+        self._glyphs[i]:draw()
     end
 end
 
@@ -252,6 +251,7 @@ function rt.Label:_parse()
     local animation_necessary = false
 
     self._glyphs = {}
+    self._glyph_indices = {}
     self._n_characters = 0
 
     local bold = false
@@ -311,6 +311,8 @@ function rt.Label:_parse()
                 effects = effects
             }
         ))
+
+        table.insert(self._glyph_indices, #self._glyphs)
 
         self._n_characters = self._n_characters + string.len(current_word)
         current_word = ""

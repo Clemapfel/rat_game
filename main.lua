@@ -2,7 +2,7 @@ require "include"
 
 rt.current_scene = bt.Scene()
 scene = rt.current_scene
---scene:set_background("WORLEY")
+scene:set_background("GRADIENT_DERIVATIVE")
 
 input = rt.InputController()
 input:signal_connect("pressed", function(_, which)

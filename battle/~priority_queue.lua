@@ -17,6 +17,11 @@ bt.PriorityQueue = meta.new_type("PriorityQueue", rt.Widget, rt.Animation, funct
             order = {},         -- Table<Entity>
             render_order = {}   -- Table<{entity_key, multiplicity_index}>
         },
+        _next = {
+            entries = {},
+            order = {},
+            render_order = {}
+        },
         _final_position_x = 0,
         _final_position_y = 0,
         _final_width = 0,
@@ -98,6 +103,7 @@ function bt.PriorityQueue:reorder(order, next_order)
     end
 
     self._current.order = {}
+    self._next.order = {}
 
     local function handle(which, order)
         which.order = order
@@ -165,6 +171,7 @@ function bt.PriorityQueue:reorder(order, next_order)
     end
 
     handle(self._current, order)
+    handle(self._next, next_order)
     self._reorder_done = false
 
     self:reformat()
@@ -239,6 +246,8 @@ function bt.PriorityQueue:size_allocate(x, y, width, height)
         self._final_position_x = self._final_position_x - (factor - 1) * element_size
         self._final_width = self._final_width + (factor - 1) * element_size
         self._final_height = self._final_height + (factor - 1) * element_size
+
+        handle(self._next, false)
     end
 end
 
@@ -247,9 +256,16 @@ function bt.PriorityQueue:realize()
     if self._is_realized == true then return end
     self._is_realized = true
     self._current.entries = {}
-    self:reorder(self._current.order)
+    self._next.entries = {}
+    self:reorder(self._current.order, self._next.order)
 
     for _, entry in pairs(self._current.entries) do
+        for _, element in pairs(entry.elements) do
+            element:realize()
+        end
+    end
+
+    for _, entry in pairs(self._next.entries) do
         for _, element in pairs(entry.elements) do
             element:realize()
         end
@@ -300,6 +316,7 @@ function bt.PriorityQueue:update(delta)
     end
 
     handle(self._current)
+    handle(self._next)
     self._world:update(delta)
 end
 
@@ -341,6 +358,9 @@ function bt.PriorityQueue:draw()
         end
 
         handle(self._current)
+        if self._preview_visible then
+            handle(self._next)
+        end
     end
 end
 
@@ -357,6 +377,7 @@ function bt.PriorityQueue:skip()
     end
 
     handle(self._current)
+    handle(self._next)
 end
 
 --- @brief

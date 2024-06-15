@@ -16,6 +16,7 @@ rt.Frame = meta.new_type("Frame", rt.Widget, function(type)
     local out = meta.new(rt.Frame, {
         _type = type,
         _child = {},
+        _child_valid = false,
         _stencil_mask = ternary(type == rt.FrameType.RECTANGULAR, rt.Rectangle(0, 0, 1, 1), rt.Circle(0, 0, 1)),
         _stencil_mask_stencil_value = rt.Frame.stencil_id,
         _frame = ternary(type == rt.FrameType.RECTANGULAR, rt.Rectangle(0, 0, 1, 1), rt.Circle(0, 0, 1)),
@@ -61,7 +62,7 @@ end
 function rt.Frame:draw()
     if not self:get_is_visible() then return end
 
-    if meta.is_widget(self._child) then
+    if self._child_valid then
         self:_bind_stencil()
         self._child:draw()
         self:_unbind_stencil()
@@ -120,6 +121,7 @@ end
 function rt.Frame:set_child(child)
     meta.assert_widget(child)
     self._child = child
+    self._child_valid = true
 
     if self:get_is_realized() then
         self._child:realize()
@@ -136,8 +138,8 @@ end
 --- @brief remove child
 function rt.Frame:remove_child()
     if not meta.is_nil(self._child) then
-        self._child:set_parent(nil)
-        self._child = nil
+        self._child = {}
+        self._child_valid = false
     end
 end
 

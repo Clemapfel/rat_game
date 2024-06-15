@@ -23,12 +23,12 @@ function rt.Polygon:draw()
     if self._type == rt.PolygonType.POLYGON then
         love.graphics.polygon(
             ternary(self:get_is_outline(), "line", "fill"),
-            splat(self._vertices)
+            table.unpack(self._vertices)
         )
     elseif self._type == rt.PolygonType.DOTS then
-        love.graphics.points(splat(self._vertices))
+        love.graphics.points(table.unpack(self._vertices))
     elseif self._type == rt.PolygonType.LINE_STRIP then
-        love.graphics.line(splat(self._vertices))
+        love.graphics.line(table.unpack(self._vertices))
     end
     self._unbind_properties()
 end

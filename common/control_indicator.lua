@@ -111,7 +111,6 @@ function rt.ControlIndicator:draw()
         local sprite, label = self._sprites[i], self._labels[i]
         sprite:draw()
         label:draw()
-        label:draw_bounds()
     end
 end
 

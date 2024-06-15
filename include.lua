@@ -78,7 +78,6 @@ require "common.graphics"
 require "common.drawable"
 require "common.animation"
 require "common.animation_queue"
-require "common.state_machine"
 
 require "common.color"
 require "common.palette"

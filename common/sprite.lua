@@ -20,28 +20,27 @@ end)
 
 --- @override
 function rt.Sprite:realize()
-    if not self._is_realized then
-        self._is_realized = true
+    if self._is_realized == true then return end
+    self._is_realized = true
 
-        self._spritesheet = rt.SpriteAtlas:get(self._id)
-        self._frame_duration = 1 / self._spritesheet:get_fps()
-        self._n_frames = self._spritesheet:get_n_frames()
-        self._width, self._height = self._spritesheet:get_frame_size()
-        self._shape:set_texture(self._spritesheet:get_texture())
+    self._spritesheet = rt.SpriteAtlas:get(self._id)
+    self._frame_duration = 1 / self._spritesheet:get_fps()
+    self._n_frames = self._spritesheet:get_n_frames()
+    self._width, self._height = self._spritesheet:get_frame_size()
+    self._shape:set_texture(self._spritesheet:get_texture())
 
-        self:reformat()
-        self:set_frame(self._current_frame)
-        self:set_minimum_size(self._width, self._height)
+    self:reformat()
+    self:set_frame(self._current_frame)
+    self:set_minimum_size(self._width, self._height)
 
-        if self._animation_id == "" then
-            self._frame_range_start = 1
-            self._frame_range_end = self._spritesheet:get_n_frames()
-        else
-            self:set_animation(self._animation_id)
-        end
-
-        self:set_opacity(self._opacity)
+    if self._animation_id == "" then
+        self._frame_range_start = 1
+        self._frame_range_end = self._spritesheet:get_n_frames()
+    else
+        self:set_animation(self._animation_id)
     end
+
+    self:set_opacity(self._opacity)
 end
 
 --- @override

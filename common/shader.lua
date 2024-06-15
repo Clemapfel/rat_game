@@ -1,6 +1,5 @@
 --- @class rt.Shader
 rt.Shader = meta.new_type("Shader", function(code_or_filename, inject_lib)
-
     local info = love.filesystem.getInfo(code_or_filename)
     inject_lib = which(inject_lib, false)
 
@@ -21,10 +20,6 @@ rt.Shader = meta.new_type("Shader", function(code_or_filename, inject_lib)
         _before = nil,
     })
 end)
-
-rt.Shader._common = {
-    src = love.filesystem.read("common/shader_functions.glsl")
-}
 
 --- @brief set uniform
 --- @param name String

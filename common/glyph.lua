@@ -96,6 +96,7 @@ function rt.Glyph:_update_outline()
 
     local offset_x, offset_y = self._outline_render_offset_x, self._outline_render_offset_y
     love.graphics.push()
+    love.graphics.setColor(1, 1, 1, 1)
 
     self._outline_swap_texture:bind_as_render_target()
     love.graphics.clear(0, 0, 0, 0)
@@ -234,7 +235,6 @@ function rt.Glyph:update(delta)
 end
 
 function rt.Glyph:_draw_glyph(x, y)
-    love.graphics.setColor(1, 1, 1, self._opacity)
     love.graphics.draw(self._glyph, x, y)
     if self._is_strikethrough then love.graphics.draw(self._strikethrough._native, x, y) end
     if self._is_underlined then love.graphics.draw(self._underline._native, x, y) end

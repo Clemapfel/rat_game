@@ -7,7 +7,10 @@ rt.LineJoin = meta.new_enum({
 
 --- @class rt.Shape
 rt.Shape = meta.new_abstract_type("Shape", rt.Drawable, {
-    _color = rt.RGBA(1, 1, 1, 1),
+    _color_r = 1,
+    _color_g = 1,
+    _color_b = 1,
+    _color_a = 1,
     _is_outline = false,
     _use_anti_aliasing = true,
     _line_width = 1,
@@ -16,8 +19,9 @@ rt.Shape = meta.new_abstract_type("Shape", rt.Drawable, {
 
 --- @brief [internal]
 function rt.Shape:_bind_properties(callback, data)
+
     love.graphics.push()
-    love.graphics.setColor(self._color.r, self._color.g, self._color.b, self._color.a * self._opacity)
+    love.graphics.setColor(self._color_r, self._color_g, self._color_b, self._color_a * self._opacity)
     love.graphics.setLineWidth(self._line_width)
     love.graphics.setPointSize(self._line_width)
 
@@ -35,9 +39,9 @@ end
 --- @param rgba rt.RGBA
 function rt.Shape:set_color(rgba)
     if meta.is_rgba(rgba) then
-        self._color = rgba
+        self._color_r, self._color_g, self._color_b, self._color_a = rt.color_unpack(rgba)
     elseif meta.is_hsva(rgba) then
-        self._color = rt.hsva_to_rgba(rgba)
+        self._color_r, self._color_g, self._color_b, self._color_a = rt.color_unpack(rt.hsva_to_rgba(rgba))
     else
         meta.assert_rgba(rgba)
     end
@@ -45,7 +49,7 @@ end
 
 --- @brief get color of all vertices
 function rt.Shape:get_color()
-    return self._color
+    return rt.RGBA(self._color_r, self._color_g, self._color_b, self._color_a)
 end
 
 --- @brief

@@ -1,24 +1,16 @@
 rt.graphics = {}
 
 --- @brief
-function rt.graphics.translate(x, y)
-    love.graphics.translate(math.round(x), math.round(y))
-end
+rt.graphics.translate = love.graphics.translate
 
 --- @brief
-function rt.graphics.origin()
-    love.graphics.origin()
-end
+rt.graphics.origin = love.graphics.origin
 
 --- @brief
-function rt.graphics.rotate(angle)
-    love.graphics.rotate(angle)
-end
+rt.graphics.rotate = love.graphics.rotate
 
 --- @brief
-function rt.graphics.scale(x, y)
-    love.graphics.scale(x, y)
-end
+rt.graphics.scale = love.graphics.scale
 
 --- @brief
 function rt.graphics.clear(r, g, b, a)
@@ -26,14 +18,10 @@ function rt.graphics.clear(r, g, b, a)
 end
 
 --- @brief
-function rt.graphics.get_width()
-    return love.graphics.getWidth()
-end
+rt.graphics.get_width = love.graphics.getWidth
 
 --- @brief
-function rt.graphics.get_height()
-    return love.graphics.getHeight()
-end
+rt.graphics.get_height = love.graphics.getHeight
 
 rt.BlendMode = meta.new_enum({
     NONE = -1,

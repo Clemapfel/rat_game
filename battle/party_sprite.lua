@@ -171,6 +171,7 @@ function bt.PartySprite:draw()
     rt.graphics.set_stencil_test()
 
     self._frame:draw()
+    bt.BattleSprite.draw(self)
     self._name:draw()
 end
 
