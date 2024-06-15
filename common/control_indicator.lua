@@ -14,7 +14,13 @@ rt.ControlIndicator = meta.new_type("ControlIndicator", rt.Widget, function(layo
         _base = rt.Spacer(),
         _opacity = 1,
         _final_width = 1,
-        _final_height = 1
+        _final_height = 1,
+
+        _snapshot = {}, -- rt.RenderTexture
+        _position_x = 0,
+        _position_y = 0,
+        _snapshot_offset_x = 0,
+        _snapshot_offset_y = 0,
     })
 end)
 
@@ -73,6 +79,9 @@ end
 
 --- @override
 function rt.ControlIndicator:size_allocate(x, y, width, height)
+    self._position_x, self._position_y = x, y
+    x, y = 0, 0
+
     local m = rt.settings.margin_unit * 0.5
     local sprite_scale = rt.settings.control_indicator.sprite_scale
     local current_x, current_y = x + m, y + m
@@ -96,22 +105,36 @@ function rt.ControlIndicator:size_allocate(x, y, width, height)
         current_x = current_x + sprite_w + m + label_w + 3 * m
     end
 
+    max_x = clamp(max_x, 0)
+    max_y = clamp(max_y, 0)
+
     local thickness = self._frame:get_thickness()
     self._final_width = max_x - x + 2 * thickness
     self._final_height = max_y - y + 2 * thickness
 
     self._frame:fit_into(x, y, self._final_width, self._final_height)
-end
 
---- @override
-function rt.ControlIndicator:draw()
+    local offset = 2;
+    self._snapshot_offset_x, self._snapshot_offset_y = offset, offset
+    self._snapshot = rt.RenderTexture(self._final_width + 2 * offset, self._final_height + 2 * offset)
+    self._snapshot:bind_as_render_target()
+    rt.graphics.translate(offset, offset)
     self._frame:draw()
-
     for i = 1, #self._labels do
         local sprite, label = self._sprites[i], self._labels[i]
         sprite:draw()
         label:draw()
     end
+    rt.graphics.translate(-offset, -offset)
+    self._snapshot:unbind_as_render_target()
+end
+
+--- @override
+function rt.ControlIndicator:draw()
+    local x_offset, y_offset = self._position_x - self._snapshot_offset_x, self._position_y - self._snapshot_offset_y
+    rt.graphics.translate(x_offset, y_offset)
+    self._snapshot:draw()
+    rt.graphics.translate(-x_offset, -y_offset)
 end
 
 --- @override

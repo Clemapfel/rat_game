@@ -345,7 +345,6 @@ end
 
 --- @brief
 function rt.TextBox:draw()
-    dbg("TODO: optimized Textbox:draw")
     if self._n_labels == 0 then return end
     if self._backdrop_current_height < 0.5 * self._line_height then return end -- prevent artifacting when frame is very thin
 

@@ -5,8 +5,13 @@ bt.MoveSelection = meta.new_type("MoveSelection", rt.Widget, rt.Animation, funct
     return meta.new(bt.MoveSelection, {
         _items = {}, -- cf. create_from
         _entries = {},
+        _selected_entry = nil,
         _frame = rt.Frame(),
         _base = rt.Spacer(),
+
+        _snapshot = rt.RenderTexture(),
+        _snapshot_offset_x = 0,
+        _snapshot_offset_y = 0,
 
         _verbose_info = bt.VerboseInfo(),
         _current_tile_i = 1,
@@ -15,6 +20,8 @@ bt.MoveSelection = meta.new_type("MoveSelection", rt.Widget, rt.Animation, funct
         _moveset = {}, -- Table<bt.Move>
 
         _y_offset = 0,
+        _position_x = 0,
+        _position_y = 0
     })
 end)
 
@@ -57,8 +64,29 @@ function bt.MoveSelection:realize()
     self:reformat()
 end
 
+function bt.MoveSelection:_update_snapshot()
+    rt.graphics.translate(self._snapshot_offset_x, self._snapshot_offset_y)
+    self._snapshot:bind_as_render_target()
+
+    self._frame:draw()
+    for entry in values(self._tiles) do
+        entry.base:draw()
+        entry.empty_indicator:draw()
+
+        if entry.item ~= nil then
+            entry.item:draw()
+        end
+    end
+
+    self._snapshot:unbind_as_render_target()
+    rt.graphics.translate(-1 * self._snapshot_offset_x, -1 * self._snapshot_offset_y)
+end
+
 --- @override
 function bt.MoveSelection:size_allocate(x, y, width, height)
+    self._position_x, self._position_y = x, y
+    x, y = 0, 0
+
     local m = rt.settings.margin_unit
     local tile_w, tile_h = 100, 100
 
@@ -154,32 +182,27 @@ function bt.MoveSelection:size_allocate(x, y, width, height)
     end
 
     self:_update_selection()
+
+    local frame_bounds = self._frame:get_bounds()
+    local offset = 15
+    self._snapshot_offset_x, self._snapshot_offset_y = offset, offset
+    self._snapshot = rt.RenderTexture(frame_bounds.width + 2 * self._snapshot_offset_x, frame_bounds.height + 2 * self._snapshot_offset_y)
+    self:_update_snapshot()
 end
 
 --- @override
 function bt.MoveSelection:draw()
     if self._is_realized ~= true then return end
 
-    rt.graphics.translate(0, self._y_offset)
+    rt.graphics.translate(self._position_x, self._position_y)
 
-    self._frame:draw()
-
-    for entry in values(self._tiles) do
-        entry.base:draw()
-        entry.empty_indicator:draw()
-
-        if entry.item ~= nil then
-            entry.item:draw()
-        end
-
-        if entry.is_selected == true then
-            entry.selection_indicator:draw()
-        end
-    end
+    rt.graphics.translate(-self._snapshot_offset_x, -self._snapshot_offset_y)
+    self._snapshot:draw()
+    rt.graphics.translate(self._snapshot_offset_x, self._snapshot_offset_y)
 
     self._verbose_info:draw()
-
-    rt.graphics.translate(0, -1 * self._y_offset)
+    self._selected_entry.selection_indicator:draw()
+    rt.graphics.translate(-self._position_x, -self._position_y)
 end
 
 --- @brief [internal]
@@ -192,6 +215,7 @@ function bt.MoveSelection:_update_selection()
         if is_selected then
             selected_move = tile.move
             n_uses = tile.n_uses
+            self._selected_entry = tile
         end
     end
 
@@ -200,6 +224,7 @@ function bt.MoveSelection:_update_selection()
     else
         self._verbose_info:show({selected_move, n_uses})
     end
+
 end
 
 for direction in range("up", "right", "down", "left") do
