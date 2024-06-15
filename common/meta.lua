@@ -380,7 +380,7 @@ end
 --- @return Boolean
 function meta.isa(x, type)
     local metatable = getmetatable(x)
-    if meta.is_nil(metatable) or meta.is_nil(metatable[meta._super_index]) then
+    if metatable == nil or metatable[meta._super_index] == nil then
         return false
     else
         return metatable[meta._super_index][type._typename] == true

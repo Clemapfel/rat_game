@@ -13,21 +13,23 @@ float box(int x, int y, int size)
 
 vec4 effect(vec4 color, Image tex, vec2 texture_coords, vec2 screen_coords)
 {
-    const int radius = 2;                       // blur radius, runtime is O((2 * radius + 1)^2)
+    const float radius = 2;
     const float outline_intensity = 3;          // opacity multiplier
 
     vec4 self = Texel(tex, texture_coords);
     vec2 pixel_size = vec2(1) / _texture_resolution;
 
+    const float kernel_value = 1. / ((2 * radius) * (2 * radius));
     vec4 sum = vec4(0);
-    for (int x = -1 * radius; x <= +1 * radius; ++x)
+    for (int x = -2; x <= +2; ++x)
     {
-        for (int y = -1 * radius; y <= +1 * radius; ++y)
+        for (int y = -2; y <= +2; ++y)
         {
-            float kernel_value = box(x + radius, y + radius, 2 * radius);
             sum += Texel(tex, texture_coords + vec2(x * pixel_size.x, y * pixel_size.y)) * kernel_value;
         }
     }
 
-    return vec4(_outline_color.rgb, sum.a) * vec4(1, 1, 1, outline_intensity * _opacity * _outline_color.a);
+    vec4 outline = vec4(_outline_color.rgb, sum.a);
+    outline.a *= outline_intensity * _opacity * _outline_color.a;
+    return vec4((outline + self).rgb, outline.a);
 }

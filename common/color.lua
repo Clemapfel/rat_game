@@ -27,10 +27,10 @@ end
 --- @param object any
 function meta.is_rgba(object)
     return sizeof(object) == 4 and
-            meta.is_number(object.r) and
-            meta.is_number(object.g) and
-            meta.is_number(object.b) and
-            meta.is_number(object.a)
+        meta.is_number(object.r) and
+        meta.is_number(object.g) and
+        meta.is_number(object.b) and
+        meta.is_number(object.a)
 end
 
 --- @brief [internal] throw if object is not rt.RGBA

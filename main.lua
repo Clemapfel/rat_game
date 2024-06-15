@@ -2,12 +2,16 @@ require "include"
 
 rt.current_scene = bt.Scene()
 scene = rt.current_scene
-scene:set_background("WORLEY")
+--scene:set_background("WORLEY")
 
 input = rt.InputController()
 input:signal_connect("pressed", function(_, which)
 
 end)
+
+hp_bar = bt.HealthBar(bt.Entity("GIRL"))
+hp_bar:realize()
+hp_bar:fit_into(50, 50, 100, 100)
 
 --- ###
 
@@ -15,6 +19,7 @@ love.load = function()
     rt.current_scene:realize()
     love.resize()
     scene:start_battle(bt.Battle("DEBUG_BATTLE"))
+    --scene:transition(bt.SceneState.SIMULATION(scene))
     scene._state_manager:start_turn()
 end
 
@@ -33,6 +38,8 @@ love.draw = function()
     if rt.current_scene ~= nil then
         rt.current_scene:draw()
     end
+
+    --hp_bar:draw()
 
     if rt.settings.show_fps == true then
         local fps = love.timer.getFPS()

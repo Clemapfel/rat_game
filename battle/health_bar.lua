@@ -114,10 +114,6 @@ function bt.HealthBar:size_allocate(x, y, width, height)
     self._label_left:set_position(x + 0.5 * width - 0.5 * center_w - left_w, label_y)
     self._label_right:set_position(x + 0.5 * width + 0.5 * center_w, label_y)
 
-    self._debug_outline = rt.Rectangle(
-        x, y, width, height
-    )
-    self._debug_outline:set_is_outline(true)
     self:_update_value()
     self:_update_color_from_percentage(self._hp_current / self._hp_max)
 end
@@ -164,10 +160,6 @@ function bt.HealthBar:draw()
         self._label_left:draw()
         self._label_center:draw()
         self._label_right:draw()
-
-        if rt.settings.debug_draw_enabled == true then
-            self._debug_outline:draw()
-        end
     end
 end
 

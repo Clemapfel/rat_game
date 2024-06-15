@@ -19,7 +19,6 @@ rt.TextEffect = meta.new_enum({
     RAINBOW = "TEXT_EFFECT_RAINBOW"
 })
 
-
 --- @class rt.Glyph
 --- @param font rt.Font
 --- @param content String
@@ -43,8 +42,6 @@ rt.Glyph = meta.new_type("Glyph", rt.Drawable, rt.Animation, function(font, cont
     if meta.is_nil(is_outlined) then is_outlined = false end
     if meta.is_nil(outline_color) then outline_color = rt.settings.glyph.default_outline_color end
 
-    local is_animated = sizeof(effects) ~= 0
-
     if not meta.is_string(content) then content = tostring(content) end
     local out = meta.new(rt.Glyph, {
         _font = font,
@@ -60,13 +57,11 @@ rt.Glyph = meta.new_type("Glyph", rt.Drawable, rt.Animation, function(font, cont
         _position_x = 0,
         _position_y = 0,
         _n_visible_characters = utf8.len(content),
-        _max_n_visible_characters = utf8.len(content),
-        _is_animated = is_animated,
+        _is_animated = false,
 
         _is_outlined = is_outlined,
         _outline_color = outline_color,
-        _outline_render_texture = {}, -- love.Canvas
-        _outline_swap_texture = {}, -- love.Canvas
+        _outline_render_texture = {}, -- rt.RenderTexture
         _outline_render_offset_x = 0,
         _outline_render_offset_y = 0,
 
@@ -77,7 +72,6 @@ rt.Glyph = meta.new_type("Glyph", rt.Drawable, rt.Animation, function(font, cont
     for _, effect in pairs(effects) do
         out._effects[effect] = true
     end
-
     out:_update()
     return out
 end)
@@ -90,61 +84,15 @@ function rt.Glyph:_get_font()
     return self._font[self._style]
 end
 
---- @brief
-function rt.Glyph:_update_outline()
-    if not self._is_outlined then return end
-
-    local offset_x, offset_y = self._outline_render_offset_x, self._outline_render_offset_y
-    love.graphics.push()
-
-    self._outline_swap_texture:bind_as_render_target()
-    love.graphics.clear(0, 0, 0, 0)
-
-    if self._is_animated == true or self._n_visible_characters ~= self._max_n_visible_characters then
-        self._render_shader:send("_shake_active", self._effects[rt.TextEffect.SHAKE] == true)
-        self._render_shader:send("_shake_offset", rt.settings.glyph.shake_offset)
-        self._render_shader:send("_shake_period", rt.settings.glyph.shake_period)
-
-        self._render_shader:send("_wave_active", self._effects[rt.TextEffect.WAVE] == true)
-        self._render_shader:send("_wave_period", rt.settings.glyph.wave_period)
-        self._render_shader:send("_wave_offset", rt.settings.glyph.wave_offset)
-        self._render_shader:send("_wave_speed", rt.settings.glyph.wave_speed)
-
-        self._render_shader:send("_rainbow_active", self._effects[rt.TextEffect.RAINBOW] == true)
-        self._render_shader:send("_rainbow_width", rt.settings.glyph.rainbow_width)
-
-        self._render_shader:send("_n_visible_characters", self._n_visible_characters)
-        self._render_shader:send("_time", self._elapsed_time)
-
-        self._render_shader:bind()
-        self:_draw_glyph(offset_x, offset_y)
-        self._render_shader:unbind()
-    else
-        self:_draw_glyph(offset_x, offset_x)
-    end
-
-    self._outline_swap_texture:unbind_as_render_target()
-
-    self._outline_render_texture:bind_as_render_target()
-    love.graphics.clear(0, 0, 0, 0)
-    self._outline_shader:bind()
-    self._outline_shader:send("_texture_resolution", {self._outline_render_texture:get_size()})
-    self._outline_shader:send("_opacity", self._opacity)
-    self._outline_shader:send("_outline_color", {self._outline_color.r, self._outline_color.g, self._outline_color.b, self._outline_color.a})
-    love.graphics.draw(self._outline_swap_texture._native, 0, 0)
-    self._outline_shader:unbind()
-    self._outline_render_texture:unbind_as_render_target()
-
-    love.graphics.pop()
-end
-
 --- @brief update held object
 function rt.Glyph:_update()
+
     if love.getVersion() >= 12 then
         self._glyph = love.graphics.newTextBatch(self:_get_font(), {{self._color.r, self._color.g, self._color.b}, self._content})
     else
         self._glyph = love.graphics.newText(self:_get_font(), {{self._color.r, self._color.g, self._color.b}, self._content})
     end
+    self._is_animated = sizeof(self._effects) > 0
 
     if self._is_outlined == true then
         local w, h = self:get_size()
@@ -168,7 +116,6 @@ function rt.Glyph:_update()
 
         if not meta.isa(self._outline_render_texture, rt.RenderTexture) or self._outline_render_texture:get_width() ~= w or self._outline_render_texture:get_height() ~= h then
             self._outline_render_texture = rt.RenderTexture(w, h)
-            self._outline_swap_texture = rt.RenderTexture(w, h)
         end
 
         self._outline_render_offset_x = x_offset
@@ -220,57 +167,94 @@ function rt.Glyph:_update()
             self._strikethrough:set_color(self._color)
         end
     end
-
-    self:_update_outline()
 end
 
---- @overload
-function rt.Glyph:update(delta)
-    self._elapsed_time = self._elapsed_time + delta
-
-    if self._is_animated and self._is_outline then
-        self:_update_outline()
-    end
+--- @brief [internal]
+function rt.Glyph:_draw_underline(x, y)
+    love.graphics.push()
+    rt.graphics.translate(x, y)
+    self._underline:draw()
+    love.graphics.pop()
 end
 
-function rt.Glyph:_draw_glyph(x, y)
-    love.graphics.setColor(1, 1, 1, self._opacity)
-    love.graphics.draw(self._glyph, x, y)
-    if self._is_strikethrough then love.graphics.draw(self._strikethrough._native, x, y) end
-    if self._is_underlined then love.graphics.draw(self._underline._native, x, y) end
+--- @brief [internal]
+function rt.Glyph:_draw_strikethrough(x, y)
+    love.graphics.push()
+    rt.graphics.translate(x, y)
+    self._strikethrough:draw()
+    love.graphics.pop()
 end
 
 --- @overload
 function rt.Glyph:draw(opacity)
     if self:get_is_visible() == false then return end
+    opacity = which(opacity, self._opacity)
 
-    if opacity == nil then opacity = self._opacity end
+    self._render_shader:send("_shake_active", self._effects[rt.TextEffect.SHAKE] == true)
+    self._render_shader:send("_shake_offset", rt.settings.glyph.shake_offset)
+    self._render_shader:send("_shake_period", rt.settings.glyph.shake_period)
+
+    self._render_shader:send("_wave_active", self._effects[rt.TextEffect.WAVE] == true)
+    self._render_shader:send("_wave_period", rt.settings.glyph.wave_period)
+    self._render_shader:send("_wave_offset", rt.settings.glyph.wave_offset)
+    self._render_shader:send("_wave_speed", rt.settings.glyph.wave_speed)
+
+    self._render_shader:send("_rainbow_active", self._effects[rt.TextEffect.RAINBOW] == true)
+    self._render_shader:send("_rainbow_width", rt.settings.glyph.rainbow_width)
+
+    self._render_shader:send("_n_visible_characters", self._n_visible_characters)
+    self._render_shader:send("_time", self._elapsed_time)
+
+    function draw_glyph(x, y)
+        self._render_shader:bind()
+        love.graphics.draw(self._glyph, x, y)
+
+        if self._is_strikethrough then
+            self:_draw_strikethrough(x, y)
+        end
+
+        if self._is_underlined then
+            self:_draw_underline(x, y)
+        end
+
+        self._render_shader:unbind()
+    end
+
     local x, y = self._position_x, self._position_y
-
-    love.graphics.setColor(1, 1, 1, self._opacity)
+    local before = love.graphics.getShader()
 
     if self._is_outlined then
-        local offset_x, offset_y = self._outline_render_offset_x, self._outline_render_offset_y
-        love.graphics.draw(self._outline_render_texture._native, x - offset_x, y - offset_y)
-    elseif self._is_animated == true or self._n_visible_characters ~= self._max_n_visible_characters then
-        self._render_shader:send("_shake_active", self._effects[rt.TextEffect.SHAKE] == true)
-        self._render_shader:send("_shake_offset", rt.settings.glyph.shake_offset)
-        self._render_shader:send("_shake_period", rt.settings.glyph.shake_period)
-        self._render_shader:send("_wave_active", self._effects[rt.TextEffect.WAVE] == true)
-        self._render_shader:send("_wave_period", rt.settings.glyph.wave_period)
-        self._render_shader:send("_wave_offset", rt.settings.glyph.wave_offset)
-        self._render_shader:send("_wave_speed", rt.settings.glyph.wave_speed)
-        self._render_shader:send("_rainbow_active", self._effects[rt.TextEffect.RAINBOW] == true)
-        self._render_shader:send("_rainbow_width", rt.settings.glyph.rainbow_width)
-        self._render_shader:send("_n_visible_characters", self._n_visible_characters)
-        self._render_shader:send("_time", self._elapsed_time)
+        -- paste glyph to render texture
+        self._outline_render_texture:bind_as_render_target()
+        love.graphics.clear(0, 0, 0, 0)
+        love.graphics.setColor(1, 1, 1, opacity)
+        love.graphics.push()
+        local before_test, before_value = rt.graphics.get_stencil_test()
+        love.graphics.origin()
+        rt.graphics.set_stencil_test()
+        draw_glyph(self._outline_render_offset_x, self._outline_render_offset_y)
+        rt.graphics.set_stencil_test(before_test, before_value)
+        love.graphics.pop()
+        self._outline_render_texture:unbind_as_render_target()
 
-        self._render_shader:bind()
-        self:_draw_glyph(x, y)
-        self._render_shader:unbind()
-    else
-        self:_draw_glyph(x, y)
+        -- render product using outline shader
+        self._outline_shader:bind()
+        love.graphics.setColor(1, 1, 1, opacity)
+        self._outline_shader:send("_texture_resolution", {self._outline_render_texture:get_size()})
+        self._outline_shader:send("_opacity", opacity)
+        self._outline_shader:send("_outline_color", {self._outline_color.r, self._outline_color.g, self._outline_color.b, self._outline_color.a})
+        love.graphics.draw(self._outline_render_texture._native, x - self._outline_render_offset_x, y - self._outline_render_offset_y)
+        self._outline_shader:unbind()
     end
+
+    -- render regular glyph on top of outline
+    love.graphics.setColor(1, 1, 1, opacity)
+    draw_glyph(x, y)
+end
+
+--- @overload
+function rt.Glyph:update(delta)
+    self._elapsed_time = self._elapsed_time + delta
 end
 
 --- @brief set font style
@@ -361,10 +345,7 @@ end
 
 --- @brief
 function rt.Glyph:set_n_visible_characters(n)
-    if n ~= self._n_visible_characters then
-        self._n_visible_characters = clamp(n, 0, self._max_n_visible_characters)
-        self:_update_outline()
-    end
+    self._n_visible_characters = clamp(n, 0, self:get_n_characters())
 end
 
 --- @brief
@@ -385,4 +366,19 @@ end
 --- @brief
 function rt.Glyph:get_opacity()
     return self._opacity
+end
+
+--- @brief
+function rt.Glyph:set_is_animated(b)
+    self._is_animated = b
+end
+
+--- @brief
+function rt.Glyph:get_is_animated()
+    return self._is_animated
+end
+
+--- @brief [internal] test glyph
+function rt.test.glyph()
+    error("TODO")
 end

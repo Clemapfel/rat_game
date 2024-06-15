@@ -46,6 +46,7 @@ end
 
 --- @brief [internal]
 function bt.SceneState.MOVE_SELECT:_update_selection()
+    local clock = rt.Clock()
     local scene = self._scene
     local move = self._move_selection:get_selected_move()
     local user = self._move_selection:get_user()
@@ -173,6 +174,7 @@ end
 --- @override
 function bt.SceneState.MOVE_SELECT:update(delta)
     local scene = self._scene
+
     for sprite in values(scene._party_sprites) do
         sprite:update(delta)
     end
@@ -183,26 +185,24 @@ function bt.SceneState.MOVE_SELECT:update(delta)
 
     scene._global_status_bar:update(delta)
     scene._priority_queue:update(delta)
-
-    for item in values(self._items) do
-        item:update(delta)
-    end
 end
 
 --- @override
 function bt.SceneState.MOVE_SELECT:draw()
     local scene = self._scene
 
-    for sprites in range(scene._party_sprites, scene._enemy_sprites) do
-        for sprite in values(sprites) do
-            sprite:draw()
-            bt.BattleSprite.draw(sprite)
-        end
+    for sprite in values(scene._party_sprites) do
+        sprite:draw()
+        bt.BattleSprite.draw(sprite)
+    end
+
+    for sprite in values(scene._enemy_sprites) do
+        sprite:draw()
+        bt.BattleSprite.draw(sprite)
     end
 
     scene._global_status_bar:draw()
     scene._priority_queue:draw()
-
     self._control_indicator:draw()
     self._move_selection:draw()
 end

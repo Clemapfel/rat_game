@@ -453,6 +453,7 @@ function bt.SceneState.ENTITY_SELECT:draw()
 
     for sprite in values(scene._party_sprites) do
         sprite:draw()
+        bt.BattleSprite.draw(sprite)
     end
 
     scene._global_status_bar:draw()

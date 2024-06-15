@@ -171,12 +171,7 @@ function bt.PartySprite:draw()
     rt.graphics.set_stencil_test()
 
     self._frame:draw()
-
-    self._health_bar:draw()
     self._name:draw()
-    self._status_bar:draw()
-    self._consumable_bar:draw()
-    self._speed_value:draw()
 end
 
 --- @brief
