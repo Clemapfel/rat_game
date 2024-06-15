@@ -462,6 +462,7 @@ function bt.SceneState.INSPECT:draw()
 
     for sprite in values(scene._party_sprites) do
         sprite:draw()
+        sprite:draw_bounds()
     end
 
     scene._global_status_bar:draw()

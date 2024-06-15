@@ -1,3 +1,7 @@
+rt.settings.battle.background = {
+    compression = 1
+}
+
 --- @class bt.Background
 bt.Background = meta.new_abstract_type("BattleBackground", rt.Widget)
 
@@ -8,13 +12,16 @@ end
 
 -- ###
 
-bt.ShaderOnlyBackground = meta.new_type("ShaderOnlyBackground", bt.Background, function(path, disabled_elapsed)
+bt.ShaderOnlyBackground = meta.new_type("ShaderOnlyBackground", bt.Background, function(path, disabled_elapsed, disable_compression)
     return meta.new(bt.ShaderOnlyBackground, {
         _path = path,
         _shader = {},   -- rt.Shader
         _shape = {},    -- rt.VertexShape
         _elapsed = rt.random.number(0, 2^8),
-        _disable_elapsed = disabled_elapsed
+        _disable_elapsed = disabled_elapsed,
+        _render_texture = {},
+        _position_x = 0,
+        _position_y = 0
     })
 end)
 
@@ -32,6 +39,13 @@ function bt.ShaderOnlyBackground:size_allocate(x, y, width, height)
     self._shape:set_vertex_position(2, x + width, y)
     self._shape:set_vertex_position(3, x + width, y + height)
     self._shape:set_vertex_position(4, x, y + height)
+
+    local factor = rt.settings.battle.background.compression
+    self._render_texture = rt.RenderTexture(factor * width, factor * height)
+    self._render_texture:set_scale_mode(rt.TextureScaleMode.LINEAR)
+    self._shape:set_texture(self._render_texture)
+
+    self._position_x, self._position_y = x, y
 end
 
 --- @override
@@ -41,15 +55,21 @@ function bt.ShaderOnlyBackground:update(delta)
 
     if self._disable_elapsed ~= false then
         self._shader:send("elapsed", self._elapsed)
+        self._shader:send("compression", rt.settings.battle.background.compression)
     end
+
+    self._render_texture:bind_as_render_target()
+    love.graphics.clear(0, 0, 0, 0)
+    self._shader:bind()
+    self._shape:draw()
+    self._shader:unbind()
+    self._render_texture:unbind_as_render_target()
 end
 
 --- @override
 function bt.ShaderOnlyBackground:draw()
     if self._is_realized ~= true then return end
-    self._shader:bind()
     self._shape:draw()
-    self._shader:unbind()
 end
 
 -- include all implementations

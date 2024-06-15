@@ -125,22 +125,21 @@ vec3 oklch_to_rgb(vec3 lch)
 #ifdef PIXEL
 
 uniform float elapsed;
+uniform float compression;
 
 vec4 effect(vec4 vertex_color, Image image, vec2 texture_coords, vec2 vertex_position)
 {
     float time = elapsed / 5;
-    vec2 pos = vertex_position / love_ScreenSize.xy;
+    vec2 pos = vertex_position.xy / love_ScreenSize.xy;
     pos -= vec2(0.5);
     pos.x *= (love_ScreenSize.x / love_ScreenSize.y);
-    pos *= 1;
 
     float weight = gaussian(distance(pos.xy, vec2(0)), 0, 4);
     float scale = 6;
-    float magnitude = clamp(fwidth(gradient_noise(vec3(pos.xy * weight * scale, time))) * 60, 0, 1);
+    float magnitude = fwidth(gradient_noise(vec3(pos.xy * weight * scale, time))) * 60;
+    magnitude = clamp(magnitude * compression, 0, 1);
 
     vec3 hsv = vec3(magnitude, 0, magnitude);
-
-    float sine = (sin(elapsed) + 1) / 2;
     return vec4(hsv_to_rgb(hsv), 1);
 }
 

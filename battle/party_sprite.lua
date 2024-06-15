@@ -151,8 +151,7 @@ function bt.PartySprite:size_allocate(x, y, width, height)
     self._max_sprite_offset = sprite_h
     self._current_sprite_offset = sprite_h
 
-    self._bounds.y = current_y - total_frame_thickness
-    self._bounds.height = frame_aabb.height + 2 * total_frame_thickness
+    self._bounds = frame_aabb
     self:_update_state()
 end
 

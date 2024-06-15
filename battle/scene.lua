@@ -155,8 +155,8 @@ function bt.Scene:draw()
     end
 
     rt.graphics.set_blend_mode(rt.BlendMode.MULTIPLY)
-    --self._gradient_left:draw()
-    --self._gradient_right:draw()
+    self._gradient_left:draw()
+    self._gradient_right:draw()
     rt.graphics.set_blend_mode()
 
     if self._current_state ~= nil then
