@@ -215,3 +215,16 @@ function rt.Frame:set_opacity(alpha)
     self._frame:set_opacity(self._opacity)
     self._frame_outline:set_opacity(self._opacity)
 end
+
+--- @brief
+function rt.Frame:set_type(type)
+    if type ~= self._type then
+        self._type = type
+        self:reformat()
+    end
+end
+
+--- @brief
+function rt.Frame:get_type()
+    return self._type
+end

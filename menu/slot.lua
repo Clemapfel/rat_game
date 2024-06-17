@@ -10,29 +10,44 @@ rt.settings.menu.slot = {
     sprite_factor = 3
 }
 
-mn.Slot = meta.new_type("Slot", rt.Widget, function(type_sprite_name, type_sprite_index)
+mn.Slot = meta.new_type("Slot", rt.Widget, function(type_label, frame_type)
     return meta.new(mn.Slot, {
-        _type_sprite = rt.Sprite(type_sprite_name, type_sprite_index),
-        _type_sprite_opacity = 0.5;
+        _type_label = rt.Label(type_label, rt.settings.font.default_tiny, rt.settings.font.default_mono_tiny),
+        _type_label_stencil = rt.Rectangle(0, 0, 1, 1),
+
         _item_sprite = {},
         _item = nil,
 
         _base = rt.Spacer(),
-        _base_inlay = rt.Rectangle(0, 0, 1, 1),
-        _frame = rt.Frame(),
+        _base_inlay = {},
+        _frame = rt.Frame(frame_type),
 
         _selection_state = bt.SelectionState.INACTIVE
     })
 end)
 
-mn.EquipSlot = function(equip)
-    local out = mn.Slot(rt.settings.menu.slot.sprite_path, rt.settings.menu.slot.sprite_ids[equip:get_type()])
+mn.EquipSlot = function(type, equip)
+    meta.assert_enum(type, bt.EquipType)
+    local label = ""
+    if type == bt.EquipType.TRINKET then
+        label = "Trinket"
+    elseif type == bt.EquipType.CONSUMABLE then
+        label = "Consumable"
+    elseif type == bt.EquipType.WEAPON then
+        label = "Weapon"
+    else
+        label = "Unknown"
+    end
+
+    label = "<o>" .. label .. "</o>"
+
+    local out = mn.Slot(label, rt.FrameType.RECTANGULAR)
     if equip ~= nil then out:set_item(equip) end
     return out
 end
 
 mn.ConsumableSlot = function(consumable)
-    local out = mn.Slot(rt.settings.menu.slot.sprite_path, "consumable")
+    local out = mn.Slot("<o>Consumable</o>", rt.FrameType.CIRCULAR)
     if consumable ~= nil then out:set_item(consumable) end
     return out
 end
@@ -60,11 +75,16 @@ function mn.Slot:realize()
     self._frame:realize()
     self._base:realize()
     self._frame:set_child(self._base)
-    self._base_inlay:set_color(rt.color_darken(self._base:get_color(), 0.15))
-    self._base_inlay:set_corner_radius(self._frame:get_corner_radius())
-    s
-    self._type_sprite:realize()
-    self._type_sprite:set_opacity(self._type_sprite_opacity)
+
+    if self._frame:get_type() == rt.FrameType.RECTANGULAR then
+        self._base_inlay = rt.Rectangle(0, 0, 1, 1)
+        self._base_inlay:set_corner_radius(self._frame:get_corner_radius())
+    else
+        self._base_inlay = rt.Circle(0, 0, 1)
+    end
+    self._base_inlay:set_color(rt.color_darken(self._base:get_color(), 0.05))
+
+    self._type_label:realize()
 
     if self._item ~= nil then
         self._item_sprite:realize()
@@ -75,28 +95,37 @@ end
 
 --- @override
 function mn.Slot:size_allocate(x, y, width, height)
-    local sprite_w, sprite_h = self._type_sprite:get_resolution()
+    local sprite_w, sprite_h = 32, 32
     local factor = rt.settings.menu.slot.sprite_factor
-    local thickness = self._frame:get_thickness()
+    local thickness = 0--
 
     sprite_w = sprite_w * factor
     sprite_h = sprite_h * factor
 
     local sprite_bounds = rt.AABB(
-        x + thickness + 0.5 * width - 0.5 * sprite_w,
-        y + thickness + 0.5 * height - 0.5 * sprite_h,
+        x + thickness,
+        y + thickness,
         sprite_w, sprite_h
     )
 
     local spacing = 0.1 * sprite_w
-    self._base_inlay:resize(x + spacing, y + spacing, sprite_w - 2 * spacing, sprite_h - 2 * spacing)
+    if self._frame:get_type() == rt.FrameType.RECTANGULAR then
+        self._base_inlay:resize(x + spacing, y + spacing, sprite_w - 2 * spacing, sprite_h - 2 * spacing)
+    else
+        self._base_inlay:resize(x + 0.5 * sprite_w, y + 0.5 * sprite_h, (sprite_w - 2 * spacing) / 2)
+    end
 
-    self._type_sprite:fit_into(sprite_bounds)
     if self._item ~= nil then
-        self._item_sprite:fit_into(sprite_bounds)
+        self._item_sprite:fit_into(sprite_bounds.x + 0.5 * sprite_bounds.width - 0.5 * sprite_w, sprite_bounds.y + 0.5 * sprite_bounds.height - 0.5 * sprite_h, sprite_w, sprite_h)
     end
 
     self._frame:fit_into(x, y, sprite_w, sprite_w)
+
+    local label_w, label_h = self._type_label:measure()
+    local label_x, label_y = x + 0.5 * sprite_w - 0.5 * label_w, y + sprite_h - self._frame:get_thickness() - label_h - 2
+    self._type_label:fit_into(label_x, label_y, sprite_w, sprite_h)
+    local padding = 50
+    self._type_label_stencil:resize(label_x - padding, label_y - padding, label_w + 2 * padding, label_h + 2 * padding)
 end
 
 --- @override
@@ -104,10 +133,11 @@ function mn.Slot:draw()
     if self._is_realized ~= true then return end
     self._frame:draw()
     self._base_inlay:draw()
-    self._type_sprite:draw()
+    self._type_label:draw()
 
     if self._item ~= nil then
         self._item_sprite:draw()
+        self._item_sprite:draw_bounds()
     end
 end
 
@@ -132,7 +162,6 @@ function mn.Slot:set_opacity(alpha)
     self._opacity = alpha
     if self._is_realized then
         self._frame:set_opacity(alpha)
-        self._type_sprite:set_opacity(alpha * self._type_sprite_opacity)
         if self._item ~= nil then
             self._item_sprite:set_opacity(alpha)
         end

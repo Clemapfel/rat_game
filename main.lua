@@ -4,18 +4,22 @@ rt.current_scene = bt.Scene()
 scene = rt.current_scene
 scene:set_background("GRADIENT_DERIVATIVE")
 
-local slot = mn.ConsumableSlot()
+local slot = mn.EquipSlot(bt.EquipType.WEAPON) --bt.Consumable("DEBUG_CONSUMABLE"))
 slot:realize()
-slot:fit_into(50, 50, 100, 100)
+slot:fit_into(50, 50, 1000, 1000)
+
+local item = mn.ListItem(bt.Move("DEBUG_MOVE"), 91)
+item:realize()
+item:fit_into(50, 50, rt.graphics.get_width() * 0.5, 100)
 
 --- ###
 
 love.load = function()
     rt.current_scene:realize()
     love.resize()
-    scene:start_battle(bt.Battle("DEBUG_BATTLE"))
+    --scene:start_battle(bt.Battle("DEBUG_BATTLE"))
     --scene:transition(bt.SceneState.SIMULATION(scene))
-    scene._state_manager:start_turn()
+    --scene._state_manager:start_turn()
 end
 
 rt.graphics.frame_duration = {
@@ -34,7 +38,7 @@ love.draw = function()
         rt.current_scene:draw()
     end
 
-    slot:draw()
+    item:draw()
 
     if rt.settings.show_fps == true then
         local fps = love.timer.getFPS()
@@ -75,6 +79,8 @@ love.resize = function()
     if rt.current_scene ~= nil then
         rt.current_scene:fit_into(0, 0, love.graphics.getWidth(), love.graphics.getHeight())
     end
+
+    item:fit_into(50, 50, rt.graphics.get_width() * 0.5, 100)
 end
 
 love.run = function()
