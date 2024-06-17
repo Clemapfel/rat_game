@@ -4,14 +4,9 @@ rt.current_scene = bt.Scene()
 scene = rt.current_scene
 scene:set_background("GRADIENT_DERIVATIVE")
 
-input = rt.InputController()
-input:signal_connect("pressed", function(_, which)
-
-end)
-
-hp_bar = bt.HealthBar(bt.Entity("GIRL"))
-hp_bar:realize()
-hp_bar:fit_into(50, 50, 100, 100)
+local slot = mn.ConsumableSlot()
+slot:realize()
+slot:fit_into(50, 50, 100, 100)
 
 --- ###
 
@@ -39,7 +34,7 @@ love.draw = function()
         rt.current_scene:draw()
     end
 
-    --hp_bar:draw()
+    slot:draw()
 
     if rt.settings.show_fps == true then
         local fps = love.timer.getFPS()

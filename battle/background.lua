@@ -1,5 +1,5 @@
 rt.settings.battle.background = {
-    compression = 1
+    compression = 0.4
 }
 
 --- @class bt.Background
@@ -12,13 +12,14 @@ end
 
 -- ###
 
-bt.ShaderOnlyBackground = meta.new_type("ShaderOnlyBackground", bt.Background, function(path, disabled_elapsed, disable_compression)
+bt.ShaderOnlyBackground = meta.new_type("ShaderOnlyBackground", bt.Background, function(path, disabled_elapsed, enable_compression)
     return meta.new(bt.ShaderOnlyBackground, {
         _path = path,
         _shader = {},   -- rt.Shader
         _shape = {},    -- rt.VertexShape
         _elapsed = rt.random.number(0, 2^8),
         _disable_elapsed = disabled_elapsed,
+        _enable_compression = which(enable_compression, false),
         _render_texture = {},
         _position_x = 0,
         _position_y = 0
@@ -55,6 +56,9 @@ function bt.ShaderOnlyBackground:update(delta)
 
     if self._disable_elapsed ~= false then
         self._shader:send("elapsed", self._elapsed)
+    end
+
+    if self._enable_compression then
         self._shader:send("compression", rt.settings.battle.background.compression)
     end
 

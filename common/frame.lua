@@ -191,6 +191,11 @@ function rt.Frame:set_corner_radius(radius)
     end
 end
 
+--- @brief
+function rt.Frame:get_corner_radius()
+    return self._corner_radius
+end
+
 --- @overload rt.Widget.measure
 function rt.Frame:measure()
     if meta.is_widget(self._child) then

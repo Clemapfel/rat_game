@@ -2,6 +2,13 @@ rt.settings.battle.equip = {
     config_path = "battle/configs/equips"
 }
 
+bt.EquipType = meta.new_enum({
+    TRINKET = "TRINKET",
+    CLOTHING = "CLOTHING",
+    WEAPON = "MELEE_WEAPON",
+    UNKNOWN = "UNKNOWN"
+})
+
 --- @class bt.Equip
 bt.Equip = meta.new_type("Equip", function(id)
     local out = bt.Equip._atlas[id]
@@ -35,6 +42,8 @@ end, {
         meta.assert_equip_interface(self)
         meta.assert_entity_interface(holder)
     end,
+
+    type = bt.EquipType.UNKNOWN,
 
     description = "(no description)",
     sprite_id = "",
@@ -131,4 +140,9 @@ end
 --- @brief
 function bt.Equip:get_description()
     return self.description
+end
+
+--- @brief
+function bt.Equip:get_type()
+    return self.type
 end

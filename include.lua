@@ -39,8 +39,9 @@ rt.math = {}
 rt.graphics = {}
 rt.settings = {}
 rt.physics = {}
-rt.battle = {}
 rt.random = {}
+rt.battle = {}
+rt.menu = {}
 rt.overworld = {}
 rt.settings = {}
 rt.settings.margin_unit = 10
@@ -48,6 +49,8 @@ meta.make_auto_extend(rt.settings, true)
 
 bt = rt.battle
 ow = rt.overworld
+mn = rt.menu
+
 for name in range("rt", "bt", "ow") do
     local t = _G[name]
     setmetatable(t, {
@@ -123,6 +126,9 @@ require "common.audio_playback"
 require "common.monitored_audio_playback"
 require "common.sound_atlas"
 
+require "common.scene_state"
+require "common.scene"
+
 -- battle
 
 require "battle.entity"
@@ -171,4 +177,7 @@ require "battle.scene_state_manager"
 
 require "battle.scene"
 require "battle.simulation_handler"
+
+require "menu.slot"
+require "menu.inventory"
 

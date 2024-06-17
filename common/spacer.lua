@@ -41,6 +41,11 @@ function rt.Spacer:set_color(color)
 end
 
 --- @brief
+function rt.Spacer:get_color()
+    return self._color
+end
+
+--- @brief
 function rt.Spacer:set_corner_radius(r)
     self._shape:set_corner_radius(r)
 end

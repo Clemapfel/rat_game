@@ -246,12 +246,12 @@ function rt.SpriteAtlas:initialize(folder)
                 parse(filename)
             elseif info.type == "file" then
                 local name, extension = rt.filesystem.get_name_and_extension(filename)
-                if seen[name] ~= true then
+                if seen[filename] ~= true then
                     if extension == "png" then
                         local id = prefix .. "/" .. name
                         if self._data[id] == nil then
                             self._data[id] = rt.SpriteAtlasEntry(prefix, name)
-                            seen[name] = true
+                            seen[filename] = true
                         end
                     end
                 end

@@ -1,5 +1,5 @@
 --- @class bt.Scene
-bt.Scene = meta.new_type("BattleScene", rt.Widget, function()
+bt.Scene = meta.new_type("BattleScene", rt.Scene, function()
     return meta.new(bt.Scene, {
         _current_state = nil,
         _state_manager = {}, -- bt.SceneStateManager
