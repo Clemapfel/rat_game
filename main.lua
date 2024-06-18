@@ -12,6 +12,10 @@ local item = mn.ListItem(bt.Move("DEBUG_MOVE"), 91)
 item:realize()
 item:fit_into(50, 50, rt.graphics.get_width() * 0.5, 100)
 
+info = mn.EntityInfo(bt.Entity("GIRL"))
+info:realize()
+info:fit_into(50, 50, 100, 100)
+
 --- ###
 
 love.load = function()
@@ -38,7 +42,7 @@ love.draw = function()
         rt.current_scene:draw()
     end
 
-    item:draw()
+    info:draw()
 
     if rt.settings.show_fps == true then
         local fps = love.timer.getFPS()

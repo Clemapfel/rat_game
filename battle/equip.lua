@@ -4,7 +4,9 @@ rt.settings.battle.equip = {
 
 bt.EquipType = meta.new_enum({
     TRINKET = "TRINKET",
-    CLOTHING = "CLOTHING",
+    MALE_CLOTHING = "MALE_CLOTHING",
+    FEMALE_CLOTHING = "FEMALE_CLOTHING",
+    UNISEX_CLOTHING = "UNISEX_CLOTHING",
     WEAPON = "MELEE_WEAPON",
     UNKNOWN = "UNKNOWN"
 })
