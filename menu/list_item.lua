@@ -27,15 +27,21 @@ ConsumableListItem
 [ ] Name        Quantity
 ]]--
 
+function mn.ListItem._new_label(text)
+    return rt.Label(text, rt.settings.font.default_small, rt.settings.font.default_mono_small)
+end
+
 --- @override
 function mn.ListItem:realize()
     if self._is_realized == true then return end
     self._is_realized = true
-    self._name_label = rt.Label("<o>" .. self._object:get_name() .. "</o>")
+
+    local new_label = mn.ListItem._new_label
+    self._name_label = new_label("<o>" .. self._object:get_name() .. "</o>")
 
     local quantity = tostring(clamp(self._quantity, 0))
     quantity = string.rep(" ", 3 - #quantity) .. quantity
-    self._quantity_label = rt.Label("<o><mono>" .. quantity .. "</o></mono>")
+    self._quantity_label = new_label("<o><mono>" .. quantity .. "</o></mono>")
     self._sprite = rt.Sprite(self._object:get_sprite_id())
 
     for widget in range(self._sprite, self._name_label, self._quantity_label) do
@@ -50,7 +56,7 @@ end
 function mn.ListItem:size_allocate(x, y, width, height)
     local m = rt.settings.margin_unit
     local sprite_w, sprite_h = self._sprite:get_resolution()
-    local factor = 2
+    local factor = 1.2
     sprite_w = sprite_w * factor
     sprite_h = sprite_h * factor
 

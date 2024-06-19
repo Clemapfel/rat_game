@@ -42,7 +42,7 @@ love.draw = function()
         rt.current_scene:draw()
     end
 
-    info:draw()
+    item:draw()
 
     if rt.settings.show_fps == true then
         local fps = love.timer.getFPS()
