@@ -1,4 +1,4 @@
-#pragma language glsl4
+//#pragma language glsl4
 
 float simplex_noise(in vec3 v) {
     const vec2 C = vec2(1.0/6.0, 1.0/3.0);

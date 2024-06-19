@@ -1,4 +1,4 @@
-#pragma language glsl3
+//#pragma language glsl3
 
 uniform vec4 _left_color;
 uniform vec4 _right_color;

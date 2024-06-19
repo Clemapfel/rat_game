@@ -1,4 +1,4 @@
-#pragma language glsl3
+//#pragma language glsl3
 
 vec3 rgb_to_hsv(vec3 c)
 {
@@ -118,7 +118,7 @@ uniform float _time;
 
 flat varying int _letter_index;
 
-#define PI (355.f / 113.f)
+#define PI 3.14159
 
 vec4 position(mat4 transform, vec4 vertex_position)
 {

@@ -1,5 +1,5 @@
 rt.settings.snow_effect.vertex_shader_source = [[
-#pragma language glsl3
+//#pragma language glsl3
 
 // GPU-side random generator
 vec3 mod289(vec3 x) {
@@ -96,7 +96,7 @@ vec4 position(mat4 transform, vec4 vertex_position)
 ]]
 
 rt.settings.snow_effect.fragment_shader_source = [[
-#pragma language glsl3
+//#pragma language glsl3
 
 // GPU-side random generator
 vec3 mod289(vec3 x) {

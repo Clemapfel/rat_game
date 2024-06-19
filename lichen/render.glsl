@@ -1,4 +1,4 @@
-#pragma language glsl4
+//#pragma language glsl4
 
 #ifdef PIXEL
 

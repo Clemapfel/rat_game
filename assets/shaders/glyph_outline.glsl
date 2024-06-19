@@ -1,4 +1,4 @@
-#pragma language glsl3
+//#pragma language glsl3
 
 uniform vec2 _texture_resolution;   // resolution of canvas
 uniform float _opacity;             // overall opacity, in [0, 1]
