@@ -21,9 +21,9 @@ info:fit_into(50, 50, 100, 100)
 love.load = function()
     rt.current_scene:realize()
     love.resize()
-    --scene:start_battle(bt.Battle("DEBUG_BATTLE"))
-    --scene:transition(bt.SceneState.SIMULATION(scene))
-    --scene._state_manager:start_turn()
+    scene:start_battle(bt.Battle("DEBUG_BATTLE"))
+    scene:transition(bt.SceneState.SIMULATION(scene))
+    scene._state_manager:start_turn()
 end
 
 rt.graphics.frame_duration = {
