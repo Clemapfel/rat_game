@@ -4,17 +4,11 @@ rt.current_scene = bt.Scene()
 scene = rt.current_scene
 scene:set_background("GRADIENT_DERIVATIVE")
 
-local slot = mn.EquipSlot(bt.EquipType.WEAPON) --bt.Consumable("DEBUG_CONSUMABLE"))
-slot:realize()
-slot:fit_into(50, 50, 1000, 1000)
-
-local item = mn.ListItem(bt.Move("DEBUG_MOVE"), 91)
-item:realize()
-item:fit_into(50, 50, rt.graphics.get_width() * 0.5, 100)
-
-info = mn.EntityInfo(bt.Entity("GIRL"))
-info:realize()
-info:fit_into(50, 50, 100, 100)
+list = mn.ScrollableList()
+for i = 1, 30 do
+    list:push(mn.ListItem(bt.Move("DEBUG_MOVE"), rt.random.integer(1, 5)))
+end
+list:realize()
 
 --- ###
 
@@ -39,10 +33,10 @@ love.draw = function()
     love.graphics.clear(0.8, 0.2, 0.8, 1)
 
     if rt.current_scene ~= nil then
-        rt.current_scene:draw()
+       --rt.current_scene:draw()
     end
 
-    item:draw()
+    list:draw()
 
     if rt.settings.show_fps == true then
         local fps = love.timer.getFPS()
@@ -84,7 +78,7 @@ love.resize = function()
         rt.current_scene:fit_into(0, 0, love.graphics.getWidth(), love.graphics.getHeight())
     end
 
-    item:fit_into(50, 50, rt.graphics.get_width() * 0.5, 100)
+    list:fit_into(50, 50, rt.graphics.get_width() / 2, rt.graphics.get_height() / 2)
 end
 
 love.run = function()

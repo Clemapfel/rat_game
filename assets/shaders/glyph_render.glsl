@@ -1,4 +1,4 @@
-//#pragma language glsl3
+#pragma language glsl3
 
 vec3 rgb_to_hsv(vec3 c)
 {

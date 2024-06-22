@@ -1,5 +1,4 @@
-#pragma glsl3
-
+//#pragma langauge glsl3
 
 // random
 vec3 mod289(vec3 x) {

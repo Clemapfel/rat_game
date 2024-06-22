@@ -11,7 +11,9 @@ mn.ListItem = meta.new_type("MenuListItem", rt.Widget, function(object, quantity
         _name_label = {}, -- rt.Label
         _label_stencil = rt.Rectangle(0, 0, 1, 1),
         _quantity_label = {}, -- rt.Label
-        _base = rt.Rectangle(0, 0, 1, 1)
+        _base = rt.Rectangle(0, 0, 1, 1),
+        _base_outline = rt.Rectangle(0, 0, 1, 1),
+        _final_h = 1
     })
 end)
 
@@ -49,14 +51,20 @@ function mn.ListItem:realize()
     end
 
     self._base:set_corner_radius(rt.settings.frame.corner_radius)
-    self._base:set_color(rt.Palette.BACKGROUND)
+    self._base:set_color(rt.Palette.GRAY_4)
+
+    self._base_outline:set_corner_radius(rt.settings.frame.corner_radius)
+    self._base_outline:set_color(rt.Palette.BACKGROUND_OUTLINE)
+    self._base_outline:set_is_outline(true)
+
+    self:reformat()
 end
 
 --- @override
 function mn.ListItem:size_allocate(x, y, width, height)
     local m = rt.settings.margin_unit
     local sprite_w, sprite_h = self._sprite:get_resolution()
-    local factor = 1.2
+    local factor = 1
     sprite_w = sprite_w * factor
     sprite_h = sprite_h * factor
 
@@ -88,19 +96,27 @@ function mn.ListItem:size_allocate(x, y, width, height)
 
     local base_h = math.max(sprite_h, label_h, quantity_h)
     self._base:resize(x, y + 0.5 * height - 0.5 * base_h, width, base_h)
+    self._base_outline:resize(x, y + 0.5 * height - 0.5 * base_h, width, base_h)
+    self._final_h = base_h
 end
 
 --- @override
 function mn.ListItem:draw()
     self._base:draw()
+    self._base_outline:draw()
 
     local stencil_value = meta.hash(self._name_label)
-    rt.graphics.stencil(stencil_value, self._label_stencil)
-    rt.graphics.set_stencil_test(rt.StencilCompareMode.EQUAL, stencil_value)
+    --rt.graphics.stencil(stencil_value, self._label_stencil)
+    --rt.graphics.set_stencil_test(rt.StencilCompareMode.EQUAL, stencil_value)
     self._name_label:draw()
-    rt.graphics.set_stencil_test()
-    rt.graphics.stencil()
+    --rt.graphics.stencil()
+    --rt.graphics.pop()
 
     self._sprite:draw()
     self._quantity_label:draw()
+end
+
+--- @override
+function mn.ListItem:measure()
+    return self._bounds.width, self._final_h
 end

@@ -5,12 +5,14 @@ mn.ScrollableList = meta.new_type("ScrollableList", rt.Widget, function()
         _n_items = 0,
         _stencil = rt.Rectangle(0, 0, 1, 1),
         _scrollbar = rt.Scrollbar(),
+        _base = rt.Rectangle(0, 0, 1, 1),
+        _base_outline = rt.Rectangle(0, 0, 1, 1),
         _selected_item = 0
     })
 end)
 
 --- @brief
-function mn.ScrollableList:push(item)
+function mn.ScrollableList:push(item, ...)
     local to_insert = {
         widget = item,
         is_selected = false,
@@ -39,44 +41,55 @@ function mn.ScrollableList:realize()
     for entry in values(self._items) do
         entry.widget:realize()
     end
+
+    self._base:set_corner_radius(rt.settings.frame.corner_radius)
+    self._base:set_color(rt.Palette.BACKGROUND)
+    self._base_outline:set_corner_radius(rt.settings.frame.corner_radius)
+    self._base_outline:set_color(rt.Palette.BACKGROUND_OUTLINE)
+    self._base_outline:set_is_outline(true)
+
 end
 
 --- @override
 function mn.ScrollableList:size_allocate(x, y, width, height)
     local scrollbar_width = 20
     local m = rt.settings.margin_unit
-    self._scrollbar:fit_into(x + width - scrollbar_width, y, scrollbar_width, height)
-    local item_bounds = rt.AABB(x, y, width - scrollbar_width - m, height)
+    local item_bounds = rt.AABB(x, y, width - scrollbar_width, 0)
     local current_x, current_y = item_bounds.x, item_bounds.y
+    self._scrollbar:fit_into(current_x + width - scrollbar_width, current_y, scrollbar_width, height)
     for entry in values(self._items) do
-        entry.widget:fit_into(0, 0, item_bounds.width, item_bounds.height)
         entry.height = select(2, entry.widget:measure())
+        entry.widget:fit_into(0, 0, item_bounds.width, entry.height)
         entry.position_x = current_x
         entry.position_y = current_y
         current_y = current_y + entry.height
     end
 
-    self._stencil:resize(x, y, width, height)
-
+    self._stencil:resize(x - 1, y - 1, width - scrollbar_width + 2, height + 2)
     self._scrollbar:set_n_pages(self._n_items)
     self._scrollbar:set_page_index(self._selected_item)
+
+    self._base:resize(x, y, width, height)
+    self._base_outline:resize(x, y, width, height)
 end
 
 --- @override
 function mn.ScrollableList:draw()
+
+    self._base:draw()
+    self._base_outline:draw()
+
     local stencil_value = meta.hash(mn.ScrollableList) % 255
     rt.graphics.stencil(stencil_value, self._stencil)
     rt.graphics.set_stencil_test(rt.StencilCompareMode.EQUAL, stencil_value)
 
-    self._scrollbar:draw()
     for item in values(self._items) do
         rt.graphics.origin()
         rt.graphics.translate(item.position_x, item.position_y)
         item.widget:draw()
-        item.widget:draw_bounds()
     end
 
     rt.graphics.set_stencil_test()
-    rt.graphics.stencil()
     rt.graphics.origin()
+    self._scrollbar:draw()
 end

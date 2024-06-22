@@ -309,8 +309,8 @@ function rt.VertexLine(thickness, ...)
         local p1, p2, p3, p4 = n-3, n-1, n, n-2
 
         for i in range(
-                p1, p2, p3,
-                p1, p3, p4
+            p1, p2, p3,
+            p1, p3, p4
         ) do
             table.insert(vertex_map, i)
         end
