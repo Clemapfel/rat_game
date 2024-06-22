@@ -1,0 +1,1012 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project version="4">
+  <component name="AutoImportSettings">
+    <option name="autoReloadType" value="SELECTIVE" />
+  </component>
+  <component name="CMakePresetLoader">{
+  &quot;useNewFormat&quot;: true
+}</component>
+  <component name="CMakeReloadState">
+    <option name="reloaded" value="true" />
+  </component>
+  <component name="CMakeRunConfigurationManager">
+    <generated>
+      <config projectName="Project" targetName="rat_game" />
+      <config projectName="Project" targetName="battle_main" />
+      <config projectName="Project" targetName="love" />
+    </generated>
+  </component>
+  <component name="CMakeSettings">
+    <configurations>
+      <configuration PROFILE_NAME="Debug" ENABLED="true" CONFIG_NAME="Debug" />
+    </configurations>
+  </component>
+  <component name="ChangeListManager">
+    <list default="true" id="7fa9ba1b-2cff-4ecc-86fb-59ab2fa76ee1" name="Changes" comment="formatted scrollbar">
+      <change afterPath="$PROJECT_DIR$/.idea/.gitignore" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/.idea/codeStyles/codeStyleConfig.xml" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/.idea/editor.xml" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/.idea/misc.xml" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/.idea/modules.xml" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/.idea/rat_game.iml" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/.idea/shelf/stashing_spectrogram.xml" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/.idea/shelf/stashing_spectrogram/shelved.patch" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/.idea/vcs.xml" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/.vscode/launch.json" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/.gitignore" beforeDir="false" afterPath="$PROJECT_DIR$/.gitignore" afterDir="false" />
+    </list>
+    <option name="SHOW_DIALOG" value="false" />
+    <option name="HIGHLIGHT_CONFLICTS" value="true" />
+    <option name="HIGHLIGHT_NON_ACTIVE_CHANGELIST" value="false" />
+    <option name="LAST_RESOLUTION" value="IGNORE" />
+  </component>
+  <component name="ClangdSettings">
+    <option name="formatViaClangd" value="false" />
+  </component>
+  <component name="Git.Settings">
+    <option name="RECENT_BRANCH_BY_REPOSITORY">
+      <map>
+        <entry key="$PROJECT_DIR$" value="main" />
+      </map>
+    </option>
+    <option name="RECENT_GIT_ROOT_PATH" value="$PROJECT_DIR$" />
+    <option name="ROOT_SYNC" value="DONT_SYNC" />
+  </component>
+  <component name="GitLabMergeRequestsSettings">{}</component>
+  <component name="GithubPullRequestsUISettings">{}</component>
+  <component name="MarkdownSettingsMigration">
+    <option name="stateVersion" value="1" />
+  </component>
+  <component name="ProjectApplicationVersion">
+    <option name="ide" value="CLion" />
+    <option name="majorVersion" value="2023" />
+    <option name="minorVersion" value="2.1" />
+  </component>
+  <component name="ProjectColorInfo">{
+  &quot;associatedIndex&quot;: 3
+}</component>
+  <component name="ProjectId" id="2UwrkWs5btoYf68s2vEx4Hlgj4E" />
+  <component name="ProjectLevelVcsManager">
+    <ConfirmationsSetting value="2" id="Add" />
+  </component>
+  <component name="ProjectViewState">
+    <option name="hideEmptyMiddlePackages" value="true" />
+    <option name="showLibraryContents" value="true" />
+  </component>
+  <component name="PropertiesComponent">{
+  &quot;keyToString&quot;: {
+    &quot;Emmy Debugger(NEW).remote_debugger.executor&quot;: &quot;Debug&quot;,
+    &quot;Emmy Debugger(NEW).remote_debugger_v2.executor&quot;: &quot;Debug&quot;,
+    &quot;Lua Application.love11.executor&quot;: &quot;Run&quot;,
+    &quot;Lua Application.love12.executor&quot;: &quot;Run&quot;,
+    &quot;Lua Application.main.executor&quot;: &quot;Run&quot;,
+    &quot;Lua Application.main_lichen.executor&quot;: &quot;Run&quot;,
+    &quot;Lua Application.main_signal.executor&quot;: &quot;Run&quot;,
+    &quot;Lua Application.main_swirl.executor&quot;: &quot;Run&quot;,
+    &quot;Lua Application.main_thread.executor&quot;: &quot;Run&quot;,
+    &quot;Lua Application.overworld.executor&quot;: &quot;Run&quot;,
+    &quot;Lua Application.rope.executor&quot;: &quot;Run&quot;,
+    &quot;RunOnceActivity.OpenProjectViewOnStart&quot;: &quot;true&quot;,
+    &quot;RunOnceActivity.RadMigrateCodeStyle&quot;: &quot;true&quot;,
+    &quot;RunOnceActivity.ShowReadmeOnStart&quot;: &quot;true&quot;,
+    &quot;RunOnceActivity.cidr.known.project.marker&quot;: &quot;true&quot;,
+    &quot;RunOnceActivity.readMode.enableVisualFormatting&quot;: &quot;true&quot;,
+    &quot;WebServerToolWindowFactoryState&quot;: &quot;false&quot;,
+    &quot;cf.advertisement.text.has.clang-format&quot;: &quot;true&quot;,
+    &quot;cf.first.check.clang-format&quot;: &quot;false&quot;,
+    &quot;cidr.known.project.marker&quot;: &quot;true&quot;,
+    &quot;deletionFromPopupRequiresConfirmation&quot;: &quot;false&quot;,
+    &quot;git-widget-placeholder&quot;: &quot;main&quot;,
+    &quot;last_opened_file_path&quot;: &quot;/home/clem/Workspace/rat_game&quot;,
+    &quot;node.js.detected.package.eslint&quot;: &quot;true&quot;,
+    &quot;node.js.detected.package.tslint&quot;: &quot;true&quot;,
+    &quot;node.js.selected.package.eslint&quot;: &quot;(autodetect)&quot;,
+    &quot;node.js.selected.package.tslint&quot;: &quot;(autodetect)&quot;,
+    &quot;nodejs_package_manager_path&quot;: &quot;npm&quot;,
+    &quot;settings.editor.selected.configurable&quot;: &quot;preferences.pluginManager&quot;,
+    &quot;vue.rearranger.settings.migration&quot;: &quot;true&quot;
+  }
+}</component>
+  <component name="ReadonlyStatusHandler">
+    <option name="SHOW_DIALOG" value="false" />
+  </component>
+  <component name="RecentsManager">
+    <key name="CopyFile.RECENT_KEYS">
+      <recent name="$PROJECT_DIR$/assets" />
+      <recent name="$PROJECT_DIR$/common" />
+      <recent name="$PROJECT_DIR$/battle/configs/moves" />
+      <recent name="$PROJECT_DIR$/battle/equips" />
+      <recent name="$PROJECT_DIR$/battle/configs/entities" />
+    </key>
+    <key name="MoveFile.RECENT_KEYS">
+      <recent name="$PROJECT_DIR$/assets/sprites" />
+      <recent name="$PROJECT_DIR$/battle/backgrounds" />
+      <recent name="$PROJECT_DIR$/battle" />
+      <recent name="$PROJECT_DIR$/battle/animations/simulation" />
+      <recent name="$PROJECT_DIR$/common" />
+    </key>
+  </component>
+  <component name="RunManager" selected="Lua Application.main">
+    <configuration name="love" type="lua.app" factoryName="Lua Application">
+      <module name="rat_game" />
+      <option name="program" value="/usr/bin/love" />
+      <option name="file" value="." />
+      <option name="workingDir" value="$PROJECT_DIR$" />
+      <option name="debuggerType" value="2" />
+      <option name="params" value="" />
+      <option name="charset" value="UTF-8" />
+      <option name="showConsole" value="true" />
+      <method v="2" />
+    </configuration>
+    <configuration name="love11" type="lua.app" factoryName="Lua Application">
+      <module name="rat_game" />
+      <option name="program" value="$PROJECT_DIR$/love/love11" />
+      <option name="file" value="." />
+      <option name="workingDir" value="$PROJECT_DIR$" />
+      <option name="debuggerType" value="2" />
+      <option name="params" value="" />
+      <option name="charset" value="UTF-8" />
+      <option name="showConsole" value="true" />
+      <method v="2" />
+    </configuration>
+    <configuration name="love" type="lua.app" factoryName="Lua Application">
+      <module name="rat_game" />
+      <option name="program" value="/usr/bin/love" />
+      <option name="file" value="." />
+      <option name="workingDir" value="$PROJECT_DIR$" />
+      <option name="debuggerType" value="2" />
+      <option name="params" value="" />
+      <option name="charset" value="UTF-8" />
+      <option name="showConsole" value="true" />
+      <method v="2" />
+    </configuration>
+    <configuration name="love" type="lua.app" factoryName="Lua Application">
+      <module name="rat_game" />
+      <option name="program" value="/usr/bin/love" />
+      <option name="file" value="." />
+      <option name="workingDir" value="$PROJECT_DIR$" />
+      <option name="debuggerType" value="2" />
+      <option name="params" value="" />
+      <option name="charset" value="UTF-8" />
+      <option name="showConsole" value="true" />
+      <method v="2" />
+    </configuration>
+    <configuration name="main" type="lua.app" factoryName="Lua Application">
+      <module name="rat_game" />
+      <option name="program" value="$PROJECT_DIR$/love/love12" />
+      <option name="file" value="main.lua" />
+      <option name="workingDir" value="$PROJECT_DIR$" />
+      <option name="debuggerType" value="2" />
+      <option name="params" value="" />
+      <option name="charset" value="UTF-8" />
+      <option name="showConsole" value="true" />
+      <method v="2" />
+    </configuration>
+    <configuration name="main_lichen" type="lua.app" factoryName="Lua Application">
+      <module name="rat_game" />
+      <option name="program" value="$PROJECT_DIR$/love/love12" />
+      <option name="file" value="main_lichen.lua" />
+      <option name="workingDir" value="$PROJECT_DIR$" />
+      <option name="debuggerType" value="2" />
+      <option name="params" value="" />
+      <option name="charset" value="UTF-8" />
+      <option name="showConsole" value="true" />
+      <method v="2" />
+    </configuration>
+    <configuration name="main_signal" type="lua.app" factoryName="Lua Application">
+      <module name="rat_game" />
+      <option name="program" value="$PROJECT_DIR$/love/love12" />
+      <option name="file" value="main_signal.lua" />
+      <option name="workingDir" value="$PROJECT_DIR$" />
+      <option name="debuggerType" value="2" />
+      <option name="params" value="" />
+      <option name="charset" value="UTF-8" />
+      <option name="showConsole" value="true" />
+      <method v="2" />
+    </configuration>
+    <configuration name="main_swirl" type="lua.app" factoryName="Lua Application">
+      <module name="rat_game" />
+      <option name="program" value="$PROJECT_DIR$/love/love12" />
+      <option name="file" value="main_swirl.lua" />
+      <option name="workingDir" value="$PROJECT_DIR$" />
+      <option name="debuggerType" value="2" />
+      <option name="params" value="" />
+      <option name="charset" value="UTF-8" />
+      <option name="showConsole" value="true" />
+      <method v="2" />
+    </configuration>
+    <configuration name="main_thread" type="lua.app" factoryName="Lua Application">
+      <module name="rat_game" />
+      <option name="program" value="$PROJECT_DIR$/love/love12" />
+      <option name="file" value="main_threads.lua" />
+      <option name="workingDir" value="$PROJECT_DIR$" />
+      <option name="debuggerType" value="2" />
+      <option name="params" value="" />
+      <option name="charset" value="UTF-8" />
+      <option name="showConsole" value="true" />
+      <method v="2" />
+    </configuration>
+    <configuration name="overworld" type="lua.app" factoryName="Lua Application">
+      <module name="rat_game" />
+      <option name="program" value="$PROJECT_DIR$/love/love12" />
+      <option name="file" value="main_overworld.lua" />
+      <option name="workingDir" value="$PROJECT_DIR$/" />
+      <option name="debuggerType" value="2" />
+      <option name="params" value="" />
+      <option name="charset" value="UTF-8" />
+      <option name="showConsole" value="true" />
+      <method v="2" />
+    </configuration>
+    <configuration name="rope" type="lua.app" factoryName="Lua Application">
+      <module name="rat_game" />
+      <option name="program" value="$PROJECT_DIR$/love/love12" />
+      <option name="file" value="main_rope.lua" />
+      <option name="workingDir" value="$PROJECT_DIR$/" />
+      <option name="debuggerType" value="2" />
+      <option name="params" value="" />
+      <option name="charset" value="UTF-8" />
+      <option name="showConsole" value="true" />
+      <method v="2" />
+    </configuration>
+    <configuration name="remote_debugger" type="lua.emmy.debugger" factoryName="Emmy Debugger(NEW)" activateToolWindowBeforeRun="false">
+      <module name="rat_game" />
+      <option name="TYPE" value="1" />
+      <option name="HOST" value="localhost" />
+      <option name="PORT" value="8172" />
+      <option name="PIPE" value="emmy" />
+      <option name="WIN_ARCH" value="1" />
+      <method v="2" />
+    </configuration>
+    <configuration name="remote_debugger" type="lua.emmy.debugger" factoryName="Emmy Debugger(NEW)" activateToolWindowBeforeRun="false">
+      <module name="rat_game" />
+      <option name="TYPE" value="1" />
+      <option name="HOST" value="localhost" />
+      <option name="PORT" value="8172" />
+      <option name="PIPE" value="emmy" />
+      <option name="WIN_ARCH" value="1" />
+      <method v="2" />
+    </configuration>
+    <configuration name="remote_debugger" type="lua.emmy.debugger" factoryName="Emmy Debugger(NEW)" activateToolWindowBeforeRun="false">
+      <module name="rat_game" />
+      <option name="TYPE" value="1" />
+      <option name="HOST" value="localhost" />
+      <option name="PORT" value="8172" />
+      <option name="PIPE" value="emmy" />
+      <option name="WIN_ARCH" value="1" />
+      <method v="2" />
+    </configuration>
+    <configuration name="remote_debugger" type="lua.emmy.debugger" factoryName="Emmy Debugger(NEW)" activateToolWindowBeforeRun="false">
+      <module name="rat_game" />
+      <option name="TYPE" value="1" />
+      <option name="HOST" value="localhost" />
+      <option name="PORT" value="8172" />
+      <option name="PIPE" value="emmy" />
+      <option name="WIN_ARCH" value="1" />
+      <method v="2" />
+    </configuration>
+    <list>
+      <item itemvalue="Emmy Debugger(NEW).remote_debugger" />
+      <item itemvalue="Lua Application.love11" />
+      <item itemvalue="Lua Application.love" />
+      <item itemvalue="Lua Application.main" />
+      <item itemvalue="Lua Application.main_lichen" />
+      <item itemvalue="Lua Application.main_signal" />
+      <item itemvalue="Lua Application.main_swirl" />
+      <item itemvalue="Lua Application.main_thread" />
+      <item itemvalue="Lua Application.overworld" />
+      <item itemvalue="Lua Application.rope" />
+    </list>
+  </component>
+  <component name="SpellCheckerSettings" RuntimeDictionaries="0" Folders="0" CustomDictionaries="0" DefaultDictionary="application-level" UseSingleDictionary="true" transferred="true" />
+  <component name="SvnConfiguration">
+    <configuration>$USER_HOME$/.subversion</configuration>
+  </component>
+  <component name="TaskManager">
+    <task active="true" id="Default" summary="Default task">
+      <changelist id="7fa9ba1b-2cff-4ecc-86fb-59ab2fa76ee1" name="Changes" comment="" />
+      <created>1693861627035</created>
+      <option name="number" value="Default" />
+      <option name="presentableId" value="Default" />
+      <updated>1693861627035</updated>
+      <workItem from="1693861628139" duration="5020000" />
+      <workItem from="1693866661673" duration="5390000" />
+      <workItem from="1693927024072" duration="14000" />
+      <workItem from="1693939759387" duration="18476000" />
+      <workItem from="1694026263109" duration="18011000" />
+      <workItem from="1694100919880" duration="47000" />
+      <workItem from="1694123788514" duration="8155000" />
+      <workItem from="1694206151649" duration="15212000" />
+      <workItem from="1694358015587" duration="5000" />
+      <workItem from="1694370041521" duration="6000" />
+      <workItem from="1694382036988" duration="8242000" />
+      <workItem from="1694553597384" duration="12652000" />
+      <workItem from="1694635786167" duration="18048000" />
+      <workItem from="1694700326811" duration="9000" />
+      <workItem from="1694723758011" duration="11434000" />
+      <workItem from="1694818271830" duration="12865000" />
+      <workItem from="1694831343547" duration="3611000" />
+      <workItem from="1694992184971" duration="23220000" />
+      <workItem from="1695223577229" duration="1471000" />
+      <workItem from="1695242091351" duration="13409000" />
+      <workItem from="1695306147609" duration="10000" />
+      <workItem from="1695331124066" duration="9486000" />
+      <workItem from="1696017178679" duration="3899000" />
+      <workItem from="1696103978027" duration="8760000" />
+      <workItem from="1696536084934" duration="9602000" />
+      <workItem from="1696609531278" duration="10000" />
+      <workItem from="1696625170988" duration="4954000" />
+      <workItem from="1696710777561" duration="28933000" />
+      <workItem from="1696956159001" duration="6000" />
+      <workItem from="1697052341353" duration="6466000" />
+      <workItem from="1697231880515" duration="6503000" />
+      <workItem from="1697401409523" duration="1083000" />
+      <workItem from="1697403450640" duration="6938000" />
+      <workItem from="1697576036842" duration="3130000" />
+      <workItem from="1697579182377" duration="970000" />
+      <workItem from="1697580191956" duration="8247000" />
+      <workItem from="1697726164716" duration="5000" />
+      <workItem from="1697733465079" duration="4129000" />
+      <workItem from="1697892127800" duration="16000" />
+      <workItem from="1697923149231" duration="860000" />
+      <workItem from="1697925915151" duration="2000" />
+      <workItem from="1697928065702" duration="1739000" />
+      <workItem from="1698095681314" duration="24148000" />
+      <workItem from="1698264381283" duration="8054000" />
+      <workItem from="1698336560746" duration="60000" />
+      <workItem from="1698336678756" duration="8709000" />
+      <workItem from="1698413842437" duration="194000" />
+      <workItem from="1698419714152" duration="10250000" />
+      <workItem from="1698594681531" duration="23419000" />
+      <workItem from="1698941314135" duration="11369000" />
+      <workItem from="1698956571889" duration="10459000" />
+      <workItem from="1699051266286" duration="2000" />
+      <workItem from="1699051569799" duration="3212000" />
+      <workItem from="1699054793941" duration="709000" />
+      <workItem from="1699055515019" duration="208000" />
+      <workItem from="1699118609274" duration="26560000" />
+      <workItem from="1699373084073" duration="27634000" />
+      <workItem from="1699635699929" duration="11249000" />
+      <workItem from="1699720985773" duration="44053000" />
+      <workItem from="1699900980399" duration="1000" />
+      <workItem from="1699901302185" duration="34645000" />
+      <workItem from="1700170047148" duration="108000" />
+      <workItem from="1700170215629" duration="85000" />
+      <workItem from="1700170500162" duration="8425000" />
+      <workItem from="1700431412948" duration="11185000" />
+      <workItem from="1700585391760" duration="40734000" />
+      <workItem from="1700777058554" duration="95555000" />
+      <workItem from="1701538822450" duration="30853000" />
+      <workItem from="1701716882662" duration="19751000" />
+      <workItem from="1701808435316" duration="7725000" />
+      <workItem from="1701977164920" duration="3543000" />
+      <workItem from="1701981947428" duration="19455000" />
+      <workItem from="1702069313367" duration="335000" />
+      <workItem from="1702069776815" duration="7029000" />
+      <workItem from="1702079639237" duration="1334000" />
+      <workItem from="1702084952602" duration="28378000" />
+      <workItem from="1702335879391" duration="3994000" />
+      <workItem from="1702343817834" duration="1080000" />
+      <workItem from="1702404454341" duration="8999000" />
+      <workItem from="1702490549979" duration="31921000" />
+      <workItem from="1702670871383" duration="26129000" />
+      <workItem from="1702938224146" duration="20000" />
+      <workItem from="1703114987637" duration="52729000" />
+      <workItem from="1703639769347" duration="79153000" />
+      <workItem from="1704314698634" duration="4552000" />
+      <workItem from="1704403652472" duration="13655000" />
+      <workItem from="1704486082849" duration="2785000" />
+      <workItem from="1704510791384" duration="616000" />
+      <workItem from="1704511421562" duration="39736000" />
+      <workItem from="1704759862732" duration="13456000" />
+      <workItem from="1704847599155" duration="13325000" />
+      <workItem from="1704912783858" duration="13642000" />
+      <workItem from="1705170041551" duration="54054000" />
+      <workItem from="1705514609289" duration="4779000" />
+      <workItem from="1705519891244" duration="2398000" />
+      <workItem from="1705533768551" duration="21087000" />
+      <workItem from="1705790596105" duration="3719000" />
+      <workItem from="1705794479347" duration="145094000" />
+      <workItem from="1706819923218" duration="36000" />
+      <workItem from="1706819977009" duration="58244000" />
+      <workItem from="1707421522983" duration="6025000" />
+      <workItem from="1707431594249" duration="23166000" />
+      <workItem from="1707688664192" duration="9759000" />
+      <workItem from="1707928671333" duration="11000" />
+      <workItem from="1707936706703" duration="10936000" />
+      <workItem from="1708018879834" duration="819000" />
+      <workItem from="1708022504161" duration="12312000" />
+      <workItem from="1708105751259" duration="11000" />
+      <workItem from="1708106925580" duration="556000" />
+      <workItem from="1708110966367" duration="430000" />
+      <workItem from="1708113695234" duration="5488000" />
+      <workItem from="1708191303647" duration="53376000" />
+      <workItem from="1708622245705" duration="621000" />
+      <workItem from="1708624854305" duration="807000" />
+      <workItem from="1708636531139" duration="36722000" />
+      <workItem from="1708785796796" duration="71000" />
+      <workItem from="1708785886955" duration="725000" />
+      <workItem from="1708787058789" duration="287000" />
+      <workItem from="1708787355167" duration="187000" />
+      <workItem from="1708787555993" duration="21657000" />
+      <workItem from="1708890307222" duration="46044000" />
+      <workItem from="1709126881636" duration="30000" />
+      <workItem from="1709127936081" duration="12000" />
+      <workItem from="1709165863620" duration="97681000" />
+      <workItem from="1709739977365" duration="86836000" />
+      <workItem from="1710190770589" duration="8465000" />
+      <workItem from="1710276474810" duration="14419000" />
+      <workItem from="1710358760650" duration="45718000" />
+      <workItem from="1710544983604" duration="78810000" />
+      <workItem from="1711130370175" duration="5000" />
+      <workItem from="1711232593349" duration="4000" />
+      <workItem from="1711233117822" duration="2111000" />
+      <workItem from="1711235245357" duration="7874000" />
+      <workItem from="1711300449112" duration="63000" />
+      <workItem from="1711300521737" duration="49000" />
+      <workItem from="1711300576020" duration="123000" />
+      <workItem from="1711300707064" duration="11000" />
+      <workItem from="1711301759263" duration="15820000" />
+      <workItem from="1711388708484" duration="29000" />
+      <workItem from="1711402317303" duration="2785000" />
+      <workItem from="1711407729008" duration="108000" />
+      <workItem from="1711407938064" duration="320000" />
+      <workItem from="1711409602874" duration="1000" />
+      <workItem from="1711411192711" duration="303000" />
+      <workItem from="1711414437884" duration="414000" />
+      <workItem from="1711417688469" duration="5000" />
+      <workItem from="1711471193947" duration="12729000" />
+      <workItem from="1711484721711" duration="42441000" />
+      <workItem from="1711751859931" duration="4025000" />
+      <workItem from="1711920539183" duration="1696000" />
+      <workItem from="1711934411032" duration="633000" />
+      <workItem from="1711935135540" duration="1678000" />
+      <workItem from="1711995562972" duration="7000" />
+      <workItem from="1711995674255" duration="13739000" />
+      <workItem from="1712083043663" duration="11794000" />
+      <workItem from="1712161161247" duration="22278000" />
+      <workItem from="1712361983870" duration="18936000" />
+      <workItem from="1712505166561" duration="2242000" />
+      <workItem from="1712509805247" duration="4644000" />
+      <workItem from="1712514454242" duration="13888000" />
+      <workItem from="1712592155098" duration="5071000" />
+      <workItem from="1712674477763" duration="17767000" />
+      <workItem from="1712692349714" duration="1000" />
+      <workItem from="1712692456646" duration="2296000" />
+      <workItem from="1712769873598" duration="6360000" />
+      <workItem from="1712778864867" duration="11473000" />
+      <workItem from="1712937651708" duration="395000" />
+      <workItem from="1712938581836" duration="308000" />
+      <workItem from="1712940496577" duration="6229000" />
+      <workItem from="1712959754240" duration="7494000" />
+      <workItem from="1713106154818" duration="41049000" />
+      <workItem from="1713286540378" duration="17390000" />
+      <workItem from="1713312446331" duration="51495000" />
+      <workItem from="1713477195305" duration="30331000" />
+      <workItem from="1713729807792" duration="67062000" />
+      <workItem from="1714088822489" duration="249076000" />
+      <workItem from="1715475811351" duration="3219000" />
+      <workItem from="1715479039541" duration="136412000" />
+      <workItem from="1716401988456" duration="62072000" />
+      <workItem from="1716758501301" duration="46505000" />
+      <workItem from="1716929771479" duration="52073000" />
+      <workItem from="1717375978396" duration="92000" />
+      <workItem from="1717376078195" duration="16020000" />
+      <workItem from="1717461862358" duration="21719000" />
+      <workItem from="1717691851715" duration="469000" />
+      <workItem from="1717692326321" duration="31000" />
+      <workItem from="1717692362094" duration="32000" />
+      <workItem from="1717692415435" duration="19790000" />
+      <workItem from="1717860229847" duration="11878000" />
+      <workItem from="1717954026233" duration="365000" />
+      <workItem from="1717954938114" duration="172000" />
+      <workItem from="1717955178953" duration="8475000" />
+      <workItem from="1717973223118" duration="8090000" />
+      <workItem from="1718038083999" duration="10430000" />
+      <workItem from="1718123601486" duration="38295000" />
+      <workItem from="1718381009605" duration="89000" />
+      <workItem from="1718381125974" duration="7495000" />
+      <workItem from="1718411702730" duration="17212000" />
+      <workItem from="1718555603941" duration="24823000" />
+      <workItem from="1718809515491" duration="39000" />
+      <workItem from="1718810295051" duration="249000" />
+      <workItem from="1718810603612" duration="18000" />
+      <workItem from="1718813473613" duration="1000" />
+      <workItem from="1718818539213" duration="300000" />
+      <workItem from="1718821612669" duration="7000" />
+      <workItem from="1718822136670" duration="385000" />
+      <workItem from="1718918659953" duration="60000" />
+      <workItem from="1718920638270" duration="1731000" />
+      <workItem from="1718983122510" duration="1000" />
+      <workItem from="1718989030154" duration="1345000" />
+      <workItem from="1718997818606" duration="961000" />
+      <workItem from="1719086554177" duration="3538000" />
+      <workItem from="1719091510975" duration="1381000" />
+      <workItem from="1719095219038" duration="4000" />
+      <workItem from="1719095326956" duration="9000" />
+      <workItem from="1719098595603" duration="126000" />
+    </task>
+    <task id="LOCAL-00781" summary="stashing failure to port">
+      <option name="closed" value="true" />
+      <created>1717372767088</created>
+      <option name="number" value="00781" />
+      <option name="presentableId" value="LOCAL-00781" />
+      <option name="project" value="LOCAL" />
+      <updated>1717372767088</updated>
+    </task>
+    <task id="LOCAL-00782" summary="polish">
+      <option name="closed" value="true" />
+      <created>1717375720700</created>
+      <option name="number" value="00782" />
+      <option name="presentableId" value="LOCAL-00782" />
+      <option name="project" value="LOCAL" />
+      <updated>1717375720700</updated>
+    </task>
+    <task id="LOCAL-00783" summary="centered party sprites">
+      <option name="closed" value="true" />
+      <created>1717376389733</created>
+      <option name="number" value="00783" />
+      <option name="presentableId" value="LOCAL-00783" />
+      <option name="project" value="LOCAL" />
+      <updated>1717376389733</updated>
+    </task>
+    <task id="LOCAL-00784" summary="added compression">
+      <option name="closed" value="true" />
+      <created>1717376400944</created>
+      <option name="number" value="00784" />
+      <option name="presentableId" value="LOCAL-00784" />
+      <option name="project" value="LOCAL" />
+      <updated>1717376400944</updated>
+    </task>
+    <task id="LOCAL-00785" summary="verbose info alignment working">
+      <option name="closed" value="true" />
+      <created>1717439709740</created>
+      <option name="number" value="00785" />
+      <option name="presentableId" value="LOCAL-00785" />
+      <option name="project" value="LOCAL" />
+      <updated>1717439709740</updated>
+    </task>
+    <task id="LOCAL-00786" summary="fixed global status display in inspect state">
+      <option name="closed" value="true" />
+      <created>1717440662478</created>
+      <option name="number" value="00786" />
+      <option name="presentableId" value="LOCAL-00786" />
+      <option name="project" value="LOCAL" />
+      <updated>1717440662479</updated>
+    </task>
+    <task id="LOCAL-00787" summary="added control indicator">
+      <option name="closed" value="true" />
+      <created>1717465746961</created>
+      <option name="number" value="00787" />
+      <option name="presentableId" value="LOCAL-00787" />
+      <option name="project" value="LOCAL" />
+      <updated>1717465746961</updated>
+    </task>
+    <task id="LOCAL-00788" summary="added global status bar selection node">
+      <option name="closed" value="true" />
+      <created>1717508047494</created>
+      <option name="number" value="00788" />
+      <option name="presentableId" value="LOCAL-00788" />
+      <option name="project" value="LOCAL" />
+      <updated>1717508047494</updated>
+    </task>
+    <task id="LOCAL-00789" summary="inspect state finished">
+      <option name="closed" value="true" />
+      <created>1717510080535</created>
+      <option name="number" value="00789" />
+      <option name="presentableId" value="LOCAL-00789" />
+      <option name="project" value="LOCAL" />
+      <updated>1717510080535</updated>
+    </task>
+    <task id="LOCAL-00790" summary="added trade-in">
+      <option name="closed" value="true" />
+      <created>1717607773181</created>
+      <option name="number" value="00790" />
+      <option name="presentableId" value="LOCAL-00790" />
+      <option name="project" value="LOCAL" />
+      <updated>1717607773181</updated>
+    </task>
+    <task id="LOCAL-00791" summary="trade working">
+      <option name="closed" value="true" />
+      <created>1717610953294</created>
+      <option name="number" value="00791" />
+      <option name="presentableId" value="LOCAL-00791" />
+      <option name="project" value="LOCAL" />
+      <updated>1717610953295</updated>
+    </task>
+    <task id="LOCAL-00792" summary="stashing polish, what to do about trade callbacks?">
+      <option name="closed" value="true" />
+      <created>1717612907578</created>
+      <option name="number" value="00792" />
+      <option name="presentableId" value="LOCAL-00792" />
+      <option name="project" value="LOCAL" />
+      <updated>1717612907578</updated>
+    </task>
+    <task id="LOCAL-00793" summary="stashing">
+      <option name="closed" value="true" />
+      <created>1717694172293</created>
+      <option name="number" value="00793" />
+      <option name="presentableId" value="LOCAL-00793" />
+      <option name="project" value="LOCAL" />
+      <updated>1717694172293</updated>
+    </task>
+    <task id="LOCAL-00794" summary="stashing guitar strings">
+      <option name="closed" value="true" />
+      <created>1717698781588</created>
+      <option name="number" value="00794" />
+      <option name="presentableId" value="LOCAL-00794" />
+      <option name="project" value="LOCAL" />
+      <updated>1717698781588</updated>
+    </task>
+    <task id="LOCAL-00795" summary="added entity selection">
+      <option name="closed" value="true" />
+      <created>1717785934356</created>
+      <option name="number" value="00795" />
+      <option name="presentableId" value="LOCAL-00795" />
+      <option name="project" value="LOCAL" />
+      <updated>1717785934356</updated>
+    </task>
+    <task id="LOCAL-00796" summary="added proper measure">
+      <option name="closed" value="true" />
+      <created>1717864980432</created>
+      <option name="number" value="00796" />
+      <option name="presentableId" value="LOCAL-00796" />
+      <option name="project" value="LOCAL" />
+      <updated>1717864980433</updated>
+    </task>
+    <task id="LOCAL-00797" summary="stashing move selection">
+      <option name="closed" value="true" />
+      <created>1717868245352</created>
+      <option name="number" value="00797" />
+      <option name="presentableId" value="LOCAL-00797" />
+      <option name="project" value="LOCAL" />
+      <updated>1717868245352</updated>
+    </task>
+    <task id="LOCAL-00798" summary="stashing topology">
+      <option name="closed" value="true" />
+      <created>1717901337635</created>
+      <option name="number" value="00798" />
+      <option name="presentableId" value="LOCAL-00798" />
+      <option name="project" value="LOCAL" />
+      <updated>1717901337635</updated>
+    </task>
+    <task id="LOCAL-00799" summary="stashing move layout">
+      <option name="closed" value="true" />
+      <created>1717957791363</created>
+      <option name="number" value="00799" />
+      <option name="presentableId" value="LOCAL-00799" />
+      <option name="project" value="LOCAL" />
+      <updated>1717957791363</updated>
+    </task>
+    <task id="LOCAL-00800" summary="more backgrounds">
+      <option name="closed" value="true" />
+      <created>1717981750867</created>
+      <option name="number" value="00800" />
+      <option name="presentableId" value="LOCAL-00800" />
+      <option name="project" value="LOCAL" />
+      <updated>1717981750867</updated>
+    </task>
+    <task id="LOCAL-00801" summary="added move selection">
+      <option name="closed" value="true" />
+      <created>1718126257078</created>
+      <option name="number" value="00801" />
+      <option name="presentableId" value="LOCAL-00801" />
+      <option name="project" value="LOCAL" />
+      <updated>1718126257079</updated>
+    </task>
+    <task id="LOCAL-00802" summary="polished move verbose info">
+      <option name="closed" value="true" />
+      <created>1718127034585</created>
+      <option name="number" value="00802" />
+      <option name="presentableId" value="LOCAL-00802" />
+      <option name="project" value="LOCAL" />
+      <updated>1718127034585</updated>
+    </task>
+    <task id="LOCAL-00803" summary="verbose info pre-formatting implemented">
+      <option name="closed" value="true" />
+      <created>1718127835179</created>
+      <option name="number" value="00803" />
+      <option name="presentableId" value="LOCAL-00803" />
+      <option name="project" value="LOCAL" />
+      <updated>1718127835179</updated>
+    </task>
+    <task id="LOCAL-00804" summary="polish">
+      <option name="closed" value="true" />
+      <created>1718128176614</created>
+      <option name="number" value="00804" />
+      <option name="presentableId" value="LOCAL-00804" />
+      <option name="project" value="LOCAL" />
+      <updated>1718128176614</updated>
+    </task>
+    <task id="LOCAL-00805" summary="stashing">
+      <option name="closed" value="true" />
+      <created>1718138914274</created>
+      <option name="number" value="00805" />
+      <option name="presentableId" value="LOCAL-00805" />
+      <option name="project" value="LOCAL" />
+      <updated>1718138914274</updated>
+    </task>
+    <task id="LOCAL-00806" summary="stashing">
+      <option name="closed" value="true" />
+      <created>1718139528673</created>
+      <option name="number" value="00806" />
+      <option name="presentableId" value="LOCAL-00806" />
+      <option name="project" value="LOCAL" />
+      <updated>1718139528674</updated>
+    </task>
+    <task id="LOCAL-00807" summary="stashing">
+      <option name="closed" value="true" />
+      <created>1718141402356</created>
+      <option name="number" value="00807" />
+      <option name="presentableId" value="LOCAL-00807" />
+      <option name="project" value="LOCAL" />
+      <updated>1718141402356</updated>
+    </task>
+    <task id="LOCAL-00808" summary="stashing for loop">
+      <option name="closed" value="true" />
+      <created>1718141839151</created>
+      <option name="number" value="00808" />
+      <option name="presentableId" value="LOCAL-00808" />
+      <option name="project" value="LOCAL" />
+      <updated>1718141839151</updated>
+    </task>
+    <task id="LOCAL-00809" summary="added party battle sprites placeholders">
+      <option name="closed" value="true" />
+      <created>1718315292642</created>
+      <option name="number" value="00809" />
+      <option name="presentableId" value="LOCAL-00809" />
+      <option name="project" value="LOCAL" />
+      <updated>1718315292642</updated>
+    </task>
+    <task id="LOCAL-00810" summary="added speech bubble">
+      <option name="closed" value="true" />
+      <created>1718337425906</created>
+      <option name="number" value="00810" />
+      <option name="presentableId" value="LOCAL-00810" />
+      <option name="project" value="LOCAL" />
+      <updated>1718337425906</updated>
+    </task>
+    <task id="LOCAL-00811" summary="stashing speech bubble">
+      <option name="closed" value="true" />
+      <created>1718337773646</created>
+      <option name="number" value="00811" />
+      <option name="presentableId" value="LOCAL-00811" />
+      <option name="project" value="LOCAL" />
+      <updated>1718337773646</updated>
+    </task>
+    <task id="LOCAL-00812" summary="stashing">
+      <option name="closed" value="true" />
+      <created>1718338282645</created>
+      <option name="number" value="00812" />
+      <option name="presentableId" value="LOCAL-00812" />
+      <option name="project" value="LOCAL" />
+      <updated>1718338282645</updated>
+    </task>
+    <task id="LOCAL-00813" summary="speech bubble finished">
+      <option name="closed" value="true" />
+      <created>1718338770458</created>
+      <option name="number" value="00813" />
+      <option name="presentableId" value="LOCAL-00813" />
+      <option name="project" value="LOCAL" />
+      <updated>1718338770458</updated>
+    </task>
+    <task id="LOCAL-00814" summary="refactored priority_queue_element">
+      <option name="closed" value="true" />
+      <created>1718383207329</created>
+      <option name="number" value="00814" />
+      <option name="presentableId" value="LOCAL-00814" />
+      <option name="project" value="LOCAL" />
+      <updated>1718383207330</updated>
+    </task>
+    <task id="LOCAL-00815" summary="added party sprite sprites">
+      <option name="closed" value="true" />
+      <created>1718388571342</created>
+      <option name="number" value="00815" />
+      <option name="presentableId" value="LOCAL-00815" />
+      <option name="project" value="LOCAL" />
+      <updated>1718388571342</updated>
+    </task>
+    <task id="LOCAL-00816" summary="added sprites">
+      <option name="closed" value="true" />
+      <created>1718388617746</created>
+      <option name="number" value="00816" />
+      <option name="presentableId" value="LOCAL-00816" />
+      <option name="project" value="LOCAL" />
+      <updated>1718388617746</updated>
+    </task>
+    <task id="LOCAL-00817" summary="added exe">
+      <option name="closed" value="true" />
+      <created>1718411900468</created>
+      <option name="number" value="00817" />
+      <option name="presentableId" value="LOCAL-00817" />
+      <option name="project" value="LOCAL" />
+      <updated>1718411900469</updated>
+    </task>
+    <task id="LOCAL-00818" summary="added sprites">
+      <option name="closed" value="true" />
+      <created>1718413181151</created>
+      <option name="number" value="00818" />
+      <option name="presentableId" value="LOCAL-00818" />
+      <option name="project" value="LOCAL" />
+      <updated>1718413181151</updated>
+    </task>
+    <task id="LOCAL-00819" summary="added sprites">
+      <option name="closed" value="true" />
+      <created>1718413262765</created>
+      <option name="number" value="00819" />
+      <option name="presentableId" value="LOCAL-00819" />
+      <option name="project" value="LOCAL" />
+      <updated>1718413262765</updated>
+    </task>
+    <task id="LOCAL-00820" summary="optimized glyph drawing">
+      <option name="closed" value="true" />
+      <created>1718473175741</created>
+      <option name="number" value="00820" />
+      <option name="presentableId" value="LOCAL-00820" />
+      <option name="project" value="LOCAL" />
+      <updated>1718473175741</updated>
+    </task>
+    <task id="LOCAL-00821" summary="optimized drawing">
+      <option name="closed" value="true" />
+      <created>1718476227552</created>
+      <option name="number" value="00821" />
+      <option name="presentableId" value="LOCAL-00821" />
+      <option name="project" value="LOCAL" />
+      <updated>1718476227552</updated>
+    </task>
+    <task id="LOCAL-00822" summary="optimized rendering by caching">
+      <option name="closed" value="true" />
+      <created>1718478012768</created>
+      <option name="number" value="00822" />
+      <option name="presentableId" value="LOCAL-00822" />
+      <option name="project" value="LOCAL" />
+      <updated>1718478012769</updated>
+    </task>
+    <task id="LOCAL-00823" summary="added background compression">
+      <option name="closed" value="true" />
+      <created>1718490715753</created>
+      <option name="number" value="00823" />
+      <option name="presentableId" value="LOCAL-00823" />
+      <option name="project" value="LOCAL" />
+      <updated>1718490715753</updated>
+    </task>
+    <task id="LOCAL-00824" summary="added menu slots">
+      <option name="closed" value="true" />
+      <created>1718643688471</created>
+      <option name="number" value="00824" />
+      <option name="presentableId" value="LOCAL-00824" />
+      <option name="project" value="LOCAL" />
+      <updated>1718643688472</updated>
+    </task>
+    <task id="LOCAL-00825" summary="added list item">
+      <option name="closed" value="true" />
+      <created>1718650615362</created>
+      <option name="number" value="00825" />
+      <option name="presentableId" value="LOCAL-00825" />
+      <option name="project" value="LOCAL" />
+      <updated>1718650615362</updated>
+    </task>
+    <task id="LOCAL-00826" summary="added entity info">
+      <option name="closed" value="true" />
+      <created>1718754878109</created>
+      <option name="number" value="00826" />
+      <option name="presentableId" value="LOCAL-00826" />
+      <option name="project" value="LOCAL" />
+      <updated>1718754878109</updated>
+    </task>
+    <task id="LOCAL-00827" summary="reverted glsl version">
+      <option name="closed" value="true" />
+      <created>1718818768810</created>
+      <option name="number" value="00827" />
+      <option name="presentableId" value="LOCAL-00827" />
+      <option name="project" value="LOCAL" />
+      <updated>1718818768811</updated>
+    </task>
+    <task id="LOCAL-00828" summary="readded main loop">
+      <option name="closed" value="true" />
+      <created>1718818964818</created>
+      <option name="number" value="00828" />
+      <option name="presentableId" value="LOCAL-00828" />
+      <option name="project" value="LOCAL" />
+      <updated>1718818964818</updated>
+    </task>
+    <task id="LOCAL-00829" summary="formatted scrollbar">
+      <option name="closed" value="true" />
+      <created>1719091539031</created>
+      <option name="number" value="00829" />
+      <option name="presentableId" value="LOCAL-00829" />
+      <option name="project" value="LOCAL" />
+      <updated>1719091539033</updated>
+    </task>
+    <option name="localTasksCounter" value="830" />
+    <servers />
+  </component>
+  <component name="TypeScriptGeneratedFilesManager">
+    <option name="version" value="3" />
+  </component>
+  <component name="UnknownFeatures">
+    <option featureType="com.intellij.fileTypeFactory" implementationName="*.lua" />
+  </component>
+  <component name="VCPKGProject">
+    <isAutomaticCheckingOnLaunch value="false" />
+    <isAutomaticFoundErrors value="true" />
+    <isAutomaticReloadCMake value="true" />
+  </component>
+  <component name="Vcs.Log.History.Properties">
+    <option name="COLUMN_ID_ORDER">
+      <list>
+        <option value="Default.Root" />
+        <option value="Default.Author" />
+        <option value="Default.Date" />
+        <option value="Default.Subject" />
+        <option value="Space.CommitStatus" />
+      </list>
+    </option>
+  </component>
+  <component name="Vcs.Log.Tabs.Properties">
+    <option name="TAB_STATES">
+      <map>
+        <entry key="MAIN">
+          <value>
+            <State>
+              <option name="FILTERS">
+                <map>
+                  <entry key="text">
+                    <value>
+                      <list>
+                        <option value="hex" />
+                      </list>
+                    </value>
+                  </entry>
+                </map>
+              </option>
+            </State>
+          </value>
+        </entry>
+      </map>
+    </option>
+  </component>
+  <component name="VcsManagerConfiguration">
+    <MESSAGE value="more backgrounds" />
+    <MESSAGE value="added move selection" />
+    <MESSAGE value="polished move verbose info" />
+    <MESSAGE value="verbose info pre-formatting implemented" />
+    <MESSAGE value="polish" />
+    <MESSAGE value="stashing for loop" />
+    <MESSAGE value="added party battle sprites placeholders" />
+    <MESSAGE value="added speech bubble" />
+    <MESSAGE value="stashing speech bubble" />
+    <MESSAGE value="stashing" />
+    <MESSAGE value="speech bubble finished" />
+    <MESSAGE value="refactored priority_queue_element" />
+    <MESSAGE value="added party sprite sprites" />
+    <MESSAGE value="added exe" />
+    <MESSAGE value="added sprites" />
+    <MESSAGE value="optimized glyph drawing" />
+    <MESSAGE value="optimized drawing" />
+    <MESSAGE value="optimized rendering by caching" />
+    <MESSAGE value="added background compression" />
+    <MESSAGE value="added menu slots" />
+    <MESSAGE value="added list item" />
+    <MESSAGE value="added entity info" />
+    <MESSAGE value="reverted glsl version" />
+    <MESSAGE value="readded main loop" />
+    <MESSAGE value="formatted scrollbar" />
+    <option name="LAST_COMMIT_MESSAGE" value="formatted scrollbar" />
+  </component>
+  <component name="XDebuggerManager">
+    <breakpoint-manager>
+      <breakpoints>
+        <line-breakpoint enabled="true" type="lua-line">
+          <url>file://$PROJECT_DIR$/old/~battle/enemy_sprite.lua</url>
+          <line>244</line>
+          <option name="timeStamp" value="6" />
+        </line-breakpoint>
+      </breakpoints>
+    </breakpoint-manager>
+  </component>
+  <component name="XSLT-Support.FileAssociations.UIState">
+    <expand />
+    <select />
+  </component>
+</project>

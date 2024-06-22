@@ -1,0 +1,62 @@
+Index: src/fourier_transform.lua
+IDEA additional info:
+Subsystem: com.intellij.openapi.diff.impl.patch.BaseRevisionTextPatchEP
+<+>rt.settings.fourier_transform = {\n    step_size = 64,\n    overlap = 0\n}\n\n--- @class\nrt.FourierTransform = meta.new_type(\"FourierTransform\", function()\n    local out = meta.new(rt.FourierTransform, {\n        _data = {},     --- Table<Table<Number>>, fourier transform per step\n        _initialized = false\n    })\n    return out\nend)\n\nrt.FourierTransform.transform_direction = meta.new_enum({\n    TIME_DOMAIN_TO_SIGNAL_DOMAIN = false,\n    SIGNAL_DOMAIN_TO_TIME_DOMAIN = true\n})\n\n--- @brief\n--- @param audio rt.Audio\nfunction rt.FourierTransform:compute_from_audio(audio, step_size)\n\n    step_size = rt.settings.fourier_transform.step_size\n    self._data_out = {}\n\n    local n_samples = audio:get_n_samples()\n    local step_i = 1\n    local sample_i = 1\n    while sample_i < n_samples do\n\n        local samples = {}\n        local c = 0\n        for _ = 1, step_size do\n            if sample_i <= n_samples then\n                table.insert(samples, audio:get_sample(sample_i))\n            else\n                table.insert(samples, 0)\n            end\n            sample_i = sample_i + 1\n        end\n\n        local transformed = fft.fft(samples)\n        table.insert(self._data_out, transformed)\n        step_i = step_i + 1\n    end\nend\n\n--- @brief convert to image\nfunction rt.FourierTransform:as_image()\n    local w, h = #self._data_out, #(self._data_out[1])\n    local out = rt.Image(w, h)\n\n    for x = 1, w do\n        for y = 1, h do\n            local value = self._data_out[x][y]\n            out:set_pixel(x, y, rt.HSVA(0, 0, value, 1))\n        end\n    end\n\n    return out\nend
+Subsystem: com.intellij.openapi.diff.impl.patch.CharsetEP
+<+>UTF-8
+===================================================================
+diff --git a/src/fourier_transform.lua b/src/fourier_transform.lua
+--- a/src/fourier_transform.lua	(revision 8a9423a8bcb535acb4a4f569d9f9762db1353c86)
++++ b/src/fourier_transform.lua	(date 1704847173514)
+@@ -21,28 +21,35 @@
+ --- @param audio rt.Audio
+ function rt.FourierTransform:compute_from_audio(audio, step_size)
+ 
+-    step_size = rt.settings.fourier_transform.step_size
+     self._data_out = {}
+ 
++    local window_size = 256
++    local window_overlap = 64
++    local first_window = 1
+     local n_samples = audio:get_n_samples()
+-    local step_i = 1
+-    local sample_i = 1
+-    while sample_i < n_samples do
++    local cols = n_samples / window_size
++
++    local offset = first_window
++    local i = 1
++    while i < cols do
++
++        local window = {}
++        for j = offset, offset + window_size do
++            if j > n_samples then break end
+ 
+-        local samples = {}
+-        local c = 0
+-        for _ = 1, step_size do
+-            if sample_i <= n_samples then
+-                table.insert(samples, audio:get_sample(sample_i))
+-            else
+-                table.insert(samples, 0)
+-            end
+-            sample_i = sample_i + 1
++            local weight = 1
++            table.insert(window, weight * audio:get_sample(j))
++        end
++
++        while #window < window_size do
++            table.insert(window, 0)
+         end
+ 
+-        local transformed = fft.fft(samples)
+-        table.insert(self._data_out, transformed)
+-        step_i = step_i + 1
++        local transform = fft.fft(window)
++        table.insert(self._data_out, transform)
++
++        i = i + 1
++        offset = offset + window_size * window_overlap
+     end
+ end
+ 
