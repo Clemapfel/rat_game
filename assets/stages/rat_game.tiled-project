@@ -1,0 +1,34 @@
+{
+    "automappingRulesFile": "",
+    "commands": [
+    ],
+    "compatibilityVersion": 1100,
+    "extensionsPath": "extensions",
+    "folders": [
+        ".",
+        "debug"
+    ],
+    "properties": [
+    ],
+    "propertyTypes": [
+        {
+            "color": "#ffffa348",
+            "drawFill": true,
+            "id": 1,
+            "members": [
+                {
+                    "name": "spritesheet",
+                    "type": "string",
+                    "value": ""
+                }
+            ],
+            "name": "AnimatedSprite",
+            "type": "class",
+            "useAs": [
+                "property",
+                "object",
+                "project"
+            ]
+        }
+    ]
+}
