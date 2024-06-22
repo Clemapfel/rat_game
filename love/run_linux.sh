@@ -1,1 +1,0 @@
-./love/linux/bin/love ../main.lua
