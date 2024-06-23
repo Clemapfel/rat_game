@@ -55,7 +55,6 @@ end
 
 function rt.Frame:_unbind_stencil()
     rt.graphics.set_stencil_test()
-
 end
 
 --- @overload rt.Drawable.draw

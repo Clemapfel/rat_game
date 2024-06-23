@@ -22,7 +22,11 @@ require "meta"
 
 -- debugger
 pcall(function()
-    package.cpath = package.cpath .. ';/home/clem/.local/share/JetBrains/CLion2023.3/EmmyLua/debugger/emmy/linux/?.so'
+    if love.system.getOS() == "Linux" then
+        package.cpath = package.cpath .. ';/home/clem/.local/share/JetBrains/CLion2023.3/EmmyLua/debugger/emmy/linux/?.so'
+    else
+        package.cpath = package.cpath .. ';C:/Users/cleme/AppData/Roaming/JetBrains/CLion2023.3/plugins/EmmyLua/debugger/emmy/windows/x64/?.dll'
+    end
     local dbg = require('emmy_core')
     dbg.tcpConnect('localhost', 8172)
 
@@ -123,7 +127,7 @@ require "common.physics_world"
 require "common.collider"
 
 require "common.audio_playback"
-require "common.monitored_audio_playback"
+--require "common.monitored_audio_playback"
 require "common.sound_atlas"
 
 require "common.scene_state"

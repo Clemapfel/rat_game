@@ -166,7 +166,6 @@ function bt.PartySprite:draw()
     rt.graphics.translate(0, self._current_sprite_offset)
     self._sprite:draw()
     rt.graphics.translate(0, -1 * self._current_sprite_offset)
-    rt.graphics.stencil()
     rt.graphics.set_stencil_test()
 
     self._frame:draw()

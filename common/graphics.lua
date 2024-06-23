@@ -68,32 +68,31 @@ function rt.graphics.set_color(color)
     love.graphics.setColor(r, g, b, a)
 end
 
---- @brief write a stencil value to an area on screen occupied by drawables
---- @param new_value Number new stencil value
---- @vararg rt.Drawable
-function rt.graphics.stencil(new_value, ...)
-
-    if new_value == nil then
-        love.graphics.clear(false, true, false)
-    end
-
-    local drawables = {...}
-    if love.getVersion() >= 12 then
+if love.getVersion() >= 12 then
+    --- @brief write a stencil value to an area on screen occupied by drawables
+    --- @param new_value Number new stencil value
+    --- @vararg rt.Drawable
+    function rt.graphics.stencil(new_value, stencil)
         local mask_r, mask_g, mask_b, mask_a = love.graphics.getColorMask()
         love.graphics.setStencilState("replace", "always", new_value, 255)
         love.graphics.setColorMask(false, false, false, false)
-        for _, to_draw in pairs(drawables) do
-            to_draw:draw()
-        end
+        stencil:draw()
         love.graphics.setColorMask(mask_r, mask_g, mask_b, mask_a)
         love.graphics.setStencilState()
-    else
+    end
+else
+    --- @brief write a stencil value to an area on screen occupied by drawables
+    --- @param new_value Number new stencil value
+    --- @vararg rt.Drawable
+    function rt.graphics.stencil(new_value, stencil)
         love.graphics.stencil(function()
-            for _, to_draw in pairs(drawables) do
-                to_draw:draw()
-            end
+            stencil:draw()
         end, "replace", new_value, true)
     end
+end
+
+function rt.graphics.clear_stencil()
+    love.graphics.clear(false, true, false)
 end
 
 rt.StencilCompareMode = meta.new_enum({

@@ -151,11 +151,10 @@ function bt.PriorityQueueElement:draw()
 
     self._frame:draw()
 
-    local stencil_value = meta.hash(bt.PriorityQueueElement) % 255
+    local stencil_value = meta.hash(self) % 255
     rt.graphics.stencil(stencil_value, self._stencil)
     rt.graphics.set_stencil_test(rt.StencilCompareMode.EQUAL, stencil_value)
     self._sprite:draw()
-    rt.graphics.stencil()
     rt.graphics.set_stencil_test()
 
     if self._id_offset_label_visible then

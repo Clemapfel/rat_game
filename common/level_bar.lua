@@ -60,8 +60,6 @@ function rt.LevelBar:draw()
     self._shape:draw()
     self._backdrop_outline:draw()
     self._shape_outline:draw()
-
-    rt.graphics.stencil()
     rt.graphics.set_stencil_test()
 end
 

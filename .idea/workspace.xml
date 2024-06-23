@@ -23,7 +23,18 @@
   </component>
   <component name="ChangeListManager">
     <list default="true" id="7fa9ba1b-2cff-4ecc-86fb-59ab2fa76ee1" name="Changes" comment="moved run scripts">
+      <change beforePath="$PROJECT_DIR$/.idea/shelf/stashing_spectrogram.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/shelf/stashing_spectrogram.xml" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/battle/background.lua" beforeDir="false" afterPath="$PROJECT_DIR$/battle/background.lua" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/battle/party_sprite.lua" beforeDir="false" afterPath="$PROJECT_DIR$/battle/party_sprite.lua" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/battle/priority_queue_element.lua" beforeDir="false" afterPath="$PROJECT_DIR$/battle/priority_queue_element.lua" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/common/frame.lua" beforeDir="false" afterPath="$PROJECT_DIR$/common/frame.lua" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/common/graphics.lua" beforeDir="false" afterPath="$PROJECT_DIR$/common/graphics.lua" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/common/input_controller.lua" beforeDir="false" afterPath="$PROJECT_DIR$/common/input_controller.lua" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/common/level_bar.lua" beforeDir="false" afterPath="$PROJECT_DIR$/common/level_bar.lua" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/common/sprite.lua" beforeDir="false" afterPath="$PROJECT_DIR$/common/sprite.lua" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/include.lua" beforeDir="false" afterPath="$PROJECT_DIR$/include.lua" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/main.lua" beforeDir="false" afterPath="$PROJECT_DIR$/main.lua" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -63,40 +74,42 @@
     <option name="hideEmptyMiddlePackages" value="true" />
     <option name="showLibraryContents" value="true" />
   </component>
-  <component name="PropertiesComponent">{
-  &quot;keyToString&quot;: {
-    &quot;Emmy Debugger(NEW).remote_debugger.executor&quot;: &quot;Debug&quot;,
-    &quot;Emmy Debugger(NEW).remote_debugger_v2.executor&quot;: &quot;Debug&quot;,
-    &quot;Lua Application.love11.executor&quot;: &quot;Run&quot;,
-    &quot;Lua Application.love12.executor&quot;: &quot;Run&quot;,
-    &quot;Lua Application.main.executor&quot;: &quot;Run&quot;,
-    &quot;Lua Application.main_lichen.executor&quot;: &quot;Run&quot;,
-    &quot;Lua Application.main_signal.executor&quot;: &quot;Run&quot;,
-    &quot;Lua Application.main_swirl.executor&quot;: &quot;Run&quot;,
-    &quot;Lua Application.main_thread.executor&quot;: &quot;Run&quot;,
-    &quot;Lua Application.overworld.executor&quot;: &quot;Run&quot;,
-    &quot;Lua Application.rope.executor&quot;: &quot;Run&quot;,
-    &quot;RunOnceActivity.OpenProjectViewOnStart&quot;: &quot;true&quot;,
-    &quot;RunOnceActivity.RadMigrateCodeStyle&quot;: &quot;true&quot;,
-    &quot;RunOnceActivity.ShowReadmeOnStart&quot;: &quot;true&quot;,
-    &quot;RunOnceActivity.cidr.known.project.marker&quot;: &quot;true&quot;,
-    &quot;RunOnceActivity.readMode.enableVisualFormatting&quot;: &quot;true&quot;,
-    &quot;WebServerToolWindowFactoryState&quot;: &quot;false&quot;,
-    &quot;cf.advertisement.text.has.clang-format&quot;: &quot;true&quot;,
-    &quot;cf.first.check.clang-format&quot;: &quot;false&quot;,
-    &quot;cidr.known.project.marker&quot;: &quot;true&quot;,
-    &quot;deletionFromPopupRequiresConfirmation&quot;: &quot;false&quot;,
-    &quot;git-widget-placeholder&quot;: &quot;main&quot;,
-    &quot;last_opened_file_path&quot;: &quot;/home/clem/Workspace/wordleai&quot;,
-    &quot;node.js.detected.package.eslint&quot;: &quot;true&quot;,
-    &quot;node.js.detected.package.tslint&quot;: &quot;true&quot;,
-    &quot;node.js.selected.package.eslint&quot;: &quot;(autodetect)&quot;,
-    &quot;node.js.selected.package.tslint&quot;: &quot;(autodetect)&quot;,
-    &quot;nodejs_package_manager_path&quot;: &quot;npm&quot;,
-    &quot;settings.editor.selected.configurable&quot;: &quot;settings.sync&quot;,
-    &quot;vue.rearranger.settings.migration&quot;: &quot;true&quot;
+  <component name="PropertiesComponent"><![CDATA[{
+  "keyToString": {
+    "Emmy Debugger(NEW).remote_debugger.executor": "Debug",
+    "Emmy Debugger(NEW).remote_debugger_v2.executor": "Debug",
+    "Lua Application.love.executor": "Run",
+    "Lua Application.love11.executor": "Run",
+    "Lua Application.love12.executor": "Run",
+    "Lua Application.main.executor": "Run",
+    "Lua Application.main_lichen.executor": "Run",
+    "Lua Application.main_signal.executor": "Run",
+    "Lua Application.main_swirl.executor": "Run",
+    "Lua Application.main_thread.executor": "Run",
+    "Lua Application.main_windows.executor": "Run",
+    "Lua Application.overworld.executor": "Run",
+    "Lua Application.rope.executor": "Run",
+    "RunOnceActivity.OpenProjectViewOnStart": "true",
+    "RunOnceActivity.RadMigrateCodeStyle": "true",
+    "RunOnceActivity.ShowReadmeOnStart": "true",
+    "RunOnceActivity.cidr.known.project.marker": "true",
+    "RunOnceActivity.readMode.enableVisualFormatting": "true",
+    "WebServerToolWindowFactoryState": "false",
+    "cf.advertisement.text.has.clang-format": "true",
+    "cf.first.check.clang-format": "false",
+    "cidr.known.project.marker": "true",
+    "deletionFromPopupRequiresConfirmation": "false",
+    "git-widget-placeholder": "main",
+    "last_opened_file_path": "C:/Users/cleme/Workspace/rat_game/love/windows/love.exe",
+    "node.js.detected.package.eslint": "true",
+    "node.js.detected.package.tslint": "true",
+    "node.js.selected.package.eslint": "(autodetect)",
+    "node.js.selected.package.tslint": "(autodetect)",
+    "nodejs_package_manager_path": "npm",
+    "settings.editor.selected.configurable": "preferences.pluginManager",
+    "vue.rearranger.settings.migration": "true"
   }
-}</component>
+}]]></component>
   <component name="ReadonlyStatusHandler">
     <option name="SHOW_DIALOG" value="false" />
   </component>
@@ -116,7 +129,7 @@
       <recent name="$PROJECT_DIR$/battle/animations/simulation" />
     </key>
   </component>
-  <component name="RunManager" selected="Lua Application.main">
+  <component name="RunManager" selected="Lua Application.main_windows">
     <configuration name="love" type="lua.app" factoryName="Lua Application">
       <module name="rat_game" />
       <option name="program" value="/usr/bin/love" />
@@ -128,110 +141,11 @@
       <option name="showConsole" value="true" />
       <method v="2" />
     </configuration>
-    <configuration name="love11" type="lua.app" factoryName="Lua Application">
+    <configuration name="main_windows" type="lua.app" factoryName="Lua Application">
       <module name="rat_game" />
-      <option name="program" value="$PROJECT_DIR$/love/love11" />
-      <option name="file" value="." />
-      <option name="workingDir" value="$PROJECT_DIR$" />
-      <option name="debuggerType" value="2" />
-      <option name="params" value="" />
-      <option name="charset" value="UTF-8" />
-      <option name="showConsole" value="true" />
-      <method v="2" />
-    </configuration>
-    <configuration name="love" type="lua.app" factoryName="Lua Application">
-      <module name="rat_game" />
-      <option name="program" value="/usr/bin/love" />
-      <option name="file" value="." />
-      <option name="workingDir" value="$PROJECT_DIR$" />
-      <option name="debuggerType" value="2" />
-      <option name="params" value="" />
-      <option name="charset" value="UTF-8" />
-      <option name="showConsole" value="true" />
-      <method v="2" />
-    </configuration>
-    <configuration name="love" type="lua.app" factoryName="Lua Application">
-      <module name="rat_game" />
-      <option name="program" value="/usr/bin/love" />
-      <option name="file" value="." />
-      <option name="workingDir" value="$PROJECT_DIR$" />
-      <option name="debuggerType" value="2" />
-      <option name="params" value="" />
-      <option name="charset" value="UTF-8" />
-      <option name="showConsole" value="true" />
-      <method v="2" />
-    </configuration>
-    <configuration name="main" type="lua.app" factoryName="Lua Application">
-      <module name="rat_game" />
-      <option name="program" value="$PROJECT_DIR$/love/love12" />
+      <option name="program" value="C:\Users\cleme\Workspace\rat_game\love\windows\love.exe" />
       <option name="file" value="main.lua" />
       <option name="workingDir" value="$PROJECT_DIR$" />
-      <option name="debuggerType" value="2" />
-      <option name="params" value="" />
-      <option name="charset" value="UTF-8" />
-      <option name="showConsole" value="true" />
-      <method v="2" />
-    </configuration>
-    <configuration name="main_lichen" type="lua.app" factoryName="Lua Application">
-      <module name="rat_game" />
-      <option name="program" value="$PROJECT_DIR$/love/love12" />
-      <option name="file" value="main_lichen.lua" />
-      <option name="workingDir" value="$PROJECT_DIR$" />
-      <option name="debuggerType" value="2" />
-      <option name="params" value="" />
-      <option name="charset" value="UTF-8" />
-      <option name="showConsole" value="true" />
-      <method v="2" />
-    </configuration>
-    <configuration name="main_signal" type="lua.app" factoryName="Lua Application">
-      <module name="rat_game" />
-      <option name="program" value="$PROJECT_DIR$/love/love12" />
-      <option name="file" value="main_signal.lua" />
-      <option name="workingDir" value="$PROJECT_DIR$" />
-      <option name="debuggerType" value="2" />
-      <option name="params" value="" />
-      <option name="charset" value="UTF-8" />
-      <option name="showConsole" value="true" />
-      <method v="2" />
-    </configuration>
-    <configuration name="main_swirl" type="lua.app" factoryName="Lua Application">
-      <module name="rat_game" />
-      <option name="program" value="$PROJECT_DIR$/love/love12" />
-      <option name="file" value="main_swirl.lua" />
-      <option name="workingDir" value="$PROJECT_DIR$" />
-      <option name="debuggerType" value="2" />
-      <option name="params" value="" />
-      <option name="charset" value="UTF-8" />
-      <option name="showConsole" value="true" />
-      <method v="2" />
-    </configuration>
-    <configuration name="main_thread" type="lua.app" factoryName="Lua Application">
-      <module name="rat_game" />
-      <option name="program" value="$PROJECT_DIR$/love/love12" />
-      <option name="file" value="main_threads.lua" />
-      <option name="workingDir" value="$PROJECT_DIR$" />
-      <option name="debuggerType" value="2" />
-      <option name="params" value="" />
-      <option name="charset" value="UTF-8" />
-      <option name="showConsole" value="true" />
-      <method v="2" />
-    </configuration>
-    <configuration name="overworld" type="lua.app" factoryName="Lua Application">
-      <module name="rat_game" />
-      <option name="program" value="$PROJECT_DIR$/love/love12" />
-      <option name="file" value="main_overworld.lua" />
-      <option name="workingDir" value="$PROJECT_DIR$/" />
-      <option name="debuggerType" value="2" />
-      <option name="params" value="" />
-      <option name="charset" value="UTF-8" />
-      <option name="showConsole" value="true" />
-      <method v="2" />
-    </configuration>
-    <configuration name="rope" type="lua.app" factoryName="Lua Application">
-      <module name="rat_game" />
-      <option name="program" value="$PROJECT_DIR$/love/love12" />
-      <option name="file" value="main_rope.lua" />
-      <option name="workingDir" value="$PROJECT_DIR$/" />
       <option name="debuggerType" value="2" />
       <option name="params" value="" />
       <option name="charset" value="UTF-8" />
@@ -275,16 +189,8 @@
       <method v="2" />
     </configuration>
     <list>
-      <item itemvalue="Lua Application.love11" />
-      <item itemvalue="Lua Application.love" />
-      <item itemvalue="Lua Application.main" />
-      <item itemvalue="Lua Application.main_lichen" />
-      <item itemvalue="Lua Application.main_signal" />
-      <item itemvalue="Lua Application.main_swirl" />
-      <item itemvalue="Lua Application.main_thread" />
-      <item itemvalue="Lua Application.overworld" />
-      <item itemvalue="Lua Application.rope" />
       <item itemvalue="Emmy Debugger(NEW).remote_debugger" />
+      <item itemvalue="Lua Application.main_windows" />
     </list>
   </component>
   <component name="SpellCheckerSettings" RuntimeDictionaries="0" Folders="0" CustomDictionaries="0" DefaultDictionary="application-level" UseSingleDictionary="true" transferred="true" />
@@ -517,6 +423,8 @@
       <workItem from="1719099926116" duration="8000" />
       <workItem from="1719100249350" duration="12000" />
       <workItem from="1719100302641" duration="3000" />
+      <workItem from="1719151082464" duration="4036000" />
+      <workItem from="1719155151553" duration="770000" />
     </task>
     <task id="LOCAL-00787" summary="added control indicator">
       <option name="closed" value="true" />

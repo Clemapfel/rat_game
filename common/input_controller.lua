@@ -73,7 +73,7 @@ function rt.InputController:get_axis(joystick_position)
 end
 
 --- @brief KEYBOARD KEY PRESSED
-love.keypressed = function (key)
+love.keypressed = function(key)
     key = rt.KeyboardKeyPrefix .. key
     local button = rt.InputHandler.reverse_mapping[key]
     if button ~= nil then
@@ -87,7 +87,7 @@ love.keypressed = function (key)
 end
 
 --- @brief KEYBOARD KEY RELEASED
-love.keyreleased = function (key)
+love.keyreleased = function(key)
     key = rt.KeyboardKeyPrefix .. key
     local button = rt.InputHandler.reverse_mapping[key]
     if button ~= nil then
@@ -101,7 +101,7 @@ love.keyreleased = function (key)
 end
 
 --- @brief MOUSE BUTTON PRESSED
-love.mousepressed = function (x, y, button_id, is_touch, n_presses)
+love.mousepressed = function(x, y, button_id, is_touch, n_presses)
     if button_id == rt.MouseButton.LEFT or is_touch then
         rt.InputHandler.state[rt.InputButton.A] = true
         for _, component in pairs(rt.InputHandler.components) do
