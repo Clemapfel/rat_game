@@ -6,9 +6,18 @@ scene:set_background("GRADIENT_DERIVATIVE")
 
 list = mn.ScrollableList()
 for i = 1, 30 do
-    list:push(mn.ListItem(bt.Move("DEBUG_MOVE"), rt.random.integer(1, 5)))
+    list:push({bt.Move("DEBUG_MOVE"), rt.random.integer(1, 5)})
 end
 list:realize()
+
+input = rt.InputController()
+input:signal_connect("pressed", function(_, which)
+    if which == rt.InputButton.UP then
+        list:move_up()
+    else
+        list:move_down()
+    end
+end)
 
 --- ###
 
@@ -58,12 +67,13 @@ love.update = function(delta)
         rt.current_scene:update(delta)
     end
 end
+
 love.resize = function()
     if rt.current_scene ~= nil then
         rt.current_scene:fit_into(0, 0, love.graphics.getWidth(), love.graphics.getHeight())
     end
 
-    list:fit_into(50, 50, rt.graphics.get_width() / 2, rt.graphics.get_height() / 2)
+    list:fit_into(50, 50, rt.graphics.get_width() / 2, rt.graphics.get_height() / 6)
 end
 
 love.run = function()
@@ -195,8 +205,7 @@ love.run = function()
             durations.max_total_duration = math.max(durations.max_total_duration, total_duration)
         end
 
-        -- force gc
-        collectgarbage("collect")
+        collectgarbage("collect") -- force gc
 
         if love.timer then love.timer.sleep(0.001) end -- limit max tick rate of while true
     end

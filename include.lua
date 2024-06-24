@@ -183,7 +183,6 @@ require "battle.scene"
 require "battle.simulation_handler"
 
 require "menu.slot"
-require "menu.list_item"
 require "menu.entity_info"
 require "menu.scrollable_list"
 require "menu.inventory"

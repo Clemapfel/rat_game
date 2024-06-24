@@ -22,9 +22,13 @@
     </configurations>
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="7fa9ba1b-2cff-4ecc-86fb-59ab2fa76ee1" name="Changes" comment="made windows runnable">
+    <list default="true" id="7fa9ba1b-2cff-4ecc-86fb-59ab2fa76ee1" name="Changes" comment="benchmarking is now split into update / draw">
+      <change afterPath="$PROJECT_DIR$/menu/~scrollable_list.lua" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/include.lua" beforeDir="false" afterPath="$PROJECT_DIR$/include.lua" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/main.lua" beforeDir="false" afterPath="$PROJECT_DIR$/main.lua" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/menu/list_item.lua" beforeDir="false" afterPath="$PROJECT_DIR$/menu/~list_item.lua" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/menu/scrollable_list.lua" beforeDir="false" afterPath="$PROJECT_DIR$/menu/scrollable_list.lua" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -97,7 +101,7 @@
     "node.js.selected.package.eslint": "(autodetect)",
     "node.js.selected.package.tslint": "(autodetect)",
     "nodejs_package_manager_path": "npm",
-    "settings.editor.selected.configurable": "preferences.pluginManager",
+    "settings.editor.selected.configurable": "editor.preferences.fonts.default",
     "vue.rearranger.settings.migration": "true"
   }
 }]]></component>
@@ -418,15 +422,7 @@
       <workItem from="1719151082464" duration="4036000" />
       <workItem from="1719155151553" duration="1006000" />
       <workItem from="1719234658941" duration="15000" />
-      <workItem from="1719237252017" duration="3103000" />
-    </task>
-    <task id="LOCAL-00788" summary="added global status bar selection node">
-      <option name="closed" value="true" />
-      <created>1717508047494</created>
-      <option name="number" value="00788" />
-      <option name="presentableId" value="LOCAL-00788" />
-      <option name="project" value="LOCAL" />
-      <updated>1717508047494</updated>
+      <workItem from="1719237252017" duration="8183000" />
     </task>
     <task id="LOCAL-00789" summary="inspect state finished">
       <option name="closed" value="true" />
@@ -812,7 +808,15 @@
       <option name="project" value="LOCAL" />
       <updated>1719156142927</updated>
     </task>
-    <option name="localTasksCounter" value="837" />
+    <task id="LOCAL-00837" summary="benchmarking is now split into update / draw">
+      <option name="closed" value="true" />
+      <created>1719241850381</created>
+      <option name="number" value="00837" />
+      <option name="presentableId" value="LOCAL-00837" />
+      <option name="project" value="LOCAL" />
+      <updated>1719241850381</updated>
+    </task>
+    <option name="localTasksCounter" value="838" />
     <servers />
   </component>
   <component name="TypeScriptGeneratedFilesManager">
@@ -861,7 +865,6 @@
     </option>
   </component>
   <component name="VcsManagerConfiguration">
-    <MESSAGE value="stashing for loop" />
     <MESSAGE value="added party battle sprites placeholders" />
     <MESSAGE value="added speech bubble" />
     <MESSAGE value="stashing speech bubble" />
@@ -886,7 +889,8 @@
     <MESSAGE value="added love executables" />
     <MESSAGE value="moved run scripts" />
     <MESSAGE value="made windows runnable" />
-    <option name="LAST_COMMIT_MESSAGE" value="made windows runnable" />
+    <MESSAGE value="benchmarking is now split into update / draw" />
+    <option name="LAST_COMMIT_MESSAGE" value="benchmarking is now split into update / draw" />
   </component>
   <component name="XDebuggerManager">
     <breakpoint-manager>
