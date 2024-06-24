@@ -131,3 +131,13 @@ end
 function rt.graphics.pop()
     love.graphics.pop()
 end
+
+--- @brief
+function rt.graphics.reset()
+    love.graphics.setColor(1, 1, 1, 1)
+    love.graphics.setLineWidth(1)
+    love.graphics.setPointSize(1)
+    love.graphics.setLineJoin(rt.LineJoin.NONE)
+    love.graphics.setStencilState()
+    love.graphics.origin()
+end

@@ -196,7 +196,7 @@ end
 --- @TODO
 function ow.Camera:draw()
     love.graphics.push()
-    --love.graphics.reset()
+    love.graphics.origin()
     self._collider:draw()
     local x, y = self._collider:get_centroid()
     love.graphics.line(x, y, self._target_x, self._target_y)

@@ -37,7 +37,7 @@ love.draw = function()
     love.graphics.clear(0.8, 0.2, 0.8, 1)
 
     if rt.current_scene ~= nil then
-        --rt.current_scene:draw()
+        rt.current_scene:draw()
     end
 
     list:draw()
@@ -58,8 +58,6 @@ love.draw = function()
         love.graphics.line(x + 0.5 * width, y, x + 0.5 * width, height)
         rt.graphics.set_blend_mode()
     end
-
-    love.graphics.reset()
 end
 
 love.update = function(delta)
@@ -138,8 +136,9 @@ love.run = function()
         update_duration = love.timer.getTime() - update_before
 
         if love.graphics.isActive() then
-            love.graphics.clear(love.graphics.getBackgroundColor())
-            love.graphics.reset()
+            love.graphics.clear(true, true, true)
+            rt.graphics.reset()
+
             local draw_before = love.timer.getTime()
             love.draw()
             local now =  love.timer.getTime()
