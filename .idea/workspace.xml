@@ -22,18 +22,8 @@
     </configurations>
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="7fa9ba1b-2cff-4ecc-86fb-59ab2fa76ee1" name="Changes" comment="moved run scripts">
-      <change beforePath="$PROJECT_DIR$/.idea/shelf/stashing_spectrogram.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/shelf/stashing_spectrogram.xml" afterDir="false" />
+    <list default="true" id="7fa9ba1b-2cff-4ecc-86fb-59ab2fa76ee1" name="Changes" comment="made windows runnable">
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/battle/background.lua" beforeDir="false" afterPath="$PROJECT_DIR$/battle/background.lua" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/battle/party_sprite.lua" beforeDir="false" afterPath="$PROJECT_DIR$/battle/party_sprite.lua" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/battle/priority_queue_element.lua" beforeDir="false" afterPath="$PROJECT_DIR$/battle/priority_queue_element.lua" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/common/frame.lua" beforeDir="false" afterPath="$PROJECT_DIR$/common/frame.lua" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/common/graphics.lua" beforeDir="false" afterPath="$PROJECT_DIR$/common/graphics.lua" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/common/input_controller.lua" beforeDir="false" afterPath="$PROJECT_DIR$/common/input_controller.lua" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/common/level_bar.lua" beforeDir="false" afterPath="$PROJECT_DIR$/common/level_bar.lua" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/common/sprite.lua" beforeDir="false" afterPath="$PROJECT_DIR$/common/sprite.lua" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/include.lua" beforeDir="false" afterPath="$PROJECT_DIR$/include.lua" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/main.lua" beforeDir="false" afterPath="$PROJECT_DIR$/main.lua" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
@@ -83,6 +73,7 @@
     "Lua Application.love12.executor": "Run",
     "Lua Application.main.executor": "Run",
     "Lua Application.main_lichen.executor": "Run",
+    "Lua Application.main_linux.executor": "Run",
     "Lua Application.main_signal.executor": "Run",
     "Lua Application.main_swirl.executor": "Run",
     "Lua Application.main_thread.executor": "Run",
@@ -100,7 +91,7 @@
     "cidr.known.project.marker": "true",
     "deletionFromPopupRequiresConfirmation": "false",
     "git-widget-placeholder": "main",
-    "last_opened_file_path": "C:/Users/cleme/Workspace/rat_game/love/windows/love.exe",
+    "last_opened_file_path": "C:/Users/cleme/Workspace/rat_game",
     "node.js.detected.package.eslint": "true",
     "node.js.detected.package.tslint": "true",
     "node.js.selected.package.eslint": "(autodetect)",
@@ -190,6 +181,7 @@
     </configuration>
     <list>
       <item itemvalue="Emmy Debugger(NEW).remote_debugger" />
+      <item itemvalue="Lua Application.love" />
       <item itemvalue="Lua Application.main_windows" />
     </list>
   </component>
@@ -424,15 +416,9 @@
       <workItem from="1719100249350" duration="12000" />
       <workItem from="1719100302641" duration="3000" />
       <workItem from="1719151082464" duration="4036000" />
-      <workItem from="1719155151553" duration="770000" />
-    </task>
-    <task id="LOCAL-00787" summary="added control indicator">
-      <option name="closed" value="true" />
-      <created>1717465746961</created>
-      <option name="number" value="00787" />
-      <option name="presentableId" value="LOCAL-00787" />
-      <option name="project" value="LOCAL" />
-      <updated>1717465746961</updated>
+      <workItem from="1719155151553" duration="1006000" />
+      <workItem from="1719234658941" duration="15000" />
+      <workItem from="1719237252017" duration="3103000" />
     </task>
     <task id="LOCAL-00788" summary="added global status bar selection node">
       <option name="closed" value="true" />
@@ -818,7 +804,15 @@
       <option name="project" value="LOCAL" />
       <updated>1719099893058</updated>
     </task>
-    <option name="localTasksCounter" value="836" />
+    <task id="LOCAL-00836" summary="made windows runnable">
+      <option name="closed" value="true" />
+      <created>1719156142927</created>
+      <option name="number" value="00836" />
+      <option name="presentableId" value="LOCAL-00836" />
+      <option name="project" value="LOCAL" />
+      <updated>1719156142927</updated>
+    </task>
+    <option name="localTasksCounter" value="837" />
     <servers />
   </component>
   <component name="TypeScriptGeneratedFilesManager">
@@ -867,7 +861,6 @@
     </option>
   </component>
   <component name="VcsManagerConfiguration">
-    <MESSAGE value="polish" />
     <MESSAGE value="stashing for loop" />
     <MESSAGE value="added party battle sprites placeholders" />
     <MESSAGE value="added speech bubble" />
@@ -892,7 +885,8 @@
     <MESSAGE value="import" />
     <MESSAGE value="added love executables" />
     <MESSAGE value="moved run scripts" />
-    <option name="LAST_COMMIT_MESSAGE" value="moved run scripts" />
+    <MESSAGE value="made windows runnable" />
+    <option name="LAST_COMMIT_MESSAGE" value="made windows runnable" />
   </component>
   <component name="XDebuggerManager">
     <breakpoint-manager>
