@@ -1,8 +1,6 @@
 do
     local paths = {
         ";?.lua",
-        ";common/?.lua",
-        ";battle/?.lua",
     }
     love.filesystem.setRequirePath(love.filesystem.getRequirePath() .. table.concat(paths))
     io.stdout:setvbuf("no") -- makes it so love2d error message is printed to console immediately
@@ -16,6 +14,14 @@ love.filesystem.setIdentity("rat_game")
 ffi = require "ffi"
 utf8 = require "utf8"
 bit = require "bit"
+
+-- other libs
+if jit.os == "Windows" then
+    love.filesystem.setRequirePath(love.filesystem.getRequirePath() .. ";libs/windows/tinyspline/lib/?.dll")
+else
+    love.filesystem.setRequirePath(love.filesystem.getRequirePath() .. ";libs/linux/tinyspline/lib/?.so")
+end
+local ts = require("tinysplinelua51")
 
 require "common"
 require "meta"
