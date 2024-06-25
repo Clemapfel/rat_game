@@ -22,12 +22,14 @@
     </configurations>
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="7fa9ba1b-2cff-4ecc-86fb-59ab2fa76ee1" name="Changes" comment="added scrollable list">
+    <list default="true" id="7fa9ba1b-2cff-4ecc-86fb-59ab2fa76ee1" name="Changes" comment="revert">
+      <change afterPath="$PROJECT_DIR$/main_menu.lua" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/menu/tab_bar.lua" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/battle/configs/battles/DEBUG_BATTLE.lua" beforeDir="false" afterPath="$PROJECT_DIR$/battle/configs/battles/DEBUG_BATTLE.lua" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/common/graphics.lua" beforeDir="false" afterPath="$PROJECT_DIR$/common/graphics.lua" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/main.lua" beforeDir="false" afterPath="$PROJECT_DIR$/main.lua" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/old/~overworld/camera.lua" beforeDir="false" afterPath="$PROJECT_DIR$/old/~overworld/camera.lua" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/include.lua" beforeDir="false" afterPath="$PROJECT_DIR$/include.lua" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/main.lua" beforeDir="false" afterPath="$PROJECT_DIR$/main_battle.lua" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/menu/inventory.lua" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/menu/scene.lua" beforeDir="false" afterPath="$PROJECT_DIR$/menu/scene.lua" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -139,7 +141,7 @@
     <configuration name="main_windows" type="lua.app" factoryName="Lua Application">
       <module name="rat_game" />
       <option name="program" value="C:\Users\cleme\Workspace\rat_game\love\windows\love.exe" />
-      <option name="file" value="main.lua" />
+      <option name="file" value="main_menu.lua" />
       <option name="workingDir" value="$PROJECT_DIR$" />
       <option name="debuggerType" value="2" />
       <option name="params" value="" />
@@ -425,23 +427,10 @@
       <workItem from="1719237252017" duration="8448000" />
       <workItem from="1719247464339" duration="4000" />
       <workItem from="1719258867346" duration="453000" />
-      <workItem from="1719259335336" duration="1334000" />
-    </task>
-    <task id="LOCAL-00790" summary="added trade-in">
-      <option name="closed" value="true" />
-      <created>1717607773181</created>
-      <option name="number" value="00790" />
-      <option name="presentableId" value="LOCAL-00790" />
-      <option name="project" value="LOCAL" />
-      <updated>1717607773181</updated>
-    </task>
-    <task id="LOCAL-00791" summary="trade working">
-      <option name="closed" value="true" />
-      <created>1717610953294</created>
-      <option name="number" value="00791" />
-      <option name="presentableId" value="LOCAL-00791" />
-      <option name="project" value="LOCAL" />
-      <updated>1717610953295</updated>
+      <workItem from="1719259335336" duration="2193000" />
+      <workItem from="1719319559958" duration="2629000" />
+      <workItem from="1719322948093" duration="602000" />
+      <workItem from="1719323563101" duration="1044000" />
     </task>
     <task id="LOCAL-00792" summary="stashing polish, what to do about trade callbacks?">
       <option name="closed" value="true" />
@@ -819,7 +808,23 @@
       <option name="project" value="LOCAL" />
       <updated>1719246949761</updated>
     </task>
-    <option name="localTasksCounter" value="839" />
+    <task id="LOCAL-00839" summary="optimization">
+      <option name="closed" value="true" />
+      <created>1719260680841</created>
+      <option name="number" value="00839" />
+      <option name="presentableId" value="LOCAL-00839" />
+      <option name="project" value="LOCAL" />
+      <updated>1719260680841</updated>
+    </task>
+    <task id="LOCAL-00840" summary="revert">
+      <option name="closed" value="true" />
+      <created>1719260869451</created>
+      <option name="number" value="00840" />
+      <option name="presentableId" value="LOCAL-00840" />
+      <option name="project" value="LOCAL" />
+      <updated>1719260869451</updated>
+    </task>
+    <option name="localTasksCounter" value="841" />
     <servers />
   </component>
   <component name="TypeScriptGeneratedFilesManager">
@@ -868,8 +873,6 @@
     </option>
   </component>
   <component name="VcsManagerConfiguration">
-    <MESSAGE value="added speech bubble" />
-    <MESSAGE value="stashing speech bubble" />
     <MESSAGE value="stashing" />
     <MESSAGE value="speech bubble finished" />
     <MESSAGE value="refactored priority_queue_element" />
@@ -893,7 +896,9 @@
     <MESSAGE value="made windows runnable" />
     <MESSAGE value="benchmarking is now split into update / draw" />
     <MESSAGE value="added scrollable list" />
-    <option name="LAST_COMMIT_MESSAGE" value="added scrollable list" />
+    <MESSAGE value="optimization" />
+    <MESSAGE value="revert" />
+    <option name="LAST_COMMIT_MESSAGE" value="revert" />
   </component>
   <component name="XDebuggerManager">
     <breakpoint-manager>

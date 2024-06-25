@@ -185,5 +185,4 @@ require "battle.simulation_handler"
 require "menu.slot"
 require "menu.entity_info"
 require "menu.scrollable_list"
-require "menu.inventory"
-
+require "menu.tab_bar"

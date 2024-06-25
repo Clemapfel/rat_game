@@ -2,7 +2,7 @@ require "include"
 
 rt.current_scene = bt.Scene()
 scene = rt.current_scene
-scene:set_background("GRADIENT_DERIVATIVE")
+scene:set_background("CLOUDS")
 
 list = mn.ScrollableList()
 for i = 1, 30 do
@@ -77,7 +77,7 @@ end
 love.run = function()
     love.window.setMode(1920 / 1.5, 1080 / 1.5, {
         vsync = -1, -- adaptive vsync, may tear but tries to stay as close to 60hz as possible
-        msaa = 8,
+        msaa = 0,
         stencil = true,
         resizable = true,
         borderless = false
@@ -108,6 +108,7 @@ love.run = function()
         if rt.graphics.frame_duration == nil then
             rt.graphics.frame_duration = {
                 n_frames = 0,
+                last_fps = love.timer.getFPS(),
 
                 max_update_duration = 0,
                 max_draw_duration = 0,
