@@ -16,15 +16,14 @@ utf8 = require "utf8"
 bit = require "bit"
 
 -- other libs
-if jit.os == "Windows" then
-    love.filesystem.setRequirePath(love.filesystem.getRequirePath() .. ";libs/windows/tinyspline/lib/?.dll")
-else
-    love.filesystem.setRequirePath(love.filesystem.getRequirePath() .. ";libs/linux/tinyspline/lib/?.so")
+if jit.os == "Linux" then
+    fftw3 = ffi.load("fftw3")
+elseif jit.os == "Windows" then
+    fftw3 = ffi.load("libfftw3-3")
 end
-local ts = require("tinysplinelua51")
 
-require "common"
-require "meta"
+require "common.common"
+require "common.meta"
 
 -- debugger
 pcall(function()
@@ -133,7 +132,7 @@ require "common.physics_world"
 require "common.collider"
 
 require "common.audio_playback"
---require "common.monitored_audio_playback"
+require "common.monitored_audio_playback"
 require "common.sound_atlas"
 
 require "common.scene_state"

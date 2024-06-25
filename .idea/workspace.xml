@@ -22,8 +22,10 @@
     </configurations>
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="7fa9ba1b-2cff-4ecc-86fb-59ab2fa76ee1" name="Changes" comment="stashing tab bar">
-      <change afterPath="$PROJECT_DIR$/common/bspline.lua" afterDir="false" />
+    <list default="true" id="7fa9ba1b-2cff-4ecc-86fb-59ab2fa76ee1" name="Changes" comment="added bspline">
+      <change afterPath="$PROJECT_DIR$/libs/linux/initialize.sh" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/love/linux/lib/libfftw3.so.3.5.8" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/love/windows/libfftw3-3.dll" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/include.lua" beforeDir="false" afterPath="$PROJECT_DIR$/include.lua" afterDir="false" />
     </list>
@@ -93,7 +95,7 @@
     "deletionFromPopupRequiresConfirmation": "false",
     "git-widget-placeholder": "main",
     "ignore.virus.scanning.warn.message": "true",
-    "last_opened_file_path": "C:/Users/cleme/Workspace/rat_game",
+    "last_opened_file_path": "C:/Users/cleme/Workspace/rat_game/love/linux/lib",
     "node.js.detected.package.eslint": "true",
     "node.js.detected.package.tslint": "true",
     "node.js.selected.package.eslint": "(autodetect)",
@@ -109,17 +111,17 @@
   <component name="RecentsManager">
     <key name="CopyFile.RECENT_KEYS">
       <recent name="C:\Users\cleme\Workspace\rat_game" />
+      <recent name="C:\Users\cleme\Workspace\rat_game\love\windows" />
+      <recent name="C:\Users\cleme\Workspace\rat_game\love\linux\lib" />
       <recent name="C:\Users\cleme\Workspace\rat_game\libs\windows" />
-      <recent name="C:\Users\cleme\Workspace\rat_game\libs" />
-      <recent name="$PROJECT_DIR$/assets" />
-      <recent name="$PROJECT_DIR$/common" />
+      <recent name="C:\Users\cleme\Workspace\rat_game\libs\linux\tinyspline" />
     </key>
     <key name="MoveFile.RECENT_KEYS">
+      <recent name="C:\Users\cleme\Workspace\rat_game\libs\linux\fftw3" />
       <recent name="C:\Users\cleme\Workspace\rat_game\libs\linux\tinyspline" />
+      <recent name="C:\Users\cleme\Workspace\rat_game\libs\linux" />
       <recent name="C:\Users\cleme\Workspace\rat_game\libs\windows\tinyspline" />
       <recent name="C:\Users\cleme\Workspace\rat_game\libs\windows\#" />
-      <recent name="C:\Users\cleme\Workspace\rat_game\libs" />
-      <recent name="C:\Users\cleme\Workspace\rat_game\libs\tinyspline\windows" />
     </key>
   </component>
   <component name="RunManager" selected="Lua Application.main_windows">
@@ -427,15 +429,10 @@
       <workItem from="1719319559958" duration="2629000" />
       <workItem from="1719322948093" duration="602000" />
       <workItem from="1719323563101" duration="1231000" />
-      <workItem from="1719331309887" duration="2947000" />
-    </task>
-    <task id="LOCAL-00793" summary="stashing">
-      <option name="closed" value="true" />
-      <created>1717694172293</created>
-      <option name="number" value="00793" />
-      <option name="presentableId" value="LOCAL-00793" />
-      <option name="project" value="LOCAL" />
-      <updated>1717694172293</updated>
+      <workItem from="1719331309887" duration="7255000" />
+      <workItem from="1719338734310" duration="2967000" />
+      <workItem from="1719342172568" duration="114000" />
+      <workItem from="1719342349559" duration="654000" />
     </task>
     <task id="LOCAL-00794" summary="stashing guitar strings">
       <option name="closed" value="true" />
@@ -821,7 +818,15 @@
       <option name="project" value="LOCAL" />
       <updated>1719324767452</updated>
     </task>
-    <option name="localTasksCounter" value="842" />
+    <task id="LOCAL-00842" summary="added bspline">
+      <option name="closed" value="true" />
+      <created>1719334357179</created>
+      <option name="number" value="00842" />
+      <option name="presentableId" value="LOCAL-00842" />
+      <option name="project" value="LOCAL" />
+      <updated>1719334357179</updated>
+    </task>
+    <option name="localTasksCounter" value="843" />
     <servers />
   </component>
   <component name="TypeScriptGeneratedFilesManager">
@@ -870,7 +875,6 @@
     </option>
   </component>
   <component name="VcsManagerConfiguration">
-    <MESSAGE value="speech bubble finished" />
     <MESSAGE value="refactored priority_queue_element" />
     <MESSAGE value="added party sprite sprites" />
     <MESSAGE value="added exe" />
@@ -895,7 +899,8 @@
     <MESSAGE value="optimization" />
     <MESSAGE value="revert" />
     <MESSAGE value="stashing tab bar" />
-    <option name="LAST_COMMIT_MESSAGE" value="stashing tab bar" />
+    <MESSAGE value="added bspline" />
+    <option name="LAST_COMMIT_MESSAGE" value="added bspline" />
   </component>
   <component name="XDebuggerManager">
     <breakpoint-manager>

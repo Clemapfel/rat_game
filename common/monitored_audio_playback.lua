@@ -28,7 +28,7 @@ end)
 
 -- fftw interface
 rt.MonitoredAudioPlayback.ft = (function()
-    local fftw = ffi.load("libfftw3")
+    local fftw = fftw3
     assert(fftw)
     local ft = {}
     ft.fftw = fftw
