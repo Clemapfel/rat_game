@@ -22,12 +22,9 @@
     </configurations>
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="7fa9ba1b-2cff-4ecc-86fb-59ab2fa76ee1" name="Changes" comment="added bspline">
-      <change afterPath="$PROJECT_DIR$/libs/linux/initialize.sh" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/love/linux/lib/libfftw3.so.3.5.8" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/love/windows/libfftw3-3.dll" afterDir="false" />
+    <list default="true" id="7fa9ba1b-2cff-4ecc-86fb-59ab2fa76ee1" name="Changes" comment="adde portable fftw">
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/include.lua" beforeDir="false" afterPath="$PROJECT_DIR$/include.lua" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/menu/tab_bar.lua" beforeDir="false" afterPath="$PROJECT_DIR$/menu/tab_bar.lua" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -110,9 +107,9 @@
   </component>
   <component name="RecentsManager">
     <key name="CopyFile.RECENT_KEYS">
+      <recent name="C:\Users\cleme\Workspace\rat_game\love\linux\lib" />
       <recent name="C:\Users\cleme\Workspace\rat_game" />
       <recent name="C:\Users\cleme\Workspace\rat_game\love\windows" />
-      <recent name="C:\Users\cleme\Workspace\rat_game\love\linux\lib" />
       <recent name="C:\Users\cleme\Workspace\rat_game\libs\windows" />
       <recent name="C:\Users\cleme\Workspace\rat_game\libs\linux\tinyspline" />
     </key>
@@ -432,15 +429,7 @@
       <workItem from="1719331309887" duration="7255000" />
       <workItem from="1719338734310" duration="2967000" />
       <workItem from="1719342172568" duration="114000" />
-      <workItem from="1719342349559" duration="654000" />
-    </task>
-    <task id="LOCAL-00794" summary="stashing guitar strings">
-      <option name="closed" value="true" />
-      <created>1717698781588</created>
-      <option name="number" value="00794" />
-      <option name="presentableId" value="LOCAL-00794" />
-      <option name="project" value="LOCAL" />
-      <updated>1717698781588</updated>
+      <workItem from="1719342349559" duration="1658000" />
     </task>
     <task id="LOCAL-00795" summary="added entity selection">
       <option name="closed" value="true" />
@@ -826,7 +815,15 @@
       <option name="project" value="LOCAL" />
       <updated>1719334357179</updated>
     </task>
-    <option name="localTasksCounter" value="843" />
+    <task id="LOCAL-00843" summary="adde portable fftw">
+      <option name="closed" value="true" />
+      <created>1719343188960</created>
+      <option name="number" value="00843" />
+      <option name="presentableId" value="LOCAL-00843" />
+      <option name="project" value="LOCAL" />
+      <updated>1719343188960</updated>
+    </task>
+    <option name="localTasksCounter" value="844" />
     <servers />
   </component>
   <component name="TypeScriptGeneratedFilesManager">
@@ -875,7 +872,6 @@
     </option>
   </component>
   <component name="VcsManagerConfiguration">
-    <MESSAGE value="refactored priority_queue_element" />
     <MESSAGE value="added party sprite sprites" />
     <MESSAGE value="added exe" />
     <MESSAGE value="added sprites" />
@@ -900,7 +896,8 @@
     <MESSAGE value="revert" />
     <MESSAGE value="stashing tab bar" />
     <MESSAGE value="added bspline" />
-    <option name="LAST_COMMIT_MESSAGE" value="added bspline" />
+    <MESSAGE value="adde portable fftw" />
+    <option name="LAST_COMMIT_MESSAGE" value="adde portable fftw" />
   </component>
   <component name="XDebuggerManager">
     <breakpoint-manager>

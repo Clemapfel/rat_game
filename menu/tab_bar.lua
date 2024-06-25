@@ -2,6 +2,7 @@
 mn.TabBar = meta.new_type("TabBar", rt.Widget, function()
     return meta.new(mn.TabBar, {
         _items = {}, -- cf. push
+        _stencil = rt.Rectangle(0, 0, 1, 1),
         _rail_width = rt.settings.frame.thickness,
     })
 end)
@@ -11,26 +12,12 @@ function mn.TabBar:push(...)
     for widget in range(...) do
         local to_insert = {
             widget = widget,
-            base_rectangle = rt.Rectangle(0, 0, 1, 1),
-            base_triangle = rt.Triangle(0, 0, 1, 1, 0.5, 0.5),
-            rail = rt.Line(0, 0, 1, 1),
-            rail_outline = rt.Line(0, 0, 1, 1),
+            frame = rt.Frame()
         }
 
         if self._is_realized then
             to_insert.widget:realize()
-        end
-
-        to_insert.base_rectangle:set_color(rt.Palette.BACKGROUND)
-        to_insert.base_triangle:set_color(rt.Palette.BACKGROUND)
-
-        to_insert.rail:set_color(rt.Palette.FOREGROUND)
-        to_insert.rail:set_line_width(self._rail_width)
-        to_insert.rail_outline:set_color(rt.Palette.BACKGROUND_OUTLINE)
-        to_insert.rail_outline:set_line_width(self._rail_width + 2)
-
-        for rail in range(to_insert.rail, to_insert.rail_outline) do
-            rail:set_line_join(rt.LineJoin.BEVEL)
+            to_insert.frame:realize()
         end
 
         table.insert(self._items, to_insert)
@@ -44,13 +31,15 @@ function mn.TabBar:realize()
 
     for item in values(self._items) do
         item.widget:realize()
+        item.frame:realize()
     end
 end
 
 --- @override
 function mn.TabBar:size_allocate(x, y, width, height)
     local current_x, current_y = x, y
-    local eps = 5
+    local max_h = NEGATIVE_INFINITY
+    local eps = 20
     for item in values(self._items) do
         local m = rt.settings.margin_unit
 
@@ -58,37 +47,27 @@ function mn.TabBar:size_allocate(x, y, width, height)
         item.widget:fit_into(current_x + m, current_y + m, w, h)
 
         local base_w = w + 2 * m
-        local base_h = h + m
-        item.base_rectangle:resize(current_x, current_y, base_w, base_h)
+        local base_h = h + 2 * m + eps
+        item.frame:fit_into(current_x, current_y, base_w, base_h)
 
-        local triangle_w = 3 * m
-        item.base_triangle:resize(
-            current_x + base_w, current_y,
-            current_x + base_w, current_y + base_h,
-            current_x + base_w + triangle_w, current_y + base_h
-        )
-
-        for rail in range(item.rail, item.rail_outline) do
-            rail:resize(
-                current_x, current_y + base_h + eps,
-                current_x, current_y,
-                current_x + base_w, current_y,
-                current_x + base_w + triangle_w + eps, current_y + base_h + eps
-            )
-        end
-
-        current_x = current_y + base_w + triangle_w
+        current_x = current_x + base_w
+        max_h = math.max(max_h, base_h)
     end
+
+
+    self._stencil:resize(x - eps, y + max_h - eps, current_x - x + 2 * eps, 1.5 * eps)
 end
 
 --- @override
 function mn.TabBar:draw()
     for item in values(self._items) do
-        item.base_rectangle:draw()
-        item.base_triangle:draw()
-        item.rail_outline:draw()
-        item.rail:draw()
+
+        local stencil_value = meta.hash(self._stencil) % 255
+        rt.graphics.stencil(stencil_value, self._stencil)
+        rt.graphics.set_stencil_test(rt.StencilCompareMode.NOT_EQUAL, stencil_value)
+        item.frame:draw()
         item.widget:draw()
         item.widget:draw_bounds()
+        rt.graphics.set_stencil_test()
     end
 end
