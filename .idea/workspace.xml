@@ -22,15 +22,8 @@
     </configurations>
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="7fa9ba1b-2cff-4ecc-86fb-59ab2fa76ee1" name="Changes" comment="added menu scene">
-      <change afterPath="$PROJECT_DIR$/menu/scene_state.lua" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/menu/scene_state_inventory.lua" afterDir="false" />
+    <list default="true" id="7fa9ba1b-2cff-4ecc-86fb-59ab2fa76ee1" name="Changes" comment="scrollable list working">
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/battle/scene.lua" beforeDir="false" afterPath="$PROJECT_DIR$/battle/scene.lua" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/battle/scene_state_entity_select.lua" beforeDir="false" afterPath="$PROJECT_DIR$/battle/scene_state_entity_select.lua" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/common/scene.lua" beforeDir="false" afterPath="$PROJECT_DIR$/common/scene.lua" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/include.lua" beforeDir="false" afterPath="$PROJECT_DIR$/include.lua" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/menu/scene.lua" beforeDir="false" afterPath="$PROJECT_DIR$/menu/scene.lua" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/menu/scrollable_list.lua" beforeDir="false" afterPath="$PROJECT_DIR$/menu/scrollable_list.lua" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
@@ -436,15 +429,7 @@
       <workItem from="1719331309887" duration="7255000" />
       <workItem from="1719338734310" duration="2967000" />
       <workItem from="1719342172568" duration="114000" />
-      <workItem from="1719342349559" duration="11822000" />
-    </task>
-    <task id="LOCAL-00797" summary="stashing move selection">
-      <option name="closed" value="true" />
-      <created>1717868245352</created>
-      <option name="number" value="00797" />
-      <option name="presentableId" value="LOCAL-00797" />
-      <option name="project" value="LOCAL" />
-      <updated>1717868245352</updated>
+      <workItem from="1719342349559" duration="14045000" />
     </task>
     <task id="LOCAL-00798" summary="stashing topology">
       <option name="closed" value="true" />
@@ -830,7 +815,15 @@
       <option name="project" value="LOCAL" />
       <updated>1719409557124</updated>
     </task>
-    <option name="localTasksCounter" value="846" />
+    <task id="LOCAL-00846" summary="scrollable list working">
+      <option name="closed" value="true" />
+      <created>1719412134550</created>
+      <option name="number" value="00846" />
+      <option name="presentableId" value="LOCAL-00846" />
+      <option name="project" value="LOCAL" />
+      <updated>1719412134550</updated>
+    </task>
+    <option name="localTasksCounter" value="847" />
     <servers />
   </component>
   <component name="TypeScriptGeneratedFilesManager">
@@ -879,7 +872,6 @@
     </option>
   </component>
   <component name="VcsManagerConfiguration">
-    <MESSAGE value="added sprites" />
     <MESSAGE value="optimized glyph drawing" />
     <MESSAGE value="optimized drawing" />
     <MESSAGE value="optimized rendering by caching" />
@@ -904,7 +896,8 @@
     <MESSAGE value="adde portable fftw" />
     <MESSAGE value="stashing before frame rework" />
     <MESSAGE value="added menu scene" />
-    <option name="LAST_COMMIT_MESSAGE" value="added menu scene" />
+    <MESSAGE value="scrollable list working" />
+    <option name="LAST_COMMIT_MESSAGE" value="scrollable list working" />
   </component>
   <component name="XDebuggerManager">
     <breakpoint-manager>

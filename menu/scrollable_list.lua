@@ -1,8 +1,19 @@
+mn.ScrollableListSortMode = meta.new_enum({
+    BY_NAME = 1,
+    BY_QUANTITY = 2,
+    BY_ID = 0
+})
+
 --- @class mn.ScrollableList
 mn.ScrollableList = meta.new_type("ScrollableList", rt.Widget, function()
     return meta.new(mn.ScrollableList, {
         _items = {}, -- cf. push
-        _object_to_item = meta.make_weak({}, true, true),
+        _object_to_item = {},
+        _sortings = {
+            [mn.ScrollableListSortMode.BY_ID] = {}, -- Table<Number, Pair<Number, Number>>
+            [mn.ScrollableListSortMode.BY_QUANTITY] = {},
+            [mn.ScrollableListSortMode.BY_NAME] = {},
+        },
         _n_items = 0,
         _stencil = rt.Rectangle(0, 0, 1, 1),
         _scrollbar = rt.Scrollbar(),
@@ -51,6 +62,11 @@ function mn.ScrollableList._realize_item(item)
     end
 
     item.base_outline:set_is_outline(true)
+end
+
+--- @brief
+function mn.ScrollableList:_regenerate_sortings()
+
 end
 
 --- @brief
