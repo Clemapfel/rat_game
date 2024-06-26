@@ -22,9 +22,9 @@
     </configurations>
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="7fa9ba1b-2cff-4ecc-86fb-59ab2fa76ee1" name="Changes" comment="stashing sortings">
+    <list default="true" id="7fa9ba1b-2cff-4ecc-86fb-59ab2fa76ee1" name="Changes" comment="stashing sortability rework">
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/battle/configs/equips/DEBUG_CLOTHING.lua" beforeDir="false" afterPath="$PROJECT_DIR$/battle/configs/equips/DEBUG_CLOTHING.lua" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/menu/scene.lua" beforeDir="false" afterPath="$PROJECT_DIR$/menu/scene.lua" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/menu/scrollable_list.lua" beforeDir="false" afterPath="$PROJECT_DIR$/menu/scrollable_list.lua" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
@@ -430,15 +430,7 @@
       <workItem from="1719331309887" duration="7255000" />
       <workItem from="1719338734310" duration="2967000" />
       <workItem from="1719342172568" duration="114000" />
-      <workItem from="1719342349559" duration="16075000" />
-    </task>
-    <task id="LOCAL-00799" summary="stashing move layout">
-      <option name="closed" value="true" />
-      <created>1717957791363</created>
-      <option name="number" value="00799" />
-      <option name="presentableId" value="LOCAL-00799" />
-      <option name="project" value="LOCAL" />
-      <updated>1717957791363</updated>
+      <workItem from="1719342349559" duration="18480000" />
     </task>
     <task id="LOCAL-00800" summary="more backgrounds">
       <option name="closed" value="true" />
@@ -824,7 +816,15 @@
       <option name="project" value="LOCAL" />
       <updated>1719414351213</updated>
     </task>
-    <option name="localTasksCounter" value="848" />
+    <task id="LOCAL-00848" summary="stashing sortability rework">
+      <option name="closed" value="true" />
+      <created>1719431733332</created>
+      <option name="number" value="00848" />
+      <option name="presentableId" value="LOCAL-00848" />
+      <option name="project" value="LOCAL" />
+      <updated>1719431733332</updated>
+    </task>
+    <option name="localTasksCounter" value="849" />
     <servers />
   </component>
   <component name="TypeScriptGeneratedFilesManager">
@@ -873,7 +873,6 @@
     </option>
   </component>
   <component name="VcsManagerConfiguration">
-    <MESSAGE value="optimized drawing" />
     <MESSAGE value="optimized rendering by caching" />
     <MESSAGE value="added background compression" />
     <MESSAGE value="added menu slots" />
@@ -898,7 +897,8 @@
     <MESSAGE value="added menu scene" />
     <MESSAGE value="scrollable list working" />
     <MESSAGE value="stashing sortings" />
-    <option name="LAST_COMMIT_MESSAGE" value="stashing sortings" />
+    <MESSAGE value="stashing sortability rework" />
+    <option name="LAST_COMMIT_MESSAGE" value="stashing sortability rework" />
   </component>
   <component name="XDebuggerManager">
     <breakpoint-manager>

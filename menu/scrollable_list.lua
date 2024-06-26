@@ -10,7 +10,7 @@ mn.ScrollableList = meta.new_type("ScrollableList", rt.Widget, function()
         _items = {}, -- cf. push
         _object_to_item = {},
         _sortings = {
-            [mn.ScrollableListSortMode.BY_ID] = {}, -- Table<item_i, {x, y, index}>
+            [mn.ScrollableListSortMode.BY_ID] = {}, -- Table<Number, {x, y, item_i}>
             [mn.ScrollableListSortMode.BY_QUANTITY] = {},
             [mn.ScrollableListSortMode.BY_NAME] = {},
         },
@@ -68,6 +68,8 @@ end
 --- @brief
 function mn.ScrollableList:_regenerate_sortings()
     local indices = table.seq(1, self._n_items, 1)
+
+    -- id
     table.sort(indices, function(a, b)
         local item_a = self._items[a].object
         local item_b = self._items[b].object
@@ -78,13 +80,57 @@ function mn.ScrollableList:_regenerate_sortings()
     local current_x, current_y = self._position_x, self._position_y
     for index_i = 1, self._n_items do
         local item_i = indices[index_i]
-        self._sortings[mn.ScrollableListSortMode.BY_ID][item_i] = {
+        self._sortings[mn.ScrollableListSortMode.BY_ID][index_i] = {
             x = current_x,
             y = current_y,
-            index = index_i
+            item_i = item_i
         }
         current_y = current_y + self._items[item_i].height
     end
+
+    -- name
+    table.sort(indices, function(a, b)
+        local item_a = self._items[a].object
+        local item_b = self._items[b].object
+
+        return item_a:get_name() < item_b:get_name()
+    end)
+
+    current_x, current_y = self._position_x, self._position_y
+    for index_i = 1, self._n_items do
+        local item_i = indices[index_i]
+        self._sortings[mn.ScrollableListSortMode.BY_NAME][index_i] = {
+            x = current_x,
+            y = current_y,
+            item_i = item_i
+        }
+        current_y = current_y + self._items[item_i].height
+    end
+
+    -- quantity (stable sort, retains by name
+    table.sort(indices, function(a, b)
+        local item_a = self._items[a]
+        local item_b = self._items[b]
+
+        return item_a.quantity > item_b.quantity
+    end)
+
+    current_x, current_y = self._position_x, self._position_y
+    for index_i = 1, self._n_items do
+        local item_i = indices[index_i]
+        self._sortings[mn.ScrollableListSortMode.BY_QUANTITY][index_i] = {
+            x = current_x,
+            y = current_y,
+            item_i = item_i
+        }
+        current_y = current_y + self._items[item_i].height
+    end
+end
+
+--- @brief
+function mn.ScrollableList:set_sort_mode(mode)
+    meta.assert_enum(mode, mn.ScrollableListSortMode)
+    self._current_sort_mode = mode
 end
 
 --- @brief
@@ -193,13 +239,13 @@ function mn.ScrollableList:draw()
     rt.graphics.push()
 
     for i = 1, self._n_items do
-        local item = self._items[i]
         local entry = self._sortings[self._current_sort_mode][i]
+        local item = self._items[entry.item_i]
 
         rt.graphics.origin()
         rt.graphics.translate(entry.x, entry.y + self._selection_offset_y)
 
-        if entry.index == self._selected_item_i then
+        if i == self._selected_item_i then
             item.selected_base:draw()
         else
             item.unselected_base:draw()
@@ -224,7 +270,7 @@ function mn.ScrollableList:move_up()
         self._scrollbar:set_page_index(self._selected_item_i)
 
         local entry = self._sortings[self._current_sort_mode][self._selected_item_i]
-        local item = self._items[entry.index]
+        local item = self._items[entry.item_i]
         local position_y = entry.y
         if position_y + self._selection_offset_y < self._min_y then
             self._selection_offset_y = self._selection_offset_y + item.height
@@ -239,7 +285,7 @@ function mn.ScrollableList:move_down()
         self._scrollbar:set_page_index(self._selected_item_i)
 
         local entry = self._sortings[self._current_sort_mode][self._selected_item_i]
-        local item = self._items[entry.index]
+        local item = self._items[entry.item_i]
         local position_y = entry.y
         if position_y + item.height + self._selection_offset_y > self._max_y then
             self._selection_offset_y = self._selection_offset_y - item.height

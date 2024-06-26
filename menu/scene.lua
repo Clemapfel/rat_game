@@ -55,6 +55,13 @@ mn.Scene = meta.new_type("MenuScene", rt.Scene, function()
         _shared_consumable_tab_index = 2,
         _shared_equip_tab_index = 3,
 
+        _shared_list_mode_order = {
+            [mn.ScrollableListSortMode.BY_ID] = mn.ScrollableListSortMode.BY_NAME,
+            [mn.ScrollableListSortMode.BY_NAME] = mn.ScrollableListSortMode.BY_QUANTITY,
+            [mn.ScrollableListSortMode.BY_QUANTITY] = mn.ScrollableListSortMode.BY_ID
+        },
+        _shared_list_mode = mn.ScrollableListSortMode.BY_ID,
+
         _current_shared_tab = 3,
 
         _shared_move_list = mn.ScrollableList(),
@@ -62,6 +69,7 @@ mn.Scene = meta.new_type("MenuScene", rt.Scene, function()
         _shared_consumable_list = mn.ScrollableList(),
 
         _input_controller = rt.InputController(),
+        _control_indicator = rt.ControlIndicator(),
     })
 end)
 
@@ -84,6 +92,21 @@ function mn.Scene:_handle_button_pressed(which)
         current_list:take(current_list:get_selected())
     elseif which == rt.InputButton.B then
         current_list:add(bt.Equip("DEBUG_EQUIP"))
+    elseif which == rt.InputButton.X then
+        self._shared_list_mode = self._shared_list_mode_order[self._shared_list_mode]
+        self._shared_move_list:set_sort_mode(self._shared_list_mode)
+        self._shared_equip_list:set_sort_mode(self._shared_list_mode)
+        self._shared_consumable_list:set_sort_mode(self._shared_list_mode)
+        self:_update_control_indicator()
+    elseif which == rt.InputButton.RIGHT then
+
+        if self._current_shared_tab == self._shared_move_tab_index then
+            self._current_shared_tab = self._shared_consumable_tab_index
+        elseif self._current_shared_tab == self._shared_consumable_tab_index then
+            self._current_shared_tab = self._shared_equip_tab_index
+        elseif self._current_shared_tab == self._shared_equip_tab_index then
+            self._current_shared_tab = self._shared_move_tab_index
+        end
     end
 end
 
@@ -146,6 +169,30 @@ function mn.Scene:realize()
     end
     self._shared_equip_list:push(table.unpack(equips))
     self._shared_equip_list:realize()
+
+    self._control_indicator:realize()
+    self:_update_control_indicator()
+end
+
+--- @brief
+function mn.Scene:_update_control_indicator()
+    local sort_label = "Sort"
+    local next_mode = self._shared_list_mode_order[self._shared_list_mode]
+    if next_mode == mn.ScrollableListSortMode.BY_ID then
+        sort_label = "Sort (by ID)"
+    elseif next_mode == mn.ScrollableListSortMode.BY_NAME then
+        sort_label = "Sort (by Name)"
+    elseif next_mode == mn.ScrollableListSortMode.BY_QUANTITY then
+        sort_label = "Sort (by Quantity)"
+    end
+
+    local prefix, postfix = "", ""-- "<o>", "</o>"
+    self._control_indicator:create_from({
+        {rt.ControlIndicatorButton.A, prefix .. "Equip / Unequip" .. postfix},
+        {rt.ControlIndicatorButton.B, prefix .. "Undo" .. postfix},
+        {rt.ControlIndicatorButton.X, prefix .. sort_label .. postfix},
+        {rt.ControlIndicatorButton.Y, prefix .. "Store" .. postfix}
+    })
 end
 
 --- @override
@@ -165,6 +212,14 @@ function mn.Scene:size_allocate(x, y, width, height)
     ) do
         list:fit_into(tab_x, tab_y + tab_h, shared_list_w, shared_list_h)
     end
+
+    local indicator_bounds = rt.AABB(x, y, width, height)
+    local m = 2 * rt.settings.margin_unit
+    indicator_bounds.x = m
+    indicator_bounds.y = m
+    indicator_bounds.width = indicator_bounds.width - 2 * m
+    indicator_bounds.height = indicator_bounds.width - 2 * m
+    self._control_indicator:fit_into(indicator_bounds);
 end
 
 --- @override
@@ -177,4 +232,6 @@ function mn.Scene:draw()
     elseif self._current_shared_tab == self._shared_equip_tab_index then
         self._shared_equip_list:draw()
     end
+
+    self._control_indicator:draw()
 end
