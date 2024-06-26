@@ -55,7 +55,7 @@ end
 
 --- @brief
 function mn.ScrollableList._update_item(item)
-    item.name_lable:set_text(self._format_name_label(item.object:get_name()))
+    item.name_label:set_text(mn.ScrollableList._format_name_label(item.object:get_name()))
     item.quantity_label:set_text(mn.ScrollableList._format_quantity_label(item.quantity))
 end
 
@@ -84,7 +84,7 @@ function mn.ScrollableList:push(...)
         table.insert(self._items, to_insert)
         self._object_to_item[object] = to_insert
 
-        if self._selected_item == 0 then self._selected_item = self._n_items end
+        if self._selected_item == 0 then self._selected_item = 1 end
         self._n_items = self._n_items + 1
     end
 end
@@ -131,6 +131,8 @@ function mn.ScrollableList:size_allocate(x, y, width, height)
             base:resize(x, y, item_w, base_h)
         end
         item.height = base_h
+
+        item.position_x, item.position_y = current_x, current_y
         current_y = current_y + item.height
     end
 
@@ -156,15 +158,12 @@ function mn.ScrollableList:draw()
     rt.graphics.stencil(stencil_value, self._stencil)
     rt.graphics.set_stencil_test(rt.StencilCompareMode.EQUAL, stencil_value)
 
-    local threshold_y = self._final_height
-    local current_y = 0
-
     rt.graphics.push()
-    rt.graphics.translate(self._position_x, self._position_y)
-    rt.graphics.translate(0, self._selection_offset_y)
 
     for i = 1, self._n_items do
         local item = self._items[i]
+        rt.graphics.origin()
+        rt.graphics.translate(item.position_x, item.position_y + self._selection_offset_y)
 
         if i == self._selected_item then
             item.selected_base:draw()
@@ -176,11 +175,6 @@ function mn.ScrollableList:draw()
         item.sprite:draw()
         item.name_label:draw()
         item.quantity_label:draw()
-
-        rt.graphics.translate(0, item.height)
-
-        current_y = current_y + item.height
-        if current_y > threshold_y then break end
     end
 
     rt.graphics.pop()
@@ -216,8 +210,18 @@ function mn.ScrollableList:move_down()
 end
 
 --- @brief
+function mn.ScrollableList:get_selected()
+    local item = self._items[self._selected_item]
+    if item ~= nil then
+        return item.object
+    else
+        return nil
+    end
+end
+
+--- @brief
 function mn.ScrollableList:take(object)
-    local item = self._object_to_item(object)
+    local item = self._object_to_item[object]
     if item == nil then
         rt.warning("In mn.ScrollableList:take: trying to take object " .. object:get_id() .. " which is not part of list")
         return
@@ -231,8 +235,20 @@ function mn.ScrollableList:take(object)
                 break
             end
         end
-        self._items:erase(item_i)
+        table.remove(self._items, item_i)
         self._object_to_item[object] = nil
+        self._n_items = self._n_items - 1
+
+        -- update item positions without reformatting
+        local current_x, current_y = self._position_x, self._position_y
+        for item in values(self._items) do
+            item.position_x, item.position_y = current_x, current_y
+            current_y = current_y + item.height
+        end
+
+        if self._n_items == 0 then
+            self._selected_item = 0
+        end
     else
         item.quantity = item.quantity - 1
         mn.ScrollableList._update_item(item)
@@ -242,11 +258,12 @@ end
 --- @brief
 function mn.ScrollableList:add(object, new_quantity)
     new_quantity = which(new_quantity, 1)
-    local item = self._object_to_item
+    local item = self._object_to_item[object]
     if item ~= nil then
         item.quantity = item.quantity + new_quantity
         mn.ScrollableList._update_item(item)
     else
         self:push({object, new_quantity})
+        self:reformat()
     end
 end

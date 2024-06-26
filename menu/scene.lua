@@ -67,12 +67,23 @@ end)
 
 --- @brief [internal]
 function mn.Scene:_handle_button_pressed(which)
+    local current_list
+    if self._current_shared_tab == self._shared_move_tab_index then
+        current_list = self._shared_move_list
+    elseif self._current_shared_tab == self._shared_consumable_tab_index then
+        current_list = self._shared_consumable_list
+    elseif self._current_shared_tab == self._shared_equip_tab_index then
+        current_list = self._shared_equip_list
+    end
+
     if which == rt.InputButton.UP then
-
+        current_list:move_up()
     elseif which == rt.InputButton.DOWN then
-
+        current_list:move_down()
     elseif which == rt.InputButton.A then
-
+        current_list:take(current_list:get_selected())
+    elseif which == rt.InputButton.B then
+        current_list:add(bt.Equip("DEBUG_EQUIP"))
     end
 end
 
@@ -81,8 +92,19 @@ function mn.Scene:realize()
     if self._is_realized == true then return end
     self._is_realized = true
 
-    self._input_controller:signal_connect("pressed", self._handle_button_pressed)
-    self._input_controller:signal_connect("released", self._handle_button_released)
+    self._input_controller:signal_connect("pressed", function(_, button)
+        if self._current_state ~= nil then
+            self._current_state:handle_button_pressed(button)
+        end
+
+        self:_handle_button_pressed(button)
+    end)
+
+    self._input_controller:signal_connect("released",  function(_, button)
+        if self._current_state ~= nil then
+            self._current_state:handle_button_released(button)
+        end
+    end)
 
     -- tab
     local settings = rt.settings.menu.scene
@@ -135,7 +157,7 @@ function mn.Scene:size_allocate(x, y, width, height)
     tab_w, tab_h = self._shared_tab_bar:measure() -- update after resize
 
     local shared_list_w = 400
-    local shared_list_h = 200
+    local shared_list_h = 100
     for list in range(
         self._shared_move_list,
         self._shared_consumable_list,

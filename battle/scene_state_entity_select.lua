@@ -7,7 +7,6 @@ bt.SceneState.ENTITY_SELECT = meta.new_type("ENTITY_SELECT", bt.SceneState, func
         _nodes = {},
         _current_node = nil,
         _unselected_entities = {},
-
         _control_indicator = {}
     })
 

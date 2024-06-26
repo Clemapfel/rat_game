@@ -22,23 +22,16 @@
     </configurations>
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="7fa9ba1b-2cff-4ecc-86fb-59ab2fa76ee1" name="Changes" comment="stashing before frame rework">
-      <change afterPath="$PROJECT_DIR$/battle/configs/consumables/ONE_CHERRY.lua" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/battle/configs/consumables/TWO_CHERRY.lua" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/battle/configs/equips/DEBUG_CLOTHING.lua" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/battle/configs/equips/DEBUG_FEMALE_CLOTHING.lua" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/battle/configs/equips/DEBUG_MALE_CLOTHING.lua" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/battle/configs/equips/DEBUG_TRINKET.lua" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/battle/configs/equips/DEBUG_WEAPON.lua" afterDir="false" />
+    <list default="true" id="7fa9ba1b-2cff-4ecc-86fb-59ab2fa76ee1" name="Changes" comment="added menu scene">
+      <change afterPath="$PROJECT_DIR$/menu/scene_state.lua" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/menu/scene_state_inventory.lua" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/battle/verbose_info.lua" beforeDir="false" afterPath="$PROJECT_DIR$/battle/verbose_info.lua" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/common/frame.lua" beforeDir="false" afterPath="$PROJECT_DIR$/common/frame.lua" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/common/sprite.lua" beforeDir="false" afterPath="$PROJECT_DIR$/common/sprite.lua" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/battle/scene.lua" beforeDir="false" afterPath="$PROJECT_DIR$/battle/scene.lua" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/battle/scene_state_entity_select.lua" beforeDir="false" afterPath="$PROJECT_DIR$/battle/scene_state_entity_select.lua" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/common/scene.lua" beforeDir="false" afterPath="$PROJECT_DIR$/common/scene.lua" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/include.lua" beforeDir="false" afterPath="$PROJECT_DIR$/include.lua" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/main_menu.lua" beforeDir="false" afterPath="$PROJECT_DIR$/main_menu.lua" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/menu/scene.lua" beforeDir="false" afterPath="$PROJECT_DIR$/menu/scene.lua" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/menu/scrollable_list.lua" beforeDir="false" afterPath="$PROJECT_DIR$/menu/scrollable_list.lua" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/menu/tab_bar.lua" beforeDir="false" afterPath="$PROJECT_DIR$/menu/tab_bar.lua" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -443,15 +436,7 @@
       <workItem from="1719331309887" duration="7255000" />
       <workItem from="1719338734310" duration="2967000" />
       <workItem from="1719342172568" duration="114000" />
-      <workItem from="1719342349559" duration="9219000" />
-    </task>
-    <task id="LOCAL-00796" summary="added proper measure">
-      <option name="closed" value="true" />
-      <created>1717864980432</created>
-      <option name="number" value="00796" />
-      <option name="presentableId" value="LOCAL-00796" />
-      <option name="project" value="LOCAL" />
-      <updated>1717864980433</updated>
+      <workItem from="1719342349559" duration="11822000" />
     </task>
     <task id="LOCAL-00797" summary="stashing move selection">
       <option name="closed" value="true" />
@@ -837,7 +822,15 @@
       <option name="project" value="LOCAL" />
       <updated>1719344081049</updated>
     </task>
-    <option name="localTasksCounter" value="845" />
+    <task id="LOCAL-00845" summary="added menu scene">
+      <option name="closed" value="true" />
+      <created>1719409557124</created>
+      <option name="number" value="00845" />
+      <option name="presentableId" value="LOCAL-00845" />
+      <option name="project" value="LOCAL" />
+      <updated>1719409557124</updated>
+    </task>
+    <option name="localTasksCounter" value="846" />
     <servers />
   </component>
   <component name="TypeScriptGeneratedFilesManager">
@@ -886,7 +879,6 @@
     </option>
   </component>
   <component name="VcsManagerConfiguration">
-    <MESSAGE value="added exe" />
     <MESSAGE value="added sprites" />
     <MESSAGE value="optimized glyph drawing" />
     <MESSAGE value="optimized drawing" />
@@ -911,7 +903,8 @@
     <MESSAGE value="added bspline" />
     <MESSAGE value="adde portable fftw" />
     <MESSAGE value="stashing before frame rework" />
-    <option name="LAST_COMMIT_MESSAGE" value="stashing before frame rework" />
+    <MESSAGE value="added menu scene" />
+    <option name="LAST_COMMIT_MESSAGE" value="added menu scene" />
   </component>
   <component name="XDebuggerManager">
     <breakpoint-manager>
@@ -920,6 +913,11 @@
           <url>file://$PROJECT_DIR$/old/~battle/enemy_sprite.lua</url>
           <line>244</line>
           <option name="timeStamp" value="6" />
+        </line-breakpoint>
+        <line-breakpoint enabled="true" type="lua-line">
+          <url>file://$PROJECT_DIR$/common/meta.lua</url>
+          <line>483</line>
+          <option name="timeStamp" value="8" />
         </line-breakpoint>
       </breakpoints>
     </breakpoint-manager>

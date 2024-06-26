@@ -165,28 +165,6 @@ function bt.Scene:draw()
 end
 
 --- @brief
-function bt.Scene:transition(new_state)
-    meta.assert_isa(new_state, bt.SceneState)
-
-    if self._is_realized == false then
-        self:realize()
-    end
-
-    local last_state = self._current_state
-    local next_state = new_state
-
-    self._current_state = next_state
-
-    if last_state ~= nil then
-        last_state:exit()
-    end
-
-    if next_state ~= nil then
-        next_state:enter()
-    end
-end
-
---- @brief
 function bt.Scene:set_background(background_id)
     if bt.Background[background_id] == nil then
         rt.error("In bt.Scene:set_background: no background with id `" .. background_id .. "`")
