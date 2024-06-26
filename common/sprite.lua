@@ -1,5 +1,6 @@
 --- @class rt.Sprite
-rt.Sprite = meta.new_type("Sprite", rt.Widget, rt.Animation, function(id)
+rt.Sprite = meta.new_type("Sprite", rt.Widget, rt.Animation, function(id, index)
+    meta.assert_string(id)
     return meta.new(rt.Sprite, {
         _id = id,
         _spritesheet = {}, -- rt.SpriteAtlasEntry
@@ -11,7 +12,7 @@ rt.Sprite = meta.new_type("Sprite", rt.Widget, rt.Animation, function(id)
         _should_loop = true,
         _frame_duration = 0,
         _n_frames = 0,
-        _animation_id = "",
+        _animation_id = index,
         _frame_range_start = 1,
         _frame_range_end = 1,
         _opacity = 1

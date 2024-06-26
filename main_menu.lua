@@ -1,53 +1,54 @@
 require "include"
 
-rt.current_scene = bt.Scene()
+rt.current_scene = mn.Scene()
 scene = rt.current_scene
 
-list = mn.ScrollableList()
-for i = 1, 30 do
-    list:push({bt.Move("DEBUG_MOVE"), rt.random.integer(1, 5)})
+state = mn.InventoryState()
+for move_id in range(
+    "DEBUG_MOVE",
+    "INSPECT",
+    "PROTECT",
+    "STRUGGLE",
+    "SURF",
+    "WISH"
+) do
+    state.shared_moves[bt.Move(move_id)] = rt.random.integer(1, 5)
 end
-list:realize()
 
-bar = mn.TabBar()
-for i = 1, 4 do
-    bar:push(rt.Label("<o>0" .. i .. "</o>"))
+for equip_id in range(
+    "DEBUG_EQUIP",
+    "DEBUG_CLOTHING",
+    "DEBUG_FEMALE_CLOTHING",
+    "DEBUG_MALE_CLOTHING",
+    "DEBUG_WEAPON",
+    "DEBUG_TRINKET"
+) do
+    state.shared_equips[bt.Equip(equip_id)] = rt.random.integer(1, 5)
 end
-bar:realize()
-bar:fit_into(50, 50, 200, 50)
 
-input = rt.InputController()
-input:signal_connect("pressed", function(_, which)
-    if which == rt.InputButton.UP then
-        list:move_up()
-    else
-        list:move_down()
-    end
-end)
+for consumable_id in range(
+    "DEBUG_CONSUMABLE",
+    "ONE_CHERRY",
+    "TWO_CHERRY"
+) do
+    state.shared_consumables[bt.Consumable(consumable_id)] = rt.random.integer(1, 5)
+end
 
 --- ###
 
 love.load = function()
+    scene._state = state
     rt.current_scene:realize()
     love.resize()
-    scene:start_battle(bt.Battle("DEBUG_BATTLE"))
-    scene:transition(bt.SceneState.SIMULATION(scene))
-    scene._state_manager:start_turn()
 end
 
 rt.settings.show_rulers = false
 rt.settings.show_fps = true
 
 love.draw = function()
-    local before = love.timer.getTime()
-    love.graphics.clear(0.8, 0.2, 0.8, 1)
-
     if rt.current_scene ~= nil then
-        --rt.current_scene:draw()
+        rt.current_scene:draw()
     end
-
-    --list:draw()
-    bar:draw()
 
     if rt.settings.show_rulers == true then
         love.graphics.setLineWidth(1)
@@ -77,8 +78,6 @@ love.resize = function()
     if rt.current_scene ~= nil then
         rt.current_scene:fit_into(0, 0, love.graphics.getWidth(), love.graphics.getHeight())
     end
-
-    list:fit_into(50, 50, rt.graphics.get_width() / 2, rt.graphics.get_height() / 6)
 end
 
 love.run = function()

@@ -4,6 +4,8 @@ mn.TabBar = meta.new_type("TabBar", rt.Widget, function()
         _items = {}, -- cf. push
         _stencil = rt.Rectangle(0, 0, 1, 1),
         _rail_width = rt.settings.frame.thickness,
+        _final_w = 1,
+        _final_h = 1
     })
 end)
 
@@ -40,9 +42,9 @@ function mn.TabBar:size_allocate(x, y, width, height)
     local current_x, current_y = x, y
     local max_h = NEGATIVE_INFINITY
     local eps = 20
-    for item in values(self._items) do
-        local m = rt.settings.margin_unit
+    local m = rt.settings.margin_unit
 
+    for item in values(self._items) do
         local w, h = item.widget:measure()
         item.widget:fit_into(current_x + m, current_y + m, w, h)
 
@@ -54,7 +56,7 @@ function mn.TabBar:size_allocate(x, y, width, height)
         max_h = math.max(max_h, base_h)
     end
 
-
+    self._final_w, self._final_h = current_x - x, max_h - 2 * m
     self._stencil:resize(x - eps, y + max_h - eps, current_x - x + 2 * eps, 1.5 * eps)
 end
 
@@ -67,7 +69,11 @@ function mn.TabBar:draw()
         rt.graphics.set_stencil_test(rt.StencilCompareMode.NOT_EQUAL, stencil_value)
         item.frame:draw()
         item.widget:draw()
-        item.widget:draw_bounds()
         rt.graphics.set_stencil_test()
     end
+end
+
+--- @override
+function mn.TabBar:measure()
+    return self._final_w, self._final_h
 end

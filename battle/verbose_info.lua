@@ -173,10 +173,8 @@ end
 --- @brief [internal]
 function bt.VerboseInfo.Page:_initialize_backdrop(width, height)
     self._backdrop = rt.Frame()
-    self._backdrop_backing = rt.Spacer()
 
     local xm, ym = self:_get_backdrop_margins()
-    self._backdrop:set_child(self._backdrop_backing)
     self._backdrop:realize()
     self._backdrop:fit_into(0, 0, width + 2 * xm, height + 2 * ym)
 end

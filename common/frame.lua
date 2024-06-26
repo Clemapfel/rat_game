@@ -36,6 +36,7 @@ rt.Frame = meta.new_type("Frame", rt.Widget, function(type)
     out._frame_outline:set_color(rt.Palette.BASE_OUTLINE)
 
     out._frame:set_line_width(out._thickness)
+    out._stencil_mask:set_color(rt.Palette.BACKGROUND)
     if out._type == rt.FrameType.RECTANGULAR then
         local corner_radius = out._corner_radius
         out._frame:set_corner_radius(corner_radius)
@@ -65,6 +66,8 @@ function rt.Frame:draw()
         self:_bind_stencil()
         self._child:draw()
         self:_unbind_stencil()
+    else
+        self._stencil_mask:draw()
     end
 
     if self._thickness > 0 then

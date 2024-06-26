@@ -22,8 +22,22 @@
     </configurations>
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="7fa9ba1b-2cff-4ecc-86fb-59ab2fa76ee1" name="Changes" comment="adde portable fftw">
+    <list default="true" id="7fa9ba1b-2cff-4ecc-86fb-59ab2fa76ee1" name="Changes" comment="stashing before frame rework">
+      <change afterPath="$PROJECT_DIR$/battle/configs/consumables/ONE_CHERRY.lua" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/battle/configs/consumables/TWO_CHERRY.lua" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/battle/configs/equips/DEBUG_CLOTHING.lua" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/battle/configs/equips/DEBUG_FEMALE_CLOTHING.lua" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/battle/configs/equips/DEBUG_MALE_CLOTHING.lua" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/battle/configs/equips/DEBUG_TRINKET.lua" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/battle/configs/equips/DEBUG_WEAPON.lua" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/battle/verbose_info.lua" beforeDir="false" afterPath="$PROJECT_DIR$/battle/verbose_info.lua" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/common/frame.lua" beforeDir="false" afterPath="$PROJECT_DIR$/common/frame.lua" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/common/sprite.lua" beforeDir="false" afterPath="$PROJECT_DIR$/common/sprite.lua" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/include.lua" beforeDir="false" afterPath="$PROJECT_DIR$/include.lua" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/main_menu.lua" beforeDir="false" afterPath="$PROJECT_DIR$/main_menu.lua" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/menu/scene.lua" beforeDir="false" afterPath="$PROJECT_DIR$/menu/scene.lua" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/menu/scrollable_list.lua" beforeDir="false" afterPath="$PROJECT_DIR$/menu/scrollable_list.lua" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/menu/tab_bar.lua" beforeDir="false" afterPath="$PROJECT_DIR$/menu/tab_bar.lua" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
@@ -429,15 +443,7 @@
       <workItem from="1719331309887" duration="7255000" />
       <workItem from="1719338734310" duration="2967000" />
       <workItem from="1719342172568" duration="114000" />
-      <workItem from="1719342349559" duration="1658000" />
-    </task>
-    <task id="LOCAL-00795" summary="added entity selection">
-      <option name="closed" value="true" />
-      <created>1717785934356</created>
-      <option name="number" value="00795" />
-      <option name="presentableId" value="LOCAL-00795" />
-      <option name="project" value="LOCAL" />
-      <updated>1717785934356</updated>
+      <workItem from="1719342349559" duration="9219000" />
     </task>
     <task id="LOCAL-00796" summary="added proper measure">
       <option name="closed" value="true" />
@@ -823,7 +829,15 @@
       <option name="project" value="LOCAL" />
       <updated>1719343188960</updated>
     </task>
-    <option name="localTasksCounter" value="844" />
+    <task id="LOCAL-00844" summary="stashing before frame rework">
+      <option name="closed" value="true" />
+      <created>1719344081049</created>
+      <option name="number" value="00844" />
+      <option name="presentableId" value="LOCAL-00844" />
+      <option name="project" value="LOCAL" />
+      <updated>1719344081049</updated>
+    </task>
+    <option name="localTasksCounter" value="845" />
     <servers />
   </component>
   <component name="TypeScriptGeneratedFilesManager">
@@ -872,7 +886,6 @@
     </option>
   </component>
   <component name="VcsManagerConfiguration">
-    <MESSAGE value="added party sprite sprites" />
     <MESSAGE value="added exe" />
     <MESSAGE value="added sprites" />
     <MESSAGE value="optimized glyph drawing" />
@@ -897,7 +910,8 @@
     <MESSAGE value="stashing tab bar" />
     <MESSAGE value="added bspline" />
     <MESSAGE value="adde portable fftw" />
-    <option name="LAST_COMMIT_MESSAGE" value="adde portable fftw" />
+    <MESSAGE value="stashing before frame rework" />
+    <option name="LAST_COMMIT_MESSAGE" value="stashing before frame rework" />
   </component>
   <component name="XDebuggerManager">
     <breakpoint-manager>

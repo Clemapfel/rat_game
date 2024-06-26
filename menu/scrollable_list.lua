@@ -2,6 +2,7 @@
 mn.ScrollableList = meta.new_type("ScrollableList", rt.Widget, function()
     return meta.new(mn.ScrollableList, {
         _items = {}, -- cf. push
+        _object_to_item = meta.make_weak({}, true, true),
         _n_items = 0,
         _stencil = rt.Rectangle(0, 0, 1, 1),
         _scrollbar = rt.Scrollbar(),
@@ -11,6 +12,10 @@ mn.ScrollableList = meta.new_type("ScrollableList", rt.Widget, function()
         _selection_offset_y = 0,
         _min_y = 0,
         _max_y = 0,
+
+        _position_x = 0,
+        _position_y = 0,
+        _final_height = 1,
 
         _label_font = rt.settings.font.default_small,
         _label_font_mono = rt.settings.font.default_mono_small
@@ -49,8 +54,14 @@ function mn.ScrollableList._realize_item(item)
 end
 
 --- @brief
+function mn.ScrollableList._update_item(item)
+    item.name_lable:set_text(self._format_name_label(item.object:get_name()))
+    item.quantity_label:set_text(mn.ScrollableList._format_quantity_label(item.quantity))
+end
+
+--- @brief
 function mn.ScrollableList:push(...)
-    for pair in values({...}) do
+    for pair in range(...) do
         local object = pair[1]
         local quantity = pair[2]
         local to_insert = {
@@ -71,6 +82,7 @@ function mn.ScrollableList:push(...)
         end
 
         table.insert(self._items, to_insert)
+        self._object_to_item[object] = to_insert
 
         if self._selected_item == 0 then self._selected_item = self._n_items end
         self._n_items = self._n_items + 1
@@ -101,6 +113,7 @@ function mn.ScrollableList:size_allocate(x, y, width, height)
     local item_w = width - scrollbar_width
     local current_x, current_y = x, y
 
+    self._position_x, self._position_y = current_x, current_y
     for item in values(self._items) do
         local x, y = 0, 0
         local sprite_w, sprite_h = item.sprite:get_resolution()
@@ -118,12 +131,11 @@ function mn.ScrollableList:size_allocate(x, y, width, height)
             base:resize(x, y, item_w, base_h)
         end
         item.height = base_h
-
-        item.position_x, item.position_y = current_x, current_y
         current_y = current_y + item.height
     end
 
     self._stencil:resize(x - 1, y - 1, width - scrollbar_width + 2, height + 2)
+    self._final_height = height
     self._scrollbar:fit_into(x + width - scrollbar_width, y, scrollbar_width, height)
     self._scrollbar:set_n_pages(self._n_items)
     self._scrollbar:set_page_index(self._selected_item)
@@ -144,11 +156,15 @@ function mn.ScrollableList:draw()
     rt.graphics.stencil(stencil_value, self._stencil)
     rt.graphics.set_stencil_test(rt.StencilCompareMode.EQUAL, stencil_value)
 
+    local threshold_y = self._final_height
+    local current_y = 0
+
     rt.graphics.push()
+    rt.graphics.translate(self._position_x, self._position_y)
+    rt.graphics.translate(0, self._selection_offset_y)
+
     for i = 1, self._n_items do
         local item = self._items[i]
-        rt.graphics.origin()
-        rt.graphics.translate(item.position_x, item.position_y + self._selection_offset_y)
 
         if i == self._selected_item then
             item.selected_base:draw()
@@ -160,6 +176,11 @@ function mn.ScrollableList:draw()
         item.sprite:draw()
         item.name_label:draw()
         item.quantity_label:draw()
+
+        rt.graphics.translate(0, item.height)
+
+        current_y = current_y + item.height
+        if current_y > threshold_y then break end
     end
 
     rt.graphics.pop()
@@ -191,5 +212,41 @@ function mn.ScrollableList:move_down()
         if item.position_y + item.height + self._selection_offset_y > self._max_y then
             self._selection_offset_y = self._selection_offset_y - item.height
         end
+    end
+end
+
+--- @brief
+function mn.ScrollableList:take(object)
+    local item = self._object_to_item(object)
+    if item == nil then
+        rt.warning("In mn.ScrollableList:take: trying to take object " .. object:get_id() .. " which is not part of list")
+        return
+    end
+
+    if item.quantity <= 1 then
+        local item_i = 1
+        for i = 1, self._n_items do
+            if self._items[i] == item then
+                item_i = i
+                break
+            end
+        end
+        self._items:erase(item_i)
+        self._object_to_item[object] = nil
+    else
+        item.quantity = item.quantity - 1
+        mn.ScrollableList._update_item(item)
+    end
+end
+
+--- @brief
+function mn.ScrollableList:add(object, new_quantity)
+    new_quantity = which(new_quantity, 1)
+    local item = self._object_to_item
+    if item ~= nil then
+        item.quantity = item.quantity + new_quantity
+        mn.ScrollableList._update_item(item)
+    else
+        self:push({object, new_quantity})
     end
 end
