@@ -39,7 +39,7 @@ end
 
 --- @override
 function mn.TabBar:size_allocate(x, y, width, height)
-    local current_x, current_y = x, y
+    local current_x, current_y = x + rt.settings.frame.thickness, y
     local max_h = NEGATIVE_INFINITY
     local eps = 20
     local m = rt.settings.margin_unit
@@ -52,7 +52,7 @@ function mn.TabBar:size_allocate(x, y, width, height)
         local base_h = h + 2 * m + eps
         item.frame:fit_into(current_x, current_y, base_w, base_h)
 
-        current_x = current_x + base_w
+        current_x = current_x + base_w + 2 * rt.settings.frame.thickness
         max_h = math.max(max_h, base_h)
     end
 

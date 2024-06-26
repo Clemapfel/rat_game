@@ -48,6 +48,7 @@ mn.Scene = meta.new_type("MenuScene", rt.Scene, function()
         _state = mn.InventoryState(),
 
         _shared_tab_bar = mn.TabBar(),
+        _shared_list_frame = rt.Frame(),
         _shared_move_tab_sprite = {}, -- rt.Sprite
         _shared_equip_tab_sprite = {}, -- rt.Sprite
         _shared_consumable_tab_sprite = {}, -- rt.Sprite
@@ -62,7 +63,6 @@ mn.Scene = meta.new_type("MenuScene", rt.Scene, function()
             [mn.ScrollableListSortMode.BY_ID] = mn.ScrollableListSortMode.BY_TYPE,
         },
         _shared_list_mode = mn.ScrollableListSortMode.BY_ID,
-
         _current_shared_tab = 3,
 
         _shared_move_list = mn.ScrollableList(),
@@ -173,6 +173,8 @@ function mn.Scene:realize()
 
     self._control_indicator:realize()
     self:_update_control_indicator()
+
+    self._shared_list_frame:realize()
 end
 
 --- @brief
@@ -200,21 +202,32 @@ end
 
 --- @override
 function mn.Scene:size_allocate(x, y, width, height)
-    local tab_x, tab_y = 50, 50
-    local tab_offset = 50
+    local padding = rt.settings.frame.thickness
+    local m = rt.settings.margin_unit
+    local tab_x, tab_y = 200, 200
+    local tab_offset = 0
     local tab_w, tab_h = self._shared_tab_bar:measure()
-    self._shared_tab_bar:fit_into(tab_x + tab_offset, tab_y, tab_w, tab_h)
+    self._shared_tab_bar:fit_into(tab_x + tab_offset + padding + 2, tab_y, tab_w, tab_h)
     tab_w, tab_h = self._shared_tab_bar:measure() -- update after resize
 
     local shared_list_w = 400
     local shared_list_h = 100
+    local shared_list_frame_bounds = rt.AABB(tab_x, tab_y + tab_h, shared_list_w, shared_list_h)
+    local x_margin, y_margin = m, 0.5 * m
     for list in range(
         self._shared_move_list,
         self._shared_consumable_list,
         self._shared_equip_list
     ) do
-        list:fit_into(tab_x, tab_y + tab_h, shared_list_w, shared_list_h)
+        list:fit_into(
+            shared_list_frame_bounds.x + x_margin,
+            shared_list_frame_bounds.y + y_margin,
+            shared_list_frame_bounds.width - 2 * x_margin,
+            shared_list_frame_bounds.height - 2 * y_margin
+        )
     end
+
+    self._shared_list_frame:fit_into(shared_list_frame_bounds)
 
     local indicator_bounds = rt.AABB(x, y, width, height)
     local m = 2 * rt.settings.margin_unit
@@ -228,6 +241,8 @@ end
 --- @override
 function mn.Scene:draw()
     self._shared_tab_bar:draw()
+    self._shared_list_frame:draw()
+
     if self._current_shared_tab == self._shared_move_tab_index then
         self._shared_move_list:draw()
     elseif self._current_shared_tab == self._shared_consumable_tab_index then

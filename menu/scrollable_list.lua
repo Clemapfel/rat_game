@@ -221,23 +221,25 @@ end
 
 --- @brief
 function mn.ScrollableList:size_allocate(x, y, width, height)
-    local scrollbar_width = 20
     local m = rt.settings.margin_unit
-    local item_w = width - scrollbar_width
+    local scrollbar_width = 1.5 * m
+    local scrollbar_margin = 0.5 * m
+    local item_w = width - (scrollbar_width + scrollbar_margin)
     local current_x, current_y = x, y
 
     self._position_x, self._position_y = current_x, current_y
     for item in values(self._items) do
         local x, y = 0, 0
         local sprite_w, sprite_h = item.sprite:get_resolution()
-        item.sprite:fit_into(x, y, sprite_w, sprite_h)
+        local sprite_x = x + 0.5 * m
+        item.sprite:fit_into(sprite_x, y, sprite_w, sprite_h)
 
         local quantity_w, quantity_h = item.quantity_label:measure()
         local quantity_x = x + item_w - quantity_w - m
         item.quantity_label:fit_into(quantity_x, y + 0.5 * sprite_h - 0.5 * quantity_h, POSITIVE_INFINITY, quantity_h)
 
         local label_w, label_h = item.name_label:measure()
-        item.name_label:fit_into(x + sprite_w + m, y + 0.5 * sprite_h - 0.5 * label_h, POSITIVE_INFINITY, label_h)
+        item.name_label:fit_into(sprite_x + sprite_w + m, y + 0.5 * sprite_h - 0.5 * label_h, POSITIVE_INFINITY, label_h)
 
         local base_h = math.max(sprite_h, label_h, quantity_h)
         for base in range(item.selected_base, item.unselected_base, item.base_outline) do
@@ -249,7 +251,7 @@ function mn.ScrollableList:size_allocate(x, y, width, height)
 
     self._stencil:resize(x - 1, y - 1, width - scrollbar_width + 2, height + 2)
     self._final_height = height
-    self._scrollbar:fit_into(x + width - scrollbar_width, y, scrollbar_width, height)
+    self._scrollbar:fit_into(x + width - (scrollbar_width) , y, scrollbar_width, height)
     self._scrollbar:set_n_pages(self._n_items)
     self._scrollbar:set_page_index(self._selected_item_i)
 
@@ -330,7 +332,7 @@ end
 
 --- @brief
 function mn.ScrollableList:get_selected()
-    local item = self._items[self._selected_item_i]
+    local item = self._items[self._sortings[self._current_sort_mode][self._selected_item_i].item_i]
     if item ~= nil then
         return item.object
     else

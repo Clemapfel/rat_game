@@ -11,7 +11,6 @@ rt.ControlIndicator = meta.new_type("ControlIndicator", rt.Widget, function(layo
         _sprites = {},
         _labels = {},
         _frame = rt.Frame(),
-        _base = rt.Spacer(),
         _opacity = 1,
         _final_width = 1,
         _final_height = 1,
@@ -47,8 +46,6 @@ function rt.ControlIndicator:realize()
     self._is_realized = true
 
     self:create_from(self._layout)
-
-    self._frame:set_child(self._base)
     self._frame:realize()
 end
 
