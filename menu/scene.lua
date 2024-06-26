@@ -56,9 +56,10 @@ mn.Scene = meta.new_type("MenuScene", rt.Scene, function()
         _shared_equip_tab_index = 3,
 
         _shared_list_mode_order = {
-            [mn.ScrollableListSortMode.BY_ID] = mn.ScrollableListSortMode.BY_NAME,
+            [mn.ScrollableListSortMode.BY_TYPE] = mn.ScrollableListSortMode.BY_NAME,
             [mn.ScrollableListSortMode.BY_NAME] = mn.ScrollableListSortMode.BY_QUANTITY,
-            [mn.ScrollableListSortMode.BY_QUANTITY] = mn.ScrollableListSortMode.BY_ID
+            [mn.ScrollableListSortMode.BY_QUANTITY] = mn.ScrollableListSortMode.BY_ID,
+            [mn.ScrollableListSortMode.BY_ID] = mn.ScrollableListSortMode.BY_TYPE,
         },
         _shared_list_mode = mn.ScrollableListSortMode.BY_ID,
 
@@ -184,6 +185,8 @@ function mn.Scene:_update_control_indicator()
         sort_label = "Sort (by Name)"
     elseif next_mode == mn.ScrollableListSortMode.BY_QUANTITY then
         sort_label = "Sort (by Quantity)"
+    elseif next_mode == mn.ScrollableListSortMode.BY_TYPE then
+        sort_label = "Sort (by Type)"
     end
 
     local prefix, postfix = "", ""-- "<o>", "</o>"

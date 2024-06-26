@@ -1,7 +1,8 @@
 mn.ScrollableListSortMode = meta.new_enum({
-    BY_NAME = 1,
-    BY_QUANTITY = 2,
-    BY_ID = 0
+    BY_ID = 0,
+    BY_TYPE = 1,
+    BY_NAME = 2,
+    BY_QUANTITY = 3,
 })
 
 --- @class mn.ScrollableList
@@ -13,6 +14,7 @@ mn.ScrollableList = meta.new_type("ScrollableList", rt.Widget, function()
             [mn.ScrollableListSortMode.BY_ID] = {}, -- Table<Number, {x, y, item_i}>
             [mn.ScrollableListSortMode.BY_QUANTITY] = {},
             [mn.ScrollableListSortMode.BY_NAME] = {},
+            [mn.ScrollableListSortMode.BY_TYPE] = {},
         },
         _current_sort_mode = mn.ScrollableListSortMode.BY_ID,
         _n_items = 0,
@@ -67,14 +69,14 @@ end
 
 --- @brief
 function mn.ScrollableList:_regenerate_sortings()
+    if self._is_realized ~= true then return end
     local indices = table.seq(1, self._n_items, 1)
 
     -- id
     table.sort(indices, function(a, b)
-        local item_a = self._items[a].object
-        local item_b = self._items[b].object
-
-        return item_a:get_id() < item_b:get_id()
+        local item_a = self._items[a]
+        local item_b = self._items[b]
+        return item_a.object:get_id() < item_b.object:get_id()
     end)
 
     local current_x, current_y = self._position_x, self._position_y
@@ -88,12 +90,43 @@ function mn.ScrollableList:_regenerate_sortings()
         current_y = current_y + self._items[item_i].height
     end
 
-    -- name
+    -- type
     table.sort(indices, function(a, b)
         local item_a = self._items[a].object
         local item_b = self._items[b].object
 
-        return item_a:get_name() < item_b:get_name()
+        local properties = {}
+        local i = 1
+        for item in range(item_a, item_b) do
+            if meta.isa(item, bt.Move) then
+                properties[i] = item:get_id()
+            elseif meta.isa(item, bt.Equip) then
+                properties[i] = item:get_type()
+            elseif meta.isa(item, bt.Consumable) then
+                properties[i] = item:get_max_n_uses()
+            end
+            i = i + 1
+        end
+
+        return properties[1] < properties[2]
+    end)
+
+    current_x, current_y = self._position_x, self._position_y
+    for index_i = 1, self._n_items do
+        local item_i = indices[index_i]
+        self._sortings[mn.ScrollableListSortMode.BY_TYPE][index_i] = {
+            x = current_x,
+            y = current_y,
+            item_i = item_i
+        }
+        current_y = current_y + self._items[item_i].height
+    end
+
+    -- name
+    table.sort(indices, function(a, b)
+        local item_a = self._items[a]
+        local item_b = self._items[b]
+        return item_a.object:get_name() < item_b.object:get_name()
     end)
 
     current_x, current_y = self._position_x, self._position_y
@@ -165,6 +198,8 @@ function mn.ScrollableList:push(...)
         if self._selected_item_i == 0 then self._selected_item_i = 1 end
         self._n_items = self._n_items + 1
     end
+
+    self:_regenerate_sortings()
 end
 
 --- @brief
@@ -327,6 +362,7 @@ function mn.ScrollableList:take(object)
         if self._n_items == 0 then
             self._selected_item_i = 0
         end
+        self:_regenerate_sortings()
     else
         item.quantity = item.quantity - 1
         mn.ScrollableList._update_item(item)
