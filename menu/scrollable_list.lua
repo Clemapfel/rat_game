@@ -10,16 +10,17 @@ mn.ScrollableList = meta.new_type("ScrollableList", rt.Widget, function()
         _items = {}, -- cf. push
         _object_to_item = {},
         _sortings = {
-            [mn.ScrollableListSortMode.BY_ID] = {}, -- Table<Number, Pair<Number, Number>>
+            [mn.ScrollableListSortMode.BY_ID] = {}, -- Table<item_i, {x, y, index}>
             [mn.ScrollableListSortMode.BY_QUANTITY] = {},
             [mn.ScrollableListSortMode.BY_NAME] = {},
         },
+        _current_sort_mode = mn.ScrollableListSortMode.BY_ID,
         _n_items = 0,
         _stencil = rt.Rectangle(0, 0, 1, 1),
         _scrollbar = rt.Scrollbar(),
         _base = rt.Rectangle(0, 0, 1, 1),
         _base_outline = rt.Rectangle(0, 0, 1, 1),
-        _selected_item = 0,
+        _selected_item_i = 0,
         _selection_offset_y = 0,
         _min_y = 0,
         _max_y = 0,
@@ -66,7 +67,24 @@ end
 
 --- @brief
 function mn.ScrollableList:_regenerate_sortings()
+    local indices = table.seq(1, self._n_items, 1)
+    table.sort(indices, function(a, b)
+        local item_a = self._items[a].object
+        local item_b = self._items[b].object
 
+        return item_a:get_id() < item_b:get_id()
+    end)
+
+    local current_x, current_y = self._position_x, self._position_y
+    for index_i = 1, self._n_items do
+        local item_i = indices[index_i]
+        self._sortings[mn.ScrollableListSortMode.BY_ID][item_i] = {
+            x = current_x,
+            y = current_y,
+            index = index_i
+        }
+        current_y = current_y + self._items[item_i].height
+    end
 end
 
 --- @brief
@@ -88,9 +106,7 @@ function mn.ScrollableList:push(...)
             quantity_label = rt.Label(self._format_quantity_label(quantity), self._label_font, self._label_font_mono),
             unselected_base = rt.Rectangle(0, 0, 1, 1),
             selected_base = rt.Rectangle(0, 0, 1, 1),
-            base_outline = rt.Rectangle(0, 0, 1, 1),
-            position_x = 0,
-            position_y = 0
+            base_outline = rt.Rectangle(0, 0, 1, 1)
         }
 
         if self._is_realized then
@@ -100,7 +116,7 @@ function mn.ScrollableList:push(...)
         table.insert(self._items, to_insert)
         self._object_to_item[object] = to_insert
 
-        if self._selected_item == 0 then self._selected_item = 1 end
+        if self._selected_item_i == 0 then self._selected_item_i = 1 end
         self._n_items = self._n_items + 1
     end
 end
@@ -147,8 +163,6 @@ function mn.ScrollableList:size_allocate(x, y, width, height)
             base:resize(x, y, item_w, base_h)
         end
         item.height = base_h
-
-        item.position_x, item.position_y = current_x, current_y
         current_y = current_y + item.height
     end
 
@@ -156,13 +170,15 @@ function mn.ScrollableList:size_allocate(x, y, width, height)
     self._final_height = height
     self._scrollbar:fit_into(x + width - scrollbar_width, y, scrollbar_width, height)
     self._scrollbar:set_n_pages(self._n_items)
-    self._scrollbar:set_page_index(self._selected_item)
+    self._scrollbar:set_page_index(self._selected_item_i)
 
     self._base:resize(x, y, width, height)
     self._base_outline:resize(x, y, width, height)
 
     self._min_y = y
     self._max_y = y + height
+
+    self:_regenerate_sortings()
 end
 
 --- @override
@@ -178,10 +194,12 @@ function mn.ScrollableList:draw()
 
     for i = 1, self._n_items do
         local item = self._items[i]
-        rt.graphics.origin()
-        rt.graphics.translate(item.position_x, item.position_y + self._selection_offset_y)
+        local entry = self._sortings[self._current_sort_mode][i]
 
-        if i == self._selected_item then
+        rt.graphics.origin()
+        rt.graphics.translate(entry.x, entry.y + self._selection_offset_y)
+
+        if entry.index == self._selected_item_i then
             item.selected_base:draw()
         else
             item.unselected_base:draw()
@@ -201,12 +219,14 @@ end
 
 --- @brief
 function mn.ScrollableList:move_up()
-    if self._selected_item > 1 then
-        self._selected_item = self._selected_item - 1
-        self._scrollbar:set_page_index(self._selected_item)
+    if self._selected_item_i > 1 then
+        self._selected_item_i = self._selected_item_i - 1
+        self._scrollbar:set_page_index(self._selected_item_i)
 
-        local item = self._items[self._selected_item]
-        if item.position_y + self._selection_offset_y < self._min_y then
+        local entry = self._sortings[self._current_sort_mode][self._selected_item_i]
+        local item = self._items[entry.index]
+        local position_y = entry.y
+        if position_y + self._selection_offset_y < self._min_y then
             self._selection_offset_y = self._selection_offset_y + item.height
         end
     end
@@ -214,12 +234,14 @@ end
 
 --- @brief
 function mn.ScrollableList:move_down()
-    if self._selected_item < self._n_items then
-        self._selected_item = self._selected_item + 1
-        self._scrollbar:set_page_index(self._selected_item)
+    if self._selected_item_i < self._n_items then
+        self._selected_item_i = self._selected_item_i + 1
+        self._scrollbar:set_page_index(self._selected_item_i)
 
-        local item = self._items[self._selected_item]
-        if item.position_y + item.height + self._selection_offset_y > self._max_y then
+        local entry = self._sortings[self._current_sort_mode][self._selected_item_i]
+        local item = self._items[entry.index]
+        local position_y = entry.y
+        if position_y + item.height + self._selection_offset_y > self._max_y then
             self._selection_offset_y = self._selection_offset_y - item.height
         end
     end
@@ -227,7 +249,7 @@ end
 
 --- @brief
 function mn.ScrollableList:get_selected()
-    local item = self._items[self._selected_item]
+    local item = self._items[self._selected_item_i]
     if item ~= nil then
         return item.object
     else
@@ -256,14 +278,8 @@ function mn.ScrollableList:take(object)
         self._n_items = self._n_items - 1
 
         -- update item positions without reformatting
-        local current_x, current_y = self._position_x, self._position_y
-        for item in values(self._items) do
-            item.position_x, item.position_y = current_x, current_y
-            current_y = current_y + item.height
-        end
-
         if self._n_items == 0 then
-            self._selected_item = 0
+            self._selected_item_i = 0
         end
     else
         item.quantity = item.quantity - 1

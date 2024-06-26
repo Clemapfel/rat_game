@@ -22,8 +22,9 @@
     </configurations>
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="7fa9ba1b-2cff-4ecc-86fb-59ab2fa76ee1" name="Changes" comment="scrollable list working">
+    <list default="true" id="7fa9ba1b-2cff-4ecc-86fb-59ab2fa76ee1" name="Changes" comment="stashing sortings">
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/battle/configs/equips/DEBUG_CLOTHING.lua" beforeDir="false" afterPath="$PROJECT_DIR$/battle/configs/equips/DEBUG_CLOTHING.lua" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/menu/scrollable_list.lua" beforeDir="false" afterPath="$PROJECT_DIR$/menu/scrollable_list.lua" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
@@ -429,15 +430,7 @@
       <workItem from="1719331309887" duration="7255000" />
       <workItem from="1719338734310" duration="2967000" />
       <workItem from="1719342172568" duration="114000" />
-      <workItem from="1719342349559" duration="14045000" />
-    </task>
-    <task id="LOCAL-00798" summary="stashing topology">
-      <option name="closed" value="true" />
-      <created>1717901337635</created>
-      <option name="number" value="00798" />
-      <option name="presentableId" value="LOCAL-00798" />
-      <option name="project" value="LOCAL" />
-      <updated>1717901337635</updated>
+      <workItem from="1719342349559" duration="16075000" />
     </task>
     <task id="LOCAL-00799" summary="stashing move layout">
       <option name="closed" value="true" />
@@ -823,7 +816,15 @@
       <option name="project" value="LOCAL" />
       <updated>1719412134550</updated>
     </task>
-    <option name="localTasksCounter" value="847" />
+    <task id="LOCAL-00847" summary="stashing sortings">
+      <option name="closed" value="true" />
+      <created>1719414351212</created>
+      <option name="number" value="00847" />
+      <option name="presentableId" value="LOCAL-00847" />
+      <option name="project" value="LOCAL" />
+      <updated>1719414351213</updated>
+    </task>
+    <option name="localTasksCounter" value="848" />
     <servers />
   </component>
   <component name="TypeScriptGeneratedFilesManager">
@@ -872,7 +873,6 @@
     </option>
   </component>
   <component name="VcsManagerConfiguration">
-    <MESSAGE value="optimized glyph drawing" />
     <MESSAGE value="optimized drawing" />
     <MESSAGE value="optimized rendering by caching" />
     <MESSAGE value="added background compression" />
@@ -897,7 +897,8 @@
     <MESSAGE value="stashing before frame rework" />
     <MESSAGE value="added menu scene" />
     <MESSAGE value="scrollable list working" />
-    <option name="LAST_COMMIT_MESSAGE" value="scrollable list working" />
+    <MESSAGE value="stashing sortings" />
+    <option name="LAST_COMMIT_MESSAGE" value="stashing sortings" />
   </component>
   <component name="XDebuggerManager">
     <breakpoint-manager>
@@ -906,11 +907,6 @@
           <url>file://$PROJECT_DIR$/old/~battle/enemy_sprite.lua</url>
           <line>244</line>
           <option name="timeStamp" value="6" />
-        </line-breakpoint>
-        <line-breakpoint enabled="true" type="lua-line">
-          <url>file://$PROJECT_DIR$/common/meta.lua</url>
-          <line>483</line>
-          <option name="timeStamp" value="8" />
         </line-breakpoint>
       </breakpoints>
     </breakpoint-manager>

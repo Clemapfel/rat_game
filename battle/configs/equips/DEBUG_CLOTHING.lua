@@ -1,5 +1,5 @@
 return {
-    name = "Test Dress",
+    name = "Test Clothing",
 
     hp_base_offset = 0,
     attack_base_offset = 0,
