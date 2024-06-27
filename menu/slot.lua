@@ -20,7 +20,6 @@ mn.Slot = meta.new_type("Slot", rt.Widget, function(type_label, frame_type)
         _item_sprite = {},
         _item = nil,
 
-        _base = rt.Spacer(),
         _base_inlay = {},
         _frame = rt.Frame(frame_type),
 
@@ -75,8 +74,6 @@ function mn.Slot:realize()
     self._is_realized = true
 
     self._frame:realize()
-    self._base:realize()
-    self._frame:set_child(self._base)
 
     if self._frame:get_type() == rt.FrameType.RECTANGULAR then
         self._base_inlay = rt.Rectangle(0, 0, 1, 1)
@@ -84,7 +81,7 @@ function mn.Slot:realize()
     else
         self._base_inlay = rt.Circle(0, 0, 1)
     end
-    self._base_inlay:set_color(rt.color_darken(self._base:get_color(), 0.05))
+    self._base_inlay:set_color(rt.color_darken(rt.Palette.BACKGROUND, 0.05))
 
     self._type_label:realize()
 

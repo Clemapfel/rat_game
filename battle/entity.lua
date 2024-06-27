@@ -14,6 +14,15 @@ bt.AILevel = meta.new_enum({
     LEVEL_2 = 2
 })
 
+bt.EquipType = meta.new_enum({
+    TRINKET = "TRINKET",
+    MALE_CLOTHING = "MALE_CLOTHING",
+    FEMALE_CLOTHING = "FEMALE_CLOTHING",
+    UNISEX_CLOTHING = "UNISEX_CLOTHING",
+    WEAPON = "MELEE_WEAPON",
+    UNKNOWN = "UNKNOWN"
+})
+
 --- @class bt.Entity
 bt.Entity = meta.new_type("BattleEntity", function(id)
     meta.assert_string(id)
@@ -52,6 +61,7 @@ end, {
     equips = {}, -- Table<EquipID, {equip: bt.Equip}>
     consumables = {}, --Table<ConsumableID, {consumable: bt.Consumable, n_consumed: Number}
 
+    equip_slot_types = {bt.EquipType.UNKNOWN, bt.EquipType.UNKNOWN},
     state = bt.EntityState.ALIVE,
 
     -- non simulation
@@ -557,4 +567,17 @@ end
 --- @brief
 function bt.Entity:get_ai_level()
     return self.ai_level
+end
+
+--- @brief
+function bt.Entity:get_equip_slot_type(i)
+    if i == nil then
+        return {table.unpack(self.equip_slot_types)}
+    else
+        if i > #self.equip_slot_types then
+            rt.error("In bt.Entity:get_equip_slot_type: index '" .. i .. "'  is out of bounds")
+        else
+            return self.equip_slot_types[i]
+        end
+    end
 end

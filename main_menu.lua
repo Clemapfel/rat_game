@@ -34,6 +34,9 @@ for consumable_id in range(
     state.shared_consumables[bt.Consumable(consumable_id)] = rt.random.integer(1, 5)
 end
 
+state.entities[bt.Entity("GIRL")] = {}
+scene._current_entity = bt.Entity("GIRL")
+
 --- ###
 
 love.load = function()

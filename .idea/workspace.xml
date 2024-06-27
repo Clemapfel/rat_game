@@ -22,12 +22,12 @@
     </configurations>
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="7fa9ba1b-2cff-4ecc-86fb-59ab2fa76ee1" name="Changes" comment="added type">
+    <list default="true" id="7fa9ba1b-2cff-4ecc-86fb-59ab2fa76ee1" name="Changes" comment="added scrollable list backing">
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/common/control_indicator.lua" beforeDir="false" afterPath="$PROJECT_DIR$/common/control_indicator.lua" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/battle/entity.lua" beforeDir="false" afterPath="$PROJECT_DIR$/battle/entity.lua" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/battle/equip.lua" beforeDir="false" afterPath="$PROJECT_DIR$/battle/equip.lua" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/main_menu.lua" beforeDir="false" afterPath="$PROJECT_DIR$/main_menu.lua" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/menu/scene.lua" beforeDir="false" afterPath="$PROJECT_DIR$/menu/scene.lua" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/menu/scrollable_list.lua" beforeDir="false" afterPath="$PROJECT_DIR$/menu/scrollable_list.lua" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/menu/tab_bar.lua" beforeDir="false" afterPath="$PROJECT_DIR$/menu/tab_bar.lua" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -432,15 +432,7 @@
       <workItem from="1719331309887" duration="7255000" />
       <workItem from="1719338734310" duration="2967000" />
       <workItem from="1719342172568" duration="114000" />
-      <workItem from="1719342349559" duration="20836000" />
-    </task>
-    <task id="LOCAL-00802" summary="polished move verbose info">
-      <option name="closed" value="true" />
-      <created>1718127034585</created>
-      <option name="number" value="00802" />
-      <option name="presentableId" value="LOCAL-00802" />
-      <option name="project" value="LOCAL" />
-      <updated>1718127034585</updated>
+      <workItem from="1719342349559" duration="24099000" />
     </task>
     <task id="LOCAL-00803" summary="verbose info pre-formatting implemented">
       <option name="closed" value="true" />
@@ -826,7 +818,15 @@
       <option name="project" value="LOCAL" />
       <updated>1719436067763</updated>
     </task>
-    <option name="localTasksCounter" value="851" />
+    <task id="LOCAL-00851" summary="added scrollable list backing">
+      <option name="closed" value="true" />
+      <created>1719437299593</created>
+      <option name="number" value="00851" />
+      <option name="presentableId" value="LOCAL-00851" />
+      <option name="project" value="LOCAL" />
+      <updated>1719437299593</updated>
+    </task>
+    <option name="localTasksCounter" value="852" />
     <servers />
   </component>
   <component name="TypeScriptGeneratedFilesManager">
@@ -875,7 +875,6 @@
     </option>
   </component>
   <component name="VcsManagerConfiguration">
-    <MESSAGE value="added menu slots" />
     <MESSAGE value="added list item" />
     <MESSAGE value="added entity info" />
     <MESSAGE value="reverted glsl version" />
@@ -900,7 +899,8 @@
     <MESSAGE value="stashing sortability rework" />
     <MESSAGE value="scrollable list sort working" />
     <MESSAGE value="added type" />
-    <option name="LAST_COMMIT_MESSAGE" value="added type" />
+    <MESSAGE value="added scrollable list backing" />
+    <option name="LAST_COMMIT_MESSAGE" value="added scrollable list backing" />
   </component>
   <component name="XDebuggerManager">
     <breakpoint-manager>

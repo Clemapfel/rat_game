@@ -2,15 +2,6 @@ rt.settings.battle.equip = {
     config_path = "battle/configs/equips"
 }
 
-bt.EquipType = meta.new_enum({
-    TRINKET = "TRINKET",
-    MALE_CLOTHING = "MALE_CLOTHING",
-    FEMALE_CLOTHING = "FEMALE_CLOTHING",
-    UNISEX_CLOTHING = "UNISEX_CLOTHING",
-    WEAPON = "MELEE_WEAPON",
-    UNKNOWN = "UNKNOWN"
-})
-
 --- @class bt.Equip
 bt.Equip = meta.new_type("Equip", function(id)
     local out = bt.Equip._atlas[id]

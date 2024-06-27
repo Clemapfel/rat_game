@@ -38,7 +38,6 @@ mn.InventoryState = meta.new_type("MenuInventoryState", function()
         stack = {},              -- Stack<Union<bt.Move, bt.Equip, bt.Consumable>>
 
         entities = {},           -- Queue<bt.Entity>
-        current_entity = nil,    -- bt.Entity
     })
 end)
 
@@ -47,6 +46,7 @@ mn.Scene = meta.new_type("MenuScene", rt.Scene, function()
     return meta.new(mn.Scene, {
         _state = mn.InventoryState(),
 
+        -- shared side
         _shared_tab_bar = mn.TabBar(),
         _shared_list_frame = rt.Frame(),
         _shared_move_tab_sprite = {}, -- rt.Sprite
@@ -71,6 +71,13 @@ mn.Scene = meta.new_type("MenuScene", rt.Scene, function()
 
         _input_controller = rt.InputController(),
         _control_indicator = rt.ControlIndicator(),
+
+        -- entity side
+        _current_entity = nil,    -- bt.Entity
+
+        _equip_slot_01 = {},
+        _equip_slot_02 = {},
+        _consumable_slot = {},
     })
 end)
 
@@ -100,7 +107,6 @@ function mn.Scene:_handle_button_pressed(which)
         self._shared_consumable_list:set_sort_mode(self._shared_list_mode)
         self:_update_control_indicator()
     elseif which == rt.InputButton.RIGHT then
-
         if self._current_shared_tab == self._shared_move_tab_index then
             self._current_shared_tab = self._shared_consumable_tab_index
         elseif self._current_shared_tab == self._shared_consumable_tab_index then
@@ -175,6 +181,14 @@ function mn.Scene:realize()
     self:_update_control_indicator()
 
     self._shared_list_frame:realize()
+
+    self._equip_slot_01 = mn.EquipSlot(bt.EquipType.UNKNOWN)
+    self._equip_slot_02 = mn.EquipSlot(bt.EquipType.UNKNOWN)
+    self._consumable_slot = mn.ConsumableSlot()
+
+    for slot in range(self._equip_slot_01, self._equip_slot_02, self._consumable_slot) do
+        slot:realize()
+    end
 end
 
 --- @brief
@@ -236,6 +250,15 @@ function mn.Scene:size_allocate(x, y, width, height)
     indicator_bounds.width = indicator_bounds.width - 2 * m
     indicator_bounds.height = indicator_bounds.width - 2 * m
     self._control_indicator:fit_into(indicator_bounds);
+
+    local slot_y = y + height - 2 * m
+    local slot_w = 50
+    local slot_x = x + 2 * m
+    self._equip_slot_01:fit_into(slot_x, slot_y, slot_w, slot_w)
+    slot_x = slot_x + slot_w + m
+    self._equip_slot_02:fit_into(slot_x, slot_y, slot_w, slot_w)
+    slot_x = slot_x + slot_w + m
+    self._consumable_slot:fit_into(slot_x, slot_y, slot_w, slot_w)
 end
 
 --- @override
@@ -250,6 +273,10 @@ function mn.Scene:draw()
     elseif self._current_shared_tab == self._shared_equip_tab_index then
         self._shared_equip_list:draw()
     end
+
+    self._equip_slot_01:draw()
+    self._equip_slot_02:draw()
+    self._consumable_slot:draw()
 
     self._control_indicator:draw()
 end
