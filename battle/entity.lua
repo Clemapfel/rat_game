@@ -570,14 +570,6 @@ function bt.Entity:get_ai_level()
 end
 
 --- @brief
-function bt.Entity:get_equip_slot_type(i)
-    if i == nil then
-        return {table.unpack(self.equip_slot_types)}
-    else
-        if i > #self.equip_slot_types then
-            rt.error("In bt.Entity:get_equip_slot_type: index '" .. i .. "'  is out of bounds")
-        else
-            return self.equip_slot_types[i]
-        end
-    end
+function bt.Entity:get_equip_slot_types()
+    return {table.unpack(self.equip_slot_types)}
 end

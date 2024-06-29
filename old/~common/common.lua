@@ -76,7 +76,6 @@ end
 --- @param vararg any
 --- @return nil
 function print(...)
-
     local values = {...}
     if string.len(values) == 0 then
         io.write("nil")

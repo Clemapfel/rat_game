@@ -34,8 +34,13 @@ for consumable_id in range(
     state.shared_consumables[bt.Consumable(consumable_id)] = rt.random.integer(1, 5)
 end
 
-state.entities[bt.Entity("GIRL")] = {}
-scene._current_entity = bt.Entity("GIRL")
+for entity in range(bt.Entity("MC"), bt.Entity("RAT"), bt.Entity("MC"), bt.Entity("GIRL")) do
+    table.insert(state.entities, entity)
+end
+
+local page = mn.EntityPage(bt.Entity("MC"))
+page:realize()
+page:fit_into(50, 50, 250, 500)
 
 --- ###
 
@@ -50,8 +55,10 @@ rt.settings.show_fps = true
 
 love.draw = function()
     if rt.current_scene ~= nil then
-        rt.current_scene:draw()
+        --rt.current_scene:draw()
     end
+
+    page:draw()
 
     if rt.settings.show_rulers == true then
         love.graphics.setLineWidth(1)
@@ -93,6 +100,9 @@ love.run = function()
     })
     love.window.setTitle("rat_game")
     love.filesystem.setIdentity("rat_game")
+
+    local major, minor = love.getVersion()
+    print("Love2D " .. major .. "." .. minor .. " | " .. jit.version)
 
     if love.load then love.load() end
     love.timer.step()

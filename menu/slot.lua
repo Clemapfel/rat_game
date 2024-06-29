@@ -166,3 +166,10 @@ function mn.Slot:set_opacity(alpha)
         end
     end
 end
+
+--- @override
+function mn.Slot:measure()
+    local sprite_w, sprite_h = 32, 32
+    local factor = rt.settings.menu.slot.sprite_factor
+    return sprite_w * factor, sprite_h * factor
+end

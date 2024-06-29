@@ -6,10 +6,6 @@ do
     io.stdout:setvbuf("no") -- makes it so love2d error message is printed to console immediately
 end
 
-local major, minor = love.getVersion()
-print("Love2D " .. major .. "." .. minor .. " | " .. jit.version)
-love.filesystem.setIdentity("rat_game")
-
 -- standard libs
 ffi = require "ffi"
 utf8 = require "utf8"
@@ -191,6 +187,7 @@ require "menu.slot"
 require "menu.entity_info"
 require "menu.scrollable_list"
 require "menu.tab_bar"
+require "menu.entity_page"
 require "menu.scene_state"
 require "menu.scene_state_inventory"
 require "menu.scene"
