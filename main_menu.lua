@@ -38,9 +38,30 @@ for entity in range(bt.Entity("MC"), bt.Entity("RAT"), bt.Entity("MC"), bt.Entit
     table.insert(state.entities, entity)
 end
 
-local page = mn.EntityPage(bt.Entity("MC"))
+local entity = bt.Entity("MC")
+entity:add_equip(1, nil)
+local page = mn.EntityPage(entity)
+
 page:realize()
 page:fit_into(50, 50, 250, 500)
+page:preview_equip(1, bt.Equip("DEBUG_EQUIP"))
+
+slot = mn.Slots(3, 1)
+slot:realize()
+slot:fit_into(50, 50, 400, 200)
+
+switch = false
+input = rt.InputController()
+input:signal_connect("pressed", function(_, which)
+    if which == rt.InputButton.A then
+        if switch == false then
+            page:preview_equip(1, bt.Equip("DEBUG_EQUIP"))
+        else
+            page:preview_equip(1, nil)
+        end
+        switch = not switch
+    end
+end)
 
 --- ###
 
@@ -58,7 +79,8 @@ love.draw = function()
         --rt.current_scene:draw()
     end
 
-    page:draw()
+    --page:draw()
+    slot:draw()
 
     if rt.settings.show_rulers == true then
         love.graphics.setLineWidth(1)

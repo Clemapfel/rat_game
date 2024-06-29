@@ -10,8 +10,8 @@ mn.EntityInfo = meta.new_type("MenuEntityInfo", rt.Widget, function(entity)
         _speed_value = entity:get_speed_base(),
 
         _hp_preview_value = 0,
-        _attack_preview_value = 0,
-        _defense_preview_value = 0,
+        _attack_preview_value = 99,
+        _defense_preview_value = 128,
         _speed_preview_value = 0,
 
         _numerical_label_w = 0,
@@ -26,17 +26,6 @@ function mn.EntityInfo:realize()
 
     self._frame:set_child(self._base)
     self._frame:realize()
-
-    function new_label(...)
-        local str = ""
-        for _, v in pairs({...}) do
-            str = str .. tostring(v)
-        end
-        local out = rt.Label(str, rt.settings.font.default, rt.settings.font.default_mono)
-        out:realize()
-        out:set_justify_mode(rt.JustifyMode.LEFT)
-        return out
-    end
 
     for stat in range(
         -- varname  heading color
@@ -60,7 +49,7 @@ function mn.EntityInfo:realize()
 
         local preview_value = self["_" .. stat[1] .. "_preview_value"]
         if preview_value ~= nil then
-            self["_" .. stat[1] .. "_preview_label"] = rt.Label(number_prefix .. preview_value .. number_postfix)
+            self["_" .. stat[1] .. "_preview_label"] = rt.Label(stat_prefix .. number_prefix .. preview_value .. number_postfix .. stat_postfix)
         end
 
         for label in range(
@@ -74,13 +63,38 @@ function mn.EntityInfo:realize()
         end
     end
 
-    local measure_label = new_label("<b>" .. "000" .. "</b>")
+    local measure_label = rt.Label("<b>" .. "000" .. "</b>")
+    measure_label:realize()
     self._numerical_label_w = select(1, measure_label:measure())
+end
+
+function mn.EntityInfo:_update()
+    for stat in range(
+        -- varname  heading color
+        {"hp", "HP", "HP"},
+        {"attack", "Attack", "ATTACK"},
+        {"defense", "Defense", "DEFENSE"},
+        {"speed", "Speed", "SPEED"}
+    ) do
+        local number_prefix = "<mono>"
+        local number_postfix = "</mono>"
+
+        local stat_prefix = "<color=" .. stat[3] .. ">"
+        local stat_postfix = "</color>"
+
+        local value_label = self["_" .. stat[1] .. "_value_label"]
+        value_label:set_text(stat_prefix .. number_prefix .. self["_" .. stat[1] .. "_value"] .. number_postfix .. stat_postfix)
+
+        local preview_value = self["_" .. stat[1] .. "_preview_value"]
+        if preview_value ~= nil then
+            local preview_label = self["_" .. stat[1] .. "_preview_label"]
+            preview_label:set_text(stat_prefix .. number_prefix .. preview_value .. number_postfix .. stat_postfix)
+        end
+    end
 end
 
 --- @override
 function mn.EntityInfo:size_allocate(x, y, width, height)
-
     self._frame:fit_into(x, y, width, height)
 
     local m = rt.settings.margin_unit
@@ -173,4 +187,6 @@ function mn.EntityInfo:set_preview_values(hp_preview, attack_preview, defense_pr
     self._attack_preview_value = attack_preview
     self._defense_preview_value = defense_preview
     self._speed_preview_value = speed_preview
+    self:_update()
+    self:reformat()
 end

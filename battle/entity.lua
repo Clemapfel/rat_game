@@ -38,8 +38,8 @@ bt.Entity = meta.new_type("BattleEntity", function(id)
 
     out.status = {}
     out.moves = {}
-    out.equips = {}
     out.consumables = {}
+    out.equips = {}
 
     out:realize()
     meta.set_is_mutable(out, false)
@@ -57,11 +57,10 @@ end, {
     priority = 0,
 
     status = {}, -- Table<bt.Status, {status: bt.Status, elapsed: Number}>
-    moves = {}, -- Table<MoveID, {move: bt:move, n_uses: Number}>
-    equips = {}, -- Table<EquipID, {equip: bt.Equip}>
-    consumables = {}, --Table<ConsumableID, {consumable: bt.Consumable, n_consumed: Number}
+    moves = {},     -- Table<MoveID, {move: bt.Move, n_uses: Number}>
+    equips = {},    -- List<{equip: bt.Equip, type: bt.EquipType}>
+    consumables = {}, -- List<ConsumableID, {consumable: bt.Consumable, n_consumed: Number}
 
-    equip_slot_types = {bt.EquipType.UNKNOWN, bt.EquipType.UNKNOWN},
     state = bt.EntityState.ALIVE,
 
     -- non simulation
@@ -144,7 +143,9 @@ function bt.Entity:_calculate_stat(which)
 
     for entry in values(self.equips) do
         local equip = entry.equip
-        value = value * equip[which .. "_base_factor"]
+        if equip ~= nil then
+            value = value * equip[which .. "_base_factor"]
+        end
     end
 
     return math.ceil(value)
@@ -155,7 +156,9 @@ function bt.Entity:_calculate_stat_base(which)
     local value = self[which .. "_base"]
     for entry in values(self.equips) do
         local equip = entry.equip
-        value = value + equip[which .. "_base_offset"]
+        if equip ~= nil then
+            value = value + equip[which .. "_base_offset"]
+        end
     end
 
     if value < 0 then value = 1 end
@@ -460,15 +463,21 @@ function bt.Entity:reduce_move_n_uses(move)
 end
 
 --- @brief
-function bt.Entity:add_equip(equip)
-    self.equips[equip:get_id()] = {
-        equip = equip
-    }
+function bt.Entity:add_equip(equip_slot_i, equip)
+    local slot = self.equips[equip_slot_i]
+    if slot == nil then
+        rt.error("In bt.Entity:add_equip: index `" .. equip_slot_i .. "` is out of bounds for an entity with `" .. sizeof(self.equips) .. "` equip slots")
+    end
+
+    if equip ~= nil and equip:get_type() ~= slot.type then
+        rt.warning("In bt.Entity:add_equip: equip `" .. equip:get_id() .. "`s type `" .. equip:get_type() .. "` does not match type `" .. slot.type .. "` of slot `" .. equip_slot_i .. "`")
+    end
+    self.equips[equip_slot_i].equip = equip
 end
 
 --- @brief
-function bt.Entity:get_equip(equip_id)
-    local entry = self.equips[equip_id]
+function bt.Entity:get_equip(equip_slot_i)
+    local entry = self.equips[equip_slot_i]
     if entry == nil then
         return nil
     else
@@ -480,14 +489,19 @@ end
 function bt.Entity:list_equips()
     local out = {}
     for entry in values(self.equips) do
-        table.insert(out, entry.equip)
+        if entry.equip ~= nil then
+            table.insert(out, entry.equip)
+        end
     end
     return out
 end
 
 --- @brief
 function bt.Entity:has_equip(equip)
-    return self.equips[equip:get_id()] ~= nil
+    for entry in values(self.equips) do
+        if entry.equip == equip then return true end
+    end
+    return false
 end
 
 --- @brief
@@ -571,5 +585,25 @@ end
 
 --- @brief
 function bt.Entity:get_equip_slot_types()
-    return {table.unpack(self.equip_slot_types)}
+    local out = {}
+    for entry in values(self.equips) do
+        table.insert(out, entry.type)
+    end
+    return out
+end
+
+--- @brief
+--- @return {hp_base, attack_base, defense_base, speed_base,
+function bt.Entity:preview_equip(equip_slot_i, new_equip)
+    local before = self.equips[equip_slot_i].equip
+    self:add_equip(equip_slot_i, new_equip)
+    local after_stats = {
+        hp_base = self:_calculate_stat_base("hp"),
+        attack_base = self:_calculate_stat_base("attack"),
+        defense_base = self:_calculate_stat_base("defense"),
+        speed_base = self:_calculate_stat_base("speed"),
+    }
+
+    self:add_equip(equip_slot_i, before)
+    return after_stats
 end

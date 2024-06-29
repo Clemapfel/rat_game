@@ -184,8 +184,8 @@ function bt.Scene:spawn_entities(...)
             entity:add_consumable(bt.Consumable(consumable_id))
         end
 
-        for equip_id in values(entry.equips) do
-            entity:add_equip(bt.Equip(equip_id))
+        for equip_i, equip_id in ipairs(entry.equips) do
+            entity:add_equip(equip_i, bt.Equip(equip_id))
         end
 
         for move_id in values(entry.moveset) do

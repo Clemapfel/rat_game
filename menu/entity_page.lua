@@ -1,17 +1,10 @@
 --- @class mn.EntityPage
 mn.EntityPage = meta.new_type("EntityPage", rt.Widget, function(entity)
-    local out = meta.new(mn.EntityPage, {
+    return meta.new(mn.EntityPage, {
         _entity = entity,
         _info = mn.EntityInfo(entity),
-        _equip_slots = {},
-        _consumable_slot = mn.ConsumableSlot()
+        _slots = {}
     })
-
-    local slot_types = entity:get_equip_slot_types()
-    for type in values(slot_types) do
-        table.insert(out._equip_slots, mn.EquipSlot(type))
-    end
-    return out
 end)
 
 --- @override
@@ -20,39 +13,33 @@ function mn.EntityPage:realize()
     self._is_realized = true
 
     self._info:realize()
-    for slot in values(self._equip_slots) do
-        slot:realize()
-    end
-    self._consumable_slot:realize()
 end
 
 --- @override
 function mn.EntityPage:size_allocate(x, y, width, height)
     local m = rt.settings.margin_unit
 
-    local slot_w = self._equip_slots[1]:measure()
-    local slot_h = slot_w
-    local slot_x, slot_y = x, y + height - slot_h - m
-
-    self._info:fit_into(x, y, width, height - 2 * m - slot_h)
-    local current_x, current_y = x, slot_y
-    for slot in values(self._equip_slots) do
-        slot:fit_into(current_x, current_y, slot_w, slot_h)
-        current_x = current_x + slot_w + m
-    end
-    self._consumable_slot:fit_into(current_x, current_y, slot_w, slot_h)
 end
 
 --- @override
 function mn.EntityPage:draw()
     self._info:draw()
-    for slot in values(self._equip_slots) do
-        slot:draw()
-    end
-    self._consumable_slot:draw()
 end
 
 --- @brief
-function mn.EntityPage:preview_equip(equip)
-    local old
+function mn.EntityPage:preview_equip(equip_slot_i, equip)
+    local old = {
+        hp_base = self._entity:get_hp_base(),
+        attack_base = self._entity:get_attack_base(),
+        defense_base = self._entity:get_defense_base(),
+        speed_base = self._entity:get_speed_base()
+    }
+
+    local new = self._entity:preview_equip(equip_slot_i, equip)
+    self._info:set_preview_values(
+        ternary(new.hp_base ~= old.hp_base, new.hp_base, nil),
+        ternary(new.attack_base ~= old.attack_base, new.attack_base, nil),
+        ternary(new.defense_base ~= old.defense_base, new.defense_base, nil),
+        ternary(new.speed_base ~= old.speed_base, new.speed_base, nil)
+    )
 end

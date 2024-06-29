@@ -75,9 +75,7 @@ mn.Scene = meta.new_type("MenuScene", rt.Scene, function()
         -- entity side
         _current_entity = nil,    -- bt.Entity
 
-        _equip_slot_01 = {},
-        _equip_slot_02 = {},
-        _consumable_slot = {},
+        _entity_pages = {}, -- cf. realize
     })
 end)
 
@@ -182,12 +180,8 @@ function mn.Scene:realize()
 
     self._shared_list_frame:realize()
 
-    self._equip_slot_01 = mn.EquipSlot(bt.EquipType.UNKNOWN)
-    self._equip_slot_02 = mn.EquipSlot(bt.EquipType.UNKNOWN)
-    self._consumable_slot = mn.ConsumableSlot()
+    for entity in keys(self._state.entities) do
 
-    for slot in range(self._equip_slot_01, self._equip_slot_02, self._consumable_slot) do
-        slot:realize()
     end
 end
 
@@ -250,15 +244,6 @@ function mn.Scene:size_allocate(x, y, width, height)
     indicator_bounds.width = indicator_bounds.width - 2 * m
     indicator_bounds.height = indicator_bounds.width - 2 * m
     self._control_indicator:fit_into(indicator_bounds);
-
-    local slot_y = y + height - 2 * m
-    local slot_w = 50
-    local slot_x = x + 2 * m
-    self._equip_slot_01:fit_into(slot_x, slot_y, slot_w, slot_w)
-    slot_x = slot_x + slot_w + m
-    self._equip_slot_02:fit_into(slot_x, slot_y, slot_w, slot_w)
-    slot_x = slot_x + slot_w + m
-    self._consumable_slot:fit_into(slot_x, slot_y, slot_w, slot_w)
 end
 
 --- @override
@@ -273,10 +258,6 @@ function mn.Scene:draw()
     elseif self._current_shared_tab == self._shared_equip_tab_index then
         self._shared_equip_list:draw()
     end
-
-    self._equip_slot_01:draw()
-    self._equip_slot_02:draw()
-    self._consumable_slot:draw()
 
     self._control_indicator:draw()
 end

@@ -22,15 +22,17 @@
     </configurations>
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="7fa9ba1b-2cff-4ecc-86fb-59ab2fa76ee1" name="Changes" comment="stashing">
-      <change afterPath="$PROJECT_DIR$/menu/entity_page.lua" afterDir="false" />
+    <list default="true" id="7fa9ba1b-2cff-4ecc-86fb-59ab2fa76ee1" name="Changes" comment="added preview optionality">
+      <change afterPath="$PROJECT_DIR$/menu/slots.lua" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/battle/battle.lua" beforeDir="false" afterPath="$PROJECT_DIR$/battle/battle.lua" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/battle/entity.lua" beforeDir="false" afterPath="$PROJECT_DIR$/battle/entity.lua" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/battle/simulation_handler.lua" beforeDir="false" afterPath="$PROJECT_DIR$/battle/simulation_handler.lua" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/include.lua" beforeDir="false" afterPath="$PROJECT_DIR$/include.lua" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/main_menu.lua" beforeDir="false" afterPath="$PROJECT_DIR$/main_menu.lua" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/menu/entity_info.lua" beforeDir="false" afterPath="$PROJECT_DIR$/menu/entity_info.lua" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/menu/slot.lua" beforeDir="false" afterPath="$PROJECT_DIR$/menu/slot.lua" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/old/~common/common.lua" beforeDir="false" afterPath="$PROJECT_DIR$/old/~common/common.lua" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/menu/entity_page.lua" beforeDir="false" afterPath="$PROJECT_DIR$/menu/entity_page.lua" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/menu/scene.lua" beforeDir="false" afterPath="$PROJECT_DIR$/menu/scene.lua" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -84,6 +86,8 @@
     "Lua Application.main_swirl.executor": "Run",
     "Lua Application.main_thread.executor": "Run",
     "Lua Application.main_windows.executor": "Run",
+    "Lua Application.main_windows_battle.executor": "Run",
+    "Lua Application.main_windows_menu.executor": "Run",
     "Lua Application.overworld.executor": "Run",
     "Lua Application.rope.executor": "Run",
     "RunOnceActivity.OpenProjectViewOnStart": "true",
@@ -127,11 +131,11 @@
       <recent name="C:\Users\cleme\Workspace\rat_game\libs\windows\#" />
     </key>
   </component>
-  <component name="RunManager" selected="Lua Application.main_windows">
-    <configuration name="love" type="lua.app" factoryName="Lua Application">
+  <component name="RunManager" selected="Lua Application.main_windows_menu">
+    <configuration name="main_windows_battle" type="lua.app" factoryName="Lua Application">
       <module name="rat_game" />
-      <option name="program" value="/usr/bin/love" />
-      <option name="file" value="." />
+      <option name="program" value="C:\Users\cleme\Workspace\rat_game\love\windows\love.exe" />
+      <option name="file" value="main_battle.lua" />
       <option name="workingDir" value="$PROJECT_DIR$" />
       <option name="debuggerType" value="2" />
       <option name="params" value="" />
@@ -139,7 +143,7 @@
       <option name="showConsole" value="true" />
       <method v="2" />
     </configuration>
-    <configuration name="main_windows" type="lua.app" factoryName="Lua Application">
+    <configuration name="main_windows_menu" type="lua.app" factoryName="Lua Application">
       <module name="rat_game" />
       <option name="program" value="C:\Users\cleme\Workspace\rat_game\love\windows\love.exe" />
       <option name="file" value="main_menu.lua" />
@@ -188,8 +192,8 @@
     </configuration>
     <list>
       <item itemvalue="Emmy Debugger(NEW).remote_debugger" />
-      <item itemvalue="Lua Application.love" />
-      <item itemvalue="Lua Application.main_windows" />
+      <item itemvalue="Lua Application.main_windows_menu" />
+      <item itemvalue="Lua Application.main_windows_battle" />
     </list>
   </component>
   <component name="SpellCheckerSettings" RuntimeDictionaries="0" Folders="0" CustomDictionaries="0" DefaultDictionary="application-level" UseSingleDictionary="true" transferred="true" />
@@ -435,15 +439,7 @@
       <workItem from="1719331309887" duration="7255000" />
       <workItem from="1719338734310" duration="2967000" />
       <workItem from="1719342172568" duration="114000" />
-      <workItem from="1719342349559" duration="29959000" />
-    </task>
-    <task id="LOCAL-00804" summary="polish">
-      <option name="closed" value="true" />
-      <created>1718128176614</created>
-      <option name="number" value="00804" />
-      <option name="presentableId" value="LOCAL-00804" />
-      <option name="project" value="LOCAL" />
-      <updated>1718128176614</updated>
+      <workItem from="1719342349559" duration="37884000" />
     </task>
     <task id="LOCAL-00805" summary="stashing">
       <option name="closed" value="true" />
@@ -829,7 +825,15 @@
       <option name="project" value="LOCAL" />
       <updated>1719516743156</updated>
     </task>
-    <option name="localTasksCounter" value="853" />
+    <task id="LOCAL-00853" summary="added preview optionality">
+      <option name="closed" value="true" />
+      <created>1719673422997</created>
+      <option name="number" value="00853" />
+      <option name="presentableId" value="LOCAL-00853" />
+      <option name="project" value="LOCAL" />
+      <updated>1719673422997</updated>
+    </task>
+    <option name="localTasksCounter" value="854" />
     <servers />
   </component>
   <component name="TypeScriptGeneratedFilesManager">
@@ -878,7 +882,6 @@
     </option>
   </component>
   <component name="VcsManagerConfiguration">
-    <MESSAGE value="added entity info" />
     <MESSAGE value="reverted glsl version" />
     <MESSAGE value="readded main loop" />
     <MESSAGE value="formatted scrollbar" />
@@ -903,7 +906,8 @@
     <MESSAGE value="added type" />
     <MESSAGE value="added scrollable list backing" />
     <MESSAGE value="stashing" />
-    <option name="LAST_COMMIT_MESSAGE" value="stashing" />
+    <MESSAGE value="added preview optionality" />
+    <option name="LAST_COMMIT_MESSAGE" value="added preview optionality" />
   </component>
   <component name="XDebuggerManager">
     <breakpoint-manager>
