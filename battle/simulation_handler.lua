@@ -185,13 +185,14 @@ function bt.Scene:spawn_entities(...)
         end
 
         for equip_i, equip_id in ipairs(entry.equips) do
-            entity:add_equip(equip_i, bt.Equip(equip_id))
+            entity:add_equip(bt.Equip(equip_id), equip_i)
         end
 
         for move_id in values(entry.moveset) do
             entity:add_move(bt.Move(move_id))
         end
         table.insert(entities, entity)
+        entity:set_hp_current(entity:get_hp_base())
         self._state:add_entity(entity)
     end
 
@@ -200,6 +201,7 @@ function bt.Scene:spawn_entities(...)
         local animations = {}
         local messages = {}
         for entity in values(entities) do
+            entity:set_hp_current(entity:get_hp_base())
             self:add_entity_sprite(entity)
             if entity:get_is_enemy() then
                 table.insert(animations, bt.Animation.ENEMY_APPEARED(self:get_sprite(entity)))

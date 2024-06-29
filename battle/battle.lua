@@ -91,7 +91,7 @@ function bt.Battle:realize()
         end
 
         for equip_i, equip_id in ipairs(entry.equips) do
-            entity:add_equip(equip_i, bt.Equip(equip_id))
+            entity:add_equip(bt.Equip(equip_id), equip_i)
         end
 
         for move_id in values(entry.moveset) do
@@ -99,6 +99,9 @@ function bt.Battle:realize()
         end
 
         self:add_entity(entity)
+        meta.set_is_mutable(entity, true)
+        entity.hp_current = entity:get_hp_base()
+        meta.set_is_mutable(entity, false)
         i = i + 1
     end
 

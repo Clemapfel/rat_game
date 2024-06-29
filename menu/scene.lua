@@ -36,7 +36,6 @@ mn.InventoryState = meta.new_type("MenuInventoryState", function()
         shared_consumables = {}, -- Table<bt.Consumable, Number>
         shared_equips = {},      -- Table<bt.Equip, Number>
         stack = {},              -- Stack<Union<bt.Move, bt.Equip, bt.Consumable>>
-
         entities = {},           -- Queue<bt.Entity>
     })
 end)

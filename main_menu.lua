@@ -39,7 +39,7 @@ for entity in range(bt.Entity("MC"), bt.Entity("RAT"), bt.Entity("MC"), bt.Entit
 end
 
 local entity = bt.Entity("MC")
-entity:add_equip(1, nil)
+entity:add_equip(nil, 1)
 local page = mn.EntityPage(entity)
 
 page:realize()

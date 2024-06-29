@@ -4,21 +4,6 @@ rt.current_scene = bt.Scene()
 scene = rt.current_scene
 scene:set_background("CLOUDS")
 
-list = mn.ScrollableList()
-for i = 1, 30 do
-    list:push({bt.Move("DEBUG_MOVE"), rt.random.integer(1, 5)})
-end
-list:realize()
-
-input = rt.InputController()
-input:signal_connect("pressed", function(_, which)
-    if which == rt.InputButton.UP then
-        list:move_up()
-    else
-        list:move_down()
-    end
-end)
-
 --- ###
 
 love.load = function()
@@ -39,8 +24,6 @@ love.draw = function()
     if rt.current_scene ~= nil then
         rt.current_scene:draw()
     end
-
-    list:draw()
 
     if rt.settings.show_rulers == true then
         love.graphics.setLineWidth(1)
@@ -70,8 +53,6 @@ love.resize = function()
     if rt.current_scene ~= nil then
         rt.current_scene:fit_into(0, 0, love.graphics.getWidth(), love.graphics.getHeight())
     end
-
-    list:fit_into(50, 50, rt.graphics.get_width() / 2, rt.graphics.get_height() / 6)
 end
 
 love.run = function()
