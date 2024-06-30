@@ -64,9 +64,11 @@ end, {
 
     n_equip_slots = 2,
     equips = {}, -- List<{equip: bt.Equip}>
+    equip_to_equip_slot_i = {}, -- Table<bt.Equip, Number>
 
     n_consumable_slots = 1,
     consumables = {}, -- List<{consumable: bt.Consumable, n_consumed: Number}>
+    consumable_to_consumable_slot_i = {}, -- Table<bt.Consumable, Number>
 
     state = bt.EntityState.ALIVE,
     ai_level = bt.AILevel.RANDOM,
@@ -427,6 +429,37 @@ function bt.Entity:_assert_move_slot_i(i)
 end
 
 --- @brief
+function bt.Entity:add_move(move, move_slot_i)
+    if move_slot_i == nil then
+        for slot_i, entry in ipairs(self.moves) do
+            if entry.move == nil then
+                entry.move = move
+                entry.n_uses_left = move:get_max_n_uses()
+                self.move_to_move_slot_i[move] = slot_i
+                return
+            end
+        end
+
+        rt.error("In bt.Entity:add_move: entity has no free move slots")
+    else
+        self:_assert_move_slot_i(move_slot_i)
+        self.moves[move_slot_i].move = move
+        self.moves[move_slot_i].n_uses_left = move:get_max_n_uses()
+        self.move_to_move_slot_i[move] = move_slot_i
+    end
+end
+
+--- @brief
+function bt.Entity:remove_move(move)
+    local i = self.move_to_move_slot_i[move]
+    if i == nil then return end
+    self.moves[i] = {
+        move = nil,
+        n_uses_left = 0
+    }
+end
+
+--- @brief
 --- @param move_slot_i Number
 function bt.Entity:get_move(move_slot_i)
     self:_assert_move_slot_i(move_slot_i)
@@ -452,27 +485,6 @@ function bt.Entity:get_move_n_uses_left(move)
         return 0
     else
         return self.moves[i].n_uses_left
-    end
-end
-
---- @brief
-function bt.Entity:add_move(move, move_slot_i)
-    if move_slot_i == nil then
-        for slot_i, entry in ipairs(self.moves) do
-            if entry.move == nil then
-                entry.move = move
-                entry.n_uses_left = move:get_max_n_uses()
-                self.move_to_move_slot_i[move] = slot_i
-                return
-            end
-        end
-
-        rt.error("In bt.Entity:add_move: entity has no free move slots")
-    else
-        self:_assert_move_slot_i(move_slot_i)
-        self.moves[move_slot_i].move = move
-        self.moves[move_slot_i].n_uses_left = move:get_max_n_uses()
-        self.move_to_move_slot_i[move] = move_slot_i
     end
 end
 
@@ -525,6 +537,7 @@ function bt.Entity:add_equip(equip, equip_slot_i)
         for slot_i, entry in ipairs(self.equips) do
             if entry.equip == nil then
                 entry.equip = equip
+                self.equip_to_equip_slot_i[equip] = slot_i
                 return
             end
         end
@@ -534,6 +547,14 @@ function bt.Entity:add_equip(equip, equip_slot_i)
         self:_assert_equip_slot_i(equip_slot_i)
         self.equips[equip_slot_i].equip = equip
     end
+end
+
+--- @brief
+function bt.Entity:remove_equip(equip)
+    local i = self.equip_to_equip_slot_i[equip]
+    if equip == nil then return end
+    self.equips[i].equip = nil
+    self.equip_to_equip_slot_i[equip] = nil
 end
 
 --- @brief
@@ -547,11 +568,15 @@ end
 function bt.Entity:list_equips()
     local out = {}
     for equip in values(self.equips) do
-        table.insert(out, equip)
+        table.insert(out, equip.equip)
     end
     return out
 end
 
+--- @brief
+function bt.Entity:has_equip(equip)
+    return self.equip_to_equip_slot_i[equip] ~= nil
+end
 
 --- @brief [internal]
 function bt.Entity:_assert_equip_slot_i(i)
@@ -561,11 +586,12 @@ function bt.Entity:_assert_equip_slot_i(i)
 end
 
 --- @brief
-function bt.Entity:add_consumable(consumable_slot_i, consumable)
+function bt.Entity:add_consumable(consumable, consumable_slot_i)
     if consumable_slot_i == nil then
-        for slot_i, entry in ipairs(self.consumable) do
+        for slot_i, entry in ipairs(self.consumables) do
             if entry.consumable == nil then
                 entry.consumable = consumable
+                self.consumable_to_consumable_slot_i[consumable] = slot_i
                 return
             end
         end
@@ -579,12 +605,12 @@ end
 
 --- @brief
 function bt.Entity:remove_consumable(consumable)
-    for entry in values(self.consumables) do
-        if entry.consumable == consumable then
-            entry.consumable = nil
-            entry.n_consumed = 0
-        end
-    end
+    local i = self.consumable_to_consumable_slot_i[consumable]
+    if i == nil then return end
+    local entry = self.consumables[i]
+    entry.consumable = nil
+    entry.n_consumed = 0
+    self.consumable_to_consumable_slot_i[consumable] = nil
 end
 
 --- @brief
@@ -596,32 +622,21 @@ end
 
 --- @brief
 function bt.Entity:get_consumable_n_consumed(consumable)
-    for entry in values(self.consumables) do
-        if entry.consumable == consumable then
-            return entry.n_consumed
-        end
-    end
-    return 0
+    local entry = self.consumables[self.consumable_to_consumable_slot_i[consumable]]
+    if entry == nil then return 0 end
+    return entry.n_consumed
 end
 
 --- @brief
 function bt.Entity:get_consumable_n_uses_left(consumable)
-    for entry in values(self.consumables) do
-        if entry.consumable == consumable then
-            return clamp(consumable:get_max_n_uses() - entry.n_consumed, 0)
-        end
-    end
-    return 0
+    local entry = self.consumables[self.consumable_to_consumable_slot_i[consumable]]
+    if entry == nil then return 0 end
+    return clamp(consumable:get_max_n_uses() - entry.n_consumed, 0)
 end
 
 --- @brief
 function bt.Entity:has_consumable(consumable)
-    for entry in values(self.consumables) do
-        if entry.consumable == consumable then
-            return true
-        end
-    end
-    return false
+    return self.consumables[consumable] == nil
 end
 
 --- @brief
@@ -635,18 +650,15 @@ end
 
 --- @brief
 function bt.Entity:consume_consumable(consumable)
-    for entry in values(self.consumables) do
-        if entry.consumable == consumable then
-            entry.n_consumed = entry.n_consumed + 1
-            local n_left = entry.consumable:get_max_n_uses() - entry.n_consumed
-            if n_left <= 0 then
-                self:remove_consumable(consumable)
-            end
-            return n_left
-        end
+    local entry =  self.consumable_to_consumable_slot_i[consumable]
+    if entry == nil then return end
+    entry.n_consumed = entry.n_consumed + 1
+    local n_left = entry.consumable:get_max_n_uses() - entry.n_consumed
+    if n_left <= 0 then
+        self:remove_consumable(consumable)
     end
+    return n_left
 end
-
 
 --- @brief
 function bt.Entity:get_description()
@@ -672,4 +684,19 @@ function bt.Entity:preview_equip(equip_slot_i, new_equip)
 
     self:add_equip(before, equip_slot_i)
     return after_stats
+end
+
+--- @brief
+function bt.Entity:get_n_move_slots()
+    return self.n_move_slots
+end
+
+--- @brief
+function bt.Entity:get_n_consumable_slots()
+    return self.n_consumable_slots
+end
+
+--- @brief
+function bt.Entity:get_n_equip_slots()
+    return self.n_equip_slots
 end

@@ -22,15 +22,16 @@
     </configurations>
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="7fa9ba1b-2cff-4ecc-86fb-59ab2fa76ee1" name="Changes" comment="stashing before refactoring equip / consumable slot system">
-      <change afterPath="$PROJECT_DIR$/battle/~entity.lua" afterDir="false" />
+    <list default="true" id="7fa9ba1b-2cff-4ecc-86fb-59ab2fa76ee1" name="Changes" comment="refactored entity">
+      <change afterPath="$PROJECT_DIR$/menu/~slots.lua" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/battle/battle.lua" beforeDir="false" afterPath="$PROJECT_DIR$/battle/battle.lua" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/battle/configs/battles/DEBUG_BATTLE.lua" beforeDir="false" afterPath="$PROJECT_DIR$/battle/configs/battles/DEBUG_BATTLE.lua" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/battle/entity.lua" beforeDir="false" afterPath="$PROJECT_DIR$/battle/entity.lua" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/battle/simulation_handler.lua" beforeDir="false" afterPath="$PROJECT_DIR$/battle/simulation_handler.lua" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/main_battle.lua" beforeDir="false" afterPath="$PROJECT_DIR$/main_battle.lua" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/main_menu.lua" beforeDir="false" afterPath="$PROJECT_DIR$/main_menu.lua" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/menu/entity_info.lua" beforeDir="false" afterPath="$PROJECT_DIR$/menu/entity_info.lua" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/menu/scene.lua" beforeDir="false" afterPath="$PROJECT_DIR$/menu/scene.lua" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/menu/slot.lua" beforeDir="false" afterPath="$PROJECT_DIR$/menu/~slot.lua" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/menu/slots.lua" beforeDir="false" afterPath="$PROJECT_DIR$/menu/slots.lua" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -129,7 +130,7 @@
       <recent name="C:\Users\cleme\Workspace\rat_game\libs\windows\#" />
     </key>
   </component>
-  <component name="RunManager" selected="Lua Application.main_windows_battle">
+  <component name="RunManager" selected="Lua Application.main_windows_menu">
     <configuration name="main_windows_battle" type="lua.app" factoryName="Lua Application">
       <module name="rat_game" />
       <option name="program" value="C:\Users\cleme\Workspace\rat_game\love\windows\love.exe" />
@@ -437,15 +438,7 @@
       <workItem from="1719331309887" duration="7255000" />
       <workItem from="1719338734310" duration="2967000" />
       <workItem from="1719342172568" duration="114000" />
-      <workItem from="1719342349559" duration="42180000" />
-    </task>
-    <task id="LOCAL-00806" summary="stashing">
-      <option name="closed" value="true" />
-      <created>1718139528673</created>
-      <option name="number" value="00806" />
-      <option name="presentableId" value="LOCAL-00806" />
-      <option name="project" value="LOCAL" />
-      <updated>1718139528674</updated>
+      <workItem from="1719342349559" duration="54253000" />
     </task>
     <task id="LOCAL-00807" summary="stashing">
       <option name="closed" value="true" />
@@ -831,7 +824,15 @@
       <option name="project" value="LOCAL" />
       <updated>1719681378054</updated>
     </task>
-    <option name="localTasksCounter" value="855" />
+    <task id="LOCAL-00855" summary="refactored entity">
+      <option name="closed" value="true" />
+      <created>1719685860858</created>
+      <option name="number" value="00855" />
+      <option name="presentableId" value="LOCAL-00855" />
+      <option name="project" value="LOCAL" />
+      <updated>1719685860858</updated>
+    </task>
+    <option name="localTasksCounter" value="856" />
     <servers />
   </component>
   <component name="TypeScriptGeneratedFilesManager">
@@ -880,7 +881,6 @@
     </option>
   </component>
   <component name="VcsManagerConfiguration">
-    <MESSAGE value="readded main loop" />
     <MESSAGE value="formatted scrollbar" />
     <MESSAGE value="added jetbrains config" />
     <MESSAGE value="import" />
@@ -905,7 +905,8 @@
     <MESSAGE value="stashing" />
     <MESSAGE value="added preview optionality" />
     <MESSAGE value="stashing before refactoring equip / consumable slot system" />
-    <option name="LAST_COMMIT_MESSAGE" value="stashing before refactoring equip / consumable slot system" />
+    <MESSAGE value="refactored entity" />
+    <option name="LAST_COMMIT_MESSAGE" value="refactored entity" />
   </component>
   <component name="XDebuggerManager">
     <breakpoint-manager>

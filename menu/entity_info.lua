@@ -16,6 +16,9 @@ mn.EntityInfo = meta.new_type("MenuEntityInfo", rt.Widget, function(entity)
 
         _numerical_label_w = 0,
         _no_preview_x_offset = 100,
+
+        _final_w = 0,
+        _final_h = 0,
     })
 end)
 
@@ -63,9 +66,21 @@ function mn.EntityInfo:realize()
         end
     end
 
-    local measure_label = rt.Label("<b>" .. "000" .. "</b>")
+    local measure_label = rt.Label("<b>" .. "0000" .. "</b>")
     measure_label:realize()
-    self._numerical_label_w = select(1, measure_label:measure())
+    local value_w, value_h = measure_label:measure()
+    self._numerical_label_w = value_w
+
+    local heading_w, colon_w, arrow_w = NEGATIVE_INFINITY, NEGATIVE_INFINITY, NEGATIVE_INFINITY
+    for stat in range("hp", "attack", "defense", "speed") do
+        heading_w = math.max(heading_w, select(1, self["_" .. stat .. "_heading_label"]:measure()))
+        colon_w = math.max(colon_w, select(1, self["_" .. stat .. "_colon"]:measure()))
+        arrow_w = math.max(colon_w, select(1, self["_" .. stat .. "_arrow"]:measure()))
+    end
+
+    local m = rt.settings.margin_unit
+    self._final_w = 4 * m + 2 * value_w + heading_w + colon_w + arrow_w
+    self._final_h = 2 * m + 4 * value_h
 end
 
 function mn.EntityInfo:_update()
@@ -95,8 +110,6 @@ end
 
 --- @override
 function mn.EntityInfo:size_allocate(x, y, width, height)
-    self._frame:fit_into(x, y, width, height)
-
     local m = rt.settings.margin_unit
     local current_y = y + m
 
@@ -144,7 +157,7 @@ function mn.EntityInfo:size_allocate(x, y, width, height)
     end
 
     self._no_preview_x_offset = preview_align - value_align + max_arrow_w
-    self._frame:fit_into(x, y, max_x - x + 2 * m, current_y - y + m)
+    self._frame:fit_into(x, y, max_x - x + 2 * m, height)
 end
 
 --- @override
@@ -189,4 +202,9 @@ function mn.EntityInfo:set_preview_values(hp_preview, attack_preview, defense_pr
     self._speed_preview_value = speed_preview
     self:_update()
     self:reformat()
+end
+
+--- @brief
+function mn.EntityInfo:measure()
+    return self._final_w, self._final_h
 end

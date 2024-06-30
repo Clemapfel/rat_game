@@ -179,8 +179,61 @@ function mn.Scene:realize()
 
     self._shared_list_frame:realize()
 
-    for entity in keys(self._state.entities) do
+    for entity in values(self._state.entities) do
+        local equip_consumable_layout = {}
+        local n_equips = entity:get_n_equip_slots()
+        for i = 1, n_equips do
+            table.insert(equip_consumable_layout, mn.SlotType.EQUIP)
+        end
 
+        for i = 1, entity:get_n_consumable_slots() do
+            table.insert(equip_consumable_layout, mn.SlotType.CONSUMABLE)
+        end
+
+        local move_layout = {}
+        do
+            local n = entity:get_n_move_slots()
+            local to_push = {}
+            while n >= 1 do
+                table.insert(to_push, mn.SlotType.MOVE)
+                if #to_push >= 5 then
+                    table.insert(move_layout, to_push)
+                    to_push = {}
+                end
+                n = n - 1
+            end
+            if #to_push ~= 0 then
+                table.insert(move_layout, to_push)
+            end
+        end
+
+        local page = {
+            info = mn.EntityInfo(entity),
+            equips_and_consumables = mn.Slots({equip_consumable_layout}),
+            moves = mn.Slots(move_layout)
+        }
+
+        page.info:realize()
+        page.equips_and_consumables:realize()
+        page.moves:realize()
+
+        local movelist = entity:list_moves()
+        for i = 1, #movelist do
+            page.moves:set_object(i, movelist[i])
+        end
+
+        local equip_list = entity:list_equips()
+        for i = 1, #equip_list do
+            page.equips_and_consumables:set_object(i, equip_list[i])
+        end
+
+        local consumable_list = entity:list_consumables()
+        for i = 1, #consumable_list do
+            page.equips_and_consumables:set_object(i + n_equips, consumable_list[i])
+        end
+
+        self._entity_pages[entity] = page
+        if self._current_entity == nil then self._current_entity = entity end
     end
 end
 
@@ -209,8 +262,51 @@ end
 
 --- @override
 function mn.Scene:size_allocate(x, y, width, height)
+
     local padding = rt.settings.frame.thickness
-    local m = rt.settings.margin_unit
+    local m = 2 * rt.settings.margin_unit
+
+    local page_w, page_h = NEGATIVE_INFINITY, NEGATIVE_INFINITY
+    for page in values(self._entity_pages) do
+        local current_x, current_y = m, m
+        local info_w, info_h = page.info:measure()
+
+        local move_w, move_h = page.moves:measure()
+
+        move_w = move_w + 4 * m
+        move_h = move_h + 4 * m
+        local move_size = math.max(move_w, move_h)
+
+        local slot_h = 300
+
+        local _, equip_h = page.equips_and_consumables:measure()
+        equip_h = equip_h + 2 * m
+
+        current_y = y + height - m
+        page.equips_and_consumables:fit_into(current_x, current_y - equip_h, move_w, equip_h)
+        page.moves:fit_into(current_x, current_y - equip_h - move_h - padding, move_w, move_h)
+        page.info:fit_into(current_x, m, move_w, height - 2 * m - move_h - equip_h - 2 * padding)
+
+        page_w = math.max(page_w, info_w + move_w + 2 * padding)
+        page_h = math.max(page_h, info_h + move_h + 2 * padding)
+    end
+
+    local shared_x = x + m + page_w + m
+    local shared_w = width - 3 * m - page_w
+    for list in range(
+        self._shared_move_list,
+        self._shared_consumable_list,
+        self._shared_equip_list
+    ) do
+        list:fit_into(
+            shared_x,
+            m,
+            shared_w,
+            height - 2 * m
+        )
+    end
+
+    --[[
     local tab_x, tab_y = 200, 200
     local tab_offset = 0
     local tab_w, tab_h = self._shared_tab_bar:measure()
@@ -243,10 +339,13 @@ function mn.Scene:size_allocate(x, y, width, height)
     indicator_bounds.width = indicator_bounds.width - 2 * m
     indicator_bounds.height = indicator_bounds.width - 2 * m
     self._control_indicator:fit_into(indicator_bounds);
+    ]]--
 end
 
 --- @override
 function mn.Scene:draw()
+    if self._is_realized ~= true then return end
+
     self._shared_tab_bar:draw()
     self._shared_list_frame:draw()
 
@@ -259,4 +358,11 @@ function mn.Scene:draw()
     end
 
     self._control_indicator:draw()
+
+    local page = self._entity_pages[self._current_entity]
+    if page ~= nil then
+        page.info:draw()
+        page.equips_and_consumables:draw()
+        page.moves:draw()
+    end
 end

@@ -35,32 +35,28 @@ for consumable_id in range(
 end
 
 for entity in range(bt.Entity("MC"), bt.Entity("RAT"), bt.Entity("MC"), bt.Entity("GIRL")) do
+    local to_insert = entity
+    for move in range(
+        "DEBUG_MOVE",
+        "INSPECT",
+        "PROTECT",
+        "STRUGGLE",
+        "SURF",
+        "WISH"
+    ) do
+        entity:add_move(bt.Move(move))
+    end
+
+    entity:add_consumable(bt.Consumable("DEBUG_CONSUMABLE"))
+    entity:add_equip(bt.Equip("DEBUG_EQUIP"))
+
     table.insert(state.entities, entity)
 end
-
-local entity = bt.Entity("MC")
-entity:add_equip(nil, 1)
-local page = mn.EntityPage(entity)
-
-page:realize()
-page:fit_into(50, 50, 250, 500)
-page:preview_equip(1, bt.Equip("DEBUG_EQUIP"))
-
-slot = mn.Slots(3, 1)
-slot:realize()
-slot:fit_into(50, 50, 400, 200)
 
 switch = false
 input = rt.InputController()
 input:signal_connect("pressed", function(_, which)
-    if which == rt.InputButton.A then
-        if switch == false then
-            page:preview_equip(1, bt.Equip("DEBUG_EQUIP"))
-        else
-            page:preview_equip(1, nil)
-        end
-        switch = not switch
-    end
+
 end)
 
 --- ###
@@ -76,11 +72,8 @@ rt.settings.show_fps = true
 
 love.draw = function()
     if rt.current_scene ~= nil then
-        --rt.current_scene:draw()
+        rt.current_scene:draw()
     end
-
-    --page:draw()
-    slot:draw()
 
     if rt.settings.show_rulers == true then
         love.graphics.setLineWidth(1)
@@ -115,7 +108,7 @@ end
 love.run = function()
     love.window.setMode(1920 / 1.5, 1080 / 1.5, {
         vsync = -1, -- adaptive vsync, may tear but tries to stay as close to 60hz as possible
-        msaa = 0,
+        msaa = 8,
         stencil = true,
         resizable = true,
         borderless = false
@@ -124,7 +117,7 @@ love.run = function()
     love.filesystem.setIdentity("rat_game")
 
     local major, minor = love.getVersion()
-    print("Love2D " .. major .. "." .. minor .. " | " .. jit.version)
+    println("Love2D " .. major .. "." .. minor .. " | " .. jit.version)
 
     if love.load then love.load() end
     love.timer.step()
@@ -177,9 +170,12 @@ love.run = function()
         love.update(delta)
         update_duration = love.timer.getTime() - update_before
 
+        local background_color = rt.Palette.TRUE_MAGENTA
         if love.graphics.isActive() then
             love.graphics.clear(true, true, true)
             rt.graphics.reset()
+            love.graphics.setColor(background_color.r, background_color.g, background_color.b, 1)
+            love.graphics.rectangle("fill", 0, 0, love.graphics.getWidth(), love.graphics.getHeight())
 
             local draw_before = love.timer.getTime()
             love.draw()
