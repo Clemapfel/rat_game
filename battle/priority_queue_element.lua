@@ -1,6 +1,5 @@
 rt.settings.battle.priority_queue_element = {
     font = rt.settings.font.default,
-    thumbnail_size = 32, -- resolution of subimage
     frame_thickness = 3,
     base_color = rt.color_darken(rt.Palette.GRAY_5, 0.05),
     frame_color = rt.Palette.GRAY_2,
@@ -11,8 +10,6 @@ rt.settings.battle.priority_queue_element = {
     dead_base_color = rt.Palette.GRAY_6,
     dead_shape_alpha = 1,
     dead_frame_color = rt.Palette.GRAY_5,
-
-    corner_radius = 10,
 }
 
 --- @class bt.PriorityQueueElement
@@ -106,7 +103,7 @@ function bt.PriorityQueueElement:realize()
     )
 
     self._stencil = rt.Rectangle(0, 0, 1, 1)
-    self._stencil:set_corner_radius(rt.settings.battle.priority_queue_element.corner_radius)
+    self._stencil:set_corner_radius(rt.settings.battle.gradient_frame.corner_radius)
 
     self:_update_state()
 end

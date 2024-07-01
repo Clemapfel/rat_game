@@ -1,3 +1,7 @@
+rt.settings.battle.gradient_frame = {
+    corner_radius = 10
+}
+
 --- @class bt.GradientFrame
 bt.GradientFrame = meta.new_type("GradientFrame", rt.Widget, function()
     return meta.new(bt.GradientFrame, {
@@ -30,7 +34,7 @@ function bt.GradientFrame:realize()
     )
     self._frame_gradient:set_is_vertical(true)
     for shape in range(self._backdrop, self._frame, self._frame_outline) do
-        shape:set_corner_radius(rt.settings.battle.priority_queue_element.corner_radius)
+        shape:set_corner_radius(rt.settings.battle.gradient_frame.corner_radius)
     end
 end
 

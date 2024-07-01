@@ -34,7 +34,9 @@ for consumable_id in range(
     state.shared_consumables[bt.Consumable(consumable_id)] = rt.random.integer(1, 5)
 end
 
-for entity in range(bt.Entity("MC"), bt.Entity("RAT"), bt.Entity("MC"), bt.Entity("GIRL")) do
+local entities = {bt.Entity("MC"), bt.Entity("RAT"), bt.Entity("PROF"), bt.Entity("GIRL")}
+
+for entity in values(entities) do
     local to_insert = entity
     for move in range(
         "DEBUG_MOVE",
@@ -52,12 +54,6 @@ for entity in range(bt.Entity("MC"), bt.Entity("RAT"), bt.Entity("MC"), bt.Entit
 
     table.insert(state.entities, entity)
 end
-
-switch = false
-input = rt.InputController()
-input:signal_connect("pressed", function(_, which)
-
-end)
 
 --- ###
 
@@ -106,7 +102,7 @@ love.resize = function()
 end
 
 love.run = function()
-    love.window.setMode(1920 / 1.5, 1080 / 1.5, {
+    love.window.setMode(1600, 900, {
         vsync = -1, -- adaptive vsync, may tear but tries to stay as close to 60hz as possible
         msaa = 8,
         stencil = true,

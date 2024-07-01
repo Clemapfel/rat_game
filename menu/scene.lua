@@ -46,7 +46,6 @@ mn.Scene = meta.new_type("MenuScene", rt.Scene, function()
         _state = mn.InventoryState(),
 
         -- shared side
-        _shared_tab_bar = mn.TabBar(),
         _shared_list_frame = rt.Frame(),
         _shared_move_tab_sprite = {}, -- rt.Sprite
         _shared_equip_tab_sprite = {}, -- rt.Sprite
@@ -64,6 +63,8 @@ mn.Scene = meta.new_type("MenuScene", rt.Scene, function()
         _shared_list_mode = mn.ScrollableListSortMode.BY_ID,
         _current_shared_tab = 3,
 
+        _shared_tabs = mn.TabBar(),
+        _shared_tabs_x_offset = 0,
         _shared_move_list = mn.ScrollableList(),
         _shared_equip_list = mn.ScrollableList(),
         _shared_consumable_list = mn.ScrollableList(),
@@ -72,9 +73,11 @@ mn.Scene = meta.new_type("MenuScene", rt.Scene, function()
         _control_indicator = rt.ControlIndicator(),
 
         -- entity side
+        _entity_tabs = mn.TabBar(),
         _current_entity = nil,    -- bt.Entity
 
         _entity_pages = {}, -- cf. realize
+        _entity_page_x_offset = 0,
     })
 end)
 
@@ -139,6 +142,13 @@ function mn.Scene:realize()
     self._shared_consumable_tab_sprite = rt.Sprite(settings.tab_bar_sprite_id, settings.consumables_sprite_index)
     self._shared_equip_tab_sprite = rt.Sprite(settings.tab_bar_sprite_id, settings.equips_sprite_index)
 
+    local temp_label_font =  rt.Font(80,
+        "assets/fonts/DejaVuSans/DejaVuSans-Regular.ttf",
+        "assets/fonts/DejaVuSans/DejaVuSans-Bold.ttf",
+        "assets/fonts/DejaVuSans/DejaVuSans-Italic.ttf",
+        "assets/fonts/DejaVuSans/DejaVuSans-BoldItalic.ttf"
+    )
+
     local tab_sprites = {
         [self._shared_move_tab_index] = self._shared_move_tab_sprite,
         [self._shared_consumable_tab_index] = self._shared_consumable_tab_sprite,
@@ -146,11 +156,19 @@ function mn.Scene:realize()
     }
 
     for sprite in values(tab_sprites) do
-        self._shared_tab_bar:push(sprite)
-        sprite:realize()
+        local sprite_w, sprite_h = sprite:get_resolution()
+        sprite_w = sprite_w * 2
+        sprite_h = sprite_h * 2
+        sprite:set_minimum_size(sprite_w, sprite_h)
+        self._shared_tabs:push(sprite)
     end
 
-    self._shared_tab_bar:realize()
+    local template_label = rt.Label("<o>T</o>")
+    self._shared_tabs:push(template_label)
+
+    self._shared_tabs:set_orientation(rt.Orientation.HORIZONTAL)
+    self._shared_tabs:set_n_post_aligned_items(1)
+    self._shared_tabs:realize()
 
     -- shared lists
     local moves = {}
@@ -179,7 +197,15 @@ function mn.Scene:realize()
 
     self._shared_list_frame:realize()
 
+    -- pages
     for entity in values(self._state.entities) do
+        local tab_sprite = rt.Sprite(entity:get_sprite_id())
+        local sprite_w, sprite_h = tab_sprite:get_resolution()
+        sprite_w = sprite_w * 3
+        sprite_h = sprite_h * 3
+        tab_sprite:set_minimum_size(sprite_w, sprite_h)
+        self._entity_tabs:push(tab_sprite)
+
         local equip_consumable_layout = {}
         local n_equips = entity:get_n_equip_slots()
         for i = 1, n_equips do
@@ -235,6 +261,12 @@ function mn.Scene:realize()
         self._entity_pages[entity] = page
         if self._current_entity == nil then self._current_entity = entity end
     end
+
+    local settings_label = rt.Label("<o>\u{2699}</o>", temp_label_font)
+    self._entity_tabs:push(settings_label)
+    self._entity_tabs:set_n_post_aligned_items(1)
+    self._entity_tabs:set_orientation(rt.Orientation.VERTICAL)
+    self._entity_tabs:realize()
 end
 
 --- @brief
@@ -262,13 +294,17 @@ end
 
 --- @override
 function mn.Scene:size_allocate(x, y, width, height)
-
     local padding = rt.settings.frame.thickness
     local m = 2 * rt.settings.margin_unit
 
+    local portrait_w = 6 * m
+    local portrait_x, portrait_y = x + m, y + m
+
     local page_w, page_h = NEGATIVE_INFINITY, NEGATIVE_INFINITY
+    local page_x, page_y = m, m
+    local slots_h, slots_w = NEGATIVE_INFINITY, NEGATIVE_INFINITY
     for page in values(self._entity_pages) do
-        local current_x, current_y = m, m
+        local current_x, current_y = page_x, portrait_y
         local info_w, info_h = page.info:measure()
 
         local move_w, move_h = page.moves:measure()
@@ -278,75 +314,53 @@ function mn.Scene:size_allocate(x, y, width, height)
         local move_size = math.max(move_w, move_h)
 
         local slot_h = 300
-
         local _, equip_h = page.equips_and_consumables:measure()
         equip_h = equip_h + 2 * m
 
         current_y = y + height - m
         page.equips_and_consumables:fit_into(current_x, current_y - equip_h, move_w, equip_h)
-        page.moves:fit_into(current_x, current_y - equip_h - move_h - padding, move_w, move_h)
-        page.info:fit_into(current_x, m, move_w, height - 2 * m - move_h - equip_h - 2 * padding)
+        page.moves:fit_into(current_x, current_y - equip_h - move_h - padding - 0.5 * m, move_w, move_h)
+        page.info:fit_into(current_x, m, move_w, height - 2 * m - move_h - equip_h - 2 * padding - mst)
 
         page_w = math.max(page_w, info_w + move_w + 2 * padding)
         page_h = math.max(page_h, info_h + move_h + 2 * padding)
+        slots_h = math.max(slots_h, equip_h)
+        slots_w = math.max(slots_w, move_w)
     end
 
-    local shared_x = x + m + page_w + m
-    local shared_w = width - 3 * m - page_w
+    self._entity_page_x_offset = slots_h + m
+    self._entity_tabs:fit_into(x + m, y + m, slots_h, height - 2 * m)
+
+    local control_w, control_h = self._control_indicator:measure()
+    self._control_indicator:fit_into(x + width - control_w - m, y + height - control_h - m, control_w, control_h)
+
+    local shared_w = slots_w * 1.5
+    local shared_x = x + width - m - shared_w
+    local shared_y = m
+
+    local shared_tabs_h = 32 * 2.5
+    self._shared_tabs:fit_into(shared_x, shared_y, x + width - shared_x - m, shared_tabs_h)
+    self._shared_tabs_x_offset = 0 -- width - select(1, self._shared_tabs:measure())
+
+    shared_y = shared_y + shared_tabs_h + m / 2
+    local shared_h = height - 2 * m - (shared_y - m) - control_h - m / 2
+    local shared_m = rt.settings.margin_unit
     for list in range(
         self._shared_move_list,
         self._shared_consumable_list,
         self._shared_equip_list
     ) do
-        list:fit_into(
-            shared_x,
-            m,
-            shared_w,
-            height - 2 * m
-        )
+        list:fit_into(shared_x + shared_m, shared_y + shared_m, shared_w - 2 * shared_m, shared_h - 2 * shared_m)
     end
 
-    --[[
-    local tab_x, tab_y = 200, 200
-    local tab_offset = 0
-    local tab_w, tab_h = self._shared_tab_bar:measure()
-    self._shared_tab_bar:fit_into(tab_x + tab_offset + padding + 2, tab_y, tab_w, tab_h)
-    tab_w, tab_h = self._shared_tab_bar:measure() -- update after resize
-
-    local shared_list_w = 400
-    local shared_list_h = 100
-    local shared_list_frame_bounds = rt.AABB(tab_x, tab_y + tab_h, shared_list_w, shared_list_h)
-    local x_margin, y_margin = m, 0.5 * m
-    for list in range(
-        self._shared_move_list,
-        self._shared_consumable_list,
-        self._shared_equip_list
-    ) do
-        list:fit_into(
-            shared_list_frame_bounds.x + x_margin,
-            shared_list_frame_bounds.y + y_margin,
-            shared_list_frame_bounds.width - 2 * x_margin,
-            shared_list_frame_bounds.height - 2 * y_margin
-        )
-    end
-
-    self._shared_list_frame:fit_into(shared_list_frame_bounds)
-
-    local indicator_bounds = rt.AABB(x, y, width, height)
-    local m = 2 * rt.settings.margin_unit
-    indicator_bounds.x = m
-    indicator_bounds.y = m
-    indicator_bounds.width = indicator_bounds.width - 2 * m
-    indicator_bounds.height = indicator_bounds.width - 2 * m
-    self._control_indicator:fit_into(indicator_bounds);
-    ]]--
+    self._shared_list_frame:fit_into(shared_x, shared_y, shared_w, shared_h)
 end
 
 --- @override
 function mn.Scene:draw()
     if self._is_realized ~= true then return end
 
-    self._shared_tab_bar:draw()
+    self._entity_tabs:draw()
     self._shared_list_frame:draw()
 
     if self._current_shared_tab == self._shared_move_tab_index then
@@ -357,12 +371,18 @@ function mn.Scene:draw()
         self._shared_equip_list:draw()
     end
 
+    rt.graphics.translate(self._shared_tabs_x_offset, 0)
+    self._shared_tabs:draw()
+    rt.graphics.translate(-self._shared_tabs_x_offset, 0)
+
     self._control_indicator:draw()
 
+    rt.graphics.translate(self._entity_page_x_offset, 0)
     local page = self._entity_pages[self._current_entity]
     if page ~= nil then
         page.info:draw()
         page.equips_and_consumables:draw()
         page.moves:draw()
     end
+    rt.graphics.translate(-self._entity_page_x_offset, 0)
 end

@@ -146,13 +146,19 @@ function rt.Frame:remove_child()
 end
 
 --- @brief
-function rt.Frame:set_color(color)
+function rt.Frame:set_color(color, base_color)
     if meta.is_hsva(color) then
         color = rt.rgba_to_hsva(color)
     end
 
     self._color = color
     self._frame:set_color(self._color)
+
+    if base_color ~= nil then
+        self._stencil_mask:set_color(base_color)
+    else
+        self._stencil_mask:set_color(rt.Palette.BACKGROUND)
+    end
 end
 
 --- @brief
@@ -169,6 +175,7 @@ function rt.Frame:set_thickness(thickness)
     if self._thickness ~= thickness then
         self._thickness = thickness
         self._frame:set_line_width(self._thickness)
+        self._frame_outline:set_line_width(self._thickness + 2)
         self:reformat()
     end
 end
