@@ -8,9 +8,7 @@ mn.EntityPortraits = meta.new_type("EntityPortraits", rt.Widget, function(entiti
     return meta.new(mn.EntityPortraits, {
         _entities = which(entities, {}),
         _selected_entity = nil,
-
         _settings_button = {},
-
         _items = {}
     })
 end)

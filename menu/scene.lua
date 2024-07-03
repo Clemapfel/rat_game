@@ -78,6 +78,9 @@ mn.Scene = meta.new_type("MenuScene", rt.Scene, function()
 
         _entity_pages = {}, -- cf. realize
         _entity_page_x_offset = 0,
+
+        -- selection
+        _selection_items = {}
     })
 end)
 
@@ -317,10 +320,15 @@ function mn.Scene:size_allocate(x, y, width, height)
         local _, equip_h = page.equips_and_consumables:measure()
         equip_h = equip_h + 2 * m
 
-        current_y = y + height - m
-        page.equips_and_consumables:fit_into(current_x, current_y - equip_h, move_w, equip_h)
-        page.moves:fit_into(current_x, current_y - equip_h - move_h - padding - 0.5 * m, move_w, move_h)
-        page.info:fit_into(current_x, m, move_w, height - 2 * m - move_h - equip_h - 2 * padding - mst)
+        current_y = y + m
+
+        local move_y = current_y
+        page.moves:fit_into(current_x, current_y, move_w, move_h)
+        local equip_y = move_y + move_h + 2 * padding
+        page.equips_and_consumables:fit_into(current_x, equip_y, move_w, equip_h)
+        local info_y = equip_y + equip_h + 2 * padding
+        local info_h = y + height - m - info_y
+        page.info:fit_into(current_x, info_y, move_w, info_h)
 
         page_w = math.max(page_w, info_w + move_w + 2 * padding)
         page_h = math.max(page_h, info_h + move_h + 2 * padding)
@@ -385,4 +393,9 @@ function mn.Scene:draw()
         page.moves:draw()
     end
     rt.graphics.translate(-self._entity_page_x_offset, 0)
+end
+
+--- @brief [internal]
+function mn.Scene:_regenerate_selection_items()
+
 end

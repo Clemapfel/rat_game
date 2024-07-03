@@ -183,6 +183,7 @@ require "battle.scene_state_manager"
 require "battle.scene"
 require "battle.simulation_handler"
 
+require "menu.selection_graph"
 require "menu.slots"
 require "menu.entity_info"
 require "menu.scrollable_list"

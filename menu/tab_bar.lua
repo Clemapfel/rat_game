@@ -11,7 +11,8 @@ mn.TabBar = meta.new_type("TabBar", rt.Widget, function()
         _n_post_aligned_items = 1,
         _orientation = rt.Orientation.HORIZONTAL,
         _final_w = 1,
-        _final_h = 1
+        _final_h = 1,
+        _selection_nodes = {}, -- List<mn.SelectionGraphNode>
     })
 end)
 
@@ -50,6 +51,7 @@ end
 
 --- @override
 function mn.TabBar:size_allocate(x, y, width, height)
+    self._selection_nodes = {}
 
     local m = rt.settings.margin_unit
     local min_x, max_x, min_y, max_y = POSITIVE_INFINITY, NEGATIVE_INFINITY, POSITIVE_INFINITY, NEGATIVE_INFINITY
@@ -111,6 +113,10 @@ function mn.TabBar:size_allocate(x, y, width, height)
         local item = self._items[item_i]
         size_allocate_item(item, current_x, current_y)
 
+        local node = mn.SelectionGraphNode()
+        node:set_aabb(current_x, current_y, item_w, item_h)
+        self._selection_nodes[item_i] = node
+
         if self._orientation == rt.Orientation.HORIZONTAL then
             current_x = current_x + item_w + item_m
         else
@@ -130,6 +136,10 @@ function mn.TabBar:size_allocate(x, y, width, height)
         local item = self._items[item_i]
         size_allocate_item(item, current_x, current_y)
 
+        local node = mn.SelectionGraphNode()
+        node:set_aabb(current_x, current_y, item_w, item_h)
+        self._selection_nodes[item_i] = node
+
         min_x = math.min(min_x, current_x)
         max_x = math.max(max_x, current_x + item_w)
         min_y = math.min(min_y, current_y)
@@ -144,6 +154,34 @@ function mn.TabBar:size_allocate(x, y, width, height)
 
     self._final_w = max_x - min_x
     self._final_h = max_y - min_y
+
+    for i = 1, self._n_items do
+        local previous = self._selection_nodes[i-1]
+        local current = self._selection_nodes[i]
+        local next = self._selection_nodes[i+1]
+
+        if self._orientation == rt.Orientation.HORIZONTAL then
+            current:set_left(previous)
+            if previous ~= nil then
+                previous:set_right(current)
+            end
+
+            current:set_right(next)
+            if next ~= nil then
+                next:set_left(current)
+            end
+        else
+            current:set_up(previous)
+            if previous ~= nil then
+                previous:set_down(current)
+            end
+
+            current:set_down(next)
+            if next ~= nil then
+                next:set_up(current)
+            end
+        end
+    end
 end
 
 --- @override
@@ -159,6 +197,10 @@ function mn.TabBar:draw()
         rt.graphics.set_stencil_test()
 
         item_i = item_i + 1
+    end
+
+    for node in values(self._selection_nodes) do
+        node:draw()
     end
 end
 
@@ -199,4 +241,12 @@ end
 --- @brief
 function mn.TabBar:measure()
     return self._final_w, self._final_h
+end
+
+--- @brief
+function mn.TabBar:get_selection_nodes()
+    local out = {}
+    for node in values(self._selection_nodes) do
+
+    end
 end

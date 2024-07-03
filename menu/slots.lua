@@ -16,7 +16,8 @@ mn.Slots = meta.new_type("MenuSlots", rt.Widget, function(layout)
         _layout = layout,
         _items = {},
         _slot_i_to_item = {},
-        _frame = rt.Frame()
+        _frame = rt.Frame(),
+        _selection_nodes = {}
     })
 end)
 
@@ -70,6 +71,7 @@ function mn.Slots:realize()
             to_insert.frame:set_color(rt.Palette.GRAY_4)
             to_insert.frame:set_is_outline(true)
             to_insert.bounds = rt.AABB(0, 0, 1, 1)
+            to_insert.selection_node = mn.SelectionGraphNode()
 
             table.insert(row, to_insert)
             self._slot_i_to_item[slot_i] = to_insert
@@ -95,13 +97,15 @@ function mn.Slots:size_allocate(x, y, width, height)
     current_y = current_y + slot_vertical_m
     slot_vertical_m = math.max(slot_vertical_m, m)
 
-    for row in values(self._items) do
+    for row_i = 1, n_rows do
+        local row = self._items[row_i]
         local n_slots = sizeof(row)
         local slot_m = ((width - 2 * m) - (n_slots * slot_w)) / (n_slots + 1)
         slot_m = math.max(slot_m, m)
 
         current_x = current_x + slot_m
-        for slot in values(row) do
+        for slot_i = 1, #row do
+            local slot = row[slot_i]
             if slot.type == mn.SlotType.EQUIP then
                 local center_x, center_y = current_x + 0.5 * slot_w, current_y + 0.5 * slot_h
                 local points = {}
@@ -131,6 +135,38 @@ function mn.Slots:size_allocate(x, y, width, height)
             end
 
             slot.base_inlay:resize(current_x + 0.5 * slot_w, current_y + 0.5 * slot_w, 0.5 * inlay_factor * slot_w, 0.5 * inlay_factor * slot_w)
+
+            slot.selection_node:set_aabb(current_x, current_y, slot_w, slot_w)
+
+            local left, right = row[slot_i - 1], row[slot_i + 1]
+            slot.selection_node:set_left(nil)
+            if left ~= nil then
+                slot.selection_node:set_left(left.selection_node)
+            end
+
+            slot.selection_node:set_right(nil)
+            if right ~= nil then
+                slot.selection_node:set_right(right.selection_node)
+            end
+
+            slot.selection_node:set_up(nil)
+            local up_row = self._items[row_i - 1]
+            if up_row ~= nil then
+                local up_item = up_row[slot_i]
+                if up_item ~= nil then
+                    slot.selection_node:set_up(up_item.selection_node)
+                end
+            end
+
+            slot.selection_node:set_down(nil)
+            local down_row = self._items[row_i - 1]
+            if down_row ~= nil then
+                local down_item = down_row[slot_i]
+                if down_item ~= nil then
+                    slot.selection_node:set_down(down_item.selection_node)
+                end
+            end
+
             current_x = current_x + slot_w + slot_m
         end
 
@@ -153,6 +189,7 @@ function mn.Slots:draw()
             if item.sprite ~= nil then
                 item.sprite:draw()
             end
+            item.selection_node:draw()
         end
     end
 end
