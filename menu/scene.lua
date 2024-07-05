@@ -1,27 +1,3 @@
---[[
-Entities:
-
-    portraits tab bar
-    HP
-    tab bar
-    name label
-    moves / consumables / equips label
-
-    list of items:
-    Header: Name, AP, Type
-        list of moves
-            Icon, Name, Max Uses
-        list of consumables
-            Icon, Name
-        list of equips
-            Icon, Name, Type
-
-    Verbose info
-
-    Equip Slot
-    Consumable Slot
-]]--
-
 rt.settings.menu.scene = {
     tab_bar_sprite_id = "menu_icons",
     equips_sprite_index = "equips",
@@ -40,110 +16,60 @@ mn.InventoryState = meta.new_type("MenuInventoryState", function()
     })
 end)
 
---- @class mn.Scene
 mn.Scene = meta.new_type("MenuScene", rt.Scene, function()
     return meta.new(mn.Scene, {
         _state = mn.InventoryState(),
 
-        -- shared side
+        _control_indicator = rt.ControlIndicator(),
+        _inventory_header_label = {}, -- rt.Label
+        _inventory_header_frame = rt.Frame(),
+
         _shared_list_frame = rt.Frame(),
         _shared_move_tab_sprite = {}, -- rt.Sprite
         _shared_equip_tab_sprite = {}, -- rt.Sprite
         _shared_consumable_tab_sprite = {}, -- rt.Sprite
-        _shared_move_tab_index = 1,
-        _shared_consumable_tab_index = 2,
-        _shared_equip_tab_index = 3,
 
-        _shared_list_mode_order = {
-            [mn.ScrollableListSortMode.BY_TYPE] = mn.ScrollableListSortMode.BY_NAME,
-            [mn.ScrollableListSortMode.BY_NAME] = mn.ScrollableListSortMode.BY_QUANTITY,
-            [mn.ScrollableListSortMode.BY_QUANTITY] = mn.ScrollableListSortMode.BY_ID,
-            [mn.ScrollableListSortMode.BY_ID] = mn.ScrollableListSortMode.BY_TYPE,
-        },
-        _shared_list_mode = mn.ScrollableListSortMode.BY_ID,
-        _current_shared_tab = 3,
+        _shared_tab_bar = mn.TabBar(),
+        _shared_list_sort_mode = mn.ScrollableListSortMode.BY_ID,
 
-        _shared_tabs = mn.TabBar(),
-        _shared_tabs_x_offset = 0,
+        _current_shader_list_index = 1,
         _shared_move_list = mn.ScrollableList(),
         _shared_equip_list = mn.ScrollableList(),
         _shared_consumable_list = mn.ScrollableList(),
+        _shared_template_list = mn.ScrollableList(),
 
-        _input_controller = rt.InputController(),
-        _control_indicator = rt.ControlIndicator(),
+        _entity_tab_bar = mn.TabBar(),
+        _entity_pages = {}, -- Table<Number, {info, equips_and_consumables, moves}>
+        _current_entity_i = 1,
 
-        -- entity side
-        _entity_tabs = mn.TabBar(),
-        _current_entity = nil,    -- bt.Entity
-
-        _entity_pages = {}, -- cf. realize
-        _entity_page_x_offset = 0,
-
-        -- selection
-        _selection_items = {}
+        _selection_nodes = {}, -- Table<mn.SelectionGraphNode>
     })
-end)
+end, {
+    _shared_move_tab_index = 1,
+    _shared_consumable_tab_index = 2,
+    _shared_equip_tab_index = 3,
+    _shared_template_tab_index = 4,
 
---- @brief [internal]
-function mn.Scene:_handle_button_pressed(which)
-    local current_list
-    if self._current_shared_tab == self._shared_move_tab_index then
-        current_list = self._shared_move_list
-    elseif self._current_shared_tab == self._shared_consumable_tab_index then
-        current_list = self._shared_consumable_list
-    elseif self._current_shared_tab == self._shared_equip_tab_index then
-        current_list = self._shared_equip_list
-    end
-
-    if which == rt.InputButton.UP then
-        current_list:move_up()
-    elseif which == rt.InputButton.DOWN then
-        current_list:move_down()
-    elseif which == rt.InputButton.A then
-        current_list:take(current_list:get_selected())
-    elseif which == rt.InputButton.B then
-        current_list:add(bt.Equip("DEBUG_EQUIP"))
-    elseif which == rt.InputButton.X then
-        self._shared_list_mode = self._shared_list_mode_order[self._shared_list_mode]
-        self._shared_move_list:set_sort_mode(self._shared_list_mode)
-        self._shared_equip_list:set_sort_mode(self._shared_list_mode)
-        self._shared_consumable_list:set_sort_mode(self._shared_list_mode)
-        self:_update_control_indicator()
-    elseif which == rt.InputButton.RIGHT then
-        if self._current_shared_tab == self._shared_move_tab_index then
-            self._current_shared_tab = self._shared_consumable_tab_index
-        elseif self._current_shared_tab == self._shared_consumable_tab_index then
-            self._current_shared_tab = self._shared_equip_tab_index
-        elseif self._current_shared_tab == self._shared_equip_tab_index then
-            self._current_shared_tab = self._shared_move_tab_index
-        end
-    end
-end
+    _shared_list_sort_mode_order = {
+        [mn.ScrollableListSortMode.BY_TYPE] = mn.ScrollableListSortMode.BY_NAME,
+        [mn.ScrollableListSortMode.BY_NAME] = mn.ScrollableListSortMode.BY_QUANTITY,
+        [mn.ScrollableListSortMode.BY_QUANTITY] = mn.ScrollableListSortMode.BY_ID,
+        [mn.ScrollableListSortMode.BY_ID] = mn.ScrollableListSortMode.BY_TYPE,
+    },
+})
 
 --- @override
 function mn.Scene:realize()
     if self._is_realized == true then return end
     self._is_realized = true
 
-    self._input_controller:signal_connect("pressed", function(_, button)
-        if self._current_state ~= nil then
-            self._current_state:handle_button_pressed(button)
-        end
+    self._inventory_header_label = rt.Label("<o>Inventory</o>")
+    self._inventory_header_label:realize()
+    self._inventory_header_label:set_justify_mode(rt.JustifyMode.CENTER)
+    self._inventory_header_frame:realize()
 
-        self:_handle_button_pressed(button)
-    end)
-
-    self._input_controller:signal_connect("released",  function(_, button)
-        if self._current_state ~= nil then
-            self._current_state:handle_button_released(button)
-        end
-    end)
-
-    -- tab
-    local settings = rt.settings.menu.scene
-    self._shared_move_tab_sprite = rt.Sprite(settings.tab_bar_sprite_id, settings.moves_sprite_index)
-    self._shared_consumable_tab_sprite = rt.Sprite(settings.tab_bar_sprite_id, settings.consumables_sprite_index)
-    self._shared_equip_tab_sprite = rt.Sprite(settings.tab_bar_sprite_id, settings.equips_sprite_index)
+    self._control_indicator:realize()
+    self:_update_control_indicator()
 
     local temp_label_font =  rt.Font(80,
         "assets/fonts/DejaVuSans/DejaVuSans-Regular.ttf",
@@ -151,11 +77,12 @@ function mn.Scene:realize()
         "assets/fonts/DejaVuSans/DejaVuSans-Italic.ttf",
         "assets/fonts/DejaVuSans/DejaVuSans-BoldItalic.ttf"
     )
-
+    
+    local settings = rt.settings.menu.scene
     local tab_sprites = {
-        [self._shared_move_tab_index] = self._shared_move_tab_sprite,
-        [self._shared_consumable_tab_index] = self._shared_consumable_tab_sprite,
-        [self._shared_equip_tab_index] = self._shared_equip_tab_sprite,
+        [self._shared_move_tab_index] = rt.Sprite(settings.tab_bar_sprite_id, settings.moves_sprite_index),
+        [self._shared_consumable_tab_index] = rt.Sprite(settings.tab_bar_sprite_id, settings.consumables_sprite_index),
+        [self._shared_equip_tab_index] = rt.Sprite(settings.tab_bar_sprite_id, settings.equips_sprite_index),
     }
 
     for sprite in values(tab_sprites) do
@@ -163,64 +90,48 @@ function mn.Scene:realize()
         sprite_w = sprite_w * 2
         sprite_h = sprite_h * 2
         sprite:set_minimum_size(sprite_w, sprite_h)
-        self._shared_tabs:push(sprite)
+        self._shared_tab_bar:push(sprite)
     end
 
-    local template_label = rt.Label("<o>T</o>")
-    self._shared_tabs:push(template_label)
+    local template_label = rt.Label("<o>T</o>", temp_label_font)
+    self._shared_tab_bar:push(template_label)
 
-    self._shared_tabs:set_orientation(rt.Orientation.HORIZONTAL)
-    self._shared_tabs:set_n_post_aligned_items(1)
-    self._shared_tabs:realize()
+    self._shared_tab_bar:set_orientation(rt.Orientation.HORIZONTAL)
+    self._shared_tab_bar:set_n_post_aligned_items(1)
+    self._shared_tab_bar:realize()
 
-    -- shared lists
-    local moves = {}
-    for move, n in pairs(self._state.shared_moves) do
-        table.insert(moves, {move, n})
+    for list in range(
+        self._shared_move_list,
+        self._shared_equip_list,
+        self._shared_consumable_list,
+        self._shared_template_list
+    ) do
+        list:realize()
     end
-    self._shared_move_list:push(table.unpack(moves))
-    self._shared_move_list:realize()
 
-    local consumables = {}
-    for consumable, n in pairs(self._state.shared_consumables) do
-        table.insert(consumables, {consumable, n})
-    end
-    self._shared_consumable_list:push(table.unpack(consumables))
-    self._shared_consumable_list:realize()
-
-    local equips = {}
-    for equip, n in pairs(self._state.shared_equips) do
-        table.insert(equips, {equip, n})
-    end
-    self._shared_equip_list:push(table.unpack(equips))
-    self._shared_equip_list:realize()
-
-    self._control_indicator:realize()
-    self:_update_control_indicator()
-
-    self._shared_list_frame:realize()
-
-    -- pages
-    for entity in values(self._state.entities) do
+    self._entity_pages = {}
+    local entities = self._state.entities
+    for entity_i = 1, #entities do
+        local entity = entities[entity_i]
         local tab_sprite = rt.Sprite(entity:get_sprite_id())
         local sprite_w, sprite_h = tab_sprite:get_resolution()
         sprite_w = sprite_w * 3
         sprite_h = sprite_h * 3
         tab_sprite:set_minimum_size(sprite_w, sprite_h)
-        self._entity_tabs:push(tab_sprite)
+        self._entity_tab_bar:push(tab_sprite)
 
         local equip_consumable_layout = {}
-        local n_equips = entity:get_n_equip_slots()
-        for i = 1, n_equips do
-            table.insert(equip_consumable_layout, mn.SlotType.EQUIP)
-        end
-
-        for i = 1, entity:get_n_consumable_slots() do
-            table.insert(equip_consumable_layout, mn.SlotType.CONSUMABLE)
-        end
-
         local move_layout = {}
         do
+            local n_equips = entity:get_n_equip_slots()
+            for i = 1, n_equips do
+                table.insert(equip_consumable_layout, mn.SlotType.EQUIP)
+            end
+
+            for i = 1, entity:get_n_consumable_slots() do
+                table.insert(equip_consumable_layout, mn.SlotType.CONSUMABLE)
+            end
+
             local n = entity:get_n_move_slots()
             local to_push = {}
             while n >= 1 do
@@ -246,36 +157,149 @@ function mn.Scene:realize()
         page.equips_and_consumables:realize()
         page.moves:realize()
 
-        local movelist = entity:list_moves()
-        for i = 1, #movelist do
-            page.moves:set_object(i, movelist[i])
-        end
+        -- TODO: fill pages
 
-        local equip_list = entity:list_equips()
-        for i = 1, #equip_list do
-            page.equips_and_consumables:set_object(i, equip_list[i])
-        end
-
-        local consumable_list = entity:list_consumables()
-        for i = 1, #consumable_list do
-            page.equips_and_consumables:set_object(i + n_equips, consumable_list[i])
-        end
-
-        self._entity_pages[entity] = page
-        if self._current_entity == nil then self._current_entity = entity end
+        self._entity_pages[entity_i] = page
     end
 
     local settings_label = rt.Label("<o>\u{2699}</o>", temp_label_font)
-    self._entity_tabs:push(settings_label)
-    self._entity_tabs:set_n_post_aligned_items(1)
-    self._entity_tabs:set_orientation(rt.Orientation.VERTICAL)
-    self._entity_tabs:realize()
+    self._entity_tab_bar:push(settings_label)
+    self._entity_tab_bar:set_n_post_aligned_items(1)
+    self._entity_tab_bar:set_orientation(rt.Orientation.VERTICAL)
+    self._entity_tab_bar:realize()
+
+    self:_create_from_state(self._state)
+end
+
+--- @brief
+function mn.Scene:_create_from_state()
+    local entities = self._state.entities
+    for entity_i = 1, #entities do
+        local page = self._entity_pages[entity_i]
+        local entity = entities[entity_i]
+
+        local moves = entity:list_moves()
+        page.moves:clear()
+        for move_i = 1, #moves do
+            page.moves:set_object(move_i,  moves[move_i])
+        end
+
+        local equips = entity:list_equips()
+        local n_equips = entity:get_n_equip_slots()
+        for i = 1, n_equips do
+            local equip = equips[i]
+            page.equips_and_consumables:set_object(i, equip)
+        end
+
+        local consumables = entity:list_consumables()
+        local n_consumables = entity:get_n_consumable_slots()
+        for i = 1, n_consumables do
+            local consumable = consumables[i]
+            page.equips_and_consumables:set_object(i + n_equips, consumable)
+        end
+    end
+end
+
+--- @override
+function mn.Scene:size_allocate(x, y, width, height)
+    local padding = rt.settings.frame.thickness
+    local m = rt.settings.margin_unit
+    local outer_margin = 2 * m
+
+    local control_w, control_h = self._control_indicator:measure()
+    self._control_indicator:fit_into(x + width - control_w - outer_margin, y + outer_margin, control_w, control_h)
+
+    local current_x, current_y = x + outer_margin, y + outer_margin
+
+    local header_w, header_h = self._inventory_header_label:measure()
+    header_w = header_w + 4 * m
+    self._inventory_header_frame:size_allocate(current_x, current_y, header_w, control_h)
+    self._inventory_header_label:size_allocate(current_x, current_y + 0.5 * control_h - 0.5 * header_h, header_w, control_h)
+
+    current_y = current_y + control_h + m
+
+    -- left side, base tile size on slots
+    local tile_size, max_move_w, max_info_w = NEGATIVE_INFINITY, NEGATIVE_INFINITY, NEGATIVE_INFINITY
+    for page in values(self._entity_pages) do
+        tile_size = math.max(tile_size, select(2, page.equips_and_consumables:measure()))
+        max_move_w = math.max(max_move_w, select(1, page.moves:measure()))
+        max_info_w = math.max(max_info_w, select(1, page.info:measure()))
+    end
+
+    tile_size = math.max(tile_size, 100)
+    local page_w = math.ceil(math.max(max_move_w, max_info_w) / tile_size) * tile_size
+
+    self._entity_tab_bar:fit_into(current_x, current_y, tile_size, height - outer_margin - (current_y - y))
+    local entity_bar_selection_nodes = self._entity_tab_bar:get_selection_nodes()
+
+    current_x = current_x + tile_size + 2 * m
+    for page in values(self._entity_pages) do
+        local slots_h = tile_size
+        local page_y = y + height - outer_margin - slots_h
+        page.equips_and_consumables:fit_into(current_x, page_y, page_w, slots_h)
+
+        local moves_h = page_w
+        page_y = page_y - m - moves_h
+        page.moves:fit_into(current_x, page_y, page_w, moves_h)
+        page.info:fit_into(current_x, current_y, page_w, page_y - current_y - m)
+    end
+
+    local shared_page_w = control_w
+    local shared_tile_size = tile_size * 0.75
+    local shared_page_x = x + width - 2 * m - shared_page_w
+    self._shared_tab_bar:fit_into(shared_page_x, current_y, shared_page_w, shared_tile_size)
+
+    current_y = current_y + shared_tile_size + m
+    local shared_list_aabb = rt.AABB(shared_page_x, current_y, shared_page_w, y + height - outer_margin - current_y)
+    for list in range(
+        self._shared_move_list,
+        self._shared_equip_list,
+        self._shared_consumable_list,
+        self._shared_template_list
+    ) do
+        list:fit_into(shared_list_aabb)
+    end
+    self:_regenerate_selection_nodes()
+end
+
+--- @override
+function mn.Scene:draw()
+    if self._is_realized ~= true then return end
+
+    self._inventory_header_frame:draw()
+    self._inventory_header_label:draw()
+    self._control_indicator:draw()
+
+    self._shared_tab_bar:draw()
+
+    self._entity_tab_bar:draw()
+    local current_page = self._entity_pages[self._current_entity_i]
+    if current_page ~= nil then
+        current_page.moves:draw()
+        current_page.equips_and_consumables:draw()
+        current_page.info:draw()
+    end
+
+    local list_i = self._current_shader_list_index
+    if list_i == self._shared_move_tab_index then
+        self._shared_move_list:draw()
+    elseif list_i == self._shared_consumable_tab_index then
+        self._shared_consumable_list:draw()
+    elseif list_i == self._shared_equip_tab_index then
+        self._shared_equip_list:draw()
+    elseif list_i == self._shared_template_tab_index then
+        self._shared_template_list:draw()
+    end
+
+    for node in values(self._selection_nodes) do
+        node:draw()
+    end
 end
 
 --- @brief
 function mn.Scene:_update_control_indicator()
     local sort_label = "Sort"
-    local next_mode = self._shared_list_mode_order[self._shared_list_mode]
+    local next_mode = self._shared_list_sort_mode_order[self._shared_list_sort_mode]
     if next_mode == mn.ScrollableListSortMode.BY_ID then
         sort_label = "Sort (by ID)"
     elseif next_mode == mn.ScrollableListSortMode.BY_NAME then
@@ -295,107 +319,141 @@ function mn.Scene:_update_control_indicator()
     })
 end
 
---- @override
-function mn.Scene:size_allocate(x, y, width, height)
-    local padding = rt.settings.frame.thickness
-    local m = 2 * rt.settings.margin_unit
+function mn.Scene:_regenerate_selection_nodes()
+    self._selection_nodes = {}
 
-    local portrait_w = 6 * m
-    local portrait_x, portrait_y = x + m, y + m
+    local page = self._entity_pages[self._current_entity_i]
 
-    local page_w, page_h = NEGATIVE_INFINITY, NEGATIVE_INFINITY
-    local page_x, page_y = m, m
-    local slots_h, slots_w = NEGATIVE_INFINITY, NEGATIVE_INFINITY
-    for page in values(self._entity_pages) do
-        local current_x, current_y = page_x, portrait_y
-        local info_w, info_h = page.info:measure()
-
-        local move_w, move_h = page.moves:measure()
-
-        move_w = move_w + 4 * m
-        move_h = move_h + 4 * m
-        local move_size = math.max(move_w, move_h)
-
-        local slot_h = 300
-        local _, equip_h = page.equips_and_consumables:measure()
-        equip_h = equip_h + 2 * m
-
-        current_y = y + m
-
-        local move_y = current_y
-        page.moves:fit_into(current_x, current_y, move_w, move_h)
-        local equip_y = move_y + move_h + 2 * padding
-        page.equips_and_consumables:fit_into(current_x, equip_y, move_w, equip_h)
-        local info_y = equip_y + equip_h + 2 * padding
-        local info_h = y + height - m - info_y
-        page.info:fit_into(current_x, info_y, move_w, info_h)
-
-        page_w = math.max(page_w, info_w + move_w + 2 * padding)
-        page_h = math.max(page_h, info_h + move_h + 2 * padding)
-        slots_h = math.max(slots_h, equip_h)
-        slots_w = math.max(slots_w, move_w)
+    local entity_tab_nodes = {}
+    for node in values(self._entity_tab_bar:get_selection_nodes()) do
+        table.insert(entity_tab_nodes, node)
     end
 
-    self._entity_page_x_offset = slots_h + m
-    self._entity_tabs:fit_into(x + m, y + m, slots_h, height - 2 * m)
+    table.sort(entity_tab_nodes, function(a, b)
+        return a:get_aabb().y < b:get_aabb().y
+    end)
 
-    local control_w, control_h = self._control_indicator:measure()
-    self._control_indicator:fit_into(x + width - control_w - m, y + height - control_h - m, control_w, control_h)
+    local info_node = mn.SelectionGraphNode()
+    info_node:set_aabb(page.info:get_bounds())
 
-    local shared_w = slots_w * 1.5
-    local shared_x = x + width - m - shared_w
-    local shared_y = m
+    local move_nodes = {}
+    local left_move_nodes, bottom_move_nodes, top_move_nodes, right_move_nodes = {}, {}, {}, {}
+    for node in values(page.moves:get_selection_nodes()) do
+        if node:get_left() == nil then table.insert(left_move_nodes, node) end
+        if node:get_up() == nil then table.insert(top_move_nodes, node) end
+        if node:get_right() == nil then table.insert(right_move_nodes, node) end
+        if node:get_down() == nil then table.insert(bottom_move_nodes, node) end
+        table.insert(move_nodes, node)
+    end
 
-    local shared_tabs_h = 32 * 2.5
-    self._shared_tabs:fit_into(shared_x, shared_y, x + width - shared_x - m, shared_tabs_h)
-    self._shared_tabs_x_offset = 0 -- width - select(1, self._shared_tabs:measure())
+    local slot_nodes = {}
+    for node in values(page.equips_and_consumables:get_selection_nodes()) do
+        table.insert(slot_nodes, node)
+    end
 
-    shared_y = shared_y + shared_tabs_h + m / 2
-    local shared_h = height - 2 * m - (shared_y - m) - control_h - m / 2
-    local shared_m = rt.settings.margin_unit
-    for list in range(
-        self._shared_move_list,
-        self._shared_consumable_list,
-        self._shared_equip_list
+    table.sort(slot_nodes, function(a, b)
+        return a:get_aabb().x < b:get_aabb().x
+    end)
+
+    local shared_tab_nodes = {}
+    for node in values(self._shared_tab_bar:get_selection_nodes()) do
+        table.insert(shared_tab_nodes, node)
+    end
+
+    table.sort(slot_nodes, function(a, b)
+        return a:get_aabb().x < b:get_aabb().x
+    end)
+
+    local shared_move_node = mn.SelectionGraphNode()
+    shared_move_node:set_aabb(self._shared_move_list:get_bounds())
+    local shared_consumable_node = mn.SelectionGraphNode()
+    shared_consumable_node:set_aabb(self._shared_consumable_list:get_bounds())
+    local shared_equip_node = mn.SelectionGraphNode()
+    shared_equip_node:set_aabb(self._shared_equip_list:get_bounds())
+    local shared_template_node = mn.SelectionGraphNode()
+    shared_template_node:set_aabb(self._shared_template_list:get_bounds())
+
+    local function find_nearest_node(origin, nodes, mode)
+        if mode == "y" then
+            local nearest_node = nil
+            local y_dist = POSITIVE_INFINITY
+            local origin_y = origin:get_aabb().y + 0.5 * origin:get_aabb().height
+            for node in values(nodes) do
+                local current_dist = math.abs(node:get_aabb().y + 0.5 * node:get_aabb().height - origin_y)
+                if current_dist < y_dist then
+                    y_dist = current_dist
+                    nearest_node = node
+                end
+            end
+            return nearest_node
+        elseif mode == "x" then
+            local nearest_node = nil
+            local x_dist = POSITIVE_INFINITY
+            local origin_x = origin:get_aabb().x + 0.5 * origin:get_aabb().width
+            for node in values(nodes) do
+                local current_dist = math.abs(node:get_aabb().x + 0.5 * node:get_aabb().width - origin_x)
+                if current_dist < x_dist then
+                    x_dist = current_dist
+                    nearest_node = node
+                end
+            end
+            return nearest_node
+        else
+            error("unreachable")
+        end
+    end
+
+    local slot_node = slot_nodes[1]
+    slot_node:set_left(find_nearest_node(slot_node, entity_tab_nodes, "y"))
+    info_node:set_left(entity_tab_nodes[1])
+
+    for node in values(left_move_nodes) do
+        node:set_left(find_nearest_node(node, entity_tab_nodes, "y"))
+    end
+
+    for node in values(slot_nodes) do
+        node:set_up(find_nearest_node(node, bottom_move_nodes, "x"))
+    end
+
+    for node in values(bottom_move_nodes) do
+        node:set_down(find_nearest_node(node, slot_nodes, "x"))
+    end
+
+    for node in values(top_move_nodes) do
+        node:set_up(info_node)
+    end
+
+    local move_right_connect_node = shared_tab_nodes[1]
+    for node in values(right_move_nodes) do
+        node:set_right(move_right_connect_node)
+    end
+
+    shared_tab_nodes[1]:set_left(info_node)
+
+    shared_move_node:set_up(shared_tab_nodes[self._shared_move_tab_index])
+    shared_move_node:set_left(right_move_nodes[1])
+
+    shared_equip_node:set_up(shared_tab_nodes[self._shared_equip_tab_index])
+    shared_equip_node:set_left(table.last(slot_nodes))
+
+    shared_consumable_node:set_up(shared_tab_nodes[self._shared_consumable_tab_index])
+    shared_consumable_node:set_left(table.last(slot_nodes))
+
+    shared_template_node:set_up(shared_tab_nodes[self._shared_template_tab_index])
+    shared_template_node:set_left(info_node)
+
+    for nodes in range(
+        entity_tab_nodes,
+        {info_node},
+        move_nodes,
+        slot_nodes,
+        shared_tab_nodes,
+        {shared_move_node, shared_equip_node, shared_consumable_node, shared_template_node}
     ) do
-        list:fit_into(shared_x + shared_m, shared_y + shared_m, shared_w - 2 * shared_m, shared_h - 2 * shared_m)
+        for node in values(nodes) do
+            table.insert(self._selection_nodes, node)
+        end
     end
 
-    self._shared_list_frame:fit_into(shared_x, shared_y, shared_w, shared_h)
-end
-
---- @override
-function mn.Scene:draw()
-    if self._is_realized ~= true then return end
-
-    self._entity_tabs:draw()
-    self._shared_list_frame:draw()
-
-    if self._current_shared_tab == self._shared_move_tab_index then
-        self._shared_move_list:draw()
-    elseif self._current_shared_tab == self._shared_consumable_tab_index then
-        self._shared_consumable_list:draw()
-    elseif self._current_shared_tab == self._shared_equip_tab_index then
-        self._shared_equip_list:draw()
-    end
-
-    rt.graphics.translate(self._shared_tabs_x_offset, 0)
-    self._shared_tabs:draw()
-    rt.graphics.translate(-self._shared_tabs_x_offset, 0)
-
-    self._control_indicator:draw()
-
-    rt.graphics.translate(self._entity_page_x_offset, 0)
-    local page = self._entity_pages[self._current_entity]
-    if page ~= nil then
-        page.info:draw()
-        page.equips_and_consumables:draw()
-        page.moves:draw()
-    end
-    rt.graphics.translate(-self._entity_page_x_offset, 0)
-end
-
---- @brief [internal]
-function mn.Scene:_regenerate_selection_items()
-
+    --self._selection_nodes = self._shared_move_list:get_selection_nodes()
 end

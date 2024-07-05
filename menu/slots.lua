@@ -17,7 +17,6 @@ mn.Slots = meta.new_type("MenuSlots", rt.Widget, function(layout)
         _items = {},
         _slot_i_to_item = {},
         _frame = rt.Frame(),
-        _selection_nodes = {}
     })
 end)
 
@@ -159,7 +158,7 @@ function mn.Slots:size_allocate(x, y, width, height)
             end
 
             slot.selection_node:set_down(nil)
-            local down_row = self._items[row_i - 1]
+            local down_row = self._items[row_i + 1]
             if down_row ~= nil then
                 local down_item = down_row[slot_i]
                 if down_item ~= nil then
@@ -189,7 +188,6 @@ function mn.Slots:draw()
             if item.sprite ~= nil then
                 item.sprite:draw()
             end
-            item.selection_node:draw()
         end
     end
 end
@@ -215,7 +213,31 @@ function mn.Slots:set_object(slot_i, object)
         rt.error("In mn.Slots:set_object: slot index `" .. slot_i .. "` is out of bounds for slots with `" .. sizeof(self._slot_i_to_item) .. "` many slots")
     end
 
-    item.sprite = rt.Sprite(object:get_sprite_id())
-    item.sprite:realize()
-    item.sprite:fit_into(item.bounds)
+    if object == nil then
+        item.sprite = nil
+    else
+        item.sprite = rt.Sprite(object:get_sprite_id())
+        item.sprite:realize()
+        item.sprite:fit_into(item.bounds)
+    end
+end
+
+--- @brief
+function mn.Slots:clear()
+    for row in values(self._items) do
+        for item in values(row) do
+            item.sprite = nil
+        end
+    end
+end
+
+--- @brief
+function mn.Slots:get_selection_nodes()
+    local out = {}
+    for row in values(self._items) do
+        for item in values(row) do
+            table.insert(out, item.selection_node)
+        end
+    end
+    return out
 end

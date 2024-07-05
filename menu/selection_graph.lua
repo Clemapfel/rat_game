@@ -33,6 +33,10 @@ function mn.SelectionGraphNode:set_aabb(aabb_or_x, y, w, h)
     self._centroid_y = self._aabb.y + 0.5 * self._aabb.height
 end
 
+function mn.SelectionGraphNode:get_aabb()
+    return self._aabb
+end
+
 function mn.SelectionGraphNode:link_up(other)
     if other ~= nil then
         meta.assert_isa(other, mn.SelectionGraphNode)
@@ -43,6 +47,10 @@ end
 
 function mn.SelectionGraphNode:set_up(other)
     self._up = other
+end
+
+function mn.SelectionGraphNode:get_up()
+    return self._up
 end
 
 function mn.SelectionGraphNode:link_right(other)
@@ -57,6 +65,10 @@ function mn.SelectionGraphNode:set_right(other)
     self._right = other
 end
 
+function mn.SelectionGraphNode:get_right()
+    return self._right
+end
+
 function mn.SelectionGraphNode:link_down(other)
     if other ~= nil then
         meta.assert_isa(other, mn.SelectionGraphNode)
@@ -69,6 +81,10 @@ function mn.SelectionGraphNode:set_down(other)
     self._down = other
 end
 
+function mn.SelectionGraphNode:get_down()
+    return self._down
+end
+
 function mn.SelectionGraphNode:link_left(other)
     if other ~= nil then
         meta.assert_isa(other, mn.SelectionGraphNode)
@@ -79,6 +95,10 @@ end
 
 function mn.SelectionGraphNode:set_left(other)
     self._left = other
+end
+
+function mn.SelectionGraphNode:get_left()
+    return self._left
 end
 
 function mn.SelectionGraphNode:draw()

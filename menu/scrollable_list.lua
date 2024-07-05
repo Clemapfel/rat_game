@@ -32,7 +32,9 @@ mn.ScrollableList = meta.new_type("ScrollableList", rt.Widget, function()
         _final_height = 1,
 
         _label_font = rt.settings.font.default,
-        _label_font_mono = rt.settings.font.default_mono
+        _label_font_mono = rt.settings.font.default_mono,
+
+        _
     })
 end)
 

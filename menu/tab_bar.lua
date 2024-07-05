@@ -247,6 +247,7 @@ end
 function mn.TabBar:get_selection_nodes()
     local out = {}
     for node in values(self._selection_nodes) do
-
+        table.insert(out, node)
     end
+    return out
 end

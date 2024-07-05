@@ -16,6 +16,7 @@ mn.EntityInfo = meta.new_type("MenuEntityInfo", rt.Widget, function(entity)
 
         _numerical_label_w = 0,
         _no_preview_x_offset = 100,
+        _text_x_offset = 0,
 
         _final_w = 0,
         _final_h = 0,
@@ -157,12 +158,18 @@ function mn.EntityInfo:size_allocate(x, y, width, height)
     end
 
     self._no_preview_x_offset = preview_align - value_align + max_arrow_w
-    self._frame:fit_into(x, y, max_x - x + 2 * m, height)
+
+    local text_w = max_x - x + 2 * m
+    local frame_w =  math.max(text_w, width)
+    self._frame:fit_into(x, y, frame_w, height)
+    self._text_x_offset = (frame_w - text_w) / 2
 end
 
 --- @override
 function mn.EntityInfo:draw()
     self._frame:draw()
+
+    rt.graphics.translate(self._text_x_offset, 0)
 
     for which in range("hp", "attack", "defense", "speed") do
         if self["_" .. which .. "_preview_value"] ~= nil then
@@ -188,6 +195,8 @@ function mn.EntityInfo:draw()
             rt.graphics.translate(-self._no_preview_x_offset, 0)
         end
     end
+
+    rt.graphics.translate(-self._text_x_offset, 0)
 end
 
 --- @brief
