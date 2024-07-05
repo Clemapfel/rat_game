@@ -32,7 +32,7 @@ mn.Scene = meta.new_type("MenuScene", rt.Scene, function()
         _shared_tab_bar = mn.TabBar(),
         _shared_list_sort_mode = mn.ScrollableListSortMode.BY_ID,
 
-        _current_shader_list_index = 1,
+        _current_shader_list_index = 2,
         _shared_move_list = mn.ScrollableList(),
         _shared_equip_list = mn.ScrollableList(),
         _shared_consumable_list = mn.ScrollableList(),
@@ -100,15 +100,6 @@ function mn.Scene:realize()
     self._shared_tab_bar:set_n_post_aligned_items(1)
     self._shared_tab_bar:realize()
 
-    for list in range(
-        self._shared_move_list,
-        self._shared_equip_list,
-        self._shared_consumable_list,
-        self._shared_template_list
-    ) do
-        list:realize()
-    end
-
     self._entity_pages = {}
     local entities = self._state.entities
     for entity_i = 1, #entities do
@@ -169,6 +160,15 @@ function mn.Scene:realize()
     self._entity_tab_bar:realize()
 
     self:_create_from_state(self._state)
+
+    for list in range(
+        self._shared_move_list,
+        self._shared_equip_list,
+        self._shared_consumable_list,
+        self._shared_template_list
+    ) do
+        list:realize()
+    end
 end
 
 --- @brief
@@ -197,6 +197,21 @@ function mn.Scene:_create_from_state()
             local consumable = consumables[i]
             page.equips_and_consumables:set_object(i + n_equips, consumable)
         end
+    end
+
+    self._shared_move_list:clear()
+    for move, quantity in pairs(self._state.shared_moves) do
+        self._shared_move_list:push({move, quantity})
+    end
+
+    self._shared_consumable_list:clear()
+    for consumable, quantity in pairs(self._state.shared_consumables) do
+        self._shared_consumable_list:push({consumable, quantity})
+    end
+
+    self._shared_equip_list:clear()
+    for equip, quantity in pairs(self._state.shared_equips) do
+        self._shared_equip_list:push({equip, quantity})
     end
 end
 

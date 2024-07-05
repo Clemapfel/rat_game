@@ -22,15 +22,10 @@
     </configurations>
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="7fa9ba1b-2cff-4ecc-86fb-59ab2fa76ee1" name="Changes" comment="stashing">
-      <change afterPath="$PROJECT_DIR$/menu/~scene.lua" afterDir="false" />
+    <list default="true" id="7fa9ba1b-2cff-4ecc-86fb-59ab2fa76ee1" name="Changes" comment="refactored menu scene ui layout and menuing graph">
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/menu/entity_info.lua" beforeDir="false" afterPath="$PROJECT_DIR$/menu/entity_info.lua" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/menu/scene.lua" beforeDir="false" afterPath="$PROJECT_DIR$/menu/scene.lua" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/menu/scrollable_list.lua" beforeDir="false" afterPath="$PROJECT_DIR$/menu/scrollable_list.lua" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/menu/selection_graph.lua" beforeDir="false" afterPath="$PROJECT_DIR$/menu/selection_graph.lua" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/menu/slots.lua" beforeDir="false" afterPath="$PROJECT_DIR$/menu/slots.lua" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/menu/tab_bar.lua" beforeDir="false" afterPath="$PROJECT_DIR$/menu/tab_bar.lua" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -441,15 +436,7 @@
       <workItem from="1719869636563" duration="14589000" />
       <workItem from="1720028280662" duration="4085000" />
       <workItem from="1720189974087" duration="1806000" />
-      <workItem from="1720191992371" duration="10783000" />
-    </task>
-    <task id="LOCAL-00810" summary="added speech bubble">
-      <option name="closed" value="true" />
-      <created>1718337425906</created>
-      <option name="number" value="00810" />
-      <option name="presentableId" value="LOCAL-00810" />
-      <option name="project" value="LOCAL" />
-      <updated>1718337425906</updated>
+      <workItem from="1720191992371" duration="12367000" />
     </task>
     <task id="LOCAL-00811" summary="stashing speech bubble">
       <option name="closed" value="true" />
@@ -835,7 +822,15 @@
       <option name="project" value="LOCAL" />
       <updated>1720032396351</updated>
     </task>
-    <option name="localTasksCounter" value="859" />
+    <task id="LOCAL-00859" summary="refactored menu scene ui layout and menuing graph">
+      <option name="closed" value="true" />
+      <created>1720203116216</created>
+      <option name="number" value="00859" />
+      <option name="presentableId" value="LOCAL-00859" />
+      <option name="project" value="LOCAL" />
+      <updated>1720203116216</updated>
+    </task>
+    <option name="localTasksCounter" value="860" />
     <servers />
   </component>
   <component name="TypeScriptGeneratedFilesManager">
@@ -884,7 +879,6 @@
     </option>
   </component>
   <component name="VcsManagerConfiguration">
-    <MESSAGE value="import" />
     <MESSAGE value="added love executables" />
     <MESSAGE value="moved run scripts" />
     <MESSAGE value="made windows runnable" />
@@ -909,7 +903,8 @@
     <MESSAGE value="stashing menu layout" />
     <MESSAGE value="refactored menu layout" />
     <MESSAGE value="stashing" />
-    <option name="LAST_COMMIT_MESSAGE" value="stashing" />
+    <MESSAGE value="refactored menu scene ui layout and menuing graph" />
+    <option name="LAST_COMMIT_MESSAGE" value="refactored menu scene ui layout and menuing graph" />
   </component>
   <component name="XDebuggerManager">
     <breakpoint-manager>

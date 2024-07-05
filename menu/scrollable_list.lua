@@ -33,8 +33,6 @@ mn.ScrollableList = meta.new_type("ScrollableList", rt.Widget, function()
 
         _label_font = rt.settings.font.default,
         _label_font_mono = rt.settings.font.default_mono,
-
-        _
     })
 end)
 
@@ -175,6 +173,19 @@ function mn.ScrollableList._update_item(item)
 end
 
 --- @brief
+function mn.ScrollableList:clear()
+    self._items = {}
+    self._object_to_item = {}
+    self._n_items = 0
+    self._sortings = {
+        [mn.ScrollableListSortMode.BY_ID] = {},
+        [mn.ScrollableListSortMode.BY_QUANTITY] = {},
+        [mn.ScrollableListSortMode.BY_NAME] = {},
+        [mn.ScrollableListSortMode.BY_TYPE] = {},
+    }
+end
+
+--- @brief
 function mn.ScrollableList:push(...)
     for pair in range(...) do
         local object = pair[1]
@@ -305,6 +316,7 @@ function mn.ScrollableList:draw()
 end
 
 --- @brief
+--- @return true if succesfully, false otherwise
 function mn.ScrollableList:move_up()
     if self._selected_item_i > 1 then
         self._selected_item_i = self._selected_item_i - 1
@@ -316,10 +328,13 @@ function mn.ScrollableList:move_up()
         if position_y + self._selection_offset_y < self._min_y then
             self._selection_offset_y = self._selection_offset_y + item.height
         end
+        return true
     end
+    return false
 end
 
 --- @brief
+--- @return true if succesfully, false otherwise
 function mn.ScrollableList:move_down()
     if self._selected_item_i < self._n_items then
         self._selected_item_i = self._selected_item_i + 1
@@ -331,7 +346,9 @@ function mn.ScrollableList:move_down()
         if position_y + item.height + self._selection_offset_y > self._max_y then
             self._selection_offset_y = self._selection_offset_y - item.height
         end
+        return true
     end
+    return false
 end
 
 --- @brief
