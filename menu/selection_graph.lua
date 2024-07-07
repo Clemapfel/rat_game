@@ -67,7 +67,16 @@ for which in range("up", "right", "down", "left") do
             local next = current["get_" .. which](current)
             if next ~= nil then
                 meta.assert_isa(next, mn.SelectionGraphNode)
+
+                if self._current_node._on_exit ~= nil then
+                    self._current_node._on_exit()
+                end
+
                 self._current_node = next
+
+                if self._current_node._on_enter ~= nil then
+                    self._current_node._on_enter()
+                end
                 return true
             end
         end
@@ -75,8 +84,17 @@ for which in range("up", "right", "down", "left") do
     end
 end
 
-function mn.SelectionGraphNode:draw(color)
 
+for which in range("on_activate", "on_enter", "on_exit") do
+    mn.SelectionGraphNode["set_" .. which] = function(self, f)
+        if f ~= nil then
+            meta.assert_function(f)
+        end
+        self["_" .. which] = f
+    end
+end
+
+function mn.SelectionGraphNode:draw(color)
     local color = which(color, rt.Palette.SELECTION)
 
     love.graphics.setLineWidth(3)
@@ -132,4 +150,17 @@ function mn.SelectionGraph:draw()
     if self._current_node ~= nil then
         self._current_node:draw(rt.Palette.SELECTION)
     end
+end
+
+function mn.SelectionGraph:activate()
+    if self._current_node ~= nil then
+        if self._current_node._on_activate ~= nil then
+            self._current_node._on_activate()
+        end
+    end
+end
+
+function mn.SelectionGraph:clear()
+    self._nodes = {}
+    self._current_node = nil
 end

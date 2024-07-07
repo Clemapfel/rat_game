@@ -102,6 +102,7 @@ function bt.VerboseInfo:size_allocate(x, y, width, height)
         end
     end
 
+    max_width = math.max(max_width, self:get_bounds().width)
     local max_x, max_y = NEGATIVE_INFINITY, NEGATIVE_INFINITY
 
     -- second pass, reformat to max width
@@ -112,8 +113,8 @@ function bt.VerboseInfo:size_allocate(x, y, width, height)
 
         page:fit_into(current_x, current_y, max_width, POSITIVE_INFINITY)
         local h = page._requested_height
-        page:_initialize_backdrop(max_width, h)
         local xm, ym = page:_get_backdrop_margins()
+        page:_initialize_backdrop(max_width, h + 2 * ym)
         local thickness = page._backdrop:get_thickness()
         current_y = current_y + h + 2 * ym + 2 * thickness
 
@@ -173,10 +174,8 @@ end
 --- @brief [internal]
 function bt.VerboseInfo.Page:_initialize_backdrop(width, height)
     self._backdrop = rt.Frame()
-
-    local xm, ym = self:_get_backdrop_margins()
     self._backdrop:realize()
-    self._backdrop:fit_into(0, 0, width + 2 * xm, height + 2 * ym)
+    self._backdrop:fit_into(0, 0, width, height)
 end
 
 --- @override

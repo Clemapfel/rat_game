@@ -73,6 +73,20 @@ _range_iterator = function(state)
     return state[index], state
 end
 
+function eachindex(t, size)
+    if size == nil then
+        local size = 0
+        for _ in pairs(t) do size = size + 1 end
+    end
+
+    return function(arr, i)
+        i = i + 1
+        if i <= size then
+            return i
+        end
+    end, t, 0
+end
+
 --- @brief print, arguments are concatenated
 --- @param vararg any
 --- @return nil
@@ -165,7 +179,6 @@ table.is_empty = is_empty
 --- @param upper_bound number
 --- @return number
 function clamp(x, lower_bound, upper_bound)
-
     if type(lower_bound) == "nil" then lower_bound = NEGATIVE_INFINITY end
     if type(upper_bound) == "nil" then upper_bound = POSITIVE_INFINITY end
 

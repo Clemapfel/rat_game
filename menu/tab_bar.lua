@@ -61,11 +61,11 @@ function mn.TabBar:size_allocate(x, y, width, height)
     if self._orientation == rt.Orientation.HORIZONTAL then
         item_h = height
         item_w = item_h
-        item_m = math.min(m + 2 * thickness, (width - 2 * m - item_w - (self._n_items - n_post_aligned_items) * item_w) / (self._n_items + 1))
+        item_m = math.min(m, (width - 2 * m - item_w - (self._n_items - n_post_aligned_items) * item_w) / (self._n_items + 1))
     else
         item_w = width
         item_h = item_w
-        item_m = math.min(m + 2 * thickness, (height - 2 * m - item_h - (self._n_items - n_post_aligned_items) * item_h) / (self._n_items + 1))
+        item_m = math.min(m, (height - 2 * m - item_h - (self._n_items - n_post_aligned_items) * item_h) / (self._n_items + 1))
     end
 
     local start_x, start_y

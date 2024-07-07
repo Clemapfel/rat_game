@@ -220,6 +220,15 @@ function mn.Slots:set_object(slot_i, object)
         item.sprite:realize()
         item.sprite:fit_into(item.bounds)
     end
+
+    item.object = object
+end
+
+--- @brief
+function mn.Slots:get_object(slot_i)
+    local item = self._slot_i_to_item[slot_i]
+    if item == nil then return nil end
+    return item.object
 end
 
 --- @brief

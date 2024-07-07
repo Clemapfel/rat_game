@@ -4,6 +4,7 @@ mn.EntityInfo = meta.new_type("MenuEntityInfo", rt.Widget, function(entity)
         _frame = rt.Frame(),
         _base = rt.Spacer(),
 
+        _name = entity:get_name(),
         _hp_value = entity:get_hp_base(),
         _attack_value = entity:get_attack_base(),
         _defense_value = entity:get_defense_base(),
@@ -30,6 +31,9 @@ function mn.EntityInfo:realize()
 
     self._frame:set_child(self._base)
     self._frame:realize()
+
+    self._name_label = rt.Label("<b><u>" .. self._name .. "</b></u>")
+    self._name_label:realize()
 
     for stat in range(
         -- varname  heading color
@@ -85,6 +89,7 @@ function mn.EntityInfo:realize()
 end
 
 function mn.EntityInfo:_update()
+    self._name_label:set_text("<b><u>" .. self._name .. "</b></u>")
     for stat in range(
         -- varname  heading color
         {"hp", "HP", "HP"},
@@ -127,6 +132,11 @@ function mn.EntityInfo:size_allocate(x, y, width, height)
     local preview_align = value_align + value_max_w
     local max_x = NEGATIVE_INFINITY
     local max_arrow_w = NEGATIVE_INFINITY
+
+    local name_w, name_h = self._name_label:measure()
+    self._name_label:fit_into(left_align, current_y, name_w, name_h)
+    current_y = current_y + name_h + m
+
     for stat in range("hp", "attack", "defense", "speed") do
         local current_x = left_align
         self["_" .. stat .. "_heading_label"]:fit_into(current_x, current_y, POSITIVE_INFINITY)
@@ -162,7 +172,7 @@ function mn.EntityInfo:size_allocate(x, y, width, height)
     local text_w = max_x - x + 2 * m
     local frame_w =  math.max(text_w, width)
     self._frame:fit_into(x, y, frame_w, height)
-    self._text_x_offset = (frame_w - text_w) / 2
+    self._text_x_offset = 0
 end
 
 --- @override
@@ -170,7 +180,7 @@ function mn.EntityInfo:draw()
     self._frame:draw()
 
     rt.graphics.translate(self._text_x_offset, 0)
-
+    self._name_label:draw()
     for which in range("hp", "attack", "defense", "speed") do
         if self["_" .. which .. "_preview_value"] ~= nil then
             for label in range(

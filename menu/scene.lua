@@ -19,6 +19,7 @@ end)
 mn.Scene = meta.new_type("MenuScene", rt.Scene, function()
     return meta.new(mn.Scene, {
         _state = mn.InventoryState(),
+        _n_entities = 0,
 
         _control_indicator = rt.ControlIndicator(),
         _inventory_header_label = {}, -- rt.Label
@@ -32,7 +33,7 @@ mn.Scene = meta.new_type("MenuScene", rt.Scene, function()
         _shared_tab_bar = mn.TabBar(),
         _shared_list_sort_mode = mn.ScrollableListSortMode.BY_ID,
 
-        _current_shader_list_index = 2,
+        _current_shared_list_index = 2,
         _shared_move_list = mn.ScrollableList(),
         _shared_equip_list = mn.ScrollableList(),
         _shared_consumable_list = mn.ScrollableList(),
@@ -44,6 +45,8 @@ mn.Scene = meta.new_type("MenuScene", rt.Scene, function()
 
         _selection_graph = mn.SelectionGraph(),
         _input = rt.InputController(),
+
+        _verbose_info_frame = rt.Frame(),
         _verbose_info = bt.VerboseInfo()
     })
 end, {
@@ -108,6 +111,7 @@ function mn.Scene:realize()
 
     self._entity_pages = {}
     local entities = self._state.entities
+    self._n_entities = 0
     for entity_i = 1, #entities do
         local entity = entities[entity_i]
         local tab_sprite = rt.Sprite(entity:get_sprite_id())
@@ -142,6 +146,8 @@ function mn.Scene:realize()
             if #to_push ~= 0 then
                 table.insert(move_layout, to_push)
             end
+
+            self._n_entities = self._n_entities + 1
         end
 
         local page = {
@@ -165,8 +171,10 @@ function mn.Scene:realize()
 
     self:_create_from_state(self._state)
 
+    self._verbose_info_frame:realize()
     self._verbose_info:realize()
 
+    self._shared_list_frame:realize()
     for list in range(
         self._shared_move_list,
         self._shared_equip_list,
@@ -175,6 +183,8 @@ function mn.Scene:realize()
     ) do
         list:realize()
     end
+
+    self:set_current_entity_page(1)
 end
 
 --- @brief
@@ -249,8 +259,11 @@ function mn.Scene:size_allocate(x, y, width, height)
 
     tile_size = math.max(tile_size, 100)
     local page_w = math.ceil(math.max(max_move_w, max_info_w) / tile_size) * tile_size
+    page_w = page_w + 0.5 * tile_size
 
     local tab_w = tile_size
+    page_w = (width - 2 * outer_margin - tab_w - 3 * (2 * m)) / 3
+
     self._entity_tab_bar:fit_into(current_x, current_y, tab_w, height - outer_margin - (current_y - y))
     local entity_bar_selection_nodes = self._entity_tab_bar:get_selection_nodes()
 
@@ -266,6 +279,45 @@ function mn.Scene:size_allocate(x, y, width, height)
         page.info:fit_into(current_x, current_y, page_w, page_y - current_y - m)
     end
 
+    local shared_page_w = page_w
+    local shared_page_h = (y + height - 2 * m) - current_y
+    local shared_tile_size = tile_size * 0.75
+    current_x = current_x + m + page_w + m
+    local shared_tab_h = shared_tile_size
+    self._shared_tab_bar:fit_into(current_x, current_y, shared_page_w, shared_tab_h)
+
+    local verbose_info_w = page_w --width - 2 * outer_margin - tab_w - 2 * m - page_w - 2 * m - shared_page_w - 2 * m
+    local verbose_info_h = shared_page_h
+    local verbose_info_bounds = rt.AABB(
+        current_x + m + shared_page_w + m,
+        current_y,
+        verbose_info_w,
+        verbose_info_h
+    )
+    self._verbose_info:fit_into(verbose_info_bounds)
+    self._verbose_info_frame:fit_into(verbose_info_bounds)
+
+    current_y = current_y + shared_tab_h + m
+
+    local shared_list_bounds = rt.AABB(current_x, current_y, shared_page_w, shared_page_h - m - shared_tab_h)
+    self._shared_list_frame:fit_into(shared_list_bounds)
+
+    local list_xm, list_ym = m, m
+    for list in range(
+        self._shared_move_list,
+        self._shared_equip_list,
+        self._shared_consumable_list,
+        self._shared_template_list
+    ) do
+        list:fit_into(
+            shared_list_bounds.x + list_xm,
+            shared_list_bounds.y + list_ym,
+            shared_list_bounds.width - 2 * list_xm,
+            shared_list_bounds.height - 2 * list_ym
+        )
+    end
+
+    --[[
     local verbose_info_w = page_w
     local verbose_info_h = (y + height - 2 * m) - current_y
     current_x = current_x + m + page_w + m
@@ -293,6 +345,7 @@ function mn.Scene:size_allocate(x, y, width, height)
     ) do
         list:fit_into(shared_list_aabb)
     end
+    ]]--
     self:_regenerate_selection_nodes()
 
     -- TODO
@@ -317,7 +370,8 @@ function mn.Scene:draw()
         current_page.info:draw()
     end
 
-    local list_i = self._current_shader_list_index
+    self._shared_list_frame:draw()
+    local list_i = self._current_shared_list_index
     if list_i == self._shared_move_tab_index then
         self._shared_move_list:draw()
     elseif list_i == self._shared_consumable_tab_index then
@@ -329,6 +383,7 @@ function mn.Scene:draw()
     end
 
     self._selection_graph:draw()
+    self._verbose_info_frame:draw()
     self._verbose_info:draw()
 end
 
@@ -356,8 +411,7 @@ function mn.Scene:_update_control_indicator()
 end
 
 function mn.Scene:_regenerate_selection_nodes()
-    self._selection_nodes = {}
-
+    self._selection_graph:clear()
     local page = self._entity_pages[self._current_entity_i]
 
     local entity_tab_nodes = {}
@@ -409,6 +463,7 @@ function mn.Scene:_regenerate_selection_nodes()
     local shared_template_node = mn.SelectionGraphNode()
     shared_template_node:set_aabb(self._shared_template_list:get_bounds())
 
+    -- linkage
     local function find_nearest_node(origin, nodes, mode)
         if mode == "y" then
             local nearest_node = nil
@@ -454,64 +509,116 @@ function mn.Scene:_regenerate_selection_nodes()
     end
 
     -- left side: jump to active entity
-    local to_active_entity_tab = function()
-        return entity_tab_nodes[self._current_entity_i]
-    end
-
-    info_node:set_left(to_active_entity_tab)
-    for node in values(left_move_nodes) do
-        node:set_left(to_active_entity_tab)
-    end
-
-    for node in values(entity_tab_nodes) do
-        node:set_right(info_node)
-    end
-    slot_nodes[1]:set_left(entity_tab_nodes[#entity_tab_nodes])
-    entity_tab_nodes[#entity_tab_nodes]:set_right(slot_nodes[1])
-
-
-    --[[
-    local slot_node = slot_nodes[1]
-    slot_node:set_left(find_nearest_node(slot_node, entity_tab_nodes, "y"))
-    info_node:set_left(entity_tab_nodes[1])
-
-    for node in values(entity_tab_nodes) do
-        node:set_right(info_node)
-    end
-
-    for node in values(left_move_nodes) do
+    for node in range(info_node, slot_nodes[1], table.unpack(left_move_nodes)) do
         node:set_left(find_nearest_node(node, entity_tab_nodes, "y"))
     end
 
-    for node in values(slot_nodes) do
-        node:set_up(find_nearest_node(node, bottom_move_nodes, "x"))
+    for node in values(entity_tab_nodes) do
+        node:set_right(find_nearest_node(node, {info_node, slot_nodes[1], table.unpack(left_move_nodes)}, "y"))
     end
 
+    slot_nodes[1]:set_left(entity_tab_nodes[#entity_tab_nodes])
 
-    for node in values(top_move_nodes) do
-        node:set_up(info_node)
+    local to_shared_right = function()
+        local list_i = self._current_shared_list_index
+        if list_i == self._shared_consumable_tab_index then
+            return shared_consumable_node
+        elseif list_i == self._shared_equip_tab_index then
+            return shared_equip_node
+        elseif list_i == self._shared_template_tab_index then
+            return shared_template_node
+        else
+            return shared_move_node
+        end
     end
 
-    local move_right_connect_node = shared_tab_nodes[1]
+    info_node:set_right(to_shared_right)
     for node in values(right_move_nodes) do
-        node:set_right(move_right_connect_node)
+        node:set_right(to_shared_right)
     end
+    slot_nodes[#slot_nodes]:set_right(to_shared_right)
 
+    -- right side
+    info_node:set_right(shared_tab_nodes[1])
     shared_tab_nodes[1]:set_left(info_node)
 
-    shared_move_node:set_up(shared_tab_nodes[self._shared_move_tab_index])
-    shared_move_node:set_left(right_move_nodes[1])
+    local shared_tab_down = to_shared_right
 
-    shared_equip_node:set_up(shared_tab_nodes[self._shared_equip_tab_index])
-    shared_equip_node:set_left(table.last(slot_nodes))
+    for node in values(shared_tab_nodes) do
+        node:set_down(shared_tab_down)
+    end
+    
+    local shared_list_up = function()
+        return shared_tab_nodes[self._current_shared_list_index]
+    end
 
-    shared_consumable_node:set_up(shared_tab_nodes[self._shared_consumable_tab_index])
-    shared_consumable_node:set_left(table.last(slot_nodes))
+    local shared_list_left = function()
+        --[[
+        local list_i = self._current_shared_list_index
+        if list_i == self._shared_consumable_tab_index then
+            return slot_nodes[#slot_nodes]
+        elseif list_i == self._shared_equip_tab_index then
+            return slot_nodes[1]
+        elseif list_i == self._shared_template_tab_index then
+            return info_node
+        else
+            return right_move_nodes[1]
+        end
+        ]]--
+        return right_move_nodes[1]
+    end
 
-    shared_template_node:set_up(shared_tab_nodes[self._shared_template_tab_index])
-    shared_template_node:set_left(info_node)
-    ]]--
+    for node in range(
+        shared_move_node,
+        shared_consumable_node,
+        shared_equip_node,
+        shared_template_node
+    ) do
+        node:set_up(shared_list_up)
+        node:set_left(shared_list_left)
+    end
 
+    -- activation
+    for node_i, node in ipairs(entity_tab_nodes) do
+        node:set_on_activate(function()
+            self:set_current_entity_page(node_i)
+        end)
+    end
+
+    entity_tab_nodes[#entity_tab_nodes]:set_on_activate(function()
+        self:open_options()
+    end)
+
+    for node_i, node in ipairs(shared_tab_nodes) do
+        node:set_on_activate(function()
+            self:set_current_shared_list_page(node_i)
+        end)
+    end
+
+    -- enter
+    for node_i, node in ipairs(slot_nodes) do
+        node:set_on_enter(function()
+            local object = self._entity_pages[self._current_entity_i].equips_and_consumables:get_object(node_i)
+            if object == nil then
+                self._verbose_info:show()
+            else
+                self._verbose_info:show({object, POSITIVE_INFINITY})
+            end
+        end)
+    end
+
+    for node_i, node in ipairs(move_nodes) do
+        node:set_on_enter(function()
+            local object = self._entity_pages[self._current_entity_i].moves:get_object(node_i)
+            if object == nil then
+                self._verbose_info:show()
+            else
+                self._verbose_info:show({object, POSITIVE_INFINITY})
+            end
+        end)
+    end
+
+    -- push
     for nodes in range(
         entity_tab_nodes,
         {info_node},
@@ -537,5 +644,25 @@ function mn.Scene:_handle_button_pressed(which)
         self._selection_graph:move_down()
     elseif which == rt.InputButton.LEFT then
         self._selection_graph:move_left()
+    elseif which == rt.InputButton.A then
+        self._selection_graph:activate()
     end
+end
+
+--- @brief
+function mn.Scene:set_current_entity_page(i)
+    if i < 1 or i > self._n_entities then return end
+    self._current_entity_i = i
+    self._entity_tab_bar:set_selected(self._current_entity_i)
+end
+
+--- @brief
+function mn.Scene:set_current_shared_list_page(i)
+    if i < 1 or i > 4 then return end
+    self._current_shared_list_index = i
+end
+
+--- @brief
+function mn.Scene:open_options()
+    rt.warning("In mn.Scene.open_options: TODO")
 end
