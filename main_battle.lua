@@ -2,7 +2,7 @@ require "include"
 
 rt.current_scene = bt.Scene()
 scene = rt.current_scene
-scene:set_background("CLOUDS")
+scene:set_background("PARALLELL_LINES")
 
 --- ###
 

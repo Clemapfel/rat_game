@@ -22,16 +22,12 @@
     </configurations>
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="7fa9ba1b-2cff-4ecc-86fb-59ab2fa76ee1" name="Changes" comment="stashing old layout">
+    <list default="true" id="7fa9ba1b-2cff-4ecc-86fb-59ab2fa76ee1" name="Changes" comment="stashing menu">
+      <change afterPath="$PROJECT_DIR$/battle/backgrounds/parallell_lines.glsl" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/battle/backgrounds/parallell_lines.lua" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/battle/verbose_info.lua" beforeDir="false" afterPath="$PROJECT_DIR$/battle/verbose_info.lua" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/common/common.lua" beforeDir="false" afterPath="$PROJECT_DIR$/common/common.lua" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/menu/entity_info.lua" beforeDir="false" afterPath="$PROJECT_DIR$/menu/entity_info.lua" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/menu/scene.lua" beforeDir="false" afterPath="$PROJECT_DIR$/menu/scene.lua" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/menu/scrollable_list.lua" beforeDir="false" afterPath="$PROJECT_DIR$/menu/scrollable_list.lua" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/menu/selection_graph.lua" beforeDir="false" afterPath="$PROJECT_DIR$/menu/selection_graph.lua" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/menu/slots.lua" beforeDir="false" afterPath="$PROJECT_DIR$/menu/slots.lua" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/menu/tab_bar.lua" beforeDir="false" afterPath="$PROJECT_DIR$/menu/tab_bar.lua" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/battle/scene.lua" beforeDir="false" afterPath="$PROJECT_DIR$/battle/scene.lua" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/main_battle.lua" beforeDir="false" afterPath="$PROJECT_DIR$/main_battle.lua" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -130,7 +126,7 @@
       <recent name="C:\Users\cleme\Workspace\rat_game\libs\windows\#" />
     </key>
   </component>
-  <component name="RunManager" selected="Lua Application.main_windows_menu">
+  <component name="RunManager" selected="Lua Application.main_windows_battle">
     <configuration name="main_windows_battle" type="lua.app" factoryName="Lua Application">
       <module name="rat_game" />
       <option name="program" value="C:\Users\cleme\Workspace\rat_game\love\windows\love.exe" />
@@ -442,15 +438,7 @@
       <workItem from="1719869636563" duration="14589000" />
       <workItem from="1720028280662" duration="4085000" />
       <workItem from="1720189974087" duration="1806000" />
-      <workItem from="1720191992371" duration="24950000" />
-    </task>
-    <task id="LOCAL-00814" summary="refactored priority_queue_element">
-      <option name="closed" value="true" />
-      <created>1718383207329</created>
-      <option name="number" value="00814" />
-      <option name="presentableId" value="LOCAL-00814" />
-      <option name="project" value="LOCAL" />
-      <updated>1718383207330</updated>
+      <workItem from="1720191992371" duration="29102000" />
     </task>
     <task id="LOCAL-00815" summary="added party sprite sprites">
       <option name="closed" value="true" />
@@ -836,7 +824,15 @@
       <option name="project" value="LOCAL" />
       <updated>1720368620816</updated>
     </task>
-    <option name="localTasksCounter" value="863" />
+    <task id="LOCAL-00863" summary="stashing menu">
+      <option name="closed" value="true" />
+      <created>1720376100256</created>
+      <option name="number" value="00863" />
+      <option name="presentableId" value="LOCAL-00863" />
+      <option name="project" value="LOCAL" />
+      <updated>1720376100256</updated>
+    </task>
+    <option name="localTasksCounter" value="864" />
     <servers />
   </component>
   <component name="TypeScriptGeneratedFilesManager">
@@ -885,7 +881,6 @@
     </option>
   </component>
   <component name="VcsManagerConfiguration">
-    <MESSAGE value="benchmarking is now split into update / draw" />
     <MESSAGE value="added scrollable list" />
     <MESSAGE value="optimization" />
     <MESSAGE value="revert" />
@@ -910,7 +905,8 @@
     <MESSAGE value="added scrollable list initialization" />
     <MESSAGE value="refactored selection graph" />
     <MESSAGE value="stashing old layout" />
-    <option name="LAST_COMMIT_MESSAGE" value="stashing old layout" />
+    <MESSAGE value="stashing menu" />
+    <option name="LAST_COMMIT_MESSAGE" value="stashing menu" />
   </component>
   <component name="XDebuggerManager">
     <breakpoint-manager>
