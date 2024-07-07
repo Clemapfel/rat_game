@@ -40,10 +40,11 @@ mn.Scene = meta.new_type("MenuScene", rt.Scene, function()
 
         _entity_tab_bar = mn.TabBar(),
         _entity_pages = {}, -- Table<Number, {info, equips_and_consumables, moves}>
-        _current_entity_i = 1,
+        _current_entity_i = 3,
 
         _selection_graph = mn.SelectionGraph(),
         _input = rt.InputController(),
+        _verbose_info = bt.VerboseInfo()
     })
 end, {
     _shared_move_tab_index = 1,
@@ -153,8 +154,6 @@ function mn.Scene:realize()
         page.equips_and_consumables:realize()
         page.moves:realize()
 
-        -- TODO: fill pages
-
         self._entity_pages[entity_i] = page
     end
 
@@ -165,6 +164,8 @@ function mn.Scene:realize()
     self._entity_tab_bar:realize()
 
     self:_create_from_state(self._state)
+
+    self._verbose_info:realize()
 
     for list in range(
         self._shared_move_list,
@@ -233,8 +234,8 @@ function mn.Scene:size_allocate(x, y, width, height)
 
     local header_w, header_h = self._inventory_header_label:measure()
     header_w = header_w + 4 * m
-    self._inventory_header_frame:size_allocate(current_x, current_y, header_w, control_h)
-    self._inventory_header_label:size_allocate(current_x, current_y + 0.5 * control_h - 0.5 * header_h, header_w, control_h)
+    self._inventory_header_frame:fit_into(current_x, current_y, header_w, control_h)
+    self._inventory_header_label:fit_into(current_x, current_y + 0.5 * control_h - 0.5 * header_h, header_w, control_h)
 
     current_y = current_y + control_h + m
 
@@ -249,7 +250,8 @@ function mn.Scene:size_allocate(x, y, width, height)
     tile_size = math.max(tile_size, 100)
     local page_w = math.ceil(math.max(max_move_w, max_info_w) / tile_size) * tile_size
 
-    self._entity_tab_bar:fit_into(current_x, current_y, tile_size, height - outer_margin - (current_y - y))
+    local tab_w = tile_size
+    self._entity_tab_bar:fit_into(current_x, current_y, tab_w, height - outer_margin - (current_y - y))
     local entity_bar_selection_nodes = self._entity_tab_bar:get_selection_nodes()
 
     current_x = current_x + tile_size + 2 * m
@@ -264,7 +266,19 @@ function mn.Scene:size_allocate(x, y, width, height)
         page.info:fit_into(current_x, current_y, page_w, page_y - current_y - m)
     end
 
-    local shared_page_w = control_w
+    local verbose_info_w = page_w
+    local verbose_info_h = (y + height - 2 * m) - current_y
+    current_x = current_x + m + page_w + m
+    self._verbose_info:fit_into(
+        current_x,
+        current_y,
+        verbose_info_w,
+        verbose_info_h
+    )
+
+    current_x = current_x + page_w
+
+    local shared_page_w = (x + width - m) - current_x - 3 * m
     local shared_tile_size = tile_size * 0.75
     local shared_page_x = x + width - 2 * m - shared_page_w
     self._shared_tab_bar:fit_into(shared_page_x, current_y, shared_page_w, shared_tile_size)
@@ -280,6 +294,9 @@ function mn.Scene:size_allocate(x, y, width, height)
         list:fit_into(shared_list_aabb)
     end
     self:_regenerate_selection_nodes()
+
+    -- TODO
+    self._verbose_info:show({bt.Entity("GIRL")})
 end
 
 --- @override
@@ -312,6 +329,7 @@ function mn.Scene:draw()
     end
 
     self._selection_graph:draw()
+    self._verbose_info:draw()
 end
 
 --- @brief
@@ -421,9 +439,45 @@ function mn.Scene:_regenerate_selection_nodes()
         end
     end
 
+    for node in values(top_move_nodes) do
+        node:set_up(info_node)
+    end
+
+    info_node:set_down(top_move_nodes[ternary(#top_move_nodes % 2 == 0, #top_move_nodes / 2, math.floor(#top_move_nodes / 2) + 1)])
+
+    for node in values(bottom_move_nodes) do
+        node:set_down(find_nearest_node(node, slot_nodes, "x"))
+    end
+
+    for node in values(slot_nodes) do
+        node:set_up(find_nearest_node(node, bottom_move_nodes, "x"))
+    end
+
+    -- left side: jump to active entity
+    local to_active_entity_tab = function()
+        return entity_tab_nodes[self._current_entity_i]
+    end
+
+    info_node:set_left(to_active_entity_tab)
+    for node in values(left_move_nodes) do
+        node:set_left(to_active_entity_tab)
+    end
+
+    for node in values(entity_tab_nodes) do
+        node:set_right(info_node)
+    end
+    slot_nodes[1]:set_left(entity_tab_nodes[#entity_tab_nodes])
+    entity_tab_nodes[#entity_tab_nodes]:set_right(slot_nodes[1])
+
+
+    --[[
     local slot_node = slot_nodes[1]
     slot_node:set_left(find_nearest_node(slot_node, entity_tab_nodes, "y"))
     info_node:set_left(entity_tab_nodes[1])
+
+    for node in values(entity_tab_nodes) do
+        node:set_right(info_node)
+    end
 
     for node in values(left_move_nodes) do
         node:set_left(find_nearest_node(node, entity_tab_nodes, "y"))
@@ -433,9 +487,6 @@ function mn.Scene:_regenerate_selection_nodes()
         node:set_up(find_nearest_node(node, bottom_move_nodes, "x"))
     end
 
-    for node in values(bottom_move_nodes) do
-        node:set_down(find_nearest_node(node, slot_nodes, "x"))
-    end
 
     for node in values(top_move_nodes) do
         node:set_up(info_node)
@@ -459,6 +510,7 @@ function mn.Scene:_regenerate_selection_nodes()
 
     shared_template_node:set_up(shared_tab_nodes[self._shared_template_tab_index])
     shared_template_node:set_left(info_node)
+    ]]--
 
     for nodes in range(
         entity_tab_nodes,

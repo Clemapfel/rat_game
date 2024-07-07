@@ -198,10 +198,6 @@ function mn.TabBar:draw()
 
         item_i = item_i + 1
     end
-
-    for node in values(self._selection_nodes) do
-        node:draw()
-    end
 end
 
 --- @brief

@@ -22,10 +22,10 @@
     </configurations>
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="7fa9ba1b-2cff-4ecc-86fb-59ab2fa76ee1" name="Changes" comment="added scrollable list initialization">
+    <list default="true" id="7fa9ba1b-2cff-4ecc-86fb-59ab2fa76ee1" name="Changes" comment="refactored selection graph">
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/menu/scene.lua" beforeDir="false" afterPath="$PROJECT_DIR$/menu/scene.lua" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/menu/selection_graph.lua" beforeDir="false" afterPath="$PROJECT_DIR$/menu/selection_graph.lua" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/menu/tab_bar.lua" beforeDir="false" afterPath="$PROJECT_DIR$/menu/tab_bar.lua" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -436,15 +436,7 @@
       <workItem from="1719869636563" duration="14589000" />
       <workItem from="1720028280662" duration="4085000" />
       <workItem from="1720189974087" duration="1806000" />
-      <workItem from="1720191992371" duration="14939000" />
-    </task>
-    <task id="LOCAL-00812" summary="stashing">
-      <option name="closed" value="true" />
-      <created>1718338282645</created>
-      <option name="number" value="00812" />
-      <option name="presentableId" value="LOCAL-00812" />
-      <option name="project" value="LOCAL" />
-      <updated>1718338282645</updated>
+      <workItem from="1720191992371" duration="17652000" />
     </task>
     <task id="LOCAL-00813" summary="speech bubble finished">
       <option name="closed" value="true" />
@@ -830,7 +822,15 @@
       <option name="project" value="LOCAL" />
       <updated>1720204445394</updated>
     </task>
-    <option name="localTasksCounter" value="861" />
+    <task id="LOCAL-00861" summary="refactored selection graph">
+      <option name="closed" value="true" />
+      <created>1720366064235</created>
+      <option name="number" value="00861" />
+      <option name="presentableId" value="LOCAL-00861" />
+      <option name="project" value="LOCAL" />
+      <updated>1720366064236</updated>
+    </task>
+    <option name="localTasksCounter" value="862" />
     <servers />
   </component>
   <component name="TypeScriptGeneratedFilesManager">
@@ -879,7 +879,6 @@
     </option>
   </component>
   <component name="VcsManagerConfiguration">
-    <MESSAGE value="moved run scripts" />
     <MESSAGE value="made windows runnable" />
     <MESSAGE value="benchmarking is now split into update / draw" />
     <MESSAGE value="added scrollable list" />
@@ -904,7 +903,8 @@
     <MESSAGE value="stashing" />
     <MESSAGE value="refactored menu scene ui layout and menuing graph" />
     <MESSAGE value="added scrollable list initialization" />
-    <option name="LAST_COMMIT_MESSAGE" value="added scrollable list initialization" />
+    <MESSAGE value="refactored selection graph" />
+    <option name="LAST_COMMIT_MESSAGE" value="refactored selection graph" />
   </component>
   <component name="XDebuggerManager">
     <breakpoint-manager>
