@@ -22,12 +22,8 @@
     </configurations>
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="7fa9ba1b-2cff-4ecc-86fb-59ab2fa76ee1" name="Changes" comment="stashing menu">
-      <change afterPath="$PROJECT_DIR$/battle/backgrounds/parallell_lines.glsl" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/battle/backgrounds/parallell_lines.lua" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/battle/scene.lua" beforeDir="false" afterPath="$PROJECT_DIR$/battle/scene.lua" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/main_battle.lua" beforeDir="false" afterPath="$PROJECT_DIR$/main_battle.lua" afterDir="false" />
+    <list default="true" id="7fa9ba1b-2cff-4ecc-86fb-59ab2fa76ee1" name="Changes" comment="added parallel line background">
+      <change beforePath="$PROJECT_DIR$/battle/backgrounds/parallell_lines.glsl" beforeDir="false" afterPath="$PROJECT_DIR$/battle/backgrounds/parallell_lines.glsl" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -438,15 +434,7 @@
       <workItem from="1719869636563" duration="14589000" />
       <workItem from="1720028280662" duration="4085000" />
       <workItem from="1720189974087" duration="1806000" />
-      <workItem from="1720191992371" duration="29102000" />
-    </task>
-    <task id="LOCAL-00815" summary="added party sprite sprites">
-      <option name="closed" value="true" />
-      <created>1718388571342</created>
-      <option name="number" value="00815" />
-      <option name="presentableId" value="LOCAL-00815" />
-      <option name="project" value="LOCAL" />
-      <updated>1718388571342</updated>
+      <workItem from="1720191992371" duration="29688000" />
     </task>
     <task id="LOCAL-00816" summary="added sprites">
       <option name="closed" value="true" />
@@ -832,7 +820,15 @@
       <option name="project" value="LOCAL" />
       <updated>1720376100256</updated>
     </task>
-    <option name="localTasksCounter" value="864" />
+    <task id="LOCAL-00864" summary="added parallel line background">
+      <option name="closed" value="true" />
+      <created>1720381479186</created>
+      <option name="number" value="00864" />
+      <option name="presentableId" value="LOCAL-00864" />
+      <option name="project" value="LOCAL" />
+      <updated>1720381479186</updated>
+    </task>
+    <option name="localTasksCounter" value="865" />
     <servers />
   </component>
   <component name="TypeScriptGeneratedFilesManager">
@@ -881,7 +877,6 @@
     </option>
   </component>
   <component name="VcsManagerConfiguration">
-    <MESSAGE value="added scrollable list" />
     <MESSAGE value="optimization" />
     <MESSAGE value="revert" />
     <MESSAGE value="stashing tab bar" />
@@ -906,7 +901,8 @@
     <MESSAGE value="refactored selection graph" />
     <MESSAGE value="stashing old layout" />
     <MESSAGE value="stashing menu" />
-    <option name="LAST_COMMIT_MESSAGE" value="stashing menu" />
+    <MESSAGE value="added parallel line background" />
+    <option name="LAST_COMMIT_MESSAGE" value="added parallel line background" />
   </component>
   <component name="XDebuggerManager">
     <breakpoint-manager>

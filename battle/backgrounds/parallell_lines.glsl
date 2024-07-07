@@ -117,7 +117,7 @@ vec4 effect(vec4 vertex_color, Image image, vec2 texture_coords, vec2 vertex_pos
     vec4 line = vec4(1 - smoothstep(0.0, width, abs(y - 0.5)));
 
     float hue = fract(fract(elapsed / 10) + line_i * 5 + elapsed / 12);
-    return vec4(0, 0, 0, 1) + vec4(oklch_to_rgb(vec3(0.8, 0.3, hue)), 1) * line;
+    return vec4(0, 0, 0, 1) + vec4(oklch_to_rgb(vec3(1, 0.3, hue)), 1) * line;
 }
 
 #endif
