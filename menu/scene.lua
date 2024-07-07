@@ -42,7 +42,8 @@ mn.Scene = meta.new_type("MenuScene", rt.Scene, function()
         _entity_pages = {}, -- Table<Number, {info, equips_and_consumables, moves}>
         _current_entity_i = 1,
 
-        _selection_nodes = {}, -- Table<mn.SelectionGraphNode>
+        _selection_graph = mn.SelectionGraph(),
+        _input = rt.InputController(),
     })
 end, {
     _shared_move_tab_index = 1,
@@ -62,6 +63,10 @@ end, {
 function mn.Scene:realize()
     if self._is_realized == true then return end
     self._is_realized = true
+
+    self._input:signal_connect("pressed", function(_, which)
+        self:_handle_button_pressed(which)
+    end)
 
     self._inventory_header_label = rt.Label("<o>Inventory</o>")
     self._inventory_header_label:realize()
@@ -306,9 +311,7 @@ function mn.Scene:draw()
         self._shared_template_list:draw()
     end
 
-    for node in values(self._selection_nodes) do
-        node:draw()
-    end
+    self._selection_graph:draw()
 end
 
 --- @brief
@@ -466,9 +469,21 @@ function mn.Scene:_regenerate_selection_nodes()
         {shared_move_node, shared_equip_node, shared_consumable_node, shared_template_node}
     ) do
         for node in values(nodes) do
-            table.insert(self._selection_nodes, node)
+            self._selection_graph:add(node)
         end
     end
+    self._selection_graph:set_current_node(info_node)
+end
 
-    --self._selection_nodes = self._shared_move_list:get_selection_nodes()
+--- @brief
+function mn.Scene:_handle_button_pressed(which)
+    if which == rt.InputButton.UP then
+        self._selection_graph:move_up()
+    elseif which == rt.InputButton.RIGHT then
+        self._selection_graph:move_right()
+    elseif which == rt.InputButton.DOWN then
+        self._selection_graph:move_down()
+    elseif which == rt.InputButton.LEFT then
+        self._selection_graph:move_left()
+    end
 end

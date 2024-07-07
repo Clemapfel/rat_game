@@ -1,8 +1,9 @@
 --- @class mn.SelectionGraph
 mn.SelectionGraph = meta.new_type("SelectionGraph", function()
     return meta.new(mn.SelectionGraph, {
-        _items = {}, -- Table<Number, Item>
-        _current_id = 1
+        _nodes = {}, -- Set<mn.SelectionGraphNode>
+        _current_node = nil,
+        _n_nodes = 0
     })
 end)
 
@@ -15,10 +16,10 @@ mn.SelectionGraphNode = meta.new_type("SelectionGraphNode", rt.Drawable, functio
         _on_enter = function()  end,
         _on_exit = function()  end,
         _on_activate = function()  end,
-        _up = nil,
-        _right = nil,
-        _down = nil,
-        _left = nil
+        _on_up = nil,     -- () -> mn.SelectionGraphNode
+        _on_right = nil,  -- () -> mn.SelectionGraphNode
+        _on_down = nil,   -- () -> mn.SelectionGraphNode
+        _on_left = nil,   -- () -> mn.SelectionGraphNode
     })
 end)
 
@@ -37,88 +38,98 @@ function mn.SelectionGraphNode:get_aabb()
     return self._aabb
 end
 
-function mn.SelectionGraphNode:link_up(other)
-    if other ~= nil then
-        meta.assert_isa(other, mn.SelectionGraphNode)
-        other._down = self
+for which in range("up", "right", "down", "left") do
+    local on_which = "_on_" .. which
+    mn.SelectionGraphNode["set_" .. which] = function(self, other_or_f)
+        if other_or_f == nil then
+            self[on_which] = nil
+        elseif meta.is_function(other_or_f) then
+            self[on_which] = other_or_f
+        else
+            meta.assert_isa(other_or_f, mn.SelectionGraphNode)
+            self[on_which] = function()
+                return other_or_f
+            end
+        end
     end
-    self._up = other
-end
 
-function mn.SelectionGraphNode:set_up(other)
-    self._up = other
-end
-
-function mn.SelectionGraphNode:get_up()
-    return self._up
-end
-
-function mn.SelectionGraphNode:link_right(other)
-    if other ~= nil then
-        meta.assert_isa(other, mn.SelectionGraphNode)
-        other._left = self
+    mn.SelectionGraphNode["get_" .. which] = function(self)
+        if self[on_which] ~= nil then
+            return self[on_which]()
+        else
+            return nil
+        end
     end
-    self._right = other
-end
 
-function mn.SelectionGraphNode:set_right(other)
-    self._right = other
-end
-
-function mn.SelectionGraphNode:get_right()
-    return self._right
-end
-
-function mn.SelectionGraphNode:link_down(other)
-    if other ~= nil then
-        meta.assert_isa(other, mn.SelectionGraphNode)
-        other._up = self
+    mn.SelectionGraph["move_" .. which] = function(self)
+        local current = self._current_node
+        if current ~= nil then
+            local next = current["get_" .. which](current)
+            if next ~= nil then
+                meta.assert_isa(next, mn.SelectionGraphNode)
+                self._current_node = next
+                return true
+            end
+        end
+        return false
     end
-    self._down = other
 end
 
-function mn.SelectionGraphNode:set_down(other)
-    self._down = other
-end
+function mn.SelectionGraphNode:draw(color)
 
-function mn.SelectionGraphNode:get_down()
-    return self._down
-end
+    local color = which(color, rt.Palette.SELECTION)
 
-function mn.SelectionGraphNode:link_left(other)
-    if other ~= nil then
-        meta.assert_isa(other, mn.SelectionGraphNode)
-        other._right = self
-    end
-    self._left = other
-end
-
-function mn.SelectionGraphNode:set_left(other)
-    self._left = other
-end
-
-function mn.SelectionGraphNode:get_left()
-    return self._left
-end
-
-function mn.SelectionGraphNode:draw()
     love.graphics.setLineWidth(3)
-    love.graphics.setColor(rt.color_unpack(rt.Palette.SELECTION))
+    love.graphics.setColor(rt.color_unpack(color))
     love.graphics.rectangle("line", self._aabb.x, self._aabb.y, self._aabb.width, self._aabb.height)
 
     local from_x, from_y = self._centroid_x, self._centroid_y
     love.graphics.setColor(rt.color_unpack(rt.Palette.BLACK))
     love.graphics.circle("fill", from_x, from_y, 7)
-    love.graphics.setColor(rt.color_unpack(rt.Palette.SELECTION))
+    love.graphics.setColor(rt.color_unpack(color))
     love.graphics.circle("fill", from_x, from_y, 6)
 
     for direction in range(
-        "_up", "_right", "_down", "_left"
+        "up", "right", "down", "left"
     ) do
-        if self[direction] ~= nil then
-            love.graphics.setColor(rt.color_unpack(rt.Palette.SELECTION))
-            local to_x, to_y = self[direction]._centroid_x, self[direction]._centroid_y
+        local next = self["get_" .. direction](self)
+        if next ~= nil then
+            love.graphics.setColor(rt.color_unpack(color))
+            local to_x, to_y = next._centroid_x, next._centroid_y
             love.graphics.line(from_x, from_y, to_x, to_y)
         end
+    end
+end
+
+function mn.SelectionGraph:add(node)
+    meta.assert_isa(node, mn.SelectionGraphNode)
+    if self._nodes[node] == nil then
+        self._nodes[node] = true
+        if self._n_nodes == 0 then
+            self._current_node = node
+        end
+        self._n_nodes = self._n_nodes + 1
+    end
+end
+
+function mn.SelectionGraph:remove(node)
+    if self._nodes[node] ~= nil then
+        self._nodes[node] = nil
+        self._n_nodes = self._n_nodes - 1
+    end
+end
+
+function mn.SelectionGraph:set_current_node(node)
+    self:add(node)
+    self._current_node = node
+end
+
+function mn.SelectionGraph:draw()
+    for node in keys(self._nodes) do
+        node:draw(rt.Palette.GRAY_4)
+    end
+
+    if self._current_node ~= nil then
+        self._current_node:draw(rt.Palette.SELECTION)
     end
 end
