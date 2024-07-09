@@ -6,6 +6,7 @@ return {
         unknown = 4,
         moves = 5,
         consumables = 6,
-        equips = 7
+        equips = 7,
+        templates = 8
     }
 }

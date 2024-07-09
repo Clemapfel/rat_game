@@ -147,6 +147,11 @@ function rt.Sprite:set_color(color)
 end
 
 --- @brief
+function rt.Sprite:get_n_frames(animation_id_maybe)
+    return self._spritesheet:get_n_frames(animation_id_maybe)
+end
+
+--- @brief
 function rt.Sprite:get_origin()
     return self._spritesheet.origin_x, self._spritesheet.origin_y
 end

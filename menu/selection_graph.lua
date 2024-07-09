@@ -13,8 +13,8 @@ mn.SelectionGraphNode = meta.new_type("SelectionGraphNode", rt.Drawable, functio
         _aabb = rt.AABB(0, 0, 1, 1),
         _centroid_x = 0,
         _centroid_y = 0,
-        _on_enter = function()  end,
-        _on_exit = function()  end,
+        _on_enter = function(direction)  end,
+        _on_exit = function(direction)  end,
         _on_activate = function()  end,
         _on_up = nil,     -- () -> mn.SelectionGraphNode
         _on_right = nil,  -- () -> mn.SelectionGraphNode
@@ -38,7 +38,16 @@ function mn.SelectionGraphNode:get_aabb()
     return self._aabb
 end
 
-for which in range("up", "right", "down", "left") do
+for name_directions in range(
+    {"up", rt.Direction.UP, rt.Direction.DOWN},
+    {"right", rt.Direction.RIGHT, rt.Direction.LEFT},
+    {"down", rt.Direction.DOWN, rt.Direction.UP},
+    {"left", rt.Direction.LEFT, rt.Direction.RIGHT})
+do
+    local which = name_directions[1]
+    local direction = name_directions[2]
+    local opposite_direction = name_directions[3]
+
     local on_which = "_on_" .. which
     mn.SelectionGraphNode["set_" .. which] = function(self, other_or_f)
         if other_or_f == nil then
@@ -69,13 +78,13 @@ for which in range("up", "right", "down", "left") do
                 meta.assert_isa(next, mn.SelectionGraphNode)
 
                 if self._current_node._on_exit ~= nil then
-                    self._current_node._on_exit()
+                    self._current_node._on_exit(direction)
                 end
 
                 self._current_node = next
 
                 if self._current_node._on_enter ~= nil then
-                    self._current_node._on_enter()
+                    self._current_node._on_enter(opposite_direction)
                 end
                 return true
             end

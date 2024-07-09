@@ -68,7 +68,13 @@ function rt.SpriteAtlasEntry:load()
         end
     else
         if config.animations ~= nil then
-            config.n_frames = sizeof(config.animations)
+            config.n_frames = NEGATIVE_INFINITY
+            for pair in values(config.animations) do
+                if meta.is_number(pair) then
+                    pair = {pair, pair}
+                end
+                config.n_frames = math.max(config.n_frames, pair[1], pair[2])
+            end
             config.width = data:getWidth() / config.n_frames
         else
             -- treat entire spritesheet as frame
@@ -85,6 +91,7 @@ function rt.SpriteAtlasEntry:load()
 
     self.frame_width = config.width
     self.frame_height = config.height
+
 
     local min_frame_i = POSITIVE_INFINITY
     local max_frame_i = NEGATIVE_INFINITY

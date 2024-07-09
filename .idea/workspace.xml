@@ -23,7 +23,19 @@
   </component>
   <component name="ChangeListManager">
     <list default="true" id="7fa9ba1b-2cff-4ecc-86fb-59ab2fa76ee1" name="Changes" comment="added parallel line background">
+      <change afterPath="$PROJECT_DIR$/assets/sprites/menu_icons.pxo" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/assets/sprites/opal.lua" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/assets/sprites/battle/menu_item.pxo" beforeDir="false" afterPath="$PROJECT_DIR$/assets/sprites/battle/menu_item.pxo" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/assets/sprites/menu_icons.lua" beforeDir="false" afterPath="$PROJECT_DIR$/assets/sprites/menu_icons.lua" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/assets/sprites/menu_icons.png" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/assets/sprites/menu_item.pxo" beforeDir="false" />
       <change beforePath="$PROJECT_DIR$/battle/backgrounds/parallell_lines.glsl" beforeDir="false" afterPath="$PROJECT_DIR$/battle/backgrounds/parallell_lines.glsl" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/common/sprite.lua" beforeDir="false" afterPath="$PROJECT_DIR$/common/sprite.lua" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/common/sprite_atlas.lua" beforeDir="false" afterPath="$PROJECT_DIR$/common/sprite_atlas.lua" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/menu/scene.lua" beforeDir="false" afterPath="$PROJECT_DIR$/menu/scene.lua" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/menu/scrollable_list.lua" beforeDir="false" afterPath="$PROJECT_DIR$/menu/scrollable_list.lua" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/menu/selection_graph.lua" beforeDir="false" afterPath="$PROJECT_DIR$/menu/selection_graph.lua" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -63,56 +75,56 @@
     <option name="hideEmptyMiddlePackages" value="true" />
     <option name="showLibraryContents" value="true" />
   </component>
-  <component name="PropertiesComponent">{
-  &quot;keyToString&quot;: {
-    &quot;Emmy Debugger(NEW).remote_debugger.executor&quot;: &quot;Debug&quot;,
-    &quot;Emmy Debugger(NEW).remote_debugger_v2.executor&quot;: &quot;Debug&quot;,
-    &quot;Lua Application.love.executor&quot;: &quot;Run&quot;,
-    &quot;Lua Application.love11.executor&quot;: &quot;Run&quot;,
-    &quot;Lua Application.love12.executor&quot;: &quot;Run&quot;,
-    &quot;Lua Application.main.executor&quot;: &quot;Run&quot;,
-    &quot;Lua Application.main_lichen.executor&quot;: &quot;Run&quot;,
-    &quot;Lua Application.main_linux.executor&quot;: &quot;Run&quot;,
-    &quot;Lua Application.main_signal.executor&quot;: &quot;Run&quot;,
-    &quot;Lua Application.main_swirl.executor&quot;: &quot;Run&quot;,
-    &quot;Lua Application.main_thread.executor&quot;: &quot;Run&quot;,
-    &quot;Lua Application.main_windows.executor&quot;: &quot;Run&quot;,
-    &quot;Lua Application.main_windows_battle.executor&quot;: &quot;Run&quot;,
-    &quot;Lua Application.main_windows_menu.executor&quot;: &quot;Run&quot;,
-    &quot;Lua Application.overworld.executor&quot;: &quot;Run&quot;,
-    &quot;Lua Application.rope.executor&quot;: &quot;Run&quot;,
-    &quot;RunOnceActivity.OpenProjectViewOnStart&quot;: &quot;true&quot;,
-    &quot;RunOnceActivity.RadMigrateCodeStyle&quot;: &quot;true&quot;,
-    &quot;RunOnceActivity.ShowReadmeOnStart&quot;: &quot;true&quot;,
-    &quot;RunOnceActivity.cidr.known.project.marker&quot;: &quot;true&quot;,
-    &quot;RunOnceActivity.readMode.enableVisualFormatting&quot;: &quot;true&quot;,
-    &quot;WebServerToolWindowFactoryState&quot;: &quot;false&quot;,
-    &quot;cf.advertisement.text.has.clang-format&quot;: &quot;true&quot;,
-    &quot;cf.first.check.clang-format&quot;: &quot;false&quot;,
-    &quot;cidr.known.project.marker&quot;: &quot;true&quot;,
-    &quot;deletionFromPopupRequiresConfirmation&quot;: &quot;false&quot;,
-    &quot;git-widget-placeholder&quot;: &quot;main&quot;,
-    &quot;ignore.virus.scanning.warn.message&quot;: &quot;true&quot;,
-    &quot;last_opened_file_path&quot;: &quot;C:/Users/cleme/Workspace/rat_game/love/linux/lib&quot;,
-    &quot;node.js.detected.package.eslint&quot;: &quot;true&quot;,
-    &quot;node.js.detected.package.tslint&quot;: &quot;true&quot;,
-    &quot;node.js.selected.package.eslint&quot;: &quot;(autodetect)&quot;,
-    &quot;node.js.selected.package.tslint&quot;: &quot;(autodetect)&quot;,
-    &quot;nodejs_package_manager_path&quot;: &quot;npm&quot;,
-    &quot;settings.editor.selected.configurable&quot;: &quot;editor.preferences.fonts.default&quot;,
-    &quot;vue.rearranger.settings.migration&quot;: &quot;true&quot;
+  <component name="PropertiesComponent"><![CDATA[{
+  "keyToString": {
+    "Emmy Debugger(NEW).remote_debugger.executor": "Debug",
+    "Emmy Debugger(NEW).remote_debugger_v2.executor": "Debug",
+    "Lua Application.love.executor": "Run",
+    "Lua Application.love11.executor": "Run",
+    "Lua Application.love12.executor": "Run",
+    "Lua Application.main.executor": "Run",
+    "Lua Application.main_lichen.executor": "Run",
+    "Lua Application.main_linux.executor": "Run",
+    "Lua Application.main_signal.executor": "Run",
+    "Lua Application.main_swirl.executor": "Run",
+    "Lua Application.main_thread.executor": "Run",
+    "Lua Application.main_windows.executor": "Run",
+    "Lua Application.main_windows_battle.executor": "Run",
+    "Lua Application.main_windows_menu.executor": "Run",
+    "Lua Application.overworld.executor": "Run",
+    "Lua Application.rope.executor": "Run",
+    "RunOnceActivity.OpenProjectViewOnStart": "true",
+    "RunOnceActivity.RadMigrateCodeStyle": "true",
+    "RunOnceActivity.ShowReadmeOnStart": "true",
+    "RunOnceActivity.cidr.known.project.marker": "true",
+    "RunOnceActivity.readMode.enableVisualFormatting": "true",
+    "WebServerToolWindowFactoryState": "false",
+    "cf.advertisement.text.has.clang-format": "true",
+    "cf.first.check.clang-format": "false",
+    "cidr.known.project.marker": "true",
+    "deletionFromPopupRequiresConfirmation": "false",
+    "git-widget-placeholder": "main",
+    "ignore.virus.scanning.warn.message": "true",
+    "last_opened_file_path": "C:/Users/cleme/Workspace/rat_game/assets/sprites",
+    "node.js.detected.package.eslint": "true",
+    "node.js.detected.package.tslint": "true",
+    "node.js.selected.package.eslint": "(autodetect)",
+    "node.js.selected.package.tslint": "(autodetect)",
+    "nodejs_package_manager_path": "npm",
+    "settings.editor.selected.configurable": "editor.preferences.fonts.default",
+    "vue.rearranger.settings.migration": "true"
   }
-}</component>
+}]]></component>
   <component name="ReadonlyStatusHandler">
     <option name="SHOW_DIALOG" value="false" />
   </component>
   <component name="RecentsManager">
     <key name="CopyFile.RECENT_KEYS">
+      <recent name="C:\Users\cleme\Workspace\rat_game\assets\sprites" />
       <recent name="C:\Users\cleme\Workspace\rat_game\love\linux\lib" />
       <recent name="C:\Users\cleme\Workspace\rat_game" />
       <recent name="C:\Users\cleme\Workspace\rat_game\love\windows" />
       <recent name="C:\Users\cleme\Workspace\rat_game\libs\windows" />
-      <recent name="C:\Users\cleme\Workspace\rat_game\libs\linux\tinyspline" />
     </key>
     <key name="MoveFile.RECENT_KEYS">
       <recent name="C:\Users\cleme\Workspace\rat_game\libs\linux\fftw3" />
@@ -434,15 +446,8 @@
       <workItem from="1719869636563" duration="14589000" />
       <workItem from="1720028280662" duration="4085000" />
       <workItem from="1720189974087" duration="1806000" />
-      <workItem from="1720191992371" duration="29688000" />
-    </task>
-    <task id="LOCAL-00816" summary="added sprites">
-      <option name="closed" value="true" />
-      <created>1718388617746</created>
-      <option name="number" value="00816" />
-      <option name="presentableId" value="LOCAL-00816" />
-      <option name="project" value="LOCAL" />
-      <updated>1718388617746</updated>
+      <workItem from="1720191992371" duration="30595000" />
+      <workItem from="1720452981857" duration="8301000" />
     </task>
     <task id="LOCAL-00817" summary="added exe">
       <option name="closed" value="true" />
@@ -828,7 +833,15 @@
       <option name="project" value="LOCAL" />
       <updated>1720381479186</updated>
     </task>
-    <option name="localTasksCounter" value="865" />
+    <task id="LOCAL-00865" summary="added parallel line background">
+      <option name="closed" value="true" />
+      <created>1720382095965</created>
+      <option name="number" value="00865" />
+      <option name="presentableId" value="LOCAL-00865" />
+      <option name="project" value="LOCAL" />
+      <updated>1720382095965</updated>
+    </task>
+    <option name="localTasksCounter" value="866" />
     <servers />
   </component>
   <component name="TypeScriptGeneratedFilesManager">

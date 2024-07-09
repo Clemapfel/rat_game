@@ -2,7 +2,8 @@ rt.settings.menu.scene = {
     tab_bar_sprite_id = "menu_icons",
     equips_sprite_index = "equips",
     moves_sprite_index = "moves",
-    consumables_sprite_index = "consumables"
+    consumables_sprite_index = "consumables",
+    template_sprite_index = "templates"
 }
 
 --- @class mn.InventoryState
@@ -33,17 +34,19 @@ mn.Scene = meta.new_type("MenuScene", rt.Scene, function()
         _shared_tab_bar = mn.TabBar(),
         _shared_list_sort_mode = mn.ScrollableListSortMode.BY_ID,
 
-        _current_shared_list_index = 2,
+        _shared_tab_index = 2,
         _shared_move_list = mn.ScrollableList(),
         _shared_equip_list = mn.ScrollableList(),
         _shared_consumable_list = mn.ScrollableList(),
         _shared_template_list = mn.ScrollableList(),
+        _shared_tab_index_to_list = meta.make_weak({}, true, true), -- Table<TabIndex, mn.ScrollableList>
 
         _entity_tab_bar = mn.TabBar(),
         _entity_pages = {}, -- Table<Number, {info, equips_and_consumables, moves}>
         _current_entity_i = 3,
 
         _selection_graph = mn.SelectionGraph(),
+        _shared_list_node_active = false,
         _input = rt.InputController(),
 
         _verbose_info_frame = rt.Frame(),
@@ -63,6 +66,33 @@ end, {
     },
 })
 
+function mn.Scene:_update_inventory_header_label()
+
+    local before_w = select(1, self._inventory_header_label:measure())
+
+    local prefix, postfix = "<o>", "</o>"
+    if self._shared_tab_index == self._shared_move_tab_index then
+        self._inventory_header_label:set_text(prefix .. "Moves" .. postfix)
+    elseif self._shared_tab_index == self._shared_consumable_tab_index then
+        self._inventory_header_label:set_text(prefix .. "Consumables" .. postfix)
+    elseif self._shared_tab_index == self._shared_equip_tab_index then
+        self._inventory_header_label:set_text(prefix .. "Equippables" .. postfix)
+    elseif self._shared_tab_index == self._shared_template_tab_index then
+        self._inventory_header_label:set_text(prefix .. "Templates" .. postfix)
+    else
+        self._inventory_header_label:set_text(prefix .. "Inventory" .. postfix)
+    end
+
+    local control_w, control_h = self._control_indicator:measure()
+    local current_x, current_y = self._inventory_header_frame:get_position()
+
+    local header_w, header_h = self._inventory_header_label:measure()
+    header_w = header_w + 4 * rt.settings.margin_unit
+    self._inventory_header_frame:fit_into(current_x, current_y, header_w, control_h)
+    self._inventory_header_label:fit_into(current_x, current_y + 0.5 * control_h - 0.5 * header_h, header_w, control_h)
+
+end
+
 --- @override
 function mn.Scene:realize()
     if self._is_realized == true then return end
@@ -80,30 +110,22 @@ function mn.Scene:realize()
     self._control_indicator:realize()
     self:_update_control_indicator()
 
-    local temp_label_font =  rt.Font(80,
-        "assets/fonts/DejaVuSans/DejaVuSans-Regular.ttf",
-        "assets/fonts/DejaVuSans/DejaVuSans-Bold.ttf",
-        "assets/fonts/DejaVuSans/DejaVuSans-Italic.ttf",
-        "assets/fonts/DejaVuSans/DejaVuSans-BoldItalic.ttf"
-    )
-    
+
     local settings = rt.settings.menu.scene
     local tab_sprites = {
         [self._shared_move_tab_index] = rt.Sprite(settings.tab_bar_sprite_id, settings.moves_sprite_index),
         [self._shared_consumable_tab_index] = rt.Sprite(settings.tab_bar_sprite_id, settings.consumables_sprite_index),
         [self._shared_equip_tab_index] = rt.Sprite(settings.tab_bar_sprite_id, settings.equips_sprite_index),
+        [self._shared_template_tab_index] = rt.Sprite(settings.tab_bar_sprite_id, settings.template_sprite_index)
     }
 
-    for sprite in values(tab_sprites) do
+    for i, sprite in ipairs(tab_sprites) do
         local sprite_w, sprite_h = sprite:get_resolution()
         sprite_w = sprite_w * 2
         sprite_h = sprite_h * 2
         sprite:set_minimum_size(sprite_w, sprite_h)
         self._shared_tab_bar:push(sprite)
     end
-
-    local template_label = rt.Label("<o>T</o>", temp_label_font)
-    self._shared_tab_bar:push(template_label)
 
     self._shared_tab_bar:set_orientation(rt.Orientation.HORIZONTAL)
     self._shared_tab_bar:set_n_post_aligned_items(1)
@@ -163,8 +185,12 @@ function mn.Scene:realize()
         self._entity_pages[entity_i] = page
     end
 
-    local settings_label = rt.Label("<o>\u{2699}</o>", temp_label_font)
-    self._entity_tab_bar:push(settings_label)
+    local sprite = rt.Sprite("opal", 19)
+    sprite:realize()
+    local sprite_w, sprite_h = sprite:get_resolution()
+    sprite:set_minimum_size(sprite_w * 3, sprite_h * 3)
+
+    self._entity_tab_bar:push(sprite)
     self._entity_tab_bar:set_n_post_aligned_items(1)
     self._entity_tab_bar:set_orientation(rt.Orientation.VERTICAL)
     self._entity_tab_bar:realize()
@@ -185,6 +211,13 @@ function mn.Scene:realize()
     end
 
     self:set_current_entity_page(1)
+    
+    self._shared_tab_index_to_list = {
+        [self._shared_move_tab_index] = self._shared_move_list,
+        [self._shared_consumable_tab_index] = self._shared_consumable_list,
+        [self._shared_equip_tab_index] = self._shared_equip_list,
+        [self._shared_template_tab_index] = self._shared_template_list
+    }
 end
 
 --- @brief
@@ -371,17 +404,8 @@ function mn.Scene:draw()
     end
 
     self._shared_list_frame:draw()
-    local list_i = self._current_shared_list_index
-    if list_i == self._shared_move_tab_index then
-        self._shared_move_list:draw()
-    elseif list_i == self._shared_consumable_tab_index then
-        self._shared_consumable_list:draw()
-    elseif list_i == self._shared_equip_tab_index then
-        self._shared_equip_list:draw()
-    elseif list_i == self._shared_template_tab_index then
-        self._shared_template_list:draw()
-    end
-
+    self._shared_tab_index_to_list[self._shared_tab_index]:draw()
+  
     self._selection_graph:draw()
     self._verbose_info_frame:draw()
     self._verbose_info:draw()
@@ -389,25 +413,61 @@ end
 
 --- @brief
 function mn.Scene:_update_control_indicator()
-    local sort_label = "Sort"
-    local next_mode = self._shared_list_sort_mode_order[self._shared_list_sort_mode]
-    if next_mode == mn.ScrollableListSortMode.BY_ID then
-        sort_label = "Sort (by ID)"
-    elseif next_mode == mn.ScrollableListSortMode.BY_NAME then
-        sort_label = "Sort (by Name)"
-    elseif next_mode == mn.ScrollableListSortMode.BY_QUANTITY then
-        sort_label = "Sort (by Quantity)"
-    elseif next_mode == mn.ScrollableListSortMode.BY_TYPE then
-        sort_label = "Sort (by Type)"
+    if self._shared_list_node_active then
+        local sort_label = "Sort"
+        local next_mode = self._shared_list_sort_mode_order[self._shared_list_sort_mode]
+        if next_mode == mn.ScrollableListSortMode.BY_ID then
+            sort_label = "Sort (by ID)"
+        elseif next_mode == mn.ScrollableListSortMode.BY_NAME then
+            sort_label = "Sort (by Name)"
+        elseif next_mode == mn.ScrollableListSortMode.BY_QUANTITY then
+            sort_label = "Sort (by Quantity)"
+        elseif next_mode == mn.ScrollableListSortMode.BY_TYPE then
+            sort_label = "Sort (by Type)"
+        end
+
+        local prefix, postfix = "", ""-- "<o>", "</o>"
+        self._control_indicator:create_from({
+            {rt.ControlIndicatorButton.A, prefix .. "Equip / Unequip" .. postfix},
+            {rt.ControlIndicatorButton.B, prefix .. "Undo" .. postfix},
+            {rt.ControlIndicatorButton.X, prefix .. sort_label .. postfix},
+            {rt.ControlIndicatorButton.Y, prefix .. "Store" .. postfix}
+        })
+    else
+        self._control_indicator:create_from({
+            {rt.ControlIndicatorButton.A, "TODO"}
+        })
     end
 
-    local prefix, postfix = "", ""-- "<o>", "</o>"
-    self._control_indicator:create_from({
-        {rt.ControlIndicatorButton.A, prefix .. "Equip / Unequip" .. postfix},
-        {rt.ControlIndicatorButton.B, prefix .. "Undo" .. postfix},
-        {rt.ControlIndicatorButton.X, prefix .. sort_label .. postfix},
-        {rt.ControlIndicatorButton.Y, prefix .. "Store" .. postfix}
-    })
+    --[[
+    TODO:
+
+        pick up move / equip / consumable, and move it on shared side
+        or move it to right side
+        quick unequip with r
+        quipck equip with l, goes to first
+
+        On shared side:
+            A: add item to cursor, then jump to move / slot
+            if item is equip, preview stat changes,
+
+        On entity side:
+            A: pickup item, or if item is already held, swap
+            R: if item is held, send that to pocket, otherwise send what is under cursor position to pocket
+
+        Verbose Info:
+            EntityPage
+                Name of Entity
+                State: Base + Boost = Final
+                Explanation of each stat
+
+                HP (<b>H</b>it <b>P</b>oints): Health, if HP reach 0, a character is knocked out. If a character receives 1 or more damage while knocked out, they die permanently and your adventure ends.stat
+                ATK (Attack): Used by most moves to calculate the damage dealt, though sometimes ATK influences other parts of a moves behavior
+                DEF (Defense): Reduces damage dealt by most moves and increases healing
+                SPD (Speed): At the start of each turn, all entities in battle will be sorted by their speed, with the highest speed acting first. May be overriden by Priority
+
+    ]]--
+
 end
 
 function mn.Scene:_regenerate_selection_nodes()
@@ -520,7 +580,7 @@ function mn.Scene:_regenerate_selection_nodes()
     slot_nodes[1]:set_left(entity_tab_nodes[#entity_tab_nodes])
 
     local to_shared_right = function()
-        local list_i = self._current_shared_list_index
+        local list_i = self._shared_tab_index
         if list_i == self._shared_consumable_tab_index then
             return shared_consumable_node
         elseif list_i == self._shared_equip_tab_index then
@@ -549,12 +609,12 @@ function mn.Scene:_regenerate_selection_nodes()
     end
     
     local shared_list_up = function()
-        return shared_tab_nodes[self._current_shared_list_index]
+        return shared_tab_nodes[self._shared_tab_index]
     end
 
     local shared_list_left = function()
         --[[
-        local list_i = self._current_shared_list_index
+        local list_i = self._shared_tab_index
         if list_i == self._shared_consumable_tab_index then
             return slot_nodes[#slot_nodes]
         elseif list_i == self._shared_equip_tab_index then
@@ -583,6 +643,9 @@ function mn.Scene:_regenerate_selection_nodes()
         node:set_on_activate(function()
             self:set_current_entity_page(node_i)
         end)
+        node:set_on_enter(function()
+            self:set_current_entity_page(node_i)
+        end)
     end
 
     entity_tab_nodes[#entity_tab_nodes]:set_on_activate(function()
@@ -592,6 +655,15 @@ function mn.Scene:_regenerate_selection_nodes()
     for node_i, node in ipairs(shared_tab_nodes) do
         node:set_on_activate(function()
             self:set_current_shared_list_page(node_i)
+        end)
+        node:set_on_enter(function()
+            self:set_current_shared_list_page(node_i)
+        end)
+        node:set_on_exit(function(direction)
+            -- if moving from tabs down to shared list node, set to 1, all other directions keep cursor
+            if direction == rt.Direction.DOWN then
+                self._shared_tab_index_to_list[self._shared_tab_index]:set_selected_i(1)
+            end
         end)
     end
 
@@ -618,6 +690,16 @@ function mn.Scene:_regenerate_selection_nodes()
         end)
     end
 
+    for node in range(shared_move_node, shared_equip_node, shared_consumable_node, shared_template_node) do
+        node:set_on_enter(function()
+            self._shared_list_node_active = true
+        end)
+
+        node:set_on_exit(function()
+            self._shared_list_node_active = false
+        end)
+    end
+    
     -- push
     for nodes in range(
         entity_tab_nodes,
@@ -636,17 +718,42 @@ end
 
 --- @brief
 function mn.Scene:_handle_button_pressed(which)
-    if which == rt.InputButton.UP then
-        self._selection_graph:move_up()
-    elseif which == rt.InputButton.RIGHT then
-        self._selection_graph:move_right()
-    elseif which == rt.InputButton.DOWN then
-        self._selection_graph:move_down()
-    elseif which == rt.InputButton.LEFT then
-        self._selection_graph:move_left()
-    elseif which == rt.InputButton.A then
-        self._selection_graph:activate()
-    end
+    ::restart::
+    if self._shared_list_node_active == true then
+        local current_shared_list = self._shared_tab_index_to_list[self._shared_tab_index]
+        
+        if which == rt.InputButton.UP then
+            -- escape from tab list when going up
+            local exit = current_shared_list:move_up()
+            if exit == false then
+                self._shared_list_node_active = false
+                goto restart
+            else
+                self._verbose_info:show({current_shared_list:get_selected(), POSITIVE_INFINITY})
+            end
+        elseif which == rt.InputButton.DOWN then
+            current_shared_list:move_down()
+            self._verbose_info:show({current_shared_list:get_selected(), POSITIVE_INFINITY})
+        elseif which == rt.InputButton.RIGHT then
+            self._selection_graph:move_right()
+        elseif which == rt.InputButton.LEFT then
+            self._selection_graph:move_left()
+        elseif which == rt.InputButton.A then
+            -- TODO
+        end
+    else
+        if which == rt.InputButton.UP then
+            self._selection_graph:move_up()
+        elseif which == rt.InputButton.RIGHT then
+            self._selection_graph:move_right()
+        elseif which == rt.InputButton.DOWN then
+            self._selection_graph:move_down()
+        elseif which == rt.InputButton.LEFT then
+            self._selection_graph:move_left()
+        elseif which == rt.InputButton.A then
+            self._selection_graph:activate()
+        end
+        end
 end
 
 --- @brief
@@ -659,7 +766,8 @@ end
 --- @brief
 function mn.Scene:set_current_shared_list_page(i)
     if i < 1 or i > 4 then return end
-    self._current_shared_list_index = i
+    self._shared_tab_index = i
+    self:_update_inventory_header_label()
 end
 
 --- @brief

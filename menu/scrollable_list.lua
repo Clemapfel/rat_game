@@ -352,6 +352,20 @@ function mn.ScrollableList:move_down()
 end
 
 --- @brief
+function mn.ScrollableList:set_selected_i(i)
+    i = clamp(i, 1, self._n_items)
+    if i > self._selected_item_i then
+        while i > self._selected_item_i do
+            if not self:move_down() then break end
+        end
+    elseif i < self._selected_item_i then
+        while i < self._selected_item_i do
+            if not self:move_up() then break end
+        end
+    end
+end
+
+--- @brief
 function mn.ScrollableList:get_selected()
     local item = self._items[self._sortings[self._current_sort_mode][self._selected_item_i].item_i]
     if item ~= nil then
@@ -359,6 +373,11 @@ function mn.ScrollableList:get_selected()
     else
         return nil
     end
+end
+
+--- @brief
+function mn.ScrollableList:get_selected_i()
+    return self._selected_item_i
 end
 
 --- @brief
