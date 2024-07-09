@@ -46,12 +46,18 @@ for entity in values(entities) do
         "SURF",
         "WISH"
     ) do
-        entity:add_move(bt.Move(move))
+        if rt.random.toss_coin(0.7) then
+            entity:add_move(bt.Move(move))
+        end
     end
 
-    entity:add_consumable(bt.Consumable("DEBUG_CONSUMABLE"))
-    entity:add_equip(bt.Equip("DEBUG_EQUIP"))
+    if entity:get_n_consumable_slots() >= 1 and rt.random.toss_coin(0.9) then
+        entity:add_consumable(bt.Consumable("DEBUG_CONSUMABLE"))
+    end
 
+    if entity:get_n_equip_slots() > 1 then
+        entity:add_equip(bt.Equip("DEBUG_EQUIP"))
+    end
     table.insert(state.entities, entity)
 end
 

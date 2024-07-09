@@ -22,19 +22,14 @@
     </configurations>
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="7fa9ba1b-2cff-4ecc-86fb-59ab2fa76ee1" name="Changes" comment="added parallel line background">
-      <change afterPath="$PROJECT_DIR$/assets/sprites/menu_icons.pxo" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/assets/sprites/opal.lua" afterDir="false" />
+    <list default="true" id="7fa9ba1b-2cff-4ecc-86fb-59ab2fa76ee1" name="Changes" comment="added more menu functionality">
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/assets/sprites/battle/menu_item.pxo" beforeDir="false" afterPath="$PROJECT_DIR$/assets/sprites/battle/menu_item.pxo" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/assets/sprites/menu_icons.lua" beforeDir="false" afterPath="$PROJECT_DIR$/assets/sprites/menu_icons.lua" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/assets/sprites/menu_icons.png" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/assets/sprites/menu_item.pxo" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/battle/backgrounds/parallell_lines.glsl" beforeDir="false" afterPath="$PROJECT_DIR$/battle/backgrounds/parallell_lines.glsl" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/common/sprite.lua" beforeDir="false" afterPath="$PROJECT_DIR$/common/sprite.lua" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/common/sprite_atlas.lua" beforeDir="false" afterPath="$PROJECT_DIR$/common/sprite_atlas.lua" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/battle/configs/entities/GIRL.lua" beforeDir="false" afterPath="$PROJECT_DIR$/battle/configs/entities/GIRL.lua" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/battle/configs/entities/MC.lua" beforeDir="false" afterPath="$PROJECT_DIR$/battle/configs/entities/MC.lua" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/battle/configs/entities/PROF.lua" beforeDir="false" afterPath="$PROJECT_DIR$/battle/configs/entities/PROF.lua" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/battle/configs/entities/RAT.lua" beforeDir="false" afterPath="$PROJECT_DIR$/battle/configs/entities/RAT.lua" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/main_menu.lua" beforeDir="false" afterPath="$PROJECT_DIR$/main_menu.lua" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/menu/scene.lua" beforeDir="false" afterPath="$PROJECT_DIR$/menu/scene.lua" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/menu/scrollable_list.lua" beforeDir="false" afterPath="$PROJECT_DIR$/menu/scrollable_list.lua" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/menu/selection_graph.lua" beforeDir="false" afterPath="$PROJECT_DIR$/menu/selection_graph.lua" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
@@ -134,7 +129,7 @@
       <recent name="C:\Users\cleme\Workspace\rat_game\libs\windows\#" />
     </key>
   </component>
-  <component name="RunManager" selected="Lua Application.main_windows_battle">
+  <component name="RunManager" selected="Lua Application.main_windows_menu">
     <configuration name="main_windows_battle" type="lua.app" factoryName="Lua Application">
       <module name="rat_game" />
       <option name="program" value="C:\Users\cleme\Workspace\rat_game\love\windows\love.exe" />
@@ -447,15 +442,7 @@
       <workItem from="1720028280662" duration="4085000" />
       <workItem from="1720189974087" duration="1806000" />
       <workItem from="1720191992371" duration="30595000" />
-      <workItem from="1720452981857" duration="8301000" />
-    </task>
-    <task id="LOCAL-00817" summary="added exe">
-      <option name="closed" value="true" />
-      <created>1718411900468</created>
-      <option name="number" value="00817" />
-      <option name="presentableId" value="LOCAL-00817" />
-      <option name="project" value="LOCAL" />
-      <updated>1718411900469</updated>
+      <workItem from="1720452981857" duration="16946000" />
     </task>
     <task id="LOCAL-00818" summary="added sprites">
       <option name="closed" value="true" />
@@ -841,7 +828,15 @@
       <option name="project" value="LOCAL" />
       <updated>1720382095965</updated>
     </task>
-    <option name="localTasksCounter" value="866" />
+    <task id="LOCAL-00866" summary="added more menu functionality">
+      <option name="closed" value="true" />
+      <created>1720488133988</created>
+      <option name="number" value="00866" />
+      <option name="presentableId" value="LOCAL-00866" />
+      <option name="project" value="LOCAL" />
+      <updated>1720488133988</updated>
+    </task>
+    <option name="localTasksCounter" value="867" />
     <servers />
   </component>
   <component name="TypeScriptGeneratedFilesManager">
@@ -890,7 +885,6 @@
     </option>
   </component>
   <component name="VcsManagerConfiguration">
-    <MESSAGE value="optimization" />
     <MESSAGE value="revert" />
     <MESSAGE value="stashing tab bar" />
     <MESSAGE value="added bspline" />
@@ -915,7 +909,8 @@
     <MESSAGE value="stashing old layout" />
     <MESSAGE value="stashing menu" />
     <MESSAGE value="added parallel line background" />
-    <option name="LAST_COMMIT_MESSAGE" value="added parallel line background" />
+    <MESSAGE value="added more menu functionality" />
+    <option name="LAST_COMMIT_MESSAGE" value="added more menu functionality" />
   </component>
   <component name="XDebuggerManager">
     <breakpoint-manager>

@@ -8,8 +8,8 @@ mn.SelectionGraph = meta.new_type("SelectionGraph", function()
 end)
 
 --- @class mn.SelectionGraphNode
-mn.SelectionGraphNode = meta.new_type("SelectionGraphNode", rt.Drawable, function()
-    return meta.new(mn.SelectionGraphNode, {
+mn.SelectionGraphNode = meta.new_type("SelectionGraphNode", rt.Drawable, function(aabb)
+    local out = meta.new(mn.SelectionGraphNode, {
         _aabb = rt.AABB(0, 0, 1, 1),
         _centroid_x = 0,
         _centroid_y = 0,
@@ -21,6 +21,14 @@ mn.SelectionGraphNode = meta.new_type("SelectionGraphNode", rt.Drawable, functio
         _on_down = nil,   -- () -> mn.SelectionGraphNode
         _on_left = nil,   -- () -> mn.SelectionGraphNode
     })
+
+    if aabb ~= nil then
+        out._aabb = aabb
+        out._centroid_x = aabb.x + 0.5 * aabb.width
+        out._centroid_y = aabb.y + 0.5 * aabb.height
+    end
+
+    return out
 end)
 
 function mn.SelectionGraphNode:set_aabb(aabb_or_x, y, w, h)
