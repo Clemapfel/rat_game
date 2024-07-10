@@ -296,7 +296,12 @@ end
 
 --- @brief
 function rt.color_lighten(color, offset)
-    return rt.color_darken(color, -1 * offset)
+    offset = clamp(offset, 0, 1)
+    if meta.is_hsva(color) then
+        return rt.HSVA(color.h, color.s, color.v + offset, color.a)
+    else
+        return rt.RGBA(color.r + offset, color.g + offset, color.b + offset, color.a)
+    end
 end
 
 --- @brief [internal] test colors

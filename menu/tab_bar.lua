@@ -1,7 +1,3 @@
-rt.settings.menu.tab_bar = {
-    frame_thickness = rt.settings.frame.thickness + 1
-}
-
 --- @class mn.TabBar
 mn.TabBar = meta.new_type("TabBar", rt.Widget, function()
     return meta.new(mn.TabBar, {
@@ -21,10 +17,11 @@ function mn.TabBar:push(widget)
     local to_insert = {
         widget = widget,
         stencil = rt.Rectangle(),
-        frame = rt.Frame()
+        frame = rt.Frame(),
+        base = rt.Spacer()
     }
 
-    to_insert.frame:set_thickness(rt.settings.menu.tab_bar.frame_thickness)
+    to_insert.frame:set_child(to_insert.base)
     to_insert.stencil:set_corner_radius(rt.settings.frame.corner_radius)
 
     if self._is_realized == true then
@@ -200,24 +197,6 @@ function mn.TabBar:draw()
     end
 end
 
---- @brief
-function mn.TabBar:set_selected(i)
-    self._selected_item_i = clamp(i, 1, self._n_items)
-    for item_i, item in ipairs(self._items) do
-        if item_i == self._selected_item_i then
-            item.frame:set_color(rt.Palette.SELECTION, rt.Palette.GRAY_5)
-        else
-            item.frame:set_color(rt.Palette.FOREGROUND)
-        end
-    end
-end
-
---- @brief
-function mn.TabBar:get_selected()
-    if self._n_items == 0 then return nil end
-    return self._selected_item_i
-end
-
 --- @brief set how many of the items at the end of the list should be pushed to the other site
 function mn.TabBar:set_n_post_aligned_items(n)
     self._n_post_aligned_items = n
@@ -246,4 +225,19 @@ function mn.TabBar:get_selection_nodes()
         table.insert(out, node)
     end
     return out
+end
+
+--- @brief
+function mn.TabBar:set_tab_selected(tab_i, b)
+    self._items[tab_i].frame:set_selected(b)
+end
+
+--- @brief
+function mn.TabBar:set_tab_active(tab_i, b)
+    local item = self._items[tab_i]
+    if b == true then
+        item.base:set_color(rt.Palette.GRAY_4)
+    else
+        item.base:set_color(rt.Palette.BACKGROUND)
+    end
 end

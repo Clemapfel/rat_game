@@ -23,7 +23,8 @@ rt.Frame = meta.new_type("Frame", rt.Widget, function(type)
         _frame_outline = ternary(type == rt.FrameType.RECTANGULAR, rt.Rectangle(0, 0, 1, 1), rt.Circle(0, 0, 1)),
         _color = rt.Palette.FOREGROUND,
         _thickness = rt.settings.frame.thickness,
-        _corner_radius = rt.settings.frame.corner_radius
+        _corner_radius = rt.settings.frame.corner_radius,
+        _is_selected = false
     })
 
     rt.Frame.stencil_id = rt.Frame.stencil_id + 1
@@ -236,4 +237,18 @@ end
 --- @brief
 function rt.Frame:get_type()
     return self._type
+end
+
+--- @brief
+function rt.Frame:set_selected(b)
+    self._is_selected = b
+    if self._is_selected ~= true then
+        self._frame:set_line_width(self._thickness)
+        self._frame_outline:set_line_width(self._thickness + 2)
+        self._frame:set_color(self._color)
+    else
+        self._frame:set_line_width(self._thickness + 2)
+        self._frame_outline:set_line_width(self._thickness + 2 + 2)
+        self._frame:set_color(rt.Palette.SELECTION)
+    end
 end

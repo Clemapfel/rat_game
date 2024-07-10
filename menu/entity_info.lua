@@ -227,3 +227,8 @@ end
 function mn.EntityInfo:measure()
     return self._final_w, self._final_h
 end
+
+--- @brief
+function mn.EntityInfo:set_selected(b)
+    self._frame:set_selected(b)
+end

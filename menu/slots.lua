@@ -266,3 +266,8 @@ function mn.Slots:set_slot_selected(slot_i, b)
         item.frame:set_line_width(rt.settings.menu.slots.frame_unselected_thickness)
     end
 end
+
+--- @brief
+function mn.Slots:set_selected(b)
+    self._frame:set_selected(b)
+end

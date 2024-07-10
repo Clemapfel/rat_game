@@ -57,7 +57,7 @@ function mn.ScrollableList._realize_item(item)
     end
 
     item.base_outline:set_color(rt.Palette.BACKGROUND_OUTLINE)
-    item.unselected_base:set_color(rt.Palette.GRAY_4)
+    item.unselected_base:set_color(rt.Palette.GRAY_5)
     item.selected_base:set_color(rt.Palette.GRAY_3)
 
     for rectangle in range(item.base_outline, item.unselected_base, item.selected_base) do

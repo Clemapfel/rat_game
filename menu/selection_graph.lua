@@ -156,7 +156,16 @@ end
 
 function mn.SelectionGraph:set_current_node(node)
     self:add(node)
+
+    if self._current_node ~= nil and self._current_node._on_exit ~= nil then
+        self._current_node._on_exit(nil)
+    end
+
     self._current_node = node
+
+    if self._current_node ~= nil and self._current_node._on_enter ~= nil then
+        self._current_node._on_enter(nil)
+    end
 end
 
 function mn.SelectionGraph:draw()
@@ -178,6 +187,11 @@ function mn.SelectionGraph:activate()
 end
 
 function mn.SelectionGraph:clear()
+    for node in keys(self._nodes) do
+        if node._on_exit ~= nil then
+            node._on_exit(nil)
+        end
+    end
     self._nodes = {}
     self._current_node = nil
 end

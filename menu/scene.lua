@@ -70,7 +70,6 @@ end, {
 })
 
 function mn.Scene:_update_inventory_header_label()
-
     local before_w = select(1, self._inventory_header_label:measure())
 
     local prefix, postfix = "<o>", "</o>"
@@ -93,7 +92,6 @@ function mn.Scene:_update_inventory_header_label()
     header_w = header_w + 4 * rt.settings.margin_unit
     self._inventory_header_frame:fit_into(current_x, current_y, header_w, control_h)
     self._inventory_header_label:fit_into(current_x, current_y + 0.5 * control_h - 0.5 * header_h, header_w, control_h)
-
 end
 
 --- @override
@@ -206,6 +204,7 @@ function mn.Scene:realize()
         list:realize()
     end
 
+    self:set_current_shared_list_page(1)
     self:set_current_entity_page(1)
     
     self._shared_tab_index_to_list = {
@@ -376,9 +375,6 @@ function mn.Scene:size_allocate(x, y, width, height)
     end
     ]]--
     self:_regenerate_selection_nodes()
-
-    -- TODO
-    self._verbose_info:show({bt.Entity("GIRL")})
 end
 
 --- @override
@@ -465,7 +461,6 @@ function mn.Scene:_update_control_indicator()
                 SPD (Speed): At the start of each turn, all entities in battle will be sorted by their speed, with the highest speed acting first. May be overriden by Priority
 
     ]]--
-
 end
 
 function mn.Scene:_regenerate_selection_nodes()
@@ -722,10 +717,12 @@ function mn.Scene:_regenerate_selection_nodes()
     for node in values(shared_list_nodes) do
         node:set_on_enter(function()
             self._shared_list_node_active = true
+            self._shared_list_frame:set_selected(true)
         end)
 
         node:set_on_exit(function()
             self._shared_list_node_active = false
+            self._shared_list_frame:set_selected(false)
         end)
     end
 
@@ -733,34 +730,49 @@ function mn.Scene:_regenerate_selection_nodes()
         node:set_on_activate(function()
             self:set_current_entity_page(entity_i)
         end)
+
+        node:set_on_enter(function()
+            self._entity_tab_bar:set_tab_selected(entity_i, true)
+        end)
+
+        node:set_on_exit(function()
+            self._entity_tab_bar:set_tab_selected(entity_i, false)
+        end)
     end
 
     for tab_i, node in ipairs(shared_tab_nodes) do
         node:set_on_activate(function()
             self:set_current_shared_list_page(tab_i)
         end)
+
+        node:set_on_enter(function()
+            self._shared_tab_bar:set_tab_selected(tab_i, true)
+        end)
+
+        node:set_on_exit(function()
+            self._shared_tab_bar:set_tab_selected(tab_i, false)
+        end)
     end
 
     for page_i, page in ipairs(entity_page_nodes) do
-        
         page.info_node:set_on_enter(function()  
-            self._set_frame_selected( self._entity_pages[page_i].info, true)
+            self._entity_pages[page_i].info:set_selected(true)
         end)
 
         page.info_node:set_on_exit(function()
-            self._set_frame_selected( self._entity_pages[page_i].info, false)
+            self._entity_pages[page_i].info:set_selected(false)
         end)
         
         for node_i, node in ipairs(page.move_nodes) do
             node:set_on_enter(function()
                 local slots = self._entity_pages[page_i].moves
-                self._set_frame_selected(slots, true)
+                slots:set_selected(true)
                 slots:set_slot_selected(node_i, true)
             end)
 
             node:set_on_exit(function()
                 local slots = self._entity_pages[page_i].moves
-                self._set_frame_selected(slots, false)
+                slots:set_selected(false)
                 slots:set_slot_selected(node_i, false)
             end)
         end
@@ -768,13 +780,13 @@ function mn.Scene:_regenerate_selection_nodes()
         for node_i, node in ipairs(page.slot_nodes) do
             node:set_on_enter(function()
                 local slots = self._entity_pages[page_i].equips_and_consumables
-                self._set_frame_selected(slots, true)
+                slots:set_selected(true)
                 slots:set_slot_selected(node_i, true)
             end)
 
             node:set_on_exit(function()
                 local slots = self._entity_pages[page_i].equips_and_consumables
-                self._set_frame_selected(slots, false)
+                slots:set_selected(false)
                 slots:set_slot_selected(node_i, false)
             end)
         end
@@ -852,13 +864,18 @@ end
 function mn.Scene:set_current_entity_page(i)
     if i < 1 or i > self._n_entities then return end
     self._current_entity_i = i
-    self._entity_tab_bar:set_selected(self._current_entity_i)
+    for entity_i = 1, self._n_entities do
+        self._entity_tab_bar:set_tab_active(entity_i, entity_i == i)
+    end
 end
 
 --- @brief
 function mn.Scene:set_current_shared_list_page(i)
     if i < 1 or i > 4 then return end
     self._shared_tab_index = i
+    for tab_i = 1, 4 do
+        self._shared_tab_bar:set_tab_active(tab_i, tab_i == i)
+    end
     self:_update_inventory_header_label()
 end
 
@@ -867,16 +884,6 @@ function mn.Scene:open_options()
     rt.warning("In mn.Scene.open_options: TODO")
 end
 
+--[[
 
---- @brief
-function mn.Scene._set_frame_selected(object, b)
-    if b then
-        object._frame:set_color(rt.Palette.SELECTION)
-        object._frame:set_thickness(rt.settings.frame.thickness + 2)
-    else
-        object._frame:set_color(rt.Palette.FOREGROUND)
-        object._frame:set_thickness(rt.settings.frame.thickness)
-    end
-end
-
-TODO: standardize frame selection for all menu elements
+]]--
