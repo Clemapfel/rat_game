@@ -1,6 +1,8 @@
 rt.settings.menu.slots = {
     sprite_resolution = 32,
-    sprite_scale = 2
+    sprite_scale = 2,
+    frame_unselected_thickness = 1,
+    frame_selected_thickness = 2
 }
 
 mn.SlotType = meta.new_enum({
@@ -68,6 +70,7 @@ function mn.Slots:realize()
             to_insert.base:set_color(base_color)
             to_insert.base_inlay:set_color(rt.color_darken(base_color, 0.1))
             to_insert.frame:set_color(rt.Palette.GRAY_4)
+            to_insert.frame:set_line_width(rt.settings.menu.slots.frame_unselected_thickness)
             to_insert.frame:set_is_outline(true)
             to_insert.bounds = rt.AABB(0, 0, 1, 1)
             to_insert.selection_node = mn.SelectionGraphNode()
@@ -249,4 +252,17 @@ function mn.Slots:get_selection_nodes()
         end
     end
     return out
+end
+
+--- @brief
+function mn.Slots:set_slot_selected(slot_i, b)
+    meta.assert_boolean(b)
+    local item = self._slot_i_to_item[slot_i]
+    if b then
+        item.frame:set_color(rt.Palette.SELECTION)
+        item.frame:set_line_width(rt.settings.menu.slots.frame_selected_thickness)
+    else
+        item.frame:set_color(rt.Palette.GRAY_4)
+        item.frame:set_line_width(rt.settings.menu.slots.frame_unselected_thickness)
+    end
 end

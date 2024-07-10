@@ -22,15 +22,10 @@
     </configurations>
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="7fa9ba1b-2cff-4ecc-86fb-59ab2fa76ee1" name="Changes" comment="added more menu functionality">
+    <list default="true" id="7fa9ba1b-2cff-4ecc-86fb-59ab2fa76ee1" name="Changes" comment="menu selection layout done">
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/battle/configs/entities/GIRL.lua" beforeDir="false" afterPath="$PROJECT_DIR$/battle/configs/entities/GIRL.lua" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/battle/configs/entities/MC.lua" beforeDir="false" afterPath="$PROJECT_DIR$/battle/configs/entities/MC.lua" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/battle/configs/entities/PROF.lua" beforeDir="false" afterPath="$PROJECT_DIR$/battle/configs/entities/PROF.lua" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/battle/configs/entities/RAT.lua" beforeDir="false" afterPath="$PROJECT_DIR$/battle/configs/entities/RAT.lua" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/main_menu.lua" beforeDir="false" afterPath="$PROJECT_DIR$/main_menu.lua" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/menu/scene.lua" beforeDir="false" afterPath="$PROJECT_DIR$/menu/scene.lua" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/menu/selection_graph.lua" beforeDir="false" afterPath="$PROJECT_DIR$/menu/selection_graph.lua" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/menu/slots.lua" beforeDir="false" afterPath="$PROJECT_DIR$/menu/slots.lua" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -442,15 +437,7 @@
       <workItem from="1720028280662" duration="4085000" />
       <workItem from="1720189974087" duration="1806000" />
       <workItem from="1720191992371" duration="30595000" />
-      <workItem from="1720452981857" duration="16946000" />
-    </task>
-    <task id="LOCAL-00818" summary="added sprites">
-      <option name="closed" value="true" />
-      <created>1718413181151</created>
-      <option name="number" value="00818" />
-      <option name="presentableId" value="LOCAL-00818" />
-      <option name="project" value="LOCAL" />
-      <updated>1718413181151</updated>
+      <workItem from="1720452981857" duration="18414000" />
     </task>
     <task id="LOCAL-00819" summary="added sprites">
       <option name="closed" value="true" />
@@ -836,7 +823,15 @@
       <option name="project" value="LOCAL" />
       <updated>1720488133988</updated>
     </task>
-    <option name="localTasksCounter" value="867" />
+    <task id="LOCAL-00867" summary="menu selection layout done">
+      <option name="closed" value="true" />
+      <created>1720556088552</created>
+      <option name="number" value="00867" />
+      <option name="presentableId" value="LOCAL-00867" />
+      <option name="project" value="LOCAL" />
+      <updated>1720556088554</updated>
+    </task>
+    <option name="localTasksCounter" value="868" />
     <servers />
   </component>
   <component name="TypeScriptGeneratedFilesManager">
@@ -885,7 +880,6 @@
     </option>
   </component>
   <component name="VcsManagerConfiguration">
-    <MESSAGE value="revert" />
     <MESSAGE value="stashing tab bar" />
     <MESSAGE value="added bspline" />
     <MESSAGE value="adde portable fftw" />
@@ -910,7 +904,8 @@
     <MESSAGE value="stashing menu" />
     <MESSAGE value="added parallel line background" />
     <MESSAGE value="added more menu functionality" />
-    <option name="LAST_COMMIT_MESSAGE" value="added more menu functionality" />
+    <MESSAGE value="menu selection layout done" />
+    <option name="LAST_COMMIT_MESSAGE" value="menu selection layout done" />
   </component>
   <component name="XDebuggerManager">
     <breakpoint-manager>

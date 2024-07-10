@@ -406,7 +406,7 @@ function mn.Scene:draw()
     self._verbose_info:draw()
 
     --self:_draw_selection_graph() -- TODO
-    self._selection_graph:draw()
+    --self._selection_graph:draw()
 end
 
 --- @brief
@@ -741,6 +741,45 @@ function mn.Scene:_regenerate_selection_nodes()
         end)
     end
 
+    for page_i, page in ipairs(entity_page_nodes) do
+        
+        page.info_node:set_on_enter(function()  
+            self._set_frame_selected( self._entity_pages[page_i].info, true)
+        end)
+
+        page.info_node:set_on_exit(function()
+            self._set_frame_selected( self._entity_pages[page_i].info, false)
+        end)
+        
+        for node_i, node in ipairs(page.move_nodes) do
+            node:set_on_enter(function()
+                local slots = self._entity_pages[page_i].moves
+                self._set_frame_selected(slots, true)
+                slots:set_slot_selected(node_i, true)
+            end)
+
+            node:set_on_exit(function()
+                local slots = self._entity_pages[page_i].moves
+                self._set_frame_selected(slots, false)
+                slots:set_slot_selected(node_i, false)
+            end)
+        end
+
+        for node_i, node in ipairs(page.slot_nodes) do
+            node:set_on_enter(function()
+                local slots = self._entity_pages[page_i].equips_and_consumables
+                self._set_frame_selected(slots, true)
+                slots:set_slot_selected(node_i, true)
+            end)
+
+            node:set_on_exit(function()
+                local slots = self._entity_pages[page_i].equips_and_consumables
+                self._set_frame_selected(slots, false)
+                slots:set_slot_selected(node_i, false)
+            end)
+        end
+    end
+
     -- push
     self._selection_graph:clear()
 
@@ -827,3 +866,17 @@ end
 function mn.Scene:open_options()
     rt.warning("In mn.Scene.open_options: TODO")
 end
+
+
+--- @brief
+function mn.Scene._set_frame_selected(object, b)
+    if b then
+        object._frame:set_color(rt.Palette.SELECTION)
+        object._frame:set_thickness(rt.settings.frame.thickness + 2)
+    else
+        object._frame:set_color(rt.Palette.FOREGROUND)
+        object._frame:set_thickness(rt.settings.frame.thickness)
+    end
+end
+
+TODO: standardize frame selection for all menu elements
