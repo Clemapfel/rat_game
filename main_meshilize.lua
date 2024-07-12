@@ -3,6 +3,18 @@ require "include"
 
 image = rt.Image("assets/sprites/test.png")
 
+shader = love.graphics.newShader([[
+vec4 effect(vec4 color, Image tex, vec2 uv, vec2 px)
+{
+    // source: https://github.com/Nikaoto/subpixel/blob/master/subpixel_d7samurai.frag
+    vec2 texture_resolution = textureSize(tex, 0);
+    uv *= texture_resolution;
+    uv = floor(uv) + min(fract(uv) / fwidth(uv), 1.0) - 0.5;
+    uv /= texture_resolution;
+    return color * texture(tex, uv);
+}
+]])
+
 texture_01 = rt.Texture(image)
 texture_01:set_scale_mode(rt.TextureScaleMode.NEAREST)
 sprite_01 = rt.VertexRectangle(50, 50, 50, 50)
@@ -15,7 +27,7 @@ texture_02:set_scale_mode(rt.TextureScaleMode.LINEAR)
 sprite_02 = rt.VertexRectangle(0, 0, 1, 1)
 sprite_02:set_texture(texture_02)
 sprite_02:set_color(rt.Palette.TRUE_MAGENTA)
-shader_02:send("texture_resolution", {image:get_width(), image:get_height()})
+--shader_02:send("texture_resolution", {image:get_width(), image:get_height()})
 
 scale_x, scale_y = 1, 1
 rotation = 0
@@ -105,7 +117,7 @@ love.update = function(dt)
         should_reformat = true
     end
 
-    scale_x = scale_x * (1 + (rotation_speed / 5) * dt)
+    scale_x = scale_x * (1 + (rotation_speed / 6) * dt)
     scale_y = scale_x
     rotation = rotation + rotation_speed * 0.01
     reformat()

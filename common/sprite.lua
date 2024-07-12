@@ -4,6 +4,7 @@ rt.Sprite = meta.new_type("Sprite", rt.Widget, rt.Animation, function(id, index)
     return meta.new(rt.Sprite, {
         _id = id,
         _spritesheet = {}, -- rt.SpriteAtlasEntry
+        _texture_resolution = {0, 0},
         _width = 0, -- 0 -> use frame resolution
         _height = 0,
         _shape = rt.VertexRectangle(0, 0, 1, 1),
@@ -15,9 +16,12 @@ rt.Sprite = meta.new_type("Sprite", rt.Widget, rt.Animation, function(id, index)
         _animation_id = index,
         _frame_range_start = 1,
         _frame_range_end = 1,
-        _opacity = 1
+        _opacity = 1,
     })
-end)
+end,
+{
+    _shader = rt.Shader("assets/shaders/sprite_scale_correction.glsl")
+})
 
 --- @override
 function rt.Sprite:realize()
@@ -29,6 +33,7 @@ function rt.Sprite:realize()
     self._n_frames = self._spritesheet:get_n_frames()
     self._width, self._height = self._spritesheet:get_frame_size()
     self._shape:set_texture(self._spritesheet:get_texture())
+    self._texture_resolution = {self._spritesheet:get_texture_resolution()}
 
     self:reformat()
     self:set_frame(self._current_frame)
@@ -46,7 +51,10 @@ end
 
 --- @override
 function rt.Sprite:draw()
+    self._shader:bind()
+    self._shader:send("texture_resolution", self._texture_resolution)
     self._shape:draw()
+    self._shader:unbind()
 end
 
 --- @override

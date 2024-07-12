@@ -91,7 +91,7 @@ function bt.Battle:realize()
         end
 
         for equip_i, equip_id in ipairs(entry.equips) do
-            entity:add_equip(bt.Equip(equip_id), equip_i)
+            --entity:add_equip(bt.Equip(equip_id), equip_i)
         end
 
         for move_id in values(entry.moveset) do
