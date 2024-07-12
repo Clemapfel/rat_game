@@ -193,6 +193,11 @@ function rt.SpriteAtlasEntry:get_frame_size()
 end
 
 --- @brief
+function rt.SpriteAtlasEntry:get_texture_resolution()
+    return self.texture:get_size()
+end
+
+--- @brief
 function rt.SpriteAtlasEntry:get_fps()
     return self.fps
 end

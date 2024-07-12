@@ -3,8 +3,6 @@ require "include"
 rt.current_scene = mn.Scene()
 scene = rt.current_scene
 
-tex = love.graphics.newTexture("assets/sprites/")
-
 state = mn.InventoryState()
 for move_id in range(
     "DEBUG_MOVE",
@@ -98,8 +96,6 @@ love.draw = function()
         love.graphics.line(x + 0.5 * width, y, x + 0.5 * width, height)
         rt.graphics.set_blend_mode()
     end
-
-    love.graphics.draw(tex)
 end
 
 love.update = function(delta)

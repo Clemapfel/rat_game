@@ -8,29 +8,19 @@ texture_01:set_scale_mode(rt.TextureScaleMode.NEAREST)
 sprite_01 = rt.VertexRectangle(50, 50, 50, 50)
 sprite_01:set_texture(texture_01)
 sprite_01:set_color(rt.Palette.TRUE_WHITE)
-sprite_01_label = rt.Label("[Nearest Neighbor]")
 
-shader_02 = rt.Shader("assets/shaders/sprite_scale_v1.glsl")
+shader_02 = rt.Shader("assets/shaders/sprite_scale_correction.glsl")
 texture_02 = rt.Texture(image)
 texture_02:set_scale_mode(rt.TextureScaleMode.LINEAR)
 sprite_02 = rt.VertexRectangle(0, 0, 1, 1)
 sprite_02:set_texture(texture_02)
 sprite_02:set_color(rt.Palette.TRUE_MAGENTA)
-sprite_02_label = rt.Label("[Linear]")
-
-shader_03 = rt.Shader("assets/shaders/sprite_scale_v2.glsl")
-texture_03 = rt.Texture(image)
-texture_03:set_scale_mode(rt.TextureScaleMode.NEAREST)
-sprite_03 = rt.VertexRectangle(0, 0, 1, 1)
-sprite_03:set_texture(texture_02)
-sprite_03:set_color(rt.Palette.TRUE_CYAN)
-sprite_03_label = rt.Label("[Custom Shader]")
+shader_02:send("texture_resolution", {image:get_width(), image:get_height()})
 
 scale_x, scale_y = 1, 1
 rotation = 0
 sprite_01_origin_x, sprite_01_origin_y = 0, 0
 sprite_02_origin_x, sprite_02_origin_y = 0, 0
-sprite_03_origin_x, sprite_03_origin_y = 0, 0
 
 input = rt.InputController()
 
@@ -51,7 +41,7 @@ function reformat()
     sprite_01_origin_x = x + 0.5 * image_w
     sprite_01_origin_y = y + 0.5 * image_h
 
-    x, y = 0.5 * w - 0.5 * image_w, 0.5 * h - 0.5 * image_h
+    x, y = 0.75 * w - 0.5 * image_w, 0.5 * h - 0.5 * image_h
     sprite_02:reformat(
         x, y,
         x + image_w, y,
@@ -60,16 +50,6 @@ function reformat()
     )
     sprite_02_origin_x = x + 0.5 * image_w
     sprite_02_origin_y = y + 0.5 * image_h
-
-    x, y = 0.75 * w - 0.5 * image_w, 0.5 * h - 0.5 * image_h
-    sprite_03:reformat(
-        x, y,
-        x + image_w, y,
-        x + image_w, y + image_h,
-        x, y + image_h
-    )
-    sprite_03_origin_x = x + 0.5 * image_w
-    sprite_03_origin_y = y + 0.5 * image_h
 end
 
 love.draw = function()
@@ -86,22 +66,22 @@ love.draw = function()
     love.graphics.rotate(rotation)
     love.graphics.translate(-sprite_02_origin_x, -sprite_02_origin_y)
     shader_02:bind()
-    shader_02:send("resolution", {image:get_width(), image:get_height()})
-    shader_02:send("sharpness", math.max(scale_x, scale_y))
     sprite_02:draw()
     shader_02:unbind()
-
-    love.graphics.origin()
-    love.graphics.translate(sprite_03_origin_x, sprite_03_origin_y)
-    love.graphics.rotate(rotation)
-    love.graphics.translate(-sprite_03_origin_x, -sprite_03_origin_y)
-    shader_03:bind()
-    sprite_03:draw()
-    shader_03:unbind()
 end
+
+stop = true
 
 love.update = function(dt)
     local scale_speed = 1
+    local rotation_speed = (2 * math.pi) * 0.2
+
+    if input:is_down(rt.InputButton.A) then
+        stop = false
+    end
+
+    if stop == true then return end
+
     local should_reformat = false
     if input:is_down(rt.InputButton.UP) then
         scale_x = scale_x * (1 + dt) * scale_speed
@@ -115,11 +95,19 @@ love.update = function(dt)
         should_reformat = true
     end
 
-    --rotation = rotation + (2 * math.pi) * 0.0001
+    if input:is_down(rt.InputButton.RIGHT) then
+        rotation = rotation + dt * rotation_speed
+        should_reformat = true
+    end
 
-    scale_x = scale_x + 0.0025
+    if input:is_down(rt.InputButton.LEFT) then
+        rotation = rotation - dt * rotation_speed
+        should_reformat = true
+    end
+
+    scale_x = scale_x * (1 + (rotation_speed / 5) * dt)
     scale_y = scale_x
-
+    rotation = rotation + rotation_speed * 0.01
     reformat()
 end
 

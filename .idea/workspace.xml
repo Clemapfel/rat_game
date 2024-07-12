@@ -22,10 +22,14 @@
     </configurations>
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="7fa9ba1b-2cff-4ecc-86fb-59ab2fa76ee1" name="Changes" comment="added meshilizer">
-      <change afterPath="$PROJECT_DIR$/assets/shaders/sprite_scale_v1.glsl" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/assets/shaders/sprite_scale_v2.glsl" afterDir="false" />
+    <list default="true" id="7fa9ba1b-2cff-4ecc-86fb-59ab2fa76ee1" name="Changes" comment="stashing">
+      <change afterPath="$PROJECT_DIR$/assets/shaders/sprite_scale_correction_alt.glsl" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/assets/shaders/sprite_scale_v1.glsl" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/assets/shaders/sprite_scale_v2.glsl" beforeDir="false" afterPath="$PROJECT_DIR$/assets/shaders/sprite_scale_correction.glsl" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/common/sprite.lua" beforeDir="false" afterPath="$PROJECT_DIR$/common/sprite.lua" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/common/sprite_atlas.lua" beforeDir="false" afterPath="$PROJECT_DIR$/common/sprite_atlas.lua" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/main_menu.lua" beforeDir="false" afterPath="$PROJECT_DIR$/main_menu.lua" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/main_meshilize.lua" beforeDir="false" afterPath="$PROJECT_DIR$/main_meshilize.lua" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
@@ -452,15 +456,7 @@
       <workItem from="1720189974087" duration="1806000" />
       <workItem from="1720191992371" duration="30595000" />
       <workItem from="1720452981857" duration="26759000" />
-      <workItem from="1720812119693" duration="3426000" />
-    </task>
-    <task id="LOCAL-00822" summary="optimized rendering by caching">
-      <option name="closed" value="true" />
-      <created>1718478012768</created>
-      <option name="number" value="00822" />
-      <option name="presentableId" value="LOCAL-00822" />
-      <option name="project" value="LOCAL" />
-      <updated>1718478012769</updated>
+      <workItem from="1720812119693" duration="6107000" />
     </task>
     <task id="LOCAL-00823" summary="added background compression">
       <option name="closed" value="true" />
@@ -846,7 +842,15 @@
       <option name="project" value="LOCAL" />
       <updated>1720809354520</updated>
     </task>
-    <option name="localTasksCounter" value="871" />
+    <task id="LOCAL-00871" summary="stashing">
+      <option name="closed" value="true" />
+      <created>1720815805471</created>
+      <option name="number" value="00871" />
+      <option name="presentableId" value="LOCAL-00871" />
+      <option name="project" value="LOCAL" />
+      <updated>1720815805471</updated>
+    </task>
+    <option name="localTasksCounter" value="872" />
     <servers />
   </component>
   <component name="TypeScriptGeneratedFilesManager">
@@ -908,7 +912,6 @@
     <MESSAGE value="refactored entity" />
     <MESSAGE value="stashing menu layout" />
     <MESSAGE value="refactored menu layout" />
-    <MESSAGE value="stashing" />
     <MESSAGE value="refactored menu scene ui layout and menuing graph" />
     <MESSAGE value="added scrollable list initialization" />
     <MESSAGE value="refactored selection graph" />
@@ -920,7 +923,8 @@
     <MESSAGE value="stashing frame selection" />
     <MESSAGE value="polished frame selection" />
     <MESSAGE value="added meshilizer" />
-    <option name="LAST_COMMIT_MESSAGE" value="added meshilizer" />
+    <MESSAGE value="stashing" />
+    <option name="LAST_COMMIT_MESSAGE" value="stashing" />
   </component>
   <component name="XDebuggerManager">
     <breakpoint-manager>
