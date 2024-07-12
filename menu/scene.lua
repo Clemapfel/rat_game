@@ -101,6 +101,12 @@ function mn.Scene:realize()
 
     self._input:signal_connect("pressed", function(_, which)
         self:_handle_button_pressed(which)
+
+        i = 1
+        if which == rt.InputButton.A then
+            self:unequip_move(i)
+            i = i + 1
+        end
     end)
 
     self._inventory_header_label = rt.Label("<o>Inventory</o>")
@@ -882,6 +888,18 @@ end
 --- @brief
 function mn.Scene:open_options()
     rt.warning("In mn.Scene.open_options: TODO")
+end
+
+--- @brief
+function mn.Scene:unequip_move(move_slot_i)
+    local page = self._entity_pages[self._current_entity_i]
+    if page == nil then return end
+
+    local move = page.moves:get_object(move_slot_i)
+    if move ~= nil then
+        page.moves:set_object(move_slot_i, nil)
+        self._shared_move_list:add(move, 1)
+    end
 end
 
 --[[

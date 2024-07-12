@@ -22,17 +22,11 @@
     </configurations>
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="7fa9ba1b-2cff-4ecc-86fb-59ab2fa76ee1" name="Changes" comment="stashing frame selection">
+    <list default="true" id="7fa9ba1b-2cff-4ecc-86fb-59ab2fa76ee1" name="Changes" comment="polished frame selection">
+      <change afterPath="$PROJECT_DIR$/main_meshilize.lua" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/common/frame.lua" beforeDir="false" afterPath="$PROJECT_DIR$/common/frame.lua" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/main_menu.lua" beforeDir="false" afterPath="$PROJECT_DIR$/main_menu.lua" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/menu/entity_info.lua" beforeDir="false" afterPath="$PROJECT_DIR$/menu/entity_info.lua" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/menu/scene.lua" beforeDir="false" afterPath="$PROJECT_DIR$/menu/scene.lua" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/menu/scrollable_list.lua" beforeDir="false" afterPath="$PROJECT_DIR$/menu/scrollable_list.lua" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/menu/selection_graph.lua" beforeDir="false" afterPath="$PROJECT_DIR$/menu/selection_graph.lua" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/menu/slots.lua" beforeDir="false" afterPath="$PROJECT_DIR$/menu/slots.lua" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/menu/tab_bar.lua" beforeDir="false" afterPath="$PROJECT_DIR$/menu/tab_bar.lua" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/old/~common/color.lua" beforeDir="false" afterPath="$PROJECT_DIR$/old/~common/color.lua" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -76,6 +70,7 @@
   "keyToString": {
     "Emmy Debugger(NEW).remote_debugger.executor": "Debug",
     "Emmy Debugger(NEW).remote_debugger_v2.executor": "Debug",
+    "Lua Application.Unnamed.executor": "Run",
     "Lua Application.love.executor": "Run",
     "Lua Application.love11.executor": "Run",
     "Lua Application.love12.executor": "Run",
@@ -131,7 +126,18 @@
       <recent name="C:\Users\cleme\Workspace\rat_game\libs\windows\#" />
     </key>
   </component>
-  <component name="RunManager" selected="Lua Application.main_windows_menu">
+  <component name="RunManager" selected="Lua Application.Unnamed">
+    <configuration name="Unnamed" type="lua.app" factoryName="Lua Application" nameIsGenerated="true">
+      <module name="rat_game" />
+      <option name="program" value="C:\Users\cleme\Workspace\rat_game\love\windows\love.exe" />
+      <option name="file" value="main_meshilize.lua" />
+      <option name="workingDir" value="$PROJECT_DIR$/" />
+      <option name="debuggerType" value="2" />
+      <option name="params" value="" />
+      <option name="charset" value="UTF-8" />
+      <option name="showConsole" value="true" />
+      <method v="2" />
+    </configuration>
     <configuration name="main_windows_battle" type="lua.app" factoryName="Lua Application">
       <module name="rat_game" />
       <option name="program" value="C:\Users\cleme\Workspace\rat_game\love\windows\love.exe" />
@@ -194,6 +200,7 @@
       <item itemvalue="Emmy Debugger(NEW).remote_debugger" />
       <item itemvalue="Lua Application.main_windows_menu" />
       <item itemvalue="Lua Application.main_windows_battle" />
+      <item itemvalue="Lua Application.Unnamed" />
     </list>
   </component>
   <component name="SpellCheckerSettings" RuntimeDictionaries="0" Folders="0" CustomDictionaries="0" DefaultDictionary="application-level" UseSingleDictionary="true" transferred="true" />
@@ -444,15 +451,7 @@
       <workItem from="1720028280662" duration="4085000" />
       <workItem from="1720189974087" duration="1806000" />
       <workItem from="1720191992371" duration="30595000" />
-      <workItem from="1720452981857" duration="21690000" />
-    </task>
-    <task id="LOCAL-00820" summary="optimized glyph drawing">
-      <option name="closed" value="true" />
-      <created>1718473175741</created>
-      <option name="number" value="00820" />
-      <option name="presentableId" value="LOCAL-00820" />
-      <option name="project" value="LOCAL" />
-      <updated>1718473175741</updated>
+      <workItem from="1720452981857" duration="25078000" />
     </task>
     <task id="LOCAL-00821" summary="optimized drawing">
       <option name="closed" value="true" />
@@ -838,7 +837,15 @@
       <option name="project" value="LOCAL" />
       <updated>1720580689830</updated>
     </task>
-    <option name="localTasksCounter" value="869" />
+    <task id="LOCAL-00869" summary="polished frame selection">
+      <option name="closed" value="true" />
+      <created>1720634826931</created>
+      <option name="number" value="00869" />
+      <option name="presentableId" value="LOCAL-00869" />
+      <option name="project" value="LOCAL" />
+      <updated>1720634826931</updated>
+    </task>
+    <option name="localTasksCounter" value="870" />
     <servers />
   </component>
   <component name="TypeScriptGeneratedFilesManager">
@@ -887,7 +894,6 @@
     </option>
   </component>
   <component name="VcsManagerConfiguration">
-    <MESSAGE value="added bspline" />
     <MESSAGE value="adde portable fftw" />
     <MESSAGE value="stashing before frame rework" />
     <MESSAGE value="added menu scene" />
@@ -912,7 +918,8 @@
     <MESSAGE value="added more menu functionality" />
     <MESSAGE value="menu selection layout done" />
     <MESSAGE value="stashing frame selection" />
-    <option name="LAST_COMMIT_MESSAGE" value="stashing frame selection" />
+    <MESSAGE value="polished frame selection" />
+    <option name="LAST_COMMIT_MESSAGE" value="polished frame selection" />
   </component>
   <component name="XDebuggerManager">
     <breakpoint-manager>
