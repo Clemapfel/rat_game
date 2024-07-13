@@ -1,4 +1,4 @@
-rt.settings.battle.animations.ally_disappeared = {
+    rt.settings.battle.animations.ally_disappeared = {
     duration = 1.5
 }
 

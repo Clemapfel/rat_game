@@ -22,12 +22,12 @@
     </configurations>
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="7fa9ba1b-2cff-4ecc-86fb-59ab2fa76ee1" name="Changes" comment="MWE">
+    <list default="true" id="7fa9ba1b-2cff-4ecc-86fb-59ab2fa76ee1" name="Changes" comment="added subpixel filtering to fix sprite scaling">
+      <change afterPath="$PROJECT_DIR$/menu/object_moved_animation.lua" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/assets/shaders/sprite_scale_correction.glsl" beforeDir="false" afterPath="$PROJECT_DIR$/assets/shaders/sprite_scale_correction.glsl" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/battle/battle.lua" beforeDir="false" afterPath="$PROJECT_DIR$/battle/battle.lua" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/common/sprite.lua" beforeDir="false" afterPath="$PROJECT_DIR$/common/sprite.lua" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/main_meshilize.lua" beforeDir="false" afterPath="$PROJECT_DIR$/main_meshilize.lua" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/battle/animations/simulation/ally_disappeared.lua" beforeDir="false" afterPath="$PROJECT_DIR$/battle/animations/simulation/ally_disappeared.lua" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/include.lua" beforeDir="false" afterPath="$PROJECT_DIR$/include.lua" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/menu/scene.lua" beforeDir="false" afterPath="$PROJECT_DIR$/menu/scene.lua" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -104,7 +104,7 @@
     &quot;node.js.selected.package.eslint&quot;: &quot;(autodetect)&quot;,
     &quot;node.js.selected.package.tslint&quot;: &quot;(autodetect)&quot;,
     &quot;nodejs_package_manager_path&quot;: &quot;npm&quot;,
-    &quot;settings.editor.selected.configurable&quot;: &quot;editor.preferences.fonts.default&quot;,
+    &quot;settings.editor.selected.configurable&quot;: &quot;preferences.pluginManager&quot;,
     &quot;vue.rearranger.settings.migration&quot;: &quot;true&quot;
   }
 }</component>
@@ -127,7 +127,7 @@
       <recent name="C:\Users\cleme\Workspace\rat_game\libs\windows\#" />
     </key>
   </component>
-  <component name="RunManager" selected="Lua Application.main_windows_battle">
+  <component name="RunManager" selected="Lua Application.main_windows_menu">
     <configuration name="Unnamed" type="lua.app" factoryName="Lua Application" nameIsGenerated="true">
       <module name="rat_game" />
       <option name="program" value="C:\Users\cleme\Workspace\rat_game\love\windows\love.exe" />
@@ -453,15 +453,9 @@
       <workItem from="1720189974087" duration="1806000" />
       <workItem from="1720191992371" duration="30595000" />
       <workItem from="1720452981857" duration="26759000" />
-      <workItem from="1720812119693" duration="7547000" />
-    </task>
-    <task id="LOCAL-00824" summary="added menu slots">
-      <option name="closed" value="true" />
-      <created>1718643688471</created>
-      <option name="number" value="00824" />
-      <option name="presentableId" value="LOCAL-00824" />
-      <option name="project" value="LOCAL" />
-      <updated>1718643688472</updated>
+      <workItem from="1720812119693" duration="8352000" />
+      <workItem from="1720887674689" duration="763000" />
+      <workItem from="1720888455996" duration="1501000" />
     </task>
     <task id="LOCAL-00825" summary="added list item">
       <option name="closed" value="true" />
@@ -847,7 +841,15 @@
       <option name="project" value="LOCAL" />
       <updated>1720818345479</updated>
     </task>
-    <option name="localTasksCounter" value="873" />
+    <task id="LOCAL-00873" summary="added subpixel filtering to fix sprite scaling">
+      <option name="closed" value="true" />
+      <created>1720819914771</created>
+      <option name="number" value="00873" />
+      <option name="presentableId" value="LOCAL-00873" />
+      <option name="project" value="LOCAL" />
+      <updated>1720819914771</updated>
+    </task>
+    <option name="localTasksCounter" value="874" />
     <servers />
   </component>
   <component name="TypeScriptGeneratedFilesManager">
@@ -896,7 +898,6 @@
     </option>
   </component>
   <component name="VcsManagerConfiguration">
-    <MESSAGE value="added menu scene" />
     <MESSAGE value="scrollable list working" />
     <MESSAGE value="stashing sortings" />
     <MESSAGE value="stashing sortability rework" />
@@ -921,7 +922,8 @@
     <MESSAGE value="added meshilizer" />
     <MESSAGE value="stashing" />
     <MESSAGE value="MWE" />
-    <option name="LAST_COMMIT_MESSAGE" value="MWE" />
+    <MESSAGE value="added subpixel filtering to fix sprite scaling" />
+    <option name="LAST_COMMIT_MESSAGE" value="added subpixel filtering to fix sprite scaling" />
   </component>
   <component name="XDebuggerManager">
     <breakpoint-manager>

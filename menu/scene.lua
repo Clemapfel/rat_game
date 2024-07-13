@@ -54,6 +54,8 @@ mn.Scene = meta.new_type("MenuScene", rt.Scene, function()
 
         _move_only_selection_active = false, -- prevent cursor from leaving move
         _slot_only_selection_active = false, -- prevent cursor from leaving equip / consumable
+
+        _animation_queue = rt.AnimationQueue(),
     })
 end, {
     _shared_move_tab_index = 1,
@@ -406,6 +408,8 @@ function mn.Scene:draw()
   
     self._verbose_info_frame:draw()
     self._verbose_info:draw()
+
+    self._animation_queue:draw()
 
     --self:_draw_selection_graph() -- TODO
     --self._selection_graph:draw()
@@ -828,6 +832,13 @@ end
 
 --- @brief
 function mn.Scene:_handle_button_pressed(which)
+
+    -- TODO
+    if which == rt.InputButton.A then
+        local page = self._entity_pages[self._current_entity_i]
+        self._animation_queue:push(mn.Animation.OBJECT_MOVED(bt.Equip("DEBUG_EQUIP"), page.moves:get_bounds(), self._shared_list_frame:get_bounds()))
+    end
+
     ::restart::
     if self._shared_list_node_active == true then
         local current_shared_list = self._shared_tab_index_to_list[self._shared_tab_index]
@@ -900,6 +911,11 @@ function mn.Scene:unequip_move(move_slot_i)
         page.moves:set_object(move_slot_i, nil)
         self._shared_move_list:add(move, 1)
     end
+end
+
+--- @override
+function mn.Scene:update(delta)
+    self._animation_queue:update(delta)
 end
 
 --[[
