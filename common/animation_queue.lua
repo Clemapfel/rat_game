@@ -84,8 +84,12 @@ function rt.AnimationQueue:append(animations)
     end
 
     local node = self._animations[#self._animations]
-    for animation in values(animations) do
-        table.insert(node.animations, animation)
+    if node == nil then
+        self:push(animations)
+    else
+        for animation in values(animations) do
+            table.insert(node.animations, animation)
+        end
     end
 end
 

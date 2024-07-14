@@ -45,10 +45,7 @@ function mn.Animation.OBJECT_MOVED:update(delta)
 
     local length = rt.distance(from_x, from_y, to_x, to_y)
     local fraction = self._elapsed / ((length / speed) + (1 + 2 * hold_duration))
-    if fraction < hold_duration then
-        self._sprite:set_opacity(fraction / hold_duration)
-        self._sprite_offset_x, self._sprite_offset_y = from_x, from_y
-    elseif  fraction > 1 - hold_duration then
+    if  fraction > 1 - hold_duration then
         self._sprite:set_opacity((1 - fraction) / hold_duration)
         self._sprite_offset_x, self._sprite_offset_y = to_x, to_y
     else
@@ -67,13 +64,6 @@ function mn.Animation.OBJECT_MOVED:draw()
     rt.graphics.translate(offset_x, offset_y)
     self._sprite:draw()
     rt.graphics.translate(-offset_x, -offset_y)
-
-    local from_x, from_y = self._from_aabb.x + 0.5 * self._from_aabb.width, self._from_aabb.y + 0.5 * self._from_aabb.height
-    local to_x, to_y = self._to_aabb.x + 0.5 * self._to_aabb.width, self._to_aabb.y + 0.5 * self._to_aabb.height
-    love.graphics.points(
-        from_x, from_y,
-        to_x, to_y
-    )
 end
 
 --- @override

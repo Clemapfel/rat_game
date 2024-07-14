@@ -22,7 +22,9 @@ mn.Scene = meta.new_type("MenuScene", rt.Scene, function()
         _state = mn.InventoryState(),
         _n_entities = 0,
 
-        _control_indicator = rt.ControlIndicator(),
+        _current_control_indicator = nil,
+        _control_indicators = {}, -- Table<rt.ControlIndicator>
+
         _inventory_header_label = {}, -- rt.Label
         _inventory_header_frame = rt.Frame(),
 
@@ -87,7 +89,7 @@ function mn.Scene:_update_inventory_header_label()
         self._inventory_header_label:set_text(prefix .. "Inventory" .. postfix)
     end
 
-    local control_w, control_h = self._control_indicator:measure()
+    local control_w, control_h = self._current_control_indicator:measure()
     local current_x, current_y = self._inventory_header_frame:get_position()
 
     local header_w, header_h = self._inventory_header_label:measure()
@@ -101,13 +103,20 @@ function mn.Scene:realize()
     if self._is_realized == true then return end
     self._is_realized = true
 
+    self._input:signal_connect("pressed", function(_, button)
+        self:_handle_button_pressed(button)
+    end)
+
+    -- placeholder control until selection graph indicators are created
+    self._current_control_indicator = rt.ControlIndicator({
+        {rt.ControlIndicatorButton.B, "Back"}
+    })
+    self._current_control_indicator:realize()
+
     self._inventory_header_label = rt.Label("<o>Inventory</o>")
     self._inventory_header_label:realize()
     self._inventory_header_label:set_justify_mode(rt.JustifyMode.CENTER)
     self._inventory_header_frame:realize()
-
-    self._control_indicator:realize()
-    self:_update_control_indicator()
 
     local settings = rt.settings.menu.scene
     local tab_sprites = {
@@ -263,10 +272,9 @@ function mn.Scene:size_allocate(x, y, width, height)
     local m = rt.settings.margin_unit
     local outer_margin = 2 * m
 
-    local control_w, control_h = self._control_indicator:measure()
-    self._control_indicator:fit_into(x + width - control_w - outer_margin, y + outer_margin, control_w, control_h)
-
     local current_x, current_y = x + outer_margin, y + outer_margin
+    local control_w, control_h = self._current_control_indicator:measure()
+    self._current_control_indicator:fit_into(x + width - control_w - outer_margin, y + outer_margin, control_w, control_h)
 
     local header_w, header_h = self._inventory_header_label:measure()
     header_w = header_w + 4 * m
@@ -381,7 +389,10 @@ function mn.Scene:draw()
 
     self._inventory_header_frame:draw()
     self._inventory_header_label:draw()
-    self._control_indicator:draw()
+
+    if self._current_control_indicator ~= nil then
+        self._current_control_indicator:draw()
+    end
 
     self._shared_tab_bar:draw()
 
@@ -405,65 +416,9 @@ function mn.Scene:draw()
     --self._selection_graph:draw()
 end
 
---- @brief
-function mn.Scene:_update_control_indicator()
-    if self._shared_list_node_active then
-        local sort_label = "Sort"
-        local next_mode = self._shared_list_sort_mode_order[self._shared_list_sort_mode]
-        if next_mode == mn.ScrollableListSortMode.BY_ID then
-            sort_label = "Sort (by ID)"
-        elseif next_mode == mn.ScrollableListSortMode.BY_NAME then
-            sort_label = "Sort (by Name)"
-        elseif next_mode == mn.ScrollableListSortMode.BY_QUANTITY then
-            sort_label = "Sort (by Quantity)"
-        elseif next_mode == mn.ScrollableListSortMode.BY_TYPE then
-            sort_label = "Sort (by Type)"
-        end
-
-        local prefix, postfix = "", ""-- "<o>", "</o>"
-        self._control_indicator:create_from({
-            {rt.ControlIndicatorButton.A, prefix .. "Equip / Unequip" .. postfix},
-            {rt.ControlIndicatorButton.B, prefix .. "Undo" .. postfix},
-            {rt.ControlIndicatorButton.X, prefix .. sort_label .. postfix},
-            {rt.ControlIndicatorButton.Y, prefix .. "Store" .. postfix}
-        })
-    else
-        self._control_indicator:create_from({
-            {rt.ControlIndicatorButton.A, "TODO"}
-        })
-    end
-
-    --[[
-    TODO:
-
-        pick up move / equip / consumable, and move it on shared side
-        or move it to right side
-        quick unequip with r
-        quipck equip with l, goes to first
-
-        On shared side:
-            A: add item to cursor, then jump to move / slot
-            if item is equip, preview stat changes,
-
-        On entity side:
-            A: pickup item, or if item is already held, swap
-            R: if item is held, send that to pocket, otherwise send what is under cursor position to pocket
-
-        Verbose Info:
-            EntityPage
-                Name of Entity
-                State: Base + Boost = Final
-                Explanation of each stat
-
-                HP (<b>H</b>it <b>P</b>oints): Health, if HP reach 0, a character is knocked out. If a character receives 1 or more damage while knocked out, they die permanently and your adventure ends.stat
-                ATK (Attack): Used by most moves to calculate the damage dealt, though sometimes ATK influences other parts of a moves behavior
-                DEF (Defense): Reduces damage dealt by most moves and increases healing
-                SPD (Speed): At the start of each turn, all entities in battle will be sorted by their speed, with the highest speed acting first. May be overriden by Priority
-
-    ]]--
-end
-
 function mn.Scene:_regenerate_selection_nodes()
+
+    local scene = self
 
     -- shared list tab nodes
     local shared_tab_nodes = {}
@@ -525,29 +480,8 @@ function mn.Scene:_regenerate_selection_nodes()
         }
     end
 
-    -- debug draw
-    self._draw_selection_graph = function(self)
-        for node in values(entity_tab_nodes) do
-            node:draw()
-        end
-
-        local page = entity_page_nodes[self._current_entity_i]
-        page.info_node:draw()
-
-        for node in values(page.move_nodes) do
-            node:draw()
-        end
-
-        for node in values(page.slot_nodes) do
-            node:draw()
-        end
-
-        for node in values(shared_tab_nodes) do
-            node:draw()
-        end
-
-        shared_list_nodes[self._shared_tab_index]:draw()
-    end
+    -- verbose info scroll node
+    local verbose_info_node = mn.SelectionGraphNode(self._verbose_info_frame:get_bounds())
 
     -- linking
     local function find_nearest_node(origin, nodes, mode)
@@ -596,7 +530,7 @@ function mn.Scene:_regenerate_selection_nodes()
         for node in values(page.bottom_move_nodes) do
             local nearest = find_nearest_node(node, page.slot_nodes, "x")
             node:set_down(function()
-                if self._move_only_selection_active ~= true then
+                if scene._move_only_selection_active ~= true then
                     return nearest
                 else
                     return nil
@@ -607,7 +541,7 @@ function mn.Scene:_regenerate_selection_nodes()
         -- up to info, unless locked
         for node in values(page.top_move_nodes) do
             node:set_up(function()
-                if self._move_only_selection_active ~= true then
+                if scene._move_only_selection_active ~= true then
                     return page.info_node
                 else
                     return nil
@@ -619,7 +553,7 @@ function mn.Scene:_regenerate_selection_nodes()
         for node in values(page.left_move_nodes) do
             local nearest = find_nearest_node(node, entity_tab_nodes, "y")
             node:set_left(function()
-                if self._move_only_selection_active ~= true then
+                if scene._move_only_selection_active ~= true then
                     return nearest
                 else
                     return nil
@@ -630,8 +564,8 @@ function mn.Scene:_regenerate_selection_nodes()
         -- right to shared, unless locked
         for node in values(page.right_move_nodes) do
             node:set_right(function()
-                if self._move_only_selection_active ~= true then
-                    return shared_list_nodes[self._shared_tab_index]
+                if scene._move_only_selection_active ~= true then
+                    return shared_list_nodes[scene._shared_tab_index]
                 else
                     return nil
                 end
@@ -642,7 +576,7 @@ function mn.Scene:_regenerate_selection_nodes()
         for node in values(page.slot_nodes) do
             local nearest_up = find_nearest_node(node, page.bottom_move_nodes, "x")
             node:set_up(function()
-                if self._slot_only_selection_active ~= true then
+                if scene._slot_only_selection_active ~= true then
                     return nearest_up
                 else
                     return nil
@@ -652,9 +586,9 @@ function mn.Scene:_regenerate_selection_nodes()
             node:set_down(nil)
         end
 
-        --slots left, unless locked
+        -- slots left, unless locked
         page.slot_nodes[1]:set_left(function()
-            if self._slot_only_selection_active ~= true then
+            if scene._slot_only_selection_active ~= true then
                 return entity_tab_nodes[#entity_tab_nodes]
             else
                 return nil
@@ -663,8 +597,8 @@ function mn.Scene:_regenerate_selection_nodes()
 
         -- slots right, unless locked
         page.slot_nodes[#(page.slot_nodes)]:set_right(function()
-            if self._slot_only_selection_active ~= true then
-                return shared_list_nodes[self._shared_tab_index]
+            if scene._slot_only_selection_active ~= true then
+                return shared_list_nodes[scene._shared_tab_index]
             else
                 return nil
             end
@@ -673,7 +607,7 @@ function mn.Scene:_regenerate_selection_nodes()
     for entity_tab_node in values(entity_tab_nodes) do
         -- precompute nearest node for all entity pages
         local nearest = {}
-        for entity_i = 1, self._n_entities do
+        for entity_i = 1, scene._n_entities do
             local page = entity_page_nodes[entity_i]
             nearest[entity_i] = find_nearest_node(
                 entity_tab_node, {
@@ -682,96 +616,157 @@ function mn.Scene:_regenerate_selection_nodes()
             )
         end
         entity_tab_node:set_right(function()
-            return nearest[self._current_entity_i]
+            return nearest[scene._current_entity_i]
         end)
     end
 
     shared_tab_nodes[1]:set_left(function()
-        return entity_page_nodes[self._current_entity_i].info_node
+        return entity_page_nodes[scene._current_entity_i].info_node
+    end)
+
+    shared_tab_nodes[#shared_tab_nodes]:set_right(function()
+        return verbose_info_node
     end)
 
     local shared_list_left = function()
-        return entity_page_nodes[self._current_entity_i].right_move_nodes[1]
+        return entity_page_nodes[scene._current_entity_i].right_move_nodes[1]
     end
+
+    local shared_list_right = function()
+        return verbose_info_node
+    end
+
+    local shared_list_up = function()
+        return shared_tab_nodes[scene._shared_tab_index]
+    end
+
     for node in values(shared_list_nodes) do
         node:set_left(shared_list_left)
+        node:set_right(shared_list_right)
+        node:set_up(shared_list_up)
     end
 
     local shared_tab_down = function()
-        return shared_list_nodes[self._shared_tab_index]
+        return shared_list_nodes[scene._shared_tab_index]
     end
 
     for node in values(shared_tab_nodes) do
         node:set_down(shared_tab_down)
     end
 
-    local shared_list_up = function()
-        return shared_tab_nodes[self._shared_tab_index]
+    verbose_info_node:set_left(function()
+        return shared_list_nodes[scene._shared_tab_index]
+    end)
+
+    -- enter / exit
+    local prefix = ""
+    local postfix = ""
+    local shared_control_layout = {
+        {rt.ControlIndicatorButton.ALL_DIRECTIONS, "Move"},
+        {rt.ControlIndicatorButton.B, "Back"},
+        {rt.ControlIndicatorButton.L, "Previous"},
+        {rt.ControlIndicatorButton.R, "Next"}
+    }
+
+    local entity_tab_control = rt.ControlIndicator({
+        {rt.ControlIndicatorButton.A, prefix .. "Select" .. postfix},
+        table.unpack(shared_control_layout)
+    })
+
+    local shared_tab_control = rt.ControlIndicator({
+        {rt.ControlIndicatorButton.A, prefix .. "Select" .. postfix},
+        table.unpack(shared_control_layout)
+    })
+
+    local entity_page_control = rt.ControlIndicator({
+        {rt.ControlIndicatorButton.A, prefix .. "TODO" .. postfix},
+        {rt.ControlIndicatorButton.X, prefix .. "Unequip Automatically" .. postfix},
+        table.unpack(shared_control_layout)
+    })
+
+    local shared_list_control = rt.ControlIndicator({
+        {rt.ControlIndicatorButton.A, prefix .. "TODO" .. postfix},
+        {rt.ControlIndicatorButton.X, prefix .. "Equip Automatically" .. postfix},
+        table.unpack(shared_control_layout)
+    })
+
+    local verbose_info_control = rt.ControlIndicator({
+        {rt.ControlIndicatorButton.A, prefix .. "TODO" .. postfix},
+        table.unpack(shared_control_layout)
+    })
+
+    self._control_indicators = {
+        entity_tab_control,
+        shared_tab_control,
+        entity_page_control,
+        shared_list_control,
+        verbose_info_control
+    }
+
+    local x, y = self._bounds.x, self._bounds.y
+    local width = self._bounds.width
+    local outer_margin = 2 * rt.settings.margin_unit
+    for indicator in values(self._control_indicators) do
+        indicator:realize()
+        local control_w, control_h = indicator:measure()
+        indicator:fit_into(x + width - control_w - outer_margin, y + outer_margin, control_w, control_h)
     end
 
-    for node in values(shared_list_nodes) do
-        node:set_up(shared_list_up)
-    end
-
-    -- activation
     for node in values(shared_list_nodes) do
         node:set_on_enter(function()
-            self._shared_list_node_active = true
-            self._shared_list_frame:set_selected(true)
+            scene._shared_list_node_active = true
+            scene._shared_list_frame:set_selected(true)
+            scene._current_control_indicator = shared_list_control
         end)
 
         node:set_on_exit(function()
-            self._shared_list_node_active = false
-            self._shared_list_frame:set_selected(false)
+            scene._shared_list_node_active = false
+            scene._shared_list_frame:set_selected(false)
         end)
     end
 
     for entity_i, node in ipairs(entity_tab_nodes) do
-        node:set_on_activate(function()
-            self:set_current_entity_page(entity_i)
-        end)
-
         node:set_on_enter(function()
-            self._entity_tab_bar:set_tab_selected(entity_i, true)
+            scene._entity_tab_bar:set_tab_selected(entity_i, true)
+            scene._current_control_indicator = entity_tab_control
         end)
 
         node:set_on_exit(function()
-            self._entity_tab_bar:set_tab_selected(entity_i, false)
+            scene._entity_tab_bar:set_tab_selected(entity_i, false)
         end)
     end
 
     for tab_i, node in ipairs(shared_tab_nodes) do
-        node:set_on_activate(function()
-            self:set_current_shared_list_page(tab_i)
-        end)
-
         node:set_on_enter(function()
-            self._shared_tab_bar:set_tab_selected(tab_i, true)
+            scene._shared_tab_bar:set_tab_selected(tab_i, true)
+            scene._current_control_indicator = shared_tab_control
         end)
 
         node:set_on_exit(function()
-            self._shared_tab_bar:set_tab_selected(tab_i, false)
+            scene._shared_tab_bar:set_tab_selected(tab_i, false)
         end)
     end
 
     for page_i, page in ipairs(entity_page_nodes) do
-        page.info_node:set_on_enter(function()  
-            self._entity_pages[page_i].info:set_selected(true)
+        page.info_node:set_on_enter(function()
+            scene._entity_pages[page_i].info:set_selected(true)
+            scene._current_control_indicator = entity_page_control
         end)
 
         page.info_node:set_on_exit(function()
-            self._entity_pages[page_i].info:set_selected(false)
+            scene._entity_pages[page_i].info:set_selected(false)
         end)
-        
+
         for node_i, node in ipairs(page.move_nodes) do
             node:set_on_enter(function()
-                local slots = self._entity_pages[page_i].moves
+                local slots = scene._entity_pages[page_i].moves
                 slots:set_selected(true)
                 slots:set_slot_selected(node_i, true)
+                scene._current_control_indicator = entity_page_control
             end)
 
             node:set_on_exit(function()
-                local slots = self._entity_pages[page_i].moves
+                local slots = scene._entity_pages[page_i].moves
                 slots:set_selected(false)
                 slots:set_slot_selected(node_i, false)
             end)
@@ -779,15 +774,84 @@ function mn.Scene:_regenerate_selection_nodes()
 
         for node_i, node in ipairs(page.slot_nodes) do
             node:set_on_enter(function()
-                local slots = self._entity_pages[page_i].equips_and_consumables
+                local slots = scene._entity_pages[page_i].equips_and_consumables
                 slots:set_selected(true)
                 slots:set_slot_selected(node_i, true)
+                scene._current_control_indicator = entity_page_control
             end)
 
             node:set_on_exit(function()
-                local slots = self._entity_pages[page_i].equips_and_consumables
+                local slots = scene._entity_pages[page_i].equips_and_consumables
                 slots:set_selected(false)
                 slots:set_slot_selected(node_i, false)
+            end)
+        end
+    end
+
+    verbose_info_node:set_on_enter(function()
+        scene._verbose_info_frame:set_selected(true)
+        scene._current_control_indicator = verbose_info_control
+    end)
+
+    verbose_info_node:set_on_exit(function()
+        scene._verbose_info_frame:set_selected(false)
+    end)
+
+    -- activation
+    for node_i, node in ipairs(entity_tab_nodes) do
+        node:set_on_a(function()
+            scene:set_current_entity_page(node_i)
+        end)
+    end
+
+    entity_tab_nodes[#entity_tab_nodes]:set_on_a(function()
+        scene:_open_options()
+    end)
+
+    for node_i, node in ipairs(shared_tab_nodes) do
+        node:set_on_a(function()
+            scene:set_current_shared_list_page(node_i)
+        end)
+    end
+
+    local shared_list_aabb = scene._shared_list_frame:get_bounds()
+    for entity_i, page in ipairs(entity_page_nodes) do
+        for node_i, node in ipairs(page.move_nodes) do
+            node:set_on_x(function(self)
+                local current_page = scene._entity_pages[scene._current_entity_i]
+                local object = current_page.moves:get_object(node_i)
+                if object == nil then return end
+                scene:set_current_shared_list_page(scene._shared_move_tab_index)
+                scene:_play_move_object_animation(object, self:get_aabb(), shared_list_aabb)
+                scene:_unequip_move(node_i)
+            end)
+        end
+
+        local entity = self._state.entities[entity_i]
+        local n_equips, n_consumables = entity:get_n_equip_slots(), entity:get_n_consumable_slots()
+        for equip_i = 1, n_equips do
+            local node_i = equip_i
+            local node = page.slot_nodes[node_i]
+            node:set_on_x(function(self)
+                local current_page = scene._entity_pages[scene._current_entity_i]
+                local object = current_page.equips_and_consumables:get_object(node_i)
+                if object == nil then return end
+                scene:set_current_shared_list_page(scene._shared_equip_tab_index)
+                scene:_play_move_object_animation(object, self:get_aabb(), shared_list_aabb)
+                scene:_unequip_equip(node_i)
+            end)
+        end
+
+        for consumable_i = 1, n_consumables do
+            local node_i = consumable_i + n_equips
+            local node = page.slot_nodes[node_i]
+            node:set_on_x(function(self)
+                local current_page = scene._entity_pages[scene._current_entity_i]
+                local object = current_page.equips_and_consumables:get_object(node_i)
+                if object == nil then return end
+                scene:set_current_shared_list_page(scene._shared_consumable_tab_index)
+                scene:_play_move_object_animation(object, self:get_aabb(), shared_list_aabb)
+                scene:_unequip_consumable(node_i)
             end)
         end
     end
@@ -798,7 +862,8 @@ function mn.Scene:_regenerate_selection_nodes()
     for nodes in range(
         entity_tab_nodes,
         shared_tab_nodes,
-        shared_list_nodes
+        shared_list_nodes,
+        {verbose_info_node}
     ) do
         for node in values(nodes) do
             self._selection_graph:add(node)
@@ -822,52 +887,53 @@ end
 
 --- @brief
 function mn.Scene:_handle_button_pressed(which)
-
-    -- TODO
-    if which == rt.InputButton.A then
-
-        self._animation_queue:push(mn.Animation.OBJECT_MOVED(
-            bt.Equip("DEBUG_EQUIP"),
-            self._selection_graph:get_current_node_aabb(),
-            self._shared_list_frame:get_bounds()
-        ))
+    if which == rt.InputButton.L then
+        local next = self._current_entity_i
+        if next == 1 then
+            next = self._n_entities
+        else
+            next = next - 1
+        end
+        self:set_current_entity_page(next)
+        return
+    elseif which == rt.InputButton.R then
+        local next = self._current_entity_i
+        if next >= self._n_entities then
+            next = 1
+        else
+            next = next + 1
+        end
+        self:set_current_entity_page(next)
+        return
     end
 
-    ::restart::
+    ::escape::
     if self._shared_list_node_active == true then
         local current_shared_list = self._shared_tab_index_to_list[self._shared_tab_index]
-        
         if which == rt.InputButton.UP then
-            -- escape from tab list when going up
-            local exit = current_shared_list:move_up()
-            if exit == false then
+            if current_shared_list:move_up() == false then
                 self._shared_list_node_active = false
-                goto restart
-            else
-                self._verbose_info:show({current_shared_list:get_selected(), POSITIVE_INFINITY})
+                goto escape
             end
         elseif which == rt.InputButton.DOWN then
             current_shared_list:move_down()
-            self._verbose_info:show({current_shared_list:get_selected(), POSITIVE_INFINITY})
-        elseif which == rt.InputButton.RIGHT then
-            self._selection_graph:move_right()
         elseif which == rt.InputButton.LEFT then
-            self._selection_graph:move_left()
+            self._shared_list_node_active = false
+            goto escape
+        elseif which == rt.InputButton.RIGHT then
+            self._shared_list_node_active = false
+            goto escape
         elseif which == rt.InputButton.A then
-            -- TODO
+
+        elseif which == rt.InputButton.B then
+
+        elseif which == rt.InputButton.X then
+
+        elseif which == rt.InputButton.Y then
+
         end
     else
-        if which == rt.InputButton.UP then
-            self._selection_graph:move_up()
-        elseif which == rt.InputButton.RIGHT then
-            self._selection_graph:move_right()
-        elseif which == rt.InputButton.DOWN then
-            self._selection_graph:move_down()
-        elseif which == rt.InputButton.LEFT then
-            self._selection_graph:move_left()
-        elseif which == rt.InputButton.A then
-            self._selection_graph:activate()
-        end
+        self._selection_graph:handle_button(which)
     end
 end
 
@@ -891,15 +957,14 @@ function mn.Scene:set_current_shared_list_page(i)
 end
 
 --- @brief
-function mn.Scene:open_options()
+function mn.Scene:_open_options()
     rt.warning("In mn.Scene.open_options: TODO")
 end
 
 --- @brief
-function mn.Scene:unequip_move(move_slot_i)
+function mn.Scene:_unequip_move(move_slot_i)
     local page = self._entity_pages[self._current_entity_i]
     if page == nil then return end
-
     local move = page.moves:get_object(move_slot_i)
     if move ~= nil then
         page.moves:set_object(move_slot_i, nil)
@@ -907,11 +972,34 @@ function mn.Scene:unequip_move(move_slot_i)
     end
 end
 
+--- @brief
+function mn.Scene:_unequip_equip(slot_i)
+    local page = self._entity_pages[self._current_entity_i]
+    if page == nil then return end
+    local eqiup = page.equips_and_consumables:get_object(slot_i)
+    if eqiup ~= nil then
+        page.equips_and_consumables:set_object(slot_i, nil)
+        self._shared_equip_list:add(eqiup, 1)
+    end
+end
+
+--- @brief
+function mn.Scene:_unequip_consumable(slot_i)
+    local page = self._entity_pages[self._current_entity_i]
+    if page == nil then return end
+    local consumable = page.equips_and_consumables:get_object(slot_i)
+    if consumable ~= nil then
+        page.equips_and_consumables:set_object(slot_i, nil)
+        self._shared_consumable_list:add(consumable, 1)
+    end
+end
+
+--- @brief
+function mn.Scene:_play_move_object_animation(object, from_aabb, to_aabb)
+    self._animation_queue:append(mn.Animation.OBJECT_MOVED(object, from_aabb, to_aabb))
+end
+
 --- @override
 function mn.Scene:update(delta)
     self._animation_queue:update(delta)
 end
-
---[[
-
-]]--

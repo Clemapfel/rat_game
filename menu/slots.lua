@@ -17,6 +17,7 @@ mn.Slots = meta.new_type("MenuSlots", rt.Widget, function(layout)
     return meta.new(mn.Slots, {
         _layout = layout,
         _items = {},
+        _n_slots = 0,
         _slot_i_to_item = {},
         _frame = rt.Frame(),
     })
@@ -29,7 +30,7 @@ function mn.Slots:realize()
 
     self._frame:realize()
 
-    local slot_i = 1
+    local n_slots = 0
     local n_rows = sizeof(self._layout)
     for row_i = 1, n_rows do
         local row_layout = self._layout[row_i]
@@ -80,6 +81,8 @@ function mn.Slots:realize()
             slot_i = slot_i + 1
         end
     end
+
+    self._n_slots = slot_i
 end
 
 --- @override
@@ -232,6 +235,16 @@ function mn.Slots:get_object(slot_i)
     local item = self._slot_i_to_item[slot_i]
     if item == nil then return nil end
     return item.object
+end
+
+--- @brief
+function mn.Slots:get_first_unoccupied_slot_i()
+    for slot_i = 1, self._n_slots do
+        if self._slot_i_to_item[slot_i]:get_object() == nil then
+            return slot_i
+        end
+    end
+    return nil
 end
 
 --- @brief

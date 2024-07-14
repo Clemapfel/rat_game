@@ -45,8 +45,8 @@ function rt.ControlIndicator:realize()
     if self._is_realized == true then return end
     self._is_realized = true
 
-    self:create_from(self._layout)
     self._frame:realize()
+    self:create_from(self._layout)
 end
 
 --- @brief
