@@ -168,6 +168,14 @@ function mn.SelectionGraph:set_current_node(node)
     end
 end
 
+function mn.SelectionGraph:get_current_node_aabb()
+    if self._current_node ~= nil then
+        return self._current_node._aabb
+    else
+        return rt.AABB(0, 0, 1, 1)
+    end
+end
+
 function mn.SelectionGraph:draw()
     for node in keys(self._nodes) do
         node:draw(rt.Palette.GRAY_4)

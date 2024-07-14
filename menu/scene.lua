@@ -101,16 +101,6 @@ function mn.Scene:realize()
     if self._is_realized == true then return end
     self._is_realized = true
 
-    self._input:signal_connect("pressed", function(_, which)
-        self:_handle_button_pressed(which)
-
-        i = 1
-        if which == rt.InputButton.A then
-            self:unequip_move(i)
-            i = i + 1
-        end
-    end)
-
     self._inventory_header_label = rt.Label("<o>Inventory</o>")
     self._inventory_header_label:realize()
     self._inventory_header_label:set_justify_mode(rt.JustifyMode.CENTER)
@@ -835,8 +825,12 @@ function mn.Scene:_handle_button_pressed(which)
 
     -- TODO
     if which == rt.InputButton.A then
-        local page = self._entity_pages[self._current_entity_i]
-        self._animation_queue:push(mn.Animation.OBJECT_MOVED(bt.Equip("DEBUG_EQUIP"), page.moves:get_bounds(), self._shared_list_frame:get_bounds()))
+
+        self._animation_queue:push(mn.Animation.OBJECT_MOVED(
+            bt.Equip("DEBUG_EQUIP"),
+            self._selection_graph:get_current_node_aabb(),
+            self._shared_list_frame:get_bounds()
+        ))
     end
 
     ::restart::

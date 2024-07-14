@@ -22,12 +22,10 @@
     </configurations>
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="7fa9ba1b-2cff-4ecc-86fb-59ab2fa76ee1" name="Changes" comment="added subpixel filtering to fix sprite scaling">
-      <change afterPath="$PROJECT_DIR$/menu/object_moved_animation.lua" afterDir="false" />
+    <list default="true" id="7fa9ba1b-2cff-4ecc-86fb-59ab2fa76ee1" name="Changes" comment="added item move animation">
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/battle/animations/simulation/ally_disappeared.lua" beforeDir="false" afterPath="$PROJECT_DIR$/battle/animations/simulation/ally_disappeared.lua" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/include.lua" beforeDir="false" afterPath="$PROJECT_DIR$/include.lua" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/menu/scene.lua" beforeDir="false" afterPath="$PROJECT_DIR$/menu/scene.lua" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/menu/selection_graph.lua" beforeDir="false" afterPath="$PROJECT_DIR$/menu/selection_graph.lua" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -455,15 +453,7 @@
       <workItem from="1720452981857" duration="26759000" />
       <workItem from="1720812119693" duration="8352000" />
       <workItem from="1720887674689" duration="763000" />
-      <workItem from="1720888455996" duration="1501000" />
-    </task>
-    <task id="LOCAL-00825" summary="added list item">
-      <option name="closed" value="true" />
-      <created>1718650615362</created>
-      <option name="number" value="00825" />
-      <option name="presentableId" value="LOCAL-00825" />
-      <option name="project" value="LOCAL" />
-      <updated>1718650615362</updated>
+      <workItem from="1720888455996" duration="3615000" />
     </task>
     <task id="LOCAL-00826" summary="added entity info">
       <option name="closed" value="true" />
@@ -849,7 +839,15 @@
       <option name="project" value="LOCAL" />
       <updated>1720819914771</updated>
     </task>
-    <option name="localTasksCounter" value="874" />
+    <task id="LOCAL-00874" summary="added item move animation">
+      <option name="closed" value="true" />
+      <created>1720890206528</created>
+      <option name="number" value="00874" />
+      <option name="presentableId" value="LOCAL-00874" />
+      <option name="project" value="LOCAL" />
+      <updated>1720890206529</updated>
+    </task>
+    <option name="localTasksCounter" value="875" />
     <servers />
   </component>
   <component name="TypeScriptGeneratedFilesManager">
@@ -898,7 +896,6 @@
     </option>
   </component>
   <component name="VcsManagerConfiguration">
-    <MESSAGE value="scrollable list working" />
     <MESSAGE value="stashing sortings" />
     <MESSAGE value="stashing sortability rework" />
     <MESSAGE value="scrollable list sort working" />
@@ -923,7 +920,8 @@
     <MESSAGE value="stashing" />
     <MESSAGE value="MWE" />
     <MESSAGE value="added subpixel filtering to fix sprite scaling" />
-    <option name="LAST_COMMIT_MESSAGE" value="added subpixel filtering to fix sprite scaling" />
+    <MESSAGE value="added item move animation" />
+    <option name="LAST_COMMIT_MESSAGE" value="added item move animation" />
   </component>
   <component name="XDebuggerManager">
     <breakpoint-manager>
