@@ -20,7 +20,7 @@ rt.Shape = meta.new_abstract_type("Shape", rt.Drawable, {
 --- @brief [internal]
 function rt.Shape:_bind_properties(callback, data)
 
-    love.graphics.push()
+    --love.graphics.push()
     love.graphics.setColor(self._color_r, self._color_g, self._color_b, self._color_a * self._opacity)
     love.graphics.setLineWidth(self._line_width)
     love.graphics.setPointSize(self._line_width)
@@ -32,7 +32,7 @@ end
 
 --- @brief [internal]
 function rt.Shape:_unbind_properties(callback, data)
-    love.graphics.pop()
+    --love.graphics.pop()
 end
 
 --- @brief set color of all vertices

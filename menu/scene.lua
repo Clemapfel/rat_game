@@ -28,6 +28,11 @@ mn.Scene = meta.new_type("MenuScene", rt.Scene, function()
         _inventory_header_label = {}, -- rt.Label
         _inventory_header_frame = rt.Frame(),
 
+        _grabbed_object = nil,
+        _grabbed_object_sprite = nil,
+        _grabbed_object_x = 0,
+        _grabbed_object_y = 0,
+
         _shared_list_frame = rt.Frame(),
         _shared_move_tab_sprite = {}, -- rt.Sprite
         _shared_equip_tab_sprite = {}, -- rt.Sprite
@@ -220,6 +225,9 @@ function mn.Scene:realize()
         [self._shared_equip_tab_index] = self._shared_equip_list,
         [self._shared_template_tab_index] = self._shared_template_list
     }
+
+    -- TODO
+    self:_set_grabbed_object(bt.Move("DEBUG_MOVE"))
 end
 
 --- @brief
@@ -411,6 +419,12 @@ function mn.Scene:draw()
     self._verbose_info:draw()
 
     self._animation_queue:draw()
+
+    if self._grabbed_object ~= nil then
+        rt.graphics.translate(self._grabbed_object_x, self._grabbed_object_y)
+        self._grabbed_object_sprite:draw()
+        rt.graphics.translate(-self._grabbed_object_x, self._grabbed_object_y)
+    end
 
     --self:_draw_selection_graph() -- TODO
     --self._selection_graph:draw()
@@ -934,6 +948,7 @@ function mn.Scene:_handle_button_pressed(which)
         end
     else
         self._selection_graph:handle_button(which)
+        self:_update_grabbed_object_position()
     end
 end
 
@@ -1002,4 +1017,20 @@ end
 --- @override
 function mn.Scene:update(delta)
     self._animation_queue:update(delta)
+end
+
+--- @brief
+function mn.Scene:_update_grabbed_object_position()
+    if self._grabbed_object == nil then return end
+    local current = self._selection_graph:get_current_node_aabb()
+    local sprite_w, sprite_h = self._grabbed_object_sprite:get_resolution()
+    self._grabbed_object_x = current.x + 0.5 * current.width - 0.5 * sprite_w
+    self._grabbed_object_y = current.y + 0.5 * current.height - 0.5 * sprite_h
+end
+
+--- @brief
+function mn.Scene:_set_grabbed_object(object)
+    self._grabbed_object = object
+    self._grabbed_object_sprite = rt.Sprite(object:get_sprite_id())
+
 end

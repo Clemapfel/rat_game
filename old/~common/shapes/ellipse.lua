@@ -1,10 +1,11 @@
 --- @class rt.Ellipse
-rt.Ellipse = meta.new_type("Ellipse", rt.Shape, function(x, y, x_radius, y_radius)
+rt.Ellipse = meta.new_type("Ellipse", rt.Shape, function(x, y, x_radius, y_radius, n_outer_vertices)
     return meta.new(rt.Ellipse, {
         _x = x,
         _y = y,
         _x_radius = x_radius,
-        _y_radius = which(y_radius, x_radius)
+        _y_radius = which(y_radius, x_radius),
+        _n_outer_vertices = n_outer_vertices
     })
 end)
 rt.Circle = rt.Ellipse
@@ -17,7 +18,8 @@ function rt.Ellipse:draw()
         self._x,
         self._y,
         self._x_radius,
-        self._y_radius
+        self._y_radius,
+        self._n_outer_vertices
     )
     self:_unbind_properties()
 end

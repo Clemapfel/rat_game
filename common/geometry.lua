@@ -163,3 +163,34 @@ end
 function rt.degrees_to_radians(dgs)
     return dgs * (math.pi / 180)
 end
+
+
+--- @brief triangle with rounded corners, like a triangular sign
+function generate_rounded_triangle(center_x, center_y, radius, corner_radius, n_corner_vertices)
+    if n_corner_vertices == nil then n_corner_vertices = 16 end
+
+    local function translate_point_by_angle(point_x, point_y, distance, angle)
+        return point_x + distance * math.cos(angle), point_y + distance * math.sin(angle)
+    end
+
+    local vertices = {}
+    for _, angle in pairs({
+        0/3 * (2 * math.pi) + (math.pi / 6),
+        1/3 * (2 * math.pi) + (math.pi / 6),
+        2/3 * (2 * math.pi) + (math.pi / 6)
+    }) do
+        local corner_x, corner_y = translate_point_by_angle(center_x, center_y, radius - corner_radius, angle)
+        for i = 1, n_corner_vertices do
+            local x, y = translate_point_by_angle(corner_x, corner_y, corner_radius, (i - 1) / (n_corner_vertices) * (2 * math.pi) / 3 - ((2 * math.pi) / 6) + angle)
+            table.insert(vertices, x)
+            table.insert(vertices, y)
+        end
+    end
+
+    -- close loop
+    table.insert(vertices, vertices[1])
+    table.insert(vertices, vertices[2])
+
+    return vertices
+end
+

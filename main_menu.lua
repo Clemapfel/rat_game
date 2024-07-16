@@ -74,7 +74,7 @@ rt.settings.show_fps = true
 
 love.draw = function()
     love.graphics.setColor(0.6, 0, 0.6, 1)
-    love.graphics.rectangle("fill", 0, 0, love.graphics.getWidth(), love.graphics.getHeight())
+    love.graphics.setPointSize(3)
 
     if rt.current_scene ~= nil then
         rt.current_scene:draw()

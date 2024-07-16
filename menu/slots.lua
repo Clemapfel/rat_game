@@ -8,7 +8,8 @@ rt.settings.menu.slots = {
 mn.SlotType = meta.new_enum({
     MOVE = "MOVE",
     EQUIP = "EQUIP",
-    CONSUMABLE = "CONSUMABLE"
+    CONSUMABLE = "CONSUMABLE",
+    INTRINSIC = "INTRINSIC"
 })
 
 --- @class mn.Slots
@@ -30,7 +31,7 @@ function mn.Slots:realize()
 
     self._frame:realize()
 
-    local n_slots = 0
+    local slot_i = 1
     local n_rows = sizeof(self._layout)
     for row_i = 1, n_rows do
         local row_layout = self._layout[row_i]
@@ -59,6 +60,12 @@ function mn.Slots:realize()
                     base = rt.Circle(0, 0, 1, 1),
                     base_inlay = rt.Circle(0, 0, 1, 1),
                     frame = rt.Circle(0, 0, 1, 1),
+                }
+            elseif type == mn.SlotType.INTRINSIC then
+                to_insert = {
+                    base = rt.Polygon(0, 0, 1, 1, 1, 0, 0, 1),
+                    base_inlay = rt.Circle(0, 0, 1, 1),
+                    frame = rt.Polygon(0, 0, 1, 1, 1, 0, 0, 1),
                 }
             else
                 rt.error("In mn.Slots:realize: unrecognized slot type at `" .. row_i .. ", " .. column_i .. "`: `" .. type .. "`")
@@ -116,7 +123,7 @@ function mn.Slots:size_allocate(x, y, width, height)
                 local points = {}
                 local n_sides = 6
                 for i = 1, n_sides do
-                    local point_x, point_y = rt.translate_point_by_angle(center_x, center_y, radius * 1.1, rt.degrees_to_radians(i / n_sides * 360))
+                    local point_x, point_y = rt.translate_point_by_angle(center_x, center_y, radius * 1.1, i / n_sides * (2 * math.pi))
                     table.insert(points, point_x)
                     table.insert(points, point_y)
                 end
@@ -131,6 +138,18 @@ function mn.Slots:size_allocate(x, y, width, height)
             elseif slot.type == mn.SlotType.MOVE then
                 for shape in range(slot.base, slot.frame) do
                     shape:resize(current_x, current_y, slot_w, slot_h)
+                end
+            elseif slot.type == mn.SlotType.INTRINSIC then
+                local points = {}
+                local center_x, center_y = current_x + 0.5 * slot_w, current_y + 0.5 * slot_h
+                for i = 1, 4 do
+                    local point_x, point_y = rt.translate_point_by_angle(center_x, center_y, radius * 1.3, i / 4 * (2 * math.pi))
+                    table.insert(points, point_x)
+                    table.insert(points, point_y)
+                end
+
+                for shape in range(slot.base, slot.frame) do
+                    shape:resize(table.unpack(points))
                 end
             end
 
@@ -284,3 +303,6 @@ end
 function mn.Slots:set_selected(b)
     self._frame:set_selected(b)
 end
+
+--- @brief
+function mn.Slots:set_unselected
