@@ -22,17 +22,12 @@
     </configurations>
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="7fa9ba1b-2cff-4ecc-86fb-59ab2fa76ee1" name="Changes" comment="refactored selection state to be in common">
+    <list default="true" id="7fa9ba1b-2cff-4ecc-86fb-59ab2fa76ee1" name="Changes" comment="added intrinsic category">
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/battle/configs/moves/PROTECT.lua" beforeDir="false" afterPath="$PROJECT_DIR$/battle/configs/moves/PROTECT.lua" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/battle/configs/moves/STRUGGLE.lua" beforeDir="false" afterPath="$PROJECT_DIR$/battle/configs/moves/STRUGGLE.lua" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/battle/entity.lua" beforeDir="false" afterPath="$PROJECT_DIR$/battle/entity.lua" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/battle/move.lua" beforeDir="false" afterPath="$PROJECT_DIR$/battle/move.lua" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/common/frame.lua" beforeDir="false" afterPath="$PROJECT_DIR$/common/frame.lua" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/menu/entity_info.lua" beforeDir="false" afterPath="$PROJECT_DIR$/menu/entity_info.lua" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/menu/scene.lua" beforeDir="false" afterPath="$PROJECT_DIR$/menu/scene.lua" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/menu/scrollable_list.lua" beforeDir="false" afterPath="$PROJECT_DIR$/menu/scrollable_list.lua" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/menu/slots.lua" beforeDir="false" afterPath="$PROJECT_DIR$/menu/slots.lua" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/menu/tab_bar.lua" beforeDir="false" afterPath="$PROJECT_DIR$/menu/tab_bar.lua" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -462,15 +457,7 @@
       <workItem from="1720887674689" duration="763000" />
       <workItem from="1720888455996" duration="3615000" />
       <workItem from="1720969128112" duration="15925000" />
-      <workItem from="1721087157672" duration="2777000" />
-    </task>
-    <task id="LOCAL-00830" summary="added jetbrains config">
-      <option name="closed" value="true" />
-      <created>1719098754810</created>
-      <option name="number" value="00830" />
-      <option name="presentableId" value="LOCAL-00830" />
-      <option name="project" value="LOCAL" />
-      <updated>1719098754811</updated>
+      <workItem from="1721087157672" duration="9381000" />
     </task>
     <task id="LOCAL-00831" summary="added jetbrains config">
       <option name="closed" value="true" />
@@ -856,7 +843,15 @@
       <option name="project" value="LOCAL" />
       <updated>1721139218329</updated>
     </task>
-    <option name="localTasksCounter" value="879" />
+    <task id="LOCAL-00879" summary="added intrinsic category">
+      <option name="closed" value="true" />
+      <created>1721141255710</created>
+      <option name="number" value="00879" />
+      <option name="presentableId" value="LOCAL-00879" />
+      <option name="project" value="LOCAL" />
+      <updated>1721141255710</updated>
+    </task>
+    <option name="localTasksCounter" value="880" />
     <servers />
   </component>
   <component name="TypeScriptGeneratedFilesManager">
@@ -905,7 +900,6 @@
     </option>
   </component>
   <component name="VcsManagerConfiguration">
-    <MESSAGE value="added scrollable list backing" />
     <MESSAGE value="added preview optionality" />
     <MESSAGE value="stashing before refactoring equip / consumable slot system" />
     <MESSAGE value="refactored entity" />
@@ -930,7 +924,8 @@
     <MESSAGE value="refactore selection graph, add per-node control indicator" />
     <MESSAGE value="stashing before adding intrinsics" />
     <MESSAGE value="refactored selection state to be in common" />
-    <option name="LAST_COMMIT_MESSAGE" value="refactored selection state to be in common" />
+    <MESSAGE value="added intrinsic category" />
+    <option name="LAST_COMMIT_MESSAGE" value="added intrinsic category" />
   </component>
   <component name="XDebuggerManager">
     <breakpoint-manager>

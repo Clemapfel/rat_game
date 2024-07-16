@@ -198,7 +198,8 @@ function mn.ScrollableList:push(...)
             quantity_label = rt.Label(self._format_quantity_label(quantity), self._label_font, self._label_font_mono),
             unselected_base = rt.Rectangle(0, 0, 1, 1),
             selected_base = rt.Rectangle(0, 0, 1, 1),
-            base_outline = rt.Rectangle(0, 0, 1, 1)
+            base_outline = rt.Rectangle(0, 0, 1, 1),
+            height = 0
         }
 
         if self._is_realized then

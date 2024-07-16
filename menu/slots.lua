@@ -89,7 +89,7 @@ function mn.Slots:realize()
         end
     end
 
-    self._n_slots = slot_i
+    self._n_slots = slot_i - 1
 end
 
 --- @override
@@ -257,9 +257,10 @@ function mn.Slots:get_object(slot_i)
 end
 
 --- @brief
-function mn.Slots:get_first_unoccupied_slot_i()
+function mn.Slots:get_first_unoccupied_slot_i(type)
     for slot_i = 1, self._n_slots do
-        if self._slot_i_to_item[slot_i]:get_object() == nil then
+        local item = self._slot_i_to_item[slot_i]
+        if (type == nil or item.type == type) and item.object == nil then
             return slot_i
         end
     end
@@ -312,4 +313,10 @@ end
 --- @brief
 function mn.Slots:set_selection_state(state)
     self._frame:set_selection_state(state)
+end
+
+--- @brief
+function mn.Slots:get_slot_aabb(slot_i)
+    local item = self._slot_i_to_item[slot_i]
+    return item.selection_node:get_aabb()
 end

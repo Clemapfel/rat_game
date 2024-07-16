@@ -225,9 +225,6 @@ function mn.Scene:realize()
         [self._shared_equip_tab_index] = self._shared_equip_list,
         [self._shared_template_tab_index] = self._shared_template_list
     }
-
-    -- TODO
-    self:_set_grabbed_object(bt.Move("DEBUG_MOVE"))
 end
 
 --- @brief
@@ -730,6 +727,16 @@ function mn.Scene:_regenerate_selection_nodes()
             scene._shared_list_node_active = true
             scene._shared_list_frame:set_selection_state(rt.SelectionState.ACTIVE)
             scene._current_control_indicator = shared_list_control
+
+            if scene._grabbed_object ~= nil then
+                if meta.isa(scene._grabbed_object, bt.Move) then
+                    scene:set_current_shared_list_page(self._shared_move_tab_index)
+                elseif meta.isa(scene._grabbed_object, bt.Equip) then
+                    scene:set_current_shared_list_page(self._shared_equip_tab_index)
+                elseif meta.isa(scene._grabbed_object, bt.Consumable) then
+                    scene:set_current_shared_list_page(self._shared_consumable_tab_index)
+                end
+            end
         end)
 
         node:set_on_exit(function()
@@ -836,7 +843,41 @@ function mn.Scene:_regenerate_selection_nodes()
                 if object == nil then return end
                 scene:set_current_shared_list_page(scene._shared_move_tab_index)
                 scene:_play_move_object_animation(object, self:get_aabb(), shared_list_aabb)
-                scene:_unequip_move(node_i)
+
+                local page = scene._entity_pages[scene._current_entity_i]
+                if page == nil then return end
+                local move = page.moves:get_object(node_i)
+                if move ~= nil then
+                    page.moves:set_object(node_i, nil)
+                    scene._shared_move_list:add(move, 1)
+                end
+
+                scene._state.entities[scene._current_entity_i]:remove_move(move)
+            end)
+
+            node:set_on_a(function(self)
+                local page = scene._entity_pages[scene._current_entity_i]
+                local down = page.moves:get_object(node_i)
+                local up = scene._grabbed_object
+
+                if up ~= nil and not meta.isa(up, bt.Move) then
+                    return
+                end
+
+                if down == nil and up == nil then
+                    -- noop
+                elseif down == nil and up ~= nil then
+                    scene:_set_grabbed_object(nil)
+                    page.moves:set_object(node_i, up)
+                elseif down ~= nil and up == nil then
+                    scene:_set_grabbed_object(down)
+                    page.moves:set_object(node_i, nil)
+                elseif down ~= nil and up ~= nil then
+                    scene:_set_grabbed_object(down)
+                    page.moves:set_object(node_i, up)
+                end
+
+                -- TODO update state
             end)
         end
 
@@ -851,7 +892,39 @@ function mn.Scene:_regenerate_selection_nodes()
                 if object == nil then return end
                 scene:set_current_shared_list_page(scene._shared_equip_tab_index)
                 scene:_play_move_object_animation(object, self:get_aabb(), shared_list_aabb)
-                scene:_unequip_equip(node_i)
+
+                local page = scene._entity_pages[scene._current_entity_i]
+                if page == nil then return end
+                local equip = page.equips_and_consumables:get_object(node_i)
+                if equip ~= nil then
+                    page.equips_and_consumables:set_object(node_i, nil)
+                    scene._shared_equip_list:add(equip, 1)
+                end
+
+                scene._state.entities[scene._current_entity_i]:remove_equip(equip)
+            end)
+
+            node:set_on_a(function(self)
+                local page = scene._entity_pages[scene._current_entity_i]
+                local down = page.equips_and_consumables:get_object(node_i)
+                local up = scene._grabbed_object
+
+                if up ~= nil and not meta.isa(up, bt.Equip) then
+                    return
+                end
+
+                if down == nil and up == nil then
+                    -- noop
+                elseif down == nil and up ~= nil then
+                    scene:_set_grabbed_object(nil)
+                    page.equips_and_consumables:set_object(node_i, up)
+                elseif down ~= nil and up == nil then
+                    scene:_set_grabbed_object(down)
+                    page.equips_and_consumables:set_object(node_i, nil)
+                elseif down ~= nil and up ~= nil then
+                    scene:_set_grabbed_object(down)
+                    page.equips_and_consumables:set_object(node_i, up)
+                end
             end)
         end
 
@@ -864,10 +937,156 @@ function mn.Scene:_regenerate_selection_nodes()
                 if object == nil then return end
                 scene:set_current_shared_list_page(scene._shared_consumable_tab_index)
                 scene:_play_move_object_animation(object, self:get_aabb(), shared_list_aabb)
-                scene:_unequip_consumable(node_i)
+
+                local page = scene._entity_pages[scene._current_entity_i]
+                if page == nil then return end
+                local consumable = page.equips_and_consumables:get_object(node_i)
+                if consumable ~= nil then
+                    page.equips_and_consumables:set_object(node_i, nil)
+                    scene._shared_consumable_list:add(consumable, 1)
+                end
+
+                scene._state.entities[scene._current_entity_i]:remove_consumable(consumable)
+            end)
+
+            node:set_on_a(function(self)
+                local page = scene._entity_pages[scene._current_entity_i]
+                local down = page.equips_and_consumables:get_object(node_i)
+                local up = scene._grabbed_object
+
+                if up ~= nil and not meta.isa(up, bt.Consumable) then
+                    return
+                end
+
+                if down == nil and up == nil then
+                    -- noop
+                elseif down == nil and up ~= nil then
+                    scene:_set_grabbed_object(nil)
+                    page.equips_and_consumables:set_object(node_i, up)
+                elseif down ~= nil and up == nil then
+                    scene:_set_grabbed_object(down)
+                    page.equips_and_consumables:set_object(node_i, nil)
+                elseif down ~= nil and up ~= nil then
+                    scene:_set_grabbed_object(down)
+                    page.equips_and_consumables:set_object(node_i, up)
+                end
             end)
         end
     end
+
+    local shared_move_list_node = shared_list_nodes[self._shared_move_tab_index]
+    shared_move_list_node:set_on_x(function()
+        local page = scene._entity_pages[scene._current_entity_i]
+        local unoccupied_slot_i = page.moves:get_first_unoccupied_slot_i(mn.SlotType.MOVE)
+        if unoccupied_slot_i ~= nil then
+            local to_insert = self._shared_move_list:get_selected()
+            local current_entity = self._state.entities[self._current_entity_i]
+            for move in values(current_entity:list_moves()) do
+                if move == to_insert then return end
+            end
+
+            if to_insert == nil then return end
+            scene._shared_move_list:take(to_insert)
+            scene:_play_move_object_animation(
+                to_insert,
+                self._shared_list_frame:get_bounds(),
+                page.moves:get_slot_aabb(unoccupied_slot_i),
+                nil,
+                function()
+                    page.moves:set_object(unoccupied_slot_i, to_insert)
+                end
+            )
+
+            current_entity:add_move(to_insert)
+        end
+    end)
+
+    shared_move_list_node:set_on_a(function()
+        local up = scene._grabbed_object
+        local down = scene._shared_move_list:get_selected()
+
+        if up == nil then
+            scene:_set_grabbed_object(down)
+            scene._shared_move_list:take(down)
+        else
+            scene:_set_grabbed_object(nil)
+            scene._shared_move_list:add(up, 1)
+        end
+    end)
+
+    local shared_equip_list_node = shared_list_nodes[self._shared_equip_tab_index]
+    shared_equip_list_node:set_on_x(function()
+        local page = scene._entity_pages[scene._current_entity_i]
+        local unoccupied_slot_i = page.equips_and_consumables:get_first_unoccupied_slot_i(mn.SlotType.EQUIP)
+        if unoccupied_slot_i ~= nil then
+            local to_insert = self._shared_equip_list:get_selected()
+            local current_entity = self._state.entities[self._current_entity_i]
+            if to_insert == nil then return end
+            scene._shared_equip_list:take(to_insert)
+            local to = page.equips_and_consumables:get_slot_aabb(unoccupied_slot_i)
+            scene:_play_move_object_animation(
+                to_insert,
+                self._shared_list_frame:get_bounds(),
+                to,
+                nil,
+                function()
+                    page.equips_and_consumables:set_object(unoccupied_slot_i, to_insert)
+                end
+            )
+
+            current_entity:add_equip(to_insert)
+        end
+    end)
+
+    shared_equip_list_node:set_on_a(function()
+        local up = scene._grabbed_object
+        local down = scene._shared_equip_list:get_selected()
+
+        if up == nil then
+            scene:_set_grabbed_object(down)
+            scene._shared_equip_list:take(down)
+        else
+            scene:_set_grabbed_object(nil)
+            scene._shared_equip_list:add(up, 1)
+        end
+    end)
+
+    local shared_consumable_list_node = shared_list_nodes[self._shared_consumable_tab_index]
+    shared_consumable_list_node:set_on_x(function()
+        local page = scene._entity_pages[scene._current_entity_i]
+        local unoccupied_slot_i = page.equips_and_consumables:get_first_unoccupied_slot_i(mn.SlotType.CONSUMABLE)
+        if unoccupied_slot_i ~= nil then
+            local to_insert = self._shared_consumable_list:get_selected()
+            local current_entity = self._state.entities[self._current_entity_i]
+            if to_insert == nil then return end
+            scene._shared_consumable_list:take(to_insert)
+            local to = page.equips_and_consumables:get_slot_aabb(unoccupied_slot_i)
+            scene:_play_move_object_animation(
+                to_insert,
+                self._shared_list_frame:get_bounds(),
+                to,
+                nil,
+                function()
+                    page.equips_and_consumables:set_object(unoccupied_slot_i, to_insert)
+                end
+            )
+
+            current_entity:add_consumable(to_insert)
+        end
+    end)
+
+    shared_consumable_list_node:set_on_a(function()
+        local up = scene._grabbed_object
+        local down = scene._shared_consumable_list:get_selected()
+
+        if up == nil then
+            scene:_set_grabbed_object(down)
+            scene._shared_consumable_list:take(down)
+        else
+            scene:_set_grabbed_object(nil)
+            scene._shared_consumable_list:add(up, 1)
+        end
+    end)
 
     -- push
     self._selection_graph:clear()
@@ -920,31 +1139,17 @@ function mn.Scene:_handle_button_pressed(which)
         return
     end
 
-    ::escape::
-    if self._shared_list_node_active == true then
-        local current_shared_list = self._shared_tab_index_to_list[self._shared_tab_index]
-        if which == rt.InputButton.UP then
-            if current_shared_list:move_up() == false then
-                self._shared_list_node_active = false
-                goto escape
-            end
-        elseif which == rt.InputButton.DOWN then
-            current_shared_list:move_down()
-        elseif which == rt.InputButton.LEFT then
+    local current_shared_list = self._shared_tab_index_to_list[self._shared_tab_index]
+    if self._shared_list_node_active and which == rt.InputButton.UP then
+        if current_shared_list:move_up() == false then
             self._shared_list_node_active = false
-            goto escape
-        elseif which == rt.InputButton.RIGHT then
-            self._shared_list_node_active = false
-            goto escape
-        elseif which == rt.InputButton.A then
-
-        elseif which == rt.InputButton.B then
-
-        elseif which == rt.InputButton.X then
-
-        elseif which == rt.InputButton.Y then
-
         end
+    elseif self._shared_list_node_active and which == rt.InputButton.DOWN then
+        current_shared_list:move_down()
+    elseif self._shared_list_node_active and which == rt.InputButton.LEFT then
+        self._shared_list_node_active = false
+    elseif self._shared_list_node_active and which == rt.InputButton.RIGHT then
+        self._shared_list_node_active = false
     else
         self._selection_graph:handle_button(which)
         self:_update_grabbed_object_position()
@@ -976,41 +1181,8 @@ function mn.Scene:_open_options()
 end
 
 --- @brief
-function mn.Scene:_unequip_move(move_slot_i)
-    local page = self._entity_pages[self._current_entity_i]
-    if page == nil then return end
-    local move = page.moves:get_object(move_slot_i)
-    if move ~= nil then
-        page.moves:set_object(move_slot_i, nil)
-        self._shared_move_list:add(move, 1)
-    end
-end
-
---- @brief
-function mn.Scene:_unequip_equip(slot_i)
-    local page = self._entity_pages[self._current_entity_i]
-    if page == nil then return end
-    local eqiup = page.equips_and_consumables:get_object(slot_i)
-    if eqiup ~= nil then
-        page.equips_and_consumables:set_object(slot_i, nil)
-        self._shared_equip_list:add(eqiup, 1)
-    end
-end
-
---- @brief
-function mn.Scene:_unequip_consumable(slot_i)
-    local page = self._entity_pages[self._current_entity_i]
-    if page == nil then return end
-    local consumable = page.equips_and_consumables:get_object(slot_i)
-    if consumable ~= nil then
-        page.equips_and_consumables:set_object(slot_i, nil)
-        self._shared_consumable_list:add(consumable, 1)
-    end
-end
-
---- @brief
-function mn.Scene:_play_move_object_animation(object, from_aabb, to_aabb)
-    self._animation_queue:append(mn.Animation.OBJECT_MOVED(object, from_aabb, to_aabb))
+function mn.Scene:_play_move_object_animation(object, from_aabb, to_aabb, before, after)
+    self._animation_queue:push(mn.Animation.OBJECT_MOVED(object, from_aabb, to_aabb), before, after)
 end
 
 --- @override
@@ -1022,7 +1194,7 @@ end
 function mn.Scene:_update_grabbed_object_position()
     if self._grabbed_object == nil then return end
     local current = self._selection_graph:get_current_node_aabb()
-    local sprite_w, sprite_h = self._grabbed_object_sprite:get_resolution()
+    local sprite_w, sprite_h = self._grabbed_object_sprite:get_minimum_size()
     self._grabbed_object_x = current.x + 0.5 * current.width - 0.5 * sprite_w
     self._grabbed_object_y = current.y + 0.5 * current.height - 0.5 * sprite_h
 end
@@ -1030,6 +1202,14 @@ end
 --- @brief
 function mn.Scene:_set_grabbed_object(object)
     self._grabbed_object = object
-    self._grabbed_object_sprite = rt.Sprite(object:get_sprite_id())
-
+    if object ~= nil then
+        self._grabbed_object_sprite = rt.Sprite(object:get_sprite_id())
+        local sprite_w, sprite_h = self._grabbed_object_sprite:get_resolution()
+        sprite_w = sprite_w * 2
+        sprite_h = sprite_h * 2
+        self._grabbed_object_sprite:set_minimum_size(sprite_w, sprite_h)
+        self._grabbed_object_sprite:set_opacity(0.5)
+    else
+        self._grabbed_object_sprite = nil
+    end
 end

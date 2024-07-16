@@ -717,3 +717,8 @@ function bt.Entity:list_intrinsic_moves()
     return out
     ]]--
 end
+
+--- @brief
+function bt.Entity:get_n_intrinsic_moves()
+    return #(self:list_intrinsic_moves())
+end
