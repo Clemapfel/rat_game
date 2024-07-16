@@ -14,6 +14,7 @@ return {
 
     priority = 0,
     max_n_uses = POSITIVE_INFINITY,
+    is_intrinsic = true,
 
     effect = function(self, user, targets)
         assert(false)

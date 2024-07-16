@@ -22,6 +22,7 @@ bt.Move = meta.new_type("Move", function(id)
 end, {
     max_n_uses = POSITIVE_INFINITY,
 
+    is_intrinsic = false,
     can_target_multiple = false,
     can_target_self = false,
     can_target_enemy = false,
@@ -60,6 +61,7 @@ function bt.Move:realize()
         can_target_self = rt.BOOLEAN,
         can_target_enemy = rt.BOOLEAN,
         can_target_ally = rt.BOOLEAN,
+        is_intrinsic = rt.BOOLEAN,
         priority = rt.SIGNED,
         description = rt.STRING,
         sprite_id = rt.STRING,
@@ -135,6 +137,11 @@ end
 --- @brief
 function bt.Move:get_priority()
     return self.priority
+end
+
+--- @brief
+function bt.Move:get_is_intrinsic()
+    return self.is_intrinsic
 end
 
 

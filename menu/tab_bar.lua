@@ -229,7 +229,7 @@ end
 
 --- @brief
 function mn.TabBar:set_tab_selected(tab_i, b)
-    self._items[tab_i].frame:set_selected(b)
+    self._items[tab_i].frame:set_selection_state(ternary(b, rt.SelectionState.ACTIVE, rt.SelectionState.INACTIVE))
 end
 
 --- @brief

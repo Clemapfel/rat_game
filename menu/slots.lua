@@ -310,8 +310,6 @@ function mn.Slots:set_slot_selection_state(slot_i, selection_state)
 end
 
 --- @brief
-function mn.Slots:set_selected(b)
-    self._frame:set_selected(b)
+function mn.Slots:set_selection_state(state)
+    self._frame:set_selection_state(state)
 end
-
---- @brief

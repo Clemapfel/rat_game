@@ -229,6 +229,6 @@ function mn.EntityInfo:measure()
 end
 
 --- @brief
-function mn.EntityInfo:set_selected(b)
-    self._frame:set_selected(b)
+function mn.EntityInfo:set_selection_state(state)
+    self._frame:set_selection_state(state)
 end

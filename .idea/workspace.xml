@@ -22,25 +22,17 @@
     </configurations>
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="7fa9ba1b-2cff-4ecc-86fb-59ab2fa76ee1" name="Changes" comment="stashing before adding intrinsics">
-      <change afterPath="$PROJECT_DIR$/common/selection_state.lua" afterDir="false" />
+    <list default="true" id="7fa9ba1b-2cff-4ecc-86fb-59ab2fa76ee1" name="Changes" comment="refactored selection state to be in common">
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/battle/battle_sprite.lua" beforeDir="false" afterPath="$PROJECT_DIR$/battle/battle_sprite.lua" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/battle/enemy_sprite.lua" beforeDir="false" afterPath="$PROJECT_DIR$/battle/enemy_sprite.lua" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/battle/global_status_bar.lua" beforeDir="false" afterPath="$PROJECT_DIR$/battle/global_status_bar.lua" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/battle/move_selection_item.lua" beforeDir="false" afterPath="$PROJECT_DIR$/battle/move_selection_item.lua" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/battle/party_sprite.lua" beforeDir="false" afterPath="$PROJECT_DIR$/battle/party_sprite.lua" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/battle/priority_queue.lua" beforeDir="false" afterPath="$PROJECT_DIR$/battle/priority_queue.lua" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/battle/scene.lua" beforeDir="false" afterPath="$PROJECT_DIR$/battle/scene.lua" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/battle/scene_state_entity_select.lua" beforeDir="false" afterPath="$PROJECT_DIR$/battle/scene_state_entity_select.lua" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/battle/scene_state_inspect.lua" beforeDir="false" afterPath="$PROJECT_DIR$/battle/scene_state_inspect.lua" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/battle/scene_state_move_select.lua" beforeDir="false" afterPath="$PROJECT_DIR$/battle/scene_state_move_select.lua" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/battle/selection_state.lua" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/battle/~priority_queue.lua" beforeDir="false" afterPath="$PROJECT_DIR$/battle/~priority_queue.lua" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/include.lua" beforeDir="false" afterPath="$PROJECT_DIR$/include.lua" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/battle/configs/moves/PROTECT.lua" beforeDir="false" afterPath="$PROJECT_DIR$/battle/configs/moves/PROTECT.lua" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/battle/configs/moves/STRUGGLE.lua" beforeDir="false" afterPath="$PROJECT_DIR$/battle/configs/moves/STRUGGLE.lua" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/battle/entity.lua" beforeDir="false" afterPath="$PROJECT_DIR$/battle/entity.lua" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/battle/move.lua" beforeDir="false" afterPath="$PROJECT_DIR$/battle/move.lua" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/common/frame.lua" beforeDir="false" afterPath="$PROJECT_DIR$/common/frame.lua" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/menu/entity_info.lua" beforeDir="false" afterPath="$PROJECT_DIR$/menu/entity_info.lua" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/menu/scene.lua" beforeDir="false" afterPath="$PROJECT_DIR$/menu/scene.lua" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/menu/slots.lua" beforeDir="false" afterPath="$PROJECT_DIR$/menu/slots.lua" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/menu/~slot.lua" beforeDir="false" afterPath="$PROJECT_DIR$/menu/~slot.lua" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/menu/tab_bar.lua" beforeDir="false" afterPath="$PROJECT_DIR$/menu/tab_bar.lua" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -470,15 +462,7 @@
       <workItem from="1720887674689" duration="763000" />
       <workItem from="1720888455996" duration="3615000" />
       <workItem from="1720969128112" duration="15925000" />
-      <workItem from="1721087157672" duration="862000" />
-    </task>
-    <task id="LOCAL-00829" summary="formatted scrollbar">
-      <option name="closed" value="true" />
-      <created>1719091539031</created>
-      <option name="number" value="00829" />
-      <option name="presentableId" value="LOCAL-00829" />
-      <option name="project" value="LOCAL" />
-      <updated>1719091539033</updated>
+      <workItem from="1721087157672" duration="2777000" />
     </task>
     <task id="LOCAL-00830" summary="added jetbrains config">
       <option name="closed" value="true" />
@@ -864,7 +848,15 @@
       <option name="project" value="LOCAL" />
       <updated>1721138237548</updated>
     </task>
-    <option name="localTasksCounter" value="878" />
+    <task id="LOCAL-00878" summary="refactored selection state to be in common">
+      <option name="closed" value="true" />
+      <created>1721139218329</created>
+      <option name="number" value="00878" />
+      <option name="presentableId" value="LOCAL-00878" />
+      <option name="project" value="LOCAL" />
+      <updated>1721139218329</updated>
+    </task>
+    <option name="localTasksCounter" value="879" />
     <servers />
   </component>
   <component name="TypeScriptGeneratedFilesManager">
@@ -913,7 +905,6 @@
     </option>
   </component>
   <component name="VcsManagerConfiguration">
-    <MESSAGE value="added type" />
     <MESSAGE value="added scrollable list backing" />
     <MESSAGE value="added preview optionality" />
     <MESSAGE value="stashing before refactoring equip / consumable slot system" />
@@ -938,7 +929,8 @@
     <MESSAGE value="stashing before selection graph refactor" />
     <MESSAGE value="refactore selection graph, add per-node control indicator" />
     <MESSAGE value="stashing before adding intrinsics" />
-    <option name="LAST_COMMIT_MESSAGE" value="stashing before adding intrinsics" />
+    <MESSAGE value="refactored selection state to be in common" />
+    <option name="LAST_COMMIT_MESSAGE" value="refactored selection state to be in common" />
   </component>
   <component name="XDebuggerManager">
     <breakpoint-manager>

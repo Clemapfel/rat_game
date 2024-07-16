@@ -700,3 +700,20 @@ end
 function bt.Entity:get_n_equip_slots()
     return self.n_equip_slots
 end
+
+--- @brief
+function bt.Entity:list_intrinsic_moves()
+    return {bt.Move("STRUGGLE"), bt.Move("PROTECT")}
+    --[[
+    local out = {}
+    for move in keys(self.move_to_move_slot_i) do
+        if move:get_is_intrinsic() then
+            table.insert(out, move)
+        end
+    end
+    table.sort(out, function(a, b)
+        return self.move_to_move_slot_i[a] < self.move_to_move_slot_i[b]
+    end)
+    return out
+    ]]--
+end

@@ -728,13 +728,13 @@ function mn.Scene:_regenerate_selection_nodes()
     for node in values(shared_list_nodes) do
         node:set_on_enter(function()
             scene._shared_list_node_active = true
-            scene._shared_list_frame:set_selected(true)
+            scene._shared_list_frame:set_selection_state(rt.SelectionState.ACTIVE)
             scene._current_control_indicator = shared_list_control
         end)
 
         node:set_on_exit(function()
             scene._shared_list_node_active = false
-            scene._shared_list_frame:set_selected(false)
+            scene._shared_list_frame:set_selection_state(rt.SelectionState.INACTIVE)
         end)
     end
 
@@ -762,25 +762,25 @@ function mn.Scene:_regenerate_selection_nodes()
 
     for page_i, page in ipairs(entity_page_nodes) do
         page.info_node:set_on_enter(function()
-            scene._entity_pages[page_i].info:set_selected(true)
+            scene._entity_pages[page_i].info:set_selection_state(rt.SelectionState.ACTIVE)
             scene._current_control_indicator = entity_page_control
         end)
 
         page.info_node:set_on_exit(function()
-            scene._entity_pages[page_i].info:set_selected(false)
+            scene._entity_pages[page_i].info:set_selection_state(rt.SelectionState.INACTIVE)
         end)
 
         for node_i, node in ipairs(page.move_nodes) do
             node:set_on_enter(function()
                 local slots = scene._entity_pages[page_i].moves
-                slots:set_selected(true)
+                slots:set_selection_state(rt.SelectionState.ACTIVE)
                 slots:set_slot_selection_state(node_i, rt.SelectionState.ACTIVE)
                 scene._current_control_indicator = entity_page_control
             end)
 
             node:set_on_exit(function()
                 local slots = scene._entity_pages[page_i].moves
-                slots:set_selected(false)
+                slots:set_selection_state(rt.SelectionState.INACTIVE)
                 slots:set_slot_selection_state(node_i, rt.SelectionState.INACTIVE)
             end)
         end
@@ -788,26 +788,26 @@ function mn.Scene:_regenerate_selection_nodes()
         for node_i, node in ipairs(page.slot_nodes) do
             node:set_on_enter(function()
                 local slots = scene._entity_pages[page_i].equips_and_consumables
-                slots:set_selected(true)
+                slots:set_selection_state(rt.SelectionState.ACTIVE)
                 slots:set_slot_selection_state(node_i, rt.SelectionState.ACTIVE)
                 scene._current_control_indicator = entity_page_control
             end)
 
             node:set_on_exit(function()
                 local slots = scene._entity_pages[page_i].equips_and_consumables
-                slots:set_selected(false)
+                slots:set_selection_state(rt.SelectionState.INACTIVE)
                 slots:set_slot_selection_state(node_i, rt.SelectionState.INACTIVE)
             end)
         end
     end
 
     verbose_info_node:set_on_enter(function()
-        scene._verbose_info_frame:set_selected(true)
+        scene._verbose_info_frame:set_selection_state(rt.SelectionState.ACTIVE)
         scene._current_control_indicator = verbose_info_control
     end)
 
     verbose_info_node:set_on_exit(function()
-        scene._verbose_info_frame:set_selected(false)
+        scene._verbose_info_frame:set_selection_state(rt.SelectionState.INACTIVE)
     end)
 
     -- activation

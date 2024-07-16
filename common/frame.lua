@@ -24,7 +24,7 @@ rt.Frame = meta.new_type("Frame", rt.Widget, function(type)
         _color = rt.Palette.FOREGROUND,
         _thickness = rt.settings.frame.thickness,
         _corner_radius = rt.settings.frame.corner_radius,
-        _is_selected = false
+        _selection_state = rt.SelectionState.INACTIVE
     })
 
     rt.Frame.stencil_id = rt.Frame.stencil_id + 1
@@ -240,15 +240,25 @@ function rt.Frame:get_type()
 end
 
 --- @brief
-function rt.Frame:set_selected(b)
-    self._is_selected = b
-    if self._is_selected ~= true then
+function rt.Frame:set_selection_state(selection_state)
+    self._selection_state = selection_state
+    if self._selection_state == rt.SelectionState.INACTIVE then
         self._frame:set_line_width(self._thickness)
         self._frame_outline:set_line_width(self._thickness + 2)
         self._frame:set_color(self._color)
-    else
+        for shape in range(self._frame, self._frame_outline) do
+            shape:set_opacity(1)
+        end
+    elseif self._selection_state == rt.SelectionState.ACTIVE then
         self._frame:set_line_width(self._thickness + 2)
         self._frame_outline:set_line_width(self._thickness + 2 + 2)
         self._frame:set_color(rt.Palette.SELECTION)
+        for shape in range(self._frame, self._frame_outline) do
+            shape:set_opacity(1)
+        end
+    elseif self._selection_state == rt.SelectionState.UNSELECTED then
+        for shape in range(self._frame, self._frame_outline) do
+            shape:set_opacity(rt.settings.selection_state.unselected_opacity)
+        end
     end
 end
