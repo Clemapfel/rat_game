@@ -65,10 +65,10 @@ end
 --- @brief
 function bt.PriorityQueue:set_selection_state(entity, state)
     for element in values(self._current.entries[entity:get_id()].elements) do
-        if state == bt.SelectionState.SELECTED then
+        if state == rt.SelectionState.SELECTED then
             element:set_is_selected(true)
             element:set_opacity(1)
-        elseif state == bt.SelectionState.UNSELECTED then
+        elseif state == rt.SelectionState.UNSELECTED then
             element:set_is_selected(false)
             element:set_opacity(rt.settings.battle.priority_queue.unselected_alpha)
         else

@@ -8,7 +8,7 @@ bt.GlobalStatusBar = meta.new_type("GlobalStatusBar", rt.Widget, rt.Animation, f
         _sprite_scale = 2,
         _target_width = 0,
         _frame_aabb = rt.AABB(0, 0, 1, 1), -- current width
-        _selection_state = bt.SelectionState.INACTIVE,
+        _selection_state = rt.SelectionState.INACTIVE,
         _elapsed = 0
     })
 end)
@@ -222,7 +222,7 @@ end
 
 --- @brief
 function bt.GlobalStatusBar:_update_state()
-    if self._selection_state == bt.SelectionState.SELECTED then
+    if self._selection_state == rt.SelectionState.SELECTED then
         self._frame:set_color(rt.Palette.SELECTION)
         self._frame:set_gradient_visible(false)
     else
@@ -230,7 +230,7 @@ function bt.GlobalStatusBar:_update_state()
         self._frame:set_gradient_visible(true)
     end
 
-    if self._selection_state == bt.SelectionState.UNSELECTED then
+    if self._selection_state == rt.SelectionState.UNSELECTED then
         self:set_opacity(rt.settings.battle.selection.unselected_opacity)
     else
         self:set_opacity(1)

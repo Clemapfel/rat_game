@@ -423,7 +423,7 @@ function mn.Scene:draw()
     if self._grabbed_object ~= nil then
         rt.graphics.translate(self._grabbed_object_x, self._grabbed_object_y)
         self._grabbed_object_sprite:draw()
-        rt.graphics.translate(-self._grabbed_object_x, self._grabbed_object_y)
+        rt.graphics.translate(-self._grabbed_object_x, -self._grabbed_object_y)
     end
 
     --self:_draw_selection_graph() -- TODO
@@ -431,7 +431,6 @@ function mn.Scene:draw()
 end
 
 function mn.Scene:_regenerate_selection_nodes()
-
     local scene = self
 
     -- shared list tab nodes
@@ -775,14 +774,14 @@ function mn.Scene:_regenerate_selection_nodes()
             node:set_on_enter(function()
                 local slots = scene._entity_pages[page_i].moves
                 slots:set_selected(true)
-                slots:set_slot_selected(node_i, true)
+                slots:set_slot_selection_state(node_i, rt.SelectionState.ACTIVE)
                 scene._current_control_indicator = entity_page_control
             end)
 
             node:set_on_exit(function()
                 local slots = scene._entity_pages[page_i].moves
                 slots:set_selected(false)
-                slots:set_slot_selected(node_i, false)
+                slots:set_slot_selection_state(node_i, rt.SelectionState.INACTIVE)
             end)
         end
 
@@ -790,14 +789,14 @@ function mn.Scene:_regenerate_selection_nodes()
             node:set_on_enter(function()
                 local slots = scene._entity_pages[page_i].equips_and_consumables
                 slots:set_selected(true)
-                slots:set_slot_selected(node_i, true)
+                slots:set_slot_selection_state(node_i, rt.SelectionState.ACTIVE)
                 scene._current_control_indicator = entity_page_control
             end)
 
             node:set_on_exit(function()
                 local slots = scene._entity_pages[page_i].equips_and_consumables
                 slots:set_selected(false)
-                slots:set_slot_selected(node_i, false)
+                slots:set_slot_selection_state(node_i, rt.SelectionState.INACTIVE)
             end)
         end
     end

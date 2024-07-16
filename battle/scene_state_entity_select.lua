@@ -333,14 +333,14 @@ function bt.SceneState.ENTITY_SELECT:_update_selection()
         for entity in values(scene._state:list_entities()) do
             local sprite = scene:get_sprite(entity)
             if is_selected[entity] == true then
-                sprite:set_selection_state(bt.SelectionState.SELECTED)
-                scene._priority_queue:set_selection_state(entity, bt.SelectionState.SELECTED)
+                sprite:set_selection_state(rt.SelectionState.SELECTED)
+                scene._priority_queue:set_selection_state(entity, rt.SelectionState.SELECTED)
             elseif is_unselected[entity] == true then
-                sprite:set_selection_state(bt.SelectionState.UNSELECTED)
-                scene._priority_queue:set_selection_state(entity, bt.SelectionState.UNSELECTED)
+                sprite:set_selection_state(rt.SelectionState.UNSELECTED)
+                scene._priority_queue:set_selection_state(entity, rt.SelectionState.UNSELECTED)
             else
-                sprite:set_selection_state(bt.SelectionState.INACTIVE)
-                scene._priority_queue:set_selection_state(entity, bt.SelectionState.UNSELECTED) -- sic, highligh prio queue differently
+                sprite:set_selection_state(rt.SelectionState.INACTIVE)
+                scene._priority_queue:set_selection_state(entity, rt.SelectionState.UNSELECTED) -- sic, highligh prio queue differently
             end
 
             if entity:get_is_enemy() == false then

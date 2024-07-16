@@ -54,15 +54,15 @@ function bt.SceneState.MOVE_SELECT:_update_selection()
     for entity in values(scene._state:list_entities()) do
         local sprite = scene:get_sprite(entity)
         if entity == self._user then
-            sprite:set_selection_state(bt.SelectionState.INACTIVE)
+            sprite:set_selection_state(rt.SelectionState.INACTIVE)
         else
-            sprite:set_selection_state(bt.SelectionState.UNSELECTED)
+            sprite:set_selection_state(rt.SelectionState.UNSELECTED)
         end
     end
 
     if move == nil then
         for entity in values(scene._state:list_entities()) do
-            scene._priority_queue:set_selection_state(entity, bt.SelectionState.UNSELECTED)
+            scene._priority_queue:set_selection_state(entity, rt.SelectionState.UNSELECTED)
         end
     else
         local targets = {}, {}
@@ -86,9 +86,9 @@ function bt.SceneState.MOVE_SELECT:_update_selection()
 
         for entity, state in pairs(targets) do
             if state == true then
-                scene._priority_queue:set_selection_state(entity, bt.SelectionState.SELECTED)
+                scene._priority_queue:set_selection_state(entity, rt.SelectionState.SELECTED)
             else
-                scene._priority_queue:set_selection_state(entity, bt.SelectionState.UNSELECTED)
+                scene._priority_queue:set_selection_state(entity, rt.SelectionState.UNSELECTED)
             end
         end
     end
@@ -162,8 +162,8 @@ end
 --- @override
 function bt.SceneState.MOVE_SELECT:exit()
     for entity in values(self._scene._state:list_entities()) do
-        self._scene:get_sprite(entity):set_selection_state(bt.SelectionState.INACTIVE)
-        self._scene._priority_queue:set_selection_state(entity, bt.SelectionState.INACTIVE)
+        self._scene:get_sprite(entity):set_selection_state(rt.SelectionState.INACTIVE)
+        self._scene._priority_queue:set_selection_state(entity, rt.SelectionState.INACTIVE)
     end
 
     for entity in values(self._scene._state:list_party()) do

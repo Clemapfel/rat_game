@@ -354,12 +354,12 @@ function bt.Scene:set_selected(entities, unselect_others)
     for entity in values(self._state:list_entities()) do
         local sprite = self:get_sprite(entity)
         if is_selected[entity] == true then
-            sprite:set_selection_state(bt.SelectionState.SELECTED)
+            sprite:set_selection_state(rt.SelectionState.SELECTED)
         else
             if unselect_others == true then
-                sprite:set_selection_state(bt.SelectionState.UNSELECTED)
+                sprite:set_selection_state(rt.SelectionState.UNSELECTED)
             else
-                sprite:set_selection_state(bt.SelectionState.INACTIVE)
+                sprite:set_selection_state(rt.SelectionState.INACTIVE)
             end
         end
     end
@@ -369,7 +369,7 @@ end
 function bt.Scene:set_unselected(entities)
     for entity in values(entities) do
         local sprite = self:get_sprite(entity)
-        sprite:set_selection_state(bt.SelectionState.UNSELECTED)
+        sprite:set_selection_state(rt.SelectionState.UNSELECTED)
     end
 end
 

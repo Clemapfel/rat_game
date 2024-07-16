@@ -23,7 +23,7 @@ mn.Slot = meta.new_type("Slot", rt.Widget, function(type_label, frame_type)
         _base_inlay = {},
         _frame = rt.Frame(frame_type),
 
-        _selection_state = bt.SelectionState.INACTIVE
+        _selection_state = rt.SelectionState.INACTIVE
     })
 end)
 
@@ -142,13 +142,13 @@ end
 
 --- @brief
 function mn.Slot:set_selection_state(state)
-    if state == bt.SelectionState.SELECTED then
+    if state == rt.SelectionState.SELECTED then
         self._frame:set_color(rt.Palette.SELECTION)
         self:set_opacity(1)
-    elseif state == bt.SelectionState.INACTIVE then
+    elseif state == rt.SelectionState.INACTIVE then
         self._frame:set_color(rt.Palette.FOREGROUND)
         self:set_opacity(1)
-    elseif state == bt.SelectionState.UNSELECTED then
+    elseif state == rt.SelectionState.UNSELECTED then
         self._frame:set_color(rt.Palette.FOREGROUND)
         self:set_opacity(0.5)
     else

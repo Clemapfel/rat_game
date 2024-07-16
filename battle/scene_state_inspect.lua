@@ -247,12 +247,12 @@ function bt.SceneState.INSPECT:_update_selection()
 
     if self._current_node == nil then
         self._scene:set_selected({}, false)
-        self._scene._global_status_bar:set_selection_state(bt.SelectionState.INACTIVE)
+        self._scene._global_status_bar:set_selection_state(rt.SelectionState.INACTIVE)
         self._verbose_info:show()
     else
         if self._current_node.is_global_status_node then
             self._scene:set_selected({}, false)
-            self._scene._global_status_bar:set_selection_state(bt.SelectionState.SELECTED)
+            self._scene._global_status_bar:set_selection_state(rt.SelectionState.SELECTED)
             local to_show = {}
             for status in values(self._scene._state:list_global_statuses()) do
                 table.insert(to_show, {status, self._scene._state:get_global_status_n_turns_left(status)})
@@ -263,7 +263,7 @@ function bt.SceneState.INSPECT:_update_selection()
             local entity = self._current_node.entity
             current_entity = entity
             self._scene:set_selected({entity}, false)
-            self._scene._global_status_bar:set_selection_state(bt.SelectionState.INACTIVE)
+            self._scene._global_status_bar:set_selection_state(rt.SelectionState.INACTIVE)
 
             -- find all objects to show
             local to_show = {{entity}}
@@ -426,7 +426,7 @@ end
 --- @override
 function bt.SceneState.INSPECT:exit()
     self._scene:set_selected({}, false)
-    self._scene._global_status_bar:set_selection_state(bt.SelectionState.INACTIVE)
+    self._scene._global_status_bar:set_selection_state(rt.SelectionState.INACTIVE)
 
     for entity in values(self._scene._state:list_party()) do
         self._scene:get_sprite(entity):set_sprite_visible(false)

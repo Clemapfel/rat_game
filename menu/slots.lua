@@ -287,15 +287,25 @@ function mn.Slots:get_selection_nodes()
 end
 
 --- @brief
-function mn.Slots:set_slot_selected(slot_i, b)
-    meta.assert_boolean(b)
+function mn.Slots:set_slot_selection_state(slot_i, selection_state)
     local item = self._slot_i_to_item[slot_i]
-    if b then
+    local unselected_opacity = 0.5
+    if selection_state == rt.SelectionState.ACTIVE then
         item.frame:set_color(rt.Palette.SELECTION)
         item.frame:set_line_width(rt.settings.menu.slots.frame_selected_thickness)
-    else
+        for shape in range(item.base, item.base_inlay, item.frame) do
+            shape:set_opacity(1)
+        end
+    elseif selection_state == rt.SelectionState.INACTIVE then
         item.frame:set_color(rt.Palette.GRAY_4)
         item.frame:set_line_width(rt.settings.menu.slots.frame_unselected_thickness)
+        for shape in range(item.base, item.base_inlay, item.frame) do
+            shape:set_opacity(1)
+        end
+    elseif selection_state == rt.SelectionState.UNSELECTED then
+        for shape in range(item.base, item.base_inlay, item.frame) do
+            shape:set_opacity(unselected_opacity)
+        end
     end
 end
 
@@ -305,4 +315,3 @@ function mn.Slots:set_selected(b)
 end
 
 --- @brief
-function mn.Slots:set_unselected

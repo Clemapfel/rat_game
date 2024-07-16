@@ -153,7 +153,7 @@ end
 --- @brief
 function bt.EnemySprite:set_selection_state(state)
     self._selection_state = state
-    if state == bt.SelectionState.UNSELECTED then
+    if state == rt.SelectionState.UNSELECTED then
         self:set_opacity(rt.settings.battle.selection.unselected_opacity)
     else
         self:set_opacity(1)

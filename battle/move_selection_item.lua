@@ -3,7 +3,7 @@ bt.MoveSelectionItem = meta.new_type("MoveSelectionItem", rt.Widget, rt.Animatio
     return meta.new(bt.MoveSelectionItem, {
         _sprite = {},
         _label = {},
-        _selection_state = bt.SelectionState.INACTIVE,
+        _selection_state = rt.SelectionState.INACTIVE,
         _move = move,
         _n_uses = n_uses,
         _final_width = 0,
