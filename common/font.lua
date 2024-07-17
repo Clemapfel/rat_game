@@ -1,5 +1,5 @@
 rt.settings.font = {
-    default_size = 28,
+    default_size = 23,
     default_size_tiny = 14,
     default_size_small = 20,
     default_size_large = 40,

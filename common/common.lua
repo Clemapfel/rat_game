@@ -544,6 +544,13 @@ function table.last(t)
     return last
 end
 
+--- @brief
+function table.pop_front(t)
+    local front = t[1]
+    table.remove(t, 1)
+    return front
+end
+
 --- @brief create a table with n copies of object
 --- @param x any
 --- @param n Number

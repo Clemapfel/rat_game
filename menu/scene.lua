@@ -63,6 +63,8 @@ mn.Scene = meta.new_type("MenuScene", rt.Scene, function()
         _slot_only_selection_active = false, -- prevent cursor from leaving equip / consumable
 
         _animation_queue = rt.AnimationQueue(),
+
+        _undo_grab = function() end
     })
 end, {
     _shared_move_tab_index = 1,
@@ -167,12 +169,13 @@ function mn.Scene:realize()
                 table.insert(equip_consumable_layout, mn.SlotType.CONSUMABLE)
             end
 
-            local n = entity:get_n_move_slots()
-
-            local i = 1
-            while i < n do
-                table.insert(move_layout, table.rep(mn.SlotType.MOVE, ternary(n - i < 5, n - i, 5)))
-                i = i + 5
+            local n_move_slots = entity:get_n_move_slots()
+            table.insert(move_layout, {})
+            for i = 1, n_move_slots do
+                table.insert(move_layout[#move_layout], mn.SlotType.MOVE)
+                if i % 4 == 0 and i ~= n_move_slots then
+                    table.insert(move_layout, {})
+                end
             end
 
             self._n_entities = self._n_entities + 1
@@ -867,17 +870,21 @@ function mn.Scene:_regenerate_selection_nodes()
                 if down == nil and up == nil then
                     -- noop
                 elseif down == nil and up ~= nil then
-                    scene:_set_grabbed_object(nil)
+                    scene:_set_grabbed_object(nil, node_i)
                     page.moves:set_object(node_i, up)
                 elseif down ~= nil and up == nil then
-                    scene:_set_grabbed_object(down)
+                    scene:_set_grabbed_object(down, node_i)
                     page.moves:set_object(node_i, nil)
                 elseif down ~= nil and up ~= nil then
-                    scene:_set_grabbed_object(down)
+                    scene:_set_grabbed_object(down, node_i)
                     page.moves:set_object(node_i, up)
                 end
 
                 -- TODO update state
+            end)
+
+            node:set_on_y(function(self)
+                scene._entity_pages[scene._current_entity_i].moves:sort()
             end)
         end
 
@@ -916,15 +923,19 @@ function mn.Scene:_regenerate_selection_nodes()
                 if down == nil and up == nil then
                     -- noop
                 elseif down == nil and up ~= nil then
-                    scene:_set_grabbed_object(nil)
+                    scene:_set_grabbed_object(nil, node_i)
                     page.equips_and_consumables:set_object(node_i, up)
                 elseif down ~= nil and up == nil then
-                    scene:_set_grabbed_object(down)
+                    scene:_set_grabbed_object(down, node_i)
                     page.equips_and_consumables:set_object(node_i, nil)
                 elseif down ~= nil and up ~= nil then
-                    scene:_set_grabbed_object(down)
+                    scene:_set_grabbed_object(down, node_i)
                     page.equips_and_consumables:set_object(node_i, up)
                 end
+            end)
+
+            node:set_on_y(function(self)
+                scene._entity_pages[scene._current_entity_i].equips_and_consumables:sort()
             end)
         end
 
@@ -961,15 +972,19 @@ function mn.Scene:_regenerate_selection_nodes()
                 if down == nil and up == nil then
                     -- noop
                 elseif down == nil and up ~= nil then
-                    scene:_set_grabbed_object(nil)
+                    scene:_set_grabbed_object(nil, node_i)
                     page.equips_and_consumables:set_object(node_i, up)
                 elseif down ~= nil and up == nil then
-                    scene:_set_grabbed_object(down)
+                    scene:_set_grabbed_object(down, node_i)
                     page.equips_and_consumables:set_object(node_i, nil)
                 elseif down ~= nil and up ~= nil then
-                    scene:_set_grabbed_object(down)
+                    scene:_set_grabbed_object(down, node_i)
                     page.equips_and_consumables:set_object(node_i, up)
                 end
+            end)
+
+            node:set_on_y(function(self)
+                scene._entity_pages[scene._current_entity_i].equips_and_consumables:sort()
             end)
         end
     end
@@ -1006,10 +1021,10 @@ function mn.Scene:_regenerate_selection_nodes()
         local down = scene._shared_move_list:get_selected()
 
         if up == nil then
-            scene:_set_grabbed_object(down)
+            scene:_set_grabbed_object(down, node_i)
             scene._shared_move_list:take(down)
         else
-            scene:_set_grabbed_object(nil)
+            scene:_set_grabbed_object(nil, node_i)
             scene._shared_move_list:add(up, 1)
         end
     end)
@@ -1043,10 +1058,10 @@ function mn.Scene:_regenerate_selection_nodes()
         local down = scene._shared_equip_list:get_selected()
 
         if up == nil then
-            scene:_set_grabbed_object(down)
+            scene:_set_grabbed_object(down, node_i)
             scene._shared_equip_list:take(down)
         else
-            scene:_set_grabbed_object(nil)
+            scene:_set_grabbed_object(nil, node_i)
             scene._shared_equip_list:add(up, 1)
         end
     end)
@@ -1080,10 +1095,10 @@ function mn.Scene:_regenerate_selection_nodes()
         local down = scene._shared_consumable_list:get_selected()
 
         if up == nil then
-            scene:_set_grabbed_object(down)
+            scene:_set_grabbed_object(down, node_i)
             scene._shared_consumable_list:take(down)
         else
-            scene:_set_grabbed_object(nil)
+            scene:_set_grabbed_object(nil, node_i)
             scene._shared_consumable_list:add(up, 1)
         end
     end)
@@ -1137,23 +1152,35 @@ function mn.Scene:_handle_button_pressed(which)
         end
         self:set_current_entity_page(next)
         return
+    elseif which == rt.InputButton.B then
+        -- undo grab
+        local grabbed = self._grabbed_object
+        if grabbed ~= nil then
+            self._grabbed_object = nil
+            self._grabbed_object_sprite = nil
+            self:_undo_grab()
+        end
     end
 
     local current_shared_list = self._shared_tab_index_to_list[self._shared_tab_index]
     if self._shared_list_node_active and which == rt.InputButton.UP then
         if current_shared_list:move_up() == false then
             self._shared_list_node_active = false
+        else
+            goto skip_others
         end
     elseif self._shared_list_node_active and which == rt.InputButton.DOWN then
         current_shared_list:move_down()
+        goto skip_others
     elseif self._shared_list_node_active and which == rt.InputButton.LEFT then
         self._shared_list_node_active = false
     elseif self._shared_list_node_active and which == rt.InputButton.RIGHT then
         self._shared_list_node_active = false
-    else
-        self._selection_graph:handle_button(which)
-        self:_update_grabbed_object_position()
     end
+
+    self._selection_graph:handle_button(which)
+    self:_update_grabbed_object_position()
+    ::skip_others::
 end
 
 --- @brief
@@ -1200,8 +1227,9 @@ function mn.Scene:_update_grabbed_object_position()
 end
 
 --- @brief
-function mn.Scene:_set_grabbed_object(object)
+function mn.Scene:_set_grabbed_object(object, origin_slot_i)
     self._grabbed_object = object
+    self._grabbed_object_origin_slot_i = origin_slot_i
     if object ~= nil then
         self._grabbed_object_sprite = rt.Sprite(object:get_sprite_id())
         local sprite_w, sprite_h = self._grabbed_object_sprite:get_resolution()
@@ -1213,3 +1241,4 @@ function mn.Scene:_set_grabbed_object(object)
         self._grabbed_object_sprite = nil
     end
 end
+

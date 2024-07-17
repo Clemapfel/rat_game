@@ -34,7 +34,7 @@ for consumable_id in range(
     state.shared_consumables[bt.Consumable(consumable_id)] = rt.random.integer(1, 5)
 end
 
-local entities = {bt.Entity("MC"), bt.Entity("RAT"), bt.Entity("PROF"), bt.Entity("GIRL")}
+local entities = {bt.Entity("MC"), bt.Entity("GIRL")}-- bt.Entity("RAT"), bt.Entity("PROF"), bt.Entity("GIRL")}
 
 for entity in values(entities) do
     local to_insert = entity
@@ -111,7 +111,7 @@ love.resize = function()
 end
 
 love.run = function()
-    love.window.setMode(1600, 900, {
+    love.window.setMode(1280, 720, {
         vsync = -1, -- adaptive vsync, may tear but tries to stay as close to 60hz as possible
         msaa = 8,
         stencil = true,

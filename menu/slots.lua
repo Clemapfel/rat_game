@@ -31,6 +31,18 @@ function mn.Slots:realize()
 
     self._frame:realize()
 
+    do -- sanitize layout
+        local to_remove = {}
+        for i = 1, sizeof(self._layout) do
+            if sizeof(self._layout[i]) == 0 then
+                table.insert(to_remove, i)
+            end
+        end
+        for i in values(to_remove) do
+            table.remove(self._layout, i)
+        end
+    end
+
     local slot_i = 1
     local n_rows = sizeof(self._layout)
     for row_i = 1, n_rows do
@@ -104,18 +116,16 @@ function mn.Slots:size_allocate(x, y, width, height)
     local slot_h = slot_w
     local radius = 0.5 * slot_w
     local n_rows = sizeof(self._items)
-    local slot_vertical_m = ((height - 2 * m) - (n_rows * slot_h)) / (n_rows + 1)
-    slot_vertical_m = math.ceil(slot_vertical_m)
-    current_y = current_y + slot_vertical_m
+    local slot_vertical_m = ((height - 4 * m) - (n_rows * slot_h)) / (n_rows + 1)
     slot_vertical_m = math.max(slot_vertical_m, m)
-
+    current_y = start_y + clamp((height - 2 * m - (n_rows * slot_h) - (n_rows - 1) * slot_vertical_m) / 2, 0)
     for row_i = 1, n_rows do
         local row = self._items[row_i]
         local n_slots = sizeof(row)
-        local slot_m = ((width - 2 * m) - (n_slots * slot_w)) / (n_slots + 1)
-        slot_m = math.max(slot_m, m)
+        local slots_xm = ((width - 2 * m) - (n_slots * slot_w)) / (n_slots + 1)
+        slots_xm = math.max(slots_xm, m)
 
-        current_x = current_x + slot_m
+        current_x = current_x + slots_xm
         for slot_i = 1, #row do
             local slot = row[slot_i]
             if slot.type == mn.SlotType.EQUIP then
@@ -191,7 +201,7 @@ function mn.Slots:size_allocate(x, y, width, height)
                 end
             end
 
-            current_x = current_x + slot_w + slot_m
+            current_x = current_x + slot_w + slots_xm
         end
 
         current_x = start_x
@@ -319,4 +329,38 @@ end
 function mn.Slots:get_slot_aabb(slot_i)
     local item = self._slot_i_to_item[slot_i]
     return item.selection_node:get_aabb()
+end
+
+--- @brief
+function mn.Slots:set_opacity(alpha)
+    self._opacity = alpha
+    self._frame:set_opacity(alpha)
+    for item in values(self._slot_i_to_item) do
+        item.base:set_opacity(alpha)
+        item.base_inlay:set_opacity(alpha)
+        item.frame:set_opacity(alpha)
+    end
+end
+
+--- @brief
+function mn.Slots:sort()
+    local by_type = {
+        [mn.SlotType.MOVE] = {},
+        [mn.SlotType.CONSUMABLE] = {},
+        [mn.SlotType.EQUIP] = {},
+        [mn.SlotType.INTRINSIC] = {}
+    }
+
+    for slot_i = 1, self._n_slots do
+        local item = self._slot_i_to_item[slot_i]
+        if item.object ~= nil then
+            table.insert(by_type[item.type], item.object)
+        end
+    end
+
+    for slot_i = 1, self._n_slots do
+        local item = self._slot_i_to_item[slot_i]
+        local to_push = table.pop_front(by_type[item.type])
+        self:set_object(slot_i, to_push)
+    end
 end

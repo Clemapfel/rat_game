@@ -257,6 +257,9 @@ function rt.Frame:set_selection_state(selection_state)
             shape:set_opacity(1)
         end
     elseif self._selection_state == rt.SelectionState.UNSELECTED then
+        self._frame:set_line_width(self._thickness)
+        self._frame_outline:set_line_width(self._thickness + 2)
+        self._frame:set_color(self._color)
         for shape in range(self._frame, self._frame_outline) do
             shape:set_opacity(rt.settings.selection_state.unselected_opacity)
         end
