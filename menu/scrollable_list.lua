@@ -167,6 +167,11 @@ function mn.ScrollableList:set_sort_mode(mode)
 end
 
 --- @brief
+function mn.ScrollableList:get_sort_mode()
+    return self._current_sort_mode
+end
+
+--- @brief
 function mn.ScrollableList._update_item(item)
     item.name_label:set_text(mn.ScrollableList._format_name_label(item.object:get_name()))
     item.quantity_label:set_text(mn.ScrollableList._format_quantity_label(item.quantity))

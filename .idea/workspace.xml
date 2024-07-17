@@ -22,20 +22,13 @@
     </configurations>
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="7fa9ba1b-2cff-4ecc-86fb-59ab2fa76ee1" name="Changes" comment="added A interaction">
-      <change afterPath="$PROJECT_DIR$/menu/~entity_info.lua" afterDir="false" />
+    <list default="true" id="7fa9ba1b-2cff-4ecc-86fb-59ab2fa76ee1" name="Changes" comment="reworked slots and entity info formatting">
+      <change afterPath="$PROJECT_DIR$/common/~labeled_sprite.lua" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/battle/configs/entities/MC.lua" beforeDir="false" afterPath="$PROJECT_DIR$/battle/configs/entities/MC.lua" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/common/common.lua" beforeDir="false" afterPath="$PROJECT_DIR$/common/common.lua" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/common/font.lua" beforeDir="false" afterPath="$PROJECT_DIR$/common/font.lua" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/common/frame.lua" beforeDir="false" afterPath="$PROJECT_DIR$/common/frame.lua" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/include.lua" beforeDir="false" afterPath="$PROJECT_DIR$/include.lua" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/main_menu.lua" beforeDir="false" afterPath="$PROJECT_DIR$/main_menu.lua" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/menu/entity_info.lua" beforeDir="false" afterPath="$PROJECT_DIR$/menu/entity_info.lua" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/menu/entity_page.lua" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/menu/icons.lua" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/battle/entity.lua" beforeDir="false" afterPath="$PROJECT_DIR$/battle/entity.lua" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/common/labeled_sprite.lua" beforeDir="false" afterPath="$PROJECT_DIR$/common/labeled_sprite.lua" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/menu/scene.lua" beforeDir="false" afterPath="$PROJECT_DIR$/menu/scene.lua" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/menu/slots.lua" beforeDir="false" afterPath="$PROJECT_DIR$/menu/slots.lua" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/menu/scrollable_list.lua" beforeDir="false" afterPath="$PROJECT_DIR$/menu/scrollable_list.lua" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -469,15 +462,7 @@
       <workItem from="1721159286211" duration="1366000" />
       <workItem from="1721229477432" duration="24000" />
       <workItem from="1721229518086" duration="219000" />
-      <workItem from="1721230391016" duration="6173000" />
-    </task>
-    <task id="LOCAL-00832" summary="import">
-      <option name="closed" value="true" />
-      <created>1719098824874</created>
-      <option name="number" value="00832" />
-      <option name="presentableId" value="LOCAL-00832" />
-      <option name="project" value="LOCAL" />
-      <updated>1719098824874</updated>
+      <workItem from="1721230391016" duration="10226000" />
     </task>
     <task id="LOCAL-00833" summary="import">
       <option name="closed" value="true" />
@@ -863,7 +848,15 @@
       <option name="project" value="LOCAL" />
       <updated>1721147738353</updated>
     </task>
-    <option name="localTasksCounter" value="881" />
+    <task id="LOCAL-00881" summary="reworked slots and entity info formatting">
+      <option name="closed" value="true" />
+      <created>1721236866298</created>
+      <option name="number" value="00881" />
+      <option name="presentableId" value="LOCAL-00881" />
+      <option name="project" value="LOCAL" />
+      <updated>1721236866299</updated>
+    </task>
+    <option name="localTasksCounter" value="882" />
     <servers />
   </component>
   <component name="TypeScriptGeneratedFilesManager">
@@ -912,7 +905,6 @@
     </option>
   </component>
   <component name="VcsManagerConfiguration">
-    <MESSAGE value="stashing before refactoring equip / consumable slot system" />
     <MESSAGE value="refactored entity" />
     <MESSAGE value="stashing menu layout" />
     <MESSAGE value="refactored menu layout" />
@@ -937,7 +929,8 @@
     <MESSAGE value="refactored selection state to be in common" />
     <MESSAGE value="added intrinsic category" />
     <MESSAGE value="added A interaction" />
-    <option name="LAST_COMMIT_MESSAGE" value="added A interaction" />
+    <MESSAGE value="reworked slots and entity info formatting" />
+    <option name="LAST_COMMIT_MESSAGE" value="reworked slots and entity info formatting" />
   </component>
   <component name="XDebuggerManager">
     <breakpoint-manager>

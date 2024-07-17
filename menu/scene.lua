@@ -691,15 +691,21 @@ function mn.Scene:_regenerate_selection_nodes()
         table.unpack(shared_control_layout)
     })
 
+    local entity_info_control = rt.ControlIndicator({
+        table.unpack(shared_control_layout)
+    })
+
     local entity_page_control = rt.ControlIndicator({
         {rt.ControlIndicatorButton.A, prefix .. "TODO" .. postfix},
         {rt.ControlIndicatorButton.X, prefix .. "Unequip Automatically" .. postfix},
+        {rt.ControlIndicatorButton.Y, prefix .. "Sort" .. postfix},
         table.unpack(shared_control_layout)
     })
 
     local shared_list_control = rt.ControlIndicator({
         {rt.ControlIndicatorButton.A, prefix .. "TODO" .. postfix},
         {rt.ControlIndicatorButton.X, prefix .. "Equip Automatically" .. postfix},
+        {rt.ControlIndicatorButton.Y, prefix .. "Sort By" .. postfix},
         table.unpack(shared_control_layout)
     })
 
@@ -712,6 +718,7 @@ function mn.Scene:_regenerate_selection_nodes()
         entity_tab_control,
         shared_tab_control,
         entity_page_control,
+        entity_info_control,
         shared_list_control,
         verbose_info_control
     }
@@ -739,6 +746,8 @@ function mn.Scene:_regenerate_selection_nodes()
                 elseif meta.isa(scene._grabbed_object, bt.Consumable) then
                     scene:set_current_shared_list_page(self._shared_consumable_tab_index)
                 end
+
+                scene:_set_grabbed_object_allowed(true)
             end
         end)
 
@@ -752,6 +761,7 @@ function mn.Scene:_regenerate_selection_nodes()
         node:set_on_enter(function()
             scene._entity_tab_bar:set_tab_selected(entity_i, true)
             scene._current_control_indicator = entity_tab_control
+            scene:_set_grabbed_object_allowed(false)
         end)
 
         node:set_on_exit(function()
@@ -763,6 +773,7 @@ function mn.Scene:_regenerate_selection_nodes()
         node:set_on_enter(function()
             scene._shared_tab_bar:set_tab_selected(tab_i, true)
             scene._current_control_indicator = shared_tab_control
+            scene:_set_grabbed_object_allowed(false)
         end)
 
         node:set_on_exit(function()
@@ -773,7 +784,8 @@ function mn.Scene:_regenerate_selection_nodes()
     for page_i, page in ipairs(entity_page_nodes) do
         page.info_node:set_on_enter(function()
             scene._entity_pages[page_i].info:set_selection_state(rt.SelectionState.ACTIVE)
-            scene._current_control_indicator = entity_page_control
+            scene._current_control_indicator = entity_info_control
+            scene:_set_grabbed_object_allowed(false)
         end)
 
         page.info_node:set_on_exit(function()
@@ -786,6 +798,8 @@ function mn.Scene:_regenerate_selection_nodes()
                 slots:set_selection_state(rt.SelectionState.ACTIVE)
                 slots:set_slot_selection_state(node_i, rt.SelectionState.ACTIVE)
                 scene._current_control_indicator = entity_page_control
+
+                scene:_set_grabbed_object_allowed(meta.isa(scene._grabbed_object, bt.Move) and not scene._state.entities[self._current_entity_i]:has_move(scene._grabbed_object))
             end)
 
             node:set_on_exit(function()
@@ -801,6 +815,13 @@ function mn.Scene:_regenerate_selection_nodes()
                 slots:set_selection_state(rt.SelectionState.ACTIVE)
                 slots:set_slot_selection_state(node_i, rt.SelectionState.ACTIVE)
                 scene._current_control_indicator = entity_page_control
+
+                local n_move_slots = scene._state.entities[page_i]:get_n_move_slots()
+                if node_i <= n_move_slots then
+                    scene:_set_grabbed_object_allowed(meta.isa(scene._grabbed_object, bt.Equip))
+                else
+                    scene:_set_grabbed_object_allowed(meta.isa(scene._grabbed_object, bt.Consumable))
+                end
             end)
 
             node:set_on_exit(function()
@@ -814,6 +835,7 @@ function mn.Scene:_regenerate_selection_nodes()
     verbose_info_node:set_on_enter(function()
         scene._verbose_info_frame:set_selection_state(rt.SelectionState.ACTIVE)
         scene._current_control_indicator = verbose_info_control
+        scene:_set_grabbed_object_allowed(false)
     end)
 
     verbose_info_node:set_on_exit(function()
@@ -862,9 +884,14 @@ function mn.Scene:_regenerate_selection_nodes()
                 local page = scene._entity_pages[scene._current_entity_i]
                 local down = page.moves:get_object(node_i)
                 local up = scene._grabbed_object
+                local entity = scene._state.entities[scene._current_entity_i]
 
-                if up ~= nil and not meta.isa(up, bt.Move) then
-                    return
+                if up ~= nil then
+                    if not meta.isa(up, bt.Move) then
+                        return
+                    end
+
+                    if entity:has_move(up) then return end
                 end
 
                 if down == nil and up == nil then
@@ -872,15 +899,18 @@ function mn.Scene:_regenerate_selection_nodes()
                 elseif down == nil and up ~= nil then
                     scene:_set_grabbed_object(nil, node_i)
                     page.moves:set_object(node_i, up)
+                    entity:add_move(up)
                 elseif down ~= nil and up == nil then
                     scene:_set_grabbed_object(down, node_i)
                     page.moves:set_object(node_i, nil)
+                    entity:remove_move(down)
+                    dbg(entity:has_move(down))
                 elseif down ~= nil and up ~= nil then
                     scene:_set_grabbed_object(down, node_i)
                     page.moves:set_object(node_i, up)
+                    :add_move(up)
+                    entity:remove_move(down)
                 end
-
-                -- TODO update state
             end)
 
             node:set_on_y(function(self)
@@ -1016,15 +1046,19 @@ function mn.Scene:_regenerate_selection_nodes()
         end
     end)
 
+    shared_move_list_node:set_on_y(function()
+        scene._shared_move_list:set_sort_mode(scene._shared_list_sort_mode_order[scene._shared_move_list:get_sort_mode()])
+    end)
+
     shared_move_list_node:set_on_a(function()
         local up = scene._grabbed_object
         local down = scene._shared_move_list:get_selected()
 
         if up == nil then
-            scene:_set_grabbed_object(down, node_i)
+            scene:_set_grabbed_object(down)
             scene._shared_move_list:take(down)
         else
-            scene:_set_grabbed_object(nil, node_i)
+            scene:_set_grabbed_object(nil)
             scene._shared_move_list:add(up, 1)
         end
     end)
@@ -1058,12 +1092,16 @@ function mn.Scene:_regenerate_selection_nodes()
         local down = scene._shared_equip_list:get_selected()
 
         if up == nil then
-            scene:_set_grabbed_object(down, node_i)
+            scene:_set_grabbed_object(down)
             scene._shared_equip_list:take(down)
         else
-            scene:_set_grabbed_object(nil, node_i)
+            scene:_set_grabbed_object(nil)
             scene._shared_equip_list:add(up, 1)
         end
+    end)
+
+    shared_equip_list_node:set_on_y(function()
+        scene._shared_equip_list:set_sort_mode(scene._shared_list_sort_mode_order[scene._shared_equip_list:get_sort_mode()])
     end)
 
     local shared_consumable_list_node = shared_list_nodes[self._shared_consumable_tab_index]
@@ -1101,6 +1139,10 @@ function mn.Scene:_regenerate_selection_nodes()
             scene:_set_grabbed_object(nil, node_i)
             scene._shared_consumable_list:add(up, 1)
         end
+    end)
+
+    shared_consumable_list_node:set_on_y(function()
+        scene._shared_consumable_list:set_sort_mode(scene._shared_list_sort_mode_order[scene._shared_consumable_list:get_sort_mode()])
     end)
 
     -- push
@@ -1142,6 +1184,8 @@ function mn.Scene:_handle_button_pressed(which)
             next = next - 1
         end
         self:set_current_entity_page(next)
+        self._selection_graph:set_current_node(self._entity_tab_bar:get_selection_nodes()[next])
+        self:_update_grabbed_object_position()
         return
     elseif which == rt.InputButton.R then
         local next = self._current_entity_i
@@ -1151,6 +1195,8 @@ function mn.Scene:_handle_button_pressed(which)
             next = next + 1
         end
         self:set_current_entity_page(next)
+        self._selection_graph:set_current_node(self._entity_tab_bar:get_selection_nodes()[next])
+        self:_update_grabbed_object_position()
         return
     elseif which == rt.InputButton.B then
         -- undo grab
@@ -1231,14 +1277,22 @@ function mn.Scene:_set_grabbed_object(object, origin_slot_i)
     self._grabbed_object = object
     self._grabbed_object_origin_slot_i = origin_slot_i
     if object ~= nil then
-        self._grabbed_object_sprite = rt.Sprite(object:get_sprite_id())
+        self._grabbed_object_sprite = rt.LabeledSprite(object:get_sprite_id())
+        self._grabbed_object_sprite:set_label("<color=LIGHT_RED_3><o>\u{00D7}</o></color>")
+        self._grabbed_object_sprite:realize()
         local sprite_w, sprite_h = self._grabbed_object_sprite:get_resolution()
         sprite_w = sprite_w * 2
         sprite_h = sprite_h * 2
         self._grabbed_object_sprite:set_minimum_size(sprite_w, sprite_h)
         self._grabbed_object_sprite:set_opacity(0.5)
+        self:_set_grabbed_object_allowed(true)
     else
         self._grabbed_object_sprite = nil
     end
 end
 
+--- @brief
+function mn.Scene:_set_grabbed_object_allowed(b)
+    if self._grabbed_object == nil then return end
+    self._grabbed_object_sprite:set_label_is_visible(not b)
+end

@@ -457,6 +457,7 @@ function bt.Entity:remove_move(move)
         move = nil,
         n_uses_left = 0
     }
+    self.move_to_move_slot_i[move] = nil
 end
 
 --- @brief
