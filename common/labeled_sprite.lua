@@ -89,3 +89,8 @@ end
 function rt.LabeledSprite:set_label_is_visible(b)
     self._label_is_visible = b
 end
+
+--- qbrief
+function rt.LabeledSprite:set_sprite_scale(b)
+
+end

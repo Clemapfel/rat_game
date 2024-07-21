@@ -22,9 +22,15 @@
     </configurations>
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="7fa9ba1b-2cff-4ecc-86fb-59ab2fa76ee1" name="Changes" comment="correctly handling control indicators now">
-      <change afterPath="$PROJECT_DIR$/menu/verbose_info_panel.lua" afterDir="false" />
+    <list default="true" id="7fa9ba1b-2cff-4ecc-86fb-59ab2fa76ee1" name="Changes" comment="added verbose info panel">
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/assets/sprites/battle/menu_icons.png" beforeDir="false" afterPath="$PROJECT_DIR$/assets/sprites/battle/menu_icons.png" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/assets/sprites/menu_icons.lua" beforeDir="false" afterPath="$PROJECT_DIR$/assets/sprites/menu_icons.lua" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/common/frame.lua" beforeDir="false" afterPath="$PROJECT_DIR$/common/frame.lua" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/common/labeled_sprite.lua" beforeDir="false" afterPath="$PROJECT_DIR$/common/labeled_sprite.lua" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/include.lua" beforeDir="false" afterPath="$PROJECT_DIR$/include.lua" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/menu/scene.lua" beforeDir="false" afterPath="$PROJECT_DIR$/menu/scene.lua" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/menu/verbose_info_panel.lua" beforeDir="false" afterPath="$PROJECT_DIR$/menu/verbose_info_panel.lua" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -458,15 +464,7 @@
       <workItem from="1721159286211" duration="1366000" />
       <workItem from="1721229477432" duration="24000" />
       <workItem from="1721229518086" duration="219000" />
-      <workItem from="1721230391016" duration="11571000" />
-    </task>
-    <task id="LOCAL-00834" summary="added love executables">
-      <option name="closed" value="true" />
-      <created>1719099576573</created>
-      <option name="number" value="00834" />
-      <option name="presentableId" value="LOCAL-00834" />
-      <option name="project" value="LOCAL" />
-      <updated>1719099576573</updated>
+      <workItem from="1721230391016" duration="18427000" />
     </task>
     <task id="LOCAL-00835" summary="moved run scripts">
       <option name="closed" value="true" />
@@ -852,7 +850,15 @@
       <option name="project" value="LOCAL" />
       <updated>1721240806624</updated>
     </task>
-    <option name="localTasksCounter" value="883" />
+    <task id="LOCAL-00883" summary="added verbose info panel">
+      <option name="closed" value="true" />
+      <created>1721430348527</created>
+      <option name="number" value="00883" />
+      <option name="presentableId" value="LOCAL-00883" />
+      <option name="project" value="LOCAL" />
+      <updated>1721430348527</updated>
+    </task>
+    <option name="localTasksCounter" value="884" />
     <servers />
   </component>
   <component name="TypeScriptGeneratedFilesManager">
@@ -901,7 +907,6 @@
     </option>
   </component>
   <component name="VcsManagerConfiguration">
-    <MESSAGE value="stashing menu layout" />
     <MESSAGE value="refactored menu layout" />
     <MESSAGE value="refactored menu scene ui layout and menuing graph" />
     <MESSAGE value="added scrollable list initialization" />
@@ -926,7 +931,8 @@
     <MESSAGE value="added A interaction" />
     <MESSAGE value="reworked slots and entity info formatting" />
     <MESSAGE value="correctly handling control indicators now" />
-    <option name="LAST_COMMIT_MESSAGE" value="correctly handling control indicators now" />
+    <MESSAGE value="added verbose info panel" />
+    <option name="LAST_COMMIT_MESSAGE" value="added verbose info panel" />
   </component>
   <component name="XDebuggerManager">
     <breakpoint-manager>

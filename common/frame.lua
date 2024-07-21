@@ -88,12 +88,12 @@ function rt.Frame:size_allocate(x, y, width, height)
         self._child:set_opacity(self._opacity)
     end
 
-    local thickness = self._thickness
+    local thickness = self._thickness + 2
 
     if self._type == rt.FrameType.RECTANGULAR then
         self._frame:resize(rt.AABB(pos_x + 0.5 * thickness, pos_y + 0.5 * thickness, w - thickness, h - thickness))
         self._frame_outline:resize(rt.AABB(pos_x + 0.5 * thickness, pos_y + 0.5 * thickness, w - thickness, h - thickness))
-        self._stencil_mask:resize(rt.AABB(pos_x + 0.5 * thickness, pos_y + 0.5 * thickness, w - thickness, h - thickness))
+        self._stencil_mask:resize(rt.AABB(pos_x + thickness, pos_y + thickness, w - 2 * thickness, h - 2 * thickness))
     elseif self._type == rt.FrameType.CIRCULAR then
         local radius = math.min(w, h) / 2 - 0.5 * thickness
         self._frame:resize(pos_x + 0.5 * w, pos_y + 0.5 * h, radius)

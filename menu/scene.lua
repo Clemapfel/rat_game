@@ -56,8 +56,8 @@ mn.Scene = meta.new_type("MenuScene", rt.Scene, function()
         _shared_list_node_active = false,
         _input = rt.InputController(),
 
-        _verbose_info_frame = rt.Frame(),
-        _verbose_info = bt.VerboseInfo(),
+        _verbose_info = mn.VerboseInfoPanel(),
+        _verbose_info_node_active = false,
 
         _move_only_selection_active = false, -- prevent cursor from leaving move
         _slot_only_selection_active = false, -- prevent cursor from leaving equip / consumable
@@ -205,8 +205,6 @@ function mn.Scene:realize()
     self._entity_tab_bar:realize()
 
     self:_create_from_state(self._state)
-
-    self._verbose_info_frame:realize()
     self._verbose_info:realize()
 
     self._shared_list_frame:realize()
@@ -337,7 +335,6 @@ function mn.Scene:size_allocate(x, y, width, height)
         verbose_info_h
     )
     self._verbose_info:fit_into(verbose_info_bounds)
-    self._verbose_info_frame:fit_into(verbose_info_bounds)
 
     current_y = current_y + shared_tab_h + m
 
@@ -415,7 +412,6 @@ function mn.Scene:draw()
     self._shared_list_frame:draw()
     self._shared_tab_index_to_list[self._shared_tab_index]:draw()
   
-    self._verbose_info_frame:draw()
     self._verbose_info:draw()
 
     self._animation_queue:draw()
@@ -494,7 +490,7 @@ function mn.Scene:_regenerate_selection_nodes()
     end
 
     -- verbose info scroll node
-    local verbose_info_node = mn.SelectionGraphNode(self._verbose_info_frame:get_bounds())
+    local verbose_info_node = mn.SelectionGraphNode(self._verbose_info:get_bounds())
 
     -- linking
     local function find_nearest_node(origin, nodes, mode)
@@ -833,13 +829,15 @@ function mn.Scene:_regenerate_selection_nodes()
     end
 
     verbose_info_node:set_on_enter(function()
-        scene._verbose_info_frame:set_selection_state(rt.SelectionState.ACTIVE)
+        self._verbose_info_node_active = true
+        scene._verbose_info:set_selection_state(rt.SelectionState.ACTIVE)
         scene._current_control_indicator = verbose_info_control
         scene:_set_grabbed_object_allowed(false)
     end)
 
     verbose_info_node:set_on_exit(function()
-        scene._verbose_info_frame:set_selection_state(rt.SelectionState.INACTIVE)
+        self._verbose_info_node_active = false
+        scene._verbose_info:set_selection_state(rt.SelectionState.INACTIVE)
     end)
 
     -- activation
@@ -1222,6 +1220,19 @@ function mn.Scene:_handle_button_pressed(which)
         self._shared_list_node_active = false
     elseif self._shared_list_node_active and which == rt.InputButton.RIGHT then
         self._shared_list_node_active = false
+    end
+
+    dbg(self._verbose_info_node_active)
+    if self._verbose_info_node_active and which == rt.InputButton.UP then
+        self._verbose_info:scroll_up()
+        goto skip_others
+    elseif self._verbose_info_node_active and which == rt.InputButton.DOWN then
+        self._verbose_info:scroll_down()
+        goto skip_others
+    elseif self._verbose_info_node_active and which == rt.InputButton.LEFT then
+        self._verbose_info_node_active = false
+    elseif self._verbose_info_node_active and which == rt.InputButton.RIGHT then
+        --self._verbose_info_node_active = false
     end
 
     self._selection_graph:handle_button(which)
