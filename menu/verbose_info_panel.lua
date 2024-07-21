@@ -5,8 +5,8 @@ mn.VerboseInfoPanel = meta.new_type("MenuVerboseInfoPanel", rt.Widget, function(
         _current_item_i = 0,
         _y_offset = 0,
         _frame = rt.Frame(),
-        _scroll_up_sprite = rt.Sprite(rt.settings.menu.scene.tab_bar_sprite_id, "arrow_up"),
-        _scroll_down_sprite = rt.Sprite(rt.settings.menu.scene.tab_bar_sprite_id, "arrow_down")
+        _scroll_up_indicator = {}, -- rt.Polygon
+        _scroll_up_indicator_outline = {}, -- rt.Polygon
     })
 end)
 
@@ -46,24 +46,23 @@ function mn.VerboseInfoPanel:realize()
     self._is_realized = true
 
     self._frame:realize()
-    self._scroll_up_sprite:realize()
-    self._scroll_down_sprite:realize()
-
+    --self._scroll_up_sprite:realize()
+    --self._scroll_down_sprite:realize()
 end
 
 --- @override
 function mn.VerboseInfoPanel:size_allocate(x, y, width, height)
     self._frame:fit_into(x, y, width, height)
 
-    local sprite_w, sprite_h = self._scroll_up_sprite:get_resolution()
+    local sprite_w, sprite_h = 32, 32--self._scroll_up_sprite:get_resolution()
     sprite_w = sprite_w * 2
     sprite_h = sprite_h * 2
     for sprite in range(self._scroll_up_sprite, self._scroll_down_sprite) do
         sprite:set_minimum_size(sprite_w, sprite_h)
     end
 
-    self._scroll_up_sprite:fit_into(x + 0.5 * width - 0.5 * sprite_w, y - 0.5 * sprite_h, sprite_w, sprite_h)
-    self._scroll_down_sprite:fit_into(x + 0.5 * width - 0.5 * sprite_w, y + height - 0.5 * sprite_h, sprite_w, sprite_h)
+    --self._scroll_up_sprite:fit_into(x + 0.5 * width - 0.5 * sprite_w, y - 0.5 * sprite_h, sprite_w, sprite_h)
+    --self._scroll_down_sprite:fit_into(x + 0.5 * width - 0.5 * sprite_w, y + height - 0.5 * sprite_h, sprite_w, sprite_h)
 
     local current_x, current_y = x, y
     self._items = {}
@@ -104,8 +103,8 @@ function mn.VerboseInfoPanel:draw()
     end
     self._frame:_unbind_stencil()
     rt.graphics.translate(0, -self._y_offset)
-    self._scroll_up_sprite:draw()
-    self._scroll_down_sprite:draw()
+    --self._scroll_up_sprite:draw()
+    --self._scroll_down_sprite:draw()
 end
 
 --- @brief
