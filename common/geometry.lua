@@ -166,7 +166,7 @@ end
 
 
 --- @brief triangle with rounded corners, like a triangular sign
-function generate_rounded_triangle(center_x, center_y, radius, corner_radius, n_corner_vertices)
+function rt.generate_rounded_triangle(center_x, center_y, radius, corner_radius, n_corner_vertices)
     if n_corner_vertices == nil then n_corner_vertices = 16 end
 
     local function translate_point_by_angle(point_x, point_y, distance, angle)
@@ -193,4 +193,88 @@ function generate_rounded_triangle(center_x, center_y, radius, corner_radius, n_
 
     return vertices
 end
+
+--- @brief
+--- @param thickness
+--- @param angle Number lower angle of hat, > 180 for downwards pointing
+function rt.generate_hat_arrow(centroid_x, centroid_y, width, thickness, angle)
+
+    angle = which(angle, 90)
+    angle = 180 - angle
+
+    local center_x, center_y = centroid_x, centroid_y
+    local right_x, right_y = rt.translate_point_by_angle(center_x, center_y, 0.5 * width, rt.degrees_to_radians((angle / 2)))
+    local left_x, left_y = rt.translate_point_by_angle(center_x, center_y, 0.5 * width, -1 * rt.degrees_to_radians(180 + (angle / 2)))
+
+
+    local top = function(x, y)
+        return rt.translate_point_by_angle(x, y, 0.5 * thickness, -1 * rt.degrees_to_radians(90))
+    end
+
+    local bottom = function(x, y)
+        return rt.translate_point_by_angle(x, y, 0.5 * thickness, rt.degrees_to_radians(90))
+    end
+
+    local center_top_x, center_top_y = top(center_x, center_y)
+    local center_bottom_x, center_bottom_y = bottom(center_x, center_y)
+    local right_top_x, right_top_y = top(right_x, right_y)
+    local right_bottom_x, right_bottom_y = bottom(right_x, right_y)
+    local left_top_x, left_top_y = top(left_x, left_y)
+    local left_bottom_x, left_bottom_y = bottom(left_x, left_y)
+
+    return {
+        center_top_x, center_top_y,
+        right_top_x, right_top_y,
+        right_bottom_x, right_bottom_y,
+
+        center_bottom_x, center_bottom_y,
+        center_top_x, center_top_y,
+        right_bottom_x, right_bottom_y,
+
+        center_top_x, center_top_y,
+        left_top_x, left_top_y,
+        left_bottom_x, left_bottom_y,
+
+        center_top_x, center_top_y,
+        center_bottom_x, center_bottom_y,
+        left_bottom_x, left_bottom_y
+    }
+end
+
+function rt.generate_hat_arrow_outline(centroid_x, centroid_y, width, thickness, angle)
+
+    angle = which(angle, 90)
+    angle = 180 - angle
+
+    local center_x, center_y = centroid_x, centroid_y
+    local right_x, right_y = rt.translate_point_by_angle(center_x, center_y, 0.5 * width, rt.degrees_to_radians((angle / 2)))
+    local left_x, left_y = rt.translate_point_by_angle(center_x, center_y, 0.5 * width, -1 * rt.degrees_to_radians(180 + (angle / 2)))
+
+
+    local top = function(x, y)
+        return rt.translate_point_by_angle(x, y, 0.5 * thickness, -1 * rt.degrees_to_radians(90))
+    end
+
+    local bottom = function(x, y)
+        return rt.translate_point_by_angle(x, y, 0.5 * thickness, rt.degrees_to_radians(90))
+    end
+
+    local center_top_x, center_top_y = top(center_x, center_y)
+    local center_bottom_x, center_bottom_y = bottom(center_x, center_y)
+    local right_top_x, right_top_y = top(right_x, right_y)
+    local right_bottom_x, right_bottom_y = bottom(right_x, right_y)
+    local left_top_x, left_top_y = top(left_x, left_y)
+    local left_bottom_x, left_bottom_y = bottom(left_x, left_y)
+
+    return {
+        center_top_x, center_top_y,
+        right_top_x, right_top_y,
+        right_bottom_x, right_bottom_y,
+        center_bottom_x, center_bottom_y,
+        left_bottom_x, left_bottom_y,
+        left_top_x, left_top_y,
+        center_top_x, center_top_y,
+    }
+end
+
 

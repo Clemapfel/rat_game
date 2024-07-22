@@ -72,55 +72,10 @@ end
 rt.settings.show_rulers = false
 rt.settings.show_fps = true
 
-local angle = 180 - 140
-local thickness = 100
-local width = 400
-
-local center_x, center_y = 400, 400
-local right_x, right_y = rt.translate_point_by_angle(center_x, center_y, 0.5 * width, rt.degrees_to_radians((angle / 2)))
-local left_x, left_y = rt.translate_point_by_angle(center_x, center_y, 0.5 * width, -1 * rt.degrees_to_radians(180 + (angle / 2)))
-
-local top = function(x, y)
-    return rt.translate_point_by_angle(x, y, 0.5 * thickness, -1 * rt.degrees_to_radians(90))
-end
-
-local bottom = function(x, y)
-    return rt.translate_point_by_angle(x, y, 0.5 * thickness, rt.degrees_to_radians(90))
-end
-
-local center_top_x, center_top_y = top(center_x, center_y)
-local center_bottom_x, center_bottom_y = bottom(center_x, center_y)
-local right_top_x, right_top_y = top(right_x, right_y)
-local right_bottom_x, right_bottom_y = bottom(right_x, right_y)
-local left_top_x, left_top_y = top(left_x, left_y)
-local left_bottom_x, left_bottom_y = bottom(left_x, left_y)
-
-local vertices = {
-    center_top_x, center_top_y,
-    right_top_x, right_top_y,
-    right_bottom_x, right_bottom_y,
-
-    center_bottom_x, center_bottom_y,
-    center_top_x, center_top_y,
-    right_bottom_x, right_bottom_y,
-
-    center_top_x, center_top_y,
-    left_top_x, left_top_y,
-    left_bottom_x, left_bottom_y,
-
-    center_top_x, center_top_y,
-    center_bottom_x, center_bottom_y,
-    left_bottom_x, left_bottom_y
-}
-
 love.draw = function()
     love.graphics.setColor(0.6, 0, 0.6, 1)
-    love.graphics.setPointSize(3)
-
-    love.graphics.setPointSize(3)
-    love.graphics.polygon("fill", table.unpack(vertices))
     if rt.current_scene ~= nil then
-        --rt.current_scene:draw()
+        rt.current_scene:draw()
     end
 
     if rt.settings.show_rulers == true then

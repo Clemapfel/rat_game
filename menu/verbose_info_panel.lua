@@ -1,3 +1,7 @@
+rt.settings.menu.verbose_info_panel = {
+    indicator_highlight_duration = 2
+}
+
 --- @class mn.VerboseInfoPanel
 mn.VerboseInfoPanel = meta.new_type("MenuVerboseInfoPanel", rt.Widget, function()
     return meta.new(mn.VerboseInfoPanel, {
@@ -7,6 +11,10 @@ mn.VerboseInfoPanel = meta.new_type("MenuVerboseInfoPanel", rt.Widget, function(
         _frame = rt.Frame(),
         _scroll_up_indicator = {}, -- rt.Polygon
         _scroll_up_indicator_outline = {}, -- rt.Polygon
+        _scroll_down_indicator = {}, -- rt.Polygon
+        _scroll_down_indicator_outline = {}, -- rt.Polygon
+        _indicator_up_duration = 0,
+        _indicator_down_duration = 0,
     })
 end)
 
@@ -31,6 +39,8 @@ function mn.VerboseInfoPanel.Item:size_allocate(x, y, width, height)
 end
 
 function mn.VerboseInfoPanel.Item:draw()
+    if self._is_realized == true then return end
+
     self.frame:draw()
     --self.frame:_bind_stencil()
     love.graphics.setColor(rt.color_unpack(self.color))
@@ -46,23 +56,31 @@ function mn.VerboseInfoPanel:realize()
     self._is_realized = true
 
     self._frame:realize()
-    --self._scroll_up_sprite:realize()
-    --self._scroll_down_sprite:realize()
+
 end
 
 --- @override
 function mn.VerboseInfoPanel:size_allocate(x, y, width, height)
     self._frame:fit_into(x, y, width, height)
 
-    local sprite_w, sprite_h = 32, 32--self._scroll_up_sprite:get_resolution()
-    sprite_w = sprite_w * 2
-    sprite_h = sprite_h * 2
-    for sprite in range(self._scroll_up_sprite, self._scroll_down_sprite) do
-        sprite:set_minimum_size(sprite_w, sprite_h)
+    local m = rt.settings.margin_unit
+    local angle = 120
+    local arrow_width = 6 * m
+    local thickness = m
+    self._scroll_up_indicator = rt.Polygon(rt.generate_hat_arrow(x + 0.5 * width, y, arrow_width, thickness, angle))
+    self._scroll_up_indicator_outline = rt.LineStrip(rt.generate_hat_arrow_outline(x + 0.5 * width, y, arrow_width, thickness, angle))
+
+    self._scroll_down_indicator = rt.Polygon(rt.generate_hat_arrow(x + 0.5 * width, y + height, arrow_width, thickness, 360 - angle))
+    self._scroll_down_indicator_outline = rt.LineStrip(rt.generate_hat_arrow_outline(x + 0.5 * width, y + height, arrow_width, thickness, 360 - angle))
+
+    for body in range(self._scroll_up_indicator, self._scroll_down_indicator) do
+        body:set_color(rt.Palette.FOREGROUND)
     end
 
-    --self._scroll_up_sprite:fit_into(x + 0.5 * width - 0.5 * sprite_w, y - 0.5 * sprite_h, sprite_w, sprite_h)
-    --self._scroll_down_sprite:fit_into(x + 0.5 * width - 0.5 * sprite_w, y + height - 0.5 * sprite_h, sprite_w, sprite_h)
+    for line in range(self._scroll_down_indicator_outline, self._scroll_up_indicator_outline) do
+        line:set_line_width(2)
+        line:set_color(rt.Palette.BASE_OUTLINE)
+    end
 
     local current_x, current_y = x, y
     self._items = {}
@@ -103,8 +121,36 @@ function mn.VerboseInfoPanel:draw()
     end
     self._frame:_unbind_stencil()
     rt.graphics.translate(0, -self._y_offset)
-    --self._scroll_up_sprite:draw()
-    --self._scroll_down_sprite:draw()
+
+    --self._scroll_up_indicator:draw()
+    self._scroll_up_indicator_outline:draw()
+
+    --self._scroll_down_indicator:draw()
+    self._scroll_down_indicator_outline:draw()
+end
+
+--- @override
+function mn.VerboseInfoPanel:update(delta)
+    self._indicator_up_duration = self._indicator_up_duration + delta
+    self._indicator_down_duration = self._indicator_down_duration + delta
+
+    local fraction = self._indicator_up_duration / rt.settings.menu.verbose_info_panel.indicator_highlight_duration
+    fraction = clamp(fraction, 0, 1)
+    local color = rt.color_mix(rt.Palette.SELECTION, rt.Palette.GRAY_4, fraction)
+    color.a = 1 - fraction
+
+    for shape in range(self._scroll_up_indicator, self._scroll_up_indicator_outline) do
+        shape:set_color(color)
+    end
+
+    fraction = self._indicator_down_duration / rt.settings.menu.verbose_info_panel.indicator_highlight_duration
+    fraction = clamp(fraction, 0, 1)
+    color = rt.color_mix(rt.Palette.SELECTION, rt.Palette.GRAY_4, fraction)
+    color.a = 1 - fraction
+
+    for shape in range(self._scroll_down_indicator, self._scroll_down_indicator_outline) do
+        shape:set_color(color)
+    end
 end
 
 --- @brief
@@ -120,6 +166,7 @@ end
 
 --- @brief
 function mn.VerboseInfoPanel:scroll_up()
+    self._indicator_up_duration = 0
     if self._current_item_i > 1 then
         self._current_item_i = self._current_item_i - 1
         self:_set_current_item(self._current_item_i)
@@ -134,6 +181,7 @@ function mn.VerboseInfoPanel:scroll_down()
     local current = self._items[self._current_item_i]
     if current == nil then return false end
 
+    self._indicator_down_duration = 0
     if self._current_item_i < self._n_items and current.height_below > self._bounds.height then
         self._current_item_i = self._current_item_i + 1
         self:_set_current_item(self._current_item_i)

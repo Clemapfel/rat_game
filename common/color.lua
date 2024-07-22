@@ -308,6 +308,27 @@ function rt.color_unpack(color)
     end
 end
 
+--- @brief
+function rt.color_mix(a, b, ratio)
+    if meta.is_hsva(a) and meta.is_hsva(b) then
+        return rt.HSVA(
+            mix(a.h, b.h, ratio),
+            mix(a.s, b.s, ratio),
+            mix(a.v, b.v, ratio),
+            mix(a.a, b.a, ratio)
+        )
+    else
+        meta.assert_rgba(a)
+        meta.assert_rgba(b)
+        return rt.RGBA(
+            mix(a.r, b.r, ratio),
+            mix(a.g, b.g, ratio),
+            mix(a.b, b.b, ratio),
+            mix(a.a, b.a, ratio)
+        )
+    end
+end
+
 --- @brief [internal] test colors
 function rt.test.colors()
     local rgba_from_string = rt.RGBA("#FF00FF")

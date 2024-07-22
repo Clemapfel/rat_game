@@ -1272,6 +1272,7 @@ end
 --- @override
 function mn.Scene:update(delta)
     self._animation_queue:update(delta)
+    self._verbose_info:update(delta)
 end
 
 --- @brief

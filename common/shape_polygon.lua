@@ -7,8 +7,10 @@ rt.PolygonType = meta.new_enum({
 
 --- @class
 rt.Polygon = meta.new_type("Polygon", rt.Shape, function(...)
+
+    local vertices = {...}
     local out = meta.new(rt.Polygon, {
-        _vertices = {...},
+        _vertices = ternary(meta.is_table(vertices[1]), vertices[1], vertices),
         _type = rt.PolygonType.POLYGON,
         _centroid_x = 0,
         _centroid_y = 0
