@@ -226,6 +226,10 @@ function mn.Scene:realize()
         [self._shared_equip_tab_index] = self._shared_equip_list,
         [self._shared_template_tab_index] = self._shared_template_list
     }
+
+    -- TODO
+    self._verbose_info:show(nil)
+    -- TODO
 end
 
 --- @brief
@@ -671,7 +675,6 @@ function mn.Scene:_regenerate_selection_nodes()
     local prefix = ""
     local postfix = ""
     local shared_control_layout = {
-        {rt.ControlIndicatorButton.ALL_DIRECTIONS, "Move"},
         {rt.ControlIndicatorButton.B, "Back"},
         {rt.ControlIndicatorButton.L, "Previous"},
         {rt.ControlIndicatorButton.R, "Next"}
@@ -707,6 +710,7 @@ function mn.Scene:_regenerate_selection_nodes()
 
     local verbose_info_control = rt.ControlIndicator({
         {rt.ControlIndicatorButton.A, prefix .. "TODO" .. postfix},
+        {rt.ControlIndicatorButton.UP_DOWN, prefix .. "Scroll" .. postfix},
         table.unpack(shared_control_layout)
     })
 
@@ -902,7 +906,6 @@ function mn.Scene:_regenerate_selection_nodes()
                     scene:_set_grabbed_object(down, node_i)
                     page.moves:set_object(node_i, nil)
                     entity:remove_move(down)
-                    dbg(entity:has_move(down))
                 elseif down ~= nil and up ~= nil then
                     scene:_set_grabbed_object(down, node_i)
                     page.moves:set_object(node_i, up)
@@ -1222,7 +1225,6 @@ function mn.Scene:_handle_button_pressed(which)
         self._shared_list_node_active = false
     end
 
-    dbg(self._verbose_info_node_active)
     if self._verbose_info_node_active and which == rt.InputButton.UP then
         self._verbose_info:scroll_up()
         goto skip_others

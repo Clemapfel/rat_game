@@ -1,5 +1,6 @@
 rt.settings.menu.verbose_info_panel = {
-    indicator_highlight_duration = 2
+    indicator_highlight_duration = 0.25,
+    indicator_base_color = rt.Palette.FOREGROUND
 }
 
 --- @class mn.VerboseInfoPanel
@@ -7,56 +8,38 @@ mn.VerboseInfoPanel = meta.new_type("MenuVerboseInfoPanel", rt.Widget, function(
     return meta.new(mn.VerboseInfoPanel, {
         _items = {},
         _current_item_i = 0,
+        _n_items = 0,
         _y_offset = 0,
         _frame = rt.Frame(),
         _scroll_up_indicator = {}, -- rt.Polygon
         _scroll_up_indicator_outline = {}, -- rt.Polygon
+        _scroll_up_indicator_visible = true,
         _scroll_down_indicator = {}, -- rt.Polygon
         _scroll_down_indicator_outline = {}, -- rt.Polygon
-        _indicator_up_duration = 0,
-        _indicator_down_duration = 0,
+        _scroll_down_indicator_visible = true,
+        _indicator_up_duration = POSITIVE_INFINITY,
+        _indicator_down_duration = POSITIVE_INFINITY,
+        _selection_state = rt.SelectionState.INACTIVE
     })
 end)
 
-mn.VerboseInfoPanel.Item = meta.new_type("MenuVerboseInfoPanelItem", rt.Widget, function()
-    return meta.new(mn.VerboseInfoPanel.Item, {
-        aabb = rt.AABB(0, 0, 1, 1),
-        height_above = 0,
-        height_below = 0,
-        frame = rt.Frame()
-    })
-end)
-
-function mn.VerboseInfoPanel.Item:realize()
-    if self._is_realized == true then return end
-    self._is_realized = true
-    self.frame:realize()
+--- @brief
+function mn.VerboseInfoPanel:show(object)
+    local to_insert = mn.VerboseInfoPanel.Item()
+    to_insert:create_from_equip(bt.Equip("DEBUG_EQUIP"))
+    to_insert:realize()
+    to_insert:fit_into(0, 0, 100, 100)
+    self._items = {to_insert}
+    self._n_items = 1
+    self:_set_current_item(1)
+    self:reformat()
 end
-
-function mn.VerboseInfoPanel.Item:size_allocate(x, y, width, height)
-    self.aabb = rt.AABB(x, y, width, height)
-    self.frame:fit_into(x, y, width, height)
-end
-
-function mn.VerboseInfoPanel.Item:draw()
-    if self._is_realized == true then return end
-
-    self.frame:draw()
-    --self.frame:_bind_stencil()
-    love.graphics.setColor(rt.color_unpack(self.color))
-    love.graphics.rectangle("fill", rt.aabb_unpack(self.aabb))
-    --self.frame:_unbind_stencil()
-end
-
--- ######
 
 --- @override
 function mn.VerboseInfoPanel:realize()
     if self._is_realized == true then return end
     self._is_realized = true
-
     self._frame:realize()
-
 end
 
 --- @override
@@ -74,29 +57,23 @@ function mn.VerboseInfoPanel:size_allocate(x, y, width, height)
     self._scroll_down_indicator_outline = rt.LineStrip(rt.generate_hat_arrow_outline(x + 0.5 * width, y + height, arrow_width, thickness, 360 - angle))
 
     for body in range(self._scroll_up_indicator, self._scroll_down_indicator) do
-        body:set_color(rt.Palette.FOREGROUND)
+        body:set_color(rt.settings.menu.verbose_info_panel.indicator_base_color)
     end
 
     for line in range(self._scroll_down_indicator_outline, self._scroll_up_indicator_outline) do
-        line:set_line_width(2)
+        line:set_line_width(1)
         line:set_color(rt.Palette.BASE_OUTLINE)
     end
 
     local current_x, current_y = x, y
-    self._items = {}
-    self._n_items = 0
     local total_height = 0
-    local n_items = 16
+    local n_items = sizeof(self._items)
     for i = 1, n_items do
-        local h = rt.random.integer(width / 10, width / 3)
-        local to_insert = mn.VerboseInfoPanel.Item()
-        to_insert.color = rt.hsva_to_rgba(rt.HSVA(i / n_items, 1, 1, 1))
-        to_insert:realize()
-        to_insert:fit_into(current_x, current_y, width, h)
-        table.insert(self._items, to_insert)
-        self._n_items = self._n_items + 1
+        local item = self._items[i]
+        item:fit_into(current_x, current_y, width, POSITIVE_INFINITY)
+        local h = select(2, item:measure())
 
-        to_insert.height_above = total_height
+        item.height_above = total_height
         total_height = total_height + h
         current_y = current_y + h
     end
@@ -108,7 +85,8 @@ function mn.VerboseInfoPanel:size_allocate(x, y, width, height)
         item.height_below = reverse_height
     end
 
-    self:_set_current_item(1)
+    self._scroll_up_indicator_visible = self:can_scroll_up()
+    self._scroll_down_indicator_visible = self:can_scroll_down()
 end
 
 --- @override
@@ -122,11 +100,15 @@ function mn.VerboseInfoPanel:draw()
     self._frame:_unbind_stencil()
     rt.graphics.translate(0, -self._y_offset)
 
-    --self._scroll_up_indicator:draw()
-    self._scroll_up_indicator_outline:draw()
+    if self._scroll_up_indicator_visible and self._selection_state == rt.SelectionState.SELECTED then
+        self._scroll_up_indicator:draw()
+        self._scroll_up_indicator_outline:draw()
+    end
 
-    --self._scroll_down_indicator:draw()
-    self._scroll_down_indicator_outline:draw()
+    if self._scroll_down_indicator_visible and self._selection_state == rt.SelectionState.SELECTED then
+        self._scroll_down_indicator:draw()
+        self._scroll_down_indicator_outline:draw()
+    end
 end
 
 --- @override
@@ -136,25 +118,25 @@ function mn.VerboseInfoPanel:update(delta)
 
     local fraction = self._indicator_up_duration / rt.settings.menu.verbose_info_panel.indicator_highlight_duration
     fraction = clamp(fraction, 0, 1)
-    local color = rt.color_mix(rt.Palette.SELECTION, rt.Palette.GRAY_4, fraction)
-    color.a = 1 - fraction
+    local color = rt.color_mix(rt.Palette.SELECTION, rt.settings.menu.verbose_info_panel.indicator_base_color, fraction)
 
-    for shape in range(self._scroll_up_indicator, self._scroll_up_indicator_outline) do
+    for shape in range(self._scroll_up_indicator) do
         shape:set_color(color)
     end
 
     fraction = self._indicator_down_duration / rt.settings.menu.verbose_info_panel.indicator_highlight_duration
     fraction = clamp(fraction, 0, 1)
-    color = rt.color_mix(rt.Palette.SELECTION, rt.Palette.GRAY_4, fraction)
-    color.a = 1 - fraction
+    color = rt.color_mix(rt.Palette.SELECTION, rt.settings.menu.verbose_info_panel.indicator_base_color, fraction)
 
-    for shape in range(self._scroll_down_indicator, self._scroll_down_indicator_outline) do
+    for shape in range(self._scroll_down_indicator) do
         shape:set_color(color)
     end
 end
 
 --- @brief
 function mn.VerboseInfoPanel:set_selection_state(state)
+    meta.assert_enum(state, rt.SelectionState)
+    self._selection_state = state
     self._frame:set_selection_state(state)
 end
 
@@ -162,12 +144,14 @@ end
 function mn.VerboseInfoPanel:_set_current_item(i)
     self._current_item_i = i
     self._y_offset = -1 * self._items[self._current_item_i].height_above
+    self._scroll_up_indicator_visible = self:can_scroll_up()
+    self._scroll_down_indicator_visible = self:can_scroll_down()
 end
 
 --- @brief
 function mn.VerboseInfoPanel:scroll_up()
     self._indicator_up_duration = 0
-    if self._current_item_i > 1 then
+    if self:can_scroll_up() then
         self._current_item_i = self._current_item_i - 1
         self:_set_current_item(self._current_item_i)
         return true
@@ -177,18 +161,27 @@ function mn.VerboseInfoPanel:scroll_up()
 end
 
 --- @brief
-function mn.VerboseInfoPanel:scroll_down()
-    local current = self._items[self._current_item_i]
-    if current == nil then return false end
+function mn.VerboseInfoPanel:can_scroll_up()
+    return self._current_item_i > 1
+end
 
+--- @brief
+function mn.VerboseInfoPanel:scroll_down()
     self._indicator_down_duration = 0
-    if self._current_item_i < self._n_items and current.height_below > self._bounds.height then
+    if self:can_scroll_down() then
         self._current_item_i = self._current_item_i + 1
         self:_set_current_item(self._current_item_i)
         return true
     else
         return false
     end
+end
+
+--- @brief
+function mn.VerboseInfoPanel:can_scroll_down()
+    local current = self._items[self._current_item_i]
+    if current == nil then return false end
+    return self._current_item_i < self._n_items and current.height_below > self._bounds.height
 end
 
 --[[

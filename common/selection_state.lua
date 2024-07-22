@@ -5,6 +5,7 @@ rt.settings.selection_state = {
 --- @class rt.SelectionState
 rt.SelectionState = meta.new_enum({
     SELECTED = 1,
+    ACTIVE = 1,
     INACTIVE = 0,
     UNSELECTED = -1
 })

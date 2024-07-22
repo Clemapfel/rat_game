@@ -12,10 +12,12 @@ return {
        RIGHT = 7,
        DOWN = 8,
        LEFT = 9,
-       ALL_DIRECTIONS = 10,
-       L = 11,
-       R = 12,
-       SELECT = 13,
-       START = 14
+       UP_DOWN = 10,
+       LEFT_RIGHT = 11,
+       ALL_DIRECTIONS = 12,
+       L = 13,
+       R = 14,
+       SELECT = 15,
+       START = 16
     }
 }

@@ -36,6 +36,8 @@ rt.ControlIndicatorButton = meta.new_enum({
     SELECT = "SELECT",
     L = "L",
     R = "R",
+    LEFT_RIGHT = "LEFT_RIGHT",
+    UP_DOWN = "UP_DOWN",
     ALL_DIRECTIONS = "ALL_DIRECTIONS",
     ALL_BUTTONS = "ALL_BUTTONS"
 })

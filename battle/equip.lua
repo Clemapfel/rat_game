@@ -39,6 +39,8 @@ end, {
     type = bt.EquipType.UNKNOWN,
 
     description = "(no description)",
+    flavor_text = "(no flavor text)",
+
     sprite_id = "",
     sprite_index = 1
 })
@@ -53,6 +55,7 @@ function bt.Equip:realize()
         name = rt.STRING,
         is_silent = rt.BOOLEAN,
         description = rt.STRING,
+        flavor_text = rt.STRING,
         sprite_id = rt.STRING,
         sprite_index = { rt.UNSIGNED, rt.STRING },
 
@@ -133,6 +136,11 @@ end
 --- @brief
 function bt.Equip:get_description()
     return self.description
+end
+
+--- @brief
+function bt.Equip:get_flavor_text()
+    return self.flavor_text
 end
 
 --- @brief
