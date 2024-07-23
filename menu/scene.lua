@@ -64,7 +64,9 @@ mn.Scene = meta.new_type("MenuScene", rt.Scene, function()
 
         _animation_queue = rt.AnimationQueue(),
 
-        _undo_grab = function() end
+        _undo_grab = function() end,
+
+        _background = bt.Background.PARALLELL_LINES()
     })
 end, {
     _shared_move_tab_index = 1,
@@ -109,6 +111,10 @@ end
 function mn.Scene:realize()
     if self._is_realized == true then return end
     self._is_realized = true
+
+    if self._background ~= nil then
+        self._background:realize()
+    end
 
     self._input:signal_connect("pressed", function(_, button)
         self:_handle_button_pressed(button)
@@ -282,6 +288,10 @@ function mn.Scene:size_allocate(x, y, width, height)
     local m = rt.settings.margin_unit
     local outer_margin = 2 * m
 
+    if self._background ~= nil then
+        self._background:fit_into(x, y, width, height)
+    end
+
     local current_x, current_y = x + outer_margin, y + outer_margin
     local control_w, control_h = self._current_control_indicator:measure()
     self._current_control_indicator:fit_into(x + width - control_w - outer_margin, y + outer_margin, control_w, control_h)
@@ -395,6 +405,10 @@ end
 --- @override
 function mn.Scene:draw()
     if self._is_realized ~= true then return end
+
+    if self._background ~= nil then
+        self._background:draw()
+    end
 
     self._inventory_header_frame:draw()
     self._inventory_header_label:draw()
@@ -1273,6 +1287,7 @@ end
 
 --- @override
 function mn.Scene:update(delta)
+    self._background:update(delta)
     self._animation_queue:update(delta)
     self._verbose_info:update(delta)
 end

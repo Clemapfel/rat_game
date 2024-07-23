@@ -39,6 +39,11 @@ vec2 rotate(vec2 point, float angle) {
     return point + pivot;
 }
 
+vec2 translate_point_by_angle(vec2 xy, float dist, float angle)
+{
+    return xy + vec2(cos(angle), sin(angle)) * dist;
+}
+
 /// @brief 3d discontinuous noise, in [0, 1]
 vec3 random_3d(in vec3 p) {
     return fract(sin(vec3(
@@ -101,6 +106,7 @@ vec4 effect(vec4 vertex_color, Image image, vec2 texture_coords, vec2 vertex_pos
     const float rotation = PI / 6;
 
     vec2 pos = texture_coords;
+    pos.y = pos.y + elapsed / 75;
     pos = rotate(pos, rotation);
     const float rng_scale = 0.2;
     float line_i = pos.y * (1 / scale) + worley_noise(vec3(pos.xy * 0.2, elapsed / 30));
@@ -114,11 +120,11 @@ vec4 effect(vec4 vertex_color, Image image, vec2 texture_coords, vec2 vertex_pos
 
     const float width_min = 0.05;
     const float width_max = 0.5;
-    float width = mix(width_min, width_max, (sin(elapsed) + 1) / 2); // TODO: route signal into this
+    float width = mix(width_min, width_max, (sin(elapsed / 3) + 1) / 2); // TODO: route signal into this
     vec4 line = vec4(1 - smoothstep(0.0, width, abs(y - 0.5)));
 
     float hue = fract(fract(elapsed / 10) + line_i * 5 + elapsed / 12);
-    return vec4(0, 0, 0, 1) + vec4(oklch_to_rgb(vec3(1 - 0.3 * ((width - width_min) / (width_max - width_min)), 0.3, hue)), 1) * line;
+    return vec4(0, 0, 0, 1) + vec4(oklch_to_rgb(vec3(1 - 0.3 * ((width - width_min) / (width_max - width_min)), 0.3, hue)), 1) * line * vec4(0.66);
 }
 
 #endif

@@ -25,12 +25,15 @@ end)
 
 --- @brief
 function mn.VerboseInfoPanel:show(object)
-    local to_insert = mn.VerboseInfoPanel.Item()
-    to_insert:create_from_equip(bt.Equip("DEBUG_EQUIP"))
-    to_insert:realize()
-    to_insert:fit_into(0, 0, 100, 100)
-    self._items = {to_insert}
-    self._n_items = 1
+    self._items = {}
+    for i = 1, 3 do
+        local to_insert = mn.VerboseInfoPanel.Item()
+        to_insert:create_from_equip(bt.Equip("DEBUG_EQUIP"))
+        to_insert:realize()
+        to_insert:fit_into(0, 0, 100, 100)
+        table.insert(self._items, to_insert)
+    end
+    self._n_items = sizeof(self._items)
     self:_set_current_item(1)
     self:reformat()
 end
@@ -74,6 +77,7 @@ function mn.VerboseInfoPanel:size_allocate(x, y, width, height)
         local h = select(2, item:measure())
 
         item.height_above = total_height
+        item.aabb.height = h
         total_height = total_height + h
         current_y = current_y + h
     end

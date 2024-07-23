@@ -1,13 +1,18 @@
 --- @class VerboseInfoPanel.Item
 mn.VerboseInfoPanel.Item = meta.new_type("MenuVerboseInfoPanelItem", rt.Widget, function()
-    return meta.new(mn.VerboseInfoPanel.Item, {
+    local out = meta.new(mn.VerboseInfoPanel.Item, {
         aabb = rt.AABB(0, 0, 1, 1),
         height_above = 0,
         height_below = 0,
         frame = rt.Frame(),
         object = nil,
+        final_height = 1,
         content = {}, -- Table<rt.Drawable>
     })
+
+    out.frame:set_corner_radius(1)
+    out.frame:set_color(rt.Palette.GRAY_3)
+    return out
 end)
 
 function mn.VerboseInfoPanel.Item:draw()
@@ -15,6 +20,10 @@ function mn.VerboseInfoPanel.Item:draw()
     for object in values(self.content) do
         object:draw()
     end
+end
+
+function mn.VerboseInfoPanel.Item:measure()
+    return self._bounds.width, self.final_height
 end
 
 function mn.VerboseInfoPanel.Item._font()
@@ -173,12 +182,22 @@ function mn.VerboseInfoPanel.Item:create_from_equip(equip)
         local start_y = y + ym
         local current_x, current_y = x + xm, start_y
         local w = width - 2 * xm
-        self.title_label:fit_into(current_x, current_y, w, POSITIVE_INFINITY)
-        current_y = current_y + select(2, self.title_label:measure())
-        current_y = current_y + m
+
+        local sprite_w, sprite_h = self.sprite:measure()
+        local title_w, title_h = self.title_label:measure()
+
+        local title_max_h = math.max(sprite_h, title_h)
+        local title_y = current_y + 0.5 * title_max_h - 0.5 * title_h
+        self.title_label:fit_into(current_x, title_y, w, POSITIVE_INFINITY)
+        self.sprite:fit_into(current_x + w - sprite_w, current_y + 0.5 * title_max_h - 0.5 * sprite_h, sprite_w, sprite_h)
+
+        current_y = current_y + title_max_h
+
+        local title_ym = current_y - title_y - title_h
 
         self.description_label:fit_into(current_x, current_y, w, POSITIVE_INFINITY)
-        current_y = current_y + select(2, self.description_label:measure()) + 1 * m
+        current_y = current_y + select(2, self.description_label:measure())
+        current_y = current_y + title_ym
 
         local max_prefix_w = NEGATIVE_INFINITY
         local max_value_w = NEGATIVE_INFINITY
@@ -223,6 +242,7 @@ function mn.VerboseInfoPanel.Item:create_from_equip(equip)
 
         local total_height = current_y - start_y + 2 * ym
         self.frame:fit_into(x, y, width, total_height)
+        self.final_height = total_height
     end
 end
 
