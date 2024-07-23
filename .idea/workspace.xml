@@ -22,18 +22,9 @@
     </configurations>
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="7fa9ba1b-2cff-4ecc-86fb-59ab2fa76ee1" name="Changes" comment="added scroll indicator">
-      <change afterPath="$PROJECT_DIR$/menu/verbose_info_panel_item.lua" afterDir="false" />
+    <list default="true" id="7fa9ba1b-2cff-4ecc-86fb-59ab2fa76ee1" name="Changes" comment="verbose info panel mwe working">
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/assets/sprites/controller_buttons.lua" beforeDir="false" afterPath="$PROJECT_DIR$/assets/sprites/controller_buttons.lua" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/assets/sprites/controller_buttons.png" beforeDir="false" afterPath="$PROJECT_DIR$/assets/sprites/controller_buttons.png" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/battle/configs/equips/DEBUG_EQUIP.lua" beforeDir="false" afterPath="$PROJECT_DIR$/battle/configs/equips/DEBUG_EQUIP.lua" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/battle/equip.lua" beforeDir="false" afterPath="$PROJECT_DIR$/battle/equip.lua" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/common/control_indicator.lua" beforeDir="false" afterPath="$PROJECT_DIR$/common/control_indicator.lua" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/common/selection_state.lua" beforeDir="false" afterPath="$PROJECT_DIR$/common/selection_state.lua" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/include.lua" beforeDir="false" afterPath="$PROJECT_DIR$/include.lua" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/menu/scene.lua" beforeDir="false" afterPath="$PROJECT_DIR$/menu/scene.lua" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/menu/verbose_info_panel.lua" beforeDir="false" afterPath="$PROJECT_DIR$/menu/verbose_info_panel.lua" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/menu/verbose_info_panel_item.lua" beforeDir="false" afterPath="$PROJECT_DIR$/menu/verbose_info_panel_item.lua" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -467,15 +458,7 @@
       <workItem from="1721159286211" duration="1366000" />
       <workItem from="1721229477432" duration="24000" />
       <workItem from="1721229518086" duration="219000" />
-      <workItem from="1721230391016" duration="31931000" />
-    </task>
-    <task id="LOCAL-00838" summary="added scrollable list">
-      <option name="closed" value="true" />
-      <created>1719246949761</created>
-      <option name="number" value="00838" />
-      <option name="presentableId" value="LOCAL-00838" />
-      <option name="project" value="LOCAL" />
-      <updated>1719246949761</updated>
+      <workItem from="1721230391016" duration="34041000" />
     </task>
     <task id="LOCAL-00839" summary="optimization">
       <option name="closed" value="true" />
@@ -861,7 +844,15 @@
       <option name="project" value="LOCAL" />
       <updated>1721608334025</updated>
     </task>
-    <option name="localTasksCounter" value="887" />
+    <task id="LOCAL-00887" summary="verbose info panel mwe working">
+      <option name="closed" value="true" />
+      <created>1721673207778</created>
+      <option name="number" value="00887" />
+      <option name="presentableId" value="LOCAL-00887" />
+      <option name="project" value="LOCAL" />
+      <updated>1721673207778</updated>
+    </task>
+    <option name="localTasksCounter" value="888" />
     <servers />
   </component>
   <component name="TypeScriptGeneratedFilesManager">
@@ -910,7 +901,6 @@
     </option>
   </component>
   <component name="VcsManagerConfiguration">
-    <MESSAGE value="refactored selection graph" />
     <MESSAGE value="stashing old layout" />
     <MESSAGE value="stashing menu" />
     <MESSAGE value="added parallel line background" />
@@ -935,7 +925,8 @@
     <MESSAGE value="stashing verbose panel" />
     <MESSAGE value="stashing direction indicator" />
     <MESSAGE value="added scroll indicator" />
-    <option name="LAST_COMMIT_MESSAGE" value="added scroll indicator" />
+    <MESSAGE value="verbose info panel mwe working" />
+    <option name="LAST_COMMIT_MESSAGE" value="verbose info panel mwe working" />
   </component>
   <component name="XDebuggerManager">
     <breakpoint-manager>
