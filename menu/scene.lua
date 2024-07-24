@@ -66,7 +66,7 @@ mn.Scene = meta.new_type("MenuScene", rt.Scene, function()
 
         _undo_grab = function() end,
 
-        _background = bt.Background.PARALLELL_LINES()
+        _background = bt.Background.FOCUS_RACK_DOTS()
     })
 end, {
     _shared_move_tab_index = 1,
@@ -442,6 +442,8 @@ function mn.Scene:draw()
 
     --self:_draw_selection_graph() -- TODO
     --self._selection_graph:draw()
+
+    self._background:draw()
 end
 
 function mn.Scene:_regenerate_selection_nodes()
