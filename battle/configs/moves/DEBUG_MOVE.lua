@@ -1,6 +1,7 @@
 return {
     name = "Debug Move",
     description = "Used for debugging, no effect but prints a message for every battle event",
+    flavor_text = "if a move does nothing, is it even a move?",
 
     sprite_id = "orbs",
     sprite_index = 1,

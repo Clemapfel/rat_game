@@ -39,7 +39,7 @@ end, {
     type = bt.EquipType.UNKNOWN,
 
     description = "(no description)",
-    flavor_text = "(no flavor text)",
+    flavor_text = "",
 
     sprite_id = "",
     sprite_index = 1

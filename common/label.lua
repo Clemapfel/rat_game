@@ -138,6 +138,7 @@ function rt.Label:size_allocate(x, y, width, height)
         for _, glyph in ipairs(rows[i]) do
             if meta.isa(glyph, rt.Glyph) then
                 local position_x, position_y = glyph:get_position()
+
                 if self._justify_mode == rt.JustifyMode.LEFT then
                     position_x = position_x + self:get_margin_left() + self:get_margin_right()
                 elseif self._justify_mode == rt.JustifyMode.CENTER then
@@ -152,45 +153,19 @@ function rt.Label:size_allocate(x, y, width, height)
                 max_x = math.max(max_x, position_x + w)
                 max_y = math.max(max_y, position_y + h)
 
-                glyph:set_position(position_x, position_y)
                 glyph._row_index = i -- wrap hinting, used for :set_n_visible_characters_from_elapsed
-            end
-        end
-    end
-
-    local w, h = max_x - min_x, max_y - min_y
-    local x_offset, y_offset = 0, 0
-
-    if x_offset ~= 0 or y_offset ~= 0 then
-
-        min_x = POSITIVE_INFINITY
-        min_y = POSITIVE_INFINITY
-        max_x = NEGATIVE_INFINITY
-        max_y = NEGATIVE_INFINITY
-
-        for _, glyph in pairs(self._glyphs) do
-            if meta.isa(glyph, rt.Glyph) then
-                local position_x, position_y = glyph:get_position()
-                glyph:set_position(position_x + x_offset, position_y + y_offset)
-
-                w, h = glyph:get_size()
-                min_x = math.min(min_x, position_x)
-                min_y = math.min(min_y, position_y)
-                max_x = math.max(max_x, position_x + w)
-                max_y = math.max(max_y, position_y + h)
             end
         end
     end
 
     self._current_width = max_x - min_x
     self._current_height = max_y - min_y
-    self._n_rows = #rows
+    self._n_rows = sizeof(rows)
 end
 
 --- @overload rt.Widget.measure
 function rt.Label:measure()
-    return math.max(self._current_width, select(1, self:get_minimum_size())) + self:get_margin_left() + self:get_margin_right(),
-    math.max(self._current_height, select(2, self:get_minimum_size())) + self:get_margin_top() + self:get_margin_bottom()
+    return self._current_width, self._current_height
 end
 
 -- control characters

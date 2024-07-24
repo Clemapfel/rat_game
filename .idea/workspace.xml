@@ -22,10 +22,12 @@
     </configurations>
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="7fa9ba1b-2cff-4ecc-86fb-59ab2fa76ee1" name="Changes" comment="added equip tooltip">
+    <list default="true" id="7fa9ba1b-2cff-4ecc-86fb-59ab2fa76ee1" name="Changes" comment="stashing">
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/battle/backgrounds/parallell_lines.glsl" beforeDir="false" afterPath="$PROJECT_DIR$/battle/backgrounds/parallell_lines.glsl" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/menu/scene.lua" beforeDir="false" afterPath="$PROJECT_DIR$/menu/scene.lua" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/battle/configs/moves/DEBUG_MOVE.lua" beforeDir="false" afterPath="$PROJECT_DIR$/battle/configs/moves/DEBUG_MOVE.lua" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/battle/equip.lua" beforeDir="false" afterPath="$PROJECT_DIR$/battle/equip.lua" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/battle/move.lua" beforeDir="false" afterPath="$PROJECT_DIR$/battle/move.lua" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/common/label.lua" beforeDir="false" afterPath="$PROJECT_DIR$/common/label.lua" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/menu/verbose_info_panel.lua" beforeDir="false" afterPath="$PROJECT_DIR$/menu/verbose_info_panel.lua" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/menu/verbose_info_panel_item.lua" beforeDir="false" afterPath="$PROJECT_DIR$/menu/verbose_info_panel_item.lua" afterDir="false" />
     </list>
@@ -461,23 +463,8 @@
       <workItem from="1721159286211" duration="1366000" />
       <workItem from="1721229477432" duration="24000" />
       <workItem from="1721229518086" duration="219000" />
-      <workItem from="1721230391016" duration="36547000" />
-    </task>
-    <task id="LOCAL-00840" summary="revert">
-      <option name="closed" value="true" />
-      <created>1719260869451</created>
-      <option name="number" value="00840" />
-      <option name="presentableId" value="LOCAL-00840" />
-      <option name="project" value="LOCAL" />
-      <updated>1719260869451</updated>
-    </task>
-    <task id="LOCAL-00841" summary="stashing tab bar">
-      <option name="closed" value="true" />
-      <created>1719324767451</created>
-      <option name="number" value="00841" />
-      <option name="presentableId" value="LOCAL-00841" />
-      <option name="project" value="LOCAL" />
-      <updated>1719324767452</updated>
+      <workItem from="1721230391016" duration="36744000" />
+      <workItem from="1721840426345" duration="6303000" />
     </task>
     <task id="LOCAL-00842" summary="added bspline">
       <option name="closed" value="true" />
@@ -855,7 +842,23 @@
       <option name="project" value="LOCAL" />
       <updated>1721767348170</updated>
     </task>
-    <option name="localTasksCounter" value="889" />
+    <task id="LOCAL-00889" summary="added background to menu">
+      <option name="closed" value="true" />
+      <created>1721769601868</created>
+      <option name="number" value="00889" />
+      <option name="presentableId" value="LOCAL-00889" />
+      <option name="project" value="LOCAL" />
+      <updated>1721769601868</updated>
+    </task>
+    <task id="LOCAL-00890" summary="stashing">
+      <option name="closed" value="true" />
+      <created>1721769748063</created>
+      <option name="number" value="00890" />
+      <option name="presentableId" value="LOCAL-00890" />
+      <option name="project" value="LOCAL" />
+      <updated>1721769748063</updated>
+    </task>
+    <option name="localTasksCounter" value="891" />
     <servers />
   </component>
   <component name="TypeScriptGeneratedFilesManager">
@@ -904,14 +907,12 @@
     </option>
   </component>
   <component name="VcsManagerConfiguration">
-    <MESSAGE value="stashing menu" />
     <MESSAGE value="added parallel line background" />
     <MESSAGE value="added more menu functionality" />
     <MESSAGE value="menu selection layout done" />
     <MESSAGE value="stashing frame selection" />
     <MESSAGE value="polished frame selection" />
     <MESSAGE value="added meshilizer" />
-    <MESSAGE value="stashing" />
     <MESSAGE value="MWE" />
     <MESSAGE value="added subpixel filtering to fix sprite scaling" />
     <MESSAGE value="added item move animation" />
@@ -929,7 +930,9 @@
     <MESSAGE value="added scroll indicator" />
     <MESSAGE value="verbose info panel mwe working" />
     <MESSAGE value="added equip tooltip" />
-    <option name="LAST_COMMIT_MESSAGE" value="added equip tooltip" />
+    <MESSAGE value="added background to menu" />
+    <MESSAGE value="stashing" />
+    <option name="LAST_COMMIT_MESSAGE" value="stashing" />
   </component>
   <component name="XDebuggerManager">
     <breakpoint-manager>

@@ -26,9 +26,10 @@ end)
 --- @brief
 function mn.VerboseInfoPanel:show(object)
     self._items = {}
-    for i = 1, 3 do
+    for i = 1, 1 do
         local to_insert = mn.VerboseInfoPanel.Item()
-        to_insert:create_from_equip(bt.Equip("DEBUG_EQUIP"))
+        --to_insert:create_from_equip(bt.Equip("DEBUG_EQUIP"))
+        to_insert:create_from_move(bt.Move("DEBUG_MOVE"))
         to_insert:realize()
         to_insert:fit_into(0, 0, 100, 100)
         table.insert(self._items, to_insert)

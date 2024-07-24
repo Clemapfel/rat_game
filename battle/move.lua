@@ -44,6 +44,7 @@ end, {
     animation_index = 1,
 
     description = "(no effect)",
+    flavor_text = ""
 })
 bt.Move._atlas = {}
 
@@ -64,6 +65,7 @@ function bt.Move:realize()
         is_intrinsic = rt.BOOLEAN,
         priority = rt.SIGNED,
         description = rt.STRING,
+        flavor_text = rt.STRING,
         sprite_id = rt.STRING,
         sprite_index = { rt.UNSIGNED, rt.STRING },
         animation_id = rt.STRING,
@@ -132,6 +134,11 @@ end
 --- @brief
 function bt.Move:get_description()
     return self.description
+end
+
+--- @brief
+function bt.Move:get_flavor_text()
+    return self.flavor_text
 end
 
 --- @brief
