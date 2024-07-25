@@ -238,7 +238,7 @@ function mn.VerboseInfoPanel.Item:create_from_equip(equip)
             end
         end
 
-        local align_w = select(2, self.description_label:measure())
+        local align_w = select(1, self.description_label:measure())
         for which in range("offset", "factor") do
             for stat in range("hp", "attack", "defense", "speed") do
                 local prefix_label = self[stat .. "_" .. which .. "_prefix_label"]
@@ -250,7 +250,7 @@ function mn.VerboseInfoPanel.Item:create_from_equip(equip)
                     prefix_label:fit_into(current_x, current_y, POSITIVE_INFINITY)
                     local colon_w = select(1, colon_label:measure())
                     colon_label:fit_into(current_x + w / 2 - colon_w, current_y, POSITIVE_INFINITY)
-                    value_label:fit_into(current_x + align_w - value_w, current_y, POSITIVE_INFINITY)
+                    value_label:fit_into(current_x + align_w - max_value_w, current_y, POSITIVE_INFINITY)
 
                     current_y = current_y + value_h
                 end
@@ -271,6 +271,8 @@ function mn.VerboseInfoPanel.Item:create_from_equip(equip)
         self.frame:fit_into(x, y, width, total_height)
         self.final_height = total_height
     end
+
+    return self
 end
 
 --- @brief move
@@ -389,5 +391,7 @@ function mn.VerboseInfoPanel.Item:create_from_move(move)
         self.frame:fit_into(x, y, width, total_height)
         self.final_height = total_height
     end
+
+    return self
 end
 

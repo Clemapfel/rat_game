@@ -26,13 +26,17 @@ end)
 --- @brief
 function mn.VerboseInfoPanel:show(object)
     self._items = {}
-    for i = 1, 1 do
-        local to_insert = mn.VerboseInfoPanel.Item()
-        --to_insert:create_from_equip(bt.Equip("DEBUG_EQUIP"))
-        to_insert:create_from_move(bt.Move("DEBUG_MOVE"))
-        to_insert:realize()
-        to_insert:fit_into(0, 0, 100, 100)
-        table.insert(self._items, to_insert)
+
+    local equip = mn.VerboseInfoPanel.Item()
+    equip:create_from_equip(bt.Equip("DEBUG_EQUIP"))
+
+    local move = mn.VerboseInfoPanel.Item()
+    move:create_from_move(bt.Move("DEBUG_MOVE"))
+
+    local to_insert = {equip, move}
+    for item in values(to_insert) do
+        item:realize()
+        table.insert(self._items, item)
     end
     self._n_items = sizeof(self._items)
     self:_set_current_item(1)
@@ -54,11 +58,13 @@ function mn.VerboseInfoPanel:size_allocate(x, y, width, height)
     local angle = 120
     local arrow_width = 6 * m
     local thickness = m
-    self._scroll_up_indicator = rt.Polygon(rt.generate_hat_arrow(x + 0.5 * width, y, arrow_width, thickness, angle))
-    self._scroll_up_indicator_outline = rt.LineStrip(rt.generate_hat_arrow_outline(x + 0.5 * width, y, arrow_width, thickness, angle))
+    local up_x, up_y = x + 0.5 * width, y - thickness
+    self._scroll_up_indicator = rt.Polygon(rt.generate_hat_arrow(up_x, up_y, arrow_width, thickness, angle))
+    self._scroll_up_indicator_outline = rt.LineStrip(rt.generate_hat_arrow_outline(up_x, up_y, arrow_width, thickness, angle))
 
-    self._scroll_down_indicator = rt.Polygon(rt.generate_hat_arrow(x + 0.5 * width, y + height, arrow_width, thickness, 360 - angle))
-    self._scroll_down_indicator_outline = rt.LineStrip(rt.generate_hat_arrow_outline(x + 0.5 * width, y + height, arrow_width, thickness, 360 - angle))
+    local down_x, down_y = x + 0.5 * width, y + height + thickness
+    self._scroll_down_indicator = rt.Polygon(rt.generate_hat_arrow(down_x, down_y, arrow_width, thickness, 360 - angle))
+    self._scroll_down_indicator_outline = rt.LineStrip(rt.generate_hat_arrow_outline(down_x, down_y, arrow_width, thickness, 360 - angle))
 
     for body in range(self._scroll_up_indicator, self._scroll_down_indicator) do
         body:set_color(rt.settings.menu.verbose_info_panel.indicator_base_color)
@@ -105,12 +111,12 @@ function mn.VerboseInfoPanel:draw()
     self._frame:_unbind_stencil()
     rt.graphics.translate(0, -self._y_offset)
 
-    if self._scroll_up_indicator_visible and self._selection_state == rt.SelectionState.SELECTED then
+    if self._scroll_up_indicator_visible then
         self._scroll_up_indicator:draw()
         self._scroll_up_indicator_outline:draw()
     end
 
-    if self._scroll_down_indicator_visible and self._selection_state == rt.SelectionState.SELECTED then
+    if self._scroll_down_indicator_visible then
         self._scroll_down_indicator:draw()
         self._scroll_down_indicator_outline:draw()
     end

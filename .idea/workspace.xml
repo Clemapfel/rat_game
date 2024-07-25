@@ -22,11 +22,15 @@
     </configurations>
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="7fa9ba1b-2cff-4ecc-86fb-59ab2fa76ee1" name="Changes" comment="added move info">
-      <change afterPath="$PROJECT_DIR$/battle/backgrounds/focus_rack_dots.glsl" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/battle/backgrounds/focus_rack_dots.lua" afterDir="false" />
+    <list default="true" id="7fa9ba1b-2cff-4ecc-86fb-59ab2fa76ee1" name="Changes" comment="added focus rack">
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/assets/sprites/controller_buttons.pxo" beforeDir="false" afterPath="$PROJECT_DIR$/assets/sprites/controller_buttons.pxo" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/battle/backgrounds/focus_rack_dots.glsl" beforeDir="false" afterPath="$PROJECT_DIR$/battle/backgrounds/focus_rack_dots.glsl" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/battle/backgrounds/focus_rack_dots.lua" beforeDir="false" afterPath="$PROJECT_DIR$/battle/backgrounds/focus_rack_dots.lua" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/common/label.lua" beforeDir="false" afterPath="$PROJECT_DIR$/common/label.lua" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/menu/scene.lua" beforeDir="false" afterPath="$PROJECT_DIR$/menu/scene.lua" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/menu/verbose_info_panel.lua" beforeDir="false" afterPath="$PROJECT_DIR$/menu/verbose_info_panel.lua" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/menu/verbose_info_panel_item.lua" beforeDir="false" afterPath="$PROJECT_DIR$/menu/verbose_info_panel_item.lua" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -462,15 +466,7 @@
       <workItem from="1721229518086" duration="219000" />
       <workItem from="1721230391016" duration="36744000" />
       <workItem from="1721840426345" duration="6522000" />
-      <workItem from="1721859312425" duration="722000" />
-    </task>
-    <task id="LOCAL-00843" summary="adde portable fftw">
-      <option name="closed" value="true" />
-      <created>1719343188960</created>
-      <option name="number" value="00843" />
-      <option name="presentableId" value="LOCAL-00843" />
-      <option name="project" value="LOCAL" />
-      <updated>1719343188960</updated>
+      <workItem from="1721859312425" duration="12237000" />
     </task>
     <task id="LOCAL-00844" summary="stashing before frame rework">
       <option name="closed" value="true" />
@@ -856,7 +852,15 @@
       <option name="project" value="LOCAL" />
       <updated>1721846913831</updated>
     </task>
-    <option name="localTasksCounter" value="892" />
+    <task id="LOCAL-00892" summary="added focus rack">
+      <option name="closed" value="true" />
+      <created>1721860142345</created>
+      <option name="number" value="00892" />
+      <option name="presentableId" value="LOCAL-00892" />
+      <option name="project" value="LOCAL" />
+      <updated>1721860142345</updated>
+    </task>
+    <option name="localTasksCounter" value="893" />
     <servers />
   </component>
   <component name="TypeScriptGeneratedFilesManager">
@@ -905,7 +909,6 @@
     </option>
   </component>
   <component name="VcsManagerConfiguration">
-    <MESSAGE value="added more menu functionality" />
     <MESSAGE value="menu selection layout done" />
     <MESSAGE value="stashing frame selection" />
     <MESSAGE value="polished frame selection" />
@@ -930,7 +933,8 @@
     <MESSAGE value="added background to menu" />
     <MESSAGE value="stashing" />
     <MESSAGE value="added move info" />
-    <option name="LAST_COMMIT_MESSAGE" value="added move info" />
+    <MESSAGE value="added focus rack" />
+    <option name="LAST_COMMIT_MESSAGE" value="added focus rack" />
   </component>
   <component name="XDebuggerManager">
     <breakpoint-manager>

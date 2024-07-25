@@ -165,7 +165,9 @@ end
 
 --- @overload rt.Widget.measure
 function rt.Label:measure()
-    return self._current_width, self._current_height
+    local min_w, min_h = self:get_minimum_size()
+    local left_m, right_m, top_m, bottom_m = self:get_margin_left(), self:get_margin_right(), self:get_margin_top(), self:get_margin_bottom()
+    return math.max(self._current_width, min_w + left_m + right_m), math.max(self._current_height, min_h + top_m + bottom_m)
 end
 
 -- control characters
@@ -218,7 +220,6 @@ rt.Label._syntax = {
     MONOSPACE_TAG_START = rt.Set("<tt>", "<mono>"),
     MONOSPACE_TAG_END = rt.Set("</tt>", "</mono>")
 }
-
 
 --- @brief [internal] transform _raw into set of glyphs
 function rt.Label:_parse()

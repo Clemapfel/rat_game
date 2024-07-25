@@ -439,11 +439,6 @@ function mn.Scene:draw()
         self._grabbed_object_sprite:draw()
         rt.graphics.translate(-self._grabbed_object_x, -self._grabbed_object_y)
     end
-
-    --self:_draw_selection_graph() -- TODO
-    --self._selection_graph:draw()
-
-    self._background:draw()
 end
 
 function mn.Scene:_regenerate_selection_nodes()
