@@ -24,35 +24,17 @@ mn.VerboseInfoPanel = meta.new_type("MenuVerboseInfoPanel", rt.Widget, function(
 end)
 
 --- @brief
-function mn.VerboseInfoPanel:show(object)
+function mn.VerboseInfoPanel:show(...)
     self._items = {}
-
-    local to_insert = {}
-    for which in range("attack", "defense", "speed", "hp") do
+    for object in values({...}) do
         local item = mn.VerboseInfoPanel.Item()
-        item:create_from_stat(which)
-        table.insert(to_insert, item)
-    end
-
-    local equip = mn.VerboseInfoPanel.Item()
-    equip:create_from_equip(bt.Equip("DEBUG_EQUIP"))
-
-    local move = mn.VerboseInfoPanel.Item()
-    move:create_from_move(bt.Move("DEBUG_MOVE"))
-
-    local consumable = mn.VerboseInfoPanel.Item()
-    consumable:create_from_consumable(bt.Consumable("DEBUG_CONSUMABLE"))
-
-    for item in range(equip, move, consumable) do
-        table.insert(to_insert, item)
-    end
-
-    for item in values(to_insert) do
+        item:create_from(object)
         item:realize()
         table.insert(self._items, item)
     end
+
     self._n_items = sizeof(self._items)
-    self:_set_current_item(1)
+    self:_set_current_item(ternary(self._n_items > 0, 1, 0))
     self:reformat()
 end
 
@@ -116,12 +98,12 @@ end
 --- @override
 function mn.VerboseInfoPanel:draw()
     self._frame:draw()
-    self._frame:_bind_stencil()
+    --self._frame:_bind_stencil()
     rt.graphics.translate(0, self._y_offset)
     for item in values(self._items) do
         item:draw()
     end
-    self._frame:_unbind_stencil()
+    --self._frame:_unbind_stencil()
     rt.graphics.translate(0, -self._y_offset)
 
     if self._scroll_up_indicator_visible then
@@ -167,7 +149,13 @@ end
 --- @brief [internal]
 function mn.VerboseInfoPanel:_set_current_item(i)
     self._current_item_i = i
-    self._y_offset = -1 * self._items[self._current_item_i].height_above
+
+    if self._current_item_i < 1 or self._current_item_i > self._n_items then
+        self._y_offset = 0
+    else
+        self._y_offset = -1 * self._items[self._current_item_i].height_above
+    end
+
     self._scroll_up_indicator_visible = self:can_scroll_up()
     self._scroll_down_indicator_visible = self:can_scroll_down()
 end

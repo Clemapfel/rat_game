@@ -26,6 +26,20 @@ function mn.VerboseInfoPanel.Item:measure()
     return self._bounds.width, self.final_height
 end
 
+function mn.VerboseInfoPanel.Item:create_from(object)
+    if meta.is_string(object) then
+        self:create_from_string(object)
+    elseif meta.isa(object, bt.Equip) then
+        self:create_from_equip(object)
+    elseif meta.isa(object, bt.Move) then
+        self:create_from_move(object)
+    elseif meta.isa(object, bt.Consumable) then
+        self:create_from_consumable(object)
+    else
+        rt.error("In mn.VerboseInfoPanel.Item.create_from: unrecognized type `" .. meta.typeof(object) .. "`")
+    end
+end
+
 function mn.VerboseInfoPanel.Item._font()
     return rt.settings.font.default_small, rt.settings.font.default_mono_small
 end
@@ -238,7 +252,7 @@ function mn.VerboseInfoPanel.Item:create_from_equip(equip)
             end
         end
 
-        local align_w = select(1, self.description_label:measure())
+        local at_least_one_stat_change = false
         for which in range("offset", "factor") do
             for stat in range("hp", "attack", "defense", "speed") do
                 local prefix_label = self[stat .. "_" .. which .. "_prefix_label"]
@@ -250,14 +264,17 @@ function mn.VerboseInfoPanel.Item:create_from_equip(equip)
                     prefix_label:fit_into(current_x, current_y, POSITIVE_INFINITY)
                     local colon_w = select(1, colon_label:measure())
                     colon_label:fit_into(current_x + w / 2 - colon_w, current_y, POSITIVE_INFINITY)
-                    value_label:fit_into(current_x + align_w - max_value_w, current_y, POSITIVE_INFINITY)
+                    value_label:fit_into(current_x + w - max_value_w, current_y, POSITIVE_INFINITY)
 
                     current_y = current_y + value_h
+                    at_least_one_stat_change = true
                 end
             end
         end
 
-        current_y = current_y + 2 * m
+        if at_least_one_stat_change then
+            current_y = current_y + 2 * m
+        end
 
         if self.spacer ~= nil then
             self.spacer:fit_into(current_x, current_y, w, 0)
@@ -265,9 +282,10 @@ function mn.VerboseInfoPanel.Item:create_from_equip(equip)
 
             self.flavor_text_label:fit_into(current_x, current_y, w, POSITIVE_INFINITY)
             current_y = current_y + select(2, self.flavor_text_label:measure()) + m
+            current_y = current_y + ym
         end
 
-        local total_height = current_y - start_y + 2 * ym
+        local total_height = current_y - start_y + ym
         self.frame:fit_into(x, y, width, total_height)
         self.final_height = total_height
     end
@@ -358,8 +376,6 @@ function mn.VerboseInfoPanel.Item:create_from_move(move)
             max_prefix_w = math.max(max_prefix_w, self[which .. "_prefix_label"]:measure())
         end
 
-        self.description_label:fit_into(current_x, current_y, w, POSITIVE_INFINITY) -- alloc to measure
-        local align_w = select(1, self.description_label:measure())
         for which in range("n_uses", "priority") do
             local prefix_label = self[which .. "_prefix_label"]
             local colon_label = self[which .. "_colon_label"]
@@ -369,7 +385,7 @@ function mn.VerboseInfoPanel.Item:create_from_move(move)
             prefix_label:fit_into(current_x, current_y, POSITIVE_INFINITY)
             local colon_w = select(1, colon_label:measure())
             colon_label:fit_into(current_x + w / 2 - colon_w, current_y, POSITIVE_INFINITY)
-            value_label:fit_into(current_x + align_w - value_w, current_y, POSITIVE_INFINITY)
+            value_label:fit_into(current_x + w - value_w, current_y, POSITIVE_INFINITY)
 
             current_y = current_y + value_h
         end
@@ -456,33 +472,49 @@ function mn.VerboseInfoPanel.Item:create_from_consumable(consumable)
 end
 
 --- @brief party info
-function mn.VerboseInfoPanel.Item:create_from_stat(stat)
+function mn.VerboseInfoPanel.Item:create_from_string(which)
     self.object = nil
     self._is_realized = true
 
-    local descriptions = {
-        ["hp"] = "HP Description, TODO",
-        ["attack"] = "Attack Description, TODO",
-        ["defense"] = "Defense Description, TODO",
-        ["speed"] = "Speed Description, TODO"
-    }
+    local format_title = function(str)
+        return "<b><u>" .. str .. "</u></b>"
+    end
 
     local titles = {
-        ["hp"] = "<b><u>Health</u></b> (<color=HP>HP</color>)",
-        ["attack"] = "<b><u>Attack</u></b> (<color=ATTACK>ATK</color>)",
-        ["defense"] = "<b><u>Defense</u></b> (<color=DEFENSE>DEF</color>)",
-        ["speed"] = "<b><u>Speed</u></b> (<color=SPEED>SPD</color>)"
+        ["hp"] = format_title("Health") .. " (<color=HP>HP</color>)",
+        ["attack"] = format_title("Attack") .. " (<color=ATTACK>ATK</color>)",
+        ["defense"] = format_title("Defense") ..  " (<color=DEFENSE>DEF</color>)",
+        ["speed"] = format_title("Speed") .." (<color=SPEED>SPD</color>)",
+
+        ["consumable"] = format_title("Held Items") .. " \u{25CF}",
+        ["equip"] = format_title("Gear") .. "  \u{2B23}",
+        ["move"] = format_title("Moves") .. "  \u{25A0}",
+
+        ["options"] = format_title("Options")
+    }
+
+    local descriptions = {
+        ["hp"] = "When a characters HP reaches 0, they are knocked out. If damaged while knocked out, they die",
+        ["attack"] = "For most moves, user's ATK increases damage dealt to the target",
+        ["defense"] = "For most moves, target's DEF decreases damage dealt to target",
+        ["speed"] = "Along with Move Priority, influences in what order participants act each turn",
+
+        ["consumable"] = "Consumable Description, TODO",
+        ["equip"] = "Equip Description, TODO",
+        ["move"] = "Move Description, TODO",
+
+        ["options"] = "Option Description, TODO"
     }
 
     self.realize = function()
         self._is_realized = true
         self.frame:realize()
 
-        self.title_label = rt.Label(titles[stat])
+        self.title_label = rt.Label(titles[which])
         self.title_label:realize()
         self.title_label:set_justify_mode(rt.JustifyMode.LEFT)
 
-        self.description_label = self._description(descriptions[stat])
+        self.description_label = self._description(descriptions[which])
 
         self.content = {
             self.title_label,

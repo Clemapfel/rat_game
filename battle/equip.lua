@@ -24,6 +24,7 @@ end, {
     defense_base_offset = 0,
     speed_base_offset = 0,
 
+    hp_base_factor = 1,
     attack_base_factor = 1,
     defense_base_factor = 1,
     speed_base_factor = 1,

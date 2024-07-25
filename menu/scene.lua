@@ -743,7 +743,7 @@ function mn.Scene:_regenerate_selection_nodes()
         indicator:fit_into(x + width - control_w - outer_margin, y + outer_margin, control_w, control_h)
     end
 
-    for node in values(shared_list_nodes) do
+    for node_i, node in ipairs(shared_list_nodes) do
         node:set_on_enter(function()
             scene._shared_list_node_active = true
             scene._shared_list_frame:set_selection_state(rt.SelectionState.ACTIVE)
@@ -760,6 +760,9 @@ function mn.Scene:_regenerate_selection_nodes()
 
                 scene:_set_grabbed_object_allowed(true)
             end
+
+            local current_shared_list = scene._shared_tab_index_to_list[scene._shared_tab_index]
+            scene:_set_verbose_info_object(current_shared_list:get_selected()) -- also updated in handle_button_pressed
         end)
 
         node:set_on_exit(function()
@@ -773,6 +776,11 @@ function mn.Scene:_regenerate_selection_nodes()
             scene._entity_tab_bar:set_tab_selected(entity_i, true)
             scene._current_control_indicator = entity_tab_control
             scene:_set_grabbed_object_allowed(false)
+
+            scene:_set_verbose_info_object(nil) -- TODO
+            if entity_i == self._n_entities + 1 then
+                scene:_set_verbose_info_object("options")
+            end
         end)
 
         node:set_on_exit(function()
@@ -785,6 +793,16 @@ function mn.Scene:_regenerate_selection_nodes()
             scene._shared_tab_bar:set_tab_selected(tab_i, true)
             scene._current_control_indicator = shared_tab_control
             scene:_set_grabbed_object_allowed(false)
+
+            if tab_i == self._shared_move_tab_index then
+                scene:_set_verbose_info_object("move")
+            elseif tab_i == self._shared_consumable_tab_index then
+                scene:_set_verbose_info_object("consumable")
+            elseif tab_i == self._shared_equip_tab_index then
+                scene:_set_verbose_info_object("equip")
+            elseif tab_i == self._shared_template_tab_index then
+                scene:_set_verbose_info_object(nil) -- TODO
+            end
         end)
 
         node:set_on_exit(function()
@@ -797,6 +815,8 @@ function mn.Scene:_regenerate_selection_nodes()
             scene._entity_pages[page_i].info:set_selection_state(rt.SelectionState.ACTIVE)
             scene._current_control_indicator = entity_info_control
             scene:_set_grabbed_object_allowed(false)
+
+            scene:_set_verbose_info_object("hp", "attack", "defense", "speed")
         end)
 
         page.info_node:set_on_exit(function()
@@ -811,6 +831,7 @@ function mn.Scene:_regenerate_selection_nodes()
                 scene._current_control_indicator = entity_page_control
 
                 scene:_set_grabbed_object_allowed(meta.isa(scene._grabbed_object, bt.Move) and not scene._state.entities[self._current_entity_i]:has_move(scene._grabbed_object))
+                scene:_set_verbose_info_object(slots:get_object(node_i))
             end)
 
             node:set_on_exit(function()
@@ -833,6 +854,8 @@ function mn.Scene:_regenerate_selection_nodes()
                 else
                     scene:_set_grabbed_object_allowed(meta.isa(scene._grabbed_object, bt.Consumable))
                 end
+
+                scene:_set_verbose_info_object(slots:get_object(node_i))
             end)
 
             node:set_on_exit(function()
@@ -848,6 +871,8 @@ function mn.Scene:_regenerate_selection_nodes()
         scene._verbose_info:set_selection_state(rt.SelectionState.ACTIVE)
         scene._current_control_indicator = verbose_info_control
         scene:_set_grabbed_object_allowed(false)
+
+        -- do not update _set_verbose_info_object
     end)
 
     verbose_info_node:set_on_exit(function()
@@ -1221,14 +1246,17 @@ function mn.Scene:_handle_button_pressed(which)
     end
 
     local current_shared_list = self._shared_tab_index_to_list[self._shared_tab_index]
+    local update_verbose_info = false
     if self._shared_list_node_active and which == rt.InputButton.UP then
         if current_shared_list:move_up() == false then
             self._shared_list_node_active = false
         else
+            update_verbose_info = true
             goto skip_others
         end
     elseif self._shared_list_node_active and which == rt.InputButton.DOWN then
         current_shared_list:move_down()
+        update_verbose_info = true
         goto skip_others
     elseif self._shared_list_node_active and which == rt.InputButton.LEFT then
         self._shared_list_node_active = false
@@ -1251,6 +1279,10 @@ function mn.Scene:_handle_button_pressed(which)
     self._selection_graph:handle_button(which)
     self:_update_grabbed_object_position()
     ::skip_others::
+
+    if update_verbose_info then
+        self:_set_verbose_info_object(current_shared_list:get_selected())
+    end
 end
 
 --- @brief
@@ -1321,4 +1353,9 @@ end
 function mn.Scene:_set_grabbed_object_allowed(b)
     if self._grabbed_object == nil then return end
     self._grabbed_object_sprite:set_label_is_visible(not b)
+end
+
+--- @brief
+function mn.Scene:_set_verbose_info_object(...)
+    self._verbose_info:show(...)
 end
