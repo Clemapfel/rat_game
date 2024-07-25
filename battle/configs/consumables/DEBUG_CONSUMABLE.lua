@@ -6,6 +6,7 @@ return {
     sprite_id = "battle/consumables",
     sprite_index = "DEBUG_CONSUMABLE",
     description = "Prints messages for every trigger payload",
+    flavor_text = "Taste the debug",
 
     on_turn_start = function(self, holder)
         meta.assert_consumable_interface(self)

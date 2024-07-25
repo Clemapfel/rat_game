@@ -27,13 +27,26 @@ end)
 function mn.VerboseInfoPanel:show(object)
     self._items = {}
 
+    local to_insert = {}
+    for which in range("attack", "defense", "speed", "hp") do
+        local item = mn.VerboseInfoPanel.Item()
+        item:create_from_stat(which)
+        table.insert(to_insert, item)
+    end
+
     local equip = mn.VerboseInfoPanel.Item()
     equip:create_from_equip(bt.Equip("DEBUG_EQUIP"))
 
     local move = mn.VerboseInfoPanel.Item()
     move:create_from_move(bt.Move("DEBUG_MOVE"))
 
-    local to_insert = {equip, move}
+    local consumable = mn.VerboseInfoPanel.Item()
+    consumable:create_from_consumable(bt.Consumable("DEBUG_CONSUMABLE"))
+
+    for item in range(equip, move, consumable) do
+        table.insert(to_insert, item)
+    end
+
     for item in values(to_insert) do
         item:realize()
         table.insert(self._items, item)

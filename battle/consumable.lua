@@ -179,6 +179,7 @@ end, {
     end,
 
     description = "(no effect)",
+    flavor_text = "",
     sprite_id = "",
     sprite_index = 1
 })
@@ -214,6 +215,7 @@ function bt.Consumable:realize()
         id = rt.STRING,
         name = rt.STRING,
         description = rt.STRING,
+        flavor_text = rt.STRING,
         sprite_id = rt.STRING,
         sprite_index = { rt.UNSIGNED, rt.STRING },
         max_n_uses = rt.UNSIGNED,
@@ -260,3 +262,9 @@ end
 function bt.Consumable:get_description()
     return self.description
 end
+
+--- @brief
+function bt.Consumable:get_flavor_text()
+    return self.flavor_text
+end
+

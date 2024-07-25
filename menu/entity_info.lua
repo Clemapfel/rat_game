@@ -30,12 +30,11 @@ end)
 function mn.EntityInfo:realize()
     if self._is_realized == true then return end
     self._is_realized = true
-
     self._frame:realize()
 
     for stat in range(
-    -- varname  heading color
-        {"hp", "HP", "HP"},
+        -- varname  heading color
+        {"hp", "Health", "HP"},
         {"attack", "Attack", "ATTACK"},
         {"defense", "Defense", "DEFENSE"},
         {"speed", "Speed", "SPEED"}
@@ -134,7 +133,7 @@ function mn.EntityInfo:size_allocate(x, y, width, height)
         local arrow_w, _ = arrow_label:measure()
 
         heading_label:fit_into(current_x, current_y, POSITIVE_INFINITY)
-        colon_label:fit_into(current_x + max_heading_w + 2 * m, current_y, POSITIVE_INFINITY)
+        colon_label:fit_into(current_x + 0.5 * (end_x - start_x) - 0.5 * colon_w, current_y, POSITIVE_INFINITY)
 
         local preview_active = self["_" .. stat .. "_preview_active"]
         if preview_active then

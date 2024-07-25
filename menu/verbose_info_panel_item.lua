@@ -74,7 +74,7 @@ function mn.VerboseInfoPanel.Item._hrule()
 end
 
 function mn.VerboseInfoPanel.Item._colon()
-    local out = rt.Label("<color=GRAY_2><b>:</b></color>", mn.VerboseInfoPanel.Item._font())
+    local out = rt.Label("<color=GRAY><b>:</b></color>", mn.VerboseInfoPanel.Item._font())
     out:set_justify_mode(rt.JustifyMode.LEFT)
     out:realize()
     return out
@@ -395,3 +395,115 @@ function mn.VerboseInfoPanel.Item:create_from_move(move)
     return self
 end
 
+--- @brief consumable
+function mn.VerboseInfoPanel.Item:create_from_consumable(consumable)
+    self.object = consumable
+    self.realize = function(self)
+        self._is_realized = true
+        self.frame:realize()
+
+        self.title_label = self._title(consumable:get_name())
+        self.description_label = self._description(consumable:get_description())
+        self.sprite = self._sprite(consumable)
+
+        local flavor_text = consumable:get_flavor_text()
+        if #flavor_text ~= 0 then
+            self.spacer = self._hrule()
+            self.flavor_text_label = self._flavor_text(consumable:get_flavor_text())
+        end
+
+        self.content = {
+            self.title_label,
+            self.sprite,
+            self.description_label,
+
+            self.spacer, -- may be nil
+            self.flavor_text_label,
+        }
+    end
+
+    self.size_allocate = function(self, x, y, width, height)
+        local m, xm, ym = self._get_margin()
+        local start_y = y + ym
+        local current_x, current_y = x + xm, start_y
+        local w = width - 2 * xm
+
+        local sprite_w, sprite_h = self.sprite:measure()
+        local title_w, title_h = self.title_label:measure()
+
+        local title_max_h = math.max(sprite_h, title_h)
+        local title_y = current_y + 0.5 * title_max_h - 0.5 * title_h
+        self.title_label:fit_into(current_x, title_y, w, POSITIVE_INFINITY)
+        self.sprite:fit_into(current_x + w - sprite_w, current_y + 0.5 * title_max_h - 0.5 * sprite_h, sprite_w, sprite_h)
+
+        current_y = current_y + title_max_h
+
+        self.description_label:fit_into(current_x, current_y, w, POSITIVE_INFINITY) -- alloc to measure
+        current_y = current_y + select(2, self.description_label:measure()) + 2 * m
+
+        if self.spacer ~= nil then
+            self.spacer:fit_into(current_x, current_y, w, 0)
+            current_y = current_y + select(2, self.spacer:measure()) + m
+
+            self.flavor_text_label:fit_into(current_x, current_y, w, POSITIVE_INFINITY)
+            current_y = current_y + select(2, self.flavor_text_label:measure()) + m
+        end
+
+        local total_height = current_y - start_y + 2 * ym
+        self.frame:fit_into(x, y, width, total_height)
+        self.final_height = total_height
+    end
+end
+
+--- @brief party info
+function mn.VerboseInfoPanel.Item:create_from_stat(stat)
+    self.object = nil
+    self._is_realized = true
+
+    local descriptions = {
+        ["hp"] = "HP Description, TODO",
+        ["attack"] = "Attack Description, TODO",
+        ["defense"] = "Defense Description, TODO",
+        ["speed"] = "Speed Description, TODO"
+    }
+
+    local titles = {
+        ["hp"] = "<b><u>Health</u></b> (<color=HP>HP</color>)",
+        ["attack"] = "<b><u>Attack</u></b> (<color=ATTACK>ATK</color>)",
+        ["defense"] = "<b><u>Defense</u></b> (<color=DEFENSE>DEF</color>)",
+        ["speed"] = "<b><u>Speed</u></b> (<color=SPEED>SPD</color>)"
+    }
+
+    self.realize = function()
+        self._is_realized = true
+        self.frame:realize()
+
+        self.title_label = rt.Label(titles[stat])
+        self.title_label:realize()
+        self.title_label:set_justify_mode(rt.JustifyMode.LEFT)
+
+        self.description_label = self._description(descriptions[stat])
+
+        self.content = {
+            self.title_label,
+            self.description_label
+        }
+    end
+
+    self.size_allocate = function(self, x, y, width, height)
+        local m, xm, ym = self._get_margin()
+        local start_y = y + ym
+        local current_x, current_y = x + xm, start_y
+        local w = width - 2 * xm
+
+        self.title_label:fit_into(current_x, current_y, w)
+        current_y = current_y + select(2, self.title_label:measure()) + m
+
+        self.description_label:fit_into(current_x, current_y, w)
+
+        current_y = current_y + select(2, self.description_label:measure()) + m
+        local total_height = current_y - start_y + 2 * ym
+        self.frame:fit_into(x, y, width, total_height)
+        self.final_height = total_height
+    end
+end

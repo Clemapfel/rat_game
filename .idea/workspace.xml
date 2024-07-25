@@ -22,13 +22,11 @@
     </configurations>
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="7fa9ba1b-2cff-4ecc-86fb-59ab2fa76ee1" name="Changes" comment="added focus rack">
+    <list default="true" id="7fa9ba1b-2cff-4ecc-86fb-59ab2fa76ee1" name="Changes" comment="alignment working again">
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/assets/sprites/controller_buttons.pxo" beforeDir="false" afterPath="$PROJECT_DIR$/assets/sprites/controller_buttons.pxo" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/battle/backgrounds/focus_rack_dots.glsl" beforeDir="false" afterPath="$PROJECT_DIR$/battle/backgrounds/focus_rack_dots.glsl" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/battle/backgrounds/focus_rack_dots.lua" beforeDir="false" afterPath="$PROJECT_DIR$/battle/backgrounds/focus_rack_dots.lua" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/common/label.lua" beforeDir="false" afterPath="$PROJECT_DIR$/common/label.lua" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/menu/scene.lua" beforeDir="false" afterPath="$PROJECT_DIR$/menu/scene.lua" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/battle/configs/consumables/DEBUG_CONSUMABLE.lua" beforeDir="false" afterPath="$PROJECT_DIR$/battle/configs/consumables/DEBUG_CONSUMABLE.lua" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/battle/consumable.lua" beforeDir="false" afterPath="$PROJECT_DIR$/battle/consumable.lua" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/menu/entity_info.lua" beforeDir="false" afterPath="$PROJECT_DIR$/menu/entity_info.lua" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/menu/verbose_info_panel.lua" beforeDir="false" afterPath="$PROJECT_DIR$/menu/verbose_info_panel.lua" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/menu/verbose_info_panel_item.lua" beforeDir="false" afterPath="$PROJECT_DIR$/menu/verbose_info_panel_item.lua" afterDir="false" />
     </list>
@@ -466,23 +464,7 @@
       <workItem from="1721229518086" duration="219000" />
       <workItem from="1721230391016" duration="36744000" />
       <workItem from="1721840426345" duration="6522000" />
-      <workItem from="1721859312425" duration="12237000" />
-    </task>
-    <task id="LOCAL-00844" summary="stashing before frame rework">
-      <option name="closed" value="true" />
-      <created>1719344081049</created>
-      <option name="number" value="00844" />
-      <option name="presentableId" value="LOCAL-00844" />
-      <option name="project" value="LOCAL" />
-      <updated>1719344081049</updated>
-    </task>
-    <task id="LOCAL-00845" summary="added menu scene">
-      <option name="closed" value="true" />
-      <created>1719409557124</created>
-      <option name="number" value="00845" />
-      <option name="presentableId" value="LOCAL-00845" />
-      <option name="project" value="LOCAL" />
-      <updated>1719409557124</updated>
+      <workItem from="1721859312425" duration="15719000" />
     </task>
     <task id="LOCAL-00846" summary="scrollable list working">
       <option name="closed" value="true" />
@@ -860,7 +842,23 @@
       <option name="project" value="LOCAL" />
       <updated>1721860142345</updated>
     </task>
-    <option name="localTasksCounter" value="893" />
+    <task id="LOCAL-00893" summary="equip and move panels done">
+      <option name="closed" value="true" />
+      <created>1721926632275</created>
+      <option name="number" value="00893" />
+      <option name="presentableId" value="LOCAL-00893" />
+      <option name="project" value="LOCAL" />
+      <updated>1721926632275</updated>
+    </task>
+    <task id="LOCAL-00894" summary="alignment working again">
+      <option name="closed" value="true" />
+      <created>1721927548554</created>
+      <option name="number" value="00894" />
+      <option name="presentableId" value="LOCAL-00894" />
+      <option name="project" value="LOCAL" />
+      <updated>1721927548554</updated>
+    </task>
+    <option name="localTasksCounter" value="895" />
     <servers />
   </component>
   <component name="TypeScriptGeneratedFilesManager">
@@ -909,8 +907,6 @@
     </option>
   </component>
   <component name="VcsManagerConfiguration">
-    <MESSAGE value="menu selection layout done" />
-    <MESSAGE value="stashing frame selection" />
     <MESSAGE value="polished frame selection" />
     <MESSAGE value="added meshilizer" />
     <MESSAGE value="MWE" />
@@ -934,7 +930,9 @@
     <MESSAGE value="stashing" />
     <MESSAGE value="added move info" />
     <MESSAGE value="added focus rack" />
-    <option name="LAST_COMMIT_MESSAGE" value="added focus rack" />
+    <MESSAGE value="equip and move panels done" />
+    <MESSAGE value="alignment working again" />
+    <option name="LAST_COMMIT_MESSAGE" value="alignment working again" />
   </component>
   <component name="XDebuggerManager">
     <breakpoint-manager>
