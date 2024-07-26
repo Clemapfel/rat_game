@@ -831,7 +831,13 @@ function mn.Scene:_regenerate_selection_nodes()
                 scene._current_control_indicator = entity_page_control
 
                 scene:_set_grabbed_object_allowed(meta.isa(scene._grabbed_object, bt.Move) and not scene._state.entities[self._current_entity_i]:has_move(scene._grabbed_object))
-                scene:_set_verbose_info_object(slots:get_object(node_i))
+
+                local object = slots:get_object(node_i)
+                if object == nil then
+                    scene:_set_verbose_info_object("move")
+                else
+                    scene:_set_verbose_info_object(slots:get_object(node_i))
+                end
             end)
 
             node:set_on_exit(function()
@@ -848,20 +854,45 @@ function mn.Scene:_regenerate_selection_nodes()
                 slots:set_slot_selection_state(node_i, rt.SelectionState.ACTIVE)
                 scene._current_control_indicator = entity_page_control
 
-                local n_move_slots = scene._state.entities[page_i]:get_n_move_slots()
-                if node_i <= n_move_slots then
+                local n_equip_slots = scene._state.entities[page_i]:get_n_equip_slots()
+                if node_i <= n_equip_slots then
                     scene:_set_grabbed_object_allowed(meta.isa(scene._grabbed_object, bt.Equip))
                 else
                     scene:_set_grabbed_object_allowed(meta.isa(scene._grabbed_object, bt.Consumable))
                 end
 
-                scene:_set_verbose_info_object(slots:get_object(node_i))
+                local object = slots:get_object(node_i)
+                if object == nil then
+                    scene:_set_verbose_info_object(ternary(node_i <= n_equip_slots, "equip", "consumable"))
+                else
+                    scene:_set_verbose_info_object(slots:get_object(node_i))
+                end
+
+                -- update stat preview
+                if node_i <= n_equip_slots then
+                    local info = scene._entity_pages[scene._current_entity_i].info
+                    local entity = scene._state.entities[scene._current_entity_i]
+
+                    local new_hp, new_attack, new_defense, new_speed = entity:preview_equip(node_i, scene._grabbed_object)
+                    local current_hp, current_attack, current_defense, current_speed = entity:get_hp_base(), entity:get_attack_base(), entity:get_defense_base(), entity:get_speed_base()
+                    info:set_preview_values(
+                        ternary(new_hp ~= current_hp, new_hp, nil),
+                        ternary(new_attack ~= current_attack, new_hp, nil),
+                        ternary(new_defense ~= current_defense, new_hp, nil),
+                        ternary(new_speed ~= current_speed, new_hp, nil)
+                    )
+                end
+
+
             end)
 
             node:set_on_exit(function()
                 local slots = scene._entity_pages[page_i].equips_and_consumables
                 slots:set_selection_state(rt.SelectionState.INACTIVE)
                 slots:set_slot_selection_state(node_i, rt.SelectionState.INACTIVE)
+
+                local info = scene._entity_pages[scene._current_entity_i].info
+                info:set_preview_values(nil, nil, nil, nil)
             end)
         end
     end
@@ -932,22 +963,77 @@ function mn.Scene:_regenerate_selection_nodes()
                     if entity:has_move(up) then return end
                 end
 
+                scene._undo_grab = function() end
+
                 if down == nil and up == nil then
                     -- noop
-                elseif down == nil and up ~= nil then
+                elseif down == nil and up ~= nil then -- put down
                     scene:_set_grabbed_object(nil, node_i)
                     page.moves:set_object(node_i, up)
+
                     entity:add_move(up)
-                elseif down ~= nil and up == nil then
+                elseif down ~= nil and up == nil then -- pick up
                     scene:_set_grabbed_object(down, node_i)
                     page.moves:set_object(node_i, nil)
                     entity:remove_move(down)
-                elseif down ~= nil and up ~= nil then
+
+                    local current_page_i = scene._current_entity_i
+                    scene._undo_grab = function()
+                        scene:set_current_entity_page(current_page_i)
+                        scene:_play_move_object_animation(
+                            down,
+                            scene._grabbed_object_bounds,
+                            page.moves:get_slot_aabb(node_i),
+                            function()
+                                page.moves:set_object(node_i, down)
+                                entity:add_move(down)
+                                page.moves:set_slot_object_visible(node_i, false)
+                            end,
+                            function()
+                                page.moves:set_slot_object_visible(node_i, true)
+                            end
+                        )
+                    end
+
+                elseif down ~= nil and up ~= nil then -- swap
                     scene:_set_grabbed_object(down, node_i)
                     page.moves:set_object(node_i, up)
-                    :add_move(up)
                     entity:remove_move(down)
+                    entity:add_move(up)
+
+                    local current_page_i = scene._current_entity_i
+                    scene._undo_grab = function()
+                        scene:set_current_entity_page(current_page_i)
+
+                        local insert_slot_i = page.moves:get_first_unoccupied_slot_i(mn.SlotType.MOVE)
+                        -- if entity slots are full, return to shared inventory
+                        if insert_slot_i == nil then
+                            scene:_play_move_object_animation(
+                                down,
+                                scene._grabbed_object_bounds,
+                                scene._shared_move_list:get_bounds(),
+                                function()
+                                    scene._shared_move_list:add(down)
+                                end
+                            )
+                        else
+                            scene:_play_move_object_animation(
+                                down,
+                                scene._grabbed_object_bounds,
+                                page.moves:get_slot_aabb(insert_slot_i),
+                                function()
+                                    page.moves:set_object(insert_slot_i, down)
+                                    entity:add_move(down)
+                                    page.moves:set_slot_object_visible(insert_slot_i, false)
+                                end,
+                                function()
+                                    page.moves:set_slot_object_visible(insert_slot_i, true)
+                                end
+                            )
+                        end
+                    end
                 end
+
             end)
 
             node:set_on_y(function(self)
@@ -989,16 +1075,87 @@ function mn.Scene:_regenerate_selection_nodes()
 
                 if down == nil and up == nil then
                     -- noop
-                elseif down == nil and up ~= nil then
+                elseif down == nil and up ~= nil then -- put down
                     scene:_set_grabbed_object(nil, node_i)
                     page.equips_and_consumables:set_object(node_i, up)
-                elseif down ~= nil and up == nil then
+                    entity:add_equip(up, node_i)
+                elseif down ~= nil and up == nil then -- pick up
                     scene:_set_grabbed_object(down, node_i)
                     page.equips_and_consumables:set_object(node_i, nil)
-                elseif down ~= nil and up ~= nil then
+                    entity:remove_equip(down)
+
+                    local current_page_i = scene._current_entity_i
+                    scene._undo_grab = function()
+                        scene:set_current_entity_page(current_page_i)
+                        scene:_play_move_object_animation(
+                            down,
+                            scene._grabbed_object_bounds,
+                            page.equips_and_consumables:get_slot_aabb(node_i),
+                            function()
+                                page.equips_and_consumables:set_object(node_i, down)
+                                entity:add_equip(down, node_i)
+                                page.equips_and_consumables:set_slot_object_visible(node_i, false)
+                            end,
+                            function()
+                                page.equips_and_consumables:set_slot_object_visible(node_i, true)
+                            end
+                        )
+                    end
+
+                elseif down ~= nil and up ~= nil then -- swap
                     scene:_set_grabbed_object(down, node_i)
                     page.equips_and_consumables:set_object(node_i, up)
+                    entity:remove_equip(down)
+                    entity:add_equip(up, node_i)
+
+                    local current_page_i = scene._current_entity_i
+                    scene._undo_grab = function()
+                        scene:set_current_entity_page(current_page_i)
+
+                        local insert_slot_i = page.equips_and_consumables:get_first_unoccupied_slot_i(mn.SlotType.EQUIP)
+                        if insert_slot_i == nil then
+                            scene:_play_move_object_animation(
+                                down,
+                                scene._grabbed_object_bounds,
+                                scene._shared_equip_list:get_bounds(),
+                                function()
+                                    scene._shared_equip_list:add(down)
+                                end
+                            )
+                        else
+                            scene:_play_move_object_animation(
+                                down,
+                                scene._grabbed_object_bounds,
+                                page.equips_and_consumables:get_slot_aabb(insert_slot_i),
+                                function()
+                                    page.equips_and_consumables:set_object(insert_slot_i, down)
+                                    entity:add_equip(down, insert_slot_i)
+                                    page.equips_and_consumables:set_slot_object_visible(insert_slot_i, false)
+                                end,
+                                function()
+                                    page.equips_and_consumables:set_slot_object_visible(insert_slot_i, true)
+                                end
+                            )
+                        end
+                    end
                 end
+
+                scene:_update_entity_info(scene._current_entity_i)
+                local info = scene._entity_pages[scene._current_entity_i].info
+                local entity = scene._state.entities[scene._current_entity_i]
+
+                local new_hp, new_attack, new_defense, new_speed = entity:preview_equip(node_i, scene._grabbed_object)
+                local current_hp, current_attack, current_defense, current_speed = entity:get_hp_base(), entity:get_attack_base(), entity:get_defense_base(), entity:get_speed_base()
+                info:set_values_and_preview_values(
+                    entity:get_hp_base(),
+                    entity:get_attack_base(),
+                    entity:get_defense_base(),
+                    entity:get_speed_base(),
+                    ternary(new_hp ~= current_hp, new_hp, nil),
+                    ternary(new_attack ~= current_attack, new_hp, nil),
+                    ternary(new_defense ~= current_defense, new_hp, nil),
+                    ternary(new_speed ~= current_speed, new_hp, nil)
+                )
             end)
 
             node:set_on_y(function(self)
@@ -1038,15 +1195,69 @@ function mn.Scene:_regenerate_selection_nodes()
 
                 if down == nil and up == nil then
                     -- noop
-                elseif down == nil and up ~= nil then
-                    scene:_set_grabbed_object(nil, node_i)
+                elseif down == nil and up ~= nil then -- put down
+                    scene:_set_grabbed_object(nil, consumable_i)
                     page.equips_and_consumables:set_object(node_i, up)
-                elseif down ~= nil and up == nil then
-                    scene:_set_grabbed_object(down, node_i)
+                    entity:add_consumable(up, node_i)
+                elseif down ~= nil and up == nil then -- pick up
+                    scene:_set_grabbed_object(down, consumable_i)
                     page.equips_and_consumables:set_object(node_i, nil)
-                elseif down ~= nil and up ~= nil then
+                    entity:remove_consumable(down)
+
+                    local current_page_i = scene._current_entity_i
+                    scene._undo_grab = function()
+                        scene:set_current_entity_page(current_page_i)
+                        scene:_play_move_object_animation(
+                            down,
+                            scene._grabbed_object_bounds,
+                            page.equips_and_consumables:get_slot_aabb(node_i),
+                            function()
+                                page.equips_and_consumables:set_object(node_i, down)
+                                entity:add_consumable(down, consumable_i)
+                                page.equips_and_consumables:set_slot_object_visible(node_i, false)
+                            end,
+                            function()
+                                page.equips_and_consumables:set_slot_object_visible(node_i, true)
+                            end
+                        )
+                    end
+
+                elseif down ~= nil and up ~= nil then -- swap
                     scene:_set_grabbed_object(down, node_i)
                     page.equips_and_consumables:set_object(node_i, up)
+                    entity:remove_consumable(down)
+                    entity:add_consumable(up, consumable_i)
+
+                    local current_page_i = scene._current_entity_i
+                    scene._undo_grab = function()
+                        scene:set_current_entity_page(current_page_i)
+
+                        local insert_slot_i = page.equips_and_consumables:get_first_unoccupied_slot_i(mn.SlotType.CONSUMABLE)
+                        if insert_slot_i == nil then
+                            scene:_play_move_object_animation(
+                                down,
+                                scene._grabbed_object_bounds,
+                                scene._shared_equip_list:get_bounds(),
+                                function()
+                                    scene._shared_equip_list:add(down)
+                                end
+                            )
+                        else
+                            scene:_play_move_object_animation(
+                                down,
+                                scene._grabbed_object_bounds,
+                                page.equips_and_consumables:get_slot_aabb(insert_slot_i),
+                                function()
+                                    page.equips_and_consumables:set_object(insert_slot_i, down)
+                                    entity:add_consumable(down, insert_slot_i)
+                                    page.equips_and_consumables:set_slot_object_visible(insert_slot_i, false)
+                                end,
+                                function()
+                                    page.equips_and_consumables:set_slot_object_visible(insert_slot_i, true)
+                                end
+                            )
+                        end
+                    end
                 end
             end)
 
@@ -1071,7 +1282,7 @@ function mn.Scene:_regenerate_selection_nodes()
             scene._shared_move_list:take(to_insert)
             scene:_play_move_object_animation(
                 to_insert,
-                self._shared_list_frame:get_bounds(),
+                scene._shared_list_frame:get_bounds(),
                 page.moves:get_slot_aabb(unoccupied_slot_i),
                 nil,
                 function()
@@ -1094,6 +1305,15 @@ function mn.Scene:_regenerate_selection_nodes()
         if up == nil then
             scene:_set_grabbed_object(down)
             scene._shared_move_list:take(down)
+            scene._undo_grab = function()
+                scene:_play_move_object_animation(
+                    down,
+                    scene._grabbed_object_bounds,
+                    scene._shared_move_list:get_bounds(),
+                    function() scene._shared_move_list:add(down) end,
+                    nil
+                )
+            end
         else
             scene:_set_grabbed_object(nil)
             scene._shared_move_list:add(up, 1)
@@ -1131,6 +1351,15 @@ function mn.Scene:_regenerate_selection_nodes()
         if up == nil then
             scene:_set_grabbed_object(down)
             scene._shared_equip_list:take(down)
+            scene._undo_grab = function()
+                scene:_play_move_object_animation(
+                    down,
+                    scene._grabbed_object_bounds,
+                    scene._shared_equip_list:get_bounds(),
+                    function() scene._shared_equip_list:add(down) end,
+                    nil
+                )
+            end
         else
             scene:_set_grabbed_object(nil)
             scene._shared_equip_list:add(up, 1)
@@ -1170,11 +1399,21 @@ function mn.Scene:_regenerate_selection_nodes()
         local down = scene._shared_consumable_list:get_selected()
 
         if up == nil then
-            scene:_set_grabbed_object(down, node_i)
+            scene:_set_grabbed_object(down)
             scene._shared_consumable_list:take(down)
+            scene._undo_grab = function()
+                scene:_play_move_object_animation(
+                    down,
+                    scene._grabbed_object_bounds,
+                    scene._shared_consumable_list:get_bounds(),
+                    function() scene._shared_consumable_list:add(down) end,
+                    nil
+                )
+            end
         else
-            scene:_set_grabbed_object(nil, node_i)
+            scene:_set_grabbed_object(nil)
             scene._shared_consumable_list:add(up, 1)
+
         end
     end)
 
@@ -1242,6 +1481,9 @@ function mn.Scene:_handle_button_pressed(which)
             self._grabbed_object = nil
             self._grabbed_object_sprite = nil
             self:_undo_grab()
+            for page in values(self._entity_pages) do
+                page.info:set_preview_values(nil, nil, nil, nil)
+            end
         end
     end
 
@@ -1328,6 +1570,7 @@ function mn.Scene:_update_grabbed_object_position()
     local sprite_w, sprite_h = self._grabbed_object_sprite:get_minimum_size()
     self._grabbed_object_x = current.x + 0.5 * current.width - 0.5 * sprite_w
     self._grabbed_object_y = current.y + 0.5 * current.height - 0.5 * sprite_h
+    self._grabbed_object_bounds = rt.AABB(current.x, current.y, sprite_w, sprite_h)
 end
 
 --- @brief
@@ -1346,6 +1589,11 @@ function mn.Scene:_set_grabbed_object(object, origin_slot_i)
         self:_set_grabbed_object_allowed(true)
     else
         self._grabbed_object_sprite = nil
+        self._undo_grab = function() end
+        for entity_i, page in ipairs(self._entity_pages) do
+            page.info:set_preview_values(nil, nil, nil, nil)
+            self:_update_entity_info(entity_i)
+        end
     end
 end
 
@@ -1357,5 +1605,12 @@ end
 
 --- @brief
 function mn.Scene:_set_verbose_info_object(...)
-    self._verbose_info:show(...)
+    self._verbose_info:show(self._grabbed_object, ...)
+end
+
+--- @brief
+function mn.Scene:_update_entity_info(entity_i)
+    local entity = self._state.entities[entity_i]
+    local page = self._entity_pages[entity_i]
+    page.info:set_values(entity:get_hp_base(), entity:get_attack_base(), entity:get_defense_base(), entity:get_speed_base())
 end

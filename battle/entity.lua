@@ -532,6 +532,13 @@ function bt.Entity:_assert_equip_slot_i(i)
     end
 end
 
+--- @brief [internal]
+function bt.Entity:_assert_consumable_slot_i(i)
+    if i < 1 or i > self.n_equip_slots then
+        rt.error("In bt.Entity:get_consumable: slot index `" .. i .. "` is out of range for entity with `" .. self.n_consumable_slots .. "` slots")
+    end
+end
+
 --- @brief
 function bt.Entity:add_equip(equip, equip_slot_i)
     if equip_slot_i == nil then
@@ -546,7 +553,16 @@ function bt.Entity:add_equip(equip, equip_slot_i)
         rt.error("In bt.Entity:add_equip: entity has no free move slots")
     else
         self:_assert_equip_slot_i(equip_slot_i)
+        local current = self.equips[equip_slot_i].equip
+        if current ~= nil then
+            self.equip_to_equip_slot_i[current] = nil
+        end
+
         self.equips[equip_slot_i].equip = equip
+
+        if equip ~= nil then
+            self.equip_to_equip_slot_i[equip] = equip_slot_i
+        end
     end
 end
 
@@ -597,10 +613,19 @@ function bt.Entity:add_consumable(consumable, consumable_slot_i)
             end
         end
 
-        rt.error("In bt.Entity:add_equip: entity has no free move slots")
+        rt.error("In bt.Entity:add_consumable: entity has no free consumable slots")
     else
         self:_assert_consumable_slot_i(consumable_slot_i)
+        local current = self.consumables[consumable_slot_i].consumable
+        if current ~= nil then
+            self.consumable_to_consumable_slot_i[current] = nil
+        end
+
         self.consumables[consumable_slot_i].consumable = consumable
+
+        if consumable ~= nil then
+            self.consumable_to_consumable_slot_i[consumable] = consumable_slot_i
+        end
     end
 end
 
@@ -672,19 +697,19 @@ function bt.Entity:get_ai_level()
 end
 
 --- @brief
---- @return {hp_base, attack_base, defense_base, speed_base,
+--- @return hp_base, attack_base, defense_base, speed_base
 function bt.Entity:preview_equip(equip_slot_i, new_equip)
     local before = self.equips[equip_slot_i].equip
     self:add_equip(new_equip, equip_slot_i)
     local after_stats = {
-        hp_base = self:_calculate_stat_base("hp"),
-        attack_base = self:_calculate_stat_base("attack"),
-        defense_base = self:_calculate_stat_base("defense"),
-        speed_base = self:_calculate_stat_base("speed"),
+        self:_calculate_stat_base("hp"),
+        self:_calculate_stat_base("attack"),
+        self:_calculate_stat_base("defense"),
+        self:_calculate_stat_base("speed"),
     }
 
     self:add_equip(before, equip_slot_i)
-    return after_stats
+    return table.unpack(after_stats)
 end
 
 --- @brief

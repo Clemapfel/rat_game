@@ -13,11 +13,11 @@ mn.EntityInfo = meta.new_type("MenuEntityInfo", rt.Widget, function(entity)
         _hp_no_preview_offset = 0,
 
         _attack_preview_value = 0,
-        _attack_preview_active = true,
+        _attack_preview_active = false,
         _attack_no_preview_offset = 123,
 
         _defense_preview_value = 0,
-        _defense_preview_active = true,
+        _defense_preview_active = false,
         _defense_no_preview_offset = 0,
 
         _speed_preview_value = 0,
@@ -188,6 +188,37 @@ function mn.EntityInfo:set_preview_values(hp_preview, attack_preview, defense_pr
     self._defense_preview_value = which(defense_preview, 0)
     self._defense_preview_active = defense_preview ~= nil
 
+    self._speed_preview_value = which(speed_preview, 0)
+    self._speed_preview_active = speed_preview ~= nil
+
+    self:_update()
+    self:reformat()
+end
+
+--- @brief
+function mn.EntityInfo:set_values(hp, attack, defense, speed)
+    self._hp_value = hp
+    self._attack_value = attack
+    self._defense_value = defense
+    self._speed_value = speed
+
+    self:_update()
+    self:reformat()
+end
+
+--- @brief
+function mn.EntityInfo:set_values_and_preview_values(hp, attack, defense, speed, hp_preview, attack_preview, defense_preview, speed_preview)
+    self._hp_value = hp
+    self._attack_value = attack
+    self._defense_value = defense
+    self._speed_value = speed
+
+    self._hp_preview_value = which(hp_preview, 0)
+    self._hp_preview_active = hp_preview ~= nil
+    self._attack_preview_value = which(attack_preview, 0)
+    self._attack_preview_active = attack_preview ~= nil
+    self._defense_preview_value = which(defense_preview, 0)
+    self._defense_preview_active = defense_preview ~= nil
     self._speed_preview_value = which(speed_preview, 0)
     self._speed_preview_active = speed_preview ~= nil
 

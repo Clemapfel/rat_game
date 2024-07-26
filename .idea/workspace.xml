@@ -22,12 +22,14 @@
     </configurations>
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="7fa9ba1b-2cff-4ecc-86fb-59ab2fa76ee1" name="Changes" comment="added stats to verbose info panel">
+    <list default="true" id="7fa9ba1b-2cff-4ecc-86fb-59ab2fa76ee1" name="Changes" comment="verbose info update implemented">
+      <change afterPath="$PROJECT_DIR$/temp.glsl" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/battle/equip.lua" beforeDir="false" afterPath="$PROJECT_DIR$/battle/equip.lua" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/battle/entity.lua" beforeDir="false" afterPath="$PROJECT_DIR$/battle/entity.lua" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/main_menu.lua" beforeDir="false" afterPath="$PROJECT_DIR$/main_menu.lua" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/menu/entity_info.lua" beforeDir="false" afterPath="$PROJECT_DIR$/menu/entity_info.lua" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/menu/scene.lua" beforeDir="false" afterPath="$PROJECT_DIR$/menu/scene.lua" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/menu/verbose_info_panel.lua" beforeDir="false" afterPath="$PROJECT_DIR$/menu/verbose_info_panel.lua" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/menu/verbose_info_panel_item.lua" beforeDir="false" afterPath="$PROJECT_DIR$/menu/verbose_info_panel_item.lua" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/menu/slots.lua" beforeDir="false" afterPath="$PROJECT_DIR$/menu/slots.lua" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -463,15 +465,8 @@
       <workItem from="1721229518086" duration="219000" />
       <workItem from="1721230391016" duration="36744000" />
       <workItem from="1721840426345" duration="6522000" />
-      <workItem from="1721859312425" duration="20244000" />
-    </task>
-    <task id="LOCAL-00847" summary="stashing sortings">
-      <option name="closed" value="true" />
-      <created>1719414351212</created>
-      <option name="number" value="00847" />
-      <option name="presentableId" value="LOCAL-00847" />
-      <option name="project" value="LOCAL" />
-      <updated>1719414351213</updated>
+      <workItem from="1721859312425" duration="20319000" />
+      <workItem from="1722013848502" duration="9104000" />
     </task>
     <task id="LOCAL-00848" summary="stashing sortability rework">
       <option name="closed" value="true" />
@@ -857,7 +852,15 @@
       <option name="project" value="LOCAL" />
       <updated>1721930225311</updated>
     </task>
-    <option name="localTasksCounter" value="896" />
+    <task id="LOCAL-00896" summary="verbose info update implemented">
+      <option name="closed" value="true" />
+      <created>1721935487262</created>
+      <option name="number" value="00896" />
+      <option name="presentableId" value="LOCAL-00896" />
+      <option name="project" value="LOCAL" />
+      <updated>1721935487262</updated>
+    </task>
+    <option name="localTasksCounter" value="897" />
     <servers />
   </component>
   <component name="TypeScriptGeneratedFilesManager">
@@ -906,7 +909,6 @@
     </option>
   </component>
   <component name="VcsManagerConfiguration">
-    <MESSAGE value="added meshilizer" />
     <MESSAGE value="MWE" />
     <MESSAGE value="added subpixel filtering to fix sprite scaling" />
     <MESSAGE value="added item move animation" />
@@ -931,7 +933,8 @@
     <MESSAGE value="equip and move panels done" />
     <MESSAGE value="alignment working again" />
     <MESSAGE value="added stats to verbose info panel" />
-    <option name="LAST_COMMIT_MESSAGE" value="added stats to verbose info panel" />
+    <MESSAGE value="verbose info update implemented" />
+    <option name="LAST_COMMIT_MESSAGE" value="verbose info update implemented" />
   </component>
   <component name="XDebuggerManager">
     <breakpoint-manager>

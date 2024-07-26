@@ -94,6 +94,7 @@ function mn.Slots:realize()
             to_insert.frame:set_is_outline(true)
             to_insert.bounds = rt.AABB(0, 0, 1, 1)
             to_insert.selection_node = mn.SelectionGraphNode()
+            to_insert.is_visible = true
 
             table.insert(row, to_insert)
             self._slot_i_to_item[slot_i] = to_insert
@@ -220,7 +221,7 @@ function mn.Slots:draw()
             item.base:draw()
             item.base_inlay:draw()
             item.frame:draw()
-            if item.sprite ~= nil then
+            if item.sprite ~= nil and item.is_visible == true then
                 item.sprite:draw()
             end
         end
@@ -363,4 +364,9 @@ function mn.Slots:sort()
         local to_push = table.pop_front(by_type[item.type])
         self:set_object(slot_i, to_push)
     end
+end
+
+--- @brief
+function mn.Slots:set_slot_object_visible(slot_i, b)
+    self._slot_i_to_item[slot_i].is_visible = b
 end

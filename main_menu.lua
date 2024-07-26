@@ -250,4 +250,3 @@ love.run = function()
         if love.timer then love.timer.sleep(0.001) end -- limit max tick rate of while true
     end
 end
-
