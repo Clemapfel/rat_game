@@ -25,6 +25,7 @@ function rt.load_config(path, to_assign, template)
     local chunk, error_maybe = love.filesystem.load(path)
     if error_maybe ~= nil then
         rt.error("In rt.load_config: error when loading config at `" .. path .. "`: " .. error_maybe)
+        return
     end
 
     local config = chunk()

@@ -61,9 +61,19 @@ for entity in values(entities) do
     table.insert(state.entities, entity)
 end
 
+local template = mn.Template("DEBUG_TEMPLATE")
+template:create_from(state.entities)
+template:deserialize(template:serialize())
+
 --- ###
 
 love.load = function()
+    local state = mn.InventoryState()
+    state.entities = {
+        bt.Entity("MC"),
+        bt.Entity("RAT"),
+        bt.Entity("GIRL")
+    }
     scene._state = state
     rt.current_scene:realize()
     love.resize()

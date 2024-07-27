@@ -1447,7 +1447,10 @@ function mn.Scene:_regenerate_selection_nodes()
         end
     end
 
-    self._selection_graph:set_current_node(entity_tab_nodes[self._current_entity_i])
+    local current_node = entity_tab_nodes[self._current_entity_i]
+    if current_node ~= nil then
+        self._selection_graph:set_current_node(current_node)
+    end
 end
 
 --- @brief

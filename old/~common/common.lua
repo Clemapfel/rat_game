@@ -43,7 +43,6 @@ function keys(t)
     end
 end
 
-
 --- @brief iterate arbitrary number of elements, if vararg contains nils, they will be skipped
 --- @vararg any
 function range(...)

@@ -184,6 +184,8 @@ require "battle.scene"
 require "battle.simulation_handler"
 
 require "menu.selection_graph"
+require "menu.template"
+require "menu.keyboard"
 require "menu.slots"
 require "menu.entity_info"
 require "menu.scrollable_list"
