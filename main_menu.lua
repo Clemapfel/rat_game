@@ -63,7 +63,13 @@ end
 
 local template = mn.Template("DEBUG_TEMPLATE")
 template:create_from(state.entities)
-template:deserialize(template:serialize())
+
+input = rt.InputController()
+input:signal_connect("pressed", function(_, which)
+    if which == rt.InputButton.Y then
+        scene:_load_template(template)
+    end
+end)
 
 --- ###
 

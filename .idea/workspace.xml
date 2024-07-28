@@ -22,37 +22,13 @@
     </configurations>
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="7fa9ba1b-2cff-4ecc-86fb-59ab2fa76ee1" name="Changes" comment="added undo and verbose info polish">
-      <change afterPath="$PROJECT_DIR$/love/love.audio.lua" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/love/love.data.lua" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/love/love.event.lua" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/love/love.filesystem.lua" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/love/love.font.lua" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/love/love.graphics.lua" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/love/love.image.lua" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/love/love.joystick.lua" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/love/love.keyboard.lua" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/love/love.lua" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/love/love.math.lua" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/love/love.mouse.lua" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/love/love.physics.lua" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/love/love.sound.lua" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/love/love.system.lua" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/love/love.thread.lua" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/love/love.timer.lua" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/love/love.touch.lua" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/love/love.video.lua" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/love/love.window.lua" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/menu/keyboard.lua" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/menu/template.lua" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/.idea/vcs.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/vcs.xml" afterDir="false" />
+    <list default="true" id="7fa9ba1b-2cff-4ecc-86fb-59ab2fa76ee1" name="Changes" comment="added keyboard">
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/battle/entity.lua" beforeDir="false" afterPath="$PROJECT_DIR$/battle/entity.lua" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/include.lua" beforeDir="false" afterPath="$PROJECT_DIR$/include.lua" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/main_menu.lua" beforeDir="false" afterPath="$PROJECT_DIR$/main_menu.lua" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/menu/keyboard.lua" beforeDir="false" afterPath="$PROJECT_DIR$/menu/keyboard.lua" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/menu/scene.lua" beforeDir="false" afterPath="$PROJECT_DIR$/menu/scene.lua" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/old/~common/common.lua" beforeDir="false" afterPath="$PROJECT_DIR$/old/~common/common.lua" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/old/~common/config.lua" beforeDir="false" afterPath="$PROJECT_DIR$/old/~common/config.lua" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/menu/scrollable_list.lua" beforeDir="false" afterPath="$PROJECT_DIR$/menu/scrollable_list.lua" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/menu/template.lua" beforeDir="false" afterPath="$PROJECT_DIR$/menu/template.lua" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -490,31 +466,7 @@
       <workItem from="1721840426345" duration="6522000" />
       <workItem from="1721859312425" duration="20319000" />
       <workItem from="1722013848502" duration="10737000" />
-      <workItem from="1722100982820" duration="11003000" />
-    </task>
-    <task id="LOCAL-00849" summary="scrollable list sort working">
-      <option name="closed" value="true" />
-      <created>1719434177002</created>
-      <option name="number" value="00849" />
-      <option name="presentableId" value="LOCAL-00849" />
-      <option name="project" value="LOCAL" />
-      <updated>1719434177002</updated>
-    </task>
-    <task id="LOCAL-00850" summary="added type">
-      <option name="closed" value="true" />
-      <created>1719436067763</created>
-      <option name="number" value="00850" />
-      <option name="presentableId" value="LOCAL-00850" />
-      <option name="project" value="LOCAL" />
-      <updated>1719436067763</updated>
-    </task>
-    <task id="LOCAL-00851" summary="added scrollable list backing">
-      <option name="closed" value="true" />
-      <created>1719437299593</created>
-      <option name="number" value="00851" />
-      <option name="presentableId" value="LOCAL-00851" />
-      <option name="project" value="LOCAL" />
-      <updated>1719437299593</updated>
+      <workItem from="1722100982820" duration="16652000" />
     </task>
     <task id="LOCAL-00852" summary="stashing">
       <option name="closed" value="true" />
@@ -884,7 +836,31 @@
       <option name="project" value="LOCAL" />
       <updated>1722023213877</updated>
     </task>
-    <option name="localTasksCounter" value="898" />
+    <task id="LOCAL-00898" summary="added love api">
+      <option name="closed" value="true" />
+      <created>1722112181386</created>
+      <option name="number" value="00898" />
+      <option name="presentableId" value="LOCAL-00898" />
+      <option name="project" value="LOCAL" />
+      <updated>1722112181386</updated>
+    </task>
+    <task id="LOCAL-00899" summary="added templates">
+      <option name="closed" value="true" />
+      <created>1722112191512</created>
+      <option name="number" value="00899" />
+      <option name="presentableId" value="LOCAL-00899" />
+      <option name="project" value="LOCAL" />
+      <updated>1722112191512</updated>
+    </task>
+    <task id="LOCAL-00900" summary="added keyboard">
+      <option name="closed" value="true" />
+      <created>1722112198761</created>
+      <option name="number" value="00900" />
+      <option name="presentableId" value="LOCAL-00900" />
+      <option name="project" value="LOCAL" />
+      <updated>1722112198761</updated>
+    </task>
+    <option name="localTasksCounter" value="901" />
     <servers />
   </component>
   <component name="TypeScriptGeneratedFilesManager">
@@ -933,9 +909,6 @@
     </option>
   </component>
   <component name="VcsManagerConfiguration">
-    <MESSAGE value="added subpixel filtering to fix sprite scaling" />
-    <MESSAGE value="added item move animation" />
-    <MESSAGE value="stashing before selection graph refactor" />
     <MESSAGE value="refactore selection graph, add per-node control indicator" />
     <MESSAGE value="stashing before adding intrinsics" />
     <MESSAGE value="refactored selection state to be in common" />
@@ -958,7 +931,10 @@
     <MESSAGE value="added stats to verbose info panel" />
     <MESSAGE value="verbose info update implemented" />
     <MESSAGE value="added undo and verbose info polish" />
-    <option name="LAST_COMMIT_MESSAGE" value="added undo and verbose info polish" />
+    <MESSAGE value="added love api" />
+    <MESSAGE value="added templates" />
+    <MESSAGE value="added keyboard" />
+    <option name="LAST_COMMIT_MESSAGE" value="added keyboard" />
   </component>
   <component name="XDebuggerManager">
     <breakpoint-manager>

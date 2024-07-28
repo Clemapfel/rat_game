@@ -219,6 +219,7 @@ function mn.ScrollableList:push(...)
     end
 
     self:_regenerate_sortings()
+    self:reformat()
 end
 
 --- @brief
@@ -373,6 +374,7 @@ end
 
 --- @brief
 function mn.ScrollableList:get_selected()
+    if self._n_items == 0 then return nil end
     local item = self._items[self._sortings[self._current_sort_mode][self._selected_item_i].item_i]
     if item ~= nil then
         return item.object
@@ -428,4 +430,9 @@ function mn.ScrollableList:add(object, new_quantity)
         self:push({object, new_quantity})
         self:reformat()
     end
+end
+
+--- @brief
+function mn.ScrollableList:get_n_items()
+    return self._n_items
 end

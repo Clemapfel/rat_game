@@ -245,8 +245,10 @@ function mn.Scene:_create_from_state()
         local page = self._entity_pages[entity_i]
         local entity = entities[entity_i]
 
-        local moves = entity:list_moves()
         page.moves:clear()
+        page.equips_and_consumables:clear()
+
+        local moves = entity:list_moves()
         for move_i = 1, #moves do
             page.moves:set_object(move_i,  moves[move_i])
         end
@@ -1299,6 +1301,7 @@ function mn.Scene:_regenerate_selection_nodes()
     end)
 
     shared_move_list_node:set_on_a(function()
+        if scene._shared_move_list:get_n_items() == 0 then return end
         local up = scene._grabbed_object
         local down = scene._shared_move_list:get_selected()
 
@@ -1345,6 +1348,7 @@ function mn.Scene:_regenerate_selection_nodes()
     end)
 
     shared_equip_list_node:set_on_a(function()
+        if scene._shared_equip_list:get_n_items() == 0 then return end
         local up = scene._grabbed_object
         local down = scene._shared_equip_list:get_selected()
 
@@ -1395,6 +1399,7 @@ function mn.Scene:_regenerate_selection_nodes()
     end)
 
     shared_consumable_list_node:set_on_a(function()
+        if scene._shared_consumable_list:get_n_items() == 0 then return end
         local up = scene._grabbed_object
         local down = scene._shared_consumable_list:get_selected()
 
@@ -1616,4 +1621,78 @@ function mn.Scene:_update_entity_info(entity_i)
     local entity = self._state.entities[entity_i]
     local page = self._entity_pages[entity_i]
     page.info:set_values(entity:get_hp_base(), entity:get_attack_base(), entity:get_defense_base(), entity:get_speed_base())
+end
+
+--- @brief
+function mn.Scene:_load_template(template)
+    meta.assert_isa(template, mn.Template)
+
+    for entity in values(self._state.entities) do
+        if template:has_entity(entity) then
+            for move in values(entity:list_moves()) do
+                entity:remove_move(move)
+
+                local current_n = state.shared_moves[move]
+                if current_n == nil then
+                    state.shared_moves[move] = 1
+                else
+                    state.shared_moves[move] = current_n + 1
+                end
+            end
+
+            for move in values(template:list_moves(entity)) do
+                local current_n = state.shared_moves[move]
+                if current_n >= 1 then
+                    state.shared_moves[move] = current_n - 1
+                    entity:add_move(move)
+                else
+                    --rt.error("out of moves `" .. move:get_id() .. "`")
+                end
+            end
+
+            for equip in values(entity:list_equips()) do
+                entity:remove_equip(equip)
+
+                local current_n = state.shared_equips[equip]
+                if current_n == nil then
+                    state.shared_equips[equip] = 1
+                else
+                    state.shared_equips[equip] = current_n + 1
+                end
+            end
+
+            for equip in values(template:list_equips(entity)) do
+                local current_n = state.shared_equips[equip]
+                if current_n >= 1 then
+                    state.shared_equips[equip] = current_n - 1
+                    entity:add_equip(equip)
+                else
+                    --rt.error("out of equips `" .. equip:get_id() .. "`")
+                end
+            end
+
+            for consumable in values(entity:list_consumables()) do
+                entity:remove_consumable(consumable)
+
+                local current_n = state.shared_consumables[consumable]
+                if current_n == nil then
+                    state.shared_consumables[consumable] = 1
+                else
+                    state.shared_consumables[consumable] = current_n + 1
+                end
+            end
+
+            for consumable in values(template:list_consumables(entity)) do
+                local current_n = state.shared_consumables[consumable]
+                if current_n >= 1 then
+                    state.shared_consumables[consumable] = current_n - 1
+                    entity:add_consumable(consumable)
+                else
+                    --rt.error("out of consumables `" .. consumable:get_id() .. "`")
+                end
+            end
+        end
+    end
+
+    self:_create_from_state(self._state)
 end
