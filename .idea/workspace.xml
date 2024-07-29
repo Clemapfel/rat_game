@@ -22,13 +22,11 @@
     </configurations>
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="7fa9ba1b-2cff-4ecc-86fb-59ab2fa76ee1" name="Changes" comment="load from template done">
-      <change afterPath="$PROJECT_DIR$/battle/backgrounds/sdf_meatballs.lua" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/battle/backgrounds/sdf_meatballs_compute.glsl" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/battle/backgrounds/sdf_meatballs_render.glsl" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/.idea/vcs.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/vcs.xml" afterDir="false" />
+    <list default="true" id="7fa9ba1b-2cff-4ecc-86fb-59ab2fa76ee1" name="Changes" comment="added sdf meatball compute shader">
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/menu/scene.lua" beforeDir="false" afterPath="$PROJECT_DIR$/menu/scene.lua" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/battle/backgrounds/sdf_meatballs.lua" beforeDir="false" afterPath="$PROJECT_DIR$/battle/backgrounds/sdf_meatballs.lua" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/battle/backgrounds/sdf_meatballs_compute.glsl" beforeDir="false" afterPath="$PROJECT_DIR$/battle/backgrounds/sdf_meatballs_compute.glsl" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/battle/backgrounds/sdf_meatballs_render.glsl" beforeDir="false" afterPath="$PROJECT_DIR$/battle/backgrounds/sdf_meatballs_render.glsl" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -468,15 +466,7 @@
       <workItem from="1722013848502" duration="10737000" />
       <workItem from="1722100982820" duration="18765000" />
       <workItem from="1722194976289" duration="882000" />
-      <workItem from="1722213965868" duration="690000" />
-    </task>
-    <task id="LOCAL-00853" summary="added preview optionality">
-      <option name="closed" value="true" />
-      <created>1719673422997</created>
-      <option name="number" value="00853" />
-      <option name="presentableId" value="LOCAL-00853" />
-      <option name="project" value="LOCAL" />
-      <updated>1719673422997</updated>
+      <workItem from="1722213965868" duration="2253000" />
     </task>
     <task id="LOCAL-00854" summary="stashing before refactoring equip / consumable slot system">
       <option name="closed" value="true" />
@@ -862,7 +852,15 @@
       <option name="project" value="LOCAL" />
       <updated>1722188213725</updated>
     </task>
-    <option name="localTasksCounter" value="902" />
+    <task id="LOCAL-00902" summary="added sdf meatball compute shader">
+      <option name="closed" value="true" />
+      <created>1722214830302</created>
+      <option name="number" value="00902" />
+      <option name="presentableId" value="LOCAL-00902" />
+      <option name="project" value="LOCAL" />
+      <updated>1722214830303</updated>
+    </task>
+    <option name="localTasksCounter" value="903" />
     <servers />
   </component>
   <component name="TypeScriptGeneratedFilesManager">
@@ -911,7 +909,6 @@
     </option>
   </component>
   <component name="VcsManagerConfiguration">
-    <MESSAGE value="stashing before adding intrinsics" />
     <MESSAGE value="refactored selection state to be in common" />
     <MESSAGE value="added intrinsic category" />
     <MESSAGE value="added A interaction" />
@@ -936,7 +933,8 @@
     <MESSAGE value="added templates" />
     <MESSAGE value="added keyboard" />
     <MESSAGE value="load from template done" />
-    <option name="LAST_COMMIT_MESSAGE" value="load from template done" />
+    <MESSAGE value="added sdf meatball compute shader" />
+    <option name="LAST_COMMIT_MESSAGE" value="added sdf meatball compute shader" />
   </component>
   <component name="XDebuggerManager">
     <breakpoint-manager>

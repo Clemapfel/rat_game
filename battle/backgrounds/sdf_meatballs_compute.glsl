@@ -2,9 +2,6 @@
 
 #define PI 3.1415926535897932384626433832795
 
-
-/// @brief simplex noise
-/// @source adapted from https://github.com/patriciogonzalezvivo/lygia/blob/main/generative/snoise.glsl
 float simplex_noise(in vec3 v) {
     const vec2 C = vec2(1.0/6.0, 1.0/3.0);
     const vec4 D = vec4(0.0, 0.5, 1.0, 2.0);
@@ -68,9 +65,25 @@ float simplex_noise(in vec3 v) {
     return 42.0 * dot(m * m, vec4(dot(p0, x0), dot(p1, x1), dot(p2, x2), dot(p3, x3)));
 }
 
+float sdf_circle(vec2 point, vec2 center,  float radius)  {
+    return length(point - center) - radius;
+}
+
+float smooth_min(float a, float b, float smoothness) {
+    float h = max(smoothness - abs(a - b), 0.0);
+    return min(a, b) - h * h * 0.25 / smoothness;
+}
+
+float smooth_max(float a, float b, float smoothness) {
+    float h = exp(smoothness * a) + exp(smoothness * b);
+    return log(h) / smoothness;
+}
+
 // ###
 
 layout(r32f) uniform image2D sdf_out;
+uniform vec2 resolution;
+uniform float elapsed;
 
 layout (local_size_x = 1, local_size_y = 1, local_size_z = 1) in;
 void computemain()
@@ -81,5 +94,15 @@ void computemain()
     int width = size.x;
     int height = size.y;
 
-    imageStore(sdf_out, ivec2(x, y), vec4(simplex_noise(vec3(x, y, 0) / 10)));
+    vec2 pos = (vec2(x, y) / resolution);
+    pos.x *= resolution.x / resolution.y;
+
+    float signed_distance = 0;
+    float x_offset = sin(elapsed) * 0.25;
+    float c1 = sdf_circle(pos, vec2(0.5, 0.5), 0.1);
+    float c2 = sdf_circle(pos, vec2(0.5 + x_offset, 0.5), 0.05);
+
+    signed_distance = smooth_min(c1, c2, 0.05);
+
+    imageStore(sdf_out, ivec2(x, y), vec4(signed_distance));
 }

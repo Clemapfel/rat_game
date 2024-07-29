@@ -1,6 +1,6 @@
 rt.settings.battle.background.sdf_meatballs = {
     resolution_factor = 0.6,
-    n_cycles_per_second = 20,
+    n_cycles_per_second = 60,
 }
 
 bt.Background.SDF_MEATBALLS = meta.new_type("SDF_MEATBALLS", bt.Background, function()
@@ -13,7 +13,8 @@ bt.Background.SDF_MEATBALLS = meta.new_type("SDF_MEATBALLS", bt.Background, func
 
         _resolution_x = 1,
         _resolution_y = 1,
-        _elapsed = 0
+        _elapsed = 0,
+        _elapsed_total = 0
     })
 end)
 
@@ -51,11 +52,15 @@ function bt.Background.SDF_MEATBALLS:update(delta, intensity)
     if self._is_realized ~= true then return end
 
     self._elapsed = self._elapsed + delta
+    self._elapsed_total = self._elapsed_total + delta
+
     local cycle_duration = 1 / rt.settings.battle.background.sdf_meatballs.n_cycles_per_second
     while self._elapsed > cycle_duration do
         self._elapsed = self._elapsed - cycle_duration
         local shader = self._step_shader
         shader:send("sdf_out", self._sdf_texture)
+        shader:send("resolution", {self._resolution_x, self._resolution_y})
+        shader:send("elapsed", self._elapsed_total)
         love.graphics.dispatchThreadgroups(shader, self._resolution_x, self._resolution_y)
     end
 end
