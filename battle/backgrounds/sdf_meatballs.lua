@@ -32,7 +32,7 @@ function bt.Background.SDF_MEATBALLS:realize()
     self._step_shader = love.graphics.newComputeShader("battle/backgrounds/sdf_meatballs_compute.glsl")
     self._render_shader = rt.Shader("battle/backgrounds/sdf_meatballs_render.glsl")
 
-    local texture_format = "r32f"
+    local texture_format = "rgba32f"
     local texture_config = { computewrite = true }
     local initial_data = love.image.newImageData(self._resolution_x, self._resolution_y, texture_format)
 
@@ -46,8 +46,8 @@ function bt.Background.SDF_MEATBALLS:realize()
     for i = 1, n_circles do
         local center_x, center_y = rt.random.integer(padding * w, w - padding * w), rt.random.integer(padding * h, h - padding * h)
         local radius = rt.random.number(0.01, 0.02)
-        local angle = rt.random.number(0, 2 * math.pi)
-        circle_data:setPixel(i, 1, center_x, center_y, radius, 0)
+        local hue = rt.random.number(0, 1)
+        circle_data:setPixel(i, 1, center_x, center_y, radius, hue)
     end
     self._data.circles_data = circle_data
     self._data.circles = love.graphics.newImage(circle_data, texture_config)
@@ -88,9 +88,9 @@ function bt.Background.SDF_MEATBALLS:update(delta, intensity)
         local shader = self._step_shader
         shader:send("sdf_out", self._sdf_texture)
         shader:send("resolution", {self._resolution_x, self._resolution_y})
-        --shader:send("elapsed", self._elapsed_total)
-        shader:send("circles", self._data.circles)
-        shader:send("n_circles", self._data.n_circles)
+        shader:send("elapsed", self._elapsed_total)
+        --shader:send("circles", self._data.circles)
+        --shader:send("n_circles", self._data.n_circles)
         love.graphics.dispatchThreadgroups(shader, self._resolution_x, self._resolution_y)
     end
 end

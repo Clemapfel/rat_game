@@ -22,17 +22,12 @@
     </configurations>
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="7fa9ba1b-2cff-4ecc-86fb-59ab2fa76ee1" name="Changes" comment="stashing sdf">
-      <change afterPath="$PROJECT_DIR$/menu/inventory_state.lua" afterDir="false" />
+    <list default="true" id="7fa9ba1b-2cff-4ecc-86fb-59ab2fa76ee1" name="Changes" comment="inventory state working">
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/battle/entity.lua" beforeDir="false" afterPath="$PROJECT_DIR$/battle/entity.lua" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/include.lua" beforeDir="false" afterPath="$PROJECT_DIR$/include.lua" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/main_menu.lua" beforeDir="false" afterPath="$PROJECT_DIR$/main_menu.lua" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/battle/backgrounds/sdf_meatballs.lua" beforeDir="false" afterPath="$PROJECT_DIR$/battle/backgrounds/sdf_meatballs.lua" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/battle/backgrounds/sdf_meatballs_compute.glsl" beforeDir="false" afterPath="$PROJECT_DIR$/battle/backgrounds/sdf_meatballs_compute.glsl" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/battle/backgrounds/sdf_meatballs_render.glsl" beforeDir="false" afterPath="$PROJECT_DIR$/battle/backgrounds/sdf_meatballs_render.glsl" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/menu/scene.lua" beforeDir="false" afterPath="$PROJECT_DIR$/menu/scene.lua" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/menu/scene_state.lua" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/menu/scene_state_inventory.lua" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/menu/template.lua" beforeDir="false" afterPath="$PROJECT_DIR$/menu/~template.lua" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/menu/~scene.lua" beforeDir="false" afterPath="$PROJECT_DIR$/menu/~scene.lua" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -473,15 +468,7 @@
       <workItem from="1722100982820" duration="18765000" />
       <workItem from="1722194976289" duration="882000" />
       <workItem from="1722213965868" duration="6180000" />
-      <workItem from="1722220329478" duration="9260000" />
-    </task>
-    <task id="LOCAL-00857" summary="refactored menu layout">
-      <option name="closed" value="true" />
-      <created>1719878081127</created>
-      <option name="number" value="00857" />
-      <option name="presentableId" value="LOCAL-00857" />
-      <option name="project" value="LOCAL" />
-      <updated>1719878081127</updated>
+      <workItem from="1722220329478" duration="14659000" />
     </task>
     <task id="LOCAL-00858" summary="stashing">
       <option name="closed" value="true" />
@@ -867,7 +854,15 @@
       <option name="project" value="LOCAL" />
       <updated>1722245349333</updated>
     </task>
-    <option name="localTasksCounter" value="906" />
+    <task id="LOCAL-00906" summary="inventory state working">
+      <option name="closed" value="true" />
+      <created>1722273771141</created>
+      <option name="number" value="00906" />
+      <option name="presentableId" value="LOCAL-00906" />
+      <option name="project" value="LOCAL" />
+      <updated>1722273771141</updated>
+    </task>
+    <option name="localTasksCounter" value="907" />
     <servers />
   </component>
   <component name="TypeScriptGeneratedFilesManager">
@@ -916,7 +911,6 @@
     </option>
   </component>
   <component name="VcsManagerConfiguration">
-    <MESSAGE value="added A interaction" />
     <MESSAGE value="reworked slots and entity info formatting" />
     <MESSAGE value="correctly handling control indicators now" />
     <MESSAGE value="added verbose info panel" />
@@ -941,7 +935,8 @@
     <MESSAGE value="added sdf meatball compute shader" />
     <MESSAGE value="hello world working" />
     <MESSAGE value="stashing sdf" />
-    <option name="LAST_COMMIT_MESSAGE" value="stashing sdf" />
+    <MESSAGE value="inventory state working" />
+    <option name="LAST_COMMIT_MESSAGE" value="inventory state working" />
   </component>
   <component name="XDebuggerManager">
     <breakpoint-manager>

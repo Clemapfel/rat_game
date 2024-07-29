@@ -111,9 +111,27 @@ float smooth_max(float a, float b, float smoothness) {
     return log(h) / smoothness;
 }
 
+vec3 hsv_to_rgb(vec3 c)
+{
+    vec4 K = vec4(1.0, 2.0 / 3.0, 1.0 / 3.0, 3.0);
+    vec3 p = abs(fract(c.xxx + K.xyz) * 6.0 - K.www);
+    return c.z * mix(K.xxx, clamp(p - K.xxx, 0.0, 1.0), c.y);
+}
+
+vec3 rgb_to_hsv(vec3 c)
+{
+    vec4 K = vec4(0.0, -1.0 / 3.0, 2.0 / 3.0, -1.0);
+    vec4 p = mix(vec4(c.bg, K.wz), vec4(c.gb, K.xy), step(c.b, c.g));
+    vec4 q = mix(vec4(p.xyw, c.r), vec4(c.r, p.yzx), step(p.x, c.r));
+
+    float d = q.x - min(q.w, q.y);
+    float e = 1.0e-10;
+    return vec3(abs(q.z + (q.w - q.y) / (6.0 * d + e)), d / (q.x + e), q.x);
+}
+
 // ###
 
-layout(r32f) uniform image2D sdf_out;
+layout(rgba32f) uniform image2D sdf_out;
 
 layout(rgba32f) uniform image2D circles;
 uniform int n_circles;
@@ -133,24 +151,13 @@ void computemain()
     vec2 pos = (vec2(x, y) / resolution);
     float x_normalization = resolution.x / resolution.y;
 
-    const float smoothness = 0.05;
+    pos.x = pos.x * x_normalization - (resolution.x - resolution.y) / resolution.y / 2;
 
-    float circle_distance = 1;
-    for (int i = 1; i <= n_circles; ++i)
-    {
-        vec4 circle = imageLoad(circles, ivec2(i, 1));
-        vec2 circle_position = circle.xy / resolution;
-        float radius = circle.z;
-        float angle = circle.w;
+    float smoothness = 0.05;
 
-        circle_distance = smooth_min(circle_distance, sdf_circle(pos, circle_position, radius), smoothness);
-    }
-
-    /*
     float circle_distance = 0;
-    float x_offset = sin(elapsed) * 0.2;
-    float c1 = sdf_ellipse(pos, vec2(0.5), vec2(clamp(abs(sin(elapsed) * 0.2), 0.1, 1), clamp(abs(cos(elapsed) * 0.2), 0.1, 1)));
-    //float c1 = sdf_circle(pos, vec2(0.5), clamp(abs(sin(elapsed) * 0.2), 0.1, 1));
+    float x_offset = sin(elapsed) * 0.25;
+    float c1 = sdf_circle(pos, vec2(0.5), clamp(abs(sin(elapsed) * 0.2), 0.1, 1));
     float c2 = sdf_circle(pos, translate_point_by_angle(vec2(0.5), x_offset, sin(elapsed / 2) * 2 * PI), 0.05);
     float c3 = sdf_circle(pos, translate_point_by_angle(vec2(0.5), x_offset, -cos(elapsed / 2) * 2 * PI), 0.05);;
     float c4 = sdf_circle(pos, translate_point_by_angle(vec2(0.5), x_offset, -cos(elapsed / 2) * 2 * PI + PI / 2), 0.05);;
@@ -158,7 +165,19 @@ void computemain()
     circle_distance = smooth_min(c1, c2, smoothness);
     circle_distance = smooth_min(circle_distance, c3, smoothness);
     circle_distance = smooth_min(circle_distance, c4, smoothness);
-    */
 
-    imageStore(sdf_out, ivec2(x, y), vec4(circle_distance));
+    const float n = 4;
+    const vec3 c1_hue = hsv_to_rgb(vec3(0.1, 1, 1));
+    const vec3 c2_hue = hsv_to_rgb(vec3(0.33, 1, 1));
+    const vec3 c3_hue = hsv_to_rgb(vec3(0.66, 1, 1));
+    const vec3 c4_hue = hsv_to_rgb(vec3(0.9, 1, 1));
+
+    vec3 circle_color = c1_hue * smoothstep(0.0, 1, c1) + c2_hue * smoothstep(0.0, 1, c2) + c3_hue * smoothstep(0.0, 1, c3) + c4_hue * smoothstep(0.0, 1, c4); // + c2_hue * (c1 step(0.0, c2)); // + c3_hue * step(0.0, c3) + c4_hue * step(0.0, c4)) / n;
+    circle_color = circle_color / 2;
+
+    vec3 as_hsv = rgb_to_hsv(circle_color);
+    as_hsv.y = 1;
+    as_hsv.z = 1;
+
+    imageStore(sdf_out, ivec2(x, y), vec4(hsv_to_rgb(as_hsv), circle_distance));
 }
