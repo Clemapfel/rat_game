@@ -1,68 +1,14 @@
 require "include"
 
+state = mn.InventoryState()
+local s = state:serialize()
+state:deserialize(s)
+local s = state:serialize()
+state:deserialize(s)
+
+println(state:serialize())
 rt.current_scene = mn.Scene()
 scene = rt.current_scene
-
-state = mn.InventoryState()
-for move_id in range(
-    "DEBUG_MOVE",
-    "INSPECT",
-    "PROTECT",
-    "STRUGGLE",
-    "SURF",
-    "WISH"
-) do
-    state.shared_moves[bt.Move(move_id)] = rt.random.integer(1, 5)
-end
-
-for equip_id in range(
-    "DEBUG_EQUIP",
-    "DEBUG_CLOTHING",
-    "DEBUG_FEMALE_CLOTHING",
-    "DEBUG_MALE_CLOTHING",
-    "DEBUG_WEAPON",
-    "DEBUG_TRINKET"
-) do
-    state.shared_equips[bt.Equip(equip_id)] = rt.random.integer(1, 5)
-end
-
-for consumable_id in range(
-    "DEBUG_CONSUMABLE",
-    "ONE_CHERRY",
-    "TWO_CHERRY"
-) do
-    state.shared_consumables[bt.Consumable(consumable_id)] = rt.random.integer(1, 5)
-end
-
-local entities = {bt.Entity("MC"), bt.Entity("GIRL")}-- bt.Entity("RAT"), bt.Entity("PROF"), bt.Entity("GIRL")}
-
-for entity in values(entities) do
-    local to_insert = entity
-    for move in range(
-        "DEBUG_MOVE",
-        "INSPECT",
-        "PROTECT",
-        "STRUGGLE",
-        "SURF",
-        "WISH"
-    ) do
-        if rt.random.toss_coin(0.7) then
-            entity:add_move(bt.Move(move))
-        end
-    end
-
-    if entity:get_n_consumable_slots() >= 1 and rt.random.toss_coin(0.9) then
-        entity:add_consumable(bt.Consumable("DEBUG_CONSUMABLE"))
-    end
-
-    if entity:get_n_equip_slots() > 1 then
-        entity:add_equip(bt.Equip("DEBUG_EQUIP"))
-    end
-    table.insert(state.entities, entity)
-end
-
-local template = mn.Template("DEBUG_TEMPLATE")
-template:create_from(state.entities)
 
 input = rt.InputController()
 input:signal_connect("pressed", function(_, which)

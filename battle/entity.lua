@@ -443,9 +443,15 @@ function bt.Entity:add_move(move, move_slot_i)
         rt.error("In bt.Entity:add_move: entity has no free move slots")
     else
         self:_assert_move_slot_i(move_slot_i)
+        local current = self.moves[move_slot_i].move
+        if current ~= nil then
+            self.move_to_move_slot_i[current] = nil
+        end
+
         self.moves[move_slot_i].move = move
-        self.moves[move_slot_i].n_uses_left = move:get_max_n_uses()
-        self.move_to_move_slot_i[move] = move_slot_i
+        if move ~= nil then
+            self.move_to_move_slot_i[move] = move_slot_i
+        end
     end
 end
 
@@ -507,6 +513,16 @@ function bt.Entity:list_moves()
     local out = {}
     for pair in values(to_sort) do
         table.insert(out, pair[1])
+    end
+    return out
+end
+
+--- @brief
+function bt.Entity:list_move_slots()
+    local out = {}
+    local n = self:get_n_move_slots()
+    for i = 1, n do
+        out[i] = self.moves[i].move
     end
     return out
 end
@@ -591,6 +607,16 @@ function bt.Entity:list_equips()
 end
 
 --- @brief
+function bt.Entity:list_equip_slots()
+    local out = {}
+    local n = self:get_n_equip_slots()
+    for i = 1, n do
+        out[i] = self.equips[i].equip
+    end
+    return out
+end
+
+--- @brief
 function bt.Entity:has_equip(equip)
     return self.equip_to_equip_slot_i[equip] ~= nil
 end
@@ -622,7 +648,6 @@ function bt.Entity:add_consumable(consumable, consumable_slot_i)
         end
 
         self.consumables[consumable_slot_i].consumable = consumable
-
         if consumable ~= nil then
             self.consumable_to_consumable_slot_i[consumable] = consumable_slot_i
         end
@@ -670,6 +695,16 @@ function bt.Entity:list_consumables()
     local out = {}
     for entry in values(self.consumables) do
         table.insert(out, entry.consumable)
+    end
+    return out
+end
+
+--- @brief
+function bt.Entity:list_consumable_slots()
+    local out = {}
+    local n = self:get_n_consumable_slots()
+    for i = 1, n do
+        out[i] = self.consumables[i].consumable
     end
     return out
 end

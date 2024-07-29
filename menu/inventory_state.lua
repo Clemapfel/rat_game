@@ -1,0 +1,417 @@
+mn.Template = meta.new_type("MenuTemplate", function(name)
+    return meta.new(mn.Template, {
+        name = name,
+        entities = {}
+    })
+end)
+
+--- @brief
+function mn.Template:create_from(...)
+    self.entities = {}
+    for entity in range(...) do
+        meta.assert_isa(entity, bt.Entity)
+        self.entities[entity] = {
+            moves = entity:list_move_slots(),
+            n_move_slots = entity:get_n_move_slots(),
+
+            equips = entity:list_equip_slots(),
+            n_equip_slots = entity:get_n_equip_slots(),
+
+            consumables = entity:list_consumable_slots(),
+            n_consumable_slots = entity:get_n_consumable_slots()
+        }
+    end
+end
+
+--- @class mn.InventoryState
+mn.InventoryState = meta.new_type("MenuInventoryState", function()
+    local self = meta.new(mn.InventoryState, {
+        shared_moves = {},          -- Table<bt.Move, Integer>
+        shared_consumables = {},    -- Table<bt.Consumable, Integer>
+        shared_equips = {},         -- Table<bt.Equip, Integer>
+        templates = {},             -- Table<mn.Template>
+        active = mn.Template()      -- mn.Template
+    })
+
+    -- setup debug
+    for move_id in range(
+        "DEBUG_MOVE",
+        "INSPECT",
+        "PROTECT",
+        "STRUGGLE",
+        "SURF",
+        "WISH"
+    ) do
+        local n = rt.random.integer(1, 5)
+        for i = 1, n do
+            self:add_shared_move(bt.Move(move_id))
+        end
+    end
+
+    for equip_id in range(
+        "DEBUG_EQUIP",
+        "DEBUG_CLOTHING",
+        "DEBUG_FEMALE_CLOTHING",
+        "DEBUG_MALE_CLOTHING",
+        "DEBUG_WEAPON",
+        "DEBUG_TRINKET"
+    ) do
+        local n = rt.random.integer(1, 5)
+        for i = 1, n do
+            self:add_shared_equip(bt.Equip(equip_id))
+        end
+    end
+
+    for consumable_id in range(
+        "DEBUG_CONSUMABLE",
+        "ONE_CHERRY",
+        "TWO_CHERRY"
+    ) do
+        local n = rt.random.integer(1, 5)
+        for i = 1, n do
+            self:add_shared_consumable(bt.Consumable(consumable_id))
+        end
+    end
+
+    local entities = {
+        bt.Entity("MC"),
+        bt.Entity("GIRL")
+    }
+
+    local empty_template = mn.Template()
+    empty_template:create_from(table.unpack(entities))
+    self:add_template(empty_template)
+
+    self.active = mn.Template()
+    self.active:create_from(table.unpack(entities))
+
+    self:equip_equip(entities[1], bt.Equip("DEBUG_EQUIP"), 1)
+    self:equip_move(entities[1], bt.Move("DEBUG_MOVE"), 2)
+    self:equip_consumable(entities[1], bt.Consumable("DEBUG_CONSUMABLE"), 1)
+
+    self:unequip_equip(entities[1], 1)
+    self:unequip_move(entities[1], 2)
+    self:unequip_consumable(entities[1], 1)
+    return self
+end)
+
+
+--- @brief
+function mn.InventoryState:serialize()
+    local to_serialize = {}
+    to_serialize.shared_moves = {}
+    for move, quantity in pairs(self.shared_moves) do
+        to_serialize.shared_moves[move:get_id()] = quantity
+    end
+
+    to_serialize.shared_equips = {}
+    for equip, quantity in pairs(self.shared_equips) do
+        to_serialize.shared_equips[equip:get_id()] = quantity
+    end
+
+    to_serialize.shared_consumables = {}
+    for consumable, quantity in pairs(self.shared_consumables) do
+        to_serialize.shared_consumables[consumable:get_id()] = quantity
+    end
+
+    local serialize_template = function(template)
+        local out = {}
+        out.name = template.name
+        out.entities = {}
+        for entity, setup in pairs(template.entities) do
+            local entity_to_push = {}
+
+            entity_to_push.n_move_slots = setup.n_move_slots
+            entity_to_push.moves = {}
+            for i = 1, setup.n_move_slots do
+                local object = setup.moves[i]
+                if object ~= nil then
+                    entity_to_push.moves[i] = object:get_id()
+                end
+            end
+
+            entity_to_push.n_equip_slots = setup.n_equip_slots
+            entity_to_push.equips = {}
+            for i = 1, setup.n_equip_slots do
+                local object = setup.equips[i]
+                if object ~= nil then
+                    entity_to_push.equips[i] = object:get_id()
+                end
+            end
+
+            entity_to_push.n_consumable_slots = setup.n_consumable_slots
+            entity_to_push.consumables = {}
+            for i = 1, setup.n_consumable_slots do
+                local object = setup.consumables[i]
+                if object ~= nil then
+                    entity_to_push.consumables[i] = object:get_id()
+                end
+            end
+
+            out.entities[entity:get_id()] = entity_to_push
+        end
+
+        return out
+    end
+
+    to_serialize.templates = {}
+    for template in values(self.templates) do
+        table.insert(to_serialize.templates, serialize_template(template))
+    end
+
+    to_serialize.active = serialize_template(self.active)
+    return "return " .. serialize(to_serialize)
+end
+
+function mn.InventoryState:deserialize(str)
+    local chunk, error_maybe = load(str)
+    if error_maybe ~= nil then
+        rt.error("In mn.InventoryState:deserialize: syntax error: " .. error_maybe)
+    end
+
+    local parsed = chunk()
+    self.shared_moves = {}
+    for id, quantity in pairs(parsed.shared_moves) do
+        self.shared_moves[bt.Move(id)] = quantity
+    end
+
+    self.shared_equips = {}
+    for id, quantity in pairs(parsed.shared_equips) do
+        self.shared_equips[bt.Equip(id)] = quantity
+    end
+
+    self.shared_consumables = {}
+    for id, quantity in pairs(parsed.shared_consumables) do
+        self.shared_consumables[bt.Consumable(id)] = quantity
+    end
+
+    local deserialize_template = function(parsed)
+        local template = mn.Template()
+        template.name = parsed.name
+        for entity_id, setup in pairs(parsed.entities) do
+            local to_insert = {
+                moves = {},
+                n_move_slots = setup.n_move_slots,
+
+                equips = {},
+                n_equip_slots = setup.n_equip_slots,
+
+                consumables = {},
+                n_consumable_slots = setup.n_consumable_slots
+            }
+
+            for slot_i, move_id in pairs(setup.moves) do
+                to_insert.moves[slot_i] = bt.Move(move_id)
+            end
+
+            for slot_i, equip_id in pairs(setup.equips) do
+                to_insert.equips[slot_i] = bt.Equip(equip_id)
+            end
+
+            for slot_i, consumable_id in pairs(setup.consumables) do
+                to_insert.consumables[slot_i] = bt.Consumable(consumable_id)
+            end
+
+            template.entities[bt.Entity(entity_id)] = to_insert
+        end
+        return template
+    end
+
+    self.templates = {}
+    for template in values(parsed.templates) do
+        table.insert(self.templates, deserialize_template(template))
+    end
+
+    self.active = deserialize_template(parsed.active)
+    return self
+end
+
+--- @brief
+for which in range("move", "equip", "consumable") do
+    mn.InventoryState["add_shared_" .. which] = function(self, object)
+        local shared_name = "shared_" .. which .. "s"
+        local current = self[shared_name][object]
+        if current == nil then
+            self[shared_name][object] = 1
+        else
+            self[shared_name][object] = current + 1
+        end
+    end
+end
+
+--- @brief
+function mn.InventoryState:add_template(template)
+    meta.assert_isa(template, mn.Template)
+    table.insert(self.templates, template)
+end
+
+--- @brief
+function mn.InventoryState:set_active_template(template)
+    meta.assert_isa(template, mn.Template)
+    self.active = template
+end
+
+--- @brief synch .active with entities
+function mn.InventoryState:export()
+    for entity, setup in pairs(self.active.entities) do
+        for slot_i = 1, setup.n_move_slots do
+            local move = setup.moves[slot_i]
+            entity:add_move(move, slot_i)
+        end
+
+        for slot_i = 1, setup.n_equip_slots do
+            local equip = setup.equips[slot_i]
+            entity:add_equip(equip, slot_i)
+        end
+
+        for slot_i = 1, setup.n_consumable_slots do
+            local consumable = setup.consumables[slot_i]
+            entity:add_consumable(consumable, slot_i)
+        end
+    end
+end
+
+--- @brief
+function mn.InventoryState:equip_equip(entity, new_equip, equip_slot_i)
+    if self.active.entities[entity] == nil then
+        rt.error("In mn.InventoryState:equip_equip: trying to equip `" .. new_equip:get_id() .. "` to entity `" .. entity:get_id() .. "`, but entity is not present in party")
+        return
+    end
+
+    local n_equip_slots = self.active.entities[entity].n_equip_slots
+    if equip_slot_i > n_equip_slots or equip_slot_i < 0 then
+        rt.error("In mn.InventoryState:equip_equip: trying to equip `" .. new_equip:get_id() .. "` to entity `" .. entity:get_id() .. "` in move slot `" .. equip_slot_i .. "`, but entity only has `" .. n_equip_slots .. "`")
+        return
+    end
+
+    local equip_n = self.shared_equips[new_equip]
+    if equip_n == nil then
+        rt.error("In mn.InventoryState:equip_equip: trying to move equip `" .. new_equip:get_id() .. "` to entity `" .. entity:get_id() .. "`, but it is not present in shared inventory")
+        return
+    end
+    
+    self.shared_equips[new_equip] = equip_n - 1
+
+    local in_slot = self.active.entities[entity].equips[equip_slot_i]
+    if in_slot ~= nil then
+        self:add_shared_equip(in_slot)
+    end
+
+    self.active.entities[entity].equips[equip_slot_i] = new_equip
+end
+
+--- @brief
+function mn.InventoryState:unequip_equip(entity, equip_slot_i)
+    if self.active.entities[entity] == nil then
+        rt.error("In mn.InventoryState:unequip_equip: trying to unequip equip at `" .. equip_slot_i .. "` from to entity `" .. entity:get_id() .. "`, but entity is not present in party")
+    end
+
+    local n_equip_slots = self.active.entities[entity].n_equip_slots
+    if equip_slot_i > n_equip_slots or equip_slot_i < 0 then
+        rt.error("In mn.InventoryState:unequip_equip: trying to unequip equip at `" .. equip_slot_i .. "` from to entity `" .. entity:get_id() .. "`, slot is out of bounds for an entity with `" .. entity:get_n_equip_slots() .. "` slots")
+    end
+
+    local in_slot = self.active.entities[entity].equips[equip_slot_i]
+    if in_slot == nil then return end
+
+    self:add_shared_equip(in_slot)
+    self.active.entities[entity].equips[equip_slot_i] = nil
+end
+
+--- @brief
+function mn.InventoryState:equip_move(entity, new_move, move_slot_i)
+    if self.active.entities[entity] == nil then
+        rt.error("In mn.InventoryState:equip_move: trying to equip `" .. new_move:get_id() .. "` to entity `" .. entity:get_id() .. "`, but entity is not present in party")
+        return
+    end
+
+    local n_move_slots = self.active.entities[entity].n_move_slots
+    if move_slot_i > n_move_slots or move_slot_i < 0 then
+        rt.error("In mn.InventoryState:equip_move: trying to equip `" .. new_move:get_id() .. "` to entity `" .. entity:get_id() .. "` in move slot `" .. move_slot_i .. "`, but entity only has `" .. n_move_slots .. "` slots")
+        return
+    end
+
+    local move_n = self.shared_moves[new_move]
+    if move_n == nil then
+        rt.error("In mn.InventoryState:equip_move: trying to move move `" .. new_move:get_id() .. "` to entity `" .. entity:get_id() .. "`, but it is not present in shared inventory")
+        return
+    end
+
+    self.shared_moves[new_move] = move_n - 1
+
+    local in_slot = self.active.entities[entity].moves[move_slot_i]
+    if in_slot ~= nil then
+        self:add_shared_move(in_slot)
+    end
+
+    self.active.entities[entity].moves[move_slot_i] = new_move
+end
+
+--- @brief
+function mn.InventoryState:unequip_move(entity, move_slot_i)
+    if self.active.entities[entity] == nil then
+        rt.error("In mn.InventoryState:unequip_equip: trying to unequip move at `" .. move_slot_i .. "` from to entity `" .. entity:get_id() .. "`, but entity is not present in party")
+        return
+    end
+
+    local n_move_slots = self.active.entities[entity].n_move_slots
+    if move_slot_i > n_move_slots or move_slot_i < 0 then
+        rt.error("In mn.InventoryState:unequip_equip: trying to unequip equip at `" .. move_slot_i .. "` from to entity `" .. entity:get_id() .. "`, slot is out of bounds for an entity with `" .. entity:get_n_equip_slots() .. "` slots")
+        return
+    end
+
+    local in_slot = self.active.entities[entity].moves[move_slot_i]
+    if in_slot == nil then return end
+
+    self:add_shared_move(in_slot)
+    self.active.entities[entity].moves[move_slot_i] = nil
+end
+
+--- @brief
+function mn.InventoryState:equip_consumable(entity, new_consumable, consumable_slot_i)
+    if self.active.entities[entity] == nil then
+        rt.error("In mn.InventoryState:equip_consumable: trying to equip `" .. new_consumable:get_id() .. "` to entity `" .. entity:get_id() .. "`, but entity is not present in party")
+        return
+    end
+
+    local n_consumable_slots = self.active.entities[entity].n_consumable_slots
+    if consumable_slot_i > n_consumable_slots or consumable_slot_i < 0 then
+        rt.error("In mn.InventoryState:equip_consumable: trying to equip `" .. new_consumable:get_id() .. "` to entity `" .. entity:get_id() .. "` in consumable slot `" .. consumable_slot_i .. "`, but entity only has `" .. n_consumable_slots .. "` slots")
+        return
+    end
+
+    local consumable_n = self.shared_consumables[new_consumable]
+    if consumable_n == nil then
+        rt.error("In mn.InventoryState:equip_consumable: trying to consumable consumable `" .. new_consumable:get_id() .. "` to entity `" .. entity:get_id() .. "`, but it is not present in shared inventory")
+        return
+    end
+
+    self.shared_consumables[new_consumable] = consumable_n - 1
+
+    local in_slot = self.active.entities[entity].consumables[consumable_slot_i]
+    if in_slot ~= nil then
+        self:add_shared_consumable(in_slot)
+    end
+
+    self.active.entities[entity].consumables[consumable_slot_i] = new_consumable
+end
+
+--- @brief
+function mn.InventoryState:unequip_consumable(entity, consumable_slot_i)
+    if self.active.entities[entity] == nil then
+        rt.error("In mn.InventoryState:unequip_equip: trying to unequip consumable at `" .. consumable_slot_i .. "` from to entity `" .. entity:get_id() .. "`, but entity is not present in party")
+        return
+    end
+
+    local n_consumable_slots = self.active.entities[entity].n_consumable_slots
+    if consumable_slot_i > n_consumable_slots or consumable_slot_i < 0 then
+        rt.error("In mn.InventoryState:unequip_equip: trying to unequip equip at `" .. consumable_slot_i .. "` from to entity `" .. entity:get_id() .. "`, slot is out of bounds for an entity with `" .. entity:get_n_equip_slots() .. "` slots")
+        return
+    end
+
+    local in_slot = self.active.entities[entity].consumables[consumable_slot_i]
+    if in_slot == nil then return end
+
+    self:add_shared_consumable(in_slot)
+    self.active.entities[entity].consumables[consumable_slot_i] = nil
+end

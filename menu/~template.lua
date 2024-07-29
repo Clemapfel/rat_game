@@ -3,7 +3,7 @@ mn.Template = meta.new_type("MenuTemplate", function(name)
     meta.assert_string(name)
     return meta.new(mn.Template, {
         _name = name,
-        _entities = {}, -- Table<EntityID, {equips, consumables, moves}>
+        _entities = {}, -- Table<Entity, {equips, consumables, moves}>
     })
 end)
 
@@ -12,7 +12,7 @@ end)
 function mn.Template:create_from(entities)
     self._entities = {}
     for entity in values(entities) do
-        local id = entity:get_id()
+        local id = entity
 
         local moves = {}
         for move in values(entity:list_moves()) do
@@ -29,7 +29,7 @@ function mn.Template:create_from(entities)
             table.insert(equips, equip:get_id())
         end
 
-        self._entities[entity:get_id()] = {
+        self._entities[entity] = {
             moves = moves,
             consumables = consumables,
             equips = equips
@@ -38,11 +38,15 @@ function mn.Template:create_from(entities)
 end
 
 --- @brief
+function mn.Template:list_entities()
+    for id in keys(self._entities) d
+end
+
+--- @brief
 function mn.Template:list_equips(entity)
     meta.assert_isa(entity, bt.Entity)
-    local entity_id = entity:get_id()
     local out = {}
-    for id in values(self._entities[entity_id].equips) do
+    for id in values(self._entities[entity].equips) do
         table.insert(out, bt.Equip(id))
     end
     return out
@@ -51,9 +55,8 @@ end
 --- @brief
 function mn.Template:list_consumables(entity)
     meta.assert_isa(entity, bt.Entity)
-    local entity_id = entity:get_id()
     local out = {}
-    for id in values(self._entities[entity_id].consumables) do
+    for id in values(self._entities[entity].consumables) do
         table.insert(out, bt.Consumable(id))
     end
     return out
@@ -62,9 +65,8 @@ end
 --- @brief
 function mn.Template:list_moves(entity)
     meta.assert_isa(entity, bt.Entity)
-    local entity_id = entity:get_id()
     local out = {}
-    for id in values(self._entities[entity_id].moves) do
+    for id in values(self._entities[entity].moves) do
         table.insert(out, bt.Move(id))
     end
     return out
@@ -72,5 +74,5 @@ end
 
 --- @brief
 function mn.Template:has_entity(entity)
-    return self._entities[entity:get_id()] ~= nil
+    return self._entities[entity] ~= nil
 end
