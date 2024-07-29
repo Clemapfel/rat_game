@@ -22,11 +22,10 @@
     </configurations>
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="7fa9ba1b-2cff-4ecc-86fb-59ab2fa76ee1" name="Changes" comment="added sdf meatball compute shader">
+    <list default="true" id="7fa9ba1b-2cff-4ecc-86fb-59ab2fa76ee1" name="Changes" comment="hello world working">
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/battle/backgrounds/sdf_meatballs.lua" beforeDir="false" afterPath="$PROJECT_DIR$/battle/backgrounds/sdf_meatballs.lua" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/battle/backgrounds/sdf_meatballs_compute.glsl" beforeDir="false" afterPath="$PROJECT_DIR$/battle/backgrounds/sdf_meatballs_compute.glsl" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/battle/backgrounds/sdf_meatballs_render.glsl" beforeDir="false" afterPath="$PROJECT_DIR$/battle/backgrounds/sdf_meatballs_render.glsl" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -466,15 +465,7 @@
       <workItem from="1722013848502" duration="10737000" />
       <workItem from="1722100982820" duration="18765000" />
       <workItem from="1722194976289" duration="882000" />
-      <workItem from="1722213965868" duration="2253000" />
-    </task>
-    <task id="LOCAL-00854" summary="stashing before refactoring equip / consumable slot system">
-      <option name="closed" value="true" />
-      <created>1719681378054</created>
-      <option name="number" value="00854" />
-      <option name="presentableId" value="LOCAL-00854" />
-      <option name="project" value="LOCAL" />
-      <updated>1719681378054</updated>
+      <workItem from="1722213965868" duration="6133000" />
     </task>
     <task id="LOCAL-00855" summary="refactored entity">
       <option name="closed" value="true" />
@@ -860,7 +851,15 @@
       <option name="project" value="LOCAL" />
       <updated>1722214830303</updated>
     </task>
-    <option name="localTasksCounter" value="903" />
+    <task id="LOCAL-00903" summary="hello world working">
+      <option name="closed" value="true" />
+      <created>1722216439105</created>
+      <option name="number" value="00903" />
+      <option name="presentableId" value="LOCAL-00903" />
+      <option name="project" value="LOCAL" />
+      <updated>1722216439106</updated>
+    </task>
+    <option name="localTasksCounter" value="904" />
     <servers />
   </component>
   <component name="TypeScriptGeneratedFilesManager">
@@ -909,7 +908,6 @@
     </option>
   </component>
   <component name="VcsManagerConfiguration">
-    <MESSAGE value="refactored selection state to be in common" />
     <MESSAGE value="added intrinsic category" />
     <MESSAGE value="added A interaction" />
     <MESSAGE value="reworked slots and entity info formatting" />
@@ -934,7 +932,8 @@
     <MESSAGE value="added keyboard" />
     <MESSAGE value="load from template done" />
     <MESSAGE value="added sdf meatball compute shader" />
-    <option name="LAST_COMMIT_MESSAGE" value="added sdf meatball compute shader" />
+    <MESSAGE value="hello world working" />
+    <option name="LAST_COMMIT_MESSAGE" value="hello world working" />
   </component>
   <component name="XDebuggerManager">
     <breakpoint-manager>

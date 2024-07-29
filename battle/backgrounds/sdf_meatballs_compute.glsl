@@ -65,8 +65,73 @@ float simplex_noise(in vec3 v) {
     return 42.0 * dot(m * m, vec4(dot(p0, x0), dot(p1, x1), dot(p2, x2), dot(p3, x3)));
 }
 
-float sdf_circle(vec2 point, vec2 center,  float radius)  {
+vec2 translate_point_by_angle(vec2 xy, float dist, float angle)
+{
+    return xy + vec2(cos(angle), sin(angle)) * dist;
+}
+
+float sdf_circle(vec2 point, vec2 center,  float radius) {
     return length(point - center) - radius;
+}
+
+float msign(in float x) { return (x<0.0)?-1.0:1.0; }
+float sdf_ellipse( vec2 p, vec2 center, in vec2 ab )
+{
+    //if( ab.x==ab.y ) return length(p)-ab.x;
+
+    p = p - center;
+    p = abs( p );
+    if( p.x>p.y ){ p=p.yx; ab=ab.yx; }
+
+    float l = ab.y*ab.y - ab.x*ab.x;
+
+    float m = ab.x*p.x/l;
+    float n = ab.y*p.y/l;
+    float m2 = m*m;
+    float n2 = n*n;
+
+    float c = (m2+n2-1.0)/3.0;
+    float c3 = c*c*c;
+
+    float d = c3 + m2*n2;
+    float q = d  + m2*n2;
+    float g = m  + m *n2;
+
+    float co;
+
+    if( d<0.0 )
+    {
+        float h = acos(q/c3)/3.0;
+        float s = cos(h) + 2.0;
+        float t = sin(h) * sqrt(3.0);
+        float rx = sqrt( m2-c*(s+t) );
+        float ry = sqrt( m2-c*(s-t) );
+        co = ry + sign(l)*rx + abs(g)/(rx*ry);
+    }
+    else
+    {
+        float h = 2.0*m*n*sqrt(d);
+        float s = msign(q+h)*pow( abs(q+h), 1.0/3.0 );
+        float t = msign(q-h)*pow( abs(q-h), 1.0/3.0 );
+        float rx = -(s+t) - c*4.0 + 2.0*m2;
+        float ry =  (s-t)*sqrt(3.0);
+        float rm = sqrt( rx*rx + ry*ry );
+        co = ry/sqrt(rm-rx) + 2.0*g/rm;
+    }
+    co = (co-m)/2.0;
+
+    float si = sqrt( max(1.0-co*co,0.0) );
+
+    vec2 r = ab * vec2(co,si);
+
+    return length(r-p) * msign(p.y-r.y);
+}
+
+float sdf_rectangle(vec2 point, vec2 center, vec2 size) {
+    vec2 p = abs(point - center) - size / 2.0;
+    vec2 distance_outside = max(p, vec2(0.0));
+    float distance_inside = min(max(p.x, p.y), 0.0);
+    return length(distance_outside) + distance_inside;
 }
 
 float smooth_min(float a, float b, float smoothness) {
@@ -82,13 +147,17 @@ float smooth_max(float a, float b, float smoothness) {
 // ###
 
 layout(r32f) uniform image2D sdf_out;
+
+layout(rgba32f) uniform image2D circles;
+uniform int n_circles;
+
 uniform vec2 resolution;
 uniform float elapsed;
 
 layout (local_size_x = 1, local_size_y = 1, local_size_z = 1) in;
 void computemain()
 {
-    ivec2 size = imageSize(sdf_out);
+    ivec2 size = ivec2(resolution.x, resolution.y);
     int x = int(gl_GlobalInvocationID.x);
     int y = int(gl_GlobalInvocationID.y);
     int width = size.x;
@@ -97,12 +166,34 @@ void computemain()
     vec2 pos = (vec2(x, y) / resolution);
     pos.x *= resolution.x / resolution.y;
 
-    float signed_distance = 0;
-    float x_offset = sin(elapsed) * 0.25;
-    float c1 = sdf_circle(pos, vec2(0.5, 0.5), 0.1);
-    float c2 = sdf_circle(pos, vec2(0.5 + x_offset, 0.5), 0.05);
+    const float smoothness = 0.05;
 
-    signed_distance = smooth_min(c1, c2, 0.05);
+    /*
+    float circle_distance = 0;
+    for (int i = 1; i <= n_circles; ++i)
+    {
+        vec4 circle = imageLoad(circles, ivec2(i, 1));
+        vec2 circle_position = circle.xy / resolution;
+        float radius = circle.z;
+        float angle = circle.w;
 
-    imageStore(sdf_out, ivec2(x, y), vec4(signed_distance));
+        circle_position = translate_point_by_angle(circle_position, elapsed * radius, angle);
+        circle_position = mod(circle_position, vec2(1, 1));
+        circle_distance = smooth_min(circle_distance, sdf_circle(pos, circle_position, radius), smoothness);
+    }
+    */
+
+    float circle_distance = 0;
+    float x_offset = sin(elapsed) * 0.2;
+    float c1 = sdf_ellipse(pos, vec2(0.5), vec2(clamp(abs(sin(elapsed) * 0.2), 0.1, 1), clamp(abs(cos(elapsed) * 0.2), 0.1, 1)));
+    //float c1 = sdf_circle(pos, vec2(0.5), clamp(abs(sin(elapsed) * 0.2), 0.1, 1));
+    float c2 = sdf_circle(pos, translate_point_by_angle(vec2(0.5), x_offset, sin(elapsed / 2) * 2 * PI), 0.05);
+    float c3 = sdf_circle(pos, translate_point_by_angle(vec2(0.5), x_offset, -cos(elapsed / 2) * 2 * PI), 0.05);;
+    float c4 = sdf_circle(pos, translate_point_by_angle(vec2(0.5), x_offset, -cos(elapsed / 2) * 2 * PI + PI / 2), 0.05);;
+
+    circle_distance = smooth_min(c1, c2, smoothness);
+    circle_distance = smooth_min(circle_distance, c3, smoothness);
+    circle_distance = smooth_min(circle_distance, c4, smoothness);
+
+    imageStore(sdf_out, ivec2(x, y), vec4(circle_distance));
 }
