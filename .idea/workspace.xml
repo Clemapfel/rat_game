@@ -22,7 +22,7 @@
     </configurations>
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="7fa9ba1b-2cff-4ecc-86fb-59ab2fa76ee1" name="Changes" comment="hello world working">
+    <list default="true" id="7fa9ba1b-2cff-4ecc-86fb-59ab2fa76ee1" name="Changes" comment="stashing sdf">
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/battle/backgrounds/sdf_meatballs.lua" beforeDir="false" afterPath="$PROJECT_DIR$/battle/backgrounds/sdf_meatballs.lua" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/battle/backgrounds/sdf_meatballs_compute.glsl" beforeDir="false" afterPath="$PROJECT_DIR$/battle/backgrounds/sdf_meatballs_compute.glsl" afterDir="false" />
@@ -465,15 +465,8 @@
       <workItem from="1722013848502" duration="10737000" />
       <workItem from="1722100982820" duration="18765000" />
       <workItem from="1722194976289" duration="882000" />
-      <workItem from="1722213965868" duration="6133000" />
-    </task>
-    <task id="LOCAL-00855" summary="refactored entity">
-      <option name="closed" value="true" />
-      <created>1719685860858</created>
-      <option name="number" value="00855" />
-      <option name="presentableId" value="LOCAL-00855" />
-      <option name="project" value="LOCAL" />
-      <updated>1719685860858</updated>
+      <workItem from="1722213965868" duration="6180000" />
+      <workItem from="1722220329478" duration="91000" />
     </task>
     <task id="LOCAL-00856" summary="stashing menu layout">
       <option name="closed" value="true" />
@@ -859,7 +852,15 @@
       <option name="project" value="LOCAL" />
       <updated>1722216439106</updated>
     </task>
-    <option name="localTasksCounter" value="904" />
+    <task id="LOCAL-00904" summary="stashing sdf">
+      <option name="closed" value="true" />
+      <created>1722220158174</created>
+      <option name="number" value="00904" />
+      <option name="presentableId" value="LOCAL-00904" />
+      <option name="project" value="LOCAL" />
+      <updated>1722220158174</updated>
+    </task>
+    <option name="localTasksCounter" value="905" />
     <servers />
   </component>
   <component name="TypeScriptGeneratedFilesManager">
@@ -908,7 +909,6 @@
     </option>
   </component>
   <component name="VcsManagerConfiguration">
-    <MESSAGE value="added intrinsic category" />
     <MESSAGE value="added A interaction" />
     <MESSAGE value="reworked slots and entity info formatting" />
     <MESSAGE value="correctly handling control indicators now" />
@@ -933,7 +933,8 @@
     <MESSAGE value="load from template done" />
     <MESSAGE value="added sdf meatball compute shader" />
     <MESSAGE value="hello world working" />
-    <option name="LAST_COMMIT_MESSAGE" value="hello world working" />
+    <MESSAGE value="stashing sdf" />
+    <option name="LAST_COMMIT_MESSAGE" value="stashing sdf" />
   </component>
   <component name="XDebuggerManager">
     <breakpoint-manager>
