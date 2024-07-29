@@ -66,7 +66,7 @@ mn.Scene = meta.new_type("MenuScene", rt.Scene, function()
 
         _undo_grab = function() end,
 
-        _background = bt.Background.FOCUS_RACK_DOTS()
+        _background = bt.Background.SDF_MEATBALLS()
     })
 end, {
     _shared_move_tab_index = 1,
@@ -412,6 +412,7 @@ function mn.Scene:draw()
         self._background:draw()
     end
 
+    --[[
     self._inventory_header_frame:draw()
     self._inventory_header_label:draw()
 
@@ -441,6 +442,7 @@ function mn.Scene:draw()
         self._grabbed_object_sprite:draw()
         rt.graphics.translate(-self._grabbed_object_x, -self._grabbed_object_y)
     end
+    ]]--
 end
 
 function mn.Scene:_regenerate_selection_nodes()
