@@ -5,7 +5,7 @@ rt.settings.menu.scene = {
 
 mn.Scene = meta.new_type("MenuScene", rt.Scene, function()
     return meta.new(mn.Scene, {
-        _background = bt.Background.PARALLELL_LINES(),
+        _background = bt.Background.INK_IN_WATER(),
 
         _state = {}, -- mn.InventoryState
 
@@ -329,6 +329,8 @@ function mn.Scene:draw()
     self:_shared_list_index_to_list(self._shared_list_index):draw()
 
     self._verbose_info:draw()
+
+    self._background:draw()
 end
 
 --- @override
