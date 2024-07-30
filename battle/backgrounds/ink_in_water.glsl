@@ -81,6 +81,23 @@ vec3 hsv_to_rgb(vec3 c)
     return c.z * mix(K.xxx, clamp(p - K.xxx, 0.0, 1.0), c.y);
 }
 
+float square_wave_sin(float x) {
+    float smoothness = 100.0;
+    return atan(smoothness * sin(2.0 * PI * x)) / PI + 0.5;
+}
+
+float square_wave_cos(float x) {
+    float smoothness = 100.0;
+    return atan(smoothness * cos(2.0 * PI * x)) / PI + 0.5;
+}
+
+
+float triangle_wave(float x)
+{
+    float pi = 2 * (335 / 113); // 2 * pi
+    return 4 * abs((x / pi) + 0.25 - floor((x / pi) + 0.75)) - 1;
+}
+
 #ifdef PIXEL
 
 uniform float elapsed;
@@ -88,30 +105,34 @@ uniform float elapsed;
 vec4 effect(vec4 vertex_color, Image image, vec2 texture_coords, vec2 vertex_position)
 {
     // src: https://www.shadertoy.com/view/4td3RN
-    vec2 uv = vertex_position / love_ScreenSize.xy;
+    vec2 uv = (vertex_position / love_ScreenSize.xy);
+    float x_normalization = love_ScreenSize.x / love_ScreenSize.y;
 
+    uv.x = uv.x * x_normalization;
+    uv.x += 0.5 * x_normalization;
+    float time = elapsed / 8;
+
+    uv.x += time / 4;
     uv *= 2;
-    uv.x *= love_ScreenSize.x / love_ScreenSize.y;
 
-    float time = elapsed / 2;
-
-    const int n_steps = 75;
-    float frequency = 0.3; // "fractalness"
+    const float n_steps = 75;
+    float frequency = 0.4;
 
     for(int i = 1; i < n_steps; i++)
     {
-        uv.x += frequency / i * cos(i * uv.y) + 0.5 * i;
-        uv.y += frequency / i * sin(i * uv.x) - 0.5 * i;
+        uv.x += frequency / i * square_wave_cos(i * uv.y + time) + 0.5 * i;
+        uv.y += frequency / i * square_wave_sin(i * uv.x + time) - 0.5 * i;
     }
 
-    float x_bias = cos(uv.x + time);
-    float y_bias = sin(uv.y + time);
-    vec3 col_a = vec3(0, 0, 0);
-    vec3 col_b = vec3(1, 1, 1);
-    vec3 col = ((col_a * col_a) * x_bias + (col_b * col_b) * (1. - y_bias)) / (x_bias + y_bias);
-    col = sqrt(col);
-
-    return vec4(vec3(length(col) > 0.5 ? 1: 0), 1.0);
+    float x_bias = sin(uv.x);
+    float y_bias = cos(uv.y);
+    vec3 col_a = vec3(simplex_noise(uv.yyx), simplex_noise(uv.xxy), simplex_noise(uv.yxy));
+    vec3 col_b = vec3(simplex_noise(uv.xyx), simplex_noise(uv.xyy), simplex_noise(uv.yxx));
+    vec3 col = ((col_a * col_a) * x_bias + (col_b * col_b) * (1. - x_bias)) / 2;
+    col = fract(sqrt(col));
+    col *= 1.1;
+    return vec4(vec3(col), 1);
+    //return vec4(vec3(length(col) > 0.5 ? 1: 0), 1.0);
 }
 
 #endif
