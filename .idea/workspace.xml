@@ -22,14 +22,14 @@
     </configurations>
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="7fa9ba1b-2cff-4ecc-86fb-59ab2fa76ee1" name="Changes" comment="imported scene">
+    <list default="true" id="7fa9ba1b-2cff-4ecc-86fb-59ab2fa76ee1" name="Changes" comment="stashing">
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/menu/inventory_state.lua" beforeDir="false" afterPath="$PROJECT_DIR$/menu/inventory_state.lua" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/assets/sprites/controller_buttons.lua" beforeDir="false" afterPath="$PROJECT_DIR$/assets/sprites/controller_buttons.lua" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/assets/sprites/controller_buttons.png" beforeDir="false" afterPath="$PROJECT_DIR$/assets/sprites/controller_buttons.png" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/assets/sprites/controller_buttons.pxo" beforeDir="false" afterPath="$PROJECT_DIR$/assets/sprites/controller_buttons.pxo" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/common/control_indicator.lua" beforeDir="false" afterPath="$PROJECT_DIR$/common/control_indicator.lua" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/menu/scene.lua" beforeDir="false" afterPath="$PROJECT_DIR$/menu/scene.lua" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/menu/scrollable_list.lua" beforeDir="false" afterPath="$PROJECT_DIR$/menu/scrollable_list.lua" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/menu/selection_graph.lua" beforeDir="false" afterPath="$PROJECT_DIR$/menu/selection_graph.lua" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/menu/slots.lua" beforeDir="false" afterPath="$PROJECT_DIR$/menu/slots.lua" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/menu/verbose_info_panel_item.lua" beforeDir="false" afterPath="$PROJECT_DIR$/menu/verbose_info_panel_item.lua" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/menu/verbose_info_panel.lua" beforeDir="false" afterPath="$PROJECT_DIR$/menu/verbose_info_panel.lua" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -470,15 +470,7 @@
       <workItem from="1722100982820" duration="18765000" />
       <workItem from="1722194976289" duration="882000" />
       <workItem from="1722213965868" duration="6180000" />
-      <workItem from="1722220329478" duration="27471000" />
-    </task>
-    <task id="LOCAL-00860" summary="added scrollable list initialization">
-      <option name="closed" value="true" />
-      <created>1720204445394</created>
-      <option name="number" value="00860" />
-      <option name="presentableId" value="LOCAL-00860" />
-      <option name="project" value="LOCAL" />
-      <updated>1720204445394</updated>
+      <workItem from="1722220329478" duration="29838000" />
     </task>
     <task id="LOCAL-00861" summary="refactored selection graph">
       <option name="closed" value="true" />
@@ -864,7 +856,15 @@
       <option name="project" value="LOCAL" />
       <updated>1722352472737</updated>
     </task>
-    <option name="localTasksCounter" value="909" />
+    <task id="LOCAL-00909" summary="stashing">
+      <option name="closed" value="true" />
+      <created>1722359959079</created>
+      <option name="number" value="00909" />
+      <option name="presentableId" value="LOCAL-00909" />
+      <option name="project" value="LOCAL" />
+      <updated>1722359959079</updated>
+    </task>
+    <option name="localTasksCounter" value="910" />
     <servers />
   </component>
   <component name="TypeScriptGeneratedFilesManager">
@@ -920,7 +920,6 @@
     <MESSAGE value="verbose info panel mwe working" />
     <MESSAGE value="added equip tooltip" />
     <MESSAGE value="added background to menu" />
-    <MESSAGE value="stashing" />
     <MESSAGE value="added move info" />
     <MESSAGE value="added focus rack" />
     <MESSAGE value="equip and move panels done" />
@@ -938,7 +937,8 @@
     <MESSAGE value="inventory state working" />
     <MESSAGE value="stashing color mixing" />
     <MESSAGE value="imported scene" />
-    <option name="LAST_COMMIT_MESSAGE" value="imported scene" />
+    <MESSAGE value="stashing" />
+    <option name="LAST_COMMIT_MESSAGE" value="stashing" />
   </component>
   <component name="XDebuggerManager">
     <breakpoint-manager>

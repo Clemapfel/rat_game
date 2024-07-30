@@ -36,6 +36,7 @@ rt.ControlIndicatorButton = meta.new_enum({
     SELECT = "SELECT",
     L = "L",
     R = "R",
+    L_R = "L_R",
     LEFT_RIGHT = "LEFT_RIGHT",
     UP_DOWN = "UP_DOWN",
     ALL_DIRECTIONS = "ALL_DIRECTIONS",
@@ -82,8 +83,9 @@ function rt.ControlIndicator:size_allocate(x, y, width, height)
     x, y = 0, 0
 
     local m = rt.settings.margin_unit * 0.5
+
     local sprite_scale = rt.settings.control_indicator.sprite_scale
-    local current_x, current_y = x + m, y + m
+    local current_x, current_y = x + 2 * m, y + m
     local max_x, max_y = NEGATIVE_INFINITY, NEGATIVE_INFINITY
     for i = 1, #self._labels do
         local sprite, label = self._sprites[i], self._labels[i]
@@ -108,7 +110,7 @@ function rt.ControlIndicator:size_allocate(x, y, width, height)
     max_y = clamp(max_y, 0)
 
     local thickness = self._frame:get_thickness()
-    self._final_width = max_x - x + 2 * thickness
+    self._final_width = max_x - x + 2 * thickness + m
     self._final_height = max_y - y + 2 * thickness
 
     self._frame:fit_into(x, y, self._final_width, self._final_height)

@@ -1,5 +1,6 @@
 rt.settings.menu.scene = {
-    tab_sprite_scale_factor = 3
+    tab_sprite_scale_factor = 3,
+    verbose_info_scroll_speed = 150
 }
 
 mn.Scene = meta.new_type("MenuScene", rt.Scene, function()
@@ -335,6 +336,19 @@ function mn.Scene:update(delta)
     if self._background ~= nil then
         self._background:update(delta)
     end
+
+    local speed = rt.settings.menu.scene.verbose_info_scroll_speed
+    if self._input_controller:is_down(rt.InputButton.L) then
+        if self._verbose_info:can_scroll_down() then
+            self._verbose_info:advance_scroll(delta * speed)
+        end
+    end
+
+    if self._input_controller:is_down(rt.InputButton.R) then
+        if self._verbose_info:can_scroll_up() then
+            self._verbose_info:advance_scroll(delta * speed * -1)
+        end
+    end
 end
 
 --- @brief
@@ -615,8 +629,8 @@ function mn.Scene:_regenerate_selection_nodes()
     for entity_i, node in ipairs(entity_tab_nodes) do
         node:set_on_enter(function()
             scene._entity_tab_bar:set_tab_selected(entity_i, true)
-            scene:_set_control_indicator_layout(entity_tab_control)
             scene:_set_verbose_info_object(nil) -- TODO: character info
+            scene:_set_control_indicator_layout(entity_tab_control)
         end)
 
         node:set_on_exit(function()
@@ -631,8 +645,8 @@ function mn.Scene:_regenerate_selection_nodes()
     for page_i, page in ipairs(entity_page_nodes) do
         page.info_node:set_on_enter(function()
             scene._entity_pages[page_i].info:set_selection_state(rt.SelectionState.ACTIVE)
-            scene:_set_control_indicator_layout(entity_info_control)
             scene:_set_verbose_info_object("hp", "attack", "defense", "speed")
+            scene:_set_control_indicator_layout(entity_info_control)
         end)
 
         page.info_node:set_on_exit(function()
@@ -641,8 +655,6 @@ function mn.Scene:_regenerate_selection_nodes()
 
         for node_i, node in ipairs(page.move_nodes) do
             node:set_on_enter(function()
-                scene:_set_control_indicator_layout(move_node_control)
-
                 local page = scene._entity_pages[page_i]
                 local slots = page.moves
                 slots:set_selection_state(rt.SelectionState.ACTIVE)
@@ -654,6 +666,8 @@ function mn.Scene:_regenerate_selection_nodes()
                 else
                     scene:_set_verbose_info_object(object)
                 end
+
+                scene:_set_control_indicator_layout(move_node_control)
             end)
 
             node:set_on_exit(function()
@@ -694,21 +708,21 @@ function mn.Scene:_regenerate_selection_nodes()
             node:set_on_enter(function()
                 local page = scene._entity_pages[page_i]
                 if node_i <= n_equips then
-                    scene:_set_control_indicator_layout(equip_node_control)
                     local object = scene._state:get_equip_at(page.entity, node_i)
                     if object == nil then
                         scene:_set_verbose_info_object("equip")
                     else
                         scene:_set_verbose_info_object(object)
                     end
+                    scene:_set_control_indicator_layout(equip_node_control)
                 else
-                    scene:_set_control_indicator_layout(consumable_node_control)
                     local object = scene._state:get_consumable_at(page.entity, node_i - n_equips)
                     if object == nil then
                         scene:_set_verbose_info_object("consumable")
                     else
                         scene:_set_verbose_info_object(object)
                     end
+                    scene:_set_control_indicator_layout(consumable_node_control)
                 end
 
                 local slots = page.equips_and_consumables
@@ -751,27 +765,27 @@ function mn.Scene:_regenerate_selection_nodes()
     end
 
     shared_move_node:set_on_enter(function()
-        scene:_set_control_indicator_layout(shared_move_control)
         scene._shared_list_frame:set_selection_state(rt.SelectionState.ACTIVE)
         scene:_set_verbose_info_object(scene._shared_move_list:get_selected_object())
+        scene:_set_control_indicator_layout(shared_move_control)
     end)
 
     shared_consumable_node:set_on_enter(function()
-        scene:_set_control_indicator_layout(shared_consumable_control)
         scene._shared_list_frame:set_selection_state(rt.SelectionState.ACTIVE)
         scene:_set_verbose_info_object(scene._shared_consumable_list:get_selected_object())
+        scene:_set_control_indicator_layout(shared_consumable_control)
     end)
 
     shared_equip_node:set_on_enter(function()
-        scene:_set_control_indicator_layout(shared_equip_control)
         scene._shared_list_frame:set_selection_state(rt.SelectionState.ACTIVE)
         scene:_set_verbose_info_object(scene._shared_equip_list:get_selected_object())
+        scene:_set_control_indicator_layout(shared_equip_control)
     end)
 
     shared_template_node:set_on_enter(function()
-        scene:_set_control_indicator_layout(shared_template_control)
         scene._shared_list_frame:set_selection_state(rt.SelectionState.ACTIVE)
         scene:_set_verbose_info_object(scene._shared_template_list:get_selected_object())
+        scene:_set_control_indicator_layout(shared_template_control)
     end)
 
     for node in values(shared_list_nodes) do
@@ -794,7 +808,6 @@ function mn.Scene:_regenerate_selection_nodes()
 
     for tab_i, node in ipairs(shared_tab_nodes) do
         node:set_on_enter(function()
-            scene:_set_control_indicator_layout(shared_tab_control)
             scene._shared_tab_bar:set_tab_selected(tab_i, true)
 
             if tab_i == scene._shared_move_list_index then
@@ -806,6 +819,7 @@ function mn.Scene:_regenerate_selection_nodes()
             elseif tab_i == scene._shared_template_list_index then
                 scene:_set_verbose_info_object("template")
             end
+            scene:_set_control_indicator_layout(shared_tab_control)
         end)
 
         node:set_on_exit(function()
@@ -872,6 +886,10 @@ function mn.Scene:_set_control_indicator_layout(layout)
         table.insert(final_layout, x)
     end
 
+    if self._verbose_info:can_scroll_up() or self._verbose_info:can_scroll_down() then
+        table.insert(final_layout, {rt.ControlIndicatorButton.L_R, "Scroll"})
+    end
+
     for x in values(shared_layout) do
         table.insert(final_layout, x)
     end
@@ -932,4 +950,4 @@ function mn.Scene:_set_verbose_info_object(...)
     self._verbose_info:show(self._grabbed_object, ...)
 end
 
-TODO: A, X, Y, visualize templates, smooth info scroll
+--TODO: A, X, Y, visualize templates, smooth info scroll

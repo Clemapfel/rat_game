@@ -17,7 +17,8 @@ return {
        ALL_DIRECTIONS = 12,
        L = 13,
        R = 14,
-       SELECT = 15,
-       START = 16
+       L_R = 15,
+       SELECT = 16,
+       START = 17
     }
 }

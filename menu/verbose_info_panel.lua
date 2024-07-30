@@ -10,6 +10,7 @@ mn.VerboseInfoPanel = meta.new_type("MenuVerboseInfoPanel", rt.Widget, function(
         _current_item_i = 0,
         _n_items = 0,
         _y_offset = 0,
+        _total_height = 0,
         _frame = rt.Frame(),
         _scroll_up_indicator = {}, -- rt.Polygon
         _scroll_up_indicator_outline = {}, -- rt.Polygon
@@ -73,6 +74,7 @@ function mn.VerboseInfoPanel:size_allocate(x, y, width, height)
     local current_x, current_y = x, y
     local total_height = 0
     local n_items = sizeof(self._items)
+    self._total_height = 0
     for i = 1, n_items do
         local item = self._items[i]
         item:fit_into(current_x, current_y, width, POSITIVE_INFINITY)
@@ -82,6 +84,8 @@ function mn.VerboseInfoPanel:size_allocate(x, y, width, height)
         item.aabb.height = h
         total_height = total_height + h
         current_y = current_y + h
+
+        self._total_height = self._total_height + h
     end
 
     local reverse_height = 0
@@ -91,20 +95,23 @@ function mn.VerboseInfoPanel:size_allocate(x, y, width, height)
         item.height_below = reverse_height
     end
 
-    self._scroll_up_indicator_visible = self:can_scroll_up()
-    self._scroll_down_indicator_visible = self:can_scroll_down()
+    self._y_offset = 0
+    self:_update_scroll_indicators()
 end
 
 --- @override
 function mn.VerboseInfoPanel:draw()
+
     self._frame:draw()
-    --self._frame:_bind_stencil()
+
+    self._frame:_bind_stencil()
     rt.graphics.translate(0, self._y_offset)
     for item in values(self._items) do
         item:draw()
     end
-    --self._frame:_unbind_stencil()
+    self._frame:_unbind_stencil()
     rt.graphics.translate(0, -self._y_offset)
+
 
     if self._scroll_up_indicator_visible then
         self._scroll_up_indicator:draw()
@@ -146,6 +153,12 @@ function mn.VerboseInfoPanel:set_selection_state(state)
     self._frame:set_selection_state(state)
 end
 
+--- @brief
+function mn.VerboseInfoPanel:_update_scroll_indicators()
+    self._scroll_up_indicator_visible = self:can_scroll_up()
+    self._scroll_down_indicator_visible = self:can_scroll_down()
+end
+
 --- @brief [internal]
 function mn.VerboseInfoPanel:_set_current_item(i)
     self._current_item_i = i
@@ -156,8 +169,7 @@ function mn.VerboseInfoPanel:_set_current_item(i)
         self._y_offset = -1 * self._items[self._current_item_i].height_above
     end
 
-    self._scroll_up_indicator_visible = self:can_scroll_up()
-    self._scroll_down_indicator_visible = self:can_scroll_down()
+    self:_update_scroll_indicators()
 end
 
 --- @brief
@@ -174,7 +186,10 @@ end
 
 --- @brief
 function mn.VerboseInfoPanel:can_scroll_up()
-    return self._current_item_i > 1
+    local last_item = self._items[#self._items]
+    if last_item == nil then return false end
+    dbg(self._y_offset, last_item:get_bounds().y - self._bounds.y, self._y_offset + last_item:get_bounds().y - self._bounds.y > 0)
+    return self._y_offset + last_item:get_bounds().y - self._bounds.y > 0
 end
 
 --- @brief
@@ -191,9 +206,15 @@ end
 
 --- @brief
 function mn.VerboseInfoPanel:can_scroll_down()
-    local current = self._items[self._current_item_i]
-    if current == nil then return false end
-    return self._current_item_i < self._n_items and current.height_below > self._bounds.height
+    return self._y_offset < 0
+end
+
+--- @brief
+function mn.VerboseInfoPanel:advance_scroll(delta)
+    if self._n_items == 0 then return end
+
+    self._y_offset = self._y_offset + delta
+    self:_update_scroll_indicators()
 end
 
 --[[
