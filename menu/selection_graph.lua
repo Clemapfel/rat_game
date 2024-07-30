@@ -82,6 +82,7 @@ function mn.SelectionGraph:set_current_node(node)
     end
 end
 
+
 --- @brief
 function mn.SelectionGraph:get_current_node_aabb()
     if self._current_node ~= nil then
@@ -89,6 +90,11 @@ function mn.SelectionGraph:get_current_node_aabb()
     else
         return rt.AABB(0, 0, 1, 1)
     end
+end
+
+--- @brief
+function mn.SelectionGraph:get_current_node()
+    return self._current_node
 end
 
 --- @brief
@@ -100,6 +106,13 @@ function mn.SelectionGraph:clear()
     end
     self._nodes = {}
     self._current_node = nil
+end
+
+--- @brief
+function mn.SelectionGraph:draw()
+    for node in keys(self._nodes) do
+        node:draw()
+    end
 end
 
 -- #############################

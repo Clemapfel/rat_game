@@ -35,6 +35,8 @@ function mn.VerboseInfoPanel.Item:create_from(object)
         self:create_from_move(object)
     elseif meta.isa(object, bt.Consumable) then
         self:create_from_consumable(object)
+    elseif meta.isa(object, mn.Template) then
+        self:create_from_template(object)
     else
         rt.error("In mn.VerboseInfoPanel.Item.create_from: unrecognized type `" .. meta.typeof(object) .. "`")
     end
@@ -217,7 +219,7 @@ function mn.VerboseInfoPanel.Item:create_from_equip(equip)
     self.size_allocate = function(self, x, y, width, height)
         local m, xm, ym = self._get_margin()
         local start_y = y + ym
-        local current_x, current_y = x + xm, start_y
+        local current_x, current_y = x + xm, start_y + ym
         local w = width - 2 * xm
 
         local sprite_w, sprite_h = self.sprite:measure()
@@ -471,6 +473,50 @@ function mn.VerboseInfoPanel.Item:create_from_consumable(consumable)
     end
 end
 
+
+--- @brief party info
+function mn.VerboseInfoPanel.Item:create_from_template(template)
+    self.object = nil
+    self._is_realized = true
+
+    local format_title = function(str)
+        return "<b><u>" .. str .. "</u></b>"
+    end
+
+    self.realize = function()
+        self._is_realized = true
+        self.frame:realize()
+
+        self.title_label = rt.Label(format_title("\"" .. template:get_name() .. "\""))
+        self.title_label:realize()
+        self.title_label:set_justify_mode(rt.JustifyMode.LEFT)
+
+        self.description_label = self._description("TODO")
+
+        self.content = {
+            self.title_label,
+            self.description_label
+        }
+    end
+
+    self.size_allocate = function(self, x, y, width, height)
+        local m, xm, ym = self._get_margin()
+        local start_y = y + ym
+        local current_x, current_y = x + xm, start_y
+        local w = width - 2 * xm
+
+        self.title_label:fit_into(current_x, current_y, w)
+        current_y = current_y + select(2, self.title_label:measure()) + m
+
+        self.description_label:fit_into(current_x, current_y, w)
+
+        current_y = current_y + select(2, self.description_label:measure()) + m
+        local total_height = current_y - start_y + 2 * ym
+        self.frame:fit_into(x, y, width, total_height)
+        self.final_height = total_height
+    end
+end
+
 --- @brief party info
 function mn.VerboseInfoPanel.Item:create_from_string(which)
     self.object = nil
@@ -489,6 +535,7 @@ function mn.VerboseInfoPanel.Item:create_from_string(which)
         ["consumable"] = format_title("Held Items") .. " \u{25CF}",
         ["equip"] = format_title("Gear") .. "  \u{2B23}",
         ["move"] = format_title("Moves") .. "  \u{25A0}",
+        ["template"] = format_title("Templates"),
 
         ["options"] = format_title("Options")
     }
@@ -502,6 +549,7 @@ function mn.VerboseInfoPanel.Item:create_from_string(which)
         ["consumable"] = "Consumable Description, TODO",
         ["equip"] = "Equip Description, TODO",
         ["move"] = "Move Description, TODO",
+        ["template"] = "Template Description, TODO",
 
         ["options"] = "Option Description, TODO"
     }
@@ -525,7 +573,7 @@ function mn.VerboseInfoPanel.Item:create_from_string(which)
     self.size_allocate = function(self, x, y, width, height)
         local m, xm, ym = self._get_margin()
         local start_y = y + ym
-        local current_x, current_y = x + xm, start_y
+        local current_x, current_y = x + xm, start_y + ym
         local w = width - 2 * xm
 
         self.title_label:fit_into(current_x, current_y, w)

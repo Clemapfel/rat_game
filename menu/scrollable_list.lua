@@ -396,7 +396,7 @@ function mn.ScrollableList:set_selected_i(i)
 end
 
 --- @brief
-function mn.ScrollableList:get_selected()
+function mn.ScrollableList:get_selected_object()
     if self._n_items == 0 then return nil end
     local item = self._items[self._sortings[self._current_sort_mode][self._selected_item_i].item_i]
     if item ~= nil then
@@ -450,7 +450,6 @@ function mn.ScrollableList:add(object, new_quantity)
         item.quantity = item.quantity + new_quantity
         mn.ScrollableList._update_item(item)
     else
-        dbg(meta.typeof(object))
         self:push({object, new_quantity})
         self:reformat()
     end

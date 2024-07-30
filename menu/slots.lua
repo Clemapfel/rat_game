@@ -269,6 +269,7 @@ function mn.Slots:set_object(slot_i, object)
     end
 end
 
+--[[
 --- @brief
 function mn.Slots:get_object(slot_i)
     if self._is_realized == false then
@@ -290,6 +291,7 @@ function mn.Slots:get_first_unoccupied_slot_i(type)
     end
     return nil
 end
+]]--
 
 --- @brief
 function mn.Slots:clear()

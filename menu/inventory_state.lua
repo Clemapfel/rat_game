@@ -426,6 +426,7 @@ function mn.InventoryState:unequip_consumable(entity, consumable_slot_i)
     self.active.entities[entity].consumables[consumable_slot_i] = nil
 end
 
+
 --- @brief
 function mn.InventoryState:list_entities()
     local out = {}
@@ -511,4 +512,42 @@ function mn.InventoryState:list_templates()
         table.insert(out, template)
     end
     return out
+end
+
+--- @brief
+function mn.InventoryState:get_n_entities()
+    return sizeof(self.active.entities)
+end
+
+--- @brief
+function mn.InventoryState:get_move_at(entity, move_slot_i)
+    meta.assert_isa(entity, bt.Entity)
+    local setup = self.active.entities[entity]
+    if setup == nil then return nil end
+    if move_slot_i > setup.n_move_slots then
+        rt.error("In mn.InventoryState:get_move_at: slot `" .. move_slot_i .. "` is out of bounds for an entity with `" .. setup.n_move_slots .. "` slots")
+    end
+    return setup.moves[move_slot_i]
+end
+
+--- @brief
+function mn.InventoryState:get_equip_at(entity, equip_slot_i)
+    meta.assert_isa(entity, bt.Entity)
+    local setup = self.active.entities[entity]
+    if setup == nil then return nil end
+    if equip_slot_i > setup.n_equip_slots then
+        rt.error("In mn.InventoryState:get_equip_at: slot `" .. equip_slot_i .. "` is out of bounds for an entity with `" .. setup.n_equip_slots .. "` slots")
+    end
+    return setup.equips[equip_slot_i]
+end
+
+--- @brief
+function mn.InventoryState:get_consumable_at(entity, consumable_slot_i)
+    meta.assert_isa(entity, bt.Entity)
+    local setup = self.active.entities[entity]
+    if setup == nil then return nil end
+    if consumable_slot_i > setup.n_consumable_slots then
+        rt.error("In mn.InventoryState:get_consumable_at: slot `" .. consumable_slot_i .. "` is out of bounds for an entity with `" .. setup.n_consumable_slots .. "` slots")
+    end
+    return setup.consumables[consumable_slot_i]
 end
