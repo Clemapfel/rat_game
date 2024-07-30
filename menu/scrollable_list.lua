@@ -50,7 +50,10 @@ end
 function mn.ScrollableList._realize_item(item)
     item.sprite:realize()
     item.name_label:realize()
-    item.quantity_label:realize()
+
+    if item.quantity_label ~= nil then
+        item.quantity_label:realize()
+    end
 
     for label in range(item.name_label, item.quantity_label) do
         label:set_justify_mode(rt.JustifyMode.LEFT)
@@ -195,17 +198,33 @@ function mn.ScrollableList:push(...)
     for pair in range(...) do
         local object = pair[1]
         local quantity = pair[2]
-        local to_insert = {
-            object = object,
-            quantity = quantity,
-            sprite = rt.Sprite(object:get_sprite_id()),
-            name_label = rt.Label(self._format_name_label(object:get_name()), self._label_font, self._label_font_mono),
-            quantity_label = rt.Label(self._format_quantity_label(quantity), self._label_font, self._label_font_mono),
-            unselected_base = rt.Rectangle(0, 0, 1, 1),
-            selected_base = rt.Rectangle(0, 0, 1, 1),
-            base_outline = rt.Rectangle(0, 0, 1, 1),
-            height = 0
-        }
+
+        local to_insert
+        if not meta.isa(object, mn.Template) then
+            to_insert = {
+                object = object,
+                quantity = quantity,
+                sprite = rt.Sprite(object:get_sprite_id()),
+                name_label = rt.Label(self._format_name_label(object:get_name()), self._label_font, self._label_font_mono),
+                quantity_label = rt.Label(self._format_quantity_label(quantity), self._label_font, self._label_font_mono),
+                unselected_base = rt.Rectangle(0, 0, 1, 1),
+                selected_base = rt.Rectangle(0, 0, 1, 1),
+                base_outline = rt.Rectangle(0, 0, 1, 1),
+                height = 0
+            }
+        else
+            to_insert = {
+                object = object,
+                quantity = 1,
+                sprite = rt.Sprite(object:get_sprite_id()),
+                name_label = rt.Label(self._format_name_label(object:get_name()), self._label_font, self._label_font_mono),
+                quantity_label = nil,
+                unselected_base = rt.Rectangle(0, 0, 1, 1),
+                selected_base = rt.Rectangle(0, 0, 1, 1),
+                base_outline = rt.Rectangle(0, 0, 1, 1),
+                height = 0
+            }
+        end
 
         if self._is_realized then
             self._realize_item(to_insert)
@@ -256,14 +275,15 @@ function mn.ScrollableList:size_allocate(x, y, width, height)
         local sprite_x = x + 0.5 * m
         item.sprite:fit_into(sprite_x, y, sprite_w, sprite_h)
 
-        local quantity_w, quantity_h = item.quantity_label:measure()
-        local quantity_x = x + item_w - quantity_w - m
-        item.quantity_label:fit_into(quantity_x, y + 0.5 * sprite_h - 0.5 * quantity_h, POSITIVE_INFINITY, quantity_h)
-
+        if item.quantity_label ~= nil then
+            local quantity_w, quantity_h = item.quantity_label:measure()
+            local quantity_x = x + item_w - quantity_w - m
+            item.quantity_label:fit_into(quantity_x, y + 0.5 * sprite_h - 0.5 * quantity_h, POSITIVE_INFINITY, quantity_h)
+        end
         local label_w, label_h = item.name_label:measure()
         item.name_label:fit_into(sprite_x + sprite_w + m, y + 0.5 * sprite_h - 0.5 * label_h, POSITIVE_INFINITY, label_h)
 
-        local base_h = math.max(sprite_h, label_h, quantity_h)
+        local base_h = math.max(sprite_h, label_h, label_h)
         for base in range(item.selected_base, item.unselected_base, item.base_outline) do
             base:resize(x, y, item_w, base_h)
         end
@@ -313,7 +333,10 @@ function mn.ScrollableList:draw()
 
         item.sprite:draw()
         item.name_label:draw()
-        item.quantity_label:draw()
+
+        if item.quantity_lable ~= nil then
+            item.quantity_label:draw()
+        end
     end
 
     rt.graphics.pop()
@@ -427,6 +450,7 @@ function mn.ScrollableList:add(object, new_quantity)
         item.quantity = item.quantity + new_quantity
         mn.ScrollableList._update_item(item)
     else
+        dbg(meta.typeof(object))
         self:push({object, new_quantity})
         self:reformat()
     end

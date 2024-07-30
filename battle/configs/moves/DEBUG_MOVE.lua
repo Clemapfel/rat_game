@@ -4,7 +4,7 @@ return {
     flavor_text = "if a move does nothing, is it even a move?",
 
     sprite_id = "orbs",
-    sprite_index = 1,
+    sprite_index = "default",
 
     animation_id = "",
 

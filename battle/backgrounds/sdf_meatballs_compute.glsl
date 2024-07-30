@@ -175,9 +175,11 @@ void computemain()
     vec3 circle_color = c1_hue * smoothstep(0.0, 1, c1) + c2_hue * smoothstep(0.0, 1, c2) + c3_hue * smoothstep(0.0, 1, c3) + c4_hue * smoothstep(0.0, 1, c4); // + c2_hue * (c1 step(0.0, c2)); // + c3_hue * step(0.0, c3) + c4_hue * step(0.0, c4)) / n;
     circle_color = circle_color / 2;
 
+    circle_color = abs(c2_hue * clamp(c2, 0, 1));
+
     vec3 as_hsv = rgb_to_hsv(circle_color);
     as_hsv.y = 1;
     as_hsv.z = 1;
 
-    imageStore(sdf_out, ivec2(x, y), vec4(hsv_to_rgb(as_hsv), circle_distance));
+    imageStore(sdf_out, ivec2(x, y), vec4(hsv_to_rgb(1, 0, circle_color), circle_color));
 }

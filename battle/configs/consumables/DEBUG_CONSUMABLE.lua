@@ -5,6 +5,7 @@ return {
 
     sprite_id = "battle/consumables",
     sprite_index = "DEBUG_CONSUMABLE",
+
     description = "Prints messages for every trigger payload",
     flavor_text = "Taste the debug",
 

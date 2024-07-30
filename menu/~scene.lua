@@ -50,7 +50,7 @@ mn.Scene = meta.new_type("MenuScene", rt.Scene, function()
 
         _entity_tab_bar = mn.TabBar(),
         _entity_pages = {}, -- Table<Number, {info, equips_and_consumables, moves}>
-        _current_entity_i = 3,
+        _entity_index = 3,
 
         _selection_graph = mn.SelectionGraph(),
         _shared_list_node_active = false,
@@ -342,7 +342,7 @@ function mn.Scene:size_allocate(x, y, width, height)
     local shared_tab_h = shared_tile_size
     self._shared_tab_bar:fit_into(current_x, current_y, shared_page_w, shared_tab_h)
 
-    local verbose_info_w = page_w --width - 2 * outer_margin - tab_w - 2 * m - page_w - 2 * m - shared_page_w - 2 * m
+    local verbose_info_w = page_w
     local verbose_info_h = shared_page_h
     local verbose_info_bounds = rt.AABB(
         current_x + m + shared_page_w + m,
@@ -412,7 +412,6 @@ function mn.Scene:draw()
         self._background:draw()
     end
 
-    --[[
     self._inventory_header_frame:draw()
     self._inventory_header_label:draw()
 
@@ -423,7 +422,7 @@ function mn.Scene:draw()
     self._shared_tab_bar:draw()
 
     self._entity_tab_bar:draw()
-    local current_page = self._entity_pages[self._current_entity_i]
+    local current_page = self._entity_pages[self._entity_index]
     if current_page ~= nil then
         current_page.moves:draw()
         current_page.equips_and_consumables:draw()
@@ -432,7 +431,7 @@ function mn.Scene:draw()
 
     self._shared_list_frame:draw()
     self._shared_tab_index_to_list[self._shared_tab_index]:draw()
-  
+
     self._verbose_info:draw()
 
     self._animation_queue:draw()
@@ -442,7 +441,6 @@ function mn.Scene:draw()
         self._grabbed_object_sprite:draw()
         rt.graphics.translate(-self._grabbed_object_x, -self._grabbed_object_y)
     end
-    ]]--
 end
 
 function mn.Scene:_regenerate_selection_nodes()
@@ -644,12 +642,12 @@ function mn.Scene:_regenerate_selection_nodes()
             )
         end
         entity_tab_node:set_right(function()
-            return nearest[scene._current_entity_i]
+            return nearest[scene._entity_index]
         end)
     end
 
     shared_tab_nodes[1]:set_left(function()
-        return entity_page_nodes[scene._current_entity_i].info_node
+        return entity_page_nodes[scene._entity_index].info_node
     end)
 
     shared_tab_nodes[#shared_tab_nodes]:set_right(function()
@@ -657,7 +655,7 @@ function mn.Scene:_regenerate_selection_nodes()
     end)
 
     local shared_list_left = function()
-        return entity_page_nodes[scene._current_entity_i].right_move_nodes[1]
+        return entity_page_nodes[scene._entity_index].right_move_nodes[1]
     end
 
     local shared_list_right = function()
@@ -834,7 +832,7 @@ function mn.Scene:_regenerate_selection_nodes()
                 slots:set_slot_selection_state(node_i, rt.SelectionState.ACTIVE)
                 scene._current_control_indicator = entity_page_control
 
-                scene:_set_grabbed_object_allowed(meta.isa(scene._grabbed_object, bt.Move) and not scene._state.entities[self._current_entity_i]:has_move(scene._grabbed_object))
+                scene:_set_grabbed_object_allowed(meta.isa(scene._grabbed_object, bt.Move) and not scene._state.entities[self._entity_index]:has_move(scene._grabbed_object))
 
                 local object = slots:get_object(node_i)
                 if object == nil then
@@ -874,8 +872,8 @@ function mn.Scene:_regenerate_selection_nodes()
 
                 -- update stat preview
                 if node_i <= n_equip_slots then
-                    local info = scene._entity_pages[scene._current_entity_i].info
-                    local entity = scene._state.entities[scene._current_entity_i]
+                    local info = scene._entity_pages[scene._entity_index].info
+                    local entity = scene._state.entities[scene._entity_index]
 
                     local new_hp, new_attack, new_defense, new_speed = entity:preview_equip(node_i, scene._grabbed_object)
                     local current_hp, current_attack, current_defense, current_speed = entity:get_hp_base(), entity:get_attack_base(), entity:get_defense_base(), entity:get_speed_base()
@@ -895,7 +893,7 @@ function mn.Scene:_regenerate_selection_nodes()
                 slots:set_selection_state(rt.SelectionState.INACTIVE)
                 slots:set_slot_selection_state(node_i, rt.SelectionState.INACTIVE)
 
-                local info = scene._entity_pages[scene._current_entity_i].info
+                local info = scene._entity_pages[scene._entity_index].info
                 info:set_preview_values(nil, nil, nil, nil)
             end)
         end
@@ -936,13 +934,13 @@ function mn.Scene:_regenerate_selection_nodes()
     for entity_i, page in ipairs(entity_page_nodes) do
         for node_i, node in ipairs(page.move_nodes) do
             node:set_on_x(function(self)
-                local current_page = scene._entity_pages[scene._current_entity_i]
+                local current_page = scene._entity_pages[scene._entity_index]
                 local object = current_page.moves:get_object(node_i)
                 if object == nil then return end
                 scene:set_current_shared_list_page(scene._shared_move_tab_index)
                 scene:_play_move_object_animation(object, self:get_aabb(), shared_list_aabb)
 
-                local page = scene._entity_pages[scene._current_entity_i]
+                local page = scene._entity_pages[scene._entity_index]
                 if page == nil then return end
                 local move = page.moves:get_object(node_i)
                 if move ~= nil then
@@ -950,14 +948,14 @@ function mn.Scene:_regenerate_selection_nodes()
                     scene._shared_move_list:add(move, 1)
                 end
 
-                scene._state.entities[scene._current_entity_i]:remove_move(move)
+                scene._state.entities[scene._entity_index]:remove_move(move)
             end)
 
             node:set_on_a(function(self)
-                local page = scene._entity_pages[scene._current_entity_i]
+                local page = scene._entity_pages[scene._entity_index]
                 local down = page.moves:get_object(node_i)
                 local up = scene._grabbed_object
-                local entity = scene._state.entities[scene._current_entity_i]
+                local entity = scene._state.entities[scene._entity_index]
 
                 if up ~= nil then
                     if not meta.isa(up, bt.Move) then
@@ -981,7 +979,7 @@ function mn.Scene:_regenerate_selection_nodes()
                     page.moves:set_object(node_i, nil)
                     entity:remove_move(down)
 
-                    local current_page_i = scene._current_entity_i
+                    local current_page_i = scene._entity_index
                     scene._undo_grab = function()
                         scene:set_current_entity_page(current_page_i)
                         scene:_play_move_object_animation(
@@ -1005,7 +1003,7 @@ function mn.Scene:_regenerate_selection_nodes()
                     entity:remove_move(down)
                     entity:add_move(up)
 
-                    local current_page_i = scene._current_entity_i
+                    local current_page_i = scene._entity_index
                     scene._undo_grab = function()
                         scene:set_current_entity_page(current_page_i)
 
@@ -1041,7 +1039,7 @@ function mn.Scene:_regenerate_selection_nodes()
             end)
 
             node:set_on_y(function(self)
-                scene._entity_pages[scene._current_entity_i].moves:sort()
+                scene._entity_pages[scene._entity_index].moves:sort()
             end)
         end
 
@@ -1051,13 +1049,13 @@ function mn.Scene:_regenerate_selection_nodes()
             local node_i = equip_i
             local node = page.slot_nodes[node_i]
             node:set_on_x(function(self)
-                local current_page = scene._entity_pages[scene._current_entity_i]
+                local current_page = scene._entity_pages[scene._entity_index]
                 local object = current_page.equips_and_consumables:get_object(node_i)
                 if object == nil then return end
                 scene:set_current_shared_list_page(scene._shared_equip_tab_index)
                 scene:_play_move_object_animation(object, self:get_aabb(), shared_list_aabb)
 
-                local page = scene._entity_pages[scene._current_entity_i]
+                local page = scene._entity_pages[scene._entity_index]
                 if page == nil then return end
                 local equip = page.equips_and_consumables:get_object(node_i)
                 if equip ~= nil then
@@ -1065,11 +1063,11 @@ function mn.Scene:_regenerate_selection_nodes()
                     scene._shared_equip_list:add(equip, 1)
                 end
 
-                scene._state.entities[scene._current_entity_i]:remove_equip(equip)
+                scene._state.entities[scene._entity_index]:remove_equip(equip)
             end)
 
             node:set_on_a(function(self)
-                local page = scene._entity_pages[scene._current_entity_i]
+                local page = scene._entity_pages[scene._entity_index]
                 local down = page.equips_and_consumables:get_object(node_i)
                 local up = scene._grabbed_object
 
@@ -1088,7 +1086,7 @@ function mn.Scene:_regenerate_selection_nodes()
                     page.equips_and_consumables:set_object(node_i, nil)
                     entity:remove_equip(down)
 
-                    local current_page_i = scene._current_entity_i
+                    local current_page_i = scene._entity_index
                     scene._undo_grab = function()
                         scene:set_current_entity_page(current_page_i)
                         scene:_play_move_object_animation(
@@ -1112,7 +1110,7 @@ function mn.Scene:_regenerate_selection_nodes()
                     entity:remove_equip(down)
                     entity:add_equip(up, node_i)
 
-                    local current_page_i = scene._current_entity_i
+                    local current_page_i = scene._entity_index
                     scene._undo_grab = function()
                         scene:set_current_entity_page(current_page_i)
 
@@ -1144,9 +1142,9 @@ function mn.Scene:_regenerate_selection_nodes()
                     end
                 end
 
-                scene:_update_entity_info(scene._current_entity_i)
-                local info = scene._entity_pages[scene._current_entity_i].info
-                local entity = scene._state.entities[scene._current_entity_i]
+                scene:_update_entity_info(scene._entity_index)
+                local info = scene._entity_pages[scene._entity_index].info
+                local entity = scene._state.entities[scene._entity_index]
 
                 local new_hp, new_attack, new_defense, new_speed = entity:preview_equip(node_i, scene._grabbed_object)
                 local current_hp, current_attack, current_defense, current_speed = entity:get_hp_base(), entity:get_attack_base(), entity:get_defense_base(), entity:get_speed_base()
@@ -1163,7 +1161,7 @@ function mn.Scene:_regenerate_selection_nodes()
             end)
 
             node:set_on_y(function(self)
-                scene._entity_pages[scene._current_entity_i].equips_and_consumables:sort()
+                scene._entity_pages[scene._entity_index].equips_and_consumables:sort()
             end)
         end
 
@@ -1171,13 +1169,13 @@ function mn.Scene:_regenerate_selection_nodes()
             local node_i = consumable_i + n_equips
             local node = page.slot_nodes[node_i]
             node:set_on_x(function(self)
-                local current_page = scene._entity_pages[scene._current_entity_i]
+                local current_page = scene._entity_pages[scene._entity_index]
                 local object = current_page.equips_and_consumables:get_object(node_i)
                 if object == nil then return end
                 scene:set_current_shared_list_page(scene._shared_consumable_tab_index)
                 scene:_play_move_object_animation(object, self:get_aabb(), shared_list_aabb)
 
-                local page = scene._entity_pages[scene._current_entity_i]
+                local page = scene._entity_pages[scene._entity_index]
                 if page == nil then return end
                 local consumable = page.equips_and_consumables:get_object(node_i)
                 if consumable ~= nil then
@@ -1185,11 +1183,11 @@ function mn.Scene:_regenerate_selection_nodes()
                     scene._shared_consumable_list:add(consumable, 1)
                 end
 
-                scene._state.entities[scene._current_entity_i]:remove_consumable(consumable)
+                scene._state.entities[scene._entity_index]:remove_consumable(consumable)
             end)
 
             node:set_on_a(function(self)
-                local page = scene._entity_pages[scene._current_entity_i]
+                local page = scene._entity_pages[scene._entity_index]
                 local down = page.equips_and_consumables:get_object(node_i)
                 local up = scene._grabbed_object
 
@@ -1208,7 +1206,7 @@ function mn.Scene:_regenerate_selection_nodes()
                     page.equips_and_consumables:set_object(node_i, nil)
                     entity:remove_consumable(down)
 
-                    local current_page_i = scene._current_entity_i
+                    local current_page_i = scene._entity_index
                     scene._undo_grab = function()
                         scene:set_current_entity_page(current_page_i)
                         scene:_play_move_object_animation(
@@ -1232,7 +1230,7 @@ function mn.Scene:_regenerate_selection_nodes()
                     entity:remove_consumable(down)
                     entity:add_consumable(up, consumable_i)
 
-                    local current_page_i = scene._current_entity_i
+                    local current_page_i = scene._entity_index
                     scene._undo_grab = function()
                         scene:set_current_entity_page(current_page_i)
 
@@ -1266,18 +1264,18 @@ function mn.Scene:_regenerate_selection_nodes()
             end)
 
             node:set_on_y(function(self)
-                scene._entity_pages[scene._current_entity_i].equips_and_consumables:sort()
+                scene._entity_pages[scene._entity_index].equips_and_consumables:sort()
             end)
         end
     end
 
     local shared_move_list_node = shared_list_nodes[self._shared_move_tab_index]
     shared_move_list_node:set_on_x(function()
-        local page = scene._entity_pages[scene._current_entity_i]
+        local page = scene._entity_pages[scene._entity_index]
         local unoccupied_slot_i = page.moves:get_first_unoccupied_slot_i(mn.SlotType.MOVE)
         if unoccupied_slot_i ~= nil then
             local to_insert = self._shared_move_list:get_selected()
-            local current_entity = self._state.entities[self._current_entity_i]
+            local current_entity = self._state.entities[self._entity_index]
             for move in values(current_entity:list_moves()) do
                 if move == to_insert then return end
             end
@@ -1327,11 +1325,11 @@ function mn.Scene:_regenerate_selection_nodes()
 
     local shared_equip_list_node = shared_list_nodes[self._shared_equip_tab_index]
     shared_equip_list_node:set_on_x(function()
-        local page = scene._entity_pages[scene._current_entity_i]
+        local page = scene._entity_pages[scene._entity_index]
         local unoccupied_slot_i = page.equips_and_consumables:get_first_unoccupied_slot_i(mn.SlotType.EQUIP)
         if unoccupied_slot_i ~= nil then
             local to_insert = self._shared_equip_list:get_selected()
-            local current_entity = self._state.entities[self._current_entity_i]
+            local current_entity = self._state.entities[self._entity_index]
             if to_insert == nil then return end
             scene._shared_equip_list:take(to_insert)
             local to = page.equips_and_consumables:get_slot_aabb(unoccupied_slot_i)
@@ -1378,11 +1376,11 @@ function mn.Scene:_regenerate_selection_nodes()
 
     local shared_consumable_list_node = shared_list_nodes[self._shared_consumable_tab_index]
     shared_consumable_list_node:set_on_x(function()
-        local page = scene._entity_pages[scene._current_entity_i]
+        local page = scene._entity_pages[scene._entity_index]
         local unoccupied_slot_i = page.equips_and_consumables:get_first_unoccupied_slot_i(mn.SlotType.CONSUMABLE)
         if unoccupied_slot_i ~= nil then
             local to_insert = self._shared_consumable_list:get_selected()
-            local current_entity = self._state.entities[self._current_entity_i]
+            local current_entity = self._state.entities[self._entity_index]
             if to_insert == nil then return end
             scene._shared_consumable_list:take(to_insert)
             local to = page.equips_and_consumables:get_slot_aabb(unoccupied_slot_i)
@@ -1454,7 +1452,7 @@ function mn.Scene:_regenerate_selection_nodes()
         end
     end
 
-    local current_node = entity_tab_nodes[self._current_entity_i]
+    local current_node = entity_tab_nodes[self._entity_index]
     if current_node ~= nil then
         self._selection_graph:set_current_node(current_node)
     end
@@ -1463,7 +1461,7 @@ end
 --- @brief
 function mn.Scene:_handle_button_pressed(which)
     if which == rt.InputButton.L then
-        local next = self._current_entity_i
+        local next = self._entity_index
         if next == 1 then
             next = self._n_entities
         else
@@ -1474,7 +1472,7 @@ function mn.Scene:_handle_button_pressed(which)
         self:_update_grabbed_object_position()
         return
     elseif which == rt.InputButton.R then
-        local next = self._current_entity_i
+        local next = self._entity_index
         if next >= self._n_entities then
             next = 1
         else
@@ -1540,7 +1538,7 @@ end
 --- @brief
 function mn.Scene:set_current_entity_page(i)
     if i < 1 or i > self._n_entities then return end
-    self._current_entity_i = i
+    self._entity_index = i
     for entity_i = 1, self._n_entities do
         self._entity_tab_bar:set_tab_active(entity_i, entity_i == i)
     end

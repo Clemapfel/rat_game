@@ -1,12 +1,7 @@
 require "include"
 
 state = mn.InventoryState()
-local s = state:serialize()
-state:deserialize(s)
-local s = state:serialize()
-state:deserialize(s)
 
-println(state:serialize())
 rt.current_scene = mn.Scene()
 scene = rt.current_scene
 

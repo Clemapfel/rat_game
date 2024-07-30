@@ -20,6 +20,7 @@ mn.Slots = meta.new_type("MenuSlots", rt.Widget, function(layout)
         _items = {},
         _n_slots = 0,
         _slot_i_to_item = {},
+        _pre_realize_items = {},
         _frame = rt.Frame(),
     })
 end)
@@ -210,6 +211,11 @@ function mn.Slots:size_allocate(x, y, width, height)
     end
 
     self._frame:fit_into(x, y, width, height)
+
+    for i = 1, self._n_slots do
+        self:set_object(i, self._pre_realize_items[i])
+    end
+    self._pre_realize_items = {}
 end
 
 --- @override
@@ -243,28 +249,35 @@ end
 
 --- @brief
 function mn.Slots:set_object(slot_i, object)
-    -- TODO: what if called before realize?
-    local item = self._slot_i_to_item[slot_i]
-    if item == nil then
-        rt.error("In mn.Slots:set_object: slot index `" .. slot_i .. "` is out of bounds for slots with `" .. sizeof(self._slot_i_to_item) .. "` many slots")
-    end
-
-    if object == nil then
-        item.sprite = nil
+    if self._is_realized == false then
+        self._pre_realize_items[slot_i] = object
     else
-        item.sprite = rt.Sprite(object:get_sprite_id())
-        item.sprite:realize()
-        item.sprite:fit_into(item.bounds)
-    end
+        local item = self._slot_i_to_item[slot_i]
+        if item == nil then
+            rt.error("In mn.Slots:set_object: slot index `" .. slot_i .. "` is out of bounds for slots with `" .. sizeof(self._slot_i_to_item) .. "` many slots")
+        end
 
-    item.object = object
+        if object == nil then
+            item.sprite = nil
+        else
+            item.sprite = rt.Sprite(object:get_sprite_id())
+            item.sprite:realize()
+            item.sprite:fit_into(item.bounds)
+        end
+
+        item.object = object
+    end
 end
 
 --- @brief
 function mn.Slots:get_object(slot_i)
-    local item = self._slot_i_to_item[slot_i]
-    if item == nil then return nil end
-    return item.object
+    if self._is_realized == false then
+        return self._pre_realize_items[slot_i]
+    else
+        local item = self._slot_i_to_item[slot_i]
+        if item == nil then return nil end
+        return item.object
+    end
 end
 
 --- @brief

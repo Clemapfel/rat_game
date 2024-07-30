@@ -2,7 +2,7 @@ return {
     name = "Test Equipment",
 
     sprite_id = "orbs",
-    sprite_index = 1,
+    sprite_index = "default",
 
     description = "Equipment used for debugging. Applies $DEBUG_STATUS at the start of the battle.",
     flavor_text = "If you read this, it means you have broken beyond the limits of this game, you are now god",

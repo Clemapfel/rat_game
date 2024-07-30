@@ -1,4 +1,5 @@
 mn.Template = meta.new_type("MenuTemplate", function(name)
+    meta.assert_string(name)
     return meta.new(mn.Template, {
         name = name,
         entities = {}
@@ -23,6 +24,17 @@ function mn.Template:create_from(...)
     end
 end
 
+--- @brief
+function mn.Template:get_sprite_id()
+    return "orbs", "generic_overlay"
+end
+
+--- @brie
+function mn.Template:get_name()
+    return self.name
+end
+
+
 --- @class mn.InventoryState
 mn.InventoryState = meta.new_type("MenuInventoryState", function()
     local self = meta.new(mn.InventoryState, {
@@ -30,7 +42,7 @@ mn.InventoryState = meta.new_type("MenuInventoryState", function()
         shared_consumables = {},    -- Table<bt.Consumable, Integer>
         shared_equips = {},         -- Table<bt.Equip, Integer>
         templates = {},             -- Table<mn.Template>
-        active = mn.Template()      -- mn.Template
+        active = mn.Template("Active Template")      -- mn.Template
     })
 
     -- setup debug
@@ -78,20 +90,18 @@ mn.InventoryState = meta.new_type("MenuInventoryState", function()
         bt.Entity("GIRL")
     }
 
-    local empty_template = mn.Template()
+    local empty_template = mn.Template("Empty Template")
     empty_template:create_from(table.unpack(entities))
     self:add_template(empty_template)
 
-    self.active = mn.Template()
+    self.active = mn.Template("Active Template")
     self.active:create_from(table.unpack(entities))
 
-    self:equip_equip(entities[1], bt.Equip("DEBUG_EQUIP"), 1)
-    self:equip_move(entities[1], bt.Move("DEBUG_MOVE"), 2)
-    self:equip_consumable(entities[1], bt.Consumable("DEBUG_CONSUMABLE"), 1)
-
-    self:unequip_equip(entities[1], 1)
-    self:unequip_move(entities[1], 2)
-    self:unequip_consumable(entities[1], 1)
+    for entity in values(entities) do
+        self:equip_move(entity, bt.Move("DEBUG_MOVE"), 1)
+        self:equip_equip(entity, bt.Equip("DEBUG_EQUIP"), 1)
+        self:equip_consumable(entity, bt.Consumable("DEBUG_CONSUMABLE"), 1)
+    end
     return self
 end)
 
@@ -414,4 +424,91 @@ function mn.InventoryState:unequip_consumable(entity, consumable_slot_i)
 
     self:add_shared_consumable(in_slot)
     self.active.entities[entity].consumables[consumable_slot_i] = nil
+end
+
+--- @brief
+function mn.InventoryState:list_entities()
+    local out = {}
+    for entity in keys(self.active.entities) do
+        table.insert(out, entity)
+    end
+    return out
+end
+
+--- @brief
+--- @return Number, Table
+function mn.InventoryState:list_move_slots(entity)
+    local setup = self.active.entities[entity]
+
+    local out = {}
+    local n = setup.n_move_slots
+    for i = 1, n do
+        table.insert(out, setup.moves[i])
+    end
+
+    return n, out
+end
+
+--- @brief
+--- @return Number, Table
+function mn.InventoryState:list_equip_slots(entity)
+    local setup = self.active.entities[entity]
+
+    local out = {}
+    local n = setup.n_equip_slots
+    for i = 1, n do
+        table.insert(out, setup.equips[i])
+    end
+
+    return n, out
+end
+
+--- @brief
+--- @return Number, Table
+function mn.InventoryState:list_consumable_slots(entity)
+    local setup = self.active.entities[entity]
+
+    local out = {}
+    local n = setup.n_consumable_slots
+    for i = 1, n do
+        table.insert(out, setup.consumables[i])
+    end
+
+    return n, out
+end
+
+--- @brief
+function mn.InventoryState:list_shared_moves()
+    local out = {}
+    for move, quantity in pairs(self.shared_moves) do
+        out[move] = quantity
+    end
+    return out
+end
+
+--- @brief
+function mn.InventoryState:list_shared_equips()
+    local out = {}
+    for equip, quantity in pairs(self.shared_equips) do
+        out[equip] = quantity
+    end
+    return out
+end
+
+--- @brief
+function mn.InventoryState:list_shared_consumables()
+    local out = {}
+    for consumable, quantity in pairs(self.shared_consumables) do
+        out[consumable] = quantity
+    end
+    return out
+end
+
+--- @brief
+function mn.InventoryState:list_templates()
+    local out = {}
+    for template in values(self.templates) do
+        table.insert(out, template)
+    end
+    return out
 end
