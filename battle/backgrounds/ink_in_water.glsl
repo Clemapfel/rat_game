@@ -91,11 +91,35 @@ float square_wave_cos(float x) {
     return atan(smoothness * cos(2.0 * PI * x)) / PI + 0.5;
 }
 
-
 float triangle_wave(float x)
 {
     float pi = 2 * (335 / 113); // 2 * pi
     return 4 * abs((x / pi) + 0.25 - floor((x / pi) + 0.75)) - 1;
+}
+
+float norm_sin(float x)
+{
+    return (sin(x) + 1) / 2;
+}
+
+vec3 oklch_to_rgb(vec3 lch)
+{
+    float theta = clamp(lch.z, 0, 1) * (2 * PI);
+    float l = lch.x;
+    float chroma = lch.y;
+    float a = chroma * cos(theta);
+    float b = chroma * sin(theta);
+    vec3 c = vec3(l, a, b);
+
+    const mat3 fwdA = mat3(1.0, 1.0, 1.0,
+                           0.3963377774, -0.1055613458, -0.0894841775,
+                           0.2158037573, -0.0638541728, -1.2914855480);
+
+    const mat3 fwdB = mat3(4.0767245293, -1.2681437731, -0.0041119885,
+                           -3.3072168827, 2.6093323231, -0.7034763098,
+                           0.2307590544, -0.3411344290,  1.7068625689);
+    vec3 lms = fwdA * c;
+    return fwdB * (lms * lms * lms);
 }
 
 #ifdef PIXEL
@@ -113,24 +137,23 @@ vec4 effect(vec4 vertex_color, Image image, vec2 texture_coords, vec2 vertex_pos
     float time = elapsed / 8;
 
     uv.x += time / 4;
+    uv -= 0.25;
     uv *= 2;
 
     const float n_steps = 75;
-    float frequency = 0.4;
+    float frequency = 0; //0.4;
 
     for(int i = 1; i < n_steps; i++)
     {
-        uv.x += frequency / i * square_wave_cos(i * uv.y + time) + 0.5 * i;
-        uv.y += frequency / i * square_wave_sin(i * uv.x + time) - 0.5 * i;
+        uv.x += frequency / i * cos(i * uv.y + time) + 0.5 * i;
+        uv.y += frequency / i * sin(i * uv.x + time) - 0.5 * i;
     }
 
     float x_bias = sin(uv.x);
     float y_bias = cos(uv.y);
-    vec3 col_a = vec3(simplex_noise(uv.yyx), simplex_noise(uv.xxy), simplex_noise(uv.yxy));
-    vec3 col_b = vec3(simplex_noise(uv.xyx), simplex_noise(uv.xyy), simplex_noise(uv.yxx));
-    vec3 col = ((col_a * col_a) * x_bias + (col_b * col_b) * (1. - x_bias)) / 2;
-    col = fract(sqrt(col));
-    col *= 1.1;
+
+    // 0.3 + (simplex_noise(vec3(x_bias, y_bias, 0)) * 2 - 1) * 0.5
+    vec3 col = oklch_to_rgb(vec3(0.8, 0.3, length((vec2(x_bias, y_bias)))));
     return vec4(vec3(col), 1);
     //return vec4(vec3(length(col) > 0.5 ? 1: 0), 1.0);
 }
