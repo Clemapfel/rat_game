@@ -91,16 +91,13 @@ float square_wave_cos(float x) {
     return atan(smoothness * cos(2.0 * PI * x)) / PI + 0.5;
 }
 
+
 float triangle_wave(float x)
 {
     float pi = 2 * (335 / 113); // 2 * pi
     return 4 * abs((x / pi) + 0.25 - floor((x / pi) + 0.75)) - 1;
 }
 
-float norm_sin(float x)
-{
-    return (sin(x) + 1) / 2;
-}
 
 vec3 oklch_to_rgb(vec3 lch)
 {
@@ -122,13 +119,72 @@ vec3 oklch_to_rgb(vec3 lch)
     return fwdB * (lms * lms * lms);
 }
 
+/// @brief worley noise
+/// @source adapted from https://github.com/patriciogonzalezvivo/lygia/blob/main/generative/worley.glsl
+float worley_noise(vec3 p) {
+    vec3 n = floor(p);
+    vec3 f = fract(p);
+
+    float dist = 1.0;
+    for (int k = -1; k <= 1; k++) {
+        for (int j = -1; j <= 1; j++) {
+            for (int i = -1; i <= 1; i++) {
+                vec3 g = vec3(i, j, k);
+
+                vec3 p = n + g;
+                p = fract(p * vec3(0.1031, 0.1030, 0.0973));
+                p += dot(p, p.yxz + 19.19);
+                vec3 o = fract((p.xxy + p.yzz) * p.zyx);
+
+                vec3 delta = g + o - f;
+                float d = length(delta);
+                dist = min(dist, d);
+            }
+        }
+    }
+
+    return 1 - dist;
+}
+
+vec3 lch_to_rgb(vec3 lch) {
+    // Scale the input values
+    float L = lch.x * 100.0;
+    float C = lch.y * 100.0;
+    float H = lch.z * 360.0;
+
+    // Convert LCH to LAB
+    float a = cos(radians(H)) * C;
+    float b = sin(radians(H)) * C;
+
+    // Convert LAB to XYZ
+    float Y = (L + 16.0) / 116.0;
+    float X = a / 500.0 + Y;
+    float Z = Y - b / 200.0;
+
+    X = 0.95047 * ((X * X * X > 0.008856) ? X * X * X : (X - 16.0 / 116.0) / 7.787);
+    Y = 1.00000 * ((Y * Y * Y > 0.008856) ? Y * Y * Y : (Y - 16.0 / 116.0) / 7.787);
+    Z = 1.08883 * ((Z * Z * Z > 0.008856) ? Z * Z * Z : (Z - 16.0 / 116.0) / 7.787);
+
+    // Convert XYZ to RGB
+    float R = X *  3.2406 + Y * -1.5372 + Z * -0.4986;
+    float G = X * -0.9689 + Y *  1.8758 + Z *  0.0415;
+    float B = X *  0.0557 + Y * -0.2040 + Z *  1.0570;
+
+    // Apply gamma correction
+    R = (R > 0.0031308) ? 1.055 * pow(R, 1.0 / 2.4) - 0.055 : 12.92 * R;
+    G = (G > 0.0031308) ? 1.055 * pow(G, 1.0 / 2.4) - 0.055 : 12.92 * G;
+    B = (B > 0.0031308) ? 1.055 * pow(B, 1.0 / 2.4) - 0.055 : 12.92 * B;
+
+    return vec3(clamp(R, 0.0, 1.0), clamp(G, 0.0, 1.0), clamp(B, 0.0, 1.0));
+}
+
 #ifdef PIXEL
 
 uniform float elapsed;
 
 vec4 effect(vec4 vertex_color, Image image, vec2 texture_coords, vec2 vertex_position)
 {
-    // src: https://www.shadertoy.com/view/4td3RN
+    // inspired by: https://www.shadertoy.com/view/4td3RN
     vec2 uv = (vertex_position / love_ScreenSize.xy);
     float x_normalization = love_ScreenSize.x / love_ScreenSize.y;
 
@@ -137,23 +193,24 @@ vec4 effect(vec4 vertex_color, Image image, vec2 texture_coords, vec2 vertex_pos
     float time = elapsed / 8;
 
     uv.x += time / 4;
-    uv -= 0.25;
-    uv *= 2;
+    uv.y += time / 2;
+    uv *= 1.5;
 
-    const float n_steps = 75;
-    float frequency = 0.0;
+    const float n_steps = 50;
+    float frequency = 0.25;
+    const float step_multiplier = 1.2;
 
     for(int i = 1; i < n_steps; i++)
     {
-        uv.x += frequency / i * sin(i * uv.y + time) + 0.5 * i;
-        uv.y += frequency / i * cos(i * uv.x + time) - 0.5 * i;
+        uv.x += frequency / i * sin(i * uv.y * step_multiplier + time) + 0.5 * i;
+        uv.y += frequency / i * cos(i * uv.x * step_multiplier - time) - 0.5 * i;
     }
 
-    float x_bias = sin(uv.x);
-    float y_bias = cos(uv.y);
+    float x_bias = (cos(uv.x * 3) + 1) / 2;
+    float y_bias = (sin((uv.y + 0.5) * 3) + 1) / 2;
 
-    vec3 col = oklch_to_rgb(vec3(0.8, 0.3, length(vec2(x_bias, y_bias))));
-    return vec4(vec3(col), 1);
+    vec3 color = lch_to_rgb(vec3(0.75 + 0.075 * (simplex_noise(uv.xyx) * 2 - 1), 0.9, length(vec2(x_bias, y_bias))));
+    return vec4(color, 1);
 }
 
 #endif
