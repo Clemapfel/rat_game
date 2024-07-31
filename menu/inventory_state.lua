@@ -99,9 +99,11 @@ mn.InventoryState = meta.new_type("MenuInventoryState", function()
     self.active:create_from(table.unpack(entities))
 
     for entity in values(entities) do
-        self:add_equipped_move(entity, bt.Move("DEBUG_MOVE"), 1)
-        self:add_equipped_equip(entity, bt.Equip("DEBUG_EQUIP"), 1)
-        self:add_equipped_consumable(entity, bt.Consumable("DEBUG_CONSUMABLE"), 1)
+        self:add_equipped_move(entity, 2, bt.Move("DEBUG_MOVE"))
+        self:add_equipped_move(entity, 4, bt.Move("WISH"))
+
+        self:add_equipped_equip(entity, 1, bt.Equip("DEBUG_EQUIP"))
+        self:add_equipped_consumable(entity, 1, bt.Consumable("DEBUG_CONSUMABLE"))
     end
     return self
 end)
@@ -294,6 +296,7 @@ for which in range("move", "equip", "consumable") do
     --- @brief
     mn.InventoryState["add_equipped_" .. which] = function(self, entity, slot_i, object)
         meta.assert_isa(entity, bt.Entity)
+        meta.assert_number(slot_i)
         local setup = self.active.entities[entity]
         if setup == nil then
             rt.error("In mn.InventoryState.take_equipped_" .. which .. ": no entity with id `" .. entity:get_id() .. "`")
@@ -342,6 +345,39 @@ for which in range("move", "equip", "consumable") do
 
         return nil
     end
+
+    --- @brief
+    mn.InventoryState["entity_get_n_" .. which .. "_slots"] = function(self, entity)
+        meta.assert_isa(entity, bt.Entity)
+        local setup = self.active.entities[entity]
+        if setup == nil then return 0 end
+        return setup["n_" .. which .. "_slots"]
+    end
+
+    --- @brief
+    mn.InventoryState["entity_list_" .. which .. "_slots"] = function(self, entity)
+        local out = {}
+        local setup = self.active.entities[entity]
+        if setup == nil then return nil end
+        local n = setup["n_" .. which .. "_slots"]
+        for i = 1, n do
+            out[i] = setup[which .. "s"][i]
+        end
+
+        return n, out
+    end
+end
+
+function mn.InventoryState:add_shared_object(object)
+    if meta.isa(object, bt.Move) then
+        self:add_shared_move(object)
+    elseif meta.isa(object, bt.Equip) then
+        self:add_shared_equip(object)
+    elseif meta.isa(object, bt.Consumable) then
+        self:add_shared_consumable(object)
+    else
+        rt.error("In mn.InventoryState.add_shared_object: unsupported object type `" .. meta.typeof(object) .. "`")
+    end
 end
 
 --- @brief
@@ -360,6 +396,55 @@ function mn.InventoryState:set_grabbed_object(object)
     end
 
     self.grabbed_object = object
+end
+
+--- @brief
+--- @return Table<bt.Move>, Table<bt.Equip>, Table<bt.Consumable>
+function mn.InventoryState:entity_sort_inventory(entity)
+    meta.assert_isa(entity, bt.Entity)
+
+    local moves = {}
+    local equips = {}
+    local consumables = {}
+    local setup = self.active.entities[entity]
+    if setup == nil then
+        rt.error("In mn.InventoryState.entity_sort_inventory: entity `" .. entity:get_id() .. "` is not part of state")
+    end
+
+    for i = 1, setup.n_move_slots do
+        if setup.moves[i] ~= nil then
+            table.insert(moves, setup.moves[i])
+        end
+        setup.moves[i] = nil
+    end
+
+    for i = 1, setup.n_equip_slots do
+        if setup.equips[i] ~= nil then
+            table.insert(equips, setup.equips[i])
+        end
+        setup.equips[i] = nil
+    end
+
+    for i = 1, setup.n_consumable_slots do
+        if setup.consumables[i] ~= nil then
+            table.insert(consumables, setup.consumables[i])
+        end
+        setup.consumables[i] = nil
+    end
+
+    for i, move in ipairs(moves) do
+        setup.moves[i] = move
+    end
+
+    for i, equip in ipairs(equips) do
+        setup.equips[i] = equip
+    end
+
+    for i, consumable in ipairs(consumables) do
+        setup.consumables[i] = consumable
+    end
+
+    return moves, equips, consumables
 end
 
 --- @brief
@@ -413,48 +498,6 @@ function mn.InventoryState:list_entities()
         table.insert(out, entity)
     end
     return out
-end
-
---- @brief
---- @return Number, Table
-function mn.InventoryState:list_move_slots(entity)
-    local setup = self.active.entities[entity]
-
-    local out = {}
-    local n = setup.n_move_slots
-    for i = 1, n do
-        table.insert(out, setup.moves[i])
-    end
-
-    return n, out
-end
-
---- @brief
---- @return Number, Table
-function mn.InventoryState:list_equip_slots(entity)
-    local setup = self.active.entities[entity]
-
-    local out = {}
-    local n = setup.n_equip_slots
-    for i = 1, n do
-        table.insert(out, setup.equips[i])
-    end
-
-    return n, out
-end
-
---- @brief
---- @return Number, Table
-function mn.InventoryState:list_consumable_slots(entity)
-    local setup = self.active.entities[entity]
-
-    local out = {}
-    local n = setup.n_consumable_slots
-    for i = 1, n do
-        table.insert(out, setup.consumables[i])
-    end
-
-    return n, out
 end
 
 --- @brief

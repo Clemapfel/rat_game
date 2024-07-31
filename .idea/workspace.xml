@@ -22,13 +22,10 @@
     </configurations>
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="7fa9ba1b-2cff-4ecc-86fb-59ab2fa76ee1" name="Changes" comment="stashing before removing equip_*">
+    <list default="true" id="7fa9ba1b-2cff-4ecc-86fb-59ab2fa76ee1" name="Changes" comment="shared list interactivity done">
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/battle/backgrounds/sdf_meatballs_compute.glsl" beforeDir="false" afterPath="$PROJECT_DIR$/battle/backgrounds/sdf_meatballs_compute.glsl" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/menu/inventory_state.lua" beforeDir="false" afterPath="$PROJECT_DIR$/menu/inventory_state.lua" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/menu/scene.lua" beforeDir="false" afterPath="$PROJECT_DIR$/menu/scene.lua" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/menu/scrollable_list.lua" beforeDir="false" afterPath="$PROJECT_DIR$/menu/scrollable_list.lua" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/menu/verbose_info_panel.lua" beforeDir="false" afterPath="$PROJECT_DIR$/menu/verbose_info_panel.lua" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -469,15 +466,7 @@
       <workItem from="1722100982820" duration="18765000" />
       <workItem from="1722194976289" duration="882000" />
       <workItem from="1722213965868" duration="6180000" />
-      <workItem from="1722220329478" duration="52946000" />
-    </task>
-    <task id="LOCAL-00870" summary="added meshilizer">
-      <option name="closed" value="true" />
-      <created>1720809354520</created>
-      <option name="number" value="00870" />
-      <option name="presentableId" value="LOCAL-00870" />
-      <option name="project" value="LOCAL" />
-      <updated>1720809354520</updated>
+      <workItem from="1722220329478" duration="55904000" />
     </task>
     <task id="LOCAL-00871" summary="stashing">
       <option name="closed" value="true" />
@@ -863,7 +852,15 @@
       <option name="project" value="LOCAL" />
       <updated>1722453266212</updated>
     </task>
-    <option name="localTasksCounter" value="919" />
+    <task id="LOCAL-00919" summary="shared list interactivity done">
+      <option name="closed" value="true" />
+      <created>1722456488735</created>
+      <option name="number" value="00919" />
+      <option name="presentableId" value="LOCAL-00919" />
+      <option name="project" value="LOCAL" />
+      <updated>1722456488735</updated>
+    </task>
+    <option name="localTasksCounter" value="920" />
     <servers />
   </component>
   <component name="TypeScriptGeneratedFilesManager">
@@ -935,9 +932,9 @@
     <MESSAGE value="stashing regular pattern" />
     <MESSAGE value="stashing" />
     <MESSAGE value="stashing fruit loops version" />
-    <MESSAGE value="shared list interactivity done" />
     <MESSAGE value="stashing before removing equip_*" />
-    <option name="LAST_COMMIT_MESSAGE" value="stashing before removing equip_*" />
+    <MESSAGE value="shared list interactivity done" />
+    <option name="LAST_COMMIT_MESSAGE" value="shared list interactivity done" />
   </component>
   <component name="XDebuggerManager">
     <breakpoint-manager>
