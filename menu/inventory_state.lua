@@ -292,15 +292,38 @@ for which in range("move", "equip", "consumable") do
     end
 
     --- @brief
+    mn.InventoryState["add_equipped_" .. which] = function(self, entity, object)
+
+    end
+
+    --- @brief
     mn.InventoryState["entity_has_" .. which] = function(self, entity, object)
         meta.assert_isa(entity, bt.Entity)
         if object == nil then return false end
         local setup = self.active.entities[entity]
+        if setup == nil then
+            rt.error("In mn.InventoryState.entity_has_" .. which .. ": entity `" .. entity:get_id() .. "` is not part of state")
+        end
         local n = setup["n_" .. which .. "_slots"]
         for i = 1, n do
             if setup[which .. "s"][i] == object then return true end
         end
         return false
+    end
+
+    --- @brief
+    mn.InventoryState["entity_get_first_free_" .. which .. "_slot"] = function(self, entity)
+        meta.assert_isa(entity, bt.Entity)
+        local setup = self.active.entities[entity]
+        if setup == nil then return nil end
+        local n = setup["n_" .. which .. "_slots"]
+        for i = 1, n do
+            if setup[which .. "s"][i] ==  nil then
+                return i
+            end
+        end
+
+        return nil
     end
 end
 
