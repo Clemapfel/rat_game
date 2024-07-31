@@ -2,6 +2,7 @@ mn.Template = meta.new_type("MenuTemplate", function(name)
     meta.assert_string(name)
     return meta.new(mn.Template, {
         name = name,
+        grabbed_object = nil,
         entities = {}
     })
 end)
@@ -236,8 +237,8 @@ function mn.InventoryState:deserialize(str)
     return self
 end
 
---- @brief
 for which in range("move", "equip", "consumable") do
+    --- @brief
     mn.InventoryState["add_shared_" .. which] = function(self, object)
         local shared_name = "shared_" .. which .. "s"
         local current = self[shared_name][object]
@@ -247,6 +248,90 @@ for which in range("move", "equip", "consumable") do
             self[shared_name][object] = current + 1
         end
     end
+
+    --- @brief
+    mn.InventoryState["take_shared_" .. which] = function(self, object)
+        local shared_name = "shared_" .. which .. "s"
+
+        local current = self[shared_name][object]
+        if current == nil then
+            rt.error("In mn.InventoryState.take_shared_" .. which .. ": `" .. object:get_id() .. "` not in shared inventory")
+            return nil
+        end
+
+        if current == 1 then
+            self[shared_name][object] = nil
+        else
+            self[shared_name][object] = current - 1
+        end
+
+        return object
+    end
+
+    --- @brief
+    mn.InventoryState["take_equipped_" .. which] = function(self, entity, object)
+        meta.assert_isa(entity, bt.Entity)
+        local setup = self.active.entities[entity]
+        if setup == nil then
+            rt.error("In mn.InventoryState.take_equipped_" .. which .. ": no entity with id `" .. entity:get_id() .. "`")
+        end
+
+        local taken = false
+        for i = 1, setup["n_" .. which .. "_slots"] do
+            if setup[which .. "s"][i] == object then
+                setup[which .. "s"][i] = nil
+                taken = true
+                break
+            end
+        end
+
+        if not taken then
+            rt.error("In mn.InventoryState.take_equipped_" .. which .. ": entity `" .. entity:get_id() .. "` does not have `" .. object:get_id() .. "` equipped")
+        end
+        return object
+    end
+
+    --- @brief
+    mn.InventoryState["entity_has_" .. which] = function(self, entity, object)
+        meta.assert_isa(entity, bt.Entity)
+        if object == nil then return false end
+        local setup = self.active.entities[entity]
+        local n = setup["n_" .. which .. "_slots"]
+        for i = 1, n do
+            if setup[which .. "s"][i] == object then return true end
+        end
+        return false
+    end
+end
+
+--- @brief
+function mn.InventoryState:set_grabbed_object(object)
+    if self.grabbed_object ~= nil then
+        if meta.isa(self.grabbed_object, bt.Move) then
+            self:add_shared_move(self.grabbed_object)
+        elseif meta.isa(self.grabbed_object, bt.Equip) then
+            self:add_shared_equip(self.grabbed_object)
+        elseif meta.isa(self.grabbed_object, bt.Consumable) then
+            self:add_shared_consumalbe(self.grabbed_object)
+        else
+            rt.error("In mn.InventoryState.set_grabbed_object: unhandling item type `" .. meta.typeof(self.grabbed_object) .. "`")
+        end
+        self.grabbed_object = nil
+    end
+
+    self.grabbed_object = object
+end
+
+--- @brief
+function mn.InventoryState:take_grabbed_object()
+    local out = self.grabbed_object
+    self.grabbed_object = nil
+    return out
+end
+
+--- @brief
+function mn.InventoryState:peek_grabbed_object()
+    return self.grabbed_object
 end
 
 --- @brief
@@ -551,3 +636,24 @@ function mn.InventoryState:get_consumable_at(entity, consumable_slot_i)
     end
     return setup.consumables[consumable_slot_i]
 end
+
+--- @brief
+function mn.InventoryState:take_shared_move(move)
+    local current = self.shared_moves[move]
+    if current == nil then
+        rt.error("In mn.InventoryState.take_shared_move: move `" .. move:get_id() .. "` not in shared inventory")
+        return nil
+    end
+
+    if current == 1 then
+        self.shared_moves[move] = nil
+    else
+        self.shared_moves[move] = current - 1
+    end
+
+    return move
+end
+
+
+
+

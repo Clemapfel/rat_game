@@ -190,26 +190,26 @@ vec4 effect(vec4 vertex_color, Image image, vec2 texture_coords, vec2 vertex_pos
 
     uv.x = uv.x * x_normalization;
     uv.x += 0.5 * x_normalization;
-    float time = elapsed / 8;
+    float time = elapsed / 16;
 
     uv.x += time / 4;
     uv.y += time / 2;
     uv *= 1.5;
 
     const float n_steps = 50;
-    float frequency = 0.25;
+    float lacunarity = 0.25;
     const float step_multiplier = 1.2;
 
     for(int i = 1; i < n_steps; i++)
     {
-        uv.x += frequency / i * sin(i * uv.y * step_multiplier + time) + 0.5 * i;
-        uv.y += frequency / i * cos(i * uv.x * step_multiplier - time) - 0.5 * i;
+        uv.x += lacunarity / i * sin(i * uv.y * step_multiplier + time) + 0.5 * i;
+        uv.y += lacunarity / i * cos(i * uv.x * step_multiplier - time) - 0.5 * i;
     }
 
     float x_bias = (cos(uv.x * 3) + 1) / 2;
     float y_bias = (sin((uv.y + 0.5) * 3) + 1) / 2;
 
-    vec3 color = lch_to_rgb(vec3(0.75 + 0.075 * (simplex_noise(uv.xyx) * 2 - 1), 0.9, length(vec2(x_bias, y_bias))));
+    vec3 color = lch_to_rgb(vec3(0.75 + 0.05 * (simplex_noise(uv.xyx) * 2 - 1), 0.9, length(vec2(x_bias, y_bias))));
     return vec4(color, 1);
 }
 

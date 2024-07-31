@@ -334,7 +334,7 @@ function mn.ScrollableList:draw()
         item.sprite:draw()
         item.name_label:draw()
 
-        if item.quantity_lable ~= nil then
+        if item.quantity_label ~= nil then
             item.quantity_label:draw()
         end
     end

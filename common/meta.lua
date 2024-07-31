@@ -556,14 +556,14 @@ end)
 --- @param x Table
 --- @param weak_keys Boolean
 --- @param weak_values Boolean
-function meta.make_weak(table, weak_keys, weak_values)
-    if meta.is_nil(weak_keys) then weak_keys = true end
-    if meta.is_nil(weak_values) then weak_values = true end
+function meta.make_weak(t, weak_keys, weak_values)
+    if weak_keys == nil then weak_keys = true end
+    if weak_values == nil then weak_values = true end
 
-    local metatable = getmetatable(table)
-    if meta.is_nil(metatable) then
+    local metatable = getmetatable(t)
+    if metatable == nil then
         metatable = {}
-        setmetatable(table, metatable)
+        setmetatable(t, metatable)
     end
 
     metatable.__mode = ""
@@ -575,7 +575,7 @@ function meta.make_weak(table, weak_keys, weak_values)
         metatable.__mode = metatable.__mode .. "v"
     end
 
-    return table
+    return t
 end
 
 --- @brief create an empty weak table

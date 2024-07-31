@@ -5,12 +5,6 @@ state = mn.InventoryState()
 rt.current_scene = mn.Scene()
 scene = rt.current_scene
 
-input = rt.InputController()
-input:signal_connect("pressed", function(_, which)
-    if which == rt.InputButton.Y then
-        scene:_load_template(template)
-    end
-end)
 
 --- ###
 
