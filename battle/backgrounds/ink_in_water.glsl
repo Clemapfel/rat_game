@@ -141,21 +141,19 @@ vec4 effect(vec4 vertex_color, Image image, vec2 texture_coords, vec2 vertex_pos
     uv *= 2;
 
     const float n_steps = 75;
-    float frequency = 0; //0.4;
+    float frequency = 0.0;
 
     for(int i = 1; i < n_steps; i++)
     {
-        uv.x += frequency / i * cos(i * uv.y + time) + 0.5 * i;
-        uv.y += frequency / i * sin(i * uv.x + time) - 0.5 * i;
+        uv.x += frequency / i * sin(i * uv.y + time) + 0.5 * i;
+        uv.y += frequency / i * cos(i * uv.x + time) - 0.5 * i;
     }
 
     float x_bias = sin(uv.x);
     float y_bias = cos(uv.y);
 
-    // 0.3 + (simplex_noise(vec3(x_bias, y_bias, 0)) * 2 - 1) * 0.5
-    vec3 col = oklch_to_rgb(vec3(0.8, 0.3, length((vec2(x_bias, y_bias)))));
+    vec3 col = oklch_to_rgb(vec3(0.8, 0.3, length(vec2(x_bias, y_bias))));
     return vec4(vec3(col), 1);
-    //return vec4(vec3(length(col) > 0.5 ? 1: 0), 1.0);
 }
 
 #endif
