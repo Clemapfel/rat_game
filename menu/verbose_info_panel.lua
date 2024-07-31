@@ -55,12 +55,12 @@ function mn.VerboseInfoPanel:size_allocate(x, y, width, height)
     local arrow_width = 6 * m
     local thickness = m
     local up_x, up_y = x + 0.5 * width, y - thickness
-    self._scroll_up_indicator = rt.Polygon(rt.generate_hat_arrow(up_x, up_y, arrow_width, thickness, angle))
-    self._scroll_up_indicator_outline = rt.LineStrip(rt.generate_hat_arrow_outline(up_x, up_y, arrow_width, thickness, angle))
+    self._scroll_down_indicator = rt.Polygon(rt.generate_hat_arrow(up_x, up_y, arrow_width, thickness, angle))
+    self._scroll_down_indicator_outline = rt.LineStrip(rt.generate_hat_arrow_outline(up_x, up_y, arrow_width, thickness, angle))
 
     local down_x, down_y = x + 0.5 * width, y + height + thickness
-    self._scroll_down_indicator = rt.Polygon(rt.generate_hat_arrow(down_x, down_y, arrow_width, thickness, 360 - angle))
-    self._scroll_down_indicator_outline = rt.LineStrip(rt.generate_hat_arrow_outline(down_x, down_y, arrow_width, thickness, 360 - angle))
+    self._scroll_up_indicator = rt.Polygon(rt.generate_hat_arrow(down_x, down_y, arrow_width, thickness, 360 - angle))
+    self._scroll_up_indicator_outline = rt.LineStrip(rt.generate_hat_arrow_outline(down_x, down_y, arrow_width, thickness, 360 - angle))
 
     for body in range(self._scroll_up_indicator, self._scroll_down_indicator) do
         body:set_color(rt.settings.menu.verbose_info_panel.indicator_base_color)

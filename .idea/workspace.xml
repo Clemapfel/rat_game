@@ -22,13 +22,12 @@
     </configurations>
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="7fa9ba1b-2cff-4ecc-86fb-59ab2fa76ee1" name="Changes" comment="stashing">
+    <list default="true" id="7fa9ba1b-2cff-4ecc-86fb-59ab2fa76ee1" name="Changes" comment="stashing before removing equip_*">
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/assets/sprites/controller_buttons.lua" beforeDir="false" afterPath="$PROJECT_DIR$/assets/sprites/controller_buttons.lua" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/assets/sprites/controller_buttons.png" beforeDir="false" afterPath="$PROJECT_DIR$/assets/sprites/controller_buttons.png" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/assets/sprites/controller_buttons.pxo" beforeDir="false" afterPath="$PROJECT_DIR$/assets/sprites/controller_buttons.pxo" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/common/control_indicator.lua" beforeDir="false" afterPath="$PROJECT_DIR$/common/control_indicator.lua" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/battle/backgrounds/sdf_meatballs_compute.glsl" beforeDir="false" afterPath="$PROJECT_DIR$/battle/backgrounds/sdf_meatballs_compute.glsl" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/menu/inventory_state.lua" beforeDir="false" afterPath="$PROJECT_DIR$/menu/inventory_state.lua" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/menu/scene.lua" beforeDir="false" afterPath="$PROJECT_DIR$/menu/scene.lua" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/menu/scrollable_list.lua" beforeDir="false" afterPath="$PROJECT_DIR$/menu/scrollable_list.lua" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/menu/verbose_info_panel.lua" beforeDir="false" afterPath="$PROJECT_DIR$/menu/verbose_info_panel.lua" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
@@ -470,79 +469,7 @@
       <workItem from="1722100982820" duration="18765000" />
       <workItem from="1722194976289" duration="882000" />
       <workItem from="1722213965868" duration="6180000" />
-      <workItem from="1722220329478" duration="29838000" />
-    </task>
-    <task id="LOCAL-00861" summary="refactored selection graph">
-      <option name="closed" value="true" />
-      <created>1720366064235</created>
-      <option name="number" value="00861" />
-      <option name="presentableId" value="LOCAL-00861" />
-      <option name="project" value="LOCAL" />
-      <updated>1720366064236</updated>
-    </task>
-    <task id="LOCAL-00862" summary="stashing old layout">
-      <option name="closed" value="true" />
-      <created>1720368620816</created>
-      <option name="number" value="00862" />
-      <option name="presentableId" value="LOCAL-00862" />
-      <option name="project" value="LOCAL" />
-      <updated>1720368620816</updated>
-    </task>
-    <task id="LOCAL-00863" summary="stashing menu">
-      <option name="closed" value="true" />
-      <created>1720376100256</created>
-      <option name="number" value="00863" />
-      <option name="presentableId" value="LOCAL-00863" />
-      <option name="project" value="LOCAL" />
-      <updated>1720376100256</updated>
-    </task>
-    <task id="LOCAL-00864" summary="added parallel line background">
-      <option name="closed" value="true" />
-      <created>1720381479186</created>
-      <option name="number" value="00864" />
-      <option name="presentableId" value="LOCAL-00864" />
-      <option name="project" value="LOCAL" />
-      <updated>1720381479186</updated>
-    </task>
-    <task id="LOCAL-00865" summary="added parallel line background">
-      <option name="closed" value="true" />
-      <created>1720382095965</created>
-      <option name="number" value="00865" />
-      <option name="presentableId" value="LOCAL-00865" />
-      <option name="project" value="LOCAL" />
-      <updated>1720382095965</updated>
-    </task>
-    <task id="LOCAL-00866" summary="added more menu functionality">
-      <option name="closed" value="true" />
-      <created>1720488133988</created>
-      <option name="number" value="00866" />
-      <option name="presentableId" value="LOCAL-00866" />
-      <option name="project" value="LOCAL" />
-      <updated>1720488133988</updated>
-    </task>
-    <task id="LOCAL-00867" summary="menu selection layout done">
-      <option name="closed" value="true" />
-      <created>1720556088552</created>
-      <option name="number" value="00867" />
-      <option name="presentableId" value="LOCAL-00867" />
-      <option name="project" value="LOCAL" />
-      <updated>1720556088554</updated>
-    </task>
-    <task id="LOCAL-00868" summary="stashing frame selection">
-      <option name="closed" value="true" />
-      <created>1720580689830</created>
-      <option name="number" value="00868" />
-      <option name="presentableId" value="LOCAL-00868" />
-      <option name="project" value="LOCAL" />
-      <updated>1720580689830</updated>
-    </task>
-    <task id="LOCAL-00869" summary="polished frame selection">
-      <option name="closed" value="true" />
-      <created>1720634826931</created>
-      <option name="number" value="00869" />
-      <option name="presentableId" value="LOCAL-00869" />
-      <option name="project" value="LOCAL" />
-      <updated>1720634826931</updated>
+      <workItem from="1722220329478" duration="52946000" />
     </task>
     <task id="LOCAL-00870" summary="added meshilizer">
       <option name="closed" value="true" />
@@ -864,7 +791,79 @@
       <option name="project" value="LOCAL" />
       <updated>1722359959079</updated>
     </task>
-    <option name="localTasksCounter" value="910" />
+    <task id="LOCAL-00910" summary="added verbose info scroll">
+      <option name="closed" value="true" />
+      <created>1722365733247</created>
+      <option name="number" value="00910" />
+      <option name="presentableId" value="LOCAL-00910" />
+      <option name="project" value="LOCAL" />
+      <updated>1722365733247</updated>
+    </task>
+    <task id="LOCAL-00911" summary="added ink in water">
+      <option name="closed" value="true" />
+      <created>1722366562054</created>
+      <option name="number" value="00911" />
+      <option name="presentableId" value="LOCAL-00911" />
+      <option name="project" value="LOCAL" />
+      <updated>1722366562055</updated>
+    </task>
+    <task id="LOCAL-00912" summary="potential cool screen transition">
+      <option name="closed" value="true" />
+      <created>1722371502713</created>
+      <option name="number" value="00912" />
+      <option name="presentableId" value="LOCAL-00912" />
+      <option name="project" value="LOCAL" />
+      <updated>1722371502713</updated>
+    </task>
+    <task id="LOCAL-00913" summary="cool texture with square wave">
+      <option name="closed" value="true" />
+      <created>1722375389495</created>
+      <option name="number" value="00913" />
+      <option name="presentableId" value="LOCAL-00913" />
+      <option name="project" value="LOCAL" />
+      <updated>1722375389495</updated>
+    </task>
+    <task id="LOCAL-00914" summary="stashing regular pattern">
+      <option name="closed" value="true" />
+      <created>1722377248296</created>
+      <option name="number" value="00914" />
+      <option name="presentableId" value="LOCAL-00914" />
+      <option name="project" value="LOCAL" />
+      <updated>1722377248296</updated>
+    </task>
+    <task id="LOCAL-00915" summary="stashing">
+      <option name="closed" value="true" />
+      <created>1722386011390</created>
+      <option name="number" value="00915" />
+      <option name="presentableId" value="LOCAL-00915" />
+      <option name="project" value="LOCAL" />
+      <updated>1722386011391</updated>
+    </task>
+    <task id="LOCAL-00916" summary="stashing fruit loops version">
+      <option name="closed" value="true" />
+      <created>1722389504606</created>
+      <option name="number" value="00916" />
+      <option name="presentableId" value="LOCAL-00916" />
+      <option name="project" value="LOCAL" />
+      <updated>1722389504606</updated>
+    </task>
+    <task id="LOCAL-00917" summary="shared list interactivity done">
+      <option name="closed" value="true" />
+      <created>1722452201805</created>
+      <option name="number" value="00917" />
+      <option name="presentableId" value="LOCAL-00917" />
+      <option name="project" value="LOCAL" />
+      <updated>1722452201805</updated>
+    </task>
+    <task id="LOCAL-00918" summary="stashing before removing equip_*">
+      <option name="closed" value="true" />
+      <created>1722453266212</created>
+      <option name="number" value="00918" />
+      <option name="presentableId" value="LOCAL-00918" />
+      <option name="project" value="LOCAL" />
+      <updated>1722453266212</updated>
+    </task>
+    <option name="localTasksCounter" value="919" />
     <servers />
   </component>
   <component name="TypeScriptGeneratedFilesManager">
@@ -913,14 +912,6 @@
     </option>
   </component>
   <component name="VcsManagerConfiguration">
-    <MESSAGE value="added verbose info panel" />
-    <MESSAGE value="stashing verbose panel" />
-    <MESSAGE value="stashing direction indicator" />
-    <MESSAGE value="added scroll indicator" />
-    <MESSAGE value="verbose info panel mwe working" />
-    <MESSAGE value="added equip tooltip" />
-    <MESSAGE value="added background to menu" />
-    <MESSAGE value="added move info" />
     <MESSAGE value="added focus rack" />
     <MESSAGE value="equip and move panels done" />
     <MESSAGE value="alignment working again" />
@@ -937,8 +928,16 @@
     <MESSAGE value="inventory state working" />
     <MESSAGE value="stashing color mixing" />
     <MESSAGE value="imported scene" />
+    <MESSAGE value="added verbose info scroll" />
+    <MESSAGE value="added ink in water" />
+    <MESSAGE value="potential cool screen transition" />
+    <MESSAGE value="cool texture with square wave" />
+    <MESSAGE value="stashing regular pattern" />
     <MESSAGE value="stashing" />
-    <option name="LAST_COMMIT_MESSAGE" value="stashing" />
+    <MESSAGE value="stashing fruit loops version" />
+    <MESSAGE value="shared list interactivity done" />
+    <MESSAGE value="stashing before removing equip_*" />
+    <option name="LAST_COMMIT_MESSAGE" value="stashing before removing equip_*" />
   </component>
   <component name="XDebuggerManager">
     <breakpoint-manager>

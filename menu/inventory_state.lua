@@ -99,9 +99,9 @@ mn.InventoryState = meta.new_type("MenuInventoryState", function()
     self.active:create_from(table.unpack(entities))
 
     for entity in values(entities) do
-        self:equip_move(entity, bt.Move("DEBUG_MOVE"), 1)
-        self:equip_equip(entity, bt.Equip("DEBUG_EQUIP"), 1)
-        self:equip_consumable(entity, bt.Consumable("DEBUG_CONSUMABLE"), 1)
+        self:add_equipped_move(entity, bt.Move("DEBUG_MOVE"), 1)
+        self:add_equipped_equip(entity, bt.Equip("DEBUG_EQUIP"), 1)
+        self:add_equipped_consumable(entity, bt.Consumable("DEBUG_CONSUMABLE"), 1)
     end
     return self
 end)
@@ -292,8 +292,25 @@ for which in range("move", "equip", "consumable") do
     end
 
     --- @brief
-    mn.InventoryState["add_equipped_" .. which] = function(self, entity, object)
+    mn.InventoryState["add_equipped_" .. which] = function(self, entity, slot_i, object)
+        meta.assert_isa(entity, bt.Entity)
+        local setup = self.active.entities[entity]
+        if setup == nil then
+            rt.error("In mn.InventoryState.take_equipped_" .. which .. ": no entity with id `" .. entity:get_id() .. "`")
+        end
 
+        local current = setup[which .. "s"][slot_i]
+        if current ~= nil then
+            if meta.isa(self.grabbed_object, bt.Move) then
+                self:add_shared_move(current)
+            elseif meta.isa(self.grabbed_object, bt.Equip) then
+                self:add_shared_equip(current)
+            elseif meta.isa(self.grabbed_object, bt.Consumable) then
+                self:add_shared_consumalbe(current)
+            end
+        end
+
+        setup[which .. "s"][slot_i] = object
     end
 
     --- @brief
@@ -388,152 +405,6 @@ function mn.InventoryState:export()
         end
     end
 end
-
---- @brief
-function mn.InventoryState:equip_equip(entity, new_equip, equip_slot_i)
-    if self.active.entities[entity] == nil then
-        rt.error("In mn.InventoryState:equip_equip: trying to equip `" .. new_equip:get_id() .. "` to entity `" .. entity:get_id() .. "`, but entity is not present in party")
-        return
-    end
-
-    local n_equip_slots = self.active.entities[entity].n_equip_slots
-    if equip_slot_i > n_equip_slots or equip_slot_i < 0 then
-        rt.error("In mn.InventoryState:equip_equip: trying to equip `" .. new_equip:get_id() .. "` to entity `" .. entity:get_id() .. "` in move slot `" .. equip_slot_i .. "`, but entity only has `" .. n_equip_slots .. "`")
-        return
-    end
-
-    local equip_n = self.shared_equips[new_equip]
-    if equip_n == nil then
-        rt.error("In mn.InventoryState:equip_equip: trying to move equip `" .. new_equip:get_id() .. "` to entity `" .. entity:get_id() .. "`, but it is not present in shared inventory")
-        return
-    end
-    
-    self.shared_equips[new_equip] = equip_n - 1
-
-    local in_slot = self.active.entities[entity].equips[equip_slot_i]
-    if in_slot ~= nil then
-        self:add_shared_equip(in_slot)
-    end
-
-    self.active.entities[entity].equips[equip_slot_i] = new_equip
-end
-
---- @brief
-function mn.InventoryState:unequip_equip(entity, equip_slot_i)
-    if self.active.entities[entity] == nil then
-        rt.error("In mn.InventoryState:unequip_equip: trying to unequip equip at `" .. equip_slot_i .. "` from to entity `" .. entity:get_id() .. "`, but entity is not present in party")
-    end
-
-    local n_equip_slots = self.active.entities[entity].n_equip_slots
-    if equip_slot_i > n_equip_slots or equip_slot_i < 0 then
-        rt.error("In mn.InventoryState:unequip_equip: trying to unequip equip at `" .. equip_slot_i .. "` from to entity `" .. entity:get_id() .. "`, slot is out of bounds for an entity with `" .. entity:get_n_equip_slots() .. "` slots")
-    end
-
-    local in_slot = self.active.entities[entity].equips[equip_slot_i]
-    if in_slot == nil then return end
-
-    self:add_shared_equip(in_slot)
-    self.active.entities[entity].equips[equip_slot_i] = nil
-end
-
---- @brief
-function mn.InventoryState:equip_move(entity, new_move, move_slot_i)
-    if self.active.entities[entity] == nil then
-        rt.error("In mn.InventoryState:equip_move: trying to equip `" .. new_move:get_id() .. "` to entity `" .. entity:get_id() .. "`, but entity is not present in party")
-        return
-    end
-
-    local n_move_slots = self.active.entities[entity].n_move_slots
-    if move_slot_i > n_move_slots or move_slot_i < 0 then
-        rt.error("In mn.InventoryState:equip_move: trying to equip `" .. new_move:get_id() .. "` to entity `" .. entity:get_id() .. "` in move slot `" .. move_slot_i .. "`, but entity only has `" .. n_move_slots .. "` slots")
-        return
-    end
-
-    local move_n = self.shared_moves[new_move]
-    if move_n == nil then
-        rt.error("In mn.InventoryState:equip_move: trying to move move `" .. new_move:get_id() .. "` to entity `" .. entity:get_id() .. "`, but it is not present in shared inventory")
-        return
-    end
-
-    self.shared_moves[new_move] = move_n - 1
-
-    local in_slot = self.active.entities[entity].moves[move_slot_i]
-    if in_slot ~= nil then
-        self:add_shared_move(in_slot)
-    end
-
-    self.active.entities[entity].moves[move_slot_i] = new_move
-end
-
---- @brief
-function mn.InventoryState:unequip_move(entity, move_slot_i)
-    if self.active.entities[entity] == nil then
-        rt.error("In mn.InventoryState:unequip_equip: trying to unequip move at `" .. move_slot_i .. "` from to entity `" .. entity:get_id() .. "`, but entity is not present in party")
-        return
-    end
-
-    local n_move_slots = self.active.entities[entity].n_move_slots
-    if move_slot_i > n_move_slots or move_slot_i < 0 then
-        rt.error("In mn.InventoryState:unequip_equip: trying to unequip equip at `" .. move_slot_i .. "` from to entity `" .. entity:get_id() .. "`, slot is out of bounds for an entity with `" .. entity:get_n_equip_slots() .. "` slots")
-        return
-    end
-
-    local in_slot = self.active.entities[entity].moves[move_slot_i]
-    if in_slot == nil then return end
-
-    self:add_shared_move(in_slot)
-    self.active.entities[entity].moves[move_slot_i] = nil
-end
-
---- @brief
-function mn.InventoryState:equip_consumable(entity, new_consumable, consumable_slot_i)
-    if self.active.entities[entity] == nil then
-        rt.error("In mn.InventoryState:equip_consumable: trying to equip `" .. new_consumable:get_id() .. "` to entity `" .. entity:get_id() .. "`, but entity is not present in party")
-        return
-    end
-
-    local n_consumable_slots = self.active.entities[entity].n_consumable_slots
-    if consumable_slot_i > n_consumable_slots or consumable_slot_i < 0 then
-        rt.error("In mn.InventoryState:equip_consumable: trying to equip `" .. new_consumable:get_id() .. "` to entity `" .. entity:get_id() .. "` in consumable slot `" .. consumable_slot_i .. "`, but entity only has `" .. n_consumable_slots .. "` slots")
-        return
-    end
-
-    local consumable_n = self.shared_consumables[new_consumable]
-    if consumable_n == nil then
-        rt.error("In mn.InventoryState:equip_consumable: trying to consumable consumable `" .. new_consumable:get_id() .. "` to entity `" .. entity:get_id() .. "`, but it is not present in shared inventory")
-        return
-    end
-
-    self.shared_consumables[new_consumable] = consumable_n - 1
-
-    local in_slot = self.active.entities[entity].consumables[consumable_slot_i]
-    if in_slot ~= nil then
-        self:add_shared_consumable(in_slot)
-    end
-
-    self.active.entities[entity].consumables[consumable_slot_i] = new_consumable
-end
-
---- @brief
-function mn.InventoryState:unequip_consumable(entity, consumable_slot_i)
-    if self.active.entities[entity] == nil then
-        rt.error("In mn.InventoryState:unequip_equip: trying to unequip consumable at `" .. consumable_slot_i .. "` from to entity `" .. entity:get_id() .. "`, but entity is not present in party")
-        return
-    end
-
-    local n_consumable_slots = self.active.entities[entity].n_consumable_slots
-    if consumable_slot_i > n_consumable_slots or consumable_slot_i < 0 then
-        rt.error("In mn.InventoryState:unequip_equip: trying to unequip equip at `" .. consumable_slot_i .. "` from to entity `" .. entity:get_id() .. "`, slot is out of bounds for an entity with `" .. entity:get_n_equip_slots() .. "` slots")
-        return
-    end
-
-    local in_slot = self.active.entities[entity].consumables[consumable_slot_i]
-    if in_slot == nil then return end
-
-    self:add_shared_consumable(in_slot)
-    self.active.entities[entity].consumables[consumable_slot_i] = nil
-end
-
 
 --- @brief
 function mn.InventoryState:list_entities()

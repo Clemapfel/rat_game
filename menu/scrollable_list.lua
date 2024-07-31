@@ -210,7 +210,8 @@ function mn.ScrollableList:push(...)
                 unselected_base = rt.Rectangle(0, 0, 1, 1),
                 selected_base = rt.Rectangle(0, 0, 1, 1),
                 base_outline = rt.Rectangle(0, 0, 1, 1),
-                height = 0
+                height = 0,
+                width = 0,
             }
         else
             to_insert = {
@@ -222,7 +223,8 @@ function mn.ScrollableList:push(...)
                 unselected_base = rt.Rectangle(0, 0, 1, 1),
                 selected_base = rt.Rectangle(0, 0, 1, 1),
                 base_outline = rt.Rectangle(0, 0, 1, 1),
-                height = 0
+                height = 0,
+                width = 0,
             }
         end
 
@@ -287,6 +289,7 @@ function mn.ScrollableList:size_allocate(x, y, width, height)
         for base in range(item.selected_base, item.unselected_base, item.base_outline) do
             base:resize(x, y, item_w, base_h)
         end
+        item.width = item_w
         item.height = base_h
         current_y = current_y + item.height
     end
@@ -407,7 +410,18 @@ function mn.ScrollableList:get_selected_object()
 end
 
 --- @brief
-function mn.ScrollableList:get_selected_i()
+function mn.ScrollableList:get_item_aabb(i)
+    local entry = self._sortings[self._current_sort_mode][i]
+    if entry == nil then return rt.AABB(0, 0, 1, 1) end
+
+    local item = self._items[entry.item_i]
+    if item == nil then return rt.AABB(0, 0, 1, 1) end
+
+    return rt.AABB(entry.x, entry.y, item.width, item.height)
+end
+
+--- @brief
+function mn.ScrollableList:get_selected_item_i()
     return self._selected_item_i
 end
 

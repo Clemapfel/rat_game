@@ -33,7 +33,8 @@ mn.Scene = meta.new_type("MenuScene", rt.Scene, function()
         _grabbed_object_allowed = false,
 
         _control_indicator = nil, -- rt.ControlIndicator
-        _input_controller = rt.InputController()
+        _input_controller = rt.InputController(),
+        _animation_queue = rt.AnimationQueue()
     })
 end, {
     _shared_move_list_index = 1,
@@ -339,6 +340,8 @@ function mn.Scene:draw()
     end
 
     self._verbose_info:draw()
+
+    self._animation_queue:draw()
 end
 
 --- @override
@@ -359,10 +362,13 @@ function mn.Scene:update(delta)
             self._verbose_info:advance_scroll(delta * speed * -1)
         end
     end
+
+    self._animation_queue:update(delta)
 end
 
 --- @brief
 function mn.Scene:_regenerate_selection_nodes()
+    local scene = self
 
     local entity_tab_control = {
         {rt.ControlIndicatorButton.A, "Select Character"}
@@ -376,6 +382,8 @@ function mn.Scene:_regenerate_selection_nodes()
     }
     
     local shared_list_x_label = "Equip"
+    local shared_list_x_disabled_label = "<color=GRAY><s>Equip</s></color>"
+
     local shared_list_y_label = "Change Sorting"
     local shared_list_up_down_label = "Select"
 
@@ -392,35 +400,60 @@ function mn.Scene:_regenerate_selection_nodes()
         end
     end
 
-    local sort_mode_to_shared_move_control = {}
-    local sort_mode_to_shared_equip_control = {}
-    local sort_mode_to_shared_consumable_control = {}
-    for sort_mode in range(
-        mn.ScrollableListSortMode.BY_ID,
-        mn.ScrollableListSortMode.BY_QUANTITY,
-        mn.ScrollableListSortMode.BY_NAME,
-        mn.ScrollableListSortMode.BY_TYPE
-    ) do
-        sort_mode_to_shared_move_control[sort_mode] = {
-            {rt.ControlIndicatorButton.A, "Take Move"},
-            {rt.ControlIndicatorButton.X, shared_list_x_label},
-            {rt.ControlIndicatorButton.Y, sort_mode_to_label(sort_mode)},
-            {rt.ControlIndicatorButton.UP_DOWN, shared_list_up_down_label}
-        }
-
-        sort_mode_to_shared_equip_control[sort_mode] = {
-            {rt.ControlIndicatorButton.A, "Take Gear"},
-            {rt.ControlIndicatorButton.X, shared_list_x_label},
-            {rt.ControlIndicatorButton.Y, sort_mode_to_label(sort_mode)},
-            {rt.ControlIndicatorButton.UP_DOWN, shared_list_up_down_label}
-        }
-
-        sort_mode_to_shared_consumable_control[sort_mode] = {
-            {rt.ControlIndicatorButton.A, "Take Item"},
-            {rt.ControlIndicatorButton.X, shared_list_x_label},
-            {rt.ControlIndicatorButton.Y, sort_mode_to_label(sort_mode)},
-            {rt.ControlIndicatorButton.UP_DOWN, shared_list_up_down_label}
-        }
+    local function get_shared_list_control(which)
+        local entity = scene._entity_pages[scene._entity_index].entity
+        if which == "move" then
+            local sort_mode = scene._shared_move_list:get_sort_mode()
+            if scene._state:entity_get_first_free_move_slot(entity) ~= nil then
+                return {
+                    {rt.ControlIndicatorButton.A, "Take Move"},
+                    {rt.ControlIndicatorButton.X, shared_list_x_label},
+                    {rt.ControlIndicatorButton.Y, sort_mode_to_label(sort_mode)},
+                    {rt.ControlIndicatorButton.UP_DOWN, shared_list_up_down_label}
+                }
+            else
+                return {
+                    {rt.ControlIndicatorButton.A, "Take Move"},
+                    {rt.ControlIndicatorButton.X, shared_list_x_disabled_label},
+                    {rt.ControlIndicatorButton.Y, sort_mode_to_label(sort_mode)},
+                    {rt.ControlIndicatorButton.UP_DOWN, shared_list_up_down_label}
+                }
+            end
+        elseif which == "equip" then
+            local sort_mode = scene._shared_equip_list:get_sort_mode()
+            if scene._state:entity_get_first_free_equip_slot(entity) ~= nil then
+                return {
+                    {rt.ControlIndicatorButton.A, "Take Gear"},
+                    {rt.ControlIndicatorButton.X, shared_list_x_label},
+                    {rt.ControlIndicatorButton.Y, sort_mode_to_label(sort_mode)},
+                    {rt.ControlIndicatorButton.UP_DOWN, shared_list_up_down_label}
+                }
+            else
+                return {
+                    {rt.ControlIndicatorButton.A, "Take Gear"},
+                    {rt.ControlIndicatorButton.X, shared_list_x_disabled_label},
+                    {rt.ControlIndicatorButton.Y, sort_mode_to_label(sort_mode)},
+                    {rt.ControlIndicatorButton.UP_DOWN, shared_list_up_down_label}
+                }
+            end
+        elseif which == "consumable" then
+            local sort_mode = scene._shared_consumable_list:get_sort_mode()
+            if scene._state:entity_get_first_free_consumable_slot(entity) ~= nil then
+                return {
+                    {rt.ControlIndicatorButton.A, "Take Item"},
+                    {rt.ControlIndicatorButton.X, shared_list_x_label},
+                    {rt.ControlIndicatorButton.Y, sort_mode_to_label(sort_mode)},
+                    {rt.ControlIndicatorButton.UP_DOWN, shared_list_up_down_label}
+                }
+            else
+                return {
+                    {rt.ControlIndicatorButton.A, "Take Item"},
+                    {rt.ControlIndicatorButton.X, shared_list_x_disabled_label},
+                    {rt.ControlIndicatorButton.Y, sort_mode_to_label(sort_mode)},
+                    {rt.ControlIndicatorButton.UP_DOWN, shared_list_up_down_label}
+                }
+            end
+        end
     end
 
     local shared_template_control = {
@@ -448,8 +481,6 @@ function mn.Scene:_regenerate_selection_nodes()
         {rt.ControlIndicatorButton.X, "Unequip"},
         {rt.ControlIndicatorButton.Y, "Sort"}
     }
-
-    local scene = self
 
     -- shared list tab nodes
     local shared_tab_nodes = {}
@@ -816,7 +847,8 @@ function mn.Scene:_regenerate_selection_nodes()
     shared_move_node:set_on_enter(function()
         scene._shared_list_frame:set_selection_state(rt.SelectionState.ACTIVE)
         scene:_set_verbose_info_object(scene._shared_move_list:get_selected_object())
-        scene:_set_control_indicator_layout(sort_mode_to_shared_move_control[scene._shared_move_list:get_sort_mode()])
+
+        scene:_set_control_indicator_layout(get_shared_list_control("move"))
         scene:_update_grabbed_object()
         scene:_set_grabbed_object_allowed(meta.isa(scene._state:peek_grabbed_object(), bt.Move))
     end)
@@ -838,47 +870,63 @@ function mn.Scene:_regenerate_selection_nodes()
         scene:_set_grabbed_object_allowed(meta.isa(scene._state:peek_grabbed_object(), bt.Move))
     end)
 
+    shared_move_node:set_on_x(function()
+        local page = scene._entity_pages[scene._entity_index]
+        local entity = page.entity
+        local slot_i = scene._state:entity_get_first_free_move_slot(entity)
+        if slot_i == nil then return end
+
+        if scene._state:peek_grabbed_object() ~= nil then
+            local object = scene._state:peek_grabbed_object()
+            if scene._state:entity_has_move(entity, object) then return end
+
+            scene._state:take_grabbed_object()
+            scene._state:add_equipped_move(entity, slot_i, object)
+
+            scene:_play_transfer_object_animation(
+                object,
+                scene:_get_grabbed_object_sprite_aabb(),
+                page.moves:get_slot_aabb(slot_i),
+                function()
+                    scene:_update_grabbed_object()
+                end,
+                function()
+                    page.moves:set_object(slot_i, object)
+                end
+            )
+        else
+            local object = scene._shared_move_list:get_selected_object()
+            if scene._state:entity_has_move(entity, object) then return end
+            scene._state:take_shared_move(object)
+            scene._state:add_equipped_move(entity, slot_i, object)
+
+            scene:_play_transfer_object_animation(
+                object,
+                scene._shared_move_list:get_item_aabb(scene._shared_move_list:get_selected_item_i()),
+                page.moves:get_slot_aabb(slot_i),
+                function()
+                    scene._shared_move_list:take(object)
+                end,
+                function()
+                    page.moves:set_object(slot_i, object)
+                end
+            )
+        end
+        scene:_set_control_indicator_layout(get_shared_list_control("move"))
+    end)
+
     shared_move_node:set_on_y(function()
         local list = self._shared_move_list
         list:set_sort_mode(scene._shared_list_sort_mode_order[list:get_sort_mode()])
-        scene:_set_control_indicator_layout(sort_mode_to_shared_move_control[list:get_sort_mode()])
+        scene:_set_control_indicator_layout(get_shared_list_control("move"))
     end)
 
-    shared_consumable_node:set_on_enter(function()
-        scene._shared_list_frame:set_selection_state(rt.SelectionState.ACTIVE)
-        scene:_set_verbose_info_object(scene._shared_consumable_list:get_selected_object())
-        scene:_set_control_indicator_layout(sort_mode_to_shared_consumable_control[scene._shared_consumable_list:get_sort_mode()])
-        scene:_update_grabbed_object()
-        scene:_set_grabbed_object_allowed(meta.isa(scene._state:peek_grabbed_object(), bt.Consumable))
-    end)
-
-    shared_consumable_node:set_on_a(function()
-        local up = scene._state:peek_grabbed_object()
-        if up ~= nil then -- deposit
-            if not meta.isa(up, bt.Consumable) then return end
-            scene._shared_consumable_list:add(up)
-            scene._state:take_grabbed_object()
-            scene._state:add_shared_consumable(up)
-        elseif up == nil then -- take
-            local object = scene._shared_consumable_list:get_selected_object()
-            scene._state:take_shared_consumable(object)
-            scene._shared_consumable_list:take(object)
-            scene._state:set_grabbed_object(object)
-        end
-        scene:_update_grabbed_object()
-        scene:_set_grabbed_object_allowed(meta.isa(scene._state:peek_grabbed_object(), bt.Consumable))
-    end)
-
-    shared_consumable_node:set_on_y(function()
-        local list = self._shared_consumable_list
-        list:set_sort_mode(scene._shared_list_sort_mode_order[list:get_sort_mode()])
-        scene:_set_control_indicator_layout(sort_mode_to_shared_consumable_control[list:get_sort_mode()])
-    end)
+    --
 
     shared_equip_node:set_on_enter(function()
         scene._shared_list_frame:set_selection_state(rt.SelectionState.ACTIVE)
         scene:_set_verbose_info_object(scene._shared_equip_list:get_selected_object())
-        scene:_set_control_indicator_layout(sort_mode_to_shared_equip_control[scene._shared_equip_list:get_sort_mode()])
+        scene:_set_control_indicator_layout(get_shared_list_control("equip"))
         scene:_update_grabbed_object()
         scene:_set_grabbed_object_allowed(meta.isa(scene._state:peek_grabbed_object(), bt.Equip))
     end)
@@ -900,16 +948,136 @@ function mn.Scene:_regenerate_selection_nodes()
         scene:_set_grabbed_object_allowed(meta.isa(scene._state:peek_grabbed_object(), bt.Equip))
     end)
 
+    shared_equip_node:set_on_x(function()
+        local page = scene._entity_pages[scene._entity_index]
+        local entity = page.entity
+        local slot_i = scene._state:entity_get_first_free_equip_slot(entity)
+        if slot_i == nil then return end
+
+        if scene._state:peek_grabbed_object() ~= nil then
+            local object = scene._state:peek_grabbed_object()
+
+            scene._state:take_grabbed_object()
+            scene._state:add_equipped_equip(entity, slot_i, object)
+
+            scene:_play_transfer_object_animation(
+                object,
+                scene:_get_grabbed_object_sprite_aabb(),
+                page.equips_and_consumables:get_slot_aabb(slot_i),
+                function()
+                    scene:_update_grabbed_object()
+                end,
+                function()
+                    page.equips_and_consumables:set_object(slot_i, object)
+                end
+            )
+        else
+            local object = scene._shared_equip_list:get_selected_object()
+            scene._state:take_shared_equip(object)
+            scene._state:add_equipped_equip(entity, slot_i, object)
+
+            scene:_play_transfer_object_animation(
+                object,
+                scene._shared_equip_list:get_item_aabb(scene._shared_equip_list:get_selected_item_i()),
+                page.equips_and_consumables:get_slot_aabb(slot_i),
+                function()
+                    scene._shared_equip_list:take(object)
+                end,
+                function()
+                    page.equips_and_consumables:set_object(slot_i, object)
+                end
+            )
+        end
+
+        scene:_set_control_indicator_layout(get_shared_list_control("equip"))
+    end)
+
     shared_equip_node:set_on_y(function()
         local list = self._shared_equip_list
         list:set_sort_mode(scene._shared_list_sort_mode_order[list:get_sort_mode()])
-        scene:_set_control_indicator_layout(sort_mode_to_shared_equip_control[list:get_sort_mode()])
+        scene:_set_control_indicator_layout(get_shared_list_control("equip"))
+    end)
+
+    shared_consumable_node:set_on_enter(function()
+        scene._shared_list_frame:set_selection_state(rt.SelectionState.ACTIVE)
+        scene:_set_verbose_info_object(scene._shared_consumable_list:get_selected_object())
+        scene:_set_control_indicator_layout(get_shared_list_control("equip"))
+        scene:_update_grabbed_object()
+        scene:_set_grabbed_object_allowed(meta.isa(scene._state:peek_grabbed_object(), bt.Consumable))
+    end)
+
+    shared_consumable_node:set_on_a(function()
+        local up = scene._state:peek_grabbed_object()
+        if up ~= nil then -- deposit
+            if not meta.isa(up, bt.Consumable) then return end
+            scene._shared_consumable_list:add(up)
+            scene._state:take_grabbed_object()
+            scene._state:add_shared_consumable(up)
+        elseif up == nil then -- take
+            local object = scene._shared_consumable_list:get_selected_object()
+            scene._state:take_shared_consumable(object)
+            scene._shared_consumable_list:take(object)
+            scene._state:set_grabbed_object(object)
+        end
+        scene:_update_grabbed_object()
+        scene:_set_grabbed_object_allowed(meta.isa(scene._state:peek_grabbed_object(), bt.Consumable))
+    end)
+
+    shared_consumable_node:set_on_x(function()
+        local page = scene._entity_pages[scene._entity_index]
+        local entity = page.entity
+        local n_equip_slots = entity:get_n_equip_slots()
+        local slot_i = scene._state:entity_get_first_free_consumable_slot(entity)
+        if slot_i == nil then return end
+
+        if scene._state:peek_grabbed_object() ~= nil then
+            local object = scene._state:peek_grabbed_object()
+
+            scene._state:take_grabbed_object()
+            scene._state:add_equipped_consumable(entity, slot_i, object)
+
+            scene:_play_transfer_object_animation(
+                object,
+                scene:_get_grabbed_object_sprite_aabb(),
+                page.equips_and_consumables:get_slot_aabb(slot_i + n_equip_slots),
+                function()
+                    scene:_update_grabbed_object()
+                end,
+                function()
+                    page.equips_and_consumables:set_object(slot_i + n_equip_slots, object)
+                end
+            )
+        else
+            local object = scene._shared_consumable_list:get_selected_object()
+            scene._state:take_shared_consumable(object)
+            scene._state:add_equipped_consumable(entity, slot_i, object)
+
+            scene:_play_transfer_object_animation(
+                object,
+                scene._shared_consumable_list:get_item_aabb(scene._shared_consumable_list:get_selected_item_i()),
+                page.equips_and_consumables:get_slot_aabb(slot_i + n_equip_slots),
+                function()
+                    scene._shared_consumable_list:take(object)
+                end,
+                function()
+                    page.equips_and_consumables:set_object(slot_i + n_equip_slots, object)
+                end
+            )
+        end
+
+        scene:_set_control_indicator_layout(get_shared_list_control("consumable"))
+    end)
+
+    shared_consumable_node:set_on_y(function()
+        local list = self._shared_consumable_list
+        list:set_sort_mode(scene._shared_list_sort_mode_order[list:get_sort_mode()])
+        scene:_set_control_indicator_layout(get_shared_list_control("consumable"))
     end)
 
     shared_template_node:set_on_enter(function()
         scene._shared_list_frame:set_selection_state(rt.SelectionState.ACTIVE)
         scene:_set_verbose_info_object(scene._shared_template_list:get_selected_object())
-        scene:_set_control_indicator_layout(shared_template_control)
+        scene:_set_control_indicator_layout(get_shared_list_control("consumable"))
         scene:_update_grabbed_object()
         scene:_set_grabbed_object_allowed(false)
     end)
@@ -918,8 +1086,6 @@ function mn.Scene:_regenerate_selection_nodes()
         node:set_on_exit(function()
             scene._shared_list_frame:set_selection_state(rt.SelectionState.INACTIVE)
         end)
-
-
     end
 
     for tab_i, node in ipairs(shared_tab_nodes) do
@@ -1105,4 +1271,21 @@ function mn.Scene:_set_grabbed_object_allowed(b)
     if self._grabbed_object_sprite ~= nil then
         self._grabbed_object_sprite:set_label_is_visible(not self._grabbed_object_allowed)
     end
+end
+
+--- @brief
+function mn.Scene:_get_grabbed_object_sprite_aabb()
+    if self._grabbed_object_sprite == nil then
+        return rt.AABB(0, 0, 1, 1)
+    end
+
+    local out = self._grabbed_object_sprite:get_bounds()
+    out.x = out.x + self._grabbed_object_sprite_x
+    out.y = out.y + self._grabbed_object_sprite_y
+    return out
+end
+
+--- @brief
+function mn.Scene:_play_transfer_object_animation(object, from_aabb, to_aabb, before, after)
+    self._animation_queue:push(mn.Animation.OBJECT_MOVED(object, from_aabb, to_aabb), before, after)
 end
