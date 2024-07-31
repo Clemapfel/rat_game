@@ -22,9 +22,8 @@
     </configurations>
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="7fa9ba1b-2cff-4ecc-86fb-59ab2fa76ee1" name="Changes" comment="shared list interactivity done">
+    <list default="true" id="7fa9ba1b-2cff-4ecc-86fb-59ab2fa76ee1" name="Changes" comment="stashing before reworking control indicator layout">
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/menu/inventory_state.lua" beforeDir="false" afterPath="$PROJECT_DIR$/menu/inventory_state.lua" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/menu/scene.lua" beforeDir="false" afterPath="$PROJECT_DIR$/menu/scene.lua" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
@@ -466,15 +465,7 @@
       <workItem from="1722100982820" duration="18765000" />
       <workItem from="1722194976289" duration="882000" />
       <workItem from="1722213965868" duration="6180000" />
-      <workItem from="1722220329478" duration="55904000" />
-    </task>
-    <task id="LOCAL-00871" summary="stashing">
-      <option name="closed" value="true" />
-      <created>1720815805471</created>
-      <option name="number" value="00871" />
-      <option name="presentableId" value="LOCAL-00871" />
-      <option name="project" value="LOCAL" />
-      <updated>1720815805471</updated>
+      <workItem from="1722220329478" duration="58146000" />
     </task>
     <task id="LOCAL-00872" summary="MWE">
       <option name="closed" value="true" />
@@ -860,7 +851,15 @@
       <option name="project" value="LOCAL" />
       <updated>1722456488735</updated>
     </task>
-    <option name="localTasksCounter" value="920" />
+    <task id="LOCAL-00920" summary="stashing before reworking control indicator layout">
+      <option name="closed" value="true" />
+      <created>1722461548921</created>
+      <option name="number" value="00920" />
+      <option name="presentableId" value="LOCAL-00920" />
+      <option name="project" value="LOCAL" />
+      <updated>1722461548921</updated>
+    </task>
+    <option name="localTasksCounter" value="921" />
     <servers />
   </component>
   <component name="TypeScriptGeneratedFilesManager">
@@ -909,7 +908,6 @@
     </option>
   </component>
   <component name="VcsManagerConfiguration">
-    <MESSAGE value="added focus rack" />
     <MESSAGE value="equip and move panels done" />
     <MESSAGE value="alignment working again" />
     <MESSAGE value="added stats to verbose info panel" />
@@ -934,7 +932,8 @@
     <MESSAGE value="stashing fruit loops version" />
     <MESSAGE value="stashing before removing equip_*" />
     <MESSAGE value="shared list interactivity done" />
-    <option name="LAST_COMMIT_MESSAGE" value="shared list interactivity done" />
+    <MESSAGE value="stashing before reworking control indicator layout" />
+    <option name="LAST_COMMIT_MESSAGE" value="stashing before reworking control indicator layout" />
   </component>
   <component name="XDebuggerManager">
     <breakpoint-manager>

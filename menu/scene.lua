@@ -370,17 +370,6 @@ end
 function mn.Scene:_regenerate_selection_nodes()
     local scene = self
 
-    local entity_tab_control = {
-        {rt.ControlIndicatorButton.A, "Select Character"}
-    }
-
-    local entity_info_control = {
-    }
-
-    local shared_tab_control = {
-        {rt.ControlIndicatorButton.A, "Select Tab"}
-    }
-
     local shared_list_x_label = "Equip"
     local shared_list_x_disabled_label = "<color=GRAY><s>Equip</s></color>"
 
@@ -400,90 +389,87 @@ function mn.Scene:_regenerate_selection_nodes()
         end
     end
 
-    local function get_shared_list_control(which)
-        local entity = scene._entity_pages[scene._entity_index].entity
-        if which == "move" then
-            local sort_mode = scene._shared_move_list:get_sort_mode()
-            local x_disabled = scene._state:entity_get_first_free_move_slot(entity) == nil
-
-            if scene._state:peek_grabbed_object() ~= nil then
-                return {
-                    {rt.ControlIndicatorButton.A, "Store Move"},
-                    {rt.ControlIndicatorButton.B, "Drop"},
-                    {rt.ControlIndicatorButton.X, ternary(x_disabled, shared_list_x_disabled_label, shared_list_x_label)},
-                    {rt.ControlIndicatorButton.Y, sort_mode_to_label(sort_mode)},
-                    {rt.ControlIndicatorButton.UP_DOWN, shared_list_up_down_label}
-                }
-            else
-                return {
-                    {rt.ControlIndicatorButton.A, "Take Move"},
-                    {rt.ControlIndicatorButton.X, ternary(x_disabled, shared_list_x_disabled_label, shared_list_x_label)},
-                    {rt.ControlIndicatorButton.Y, sort_mode_to_label(sort_mode)},
-                    {rt.ControlIndicatorButton.UP_DOWN, shared_list_up_down_label}
-                }
-            end
-        elseif which == "equip" then
-            local sort_mode = scene._shared_equip_list:get_sort_mode()
-            if scene._state:entity_get_first_free_equip_slot(entity) ~= nil then
-                return {
-                    {rt.ControlIndicatorButton.A, "Take Gear"},
-                    {rt.ControlIndicatorButton.X, shared_list_x_label},
-                    {rt.ControlIndicatorButton.Y, sort_mode_to_label(sort_mode)},
-                    {rt.ControlIndicatorButton.UP_DOWN, shared_list_up_down_label}
-                }
-            else
-                return {
-                    {rt.ControlIndicatorButton.A, "Take Gear"},
-                    {rt.ControlIndicatorButton.X, shared_list_x_disabled_label},
-                    {rt.ControlIndicatorButton.Y, sort_mode_to_label(sort_mode)},
-                    {rt.ControlIndicatorButton.UP_DOWN, shared_list_up_down_label}
-                }
-            end
-        elseif which == "consumable" then
-            local sort_mode = scene._shared_consumable_list:get_sort_mode()
-            if scene._state:entity_get_first_free_consumable_slot(entity) ~= nil then
-                return {
-                    {rt.ControlIndicatorButton.A, "Take Item"},
-                    {rt.ControlIndicatorButton.X, shared_list_x_label},
-                    {rt.ControlIndicatorButton.Y, sort_mode_to_label(sort_mode)},
-                    {rt.ControlIndicatorButton.UP_DOWN, shared_list_up_down_label}
-                }
-            else
-                return {
-                    {rt.ControlIndicatorButton.A, "Take Item"},
-                    {rt.ControlIndicatorButton.X, shared_list_x_disabled_label},
-                    {rt.ControlIndicatorButton.Y, sort_mode_to_label(sort_mode)},
-                    {rt.ControlIndicatorButton.UP_DOWN, shared_list_up_down_label}
-                }
-            end
+    local drop_grabbed_object_entry = function()
+        if scene._state:peek_grabbed_object() ~= nil then
+            return {rt.ControlIndicatorButton.B, "Drop"}
+        else
+            return nil
         end
+    end 
+
+    -- control indicator layouts
+
+    local get_shared_move_list_control = function()
+        return {
+            {rt.ControlIndicatorButton.A, "shared move list"},
+            drop_grabbed_object_entry()
+        }
     end
-
-    local shared_template_control = {
-        {rt.ControlIndicatorButton.A, "Load Template"},
-        {rt.ControlIndicatorButton.UP_DOWN, shared_list_up_down_label}
-    }
-
-    local verbose_info_control = {
-    }
-
-    local move_node_control = {
-        {rt.ControlIndicatorButton.A, "Take Move"},
-        {rt.ControlIndicatorButton.X, "Unequip"},
-        {rt.ControlIndicatorButton.Y, "Sort"}
-    }
-
-    local equip_node_control = {
-        {rt.ControlIndicatorButton.A, "Take Gear"},
-        {rt.ControlIndicatorButton.X, "Unequip"},
-        {rt.ControlIndicatorButton.Y, "Sort"}
-    }
-
-    local consumable_node_control = {
-        {rt.ControlIndicatorButton.A, "Take Item"},
-        {rt.ControlIndicatorButton.X, "Unequip"},
-        {rt.ControlIndicatorButton.Y, "Sort"}
-    }
+    
+    local get_shared_equip_list_control = function()
+        return {
+            {rt.ControlIndicatorButton.A, "shared equip list"},
+            drop_grabbed_object_entry()
+        }
+    end
+    
+    local get_shared_consumable_list_control = function()
+        return {
+            {rt.ControlIndicatorButton.A, "shared consumable list"},
+            drop_grabbed_object_entry()
+        }
+    end
+    
+    local get_template_list_control = function()
+        return {
+            {rt.ControlIndicatorButton.A, "shared template list"},
+             drop_grabbed_object_entry()
+        }
+    end
+    
+    local get_entity_info_control = function()
+        return {
+            drop_grabbed_object_entry()
+        }
+    end
+    
+    local get_move_node_control = function()
+        return {
+            {rt.ControlIndicatorButton.A, "move node"}
+        }
+    end
+    
+    local get_equip_node_control = function()
+        return {
+            {rt.ControlIndicatorButton.A, "equip node"}
+        }
+    end
+    
+    local get_consumable_node_control = function()
+        return {
+            {rt.ControlIndicatorButton.A, "consumable node"}
+        }
+    end
+    
+    local get_entity_tab_control = function()
+        return {
+            {rt.ControlIndicatorButton.A, "Select Character"},
+            drop_grabbed_object_entry()
+        }
+    end
+    
+    local get_shared_tab_control = function()
+        return {
+            {rt.ControlIndicatorButton.A, "Select Tab"},
+            drop_grabbed_object_entry()
+        }
+    end
+    
+    local get_verbose_info_control = function()
+        return {
+            drop_grabbed_object_entry()()
+        }
+    end
 
     -- shared list tab nodes
     local shared_tab_nodes = {}
@@ -629,6 +615,11 @@ function mn.Scene:_regenerate_selection_nodes()
 
         -- slots right, unless locked
         page.slot_nodes[#(page.slot_nodes)]:set_right(shared_list_nodes[scene._shared_list_index])
+
+
+        for move_node in values(page.move_nodes) do
+            move_node.get_control_indicator_layout = get_move_node_control
+        end
     end
 
     for entity_tab_node in values(entity_tab_nodes) do
@@ -691,13 +682,51 @@ function mn.Scene:_regenerate_selection_nodes()
     end)
     ]]--
 
+    for page_i, page in ipairs(entity_page_nodes) do
+        page.info_node.get_control_indicator_layout = get_entity_info_control
+        for node in values(page.move_nodes) do
+            node.get_control_indicator_layout = get_move_node_control
+        end
+
+        local n_equips = scene._entity_pages[page_i].entity:get_n_equip_slots()
+        for i, node in ipairs(page.slot_nodes) do
+            if i <= n_equips then
+                node.get_control_indicator_layout = get_equip_node_control
+            else
+                node.get_control_indicator_layout = get_consumable_node_control
+            end
+        end
+    end
+
+    for node in values(shared_tab_nodes) do
+        node.get_control_indicator_layout = get_shared_tab_control
+    end
+
+    for node in values(entity_tab_nodes) do
+        node.get_control_indicator_layout = get_entity_tab_control
+    end
+
+    shared_move_node.get_control_indicator_layout = get_shared_move_list_control
+    shared_equip_node.get_control_indicator_layout = get_shared_equip_list_control
+    shared_consumable_node.get_control_indicator_layout = get_shared_consumable_list_control
+    verbose_info_node.get_control_indicator_layout = get_verbose_info_control
+
     -- interactivity
+    
+    local on_b_undo_grab = function(control)
+        meta.assert_function(control)
+        return function()
+            if scene._state:peek_grabbed_object() ~= nil then
+                self._undo_grab()
+                self:_update_grabbed_object()
+            end
+        end
+    end
 
     for entity_i, node in ipairs(entity_tab_nodes) do
         node:set_on_enter(function()
             scene._entity_tab_bar:set_tab_selected(entity_i, true)
             scene:_set_verbose_info_object(nil) -- TODO: character info
-            scene:_set_control_indicator_layout(entity_tab_control)
 
             scene:_update_grabbed_object()
             scene:_set_grabbed_object_allowed(false)
@@ -710,6 +739,8 @@ function mn.Scene:_regenerate_selection_nodes()
         node:set_on_a(function()
             scene._entity_index = entity_i
         end)
+        
+        node:set_on_b(on_b_undo_grab(get_entity_tab_control))
     end
 
     local page_node_sort_on_y = function()
@@ -737,11 +768,12 @@ function mn.Scene:_regenerate_selection_nodes()
         page.info_node:set_on_enter(function()
             scene._entity_pages[page_i].info:set_selection_state(rt.SelectionState.ACTIVE)
             scene:_set_verbose_info_object("hp", "attack", "defense", "speed")
-            scene:_set_control_indicator_layout(entity_info_control)
 
             scene:_update_grabbed_object()
             scene:_set_grabbed_object_allowed(false)
         end)
+
+        page.info_node:set_on_b(on_b_undo_grab(get_entity_info_control))
 
         page.info_node:set_on_exit(function()
             scene._entity_pages[page_i].info:set_selection_state(rt.SelectionState.INACTIVE)
@@ -761,7 +793,6 @@ function mn.Scene:_regenerate_selection_nodes()
                     scene:_set_verbose_info_object(object)
                 end
 
-                scene:_set_control_indicator_layout(move_node_control)
                 scene:_update_grabbed_object()
                 local grabbed = scene._state:peek_grabbed_object()
                 scene:_set_grabbed_object_allowed(
@@ -771,6 +802,7 @@ function mn.Scene:_regenerate_selection_nodes()
             end)
 
             node:set_on_y(page_node_sort_on_y)
+            node:set_on_b(on_b_undo_grab(get_move_node_control))
 
             node:set_on_exit(function()
                 local slots = scene._entity_pages[page_i].moves
@@ -790,7 +822,6 @@ function mn.Scene:_regenerate_selection_nodes()
                     else
                         scene:_set_verbose_info_object(object)
                     end
-                    scene:_set_control_indicator_layout(equip_node_control)
                     scene:_set_grabbed_object_allowed(meta.isa(scene._state:peek_grabbed_object(), bt.Equip))
                 else
                     local object = scene._state:get_consumable_at(page.entity, node_i - n_equips)
@@ -799,7 +830,6 @@ function mn.Scene:_regenerate_selection_nodes()
                     else
                         scene:_set_verbose_info_object(object)
                     end
-                    scene:_set_control_indicator_layout(consumable_node_control)
                     scene:_set_grabbed_object_allowed(meta.isa(scene._state:peek_grabbed_object(), bt.Consumable))
                 end
 
@@ -811,6 +841,12 @@ function mn.Scene:_regenerate_selection_nodes()
             end)
 
             node:set_on_y(page_node_sort_on_y)
+
+            if node_i <= n_equips then
+                node:set_on_b(on_b_undo_grab(get_equip_node_control))
+            else
+                node:set_on_b(on_b_undo_grab(get_consumable_node_control))
+            end
 
             node:set_on_exit(function()
                 local slots = scene._entity_pages[page_i].equips_and_consumables
@@ -824,7 +860,6 @@ function mn.Scene:_regenerate_selection_nodes()
         scene._shared_list_frame:set_selection_state(rt.SelectionState.ACTIVE)
         scene:_set_verbose_info_object(scene._shared_move_list:get_selected_object())
 
-        scene:_set_control_indicator_layout(get_shared_list_control("move"))
         scene:_update_grabbed_object()
         scene:_set_grabbed_object_allowed(meta.isa(scene._state:peek_grabbed_object(), bt.Move))
     end)
@@ -853,12 +888,10 @@ function mn.Scene:_regenerate_selection_nodes()
                         scene._shared_move_list:add(grabbed)
                     end
                 )
-                scene:_set_control_indicator_layout(get_shared_list_control("move"))
                 scene._undo_grab = function() end
             end
         end
         scene:_update_grabbed_object()
-        scene:_set_control_indicator_layout(get_shared_list_control("move"))
         scene:_set_grabbed_object_allowed(meta.isa(scene._state:peek_grabbed_object(), bt.Move))
     end)
 
@@ -905,21 +938,20 @@ function mn.Scene:_regenerate_selection_nodes()
                 end
             )
         end
-        scene:_set_control_indicator_layout(get_shared_list_control("move"))
     end)
 
     shared_move_node:set_on_y(function()
         local list = self._shared_move_list
         list:set_sort_mode(scene._shared_list_sort_mode_order[list:get_sort_mode()])
-        scene:_set_control_indicator_layout(get_shared_list_control("move"))
     end)
+
+    shared_move_node:set_on_b(on_b_undo_grab(get_shared_move_list_control))
 
     --
 
     shared_equip_node:set_on_enter(function()
         scene._shared_list_frame:set_selection_state(rt.SelectionState.ACTIVE)
         scene:_set_verbose_info_object(scene._shared_equip_list:get_selected_object())
-        scene:_set_control_indicator_layout(get_shared_list_control("equip"))
         scene:_update_grabbed_object()
         scene:_set_grabbed_object_allowed(meta.isa(scene._state:peek_grabbed_object(), bt.Equip))
     end)
@@ -949,11 +981,9 @@ function mn.Scene:_regenerate_selection_nodes()
                     end
                 )
                 scene._undo_grab = function() end
-                scene:_set_control_indicator_layout(get_shared_list_control("equip"))
             end
         end
         scene:_update_grabbed_object()
-        scene:_set_control_indicator_layout(get_shared_list_control("equip"))
         scene:_set_grabbed_object_allowed(meta.isa(scene._state:peek_grabbed_object(), bt.Equip))
     end)
 
@@ -998,20 +1028,20 @@ function mn.Scene:_regenerate_selection_nodes()
                 end
             )
         end
-
-        scene:_set_control_indicator_layout(get_shared_list_control("equip"))
     end)
 
     shared_equip_node:set_on_y(function()
         local list = self._shared_equip_list
         list:set_sort_mode(scene._shared_list_sort_mode_order[list:get_sort_mode()])
-        scene:_set_control_indicator_layout(get_shared_list_control("equip"))
     end)
+
+    shared_equip_node:set_on_b(on_b_undo_grab(get_shared_equip_list_control))
+
+    --
 
     shared_consumable_node:set_on_enter(function()
         scene._shared_list_frame:set_selection_state(rt.SelectionState.ACTIVE)
         scene:_set_verbose_info_object(scene._shared_consumable_list:get_selected_object())
-        scene:_set_control_indicator_layout(get_shared_list_control("equip"))
         scene:_update_grabbed_object()
         scene:_set_grabbed_object_allowed(meta.isa(scene._state:peek_grabbed_object(), bt.Consumable))
     end)
@@ -1041,11 +1071,9 @@ function mn.Scene:_regenerate_selection_nodes()
                     end
                 )
                 scene._undo_grab = function() end
-                scene:_set_control_indicator_layout(get_shared_list_control("consumable"))
             end
         end
         scene:_update_grabbed_object()
-        scene:_set_control_indicator_layout(get_shared_list_control("consumable"))
         scene:_set_grabbed_object_allowed(meta.isa(scene._state:peek_grabbed_object(), bt.Consumable))
     end)
 
@@ -1091,23 +1119,25 @@ function mn.Scene:_regenerate_selection_nodes()
                 end
             )
         end
-
-        scene:_set_control_indicator_layout(get_shared_list_control("consumable"))
     end)
 
     shared_consumable_node:set_on_y(function()
         local list = self._shared_consumable_list
         list:set_sort_mode(scene._shared_list_sort_mode_order[list:get_sort_mode()])
-        scene:_set_control_indicator_layout(get_shared_list_control("consumable"))
     end)
+
+    shared_consumable_node:set_on_b(on_b_undo_grab(get_shared_consumable_list_control))
+
+    --
 
     shared_template_node:set_on_enter(function()
         scene._shared_list_frame:set_selection_state(rt.SelectionState.ACTIVE)
         scene:_set_verbose_info_object(scene._shared_template_list:get_selected_object())
-        scene:_set_control_indicator_layout(get_shared_list_control("consumable"))
         scene:_update_grabbed_object()
         scene:_set_grabbed_object_allowed(false)
     end)
+
+    shared_template_node:set_on_b(on_b_undo_grab(get_template_list_control))
 
     for node in values(shared_list_nodes) do
         node:set_on_exit(function()
@@ -1128,7 +1158,6 @@ function mn.Scene:_regenerate_selection_nodes()
             elseif tab_i == scene._shared_template_list_index then
                 scene:_set_verbose_info_object("template")
             end
-            scene:_set_control_indicator_layout(shared_tab_control)
             scene:_update_grabbed_object()
             scene:_set_grabbed_object_allowed(false)
         end)
@@ -1140,6 +1169,8 @@ function mn.Scene:_regenerate_selection_nodes()
         node:set_on_a(function()
             scene._shared_list_index = tab_i
         end)
+
+        node:set_on_b(on_b_undo_grab(get_shared_tab_control))
     end
 
     verbose_info_node:set_on_enter(function()
@@ -1151,6 +1182,8 @@ function mn.Scene:_regenerate_selection_nodes()
     verbose_info_node:set_on_exit(function()
         scene._verbose_info:set_selection_state(rt.SelectionState.INACTIVE)
     end)
+
+    verbose_info_node:set_on_b(get_verbose_info_control)
 
     -- push
     self._selection_graph:clear()
@@ -1182,6 +1215,8 @@ function mn.Scene:_regenerate_selection_nodes()
     if current_node ~= nil then
         self._selection_graph:set_current_node(current_node)
     end
+
+    self:_set_control_indicator_layout(self._selection_graph:get_current_node().get_control_indicator_layout())
 end
 
 --- @brief
@@ -1191,10 +1226,6 @@ function mn.Scene:_set_control_indicator_layout(layout)
     }
 
     local final_layout = {}
-    if self._grabbed_object ~= nil then
-        table.insert(final_layout, {rt.ControlIndicatorButton.B, "Drop"})
-    end
-
     for x in values(layout) do
         table.insert(final_layout, x)
     end
@@ -1244,11 +1275,6 @@ function mn.Scene:_handle_button_pressed(which)
     local current_shared_list = self:_shared_list_index_to_list(self._shared_list_index)
     local grabbed_object = self._state:peek_grabbed_object()
 
-    if grabbed_object ~= nil and which == rt.InputButton.B then
-        self._undo_grab()
-        self:_update_grabbed_object()
-    end
-
     if current_node.is_shared_list_node == true and which == rt.InputButton.UP and grabbed_object == nil then
         local success = current_shared_list:move_up()
         if not success then -- escape from list scroll
@@ -1262,7 +1288,9 @@ function mn.Scene:_handle_button_pressed(which)
         end
     else
         self._selection_graph:handle_button(which)
+        self:_set_control_indicator_layout(self._selection_graph:get_current_node().get_control_indicator_layout())
     end
+
 end
 
 --- @brief
