@@ -784,6 +784,8 @@ function mn.Scene:_regenerate_selection_nodes()
     shared_move_node.get_control_indicator_layout = get_shared_move_list_control
     shared_equip_node.get_control_indicator_layout = get_shared_equip_list_control
     shared_consumable_node.get_control_indicator_layout = get_shared_consumable_list_control
+    shared_template_node.get_control_indicator_layout = get_template_list_control
+
     verbose_info_node.get_control_indicator_layout = get_verbose_info_control
 
     -- interactivity
@@ -877,7 +879,7 @@ function mn.Scene:_regenerate_selection_nodes()
             end)
 
             node:set_on_a(function()
-                Slot A behavior, + entity info update
+                TODO Slot A, X behavior, + entity info update, template load from list, template info item
             end)
 
             node:set_on_x(function()
