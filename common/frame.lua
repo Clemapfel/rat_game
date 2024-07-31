@@ -7,7 +7,18 @@ rt.FrameType = meta.new_enum({
 
 rt.settings.frame = {
     thickness = 2, -- px
-    corner_radius = 10
+    corner_radius = 10,
+    selected_base_color = (function()
+        local a = rt.Palette.GRAY_5
+        local b = rt.Palette.BACKGROUND
+        local weight = 0.25
+        return rt.RGBA(
+            mix(a.r, b.r, weight),
+            mix(a.g, b.g, weight),
+            mix(a.b, b.b, weight),
+            math.max(a.a, b.a)
+        )
+    end)()
 }
 
 --- @class rt.Frame
@@ -249,6 +260,7 @@ function rt.Frame:set_selection_state(selection_state)
         for shape in range(self._frame, self._frame_outline) do
             shape:set_opacity(1)
         end
+        self._stencil_mask:set_color(rt.Palette.BACKGROUND)
     elseif self._selection_state == rt.SelectionState.ACTIVE then
         self._frame:set_line_width(self._thickness + 2)
         self._frame_outline:set_line_width(self._thickness + 2 + 2)
@@ -256,6 +268,7 @@ function rt.Frame:set_selection_state(selection_state)
         for shape in range(self._frame, self._frame_outline) do
             shape:set_opacity(1)
         end
+        self._stencil_mask:set_color(rt.settings.frame.selected_base_color)
     elseif self._selection_state == rt.SelectionState.UNSELECTED then
         self._frame:set_line_width(self._thickness)
         self._frame_outline:set_line_width(self._thickness + 2)

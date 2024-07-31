@@ -39,16 +39,16 @@ function mn.EntityInfo:realize()
         {"defense", "Defense", "DEFENSE"},
         {"speed", "Speed", "SPEED"}
     ) do
-        local heading_prefix = "<b>"
-        local heading_postfix = "</b>"
+        local heading_prefix = "<b><o>"
+        local heading_postfix = "</b></o>"
         self["_" .. stat[1] .. "_heading_label"] = rt.Label(heading_prefix .. stat[2] .. heading_postfix)
 
-        local number_prefix = "<mono>"
-        local number_postfix = "</mono>"
+        local number_prefix = "<mono><o>"
+        local number_postfix = "</mono></o>"
 
         local stat_prefix = "<color=" .. stat[3] .. ">"
         local stat_postfix = "</color>"
-        self["_" .. stat[1] .. "_colon"] = rt.Label("<color=GRAY><b> :</b></color>")
+        self["_" .. stat[1] .. "_colon"] = rt.Label("<color=GRAY><b><o> :</o></b></color>")
         self["_" .. stat[1] .. "_arrow"] = rt.Label("<color=GRAY> \u{2192}</color>")
         self["_" .. stat[1] .. "_value_label"] = rt.Label(stat_prefix .. number_prefix .. self["_" .. stat[1] .. "_value"] .. number_postfix .. stat_postfix)
 
@@ -77,11 +77,11 @@ function mn.EntityInfo:_update()
         {"defense", "Defense", "DEFENSE"},
         {"speed", "Speed", "SPEED"}
     ) do
-        local number_prefix = "<mono>"
-        local number_postfix = "</mono>"
+        local number_prefix = "<mono><o>"
+        local number_postfix = "</mono></o>"
 
-        local stat_prefix = "<color=" .. stat[3] .. ">"
-        local stat_postfix = "</color>"
+        local stat_prefix = "<o><color=" .. stat[3] .. ">"
+        local stat_postfix = "</color></o>"
 
         local value_label = self["_" .. stat[1] .. "_value_label"]
         value_label:set_text(stat_prefix .. number_prefix .. self["_" .. stat[1] .. "_value"] .. number_postfix .. stat_postfix)
@@ -132,7 +132,7 @@ function mn.EntityInfo:size_allocate(x, y, width, height)
         local arrow_label = self["_" .. stat .. "_arrow"]
         local arrow_w, _ = arrow_label:measure()
 
-        heading_label:fit_into(current_x, current_y, POSITIVE_INFINITY)
+        heading_label:fit_into(math.floor(current_x), math.floor(current_y), POSITIVE_INFINITY)
         colon_label:fit_into(current_x + 0.5 * (end_x - start_x) - 0.5 * colon_w, current_y, POSITIVE_INFINITY)
 
         local preview_active = self["_" .. stat .. "_preview_active"]
@@ -157,7 +157,7 @@ end
 function mn.EntityInfo:draw()
     self._frame:draw()
 
-    rt.graphics.translate(0, self._y_center_offset)
+    rt.graphics.translate(0, math.floor(self._y_center_offset))
     for stat in range("hp", "attack", "defense", "speed") do
         self["_" .. stat .. "_heading_label"]:draw()
         self["_" .. stat .. "_colon"]:draw()
@@ -170,7 +170,7 @@ function mn.EntityInfo:draw()
             self["_" .. stat .. "_value_label"]:draw()
         end
     end
-    rt.graphics.translate(0, -self._y_center_offset)
+    rt.graphics.translate(0, -math.floor(self._y_center_offset))
 end
 
 --- @brief

@@ -59,26 +59,31 @@ function mn.Slots:realize()
                     base = rt.Polygon(0, 0, 1, 1, 1, 0, 0, 1),
                     base_inlay = rt.Circle(0, 0, 1, 1),
                     frame = rt.Polygon(0, 0, 1, 1, 1, 0, 0, 1),
+                    frame_outline = rt.Polygon(0, 0, 1, 1, 1, 0, 0, 1),
                 }
             elseif type == mn.SlotType.MOVE then
                 to_insert = {
                     base = rt.Rectangle(0, 0, 1, 1),
                     base_inlay = rt.Circle(0, 0, 1, 1),
                     frame = rt.Rectangle(0, 0, 1, 1),
+                    frame_outline = rt.Rectangle(0, 0, 1, 1)
                 }
                 to_insert.base:set_corner_radius(rt.settings.frame.corner_radius)
                 to_insert.frame:set_corner_radius(rt.settings.frame.corner_radius)
+                to_insert.frame_outline:set_corner_radius(rt.settings.frame.corner_radius)
             elseif type == mn.SlotType.CONSUMABLE then
                 to_insert = {
                     base = rt.Circle(0, 0, 1, 1),
                     base_inlay = rt.Circle(0, 0, 1, 1),
                     frame = rt.Circle(0, 0, 1, 1),
+                    frame_outline = rt.Circle(0, 0, 1, 1)
                 }
             elseif type == mn.SlotType.INTRINSIC then
                 to_insert = {
                     base = rt.Polygon(0, 0, 1, 1, 1, 0, 0, 1),
                     base_inlay = rt.Circle(0, 0, 1, 1),
                     frame = rt.Polygon(0, 0, 1, 1, 1, 0, 0, 1),
+                    frame_outline = rt.Polygon(0, 0, 1, 1, 1, 0, 0, 1),
                 }
             else
                 rt.error("In mn.Slots:realize: unrecognized slot type at `" .. row_i .. ", " .. column_i .. "`: `" .. type .. "`")
@@ -93,6 +98,9 @@ function mn.Slots:realize()
             to_insert.frame:set_color(rt.Palette.GRAY_4)
             to_insert.frame:set_line_width(rt.settings.menu.slots.frame_unselected_thickness)
             to_insert.frame:set_is_outline(true)
+            to_insert.frame_outline:set_color(rt.Palette.BACKGROUND_OUTLINE)
+            to_insert.frame_outline:set_line_width(3)
+            to_insert.frame_outline:set_is_outline(true)
             to_insert.bounds = rt.AABB(0, 0, 1, 1)
             to_insert.selection_node = mn.SelectionGraphNode()
             to_insert.is_visible = true
@@ -140,15 +148,15 @@ function mn.Slots:size_allocate(x, y, width, height)
                     table.insert(points, point_y)
                 end
 
-                for shape in range(slot.base, slot.frame) do
+                for shape in range(slot.base, slot.frame, slot.frame_outline) do
                     shape:resize(table.unpack(points))
                 end
             elseif slot.type == mn.SlotType.CONSUMABLE then
-                for shape in range(slot.base, slot.frame) do
+                for shape in range(slot.base, slot.frame, slot.frame_outline) do
                     shape:resize(current_x + 0.5 * slot_w, current_y + 0.5 * slot_w, 0.5 * slot_w, 0.5 * slot_h)
                 end
             elseif slot.type == mn.SlotType.MOVE then
-                for shape in range(slot.base, slot.frame) do
+                for shape in range(slot.base, slot.frame, slot.frame_outline) do
                     shape:resize(current_x, current_y, slot_w, slot_h)
                 end
             elseif slot.type == mn.SlotType.INTRINSIC then
@@ -160,7 +168,7 @@ function mn.Slots:size_allocate(x, y, width, height)
                     table.insert(points, point_y)
                 end
 
-                for shape in range(slot.base, slot.frame) do
+                for shape in range(slot.base, slot.frame, slot.frame_outline) do
                     shape:resize(table.unpack(points))
                 end
             end
@@ -226,6 +234,7 @@ function mn.Slots:draw()
         for item in values(row) do
             item.base:draw()
             item.base_inlay:draw()
+            item.frame_outline:draw()
             item.frame:draw()
             if item.sprite ~= nil and item.is_visible == true then
                 item.sprite:draw()
@@ -269,7 +278,6 @@ function mn.Slots:set_object(slot_i, object)
     end
 end
 
---[[
 --- @brief
 function mn.Slots:get_object(slot_i)
     if self._is_realized == false then
@@ -281,17 +289,6 @@ function mn.Slots:get_object(slot_i)
     end
 end
 
---- @brief
-function mn.Slots:get_first_unoccupied_slot_i(type)
-    for slot_i = 1, self._n_slots do
-        local item = self._slot_i_to_item[slot_i]
-        if (type == nil or item.type == type) and item.object == nil then
-            return slot_i
-        end
-    end
-    return nil
-end
-]]--
 
 --- @brief
 function mn.Slots:clear()
@@ -355,6 +352,7 @@ function mn.Slots:set_opacity(alpha)
         item.base:set_opacity(alpha)
         item.base_inlay:set_opacity(alpha)
         item.frame:set_opacity(alpha)
+        item.frame_outline:set_opacity(alpha)
     end
 end
 

@@ -311,8 +311,8 @@ end
 
 --- @override
 function mn.ScrollableList:draw()
-    self._base:draw()
-    self._base_outline:draw()
+    --self._base:draw()
+    --self._base_outline:draw()
 
     local stencil_value = meta.hash(mn.ScrollableList) % 255
     --rt.graphics.stencil(stencil_value, self._stencil)

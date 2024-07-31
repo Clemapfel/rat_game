@@ -18,7 +18,8 @@ function mn.TabBar:push(widget)
         widget = widget,
         stencil = rt.Rectangle(),
         frame = rt.Frame(),
-        base = rt.Spacer()
+        base = rt.Spacer(),
+        is_selected = false
     }
 
     to_insert.frame:set_child(to_insert.base)
@@ -229,15 +230,27 @@ end
 
 --- @brief
 function mn.TabBar:set_tab_selected(tab_i, b)
-    self._items[tab_i].frame:set_selection_state(ternary(b, rt.SelectionState.ACTIVE, rt.SelectionState.INACTIVE))
+    local item =  self._items[tab_i]
+    item.frame:set_selection_state(ternary(b, rt.SelectionState.ACTIVE, rt.SelectionState.INACTIVE))
+
+    if item.is_selected then
+        item.base:set_color(rt.Palette.GRAY_3)
+    else
+        if b then
+            item.base:set_color(rt.settings.frame.selected_base_color)
+        else
+            item.base:set_color(rt.Palette.BACKGROUND)
+        end
+    end
 end
 
 --- @brief
 function mn.TabBar:set_tab_active(tab_i, b)
     local item = self._items[tab_i]
     if b == true then
-        item.base:set_color(rt.Palette.GRAY_4)
+        item.base:set_color(rt.Palette.GRAY_3)
     else
         item.base:set_color(rt.Palette.BACKGROUND)
     end
+    item.is_selected = b
 end
