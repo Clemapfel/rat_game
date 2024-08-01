@@ -22,14 +22,11 @@
     </configurations>
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="7fa9ba1b-2cff-4ecc-86fb-59ab2fa76ee1" name="Changes" comment="new control indicator layout trigger">
+    <list default="true" id="7fa9ba1b-2cff-4ecc-86fb-59ab2fa76ee1" name="Changes" comment="stashing">
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/common/frame.lua" beforeDir="false" afterPath="$PROJECT_DIR$/common/frame.lua" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/menu/entity_info.lua" beforeDir="false" afterPath="$PROJECT_DIR$/menu/entity_info.lua" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/common/animation_queue.lua" beforeDir="false" afterPath="$PROJECT_DIR$/common/animation_queue.lua" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/menu/object_moved_animation.lua" beforeDir="false" afterPath="$PROJECT_DIR$/menu/object_moved_animation.lua" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/menu/scene.lua" beforeDir="false" afterPath="$PROJECT_DIR$/menu/scene.lua" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/menu/scrollable_list.lua" beforeDir="false" afterPath="$PROJECT_DIR$/menu/scrollable_list.lua" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/menu/slots.lua" beforeDir="false" afterPath="$PROJECT_DIR$/menu/slots.lua" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/menu/tab_bar.lua" beforeDir="false" afterPath="$PROJECT_DIR$/menu/tab_bar.lua" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -470,23 +467,7 @@
       <workItem from="1722100982820" duration="18765000" />
       <workItem from="1722194976289" duration="882000" />
       <workItem from="1722213965868" duration="6180000" />
-      <workItem from="1722220329478" duration="63506000" />
-    </task>
-    <task id="LOCAL-00873" summary="added subpixel filtering to fix sprite scaling">
-      <option name="closed" value="true" />
-      <created>1720819914771</created>
-      <option name="number" value="00873" />
-      <option name="presentableId" value="LOCAL-00873" />
-      <option name="project" value="LOCAL" />
-      <updated>1720819914771</updated>
-    </task>
-    <task id="LOCAL-00874" summary="added item move animation">
-      <option name="closed" value="true" />
-      <created>1720890206528</created>
-      <option name="number" value="00874" />
-      <option name="presentableId" value="LOCAL-00874" />
-      <option name="project" value="LOCAL" />
-      <updated>1720890206529</updated>
+      <workItem from="1722220329478" duration="70330000" />
     </task>
     <task id="LOCAL-00875" summary="stashing before selection graph refactor">
       <option name="closed" value="true" />
@@ -864,7 +845,23 @@
       <option name="project" value="LOCAL" />
       <updated>1722463851463</updated>
     </task>
-    <option name="localTasksCounter" value="922" />
+    <task id="LOCAL-00922" summary="polished selection indicators">
+      <option name="closed" value="true" />
+      <created>1722469688352</created>
+      <option name="number" value="00922" />
+      <option name="presentableId" value="LOCAL-00922" />
+      <option name="project" value="LOCAL" />
+      <updated>1722469688352</updated>
+    </task>
+    <task id="LOCAL-00923" summary="stashing">
+      <option name="closed" value="true" />
+      <created>1722469815787</created>
+      <option name="number" value="00923" />
+      <option name="presentableId" value="LOCAL-00923" />
+      <option name="project" value="LOCAL" />
+      <updated>1722469815787</updated>
+    </task>
+    <option name="localTasksCounter" value="924" />
     <servers />
   </component>
   <component name="TypeScriptGeneratedFilesManager">
@@ -913,7 +910,6 @@
     </option>
   </component>
   <component name="VcsManagerConfiguration">
-    <MESSAGE value="alignment working again" />
     <MESSAGE value="added stats to verbose info panel" />
     <MESSAGE value="verbose info update implemented" />
     <MESSAGE value="added undo and verbose info polish" />
@@ -932,13 +928,14 @@
     <MESSAGE value="potential cool screen transition" />
     <MESSAGE value="cool texture with square wave" />
     <MESSAGE value="stashing regular pattern" />
-    <MESSAGE value="stashing" />
     <MESSAGE value="stashing fruit loops version" />
     <MESSAGE value="stashing before removing equip_*" />
     <MESSAGE value="shared list interactivity done" />
     <MESSAGE value="stashing before reworking control indicator layout" />
     <MESSAGE value="new control indicator layout trigger" />
-    <option name="LAST_COMMIT_MESSAGE" value="new control indicator layout trigger" />
+    <MESSAGE value="polished selection indicators" />
+    <MESSAGE value="stashing" />
+    <option name="LAST_COMMIT_MESSAGE" value="stashing" />
   </component>
   <component name="XDebuggerManager">
     <breakpoint-manager>

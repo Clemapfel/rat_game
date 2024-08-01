@@ -74,22 +74,30 @@ function rt.AnimationQueue:push(animations, start_callback, finish_callback)
         table.insert(node.animations, animation)
     end
 
-    table.insert(self._animations, node)
+    table.insert(self._animations, {node})
 end
 
 --- @brief
-function rt.AnimationQueue:append(animations)
+function rt.AnimationQueue:append(animations, start_callback, finish_callback)
     if meta.isa(animations, rt.QueueableAnimation) then
         animations = { animations }
     end
 
-    local node = self._animations[#self._animations]
-    if node == nil then
-        self:push(animations)
+    if sizeof(self._animations) == 0 then
+        self:push(animations, start_callback, finish_callback)
     else
+        local node = {}
+        node.on_start = start_callback
+        node.on_finish = finish_callback
+        node.is_started = false
+        node.is_finished = false
+        node.animations = {}
         for animation in values(animations) do
+            meta.assert_isa(animation, rt.QueueableAnimation)
             table.insert(node.animations, animation)
         end
+
+        table.insert(self._animations[#self._animations], node)
     end
 end
 
@@ -111,28 +119,29 @@ end
 
 --- @brief
 function rt.AnimationQueue:skip()
-    local node = self._animations[1]
-    if node == nil then return end
+    for node in values(self._animations[1]) do
+        if node == nil then return end
 
-    if node._is_started == false then
-        node._is_started = true
-        if node.on_start ~= nil then
-            node.on_start()
-        end
-    end
-
-    for animation in values(node.animations) do
-        if animation._state == rt.QueueableAnimationState.IDLE then
-            self:_start_animation(animation)
+        if node._is_started == false then
+            node._is_started = true
+            if node.on_start ~= nil then
+                node.on_start()
+            end
         end
 
-        animation:update(0)
-        self:_finish_animation(animation)
-    end
+        for animation in values(node.animations) do
+            if animation._state == rt.QueueableAnimationState.IDLE then
+                self:_start_animation(animation)
+            end
 
-    if node.on_finish ~= nil and node.is_finished == false then
-        node.on_finish()
-        node.is_finished = true
+            animation:update(0)
+            self:_finish_animation(animation)
+        end
+
+        if node.on_finish ~= nil and node.is_finished == false then
+            node.on_finish()
+            node.is_finished = true
+        end
     end
 
     table.remove(self._animations, 1)
@@ -141,40 +150,52 @@ end
 --- @brief
 function rt.AnimationQueue:update(delta)
     ::restart::
-    local node = self._animations[1]
-    if node == nil then return end
+    if sizeof(self._animations) == 0 then return end
 
-    if node.is_started == false then
-        node.is_started = true
+    for node in values(self._animations[1]) do
+        if node.is_started == false then
+            node.is_started = true
 
-        if node.on_start ~= nil then
-            node.on_start()
-        end
-    end
-
-    local depleted = true
-    for animation in values(node.animations) do
-        if animation._state == rt.QueueableAnimationState.IDLE then
-            self:_start_animation(animation)
-        end
-
-        if animation._state ~= rt.QueueableAnimationState.FINISHED then
-            local res = animation:update(delta)
-            if res == rt.QueueableAnimationResult.DISCONTINUE then
-                self:_finish_animation(animation)
-            elseif res == rt.QueueableAnimationResult.CONTINUE then
-                depleted = false
-            else
-                rt.error("In rt.AnimationQueue: animation `" .. meta.typeof(animation) .. "`.update does not return rt.QueueableAnimationResult, instead returns `" .. serialize(res) .. "`")
+            if node.on_start ~= nil then
+                node.on_start()
             end
         end
+
+        local depleted = true
+        for animation in values(node.animations) do
+            if animation._state == rt.QueueableAnimationState.IDLE then
+                self:_start_animation(animation)
+            end
+
+            if animation._state ~= rt.QueueableAnimationState.FINISHED then
+                local res = animation:update(delta)
+                if res == rt.QueueableAnimationResult.DISCONTINUE then
+                    self:_finish_animation(animation)
+                elseif res == rt.QueueableAnimationResult.CONTINUE then
+                    depleted = false
+                else
+                    rt.error("In rt.AnimationQueue: animation `" .. meta.typeof(animation) .. "`.update does not return rt.QueueableAnimationResult, instead returns `" .. serialize(res) .. "`")
+                end
+            end
+        end
+
+        if depleted == true then
+            if node.on_finish ~= nil and node.is_finished == false then
+                node.on_finish()
+            end
+            node.is_finished = true
+        end
     end
 
-    if depleted == true then
-        if node.on_finish ~= nil and node.is_finished == false then
-            node.on_finish()
+    local done = true
+    for node in values(self._animations[1]) do
+        if node.is_finished ~= true then
+            done = false
+            break
         end
-        node.is_finished = true
+    end
+
+    if done == true then
         table.remove(self._animations, 1)
         delta = 0
         goto restart
@@ -183,11 +204,12 @@ end
 
 --- @brief
 function rt.AnimationQueue:draw()
-    local node = self._animations[1]
-    if node == nil or node.is_started == false then return end
-    for animation in values(node.animations) do
-        if animation:get_state() ~= rt.QueueableAnimationState.FINISHED then
-            animation:draw()
+    for node in values(self._animations[1]) do
+        if node == nil or node.is_started == false then return end
+        for animation in values(node.animations) do
+            if animation:get_state() ~= rt.QueueableAnimationState.FINISHED then
+                animation:draw()
+            end
         end
     end
 end

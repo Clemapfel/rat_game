@@ -34,7 +34,9 @@ mn.Scene = meta.new_type("MenuScene", rt.Scene, function()
 
         _control_indicator = nil, -- rt.ControlIndicator
         _input_controller = rt.InputController(),
-        _animation_queue = rt.AnimationQueue()
+        _animation_queue = rt.AnimationQueue(),
+
+        _shared_list_index_to_selection_node = {}
     })
 end, {
     _shared_move_list_index = 1,
@@ -402,7 +404,8 @@ function mn.Scene:_regenerate_selection_nodes()
     -- control indicator layouts
 
     local get_shared_move_list_control = function()
-        local x_disabled =  scene._state:entity_get_first_free_move_slot(scene._entity_pages[scene._entity_index].entity) == nil
+        local entity = scene._entity_pages[scene._entity_index].entity
+        local x_disabled =  scene._state:entity_get_first_free_move_slot(entity) == nil or scene._state:entity_has_move(entity, scene._shared_move_list:get_selected_object())
         local is_grabbing = scene._state:peek_grabbed_object() ~= nil
         local sort_mode = scene._shared_move_list:get_sort_mode()
         return {
@@ -879,11 +882,77 @@ function mn.Scene:_regenerate_selection_nodes()
             end)
 
             node:set_on_a(function()
-                TODO Slot A, X behavior, + entity info update, template load from list, template info item
+                local page = scene._entity_pages[page_i]
+                local up = scene._state:peek_grabbed_object()
+                local down = page.moves:get_object(node_i)
+
+                if up ~= nil and down == nil then -- deposit
+                    if not meta.isa(up, bt.Move) or scene._state:entity_has_move(page.entity, up) then return end
+
+                    scene._state:take_grabbed_object()
+                    scene._state:add_equipped_move(page.entity, node_i, up)
+
+                    page.moves:set_object(node_i, up)
+                    scene:_update_grabbed_object()
+                elseif up == nil and down ~= nil then -- grab
+                    scene._state:set_grabbed_object(down)
+                    scene._state:take_equipped_move(page.entity, down)
+
+                    page.moves:set_object(node_i, nil)
+                    scene:_update_grabbed_object()
+                    scene:_set_grabbed_object_allowed(true)
+                elseif up ~= nil and down ~= nil then -- swap
+                    if not meta.isa(up, bt.Move) or scene._state:entity_has_move(page.entity, up) then return end
+
+                    local new_equipped = scene._state:take_grabbed_object()
+                    local new_grabbed = scene._state:take_equipped_move(page.entity, down)
+
+                    scene._state:set_grabbed_object(new_grabbed)
+                    scene._state:add_equipped_move(page.entity, node_i, new_equipped)
+
+                    page.moves:set_object(node_i, new_equipped)
+                    scene:_update_grabbed_object()
+                    scene:_set_grabbed_object_allowed(true)
+                end
             end)
 
             node:set_on_x(function()
-                --scene:_set_shared_tab_index
+                local page = scene._entity_pages[page_i]
+                local down = page.moves:get_object(node_i)
+                local up = scene._state:peek_grabbed_object()
+
+                if up ~= nil then
+                    -- do not check if move
+                    scene._state:take_grabbed_object()
+                    scene._state:add_shared_move(up)
+
+                    scene:_play_transfer_object_animation(
+                        up,
+                        scene:_get_grabbed_object_sprite_aabb(),
+                        scene._shared_move_list:get_bounds(),
+                        function()
+                            scene:_update_grabbed_object()
+                        end,
+                        function()
+                            scene._shared_move_list:add(up)
+                        end
+                    )
+                elseif down ~= nil then
+                    scene._state:take_equipped_move(page.entity, down)
+                    scene._state:add_shared_move(down)
+
+                    scene:_play_transfer_object_animation(
+                        down,
+                        page.moves:get_slot_aabb(node_i),
+                        scene._shared_move_list:get_bounds(),
+                        function()
+                            page.moves:set_object(node_i, nil)
+                        end,
+                        function()
+                            scene._shared_move_list:add(down)
+                        end
+                    )
+                end
             end)
 
             node:set_on_y(page_node_sort_on_y)
@@ -928,8 +997,156 @@ function mn.Scene:_regenerate_selection_nodes()
             node:set_on_y(page_node_sort_on_y)
 
             if node_i <= n_equips then
+                node:set_on_a(function()
+                    local page = scene._entity_pages[page_i]
+                    local up = scene._state:peek_grabbed_object()
+                    local down = page.equips_and_consumables:get_object(node_i)
+
+                    if up ~= nil and down == nil then -- deposit
+                        if not meta.isa(up, bt.Equip) then return end
+
+                        scene._state:take_grabbed_object()
+                        scene._state:add_equipped_equip(page.entity, node_i, up)
+
+                        page.equips_and_consumables:set_object(node_i, up)
+                        scene:_update_grabbed_object()
+                    elseif up == nil and down ~= nil then -- grab
+                        scene._state:set_grabbed_object(down)
+                        scene._state:take_equipped_equip(page.entity, down)
+
+                        page.equips_and_consumables:set_object(node_i, nil)
+                        scene:_update_grabbed_object()
+                        scene:_set_grabbed_object_allowed(true)
+                    elseif up ~= nil and down ~= nil then -- swap
+                        if not meta.isa(up, bt.Equip) then return end
+
+                        local new_equipped = scene._state:take_grabbed_object()
+                        local new_grabbed = scene._state:take_equipped_equip(page.entity, down)
+
+                        scene._state:set_grabbed_object(new_grabbed)
+                        scene._state:add_equipped_equip(page.entity, node_i, new_equipped)
+
+                        page.equips_and_consumables:set_object(node_i, new_equipped)
+                        scene:_update_grabbed_object()
+                        scene:_set_grabbed_object_allowed(true)
+                    end
+                end)
+
+                node:set_on_x(function()
+                    local page = scene._entity_pages[page_i]
+                    local down = page.equips_and_consumables:get_object(node_i)
+                    local up = scene._state:peek_grabbed_object()
+
+                    if up ~= nil then
+                        -- do not check if equip
+                        scene._state:take_grabbed_object()
+                        scene._state:add_shared_equip(up)
+
+                        scene:_play_transfer_object_animation(
+                            up,
+                            scene:_get_grabbed_object_sprite_aabb(),
+                            scene._shared_equip_list:get_bounds(),
+                            function()
+                                scene:_update_grabbed_object()
+                            end,
+                            function()
+                                scene._shared_equip_list:add(up)
+                            end
+                        )
+                    elseif down ~= nil then
+                        scene._state:take_equipped_equip(page.entity, down)
+                        scene._state:add_shared_equip(down)
+
+                        scene:_play_transfer_object_animation(
+                            down,
+                            page.equips_and_consumables:get_slot_aabb(node_i),
+                            scene._shared_equip_list:get_bounds(),
+                            function()
+                                page.equips_and_consumables:set_object(node_i, nil)
+                            end,
+                            function()
+                                scene._shared_equip_list:add(down)
+                            end
+                        )
+                    end
+                end)
+
                 node:set_on_b(on_b_undo_grab(get_equip_node_control))
             else
+                node:set_on_a(function()
+                    local page = scene._entity_pages[page_i]
+                    local up = scene._state:peek_grabbed_object()
+                    local down = page.equips_and_consumables:get_object(node_i)
+
+                    if up ~= nil and down == nil then -- deposit
+                        if not meta.isa(up, bt.Equip) then return end
+
+                        scene._state:take_grabbed_object()
+                        scene._state:add_equipped_consumable(page.entity, node_i, up)
+
+                        page.equips_and_consumables:set_object(node_i, up)
+                        scene:_update_grabbed_object()
+                    elseif up == nil and down ~= nil then -- grab
+                        scene._state:set_grabbed_object(down)
+                        scene._state:add_equipped_consumable(page.entity, down)
+
+                        page.equips_and_consumables:set_object(node_i, nil)
+                        scene:_update_grabbed_object()
+                        scene:_set_grabbed_object_allowed(true)
+                    elseif up ~= nil and down ~= nil then -- swap
+                        if not meta.isa(up, bt.Equip) then return end
+
+                        local new_consumableped = scene._state:take_grabbed_object()
+                        local new_grabbed = scene._state:add_equipped_consumable(page.entity, down)
+
+                        scene._state:set_grabbed_object(new_grabbed)
+                        scene._state:add_equipped_consumable(page.entity, node_i, new_consumableped)
+
+                        page.equips_and_consumables:set_object(node_i, new_consumableped)
+                        scene:_update_grabbed_object()
+                        scene:_set_grabbed_object_allowed(true)
+                    end
+                end)
+
+                node:set_on_x(function()
+                    local page = scene._entity_pages[page_i]
+                    local down = page.equips_and_consumables:get_object(node_i)
+                    local up = scene._state:peek_grabbed_object()
+
+                    if up ~= nil then
+                        -- do not check if consumable
+                        scene._state:take_grabbed_object()
+                        scene._state:add_shared_consumable(up)
+
+                        scene:_play_transfer_object_animation(
+                            up,
+                            scene:_get_grabbed_object_sprite_aabb(),
+                            scene._shared_consumable_list:get_bounds(),
+                            function()
+                                scene:_update_grabbed_object()
+                            end,
+                            function()
+                                scene._shared_consumable_list:add(up)
+                            end
+                        )
+                    elseif down ~= nil then
+                        scene._state:take_equipped_consumable(page.entity, down)
+                        scene._state:add_shared_consumable(down)
+
+                        scene:_play_transfer_object_animation(
+                            down,
+                            page.equips_and_consumables:get_slot_aabb(node_i),
+                            scene._shared_consumable_list:get_bounds(),
+                            function()
+                                page.equips_and_consumables:set_object(node_i, nil)
+                            end,
+                            function()
+                                scene._shared_consumable_list:add(down)
+                            end
+                        )
+                    end
+                end)
+
                 node:set_on_b(on_b_undo_grab(get_consumable_node_control))
             end
 
@@ -1010,7 +1227,6 @@ function mn.Scene:_regenerate_selection_nodes()
             if scene._state:entity_has_move(entity, object) then return end
             scene._state:take_shared_move(object)
             scene._state:add_equipped_move(entity, slot_i, object)
-
             scene:_play_transfer_object_animation(
                 object,
                 scene._shared_move_list:get_item_aabb(scene._shared_move_list:get_selected_item_i()),
@@ -1373,9 +1589,8 @@ function mn.Scene:_handle_button_pressed(which)
         end
     else
         self._selection_graph:handle_button(which)
-        self:_set_control_indicator_layout(self._selection_graph:get_current_node().get_control_indicator_layout())
     end
-
+    self:_set_control_indicator_layout(self._selection_graph:get_current_node().get_control_indicator_layout())
 end
 
 --- @brief
@@ -1433,7 +1648,7 @@ end
 
 --- @brief
 function mn.Scene:_play_transfer_object_animation(object, from_aabb, to_aabb, before, after)
-    self._animation_queue:push(mn.Animation.OBJECT_MOVED(object, from_aabb, to_aabb), before, after)
+    self._animation_queue:append(mn.Animation.OBJECT_MOVED(object, from_aabb, to_aabb), before, after)
 end
 
 --- @brief
