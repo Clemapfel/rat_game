@@ -26,8 +26,17 @@ rt.settings.show_fps = true
 local todo = rt.MessageDialog(
     "Title Title",
     "This message dialog is just for debugging, this text needs to be long enough to fit multiple lines",
-    "OK", "No", "Why?"
+    "OK", "Cancel"
 )
+todo:signal_connect("selection", function(dialog, index)
+    if index == 1 then
+        println("OK")
+        dialog:close()
+    elseif index == 2 then
+        println("Cancel")
+        dialog:close()
+    end
+end)
 todo:realize()
 
 love.draw = function()

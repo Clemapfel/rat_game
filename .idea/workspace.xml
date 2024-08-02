@@ -22,17 +22,10 @@
     </configurations>
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="7fa9ba1b-2cff-4ecc-86fb-59ab2fa76ee1" name="Changes" comment="added a/x for page nodes">
-      <change afterPath="$PROJECT_DIR$/common/message_dialog.lua" afterDir="false" />
+    <list default="true" id="7fa9ba1b-2cff-4ecc-86fb-59ab2fa76ee1" name="Changes" comment="implemented template loading">
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/battle/backgrounds/ink_in_water.glsl" beforeDir="false" afterPath="$PROJECT_DIR$/battle/backgrounds/ink_in_water.glsl" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/include.lua" beforeDir="false" afterPath="$PROJECT_DIR$/include.lua" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/common/message_dialog.lua" beforeDir="false" afterPath="$PROJECT_DIR$/common/message_dialog.lua" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/main_menu.lua" beforeDir="false" afterPath="$PROJECT_DIR$/main_menu.lua" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/menu/inventory_state.lua" beforeDir="false" afterPath="$PROJECT_DIR$/menu/inventory_state.lua" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/menu/scene.lua" beforeDir="false" afterPath="$PROJECT_DIR$/menu/scene.lua" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/menu/scrollable_list.lua" beforeDir="false" afterPath="$PROJECT_DIR$/menu/scrollable_list.lua" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/menu/slots.lua" beforeDir="false" afterPath="$PROJECT_DIR$/menu/slots.lua" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/menu/tab_bar.lua" beforeDir="false" afterPath="$PROJECT_DIR$/menu/tab_bar.lua" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -473,23 +466,7 @@
       <workItem from="1722100982820" duration="18765000" />
       <workItem from="1722194976289" duration="882000" />
       <workItem from="1722213965868" duration="6180000" />
-      <workItem from="1722220329478" duration="75786000" />
-    </task>
-    <task id="LOCAL-00876" summary="refactore selection graph, add per-node control indicator">
-      <option name="closed" value="true" />
-      <created>1720981642647</created>
-      <option name="number" value="00876" />
-      <option name="presentableId" value="LOCAL-00876" />
-      <option name="project" value="LOCAL" />
-      <updated>1720981642647</updated>
-    </task>
-    <task id="LOCAL-00877" summary="stashing before adding intrinsics">
-      <option name="closed" value="true" />
-      <created>1721138237548</created>
-      <option name="number" value="00877" />
-      <option name="presentableId" value="LOCAL-00877" />
-      <option name="project" value="LOCAL" />
-      <updated>1721138237548</updated>
+      <workItem from="1722220329478" duration="77907000" />
     </task>
     <task id="LOCAL-00878" summary="refactored selection state to be in common">
       <option name="closed" value="true" />
@@ -867,7 +844,23 @@
       <option name="project" value="LOCAL" />
       <updated>1722540954066</updated>
     </task>
-    <option name="localTasksCounter" value="925" />
+    <task id="LOCAL-00925" summary="added message dialog">
+      <option name="closed" value="true" />
+      <created>1722625314654</created>
+      <option name="number" value="00925" />
+      <option name="presentableId" value="LOCAL-00925" />
+      <option name="project" value="LOCAL" />
+      <updated>1722625314654</updated>
+    </task>
+    <task id="LOCAL-00926" summary="implemented template loading">
+      <option name="closed" value="true" />
+      <created>1722625320362</created>
+      <option name="number" value="00926" />
+      <option name="presentableId" value="LOCAL-00926" />
+      <option name="project" value="LOCAL" />
+      <updated>1722625320363</updated>
+    </task>
+    <option name="localTasksCounter" value="927" />
     <servers />
   </component>
   <component name="TypeScriptGeneratedFilesManager">
@@ -916,8 +909,6 @@
     </option>
   </component>
   <component name="VcsManagerConfiguration">
-    <MESSAGE value="verbose info update implemented" />
-    <MESSAGE value="added undo and verbose info polish" />
     <MESSAGE value="added love api" />
     <MESSAGE value="added templates" />
     <MESSAGE value="added keyboard" />
@@ -941,7 +932,9 @@
     <MESSAGE value="polished selection indicators" />
     <MESSAGE value="stashing" />
     <MESSAGE value="added a/x for page nodes" />
-    <option name="LAST_COMMIT_MESSAGE" value="added a/x for page nodes" />
+    <MESSAGE value="added message dialog" />
+    <MESSAGE value="implemented template loading" />
+    <option name="LAST_COMMIT_MESSAGE" value="implemented template loading" />
   </component>
   <component name="XDebuggerManager">
     <breakpoint-manager>

@@ -1,5 +1,6 @@
 --- @class rt.MessageDialog
-rt.MessageDialog = meta.new_type("MessageDialog", rt.Widget, function(message, submessage, option1, ...)
+--- @signal selection (rt.MessageDialog, Unsigned) -> nil
+rt.MessageDialog = meta.new_type("MessageDialog", rt.Widget, rt.SignalEmitter, function(message, submessage, option1, ...)
     local out = meta.new(rt.MessageDialog, {
         _message = message,
         _submessage = submessage,
@@ -14,7 +15,10 @@ rt.MessageDialog = meta.new_type("MessageDialog", rt.Widget, function(message, s
         _shadow = rt.Rectangle(0, 0, 1, 1),
 
         _render_x_offset = 0,
-        _render_y_offset = 0
+        _render_y_offset = 0,
+
+        _is_active = false,
+        _input = rt.InputController()
     })
 
     meta.assert_string(out._message)
@@ -23,17 +27,34 @@ rt.MessageDialog = meta.new_type("MessageDialog", rt.Widget, function(message, s
         meta.assert_string(option)
     end
 
+    out:signal_add("selection")
     return out
 end)
+
+--- @brief
+function rt.MessageDialog:set_is_active(b)
+    self._is_active = b
+    self._input:set_is_disabled(not b)
+end
+
+--- @brief
+function rt.MessageDialog:close()
+    self:set_is_active(false)
+    self:set_is_visible(false)
+end
+
+--- @brief
+function rt.MessageDialog:present()
+    self:set_is_active(true)
+    self:set_is_visible(true)
+end
 
 --- @override
 function rt.MessageDialog:realize()
     if self._is_realized == true then return end
     self._is_realized = true
 
-    local frame_color = rt.Palette.GRAY_4
     self._frame:realize()
-    self._frame:set_color(frame_color)
 
     self._message_label = rt.Label("<b>" .. self._message .. "</b>", rt.settings.font.default, rt.settings.font.default_mono)
     self._submessage_label = rt.Label(self._submessage, rt.settings.font.default_small, rt.settings.font.default_mono_small)
@@ -47,34 +68,23 @@ function rt.MessageDialog:realize()
     for option in values(self._options) do
         local to_insert = {
             label = rt.Label(option),
-            base = rt.Rectangle(0, 0, 1, 1),
-            outline = rt.Rectangle(0, 0, 1, 1),
-            selection_outline = rt.Rectangle(0, 0, 1, 1),
             frame = rt.Frame()
         }
 
         to_insert.frame:realize()
-        to_insert.frame:set_color(frame_color)
-
+        to_insert.frame:set_color(rt.Palette.GRAY_3)
         to_insert.label:realize()
         to_insert.label:set_justify_mode(rt.JustifyMode.CENTER)
-        to_insert.base:set_color(rt.Palette.GRAY_5)
-        to_insert.outline:set_color(rt.Palette.BACKGROUND_OUTLINE)
-        to_insert.selection_outline:set_color(rt.Palette.SELECTION)
-
-        for rect in range(to_insert.base, to_insert.outline, to_insert.selection_outline) do
-            rect:set_corner_radius(rt.settings.frame.corner_radius)
-        end
-
-        for rect in range(to_insert.outline, to_insert.selection_outline) do
-            rect:set_is_outline(true)
-        end
 
         table.insert(self._buttons, to_insert)
     end
 
-    local factor = 0.3
+    local factor = 0.5
     self._shadow:set_color(rt.RGBA(factor, factor, factor,  1))
+
+    self._input:signal_connect("pressed", function(_, which)
+        self:_handle_button_pressed(which)
+    end)
 end
 
 --- @override
@@ -91,10 +101,14 @@ function rt.MessageDialog:size_allocate(x, y, width, height)
         max_h = math.max(max_h, label_h)
     end
 
-    local item_w = max_w + 4 * m
-    local item_h = max_h + 2 * m
-
     local n_buttons = sizeof(self._buttons)
+    local title_label_w, title_label_h = self._message_label:measure()
+    max_w = math.max(max_w, title_label_w / n_buttons)
+    max_w = math.max(max_w, rt.graphics.get_width() / 4 / n_buttons)
+
+    local item_w = max_w + 4 * m
+    local item_h = max_h + 1.5 * m
+
     local button_w = n_buttons * item_w + (n_buttons - 1) * m
 
     self._message_label:fit_into(0, 0, button_w)
@@ -112,10 +126,6 @@ function rt.MessageDialog:size_allocate(x, y, width, height)
     current_y = current_y + sub_label_h + m
 
     for item in values(self._buttons) do
-        for shape in range(item.base, item.outline, item.selection_outline) do
-            shape:resize(current_x, current_y, item_w, item_h)
-        end
-
         local label_h = select(2, item.label:measure())
         item.label:fit_into(current_x, current_y + 0.5 * item_h - 0.5 * label_h, item_w, item_h)
         item.frame:fit_into(current_x, current_y, item_w, item_h)
@@ -129,10 +139,14 @@ function rt.MessageDialog:size_allocate(x, y, width, height)
 
     self._render_x_offset = math.floor(x + 0.5 * width - 0.5 * frame_w)
     self._render_y_offset = math.floor(y + 0.5 * height - 0.5 * frame_h)
+
+    self:_update_selected_item()
 end
 
 --- @override
 function rt.MessageDialog:draw()
+    if self:get_is_visible() == false then return end
+
     rt.graphics.set_blend_mode(rt.BlendMode.MULTIPLY)
     self._shadow:draw()
     rt.graphics.set_blend_mode()
@@ -144,13 +158,6 @@ function rt.MessageDialog:draw()
     self._submessage_label:draw()
 
     for item_i, item in ipairs(self._buttons) do
-        item.base:draw()
-        if item_i == self._selected_item_i then
-            item.selection_outline:draw()
-        else
-            item.outline:draw()
-        end
-
         item.frame:draw()
         item.label:draw()
     end
@@ -158,3 +165,30 @@ function rt.MessageDialog:draw()
     rt.graphics.translate(-1 * self._render_x_offset, -1 * self._render_y_offset)
 end
 
+--- @brief
+function rt.MessageDialog:_update_selected_item()
+    for item_i, item in ipairs(self._buttons) do
+        if item_i == self._selected_item_i then
+            item.frame:set_selection_state(rt.SelectionState.ACTIVE)
+        else
+            item.frame:set_selection_state(rt.SelectionState.INACTIVE)
+        end
+    end
+end
+
+--- @brief
+function rt.MessageDialog:_handle_button_pressed(which)
+    if which == rt.InputButton.LEFT then
+        if self._selected_item_i > 0 then
+            self._selected_item_i = self._selected_item_i - 1
+            self:_update_selected_item()
+        end
+    elseif which == rt.InputButton.RIGHT then
+        if self._selected_item_i < sizeof(self._buttons) then
+            self._selected_item_i = self._selected_item_i + 1
+            self:_update_selected_item()
+        end
+    elseif which == rt.InputButton.A then
+        self:signal_emit("selection", self._selected_item_i)
+    end
+end
