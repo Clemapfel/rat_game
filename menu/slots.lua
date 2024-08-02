@@ -295,6 +295,7 @@ function mn.Slots:clear()
     for row in values(self._items) do
         for item in values(row) do
             item.sprite = nil
+            item.object = nil
         end
     end
 end

@@ -202,8 +202,8 @@ vec4 effect(vec4 vertex_color, Image image, vec2 texture_coords, vec2 vertex_pos
 
     for(int i = 1; i < n_steps; i++)
     {
-        uv.x += lacunarity / i * sin(i * uv.y * step_multiplier + time) + 0.5 * i;
-        uv.y += lacunarity / i * cos(i * uv.x * step_multiplier - time) - 0.5 * i;
+        uv.x += lacunarity / i * sin(i * uv.y * step_multiplier + 2 * time) + 0.5 * i;
+        uv.y += lacunarity / i * cos(i * uv.x * step_multiplier - 2 * time) - 0.5 * i;
     }
 
     float x_bias = (cos(uv.x * 3) + 1) / 2;

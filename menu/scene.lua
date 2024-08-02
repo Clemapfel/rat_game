@@ -1,7 +1,8 @@
 rt.settings.menu.scene = {
     tab_sprite_scale_factor = 3,
     grabbed_object_sprite_scale_factor = 2,
-    verbose_info_scroll_speed = 150
+    verbose_info_scroll_speed = 150,
+    grabbed_object_sprite_offset = -0.1
 }
 
 mn.Scene = meta.new_type("MenuScene", rt.Scene, function()
@@ -36,7 +37,8 @@ mn.Scene = meta.new_type("MenuScene", rt.Scene, function()
         _input_controller = rt.InputController(),
         _animation_queue = rt.AnimationQueue(),
 
-        _shared_list_index_to_selection_node = {}
+        _shared_list_index_to_selection_node = {},
+        _previous_selection_node = {}
     })
 end, {
     _shared_move_list_index = 1,
@@ -83,7 +85,10 @@ function mn.Scene:_create_from_state(state)
 
     local tab_sprite_scale_factor = rt.settings.menu.scene.tab_sprite_scale_factor
 
+    self._state = state
     self._entity_pages = {}
+    self._entity_tab_bar:clear()
+
     local entities = self._state:list_entities()
     table.sort(entities, function(a, b)
         return self._entity_order[a:get_id()] < self._entity_order[b:get_id()]
@@ -157,18 +162,22 @@ function mn.Scene:_create_from_state(state)
     self._entity_tab_bar:set_orientation(rt.Orientation.VERTICAL)
     self._entity_tab_bar:realize()
 
+    self._shared_move_list:clear()
     for move, quantity in pairs(self._state:list_shared_moves()) do
         self._shared_move_list:add(move, quantity)
     end
 
+    self._shared_equip_list:clear()
     for equip, quantity in pairs(self._state:list_shared_equips()) do
         self._shared_equip_list:add(equip, quantity)
     end
 
+    self._shared_consumable_list:clear()
     for consumable, quantity in pairs(self._state:list_shared_consumables()) do
         self._shared_consumable_list:add(consumable, quantity)
     end
 
+    self._shared_template_list:clear()
     for template in values(self._state:list_templates()) do
         self._shared_template_list:add(template)
     end
@@ -201,8 +210,6 @@ function mn.Scene:realize()
     self._shared_tab_bar:set_n_post_aligned_items(1)
     self._shared_tab_bar:realize()
 
-    self:_create_from_state(self._state)
-
     for widget in range(
         self._shared_move_list,
         self._shared_equip_list,
@@ -221,6 +228,8 @@ function mn.Scene:realize()
     self._input_controller:signal_connect("pressed", function(_, which)
         self:_handle_button_pressed(which)
     end)
+
+    self:_create_from_state(self._state)
 end
 
 --- @override
@@ -666,11 +675,25 @@ function mn.Scene:_regenerate_selection_nodes()
 
         page.info_node:set_left(entity_tab_nodes[1])
         page.info_node:set_right(shared_tab_nodes[1])
-        page.info_node:set_down(page.top_move_nodes[center_node_i])
+        page.info_node:set_down(function()
+            for node in values(page.top_move_nodes) do
+                if node == scene._previous_selection_node then
+                    return scene._previous_selection_node
+                end
+            end
+            return page.top_move_nodes[center_node_i]
+        end)
 
         -- down to slots, unless locked
         for node in values(page.bottom_move_nodes) do
-            node:set_down(find_nearest_node(node, page.slot_nodes, "x"))
+            node:set_down(function()
+                for node in values(page.slot_nodes) do
+                    if node == scene._previous_selection_node then
+                        return scene._previous_selection_node
+                    end
+                end
+                return find_nearest_node(node, page.slot_nodes, "x")
+            end)
         end
 
         -- up to info, unless locked
@@ -690,7 +713,14 @@ function mn.Scene:_regenerate_selection_nodes()
 
         -- slots up or down, unless locked
         for node in values(page.slot_nodes) do
-            node:set_up(find_nearest_node(node, page.bottom_move_nodes, "x"))
+            node:set_up(function()
+                for node in values(page.bottom_move_nodes) do
+                    if node == scene._previous_selection_node then
+                        return scene._previous_selection_node
+                    end
+                end
+                return find_nearest_node(node, page.bottom_move_nodes, "x")
+            end)
         end
 
         -- slots left, unless locked
@@ -712,6 +742,12 @@ function mn.Scene:_regenerate_selection_nodes()
             )
         end
         entity_tab_node:set_right(function()
+            local page = entity_page_nodes[scene._entity_index]
+            for node in range(page.info_node, page.slot_nodes[1], table.unpack(page.left_move_nodes)) do
+                if node == scene._previous_selection_node then
+                    return scene._previous_selection_node
+                end
+            end
             return nearest[scene._entity_index]
         end)
     end
@@ -727,6 +763,12 @@ function mn.Scene:_regenerate_selection_nodes()
     ]]--
 
     local shared_list_left = function()
+        local page = entity_page_nodes[scene._entity_index]
+        for node in values(page.right_move_nodes) do
+            if scene._previous_selection_node == node then
+                return scene._previous_selection_node
+            end
+        end
         return entity_page_nodes[scene._entity_index].right_move_nodes[1]
     end
 
@@ -737,6 +779,13 @@ function mn.Scene:_regenerate_selection_nodes()
     ]]--
 
     local shared_list_up = function()
+        local is_viable = {}
+        for i = 1, 4 do
+            if shared_tab_nodes[i] == scene._previous_selection_node then
+                return scene._previous_selection_node
+            end
+        end
+
         return shared_tab_nodes[scene._shared_list_index]
     end
 
@@ -867,7 +916,7 @@ function mn.Scene:_regenerate_selection_nodes()
                 slots:set_slot_selection_state(node_i, rt.SelectionState.ACTIVE)
 
                 local object = scene._state:get_move_at(page.entity, node_i)
-                if object == nil then
+                if object == nil and scene._state:peek_grabbed_object() == nil then
                     scene:_set_verbose_info_object("move")
                 else
                     scene:_set_verbose_info_object(object)
@@ -971,7 +1020,7 @@ function mn.Scene:_regenerate_selection_nodes()
                 local page = scene._entity_pages[page_i]
                 if node_i <= n_equips then
                     local object = scene._state:get_equip_at(page.entity, node_i)
-                    if object == nil then
+                    if object == nil and scene._state:peek_grabbed_object() == nil then
                         scene:_set_verbose_info_object("equip")
                     else
                         scene:_set_verbose_info_object(object)
@@ -979,7 +1028,7 @@ function mn.Scene:_regenerate_selection_nodes()
                     scene:_set_grabbed_object_allowed(meta.isa(scene._state:peek_grabbed_object(), bt.Equip))
                 else
                     local object = scene._state:get_consumable_at(page.entity, node_i - n_equips)
-                    if object == nil then
+                    if object == nil and scene._state:peek_grabbed_object() == nil then
                         scene:_set_verbose_info_object("consumable")
                     else
                         scene:_set_verbose_info_object(object)
@@ -1438,6 +1487,15 @@ function mn.Scene:_regenerate_selection_nodes()
         scene:_set_grabbed_object_allowed(false)
     end)
 
+    shared_template_node:set_on_a(function()
+        local current = scene._shared_template_list:get_selected_object()
+        if current ~= nil then
+            scene._state:load_template(current)
+            scene:_create_from_state(scene._state)
+            scene:reformat()
+        end
+    end)
+
     shared_template_node:set_on_b(on_b_undo_grab(get_template_list_control))
 
     for node in values(shared_list_nodes) do
@@ -1588,8 +1646,14 @@ function mn.Scene:_handle_button_pressed(which)
             self:_set_verbose_info_object(current_shared_list:get_selected_object())
         end
     else
+        local before = self._selection_graph:get_current_node()
         self._selection_graph:handle_button(which)
+        local after = self._selection_graph:get_current_node()
+        if before ~= after then
+            self._previous_selection_node = before
+        end
     end
+
     self:_set_control_indicator_layout(self._selection_graph:get_current_node().get_control_indicator_layout())
 end
 
@@ -1607,22 +1671,27 @@ function mn.Scene:_update_grabbed_object()
             self._grabbed_object_id = nil
         end
     else
+        local sprite_w, sprite_h
         if grabbed:get_id() ~= self._grabbed_object_id then
             self._grabbed_object_id = grabbed:get_id()
             self._grabbed_object_sprite = rt.LabeledSprite(grabbed:get_sprite_id())
             self._grabbed_object_sprite:set_label("<color=LIGHT_RED_3><o>\u{00D7}</o></color>")
             self._grabbed_object_sprite:realize()
-            local sprite_w, sprite_h = self._grabbed_object_sprite:get_resolution()
+            sprite_w, sprite_h = self._grabbed_object_sprite:get_resolution()
             local sprite_factor = rt.settings.menu.scene.grabbed_object_sprite_scale_factor
-            self._grabbed_object_sprite:fit_into(0, 0, sprite_w * sprite_factor, sprite_h * sprite_factor)
+            sprite_w = sprite_w * sprite_factor
+            sprite_h = sprite_h * sprite_factor
+            
+            local offset = rt.settings.menu.scene.grabbed_object_sprite_offset
+            
+            self._grabbed_object_sprite:fit_into(-0.5 * sprite_w + offset * sprite_w, -0.5 * sprite_h + offset * sprite_w, sprite_w, sprite_h)
             self._grabbed_object_sprite:set_opacity(0.5)
             self:_set_grabbed_object_allowed(self._grabbed_object_allowed)
         end
 
         local current = self._selection_graph:get_current_node_aabb()
-        local sprite_w, sprite_h = self._grabbed_object_sprite:get_minimum_size()
-        self._grabbed_object_sprite_x = current.x + 0.5 * current.width - sprite_w
-        self._grabbed_object_sprite_y = current.y + 0.5 * current.height - sprite_h
+        self._grabbed_object_sprite_x = current.x + 0.5 * current.width
+        self._grabbed_object_sprite_y = current.y + 0.5 * current.height
     end
 end
 

@@ -466,7 +466,7 @@ function mn.InventoryState:add_template(template)
 end
 
 --- @brief
-function mn.InventoryState:set_active_template(template)
+function mn.InventoryState:load_template(template)
     meta.assert_isa(template, mn.Template)
     self.active = template
 end

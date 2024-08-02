@@ -177,7 +177,9 @@ end
 --- @brief
 function mn.ScrollableList._update_item(item)
     item.name_label:set_text(mn.ScrollableList._format_name_label(item.object:get_name()))
-    item.quantity_label:set_text(mn.ScrollableList._format_quantity_label(item.quantity))
+    if item.quantity_label ~= nil then
+        item.quantity_label:set_text(mn.ScrollableList._format_quantity_label(item.quantity))
+    end
 end
 
 --- @brief

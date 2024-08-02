@@ -22,11 +22,17 @@
     </configurations>
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="7fa9ba1b-2cff-4ecc-86fb-59ab2fa76ee1" name="Changes" comment="stashing">
+    <list default="true" id="7fa9ba1b-2cff-4ecc-86fb-59ab2fa76ee1" name="Changes" comment="added a/x for page nodes">
+      <change afterPath="$PROJECT_DIR$/common/message_dialog.lua" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/common/animation_queue.lua" beforeDir="false" afterPath="$PROJECT_DIR$/common/animation_queue.lua" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/menu/object_moved_animation.lua" beforeDir="false" afterPath="$PROJECT_DIR$/menu/object_moved_animation.lua" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/battle/backgrounds/ink_in_water.glsl" beforeDir="false" afterPath="$PROJECT_DIR$/battle/backgrounds/ink_in_water.glsl" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/include.lua" beforeDir="false" afterPath="$PROJECT_DIR$/include.lua" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/main_menu.lua" beforeDir="false" afterPath="$PROJECT_DIR$/main_menu.lua" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/menu/inventory_state.lua" beforeDir="false" afterPath="$PROJECT_DIR$/menu/inventory_state.lua" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/menu/scene.lua" beforeDir="false" afterPath="$PROJECT_DIR$/menu/scene.lua" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/menu/scrollable_list.lua" beforeDir="false" afterPath="$PROJECT_DIR$/menu/scrollable_list.lua" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/menu/slots.lua" beforeDir="false" afterPath="$PROJECT_DIR$/menu/slots.lua" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/menu/tab_bar.lua" beforeDir="false" afterPath="$PROJECT_DIR$/menu/tab_bar.lua" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -467,15 +473,7 @@
       <workItem from="1722100982820" duration="18765000" />
       <workItem from="1722194976289" duration="882000" />
       <workItem from="1722213965868" duration="6180000" />
-      <workItem from="1722220329478" duration="70330000" />
-    </task>
-    <task id="LOCAL-00875" summary="stashing before selection graph refactor">
-      <option name="closed" value="true" />
-      <created>1720968823269</created>
-      <option name="number" value="00875" />
-      <option name="presentableId" value="LOCAL-00875" />
-      <option name="project" value="LOCAL" />
-      <updated>1720968823269</updated>
+      <workItem from="1722220329478" duration="75786000" />
     </task>
     <task id="LOCAL-00876" summary="refactore selection graph, add per-node control indicator">
       <option name="closed" value="true" />
@@ -861,7 +859,15 @@
       <option name="project" value="LOCAL" />
       <updated>1722469815787</updated>
     </task>
-    <option name="localTasksCounter" value="924" />
+    <task id="LOCAL-00924" summary="added a/x for page nodes">
+      <option name="closed" value="true" />
+      <created>1722540954066</created>
+      <option name="number" value="00924" />
+      <option name="presentableId" value="LOCAL-00924" />
+      <option name="project" value="LOCAL" />
+      <updated>1722540954066</updated>
+    </task>
+    <option name="localTasksCounter" value="925" />
     <servers />
   </component>
   <component name="TypeScriptGeneratedFilesManager">
@@ -910,7 +916,6 @@
     </option>
   </component>
   <component name="VcsManagerConfiguration">
-    <MESSAGE value="added stats to verbose info panel" />
     <MESSAGE value="verbose info update implemented" />
     <MESSAGE value="added undo and verbose info polish" />
     <MESSAGE value="added love api" />
@@ -935,7 +940,8 @@
     <MESSAGE value="new control indicator layout trigger" />
     <MESSAGE value="polished selection indicators" />
     <MESSAGE value="stashing" />
-    <option name="LAST_COMMIT_MESSAGE" value="stashing" />
+    <MESSAGE value="added a/x for page nodes" />
+    <option name="LAST_COMMIT_MESSAGE" value="added a/x for page nodes" />
   </component>
   <component name="XDebuggerManager">
     <breakpoint-manager>

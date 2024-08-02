@@ -124,6 +124,7 @@ require "common.gradient"
 require "common.fast_forward_indicator"
 require "common.control_indicator"
 require "common.particle_emitter"
+require "common.message_dialog"
 
 require "common.physics_world"
 require "common.collider"

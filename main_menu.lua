@@ -23,11 +23,20 @@ end
 rt.settings.show_rulers = false
 rt.settings.show_fps = true
 
+local todo = rt.MessageDialog(
+    "Title Title",
+    "This message dialog is just for debugging, this text needs to be long enough to fit multiple lines",
+    "OK", "No", "Why?"
+)
+todo:realize()
+
 love.draw = function()
     love.graphics.setColor(0.6, 0, 0.6, 1)
     if rt.current_scene ~= nil then
         rt.current_scene:draw()
     end
+
+    todo:draw()
 
     if rt.settings.show_rulers == true then
         love.graphics.setLineWidth(1)
@@ -57,6 +66,8 @@ love.resize = function()
     if rt.current_scene ~= nil then
         rt.current_scene:fit_into(0, 0, love.graphics.getWidth(), love.graphics.getHeight())
     end
+
+    todo:fit_into(0, 0, rt.graphics.get_width(), rt.graphics.get_height())
 end
 
 love.run = function()

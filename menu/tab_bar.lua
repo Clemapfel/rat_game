@@ -254,3 +254,11 @@ function mn.TabBar:set_tab_active(tab_i, b)
     end
     item.is_selected = b
 end
+
+--- @brief
+function mn.TabBar:clear()
+    self._items = {}
+    self._n_items = 0
+    self._selected_item_i = 0
+    self._selection_nodes = {}
+end
