@@ -114,7 +114,6 @@ function rt.MessageDialog:size_allocate(x, y, width, height)
     self._message_label:fit_into(0, 0, button_w)
     self._submessage_label:fit_into(0, 0, button_w)
 
-    local title_label_w, title_label_h = self._message_label:measure()
     local sub_label_w, sub_label_h = self._submessage_label:measure()
 
     local xm, ym = 4 * m, 2 * m

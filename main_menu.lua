@@ -24,8 +24,8 @@ rt.settings.show_rulers = false
 rt.settings.show_fps = true
 
 local todo = rt.MessageDialog(
-    "Title Title",
-    "This message dialog is just for debugging, this text needs to be long enough to fit multiple lines",
+    "Short",
+    "",
     "OK", "Cancel"
 )
 todo:signal_connect("selection", function(dialog, index)
