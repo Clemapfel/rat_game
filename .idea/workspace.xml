@@ -22,10 +22,12 @@
     </configurations>
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="7fa9ba1b-2cff-4ecc-86fb-59ab2fa76ee1" name="Changes" comment="implemented template loading">
+    <list default="true" id="7fa9ba1b-2cff-4ecc-86fb-59ab2fa76ee1" name="Changes" comment="stashing message dialog">
+      <change afterPath="$PROJECT_DIR$/common/keyboard.lua" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/common/message_dialog.lua" beforeDir="false" afterPath="$PROJECT_DIR$/common/message_dialog.lua" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/include.lua" beforeDir="false" afterPath="$PROJECT_DIR$/include.lua" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/main_menu.lua" beforeDir="false" afterPath="$PROJECT_DIR$/main_menu.lua" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/menu/keyboard.lua" beforeDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -466,23 +468,7 @@
       <workItem from="1722100982820" duration="18765000" />
       <workItem from="1722194976289" duration="882000" />
       <workItem from="1722213965868" duration="6180000" />
-      <workItem from="1722220329478" duration="77907000" />
-    </task>
-    <task id="LOCAL-00878" summary="refactored selection state to be in common">
-      <option name="closed" value="true" />
-      <created>1721139218329</created>
-      <option name="number" value="00878" />
-      <option name="presentableId" value="LOCAL-00878" />
-      <option name="project" value="LOCAL" />
-      <updated>1721139218329</updated>
-    </task>
-    <task id="LOCAL-00879" summary="added intrinsic category">
-      <option name="closed" value="true" />
-      <created>1721141255710</created>
-      <option name="number" value="00879" />
-      <option name="presentableId" value="LOCAL-00879" />
-      <option name="project" value="LOCAL" />
-      <updated>1721141255710</updated>
+      <workItem from="1722220329478" duration="82173000" />
     </task>
     <task id="LOCAL-00880" summary="added A interaction">
       <option name="closed" value="true" />
@@ -860,7 +846,23 @@
       <option name="project" value="LOCAL" />
       <updated>1722625320363</updated>
     </task>
-    <option name="localTasksCounter" value="927" />
+    <task id="LOCAL-00927" summary="finished message dialog">
+      <option name="closed" value="true" />
+      <created>1722627561958</created>
+      <option name="number" value="00927" />
+      <option name="presentableId" value="LOCAL-00927" />
+      <option name="project" value="LOCAL" />
+      <updated>1722627561958</updated>
+    </task>
+    <task id="LOCAL-00928" summary="stashing message dialog">
+      <option name="closed" value="true" />
+      <created>1722629087720</created>
+      <option name="number" value="00928" />
+      <option name="presentableId" value="LOCAL-00928" />
+      <option name="project" value="LOCAL" />
+      <updated>1722629087720</updated>
+    </task>
+    <option name="localTasksCounter" value="929" />
     <servers />
   </component>
   <component name="TypeScriptGeneratedFilesManager">
@@ -909,8 +911,6 @@
     </option>
   </component>
   <component name="VcsManagerConfiguration">
-    <MESSAGE value="added love api" />
-    <MESSAGE value="added templates" />
     <MESSAGE value="added keyboard" />
     <MESSAGE value="load from template done" />
     <MESSAGE value="added sdf meatball compute shader" />
@@ -934,7 +934,9 @@
     <MESSAGE value="added a/x for page nodes" />
     <MESSAGE value="added message dialog" />
     <MESSAGE value="implemented template loading" />
-    <option name="LAST_COMMIT_MESSAGE" value="implemented template loading" />
+    <MESSAGE value="finished message dialog" />
+    <MESSAGE value="stashing message dialog" />
+    <option name="LAST_COMMIT_MESSAGE" value="stashing message dialog" />
   </component>
   <component name="XDebuggerManager">
     <breakpoint-manager>

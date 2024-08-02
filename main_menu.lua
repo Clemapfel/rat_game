@@ -23,20 +23,7 @@ end
 rt.settings.show_rulers = false
 rt.settings.show_fps = true
 
-local todo = rt.MessageDialog(
-    "Short",
-    "",
-    "OK", "Cancel"
-)
-todo:signal_connect("selection", function(dialog, index)
-    if index == 1 then
-        println("OK")
-        dialog:close()
-    elseif index == 2 then
-        println("Cancel")
-        dialog:close()
-    end
-end)
+local todo = rt.Keyboard()
 todo:realize()
 
 love.draw = function()
