@@ -1,25 +1,25 @@
---- @class mn.SelectionGraph
-mn.SelectionGraph = meta.new_type("SelectionGraph", function()
-    return meta.new(mn.SelectionGraph, {
-        _nodes = {}, -- Set<mn.SelectionGraphNode>
+--- @class rt.SelectionGraph
+rt.SelectionGraph = meta.new_type("SelectionGraph", function()
+    return meta.new(rt.SelectionGraph, {
+        _nodes = {}, -- Set<rt.SelectionGraphNode>
         _current_node = nil,
         _n_nodes = 0
     })
 end)
 
---- @class mn.SelectionGraphNode
-mn.SelectionGraphNode = meta.new_type("SelectionGraphNode", rt.Drawable, function(aabb)
-    local out = meta.new(mn.SelectionGraphNode, {
+--- @class rt.SelectionGraphNode
+rt.SelectionGraphNode = meta.new_type("SelectionGraphNode", rt.Drawable, function(aabb)
+    local out = meta.new(rt.SelectionGraphNode, {
         _aabb = rt.AABB(0, 0, 1, 1),
         _centroid_x = 0,
         _centroid_y = 0,
         _on_enter = function(direction)  end,
         _on_exit = function(direction)  end,
         _on_activate = function()  end,
-        _on_up = nil,     -- () -> mn.SelectionGraphNode
-        _on_right = nil,  -- () -> mn.SelectionGraphNode
-        _on_down = nil,   -- () -> mn.SelectionGraphNode
-        _on_left = nil,   -- () -> mn.SelectionGraphNode
+        _on_up = nil,     -- () -> rt.SelectionGraphNode
+        _on_right = nil,  -- () -> rt.SelectionGraphNode
+        _on_down = nil,   -- () -> rt.SelectionGraphNode
+        _on_left = nil,   -- () -> rt.SelectionGraphNode
     })
 
     if aabb ~= nil then
@@ -31,7 +31,7 @@ mn.SelectionGraphNode = meta.new_type("SelectionGraphNode", rt.Drawable, functio
     return out
 end)
 
-function mn.SelectionGraphNode:set_aabb(aabb_or_x, y, w, h)
+function rt.SelectionGraphNode:set_aabb(aabb_or_x, y, w, h)
     if meta.is_aabb(aabb_or_x) then
         self._aabb = aabb_or_x
     else
@@ -42,7 +42,7 @@ function mn.SelectionGraphNode:set_aabb(aabb_or_x, y, w, h)
     self._centroid_y = self._aabb.y + 0.5 * self._aabb.height
 end
 
-function mn.SelectionGraphNode:get_aabb()
+function rt.SelectionGraphNode:get_aabb()
     return self._aabb
 end
 
@@ -57,20 +57,20 @@ do
     local opposite_direction = name_directions[3]
 
     local on_which = "_on_" .. which
-    mn.SelectionGraphNode["set_" .. which] = function(self, other_or_f)
+    rt.SelectionGraphNode["set_" .. which] = function(self, other_or_f)
         if other_or_f == nil then
             self[on_which] = nil
         elseif meta.is_function(other_or_f) then
             self[on_which] = other_or_f
         else
-            meta.assert_isa(other_or_f, mn.SelectionGraphNode)
+            meta.assert_isa(other_or_f, rt.SelectionGraphNode)
             self[on_which] = function()
                 return other_or_f
             end
         end
     end
 
-    mn.SelectionGraphNode["get_" .. which] = function(self)
+    rt.SelectionGraphNode["get_" .. which] = function(self)
         if self[on_which] ~= nil then
             return self[on_which]()
         else
@@ -78,12 +78,12 @@ do
         end
     end
 
-    mn.SelectionGraph["move_" .. which] = function(self)
+    rt.SelectionGraph["move_" .. which] = function(self)
         local current = self._current_node
         if current ~= nil then
             local next = current["get_" .. which](current)
             if next ~= nil then
-                meta.assert_isa(next, mn.SelectionGraphNode)
+                meta.assert_isa(next, rt.SelectionGraphNode)
 
                 if self._current_node._on_exit ~= nil then
                     self._current_node._on_exit(direction)
@@ -103,7 +103,7 @@ end
 
 
 for which in range("on_activate", "on_enter", "on_exit") do
-    mn.SelectionGraphNode["set_" .. which] = function(self, f)
+    rt.SelectionGraphNode["set_" .. which] = function(self, f)
         if f ~= nil then
             meta.assert_function(f)
         end
@@ -111,7 +111,7 @@ for which in range("on_activate", "on_enter", "on_exit") do
     end
 end
 
-function mn.SelectionGraphNode:draw(color)
+function rt.SelectionGraphNode:draw(color)
     local color = which(color, rt.Palette.SELECTION)
 
     love.graphics.setLineWidth(3)
@@ -136,8 +136,8 @@ function mn.SelectionGraphNode:draw(color)
     end
 end
 
-function mn.SelectionGraph:add(node)
-    meta.assert_isa(node, mn.SelectionGraphNode)
+function rt.SelectionGraph:add(node)
+    meta.assert_isa(node, rt.SelectionGraphNode)
     if self._nodes[node] == nil then
         self._nodes[node] = true
         if self._n_nodes == 0 then
@@ -147,14 +147,14 @@ function mn.SelectionGraph:add(node)
     end
 end
 
-function mn.SelectionGraph:remove(node)
+function rt.SelectionGraph:remove(node)
     if self._nodes[node] ~= nil then
         self._nodes[node] = nil
         self._n_nodes = self._n_nodes - 1
     end
 end
 
-function mn.SelectionGraph:set_current_node(node)
+function rt.SelectionGraph:set_current_node(node)
     self:add(node)
 
     if self._current_node ~= nil and self._current_node._on_exit ~= nil then
@@ -168,7 +168,7 @@ function mn.SelectionGraph:set_current_node(node)
     end
 end
 
-function mn.SelectionGraph:get_current_node_aabb()
+function rt.SelectionGraph:get_current_node_aabb()
     if self._current_node ~= nil then
         return self._current_node._aabb
     else
@@ -176,7 +176,7 @@ function mn.SelectionGraph:get_current_node_aabb()
     end
 end
 
-function mn.SelectionGraph:draw()
+function rt.SelectionGraph:draw()
     for node in keys(self._nodes) do
         node:draw(rt.Palette.GRAY_4)
     end
@@ -186,7 +186,7 @@ function mn.SelectionGraph:draw()
     end
 end
 
-function mn.SelectionGraph:activate()
+function rt.SelectionGraph:activate()
     if self._current_node ~= nil then
         if self._current_node._on_activate ~= nil then
             self._current_node._on_activate()
@@ -194,7 +194,7 @@ function mn.SelectionGraph:activate()
     end
 end
 
-function mn.SelectionGraph:clear()
+function rt.SelectionGraph:clear()
     for node in keys(self._nodes) do
         if node._on_exit ~= nil then
             node._on_exit(nil)

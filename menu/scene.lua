@@ -26,7 +26,7 @@ mn.Scene = meta.new_type("MenuScene", rt.Scene, function()
 
         _verbose_info = mn.VerboseInfoPanel(),
 
-        _selection_graph = mn.SelectionGraph(),
+        _selection_graph = rt.SelectionGraph(),
         _grabbed_object_sprite = nil,
         _grabbed_object_sprite_x = 0,
         _grabbed_object_sprite_y = 0,
@@ -581,7 +581,7 @@ function mn.Scene:_regenerate_selection_nodes()
         self._shared_equip_list_index,
         self._shared_template_list_index
     ) do
-        local node = mn.SelectionGraphNode(self:_shared_list_index_to_list(index):get_bounds())
+        local node = rt.SelectionGraphNode(self:_shared_list_index_to_list(index):get_bounds())
         node.is_shared_list_node = true
         shared_list_nodes[index] = node
     end
@@ -603,7 +603,7 @@ function mn.Scene:_regenerate_selection_nodes()
     local n_entities = self._state:get_n_entities()
     for entity_i = 1, n_entities do
         local page = self._entity_pages[entity_i]
-        local info_node = mn.SelectionGraphNode(page.info:get_bounds())
+        local info_node = rt.SelectionGraphNode(page.info:get_bounds())
         local move_nodes = {}
         local left_move_nodes, bottom_move_nodes, top_move_nodes, right_move_nodes = {}, {}, {}, {}
         for node in values(page.moves:get_selection_nodes()) do
@@ -632,7 +632,7 @@ function mn.Scene:_regenerate_selection_nodes()
     end
 
     -- verbose info scroll node
-    local verbose_info_node = mn.SelectionGraphNode(self._verbose_info:get_bounds())
+    local verbose_info_node = rt.SelectionGraphNode(self._verbose_info:get_bounds())
 
     -- linking
     local function find_nearest_node(origin, nodes, mode)

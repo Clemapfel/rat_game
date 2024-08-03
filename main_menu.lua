@@ -23,7 +23,7 @@ end
 rt.settings.show_rulers = false
 rt.settings.show_fps = true
 
-local todo = rt.Keyboard()
+local todo = rt.Keyboard(12)
 todo:realize()
 
 love.draw = function()
@@ -56,6 +56,8 @@ love.update = function(delta)
     if rt.current_scene ~= nil and rt.current_scene.update ~= nil then
         rt.current_scene:update(delta)
     end
+
+    todo:update(delta)
 end
 
 love.resize = function()

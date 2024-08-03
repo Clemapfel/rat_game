@@ -102,7 +102,7 @@ function mn.Slots:realize()
             to_insert.frame_outline:set_line_width(3)
             to_insert.frame_outline:set_is_outline(true)
             to_insert.bounds = rt.AABB(0, 0, 1, 1)
-            to_insert.selection_node = mn.SelectionGraphNode()
+            to_insert.selection_node = rt.SelectionGraphNode()
             to_insert.is_visible = true
 
             table.insert(row, to_insert)

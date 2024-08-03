@@ -8,7 +8,7 @@ mn.TabBar = meta.new_type("TabBar", rt.Widget, function()
         _orientation = rt.Orientation.HORIZONTAL,
         _final_w = 1,
         _final_h = 1,
-        _selection_nodes = {}, -- List<mn.SelectionGraphNode>
+        _selection_nodes = {}, -- List<rt.SelectionGraphNode>
     })
 end)
 
@@ -111,7 +111,7 @@ function mn.TabBar:size_allocate(x, y, width, height)
         local item = self._items[item_i]
         size_allocate_item(item, current_x, current_y)
 
-        local node = mn.SelectionGraphNode()
+        local node = rt.SelectionGraphNode()
         node:set_aabb(current_x, current_y, item_w, item_h)
         self._selection_nodes[item_i] = node
 
@@ -134,7 +134,7 @@ function mn.TabBar:size_allocate(x, y, width, height)
         local item = self._items[item_i]
         size_allocate_item(item, current_x, current_y)
 
-        local node = mn.SelectionGraphNode()
+        local node = rt.SelectionGraphNode()
         node:set_aabb(current_x, current_y, item_w, item_h)
         self._selection_nodes[item_i] = node
 
