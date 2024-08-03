@@ -4,19 +4,21 @@ state = mn.InventoryState()
 
 rt.current_scene = mn.Scene()
 scene = rt.current_scene
-
+scene = nil
 
 --- ###
 
 love.load = function()
-    local state = mn.InventoryState()
-    state.entities = {
-        bt.Entity("MC"),
-        bt.Entity("RAT"),
-        bt.Entity("GIRL")
-    }
-    scene._state = state
-    rt.current_scene:realize()
+    if scene ~= nil then
+        local state = mn.InventoryState()
+        state.entities = {
+            bt.Entity("MC"),
+            bt.Entity("RAT"),
+            bt.Entity("GIRL")
+        }
+        scene._state = state
+        scene:realize()
+    end
     love.resize()
 end
 
@@ -28,8 +30,8 @@ todo:realize()
 
 love.draw = function()
     love.graphics.setColor(0.6, 0, 0.6, 1)
-    if rt.current_scene ~= nil then
-        rt.current_scene:draw()
+    if scene ~= nil then
+        scene:draw()
     end
 
     todo:draw()
@@ -53,16 +55,16 @@ love.draw = function()
 end
 
 love.update = function(delta)
-    if rt.current_scene ~= nil and rt.current_scene.update ~= nil then
-        rt.current_scene:update(delta)
+    if scene ~= nil and scene.update ~= nil then
+        scene:update(delta)
     end
 
     todo:update(delta)
 end
 
 love.resize = function()
-    if rt.current_scene ~= nil then
-        rt.current_scene:fit_into(0, 0, love.graphics.getWidth(), love.graphics.getHeight())
+    if scene ~= nil then
+        scene:fit_into(0, 0, love.graphics.getWidth(), love.graphics.getHeight())
     end
 
     todo:fit_into(0, 0, rt.graphics.get_width(), rt.graphics.get_height())

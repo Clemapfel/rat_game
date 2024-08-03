@@ -1,6 +1,8 @@
 rt.settings.keyboard = {
     n_ticks_per_second = 8,
-    tick_delay = 0.3        -- seconds until auto-move triggers
+    tick_delay = 0.25,        -- seconds until auto-move triggers
+    underline_thickness = 3,
+    underline_outline_thickness_delta = 2
 }
 
 --- @class rt.Keyboard
@@ -30,7 +32,15 @@ rt.Keyboard = meta.new_type("Keyboard", rt.Widget, rt.SignalEmitter, function(ma
             [rt.InputButton.DOWN] = 0,
             [rt.InputButton.LEFT] = 0,
         },
-        _selection_graph = rt.SelectionGraph()
+        _selection_graph = rt.SelectionGraph(),
+
+        _control_indicator = rt.ControlIndicator({
+            {rt.ControlIndicatorButton.START, "Accept"},
+            {rt.ControlIndicatorButton.A, "Select"},
+            {rt.ControlIndicatorButton.B, "Erase"},
+            {rt.ControlIndicatorButton.X, "Abort"},
+            {rt.ControlIndicatorButton.L_R, "Move Cursor"}
+        })
     })
 end)
 
@@ -91,6 +101,9 @@ function rt.Keyboard:realize()
 
     local font, font_mono = rt.settings.font.default, rt.settings.font.default_mono
 
+    local selection_prefix = "<b><color=SELECTION>"
+    local selection_postfix = "</b></color>"
+
     self._letter_items = {}
     self._max_label_w = NEGATIVE_INFINITY
     self._max_label_h = NEGATIVE_INFINITY
@@ -102,17 +115,24 @@ function rt.Keyboard:realize()
                 char = " "
             end
             local item = {
-                label = rt.Label(char),
-                frame = rt.Rectangle(0, 0, 1, 1),
+                label = rt.Label("<o>" .. char .. "</o>", font, font_mono),
+                selected_label = rt.Label("<o>" .. selection_prefix .. char .. selection_postfix .. "</o>", font, font_mono),
                 letter = char,
+                underline = rt.Line(0, 0, 1, 1),
+                underline_outline = rt.Line(0, 0, 1, 1),
+                is_selected = false,
                 node = rt.SelectionGraphNode()
             }
 
-            item.label:set_justify_mode(rt.JustifyMode.CENTER, font, font_mono)
-            item.label:realize()
+            for label in range(item.label, item.selected_label) do
+                label:set_justify_mode(rt.JustifyMode.CENTER)
+                label:realize()
+            end
 
-            self:_set_item_selected(item, false)
-            item.frame:set_is_outline(true)
+            item.underline:set_line_width(rt.settings.keyboard.underline_thickness)
+            item.underline:set_color(rt.Palette.SELECTION)
+            item.underline_outline:set_line_width(rt.settings.keyboard.underline_thickness + rt.settings.keyboard.underline_outline_thickness_delta)
+            item.underline_outline:set_color(rt.Palette.BACKGROUND_OUTLINE)
 
             item.node.item = item
             table.insert(to_push, item)
@@ -140,6 +160,8 @@ function rt.Keyboard:realize()
     self._input:signal_connect("released", function(_, which)
         self:_handle_button_released(which)
     end)
+
+    self._control_indicator:realize()
 end
 
 --- @override
@@ -154,9 +176,9 @@ function rt.Keyboard:size_allocate(x, y, width, height)
 
     current_y = current_y + entry_label_h + 2 * entry_label_ym
 
-    local label_w = math.max(self._max_label_w, self._max_label_h)
+    local label_w = math.max(self._max_label_w, self._max_label_h) + m
     local label_h = label_w
-    local label_xm, label_ym = m, m
+    local label_xm, label_ym = 0 * label_w, 0.5 * m
 
     local letter_xm, letter_ym = 4 * m, 2 * m
     local start_x, start_y = current_x + letter_xm, current_y + letter_ym
@@ -165,19 +187,46 @@ function rt.Keyboard:size_allocate(x, y, width, height)
     local max_row_n = NEGATIVE_INFINITY
 
     self._selection_graph:clear()
+    local keyboard = self
 
+    local line_w, line_h
+    do
+        local label = rt.Label("#")
+        label:realize()
+        line_w = select(1, label:measure())
+    end
+    line_h = rt.settings.keyboard.underline_thickness
+
+    local outline_line_w = line_w + rt.settings.keyboard.underline_outline_thickness_delta
 
     local n_rows = sizeof(self._letter_items)
     for row_i, row in ipairs(self._letter_items) do
         local n_items = sizeof(row)
         for item_i, item in ipairs(row) do
             local frame_aabb = rt.AABB(current_x, current_y, label_w, label_h)
-            item.frame:resize(frame_aabb)
-            item.label:fit_into(current_x, current_y, label_w, label_w)
+
+            local current_label_w, current_label_h = item.label:measure()
+            local label_bounds = rt.AABB(current_x, current_y + 0.5 * label_h - 0.5 * current_label_h, label_w, label_w)
+            item.label:fit_into(label_bounds)
+            item.selected_label:fit_into(label_bounds)
+
+            item.underline:resize(
+                current_x + 0.5 * label_w - 0.5 * line_w,
+                current_y + label_h - line_h,
+                current_x + 0.5 * label_w + 0.5 * line_w,
+                current_y + label_h - line_h
+            )
+
+            item.underline_outline:resize(
+                current_x + 0.5 * label_w - 0.5 * outline_line_w,
+                current_y + label_h - line_h,
+                current_x + 0.5 * label_w + 0.5 * outline_line_w,
+                current_y + label_h - line_h
+            )
 
             current_x = current_x + label_w + label_xm
 
-            item.node:set_aabb(frame_aabb)
+            item.node:set_bounds(frame_aabb)
 
             self._selection_graph:add(item.node)
             if item_i > 1 then
@@ -195,6 +244,18 @@ function rt.Keyboard:size_allocate(x, y, width, height)
             if row_i < n_rows then
                 item.node:set_down(self._letter_items[row_i + 1][item_i].node)
             end
+
+            item.node:signal_connect(rt.InputButton.A, function(self)
+                keyboard:_append_char(self.item.letter)
+            end)
+
+            item.node:signal_connect("enter", function(self)
+                self.item.is_selected = true
+            end)
+
+            item.node:signal_connect("exit", function(self)
+                self.item.is_selected = false
+            end)
         end
 
         current_y = current_y + label_h + label_ym
@@ -203,49 +264,78 @@ function rt.Keyboard:size_allocate(x, y, width, height)
         max_row_n = math.max(max_row_n, n_items)
     end
 
-    self._letter_frame:fit_into(
+    local frame_bounds = rt.AABB(
         start_x - letter_xm,
         start_y - letter_ym,
         max_row_n * label_w + (max_row_n - 1) * label_xm + 2 * letter_xm,
         n_rows * label_h + (n_rows - 1) * label_ym + 2 * letter_ym
     )
+    self._letter_frame:fit_into(frame_bounds)
 
-    self._selection_graph:set_current_node(self._letter_items[1][1].node)
+    local to_select = self._letter_items[1][1]
+    self._selection_graph:set_current_node(to_select.node)
+    to_select.is_selected = true
+
+    local indicator_w, indicator_h = self._control_indicator:measure()
+    self._control_indicator:fit_into(
+        frame_bounds.x,
+        frame_bounds.y + frame_bounds.height,
+        frame_bounds.width,
+        indicator_w
+    )
 end
 
 --- @override
 function rt.Keyboard:draw()
-
     self._entry_label_frame:draw()
     self._entry_label:draw()
 
     self._letter_frame:draw()
     for row in values(self._letter_items) do
         for item in values(row) do
-            item.frame:draw()
-            item.label:draw()
+            if item.is_selected then
+                item.underline_outline:draw()
+                item.underline:draw()
+                item.selected_label:draw()
+            else
+                item.label:draw()
+            end
         end
     end
 
+    self._control_indicator:draw()
     --self._selection_graph:draw()
 end
 
 --- @brief
-function rt.Keyboard:_set_item_selected(item, b)
-    if b == true then
-        item.frame:set_color(rt.Palette.SELECTION)
-    else
-        item.frame:set_color(rt.Palette.GRAY_4)
-    end
+function rt.Keyboard:_append_char(char)
+    println("append: `", char, "`")
+end
+
+--- @brief
+function rt.Keyboard:_erase_char(char)
+    println("erase")
+end
+
+--- @brief
+function rt.Keyboard:_trigger_dont_care()
+    println("don't care")
+end
+
+--- @brief
+function rt.Keyboard:_accept()
+    println("accept")
+end
+
+--- @brief
+function rt.Keyboard:_cancel()
+    println("cancel")
 end
 
 --- @brief
 function rt.Keyboard:_handle_button_pressed(which)
-    local before = self._selection_graph:get_current_node()
-    self:_set_item_selected(before.item, false)
     self._selection_graph:handle_button(which)
-    local after = self._selection_graph:get_current_node()
-    self:_set_item_selected(after.item, true)
+    -- enter/exit sets selection
 end
 
 --- @brief

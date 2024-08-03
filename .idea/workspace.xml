@@ -23,17 +23,11 @@
   </component>
   <component name="ChangeListManager">
     <list default="true" id="7fa9ba1b-2cff-4ecc-86fb-59ab2fa76ee1" name="Changes" comment="added keyboard">
-      <change afterPath="$PROJECT_DIR$/common/selection_graph.lua" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/common/~selection_graph.lua" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/common/keyboard.lua" beforeDir="false" afterPath="$PROJECT_DIR$/common/keyboard.lua" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/include.lua" beforeDir="false" afterPath="$PROJECT_DIR$/include.lua" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/common/selection_graph.lua" beforeDir="false" afterPath="$PROJECT_DIR$/common/selection_graph.lua" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/main_menu.lua" beforeDir="false" afterPath="$PROJECT_DIR$/main_menu.lua" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/menu/scene.lua" beforeDir="false" afterPath="$PROJECT_DIR$/menu/scene.lua" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/menu/selection_graph.lua" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/menu/slots.lua" beforeDir="false" afterPath="$PROJECT_DIR$/menu/slots.lua" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/menu/tab_bar.lua" beforeDir="false" afterPath="$PROJECT_DIR$/menu/tab_bar.lua" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/menu/~scene.lua" beforeDir="false" afterPath="$PROJECT_DIR$/menu/~scene.lua" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/menu/~selection_graph.lua" beforeDir="false" afterPath="$PROJECT_DIR$/menu/~selection_graph.lua" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -474,15 +468,7 @@
       <workItem from="1722100982820" duration="18765000" />
       <workItem from="1722194976289" duration="882000" />
       <workItem from="1722213965868" duration="6180000" />
-      <workItem from="1722220329478" duration="89482000" />
-    </task>
-    <task id="LOCAL-00881" summary="reworked slots and entity info formatting">
-      <option name="closed" value="true" />
-      <created>1721236866298</created>
-      <option name="number" value="00881" />
-      <option name="presentableId" value="LOCAL-00881" />
-      <option name="project" value="LOCAL" />
-      <updated>1721236866299</updated>
+      <workItem from="1722220329478" duration="93720000" />
     </task>
     <task id="LOCAL-00882" summary="correctly handling control indicators now">
       <option name="closed" value="true" />
@@ -868,7 +854,15 @@
       <option name="project" value="LOCAL" />
       <updated>1722631871050</updated>
     </task>
-    <option name="localTasksCounter" value="930" />
+    <task id="LOCAL-00930" summary="added keyboard">
+      <option name="closed" value="true" />
+      <created>1722717755631</created>
+      <option name="number" value="00930" />
+      <option name="presentableId" value="LOCAL-00930" />
+      <option name="project" value="LOCAL" />
+      <updated>1722717755631</updated>
+    </task>
+    <option name="localTasksCounter" value="931" />
     <servers />
   </component>
   <component name="TypeScriptGeneratedFilesManager">
