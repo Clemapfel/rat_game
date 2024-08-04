@@ -453,7 +453,7 @@ function mn.Scene:_regenerate_selection_nodes()
     end
 
     table.sort(shared_tab_nodes, function(a, b)
-        return a:get_aabb().x < b:get_aabb().x
+        return a:get_bounds().x < b:get_bounds().x
     end)
 
     -- shared list nodes
@@ -472,7 +472,7 @@ function mn.Scene:_regenerate_selection_nodes()
     for node in values(self._entity_tab_bar:get_selection_nodes()) do
         table.insert(entity_tab_nodes, node)
     end
-    table.sort(entity_tab_nodes, function(a, b) return a:get_aabb().y < b:get_aabb().y end)
+    table.sort(entity_tab_nodes, function(a, b) return a:get_bounds().y < b:get_bounds().y end)
 
     -- per-entity page nodes
     local entity_page_nodes = {}
@@ -493,7 +493,7 @@ function mn.Scene:_regenerate_selection_nodes()
         for node in values(page.equips_and_consumables:get_selection_nodes()) do
             table.insert(slot_nodes, node)
         end
-        table.sort(slot_nodes, function(a, b) return a:get_aabb().x < b:get_aabb().x end)
+        table.sort(slot_nodes, function(a, b) return a:get_bounds().x < b:get_aabb().x end)
 
         entity_page_nodes[entity_i] = {
             info_node = info_node,

@@ -206,6 +206,7 @@ end
 
 --- @see rt.SignalComponent.connect
 function rt.SignalEmitter:signal_connect(name, callback, data)
+    meta.assert_function(callback)
     local component = rt.get_signal_component(self)
     if meta.is_nil(component) then component = rt.add_signal_component(self) end
     return component:connect(name, callback, data)

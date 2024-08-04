@@ -4,7 +4,6 @@ state = mn.InventoryState()
 
 rt.current_scene = mn.Scene()
 scene = rt.current_scene
-scene = nil
 
 --- ###
 
@@ -25,17 +24,11 @@ end
 rt.settings.show_rulers = false
 rt.settings.show_fps = true
 
-local todo = rt.Keyboard(12, "Test Test")
-todo:realize()
-
-
 love.draw = function()
     love.graphics.setColor(0.6, 0, 0.6, 1)
     if scene ~= nil then
         scene:draw()
     end
-
-    todo:draw()
 
     if rt.settings.show_rulers == true then
         love.graphics.setLineWidth(1)
@@ -59,16 +52,12 @@ love.update = function(delta)
     if scene ~= nil and scene.update ~= nil then
         scene:update(delta)
     end
-
-    todo:update(delta)
 end
 
 love.resize = function()
     if scene ~= nil then
         scene:fit_into(0, 0, love.graphics.getWidth(), love.graphics.getHeight())
     end
-
-    todo:fit_into(0, 0, rt.graphics.get_width(), rt.graphics.get_height())
 end
 
 love.run = function()

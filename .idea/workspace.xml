@@ -22,11 +22,17 @@
     </configurations>
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="7fa9ba1b-2cff-4ecc-86fb-59ab2fa76ee1" name="Changes" comment="polished keyboard">
+    <list default="true" id="7fa9ba1b-2cff-4ecc-86fb-59ab2fa76ee1" name="Changes" comment="finished keyboard">
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/common/input_controller.lua" beforeDir="false" afterPath="$PROJECT_DIR$/common/input_controller.lua" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/common/keyboard.lua" beforeDir="false" afterPath="$PROJECT_DIR$/common/keyboard.lua" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/battle/configs/entities/GIRL.lua" beforeDir="false" afterPath="$PROJECT_DIR$/battle/configs/entities/GIRL.lua" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/common/selection_graph.lua" beforeDir="false" afterPath="$PROJECT_DIR$/common/selection_graph.lua" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/common/signals.lua" beforeDir="false" afterPath="$PROJECT_DIR$/common/signals.lua" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/main_menu.lua" beforeDir="false" afterPath="$PROJECT_DIR$/main_menu.lua" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/menu/inventory_state.lua" beforeDir="false" afterPath="$PROJECT_DIR$/menu/inventory_state.lua" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/menu/scene.lua" beforeDir="false" afterPath="$PROJECT_DIR$/menu/scene.lua" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/menu/slots.lua" beforeDir="false" afterPath="$PROJECT_DIR$/menu/slots.lua" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/menu/tab_bar.lua" beforeDir="false" afterPath="$PROJECT_DIR$/menu/tab_bar.lua" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/menu/~scene.lua" beforeDir="false" afterPath="$PROJECT_DIR$/menu/~scene.lua" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -468,15 +474,7 @@
       <workItem from="1722194976289" duration="882000" />
       <workItem from="1722213965868" duration="6180000" />
       <workItem from="1722220329478" duration="106641000" />
-      <workItem from="1722784088000" duration="8912000" />
-    </task>
-    <task id="LOCAL-00887" summary="verbose info panel mwe working">
-      <option name="closed" value="true" />
-      <created>1721673207778</created>
-      <option name="number" value="00887" />
-      <option name="presentableId" value="LOCAL-00887" />
-      <option name="project" value="LOCAL" />
-      <updated>1721673207778</updated>
+      <workItem from="1722784088000" duration="13625000" />
     </task>
     <task id="LOCAL-00888" summary="added equip tooltip">
       <option name="closed" value="true" />
@@ -862,7 +860,15 @@
       <option name="project" value="LOCAL" />
       <updated>1722789790110</updated>
     </task>
-    <option name="localTasksCounter" value="936" />
+    <task id="LOCAL-00936" summary="finished keyboard">
+      <option name="closed" value="true" />
+      <created>1722793223252</created>
+      <option name="number" value="00936" />
+      <option name="presentableId" value="LOCAL-00936" />
+      <option name="project" value="LOCAL" />
+      <updated>1722793223252</updated>
+    </task>
+    <option name="localTasksCounter" value="937" />
     <servers />
   </component>
   <component name="TypeScriptGeneratedFilesManager">
@@ -911,7 +917,6 @@
     </option>
   </component>
   <component name="VcsManagerConfiguration">
-    <MESSAGE value="stashing color mixing" />
     <MESSAGE value="imported scene" />
     <MESSAGE value="added verbose info scroll" />
     <MESSAGE value="added ink in water" />
@@ -936,7 +941,8 @@
     <MESSAGE value="stasing keyboard, utf8 input broken" />
     <MESSAGE value="fixed selection graph for specil accept / cancel items" />
     <MESSAGE value="polished keyboard" />
-    <option name="LAST_COMMIT_MESSAGE" value="polished keyboard" />
+    <MESSAGE value="finished keyboard" />
+    <option name="LAST_COMMIT_MESSAGE" value="finished keyboard" />
   </component>
   <component name="XDebuggerManager">
     <breakpoint-manager>
@@ -945,6 +951,11 @@
           <url>file://$PROJECT_DIR$/old/~battle/enemy_sprite.lua</url>
           <line>244</line>
           <option name="timeStamp" value="6" />
+        </line-breakpoint>
+        <line-breakpoint enabled="true" type="lua-line">
+          <url>file://$PROJECT_DIR$/common/keyboard.lua</url>
+          <line>509</line>
+          <option name="timeStamp" value="7" />
         </line-breakpoint>
       </breakpoints>
     </breakpoint-manager>

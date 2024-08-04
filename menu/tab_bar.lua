@@ -112,7 +112,7 @@ function mn.TabBar:size_allocate(x, y, width, height)
         size_allocate_item(item, current_x, current_y)
 
         local node = rt.SelectionGraphNode()
-        node:set_aabb(current_x, current_y, item_w, item_h)
+        node:set_bounds(current_x, current_y, item_w, item_h)
         self._selection_nodes[item_i] = node
 
         if self._orientation == rt.Orientation.HORIZONTAL then
@@ -135,7 +135,7 @@ function mn.TabBar:size_allocate(x, y, width, height)
         size_allocate_item(item, current_x, current_y)
 
         local node = rt.SelectionGraphNode()
-        node:set_aabb(current_x, current_y, item_w, item_h)
+        node:set_bounds(current_x, current_y, item_w, item_h)
         self._selection_nodes[item_i] = node
 
         min_x = math.min(min_x, current_x)

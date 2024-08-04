@@ -93,10 +93,14 @@ end
 
 --- @brief
 function rt.SelectionGraphNode:set_up(next)
-    meta.assert(next, rt.SelectionGraphNode)
-    self:signal_connect(rt.InputButton.UP, function(self)
-        return next
-    end)
+    if next == nil then
+        self:signal_disconnect(rt.InputButton.UP)
+    else
+        meta.assert_isa(next, rt.SelectionGraphNode)
+        self:signal_connect(rt.InputButton.UP, function(self)
+            return next
+        end)
+    end
 end
 
 --- @brief
@@ -106,10 +110,14 @@ end
 
 --- @brief
 function rt.SelectionGraphNode:set_right(next)
-    meta.assert(next, rt.SelectionGraphNode)
-    self:signal_connect(rt.InputButton.RIGHT, function(self)
-        return next
-    end)
+    if next == nil then
+        self:signal_disconnect(rt.InputButton.RIGHT)
+    else
+        meta.assert_isa(next, rt.SelectionGraphNode)
+        self:signal_connect(rt.InputButton.RIGHT, function(self)
+            return next
+        end)
+    end
 end
 
 --- @brief
@@ -119,10 +127,14 @@ end
 
 --- @brief
 function rt.SelectionGraphNode:set_down(next)
-    meta.assert(next, rt.SelectionGraphNode)
-    self:signal_connect(rt.InputButton.DOWN, function(self)
-        return next
-    end)
+    if next == nil then
+        self:signal_disconnect(rt.InputButton.DOWN)
+    else
+        meta.assert_isa(next, rt.SelectionGraphNode)
+        self:signal_connect(rt.InputButton.DOWN, function(self)
+            return next
+        end)
+    end
 end
 
 --- @brief
@@ -132,10 +144,14 @@ end
 
 --- @brief
 function rt.SelectionGraphNode:set_left(next)
-    meta.assert(next, rt.SelectionGraphNode)
-    self:signal_connect(rt.InputButton.LEFT, function(self)
-        return next
-    end)
+    if next == nil then
+        self:signal_disconnect(rt.InputButton.LEFT)
+    else
+        meta.assert_isa(next, rt.SelectionGraphNode)
+        self:signal_connect(rt.InputButton.LEFT, function(self)
+            return next
+        end)
+    end
 end
 
 --- @brief

@@ -271,21 +271,18 @@ for which in range("move", "equip", "consumable") do
     end
 
     --- @brief
-    mn.InventoryState["take_equipped_" .. which] = function(self, entity, object)
+    mn.InventoryState["take_equipped_" .. which] = function(self, entity, slot_i)
         meta.assert_isa(entity, bt.Entity)
+        meta.assert_number(slot_i)
         local setup = self.active.entities[entity]
         if setup == nil then
             rt.error("In mn.InventoryState.take_equipped_" .. which .. ": no entity with id `" .. entity:get_id() .. "`")
         end
 
         local taken = false
-        for i = 1, setup["n_" .. which .. "_slots"] do
-            if setup[which .. "s"][i] == object then
-                setup[which .. "s"][i] = nil
-                taken = true
-                break
-            end
-        end
+        local object = setup[which .. "s"][slot_i]
+        setup[which .. "s"][slot_i] = nil
+        taken = object ~= nil
 
         if not taken then
             rt.error("In mn.InventoryState.take_equipped_" .. which .. ": entity `" .. entity:get_id() .. "` does not have `" .. object:get_id() .. "` equipped")
@@ -309,7 +306,7 @@ for which in range("move", "equip", "consumable") do
             elseif meta.isa(self.grabbed_object, bt.Equip) then
                 self:add_shared_equip(current)
             elseif meta.isa(self.grabbed_object, bt.Consumable) then
-                self:add_shared_consumalbe(current)
+                self:add_shared_consumable(current)
             end
         end
 
@@ -388,7 +385,7 @@ function mn.InventoryState:set_grabbed_object(object)
         elseif meta.isa(self.grabbed_object, bt.Equip) then
             self:add_shared_equip(self.grabbed_object)
         elseif meta.isa(self.grabbed_object, bt.Consumable) then
-            self:add_shared_consumalbe(self.grabbed_object)
+            self:add_shared_consumable(self.grabbed_object)
         else
             rt.error("In mn.InventoryState.set_grabbed_object: unhandling item type `" .. meta.typeof(self.grabbed_object) .. "`")
         end

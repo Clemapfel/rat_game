@@ -180,7 +180,7 @@ function mn.Slots:size_allocate(x, y, width, height)
 
             slot.base_inlay:resize(current_x + 0.5 * slot_w, current_y + 0.5 * slot_w, 0.5 * inlay_factor * slot_w, 0.5 * inlay_factor * slot_w)
 
-            slot.selection_node:set_aabb(current_x, current_y, slot_w, slot_w)
+            slot.selection_node:set_bounds(current_x, current_y, slot_w, slot_w)
 
             local left, right = row[slot_i - 1], row[slot_i + 1]
             slot.selection_node:set_left(nil)
@@ -342,7 +342,7 @@ end
 --- @brief
 function mn.Slots:get_slot_aabb(slot_i)
     local item = self._slot_i_to_item[slot_i]
-    return item.selection_node:get_aabb()
+    return item.selection_node:get_bounds()
 end
 
 --- @brief

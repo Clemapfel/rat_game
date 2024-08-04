@@ -570,7 +570,7 @@ function mn.Scene:_regenerate_selection_nodes()
     end
 
     table.sort(shared_tab_nodes, function(a, b)
-        return a:get_aabb().x < b:get_aabb().x
+        return a:get_bounds().x < b:get_bounds().x
     end)
 
     -- shared list nodes
@@ -596,7 +596,7 @@ function mn.Scene:_regenerate_selection_nodes()
     for node in values(self._entity_tab_bar:get_selection_nodes()) do
         table.insert(entity_tab_nodes, node)
     end
-    table.sort(entity_tab_nodes, function(a, b) return a:get_aabb().y < b:get_aabb().y end)
+    table.sort(entity_tab_nodes, function(a, b) return a:get_bounds().y < b:get_bounds().y end)
 
     -- per-entity page nodes
     local entity_page_nodes = {}
@@ -618,7 +618,7 @@ function mn.Scene:_regenerate_selection_nodes()
         for node in values(page.equips_and_consumables:get_selection_nodes()) do
             table.insert(slot_nodes, node)
         end
-        table.sort(slot_nodes, function(a, b) return a:get_aabb().x < b:get_aabb().x end)
+        table.sort(slot_nodes, function(a, b) return a:get_bounds().x < b:get_bounds().x end)
 
         entity_page_nodes[entity_i] = {
             info_node = info_node,
@@ -639,9 +639,9 @@ function mn.Scene:_regenerate_selection_nodes()
         if mode == "y" then
             local nearest_node = nil
             local y_dist = POSITIVE_INFINITY
-            local origin_y = origin:get_aabb().y + 0.5 * origin:get_aabb().height
+            local origin_y = origin:get_bounds().y + 0.5 * origin:get_bounds().height
             for node in values(nodes) do
-                local current_dist = math.abs(node:get_aabb().y + 0.5 * node:get_aabb().height - origin_y)
+                local current_dist = math.abs(node:get_bounds().y + 0.5 * node:get_bounds().height - origin_y)
                 if current_dist < y_dist then
                     y_dist = current_dist
                     nearest_node = node
@@ -651,9 +651,9 @@ function mn.Scene:_regenerate_selection_nodes()
         elseif mode == "x" then
             local nearest_node = nil
             local x_dist = POSITIVE_INFINITY
-            local origin_x = origin:get_aabb().x + 0.5 * origin:get_aabb().width
+            local origin_x = origin:get_bounds().x + 0.5 * origin:get_bounds().width
             for node in values(nodes) do
-                local current_dist = math.abs(node:get_aabb().x + 0.5 * node:get_aabb().width - origin_x)
+                local current_dist = math.abs(node:get_bounds().x + 0.5 * node:get_bounds().width - origin_x)
                 if current_dist < x_dist then
                     x_dist = current_dist
                     nearest_node = node
@@ -675,7 +675,7 @@ function mn.Scene:_regenerate_selection_nodes()
 
         page.info_node:set_left(entity_tab_nodes[1])
         page.info_node:set_right(shared_tab_nodes[1])
-        page.info_node:set_down(function()
+        page.info_node:signal_connect(rt.InputButton.DOWN, function()
             for node in values(page.top_move_nodes) do
                 if node == scene._previous_selection_node then
                     return scene._previous_selection_node
@@ -686,7 +686,7 @@ function mn.Scene:_regenerate_selection_nodes()
 
         -- down to slots, unless locked
         for node in values(page.bottom_move_nodes) do
-            node:set_down(function()
+            node:signal_connect(rt.InputButton.DOWN, function()
                 for node in values(page.slot_nodes) do
                     if node == scene._previous_selection_node then
                         return scene._previous_selection_node
@@ -708,12 +708,14 @@ function mn.Scene:_regenerate_selection_nodes()
 
         -- right to shared, unless locked
         for node in values(page.right_move_nodes) do
-            node:set_right(shared_list_nodes[scene._shared_list_index])
+            node:signal_connect(rt.InputButton.RIGHT, function()
+                return shared_list_nodes[scene._shared_list_index]
+            end)
         end
 
         -- slots up or down, unless locked
         for node in values(page.slot_nodes) do
-            node:set_up(function()
+            node:signal_connect(rt.InputButton.UP, function()
                 for node in values(page.bottom_move_nodes) do
                     if node == scene._previous_selection_node then
                         return scene._previous_selection_node
@@ -727,7 +729,9 @@ function mn.Scene:_regenerate_selection_nodes()
         page.slot_nodes[1]:set_left(entity_tab_nodes[#entity_tab_nodes])
 
         -- slots right, unless locked
-        page.slot_nodes[#(page.slot_nodes)]:set_right(shared_list_nodes[scene._shared_list_index])
+        page.slot_nodes[#(page.slot_nodes)]:signal_connect(rt.InputButton.RIGHT, function(_)
+            return shared_list_nodes[scene._shared_list_index]
+        end)
     end
 
     for entity_tab_node in values(entity_tab_nodes) do
@@ -741,7 +745,7 @@ function mn.Scene:_regenerate_selection_nodes()
                 }, "y"
             )
         end
-        entity_tab_node:set_right(function()
+        entity_tab_node:signal_connect(rt.InputButton.RIGHT, function()
             local page = entity_page_nodes[scene._entity_index]
             for node in range(page.info_node, page.slot_nodes[1], table.unpack(page.left_move_nodes)) do
                 if node == scene._previous_selection_node then
@@ -752,12 +756,12 @@ function mn.Scene:_regenerate_selection_nodes()
         end)
     end
 
-    shared_tab_nodes[1]:set_left(function()
+    shared_tab_nodes[1]:signal_connect(rt.InputButton.LEFT, function()
         return entity_page_nodes[scene._entity_index].info_node
     end)
 
     --[[
-    shared_tab_nodes[#shared_tab_nodes]:set_right(function()
+    shared_tab_nodes[#shared_tab_nodes]:signal_connect(rt.InputButton.RIGHT, function()
         return verbose_info_node
     end)
     ]]--
@@ -790,20 +794,26 @@ function mn.Scene:_regenerate_selection_nodes()
     end
 
     for node in values(shared_list_nodes) do
-        node:set_left(shared_list_left)
-        node:set_right(shared_list_right)
-        node:set_up(shared_list_up)
-    end
+        node:signal_connect(rt.InputButton.LEFT, function(_)
+            return shared_list_left()
+        end)
 
-    local shared_tab_down = function()
-        return shared_list_nodes[scene._shared_list_index]
+        node:signal_connect(rt.InputButton.RIGHT, function(_)
+            return nil --shared_list_right()
+        end)
+
+        node:signal_connect(rt.InputButton.UP, function(_)
+            return shared_list_up()
+        end)
     end
 
     for node in values(shared_tab_nodes) do
-        node:set_down(shared_tab_down)
+        node:signal_connect(rt.InputButton.DOWN, function(_)
+            return shared_list_nodes[scene._shared_list_index]
+        end)
     end
 
-    verbose_info_node:set_left(function()
+    verbose_info_node:signal_connect(rt.InputButton.LEFT, function(_)
         return shared_tab_nodes[#shared_tab_nodes]
     end)
 
@@ -842,18 +852,15 @@ function mn.Scene:_regenerate_selection_nodes()
 
     -- interactivity
 
-    local on_b_undo_grab = function(control)
-        meta.assert_function(control)
-        return function()
-            if scene._state:peek_grabbed_object() ~= nil then
-                self._undo_grab()
-                self:_update_grabbed_object()
-            end
+    local on_b_undo_grab = function()
+        if scene._state:peek_grabbed_object() ~= nil then
+            self._undo_grab()
+            self:_update_grabbed_object()
         end
     end
 
     for entity_i, node in ipairs(entity_tab_nodes) do
-        node:set_on_enter(function()
+        node:signal_connect("enter", function(_)
             scene._entity_tab_bar:set_tab_selected(entity_i, true)
             scene:_set_verbose_info_object(nil) -- TODO: character info
 
@@ -861,18 +868,20 @@ function mn.Scene:_regenerate_selection_nodes()
             scene:_set_grabbed_object_allowed(false)
         end)
 
-        node:set_on_exit(function()
+        node:signal_connect("exit", function(_)
             scene._entity_tab_bar:set_tab_selected(entity_i, false)
         end)
 
-        node:set_on_a(function()
+        node:signal_connect(rt.InputButton.A, function(_)
             scene:_set_entity_index(entity_i)
         end)
 
-        node:set_on_b(on_b_undo_grab(get_entity_tab_control))
+        node:signal_connect(rt.InputButton.B, function(_)
+            on_b_undo_grab()
+        end)
     end
 
-    local page_node_sort_on_y = function()
+    local page_node_sort_on_y = function(_)
         local page = scene._entity_pages[scene._entity_index]
         local moves, equips, consumables = scene._state:entity_sort_inventory(page.entity)
 
@@ -894,7 +903,7 @@ function mn.Scene:_regenerate_selection_nodes()
     end
 
     for page_i, page in ipairs(entity_page_nodes) do
-        page.info_node:set_on_enter(function()
+        page.info_node:signal_connect("enter", function(_)
             scene._entity_pages[page_i].info:set_selection_state(rt.SelectionState.ACTIVE)
             scene:_set_verbose_info_object("hp", "attack", "defense", "speed")
 
@@ -902,14 +911,16 @@ function mn.Scene:_regenerate_selection_nodes()
             scene:_set_grabbed_object_allowed(false)
         end)
 
-        page.info_node:set_on_b(on_b_undo_grab(get_entity_info_control))
+        page.info_node:signal_connect(rt.InputButton.B, function()
+            on_b_undo_grab()
+        end)
 
-        page.info_node:set_on_exit(function()
+        page.info_node:signal_connect("exit", function(_)
             scene._entity_pages[page_i].info:set_selection_state(rt.SelectionState.INACTIVE)
         end)
 
         for node_i, node in ipairs(page.move_nodes) do
-            node:set_on_enter(function()
+            node:signal_connect("enter", function(_)
                 local page = scene._entity_pages[page_i]
                 local slots = page.moves
                 slots:set_selection_state(rt.SelectionState.ACTIVE)
@@ -930,7 +941,7 @@ function mn.Scene:_regenerate_selection_nodes()
                 )
             end)
 
-            node:set_on_a(function()
+            node:signal_connect(rt.InputButton.A, function(_)
                 local page = scene._entity_pages[page_i]
                 local up = scene._state:peek_grabbed_object()
                 local down = page.moves:get_object(node_i)
@@ -943,18 +954,36 @@ function mn.Scene:_regenerate_selection_nodes()
 
                     page.moves:set_object(node_i, up)
                     scene:_update_grabbed_object()
+                    scene._undo_grab = function() end
                 elseif up == nil and down ~= nil then -- grab
                     scene._state:set_grabbed_object(down)
-                    scene._state:take_equipped_move(page.entity, down)
+                    scene._state:take_equipped_move(page.entity, node_i)
 
                     page.moves:set_object(node_i, nil)
                     scene:_update_grabbed_object()
                     scene:_set_grabbed_object_allowed(true)
+                    scene._undo_grab = function()
+                        scene:_set_entity_index(page_i)
+                        scene._state:add_equipped_move(page.entity, node_i, down)
+                        scene._state:set_grabbed_object(nil)
+                        scene:_play_transfer_object_animation(
+                            down,
+                            scene:_get_grabbed_object_sprite_aabb(),
+                            page.moves:get_slot_aabb(node_i),
+                            function()
+                            end,
+                            function()
+                                page.moves:set_object(node_i, down)
+                                scene:_update_grabbed_object()
+                            end
+                        )
+                        scene._undo_grab = function() end
+                    end
                 elseif up ~= nil and down ~= nil then -- swap
                     if not meta.isa(up, bt.Move) or scene._state:entity_has_move(page.entity, up) then return end
 
                     local new_equipped = scene._state:take_grabbed_object()
-                    local new_grabbed = scene._state:take_equipped_move(page.entity, down)
+                    local new_grabbed = scene._state:take_equipped_move(page.entity, node_i)
 
                     scene._state:set_grabbed_object(new_grabbed)
                     scene._state:add_equipped_move(page.entity, node_i, new_equipped)
@@ -962,10 +991,28 @@ function mn.Scene:_regenerate_selection_nodes()
                     page.moves:set_object(node_i, new_equipped)
                     scene:_update_grabbed_object()
                     scene:_set_grabbed_object_allowed(true)
+                    scene._undo_grab = function()
+                        scene:_set_entity_index(page_i)
+                        scene._state:add_equipped_move(page.entity, node_i, new_grabbed)
+                        scene._state:set_grabbed_object(new_equipped)
+                        scene:_play_transfer_object_animation(
+                            down,
+                            scene:_get_grabbed_object_sprite_aabb(),
+                            page.moves:get_slot_aabb(node_i),
+                            function()
+                                page.moves:set_object(node_i, nil)
+                            end,
+                            function()
+                                page.moves:set_object(node_i, new_grabbed)
+                                scene:_update_grabbed_object()
+                            end
+                        )
+                        scene._undo_grab = function() end
+                    end
                 end
             end)
 
-            node:set_on_x(function()
+            node:signal_connect(rt.InputButton.X, function(_)
                 local page = scene._entity_pages[page_i]
                 local down = page.moves:get_object(node_i)
                 local up = scene._state:peek_grabbed_object()
@@ -987,7 +1034,7 @@ function mn.Scene:_regenerate_selection_nodes()
                         end
                     )
                 elseif down ~= nil then
-                    scene._state:take_equipped_move(page.entity, down)
+                    scene._state:take_equipped_move(page.entity, node_i)
                     scene._state:add_shared_move(down)
 
                     scene:_play_transfer_object_animation(
@@ -1004,10 +1051,12 @@ function mn.Scene:_regenerate_selection_nodes()
                 end
             end)
 
-            node:set_on_y(page_node_sort_on_y)
-            node:set_on_b(on_b_undo_grab(get_move_node_control))
+            node:signal_connect(rt.InputButton.Y, page_node_sort_on_y)
+            node:signal_connect(rt.InputButton.B, function(_)
+                on_b_undo_grab()
+            end)
 
-            node:set_on_exit(function()
+            node:signal_connect("exit", function(_)
                 local slots = scene._entity_pages[page_i].moves
                 slots:set_selection_state(rt.SelectionState.INACTIVE)
                 slots:set_slot_selection_state(node_i, rt.SelectionState.INACTIVE)
@@ -1016,7 +1065,7 @@ function mn.Scene:_regenerate_selection_nodes()
 
         local n_equips = scene._entity_pages[page_i].entity:get_n_equip_slots()
         for node_i, node in ipairs(page.slot_nodes) do
-            node:set_on_enter(function()
+            node:signal_connect("enter", function(_)
                 local page = scene._entity_pages[page_i]
                 if node_i <= n_equips then
                     local object = scene._state:get_equip_at(page.entity, node_i)
@@ -1043,10 +1092,10 @@ function mn.Scene:_regenerate_selection_nodes()
                 scene:_update_grabbed_object()
             end)
 
-            node:set_on_y(page_node_sort_on_y)
+            node:signal_connect(rt.InputButton.Y, page_node_sort_on_y)
 
             if node_i <= n_equips then
-                node:set_on_a(function()
+                node:signal_connect(rt.InputButton.A, function(_)
                     local page = scene._entity_pages[page_i]
                     local up = scene._state:peek_grabbed_object()
                     local down = page.equips_and_consumables:get_object(node_i)
@@ -1059,18 +1108,36 @@ function mn.Scene:_regenerate_selection_nodes()
 
                         page.equips_and_consumables:set_object(node_i, up)
                         scene:_update_grabbed_object()
+                        scene._undo_grab = function() end
                     elseif up == nil and down ~= nil then -- grab
                         scene._state:set_grabbed_object(down)
-                        scene._state:take_equipped_equip(page.entity, down)
+                        scene._state:take_equipped_equip(page.entity, node_i)
 
                         page.equips_and_consumables:set_object(node_i, nil)
                         scene:_update_grabbed_object()
                         scene:_set_grabbed_object_allowed(true)
+                        scene._undo_grab = function()
+                            scene:_set_entity_index(page_i)
+                            scene._state:add_equipped_equip(page.entity, node_i, down)
+                            scene._state:set_grabbed_object(nil)
+                            scene:_play_transfer_object_animation(
+                                down,
+                                scene:_get_grabbed_object_sprite_aabb(),
+                                page.equips_and_consumables:get_slot_aabb(node_i),
+                                function()
+                                end,
+                                function()
+                                    page.equips_and_consumables:set_object(node_i, down)
+                                    scene:_update_grabbed_object()
+                                end
+                            )
+                            scene._undo_grab = function() end
+                        end
                     elseif up ~= nil and down ~= nil then -- swap
                         if not meta.isa(up, bt.Equip) then return end
 
                         local new_equipped = scene._state:take_grabbed_object()
-                        local new_grabbed = scene._state:take_equipped_equip(page.entity, down)
+                        local new_grabbed = scene._state:take_equipped_equip(page.entity, node_i)
 
                         scene._state:set_grabbed_object(new_grabbed)
                         scene._state:add_equipped_equip(page.entity, node_i, new_equipped)
@@ -1078,10 +1145,28 @@ function mn.Scene:_regenerate_selection_nodes()
                         page.equips_and_consumables:set_object(node_i, new_equipped)
                         scene:_update_grabbed_object()
                         scene:_set_grabbed_object_allowed(true)
+                        scene._undo_grab = function()
+                            scene:_set_entity_index(page_i)
+                            scene._state:add_equipped_equip(page.entity, node_i, new_grabbed)
+                            scene._state:set_grabbed_object(new_equipped)
+                            scene:_play_transfer_object_animation(
+                                down,
+                                scene:_get_grabbed_object_sprite_aabb(),
+                                page.equips_and_consumables:get_slot_aabb(node_i),
+                                function()
+                                    page.equips_and_consumables:set_object(node_i, nil)
+                                end,
+                                function()
+                                    page.equips_and_consumables:set_object(node_i, new_grabbed)
+                                    scene:_update_grabbed_object()
+                                end
+                            )
+                            scene._undo_grab = function() end
+                        end
                     end
                 end)
 
-                node:set_on_x(function()
+                node:signal_connect(rt.InputButton.X, function(_)
                     local page = scene._entity_pages[page_i]
                     local down = page.equips_and_consumables:get_object(node_i)
                     local up = scene._state:peek_grabbed_object()
@@ -1103,7 +1188,7 @@ function mn.Scene:_regenerate_selection_nodes()
                             end
                         )
                     elseif down ~= nil then
-                        scene._state:take_equipped_equip(page.entity, down)
+                        scene._state:take_equipped_equip(page.entity, node_i)
                         scene._state:add_shared_equip(down)
 
                         scene:_play_transfer_object_animation(
@@ -1120,44 +1205,82 @@ function mn.Scene:_regenerate_selection_nodes()
                     end
                 end)
 
-                node:set_on_b(on_b_undo_grab(get_equip_node_control))
-            else
-                node:set_on_a(function()
+                node:signal_connect(rt.InputButton.B, function(_)
+                    on_b_undo_grab()
+                end)
+            else -- consumable slot
+                node:signal_connect(rt.InputButton.A, function(_)
                     local page = scene._entity_pages[page_i]
                     local up = scene._state:peek_grabbed_object()
                     local down = page.equips_and_consumables:get_object(node_i)
 
                     if up ~= nil and down == nil then -- deposit
-                        if not meta.isa(up, bt.Equip) then return end
+                        if not meta.isa(up, bt.Consumable) then return end
 
                         scene._state:take_grabbed_object()
-                        scene._state:add_equipped_consumable(page.entity, node_i, up)
+                        scene._state:add_equipped_consumable(page.entity, node_i - n_equips, up)
 
                         page.equips_and_consumables:set_object(node_i, up)
                         scene:_update_grabbed_object()
+                        scene._undo_grab = function() end
                     elseif up == nil and down ~= nil then -- grab
                         scene._state:set_grabbed_object(down)
-                        scene._state:add_equipped_consumable(page.entity, down)
+                        scene._state:take_equipped_consumable(page.entity, node_i - n_equips)
 
                         page.equips_and_consumables:set_object(node_i, nil)
                         scene:_update_grabbed_object()
                         scene:_set_grabbed_object_allowed(true)
+                        scene._undo_grab = function()
+                            scene:_set_entity_index(page_i)
+                            scene._state:add_equipped_consumable(page.entity, node_i - n_equips, down)
+                            scene._state:set_grabbed_object(nil)
+                            scene:_play_transfer_object_animation(
+                                down,
+                                scene:_get_grabbed_object_sprite_aabb(),
+                                page.equips_and_consumables:get_slot_aabb(node_i),
+                                function()
+                                end,
+                                function()
+                                    page.equips_and_consumables:set_object(node_i, down)
+                                    scene:_update_grabbed_object()
+                                end
+                            )
+                            scene._undo_grab = function() end
+                        end
                     elseif up ~= nil and down ~= nil then -- swap
-                        if not meta.isa(up, bt.Equip) then return end
+                        if not meta.isa(up, bt.Consumable) then return end
 
-                        local new_consumableped = scene._state:take_grabbed_object()
-                        local new_grabbed = scene._state:add_equipped_consumable(page.entity, down)
+                        local new_equipped = scene._state:take_grabbed_object()
+                        local new_grabbed = scene._state:take_equipped_consumable(page.entity, node_i - n_equips)
 
                         scene._state:set_grabbed_object(new_grabbed)
-                        scene._state:add_equipped_consumable(page.entity, node_i, new_consumableped)
+                        scene._state:add_equipped_consumable(page.entity, node_i - n_equips, new_equipped)
 
-                        page.equips_and_consumables:set_object(node_i, new_consumableped)
+                        page.equips_and_consumables:set_object(node_i, new_equipped)
                         scene:_update_grabbed_object()
                         scene:_set_grabbed_object_allowed(true)
+                        scene._undo_grab = function()
+                            scene:_set_entity_index(page_i)
+                            scene._state:add_equipped_consumable(page.entity, node_i - n_equips, new_grabbed)
+                            scene._state:set_grabbed_object(new_equipped)
+                            scene:_play_transfer_object_animation(
+                                down,
+                                scene:_get_grabbed_object_sprite_aabb(),
+                                page.equips_and_consumables:get_slot_aabb(node_i),
+                                function()
+                                    page.equips_and_consumables:set_object(node_i, nil)
+                                end,
+                                function()
+                                    page.equips_and_consumables:set_object(node_i, new_grabbed)
+                                    scene:_update_grabbed_object()
+                                end
+                            )
+                            scene._undo_grab = function() end
+                        end
                     end
                 end)
 
-                node:set_on_x(function()
+                node:signal_connect(rt.InputButton.X, function(_)
                     local page = scene._entity_pages[page_i]
                     local down = page.equips_and_consumables:get_object(node_i)
                     local up = scene._state:peek_grabbed_object()
@@ -1179,7 +1302,7 @@ function mn.Scene:_regenerate_selection_nodes()
                             end
                         )
                     elseif down ~= nil then
-                        scene._state:take_equipped_consumable(page.entity, down)
+                        scene._state:take_equipped_consumable(page.entity, node_i - n_equips)
                         scene._state:add_shared_consumable(down)
 
                         scene:_play_transfer_object_animation(
@@ -1196,10 +1319,12 @@ function mn.Scene:_regenerate_selection_nodes()
                     end
                 end)
 
-                node:set_on_b(on_b_undo_grab(get_consumable_node_control))
+                node:signal_connect(rt.InputButton.B, function(_)
+                    on_b_undo_grab()
+                end)
             end
 
-            node:set_on_exit(function()
+            node:signal_connect("exit", function(_)
                 local slots = scene._entity_pages[page_i].equips_and_consumables
                 slots:set_selection_state(rt.SelectionState.INACTIVE)
                 slots:set_slot_selection_state(node_i, rt.SelectionState.INACTIVE)
@@ -1207,7 +1332,7 @@ function mn.Scene:_regenerate_selection_nodes()
         end
     end
 
-    shared_move_node:set_on_enter(function()
+    shared_move_node:signal_connect("enter", function(_)
         scene._shared_list_frame:set_selection_state(rt.SelectionState.ACTIVE)
         scene:_set_verbose_info_object(scene._shared_move_list:get_selected_object())
 
@@ -1215,7 +1340,7 @@ function mn.Scene:_regenerate_selection_nodes()
         scene:_set_grabbed_object_allowed(meta.isa(scene._state:peek_grabbed_object(), bt.Move))
     end)
 
-    shared_move_node:set_on_a(function()
+    shared_move_node:signal_connect(rt.InputButton.A, function(_)
         local up = scene._state:peek_grabbed_object()
         if up ~= nil then -- deposit
             if not meta.isa(up, bt.Move) then return end
@@ -1246,7 +1371,7 @@ function mn.Scene:_regenerate_selection_nodes()
         scene:_set_grabbed_object_allowed(meta.isa(scene._state:peek_grabbed_object(), bt.Move))
     end)
 
-    shared_move_node:set_on_x(function()
+    shared_move_node:signal_connect(rt.InputButton.X, function(_)
         local page = scene._entity_pages[scene._entity_index]
         local entity = page.entity
         local slot_i = scene._state:entity_get_first_free_move_slot(entity)
@@ -1290,23 +1415,25 @@ function mn.Scene:_regenerate_selection_nodes()
         end
     end)
 
-    shared_move_node:set_on_y(function()
+    shared_move_node:signal_connect(rt.InputButton.Y, function(_)
         local list = self._shared_move_list
         list:set_sort_mode(scene._shared_list_sort_mode_order[list:get_sort_mode()])
     end)
 
-    shared_move_node:set_on_b(on_b_undo_grab(get_shared_move_list_control))
+    shared_move_node:signal_connect(rt.InputButton.B, function(_)
+        on_b_undo_grab()
+    end)
 
     --
 
-    shared_equip_node:set_on_enter(function()
+    shared_equip_node:signal_connect("enter", function(_)
         scene._shared_list_frame:set_selection_state(rt.SelectionState.ACTIVE)
         scene:_set_verbose_info_object(scene._shared_equip_list:get_selected_object())
         scene:_update_grabbed_object()
         scene:_set_grabbed_object_allowed(meta.isa(scene._state:peek_grabbed_object(), bt.Equip))
     end)
 
-    shared_equip_node:set_on_a(function()
+    shared_equip_node:signal_connect(rt.InputButton.A, function(_)
         local up = scene._state:peek_grabbed_object()
         if up ~= nil then -- deposit
             if not meta.isa(up, bt.Equip) then return end
@@ -1337,7 +1464,7 @@ function mn.Scene:_regenerate_selection_nodes()
         scene:_set_grabbed_object_allowed(meta.isa(scene._state:peek_grabbed_object(), bt.Equip))
     end)
 
-    shared_equip_node:set_on_x(function()
+    shared_equip_node:signal_connect(rt.InputButton.X, function(_)
         local page = scene._entity_pages[scene._entity_index]
         local entity = page.entity
         local slot_i = scene._state:entity_get_first_free_equip_slot(entity)
@@ -1380,23 +1507,25 @@ function mn.Scene:_regenerate_selection_nodes()
         end
     end)
 
-    shared_equip_node:set_on_y(function()
+    shared_equip_node:signal_connect(rt.InputButton.Y, function(_)
         local list = self._shared_equip_list
         list:set_sort_mode(scene._shared_list_sort_mode_order[list:get_sort_mode()])
     end)
 
-    shared_equip_node:set_on_b(on_b_undo_grab(get_shared_equip_list_control))
+    shared_equip_node:signal_connect(rt.InputButton.B, function(_)
+        on_b_undo_grab()
+    end)
 
     --
 
-    shared_consumable_node:set_on_enter(function()
+    shared_consumable_node:signal_connect("enter", function(_)
         scene._shared_list_frame:set_selection_state(rt.SelectionState.ACTIVE)
         scene:_set_verbose_info_object(scene._shared_consumable_list:get_selected_object())
         scene:_update_grabbed_object()
         scene:_set_grabbed_object_allowed(meta.isa(scene._state:peek_grabbed_object(), bt.Consumable))
     end)
 
-    shared_consumable_node:set_on_a(function()
+    shared_consumable_node:signal_connect(rt.InputButton.A, function(_)
         local up = scene._state:peek_grabbed_object()
         if up ~= nil then -- deposit
             if not meta.isa(up, bt.Consumable) then return end
@@ -1427,7 +1556,7 @@ function mn.Scene:_regenerate_selection_nodes()
         scene:_set_grabbed_object_allowed(meta.isa(scene._state:peek_grabbed_object(), bt.Consumable))
     end)
 
-    shared_consumable_node:set_on_x(function()
+    shared_consumable_node:signal_connect(rt.InputButton.X, function(_)
         local page = scene._entity_pages[scene._entity_index]
         local entity = page.entity
         local n_equip_slots = entity:get_n_equip_slots()
@@ -1471,23 +1600,25 @@ function mn.Scene:_regenerate_selection_nodes()
         end
     end)
 
-    shared_consumable_node:set_on_y(function()
+    shared_consumable_node:signal_connect(rt.InputButton.Y, function(_)
         local list = self._shared_consumable_list
         list:set_sort_mode(scene._shared_list_sort_mode_order[list:get_sort_mode()])
     end)
 
-    shared_consumable_node:set_on_b(on_b_undo_grab(get_shared_consumable_list_control))
+    shared_consumable_node:signal_connect(rt.InputButton.B, function(_)
+        on_b_undo_grab()
+    end)
 
     --
 
-    shared_template_node:set_on_enter(function()
+    shared_template_node:signal_connect("enter", function(_)
         scene._shared_list_frame:set_selection_state(rt.SelectionState.ACTIVE)
         scene:_set_verbose_info_object(scene._shared_template_list:get_selected_object())
         scene:_update_grabbed_object()
         scene:_set_grabbed_object_allowed(false)
     end)
 
-    shared_template_node:set_on_a(function()
+    shared_template_node:signal_connect(rt.InputButton.A, function(_)
         local current = scene._shared_template_list:get_selected_object()
         if current ~= nil then
             scene._state:load_template(current)
@@ -1496,16 +1627,18 @@ function mn.Scene:_regenerate_selection_nodes()
         end
     end)
 
-    shared_template_node:set_on_b(on_b_undo_grab(get_template_list_control))
+    shared_template_node:signal_connect(rt.InputButton.B, function(_)
+        on_b_undo_grab()
+    end)
 
     for node in values(shared_list_nodes) do
-        node:set_on_exit(function()
+        node:signal_connect("exit", function(_)
             scene._shared_list_frame:set_selection_state(rt.SelectionState.INACTIVE)
         end)
     end
 
     for tab_i, node in ipairs(shared_tab_nodes) do
-        node:set_on_enter(function()
+        node:signal_connect("enter", function(_)
             scene._shared_tab_bar:set_tab_selected(tab_i, true)
 
             if tab_i == scene._shared_move_list_index then
@@ -1521,30 +1654,31 @@ function mn.Scene:_regenerate_selection_nodes()
             scene:_set_grabbed_object_allowed(false)
         end)
 
-        node:set_on_exit(function()
+        node:signal_connect("exit", function(_)
             scene._shared_tab_bar:set_tab_selected(tab_i, false)
         end)
 
-        node:set_on_a(function()
+        node:signal_connect(rt.InputButton.A, function(_)
             scene:_set_shared_list_index(tab_i)
         end)
 
-        node:set_on_b(on_b_undo_grab(get_shared_tab_control))
+        node:signal_connect(rt.InputButton.B, function(_)
+            on_b_undo_grab()
+        end)
     end
 
-    verbose_info_node:set_on_enter(function()
+    verbose_info_node:signal_connect("enter", function(_)
         scene._verbose_info:set_selection_state(rt.SelectionState.ACTIVE)
         scene:_update_grabbed_object()
         scene:_set_grabbed_object_allowed(false)
     end)
 
-    verbose_info_node:set_on_exit(function()
+    verbose_info_node:signal_connect("exit", function()
         scene._verbose_info:set_selection_state(rt.SelectionState.INACTIVE)
     end)
 
-    verbose_info_node:set_on_b(get_verbose_info_control)
-
     -- push
+
     self._selection_graph:clear()
 
     for nodes in range(
