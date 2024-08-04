@@ -124,7 +124,6 @@ function rt.SignalComponent:disconnect(name, handler_id)
         signal.data = {}
     elseif meta.is_table(handler_id) then
         for _, id in ipairs(handler_id) do
-
             signal.callbacks[id] = nil
             signal.data[id] = nil
         end
@@ -132,6 +131,14 @@ function rt.SignalComponent:disconnect(name, handler_id)
 
         signal.callbacks[handler_id] = nil
         signal.data[handler_id] = nil
+    end
+end
+
+--- @brief disconnect all handlers permanently
+--- @param component rt.SignalComponent
+function rt.SignalComponent:disconnect_all()
+    for name, signal in pairs(self._signals) do
+        self:disconnect(name)
     end
 end
 
@@ -209,6 +216,11 @@ function rt.SignalEmitter:signal_disconnect(name, handler_id)
     local component = rt.get_signal_component(self)
     if meta.is_nil(component) then component = rt.add_signal_component(self) end
     return component:disconnect(name, handler_id)
+end
+
+--- @see rt.SignalComponent.disconnect_all
+function rt.SignalEmitter:signal_disconnect_all()
+    rt.get_signal_component(self):disconnect_all()
 end
 
 --- @see rt.SignalComponent.set_is_blocked

@@ -22,9 +22,11 @@
     </configurations>
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="7fa9ba1b-2cff-4ecc-86fb-59ab2fa76ee1" name="Changes" comment="stasing keyboard, utf8 input broken">
+    <list default="true" id="7fa9ba1b-2cff-4ecc-86fb-59ab2fa76ee1" name="Changes" comment="fixed selection graph for specil accept / cancel items">
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/common/keyboard.lua" beforeDir="false" afterPath="$PROJECT_DIR$/common/keyboard.lua" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/common/selection_graph.lua" beforeDir="false" afterPath="$PROJECT_DIR$/common/selection_graph.lua" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/common/signals.lua" beforeDir="false" afterPath="$PROJECT_DIR$/common/signals.lua" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -466,15 +468,7 @@
       <workItem from="1722194976289" duration="882000" />
       <workItem from="1722213965868" duration="6180000" />
       <workItem from="1722220329478" duration="106641000" />
-      <workItem from="1722784088000" duration="306000" />
-    </task>
-    <task id="LOCAL-00885" summary="stashing direction indicator">
-      <option name="closed" value="true" />
-      <created>1721603734340</created>
-      <option name="number" value="00885" />
-      <option name="presentableId" value="LOCAL-00885" />
-      <option name="project" value="LOCAL" />
-      <updated>1721603734340</updated>
+      <workItem from="1722784088000" duration="5457000" />
     </task>
     <task id="LOCAL-00886" summary="added scroll indicator">
       <option name="closed" value="true" />
@@ -860,7 +854,15 @@
       <option name="project" value="LOCAL" />
       <updated>1722740929503</updated>
     </task>
-    <option name="localTasksCounter" value="934" />
+    <task id="LOCAL-00934" summary="fixed selection graph for specil accept / cancel items">
+      <option name="closed" value="true" />
+      <created>1722784679148</created>
+      <option name="number" value="00934" />
+      <option name="presentableId" value="LOCAL-00934" />
+      <option name="project" value="LOCAL" />
+      <updated>1722784679148</updated>
+    </task>
+    <option name="localTasksCounter" value="935" />
     <servers />
   </component>
   <component name="TypeScriptGeneratedFilesManager">
@@ -909,7 +911,6 @@
     </option>
   </component>
   <component name="VcsManagerConfiguration">
-    <MESSAGE value="stashing sdf" />
     <MESSAGE value="inventory state working" />
     <MESSAGE value="stashing color mixing" />
     <MESSAGE value="imported scene" />
@@ -934,7 +935,8 @@
     <MESSAGE value="working on keyboard" />
     <MESSAGE value="stashing keyboard" />
     <MESSAGE value="stasing keyboard, utf8 input broken" />
-    <option name="LAST_COMMIT_MESSAGE" value="stasing keyboard, utf8 input broken" />
+    <MESSAGE value="fixed selection graph for specil accept / cancel items" />
+    <option name="LAST_COMMIT_MESSAGE" value="fixed selection graph for specil accept / cancel items" />
   </component>
   <component name="XDebuggerManager">
     <breakpoint-manager>

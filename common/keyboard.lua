@@ -7,7 +7,7 @@ rt.settings.keyboard = {
 
 --- @class rt.Keyboard
 --- @signal accept (rt.Keyboard, String) -> nil
---- @signal abort (rt.Keyboard) -> nil
+--- @signal cancel (rt.Keyboard) -> nil
 rt.Keyboard = meta.new_type("Keyboard", rt.Widget, rt.SignalEmitter, function(max_n_entry_chars, suggestion)
     meta.assert_number(max_n_entry_chars)
     meta.assert_string(suggestion)
@@ -22,11 +22,14 @@ rt.Keyboard = meta.new_type("Keyboard", rt.Widget, rt.SignalEmitter, function(ma
         _suggestion = suggestion,
         _entry_text = suggestion,
         _entry_stencil = rt.Rectangle(0, 0, 1, 1),
+        _entry_x_offset = 0,
         _entry_label_frame = rt.Frame(),
         _entry_label = rt.Label("_"),
         _char_count_label = rt.Label("0"),
 
         _input = rt.InputController(),
+        _text_input_active = false,
+
         _input_tick_elapsed = {
             [rt.InputButton.UP] = 0,
             [rt.InputButton.RIGHT] = 0,
@@ -44,10 +47,11 @@ rt.Keyboard = meta.new_type("Keyboard", rt.Widget, rt.SignalEmitter, function(ma
             [rt.InputButton.B] = 0
         },
         _selection_graph = rt.SelectionGraph(),
+        _last_selected_item = nil,
 
         _control_indicator = rt.ControlIndicator({
             {rt.ControlIndicatorButton.START, "Choose Name"},
-            --{rt.ControlIndicatorButton.A, "Select"},
+            {rt.ControlIndicatorButton.SELECT, "Text Input"},
             {rt.ControlIndicatorButton.B, "Erase"},
             {rt.ControlIndicatorButton.X, "Cancel"},
             --{rt.ControlIndicatorButton.L_R, "Move Cursor"}
@@ -228,7 +232,7 @@ function rt.Keyboard:size_allocate(x, y, width, height)
 
     local entry_label_w, entry_label_h = self._entry_label:measure()
 
-    local top_row_h = indicator_h --math.max(indicator_h, entry_label_h + 2 * m)
+    local top_row_h = indicator_h
     self._control_indicator:fit_into(
         current_x + total_w - indicator_w,
         current_y,
@@ -238,7 +242,8 @@ function rt.Keyboard:size_allocate(x, y, width, height)
 
     local frame_aabb = rt.AABB(current_x, current_y, total_w - indicator_w, top_row_h)
     self._entry_label_frame:fit_into(frame_aabb)
-    self._entry_stencil = rt.Rectangle(frame_aabb.x, frame_aabb.y, frame_aabb.width, frame_aabb.height)
+    local entry_w, entry_h = self._entry_label:measure()
+    self._entry_label:fit_into(frame_aabb.x + letter_xm, frame_aabb.y + 0.5 * frame_aabb.height - 0.5 * entry_h, POSITIVE_INFINITY)
     self:_update_entry()
 
     current_y = y + top_row_h
@@ -247,12 +252,15 @@ function rt.Keyboard:size_allocate(x, y, width, height)
     current_x, current_y = start_x, start_y
 
     local special_item_up_candidates = {}
+    self._selection_graph:clear()
 
     local n_rows = sizeof(self._letter_items)
     for row_i, row in ipairs(self._letter_items) do
         local n_items = sizeof(row)
         for item_i, item in ipairs(row) do
             if item.letter ~= " " then
+                item.node:signal_disconnect_all()
+
                 local frame_aabb = rt.AABB(current_x, current_y, label_w, label_h)
                 local current_label_w, current_label_h = item.label:measure()
                 local label_bounds = rt.AABB(current_x, current_y + 0.5 * label_h - 0.5 * current_label_h, label_w, label_w)
@@ -353,6 +361,7 @@ function rt.Keyboard:size_allocate(x, y, width, height)
 
                 item.node:signal_connect("exit", function(self)
                     self.item.is_selected = false
+                    keyboard._last_selected_item = self
                 end)
             end
             current_x = current_x + label_w + label_xm
@@ -363,7 +372,7 @@ function rt.Keyboard:size_allocate(x, y, width, height)
 
         max_row_n = math.max(max_row_n, n_items)
     end
-    f
+
     -- align special items
     current_x = start_x + total_w - letter_xm - letter_xm
     current_y = current_y - label_h - label_ym
@@ -395,20 +404,13 @@ function rt.Keyboard:size_allocate(x, y, width, height)
             current_y + label_h - line_h
         )
 
-        local min_dist = POSITIVE_INFINITY
-        local best_candidate = nil
-        for candidate in values(special_item_up_candidates) do
-            local aabb = candidate.node:get_bounds()
-            local dist = math.abs(aabb.x - (bounds.x + 0.5 * bounds.width))
-            if dist < min_dist then
-                min_dist = dist
-                best_candidate = candidate
-            end
-        end
-
-        item.node:set_up(best_candidate.node)
         current_x = current_x - letter_xm
     end
+
+    local special_item_memory_candidates = {
+        [self._accept_item] = {},
+        [self._cancel_item] = {}
+    }
 
     for candidate in values(special_item_up_candidates) do
         local best_item
@@ -421,7 +423,31 @@ function rt.Keyboard:size_allocate(x, y, width, height)
             end
         end
 
+        table.insert(special_item_memory_candidates[best_item], candidate.node)
         candidate.node:set_down(best_item.node)
+    end
+
+    local min_dist = POSITIVE_INFINITY
+    for item in range(self._accept_item, self._cancel_item) do
+        local best_candidate = nil
+        local bounds = item.node:get_bounds()
+        for candidate in values(special_item_up_candidates) do
+            local aabb = candidate.node:get_bounds()
+            local dist = math.abs(aabb.x - (bounds.x + 0.5 * bounds.width))
+            if dist < min_dist then
+                min_dist = dist
+                best_candidate = candidate
+            end
+        end
+
+        item.node:signal_connect(rt.InputButton.UP, function(self)
+            for candidate in values(special_item_memory_candidates[item]) do
+                if candidate == keyboard._last_selected_item then
+                    return candidate
+                end
+            end
+            return best_candidate.node
+        end)
     end
 
     local frame_bounds = rt.AABB(
@@ -440,7 +466,15 @@ end
 --- @override
 function rt.Keyboard:draw()
     self._entry_label_frame:draw()
+
+    local stencil_value = meta.hash(self) % 255
+    rt.graphics.stencil(stencil_value, self._entry_stencil)
+    rt.graphics.set_stencil_test(rt.StencilCompareMode.EQUAL, stencil_value)
+    rt.graphics.translate(-self._entry_x_offset, 0)
     self._entry_label:draw()
+    rt.graphics.translate(self._entry_x_offset, 0)
+    rt.graphics.set_stencil_test()
+
     self._char_count_label:draw()
 
     self._letter_frame:draw()
@@ -463,13 +497,13 @@ end
 --- @brief
 function rt.Keyboard:_append_char(char)
     self._entry_text = self._entry_text .. char
-    self._n_entry_chars = #self._entry_text
+    self._n_entry_chars = utf8.len(self._entry_text)
     self:_update_entry()
 end
 
 --- @brief
 function rt.Keyboard:_erase_char(char)
-    if #self._entry_text > 0 then
+    if utf8.len(self._entry_text) > 0 then
         self._entry_text = utf8.sub(self._entry_text, 1, self._n_entry_chars - 1)
         self._n_entry_chars = self._n_entry_chars - 1
         self:_update_entry()
@@ -478,8 +512,8 @@ end
 
 --- @brief
 function rt.Keyboard:_accept()
-    if #self._entry_text > self._max_n_entry_chars then return end
-    if #self._entry_text == 0 then
+    if utf8.len(self._entry_text) > self._max_n_entry_chars then return end
+    if utf8.len(self._entry_text) == 0 then
         self._entry_text = self._suggestion
         self:_update_entry()
     end
@@ -488,12 +522,14 @@ end
 
 --- @brief
 function rt.Keyboard:_cancel()
-    self:signal_emit("abort")
+    self:signal_emit("cancel")
 end
 
 --- @brief
 function rt.Keyboard:_handle_button_pressed(which)
-    if which == rt.InputButton.START then
+
+    if which == rt.InputButton.SELECT then
+    elseif which == rt.InputButton.START then
         self._selection_graph:set_current_node(self._accept_item.node)
     elseif which == rt.InputButton.X then
         self._selection_graph:set_current_node(self._cancel_item.node)
@@ -542,18 +578,25 @@ function rt.Keyboard:_update_entry()
     local entry_str = self._entry_text
     self._entry_label:set_text(entry_str)
     local entry_w, entry_h = self._entry_label:measure()
-    self._entry_label:fit_into(frame_bounds.x + xm, frame_bounds.y + 0.5 * frame_bounds.height - 0.5 * entry_h, frame_bounds.width)
+    self._entry_label:fit_into(frame_bounds.x + xm, frame_bounds.y + 0.5 * frame_bounds.height - 0.5 * entry_h, POSITIVE_INFINITY)
 
     local count_str
-    if #self._entry_text > self._max_n_entry_chars then
-        count_str = "<mono><color=RED><b>" ..  (self._max_n_entry_chars - #self._entry_text) .. "</b></color></mono>"
+    if utf8.len(self._entry_text) > self._max_n_entry_chars then
+        count_str = "<mono><color=RED><b>" ..  (self._max_n_entry_chars - utf8.len(self._entry_text)) .. "</b></color></mono>"
         self._accept_item.label:set_opacity(0.3)
         self._accept_item.selected_label:set_opacity(0.3)
+        self._accept_item.underline:set_opacity(0.3)
     else
-        count_str = "<mono><color=GRAY_4>" ..  (self._max_n_entry_chars - #self._entry_text) .. "</color></mono>"
+        count_str = "<mono><color=GRAY_4>" ..  (self._max_n_entry_chars - utf8.len(self._entry_text)) .. "</color></mono>"
         self._accept_item.label:set_opacity(1)
+        self._accept_item.selected_label:set_opacity(1)
+        self._accept_item.underline:set_opacity(1)
     end
     self._char_count_label:set_text(count_str)
     local count_w, count_h = self._char_count_label:measure()
     self._char_count_label:fit_into(frame_bounds.x, frame_bounds.y + 0.5 * frame_bounds.height - 0.5 * count_h, frame_bounds.width - xm)
+
+    local stencil_w = frame_bounds.width - 2 * xm - select(1, self._char_count_label:measure()) - rt.settings.margin_unit
+    self._entry_stencil:resize(frame_bounds.x + xm, frame_bounds.y, stencil_w, frame_bounds.height)
+    self._entry_x_offset = clamp(select(1, self._entry_label:measure()) - stencil_w, 0)
 end
