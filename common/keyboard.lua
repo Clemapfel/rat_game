@@ -228,7 +228,7 @@ function rt.Keyboard:size_allocate(x, y, width, height)
 
     local entry_label_w, entry_label_h = self._entry_label:measure()
 
-    local top_row_h = math.max(indicator_h, entry_label_h + 2 * m)
+    local top_row_h = indicator_h --math.max(indicator_h, entry_label_h + 2 * m)
     self._control_indicator:fit_into(
         current_x + total_w - indicator_w,
         current_y,
@@ -245,6 +245,8 @@ function rt.Keyboard:size_allocate(x, y, width, height)
 
     local start_x, start_y = current_x + letter_xm, current_y + letter_ym
     current_x, current_y = start_x, start_y
+
+    local special_item_up_candidates = {}
 
     local n_rows = sizeof(self._letter_items)
     for row_i, row in ipairs(self._letter_items) do
@@ -313,14 +315,17 @@ function rt.Keyboard:size_allocate(x, y, width, height)
 
                 do
                     local down_i = ternary(row_i == n_rows, 1, row_i + 1)
-                    while self._letter_items[down_i][item_i].letter == " " do
+                    while down_i < n_rows and self._letter_items[down_i][item_i].letter == " " do
                         down_i = down_i + 1
-                        if down_i > n_rows then down_i = 1 end
-                        if self._letter_items[down_i][item_i] == item then break end
                     end
 
                     if self._letter_items[down_i] ~= nil and self._letter_items[down_i][item_i] ~= nil then
-                        item.node:set_down(self._letter_items[down_i][item_i].node)
+                        local down_item = self._letter_items[down_i][item_i]
+                        if down_item.letter == " " or down_item == self._accept_item or down_item == self._cancel_item then
+                            table.insert(special_item_up_candidates, item)
+                        else
+                            item.node:set_down(self._letter_items[down_i][item_i].node)
+                        end
                     end
                 end
 
@@ -358,7 +363,7 @@ function rt.Keyboard:size_allocate(x, y, width, height)
 
         max_row_n = math.max(max_row_n, n_items)
     end
-
+    f
     -- align special items
     current_x = start_x + total_w - letter_xm - letter_xm
     current_y = current_y - label_h - label_ym
@@ -366,7 +371,6 @@ function rt.Keyboard:size_allocate(x, y, width, height)
     for item in range(self._accept_item, self._cancel_item) do
         item.label:set_justify_mode(rt.JustifyMode.LEFT)
         item.selected_label:set_justify_mode(rt.JustifyMode.LEFT)
-
         item.node:signal_connect(rt.InputButton.A)
 
         local w, h = item.selected_label:measure()
@@ -374,6 +378,7 @@ function rt.Keyboard:size_allocate(x, y, width, height)
         local bounds = rt.AABB(current_x, current_y + 0.5 * label_h - 0.5 * h)
         item.label:fit_into(bounds)
         item.selected_label:fit_into(bounds)
+        item.node:set_bounds(bounds)
 
         local line_w = 1 * w
         item.underline:resize(
@@ -390,7 +395,33 @@ function rt.Keyboard:size_allocate(x, y, width, height)
             current_y + label_h - line_h
         )
 
+        local min_dist = POSITIVE_INFINITY
+        local best_candidate = nil
+        for candidate in values(special_item_up_candidates) do
+            local aabb = candidate.node:get_bounds()
+            local dist = math.abs(aabb.x - (bounds.x + 0.5 * bounds.width))
+            if dist < min_dist then
+                min_dist = dist
+                best_candidate = candidate
+            end
+        end
+
+        item.node:set_up(best_candidate.node)
         current_x = current_x - letter_xm
+    end
+
+    for candidate in values(special_item_up_candidates) do
+        local best_item
+        local min_distance = POSITIVE_INFINITY
+        for item in range(self._accept_item, self._cancel_item) do
+            local dist = math.abs(candidate.node:get_bounds().x - item.node:get_bounds().x)
+            if dist < min_distance then
+                min_distance = dist
+                best_item = item
+            end
+        end
+
+        candidate.node:set_down(best_item.node)
     end
 
     local frame_bounds = rt.AABB(
@@ -451,7 +482,6 @@ function rt.Keyboard:_accept()
     if #self._entry_text == 0 then
         self._entry_text = self._suggestion
         self:_update_entry()
-        dbg("called")
     end
     self:signal_emit("accept", self._entry_text)
 end
@@ -526,4 +556,4 @@ function rt.Keyboard:_update_entry()
     self._char_count_label:set_text(count_str)
     local count_w, count_h = self._char_count_label:measure()
     self._char_count_label:fit_into(frame_bounds.x, frame_bounds.y + 0.5 * frame_bounds.height - 0.5 * count_h, frame_bounds.width - xm)
-    end
+end
