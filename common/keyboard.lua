@@ -14,11 +14,11 @@ rt.Keyboard = meta.new_type("Keyboard", rt.Widget, rt.SignalEmitter, function(ma
     local out = meta.new(rt.Keyboard, {
         _letter_frame = rt.Frame(),
         _letter_items = {}, -- Table<Table<rt.Label>>
+        _character_to_item = {},
         _accept_item = nil,
         _cancel_item = nil,
 
         _max_n_entry_chars = max_n_entry_chars,
-        _n_entry_chars = 0,
         _suggestion = suggestion,
         _entry_text = suggestion,
         _entry_stencil = rt.Rectangle(0, 0, 1, 1),
@@ -29,6 +29,7 @@ rt.Keyboard = meta.new_type("Keyboard", rt.Widget, rt.SignalEmitter, function(ma
 
         _input = rt.InputController(),
         _text_input_active = false,
+        _swallow_first_text_input = true,
 
         _input_tick_elapsed = {
             [rt.InputButton.UP] = 0,
@@ -49,13 +50,7 @@ rt.Keyboard = meta.new_type("Keyboard", rt.Widget, rt.SignalEmitter, function(ma
         _selection_graph = rt.SelectionGraph(),
         _last_selected_item = nil,
 
-        _control_indicator = rt.ControlIndicator({
-            {rt.ControlIndicatorButton.START, "Choose Name"},
-            {rt.ControlIndicatorButton.SELECT, "Text Input"},
-            {rt.ControlIndicatorButton.B, "Erase"},
-            {rt.ControlIndicatorButton.X, "Cancel"},
-            --{rt.ControlIndicatorButton.L_R, "Move Cursor"}
-        })
+        _control_indicator = rt.ControlIndicator({rt.ControlIndicatorButton.ALL_BUTTONS, ""})
     })
 
     out:signal_add("accept")
@@ -125,6 +120,8 @@ function rt.Keyboard:realize()
     self._letter_items = {}
     self._max_label_w = NEGATIVE_INFINITY
     self._max_label_h = NEGATIVE_INFINITY
+
+    self._character_to_item = {}
     
     local function initialize_item(char)
         local item = {
@@ -136,6 +133,8 @@ function rt.Keyboard:realize()
             is_selected = false,
             node = rt.SelectionGraphNode()
         }
+
+        self._character_to_item[char] = item
 
         for label in range(item.label, item.selected_label) do
             label:set_justify_mode(rt.JustifyMode.CENTER)
@@ -194,6 +193,11 @@ function rt.Keyboard:realize()
         self:_handle_button_released(which)
     end)
 
+    self._input:signal_connect("text_input", function(_, text)
+        self:_handle_textinput(text)
+    end)
+
+    self:_update_control_indicator();
     self._control_indicator:realize()
     self:_update_entry()
 end
@@ -497,15 +501,14 @@ end
 --- @brief
 function rt.Keyboard:_append_char(char)
     self._entry_text = self._entry_text .. char
-    self._n_entry_chars = utf8.len(self._entry_text)
     self:_update_entry()
 end
 
 --- @brief
 function rt.Keyboard:_erase_char(char)
-    if utf8.len(self._entry_text) > 0 then
-        self._entry_text = utf8.sub(self._entry_text, 1, self._n_entry_chars - 1)
-        self._n_entry_chars = self._n_entry_chars - 1
+    local length = utf8.len(self._entry_text)
+    if length > 0 then
+        self._entry_text = utf8.sub(self._entry_text, 1, length - 1)
         self:_update_entry()
     end
 end
@@ -528,8 +531,17 @@ end
 --- @brief
 function rt.Keyboard:_handle_button_pressed(which)
 
+    --[[
     if which == rt.InputButton.SELECT then
-    elseif which == rt.InputButton.START then
+        self._text_input_active = not self._text_input_active
+        self._swallow_first_text_input = true
+        self:_update_control_indicator()
+    end
+    ]]--
+
+    if self._text_input_active == true then return end
+
+    if which == rt.InputButton.START then
         self._selection_graph:set_current_node(self._accept_item.node)
     elseif which == rt.InputButton.X then
         self._selection_graph:set_current_node(self._cancel_item.node)
@@ -537,6 +549,20 @@ function rt.Keyboard:_handle_button_pressed(which)
         self._selection_graph:handle_button(which)
     end
     -- enter/exit sets selection
+end
+
+--- @brief
+function rt.Keyboard:_handle_textinput(which)
+    if self._text_input_active == false then return end
+    if self._swallow_first_text_input == true then
+        self._swallow_first_text_input = false
+        return
+    end
+    local item = self._character_to_item[which]
+    if item ~= nil then
+        self._selection_graph:set_current_node(item.node)
+        self._selection_graph:handle_button(rt.InputButton.A)
+    end
 end
 
 --- @brief
@@ -599,4 +625,20 @@ function rt.Keyboard:_update_entry()
     local stencil_w = frame_bounds.width - 2 * xm - select(1, self._char_count_label:measure()) - rt.settings.margin_unit
     self._entry_stencil:resize(frame_bounds.x + xm, frame_bounds.y, stencil_w, frame_bounds.height)
     self._entry_x_offset = clamp(select(1, self._entry_label:measure()) - stencil_w, 0)
+end
+
+--- @brief
+function rt.Keyboard:_update_control_indicator()
+    if self._text_input_active == true then
+        self._control_indicator:create_from({
+            {rt.ControlIndicatorButton.SELECT, "Disable Keyboard Input"},
+        })
+    else
+        self._control_indicator:create_from({
+            {rt.ControlIndicatorButton.B, "Erase"},
+            {rt.ControlIndicatorButton.X, "Cancel"},
+            {rt.ControlIndicatorButton.START, "Accept"},
+            --{rt.ControlIndicatorButton.SELECT, "Enable Keyboard Input"},
+        })
+    end
 end

@@ -28,6 +28,7 @@ rt.settings.show_fps = true
 local todo = rt.Keyboard(12, "Test Test")
 todo:realize()
 
+
 love.draw = function()
     love.graphics.setColor(0.6, 0, 0.6, 1)
     if scene ~= nil then

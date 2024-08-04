@@ -31,6 +31,7 @@ rt.InputController = meta.new_type("InputController", rt.SignalEmitter, function
     out:signal_add("enter")
     out:signal_add("motion")
     out:signal_add("leave")
+    out:signal_add("text_input")
 
     rt.InputHandler.components[meta.hash(out)] = out
     return out
@@ -96,6 +97,15 @@ love.keyreleased = function(key)
             if component._is_disabled == false then
                 component:signal_emit("released", button)
             end
+        end
+    end
+end
+
+--- @brief
+love.textinput = function(str)
+    for _, component in pairs(rt.InputHandler.components) do
+        if component._is_disabled == false then
+            component:signal_emit("text_input", str)
         end
     end
 end

@@ -22,11 +22,11 @@
     </configurations>
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="7fa9ba1b-2cff-4ecc-86fb-59ab2fa76ee1" name="Changes" comment="fixed selection graph for specil accept / cancel items">
+    <list default="true" id="7fa9ba1b-2cff-4ecc-86fb-59ab2fa76ee1" name="Changes" comment="polished keyboard">
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/common/input_controller.lua" beforeDir="false" afterPath="$PROJECT_DIR$/common/input_controller.lua" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/common/keyboard.lua" beforeDir="false" afterPath="$PROJECT_DIR$/common/keyboard.lua" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/common/selection_graph.lua" beforeDir="false" afterPath="$PROJECT_DIR$/common/selection_graph.lua" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/common/signals.lua" beforeDir="false" afterPath="$PROJECT_DIR$/common/signals.lua" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/main_menu.lua" beforeDir="false" afterPath="$PROJECT_DIR$/main_menu.lua" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -468,15 +468,7 @@
       <workItem from="1722194976289" duration="882000" />
       <workItem from="1722213965868" duration="6180000" />
       <workItem from="1722220329478" duration="106641000" />
-      <workItem from="1722784088000" duration="5457000" />
-    </task>
-    <task id="LOCAL-00886" summary="added scroll indicator">
-      <option name="closed" value="true" />
-      <created>1721608334025</created>
-      <option name="number" value="00886" />
-      <option name="presentableId" value="LOCAL-00886" />
-      <option name="project" value="LOCAL" />
-      <updated>1721608334025</updated>
+      <workItem from="1722784088000" duration="8912000" />
     </task>
     <task id="LOCAL-00887" summary="verbose info panel mwe working">
       <option name="closed" value="true" />
@@ -862,7 +854,15 @@
       <option name="project" value="LOCAL" />
       <updated>1722784679148</updated>
     </task>
-    <option name="localTasksCounter" value="935" />
+    <task id="LOCAL-00935" summary="polished keyboard">
+      <option name="closed" value="true" />
+      <created>1722789790110</created>
+      <option name="number" value="00935" />
+      <option name="presentableId" value="LOCAL-00935" />
+      <option name="project" value="LOCAL" />
+      <updated>1722789790110</updated>
+    </task>
+    <option name="localTasksCounter" value="936" />
     <servers />
   </component>
   <component name="TypeScriptGeneratedFilesManager">
@@ -911,7 +911,6 @@
     </option>
   </component>
   <component name="VcsManagerConfiguration">
-    <MESSAGE value="inventory state working" />
     <MESSAGE value="stashing color mixing" />
     <MESSAGE value="imported scene" />
     <MESSAGE value="added verbose info scroll" />
@@ -936,7 +935,8 @@
     <MESSAGE value="stashing keyboard" />
     <MESSAGE value="stasing keyboard, utf8 input broken" />
     <MESSAGE value="fixed selection graph for specil accept / cancel items" />
-    <option name="LAST_COMMIT_MESSAGE" value="fixed selection graph for specil accept / cancel items" />
+    <MESSAGE value="polished keyboard" />
+    <option name="LAST_COMMIT_MESSAGE" value="polished keyboard" />
   </component>
   <component name="XDebuggerManager">
     <breakpoint-manager>
