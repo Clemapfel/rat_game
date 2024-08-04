@@ -596,10 +596,10 @@ end
 --- @brief set text justification
 --- @param mode rt.JustifyMode
 function rt.Label:set_justify_mode(mode)
-    if self._justify_mode ~= mode then
+    --if self._justify_mode ~= mode then
         self._justify_mode = mode
         self:reformat()
-    end
+    --end
 end
 
 --- @brief get text justification
@@ -713,6 +713,11 @@ end
 --- @brief
 function rt.Label:set_opacity(alpha)
     self._opacity = alpha
+    for glyph in values(self._glyphs) do
+        if meta.isa(glyph, rt.Glyph) then
+            glyph:set_opacity(self._opacity)
+        end
+    end
 end
 
 --- @brief

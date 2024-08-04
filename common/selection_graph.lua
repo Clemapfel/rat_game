@@ -194,14 +194,14 @@ end
 function rt.SelectionGraph:set_current_node(node)
     self:add(node)
 
-    if self._current_node ~= nil and self._current_node._on_exit ~= nil then
-        self._current_node._on_exit(nil)
+    if self._current_node ~= nil then
+        self._current_node:signal_emit("exit")
     end
 
     self._current_node = node
 
-    if self._current_node ~= nil and self._current_node._on_enter ~= nil then
-        self._current_node._on_enter(nil)
+    if self._current_node ~= nil then
+        self._current_node:signal_emit("enter")
     end
 end
 

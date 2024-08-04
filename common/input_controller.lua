@@ -107,7 +107,7 @@ love.mousepressed = function(x, y, button_id, is_touch, n_presses)
         for _, component in pairs(rt.InputHandler.components) do
             if not component._is_disabled then
                 if component._instance == nil then
-                    component:signal_emit("pressed", rt.InputButton.A)
+                    --component:signal_emit("pressed", rt.InputButton.A)
                 else
                     if rt.aabb_contains(component._instance:get_bounds(), x, y) then
                         component:signal_emit("pressed", rt.InputButton.A)

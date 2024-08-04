@@ -95,7 +95,7 @@ function rt.Glyph:_update_outline()
 
     local offset_x, offset_y = self._outline_render_offset_x, self._outline_render_offset_y
     love.graphics.push()
-    love.graphics.setColor(1, 1, 1, 1)
+    love.graphics.setColor(1, 1, 1, self._opacity)
 
     self._outline_swap_texture:bind_as_render_target()
     love.graphics.clear(0, 0, 0, 0)

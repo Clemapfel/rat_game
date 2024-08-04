@@ -8,8 +8,9 @@ rt.settings.keyboard = {
 --- @class rt.Keyboard
 --- @signal accept (rt.Keyboard, String) -> nil
 --- @signal abort (rt.Keyboard) -> nil
-rt.Keyboard = meta.new_type("Keyboard", rt.Widget, rt.SignalEmitter, function(max_n_entry_chars)
+rt.Keyboard = meta.new_type("Keyboard", rt.Widget, rt.SignalEmitter, function(max_n_entry_chars, suggestion)
     meta.assert_number(max_n_entry_chars)
+    meta.assert_string(suggestion)
     local out = meta.new(rt.Keyboard, {
         _letter_frame = rt.Frame(),
         _letter_items = {}, -- Table<Table<rt.Label>>
@@ -18,7 +19,9 @@ rt.Keyboard = meta.new_type("Keyboard", rt.Widget, rt.SignalEmitter, function(ma
 
         _max_n_entry_chars = max_n_entry_chars,
         _n_entry_chars = 0,
-        _entry_text = "",
+        _suggestion = suggestion,
+        _entry_text = suggestion,
+        _entry_stencil = rt.Rectangle(0, 0, 1, 1),
         _entry_label_frame = rt.Frame(),
         _entry_label = rt.Label("_"),
         _char_count_label = rt.Label("0"),
@@ -29,12 +32,16 @@ rt.Keyboard = meta.new_type("Keyboard", rt.Widget, rt.SignalEmitter, function(ma
             [rt.InputButton.RIGHT] = 0,
             [rt.InputButton.DOWN] = 0,
             [rt.InputButton.LEFT] = 0,
+            [rt.InputButton.A] = 0,
+            [rt.InputButton.B] = 0
         },
         _input_tick_delay = {
             [rt.InputButton.UP] = 0,
             [rt.InputButton.RIGHT] = 0,
             [rt.InputButton.DOWN] = 0,
             [rt.InputButton.LEFT] = 0,
+            [rt.InputButton.A] = 0,
+            [rt.InputButton.B] = 0
         },
         _selection_graph = rt.SelectionGraph(),
 
@@ -42,7 +49,7 @@ rt.Keyboard = meta.new_type("Keyboard", rt.Widget, rt.SignalEmitter, function(ma
             {rt.ControlIndicatorButton.START, "Choose Name"},
             --{rt.ControlIndicatorButton.A, "Select"},
             {rt.ControlIndicatorButton.B, "Erase"},
-            {rt.ControlIndicatorButton.X, "Abort"},
+            {rt.ControlIndicatorButton.X, "Cancel"},
             --{rt.ControlIndicatorButton.L_R, "Move Cursor"}
         })
     })
@@ -84,10 +91,10 @@ rt.Keyboard._layout = {
     {"U", "V", "W", "X", "Y", "Z", " ", " ", " ", " ", " ", " ", "í", "ï", "ñ", "ç", "ß"},
     {},
     {"a", "b", "c", "d", "e", "f", "g", "h", "i", "j", " ", " ", ".", ",", ":", ";", "\"", "'", "!", "?", "*", "^"},
-    {"k", "l", "m", "n", "o", "p", "q", "r", "s", "t", " ", " ", "+", "-", "=", "~", "\\|", "#", "%", "$", "&", "_"},
+    {"k", "l", "m", "n", "o", "p", "q", "r", "s", "t", " ", " ", "_", "+", "-", "=", "~", "\\|", "#", "%", "$", "&"},
     {"u", "v", "w", "x", "y", "z", " ", " ", " ", " ", " ", " ", "\\<", "\\>", "(", ")", "[", "]", "{", "}", "/", "\\\\"},
     {},
-    {"0", "1", "2", "3", "4", "5", "6", "7", "8", "9", " ", " "}
+    {"0", "1", "2", "3", "4", "5", "6", "7", "8", "9", " ", " ", "\u{2605}", "\u{266A}", "\u{2665}", "\u{25C6}"}
 }
 
 --- @override
@@ -184,6 +191,7 @@ function rt.Keyboard:realize()
     end)
 
     self._control_indicator:realize()
+    self:_update_entry()
 end
 
 --- @override
@@ -230,6 +238,7 @@ function rt.Keyboard:size_allocate(x, y, width, height)
 
     local frame_aabb = rt.AABB(current_x, current_y, total_w - indicator_w, top_row_h)
     self._entry_label_frame:fit_into(frame_aabb)
+    self._entry_stencil = rt.Rectangle(frame_aabb.x, frame_aabb.y, frame_aabb.width, frame_aabb.height)
     self:_update_entry()
 
     current_y = y + top_row_h
@@ -241,84 +250,107 @@ function rt.Keyboard:size_allocate(x, y, width, height)
     for row_i, row in ipairs(self._letter_items) do
         local n_items = sizeof(row)
         for item_i, item in ipairs(row) do
-            local frame_aabb = rt.AABB(current_x, current_y, label_w, label_h)
+            if item.letter ~= " " then
+                local frame_aabb = rt.AABB(current_x, current_y, label_w, label_h)
+                local current_label_w, current_label_h = item.label:measure()
+                local label_bounds = rt.AABB(current_x, current_y + 0.5 * label_h - 0.5 * current_label_h, label_w, label_w)
+                item.label:fit_into(label_bounds)
+                item.selected_label:fit_into(label_bounds)
 
-            local current_label_w, current_label_h = item.label:measure()
-            local label_bounds = rt.AABB(current_x, current_y + 0.5 * label_h - 0.5 * current_label_h, label_w, label_w)
-            item.label:fit_into(label_bounds)
-            item.selected_label:fit_into(label_bounds)
+                item.underline:resize(
+                    current_x + 0.5 * label_w - 0.5 * line_w,
+                    current_y + label_h - line_h,
+                    current_x + 0.5 * label_w + 0.5 * line_w,
+                    current_y + label_h - line_h
+                )
 
-            item.underline:resize(
-                current_x + 0.5 * label_w - 0.5 * line_w,
-                current_y + label_h - line_h,
-                current_x + 0.5 * label_w + 0.5 * line_w,
-                current_y + label_h - line_h
-            )
+                item.underline_outline:resize(
+                    current_x + 0.5 * label_w - 0.5 * outline_line_w,
+                    current_y + label_h - line_h,
+                    current_x + 0.5 * label_w + 0.5 * outline_line_w,
+                    current_y + label_h - line_h
+                )
 
-            item.underline_outline:resize(
-                current_x + 0.5 * label_w - 0.5 * outline_line_w,
-                current_y + label_h - line_h,
-                current_x + 0.5 * label_w + 0.5 * outline_line_w,
-                current_y + label_h - line_h
-            )
+                item.node:set_bounds(frame_aabb)
 
+                self._selection_graph:add(item.node)
+
+                -- link nodes, skipping " " while keeping them for layout
+                do
+                    local previous_i = ternary(item_i == 1, max_row_n, item_i - 1)
+                    while previous_i > 1 and row[previous_i].letter == " "  do
+                        previous_i = previous_i - 1
+                    end
+
+                    if row[previous_i] ~= nil then
+                        item.node:set_left(row[previous_i].node)
+                    end
+                end
+
+                do
+                    local next_i = ternary(item_i == n_items, 1, item_i + 1)
+                    while next_i < max_row_n and row[next_i].letter == " " do
+                        next_i = next_i + 1
+                    end
+
+                    if row[next_i] ~= nil then
+                        item.node:set_right(row[next_i].node)
+                    end
+                end
+
+                do
+                    local up_i = ternary(row_i == 1, n_rows, row_i - 1)
+                    while self._letter_items[up_i][item_i].letter == " " do
+                        up_i = up_i - 1
+                        if up_i < 1 then up_i = n_rows end
+                        if self._letter_items[up_i][item_i] == item then break end
+                    end
+
+                    if self._letter_items[up_i] ~= nil and self._letter_items[up_i][item_i] ~= nil then
+                        item.node:set_up(self._letter_items[up_i][item_i].node)
+                    end
+                end
+
+                do
+                    local down_i = ternary(row_i == n_rows, 1, row_i + 1)
+                    while self._letter_items[down_i][item_i].letter == " " do
+                        down_i = down_i + 1
+                        if down_i > n_rows then down_i = 1 end
+                        if self._letter_items[down_i][item_i] == item then break end
+                    end
+
+                    if self._letter_items[down_i] ~= nil and self._letter_items[down_i][item_i] ~= nil then
+                        item.node:set_down(self._letter_items[down_i][item_i].node)
+                    end
+                end
+
+                if item ~= self._accept_item and item ~= self._cancel_item then
+                    item.node:signal_connect(rt.InputButton.A, function(self)
+                        keyboard:_append_char(self.item.letter)
+                    end)
+                elseif item == self._accept_item then
+                    item.node:signal_connect(rt.InputButton.A, function(self)
+                        keyboard:_accept()
+                    end)
+                elseif item == self._cancel_item then
+                    item.node:signal_connect(rt.InputButton.A, function(self)
+                        keyboard:_cancel()
+                    end)
+                end
+
+                item.node:signal_connect(rt.InputButton.B, function(self)
+                    keyboard:_erase_char()
+                end)
+
+                item.node:signal_connect("enter", function(self)
+                    self.item.is_selected = true
+                end)
+
+                item.node:signal_connect("exit", function(self)
+                    self.item.is_selected = false
+                end)
+            end
             current_x = current_x + label_w + label_xm
-            item.node:set_bounds(frame_aabb)
-
-            self._selection_graph:add(item.node)
-            if item_i > 1 then
-                item.node:set_left(row[item_i - 1].node)
-            else
-                item.node:set_left(row[max_row_n].node)
-            end
-
-            if item_i < n_items then
-                item.node:set_right(row[item_i + 1].node)
-            else
-                item.node:set_right(row[1].node)
-            end
-
-            if row_i > 1 then
-                item.node:set_up(self._letter_items[row_i - 1][item_i].node)
-            else
-                item.node:set_up(self._letter_items[n_rows][item_i].node)
-            end
-
-            if row_i < n_rows then
-                item.node:set_down(self._letter_items[row_i + 1][item_i].node)
-            else
-                item.node:set_down(self._letter_items[1][item_i].node)
-            end
-
-            if item ~= self._accept_item and item ~= self._cancel_item then
-                item.node:signal_connect(rt.InputButton.A, function(self)
-                    keyboard:_append_char(self.item.letter)
-                end)
-            elseif item == self._accept_item then
-                item.node:signal_connect(rt.InputButton.A, function(self)
-                    keyboard:_accept()
-                end)
-            elseif item == self._cancel_item then
-                item.node:signal_connect(rt.InputButton.A, function(self)
-                    keyboard:_abort()
-                end)
-            end
-
-            item.node:signal_connect(rt.InputButton.B, function(self)
-                keyboard:_erase_char()
-            end)
-
-            item.node:signal_connect(rt.InputButton.X, function(self)
-                keyboard:_abort()
-            end)
-
-            item.node:signal_connect("enter", function(self)
-                self.item.is_selected = true
-            end)
-
-            item.node:signal_connect("exit", function(self)
-                self.item.is_selected = false
-            end)
         end
 
         current_y = current_y + label_h + label_ym
@@ -328,7 +360,7 @@ function rt.Keyboard:size_allocate(x, y, width, height)
     end
 
     -- align special items
-    current_x = start_x + total_w - letter_xm - m
+    current_x = start_x + total_w - letter_xm - letter_xm
     current_y = current_y - label_h - label_ym
 
     for item in range(self._accept_item, self._cancel_item) do
@@ -338,10 +370,27 @@ function rt.Keyboard:size_allocate(x, y, width, height)
         item.node:signal_connect(rt.InputButton.A)
 
         local w, h = item.selected_label:measure()
-        local bounds = rt.AABB(current_x - w, current_y + 0.5 * label_h - 0.5 * h)
+        current_x = current_x - w
+        local bounds = rt.AABB(current_x, current_y + 0.5 * label_h - 0.5 * h)
         item.label:fit_into(bounds)
         item.selected_label:fit_into(bounds)
-        current_x = current_x - w - label_xm
+
+        local line_w = 1 * w
+        item.underline:resize(
+            current_x + 0.5 * w - 0.5 * line_w,
+            current_y + label_h - line_h,
+            current_x + 0.5 * w + 0.5 * line_w,
+            current_y + label_h - line_h
+        )
+
+        item.underline_outline:resize(
+            current_x + 0.5 * w - 0.5 * outline_line_w,
+            current_y + label_h - line_h,
+            current_x + 0.5 * w + 0.5 * outline_line_w,
+            current_y + label_h - line_h
+        )
+
+        current_x = current_x - letter_xm
     end
 
     local frame_bounds = rt.AABB(
@@ -383,14 +432,13 @@ end
 --- @brief
 function rt.Keyboard:_append_char(char)
     self._entry_text = self._entry_text .. char
-    self._n_entry_chars = self._n_entry_chars + 1
+    self._n_entry_chars = #self._entry_text
     self:_update_entry()
 end
 
 --- @brief
 function rt.Keyboard:_erase_char(char)
     if #self._entry_text > 0 then
-        dbg("called")
         self._entry_text = utf8.sub(self._entry_text, 1, self._n_entry_chars - 1)
         self._n_entry_chars = self._n_entry_chars - 1
         self:_update_entry()
@@ -399,17 +447,29 @@ end
 
 --- @brief
 function rt.Keyboard:_accept()
-    self:signal_emit("accept")
+    if #self._entry_text > self._max_n_entry_chars then return end
+    if #self._entry_text == 0 then
+        self._entry_text = self._suggestion
+        self:_update_entry()
+        dbg("called")
+    end
+    self:signal_emit("accept", self._entry_text)
 end
 
 --- @brief
-function rt.Keyboard:_abort()
+function rt.Keyboard:_cancel()
     self:signal_emit("abort")
 end
 
 --- @brief
 function rt.Keyboard:_handle_button_pressed(which)
-    self._selection_graph:handle_button(which)
+    if which == rt.InputButton.START then
+        self._selection_graph:set_current_node(self._accept_item.node)
+    elseif which == rt.InputButton.X then
+        self._selection_graph:set_current_node(self._cancel_item.node)
+    else
+        self._selection_graph:handle_button(which)
+    end
     -- enter/exit sets selection
 end
 
@@ -425,7 +485,7 @@ end
 function rt.Keyboard:update(delta)
     local duration = 1 / rt.settings.keyboard.n_ticks_per_second
     local min_delay = rt.settings.keyboard.tick_delay
-    for button in range(rt.InputButton.UP, rt.InputButton.RIGHT, rt.InputButton.DOWN, rt.InputButton.LEFT) do
+    for button in keys(self._input_tick_elapsed) do
         if self._input:is_down(button) then
             local delay = self._input_tick_delay[button]
             delay = delay + delta
@@ -454,8 +514,16 @@ function rt.Keyboard:_update_entry()
     local entry_w, entry_h = self._entry_label:measure()
     self._entry_label:fit_into(frame_bounds.x + xm, frame_bounds.y + 0.5 * frame_bounds.height - 0.5 * entry_h, frame_bounds.width)
 
-    local count_str = "<mono><color=GRAY_4>" ..  (self._max_n_entry_chars - #self._entry_text) .. "</color></mono>"
+    local count_str
+    if #self._entry_text > self._max_n_entry_chars then
+        count_str = "<mono><color=RED><b>" ..  (self._max_n_entry_chars - #self._entry_text) .. "</b></color></mono>"
+        self._accept_item.label:set_opacity(0.3)
+        self._accept_item.selected_label:set_opacity(0.3)
+    else
+        count_str = "<mono><color=GRAY_4>" ..  (self._max_n_entry_chars - #self._entry_text) .. "</color></mono>"
+        self._accept_item.label:set_opacity(1)
+    end
     self._char_count_label:set_text(count_str)
     local count_w, count_h = self._char_count_label:measure()
     self._char_count_label:fit_into(frame_bounds.x, frame_bounds.y + 0.5 * frame_bounds.height - 0.5 * count_h, frame_bounds.width - xm)
-end
+    end

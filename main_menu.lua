@@ -25,7 +25,7 @@ end
 rt.settings.show_rulers = false
 rt.settings.show_fps = true
 
-local todo = rt.Keyboard(12)
+local todo = rt.Keyboard(12, "Test Test")
 todo:realize()
 
 love.draw = function()
