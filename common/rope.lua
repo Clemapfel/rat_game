@@ -1,132 +1,133 @@
 -- src: https://github.com/Toqozz/blog-code/blob/master/rope/Assets/Rope.cs
 -- src: https://www.owlree.blog/posts/simulating-a-rope.html
 
---- @class VerletNode
-function VerletNode(position_x, position_y)
-    return {
-        position_x = position_x,
-        position_y = position_y,
-        old_position_x = position_x,
-        old_position_y = position_y
-    }
-end
-
 --- @class Rope
-rt.Rope = meta.new_type("Rope", function(x, y, n_vertices, vertex_distance)
+rt.Rope = meta.new_type("Rope", function(n_nodes, node_distance)
     return meta.new(rt.Rope, {
-        is_realized = false,
-        initial_pos_x = x,
-        initial_pos_y = y,
+        _is_realized = false,
+        _n_nodes = n_nodes,
+        _node_distance = node_distance,
 
-        total_nodes = which(n_vertices, 40),
-        node_distance = which(vertex_distance, 0.1),
+        _positions = {},
+        _old_positions = {},
 
-        step_time = 0.01,
-        max_step = 0.1,
+        _gravity_x = 0,
+        _gravity_y = 2000,
 
-        gravity_x = 0,
-        gravity_y = 20,
-
-        anchor_x = 0,
-        anchor_y = 0,
-
-        nodes = {}, -- Table<VerletNode>
-        n_nodes = 0,
+        _colors = {}
     })
 end)
 
+--- @brief
 function rt.Rope:realize()
-    local position_x, position_y = self.initial_pos_x, self.initial_pos_y
-    for i = 1, self.total_nodes do
-        local node = VerletNode(position_x, position_y)
-        self.nodes[i] = node
-        position_y = position_y + self.node_distance
+    local x, y = love.mouse.getPosition()
+    for i = 1, self._n_nodes do
+        table.insert(self._positions, x)
+        table.insert(self._positions, y)
+        table.insert(self._old_positions, x)
+        table.insert(self._old_positions, y)
+
+        y = y + self._node_distance
     end
-    self.n_nodes = self.total_nodes
-    self.is_realized = true
+
+    -- pre-calculate colors
+    for i = 1, 2 * self._n_nodes, 2 do
+        local node_x = self._positions[i]
+        local node_y = self._positions[i+1]
+        local color = rt.hsva_to_rgba(rt.HSVA((i / 2) / self._n_nodes, 1, 1, 1))
+        self._colors[i] = {color.r, color.g, color.b, color.a}
+    end
+
+    self._is_realized = true
 end
 
+--- @brief
 function rt.Rope:draw()
     if self.is_realized == false then return end
 
     love.graphics.setLineWidth(3)
-    local to_draw = {}
-    for node in values(self.nodes) do
-        table.insert(to_draw, node.position_x)
-        table.insert(to_draw, node.position_y)
-    end
+    local n = 2 * (self._n_nodes - 1)
+    for i = 1, n, 2 do
+        local node_1_x, node_1_y = self._positions[i], self._positions[i + 1]
+        local node_2_x, node_2_y = self._positions[i + 2], self._positions[i + 3]
 
-    love.graphics.line(to_draw)
+        local color = self._colors[i]
+        love.graphics.setColor(table.unpack(color))
+        love.graphics.line(node_1_x, node_1_y, node_2_x, node_2_y)
+    end
 end
 
+--- @brief
 function rt.Rope:update(delta, n_iterations)
-    n_iterations = which(n_iterations, 80)
-    self:verlet_step(delta)
+    self:_verlet_step(delta)
     for i = 1, n_iterations do
-        self:apply_constraints()
+        local mouse_x, mouse_y = love.mouse.getPosition()
+        self._positions[1] = mouse_x
+        self._positions[2] = mouse_y
+        self:_apply_jakobsen_constraints()
     end
 end
 
-function rt.Rope:verlet_step(delta)
-    for i = 1, self.n_nodes do
-        local node = self.nodes[i]
-        local temp_x, temp_y = node.position_x, node.position_y
+--- @brief
+function rt.Rope:_verlet_step(delta)
+    local delta_squared = delta * delta
+    local gravity_x, gravity_y = self._gravity_x, self._gravity_y
+    local n = 2 * self._n_nodes
+    local positions = self._positions
+    local old_positions = self._old_positions
 
-        node.position_x = node.position_x + (node.position_x - node.old_position_x) + self.gravity_x * (delta * delta)
-        node.position_y = node.position_y + (node.position_y - node.old_position_y) + self.gravity_y * (delta * delta)
+    for i = 1, n, 2 do
+        local current_x, current_y = positions[i], positions[i+1]
+        local old_x, old_y = old_positions[i], old_positions[i+1]
 
-        node.old_position_x = temp_x
-        node.old_position_y = temp_y
+        local before_x, before_y = current_x, current_y
+
+        positions[i] = current_x + (current_x - old_x) + gravity_x * delta_squared
+        positions[i+1] = current_y + (current_y - old_y) + gravity_y* delta_squared
+
+        old_positions[i] = before_x
+        old_positions[i+1] = before_y
     end
 end
 
-function rt.Rope:apply_constraints()
-    for i = 1, self.n_nodes - 1 do
-        local node_1, node_2 = self.nodes[i], self.nodes[i + 1]
+--- @brief
+function rt.Rope:_apply_jakobsen_constraints()
+    local sqrt = math.sqrt
+    local node_distance = self._node_distance
+    local n = 2 * (self._n_nodes - 1)
+    local positions = self._positions
 
-        if i == 1 then
-            local mouse_x, mouse_y = love.mouse.getPosition()
-            node_1.position_x = mouse_x
-            node_2.position_y = mouse_y
+    for i = 1, n, 2 do
+        local node_1_xi, node_1_yi, node_2_xi, node_2_yi = i, i+1, i+2, i+3
+        local node_1_x, node_1_y = positions[node_1_xi], positions[node_1_yi]
+        local node_2_x, node_2_y = positions[node_2_xi], positions[node_2_yi]
+
+        local diff_x = node_1_x - node_2_x
+        local diff_y = node_1_y - node_2_y
+
+        local distance
+        do
+            local a = node_2_x - node_1_x
+            local b = node_2_y - node_1_y
+            distance = sqrt(a * a + b * b)
         end
 
-        local diff_x = node_1.position_x - node_2.position_x
-        local diff_y = node_1.position_y - node_2.position_y
-
-        local dist = rt.distance(node_1.position_x, node_1.position_y, node_2.position_x, node_2.position_y)
-        local difference = 0
-
-        if dist > 0 then
-            difference = (self.node_distance - dist) / dist
-        end
+        local difference = (node_distance - distance) / distance
 
         local translate_x = diff_x * 0.5 * difference
         local translate_y = diff_y * 0.5 * difference
 
-        node_1.position_x = node_1.position_x + translate_x
-        node_1.position_y = node_1.position_y + translate_y
-
-        node_2.position_x = node_2.position_x - translate_x
-        node_2.position_y = node_2.position_y - translate_y
+        positions[node_1_xi] = node_1_x + translate_x
+        positions[node_1_yi] = node_1_y + translate_y
+        positions[node_2_xi] = node_2_x - translate_x
+        positions[node_2_yi] = node_2_y - translate_y
     end
 end
 
---[[
-function rt.Rope:jakobsen_relax_constraints(n_steps, desired_distance)
-    local step = function(p1_x, p1_y, p2_x, p2_y, desired_distance)
-        local direction_x, direction_y = rt.normalize(p2_x - p1_x, p2_y - p1_y)
-        local delta_d = rt.distance(p1_x, p1_y, p2_x, p2_y) - desired_distance
-        p1_x = p1_x + delta_d * direction_x / 2
-        p1_y = p1_y + delta_d * direction_y / 2
-        p2_x = p2_x - delta_d * direction_x / 2
-        p2_y = p2_y - delta_d * direction_y / 2
-    end
-
-    for i = 1, self.n_nodes - 1 do
-        local node_1 = self.nodes[i]
-        local node_2 = self.nodes[i+1]
-
-
+--- @brief
+function rt.Rope:relax()
+    for i = 1, 2 * self.n_nodes, 2 do
+        self._old_positions[i] = self._positions[i]
+        self._old_positions[i+1] = self._positions[i+1]
     end
 end
-]]--

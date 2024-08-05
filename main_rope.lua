@@ -4,8 +4,15 @@ require "common.rope"
 
 -- ###
 
-rope = rt.Rope(300, 300, 40, 5)
+rope = rt.Rope(40, 8)
 rope:realize()
+
+input = rt.InputController()
+input:signal_connect("pressed", function(_, which)
+    if which == rt.InputButton.A then
+        rope:relax()
+    end
+end)
 
 rope_elapsed = 0
 dt_step = 1 / 60
@@ -17,15 +24,11 @@ rt.settings.show_rulers = false
 rt.settings.show_fps = true
 
 love.update = function(delta)
-    rope_elapsed = rope_elapsed + delta
-    while rope_elapsed > dt_step do
-        rope_elapsed = rope_elapsed - dt_step
-        rope:update(dt_step, 80)
-    end
+    rope:update(delta, 200)
 end
 
 love.draw = function()
-    love.graphics.setColor(0.6, 0, 0.6, 1)
+    love.graphics.clear(0.3, 0, 0.3, 1)
 
     rope:draw()
 
@@ -57,9 +60,6 @@ love.run = function()
     })
     love.window.setTitle("rat_game")
     love.filesystem.setIdentity("rat_game")
-
-    local major, minor = love.getVersion()
-    println("Love2D " .. major .. "." .. minor .. " | " .. jit.version)
 
     if love.load then love.load() end
     love.timer.step()

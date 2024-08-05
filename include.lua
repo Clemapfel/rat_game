@@ -11,6 +11,17 @@ ffi = require "ffi"
 utf8 = require "utf8"
 bit = require "bit"
 
+do -- print versions
+    local major, minor = love.getVersion()
+    local status
+    if jit.status() then
+        status = "ON"
+    else
+        status = "OFF"
+    end
+    print("Love2D " .. major .. "." .. minor .. " | " .. jit.version .. " (jit: " .. status .. ")")
+end
+
 -- other libs
 if jit.os == "Linux" then
     fftw3 = ffi.load("fftw3")

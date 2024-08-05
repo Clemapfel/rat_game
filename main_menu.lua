@@ -71,9 +71,6 @@ love.run = function()
     love.window.setTitle("rat_game")
     love.filesystem.setIdentity("rat_game")
 
-    local major, minor = love.getVersion()
-    println("Love2D " .. major .. "." .. minor .. " | " .. jit.version)
-
     if love.load then love.load() end
     love.timer.step()
 
