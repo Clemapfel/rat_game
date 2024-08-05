@@ -7,7 +7,7 @@ rt.settings.menu.scene = {
 
 mn.Scene = meta.new_type("MenuScene", rt.Scene, function()
     return meta.new(mn.Scene, {
-        _background = bt.Background.INK_IN_WATER(),
+        _background = bt.Background.SDF_MEATBALLS(),
 
         _state = {}, -- mn.InventoryState
 
@@ -355,6 +355,7 @@ function mn.Scene:draw()
     self._verbose_info:draw()
 
     self._animation_queue:draw()
+    self._background:draw()
 end
 
 --- @override

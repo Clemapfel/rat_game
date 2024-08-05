@@ -129,6 +129,11 @@ vec3 rgb_to_hsv(vec3 c)
     return vec3(abs(q.z + (q.w - q.y) / (6.0 * d + e)), d / (q.x + e), q.x);
 }
 
+float project(float lower, float upper, float value)
+{
+    return value * abs(upper - lower) + min(lower, upper);
+}
+
 // ###
 
 layout(rgba32f) uniform image2D sdf_out;
@@ -155,29 +160,21 @@ void computemain()
 
     float smoothness = 0.05;
 
-    float circle_distance = 0;
-    float x_offset = sin(elapsed) * 0.25;
-    float c1 = sdf_circle(pos, vec2(0.5), clamp(abs(sin(elapsed) * 0.2), 0.1, 1));
-    float c2 = sdf_circle(pos, translate_point_by_angle(vec2(0.5), x_offset, sin(elapsed / 2) * 2 * PI), 0.05);
-    float c3 = sdf_circle(pos, translate_point_by_angle(vec2(0.5), x_offset, -cos(elapsed / 2) * 2 * PI), 0.05);;
-    float c4 = sdf_circle(pos, translate_point_by_angle(vec2(0.5), x_offset, -cos(elapsed / 2) * 2 * PI + PI / 2), 0.05);;
+    const int n_balls = 6;
+    const int n_circles = 3;
+    float time = elapsed / 8;
+    float dist = 1;
+    for (int ball_i = 1; ball_i <= n_balls; ++ball_i)
+    {
+        for (int offset_i = 1; offset_i <= n_circles; ++offset_i) {
+            float angle = (ball_i) / float(n_balls) * (2 * PI) + (offset_i) / float(n_circles) * PI / (n_balls - 2);
+            angle -= time;
+            float offset = project((sin(time) + 1 / 2), 0.05, 0.4) * offset_i / n_circles;
+            float radius = 0.05;
+            vec2 center = translate_point_by_angle(vec2(0.5), offset, angle);
+            dist = smooth_min(dist, sdf_circle(pos, center, radius), smoothness);
+        }
+    }
 
-    circle_distance = smooth_min(c1, c2, smoothness);
-    circle_distance = smooth_min(circle_distance, c3, smoothness);
-    circle_distance = smooth_min(circle_distance, c4, smoothness);
-
-    const float n = 4;
-    const vec3 c1_hue = hsv_to_rgb(vec3(0.1, 1, 1));
-    const vec3 c2_hue = hsv_to_rgb(vec3(0.33, 1, 1));
-    const vec3 c3_hue = hsv_to_rgb(vec3(0.66, 1, 1));
-    const vec3 c4_hue = hsv_to_rgb(vec3(0.9, 1, 1));
-    
-    const float border = 0.1;
-    vec3 circle_color = c1_hue * smoothstep(-border, +border, c1) + c2_hue * smoothstep(-border, +border, c2) + c3_hue * smoothstep(-border, +border, c3) + c4_hue * smoothstep(-border, +border, c4); // + c2_hue * (c1 step(0.0, c2)); // + c3_hue * step(0.0, c3) + c4_hue * step(0.0, c4)) / n;
-    circle_color = circle_color / 2;
-
-    circle_color = abs(c2_hue * clamp(c2, 0, 1));
-
-
-    imageStore(sdf_out, ivec2(x, y), vec4(vec3(1), circle_distance));
+    imageStore(sdf_out, ivec2(x, y), vec4(vec3(1), dist));
 }
