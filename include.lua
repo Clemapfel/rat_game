@@ -197,6 +197,9 @@ require "battle.scene_state_manager"
 require "battle.scene"
 require "battle.simulation_handler"
 
+-- menu
+
+require "menu.template"
 require "menu.inventory_state"
 require "menu.slots"
 require "menu.entity_info"
@@ -206,3 +209,7 @@ require "menu.verbose_info_panel"
 require "menu.verbose_info_panel_item"
 require "menu.object_moved_animation"
 require "menu.scene"
+
+-- overworld
+
+require "overworld.player"

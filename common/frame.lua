@@ -278,3 +278,8 @@ function rt.Frame:set_selection_state(selection_state)
         end
     end
 end
+
+--- @brief
+function rt.Frame:get_selection_state()
+    return self._selection_state
+end

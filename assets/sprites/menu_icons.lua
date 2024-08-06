@@ -8,7 +8,8 @@ return {
         consumables = 6,
         equips = 7,
         templates = 8,
-        arrow_down = 9,
-        arrow_up = 10
+        exit = 9,
+        arrow_down = 10,
+        arrow_up = 11
     }
 }

@@ -4,33 +4,88 @@ require "common.rope"
 
 -- ###
 
-rope = rt.Rope(40, 8)
-rope:realize()
-
-input = rt.InputController()
-input:signal_connect("pressed", function(_, which)
-    if which == rt.InputButton.A then
-        rope:relax()
-    end
-end)
-
+local ropes = {}
 rope_elapsed = 0
 dt_step = 1 / 60
+n_ropes = 300
+rope_length = 200
+n_rope_segments = 16
+n_rope_iterations = 3
+ball_radius = 20
 
 love.load = function()
+    local line_h, line_w = rt.graphics.get_height(), rt.graphics.get_width()
+    local line_x = 0 --(rt.graphics.get_width() - line_w) / 2
+    local line_y = 0 --(rt.graphics.get_height() - line_h) / 2
+
+    world = rt.PhysicsWorld(0, 0) --2000)
+    ball = rt.CircleCollider(world, rt.ColliderType.DYNAMIC, line_x + 0.5 * line_w, line_y + 0.5 * line_h, ball_radius)
+    ball:set_restitution(1.02)
+    --ball:apply_linear_impulse(300, 0)
+
+
+    player = ow.Player(world, 0, 0) --line_x + 0.5 * line_w, line_y + 0.5 * line_h)
+    player:realize()
+
+    love.mouse.setVisible(false)
+
+
+    for i = 1, n_ropes do
+        local rope = rt.Rope(rt.random.number(0.9 * rope_length, 1 * rope_length), n_rope_segments, player:get_centroid())
+        rope:realize()
+        local origin_x, origin_y = rt.translate_point_by_angle(0, 0, ball_radius, (i / n_ropes) * (2 * math.pi))
+        ropes[i] = {
+            rope = rope,
+            offset_x = origin_x,
+            offset_y = origin_y
+        }
+        local gravity = 40
+        rope:set_gravity(-origin_x * gravity, -origin_y * gravity)
+    end
+
+    ground = rt.LineCollider(world, rt.ColliderType.STATIC,
+        line_x, line_y,
+        line_x, line_y + line_h,
+        line_x + line_w, line_y + line_h,
+        line_x + line_w, line_y,
+        line_x, line_y
+    )
+
 end
 
 rt.settings.show_rulers = false
 rt.settings.show_fps = true
 
+local input = rt.InputController()
+
+local prev_x, prev_y = 0, 0
 love.update = function(delta)
-    rope:update(delta, 200)
+
+    if true then --input:is_down(rt.InputButton.A) then
+        world:update(delta)
+        player:update(delta)
+
+        local center_x, center_y = player:get_centroid()
+
+        for i = 1, n_ropes do
+            local item = ropes[i]
+            item.rope:set_anchor(center_x + item.offset_x, center_y + item.offset_y)
+            item.rope:update(delta, n_rope_iterations)
+        end
+    end
 end
 
 love.draw = function()
     love.graphics.clear(0.3, 0, 0.3, 1)
 
-    rope:draw()
+    for i = 1, n_ropes do
+        local item = ropes[i]
+        item.rope:draw()
+    end
+
+    ground:draw()
+    --ball:draw()
+    --player:draw()
 
     if rt.settings.show_rulers == true then
         love.graphics.setLineWidth(1)

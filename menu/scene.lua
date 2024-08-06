@@ -7,7 +7,7 @@ rt.settings.menu.scene = {
 
 mn.Scene = meta.new_type("MenuScene", rt.Scene, function()
     return meta.new(mn.Scene, {
-        _background = bt.Background.SDF_MEATBALLS(),
+        _background = bt.Background.INK_IN_WATER(),
 
         _state = {}, -- mn.InventoryState
 
@@ -34,11 +34,20 @@ mn.Scene = meta.new_type("MenuScene", rt.Scene, function()
         _grabbed_object_allowed = false,
 
         _control_indicator = nil, -- rt.ControlIndicator
+        _exit_indicator = nil, -- rt.ControlIndicator
         _input_controller = rt.InputController(),
         _animation_queue = rt.AnimationQueue(),
 
         _shared_list_index_to_selection_node = {},
-        _previous_selection_node = {}
+        _previous_selection_node = {},
+
+        _dialog_shadow = rt.Rectangle(0, 0, 1, 1),
+
+        _template_confirm_dialog = nil, -- rt.MessageDialog
+        _template_confirm_dialog_active = false,
+
+        _template_name_keyboard = nil, -- rt.Keyboard
+        _template_name_keyboard_active = false,
     })
 end, {
     _shared_move_list_index = 1,
@@ -224,10 +233,26 @@ function mn.Scene:realize()
     self._control_indicator = rt.ControlIndicator({
         {rt.ControlIndicatorButton.ALL_BUTTONS, ""}
     })
+    self._control_indicator:realize()
+
+    self._exit_indicator = rt.ControlIndicator({
+        {rt.ControlIndicatorButton.START, "Exit"}
+    })
+    self._exit_indicator:realize()
 
     self._input_controller:signal_connect("pressed", function(_, which)
         self:_handle_button_pressed(which)
     end)
+
+    self._template_confirm_dialog = rt.MessageDialog(
+        "Overwrite current Equipment?",
+        "Loading a template will TODO",
+        rt.MessageDialogOption.ACCEPT, rt.MessageDialogOption.CANCEL
+    )
+    self._template_confirm_dialog:realize()
+
+    self._template_name_keyboard = rt.Keyboard(#("New Template #1234"), "new_template_01")
+    self._template_name_keyboard:realize()
 
     self:_create_from_state(self._state)
 end
@@ -242,11 +267,12 @@ function mn.Scene:size_allocate(x, y, width, height)
     local m = rt.settings.margin_unit
     local outer_margin = 2 * m
 
-    self._control_indicator:realize()
-
     local current_x, current_y = x + outer_margin, y + outer_margin
     local control_w, control_h = self._control_indicator:measure()
     self._control_indicator:fit_into(x + width - control_w - outer_margin, y + outer_margin, control_w, control_h)
+
+    local exit_w, exit_h = self._exit_indicator:measure()
+    self._exit_indicator:fit_into(x + outer_margin, y + outer_margin, exit_w, exit_h)
 
     current_y = current_y + control_h + m
 
@@ -320,6 +346,13 @@ function mn.Scene:size_allocate(x, y, width, height)
     self:_regenerate_selection_nodes()
     self:_set_shared_list_index(self._shared_list_index)
     self:_set_entity_index(self._entity_index)
+
+    local shadow_strength = 0.2;
+    self._dialog_shadow:set_color(rt.RGBA(shadow_strength, shadow_strength, shadow_strength, 1))
+    self._dialog_shadow:resize(x, y, width, height)
+
+    self._template_name_keyboard:fit_into(x, y, width, height)
+    self._template_confirm_dialog:fit_into(x,y , width, height)
 end
 
 --- @override
@@ -342,6 +375,8 @@ function mn.Scene:draw()
         self._control_indicator:draw()
     end
 
+    self._exit_indicator:draw()
+
     self._shared_tab_bar:draw()
     self._shared_list_frame:draw()
     self:_shared_list_index_to_list(self._shared_list_index):draw()
@@ -353,9 +388,21 @@ function mn.Scene:draw()
     end
 
     self._verbose_info:draw()
-
     self._animation_queue:draw()
-    self._background:draw()
+
+    if self._template_confirm_dialog_active or self._template_name_keyboard_active then
+        rt.graphics.set_blend_mode(rt.BlendMode.MULTIPLY)
+        self._dialog_shadow:draw()
+        rt.graphics.set_blend_mode()
+    end
+
+    if self._template_name_keyboard_active then
+        self._template_name_keyboard:draw()
+    end
+
+    if self._template_confirm_dialog_active then
+        self._template_confirm_dialog:draw()
+    end
 end
 
 --- @override
@@ -378,6 +425,14 @@ function mn.Scene:update(delta)
     end
 
     self._animation_queue:update(delta)
+
+    if self._template_name_keyboard_active then
+        self._template_name_keyboard:update(delta)
+    end
+
+    if self._template_confirm_dialog_active then
+        self._template_confirm_dialog:update(delta)
+    end
 end
 
 --- @brief
@@ -416,49 +471,101 @@ function mn.Scene:_regenerate_selection_nodes()
     local get_shared_move_list_control = function()
         local entity = scene._entity_pages[scene._entity_index].entity
         local x_disabled =  scene._state:entity_get_first_free_move_slot(entity) == nil or scene._state:entity_has_move(entity, scene._shared_move_list:get_selected_object())
-        local is_grabbing = scene._state:peek_grabbed_object() ~= nil
         local sort_mode = scene._shared_move_list:get_sort_mode()
+
+        local a_label, x_label
+        local is_grabbing = scene._state:peek_grabbed_object() ~= nil
+        local is_move =  meta.isa(scene._state:peek_grabbed_object(), bt.Move)
+        if is_grabbing and is_move then
+            a_label = "Deposit Move"
+            x_label = "<s><color=GRAY>Equip</color></s>"
+        elseif is_grabbing and not is_move then
+            a_label = "<s><color=GRAY>Desposit Move</color></s>"
+            x_label = "<s><color=GRAY>Equip</color></s>"
+        else
+            a_label = "Take Move"
+            x_label = ternary(x_disabled, shared_list_x_disabled_label, shared_list_x_label)
+        end
+
         return {
-            {rt.ControlIndicatorButton.A, ternary(is_grabbing, "Deposit Move", "Take Move")},
+            {rt.ControlIndicatorButton.A, a_label},
             drop_grabbed_object_entry(),
-            {rt.ControlIndicatorButton.X, ternary(x_disabled, shared_list_x_disabled_label, shared_list_x_label)},
+            {rt.ControlIndicatorButton.X, x_label},
             {rt.ControlIndicatorButton.Y, sort_mode_to_label(sort_mode)},
             {rt.ControlIndicatorButton.UP_DOWN, shared_list_up_down_label}
         }
     end
 
     local get_shared_equip_list_control = function()
-        local x_disabled =  scene._state:entity_get_first_free_equip_slot(scene._entity_pages[scene._entity_index].entity) == nil
+        local entity = scene._entity_pages[scene._entity_index].entity
+        local x_disabled =  scene._state:entity_get_first_free_equip_slot(entity) == nil
+        local sort_mode = scene._shared_move_list:get_sort_mode()
+
+        local a_label, x_label
         local is_grabbing = scene._state:peek_grabbed_object() ~= nil
-        local sort_mode = scene._shared_equip_list:get_sort_mode()
+        local is_move =  meta.isa(scene._state:peek_grabbed_object(), bt.Equip)
+        if is_grabbing and is_move then
+            a_label = "Deposit Gear"
+            x_label = "<s><color=GRAY>Equip</color></s>"
+        elseif is_grabbing and not is_move then
+            a_label = "<s><color=GRAY>Desposit Gear</color></s>"
+            x_label = "<s><color=GRAY>Equip</color></s>"
+        else
+            a_label = "Take Gear"
+            x_label = ternary(x_disabled, shared_list_x_disabled_label, shared_list_x_label)
+        end
+
         return {
-            {rt.ControlIndicatorButton.A, ternary(is_grabbing, "Deposit Gear", "Take Gear")},
+            {rt.ControlIndicatorButton.A, a_label},
             drop_grabbed_object_entry(),
-            {rt.ControlIndicatorButton.X, ternary(x_disabled, shared_list_x_disabled_label, shared_list_x_label)},
+            {rt.ControlIndicatorButton.X, x_label},
             {rt.ControlIndicatorButton.Y, sort_mode_to_label(sort_mode)},
             {rt.ControlIndicatorButton.UP_DOWN, shared_list_up_down_label}
         }
     end
 
     local get_shared_consumable_list_control = function()
-        local x_disabled =  scene._state:entity_get_first_free_consumable_slot(scene._entity_pages[scene._entity_index].entity) == nil
+        local entity = scene._entity_pages[scene._entity_index].entity
+        local x_disabled =  scene._state:entity_get_first_free_consumable_slot(entity) == nil
+        local sort_mode = scene._shared_move_list:get_sort_mode()
+
+        local a_label, x_label
         local is_grabbing = scene._state:peek_grabbed_object() ~= nil
-        local sort_mode = scene._shared_consumable_list:get_sort_mode()
+        local is_move =  meta.isa(scene._state:peek_grabbed_object(), bt.Consumable)
+        if is_grabbing and is_move then
+            a_label = "Deposit Item"
+            x_label = "<s><color=GRAY>Equip</color></s>"
+        elseif is_grabbing and not is_move then
+            a_label = "<s><color=GRAY>Desposit Item</color></s>"
+            x_label = "<s><color=GRAY>Equip</color></s>"
+        else
+            a_label = "Take Item"
+            x_label = ternary(x_disabled, shared_list_x_disabled_label, shared_list_x_label)
+        end
+
         return {
-            {rt.ControlIndicatorButton.A, ternary(is_grabbing, "Deposit Item", "Take Item")},
+            {rt.ControlIndicatorButton.A, a_label},
             drop_grabbed_object_entry(),
-            {rt.ControlIndicatorButton.X, ternary(x_disabled, shared_list_x_disabled_label, shared_list_x_label)},
+            {rt.ControlIndicatorButton.X, x_label},
             {rt.ControlIndicatorButton.Y, sort_mode_to_label(sort_mode)},
             {rt.ControlIndicatorButton.UP_DOWN, shared_list_up_down_label}
         }
     end
 
     local get_template_list_control = function()
-        return {
-            {rt.ControlIndicatorButton.A, "[TODO]<s>Load Template</s>"},
-            {rt.ControlIndicatorButton.X, "[TODO]<s>Rename</s>"},
-             drop_grabbed_object_entry()
-        }
+        if scene._state:peek_grabbed_object() ~= nil then
+            return {
+                {rt.ControlIndicatorButton.A, "<s><color=GRAY>Load Template</color></s>"},
+                {rt.ControlIndicatorButton.X, "<s><color=GRAY>Rename</color></s>"},
+                drop_grabbed_object_entry()
+            }
+        else
+            return {
+                {rt.ControlIndicatorButton.A, "Load Template"},
+                {rt.ControlIndicatorButton.X, "Rename"},
+                drop_grabbed_object_entry()
+            }
+        end
     end
 
     local get_entity_info_control = function()
@@ -564,6 +671,12 @@ function mn.Scene:_regenerate_selection_nodes()
         }
     end
 
+    local get_exit_control = function()
+        return {
+            {rt.ControlIndicatorButton.A, "Confirm Exit"}
+        }
+    end
+
     -- shared list tab nodes
     local shared_tab_nodes = {}
     for node in values(self._shared_tab_bar:get_selection_nodes()) do
@@ -598,6 +711,9 @@ function mn.Scene:_regenerate_selection_nodes()
         table.insert(entity_tab_nodes, node)
     end
     table.sort(entity_tab_nodes, function(a, b) return a:get_bounds().y < b:get_bounds().y end)
+
+    -- exit node
+    local exit_node = rt.SelectionGraphNode(self._exit_indicator:get_bounds())
 
     -- per-entity page nodes
     local entity_page_nodes = {}
@@ -757,6 +873,9 @@ function mn.Scene:_regenerate_selection_nodes()
         end)
     end
 
+    entity_tab_nodes[1]:set_up(exit_node)
+    exit_node:set_down(entity_tab_nodes[1])
+
     shared_tab_nodes[1]:signal_connect(rt.InputButton.LEFT, function()
         return entity_page_nodes[scene._entity_index].info_node
     end)
@@ -848,8 +967,8 @@ function mn.Scene:_regenerate_selection_nodes()
     shared_equip_node.get_control_indicator_layout = get_shared_equip_list_control
     shared_consumable_node.get_control_indicator_layout = get_shared_consumable_list_control
     shared_template_node.get_control_indicator_layout = get_template_list_control
-
     verbose_info_node.get_control_indicator_layout = get_verbose_info_control
+    exit_node.get_control_indicator_layout = get_exit_control
 
     -- interactivity
 
@@ -881,6 +1000,25 @@ function mn.Scene:_regenerate_selection_nodes()
             on_b_undo_grab()
         end)
     end
+
+    exit_node:signal_connect("enter", function(self)
+        scene._exit_indicator:set_selection_state(rt.SelectionState.ACTIVE)
+        scene:_set_verbose_info_object(nil)
+        scene:_set_grabbed_object_allowed(false)
+        scene:_update_grabbed_object()
+    end)
+
+    exit_node:signal_connect("exit", function(_)
+        scene._exit_indicator:set_selection_state(rt.SelectionState.INACTIVE)
+    end)
+
+    exit_node:signal_connect(rt.InputButton.A, function(_)
+        if scene._state:peek_grabbed_object() ~= nil then
+            scene._state:add_shared_object(scene._state:take_grabbed_object())
+            scene:_update_grabbed_object()
+        end
+        rt.warning("In exit_node:signal A: exit todo")
+    end)
 
     local page_node_sort_on_y = function(_)
         local page = scene._entity_pages[scene._entity_index]
@@ -1335,10 +1473,16 @@ function mn.Scene:_regenerate_selection_nodes()
 
     shared_move_node:signal_connect("enter", function(_)
         scene._shared_list_frame:set_selection_state(rt.SelectionState.ACTIVE)
+        scene._shared_move_list:set_selection_state(rt.SelectionState.ACTIVE)
+
         scene:_set_verbose_info_object(scene._shared_move_list:get_selected_object())
 
         scene:_update_grabbed_object()
         scene:_set_grabbed_object_allowed(meta.isa(scene._state:peek_grabbed_object(), bt.Move))
+    end)
+
+    shared_move_node:signal_connect("exit", function(_)
+        scene._shared_move_list:set_selection_state(rt.SelectionState.INACTIVE)
     end)
 
     shared_move_node:signal_connect(rt.InputButton.A, function(_)
@@ -1378,25 +1522,10 @@ function mn.Scene:_regenerate_selection_nodes()
         local slot_i = scene._state:entity_get_first_free_move_slot(entity)
         if slot_i == nil then return end
 
-        if scene._state:peek_grabbed_object() ~= nil then
-            local object = scene._state:peek_grabbed_object()
-            if scene._state:entity_has_move(entity, object) then return end
+        local up = scene._state:peek_grabbed_object()
 
-            scene._state:take_grabbed_object()
-            scene._state:add_equipped_move(entity, slot_i, object)
-            scene._undo_grab = function() end
-
-            scene:_play_transfer_object_animation(
-                object,
-                scene:_get_grabbed_object_sprite_aabb(),
-                page.moves:get_slot_aabb(slot_i),
-                function()
-                    scene:_update_grabbed_object()
-                end,
-                function()
-                    page.moves:set_object(slot_i, object)
-                end
-            )
+        if up ~= nil then
+            return
         else
             local object = scene._shared_move_list:get_selected_object()
             if scene._state:entity_has_move(entity, object) then return end
@@ -1429,9 +1558,14 @@ function mn.Scene:_regenerate_selection_nodes()
 
     shared_equip_node:signal_connect("enter", function(_)
         scene._shared_list_frame:set_selection_state(rt.SelectionState.ACTIVE)
+        scene._shared_equip_list:set_selection_state(rt.SelectionState.ACTIVE)
         scene:_set_verbose_info_object(scene._shared_equip_list:get_selected_object())
         scene:_update_grabbed_object()
         scene:_set_grabbed_object_allowed(meta.isa(scene._state:peek_grabbed_object(), bt.Equip))
+    end)
+
+    shared_equip_node:signal_connect("exit", function(_)
+        scene._shared_equip_list:set_selection_state(rt.SelectionState.INACTIVE)
     end)
 
     shared_equip_node:signal_connect(rt.InputButton.A, function(_)
@@ -1472,23 +1606,7 @@ function mn.Scene:_regenerate_selection_nodes()
         if slot_i == nil then return end
 
         if scene._state:peek_grabbed_object() ~= nil then
-            local object = scene._state:peek_grabbed_object()
-
-            scene._state:take_grabbed_object()
-            scene._state:add_equipped_equip(entity, slot_i, object)
-            scene._undo_grab = function() end
-
-            scene:_play_transfer_object_animation(
-                object,
-                scene:_get_grabbed_object_sprite_aabb(),
-                page.equips_and_consumables:get_slot_aabb(slot_i),
-                function()
-                    scene:_update_grabbed_object()
-                end,
-                function()
-                    page.equips_and_consumables:set_object(slot_i, object)
-                end
-            )
+           return
         else
             local object = scene._shared_equip_list:get_selected_object()
             scene._state:take_shared_equip(object)
@@ -1521,9 +1639,14 @@ function mn.Scene:_regenerate_selection_nodes()
 
     shared_consumable_node:signal_connect("enter", function(_)
         scene._shared_list_frame:set_selection_state(rt.SelectionState.ACTIVE)
+        scene._shared_consumable_list:set_selection_state(rt.SelectionState.ACTIVE)
         scene:_set_verbose_info_object(scene._shared_consumable_list:get_selected_object())
         scene:_update_grabbed_object()
         scene:_set_grabbed_object_allowed(meta.isa(scene._state:peek_grabbed_object(), bt.Consumable))
+    end)
+
+    shared_consumable_node:signal_connect("exit", function(_)
+        scene._shared_consumable_list:set_selection_state(rt.SelectionState.INACTIVE)
     end)
 
     shared_consumable_node:signal_connect(rt.InputButton.A, function(_)
@@ -1565,23 +1688,7 @@ function mn.Scene:_regenerate_selection_nodes()
         if slot_i == nil then return end
 
         if scene._state:peek_grabbed_object() ~= nil then
-            local object = scene._state:peek_grabbed_object()
-
-            scene._state:take_grabbed_object()
-            scene._state:add_equipped_consumable(entity, slot_i, object)
-            scene._undo_grab = function() end
-
-            scene:_play_transfer_object_animation(
-                object,
-                scene:_get_grabbed_object_sprite_aabb(),
-                page.equips_and_consumables:get_slot_aabb(slot_i + n_equip_slots),
-                function()
-                    scene:_update_grabbed_object()
-                end,
-                function()
-                    page.equips_and_consumables:set_object(slot_i + n_equip_slots, object)
-                end
-            )
+            return
         else
             local object = scene._shared_consumable_list:get_selected_object()
             scene._state:take_shared_consumable(object)
@@ -1614,22 +1721,64 @@ function mn.Scene:_regenerate_selection_nodes()
 
     shared_template_node:signal_connect("enter", function(_)
         scene._shared_list_frame:set_selection_state(rt.SelectionState.ACTIVE)
+        scene._shared_template_list:set_selection_state(rt.SelectionState.ACTIVE)
         scene:_set_verbose_info_object(scene._shared_template_list:get_selected_object())
         scene:_update_grabbed_object()
         scene:_set_grabbed_object_allowed(false)
     end)
 
+    shared_template_node:signal_connect("exit", function(_)
+        scene._shared_template_list:set_selection_state(rt.SelectionState.INACTIVE)
+    end)
+
     shared_template_node:signal_connect(rt.InputButton.A, function(_)
+        if scene._state:peek_grabbed_object() ~= nil then
+            return
+        end
+
         local current = scene._shared_template_list:get_selected_object()
         if current ~= nil then
-            scene._state:load_template(current)
-            scene:_create_from_state(scene._state)
-            scene:reformat()
+            scene._template_confirm_dialog:signal_disconnect("selection")
+            scene._template_confirm_dialog:signal_connect("selection", function(self, option_index)
+                if option_index == rt.MessageDialogOption.ACCEPT then
+                    local current = scene._shared_template_list:get_selected_object()
+                    if current ~= nil then
+                        scene._state:load_template(current)
+                        scene:_create_from_state(scene._state)
+                        scene:reformat()
+                        dbg("loaded " .. current:get_name())
+                    end
+                end
+
+                scene._template_confirm_dialog_active = false
+                scene._template_confirm_dialog:close()
+                scene._template_confirm_dialog:signal_disconnect("selection")
+            end)
+
+            scene._template_confirm_dialog_active = true
+            scene._template_confirm_dialog:present()
         end
     end)
 
     shared_template_node:signal_connect(rt.InputButton.B, function(_)
         on_b_undo_grab()
+    end)
+
+    shared_template_node:signal_connect(rt.InputButton.X, function(_)
+        scene._template_name_keyboard:signal_disconnect_all()
+        scene._template_name_keyboard:signal_connect("accept", function(self, new_name)
+            local template = scene._shared_template_list:get_selected_object()
+            scene._shared_template_list:take(template)
+            template:set_name(new_name)
+            scene._shared_template_list:add(template)
+
+            scene:_hide_keyboard()
+        end)
+        scene._template_name_keyboard:signal_connect("cancel", function(self)
+            scene:_hide_keyboard()
+        end)
+
+        scene:_show_keyboard()
     end)
 
     for node in values(shared_list_nodes) do
@@ -1686,7 +1835,8 @@ function mn.Scene:_regenerate_selection_nodes()
         entity_tab_nodes,
         shared_tab_nodes,
         shared_list_nodes,
-        {verbose_info_node}
+        {verbose_info_node},
+        {exit_node}
     ) do
         for node in values(nodes) do
             self._selection_graph:add(node)
@@ -1764,32 +1914,40 @@ end
 
 --- @brief
 function mn.Scene:_handle_button_pressed(which)
-    local current_node = self._selection_graph:get_current_node()
-    if current_node == nil then return end
-    local current_shared_list = self:_shared_list_index_to_list(self._shared_list_index)
-    local grabbed_object = self._state:peek_grabbed_object()
 
-    if current_node.is_shared_list_node == true and which == rt.InputButton.UP and grabbed_object == nil then
-        local success = current_shared_list:move_up()
-        if not success then -- escape from list scroll
-            self._selection_graph:handle_button(rt.InputButton.UP)
-        else
-            self:_set_verbose_info_object(current_shared_list:get_selected_object())
-        end
-    elseif current_node.is_shared_list_node == true and which == rt.InputButton.DOWN and grabbed_object == nil then
-        if current_shared_list:move_down() then
-            self:_set_verbose_info_object(current_shared_list:get_selected_object())
-        end
+
+    if self._template_name_keyboard_active == true then
+
+    elseif self._template_confirm_dialog_active == true then
+
     else
-        local before = self._selection_graph:get_current_node()
-        self._selection_graph:handle_button(which)
-        local after = self._selection_graph:get_current_node()
-        if before ~= after then
-            self._previous_selection_node = before
-        end
-    end
+        local current_node = self._selection_graph:get_current_node()
+        if current_node == nil then return end
+        local current_shared_list = self:_shared_list_index_to_list(self._shared_list_index)
+        local grabbed_object = self._state:peek_grabbed_object()
 
-    self:_set_control_indicator_layout(self._selection_graph:get_current_node().get_control_indicator_layout())
+        if current_node.is_shared_list_node == true and which == rt.InputButton.UP and grabbed_object == nil then
+            local success = current_shared_list:move_up()
+            if not success then -- escape from list scroll
+                self._selection_graph:handle_button(rt.InputButton.UP)
+            else
+                self:_set_verbose_info_object(current_shared_list:get_selected_object())
+            end
+        elseif current_node.is_shared_list_node == true and which == rt.InputButton.DOWN and grabbed_object == nil then
+            if current_shared_list:move_down() then
+                self:_set_verbose_info_object(current_shared_list:get_selected_object())
+            end
+        else
+            local before = self._selection_graph:get_current_node()
+            self._selection_graph:handle_button(which)
+            local after = self._selection_graph:get_current_node()
+            if before ~= after then
+                self._previous_selection_node = before
+            end
+        end
+
+        self:_set_control_indicator_layout(self._selection_graph:get_current_node().get_control_indicator_layout())
+    end
 end
 
 --- @brief
@@ -1820,7 +1978,7 @@ function mn.Scene:_update_grabbed_object()
             local offset = rt.settings.menu.scene.grabbed_object_sprite_offset
             
             self._grabbed_object_sprite:fit_into(-0.5 * sprite_w + offset * sprite_w, -0.5 * sprite_h + offset * sprite_w, sprite_w, sprite_h)
-            self._grabbed_object_sprite:set_opacity(0.5)
+            self._grabbed_object_sprite:get_sprite():set_opacity(0.5)
             self:_set_grabbed_object_allowed(self._grabbed_object_allowed)
         end
 
@@ -1871,4 +2029,16 @@ function mn.Scene:_set_entity_index(entity_i)
     for i = 1, n do
         self._entity_tab_bar:set_tab_active(i, i == self._entity_index)
     end
+end
+
+--- @brief
+function mn.Scene:_show_keyboard()
+    self._template_name_keyboard_active = true
+    self._template_name_keyboard:present()
+end
+
+--- @brief
+function mn.Scene:_hide_keyboard()
+    self._template_name_keyboard_active = false
+    self._template_name_keyboard:close()
 end

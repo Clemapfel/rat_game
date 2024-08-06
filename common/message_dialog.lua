@@ -1,4 +1,16 @@
+rt.settings.message_dialog = {
+    input_delay = 0.2, -- seconds
+}
+
+rt.MessageDialogOption = meta.new_enum({
+    ACCEPT = "OK",
+    CANCEL = "Cancel"
+})
+
 --- @class rt.MessageDialog
+--- @param message String
+--- @param submessage String
+--- @param option1 vararg
 --- @signal selection (rt.MessageDialog, Unsigned) -> nil
 rt.MessageDialog = meta.new_type("MessageDialog", rt.Widget, rt.SignalEmitter, function(message, submessage, option1, ...)
     local out = meta.new(rt.MessageDialog, {
@@ -12,19 +24,23 @@ rt.MessageDialog = meta.new_type("MessageDialog", rt.Widget, rt.SignalEmitter, f
         _submessage_label = {}, -- rt.Label
         _buttons = {},
         _frame = rt.Frame(),
-        _shadow = rt.Rectangle(0, 0, 1, 1),
 
         _render_x_offset = 0,
         _render_y_offset = 0,
 
         _is_active = false,
-        _input = rt.InputController()
+        _input = rt.InputController(),
+
+        _elapsed = 0
     })
 
     meta.assert_string(out._message)
     meta.assert_string(out._submessage)
-    for option in values(out._options) do
+    for i, option in ipairs(out._options) do
         meta.assert_string(option)
+        if option == rt.MessageDialogOption.CANCEL then
+            out._selected_item_i = i
+        end
     end
 
     out:signal_add("selection")
@@ -45,6 +61,7 @@ end
 
 --- @brief
 function rt.MessageDialog:present()
+    self._elapsed = 0
     self:set_is_active(true)
     self:set_is_visible(true)
 end
@@ -79,9 +96,6 @@ function rt.MessageDialog:realize()
         table.insert(self._buttons, to_insert)
     end
 
-    local factor = 0.5
-    self._shadow:set_color(rt.RGBA(factor, factor, factor,  1))
-
     self._input:signal_connect("pressed", function(_, which)
         self:_handle_button_pressed(which)
     end)
@@ -89,8 +103,6 @@ end
 
 --- @override
 function rt.MessageDialog:size_allocate(x, y, width, height)
-    self._shadow:resize(x, y, width, height)
-
     local m = rt.settings.margin_unit
 
     local max_w = NEGATIVE_INFINITY
@@ -146,10 +158,6 @@ end
 function rt.MessageDialog:draw()
     if self:get_is_visible() == false then return end
 
-    rt.graphics.set_blend_mode(rt.BlendMode.MULTIPLY)
-    self._shadow:draw()
-    rt.graphics.set_blend_mode()
-
     rt.graphics.translate(self._render_x_offset, self._render_y_offset)
 
     self._frame:draw()
@@ -177,8 +185,12 @@ end
 
 --- @brief
 function rt.MessageDialog:_handle_button_pressed(which)
+    if self._elapsed < rt.settings.message_dialog.input_delay then
+        return
+    end
+
     if which == rt.InputButton.LEFT then
-        if self._selected_item_i > 0 then
+        if self._selected_item_i > 1 then
             self._selected_item_i = self._selected_item_i - 1
             self:_update_selected_item()
         end
@@ -188,6 +200,13 @@ function rt.MessageDialog:_handle_button_pressed(which)
             self:_update_selected_item()
         end
     elseif which == rt.InputButton.A then
-        self:signal_emit("selection", self._selected_item_i)
+        self:signal_emit("selection", self._options[self._selected_item_i])
+    end
+end
+
+--- @override
+function rt.MessageDialog:update(delta)
+    if self._is_active then
+        self._elapsed = self._elapsed + delta
     end
 end

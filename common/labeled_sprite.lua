@@ -92,5 +92,15 @@ end
 
 --- qbrief
 function rt.LabeledSprite:set_sprite_scale(b)
+    rt.error("TODO refactor")
+end
 
+--- @brief
+function rt.LabeledSprite:get_sprite()
+    return self._sprite
+end
+
+--- @brief
+function rt.LabeledSprite:get_label()
+    return self._label
 end

@@ -50,7 +50,14 @@ rt.Keyboard = meta.new_type("Keyboard", rt.Widget, rt.SignalEmitter, function(ma
         _selection_graph = rt.SelectionGraph(),
         _last_selected_item = nil,
 
-        _control_indicator = rt.ControlIndicator({rt.ControlIndicatorButton.ALL_BUTTONS, ""})
+        _control_indicator = rt.ControlIndicator({rt.ControlIndicatorButton.ALL_BUTTONS, ""}),
+
+        _is_active = false,
+        _x_offset = 0,
+        _y_offset = 0,
+
+        _snapshot_padding = 10,
+        _snapshot_texture = rt.RenderTexture()
     })
 
     out:signal_add("accept")
@@ -81,19 +88,19 @@ rt.Keyboard._layout = {
 
     ]]--
     --[[
-    {"A", "B", "C", "D", "E", "F", "G", "H", "I", "J", " ", " ", "À", "Á", "Â", "Ä", "Ã", "È", "É", "Ê", "Ë", "Ẽ"},
-    {"K", "L", "M", "N", "O", "P", "Q", "R", "S", "T", " ", " ", "Ò", "Ó", "Ô", "Ö", "Õ", "Ù", "Ú", "Û", "Ü", "Ũ"},
-    {"U", "V", "W", "X", "Y", "Z", " ", " ", " ", " ", " ", " ", "Í", "Ï", "Ñ", "Ç"},
+    {"A", "B", "C", "D", "E", "F", "G", "H", "I", "J", "", "", "À", "Á", "Â", "Ä", "Ã", "È", "É", "Ê", "Ë", "Ẽ"},
+    {"K", "L", "M", "N", "O", "P", "Q", "R", "S", "T", "", "", "Ò", "Ó", "Ô", "Ö", "Õ", "Ù", "Ú", "Û", "Ü", "Ũ"},
+    {"U", "V", "W", "X", "Y", "Z", " ", " ", " ", " ", "", "", "Í", "Ï", "Ñ", "Ç"},
     ]]--
-    {"A", "B", "C", "D", "E", "F", "G", "H", "I", "J", " ", " ", "à", "á", "â", "ä", "ã", "è", "é", "ê", "ë", "ẽ"},
-    {"K", "L", "M", "N", "O", "P", "Q", "R", "S", "T", " ", " ", "ò", "ó", "ô", "ö", "õ", "ù", "ú", "û", "ü", "ũ"},
-    {"U", "V", "W", "X", "Y", "Z", " ", " ", " ", " ", " ", " ", "í", "ï", "ñ", "ç", "ß"},
+    {"A", "B", "C", "D", "E", "F", "G", "H", "I", "J", "", "", "à", "á", "â", "ä", "ã", "è", "é", "ê", "ë", "ẽ"},
+    {"K", "L", "M", "N", "O", "P", "Q", "R", "S", "T", "", "", "ò", "ó", "ô", "ö", "õ", "ù", "ú", "û", "ü", "ũ"},
+    {"U", "V", "W", "X", "Y", "Z", " ", " ", " ", " ", "", "", "í", "ï", "ñ", "ç", "ß", " ", " ", " ", " ", " "},
     {},
-    {"a", "b", "c", "d", "e", "f", "g", "h", "i", "j", " ", " ", ".", ",", ":", ";", "\"", "'", "!", "?", "*", "^"},
-    {"k", "l", "m", "n", "o", "p", "q", "r", "s", "t", " ", " ", "_", "+", "-", "=", "~", "\\|", "#", "%", "$", "&"},
-    {"u", "v", "w", "x", "y", "z", " ", " ", " ", " ", " ", " ", "\\<", "\\>", "(", ")", "[", "]", "{", "}", "/", "\\\\"},
+    {"a", "b", "c", "d", "e", "f", "g", "h", "i", "j", "", "", ".", ",", ":", ";", "\"", "'", "!", "?", "*", "^"},
+    {"k", "l", "m", "n", "o", "p", "q", "r", "s", "t", "", "", "_", "+", "-", "=", "~", "\\|", "#", "%", "$", "&"},
+    {"u", "v", "w", "x", "y", "z", " ", " ", " ", " ", "", "", "\\<", "\\>", "(", ")", "[", "]", "{", "}", "/", "\\\\"},
     {},
-    {"0", "1", "2", "3", "4", "5", "6", "7", "8", "9", " ", " ", "\u{2605}", "\u{266A}", "\u{2665}", "\u{25C6}"}
+    {"0", "1", "2", "3", "4", "5", "6", "7", "8", "9", "", "", "\u{2605}", "\u{266A}", "\u{2665}", "\u{25C6}"}
 }
 
 --- @override
@@ -160,7 +167,7 @@ function rt.Keyboard:realize()
         for i = 1, max_row_n do
             local char = self._layout[row_i][i]
             if char == nil then
-                char = " "
+                char = ""
             end
 
             table.insert(to_push, initialize_item(char))
@@ -262,7 +269,7 @@ function rt.Keyboard:size_allocate(x, y, width, height)
     for row_i, row in ipairs(self._letter_items) do
         local n_items = sizeof(row)
         for item_i, item in ipairs(row) do
-            if item.letter ~= " " then
+            if item.letter ~= "" then
                 item.node:signal_disconnect_all()
 
                 local frame_aabb = rt.AABB(current_x, current_y, label_w, label_h)
@@ -289,10 +296,10 @@ function rt.Keyboard:size_allocate(x, y, width, height)
 
                 self._selection_graph:add(item.node)
 
-                -- link nodes, skipping " " while keeping them for layout
+                -- link nodes, skipping "" while keeping them for layout
                 do
                     local previous_i = ternary(item_i == 1, max_row_n, item_i - 1)
-                    while previous_i > 1 and row[previous_i].letter == " "  do
+                    while previous_i > 1 and row[previous_i].letter == ""  do
                         previous_i = previous_i - 1
                     end
 
@@ -303,7 +310,7 @@ function rt.Keyboard:size_allocate(x, y, width, height)
 
                 do
                     local next_i = ternary(item_i == n_items, 1, item_i + 1)
-                    while next_i < max_row_n and row[next_i].letter == " " do
+                    while next_i < max_row_n and row[next_i].letter == "" do
                         next_i = next_i + 1
                     end
 
@@ -314,7 +321,7 @@ function rt.Keyboard:size_allocate(x, y, width, height)
 
                 do
                     local up_i = ternary(row_i == 1, n_rows, row_i - 1)
-                    while self._letter_items[up_i][item_i].letter == " " do
+                    while self._letter_items[up_i][item_i].letter == "" do
                         up_i = up_i - 1
                         if up_i < 1 then up_i = n_rows end
                         if self._letter_items[up_i][item_i] == item then break end
@@ -327,13 +334,13 @@ function rt.Keyboard:size_allocate(x, y, width, height)
 
                 do
                     local down_i = ternary(row_i == n_rows, 1, row_i + 1)
-                    while down_i < n_rows and self._letter_items[down_i][item_i].letter == " " do
+                    while down_i < n_rows and self._letter_items[down_i][item_i].letter == "" do
                         down_i = down_i + 1
                     end
 
                     if self._letter_items[down_i] ~= nil and self._letter_items[down_i][item_i] ~= nil then
                         local down_item = self._letter_items[down_i][item_i]
-                        if down_item.letter == " " or down_item == self._accept_item or down_item == self._cancel_item then
+                        if down_item.letter == "" or down_item == self._accept_item or down_item == self._cancel_item then
                             table.insert(special_item_up_candidates, item)
                         else
                             item.node:set_down(self._letter_items[down_i][item_i].node)
@@ -384,7 +391,6 @@ function rt.Keyboard:size_allocate(x, y, width, height)
     for item in range(self._accept_item, self._cancel_item) do
         item.label:set_justify_mode(rt.JustifyMode.LEFT)
         item.selected_label:set_justify_mode(rt.JustifyMode.LEFT)
-        item.node:signal_connect(rt.InputButton.A)
 
         local w, h = item.selected_label:measure()
         current_x = current_x - w
@@ -465,10 +471,47 @@ function rt.Keyboard:size_allocate(x, y, width, height)
     local to_select = self._letter_items[1][1]
     self._selection_graph:set_current_node(to_select.node)
     to_select.is_selected = true
+
+    local final_w = self._control_indicator:get_bounds().x + self._control_indicator:get_bounds().width - self._entry_label_frame:get_bounds().x
+    local final_h = self._letter_frame:get_bounds().y + self._letter_frame:get_bounds().height - self._control_indicator:get_bounds().y
+    self._x_offset = math.floor((width - final_w) / 2)
+    self._y_offset = math.floor((height - final_h) / 2)
+
+    local padding = self._snapshot_padding
+    self._snapshot_texture = rt.RenderTexture(final_w + 2 * padding, final_h + 2 * padding)
+    self._snapshot_texture:bind_as_render_target()
+    rt.graphics.translate(padding, padding)
+    self._entry_label_frame:draw()
+    self._letter_frame:draw()
+    for row in values(self._letter_items) do
+        for item in values(row) do
+            item.label:draw()
+        end
+    end
+    self._control_indicator:draw()
+    rt.graphics.translate(-padding, -padding)
+    self._snapshot_texture:unbind_as_render_target()
 end
 
 --- @override
 function rt.Keyboard:draw()
+    rt.graphics.translate(self._x_offset, self._y_offset)
+
+    --[[
+    local padding = self._snapshot_padding
+    rt.graphics.translate(-padding, -padding)
+    self._snapshot_texture:draw()
+    rt.graphics.translate(padding, padding)
+
+    self._entry_label:draw()
+    self._char_count_label:draw()
+
+    local item = self._selection_graph:get_current_node().item
+    item.underline_outline:draw()
+    item.underline:draw()
+    item.selected_label:draw()
+    ]]--
+
     self._entry_label_frame:draw()
 
     local stencil_value = meta.hash(self) % 255
@@ -496,6 +539,8 @@ function rt.Keyboard:draw()
 
     self._control_indicator:draw()
     --self._selection_graph:draw()
+
+    rt.graphics.translate(-self._x_offset, -self._y_offset)
 end
 
 --- @brief
@@ -530,14 +575,7 @@ end
 
 --- @brief
 function rt.Keyboard:_handle_button_pressed(which)
-
-    --[[
-    if which == rt.InputButton.SELECT then
-        self._text_input_active = not self._text_input_active
-        self._swallow_first_text_input = true
-        self:_update_control_indicator()
-    end
-    ]]--
+    if self._is_active ~= true then return end
 
     if self._text_input_active == true then return end
 
@@ -553,6 +591,7 @@ end
 
 --- @brief
 function rt.Keyboard:_handle_textinput(which)
+    if self._is_active ~= true then return end
     if self._text_input_active == false then return end
     if self._swallow_first_text_input == true then
         self._swallow_first_text_input = false
@@ -567,6 +606,7 @@ end
 
 --- @brief
 function rt.Keyboard:_handle_button_released(which)
+    if self._is_active ~= true then return end
     if self._input_tick_elapsed[which] ~= nil then
         self._input_tick_elapsed[which] = 0
         self._input_tick_delay[which] = 0
@@ -641,4 +681,25 @@ function rt.Keyboard:_update_control_indicator()
             --{rt.ControlIndicatorButton.SELECT, "Enable Keyboard Input"},
         })
     end
+end
+
+--- @brief
+function rt.Keyboard:set_text(text)
+    self._entry_text = text
+    self:_update_entry()
+end
+
+--- @brief
+function rt.Keyboard:get_text()
+    return self._entry_text
+end
+
+--- @brief
+function rt.Keyboard:present()
+    self._is_active = true
+end
+
+--- @brief
+function rt.Keyboard:close()
+    self._is_active = false
 end

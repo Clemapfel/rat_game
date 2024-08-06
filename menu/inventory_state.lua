@@ -1,41 +1,3 @@
-mn.Template = meta.new_type("MenuTemplate", function(name)
-    meta.assert_string(name)
-    return meta.new(mn.Template, {
-        name = name,
-        grabbed_object = nil,
-        entities = {}
-    })
-end)
-
---- @brief
-function mn.Template:create_from(...)
-    self.entities = {}
-    for entity in range(...) do
-        meta.assert_isa(entity, bt.Entity)
-        self.entities[entity] = {
-            moves = entity:list_move_slots(),
-            n_move_slots = entity:get_n_move_slots(),
-
-            equips = entity:list_equip_slots(),
-            n_equip_slots = entity:get_n_equip_slots(),
-
-            consumables = entity:list_consumable_slots(),
-            n_consumable_slots = entity:get_n_consumable_slots()
-        }
-    end
-end
-
---- @brief
-function mn.Template:get_sprite_id()
-    return "orbs", "generic_overlay"
-end
-
---- @brie
-function mn.Template:get_name()
-    return self.name
-end
-
-
 --- @class mn.InventoryState
 mn.InventoryState = meta.new_type("MenuInventoryState", function()
     local self = meta.new(mn.InventoryState, {
@@ -92,7 +54,9 @@ mn.InventoryState = meta.new_type("MenuInventoryState", function()
     }
 
     local empty_template = mn.Template("Empty Template")
-    empty_template:create_from(table.unpack(entities))
+    for entity in values(entities) do
+        empty_template:add_entity(entity)
+    end
     self:add_template(empty_template)
 
     self.active = mn.Template("Active Template")
@@ -465,7 +429,17 @@ end
 --- @brief
 function mn.InventoryState:load_template(template)
     meta.assert_isa(template, mn.Template)
-    self.active = template
+
+    --[[
+    local backup = mn.Template("Previous Template")
+    for entity in keys(self.active.entities) do
+        backup:add_entity(entity)
+    end
+    backup:copy_from(self.active)
+    self:add_template(backup)
+    ]]--
+
+    self.active:copy_from(template)
 end
 
 --- @brief synch .active with entities

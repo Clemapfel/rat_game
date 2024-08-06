@@ -13,7 +13,7 @@ rt.settings.overworld.player = {
 }
 
 --- @class ow.Player
-ow.Player = meta.new_type("Player", ow.OverworldEntity, rt.Animation, function(world, spawn_x, spawn_y)
+ow.Player = meta.new_type("Player", rt.Widget, rt.Animation, function(world, spawn_x, spawn_y)
     local out = meta.new(ow.Player, {
         _world = world,
 
@@ -107,15 +107,17 @@ function ow.Player:realize()
 
     self._collider:set_mass(rt.settings.overworld.player.mass)
 
-    self._input = rt.add_input_controller(self)
+    self._input = rt.InputController()
     self._input:signal_connect("pressed", ow.Player._handle_button_pressed, self)
     self._input:signal_connect("released", ow.Player._handle_button_released, self)
     self._input:signal_connect("joystick", ow.Player._handle_joystick, self)
+    self._input:signal_connect("motion", function(_, x, y)
+        self:_handle_mouse(x, y)
+    end)
 
     self._world:signal_connect("update", ow.Player._on_physics_update, self)
     self._sensor:set_allow_sleeping(false)
 
-    self:set_is_animated(true)
     self._is_realized = true
 
     self._collider:set_collision_group(rt.ColliderCollisionGroup.ALL)
@@ -127,7 +129,7 @@ end
 --- @overload
 function ow.Player:draw()
     if self._is_realized == true then
-        if self._scene:get_debug_draw_enabled() then
+        if true then
             self._debug_body:draw()
             self._debug_body_outline:draw()
 
@@ -166,7 +168,7 @@ function ow.Player:update(delta)
         self._movement_timer = self._movement_timer + delta
     end
 
-    if self._scene:get_debug_draw_enabled() then
+    if true then
         local x, y = self._collider:get_centroid()
         local max_velocity = rt.settings.overworld.player.velocity
         local velocity_x, velocity_y = self._collider:get_linear_velocity()
@@ -221,6 +223,16 @@ function ow.Player:update(delta)
     end
 
     self:_update_velocity()
+
+
+    -- TODO
+    local target_x, target_y = love.mouse.getPosition()
+    local current_x, current_y = self._collider:get_centroid()
+    local impulse_x, impulse_y = rt.normalize(target_x  - current_x, target_y - current_y)
+    local factor = (rt.distance(current_x, current_y, target_x, target_y)) * 2
+        self._collider:apply_linear_impulse(impulse_x * factor, impulse_y * factor)
+
+    -- TODO
 end
 
 --- @brief [internal]
@@ -345,10 +357,19 @@ function ow.Player._handle_joystick(_, x, y, which, self)
 end
 
 --- @brief
+function ow.Player:_handle_mouse(x, y)
+end
+
+--- @brief
 function ow.Player:get_bounds()
     local x, y = self._collider:get_position()
     local radius = self._radius
     return rt.AABB(x - radius, y - radius, 2 * radius, 2 * radius)
+end
+
+--- @brief
+function ow.Player:get_centroid()
+    return self._collider:get_centroid()
 end
 
 --- @brief
@@ -388,4 +409,9 @@ function ow.Player:get_camera_anchor()
     else
         return self._camera_anchor_x, self._camera_anchor_y
     end
+end
+
+--- @brief
+function ow.Player:get_linear_velocity()
+    return self._velocity_magnitude
 end

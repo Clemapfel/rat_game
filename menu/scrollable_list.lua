@@ -26,6 +26,7 @@ mn.ScrollableList = meta.new_type("ScrollableList", rt.Widget, function()
         _selection_offset_y = 0,
         _min_y = 0,
         _max_y = 0,
+        _selection_state = rt.SelectionState.INACTIVE,
 
         _position_x = 0,
         _position_y = 0,
@@ -322,6 +323,8 @@ function mn.ScrollableList:draw()
 
     rt.graphics.push()
 
+    local active = self._selection_state == rt.SelectionState.ACTIVE
+
     for i = 1, self._n_items do
         local entry = self._sortings[self._current_sort_mode][i]
         local item = self._items[entry.item_i]
@@ -329,7 +332,7 @@ function mn.ScrollableList:draw()
         rt.graphics.origin()
         rt.graphics.translate(entry.x, entry.y + self._selection_offset_y)
 
-        if i == self._selected_item_i then
+        if active and i == self._selected_item_i then
             item.selected_base:draw()
         else
             item.unselected_base:draw()
@@ -474,4 +477,9 @@ end
 --- @brief
 function mn.ScrollableList:get_n_items()
     return self._n_items
+end
+
+--- @brief
+function mn.ScrollableList:set_selection_state(state)
+    self._selection_state = state
 end

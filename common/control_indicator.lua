@@ -115,6 +115,11 @@ function rt.ControlIndicator:size_allocate(x, y, width, height)
 
     self._frame:fit_into(x, y, self._final_width, self._final_height)
 
+    self:_update_snapshot()
+end
+
+--- @brief
+function rt.ControlIndicator:_update_snapshot()
     local offset = 2;
     self._snapshot_offset_x, self._snapshot_offset_y = offset, offset
     self._snapshot = rt.RenderTexture(self._final_width + 2 * offset, self._final_height + 2 * offset)
@@ -151,4 +156,13 @@ end
 --- @override
 function rt.ControlIndicator:measure()
     return self._final_width, self._final_height
+end
+
+--- @brief
+function rt.ControlIndicator:set_selection_state(state)
+    local current = self._frame:get_selection_state()
+    if state ~= current then
+        self._frame:set_selection_state(state)
+        self:_update_snapshot()
+    end
 end
