@@ -22,26 +22,11 @@
     </configurations>
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="7fa9ba1b-2cff-4ecc-86fb-59ab2fa76ee1" name="Changes" comment="optimized rope">
-      <change afterPath="$PROJECT_DIR$/menu/template.lua" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/overworld/player.lua" afterDir="false" />
+    <list default="true" id="7fa9ba1b-2cff-4ecc-86fb-59ab2fa76ee1" name="Changes" comment="added keyboard and message dialog">
+      <change afterPath="$PROJECT_DIR$/common/rope_thread.lua" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/assets/sprites/battle/menu_icons.png" beforeDir="false" afterPath="$PROJECT_DIR$/assets/sprites/battle/menu_icons.png" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/assets/sprites/controller_buttons.png" beforeDir="false" afterPath="$PROJECT_DIR$/assets/sprites/controller_buttons.png" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/assets/sprites/controller_buttons.pxo" beforeDir="false" afterPath="$PROJECT_DIR$/assets/sprites/controller_buttons.pxo" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/assets/sprites/menu_icons.lua" beforeDir="false" afterPath="$PROJECT_DIR$/assets/sprites/menu_icons.lua" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/common/control_indicator.lua" beforeDir="false" afterPath="$PROJECT_DIR$/common/control_indicator.lua" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/common/frame.lua" beforeDir="false" afterPath="$PROJECT_DIR$/common/frame.lua" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/common/keyboard.lua" beforeDir="false" afterPath="$PROJECT_DIR$/common/keyboard.lua" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/common/labeled_sprite.lua" beforeDir="false" afterPath="$PROJECT_DIR$/common/labeled_sprite.lua" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/common/message_dialog.lua" beforeDir="false" afterPath="$PROJECT_DIR$/common/message_dialog.lua" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/common/rope.lua" beforeDir="false" afterPath="$PROJECT_DIR$/common/rope.lua" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/include.lua" beforeDir="false" afterPath="$PROJECT_DIR$/include.lua" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/common/collider.lua" beforeDir="false" afterPath="$PROJECT_DIR$/common/collider.lua" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/main_rope.lua" beforeDir="false" afterPath="$PROJECT_DIR$/main_rope.lua" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/menu/inventory_state.lua" beforeDir="false" afterPath="$PROJECT_DIR$/menu/inventory_state.lua" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/menu/scene.lua" beforeDir="false" afterPath="$PROJECT_DIR$/menu/scene.lua" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/menu/scrollable_list.lua" beforeDir="false" afterPath="$PROJECT_DIR$/menu/scrollable_list.lua" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/old/~overworld/player.lua" beforeDir="false" afterPath="$PROJECT_DIR$/old/~overworld/player.lua" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -143,7 +128,7 @@
       <recent name="C:\Users\cleme\Workspace\rat_game\libs\windows\tinyspline" />
     </key>
   </component>
-  <component name="RunManager" selected="Lua Application.main_windows_menu">
+  <component name="RunManager" selected="Lua Application.main_rope_windows">
     <configuration name="main_overworld_windows" type="lua.app" factoryName="Lua Application">
       <module name="rat_game" />
       <option name="program" value="C:\Users\cleme\Workspace\rat_game\love\windows\love.exe" />
@@ -498,15 +483,8 @@
       <workItem from="1722213965868" duration="6180000" />
       <workItem from="1722220329478" duration="106641000" />
       <workItem from="1722784088000" duration="43597000" />
-      <workItem from="1722959445101" duration="12391000" />
-    </task>
-    <task id="LOCAL-00891" summary="added move info">
-      <option name="closed" value="true" />
-      <created>1721846913831</created>
-      <option name="number" value="00891" />
-      <option name="presentableId" value="LOCAL-00891" />
-      <option name="project" value="LOCAL" />
-      <updated>1721846913831</updated>
+      <workItem from="1722959445101" duration="13475000" />
+      <workItem from="1722979743893" duration="5244000" />
     </task>
     <task id="LOCAL-00892" summary="added focus rack">
       <option name="closed" value="true" />
@@ -892,7 +870,15 @@
       <option name="project" value="LOCAL" />
       <updated>1722881244248</updated>
     </task>
-    <option name="localTasksCounter" value="940" />
+    <task id="LOCAL-00940" summary="added keyboard and message dialog">
+      <option name="closed" value="true" />
+      <created>1722971920122</created>
+      <option name="number" value="00940" />
+      <option name="presentableId" value="LOCAL-00940" />
+      <option name="project" value="LOCAL" />
+      <updated>1722971920123</updated>
+    </task>
+    <option name="localTasksCounter" value="941" />
     <servers />
   </component>
   <component name="TypeScriptGeneratedFilesManager">
@@ -941,7 +927,6 @@
     </option>
   </component>
   <component name="VcsManagerConfiguration">
-    <MESSAGE value="potential cool screen transition" />
     <MESSAGE value="cool texture with square wave" />
     <MESSAGE value="stashing regular pattern" />
     <MESSAGE value="stashing fruit loops version" />
@@ -966,7 +951,8 @@
     <MESSAGE value="refactored scene" />
     <MESSAGE value="added rope" />
     <MESSAGE value="optimized rope" />
-    <option name="LAST_COMMIT_MESSAGE" value="optimized rope" />
+    <MESSAGE value="added keyboard and message dialog" />
+    <option name="LAST_COMMIT_MESSAGE" value="added keyboard and message dialog" />
   </component>
   <component name="XDebuggerManager">
     <breakpoint-manager>

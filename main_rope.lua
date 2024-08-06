@@ -1,91 +1,118 @@
 require "include"
 
-require "common.rope"
+THREAD_ID = 0
+require "common.rope_thread"
 
 -- ###
 
-local ropes = {}
-rope_elapsed = 0
-dt_step = 1 / 60
-n_ropes = 300
-rope_length = 200
-n_rope_segments = 16
-n_rope_iterations = 3
-ball_radius = 20
+ropes = {}
+n_ropes = 1000
+rope_length = 400
+rope_n_nodes = 16
+n_iterations = 4
+friction = 0.99
+
+threads = {}
+n_threads = 32
+
+local active = false
 
 love.load = function()
-    local line_h, line_w = rt.graphics.get_height(), rt.graphics.get_width()
-    local line_x = 0 --(rt.graphics.get_width() - line_w) / 2
-    local line_y = 0 --(rt.graphics.get_height() - line_h) / 2
-
-    world = rt.PhysicsWorld(0, 0) --2000)
-    ball = rt.CircleCollider(world, rt.ColliderType.DYNAMIC, line_x + 0.5 * line_w, line_y + 0.5 * line_h, ball_radius)
-    ball:set_restitution(1.02)
-    --ball:apply_linear_impulse(300, 0)
-
-
-    player = ow.Player(world, 0, 0) --line_x + 0.5 * line_w, line_y + 0.5 * line_h)
-    player:realize()
-
-    love.mouse.setVisible(false)
-
-
-    for i = 1, n_ropes do
-        local rope = rt.Rope(rt.random.number(0.9 * rope_length, 1 * rope_length), n_rope_segments, player:get_centroid())
-        rope:realize()
-        local origin_x, origin_y = rt.translate_point_by_angle(0, 0, ball_radius, (i / n_ropes) * (2 * math.pi))
-        ropes[i] = {
-            rope = rope,
-            offset_x = origin_x,
-            offset_y = origin_y
+    for i = 1, n_threads do
+        local thread = {
+            main_to_worker = love.thread.newChannel(),
+            worker_to_main = love.thread.newChannel(),
+            native = love.thread.newThread("common/rope_thread.lua"),
+            ropes = {},
+            n_ropes = 0
         }
-        local gravity = 40
-        rope:set_gravity(-origin_x * gravity, -origin_y * gravity)
+
+        thread.native:start(thread.main_to_worker, thread.worker_to_main)
+        threads[i] = thread
     end
 
-    ground = rt.LineCollider(world, rt.ColliderType.STATIC,
-        line_x, line_y,
-        line_x, line_y + line_h,
-        line_x + line_w, line_y + line_h,
-        line_x + line_w, line_y,
-        line_x, line_y
-    )
+    local min_x, max_x, y = 100, rt.graphics.get_width() - 100, 200
+    local current_x, current_y = min_x, y
+    local step = (max_x - min_x) / n_ropes
 
+    local gravity_x, gravity_y = 0, 100
+    for i = 1, n_ropes do
+        local rope = _new_rope(
+            current_x,
+            current_y,
+            rope_length,
+            rope_n_nodes,
+            gravity_x,
+            gravity_y
+        )
+        rope.id = i
+        ropes[rope.id] = rope
+
+        current_x = current_x + step
+    end
+
+    local n_pushed = n_ropes
+    local thread_i, rope_i = 1, 1
+    while rope_i <= n_ropes do
+        local thread = threads[thread_i]
+        table.insert(thread.ropes, ropes[rope_i])
+        thread.n_ropes = thread.n_ropes + 1
+        rope_i = rope_i + 1
+        thread_i = (thread_i % 16) + 1
+    end
 end
 
-rt.settings.show_rulers = false
-rt.settings.show_fps = true
-
-local input = rt.InputController()
-
-local prev_x, prev_y = 0, 0
 love.update = function(delta)
+    if love.keyboard.isDown("space") then active = true end
+    if active ~= true then return end
+    local mouse_x, mouse_y = love.mouse.getPosition()
 
-    if true then --input:is_down(rt.InputButton.A) then
-        world:update(delta)
-        player:update(delta)
+    -- request
+    for thread_i = 1, n_threads do
+        local thread = threads[thread_i]
+        for rope_i = 1, thread.n_ropes do
+            local rope = thread.ropes[rope_i]
+            thread.main_to_worker:push({
+                id = rope.id,
+                n_iterations = n_iterations,
+                delta = delta,
+                n_nodes = rope.n_nodes,
+                node_distance = rope.node_distance,
+                gravity_x = rope.gravity_x,
+                gravity_y = rope.gravity_y,
+                friction = friction,
+                anchor_x = mouse_x, --rope.anchor_x,
+                anchor_y = mouse_y, --rope.anchor_y,
+                positions = rope.positions,
+                old_positions = rope.old_positions,
+                masses = rope.masses
+            })
+        end
+    end
 
-        local center_x, center_y = player:get_centroid()
-
-        for i = 1, n_ropes do
-            local item = ropes[i]
-            item.rope:set_anchor(center_x + item.offset_x, center_y + item.offset_y)
-            item.rope:update(delta, n_rope_iterations)
+    -- collect
+    for thread_i = 1, n_threads do
+        local thread = threads[thread_i]
+        while thread.worker_to_main:getCount() > 0 do
+            local message = thread.worker_to_main:pop()
+            local rope = ropes[message.id]
+            rope.positions = message.positions
+            rope.old_positions = message.old_positions
         end
     end
 end
 
+-- ###
+
+rt.settings.show_rulers = false
+rt.settings.show_fps = true
+
 love.draw = function()
     love.graphics.clear(0.3, 0, 0.3, 1)
 
-    for i = 1, n_ropes do
-        local item = ropes[i]
-        item.rope:draw()
+    for rope_i = 1, n_ropes do
+        _draw_rope(ropes[rope_i])
     end
-
-    ground:draw()
-    --ball:draw()
-    --player:draw()
 
     if rt.settings.show_rulers == true then
         love.graphics.setLineWidth(1)
