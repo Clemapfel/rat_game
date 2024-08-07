@@ -5,15 +5,17 @@ require "common.rope_thread"
 
 -- ###
 
-ropes = {}
-n_ropes = 1000
-rope_length = 400
-rope_n_nodes = 16
-n_iterations = 4
-friction = 0.99
-
 threads = {}
 n_threads = 32
+
+ropes = {}
+n_ropes = 10
+rope_length = 400
+rope_n_nodes = 16
+n_iterations = 50
+friction = 0.97
+
+rope_shader = rt.Shader("common/rope_shader.glsl")
 
 local active = false
 
@@ -58,7 +60,7 @@ love.load = function()
         table.insert(thread.ropes, ropes[rope_i])
         thread.n_ropes = thread.n_ropes + 1
         rope_i = rope_i + 1
-        thread_i = (thread_i % 16) + 1
+        thread_i = (thread_i % n_threads) + 1
     end
 end
 
@@ -84,8 +86,7 @@ love.update = function(delta)
                 anchor_x = mouse_x, --rope.anchor_x,
                 anchor_y = mouse_y, --rope.anchor_y,
                 positions = rope.positions,
-                old_positions = rope.old_positions,
-                masses = rope.masses
+                old_positions = rope.old_positions
             })
         end
     end
@@ -107,12 +108,18 @@ end
 rt.settings.show_rulers = false
 rt.settings.show_fps = true
 
+local debug = {}
+for i = 1, 16 do
+    table.insert(debug, 50 + i / 16 * 600)
+    table.insert(debug, 400)
+end
+
 love.draw = function()
     love.graphics.clear(0.3, 0, 0.3, 1)
+    love.graphics.setLineWidth(50)
 
-    for rope_i = 1, n_ropes do
-        _draw_rope(ropes[rope_i])
-    end
+    local mesh = _positions_to_mesh(ropes[1].n_nodes, ropes[1].positions)
+    love.graphics.draw(mesh)
 
     if rt.settings.show_rulers == true then
         love.graphics.setLineWidth(1)
