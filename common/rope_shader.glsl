@@ -44,7 +44,7 @@ uniform int n_vertices;
 
 vec4 position(mat4 transform, vec4 vertex_position)
 {
-    hue = 0;
+    hue = gl_VertexID / float(n_vertices * 16);
     return transform * vertex_position;
 }
 
@@ -56,7 +56,8 @@ varying float hue;
 
 vec4 effect(vec4 vertex_color, Image tex, vec2 texture_coords, vec2 vertex_position)
 {
-    return vec4(hsv_to_rgb(vec3(texture_coords.x, 1, 1)), 1);
+    //return vec4(lch_to_rgb(vec3(0.8, 0.8, hue)), 1);
+    return vec4(hsv_to_rgb(vec3(hue, 0, hue)), 1);
 }
 
 #endif

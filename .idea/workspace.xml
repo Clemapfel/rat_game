@@ -22,10 +22,11 @@
     </configurations>
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="7fa9ba1b-2cff-4ecc-86fb-59ab2fa76ee1" name="Changes" comment="parallelized ropes">
-      <change afterPath="$PROJECT_DIR$/common/rope_shader.glsl" afterDir="false" />
+    <list default="true" id="7fa9ba1b-2cff-4ecc-86fb-59ab2fa76ee1" name="Changes" comment="added mesh">
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/common/rope_shader.glsl" beforeDir="false" afterPath="$PROJECT_DIR$/common/rope_shader.glsl" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/common/rope_thread.lua" beforeDir="false" afterPath="$PROJECT_DIR$/common/rope_thread.lua" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/common/shader.lua" beforeDir="false" afterPath="$PROJECT_DIR$/common/shader.lua" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/main_rope.lua" beforeDir="false" afterPath="$PROJECT_DIR$/main_rope.lua" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
@@ -484,15 +485,7 @@
       <workItem from="1722220329478" duration="106641000" />
       <workItem from="1722784088000" duration="43597000" />
       <workItem from="1722959445101" duration="13475000" />
-      <workItem from="1722979743893" duration="8185000" />
-    </task>
-    <task id="LOCAL-00893" summary="equip and move panels done">
-      <option name="closed" value="true" />
-      <created>1721926632275</created>
-      <option name="number" value="00893" />
-      <option name="presentableId" value="LOCAL-00893" />
-      <option name="project" value="LOCAL" />
-      <updated>1721926632275</updated>
+      <workItem from="1722979743893" duration="10227000" />
     </task>
     <task id="LOCAL-00894" summary="alignment working again">
       <option name="closed" value="true" />
@@ -878,7 +871,15 @@
       <option name="project" value="LOCAL" />
       <updated>1722988023884</updated>
     </task>
-    <option name="localTasksCounter" value="942" />
+    <task id="LOCAL-00942" summary="added mesh">
+      <option name="closed" value="true" />
+      <created>1722991151418</created>
+      <option name="number" value="00942" />
+      <option name="presentableId" value="LOCAL-00942" />
+      <option name="project" value="LOCAL" />
+      <updated>1722991151418</updated>
+    </task>
+    <option name="localTasksCounter" value="943" />
     <servers />
   </component>
   <component name="TypeScriptGeneratedFilesManager">
@@ -927,7 +928,6 @@
     </option>
   </component>
   <component name="VcsManagerConfiguration">
-    <MESSAGE value="stashing regular pattern" />
     <MESSAGE value="stashing fruit loops version" />
     <MESSAGE value="stashing before removing equip_*" />
     <MESSAGE value="shared list interactivity done" />
@@ -952,7 +952,8 @@
     <MESSAGE value="optimized rope" />
     <MESSAGE value="added keyboard and message dialog" />
     <MESSAGE value="parallelized ropes" />
-    <option name="LAST_COMMIT_MESSAGE" value="parallelized ropes" />
+    <MESSAGE value="added mesh" />
+    <option name="LAST_COMMIT_MESSAGE" value="added mesh" />
   </component>
   <component name="XDebuggerManager">
     <breakpoint-manager>

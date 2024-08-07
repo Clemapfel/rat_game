@@ -9,10 +9,10 @@ threads = {}
 n_threads = 32
 
 ropes = {}
-n_ropes = 10
+n_ropes = 300
 rope_length = 400
-rope_n_nodes = 16
-n_iterations = 50
+rope_n_nodes = 32
+n_iterations = 2
 friction = 0.97
 
 rope_shader = rt.Shader("common/rope_shader.glsl")
@@ -61,6 +61,13 @@ love.load = function()
         thread.n_ropes = thread.n_ropes + 1
         rope_i = rope_i + 1
         thread_i = (thread_i % n_threads) + 1
+    end
+end
+
+love.keypressed = function(which)
+    if which == "b" then
+        dbg("called")
+        rope_shader:recompile()
     end
 end
 
@@ -118,8 +125,14 @@ love.draw = function()
     love.graphics.clear(0.3, 0, 0.3, 1)
     love.graphics.setLineWidth(50)
 
-    local mesh = _positions_to_mesh(ropes[1].n_nodes, ropes[1].positions)
-    love.graphics.draw(mesh)
+    love.graphics.setColor(1, 1, 1, 1)
+
+    rope_shader:bind()
+    rope_shader:send("n_vertices", rope_n_nodes * n_ropes)
+    for i = 1, n_ropes do
+        _draw_rope(ropes[i])
+    end
+    rope_shader:unbind()
 
     if rt.settings.show_rulers == true then
         love.graphics.setLineWidth(1)

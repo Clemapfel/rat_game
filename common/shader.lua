@@ -1,22 +1,8 @@
 --- @class rt.Shader
-rt.Shader = meta.new_type("Shader", function(code_or_filename, inject_lib)
-    local info = love.filesystem.getInfo(code_or_filename)
-    inject_lib = which(inject_lib, false)
-
-    local native
-    if inject_lib then
-        if info == nil then
-            native = love.graphics.newShader(rt.Shader._common.src .. "\n" .. code_or_filename)
-        else
-            local code = love.filesystem.read(code_or_filename)
-            native = love.graphics.newShader(rt.Shader._common.src .. "\n" .. code)
-        end
-    else
-        native = love.graphics.newShader(code_or_filename)
-    end
-
+rt.Shader = meta.new_type("Shader", function(filename)
     return meta.new(rt.Shader, {
-        _native = native,
+        _native = love.graphics.newShader(filename),
+        _filename = filename,
         _before = nil,
     })
 end)
@@ -37,4 +23,9 @@ end
 --- @brief
 function rt.Shader:unbind()
     love.graphics.setShader(self._before)
+end
+
+--- @brief
+function rt.Shader:recompile()
+    self._native = love.graphics.newShader(self._filename)
 end

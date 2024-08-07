@@ -32,9 +32,6 @@ function _new_rope(x, y, length, n_nodes, gravity_x, gravity_y)
 end
 
 function _draw_rope(rope)
-    rope.mesh:draw()
-    love.graphics.line(rope.positions)
-    --[[
     love.graphics.setLineWidth(1)
     local n_nodes = rope.n_nodes
     local n = 2 * (n_nodes - 1)
@@ -46,7 +43,6 @@ function _draw_rope(rope)
         love.graphics.setColor(table.unpack(color))
         love.graphics.line(node_1_x, node_1_y, node_2_x, node_2_y)
     end
-    ]]
 end
 
 function _verlet_step(delta, n_nodes, gravity_x, gravity_y, friction, positions, old_positions)
@@ -167,52 +163,94 @@ while THREAD_ID ~= 0 do
     })
 end
 
-function _create_mesh(n_ropes, n_nodes)
-    n_vertices =
-end
-
-function _positions_to_mesh(n_positions, positions)
-    local n = 2 * (n_positions - 1)
-    local atan2 = math.atan2
-    local offset = (1 / 8) * (2 * math.pi)
-
-    local thickness = 4
-    local translate_by_angle = function(point_x, point_y, angle)
-        return point_x + thickness * math.cos(angle), point_y + thickness * math.sin(angle)
-    end
-
+function _create_mesh(n_ropes, n_nodes, ropes)
     local vertices = {}
-
+    local vertex_map = {}
     local vertex_format = {
         { name = "VertexPosition", format = "floatvec2" },
         { name = "VertexColor",    format = "floatvec4" }
     }
 
-    local vertex_map = {}
+    local thickness = 3
 
-    for i = 1, n, 2 do
-        local node_1_x, node_1_y = positions[i], positions[i + 1]
-        local node_2_x, node_2_y = positions[i + 2], positions[i + 3]
+    local n = 2 * (n_nodes - 1)
+    local atan2 = math.atan2
+    local offset = (1 / 8) * (2 * math.pi)
+    local translate_by_angle = function(point_x, point_y, angle)
+        return point_x + thickness * math.cos(angle), point_y + thickness * math.sin(angle)
+    end
 
-        local angle = atan2(node_2_y - node_1_y, node_2_x - node_1_x)
-        local a1_x, a1_y = translate_by_angle(node_1_x, node_1_y, angle - offset)
-        local a2_x, a2_y = translate_by_angle(node_1_x, node_1_y, angle + offset)
-        local b1_x, b1_y = translate_by_angle(node_2_x, node_2_y, angle - offset)
-        local b2_x, b2_y = translate_by_angle(node_2_x, node_2_y, angle + offset)
+    local vertex_i = 1
+    for rope_i = 1, n_ropes do
+        local positions = ropes[rope_i].positions
+        for node_i = 1, n, 2 do
+            local node_1_x, node_1_y = positions[node_i], positions[node_i + 1]
+            local node_2_x, node_2_y = positions[node_i + 2], positions[node_i + 3]
 
-        table.insert(vertices, { a1_x, a1_y, 1, 1, 1, 1 })
-        table.insert(vertices, { a2_x, a2_y, 1, 1, 1, 1 })
-        table.insert(vertices, { b1_x, b1_y, 1, 1, 1, 1 })
-        table.insert(vertices, { b2_x, b2_y, 1, 1, 1, 1 })
+            local angle = atan2(node_2_y - node_1_y, node_2_x - node_1_x)
+            local a1_x, a1_y = translate_by_angle(node_1_x, node_1_y, angle - offset)
+            local a2_x, a2_y = translate_by_angle(node_1_x, node_1_y, angle + offset)
+            local b1_x, b1_y = translate_by_angle(node_2_x, node_2_y, angle - offset)
+            local b2_x, b2_y = translate_by_angle(node_2_x, node_2_y, angle + offset)
 
-        for i in range(
-            i, i + 1, i + 3,
-            i, i + 2, i + 3) do
-            table.insert(vertex_map, i)
+            local color = rt.hsva_to_rgba(rt.HSVA((node_i / 2) / (n_nodes), 1, 1, 1, 1))
+
+            table.insert(vertices, { a1_x, a1_y, rt.color_unpack(color) })
+            table.insert(vertices, { a2_x, a2_y, rt.color_unpack(color) })
+            table.insert(vertices, { b1_x, b1_y, rt.color_unpack(color) })
+            table.insert(vertices, { b2_x, b2_y, rt.color_unpack(color) })
+
+            for i in range(
+                vertex_i, vertex_i + 1, vertex_i + 3,
+                vertex_i, vertex_i + 2, vertex_i + 3) do
+                table.insert(vertex_map, i)
+            end
+
+            vertex_i = vertex_i + 4
         end
     end
 
     local mesh = love.graphics.newMesh(vertex_format, vertices, "triangles", "dynamic")
     mesh:setVertexMap(vertex_map)
     return mesh
+end
+
+function _update_mesh(mesh, n_ropes, n_nodes, ropes)
+    local vertices = {}
+
+
+    local thickness = 3
+
+    local n = 2 * (n_nodes - 1)
+    local atan2 = math.atan2
+    local offset = (1 / 8) * (2 * math.pi)
+    local translate_by_angle = function(point_x, point_y, angle)
+        return point_x + thickness * math.cos(angle), point_y + thickness * math.sin(angle)
+    end
+
+    local vertex_i = 1
+    for rope_i = 1, n_ropes do
+        local positions = ropes[rope_i].positions
+        for node_i = 1, n, 2 do
+            local node_1_x, node_1_y = positions[node_i], positions[node_i + 1]
+            local node_2_x, node_2_y = positions[node_i + 2], positions[node_i + 3]
+
+            local angle = atan2(node_2_y - node_1_y, node_2_x - node_1_x)
+            local a1_x, a1_y = translate_by_angle(node_1_x, node_1_y, angle - offset)
+            local a2_x, a2_y = translate_by_angle(node_1_x, node_1_y, angle + offset)
+            local b1_x, b1_y = translate_by_angle(node_2_x, node_2_y, angle - offset)
+            local b2_x, b2_y = translate_by_angle(node_2_x, node_2_y, angle + offset)
+
+            local color = rt.hsva_to_rgba(rt.HSVA((node_i / 2) / (n_nodes), 1, 1, 1, 1))
+
+            vertices[vertex_i + 0] = { a1_x, a1_y, rt.color_unpack(color) }
+            vertices[vertex_i + 1] = { a2_x, a2_y, rt.color_unpack(color) }
+            vertices[vertex_i + 2] = { b1_x, b1_y, rt.color_unpack(color) }
+            vertices[vertex_i + 3] = { b2_x, b2_y, rt.color_unpack(color) }
+
+            vertex_i = vertex_i + 4
+        end
+    end
+
+    mesh:setVertices(vertices)
 end
