@@ -14,6 +14,8 @@ rope_length = 400
 rope_n_nodes = 32
 n_iterations = 2
 friction = 0.97
+min_mass = 70
+max_mass = 100
 
 rope_shader = rt.Shader("common/rope_shader.glsl")
 
@@ -93,7 +95,7 @@ love.update = function(delta)
                 anchor_x = mouse_x, --rope.anchor_x,
                 anchor_y = mouse_y, --rope.anchor_y,
                 positions = rope.positions,
-                old_positions = rope.old_positions
+                old_positions = rope.old_positions,
             })
         end
     end
@@ -127,12 +129,10 @@ love.draw = function()
 
     love.graphics.setColor(1, 1, 1, 1)
 
-    rope_shader:bind()
     rope_shader:send("n_vertices", rope_n_nodes * n_ropes)
     for i = 1, n_ropes do
         _draw_rope(ropes[i])
     end
-    rope_shader:unbind()
 
     if rt.settings.show_rulers == true then
         love.graphics.setLineWidth(1)

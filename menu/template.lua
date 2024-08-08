@@ -79,3 +79,12 @@ end
 function mn.Template:set_name(name)
     self.name = name
 end
+
+--- @brief
+function mn.Template:list_entities()
+    local out = {}
+    for entity in keys(self.entities) do
+        table.insert(out, entity)
+    end
+    return out
+end

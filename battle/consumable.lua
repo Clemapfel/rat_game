@@ -1,5 +1,6 @@
 rt.settings.battle.consumable = {
-    config_path = "battle/configs/consumables"
+    config_path = "battle/configs/consumables",
+    name = "Item"
 }
 
 --- @class bt.Consumable

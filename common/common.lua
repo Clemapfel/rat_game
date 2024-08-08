@@ -760,3 +760,14 @@ function exit(status)
     love.event.push("quit", status)
 end
 
+--- @brief hash string
+function string.sha256(string)
+    local hash
+    if love.getVersion() >= 12 then
+        hash = love.data.hash("string", "sha256", string)
+    else
+        hash = love.data.hash("sha256", string)
+    end
+    return hash
+end
+

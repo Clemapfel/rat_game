@@ -35,60 +35,13 @@ function _draw_rope(rope)
     love.graphics.setLineWidth(1)
     local n_nodes = rope.n_nodes
     local n = 2 * (n_nodes - 1)
+    love.graphics.setColor(1, 1, 1, 1) --table.unpack(color))
     for i = 1, n, 2 do
         local node_1_x, node_1_y = rope.positions[i], rope.positions[i + 1]
         local node_2_x, node_2_y = rope.positions[i + 2], rope.positions[i + 3]
 
         local color = rope.colors[(i + 1) / 2]
-        love.graphics.setColor(table.unpack(color))
         love.graphics.line(node_1_x, node_1_y, node_2_x, node_2_y)
-    end
-end
-
-function _verlet_step(delta, n_nodes, gravity_x, gravity_y, friction, positions, old_positions)
-    local delta_squared = delta * delta
-    local n = 2 * n_nodes
-    friction = clamp(friction, 0, 1)
-    for i = 1, n, 2 do
-        local current_x, current_y = positions[i], positions[i+1]
-        local old_x, old_y = old_positions[i], old_positions[i+1]
-
-        local before_x, before_y = current_x, current_y
-
-        positions[i] = current_x + (current_x - old_x) * friction + gravity_x * delta_squared
-        positions[i+1] = current_y + (current_y - old_y) * friction + gravity_y * delta_squared
-
-        old_positions[i] = before_x
-        old_positions[i+1] = before_y
-    end
-end
-
-function _jakobsen_constraint_step(n_nodes, node_distance, positions)
-    local sqrt = math.sqrt
-    local n = 2 * (n_nodes - 1)
-
-    for i = 1, n, 2 do
-        local node_1_xi, node_1_yi, node_2_xi, node_2_yi = i, i+1, i+2, i+3
-        local node_1_x, node_1_y = positions[node_1_xi], positions[node_1_yi]
-        local node_2_x, node_2_y = positions[node_2_xi], positions[node_2_yi]
-
-        local difference_x = node_1_x - node_2_x
-        local difference_y = node_1_y - node_2_y
-
-        local distance
-        local x_delta = node_2_x - node_1_x
-        local y_delta = node_2_y - node_1_y
-        distance = sqrt(x_delta * x_delta + y_delta * y_delta)
-
-        local difference = (node_distance - distance) / distance
-
-        local translate_x = difference_x * 0.5 * difference
-        local translate_y = difference_y * 0.5 * difference
-
-        positions[node_1_xi] = node_1_x + translate_x
-        positions[node_1_yi] = node_1_y + translate_y
-        positions[node_2_xi] = node_2_x - translate_x
-        positions[node_2_yi] = node_2_y - translate_y
     end
 end
 
@@ -107,6 +60,7 @@ while THREAD_ID ~= 0 do
     local friction = message.friction           -- Number [0, 1]
     local positions = message.positions         -- Table<Number>, 2 * n
     local old_positions = message.old_positions -- Table<Number>, 2 * n
+    local mass = message.mass
 
     -- verlet step
     local delta_squared = delta * delta
@@ -118,13 +72,14 @@ while THREAD_ID ~= 0 do
 
         local before_x, before_y = current_x, current_y
 
-        positions[i] = current_x + (current_x - old_x) * friction + gravity_x * delta_squared
-        positions[i+1] = current_y + (current_y - old_y) * friction + gravity_y * delta_squared
+        positions[i] = current_x + (current_x - old_x) * friction + mass * gravity_x * delta_squared
+        positions[i+1] = current_y + (current_y - old_y) * friction + mass * gravity_y * delta_squared
 
         old_positions[i] = before_x
         old_positions[i+1] = before_y
     end
 
+    -- jakobsen constraints
     local sqrt = math.sqrt
     local n = 2 * (n_nodes - 1)
     for i = 1, n_iterations do

@@ -497,6 +497,12 @@ function mn.VerboseInfoPanel.Item:create_from_template(template)
             self.title_label,
             self.description_label
         }
+
+        local tab = "  "
+        for entity in values(template:list_entities()) do
+            local name_label = rt.Label("<b>" .. entity:get_name() .. "<b>")
+            local equip_label = rt.Label
+        end
     end
 
     self.size_allocate = function(self, x, y, width, height)
@@ -526,15 +532,19 @@ function mn.VerboseInfoPanel.Item:create_from_string(which)
         return "<b><u>" .. str .. "</u></b>"
     end
 
+    local consumable_name = rt.settings.battle.consumable.name
+    local equip_name = rt.settings.battle.equip.name
+    local move_name = rt.settings.battle.move.name
+
     local titles = {
         ["hp"] = format_title("Health") .. " (<color=HP>HP</color>)",
         ["attack"] = format_title("Attack") .. " (<color=ATTACK>ATK</color>)",
         ["defense"] = format_title("Defense") ..  " (<color=DEFENSE>DEF</color>)",
         ["speed"] = format_title("Speed") .." (<color=SPEED>SPD</color>)",
 
-        ["consumable"] = format_title("Held Items") .. " \u{25CF}",
-        ["equip"] = format_title("Gear") .. "  \u{2B23}",
-        ["move"] = format_title("Moves") .. "  \u{25A0}",
+        ["consumable"] = format_title(consumable_name .. "s") .. " \u{25CF}",
+        ["equip"] = format_title(equip_name .. "s") .. "  \u{2B23}",
+        ["move"] = format_title(move_name .. "s") .. "  \u{25A0}",
         ["template"] = format_title("Templates"),
 
         ["options"] = format_title("Options")

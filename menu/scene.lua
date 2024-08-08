@@ -468,6 +468,10 @@ function mn.Scene:_regenerate_selection_nodes()
 
     -- control indicator layouts
 
+    local consumable_name = rt.settings.battle.consumable.name
+    local equip_name = rt.settings.battle.equip.name
+    local move_name = rt.settings.battle.move.name
+
     local get_shared_move_list_control = function()
         local entity = scene._entity_pages[scene._entity_index].entity
         local x_disabled =  scene._state:entity_get_first_free_move_slot(entity) == nil or scene._state:entity_has_move(entity, scene._shared_move_list:get_selected_object())
@@ -477,13 +481,13 @@ function mn.Scene:_regenerate_selection_nodes()
         local is_grabbing = scene._state:peek_grabbed_object() ~= nil
         local is_move =  meta.isa(scene._state:peek_grabbed_object(), bt.Move)
         if is_grabbing and is_move then
-            a_label = "Deposit Move"
+            a_label = "Deposit " .. move_name
             x_label = "<s><color=GRAY>Equip</color></s>"
         elseif is_grabbing and not is_move then
-            a_label = "<s><color=GRAY>Desposit Move</color></s>"
+            a_label = "<s><color=GRAY>Desposit " .. move_name .. "</color></s>"
             x_label = "<s><color=GRAY>Equip</color></s>"
         else
-            a_label = "Take Move"
+            a_label = "Take " .. move_name
             x_label = ternary(x_disabled, shared_list_x_disabled_label, shared_list_x_label)
         end
 
@@ -505,13 +509,13 @@ function mn.Scene:_regenerate_selection_nodes()
         local is_grabbing = scene._state:peek_grabbed_object() ~= nil
         local is_move =  meta.isa(scene._state:peek_grabbed_object(), bt.Equip)
         if is_grabbing and is_move then
-            a_label = "Deposit Gear"
+            a_label = "Deposit " .. equip_name
             x_label = "<s><color=GRAY>Equip</color></s>"
         elseif is_grabbing and not is_move then
-            a_label = "<s><color=GRAY>Desposit Gear</color></s>"
+            a_label = "<s><color=GRAY>Desposit " .. equip_name .. "</color></s>"
             x_label = "<s><color=GRAY>Equip</color></s>"
         else
-            a_label = "Take Gear"
+            a_label = "Take " .. equip_name
             x_label = ternary(x_disabled, shared_list_x_disabled_label, shared_list_x_label)
         end
 
@@ -533,13 +537,13 @@ function mn.Scene:_regenerate_selection_nodes()
         local is_grabbing = scene._state:peek_grabbed_object() ~= nil
         local is_move =  meta.isa(scene._state:peek_grabbed_object(), bt.Consumable)
         if is_grabbing and is_move then
-            a_label = "Deposit Item"
+            a_label = "Deposit " .. consumable_name
             x_label = "<s><color=GRAY>Equip</color></s>"
         elseif is_grabbing and not is_move then
-            a_label = "<s><color=GRAY>Desposit Item</color></s>"
+            a_label = "<s><color=GRAY>Desposit " .. consumable_name .. "</color></s>"
             x_label = "<s><color=GRAY>Equip</color></s>"
         else
-            a_label = "Take Item"
+            a_label = "Take " .. consumable_name
             x_label = ternary(x_disabled, shared_list_x_disabled_label, shared_list_x_label)
         end
 
@@ -575,26 +579,25 @@ function mn.Scene:_regenerate_selection_nodes()
     end
 
     local entity_page_node_control = function(up, down)
-
         local up_name = ""
         if up ~= nil then
             if meta.isa(up, bt.Move) then
-                up_name = "Move"
+                up_name = move_name
             elseif meta.isa(up, bt.Equip) then
-                up_name = "Gear"
+                up_name = equip_name
             elseif meta.isa(up, bt.Consumable) then
-                up_name = "Item"
+                up_name = consumable_name
             end
         end
 
         local down_name = ""
         if down ~= nil then
             if meta.isa(down, bt.Move) then
-                down_name = "Move"
+                down_name = move_name
             elseif meta.isa(down, bt.Equip) then
-                down_name = "Gear"
+                down_name = equip_name
             elseif meta.isa(down, bt.Consumable) then
-                down_name = "Item"
+                down_name = consumable_name
             end
         end
 

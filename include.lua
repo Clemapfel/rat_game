@@ -81,6 +81,7 @@ require "common.log"
 require "common.filesystem"
 require "common.config"
 require "common.time"
+require "common.save_file"
 
 require "common.matrix"
 require "common.geometry"

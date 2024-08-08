@@ -5,6 +5,21 @@ state = mn.InventoryState()
 rt.current_scene = mn.Scene()
 scene = rt.current_scene
 
+local save = rt.SaveFileHandler()
+save:set("test", {
+    test = 1234,
+    data = {
+        test = {
+            1, 2, 3
+        },
+
+        rip = "rip"
+    }
+})
+save:save()
+save:load()
+--dbg(save._data)
+
 --- ###
 
 love.load = function()
