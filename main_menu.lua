@@ -16,9 +16,14 @@ save:set("test", {
         rip = "rip"
     }
 })
-save:save()
-save:load()
---dbg(save._data)
+
+
+local cloth = rt.Cloth(
+    rt.graphics.get_width() * 0.5, rt.graphics.get_height() * 0.5,
+    10, 10,
+    0, 0
+)
+cloth:realize()
 
 --- ###
 
@@ -40,10 +45,12 @@ rt.settings.show_rulers = false
 rt.settings.show_fps = true
 
 love.draw = function()
-    love.graphics.setColor(0.6, 0, 0.6, 1)
+    love.graphics.clear(0.3, 0, 0.3, 1)
     if scene ~= nil then
-        scene:draw()
+        --scene:draw()
     end
+
+    cloth:draw()
 
     if rt.settings.show_rulers == true then
         love.graphics.setLineWidth(1)
@@ -67,6 +74,9 @@ love.update = function(delta)
     if scene ~= nil and scene.update ~= nil then
         scene:update(delta)
     end
+
+    cloth:set_anchor(love.mouse.getPosition())
+    cloth:update(delta, 10)
 end
 
 love.resize = function()

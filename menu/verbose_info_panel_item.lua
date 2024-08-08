@@ -491,11 +491,9 @@ function mn.VerboseInfoPanel.Item:create_from_template(template)
         self.title_label:realize()
         self.title_label:set_justify_mode(rt.JustifyMode.LEFT)
 
-        self.description_label = self._description("TODO")
 
         self.content = {
             self.title_label,
-            self.description_label
         }
 
         local tab = "  "

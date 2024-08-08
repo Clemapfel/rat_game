@@ -142,6 +142,7 @@ require "common.keyboard"
 
 require "common.physics_world"
 require "common.collider"
+require "common.rope"
 
 require "common.audio_playback"
 require "common.monitored_audio_playback"
