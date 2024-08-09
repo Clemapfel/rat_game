@@ -3,7 +3,7 @@ return {
     description = "Reveal information about Enemey",
 
     sprite_id = "orbs",
-    sprite_index = 5,
+    sprite_index = "INSPECT",
 
     animation_id = "",
 

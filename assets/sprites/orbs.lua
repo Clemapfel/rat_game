@@ -7,11 +7,13 @@ return {
        generic_base = 1,
        generic_overlay = 2,
        default = 3,
-       protect = 4,
-       strike = 5,
+       PROTECT = 4,
+       STRUGGLE = 5,
        no_action = 6,
-       analyze = 7,
-       wish = 8,
-       rest = {9, 25}
+       INSPECT = 7,
+       WISH = 8,
+       empty = 9,
+       SURF = 10,
+       rest = {11, 25}
     }
 }

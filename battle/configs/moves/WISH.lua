@@ -3,7 +3,7 @@ return {
     description = "Make a wish at the start of this turn, will come true next turn and restor 50% of users hp",
 
     sprite_id = "orbs",
-    sprite_index = 6,
+    sprite_index = "WISH",
 
     animation_id = "",
 

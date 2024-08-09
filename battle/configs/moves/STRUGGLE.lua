@@ -3,7 +3,7 @@ return {
     description = "Deals 1x user.attack damage to target",
 
     sprite_id = "orbs",
-    sprite_index = 3,
+    sprite_index = "STRUGGLE",
 
     animation_id = "",
 

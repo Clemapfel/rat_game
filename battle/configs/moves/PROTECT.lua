@@ -3,7 +3,7 @@ return {
     description = "Blocks all damage for one turn, fails if used repeatedly",
 
     sprite_id = "orbs",
-    sprite_index = 2,
+    sprite_index = "PROTECT",
 
     animation_id = "",
 

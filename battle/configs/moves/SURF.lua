@@ -3,7 +3,7 @@ return {
     description = "Deals damage to all enemies and allies, not self",
 
     sprite_id = "orbs",
-    sprite_index = 8,
+    sprite_index = "SURF",
 
     animation_id = "",
 
