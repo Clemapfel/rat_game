@@ -23,10 +23,21 @@
   </component>
   <component name="ChangeListManager">
     <list default="true" id="7fa9ba1b-2cff-4ecc-86fb-59ab2fa76ee1" name="Changes" comment="stashing cloth">
-      <change afterPath="$PROJECT_DIR$/temp.glsl" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/common/cloth.lua" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/battle/entity.lua" beforeDir="false" afterPath="$PROJECT_DIR$/battle/entity.lua" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/battle/move.lua" beforeDir="false" afterPath="$PROJECT_DIR$/battle/move.lua" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/common/keyboard.lua" beforeDir="false" afterPath="$PROJECT_DIR$/common/keyboard.lua" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/common/label.lua" beforeDir="false" afterPath="$PROJECT_DIR$/common/label.lua" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/common/message_dialog.lua" beforeDir="false" afterPath="$PROJECT_DIR$/common/message_dialog.lua" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/common/rope.lua" beforeDir="false" afterPath="$PROJECT_DIR$/common/rope.lua" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/include.lua" beforeDir="false" afterPath="$PROJECT_DIR$/include.lua" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/main_menu.lua" beforeDir="false" afterPath="$PROJECT_DIR$/main_menu.lua" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/menu/inventory_state.lua" beforeDir="false" afterPath="$PROJECT_DIR$/menu/inventory_state.lua" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/menu/scene.lua" beforeDir="false" afterPath="$PROJECT_DIR$/menu/scene.lua" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/menu/scrollable_list.lua" beforeDir="false" afterPath="$PROJECT_DIR$/menu/scrollable_list.lua" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/menu/template.lua" beforeDir="false" afterPath="$PROJECT_DIR$/menu/template.lua" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/menu/verbose_info_panel_item.lua" beforeDir="false" afterPath="$PROJECT_DIR$/menu/verbose_info_panel_item.lua" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -486,15 +497,7 @@
       <workItem from="1722959445101" duration="13475000" />
       <workItem from="1722979743893" duration="10618000" />
       <workItem from="1723056466620" duration="10559000" />
-      <workItem from="1723069788250" duration="18317000" />
-    </task>
-    <task id="LOCAL-00897" summary="added undo and verbose info polish">
-      <option name="closed" value="true" />
-      <created>1722023213876</created>
-      <option name="number" value="00897" />
-      <option name="presentableId" value="LOCAL-00897" />
-      <option name="project" value="LOCAL" />
-      <updated>1722023213877</updated>
+      <workItem from="1723069788250" duration="29065000" />
     </task>
     <task id="LOCAL-00898" summary="added love api">
       <option name="closed" value="true" />
@@ -880,7 +883,15 @@
       <option name="project" value="LOCAL" />
       <updated>1723158345970</updated>
     </task>
-    <option name="localTasksCounter" value="946" />
+    <task id="LOCAL-00946" summary="stashing cloth">
+      <option name="closed" value="true" />
+      <created>1723164913393</created>
+      <option name="number" value="00946" />
+      <option name="presentableId" value="LOCAL-00946" />
+      <option name="project" value="LOCAL" />
+      <updated>1723164913393</updated>
+    </task>
+    <option name="localTasksCounter" value="947" />
     <servers />
   </component>
   <component name="TypeScriptGeneratedFilesManager">

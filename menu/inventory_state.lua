@@ -9,42 +9,48 @@ mn.InventoryState = meta.new_type("MenuInventoryState", function()
     })
 
     -- setup debug
-    for move_id in range(
-        "DEBUG_MOVE",
-        "INSPECT",
-        "PROTECT",
-        "STRUGGLE",
-        "SURF",
-        "WISH"
-    ) do
+    local moves = {
+        bt.Move("DEBUG_MOVE"),
+        bt.Move("INSPECT"),
+        bt.Move("PROTECT"),
+        bt.Move("STRUGGLE"),
+        bt.Move("SURF"),
+        bt.Move("WISH")
+    }
+
+    for move in values(moves) do
         local n = rt.random.integer(1, 5)
         for i = 1, n do
-            self:add_shared_move(bt.Move(move_id))
+            self:add_shared_move(move)
         end
     end
 
-    for equip_id in range(
-        "DEBUG_EQUIP",
-        "DEBUG_CLOTHING",
-        "DEBUG_FEMALE_CLOTHING",
-        "DEBUG_MALE_CLOTHING",
-        "DEBUG_WEAPON",
-        "DEBUG_TRINKET"
-    ) do
+    local equips = {
+        bt.Equip("DEBUG_EQUIP"),
+        bt.Equip("DEBUG_CLOTHING"),
+        bt.Equip("DEBUG_FEMALE_CLOTHING"),
+        bt.Equip("DEBUG_MALE_CLOTHING"),
+        bt.Equip("DEBUG_WEAPON"),
+        bt.Equip("DEBUG_TRINKET")
+    }
+
+    for equip in values(equips) do
         local n = rt.random.integer(1, 5)
         for i = 1, n do
-            self:add_shared_equip(bt.Equip(equip_id))
+            self:add_shared_equip(equip)
         end
     end
 
-    for consumable_id in range(
-        "DEBUG_CONSUMABLE",
-        "ONE_CHERRY",
-        "TWO_CHERRY"
-    ) do
+    local consumables = {
+        bt.Consumable("DEBUG_CONSUMABLE"),
+        bt.Consumable("ONE_CHERRY"),
+        bt.Consumable("TWO_CHERRY")
+    }
+
+    for consumable in values(consumables) do
         local n = rt.random.integer(1, 5)
         for i = 1, n do
-            self:add_shared_consumable(bt.Consumable(consumable_id))
+            self:add_shared_consumable(consumable)
         end
     end
 
@@ -58,6 +64,31 @@ mn.InventoryState = meta.new_type("MenuInventoryState", function()
         empty_template:add_entity(entity)
     end
     self:add_template(empty_template)
+
+    local debug_template = mn.Template("Debug Template")
+    for entity in values(entities) do
+        debug_template:add_entity(entity)
+        do
+            local move_i = 1
+            for i = 1, entity:get_n_move_slots() do
+                if move_i > sizeof(moves) then break end -- assert unique moves
+                if rt.random.toss_coin(0.95) then
+                    debug_template.entities[entity].moves[i] = moves[move_i]
+                    move_i = move_i + 1
+                    move_i = move_i % sizeof(moves) + 1
+                end
+            end
+        end
+
+        for i = 1, entity:get_n_equip_slots() do
+            debug_template.entities[entity].equips[i] = equips[rt.random.integer(i, sizeof(equips))]
+        end
+
+        for i = 1, entity:get_n_consumable_slots() do
+            debug_template.entities[entity].consumables[i] = consumables[rt.random.integer(i, sizeof(consumables))]
+        end
+    end
+    self:add_template(debug_template)
 
     self.active = mn.Template("Active Template")
     self.active:create_from(table.unpack(entities))

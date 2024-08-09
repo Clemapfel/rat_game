@@ -14,6 +14,8 @@ rt.JustifyMode = meta.new_enum({
 --- @param text String
 --- @param font rt.Font (or nil)
 rt.Label = meta.new_type("Label", rt.Widget, function(text, font, monospace_font)
+    meta.assert_string(text)
+
     if meta.is_nil(text) then
         text = ""
     end

@@ -108,6 +108,8 @@ function mn.ScrollableList:_regenerate_sortings()
                 properties[i] = item:get_type()
             elseif meta.isa(item, bt.Consumable) then
                 properties[i] = item:get_max_n_uses()
+            elseif meta.isa(item, mn.Template) then
+                properties[i] = item:get_name()
             end
             i = i + 1
         end

@@ -200,7 +200,9 @@ rt.Cloth = meta.new_type("Cloth", function(width, height, n_columns, n_rows, anc
         _grid_i_to_node_i = {{}},
 
         _mesh = {}, -- rt.Mesh
-        _vertices = {}
+        _vertices = {},
+
+        _was_cut = {}
     })
 end)
 
@@ -233,7 +235,7 @@ function rt.Cloth:realize()
         table.insert(vertices, {
             current_x, current_y,
             (col_i - 1) / (self._n_columns - 1), (row_i - 1) / (self._n_rows - 1),
-            color.r, color.g, color.b, 1
+            1, 1, 1, 1--color.r, color.g, color.b, 1
         })
 
         if i < self._n_nodes and row_i ~= self._n_nodes_per_column then
@@ -286,8 +288,7 @@ end
 
 function rt.Cloth:draw()
     if self._is_realized ~= true then return end
-    local pairs = self._pairs
-    local positions = self._positions
+        local positions = self._positions
     local colors = self._colors
 
     --love.graphics.setLineWidth(3)
@@ -312,6 +313,19 @@ function rt.Cloth:draw()
         love.graphics.line(node_1_x, node_1_y, node_2_x, node_2_y)
     end
     ]]--
+
+    for _, pair in pairs(self._pairs) do
+        local node_1_i = pair[1]
+        local node_2_i = pair[2]
+
+        if not (self._was_cut[node_1_i] or self._was_cut[node_2_i]) then
+
+            local node_1_x, node_1_y = self._positions[node_1_i][1], self._positions[node_1_i][2]
+            local node_2_x, node_2_y = self._positions[node_2_i][1], self._positions[node_2_i][2]
+
+            love.graphics.line(node_1_x, node_1_y, node_2_x, node_2_y)
+        end
+    end
 end
 
 function rt.Cloth:update(delta, n_iterations)
@@ -358,6 +372,13 @@ function rt.Cloth:update(delta, n_iterations)
     for _ = 1, n_iterations do
         local o = 100
 
+        local w = 1 * self._width
+        for i = 1, self._n_columns do
+            local pos = self._positions[self._grid_i_to_node_i[i][1]]
+            pos[1] = x - (i / self._n_columns / 2) * w
+            pos[2] = y
+        end
+
         --self._positions[self._grid_i_to_node_i[1][1]] = {x - 0.4 * self._width - o, y - o}
         --self._positions[self._grid_i_to_node_i[math.floor(self._n_nodes_per_row / 2) + 1][1]] = {x, y - 3 * o}
         --self._positions[self._grid_i_to_node_i[self._n_nodes_per_row][1]] = {x + 0.4 * self._width + o, y - o}
@@ -367,12 +388,12 @@ function rt.Cloth:update(delta, n_iterations)
         --self._positions[self._grid_i_to_node_i[math.floor(self._n_nodes_per_row / 2) + 1][self._n_columns]] = {x, y + self._height}
         --self._positions[self._grid_i_to_node_i[self._n_nodes_per_row][self._n_columns]] = {x + 0.3 * self._width, y + self._height}
 
-        self._positions[self._grid_i_to_node_i[1][1]] = {x - 0.2 * self._width, y}
-        self._positions[self._grid_i_to_node_i[math.floor(self._n_nodes_per_row / 2) + 1][1]] = {x, y}
-        self._positions[self._grid_i_to_node_i[self._n_nodes_per_row][1]] = {x + 0.2 * self._width, y}
+        --self._positions[self._grid_i_to_node_i[1][1]] = {x - 0.2 * self._width, y}
+        --self._positions[self._grid_i_to_node_i[math.floor(self._n_nodes_per_row / 2) + 1][1]] = {x, y}
+        --self._positions[self._grid_i_to_node_i[self._n_nodes_per_row][1]] = {x + 0.2 * self._width, y}
 
-        for i = 1, n do
-            local pair = self._pairs[i]
+        for _, pair in pairs(self._pairs) do
+            --local pair = self._pairs[i]
 
             local node_1_i, node_2_i = pair[1], pair[2]
 

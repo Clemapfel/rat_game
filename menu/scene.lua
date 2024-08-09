@@ -428,10 +428,18 @@ function mn.Scene:update(delta)
 
     if self._template_name_keyboard_active then
         self._template_name_keyboard:update(delta)
+
+        if self._template_name_keyboard:get_is_active() == false then
+            self._template_name_keyboard_active = false
+        end
     end
 
     if self._template_confirm_dialog_active then
         self._template_confirm_dialog:update(delta)
+
+        if self._template_confirm_dialog:get_is_active() == false then
+            self._template_confirm_dialog_active = false
+        end
     end
 end
 
@@ -1741,6 +1749,9 @@ function mn.Scene:_regenerate_selection_nodes()
 
         local current = scene._shared_template_list:get_selected_object()
         if current ~= nil then
+            scene._template_confirm_dialog_active = true
+            scene._template_confirm_dialog:present()
+
             scene._template_confirm_dialog:signal_disconnect("selection")
             scene._template_confirm_dialog:signal_connect("selection", function(self, option_index)
                 if option_index == rt.MessageDialogOption.ACCEPT then
@@ -1749,17 +1760,12 @@ function mn.Scene:_regenerate_selection_nodes()
                         scene._state:load_template(current)
                         scene:_create_from_state(scene._state)
                         scene:reformat()
-                        dbg("loaded " .. current:get_name())
                     end
                 end
 
-                scene._template_confirm_dialog_active = false
                 scene._template_confirm_dialog:close()
                 scene._template_confirm_dialog:signal_disconnect("selection")
             end)
-
-            scene._template_confirm_dialog_active = true
-            scene._template_confirm_dialog:present()
         end
     end)
 
@@ -1918,7 +1924,7 @@ end
 --- @brief
 function mn.Scene:_handle_button_pressed(which)
 
-
+    dbg(which, self._template_confirm_dialog_active)
     if self._template_name_keyboard_active == true then
 
     elseif self._template_confirm_dialog_active == true then
@@ -2042,6 +2048,5 @@ end
 
 --- @brief
 function mn.Scene:_hide_keyboard()
-    self._template_name_keyboard_active = false
     self._template_name_keyboard:close()
 end

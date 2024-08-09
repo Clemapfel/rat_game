@@ -550,7 +550,7 @@ end
 
 --- @brief [internal]
 function bt.Entity:_assert_consumable_slot_i(i)
-    if i < 1 or i > self.n_equip_slots then
+    if i < 1 or i > self.n_consumable_slots then
         rt.error("In bt.Entity:get_consumable: slot index `" .. i .. "` is out of range for entity with `" .. self.n_consumable_slots  .. "` slots")
     end
 end

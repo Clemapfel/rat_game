@@ -703,3 +703,8 @@ end
 function rt.Keyboard:close()
     self._is_active = false
 end
+
+--- @brief
+function rt.Keyboard:get_is_active()
+    return self._is_active
+end

@@ -18,16 +18,6 @@ save:set("test", {
 })
 
 
-local cloth = rt.Cloth(
-    rt.graphics.get_width() * 0.75, 300,
-    15, 15,
-    0, 0
-)
-cloth:realize()
-
-local tex = rt.Texture("assets/test.png")
-cloth._mesh:setTexture(tex._native)
-
 --- ###
 
 love.load = function()
@@ -50,11 +40,9 @@ rt.settings.show_fps = true
 love.draw = function()
     love.graphics.clear(0.3, 0, 0.3, 1)
     if scene ~= nil then
-        --scene:draw()
+        scene:draw()
     end
 
-    love.graphics.setColor(1, 1, 1, 1)
-    cloth:draw()
 
     if rt.settings.show_rulers == true then
         love.graphics.setLineWidth(1)
@@ -78,12 +66,6 @@ love.update = function(delta)
     if scene ~= nil and scene.update ~= nil then
         scene:update(delta)
     end
-
-    cloth:set_anchor(love.mouse.getPosition())
-
-    --if love.keyboard.isDown("space") then
-        cloth:update(delta, 50)
-    --end
 end
 
 love.resize = function()

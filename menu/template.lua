@@ -4,7 +4,8 @@ mn.Template = meta.new_type("MenuTemplate", function(name)
     return meta.new(mn.Template, {
         name = name,
         grabbed_object = nil,
-        entities = {}
+        entities = {},
+        created_on = os.date("%c")
     })
 end)
 
@@ -87,4 +88,47 @@ function mn.Template:list_entities()
         table.insert(out, entity)
     end
     return out
+end
+
+--- @brief
+function mn.Template:list_move_slots(entity)
+    meta.assert_isa(entity, bt.Entity)
+    local setup = self.entities[entity]
+    local out = {}
+    for i = 1, setup.n_move_slots do
+        out[i] = setup.moves[i]
+    end
+    return out, setup.n_move_slots
+end
+
+--- @brief
+function mn.Template:list_consumable_slots(entity)
+    meta.assert_isa(entity, bt.Entity)
+    local setup = self.entities[entity]
+    local out = {}
+    for i = 1, setup.n_consumable_slots do
+        out[i] = setup.consumables[i]
+    end
+    return out, setup.n_consumable_slots
+end
+
+--- @brief
+function mn.Template:list_equip_slots(entity)
+    meta.assert_isa(entity, bt.Entity)
+    local setup = self.entities[entity]
+    local out = {}
+    for i = 1, setup.n_equip_slots do
+        out[i] = setup.equips[i]
+    end
+    return out, setup.n_equip_slots
+end
+
+--- @brief
+function mn.Template:get_id()
+    return self:get_name()
+end
+
+--- @brief
+function mn.Template:get_creation_date()
+    return self.created_on
 end

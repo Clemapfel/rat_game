@@ -487,35 +487,154 @@ function mn.VerboseInfoPanel.Item:create_from_template(template)
         self._is_realized = true
         self.frame:realize()
 
-        self.title_label = rt.Label(format_title("\"" .. template:get_name() .. "\""))
+        self.title_label = rt.Label(format_title(template:get_name()))
         self.title_label:realize()
         self.title_label:set_justify_mode(rt.JustifyMode.LEFT)
 
+        self.created_on_label = self._flavor_text("Created: " .. template:get_creation_date())
 
         self.content = {
             self.title_label,
+            self.created_on_label
         }
 
-        local tab = "  "
+        local equip_name = rt.settings.battle.equip.name
+        local consumable_name = rt.settings.battle.consumable.name
+        local move_name = rt.settings.battle.move.name
+
+        self.entities = {}
+        local font, mono_font = rt.settings.font.default_small, rt.settings.font.default_mono_small
         for entity in values(template:list_entities()) do
-            local name_label = rt.Label("<b>" .. entity:get_name() .. "<b>")
-            local equip_label = rt.Label
+            local to_push = {
+                name_label = rt.Label("<u>" .. entity:get_name() .. "</u>", font, mono_font),
+                move_label = rt.Label(move_name .. "s:", font, mono_font),
+                move_sprites = {},
+                equip_and_consumable_label = rt.Label("Equipment:", font, mono_font),
+                equip_sprites = {},
+                consumable_sprites = {},
+                hrule = self._hrule()
+            }
+
+            local move_slots, n_move_slots = template:list_move_slots(entity)
+            for i = 1, n_move_slots do
+                if move_slots[i] ~= nil then
+                    table.insert(to_push.move_sprites, rt.Sprite(move_slots[i]:get_sprite_id()))
+                end
+            end
+
+            if sizeof(to_push.move_sprites) == 0 then
+                table.insert(to_push.move_sprites, self._description("<color=GRAY>(none)</color>"))
+            end
+
+            local equip_slots, n_equip_slots = template:list_equip_slots(entity)
+            for i = 1, n_equip_slots do
+                if equip_slots[i] ~= nil then
+                    table.insert(to_push.equip_sprites, rt.Sprite(equip_slots[i]:get_sprite_id()))
+                end
+            end
+
+            local consumable_slots, n_consumable_slots = template:list_consumable_slots(entity)
+            for i = 1, n_consumable_slots do
+                if consumable_slots[i] ~= nil then
+                    table.insert(to_push.consumable_sprites, rt.Sprite(consumable_slots[i]:get_sprite_id()))
+                end
+            end
+
+            if sizeof(to_push.equip_sprites) == 0 and sizeof(to_push.consumable_sprites) == 0 then
+                table.insert(to_push.equip_sprites, self._description("<color=GRAY>(none)</color>"))
+            end
+
+            for widget in range(to_push.name_label, to_push.move_label, to_push.equip_and_consumable_label, to_push.hrule) do
+                widget:realize()
+                table.insert(self.content, widget)
+            end
+
+            for t in range(to_push.move_sprites, to_push.equip_sprites, to_push.consumable_sprites) do
+                for sprite in values(t) do
+                    sprite:realize()
+                    table.insert(self.content, sprite)
+                end
+            end
+
+            self.entities[entity] = to_push
         end
     end
 
     self.size_allocate = function(self, x, y, width, height)
         local m, xm, ym = self._get_margin()
-        local start_y = y + ym
-        local current_x, current_y = x + xm, start_y
+        local start_y = y + 2 * ym
+        local start_x = x + xm
+        local current_x, current_y = start_x, start_y
         local w = width - 2 * xm
 
         self.title_label:fit_into(current_x, current_y, w)
         current_y = current_y + select(2, self.title_label:measure()) + m
 
-        self.description_label:fit_into(current_x, current_y, w)
+        local sprite_w, sprite_h = 32, 32
+        local tab = 2 * xm
+        for element in values(self.entities) do
+            element.name_label:fit_into(current_x, current_y, POSITIVE_INFINITY)
+            current_y = current_y + select(2, element.name_label:measure()) + m
 
-        current_y = current_y + select(2, self.description_label:measure()) + m
-        local total_height = current_y - start_y + 2 * ym
+            element.move_label:fit_into(current_x + xm, current_y)
+            current_y = current_y + select(2, element.move_label:measure()) + 0.5 * m
+
+            local sprite_start_x = current_x + xm + xm
+            local sprite_x = current_x + xm + xm
+
+            local n_moves = sizeof(element.move_sprites)
+            for i = 1, n_moves do
+                local sprite = element.move_sprites[i]
+                sprite:fit_into(sprite_x, current_y, sprite_w, sprite_h)
+                sprite_x = sprite_x + sprite_w
+
+                if sprite_x + sprite_w > start_x + w - xm and i ~= n_moves then
+                    sprite_x = sprite_start_x
+                    current_y = current_y + sprite_w
+                end
+            end
+
+            current_y = current_y + sprite_w + m
+
+            element.equip_and_consumable_label:fit_into(current_x + xm, current_y)
+            current_y = current_y + select(2, element.move_label:measure()) + 0.5 * m
+
+            sprite_x = sprite_start_x
+            local n_equips = sizeof(element.equip_sprites)
+            for i = 1, n_equips do
+                local sprite = element.equip_sprites[i]
+                sprite:fit_into(sprite_x, current_y, sprite_w, sprite_h)
+                sprite_x = sprite_x + sprite_w
+
+                if sprite_x + sprite_w > start_x + w - xm then
+                    sprite_x = sprite_start_x
+                    current_y = current_y + sprite_h
+                end
+            end
+
+            local n_consumables = sizeof(element.consumable_sprites)
+            for i = 1, n_consumables do
+                local sprite = element.consumable_sprites[i]
+                sprite:fit_into(sprite_x, current_y, sprite_w, sprite_h)
+                sprite_x = sprite_x + sprite_w
+
+                if sprite_x + sprite_w > start_x + w - xm and i + n_equips < n_equips + n_consumables then
+                    sprite_x = sprite_start_x
+                    current_y = current_y + sprite_h
+                end
+            end
+
+            current_y = current_y + sprite_h + m
+            element.hrule:fit_into(current_x, current_y, w, 0)
+            current_y = current_y + 2 * m + 3
+        end
+
+        current_y = current_y - m
+
+        self.created_on_label:fit_into(start_x, current_y, w)
+        current_y = current_y + select(2, self.created_on_label:measure()) + 2 * ym
+
+        local total_height = current_y - y
         self.frame:fit_into(x, y, width, total_height)
         self.final_height = total_height
     end

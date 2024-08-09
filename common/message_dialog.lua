@@ -54,6 +54,11 @@ function rt.MessageDialog:set_is_active(b)
 end
 
 --- @brief
+function rt.MessageDialog:get_is_active()
+    return self._is_active
+end
+
+--- @brief
 function rt.MessageDialog:close()
     self:set_is_active(false)
     self:set_is_visible(false)
