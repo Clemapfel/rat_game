@@ -19,11 +19,14 @@ save:set("test", {
 
 
 local cloth = rt.Cloth(
-    rt.graphics.get_width() * 0.5, rt.graphics.get_height() * 0.5,
-    10, 10,
+    rt.graphics.get_width() * 0.75, 300,
+    15, 15,
     0, 0
 )
 cloth:realize()
+
+local tex = rt.Texture("assets/test.png")
+cloth._mesh:setTexture(tex._native)
 
 --- ###
 
@@ -50,6 +53,7 @@ love.draw = function()
         --scene:draw()
     end
 
+    love.graphics.setColor(1, 1, 1, 1)
     cloth:draw()
 
     if rt.settings.show_rulers == true then
@@ -76,7 +80,10 @@ love.update = function(delta)
     end
 
     cloth:set_anchor(love.mouse.getPosition())
-    cloth:update(delta, 10)
+
+    --if love.keyboard.isDown("space") then
+        cloth:update(delta, 50)
+    --end
 end
 
 love.resize = function()

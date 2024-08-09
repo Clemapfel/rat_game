@@ -22,12 +22,11 @@
     </configurations>
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="7fa9ba1b-2cff-4ecc-86fb-59ab2fa76ee1" name="Changes" comment="added save file">
+    <list default="true" id="7fa9ba1b-2cff-4ecc-86fb-59ab2fa76ee1" name="Changes" comment="stashing cloth">
+      <change afterPath="$PROJECT_DIR$/temp.glsl" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/common/rope.lua" beforeDir="false" afterPath="$PROJECT_DIR$/common/rope.lua" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/include.lua" beforeDir="false" afterPath="$PROJECT_DIR$/include.lua" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/main_menu.lua" beforeDir="false" afterPath="$PROJECT_DIR$/main_menu.lua" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/menu/verbose_info_panel_item.lua" beforeDir="false" afterPath="$PROJECT_DIR$/menu/verbose_info_panel_item.lua" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -487,15 +486,7 @@
       <workItem from="1722959445101" duration="13475000" />
       <workItem from="1722979743893" duration="10618000" />
       <workItem from="1723056466620" duration="10559000" />
-      <workItem from="1723069788250" duration="11560000" />
-    </task>
-    <task id="LOCAL-00896" summary="verbose info update implemented">
-      <option name="closed" value="true" />
-      <created>1721935487262</created>
-      <option name="number" value="00896" />
-      <option name="presentableId" value="LOCAL-00896" />
-      <option name="project" value="LOCAL" />
-      <updated>1721935487262</updated>
+      <workItem from="1723069788250" duration="18317000" />
     </task>
     <task id="LOCAL-00897" summary="added undo and verbose info polish">
       <option name="closed" value="true" />
@@ -881,7 +872,15 @@
       <option name="project" value="LOCAL" />
       <updated>1723075334597</updated>
     </task>
-    <option name="localTasksCounter" value="945" />
+    <task id="LOCAL-00945" summary="stashing cloth">
+      <option name="closed" value="true" />
+      <created>1723158345970</created>
+      <option name="number" value="00945" />
+      <option name="presentableId" value="LOCAL-00945" />
+      <option name="project" value="LOCAL" />
+      <updated>1723158345970</updated>
+    </task>
+    <option name="localTasksCounter" value="946" />
     <servers />
   </component>
   <component name="TypeScriptGeneratedFilesManager">
@@ -930,7 +929,6 @@
     </option>
   </component>
   <component name="VcsManagerConfiguration">
-    <MESSAGE value="shared list interactivity done" />
     <MESSAGE value="stashing before reworking control indicator layout" />
     <MESSAGE value="new control indicator layout trigger" />
     <MESSAGE value="polished selection indicators" />
@@ -955,7 +953,8 @@
     <MESSAGE value="added mesh" />
     <MESSAGE value="stashing rope" />
     <MESSAGE value="added save file" />
-    <option name="LAST_COMMIT_MESSAGE" value="added save file" />
+    <MESSAGE value="stashing cloth" />
+    <option name="LAST_COMMIT_MESSAGE" value="stashing cloth" />
   </component>
   <component name="XDebuggerManager">
     <breakpoint-manager>
