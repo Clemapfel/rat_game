@@ -22,15 +22,15 @@
     </configurations>
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="7fa9ba1b-2cff-4ecc-86fb-59ab2fa76ee1" name="Changes" comment="added template verbose info, fixed message dialog loop">
-      <change afterPath="$PROJECT_DIR$/common/game_state.lua" afterDir="false" />
+    <list default="true" id="7fa9ba1b-2cff-4ecc-86fb-59ab2fa76ee1" name="Changes" comment="stashing">
+      <change afterPath="$PROJECT_DIR$/keybindings.lua" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/main.lua" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/.idea/misc.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/misc.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/.idea/vcs.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/vcs.xml" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/assets/sprites/orbs.lua" beforeDir="false" afterPath="$PROJECT_DIR$/assets/sprites/orbs.lua" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/battle/configs/moves/INSPECT.lua" beforeDir="false" afterPath="$PROJECT_DIR$/battle/configs/moves/INSPECT.lua" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/battle/configs/moves/PROTECT.lua" beforeDir="false" afterPath="$PROJECT_DIR$/battle/configs/moves/PROTECT.lua" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/battle/configs/moves/STRUGGLE.lua" beforeDir="false" afterPath="$PROJECT_DIR$/battle/configs/moves/STRUGGLE.lua" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/battle/configs/moves/SURF.lua" beforeDir="false" afterPath="$PROJECT_DIR$/battle/configs/moves/SURF.lua" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/battle/configs/moves/WISH.lua" beforeDir="false" afterPath="$PROJECT_DIR$/battle/configs/moves/WISH.lua" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/common/game_state.lua" beforeDir="false" afterPath="$PROJECT_DIR$/common/game_state.lua" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/common/input_handler.lua" beforeDir="false" afterPath="$PROJECT_DIR$/common/input_handler.lua" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/main_menu.lua" beforeDir="false" afterPath="$PROJECT_DIR$/main_menu.lua" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -40,10 +40,11 @@
   <component name="ClangdSettings">
     <option name="formatViaClangd" value="false" />
   </component>
+  <component name="ExecutionTargetManager" SELECTED_TARGET="CMakeBuildProfile:Debug" />
   <component name="Git.Settings">
     <option name="RECENT_BRANCH_BY_REPOSITORY">
       <map>
-        <entry key="$PROJECT_DIR$" value="main" />
+        <entry key="$PROJECT_DIR$" value="box2c" />
       </map>
     </option>
     <option name="RECENT_GIT_ROOT_PATH" value="$PROJECT_DIR$" />
@@ -72,6 +73,8 @@
   </component>
   <component name="PropertiesComponent">{
   &quot;keyToString&quot;: {
+    &quot;CMake Application.box2d.executor&quot;: &quot;Run&quot;,
+    &quot;CMake Application.test.executor&quot;: &quot;Run&quot;,
     &quot;Emmy Debugger(NEW).remote_debugger.executor&quot;: &quot;Debug&quot;,
     &quot;Emmy Debugger(NEW).remote_debugger_v2.executor&quot;: &quot;Debug&quot;,
     &quot;Lua Application.Unnamed.executor&quot;: &quot;Run&quot;,
@@ -133,6 +136,11 @@
     </key>
   </component>
   <component name="RunManager" selected="Lua Application.main_windows_menu">
+    <configuration default="true" type="CMakeRunConfiguration" factoryName="Application" REDIRECT_INPUT="false" ELEVATE="false" USE_EXTERNAL_CONSOLE="false" EMULATE_TERMINAL="false" PASS_PARENT_ENVS_2="true">
+      <method v="2">
+        <option name="com.jetbrains.cidr.execution.CidrBuildBeforeRunTaskProvider$BuildBeforeRunTask" enabled="true" />
+      </method>
+    </configuration>
     <configuration name="main_overworld_windows" type="lua.app" factoryName="Lua Application">
       <module name="rat_game" />
       <option name="program" value="C:\Users\cleme\Workspace\rat_game\love\windows\love.exe" />
@@ -491,15 +499,8 @@
       <workItem from="1722979743893" duration="10618000" />
       <workItem from="1723056466620" duration="10559000" />
       <workItem from="1723069788250" duration="29090000" />
-      <workItem from="1723236123036" duration="1702000" />
-    </task>
-    <task id="LOCAL-00899" summary="added templates">
-      <option name="closed" value="true" />
-      <created>1722112191512</created>
-      <option name="number" value="00899" />
-      <option name="presentableId" value="LOCAL-00899" />
-      <option name="project" value="LOCAL" />
-      <updated>1722112191512</updated>
+      <workItem from="1723236123036" duration="2113000" />
+      <workItem from="1723243211205" duration="1623000" />
     </task>
     <task id="LOCAL-00900" summary="added keyboard">
       <option name="closed" value="true" />
@@ -885,7 +886,15 @@
       <option name="project" value="LOCAL" />
       <updated>1723229986474</updated>
     </task>
-    <option name="localTasksCounter" value="948" />
+    <task id="LOCAL-00948" summary="stashing">
+      <option name="closed" value="true" />
+      <created>1723242799108</created>
+      <option name="number" value="00948" />
+      <option name="presentableId" value="LOCAL-00948" />
+      <option name="project" value="LOCAL" />
+      <updated>1723242799108</updated>
+    </task>
+    <option name="localTasksCounter" value="949" />
     <servers />
   </component>
   <component name="TypeScriptGeneratedFilesManager">
@@ -936,7 +945,6 @@
   <component name="VcsManagerConfiguration">
     <MESSAGE value="new control indicator layout trigger" />
     <MESSAGE value="polished selection indicators" />
-    <MESSAGE value="stashing" />
     <MESSAGE value="added a/x for page nodes" />
     <MESSAGE value="added message dialog" />
     <MESSAGE value="implemented template loading" />
@@ -959,7 +967,8 @@
     <MESSAGE value="added save file" />
     <MESSAGE value="stashing cloth" />
     <MESSAGE value="added template verbose info, fixed message dialog loop" />
-    <option name="LAST_COMMIT_MESSAGE" value="added template verbose info, fixed message dialog loop" />
+    <MESSAGE value="stashing" />
+    <option name="LAST_COMMIT_MESSAGE" value="stashing" />
   </component>
   <component name="XDebuggerManager">
     <breakpoint-manager>

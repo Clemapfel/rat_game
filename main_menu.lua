@@ -1,5 +1,68 @@
 require "include"
 
+--[[
+state = { -- Serializable Table, no functions or userdata
+    # entities
+    party[position_i] = {
+        entity_id
+
+        n_move_slots
+        moves[slot_i] = {
+            move_id
+            n_times_used
+        }
+
+        n_consumable_slots
+        consumables[slot_i] = {
+            consumable_id
+            n_stacks_left
+        }
+
+        equips[slot_i] = {
+            equip_id
+            n_times_used
+        }
+
+        status[slot_i] = {
+            status_id
+            n_turns_passed
+        }
+
+        simulation_state -- Table<BattleID, Table<ID, Value>>
+
+        state -- bt.EntityState
+        hp    -- Unsigned
+    }
+
+    # inventory
+    shared_inventory = {
+        moves  -- Table<MoveID, Count>
+        equips -- Table<EquipID, Count>
+        consumables -- Table<ConsumableID, Count>
+    }
+
+    templates[template_i] = {
+        created_on  -- Date
+        name
+        setups[entity_id] = {
+            moves[slot_i] = MoveID
+            equips[slot_i] = EquipID
+            consumables[slot_i] = ConsumableID
+        }
+    }
+
+    # config
+    config = {
+        [rt.InputButton] = Table<love_key_id>,
+        vsync   -- {-1, 0, 1}
+        msaa    -- {0, 2, 4, 8, 16}
+        resolution_x, resolution_y
+    }
+
+    input_mapping[rt.InputButton.A] = love.
+}
+    ]]--
+
 state = mn.InventoryState()
 
 rt.current_scene = mn.Scene()

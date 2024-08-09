@@ -1,57 +1,54 @@
+rt.VSyncMode = {
+    ADAPTIVE = -1,
+    OFF = 0,
+    ON = 1
+}
+
+rt.MSAAQuality = {
+    OFF = 0,
+    GOOD = 2,
+    BETTER = 4,
+    BEST = 8,
+    MAX = 16
+}
+
 --- @class rt.GameState
-rt.GameState = meta.new_type("GameState", {
-    --[[
-    state = { -- Serializable Table, no functions or userdata
-    # entities
-    party[position_i] = {
-        entity_id
+rt.GameState = meta.new_type("GameState", function()
+    local state = {
+        -- graphics settings
+        config = {
+            vsync = rt.VSyncMode.ADAPTIVE,
+            msaa = rt.MSAAQuality.BEST,
+            resolution_x = 1280,
+            resolution_y = 720
+        },
 
-        n_move_slots
-        moves[slot_i] = {
-            move_id
-            n_times_used
-        }
-
-        n_consumable_slots
-        consumables[slot_i] = {
-            consumable_id
-            n_stacks_left
-        }
-
-        equips[slot_i] = {
-            equip_id
-            n_times_used
-        }
-
-        status[slot_i] = {
-            status_id
-            n_turns_passed
-        }
-
-        simulation_state -- Table<BattleID, Table<ID, Value>>
-
-        state -- bt.EntityState
-        hp    -- Unsigned
+        -- keybindings
+        input_mapping = (function()
+            local out = {}
+            for key in range(
+                rt.InputButton.A,
+                rt.InputButton.B,
+                rt.InputButton.X,
+                rt.InputButton.Y,
+                rt.InputButton.L,
+                rt.InputButton.R,
+                rt.InputButton.START,
+                rt.InputButton.SELECT,
+                rt.InputButton.UP,
+                rt.InputButton.DOWN,
+                rt.InputButton.LEFT,
+                rt.InputButton.RIGHT
+            ) do
+                out[key] = {}
+            end
+        end)()
     }
 
-    # inventory
-    shared_inventory = {
-        moves  -- Table<MoveID, Count>
-        equips -- Table<EquipID, Count>
-        consumables -- Table<ConsumableID, Count>
-    }
-
-    templates[template_i] = {
-        created_on  -- Date
-        name
-        setups[entity_id] = {
-            moves[slot_i] = MoveID
-            equips[slot_i] = EquipID
-            consumables[slot_i] = ConsumableID
-        }
-    }
-    ]]--
-})
+    return meta.new(rt.GameState, {
+        state
+    })
+end)
 
 --- @brief
 function rt.GameState:import_from_save_file(file)
@@ -61,5 +58,9 @@ end
 --- @brief
 --- @return file
 function rt.GameState:export_to_save_file()
+end
+
+--- @brief
+function rt.GameState:load_input_mapping_from(file)
 
 end

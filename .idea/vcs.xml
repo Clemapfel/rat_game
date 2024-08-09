@@ -2,5 +2,8 @@
 <project version="4">
   <component name="VcsDirectoryMappings">
     <mapping directory="" vcs="Git" />
+    <mapping directory="$PROJECT_DIR$/box2c" vcs="Git" />
+    <mapping directory="$PROJECT_DIR$/box2c/cmake-build-debug/_deps/enkits-src" vcs="Git" />
+    <mapping directory="$PROJECT_DIR$/box2c/cmake-build-debug/_deps/glfw-src" vcs="Git" />
   </component>
 </project>
