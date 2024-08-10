@@ -1,5 +1,9 @@
 require "include"
 
+require "common.game_state"
+
+STATE = rt.GameState()
+
 --[[
 state = { -- Serializable Table, no functions or userdata
     # entities

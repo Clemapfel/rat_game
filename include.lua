@@ -92,7 +92,7 @@ require "common.set"
 require "common.graph"
 
 require "common.signals"
-require "common.input_handler"
+require "common.input_button"
 require "common.input_controller"
 require "common.graphics"
 require "common.drawable"

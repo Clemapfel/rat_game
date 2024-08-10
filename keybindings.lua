@@ -1,3 +1,4 @@
+-- for a list of available keys and buttons, see common/input_buttons.lua
 return {
     A = {
         rt.GamepadButton.RIGHT,
