@@ -1,3 +1,5 @@
+rt.random = {}
+
 rt.random.DEFAULT_SEED = os.time()
 if not meta.is_nil(love) then
     love.math.setRandomSeed(rt.random.DEFAULT_SEED)

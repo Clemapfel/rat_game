@@ -81,8 +81,8 @@ rt.Glyph = meta.new_type("Glyph", rt.Drawable, rt.Animation, function(font, cont
     return out
 end)
 
-rt.Glyph._outline_shader = rt.Shader("assets/shaders/glyph_outline.glsl")
-rt.Glyph._render_shader = rt.Shader("assets/shaders/glyph_render.glsl")
+rt.Glyph._outline_shader = rt.Shader("common/glyph_outline.glsl")
+rt.Glyph._render_shader = rt.Shader("common/glyph_render.glsl")
 
 --- @brief [internal]
 function rt.Glyph:_get_font()
@@ -227,7 +227,6 @@ end
 --- @overload
 function rt.Glyph:update(delta)
     self._elapsed_time = self._elapsed_time + delta
-
     if self._is_animated and self._is_outline then
         self:_update_outline()
     end
@@ -251,7 +250,9 @@ function rt.Glyph:draw(opacity)
     if self._is_outlined then
         local offset_x, offset_y = self._outline_render_offset_x, self._outline_render_offset_y
         love.graphics.draw(self._outline_render_texture._native, x - offset_x, y - offset_y)
-    elseif self._is_animated == true or self._n_visible_characters ~= self._max_n_visible_characters then
+    end
+
+    if self._is_animated == true or self._n_visible_characters ~= self._max_n_visible_characters then
         self._render_shader:send("_shake_active", self._effects[rt.TextEffect.SHAKE] == true)
         self._render_shader:send("_shake_offset", rt.settings.glyph.shake_offset)
         self._render_shader:send("_shake_period", rt.settings.glyph.shake_period)

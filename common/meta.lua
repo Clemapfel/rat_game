@@ -541,16 +541,13 @@ meta.Type = meta.new_type("Type", function()
     return meta.new(meta.Type)
 end)
 
---- @class Function
---- @class Nil
---- @class String
---- @class Table
---- @class Boolean
---- @class Number
---- @class Signed
---- @class Unsigned
---- @class Integer
---- @class Float
+--- @type Function
+--- @type String
+--- @type Table
+--- @type Boolean
+--- @type Signed
+--- @type Unsigned
+--- @type Number
 
 --- @brief make table weak, meaning it does not increase the reference count of its values
 --- @param x Table
@@ -623,22 +620,6 @@ end
 --- @brief hash object, each instance has a unique ID
 function meta.hash(x)
     return rawget(x, 1)[meta._hash_index]
-end
-
---- @brief serialize meta.Object
-function meta.serialize(x, skip_functions)
-    meta.assert_object(x)
-    skip_functions = which(skip_functions, true)
-    local out = {}
-    table.insert(out, "#" .. tostring(meta.hash(x)) .. " = {\n")
-    for key, value in pairs(rawget(x, 1)[1]) do
-        if not meta.is_function(value) then
-            table.insert(out, "\t" .. tostring(key)  .. " = " .. serialize(value) .. "\n")
-        end
-    end
-
-    table.insert(out, "}\n")
-    return table.concat(out)
 end
 
 --- @brief

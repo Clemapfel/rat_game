@@ -151,8 +151,8 @@ function rt.SpriteAtlasEntry:load()
             current[2] = math.max(index, current[2])
         end
         self.texture_rectangles[index] = rt.AABB(
-                (index - 1) / self.n_frames, 0,
-                1 / self.n_frames, 1
+            (index - 1) / self.n_frames, 0,
+            1 / self.n_frames, 1
         )
     end
 

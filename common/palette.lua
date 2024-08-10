@@ -281,7 +281,3 @@ rt._PaletteMetatable = {
     end
 }
 setmetatable(rt.Palette, rt._PaletteMetatable)
-
---- @brief [internal] test palette
-function rt.test.palette()
-end

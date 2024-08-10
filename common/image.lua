@@ -89,8 +89,3 @@ function rt.Image:get_height()
     local w, h = self:get_size()
     return h
 end
-
---- @brief test Image
-function rt.test.image()
-    error("TODO")
-end

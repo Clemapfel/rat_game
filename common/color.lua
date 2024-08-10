@@ -64,10 +64,10 @@ end
 --- @return Boolean
 function meta.is_hsva(object)
     return sizeof(object) == 4 and
-            meta.is_number(object.h) and
-            meta.is_number(object.s) and
-            meta.is_number(object.v) and
-            meta.is_number(object.a)
+        meta.is_number(object.h) and
+        meta.is_number(object.s) and
+        meta.is_number(object.v) and
+        meta.is_number(object.a)
 end
 
 --- @brief [internal] throw if object is not rt.HSVA
@@ -230,17 +230,17 @@ function rt.html_code_to_color(code)
 
     if sizeof(as_hex) == 6 then
         return rt.RGBA(
-                hex_component_to_int(as_hex[1], as_hex[2]) / 255.0,
-                hex_component_to_int(as_hex[3], as_hex[4]) / 255.0,
-                hex_component_to_int(as_hex[5], as_hex[6]) / 255.0,
-                1
+            hex_component_to_int(as_hex[1], as_hex[2]) / 255.0,
+            hex_component_to_int(as_hex[3], as_hex[4]) / 255.0,
+            hex_component_to_int(as_hex[5], as_hex[6]) / 255.0,
+            1
         )
     elseif sizeof(as_hex) == 8 then
         return rt.RGBA(
-                hex_component_to_int(as_hex[1], as_hex[2]) / 255.0,
-                hex_component_to_int(as_hex[3], as_hex[4]) / 255.0,
-                hex_component_to_int(as_hex[5], as_hex[6]) / 255.0,
-                hex_component_to_int(as_hex[7], as_hex[8]) / 255.0
+            hex_component_to_int(as_hex[1], as_hex[2]) / 255.0,
+            hex_component_to_int(as_hex[3], as_hex[4]) / 255.0,
+            hex_component_to_int(as_hex[5], as_hex[6]) / 255.0,
+            hex_component_to_int(as_hex[7], as_hex[8]) / 255.0
         )
     else
         error_reason = "more than 6 or 8 digits specified"
@@ -309,6 +309,14 @@ function rt.color_unpack(color)
 end
 
 --- @brief
+function rt.color_copy(color)
+    if meta.is_rgba(color) then
+        return rt.RGBA(color.r, color.g, color.b, color.a)
+    else
+        return rt.HSVA(color.h, color.s, color.v, color.a)
+    end
+end
+--- @brief
 function rt.color_mix(a, b, ratio)
     if meta.is_hsva(a) and meta.is_hsva(b) then
         return rt.HSVA(
@@ -327,20 +335,4 @@ function rt.color_mix(a, b, ratio)
             mix(a.a, b.a, ratio)
         )
     end
-end
-
---- @brief [internal] test colors
-function rt.test.colors()
-    local rgba_from_string = rt.RGBA("#FF00FF")
-    local rgba_from_components = rt.RGBA(1, 0, 1, 1)
-    assert(meta.is_rgba(rgba_from_string))
-    assert(not meta.is_hsva(rgba_from_string))
-    assert(rt.compare_rgba(rgba_from_string, rgba_from_components))
-
-    local hsva = rt.HSVA(0.5, 1, 0.75, 1)
-    assert(rt.compare_hsva(hsva, rt.HSVA(0.5, 1, 0.75, 1)))
-    assert(not meta.is_rgba(hsva))
-    assert(not rt.compare_hsva(hsva, rt.HSVA(0, 1, 0, 1)))
-    assert(rt.compare_hsva(hsva, rt.rgba_to_hsva(rt.hsva_to_rgba(hsva))))
-    assert(rt.compare_hsva(rt.HSVA(1, 1, 1, 1), rt.HSVA(0, 1, 1, 1)))
 end

@@ -101,8 +101,3 @@ if love.getVersion() >= 12 then
         return love.graphics.readbackTexture(self._native)
     end
 end
-
---- @brief test texture
-function rt.test.texture()
-    error("TODO")
-end

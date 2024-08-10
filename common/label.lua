@@ -753,8 +753,3 @@ end
 function rt.Label:get_line_height()
     return self._font:get_bold_italic():getHeight()
 end
-
---- @brief [internal]
-function rt.test.label()
-    error("TODO")
-end
