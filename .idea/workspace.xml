@@ -22,13 +22,10 @@
     </configurations>
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="7fa9ba1b-2cff-4ecc-86fb-59ab2fa76ee1" name="Changes" comment="stashing before refactoring for gamestate">
-      <change afterPath="$PROJECT_DIR$/common/input_button.lua" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/common/~input_controller.lua" afterDir="false" />
+    <list default="true" id="7fa9ba1b-2cff-4ecc-86fb-59ab2fa76ee1" name="Changes" comment="refactored input controller for global state">
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/common/game_state.lua" beforeDir="false" afterPath="$PROJECT_DIR$/common/game_state.lua" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/common/input_controller.lua" beforeDir="false" afterPath="$PROJECT_DIR$/common/input_controller.lua" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/common/input_handler.lua" beforeDir="false" afterPath="$PROJECT_DIR$/common/~input_handler.lua" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/common/save_file.lua" beforeDir="false" afterPath="$PROJECT_DIR$/common/save_file.lua" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/include.lua" beforeDir="false" afterPath="$PROJECT_DIR$/include.lua" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/keybindings.lua" beforeDir="false" afterPath="$PROJECT_DIR$/keybindings.lua" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/main_menu.lua" beforeDir="false" afterPath="$PROJECT_DIR$/main_menu.lua" afterDir="false" />
@@ -501,15 +498,7 @@
       <workItem from="1723056466620" duration="10559000" />
       <workItem from="1723069788250" duration="29090000" />
       <workItem from="1723236123036" duration="2113000" />
-      <workItem from="1723243211205" duration="5225000" />
-    </task>
-    <task id="LOCAL-00901" summary="load from template done">
-      <option name="closed" value="true" />
-      <created>1722188213725</created>
-      <option name="number" value="00901" />
-      <option name="presentableId" value="LOCAL-00901" />
-      <option name="project" value="LOCAL" />
-      <updated>1722188213725</updated>
+      <workItem from="1723243211205" duration="6751000" />
     </task>
     <task id="LOCAL-00902" summary="added sdf meatball compute shader">
       <option name="closed" value="true" />
@@ -895,7 +884,15 @@
       <option name="project" value="LOCAL" />
       <updated>1723244847344</updated>
     </task>
-    <option name="localTasksCounter" value="950" />
+    <task id="LOCAL-00950" summary="refactored input controller for global state">
+      <option name="closed" value="true" />
+      <created>1723248465026</created>
+      <option name="number" value="00950" />
+      <option name="presentableId" value="LOCAL-00950" />
+      <option name="project" value="LOCAL" />
+      <updated>1723248465026</updated>
+    </task>
+    <option name="localTasksCounter" value="951" />
     <servers />
   </component>
   <component name="TypeScriptGeneratedFilesManager">
@@ -944,7 +941,6 @@
     </option>
   </component>
   <component name="VcsManagerConfiguration">
-    <MESSAGE value="polished selection indicators" />
     <MESSAGE value="added a/x for page nodes" />
     <MESSAGE value="added message dialog" />
     <MESSAGE value="implemented template loading" />
@@ -969,7 +965,8 @@
     <MESSAGE value="added template verbose info, fixed message dialog loop" />
     <MESSAGE value="stashing" />
     <MESSAGE value="stashing before refactoring for gamestate" />
-    <option name="LAST_COMMIT_MESSAGE" value="stashing before refactoring for gamestate" />
+    <MESSAGE value="refactored input controller for global state" />
+    <option name="LAST_COMMIT_MESSAGE" value="refactored input controller for global state" />
   </component>
   <component name="XDebuggerManager">
     <breakpoint-manager>
@@ -978,6 +975,11 @@
           <url>file://$PROJECT_DIR$/old/~battle/enemy_sprite.lua</url>
           <line>244</line>
           <option name="timeStamp" value="6" />
+        </line-breakpoint>
+        <line-breakpoint enabled="true" type="lua-line">
+          <url>file://$PROJECT_DIR$/common/input_button.lua</url>
+          <line>131</line>
+          <option name="timeStamp" value="8" />
         </line-breakpoint>
       </breakpoints>
     </breakpoint-manager>

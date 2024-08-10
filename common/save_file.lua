@@ -7,16 +7,12 @@ rt.settings.save_file_handler = {
 rt.SaveFileHandler = meta.new_type("SaveFileHandler", function()
     local out = meta.new(rt.SaveFileHandler, {
         _elapsed = 0,
-        _folders_initialized = false,
-        _data = {},
+        _folders_initialized = false
     })
 
-    assert(love.filesystem.mountFullPath(
-        love.filesystem.getSource() .. "/appdata",
-        "appdata",
-        "readwrite",
-        true
-    ))
+    if love.filesystem.mountFullPath(love.filesystem.getSource() .. "/appdata", "appdata", "readwrite", true) == false then
+        rt.error("In rt.SaveFileHandler: unable to mount file at `" .. love.filesystem.getSource() .. "/appdata" .. "`, using `" .. love.filesystem.getAppdataDirectory() .. "` instead")
+    end
     return out
 end)
 
@@ -27,18 +23,6 @@ function rt.SaveFileHandler:update(delta)
         self:save()
         self._elapsed = 0
     end
-end
-
---- @brief
-function rt.SaveFileHandler:set(id, t)
-    meta.assert_string(id)
-    self._data[id] = t
-end
-
---- @brief
-function rt.SaveFileHandler:get(id)
-    meta.assert_string(id)
-    return self._data[id]
 end
 
 --- @brief
@@ -69,13 +53,13 @@ function rt.SaveFileHandler:_format_file_name()
 end
 
 -- @brief
-function rt.SaveFileHandler:save()
+function rt.SaveFileHandler:save(data)
     self:_initialize_folders()
 
     local prefix = rt.settings.save_file_handler.save_directory_name
     local file_name = self:_format_file_name()
 
-    local data = "return " .. serialize(self._data)
+    local data = "return " .. serialize(data)
     local save_file_path = prefix .. file_name .. ".save"
     local save_file = love.filesystem.openFile(save_file_path, "w")
     if save_file == nil then
@@ -165,6 +149,5 @@ function rt.SaveFileHandler:load(id)
         return
     end
 
-    self._data = chunk()
     rt.log("succesfully loaded file `" .. save_file_path .. "`")
 end
