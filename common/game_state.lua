@@ -324,3 +324,10 @@ function rt.GameState:run()
         if love.timer then love.timer.sleep(0.001) end -- limit max tick rate of while true
     end
 end
+
+--- @brief
+--- @param file String
+--- @param sanitize Boolean
+function rt.GameState:load_from_save_file(file, sanitize)
+    if sanitize == nil then sanitize = true end
+end

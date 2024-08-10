@@ -22,696 +22,29 @@
     </configurations>
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="7fa9ba1b-2cff-4ecc-86fb-59ab2fa76ee1" name="Changes" comment="refactored input controller for global state">
-      <change afterPath="$PROJECT_DIR$/common/input_buttons.lua" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/common/save_file_handler.lua" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/common/serialize.lua" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/common/signal_emitter.lua" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/debug_savefile.lua" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/old/CMakeLists.txt" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/old/assets/fonts/DejaVuSans/DejaVuSans-Bold.ttf" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/old/assets/fonts/DejaVuSans/DejaVuSans-BoldItalic.ttf" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/old/assets/fonts/DejaVuSans/DejaVuSans-ExtraLight.ttf" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/old/assets/fonts/DejaVuSans/DejaVuSans-Italic.ttf" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/old/assets/fonts/DejaVuSans/DejaVuSans-Regular.ttf" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/old/assets/fonts/DejaVuSans/DejaVuSansCondensed-Bold.ttf" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/old/assets/fonts/DejaVuSans/DejaVuSansCondensed-BoldOblique.ttf" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/old/assets/fonts/DejaVuSans/DejaVuSansCondensed-Oblique.ttf" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/old/assets/fonts/DejaVuSans/DejaVuSansCondensed.ttf" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/old/assets/fonts/DejaVuSansMono/57-dejavu-sans-mono.conf" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/old/assets/fonts/DejaVuSansMono/DejaVuSansMono-Bold.ttf" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/old/assets/fonts/DejaVuSansMono/DejaVuSansMono-BoldItalic.ttf" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/old/assets/fonts/DejaVuSansMono/DejaVuSansMono-Italic.ttf" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/old/assets/fonts/DejaVuSansMono/DejaVuSansMono-Regular.ttf" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/old/assets/fonts/DejaVuSansMono/LICENSE" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/old/assets/fonts/NotoSans/NotoSans-Black.ttf" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/old/assets/fonts/NotoSans/NotoSans-BlackItalic.ttf" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/old/assets/fonts/NotoSans/NotoSans-Bold.ttf" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/old/assets/fonts/NotoSans/NotoSans-BoldItalic.ttf" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/old/assets/fonts/NotoSans/NotoSans-ExtraBold.ttf" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/old/assets/fonts/NotoSans/NotoSans-ExtraBoldItalic.ttf" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/old/assets/fonts/NotoSans/NotoSans-ExtraLight.ttf" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/old/assets/fonts/NotoSans/NotoSans-ExtraLightItalic.ttf" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/old/assets/fonts/NotoSans/NotoSans-Italic.ttf" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/old/assets/fonts/NotoSans/NotoSans-Light.ttf" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/old/assets/fonts/NotoSans/NotoSans-LightItalic.ttf" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/old/assets/fonts/NotoSans/NotoSans-Medium.ttf" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/old/assets/fonts/NotoSans/NotoSans-MediumItalic.ttf" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/old/assets/fonts/NotoSans/NotoSans-Regular.ttf" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/old/assets/fonts/NotoSans/NotoSans-SemiBold.ttf" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/old/assets/fonts/NotoSans/NotoSans-SemiBoldItalic.ttf" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/old/assets/fonts/NotoSans/NotoSans-Thin.ttf" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/old/assets/fonts/NotoSans/NotoSans-ThinItalic.ttf" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/old/assets/fonts/NotoSans/OFL.txt" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/old/assets/fonts/NotoSansMath/NotoSansMath-Regular.ttf" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/old/assets/fonts/NotoSansMath/OFL.txt" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/old/assets/fonts/Roboto/LICENSE.txt" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/old/assets/fonts/Roboto/Roboto-Black.ttf" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/old/assets/fonts/Roboto/Roboto-BlackItalic.ttf" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/old/assets/fonts/Roboto/Roboto-Bold.ttf" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/old/assets/fonts/Roboto/Roboto-BoldItalic.ttf" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/old/assets/fonts/Roboto/Roboto-Italic.ttf" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/old/assets/fonts/Roboto/Roboto-Light.ttf" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/old/assets/fonts/Roboto/Roboto-LightItalic.ttf" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/old/assets/fonts/Roboto/Roboto-Medium.ttf" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/old/assets/fonts/Roboto/Roboto-MediumItalic.ttf" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/old/assets/fonts/Roboto/Roboto-Regular.ttf" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/old/assets/fonts/Roboto/Roboto-Thin.ttf" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/old/assets/fonts/Roboto/Roboto-ThinItalic.ttf" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/old/assets/fonts/fallback.otf" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/old/assets/shaders/glyph_outline.glsl" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/old/assets/shaders/glyph_render.glsl" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/old/common/animation.lua" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/old/common/animation_queue.lua" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/old/common/color.lua" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/old/common/common.lua" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/old/common/drawable.lua" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/old/common/easement_functions.lua" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/old/common/font.lua" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/old/common/game_state.lua" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/old/common/geometry.lua" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/old/common/glyph.lua" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/old/common/graphics.lua" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/old/common/input_controller.lua" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/old/common/label.lua" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/old/common/log.lua" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/old/common/meta.lua" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/old/common/palette.lua" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/old/common/random.lua" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/old/common/render_texture.lua" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/old/common/selection_graph.lua" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/old/common/selection_state.lua" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/old/common/shader.lua" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/old/common/shape.lua" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/old/common/shape_ellipse.lua" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/old/common/shape_polygon.lua" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/old/common/sprite.lua" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/old/common/sprite_atlas.lua" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/old/common/vertex_shape.lua" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/old/common/widget.lua" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/old/include.lua" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/older/~common/filesystem.lua" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/older/~common/image.lua" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/older/~common/set.lua" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/older/~common/shapes/rectangle.lua" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/older/~common/texture.lua" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/older/~common/time.lua" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/.idea/misc.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/misc.xml" afterDir="false" />
+    <list default="true" id="7fa9ba1b-2cff-4ecc-86fb-59ab2fa76ee1" name="Changes" comment="imported rewrite">
+      <change afterPath="$PROJECT_DIR$/assets/sprites/controller_buttons.lua" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/assets/sprites/controller_buttons.png" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/assets/sprites/controller_buttons.pxo" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/common/cloth.lua" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/common/collider.lua" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/common/control_indicator.lua" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/common/direction_indicator.lua" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/common/frame.lua" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/common/keyboard.lua" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/common/labeled_sprite.lua" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/common/message_dialog.lua" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/common/particle_emitter.lua" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/common/physics_world.lua" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/common/rope.lua" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/common/scrollbar.lua" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/common/spacer.lua" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/CMakeLists.txt" beforeDir="false" afterPath="$PROJECT_DIR$/CMakeLists.txt" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/assets/data/Untitled 1.ods" beforeDir="false" afterPath="$PROJECT_DIR$/old/assets/data/Untitled 1.ods" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/assets/data/actions.ods" beforeDir="false" afterPath="$PROJECT_DIR$/old/assets/data/actions.ods" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/assets/favicon.png" beforeDir="false" afterPath="$PROJECT_DIR$/old/assets/favicon.png" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/assets/fonts/Roboto/LICENSE.txt" beforeDir="false" afterPath="$PROJECT_DIR$/assets/fonts/Roboto/LICENSE.txt" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/assets/fonts/nds_bios.ttf" beforeDir="false" afterPath="$PROJECT_DIR$/old/assets/fonts/nds_bios.ttf" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/assets/fonts/pixel.ttf" beforeDir="false" afterPath="$PROJECT_DIR$/old/assets/fonts/pixel.ttf" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/assets/fonts/pixel_2.ttf" beforeDir="false" afterPath="$PROJECT_DIR$/old/assets/fonts/pixel_2.ttf" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/assets/fonts/pixelmix.ttf" beforeDir="false" afterPath="$PROJECT_DIR$/old/assets/fonts/pixelmix.ttf" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/assets/fonts/pixelmix_bold.ttf" beforeDir="false" afterPath="$PROJECT_DIR$/old/assets/fonts/pixelmix_bold.ttf" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/assets/fonts/unifont.ttf" beforeDir="false" afterPath="$PROJECT_DIR$/old/assets/fonts/unifont.ttf" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/assets/fonts/unifont_bold.pf2" beforeDir="false" afterPath="$PROJECT_DIR$/old/assets/fonts/unifont_bold.pf2" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/assets/music/test_music_01.mp3" beforeDir="false" afterPath="$PROJECT_DIR$/old/assets/music/test_music_01.mp3" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/assets/music/test_music_02.mp3" beforeDir="false" afterPath="$PROJECT_DIR$/old/assets/music/test_music_02.mp3" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/assets/music/test_music_03.mp3" beforeDir="false" afterPath="$PROJECT_DIR$/old/assets/music/test_music_03.mp3" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/assets/music/test_music_04.mp3" beforeDir="false" afterPath="$PROJECT_DIR$/old/assets/music/test_music_04.mp3" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/assets/music/test_music_05.mp3" beforeDir="false" afterPath="$PROJECT_DIR$/old/assets/music/test_music_05.mp3" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/assets/music/test_music_mono.mp3" beforeDir="false" afterPath="$PROJECT_DIR$/old/assets/music/test_music_mono.mp3" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/assets/music/test_sound_effect.mp3" beforeDir="false" afterPath="$PROJECT_DIR$/old/assets/music/test_sound_effect.mp3" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/assets/music/test_sound_effect_mono.mp3" beforeDir="false" afterPath="$PROJECT_DIR$/old/assets/music/test_sound_effect_mono.mp3" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/assets/music/test_soundeffect.wav" beforeDir="false" afterPath="$PROJECT_DIR$/old/assets/music/test_soundeffect.wav" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/assets/palette.png" beforeDir="false" afterPath="$PROJECT_DIR$/old/assets/palette.png" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/assets/shaders/audio_processor_visualization.glsl" beforeDir="false" afterPath="$PROJECT_DIR$/old/assets/shaders/audio_processor_visualization.glsl" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/assets/shaders/audio_visualizer_debug.glsl" beforeDir="false" afterPath="$PROJECT_DIR$/old/assets/shaders/audio_visualizer_debug.glsl" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/assets/shaders/battle_background.glsl" beforeDir="false" afterPath="$PROJECT_DIR$/old/assets/shaders/battle_background.glsl" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/assets/shaders/battle_test_background.glsl" beforeDir="false" afterPath="$PROJECT_DIR$/old/assets/shaders/battle_test_background.glsl" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/assets/shaders/enemy_sprite.glsl" beforeDir="false" afterPath="$PROJECT_DIR$/old/assets/shaders/enemy_sprite.glsl" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/assets/shaders/fast_forward_indicator.glsl" beforeDir="false" afterPath="$PROJECT_DIR$/old/assets/shaders/fast_forward_indicator.glsl" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/assets/shaders/glyph_outline.glsl" beforeDir="false" afterPath="$PROJECT_DIR$/common/glyph_outline.glsl" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/assets/shaders/glyph_rainbow.glsl" beforeDir="false" afterPath="$PROJECT_DIR$/old/assets/shaders/glyph_rainbow.glsl" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/assets/shaders/glyph_render.glsl" beforeDir="false" afterPath="$PROJECT_DIR$/common/glyph_render.glsl" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/assets/shaders/log_gradient.glsl" beforeDir="false" afterPath="$PROJECT_DIR$/old/assets/shaders/log_gradient.glsl" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/assets/shaders/mint_wave.glsl" beforeDir="false" afterPath="$PROJECT_DIR$/old/assets/shaders/mint_wave.glsl" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/assets/shaders/noise.glsl" beforeDir="false" afterPath="$PROJECT_DIR$/old/assets/shaders/noise.glsl" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/assets/shaders/priority_queue_element.glsl" beforeDir="false" afterPath="$PROJECT_DIR$/old/assets/shaders/priority_queue_element.glsl" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/assets/shaders/snapshot_layout.glsl" beforeDir="false" afterPath="$PROJECT_DIR$/old/assets/shaders/snapshot_layout.glsl" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/assets/shaders/sprite_scale_correction.glsl" beforeDir="false" afterPath="$PROJECT_DIR$/old/assets/shaders/sprite_scale_correction.glsl" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/assets/shaders/sprite_scale_correction_alt.glsl" beforeDir="false" afterPath="$PROJECT_DIR$/old/assets/shaders/sprite_scale_correction_alt.glsl" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/assets/shaders/texture_flip.glsl" beforeDir="false" afterPath="$PROJECT_DIR$/old/assets/shaders/texture_flip.glsl" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/assets/shaders/wing_flap.glsl" beforeDir="false" afterPath="$PROJECT_DIR$/old/assets/shaders/wing_flap.glsl" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/assets/shaders/~snapshot_layout.glsl" beforeDir="false" afterPath="$PROJECT_DIR$/old/assets/shaders/~snapshot_layout.glsl" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/assets/sound_effects/download_links.txt" beforeDir="false" afterPath="$PROJECT_DIR$/old/assets/sound_effects/download_links.txt" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/assets/sprites/battle/consumables.lua" beforeDir="false" afterPath="$PROJECT_DIR$/old/assets/sprites/battle/consumables.lua" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/assets/sprites/battle/consumables.png" beforeDir="false" afterPath="$PROJECT_DIR$/old/assets/sprites/battle/consumables.png" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/assets/sprites/battle/consumables.pxo" beforeDir="false" afterPath="$PROJECT_DIR$/old/assets/sprites/battle/consumables.pxo" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/assets/sprites/battle/debug_enemy_sprite_01.lua" beforeDir="false" afterPath="$PROJECT_DIR$/old/assets/sprites/battle/debug_enemy_sprite_01.lua" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/assets/sprites/battle/debug_enemy_sprite_01.png" beforeDir="false" afterPath="$PROJECT_DIR$/old/assets/sprites/battle/debug_enemy_sprite_01.png" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/assets/sprites/battle/debug_enemy_sprite_01.pxo" beforeDir="false" afterPath="$PROJECT_DIR$/old/assets/sprites/battle/debug_enemy_sprite_01.pxo" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/assets/sprites/battle/debug_enemy_sprite_03.png" beforeDir="false" afterPath="$PROJECT_DIR$/old/assets/sprites/battle/debug_enemy_sprite_03.png" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/assets/sprites/battle/debug_enemy_sprite_04.png" beforeDir="false" afterPath="$PROJECT_DIR$/old/assets/sprites/battle/debug_enemy_sprite_04.png" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/assets/sprites/battle/debug_enemy_sprite_04.pxo" beforeDir="false" afterPath="$PROJECT_DIR$/old/assets/sprites/battle/debug_enemy_sprite_04.pxo" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/assets/sprites/battle/girl_battle.lua" beforeDir="false" afterPath="$PROJECT_DIR$/old/assets/sprites/battle/girl_battle.lua" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/assets/sprites/battle/girl_battle.png" beforeDir="false" afterPath="$PROJECT_DIR$/old/assets/sprites/battle/girl_battle.png" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/assets/sprites/battle/girl_battle.pxo" beforeDir="false" afterPath="$PROJECT_DIR$/old/assets/sprites/battle/girl_battle.pxo" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/assets/sprites/battle/mc_battle.lua" beforeDir="false" afterPath="$PROJECT_DIR$/old/assets/sprites/battle/mc_battle.lua" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/assets/sprites/battle/mc_battle.png" beforeDir="false" afterPath="$PROJECT_DIR$/old/assets/sprites/battle/mc_battle.png" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/assets/sprites/battle/mc_battle.pxo" beforeDir="false" afterPath="$PROJECT_DIR$/old/assets/sprites/battle/mc_battle.pxo" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/assets/sprites/battle/menu_icons.png" beforeDir="false" afterPath="$PROJECT_DIR$/old/assets/sprites/battle/menu_icons.png" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/assets/sprites/battle/menu_item.pxo" beforeDir="false" afterPath="$PROJECT_DIR$/old/assets/sprites/battle/menu_item.pxo" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/assets/sprites/battle/old_status.lua" beforeDir="false" afterPath="$PROJECT_DIR$/old/assets/sprites/battle/old_status.lua" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/assets/sprites/battle/old_status.png" beforeDir="false" afterPath="$PROJECT_DIR$/old/assets/sprites/battle/old_status.png" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/assets/sprites/battle/party.pxo" beforeDir="false" afterPath="$PROJECT_DIR$/old/assets/sprites/battle/party.pxo" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/assets/sprites/battle/prof_battle.lua" beforeDir="false" afterPath="$PROJECT_DIR$/old/assets/sprites/battle/prof_battle.lua" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/assets/sprites/battle/prof_battle.png" beforeDir="false" afterPath="$PROJECT_DIR$/old/assets/sprites/battle/prof_battle.png" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/assets/sprites/battle/prof_battle.pxo" beforeDir="false" afterPath="$PROJECT_DIR$/old/assets/sprites/battle/prof_battle.pxo" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/assets/sprites/battle/rat_battle.lua" beforeDir="false" afterPath="$PROJECT_DIR$/old/assets/sprites/battle/rat_battle.lua" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/assets/sprites/battle/rat_battle.png" beforeDir="false" afterPath="$PROJECT_DIR$/old/assets/sprites/battle/rat_battle.png" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/assets/sprites/battle/rat_battle.pxo" beforeDir="false" afterPath="$PROJECT_DIR$/old/assets/sprites/battle/rat_battle.pxo" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/assets/sprites/battle/small_ufo.lua" beforeDir="false" afterPath="$PROJECT_DIR$/old/assets/sprites/battle/small_ufo.lua" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/assets/sprites/battle/small_ufo.png" beforeDir="false" afterPath="$PROJECT_DIR$/old/assets/sprites/battle/small_ufo.png" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/assets/sprites/battle/small_ufo.pxo" beforeDir="false" afterPath="$PROJECT_DIR$/old/assets/sprites/battle/small_ufo.pxo" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/assets/sprites/battle/stances.lua" beforeDir="false" afterPath="$PROJECT_DIR$/old/assets/sprites/battle/stances.lua" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/assets/sprites/battle/stances.png" beforeDir="false" afterPath="$PROJECT_DIR$/old/assets/sprites/battle/stances.png" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/assets/sprites/battle/stances.pxo" beforeDir="false" afterPath="$PROJECT_DIR$/old/assets/sprites/battle/stances.pxo" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/assets/sprites/battle/status_ailment.pxo" beforeDir="false" afterPath="$PROJECT_DIR$/old/assets/sprites/battle/status_ailment.pxo" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/assets/sprites/controller_buttons.lua" beforeDir="false" afterPath="$PROJECT_DIR$/old/assets/sprites/controller_buttons.lua" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/assets/sprites/controller_buttons.png" beforeDir="false" afterPath="$PROJECT_DIR$/old/assets/sprites/controller_buttons.png" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/assets/sprites/controller_buttons.pxo" beforeDir="false" afterPath="$PROJECT_DIR$/old/assets/sprites/controller_buttons.pxo" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/assets/sprites/debug/bouncy_ball.lua" beforeDir="false" afterPath="$PROJECT_DIR$/old/assets/sprites/debug/bouncy_ball.lua" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/assets/sprites/debug/bouncy_ball.png" beforeDir="false" afterPath="$PROJECT_DIR$/old/assets/sprites/debug/bouncy_ball.png" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/assets/sprites/debug/bouncy_ball.tsx" beforeDir="false" afterPath="$PROJECT_DIR$/old/assets/sprites/debug/bouncy_ball.tsx" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/assets/sprites/debug/debug_enemy_sprite_01.png.pxo" beforeDir="false" afterPath="$PROJECT_DIR$/old/assets/sprites/debug/debug_enemy_sprite_01.png.pxo" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/assets/sprites/debug/debug_enemy_sprite_03.pxo" beforeDir="false" afterPath="$PROJECT_DIR$/old/assets/sprites/debug/debug_enemy_sprite_03.pxo" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/assets/sprites/debug/debug_sprites.pxo" beforeDir="false" afterPath="$PROJECT_DIR$/old/assets/sprites/debug/debug_sprites.pxo" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/assets/sprites/entity_portrait.lua" beforeDir="false" afterPath="$PROJECT_DIR$/old/assets/sprites/entity_portrait.lua" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/assets/sprites/entity_portrait.png" beforeDir="false" afterPath="$PROJECT_DIR$/old/assets/sprites/entity_portrait.png" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/assets/sprites/entity_portrait.pxo" beforeDir="false" afterPath="$PROJECT_DIR$/old/assets/sprites/entity_portrait.pxo" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/assets/sprites/equipment.lua" beforeDir="false" afterPath="$PROJECT_DIR$/old/assets/sprites/equipment.lua" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/assets/sprites/equipment.png" beforeDir="false" afterPath="$PROJECT_DIR$/old/assets/sprites/equipment.png" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/assets/sprites/equipment.pxo" beforeDir="false" afterPath="$PROJECT_DIR$/old/assets/sprites/equipment.pxo" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/assets/sprites/example.lua" beforeDir="false" afterPath="$PROJECT_DIR$/old/assets/sprites/example.lua" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/assets/sprites/inventory_menu.pxo" beforeDir="false" afterPath="$PROJECT_DIR$/old/assets/sprites/inventory_menu.pxo" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/assets/sprites/inventory_thumbnails.pxo" beforeDir="false" afterPath="$PROJECT_DIR$/old/assets/sprites/inventory_thumbnails.pxo" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/assets/sprites/menu_icons.lua" beforeDir="false" afterPath="$PROJECT_DIR$/old/assets/sprites/menu_icons.lua" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/assets/sprites/menu_icons.pxo" beforeDir="false" afterPath="$PROJECT_DIR$/old/assets/sprites/menu_icons.pxo" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/assets/sprites/opal.lua" beforeDir="false" afterPath="$PROJECT_DIR$/old/assets/sprites/opal.lua" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/assets/sprites/orbs.lua" beforeDir="false" afterPath="$PROJECT_DIR$/old/assets/sprites/orbs.lua" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/assets/sprites/orbs.png" beforeDir="false" afterPath="$PROJECT_DIR$/old/assets/sprites/orbs.png" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/assets/sprites/orbs.pxo" beforeDir="false" afterPath="$PROJECT_DIR$/old/assets/sprites/orbs.pxo" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/assets/sprites/party_info.lua" beforeDir="false" afterPath="$PROJECT_DIR$/old/assets/sprites/party_info.lua" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/assets/sprites/party_info.png" beforeDir="false" afterPath="$PROJECT_DIR$/old/assets/sprites/party_info.png" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/assets/sprites/party_info.pxo" beforeDir="false" afterPath="$PROJECT_DIR$/old/assets/sprites/party_info.pxo" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/assets/sprites/status_ailment.lua" beforeDir="false" afterPath="$PROJECT_DIR$/old/assets/sprites/status_ailment.lua" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/assets/sprites/status_ailment.png" beforeDir="false" afterPath="$PROJECT_DIR$/old/assets/sprites/status_ailment.png" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/assets/sprites/status_ailment.pxo" beforeDir="false" afterPath="$PROJECT_DIR$/old/assets/sprites/status_ailment.pxo" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/assets/sprites/test_animation.lua" beforeDir="false" afterPath="$PROJECT_DIR$/old/assets/sprites/test_animation.lua" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/assets/sprites/test_animation.png" beforeDir="false" afterPath="$PROJECT_DIR$/old/assets/sprites/test_animation.png" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/assets/sprites/test_animation.pxo" beforeDir="false" afterPath="$PROJECT_DIR$/old/assets/sprites/test_animation.pxo" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/assets/sprites/test_enemy.lua" beforeDir="false" afterPath="$PROJECT_DIR$/old/assets/sprites/test_enemy.lua" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/assets/sprites/test_enemy.png" beforeDir="false" afterPath="$PROJECT_DIR$/old/assets/sprites/test_enemy.png" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/assets/sprites/test_enemy.pxo" beforeDir="false" afterPath="$PROJECT_DIR$/old/assets/sprites/test_enemy.pxo" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/assets/sprites/test_frame.lua" beforeDir="false" afterPath="$PROJECT_DIR$/old/assets/sprites/test_frame.lua" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/assets/sprites/test_frame.png" beforeDir="false" afterPath="$PROJECT_DIR$/old/assets/sprites/test_frame.png" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/assets/sprites/test_frame.pxo" beforeDir="false" afterPath="$PROJECT_DIR$/old/assets/sprites/test_frame.pxo" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/assets/sprites/test_levelbar.lua" beforeDir="false" afterPath="$PROJECT_DIR$/old/assets/sprites/test_levelbar.lua" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/assets/sprites/test_levelbar.png" beforeDir="false" afterPath="$PROJECT_DIR$/old/assets/sprites/test_levelbar.png" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/assets/sprites/test_levelbar.pxo" beforeDir="false" afterPath="$PROJECT_DIR$/old/assets/sprites/test_levelbar.pxo" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/assets/sprites/test_scale.lua" beforeDir="false" afterPath="$PROJECT_DIR$/old/assets/sprites/test_scale.lua" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/assets/sprites/test_scale.png" beforeDir="false" afterPath="$PROJECT_DIR$/old/assets/sprites/test_scale.png" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/assets/sprites/test_scale.pxo" beforeDir="false" afterPath="$PROJECT_DIR$/old/assets/sprites/test_scale.pxo" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/assets/sprites/todo_delete.png" beforeDir="false" afterPath="$PROJECT_DIR$/old/assets/sprites/todo_delete.png" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/assets/sprites/untitled.png" beforeDir="false" afterPath="$PROJECT_DIR$/old/assets/sprites/untitled.png" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/assets/sprites/untitled.pxo" beforeDir="false" afterPath="$PROJECT_DIR$/old/assets/sprites/untitled.pxo" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/assets/stages/debug/animated_sprite.tx" beforeDir="false" afterPath="$PROJECT_DIR$/old/assets/stages/debug/animated_sprite.tx" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/assets/stages/debug/bouncy_ball.lua" beforeDir="false" afterPath="$PROJECT_DIR$/old/assets/stages/debug/bouncy_ball.lua" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/assets/stages/debug/bouncy_ball.tsx" beforeDir="false" afterPath="$PROJECT_DIR$/old/assets/stages/debug/bouncy_ball.tsx" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/assets/stages/debug/debug_infinite_map.lua" beforeDir="false" afterPath="$PROJECT_DIR$/old/assets/stages/debug/debug_infinite_map.lua" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/assets/stages/debug/debug_infinite_map.tmx" beforeDir="false" afterPath="$PROJECT_DIR$/old/assets/stages/debug/debug_infinite_map.tmx" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/assets/stages/debug/debug_map.lua" beforeDir="false" afterPath="$PROJECT_DIR$/old/assets/stages/debug/debug_map.lua" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/assets/stages/debug/debug_map.tmx" beforeDir="false" afterPath="$PROJECT_DIR$/old/assets/stages/debug/debug_map.tmx" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/assets/stages/debug/debug_tileset.lua" beforeDir="false" afterPath="$PROJECT_DIR$/old/assets/stages/debug/debug_tileset.lua" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/assets/stages/debug/debug_tileset.png" beforeDir="false" afterPath="$PROJECT_DIR$/old/assets/stages/debug/debug_tileset.png" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/assets/stages/debug/debug_tileset.pxo" beforeDir="false" afterPath="$PROJECT_DIR$/old/assets/stages/debug/debug_tileset.pxo" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/assets/stages/debug/debug_tileset.tsx" beforeDir="false" afterPath="$PROJECT_DIR$/old/assets/stages/debug/debug_tileset.tsx" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/assets/stages/debug/rat_game.tiled-session" beforeDir="false" afterPath="$PROJECT_DIR$/old/assets/stages/debug/rat_game.tiled-session" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/assets/stages/debug/test_template.tx" beforeDir="false" afterPath="$PROJECT_DIR$/old/assets/stages/debug/test_template.tx" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/assets/stages/rat_game.tiled-project" beforeDir="false" afterPath="$PROJECT_DIR$/old/assets/stages/rat_game.tiled-project" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/assets/stages/rat_game.tiled-session" beforeDir="false" afterPath="$PROJECT_DIR$/old/assets/stages/rat_game.tiled-session" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/assets/stages/test.ldtk" beforeDir="false" afterPath="$PROJECT_DIR$/old/assets/stages/test.ldtk" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/assets/stages/test.tsx" beforeDir="false" afterPath="$PROJECT_DIR$/old/assets/stages/test.tsx" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/assets/stages/~debug/carpet.lua" beforeDir="false" afterPath="$PROJECT_DIR$/old/assets/stages/~debug/carpet.lua" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/assets/stages/~debug/carpet.png" beforeDir="false" afterPath="$PROJECT_DIR$/old/assets/stages/~debug/carpet.png" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/assets/stages/~debug/carpet.pxo" beforeDir="false" afterPath="$PROJECT_DIR$/old/assets/stages/~debug/carpet.pxo" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/assets/stages/~debug/carpet.tsx" beforeDir="false" afterPath="$PROJECT_DIR$/old/assets/stages/~debug/carpet.tsx" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/assets/stages/~debug/debug.tmx" beforeDir="false" afterPath="$PROJECT_DIR$/old/assets/stages/~debug/debug.tmx" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/assets/stages/~debug/debug.tsx" beforeDir="false" afterPath="$PROJECT_DIR$/old/assets/stages/~debug/debug.tsx" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/assets/stages/~debug/debug_map.lua" beforeDir="false" afterPath="$PROJECT_DIR$/old/assets/stages/~debug/debug_map.lua" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/assets/stages/~debug/debug_tileset.lua" beforeDir="false" afterPath="$PROJECT_DIR$/old/assets/stages/~debug/debug_tileset.lua" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/assets/stages/~debug/debug_tileset.png" beforeDir="false" afterPath="$PROJECT_DIR$/old/assets/stages/~debug/debug_tileset.png" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/assets/stages/~debug/debug_tileset.pxo" beforeDir="false" afterPath="$PROJECT_DIR$/old/assets/stages/~debug/debug_tileset.pxo" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/assets/stages/~debug/debug_tileset.tsx" beforeDir="false" afterPath="$PROJECT_DIR$/old/assets/stages/~debug/debug_tileset.tsx" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/assets/stages/~debug/rat_game.tiled-project" beforeDir="false" afterPath="$PROJECT_DIR$/old/assets/stages/~debug/rat_game.tiled-project" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/assets/stages/~debug/rat_game.tiled-session" beforeDir="false" afterPath="$PROJECT_DIR$/old/assets/stages/~debug/rat_game.tiled-session" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/battle/action_choice.lua" beforeDir="false" afterPath="$PROJECT_DIR$/old/battle/action_choice.lua" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/battle/animation.lua" beforeDir="false" afterPath="$PROJECT_DIR$/old/battle/animation.lua" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/battle/animations/moves/swirl.glsl" beforeDir="false" afterPath="$PROJECT_DIR$/old/battle/animations/moves/swirl.glsl" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/battle/animations/moves/swirl.lua" beforeDir="false" afterPath="$PROJECT_DIR$/old/battle/animations/moves/swirl.lua" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/battle/animations/simulation/ally_appeared.lua" beforeDir="false" afterPath="$PROJECT_DIR$/old/battle/animations/simulation/ally_appeared.lua" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/battle/animations/simulation/ally_disappeared.lua" beforeDir="false" afterPath="$PROJECT_DIR$/old/battle/animations/simulation/ally_disappeared.lua" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/battle/animations/simulation/consumable_applied.lua" beforeDir="false" afterPath="$PROJECT_DIR$/old/battle/animations/simulation/consumable_applied.lua" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/battle/animations/simulation/consumable_consumed.lua" beforeDir="false" afterPath="$PROJECT_DIR$/old/battle/animations/simulation/consumable_consumed.lua" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/battle/animations/simulation/consumable_gained.lua" beforeDir="false" afterPath="$PROJECT_DIR$/old/battle/animations/simulation/consumable_gained.lua" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/battle/animations/simulation/consumable_lost.lua" beforeDir="false" afterPath="$PROJECT_DIR$/old/battle/animations/simulation/consumable_lost.lua" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/battle/animations/simulation/delay.lua" beforeDir="false" afterPath="$PROJECT_DIR$/old/battle/animations/simulation/delay.lua" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/battle/animations/simulation/enemy_appeared.lua" beforeDir="false" afterPath="$PROJECT_DIR$/old/battle/animations/simulation/enemy_appeared.lua" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/battle/animations/simulation/enemy_disappeared.lua" beforeDir="false" afterPath="$PROJECT_DIR$/old/battle/animations/simulation/enemy_disappeared.lua" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/battle/animations/simulation/global_status_applied.lua" beforeDir="false" afterPath="$PROJECT_DIR$/old/battle/animations/simulation/global_status_applied.lua" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/battle/animations/simulation/global_status_gained.lua" beforeDir="false" afterPath="$PROJECT_DIR$/old/battle/animations/simulation/global_status_gained.lua" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/battle/animations/simulation/global_status_lost.lua" beforeDir="false" afterPath="$PROJECT_DIR$/old/battle/animations/simulation/global_status_lost.lua" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/battle/animations/simulation/helped_up.lua" beforeDir="false" afterPath="$PROJECT_DIR$/old/battle/animations/simulation/helped_up.lua" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/battle/animations/simulation/hp_gained.lua" beforeDir="false" afterPath="$PROJECT_DIR$/old/battle/animations/simulation/hp_gained.lua" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/battle/animations/simulation/hp_lost.lua" beforeDir="false" afterPath="$PROJECT_DIR$/old/battle/animations/simulation/hp_lost.lua" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/battle/animations/simulation/killed.lua" beforeDir="false" afterPath="$PROJECT_DIR$/old/battle/animations/simulation/killed.lua" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/battle/animations/simulation/knocked_out.lua" beforeDir="false" afterPath="$PROJECT_DIR$/old/battle/animations/simulation/knocked_out.lua" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/battle/animations/simulation/message.lua" beforeDir="false" afterPath="$PROJECT_DIR$/old/battle/animations/simulation/message.lua" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/battle/animations/simulation/move.lua" beforeDir="false" afterPath="$PROJECT_DIR$/old/battle/animations/simulation/move.lua" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/battle/animations/simulation/no_longer_stunned.lua" beforeDir="false" afterPath="$PROJECT_DIR$/old/battle/animations/simulation/no_longer_stunned.lua" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/battle/animations/simulation/reorder_priority_queue.lua" beforeDir="false" afterPath="$PROJECT_DIR$/old/battle/animations/simulation/reorder_priority_queue.lua" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/battle/animations/simulation/status_applied.lua" beforeDir="false" afterPath="$PROJECT_DIR$/old/battle/animations/simulation/status_applied.lua" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/battle/animations/simulation/status_gained.lua" beforeDir="false" afterPath="$PROJECT_DIR$/old/battle/animations/simulation/status_gained.lua" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/battle/animations/simulation/status_lost.lua" beforeDir="false" afterPath="$PROJECT_DIR$/old/battle/animations/simulation/status_lost.lua" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/battle/animations/simulation/stunned.lua" beforeDir="false" afterPath="$PROJECT_DIR$/old/battle/animations/simulation/stunned.lua" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/battle/animations/simulation/switched.lua" beforeDir="false" afterPath="$PROJECT_DIR$/old/battle/animations/simulation/switched.lua" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/battle/animations/simulation/turn_end.lua" beforeDir="false" afterPath="$PROJECT_DIR$/old/battle/animations/simulation/turn_end.lua" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/battle/animations/simulation/turn_start.lua" beforeDir="false" afterPath="$PROJECT_DIR$/old/battle/animations/simulation/turn_start.lua" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/battle/background.lua" beforeDir="false" afterPath="$PROJECT_DIR$/old/battle/background.lua" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/battle/backgrounds/brusselator.glsl" beforeDir="false" afterPath="$PROJECT_DIR$/old/battle/backgrounds/brusselator.glsl" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/battle/backgrounds/brusselator.lua" beforeDir="false" afterPath="$PROJECT_DIR$/old/battle/backgrounds/brusselator.lua" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/battle/backgrounds/clouds.glsl" beforeDir="false" afterPath="$PROJECT_DIR$/old/battle/backgrounds/clouds.glsl" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/battle/backgrounds/clouds.lua" beforeDir="false" afterPath="$PROJECT_DIR$/old/battle/backgrounds/clouds.lua" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/battle/backgrounds/dot_matrix.glsl" beforeDir="false" afterPath="$PROJECT_DIR$/old/battle/backgrounds/dot_matrix.glsl" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/battle/backgrounds/dot_matrix.lua" beforeDir="false" afterPath="$PROJECT_DIR$/old/battle/backgrounds/dot_matrix.lua" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/battle/backgrounds/eye.glsl" beforeDir="false" afterPath="$PROJECT_DIR$/old/battle/backgrounds/eye.glsl" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/battle/backgrounds/eye.lua" beforeDir="false" afterPath="$PROJECT_DIR$/old/battle/backgrounds/eye.lua" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/battle/backgrounds/focus_rack_dots.glsl" beforeDir="false" afterPath="$PROJECT_DIR$/old/battle/backgrounds/focus_rack_dots.glsl" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/battle/backgrounds/focus_rack_dots.lua" beforeDir="false" afterPath="$PROJECT_DIR$/old/battle/backgrounds/focus_rack_dots.lua" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/battle/backgrounds/gradient_derivative.glsl" beforeDir="false" afterPath="$PROJECT_DIR$/old/battle/backgrounds/gradient_derivative.glsl" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/battle/backgrounds/gradient_derivative.lua" beforeDir="false" afterPath="$PROJECT_DIR$/old/battle/backgrounds/gradient_derivative.lua" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/battle/backgrounds/guitar_strings.glsl" beforeDir="false" afterPath="$PROJECT_DIR$/old/battle/backgrounds/guitar_strings.glsl" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/battle/backgrounds/guitar_strings.lua" beforeDir="false" afterPath="$PROJECT_DIR$/old/battle/backgrounds/guitar_strings.lua" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/battle/backgrounds/ink_in_water.glsl" beforeDir="false" afterPath="$PROJECT_DIR$/old/battle/backgrounds/ink_in_water.glsl" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/battle/backgrounds/ink_in_water.lua" beforeDir="false" afterPath="$PROJECT_DIR$/old/battle/backgrounds/ink_in_water.lua" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/battle/backgrounds/lavalamp.glsl" beforeDir="false" afterPath="$PROJECT_DIR$/old/battle/backgrounds/lavalamp.glsl" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/battle/backgrounds/lavalamp.lua" beforeDir="false" afterPath="$PROJECT_DIR$/old/battle/backgrounds/lavalamp.lua" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/battle/backgrounds/lichen.glsl" beforeDir="false" afterPath="$PROJECT_DIR$/old/battle/backgrounds/lichen.glsl" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/battle/backgrounds/lichen.lua" beforeDir="false" afterPath="$PROJECT_DIR$/old/battle/backgrounds/lichen.lua" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/battle/backgrounds/noise_ball.glsl" beforeDir="false" afterPath="$PROJECT_DIR$/old/battle/backgrounds/noise_ball.glsl" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/battle/backgrounds/noise_ball.lua" beforeDir="false" afterPath="$PROJECT_DIR$/old/battle/backgrounds/noise_ball.lua" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/battle/backgrounds/overlap_lines.lua" beforeDir="false" afterPath="$PROJECT_DIR$/old/battle/backgrounds/overlap_lines.lua" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/battle/backgrounds/parallell_lines.glsl" beforeDir="false" afterPath="$PROJECT_DIR$/old/battle/backgrounds/parallell_lines.glsl" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/battle/backgrounds/parallell_lines.lua" beforeDir="false" afterPath="$PROJECT_DIR$/old/battle/backgrounds/parallell_lines.lua" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/battle/backgrounds/sdf_meatballs.lua" beforeDir="false" afterPath="$PROJECT_DIR$/old/battle/backgrounds/sdf_meatballs.lua" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/battle/backgrounds/sdf_meatballs_compute.glsl" beforeDir="false" afterPath="$PROJECT_DIR$/old/battle/backgrounds/sdf_meatballs_compute.glsl" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/battle/backgrounds/sdf_meatballs_render.glsl" beforeDir="false" afterPath="$PROJECT_DIR$/old/battle/backgrounds/sdf_meatballs_render.glsl" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/battle/backgrounds/topography.glsl" beforeDir="false" afterPath="$PROJECT_DIR$/old/battle/backgrounds/topography.glsl" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/battle/backgrounds/topography.lua" beforeDir="false" afterPath="$PROJECT_DIR$/old/battle/backgrounds/topography.lua" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/battle/backgrounds/triangle_tiling.glsl" beforeDir="false" afterPath="$PROJECT_DIR$/old/battle/backgrounds/triangle_tiling.glsl" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/battle/backgrounds/triangle_tiling.lua" beforeDir="false" afterPath="$PROJECT_DIR$/old/battle/backgrounds/triangle_tiling.lua" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/battle/backgrounds/voroworms.glsl" beforeDir="false" afterPath="$PROJECT_DIR$/old/battle/backgrounds/voroworms.glsl" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/battle/backgrounds/voroworms.lua" beforeDir="false" afterPath="$PROJECT_DIR$/old/battle/backgrounds/voroworms.lua" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/battle/backgrounds/worley.glsl" beforeDir="false" afterPath="$PROJECT_DIR$/old/battle/backgrounds/worley.glsl" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/battle/backgrounds/worley.lua" beforeDir="false" afterPath="$PROJECT_DIR$/old/battle/backgrounds/worley.lua" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/battle/battle.lua" beforeDir="false" afterPath="$PROJECT_DIR$/old/battle/battle.lua" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/battle/battle_interface.lua" beforeDir="false" afterPath="$PROJECT_DIR$/old/battle/battle_interface.lua" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/battle/battle_simulation.lua" beforeDir="false" afterPath="$PROJECT_DIR$/old/battle/battle_simulation.lua" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/battle/battle_sprite.lua" beforeDir="false" afterPath="$PROJECT_DIR$/old/battle/battle_sprite.lua" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/battle/battle_ui.lua" beforeDir="false" afterPath="$PROJECT_DIR$/old/battle/battle_ui.lua" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/battle/configs/battles/DEBUG_BATTLE.lua" beforeDir="false" afterPath="$PROJECT_DIR$/old/battle/configs/battles/DEBUG_BATTLE.lua" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/battle/configs/consumables/DEBUG_CONSUMABLE.lua" beforeDir="false" afterPath="$PROJECT_DIR$/old/battle/configs/consumables/DEBUG_CONSUMABLE.lua" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/battle/configs/consumables/ONE_CHERRY.lua" beforeDir="false" afterPath="$PROJECT_DIR$/old/battle/configs/consumables/ONE_CHERRY.lua" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/battle/configs/consumables/TWO_CHERRY.lua" beforeDir="false" afterPath="$PROJECT_DIR$/old/battle/configs/consumables/TWO_CHERRY.lua" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/battle/configs/consumables/_docs.md" beforeDir="false" afterPath="$PROJECT_DIR$/old/battle/configs/consumables/_docs.md" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/battle/configs/entities/BALL_WITH_FACE.lua" beforeDir="false" afterPath="$PROJECT_DIR$/old/battle/configs/entities/BALL_WITH_FACE.lua" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/battle/configs/entities/GAMBLER_MOLE.lua" beforeDir="false" afterPath="$PROJECT_DIR$/old/battle/configs/entities/GAMBLER_MOLE.lua" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/battle/configs/entities/GIRL.lua" beforeDir="false" afterPath="$PROJECT_DIR$/old/battle/configs/entities/GIRL.lua" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/battle/configs/entities/MC.lua" beforeDir="false" afterPath="$PROJECT_DIR$/old/battle/configs/entities/MC.lua" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/battle/configs/entities/PROF.lua" beforeDir="false" afterPath="$PROJECT_DIR$/old/battle/configs/entities/PROF.lua" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/battle/configs/entities/RAT.lua" beforeDir="false" afterPath="$PROJECT_DIR$/old/battle/configs/entities/RAT.lua" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/battle/configs/entities/SMALL_UFO.lua" beforeDir="false" afterPath="$PROJECT_DIR$/old/battle/configs/entities/SMALL_UFO.lua" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/battle/configs/entities/WALKING_SPROUT.lua" beforeDir="false" afterPath="$PROJECT_DIR$/old/battle/configs/entities/WALKING_SPROUT.lua" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/battle/configs/equips/DEBUG_CLOTHING.lua" beforeDir="false" afterPath="$PROJECT_DIR$/old/battle/configs/equips/DEBUG_CLOTHING.lua" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/battle/configs/equips/DEBUG_EQUIP.lua" beforeDir="false" afterPath="$PROJECT_DIR$/old/battle/configs/equips/DEBUG_EQUIP.lua" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/battle/configs/equips/DEBUG_FEMALE_CLOTHING.lua" beforeDir="false" afterPath="$PROJECT_DIR$/old/battle/configs/equips/DEBUG_FEMALE_CLOTHING.lua" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/battle/configs/equips/DEBUG_MALE_CLOTHING.lua" beforeDir="false" afterPath="$PROJECT_DIR$/old/battle/configs/equips/DEBUG_MALE_CLOTHING.lua" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/battle/configs/equips/DEBUG_TRINKET.lua" beforeDir="false" afterPath="$PROJECT_DIR$/old/battle/configs/equips/DEBUG_TRINKET.lua" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/battle/configs/equips/DEBUG_WEAPON.lua" beforeDir="false" afterPath="$PROJECT_DIR$/old/battle/configs/equips/DEBUG_WEAPON.lua" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/battle/configs/equips/_docs.md" beforeDir="false" afterPath="$PROJECT_DIR$/old/battle/configs/equips/_docs.md" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/battle/configs/global_statuses/DEBUG_GLOBAL_STATUS.lua" beforeDir="false" afterPath="$PROJECT_DIR$/old/battle/configs/global_statuses/DEBUG_GLOBAL_STATUS.lua" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/battle/configs/moves/DEBUG_MOVE.lua" beforeDir="false" afterPath="$PROJECT_DIR$/old/battle/configs/moves/DEBUG_MOVE.lua" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/battle/configs/moves/INSPECT.lua" beforeDir="false" afterPath="$PROJECT_DIR$/old/battle/configs/moves/INSPECT.lua" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/battle/configs/moves/PROTECT.lua" beforeDir="false" afterPath="$PROJECT_DIR$/old/battle/configs/moves/PROTECT.lua" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/battle/configs/moves/STRUGGLE.lua" beforeDir="false" afterPath="$PROJECT_DIR$/old/battle/configs/moves/STRUGGLE.lua" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/battle/configs/moves/SURF.lua" beforeDir="false" afterPath="$PROJECT_DIR$/old/battle/configs/moves/SURF.lua" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/battle/configs/moves/WISH.lua" beforeDir="false" afterPath="$PROJECT_DIR$/old/battle/configs/moves/WISH.lua" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/battle/configs/moves/_docs.md" beforeDir="false" afterPath="$PROJECT_DIR$/old/battle/configs/moves/_docs.md" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/battle/configs/statuses/DEBUG_STATUS.lua" beforeDir="false" afterPath="$PROJECT_DIR$/old/battle/configs/statuses/DEBUG_STATUS.lua" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/battle/consumable.lua" beforeDir="false" afterPath="$PROJECT_DIR$/old/battle/consumable.lua" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/battle/consumable_bar.lua" beforeDir="false" afterPath="$PROJECT_DIR$/old/battle/consumable_bar.lua" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/battle/consumable_interface.lua" beforeDir="false" afterPath="$PROJECT_DIR$/old/battle/consumable_interface.lua" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/battle/enemy_ai.lua" beforeDir="false" afterPath="$PROJECT_DIR$/old/battle/enemy_ai.lua" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/battle/enemy_sprite.lua" beforeDir="false" afterPath="$PROJECT_DIR$/old/battle/enemy_sprite.lua" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/battle/entity.lua" beforeDir="false" afterPath="$PROJECT_DIR$/old/battle/entity.lua" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/battle/entity_interface.lua" beforeDir="false" afterPath="$PROJECT_DIR$/old/battle/entity_interface.lua" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/battle/equip.lua" beforeDir="false" afterPath="$PROJECT_DIR$/old/battle/equip.lua" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/battle/equip_interface.lua" beforeDir="false" afterPath="$PROJECT_DIR$/old/battle/equip_interface.lua" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/battle/global_status.lua" beforeDir="false" afterPath="$PROJECT_DIR$/old/battle/global_status.lua" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/battle/global_status_bar.lua" beforeDir="false" afterPath="$PROJECT_DIR$/old/battle/global_status_bar.lua" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/battle/global_status_interface.lua" beforeDir="false" afterPath="$PROJECT_DIR$/old/battle/global_status_interface.lua" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/battle/gradient_frame.lua" beforeDir="false" afterPath="$PROJECT_DIR$/old/battle/gradient_frame.lua" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/battle/health_bar.lua" beforeDir="false" afterPath="$PROJECT_DIR$/old/battle/health_bar.lua" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/battle/move.lua" beforeDir="false" afterPath="$PROJECT_DIR$/old/battle/move.lua" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/battle/move_interface.lua" beforeDir="false" afterPath="$PROJECT_DIR$/old/battle/move_interface.lua" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/battle/move_selection.lua" beforeDir="false" afterPath="$PROJECT_DIR$/old/battle/move_selection.lua" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/battle/move_selection_item.lua" beforeDir="false" afterPath="$PROJECT_DIR$/old/battle/move_selection_item.lua" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/battle/party_sprite.lua" beforeDir="false" afterPath="$PROJECT_DIR$/old/battle/party_sprite.lua" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/battle/priority_queue.lua" beforeDir="false" afterPath="$PROJECT_DIR$/old/battle/priority_queue.lua" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/battle/priority_queue_element.lua" beforeDir="false" afterPath="$PROJECT_DIR$/old/battle/priority_queue_element.lua" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/battle/scene.lua" beforeDir="false" afterPath="$PROJECT_DIR$/old/battle/scene.lua" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/battle/scene_state.lua" beforeDir="false" afterPath="$PROJECT_DIR$/old/battle/scene_state.lua" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/battle/scene_state_entity_select.lua" beforeDir="false" afterPath="$PROJECT_DIR$/old/battle/scene_state_entity_select.lua" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/battle/scene_state_inspect.lua" beforeDir="false" afterPath="$PROJECT_DIR$/old/battle/scene_state_inspect.lua" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/battle/scene_state_manager.lua" beforeDir="false" afterPath="$PROJECT_DIR$/old/battle/scene_state_manager.lua" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/battle/scene_state_move_select.lua" beforeDir="false" afterPath="$PROJECT_DIR$/old/battle/scene_state_move_select.lua" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/battle/scene_state_simulation.lua" beforeDir="false" afterPath="$PROJECT_DIR$/old/battle/scene_state_simulation.lua" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/battle/simulation_handler.lua" beforeDir="false" afterPath="$PROJECT_DIR$/old/battle/simulation_handler.lua" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/battle/speed_value.lua" beforeDir="false" afterPath="$PROJECT_DIR$/old/battle/speed_value.lua" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/battle/status.lua" beforeDir="false" afterPath="$PROJECT_DIR$/old/battle/status.lua" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/battle/status_bar.lua" beforeDir="false" afterPath="$PROJECT_DIR$/old/battle/status_bar.lua" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/battle/status_interface.lua" beforeDir="false" afterPath="$PROJECT_DIR$/old/battle/status_interface.lua" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/battle/verbose_info.lua" beforeDir="false" afterPath="$PROJECT_DIR$/old/battle/verbose_info.lua" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/battle/~entity.lua" beforeDir="false" afterPath="$PROJECT_DIR$/old/battle/~entity.lua" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/battle/~priority_queue.lua" beforeDir="false" afterPath="$PROJECT_DIR$/old/battle/~priority_queue.lua" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/battle/~priority_queue_element.lua" beforeDir="false" afterPath="$PROJECT_DIR$/old/battle/~priority_queue_element.lua" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/common/animation.lua" beforeDir="false" afterPath="$PROJECT_DIR$/common/animation.lua" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/common/aspect_layout.lua" beforeDir="false" afterPath="$PROJECT_DIR$/old/common/aspect_layout.lua" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/common/audio_playback.lua" beforeDir="false" afterPath="$PROJECT_DIR$/old/common/audio_playback.lua" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/common/cloth.lua" beforeDir="false" afterPath="$PROJECT_DIR$/old/common/cloth.lua" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/common/collider.lua" beforeDir="false" afterPath="$PROJECT_DIR$/old/common/collider.lua" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/common/color.lua" beforeDir="false" afterPath="$PROJECT_DIR$/common/color.lua" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/common/common.lua" beforeDir="false" afterPath="$PROJECT_DIR$/common/common.lua" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/common/config.lua" beforeDir="false" afterPath="$PROJECT_DIR$/old/common/config.lua" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/common/control_indicator.lua" beforeDir="false" afterPath="$PROJECT_DIR$/old/common/control_indicator.lua" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/common/direction_indicator.lua" beforeDir="false" afterPath="$PROJECT_DIR$/old/common/direction_indicator.lua" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/common/fast_forward_indicator.lua" beforeDir="false" afterPath="$PROJECT_DIR$/old/common/fast_forward_indicator.lua" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/common/filesystem.lua" beforeDir="false" afterPath="$PROJECT_DIR$/common/filesystem.lua" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/common/frame.lua" beforeDir="false" afterPath="$PROJECT_DIR$/old/common/frame.lua" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/common/geometry.lua" beforeDir="false" afterPath="$PROJECT_DIR$/common/geometry.lua" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/common/glyph.lua" beforeDir="false" afterPath="$PROJECT_DIR$/common/glyph.lua" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/common/gradient.lua" beforeDir="false" afterPath="$PROJECT_DIR$/old/common/gradient.lua" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/common/graph.lua" beforeDir="false" afterPath="$PROJECT_DIR$/old/common/graph.lua" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/common/image.lua" beforeDir="false" afterPath="$PROJECT_DIR$/common/image.lua" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/common/input_button.lua" beforeDir="false" afterPath="$PROJECT_DIR$/old/common/input_button.lua" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/common/keyboard.lua" beforeDir="false" afterPath="$PROJECT_DIR$/old/common/keyboard.lua" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/common/label.lua" beforeDir="false" afterPath="$PROJECT_DIR$/common/label.lua" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/common/labeled_sprite.lua" beforeDir="false" afterPath="$PROJECT_DIR$/old/common/labeled_sprite.lua" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/common/level_bar.lua" beforeDir="false" afterPath="$PROJECT_DIR$/old/common/level_bar.lua" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/common/list.lua" beforeDir="false" afterPath="$PROJECT_DIR$/old/common/list.lua" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/common/matrix.lua" beforeDir="false" afterPath="$PROJECT_DIR$/old/common/matrix.lua" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/common/message_dialog.lua" beforeDir="false" afterPath="$PROJECT_DIR$/old/common/message_dialog.lua" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/common/meta.lua" beforeDir="false" afterPath="$PROJECT_DIR$/common/meta.lua" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/common/monitored_audio_playback.lua" beforeDir="false" afterPath="$PROJECT_DIR$/old/common/monitored_audio_playback.lua" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/common/ordered_box.lua" beforeDir="false" afterPath="$PROJECT_DIR$/old/common/ordered_box.lua" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/common/palette.lua" beforeDir="false" afterPath="$PROJECT_DIR$/common/palette.lua" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/common/particle_emitter.lua" beforeDir="false" afterPath="$PROJECT_DIR$/old/common/particle_emitter.lua" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/common/physics_world.lua" beforeDir="false" afterPath="$PROJECT_DIR$/old/common/physics_world.lua" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/common/random.lua" beforeDir="false" afterPath="$PROJECT_DIR$/common/random.lua" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/common/rope.lua" beforeDir="false" afterPath="$PROJECT_DIR$/old/common/rope.lua" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/common/rope_thread.lua" beforeDir="false" afterPath="$PROJECT_DIR$/old/common/rope_thread.lua" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/common/save_file.lua" beforeDir="false" afterPath="$PROJECT_DIR$/old/common/save_file.lua" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/common/save_file_thread.lua" beforeDir="false" afterPath="$PROJECT_DIR$/old/common/save_file_thread.lua" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/common/scene.lua" beforeDir="false" afterPath="$PROJECT_DIR$/old/common/scene.lua" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/common/scene_state.lua" beforeDir="false" afterPath="$PROJECT_DIR$/old/common/scene_state.lua" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/common/scrollbar.lua" beforeDir="false" afterPath="$PROJECT_DIR$/old/common/scrollbar.lua" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/common/selection_indicator.lua" beforeDir="false" afterPath="$PROJECT_DIR$/old/common/selection_indicator.lua" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/common/set.lua" beforeDir="false" afterPath="$PROJECT_DIR$/common/set.lua" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/common/signals.lua" beforeDir="false" afterPath="$PROJECT_DIR$/old/common/signals.lua" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/common/snapshot.lua" beforeDir="false" afterPath="$PROJECT_DIR$/old/common/snapshot.lua" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/common/sound_atlas.lua" beforeDir="false" afterPath="$PROJECT_DIR$/old/common/sound_atlas.lua" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/common/spacer.lua" beforeDir="false" afterPath="$PROJECT_DIR$/old/common/spacer.lua" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/common/speech_bubble.lua" beforeDir="false" afterPath="$PROJECT_DIR$/old/common/speech_bubble.lua" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/common/spline.lua" beforeDir="false" afterPath="$PROJECT_DIR$/old/common/spline.lua" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/common/game_state.lua" beforeDir="false" afterPath="$PROJECT_DIR$/common/game_state.lua" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/common/sprite.lua" beforeDir="false" afterPath="$PROJECT_DIR$/common/sprite.lua" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/common/sprite_atlas.lua" beforeDir="false" afterPath="$PROJECT_DIR$/common/sprite_atlas.lua" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/common/textbox.lua" beforeDir="false" afterPath="$PROJECT_DIR$/old/common/textbox.lua" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/common/texture.lua" beforeDir="false" afterPath="$PROJECT_DIR$/common/texture.lua" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/common/vertex_shape.lua" beforeDir="false" afterPath="$PROJECT_DIR$/common/vertex_shape.lua" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/common/~input_controller.lua" beforeDir="false" afterPath="$PROJECT_DIR$/old/common/~input_controller.lua" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/common/~input_handler.lua" beforeDir="false" afterPath="$PROJECT_DIR$/old/common/~input_handler.lua" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/common/~labeled_sprite.lua" beforeDir="false" afterPath="$PROJECT_DIR$/old/common/~labeled_sprite.lua" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/common/~rope.lua" beforeDir="false" afterPath="$PROJECT_DIR$/old/common/~rope.lua" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/common/~selection_graph.lua" beforeDir="false" afterPath="$PROJECT_DIR$/old/common/~selection_graph.lua" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/essay.md" beforeDir="false" afterPath="$PROJECT_DIR$/old/essay.md" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/debug_savefile.lua" beforeDir="false" afterPath="$PROJECT_DIR$/debug_savefile.lua" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/include.lua" beforeDir="false" afterPath="$PROJECT_DIR$/include.lua" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/lichen/render.glsl" beforeDir="false" afterPath="$PROJECT_DIR$/old/lichen/render.glsl" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/lichen/render_instanced.glsl" beforeDir="false" afterPath="$PROJECT_DIR$/old/lichen/render_instanced.glsl" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/lichen/rhombus.jpg" beforeDir="false" afterPath="$PROJECT_DIR$/old/lichen/rhombus.jpg" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/lichen/step.glsl" beforeDir="false" afterPath="$PROJECT_DIR$/old/lichen/step.glsl" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/lichen/swirl.glsl" beforeDir="false" afterPath="$PROJECT_DIR$/old/lichen/swirl.glsl" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/lichen/~step.glsl" beforeDir="false" afterPath="$PROJECT_DIR$/old/lichen/~step.glsl" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/main.lua" beforeDir="false" afterPath="$PROJECT_DIR$/main.lua" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/main_battle.lua" beforeDir="false" afterPath="$PROJECT_DIR$/old/main_battle.lua" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/main_lichen.lua" beforeDir="false" afterPath="$PROJECT_DIR$/old/main_lichen.lua" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/main_menu.lua" beforeDir="false" afterPath="$PROJECT_DIR$/old/main_menu.lua" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/main_meshilize.lua" beforeDir="false" afterPath="$PROJECT_DIR$/old/main_meshilize.lua" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/main_overworld.lua" beforeDir="false" afterPath="$PROJECT_DIR$/old/main_overworld.lua" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/main_rope.lua" beforeDir="false" afterPath="$PROJECT_DIR$/old/main_rope.lua" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/main_swirl.lua" beforeDir="false" afterPath="$PROJECT_DIR$/old/main_swirl.lua" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/menu/entity_info.lua" beforeDir="false" afterPath="$PROJECT_DIR$/old/menu/entity_info.lua" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/menu/inventory_state.lua" beforeDir="false" afterPath="$PROJECT_DIR$/old/menu/inventory_state.lua" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/menu/object_moved_animation.lua" beforeDir="false" afterPath="$PROJECT_DIR$/old/menu/object_moved_animation.lua" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/menu/scene.lua" beforeDir="false" afterPath="$PROJECT_DIR$/old/menu/scene.lua" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/menu/scrollable_list.lua" beforeDir="false" afterPath="$PROJECT_DIR$/old/menu/scrollable_list.lua" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/menu/slots.lua" beforeDir="false" afterPath="$PROJECT_DIR$/old/menu/slots.lua" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/menu/tab_bar.lua" beforeDir="false" afterPath="$PROJECT_DIR$/old/menu/tab_bar.lua" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/menu/template.lua" beforeDir="false" afterPath="$PROJECT_DIR$/old/menu/template.lua" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/menu/verbose_info_panel.lua" beforeDir="false" afterPath="$PROJECT_DIR$/old/menu/verbose_info_panel.lua" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/menu/verbose_info_panel_item.lua" beforeDir="false" afterPath="$PROJECT_DIR$/old/menu/verbose_info_panel_item.lua" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/menu/~entity_info.lua" beforeDir="false" afterPath="$PROJECT_DIR$/old/menu/~entity_info.lua" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/menu/~entity_portraits.lua" beforeDir="false" afterPath="$PROJECT_DIR$/old/menu/~entity_portraits.lua" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/menu/~scene.lua" beforeDir="false" afterPath="$PROJECT_DIR$/old/menu/~scene.lua" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/menu/~selection_graph.lua" beforeDir="false" afterPath="$PROJECT_DIR$/old/menu/~selection_graph.lua" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/menu/~slot.lua" beforeDir="false" afterPath="$PROJECT_DIR$/old/menu/~slot.lua" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/menu/~slots.lua" beforeDir="false" afterPath="$PROJECT_DIR$/old/menu/~slots.lua" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/menu/~tab_bar.lua" beforeDir="false" afterPath="$PROJECT_DIR$/old/menu/~tab_bar.lua" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/menu/~template.lua" beforeDir="false" afterPath="$PROJECT_DIR$/old/menu/~template.lua" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/old/~battle/animation_queue.lua" beforeDir="false" afterPath="$PROJECT_DIR$/older/~battle/animation_queue.lua" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/old/~battle/animations/consumable_applied.lua" beforeDir="false" afterPath="$PROJECT_DIR$/older/~battle/animations/consumable_applied.lua" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/old/~battle/animations/consumable_consumed.lua" beforeDir="false" afterPath="$PROJECT_DIR$/older/~battle/animations/consumable_consumed.lua" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/old/~battle/animations/enemy_appeared.lua" beforeDir="false" afterPath="$PROJECT_DIR$/older/~battle/animations/enemy_appeared.lua" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/old/~battle/animations/global_status_applied.lua" beforeDir="false" afterPath="$PROJECT_DIR$/older/~battle/animations/global_status_applied.lua" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/old/~battle/animations/global_status_gained.lua" beforeDir="false" afterPath="$PROJECT_DIR$/older/~battle/animations/global_status_gained.lua" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/old/~battle/animations/global_status_lost.lua" beforeDir="false" afterPath="$PROJECT_DIR$/older/~battle/animations/global_status_lost.lua" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/old/~battle/animations/helped_up.lua" beforeDir="false" afterPath="$PROJECT_DIR$/older/~battle/animations/helped_up.lua" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/old/~battle/animations/hp_gained.lua" beforeDir="false" afterPath="$PROJECT_DIR$/older/~battle/animations/hp_gained.lua" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/old/~battle/animations/hp_lost.lua" beforeDir="false" afterPath="$PROJECT_DIR$/older/~battle/animations/hp_lost.lua" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/old/~battle/animations/killed.lua" beforeDir="false" afterPath="$PROJECT_DIR$/older/~battle/animations/killed.lua" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/old/~battle/animations/knocked_out.lua" beforeDir="false" afterPath="$PROJECT_DIR$/older/~battle/animations/knocked_out.lua" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/old/~battle/animations/message.lua" beforeDir="false" afterPath="$PROJECT_DIR$/older/~battle/animations/message.lua" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/old/~battle/animations/move.lua" beforeDir="false" afterPath="$PROJECT_DIR$/older/~battle/animations/move.lua" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/old/~battle/animations/stance_changed.lua" beforeDir="false" afterPath="$PROJECT_DIR$/older/~battle/animations/stance_changed.lua" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/old/~battle/animations/status_applied.lua" beforeDir="false" afterPath="$PROJECT_DIR$/older/~battle/animations/status_applied.lua" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/old/~battle/animations/status_gained.lua" beforeDir="false" afterPath="$PROJECT_DIR$/older/~battle/animations/status_gained.lua" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/old/~battle/animations/status_lost.lua" beforeDir="false" afterPath="$PROJECT_DIR$/older/~battle/animations/status_lost.lua" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/old/~battle/animations/stunned.lua" beforeDir="false" afterPath="$PROJECT_DIR$/older/~battle/animations/stunned.lua" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/old/~battle/animations/switch.lua" beforeDir="false" afterPath="$PROJECT_DIR$/older/~battle/animations/switch.lua" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/old/~battle/animations/turn_end.lua" beforeDir="false" afterPath="$PROJECT_DIR$/older/~battle/animations/turn_end.lua" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/old/~battle/animations/turn_start.lua" beforeDir="false" afterPath="$PROJECT_DIR$/older/~battle/animations/turn_start.lua" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/old/~battle/backdrop.lua" beforeDir="false" afterPath="$PROJECT_DIR$/older/~battle/backdrop.lua" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/old/~battle/backgrounds/TEST_BACKGROUND.lua" beforeDir="false" afterPath="$PROJECT_DIR$/older/~battle/backgrounds/TEST_BACKGROUND.lua" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/old/~battle/battle_animation.lua" beforeDir="false" afterPath="$PROJECT_DIR$/older/~battle/battle_animation.lua" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/old/~battle/battle_animation_target.lua" beforeDir="false" afterPath="$PROJECT_DIR$/older/~battle/battle_animation_target.lua" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/old/~battle/battle_background.lua" beforeDir="false" afterPath="$PROJECT_DIR$/older/~battle/battle_background.lua" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/old/~battle/battle_config.lua" beforeDir="false" afterPath="$PROJECT_DIR$/older/~battle/battle_config.lua" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/old/~battle/battle_entity.lua" beforeDir="false" afterPath="$PROJECT_DIR$/older/~battle/battle_entity.lua" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/old/~battle/battle_log.lua" beforeDir="false" afterPath="$PROJECT_DIR$/older/~battle/battle_log.lua" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/old/~battle/battle_scene.lua" beforeDir="false" afterPath="$PROJECT_DIR$/older/~battle/battle_scene.lua" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/old/~battle/battle_state.lua" beforeDir="false" afterPath="$PROJECT_DIR$/older/~battle/battle_state.lua" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/old/~battle/battle_ui.lua" beforeDir="false" afterPath="$PROJECT_DIR$/older/~battle/battle_ui.lua" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/old/~battle/configs/battles/TEST_BATTLE.lua" beforeDir="false" afterPath="$PROJECT_DIR$/older/~battle/configs/battles/TEST_BATTLE.lua" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/old/~battle/configs/consumables/DEBUG_CONSUMABLE.lua" beforeDir="false" afterPath="$PROJECT_DIR$/older/~battle/configs/consumables/DEBUG_CONSUMABLE.lua" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/old/~battle/configs/docs.md" beforeDir="false" afterPath="$PROJECT_DIR$/older/~battle/configs/docs.md" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/old/~battle/configs/entities/BALL_WITH_FACE.lua" beforeDir="false" afterPath="$PROJECT_DIR$/older/~battle/configs/entities/BALL_WITH_FACE.lua" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/old/~battle/configs/entities/GAMBLER_MOLE.lua" beforeDir="false" afterPath="$PROJECT_DIR$/older/~battle/configs/entities/GAMBLER_MOLE.lua" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/old/~battle/configs/entities/SMALL_UFO.lua" beforeDir="false" afterPath="$PROJECT_DIR$/older/~battle/configs/entities/SMALL_UFO.lua" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/old/~battle/configs/entities/WALKING_SPROUT.lua" beforeDir="false" afterPath="$PROJECT_DIR$/older/~battle/configs/entities/WALKING_SPROUT.lua" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/old/~battle/configs/equips/DEBUG_EQUIP.lua" beforeDir="false" afterPath="$PROJECT_DIR$/older/~battle/configs/equips/DEBUG_EQUIP.lua" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/old/~battle/configs/global_status/DEBUG_GLOBAL_STATUS.lua" beforeDir="false" afterPath="$PROJECT_DIR$/older/~battle/configs/global_status/DEBUG_GLOBAL_STATUS.lua" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/old/~battle/configs/moves/TEST_MOVE.lua" beforeDir="false" afterPath="$PROJECT_DIR$/older/~battle/configs/moves/TEST_MOVE.lua" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/old/~battle/configs/stances/NEUTRAL.lua" beforeDir="false" afterPath="$PROJECT_DIR$/older/~battle/configs/stances/NEUTRAL.lua" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/old/~battle/configs/stances/TEST.lua" beforeDir="false" afterPath="$PROJECT_DIR$/older/~battle/configs/stances/TEST.lua" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/old/~battle/configs/stances/TEST_02.lua" beforeDir="false" afterPath="$PROJECT_DIR$/older/~battle/configs/stances/TEST_02.lua" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/old/~battle/configs/status/DEBUG_STATUS.lua" beforeDir="false" afterPath="$PROJECT_DIR$/older/~battle/configs/status/DEBUG_STATUS.lua" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/old/~battle/configs/status/ONE_TURN_STUN.lua" beforeDir="false" afterPath="$PROJECT_DIR$/older/~battle/configs/status/ONE_TURN_STUN.lua" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/old/~battle/configs/status/TEST.lua" beforeDir="false" afterPath="$PROJECT_DIR$/older/~battle/configs/status/TEST.lua" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/old/~battle/consumable.lua" beforeDir="false" afterPath="$PROJECT_DIR$/older/~battle/consumable.lua" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/old/~battle/consumable_interface.lua" beforeDir="false" afterPath="$PROJECT_DIR$/older/~battle/consumable_interface.lua" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/old/~battle/enemy_sprite.lua" beforeDir="false" afterPath="$PROJECT_DIR$/older/~battle/enemy_sprite.lua" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/old/~battle/entity_interface.lua" beforeDir="false" afterPath="$PROJECT_DIR$/older/~battle/entity_interface.lua" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/old/~battle/equip.lua" beforeDir="false" afterPath="$PROJECT_DIR$/older/~battle/equip.lua" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/old/~battle/equip_interface.lua" beforeDir="false" afterPath="$PROJECT_DIR$/older/~battle/equip_interface.lua" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/old/~battle/global_status.lua" beforeDir="false" afterPath="$PROJECT_DIR$/older/~battle/global_status.lua" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/old/~battle/global_status_interface.lua" beforeDir="false" afterPath="$PROJECT_DIR$/older/~battle/global_status_interface.lua" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/old/~battle/health_bar.lua" beforeDir="false" afterPath="$PROJECT_DIR$/older/~battle/health_bar.lua" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/old/~battle/interface.lua" beforeDir="false" afterPath="$PROJECT_DIR$/older/~battle/interface.lua" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/old/~battle/move.lua" beforeDir="false" afterPath="$PROJECT_DIR$/older/~battle/move.lua" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/old/~battle/move_interface.lua" beforeDir="false" afterPath="$PROJECT_DIR$/older/~battle/move_interface.lua" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/old/~battle/move_selection.lua" beforeDir="false" afterPath="$PROJECT_DIR$/older/~battle/move_selection.lua" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/old/~battle/party_info.lua" beforeDir="false" afterPath="$PROJECT_DIR$/older/~battle/party_info.lua" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/old/~battle/party_sprite.lua" beforeDir="false" afterPath="$PROJECT_DIR$/older/~battle/party_sprite.lua" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/old/~battle/priority_queue.lua" beforeDir="false" afterPath="$PROJECT_DIR$/older/~battle/priority_queue.lua" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/old/~battle/priority_queue_element.lua" beforeDir="false" afterPath="$PROJECT_DIR$/older/~battle/priority_queue_element.lua" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/old/~battle/simulation.lua" beforeDir="false" afterPath="$PROJECT_DIR$/older/~battle/simulation.lua" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/old/~battle/speed_value.lua" beforeDir="false" afterPath="$PROJECT_DIR$/older/~battle/speed_value.lua" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/old/~battle/stance.lua" beforeDir="false" afterPath="$PROJECT_DIR$/older/~battle/stance.lua" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/old/~battle/status.lua" beforeDir="false" afterPath="$PROJECT_DIR$/older/~battle/status.lua" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/old/~battle/status_bar.lua" beforeDir="false" afterPath="$PROJECT_DIR$/older/~battle/status_bar.lua" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/old/~battle/status_bar_element.lua" beforeDir="false" afterPath="$PROJECT_DIR$/older/~battle/status_bar_element.lua" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/old/~battle/status_interface.lua" beforeDir="false" afterPath="$PROJECT_DIR$/older/~battle/status_interface.lua" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/old/~battle/verbose_info_panel.lua" beforeDir="false" afterPath="$PROJECT_DIR$/older/~battle/verbose_info_panel.lua" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/old/~battle/verbose_info_panel/entity_page.lua" beforeDir="false" afterPath="$PROJECT_DIR$/older/~battle/verbose_info_panel/entity_page.lua" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/old/~battle/verbose_info_panel/move_page.lua" beforeDir="false" afterPath="$PROJECT_DIR$/older/~battle/verbose_info_panel/move_page.lua" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/old/~battle/verbose_info_panel/status_page.lua" beforeDir="false" afterPath="$PROJECT_DIR$/older/~battle/verbose_info_panel/status_page.lua" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/old/~battle/~battle_entity_interface.lua" beforeDir="false" afterPath="$PROJECT_DIR$/older/~battle/~battle_entity_interface.lua" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/old/~battle/~battle_log.lua" beforeDir="false" afterPath="$PROJECT_DIR$/older/~battle/~battle_log.lua" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/old/~battle/~priority_queue.lua" beforeDir="false" afterPath="$PROJECT_DIR$/older/~battle/~priority_queue.lua" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/old/~battle/~priority_queue_element.lua" beforeDir="false" afterPath="$PROJECT_DIR$/older/~battle/~priority_queue_element.lua" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/old/~battle/~simulation.lua" beforeDir="false" afterPath="$PROJECT_DIR$/older/~battle/~simulation.lua" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/old/~common/angle.lua" beforeDir="false" afterPath="$PROJECT_DIR$/older/~common/angle.lua" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/old/~common/animation.lua" beforeDir="false" afterPath="$PROJECT_DIR$/older/~common/animation.lua" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/old/~common/aspect_layout.lua" beforeDir="false" afterPath="$PROJECT_DIR$/older/~common/aspect_layout.lua" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/old/~common/audio.lua" beforeDir="false" afterPath="$PROJECT_DIR$/older/~common/audio.lua" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/old/~common/audio_playback.lua" beforeDir="false" afterPath="$PROJECT_DIR$/older/~common/audio_playback.lua" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/old/~common/benchmark.lua" beforeDir="false" afterPath="$PROJECT_DIR$/older/~common/benchmark.lua" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/old/~common/bezier_curve.lua" beforeDir="false" afterPath="$PROJECT_DIR$/older/~common/bezier_curve.lua" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/old/~common/bin_layout.lua" beforeDir="false" afterPath="$PROJECT_DIR$/older/~common/bin_layout.lua" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/old/~common/button.lua" beforeDir="false" afterPath="$PROJECT_DIR$/older/~common/button.lua" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/old/~common/collider.lua" beforeDir="false" afterPath="$PROJECT_DIR$/older/~common/collider.lua" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/old/~common/color.lua" beforeDir="false" afterPath="$PROJECT_DIR$/older/~common/color.lua" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/old/~common/common.lua" beforeDir="false" afterPath="$PROJECT_DIR$/older/~common/common.lua" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/old/~common/config.lua" beforeDir="false" afterPath="$PROJECT_DIR$/older/~common/config.lua" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/old/~common/direction.lua" beforeDir="false" afterPath="$PROJECT_DIR$/older/~common/direction.lua" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/old/~common/direction_indicator.lua" beforeDir="false" afterPath="$PROJECT_DIR$/older/~common/direction_indicator.lua" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/old/~common/drawable.lua" beforeDir="false" afterPath="$PROJECT_DIR$/older/~common/drawable.lua" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/old/~common/easement_functions.lua" beforeDir="false" afterPath="$PROJECT_DIR$/older/~common/easement_functions.lua" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/old/~common/emblem_layout.lua" beforeDir="false" afterPath="$PROJECT_DIR$/older/~common/emblem_layout.lua" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/old/~common/filesystem.lua" beforeDir="false" afterPath="$PROJECT_DIR$/old/common/filesystem.lua" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/old/~common/flow_layout.lua" beforeDir="false" afterPath="$PROJECT_DIR$/older/~common/flow_layout.lua" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/old/~common/font.lua" beforeDir="false" afterPath="$PROJECT_DIR$/older/~common/font.lua" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/old/~common/frame.lua" beforeDir="false" afterPath="$PROJECT_DIR$/older/~common/frame.lua" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/old/~common/geometry.lua" beforeDir="false" afterPath="$PROJECT_DIR$/older/~common/geometry.lua" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/old/~common/glyph.lua" beforeDir="false" afterPath="$PROJECT_DIR$/older/~common/glyph.lua" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/old/~common/gradient.lua" beforeDir="false" afterPath="$PROJECT_DIR$/older/~common/gradient.lua" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/old/~common/gradient_spacer.lua" beforeDir="false" afterPath="$PROJECT_DIR$/older/~common/gradient_spacer.lua" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/old/~common/graphics.lua" beforeDir="false" afterPath="$PROJECT_DIR$/older/~common/graphics.lua" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/old/~common/grid_layout.lua" beforeDir="false" afterPath="$PROJECT_DIR$/older/~common/grid_layout.lua" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/old/~common/image.lua" beforeDir="false" afterPath="$PROJECT_DIR$/old/common/image.lua" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/old/~common/image_display.lua" beforeDir="false" afterPath="$PROJECT_DIR$/older/~common/image_display.lua" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/old/~common/input_controller.lua" beforeDir="false" afterPath="$PROJECT_DIR$/older/~common/input_controller.lua" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/old/~common/input_handler.lua" beforeDir="false" afterPath="$PROJECT_DIR$/older/~common/input_handler.lua" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/old/~common/joint.lua" beforeDir="false" afterPath="$PROJECT_DIR$/older/~common/joint.lua" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/old/~common/keymap.lua" beforeDir="false" afterPath="$PROJECT_DIR$/older/~common/keymap.lua" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/old/~common/keymap_indicator.lua" beforeDir="false" afterPath="$PROJECT_DIR$/older/~common/keymap_indicator.lua" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/old/~common/label.lua" beforeDir="false" afterPath="$PROJECT_DIR$/older/~common/label.lua" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/old/~common/level_bar.lua" beforeDir="false" afterPath="$PROJECT_DIR$/older/~common/level_bar.lua" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/old/~common/list.lua" beforeDir="false" afterPath="$PROJECT_DIR$/older/~common/list.lua" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/old/~common/list_layout.lua" beforeDir="false" afterPath="$PROJECT_DIR$/older/~common/list_layout.lua" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/old/~common/list_view.lua" beforeDir="false" afterPath="$PROJECT_DIR$/older/~common/list_view.lua" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/old/~common/log.lua" beforeDir="false" afterPath="$PROJECT_DIR$/older/~common/log.lua" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/old/~common/matrix.lua" beforeDir="false" afterPath="$PROJECT_DIR$/older/~common/matrix.lua" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/old/~common/meta.lua" beforeDir="false" afterPath="$PROJECT_DIR$/older/~common/meta.lua" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/old/~common/monitored_audio_playback.lua" beforeDir="false" afterPath="$PROJECT_DIR$/older/~common/monitored_audio_playback.lua" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/old/~common/notch_bar.lua" beforeDir="false" afterPath="$PROJECT_DIR$/older/~common/notch_bar.lua" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/old/~common/notify.lua" beforeDir="false" afterPath="$PROJECT_DIR$/older/~common/notify.lua" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/old/~common/overlay_layout.lua" beforeDir="false" afterPath="$PROJECT_DIR$/older/~common/overlay_layout.lua" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/old/~common/palette.lua" beforeDir="false" afterPath="$PROJECT_DIR$/older/~common/palette.lua" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/old/~common/particle_emitter.lua" beforeDir="false" afterPath="$PROJECT_DIR$/older/~common/particle_emitter.lua" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/old/~common/physics_world.lua" beforeDir="false" afterPath="$PROJECT_DIR$/older/~common/physics_world.lua" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/old/~common/plot.lua" beforeDir="false" afterPath="$PROJECT_DIR$/older/~common/plot.lua" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/old/~common/profiler.lua" beforeDir="false" afterPath="$PROJECT_DIR$/older/~common/profiler.lua" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/old/~common/random.lua" beforeDir="false" afterPath="$PROJECT_DIR$/older/~common/random.lua" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/old/~common/render.lua" beforeDir="false" afterPath="$PROJECT_DIR$/older/~common/render.lua" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/old/~common/render_texture.lua" beforeDir="false" afterPath="$PROJECT_DIR$/older/~common/render_texture.lua" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/old/~common/reveal_layout.lua" beforeDir="false" afterPath="$PROJECT_DIR$/older/~common/reveal_layout.lua" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/old/~common/scale.lua" beforeDir="false" afterPath="$PROJECT_DIR$/older/~common/scale.lua" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/old/~common/scene.lua" beforeDir="false" afterPath="$PROJECT_DIR$/older/~common/scene.lua" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/old/~common/scrollbar.lua" beforeDir="false" afterPath="$PROJECT_DIR$/older/~common/scrollbar.lua" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/old/~common/selection_handler.lua" beforeDir="false" afterPath="$PROJECT_DIR$/older/~common/selection_handler.lua" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/old/~common/set.lua" beforeDir="false" afterPath="$PROJECT_DIR$/old/common/set.lua" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/old/~common/settings.lua" beforeDir="false" afterPath="$PROJECT_DIR$/older/~common/settings.lua" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/old/~common/shader.lua" beforeDir="false" afterPath="$PROJECT_DIR$/older/~common/shader.lua" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/old/~common/shader_functions.glsl" beforeDir="false" afterPath="$PROJECT_DIR$/older/~common/shader_functions.glsl" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/old/~common/shape.lua" beforeDir="false" afterPath="$PROJECT_DIR$/older/~common/shape.lua" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/old/~common/shapes/ellipse.lua" beforeDir="false" afterPath="$PROJECT_DIR$/older/~common/shapes/ellipse.lua" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/old/~common/shapes/polygon.lua" beforeDir="false" afterPath="$PROJECT_DIR$/older/~common/shapes/polygon.lua" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/old/~common/shapes/rectangle.lua" beforeDir="false" afterPath="$PROJECT_DIR$/old/common/shape_rectangle.lua" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/old/~common/signals.lua" beforeDir="false" afterPath="$PROJECT_DIR$/older/~common/signals.lua" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/old/~common/snapshot_layout.lua" beforeDir="false" afterPath="$PROJECT_DIR$/older/~common/snapshot_layout.lua" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/old/~common/sound_atlas.lua" beforeDir="false" afterPath="$PROJECT_DIR$/older/~common/sound_atlas.lua" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/old/~common/spacer.lua" beforeDir="false" afterPath="$PROJECT_DIR$/older/~common/spacer.lua" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/old/~common/sparse_matrix.lua" beforeDir="false" afterPath="$PROJECT_DIR$/older/~common/sparse_matrix.lua" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/old/~common/spin_button.lua" beforeDir="false" afterPath="$PROJECT_DIR$/older/~common/spin_button.lua" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/old/~common/spline.lua" beforeDir="false" afterPath="$PROJECT_DIR$/older/~common/spline.lua" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/old/~common/split_layout.lua" beforeDir="false" afterPath="$PROJECT_DIR$/older/~common/split_layout.lua" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/old/~common/sprite.lua" beforeDir="false" afterPath="$PROJECT_DIR$/older/~common/sprite.lua" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/old/~common/sprite_atlas.lua" beforeDir="false" afterPath="$PROJECT_DIR$/older/~common/sprite_atlas.lua" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/old/~common/sprite_frame.lua" beforeDir="false" afterPath="$PROJECT_DIR$/older/~common/sprite_frame.lua" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/old/~common/spritesheet.lua" beforeDir="false" afterPath="$PROJECT_DIR$/older/~common/spritesheet.lua" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/old/~common/state_queue.lua" beforeDir="false" afterPath="$PROJECT_DIR$/older/~common/state_queue.lua" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/old/~common/statistics.lua" beforeDir="false" afterPath="$PROJECT_DIR$/older/~common/statistics.lua" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/old/~common/swipe_layout.lua" beforeDir="false" afterPath="$PROJECT_DIR$/older/~common/swipe_layout.lua" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/old/~common/switch.lua" beforeDir="false" afterPath="$PROJECT_DIR$/older/~common/switch.lua" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/old/~common/tab_layout.lua" beforeDir="false" afterPath="$PROJECT_DIR$/older/~common/tab_layout.lua" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/old/~common/test.lua" beforeDir="false" afterPath="$PROJECT_DIR$/older/~common/test.lua" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/old/~common/texture.lua" beforeDir="false" afterPath="$PROJECT_DIR$/old/common/texture.lua" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/old/~common/thread_pool.lua" beforeDir="false" afterPath="$PROJECT_DIR$/older/~common/thread_pool.lua" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/old/~common/thread_pool_worker.lua" beforeDir="false" afterPath="$PROJECT_DIR$/older/~common/thread_pool_worker.lua" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/old/~common/time.lua" beforeDir="false" afterPath="$PROJECT_DIR$/old/common/time.lua" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/old/~common/tooltip_layout.lua" beforeDir="false" afterPath="$PROJECT_DIR$/older/~common/tooltip_layout.lua" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/old/~common/vector.lua" beforeDir="false" afterPath="$PROJECT_DIR$/older/~common/vector.lua" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/old/~common/vertex_shape.lua" beforeDir="false" afterPath="$PROJECT_DIR$/older/~common/vertex_shape.lua" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/old/~common/viewport.lua" beforeDir="false" afterPath="$PROJECT_DIR$/older/~common/viewport.lua" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/old/~common/wavelet_transform.lua" beforeDir="false" afterPath="$PROJECT_DIR$/older/~common/wavelet_transform.lua" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/old/~common/widget.lua" beforeDir="false" afterPath="$PROJECT_DIR$/older/~common/widget.lua" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/old/~common/window_layout.lua" beforeDir="false" afterPath="$PROJECT_DIR$/older/~common/window_layout.lua" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/old/~common/~animation_timer.lua" beforeDir="false" afterPath="$PROJECT_DIR$/older/~common/~animation_timer.lua" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/old/~common/~audio_processor.lua" beforeDir="false" afterPath="$PROJECT_DIR$/older/~common/~audio_processor.lua" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/old/~common/~fourier_transform.lua" beforeDir="false" afterPath="$PROJECT_DIR$/older/~common/~fourier_transform.lua" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/old/~common/~gamepad_controller.lua" beforeDir="false" afterPath="$PROJECT_DIR$/older/~common/~gamepad_controller.lua" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/old/~common/~input_controller.lua" beforeDir="false" afterPath="$PROJECT_DIR$/older/~common/~input_controller.lua" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/old/~common/~keyboard_controller.lua" beforeDir="false" afterPath="$PROJECT_DIR$/older/~common/~keyboard_controller.lua" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/old/~common/~mouse_controller.lua" beforeDir="false" afterPath="$PROJECT_DIR$/older/~common/~mouse_controller.lua" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/old/~common/~sprite.lua" beforeDir="false" afterPath="$PROJECT_DIR$/older/~common/~sprite.lua" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/old/~common/~thread.lua" beforeDir="false" afterPath="$PROJECT_DIR$/older/~common/~thread.lua" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/old/~common/~thread_worker.lua" beforeDir="false" afterPath="$PROJECT_DIR$/older/~common/~thread_worker.lua" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/old/~common/~~audio_processor.lua" beforeDir="false" afterPath="$PROJECT_DIR$/older/~common/~~audio_processor.lua" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/old/~include.lua" beforeDir="false" afterPath="$PROJECT_DIR$/older/~include.lua" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/old/~main.lua" beforeDir="false" afterPath="$PROJECT_DIR$/old/~main.lua" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/old/~overworld/camera.lua" beforeDir="false" afterPath="$PROJECT_DIR$/older/~overworld/camera.lua" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/old/~overworld/overworld_entity.lua" beforeDir="false" afterPath="$PROJECT_DIR$/older/~overworld/overworld_entity.lua" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/old/~overworld/overworld_scene.lua" beforeDir="false" afterPath="$PROJECT_DIR$/older/~overworld/overworld_scene.lua" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/old/~overworld/overworld_sprite.lua" beforeDir="false" afterPath="$PROJECT_DIR$/older/~overworld/overworld_sprite.lua" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/old/~overworld/player.lua" beforeDir="false" afterPath="$PROJECT_DIR$/older/~overworld/player.lua" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/old/~overworld/stage.lua" beforeDir="false" afterPath="$PROJECT_DIR$/older/~overworld/stage.lua" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/old/~overworld/tileset.lua" beforeDir="false" afterPath="$PROJECT_DIR$/older/~overworld/tileset.lua" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/old/~overworld/trigger.lua" beforeDir="false" afterPath="$PROJECT_DIR$/older/~overworld/trigger.lua" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/old/~overworld/~map.lua" beforeDir="false" afterPath="$PROJECT_DIR$/older/~overworld/~map.lua" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/old/~overworld/~player.lua" beforeDir="false" afterPath="$PROJECT_DIR$/older/~overworld/~player.lua" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/old/~overworld/~rain_effect.lua" beforeDir="false" afterPath="$PROJECT_DIR$/older/~overworld/~rain_effect.lua" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/old/~overworld/~snow_effect.lua" beforeDir="false" afterPath="$PROJECT_DIR$/older/~overworld/~snow_effect.lua" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/old/~overworld/~tileset.lua" beforeDir="false" afterPath="$PROJECT_DIR$/older/~overworld/~tileset.lua" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/overworld/player.lua" beforeDir="false" afterPath="$PROJECT_DIR$/old/overworld/player.lua" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/temp.cs" beforeDir="false" afterPath="$PROJECT_DIR$/old/temp.cs" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/temp.glsl" beforeDir="false" afterPath="$PROJECT_DIR$/old/temp.glsl" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/~main.lua" beforeDir="false" afterPath="$PROJECT_DIR$/older/~main.lua" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -803,10 +136,10 @@
   <component name="RecentsManager">
     <key name="CopyFile.RECENT_KEYS">
       <recent name="C:\Users\cleme\Workspace\rat_game\common" />
+      <recent name="C:\Users\cleme\Workspace\rat_game\assets\sprites" />
       <recent name="C:\Users\cleme\Workspace\rat_game\assets" />
       <recent name="C:\Users\cleme\Workspace\rat_game\assets\fonts" />
       <recent name="C:\Users\cleme\Workspace\rat_game\love" />
-      <recent name="C:\Users\cleme\Workspace\rat_game\assets\sprites" />
     </key>
     <key name="MoveFile.RECENT_KEYS">
       <recent name="C:\Users\cleme\Workspace\rat_game\old" />
@@ -1193,14 +526,6 @@
       <workItem from="1723236123036" duration="2113000" />
       <workItem from="1723243211205" duration="6751000" />
     </task>
-    <task id="LOCAL-00902" summary="added sdf meatball compute shader">
-      <option name="closed" value="true" />
-      <created>1722214830302</created>
-      <option name="number" value="00902" />
-      <option name="presentableId" value="LOCAL-00902" />
-      <option name="project" value="LOCAL" />
-      <updated>1722214830303</updated>
-    </task>
     <task id="LOCAL-00903" summary="hello world working">
       <option name="closed" value="true" />
       <created>1722216439105</created>
@@ -1585,7 +910,15 @@
       <option name="project" value="LOCAL" />
       <updated>1723248465026</updated>
     </task>
-    <option name="localTasksCounter" value="951" />
+    <task id="LOCAL-00951" summary="imported rewrite">
+      <option name="closed" value="true" />
+      <created>1723324060339</created>
+      <option name="number" value="00951" />
+      <option name="presentableId" value="LOCAL-00951" />
+      <option name="project" value="LOCAL" />
+      <updated>1723324060339</updated>
+    </task>
+    <option name="localTasksCounter" value="952" />
     <servers />
   </component>
   <component name="TypeScriptGeneratedFilesManager">
@@ -1634,7 +967,6 @@
     </option>
   </component>
   <component name="VcsManagerConfiguration">
-    <MESSAGE value="added a/x for page nodes" />
     <MESSAGE value="added message dialog" />
     <MESSAGE value="implemented template loading" />
     <MESSAGE value="finished message dialog" />
@@ -1659,7 +991,8 @@
     <MESSAGE value="stashing" />
     <MESSAGE value="stashing before refactoring for gamestate" />
     <MESSAGE value="refactored input controller for global state" />
-    <option name="LAST_COMMIT_MESSAGE" value="refactored input controller for global state" />
+    <MESSAGE value="imported rewrite" />
+    <option name="LAST_COMMIT_MESSAGE" value="imported rewrite" />
   </component>
   <component name="XDebuggerManager">
     <breakpoint-manager>

@@ -97,7 +97,20 @@ require "common.widget"
 require "common.font"
 require "common.glyph"
 require "common.label"
+require "common.frame"
+require "common.spacer"
+require "common.ordered_box"
+require "common.labeled_sprite"
+require "common.scrollbar"
+require "common.control_indicator"
+require "common.particle_emitter"
+require "common.message_dialog"
+require "common.keyboard"
 
+require "common.physics_world"
+require "common.collider"
+require "common.rope"
+require "common.cloth"
 
 
 
