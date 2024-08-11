@@ -59,6 +59,7 @@ end, {
     portrait_sprite_index = nil,
 
     name = "",
+    name_suffix = "",
     description = "(no description)",
 })
 
@@ -100,31 +101,24 @@ function bt.Entity:realize()
     assert(self.n_equip_slots < POSITIVE_INFINITY)
 
     STATE:add_entity(self)
-    local multiplicity = STATE:entity_get_multiplicity(self)
-    self.id = self.id .. self:_multiplicity_to_id_suffix(multiplicity)
-    self.name = self.name .. self:_multiplicity_to_name_suffix(multiplicity)
-
     meta.set_is_mutable(self, false)
 end
 
 --- @brief
-function bt.Entity:_multiplicity_to_id_suffix(n)
-    if n == 0 then
-        return ""
-    else
-        local out = "_"
-        if n < 10 then out = out .. "0" end
-        return out .. tostring(n)
-    end
-end
+function bt.Entity:update_id_from_multiplicity(n)
+    local id_suffix = ""
+    local name_suffix = ""
 
---- @brief
-function bt.Entity:_multiplicity_to_name_suffix(n)
-    if n == 0 then
-        return ""
-    else
-        return " " .. utf8.char(n + 0x03B1 - 1) -- lowercase greek letters
+    if n > 1 then
+        name_suffix = " " .. utf8.char(n + 0x03B1 - 1) -- lowercase greek letters
+
+        id_suffix = "_"
+        if n < 10 then id_suffix = id_suffix .. "0" end
+        return id_suffix .. tostring(n)
     end
+
+    self.id = self.config_id .. id_suffix
+    self.name_suffix = name_suffix
 end
 
 --- @brief
@@ -139,7 +133,7 @@ end
 
 --- @brief
 function bt.Entity:get_name()
-    return self.name
+    return self.name .. self.name_suffix
 end
 
 --- @brief

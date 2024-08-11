@@ -37,6 +37,7 @@ rt.GameState = meta.new_type("GameState", function()
         n_enemies = 0,
         n_allies = 0,
         entity_id_to_multiplicity = {},
+        entity_id_to_index = {},
         entities = {},
 
         shared_moves = {},

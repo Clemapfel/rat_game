@@ -1,9 +1,11 @@
 --[[
     entity_id_to_multiplicity[entity_id] = count,
+    entity_id_to_index[entity_id] = index,
     n_allies = 0
     n_enemies = 0
 
-    entities[entity_id] = {
+    entities = {
+        id      -- EntityID
         hp      -- Unsigned
         index   -- Unsigned
         
@@ -40,14 +42,6 @@ function rt.GameState:add_entity(entity)
 
     local state = self._state
 
-    local id = entity:get_config_id()
-    local current_multiplicity = state.entity_id_to_multiplicity[id]
-    if current_multiplicity == nil then
-        state.entity_id_to_multiplicity[id] = 1
-    else
-        state.entity_id_to_multiplicity[id] = current_multiplicity + 1
-    end
-
     if entity:get_is_enemy() then
         state.n_enemies = state.n_enemies + 1
     else
@@ -70,11 +64,15 @@ function rt.GameState:add_entity(entity)
             id = "",
             n_used = 0
         }
+    end
 
+    for i = 1, n_equips do
         to_add.equips[i] = {
             id = ""
         }
+    end
 
+    for i = 1, n_consumables do
         to_add.consumables[i] = {
             id = "",
             n_used = 0
@@ -87,9 +85,19 @@ function rt.GameState:add_entity(entity)
         to_add.index = state.n_allies
     end
 
-    to_add.hp = entity:get_hp_base()
+    table.insert(state.entities, to_add)
 
-    state.entities[entity:get_id()] = to_add
+    local config_id = entity:get_config_id()
+    local current_multiplicity = state.entity_id_to_multiplicity[config_id]
+    if state.entity_id_to_multiplicity[config_id] == nil then
+        current_multiplicity = 1
+    end
+    current_multiplicity = current_multiplicity + 1
+    state.entity_id_to_multiplicity[config_id] = current_multiplicity
+
+    entity:update_id_from_multiplicity(current_multiplicity)
+    state.entity_id_to_index[entity:get_id()] = sizeof(state.entities)
+    to_add.hp = entity:get_hp_base()
 end
 
 --- @brief
@@ -125,9 +133,14 @@ function rt.GameState:entity_get_multiplicity(entity)
 end
 
 --- @brief
+function rt.GameState:_get_entity_entry(entity)
+    return self._state.entities[self._state.entity_id_to_index[entity:get_id()]]
+end
+
+--- @brief
 function rt.GameState:entity_get_hp(entity)
     meta.assert_isa(entity, bt.Entity)
-    local entry = self._state.entities[entity]
+    local entry = self:_get_entity_entry(entity)
     if entry == nil then
         rt.error("In rt.GameState:entity_get_hp: entity `" .. entity:get_id() .. "` is not part of state")
         return 0
@@ -139,9 +152,9 @@ end
 --- @brief
 function rt.GameState:entity_set_hp(entity, new_hp)
     meta.assert_isa(entity, bt.Entity)
-    meta.assert_number(entity, new_hp)
+    meta.assert_number(new_hp)
     
-    local entry = self._state.entities[entity]
+    local entry = self:_get_entity_entry(entity)
     if entry == nil then
         rt.error("In rt.GameState:entity_set_hp: entity `" .. entity:get_id() .. "` is not part of state")
         return
@@ -168,19 +181,42 @@ for which in range("move", "equip", "consumable") do
     rt.GameState["entity_list_" .. which .. "s"] = function(self, entity)
         meta.assert_isa(entity, bt.Entity)
 
-        local entry = self._state.entities[entity:get_id()]
+        local entry = self:_get_entity_entry(entity)
         if entry == nil then 
-            rt.error("In rt.GameState:entity_list_" .. which ..": entity `" .. entity:get_id() .. "` is not part of state")
+            rt.error("In rt.GameState:entity_list_" .. which .."s: entity `" .. entity:get_id() .. "` is not part of state")
             return {} 
         end
 
         local out = {}
         local n_slots = entity["get_n_" .. which .. "_slots"](entity)
-        for i = 1, n_slots do
-            local id = entry[which .. "s"].id
-            table.insert(out, type(id))
+        for slot_i = 1, n_slots do
+            local id = entry[which .. "s"][slot_i].id
+            if id ~= "" then
+                table.insert(out, type(id))
+            end
         end
         return out
+    end
+
+    --- @brief entity_list_move_slots, entity_list_equip_slots, entity_list_consumable_slots
+    rt.GameState["entity_list_" .. which .. "_slots"] = function(self, entity)
+        meta.assert_isa(entity, bt.Entity)
+
+        local entry = self:_get_entity_entry(entity)
+        if entry == nil then
+            rt.error("In rt.GameState:entity_list_" .. which .."s: entity `" .. entity:get_id() .. "` is not part of state")
+            return {}
+        end
+
+        local out = {}
+        local n_slots = entity["get_n_" .. which .. "_slots"](entity)
+        for slot_i = 1, n_slots do
+            local id = entry[which .. "s"][slot_i].id
+            if id ~= "" then
+                out[slot_i] = type(id)
+            end
+        end
+        return out, n_slots
     end
 
     --- @brief entity_get_move, entity_get_equip, entity_get_consumable
@@ -193,13 +229,18 @@ for which in range("move", "equip", "consumable") do
             return
         end
 
-        local entry = self._state.entities[entity:get_id()]
+        local entry = self:_get_entity_entry(entity)
         if entry == nil then
             rt.error("In rt.GameState:entity_get_" .. which ..": entity `" .. entity:get_id() .. "` is not part of state")
             return nil
         end
 
-        return type(entry[which .. "s"][slot_i].id)
+        local id = entry[which .. "s"][slot_i].id
+        if id == "" then
+            return nil
+        else
+            return type(id)
+        end
     end
 
     --- @brief entity_add_move, entity_add_equip, entity_add_consumable
@@ -208,12 +249,12 @@ for which in range("move", "equip", "consumable") do
         meta.assert_isa(object, type)
 
         local n_slots = entity["get_n_" .. which .. "_slots"](entity)
-        if slot_i <= 0 or math.fmod(slot_i, 1) ~= 0 or slot_i > n_slots() then
+        if slot_i <= 0 or math.fmod(slot_i, 1) ~= 0 or slot_i > n_slots then
             rt.error("In rt.GameState:entity_add_" .. which .. ": slot index `" .. slot_i .. "` is out of range for an entity with `" .. n_slots .. "` slots")
             return
         end
 
-        local entry = self._state.entities[entity:get_id()]
+        local entry = self:_get_entity_entry(entity)
         if entry == nil then
             rt.error("In rt.GameState:entity_add_" .. which ..": entity `" .. entity:get_id() .. "` is not part of state")
             return
@@ -237,7 +278,7 @@ for which in range("move", "equip", "consumable") do
             return
         end
 
-        local entry = self._state.entities[entity:get_id()]
+        local entry = self:_get_entity_entry(entity)
         if entry == nil then
             rt.error("In rt.GameState:entity_remove_" .. which ..": entity `" .. entity:get_id() .. "` is not part of state")
             return 
@@ -261,7 +302,7 @@ for which in range("move", "equip", "consumable") do
                 return
             end
 
-            local entry = self._state.entities[entity:get_id()]
+            local entry = self:_get_entity_entry(entity)
             if entry == nil then
                 rt.error("In rt.GameState:entity_" .. which .."_get_n_used: entity `" .. entity:get_id() .. "` is not part of state")
                 return 0
@@ -280,7 +321,7 @@ for which in range("move", "equip", "consumable") do
                 return
             end
 
-            local entry = self._state.entities[entity:get_id()]
+            local entry = self:_get_entity_entry(entity)
             if entry == nil then
                 rt.error("In rt.GameState:entity_" .. which .."_increase_n_used: entity `" .. entity:get_id() .. "` is not part of state")
                 return 
@@ -389,6 +430,7 @@ function rt.GameState:initialize_debug_party()
 
     local entities = {
         "MC",
+        "MC",
         "PROF",
         "GIRL",
         "RAT"
@@ -410,16 +452,16 @@ function rt.GameState:initialize_debug_party()
 
         for slot_i = 1, entity:get_n_equip_slots() do
             if rt.random.toss_coin(0.8) then
-                self:entity_add_equip(entity, slot_i, rt.random(1, #equips))
+                self:entity_add_equip(entity, slot_i, bt.Equip(equips[rt.random.integer(1, #equips)]))
             end
         end
 
         for slot_i = 1, entity:get_n_consumable_slots() do
             if rt.random.toss_coin(0.8) then
-                self:entity_add_consumable(entity, slot_i, rt.random(1, #consumables))
+                self:entity_add_consumable(entity, slot_i, bt.Consumable(consumables[rt.random.integer(1, #consumables)]))
             end
         end
 
-        self:entity_set_hp(entity:get_hp_base())
+        self:entity_set_hp(entity, entity:get_hp_base())
     end
 end
