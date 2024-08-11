@@ -22,12 +22,12 @@ bt.Entity = meta.new_type("BattleEntity", function(id)
     meta.assert_string(id)
     local path = rt.settings.battle.entity.config_path .. "/" .. id .. ".lua"
     local out = meta.new(bt.Entity, {
-        id = id,
         _path = path,
         _config_id = id,
         _is_realized = false,
     })
 
+    out.id = id
     out:realize()
     meta.set_is_mutable(out, false)
     return out
@@ -57,6 +57,9 @@ end, {
 
     portrait_sprite_id = nil,
     portrait_sprite_index = nil,
+
+    id = "",
+    id_suffix = "",
 
     name = "",
     name_suffix = "",
@@ -100,7 +103,6 @@ function bt.Entity:realize()
     assert(self.n_equip_slots < POSITIVE_INFINITY)
     assert(self.n_equip_slots < POSITIVE_INFINITY)
 
-    STATE:add_entity(self)
     meta.set_is_mutable(self, false)
 end
 
@@ -114,16 +116,18 @@ function bt.Entity:update_id_from_multiplicity(n)
 
         id_suffix = "_"
         if n < 10 then id_suffix = id_suffix .. "0" end
-        return id_suffix .. tostring(n)
+        id_suffix = id_suffix .. tostring(n)
     end
 
-    self.id = self.config_id .. id_suffix
+    meta.set_is_mutable(self, true)
+    self.id_suffix = id_suffix
     self.name_suffix = name_suffix
+    meta.set_is_mutable(self, false)
 end
 
 --- @brief
 function bt.Entity:get_id()
-    return self.id
+    return self.id .. self.id_suffix
 end
 
 --- @brief

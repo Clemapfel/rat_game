@@ -46,7 +46,8 @@ rt.GameState = meta.new_type("GameState", function()
     }
 
     local out = meta.new(rt.GameState, {
-        _state = state
+        _state = state,
+        _entity_index_to_entity = {}
     })
 
     out:load_input_mapping()

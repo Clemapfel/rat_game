@@ -78,8 +78,6 @@ function bt.Equip:realize()
     rt.load_config(self._path, self, template)
     self._is_realized = true
     meta.set_is_mutable(self, false)
-
-    dbg("TODO: see also by parsing config")
 end
 
 --- @brief

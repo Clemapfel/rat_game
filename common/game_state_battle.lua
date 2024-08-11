@@ -22,6 +22,10 @@
             id
             n_used
         }
+
+        statuses[status_id] = {
+            n_turns_elapsed
+        }
     }
 
     shared_moves[move_id] = {
@@ -54,6 +58,7 @@ function rt.GameState:add_entity(entity)
     local to_add = {
         index = -1,
         hp = -1,
+        id = "",
         moves = {},
         equips = {},
         consumables = {}
@@ -90,14 +95,18 @@ function rt.GameState:add_entity(entity)
     local config_id = entity:get_config_id()
     local current_multiplicity = state.entity_id_to_multiplicity[config_id]
     if state.entity_id_to_multiplicity[config_id] == nil then
-        current_multiplicity = 1
+        current_multiplicity = 0
     end
     current_multiplicity = current_multiplicity + 1
     state.entity_id_to_multiplicity[config_id] = current_multiplicity
 
     entity:update_id_from_multiplicity(current_multiplicity)
-    state.entity_id_to_index[entity:get_id()] = sizeof(state.entities)
+    local count = sizeof(state.entities)
+    state.entity_id_to_index[entity:get_id()] = count
     to_add.hp = entity:get_hp_base()
+    to_add.id = entity:get_id()
+
+    self._entity_index_to_entity[count] = entity
 end
 
 --- @brief
@@ -116,8 +125,17 @@ function rt.GameState:remove_entity(entity)
         state.n_allies = state.n_allies - 1
     end
 
-    self.entities[entity:get_id()] = nil
+    state.entities[entity:get_id()] = nil
     -- do not reset multiplicity
+end
+
+--- @brief
+function rt.GameState:list_entities()
+    local out = {}
+    for i, entity in ipairs(self._entity_index_to_entity) do
+        table.insert(out, entity)
+    end
+    return out
 end
 
 --- @brief
@@ -331,14 +349,24 @@ for which in range("move", "equip", "consumable") do
     end
 
     --- @brief list_shared_moves, list_shared_equips, list_shared_consumables
-    --- @return Table<bt.Move, Unsigned>, Table<bt.Equip, Unsigned>, Table<bt.Consumable, Unsigned>
     rt.GameState["list_shared_" .. which .. "s"] = function(self)
         local out = {}
         local entries = self._state["shared_" .. which .. "s"]
         for id, entry in pairs(entries) do
-            out[type(id)] = entry.count
+            table.insert(out, type(id))
         end
         return out
+    end
+
+    --- @brief get_shared_move_count, get_shared_equip_count, get_shared_consumable_count
+    rt.GameState["get_shared_" .. which .. "_count"] = function(self, object)
+        meta.assert_isa(object, type)
+        local item = self._state["shared_" .. which .. "s"]
+        if item == nil then
+            return item[object:get_id()]
+        else
+            return 0
+        end
     end
 
     --- @brief add_shared_move, add_shared_equip, add_shared_consumable
@@ -386,20 +414,80 @@ for which in range("move", "equip", "consumable") do
 end
 
 --- @brief
-function rt.GameState:entity_list_statuses(entity)
-    meta.assert_isa(entity, bt.Entity)
-end
-
---- @brief
 function rt.GameState:entity_add_status(entity, status)
     meta.assert_isa(entity, bt.Entity)
     meta.assert_isa(status, bt.Status)
+
+    local entry = self:_get_entity_entry(entity)
+    if entry == nil then
+        rt.error("In rt.GameState:entity_add_status: entity `" .. entity:get_id() .. "` is not part of state")
+        return
+    end
+
+    entry.statuses[status:get_id()] = {
+        n_turns_elapsed = 0
+    }
+end
+
+--- @brief
+--- @return Table<bt.Status>
+function rt.GameState:entity_list_statuses(entity)
+    meta.assert_isa(entity, bt.Entity)
+
+    local entry = self:_get_entity_entry(entity)
+    if entry == nil then
+        rt.error("In rt.GameState:entity_list_statuses: entity `" .. entity:get_id() .. "` is not part of state")
+        return {}
+    end
+
+    local out = {}
+    for id, _ in pairs(entry.statuses) do
+        table.insert(out, bt.Status(id))
+    end
+    return out
+end
+
+--- @brief
+function rt.GameState:entity_get_status_n_turns_elapsed(entity, status)
+    meta.assert_isa(entity, bt.Entity)
+    meta.assert_isa(status, bt.Status)
+    local entry = self:_get_entity_entry(entity)
+    if entry == nil then
+        rt.error("In rt.GameState:entity_get_status_n_turns_elapsed: entity `" .. entity:get_id() .. "` is not part of state")
+        return 0
+    end
+
+    local item = entry.statuses[status:get_id()]
+    if item == nil then return 0 end
+    return item.n_turns_elapsed
+end
+
+--- @brief
+function rt.GameState:entity_has_status(entity, status)
+    meta.assert_isa(entity, bt.Entity)
+    meta.assert_isa(status, bt.Status)
+
+    local entry = self:_get_entity_entry(entity)
+    if entry == nil then
+        rt.error("In rt.GameState:entity_has_status: entity `" .. entity:get_id() .. "` is not part of state")
+        return false
+    end
+
+    return entry.statuses[status:get_id()] ~= nil
 end
 
 --- @brief
 function rt.GameState:entity_remove_status(entity, status)
     meta.assert_isa(entity, bt.Entity)
     meta.assert_isa(status, bt.Status)
+
+    local entry = self:_get_entity_entry(entity)
+    if entry == nil then
+        rt.error("In rt.GameState:entity_remove_status: entity `" .. entity:get_id() .. "` is not part of state")
+        return
+    end
+
+    entry.statuses[status.get_id()] = nil
 end
 
 --- @brief
@@ -443,7 +531,7 @@ function rt.GameState:initialize_debug_party()
         local possible_moves = rt.random.shuffle({table.unpack(moves)})
         local move_i = 1
         for slot_i = 1, entity:get_n_move_slots() do
-            if rt.random.toss_coin(0.5) then
+            if rt.random.toss_coin(0.8) then
                 self:entity_add_move(entity, slot_i, bt.Move(possible_moves[move_i]))
                 move_i = move_i + 1
                 if move_i > #moves then break end
@@ -465,3 +553,5 @@ function rt.GameState:initialize_debug_party()
         self:entity_set_hp(entity, entity:get_hp_base())
     end
 end
+
+
