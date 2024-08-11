@@ -215,6 +215,20 @@ function meta.assert_number(x, ...)
     end
 end
 
+--- @brief
+function meta.assert_unsigned(...)
+    for number in range(...) do
+        meta._assert_aux(meta.is_number(x) and x > 0 and math.fmod(x, 1) == 0, x, "unsigned")
+    end
+end
+
+--- @brief
+function meta.assert_signed(...)
+    for number in range(...) do
+        meta._assert_aux(meta.is_number(x) and math.fmod(x, 1) == 0, x, "signed")
+    end
+end
+
 --- @brief throw if object is not nil
 --- @param x any
 function meta.assert_nil(x, ...)

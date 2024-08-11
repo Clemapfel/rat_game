@@ -32,6 +32,16 @@ rt.GameState = meta.new_type("GameState", function()
             end
             return out
         end)(),
+
+        -- battle
+        n_enemies = 0,
+        n_allies = 0,
+        entity_id_to_multiplicity = {},
+        entities = {},
+
+        shared_moves = {},
+        shared_equips = {},
+        shared_consumables = {}
     }
 
     local out = meta.new(rt.GameState, {
@@ -323,11 +333,4 @@ function rt.GameState:run()
 
         if love.timer then love.timer.sleep(0.001) end -- limit max tick rate of while true
     end
-end
-
---- @brief
---- @param file String
---- @param sanitize Boolean
-function rt.GameState:load_from_save_file(file, sanitize)
-    if sanitize == nil then sanitize = true end
 end

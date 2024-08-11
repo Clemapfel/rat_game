@@ -14,15 +14,6 @@ bt.AILevel = meta.new_enum({
     LEVEL_2 = 2
 })
 
-bt.EquipType = meta.new_enum({
-    TRINKET = "TRINKET",
-    MALE_CLOTHING = "MALE_CLOTHING",
-    FEMALE_CLOTHING = "FEMALE_CLOTHING",
-    UNISEX_CLOTHING = "UNISEX_CLOTHING",
-    WEAPON = "MELEE_WEAPON",
-    UNKNOWN = "UNKNOWN"
-})
-
 --- @class bt.Entity
 bt.Entity = meta.new_type("BattleEntity", function(id)
     meta.assert_string(id)

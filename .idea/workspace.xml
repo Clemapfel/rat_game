@@ -22,29 +22,45 @@
     </configurations>
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="7fa9ba1b-2cff-4ecc-86fb-59ab2fa76ee1" name="Changes" comment="imported rewrite">
-      <change afterPath="$PROJECT_DIR$/assets/sprites/controller_buttons.lua" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/assets/sprites/controller_buttons.png" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/assets/sprites/controller_buttons.pxo" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/common/cloth.lua" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/common/collider.lua" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/common/control_indicator.lua" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/common/direction_indicator.lua" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/common/frame.lua" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/common/keyboard.lua" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/common/labeled_sprite.lua" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/common/message_dialog.lua" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/common/particle_emitter.lua" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/common/physics_world.lua" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/common/rope.lua" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/common/scrollbar.lua" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/common/spacer.lua" afterDir="false" />
+    <list default="true" id="7fa9ba1b-2cff-4ecc-86fb-59ab2fa76ee1" name="Changes" comment="imported">
+      <change afterPath="$PROJECT_DIR$/assets/configs/consumables/DEBUG_CONSUMABLE.lua" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/assets/configs/consumables/ONE_CHERRY.lua" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/assets/configs/consumables/TWO_CHERRY.lua" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/assets/configs/entities/BALL_WITH_FACE.lua" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/assets/configs/entities/GAMBLER_MOLE.lua" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/assets/configs/entities/GIRL.lua" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/assets/configs/entities/MC.lua" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/assets/configs/entities/PROF.lua" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/assets/configs/entities/RAT.lua" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/assets/configs/entities/SMALL_UFO.lua" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/assets/configs/entities/WALKING_SPROUT.lua" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/assets/configs/equips/DEBUG_CLOTHING.lua" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/assets/configs/equips/DEBUG_EQUIP.lua" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/assets/configs/equips/DEBUG_FEMALE_CLOTHING.lua" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/assets/configs/equips/DEBUG_MALE_CLOTHING.lua" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/assets/configs/equips/DEBUG_TRINKET.lua" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/assets/configs/equips/DEBUG_WEAPON.lua" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/assets/configs/moves/DEBUG_MOVE.lua" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/assets/configs/moves/INSPECT.lua" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/assets/configs/moves/PROTECT.lua" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/assets/configs/moves/STRUGGLE.lua" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/assets/configs/moves/SURF.lua" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/assets/configs/moves/WISH.lua" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/assets/configs/statuses/DEBUG_STATUS.lua" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/battle/consumable.lua" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/battle/entity.lua" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/battle/equip.lua" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/battle/move.lua" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/battle/status.lua" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/common/config.lua" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/common/game_state_battle.lua" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/common/game_state.lua" beforeDir="false" afterPath="$PROJECT_DIR$/common/game_state.lua" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/common/sprite.lua" beforeDir="false" afterPath="$PROJECT_DIR$/common/sprite.lua" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/debug_savefile.lua" beforeDir="false" afterPath="$PROJECT_DIR$/debug_savefile.lua" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/common/meta.lua" beforeDir="false" afterPath="$PROJECT_DIR$/common/meta.lua" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/include.lua" beforeDir="false" afterPath="$PROJECT_DIR$/include.lua" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/main.lua" beforeDir="false" afterPath="$PROJECT_DIR$/main.lua" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/old/battle/entity.lua" beforeDir="false" afterPath="$PROJECT_DIR$/old/battle/entity.lua" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/old/common/config.lua" beforeDir="false" afterPath="$PROJECT_DIR$/old/common/config.lua" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -120,7 +136,7 @@
     "deletionFromPopupRequiresConfirmation": "false",
     "git-widget-placeholder": "main",
     "ignore.virus.scanning.warn.message": "true",
-    "last_opened_file_path": "C:/Users/cleme/Workspace/rat_game/common",
+    "last_opened_file_path": "C:/Users/cleme/Workspace/rat_game/assets",
     "node.js.detected.package.eslint": "true",
     "node.js.detected.package.tslint": "true",
     "node.js.selected.package.eslint": "(autodetect)",
@@ -135,18 +151,18 @@
   </component>
   <component name="RecentsManager">
     <key name="CopyFile.RECENT_KEYS">
+      <recent name="C:\Users\cleme\Workspace\rat_game\assets" />
       <recent name="C:\Users\cleme\Workspace\rat_game\common" />
       <recent name="C:\Users\cleme\Workspace\rat_game\assets\sprites" />
-      <recent name="C:\Users\cleme\Workspace\rat_game\assets" />
       <recent name="C:\Users\cleme\Workspace\rat_game\assets\fonts" />
       <recent name="C:\Users\cleme\Workspace\rat_game\love" />
     </key>
     <key name="MoveFile.RECENT_KEYS">
+      <recent name="C:\Users\cleme\Workspace\rat_game\assets\configs" />
       <recent name="C:\Users\cleme\Workspace\rat_game\old" />
       <recent name="C:\Users\cleme\Workspace\rat_game" />
       <recent name="C:\Users\cleme\Workspace\rat_game\love" />
       <recent name="C:\Users\cleme\Workspace\rat_game\libs\linux\fftw3" />
-      <recent name="C:\Users\cleme\Workspace\rat_game\libs\linux\tinyspline" />
     </key>
   </component>
   <component name="RunManager" selected="Lua Application.main">
@@ -525,14 +541,6 @@
       <workItem from="1723069788250" duration="29090000" />
       <workItem from="1723236123036" duration="2113000" />
       <workItem from="1723243211205" duration="6751000" />
-    </task>
-    <task id="LOCAL-00903" summary="hello world working">
-      <option name="closed" value="true" />
-      <created>1722216439105</created>
-      <option name="number" value="00903" />
-      <option name="presentableId" value="LOCAL-00903" />
-      <option name="project" value="LOCAL" />
-      <updated>1722216439106</updated>
     </task>
     <task id="LOCAL-00904" summary="stashing sdf">
       <option name="closed" value="true" />
@@ -918,7 +926,15 @@
       <option name="project" value="LOCAL" />
       <updated>1723324060339</updated>
     </task>
-    <option name="localTasksCounter" value="952" />
+    <task id="LOCAL-00952" summary="imported">
+      <option name="closed" value="true" />
+      <created>1723325834031</created>
+      <option name="number" value="00952" />
+      <option name="presentableId" value="LOCAL-00952" />
+      <option name="project" value="LOCAL" />
+      <updated>1723325834031</updated>
+    </task>
+    <option name="localTasksCounter" value="953" />
     <servers />
   </component>
   <component name="TypeScriptGeneratedFilesManager">
@@ -967,7 +983,6 @@
     </option>
   </component>
   <component name="VcsManagerConfiguration">
-    <MESSAGE value="added message dialog" />
     <MESSAGE value="implemented template loading" />
     <MESSAGE value="finished message dialog" />
     <MESSAGE value="stashing message dialog" />
@@ -992,7 +1007,8 @@
     <MESSAGE value="stashing before refactoring for gamestate" />
     <MESSAGE value="refactored input controller for global state" />
     <MESSAGE value="imported rewrite" />
-    <option name="LAST_COMMIT_MESSAGE" value="imported rewrite" />
+    <MESSAGE value="imported" />
+    <option name="LAST_COMMIT_MESSAGE" value="imported" />
   </component>
   <component name="XDebuggerManager">
     <breakpoint-manager>

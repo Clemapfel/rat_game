@@ -68,6 +68,7 @@ require "common.signal_emitter"
 
 require "common.filesystem"
 require "common.save_file_handler"
+require "common.config"
 
 require "common.geometry"
 require "common.random"
@@ -99,7 +100,6 @@ require "common.glyph"
 require "common.label"
 require "common.frame"
 require "common.spacer"
-require "common.ordered_box"
 require "common.labeled_sprite"
 require "common.scrollbar"
 require "common.control_indicator"
@@ -112,5 +112,14 @@ require "common.collider"
 require "common.rope"
 require "common.cloth"
 
+-- battle
+require "battle.move"
+require "battle.equip"
+require "battle.consumable"
+require "battle.status"
+require "battle.entity"
 
+-- state
+require "common.game_state"
+require "common.game_state_battle"
 
