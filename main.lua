@@ -2,10 +2,14 @@ require "include"
 STATE = rt.GameState()
 STATE:initialize_debug_party()
 
+cloth = rt.Cloth(500, 500, 20, 20)
+cloth:realize()
+local texture = rt.Texture("assets/why.png")
+--cloth._mesh:setTexture(texture._native)
+
 for e in values(STATE:list_entities()) do
     dbg(e:get_id())
 end
-
 
 love.load = function()
     gradient = rt.VertexRectangle(0, 0, rt.graphics.get_width(), rt.graphics.get_height())
@@ -16,21 +20,17 @@ love.load = function()
 end
 
 love.update = function(delta)
+    cloth:update(delta, 15)
 end
 
 love.draw = function()
-    gradient:draw()
+    love.graphics.setColor(1, 1, 1, 1)
+    love.graphics.setColor(0, 0, 0, 1)
+    love.graphics.rectangle("fill", 0, 0, rt.graphics.get_width(), rt.graphics.get_height())
 
-    love.graphics.setColor(0, 1, 0, 1)
-    local x, y = love.mouse.getPosition()
-    love.graphics.circle("fill", x, y, 150, 150)
-
-   -- love.graphics.setBlendState("add", "max", "srcalpha", "srcalpha", "oneminussrcalpha", "oneminussrcalpha")
-    rt.graphics.set_blend_mode(rt.BlendMode.NORMAL, rt.BlendMode.MAX)
-    love.graphics.setColor(1, 0, 1, 0.25)
-    love.graphics.circle("fill", 300, 300, 200, 200)
-    love.graphics.setColor(0, 1, 1, 0.33)
-    love.graphics.circle("fill", 300 + 100, 300, 200, 200)
+    --love.graphics.translate(200, 50)
+    cloth:draw()
+    --love.graphics.translate(-200, -50)
 end
 
 love.resize = function()
