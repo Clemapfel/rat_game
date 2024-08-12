@@ -200,7 +200,7 @@ function mn.Scene:realize()
         self._entity_pages[entity_i] = page
     end
 
-    local sprite = rt.Sprite("opal", 19)
+    local sprite = rt.Sprite("battle/opal", 19)
     sprite:realize()
     local sprite_w, sprite_h = sprite:get_resolution()
     sprite:set_minimum_size(sprite_w * 3, sprite_h * 3)

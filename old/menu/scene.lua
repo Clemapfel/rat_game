@@ -43,8 +43,8 @@ mn.Scene = meta.new_type("MenuScene", rt.Scene, function()
 
         _dialog_shadow = rt.Rectangle(0, 0, 1, 1),
 
-        _template_confirm_dialog = nil, -- rt.MessageDialog
-        _template_confirm_dialog_active = false,
+        _template_confirm_load_dialog = nil, -- rt.MessageDialog
+        _template_confirm_load_dialog_active = false,
 
         _template_name_keyboard = nil, -- rt.Keyboard
         _template_name_keyboard_active = false,
@@ -244,12 +244,12 @@ function mn.Scene:realize()
         self:_handle_button_pressed(which)
     end)
 
-    self._template_confirm_dialog = rt.MessageDialog(
+    self._template_confirm_load_dialog = rt.MessageDialog(
         "Overwrite current Equipment?",
         "Loading a template will TODO",
         rt.MessageDialogOption.ACCEPT, rt.MessageDialogOption.CANCEL
     )
-    self._template_confirm_dialog:realize()
+    self._template_confirm_load_dialog:realize()
 
     self._template_name_keyboard = rt.Keyboard(#("New Template #1234"), "new_template_01")
     self._template_name_keyboard:realize()
@@ -352,7 +352,7 @@ function mn.Scene:size_allocate(x, y, width, height)
     self._dialog_shadow:resize(x, y, width, height)
 
     self._template_name_keyboard:fit_into(x, y, width, height)
-    self._template_confirm_dialog:fit_into(x,y , width, height)
+    self._template_confirm_load_dialog:fit_into(x,y , width, height)
 end
 
 --- @override
@@ -390,7 +390,7 @@ function mn.Scene:draw()
     self._verbose_info:draw()
     self._animation_queue:draw()
 
-    if self._template_confirm_dialog_active or self._template_name_keyboard_active then
+    if self._template_confirm_load_dialog_active or self._template_name_keyboard_active then
         rt.graphics.set_blend_mode(rt.BlendMode.MULTIPLY)
         self._dialog_shadow:draw()
         rt.graphics.set_blend_mode()
@@ -400,8 +400,8 @@ function mn.Scene:draw()
         self._template_name_keyboard:draw()
     end
 
-    if self._template_confirm_dialog_active then
-        self._template_confirm_dialog:draw()
+    if self._template_confirm_load_dialog_active then
+        self._template_confirm_load_dialog:draw()
     end
 end
 
@@ -434,11 +434,11 @@ function mn.Scene:update(delta)
         end
     end
 
-    if self._template_confirm_dialog_active then
-        self._template_confirm_dialog:update(delta)
+    if self._template_confirm_load_dialog_active then
+        self._template_confirm_load_dialog:update(delta)
 
-        if self._template_confirm_dialog:get_is_active() == false then
-            self._template_confirm_dialog_active = false
+        if self._template_confirm_load_dialog:get_is_active() == false then
+            self._template_confirm_load_dialog_active = false
         end
     end
 end
@@ -1749,11 +1749,11 @@ function mn.Scene:_regenerate_selection_nodes()
 
         local current = scene._shared_template_list:get_selected_object()
         if current ~= nil then
-            scene._template_confirm_dialog_active = true
-            scene._template_confirm_dialog:present()
+            scene._template_confirm_load_dialog_active = true
+            scene._template_confirm_load_dialog:present()
 
-            scene._template_confirm_dialog:signal_disconnect("selection")
-            scene._template_confirm_dialog:signal_connect("selection", function(self, option_index)
+            scene._template_confirm_load_dialog:signal_disconnect("selection")
+            scene._template_confirm_load_dialog:signal_connect("selection", function(self, option_index)
                 if option_index == rt.MessageDialogOption.ACCEPT then
                     local current = scene._shared_template_list:get_selected_object()
                     if current ~= nil then
@@ -1763,8 +1763,8 @@ function mn.Scene:_regenerate_selection_nodes()
                     end
                 end
 
-                scene._template_confirm_dialog:close()
-                scene._template_confirm_dialog:signal_disconnect("selection")
+                scene._template_confirm_load_dialog:close()
+                scene._template_confirm_load_dialog:signal_disconnect("selection")
             end)
         end
     end)
@@ -1924,10 +1924,10 @@ end
 --- @brief
 function mn.Scene:_handle_button_pressed(which)
 
-    dbg(which, self._template_confirm_dialog_active)
+    dbg(which, self._template_confirm_load_dialog_active)
     if self._template_name_keyboard_active == true then
 
-    elseif self._template_confirm_dialog_active == true then
+    elseif self._template_confirm_load_dialog_active == true then
 
     else
         local current_node = self._selection_graph:get_current_node()

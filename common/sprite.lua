@@ -1,3 +1,7 @@
+rt.settings.sprite = {
+    shader_path = "common/sprite_scale_correction.glsl"
+}
+
 --- @class rt.Sprite
 rt.Sprite = meta.new_type("Sprite", rt.Widget, rt.Animation, function(id, index)
     meta.assert_string(id)
@@ -20,7 +24,7 @@ rt.Sprite = meta.new_type("Sprite", rt.Widget, rt.Animation, function(id, index)
     })
 end,
     {
-        _shader = rt.Shader("assets/shaders/sprite_scale_correction.glsl")
+        _shader = rt.Shader(rt.settings.sprite.shader_path)
     })
 
 --- @override

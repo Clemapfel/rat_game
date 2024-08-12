@@ -47,3 +47,8 @@ function mn.Template:list_equip_slots(entity)
     meta.assert_isa(entity, bt.Entity)
     return self._state:template_list_entity_equips_slots(self._id, entity:get_id())
 end
+
+--- @brief
+function mn.Template:get_sprite_id()
+    return "orbs", "generic_overlay"
+end

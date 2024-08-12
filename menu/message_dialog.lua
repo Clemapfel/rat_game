@@ -1,7 +1,6 @@
 
 rt.settings.message_dialog = {
     input_delay = 0.2, -- seconds
-    shadow_strength = 0.2, -- factor for Blendmode.MULTIPLY
 }
 
 rt.MessageDialogOption = meta.new_enum({

@@ -394,7 +394,7 @@ function rt.Keyboard:size_allocate(x, y, width, height)
 
         local w, h = item.selected_label:measure()
         current_x = current_x - w
-        local bounds = rt.AABB(current_x, current_y + 0.5 * label_h - 0.5 * h, 1, 1)
+        local bounds = rt.AABB(current_x, current_y + 0.5 * label_h - 0.5 * h)
         item.label:fit_into(bounds)
         item.selected_label:fit_into(bounds)
         item.node:set_bounds(bounds)

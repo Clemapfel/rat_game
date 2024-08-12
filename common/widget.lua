@@ -1,8 +1,20 @@
+rt.settings.margin_unit = 10
 rt.settings.widget = {}
+
+rt.Orientation = meta.new_enum({
+    HORIZONTAL = "HORIZONTAL",
+    VERTICAL = "VERTICAL"
+})
+
+rt.Alignment = meta.new_enum({
+    START = "START",
+    CENTER = "CENTER",
+    END = "END"
+})
 
 --- @class rt.Widget
 rt.Widget = meta.new_abstract_type("Widget", rt.Drawable, {
-    _bounds = rt.AxisAlignedRectangle(), -- maximum area
+    _bounds = rt.AxisAlignedRectangle(0, 0, 1, 1), -- maximum area
     _margin_top = 0,
     _margin_bottom = 0,
     _margin_left = 0,

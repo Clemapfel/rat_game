@@ -155,6 +155,21 @@ function rt.GameState:list_entities()
 end
 
 --- @brief
+function rt.GameState:get_n_entities()
+    return self._state.n_allies + self._state.n_enemies
+end
+
+--- @brief
+function rt.GameState:get_n_allies()
+    return self._state.n_allies
+end
+
+--- @brief
+function rt.GameState:get_n_enemies()
+    return self._state.n_enemies
+end
+
+--- @brief
 function rt.GameState:entity_get_multiplicity(entity)
     meta.assert_isa(entity, bt.Entity)
 
@@ -176,6 +191,17 @@ function rt.GameState:_entity_id_to_entity(id)
     local index = self._state.entity_id_to_index[id]
     if index == nil then return nil end
     return self._entity_index_to_entity[index]
+end
+
+--- @brief
+function rt.GameState:entity_get_party_index(entity)
+    meta.assert_isa(entity, bt.Entity)
+    local entry = self:_get_entity_entry(entity)
+    if entry == nil then
+        rt.error("In rt.GameState:entity_get_party_index: entity `" .. entity:get_id() .. "` is not part of state")
+        return -1
+    end
+    return entry.index
 end
 
 --- @brief
@@ -378,6 +404,16 @@ for which in range("move", "equip", "consumable") do
         local entries = self._state["shared_" .. which .. "s"]
         for id, entry in pairs(entries) do
             table.insert(out, Type(id))
+        end
+        return out
+    end
+
+    --- @brief list_shared_move_quantities, list_shared_equip_quantities, list_shared_consumable_quantities
+    rt.GameState["list_shared_" .. which .. "_quantities"] = function(self)
+        local out = {}
+        local entries = self._state["shared_" .. which .. "s"]
+        for id, entry in pairs(entries) do
+            out[Type(id)] = entry.count
         end
         return out
     end
