@@ -42,12 +42,15 @@ rt.GameState = meta.new_type("GameState", function()
 
         shared_moves = {},
         shared_equips = {},
-        shared_consumables = {}
+        shared_consumables = {},
+
+        template_id_counter = 0,
+        templates = {}
     }
 
     local out = meta.new(rt.GameState, {
         _state = state,
-        _entity_index_to_entity = {}
+        _entity_index_to_entity = {},
     })
 
     out:load_input_mapping()

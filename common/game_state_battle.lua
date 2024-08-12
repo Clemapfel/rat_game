@@ -10,16 +10,16 @@
         index   -- Unsigned
         
         moves[slot_i] = {
-            id
+            id  -- MoveID
             n_used
         }
 
         equips[slot_i] = {
-            id
+            id  -- EquipID
         }
 
         consumables[slot_i] = {
-            id
+            id  -- ConsumableID
             n_used
         }
 
@@ -37,6 +37,22 @@
     }
 
     shared_consumables[equip_id] = {
+    }
+
+    template_id_counter -- Unsigned
+    templates = {
+        name    -- String
+        date    -- UnixTimestamp
+        entities[config_id] = {
+            n_move_slots
+            moves[slot_i] = MoveID
+
+            n_consumable_slots
+            consumables[slot_i] = ConsumableID
+
+            n_equip_slots
+            equips[slot_i] = EquipID
+        }
     }
 ]]--
 
@@ -156,6 +172,13 @@ function rt.GameState:_get_entity_entry(entity)
 end
 
 --- @brief
+function rt.GameState:_entity_id_to_entity(id)
+    local index = self._state.entity_id_to_index[id]
+    if index == nil then return nil end
+    return self._entity_index_to_entity[index]
+end
+
+--- @brief
 function rt.GameState:entity_get_hp(entity)
     meta.assert_isa(entity, bt.Entity)
     local entry = self:_get_entity_entry(entity)
@@ -186,13 +209,13 @@ function rt.GameState:entity_set_hp(entity, new_hp)
 end
 
 for which in range("move", "equip", "consumable") do
-    local type
+    local Type
     if which == "move" then
-        type = bt.Move
+        Type = bt.Move
     elseif which == "equip" then
-        type = bt.Equip
+        Type = bt.Equip
     elseif which == "consumable" then
-        type = bt.Consumable
+        Type = bt.Consumable
     end
 
     --- @brief entity_list_moves, entity_list_equips, entity_list_consumables
@@ -210,13 +233,14 @@ for which in range("move", "equip", "consumable") do
         for slot_i = 1, n_slots do
             local id = entry[which .. "s"][slot_i].id
             if id ~= "" then
-                table.insert(out, type(id))
+                table.insert(out, Type(id))
             end
         end
         return out
     end
 
     --- @brief entity_list_move_slots, entity_list_equip_slots, entity_list_consumable_slots
+    --- @return Unsigned, Table<*>
     rt.GameState["entity_list_" .. which .. "_slots"] = function(self, entity)
         meta.assert_isa(entity, bt.Entity)
 
@@ -231,10 +255,10 @@ for which in range("move", "equip", "consumable") do
         for slot_i = 1, n_slots do
             local id = entry[which .. "s"][slot_i].id
             if id ~= "" then
-                out[slot_i] = type(id)
+                out[slot_i] = Type(id)
             end
         end
-        return out, n_slots
+        return n_slots, out
     end
 
     --- @brief entity_get_move, entity_get_equip, entity_get_consumable
@@ -257,14 +281,14 @@ for which in range("move", "equip", "consumable") do
         if id == "" then
             return nil
         else
-            return type(id)
+            return Type(id)
         end
     end
 
     --- @brief entity_add_move, entity_add_equip, entity_add_consumable
     rt.GameState["entity_add_" .. which] = function(self, entity, slot_i, object)
         meta.assert_isa(entity, bt.Entity)
-        meta.assert_isa(object, type)
+        meta.assert_isa(object, Type)
 
         local n_slots = entity["get_n_" .. which .. "_slots"](entity)
         if slot_i <= 0 or math.fmod(slot_i, 1) ~= 0 or slot_i > n_slots then
@@ -353,14 +377,14 @@ for which in range("move", "equip", "consumable") do
         local out = {}
         local entries = self._state["shared_" .. which .. "s"]
         for id, entry in pairs(entries) do
-            table.insert(out, type(id))
+            table.insert(out, Type(id))
         end
         return out
     end
 
     --- @brief get_shared_move_count, get_shared_equip_count, get_shared_consumable_count
     rt.GameState["get_shared_" .. which .. "_count"] = function(self, object)
-        meta.assert_isa(object, type)
+        meta.assert_isa(object, Type)
         local item = self._state["shared_" .. which .. "s"]
         if item == nil then
             return item[object:get_id()]
@@ -371,7 +395,7 @@ for which in range("move", "equip", "consumable") do
 
     --- @brief add_shared_move, add_shared_equip, add_shared_consumable
     rt.GameState["add_shared_" .. which] = function(self, object)
-        meta.assert_isa(object, type)
+        meta.assert_isa(object, Type)
 
         local entry = self._state["shared_" .. which .. "s"][object:get_id()]
         if entry == nil then
@@ -386,7 +410,7 @@ for which in range("move", "equip", "consumable") do
 
     --- @brief remove_shared_move, remove_shared_equip, remove_shared_consumable
     rt.GameState["remove_shared_" .. which] = function(self, object)
-        meta.assert_isa(object, type)
+        meta.assert_isa(object, Type)
 
         local entry = self._state["shared_" .. which .. "s"][object:get_id()]
         if entry == nil then
@@ -402,7 +426,7 @@ for which in range("move", "equip", "consumable") do
 
     --- @brief get_shared_move_count, get_shared_equip_count, get_shared_consumable_count
     rt.GameState["get_shared_" .. which .. "_count"] = function(self, object)
-        meta.assert_isa(object, type)
+        meta.assert_isa(object, Type)
 
         local entry = self._state["shared_" .. which .. "s"][object:get_id()]
         if entry == nil then
@@ -490,8 +514,208 @@ function rt.GameState:entity_remove_status(entity, status)
     entry.statuses[status.get_id()] = nil
 end
 
+
 --- @brief
-function rt.GameState:initialize_debug_party()
+function rt.GameState:list_templates()
+    local out = {}
+    for id in keys(self._state.templates) do
+        table.insert(out, mn.Template(self, id))
+    end
+    return out
+end
+
+--- @brief
+function rt.GameState:template_get_name(id)
+    local entry = self._state.templates[id]
+    if entry == nil then
+        rt.error("In rt.GameState:template_get_name: template `" .. id .. "` is not part of state")
+        return ""
+    end
+    return entry.name
+end
+
+--- @brief
+function rt.GameState:template_get_date(id)
+    local entry = self._state.templates[id]
+    if entry == nil then
+        rt.error("In rt.GameState:template_get_date: template `" .. id .. "` is not part of state")
+        return os.date("%c", os.time())
+    end
+
+    return os.date("%c", entry.date)
+end
+
+--- @brief
+function rt.GameState:template_list_entities(id)
+    local entry = self._state.templates[id]
+    if entry == nil then
+        rt.error("In rt.GameState:template_list_entities: template `" .. id .. "` is not part of state")
+        return {}
+    end
+
+    local out = {}
+    for entity_id in keys(entry.entities) do
+        table.insert(out, self:_entity_id_to_entity(entity_id))
+    end
+    return out
+end
+
+for which in range("move", "consumable", "equip") do
+    local Type
+    if which == "move" then
+        Type = bt.Move
+    elseif which == "equip" then
+        Type = bt.Equip
+    elseif which == "consumable" then
+        Type = bt.Consumable
+    end
+
+    --- @brief template_list_entity_move_slots, template_list_entity_consumable_slots, template_list_entity_equip_slots
+    rt.GameState["template_list_entity_" .. which .. "_slots"] = function(self, template_id, entity_id)
+        meta.assert_string(template_id, entity_id)
+
+        local entry = self._state.templates[template_id]
+        if entry == nil then
+            rt.error("In rt.GameState:template_list_entity_" .. which .. "_slots: template `" .. template_id .. "` is not part of state")
+            return {}
+        end
+
+        local setup = entry.entities[entity_id]
+        if setup == nil then return {} end
+
+        local out = {}
+        local slots = setup[which .. "s"]
+        for slot_i, id in ipairs(slots) do
+            if id ~= "" then
+                out[slot_i] = Type(id)
+            end
+        end
+
+        return out
+    end
+end
+
+function rt.GameState:_template_id_from_count(n)
+
+end
+
+--- @brief
+--- @return TemplateID
+function rt.GameState:add_template(name)
+    meta.assert_string(name)
+    local n = self._state.template_id_counter
+
+    local id = "TEMPLATE_"
+    if n < 10 then
+        id = id .. "00"
+    elseif n < 100 then
+        id = id .. "0"
+    end
+
+    id = id .. n .. "_"
+
+    for i = 1, #name do
+        local c = string.at(name, i)
+        if c == " " then
+            id = id .. "_"
+        else
+            id = id .. string.upper(c)
+        end
+    end
+
+    self._state.template_id_counter = self._state.template_id_counter + 1
+    self._state.templates[id] = {
+        name = name,
+        date = os.time(),
+        entities = {}
+    }
+
+    return id
+end
+
+--- @brief
+function rt.GameState:template_rename(id, new_name)
+    meta.assert_string(id, new_name)
+    local entry = self._state.templates[id]
+    if entry == nil then
+        rt.error("In rt.GameState:template_rename: no template with id `" .. id .. "`")
+        return
+    end
+
+    entry.name = new_name
+end
+
+--- @brief
+function rt.GameState:template_remove(id)
+    meta.assert_string(id, new_name)
+    local entry = self._state.templates[id]
+    if entry == nil then
+        rt.error("In rt.GameState:template_remove: no template with id `" .. id .. "`")
+        return
+    end
+end
+
+--- @brief
+--- @param entity bt.Entity
+--- @param moves Table<bt.Move>
+--- @param equips Table<bt.Equips>
+--- @param consumables Table<bt.Consumables>
+function rt.GameState:template_add_entity(id, entity, moves, equips, consumables)
+    meta.assert_string(id)
+    meta.assert_table(moves, equips, consumables)
+    meta.assert_isa(entity, bt.Entity)
+
+    local entry = self._state.templates[id]
+    if entry == nil then
+        rt.error("In rt.GameState:template_add_entity: no template with id `" .. id .. "`")
+        return
+    end
+
+    local n_move_slots = entity:get_n_move_slots()
+    local n_consumable_slots = entity:get_n_consumable_slots()
+    local n_equip_slots = entity:get_n_equip_slots()
+
+    local setup = {
+        moves = {},
+        consumables = {},
+        equips = {}
+    }
+
+    for i = 1, n_move_slots do
+        local move = moves[i]
+        if move ~= nil then
+            meta.assert_isa(move, bt.Move)
+            setup.moves[i] = move:get_id()
+        else
+            setup.moves[i] = ""
+        end
+    end
+
+    for i = 1, n_equip_slots do
+        local equip = equips[i]
+        if equip ~= nil then
+            meta.assert_isa(equip, bt.Equip)
+            setup.equips[i] = equip:get_id()
+        else
+            setup.equips[i] = ""
+        end
+    end
+
+    for i = 1, n_consumable_slots do
+        local consumable = consumables[i]
+        if consumable ~= nil then
+            meta.assert_isa(consumable, bt.Consumable)
+            setup.consumables[i] = consumable:get_id()
+        else
+            setup.consumables[i] = ""
+        end
+    end
+
+    entry.entities[entity:get_id()] = setup
+end
+
+--- @brief
+function rt.GameState:initialize_debug_state()
     local moves = {
         "DEBUG_MOVE",
         "INSPECT",
@@ -517,16 +741,13 @@ function rt.GameState:initialize_debug_party()
     }
 
     local entities = {
-        "MC",
-        "MC",
-        "PROF",
-        "GIRL",
-        "RAT"
+        bt.Entity(self, "MC"),
+        bt.Entity(self, "PROF"),
+        bt.Entity(self, "GIRL"),
+        bt.Entity(self, "RAT"),
     }
 
-    for id in values(entities) do
-        local entity = bt.Entity(id)
-        self:add_entity(entity)
+    for entity in values(entities) do
 
         local possible_moves = rt.random.shuffle({table.unpack(moves)})
         local move_i = 1
@@ -552,6 +773,27 @@ function rt.GameState:initialize_debug_party()
 
         self:entity_set_hp(entity, entity:get_hp_base())
     end
+
+    local max_count = 99
+    for move in values(moves) do
+        self:add_shared_move(bt.Move(move), rt.random.integer(1, max_count))
+    end
+
+    for consumable in values(consumables) do
+        self:add_shared_consumable(bt.Consumable(consumable), rt.random.integer(1, max_count))
+    end
+
+    for equip in values(equips) do
+        self:add_shared_equip(bt.Equip(equip), rt.random.integer(1, max_count))
+    end
+
+    local empty_template = self:add_template("Empty Template")
+    for entity in values(entities) do
+        self:template_add_entity(empty_template, entity, {}, {}, {})
+    end
+
+    local debug_template = self:add_template("Debug Template")
+    for entity in values(entities) do
+        self:template_add_entity(debug_template, entity, entity:list_moves(), entity:list_equips(), entity:list_consumables())
+    end
 end
-
-

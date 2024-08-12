@@ -498,7 +498,6 @@ function utf8.greater_than(a, b)
     return not utf8.equal(a, b) and not utf8.less_than(a, b)
 end
 
-
 --- @brief make first letter capital
 --- @param str string
 function string.capitalize(str)

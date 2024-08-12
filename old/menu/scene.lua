@@ -15,7 +15,7 @@ mn.Scene = meta.new_type("MenuScene", rt.Scene, function()
         _entity_pages = {},
         _entity_index = 1,
 
-        _shared_list_index = mn.Scene._shared_move_list_index,
+        _shared_list_index = mn.Scene.shared_move_list_index,
         _shared_list_frame = rt.Frame(),
         _shared_tab_bar = mn.TabBar(),
 
@@ -50,10 +50,10 @@ mn.Scene = meta.new_type("MenuScene", rt.Scene, function()
         _template_name_keyboard_active = false,
     })
 end, {
-    _shared_move_list_index = 1,
-    _shared_consumable_list_index = 2,
-    _shared_equip_list_index = 3,
-    _shared_template_list_index = 4,
+    shared_move_list_index = 1,
+    shared_consumable_list_index = 2,
+    shared_equip_list_index = 3,
+    shared_template_list_index = 4,
 
     _shared_list_sort_mode_order = {
         [mn.ScrollableListSortMode.BY_TYPE] = mn.ScrollableListSortMode.BY_NAME,
@@ -75,13 +75,13 @@ end, {
 --- @brief
 function mn.Scene:_shared_list_index_to_list(index)
     meta.assert_number(index)
-    if index == self._shared_move_list_index then
+    if index == self.shared_move_list_index then
         return self._shared_move_list
-    elseif index == self._shared_consumable_list_index then
+    elseif index == self.shared_consumable_list_index then
         return self._shared_consumable_list
-    elseif index == self._shared_equip_list_index then
+    elseif index == self.shared_equip_list_index then
         return self._shared_equip_list
-    elseif index == self._shared_template_list_index then
+    elseif index == self.shared_template_list_index then
         return self._shared_template_list
     else
         rt.error("In mn.Scene:_shared_list_index_to_index: invalid index `" .. index .. "`")
@@ -203,10 +203,10 @@ function mn.Scene:realize()
 
     local tab_bar_sprite_id = "menu_icons"
     local tab_sprites = {
-        [self._shared_move_list_index] = rt.Sprite(tab_bar_sprite_id, "moves"),
-        [self._shared_consumable_list_index] = rt.Sprite(tab_bar_sprite_id, "consumables"),
-        [self._shared_equip_list_index] = rt.Sprite(tab_bar_sprite_id, "equips"),
-        [self._shared_template_list_index] = rt.Sprite(tab_bar_sprite_id, "templates")
+        [self.shared_move_list_index] = rt.Sprite(tab_bar_sprite_id, "moves"),
+        [self.shared_consumable_list_index] = rt.Sprite(tab_bar_sprite_id, "consumables"),
+        [self.shared_equip_list_index] = rt.Sprite(tab_bar_sprite_id, "equips"),
+        [self.shared_template_list_index] = rt.Sprite(tab_bar_sprite_id, "templates")
     }
 
     for i, sprite in ipairs(tab_sprites) do
@@ -701,20 +701,20 @@ function mn.Scene:_regenerate_selection_nodes()
     -- shared list nodes
     local shared_list_nodes = {}
     for index in range(
-        self._shared_move_list_index,
-        self._shared_consumable_list_index,
-        self._shared_equip_list_index,
-        self._shared_template_list_index
+        self.shared_move_list_index,
+        self.shared_consumable_list_index,
+        self.shared_equip_list_index,
+        self.shared_template_list_index
     ) do
         local node = rt.SelectionGraphNode(self:_shared_list_index_to_list(index):get_bounds())
         node.is_shared_list_node = true
         shared_list_nodes[index] = node
     end
 
-    local shared_move_node = shared_list_nodes[self._shared_move_list_index]
-    local shared_consumable_node = shared_list_nodes[self._shared_consumable_list_index]
-    local shared_equip_node = shared_list_nodes[self._shared_equip_list_index]
-    local shared_template_node = shared_list_nodes[self._shared_template_list_index]
+    local shared_move_node = shared_list_nodes[self.shared_move_list_index]
+    local shared_consumable_node = shared_list_nodes[self.shared_consumable_list_index]
+    local shared_equip_node = shared_list_nodes[self.shared_equip_list_index]
+    local shared_template_node = shared_list_nodes[self.shared_template_list_index]
 
     -- entity tab nodes
     local entity_tab_nodes = {}
@@ -1800,13 +1800,13 @@ function mn.Scene:_regenerate_selection_nodes()
         node:signal_connect("enter", function(_)
             scene._shared_tab_bar:set_tab_selected(tab_i, true)
 
-            if tab_i == scene._shared_move_list_index then
+            if tab_i == scene.shared_move_list_index then
                 scene:_set_verbose_info_object("move")
-            elseif tab_i == scene._shared_consumable_list_index then
+            elseif tab_i == scene.shared_consumable_list_index then
                 scene:_set_verbose_info_object("consumable")
-            elseif tab_i == scene._shared_equip_list_index then
+            elseif tab_i == scene.shared_equip_list_index then
                 scene:_set_verbose_info_object("equip")
-            elseif tab_i == scene._shared_template_list_index then
+            elseif tab_i == scene.shared_template_list_index then
                 scene:_set_verbose_info_object("template")
             end
             scene:_update_grabbed_object()

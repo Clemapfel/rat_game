@@ -112,12 +112,20 @@ require "common.collider"
 require "common.rope"
 require "common.cloth"
 
+require "common.scene"
+
 -- battle
 require "battle.move"
 require "battle.equip"
 require "battle.consumable"
 require "battle.status"
 require "battle.entity"
+
+-- menu
+require "menu.template"
+require "menu.tab_bar"
+require "menu.scrollable_list"
+require "menu.inventory_scene"
 
 -- state
 require "common.game_state"

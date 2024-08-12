@@ -22,14 +22,23 @@
     </configurations>
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="7fa9ba1b-2cff-4ecc-86fb-59ab2fa76ee1" name="Changes" comment="debug party working">
+    <list default="true" id="7fa9ba1b-2cff-4ecc-86fb-59ab2fa76ee1" name="Changes" comment="stashing cloth">
+      <change afterPath="$PROJECT_DIR$/common/scene.lua" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/menu/inventory_scene.lua" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/menu/scrollable_list.lua" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/menu/tab_bar.lua" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/menu/template.lua" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/battle/entity.lua" beforeDir="false" afterPath="$PROJECT_DIR$/battle/entity.lua" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/battle/equip.lua" beforeDir="false" afterPath="$PROJECT_DIR$/battle/equip.lua" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/common/cloth.lua" beforeDir="false" afterPath="$PROJECT_DIR$/common/cloth.lua" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/common/common.lua" beforeDir="false" afterPath="$PROJECT_DIR$/common/common.lua" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/common/game_state.lua" beforeDir="false" afterPath="$PROJECT_DIR$/common/game_state.lua" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/common/game_state_battle.lua" beforeDir="false" afterPath="$PROJECT_DIR$/common/game_state_battle.lua" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/common/graphics.lua" beforeDir="false" afterPath="$PROJECT_DIR$/common/graphics.lua" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/common/serialize.lua" beforeDir="false" afterPath="$PROJECT_DIR$/common/serialize.lua" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/include.lua" beforeDir="false" afterPath="$PROJECT_DIR$/include.lua" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/main.lua" beforeDir="false" afterPath="$PROJECT_DIR$/main.lua" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/old/battle/equip.lua" beforeDir="false" afterPath="$PROJECT_DIR$/old/battle/equip.lua" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/old/menu/scene.lua" beforeDir="false" afterPath="$PROJECT_DIR$/old/menu/scene.lua" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -511,22 +520,6 @@
       <workItem from="1723236123036" duration="2113000" />
       <workItem from="1723243211205" duration="6751000" />
     </task>
-    <task id="LOCAL-00906" summary="inventory state working">
-      <option name="closed" value="true" />
-      <created>1722273771141</created>
-      <option name="number" value="00906" />
-      <option name="presentableId" value="LOCAL-00906" />
-      <option name="project" value="LOCAL" />
-      <updated>1722273771141</updated>
-    </task>
-    <task id="LOCAL-00907" summary="stashing color mixing">
-      <option name="closed" value="true" />
-      <created>1722286790848</created>
-      <option name="number" value="00907" />
-      <option name="presentableId" value="LOCAL-00907" />
-      <option name="project" value="LOCAL" />
-      <updated>1722286790848</updated>
-    </task>
     <task id="LOCAL-00908" summary="imported scene">
       <option name="closed" value="true" />
       <created>1722352472737</created>
@@ -903,7 +896,23 @@
       <option name="project" value="LOCAL" />
       <updated>1723402756265</updated>
     </task>
-    <option name="localTasksCounter" value="955" />
+    <task id="LOCAL-00955" summary="refactored blend modes">
+      <option name="closed" value="true" />
+      <created>1723411104317</created>
+      <option name="number" value="00955" />
+      <option name="presentableId" value="LOCAL-00955" />
+      <option name="project" value="LOCAL" />
+      <updated>1723411104318</updated>
+    </task>
+    <task id="LOCAL-00956" summary="stashing cloth">
+      <option name="closed" value="true" />
+      <created>1723414891302</created>
+      <option name="number" value="00956" />
+      <option name="presentableId" value="LOCAL-00956" />
+      <option name="project" value="LOCAL" />
+      <updated>1723414891302</updated>
+    </task>
+    <option name="localTasksCounter" value="957" />
     <servers />
   </component>
   <component name="TypeScriptGeneratedFilesManager">
@@ -952,7 +961,6 @@
     </option>
   </component>
   <component name="VcsManagerConfiguration">
-    <MESSAGE value="stashing message dialog" />
     <MESSAGE value="added keyboard" />
     <MESSAGE value="working on keyboard" />
     <MESSAGE value="stashing keyboard" />
@@ -968,7 +976,6 @@
     <MESSAGE value="added mesh" />
     <MESSAGE value="stashing rope" />
     <MESSAGE value="added save file" />
-    <MESSAGE value="stashing cloth" />
     <MESSAGE value="added template verbose info, fixed message dialog loop" />
     <MESSAGE value="stashing" />
     <MESSAGE value="stashing before refactoring for gamestate" />
@@ -977,7 +984,9 @@
     <MESSAGE value="imported" />
     <MESSAGE value="imported battle objects" />
     <MESSAGE value="debug party working" />
-    <option name="LAST_COMMIT_MESSAGE" value="debug party working" />
+    <MESSAGE value="refactored blend modes" />
+    <MESSAGE value="stashing cloth" />
+    <option name="LAST_COMMIT_MESSAGE" value="stashing cloth" />
   </component>
   <component name="XDebuggerManager">
     <breakpoint-manager>

@@ -1,6 +1,6 @@
 rt.settings.battle.entity = {
     config_path = "assets/configs/entities",
-    name = "Character"
+    name = "Character",
 }
 
 --- @class EntityState
@@ -18,12 +18,14 @@ bt.AILevel = meta.new_enum({
 })
 
 --- @class bt.Entity
-bt.Entity = meta.new_type("BattleEntity", function(id)
+bt.Entity = meta.new_type("BattleEntity", function(state, id)
+    meta.assert_isa(state, rt.GameState)
     meta.assert_string(id)
     local path = rt.settings.battle.entity.config_path .. "/" .. id .. ".lua"
     local out = meta.new(bt.Entity, {
         _path = path,
         _config_id = id,
+        _state = state,
         _is_realized = false,
     })
 
@@ -102,6 +104,8 @@ function bt.Entity:realize()
     assert(self.n_move_slots < POSITIVE_INFINITY)
     assert(self.n_equip_slots < POSITIVE_INFINITY)
     assert(self.n_equip_slots < POSITIVE_INFINITY)
+
+    self._state:add_entity(self)
 
     meta.set_is_mutable(self, false)
 end
@@ -192,7 +196,7 @@ end
 
 --- @brief
 function bt.Entity:get_hp_current()
-    return STATE:entity_get_hp(self)
+    return self._state:entity_get_hp(self)
 end
 
 for which in range("hp", "attack", "defense", "speed") do
@@ -204,7 +208,7 @@ for which in range("hp", "attack", "defense", "speed") do
     --- @brief get_hp_base, get_attack_base, get_defense_base, get_speed_base
     bt.Entity["get_" .. which .. "_base"] = function(self)
         local value = self["get_" .. which .. "_base_raw"](self)
-        local equips = STATE:entity_list_equips(self)
+        local equips = self._state:entity_list_equips(self)
         for equip in values(equips) do
             value = value + equip[which .. "_base_offset"]
         end
@@ -221,7 +225,7 @@ for which in range("hp", "attack", "defense", "speed") do
         bt.Entity["get_" .. which .. "_current"] = function(self)
             local value = self["get_" .. which .. "_base"](self)
 
-            local statuses = STATE:entity_list_statuses(self)
+            local statuses = self._state:entity_list_statuses(self)
             for status in values(statuses) do
                 value = value + status[which .. "_offset"]
             end
@@ -238,4 +242,24 @@ for which in range("hp", "attack", "defense", "speed") do
     bt.Entity["get_" .. which] = function(self)
         return self["get_" .. which .. "_current"]
     end
+end
+
+--- @brief
+function bt.Entity:list_moves()
+    return self._state:entity_list_moves(self)
+end
+
+--- @brief
+function bt.Entity:list_equips()
+    return self._state:entity_list_equips(self)
+end
+
+--- @brief
+function bt.Entity:list_consumables()
+    return self._state:entity_list_consumables(self)
+end
+
+--- @brief
+function bt.Entity:list_statuses()
+    return self._state:entity_list_statuses(self)
 end

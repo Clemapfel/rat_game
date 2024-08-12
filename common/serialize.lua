@@ -19,7 +19,7 @@ _serialize_inner = function(buffer, object, n_indent_tabs, seen, comment_out)
     if type(object) == "number" then
         _serialize_insert(buffer, object)
     elseif type(object) == "string" then
-        _serialize_insert(buffer, "\"" .. object .. "\"")
+        _serialize_insert(buffer, "\"", object, "\"")
     elseif type(object) == "boolean" then
         if object == true then
             _serialize_insert(buffer, "true")
@@ -42,16 +42,24 @@ _serialize_inner = function(buffer, object, n_indent_tabs, seen, comment_out)
             local index = 0
             for key, value in pairs(object) do
                 if comment_out and type(value) == "function" or type(value) == "userdata" then
-                    _serialize_insert(buffer, "--[[ " .. key .. " = " .. tostring(value) .. ", ]]\n")
+                    _serialize_insert(buffer, "--[[ ", key, " = ", tostring(value), ", ]]\n")
                     index = index + 1
                 elseif comment_out and seen[object] then
-                    _serialize_insert(buffer, "--[[ " .. key .. " = ..., ]]\n")
+                    _serialize_insert(buffer, "--[[ ", key, " = ..., ]]\n")
                     index = index + 1
                 else
-                    if type(key) == "number" then
-                        _serialize_insert(buffer, _serialize_get_indent(n_indent_tabs), "[", key, "] = ")
+                    if type(key) == "string" then
+                        -- check if string is valid variable name, if no, escape
+                        local _, error_maybe = load(key .. " = 1")
+                        if error_maybe == nil then
+                            _serialize_insert(buffer, _serialize_get_indent(n_indent_tabs), tostring(key), " = ")
+                        else
+                            _serialize_insert(buffer, _serialize_get_indent(n_indent_tabs), "[\"", tostring(key), "\"]", " = ")
+                        end
+                    elseif type(key) == "number" then
+                        _serialize_insert(buffer, _serialize_get_indent(n_indent_tabs), "[", tostring(key), "] = ")
                     else
-                        _serialize_insert(buffer, _serialize_get_indent(n_indent_tabs), tostring(key), " = ")
+                        _serialize_insert(buffer, _serialize_get_indent(n_indent_tabs), "[", serialize(key), "] = ")
                     end
 
                     _serialize_inner(buffer, value, n_indent_tabs, seen)
@@ -72,7 +80,7 @@ _serialize_inner = function(buffer, object, n_indent_tabs, seen, comment_out)
         seen[object] = true
     else
         -- function, userdata, when not commented out
-        _serialize_insert(buffer, "[" .. tostring(object) .. "]")
+        _serialize_insert(buffer, "[", tostring(object), "]")
     end
 end
 
