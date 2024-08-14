@@ -1,5 +1,9 @@
 if mn.Animation == nil then mn.Animation = {} end
 
+rt.settings.menu.animation.object_moved = {
+    speed = 1000, -- px / s
+}
+
 --- @class mn.ObjectMovedAnimation
 mn.Animation.OBJECT_MOVED = meta.new_type("OBJECT_MOVED", rt.QueueableAnimation, function(object, from, to)
     meta.assert_aabb(from)
@@ -27,7 +31,6 @@ function mn.Animation.OBJECT_MOVED:start()
     self._sprite:set_minimum_size(sprite_w, sprite_h)
     self._sprite:fit_into(0, 0, sprite_w, sprite_h)
 
-
     self._sprite_size_offset_x = -sprite_w * 0.5
     self._sprite_size_offset_y = -sprite_h * 0.5
 
@@ -40,20 +43,15 @@ function mn.Animation.OBJECT_MOVED:update(delta)
     local from_x, from_y = self._from_aabb.x + 0.5 * self._from_aabb.width, self._from_aabb.y + 0.5 * self._from_aabb.height
     local to_x, to_y = self._to_aabb.x + 0.5 * self._to_aabb.width, self._to_aabb.y + 0.5 * self._to_aabb.height
 
-    local speed = 10000 -- px / s
-    local hold_duration = 0.1
+    local speed = rt.settings.menu.animation.object_moved.speed
 
     local length = rt.distance(from_x, from_y, to_x, to_y)
-    local fraction = self._elapsed / ((length / speed) + (1 + 2 * hold_duration))
-    if  fraction > 1 - hold_duration then
-        --self._sprite:set_opacity((1 - fraction) / hold_duration)
-        self._sprite_offset_x, self._sprite_offset_y = to_x, to_y
-    else
-        --self._sprite:set_opacity(1)
-        local angle = rt.angle(to_x - from_x, to_y - from_y)
-        local distance = rt.sigmoid(fraction / (1 - 2 * hold_duration), 18) * length
-        self._sprite_offset_x, self._sprite_offset_y = rt.translate_point_by_angle(from_x, from_y, distance, angle)
-    end
+    local duration = (length / speed)
+    local fraction = clamp(self._elapsed / duration, 0, 1)
+
+    local angle = rt.angle(to_x - from_x, to_y - from_y)
+    local distance = rt.sigmoid(fraction) * length
+    self._sprite_offset_x, self._sprite_offset_y = rt.translate_point_by_angle(from_x, from_y, distance, angle)
 
     return fraction < 1
 end

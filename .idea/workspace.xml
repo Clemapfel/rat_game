@@ -22,8 +22,8 @@
     </configurations>
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="7fa9ba1b-2cff-4ecc-86fb-59ab2fa76ee1" name="Changes" comment="added interactivity to menu rework">
-      <change beforePath="$PROJECT_DIR$/menu/inventory_scene.lua" beforeDir="false" afterPath="$PROJECT_DIR$/menu/inventory_scene.lua" afterDir="false" />
+    <list default="true" id="7fa9ba1b-2cff-4ecc-86fb-59ab2fa76ee1" name="Changes" comment="fixed grafics desynch bug">
+      <change beforePath="$PROJECT_DIR$/menu/inventory_scene_object_moved_animation.lua" beforeDir="false" afterPath="$PROJECT_DIR$/menu/inventory_scene_object_moved_animation.lua" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -492,15 +492,7 @@
       <workItem from="1723514028401" duration="723000" />
       <workItem from="1723561350106" duration="6170000" />
       <workItem from="1723589641733" duration="1000" />
-      <workItem from="1723592313892" duration="16689000" />
-    </task>
-    <task id="LOCAL-00911" summary="added ink in water">
-      <option name="closed" value="true" />
-      <created>1722366562054</created>
-      <option name="number" value="00911" />
-      <option name="presentableId" value="LOCAL-00911" />
-      <option name="project" value="LOCAL" />
-      <updated>1722366562055</updated>
+      <workItem from="1723592313892" duration="16994000" />
     </task>
     <task id="LOCAL-00912" summary="potential cool screen transition">
       <option name="closed" value="true" />
@@ -886,7 +878,15 @@
       <option name="project" value="LOCAL" />
       <updated>1723658910822</updated>
     </task>
-    <option name="localTasksCounter" value="960" />
+    <task id="LOCAL-00960" summary="fixed grafics desynch bug">
+      <option name="closed" value="true" />
+      <created>1723659199851</created>
+      <option name="number" value="00960" />
+      <option name="presentableId" value="LOCAL-00960" />
+      <option name="project" value="LOCAL" />
+      <updated>1723659199851</updated>
+    </task>
+    <option name="localTasksCounter" value="961" />
     <servers />
   </component>
   <component name="TypeScriptGeneratedFilesManager">
@@ -935,7 +935,6 @@
     </option>
   </component>
   <component name="VcsManagerConfiguration">
-    <MESSAGE value="stasing keyboard, utf8 input broken" />
     <MESSAGE value="fixed selection graph for specil accept / cancel items" />
     <MESSAGE value="polished keyboard" />
     <MESSAGE value="finished keyboard" />
@@ -960,7 +959,8 @@
     <MESSAGE value="added templates" />
     <MESSAGE value="imported menu" />
     <MESSAGE value="added interactivity to menu rework" />
-    <option name="LAST_COMMIT_MESSAGE" value="added interactivity to menu rework" />
+    <MESSAGE value="fixed grafics desynch bug" />
+    <option name="LAST_COMMIT_MESSAGE" value="fixed grafics desynch bug" />
   </component>
   <component name="XDebuggerManager">
     <breakpoint-manager>
