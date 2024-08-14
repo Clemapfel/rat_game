@@ -598,7 +598,7 @@ function meta.weak_table(weak_keys, weak_values)
     return out
 end
 
---- @brief
+--- @brief make it such that indexing a table will autt
 function meta.make_auto_extend(x, recursive)
     if recursive == nil then recursive = false end
     local metatable = getmetatable(table)

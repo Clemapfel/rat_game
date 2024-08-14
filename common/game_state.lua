@@ -51,6 +51,7 @@ rt.GameState = meta.new_type("GameState", function()
     local out = meta.new(rt.GameState, {
         _state = state,
         _entity_index_to_entity = {},
+        _grabbed_object = nil, -- helper for mn.InventoryScene
     })
 
     out:load_input_mapping()

@@ -133,6 +133,7 @@ require "menu.tab_bar"
 require "menu.scrollable_list"
 require "menu.slots"
 require "menu.entity_info"
+require "menu.inventory_scene_object_moved_animation"
 require "menu.inventory_scene"
 
 -- state

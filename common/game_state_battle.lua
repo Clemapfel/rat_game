@@ -292,9 +292,9 @@ for which in range("move", "equip", "consumable") do
         meta.assert_isa(entity, bt.Entity)
 
         local n_slots = entity["get_n_" .. which .. "_slots"](entity)
-        if slot_i <= 0 or math.fmod(slot_i, 1) ~= 0 or slot_i > n_slots() then
+        if slot_i <= 0 or math.fmod(slot_i, 1) ~= 0 or slot_i > n_slots then
             rt.error("In rt.GameState:entity_add_" .. which .. ": slot index `" .. slot_i .. "` is out of range for an entity with `" .. n_slots .. "` slots")
-            return
+            return nil
         end
 
         local entry = self:_get_entity_entry(entity)
@@ -311,10 +311,30 @@ for which in range("move", "equip", "consumable") do
         end
     end
 
+    --- @brief entity_get_first_free_move_slot, entity_get_first_free_equip_slot, entity_get_first_free_consumable_slot
+    rt.GameState["entity_get_first_free_" .. which .. "_slot"] = function(self, entity)
+        meta.assert_isa(entity, bt.Entity)
+
+        local entry = self:_get_entity_entry(entity)
+        if entry == nil then
+            rt.error("In rt.GameState:entity_get_first_free_" .. which .."_slot: entity `" .. entity:get_id() .. "` is not part of state")
+            return nil
+        end
+
+        local n_slots = entity["get_n_" .. which .. "_slots"](entity)
+        local slots = entry[which .. "s"]
+        for i = 1, n_slots do
+            if slots[i].id == "" then return i end
+        end
+
+        return nil
+    end
+
     --- @brief entity_add_move, entity_add_equip, entity_add_consumable
     rt.GameState["entity_add_" .. which] = function(self, entity, slot_i, object)
         meta.assert_isa(entity, bt.Entity)
         meta.assert_isa(object, Type)
+        meta.assert_number(slot_i)
 
         local n_slots = entity["get_n_" .. which .. "_slots"](entity)
         if slot_i <= 0 or math.fmod(slot_i, 1) ~= 0 or slot_i > n_slots then
@@ -339,9 +359,10 @@ for which in range("move", "equip", "consumable") do
     --- @brief entity_remove_move, entity_remove_equip, entity_remove_consumable
     rt.GameState["entity_remove_" .. which] = function(self, entity, slot_i)
         meta.assert_isa(entity, bt.Entity)
+        meta.assert_number(slot_i)
 
         local n_slots = entity["get_n_" .. which .. "_slots"](entity)
-        if slot_i <= 0 or math.fmod(slot_i, 1) ~= 0 or slot_i > n_slots() then
+        if slot_i <= 0 or math.fmod(slot_i, 1) ~= 0 or slot_i > n_slots then
             rt.error("In rt.GameState:entity_remove_" .. which .. ": slot index `" .. slot_i .. "` is out of range for an entity with `" .. n_slots .. "` slots")
             return
         end
@@ -352,11 +373,36 @@ for which in range("move", "equip", "consumable") do
             return 
         end
         local object_entry = entry[which .. "s"]
+        local current_id = object_entry[slot_i].id
         object_entry[slot_i].id = ""
 
         if object_entry.n_used ~= nil then
             object_entry.n_used = 0
         end
+
+        if current_id == "" then return nil else return Type(current_id) end
+    end
+
+    --- @brief entity_has_move, entity_has_equip, entity_has_consumable
+    rt.GameState["entity_has_" .. which] = function(self, entity, object)
+        meta.assert_isa(entity, bt.Entity)
+        meta.assert_isa(object, Type)
+
+        local entry = self:_get_entity_entry(entity)
+        if entry == nil then
+            rt.error("In rt.GameState:entity_has_" .. which ..": entity `" .. entity:get_id() .. "` is not part of state")
+            return
+        end
+        local slots = entry[which .. "s"]
+        local n_slots = entity["get_n_" .. which .. "_slots"](entity)
+
+        for i = 1, n_slots do
+            if slots[i].id == object:get_id() then
+                return true
+            end
+         end
+
+        return false
     end
 
     if which == "move" or which == "consumable" then
@@ -471,6 +517,76 @@ for which in range("move", "equip", "consumable") do
             return entry.count
         end
     end
+end
+
+--- @brief
+function rt.GameState:add_shared_object(object)
+    if meta.isa(object, bt.Move) then
+        self:add_shared_move(object)
+    elseif meta.isa(object, bt.Equip) then
+        self:add_shared_equip(object)
+    elseif meta.isa(object, bt.Consumable) then
+        self:add_shareD_consumable(object)
+    else
+        rt.error("In rt.GameState:add_shared_object: object `" .. meta.typeof(object) .. "` is not a bt.Move, bt.Equip, or bt.Consumable")
+    end
+end
+
+--- @brief
+function rt.GameState:entity_sort_inventory(entity)
+    meta.assert_isa(entity, bt.Entity)
+
+    local entry = self:_get_entity_entry(entity)
+    if entry == nil then
+        rt.error("In rt.GameState:entity_sort_inventory: entity `" .. entity:get_id() .. "` is not part of state")
+        return
+    end
+
+    local moves = {}
+    local equips = {}
+    local consumables = {}
+
+    local n_move_slots, n_equip_slots, n_consumable_slots = entity:get_n_move_slots(), entity:get_n_equip_slots(), entity:get_n_consumable_slots()
+    for i = 1, n_move_slots do
+        local id = entry.moves[i].id
+        if id ~= "" then
+            local move = bt.Move(id)
+            table.insert(moves, move)
+            self:entity_remove_move(entity, i)
+        end
+    end
+
+    for i = 1, n_equip_slots do
+        local id = entry.equips[i].id
+        if id ~= "" then
+            local equip = bt.Equip(id)
+            table.insert(equips, equip)
+            self:entity_remove_equip(entity, i)
+        end
+    end
+
+    for i = 1, n_consumable_slots do
+        local id = entry.consumables[i].id
+        if id ~= "" then
+            local consumable = bt.Consumable(id)
+            table.insert(consumables, consumable)
+            self:entity_remove_consumable(entity, i)
+        end
+    end
+
+    for i, move in ipairs(moves) do
+        self:entity_add_move(entity, i, move)
+    end
+
+    for i, equip in ipairs(equips) do
+        self:entity_add_equip(entity, i, equip)
+    end
+
+    for i, consumable in ipairs(consumables) do
+        self:entity_add_consumable(entity, i, consumable)
+    end
+
+    return moves, equips, consumables
 end
 
 --- @brief
@@ -751,6 +867,48 @@ function rt.GameState:template_add_entity(id, entity, moves, equips, consumables
 end
 
 --- @brief
+function rt.GameState:set_grabbed_object(object)
+
+    if not (meta.isa(object, bt.Move) or meta.isa(object, bt.Equip) or meta.isa(object, bt.Consumable)) then
+        rt.error("In rt.GameState:set_grabbed_object: Objet `" .. meta.typeof(object) .. "` is not a bt.Move, bt.Consumable, or bt.Equip")
+        return
+    end
+
+    if self._grabbed_object ~= nil then
+        if meta.isa(self._grabbed_object, bt.Move) then
+            self:add_shared_move(self._grabbed_object)
+        elseif meta.isa(self._grabbed_object, bt.Equip) then
+            self:add_shared_equip(self._grabbed_object)
+        elseif meta.isa(self._grabbed_object, bt.Consumable) then
+            self:add_shared_consumable(self._grabbed_object)
+        else
+            -- unreachable
+        end
+    end
+
+    self._grabbed_object = object
+end
+
+--- @brief
+function rt.GameState:has_grabbed_object()
+    return self._grabbed_object ~= nil
+end
+
+--- @brief
+function rt.GameState:take_grabbed_object()
+    local out = self._grabbed_object
+    self._grabbed_object = nil
+    return out
+end
+
+--- @brief
+function rt.GameState:peek_grabbed_object()
+    return self._grabbed_object
+end
+
+
+
+--- @brief
 function rt.GameState:initialize_debug_state()
     local moves = {
         "DEBUG_MOVE",
@@ -788,7 +946,7 @@ function rt.GameState:initialize_debug_state()
         local possible_moves = rt.random.shuffle({table.unpack(moves)})
         local move_i = 1
         for slot_i = 1, entity:get_n_move_slots() do
-            if rt.random.toss_coin(0.8) then
+            if rt.random.toss_coin(0.2) then
                 self:entity_add_move(entity, slot_i, bt.Move(possible_moves[move_i]))
                 move_i = move_i + 1
                 if move_i > #moves then break end

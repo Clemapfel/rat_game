@@ -212,6 +212,61 @@ function rt.VertexRectangle(x, y, width, height)
 end
 
 --- @brief
+function rt.VertexRectangleSegments(thickness, vertices)
+    local n_vertices = #vertices
+
+    if not (n_vertices >= 4 and n_vertices % 2 == 0) then
+        rt.error("In rt.VertexRectangleSegments: Need at least 2 vertices")
+    end
+
+    function translate_point(point_x, point_y, distance, angle_dg)
+        local rad = angle_dg * math.pi / 180
+        return point_x + distance * math.cos(rad), point_y + distance * math.sin(rad)
+    end
+
+    local vertices_out = {}
+    local vertex_map = {}
+    for i = 1, n_vertices - 2, 2 do
+        local a_x, a_y = vertices[i+0], vertices[i+1]
+        local b_x, b_y = vertices[i+2], vertices[i+3]
+
+        local ab_x, ab_y = b_x - a_x, b_y - a_y
+        local angle = math.atan2(ab_y, ab_x)
+        local angle_dg = ((angle * 180 / math.pi) + 360) % 360;
+
+        local p1_x, p1_y = translate_point(a_x, a_y, thickness, angle_dg - 90)
+        local p2_x, p2_y = translate_point(b_x, b_y, thickness, angle_dg - 90)
+        local p3_x, p3_y = translate_point(b_x, b_y, thickness, angle_dg + 90)
+        local p4_x, p4_y = translate_point(a_x, a_y, thickness, angle_dg + 90)
+
+        for p in range(
+            {p1_x, p1_y, 0},
+            {p2_x, p2_y, 0},
+            {p3_x, p3_y, 0},
+            {p4_x, p4_y, 0}
+        ) do
+            table.insert(vertices_out, p)
+        end
+
+        local n = #vertices_out
+        local p1_i = n-3
+        local p2_i = n-2
+        local p3_i = n-1
+        local p4_i = n
+
+        local n = #vertices_out
+        for i in range(p1_i, p2_i, p3_i, p1_i, p3_i, p4_i) do
+            table.insert(vertex_map, i)
+        end
+    end
+
+    local out = rt.VertexShape(vertices_out)
+    out:set_draw_mode(rt.MeshDrawMode.TRIANGLES)
+    out:set_vertex_order(vertex_map)
+    return out
+end
+
+--- @brief
 function rt.VertexCircle(x, y, x_radius, y_radius, n_outer_vertices)
     y_radius = which(y_radius, x_radius)
     n_outer_vertices = which(n_outer_vertices, 8)

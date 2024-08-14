@@ -151,7 +151,7 @@ end
 love.mousepressed = function(x, y, button_id, is_touch, n_presses)
     if button_id == rt.MouseButton.LEFT or is_touch then
         for _, component in pairs(rt.InputControllerState.components) do
-            if not component._is_disabled then
+            if not component._is_disabled and component._instance ~= nil then
                 local bounds = component._instance:get_bounds()
                 if rt.aabb_contains(bounds, x, y) then
                     component:signal_emit("pressed", rt.InputButton.A)
@@ -165,7 +165,7 @@ end
 love.mousereleased = function(x, y, button_id, is_touch, n_presses)
     if button_id == rt.MouseButton.LEFT or is_touch then
         for _, component in pairs(rt.InputControllerState.components) do
-            if not component._is_disabled then
+            if not component._is_disabled and component._instance ~= nil then
                 local bounds = component._instance:get_bounds()
                 if rt.aabb_contains(bounds, x, y) then
                     component:signal_emit("released", rt.InputButton.A)

@@ -21,6 +21,7 @@ end)
 rt.SelectionGraphNode = meta.new_type("SelectionGraphNode", rt.SignalEmitter, rt.Drawable, function(aabb)
     local out = meta.new(rt.SelectionGraphNode, {
         _aabb = rt.AABB(0, 0, 1, 1),
+        _control_layout_function = function() return {} end,
         _centroid_x = 0,
         _centroid_y = 0,
     })
@@ -157,6 +158,22 @@ end
 --- @brief
 function rt.SelectionGraphNode:get_left()
     return self:signal_emit(rt.InputButton.LEFT)
+end
+
+--- @brief
+function rt.SelectionGraphNode:set_control_layout(layout)
+    if meta.is_function(layout) then
+        self._control_layout_function = layout
+    else
+        self._control_layout_function = function()
+            return layout
+        end
+    end
+end
+
+--- @brief
+function rt.SelectionGraphNode:get_control_layout()
+    return self._control_layout_function()
 end
 
 --- ###
