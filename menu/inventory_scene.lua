@@ -1424,7 +1424,7 @@ function mn.InventoryScene:_regenerate_selection_nodes()
                             page.moves:get_slot_aabb(node_i),
                             function() end,
                             function()
-                                page.moves:set_object(node_i, down)
+                                page.moves:set_object(node_i, scene._state:entity_get_move(page.entity, node_i))
                                 scene:_update_grabbed_object()
                             end
                         )
@@ -1452,7 +1452,7 @@ function mn.InventoryScene:_regenerate_selection_nodes()
                                 page.moves:set_object(node_i, nil)
                             end,
                             function()
-                                page.moves:set_object(node_i, new_grabbed)
+                                page.moves:set_object(node_i, scene._state:entity_get_move(page.entity, node_i))
                                 scene:_update_grabbed_object()
                             end
                         )
@@ -1556,7 +1556,7 @@ function mn.InventoryScene:_regenerate_selection_nodes()
                                 page.equips_and_consumables:get_slot_aabb(node_i),
                                 function()  end,
                                 function()
-                                    page.equips_and_consumables:set_object(node_i, down)
+                                    page.equips_and_consumables:set_object(node_i, scene._state:entity_get_equip(page.entity, node_i))
                                     scene:_update_grabbed_object()
                                 end
                             )
@@ -1584,7 +1584,7 @@ function mn.InventoryScene:_regenerate_selection_nodes()
                                     page.equips_and_consumables:set_object(node_i, nil)
                                 end,
                                 function()
-                                    page.equips_and_consumables:set_object(node_i, new_grabbed)
+                                    page.equips_and_consumables:set_object(node_i, scene._state:entity_get_equip(page.entity, node_i))
                                     scene:_update_grabbed_object()
                                 end
                             )
@@ -1620,7 +1620,7 @@ function mn.InventoryScene:_regenerate_selection_nodes()
                                 page.equips_and_consumables:get_slot_aabb(node_i),
                                 function()  end,
                                 function()
-                                    page.equips_and_consumables:set_object(node_i, down)
+                                    page.equips_and_consumables:set_object(node_i, scene._state:entity_get_consumable(page.entity, node_i))
                                     scene:_update_grabbed_object()
                                 end
                             )
@@ -1648,7 +1648,7 @@ function mn.InventoryScene:_regenerate_selection_nodes()
                                     page.equips_and_consumables:set_object(node_i, nil)
                                 end,
                                 function()
-                                    page.equips_and_consumables:set_object(node_i, new_grabbed)
+                                    page.equips_and_consumables:set_object(node_i, scene._state:entity_get_consumable(page.entity, node_i))
                                     scene:_update_grabbed_object()
                                 end
                             )

@@ -22,17 +22,7 @@
     </configurations>
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="7fa9ba1b-2cff-4ecc-86fb-59ab2fa76ee1" name="Changes" comment="imported menu">
-      <change afterPath="$PROJECT_DIR$/menu/inventory_scene_object_moved_animation.lua" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/.idea/vcs.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/vcs.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/common/game_state.lua" beforeDir="false" afterPath="$PROJECT_DIR$/common/game_state.lua" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/common/game_state_battle.lua" beforeDir="false" afterPath="$PROJECT_DIR$/common/game_state_battle.lua" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/common/input_controller.lua" beforeDir="false" afterPath="$PROJECT_DIR$/common/input_controller.lua" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/common/meta.lua" beforeDir="false" afterPath="$PROJECT_DIR$/common/meta.lua" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/common/selection_graph.lua" beforeDir="false" afterPath="$PROJECT_DIR$/common/selection_graph.lua" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/common/vertex_shape.lua" beforeDir="false" afterPath="$PROJECT_DIR$/common/vertex_shape.lua" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/include.lua" beforeDir="false" afterPath="$PROJECT_DIR$/include.lua" afterDir="false" />
+    <list default="true" id="7fa9ba1b-2cff-4ecc-86fb-59ab2fa76ee1" name="Changes" comment="added interactivity to menu rework">
       <change beforePath="$PROJECT_DIR$/menu/inventory_scene.lua" beforeDir="false" afterPath="$PROJECT_DIR$/menu/inventory_scene.lua" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
@@ -502,15 +492,7 @@
       <workItem from="1723514028401" duration="723000" />
       <workItem from="1723561350106" duration="6170000" />
       <workItem from="1723589641733" duration="1000" />
-      <workItem from="1723592313892" duration="16275000" />
-    </task>
-    <task id="LOCAL-00910" summary="added verbose info scroll">
-      <option name="closed" value="true" />
-      <created>1722365733247</created>
-      <option name="number" value="00910" />
-      <option name="presentableId" value="LOCAL-00910" />
-      <option name="project" value="LOCAL" />
-      <updated>1722365733247</updated>
+      <workItem from="1723592313892" duration="16689000" />
     </task>
     <task id="LOCAL-00911" summary="added ink in water">
       <option name="closed" value="true" />
@@ -896,7 +878,15 @@
       <option name="project" value="LOCAL" />
       <updated>1723482871471</updated>
     </task>
-    <option name="localTasksCounter" value="959" />
+    <task id="LOCAL-00959" summary="added interactivity to menu rework">
+      <option name="closed" value="true" />
+      <created>1723658910822</created>
+      <option name="number" value="00959" />
+      <option name="presentableId" value="LOCAL-00959" />
+      <option name="project" value="LOCAL" />
+      <updated>1723658910822</updated>
+    </task>
+    <option name="localTasksCounter" value="960" />
     <servers />
   </component>
   <component name="TypeScriptGeneratedFilesManager">
@@ -945,7 +935,6 @@
     </option>
   </component>
   <component name="VcsManagerConfiguration">
-    <MESSAGE value="stashing keyboard" />
     <MESSAGE value="stasing keyboard, utf8 input broken" />
     <MESSAGE value="fixed selection graph for specil accept / cancel items" />
     <MESSAGE value="polished keyboard" />
@@ -970,7 +959,8 @@
     <MESSAGE value="stashing cloth" />
     <MESSAGE value="added templates" />
     <MESSAGE value="imported menu" />
-    <option name="LAST_COMMIT_MESSAGE" value="imported menu" />
+    <MESSAGE value="added interactivity to menu rework" />
+    <option name="LAST_COMMIT_MESSAGE" value="added interactivity to menu rework" />
   </component>
   <component name="XDebuggerManager">
     <breakpoint-manager>
