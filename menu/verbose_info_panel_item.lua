@@ -471,6 +471,12 @@ function mn.VerboseInfoPanel.Item:create_from_consumable(consumable)
         self.frame:fit_into(x, y, width, total_height)
         self.final_height = total_height
     end
+
+    self.measure = function(self)
+        return self._bounds.width, self.final_height
+    end
+
+    return self
 end
 
 
@@ -515,7 +521,7 @@ function mn.VerboseInfoPanel.Item:create_from_template(template)
                 hrule = self._hrule()
             }
 
-            local move_slots, n_move_slots = template:list_move_slots(entity)
+            local n_move_slots, move_slots = template:list_move_slots(entity)
             for i = 1, n_move_slots do
                 if move_slots[i] ~= nil then
                     table.insert(to_push.move_sprites, rt.Sprite(move_slots[i]:get_sprite_id()))
@@ -526,14 +532,14 @@ function mn.VerboseInfoPanel.Item:create_from_template(template)
                 table.insert(to_push.move_sprites, self._description("<color=GRAY>(none)</color>"))
             end
 
-            local equip_slots, n_equip_slots = template:list_equip_slots(entity)
+            local n_equip_slots, equip_slots = template:list_equip_slots(entity)
             for i = 1, n_equip_slots do
                 if equip_slots[i] ~= nil then
                     table.insert(to_push.equip_sprites, rt.Sprite(equip_slots[i]:get_sprite_id()))
                 end
             end
 
-            local consumable_slots, n_consumable_slots = template:list_consumable_slots(entity)
+            local n_consumable_slots, consumable_slots = template:list_consumable_slots(entity)
             for i = 1, n_consumable_slots do
                 if consumable_slots[i] ~= nil then
                     table.insert(to_push.consumable_sprites, rt.Sprite(consumable_slots[i]:get_sprite_id()))
@@ -638,6 +644,12 @@ function mn.VerboseInfoPanel.Item:create_from_template(template)
         self.frame:fit_into(x, y, width, total_height)
         self.final_height = total_height
     end
+
+    self.measure = function(self)
+        return self._bounds.width, self.final_height
+    end
+
+    return self
 end
 
 --- @brief party info
@@ -713,4 +725,10 @@ function mn.VerboseInfoPanel.Item:create_from_string(which)
         self.frame:fit_into(x, y, width, total_height)
         self.final_height = total_height
     end
+
+    self.measure = function(self)
+        return self._bounds.width, self.final_height
+    end
+
+    return self
 end

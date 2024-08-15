@@ -177,7 +177,7 @@ function rt.GameState:load_input_mapping()
     end
 
     rt.InputControllerState.load_from_state(self)
-    rt.log("Succesfully loaded input mapping from `" .. file .. "`")
+    rt.log("Successfully loaded input mapping from `" .. file .. "`")
 end
 
 --- @brief

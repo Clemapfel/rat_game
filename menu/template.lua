@@ -45,7 +45,12 @@ end
 --- @return Unsigned, Table<bt.Equip>
 function mn.Template:list_equip_slots(entity)
     meta.assert_isa(entity, bt.Entity)
-    return self._state:template_list_entity_equips_slots(self._id, entity:get_id())
+    return self._state:template_list_entity_equip_slots(self._id, entity:get_id())
+end
+
+--- @brief
+function mn.Template:get_creation_date()
+    return self._state:template_get_date(self._id)
 end
 
 --- @brief

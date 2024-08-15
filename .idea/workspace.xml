@@ -22,8 +22,18 @@
     </configurations>
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="7fa9ba1b-2cff-4ecc-86fb-59ab2fa76ee1" name="Changes" comment="fixed grafics desynch bug">
-      <change beforePath="$PROJECT_DIR$/menu/inventory_scene_object_moved_animation.lua" beforeDir="false" afterPath="$PROJECT_DIR$/menu/inventory_scene_object_moved_animation.lua" afterDir="false" />
+    <list default="true" id="7fa9ba1b-2cff-4ecc-86fb-59ab2fa76ee1" name="Changes" comment="fixed separate blendmodes">
+      <change afterPath="$PROJECT_DIR$/battle/config_atlas.lua" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/common/game_state_battle.lua" beforeDir="false" afterPath="$PROJECT_DIR$/common/game_state_battle.lua" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/common/graphics.lua" beforeDir="false" afterPath="$PROJECT_DIR$/common/graphics.lua" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/common/message_dialog.lua" beforeDir="false" afterPath="$PROJECT_DIR$/common/message_dialog.lua" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/menu/inventory_scene.lua" beforeDir="false" afterPath="$PROJECT_DIR$/menu/inventory_scene.lua" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/menu/template.lua" beforeDir="false" afterPath="$PROJECT_DIR$/menu/template.lua" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/menu/verbose_info_panel.lua" beforeDir="false" afterPath="$PROJECT_DIR$/menu/verbose_info_panel.lua" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/menu/verbose_info_panel_item.lua" beforeDir="false" afterPath="$PROJECT_DIR$/menu/verbose_info_panel_item.lua" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/old/common/game_state.lua" beforeDir="false" afterPath="$PROJECT_DIR$/old/common/game_state.lua" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/old/menu/scene.lua" beforeDir="false" afterPath="$PROJECT_DIR$/old/menu/scene.lua" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -492,23 +502,8 @@
       <workItem from="1723514028401" duration="723000" />
       <workItem from="1723561350106" duration="6170000" />
       <workItem from="1723589641733" duration="1000" />
-      <workItem from="1723592313892" duration="16994000" />
-    </task>
-    <task id="LOCAL-00912" summary="potential cool screen transition">
-      <option name="closed" value="true" />
-      <created>1722371502713</created>
-      <option name="number" value="00912" />
-      <option name="presentableId" value="LOCAL-00912" />
-      <option name="project" value="LOCAL" />
-      <updated>1722371502713</updated>
-    </task>
-    <task id="LOCAL-00913" summary="cool texture with square wave">
-      <option name="closed" value="true" />
-      <created>1722375389495</created>
-      <option name="number" value="00913" />
-      <option name="presentableId" value="LOCAL-00913" />
-      <option name="project" value="LOCAL" />
-      <updated>1722375389495</updated>
+      <workItem from="1723592313892" duration="18575000" />
+      <workItem from="1723734031418" duration="5490000" />
     </task>
     <task id="LOCAL-00914" summary="stashing regular pattern">
       <option name="closed" value="true" />
@@ -886,7 +881,23 @@
       <option name="project" value="LOCAL" />
       <updated>1723659199851</updated>
     </task>
-    <option name="localTasksCounter" value="961" />
+    <task id="LOCAL-00961" summary="polished animation">
+      <option name="closed" value="true" />
+      <created>1723659663553</created>
+      <option name="number" value="00961" />
+      <option name="presentableId" value="LOCAL-00961" />
+      <option name="project" value="LOCAL" />
+      <updated>1723659663553</updated>
+    </task>
+    <task id="LOCAL-00962" summary="fixed separate blendmodes">
+      <option name="closed" value="true" />
+      <created>1723736852632</created>
+      <option name="number" value="00962" />
+      <option name="presentableId" value="LOCAL-00962" />
+      <option name="project" value="LOCAL" />
+      <updated>1723736852632</updated>
+    </task>
+    <option name="localTasksCounter" value="963" />
     <servers />
   </component>
   <component name="TypeScriptGeneratedFilesManager">
@@ -935,8 +946,6 @@
     </option>
   </component>
   <component name="VcsManagerConfiguration">
-    <MESSAGE value="fixed selection graph for specil accept / cancel items" />
-    <MESSAGE value="polished keyboard" />
     <MESSAGE value="finished keyboard" />
     <MESSAGE value="refactored scene" />
     <MESSAGE value="added rope" />
@@ -960,7 +969,9 @@
     <MESSAGE value="imported menu" />
     <MESSAGE value="added interactivity to menu rework" />
     <MESSAGE value="fixed grafics desynch bug" />
-    <option name="LAST_COMMIT_MESSAGE" value="fixed grafics desynch bug" />
+    <MESSAGE value="polished animation" />
+    <MESSAGE value="fixed separate blendmodes" />
+    <option name="LAST_COMMIT_MESSAGE" value="fixed separate blendmodes" />
   </component>
   <component name="XDebuggerManager">
     <breakpoint-manager>

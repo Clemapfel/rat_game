@@ -1730,7 +1730,7 @@ function mn.Scene:_regenerate_selection_nodes()
 
     --
 
-    shared_template_node:signal_connect("enter", function(_)
+    shared_template_node:signal_connect("enter", function(_)l
         scene._shared_list_frame:set_selection_state(rt.SelectionState.ACTIVE)
         scene._shared_template_list:set_selection_state(rt.SelectionState.ACTIVE)
         scene:_set_verbose_info_object(scene._shared_template_list:get_selected_object())

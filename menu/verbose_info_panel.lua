@@ -188,7 +188,7 @@ end
 function mn.VerboseInfoPanel:can_scroll_up()
     local last_item = self._items[#self._items]
     if last_item == nil then return false end
-    return self._y_offset + last_item:get_bounds().y - self._bounds.y > 0
+    return self._y_offset + select(2, last_item:measure()) - self._bounds.y > 0
 end
 
 --- @brief

@@ -60,7 +60,7 @@ rt.BlendFactor = meta.new_enum({
 --- @brief set blend mode
 function rt.graphics.set_blend_mode(blend_mode_rgb, blend_mode_alpha)
     if blend_mode_rgb == nil then blend_mode_rgb = rt.BlendMode.NORMAL end
-    if blend_mode_alpha == nil then blend_mode_alpha = rt.BlendMode.ADD end
+    if blend_mode_alpha == nil then blend_mode_alpha = rt.BlendMode.NORMAL end
     if love.getVersion() >= 12 then
         local rgb_operation, rgb_source_factor, rgb_destination_factor
         if blend_mode_rgb == rt.BlendMode.NONE then
@@ -100,11 +100,7 @@ function rt.graphics.set_blend_mode(blend_mode_rgb, blend_mode_alpha)
             alpha_operation = rt.BlendOperation.ADD
             alpha_source_factor = rt.BlendOperator.ZERO
             alpha_destination_factor = rt.BlendOperator.ONE
-        elseif blend_mode_alpha == rt.BlendMode.NORMAL then
-            alpha_operation = rt.BlendOperation.ADD
-            alpha_source_factor = rt.BlendFactor.ONE
-            alpha_destination_factor = rt.BlendFactor.ONE
-        elseif blend_mode_alpha == rt.BlendMode.ADD then
+        elseif blend_mode_alpha == rt.BlendMode.NORMAL or blend_mode_alpha == rt.BlendMode.ADD then
             alpha_operation = rt.BlendOperation.ADD
             alpha_source_factor = rt.BlendFactor.ONE
             alpha_destination_factor = rt.BlendFactor.ONE
@@ -127,7 +123,6 @@ function rt.graphics.set_blend_mode(blend_mode_rgb, blend_mode_alpha)
         else
             rt.error("In rt.graphics.set_blend_mode: invalid alpha blend mode `" .. tostring(blend_mode_alpha) .. "`")
         end
-
 
         love.graphics.setBlendState(rgb_operation, alpha_operation, rgb_source_factor, alpha_source_factor, rgb_destination_factor, alpha_destination_factor)
     else
@@ -154,7 +149,7 @@ end
 
 --- @brief
 function rt.graphics.set_color(color)
-    local r, g, b, a = color, g, b, a
+    local r, g, b, a = color
     if meta.is_rgba(color) then
         r, g, b, a = color.r, color.g, color.b, color.a
     elseif meta.is_hsva(color) then

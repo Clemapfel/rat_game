@@ -1,5 +1,6 @@
 rt.settings.message_dialog = {
     input_delay = 0.2, -- seconds
+    shadow_strength = 0.2
 }
 
 rt.MessageDialogOption = meta.new_enum({
@@ -29,6 +30,9 @@ rt.MessageDialog = meta.new_type("MessageDialog", rt.Widget, rt.SignalEmitter, f
         _render_y_offset = 0,
 
         _is_active = false,
+        _queue_deactivate = 0,
+        _queue_activate = 0,
+
         _input = rt.InputController(),
 
         _elapsed = 0
@@ -46,30 +50,6 @@ rt.MessageDialog = meta.new_type("MessageDialog", rt.Widget, rt.SignalEmitter, f
     out:signal_add("selection")
     return out
 end)
-
---- @brief
-function rt.MessageDialog:set_is_active(b)
-    self._is_active = b
-    self._input:set_is_disabled(not b)
-end
-
---- @brief
-function rt.MessageDialog:get_is_active()
-    return self._is_active
-end
-
---- @brief
-function rt.MessageDialog:close()
-    self:set_is_active(false)
-    self:set_is_visible(false)
-end
-
---- @brief
-function rt.MessageDialog:present()
-    self._elapsed = 0
-    self:set_is_active(true)
-    self:set_is_visible(true)
-end
 
 --- @override
 function rt.MessageDialog:realize()
@@ -161,7 +141,7 @@ end
 
 --- @override
 function rt.MessageDialog:draw()
-    if self:get_is_visible() == false then return end
+    if self._is_active == false then return end
 
     rt.graphics.translate(self._render_x_offset, self._render_y_offset)
 
@@ -190,6 +170,8 @@ end
 
 --- @brief
 function rt.MessageDialog:_handle_button_pressed(which)
+    if self._is_active ~= true then return end
+
     if self._elapsed < rt.settings.message_dialog.input_delay then
         return
     end
@@ -209,9 +191,38 @@ function rt.MessageDialog:_handle_button_pressed(which)
     end
 end
 
+--- @brief
+function rt.MessageDialog:get_is_active()
+    return self._is_active == true or self._queue_activate > 0
+end
+
+--- @brief
+function rt.MessageDialog:close()
+    self._queue_deactivate = 2
+end
+
+--- @brief
+function rt.MessageDialog:present()
+    self._queue_activate = 2 -- delay input by 2 frames
+end
+
 --- @override
 function rt.MessageDialog:update(delta)
     if self._is_active then
         self._elapsed = self._elapsed + delta
+    end
+
+    if self._queue_activate > 0 then
+        self._queue_activate = self._queue_activate - 1
+        if self._queue_activate == 0 then
+            self._is_active = true
+        end
+    end
+
+    if self._queue_deactivate > 0 then
+        self._queue_deactivate = self._queue_deactivate - 1
+        if self._queue_deactivate == 0 then
+            self._is_active = false
+        end
     end
 end

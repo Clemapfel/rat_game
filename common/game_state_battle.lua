@@ -723,6 +723,7 @@ for which in range("move", "consumable", "equip") do
     end
 
     --- @brief template_list_entity_move_slots, template_list_entity_consumable_slots, template_list_entity_equip_slots
+    --- @return Unsigned, Table<*>
     rt.GameState["template_list_entity_" .. which .. "_slots"] = function(self, template_id, entity_id)
         meta.assert_string(template_id, entity_id)
 
@@ -737,13 +738,15 @@ for which in range("move", "consumable", "equip") do
 
         local out = {}
         local slots = setup[which .. "s"]
+        local n = 0
         for slot_i, id in ipairs(slots) do
             if id ~= "" then
                 out[slot_i] = Type(id)
             end
+            n = n + 1
         end
 
-        return out
+        return n, out
     end
 end
 
@@ -783,6 +786,24 @@ function rt.GameState:add_template(name)
     }
 
     return id
+end
+
+--- @brief
+function rt.GameState:remove_template(template)
+    meta.assert_isa(template, mn.Template)
+    local id = template:get_id()
+    if self._state.templates[id] == nil then
+        rt.error("In rt.GameState.remove_template: template `" .. id .. "` is not part of state")
+        return
+    end
+
+    self._state.templates[id] = nil
+end
+
+--- @brief
+function rt.GameState:load_template(template)
+    meta.assert_isa(template, bt.Template)
+    TODO
 end
 
 --- @brief

@@ -312,6 +312,7 @@ function mn.InventoryScene:size_allocate(x, y, width, height)
 
     self._template_rename_keyboard:fit_into(x, y, width, height)
     self._template_confirm_load_dialog:fit_into(x,y , width, height)
+    self._template_confirm_delete_dialog:fit_into(x,y , width, height)
 end
 
 --- @override
@@ -368,10 +369,10 @@ function mn.InventoryScene:draw()
     
     local template_load_active = self._template_confirm_load_dialog:get_is_active()
     local template_delete_active = self._template_confirm_delete_dialog:get_is_active()
-    local template_rename_active = self._template_confirm_delete_dialog:get_is_active()
+    local template_rename_active = self._template_rename_keyboard:get_is_active()
 
     if template_load_active or template_delete_active or template_rename_active then
-        rt.graphics.set_blend_mode(rt.BlendMode.MULTIPLY)
+        rt.graphics.set_blend_mode(rt.BlendMode.MULTIPLY, rt.BlendMode.ADD)
         self._dialog_shadow:draw()
         rt.graphics.set_blend_mode()
     end
@@ -1861,18 +1862,64 @@ function mn.InventoryScene:_regenerate_selection_nodes()
 
     shared_template_node:signal_connect(rt.InputButton.B, on_b_undo_grab)
 
+    scene._template_confirm_load_dialog:signal_disconnect_all()
+    scene._template_confirm_load_dialog:signal_connect("selection", function(self, option_index)
+        if option_index == rt.MessageDialogOption.ACCEPT then
+            local current = scene._shared_template_list:get_selected_object()
+            if current ~= nil then
+                scene._state:load_template(current)
+                local clock = rt.Clock()
+                scene:create_from_state(scene._state)
+                scene:reformat()
+            end
+        end
+
+        scene._template_confirm_load_dialog:close()
+    end)
+
     shared_template_node:signal_connect(rt.InputButton.A, function(_)
-        -- TODO: load
+        if template_list_allow_load() then
+            scene._template_confirm_load_dialog:present()
+        end
+    end)
+
+    scene._template_rename_keyboard:signal_disconnect_all()
+    scene._template_rename_keyboard:signal_connect("accept", function(self, new_name)
+        local template = scene._shared_template_list:get_selected_object()
+        scene._shared_template_list:take(template)
+        scene._state:template_rename(template:get_id(), new_name)
+        scene._shared_template_list:add(template)
+
+        self:close()
+    end)
+    scene._template_rename_keyboard:signal_connect("cancel", function(self)
+        self:close()
     end)
 
     shared_template_node:signal_connect(rt.InputButton.X, function(_)
-        -- TODO: rename
+        if template_list_allow_rename() then
+            scene._template_rename_keyboard:present()
+        end
+    end)
+
+    scene._template_confirm_delete_dialog:signal_disconnect_all()
+    scene._template_confirm_delete_dialog:signal_connect("selection", function(self, option_index)
+        if option_index == rt.MessageDialogOption.ACCEPT then
+            local current = scene._shared_template_list:get_selected_object()
+            if current ~= nil then
+                scene._state:remove_template(current)
+                scene._shared_template_list:take(current)
+            end
+        end
+
+        scene._template_confirm_delete_dialog:close()
     end)
 
     shared_template_node:signal_connect(rt.InputButton.Y, function(_)
-        -- TODO: delete
+        if template_list_allow_delete() then
+            scene._template_confirm_delete_dialog:present()
+        end
     end)
-
 
     -- push
 
