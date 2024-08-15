@@ -59,47 +59,76 @@ rt.BlendFactor = meta.new_enum({
 
 --- @brief set blend mode
 function rt.graphics.set_blend_mode(blend_mode_rgb, blend_mode_alpha)
-    if blend_mode_alpha == nil then blend_mode_alpha = blend_mode_rgb end
+    if blend_mode_rgb == nil then blend_mode_rgb = rt.BlendMode.NORMAL end
+    if blend_mode_alpha == nil then blend_mode_alpha = rt.BlendMode.ADD end
     if love.getVersion() >= 12 then
-        local mode_to_equation = function(mode)
-            local operation, source_factor, destination_factor
-            if mode == rt.BlendMode.NONE then
-                operation = rt.BlendOperation.ADD
-                source_factor = rt.BlendFactor.ZERO
-                destination_factor = rt.BlendFactor.ONE
-            elseif mode == rt.BlendMode.NORMAL then
-                operation = rt.BlendOperation.ADD
-                source_factor = rt.BlendFactor.SOURCE_ALPHA
-                destination_factor = rt.BlendFactor.ONE_MINUS_SOURCE_ALPHA
-            elseif mode == rt.BlendMode.ADD then
-                operation = rt.BlendOperation.ADD
-                source_factor = rt.BlendFactor.ONE
-                destination_factor = rt.BlendFactor.ONE
-            elseif mode == rt.BlendMode.SUBTRACT then
-                operation = rt.BlendOperation.REVERSE_SUBTRACT
-                source_factor = rt.BlendFactor.ONE
-                destination_factor = rt.BlendFactor.ONE
-            elseif mode == rt.BlendMode.MULTIPLY then
-                operation = rt.BlendOperation.ADD
-                source_factor = rt.BlendFactor.ZERO
-                destination_factor = rt.BlendFactor.ONE
-            elseif mode == rt.BlendMode.MIN then
-                operation = rt.BlendOperation.MIN
-                source_factor = rt.BlendFactor.ONE
-                destination_factor = rt.BlendFactor.ONE
-            elseif mode == rt.BlendMode.MAX then
-                operation = rt.BlendOperation.MAX
-                source_factor = rt.BlendFactor.ONE
-                destination_factor = rt.BlendFactor.ONE
-            else
-                rt.error("In rt.graphics.set_blend_mode: invalid blend mode `" .. tostring(mode) .. "`")
-            end
-
-            return operation, source_factor, destination_factor
+        local rgb_operation, rgb_source_factor, rgb_destination_factor
+        if blend_mode_rgb == rt.BlendMode.NONE then
+            rgb_operation = rt.BlendOperation.ADD
+            rgb_source_factor = rt.BlendOperator.ZERO
+            rgb_destination_factor = rt.BlendOperator.ONE
+        elseif blend_mode_rgb == rt.BlendMode.NORMAL then
+            rgb_operation = rt.BlendOperation.ADD
+            rgb_source_factor = rt.BlendFactor.SOURCE_ALPHA
+            rgb_destination_factor = rt.BlendFactor.ONE_MINUS_SOURCE_ALPHA
+        elseif blend_mode_rgb == rt.BlendMode.ADD then
+            rgb_operation = rt.BlendOperation.ADD
+            rgb_source_factor = rt.BlendFactor.ONE
+            rgb_destination_factor = rt.BlendFactor.ONE
+        elseif blend_mode_rgb == rt.BlendMode.SUBTRACT then
+            rgb_operation = rt.BlendOperation.REVERSE_SUBTRACT
+            rgb_source_factor = rt.BlendFactor.ONE
+            rgb_destination_factor = rt.BlendFactor.ONE
+        elseif blend_mode_rgb == rt.BlendMode.MULTIPLY then
+            rgb_operation = rt.BlendOperation.ADD
+            rgb_source_factor = rt.BlendFactor.DESTINATION_COLOR
+            rgb_destination_factor = rt.BlendFactor.ZERO
+        elseif blend_mode_rgb == rt.BlendMode.MIN then
+            rgb_operation = rt.BlendOperation.MIN
+            rgb_source_factor = rt.BlendFactor.ONE
+            rgb_destination_factor = rt.BlendFactor.ONE
+        elseif blend_mode_rgb == rt.BlendMode.MAX then
+            rgb_operation = rt.BlendOperation.MAX
+            rgb_source_factor = rt.BlendFactor.ONE
+            rgb_destination_factor = rt.BlendFactor.ONE
+        else
+            rt.error("In rt.graphics.set_blend_mode: invalid rgb blend mode `" .. tostring(blend_mode_rgb) .. "`")
         end
         
-        local rgb_operation, rgb_source_factor, rgb_destination_factor = mode_to_equation(blend_mode_rgb)
-        local alpha_operation, alpha_source_factor, alpha_destination_factor = mode_to_equation(blend_mode_alpha)
+        local alpha_operation, alpha_source_factor, alpha_destination_factor
+        if blend_mode_alpha == rt.BlendMode.NONE then
+            alpha_operation = rt.BlendOperation.ADD
+            alpha_source_factor = rt.BlendOperator.ZERO
+            alpha_destination_factor = rt.BlendOperator.ONE
+        elseif blend_mode_alpha == rt.BlendMode.NORMAL then
+            alpha_operation = rt.BlendOperation.ADD
+            alpha_source_factor = rt.BlendFactor.ONE
+            alpha_destination_factor = rt.BlendFactor.ONE
+        elseif blend_mode_alpha == rt.BlendMode.ADD then
+            alpha_operation = rt.BlendOperation.ADD
+            alpha_source_factor = rt.BlendFactor.ONE
+            alpha_destination_factor = rt.BlendFactor.ONE
+        elseif blend_mode_alpha == rt.BlendMode.SUBTRACT then
+            alpha_operation = rt.BlendOperation.REVERSE_SUBTRACT
+            alpha_source_factor = rt.BlendFactor.ONE
+            alpha_destination_factor = rt.BlendFactor.ONE
+        elseif blend_mode_alpha == rt.BlendMode.MULTIPLY then
+            alpha_operation = rt.BlendOperation.ADD
+            alpha_source_factor = rt.BlendFactor.DESTINATION_ALPHA
+            alpha_destination_factor = rt.BlendFactor.ZERO
+        elseif blend_mode_alpha == rt.BlendMode.MIN then
+            alpha_operation = rt.BlendOperation.MIN
+            alpha_source_factor = rt.BlendFactor.ONE
+            alpha_destination_factor = rt.BlendFactor.ONE
+        elseif blend_mode_alpha == rt.BlendMode.MAX then
+            alpha_operation = rt.BlendOperation.MAX
+            alpha_source_factor = rt.BlendFactor.ONE
+            alpha_destination_factor = rt.BlendFactor.ONE
+        else
+            rt.error("In rt.graphics.set_blend_mode: invalid alpha blend mode `" .. tostring(blend_mode_alpha) .. "`")
+        end
+
+
         love.graphics.setBlendState(rgb_operation, alpha_operation, rgb_source_factor, alpha_source_factor, rgb_destination_factor, alpha_destination_factor)
     else
         local blend_mode = blend_mode_rgb
