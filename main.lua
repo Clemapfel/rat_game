@@ -1,4 +1,5 @@
 require "include"
+
 state = rt.GameState()
 state:initialize_debug_state()
 scene = mn.InventoryScene(state)

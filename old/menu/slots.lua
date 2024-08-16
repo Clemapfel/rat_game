@@ -21,6 +21,7 @@ mn.Slots = meta.new_type("MenuSlots", rt.Widget, function(layout)
         _n_slots = 0,
         _slot_i_to_item = {},
         _pre_realize_items = {},
+        _snapshot = rt.RenderTexture(),
         _frame = rt.Frame(),
     })
 end)
@@ -224,12 +225,28 @@ function mn.Slots:size_allocate(x, y, width, height)
         self:set_object(i, self._pre_realize_items[i])
     end
     self._pre_realize_items = {}
+
+    self._snapshot = rt.RenderTexture(width, height)
+    rt.graphics.translate(-x, -y)
+    self._snapshot:bind_as_render_target()
+    for row in values(self._items) do
+        for item in values(row) do
+            item.base:draw()
+            item.base_inlay:draw()
+            item.frame_outline:draw()
+            item.frame:draw()
+        end
+    end
+    self._snapshot:unbind_as_render_target()
+    rt.graphics.translate(x, y)
 end
 
 --- @override
 function mn.Slots:draw()
     if self._is_realized ~= true then return end
     self._frame:draw()
+
+    --[[
     for row in values(self._items) do
         for item in values(row) do
             item.base:draw()
@@ -241,6 +258,7 @@ function mn.Slots:draw()
             end
         end
     end
+    ]]
 end
 
 --- @override

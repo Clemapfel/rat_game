@@ -81,9 +81,16 @@ function mn.VerboseInfoPanel:size_allocate(x, y, width, height)
         local h = select(2, item:measure())
 
         item.height_above = total_height
-        item.aabb.height = h
+        item.aabb = rt.AABB(current_x, current_y, width, h)
         total_height = total_height + h
         current_y = current_y + h
+
+        item.snapshot = rt.RenderTexture(item.aabb.width, item.aabb.height)
+        rt.graphics.translate(-item.aabb.x, -item.aabb.y)
+        item.snapshot:bind_as_render_target()
+        item:draw()
+        item.snapshot:unbind_as_render_target()
+        rt.graphics.translate(item.aabb.x, item.aabb.y)
 
         self._total_height = self._total_height + h
     end
@@ -101,17 +108,15 @@ end
 
 --- @override
 function mn.VerboseInfoPanel:draw()
-
     self._frame:draw()
 
     self._frame:_bind_stencil()
     rt.graphics.translate(0, self._y_offset)
     for item in values(self._items) do
-        item:draw()
+        item.snapshot:draw(item.aabb.x, item.aabb.y)
     end
     self._frame:_unbind_stencil()
     rt.graphics.translate(0, -self._y_offset)
-
 
     if self._scroll_up_indicator_visible then
         self._scroll_up_indicator:draw()

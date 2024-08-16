@@ -90,9 +90,9 @@ function rt.Texture:get_height()
 end
 
 --- @overload rt.Drawable.draw
-function rt.Texture:draw()
+function rt.Texture:draw(x, y)
     love.graphics.setColor(1, 1, 1, 1)
-    love.graphics.draw(self._native)
+    love.graphics.draw(self._native, x, y)
 end
 
 if love.getVersion() >= 12 then
