@@ -1,6 +1,9 @@
 return {
     name = "MC",
     sprite_id = "battle/mc_battle",
+    portrait_sprite_id = "menu_portraits",
+    portrait_sprite_index = "MC",
+
     is_enemy = false,
     n_move_slots = 4 * 4,
     n_equip_slots = 2,

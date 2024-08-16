@@ -14,6 +14,8 @@ rt.MessageDialogOption = meta.new_enum({
 --- @param option1 vararg
 --- @signal selection (rt.MessageDialog, Unsigned) -> nil
 rt.MessageDialog = meta.new_type("MessageDialog", rt.Widget, rt.SignalEmitter, function(message, submessage, option1, ...)
+    message = which(message, " ")
+    submessage = which(submessage, " ")
     local out = meta.new(rt.MessageDialog, {
         _message = message,
         _submessage = submessage,
@@ -204,6 +206,30 @@ end
 --- @brief
 function rt.MessageDialog:present()
     self._queue_activate = 2 -- delay input by 2 frames
+end
+
+--- @brief
+function rt.MessageDialog:set_message(message, submessage)
+    meta.assert_string(message)
+    self._message_label:set_text(message)
+
+    if submessage ~= nil then
+        meta.assert_string(submessage)
+        self._submessage_label:set_text(submessage)
+    end
+
+    if self._is_realized then
+        self:reformat()
+    end
+end
+
+--- @brief
+function rt.MessageDialog:set_submessage(submessage)
+    meta.assert_string(submessage)
+    self._submessage_label:set_text(submessage)
+    if self._is_realized then
+        self:reformat()
+    end
 end
 
 --- @override

@@ -356,31 +356,3 @@ function mn.Slots:set_opacity(alpha)
         item.frame_outline:set_opacity(alpha)
     end
 end
-
---- @brief
-function mn.Slots:sort()
-    local by_type = {
-        [mn.SlotType.MOVE] = {},
-        [mn.SlotType.CONSUMABLE] = {},
-        [mn.SlotType.EQUIP] = {},
-        [mn.SlotType.INTRINSIC] = {}
-    }
-
-    for slot_i = 1, self._n_slots do
-        local item = self._slot_i_to_item[slot_i]
-        if item.object ~= nil then
-            table.insert(by_type[item.type], item.object)
-        end
-    end
-
-    for slot_i = 1, self._n_slots do
-        local item = self._slot_i_to_item[slot_i]
-        local to_push = table.pop_front(by_type[item.type])
-        self:set_object(slot_i, to_push)
-    end
-end
-
---- @brief
-function mn.Slots:set_slot_object_visible(slot_i, b)
-    self._slot_i_to_item[slot_i].is_visible = b
-end

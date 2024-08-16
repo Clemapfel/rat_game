@@ -802,8 +802,99 @@ end
 
 --- @brief
 function rt.GameState:load_template(template)
-    meta.assert_isa(template, bt.Template)
-    TODO
+    meta.assert_isa(template, mn.Template)
+    local id = template:get_id()
+    local entry = self._state.templates[id]
+    if entry == nil then
+        rt.error("In rt.GameState:load_template: no template with id `" .. id .. "`")
+    end
+
+    local state = self._state
+    local entity_id_to_is_present = {}
+
+    -- unequip all
+    local entities = self:list_entities()
+    for entity_i, entity_entry in ipairs(state.entities) do
+        entity_id_to_is_present[entity_entry.id] = true
+
+        local entity = self._entity_index_to_entity[entity_i]
+        for slot_i, move_entry in ipairs(entity_entry.moves) do
+            if move_entry.id ~= "" then
+                local move = bt.Move(move_entry.id)
+                self:entity_remove_move(entity, slot_i)
+                self:add_shared_move(move)
+            end
+        end
+
+        for slot_i, equip_entry in ipairs(entity_entry.equips) do
+            if equip_entry.id ~= "" then
+                local equip = bt.Equip(equip_entry.id)
+                self:entity_remove_equip(entity, slot_i)
+                self:add_shared_equip(equip)
+            end
+        end
+
+        for slot_i, consumable_entry in ipairs(entity_entry.consumables) do
+            if consumable_entry.id ~= "" then
+                local consumable = bt.Consumable(consumable_entry.id)
+                self:entity_remove_consumable(entity, slot_i)
+                self:add_shared_consumable(consumable)
+            end
+        end
+    end
+
+    -- equip if possible
+    local full_equip_possible = true
+
+    for entity in values(template:list_entities()) do
+        if entity_id_to_is_present[entity:get_id()] then
+            local n, slots = template:list_move_slots(entity)
+            local move_set = {}
+            for slot_i = 1, n do
+                local move = slots[slot_i]
+                if move ~= nil then
+                    local shared_move_entry = state.shared_moves[move:get_id()]
+                    if shared_move_entry ~= nil and shared_move_entry.count >= 1 and move_set[move] == nil then
+                        self:remove_shared_move(move)
+                        self:entity_add_move(entity, slot_i, move)
+                        move_set[move] = true
+                    else
+                        full_equip_possible = false
+                    end
+                end
+            end
+
+            for slot_i = 1, n do
+                local equip = slots[slot_i]
+                if equip ~= nil then
+                    local shared_equip_entry = state.shared_equips[equip:get_id()]
+                    if shared_equip_entry ~= nil and shared_equip_entry.count >= 1 then
+                        self:remove_shared_equip(equip)
+                        self:entity_add_equip(entity, slot_i, equip)
+                    else
+                        full_equip_possible = false
+                    end
+                end
+            end
+
+            for slot_i = 1, n do
+                local consumable = slots[slot_i]
+                if consumable ~= nil then
+                    local shared_consumable_entry = state.shared_consumables[consumable:get_id()]
+                    if shared_consumable_entry ~= nil and shared_consumable_entry.count >= 1 then
+                        self:remove_shared_consumable(consumable)
+                        self:entity_add_consumable(entity, slot_i, consumable)
+                    else
+                        full_equip_possible = false
+                    end
+                end
+            end
+        else
+            full_equip_possible = false
+        end
+    end
+
+    return full_equip_possible
 end
 
 --- @brief
@@ -820,7 +911,7 @@ end
 
 --- @brief
 function rt.GameState:template_remove(id)
-    meta.assert_string(id, new_name)
+    meta.assert_string(id)
     local entry = self._state.templates[id]
     if entry == nil then
         rt.error("In rt.GameState:template_remove: no template with id `" .. id .. "`")
@@ -1010,5 +1101,10 @@ function rt.GameState:initialize_debug_state()
     local debug_template = self:add_template("Debug Template")
     for entity in values(entities) do
         self:template_add_entity(debug_template, entity, entity:list_moves(), entity:list_equips(), entity:list_consumables())
+    end
+
+    local error_template = self:add_template("Error Template")
+    for entity in range(entities[1]) do
+        self:template_add_entity(error_template, entity, table.rep(bt.Move("DEBUG_MOVE"), 16), {}, {})
     end
 end

@@ -3,12 +3,6 @@ rt.settings.menu.inventory_scene = {
     verbose_info_scroll_speed = 150,
     sprite_factor = 2,
     grabbed_object_sprite_offset = -0.1,
-    
-    template_confirm_load_heading = "Overwrite current Equipment?",
-    template_confirm_load_body = "This will return all currently equipped items back to the shared inventory",
-    
-    template_confirm_delete_heading = "Delete Template permanently?",
-    template_confirm_delete_body = "This action cannot be undone",
 }
 
 --- @class mn.InventoryScene
@@ -47,6 +41,7 @@ mn.InventoryScene = meta.new_type("InventoryScene", rt.Scene, function(state)
         _dialog_shadow = rt.Rectangle(0, 0, 1, 1),
         _template_confirm_load_dialog = nil, -- rt.MessageDialog
         _template_confirm_delete_dialog = nil, -- rt.MessageDialog
+        _template_apply_unsuccesfull_dialog = nil, -- rt.MessageDialog
         _template_rename_keyboard = nil, -- rt.Keyboard
     })
 end, {
@@ -105,18 +100,22 @@ function mn.InventoryScene:realize()
     end)
     
     self._template_confirm_load_dialog = rt.MessageDialog(
-        rt.settings.menu.inventory_scene.template_confirm_load_heading,
-        rt.settings.menu.inventory_scene.template_confirm_load_body,
+        " ", " ", -- set during present()
         rt.MessageDialogOption.ACCEPT, rt.MessageDialogOption.CANCEL
     )
     self._template_confirm_load_dialog:realize()
 
     self._template_confirm_delete_dialog = rt.MessageDialog(
-        rt.settings.menu.inventory_scene.template_confirm_delete_heading,
-        rt.settings.menu.inventory_scene.template_confirm_delete_body,
+        " ", " ", -- set during present()
         rt.MessageDialogOption.ACCEPT, rt.MessageDialogOption.CANCEL
     )
     self._template_confirm_delete_dialog:realize()
+
+    self._template_apply_unsuccesfull_dialog = rt.MessageDialog(
+        " ", " ", -- set during present()
+        rt.MessageDialogOption.ACCEPT
+    )
+    self._template_apply_unsuccesfull_dialog:realize()
     
     self._template_rename_keyboard = rt.Keyboard(#("New Template #1234"), "New Template")
     self._template_rename_keyboard:realize()
@@ -137,7 +136,7 @@ function mn.InventoryScene:create_from_state(state)
     end)
 
     for entity_i, entity in ipairs(entities) do
-        local tab_sprite = rt.Sprite(entity:get_sprite_id())
+        local tab_sprite = rt.Sprite(entity:get_portrait_sprite_id())
         local sprite_w, sprite_h = tab_sprite:get_resolution()
         tab_sprite:set_minimum_size(sprite_w * tab_sprite_scale_factor, sprite_h * tab_sprite_scale_factor)
         self._entity_tab_bar:push(tab_sprite)
@@ -311,8 +310,9 @@ function mn.InventoryScene:size_allocate(x, y, width, height)
     self._dialog_shadow:resize(x, y, width, height)
 
     self._template_rename_keyboard:fit_into(x, y, width, height)
-    self._template_confirm_load_dialog:fit_into(x,y , width, height)
-    self._template_confirm_delete_dialog:fit_into(x,y , width, height)
+    self._template_confirm_load_dialog:fit_into(x, y, width, height)
+    self._template_confirm_delete_dialog:fit_into(x, y, width, height)
+    self._template_apply_unsuccesfull_dialog:fit_into(x, y, width, height)
 end
 
 --- @override
@@ -325,6 +325,8 @@ function mn.InventoryScene:update(delta)
         self._template_confirm_delete_dialog:update(delta)
     elseif self._template_confirm_load_dialog:get_is_active() then
         self._template_confirm_load_dialog:update(delta)
+    elseif self._template_apply_unsuccesfull_dialog:get_is_active() then
+        self._template_apply_unsuccesfull_dialog:update(delta)
     else
         local speed = rt.settings.menu.inventory_scene.verbose_info_scroll_speed
         if self._input_controller:is_down(rt.InputButton.L) then
@@ -366,12 +368,13 @@ function mn.InventoryScene:draw()
 
     self._verbose_info:draw()
     self._animation_queue:draw()
-    
+
     local template_load_active = self._template_confirm_load_dialog:get_is_active()
     local template_delete_active = self._template_confirm_delete_dialog:get_is_active()
     local template_rename_active = self._template_rename_keyboard:get_is_active()
+    local template_load_unsuccesfull_active = self._template_apply_unsuccesfull_dialog:get_is_active()
 
-    if template_load_active or template_delete_active or template_rename_active then
+    if template_load_active or template_delete_active or template_rename_active or template_load_unsuccesfull_active then
         rt.graphics.set_blend_mode(rt.BlendMode.MULTIPLY, rt.BlendMode.ADD)
         self._dialog_shadow:draw()
         rt.graphics.set_blend_mode()
@@ -387,6 +390,10 @@ function mn.InventoryScene:draw()
 
     if template_rename_active then
         self._template_rename_keyboard:draw()
+    end
+
+    if template_load_unsuccesfull_active then
+        self._template_apply_unsuccesfull_dialog:draw()
     end
 end
 
@@ -458,7 +465,9 @@ end
 function mn.InventoryScene:_handle_button_pressed(which)
     local dialog_active = self._template_rename_keyboard:get_is_active() or
         self._template_confirm_load_dialog:get_is_active() or
-        self._template_confirm_delete_dialog:get_is_active()
+        self._template_confirm_delete_dialog:get_is_active() or
+        self._template_apply_unsuccesfull_dialog:get_is_active()
+
     if dialog_active then
         -- noop
     else
@@ -1862,15 +1871,27 @@ function mn.InventoryScene:_regenerate_selection_nodes()
 
     shared_template_node:signal_connect(rt.InputButton.B, on_b_undo_grab)
 
+    scene._template_apply_unsuccesfull_dialog:signal_disconnect_all()
+    scene._template_apply_unsuccesfull_dialog:signal_connect("selection", function(self, option_index)
+        self:close()
+    end)
+
     scene._template_confirm_load_dialog:signal_disconnect_all()
     scene._template_confirm_load_dialog:signal_connect("selection", function(self, option_index)
         if option_index == rt.MessageDialogOption.ACCEPT then
             local current = scene._shared_template_list:get_selected_object()
             if current ~= nil then
-                scene._state:load_template(current)
+                local success = scene._state:load_template(current)
                 local clock = rt.Clock()
                 scene:create_from_state(scene._state)
                 scene:reformat()
+
+                if success == false then
+                    scene._template_apply_unsuccesfull_dialog:set_message(
+                        scene:_template_apply_unsuccesfull_dialog_message(current:get_name())
+                    )
+                    scene._template_apply_unsuccesfull_dialog:present()
+                end
             end
         end
 
@@ -1879,7 +1900,13 @@ function mn.InventoryScene:_regenerate_selection_nodes()
 
     shared_template_node:signal_connect(rt.InputButton.A, function(_)
         if template_list_allow_load() then
-            scene._template_confirm_load_dialog:present()
+            local current = scene._shared_template_list:get_selected_object()
+            if current ~= nil then
+                scene._template_confirm_load_dialog:set_message(
+                    scene:_template_confirm_load_dialog_message(current:get_name())
+                )
+                scene._template_confirm_load_dialog:present()
+            end
         end
     end)
 
@@ -1917,7 +1944,11 @@ function mn.InventoryScene:_regenerate_selection_nodes()
 
     shared_template_node:signal_connect(rt.InputButton.Y, function(_)
         if template_list_allow_delete() then
-            scene._template_confirm_delete_dialog:present()
+            local current = scene._shared_template_list:get_select_object()
+            if current ~= nil then
+                scene._template_confirm_delete_dialog:set_message(scene:_template_confirm_delete_dialog_message(current:get_name()))
+                scene._template_confirm_delete_dialog:present()
+            end
         end
     end)
 
@@ -2016,4 +2047,21 @@ end
 --- @brief
 function mn.InventoryScene:_play_transfer_object_animation(object, from_aabb, to_aabb, before, after)
     self._animation_queue:append(mn.Animation.OBJECT_MOVED(object, from_aabb, to_aabb), before, after)
+end
+
+--- @brief
+function mn.InventoryScene:_template_confirm_load_dialog_message(name)
+    return "Overwrite current Equipment?",
+        "This will return all currently equipped items back to the shared inventory"
+end
+
+--- @brief
+function mn.InventoryScene:_template_confirm_delete_dialog_message(name)
+    return "Delete Template \"" .. name .. "\" permanently?",
+        "This action cannot be undone"
+end
+
+--- @brief
+function mn.InventoryScene:_template_apply_unsuccesfull_dialog_message(name)
+    return "Some Elements of Template \"" .. name .. "\" could not be applied", ""
 end

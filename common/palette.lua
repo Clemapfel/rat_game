@@ -263,7 +263,7 @@ function rt.Palette:export()
             image:set_pixel(i, 1, color)
         end
     end
-
+    
     image:save_to_file("palette.png")
     local from = love.filesystem.getAppdataDirectory() .. "love/rat_game/palette.png"
     local to = love.filesystem.getSourceBaseDirectory() .. "/rat_game/assets/palette.png"
