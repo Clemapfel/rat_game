@@ -19,8 +19,8 @@ rt.GameState = meta.new_type("GameState", function()
         config = {
             vsync = rt.VSyncMode.ADAPTIVE,
             msaa = rt.MSAAQuality.BEST,
-            resolution_x = 1280,
-            resolution_y = 720,
+            resolution_x = 1600,--1280,
+            resolution_y = 900,--720,
             show_fps = true
         },
 

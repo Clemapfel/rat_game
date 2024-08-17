@@ -21,6 +21,7 @@ rt.Sprite = meta.new_type("Sprite", rt.Widget, rt.Animation, function(id, index)
         _frame_range_start = 1,
         _frame_range_end = 1,
         _opacity = 1,
+        _use_corrective_shader = false
     })
 end,
     {
@@ -55,10 +56,14 @@ end
 
 --- @override
 function rt.Sprite:draw()
-    self._shader:bind()
-    self._shader:send("texture_resolution", self._texture_resolution)
-    self._shape:draw()
-    self._shader:unbind()
+    if self._use_corrective_shader then
+        self._shader:bind()
+        self._shader:send("texture_resolution", self._texture_resolution)
+        self._shape:draw()
+        self._shader:unbind()
+    else
+        self._shape:draw()
+    end
 end
 
 --- @override
@@ -166,4 +171,9 @@ end
 --- @brief
 function rt.Sprite:get_origin()
     return self._spritesheet.origin_x, self._spritesheet.origin_y
+end
+
+--- @brief
+function rt.Sprite:set_use_corrective_shader(b)
+    self._use_corrective_shader = b
 end

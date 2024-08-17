@@ -374,6 +374,7 @@ function mn.InventoryScene:draw()
     local template_rename_active = self._template_rename_keyboard:get_is_active()
     local template_load_unsuccesfull_active = self._template_apply_unsuccesfull_dialog:get_is_active()
 
+
     if template_load_active or template_delete_active or template_rename_active or template_load_unsuccesfull_active then
         rt.graphics.set_blend_mode(rt.BlendMode.MULTIPLY, rt.BlendMode.ADD)
         self._dialog_shadow:draw()

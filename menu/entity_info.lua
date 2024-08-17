@@ -23,6 +23,10 @@ mn.EntityInfo = meta.new_type("MenuEntityInfo", rt.Widget, function(entity)
         _speed_preview_value = 0,
         _speed_preview_active = false,
         _speed_no_preview_offset = 0,
+
+        _snapshot = nil, -- rt.RenderTexture
+        _snapshot_x = 0,
+        _snapshot_y = 0,
     })
 end)
 
@@ -151,12 +155,14 @@ function mn.EntityInfo:size_allocate(x, y, width, height)
 
     self._frame:fit_into(x, y, width, height)
     self._y_center_offset = ((end_y - start_y) - total_h) / 2
-end
 
---- @override
-function mn.EntityInfo:draw()
+    self._snapshot_x = x
+    self._snapshot_y = y
+    self._snapshot = rt.RenderTexture(width, height)
+
+    self._snapshot:bind_as_render_target()
+    rt.graphics.translate(-x, -y)
     self._frame:draw()
-
     rt.graphics.translate(0, math.floor(self._y_center_offset))
     for stat in range("hp", "attack", "defense", "speed") do
         self["_" .. stat .. "_heading_label"]:draw()
@@ -171,6 +177,13 @@ function mn.EntityInfo:draw()
         end
     end
     rt.graphics.translate(0, -math.floor(self._y_center_offset))
+    rt.graphics.translate(x, y)
+    self._snapshot:unbind_as_render_target()
+end
+
+--- @override
+function mn.EntityInfo:draw()
+    self._snapshot:draw(self._snapshot_x, self._snapshot_y)
 end
 
 --- @brief
