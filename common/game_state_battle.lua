@@ -123,6 +123,7 @@ function rt.GameState:add_entity(entity)
     to_add.id = entity:get_id()
 
     self._entity_index_to_entity[count] = entity
+    self._entity_to_entity_index[entity] = count
 end
 
 --- @brief
@@ -151,6 +152,7 @@ function rt.GameState:list_entities()
     for i, entity in ipairs(self._entity_index_to_entity) do
         table.insert(out, entity)
     end
+
     return out
 end
 
@@ -709,6 +711,11 @@ function rt.GameState:template_list_entities(id)
     for entity_id in keys(entry.entities) do
         table.insert(out, self:_entity_id_to_entity(entity_id))
     end
+
+    table.sort(out, function(a, b)
+        return self._entity_to_entity_index[a] < self._entity_to_entity_index[b]
+    end)
+
     return out
 end
 
@@ -864,6 +871,7 @@ function rt.GameState:load_template(template)
                 end
             end
 
+            n, slots = template:list_equip_slots(entity)
             for slot_i = 1, n do
                 local equip = slots[slot_i]
                 if equip ~= nil then
@@ -877,6 +885,7 @@ function rt.GameState:load_template(template)
                 end
             end
 
+            n, slots = template:list_consumable_slots(entity)
             for slot_i = 1, n do
                 local consumable = slots[slot_i]
                 if consumable ~= nil then

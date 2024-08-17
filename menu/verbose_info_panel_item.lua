@@ -512,6 +512,7 @@ function mn.VerboseInfoPanel.Item:create_from_template(template)
         local font, mono_font = rt.settings.font.default_small, rt.settings.font.default_mono_small
         for entity in values(template:list_entities()) do
             local to_push = {
+                entity = entity,
                 name_label = rt.Label("<u>" .. entity:get_name() .. "</u>", font, mono_font),
                 move_label = rt.Label(move_name .. "s:", font, mono_font),
                 move_sprites = {},
@@ -562,7 +563,7 @@ function mn.VerboseInfoPanel.Item:create_from_template(template)
                 end
             end
 
-            self.entities[entity] = to_push
+            table.insert(self.entities, to_push)
         end
     end
 
