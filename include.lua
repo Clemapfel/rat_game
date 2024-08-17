@@ -110,6 +110,7 @@ require "common.control_indicator"
 require "common.particle_emitter"
 require "common.message_dialog"
 require "common.keyboard"
+require "common.direction_indicator"
 
 require "common.physics_world"
 require "common.collider"
@@ -124,6 +125,7 @@ require "battle.equip"
 require "battle.consumable"
 require "battle.status"
 require "battle.entity"
+require "battle.background"
 
 -- menu
 require "menu.template"
@@ -135,6 +137,8 @@ require "menu.slots"
 require "menu.entity_info"
 require "menu.inventory_scene_object_moved_animation"
 require "menu.inventory_scene"
+
+require "menu.option_button"
 
 -- state
 require "common.game_state"

@@ -1,8 +1,8 @@
 --[[
 vsync               : on / off / adaptive
 fullsceen           : on / off
-msaa                : 0 / 2 / 4 / 8 / 16
-
+msaa                : off, okay, good, better, best
+font size           : normal, larger, largest
 
 reset to default
 ]]
