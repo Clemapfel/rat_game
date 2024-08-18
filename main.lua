@@ -35,6 +35,7 @@ love.update = function(delta)
         scene:update(delta)
     end
 
+    option:update(delta)
     background:update(delta)
 end
 
