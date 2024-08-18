@@ -15,7 +15,6 @@ scale = mn.Scale(0, 100, 10, 50)
 scale:realize()
 scale:fit_into(100, 200, 200, 27)
 
-
 input = rt.InputController()
 input:signal_connect("pressed", function(_, which)
     if which == rt.InputButton.RIGHT then
@@ -29,7 +28,7 @@ input:signal_connect("pressed", function(_, which)
     end
 end)
 
-background = bt.Background.POLAR_COORDINATES()
+background = bt.Background.STAINED_GLASS_BUTTERFLY()
 background:realize()
 
 love.load = function()
@@ -56,7 +55,7 @@ love.draw = function()
 
     option:draw()
     scale:draw()
-    ---background:draw()
+    background:draw()
 end
 
 love.resize = function()
