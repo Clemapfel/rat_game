@@ -36,6 +36,8 @@ end
 
 --- @overload
 function rt.Ellipse:resize(x, y, x_radius, y_radius)
+    if x_radius == nil then x_radius = self._x_radius end
+    if y_radius == nil then y_radius = x_radius end
     self._x = x
     self._y = y
     self._x_radius = x_radius

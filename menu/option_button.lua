@@ -1,24 +1,38 @@
 rt.settings.menu.option_button = {
-    scroll_speed = 300, -- px per second
+    scroll_speed = 600, -- px per second
+    indicator_glow_duration = 0.2, -- seconds
 }
 
 --- @class mn.OptionButton
-mn.OptionButton = meta.new_type("OptionButton", rt.Widget, function(...)
+--- @signal selection (mn.OptionButton, string) -> nil
+mn.OptionButton = meta.new_type("OptionButton", rt.Widget, rt.SignalEmitter, function(...)
     assert(_G._select("#", ...) > 0)
-    return meta.new(mn.OptionButton, {
+    local out = meta.new(mn.OptionButton, {
         _options = {...},
         _left_indicator = rt.DirectionIndicator(rt.Direction.LEFT),
         _right_indicator = rt.DirectionIndicator(rt.Direction.RIGHT),
-        _left_line = rt.Line(),
-        _right_line = rt.Line(),
+
+        _right_indicator_glow_active = false,
+        _right_indicator_elapsed = 0,
+
+        _left_indicator_glow_active = false,
+        _left_indicator_elapsed = 0,
+
         _items = {}, -- Table<rt.Label>
         _current_item_i = 1,
         _current_offset = 0,
-        _x_offset = 0,
         _n_items = 0,
         _stencil = rt.Rectangle()
     })
+
+    out:signal_add("selection")
+    return out
 end)
+
+--- @brief
+function mn.OptionButton:_emit_selection()
+    self:signal_emit("selection", self._items[self._current_item_i].text)
+end
 
 --- @override
 function mn.OptionButton:realize()
@@ -28,9 +42,10 @@ function mn.OptionButton:realize()
     self._option_labels = {}
     for option in values(self._options) do
         local to_push = {
+            text = option,
             label = rt.Label("<o>" .. option .. "</o>"),
             offset = 0,
-            line = rt.Line(),
+            line = rt.Rectangle(),
         }
         to_push.label:realize()
         to_push.label:set_justify_mode(rt.JustifyMode.LEFT)
@@ -41,6 +56,8 @@ function mn.OptionButton:realize()
 
     self._left_indicator:realize()
     self._right_indicator:realize()
+
+    self:_emit_selection()
 end
 
 --- @override
@@ -63,49 +80,60 @@ function mn.OptionButton:size_allocate(x, y, width, height)
         n = n + 1
     end
 
-    local label_m = (width - total_w) / (n + 1)
+    local label_m = m
+    local tile_w = max_w + 2 * label_m
 
-    self._left_indicator:fit_into(current_x, y + 0.5 * height - 0.5 * max_h, max_h, max_h)
-    current_x = current_x + max_h
+    local left_x = x
+    self._left_indicator:fit_into(left_x, y + 0.5 * height - 0.5 * max_h, max_h, max_h)
 
-    self._left_line:resize(current_x, y, current_x, y + height)
+    local right_x = left_x + max_h + label_m + tile_w + label_m
+    self._right_indicator:fit_into(right_x, y + 0.5 * height - 0.5 * max_h, max_h, max_h)
 
-    local label_start_x = current_x
-    current_x = current_x + m
+    local label_start_x = x + max_h + label_m
+    local label_y = y + 0.5 * height - 0.5 * max_h
 
+    current_x = label_start_x
     for i, item in ipairs(self._items) do
         local w, h = label_ws[i], label_hs[i]
-        item.label:fit_into(current_x, y + 0.5 * height - 0.5 * h, POSITIVE_INFINITY)
-        item.offset = current_x + 0.5 * w - label_start_x
 
-        local line_x = current_x + 0.5 * w
-        item.line:resize(line_x, y, line_x, y + height)
-        current_x = current_x + label_m + w
+        item.line:resize(current_x, label_y, tile_w, h)
+        item.line:set_color(rt.hsva_to_rgba(rt.HSVA(i / n, 1, 1, 1)))
+        item.line:set_opacity(0.5)
+
+        item.label:fit_into(current_x + 0.5 * tile_w - 0.5 * w, label_y, POSITIVE_INFINITY)
+
+        item.offset = current_x - label_start_x
+        current_x = current_x + tile_w + 5
     end
 
-    self._x_offset = (current_x - label_start_x) / 2
+    local stencil_h = max_h + 10
+    left_x = left_x + max_h
+    self._stencil:resize(left_x, y + 0.5 * height - 0.5 * stencil_h, (right_x - left_x), stencil_h)
 
-    self._right_line:resize(current_x, y, current_x, y + height)
-    self._right_indicator:fit_into(current_x, y + 0.5 * height - 0.5 * max_h, max_h, max_h)
+    self:_update_direction_indicators()
 end
 
 --- @override
 function mn.OptionButton:draw()
-    local item = self._items[self._current_item_i]
-
     self._left_indicator:draw()
     self._right_indicator:draw()
 
-    self._left_line:draw()
-    self._right_line:draw()
+    local stencil_value = meta.hash(self) % 255
+    rt.graphics.stencil(stencil_value, self._stencil)
+    rt.graphics.set_stencil_test(rt.StencilCompareMode.NOT_EQUAL)
 
-    rt.graphics.translate(self._x_offset - self._current_offset, 0)
+    local offset = self._current_offset
+    rt.graphics.translate(-offset, 0)
 
-    for item in values(self._items) do
-        item.label:draw()
-        item.line:draw()
+    for i = self._current_item_i - 1, self._current_item_i + 1 do
+        local item = self._items[i]
+        if item ~= nil then
+            item.label:draw()
+        end
     end
-    rt.graphics.translate(-(self._x_offset - self._current_offset), 0)
+
+    rt.graphics.translate(offset, 0)
+    rt.graphics.set_stencil_test()
 end
 
 --- @brief
@@ -119,12 +147,57 @@ function mn.OptionButton:update(delta)
         self._current_offset = clamp(self._current_offset - offset, target_offset)
     end
 
+    local glow_duration = rt.settings.menu.option_button.indicator_glow_duration
+    if self._right_indicator_glow_active then
+        self._right_indicator_elapsed = self._right_indicator_elapsed + delta
+        local fraction = clamp(self._right_indicator_elapsed / glow_duration, 0, 1)
+        local target_color = rt.color_mix(rt.Palette.SELECTION, rt.Palette.FOREGROUND, fraction)
+        self._right_indicator:set_color(target_color)
+
+        if self._right_indicator_elapsed >= glow_duration then
+            self._right_indicator_elapsed = 0
+            self._right_indicator_glow_active = false
+        end
+    end
+
+    if self._left_indicator_glow_active then
+        self._left_indicator_elapsed = self._left_indicator_elapsed + delta
+        local fraction = clamp(self._left_indicator_elapsed / glow_duration, 0, 1)
+        local target_color = rt.color_mix(rt.Palette.SELECTION, rt.Palette.FOREGROUND, fraction)
+        self._left_indicator:set_color(target_color)
+
+        if self._left_indicator_elapsed >= glow_duration then
+            self._left_indicator_elapsed = 0
+            self._left_indicator_glow_active = false
+        end
+    end
+end
+
+--- @brief
+function mn.OptionButton:_update_direction_indicators()
+    local off_opacity = 0.5;
+    if self:can_move_right() then
+        self._right_indicator:set_opacity(1)
+    else
+        self._right_indicator:set_opacity(off_opacity)
+    end
+
+    if self:can_move_left() then
+        self._left_indicator:set_opacity(1)
+    else
+        self._left_indicator:set_opacity(off_opacity)
+    end
 end
 
 --- @brief
 function mn.OptionButton:move_right()
     if self:can_move_right() then
         self._current_item_i = self._current_item_i + 1
+
+        self._right_indicator_glow_active = true
+        self._right_indicator:set_color(rt.Palette.TRUE_WHITE)
+        self:_update_direction_indicators()
+        self:_emit_selection()
         return true
     else
         return false
@@ -135,9 +208,28 @@ end
 function mn.OptionButton:move_left()
     if self:can_move_left() then
         self._current_item_i = self._current_item_i - 1
+
+        self._left_indicator_glow_active = true
+        self._left_indicator:set_color(rt.Palette.TRUE_WHITE)
+        self:_update_direction_indicators()
+        self:_emit_selection()
         return true
     else
         return false
+    end
+end
+
+--- @brief
+function mn.OptionButton:set_option(i_or_text)
+    if meta.is_number(i_or_text) then
+        local i = i_or_text
+        if i > self._n_items then
+            rt.error("In mn.OptionButton:set_option: option #" .. i .. " is out of bounds for OptionButton with `" .. self._n_items .. "` options")
+            return
+        end
+
+        self._current_item_i = i
+        self:_emit_selection()
     end
 end
 

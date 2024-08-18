@@ -22,50 +22,15 @@
     </configurations>
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="7fa9ba1b-2cff-4ecc-86fb-59ab2fa76ee1" name="Changes" comment="template verbose info now follows state order">
-      <change afterPath="$PROJECT_DIR$/battle/background.lua" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/battle/backgrounds/brusselator.glsl" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/battle/backgrounds/brusselator.lua" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/battle/backgrounds/clouds.glsl" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/battle/backgrounds/clouds.lua" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/battle/backgrounds/dot_matrix.glsl" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/battle/backgrounds/dot_matrix.lua" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/battle/backgrounds/eye.glsl" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/battle/backgrounds/eye.lua" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/battle/backgrounds/focus_rack_dots.glsl" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/battle/backgrounds/focus_rack_dots.lua" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/battle/backgrounds/gradient_derivative.glsl" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/battle/backgrounds/gradient_derivative.lua" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/battle/backgrounds/guitar_strings.glsl" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/battle/backgrounds/guitar_strings.lua" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/battle/backgrounds/ink_in_water.glsl" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/battle/backgrounds/ink_in_water.lua" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/battle/backgrounds/lavalamp.glsl" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/battle/backgrounds/lavalamp.lua" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/battle/backgrounds/lichen.glsl" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/battle/backgrounds/lichen.lua" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/battle/backgrounds/noise_ball.glsl" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/battle/backgrounds/noise_ball.lua" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/battle/backgrounds/overlap_lines.lua" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/battle/backgrounds/parallell_lines.glsl" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/battle/backgrounds/parallell_lines.lua" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/battle/backgrounds/polar_coordinates.glsl" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/battle/backgrounds/polar_coordinates.lua" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/battle/backgrounds/sdf_meatballs.lua" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/battle/backgrounds/sdf_meatballs_compute.glsl" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/battle/backgrounds/sdf_meatballs_render.glsl" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/battle/backgrounds/topography.glsl" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/battle/backgrounds/topography.lua" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/battle/backgrounds/triangle_tiling.glsl" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/battle/backgrounds/triangle_tiling.lua" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/battle/backgrounds/voroworms.glsl" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/battle/backgrounds/voroworms.lua" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/battle/backgrounds/worley.glsl" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/battle/backgrounds/worley.lua" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/menu/option_button.lua" afterDir="false" />
+    <list default="true" id="7fa9ba1b-2cff-4ecc-86fb-59ab2fa76ee1" name="Changes" comment="stashing scrolling">
+      <change afterPath="$PROJECT_DIR$/menu/scale.lua" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/common/direction_indicator.lua" beforeDir="false" afterPath="$PROJECT_DIR$/common/direction_indicator.lua" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/common/game_state.lua" beforeDir="false" afterPath="$PROJECT_DIR$/common/game_state.lua" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/common/shape_ellipse.lua" beforeDir="false" afterPath="$PROJECT_DIR$/common/shape_ellipse.lua" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/include.lua" beforeDir="false" afterPath="$PROJECT_DIR$/include.lua" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/main.lua" beforeDir="false" afterPath="$PROJECT_DIR$/main.lua" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/menu/option_button.lua" beforeDir="false" afterPath="$PROJECT_DIR$/menu/option_button.lua" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/menu/options_scene.lua" beforeDir="false" afterPath="$PROJECT_DIR$/menu/options_scene.lua" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
@@ -540,23 +505,7 @@
       <workItem from="1723765694923" duration="1180000" />
       <workItem from="1723817745942" duration="8699000" />
       <workItem from="1723830657030" duration="915000" />
-      <workItem from="1723845265295" duration="14316000" />
-    </task>
-    <task id="LOCAL-00919" summary="shared list interactivity done">
-      <option name="closed" value="true" />
-      <created>1722456488735</created>
-      <option name="number" value="00919" />
-      <option name="presentableId" value="LOCAL-00919" />
-      <option name="project" value="LOCAL" />
-      <updated>1722456488735</updated>
-    </task>
-    <task id="LOCAL-00920" summary="stashing before reworking control indicator layout">
-      <option name="closed" value="true" />
-      <created>1722461548921</created>
-      <option name="number" value="00920" />
-      <option name="presentableId" value="LOCAL-00920" />
-      <option name="project" value="LOCAL" />
-      <updated>1722461548921</updated>
+      <workItem from="1723845265295" duration="27263000" />
     </task>
     <task id="LOCAL-00921" summary="new control indicator layout trigger">
       <option name="closed" value="true" />
@@ -934,7 +883,23 @@
       <option name="project" value="LOCAL" />
       <updated>1723911855124</updated>
     </task>
-    <option name="localTasksCounter" value="968" />
+    <task id="LOCAL-00968" summary="stashing option button">
+      <option name="closed" value="true" />
+      <created>1723933153784</created>
+      <option name="number" value="00968" />
+      <option name="presentableId" value="LOCAL-00968" />
+      <option name="project" value="LOCAL" />
+      <updated>1723933153784</updated>
+    </task>
+    <task id="LOCAL-00969" summary="stashing scrolling">
+      <option name="closed" value="true" />
+      <created>1723990841803</created>
+      <option name="number" value="00969" />
+      <option name="presentableId" value="LOCAL-00969" />
+      <option name="project" value="LOCAL" />
+      <updated>1723990841803</updated>
+    </task>
+    <option name="localTasksCounter" value="970" />
     <servers />
   </component>
   <component name="TypeScriptGeneratedFilesManager">
@@ -983,8 +948,6 @@
     </option>
   </component>
   <component name="VcsManagerConfiguration">
-    <MESSAGE value="parallelized ropes" />
-    <MESSAGE value="added mesh" />
     <MESSAGE value="stashing rope" />
     <MESSAGE value="added save file" />
     <MESSAGE value="added template verbose info, fixed message dialog loop" />
@@ -1008,7 +971,9 @@
     <MESSAGE value="added snapshot optimization" />
     <MESSAGE value="optimized entity info drawing" />
     <MESSAGE value="template verbose info now follows state order" />
-    <option name="LAST_COMMIT_MESSAGE" value="template verbose info now follows state order" />
+    <MESSAGE value="stashing option button" />
+    <MESSAGE value="stashing scrolling" />
+    <option name="LAST_COMMIT_MESSAGE" value="stashing scrolling" />
   </component>
   <component name="XDebuggerManager">
     <breakpoint-manager>

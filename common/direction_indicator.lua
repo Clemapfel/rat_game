@@ -37,6 +37,8 @@ end)
 --- @overload rt.Drawable.draw
 function rt.DirectionIndicator:draw()
     if not self:get_is_visible() then return end
+
+    rt.graphics.set_blend_mode(rt.BlendMode.NORMAL, rt.BlendMode.MULTIPLY)
     if self._direction == rt.Direction.NONE then
         self._ring:draw()
         self._ring_outline_outer:draw()
@@ -45,6 +47,7 @@ function rt.DirectionIndicator:draw()
         self._arrow:draw()
         self._arrow_outline:draw()
     end
+    rt.graphics.set_blend_mode()
 end
 
 --- @overload rt.Widget.size_allocate

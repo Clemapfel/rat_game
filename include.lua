@@ -139,6 +139,7 @@ require "menu.inventory_scene_object_moved_animation"
 require "menu.inventory_scene"
 
 require "menu.option_button"
+require "menu.scale"
 
 -- state
 require "common.game_state"

@@ -4,16 +4,26 @@ state = rt.GameState()
 state:initialize_debug_state()
 scene = mn.InventoryScene(state)
 
-option = mn.OptionButton("A", "BBB", "C-")
+option = mn.OptionButton("A", "BBB", "C-", "AD", "ada", "AdA", "ADAW", "asda", "ADA")
 option:realize()
 option:fit_into(100, 100, 200, 50)
+option:signal_connect("selection", function(_, which)
+    dbg(which)
+end)
+
+scale = mn.Scale(0, 100, 10, 50)
+scale:realize()
+scale:fit_into(100, 200, 200, 27)
+
 
 input = rt.InputController()
 input:signal_connect("pressed", function(_, which)
     if which == rt.InputButton.RIGHT then
         option:move_right()
+        scale:move_right()
     elseif which == rt.InputButton.LEFT then
         option:move_left()
+        scale:move_left()
     elseif which == rt.InputButton.A then
         background._shader:recompile()
     end
@@ -45,6 +55,7 @@ love.draw = function()
     end
 
     option:draw()
+    scale:draw()
     ---background:draw()
 end
 

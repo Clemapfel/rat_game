@@ -15,12 +15,16 @@ rt.MSAAQuality = {
 --- @class rt.GameState
 rt.GameState = meta.new_type("GameState", function()
     local state = {
-        -- graphics settings
+        -- system settings
         config = {
             vsync = rt.VSyncMode.ADAPTIVE,
             msaa = rt.MSAAQuality.BEST,
             resolution_x = 1600,--1280,
             resolution_y = 900,--720,
+            sfx_level = 1,
+            music_level = 1,
+            vfx_motion_level = 1,
+            vfx_contrast_level = 1,
             show_fps = true
         },
 
@@ -340,4 +344,79 @@ function rt.GameState:run()
 
         if love.timer then love.timer.sleep(0.001) end -- limit max tick rate of while true
     end
+end
+
+rt.VSyncMode = {
+    ADAPTIVE = -1,
+    OFF = 0,
+    ON = 1
+}
+
+--- @brief
+function rt.GameState:set_vsync_mode(mode)
+    meta.assert_enum(mode, rt.VSyncmode)
+    love.window.setVSync(mode)
+end
+
+--- @brief
+function rt.GameState:set_fullscreen(on)
+    meta.assert_boolean(on)
+    love.window.setFullscreen(on)
+end
+
+--- @brief
+function rt.GameState:set_borderless(on)
+    meta.assert_boolean(on)
+    rt.error("TODO")
+end
+
+--- @brief
+function rt.GameState:set_msaa_level(msaa)
+    meta.assert_unsigned(msaa)
+    rt.error("TODO")
+end
+
+--- @brief
+function rt.GameState:set_resolution(width, height)
+    rt.error("TODO")
+end
+
+--- @brief
+function rt.GameState:set_sfx_level(fraction)
+    meta.assert_number(fraction)
+    if fraction < 0 or fraction > 1 then
+        rt.error("In rt.GameState:set_sfx_level: level `" .. fraction .. "` is outside [0, 1]")
+        fraction = clamp(fraction, 0, 1)
+    end
+    self._state.config.sfx_level = fraction
+end
+
+--- @brief
+function rt.GameState:set_music_level(fraction)
+    meta.assert_number(fraction)
+    if fraction < 0 or fraction > 1 then
+        rt.error("In rt.GameState:set_music_level: level `" .. fraction .. "` is outside [0, 1]")
+        fraction = clamp(fraction, 0, 1)
+    end
+    self._state.config.music_level = fraction
+end
+
+--- @brief
+function rt.GameState:set_vfx_motion_level(fraction)
+    meta.assert_number(fraction)
+    if fraction < 0 or fraction > 1 then
+        rt.error("In rt.GameState:set_vfx_motion_level: level `" .. fraction .. "` is outside [0, 1]")
+        fraction = clamp(fraction, 0, 1)
+    end
+    self._state.config.vfx_motion_level = fraction
+end
+
+--- @brief
+function rt.GameState:set_vfx_contrast_level(fraction)
+    meta.assert_number(fraction)
+    if fraction < 0 or fraction > 1 then
+        rt.error("In rt.GameState:set_vfx_contrast_level: level `" .. fraction .. "` is outside [0, 1]")
+        fraction = clamp(fraction, 0, 1)
+    end
+    self._state.config.vfx_contrast_level = fraction
 end
