@@ -22,16 +22,10 @@
     </configurations>
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="7fa9ba1b-2cff-4ecc-86fb-59ab2fa76ee1" name="Changes" comment="stashing scrolling">
-      <change afterPath="$PROJECT_DIR$/menu/scale.lua" afterDir="false" />
+    <list default="true" id="7fa9ba1b-2cff-4ecc-86fb-59ab2fa76ee1" name="Changes" comment="stashing voro">
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/common/direction_indicator.lua" beforeDir="false" afterPath="$PROJECT_DIR$/common/direction_indicator.lua" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/common/game_state.lua" beforeDir="false" afterPath="$PROJECT_DIR$/common/game_state.lua" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/common/shape_ellipse.lua" beforeDir="false" afterPath="$PROJECT_DIR$/common/shape_ellipse.lua" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/include.lua" beforeDir="false" afterPath="$PROJECT_DIR$/include.lua" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/main.lua" beforeDir="false" afterPath="$PROJECT_DIR$/main.lua" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/menu/option_button.lua" beforeDir="false" afterPath="$PROJECT_DIR$/menu/option_button.lua" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/menu/options_scene.lua" beforeDir="false" afterPath="$PROJECT_DIR$/menu/options_scene.lua" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/battle/backgrounds/stained_glass_butterfly.glsl" beforeDir="false" afterPath="$PROJECT_DIR$/battle/backgrounds/stained_glass_butterfly.glsl" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/battle/backgrounds/stained_glass_butterfly.lua" beforeDir="false" afterPath="$PROJECT_DIR$/battle/backgrounds/stained_glass_butterfly.lua" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -505,23 +499,7 @@
       <workItem from="1723765694923" duration="1180000" />
       <workItem from="1723817745942" duration="8699000" />
       <workItem from="1723830657030" duration="915000" />
-      <workItem from="1723845265295" duration="27263000" />
-    </task>
-    <task id="LOCAL-00921" summary="new control indicator layout trigger">
-      <option name="closed" value="true" />
-      <created>1722463851463</created>
-      <option name="number" value="00921" />
-      <option name="presentableId" value="LOCAL-00921" />
-      <option name="project" value="LOCAL" />
-      <updated>1722463851463</updated>
-    </task>
-    <task id="LOCAL-00922" summary="polished selection indicators">
-      <option name="closed" value="true" />
-      <created>1722469688352</created>
-      <option name="number" value="00922" />
-      <option name="presentableId" value="LOCAL-00922" />
-      <option name="project" value="LOCAL" />
-      <updated>1722469688352</updated>
+      <workItem from="1723845265295" duration="31196000" />
     </task>
     <task id="LOCAL-00923" summary="stashing">
       <option name="closed" value="true" />
@@ -899,7 +877,23 @@
       <option name="project" value="LOCAL" />
       <updated>1723990841803</updated>
     </task>
-    <option name="localTasksCounter" value="970" />
+    <task id="LOCAL-00970" summary="added scale">
+      <option name="closed" value="true" />
+      <created>1724001592648</created>
+      <option name="number" value="00970" />
+      <option name="presentableId" value="LOCAL-00970" />
+      <option name="project" value="LOCAL" />
+      <updated>1724001592648</updated>
+    </task>
+    <task id="LOCAL-00971" summary="stashing voro">
+      <option name="closed" value="true" />
+      <created>1724005760177</created>
+      <option name="number" value="00971" />
+      <option name="presentableId" value="LOCAL-00971" />
+      <option name="project" value="LOCAL" />
+      <updated>1724005760177</updated>
+    </task>
+    <option name="localTasksCounter" value="972" />
     <servers />
   </component>
   <component name="TypeScriptGeneratedFilesManager">
@@ -948,8 +942,6 @@
     </option>
   </component>
   <component name="VcsManagerConfiguration">
-    <MESSAGE value="stashing rope" />
-    <MESSAGE value="added save file" />
     <MESSAGE value="added template verbose info, fixed message dialog loop" />
     <MESSAGE value="stashing" />
     <MESSAGE value="stashing before refactoring for gamestate" />
@@ -973,7 +965,9 @@
     <MESSAGE value="template verbose info now follows state order" />
     <MESSAGE value="stashing option button" />
     <MESSAGE value="stashing scrolling" />
-    <option name="LAST_COMMIT_MESSAGE" value="stashing scrolling" />
+    <MESSAGE value="added scale" />
+    <MESSAGE value="stashing voro" />
+    <option name="LAST_COMMIT_MESSAGE" value="stashing voro" />
   </component>
   <component name="XDebuggerManager">
     <breakpoint-manager>
@@ -992,6 +986,11 @@
           <url>file://$PROJECT_DIR$/old/menu/scene.lua</url>
           <line>333</line>
           <option name="timeStamp" value="9" />
+        </line-breakpoint>
+        <line-breakpoint enabled="true" type="lua-line">
+          <url>file://$PROJECT_DIR$/common/game_state.lua</url>
+          <line>13</line>
+          <option name="timeStamp" value="11" />
         </line-breakpoint>
       </breakpoints>
     </breakpoint-manager>
