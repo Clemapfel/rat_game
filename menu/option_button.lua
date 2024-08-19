@@ -22,7 +22,7 @@ mn.OptionButton = meta.new_type("OptionButton", rt.Widget, rt.SignalEmitter, fun
         _current_item_i = 1,
         _current_offset = 0,
         _n_items = 0,
-        _stencil = rt.Rectangle()
+        _stencil = rt.Rectangle(0, 0, 1, 1)
     })
 
     out:signal_add("selection")
@@ -45,7 +45,7 @@ function mn.OptionButton:realize()
             text = option,
             label = rt.Label("<o>" .. option .. "</o>"),
             offset = 0,
-            line = rt.Rectangle(),
+            line = rt.Rectangle(0, 0, 1, 1),
         }
         to_push.label:realize()
         to_push.label:set_justify_mode(rt.JustifyMode.LEFT)
@@ -57,7 +57,12 @@ function mn.OptionButton:realize()
     self._left_indicator:realize()
     self._right_indicator:realize()
 
-    self:_emit_selection()
+    self:create_from_state(self._state)
+end
+
+--- @override
+function mn.OptionButton:create_from_state(state)
+    self._state = state
 end
 
 --- @override
@@ -101,7 +106,6 @@ function mn.OptionButton:size_allocate(x, y, width, height)
         item.line:set_opacity(0.5)
 
         item.label:fit_into(current_x + 0.5 * tile_w - 0.5 * w, label_y, POSITIVE_INFINITY)
-
         item.offset = current_x - label_start_x
         current_x = current_x + tile_w + 5
     end

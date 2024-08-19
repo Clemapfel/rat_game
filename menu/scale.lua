@@ -9,15 +9,15 @@ mn.Scale = meta.new_type("MenuScale", rt.Widget, rt.SignalEmitter, function(min,
     end
 
     local out = meta.new(mn.Scale, {
-        _rail_center = rt.Rectangle(),
-        _rail_center_outline_top = rt.Line(),
-        _rail_center_outline_bottom = rt.Line(),
-        _rail_left = rt.Circle(),
-        _rail_left_outline = rt.Circle(),
-        _rail_right = rt.Circle(),
-        _rail_right_outline = rt.Circle(),
-        _slider_body = rt.Circle(),
-        _slider_outline = rt.Circle(),
+        _rail_center = rt.Rectangle(0, 0, 1, 1),
+        _rail_center_outline_top = rt.Line(0, 0, 1, 1),
+        _rail_center_outline_bottom = rt.Line(0, 0, 1,1),
+        _rail_left = rt.Circle(0, 0, 1),
+        _rail_left_outline = rt.Circle(0, 0, 1),
+        _rail_right = rt.Circle(0, 0, 1),
+        _rail_right_outline = rt.Circle(0, 0, 1),
+        _slider_body = rt.Circle(0, 0, 1),
+        _slider_outline = rt.Circle(0, 0, 1),
 
         _min = min,
         _max = max,
@@ -170,4 +170,9 @@ end
 --- @brief
 function mn.Scale:get_value()
     return self._value
+end
+
+--- @brief
+function mn.Scale:update(delta)
+    -- noop
 end

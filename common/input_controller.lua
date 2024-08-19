@@ -25,6 +25,7 @@ rt.InputControllerState = {
 --- @signal controller_connected  (self, id) -> nil
 --- @signal controller_disconnected  (self, id) -> nil
 --- @signal motion    (self, x, y, dx, dy) -> nil
+--- @signal keyboard_pressed_raw (self, name, scancode) -> nil
 rt.InputController = meta.new_type("InputController", rt.SignalEmitter, function(instance)
     if instance ~= nil then
         if not meta.is_function(instance.get_bounds) then
@@ -37,6 +38,7 @@ rt.InputController = meta.new_type("InputController", rt.SignalEmitter, function
         _instance = instance,
     })
 
+    out:signal_add("keyboard_pressed_raw")
     out:signal_add("pressed")
     out:signal_add("released")
     out:signal_add("joystick")
@@ -60,9 +62,9 @@ end)
 function rt.InputControllerState.load_from_state(state)
     local mapping = state:get_input_mapping()
     for input_button in values(meta.instances(rt.InputButton)) do
-        for mapped in values(mapping[input_button]) do
-            rt.InputControllerState.reverse_mapping[mapped] = input_button
-        end
+        local mapped = mapping[input_button]
+        rt.InputControllerState.reverse_mapping[mapped.gamepad] = input_button
+        rt.InputControllerState.reverse_mapping[mapped.keyboard] = input_button
         rt.InputControllerState.state[input_button] = false
     end
 
@@ -111,15 +113,21 @@ function rt.InputController:get_axis(joystick_position)
 end
 
 --- @brief
-love.keypressed = function(key)
-    key = rt.KeyboardKeyPrefix .. key
-    local button = rt.InputControllerState.reverse_mapping[key]
+love.keypressed = function(key, scancode)
+    local raw = key
+    local button = rt.InputControllerState.reverse_mapping[rt.KeyboardKeyPrefix .. key]
     if button ~= nil then
         rt.InputControllerState.state[button] = true
-        for _, component in pairs(rt.InputControllerState.components) do
-            if component._is_disabled == false then
+    end
+
+    rt.InputControllerState.is_controller_active = false
+
+    for _, component in pairs(rt.InputControllerState.components) do
+        if component._is_disabled == false then
+            if button ~= nil then
                 component:signal_emit("pressed", button)
             end
+            component:signal_emit("keyboard_pressed_raw", raw, scancode)
         end
     end
 end
@@ -140,6 +148,8 @@ end
 
 --- @brief
 love.textinput = function(str)
+    rt.InputControllerState.is_controller_active = false
+
     for _, component in pairs(rt.InputControllerState.components) do
         if component._is_disabled == false then
             component:signal_emit("text_input", str)
@@ -204,6 +214,8 @@ end
 
 --- @brief
 love.gamepadpressed = function(joystick, which)
+    rt.InputControllerState.is_controller_active = true
+
     local button = rt.InputControllerState.reverse_mapping[rt.GamepadButtonPrefix ..which]
     if button ~= nil then
         rt.InputControllerState.state[button] = true

@@ -2,34 +2,19 @@ require "include"
 
 state = rt.GameState()
 state:initialize_debug_state()
-scene = mn.InventoryScene(state)
-
-option = mn.OptionButton("A", "BBB", "C-", "AD", "ada", "AdA", "ADAW", "asda", "ADA")
-option:realize()
-option:fit_into(100, 100, 200, 50)
-option:signal_connect("selection", function(_, which)
-    dbg(which)
-end)
-
-scale = mn.Scale(0, 100, 10, 50)
-scale:realize()
-scale:fit_into(100, 200, 200, 27)
+--scene = mn.InventoryScene(state)
+scene = mn.OptionsScene(state)
 
 input = rt.InputController()
 input:signal_connect("pressed", function(_, which)
-    if which == rt.InputButton.RIGHT then
-        option:move_right()
-        scale:move_right()
-    elseif which == rt.InputButton.LEFT then
-        option:move_left()
-        scale:move_left()
-    elseif which == rt.InputButton.A then
-        background._shader:recompile()
-    end
+    dbg(which)
 end)
 
-background = bt.Background.STAINED_GLASS_BUTTERFLY()
-background:realize()
+input:signal_connect("keyboard_pressed_raw", function(_, raw, scancode)
+    --dbg(raw, scancode)
+end)
+
+state:set_input_button_keyboard_key(rt.InputButton.UP, rt.KeyboardKey.A)
 
 love.load = function()
     if scene ~= nil then
@@ -43,19 +28,13 @@ love.update = function(delta)
     if scene ~= nil then
         scene:update(delta)
     end
-
-    option:update(delta)
-    background:update(delta)
 end
 
 love.draw = function()
     if scene ~= nil then
-        --scene:draw()
+        scene:draw()
     end
 
-    option:draw()
-    scale:draw()
-    background:draw()
 end
 
 love.resize = function()
@@ -63,8 +42,6 @@ love.resize = function()
     if scene ~= nil then
         scene:fit_into(x, y, w, h)
     end
-
-    background:fit_into(x, y, w, h)
 end
 
 love.run = function()

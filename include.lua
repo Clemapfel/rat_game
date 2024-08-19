@@ -140,6 +140,8 @@ require "menu.inventory_scene"
 
 require "menu.option_button"
 require "menu.scale"
+require "menu.keybinding_indicator"
+require "menu.options_scene"
 
 -- state
 require "common.game_state"

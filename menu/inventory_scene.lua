@@ -126,8 +126,9 @@ end
 --- @override
 function mn.InventoryScene:create_from_state(state)
     local tab_sprite_scale_factor = 3
-
+    self._state = state
     self._entity_pages = {}
+
     self._entity_tab_bar:clear()
 
     local entities = self._state:list_entities()
@@ -438,7 +439,7 @@ function mn.InventoryScene:_set_control_indicator_layout(layout)
     self._current_control_indicator_layout = final_layout
     self._control_indicator:create_from(final_layout)
 
-    local outer_margin = rt.settings.menu.inventory_scene.outer_margin
+    local outer_margin = rt.settings.outer_margin
     local control_w, control_h = self._control_indicator:measure()
     self._control_indicator:fit_into(
         self._bounds.x + self._bounds.width - control_w - outer_margin,

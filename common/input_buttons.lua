@@ -197,3 +197,38 @@ rt.InputButton = meta.new_enum({
     R = "R",
     DEBUG = "DEBUG"
 })
+
+
+--- @brief
+rt._gamepad_button_to_string = {
+    ["y"] = "TOP",
+    ["b"] = "RIGHT",
+    ["a"] = "BOTTOM",
+    ["x"] = "LEFT",
+    ["dpup"] = "UP",
+    ["dpdown"] = "DOWN",
+    ["dpleft"] = "LEFT",
+    ["dpright"] = "RIGHT",
+    ["leftshoulder"] = "L",
+    ["rightshoulder"] = "R",
+    ["start"] = "START",
+    ["back"] = "SELECT",
+    ["home"] = "CENTER",
+    ["lstick"] = "RIGHT STICK",
+    ["rstick"] = "LEFT STRICK",
+    ["paddle1"] = "PADDLE #1",
+    ["paddle2"] = "PADDLE #2",
+    ["paddle3"] = "PADDLE #3",
+    ["paddle4"] = "PADDLE #4"
+}
+
+function rt.gamepad_button_to_string(gamepad_button)
+    local raw = string.sub(gamepad_button, #rt.GamepadButtonPrefix + 1, #gamepad_button)
+    local out = rt._gamepad_button_to_string[raw]
+    if out == nil then return "UNKNOWN" else return out end
+end
+
+function rt.keyboard_key_to_string(keyboard_key)
+    local raw = string.sub(keyboard_key, #rt.KeyboardKeyPrefix + 1, #keyboard_key)
+    return string.upper(love.keyboard.getKeyFromScancode(raw))
+end

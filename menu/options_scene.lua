@@ -1,119 +1,142 @@
 --- @class mn.OptionsScene
 mn.OptionsScene = meta.new_type("MenuOptionsScene", rt.Scene, function(state)
 
-    local out = {
-        _state = state
+    local fields = {
+        _state = state,
+        _items = {},
+        _remappers = {},
+        _remap_target_button = rt.InputButton.A,
+        _remap_controller = rt.InputController(),
+        _remapper_button_order = {
+            rt.InputButton.A,
+            rt.InputButton.B,
+            rt.InputButton.X,
+            rt.InputButton.Y,
+            rt.InputButton.UP,
+            rt.InputButton.RIGHT,
+            rt.InputButton.DOWN,
+            rt.InputButton.LEFT,
+            rt.InputButton.L,
+            rt.InputButton.R,
+            rt.InputButton.START,
+            rt.InputButton.SELECT
+        },
+        _button_to_remapper = {}
     }
+
+    --fields._remap_controller:set_is_disabled(true)
     
-    out._vsync_label_text = "VSync"
-    out._vsync_on_label = "ON"
-    out._vsync_off_label = "OFF"
-    out._vsync_adaptive_label = "ADAPTIVE"
+    fields._vsync_label_text = "VSync"
+    fields._vsync_on_label = "ON"
+    fields._vsync_off_label = "OFF"
+    fields._vsync_adaptive_label = "ADAPTIVE"
 
-    out._fullscreen_label_text = "Fullscreen"
-    out._fullscreen_true_label = "YES"
-    out._fullscreen_false_label = "NO"
+    fields._fullscreen_label_text = "Fullscreen"
+    fields._fullscreen_true_label = "YES"
+    fields._fullscreen_false_label = "NO"
 
-    out._borderless_label_text = "Borderless"
-    out._borderless_true_label = "YES"
-    out._borderless_false_label = "NO"
+    fields._borderless_label_text = "Borderless"
+    fields._borderless_true_label = "YES"
+    fields._borderless_false_label = "NO"
 
-    out._msaa_label_text = "MSAA"
-    out._msaa_0_label = "0"
-    out._msaa_2_label = "2"
-    out._msaa_4_label = "4"
-    out._msaa_8_label = "8"
-    out._msaa_16_label = "16"
+    fields._msaa_label_text = "MSAA"
+    fields._msaa_0_label = "0"
+    fields._msaa_2_label = "2"
+    fields._msaa_4_label = "4"
+    fields._msaa_8_label = "8"
+    fields._msaa_16_label = "16"
 
-    out._resolution_label_text = "Resolution"
-    out._resolution_1280_720_label = "1280x720 (16:9)"
-    out._resolution_1600_900_label = "1600x900 (16:9)"
-    out._resolution_1920_1080_label = "1920x1080 (16:9)"
-    out._resolution_2560_1440_label = "2560x1400 (16:9)"
-    out._resolution_variable_label = "custom"
+    fields._resolution_label_text = "Resolution"
+    fields._resolution_1280_720_label = "1280x720 (16:9)"
+    fields._resolution_1600_900_label = "1600x900 (16:9)"
+    fields._resolution_1920_1080_label = "1920x1080 (16:9)"
+    fields._resolution_2560_1440_label = "2560x1400 (16:9)"
+    fields._resolution_variable_label = "custom"
 
-    out._multiple_choice_layout = {
-        [out._vsync_label_text] = {
+    fields._multiple_choice_layout = {
+        [fields._vsync_label_text] = {
             options = {
-                out._vsync_on_label,
-                out._vsync_off_label,
-                out._vsync_adaptive_label
+                fields._vsync_on_label,
+                fields._vsync_off_label,
+                fields._vsync_adaptive_label
             },
-            default = out._vsync_adaptive_label
+            default = fields._vsync_adaptive_label
         },
 
-        [out._fullscreen_label_text] = {
+        [fields._fullscreen_label_text] = {
             options = {
-                out._fullscreen_true_label,
-                out._fullscreen_false_label
+                fields._fullscreen_true_label,
+                fields._fullscreen_false_label
             },
-            default = out._fullscreen_false_label
+            default = fields._fullscreen_false_label
         },
 
-        [out._borderless_label_text] = {
+        [fields._borderless_label_text] = {
             options = {
-                out._borderless_true_label,
-                out._borderless_false_label,
+                fields._borderless_true_label,
+                fields._borderless_false_label,
             },
-            default = out._borderless_false_label
+            default = fields._borderless_false_label
         },
 
-        [out._msaa_label_text] = {
+        [fields._msaa_label_text] = {
             options = {
-                out._msaa_0_label,
-                out._msaa_2_label,
-                out._msaa_4_label,
-                out._msaa_8_label,
-                out._msaa_16_label
+                fields._msaa_0_label,
+                fields._msaa_2_label,
+                fields._msaa_4_label,
+                fields._msaa_8_label,
+                fields._msaa_16_label
             },
-            default = out._msaa_8_label
+            default = fields._msaa_8_label
         },
 
-        [out._resolution_label_text] = {
+        [fields._resolution_label_text] = {
             options = {
-                out._resolution_1280_720_label,
-                out._resolution_1600_900_label,
-                out._resolution_1920_1080_label,
-                out._resolution_2560_1440_label,
-                out._resolution_variable_label,
+                fields._resolution_1280_720_label,
+                fields._resolution_1600_900_label,
+                fields._resolution_1920_1080_label,
+                fields._resolution_2560_1440_label,
+                fields._resolution_variable_label,
             },
-            default = out._resolution_1280_720_label
+            default = fields._resolution_1280_720_label
         }
     }
 
-    out._sfx_level_text = "Sound Effects"
-    out._music_level_text = "Music"
-    out._vfx_motion_text = "Motion Effects"
-    out._vfx_contrast_text = "Visual Effects"
+    fields._sfx_level_text = "Sound Effects"
+    fields._music_level_text = "Music"
+    fields._vfx_motion_text = "Motion Effects"
+    fields._vfx_contrast_text = "Visual Effects"
 
-    out._level_layout = {
-        [out._sfx_level_text] = {
+    fields._level_layout = {
+        [fields._sfx_level_text] = {
             range = {0, 100, 100},
             default = 50
         },
 
-        [out._music_level_text] = {
+        [fields._music_level_text] = {
             range = {0, 100, 100},
             default = 50
         },
 
-        [out._vfx_motion_text] = {
+        [fields._vfx_motion_text] = {
             range = {0, 3, 3},
             default = 3
         },
 
-        [out._vfx_contrast_text] = {
+        [fields._vfx_contrast_text] = {
             range = {0, 100, 1},
             default = 100
         }
     }
 
-    return meta.new(mn.OptionsScene, out)
+    local out = meta.new(mn.OptionsScene, fields)
+    return out
 end)
 
 --- @override
 function mn.OptionsScene:realize()
     if self._is_realized then return end
+    self._is_realized = true
 
     local scene = self
 
@@ -123,15 +146,26 @@ function mn.OptionsScene:realize()
         label:set_justify_mode(rt.JustifyMode.LEFT)
         label:realize()
 
-        local button = mn.OptionsButton(table.unpack(scene._multiple_choice_layout[text]))
+        local entry = scene._multiple_choice_layout[text]
+        local button = mn.OptionButton(table.unpack(entry.options))
+        button:set_option(entry.default)
         button:realize()
 
         scene["_" .. name .. "_label"] = label
         scene["_" .. name .. "_option_button"] = button
-        scene["_" .. name .. "_option_button"]:signal_connect("select", handler)
+        scene["_" .. name .. "_option_button"]:signal_connect("selection", handler)
+
+        local frame = rt.Frame()
+        frame:realize()
+
+        table.insert(scene._items, {
+            label = label,
+            widget = button,
+            frame = frame
+        })
     end
 
-    create_button_and_label("vsync", self._vsync_label, function(_, which)
+    create_button_and_label("vsync", self._vsync_label_text, function(_, which)
         local mode
         if which == scene._vsync_on_label then
             mode = rt.VSyncMode.ON
@@ -217,6 +251,15 @@ function mn.OptionsScene:realize()
 
         scale:realize()
         scale:signal_connect("value_changed", handler)
+
+        local frame = rt.Frame()
+        frame:realize()
+
+        table.insert(scene._items, {
+            label = label,
+            widget = scale,
+            frame = frame
+        })
     end
 
     create_button_and_scale("sfx_level", self._sfx_level_text, function(_, fraction)
@@ -234,4 +277,104 @@ function mn.OptionsScene:realize()
     create_button_and_scale("vfx_contrast", self._vfx_contrast_text, function(_, fraction)
         scene._state:set_vfx_contrast_level(fraction)
     end)
+
+
+    for button in values(self._remapper_button_order) do
+        local remapper =  mn.KeybindingIndicator(self._state, button)
+        remapper:realize()
+        table.insert(self._remappers, remapper)
+        self._button_to_remapper[button] = remapper
+    end
+
+    self._remap_controller:signal_connect("keyboard_pressed_raw", function(_, name, scancode)
+        local remapper = scene._button_to_remapper[scene._remap_target_button]
+        remapper:set_keyboard_key_label(string.upper(name))
+        scene._state:set_input_button_keyboard_key(scene._remap_target_button, rt.KeyboardKeyPrefix .. scancode)
+    end)
+end
+
+--- @override
+function mn.OptionsScene:create_from_state(state)
+    self._state = state
+
+    for button in values(self._remapper_button_order) do
+        local remapper = self._button_to_remapper[button]
+        local current = self._state:input_button_to_keyboard_key(button)
+        remapper:set_keyboard_key_label(rt.keyboard_key_to_string(current))
+
+        current = self._state:input_button_to_gamepad_button(button)
+        remapper:set_gamepad_button_label(rt.gamepad_button_to_string(current))
+    end
+end
+
+--- @override
+function mn.OptionsScene:size_allocate(x, y, width, height)
+    local m = rt.settings.margin_unit
+    local outer_margin = 2 * m
+    local start_y = y + outer_margin
+    local current_x, current_y = x + outer_margin, start_y
+
+    local max_label_w = NEGATIVE_INFINITY
+    local label_ws, label_hs = {}, {}
+    for item in values(self._items) do
+        local label_w, label_h = item.label:measure()
+        table.insert(label_ws, label_w)
+        table.insert(label_hs, label_h)
+        max_label_w = math.max(max_label_w, label_w)
+    end
+
+    local w = 0.5 * width
+    local label_xm = 5 * m
+    for i, item in ipairs(self._items) do
+        local label_h, label_w = label_hs[i], label_ws[i]
+        local frame_h = label_h + 2 * m
+        item.frame:fit_into(current_x, current_y, w - 2 * outer_margin, frame_h)
+        item.label:fit_into(current_x + m, current_y + 0.5 * frame_h - 0.5 * label_h, POSITIVE_INFINITY)
+        local widget_w = w - 2 * outer_margin - m - max_label_w - 2 * label_xm
+        item.widget:fit_into(
+            current_x + m + max_label_w + label_xm,
+            current_y + 0.5 * frame_h - 0.5 * label_h,
+            widget_w,
+            label_h
+        )
+        current_y = current_y + frame_h
+    end
+
+    local rest_h = height - 2 * outer_margin - (current_y - start_y)
+    local rest_w = width - 2 * outer_margin
+    local remapper_w = rest_w / 3
+    local remapper_h = rest_h / 4
+
+    local remapper_x, remapper_y = current_x, current_y
+    local row_i, col_i = 1, 1
+
+    for i = 1, 12 do
+        local remapper = self._remappers[i]
+        remapper:fit_into(current_x + (col_i - 1) * remapper_w, current_y + (row_i - 1) * remapper_h, remapper_w, remapper_h)
+        row_i = row_i + 1
+        if row_i > 4 then
+            row_i = 1
+            col_i = col_i + 1
+        end
+    end
+end
+
+--- @override
+function mn.OptionsScene:draw()
+    for item in values(self._items) do
+        item.frame:draw()
+        item.label:draw()
+        item.widget:draw()
+    end
+
+    for remapper in values(self._remappers) do
+        remapper:draw()
+    end
+end
+
+--- @override
+function mn.OptionsScene:update(delta)
+    for item in values(self._items) do
+        item.widget:update(delta)
+    end
 end

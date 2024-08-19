@@ -46,6 +46,7 @@ function rt.Rectangle:resize(x, y, width, height)
         self._width = aabb.width
         self._height = aabb.height
     else
+        meta.assert_number(x, y, width, height)
         self._x = x
         self._y = y
         self._width = width

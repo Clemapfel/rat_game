@@ -19,8 +19,8 @@ rt.GameState = meta.new_type("GameState", function()
         config = {
             vsync = rt.VSyncMode.ADAPTIVE,
             msaa = rt.MSAAQuality.BEST,
-            resolution_x = 1600,--1280,
-            resolution_y = 900,--720,
+            resolution_x = 1280,
+            resolution_y = 720,
             sfx_level = 1,
             music_level = 1,
             vfx_motion_level = 1,
@@ -72,71 +72,68 @@ function rt.GameState:load_input_mapping()
         rt.warning("Custom keybindings not available, loaded default keybindings instead")
         self._state.input_mapping =  {
             A = {
-                rt.GamepadButton.RIGHT,
-                rt.KeyboardKey.SPACE
+                gamepad = rt.GamepadButton.RIGHT,
+                keyboard = rt.KeyboardKey.SPACE
             },
 
             B = {
-                rt.GamepadButton.BOTTOM,
-                rt.KeyboardKey.B
+                gamepad = rt.GamepadButton.BOTTOM,
+                keyboard = rt.KeyboardKey.B
             },
 
             X = {
-                rt.GamepadButton.TOP,
-                rt.KeyboardKey.X,
+                gamepad = rt.GamepadButton.TOP,
+                keyboard = rt.KeyboardKey.X,
             },
 
             Y = {
-                rt.GamepadButton.LEFT,
-                rt.KeyboardKey.Y
+                gamepad = rt.GamepadButton.LEFT,
+                keyboard = rt.KeyboardKey.Y
             },
 
             L = {
-                rt.GamepadButton.LEFT_SHOULDER,
-                rt.KeyboardKey.L
+                gamepad = rt.GamepadButton.LEFT_SHOULDER,
+                keyboard = rt.KeyboardKey.L
             },
 
             R = {
-                rt.GamepadButton.RIGHT_SHOULDER,
-                rt.KeyboardKey.R
+                gamepad = rt.GamepadButton.RIGHT_SHOULDER,
+                keyboard = rt.KeyboardKey.R
             },
 
             START = {
-                rt.GamepadButton.START,
-                rt.KeyboardKey.M
+                gamepad = rt.GamepadButton.START,
+                keyboard = rt.KeyboardKey.M
             },
 
             SELECT = {
-                rt.GamepadButton.SELECT,
-                rt.KeyboardKey.N
+                gamepad = rt.GamepadButton.SELECT,
+                keyboard = rt.KeyboardKey.N
             },
 
             UP = {
-                rt.GamepadButton.DPAD_UP,
-                rt.KeyboardKey.ARROW_UP,
-                rt.KeyboardKey.W
+                gamepad = rt.GamepadButton.DPAD_UP,
+                keyboard = rt.KeyboardKey.ARROW_UP,
             },
 
             RIGHT = {
-                rt.GamepadButton.DPAD_RIGHT,
-                rt.KeyboardKey.ARROW_RIGHT,
-                rt.KeyboardKey.D
+                gamepad = rt.GamepadButton.DPAD_RIGHT,
+                keyboard = rt.KeyboardKey.ARROW_RIGHT,
             },
 
             DOWN = {
-                rt.GamepadButton.DPAD_DOWN,
-                rt.KeyboardKey.ARROW_DOWN,
-                rt.KeyboardKey.S
+                gamepad = rt.GamepadButton.DPAD_DOWN,
+                keyboard = rt.KeyboardKey.ARROW_DOWN,
             },
 
             LEFT = {
-                rt.GamepadButton.DPAD_LEFT,
-                rt.KeyboardKey.ARROW_LEFT,
-                rt.KeyboardKey.A
+                gamepad = rt.GamepadButton.DPAD_LEFT,
+                keyboard = rt.KeyboardKey.ARROW_LEFT,
             },
 
             DEBUG = {
-                rt.KeyboardKey.ESCAPE
+                gamepad = rt.GamepadButton.HOME,
+                keyboard = rt.KeyboardKey.ESCAPE
             }
         }
 
@@ -158,18 +155,11 @@ function rt.GameState:load_input_mapping()
         if valid_keys[key] == nil then
             rt.error("In rt.GameState.load_input_mapping: encountered unexpected key `" .. key .. "`")
         else
-            if meta.is_table(value) then
-                for mapped in values(value) do
-                    table.insert(state.input_mapping[key], mapped)
-                    if reverse_mapping_count[mapped] == nil then
-                        reverse_mapping_count[mapped] = {key}
-                    else
-                        table.insert(reverse_mapping_count[mapped], key)
-                    end
-                end
-            else
-                local mapped = value
-                table.insert(state.input_mapping[key], mapped)
+            meta.assert_table(value)
+            for id in range("gamepad", "keyboard") do
+                local mapped = value[id]
+                state.input_mapping[key][id] = mapped
+
                 if reverse_mapping_count[mapped] == nil then
                     reverse_mapping_count[mapped] = {key}
                 else
@@ -206,6 +196,48 @@ function rt.GameState:get_input_mapping()
     return self._state.input_mapping
 end
 
+--- @brief
+function rt.GameState:set_input_button_gamepad_button(input_button, new_gamepad_button)
+    meta.assert_enum(input_button, rt.InputButton)
+    meta.assert_enum(new_gamepad_button, rt.GamepadButton)
+    local current = self._state.input_mapping[input_button].gamepad
+
+    if current ~= new_gamepad_button then
+        self._state.input_mapping[input_button].gamepad = new_gamepad_button
+        rt.InputControllerState.load_from_state(self)
+    end
+end
+
+--- @brief
+function rt.GameState:set_input_button_keyboard_key(input_button, keyboard_key)
+    meta.assert_enum(input_button, rt.InputButton)
+    meta.assert_enum(keyboard_key, rt.KeyboardKey)
+    local current = self._state.input_mapping[input_button].keyboard
+
+    if current ~= keyboard_key then
+        self._state.input_mapping[input_button].keyboard = keyboard_key
+        rt.InputControllerState.load_from_state(self)
+    end
+end
+
+--- @brief
+function rt.GameState:input_button_to_gamepad_button(input_button)
+    meta.assert_enum(input_button, rt.InputButton)
+    return self._state.input_mapping[input_button].gamepad
+end
+
+--- @brief
+function rt.GameState:input_button_to_keyboard_key(input_button)
+    meta.assert_enum(input_button, rt.InputButton)
+    return self._state.input_mapping[input_button].keyboard
+end
+
+--- @brief
+function rt.GameState:get_is_controller_active()
+    return rt.InputControllerState.is_controller_active
+end
+
+--- @brief
 function rt.GameState:run()
     love.window.setMode(self._state.config.resolution_x, self._state.config.resolution_y, {
         vsync = self._state.config.vsync, -- adaptive vsync, may tear but tries to stay as close to 60hz as possible
@@ -420,3 +452,5 @@ function rt.GameState:set_vfx_contrast_level(fraction)
     end
     self._state.config.vfx_contrast_level = fraction
 end
+
+--- @brief

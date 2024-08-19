@@ -161,6 +161,7 @@ function rt.Cloth:update(delta, n_iterations)
     local x, y = love.mouse.getPosition()
     -- TODO
 
+    CURTAIN_WIDTH = 500
     -- apply constraints
     for _ = 1, n_iterations do
 
