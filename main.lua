@@ -16,6 +16,9 @@ end)
 
 state:set_input_button_keyboard_key(rt.InputButton.UP, rt.KeyboardKey.A)
 
+background = bt.Background.VORONOI_CRYSTALS()
+background:realize()
+
 love.load = function()
     if scene ~= nil then
         scene:realize()
@@ -28,13 +31,17 @@ love.update = function(delta)
     if scene ~= nil then
         scene:update(delta)
     end
+
+    if love.keyboard.isDown("space") then
+        background:update(delta)
+    end
 end
 
 love.draw = function()
     if scene ~= nil then
         scene:draw()
     end
-
+    background:draw()
 end
 
 love.resize = function()
@@ -42,6 +49,8 @@ love.resize = function()
     if scene ~= nil then
         scene:fit_into(x, y, w, h)
     end
+
+    background:fit_into(x, y, w, h)
 end
 
 love.run = function()

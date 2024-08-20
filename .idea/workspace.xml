@@ -22,10 +22,11 @@
     </configurations>
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="7fa9ba1b-2cff-4ecc-86fb-59ab2fa76ee1" name="Changes" comment="stashing voro">
+    <list default="true" id="7fa9ba1b-2cff-4ecc-86fb-59ab2fa76ee1" name="Changes" comment="refactored input mapping">
+      <change afterPath="$PROJECT_DIR$/battle/backgrounds/voronoi_crystals.glsl" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/battle/backgrounds/voronoi_crystals.lua" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/battle/backgrounds/stained_glass_butterfly.glsl" beforeDir="false" afterPath="$PROJECT_DIR$/battle/backgrounds/stained_glass_butterfly.glsl" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/battle/backgrounds/stained_glass_butterfly.lua" beforeDir="false" afterPath="$PROJECT_DIR$/battle/backgrounds/stained_glass_butterfly.lua" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/main.lua" beforeDir="false" afterPath="$PROJECT_DIR$/main.lua" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -123,11 +124,11 @@
       <recent name="C:\Users\cleme\Workspace\rat_game\common" />
     </key>
     <key name="MoveFile.RECENT_KEYS">
+      <recent name="C:\Users\cleme\Workspace\rat_game\menu" />
       <recent name="C:\Users\cleme\Workspace\rat_game\assets\sprites\battle" />
       <recent name="C:\Users\cleme\Workspace\rat_game\common" />
       <recent name="C:\Users\cleme\Workspace\rat_game\assets\configs" />
       <recent name="C:\Users\cleme\Workspace\rat_game\old" />
-      <recent name="C:\Users\cleme\Workspace\rat_game" />
     </key>
   </component>
   <component name="RunManager" selected="Lua Application.main">
@@ -499,23 +500,7 @@
       <workItem from="1723765694923" duration="1180000" />
       <workItem from="1723817745942" duration="8699000" />
       <workItem from="1723830657030" duration="915000" />
-      <workItem from="1723845265295" duration="31196000" />
-    </task>
-    <task id="LOCAL-00923" summary="stashing">
-      <option name="closed" value="true" />
-      <created>1722469815787</created>
-      <option name="number" value="00923" />
-      <option name="presentableId" value="LOCAL-00923" />
-      <option name="project" value="LOCAL" />
-      <updated>1722469815787</updated>
-    </task>
-    <task id="LOCAL-00924" summary="added a/x for page nodes">
-      <option name="closed" value="true" />
-      <created>1722540954066</created>
-      <option name="number" value="00924" />
-      <option name="presentableId" value="LOCAL-00924" />
-      <option name="project" value="LOCAL" />
-      <updated>1722540954066</updated>
+      <workItem from="1723845265295" duration="50871000" />
     </task>
     <task id="LOCAL-00925" summary="added message dialog">
       <option name="closed" value="true" />
@@ -893,7 +878,23 @@
       <option name="project" value="LOCAL" />
       <updated>1724005760177</updated>
     </task>
-    <option name="localTasksCounter" value="972" />
+    <task id="LOCAL-00972" summary="added stained glass">
+      <option name="closed" value="true" />
+      <created>1724007329566</created>
+      <option name="number" value="00972" />
+      <option name="presentableId" value="LOCAL-00972" />
+      <option name="project" value="LOCAL" />
+      <updated>1724007329567</updated>
+    </task>
+    <task id="LOCAL-00973" summary="refactored input mapping">
+      <option name="closed" value="true" />
+      <created>1724089791887</created>
+      <option name="number" value="00973" />
+      <option name="presentableId" value="LOCAL-00973" />
+      <option name="project" value="LOCAL" />
+      <updated>1724089791887</updated>
+    </task>
+    <option name="localTasksCounter" value="974" />
     <servers />
   </component>
   <component name="TypeScriptGeneratedFilesManager">
@@ -942,8 +943,6 @@
     </option>
   </component>
   <component name="VcsManagerConfiguration">
-    <MESSAGE value="added template verbose info, fixed message dialog loop" />
-    <MESSAGE value="stashing" />
     <MESSAGE value="stashing before refactoring for gamestate" />
     <MESSAGE value="refactored input controller for global state" />
     <MESSAGE value="imported rewrite" />
@@ -967,7 +966,9 @@
     <MESSAGE value="stashing scrolling" />
     <MESSAGE value="added scale" />
     <MESSAGE value="stashing voro" />
-    <option name="LAST_COMMIT_MESSAGE" value="stashing voro" />
+    <MESSAGE value="added stained glass" />
+    <MESSAGE value="refactored input mapping" />
+    <option name="LAST_COMMIT_MESSAGE" value="refactored input mapping" />
   </component>
   <component name="XDebuggerManager">
     <breakpoint-manager>
@@ -978,19 +979,9 @@
           <option name="timeStamp" value="6" />
         </line-breakpoint>
         <line-breakpoint enabled="true" type="lua-line">
-          <url>file://$PROJECT_DIR$/old/common/input_button.lua</url>
-          <line>131</line>
-          <option name="timeStamp" value="8" />
-        </line-breakpoint>
-        <line-breakpoint enabled="true" type="lua-line">
           <url>file://$PROJECT_DIR$/old/menu/scene.lua</url>
           <line>333</line>
           <option name="timeStamp" value="9" />
-        </line-breakpoint>
-        <line-breakpoint enabled="true" type="lua-line">
-          <url>file://$PROJECT_DIR$/common/game_state.lua</url>
-          <line>13</line>
-          <option name="timeStamp" value="11" />
         </line-breakpoint>
       </breakpoints>
     </breakpoint-manager>
