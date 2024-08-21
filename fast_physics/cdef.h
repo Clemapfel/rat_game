@@ -1,0 +1,390 @@
+// ### SDL THREAD ###
+void* SDL_CreateThread(int(*fn)(void*), const char *name, void *data);
+void SDL_WaitThread(void* thread, int *status);
+
+// ### BOX2D CALLBACK ###
+
+typedef void b2TaskCallback( int32_t startIndex, int32_t endIndex, uint32_t workerIndex, void* taskContext );
+typedef void* b2EnqueueTaskCallback( b2TaskCallback* task, int32_t itemCount, int32_t minRange, void* taskContext, void* userContext );
+typedef void b2FinishTaskCallback( void* userTask, void* userContext );
+
+// ### MATH ###
+
+typedef struct b2Vec2
+{
+    float x, y;
+} b2Vec2;
+
+typedef struct b2Rot
+{
+    float c, s;
+} b2Rot;
+
+typedef struct b2Transform
+{
+    b2Vec2 p;
+    b2Rot q;
+} b2Transform;
+
+typedef struct b2Mat22
+{
+    b2Vec2 cx, cy;
+} b2Mat22;
+
+typedef struct b2AABB
+{
+    b2Vec2 lowerBound;
+    b2Vec2 upperBound;
+} b2AABB;
+
+// ### WORLD ###
+
+typedef struct b2WorldDef
+{
+    b2Vec2 gravity;
+    float restitutionThreshold;
+    float contactPushoutVelocity;
+    float hitEventThreshold;
+    float contactHertz;
+    float contactDampingRatio;
+    float jointHertz;
+    float jointDampingRatio;
+    float maximumLinearVelocity;
+    bool enableSleep;
+    bool enableContinous;
+    int32_t workerCount;
+    b2EnqueueTaskCallback* enqueueTask;
+    b2FinishTaskCallback* finishTask;
+    void* userTaskContext;
+    int32_t internalValue;
+} b2WorldDef;
+
+b2WorldDef b2DefaultWorldDef( void );
+
+typedef struct b2WorldId
+{
+    uint16_t index1;
+    uint16_t revision;
+} b2WorldId;
+
+b2WorldId b2CreateWorld( const b2WorldDef* def );
+void b2DestroyWorld( b2WorldId worldId );
+bool b2World_IsValid( b2WorldId id );
+void b2World_Step( b2WorldId worldId, float timeStep, int subStepCount );
+void b2World_SetGravity( b2WorldId worldId, b2Vec2 gravity );
+b2Vec2 b2World_GetGravity( b2WorldId worldId );
+
+// ### BODY ###
+
+typedef enum b2BodyType
+{
+    b2_staticBody = 0,
+    b2_kinematicBody = 1,
+    b2_dynamicBody = 2,
+    b2_bodyTypeCount,
+} b2BodyType;
+
+typedef struct b2BodyDef
+{
+    b2BodyType type;
+    b2Vec2 position;
+    b2Rot rotation;
+    b2Vec2 linearVelocity;
+    float angularVelocity;
+    float linearDamping;
+    float angularDamping;
+    float gravityScale;
+    float sleepThreshold;
+    void* userData;
+    bool enableSleep;
+    bool isAwake;
+    bool fixedRotation;
+    bool isBullet;
+    bool isEnabled;
+    bool automaticMass;
+    bool allowFastRotation;
+    int32_t internalValue;
+} b2BodyDef;
+
+typedef struct b2BodyId
+{
+    int32_t index1;
+    uint16_t world0;
+    uint16_t revision;
+} b2BodyId;
+
+b2BodyId b2CreateBody( b2WorldId worldId, const b2BodyDef* def );
+void b2DestroyBody( b2BodyId bodyId );
+bool b2Body_IsValid( b2BodyId id );
+b2BodyType b2Body_GetType( b2BodyId bodyId );
+void b2Body_SetType( b2BodyId bodyId, b2BodyType type );
+b2Transform b2Body_GetTransform( b2BodyId bodyId );
+void b2Body_SetTransform( b2BodyId bodyId, b2Vec2 position, b2Rot rotation );
+b2Vec2 b2Body_GetLocalPoint( b2BodyId bodyId, b2Vec2 worldPoint );
+b2Vec2 b2Body_GetWorldPoint( b2BodyId bodyId, b2Vec2 localPoint );
+b2Vec2 b2Body_GetLocalVector( b2BodyId bodyId, b2Vec2 worldVector );
+b2Vec2 b2Body_GetWorldVector( b2BodyId bodyId, b2Vec2 localVector );
+b2Vec2 b2Body_GetLinearVelocity( b2BodyId bodyId );
+float b2Body_GetAngularVelocity( b2BodyId bodyId );
+void b2Body_SetLinearVelocity( b2BodyId bodyId, b2Vec2 linearVelocity );
+void b2Body_SetAngularVelocity( b2BodyId bodyId, float angularVelocity );
+void b2Body_ApplyForce( b2BodyId bodyId, b2Vec2 force, b2Vec2 point, bool wake );
+void b2Body_ApplyForceToCenter( b2BodyId bodyId, b2Vec2 force, bool wake );
+void b2Body_ApplyTorque( b2BodyId bodyId, float torque, bool wake );
+void b2Body_ApplyLinearImpulse( b2BodyId bodyId, b2Vec2 impulse, b2Vec2 point, bool wake );
+void b2Body_ApplyLinearImpulseToCenter( b2BodyId bodyId, b2Vec2 impulse, bool wake );
+void b2Body_ApplyAngularImpulse( b2BodyId bodyId, float impulse, bool wake );
+float b2Body_GetMass( b2BodyId bodyId );
+float b2Body_GetInertiaTensor( b2BodyId bodyId );
+b2Vec2 b2Body_GetLocalCenterOfMass( b2BodyId bodyId );
+b2Vec2 b2Body_GetWorldCenterOfMass( b2BodyId bodyId );
+
+typedef struct b2MassData
+{
+    float mass;
+    b2Vec2 center;
+    float rotationalInertia;
+} b2MassData;
+
+void b2Body_SetMassData( b2BodyId bodyId, b2MassData massData );
+b2MassData b2Body_GetMassData( b2BodyId bodyId );
+void b2Body_SetAutomaticMass( b2BodyId bodyId, bool automaticMass );
+bool b2Body_GetAutomaticMass( b2BodyId bodyId );
+void b2Body_SetLinearDamping( b2BodyId bodyId, float linearDamping );
+float b2Body_GetLinearDamping( b2BodyId bodyId );
+void b2Body_SetAngularDamping( b2BodyId bodyId, float angularDamping );
+float b2Body_GetAngularDamping( b2BodyId bodyId );
+void b2Body_SetGravityScale( b2BodyId bodyId, float gravityScale );
+float b2Body_GetGravityScale( b2BodyId bodyId );
+bool b2Body_IsAwake( b2BodyId bodyId );
+void b2Body_SetAwake( b2BodyId bodyId, bool awake );
+void b2Body_EnableSleep( b2BodyId bodyId, bool enableSleep );
+bool b2Body_IsSleepEnabled( b2BodyId bodyId );
+void b2Body_SetSleepThreshold( b2BodyId bodyId, float sleepVelocity );
+float b2Body_GetSleepThreshold( b2BodyId bodyId );
+bool b2Body_IsEnabled( b2BodyId bodyId );
+void b2Body_Disable( b2BodyId bodyId );
+void b2Body_Enable( b2BodyId bodyId );
+void b2Body_SetFixedRotation( b2BodyId bodyId, bool flag );
+bool b2Body_IsFixedRotation( b2BodyId bodyId );
+void b2Body_SetBullet( b2BodyId bodyId, bool flag );
+bool b2Body_IsBullet( b2BodyId bodyId );
+void b2Body_EnableHitEvents( b2BodyId bodyId, bool enableHitEvents );
+b2AABB b2Body_ComputeAABB( b2BodyId bodyId );
+
+// ### FILTER ###
+typedef struct b2Filter
+{
+    uint32_t categoryBits;
+    uint32_t maskBits;
+    int32_t groupIndex;
+} b2Filter;
+
+b2Filter b2DefaultFilter( void );
+
+// ### SHAPES ###
+
+typedef enum b2ShapeType
+{
+    b2_circleShape,
+    b2_capsuleShape,
+    b2_segmentShape,
+    b2_polygonShape,
+    b2_smoothSegmentShape,
+    b2_shapeTypeCount
+} b2ShapeType;
+
+typedef struct b2ShapeDef
+{
+    void* userData;
+    float friction;
+    float restitution;
+    float density;
+    b2Filter filter;
+    uint32_t customColor;
+    bool isSensor;
+    bool enableSensorEvents;
+    bool enableContactEvents;
+    bool enableHitEvents;
+    bool enablePreSolveEvents;
+    bool forceContactCreation;
+    int32_t internalValue;
+} b2ShapeDef;
+
+typedef struct b2ShapeId
+{
+    int32_t index1;
+    uint16_t world0;
+    uint16_t revision;
+} b2ShapeId;
+
+int b2Body_GetShapeCount( b2BodyId bodyId );
+int b2Body_GetShapes( b2BodyId bodyId, b2ShapeId* shapeArray, int capacity );
+
+b2ShapeDef b2DefaultShapeDef( void );
+
+void b2DestroyShape( b2ShapeId shapeId );
+bool b2Shape_IsValid( b2ShapeId id );
+b2ShapeType b2Shape_GetType( b2ShapeId shapeId );
+b2BodyId b2Shape_GetBody( b2ShapeId shapeId );
+bool b2Shape_IsSensor( b2ShapeId shapeId );
+void b2Shape_SetUserData( b2ShapeId shapeId, void* userData );
+void* b2Shape_GetUserData( b2ShapeId shapeId );
+void b2Shape_SetDensity( b2ShapeId shapeId, float density );
+float b2Shape_GetDensity( b2ShapeId shapeId );
+void b2Shape_SetFriction( b2ShapeId shapeId, float friction );
+float b2Shape_GetFriction( b2ShapeId shapeId );
+void b2Shape_SetRestitution( b2ShapeId shapeId, float restitution );
+float b2Shape_GetRestitution( b2ShapeId shapeId );
+void b2Shape_EnableSensorEvents( b2ShapeId shapeId, bool flag );
+bool b2Shape_AreSensorEventsEnabled( b2ShapeId shapeId );
+void b2Shape_EnableContactEvents( b2ShapeId shapeId, bool flag );
+bool b2Shape_AreContactEventsEnabled( b2ShapeId shapeId );
+void b2Shape_EnablePreSolveEvents( b2ShapeId shapeId, bool flag );
+bool b2Shape_ArePreSolveEventsEnabled( b2ShapeId shapeId );
+void b2Shape_EnableHitEvents( b2ShapeId shapeId, bool flag );
+bool b2Shape_AreHitEventsEnabled( b2ShapeId shapeId );
+b2AABB b2Shape_GetAABB( b2ShapeId shapeId );
+b2Vec2 b2Shape_GetClosestPoint( b2ShapeId shapeId, b2Vec2 target );
+b2Filter b2Shape_GetFilter( b2ShapeId shapeId );
+void b2Shape_SetFilter( b2ShapeId shapeId, b2Filter filter );
+
+// ### CHAINS ###
+
+typedef struct b2ChainDef
+{
+    void* userData;
+    const b2Vec2* points;
+    int32_t count;
+    float friction;
+    float restitution;
+    b2Filter filter;
+    bool isLoop;
+    int32_t internalValue;
+} b2ChainDef;
+
+typedef struct b2ChainId
+{
+    int32_t index1;
+    uint16_t world0;
+    uint16_t revision;
+} b2ChainId;
+
+b2ChainDef b2DefaultChainDef( void );
+
+b2ChainId b2CreateChain( b2BodyId bodyId, const b2ChainDef* def );
+void b2DestroyChain( b2ChainId chainId );
+void b2Chain_SetFriction( b2ChainId chainId, float friction );
+void b2Chain_SetRestitution( b2ChainId chainId, float restitution );
+bool b2Chain_IsValid( b2ChainId id );
+
+// ### GEOMETRY ###
+
+#DEFINE b2_maxPolygonVertices 8
+
+typedef struct b2Circle
+{
+    b2Vec2 center;
+    float radius;
+} b2Circle;
+
+typedef struct b2Capsule
+{
+    b2Vec2 center1;
+    b2Vec2 center2;
+    float radius;
+} b2Capsule;
+
+typedef struct b2Polygon
+{
+    b2Vec2 vertices[b2_maxPolygonVertices];
+    b2Vec2 normals[b2_maxPolygonVertices];
+    b2Vec2 centroid;
+    float radius;
+    int32_t count;
+} b2Polygon;
+
+typedef struct b2Segment
+{
+    b2Vec2 point1;
+    b2Vec2 point2;
+} b2Segment;
+
+typedef struct b2Hull
+{
+    b2Vec2 points[b2_maxPolygonVertices];
+    int32_t count;
+} b2Hull;
+
+b2Hull b2ComputeHull( const b2Vec2* points, int32_t count );
+bool b2ValidateHull( const b2Hull* hull );
+
+b2Polygon b2MakePolygon( const b2Hull* hull, float radius );
+b2Polygon b2MakeOffsetPolygon( const b2Hull* hull, float radius, b2Transform transform );
+b2Polygon b2MakeSquare( float h );
+b2Polygon b2MakeBox( float hx, float hy );
+b2Polygon b2MakeRoundedBox( float hx, float hy, float radius );
+b2Polygon b2MakeOffsetBox( float hx, float hy, b2Vec2 center, float angle );
+b2Polygon b2TransformPolygon( b2Transform transform, const b2Polygon* polygon );
+
+b2ShapeId b2CreateCircleShape( b2BodyId bodyId, const b2ShapeDef* def, const b2Circle* circle );
+b2ShapeId b2CreateSegmentShape( b2BodyId bodyId, const b2ShapeDef* def, const b2Segment* segment );
+b2ShapeId b2CreateCapsuleShape( b2BodyId bodyId, const b2ShapeDef* def, const b2Capsule* capsule );
+b2ShapeId b2CreatePolygonShape( b2BodyId bodyId, const b2ShapeDef* def, const b2Polygon* polygon );
+void b2Shape_SetCircle( b2ShapeId shapeId, const b2Circle* circle );
+void b2Shape_SetCapsule( b2ShapeId shapeId, const b2Capsule* capsule );
+void b2Shape_SetSegment( b2ShapeId shapeId, const b2Segment* segment );
+void b2Shape_SetPolygon( b2ShapeId shapeId, const b2Polygon* polygon );
+
+b2MassData b2ComputeCircleMass( const b2Circle* shape, float density );
+b2MassData b2ComputeCapsuleMass( const b2Capsule* shape, float density );
+b2MassData b2ComputePolygonMass( const b2Polygon* shape, float density );
+
+b2AABB b2ComputeCircleAABB( const b2Circle* shape, b2Transform transform );
+b2AABB b2ComputeCapsuleAABB( const b2Capsule* shape, b2Transform transform );
+b2AABB b2ComputePolygonAABB( const b2Polygon* shape, b2Transform transform );
+b2AABB b2ComputeSegmentAABB( const b2Segment* shape, b2Transform transform );
+
+bool b2PointInCircle( b2Vec2 point, const b2Circle* shape );
+bool b2PointInCapsule( b2Vec2 point, const b2Capsule* shape );
+bool b2PointInPolygon( b2Vec2 point, const b2Polygon* shape );
+
+typedef struct b2RayCastInput
+{
+    b2Vec2 origin;
+    b2Vec2 translation;
+    float maxFraction;
+} b2RayCastInput;
+
+typedef struct b2ShapeCastInput
+{
+    b2Vec2 points[b2_maxPolygonVertices];
+    int32_t count;
+    float radius;
+    b2Vec2 translation;
+    float maxFraction;
+} b2ShapeCastInput;
+
+typedef struct b2CastOutput
+{
+    b2Vec2 normal;
+    b2Vec2 point;
+    float fraction;
+    int32_t iterations;
+    bool hit;
+} b2CastOutput;
+
+b2CastOutput b2RayCastCircle( const b2RayCastInput* input, const b2Circle* shape );
+b2CastOutput b2RayCastCapsule( const b2RayCastInput* input, const b2Capsule* shape );
+b2CastOutput b2RayCastSegment( const b2RayCastInput* input, const b2Segment* shape, bool oneSided );
+b2CastOutput b2RayCastPolygon( const b2RayCastInput* input, const b2Polygon* shape );
+b2CastOutput b2ShapeCastCircle( const b2ShapeCastInput* input, const b2Circle* shape );
+b2CastOutput b2ShapeCastCapsule( const b2ShapeCastInput* input, const b2Capsule* shape );
+b2CastOutput b2ShapeCastSegment( const b2ShapeCastInput* input, const b2Segment* shape );
+b2CastOutput b2ShapeCastPolygon( const b2ShapeCastInput* input, const b2Polygon* shape );
+
+// ### CONTACTS ####
+
+//int b2Body_GetContactCapacity( b2BodyId bodyId );
+//int b2Body_GetContactData( b2BodyId bodyId, b2ContactData* contactData, int capacity );
+*/

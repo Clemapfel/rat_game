@@ -41,10 +41,12 @@ rt.settings = {}
 rt.menu = {}
 rt.battle = {}
 rt.overworld = {}
+rt.physics = {}
 
 mn = rt.menu
 bt = rt.battle
 ow = rt.overworld
+b2 = rt.physics
 
 for _, name in pairs({"rt", "bt", "ow"}) do
     local t = _G[name]
