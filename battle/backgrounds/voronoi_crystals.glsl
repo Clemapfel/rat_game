@@ -93,7 +93,7 @@ vec4 effect(vec4 vertex_color, Image image, vec2 texture_coords, vec2 vertex_pos
     pos *= 10;
 
     float angle = mod(-1 * elapsed, 2 * PI);
-    vec3 tiled = voronoi(pos, sine_wave(0.04 * elapsed) * 150 * distance(texture_coords, vec2(0.5)) * 0.4);
+    vec3 tiled = voronoi(pos, 10 * sine_wave(0.04 * elapsed) * 150 * distance(texture_coords, vec2(0.5)) * 0.4);
 
     const float max_value = 0.01;
     float value = cos(angle) * tiled.y + sin(angle) * tiled.z;
