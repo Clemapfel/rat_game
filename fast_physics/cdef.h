@@ -73,6 +73,10 @@ bool b2World_IsValid( b2WorldId id );
 void b2World_Step( b2WorldId worldId, float timeStep, int subStepCount );
 void b2World_SetGravity( b2WorldId worldId, b2Vec2 gravity );
 b2Vec2 b2World_GetGravity( b2WorldId worldId );
+void b2World_EnableSleeping( b2WorldId worldId, bool flag );
+void b2World_EnableContinuous( b2WorldId worldId, bool flag );
+void b2World_SetRestitutionThreshold( b2WorldId worldId, float value );
+void b2World_SetHitEventThreshold( b2WorldId worldId, float value );
 
 // ### BODY ###
 
@@ -173,6 +177,7 @@ void b2Body_EnableHitEvents( b2BodyId bodyId, bool enableHitEvents );
 b2AABB b2Body_ComputeAABB( b2BodyId bodyId );
 
 // ### FILTER ###
+
 typedef struct b2Filter
 {
     uint32_t categoryBits;
@@ -249,6 +254,77 @@ b2Vec2 b2Shape_GetClosestPoint( b2ShapeId shapeId, b2Vec2 target );
 b2Filter b2Shape_GetFilter( b2ShapeId shapeId );
 void b2Shape_SetFilter( b2ShapeId shapeId, b2Filter filter );
 
+typedef struct b2BodyMoveEvent
+{
+    b2Transform transform;
+    b2BodyId bodyId;
+    void* userData;
+    bool fellAsleep;
+} b2BodyMoveEvent;
+
+typedef struct b2BodyEvents
+{
+    b2BodyMoveEvent* moveEvents;
+    int32_t moveCount;
+} b2BodyEvents;
+
+b2BodyEvents b2World_GetBodyEvents( b2WorldId worldId );
+
+typedef struct b2SensorBeginTouchEvent
+{
+    b2ShapeId sensorShapeId;
+    b2ShapeId visitorShapeId;
+} b2SensorBeginTouchEvent;
+
+typedef struct b2SensorEndTouchEvent
+{
+    b2ShapeId sensorShapeId;
+    b2ShapeId visitorShapeId;
+} b2SensorEndTouchEvent;
+
+typedef struct b2SensorEvents
+{
+    b2SensorBeginTouchEvent* beginEvents;
+    b2SensorEndTouchEvent* endEvents;
+    int32_t beginCount;
+    int32_t endCount;
+} b2SensorEvents;
+
+b2SensorEvents b2World_GetSensorEvents( b2WorldId worldId );
+
+typedef struct b2ContactBeginTouchEvent
+{
+    b2ShapeId shapeIdA;
+    b2ShapeId shapeIdB;
+} b2ContactBeginTouchEvent;
+
+typedef struct b2ContactEndTouchEvent
+{
+    b2ShapeId shapeIdA;
+    b2ShapeId shapeIdB;
+} b2ContactEndTouchEvent;
+
+typedef struct b2ContactHitEvent
+{
+    b2ShapeId shapeIdA;
+    b2ShapeId shapeIdB;
+    b2Vec2 point;
+    b2Vec2 normal;
+    float approachSpeed;
+} b2ContactHitEvent;
+
+typedef struct b2ContactEvents
+{
+    b2ContactBeginTouchEvent* beginEvents;
+    b2ContactEndTouchEvent* endEvents;
+    b2ContactHitEvent* hitEvents;
+    int32_t beginCount;
+    int32_t endCount;
+    int32_t hitCount;
+} b2ContactEvents;
+
+b2ContactEvents b2World_GetContactEvents( b2WorldId worldId );
+
 // ### CHAINS ###
 
 typedef struct b2ChainDef
@@ -280,8 +356,6 @@ bool b2Chain_IsValid( b2ChainId id );
 
 // ### GEOMETRY ###
 
-#DEFINE b2_maxPolygonVertices 8
-
 typedef struct b2Circle
 {
     b2Vec2 center;
@@ -297,8 +371,8 @@ typedef struct b2Capsule
 
 typedef struct b2Polygon
 {
-    b2Vec2 vertices[b2_maxPolygonVertices];
-    b2Vec2 normals[b2_maxPolygonVertices];
+    b2Vec2 vertices[8];
+    b2Vec2 normals[8];
     b2Vec2 centroid;
     float radius;
     int32_t count;
@@ -312,7 +386,7 @@ typedef struct b2Segment
 
 typedef struct b2Hull
 {
-    b2Vec2 points[b2_maxPolygonVertices];
+    b2Vec2 points[8];
     int32_t count;
 } b2Hull;
 
@@ -336,6 +410,35 @@ void b2Shape_SetCapsule( b2ShapeId shapeId, const b2Capsule* capsule );
 void b2Shape_SetSegment( b2ShapeId shapeId, const b2Segment* segment );
 void b2Shape_SetPolygon( b2ShapeId shapeId, const b2Polygon* polygon );
 
+typedef struct b2QueryFilter
+{
+    uint32_t categoryBits;
+    uint32_t maskBits;
+} b2QueryFilter;
+
+typedef bool b2OverlapResultFcn( b2ShapeId shapeId, void* context );
+void b2World_OverlapAABB( b2WorldId worldId, b2AABB aabb, b2QueryFilter filter, b2OverlapResultFcn* fcn, void* context );
+void b2World_OverlapCircle( b2WorldId worldId, const b2Circle* circle, b2Transform transform, b2QueryFilter filter, b2OverlapResultFcn* fcn, void* context );
+void b2World_OverlapCapsule( b2WorldId worldId, const b2Capsule* capsule, b2Transform transform, b2QueryFilter filter, b2OverlapResultFcn* fcn, void* context );
+void b2World_OverlapPolygon( b2WorldId worldId, const b2Polygon* polygon, b2Transform transform, b2QueryFilter filter, b2OverlapResultFcn* fcn, void* context );
+
+typedef float b2CastResultFcn( b2ShapeId shapeId, b2Vec2 point, b2Vec2 normal, float fraction, void* context );
+void b2World_CastRay( b2WorldId worldId, b2Vec2 origin, b2Vec2 translation, b2QueryFilter filter, b2CastResultFcn* fcn, void* context );
+void b2World_CastCircle( b2WorldId worldId, const b2Circle* circle, b2Transform originTransform, b2Vec2 translation, b2QueryFilter filter, b2CastResultFcn* fcn, void* context );
+void b2World_CastCapsule( b2WorldId worldId, const b2Capsule* capsule, b2Transform originTransform, b2Vec2 translation, b2QueryFilter filter, b2CastResultFcn* fcn, void* context );
+void b2World_CastPolygon( b2WorldId worldId, const b2Polygon* polygon, b2Transform originTransform, b2Vec2 translation, b2QueryFilter filter, b2CastResultFcn* fcn, void* context );
+
+typedef struct b2RayResult
+{
+    b2ShapeId shapeId;
+    b2Vec2 point;
+    b2Vec2 normal;
+    float fraction;
+    bool hit;
+} b2RayResult;
+
+b2RayResult b2World_CastRayClosest( b2WorldId worldId, b2Vec2 origin, b2Vec2 translation, b2QueryFilter filter );
+
 b2MassData b2ComputeCircleMass( const b2Circle* shape, float density );
 b2MassData b2ComputeCapsuleMass( const b2Capsule* shape, float density );
 b2MassData b2ComputePolygonMass( const b2Polygon* shape, float density );
@@ -358,7 +461,7 @@ typedef struct b2RayCastInput
 
 typedef struct b2ShapeCastInput
 {
-    b2Vec2 points[b2_maxPolygonVertices];
+    b2Vec2 points[8];
     int32_t count;
     float radius;
     b2Vec2 translation;
@@ -383,8 +486,39 @@ b2CastOutput b2ShapeCastCapsule( const b2ShapeCastInput* input, const b2Capsule*
 b2CastOutput b2ShapeCastSegment( const b2ShapeCastInput* input, const b2Segment* shape );
 b2CastOutput b2ShapeCastPolygon( const b2ShapeCastInput* input, const b2Polygon* shape );
 
+typedef struct b2ManifoldPoint
+{
+
+    b2Vec2 point;
+    b2Vec2 anchorA;
+    b2Vec2 anchorB;
+    float separation;
+    float normalImpulse;
+    float tangentImpulse;
+    float maxNormalImpulse;
+    float normalVelocity;
+    uint16_t id;
+    bool persisted;
+} b2ManifoldPoint;
+
+typedef struct b2Manifold
+{
+    b2ManifoldPoint points[2];
+    b2Vec2 normal;
+    int32_t pointCount;
+} b2Manifold;
+
+b2Manifold b2CollideCircles( const b2Circle* circleA, b2Transform xfA, const b2Circle* circleB, b2Transform xfB );
+b2Manifold b2CollideCapsuleAndCircle( const b2Capsule* capsuleA, b2Transform xfA, const b2Circle* circleB, b2Transform xfB );
+b2Manifold b2CollideSegmentAndCircle( const b2Segment* segmentA, b2Transform xfA, const b2Circle* circleB, b2Transform xfB );
+b2Manifold b2CollidePolygonAndCircle( const b2Polygon* polygonA, b2Transform xfA, const b2Circle* circleB, b2Transform xfB );
+b2Manifold b2CollideCapsules( const b2Capsule* capsuleA, b2Transform xfA, const b2Capsule* capsuleB, b2Transform xfB );
+b2Manifold b2CollideSegmentAndCapsule( const b2Segment* segmentA, b2Transform xfA, const b2Capsule* capsuleB, b2Transform xfB );
+b2Manifold b2CollidePolygonAndCapsule( const b2Polygon* polygonA, b2Transform xfA, const b2Capsule* capsuleB, b2Transform xfB );
+b2Manifold b2CollidePolygons( const b2Polygon* polygonA, b2Transform xfA, const b2Polygon* polygonB, b2Transform xfB );
+b2Manifold b2CollideSegmentAndPolygon( const b2Segment* segmentA, b2Transform xfA, const b2Polygon* polygonB, b2Transform xfB );
+
 // ### CONTACTS ####
 
 //int b2Body_GetContactCapacity( b2BodyId bodyId );
 //int b2Body_GetContactData( b2BodyId bodyId, b2ContactData* contactData, int capacity );
-*/
