@@ -175,3 +175,8 @@ end
 function mn.Scale:update(delta)
     -- noop
 end
+
+--- @override
+function mn.Scale:measure()
+    return self._bounds.width, self._bounds.height
+end

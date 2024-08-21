@@ -22,19 +22,12 @@
     </configurations>
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="7fa9ba1b-2cff-4ecc-86fb-59ab2fa76ee1" name="Changes" comment="sdl threads working">
-      <change afterPath="$PROJECT_DIR$/assets/favicon.png" afterDir="false" />
+    <list default="true" id="7fa9ba1b-2cff-4ecc-86fb-59ab2fa76ee1" name="Changes" comment="fixed game state modification from options menu">
       <change afterPath="$PROJECT_DIR$/love/windows/box2d.dll" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/assets/why.png" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/common/game_state.lua" beforeDir="false" afterPath="$PROJECT_DIR$/common/game_state.lua" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/common/label.lua" beforeDir="false" afterPath="$PROJECT_DIR$/common/label.lua" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/common/signal_emitter.lua" beforeDir="false" afterPath="$PROJECT_DIR$/common/signal_emitter.lua" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/main.lua" beforeDir="false" afterPath="$PROJECT_DIR$/main.lua" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/menu/option_button.lua" beforeDir="false" afterPath="$PROJECT_DIR$/menu/option_button.lua" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/menu/options_scene.lua" beforeDir="false" afterPath="$PROJECT_DIR$/menu/options_scene.lua" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/menu/scale.lua" beforeDir="false" afterPath="$PROJECT_DIR$/menu/scale.lua" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/old/common/signals.lua" beforeDir="false" afterPath="$PROJECT_DIR$/old/common/signals.lua" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -516,15 +509,7 @@
       <workItem from="1724199426678" duration="115000" />
       <workItem from="1724200537484" duration="482000" />
       <workItem from="1724251423646" duration="176000" />
-      <workItem from="1724251645633" duration="6201000" />
-    </task>
-    <task id="LOCAL-00927" summary="finished message dialog">
-      <option name="closed" value="true" />
-      <created>1722627561958</created>
-      <option name="number" value="00927" />
-      <option name="presentableId" value="LOCAL-00927" />
-      <option name="project" value="LOCAL" />
-      <updated>1722627561958</updated>
+      <workItem from="1724251645633" duration="7302000" />
     </task>
     <task id="LOCAL-00928" summary="stashing message dialog">
       <option name="closed" value="true" />
@@ -910,7 +895,15 @@
       <option name="project" value="LOCAL" />
       <updated>1724251673476</updated>
     </task>
-    <option name="localTasksCounter" value="976" />
+    <task id="LOCAL-00976" summary="fixed game state modification from options menu">
+      <option name="closed" value="true" />
+      <created>1724265212708</created>
+      <option name="number" value="00976" />
+      <option name="presentableId" value="LOCAL-00976" />
+      <option name="project" value="LOCAL" />
+      <updated>1724265212708</updated>
+    </task>
+    <option name="localTasksCounter" value="977" />
     <servers />
   </component>
   <component name="TypeScriptGeneratedFilesManager">
@@ -959,7 +952,6 @@
     </option>
   </component>
   <component name="VcsManagerConfiguration">
-    <MESSAGE value="imported rewrite" />
     <MESSAGE value="imported" />
     <MESSAGE value="imported battle objects" />
     <MESSAGE value="debug party working" />
@@ -984,7 +976,8 @@
     <MESSAGE value="refactored input mapping" />
     <MESSAGE value="added voronoi crystals" />
     <MESSAGE value="sdl threads working" />
-    <option name="LAST_COMMIT_MESSAGE" value="sdl threads working" />
+    <MESSAGE value="fixed game state modification from options menu" />
+    <option name="LAST_COMMIT_MESSAGE" value="fixed game state modification from options menu" />
   </component>
   <component name="XDebuggerManager">
     <breakpoint-manager>

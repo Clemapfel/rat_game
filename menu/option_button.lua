@@ -23,8 +23,14 @@ mn.OptionButton = meta.new_type("OptionButton", rt.Widget, rt.SignalEmitter, fun
         _current_item_i = 1,
         _current_offset = 0,
         _n_items = 0,
-        _stencil = rt.Rectangle(0, 0, 1, 1)
+        _stencil = rt.Rectangle(0, 0, 1, 1),
+        _final_w = 1,
+        _final_h = 1
     })
+
+    for i, option in ipairs(out._options) do
+        out._item_label_to_item_i[option] = i
+    end
 
     out:signal_add("selection")
     return out
@@ -40,7 +46,6 @@ function mn.OptionButton:realize()
     if self._is_realized == true then return end
     self._is_realized = true
 
-    self._item_label_to_item_i = {}
     self._option_labels = {}
     self._n_items = 0
     self._items = {}
@@ -56,7 +61,6 @@ function mn.OptionButton:realize()
 
         self._n_items = self._n_items + 1
         table.insert(self._items, to_push)
-        self._item_label_to_item_i[option] = self._n_items
     end
 
     self._left_indicator:realize()
@@ -98,6 +102,9 @@ function mn.OptionButton:size_allocate(x, y, width, height)
 
     local right_x = left_x + max_h + label_m + tile_w + label_m
     self._right_indicator:fit_into(right_x, y + 0.5 * height - 0.5 * max_h, max_h, max_h)
+
+    self._final_w = right_x + max_h - left_x
+    self._final_h = max_h
 
     local label_start_x = x + max_h + label_m
     local label_y = y + 0.5 * height - 0.5 * max_h
@@ -261,4 +268,9 @@ end
 --- @brief
 function mn.OptionButton:can_move_right()
     return self._current_item_i < self._n_items
+end
+
+--- @brief
+function mn.OptionButton:measure()
+    return self._final_w, self._final_h
 end

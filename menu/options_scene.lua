@@ -204,7 +204,8 @@ function mn.OptionsScene:realize()
         table.insert(scene._items, {
             label = label,
             widget = button,
-            frame = frame
+            frame = frame,
+            x_offset = 0
         })
     end
     
@@ -284,7 +285,8 @@ function mn.OptionsScene:realize()
         table.insert(scene._items, {
             label = label,
             widget = scale,
-            frame = frame
+            frame = frame,
+            x_offset = 0,
         })
     end
 
@@ -398,13 +400,15 @@ function mn.OptionsScene:size_allocate(x, y, width, height)
         local frame_h = label_h + 2 * m
         item.frame:fit_into(current_x, current_y, w - 2 * outer_margin, frame_h)
         item.label:fit_into(current_x + m, current_y + 0.5 * frame_h - 0.5 * label_h, POSITIVE_INFINITY)
-        local widget_w = w - 2 * outer_margin - m - max_label_w - 2 * label_xm
+        local widget_x = current_x + m + max_label_w + label_xm
+        local widget_w = x + w - outer_margin - 2 * m - widget_x
         item.widget:fit_into(
-            current_x + m + max_label_w + label_xm,
+            widget_x,
             current_y + 0.5 * frame_h - 0.5 * label_h,
             widget_w,
             label_h
         )
+        item.x_offset = widget_x - widget_x + 0.5 * widget_w - 0.5 * select(1, item.widget:measure())
         current_y = current_y + frame_h
     end
 
@@ -432,7 +436,10 @@ function mn.OptionsScene:draw()
     for item in values(self._items) do
         item.frame:draw()
         item.label:draw()
+
+        rt.graphics.translate(item.x_offset, 0)
         item.widget:draw()
+        rt.graphics.translate(-item.x_offset, 0)
     end
 
     for remapper in values(self._remappers) do
