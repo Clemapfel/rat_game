@@ -95,15 +95,15 @@ function mn.OptionButton:size_allocate(x, y, width, height)
     end
 
     local label_m = m
-    local tile_w = max_w + 2 * label_m
+    local tile_w = width - 2 * label_m - 2 * max_h --max_w + 2 * label_m
 
     local left_x = x
     self._left_indicator:fit_into(left_x, y + 0.5 * height - 0.5 * max_h, max_h, max_h)
 
-    local right_x = left_x + max_h + label_m + tile_w + label_m
+    local right_x = x + width - max_h --left_x + max_h + label_m + tile_w + label_m
     self._right_indicator:fit_into(right_x, y + 0.5 * height - 0.5 * max_h, max_h, max_h)
 
-    self._final_w = right_x + max_h - left_x
+    self._final_w = width --right_x + max_h - left_x
     self._final_h = max_h
 
     local label_start_x = x + max_h + label_m
@@ -156,7 +156,7 @@ end
 function mn.OptionButton:update(delta)
     local target_offset = self._items[self._current_item_i].offset
 
-    local offset = delta * rt.settings.menu.option_button.scroll_speed
+    local offset = delta * rt.settings.menu.option_button.scroll_speed * (1 + (target_offset - self._current_offset) / 500)
     if self._current_offset < target_offset then
         self._current_offset = clamp(self._current_offset + offset, 0, target_offset)
     elseif self._current_offset > target_offset then
@@ -191,7 +191,7 @@ end
 
 --- @brief
 function mn.OptionButton:_update_direction_indicators()
-    local off_opacity = 0.5;
+    local off_opacity = 0.4;
     if self:can_move_right() then
         self._right_indicator:set_opacity(1)
     else

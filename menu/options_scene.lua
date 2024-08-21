@@ -399,9 +399,9 @@ function mn.OptionsScene:size_allocate(x, y, width, height)
         local label_h, label_w = label_hs[i], label_ws[i]
         local frame_h = label_h + 2 * m
         item.frame:fit_into(current_x, current_y, w - 2 * outer_margin, frame_h)
-        item.label:fit_into(current_x + m, current_y + 0.5 * frame_h - 0.5 * label_h, POSITIVE_INFINITY)
+        item.label:fit_into(current_x + 2 * m, current_y + 0.5 * frame_h - 0.5 * label_h, POSITIVE_INFINITY)
         local widget_x = current_x + m + max_label_w + label_xm
-        local widget_w = x + w - outer_margin - 2 * m - widget_x
+        local widget_w = x + w - outer_margin - 4 * m - widget_x
         item.widget:fit_into(
             widget_x,
             current_y + 0.5 * frame_h - 0.5 * label_h,
