@@ -232,7 +232,7 @@ function rt.SignalEmitter:signal_set_is_blocked(name, b)
 end
 
 --- @see rt.SignalComponent.get_is_blocked
-function rt.SignalEmitter:signal_set_is_blocked(name)
+function rt.SignalEmitter:signal_get_is_blocked(name)
     local component = rt.get_signal_component(self)
     if meta.is_nil(component) then component = rt.add_signal_component(self) end
     return component:get_is_blocked(name)

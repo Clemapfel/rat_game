@@ -84,6 +84,7 @@ function rt.SignalComponent:emit(name, ...)
     end
 
     if signal.is_blocked then return end
+
     local res = nil
     for id, callback in pairs(signal.callbacks) do
         local args = {...}

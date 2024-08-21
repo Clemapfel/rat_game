@@ -99,8 +99,7 @@ end
 
 --- @brief
 function mn.Scale:_quantize_value()
-    self._value = clamp(self._value - math.fmod(self._value, self._step), self._min, self._max)
-    dbg(self._value)
+    --self._value = clamp(self._value - math.fmod(self._value, self._step), self._min, self._max)
 end
 
 --- @brief

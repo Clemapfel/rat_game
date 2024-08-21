@@ -50,6 +50,7 @@ end)
 --- @overload rt.Widget.realize
 function rt.Label:realize()
     if not self:get_is_realized() then
+        self._bounds = rt.AABB(0, 0, POSITIVE_INFINITY, POSITIVE_INFINITY) -- assume one line until first fit_into
         self:_parse()
         self:_update_default_size()
         self._is_realized = true
@@ -75,6 +76,7 @@ end
 
 --- @overload rt.Widget.size_allocate
 function rt.Label:size_allocate(x, y, width, height)
+
     -- apply wrapping
     local syntax = rt.Label._syntax
     local space = self._font:get_bold_italic():getWidth(syntax.SPACE)
@@ -111,6 +113,7 @@ function rt.Label:size_allocate(x, y, width, height)
         elseif meta.isa(glyph, rt.Glyph) then
             local w, h = glyph:get_size()
             if glyph_x - x + w >= width and not one_word_mode then
+                dbg(glyph:get_content(), width)
                 glyph_x = x
                 glyph_y = glyph_y + line_height
                 glyph:set_position(glyph_x, glyph_y)
@@ -598,10 +601,10 @@ end
 --- @brief set text justification
 --- @param mode rt.JustifyMode
 function rt.Label:set_justify_mode(mode)
-    --if self._justify_mode ~= mode then
-        self._justify_mode = mode
+    self._justify_mode = mode
+    if self._is_realized then
         self:reformat()
-    --end
+    end
 end
 
 --- @brief get text justification

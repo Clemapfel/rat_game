@@ -16,17 +16,17 @@ rt.MSAAQuality = {
 rt.GameState = meta.new_type("GameState", function()
     local state = {
         -- system settings
-        config = {
-            vsync = rt.VSyncMode.ADAPTIVE,
-            msaa = rt.MSAAQuality.BEST,
-            resolution_x = 1280,
-            resolution_y = 720,
-            sfx_level = 1,
-            music_level = 1,
-            vfx_motion_level = 1,
-            vfx_contrast_level = 1,
-            show_fps = true
-        },
+        vsync_mode = rt.VSyncMode.ADAPTIVE,
+        msaa_quality = rt.MSAAQuality.BEST,
+        is_fullscreen = false,
+        is_borderless = false,
+        resolution_x = 1280,
+        resolution_y = 720,
+        sfx_level = 1,
+        music_level = 1,
+        vfx_motion_level = 1,
+        vfx_contrast_level = 1,
+        show_fps = true,
 
         -- keybindings
         input_mapping = (function()
@@ -238,16 +238,39 @@ function rt.GameState:get_is_controller_active()
 end
 
 --- @brief
+function rt.GameState:_update_window_mode()
+    local fullscreen, fullscreentype = self._state.is_fullscreen
+    if fullscreen then
+        fullscreentype = "exclusive"
+    else
+        fullscreentype = "desktop"
+    end
+
+    love.window.setMode(
+        self._state.resolution_x,
+        self._state.resolution_y,
+        {
+            fullscreen = self._state.is_fullscreen,
+            fullscreentype = fullscreentype,
+            vsync = self._state.vsync_mode,
+            msaa = self._state.msaa_quality,
+            stencil = true,
+            depth = false,
+            resizable = not self._state.is_borderless,
+            borderless = self._state.is_borderless,
+            centered = false,
+            minwidth = self._state.resolution_x,
+            minheight = self._state.resolution_y
+        }
+    )
+end
+
+--- @brief
 function rt.GameState:run()
-    love.window.setMode(self._state.config.resolution_x, self._state.config.resolution_y, {
-        vsync = self._state.config.vsync, -- adaptive vsync, may tear but tries to stay as close to 60hz as possible
-        msaa = self._state.config.msaa,
-        stencil = true,
-        resizable = true,
-        borderless = false
-    })
     love.window.setTitle("rat_game")
+    love.window.setIcon(love.image.newImageData("assets/favicon.png"))
     love.filesystem.setIdentity("rat_game")
+    self:_update_window_mode()
 
     if love.load then love.load() end
     love.timer.step()
@@ -313,7 +336,7 @@ function rt.GameState:run()
             draw_duration = now - draw_before
             total_duration = now - update_before
 
-            if self._state.config.show_fps == true then
+            if self._state.show_fps == true then
                 local fps = love.timer.getFPS()
                 local frame_duration = 1 / fps
                 local update_percentage = tostring(math.floor(durations.max_update_duration / frame_duration * 100))
@@ -330,7 +353,7 @@ function rt.GameState:run()
         end
 
         durations.n_frames = durations.n_frames + 1
-        if durations.n_frames > 90 and self._state.config.show_fps == true then
+        if durations.n_frames > 90 and self._state.show_fps == true then
             table.insert(durations.update_durations, update_duration)
             table.insert(durations.draw_durations, draw_duration)
             table.insert(durations.total_durations, total_duration)
@@ -386,31 +409,69 @@ rt.VSyncMode = {
 
 --- @brief
 function rt.GameState:set_vsync_mode(mode)
-    meta.assert_enum(mode, rt.VSyncmode)
+    meta.assert_enum(mode, rt.VSyncMode)
+    self._state.vsync_mode = mode
     love.window.setVSync(mode)
 end
 
 --- @brief
-function rt.GameState:set_fullscreen(on)
-    meta.assert_boolean(on)
-    love.window.setFullscreen(on)
+function rt.GameState:get_vsync_mode(mode)
+    return self._state.vsync_mode
 end
 
 --- @brief
-function rt.GameState:set_borderless(on)
+function rt.GameState:set_is_fullscreen(on)
     meta.assert_boolean(on)
-    rt.error("TODO")
+    self._state.is_fullscreen = on
 end
 
 --- @brief
-function rt.GameState:set_msaa_level(msaa)
-    meta.assert_unsigned(msaa)
-    rt.error("TODO")
+function rt.GameState:get_is_fullscreen()
+    return self._state.is_fullscreen
+end
+
+--- @brief
+function rt.GameState:set_is_borderless(on)
+    meta.assert_boolean(on)
+    if on ~= self._state.is_borderless then
+        self._state.is_borderless = on
+        self:_update_window_mode()
+    end
+end
+
+--- @brief
+function rt.GameState:get_is_borderless()
+    return self._state.is_borderless
+end
+
+--- @brief
+function rt.GameState:set_msaa_quality(msaa)
+    meta.assert_enum(msaa, rt.MSAAQuality)
+    if msaa ~= self._state.msaa_quality then
+        self._state.msaa_quality = msaa
+        self:_update_window_mode()
+    end
+end
+
+--- @brief
+function rt.GameState:get_msaa_quality()
+    return self._state.msaa_quality
 end
 
 --- @brief
 function rt.GameState:set_resolution(width, height)
-    rt.error("TODO")
+    meta.assert_number(width, height)
+    local current_x, current_y = self._state.resolution_x, self._state.resolution_y
+    if current_x ~= width or current_y ~= height then
+        self._state.resolution_x = width
+        self._state.resolution_y = height
+        self:_update_window_mode()
+    end
+end
+
+--- @brief
+function rt.GameState:get_resolution()
+    return self._state.resolution_x, self._state.resolution_y
 end
 
 --- @brief
@@ -420,7 +481,13 @@ function rt.GameState:set_sfx_level(fraction)
         rt.error("In rt.GameState:set_sfx_level: level `" .. fraction .. "` is outside [0, 1]")
         fraction = clamp(fraction, 0, 1)
     end
-    self._state.config.sfx_level = fraction
+    self._state.sfx_level = fraction
+    dbg("called")
+end
+
+--- @brief
+function rt.GameState:get_sfx_level()
+    return self._state.sfx_level
 end
 
 --- @brief
@@ -430,7 +497,12 @@ function rt.GameState:set_music_level(fraction)
         rt.error("In rt.GameState:set_music_level: level `" .. fraction .. "` is outside [0, 1]")
         fraction = clamp(fraction, 0, 1)
     end
-    self._state.config.music_level = fraction
+    self._state.music_level = fraction
+end
+
+--- @brief
+function rt.GameState:get_music_level()
+    return self._state.music_level
 end
 
 --- @brief
@@ -440,7 +512,12 @@ function rt.GameState:set_vfx_motion_level(fraction)
         rt.error("In rt.GameState:set_vfx_motion_level: level `" .. fraction .. "` is outside [0, 1]")
         fraction = clamp(fraction, 0, 1)
     end
-    self._state.config.vfx_motion_level = fraction
+    self._state.vfx_motion_level = fraction
+end
+
+--- @brief
+function rt.GameState:get_vfx_motion_level()
+    return self._state.vfx_motion_level
 end
 
 --- @brief
@@ -450,7 +527,10 @@ function rt.GameState:set_vfx_contrast_level(fraction)
         rt.error("In rt.GameState:set_vfx_contrast_level: level `" .. fraction .. "` is outside [0, 1]")
         fraction = clamp(fraction, 0, 1)
     end
-    self._state.config.vfx_contrast_level = fraction
+    self._state.vfx_contrast_level = fraction
 end
 
 --- @brief
+function rt.GameState:get_vfx_contrast_level()
+    return self._state.vfx_contrast_level
+end

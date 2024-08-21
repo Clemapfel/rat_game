@@ -21,37 +21,69 @@ mn.OptionsScene = meta.new_type("MenuOptionsScene", rt.Scene, function(state)
             rt.InputButton.START,
             rt.InputButton.SELECT
         },
-        _button_to_remapper = {}
+        _button_to_remapper = {},
+        _selection_graph = rt.SelectionGraph()
     }
 
-    --fields._remap_controller:set_is_disabled(true)
-    
     fields._vsync_label_text = "VSync"
     fields._vsync_on_label = "ON"
     fields._vsync_off_label = "OFF"
     fields._vsync_adaptive_label = "ADAPTIVE"
+    fields._vsync_label = nil
+    fields._vsync_option_button = nil
+
+    fields._vsync_mode_to_vsync_label = {
+        [rt.VSyncMode.ON] = fields._vsync_on_label,
+        [rt.VSyncMode.OFF] = fields._vsync_off_label,
+        [rt.VSyncMode.ADAPTIVE] = fields._vsync_adaptive_label
+    }
+
+    fields._vsync_label_to_vsync_mode = {}
+    for key, value in pairs(fields._vsync_mode_to_vsync_label) do
+        fields._vsync_label_to_vsync_mode[value] = key
+    end
 
     fields._fullscreen_label_text = "Fullscreen"
     fields._fullscreen_true_label = "YES"
     fields._fullscreen_false_label = "NO"
+    fields._fullscreen_label = nil
+    fields._fullscreen_option_button = nil
 
     fields._borderless_label_text = "Borderless"
     fields._borderless_true_label = "YES"
     fields._borderless_false_label = "NO"
+    fields._borderless_label = nil
+    fields._borderless_option_button = nil
 
     fields._msaa_label_text = "MSAA"
-    fields._msaa_0_label = "0"
-    fields._msaa_2_label = "2"
-    fields._msaa_4_label = "4"
-    fields._msaa_8_label = "8"
-    fields._msaa_16_label = "16"
+    fields._msaa_off_label = "OFF"
+    fields._msaa_good_label = "Good"
+    fields._msaa_better_label = "Better"
+    fields._msaa_best_label = "Best"
+    fields._msaa_max_label = "Maximum"
+    fields._msaa_label = nil
+    fields._msaa_option_button = nil
+
+    fields._msaa_quality_to_msaa_label = {
+        [rt.MSAAQuality.OFF] = fields._msaa_off_label,
+        [rt.MSAAQuality.GOOD] = fields._msaa_good_label,
+        [rt.MSAAQuality.BETTER] = fields._msaa_better_label,
+        [rt.MSAAQuality.BEST] = fields._msaa_best_label,
+        [rt.MSAAQuality.MAX] = fields._msaa_max_label,
+    }
+
+    fields._msaa_label_to_msaa_quality = {}
+    for key, value in pairs(fields._msaa_quality_to_msaa_label) do
+        fields._msaa_label_to_msaa_quality[value] = key
+    end
 
     fields._resolution_label_text = "Resolution"
     fields._resolution_1280_720_label = "1280x720 (16:9)"
     fields._resolution_1600_900_label = "1600x900 (16:9)"
     fields._resolution_1920_1080_label = "1920x1080 (16:9)"
     fields._resolution_2560_1440_label = "2560x1400 (16:9)"
-    fields._resolution_variable_label = "custom"
+    fields._resolution_label = nil
+    fields._resolution_option_button = nil
 
     fields._multiple_choice_layout = {
         [fields._vsync_label_text] = {
@@ -81,13 +113,13 @@ mn.OptionsScene = meta.new_type("MenuOptionsScene", rt.Scene, function(state)
 
         [fields._msaa_label_text] = {
             options = {
-                fields._msaa_0_label,
-                fields._msaa_2_label,
-                fields._msaa_4_label,
-                fields._msaa_8_label,
-                fields._msaa_16_label
+                fields._msaa_off_label,
+                fields._msaa_good_label,
+                fields._msaa_better_label,
+                fields._msaa_best_label,
+                fields._msaa_best_label
             },
-            default = fields._msaa_8_label
+            default = fields._msaa_best_label
         },
 
         [fields._resolution_label_text] = {
@@ -103,28 +135,39 @@ mn.OptionsScene = meta.new_type("MenuOptionsScene", rt.Scene, function(state)
     }
 
     fields._sfx_level_text = "Sound Effects"
+    fields._sfx_level_label = nil
+    fields._sfx_level_scale = nil
+
     fields._music_level_text = "Music"
+    fields._music_level_label = nil
+    fields._music_level_scale = nil
+
     fields._vfx_motion_text = "Motion Effects"
+    fields._vfx_motion_label = nil
+    fields._vfx_motion_scale = nil
+
     fields._vfx_contrast_text = "Visual Effects"
+    fields._vfx_contrast_label = nil
+    fields._vfx_contrast_scale = nil
 
     fields._level_layout = {
         [fields._sfx_level_text] = {
-            range = {0, 100, 100},
+            range = {0, 1, 100},
             default = 50
         },
 
         [fields._music_level_text] = {
-            range = {0, 100, 100},
+            range = {0, 1, 100},
             default = 50
         },
 
         [fields._vfx_motion_text] = {
-            range = {0, 3, 3},
+            range = {0, 1, 3},
             default = 3
         },
 
         [fields._vfx_contrast_text] = {
-            range = {0, 100, 1},
+            range = {0, 1, 1},
             default = 100
         }
     }
@@ -148,8 +191,8 @@ function mn.OptionsScene:realize()
 
         local entry = scene._multiple_choice_layout[text]
         local button = mn.OptionButton(table.unpack(entry.options))
-        button:set_option(entry.default)
         button:realize()
+        button:set_option(entry.default)
 
         scene["_" .. name .. "_label"] = label
         scene["_" .. name .. "_option_button"] = button
@@ -164,17 +207,9 @@ function mn.OptionsScene:realize()
             frame = frame
         })
     end
-
+    
     create_button_and_label("vsync", self._vsync_label_text, function(_, which)
-        local mode
-        if which == scene._vsync_on_label then
-            mode = rt.VSyncMode.ON
-        elseif which == scene._vsync_off_label then
-            mode = rt.VSyncMode.OFF
-        elseif which == scene._vsync_adaptive_label then
-            mode = rt.VSyncMode.ADAPTIVE
-        end
-        scene._state:set_vsync_mode(mode)
+        scene._state:set_vsync_mode(scene._vsync_label_to_vsync_mode[which])
     end)
 
     create_button_and_label("fullscreen", self._fullscreen_label_text, function(_, which)
@@ -184,7 +219,7 @@ function mn.OptionsScene:realize()
         elseif which == scene._fullscreen_false_label then
             on = false
         end
-        scene._state:set_fullscreen(on)
+        scene._state:set_is_fullscreen(on)
     end)
 
     create_button_and_label("borderless", self._borderless_label_text, function(_, which)
@@ -194,23 +229,12 @@ function mn.OptionsScene:realize()
         elseif which == scene._borderless_false_label then
             on = false
         end
-        scene._state:set_borderless(on)
+        scene._state:set_is_borderless(on)
     end)
 
     create_button_and_label("msaa", self._msaa_label_text, function(_, which)
-        local level
-        if which == scene._msaa_0_label then
-            level = 0
-        elseif which == scene._msaa_2_label then
-            level = 2
-        elseif which == scene._msaa_4_label then
-            level = 4
-        elseif which == scene._msaa_8_label then
-            level = 8
-        elseif which == scene._msaa_16_label then
-            level = 16
-        end
-        scene._state:set_msaa_level(level)
+        local level = scene._msaa_label_to_msaa_quality[which]
+        scene._state:set_msaa_quality(level)
     end)
 
     create_button_and_label("resolution", self._resolution_label_text, function(_, which)
@@ -230,13 +254,12 @@ function mn.OptionsScene:realize()
             x_res, y_res = 2560, 1440
         end
 
-        scene._state:set_resizable(false)
         scene._state:set_resolution(x_res, y_res)
     end)
 
     --
 
-    local create_button_and_scale = function(name, text, handler)
+    local create_scale_and_label = function(name, text, handler)
         local label = rt.Label(label_prefix .. text .. label_postfix)
         label:set_justify_mode(rt.JustifyMode.LEFT)
         label:realize()
@@ -255,6 +278,9 @@ function mn.OptionsScene:realize()
         local frame = rt.Frame()
         frame:realize()
 
+        scene["_" .. name .. "_label"] = label
+        scene["_" .. name .. "_scale"] = scale
+
         table.insert(scene._items, {
             label = label,
             widget = scale,
@@ -262,22 +288,21 @@ function mn.OptionsScene:realize()
         })
     end
 
-    create_button_and_scale("sfx_level", self._sfx_level_text, function(_, fraction)
+    create_scale_and_label("sfx_level", self._sfx_level_text, function(_, fraction)
         scene._state:set_sfx_level(fraction)
     end)
 
-    create_button_and_scale("music_level", self._music_level_text, function(_, fraction)
+    create_scale_and_label("music_level", self._music_level_text, function(_, fraction)
         scene._state:set_music_level(fraction)
     end)
 
-    create_button_and_scale("vfx_motion", self._vfx_motion_text, function(_, fraction)
+    create_scale_and_label("vfx_motion", self._vfx_motion_text, function(_, fraction)
         scene._state:set_vfx_motion_level(fraction)
     end)
 
-    create_button_and_scale("vfx_contrast", self._vfx_contrast_text, function(_, fraction)
+    create_scale_and_label("vfx_contrast", self._vfx_contrast_text, function(_, fraction)
         scene._state:set_vfx_contrast_level(fraction)
     end)
-
 
     for button in values(self._remapper_button_order) do
         local remapper =  mn.KeybindingIndicator(self._state, button)
@@ -291,11 +316,54 @@ function mn.OptionsScene:realize()
         remapper:set_keyboard_key_label(string.upper(name))
         scene._state:set_input_button_keyboard_key(scene._remap_target_button, rt.KeyboardKeyPrefix .. scancode)
     end)
+
+    self:create_from_state(self._state)
 end
 
 --- @override
 function mn.OptionsScene:create_from_state(state)
     self._state = state
+
+    local set_option = function(button, option)
+        button:signal_set_is_blocked("selection", true)
+        button:set_option(option)
+        button:signal_set_is_blocked("selection", false)
+    end
+
+    set_option(self._vsync_option_button, self._vsync_mode_to_vsync_label[self._state:get_vsync_mode()])
+    
+    set_option(self._fullscreen_option_button, ternary(
+        self._state:get_is_fullscreen(), 
+        self._fullscreen_true_label, 
+        self._fullscreen_false_label
+    ))
+    
+    set_option(self._borderless_option_button, ternary(
+        self._state:get_is_borderless(),
+        self._borderless_true_label,
+        self._borderless_false_label
+    ))
+
+    set_option(self._msaa_option_button, self._msaa_quality_to_msaa_label[self._state:get_msaa_quality()])
+
+    local res_x, res_y = self._state:get_resolution()
+    local resolution_label = self["_resolution_" .. res_x .. "_" .. res_y .. "_label"]
+    if resolution_label == nil then
+        resolution_label = self._resolution_variable_label
+    end
+
+    set_option(self._resolution_option_button, resolution_label)
+
+    local set_scale = function(scale, value)
+        scale:signal_set_is_blocked("value_changed", true)
+        scale:set_value(value)
+        scale:signal_set_is_blocked("value_changed", false)
+    end
+
+    set_scale(self._sfx_level_scale, self._state:get_sfx_level())
+    set_scale(self._music_level_scale, self._state:get_music_level())
+    set_scale(self._vfx_motion_scale, self._state:get_vfx_motion_level())
+    set_scale(self._vfx_contrast_scale, self._state:get_vfx_contrast_level())
 
     for button in values(self._remapper_button_order) do
         local remapper = self._button_to_remapper[button]
@@ -377,4 +445,9 @@ function mn.OptionsScene:update(delta)
     for item in values(self._items) do
         item.widget:update(delta)
     end
+end
+
+--- @brief
+function mn.OptionsScene:_regenerate_selection_nodes()
+    local vsync_node = rt.SelectionGraphNode(self._vsync_option_button:get_bounds())
 end

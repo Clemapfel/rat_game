@@ -19,6 +19,7 @@ mn.OptionButton = meta.new_type("OptionButton", rt.Widget, rt.SignalEmitter, fun
         _left_indicator_elapsed = 0,
 
         _items = {}, -- Table<rt.Label>
+        _item_label_to_item_i = {},
         _current_item_i = 1,
         _current_offset = 0,
         _n_items = 0,
@@ -39,7 +40,10 @@ function mn.OptionButton:realize()
     if self._is_realized == true then return end
     self._is_realized = true
 
+    self._item_label_to_item_i = {}
     self._option_labels = {}
+    self._n_items = 0
+    self._items = {}
     for option in values(self._options) do
         local to_push = {
             text = option,
@@ -52,6 +56,7 @@ function mn.OptionButton:realize()
 
         self._n_items = self._n_items + 1
         table.insert(self._items, to_push)
+        self._item_label_to_item_i[option] = self._n_items
     end
 
     self._left_indicator:realize()
@@ -105,7 +110,7 @@ function mn.OptionButton:size_allocate(x, y, width, height)
         item.line:set_color(rt.hsva_to_rgba(rt.HSVA(i / n, 1, 1, 1)))
         item.line:set_opacity(0.5)
 
-        item.label:fit_into(current_x + 0.5 * tile_w - 0.5 * w, label_y, POSITIVE_INFINITY)
+        item.label:fit_into(current_x + 0.5 * tile_w - 0.5 * w, label_y, POSITIVE_INFINITY, POSITIVE_INFINITY)
         item.offset = current_x - label_start_x
         current_x = current_x + tile_w + 5
     end
@@ -233,6 +238,17 @@ function mn.OptionButton:set_option(i_or_text)
         end
 
         self._current_item_i = i
+        self:_emit_selection()
+    else
+        meta.assert_string(i_or_text)
+        local text = i_or_text
+        local new_i = self._item_label_to_item_i[text]
+        if new_i == nil then
+            rt.error("In mn.OptionButton:set_option: option `" .. text .. "` is not available")
+            return
+        end
+
+        self._current_item_i = new_i
         self:_emit_selection()
     end
 end

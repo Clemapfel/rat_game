@@ -14,28 +14,6 @@ input:signal_connect("keyboard_pressed_raw", function(_, raw, scancode)
     --dbg(raw, scancode)
 end)
 
-sdl2 = ffi.load("SDL2")
-local cdef = [[
-    int SDL_Init(uint32_t);
-    void* SDL_CreateThread(int(*)(void), char*, void*);
-    void SDL_WaitThread(void*, int*);
-]]
-ffi.cdef(cdef)
-
-test = function()
-    print("test")
-    return 1
-end
-
-sdl2.SDL_Init(1)
-local name = "Thread"
-local cname = ffi.new("char[" .. #name .. "]")
-ffi.copy(cname, name)
-local thread = sdl2.SDL_CreateThread(test, cname, ffi.CNULL)
-
-local status = ffi.new("int[1]")
-sdl2.SDL_WaitThread(thread, status)
-
 
 state:set_input_button_keyboard_key(rt.InputButton.UP, rt.KeyboardKey.A)
 
