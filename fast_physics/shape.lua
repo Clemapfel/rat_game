@@ -59,6 +59,21 @@ function b2.PolygonShape(body, polygon, is_sensor)
 end
 
 --- @brief
+function b2.ChainShape(body, ...)
+    TODO
+    local chain_def = box2d.b2DefaultChainDef()
+    local points = {...}
+    local vec2s = ffi.new("b2Vec2[" .. #points / 2 .. "]")
+    for i = 1, #points, 2 do
+        local vec2 = ffi.typeof("b2Vec2")(points[i], points[i+1])
+        vec2s[i] = vec2
+        chain_def.count = chain_def.count + 1
+    end
+    chain_def.points = vec2s
+    return b2.Shape:new_from_id(box2d.b2CreateChain(body._native, chain_def))
+end
+
+--- @brief
 function b2.Shape:get_body()
     return b2.Body:new_from_id(box2d.b2Shape_GetBody(self._native))
 end
@@ -130,6 +145,8 @@ function b2.Shape:draw()
         b2._draw_segment(box2d.b2Shape_GetSegment(self._native))
     elseif type == box2d.b2_capsuleShape then
         b2._draw_segment(box2d.b2Shape_GetCapsule(self._native))
+    elseif type == box2d.b2_smoothSegmentShape then
+        b2._draw_smooth_segment(box2d.b2Shape_GetSmoothSegment(self._native))
     else
         error("In b2.Shape:draw: unhandlined shape type `" .. type .. "`")
     end
@@ -236,6 +253,11 @@ end
 --- @brief
 function b2._draw_segment(segment)
     love.graphics.line(segment.point1.x, segment.point1.y, segment.point2.x, segment.point2.y)
+end
+
+--- @brief
+function b2._draw_smooth_segment(smooth)
+    love.graphics.line(smooth.segment.point1.x, smooth.segment.point1.y, smooth.segment.point2.x, smooth.segment.point2.y)
 end
 
 --- @brief

@@ -31,6 +31,7 @@ local polygon = b2.Polygon(200, 300, 250, 500, 300, 400)
 
 body = b2.Body(world, b2.BodyType.DYNAMIC, 300, 300)
 shape = b2.PolygonShape(body, b2.Rectangle(100, 100))
+shape = b2.ChainShape(body, 50, 50, 250, 50, 250, 250, 50, 250)
 
 love.load = function()
     love.window.setMode(800, 600, {

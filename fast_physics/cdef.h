@@ -383,6 +383,14 @@ typedef struct b2Segment
     b2Vec2 point2;
 } b2Segment;
 
+typedef struct b2SmoothSegment
+{
+    b2Vec2 ghost1;
+    b2Segment segment;
+    b2Vec2 ghost2;
+    int32_t chainId;
+} b2SmoothSegment;
+
 typedef struct b2Hull
 {
     b2Vec2 points[8];
@@ -412,6 +420,7 @@ b2Circle b2Shape_GetCircle( b2ShapeId shapeId );
 b2Capsule b2Shape_GetCapsule( b2ShapeId shapeId );
 b2Segment b2Shape_GetSegment( b2ShapeId shapeId );
 b2Polygon b2Shape_GetPolygon( b2ShapeId shapeId );
+b2SmoothSegment b2Shape_GetSmoothSegment( b2ShapeId shapeId );
 
 typedef struct b2QueryFilter
 {

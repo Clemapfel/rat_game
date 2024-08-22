@@ -22,19 +22,10 @@
     </configurations>
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="7fa9ba1b-2cff-4ecc-86fb-59ab2fa76ee1" name="Changes" comment="added cdef">
-      <change afterPath="$PROJECT_DIR$/fast_physics/body.lua" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/fast_physics/capsule.lua" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/fast_physics/circle.lua" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/fast_physics/polygon.lua" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/fast_physics/segment.lua" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/fast_physics/shape.lua" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/fast_physics/world.lua" afterDir="false" />
+    <list default="true" id="7fa9ba1b-2cff-4ecc-86fb-59ab2fa76ee1" name="Changes" comment="bodies working">
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/common/game_state.lua" beforeDir="false" afterPath="$PROJECT_DIR$/common/game_state.lua" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/fast_physics/box2d/src/shape.c" beforeDir="false" afterPath="$PROJECT_DIR$/fast_physics/box2d/src/shape.c" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/fast_physics/cdef.h" beforeDir="false" afterPath="$PROJECT_DIR$/fast_physics/cdef.h" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/main.lua" beforeDir="false" afterPath="$PROJECT_DIR$/main.lua" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/fast_physics/shape.lua" beforeDir="false" afterPath="$PROJECT_DIR$/fast_physics/shape.lua" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/main_box2d.lua" beforeDir="false" afterPath="$PROJECT_DIR$/main_box2d.lua" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
@@ -496,15 +487,7 @@
       <workItem from="1724200537484" duration="482000" />
       <workItem from="1724251423646" duration="176000" />
       <workItem from="1724251645633" duration="13279000" />
-      <workItem from="1724272983061" duration="15674000" />
-    </task>
-    <task id="LOCAL-00932" summary="stashing keyboard">
-      <option name="closed" value="true" />
-      <created>1722732214314</created>
-      <option name="number" value="00932" />
-      <option name="presentableId" value="LOCAL-00932" />
-      <option name="project" value="LOCAL" />
-      <updated>1722732214314</updated>
+      <workItem from="1724272983061" duration="16795000" />
     </task>
     <task id="LOCAL-00933" summary="stasing keyboard, utf8 input broken">
       <option name="closed" value="true" />
@@ -890,7 +873,15 @@
       <option name="project" value="LOCAL" />
       <updated>1724274082859</updated>
     </task>
-    <option name="localTasksCounter" value="981" />
+    <task id="LOCAL-00981" summary="bodies working">
+      <option name="closed" value="true" />
+      <created>1724291786376</created>
+      <option name="number" value="00981" />
+      <option name="presentableId" value="LOCAL-00981" />
+      <option name="project" value="LOCAL" />
+      <updated>1724291786376</updated>
+    </task>
+    <option name="localTasksCounter" value="982" />
     <servers />
   </component>
   <component name="TypeScriptGeneratedFilesManager">
@@ -939,7 +930,6 @@
     </option>
   </component>
   <component name="VcsManagerConfiguration">
-    <MESSAGE value="stashing cloth" />
     <MESSAGE value="added templates" />
     <MESSAGE value="imported menu" />
     <MESSAGE value="added interactivity to menu rework" />
@@ -964,7 +954,8 @@
     <MESSAGE value="fixed option button layout" />
     <MESSAGE value="stashing cdef" />
     <MESSAGE value="added cdef" />
-    <option name="LAST_COMMIT_MESSAGE" value="added cdef" />
+    <MESSAGE value="bodies working" />
+    <option name="LAST_COMMIT_MESSAGE" value="bodies working" />
   </component>
   <component name="XDebuggerManager">
     <breakpoint-manager>
