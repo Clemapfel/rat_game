@@ -2,12 +2,6 @@
 void* SDL_CreateThread(int(*fn)(void*), const char *name, void *data);
 void SDL_WaitThread(void* thread, int *status);
 
-// ### BOX2D CALLBACK ###
-
-typedef void b2TaskCallback( int32_t startIndex, int32_t endIndex, uint32_t workerIndex, void* taskContext );
-typedef void* b2EnqueueTaskCallback( b2TaskCallback* task, int32_t itemCount, int32_t minRange, void* taskContext, void* userContext );
-typedef void b2FinishTaskCallback( void* userTask, void* userContext );
-
 // ### MATH ###
 
 typedef struct b2Vec2
@@ -38,6 +32,10 @@ typedef struct b2AABB
 } b2AABB;
 
 // ### WORLD ###
+
+typedef void b2TaskCallback( int32_t startIndex, int32_t endIndex, uint32_t workerIndex, void* taskContext );
+typedef void* b2EnqueueTaskCallback( b2TaskCallback* task, int32_t itemCount, int32_t minRange, void* taskContext, void* userContext );
+typedef void b2FinishTaskCallback( void* userTask, void* userContext );
 
 typedef struct b2WorldDef
 {
@@ -117,6 +115,7 @@ typedef struct b2BodyId
     uint16_t revision;
 } b2BodyId;
 
+b2BodyDef b2DefaultBodyDef( void );
 b2BodyId b2CreateBody( b2WorldId worldId, const b2BodyDef* def );
 void b2DestroyBody( b2BodyId bodyId );
 bool b2Body_IsValid( b2BodyId id );
@@ -409,6 +408,10 @@ void b2Shape_SetCircle( b2ShapeId shapeId, const b2Circle* circle );
 void b2Shape_SetCapsule( b2ShapeId shapeId, const b2Capsule* capsule );
 void b2Shape_SetSegment( b2ShapeId shapeId, const b2Segment* segment );
 void b2Shape_SetPolygon( b2ShapeId shapeId, const b2Polygon* polygon );
+b2Circle b2Shape_GetCircle( b2ShapeId shapeId );
+b2Capsule b2Shape_GetCapsule( b2ShapeId shapeId );
+b2Segment b2Shape_GetSegment( b2ShapeId shapeId );
+b2Polygon b2Shape_GetPolygon( b2ShapeId shapeId );
 
 typedef struct b2QueryFilter
 {

@@ -14,7 +14,6 @@ input:signal_connect("keyboard_pressed_raw", function(_, raw, scancode)
     --dbg(raw, scancode)
 end)
 
-
 state:set_input_button_keyboard_key(rt.InputButton.UP, rt.KeyboardKey.A)
 
 background = bt.Background.VORONOI_CRYSTALS()

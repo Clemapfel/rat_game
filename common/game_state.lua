@@ -211,9 +211,13 @@ end
 --- @brief
 function rt.GameState:set_input_button_keyboard_key(input_button, keyboard_key)
     meta.assert_enum(input_button, rt.InputButton)
-    meta.assert_enum(keyboard_key, rt.KeyboardKey)
-    local current = self._state.input_mapping[input_button].keyboard
 
+    if not meta.is_enum_value(keyboard_key, rt.KeyboardKey) then
+        rt.warning("In rt.GameState:set_input_button_keyboard_key: key `" .. keyboard_key .. "` is not a supported keyboard key")
+        return
+    end
+
+    local current = self._state.input_mapping[input_button].keyboard
     if current ~= keyboard_key then
         self._state.input_mapping[input_button].keyboard = keyboard_key
         rt.InputControllerState.load_from_state(self)
