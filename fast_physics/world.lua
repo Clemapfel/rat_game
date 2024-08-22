@@ -162,8 +162,8 @@ function b2._initialize_debug_draw(config)
     --config.drawAABBs = true
     --config.drawMass = true
 
-    config.DrawPolygon = ffi.cast("void (*)( const b2Vec2* vertices, int vertexCount, b2HexColor color, void* context )", _draw_polygon)
-    --config.DrawSolidPolygon = ffi.cast("void (*)( b2Transform transform, const b2Vec2* vertices, int vertexCount, float radius, b2HexColor color,void* context )", _draw_solid_polygon)
+    config.DrawPolygon = ffi.new("void (*)( const b2Vec2* vertices, int vertexCount, b2HexColor color, void* context )", _draw_polygon);
+    config.DrawSolidPolygon = ffi.new("void (*)( b2Transform transform, const b2Vec2* vertices, int vertexCount, float radius, b2HexColor color, void* context )", _draw_solid_polygon)
     --config.DrawCircle = ffi.cast("void ( * )( b2Vec2 center, float radius, b2HexColor color, void* context )", _draw_circle)
     --config.DrawSolidCircle = ffi.cast("    void ( *DrawSolidCircle )( b2Transform transform, float radius, b2HexColor color, void* context )", _draw_solid_circle)
 --[[
