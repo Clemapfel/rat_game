@@ -1,3 +1,21 @@
+ffi = require "ffi"
+ffi.cdef--[[
+typedef struct SubStruct {
+    float any;
+} SubStruct;
+
+typedef struct Struct
+{
+    void (*fn_pointer_sub_ptr)(SubStruct* x);
+    void (*fn_pointer_sub_value)(SubStruct x);
+    int (*fn_pointer_sub_three)(float x, int y, SubStruct z, void* w);
+} Struct;
+]]
+
+local test = ffi.typeof("Struct")()
+test.fn_pointer_sub_ptr = function(x) end
+test.fn_pointer_sub_three = function() end
+
 require "include"
 
 state = rt.GameState()

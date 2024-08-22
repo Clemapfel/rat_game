@@ -22,11 +22,9 @@
     </configurations>
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="7fa9ba1b-2cff-4ecc-86fb-59ab2fa76ee1" name="Changes" comment="stashing chain shape">
-      <change afterPath="$PROJECT_DIR$/fast_physics/draw.lua" afterDir="false" />
+    <list default="true" id="7fa9ba1b-2cff-4ecc-86fb-59ab2fa76ee1" name="Changes" comment="stashing interface">
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/fast_physics/cdef.h" beforeDir="false" afterPath="$PROJECT_DIR$/fast_physics/cdef.h" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/fast_physics/shape.lua" beforeDir="false" afterPath="$PROJECT_DIR$/fast_physics/shape.lua" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/fast_physics/world.lua" beforeDir="false" afterPath="$PROJECT_DIR$/fast_physics/world.lua" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/main.lua" beforeDir="false" afterPath="$PROJECT_DIR$/main.lua" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/main_box2d.lua" beforeDir="false" afterPath="$PROJECT_DIR$/main_box2d.lua" afterDir="false" />
@@ -136,7 +134,7 @@
       <recent name="C:\Users\cleme\Workspace\rat_game\common" />
     </key>
   </component>
-  <component name="RunManager" selected="Lua Application.main_box2d">
+  <component name="RunManager" selected="Lua Application.main">
     <configuration name="main" type="lua.app" factoryName="Lua Application">
       <module name="rat_game" />
       <option name="program" value="C:\Users\cleme\Workspace\rat_game\love\windows\love.exe" />
@@ -490,23 +488,8 @@
       <workItem from="1724200537484" duration="482000" />
       <workItem from="1724251423646" duration="176000" />
       <workItem from="1724251645633" duration="13279000" />
-      <workItem from="1724272983061" duration="20206000" />
-    </task>
-    <task id="LOCAL-00934" summary="fixed selection graph for specil accept / cancel items">
-      <option name="closed" value="true" />
-      <created>1722784679148</created>
-      <option name="number" value="00934" />
-      <option name="presentableId" value="LOCAL-00934" />
-      <option name="project" value="LOCAL" />
-      <updated>1722784679148</updated>
-    </task>
-    <task id="LOCAL-00935" summary="polished keyboard">
-      <option name="closed" value="true" />
-      <created>1722789790110</created>
-      <option name="number" value="00935" />
-      <option name="presentableId" value="LOCAL-00935" />
-      <option name="project" value="LOCAL" />
-      <updated>1722789790110</updated>
+      <workItem from="1724272983061" duration="21871000" />
+      <workItem from="1724335305502" duration="1906000" />
     </task>
     <task id="LOCAL-00936" summary="finished keyboard">
       <option name="closed" value="true" />
@@ -884,7 +867,23 @@
       <option name="project" value="LOCAL" />
       <updated>1724292921354</updated>
     </task>
-    <option name="localTasksCounter" value="983" />
+    <task id="LOCAL-00983" summary="stashing debug draw">
+      <option name="closed" value="true" />
+      <created>1724297273748</created>
+      <option name="number" value="00983" />
+      <option name="presentableId" value="LOCAL-00983" />
+      <option name="project" value="LOCAL" />
+      <updated>1724297273748</updated>
+    </task>
+    <task id="LOCAL-00984" summary="stashing interface">
+      <option name="closed" value="true" />
+      <created>1724297428785</created>
+      <option name="number" value="00984" />
+      <option name="presentableId" value="LOCAL-00984" />
+      <option name="project" value="LOCAL" />
+      <updated>1724297428785</updated>
+    </task>
+    <option name="localTasksCounter" value="985" />
     <servers />
   </component>
   <component name="TypeScriptGeneratedFilesManager">
@@ -933,8 +932,6 @@
     </option>
   </component>
   <component name="VcsManagerConfiguration">
-    <MESSAGE value="imported menu" />
-    <MESSAGE value="added interactivity to menu rework" />
     <MESSAGE value="fixed grafics desynch bug" />
     <MESSAGE value="polished animation" />
     <MESSAGE value="fixed separate blendmodes" />
@@ -958,7 +955,9 @@
     <MESSAGE value="added cdef" />
     <MESSAGE value="bodies working" />
     <MESSAGE value="stashing chain shape" />
-    <option name="LAST_COMMIT_MESSAGE" value="stashing chain shape" />
+    <MESSAGE value="stashing debug draw" />
+    <MESSAGE value="stashing interface" />
+    <option name="LAST_COMMIT_MESSAGE" value="stashing interface" />
   </component>
   <component name="XDebuggerManager">
     <breakpoint-manager>

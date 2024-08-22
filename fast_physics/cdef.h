@@ -1,7 +1,3 @@
-// ### SDL THREAD ###
-void* SDL_CreateThread(int(*fn)(void*), const char *name, void *data);
-void SDL_WaitThread(void* thread, int *status);
-
 // ### MATH ###
 
 typedef struct b2Vec2
@@ -726,5 +722,13 @@ typedef struct b2DebugDraw
     bool drawFrictionImpulses;
     void* context;
 } b2DebugDraw;
+
+typedef struct SubStruct {} SubStruct;
+
+typedef struct Struct
+{
+    void (*fn_pointer_sub_ptr)(SubStruct* x);
+    void (*fn_pointer_sub_value)(SubStruct x);
+} Struct;
 
 void b2World_Draw( b2WorldId worldId, b2DebugDraw* draw );

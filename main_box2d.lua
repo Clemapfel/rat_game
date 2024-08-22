@@ -1,7 +1,6 @@
 require "include"
 
 box2d = ffi.load("box2d")
-assert(box2d ~= nil)
 local cdef, _ = love.filesystem.read("fast_physics/cdef.h")
 ffi.cdef(cdef)
 require "fast_physics.world"

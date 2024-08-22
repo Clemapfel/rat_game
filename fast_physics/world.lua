@@ -70,109 +70,21 @@ end
 
 --- @brief
 function b2._initialize_threads(world_def)
-    -- TODO
-end
+    sdl2 = ffi.load("SDL2")
+    sdl2.cdef[[
+    void* SDL_CreateThread(int(*fn)(void*), const char *name, void *data);
+    void SDL_WaitThread(void* thread, int *status);
+    ]]
 
--- void ( *DrawPolygon )( const b2Vec2* vertices, int vertexCount, b2HexColor color, void* context );
-function b2._draw_polygon(transform, vertices, n_pointers, radius, color, context)
-    local points = {}
-    for i = 1, n_points do
-        table.insert(points, vertices[i].x)
-        table.insert(points, vertices[i].y)
+    -- void b2FinishTaskCallback( void* task, void* context );
+    world_def.finishTask = function(task, context)
+        if task ~= ffi.CNULL then
+            sdl2.WaitThread()
+        end
     end
 
-    love.graphics.push()
-    love.graphics.rotate(math.atan(s, c))
-    love.graphics.translate(transform.p.x, transform.p.y)
-    local r, g, b = b2._b2_hex_color_to_rgb(hex)
-    love.graphics.setColor(r, g, b, 1)
-    love.graphics.setLineWidth(1)
-    love.graphics.polygon("line", vertices)
-    love.graphics.pop()
-end
+    -- void* b2EnqueueTaskCallback( b2TaskCallback* task, int32_t itemCount, int32_t minRange, void* taskContext, void* userContext );
+    world_def.enqueueTask = function()
 
---- void ( *DrawPolygon )( const b2Vec2* vertices, int vertexCount, b2HexColor color, void* context );
-function _draw_polygon(vertices, n_vertices, color, context)
-
-end
-
--- void ( *DrawSolidPolygon )( b2Transform transform, const b2Vec2* vertices, int vertexCount, float radius, b2HexColor color,void* context );
-function _draw_solid_polygon(transform, n_vertices, color, radius, context)
-
-end
-
--- void ( *DrawCircle )( b2Vec2 center, float radius, b2HexColor color, void* context );
-function _draw_circle(center, radius, color, context)
-
-end
-
--- void ( *DrawSolidCircle )( b2Transform transform, float radius, b2HexColor color, void* context );
-function _draw_solid_circle(transform, radius, color, context)
-
-end
-
--- void ( *DrawCapsule )( b2Vec2 p1, b2Vec2 p2, float radius, b2HexColor color, void* context );
-function _draw_capsule(p1, p2, radius, color, context)
-
-end
-
--- void ( *DrawSolidCapsule )( b2Vec2 p1, b2Vec2 p2, float radius, b2HexColor color, void* context );
-function _draw_solid_capsule(p1, p2, radius, color, context)
-
-end
-
--- void ( *DrawSegment )( b2Vec2 p1, b2Vec2 p2, b2HexColor color, void* context );
-function _draw_segment(p1, p2, color, context)
-
-end
-
--- void ( *DrawTransform )( b2Transform transform, void* context );
-function _draw_transform(transform, context)
-
-end
-
--- void ( *DrawPoint )( b2Vec2 p, float size, b2HexColor color, void* context );
-function _draw_point(p, size, color, context)
-
-end
-
--- void ( *DrawString )( b2Vec2 p, const char* s, void* context );
-function _draw_string(p, string, context)
-
-end
-
---- @brief
---- @param b2DebugDraw
-function b2._initialize_debug_draw(config)
-
-    function b2._b2_hex_color_to_rgb(hex)
-        -- Remove the hash at the start if it's there
-        hex = tostring(hex):gsub("#", "")
-
-        -- Convert the hex string to numbers
-        dbg(hex)
-        local r = tonumber(hex:sub(1, 2), 16)
-        local g = tonumber(hex:sub(3, 4), 16)
-        local b = tonumber(hex:sub(5, 6), 16)
-
-        return r / 255, g / 255, b / 255
     end
-
-    --config.drawShapes = true
-    --config.drawAABBs = true
-    --config.drawMass = true
-
-    config.DrawPolygon = ffi.new("void (*)( const b2Vec2* vertices, int vertexCount, b2HexColor color, void* context )", _draw_polygon);
-    config.DrawSolidPolygon = ffi.new("void (*)( b2Transform transform, const b2Vec2* vertices, int vertexCount, float radius, b2HexColor color, void* context )", _draw_solid_polygon)
-    --config.DrawCircle = ffi.cast("void ( * )( b2Vec2 center, float radius, b2HexColor color, void* context )", _draw_circle)
-    --config.DrawSolidCircle = ffi.cast("    void ( *DrawSolidCircle )( b2Transform transform, float radius, b2HexColor color, void* context )", _draw_solid_circle)
---[[
-    config.DrawCapsule = _draw_capsule
-    config.DrawSolidCapsule = _draw_solid_capsule
-    config.DrawSegment = _draw_segment
-    config.DrawTransform = _draw_transform
-    config.DrawPoint = _draw_point
-    config.DrawString = _draw_string
-    ]]--
 end
-
