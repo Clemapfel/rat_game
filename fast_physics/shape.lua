@@ -60,7 +60,6 @@ end
 
 --- @brief
 function b2.ChainShape(body, ...)
-    TODO
     local chain_def = box2d.b2DefaultChainDef()
     local points = {...}
     local vec2s = ffi.new("b2Vec2[" .. #points / 2 .. "]")

@@ -22,10 +22,13 @@
     </configurations>
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="7fa9ba1b-2cff-4ecc-86fb-59ab2fa76ee1" name="Changes" comment="bodies working">
+    <list default="true" id="7fa9ba1b-2cff-4ecc-86fb-59ab2fa76ee1" name="Changes" comment="stashing chain shape">
+      <change afterPath="$PROJECT_DIR$/fast_physics/draw.lua" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/fast_physics/cdef.h" beforeDir="false" afterPath="$PROJECT_DIR$/fast_physics/cdef.h" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/fast_physics/shape.lua" beforeDir="false" afterPath="$PROJECT_DIR$/fast_physics/shape.lua" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/fast_physics/world.lua" beforeDir="false" afterPath="$PROJECT_DIR$/fast_physics/world.lua" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/main.lua" beforeDir="false" afterPath="$PROJECT_DIR$/main.lua" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/main_box2d.lua" beforeDir="false" afterPath="$PROJECT_DIR$/main_box2d.lua" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
@@ -487,15 +490,7 @@
       <workItem from="1724200537484" duration="482000" />
       <workItem from="1724251423646" duration="176000" />
       <workItem from="1724251645633" duration="13279000" />
-      <workItem from="1724272983061" duration="16795000" />
-    </task>
-    <task id="LOCAL-00933" summary="stasing keyboard, utf8 input broken">
-      <option name="closed" value="true" />
-      <created>1722740929503</created>
-      <option name="number" value="00933" />
-      <option name="presentableId" value="LOCAL-00933" />
-      <option name="project" value="LOCAL" />
-      <updated>1722740929503</updated>
+      <workItem from="1724272983061" duration="20206000" />
     </task>
     <task id="LOCAL-00934" summary="fixed selection graph for specil accept / cancel items">
       <option name="closed" value="true" />
@@ -881,7 +876,15 @@
       <option name="project" value="LOCAL" />
       <updated>1724291786376</updated>
     </task>
-    <option name="localTasksCounter" value="982" />
+    <task id="LOCAL-00982" summary="stashing chain shape">
+      <option name="closed" value="true" />
+      <created>1724292921354</created>
+      <option name="number" value="00982" />
+      <option name="presentableId" value="LOCAL-00982" />
+      <option name="project" value="LOCAL" />
+      <updated>1724292921354</updated>
+    </task>
+    <option name="localTasksCounter" value="983" />
     <servers />
   </component>
   <component name="TypeScriptGeneratedFilesManager">
@@ -930,7 +933,6 @@
     </option>
   </component>
   <component name="VcsManagerConfiguration">
-    <MESSAGE value="added templates" />
     <MESSAGE value="imported menu" />
     <MESSAGE value="added interactivity to menu rework" />
     <MESSAGE value="fixed grafics desynch bug" />
@@ -955,7 +957,8 @@
     <MESSAGE value="stashing cdef" />
     <MESSAGE value="added cdef" />
     <MESSAGE value="bodies working" />
-    <option name="LAST_COMMIT_MESSAGE" value="bodies working" />
+    <MESSAGE value="stashing chain shape" />
+    <option name="LAST_COMMIT_MESSAGE" value="stashing chain shape" />
   </component>
   <component name="XDebuggerManager">
     <breakpoint-manager>

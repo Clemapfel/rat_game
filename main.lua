@@ -51,6 +51,7 @@ love.resize = function()
     end
 
     background:fit_into(x, y, w, h)
+    love.graphics.draw(love.physics.newBody(love.physics.newWorld(0, 0), 10, 10))
 end
 
 love.run = function()
