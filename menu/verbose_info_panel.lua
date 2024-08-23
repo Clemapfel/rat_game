@@ -21,7 +21,8 @@ rt.VerboseInfoObject = meta.new_enum({
     SOUND_EFFECTS = "sfx_level",
     MUSIC = "music_level",
     MOTION_EFFECTS = "vfx_motion_level",
-    VISUAL_EFFECTS = "vfx_contrast_level"
+    VISUAL_EFFECTS = "vfx_contrast_level",
+    KEYMAP = "keymap"
 })
 
 --- @class mn.VerboseInfoPanel

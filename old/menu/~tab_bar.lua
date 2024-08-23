@@ -64,7 +64,7 @@ end
 function mn.TabBar:draw()
     for item in values(self._items) do
 
-        local stencil_value = meta.hash(self._stencil) % 255
+        local stencil_value = meta.hash(self._stencil) % 254 + 1
         rt.graphics.stencil(stencil_value, self._stencil)
         rt.graphics.set_stencil_test(rt.StencilCompareMode.NOT_EQUAL, stencil_value)
         item.frame:draw()

@@ -1,30 +1,29 @@
+rt.settings.menu.option_scene = {
+    scale_n_ticks_per_second = 32,
+    scale_delay = 1 / 3 -- seconds
+}
+
 --- @class mn.OptionsScene
 mn.OptionsScene = meta.new_type("MenuOptionsScene", rt.Scene, function(state)
 
     local fields = {
         _state = state,
         _items = {},
-        _remappers = {},
-        _remap_target_button = rt.InputButton.A,
-        _remap_controller = rt.InputController(),
-        _remapper_button_order = {
-            rt.InputButton.A,
-            rt.InputButton.B,
-            rt.InputButton.X,
-            rt.InputButton.Y,
-            rt.InputButton.UP,
-            rt.InputButton.RIGHT,
-            rt.InputButton.DOWN,
-            rt.InputButton.LEFT,
-            rt.InputButton.L,
-            rt.InputButton.R,
-            rt.InputButton.START,
-            rt.InputButton.SELECT
-        },
-        _button_to_remapper = {},
-        _verbose_info = mn.VerboseInfoPanel(),
-        _selection_graph = rt.SelectionGraph()
+        _verbose_info_panel = mn.VerboseInfoPanel(),
+        _selection_graph = rt.SelectionGraph(),
+        _input_controller = rt.InputController(),
+        _control_indicator = rt.ControlIndicator(),
+
+        _scale_is_selected = false,
+        _selected_scale = nil,
+        _scale_delay_elapsed = 0,
+        _scale_delay_duration = rt.settings.menu.option_scene.scale_delay,
+        _scale_tick_elapsed = 0,
+        _scale_tick_duration = 1 / rt.settings.menu.option_scene.scale_n_ticks_per_second,
+        _scale_tick_direction = true, -- true = right
     }
+
+    -- nil items set during :realize
 
     fields._vsync_label_text = "VSync"
     fields._vsync_on_label = "ON"
@@ -32,6 +31,7 @@ mn.OptionsScene = meta.new_type("MenuOptionsScene", rt.Scene, function(state)
     fields._vsync_adaptive_label = "ADAPTIVE"
     fields._vsync_label = nil
     fields._vsync_option_button = nil
+    fields._vsync_item = nil
 
     fields._vsync_mode_to_vsync_label = {
         [rt.VSyncMode.ON] = fields._vsync_on_label,
@@ -49,12 +49,14 @@ mn.OptionsScene = meta.new_type("MenuOptionsScene", rt.Scene, function(state)
     fields._fullscreen_false_label = "NO"
     fields._fullscreen_label = nil
     fields._fullscreen_option_button = nil
+    fields._fullscreen_item = nil
 
     fields._borderless_label_text = "Borderless"
     fields._borderless_true_label = "YES"
     fields._borderless_false_label = "NO"
     fields._borderless_label = nil
     fields._borderless_option_button = nil
+    fields._borderless_item = nil
 
     fields._msaa_label_text = "MSAA"
     fields._msaa_off_label = "OFF"
@@ -64,6 +66,7 @@ mn.OptionsScene = meta.new_type("MenuOptionsScene", rt.Scene, function(state)
     fields._msaa_max_label = "Maximum"
     fields._msaa_label = nil
     fields._msaa_option_button = nil
+    fields._msaa_item = nil
 
     fields._msaa_quality_to_msaa_label = {
         [rt.MSAAQuality.OFF] = fields._msaa_off_label,
@@ -85,31 +88,32 @@ mn.OptionsScene = meta.new_type("MenuOptionsScene", rt.Scene, function(state)
     fields._resolution_2560_1440_label = "2560x1400 (16:9)"
     fields._resolution_label = nil
     fields._resolution_option_button = nil
+    fields._resolution_item = nil
 
     fields._multiple_choice_layout = {
-        [fields._vsync_label_text] = {
-            options = {
-                fields._vsync_on_label,
-                fields._vsync_off_label,
-                fields._vsync_adaptive_label
-            },
-            default = fields._vsync_adaptive_label
-        },
-
         [fields._fullscreen_label_text] = {
             options = {
-                fields._fullscreen_true_label,
-                fields._fullscreen_false_label
+                fields._fullscreen_false_label,
+                fields._fullscreen_true_label
             },
             default = fields._fullscreen_false_label
         },
 
         [fields._borderless_label_text] = {
             options = {
-                fields._borderless_true_label,
                 fields._borderless_false_label,
+                fields._borderless_true_label,
             },
             default = fields._borderless_false_label
+        },
+
+        [fields._vsync_label_text] = {
+            options = {
+                fields._vsync_off_label,
+                fields._vsync_on_label,
+                fields._vsync_adaptive_label
+            },
+            default = fields._vsync_adaptive_label
         },
 
         [fields._msaa_label_text] = {
@@ -118,7 +122,7 @@ mn.OptionsScene = meta.new_type("MenuOptionsScene", rt.Scene, function(state)
                 fields._msaa_good_label,
                 fields._msaa_better_label,
                 fields._msaa_best_label,
-                fields._msaa_best_label
+                fields._msaa_max_label
             },
             default = fields._msaa_best_label
         },
@@ -138,18 +142,22 @@ mn.OptionsScene = meta.new_type("MenuOptionsScene", rt.Scene, function(state)
     fields._sfx_level_text = "Sound Effects"
     fields._sfx_level_label = nil
     fields._sfx_level_scale = nil
+    fields._sfx_level_item = nil
 
     fields._music_level_text = "Music"
     fields._music_level_label = nil
     fields._music_level_scale = nil
+    fields._music_level_item = nil
 
     fields._vfx_motion_text = "Motion Effects"
     fields._vfx_motion_label = nil
     fields._vfx_motion_scale = nil
+    fields._vfx_motion_item = nil
 
     fields._vfx_contrast_text = "Visual Effects"
     fields._vfx_contrast_label = nil
     fields._vfx_contrast_scale = nil
+    fields._vfx_contrast_item = nil
 
     fields._level_layout = {
         [fields._sfx_level_text] = {
@@ -172,6 +180,11 @@ mn.OptionsScene = meta.new_type("MenuOptionsScene", rt.Scene, function(state)
             default = 100
         }
     }
+
+    fields._keymap_text = "Controls"
+    fields._keymap_label = nil
+    fields._keymap_arrow = nil
+    fields._keymap_item = nil
 
     local out = meta.new(mn.OptionsScene, fields)
     return out
@@ -197,22 +210,22 @@ function mn.OptionsScene:realize()
 
         scene["_" .. name .. "_label"] = label
         scene["_" .. name .. "_option_button"] = button
-        scene["_" .. name .. "_option_button"]:signal_connect("selection", handler)
+        --scene["_" .. name .. "_option_button"]:signal_connect("selection", handler)
 
         local frame = rt.Frame()
         frame:realize()
 
-        table.insert(scene._items, {
+        local item = {
             label = label,
             widget = button,
             frame = frame,
+            default = self._multiple_choice_layout[text].default,
             x_offset = 0
-        })
+        }
+
+        self["_" .. name .. "_item"] = item
+        table.insert(scene._items, item)
     end
-    
-    create_button_and_label("vsync", self._vsync_label_text, function(_, which)
-        scene._state:set_vsync_mode(scene._vsync_label_to_vsync_mode[which])
-    end)
 
     create_button_and_label("fullscreen", self._fullscreen_label_text, function(_, which)
         local on
@@ -232,6 +245,10 @@ function mn.OptionsScene:realize()
             on = false
         end
         scene._state:set_is_borderless(on)
+    end)
+
+    create_button_and_label("vsync", self._vsync_label_text, function(_, which)
+        scene._state:set_vsync_mode(scene._vsync_label_to_vsync_mode[which])
     end)
 
     create_button_and_label("msaa", self._msaa_label_text, function(_, which)
@@ -283,12 +300,16 @@ function mn.OptionsScene:realize()
         scene["_" .. name .. "_label"] = label
         scene["_" .. name .. "_scale"] = scale
 
-        table.insert(scene._items, {
+        local item = {
             label = label,
             widget = scale,
             frame = frame,
             x_offset = 0,
-        })
+            default = 1
+        }
+
+        self["_" .. name .. "_item"] = item
+        table.insert(scene._items, item)
     end
 
     create_scale_and_label("sfx_level", self._sfx_level_text, function(_, fraction)
@@ -307,22 +328,56 @@ function mn.OptionsScene:realize()
         scene._state:set_vfx_contrast_level(fraction)
     end)
 
-    for button in values(self._remapper_button_order) do
-        local remapper =  mn.KeybindingIndicator(self._state, button)
-        remapper:realize()
-        table.insert(self._remappers, remapper)
-        self._button_to_remapper[button] = remapper
+    self:create_from_state(self._state)
+    self._verbose_info_panel:realize()
+
+    local keymap_item = {
+        label = rt.Label(label_prefix .. self._keymap_text .. label_postfix),
+        widget = rt.DirectionIndicator(rt.Direction.RIGHT),
+        frame = rt.Frame(),
+        x_offset = 0,
+    }
+    table.insert(self._items, keymap_item)
+    self._keymap_item = keymap_item
+
+    for widget in range(keymap_item.label, keymap_item.widget, keymap_item.frame) do
+        widget:realize()
     end
 
-    self._remap_controller:signal_connect("keyboard_pressed_raw", function(_, name, scancode)
-        local remapper = scene._button_to_remapper[scene._remap_target_button]
-        remapper:set_keyboard_key_label(string.upper(name))
-        scene._state:set_input_button_keyboard_key(scene._remap_target_button, rt.KeyboardKeyPrefix .. scancode)
+    local _, label_h = keymap_item.label:measure()
+    keymap_item.widget:set_minimum_size(label_h, label_h)
+
+    self._input_controller:signal_disconnect_all()
+    self._input_controller:signal_connect("pressed", function(_, which)
+        self:_handle_button_pressed(which)
     end)
 
-    self:create_from_state(self._state)
+    self._input_controller:signal_connect("released", function(_, which)
+        if self._scale_is_selected then
+            self._scale_delay_elapsed = 0
+            self._scale_tick_elapsed = 0
+        end
+    end)
 
-    self._verbose_info_panel:realize()
+    self._control_indicator:realize()
+    self:_update_control_indicator(true)
+end
+
+--- @brief
+function mn.OptionsScene:_update_control_indicator(left_right_allowed)
+    meta.assert_boolean(left_right_allowed)
+    local left_right_label = "Change Value"
+    if not left_right_allowed then
+        left_right_label = "<s><color=GRAY>" .. left_right_label .. "</s></color>"
+    end
+
+    self._control_indicator:create_from({
+        {rt.ControlIndicatorButton.B, "Exit"},
+        {rt.ControlIndicatorButton.X, "Apply"},
+        {rt.ControlIndicatorButton.Y, "Set Default"},
+        {rt.ControlIndicatorButton.LEFT_RIGHT, left_right_label},
+        {rt.ControlIndicatorButton.UP_DOWN, "Select"}
+    })
 end
 
 --- @override
@@ -369,15 +424,6 @@ function mn.OptionsScene:create_from_state(state)
     set_scale(self._music_level_scale, self._state:get_music_level())
     set_scale(self._vfx_motion_scale, self._state:get_vfx_motion_level())
     set_scale(self._vfx_contrast_scale, self._state:get_vfx_contrast_level())
-
-    for button in values(self._remapper_button_order) do
-        local remapper = self._button_to_remapper[button]
-        local current = self._state:input_button_to_keyboard_key(button)
-        remapper:set_keyboard_key_label(rt.keyboard_key_to_string(current))
-
-        current = self._state:input_button_to_gamepad_button(button)
-        remapper:set_gamepad_button_label(rt.gamepad_button_to_string(current))
-    end
 end
 
 --- @override
@@ -385,26 +431,41 @@ function mn.OptionsScene:size_allocate(x, y, width, height)
     local m = rt.settings.margin_unit
     local outer_margin = 2 * m
     local start_y = y + outer_margin
+    local control_w, control_h = self._control_indicator:measure()
+    self._control_indicator:fit_into(x + width - outer_margin - control_w, start_y, control_w, control_h)
+
+    start_y = start_y + control_h + m
+
     local current_x, current_y = x + outer_margin, start_y
 
-    local max_label_w = NEGATIVE_INFINITY
+    local max_label_w, max_label_h = NEGATIVE_INFINITY, NEGATIVE_INFINITY
     local label_ws, label_hs = {}, {}
+    local n_items = 0
     for item in values(self._items) do
         local label_w, label_h = item.label:measure()
         table.insert(label_ws, label_w)
         table.insert(label_hs, label_h)
         max_label_w = math.max(max_label_w, label_w)
+        max_label_h = math.max(max_label_h, label_h)
+        n_items = n_items + 1
     end
 
-    local w = 0.5 * width
-    local label_xm = 5 * m
+    local label_xm = 7 * m
+    local widget_w = 0.4 * width
+    local w = widget_w + label_xm + 2 * m
+
+    local item_spacing = 0.5 * m
+    local item_h = (y + height - start_y - outer_margin - (n_items - 1) * item_spacing) / (n_items)
+    local item_w = max_label_w + widget_w + 2 * m
+    local item_x = x + outer_margin
+
+
     for i, item in ipairs(self._items) do
         local label_h, label_w = label_hs[i], label_ws[i]
-        local frame_h = label_h + 2 * m
-        item.frame:fit_into(current_x, current_y, w - 2 * outer_margin, frame_h)
-        item.label:fit_into(current_x + 2 * m, current_y + 0.5 * frame_h - 0.5 * label_h, POSITIVE_INFINITY)
+        local frame_h = item_h
+        item.frame:fit_into(item_x, current_y, item_w, frame_h)
+        item.label:fit_into(item_x + 2 * m, current_y + 0.5 * frame_h - 0.5 * label_h, POSITIVE_INFINITY)
         local widget_x = current_x + m + max_label_w + label_xm
-        local widget_w = x + w - outer_margin - 4 * m - widget_x
         item.widget:fit_into(
             widget_x,
             current_y + 0.5 * frame_h - 0.5 * label_h,
@@ -412,26 +473,102 @@ function mn.OptionsScene:size_allocate(x, y, width, height)
             label_h
         )
         item.x_offset = widget_x - widget_x + 0.5 * widget_w - 0.5 * select(1, item.widget:measure())
-        current_y = current_y + frame_h
+        current_y = current_y + frame_h + item_spacing
     end
 
-    local rest_h = height - 2 * outer_margin - (current_y - start_y)
-    local rest_w = width - 2 * outer_margin
-    local remapper_w = rest_w / 3
-    local remapper_h = rest_h / 4
+    self._verbose_info_panel:fit_into(
+        x + width - widget_w - outer_margin,
+        start_y,
+        widget_w,
+        height - 2 * outer_margin - control_h - m
+    )
 
-    local remapper_x, remapper_y = current_x, current_y
-    local row_i, col_i = 1, 1
+    self:_regenerate_selection_nodes()
+end
 
-    for i = 1, 12 do
-        local remapper = self._remappers[i]
-        remapper:fit_into(current_x + (col_i - 1) * remapper_w, current_y + (row_i - 1) * remapper_h, remapper_w, remapper_h)
-        row_i = row_i + 1
-        if row_i > 4 then
-            row_i = 1
-            col_i = col_i + 1
-        end
+--- @brief
+function mn.OptionsScene:_regenerate_selection_nodes()
+    self._selection_graph:clear()
+
+    local nodes = {}
+    local item_to_node = {}
+    for item in values(self._items) do
+        local node = rt.SelectionGraphNode(item.frame:get_bounds())
+        table.insert(nodes, node)
+        item_to_node[item] = node
+        self._selection_graph:add(node)
     end
+
+    for i = 1, #nodes do
+        nodes[i]:set_up(nodes[i-1])
+        nodes[i]:set_down(nodes[i+1])
+    end
+
+    nodes[1]:set_up(nodes[#nodes])
+    nodes[#nodes]:set_down(nodes[1])
+
+    local scene = self
+    for item_verbose_info_object in range(
+        {self._vsync_item, rt.VerboseInfoObject.VSYNC},
+        {self._fullscreen_item, rt.VerboseInfoObject.FULLSCREEN},
+        {self._borderless_item, rt.VerboseInfoObject.BORDERLESS},
+        {self._msaa_item, rt.VerboseInfoObject.MSAA},
+        {self._resolution_item, rt.VerboseInfoObject.RESOLUTION},
+        {self._sfx_level_item, rt.VerboseInfoObject.SFX_LEVEL},
+        {self._music_level_item, rt.VerboseInfoObject.MUSIC_LEVEL},
+        {self._vfx_motion_item, rt.VerboseInfoObject.VFX_LEVEL},
+        {self._vfx_contrast_item, rt.VerboseInfoObject.VFX_CONTRAST}
+        --{self._keymap_item, rt.VerboseInfoObject.KEYMAP}
+    ) do
+        local item = item_verbose_info_object[1]
+        local verbose_info_object = item_verbose_info_object[2]
+        local node = item_to_node[item]
+        node:signal_connect("enter", function(_)
+            --scene._verbose_info_panel:show(verbose_info_object)
+            item.frame:set_selection_state(rt.SelectionState.ACTIVE)
+            if meta.isa(item.widget, mn.Scale) then
+                scene._scale_is_selected = true
+                scene._selected_scale = item.widget
+            end
+            scene._scale_tick_elapsed = 0
+            scene._scale_delay_elapsed = 0
+        end)
+
+        node:signal_connect("exit", function(_)
+            item.frame:set_selection_state(rt.SelectionState.INACTIVE)
+            scene._scale_is_selected = false
+            scene._selected_scale = nil
+        end)
+
+        node:signal_connect(rt.InputButton.RIGHT, function(_)
+            item.widget:move_right()
+            self._scale_tick_direction = true
+        end)
+
+        node:signal_connect(rt.InputButton.LEFT, function(_)
+            item.widget:move_left()
+            self._scale_tick_direction = false
+        end)
+
+        node:signal_connect(rt.InputButton.Y, function(_)
+            if meta.isa(item.widget, mn.OptionButton) then
+                item.widget:set_option(item.default)
+            elseif meta.isa(item.widget, mn.Scale) then
+                item.widget:set_value(item.default)
+            end
+        end)
+    end
+
+    local keymap_node = item_to_node[self._keymap_item]
+   keymap_node:signal_connect("enter", function(_)
+        scene._keymap_item.frame:set_selection_state(rt.SelectionState.ACTIVE)
+    end)
+
+   keymap_node:signal_connect("exit", function(_)
+        scene._keymap_item.frame:set_selection_state(rt.SelectionState.INACTIVE)
+    end)
+
+    self._selection_graph:set_current_node(item_to_node[self._items[1]])
 end
 
 --- @override
@@ -446,20 +583,34 @@ function mn.OptionsScene:draw()
     end
 
     self._verbose_info_panel:draw()
-
-    for remapper in values(self._remappers) do
-        remapper:draw()
-    end
+    self._control_indicator:draw()
 end
 
 --- @override
 function mn.OptionsScene:update(delta)
     for item in values(self._items) do
-        item.widget:update(delta)
+        if item.widget.update ~= nil then
+            item.widget:update(delta)
+        end
+    end
+
+    if self._scale_is_selected then
+        self._scale_delay_elapsed = self._scale_delay_elapsed + delta
+        if self._scale_delay_elapsed >= self._scale_delay_duration then
+            self._scale_tick_elapsed = self._scale_tick_elapsed + delta
+            while self._scale_tick_elapsed > self._scale_tick_duration do
+                self._scale_tick_elapsed = self._scale_tick_elapsed - self._scale_tick_duration
+                if self._scale_tick_direction == true and self._input_controller:is_down(rt.InputButton.RIGHT) then
+                    self._selected_scale:move_right()
+                elseif self._input_controller:is_down(rt.InputButton.LEFT) then
+                    self._selected_scale:move_left()
+                end
+            end
+        end
     end
 end
 
 --- @brief
-function mn.OptionsScene:_regenerate_selection_nodes()
-    local vsync_node = rt.SelectionGraphNode(self._vsync_option_button:get_bounds())
+function mn.OptionsScene:_handle_button_pressed(which)
+    self._selection_graph:handle_button(which)
 end

@@ -85,7 +85,7 @@ function mn.EntityPortraits:draw()
     for item in values(self._items) do
         item.frame:draw()
 
-        local stencil_value = (meta.hash(self) + item_i) % 255
+        local stencil_value = (meta.hash(self) + item_i) % 254 + 1
         rt.graphics.stencil(stencil_value, item.stencil)
         rt.graphics.set_stencil_test(rt.StencilCompareMode.EQUAL, stencil_value)
         item.sprite:draw()

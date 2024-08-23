@@ -64,7 +64,7 @@ function bt.GradientFrame:draw()
     self._frame:draw()
 
     if self._gradient_visible == true then
-        local stencil_value = meta.hash(self) % 255
+        local stencil_value = meta.hash(self) % 254 + 1
         rt.graphics.stencil(stencil_value, self._frame)
         rt.graphics.set_stencil_test(rt.StencilCompareMode.EQUAL, stencil_value)
         rt.graphics.set_blend_mode(rt.BlendMode.MULTIPLY)

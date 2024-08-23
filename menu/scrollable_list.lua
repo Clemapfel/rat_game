@@ -279,7 +279,7 @@ end
 
 --- @override
 function mn.ScrollableList:draw()
-    local stencil_value = meta.hash(mn.ScrollableList) % 255
+    local stencil_value = meta.hash(mn.ScrollableList) % 254 + 1
 
     rt.graphics.push()
 

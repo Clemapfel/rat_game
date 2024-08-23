@@ -125,7 +125,7 @@ rt.Palette.BASE = rt.Palette.GRAY_5
 rt.Palette.BASE_OUTLINE = rt.Palette.BLACK
 
 rt.Palette.FOREGROUND = rt.Palette.GRAY_1
-rt.Palette.FOREGROUND_OUTLINE = rt.Palette.BLACK
+rt.Palette.FOREGROUND_OUTLINE = rt.Palette.GRAY_3
 
 rt.Palette.TEXT = rt.Palette.WHITE
 

@@ -75,9 +75,9 @@ function rt.Frame:draw()
     if not self:get_is_visible() then return end
 
     if self._child_valid then
-        self:_bind_stencil()
+        --self:_bind_stencil()
         self._child:draw()
-        self:_unbind_stencil()
+        --self:_unbind_stencil()
     else
         self._stencil_mask:draw()
     end

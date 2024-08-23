@@ -22,19 +22,29 @@
     </configurations>
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="7fa9ba1b-2cff-4ecc-86fb-59ab2fa76ee1" name="Changes" comment="stashing interface">
+    <list default="true" id="7fa9ba1b-2cff-4ecc-86fb-59ab2fa76ee1" name="Changes" comment="stashing before removing keymapper">
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/common/font.lua" beforeDir="false" afterPath="$PROJECT_DIR$/common/font.lua" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/common/frame.lua" beforeDir="false" afterPath="$PROJECT_DIR$/common/frame.lua" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/common/game_state.lua" beforeDir="false" afterPath="$PROJECT_DIR$/common/game_state.lua" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/common/label.lua" beforeDir="false" afterPath="$PROJECT_DIR$/common/label.lua" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/common/sprite_scale_correction.glsl" beforeDir="false" afterPath="$PROJECT_DIR$/common/sprite_scale_correction.glsl" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/fast_physics/world.lua" beforeDir="false" afterPath="$PROJECT_DIR$/fast_physics/world.lua" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/main.lua" beforeDir="false" afterPath="$PROJECT_DIR$/main.lua" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/main_box2d.lua" beforeDir="false" afterPath="$PROJECT_DIR$/main_box2d.lua" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/menu/inventory_scene.lua" beforeDir="false" afterPath="$PROJECT_DIR$/menu/inventory_scene.lua" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/common/keyboard.lua" beforeDir="false" afterPath="$PROJECT_DIR$/common/keyboard.lua" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/common/palette.lua" beforeDir="false" afterPath="$PROJECT_DIR$/common/palette.lua" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/include.lua" beforeDir="false" afterPath="$PROJECT_DIR$/include.lua" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/menu/keyboard.lua" beforeDir="false" afterPath="$PROJECT_DIR$/menu/keyboard.lua" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/menu/option_button.lua" beforeDir="false" afterPath="$PROJECT_DIR$/menu/option_button.lua" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/menu/options_scene.lua" beforeDir="false" afterPath="$PROJECT_DIR$/menu/options_scene.lua" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/menu/scale.lua" beforeDir="false" afterPath="$PROJECT_DIR$/menu/scale.lua" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/menu/scrollable_list.lua" beforeDir="false" afterPath="$PROJECT_DIR$/menu/scrollable_list.lua" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/menu/tab_bar.lua" beforeDir="false" afterPath="$PROJECT_DIR$/menu/tab_bar.lua" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/menu/verbose_info_panel.lua" beforeDir="false" afterPath="$PROJECT_DIR$/menu/verbose_info_panel.lua" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/menu/verbose_info_panel_item.lua" beforeDir="false" afterPath="$PROJECT_DIR$/menu/verbose_info_panel_item.lua" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/old/battle/gradient_frame.lua" beforeDir="false" afterPath="$PROJECT_DIR$/old/battle/gradient_frame.lua" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/old/battle/party_sprite.lua" beforeDir="false" afterPath="$PROJECT_DIR$/old/battle/party_sprite.lua" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/old/battle/priority_queue_element.lua" beforeDir="false" afterPath="$PROJECT_DIR$/old/battle/priority_queue_element.lua" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/old/common/keyboard.lua" beforeDir="false" afterPath="$PROJECT_DIR$/old/common/keyboard.lua" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/old/common/level_bar.lua" beforeDir="false" afterPath="$PROJECT_DIR$/old/common/level_bar.lua" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/old/menu/scrollable_list.lua" beforeDir="false" afterPath="$PROJECT_DIR$/old/menu/scrollable_list.lua" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/old/menu/tab_bar.lua" beforeDir="false" afterPath="$PROJECT_DIR$/old/menu/tab_bar.lua" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/old/menu/~entity_portraits.lua" beforeDir="false" afterPath="$PROJECT_DIR$/old/menu/~entity_portraits.lua" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/old/menu/~tab_bar.lua" beforeDir="false" afterPath="$PROJECT_DIR$/old/menu/~tab_bar.lua" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -498,31 +508,7 @@
       <workItem from="1724272983061" duration="21871000" />
       <workItem from="1724335305502" duration="1906000" />
       <workItem from="1724337474091" duration="1303000" />
-      <workItem from="1724427225384" duration="5535000" />
-    </task>
-    <task id="LOCAL-00936" summary="finished keyboard">
-      <option name="closed" value="true" />
-      <created>1722793223252</created>
-      <option name="number" value="00936" />
-      <option name="presentableId" value="LOCAL-00936" />
-      <option name="project" value="LOCAL" />
-      <updated>1722793223252</updated>
-    </task>
-    <task id="LOCAL-00937" summary="refactored scene">
-      <option name="closed" value="true" />
-      <created>1722797938869</created>
-      <option name="number" value="00937" />
-      <option name="presentableId" value="LOCAL-00937" />
-      <option name="project" value="LOCAL" />
-      <updated>1722797938869</updated>
-    </task>
-    <task id="LOCAL-00938" summary="added rope">
-      <option name="closed" value="true" />
-      <created>1722877201066</created>
-      <option name="number" value="00938" />
-      <option name="presentableId" value="LOCAL-00938" />
-      <option name="project" value="LOCAL" />
-      <updated>1722877201066</updated>
+      <workItem from="1724427225384" duration="13782000" />
     </task>
     <task id="LOCAL-00939" summary="optimized rope">
       <option name="closed" value="true" />
@@ -892,7 +878,31 @@
       <option name="project" value="LOCAL" />
       <updated>1724297428785</updated>
     </task>
-    <option name="localTasksCounter" value="985" />
+    <task id="LOCAL-00985" summary="added draw call performance metrics">
+      <option name="closed" value="true" />
+      <created>1724432852782</created>
+      <option name="number" value="00985" />
+      <option name="presentableId" value="LOCAL-00985" />
+      <option name="project" value="LOCAL" />
+      <updated>1724432852782</updated>
+    </task>
+    <task id="LOCAL-00986" summary="added info object constants">
+      <option name="closed" value="true" />
+      <created>1724432900678</created>
+      <option name="number" value="00986" />
+      <option name="presentableId" value="LOCAL-00986" />
+      <option name="project" value="LOCAL" />
+      <updated>1724432900678</updated>
+    </task>
+    <task id="LOCAL-00987" summary="stashing before removing keymapper">
+      <option name="closed" value="true" />
+      <created>1724432919471</created>
+      <option name="number" value="00987" />
+      <option name="presentableId" value="LOCAL-00987" />
+      <option name="project" value="LOCAL" />
+      <updated>1724432919471</updated>
+    </task>
+    <option name="localTasksCounter" value="988" />
     <servers />
   </component>
   <component name="TypeScriptGeneratedFilesManager">
@@ -941,9 +951,6 @@
     </option>
   </component>
   <component name="VcsManagerConfiguration">
-    <MESSAGE value="fixed grafics desynch bug" />
-    <MESSAGE value="polished animation" />
-    <MESSAGE value="fixed separate blendmodes" />
     <MESSAGE value="dialogs working" />
     <MESSAGE value="added template load" />
     <MESSAGE value="added snapshot optimization" />
@@ -966,7 +973,10 @@
     <MESSAGE value="stashing chain shape" />
     <MESSAGE value="stashing debug draw" />
     <MESSAGE value="stashing interface" />
-    <option name="LAST_COMMIT_MESSAGE" value="stashing interface" />
+    <MESSAGE value="added draw call performance metrics" />
+    <MESSAGE value="added info object constants" />
+    <MESSAGE value="stashing before removing keymapper" />
+    <option name="LAST_COMMIT_MESSAGE" value="stashing before removing keymapper" />
   </component>
   <component name="XDebuggerManager">
     <breakpoint-manager>

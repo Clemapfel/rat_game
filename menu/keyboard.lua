@@ -514,7 +514,7 @@ function rt.Keyboard:draw()
 
     self._entry_label_frame:draw()
 
-    local stencil_value = meta.hash(self) % 255
+    local stencil_value = meta.hash(self) % 254 + 1
     rt.graphics.stencil(stencil_value, self._entry_stencil)
     rt.graphics.set_stencil_test(rt.StencilCompareMode.EQUAL, stencil_value)
     rt.graphics.translate(-self._entry_x_offset, 0)

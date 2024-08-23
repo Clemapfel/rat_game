@@ -160,7 +160,7 @@ function bt.PartySprite:draw()
     if not self._is_realized == true then return false end
     if self._is_visible == false then return end
 
-    local stencil_value = meta.hash(self) % 255
+    local stencil_value = meta.hash(self) % 254 + 1
     rt.graphics.stencil(stencil_value, self._sprite_stencil)
     rt.graphics.set_stencil_test(rt.StencilCompareMode.NOT_EQUAL, stencil_value)
     rt.graphics.translate(0, self._current_sprite_offset)

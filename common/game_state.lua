@@ -354,9 +354,8 @@ function rt.GameState:run()
                 local total_percentage = tostring(math.floor(durations.max_total_duration / frame_duration * 100))
                 local n_draws = tostring(durations.max_n_draws)
                 local n_texture_switches = tostring(durations.max_n_texture_switches)
-                local n_textures = stats.textures
 
-                local label = tostring(fps) .. " | " .. durations.format(update_percentage) .. "% | " ..  durations.format(draw_percentage) .. "% | " .. n_draws .. " (" .. n_texture_switches .. ") | " .. n_textures
+                local label = tostring(fps) .. " | " .. durations.format(update_percentage) .. "% | " ..  durations.format(draw_percentage) .. "% | " .. n_draws .. " (" .. n_texture_switches .. ")"
                 love.graphics.setColor(1, 1, 1, 0.75)
                 local margin = 3
                 local label_w, label_h = love.graphics.getFont():getWidth(label), love.graphics.getFont():getHeight(label)

@@ -148,7 +148,7 @@ function bt.PriorityQueueElement:draw()
 
     self._frame:draw()
 
-    local stencil_value = meta.hash(self) % 255
+    local stencil_value = meta.hash(self) % 254 + 1
     rt.graphics.stencil(stencil_value, self._stencil)
     rt.graphics.set_stencil_test(rt.StencilCompareMode.EQUAL, stencil_value)
     self._sprite:draw()

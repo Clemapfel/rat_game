@@ -1,5 +1,5 @@
 rt.settings.menu.option_button = {
-    scroll_speed = 600, -- px per second
+    scroll_speed = 1000, -- px per second
     indicator_glow_duration = 0.2, -- seconds
 }
 
@@ -127,6 +127,7 @@ function mn.OptionButton:size_allocate(x, y, width, height)
     self._stencil:resize(left_x, y + 0.5 * height - 0.5 * stencil_h, (right_x - left_x), stencil_h)
 
     self:_update_direction_indicators()
+    self._current_offset = self._items[self._current_item_i].offset
 end
 
 --- @override
@@ -134,7 +135,7 @@ function mn.OptionButton:draw()
     self._left_indicator:draw()
     self._right_indicator:draw()
 
-    local stencil_value = meta.hash(self) % 255
+    local stencil_value = meta.hash(self) % 254 + 1
     rt.graphics.stencil(stencil_value, self._stencil)
     rt.graphics.set_stencil_test(rt.StencilCompareMode.NOT_EQUAL)
 
@@ -156,7 +157,7 @@ end
 function mn.OptionButton:update(delta)
     local target_offset = self._items[self._current_item_i].offset
 
-    local offset = delta * rt.settings.menu.option_button.scroll_speed * (1 + (target_offset - self._current_offset) / 500)
+    local offset = delta * rt.settings.menu.option_button.scroll_speed
     if self._current_offset < target_offset then
         self._current_offset = clamp(self._current_offset + offset, 0, target_offset)
     elseif self._current_offset > target_offset then
@@ -191,7 +192,7 @@ end
 
 --- @brief
 function mn.OptionButton:_update_direction_indicators()
-    local off_opacity = 0.4;
+    local off_opacity = 0.2;
     if self:can_move_right() then
         self._right_indicator:set_opacity(1)
     else

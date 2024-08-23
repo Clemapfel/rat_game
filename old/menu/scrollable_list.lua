@@ -319,7 +319,7 @@ function mn.ScrollableList:draw()
     --self._base:draw()
     --self._base_outline:draw()
 
-    local stencil_value = meta.hash(mn.ScrollableList) % 255
+    local stencil_value = meta.hash(mn.ScrollableList) % 254 + 1
     --rt.graphics.stencil(stencil_value, self._stencil)
     --rt.graphics.set_stencil_test(rt.StencilCompareMode.EQUAL, stencil_value)
 

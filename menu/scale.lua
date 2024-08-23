@@ -43,12 +43,14 @@ function mn.Scale:realize()
         self._rail_center_outline_top,
         self._rail_center_outline_bottom,
         self._rail_left_outline,
-        self._rail_right_outline,
-        self._slider_outline
+        self._rail_right_outline
     ) do
-        outline:set_color(rt.Palette.BASE_OUTLINE)
+        outline:set_color(rt.Palette.FOREGROUND_OUTLINE)
         outline:set_is_outline(true)
     end
+
+    self._slider_outline:set_color(rt.Palette.BASE_OUTLINE)
+    self._slider_outline:set_is_outline(true)
 
     self._slider_body:set_color(rt.Palette.FOREGROUND)
     self:_emit_value_changed()
