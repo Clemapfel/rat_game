@@ -3,6 +3,27 @@ rt.settings.menu.verbose_info_panel = {
     indicator_base_color = rt.Palette.FOREGROUND
 }
 
+rt.VerboseInfoObject = meta.new_enum({
+    MOVE = "move",
+    CONSUMABLE = "consumable",
+    EQUIP = "equip",
+    TEMPLATE = "template",
+    HP = "hp",
+    ATTACK = "attack",
+    DEFENSE = "defense",
+    SPEED = "speed",
+    OPTIONS = "options",
+    VSYNC = "vsync",
+    FULLSCREEN = "fullscreen",
+    BORDERLRESS = "borderless",
+    MSAA = "msaa",
+    RESOLUTION = "resolution",
+    SOUND_EFFECTS = "sfx_level",
+    MUSIC = "music_level",
+    MOTION_EFFECTS = "vfx_motion_level",
+    VISUAL_EFFECTS = "vfx_contrast_level"
+})
+
 --- @class mn.VerboseInfoPanel
 mn.VerboseInfoPanel = meta.new_type("MenuVerboseInfoPanel", rt.Widget, function()
     return meta.new(mn.VerboseInfoPanel, {

@@ -439,7 +439,7 @@ function mn.InventoryScene:_set_control_indicator_layout(layout)
     self._current_control_indicator_layout = final_layout
     self._control_indicator:create_from(final_layout)
 
-    local outer_margin = rt.settings.outer_margin
+    local outer_margin = rt.settings.margin_unit * 2
     local control_w, control_h = self._control_indicator:measure()
     self._control_indicator:fit_into(
         self._bounds.x + self._bounds.width - control_w - outer_margin,
@@ -1280,13 +1280,13 @@ function mn.InventoryScene:_regenerate_selection_nodes()
             scene._shared_tab_bar:set_tab_selected(tab_i, true)
 
             if tab_i == scene.shared_move_list_index then
-                scene:_set_verbose_info_object("move")
+                scene:_set_verbose_info_object(rt.VerboseInfoObject.MOVE)
             elseif tab_i == scene.shared_consumable_list_index then
-                scene:_set_verbose_info_object("consumable")
+                scene:_set_verbose_info_object(rt.VerboseInfoObject.CONSUMABLE)
             elseif tab_i == scene.shared_equip_list_index then
-                scene:_set_verbose_info_object("equip")
+                scene:_set_verbose_info_object(rt.VerboseInfoObject.EQUIP)
             elseif tab_i == scene.shared_template_list_index then
-                scene:_set_verbose_info_object("template")
+                scene:_set_verbose_info_object(rt.VerboseInfoObject.TEMPLATE)
             end
             scene:_update_grabbed_object()
             scene:_set_grabbed_object_allowed(false)
@@ -1344,7 +1344,12 @@ function mn.InventoryScene:_regenerate_selection_nodes()
     for page_i, node_page in ipairs(entity_page_nodes) do
         node_page.info_node:signal_connect("enter", function(_)
             scene._entity_pages[page_i].info:set_selection_state(rt.SelectionState.ACTIVE)
-            scene:_set_verbose_info_object("hp", "attack", "defense", "speed")
+            scene:_set_verbose_info_object(
+                rt.VerboseInfoObject.HP,
+                rt.VerboseInfoObject.ATTACK,
+                rt.VerboseInfoObject.DEFENSE,
+                rt.VerboseInfoObject.SPEED
+            )
             scene:_update_grabbed_object()
             scene:_set_grabbed_object_allowed(false)
         end)
@@ -1387,7 +1392,7 @@ function mn.InventoryScene:_regenerate_selection_nodes()
 
                 local object = scene._state:entity_get_move(page.entity, node_i)
                 if object == nil and not scene._state:has_grabbed_object() then
-                    scene:_set_verbose_info_object("move")
+                    scene:_set_verbose_info_object(rt.VerboseInfoObject.MOVE)
                 else
                     scene:_set_verbose_info_object(object)
                 end
@@ -1508,7 +1513,7 @@ function mn.InventoryScene:_regenerate_selection_nodes()
                 if node_i <= n_equip_slots then
                     local object = scene._state:entity_get_equip(entity, node_i)
                     if object == nil and not scene._state:has_grabbed_object() then
-                        scene:_set_verbose_info_object("equip")
+                        scene:_set_verbose_info_object(rt.VerboseInfoObject.EQUIP)
                     else
                         scene:_set_verbose_info_object(object)
                     end
@@ -1516,7 +1521,7 @@ function mn.InventoryScene:_regenerate_selection_nodes()
                 else
                     local object = scene._state:entity_get_consumable(entity, node_i - n_equip_slots)
                     if object == nil and not scene._state:has_grabbed_object() then
-                        scene:_set_verbose_info_object("consumable")
+                        scene:_set_verbose_info_object(rt.VerboseInfoObject.CONSUMABLE)
                     else
                         scene:_set_verbose_info_object(object)
                     end

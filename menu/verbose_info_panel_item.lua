@@ -667,31 +667,31 @@ function mn.VerboseInfoPanel.Item:create_from_string(which)
     local move_name = rt.settings.battle.move.name
 
     local titles = {
-        ["hp"] = format_title("Health") .. " (<color=HP>HP</color>)",
-        ["attack"] = format_title("Attack") .. " (<color=ATTACK>ATK</color>)",
-        ["defense"] = format_title("Defense") ..  " (<color=DEFENSE>DEF</color>)",
-        ["speed"] = format_title("Speed") .." (<color=SPEED>SPD</color>)",
+        [rt.VerboseInfoObject.HP] = format_title("Health") .. " (<color=HP>HP</color>)",
+        [rt.VerboseInfoObject.ATTACK] = format_title("Attack") .. " (<color=ATTACK>ATK</color>)",
+        [rt.VerboseInfoObject.DEFENSE] = format_title("Defense") ..  " (<color=DEFENSE>DEF</color>)",
+        [rt.VerboseInfoObject.SPEED] = format_title("Speed") .." (<color=SPEED>SPD</color>)",
 
-        ["consumable"] = format_title(consumable_name .. "s") .. " \u{25CF}",
-        ["equip"] = format_title(equip_name .. "s") .. "  \u{2B23}",
-        ["move"] = format_title(move_name .. "s") .. "  \u{25A0}",
-        ["template"] = format_title("Templates"),
+        [rt.VerboseInfoObject.CONSUMABLE] = format_title(consumable_name .. "s") .. " \u{25CF}",
+        [rt.VerboseInfoObject.EQUIP] = format_title(equip_name .. "s") .. "  \u{2B23}",
+        [rt.VerboseInfoObject.MOVE] = format_title(move_name .. "s") .. "  \u{25A0}",
+        [rt.VerboseInfoObject.TEMPLATE] = format_title("Templates"),
 
-        ["options"] = format_title("Options")
+        [rt.VerboseInfoObject.OPTIONS] = format_title("Options")
     }
 
     local descriptions = {
-        ["hp"] = "When a characters HP reaches 0, they are knocked out. If damaged while knocked out, they die",
-        ["attack"] = "For most moves, user's ATK increases damage dealt to the target",
-        ["defense"] = "For most moves, target's DEF decreases damage dealt to target",
-        ["speed"] = "Along with Move Priority, influences in what order participants act each turn",
+        [rt.VerboseInfoObject.HP] = "When a characters HP reaches 0, they are knocked out. If damaged while knocked out, they die",
+        [rt.VerboseInfoObject.ATTACK] = "For most moves, user's ATK increases damage dealt to the target",
+        [rt.VerboseInfoObject.DEFENSE] = "For most moves, target's DEF decreases damage dealt to target",
+        [rt.VerboseInfoObject.SPEED] = "Along with Move Priority, influences in what order participants act each turn",
 
-        ["consumable"] = "Consumable Description, TODO",
-        ["equip"] = "Equip Description, TODO",
-        ["move"] = "Move Description, TODO",
-        ["template"] = "Template Description, TODO",
+        [rt.VerboseInfoObject.CONSUMABLE] = "Consumable Description, TODO",
+        [rt.VerboseInfoObject.EQUIP] = "Equip Description, TODO",
+        [rt.VerboseInfoObject.MOVE] = "Move Description, TODO",
+        [rt.VerboseInfoObject.TEMPLATE] = "Template Description, TODO",
 
-        ["options"] = "Option Description, TODO"
+        [rt.VerboseInfoObject.OPTIONS] = "Option Description, TODO"
     }
 
     self.realize = function()
