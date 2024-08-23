@@ -26,7 +26,7 @@ rt.GameState = meta.new_type("GameState", function()
         music_level = 1,
         vfx_motion_level = 1,
         vfx_contrast_level = 1,
-        show_fps = true,
+        show_diagnostics = true,
 
         -- keybindings
         input_mapping = (function()
@@ -304,10 +304,14 @@ function rt.GameState:run()
                 max_update_duration = 0,
                 max_draw_duration = 0,
                 max_total_duration = 0,
+                max_n_draws = 0,
+                max_n_texture_switches = 0,
 
                 update_durations = {},
                 draw_durations = {},
                 total_durations = {},
+                n_draws = {},
+                n_texture_switches = {},
 
                 format = function(str)
                     while #str < 3 do
@@ -327,6 +331,7 @@ function rt.GameState:run()
         love.update(delta)
         update_duration = love.timer.getTime() - update_before
 
+        local stats
         local background_color = rt.Palette.TRUE_MAGENTA
         if love.graphics.isActive() then
             love.graphics.clear(true, true, true)
@@ -339,42 +344,55 @@ function rt.GameState:run()
             local now =  love.timer.getTime()
             draw_duration = now - draw_before
             total_duration = now - update_before
+            stats = love.graphics.getStats()
 
-            if self._state.show_fps == true then
+            if self._state.show_diagnostics == true then
                 local fps = love.timer.getFPS()
                 local frame_duration = 1 / fps
                 local update_percentage = tostring(math.floor(durations.max_update_duration / frame_duration * 100))
                 local draw_percentage = tostring(math.floor(durations.max_draw_duration / frame_duration * 100))
                 local total_percentage = tostring(math.floor(durations.max_total_duration / frame_duration * 100))
+                local n_draws = tostring(durations.max_n_draws)
+                local n_texture_switches = tostring(durations.max_n_texture_switches)
+                local n_textures = stats.textures
 
-                local label = tostring(fps) .. " | " .. durations.format(update_percentage) .. "% | " ..  durations.format(draw_percentage) .. "% | " ..  durations.format(total_percentage) .. "%"
+                local label = tostring(fps) .. " | " .. durations.format(update_percentage) .. "% | " ..  durations.format(draw_percentage) .. "% | " .. n_draws .. " (" .. n_texture_switches .. ") | " .. n_textures
                 love.graphics.setColor(1, 1, 1, 0.75)
                 local margin = 3
-                love.graphics.print(label, math.floor(rt.graphics.get_width() - love.graphics.getFont():getWidth(label) - 2 * margin), math.floor(0.5 * margin))
+                local label_w, label_h = love.graphics.getFont():getWidth(label), love.graphics.getFont():getHeight(label)
+                love.graphics.print(label, math.floor(rt.graphics.get_width() - label_w - 2 * margin), math.floor(0.5 * margin))
             end
 
             love.graphics.present()
         end
 
         durations.n_frames = durations.n_frames + 1
-        if durations.n_frames > 90 and self._state.show_fps == true then
+
+        if durations.n_frames > 90 and self._state.show_diagnostics == true then
             table.insert(durations.update_durations, update_duration)
             table.insert(durations.draw_durations, draw_duration)
             table.insert(durations.total_durations, total_duration)
+            table.insert(durations.n_draws, stats.drawcalls)
+            table.insert(durations.n_texture_switches, stats.canvasswitches)
 
             local update_update = durations.update_durations[1] == durations.max_update_duration
             local update_draw = durations.draw_durations[1] == durations.max_draw_duration
             local update_total = durations.total_durations[1] == durations.max_total_duration
+            local update_draws = durations.n_draws[1] == durations.max_n_draws
+            local update_texture_switches = durations.n_texture_switches[1] == durations.max_n_texture_switches
 
             durations.n_frames = durations.n_frames - 1
             table.remove(durations.update_durations, 1)
             table.remove(durations.draw_durations, 1)
             table.remove(durations.total_durations, 1)
+            table.remove(durations.n_draws, 1)
+            table.remove(durations.n_texture_switches, 1)
 
-            -- only recompute new max duration if necessary
-            if update_update then durations.max_update_duration = 0 end
-            if update_draw then durations.max_draw_duration = 0 end
-            if update_total then durations.max_total_duration = 0 end
+            if update_update then durations.max_update_duration = NEGATIVE_INFINITY end
+            if update_draw then durations.max_draw_duration = NEGATIVE_INFINITY end
+            if update_total then durations.max_total_duration = NEGATIVE_INFINITY end
+            if update_draws then durations.max_n_draws = NEGATIVE_INFINITY end
+            if update_texture_switches then durations.max_n_texture_switches = NEGATIVE_INFINITY end
 
             for i = 1, durations.n_frames do
                 if update_update then
@@ -388,19 +406,30 @@ function rt.GameState:run()
                 if update_total then
                     durations.max_total_duration = math.max(durations.max_total_duration, durations.total_durations[i])
                 end
+
+                if update_draws then
+                    durations.max_n_draws = math.max(durations.max_n_draws, durations.n_draws[i])
+                end
+
+                if update_texture_switches then
+                    durations.max_n_texture_switches = math.max(durations.max_n_texture_switches, durations.n_texture_switches[i])
+                end
             end
         else
             table.insert(durations.update_durations, update_duration)
             table.insert(durations.draw_durations, draw_duration)
             table.insert(durations.total_durations, total_duration)
+            table.insert(durations.n_draws, stats.drawcalls + stats.drawcallsbatched)
+            table.insert(durations.n_texture_switches, stats.canvasswitches)
 
             durations.max_update_duration = math.max(durations.max_update_duration, update_duration)
             durations.max_draw_duration = math.max(durations.max_draw_duration, draw_duration)
             durations.max_total_duration = math.max(durations.max_total_duration, total_duration)
+            durations.max_n_draws = math.max(durations.max_n_draws, stats.drawcalls + stats.drawcallsbatched)
+            durations.max_n_texture_switches = math.max(durations.max_n_texture_switches, stats.canvasswitches)
         end
 
-        collectgarbage("collect") -- force gc
-
+        collectgarbage("collect")
         if love.timer then love.timer.sleep(0.001) end -- limit max tick rate of while true
     end
 end

@@ -113,7 +113,6 @@ function rt.Label:size_allocate(x, y, width, height)
         elseif meta.isa(glyph, rt.Glyph) then
             local w, h = glyph:get_size()
             if glyph_x - x + w >= width and not one_word_mode then
-                dbg(glyph:get_content(), width)
                 glyph_x = x
                 glyph_y = glyph_y + line_height
                 glyph:set_position(glyph_x, glyph_y)

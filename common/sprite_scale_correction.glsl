@@ -1,5 +1,6 @@
 uniform vec2 texture_resolution;
 
+// https://github.com/Nikaoto/subpixel/blob/master/subpixel_grad.frag
 vec4 effect(vec4 color, sampler2D tex, vec2 uv, vec2 px)
 {
     vec2 texel_size = vec2(1.0) / texture_resolution;

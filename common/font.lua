@@ -17,6 +17,8 @@ rt.settings.font = {
     bold_fallbacks = {},        -- Table<love.Font>
 }
 
+N_FONTS = 0
+
 --- @class rt.Font
 --- @param regular_path String
 --- @param bold_path String (or nil)

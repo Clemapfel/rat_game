@@ -31,7 +31,6 @@ function b2.World:new_from_id(id)
     }, {
         __index = b2.World
     })
-    b2._initialize_debug_draw(out._debug_draw)
     return out
 end
 
@@ -69,22 +68,29 @@ function b2.World:draw()
 end
 
 --- @brief
-function b2._initialize_threads(world_def)
+function b2._initialize_threads(world_def, n_threads)
     sdl2 = ffi.load("SDL2")
-    sdl2.cdef[[
+    ffi.cdef[[
     void* SDL_CreateThread(int(*fn)(void*), const char *name, void *data);
     void SDL_WaitThread(void* thread, int *status);
     ]]
+    
+    world_def.workerCount = n_threads
 
-    -- void b2FinishTaskCallback( void* task, void* context );
+    -- void b2FinishTaskCallback(SDL_Thread* task, void* context );
     world_def.finishTask = function(task, context)
         if task ~= ffi.CNULL then
-            sdl2.WaitThread()
+            sdl2.WaitThread(task)
         end
     end
 
-    -- void* b2EnqueueTaskCallback( b2TaskCallback* task, int32_t itemCount, int32_t minRange, void* taskContext, void* userContext );
-    world_def.enqueueTask = function()
+    -- void b2TaskCallback(int32_t startIndex, int32_t endIndex, uint32_t workerIndex, void *taskContext)
+    function task_callback(start_i, end_i, thread_i, worker_i, context)
 
+    end
+
+    -- SDL_Thread* b2EnqueueTaskCallback( b2TaskCallback* task, int32_t itemCount, int32_t minRange, void* taskContext, void* userContext );
+    world_def.enqueueTask = function(task, item_count, range_min, task_context, user_context)
+        return sdl2.SDL_CreateThread()
     end
 end
