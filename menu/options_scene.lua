@@ -22,6 +22,7 @@ mn.OptionsScene = meta.new_type("MenuOptionsScene", rt.Scene, function(state)
             rt.InputButton.SELECT
         },
         _button_to_remapper = {},
+        _verbose_info = mn.VerboseInfoPanel(),
         _selection_graph = rt.SelectionGraph()
     }
 
@@ -320,6 +321,8 @@ function mn.OptionsScene:realize()
     end)
 
     self:create_from_state(self._state)
+
+    self._verbose_info_panel:realize()
 end
 
 --- @override
@@ -441,6 +444,8 @@ function mn.OptionsScene:draw()
         item.widget:draw()
         rt.graphics.translate(-item.x_offset, 0)
     end
+
+    self._verbose_info_panel:draw()
 
     for remapper in values(self._remappers) do
         remapper:draw()
