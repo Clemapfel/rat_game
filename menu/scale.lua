@@ -79,7 +79,7 @@ function mn.Scale:size_allocate(x, y, width, height)
     self._rail_center_outline_bottom:resize(rail_x, y + 0.5 * height + rail_r, rail_x + rail_w, y + 0.5 * height + rail_r)
 
     local fraction = (self._value - self._min) / (self._max - self._min)
-    local slider_x = (x + rail_r) + fraction * (width - 2 * rail_r)
+    local slider_x = x + rail_r + fraction * (width - 2 * rail_r)
     for slider in range(self._slider_body, self._slider_outline) do
         slider:resize(slider_x, y + 0.5 * height, slider_r)
     end
@@ -101,7 +101,7 @@ end
 
 --- @brief
 function mn.Scale:_quantize_value()
-    --self._value = clamp(self._value - math.fmod(self._value, self._step), self._min, self._max)
+    self._value = clamp(self._value, self._min, self._max)
 end
 
 --- @brief
