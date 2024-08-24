@@ -1,3 +1,8 @@
+rt.settings.game_state = {
+    lower_gamma_bound = 0.4,
+    upper_gamma_bound = 2.2 + 0.5
+}
+
 rt.VSyncMode = {
     ADAPTIVE = -1,
     OFF = 0,
@@ -18,8 +23,8 @@ rt.GameState = meta.new_type("GameState", function()
         -- system settings
         vsync_mode = rt.VSyncMode.ADAPTIVE,
         msaa_quality = rt.MSAAQuality.BEST,
+        gamma = 1,
         is_fullscreen = false,
-        is_borderless = false,
         resolution_x = 1280,
         resolution_y = 720,
         sfx_level = 1,
@@ -57,6 +62,9 @@ rt.GameState = meta.new_type("GameState", function()
         _entity_index_to_entity = {},
         _entity_to_entity_index = {},
         _grabbed_object = nil, -- helper for mn.InventoryScene
+        _render_shape = rt.VertexRectangle(0, 0, 1, 1),
+        _render_texture = rt.RenderTexture(1, 1),
+        _render_shader = rt.Shader("common/game_state_render_shader.glsl")
     })
 
     out:load_input_mapping()
@@ -243,30 +251,43 @@ end
 
 --- @brief
 function rt.GameState:_update_window_mode()
-    local fullscreen, fullscreentype = self._state.is_fullscreen
-    if fullscreen then
-        fullscreentype = "exclusive"
-    else
-        fullscreentype = "desktop"
+    local window_res_x, window_res_y = self._state.resolution_x, self._state.resolution_y
+    local resizable = true
+    local borderless = false
+    local centered = false
+
+    if self._state.is_fullscreen then
+        window_res_x, window_res_y = 0, 0 -- screen size
+        resizable = false
+        borderless = true
+        centered = true
     end
 
     love.window.setMode(
-        self._state.resolution_x,
-        self._state.resolution_y,
+        window_res_x,
+        window_res_y,
         {
-            fullscreen = self._state.is_fullscreen,
-            fullscreentype = fullscreentype,
+            fullscreen = false,
+            fullscreentype = "desktop",
             vsync = self._state.vsync_mode,
-            msaa = self._state.msaa_quality,
+            msaa = 0, --self._state.msaa_quality,
             stencil = true,
             depth = false,
-            resizable = not self._state.is_borderless,
-            borderless = self._state.is_borderless,
-            centered = false,
+            resizable = resizable,
+            borderless = borderless,
+            centered = self._state.is_fullscreen,
             minwidth = self._state.resolution_x,
             minheight = self._state.resolution_y
         }
     )
+
+    self._render_texture = rt.RenderTexture(
+        self._state.resolution_x,
+        self._state.resolution_y,
+        self._state.msaa_quality
+    )
+    self._render_shape = rt.VertexRectangle(0, 0, love.graphics.getWidth(), love.graphics.getHeight())
+    self._render_shape:set_texture(self._render_texture)
 end
 
 --- @brief
@@ -334,6 +355,8 @@ function rt.GameState:run()
         local stats
         local background_color = rt.Palette.TRUE_MAGENTA
         if love.graphics.isActive() then
+            self._render_texture:bind_as_render_target()
+
             love.graphics.clear(true, true, true)
             rt.graphics.reset()
             love.graphics.setColor(background_color.r, background_color.g, background_color.b, 1)
@@ -362,6 +385,13 @@ function rt.GameState:run()
                 love.graphics.print(label, math.floor(rt.graphics.get_width() - label_w - 2 * margin), math.floor(0.5 * margin))
             end
 
+            self._render_texture:unbind_as_render_target()
+            love.graphics.clear()
+            love.graphics.reset()
+            self._render_shader:bind()
+            self._render_shader:send("gamma", self._state.gamma)
+            self._render_shape:draw()
+            self._render_shader:unbind()
             love.graphics.present()
         end
 
@@ -463,17 +493,13 @@ function rt.GameState:get_is_fullscreen()
 end
 
 --- @brief
-function rt.GameState:set_is_borderless(on)
-    meta.assert_boolean(on)
-    if on ~= self._state.is_borderless then
-        self._state.is_borderless = on
-        self:_update_window_mode()
-    end
+function rt.GameState:set_gamma_level(level)
+    self._state.gamma = level
 end
 
 --- @brief
-function rt.GameState:get_is_borderless()
-    return self._state.is_borderless
+function rt.GameState:get_gamma_level()
+    return self._state.gamma
 end
 
 --- @brief

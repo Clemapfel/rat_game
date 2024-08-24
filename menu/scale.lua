@@ -106,7 +106,7 @@ end
 
 --- @brief
 function mn.Scale:_emit_value_changed()
-    self:signal_emit("value_changed", (self._value - self._min) / (self._max - self._min))
+    self:signal_emit("value_changed", self._value)
 end
 
 --- @brief

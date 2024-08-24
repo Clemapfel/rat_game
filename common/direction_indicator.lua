@@ -38,7 +38,7 @@ end)
 function rt.DirectionIndicator:draw()
     if not self:get_is_visible() then return end
 
-    rt.graphics.set_blend_mode(rt.BlendMode.NORMAL, rt.BlendMode.MULTIPLY)
+    rt.graphics.set_blend_mode(rt.BlendMode.NORMAL, rt.BlendMode.MAX)
     if self._direction == rt.Direction.NONE then
         self._ring:draw()
         self._ring_outline_outer:draw()

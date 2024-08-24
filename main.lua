@@ -31,25 +31,27 @@ love.update = function(delta)
         scene:update(delta)
     end
 
-    if love.keyboard.isDown("space") then
-        background:update(delta)
-    end
+    background:update(delta)
 end
 
 love.draw = function()
+    background:draw()
     if scene ~= nil then
         scene:draw()
     end
-    --background:draw()
 end
 
 love.resize = function()
-    local x, y, w, h = 0, 0, rt.graphics.get_width(), rt.graphics.get_height()
+    state._render_shape = rt.VertexRectangle(0, 0, love.graphics.getWidth(), love.graphics.getHeight())
+    state._render_shape:set_texture(state._render_texture)
+
+    local x, y, w, h = 0, 0, state:get_resolution()
+
+    background:fit_into(x, y, w, h)
     if scene ~= nil then
         scene:fit_into(x, y, w, h)
     end
 
-    background:fit_into(x, y, w, h)
 end
 
 love.run = function()

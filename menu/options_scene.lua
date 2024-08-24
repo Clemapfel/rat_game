@@ -51,13 +51,6 @@ mn.OptionsScene = meta.new_type("MenuOptionsScene", rt.Scene, function(state)
     fields._fullscreen_option_button = nil
     fields._fullscreen_item = nil
 
-    fields._borderless_label_text = "Borderless"
-    fields._borderless_true_label = "YES"
-    fields._borderless_false_label = "NO"
-    fields._borderless_label = nil
-    fields._borderless_option_button = nil
-    fields._borderless_item = nil
-
     fields._msaa_label_text = "MSAA"
     fields._msaa_off_label = "OFF"
     fields._msaa_good_label = "Good"
@@ -99,14 +92,6 @@ mn.OptionsScene = meta.new_type("MenuOptionsScene", rt.Scene, function(state)
             default = fields._fullscreen_false_label
         },
 
-        [fields._borderless_label_text] = {
-            options = {
-                fields._borderless_false_label,
-                fields._borderless_true_label,
-            },
-            default = fields._borderless_false_label
-        },
-
         [fields._vsync_label_text] = {
             options = {
                 fields._vsync_off_label,
@@ -139,6 +124,11 @@ mn.OptionsScene = meta.new_type("MenuOptionsScene", rt.Scene, function(state)
         }
     }
 
+    fields._gamma_text = "Gamma"
+    fields._gamma_label = nil
+    fields._gamma_scale = nil
+    fields._gamma_item = nil
+
     fields._sfx_level_text = "Sound Effects"
     fields._sfx_level_label = nil
     fields._sfx_level_scale = nil
@@ -160,6 +150,11 @@ mn.OptionsScene = meta.new_type("MenuOptionsScene", rt.Scene, function(state)
     fields._vfx_contrast_item = nil
 
     fields._level_layout = {
+        [fields._gamma_text] = {
+            range = {0.3, 2.2, 100},
+            default = 1.0
+        },
+
         [fields._sfx_level_text] = {
             range = {0, 1, 100},
             default = 50
@@ -237,16 +232,6 @@ function mn.OptionsScene:realize()
         scene._state:set_is_fullscreen(on)
     end)
 
-    create_button_and_label("borderless", self._borderless_label_text, function(_, which)
-        local on
-        if which == scene._borderless_true_label then
-            on = true
-        elseif which == scene._borderless_false_label then
-            on = false
-        end
-        scene._state:set_is_borderless(on)
-    end)
-
     create_button_and_label("vsync", self._vsync_label_text, function(_, which)
         scene._state:set_vsync_mode(scene._vsync_label_to_vsync_mode[which])
     end)
@@ -311,6 +296,10 @@ function mn.OptionsScene:realize()
         self["_" .. name .. "_item"] = item
         table.insert(scene._items, item)
     end
+
+    create_scale_and_label("gamma", self._gamma_text, function(_, fraction)
+        scene._state:set_gamma_level(fraction)
+    end)
 
     create_scale_and_label("sfx_level", self._sfx_level_text, function(_, fraction)
         scene._state:set_sfx_level(fraction)
@@ -397,12 +386,6 @@ function mn.OptionsScene:create_from_state(state)
         self._fullscreen_true_label, 
         self._fullscreen_false_label
     ))
-    
-    set_option(self._borderless_option_button, ternary(
-        self._state:get_is_borderless(),
-        self._borderless_true_label,
-        self._borderless_false_label
-    ))
 
     set_option(self._msaa_option_button, self._msaa_quality_to_msaa_label[self._state:get_msaa_quality()])
 
@@ -420,6 +403,7 @@ function mn.OptionsScene:create_from_state(state)
         scale:signal_set_is_blocked("value_changed", false)
     end
 
+    set_scale(self._gamma_scale, self._state:get_gamma_level())
     set_scale(self._sfx_level_scale, self._state:get_sfx_level())
     set_scale(self._music_level_scale, self._state:get_music_level())
     set_scale(self._vfx_motion_scale, self._state:get_vfx_motion_level())
@@ -541,7 +525,7 @@ function mn.OptionsScene:_regenerate_selection_nodes()
     for item_verbose_info_object in range(
         {self._vsync_item, rt.VerboseInfoObject.VSYNC},
         {self._fullscreen_item, rt.VerboseInfoObject.FULLSCREEN},
-        {self._borderless_item, rt.VerboseInfoObject.BORDERLESS},
+        {self._gamma_item, rt.VerboseInfoObject.GAMMA},
         {self._msaa_item, rt.VerboseInfoObject.MSAA},
         {self._resolution_item, rt.VerboseInfoObject.RESOLUTION},
         {self._sfx_level_item, rt.VerboseInfoObject.SFX_LEVEL},

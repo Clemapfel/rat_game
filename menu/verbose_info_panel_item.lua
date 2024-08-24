@@ -677,7 +677,17 @@ function mn.VerboseInfoPanel.Item:create_from_string(which)
         [rt.VerboseInfoObject.MOVE] = format_title(move_name .. "s") .. "  \u{25A0}",
         [rt.VerboseInfoObject.TEMPLATE] = format_title("Templates"),
 
-        [rt.VerboseInfoObject.OPTIONS] = format_title("Options")
+        [rt.VerboseInfoObject.OPTIONS] = format_title("Options"),
+        [rt.VerboseInfoObject.VSYNC] = format_title("Vertical Synchronization"),
+        [rt.VerboseInfoObject.FULLSCREEN] = "Fullscreen",
+        [rt.VerboseInfoObject.BORDERLRESS] = "Borderless",
+        [rt.VerboseInfoObject.MSAA] = "Multi Sample Anti Aliasing",
+        [rt.VerboseInfoObject.RESOLUTION] = "Screen Resolution",
+        [rt.VerboseInfoObject.SOUND_EFFECTS] = "Sound Effect Audio Level",
+        [rt.VerboseInfoObject.MUSIC] = "Music Audio Level",
+        [rt.VerboseInfoObject.MOTION_EFFECTS] = "Motion Effects (Screen Shake)",
+        [rt.VerboseInfoObject.VISUAL_EFFECTS] = "Background Intensity",
+        [rt.VerboseInfoObject.KEYMAP] = "keymap"
     }
 
     local descriptions = {

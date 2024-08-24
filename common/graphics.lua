@@ -59,6 +59,7 @@ rt.BlendFactor = meta.new_enum({
 
 --- @brief set blend mode
 function rt.graphics.set_blend_mode(blend_mode_rgb, blend_mode_alpha)
+
     if blend_mode_rgb == nil then blend_mode_rgb = rt.BlendMode.NORMAL end
     if blend_mode_alpha == nil then blend_mode_alpha = rt.BlendMode.NORMAL end
     if love.getVersion() >= 12 then
@@ -123,7 +124,6 @@ function rt.graphics.set_blend_mode(blend_mode_rgb, blend_mode_alpha)
         else
             rt.error("In rt.graphics.set_blend_mode: invalid alpha blend mode `" .. tostring(blend_mode_alpha) .. "`")
         end
-
         love.graphics.setBlendState(rgb_operation, alpha_operation, rgb_source_factor, alpha_source_factor, rgb_destination_factor, alpha_destination_factor)
     else
         local blend_mode = blend_mode_rgb
