@@ -22,8 +22,14 @@
     </configurations>
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="7fa9ba1b-2cff-4ecc-86fb-59ab2fa76ee1" name="Changes" comment="stashing options menu">
-      <change afterPath="$PROJECT_DIR$/vector_benchmark.lua" afterDir="false" />
+    <list default="true" id="7fa9ba1b-2cff-4ecc-86fb-59ab2fa76ee1" name="Changes" comment="added vector benchmark">
+      <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/common/widget.lua" beforeDir="false" afterPath="$PROJECT_DIR$/common/widget.lua" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/fast_physics/cdef.h" beforeDir="false" afterPath="$PROJECT_DIR$/fast_physics/cdef.h" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/main_box2d.lua" beforeDir="false" afterPath="$PROJECT_DIR$/main_box2d.lua" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/menu/options_scene.lua" beforeDir="false" afterPath="$PROJECT_DIR$/menu/options_scene.lua" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/old/include.lua" beforeDir="false" afterPath="$PROJECT_DIR$/old/include.lua" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/vector_benchmark.lua" beforeDir="false" afterPath="$PROJECT_DIR$/vector_benchmark.lua" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -487,15 +493,9 @@
       <workItem from="1724272983061" duration="21871000" />
       <workItem from="1724335305502" duration="1906000" />
       <workItem from="1724337474091" duration="1303000" />
-      <workItem from="1724427225384" duration="14373000" />
-    </task>
-    <task id="LOCAL-00940" summary="added keyboard and message dialog">
-      <option name="closed" value="true" />
-      <created>1722971920122</created>
-      <option name="number" value="00940" />
-      <option name="presentableId" value="LOCAL-00940" />
-      <option name="project" value="LOCAL" />
-      <updated>1722971920123</updated>
+      <workItem from="1724427225384" duration="14514000" />
+      <workItem from="1724444607274" duration="4551000" />
+      <workItem from="1724449250792" duration="9261000" />
     </task>
     <task id="LOCAL-00941" summary="parallelized ropes">
       <option name="closed" value="true" />
@@ -881,7 +881,15 @@
       <option name="project" value="LOCAL" />
       <updated>1724441183302</updated>
     </task>
-    <option name="localTasksCounter" value="989" />
+    <task id="LOCAL-00989" summary="added vector benchmark">
+      <option name="closed" value="true" />
+      <created>1724444592462</created>
+      <option name="number" value="00989" />
+      <option name="presentableId" value="LOCAL-00989" />
+      <option name="project" value="LOCAL" />
+      <updated>1724444592462</updated>
+    </task>
+    <option name="localTasksCounter" value="990" />
     <servers />
   </component>
   <component name="TypeScriptGeneratedFilesManager">
@@ -930,7 +938,6 @@
     </option>
   </component>
   <component name="VcsManagerConfiguration">
-    <MESSAGE value="added template load" />
     <MESSAGE value="added snapshot optimization" />
     <MESSAGE value="optimized entity info drawing" />
     <MESSAGE value="template verbose info now follows state order" />
@@ -955,7 +962,8 @@
     <MESSAGE value="added info object constants" />
     <MESSAGE value="stashing before removing keymapper" />
     <MESSAGE value="stashing options menu" />
-    <option name="LAST_COMMIT_MESSAGE" value="stashing options menu" />
+    <MESSAGE value="added vector benchmark" />
+    <option name="LAST_COMMIT_MESSAGE" value="added vector benchmark" />
   </component>
   <component name="XDebuggerManager">
     <breakpoint-manager>

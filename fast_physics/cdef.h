@@ -732,3 +732,7 @@ typedef struct Struct
 } Struct;
 
 void b2World_Draw( b2WorldId worldId, b2DebugDraw* draw );
+
+// ### Vector Math ###
+
+b2Vec2 b2Add(b2Vec2 a, b2Vec2 b);

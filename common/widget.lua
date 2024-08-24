@@ -242,9 +242,8 @@ function rt.Widget:draw_bounds()
     local as_hsva = rt.HSVA((meta.hash(self) % 100) / 100, 1, 1, 1)
     local as_rgba = rt.hsva_to_rgba(as_hsva)
     love.graphics.setColor(as_rgba.r, as_rgba.g, as_rgba.b, 0.2)
-    local w, h = self:measure()
-    love.graphics.rectangle("fill", self._bounds.x, self._bounds.y, w, h)
+    love.graphics.rectangle("fill", self._bounds.x, self._bounds.y, self._bounds.width, self._bounds.height)
     love.graphics.setColor(as_rgba.r, as_rgba.g, as_rgba.b, 1)
-    love.graphics.rectangle("line", self._bounds.x, self._bounds.y, w, h)
+    love.graphics.rectangle("line", self._bounds.x, self._bounds.y, self._bounds.width, self._bounds.height)
 end
 

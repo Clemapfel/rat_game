@@ -436,8 +436,6 @@ function mn.OptionsScene:size_allocate(x, y, width, height)
 
     start_y = start_y + control_h + m
 
-    local current_x, current_y = x + outer_margin, start_y
-
     local max_label_w, max_label_h = NEGATIVE_INFINITY, NEGATIVE_INFINITY
     local label_ws, label_hs = {}, {}
     local n_items = 0
@@ -450,7 +448,39 @@ function mn.OptionsScene:size_allocate(x, y, width, height)
         n_items = n_items + 1
     end
 
-    local label_xm = 7 * m
+    local label_left_m = outer_margin
+    local label_right_m = 7 * m
+    local widget_right_m = 2 * outer_margin
+    local button_area_left_m = outer_margin
+    local button_area_right_m = m
+    local verbose_info_right_m = outer_margin
+
+    local verbose_info_w = (width - (button_area_left_m + label_left_m + max_label_w + label_right_m + widget_right_m + button_area_right_m + verbose_info_right_m)) / 2
+    local item_vertical_m = 0.5 * m
+    local item_h = (y + height - start_y - outer_margin - (n_items - 1) * item_vertical_m) / n_items
+    local item_w = label_left_m + max_label_w + label_right_m + verbose_info_w + widget_right_m
+
+    local current_x, current_y = x + button_area_left_m, start_y
+    for i, item in ipairs(self._items) do
+        item.label:fit_into(current_x + label_left_m, current_y + 0.5 * item_h - 0.5 * max_label_h, POSITIVE_INFINITY)
+        item.widget:fit_into(
+            current_x + label_left_m + max_label_w + label_right_m,
+            current_y + 0.5 * item_h - 0.5 * max_label_h,
+            verbose_info_w,
+            max_label_h
+        )
+        item.frame:fit_into(current_x, current_y, item_w, item_h)
+        current_y = current_y + item_h + item_vertical_m
+    end
+
+    self._verbose_info_panel:fit_into(
+        x + width - verbose_info_right_m - verbose_info_w,
+        start_y,
+        verbose_info_w,
+        y + height - start_y - outer_margin
+    )
+
+    --[[
     local widget_w = 0.4 * width
     local w = widget_w + label_xm + 2 * m
 
@@ -458,7 +488,6 @@ function mn.OptionsScene:size_allocate(x, y, width, height)
     local item_h = (y + height - start_y - outer_margin - (n_items - 1) * item_spacing) / (n_items)
     local item_w = max_label_w + widget_w + 2 * m
     local item_x = x + outer_margin
-
 
     for i, item in ipairs(self._items) do
         local label_h, label_w = label_hs[i], label_ws[i]
@@ -482,6 +511,7 @@ function mn.OptionsScene:size_allocate(x, y, width, height)
         widget_w,
         height - 2 * outer_margin - control_h - m
     )
+    ]]--
 
     self:_regenerate_selection_nodes()
 end
