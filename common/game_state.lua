@@ -64,7 +64,9 @@ rt.GameState = meta.new_type("GameState", function()
         _grabbed_object = nil, -- helper for mn.InventoryScene
         _render_shape = rt.VertexRectangle(0, 0, 1, 1),
         _render_texture = rt.RenderTexture(1, 1),
-        _render_shader = rt.Shader("common/game_state_render_shader.glsl")
+        _render_shader = rt.Shader("common/game_state_render_shader.glsl"),
+
+        _current_scene = nil
     })
 
     out:load_input_mapping()
@@ -254,13 +256,11 @@ function rt.GameState:_update_window_mode()
     local window_res_x, window_res_y = self._state.resolution_x, self._state.resolution_y
     local resizable = true
     local borderless = false
-    local centered = false
 
     if self._state.is_fullscreen then
         window_res_x, window_res_y = 0, 0 -- screen size
         resizable = false
         borderless = true
-        centered = true
     end
 
     love.window.setMode(
@@ -275,7 +275,7 @@ function rt.GameState:_update_window_mode()
             depth = false,
             resizable = resizable,
             borderless = borderless,
-            centered = self._state.is_fullscreen,
+            centered = true,
             minwidth = self._state.resolution_x,
             minheight = self._state.resolution_y
         }
@@ -286,12 +286,12 @@ function rt.GameState:_update_window_mode()
         self._state.resolution_y,
         self._state.msaa_quality
     )
-    self._render_shape = rt.VertexRectangle(0, 0, love.graphics.getWidth(), love.graphics.getHeight())
-    self._render_shape:set_texture(self._render_texture)
+    self._render_texture:set_scale_mode(rt.TextureScaleMode.LINEAR)
+    self:_resize(love.graphics.getWidth(), love.graphics.getHeight())
 end
 
 --- @brief
-function rt.GameState:run()
+function rt.GameState:_run()
     love.window.setTitle("rat_game")
     love.window.setIcon(love.image.newImageData("assets/favicon.png"))
     love.filesystem.setIdentity("rat_game")
@@ -463,6 +463,45 @@ function rt.GameState:run()
     end
 end
 
+--- @brief
+function rt.GameState:_resize(new_width, new_height)
+    self._render_shape = rt.VertexRectangle(0, 0, new_width, new_height)
+    self._render_shape:set_texture(self._render_texture)
+
+    if self._current_scene ~= nil then
+        self._current_scene:fit_into(0, 0, self._state.resolution_x, self._state.resolution_y)
+    end
+end
+
+--- @brief
+function rt.GameState:_update(delta)
+    if self._current_scene ~= nil then
+        self._current_scene:update(delta)
+    end
+end
+
+--- @brief
+function rt.GameState:_load()
+    if self._current_scene ~= nil then
+        self._current_scene:realize()
+        self._current_scene:fit_into(0, 0, self._state.resolution_x, self._state.resolution_y)
+    end
+end
+
+--- @brief
+function rt.GameState:_draw()
+    if self._current_scene ~= nil then
+        self._current_scene:draw()
+    end
+end
+
+--- @brief
+function rt.GameState:set_current_scene(scene)
+    meta.assert_isa(scene, rt.Scene)
+    self._current_scene = scene
+    self:_load()
+end
+
 rt.VSyncMode = {
     ADAPTIVE = -1,
     OFF = 0,
@@ -485,6 +524,7 @@ end
 function rt.GameState:set_is_fullscreen(on)
     meta.assert_boolean(on)
     self._state.is_fullscreen = on
+    self:_update_window_mode()
 end
 
 --- @brief

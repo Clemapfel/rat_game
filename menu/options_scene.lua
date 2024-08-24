@@ -205,7 +205,7 @@ function mn.OptionsScene:realize()
 
         scene["_" .. name .. "_label"] = label
         scene["_" .. name .. "_option_button"] = button
-        --scene["_" .. name .. "_option_button"]:signal_connect("selection", handler)
+        scene["_" .. name .. "_option_button"]:signal_connect("selection", handler)
 
         local frame = rt.Frame()
         frame:realize()

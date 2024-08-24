@@ -2,15 +2,30 @@ require "include"
 
 state = rt.GameState()
 state:initialize_debug_state()
-scene = mn.InventoryScene(state)
-scene = mn.OptionsScene(state)
+
+main_to_worker, worker_to_main = love.thread.newChannel(), love.thread.newChannel()
+thread = love.thread.newThread("common/loading_screen.lua")
+
+thread:start(main_to_worker, worker_to_main)
+
+inventory_scene = mn.InventoryScene(state)
+inventory_scene:realize()
+
+option_scene = mn.OptionsScene(state)
+option_scene:realize()
+
+local which_scene = true
+
+state:set_current_scene(option_scene)
 
 input = rt.InputController()
 input:signal_connect("pressed", function(_, which)
-end)
-
-input:signal_connect("keyboard_pressed_raw", function(_, raw, scancode)
-    --dbg(raw, scancode)
+    which_scene = not which_scene
+    if which_scene == true then
+        state:set_current_scene(inventory_scene)
+    else
+        state:set_current_scene(option_scene)
+    end
 end)
 
 state:set_input_button_keyboard_key(rt.InputButton.UP, rt.KeyboardKey.A)
@@ -19,41 +34,38 @@ background = bt.Background.VORONOI_CRYSTALS()
 background:realize()
 
 love.load = function()
-    if scene ~= nil then
-        scene:realize()
-        scene:create_from_state(state)
-        love.resize()
-    end
+    background:realize()
+    state:_load()
+
+    love.resize(love.graphics.getWidth(), love.graphics.getHeight())
 end
 
 love.update = function(delta)
-    if scene ~= nil then
-        scene:update(delta)
-    end
-
     background:update(delta)
+    state:_update(delta)
+
+    if canvas == nil then
+        local maybe = worker_to_main:peek()
+        if maybe ~= nil then
+            canvas = maybe
+        end
+    end
 end
 
 love.draw = function()
     background:draw()
-    if scene ~= nil then
-        scene:draw()
+    state:_draw()
+
+    if canvas ~= nil then
+        love.graphics.draw(canvas)
     end
 end
 
-love.resize = function()
-    state._render_shape = rt.VertexRectangle(0, 0, love.graphics.getWidth(), love.graphics.getHeight())
-    state._render_shape:set_texture(state._render_texture)
-
-    local x, y, w, h = 0, 0, state:get_resolution()
-
-    background:fit_into(x, y, w, h)
-    if scene ~= nil then
-        scene:fit_into(x, y, w, h)
-    end
-
+love.resize = function(new_width, new_height)
+    background:fit_into(0, 0, state:get_resolution())
+    state:_resize(new_width, new_height)
 end
 
 love.run = function()
-    state:run()
+    state:_run()
 end

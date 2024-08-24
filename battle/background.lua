@@ -20,7 +20,7 @@ bt.ShaderOnlyBackground = meta.new_type("ShaderOnlyBackground", bt.Background, f
         _elapsed = rt.random.number(0, 2^8),
         _disable_elapsed = disabled_elapsed,
         _enable_compression = which(enable_compression, false),
-        _render_texture = {},
+        _render_texture = rt.RenderTexture(1, 1),
         _position_x = 0,
         _position_y = 0
     })

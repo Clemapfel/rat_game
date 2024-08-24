@@ -24,7 +24,7 @@ mn.EntityInfo = meta.new_type("MenuEntityInfo", rt.Widget, function(entity)
         _speed_preview_active = false,
         _speed_no_preview_offset = 0,
 
-        _snapshot = nil, -- rt.RenderTexture
+        _snapshot = rt.RenderTexture(1, 1), -- rt.RenderTexture
         _snapshot_x = 0,
         _snapshot_y = 0,
     })
