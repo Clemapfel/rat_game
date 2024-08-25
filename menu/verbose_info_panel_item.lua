@@ -729,7 +729,7 @@ function mn.VerboseInfoPanel.Item:create_from_enum(which)
         [rt.VerboseInfoObject.OPTIONS] = "Option Description, TODO",
 
         [rt.VerboseInfoObject.VSYNC] = "Synchronizes game refresh rate with that of the screen, preventing screen sharing. When 'adaptive', dynamically turns of vsync depending on the frame rate.",
-        [rt.VerboseInfoObject.MSAA] = "Smoothes corners and sharp edges, but decreases performance.",
+        [rt.VerboseInfoObject.MSAA] = "Reduces artifacting along lines and sharp edges, but decreases performance",
         [rt.VerboseInfoObject.GAMMA] = "Changes brightness of the screen",
         [rt.VerboseInfoObject.FULLSCREEN] = "Whether the window should fill the entire screen",
         [rt.VerboseInfoObject.RESOLUTION] = "Resolution of the window, also sets minimum size.",
@@ -859,7 +859,6 @@ function mn.VerboseInfoPanel.Item:create_as_visual_effects_widget()
     end
 end
 
-
 function mn.VerboseInfoPanel.Item:create_as_motion_effects_widget()
     self.object = nil
     self._is_realized = false
@@ -869,6 +868,44 @@ function mn.VerboseInfoPanel.Item:create_as_motion_effects_widget()
         self.frame:realize()
 
         self.widget = mn.ShakeIntensityWidget()
+        self.widget:realize()
+
+        self.content = {
+            self.widget
+        }
+    end
+
+    self.size_allocate = function(self, x, y, width, height)
+        local m, xm, ym = self._get_margin()
+        ym = 2 * ym
+        local w = 0.75 * (width - 2 * xm)
+        height = w + 2 * ym
+        self.widget:fit_into(
+            x + 0.5 * width - 0.5 * w,
+            y + 0.5 * height - 0.5 * w,
+            w,
+            w
+        )
+
+        self.frame:fit_into(x, y, width, height)
+        self.final_height = height
+    end
+
+    self.update = function(self, delta)
+        self.widget:update(delta)
+    end
+end
+
+
+function mn.VerboseInfoPanel.Item:create_as_msaa_widget()
+    self.object = nil
+    self._is_realized = false
+
+    self.realize = function()
+        self._is_realized = true
+        self.frame:realize()
+
+        self.widget = mn.MSAAIntensityWidget()
         self.widget:realize()
 
         self.content = {

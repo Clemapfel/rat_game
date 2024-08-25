@@ -146,6 +146,7 @@ require "menu.option_button"
 require "menu.scale"
 require "menu.keybinding_indicator"
 require "menu.shake_intensity_widget"
+require "menu.msaa_intensity_widget"
 require "menu.options_scene"
 
 -- state

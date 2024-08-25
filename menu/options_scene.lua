@@ -493,7 +493,7 @@ function mn.OptionsScene:_regenerate_selection_nodes()
         {self._vsync_item, rt.VerboseInfoObject.VSYNC},
         {self._fullscreen_item, rt.VerboseInfoObject.FULLSCREEN},
         {self._gamma_item, {rt.VerboseInfoObject.GAMMA, rt.VerboseInfoObject.GAMMA_WIDGET}},
-        {self._msaa_item, rt.VerboseInfoObject.MSAA},
+        {self._msaa_item, {rt.VerboseInfoObject.MSAA, rt.VerboseInfoObject.MSAA_WIDGET}},
         {self._resolution_item, rt.VerboseInfoObject.RESOLUTION},
         {self._sfx_level_item, rt.VerboseInfoObject.SOUND_EFFECTS},
         {self._music_level_item, rt.VerboseInfoObject.MUSIC_LEVEL},
