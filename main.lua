@@ -3,11 +3,6 @@ require "include"
 state = rt.GameState()
 state:initialize_debug_state()
 
-main_to_worker, worker_to_main = love.thread.newChannel(), love.thread.newChannel()
-thread = love.thread.newThread("common/loading_screen.lua")
-
-thread:start(main_to_worker, worker_to_main)
-
 inventory_scene = mn.InventoryScene(state)
 inventory_scene:realize()
 
@@ -20,12 +15,7 @@ state:set_current_scene(option_scene)
 
 input = rt.InputController()
 input:signal_connect("pressed", function(_, which)
-    which_scene = not which_scene
-    if which_scene == true then
-        state:set_current_scene(inventory_scene)
-    else
-        state:set_current_scene(option_scene)
-    end
+
 end)
 
 state:set_input_button_keyboard_key(rt.InputButton.UP, rt.KeyboardKey.A)
@@ -43,13 +33,6 @@ end
 love.update = function(delta)
     background:update(delta)
     state:_update(delta)
-
-    if canvas == nil then
-        local maybe = worker_to_main:peek()
-        if maybe ~= nil then
-            canvas = maybe
-        end
-    end
 end
 
 love.draw = function()

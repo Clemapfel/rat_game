@@ -22,18 +22,22 @@
     </configurations>
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="7fa9ba1b-2cff-4ecc-86fb-59ab2fa76ee1" name="Changes" comment="fixed slider alignment">
-      <change afterPath="$PROJECT_DIR$/common/game_state_render_shader.glsl" afterDir="false" />
+    <list default="true" id="7fa9ba1b-2cff-4ecc-86fb-59ab2fa76ee1" name="Changes" comment="made scene part of state">
+      <change afterPath="$PROJECT_DIR$/battle/backgrounds/contrast_test.glsl" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/battle/backgrounds/contrast_test.lua" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/common/spline.lua" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/menu/shake_intensity_widget.lua" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/common/direction_indicator.lua" beforeDir="false" afterPath="$PROJECT_DIR$/common/direction_indicator.lua" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/battle/background.lua" beforeDir="false" afterPath="$PROJECT_DIR$/battle/background.lua" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/common/game_state.lua" beforeDir="false" afterPath="$PROJECT_DIR$/common/game_state.lua" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/common/graphics.lua" beforeDir="false" afterPath="$PROJECT_DIR$/common/graphics.lua" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/common/render_texture.lua" beforeDir="false" afterPath="$PROJECT_DIR$/common/render_texture.lua" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/common/shader.lua" beforeDir="false" afterPath="$PROJECT_DIR$/common/shader.lua" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/include.lua" beforeDir="false" afterPath="$PROJECT_DIR$/include.lua" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/main.lua" beforeDir="false" afterPath="$PROJECT_DIR$/main.lua" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/menu/inventory_scene.lua" beforeDir="false" afterPath="$PROJECT_DIR$/menu/inventory_scene.lua" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/menu/options_scene.lua" beforeDir="false" afterPath="$PROJECT_DIR$/menu/options_scene.lua" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/menu/scale.lua" beforeDir="false" afterPath="$PROJECT_DIR$/menu/scale.lua" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/menu/verbose_info_panel.lua" beforeDir="false" afterPath="$PROJECT_DIR$/menu/verbose_info_panel.lua" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/menu/verbose_info_panel_item.lua" beforeDir="false" afterPath="$PROJECT_DIR$/menu/verbose_info_panel_item.lua" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/old/menu/scene.lua" beforeDir="false" afterPath="$PROJECT_DIR$/old/menu/scene.lua" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -133,11 +137,11 @@
       <recent name="C:\Users\cleme\Workspace\rat_game\assets\sprites\battle" />
     </key>
     <key name="MoveFile.RECENT_KEYS">
+      <recent name="C:\Users\cleme\Workspace\rat_game\assets\sprites" />
       <recent name="C:\Users\cleme\Workspace\rat_game" />
       <recent name="C:\Users\cleme\Workspace\rat_game\fast_physics" />
       <recent name="C:\Users\cleme\Workspace\rat_game\menu" />
       <recent name="C:\Users\cleme\Workspace\rat_game\assets\sprites\battle" />
-      <recent name="C:\Users\cleme\Workspace\rat_game\common" />
     </key>
   </component>
   <component name="RunManager" selected="Lua Application.main">
@@ -499,23 +503,7 @@
       <workItem from="1724337474091" duration="1303000" />
       <workItem from="1724427225384" duration="14514000" />
       <workItem from="1724444607274" duration="4551000" />
-      <workItem from="1724449250792" duration="14394000" />
-    </task>
-    <task id="LOCAL-00943" summary="stashing rope">
-      <option name="closed" value="true" />
-      <created>1722993224852</created>
-      <option name="number" value="00943" />
-      <option name="presentableId" value="LOCAL-00943" />
-      <option name="project" value="LOCAL" />
-      <updated>1722993224852</updated>
-    </task>
-    <task id="LOCAL-00944" summary="added save file">
-      <option name="closed" value="true" />
-      <created>1723075334596</created>
-      <option name="number" value="00944" />
-      <option name="presentableId" value="LOCAL-00944" />
-      <option name="project" value="LOCAL" />
-      <updated>1723075334597</updated>
+      <workItem from="1724449250792" duration="30309000" />
     </task>
     <task id="LOCAL-00945" summary="stashing cloth">
       <option name="closed" value="true" />
@@ -893,7 +881,23 @@
       <option name="project" value="LOCAL" />
       <updated>1724520350450</updated>
     </task>
-    <option name="localTasksCounter" value="992" />
+    <task id="LOCAL-00992" summary="added gamma correction">
+      <option name="closed" value="true" />
+      <created>1724523294299</created>
+      <option name="number" value="00992" />
+      <option name="presentableId" value="LOCAL-00992" />
+      <option name="project" value="LOCAL" />
+      <updated>1724523294299</updated>
+    </task>
+    <task id="LOCAL-00993" summary="made scene part of state">
+      <option name="closed" value="true" />
+      <created>1724527646994</created>
+      <option name="number" value="00993" />
+      <option name="presentableId" value="LOCAL-00993" />
+      <option name="project" value="LOCAL" />
+      <updated>1724527646994</updated>
+    </task>
+    <option name="localTasksCounter" value="994" />
     <servers />
   </component>
   <component name="TypeScriptGeneratedFilesManager">
@@ -942,8 +946,6 @@
     </option>
   </component>
   <component name="VcsManagerConfiguration">
-    <MESSAGE value="template verbose info now follows state order" />
-    <MESSAGE value="stashing option button" />
     <MESSAGE value="stashing scrolling" />
     <MESSAGE value="added scale" />
     <MESSAGE value="stashing voro" />
@@ -967,7 +969,9 @@
     <MESSAGE value="added vector benchmark" />
     <MESSAGE value="options scene layout done" />
     <MESSAGE value="fixed slider alignment" />
-    <option name="LAST_COMMIT_MESSAGE" value="fixed slider alignment" />
+    <MESSAGE value="added gamma correction" />
+    <MESSAGE value="made scene part of state" />
+    <option name="LAST_COMMIT_MESSAGE" value="made scene part of state" />
   </component>
   <component name="XDebuggerManager">
     <breakpoint-manager>
@@ -979,7 +983,7 @@
         </line-breakpoint>
         <line-breakpoint enabled="true" type="lua-line">
           <url>file://$PROJECT_DIR$/old/menu/scene.lua</url>
-          <line>333</line>
+          <line>332</line>
           <option name="timeStamp" value="9" />
         </line-breakpoint>
       </breakpoints>

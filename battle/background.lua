@@ -1,5 +1,6 @@
 rt.settings.battle.background = {
-    compression = 1.0
+    compression = 1.0,
+    contrast = 0.5
 }
 
 --- @class bt.Background
@@ -16,6 +17,7 @@ bt.ShaderOnlyBackground = meta.new_type("ShaderOnlyBackground", bt.Background, f
     return meta.new(bt.ShaderOnlyBackground, {
         _path = path,
         _shader = {},   -- rt.Shader
+        _mask_shape = {}, -- rt.VertexShape
         _shape = {},    -- rt.VertexShape
         _elapsed = rt.random.number(0, 2^8),
         _disable_elapsed = disabled_elapsed,
@@ -32,14 +34,23 @@ function bt.ShaderOnlyBackground:realize()
     self._is_realized = true
     self._shader = rt.Shader(self._path)
     self._shape = rt.VertexRectangle(0, 0, 1, 1)
+    self._mask_shape = rt.VertexRectangle(0, 0, 1, 1)
+
+    local contrast = rt.settings.contrast
+    for i = 1, 4 do
+        self._shape:set_vertex_color(i, rt.RGBA(1, 1, 1, 1))
+        self._mask_shape:set_vertex_color(i, rt.RGBA(0, 0, 0, 1 - contrast))
+    end
 end
 
 --- @override
 function bt.ShaderOnlyBackground:size_allocate(x, y, width, height)
-    self._shape:set_vertex_position(1, x, y)
-    self._shape:set_vertex_position(2, x + width, y)
-    self._shape:set_vertex_position(3, x + width, y + height)
-    self._shape:set_vertex_position(4, x, y + height)
+    for shape in range(self._shape, self._mask_shape) do
+        shape:set_vertex_position(1, x, y)
+        shape:set_vertex_position(2, x + width, y)
+        shape:set_vertex_position(3, x + width, y + height)
+        shape:set_vertex_position(4, x, y + height)
+    end
 
     local factor = rt.settings.battle.background.compression
     self._render_texture = rt.RenderTexture(factor * width, factor * height)
@@ -54,12 +65,17 @@ function bt.ShaderOnlyBackground:update(delta)
     if self._is_realized ~= true then return end
     self._elapsed = self._elapsed + delta
 
-    if self._disable_elapsed ~= false then
+    if self._shader:has_uniform("elapsed") then
         self._shader:send("elapsed", self._elapsed)
     end
 
     if self._enable_compression then
         self._shader:send("compression", rt.settings.battle.background.compression)
+    end
+
+    local contrast = rt.settings.battle.background.contrast
+    for i = 1, 4 do
+        self._mask_shape:set_vertex_color(i, rt.RGBA(contrast, contrast, contrast, 1))
     end
 
     self._render_texture:bind_as_render_target()
@@ -73,7 +89,14 @@ end
 --- @override
 function bt.ShaderOnlyBackground:draw()
     if self._is_realized ~= true then return end
+
+    self._shader:bind()
     self._shape:draw()
+    self._shader:unbind()
+
+    rt.graphics.set_blend_mode(rt.BlendMode.MULTIPLY, rt.BlendMode.NORMAL)
+    self._mask_shape:draw()
+    rt.graphics.set_blend_mode()
 end
 
 -- include all implementations

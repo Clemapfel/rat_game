@@ -3,6 +3,11 @@ rt.settings.game_state = {
     upper_gamma_bound = 2.2 + 0.5
 }
 
+rt.settings.contrast = 1.0
+rt.settings.motion_intensity = 1.0
+rt.settings.music_level = 1.0
+rt.settings.sfx_level = 1.0
+
 rt.VSyncMode = {
     ADAPTIVE = -1,
     OFF = 0,
@@ -288,6 +293,9 @@ function rt.GameState:_update_window_mode()
     )
     self._render_texture:set_scale_mode(rt.TextureScaleMode.LINEAR)
     self:_resize(love.graphics.getWidth(), love.graphics.getHeight())
+
+    rt.settings.contrast = self._state.vfx_contrast_level
+    rt.settings.motion_intensity = self._state.vfx_motion_level
 end
 
 --- @brief
@@ -604,13 +612,14 @@ function rt.GameState:get_music_level()
 end
 
 --- @brief
-function rt.GameState:set_vfx_motion_level(fraction)
+function rt.GameState:set_motion_intensity(fraction)
     meta.assert_number(fraction)
     if fraction < 0 or fraction > 1 then
-        rt.error("In rt.GameState:set_vfx_motion_level: level `" .. fraction .. "` is outside [0, 1]")
+        rt.error("In rt.GameState:set_motion_intensity: level `" .. fraction .. "` is outside [0, 1]")
         fraction = clamp(fraction, 0, 1)
     end
     self._state.vfx_motion_level = fraction
+    rt.settings.motion_intensity = fraction
 end
 
 --- @brief
@@ -625,7 +634,8 @@ function rt.GameState:set_vfx_contrast_level(fraction)
         rt.error("In rt.GameState:set_vfx_contrast_level: level `" .. fraction .. "` is outside [0, 1]")
         fraction = clamp(fraction, 0, 1)
     end
-    self._state.vfx_contrast_level = fraction
+    self._state.vfx_contrast_level = clamp(fraction, 0, 1)
+    rt.settings.battle.background.contrast = fraction
 end
 
 --- @brief

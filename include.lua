@@ -96,6 +96,7 @@ require "common.shape_rectangle"
 require "common.shape_polygon"
 require "common.shape_ellipse"
 require "common.vertex_shape"
+require "common.spline"
 
 require "common.widget"
 require "common.font"
@@ -144,6 +145,7 @@ require "menu.inventory_scene"
 require "menu.option_button"
 require "menu.scale"
 require "menu.keybinding_indicator"
+require "menu.shake_intensity_widget"
 require "menu.options_scene"
 
 -- state

@@ -15,6 +15,7 @@ mn.VerboseInfoPanel.Item = meta.new_type("MenuVerboseInfoPanelItem", rt.Widget, 
     return out
 end)
 
+--- @override
 function mn.VerboseInfoPanel.Item:draw()
     self.frame:draw()
     for object in values(self.content) do
@@ -22,13 +23,15 @@ function mn.VerboseInfoPanel.Item:draw()
     end
 end
 
+--- @override
 function mn.VerboseInfoPanel.Item:measure()
     return self._bounds.width, self.final_height
 end
 
+--- @brief
 function mn.VerboseInfoPanel.Item:create_from(object)
-    if meta.is_string(object) then
-        self:create_from_string(object)
+    if meta.is_enum_value(object, rt.VerboseInfoObject) then
+        self:create_from_enum(object)
     elseif meta.isa(object, bt.Equip) then
         self:create_from_equip(object)
     elseif meta.isa(object, bt.Move) then
@@ -128,6 +131,8 @@ end
 --- @brief equip
 function mn.VerboseInfoPanel.Item:create_from_equip(equip)
     self.object = equip
+    self._is_realized = false
+
     self.realize = function(self)
         self._is_realized = true
 
@@ -298,6 +303,8 @@ end
 --- @brief move
 function mn.VerboseInfoPanel.Item:create_from_move(move)
     self.object = move
+    self._is_realized = false
+
     self.realize = function(self)
         self._is_realized = true
         self.frame:realize()
@@ -416,6 +423,8 @@ end
 --- @brief consumable
 function mn.VerboseInfoPanel.Item:create_from_consumable(consumable)
     self.object = consumable
+    self._is_realized = false
+
     self.realize = function(self)
         self._is_realized = true
         self.frame:realize()
@@ -483,7 +492,7 @@ end
 --- @brief party info
 function mn.VerboseInfoPanel.Item:create_from_template(template)
     self.object = nil
-    self._is_realized = true
+    self._is_realized = false
 
     local format_title = function(str)
         return "<b><u>" .. str .. "</u></b>"
@@ -654,9 +663,23 @@ function mn.VerboseInfoPanel.Item:create_from_template(template)
 end
 
 --- @brief party info
-function mn.VerboseInfoPanel.Item:create_from_string(which)
+function mn.VerboseInfoPanel.Item:create_from_enum(which)
     self.object = nil
-    self._is_realized = true
+    self._is_realized = false
+
+    if which == rt.VerboseInfoObject.MSAA_WIDGET then
+        self:create_as_msaa_widget()
+        return
+    elseif which == rt.VerboseInfoObject.GAMMA_WIDGET then
+        self:create_as_gamma_widget()
+        return
+    elseif which == rt.VerboseInfoObject.MOTION_EFFECTS_WIDGET then
+        self:create_as_motion_effects_widget()
+        return
+    elseif which == rt.VerboseInfoObject.VISUAL_EFFECTS_WIDGET then
+        self:create_as_visual_effects_widget()
+        return
+    end
 
     local format_title = function(str)
         return "<b><u>" .. str .. "</u></b>"
@@ -679,15 +702,17 @@ function mn.VerboseInfoPanel.Item:create_from_string(which)
 
         [rt.VerboseInfoObject.OPTIONS] = format_title("Options"),
         [rt.VerboseInfoObject.VSYNC] = format_title("Vertical Synchronization"),
-        [rt.VerboseInfoObject.FULLSCREEN] = "Fullscreen",
-        [rt.VerboseInfoObject.BORDERLRESS] = "Borderless",
-        [rt.VerboseInfoObject.MSAA] = "Multi Sample Anti Aliasing",
-        [rt.VerboseInfoObject.RESOLUTION] = "Screen Resolution",
-        [rt.VerboseInfoObject.SOUND_EFFECTS] = "Sound Effect Audio Level",
-        [rt.VerboseInfoObject.MUSIC] = "Music Audio Level",
-        [rt.VerboseInfoObject.MOTION_EFFECTS] = "Motion Effects (Screen Shake)",
-        [rt.VerboseInfoObject.VISUAL_EFFECTS] = "Background Intensity",
-        [rt.VerboseInfoObject.KEYMAP] = "keymap"
+        [rt.VerboseInfoObject.GAMMA] = format_title("Brightness (Gamma)"),
+        [rt.VerboseInfoObject.FULLSCREEN] = format_title("Fullscreen"),
+        [rt.VerboseInfoObject.RESOLUTION] = format_title("Screen Resolution"),
+        [rt.VerboseInfoObject.SOUND_EFFECTS] = format_title("Sound Effect Audio Level"),
+        [rt.VerboseInfoObject.MUSIC] = format_title("Music Audio Level"),
+
+        [rt.VerboseInfoObject.MOTION_EFFECTS] = format_title("Screen Shake"),
+        [rt.VerboseInfoObject.VISUAL_EFFECTS] = format_title("Background Intensity"),
+        [rt.VerboseInfoObject.MSAA] = format_title("Multi Sample Anti Aliasing (MSAA)"),
+
+        [rt.VerboseInfoObject.KEYMAP] = "Controls"
     }
 
     local descriptions = {
@@ -701,7 +726,20 @@ function mn.VerboseInfoPanel.Item:create_from_string(which)
         [rt.VerboseInfoObject.MOVE] = "Move Description, TODO",
         [rt.VerboseInfoObject.TEMPLATE] = "Template Description, TODO",
 
-        [rt.VerboseInfoObject.OPTIONS] = "Option Description, TODO"
+        [rt.VerboseInfoObject.OPTIONS] = "Option Description, TODO",
+
+        [rt.VerboseInfoObject.VSYNC] = "Synchronizes game refresh rate with that of the screen, preventing screen sharing. When 'adaptive', dynamically turns of vsync depending on the frame rate.",
+        [rt.VerboseInfoObject.MSAA] = "Smoothes corners and sharp edges, but decreases performance.",
+        [rt.VerboseInfoObject.GAMMA] = "Changes brightness of the screen",
+        [rt.VerboseInfoObject.FULLSCREEN] = "Whether the window should fill the entire screen",
+        [rt.VerboseInfoObject.RESOLUTION] = "Resolution of the window, also sets minimum size.",
+        [rt.VerboseInfoObject.SOUND_EFFECTS] = "Loudness of all sounds except music",
+        [rt.VerboseInfoObject.MUSIC] = "Loudness of music",
+
+        [rt.VerboseInfoObject.MOTION_EFFECTS] = "Intensity of screen shake and other motion-based animations",
+        [rt.VerboseInfoObject.VISUAL_EFFECTS] = "Intensity of background TODO",
+
+        [rt.VerboseInfoObject.KEYMAP] = "Remap keyboard / controller controls",
     }
 
     self.realize = function()
@@ -716,7 +754,7 @@ function mn.VerboseInfoPanel.Item:create_from_string(which)
 
         self.content = {
             self.title_label,
-            self.description_label
+            self.description_label,
         }
     end
 
@@ -732,6 +770,7 @@ function mn.VerboseInfoPanel.Item:create_from_string(which)
         self.description_label:fit_into(current_x, current_y, w)
 
         current_y = current_y + select(2, self.description_label:measure()) + m
+
         local total_height = current_y - start_y + 2 * ym
         self.frame:fit_into(x, y, width, total_height)
         self.final_height = total_height
@@ -743,3 +782,119 @@ function mn.VerboseInfoPanel.Item:create_from_string(which)
 
     return self
 end
+
+function mn.VerboseInfoPanel.Item:create_as_gamma_widget()
+    self.object = nil
+    self._is_realized = false
+
+    self.realize = function()
+        self._is_realized = true
+        self.frame:realize()
+
+        self.widget = rt.Sprite("gamma_test_image")
+        self.widget:realize()
+
+        self.content = {
+            self.widget
+        }
+    end
+
+    self.size_allocate = function(self, x, y, width, height)
+        local m, xm, ym = self._get_margin()
+        ym = 2 * ym
+        local w = 0.75 * (width - 2 * xm)
+        height = w + 2 * ym
+        self.widget:fit_into(
+            x + 0.5 * width - 0.5 * w,
+            y + 0.5 * height - 0.5 * w,
+            w,
+            w
+        )
+
+        self.frame:fit_into(x, y, width, height)
+        self.final_height = height
+    end
+
+    self.measure = function(self)
+        return self._bounds.width, self.final_height
+    end
+
+    return self
+end
+
+function mn.VerboseInfoPanel.Item:create_as_visual_effects_widget()
+    self.object = nil
+    self._is_realized = false
+
+    self.realize = function()
+        self._is_realized = true
+        self.frame:realize()
+
+        self.widget = bt.Background.CONTRAST_TEST()
+        self.widget:realize()
+
+        self.content = {
+            self.widget
+        }
+    end
+
+    self.size_allocate = function(self, x, y, width, height)
+        local m, xm, ym = self._get_margin()
+        ym = 2 * ym
+        local w = 0.75 * (width - 2 * xm)
+        height = w + 2 * ym
+        self.widget:fit_into(
+            x + 0.5 * width - 0.5 * w,
+            y + 0.5 * height - 0.5 * w,
+            w,
+            w
+        )
+
+        self.frame:fit_into(x, y, width, height)
+        self.final_height = height
+    end
+
+    self.update = function(self, delta)
+        self.widget:update(delta)
+    end
+end
+
+
+function mn.VerboseInfoPanel.Item:create_as_motion_effects_widget()
+    self.object = nil
+    self._is_realized = false
+
+    self.realize = function()
+        self._is_realized = true
+        self.frame:realize()
+
+        self.widget = mn.ShakeIntensityWidget()
+        self.widget:realize()
+
+        self.content = {
+            self.widget
+        }
+    end
+
+    self.size_allocate = function(self, x, y, width, height)
+        local m, xm, ym = self._get_margin()
+        ym = 2 * ym
+        local w = 0.75 * (width - 2 * xm)
+        height = w + 2 * ym
+        self.widget:fit_into(
+            x + 0.5 * width - 0.5 * w,
+            y + 0.5 * height - 0.5 * w,
+            w,
+            w
+        )
+
+        self.frame:fit_into(x, y, width, height)
+        self.final_height = height
+    end
+
+    self.update = function(self, delta)
+        self.widget:update(delta)
+    end
+end
+
+

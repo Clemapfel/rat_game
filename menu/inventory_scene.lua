@@ -319,6 +319,7 @@ end
 --- @override
 function mn.InventoryScene:update(delta)
     self._animation_queue:update(delta)
+    self._verbose_info:update(delta)
 
     if self._template_rename_keyboard:get_is_active() then
         self._template_rename_keyboard:update(delta)

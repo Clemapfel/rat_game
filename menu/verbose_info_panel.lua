@@ -16,12 +16,16 @@ rt.VerboseInfoObject = meta.new_enum({
     VSYNC = "vsync",
     FULLSCREEN = "fullscreen",
     GAMMA = "gamma",
+    GAMMA_WIDGET = "gamma_widget",
     MSAA = "msaa",
+    MSAA_WIDGET = "msaa_widget",
     RESOLUTION = "resolution",
     SOUND_EFFECTS = "sfx_level",
     MUSIC = "music_level",
     MOTION_EFFECTS = "vfx_motion_level",
+    MOTION_EFFECTS_WIDGET= "vfx_motion_level_widget",
     VISUAL_EFFECTS = "vfx_contrast_level",
+    VISUAL_EFFECTS_WIDGET = "vfx_contrast_level_widget",
     KEYMAP = "keymap"
 })
 
@@ -107,12 +111,14 @@ function mn.VerboseInfoPanel:size_allocate(x, y, width, height)
         total_height = total_height + h
         current_y = current_y + h
 
-        item.snapshot = rt.RenderTexture(item.aabb.width, item.aabb.height)
-        rt.graphics.translate(-item.aabb.x, -item.aabb.y)
-        item.snapshot:bind_as_render_target()
-        item:draw()
-        item.snapshot:unbind_as_render_target()
-        rt.graphics.translate(item.aabb.x, item.aabb.y)
+        if item.update == nil then
+            item.snapshot = rt.RenderTexture(item.aabb.width, item.aabb.height)
+            rt.graphics.translate(-item.aabb.x, -item.aabb.y)
+            item.snapshot:bind_as_render_target()
+            item:draw()
+            item.snapshot:unbind_as_render_target()
+            rt.graphics.translate(item.aabb.x, item.aabb.y)
+        end
 
         self._total_height = self._total_height + h
     end
@@ -135,10 +141,15 @@ function mn.VerboseInfoPanel:draw()
     self._frame:_bind_stencil()
     rt.graphics.translate(0, self._y_offset)
     for item in values(self._items) do
-        item.snapshot:draw(item.aabb.x, item.aabb.y)
+        if item.update == nil then
+            item.snapshot:draw(item.aabb.x, item.aabb.y)
+        else
+            item:draw()
+        end
     end
     self._frame:_unbind_stencil()
     rt.graphics.translate(0, -self._y_offset)
+
 
     if self._scroll_up_indicator_visible then
         self._scroll_up_indicator:draw()
@@ -170,6 +181,12 @@ function mn.VerboseInfoPanel:update(delta)
 
     for shape in range(self._scroll_down_indicator) do
         shape:set_color(color)
+    end
+
+    for item in values(self._items) do
+        if item.update ~= nil then
+            item:update(delta)
+        end
     end
 end
 

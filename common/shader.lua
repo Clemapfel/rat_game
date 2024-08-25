@@ -14,6 +14,11 @@ function rt.Shader:send(name, value)
     self._native:send(name, value)
 end
 
+--- @brief
+function rt.Shader:has_uniform(name)
+    return self._native:hasUniform(name)
+end
+
 --- @brief make shader the current on
 function rt.Shader:bind()
     self._before = love.graphics.getShader()

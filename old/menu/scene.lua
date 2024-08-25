@@ -276,7 +276,6 @@ function mn.Scene:size_allocate(x, y, width, height)
 
     current_y = current_y + control_h + m
 
-    -- left side
     local tile_size, max_move_w, max_info_w = NEGATIVE_INFINITY, NEGATIVE_INFINITY, NEGATIVE_INFINITY
     for page in values(self._entity_pages) do
         tile_size = math.max(tile_size, select(2, page.equips_and_consumables:measure()))

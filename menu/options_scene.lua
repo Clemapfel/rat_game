@@ -9,7 +9,7 @@ mn.OptionsScene = meta.new_type("MenuOptionsScene", rt.Scene, function(state)
     local fields = {
         _state = state,
         _items = {},
-        _verbose_info_panel = mn.VerboseInfoPanel(),
+        _verbose_info = mn.VerboseInfoPanel(),
         _selection_graph = rt.SelectionGraph(),
         _input_controller = rt.InputController(),
         _control_indicator = rt.ControlIndicator(),
@@ -166,12 +166,12 @@ mn.OptionsScene = meta.new_type("MenuOptionsScene", rt.Scene, function(state)
         },
 
         [fields._vfx_motion_text] = {
-            range = {0, 1, 3},
+            range = {0, 1, 100},
             default = 3
         },
 
         [fields._vfx_contrast_text] = {
-            range = {0, 1, 1},
+            range = {0, 1, 100},
             default = 100
         }
     }
@@ -310,7 +310,7 @@ function mn.OptionsScene:realize()
     end)
 
     create_scale_and_label("vfx_motion", self._vfx_motion_text, function(_, fraction)
-        scene._state:set_vfx_motion_level(fraction)
+        scene._state:set_motion_intensity(fraction)
     end)
 
     create_scale_and_label("vfx_contrast", self._vfx_contrast_text, function(_, fraction)
@@ -318,7 +318,7 @@ function mn.OptionsScene:realize()
     end)
 
     self:create_from_state(self._state)
-    self._verbose_info_panel:realize()
+    self._verbose_info:realize()
 
     local keymap_item = {
         label = rt.Label(label_prefix .. self._keymap_text .. label_postfix),
@@ -457,45 +457,12 @@ function mn.OptionsScene:size_allocate(x, y, width, height)
         current_y = current_y + item_h + item_vertical_m
     end
 
-    self._verbose_info_panel:fit_into(
+    self._verbose_info:fit_into(
         x + width - verbose_info_right_m - verbose_info_w,
         start_y,
         verbose_info_w,
         y + height - start_y - outer_margin
     )
-
-    --[[
-    local widget_w = 0.4 * width
-    local w = widget_w + label_xm + 2 * m
-
-    local item_spacing = 0.5 * m
-    local item_h = (y + height - start_y - outer_margin - (n_items - 1) * item_spacing) / (n_items)
-    local item_w = max_label_w + widget_w + 2 * m
-    local item_x = x + outer_margin
-
-    for i, item in ipairs(self._items) do
-        local label_h, label_w = label_hs[i], label_ws[i]
-        local frame_h = item_h
-        item.frame:fit_into(item_x, current_y, item_w, frame_h)
-        item.label:fit_into(item_x + 2 * m, current_y + 0.5 * frame_h - 0.5 * label_h, POSITIVE_INFINITY)
-        local widget_x = current_x + m + max_label_w + label_xm
-        item.widget:fit_into(
-            widget_x,
-            current_y + 0.5 * frame_h - 0.5 * label_h,
-            widget_w,
-            label_h
-        )
-        item.x_offset = widget_x - widget_x + 0.5 * widget_w - 0.5 * select(1, item.widget:measure())
-        current_y = current_y + frame_h + item_spacing
-    end
-
-    self._verbose_info_panel:fit_into(
-        x + width - widget_w - outer_margin,
-        start_y,
-        widget_w,
-        height - 2 * outer_margin - control_h - m
-    )
-    ]]--
 
     self:_regenerate_selection_nodes()
 end
@@ -525,20 +492,24 @@ function mn.OptionsScene:_regenerate_selection_nodes()
     for item_verbose_info_object in range(
         {self._vsync_item, rt.VerboseInfoObject.VSYNC},
         {self._fullscreen_item, rt.VerboseInfoObject.FULLSCREEN},
-        {self._gamma_item, rt.VerboseInfoObject.GAMMA},
+        {self._gamma_item, {rt.VerboseInfoObject.GAMMA, rt.VerboseInfoObject.GAMMA_WIDGET}},
         {self._msaa_item, rt.VerboseInfoObject.MSAA},
         {self._resolution_item, rt.VerboseInfoObject.RESOLUTION},
-        {self._sfx_level_item, rt.VerboseInfoObject.SFX_LEVEL},
+        {self._sfx_level_item, rt.VerboseInfoObject.SOUND_EFFECTS},
         {self._music_level_item, rt.VerboseInfoObject.MUSIC_LEVEL},
-        {self._vfx_motion_item, rt.VerboseInfoObject.VFX_LEVEL},
-        {self._vfx_contrast_item, rt.VerboseInfoObject.VFX_CONTRAST}
+        {self._vfx_motion_item, {rt.VerboseInfoObject.MOTION_EFFECTS, rt.VerboseInfoObject.MOTION_EFFECTS_WIDGET}},
+        {self._vfx_contrast_item, {rt.VerboseInfoObject.VISUAL_EFFECTS, rt.VerboseInfoObject.VISUAL_EFFECTS_WIDGET}}
         --{self._keymap_item, rt.VerboseInfoObject.KEYMAP}
     ) do
         local item = item_verbose_info_object[1]
         local verbose_info_object = item_verbose_info_object[2]
+        if not meta.is_table(verbose_info_object) then
+            verbose_info_object = {verbose_info_object}
+        end
+
         local node = item_to_node[item]
         node:signal_connect("enter", function(_)
-            --scene._verbose_info_panel:show(verbose_info_object)
+            scene._verbose_info:show(table.unpack(verbose_info_object))
             item.frame:set_selection_state(rt.SelectionState.ACTIVE)
             if meta.isa(item.widget, mn.Scale) then
                 scene._scale_is_selected = true
@@ -574,11 +545,11 @@ function mn.OptionsScene:_regenerate_selection_nodes()
     end
 
     local keymap_node = item_to_node[self._keymap_item]
-   keymap_node:signal_connect("enter", function(_)
+    keymap_node:signal_connect("enter", function(_)
         scene._keymap_item.frame:set_selection_state(rt.SelectionState.ACTIVE)
     end)
 
-   keymap_node:signal_connect("exit", function(_)
+    keymap_node:signal_connect("exit", function(_)
         scene._keymap_item.frame:set_selection_state(rt.SelectionState.INACTIVE)
     end)
 
@@ -596,7 +567,7 @@ function mn.OptionsScene:draw()
         rt.graphics.translate(-item.x_offset, 0)
     end
 
-    self._verbose_info_panel:draw()
+    self._verbose_info:draw()
     self._control_indicator:draw()
 end
 
@@ -622,6 +593,21 @@ function mn.OptionsScene:update(delta)
             end
         end
     end
+
+    local speed = rt.settings.menu.inventory_scene.verbose_info_scroll_speed
+    if self._input_controller:is_down(rt.InputButton.L) then
+        if self._verbose_info:can_scroll_down() then
+            self._verbose_info:advance_scroll(delta * speed)
+        end
+    end
+
+    if self._input_controller:is_down(rt.InputButton.R) then
+        if self._verbose_info:can_scroll_up() then
+            self._verbose_info:advance_scroll(delta * speed * -1)
+        end
+    end
+
+    self._verbose_info:update(delta)
 end
 
 --- @brief
