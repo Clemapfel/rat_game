@@ -1,7 +1,7 @@
 uniform vec2 texture_resolution;
 
-float round(float value) {
-    return floor(value + 0.5);
+float round(vec2 value) {
+    return vec2(floor(value.x + 0.5), floor(value.y + 0.5));
 }
 
 // https://github.com/Nikaoto/subpixel/blob/master/subpixel_grad.frag

@@ -22,12 +22,8 @@
     </configurations>
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="7fa9ba1b-2cff-4ecc-86fb-59ab2fa76ee1" name="Changes" comment="added msaa widget">
-      <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/battle/backgrounds/voronoi_crystals.glsl" beforeDir="false" afterPath="$PROJECT_DIR$/battle/backgrounds/voronoi_crystals.glsl" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/common/game_state.lua" beforeDir="false" afterPath="$PROJECT_DIR$/common/game_state.lua" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/common/graphics.lua" beforeDir="false" afterPath="$PROJECT_DIR$/common/graphics.lua" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/main.lua" beforeDir="false" afterPath="$PROJECT_DIR$/main.lua" afterDir="false" />
+    <list default="true" id="7fa9ba1b-2cff-4ecc-86fb-59ab2fa76ee1" name="Changes" comment="added round">
+      <change beforePath="$PROJECT_DIR$/common/sprite_scale_correction.glsl" beforeDir="false" afterPath="$PROJECT_DIR$/common/sprite_scale_correction.glsl" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -493,23 +489,7 @@
       <workItem from="1724337474091" duration="1303000" />
       <workItem from="1724427225384" duration="14514000" />
       <workItem from="1724444607274" duration="4551000" />
-      <workItem from="1724449250792" duration="38022000" />
-    </task>
-    <task id="LOCAL-00947" summary="added template verbose info, fixed message dialog loop">
-      <option name="closed" value="true" />
-      <created>1723229986474</created>
-      <option name="number" value="00947" />
-      <option name="presentableId" value="LOCAL-00947" />
-      <option name="project" value="LOCAL" />
-      <updated>1723229986474</updated>
-    </task>
-    <task id="LOCAL-00948" summary="stashing">
-      <option name="closed" value="true" />
-      <created>1723242799108</created>
-      <option name="number" value="00948" />
-      <option name="presentableId" value="LOCAL-00948" />
-      <option name="project" value="LOCAL" />
-      <updated>1723242799108</updated>
+      <workItem from="1724449250792" duration="38275000" />
     </task>
     <task id="LOCAL-00949" summary="stashing before refactoring for gamestate">
       <option name="closed" value="true" />
@@ -887,7 +867,23 @@
       <option name="project" value="LOCAL" />
       <updated>1724609924998</updated>
     </task>
-    <option name="localTasksCounter" value="996" />
+    <task id="LOCAL-00996" summary="stashing">
+      <option name="closed" value="true" />
+      <created>1724718515223</created>
+      <option name="number" value="00996" />
+      <option name="presentableId" value="LOCAL-00996" />
+      <option name="project" value="LOCAL" />
+      <updated>1724718515223</updated>
+    </task>
+    <task id="LOCAL-00997" summary="added round">
+      <option name="closed" value="true" />
+      <created>1724718694838</created>
+      <option name="number" value="00997" />
+      <option name="presentableId" value="LOCAL-00997" />
+      <option name="project" value="LOCAL" />
+      <updated>1724718694838</updated>
+    </task>
+    <option name="localTasksCounter" value="998" />
     <servers />
   </component>
   <component name="TypeScriptGeneratedFilesManager">
@@ -936,8 +932,6 @@
     </option>
   </component>
   <component name="VcsManagerConfiguration">
-    <MESSAGE value="stashing voro" />
-    <MESSAGE value="added stained glass" />
     <MESSAGE value="refactored input mapping" />
     <MESSAGE value="added voronoi crystals" />
     <MESSAGE value="sdl threads working" />
@@ -961,7 +955,9 @@
     <MESSAGE value="made scene part of state" />
     <MESSAGE value="added option preview widgets" />
     <MESSAGE value="added msaa widget" />
-    <option name="LAST_COMMIT_MESSAGE" value="added msaa widget" />
+    <MESSAGE value="stashing" />
+    <MESSAGE value="added round" />
+    <option name="LAST_COMMIT_MESSAGE" value="added round" />
   </component>
   <component name="XDebuggerManager">
     <breakpoint-manager>
