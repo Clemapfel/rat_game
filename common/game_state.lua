@@ -329,6 +329,7 @@ function rt.GameState:_run()
             rt.graphics.frame_duration = {
                 n_frames = 0,
                 last_fps = love.timer.getFPS(),
+                frame_start = love.timer.getTime(),
 
                 max_update_duration = 0,
                 max_draw_duration = 0,
@@ -352,6 +353,7 @@ function rt.GameState:_run()
         end
 
         local durations = rt.graphics.frame_duration
+        durations.frame_start = love.timer.getTime()
         local update_duration = 0
         local draw_duration = 0
         local total_duration = 0

@@ -87,9 +87,7 @@ uniform float elapsed;
 vec4 effect(vec4 vertex_color, Image image, vec2 texture_coords, vec2 vertex_position)
 {
     vec2 pos = texture_coords;
-    //pos.xy += elapsed / 100;
     pos = rotate(pos - vec2(0.5), -(1 / 8.) * elapsed);
-
     pos *= 10;
 
     float angle = mod(-1 * elapsed, 2 * PI);

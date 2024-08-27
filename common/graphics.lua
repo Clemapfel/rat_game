@@ -233,3 +233,9 @@ function rt.graphics.reset()
     love.graphics.setStencilState()
     love.graphics.origin()
 end
+
+--- @brief
+function rt.graphics.get_frame_duration()
+    if rt.graphics.frame_duration == nil then return 0 end
+    return love.timer.getTime() - rt.graphics.frame_duration.frame_start
+end
