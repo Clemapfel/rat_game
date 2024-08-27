@@ -1,6 +1,6 @@
 uniform vec2 texture_resolution;
 
-float round(vec2 value) {
+vec2 round(vec2 value) {
     return vec2(floor(value.x + 0.5), floor(value.y + 0.5));
 }
 
