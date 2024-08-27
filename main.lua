@@ -42,6 +42,10 @@ function Stall:realize_async()
     coroutine.resume(self._realize_async_coroutine)
 end
 
+function Stall:draw()
+
+end
+
 local stall = Stall()
 
 state = rt.GameState()
@@ -55,7 +59,7 @@ option_scene:realize()
 
 local which_scene = true
 
-state:set_current_scene(option_scene)
+state:set_current_scene(inventory_scene)
 
 input = rt.InputController()
 input:signal_connect("pressed", function(_, which)
@@ -75,13 +79,12 @@ love.load = function()
 end
 
 love.update = function(delta)
-    --background:update(delta)
+    background:update(delta)
     state:_update(delta)
-    --stall:realize_async()
 end
 
 love.draw = function()
-    --background:draw()
+    background:draw()
     state:_draw()
 end
 

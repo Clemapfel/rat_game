@@ -68,6 +68,7 @@ meta.make_auto_extend(rt.settings, true)
 require "common.time"
 require "common.log"
 require "common.signal_emitter"
+require "common.coroutine"
 
 require "common.filesystem"
 require "common.save_file_handler"
