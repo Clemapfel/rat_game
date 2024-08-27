@@ -75,13 +75,13 @@ love.load = function()
 end
 
 love.update = function(delta)
-    background:update(delta)
+    --background:update(delta)
     state:_update(delta)
     --stall:realize_async()
 end
 
 love.draw = function()
-    background:draw()
+    --background:draw()
     state:_draw()
 end
 
