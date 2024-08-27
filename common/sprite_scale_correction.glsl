@@ -1,5 +1,9 @@
 uniform vec2 texture_resolution;
 
+float round(float value) {
+    return floor(value + 0.5);
+}
+
 // https://github.com/Nikaoto/subpixel/blob/master/subpixel_grad.frag
 vec4 effect(vec4 color, sampler2D tex, vec2 uv, vec2 px)
 {
