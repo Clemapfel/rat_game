@@ -384,14 +384,14 @@ function rt.GameState:_run()
 
             if self._state.show_diagnostics == true then
                 local fps = love.timer.getFPS()
-                local frame_duration = 1 / fps
+                local frame_duration = 1 / 60
                 local update_percentage = tostring(math.floor(durations.max_update_duration / frame_duration * 100))
                 local draw_percentage = tostring(math.floor(durations.max_draw_duration / frame_duration * 100))
                 local total_percentage = tostring(math.floor(durations.max_total_duration / frame_duration * 100))
                 local n_draws = tostring(durations.max_n_draws)
                 local n_texture_switches = tostring(durations.max_n_texture_switches)
 
-                local label = tostring(fps) .. " | " .. durations.format(update_percentage) .. "% | " ..  durations.format(draw_percentage) .. "% | " .. n_draws .. " (" .. n_texture_switches .. ")"
+                local label = tostring(fps) .. " | " .. durations.format(update_percentage) .. "% | " ..  durations.format(draw_percentage) .. "% | " ..  durations.format(total_percentage) .. "% | " .. n_draws
                 love.graphics.setColor(1, 1, 1, 0.75)
                 local margin = 3
                 local label_w, label_h = love.graphics.getFont():getWidth(label), love.graphics.getFont():getHeight(label)
@@ -492,7 +492,6 @@ end
 
 --- @brief
 function rt.GameState:_update(delta)
-
     local n = sizeof(self._active_coroutines)
     if n > 1 then dbg(n) end
 
@@ -513,9 +512,10 @@ function rt.GameState:_update(delta)
 
     table.insert(self._active_coroutines, rt.Coroutine(function()
         if self._current_scene ~= nil then
-            love.timer.sleep(3/60)
-            dbg(rt.graphics.get_frame_duration() / (1 / 60))
+
+            rt.savepoint_maybe()
             self._current_scene:update(delta)
+            rt.savepoint_maybe()
         end
     end))
 end
