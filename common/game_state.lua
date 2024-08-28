@@ -64,14 +64,15 @@ rt.GameState = meta.new_type("GameState", function()
 
     local out = meta.new(rt.GameState, {
         _state = state,
-        _entity_index_to_entity = {},
-        _entity_to_entity_index = {},
+        _entity_index_to_entity = {},   -- Table<Number, bt.Entity>
+        _entity_to_entity_index = {},   -- Table<bt.Entity, Number>
         _grabbed_object = nil, -- helper for mn.InventoryScene
         _render_shape = rt.VertexRectangle(0, 0, 1, 1),
         _render_texture = rt.RenderTexture(1, 1),
         _render_shader = rt.Shader("common/game_state_render_shader.glsl"),
 
-        _current_scene = nil
+        _current_scene = nil,
+        _active_coroutines = {} -- Table<rt.Coroutine>
     })
 
     out:load_input_mapping()
@@ -325,11 +326,10 @@ function rt.GameState:_run()
         love.timer.step()
         delta = love.timer.getDelta()
 
-        if rt.graphics.frame_duration == nil then
-            rt.graphics.frame_duration = {
+        if self._frame_durations == nil then
+            self._frame_durations = {
                 n_frames = 0,
                 last_fps = love.timer.getFPS(),
-                frame_start = love.timer.getTime(),
 
                 max_update_duration = 0,
                 max_draw_duration = 0,
@@ -352,11 +352,12 @@ function rt.GameState:_run()
             }
         end
 
-        local durations = rt.graphics.frame_duration
-        durations.frame_start = love.timer.getTime()
+        local durations = self._frame_durations
         local update_duration = 0
         local draw_duration = 0
         local total_duration = 0
+
+        rt.graphics.frame_start = love.timer.getTime()
 
         local update_before = love.timer.getTime()
         love.update(delta)
@@ -478,24 +479,41 @@ function rt.GameState:_resize(new_width, new_height)
     self._render_shape = rt.VertexRectangle(0, 0, new_width, new_height)
     self._render_shape:set_texture(self._render_texture)
 
-    if self._current_scene ~= nil then
+    table.insert(self._active_coroutines, rt.Coroutine(function()
+        rt.savepoint_maybe()
         self._current_scene:fit_into(0, 0, self._state.resolution_x, self._state.resolution_y)
-    end
+        rt.savepoint_maybe()
+    end))
 end
+
+STEP_COUNTER = 0
 
 --- @brief
 function rt.GameState:_update(delta)
-    if self._current_scene ~= nil then
+
+    local to_remove = {}
+    for i, routine in ipairs(self._active_coroutines) do
+        if not routine:get_is_done() then
+            routine:resume()
+            return
+        else
+            table.insert(to_remove, i)
+        end
+    end
+
+    table.sort(to_remove, function(a, b) return a > b end)
+    for i in values(to_remove) do
+        table.remove(self._active_coroutines, i)
+    end
+
+    if self._current_scene ~= nil and #self._active_coroutines == 0 then
         self._current_scene:update(delta)
     end
 end
 
 --- @brief
 function rt.GameState:_load()
-    if self._current_scene ~= nil then
-        self._current_scene:realize()
-        self._current_scene:fit_into(0, 0, self._state.resolution_x, self._state.resolution_y)
-    end
+    -- noop
 end
 
 --- @brief
@@ -508,8 +526,18 @@ end
 --- @brief
 function rt.GameState:set_current_scene(scene)
     meta.assert_isa(scene, rt.Scene)
-    self._current_scene = scene
-    self:_load()
+    table.insert(self._active_coroutines, rt.Coroutine(function()
+        if self._current_scene ~= nil then
+            self._current_scene:set_is_active(false)
+        end
+        self._current_scene = scene
+        self._current_scene:set_is_active(true)
+        rt.savepoint_maybe()
+        self._current_scene:realize()
+        rt.savepoint_maybe()
+        self._current_scene:fit_into(0, 0, self._state.resolution_x, self._state.resolution_y)
+        rt.savepoint_maybe()
+    end))
 end
 
 rt.VSyncMode = {
@@ -590,7 +618,6 @@ function rt.GameState:set_sfx_level(fraction)
         fraction = clamp(fraction, 0, 1)
     end
     self._state.sfx_level = fraction
-    dbg("called")
 end
 
 --- @brief

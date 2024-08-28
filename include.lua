@@ -69,6 +69,7 @@ require "common.time"
 require "common.log"
 require "common.signal_emitter"
 require "common.coroutine"
+require "common.thread"
 
 require "common.filesystem"
 require "common.save_file_handler"

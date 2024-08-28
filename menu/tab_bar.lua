@@ -16,7 +16,7 @@ end)
 function mn.TabBar:push(widget)
     local to_insert = {
         widget = widget,
-        stencil = rt.Rectangle(),
+        stencil = rt.Rectangle(0, 0, 1, 1),
         frame = rt.Frame(),
         base = rt.Spacer(),
         is_selected = false
@@ -184,6 +184,7 @@ end
 
 --- @override
 function mn.TabBar:draw()
+    if self._is_realized ~= true then return end
     local item_i = 1
     for item in values(self._items) do
         item.frame:draw()

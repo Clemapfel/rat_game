@@ -162,7 +162,6 @@ function mn.EntityInfo:size_allocate(x, y, width, height)
 
     self._snapshot:bind_as_render_target()
     rt.graphics.translate(-x, -y)
-    self._frame:draw()
     rt.graphics.translate(0, math.floor(self._y_center_offset))
     for stat in range("hp", "attack", "defense", "speed") do
         self["_" .. stat .. "_heading_label"]:draw()
@@ -183,6 +182,7 @@ end
 
 --- @override
 function mn.EntityInfo:draw()
+    self._frame:draw()
     self._snapshot:draw(self._snapshot_x, self._snapshot_y)
 end
 

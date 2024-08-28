@@ -5,7 +5,6 @@ rt.settings.menu.option_scene = {
 
 --- @class mn.OptionsScene
 mn.OptionsScene = meta.new_type("MenuOptionsScene", rt.Scene, function(state)
-
     local fields = {
         _state = state,
         _items = {},
@@ -21,6 +20,8 @@ mn.OptionsScene = meta.new_type("MenuOptionsScene", rt.Scene, function(state)
         _scale_tick_elapsed = 0,
         _scale_tick_duration = 1 / rt.settings.menu.option_scene.scale_n_ticks_per_second,
         _scale_tick_direction = true, -- true = right
+
+        _load_coroutine = nil, -- rt.Coroutine
     }
 
     -- nil items set during :realize
@@ -350,6 +351,7 @@ function mn.OptionsScene:realize()
 
     self._control_indicator:realize()
     self:_update_control_indicator(true)
+    self:create_from_state(self._state)
 end
 
 --- @brief
@@ -558,6 +560,7 @@ end
 
 --- @override
 function mn.OptionsScene:draw()
+    if self._is_realized ~= true then return end
     for item in values(self._items) do
         item.frame:draw()
         item.label:draw()
@@ -573,6 +576,8 @@ end
 
 --- @override
 function mn.OptionsScene:update(delta)
+    if self._is_active ~= true then return end
+
     for item in values(self._items) do
         if item.widget.update ~= nil then
             item.widget:update(delta)
@@ -612,5 +617,7 @@ end
 
 --- @brief
 function mn.OptionsScene:_handle_button_pressed(which)
+    if self._is_active ~= true then return end
+
     self._selection_graph:handle_button(which)
 end

@@ -36,8 +36,6 @@ rt.MessageDialog = meta.new_type("MessageDialog", rt.Widget, rt.SignalEmitter, f
         _elapsed = 0
     })
 
-    meta.assert_string(out._message)
-    meta.assert_string(out._submessage)
     for i, option in ipairs(out._options) do
         meta.assert_string(option)
         if option == rt.MessageDialogOption.CANCEL then

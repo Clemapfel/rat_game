@@ -1,7 +1,17 @@
 --- @class rt.Scene
 rt.Scene = meta.new_abstract_type("Scene", rt.Widget, {
-    _is_realized = false
+    _is_active = false
 })
+
+--- @brief
+function rt.Scene:set_is_active(b)
+    self._is_active = b
+end
+
+--- @brief
+function rt.Scene:get_is_active()
+    return self._is_active
+end
 
 --- @override
 function rt.Scene:create_from_state(state)

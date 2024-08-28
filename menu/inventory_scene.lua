@@ -33,16 +33,16 @@ mn.InventoryScene = meta.new_type("InventoryScene", rt.Scene, function(state)
         _grabbed_object_allowed = false,
 
         _current_control_indicator_layout = {{rt.ControlIndicatorButton.A, "UNINITIALIZED"}},
-        _control_indicator = nil, -- rt.ControlIndicator
+        _control_indicator = rt.ControlIndicator(),
 
         _animation_queue = rt.AnimationQueue(),
         _input_controller = rt.InputController(),
 
         _dialog_shadow = rt.Rectangle(0, 0, 1, 1),
-        _template_confirm_load_dialog = nil, -- rt.MessageDialog
-        _template_confirm_delete_dialog = nil, -- rt.MessageDialog
-        _template_apply_unsuccesfull_dialog = nil, -- rt.MessageDialog
-        _template_rename_keyboard = nil, -- rt.Keyboard
+        _template_confirm_load_dialog = rt.MessageDialog(),
+        _template_confirm_delete_dialog = rt.MessageDialog(),
+        _template_apply_unsuccesfull_dialog = rt.MessageDialog(),
+        _template_rename_keyboard = rt.Keyboard(#("New Template #1234"), "New Template"),
     })
 end, {
     shared_move_list_index = 1,
@@ -60,7 +60,8 @@ end, {
 --- @override
 function mn.InventoryScene:realize()
     if self._is_realized == true then return end
-    self._is_realized = true
+
+    rt.savepoint_maybe()
 
     local tab_bar_sprite_id = "menu_icons"
     local tab_sprites = {
@@ -92,13 +93,17 @@ function mn.InventoryScene:realize()
         widget:realize()
     end
 
+    rt.savepoint_maybe()
+
     self._control_indicator = rt.ControlIndicator(self._current_control_indicator_layout)
     self._control_indicator:realize()
 
     self._input_controller:signal_connect("pressed", function(_, which)
         self:_handle_button_pressed(which)
     end)
-    
+
+    rt.savepoint_maybe()
+
     self._template_confirm_load_dialog = rt.MessageDialog(
         " ", " ", -- set during present()
         rt.MessageDialogOption.ACCEPT, rt.MessageDialogOption.CANCEL
@@ -117,10 +122,15 @@ function mn.InventoryScene:realize()
     )
     self._template_apply_unsuccesfull_dialog:realize()
     
-    self._template_rename_keyboard = rt.Keyboard(#("New Template #1234"), "New Template")
     self._template_rename_keyboard:realize()
 
+    rt.savepoint_maybe()
+
     self:create_from_state(self._state)
+
+    rt.savepoint_maybe()
+
+    self._is_realized = true
 end
 
 --- @override
@@ -135,6 +145,8 @@ function mn.InventoryScene:create_from_state(state)
     table.sort(entities, function(a, b)
         return self._state:entity_get_party_index(a) < self._state:entity_get_party_index(b)
     end)
+
+    rt.savepoint_maybe()
 
     for entity_i, entity in ipairs(entities) do
         local tab_sprite = rt.Sprite(entity:get_portrait_sprite_id())
@@ -192,6 +204,8 @@ function mn.InventoryScene:create_from_state(state)
         page.equips_and_consumables:realize()
         page.moves:realize()
         self._entity_pages[entity_i] = page
+
+        rt.savepoint_maybe()
     end
 
     local sprite = rt.Sprite("opal", 19)
@@ -204,25 +218,35 @@ function mn.InventoryScene:create_from_state(state)
     self._entity_tab_bar:set_orientation(rt.Orientation.VERTICAL)
     self._entity_tab_bar:realize()
 
+    rt.savepoint_maybe()
+
     self._shared_move_list:clear()
     for move, quantity in pairs(self._state:list_shared_move_quantities()) do
         self._shared_move_list:add(move, quantity)
     end
+
+    rt.savepoint_maybe()
 
     self._shared_equip_list:clear()
     for equip, quantity in pairs(self._state:list_shared_equip_quantities()) do
         self._shared_equip_list:add(equip, quantity)
     end
 
+    rt.savepoint_maybe()
+
     self._shared_consumable_list:clear()
     for consumable, quantity in pairs(self._state:list_shared_consumable_quantities()) do
         self._shared_consumable_list:add(consumable, quantity)
     end
 
+    rt.savepoint_maybe()
+
     self._shared_template_list:clear()
     for template in values(self._state:list_templates()) do
         self._shared_template_list:add(template)
     end
+
+    rt.savepoint_maybe()
 end
 
 --- @override
@@ -253,6 +277,8 @@ function mn.InventoryScene:size_allocate(x, y, width, height)
     self._entity_tab_bar:fit_into(current_x, current_y, tab_w, height - outer_margin - (current_y - y))
     local entity_bar_selection_nodes = self._entity_tab_bar:get_selection_nodes()
 
+    rt.savepoint_maybe()
+
     current_x = current_x + tile_size + 2 * m
     for page in values(self._entity_pages) do
         local slots_h = tile_size
@@ -263,6 +289,8 @@ function mn.InventoryScene:size_allocate(x, y, width, height)
         page_y = page_y - m - moves_h
         page.moves:fit_into(current_x, page_y, page_w, moves_h)
         page.info:fit_into(current_x, current_y, page_w, page_y - current_y - m)
+
+        rt.savepoint_maybe()
     end
 
     local shared_page_w = page_w
@@ -287,6 +315,8 @@ function mn.InventoryScene:size_allocate(x, y, width, height)
     local shared_list_bounds = rt.AABB(current_x, current_y, shared_page_w, shared_page_h - m - shared_tab_h)
     self._shared_list_frame:fit_into(shared_list_bounds)
 
+    rt.savepoint_maybe()
+
     local list_xm, list_ym = m, m
     for list in range(
         self._shared_move_list,
@@ -300,9 +330,14 @@ function mn.InventoryScene:size_allocate(x, y, width, height)
             shared_list_bounds.width - 2 * list_xm,
             shared_list_bounds.height - 2 * list_ym
         )
+
+        rt.savepoint_maybe()
     end
 
+    rt.savepoint_maybe()
     self:_regenerate_selection_nodes()
+    rt.savepoint_maybe()
+
     self:_set_shared_list_index(self._shared_list_index)
     self:_set_entity_index(self._entity_index)
 
@@ -314,10 +349,14 @@ function mn.InventoryScene:size_allocate(x, y, width, height)
     self._template_confirm_load_dialog:fit_into(x, y, width, height)
     self._template_confirm_delete_dialog:fit_into(x, y, width, height)
     self._template_apply_unsuccesfull_dialog:fit_into(x, y, width, height)
+
+    rt.savepoint_maybe()
 end
 
 --- @override
 function mn.InventoryScene:update(delta)
+    if self._is_active ~= true then return end
+
     self._animation_queue:update(delta)
     self._verbose_info:update(delta)
 
@@ -375,7 +414,6 @@ function mn.InventoryScene:draw()
     local template_delete_active = self._template_confirm_delete_dialog:get_is_active()
     local template_rename_active = self._template_rename_keyboard:get_is_active()
     local template_load_unsuccesfull_active = self._template_apply_unsuccesfull_dialog:get_is_active()
-
 
     if template_load_active or template_delete_active or template_rename_active or template_load_unsuccesfull_active then
         rt.graphics.set_blend_mode(rt.BlendMode.MULTIPLY, rt.BlendMode.ADD)
@@ -466,6 +504,8 @@ end
 
 --- @brief
 function mn.InventoryScene:_handle_button_pressed(which)
+    if self._is_active ~= true then return end
+
     local dialog_active = self._template_rename_keyboard:get_is_active() or
         self._template_confirm_load_dialog:get_is_active() or
         self._template_confirm_delete_dialog:get_is_active() or

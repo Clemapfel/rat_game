@@ -15,7 +15,7 @@ rt.ControlIndicator = meta.new_type("ControlIndicator", rt.Widget, function(layo
         _final_width = 1,
         _final_height = 1,
 
-        _snapshot = {}, -- rt.RenderTexture
+        _snapshot = rt.RenderTexture(1, 1),
         _position_x = 0,
         _position_y = 0,
         _snapshot_offset_x = 0,

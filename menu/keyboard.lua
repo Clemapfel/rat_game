@@ -10,7 +10,7 @@ rt.settings.keyboard = {
 --- @signal cancel (rt.Keyboard) -> nil
 rt.Keyboard = meta.new_type("Keyboard", rt.Widget, rt.SignalEmitter, function(max_n_entry_chars, suggestion)
     meta.assert_number(max_n_entry_chars)
-    meta.assert_string(suggestion)
+    suggestion = which(suggestion, "")
     local out = meta.new(rt.Keyboard, {
         _letter_frame = rt.Frame(),
         _letter_items = {}, -- Table<Table<rt.Label>>
