@@ -493,6 +493,9 @@ end
 --- @brief
 function rt.GameState:_update(delta)
 
+    local n = sizeof(self._active_coroutines)
+    if n > 1 then dbg(n) end
+
     local to_remove = {}
     for i, routine in ipairs(self._active_coroutines) do
         if not routine:get_is_done() then
@@ -508,14 +511,18 @@ function rt.GameState:_update(delta)
         table.remove(self._active_coroutines, i)
     end
 
-    if self._current_scene ~= nil and #self._active_coroutines == 0 then
-        self._current_scene:update(delta)
-    end
+    table.insert(self._active_coroutines, rt.Coroutine(function()
+        if self._current_scene ~= nil then
+            love.timer.sleep(3/60)
+            dbg(rt.graphics.get_frame_duration() / (1 / 60))
+            self._current_scene:update(delta)
+        end
+    end))
 end
 
 --- @brief
 function rt.GameState:_load()
-    -- noop
+    -- noop, done on first update
 end
 
 --- @brief
