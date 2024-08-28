@@ -75,6 +75,8 @@ function rt.Widget:reformat()
     if h < self._minimum_height then h = self._minimum_height end
 
     self:size_allocate(x, y, w, h)
+
+    rt.savepoint_maybe()
 end
 
 --- @brief resize widget such that it fits into the given bounds
@@ -97,6 +99,8 @@ function rt.Widget:fit_into(aabb, y, w, h)
         math.round(aabb.width), math.round(aabb.height)
     )
     self:reformat()
+
+    rt.savepoint_maybe()
 end
 
 --- @brief

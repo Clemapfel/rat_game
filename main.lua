@@ -1,12 +1,5 @@
 require "include"
 
-routine = coroutine.create(function()
-    error("test")
-end)
-
-coroutine.resume(routine)
-
-
 state = rt.GameState()
 state:initialize_debug_state()
 

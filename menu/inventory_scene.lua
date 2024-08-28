@@ -110,18 +110,24 @@ function mn.InventoryScene:realize()
     )
     self._template_confirm_load_dialog:realize()
 
+    rt.savepoint_maybe()
+
     self._template_confirm_delete_dialog = rt.MessageDialog(
         " ", " ", -- set during present()
         rt.MessageDialogOption.ACCEPT, rt.MessageDialogOption.CANCEL
     )
     self._template_confirm_delete_dialog:realize()
 
+    rt.savepoint_maybe()
+
     self._template_apply_unsuccesfull_dialog = rt.MessageDialog(
         " ", " ", -- set during present()
         rt.MessageDialogOption.ACCEPT
     )
     self._template_apply_unsuccesfull_dialog:realize()
-    
+
+    rt.savepoint_maybe()
+
     self._template_rename_keyboard:realize()
 
     rt.savepoint_maybe()
@@ -153,6 +159,8 @@ function mn.InventoryScene:create_from_state(state)
         local sprite_w, sprite_h = tab_sprite:get_resolution()
         tab_sprite:set_minimum_size(sprite_w * tab_sprite_scale_factor, sprite_h * tab_sprite_scale_factor)
         self._entity_tab_bar:push(tab_sprite)
+
+        rt.savepoint_maybe()
 
         local equip_consumable_layout = {}
         local move_layout = {}
@@ -190,10 +198,14 @@ function mn.InventoryScene:create_from_state(state)
             page.moves:set_object(i, moves[i])
         end
 
+        rt.savepoint_maybe()
+
         local n_equips, equips = self._state:entity_list_equip_slots(entity)
         for i = 1, n_equips do
             page.equips_and_consumables:set_object(i, equips[i])
         end
+
+        rt.savepoint_maybe()
 
         local n_consumables, consumables = self._state:entity_list_consumable_slots(entity)
         for i = 1, n_consumables do
@@ -201,8 +213,17 @@ function mn.InventoryScene:create_from_state(state)
         end
 
         page.info:realize()
+
+        rt.savepoint_maybe()
+
         page.equips_and_consumables:realize()
+
+        rt.savepoint_maybe()
+
         page.moves:realize()
+
+        rt.savepoint_maybe()
+
         self._entity_pages[entity_i] = page
 
         rt.savepoint_maybe()

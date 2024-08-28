@@ -22,12 +22,16 @@ end)
 
 --- @brief
 function rt.Coroutine:start(...)
-    coroutine.resume(self._native, ...)
+    local status, error = coroutine.resume(self._native, ...)
 end
 
 --- @brief
 function rt.Coroutine:resume()
-    coroutine.resume(self._native)
+    local status, error_maybe = coroutine.resume(self._native)
+    if error_maybe ~= nil then
+        local stacktrace = debug.traceback(self._native, error_maybe)
+        rt.error(stacktrace)
+    end
 end
 
 --- @brief
@@ -40,7 +44,7 @@ rt.savepoint_maybe = function(frame_percentage)
     if frame_percentage == nil then frame_percentage = 0.5 end
     local frame_duration = rt.graphics.get_frame_duration() / (1 / 60)
     if frame_duration > 1 then
-        rt.error("")
+        dbg(frame_duration, debug.traceback())
     end
 
     if frame_duration > frame_percentage then

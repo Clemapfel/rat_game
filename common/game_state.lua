@@ -481,7 +481,9 @@ function rt.GameState:_resize(new_width, new_height)
 
     table.insert(self._active_coroutines, rt.Coroutine(function()
         rt.savepoint_maybe()
-        self._current_scene:fit_into(0, 0, self._state.resolution_x, self._state.resolution_y)
+        if self._current_scene ~= nil then
+            self._current_scene:fit_into(0, 0, self._state.resolution_x, self._state.resolution_y)
+        end
         rt.savepoint_maybe()
     end))
 end
