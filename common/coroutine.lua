@@ -43,8 +43,9 @@ end
 rt.savepoint_maybe = function(frame_percentage)
     if frame_percentage == nil then frame_percentage = 0.5 end
     local frame_duration = rt.graphics.get_frame_duration() / (1 / 60)
-    if frame_duration > 1 then
-        dbg(frame_duration, debug.traceback())
+
+    if frame_duration > 2 then
+        rt.log("In rt.savepoint_maybe: Lag frame detected, exceeded frame duration by " .. math.round((frame_duration - 1) * 100) .. "%\n" .. debug.traceback())
     end
 
     if frame_duration > frame_percentage then

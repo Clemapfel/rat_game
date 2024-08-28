@@ -269,7 +269,7 @@ function rt.GameState:_update_window_mode()
         borderless = true
     end
 
-    love.window.setMode(
+    love.window.updateMode(
         window_res_x,
         window_res_y,
         {
@@ -281,11 +281,13 @@ function rt.GameState:_update_window_mode()
             depth = false,
             resizable = resizable,
             borderless = borderless,
-            centered = true,
-            minwidth = self._state.resolution_x,
-            minheight = self._state.resolution_y
+            minwidth = window_res_x,
+            minheight = window_res_y,
         }
     )
+
+    love.window.updateMode(window_res_x, window_res_y, {minwidth = window_res_x, minheight = window_res_y})
+    -- for some reason window does not shrink unless updateMode is called twice
 
     self._render_texture = rt.RenderTexture(
         self._state.resolution_x,
@@ -487,8 +489,6 @@ function rt.GameState:_resize(new_width, new_height)
         rt.savepoint_maybe()
     end))
 end
-
-STEP_COUNTER = 0
 
 --- @brief
 function rt.GameState:_update(delta)

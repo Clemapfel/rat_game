@@ -61,7 +61,6 @@ end, {
 function mn.InventoryScene:realize()
     if self._is_realized == true then return end
 
-    rt.savepoint_maybe()
 
     local tab_bar_sprite_id = "menu_icons"
     local tab_sprites = {
@@ -93,7 +92,6 @@ function mn.InventoryScene:realize()
         widget:realize()
     end
 
-    rt.savepoint_maybe()
 
     self._control_indicator = rt.ControlIndicator(self._current_control_indicator_layout)
     self._control_indicator:realize()
@@ -102,7 +100,6 @@ function mn.InventoryScene:realize()
         self:_handle_button_pressed(which)
     end)
 
-    rt.savepoint_maybe()
 
     self._template_confirm_load_dialog = rt.MessageDialog(
         " ", " ", -- set during present()
@@ -110,7 +107,6 @@ function mn.InventoryScene:realize()
     )
     self._template_confirm_load_dialog:realize()
 
-    rt.savepoint_maybe()
 
     self._template_confirm_delete_dialog = rt.MessageDialog(
         " ", " ", -- set during present()
@@ -118,7 +114,6 @@ function mn.InventoryScene:realize()
     )
     self._template_confirm_delete_dialog:realize()
 
-    rt.savepoint_maybe()
 
     self._template_apply_unsuccesfull_dialog = rt.MessageDialog(
         " ", " ", -- set during present()
@@ -126,15 +121,12 @@ function mn.InventoryScene:realize()
     )
     self._template_apply_unsuccesfull_dialog:realize()
 
-    rt.savepoint_maybe()
 
     self._template_rename_keyboard:realize()
 
-    rt.savepoint_maybe()
 
     self:create_from_state(self._state)
 
-    rt.savepoint_maybe()
 
     self._is_realized = true
 end
@@ -152,15 +144,12 @@ function mn.InventoryScene:create_from_state(state)
         return self._state:entity_get_party_index(a) < self._state:entity_get_party_index(b)
     end)
 
-    rt.savepoint_maybe()
 
     for entity_i, entity in ipairs(entities) do
         local tab_sprite = rt.Sprite(entity:get_portrait_sprite_id())
         local sprite_w, sprite_h = tab_sprite:get_resolution()
         tab_sprite:set_minimum_size(sprite_w * tab_sprite_scale_factor, sprite_h * tab_sprite_scale_factor)
         self._entity_tab_bar:push(tab_sprite)
-
-        rt.savepoint_maybe()
 
         local equip_consumable_layout = {}
         local move_layout = {}
@@ -197,16 +186,12 @@ function mn.InventoryScene:create_from_state(state)
         for i = 1, n_moves do
             page.moves:set_object(i, moves[i])
         end
-
-        rt.savepoint_maybe()
-
+        
         local n_equips, equips = self._state:entity_list_equip_slots(entity)
         for i = 1, n_equips do
             page.equips_and_consumables:set_object(i, equips[i])
         end
-
-        rt.savepoint_maybe()
-
+        
         local n_consumables, consumables = self._state:entity_list_consumable_slots(entity)
         for i = 1, n_consumables do
             page.equips_and_consumables:set_object(i + n_equips, consumables[i])
@@ -214,19 +199,11 @@ function mn.InventoryScene:create_from_state(state)
 
         page.info:realize()
 
-        rt.savepoint_maybe()
-
         page.equips_and_consumables:realize()
-
-        rt.savepoint_maybe()
 
         page.moves:realize()
 
-        rt.savepoint_maybe()
-
         self._entity_pages[entity_i] = page
-
-        rt.savepoint_maybe()
     end
 
     local sprite = rt.Sprite("opal", 19)
@@ -239,35 +216,26 @@ function mn.InventoryScene:create_from_state(state)
     self._entity_tab_bar:set_orientation(rt.Orientation.VERTICAL)
     self._entity_tab_bar:realize()
 
-    rt.savepoint_maybe()
 
     self._shared_move_list:clear()
     for move, quantity in pairs(self._state:list_shared_move_quantities()) do
         self._shared_move_list:add(move, quantity)
     end
 
-    rt.savepoint_maybe()
-
     self._shared_equip_list:clear()
     for equip, quantity in pairs(self._state:list_shared_equip_quantities()) do
         self._shared_equip_list:add(equip, quantity)
     end
-
-    rt.savepoint_maybe()
 
     self._shared_consumable_list:clear()
     for consumable, quantity in pairs(self._state:list_shared_consumable_quantities()) do
         self._shared_consumable_list:add(consumable, quantity)
     end
 
-    rt.savepoint_maybe()
-
     self._shared_template_list:clear()
     for template in values(self._state:list_templates()) do
         self._shared_template_list:add(template)
     end
-
-    rt.savepoint_maybe()
 end
 
 --- @override
@@ -298,7 +266,6 @@ function mn.InventoryScene:size_allocate(x, y, width, height)
     self._entity_tab_bar:fit_into(current_x, current_y, tab_w, height - outer_margin - (current_y - y))
     local entity_bar_selection_nodes = self._entity_tab_bar:get_selection_nodes()
 
-    rt.savepoint_maybe()
 
     current_x = current_x + tile_size + 2 * m
     for page in values(self._entity_pages) do
@@ -310,8 +277,6 @@ function mn.InventoryScene:size_allocate(x, y, width, height)
         page_y = page_y - m - moves_h
         page.moves:fit_into(current_x, page_y, page_w, moves_h)
         page.info:fit_into(current_x, current_y, page_w, page_y - current_y - m)
-
-        rt.savepoint_maybe()
     end
 
     local shared_page_w = page_w
@@ -336,7 +301,6 @@ function mn.InventoryScene:size_allocate(x, y, width, height)
     local shared_list_bounds = rt.AABB(current_x, current_y, shared_page_w, shared_page_h - m - shared_tab_h)
     self._shared_list_frame:fit_into(shared_list_bounds)
 
-    rt.savepoint_maybe()
 
     local list_xm, list_ym = m, m
     for list in range(
@@ -351,13 +315,9 @@ function mn.InventoryScene:size_allocate(x, y, width, height)
             shared_list_bounds.width - 2 * list_xm,
             shared_list_bounds.height - 2 * list_ym
         )
-
-        rt.savepoint_maybe()
     end
 
-    rt.savepoint_maybe()
     self:_regenerate_selection_nodes()
-    rt.savepoint_maybe()
 
     self:_set_shared_list_index(self._shared_list_index)
     self:_set_entity_index(self._entity_index)
@@ -370,8 +330,6 @@ function mn.InventoryScene:size_allocate(x, y, width, height)
     self._template_confirm_load_dialog:fit_into(x, y, width, height)
     self._template_confirm_delete_dialog:fit_into(x, y, width, height)
     self._template_apply_unsuccesfull_dialog:fit_into(x, y, width, height)
-
-    rt.savepoint_maybe()
 end
 
 --- @override

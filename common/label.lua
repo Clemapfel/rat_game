@@ -49,7 +49,7 @@ end)
 
 --- @overload rt.Widget.realize
 function rt.Label:realize()
-    if not self:get_is_realized() then
+    if self:get_is_realized() == false then
         self._bounds = rt.AABB(0, 0, POSITIVE_INFINITY, POSITIVE_INFINITY) -- assume one line until first fit_into
         self:_parse()
         self:_update_default_size()
@@ -188,6 +188,8 @@ function rt.Label:size_allocate(x, y, width, height)
     self._current_width = max_x - min_x
     self._current_height = max_y - min_y
     self._n_rows = sizeof(rows)
+
+    rt.savepoint_maybe()
 end
 
 --- @overload rt.Widget.measure
@@ -571,6 +573,8 @@ function rt.Label:_parse()
     else
         self:set_n_visible_characters(self._n_visible_characters)
     end
+
+    rt.savepoint_maybe()
 end
 
 --- @brief [internal] calculate size given infinite area

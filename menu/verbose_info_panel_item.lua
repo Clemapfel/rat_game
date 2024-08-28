@@ -8,6 +8,7 @@ mn.VerboseInfoPanel.Item = meta.new_type("MenuVerboseInfoPanelItem", rt.Widget, 
         object = nil,
         final_height = 1,
         content = {}, -- Table<rt.Drawable>
+        snapshot = rt.RenderTexture(1, 1)
     })
 
     out.frame:set_corner_radius(1)
