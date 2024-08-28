@@ -123,7 +123,6 @@ end
 
 --- @override
 function mn.Slots:size_allocate(x, y, width, height)
-    if self._is_realized ~= true then return end
     local m = rt.settings.margin_unit
     local inlay_factor = 0.7
 
@@ -251,7 +250,7 @@ end
 
 --- @override
 function mn.Slots:draw()
-    if self._is_realized ~= true then return end
+    if not self:get_is_allocated() then return end
     self._frame:draw()
     self._snapshot:draw(self._snapshot_x, self._snapshot_y)
 

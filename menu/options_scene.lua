@@ -560,7 +560,7 @@ end
 
 --- @override
 function mn.OptionsScene:draw()
-    if self._is_realized ~= true then return end
+    if not self:get_is_allocated() then return end
     for item in values(self._items) do
         item.frame:draw()
         item.label:draw()

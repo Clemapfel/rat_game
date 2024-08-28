@@ -365,7 +365,7 @@ end
 
 --- @override
 function mn.InventoryScene:draw()
-    if self._is_realized ~= true then return end
+    if not self:get_is_allocated() then return end
 
     self._entity_tab_bar:draw()
     local current_page = self._entity_pages[self._entity_index]
@@ -459,6 +459,7 @@ function mn.InventoryScene:_set_control_indicator_layout(layout)
 
     local outer_margin = rt.settings.margin_unit * 2
     local control_w, control_h = self._control_indicator:measure()
+
     self._control_indicator:fit_into(
         self._bounds.x + self._bounds.width - control_w - outer_margin,
         self._bounds.y + outer_margin, control_w, control_h

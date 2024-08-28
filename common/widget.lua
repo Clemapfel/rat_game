@@ -22,6 +22,7 @@ rt.Widget = meta.new_abstract_type("Widget", rt.Drawable, {
     _minimum_width = 1,
     _minimum_height = 1,
     _is_realized = false,
+    _is_allocated = false,
     _opacity = 1
 })
 
@@ -75,7 +76,7 @@ function rt.Widget:reformat()
     if h < self._minimum_height then h = self._minimum_height end
 
     self:size_allocate(x, y, w, h)
-
+    self._is_allocated = true
     rt.savepoint_maybe()
 end
 
@@ -99,8 +100,6 @@ function rt.Widget:fit_into(aabb, y, w, h)
         math.round(aabb.width), math.round(aabb.height)
     )
     self:reformat()
-
-    rt.savepoint_maybe()
 end
 
 --- @brief
@@ -238,6 +237,11 @@ end
 --- @brief get whether widget was realized
 function rt.Widget:get_is_realized()
     return self._is_realized
+end
+
+--- @brief
+function rt.Widget:get_is_allocated()
+    return self._is_allocated
 end
 
 --- @brief

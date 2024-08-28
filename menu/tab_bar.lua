@@ -184,7 +184,7 @@ end
 
 --- @override
 function mn.TabBar:draw()
-    if self._is_realized ~= true then return end
+    if not self:get_is_allocated() then return end
     local item_i = 1
     for item in values(self._items) do
         item.frame:draw()

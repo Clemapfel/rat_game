@@ -58,6 +58,7 @@ function mn.VerboseInfoPanel:show(...)
         item:create_from(object)
         item:realize()
         table.insert(self._items, item)
+        rt.savepoint_maybe()
     end
 
     self._n_items = sizeof(self._items)

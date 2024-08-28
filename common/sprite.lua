@@ -99,7 +99,7 @@ end
 
 --- @brief
 function rt.Sprite:set_animation(id)
-    if self._is_realized == false then self:realize() end
+    if self:get_is_realized() == false then self:realize() end
     if id == "" or id == nil then
         self:set_frame(1)
         self._frame_range_start = 1

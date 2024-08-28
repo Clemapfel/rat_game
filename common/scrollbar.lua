@@ -61,8 +61,6 @@ end
 
 --- @brief
 function rt.Scrollbar:size_allocate(x, y, w, h)
-    if self._is_realized == false then return end
-
     local t = math.floor(self._outline_width / 2)
     self._base:resize(x, y, w, h)
     self._base_outline:resize(x + t, y + t, w - 2 * t, h - 2 * t)

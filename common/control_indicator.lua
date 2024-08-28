@@ -54,6 +54,8 @@ end
 
 --- @brief
 function rt.ControlIndicator:create_from(layout)
+    rt.savepoint_maybe()
+
     self._layout = layout
     local spritesheet_id = rt.settings.control_indicator.spritesheet_id
     self._sprites = {}
@@ -72,6 +74,8 @@ function rt.ControlIndicator:create_from(layout)
 
         sprite:set_opacity(self._opacity)
         label:set_opacity(self._opacity)
+
+        rt.savepoint_maybe()
     end
 
     self:reformat()

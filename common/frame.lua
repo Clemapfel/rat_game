@@ -72,7 +72,7 @@ end
 
 --- @overload rt.Drawable.draw
 function rt.Frame:draw()
-    if not self:get_is_visible() then return end
+    if not self:get_is_visible() or not self:get_is_allocated() then return end
 
     if self._child_valid then
         self:_bind_stencil()
