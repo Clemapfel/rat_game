@@ -123,6 +123,11 @@ function rt.Font:get_bold_italic()
     return self[rt.FontStyle.BOLD_ITALIC]
 end
 
+--- @brief
+function rt.Font:measure_glyph(label)
+    return self[rt.FontStyle.REGULAR]:getWidth(label), self[rt.FontStyle.REGULAR]:getHeight(label)
+end
+
 --- @brief [internal] load default fonts and fallbacks
 function rt.load_default_fonts()
     -- fallback fonts to support more symbols

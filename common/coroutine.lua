@@ -1,5 +1,6 @@
 rt.coroutine = {}
 rt.coroutine.frame_start = love.timer.getTime()
+rt.coroutine.n_active = 0
 
 --- @class rt.CoroutineStatus
 rt.CoroutineStatus = meta.new_enum({
@@ -13,7 +14,11 @@ rt.CoroutineStatus = meta.new_enum({
 rt.Coroutine = meta.new_type("Coroutine", function(f, start_immediately)
     if start_immediately == nil then start_immediately = false end
     local out = meta.new(rt.Coroutine, {
-        _native = coroutine.create(f)
+        _native = coroutine.create(function(...)
+            rt.coroutine.n_active = rt.coroutine.n_active + 1
+            f(...)
+            rt.coroutine.n_active = rt.coroutine.n_active - 1
+        end)
     })
 
     if start_immediately == true then coroutine.resume(out._native) end
@@ -41,6 +46,7 @@ end
 
 --- @brief
 rt.savepoint_maybe = function(frame_percentage)
+    if rt.coroutine.n_active <= 0 then return end
     if frame_percentage == nil then frame_percentage = 0.5 end
     local frame_duration = rt.graphics.get_frame_duration() / (1 / 60)
 

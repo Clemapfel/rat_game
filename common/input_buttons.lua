@@ -198,7 +198,6 @@ rt.InputButton = meta.new_enum({
     DEBUG = "DEBUG"
 })
 
-
 --- @brief
 rt._gamepad_button_to_string = {
     ["y"] = "TOP",

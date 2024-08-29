@@ -8,6 +8,10 @@ option_scene = mn.OptionsScene(state)
 
 which_scene = true
 
+indicator = rt.KeybindingIndicator(rt.KeyboardKey.BACKSPACE)
+indicator:realize()
+indicator:fit_into(50, 50, 75, 75)
+
 input = rt.InputController()
 input:signal_connect("pressed", function(_, which)
     if which == rt.InputButton.L then
@@ -18,6 +22,10 @@ input:signal_connect("pressed", function(_, which)
             state:set_current_scene(option_scene)
         end
     end
+end)
+
+input:signal_connect("keyboard_pressed_raw", function(_, which, scancode)
+    dbg(which, " ", scancode)
 end)
 
 love.load = function()
@@ -32,6 +40,8 @@ end
 
 love.draw = function()
     state:_draw()
+
+    indicator:draw()
 end
 
 love.resize = function(new_width, new_height)

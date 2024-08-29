@@ -493,13 +493,14 @@ end
 --- @brief
 function rt.GameState:_update(delta)
     local n = sizeof(self._active_coroutines)
-    if n > 1 then dbg(n) end
 
     local to_remove = {}
+    local max_n_routines = 2;
+    local n_routines = 0;
     for i, routine in ipairs(self._active_coroutines) do
         if not routine:get_is_done() then
             routine:resume()
-            return
+            return; -- work trough all routines until first update
         else
             table.insert(to_remove, i)
         end
@@ -510,14 +511,9 @@ function rt.GameState:_update(delta)
         table.remove(self._active_coroutines, i)
     end
 
-    table.insert(self._active_coroutines, rt.Coroutine(function()
-        if self._current_scene ~= nil then
-
-            rt.savepoint_maybe()
-            self._current_scene:update(delta)
-            rt.savepoint_maybe()
-        end
-    end))
+    if self._current_scene ~= nil then
+        self._current_scene:update(delta)
+    end
 end
 
 --- @brief
