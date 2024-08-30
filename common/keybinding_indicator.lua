@@ -40,6 +40,8 @@ function rt.KeybindingIndicator:size_allocate(x, y, width, height)
             self._key == rt.GamepadButton.DPAD_LEFT,
             height
         )
+    elseif self._key == rt.GamepadButton.START or self._key == rt.GamepadButton.SELECT then
+        self:_as_start_select(self._key == rt.GamepadButton.START, height)
     end
 end
 
@@ -420,12 +422,98 @@ function rt.KeybindingIndicator:_as_dpad(up_selected, right_selected, down_selec
         bottom_base,
         left_base,
 
-
         --[[
         top_outline,
         right_outline,
         bottom_outline,
         left_outline
         ]]--
+    }
+end
+
+--- @brief
+function rt.KeybindingIndicator:_as_start_select(start_or_select, width)
+    local x, y = 0, 0
+    local height = width
+
+    local w = 0.9 * width / 1.5
+    local h = 0.4 * height / 1.5
+
+    local center_x, center_y = x + 0.5 * width, y + 0.5 * height
+    local base = rt.Rectangle(center_x - 0.5 * w, center_y - 0.5 * h, w, h)
+    local base_outline = rt.Rectangle(center_x - 0.5 * w, center_y - 0.5 * h, w, h)
+    local base_outline_outline = rt.Rectangle(center_x - 0.5 * w, center_y - 0.5 * h, w, h)
+
+    for rectangle in range(base, base_outline, base_outline_outline) do
+        rectangle:set_corner_radius(h / 2)
+    end
+
+    base:set_color(self.foreground_color)
+    base_outline:set_color(self.outline_color)
+    base_outline:set_is_outline(true)
+    base_outline:set_line_width(2)
+
+    base_outline_outline:set_color(rt.Palette.TRUE_WHITE)
+    base_outline_outline:set_is_outline(true)
+    base_outline_outline:set_line_width(6)
+
+    local r = 0.5 * h * 0.8
+    local right_triangle, right_triangle_outline
+
+    do
+        local angle1 = 0
+        local angle2 = 2 * math.pi / 3
+        local angle3 = 4 * math.pi / 3
+
+        local vertices = {
+            center_x + r * math.cos(angle1), center_y + r * math.sin(angle1),
+            center_x + r * math.cos(angle2), center_y + r * math.sin(angle2),
+            center_x + r * math.cos(angle3), center_y + r * math.sin(angle3)
+        }
+
+        right_triangle = rt.Polygon(vertices)
+        right_triangle_outline = rt.Polygon(vertices)
+    end
+
+    local left_triangle, left_triangle_outline
+    do
+        local angle1 = math.pi
+        local angle2 = math.pi + 2 * math.pi / 3
+        local angle3 = math.pi + 4 * math.pi / 3
+
+        local vertices = {
+            center_x + r * math.cos(angle1), center_y + r * math.sin(angle1),
+            center_x + r * math.cos(angle2), center_y + r * math.sin(angle2),
+            center_x + r * math.cos(angle3), center_y + r * math.sin(angle3)
+        }
+
+        left_triangle = rt.Polygon(vertices)
+        left_triangle_outline = rt.Polygon(vertices)
+    end
+
+    for triangle in range(left_triangle, right_triangle) do
+        triangle:set_color(self.background_color)
+    end
+
+    for triangle_outline in range(left_triangle_outline, right_triangle_outline) do
+        triangle_outline:set_color(self.outline_color)
+        triangle_outline:set_is_outline(true)
+    end
+
+    local triangle, triangle_outline
+    if start_or_select == true then
+        triangle = right_triangle
+        triangle_outline = right_triangle_outline
+    else
+        triangle = left_triangle
+        triangle_outline = left_triangle_outline
+    end
+
+    self._content = {
+        base_outline_outline,
+        base,
+        base_outline,
+        triangle,
+        triangle_outline
     }
 end

@@ -22,14 +22,10 @@
     </configurations>
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="7fa9ba1b-2cff-4ecc-86fb-59ab2fa76ee1" name="Changes" comment="added button indicators">
+    <list default="true" id="7fa9ba1b-2cff-4ecc-86fb-59ab2fa76ee1" name="Changes" comment="added buttons and dpad">
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/common/game_state.lua" beforeDir="false" afterPath="$PROJECT_DIR$/common/game_state.lua" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/common/input_buttons.lua" beforeDir="false" afterPath="$PROJECT_DIR$/common/input_buttons.lua" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/common/keybinding_indicator.lua" beforeDir="false" afterPath="$PROJECT_DIR$/common/keybinding_indicator.lua" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/common/shape_ellipse.lua" beforeDir="false" afterPath="$PROJECT_DIR$/common/shape_ellipse.lua" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/main.lua" beforeDir="false" afterPath="$PROJECT_DIR$/main.lua" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/older/~common/shapes/ellipse.lua" beforeDir="false" afterPath="$PROJECT_DIR$/older/~common/shapes/ellipse.lua" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -499,15 +495,7 @@
       <workItem from="1724863091866" duration="7939000" />
       <workItem from="1724871059493" duration="5162000" />
       <workItem from="1724897431690" duration="360000" />
-      <workItem from="1724955706113" duration="18116000" />
-    </task>
-    <task id="LOCAL-00961" summary="polished animation">
-      <option name="closed" value="true" />
-      <created>1723659663553</created>
-      <option name="number" value="00961" />
-      <option name="presentableId" value="LOCAL-00961" />
-      <option name="project" value="LOCAL" />
-      <updated>1723659663553</updated>
+      <workItem from="1724955706113" duration="19436000" />
     </task>
     <task id="LOCAL-00962" summary="fixed separate blendmodes">
       <option name="closed" value="true" />
@@ -893,7 +881,15 @@
       <option name="project" value="LOCAL" />
       <updated>1724986518757</updated>
     </task>
-    <option name="localTasksCounter" value="1010" />
+    <task id="LOCAL-01010" summary="added buttons and dpad">
+      <option name="closed" value="true" />
+      <created>1725044584854</created>
+      <option name="number" value="01010" />
+      <option name="presentableId" value="LOCAL-01010" />
+      <option name="project" value="LOCAL" />
+      <updated>1725044584854</updated>
+    </task>
+    <option name="localTasksCounter" value="1011" />
     <servers />
   </component>
   <component name="TypeScriptGeneratedFilesManager">
@@ -942,7 +938,6 @@
     </option>
   </component>
   <component name="VcsManagerConfiguration">
-    <MESSAGE value="stashing debug draw" />
     <MESSAGE value="stashing interface" />
     <MESSAGE value="added draw call performance metrics" />
     <MESSAGE value="added info object constants" />
@@ -967,7 +962,8 @@
     <MESSAGE value="stashing update, why does it impact fps instead of piling up coroutines?" />
     <MESSAGE value="added keyboard indicator" />
     <MESSAGE value="added button indicators" />
-    <option name="LAST_COMMIT_MESSAGE" value="added button indicators" />
+    <MESSAGE value="added buttons and dpad" />
+    <option name="LAST_COMMIT_MESSAGE" value="added buttons and dpad" />
   </component>
   <component name="XDebuggerManager">
     <breakpoint-manager>
