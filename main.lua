@@ -11,23 +11,28 @@ which_scene = true
 
 indicators = {}
 
+local bindings = {
+    rt.GamepadButton.TOP, rt.GamepadButton.RIGHT, rt.GamepadButton.BOTTOM, rt.GamepadButton.LEFT, "\n",
+    rt.KeyboardKey.ARROW_UP, rt.KeyboardKey.BACKSPACE, rt.KeyboardKey.SPACE, rt.KeyboardKey.RETURN, "\n",
+    rt.GamepadButton.DPAD_UP, rt.GamepadButton.DPAD_RIGHT, rt.GamepadButton.DPAD_DOWN, rt.GamepadButton.DPAD_LEFT, "\n"
+}
+
 local indicator_x, indicator_y = 50, 50
 local indicator_w, indicator_h = 75, 75
 local row_i, col_i = 0, 0
-for which in range(rt.GamepadButton.TOP, rt.GamepadButton.RIGHT, rt.GamepadButton.BOTTOM, rt.GamepadButton.LEFT) do
-    local indicator = rt.KeybindingIndicator(which)
-    indicator:realize()
-    indicator:fit_into(indicator_x + row_i * indicator_w, indicator_y + col_i * indicator_h, indicator_w, indicator_h)
-
-    row_i = row_i + 1
-    if indicator_x + indicator_w * row_i > rt.graphics.get_width() - indicator_x then
+for which in values(bindings) do
+    if which == "\n" then
         row_i = 0
         col_i = col_i + 1
+    else
+        local indicator = rt.KeybindingIndicator(which)
+        indicator:realize()
+        indicator:fit_into(math.round(indicator_x + row_i * indicator_w), math.round(indicator_y + col_i * indicator_h), indicator_w, indicator_h)
+
+        row_i = row_i + 1
+        table.insert(indicators, indicator)
     end
-
-    table.insert(indicators, indicator)
 end
-
 
 input = rt.InputController()
 input:signal_connect("pressed", function(_, which)
@@ -56,7 +61,7 @@ love.update = function(delta)
 end
 
 love.draw = function()
-    state:_draw()
+    --state:_draw()
 
     for indicator in values(indicators) do
         indicator:draw()

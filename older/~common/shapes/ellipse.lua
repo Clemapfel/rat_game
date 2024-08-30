@@ -48,6 +48,11 @@ function rt.Ellipse:set_center(x, y)
     self._y = y
 end
 
+--- @brief
+function rt.Ellipse:set_(n)
+    self._n_outer_vertices = n
+end
+
 --- @overload
 rt.Ellipse.set_centroid = rt.Ellipse.set_center
 

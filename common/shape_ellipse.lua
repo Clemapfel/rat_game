@@ -71,3 +71,8 @@ end
 function rt.Ellipse:get_radius()
     return self._x_radius, self._y_radius
 end
+
+--- @brief
+function rt.Ellipse:set_n_outer_vertices(n)
+    self._n_outer_vertices = n
+end

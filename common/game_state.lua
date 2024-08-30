@@ -276,7 +276,7 @@ function rt.GameState:_update_window_mode()
             fullscreen = false,
             fullscreentype = "desktop",
             vsync = self._state.vsync_mode,
-            msaa = 0, --self._state.msaa_quality,
+            msaa = self._state.msaa_quality,
             stencil = true,
             depth = false,
             resizable = resizable,

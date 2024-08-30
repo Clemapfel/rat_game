@@ -238,10 +238,25 @@ function rt.keyboard_key_to_string(keyboard_key)
         return ""
     end
 
-    if res == "ä" then res = "Ä"
-    elseif res == "ö" then res = "Ö"
-    elseif res == "ü" then res = "Ü"
-    end
+    local up_arrow = "\u{2191}"
+    local down_arrow = "\u{2193}"
+    local left_arrow = "\u{2190}"
+    local right_arrow = "\u{2192}"
+    local space_bar = "\u{2423}"
+    local enter = "\u{21B5}"
+    local backspace = "\u{232B}"
 
-    return string.upper(res)
+    if res == "ä" then return "Ä"
+    elseif res == "ö" then return "Ö"
+    elseif res == "ü" then return "Ü"
+    elseif res == "up" then return up_arrow
+    elseif res == "right" then return right_arrow
+    elseif res == "down" then return down_arrow
+    elseif res == "left" then return left_arrow
+    elseif res == "space" then return space_bar
+    elseif res == "return" then return enter
+    --elseif res == "backspace" then return backspace
+    else
+        return string.upper(res)
+    end
 end

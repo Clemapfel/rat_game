@@ -22,11 +22,14 @@
     </configurations>
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="7fa9ba1b-2cff-4ecc-86fb-59ab2fa76ee1" name="Changes" comment="added keyboard indicator">
+    <list default="true" id="7fa9ba1b-2cff-4ecc-86fb-59ab2fa76ee1" name="Changes" comment="added button indicators">
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/common/game_state.lua" beforeDir="false" afterPath="$PROJECT_DIR$/common/game_state.lua" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/common/input_buttons.lua" beforeDir="false" afterPath="$PROJECT_DIR$/common/input_buttons.lua" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/common/keybinding_indicator.lua" beforeDir="false" afterPath="$PROJECT_DIR$/common/keybinding_indicator.lua" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/common/shape_ellipse.lua" beforeDir="false" afterPath="$PROJECT_DIR$/common/shape_ellipse.lua" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/main.lua" beforeDir="false" afterPath="$PROJECT_DIR$/main.lua" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/older/~common/shapes/ellipse.lua" beforeDir="false" afterPath="$PROJECT_DIR$/older/~common/shapes/ellipse.lua" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -496,15 +499,7 @@
       <workItem from="1724863091866" duration="7939000" />
       <workItem from="1724871059493" duration="5162000" />
       <workItem from="1724897431690" duration="360000" />
-      <workItem from="1724955706113" duration="10828000" />
-    </task>
-    <task id="LOCAL-00960" summary="fixed grafics desynch bug">
-      <option name="closed" value="true" />
-      <created>1723659199851</created>
-      <option name="number" value="00960" />
-      <option name="presentableId" value="LOCAL-00960" />
-      <option name="project" value="LOCAL" />
-      <updated>1723659199851</updated>
+      <workItem from="1724955706113" duration="18116000" />
     </task>
     <task id="LOCAL-00961" summary="polished animation">
       <option name="closed" value="true" />
@@ -890,7 +885,15 @@
       <option name="project" value="LOCAL" />
       <updated>1724975937196</updated>
     </task>
-    <option name="localTasksCounter" value="1009" />
+    <task id="LOCAL-01009" summary="added button indicators">
+      <option name="closed" value="true" />
+      <created>1724986518757</created>
+      <option name="number" value="01009" />
+      <option name="presentableId" value="LOCAL-01009" />
+      <option name="project" value="LOCAL" />
+      <updated>1724986518757</updated>
+    </task>
+    <option name="localTasksCounter" value="1010" />
     <servers />
   </component>
   <component name="TypeScriptGeneratedFilesManager">
@@ -939,7 +942,6 @@
     </option>
   </component>
   <component name="VcsManagerConfiguration">
-    <MESSAGE value="stashing chain shape" />
     <MESSAGE value="stashing debug draw" />
     <MESSAGE value="stashing interface" />
     <MESSAGE value="added draw call performance metrics" />
@@ -964,7 +966,8 @@
     <MESSAGE value="refactored _is_realized to get_is_realized" />
     <MESSAGE value="stashing update, why does it impact fps instead of piling up coroutines?" />
     <MESSAGE value="added keyboard indicator" />
-    <option name="LAST_COMMIT_MESSAGE" value="added keyboard indicator" />
+    <MESSAGE value="added button indicators" />
+    <option name="LAST_COMMIT_MESSAGE" value="added button indicators" />
   </component>
   <component name="XDebuggerManager">
     <breakpoint-manager>
