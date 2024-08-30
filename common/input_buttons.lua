@@ -110,12 +110,12 @@ rt.KeyboardKey = meta.new_enum({
     POWER = rt.KeyboardKeyPrefix .. "power",
     EURO = rt.KeyboardKeyPrefix .. "currencyunit",
     UNDO = rt.KeyboardKeyPrefix .. "undo",
-    SEARCH = rt.KeyboardKeyPrefix .. "appsearch",
-    HOME = rt.KeyboardKeyPrefix .. "apphome",
-    BACK = rt.KeyboardKeyPrefix .. "appback",
-    FORWARD = rt.KeyboardKeyPrefix .. "appforward",
-    REFRESH = rt.KeyboardKeyPrefix .. "apprefresh",
-    BOOKMARKS = rt.KeyboardKeyPrefix .. "appbookmarks",
+    SEARCH = rt.KeyboardKeyPrefix .. "acsearch",
+    HOME = rt.KeyboardKeyPrefix .. "achome",
+    BACK = rt.KeyboardKeyPrefix .. "acback",
+    FORWARD = rt.KeyboardKeyPrefix .. "acforward",
+    REFRESH = rt.KeyboardKeyPrefix .. "acrefresh",
+    BOOKMARKS = rt.KeyboardKeyPrefix .. "acbookmarks",
     NUMPAD_0 = rt.KeyboardKeyPrefix .. "kp0",
     NUMPAD_1 = rt.KeyboardKeyPrefix .. "kp1",
     NUMPAD_2 = rt.KeyboardKeyPrefix .. "kp2",
@@ -228,6 +228,20 @@ function rt.gamepad_button_to_string(gamepad_button)
 end
 
 function rt.keyboard_key_to_string(keyboard_key)
+    if keyboard_key == rt.KeyboardKey.UNKNOWN then return "" end
     local raw = string.sub(keyboard_key, #rt.KeyboardKeyPrefix + 1, #keyboard_key)
-    return string.upper(love.keyboard.getKeyFromScancode(raw))
+
+    local status
+    local status, res = pcall(function() return love.keyboard.getKeyFromScancode(raw) end)
+    if status == false then
+        rt.warning("In rt.keyboard_key_to_string: invalid scancode `" .. raw .. "`")
+        return ""
+    end
+
+    if res == "ä" then res = "Ä"
+    elseif res == "ö" then res = "Ö"
+    elseif res == "ü" then res = "Ü"
+    end
+
+    return string.upper(res)
 end

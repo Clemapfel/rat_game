@@ -8,9 +8,26 @@ option_scene = mn.OptionsScene(state)
 
 which_scene = true
 
-indicator = rt.KeybindingIndicator(rt.KeyboardKey.BACKSPACE)
-indicator:realize()
-indicator:fit_into(50, 50, 75, 75)
+
+indicators = {}
+
+local indicator_x, indicator_y = 50, 50
+local indicator_w, indicator_h = 75, 75
+local row_i, col_i = 0, 0
+for which in range(rt.GamepadButton.TOP, rt.GamepadButton.RIGHT, rt.GamepadButton.BOTTOM, rt.GamepadButton.LEFT) do
+    local indicator = rt.KeybindingIndicator(which)
+    indicator:realize()
+    indicator:fit_into(indicator_x + row_i * indicator_w, indicator_y + col_i * indicator_h, indicator_w, indicator_h)
+
+    row_i = row_i + 1
+    if indicator_x + indicator_w * row_i > rt.graphics.get_width() - indicator_x then
+        row_i = 0
+        col_i = col_i + 1
+    end
+
+    table.insert(indicators, indicator)
+end
+
 
 input = rt.InputController()
 input:signal_connect("pressed", function(_, which)
@@ -41,7 +58,9 @@ end
 love.draw = function()
     state:_draw()
 
-    indicator:draw()
+    for indicator in values(indicators) do
+        indicator:draw()
+    end
 end
 
 love.resize = function(new_width, new_height)

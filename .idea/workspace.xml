@@ -22,16 +22,11 @@
     </configurations>
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="7fa9ba1b-2cff-4ecc-86fb-59ab2fa76ee1" name="Changes" comment="stashing update, why does it impact fps instead of piling up coroutines?">
-      <change afterPath="$PROJECT_DIR$/common/keybinding_indicator.lua" afterDir="false" />
+    <list default="true" id="7fa9ba1b-2cff-4ecc-86fb-59ab2fa76ee1" name="Changes" comment="added keyboard indicator">
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/common/coroutine.lua" beforeDir="false" afterPath="$PROJECT_DIR$/common/coroutine.lua" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/common/font.lua" beforeDir="false" afterPath="$PROJECT_DIR$/common/font.lua" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/common/game_state.lua" beforeDir="false" afterPath="$PROJECT_DIR$/common/game_state.lua" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/common/input_buttons.lua" beforeDir="false" afterPath="$PROJECT_DIR$/common/input_buttons.lua" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/include.lua" beforeDir="false" afterPath="$PROJECT_DIR$/include.lua" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/common/keybinding_indicator.lua" beforeDir="false" afterPath="$PROJECT_DIR$/common/keybinding_indicator.lua" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/main.lua" beforeDir="false" afterPath="$PROJECT_DIR$/main.lua" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/menu/keybinding_indicator.lua" beforeDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -501,15 +496,7 @@
       <workItem from="1724863091866" duration="7939000" />
       <workItem from="1724871059493" duration="5162000" />
       <workItem from="1724897431690" duration="360000" />
-      <workItem from="1724955706113" duration="5157000" />
-    </task>
-    <task id="LOCAL-00959" summary="added interactivity to menu rework">
-      <option name="closed" value="true" />
-      <created>1723658910822</created>
-      <option name="number" value="00959" />
-      <option name="presentableId" value="LOCAL-00959" />
-      <option name="project" value="LOCAL" />
-      <updated>1723658910822</updated>
+      <workItem from="1724955706113" duration="10828000" />
     </task>
     <task id="LOCAL-00960" summary="fixed grafics desynch bug">
       <option name="closed" value="true" />
@@ -895,7 +882,15 @@
       <option name="project" value="LOCAL" />
       <updated>1724876081413</updated>
     </task>
-    <option name="localTasksCounter" value="1008" />
+    <task id="LOCAL-01008" summary="added keyboard indicator">
+      <option name="closed" value="true" />
+      <created>1724975937195</created>
+      <option name="number" value="01008" />
+      <option name="presentableId" value="LOCAL-01008" />
+      <option name="project" value="LOCAL" />
+      <updated>1724975937196</updated>
+    </task>
+    <option name="localTasksCounter" value="1009" />
     <servers />
   </component>
   <component name="TypeScriptGeneratedFilesManager">
@@ -944,7 +939,6 @@
     </option>
   </component>
   <component name="VcsManagerConfiguration">
-    <MESSAGE value="bodies working" />
     <MESSAGE value="stashing chain shape" />
     <MESSAGE value="stashing debug draw" />
     <MESSAGE value="stashing interface" />
@@ -969,7 +963,8 @@
     <MESSAGE value="stashing, why does update not stack with increased frame duration" />
     <MESSAGE value="refactored _is_realized to get_is_realized" />
     <MESSAGE value="stashing update, why does it impact fps instead of piling up coroutines?" />
-    <option name="LAST_COMMIT_MESSAGE" value="stashing update, why does it impact fps instead of piling up coroutines?" />
+    <MESSAGE value="added keyboard indicator" />
+    <option name="LAST_COMMIT_MESSAGE" value="added keyboard indicator" />
   </component>
   <component name="XDebuggerManager">
     <breakpoint-manager>
