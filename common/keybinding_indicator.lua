@@ -10,7 +10,7 @@ rt.KeybindingIndicator = meta.new_type("KeybindingIndicator", rt.Widget, functio
     return meta.new(rt.KeybindingIndicator, {
         _key = key,
         _font = nil, -- rt.Font
-        _content = {}, -- Table<rt.Drawable>
+        _draw = function() end,
     })
 end, {
     font_size_to_font = {},
@@ -42,15 +42,15 @@ function rt.KeybindingIndicator:size_allocate(x, y, width, height)
         )
     elseif self._key == rt.GamepadButton.START or self._key == rt.GamepadButton.SELECT then
         self:_as_start_select(self._key == rt.GamepadButton.START, height)
+    elseif self._key == rt.GamepadButton.LEFT_SHOULDER or self._key == rt.GamepadButton.RIGHT_SHOULDER then
+        self:_as_l_r(self._key == rt.GamepadButton.LEFT_SHOULDER, height)
     end
 end
 
 --- @override
 function rt.KeybindingIndicator:draw()
     rt.graphics.translate(self._bounds.x, self._bounds.y)
-    for drawable in values(self._content) do
-        drawable:draw()
-    end
+    self._draw()
     rt.graphics.translate(-self._bounds.x, -self._bounds.y)
 end
 
@@ -159,6 +159,12 @@ function rt.KeybindingIndicator:_as_keyboard_key(label, width)
         front_base,
         front_base_outline
     }
+
+    self._draw = function()
+        for drawable in values(self._content) do
+            drawable:draw()
+        end
+    end
 
     outline_outline:draw()
     base:draw()
@@ -281,6 +287,12 @@ function rt.KeybindingIndicator:_as_button(which, width)
         left_outline,
         selection_inlay
     }
+
+    self._draw = function()
+        for drawable in values(self._content) do
+            drawable:draw()
+        end
+    end
 end
 
 --- @brief
@@ -429,6 +441,12 @@ function rt.KeybindingIndicator:_as_dpad(up_selected, right_selected, down_selec
         left_outline
         ]]--
     }
+
+    self._draw = function()
+        for drawable in values(self._content) do
+            drawable:draw()
+        end
+    end
 end
 
 --- @brief
@@ -516,4 +534,70 @@ function rt.KeybindingIndicator:_as_start_select(start_or_select, width)
         triangle,
         triangle_outline
     }
+
+    self._draw = function()
+        for drawable in values(self._content) do
+            drawable:draw()
+        end
+    end
+end
+
+--- @brief
+function rt.KeybindingIndicator:_as_l_r(l_or_r, width)
+    local x, y, height = 0, 0, width
+
+    local label
+    if l_or_r == true then
+        label = rt.Label("<o>L</o>")
+    else
+        label = rt.Label("<o>R</o>")
+    end
+
+    label:realize()
+    label:set_justify_mode(rt.JustifyMode.CENTER)
+    local label_w, label_h = label:measure()
+    label:fit_into(0, y + 0.5 * height - 0.5 * label_h, width, height)
+
+    local larger_x, larger_y = 0, 0
+    local larger_w = width
+    local larger_h = height
+    local larger, larger_outline = rt.Rectangle(larger_x, larger_y, 5 * larger_w, 5 * larger_h), rt.Rectangle(larger_x, larger_y, 5 * larger_w, 5 * larger_h)
+
+    for large in range(larger, larger_outline) do
+        large:set_corner_radius(width / 1.5)
+    end
+
+    local smaller, smaller_outline = rt.Rectangle(larger_x, larger_y, larger_w, larger_h), rt.Rectangle(larger_x, larger_y, larger_w, larger_h)
+
+    for small in range(smaller, smaller_outline) do
+        smaller:set_corner_radius(width / 8)
+    end
+
+    for outline in range(smaller_outline, larger_outline) do
+        outline:set_is_outline(true)
+        outline:set_color(self.outline_color)
+        outline:set_line_width(4)
+    end
+
+    self._content = {
+        label
+    }
+
+    self._draw = function()
+        label:draw()
+
+        local base, smaller_v, larger_v = 123, 1, 1
+
+        -- draw intersection
+        rt.graphics.stencil(base, rt.Rectangle(0, 0, height, height), rt.StencilMode.REPLACE)
+        rt.graphics.stencil(smaller_v, smaller, rt.StencilMode.INCREMENT)
+        rt.graphics.stencil(larger_v, larger, rt.StencilMode.INCREMENT)
+
+        rt.graphics.set_stencil_test(rt.StencilCompareMode.EQUAL, base + smaller_v + larger_v)
+        larger:draw()
+        smaller:draw()
+        larger_outline:draw()
+        smaller_outline:draw()
+        rt.graphics.set_stencil_test()
+    end
 end

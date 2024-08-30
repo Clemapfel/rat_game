@@ -15,7 +15,7 @@ local bindings = {
     rt.GamepadButton.TOP, rt.GamepadButton.RIGHT, rt.GamepadButton.BOTTOM, rt.GamepadButton.LEFT, "\n",
     rt.KeyboardKey.ARROW_UP, rt.KeyboardKey.BACKSPACE, rt.KeyboardKey.SPACE, rt.KeyboardKey.RETURN, "\n",
     rt.GamepadButton.DPAD_UP, rt.GamepadButton.DPAD_RIGHT, rt.GamepadButton.DPAD_DOWN, rt.GamepadButton.DPAD_LEFT, "\n",
-    rt.GamepadButton.START, rt.GamepadButton.SELECT, "\n"
+    rt.GamepadButton.START, rt.GamepadButton.SELECT, rt.GamepadButton.LEFT_SHOULDER, rt.GamepadButton.RIGHT_SHOULDER, "\n"
 }
 
 local indicator_x, indicator_y = 50, 50

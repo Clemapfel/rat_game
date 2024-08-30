@@ -379,7 +379,14 @@ function meta.new_enum(fields)
         metatable[1][name] = value
     end
 
-    metatable.__index = out[1][1]
+    metatable.__index = function(self, key)
+        local res = metatable[1][key]
+        if res == nil then
+            rt.error("In Enum.__index: enum has no member with name `" .. key .. "`")
+        end
+        return res
+    end
+
     meta.set_is_mutable(out, false)
     return out
 end

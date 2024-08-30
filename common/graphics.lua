@@ -161,12 +161,21 @@ function rt.graphics.set_color(color)
 end
 
 if love.getVersion() >= 12 then
+
+    --- @class rt.StencilMode
+    rt.StencilMode = meta.new_enum({
+        REPLACE = "replace",
+        INCREMENT = "increment",
+        DECREMENT = "decrement"
+    })
+
     --- @brief write a stencil value to an area on screen occupied by drawables
     --- @param new_value Number new stencil value
     --- @vararg rt.Drawable
-    function rt.graphics.stencil(new_value, stencil)
+    function rt.graphics.stencil(new_value, stencil, mode)
+        if mode == nil then mode = rt.StencilMode.REPLACE end
         local mask_r, mask_g, mask_b, mask_a = love.graphics.getColorMask()
-        love.graphics.setStencilState("replace", "always", new_value, 255)
+        love.graphics.setStencilState(mode, "always", new_value, 255)
         love.graphics.setColorMask(false, false, false, false)
         stencil:draw()
         love.graphics.setColorMask(mask_r, mask_g, mask_b, mask_a)
