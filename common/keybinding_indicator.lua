@@ -473,7 +473,7 @@ function rt.KeybindingIndicator:_as_start_select(start_or_select, width)
 
     base_outline_outline:set_color(rt.Palette.TRUE_WHITE)
     base_outline_outline:set_is_outline(true)
-    base_outline_outline:set_line_width(6)
+    base_outline_outline:set_line_width(5)
 
     local r = 0.5 * h * 0.8
     local right_triangle, right_triangle_outline
@@ -558,46 +558,82 @@ function rt.KeybindingIndicator:_as_l_r(l_or_r, width)
     local label_w, label_h = label:measure()
     label:fit_into(0, y + 0.5 * height - 0.5 * label_h, width, height)
 
-    local larger_x, larger_y = 0, 0
-    local larger_w = width
-    local larger_h = height
-    local larger, larger_outline = rt.Rectangle(larger_x, larger_y, 5 * larger_w, 5 * larger_h), rt.Rectangle(larger_x, larger_y, 5 * larger_w, 5 * larger_h)
+    local corner_radius = 10
+    local rect_w, rect_h = width * 0.7, width * 0.45
+    local rect_x, rect_y = (width - rect_w) / 2, (height - rect_h) / 2
+    local rectangle = rt.Rectangle(rect_x, rect_y, rect_w, rect_h)
+    local rectangle_outline = rt.Rectangle(rect_x, rect_y, rect_w, rect_h)
 
-    for large in range(larger, larger_outline) do
-        large:set_corner_radius(width / 1.5)
-    end
+    rectangle:set_corner_radius(10)
+    rectangle_outline:set_corner_radius(10)
 
-    local smaller, smaller_outline = rt.Rectangle(larger_x, larger_y, larger_w, larger_h), rt.Rectangle(larger_x, larger_y, larger_w, larger_h)
+    local bezier_offset = -0.05 * width
+    local curve = love.math.newBezierCurve(
+    rect_x + rect_w - corner_radius , rect_y,
 
-    for small in range(smaller, smaller_outline) do
-        smaller:set_corner_radius(width / 8)
-    end
+        rect_x + bezier_offset,  rect_y + bezier_offset,
 
-    for outline in range(smaller_outline, larger_outline) do
-        outline:set_is_outline(true)
-        outline:set_color(self.outline_color)
-        outline:set_line_width(4)
-    end
+        rect_x, rect_y + rect_h - corner_radius
+    )
+    local curve_line = rt.Line(curve:render())
 
+    local polygon = rt.Polygon(rect_x + 0.9 * rect_w, rect_y + 0.9 * rect_h, table.unpack(curve:render()))
+
+    local padding = 3
+    local stencil = rt.Rectangle(
+        0, 0, 0.6 * width, 0.6 * height
+    )
     self._content = {
-        label
+        label,
+        polygon
     }
 
+    for line in range(curve_line, rectangle_outline) do
+        line:set_color(self.outline_color)
+        line:set_is_outline(true)
+        line:set_line_width(2)
+    end
+
+    for base in range(rectangle, polygon) do
+        base:set_color(self.background_color)
+    end
+
+    local line_outline = rt.Line(curve:render())
+    line_outline:set_color(rt.Palette.WHITE)
+    line_outline:set_line_width(6)
+
+    local rectangle_outline_outline = rt.Rectangle(rect_x, rect_y, rect_w, rect_h)
+    rectangle_outline_outline:set_color(rt.Palette.WHITE)
+    rectangle_outline_outline:set_is_outline(true)
+    rectangle_outline_outline:set_line_width(5)
+    rectangle_outline_outline:set_corner_radius(corner_radius)
+
+    local flip_x = 0.5 * width
     self._draw = function()
-        label:draw()
 
-        local base, smaller_v, larger_v = 123, 1, 1
+        if l_or_r == false then
+            rt.graphics.push()
+            rt.graphics.translate(flip_x, 0)
+            rt.graphics.scale(-1, 1)
+            rt.graphics.translate(-flip_x, 0)
+        end
 
-        -- draw intersection
-        rt.graphics.stencil(base, rt.Rectangle(0, 0, height, height), rt.StencilMode.REPLACE)
-        rt.graphics.stencil(smaller_v, smaller, rt.StencilMode.INCREMENT)
-        rt.graphics.stencil(larger_v, larger, rt.StencilMode.INCREMENT)
+        line_outline:draw()
 
-        rt.graphics.set_stencil_test(rt.StencilCompareMode.EQUAL, base + smaller_v + larger_v)
-        larger:draw()
-        smaller:draw()
-        larger_outline:draw()
-        smaller_outline:draw()
+        rt.graphics.stencil(123, stencil)
+        rt.graphics.set_stencil_test(rt.StencilCompareMode.NOT_EQUAL, 123)
+        rectangle_outline_outline:draw()
+        rectangle:draw()
+        rectangle_outline:draw()
         rt.graphics.set_stencil_test()
+
+        polygon:draw()
+        curve_line:draw()
+
+        if l_or_r == false then
+            rt.graphics.pop()
+        end
+
+        label:draw()
     end
 end

@@ -498,7 +498,7 @@ function mn.OptionsScene:_regenerate_selection_nodes()
         {self._msaa_item, {rt.VerboseInfoObject.MSAA, rt.VerboseInfoObject.MSAA_WIDGET}},
         {self._resolution_item, rt.VerboseInfoObject.RESOLUTION},
         {self._sfx_level_item, rt.VerboseInfoObject.SOUND_EFFECTS},
-        {self._music_level_item, rt.VerboseInfoObject.MUSIC_LEVEL},
+        {self._music_level_item, rt.VerboseInfoObject.MUSIC},
         {self._vfx_motion_item, {rt.VerboseInfoObject.MOTION_EFFECTS, rt.VerboseInfoObject.MOTION_EFFECTS_WIDGET}},
         {self._vfx_contrast_item, {rt.VerboseInfoObject.VISUAL_EFFECTS, rt.VerboseInfoObject.VISUAL_EFFECTS_WIDGET}}
         --{self._keymap_item, rt.VerboseInfoObject.KEYMAP}

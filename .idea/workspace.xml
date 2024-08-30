@@ -22,12 +22,13 @@
     </configurations>
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="7fa9ba1b-2cff-4ecc-86fb-59ab2fa76ee1" name="Changes" comment="added start select button">
+    <list default="true" id="7fa9ba1b-2cff-4ecc-86fb-59ab2fa76ee1" name="Changes" comment="stashing r/l">
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/common/graphics.lua" beforeDir="false" afterPath="$PROJECT_DIR$/common/graphics.lua" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/common/game_state.lua" beforeDir="false" afterPath="$PROJECT_DIR$/common/game_state.lua" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/common/keybinding_indicator.lua" beforeDir="false" afterPath="$PROJECT_DIR$/common/keybinding_indicator.lua" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/common/meta.lua" beforeDir="false" afterPath="$PROJECT_DIR$/common/meta.lua" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/common/shape_rectangle.lua" beforeDir="false" afterPath="$PROJECT_DIR$/common/shape_rectangle.lua" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/main.lua" beforeDir="false" afterPath="$PROJECT_DIR$/main.lua" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/menu/options_scene.lua" beforeDir="false" afterPath="$PROJECT_DIR$/menu/options_scene.lua" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -497,15 +498,8 @@
       <workItem from="1724863091866" duration="7939000" />
       <workItem from="1724871059493" duration="5162000" />
       <workItem from="1724897431690" duration="360000" />
-      <workItem from="1724955706113" duration="21510000" />
-    </task>
-    <task id="LOCAL-00963" summary="dialogs working">
-      <option name="closed" value="true" />
-      <created>1723739750719</created>
-      <option name="number" value="00963" />
-      <option name="presentableId" value="LOCAL-00963" />
-      <option name="project" value="LOCAL" />
-      <updated>1723739750719</updated>
+      <workItem from="1724955706113" duration="22131000" />
+      <workItem from="1725055990975" duration="6058000" />
     </task>
     <task id="LOCAL-00964" summary="added template load">
       <option name="closed" value="true" />
@@ -891,7 +885,15 @@
       <option name="project" value="LOCAL" />
       <updated>1725045728277</updated>
     </task>
-    <option name="localTasksCounter" value="1012" />
+    <task id="LOCAL-01012" summary="stashing r/l">
+      <option name="closed" value="true" />
+      <created>1725047807899</created>
+      <option name="number" value="01012" />
+      <option name="presentableId" value="LOCAL-01012" />
+      <option name="project" value="LOCAL" />
+      <updated>1725047807899</updated>
+    </task>
+    <option name="localTasksCounter" value="1013" />
     <servers />
   </component>
   <component name="TypeScriptGeneratedFilesManager">
@@ -940,7 +942,6 @@
     </option>
   </component>
   <component name="VcsManagerConfiguration">
-    <MESSAGE value="added draw call performance metrics" />
     <MESSAGE value="added info object constants" />
     <MESSAGE value="stashing before removing keymapper" />
     <MESSAGE value="stashing options menu" />
@@ -965,7 +966,8 @@
     <MESSAGE value="added button indicators" />
     <MESSAGE value="added buttons and dpad" />
     <MESSAGE value="added start select button" />
-    <option name="LAST_COMMIT_MESSAGE" value="added start select button" />
+    <MESSAGE value="stashing r/l" />
+    <option name="LAST_COMMIT_MESSAGE" value="stashing r/l" />
   </component>
   <component name="XDebuggerManager">
     <breakpoint-manager>
