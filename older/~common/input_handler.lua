@@ -164,7 +164,9 @@ rt.GamepadButton = meta.new_enum({
     LEFT_STICK = rt.GamepadButtonPrefix .. "leftstick",
     RIGHT_STICK = rt.GamepadButtonPrefix .. "rightstick",
     LEFT_SHOULDER = rt.GamepadButtonPrefix .. "leftshoulder",
-    RIGHT_SHOULDER = rt.GamepadButtonPrefix .. "rightshoulder"
+    RIGHT_SHOULDER = rt.GamepadButtonPrefix .. "rightshoulder",
+    LEFT_TRIGGER = rt.GamepadButtonPrefix .. "triggerleft",
+    RIGHT_TRIGGER = rt.GamepadButtonprefix .. "triggerright"
 })
 
 --- @class rt.GamepadAxis

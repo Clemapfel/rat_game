@@ -44,6 +44,8 @@ function rt.KeybindingIndicator:size_allocate(x, y, width, height)
         self:_as_start_select(self._key == rt.GamepadButton.START, height)
     elseif self._key == rt.GamepadButton.LEFT_SHOULDER or self._key == rt.GamepadButton.RIGHT_SHOULDER then
         self:_as_l_r(self._key == rt.GamepadButton.LEFT_SHOULDER, height)
+    elseif self._key == rt.GamepadButton.LEFT_STICK or self._key == rt.GamepadButton.RIGHT_STICK then
+        self:_as_joystick(self._key == rt.GamepadButton.LEFT_STICK, height)
     end
 end
 
@@ -635,5 +637,125 @@ function rt.KeybindingIndicator:_as_l_r(l_or_r, width)
         end
 
         label:draw()
+    end
+end
+
+--- @brief
+function rt.KeybindingIndicator:_as_joystick(left_or_right, width)
+    local radius = 0.8 * width / 2
+    local x, y, height = 0, 0, width
+    local center_x, center_y = x + 0.5 * width, y + 0.5 * height
+
+    local base_x, base_y, base_radius = center_x, center_y, radius * 0.7
+    local base = rt.Circle(base_x, base_y, base_radius)
+    local base_outline = rt.Circle(base_x, base_y, base_radius)
+    local base_outline_outline = rt.Circle(base_x, base_y, base_radius)
+
+    base_outline:set_is_outline(true)
+    base_outline_outline:set_is_outline(true)
+
+    local outline_width = 2
+
+    base:set_color(self.background_color)
+    base_outline:set_color(self.outline_color)
+    base_outline:set_line_width(outline_width)
+    base_outline_outline:set_color(rt.Palette.TRUE_WHITE)
+    base_outline_outline:set_line_width(outline_width + 3)
+
+    local neck_center_x, neck_center_y, neck_width, neck_height = center_x, center_y, 0.25 * width, 0.25 * height
+    local neck_base = rt.Rectangle(neck_center_x - 0.5 * neck_width, neck_center_y - neck_height, neck_width, neck_height)
+    local neck_outline_left = rt.Line(neck_center_x - 0.5 * neck_width, neck_center_y, neck_center_x - 0.5 * neck_width, neck_center_y - neck_height)
+    local neck_outline_right = rt.Line(neck_center_x + 0.5 * neck_width, neck_center_y, neck_center_x + 0.5 * neck_width, neck_center_y - neck_height)
+    local neck_outline_outline_left = rt.Line(neck_center_x - 0.5 * neck_width, neck_center_y, neck_center_x - 0.5 * neck_width, neck_center_y - neck_height)
+    local neck_outline_outline_right = rt.Line(neck_center_x + 0.5 * neck_width, neck_center_y, neck_center_x + 0.5 * neck_width, neck_center_y - neck_height)
+    local neck_foot = rt.Circle(neck_center_x, neck_center_y, neck_width * 0.5)
+    local neck_foot_outline = rt.Circle(neck_center_x, neck_center_y, neck_width * 0.5)
+
+    local head_x, head_y, head_x_radius, head_y_radius = center_x, center_y - neck_height, base_radius * 1.15, base_radius * 1.15 * 0.75
+    local head_base = rt.Ellipse(head_x, head_y, head_x_radius, head_y_radius)
+    local head_outline = rt.Ellipse(head_x, head_y, head_x_radius, head_y_radius)
+    local head_outline_outline = rt.Ellipse(head_x, head_y, head_x_radius, head_y_radius)
+
+    local inlay_ratio = 0.7
+    local head_inlay = rt.Ellipse(head_x, head_y - 0.075 * head_y_radius, head_x_radius * inlay_ratio, head_y_radius * inlay_ratio)
+
+    local label
+    if left_or_right == true then
+        label = rt.Label("<o>L</o>")
+    else
+        label = rt.Label("<o>R</o>")
+    end
+
+    label:realize()
+    label:set_justify_mode(rt.JustifyMode.CENTER)
+    local label_w, label_h = label:measure()
+    label:fit_into(0, y + 0.5 * height - 0.5 * label_h - head_y, width, height)
+
+    local indicator_w = 0.175 * width
+    local indicator_y = y + 0.5 * height - 0.5 * label_h - head_y + label_h
+
+    local indicator_vertices = {
+        x + 0.5 * width - 0.5 * indicator_w,
+        indicator_y,
+        x + 0.5 * width + 0.5 * indicator_w,
+        indicator_y,
+        x + 0.5 * width,
+        indicator_y + 0.5 * indicator_w
+    }
+    local down_indicator = rt.Polygon(indicator_vertices)
+    local down_indicator_outline = rt.Polygon(indicator_vertices)
+    down_indicator_outline:set_is_outline(true)
+
+    head_base:set_color(self.foreground_color)
+    head_outline:set_color(self.outline_color)
+    head_outline:set_is_outline(true)
+    head_outline_outline:set_is_outline(true)
+    head_outline:set_line_width(outline_width)
+    head_outline_outline:set_line_width(outline_width + 3)
+    head_inlay:set_color(self.background_color)
+
+    for neck in range(neck_base, neck_foot) do
+        neck:set_color(rt.color_darken(self.background_color, 0.1))
+    end
+
+    for outline in range(neck_outline_left, neck_outline_right, neck_foot_outline, down_indicator_outline) do
+        outline:set_color(self.outline_color)
+        outline:set_line_width(outline_width)
+    end
+
+    neck_foot_outline:set_is_outline(true)
+
+    for outline in range(neck_outline_outline_left, neck_outline_outline_right, head_outline_outline) do
+        outline:set_color(rt.Palette.TRUE_WHITE)
+        outline:set_line_width(outline_width + 3)
+    end
+
+    self._content = {
+        base_outline_outline,
+        head_outline_outline,
+        base,
+        base_outline,
+
+        --neck_outline_outline_left,
+        --neck_outline_outline_right,
+        neck_foot,
+        neck_foot_outline,
+        neck_base,
+        neck_outline_left,
+        neck_outline_right,
+
+        head_base,
+        head_outline,
+        head_inlay,
+
+        label,
+        down_indicator_outline,
+        down_indicator
+    }
+
+    self._draw = function()
+        for drawable in values(self._content) do
+            drawable:draw()
+        end
     end
 end

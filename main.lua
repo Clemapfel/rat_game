@@ -8,14 +8,14 @@ option_scene = mn.OptionsScene(state)
 
 which_scene = true
 
-
 indicators = {}
 
 local bindings = {
     rt.GamepadButton.TOP, rt.GamepadButton.RIGHT, rt.GamepadButton.BOTTOM, rt.GamepadButton.LEFT, "\n",
     rt.KeyboardKey.ARROW_UP, rt.KeyboardKey.W, rt.KeyboardKey.SPACE, rt.KeyboardKey.RETURN, "\n",
     rt.GamepadButton.DPAD_UP, rt.GamepadButton.DPAD_RIGHT, rt.GamepadButton.DPAD_DOWN, rt.GamepadButton.DPAD_LEFT, "\n",
-    rt.GamepadButton.START, rt.GamepadButton.SELECT, rt.GamepadButton.LEFT_SHOULDER, rt.GamepadButton.RIGHT_SHOULDER, "\n"
+    rt.GamepadButton.START, rt.GamepadButton.SELECT, rt.GamepadButton.LEFT_SHOULDER, rt.GamepadButton.RIGHT_SHOULDER, "\n",
+    rt.GamepadButton.LEFT_STICK, rt.GamepadButton.RIGHT_STICK
 }
 
 local indicator_x, indicator_y = 50, 50
@@ -47,6 +47,10 @@ input:signal_connect("pressed", function(_, which)
     end
 end)
 
+input:signal_connect("gamepad_pressed_raw", function(_, which, scancode)
+    dbg(which)
+end)
+
 input:signal_connect("keyboard_pressed_raw", function(_, which, scancode)
     dbg(which, " ", scancode)
 end)
@@ -63,7 +67,6 @@ end
 
 love.draw = function()
     --state:_draw()
-
     for indicator in values(indicators) do
         indicator:draw()
     end

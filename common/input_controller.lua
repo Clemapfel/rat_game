@@ -26,6 +26,7 @@ rt.InputControllerState = {
 --- @signal controller_disconnected  (self, id) -> nil
 --- @signal motion    (self, x, y, dx, dy) -> nil
 --- @signal keyboard_pressed_raw (self, name, scancode) -> nil
+--- @signal gamepad_pressed_raw (self, button) -> nil
 rt.InputController = meta.new_type("InputController", rt.SignalEmitter, function(instance)
     if instance ~= nil then
         if not meta.is_function(instance.get_bounds) then
@@ -39,6 +40,7 @@ rt.InputController = meta.new_type("InputController", rt.SignalEmitter, function
     })
 
     out:signal_add("keyboard_pressed_raw")
+    out:signal_add("gamepad_pressed_raw")
     out:signal_add("pressed")
     out:signal_add("released")
     out:signal_add("joystick")
@@ -69,7 +71,7 @@ function rt.InputControllerState.load_from_state(state)
     end
 
     rt.InputControllerState.axis_state = {}
-    for axis in range() do
+    for axis in values(meta.instances(rt.GamepadAxis)) do
         rt.InputControllerState.axis_state[axis] = 0
     end
 
@@ -215,13 +217,13 @@ end
 --- @brief
 love.gamepadpressed = function(joystick, which)
     rt.InputControllerState.is_controller_active = true
-
-    local button = rt.InputControllerState.reverse_mapping[rt.GamepadButtonPrefix ..which]
+    local button = rt.InputControllerState.reverse_mapping[rt.GamepadButtonPrefix .. which]
     if button ~= nil then
         rt.InputControllerState.state[button] = true
         for _, component in pairs(rt.InputControllerState.components) do
             if component._is_disabled == false then
                 component:signal_emit("pressed", button)
+                component:signal_emit("gamepad_pressed_raw", which)
             end
         end
     end
@@ -242,6 +244,7 @@ end
 
 --- @brief
 love.gamepadaxis = function(joystick, axis, value)
+    local previous_state = rt.InputControllerState.axis_state[axis]
     rt.InputControllerState.axis_state[axis] = value
     if axis == rt.GamepadAxis.LEFT_X or axis == rt.GamepadAxis.LEFT_Y then
         local x = rt.InputControllerState.axis_state[rt.GamepadAxis.LEFT_X]
@@ -258,6 +261,14 @@ love.gamepadaxis = function(joystick, axis, value)
             if component._is_disabled == false then
                 component:signal_emit("joystick", x, y, rt.JoystickPosition.RIGHT)
             end
+        end
+    elseif axis == rt.GamepadAxis.LEFT_TRIGGER then
+        if previous_state > 0.5 and value <= 0.5 then
+            love.gamepadpressed(joystick, "leftshoulder")
+        end
+    elseif axis == rt.GamepadAxis.RIGHT_TRIGGER then
+        if previous_state > 0.5 and value <= 0.5 then
+            love.gamepadpressed(joystick, "rightshoulder")
         end
     else
         -- unhandled axis
