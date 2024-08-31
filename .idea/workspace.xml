@@ -22,12 +22,9 @@
     </configurations>
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="7fa9ba1b-2cff-4ecc-86fb-59ab2fa76ee1" name="Changes" comment="stashing icons">
-      <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
+    <list default="true" id="7fa9ba1b-2cff-4ecc-86fb-59ab2fa76ee1" name="Changes" comment="added joystick indicator">
       <change beforePath="$PROJECT_DIR$/common/input_controller.lua" beforeDir="false" afterPath="$PROJECT_DIR$/common/input_controller.lua" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/common/keybinding_indicator.lua" beforeDir="false" afterPath="$PROJECT_DIR$/common/keybinding_indicator.lua" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/main.lua" beforeDir="false" afterPath="$PROJECT_DIR$/main.lua" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/older/~common/input_handler.lua" beforeDir="false" afterPath="$PROJECT_DIR$/older/~common/input_handler.lua" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -498,15 +495,7 @@
       <workItem from="1724871059493" duration="5162000" />
       <workItem from="1724897431690" duration="360000" />
       <workItem from="1724955706113" duration="22131000" />
-      <workItem from="1725055990975" duration="11020000" />
-    </task>
-    <task id="LOCAL-00965" summary="added snapshot optimization">
-      <option name="closed" value="true" />
-      <created>1723826345785</created>
-      <option name="number" value="00965" />
-      <option name="presentableId" value="LOCAL-00965" />
-      <option name="project" value="LOCAL" />
-      <updated>1723826345785</updated>
+      <workItem from="1725055990975" duration="11324000" />
     </task>
     <task id="LOCAL-00966" summary="optimized entity info drawing">
       <option name="closed" value="true" />
@@ -892,7 +881,15 @@
       <option name="project" value="LOCAL" />
       <updated>1725062312551</updated>
     </task>
-    <option name="localTasksCounter" value="1014" />
+    <task id="LOCAL-01014" summary="added joystick indicator">
+      <option name="closed" value="true" />
+      <created>1725123333507</created>
+      <option name="number" value="01014" />
+      <option name="presentableId" value="LOCAL-01014" />
+      <option name="project" value="LOCAL" />
+      <updated>1725123333507</updated>
+    </task>
+    <option name="localTasksCounter" value="1015" />
     <servers />
   </component>
   <component name="TypeScriptGeneratedFilesManager">
@@ -941,7 +938,6 @@
     </option>
   </component>
   <component name="VcsManagerConfiguration">
-    <MESSAGE value="stashing before removing keymapper" />
     <MESSAGE value="stashing options menu" />
     <MESSAGE value="added vector benchmark" />
     <MESSAGE value="options scene layout done" />
@@ -966,7 +962,8 @@
     <MESSAGE value="added start select button" />
     <MESSAGE value="stashing r/l" />
     <MESSAGE value="stashing icons" />
-    <option name="LAST_COMMIT_MESSAGE" value="stashing icons" />
+    <MESSAGE value="added joystick indicator" />
+    <option name="LAST_COMMIT_MESSAGE" value="added joystick indicator" />
   </component>
   <component name="XDebuggerManager">
     <breakpoint-manager>
