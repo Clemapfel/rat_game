@@ -22,25 +22,10 @@
     </configurations>
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="7fa9ba1b-2cff-4ecc-86fb-59ab2fa76ee1" name="Changes" comment="refatored input controller">
-      <change afterPath="$PROJECT_DIR$/assets/text/english/options_scene.lua" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/common/text_atlas.lua" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/menu/keybinding_scene.lua" afterDir="false" />
+    <list default="true" id="7fa9ba1b-2cff-4ecc-86fb-59ab2fa76ee1" name="Changes" comment="refactored with text atlas">
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/common/game_state.lua" beforeDir="false" afterPath="$PROJECT_DIR$/common/game_state.lua" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/common/input_button.lua" beforeDir="false" afterPath="$PROJECT_DIR$/common/input_button.lua" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/common/input_controller.lua" beforeDir="false" afterPath="$PROJECT_DIR$/common/input_controller.lua" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/common/~input_buttons.lua" beforeDir="false" afterPath="$PROJECT_DIR$/common/~input_buttons.lua" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/fast_physics/box2d/build/_deps/glfw-src/deps/mingw/dinput.h" beforeDir="false" afterPath="$PROJECT_DIR$/fast_physics/box2d/build/_deps/glfw-src/deps/mingw/dinput.h" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/fast_physics/box2d/build/_deps/glfw-src/src/win32_init.c" beforeDir="false" afterPath="$PROJECT_DIR$/fast_physics/box2d/build/_deps/glfw-src/src/win32_init.c" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/common/text_atlas.lua" beforeDir="false" afterPath="$PROJECT_DIR$/common/text_atlas.lua" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/include.lua" beforeDir="false" afterPath="$PROJECT_DIR$/include.lua" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/main.lua" beforeDir="false" afterPath="$PROJECT_DIR$/main.lua" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/menu/options_scene.lua" beforeDir="false" afterPath="$PROJECT_DIR$/menu/options_scene.lua" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/menu/verbose_info_panel_item.lua" beforeDir="false" afterPath="$PROJECT_DIR$/menu/verbose_info_panel_item.lua" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/old/common/input_button.lua" beforeDir="false" afterPath="$PROJECT_DIR$/old/common/input_button.lua" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/old/common/~input_handler.lua" beforeDir="false" afterPath="$PROJECT_DIR$/old/common/~input_handler.lua" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/older/~common/input_handler.lua" beforeDir="false" afterPath="$PROJECT_DIR$/older/~common/input_handler.lua" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/older/~common/~keyboard_controller.lua" beforeDir="false" afterPath="$PROJECT_DIR$/older/~common/~keyboard_controller.lua" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -511,23 +496,7 @@
       <workItem from="1724871059493" duration="5162000" />
       <workItem from="1724897431690" duration="360000" />
       <workItem from="1724955706113" duration="22131000" />
-      <workItem from="1725055990975" duration="29954000" />
-    </task>
-    <task id="LOCAL-00969" summary="stashing scrolling">
-      <option name="closed" value="true" />
-      <created>1723990841803</created>
-      <option name="number" value="00969" />
-      <option name="presentableId" value="LOCAL-00969" />
-      <option name="project" value="LOCAL" />
-      <updated>1723990841803</updated>
-    </task>
-    <task id="LOCAL-00970" summary="added scale">
-      <option name="closed" value="true" />
-      <created>1724001592648</created>
-      <option name="number" value="00970" />
-      <option name="presentableId" value="LOCAL-00970" />
-      <option name="project" value="LOCAL" />
-      <updated>1724001592648</updated>
+      <workItem from="1725055990975" duration="30695000" />
     </task>
     <task id="LOCAL-00971" summary="stashing voro">
       <option name="closed" value="true" />
@@ -905,7 +874,23 @@
       <option name="project" value="LOCAL" />
       <updated>1725202640582</updated>
     </task>
-    <option name="localTasksCounter" value="1018" />
+    <task id="LOCAL-01018" summary="refactored input controll">
+      <option name="closed" value="true" />
+      <created>1725227038385</created>
+      <option name="number" value="01018" />
+      <option name="presentableId" value="LOCAL-01018" />
+      <option name="project" value="LOCAL" />
+      <updated>1725227038385</updated>
+    </task>
+    <task id="LOCAL-01019" summary="refactored with text atlas">
+      <option name="closed" value="true" />
+      <created>1725227046069</created>
+      <option name="number" value="01019" />
+      <option name="presentableId" value="LOCAL-01019" />
+      <option name="project" value="LOCAL" />
+      <updated>1725227046069</updated>
+    </task>
+    <option name="localTasksCounter" value="1020" />
     <servers />
   </component>
   <component name="TypeScriptGeneratedFilesManager">
@@ -954,8 +939,6 @@
     </option>
   </component>
   <component name="VcsManagerConfiguration">
-    <MESSAGE value="options scene layout done" />
-    <MESSAGE value="fixed slider alignment" />
     <MESSAGE value="added gamma correction" />
     <MESSAGE value="made scene part of state" />
     <MESSAGE value="added option preview widgets" />
@@ -979,7 +962,9 @@
     <MESSAGE value="added joystick indicator" />
     <MESSAGE value="stashing before input rework" />
     <MESSAGE value="refatored input controller" />
-    <option name="LAST_COMMIT_MESSAGE" value="refatored input controller" />
+    <MESSAGE value="refactored input controll" />
+    <MESSAGE value="refactored with text atlas" />
+    <option name="LAST_COMMIT_MESSAGE" value="refactored with text atlas" />
   </component>
   <component name="XDebuggerManager">
     <breakpoint-manager>
