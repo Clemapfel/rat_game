@@ -35,9 +35,9 @@ rt.InputMethod = meta.new_enum({
 --- @signal controller_connected  (self, id) -> nil
 --- @signal controller_disconnected  (self, id) -> nil
 --- @signal motion    (self, x, y, dx, dy) -> nil
---- @signal keyboard_pressed (self, rt.KeyboardKey) -> nil
+--- @signal keyboard_pressed  (self, rt.KeyboardKey) -> nil
 --- @signal keyboard_released (self, rt.KeyboardKey) -> nil
---- @signal gamepad_pressed (self, rt.GamepadButton) -> nil
+--- @signal gamepad_pressed   (self, rt.GamepadButton) -> nil
 --- @signal gamepad_released (self, rt.GamepadButton) -> nil
 --- @signal input_method_changed (self, rt.InputMethod) -> nil
 rt.InputController = meta.new_type("InputController", rt.SignalEmitter, function(bounds)
@@ -51,6 +51,7 @@ rt.InputController = meta.new_type("InputController", rt.SignalEmitter, function
     out:signal_add("keyboard_released")
     out:signal_add("gamepad_pressed")
     out:signal_add("gamepad_released")
+    out:signal_add("input_method_changed")
 
     out:signal_add("pressed")
     out:signal_add("released")
@@ -164,8 +165,7 @@ love.keypressed = function(_, scancode)
 end
 
 --- @brief
-love.keyreleased = function(native)
-    local scancode = love.keyboard.getScancodeFromKey(native)
+love.keyreleased = function(native, scancode)
     local key = rt.KeyboardKeyPrefix .. scancode
     local button = rt.InputControllerState.reverse_mapping[key]
 
@@ -267,7 +267,7 @@ end
 
 --- @brief
 love.gamepadreleased = function(joystick, native)
-    local key = rt.GamepdButtonPrefix .. native
+    local key = rt.GamepadButtonPrefix .. native
     local button = rt.InputControllerState.reverse_mapping[rt.GamepadButtonPrefix .. native]
 
     if button ~= nil then rt.InputControllerState.state[button] = true end
@@ -288,7 +288,7 @@ love.gamepadaxis = function(joystick, axis, value)
     local previous_state = rt.InputControllerState.axis_state[axis]
     rt.InputControllerState.axis_state[axis] = value
 
-    if axis == rt.gamepadAxis.LEFT_X or axis == rt.GamepadAxis.LEFT_Y then
+    if axis == rt.GamepadAxis.LEFT_X or axis == rt.GamepadAxis.LEFT_Y then
         local x = rt.InputControllerState.axis_state[rt.GamepadAxis.LEFT_X]
         local y = rt.InputControllerState.axis_state[rt.GamepadAxis.LEFT_Y]
         for _, component in pairs(rt.InputControllerState.components) do
@@ -320,39 +320,6 @@ end
 --- @brief
 --- @return (Boolean, String) is_valid, reason
 function rt.InputControllerState:validate_input_mapping()
-    -- one assignment for all input buttons for both gamepad and keyboad
-    -- no keyboard key or gampedbutton assigned to two input buttons
-    local input_button_to_gamepad = {}
-    local input_button_to_keyboard = {}
-    local gamepad_to_input_button = {}
-    local keyboard_to_input_button = {}
-
-    for button in values(meta.instances(rt.InputButton)) do
-        input_button_to_gamepad[button] = {}
-        input_button_to_keyboard[button] = {}
-    end
-
-    for native, button in pairs(self.reverse_mapping) do
-        meta.assert_enum(button, rt.InputButton)
-        if meta.is_enum_value(native, rt.GamepadButton) then
-            table.insert(input_button_to_gamepad[button], native)
-            local current = gamepad_to_input_button[native]
-            if current == nil then
-                gamepad_to_input_button[native] = {button}
-            else
-                table.insert(current, button)
-            end
-        elseif meta.is_enum_value(native, rt.KeyboardKey) then
-            table.insert(input_button_to_keyboard[button], native)
-            local current = keyboard_to_input_button[native]
-            if current == nil then
-                keyboard_to_input_button[native] = {button}
-            else
-                table.insert(current, button)
-            end
-        end
-    end
-
     local no_keyboard_input_buttons = {}
     local no_gamepad_input_buttons = {}
     local double_bound_gamepad_buttons = {} -- Table<rt.GamepadButton, Table<rt.InputButton>>
@@ -360,35 +327,55 @@ function rt.InputControllerState:validate_input_mapping()
 
     local is_valid = true
 
-    for button, bindings in pairs(input_button_to_keyboard) do
-        if sizeof(bindings) == 0 then
+    local keyboard_to_button = {}
+    local gamepad_to_button = {}
+
+    for button in values(meta.instances(rt.InputButton)) do
+        local keyboard_mapped, gamepad_mapped = false, false
+        for native in values(self.mapping[button]) do
+            if  meta.is_enum_value(native, rt.KeyboardKey) then
+                keyboard_mapped = true
+                if keyboard_to_button[native] == nil then
+                    keyboard_to_button[native] = {}
+                end
+                table.insert(keyboard_to_button[native], button)
+            elseif  meta.is_enum_value(native, rt.GamepadButton) then
+                gamepad_mapped = true
+                if gamepad_to_button[native] == nil then
+                    gamepad_to_button[native] = {}
+                end
+                table.insert(gamepad_to_button[native], button)
+            else
+                rt.error("In rt.InputController.validate_input_mapping: unexpected value `" .. native .. "` for mapping of `" .. button .. "`")
+            end
+        end
+
+        if keyboard_mapped == false then
             table.insert(no_keyboard_input_buttons, button)
             is_valid = false
         end
-    end
 
-    for button, bindings in pairs(input_button_to_gamepad) do
-        if sizeof(bindings) == 0 then
+        if gamepad_mapped == false then
             table.insert(no_gamepad_input_buttons, button)
             is_valid = false
         end
     end
 
-    for native, buttons in pairs(keyboard_to_input_button) do
+    for native, buttons in pairs(keyboard_to_button) do
         if sizeof(buttons) > 1 then
             double_bound_keyboard_keys[native] = buttons
             is_valid = false
         end
     end
 
-    for native, buttons in pairs(gamepad_to_input_button) do
+    for native, buttons in pairs(gamepad_to_button) do
         if sizeof(buttons) > 1 then
             double_bound_gamepad_buttons[native] = buttons
             is_valid = false
         end
     end
 
-    local prefix = "\t+ "
+    local prefix = string.rep(" ", 8)
     local error_message = {}
     if not is_valid then
         table.insert(error_message, "Error while validating keybindings, mapping is invalid.\n")
@@ -408,16 +395,32 @@ function rt.InputControllerState:validate_input_mapping()
         end
 
         if sizeof(double_bound_gamepad_buttons) ~= 0 then
-            table.insert(error_message, "The following buttons are bound to multiple actions :\n")
+            table.insert(error_message, "The following gamepad buttons are bound to multiple actions :\n")
             for native, buttons in pairs(double_bound_gamepad_buttons) do
-                table.insert(error_message, prefix .. rt.gamepad_button_to_string(native) .. "\n")
+                table.insert(error_message, prefix .. rt.gamepad_button_to_string(native) .. " (bound to: ")
+                local n_buttons = #buttons
+                for i, button in ipairs(buttons) do
+                    if i < n_buttons then
+                        table.insert(error_message, button .. ", ")
+                    else
+                        table.insert(error_message, button .. ")\n")
+                    end
+                end
             end
         end
 
         if sizeof(double_bound_keyboard_keys) ~= 0 then
             table.insert(error_message, "The following keyboard keys are bound to multiple actions :\n")
             for native, buttons in pairs(double_bound_keyboard_keys) do
-                table.insert(error_message, prefix .. rt.keyboard_key_to_string(native) .. "\n")
+                table.insert(error_message, prefix .. rt.keyboard_key_to_string(native) .. " (bound to: ")
+                local n_buttons = #buttons
+                for i, button in ipairs(buttons) do
+                    if i < n_buttons then
+                        table.insert(error_message, button .. ", ")
+                    else
+                        table.insert(error_message, button .. ")\n")
+                    end
+                end
             end
         end
     end
@@ -426,7 +429,7 @@ function rt.InputControllerState:validate_input_mapping()
 end
 
 --- @brief
-function rt.InputControllerstate:load_default_mapping()
+function rt.InputControllerState:load_default_mapping()
     local default_mapping = {
         [rt.InputButton.A] = {
             rt.KeyboardKey.SPACE,
@@ -444,8 +447,8 @@ function rt.InputControllerstate:load_default_mapping()
         },
 
         [rt.InputButton.Y] = {
-            rt.KeyboardKey.Y,
-            rt.GamepadButton.RIGHT
+            rt.KeyboardKey.Z,
+            rt.GamepadButton.LEFT
         },
 
         [rt.InputButton.L] = {
@@ -471,30 +474,30 @@ function rt.InputControllerstate:load_default_mapping()
         [rt.InputButton.UP] = {
             rt.KeyboardKey.ARROW_UP,
             rt.KeyboardKey.W,
-            rt.KeyboardKey.NUMPAD_EIGHT,
+            rt.KeyboardKey.KEYPAD_EIGHT,
             rt.GamepadButton.DPAD_UP,
         },
 
         [rt.InputButton.RIGHT] = {
             rt.KeyboardKey.ARROW_RIGHT,
             rt.KeyboardKey.D,
-            rt.KeyboardKey.NUMPAD_SIX,
+            rt.KeyboardKey.KEYPAD_SIX,
             rt.GamepadButton.DPAD_RIGHT
         },
 
         [rt.InputButton.DOWN] = {
             rt.KeyboardKey.ARROW_DOWN,
             rt.KeyboardKey.S,
-            rt.KeyboardKey.NUMPAD_FIVE,
-            rt.KeyboardKey.NUPAD_TWO,
+            rt.KeyboardKey.KEYPAD_FIVE,
+            rt.KeyboardKey.KEYPAD_TWO,
             rt.GamepadButton.DPAD_DOWN
         },
 
         [rt.InputButton.LEFT] = {
             rt.KeyboardKey.ARROW_LEFT,
             rt.KeyboardKey.A,
-            rt.KeyboardKey.NUMPAD_FOUR,
-            rt.GamepdButton.DPAD_LEFT
+            rt.KeyboardKey.KEYPAD_FOUR,
+            rt.GamepadButton.DPAD_LEFT
         },
 
         [rt.InputButton.DEBUG] = {
@@ -504,93 +507,22 @@ function rt.InputControllerstate:load_default_mapping()
         }
     }
 
-    local pathologic_mapping = {
-        [rt.InputButton.A] = {
-            -- unmapped
-        },
-
-        [rt.InputButton.B] = {
-            rt.KeyboardKey.B,
-            rt.GamepadButton.BOTTOM
-        },
-
-        [rt.InputButton.X] = {
-            rt.KeyboardKey.X,
-            rt.GamepadButton.TOP
-        },
-
-        [rt.InputButton.Y] = {
-            rt.KeyboardKey.Y,
-            rt.GamepadButton.RIGHT
-        },
-
-        [rt.InputButton.L] = {
-            rt.KeyboardKey.L,
-            rt.GamepadButton.LEFT_SHOULDER
-        },
-
-        [rt.InputButton.R] = { -- double mapping
-            rt.KeyboardKey.L,
-            rt.GamepadButton.LEFT_SHOULDER
-        },
-
-        [rt.InputButton.START] = {
-            rt.KeyboardKey.M,
-            rt.GamepadButton.START
-        },
-
-        [rt.InputButton.SELECT] = {
-            rt.KeyboardKey.N,
-            rt.GamepadButton.SELECT
-        },
-
-        [rt.InputButton.UP] = {
-            rt.KeyboardKey.ARROW_UP,
-            rt.KeyboardKey.W,
-            rt.KeyboardKey.NUMPAD_EIGHT,
-            rt.GamepadButton.DPAD_UP,
-        },
-
-        [rt.InputButton.RIGHT] = {
-            rt.KeyboardKey.ARROW_RIGHT,
-            rt.KeyboardKey.D,
-            rt.KeyboardKey.NUMPAD_SIX,
-            rt.GamepadButton.DPAD_RIGHT
-        },
-
-        [rt.InputButton.DOWN] = {
-            rt.KeyboardKey.ARROW_DOWN,
-            rt.KeyboardKey.S,
-            rt.KeyboardKey.NUMPAD_FIVE,
-            rt.KeyboardKey.NUPAD_TWO,
-            rt.GamepadButton.DPAD_DOWN
-        },
-
-        [rt.InputButton.LEFT] = {
-            rt.KeyboardKey.ARROW_LEFT,
-            rt.KeyboardKey.A,
-            rt.KeyboardKey.NUMPAD_FOUR,
-            rt.GamepdButton.DPAD_LEFT
-        },
-
-        [rt.InputButton.DEBUG] = {
-            rt.KeyboardKey.ESCAPE,
-            rt.GamepadButton.LEFT_STICK,
-            rt.GamepadButton.RIGHT_STICK
-        }
-    }
-
-    default_mapping = pathologic_mapping
+    self.mapping = {}
+    for button in values(meta.instances(rt.InputButton)) do
+        self.mapping[button] = {}
+    end
 
     self.reverse_mapping = {}
     for input_button, natives in pairs(default_mapping) do
         for native in values(natives) do
+            table.insert(self.mapping[input_button], native)
             self.reverse_mapping[native] = input_button
         end
     end
 
-    if not self:valid_input_mapping() then
-        rt.error("[FATAL] In rt.InputControllerState:reset_input_mapping: default input mapping is not valid")
+    local is_valid, message = self:validate_input_mapping()
+    if not is_valid then
+        rt.error("[FATAL] In rt.InputControllerState:load_default_mapping: " .. message)
     end
 end
 
@@ -600,7 +532,7 @@ function rt.InputControllerState:set_keybinding(input_button, new_gamepad_button
 
     local before = self.reverse_mapping[new_gamepad_button]
     self.reverse_mapping[new_gamepad_button] = input_button
-    if not self:valid_input_mapping() then
+    if not self:validate_input_mapping() then
         self.reverse_mapping[new_gamepad_button] = before
         return false
     else
@@ -608,3 +540,19 @@ function rt.InputControllerState:set_keybinding(input_button, new_gamepad_button
     end
 end
 
+--- @brief
+--- @return (rt.KeyboardKey, rt.GamepadButton)
+function rt.InputControllerState:get_keybinding(input_button)
+    local first_keyboard_key, first_gamepad_button = nil, nil
+    for x in values(self.mapping[input_button]) do
+        if meta.is_enum_value(x, rt.Keyboradkey) then
+            first_keyboard_key = x
+        elseif meta.is_enum_value(x, rt.GamepadButtonPrefix) then
+            first_gamepad_button = x
+        end
+
+        if first_gamepad_button ~= nil and first_keyboard_key ~= nil then
+            return first_keyboard_key, first_gamepad_button
+        end
+    end
+end

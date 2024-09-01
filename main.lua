@@ -49,20 +49,18 @@ input:signal_connect("pressed", function(_, which)
     end
 end)
 
-input:signal_connect("gamepad_pressed_raw", function(_, which, scancode)
+input:signal_connect("gamepad_pressed", function(_, which)
     dbg(which)
-    indicator = rt.KeybindingIndicator(rt.GamepadButtonPrefix .. which)
+    indicator = rt.KeybindingIndicator(which)
     indicator:realize()
     indicator:fit_into(50, 50, 75, 75)
 end)
 
-input:signal_connect("keyboard_pressed_raw", function(_, which, scancode)
-    --TODO: do not use enum, rework input controller to use scancodes directly, only prefix keyboard
-    --[[
-    indicator = rt.KeybindingIndicator(rt.KeyboardKeyPrefix .. scancode)
+input:signal_connect("keyboard_pressed", function(_, which)
+    dbg(which)
+    indicator = rt.KeybindingIndicator(which)
     indicator:realize()
     indicator:fit_into(50, 50, 75, 75)
-    ]]--
 end)
 
 love.load = function()
@@ -76,7 +74,7 @@ love.update = function(delta)
 end
 
 love.draw = function()
-    --state:_draw()
+    state:_draw()
     if indicator ~= nil then
         indicator:draw()
     end

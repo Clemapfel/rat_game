@@ -103,6 +103,7 @@ rt.KeyboardKey = meta.new_enum({
     ARROW_LEFT = rt.KeyboardKeyPrefix .."left",
     ARROW_DOWN = rt.KeyboardKeyPrefix .."down",
     ARROW_UP = rt.KeyboardKeyPrefix .."up",
+    BACKSLASH = rt.KeyboardKeyPrefix .. "\\",
     NON_US_BACKSLASH = rt.KeyboardKeyPrefix .."nonusbackslash",
     APPLICATION = rt.KeyboardKeyPrefix .."application",
     EXECUTE = rt.KeyboardKeyPrefix .."execute",
@@ -276,7 +277,7 @@ end
 --- @brief
 function rt.keyboard_key_to_string(keyboard_key)
     if keyboard_key == rt.KeyboardKey.UNKNOWN then return "" end
-    local raw = rt.keyboard_key_to_native
+    local raw = rt.keyboard_key_to_native(keyboard_key)
 
     local status, res = pcall(function() return love.keyboard.getKeyFromScancode(raw) end)
     if status == false then
@@ -309,32 +310,29 @@ end
 
 --- @brief
 function rt.gamepad_button_to_string(gamepad_button)
-    return {
-        ["y"] = "TOP",
-        ["b"] = "RIGHT",
-        ["a"] = "BOTTOM",
-        ["x"] = "LEFT",
-        ["dpup"] = "UP",
-        ["dpdown"] = "DOWN",
-        ["dpleft"] = "LEFT",
-        ["dpright"] = "RIGHT",
-        ["leftshoulder"] = "L",
-        ["rightshoulder"] = "R",
-        ["start"] = "START",
-        ["back"] = "SELECT",
-        ["home"] = "CENTER",
-        ["lstick"] = "RIGHT STICK",
-        ["rstick"] = "LEFT STRICK",
-        ["paddle1"] = "PADDLE #1",
-        ["paddle2"] = "PADDLE #2",
-        ["paddle3"] = "PADDLE #3",
-        ["paddle4"] = "PADDLE #4"
-    }[gamepad_button]
+    return ({
+        [rt.GamepadButton.TOP] = "Top Face Button",
+        [rt.GamepadButton.RIGHT] = "Right Face Button",
+        [rt.GamepadButton.BOTTOM] = "Bottom Face Button",
+        [rt.GamepadButton.LEFT] = "Left Face Button",
+        [rt.GamepadButton.DPAD_UP] = "DPad Up",
+        [rt.GamepadButton.DPAD_DOWN] = "DPad Down",
+        [rt.GamepadButton.DPAD_LEFT] = "DPad Left",
+        [rt.GamepadButton.DPAD_RIGHT] = "DPad Right",
+        [rt.GamepadButton.START] = "Start",
+        [rt.GamepadButton.SELECT] = "Select",
+        [rt.GamepadButton.CENTER] = "Home",
+        [rt.GamepadButton.LEFT_STICK] = "Left Stick Press",
+        [rt.GamepadButton.RIGHT_STICK] = "Right Stick Press",
+        [rt.GamepadButton.LEFT_SHOULDER] = "Left Shoulder",
+        [rt.GamepadButton.RIGHT_SHOULDER] = "Right Shoulder",
+        [rt.GamepadButton.UNKNOWN] = "(Unknown)",
+    })[gamepad_button]
 end
 
 --- @brief
 function rt.input_button_to_string(button)
-    return {
+    return ({
        [rt.InputButton.A] = "A",
        [rt.InputButton.B] = "B",
        [rt.InputButton.X] = "X",
@@ -348,6 +346,6 @@ function rt.input_button_to_string(button)
        [rt.InputButton.START] = "Start",
        [rt.InputButton.SELECT] = "Select",
        [rt.InputButton.DEBUG] = "Debug"
-    }[button]
+    })[button]
 end
 

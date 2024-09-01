@@ -66,13 +66,13 @@ rt.GameState = meta.new_type("GameState", function()
         _active_coroutines = {} -- Table<rt.Coroutine>
     })
 
-    rt.InputControllerState:load_input_mapping()
+    out:load_input_mapping()
     return out
 end)
 
 --- @brief
 function rt.GameState:load_input_mapping()
-    rt.InputControllerState:reset_input_mapping()
+    rt.InputControllerState:load_default_mapping()
 end
 
 --- @brief

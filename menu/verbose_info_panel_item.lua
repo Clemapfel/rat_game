@@ -729,7 +729,7 @@ function mn.VerboseInfoPanel.Item:create_from_enum(which)
 
         [rt.VerboseInfoObject.OPTIONS] = "Option Description, TODO",
 
-        [rt.VerboseInfoObject.VSYNC] = "Synchronizes game refresh rate with that of the screen, preventing screen sharing. When 'adaptive', dynamically turns of vsync depending on the frame rate.",
+        [rt.VerboseInfoObject.VSYNC] = "Synchronizes game refresh rate with that of the screen, preventing screen tearing. When 'adaptive', dynamically turns of vsync depending on the frame rate. When `off`, frame rate is no longer capped by the monitor refresh rate.",
         [rt.VerboseInfoObject.MSAA] = "Reduces artifacting along lines and sharp edges, but decreases performance",
         [rt.VerboseInfoObject.GAMMA] = "Changes brightness of the screen",
         [rt.VerboseInfoObject.FULLSCREEN] = "Whether the window should fill the entire screen",

@@ -80,7 +80,7 @@ require "common.random"
 require "common.easement_functions"
 require "common.set"
 
-require "common.input_buttons"
+require "common.input_button"
 require "common.input_controller"
 
 require "common.graphics"

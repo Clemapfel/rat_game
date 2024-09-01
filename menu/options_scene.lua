@@ -26,10 +26,12 @@ mn.OptionsScene = meta.new_type("MenuOptionsScene", rt.Scene, function(state)
 
     -- nil items set during :realize
 
-    fields._vsync_label_text = "VSync"
-    fields._vsync_on_label = "ON"
-    fields._vsync_off_label = "OFF"
-    fields._vsync_adaptive_label = "ADAPTIVE"
+    local labels = rt.TextAtlas:get("options_scene")
+
+    fields._vsync_label_text = labels.vsync
+    fields._vsync_on_label = labels.vsync_on
+    fields._vsync_off_label = labels.vsync_off
+    fields._vsync_adaptive_label = labels.vsync_adaptive
     fields._vsync_label = nil
     fields._vsync_option_button = nil
     fields._vsync_item = nil
@@ -45,19 +47,19 @@ mn.OptionsScene = meta.new_type("MenuOptionsScene", rt.Scene, function(state)
         fields._vsync_label_to_vsync_mode[value] = key
     end
 
-    fields._fullscreen_label_text = "Fullscreen"
-    fields._fullscreen_true_label = "YES"
-    fields._fullscreen_false_label = "NO"
+    fields._fullscreen_label_text = labels.fullscreen
+    fields._fullscreen_true_label = labels.fullscreen_on
+    fields._fullscreen_false_label = labels.fullscreen_off
     fields._fullscreen_label = nil
     fields._fullscreen_option_button = nil
     fields._fullscreen_item = nil
 
-    fields._msaa_label_text = "MSAA"
-    fields._msaa_off_label = "OFF"
-    fields._msaa_good_label = "Good"
-    fields._msaa_better_label = "Better"
-    fields._msaa_best_label = "Best"
-    fields._msaa_max_label = "Maximum"
+    fields._msaa_label_text = labels.msaa
+    fields._msaa_off_label = labels.msaa_off
+    fields._msaa_good_label = labels.msaa_good
+    fields._msaa_better_label = labels.msaa_better
+    fields._msaa_best_label = labels.msaa_best
+    fields._msaa_max_label = labels.msaa_max
     fields._msaa_label = nil
     fields._msaa_option_button = nil
     fields._msaa_item = nil
@@ -75,11 +77,11 @@ mn.OptionsScene = meta.new_type("MenuOptionsScene", rt.Scene, function(state)
         fields._msaa_label_to_msaa_quality[value] = key
     end
 
-    fields._resolution_label_text = "Resolution"
-    fields._resolution_1280_720_label = "1280x720 (16:9)"
-    fields._resolution_1600_900_label = "1600x900 (16:9)"
-    fields._resolution_1920_1080_label = "1920x1080 (16:9)"
-    fields._resolution_2560_1440_label = "2560x1400 (16:9)"
+    fields._resolution_label_text = labels.resolution
+    fields._resolution_1280_720_label = labels.resolution_1280_720
+    fields._resolution_1600_900_label = labels.resolution_1600_900
+    fields._resolution_1920_1080_label = labels.resolution_1920_1080
+    fields._resolution_2560_1440_label = labels.resolution_2560_1440
     fields._resolution_label = nil
     fields._resolution_option_button = nil
     fields._resolution_item = nil
@@ -125,27 +127,27 @@ mn.OptionsScene = meta.new_type("MenuOptionsScene", rt.Scene, function(state)
         }
     }
 
-    fields._gamma_text = "Gamma"
+    fields._gamma_text = labels.gamma
     fields._gamma_label = nil
     fields._gamma_scale = nil
     fields._gamma_item = nil
 
-    fields._sfx_level_text = "Sound Effects"
+    fields._sfx_level_text = labels.sfx_level
     fields._sfx_level_label = nil
     fields._sfx_level_scale = nil
     fields._sfx_level_item = nil
 
-    fields._music_level_text = "Music"
+    fields._music_level_text = labels.music_level
     fields._music_level_label = nil
     fields._music_level_scale = nil
     fields._music_level_item = nil
 
-    fields._vfx_motion_text = "Motion Effects"
+    fields._vfx_motion_text = labels.vfx_motion
     fields._vfx_motion_label = nil
     fields._vfx_motion_scale = nil
     fields._vfx_motion_item = nil
 
-    fields._vfx_contrast_text = "Visual Effects"
+    fields._vfx_contrast_text = labels.vfx_contrast
     fields._vfx_contrast_label = nil
     fields._vfx_contrast_scale = nil
     fields._vfx_contrast_item = nil
@@ -177,7 +179,7 @@ mn.OptionsScene = meta.new_type("MenuOptionsScene", rt.Scene, function(state)
         }
     }
 
-    fields._keymap_text = "Controls"
+    fields._keymap_text = labels.keymap
     fields._keymap_label = nil
     fields._keymap_arrow = nil
     fields._keymap_item = nil
@@ -357,17 +359,15 @@ end
 --- @brief
 function mn.OptionsScene:_update_control_indicator(left_right_allowed)
     meta.assert_boolean(left_right_allowed)
-    local left_right_label = "Change Value"
+    local labels = rt.SpriteAtlas:get("options_scene")
+    local left_right_label = labels.control_indicator_a
     if not left_right_allowed then
         left_right_label = "<s><color=GRAY>" .. left_right_label .. "</s></color>"
     end
 
     self._control_indicator:create_from({
-        {rt.ControlIndicatorButton.B, "Exit"},
-        {rt.ControlIndicatorButton.X, "Apply"},
-        {rt.ControlIndicatorButton.Y, "Set Default"},
-        {rt.ControlIndicatorButton.LEFT_RIGHT, left_right_label},
-        {rt.ControlIndicatorButton.UP_DOWN, "Select"}
+        {rt.ControlIndicatorButton.B, labels.control_indicator_b},
+        {rt.ControlIndicatorButton.Y, labels.control_indicator_y}
     })
 end
 
