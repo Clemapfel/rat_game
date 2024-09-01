@@ -116,6 +116,7 @@ end
 
 --- @brief
 love.keypressed = function(key, scancode)
+
     local raw = key
     local button = rt.InputControllerState.reverse_mapping[rt.KeyboardKeyPrefix .. key]
     if button ~= nil then

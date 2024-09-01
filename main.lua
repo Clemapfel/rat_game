@@ -57,7 +57,7 @@ input:signal_connect("gamepad_pressed_raw", function(_, which, scancode)
 end)
 
 input:signal_connect("keyboard_pressed_raw", function(_, which, scancode)
-    TODO: do not use enum, rework input controller to use scancodes directly, only prefix keyboard
+    --TODO: do not use enum, rework input controller to use scancodes directly, only prefix keyboard
     --[[
     indicator = rt.KeybindingIndicator(rt.KeyboardKeyPrefix .. scancode)
     indicator:realize()
