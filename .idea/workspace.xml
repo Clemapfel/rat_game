@@ -22,10 +22,12 @@
     </configurations>
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="7fa9ba1b-2cff-4ecc-86fb-59ab2fa76ee1" name="Changes" comment="refactored with text atlas">
+    <list default="true" id="7fa9ba1b-2cff-4ecc-86fb-59ab2fa76ee1" name="Changes" comment="stashing text atlas">
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/assets/text/english/options_scene.lua" beforeDir="false" afterPath="$PROJECT_DIR$/assets/text/english/options_scene.lua" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/common/filesystem.lua" beforeDir="false" afterPath="$PROJECT_DIR$/common/filesystem.lua" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/common/text_atlas.lua" beforeDir="false" afterPath="$PROJECT_DIR$/common/text_atlas.lua" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/include.lua" beforeDir="false" afterPath="$PROJECT_DIR$/include.lua" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/menu/options_scene.lua" beforeDir="false" afterPath="$PROJECT_DIR$/menu/options_scene.lua" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -496,15 +498,9 @@
       <workItem from="1724871059493" duration="5162000" />
       <workItem from="1724897431690" duration="360000" />
       <workItem from="1724955706113" duration="22131000" />
-      <workItem from="1725055990975" duration="30695000" />
-    </task>
-    <task id="LOCAL-00971" summary="stashing voro">
-      <option name="closed" value="true" />
-      <created>1724005760177</created>
-      <option name="number" value="00971" />
-      <option name="presentableId" value="LOCAL-00971" />
-      <option name="project" value="LOCAL" />
-      <updated>1724005760177</updated>
+      <workItem from="1725055990975" duration="30709000" />
+      <workItem from="1725306584614" duration="2403000" />
+      <workItem from="1725309008282" duration="782000" />
     </task>
     <task id="LOCAL-00972" summary="added stained glass">
       <option name="closed" value="true" />
@@ -890,7 +886,15 @@
       <option name="project" value="LOCAL" />
       <updated>1725227046069</updated>
     </task>
-    <option name="localTasksCounter" value="1020" />
+    <task id="LOCAL-01020" summary="stashing text atlas">
+      <option name="closed" value="true" />
+      <created>1725229007250</created>
+      <option name="number" value="01020" />
+      <option name="presentableId" value="LOCAL-01020" />
+      <option name="project" value="LOCAL" />
+      <updated>1725229007250</updated>
+    </task>
+    <option name="localTasksCounter" value="1021" />
     <servers />
   </component>
   <component name="TypeScriptGeneratedFilesManager">
@@ -939,7 +943,6 @@
     </option>
   </component>
   <component name="VcsManagerConfiguration">
-    <MESSAGE value="added gamma correction" />
     <MESSAGE value="made scene part of state" />
     <MESSAGE value="added option preview widgets" />
     <MESSAGE value="added msaa widget" />
@@ -964,7 +967,8 @@
     <MESSAGE value="refatored input controller" />
     <MESSAGE value="refactored input controll" />
     <MESSAGE value="refactored with text atlas" />
-    <option name="LAST_COMMIT_MESSAGE" value="refactored with text atlas" />
+    <MESSAGE value="stashing text atlas" />
+    <option name="LAST_COMMIT_MESSAGE" value="stashing text atlas" />
   </component>
   <component name="XDebuggerManager">
     <breakpoint-manager>
@@ -978,11 +982,6 @@
           <url>file://$PROJECT_DIR$/old/menu/scene.lua</url>
           <line>332</line>
           <option name="timeStamp" value="9" />
-        </line-breakpoint>
-        <line-breakpoint enabled="true" type="lua-line">
-          <url>file://$PROJECT_DIR$/common/input_button.lua</url>
-          <line>114</line>
-          <option name="timeStamp" value="11" />
         </line-breakpoint>
       </breakpoints>
     </breakpoint-manager>

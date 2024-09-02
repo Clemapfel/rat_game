@@ -3,7 +3,16 @@ rt.filesystem = {}
 --- @brief
 --- @return String, String filename, extension
 function rt.filesystem.get_name_and_extension(path)
-    return string.match(path, "^.+/(.+)%.(.+)$")
+    local file_pattern = "([^/\\]+)%.([^/\\]+)$"
+    local dir_pattern = "([^/\\]+)/?$"
+
+    local file_name, extension = path:match(file_pattern)
+    if file_name and extension then
+        return file_name, extension
+    else
+        local dir_name = path:match(dir_pattern)
+        return dir_name, nil
+    end
 end
 
 --- @brief

@@ -359,7 +359,7 @@ end
 --- @brief
 function mn.OptionsScene:_update_control_indicator(left_right_allowed)
     meta.assert_boolean(left_right_allowed)
-    local labels = rt.SpriteAtlas:get("options_scene")
+    local labels = rt.TextAtlas:get("options_scene")
     local left_right_label = labels.control_indicator_a
     if not left_right_allowed then
         left_right_label = "<s><color=GRAY>" .. left_right_label .. "</s></color>"

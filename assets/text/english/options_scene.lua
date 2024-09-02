@@ -1,7 +1,7 @@
 return {
     vsync = "VSync",
     vsync_on = "ON",
-    vsync_off "OFF",
+    vsync_off = "OFF",
     vsync_adaptive = "ADAPTIVE",
 
     fullscreen = "Fullscreen",
