@@ -332,20 +332,33 @@ end
 
 --- @brief
 function rt.input_button_to_string(button)
-    return ({
-       [rt.InputButton.A] = "A",
-       [rt.InputButton.B] = "B",
-       [rt.InputButton.X] = "X",
-       [rt.InputButton.Y] = "Y",
-       [rt.InputButton.UP] = "Up",
-       [rt.InputButton.RIGHT] = "Right",
-       [rt.InputButton.DOWN] = "Down",
-       [rt.InputButton.LEFT] = "Left",
-       [rt.InputButton.L] = "L",
-       [rt.InputButton.R] = "R",
-       [rt.InputButton.START] = "Start",
-       [rt.InputButton.SELECT] = "Select",
-       [rt.InputButton.DEBUG] = "Debug"
-    })[button]
+    local names = rt.TextAtlas:get("menu")
+    if button == rt.InputButton.A then
+        return names.a_action
+    elseif button == rt.InputButton.B then
+        return names.b_action
+    elseif button == rt.InputButton.X then
+        return names.x_action
+    elseif button == rt.InputButton.Y then
+        return names.y_action
+    elseif button == rt.InputButton.UP then
+        return names.up_action
+    elseif button == rt.InputButton.RIGHT then
+        return names.right_action
+    elseif button == rt.InputButton.DOWN then
+        return names.down_action
+    elseif button == rt.InputButton.LEFT then
+        return names.left_action
+    elseif button == rt.InputButton.L then
+        return names.l_action
+    elseif button == rt.InputButton.R then
+        return names.r_action
+    elseif button == rt.InputButton.START then
+        return names.start_action
+    elseif button == rt.InputButton.SELECT then
+        return names.select_action
+    elseif button == rt.InputButton.DEBUG then
+        return names.debug_action
+    end
 end
 

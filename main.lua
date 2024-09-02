@@ -5,6 +5,7 @@ state:initialize_debug_state()
 
 inventory_scene = mn.InventoryScene(state)
 option_scene = mn.OptionsScene(state)
+keybinding_scene = mn.KeybindingScene(state)
 
 which_scene = true
 

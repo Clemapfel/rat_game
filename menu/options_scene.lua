@@ -1,6 +1,7 @@
-rt.settings.menu.option_scene = {
+rt.settings.menu.options_scene = {
     scale_n_ticks_per_second = 32,
-    scale_delay = 1 / 3 -- seconds
+    scale_delay = 1 / 3, -- seconds,
+    text_atlas_id = "menu/options_scene"
 }
 
 --- @class mn.OptionsScene
@@ -16,9 +17,9 @@ mn.OptionsScene = meta.new_type("MenuOptionsScene", rt.Scene, function(state)
         _scale_is_selected = false,
         _selected_scale = nil,
         _scale_delay_elapsed = 0,
-        _scale_delay_duration = rt.settings.menu.option_scene.scale_delay,
+        _scale_delay_duration = rt.settings.menu.options_scene.scale_delay,
         _scale_tick_elapsed = 0,
-        _scale_tick_duration = 1 / rt.settings.menu.option_scene.scale_n_ticks_per_second,
+        _scale_tick_duration = 1 / rt.settings.menu.options_scene.scale_n_ticks_per_second,
         _scale_tick_direction = true, -- true = right
 
         _load_coroutine = nil, -- rt.Coroutine
@@ -26,7 +27,7 @@ mn.OptionsScene = meta.new_type("MenuOptionsScene", rt.Scene, function(state)
 
     -- nil items set during :realize
 
-    local labels = rt.TextAtlas:get("options_scene")
+    local labels = rt.TextAtlas:get(rt.settings.menu.options_scene.text_atlas_id)
 
     fields._vsync_label_text = labels.vsync
     fields._vsync_on_label = labels.vsync_on
@@ -359,7 +360,7 @@ end
 --- @brief
 function mn.OptionsScene:_update_control_indicator(left_right_allowed)
     meta.assert_boolean(left_right_allowed)
-    local labels = rt.TextAtlas:get("options_scene")
+    local labels = rt.TextAtlas:get(rt.settings.menu.options_scene.text_atlas_id)
     local left_right_label = labels.control_indicator_a
     if not left_right_allowed then
         left_right_label = "<s><color=GRAY>" .. left_right_label .. "</s></color>"

@@ -24,7 +24,7 @@ rt.InputControllerState = {
 --- @class rt.InputMethod
 rt.InputMethod = meta.new_enum({
     KEYBOARD = false,
-    CONTROLLER = true
+    GAMEPAD = true
 })
 
 --- @class rt.InputController
@@ -554,5 +554,14 @@ function rt.InputControllerState:get_keybinding(input_button)
         if first_gamepad_button ~= nil and first_keyboard_key ~= nil then
             return first_keyboard_key, first_gamepad_button
         end
+    end
+end
+
+--- @brief
+function rt.InputControllerState:get_input_method()
+    if self.gamepad_active then 
+        return rt.InputMethod.GAMEPAD 
+    else 
+        return rt.InputMethod.KEYBOARD 
     end
 end

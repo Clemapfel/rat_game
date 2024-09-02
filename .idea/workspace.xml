@@ -22,11 +22,13 @@
     </configurations>
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="7fa9ba1b-2cff-4ecc-86fb-59ab2fa76ee1" name="Changes" comment="stashing text atlas">
+    <list default="true" id="7fa9ba1b-2cff-4ecc-86fb-59ab2fa76ee1" name="Changes" comment="text atlas working">
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/assets/text/english/options_scene.lua" beforeDir="false" afterPath="$PROJECT_DIR$/assets/text/english/options_scene.lua" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/common/filesystem.lua" beforeDir="false" afterPath="$PROJECT_DIR$/common/filesystem.lua" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/common/text_atlas.lua" beforeDir="false" afterPath="$PROJECT_DIR$/common/text_atlas.lua" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/assets/text/english/options_scene.lua" beforeDir="false" afterPath="$PROJECT_DIR$/assets/text/english/menu.lua" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/common/input_button.lua" beforeDir="false" afterPath="$PROJECT_DIR$/common/input_button.lua" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/common/input_controller.lua" beforeDir="false" afterPath="$PROJECT_DIR$/common/input_controller.lua" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/main.lua" beforeDir="false" afterPath="$PROJECT_DIR$/main.lua" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/menu/keybinding_scene.lua" beforeDir="false" afterPath="$PROJECT_DIR$/menu/keybinding_scene.lua" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/menu/options_scene.lua" beforeDir="false" afterPath="$PROJECT_DIR$/menu/options_scene.lua" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
@@ -500,15 +502,7 @@
       <workItem from="1724955706113" duration="22131000" />
       <workItem from="1725055990975" duration="30709000" />
       <workItem from="1725306584614" duration="2403000" />
-      <workItem from="1725309008282" duration="782000" />
-    </task>
-    <task id="LOCAL-00972" summary="added stained glass">
-      <option name="closed" value="true" />
-      <created>1724007329566</created>
-      <option name="number" value="00972" />
-      <option name="presentableId" value="LOCAL-00972" />
-      <option name="project" value="LOCAL" />
-      <updated>1724007329567</updated>
+      <workItem from="1725309008282" duration="5135000" />
     </task>
     <task id="LOCAL-00973" summary="refactored input mapping">
       <option name="closed" value="true" />
@@ -894,7 +888,15 @@
       <option name="project" value="LOCAL" />
       <updated>1725229007250</updated>
     </task>
-    <option name="localTasksCounter" value="1021" />
+    <task id="LOCAL-01021" summary="text atlas working">
+      <option name="closed" value="true" />
+      <created>1725309798119</created>
+      <option name="number" value="01021" />
+      <option name="presentableId" value="LOCAL-01021" />
+      <option name="project" value="LOCAL" />
+      <updated>1725309798120</updated>
+    </task>
+    <option name="localTasksCounter" value="1022" />
     <servers />
   </component>
   <component name="TypeScriptGeneratedFilesManager">
@@ -943,7 +945,6 @@
     </option>
   </component>
   <component name="VcsManagerConfiguration">
-    <MESSAGE value="made scene part of state" />
     <MESSAGE value="added option preview widgets" />
     <MESSAGE value="added msaa widget" />
     <MESSAGE value="stashing" />
@@ -968,7 +969,8 @@
     <MESSAGE value="refactored input controll" />
     <MESSAGE value="refactored with text atlas" />
     <MESSAGE value="stashing text atlas" />
-    <option name="LAST_COMMIT_MESSAGE" value="stashing text atlas" />
+    <MESSAGE value="text atlas working" />
+    <option name="LAST_COMMIT_MESSAGE" value="text atlas working" />
   </component>
   <component name="XDebuggerManager">
     <breakpoint-manager>

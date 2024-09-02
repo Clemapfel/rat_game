@@ -1,5 +1,5 @@
 rt.settings.menu.keybinding_scene = {
-
+    text_atlas_id = "menu/keybindings_scene"
 }
 
 --- @class rt.KeybindingScene
@@ -31,9 +31,71 @@ end, {
 function mn.KeybindingScene:realize()
     if self._is_realized == true then return end
     self._is_realized = true
+
+    local labels = rt.TextAtlas:get("menu/keybindings_scene")
+    self._accept_label = rt.Label(labels.accepts)
+    self._go_back_label = rt.Label(labels.go_back)
+    self._heading_label = rt.Label(labels.heading)
+
+    for label in range(self._accept_label, self._go_back_label, self._heading_label) do
+        label:realize()
+    end
+
+    for frame in range(self._accept_frame, self._go_back_frame, self._heading_frame) do
+        frame:realize()
+    end
+
+    self._items = {}
+    for button_row in values(self.button_layout) do
+        local row = {}
+        for button in values(button_row) do
+            local to_insert = {
+                button = button,
+                label = rt.Label(labels[button]),
+                frame = rt.Frame(),
+                indicator = rt.KeybindingIndicator()
+            }
+
+            to_insert.label:realize()
+            to_insert.frame:realize()
+            to_insert.indicator:realize()
+            table.insert(row, to_insert)
+        end
+        table.insert(self._items, row)
+    end
 end
 
 --- @override
-function mn.Keybindingscene:create_from_state(state)
+function mn.KeybindingScene:create_from_state(state)
+    for item_row in values(self._items) do
+        for item in values(item_row) do
+            local binding = self._state:
+        end
+    end
+end
 
+--- @override
+function mn.KeybindingsScene:size_allocate(x, y, width, height)
+
+end
+
+--- @override
+function mn.KeybindingsScene:draw()
+    if self._is_realized ~= true then return end
+    self._heading_frame:draw()
+    self._heading_label:draw()
+
+    for item_row in values(self._items) do
+        for item in values(item_row) do
+            item.frame:draw()
+            item.label:draw()
+            item.indicator:draw()
+        end
+    end
+
+    self._go_back_frame:draw()
+    self._go_back_label:draw()
+
+    self._accept_frame:draw()
+    self._accept_label:draw()
 end
