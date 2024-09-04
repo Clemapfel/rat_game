@@ -18,11 +18,14 @@ function b2.Body:new(world, type, position_x, position_y)
     def.type = type
     def.position = ffi.typeof("b2Vec2")(position_x, position_y)
 
+    --[[
     local body_id = ffi.gc(
         box2d.b2CreateBody(world._native, def),
         box2d.b2DestroyBody
     )
+    ]]--
 
+    local body_id = box2d.b2CreateBody(world._native, def)
     return b2.Body:new_from_id(body_id)
 end
 
@@ -262,14 +265,14 @@ end
 --- @brief
 function b2.Body:draw()
     assert(rt ~= nil and love.draw ~= nil)
-    local color = rt.hsva_to_rgba(rt.HSVA(love.math.perlinNoise(self._native.index1), 1,1, 1));
+    local color = rt.hsva_to_rgba(rt.HSVA(math.fmod((self._native.index1 / 16), 1), 1,1, 1));
     love.graphics.setColor(color.r, color.g, color.b, color.a)
 
     local n = box2d.b2Body_GetShapeCount(self._native)
-    local shapes = ffi.new("b2ShapeId*[" .. n .. "]")
+    local shapes = ffi.new("b2ShapeId[" .. n .. "]")
     local _ = box2d.b2Body_GetShapes(self._native, shapes, n)
     local out = {}
-    for i = 1, n do
-        b2.Shape(shapes[i]):draw()
+    for i = 0, n-1 do
+        b2.Shape:new_from_id(shapes[i]):draw()
     end
 end

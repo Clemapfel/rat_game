@@ -234,7 +234,10 @@ end
 
 --- @brief
 function b2._draw_circle(circle, body)
-    love.graphics.circle("fill", circle.center.x, circle.center.y, circle.radius)
+    --local current_r, current_g, current_b = love.graphics.getColor()
+    --love.graphics.setColor(current_r, current_g, current_b, 0.5)
+    --love.graphics.circle("fill", circle.center.x, circle.center.y, circle.radius)
+    --love.graphics.setColor(current_r, current_g, current_b, 1)
     love.graphics.circle("line", circle.center.x, circle.center.y, circle.radius)
 end
 

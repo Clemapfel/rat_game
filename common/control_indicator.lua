@@ -139,11 +139,12 @@ function rt.ControlIndicator:size_allocate(x, y, width, height)
     local indicator_width = 10 * m
     local max_x, max_y = NEGATIVE_INFINITY, NEGATIVE_INFINITY
     local current_x, current_y = x + 2 * m, y + m
+    local indicator_m = m
     for i = 1, #self._labels do
         local keyboard_indicator, gamepad_indicator, label = self._keyboard_indicators[i], self._gamepad_indicators[i], self._labels[i]
 
-        keyboard_indicator:fit_into(current_x, current_y, indicator_width, indicator_width)
-        gamepad_indicator:fit_into(current_x, current_y, indicator_width, indicator_width)
+        keyboard_indicator:fit_into(current_x + indicator_m, current_y + indicator_m, indicator_width, indicator_width)
+        gamepad_indicator:fit_into(current_x + indicator_m, current_y + indicator_m, indicator_width, indicator_width)
 
         local label_w, label_h = label:measure()
         label:fit_into(current_x + indicator_width + m, current_y + 0.5 * math.max(indicator_width, label_h) - 0.5 * math.min(indicator_width, label_h), POSITIVE_INFINITY, label_h)
@@ -152,7 +153,7 @@ function rt.ControlIndicator:size_allocate(x, y, width, height)
         max_x = math.max(max_x, current_x + indicator_width + label_w + 3 * m)
         max_y = math.max(max_y, current_y + math.max(indicator_width, label_h))
 
-        current_x = current_x + indicator_width + m + label_w + 3 * m
+        current_x = current_x + indicator_width + m + 2 * indicator_m + label_w + 3 * m
     end
 
     max_x = clamp(max_x, 0)
@@ -160,7 +161,7 @@ function rt.ControlIndicator:size_allocate(x, y, width, height)
 
     local thickness = self._frame:get_thickness()
     self._final_width = max_x - x + 2 * thickness + m
-    self._final_height = max_y - y + 2 * thickness
+    self._final_height = max_y - y + 2 * thickness + indicator_m
     self._frame:fit_into(x, y, self._final_width, self._final_height)
 
     self:_update_snapshot()

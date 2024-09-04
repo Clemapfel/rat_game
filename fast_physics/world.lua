@@ -15,10 +15,13 @@ function b2.World:new(gravity_x, gravity_y, n_threads)
         b2._initialize_threads(def, n_threads)
     end
 
+    world_id = box2d.b2CreateWorld(def)
+    --[[
     local world_id = ffi.gc(
         box2d.b2CreateWorld(def),
         box2d.b2DestroyWorld
     )
+    ]]--
 
     return b2.World:new_from_id(world_id)
 end
@@ -27,7 +30,6 @@ end
 function b2.World:new_from_id(id)
     local out = setmetatable({
         _native = id,
-        _debug_draw = ffi.typeof("b2DebugDraw")()
     }, {
         __index = b2.World
     })
@@ -65,32 +67,4 @@ end
 --- @brief
 function b2.World:draw()
     box2d.b2World_Draw(self._native, self._debug_draw)
-end
-
---- @brief
-function b2._initialize_threads(world_def, n_threads)
-    sdl2 = ffi.load("SDL2")
-    ffi.cdef[[
-    void* SDL_CreateThread(int(*fn)(void*), const char *name, void *data);
-    void SDL_WaitThread(void* thread, int *status);
-    ]]
-    
-    world_def.workerCount = n_threads
-
-    -- void b2FinishTaskCallback(SDL_Thread* task, void* context );
-    world_def.finishTask = function(task, context)
-        if task ~= ffi.CNULL then
-            sdl2.WaitThread(task)
-        end
-    end
-
-    -- void b2TaskCallback(int32_t startIndex, int32_t endIndex, uint32_t workerIndex, void *taskContext)
-    function task_callback(start_i, end_i, thread_i, worker_i, context)
-
-    end
-
-    -- SDL_Thread* b2EnqueueTaskCallback( b2TaskCallback* task, int32_t itemCount, int32_t minRange, void* taskContext, void* userContext );
-    world_def.enqueueTask = function(task, item_count, range_min, task_context, user_context)
-        return sdl2.SDL_CreateThread()
-    end
 end
