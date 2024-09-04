@@ -50,7 +50,7 @@ rt.Keyboard = meta.new_type("Keyboard", rt.Widget, rt.SignalEmitter, function(ma
         _selection_graph = rt.SelectionGraph(),
         _last_selected_item = nil,
 
-        _control_indicator = rt.ControlIndicator({rt.ControlIndicatorButton.ALL_BUTTONS, ""}),
+        _control_indicator = rt.ControlIndicator({rt.ControlIndicatorButton.A, ""}),
 
         _is_active = false,
         _x_offset = 0,

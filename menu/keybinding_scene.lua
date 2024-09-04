@@ -78,8 +78,18 @@ function mn.KeybindingScene:realize()
     end
 
     self._control_indicator:create_from({
-        {rt.ControlIndicatorButton.ALL_DIRECTIONS, "Select"},
-        {rt.ControlIndicatorButton.A, "Remap"},
+        { rt.ControlIndicatorButton.A, "" },
+        { rt.ControlIndicatorButton.B, "" },
+        { rt.ControlIndicatorButton.X, "" },
+        { rt.ControlIndicatorButton.Y, "" },
+        { rt.ControlIndicatorButton.UP, "" },
+        { rt.ControlIndicatorButton.RIGHT, "" },
+        { rt.ControlIndicatorButton.DOWN, "" },
+        { rt.ControlIndicatorButton.LEFT, "" },
+        { rt.ControlIndicatorButton.START, "" },
+        { rt.ControlIndicatorButton.SELECT, "" },
+        { rt.ControlIndicatorButton.L, "" },
+        { rt.ControlIndicatorButton.R, "" },
     })
     self._control_indicator:realize()
 
@@ -114,8 +124,8 @@ function mn.KeybindingScene:create_from_state(state)
     for item_row in values(self._items) do
         for item in values(item_row) do
             local keyboard, gamepad = rt.InputControllerState:get_keybinding(item.button)
-            item.gamepad_indicator:set_key(gamepad)
-            item.keyboard_indicator:set_key(keyboard)
+            item.gamepad_indicator:create_from_gamepad_button(gamepad)
+            item.keyboard_indicator:create_from_keyboard_key(keyboard)
         end
     end
 end
@@ -278,6 +288,11 @@ function mn.KeybindingScene:_regenerate_selection_nodes()
         node:set_right(bottom_nodes[i + 1])
     end
 
+    restore_defaults_node:signal_connect(rt.InputButton.A, function(_)
+        self._state:load_default_input_mapping()
+        self:create_from_state(self._state)
+    end)
+
     self._selection_graph:set_current_node(item_rows[1][1])
 end
 
@@ -310,9 +325,9 @@ end
 function mn.KeybindingScene:_finish_assignment(which)
     local item = self._button_to_item[self._assignment_button]
     if meta.is_enum_value(which, rt.KeyboardKey) then
-        item.keyboard_indicator:set_key(which)
+        item.keyboard_indicator:create_from_keyboard_key(which)
     else
-        item.gamepad_indicator:set_key(which)
+        item.gamepad_indicator:create_from_gamepad_button(which)
     end
     self._assignment_active = false
 

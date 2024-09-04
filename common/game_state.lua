@@ -72,6 +72,11 @@ end)
 
 --- @brief
 function rt.GameState:load_input_mapping()
+    self:load_default_input_mapping()
+end
+
+--- @brief
+function rt.GameState:load_default_input_mapping()
     rt.InputControllerState:load_default_mapping()
 end
 

@@ -294,6 +294,7 @@ end
 love.gamepadaxis = function(joystick, axis, value)
     local previous_state = rt.InputControllerState.axis_state[axis]
     rt.InputControllerState.axis_state[axis] = value
+    rt.InputControllerState:set_gamepad_active(true)
 
     if axis == rt.GamepadAxis.LEFT_X or axis == rt.GamepadAxis.LEFT_Y then
         local x = rt.InputControllerState.axis_state[rt.GamepadAxis.LEFT_X]
