@@ -289,7 +289,7 @@ function rt.keyboard_key_to_string(keyboard_key)
     local down_arrow = "\u{2193}"
     local left_arrow = "\u{2190}"
     local right_arrow = "\u{2192}"
-    local space_bar = "\u{2423}"
+    local space_bar = "space"--"\u{2423}"
     local enter = "\u{21B5}"
     local backspace = "\u{232B}"
 

@@ -3,6 +3,7 @@ rt.settings.font = {
     default_size_tiny = 14,
     default_size_small = 20,
     default_size_large = 40,
+    min_font_size = 12,
     default = {},       -- rt.Font
     default_large = {},
     default_small = {},

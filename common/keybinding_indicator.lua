@@ -4,13 +4,14 @@ rt.settings.keybinding_indicator = {
 
 --- @class rt.KeybindingIndicator
 rt.KeybindingIndicator = meta.new_type("KeybindingIndicator", rt.Widget, function(key)
-    if not (meta.is_enum_value(key, rt.KeyboardKey) or meta.is_enum_value(key, rt.GamepadButton)) then
+    if key ~= nil and not (meta.is_enum_value(key, rt.KeyboardKey) or meta.is_enum_value(key, rt.GamepadButton)) then
         rt.error("In rt.KeybindingIndicator(): key `" .. key .. "` is not a valid keyboard key or gamepad button identifier")
     end
     return meta.new(rt.KeybindingIndicator, {
         _key = key,
         _font = nil, -- rt.Font
         _draw = function() end,
+        _snapshot = rt.RenderTexture(1, 1)
     })
 end, {
     font_size_to_font = {},
@@ -24,6 +25,14 @@ end, {
 function rt.KeybindingIndicator:realize()
     if self:get_is_realized() == true then return end
     self._is_realized = true
+end
+
+--- @brief
+function rt.KeybindingIndicator:set_key(key)
+    self._key = key
+    if self._is_realized == true then
+        self:reformat()
+    end
 end
 
 --- @override
@@ -47,137 +56,23 @@ function rt.KeybindingIndicator:size_allocate(x, y, width, height)
     elseif self._key == rt.GamepadButton.LEFT_STICK or self._key == rt.GamepadButton.RIGHT_STICK then
         self:_as_joystick(self._key == rt.GamepadButton.LEFT_STICK, height)
     end
+
+    self._snapshot = rt.RenderTexture(width, height)
+    self._snapshot:bind_as_render_target()
+    self:_draw()
+    self._snapshot:unbind_as_render_target()
 end
 
 --- @override
 function rt.KeybindingIndicator:draw()
-    rt.graphics.translate(self._bounds.x, self._bounds.y)
-    self._draw()
-    rt.graphics.translate(-self._bounds.x, -self._bounds.y)
+    love.graphics.setColor(1, 1, 1, self._opacity)
+    love.graphics.draw(self._snapshot._native, self._bounds.x, self._bounds.y)
+    love.graphics.setColor(1, 1, 1, 1)
 end
 
 --- @brief
-function rt.KeybindingIndicator:_as_keyboard_key(label, width)
-
-    -- find appropriate font size
-    local label_w
-    local font_size = math.round(0.35 * width)
-    local label_m = 10
-    repeat
-        local font = rt.KeybindingIndicator.font_size_to_font[font_size]
-        if font == nil then
-            rt.KeybindingIndicator.font_size_to_font[font_size] = rt.Font(font_size, rt.settings.keybinding_indicator.font_path)
-            font = rt.KeybindingIndicator.font_size_to_font[font_size]
-        end
-
-        label_w, _ = font:measure_glyph(label)
-        self._font = font
-
-        font_size = font_size - 2
-    until label_w < (width - 2 * label_m) or font_size < 12
-
-    local x, y = 0, 0
-    local height = width
-
-    local glyph = rt.Label("<o>" .. label .. "</o>")--, self._font)
-    glyph:set_justify_mode(rt.JustifyMode.CENTER)
-    glyph:realize()
-    local glyph_w, glyph_h = glyph:measure()
-
-    local base_w, base_h = width - 2 * label_m, height - 2 * label_m
-    local front_w, front_h = 0.75 * base_w, 0.75 * base_h
-    local front_offset = (base_h - front_h) * 0.25
-    local front_base, front_base_outline, base, base_outline = rt.Rectangle(), rt.Rectangle(), rt.Rectangle(), rt.Rectangle()
-
-    glyph:fit_into(x, y + 0.5 * height - 0.5 * glyph_h - front_offset, width, height)
-
-    local front_x, front_y = x + 0.5 * width - 0.5 * front_w, y + 0.5 * height - 0.5 * front_h - front_offset
-    for shape in range(front_base, front_base_outline) do
-        shape:resize(front_x, front_y, front_w, front_h)
-    end
-
-    local base_x, base_y =  x + 0.5 * width - 0.5 * base_w, y + 0.5 * height - 0.5 * base_h
-    for shape in range(base, base_outline) do
-        shape:resize(base_x, base_y, base_w, base_h)
-    end
-
-    local corner_radius = 5
-    for shape in range(front_base, front_base_outline, base, base_outline) do
-        shape:set_corner_radius(corner_radius)
-    end
-
-    base:set_color(self.background_color)
-    front_base:set_color(self.foreground_color)
-    local outline_color = self.outline_color
-
-    local outline_width = 2
-    for outline in range(front_base_outline, base_outline) do
-        outline:set_is_outline(true)
-        outline:set_color(outline_color)
-        outline:set_line_width(outline_width)
-    end
-
-    local lines = {}
-    local offset = corner_radius * 0.4
-    table.insert(lines, rt.Line(
-        front_x + offset, front_y + offset,
-        base_x + offset, base_y + offset
-    ))
-
-    table.insert(lines, rt.Line(
-        front_x + front_w - offset, front_y + offset,
-        base_x + base_w - offset, base_y + offset
-    ))
-
-    table.insert(lines, rt.Line(
-        front_x + offset, front_y + front_h - offset,
-        base_x + offset, base_y + base_h - offset
-    ))
-
-    table.insert(lines, rt.Line(
-        front_x + front_w - offset, front_y + front_h - offset,
-        base_x + base_w - offset, base_y + base_h - offset
-    ))
-
-    for line in values(lines) do
-        line:set_color(outline_color)
-        line:set_line_width(outline_width)
-    end
-
-    local outline_outline_w = 2
-    local outline_outline = rt.Rectangle(
-        base_x - outline_outline_w,
-        base_y - outline_outline_w,
-        base_w + 2 * outline_outline_w,
-        base_h + 2 * outline_outline_w
-    )
-    outline_outline:set_corner_radius(corner_radius)
-    outline_outline:set_color(self.outline_outline_color)
-
-    self._content = {
-        outline_outline,
-        base,
-        base_outline,
-        front_base,
-        front_base_outline
-    }
-
-    self._draw = function()
-        for drawable in values(self._content) do
-            drawable:draw()
-        end
-    end
-
-    outline_outline:draw()
-    base:draw()
-    base_outline:draw()
-    front_base:draw()
-    front_base_outline:draw()
-    for line in values(lines) do
-        table.insert(self._content, line)
-    end
-
-    table.insert(self._content, glyph)
+function rt.KeybindingIndicator:set_opacity(opacity)
+    self._opacity = opacity
 end
 
 --- @brief
@@ -572,9 +467,7 @@ function rt.KeybindingIndicator:_as_l_r(l_or_r, width)
     local bezier_offset = -0.05 * width
     local curve = love.math.newBezierCurve(
     rect_x + rect_w - corner_radius , rect_y,
-
         rect_x + bezier_offset,  rect_y + bezier_offset,
-
         rect_x, rect_y + rect_h - corner_radius
     )
     local curve_line = rt.Line(curve:render())
@@ -751,6 +644,160 @@ function rt.KeybindingIndicator:_as_joystick(left_or_right, width)
         label,
         down_indicator_outline,
         down_indicator
+    }
+
+    self._draw = function()
+        for drawable in values(self._content) do
+            drawable:draw()
+        end
+    end
+end
+
+--- @brief
+function rt.KeybindingIndicator:_as_keyboard_key(label, width)
+
+    local outer_m = 0.1 * width
+    local outer_w = width - 2 * outer_m
+    local outer_h = outer_w
+
+    local is_space = label == rt.keyboard_key_to_string(rt.KeyboardKey.SPACE)
+    if is_space then
+        outer_w = width
+        outer_h = 0.4 * outer_w
+    end
+
+    local trapezoid_w = 0.15 * outer_w
+    local left_trapezoid_w = trapezoid_w
+    local right_trapezoid_w = trapezoid_w
+    local y_offset = 0.05 * outer_h
+    local bottom_trapezoid_h = trapezoid_w + y_offset
+    local top_trapezoid_h = trapezoid_w - y_offset
+
+    if is_space then
+        local trapezoid_factor = 0.5
+        left_trapezoid_w = trapezoid_factor * left_trapezoid_w
+        right_trapezoid_w = trapezoid_factor * right_trapezoid_w
+        top_trapezoid_h = trapezoid_factor * top_trapezoid_h
+        bottom_trapezoid_h = trapezoid_factor * bottom_trapezoid_h
+    end
+
+    local inner_w, inner_h = outer_w - left_trapezoid_w - right_trapezoid_w, outer_h - top_trapezoid_h - bottom_trapezoid_h
+
+    local x, y, height = 0, 0, width
+    local outer_x, outer_y = x + 0.5 * width - 0.5 * outer_w, y + 0.5 * height - 0.5 * outer_h
+
+    local outer = rt.Rectangle(outer_x, outer_y, outer_w, outer_h)
+    local outer_outline = rt.Rectangle(outer_x - 1, outer_y - 1, outer_w + 2, outer_h + 2)
+
+    local inner_x, inner_y = outer_x + left_trapezoid_w, outer_y + top_trapezoid_h
+    local inner_padding = 0.005 * outer_w
+    local inner = rt.Rectangle(inner_x - inner_padding, inner_y - inner_padding, inner_w + 2 * inner_padding, inner_h + 2 * inner_padding)
+    local inner_outline = rt.Rectangle(inner_x - inner_padding, inner_y - inner_padding, inner_w + 2 * inner_padding, inner_h + 2 * inner_padding)
+
+    for rectangle in range(outer, inner, outer_outline, inner_outline) do
+        rectangle:set_corner_radius(4)
+    end
+
+    outer:set_color(rt.Palette.GRAY_5)
+    inner:set_color(rt.Palette.GRAY_3)
+
+    local top_trapezoid = rt.Polygon(
+        outer_x, outer_y,
+        outer_x + outer_w, outer_y,
+        inner_x + inner_w, inner_y,
+        inner_x, inner_y
+    )
+
+    local top_outline = rt.Polygon(
+        outer_x, outer_y,
+        outer_x + outer_w, outer_y,
+        inner_x + inner_w, inner_y,
+        inner_x, inner_y
+    )
+
+    local right_trapezoid = rt.Polygon(
+        outer_x + outer_w, outer_y,
+        outer_x + outer_w, outer_y + outer_h,
+        inner_x + inner_w, inner_y + inner_h,
+        inner_x + inner_w, inner_y
+    )
+
+    local right_outline = rt.Polygon(
+        outer_x + outer_w, outer_y,
+        outer_x + outer_w, outer_y + outer_h,
+        inner_x + inner_w, inner_y + inner_h,
+        inner_x + inner_w, inner_y
+    )
+
+    local bottom_trapezoid = rt.Polygon(
+        inner_x, inner_y + inner_h,
+        inner_x + inner_w, inner_y + inner_h,
+        outer_x + outer_w, outer_y + outer_h,
+        outer_x, outer_y + outer_h
+    )
+
+    local bottom_outline = rt.Polygon(
+        inner_x, inner_y + inner_h,
+        inner_x + inner_w, inner_y + inner_h,
+        outer_x + outer_w, outer_y + outer_h,
+        outer_x, outer_y + outer_h
+    )
+
+    local left_trapezoid = rt.Polygon(
+        outer_x, outer_y,
+        inner_x, inner_y,
+        inner_x, inner_y + inner_h,
+        outer_x, outer_y + outer_h
+    )
+
+    local left_outline = rt.Polygon(
+        outer_x, outer_y,
+        inner_x, inner_y,
+        inner_x, inner_y + inner_h,
+        outer_x, outer_y + outer_h
+    )
+
+    outer_outline:set_is_outline(true)
+    outer_outline:set_line_width(1)
+    outer_outline:set_color(rt.Palette.TRUE_WHITE)
+
+    inner_outline:set_is_outline(true)
+    inner_outline:set_line_width(1)
+    inner_outline:set_is_outline(true)
+    inner_outline:set_color(rt.Palette.GRAY_6)
+
+    top_trapezoid:set_color(rt.Palette.GRAY_4)
+    bottom_trapezoid:set_color(rt.color_mix(rt.Palette.GRAY_5, rt.Palette.GRAY_6, 0.5))
+    left_trapezoid:set_color(rt.Palette.GRAY_5)
+    right_trapezoid:set_color(rt.Palette.GRAY_5)
+
+    for outline in range(top_outline, right_outline, bottom_outline, left_outline) do
+        outline:set_color(rt.Palette.GRAY_7)
+        outline:set_is_outline(true)
+    end
+
+    local font = nil
+    if is_space then font = rt.settings.font.default_tiny end
+    local glyph = rt.Label("<o>" .. label .. "</o>", font)
+    glyph:set_justify_mode(rt.JustifyMode.CENTER)
+    glyph:realize()
+    local glyph_w, glyph_h = glyph:measure()
+    glyph:fit_into(0, 0 + 0.5 * width - 0.5 * glyph_h - y_offset, width, width)
+
+    self._content = {
+        outer,
+        top_trapezoid,
+        right_trapezoid,
+        bottom_trapezoid,
+        left_trapezoid,
+        top_outline,
+        right_outline,
+        bottom_outline,
+        left_outline,
+        inner,
+        inner_outline,
+        outer_outline,
+        glyph
     }
 
     self._draw = function()

@@ -83,8 +83,14 @@ function rt.InputController:is_keyboard_key_down(key)
     return love.keyboard.isDown(rt.keyboard_key_to_native(key))
 end
 
+--- @brief
 function rt.InputController:is_keyboard_key_up(key)
     return not self:is_keyboard_key_down()
+end
+
+--- @brief
+function rt.InputController:get_input_method()
+    return rt.InputControllerState:get_input_method()
 end
 
 --- @brief
@@ -134,6 +140,7 @@ end
 
 --- @brief
 function rt.InputControllerState:set_gamepad_active(next)
+    meta.assert_boolean(next)
     local current = rt.InputControllerState.gamepad_active
     rt.InputControllerState.gamepad_active = next
 
@@ -463,11 +470,14 @@ function rt.InputControllerState:load_default_mapping()
 
         [rt.InputButton.START] = {
             rt.KeyboardKey.M,
+            rt.KeyboardKey.RETURN,
             rt.GamepadButton.START
         },
 
         [rt.InputButton.SELECT] = {
             rt.KeyboardKey.N,
+            rt.KeyboardKey.RIGHT_SQUARE_BRACKET,
+            rt.KeyboardKey.BACKSLASH,
             rt.GamepadButton.SELECT
         },
 
@@ -545,9 +555,9 @@ end
 function rt.InputControllerState:get_keybinding(input_button)
     local first_keyboard_key, first_gamepad_button = nil, nil
     for x in values(self.mapping[input_button]) do
-        if meta.is_enum_value(x, rt.Keyboradkey) then
+        if meta.is_enum_value(x, rt.KeyboardKey) and not first_keyboard_key then
             first_keyboard_key = x
-        elseif meta.is_enum_value(x, rt.GamepadButtonPrefix) then
+        elseif meta.is_enum_value(x, rt.GamepadButton) and not first_gamepad_button then
             first_gamepad_button = x
         end
 
@@ -555,11 +565,14 @@ function rt.InputControllerState:get_keybinding(input_button)
             return first_keyboard_key, first_gamepad_button
         end
     end
+
+    rt.error("In rt.InputControllerState: no keybinding for `" .. input_button .. "`")
+    return nil, nil
 end
 
 --- @brief
 function rt.InputControllerState:get_input_method()
-    if self.gamepad_active then 
+    if self.gamepad_active then
         return rt.InputMethod.GAMEPAD 
     else 
         return rt.InputMethod.KEYBOARD 

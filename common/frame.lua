@@ -235,6 +235,7 @@ function rt.Frame:set_opacity(alpha)
     if meta.is_widget(self._child) then self._child:set_opacity(self._opacity) end
     self._frame:set_opacity(self._opacity)
     self._frame_outline:set_opacity(self._opacity)
+    self._stencil_mask:set_opacity(self._opacity)
 end
 
 --- @brief

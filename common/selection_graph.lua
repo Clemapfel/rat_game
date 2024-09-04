@@ -200,14 +200,16 @@ function rt.SelectionGraph:handle_button(button)
 end
 
 --- @brief
-function rt.SelectionGraph:add(node)
-    meta.assert_isa(node, rt.SelectionGraphNode)
-    if self._nodes[node] == nil then
-        self._nodes[node] = true
-        if self._n_nodes == 0 then
-            self._current_node = node
+function rt.SelectionGraph:add(...)
+    for node in range(...) do
+        meta.assert_isa(node, rt.SelectionGraphNode)
+        if self._nodes[node] == nil then
+            self._nodes[node] = true
+            if self._n_nodes == 0 then
+                self._current_node = node
+            end
+            self._n_nodes = self._n_nodes + 1
         end
-        self._n_nodes = self._n_nodes + 1
     end
 end
 

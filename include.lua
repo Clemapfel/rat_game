@@ -151,6 +151,7 @@ require "menu.scale"
 require "menu.shake_intensity_widget"
 require "menu.msaa_intensity_widget"
 require "menu.options_scene"
+require "menu.keybinding_scene"
 
 -- state
 require "common.game_state"
