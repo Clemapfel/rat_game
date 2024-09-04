@@ -41,15 +41,17 @@ end
 function rt.KeybindingIndicator:create_as_button(top_selected, right_selected, bottom_selected, left_selected)
     self._initializer = function(self, width)
         local total_w = width
-        local button_outer_m = 0.225 * width
+        local button_outer_m = 0.23 * width
         local button_inner_m = button_outer_m
-        local button_r = (width - 2 * button_outer_m - button_inner_m) / 2
+        local button_r = (width - 2 * button_outer_m - button_inner_m) / 2.1
 
         local x, y = 0, 0
         local height = width
 
-        local center_offset_x, center_offset_y = 0.5 * button_inner_m + button_r, 0.5 * button_inner_m + button_r
-        local center_x, center_y = x + 0.5 * width, y + 0.5 * height
+        local outline_outline_width = 3
+        local center_offset_x = 0.35 * button_inner_m + button_r
+        local center_offset_y = center_offset_x
+        local center_x, center_y = x + 0.5 * width, y + 0.5 * height - outline_outline_width
         local top_x, top_y = center_x, center_y - center_offset_y
         local right_x, right_y = center_x + center_offset_x, center_y
         local bottom_x, bottom_y = center_x, center_y + center_offset_y
@@ -68,7 +70,6 @@ function rt.KeybindingIndicator:create_as_button(top_selected, right_selected, b
         local bottom_back, bottom_back_outline = rt.Circle(bottom_x + back_x_offset, bottom_y + back_y_offset, button_r), rt.Circle(bottom_x + back_x_offset, bottom_y + back_y_offset, button_r)
         local left_back, left_back_outline = rt.Circle(left_x + back_x_offset, left_y + back_y_offset, button_r), rt.Circle(left_x + back_x_offset, left_y + back_y_offset, button_r)
 
-        local outline_outline_width = 3
         local top_outline_outline = rt.Circle(top_x, top_y, button_r + outline_outline_width)
         local right_outline_outline = rt.Circle(right_x, right_y, button_r + outline_outline_width)
         local bottom_outline_outline = rt.Circle(bottom_x, bottom_y, button_r + outline_outline_width)
@@ -80,7 +81,7 @@ function rt.KeybindingIndicator:create_as_button(top_selected, right_selected, b
         local left_back_outline_outline = rt.Circle(left_x + back_x_offset, left_y + back_y_offset, button_r + outline_outline_width)
 
         local outline_width = 2
-        local selection_inlay_radius = (button_r - outline_width) * 0.85
+        local selection_inlay_radius = button_r --(button_r - outline_width) * 0.85
         local top_selection = rt.Circle(top_x, top_y, selection_inlay_radius)
         local right_selection = rt.Circle(right_x, right_y, selection_inlay_radius)
         local bottom_selection = rt.Circle(bottom_x, bottom_y, selection_inlay_radius)
@@ -136,11 +137,11 @@ function rt.KeybindingIndicator:create_as_button(top_selected, right_selected, b
             right_base,
             bottom_base,
             left_base,
+            selection_inlay,
             top_outline,
             right_outline,
             bottom_outline,
             left_outline,
-            selection_inlay
         }
 
         self._draw = function()
@@ -176,8 +177,8 @@ function rt.KeybindingIndicator:create_as_dpad(up_selected, right_selected, down
         local left_bottom_x, left_bottom_y = center_x - r, center_y + m / 2
         local center_bottom_left_x, center_bottom_left_y = center_x - m / 2, center_y + m / 2
 
-        local center_offset = 3
-        local frame_offset = 4
+        local center_offset = 0.175 * m
+        local frame_offset = 0.18 * m
         local top = {
             top_left_x + frame_offset, top_left_y + frame_offset,
             top_right_x - frame_offset, top_right_y + frame_offset,
@@ -317,8 +318,8 @@ function rt.KeybindingIndicator:create_as_start_or_select(start_or_select)
         local x, y = 0, 0
         local height = width
 
-        local w = 0.9 * width / 1.5
-        local h = 0.4 * height / 1.5
+        local w = 0.9 * width / 1.2
+        local h = 0.4 * height / 1.2
 
         local center_x, center_y = x + 0.5 * width, y + 0.5 * height
         local base = rt.Rectangle(center_x - 0.5 * w, center_y - 0.5 * h, w, h)
@@ -424,81 +425,104 @@ function rt.KeybindingIndicator:create_as_l_or_r(l_or_r)
         local label_w, label_h = label:measure()
         label:fit_into(0, y + 0.5 * height - 0.5 * label_h, width, height)
 
-        local corner_radius = 10
-        local rect_w, rect_h = width * 0.7, width * 0.45
-        local rect_x, rect_y = (width - rect_w) / 2, (height - rect_h) / 2
-        local rectangle = rt.Rectangle(rect_x, rect_y, rect_w, rect_h)
-        local rectangle_outline = rt.Rectangle(rect_x, rect_y, rect_w, rect_h)
+        local center_x, center_y = x + 0.55 * width , y + 0.5 * height
+        local rect_w, rect_h = 0.75 * width, 0.45 * width
+        local rect_base_x, rect_base_y = center_x - 0.5 * rect_w, center_y - 0.5 * rect_h
+        local rectangle_base = rt.Rectangle(rect_base_x, rect_base_y, rect_w, rect_h)
+        local rectangle_base_outline = rt.Rectangle(rect_base_x, rect_base_y, rect_w, rect_h)
+        local rectangle_base_outline_outline = rt.Rectangle(rect_base_x, rect_base_y, rect_w, rect_h)
 
-        rectangle:set_corner_radius(10)
-        rectangle_outline:set_corner_radius(10)
+        local outline_width = 2
+        rectangle_base:set_color(rt.Palette.GRAY_4)
+        rectangle_base_outline:set_color(rt.Palette.GRAY_7)
+        rectangle_base_outline:set_line_width(outline_width)
+        rectangle_base_outline_outline:set_color(rt.Palette.TRUE_WHITE)
+        rectangle_base_outline_outline:set_line_width(outline_width + 4)
 
-        local bezier_offset = -0.05 * width
-        local curve = love.math.newBezierCurve(
-            rect_x + rect_w - corner_radius , rect_y,
-            rect_x + bezier_offset,  rect_y + bezier_offset,
-            rect_x, rect_y + rect_h - corner_radius
-        )
-        local curve_line = rt.Line(curve:render())
-
-        local polygon = rt.Polygon(rect_x + 0.9 * rect_w, rect_y + 0.9 * rect_h, table.unpack(curve:render()))
-
-        local padding = 3
-        local stencil = rt.Rectangle(
-            0, 0, 0.6 * width, 0.6 * height
-        )
-        self._content = {
-            label,
-            polygon
-        }
-
-        for line in range(curve_line, rectangle_outline) do
-            line:set_color(rt.Palette.GRAY_7)
-            line:set_is_outline(true)
-            line:set_line_width(2)
+        for outline in range(rectangle_base_outline, rectangle_base_outline_outline) do
+            outline:set_is_outline(true)
         end
 
-        for base in range(rectangle, polygon) do
-            base:set_color(rt.Palette.GRAY_5)
+        local corner_radius = 0.2 * rect_h
+        for rect in range(rectangle_base, rectangle_base_outline, rectangle_base_outline_outline) do
+            rect:set_corner_radius(corner_radius)
         end
 
-        local line_outline = rt.Line(curve:render())
-        line_outline:set_color(rt.Palette.WHITE)
-        line_outline:set_line_width(6)
+        local polygon_last_y_offset = 0.02 * height
+        local bezier = love.math.newBezierCurve(
+            rect_base_x + corner_radius + polygon_last_y_offset, rect_base_y,
+            rect_base_x + rect_w, rect_base_y,
+            rect_base_x + rect_w, rect_base_y + rect_h - corner_radius
+        )
 
-        local rectangle_outline_outline = rt.Rectangle(rect_x, rect_y, rect_w, rect_h)
-        rectangle_outline_outline:set_color(rt.Palette.WHITE)
-        rectangle_outline_outline:set_is_outline(true)
-        rectangle_outline_outline:set_line_width(5)
-        rectangle_outline_outline:set_corner_radius(corner_radius)
+
+        local stencil_padding = corner_radius + outline_width
+        local stencil = rt.Triangle(
+            rect_base_x + corner_radius - stencil_padding, rect_base_y - stencil_padding,
+            rect_base_x + rect_w + stencil_padding, rect_base_y - stencil_padding,
+            rect_base_x + rect_w + stencil_padding, rect_base_y + rect_h - corner_radius
+        )
+
+        local polygon_points = {}
+
+        for p in values(bezier:render()) do
+            table.insert(polygon_points, p)
+        end
+
+        local first_x, first_y = polygon_points[1], polygon_points[2]
+        first_x = first_x - polygon_last_y_offset
+        table.insert(polygon_points, 1, first_y)
+        table.insert(polygon_points,  2, first_x)
+
+        local last_x, last_y = polygon_points[#polygon_points-1], polygon_points[#polygon_points]
+        last_y = last_y + polygon_last_y_offset
+        table.insert(polygon_points, last_x)
+        table.insert(polygon_points, last_y)
+
+
+        local curve_outline = rt.Line(polygon_points)
+        local curve_outline_outline = rt.Line(polygon_points)
+
+        curve_outline:set_line_width(outline_width)
+        curve_outline_outline:set_line_width(outline_width + 4)
+        curve_outline:set_color(rt.Palette.GRAY_7)
+        curve_outline_outline:set_color(rt.Palette.TRUE_WHITE)
+
+        local polygon = rt.Polygon({
+            rect_base_x + corner_radius - 2 * polygon_last_y_offset, rect_base_y + rect_h - corner_radius + polygon_last_y_offset,
+            table.unpack(polygon_points)
+        })
+        polygon:set_color(rt.Palette.GRAY_4)
 
         local flip_x = 0.5 * width
         self._draw = function()
-
-            if l_or_r == false then
+            if l_or_r == true then
                 rt.graphics.push()
                 rt.graphics.translate(flip_x, 0)
                 rt.graphics.scale(-1, 1)
                 rt.graphics.translate(-flip_x, 0)
             end
 
-            line_outline:draw()
+            curve_outline_outline:draw()
+            polygon:draw()
 
             rt.graphics.stencil(123, stencil)
             rt.graphics.set_stencil_test(rt.StencilCompareMode.NOT_EQUAL, 123)
-            rectangle_outline_outline:draw()
-            rectangle:draw()
-            rectangle_outline:draw()
+            rectangle_base_outline_outline:draw()
+            rectangle_base:draw()
+            rectangle_base_outline:draw()
             rt.graphics.set_stencil_test()
 
-            polygon:draw()
-            curve_line:draw()
 
-            if l_or_r == false then
+            curve_outline:draw()
+
+            if l_or_r == true then
                 rt.graphics.pop()
             end
 
             label:draw()
+
+            --stencil:draw()
         end
     end
 

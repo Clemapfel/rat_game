@@ -22,17 +22,10 @@
     </configurations>
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="7fa9ba1b-2cff-4ecc-86fb-59ab2fa76ee1" name="Changes" comment="key bindings selection graph working">
-      <change afterPath="$PROJECT_DIR$/common/~control_indicator.lua" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/common/~keybinding_indicator.lua" afterDir="false" />
+    <list default="true" id="7fa9ba1b-2cff-4ecc-86fb-59ab2fa76ee1" name="Changes" comment="refacotred keybinding indicator, control indicator now uses it">
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/common/control_indicator.lua" beforeDir="false" afterPath="$PROJECT_DIR$/common/control_indicator.lua" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/common/game_state.lua" beforeDir="false" afterPath="$PROJECT_DIR$/common/game_state.lua" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/common/input_controller.lua" beforeDir="false" afterPath="$PROJECT_DIR$/common/input_controller.lua" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/common/keybinding_indicator.lua" beforeDir="false" afterPath="$PROJECT_DIR$/common/keybinding_indicator.lua" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/common/keyboard.lua" beforeDir="false" afterPath="$PROJECT_DIR$/common/keyboard.lua" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/menu/inventory_scene.lua" beforeDir="false" afterPath="$PROJECT_DIR$/menu/inventory_scene.lua" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/menu/keybinding_scene.lua" beforeDir="false" afterPath="$PROJECT_DIR$/menu/keybinding_scene.lua" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/main.lua" beforeDir="false" afterPath="$PROJECT_DIR$/main.lua" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -507,15 +500,7 @@
       <workItem from="1725055990975" duration="30709000" />
       <workItem from="1725306584614" duration="2403000" />
       <workItem from="1725309008282" duration="24176000" />
-      <workItem from="1725458724189" duration="6648000" />
-    </task>
-    <task id="LOCAL-00975" summary="sdl threads working">
-      <option name="closed" value="true" />
-      <created>1724251673476</created>
-      <option name="number" value="00975" />
-      <option name="presentableId" value="LOCAL-00975" />
-      <option name="project" value="LOCAL" />
-      <updated>1724251673476</updated>
+      <workItem from="1725458724189" duration="9629000" />
     </task>
     <task id="LOCAL-00976" summary="fixed game state modification from options menu">
       <option name="closed" value="true" />
@@ -901,7 +886,15 @@
       <option name="project" value="LOCAL" />
       <updated>1725410747835</updated>
     </task>
-    <option name="localTasksCounter" value="1024" />
+    <task id="LOCAL-01024" summary="refacotred keybinding indicator, control indicator now uses it">
+      <option name="closed" value="true" />
+      <created>1725472602407</created>
+      <option name="number" value="01024" />
+      <option name="presentableId" value="LOCAL-01024" />
+      <option name="project" value="LOCAL" />
+      <updated>1725472602407</updated>
+    </task>
+    <option name="localTasksCounter" value="1025" />
     <servers />
   </component>
   <component name="TypeScriptGeneratedFilesManager">
@@ -950,7 +943,6 @@
     </option>
   </component>
   <component name="VcsManagerConfiguration">
-    <MESSAGE value="added msaa widget" />
     <MESSAGE value="added round" />
     <MESSAGE value="update" />
     <MESSAGE value="stashing coroutines" />
@@ -975,7 +967,8 @@
     <MESSAGE value="text atlas working" />
     <MESSAGE value="stashing" />
     <MESSAGE value="key bindings selection graph working" />
-    <option name="LAST_COMMIT_MESSAGE" value="key bindings selection graph working" />
+    <MESSAGE value="refacotred keybinding indicator, control indicator now uses it" />
+    <option name="LAST_COMMIT_MESSAGE" value="refacotred keybinding indicator, control indicator now uses it" />
   </component>
   <component name="XDebuggerManager">
     <breakpoint-manager>
