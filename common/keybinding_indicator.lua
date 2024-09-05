@@ -792,7 +792,7 @@ function rt.KeybindingIndicator:create_as_key(text, is_space)
             outer_h = 0.4 * outer_w
         end
 
-        local trapezoid_w = 0.15 * outer_w
+        local trapezoid_w = 0.1 * outer_w
         local left_trapezoid_w = trapezoid_w
         local right_trapezoid_w = trapezoid_w
         local y_offset = 0.05 * outer_h
@@ -940,12 +940,86 @@ end
 
 --- @brief
 function rt.KeybindingIndicator:create_as_two_horizontal_keys(left_text, right_text)
-    self:create_as_key(left_text .. " & " .. right_text, false)
+    self._initializer = function(self, width)
+        local x, y, height = 0, 0, width
+        local radius = 0.5 * width / 2
+
+        local right_label = rt.Label("<o>" .. right_text .. "</o>", rt.settings.font.default_small)
+        local left_label = rt.Label("<o>" .. left_text .. "</o>", rt.settings.font.default_small)
+
+        for label in range(right_label, left_label) do
+            label:realize()
+            label:set_justify_mode(rt.JustifyMode.CENTER)
+        end
+
+        local line_width = 2
+        local center_x, center_y = 0.5 * width, 0.5 * height
+        local rect_r = (0.6 * width - 4 * line_width) / 2
+        local spacer = 0
+
+        local right_center_x, right_center_y = center_x + rect_r + spacer, center_y
+        local left_center_x, left_center_y = center_x - rect_r - spacer, center_y
+
+        local right_base = rt.Rectangle(right_center_x - rect_r, right_center_y - rect_r, 2 * rect_r, 2 * rect_r)
+        local right_outline = rt.Rectangle(right_center_x - rect_r, right_center_y - rect_r, 2 * rect_r, 2 * rect_r)
+        local right_outline_outline = rt.Rectangle(right_center_x - rect_r, right_center_y - rect_r, 2 * rect_r, 2 * rect_r)
+        local right_label_w, right_label_h = right_label:measure()
+        right_label:fit_into(right_center_x - rect_r, right_center_y - 0.5 * right_label_h, 2 * rect_r, 2 * rect_r)
+
+        local left_base = rt.Rectangle(left_center_x - rect_r, left_center_y - rect_r, 2 * rect_r, 2 * rect_r)
+        local left_outline = rt.Rectangle(left_center_x - rect_r, left_center_y - rect_r, 2 * rect_r, 2 * rect_r)
+        local left_outline_outline = rt.Rectangle(left_center_x - rect_r, left_center_y - rect_r, 2 * rect_r, 2 * rect_r)
+        local left_label_w, left_label_h = left_label:measure()
+        left_label:fit_into(left_center_x - rect_r, left_center_y - 0.5 * left_label_h, 2 * rect_r, 2 * rect_r)
+
+        local corner_radius = 0.05 * width
+        for base in range(right_base, left_base) do
+            base:set_color(rt.Palette.GRAY_3)
+            base:set_corner_radius(corner_radius)
+        end
+
+        for outline in range(right_outline, left_outline) do
+            outline:set_is_outline(true)
+            outline:set_color(rt.Palette.GRAY_7)
+            outline:set_corner_radius(corner_radius)
+            outline:set_line_width(line_width)
+        end
+
+        for outline_outline in range(right_outline_outline, left_outline_outline) do
+            outline_outline:set_is_outline(true)
+            outline_outline:set_color(rt.Palette.TRUE_WHITE)
+            outline_outline:set_line_width(line_width + 3)
+            outline_outline:set_corner_radius(corner_radius)
+        end
+
+        local outline_outline = rt.Rectangle(0, 0, width, width)
+        outline_outline:set_color(rt.Palette.TRUE_WHITE)
+
+        self._content = {
+            right_outline_outline,
+            left_outline_outline,
+
+            right_base,
+            right_outline,
+
+            left_base,
+            left_outline,
+
+            right_label,
+            left_label
+        }
+
+        self._draw = function()
+            for drawable in values(self._content) do
+                drawable:draw()
+            end
+        end
+    end
 end
 
 --- @brief
-function rt.KeybindingIndicator:create_as_two_vertical_keys(up_text, bottom_text)
-    self:create_as_key(up_text .. "\n" .. bottom_text, false)
+function rt.KeybindingIndicator:create_as_two_vertical_keys(top_text, bottom_text)
+    self:create_as_two_horizontal_keys(top_text, bottom_text)
 end
 
 --- @brief

@@ -435,7 +435,7 @@ function mn.InventoryScene:_set_control_indicator_layout(layout)
     end
 
     if self._verbose_info:can_scroll_up() or self._verbose_info:can_scroll_down() then
-        table.insert(final_layout, {rt.ControlIndicatorButton.L_R, "Scroll"})
+        --table.insert(final_layout, {rt.ControlIndicatorButton.L_R, "Scroll"})
     end
 
     for x in values(shared_layout) do

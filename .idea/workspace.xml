@@ -22,22 +22,12 @@
     </configurations>
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="7fa9ba1b-2cff-4ecc-86fb-59ab2fa76ee1" name="Changes" comment="stashing uses threads but runs serially">
+    <list default="true" id="7fa9ba1b-2cff-4ecc-86fb-59ab2fa76ee1" name="Changes" comment="polished scenes">
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/assets/text/english/menu.lua" beforeDir="false" afterPath="$PROJECT_DIR$/assets/text/english/menu.lua" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/battle/background.lua" beforeDir="false" afterPath="$PROJECT_DIR$/battle/background.lua" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/common/control_indicator.lua" beforeDir="false" afterPath="$PROJECT_DIR$/common/control_indicator.lua" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/common/game_state.lua" beforeDir="false" afterPath="$PROJECT_DIR$/common/game_state.lua" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/common/input_controller.lua" beforeDir="false" afterPath="$PROJECT_DIR$/common/input_controller.lua" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/common/keybinding_indicator.lua" beforeDir="false" afterPath="$PROJECT_DIR$/common/keybinding_indicator.lua" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/fast_physics/world_thread.lua" beforeDir="false" afterPath="$PROJECT_DIR$/fast_physics/world_thread.lua" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/fast_physics/world_thread_worker.lua" beforeDir="false" afterPath="$PROJECT_DIR$/fast_physics/world_thread_worker.lua" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/main.lua" beforeDir="false" afterPath="$PROJECT_DIR$/main.lua" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/menu/inventory_scene.lua" beforeDir="false" afterPath="$PROJECT_DIR$/menu/inventory_scene.lua" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/menu/keybinding_scene.lua" beforeDir="false" afterPath="$PROJECT_DIR$/menu/keybinding_scene.lua" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/menu/options_scene.lua" beforeDir="false" afterPath="$PROJECT_DIR$/menu/options_scene.lua" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/menu/verbose_info_panel.lua" beforeDir="false" afterPath="$PROJECT_DIR$/menu/verbose_info_panel.lua" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/menu/verbose_info_panel_item.lua" beforeDir="false" afterPath="$PROJECT_DIR$/menu/verbose_info_panel_item.lua" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -516,15 +506,7 @@
       <workItem from="1725491987773" duration="2767000" />
       <workItem from="1725497293442" duration="2685000" />
       <workItem from="1725500236845" duration="1577000" />
-      <workItem from="1725502219832" duration="9995000" />
-    </task>
-    <task id="LOCAL-00981" summary="bodies working">
-      <option name="closed" value="true" />
-      <created>1724291786376</created>
-      <option name="number" value="00981" />
-      <option name="presentableId" value="LOCAL-00981" />
-      <option name="project" value="LOCAL" />
-      <updated>1724291786376</updated>
+      <workItem from="1725502219832" duration="11358000" />
     </task>
     <task id="LOCAL-00982" summary="stashing chain shape">
       <option name="closed" value="true" />
@@ -910,7 +892,15 @@
       <option name="project" value="LOCAL" />
       <updated>1725504423020</updated>
     </task>
-    <option name="localTasksCounter" value="1030" />
+    <task id="LOCAL-01030" summary="polished scenes">
+      <option name="closed" value="true" />
+      <created>1725549432919</created>
+      <option name="number" value="01030" />
+      <option name="presentableId" value="LOCAL-01030" />
+      <option name="project" value="LOCAL" />
+      <updated>1725549432919</updated>
+    </task>
+    <option name="localTasksCounter" value="1031" />
     <servers />
   </component>
   <component name="TypeScriptGeneratedFilesManager">
@@ -959,7 +949,6 @@
     </option>
   </component>
   <component name="VcsManagerConfiguration">
-    <MESSAGE value="coroutines working" />
     <MESSAGE value="stashing, why does update not stack with increased frame duration" />
     <MESSAGE value="refactored _is_realized to get_is_realized" />
     <MESSAGE value="stashing update, why does it impact fps instead of piling up coroutines?" />
@@ -984,7 +973,8 @@
     <MESSAGE value="works for a few cycles" />
     <MESSAGE value="stashing, finish_tasks seems to be called async too" />
     <MESSAGE value="stashing uses threads but runs serially" />
-    <option name="LAST_COMMIT_MESSAGE" value="stashing uses threads but runs serially" />
+    <MESSAGE value="polished scenes" />
+    <option name="LAST_COMMIT_MESSAGE" value="polished scenes" />
   </component>
   <component name="XDebuggerManager">
     <breakpoint-manager>

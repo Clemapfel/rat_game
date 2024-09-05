@@ -49,7 +49,7 @@ function rt.ControlIndicator:_initialize_indicator_from_control_indicator_button
         elseif button == rt.ControlIndicatorButton.LEFT_RIGHT then
             local left, _ = rt.InputControllerState:get_keybinding(rt.InputButton.LEFT)
             local right, _ = rt.InputControllerState:get_keybinding(rt.InputButton.RIGHT)
-            indicator:create_as_two_vertical_keys(
+            indicator:create_as_two_horizontal_keys(
                 rt.keyboard_key_to_string(left),
                 rt.keyboard_key_to_string(right)
             )
