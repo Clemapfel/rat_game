@@ -8,6 +8,7 @@ function b2.World:new_with_threads(gravity_x, gravity_y, n_threads)
 
     typedef struct b2ThreadDispatch {
         int32_t n_dispatched;
+        int64_t step_i;
     } b2ThreadDispatch;
 
     typedef struct b2UserContext {
@@ -31,7 +32,10 @@ function b2.World:new_with_threads(gravity_x, gravity_y, n_threads)
         _worker_to_main = love.thread.newChannel(),
         _main_to_worker_channels = {},
         _threads = {},
+        _enqueue_task = nil,
+        _finish_task = nil,
         _n_threads = n_threads,
+        _step_i = 0,
         _n_dispatched = 0,
     }, {
         __index = b2.World
@@ -50,14 +54,12 @@ function b2.World:new_with_threads(gravity_x, gravity_y, n_threads)
     def.userTaskContext = user_context
 
     -- void* b2_enqueue_task(b2TaskCallback* task, int32_t item_count, int32_t min_range, void* task_context, void* user_context_ptr)
-    def.enqueueTask = function (task_callback, item_count, min_range, task_context, _)
-        local n_items_per_worker = item_count--math.ceil(item_count / world._n_threads)
-        if n_items_per_worker < min_range then
-            n_items_per_worker = min_range
-        end
-
+    world._enqueue_task = function (task_callback, item_count, min_range, task_context, _)
         local tasks = {}
         local n_tasks = 0
+
+        local step_i = world._step_i
+        world._step_i = world._step_i + 1
 
         local item_i = 0
         local worker_i = 0
@@ -66,12 +68,19 @@ function b2.World:new_with_threads(gravity_x, gravity_y, n_threads)
             if end_i > item_count then end_i = item_count end
             local start_i = item_i
 
+            local context_ptr = love.data.newByteData(ffi.sizeof("void*"))
+            ffi.cast("void**", context_ptr:getFFIPointer())[0] = task_context
+
+            local callback_ptr = love.data.newByteData(ffi.sizeof("void*"))
+            ffi.cast("void**", callback_ptr:getFFIPointer())[0] = task_callback
+
             table.insert(tasks, {
                 start_i = start_i,
                 end_i = end_i,
                 worker_i = worker_i,
-                context = tonumber(ffi.cast("uint64_t", task_context)),
-                callback = tonumber(ffi.cast("uint64_t", task_callback))
+                context = context_ptr,
+                callback = callback_ptr,
+                step_i = step_i
             })
             n_tasks = n_tasks + 1
 
@@ -80,23 +89,32 @@ function b2.World:new_with_threads(gravity_x, gravity_y, n_threads)
             item_i = item_i + (end_i - start_i)
         end
 
+        dbg("dispatch ", task_context)
         for task in values(tasks) do
             world._main_to_worker_channels[task.worker_i + 1]:push(task)
         end
 
         local dispatch = ffi.cast("b2ThreadDispatch*", ffi.C.malloc(sizeof("b2ThreadDispatch")))
         dispatch.n_dispatched = n_tasks
+        dispatch.step_i = step_i
+
         return dispatch
     end
     
-    def.finishTask = function(dispatch_ptr, user_context_ptr)
+    world._finish_task = function(dispatch_ptr, user_context_ptr)
         local dispatch = ffi.cast("b2ThreadDispatch*", dispatch_ptr)
         while dispatch.n_dispatched > 0 do
-            local done_id = world._worker_to_main:demand()
-            dispatch.n_dispatched = dispatch.n_dispatched - 1
+            local message = world._worker_to_main:demand()
+            if message == dispatch.step_i then
+                dispatch.n_dispatched = dispatch.n_dispatched - 1
+            end
         end
-        worffi.C.free(dispatch)
+
+        ffi.C.free(dispatch)
     end
+
+    def.enqueueTask = world._enqueue_task
+    def.finishTask = world._finish_task
 
     for i = 1, n_threads do
         local thread = love.thread.newThread("fast_physics/world_thread_worker.lua")
@@ -106,23 +124,3 @@ function b2.World:new_with_threads(gravity_x, gravity_y, n_threads)
     world._native = box2d.b2CreateWorld(def)
     return world
 end
-
-b2_THREAD_SUCCESS = 123
--- int b2_task_callback(void* thread_context_pointer)
-function b2_task_callback(thread_context_ptr)
-    local context = ffi.cast("ThreadContext*", thread_context_ptr)
-    context.task(
-        context.start,
-        context.finish,
-        context.worker_index,
-        context.task_context
-    )
-
-    ffi.C.delete(context)
-    return b2_THREAD_SUCCESS
-end
-
--- void b2_finish_task(void* dispatch_ptr, void* user_context_ptr) {
-function b2_finish_task(dispatch_ptr, user_context_ptr)
-end
-

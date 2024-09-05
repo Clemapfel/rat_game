@@ -22,12 +22,10 @@
     </configurations>
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="7fa9ba1b-2cff-4ecc-86fb-59ab2fa76ee1" name="Changes" comment="box2d thread hello world working">
+    <list default="true" id="7fa9ba1b-2cff-4ecc-86fb-59ab2fa76ee1" name="Changes" comment="works for a few cycles">
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/fast_physics/world_thread.lua" beforeDir="false" afterPath="$PROJECT_DIR$/fast_physics/world_thread.lua" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/fast_physics/world_thread_worker.lua" beforeDir="false" afterPath="$PROJECT_DIR$/fast_physics/world_thread_worker.lua" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/main.lua" beforeDir="false" afterPath="$PROJECT_DIR$/main.lua" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/main_box2d.lua" beforeDir="false" afterPath="$PROJECT_DIR$/main_box2d.lua" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -505,15 +503,8 @@
       <workItem from="1725458724189" duration="13906000" />
       <workItem from="1725491987773" duration="2767000" />
       <workItem from="1725497293442" duration="2685000" />
-      <workItem from="1725500236845" duration="5000" />
-    </task>
-    <task id="LOCAL-00978" summary="fixed option button layout">
-      <option name="closed" value="true" />
-      <created>1724266827850</created>
-      <option name="number" value="00978" />
-      <option name="presentableId" value="LOCAL-00978" />
-      <option name="project" value="LOCAL" />
-      <updated>1724266827850</updated>
+      <workItem from="1725500236845" duration="1577000" />
+      <workItem from="1725502219832" duration="4000" />
     </task>
     <task id="LOCAL-00979" summary="stashing cdef">
       <option name="closed" value="true" />
@@ -899,7 +890,15 @@
       <option name="project" value="LOCAL" />
       <updated>1725492342215</updated>
     </task>
-    <option name="localTasksCounter" value="1027" />
+    <task id="LOCAL-01027" summary="works for a few cycles">
+      <option name="closed" value="true" />
+      <created>1725500481751</created>
+      <option name="number" value="01027" />
+      <option name="presentableId" value="LOCAL-01027" />
+      <option name="project" value="LOCAL" />
+      <updated>1725500481752</updated>
+    </task>
+    <option name="localTasksCounter" value="1028" />
     <servers />
   </component>
   <component name="TypeScriptGeneratedFilesManager">
@@ -948,7 +947,6 @@
     </option>
   </component>
   <component name="VcsManagerConfiguration">
-    <MESSAGE value="stashing coroutines" />
     <MESSAGE value="added coroutine architecture to scene loading" />
     <MESSAGE value="stashing before moving save_point maybe to widget level" />
     <MESSAGE value="coroutines working" />
@@ -973,7 +971,8 @@
     <MESSAGE value="refacotred keybinding indicator, control indicator now uses it" />
     <MESSAGE value="stashing imperfect l/r" />
     <MESSAGE value="box2d thread hello world working" />
-    <option name="LAST_COMMIT_MESSAGE" value="box2d thread hello world working" />
+    <MESSAGE value="works for a few cycles" />
+    <option name="LAST_COMMIT_MESSAGE" value="works for a few cycles" />
   </component>
   <component name="XDebuggerManager">
     <breakpoint-manager>

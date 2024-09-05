@@ -10,6 +10,8 @@ worker_to_main, main_to_worker, thread_id = ...
 
 while true do
     local task = main_to_worker:demand()
-    ffi.cast("b2TaskCallback*", task.callback)(task.start_i, task.end_i, task.worker_i, ffi.cast("void*", task.context))
-    worker_to_main:push(thread_id)
+    local callback = ffi.cast("void**", task.callback:getFFIPointer())[0]
+    local context = ffi.cast("void**", task.context:getFFIPointer())[0]
+    ffi.cast("b2TaskCallback*", callback)(task.start_i, task.end_i, thread_id, context)
+    worker_to_main:push(task.step_i)
 end
