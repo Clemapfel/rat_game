@@ -1,5 +1,8 @@
 require "include"
 
+
+
+
 state = rt.GameState()
 state:initialize_debug_state()
 

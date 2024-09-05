@@ -22,14 +22,11 @@
     </configurations>
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="7fa9ba1b-2cff-4ecc-86fb-59ab2fa76ee1" name="Changes" comment="stashing imperfect l/r">
-      <change afterPath="$PROJECT_DIR$/fast_physics/threads.lua" afterDir="false" />
+    <list default="true" id="7fa9ba1b-2cff-4ecc-86fb-59ab2fa76ee1" name="Changes" comment="box2d thread hello world working">
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/common/control_indicator.lua" beforeDir="false" afterPath="$PROJECT_DIR$/common/control_indicator.lua" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/fast_physics/body.lua" beforeDir="false" afterPath="$PROJECT_DIR$/fast_physics/body.lua" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/fast_physics/cdef.h" beforeDir="false" afterPath="$PROJECT_DIR$/fast_physics/cdef.h" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/fast_physics/shape.lua" beforeDir="false" afterPath="$PROJECT_DIR$/fast_physics/shape.lua" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/fast_physics/world.lua" beforeDir="false" afterPath="$PROJECT_DIR$/fast_physics/world.lua" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/fast_physics/world_thread.lua" beforeDir="false" afterPath="$PROJECT_DIR$/fast_physics/world_thread.lua" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/fast_physics/world_thread_worker.lua" beforeDir="false" afterPath="$PROJECT_DIR$/fast_physics/world_thread_worker.lua" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/main.lua" beforeDir="false" afterPath="$PROJECT_DIR$/main.lua" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/main_box2d.lua" beforeDir="false" afterPath="$PROJECT_DIR$/main_box2d.lua" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
@@ -506,15 +503,9 @@
       <workItem from="1725306584614" duration="2403000" />
       <workItem from="1725309008282" duration="24176000" />
       <workItem from="1725458724189" duration="13906000" />
-      <workItem from="1725491987773" duration="345000" />
-    </task>
-    <task id="LOCAL-00977" summary="stashing options button layout">
-      <option name="closed" value="true" />
-      <created>1724266302053</created>
-      <option name="number" value="00977" />
-      <option name="presentableId" value="LOCAL-00977" />
-      <option name="project" value="LOCAL" />
-      <updated>1724266302053</updated>
+      <workItem from="1725491987773" duration="2767000" />
+      <workItem from="1725497293442" duration="2685000" />
+      <workItem from="1725500236845" duration="5000" />
     </task>
     <task id="LOCAL-00978" summary="fixed option button layout">
       <option name="closed" value="true" />
@@ -900,7 +891,15 @@
       <option name="project" value="LOCAL" />
       <updated>1725475813044</updated>
     </task>
-    <option name="localTasksCounter" value="1026" />
+    <task id="LOCAL-01026" summary="box2d thread hello world working">
+      <option name="closed" value="true" />
+      <created>1725492342215</created>
+      <option name="number" value="01026" />
+      <option name="presentableId" value="LOCAL-01026" />
+      <option name="project" value="LOCAL" />
+      <updated>1725492342215</updated>
+    </task>
+    <option name="localTasksCounter" value="1027" />
     <servers />
   </component>
   <component name="TypeScriptGeneratedFilesManager">
@@ -949,7 +948,6 @@
     </option>
   </component>
   <component name="VcsManagerConfiguration">
-    <MESSAGE value="update" />
     <MESSAGE value="stashing coroutines" />
     <MESSAGE value="added coroutine architecture to scene loading" />
     <MESSAGE value="stashing before moving save_point maybe to widget level" />
@@ -974,7 +972,8 @@
     <MESSAGE value="key bindings selection graph working" />
     <MESSAGE value="refacotred keybinding indicator, control indicator now uses it" />
     <MESSAGE value="stashing imperfect l/r" />
-    <option name="LAST_COMMIT_MESSAGE" value="stashing imperfect l/r" />
+    <MESSAGE value="box2d thread hello world working" />
+    <option name="LAST_COMMIT_MESSAGE" value="box2d thread hello world working" />
   </component>
   <component name="XDebuggerManager">
     <breakpoint-manager>

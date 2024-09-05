@@ -61,4 +61,21 @@ love.draw = function()
     for drawable in values(to_draw) do
         drawable:draw()
     end
+
+    love.graphics.setColor(1, 1, 1, 1)
+    love.graphics.print(love.timer.getFPS(), 5, 5)
 end
+
+--[[
+local channel = love.thread.newChannel()
+local allocated = ffi.new("int32_t[3]")
+allocated[1] = 1234
+allocated[2] = -1234
+allocated[3] = 4567
+
+channel:push(tonumber(ffi.cast("uint64_t", allocated)))
+
+local popped = ffi.cast("int32_t*", channel:pop())
+dbg(popped[1], popped[2], popped[3])
+]]--
+
