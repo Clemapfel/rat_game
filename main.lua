@@ -1,19 +1,11 @@
 require "include"
 
-
-
-
 state = rt.GameState()
 state:initialize_debug_state()
 
 inventory_scene = mn.InventoryScene(state)
 option_scene = mn.OptionsScene(state)
 keybinding_scene = mn.KeybindingScene(state)
-
-indicator = rt.KeybindingIndicator()
-indicator:create_as_l_or_r(true)
-indicator:realize()
-indicator:fit_into(50, 50, 300, 300)
 
 input = rt.InputController()
 input:signal_connect("keyboard_pressed", function(_, which)
@@ -38,9 +30,6 @@ end
 
 love.draw = function()
     state:_draw()
-    if indicator ~= nil then
-        indicator:draw()
-    end
 end
 
 love.resize = function(new_width, new_height)

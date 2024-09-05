@@ -13,6 +13,8 @@ mn.OptionsScene = meta.new_type("MenuOptionsScene", rt.Scene, function(state)
         _selection_graph = rt.SelectionGraph(),
         _input_controller = rt.InputController(),
         _control_indicator = rt.ControlIndicator(),
+        _heading_label = nil, -- rt.Label
+        _heading_frame = rt.Frame(),
 
         _scale_is_selected = false,
         _selected_scale = nil,
@@ -28,6 +30,7 @@ mn.OptionsScene = meta.new_type("MenuOptionsScene", rt.Scene, function(state)
     -- nil items set during :realize
 
     local labels = rt.TextAtlas:get(rt.settings.menu.options_scene.text_atlas_id)
+    fields._heading_label = rt.Label(labels.heading)
 
     fields._vsync_label_text = labels.vsync
     fields._vsync_on_label = labels.vsync_on
@@ -153,6 +156,11 @@ mn.OptionsScene = meta.new_type("MenuOptionsScene", rt.Scene, function(state)
     fields._vfx_contrast_scale = nil
     fields._vfx_contrast_item = nil
 
+    fields._deadzone_text = labels.deadzone
+    fields._deadzone_label = nil
+    fields._deadzone_scale = nil
+    fields._deadzone_item = nil
+
     fields._level_layout = {
         [fields._gamma_text] = {
             range = {0.3, 2.2, 100},
@@ -177,6 +185,11 @@ mn.OptionsScene = meta.new_type("MenuOptionsScene", rt.Scene, function(state)
         [fields._vfx_contrast_text] = {
             range = {0, 1, 100},
             default = 100
+        },
+
+        [fields._deadzone_text] = {
+            range = {0, 0.95, 100},
+            default = 0.15
         }
     }
 
@@ -195,6 +208,9 @@ function mn.OptionsScene:realize()
     self._is_realized = true
 
     local scene = self
+
+    self._heading_label:realize()
+    self._heading_frame:realize()
 
     local label_prefix, label_postfix = "<b>", "</b>"
     local create_button_and_label = function(name, text, handler)
@@ -321,6 +337,10 @@ function mn.OptionsScene:realize()
         scene._state:set_vfx_contrast_level(fraction)
     end)
 
+    create_scale_and_label("deadzone", self._deadzone_text, function(_, fraction)
+        scene._state:set_deadzone(fraction)
+    end)
+
     self:create_from_state(self._state)
     self._verbose_info:realize()
 
@@ -367,8 +387,9 @@ function mn.OptionsScene:_update_control_indicator(left_right_allowed)
     end
 
     self._control_indicator:create_from({
-        {rt.ControlIndicatorButton.B, labels.control_indicator_b},
-        {rt.ControlIndicatorButton.Y, labels.control_indicator_y}
+        {rt.ControlIndicatorButton.LEFT_RIGHT, labels.control_indicator_left_right},
+        {rt.ControlIndicatorButton.Y, labels.control_indicator_y},
+        {rt.ControlIndicatorButton.B, labels.control_indicator_b}
     })
 end
 
@@ -411,6 +432,7 @@ function mn.OptionsScene:create_from_state(state)
     set_scale(self._music_level_scale, self._state:get_music_level())
     set_scale(self._vfx_motion_scale, self._state:get_vfx_motion_level())
     set_scale(self._vfx_contrast_scale, self._state:get_vfx_contrast_level())
+    set_scale(self._deadzone_scale, self._state:get_deadzone())
 end
 
 --- @override
@@ -420,6 +442,10 @@ function mn.OptionsScene:size_allocate(x, y, width, height)
     local start_y = y + outer_margin
     local control_w, control_h = self._control_indicator:measure()
     self._control_indicator:fit_into(x + width - outer_margin - control_w, start_y, control_w, control_h)
+
+    local heading_w, heading_h = self._heading_label:measure()
+    self._heading_frame:fit_into(x + outer_margin, start_y, heading_w + 2 * outer_margin, control_h)
+    self._heading_label:fit_into(x + outer_margin + outer_margin, start_y + 0.5 * control_h - 0.5 * heading_h, POSITIVE_INFINITY)
 
     start_y = start_y + control_h + m
 
@@ -501,8 +527,9 @@ function mn.OptionsScene:_regenerate_selection_nodes()
         {self._sfx_level_item, rt.VerboseInfoObject.SOUND_EFFECTS},
         {self._music_level_item, rt.VerboseInfoObject.MUSIC},
         {self._vfx_motion_item, {rt.VerboseInfoObject.MOTION_EFFECTS, rt.VerboseInfoObject.MOTION_EFFECTS_WIDGET}},
-        {self._vfx_contrast_item, {rt.VerboseInfoObject.VISUAL_EFFECTS, rt.VerboseInfoObject.VISUAL_EFFECTS_WIDGET}}
-        --{self._keymap_item, rt.VerboseInfoObject.KEYMAP}
+        {self._vfx_contrast_item, {rt.VerboseInfoObject.VISUAL_EFFECTS, rt.VerboseInfoObject.VISUAL_EFFECTS_WIDGET}},
+        {self._deadzone_item, {rt.VerboseInfoObject.DEADZONE}},
+        {self._keymap_item, rt.VerboseInfoObject.KEYMAP}
     ) do
         local item = item_verbose_info_object[1]
         local verbose_info_object = item_verbose_info_object[2]
@@ -572,6 +599,8 @@ function mn.OptionsScene:draw()
     end
 
     self._verbose_info:draw()
+    self._heading_frame:draw()
+    self._heading_label:draw()
     self._control_indicator:draw()
 end
 

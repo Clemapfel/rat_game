@@ -712,8 +712,8 @@ function mn.VerboseInfoPanel.Item:create_from_enum(which)
         [rt.VerboseInfoObject.MOTION_EFFECTS] = format_title("Screen Shake"),
         [rt.VerboseInfoObject.VISUAL_EFFECTS] = format_title("Background Intensity"),
         [rt.VerboseInfoObject.MSAA] = format_title("Multi Sample Anti Aliasing (MSAA)"),
-
-        [rt.VerboseInfoObject.KEYMAP] = "Controls"
+        [rt.VerboseInfoObject.DEADZONE] = format_title("Deadzone"),
+        [rt.VerboseInfoObject.KEYMAP] = format_title("Controls")
     }
 
     local descriptions = {
@@ -741,6 +741,7 @@ function mn.VerboseInfoPanel.Item:create_from_enum(which)
         [rt.VerboseInfoObject.VISUAL_EFFECTS] = "Intensity of background TODO",
 
         [rt.VerboseInfoObject.KEYMAP] = "Remap keyboard / controller controls",
+        [rt.VerboseInfoObject.DEADZONE] = "Minimum distance from center the joysticks have to be moved for an input to register"
     }
 
     self.realize = function()

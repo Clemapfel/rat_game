@@ -54,6 +54,7 @@ void free(void *ptr);
         _finish_task = nil,
         _n_threads = n_threads,
         _step_i = 0,
+        _step_i_to_semaphore = {},
         _n_dispatched = 0,
     }, {
         __index = b2.World

@@ -11,6 +11,9 @@ mn.InventoryScene = meta.new_type("InventoryScene", rt.Scene, function(state)
     return meta.new(mn.InventoryScene, {
         _state = state,
 
+        _heading_label = rt.Label(rt.TextAtlas:get("menu.inventory_scene.heading")),
+        _heading_frame = rt.Frame(),
+
         _entity_tab_bar = mn.TabBar(),
         _entity_pages = {},
         _entity_index = 1,
@@ -61,7 +64,6 @@ end, {
 function mn.InventoryScene:realize()
     if self._is_realized == true then return end
 
-
     local tab_bar_sprite_id = "menu_icons"
     local tab_sprites = {
         [self.shared_move_list_index] = rt.Sprite(tab_bar_sprite_id, "moves"),
@@ -92,6 +94,8 @@ function mn.InventoryScene:realize()
         widget:realize()
     end
 
+    self._heading_label:realize()
+    self._heading_frame:realize()
 
     self._control_indicator = rt.ControlIndicator(self._current_control_indicator_layout)
     self._control_indicator:realize()
@@ -99,7 +103,6 @@ function mn.InventoryScene:realize()
     self._input_controller:signal_connect("pressed", function(_, which)
         self:_handle_button_pressed(which)
     end)
-
 
     self._template_confirm_load_dialog = rt.MessageDialog(
         " ", " ", -- set during present()
@@ -126,8 +129,6 @@ function mn.InventoryScene:realize()
 
 
     self:create_from_state(self._state)
-
-
     self._is_realized = true
 end
 
@@ -246,6 +247,10 @@ function mn.InventoryScene:size_allocate(x, y, width, height)
     local current_x, current_y = x + outer_margin, y + outer_margin
     local control_w, control_h = self._control_indicator:measure()
     self._control_indicator:fit_into(x + width - control_w - outer_margin, y + outer_margin, control_w, control_h)
+
+    local heading_w, heading_h = self._heading_label:measure()
+    self._heading_frame:fit_into(x + outer_margin, current_y, heading_w + 2 * outer_margin, control_h)
+    self._heading_label:fit_into(x + outer_margin + outer_margin, current_y + 0.5 * control_h - 0.5 * heading_h, POSITIVE_INFINITY)
 
     current_y = current_y + control_h + m
 
@@ -375,6 +380,9 @@ function mn.InventoryScene:draw()
         current_page.info:draw()
     end
 
+    self._heading_frame:draw()
+    self._heading_label:draw()
+
     self._control_indicator:draw()
     self._shared_tab_bar:draw()
     self._shared_list_frame:draw()
@@ -419,9 +427,7 @@ end
 
 --- @brief
 function mn.InventoryScene:_set_control_indicator_layout(layout)
-    local shared_layout = {
-        {rt.ControlIndicatorButton.ALL_DIRECTIONS, "Move"}
-    }
+    local shared_layout = {}
 
     local final_layout = {}
     for x in values(layout) do
@@ -429,8 +435,7 @@ function mn.InventoryScene:_set_control_indicator_layout(layout)
     end
 
     if self._verbose_info:can_scroll_up() or self._verbose_info:can_scroll_down() then
-        table.insert(final_layout, {rt.ControlIndicatorButton.L, "Scroll Up"})
-        table.insert(final_layout, {rt.ControlIndicatorButton.R, "Scroll Down"})
+        table.insert(final_layout, {rt.ControlIndicatorButton.L_R, "Scroll"})
     end
 
     for x in values(shared_layout) do

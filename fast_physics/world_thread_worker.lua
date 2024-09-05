@@ -14,5 +14,7 @@ while true do
     local callback = ffi.cast("void**", task.callback:getFFIPointer())[0]
     local context = ffi.cast("void**", task.context:getFFIPointer())[0]
     ffi.cast("b2TaskCallback*", callback)(task.start_i, task.end_i, thread_id, context)
-    worker_to_main:push(task.step_i)
+
+
+    :push(task.step_i)
 end

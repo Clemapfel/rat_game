@@ -1,6 +1,5 @@
 rt.settings.battle.background = {
-    compression = 1.0,
-    contrast = 0.5
+    compression = 1.0
 }
 
 --- @class bt.Background

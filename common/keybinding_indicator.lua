@@ -4,6 +4,7 @@ rt.KeybindingIndicator = meta.new_type("KeybindingIndicator", rt.Widget, functio
         _font = nil, -- rt.Font
         _draw = function() end,
         _snapshot = rt.RenderTexture(1, 1),
+        _final_width = 0,
         _initializer = function(self, width)  end
     })
 end, {
@@ -18,8 +19,12 @@ end
 
 --- @brief
 function rt.KeybindingIndicator:size_allocate(x, y, width, height)
+    self._final_width = -1
     self._initializer(self, width)
-    self._snapshot = rt.RenderTexture(width, height)
+    if self._final_width == -1 then
+        self._final_width = width
+    end
+    self._snapshot = rt.RenderTexture(self._final_width, height)
     self._snapshot:bind_as_render_target()
     self:_draw()
     self._snapshot:unbind_as_render_target()
@@ -654,7 +659,8 @@ function rt.KeybindingIndicator:create_as_joystick(left_or_right)
     self._initializer = function(self, width)
         local radius = 0.8 * width / 2
         local x, y, height = 0, 0, width
-        local center_x, center_y = x + 0.5 * width, y + 0.5 * height
+        local y_offset = 0.05 * height
+        local center_x, center_y = x + 0.5 * width, y + 0.5 * height + y_offset
 
         local base_x, base_y, base_radius = center_x, center_y, radius * 0.7
         local base = rt.Circle(base_x, base_y, base_radius)
@@ -666,7 +672,7 @@ function rt.KeybindingIndicator:create_as_joystick(left_or_right)
 
         local outline_width = 2
 
-        base:set_color(rt.Palette.GRAY_5)
+        base:set_color(rt.Palette.GRAY_4)
         base_outline:set_color(rt.Palette.GRAY_7)
         base_outline:set_line_width(outline_width)
         base_outline_outline:set_color(rt.Palette.TRUE_WHITE)
@@ -699,10 +705,10 @@ function rt.KeybindingIndicator:create_as_joystick(left_or_right)
         label:realize()
         label:set_justify_mode(rt.JustifyMode.CENTER)
         local label_w, label_h = label:measure()
-        label:fit_into(0, y + 0.5 * height - 0.5 * label_h - head_y, width, height)
+        label:fit_into(0, y + 0.5 * height - 0.5 * label_h - head_y + y_offset, width, height)
 
         local indicator_w = 0.175 * width
-        local indicator_y = y + 0.5 * height - 0.5 * label_h - head_y + label_h
+        local indicator_y = y + 0.5 * height - 0.5 * label_h - head_y + label_h + y_offset
 
         local indicator_vertices = {
             x + 0.5 * width - 0.5 * indicator_w,
@@ -722,7 +728,7 @@ function rt.KeybindingIndicator:create_as_joystick(left_or_right)
         head_outline_outline:set_is_outline(true)
         head_outline:set_line_width(outline_width)
         head_outline_outline:set_line_width(outline_width + 3)
-        head_inlay:set_color(rt.Palette.GRAY_5)
+        head_inlay:set_color(rt.Palette.GRAY_4)
 
         for neck in range(neck_base, neck_foot) do
             neck:set_color(rt.color_darken(rt.Palette.GRAY_5, 0.1))
@@ -776,14 +782,13 @@ end
 --- @brief
 function rt.KeybindingIndicator:create_as_key(text, is_space)
     if is_space == nil then is_space = false end
-
     self._initializer = function(self, width)
-        local outer_m = 0.1 * width
+        local outer_m = 0.2 * width
         local outer_w = width - 2 * outer_m
         local outer_h = outer_w
 
         if is_space then
-            outer_w = width
+            outer_w = 0.9 * width
             outer_h = 0.4 * outer_w
         end
 
@@ -795,7 +800,7 @@ function rt.KeybindingIndicator:create_as_key(text, is_space)
         local top_trapezoid_h = trapezoid_w - y_offset
 
         if is_space then
-            local trapezoid_factor = 0.5
+            local trapezoid_factor = 0.3
             left_trapezoid_w = trapezoid_factor * left_trapezoid_w
             right_trapezoid_w = trapezoid_factor * right_trapezoid_w
             top_trapezoid_h = trapezoid_factor * top_trapezoid_h
@@ -883,7 +888,7 @@ function rt.KeybindingIndicator:create_as_key(text, is_space)
         outer_outline:set_color(rt.Palette.TRUE_WHITE)
 
         inner_outline:set_is_outline(true)
-        inner_outline:set_line_width(1)
+        inner_outline:set_line_width(2)
         inner_outline:set_is_outline(true)
         inner_outline:set_color(rt.Palette.GRAY_6)
 
@@ -895,6 +900,7 @@ function rt.KeybindingIndicator:create_as_key(text, is_space)
         for outline in range(top_outline, right_outline, bottom_outline, left_outline) do
             outline:set_color(rt.Palette.GRAY_7)
             outline:set_is_outline(true)
+            outline:set_line_width(1)
         end
 
         local font = nil
@@ -902,8 +908,8 @@ function rt.KeybindingIndicator:create_as_key(text, is_space)
         local label = rt.Label("<o>" .. text .. "</o>", font)
         label:set_justify_mode(rt.JustifyMode.CENTER)
         label:realize()
-        local glyph_w, glyph_h = label:measure()
-        label:fit_into(0, 0 + 0.5 * width - 0.5 * glyph_h - y_offset, width, width)
+        local label_w, label_h = label:measure()
+        label:fit_into(0, 0 + 0.5 * width - 0.5 * label_h - y_offset, width, width)
 
         self._content = {
             outer,
@@ -926,6 +932,8 @@ function rt.KeybindingIndicator:create_as_key(text, is_space)
                 drawable:draw()
             end
         end
+
+        self._final_width = math.max(width, label_w)
     end
     if self._is_realized then self:reformat() end
 end
@@ -942,13 +950,111 @@ end
 
 --- @brief
 function rt.KeybindingIndicator:create_as_four_keys(up_text, right_text, bottom_text, left_text)
-    self:create_as_key("TODO", false)
+    self._initializer = function(self, width)
+        local x, y, height = 0, 0, width
+        local radius = 0.5 * width / 2
+
+        local top_label = rt.Label("<o>" .. up_text .. "</o>", rt.settings.font.default_tiny)
+        local right_label = rt.Label("<o>" .. right_text .. "</o>", rt.settings.font.default_tiny)
+        local bottom_label = rt.Label("<o>" .. bottom_text .. "</o>", rt.settings.font.default_tiny)
+        local left_label = rt.Label("<o>" .. left_text .. "</o>", rt.settings.font.default_tiny)
+
+        for label in range(top_label, right_label, bottom_label, left_label) do
+            label:realize()
+            label:set_justify_mode(rt.JustifyMode.CENTER)
+        end
+
+        local line_width = 2
+        local rect_r = ((width / 3) - line_width) / 2
+        local center_x, center_y = 0.5 * width, 0.5 * height + rect_r
+        local top_center_x, top_center_y = center_x, center_y - 2 * rect_r
+        local right_center_x, right_center_y = center_x + 2 * rect_r, center_y
+        local bottom_center_x, bottom_center_y = center_x, center_y
+        local left_center_x, left_center_y = center_x - 2 * rect_r, center_y
+
+        local top_base = rt.Rectangle(top_center_x - rect_r, top_center_y - rect_r, 2 * rect_r, 2 * rect_r)
+        local top_outline = rt.Rectangle(top_center_x - rect_r, top_center_y - rect_r, 2 * rect_r, 2 * rect_r)
+        local top_outline_outline = rt.Rectangle(top_center_x - rect_r, top_center_y - rect_r, 2 * rect_r, 2 * rect_r)
+        local top_label_w, top_label_h = top_label:measure()
+        top_label:fit_into(top_center_x - rect_r, top_center_y - 0.5 * top_label_h, 2 * rect_r, 2 * rect_r)
+
+        local right_base = rt.Rectangle(right_center_x - rect_r, right_center_y - rect_r, 2 * rect_r, 2 * rect_r)
+        local right_outline = rt.Rectangle(right_center_x - rect_r, right_center_y - rect_r, 2 * rect_r, 2 * rect_r)
+        local right_outline_outline = rt.Rectangle(right_center_x - rect_r, right_center_y - rect_r, 2 * rect_r, 2 * rect_r)
+        local right_label_w, right_label_h = right_label:measure()
+        right_label:fit_into(right_center_x - rect_r, right_center_y - 0.5 * right_label_h, 2 * rect_r, 2 * rect_r)
+
+        local bottom_base = rt.Rectangle(bottom_center_x - rect_r, bottom_center_y - rect_r, 2 * rect_r, 2 * rect_r)
+        local bottom_outline = rt.Rectangle(bottom_center_x - rect_r, bottom_center_y - rect_r, 2 * rect_r, 2 * rect_r)
+        local bottom_outline_outline = rt.Rectangle(bottom_center_x - rect_r, bottom_center_y - rect_r, 2 * rect_r, 2 * rect_r)
+        local bottom_label_w, bottom_label_h = bottom_label:measure()
+        bottom_label:fit_into(bottom_center_x - rect_r, bottom_center_y - 0.5 * bottom_label_h, 2 * rect_r, 2 * rect_r)
+
+        local left_base = rt.Rectangle(left_center_x - rect_r, left_center_y - rect_r, 2 * rect_r, 2 * rect_r)
+        local left_outline = rt.Rectangle(left_center_x - rect_r, left_center_y - rect_r, 2 * rect_r, 2 * rect_r)
+        local left_outline_outline = rt.Rectangle(left_center_x - rect_r, left_center_y - rect_r, 2 * rect_r, 2 * rect_r)
+        local left_label_w, left_label_h = left_label:measure()
+        left_label:fit_into(left_center_x - rect_r, left_center_y - 0.5 * left_label_h, 2 * rect_r, 2 * rect_r)
+
+        local corner_radius = 0.05 * width
+        for base in range(top_base, right_base, bottom_base, left_base) do
+            base:set_color(rt.Palette.GRAY_3)
+            base:set_corner_radius(corner_radius)
+        end
+
+        for outline in range(top_outline, right_outline, bottom_outline, left_outline) do
+            outline:set_is_outline(true)
+            outline:set_color(rt.Palette.GRAY_7)
+            outline:set_corner_radius(corner_radius)
+            outline:set_line_width(line_width)
+        end
+
+        for outline_outline in range(top_outline_outline, right_outline_outline, bottom_outline_outline, left_outline_outline) do
+            outline_outline:set_is_outline(true)
+            outline_outline:set_color(rt.Palette.TRUE_WHITE)
+            outline_outline:set_line_width(line_width + 3)
+            outline_outline:set_corner_radius(corner_radius)
+        end
+
+        local outline_outline = rt.Rectangle(0, 0, width, width)
+        outline_outline:set_color(rt.Palette.TRUE_WHITE)
+
+        self._content = {
+            top_outline_outline,
+            right_outline_outline,
+            bottom_outline_outline,
+            left_outline_outline,
+
+            top_base,
+            top_outline,
+
+            right_base,
+            right_outline,
+
+            bottom_base,
+            bottom_outline,
+
+            left_base,
+            left_outline,
+
+            top_label,
+            right_label,
+            bottom_label,
+            left_label
+        }
+
+        self._draw = function()
+            for drawable in values(self._content) do
+                drawable:draw()
+            end
+        end
+    end
 end
 
 --- @brief
 function rt.KeybindingIndicator:create_from_keyboard_key(keyboard_key)
     meta.assert_enum(keyboard_key, rt.KeyboardKey)
-    self:create_as_key(rt.keyboard_key_to_string(keyboard_key))
+    self:create_as_key(rt.keyboard_key_to_string(keyboard_key), keyboard_key == rt.KeyboardKey.SPACE)
 end
 
 --- @brief

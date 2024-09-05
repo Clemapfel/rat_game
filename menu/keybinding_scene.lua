@@ -6,6 +6,7 @@ rt.settings.menu.keybinding_scene = {
 mn.KeybindingScene = meta.new_type("KeybindingScene", rt.Scene, function(state)
     return meta.new(mn.KeybindingScene, {
         _state = state,
+        _input_method = rt.InputMethod.KEYBOARD,
         _items = {},                   -- Table<Table<mn.KeybindingScene.Item>>
         _button_to_item = {},          -- Table<rt.InputButton, mn.KeybindingScene.Item>
         _restore_default_item = nil,   -- mn.KeybindingScene.Item
@@ -30,21 +31,22 @@ mn.KeybindingScene = meta.new_type("KeybindingScene", rt.Scene, function(state)
     })
 end, {
     button_layout = {
-        {rt.InputButton.A, rt.InputButton.B, rt.InputButton.X, rt.InputButton.Y},
-        {rt.InputButton.UP, rt.InputButton.RIGHT, rt.InputButton.DOWN, rt.InputButton.LEFT},
-        {rt.InputButton.L, rt.InputButton.R, rt.InputButton.START, rt.InputButton.SELECT}
+        {rt.InputButton.A, rt.InputButton.UP,    rt.InputButton.START},
+        {rt.InputButton.B, rt.InputButton.RIGHT, rt.InputButton.SELECT},
+        {rt.InputButton.X, rt.InputButton.DOWN,  rt.InputButton.L},
+        {rt.InputButton.Y, rt.InputButton.LEFT,  rt.InputButton.R},
     }
 })
 
 --- @override
 function mn.KeybindingScene:realize()
     if self._is_realized == true then return end
-    self._is_realized = true
 
+    self._input_method = self._input:get_input_method()
     local labels = rt.TextAtlas:get(rt.settings.menu.keybinding_scene.text_atlas_id)
     self._accept_label = rt.Label(labels.accept)
     self._go_back_label = rt.Label(labels.go_back)
-    self._heading_label = rt.Label(labels.heading)
+    self._heading_label = rt.Label("TODO") -- initialize in input_method_changed
     self._restore_defaults_label = rt.Label(labels.restore_defaults)
 
     for label in range(self._accept_label, self._go_back_label, self._heading_label, self._restore_defaults_label) do
@@ -78,24 +80,16 @@ function mn.KeybindingScene:realize()
     end
 
     self._control_indicator:create_from({
-        { rt.ControlIndicatorButton.A, "" },
-        { rt.ControlIndicatorButton.B, "" },
-        { rt.ControlIndicatorButton.X, "" },
-        { rt.ControlIndicatorButton.Y, "" },
-        { rt.ControlIndicatorButton.UP, "" },
-        { rt.ControlIndicatorButton.RIGHT, "" },
-        { rt.ControlIndicatorButton.DOWN, "" },
-        { rt.ControlIndicatorButton.LEFT, "" },
-        { rt.ControlIndicatorButton.START, "" },
-        { rt.ControlIndicatorButton.SELECT, "" },
-        { rt.ControlIndicatorButton.L, "" },
-        { rt.ControlIndicatorButton.R, "" },
+        {rt.ControlIndicatorButton.A, labels.control_indicator_a},
+        {rt.ControlIndicatorButton.ALL_DIRECTIONS, labels.control_indicator_all},
+        {rt.ControlIndicatorButton.B, labels.control_indicator_b}
     })
     self._control_indicator:realize()
 
     self:create_from_state(self._state)
 
     local scene = self
+    self._input:set_treat_left_joystick_as_dpad(true)
     self._input:signal_disconnect_all()
     self._input:signal_connect("pressed", function(_, which)
         if scene._skip_frame > 0 then return end
@@ -117,6 +111,22 @@ function mn.KeybindingScene:realize()
             scene:_finish_assignment(which)
         end
     end)
+
+    self._input:signal_connect("input_method_changed", function(_, new)
+        scene._input_method = new
+        if scene._input_method == rt.InputMethod.KEYBOARD then
+            scene._heading_label:set_text(labels.heading_keyboard)
+        elseif scene._input_method == rt.InputMethod.GAMEPAD then
+            scene._heading_label:set_text(labels.heading_gamepad)
+        end
+
+        if scene._is_realized then
+            self:reformat()
+        end
+    end)
+
+    self._input:signal_emit("input_method_changed", self._input:get_input_method())
+    self._is_realized = true
 end
 
 --- @override
@@ -149,6 +159,7 @@ function mn.KeybindingScene:size_allocate(x, y, width, height)
     local item_x, item_y = current_x, current_y
 
     local max_label_w, max_label_h, max_row_n = NEGATIVE_INFINITY, NEGATIVE_INFINITY, NEGATIVE_INFINITY
+    local n_rows = 0
     for item_row in values(self._items) do
         local row_n = 0
         for item in values(item_row) do
@@ -157,6 +168,7 @@ function mn.KeybindingScene:size_allocate(x, y, width, height)
             row_n = row_n + 1
         end
         max_row_n = math.max(max_row_n, row_n)
+        n_rows = n_rows + 1
     end
 
     max_label_w = math.max(max_label_w, select(1, self._accept_label:measure()))
@@ -166,7 +178,14 @@ function mn.KeybindingScene:size_allocate(x, y, width, height)
     local indicator_h = indicator_w
     local item_w = xm + max_label_w + 2 * xm + indicator_w + xm
     local item_h = math.max(max_label_h, indicator_h) + 2 * ym
-    local item_xm = (width - 2 * xm - max_row_n * item_w) / (max_row_n - 1)
+    local item_xm = m
+    local item_ym = m
+    current_x = x + 0.5 * width - (max_row_n * item_w + (max_row_n - 1) * item_xm) / 2
+    item_x = current_x
+
+    --current_y = y + 0.5 * height - (n_rows * item_h + (n_rows - 1) * item_ym) / 2
+    --item_y = current_y
+
     for item_row in values(self._items) do
         for item in values(item_row) do
             local label_w, label_h = item.label:measure()

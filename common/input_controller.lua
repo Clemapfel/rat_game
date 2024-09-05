@@ -17,6 +17,8 @@ rt.InputControllerState = {
         [rt.GamepadAxis.LEFT_TRIGGER] = 0,
         [rt.GamepadAxis.RIGHT_TRIGGER] = 0,
     },
+    deadzone = 0.1,
+    previous_gamepad_direction = nil,
     gamepad_active = false,
     is_initialized = false
 }
@@ -44,6 +46,7 @@ rt.InputController = meta.new_type("InputController", rt.SignalEmitter, function
     if bounds ~= nil then meta.assert_aabb(bounds) end
     local out = meta.new(rt.InputController, {
         _is_disabled = false,
+        _treat_left_joystick_as_dpad = true,
         _aabb = bounds, -- Optional<rt.AABB>
     })
 
@@ -91,6 +94,16 @@ end
 --- @brief
 function rt.InputController:get_input_method()
     return rt.InputControllerState:get_input_method()
+end
+
+--- @brief
+function rt.InputController:set_treat_left_joystick_as_dpad(b)
+    self._treat_left_joystick_as_dpad = b
+end
+
+--- @brief
+function rt.InputController:get_treat_left_joystick_as_dpad()
+    return self._treat_left_joystick_as_dpad
 end
 
 --- @brief
@@ -299,9 +312,39 @@ love.gamepadaxis = function(joystick, axis, value)
     if axis == rt.GamepadAxis.LEFT_X or axis == rt.GamepadAxis.LEFT_Y then
         local x = rt.InputControllerState.axis_state[rt.GamepadAxis.LEFT_X]
         local y = rt.InputControllerState.axis_state[rt.GamepadAxis.LEFT_Y]
+
+        local distance = math.sqrt(x^2 + y^2)
+        if distance < rt.InputControllerState.deadzone then
+            rt.InputControllerState.previous_gamepad_direction = nil
+            return
+        end
+
+        -- convert analog to digital
+        local before = rt.InputControllerState.previous_gamepad_direction
+        local angle = math.atan2(x, y) % (2 * math.pi)
+        local dpad
+        if (angle >= 7 * math.pi / 4 or angle < math.pi / 4) then
+            dpad = rt.GamepadButton.DPAD_DOWN
+        elseif (angle >= math.pi / 4 and angle < 3 * math.pi / 4) then
+            dpad = rt.GamepadButton.DPAD_RIGHT
+        elseif (angle >= 3 * math.pi / 4 and angle < 5 * math.pi / 4) then
+            dpad = rt.GamepadButton.DPAD_UP
+        else
+            dpad = rt.GamepadButton.DPAD_LEFT
+        end
+        local button = rt.InputControllerState.reverse_mapping[dpad]
+        rt.InputControllerState.previous_gamepad_direction = dpad
+
         for _, component in pairs(rt.InputControllerState.components) do
             if component._is_disabled == false then
                 component:signal_emit("joystick", x, y, rt.JoystickPosition.LEFT)
+
+                if dpad ~= before and component._treat_left_joystick_as_dpad then
+                    if button ~= nil then
+                        component:signal_emit("pressed", button)
+                    end
+                    component:signal_emit("gamepad_pressed", dpad)
+                end
             end
         end
     elseif axis == rt.GamepadAxis.RIGHT_X or axis == rt.GamepadAxis.RIGHT_Y then

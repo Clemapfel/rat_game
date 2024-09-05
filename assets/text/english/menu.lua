@@ -1,5 +1,13 @@
 return {
+    -- mn.InventoryScene
+    inventory_scene = {
+        heading = "<b>Inventory</b>"
+    },
+
+    -- mn.OptionsScene
     options_scene = {
+        heading = "<b>Settings</b>",
+
         vsync = "VSync",
         vsync_on = "ON",
         vsync_off = "OFF",
@@ -27,11 +35,13 @@ return {
         music_level = "Music",
         vfx_motion = "Motion Effects",
         vfx_contrast = "Visual Effects",
+        deadzone = "Deadzone",
         keymap = "Controls",
 
         control_indicator_a = "Change Value",
         control_indicator_b = "Exit",
-        control_indicator_y = "Restore Default"
+        control_indicator_y = "Restore Default",
+        control_indicator_left_right = "Change Value"
     },
 
     -- input_button_to_string
@@ -52,7 +62,8 @@ return {
     keybinding_scene = {
         accept = "Accept",
         go_back = "Abort",
-        heading = "<b>Keybindings</b>",
+        heading_keyboard = "<b>Controls > Keyboard</b>",
+        heading_gamepad = "<b>Controls > Gamepad</b>",
         restore_defaults = "Restore Defaults",
 
         [rt.InputButton.A] = "A",
@@ -67,5 +78,9 @@ return {
         [rt.InputButton.R] = "Right Alt",
         [rt.InputButton.START] = "Start",
         [rt.InputButton.SELECT] = "Select",
+
+        control_indicator_a = "Remap",
+        control_indicator_all = "Select",
+        control_indicator_b = "Abort"
     }
 }

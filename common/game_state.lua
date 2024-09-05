@@ -36,6 +36,7 @@ rt.GameState = meta.new_type("GameState", function()
         music_level = 1,
         vfx_motion_level = 1,
         vfx_contrast_level = 1,
+        deadzone = 0.15,
         show_diagnostics = true,
 
         -- battle
@@ -52,6 +53,8 @@ rt.GameState = meta.new_type("GameState", function()
         template_id_counter = 0,
         templates = {}
     }
+
+    state.deadzone = rt.InputControllerState.deadzone
 
     local out = meta.new(rt.GameState, {
         _state = state,
@@ -498,4 +501,18 @@ end
 --- @brief
 function rt.GameState:get_vfx_contrast_level()
     return self._state.vfx_contrast_level
+end
+
+--- @brief
+function rt.GameState:get_deadzone()
+    return rt.InputControllerState.deadzone
+end
+
+--- @brief
+function rt.GameState:set_deadzone(fraction)
+    if not (fraction >= 0 and fraction < 1) then
+        rt.error("In rt.GameState:set_deadzone: value `" .. fraction .. "` is outside [0, 1)")
+    end
+    self._state.deadzone = fraction
+    rt.InputControllerState.deadzone = self._state.deadzone
 end

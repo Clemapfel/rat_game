@@ -74,7 +74,7 @@ function rt.ControlIndicator:_initialize_indicator_from_control_indicator_button
         elseif button == rt.ControlIndicatorButton.LEFT_RIGHT then
             indicator:create_as_dpad(false, true, false, true)
         elseif button == rt.ControlIndicatorButton.ALL_DIRECTIONS then
-            indicator:create_as_dpad(true, true, true, true)
+            indicator:create_as_dpad(false, false, false, false)
         else
             local _, binding = rt.InputControllerState:get_keybinding(button)
             indicator:create_from_gamepad_button(binding)
@@ -135,35 +135,31 @@ function rt.ControlIndicator:size_allocate(x, y, width, height)
     x, y = 0, 0
 
     local m = rt.settings.margin_unit * 0.5
+    local indicator_width = 12 * m
 
-    local indicator_width = 10 * m
-    local max_x, max_y = NEGATIVE_INFINITY, NEGATIVE_INFINITY
-    local current_x, current_y = x + 2 * m, y + m
-    local indicator_m = m
+    local xm = 2 * m
+    local ym = 0.0 * m
+    height = indicator_width + 2 * ym
+
+    local current_x, current_y = x + 4 * m, y + ym
     for i = 1, #self._labels do
         local keyboard_indicator, gamepad_indicator, label = self._keyboard_indicators[i], self._gamepad_indicators[i], self._labels[i]
 
-        keyboard_indicator:fit_into(current_x + indicator_m, current_y + indicator_m, indicator_width, indicator_width)
-        gamepad_indicator:fit_into(current_x + indicator_m, current_y + indicator_m, indicator_width, indicator_width)
+        for indicator in range(keyboard_indicator, gamepad_indicator) do
+            indicator:fit_into(current_x, 0 + 0.5 * height - 0.5 * indicator_width , indicator_width, indicator_width)
+        end
 
+        current_x = current_x + indicator_width + 2 * m
         local label_w, label_h = label:measure()
-        label:fit_into(current_x + indicator_width + m, current_y + 0.5 * math.max(indicator_width, label_h) - 0.5 * math.min(indicator_width, label_h), POSITIVE_INFINITY, label_h)
+        label:fit_into(current_x, 0 + 0.5 * height - 0.5 * label_h, POSITIVE_INFINITY)
 
-        label_w, label_h = label:measure()
-        max_x = math.max(max_x, current_x + indicator_width + label_w + 3 * m)
-        max_y = math.max(max_y, current_y + math.max(indicator_width, label_h))
-
-        current_x = current_x + indicator_width + m + 2 * indicator_m + label_w + 3 * m
+        current_x = current_x + label_w + 4 * m
     end
 
-    max_x = clamp(max_x, 0)
-    max_y = clamp(max_y, 0)
-
     local thickness = self._frame:get_thickness()
-    self._final_width = max_x - x + 2 * thickness + m
-    self._final_height = max_y - y + 2 * thickness + indicator_m
-    self._frame:fit_into(x, y, self._final_width, self._final_height)
-
+    self._final_height = height
+    self._final_width = current_x - x
+    self._frame:fit_into(0, 0, self._final_width, self._final_height)
     self:_update_snapshot()
 end
 
