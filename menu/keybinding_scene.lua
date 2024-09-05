@@ -133,7 +133,7 @@ end
 function mn.KeybindingScene:create_from_state(state)
     for item_row in values(self._items) do
         for item in values(item_row) do
-            local keyboard, gamepad = rt.InputControllerState:get_keybinding(item.button)
+            local keyboard, gamepad = rt.get_active_state():get_keybinding(item.button)
             item.gamepad_indicator:create_from_gamepad_button(gamepad)
             item.keyboard_indicator:create_from_keyboard_key(keyboard)
         end

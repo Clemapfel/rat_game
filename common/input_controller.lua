@@ -8,7 +8,8 @@ rt.InputControllerState = {
     components = {},      -- Table<rt.InputController>
     mapping = {},         -- Table<rt.InputButton, Table<Union<rt.GamepadButton, rt.KeyboardKey>>>
     reverse_mapping = {}, -- Table<love.KeyConstant, Union<rt.GamepadButton, rt.Keyboardkey>>
-    state = {},           -- Table<rt.InputButton, Bool>
+    deadzone = 0.1,       -- in [0, 1)
+    button_state = {},    -- Table<rt.InputButton, Bool>
     axis_state = {        -- Table<rt.GampeadAxis, Number>
         [rt.GamepadAxis.LEFT_X] = 0,
         [rt.GamepadAxis.LEFT_Y] = 0,
@@ -17,10 +18,10 @@ rt.InputControllerState = {
         [rt.GamepadAxis.LEFT_TRIGGER] = 0,
         [rt.GamepadAxis.RIGHT_TRIGGER] = 0,
     },
-    deadzone = 0.1,
     previous_gamepad_direction = nil,
     gamepad_active = false,
-    is_initialized = false
+    is_initialized = false,
+    active_state = nil
 }
 
 --- @class rt.InputMethod
@@ -73,12 +74,12 @@ end)
 
 --- @brief
 function rt.InputController:is_down(key)
-    return rt.InputControllerState.state[key] == true
+    return rt.InputControllerState.button_state[key] == true
 end
 
 --- @brief
 function rt.InputController:is_up(key)
-    return rt.InputControllerState.state[key] == false
+    return rt.InputControllerState.button_state[key] == false
 end
 
 --- @brief
@@ -171,7 +172,7 @@ love.keypressed = function(_, scancode)
     local key = rt.KeyboardKeyPrefix .. scancode
     local button = rt.InputControllerState.reverse_mapping[key]
 
-    if button ~= nil then rt.InputControllerState.state[button] = true end
+    if button ~= nil then rt.InputControllerState.button_state[button] = true end
     rt.InputControllerState:set_gamepad_active(false)
 
     for _, component in pairs(rt.InputControllerState.components) do
@@ -189,7 +190,7 @@ love.keyreleased = function(native, scancode)
     local key = rt.KeyboardKeyPrefix .. scancode
     local button = rt.InputControllerState.reverse_mapping[key]
 
-    if button ~= nil then rt.InputControllerState.state[button] = false end
+    if button ~= nil then rt.InputControllerState.button_state[button] = false end
     rt.InputControllerState:set_gamepad_active(false)
 
     for _, component in pairs(rt.InputControllerState.components) do
@@ -272,7 +273,7 @@ love.gamepadpressed = function(joystick, native)
     local key = rt.GamepadButtonPrefix .. native
     local button = rt.InputControllerState.reverse_mapping[rt.GamepadButtonPrefix .. native]
 
-    if button ~= nil then rt.InputControllerState.state[button] = true end
+    if button ~= nil then rt.InputControllerState.button_state[button] = true end
     rt.InputControllerState:set_gamepad_active(true)
 
     for _, component in pairs(rt.InputControllerState.components) do
@@ -290,7 +291,7 @@ love.gamepadreleased = function(joystick, native)
     local key = rt.GamepadButtonPrefix .. native
     local button = rt.InputControllerState.reverse_mapping[rt.GamepadButtonPrefix .. native]
 
-    if button ~= nil then rt.InputControllerState.state[button] = true end
+    if button ~= nil then rt.InputControllerState.button_state[button] = false end
     rt.InputControllerState:set_gamepad_active(true)
 
     for _, component in pairs(rt.InputControllerState.components) do
@@ -480,94 +481,13 @@ function rt.InputControllerState:validate_input_mapping()
 end
 
 --- @brief
-function rt.InputControllerState:load_default_mapping()
-    local default_mapping = {
-        [rt.InputButton.A] = {
-            rt.KeyboardKey.SPACE,
-            rt.GamepadButton.RIGHT
-        },
-
-        [rt.InputButton.B] = {
-            rt.KeyboardKey.B,
-            rt.GamepadButton.BOTTOM
-        },
-
-        [rt.InputButton.X] = {
-            rt.KeyboardKey.X,
-            rt.GamepadButton.TOP
-        },
-
-        [rt.InputButton.Y] = {
-            rt.KeyboardKey.Z,
-            rt.GamepadButton.LEFT
-        },
-
-        [rt.InputButton.L] = {
-            rt.KeyboardKey.L,
-            rt.GamepadButton.LEFT_SHOULDER
-        },
-
-        [rt.InputButton.R] = {
-            rt.KeyboardKey.R,
-            rt.GamepadButton.RIGHT_SHOULDER
-        },
-
-        [rt.InputButton.START] = {
-            rt.KeyboardKey.M,
-            rt.KeyboardKey.RETURN,
-            rt.GamepadButton.START
-        },
-
-        [rt.InputButton.SELECT] = {
-            rt.KeyboardKey.N,
-            rt.KeyboardKey.RIGHT_SQUARE_BRACKET,
-            rt.KeyboardKey.BACKSLASH,
-            rt.GamepadButton.SELECT
-        },
-
-        [rt.InputButton.UP] = {
-            rt.KeyboardKey.ARROW_UP,
-            rt.KeyboardKey.W,
-            rt.KeyboardKey.KEYPAD_EIGHT,
-            rt.GamepadButton.DPAD_UP,
-        },
-
-        [rt.InputButton.RIGHT] = {
-            rt.KeyboardKey.ARROW_RIGHT,
-            rt.KeyboardKey.D,
-            rt.KeyboardKey.KEYPAD_SIX,
-            rt.GamepadButton.DPAD_RIGHT
-        },
-
-        [rt.InputButton.DOWN] = {
-            rt.KeyboardKey.ARROW_DOWN,
-            rt.KeyboardKey.S,
-            rt.KeyboardKey.KEYPAD_FIVE,
-            rt.KeyboardKey.KEYPAD_TWO,
-            rt.GamepadButton.DPAD_DOWN
-        },
-
-        [rt.InputButton.LEFT] = {
-            rt.KeyboardKey.ARROW_LEFT,
-            rt.KeyboardKey.A,
-            rt.KeyboardKey.KEYPAD_FOUR,
-            rt.GamepadButton.DPAD_LEFT
-        },
-
-        [rt.InputButton.DEBUG] = {
-            rt.KeyboardKey.ESCAPE,
-            rt.GamepadButton.LEFT_STICK,
-            rt.GamepadButton.RIGHT_STICK
-        }
-    }
-
-    self.mapping = {}
+function rt.InputControllerState:load_mapping(mapping)
     for button in values(meta.instances(rt.InputButton)) do
         self.mapping[button] = {}
     end
 
     self.reverse_mapping = {}
-    for input_button, natives in pairs(default_mapping) do
+    for input_button, natives in pairs(mapping) do
         for native in values(natives) do
             table.insert(self.mapping[input_button], native)
             self.reverse_mapping[native] = input_button
@@ -576,42 +496,8 @@ function rt.InputControllerState:load_default_mapping()
 
     local is_valid, message = self:validate_input_mapping()
     if not is_valid then
-        rt.error("[FATAL] In rt.InputControllerState:load_default_mapping: " .. message)
+        rt.error("[FATAL] In rt.InputControllerState:load_mapping: " .. message)
     end
-end
-
---- @brief
-function rt.InputControllerState:set_keybinding(input_button, new_gamepad_button)
-    meta.assert_enum(input_button, rt.InputButton)
-
-    local before = self.reverse_mapping[new_gamepad_button]
-    self.reverse_mapping[new_gamepad_button] = input_button
-    if not self:validate_input_mapping() then
-        self.reverse_mapping[new_gamepad_button] = before
-        return false
-    else
-        return true
-    end
-end
-
---- @brief
---- @return (rt.KeyboardKey, rt.GamepadButton)
-function rt.InputControllerState:get_keybinding(input_button)
-    local first_keyboard_key, first_gamepad_button = nil, nil
-    for x in values(self.mapping[input_button]) do
-        if meta.is_enum_value(x, rt.KeyboardKey) and not first_keyboard_key then
-            first_keyboard_key = x
-        elseif meta.is_enum_value(x, rt.GamepadButton) and not first_gamepad_button then
-            first_gamepad_button = x
-        end
-
-        if first_gamepad_button ~= nil and first_keyboard_key ~= nil then
-            return first_keyboard_key, first_gamepad_button
-        end
-    end
-
-    rt.error("In rt.InputControllerState: no keybinding for `" .. input_button .. "`")
-    return nil, nil
 end
 
 --- @brief

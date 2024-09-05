@@ -40,24 +40,24 @@ rt.ControlIndicatorButton = meta.new_enum({
 function rt.ControlIndicator:_initialize_indicator_from_control_indicator_button(indicator, button, is_keyboard)
     if is_keyboard then
         if button == rt.ControlIndicatorButton.UP_DOWN then
-            local up, _ = rt.InputControllerState:get_keybinding(rt.InputButton.UP)
-            local down, _ = rt.InputControllerState:get_keybinding(rt.InputButton.DOWN)
+            local up, _ = rt.get_active_state():get_keybinding(rt.InputButton.UP)
+            local down, _ = rt.get_active_state():get_keybinding(rt.InputButton.DOWN)
             indicator:create_as_two_vertical_keys(
                 rt.keyboard_key_to_string(up),
                 rt.keyboard_key_to_string(down)
             )
         elseif button == rt.ControlIndicatorButton.LEFT_RIGHT then
-            local left, _ = rt.InputControllerState:get_keybinding(rt.InputButton.LEFT)
-            local right, _ = rt.InputControllerState:get_keybinding(rt.InputButton.RIGHT)
+            local left, _ = rt.get_active_state():get_keybinding(rt.InputButton.LEFT)
+            local right, _ = rt.get_active_state():get_keybinding(rt.InputButton.RIGHT)
             indicator:create_as_two_horizontal_keys(
                 rt.keyboard_key_to_string(left),
                 rt.keyboard_key_to_string(right)
             )
         elseif button == rt.ControlIndicatorButton.ALL_DIRECTIONS then
-            local up, _ = rt.InputControllerState:get_keybinding(rt.InputButton.UP)
-            local down, _ = rt.InputControllerState:get_keybinding(rt.InputButton.DOWN)
-            local left, _ = rt.InputControllerState:get_keybinding(rt.InputButton.LEFT)
-            local right, _ = rt.InputControllerState:get_keybinding(rt.InputButton.RIGHT)
+            local up, _ = rt.get_active_state():get_keybinding(rt.InputButton.UP)
+            local down, _ = rt.get_active_state():get_keybinding(rt.InputButton.DOWN)
+            local left, _ = rt.get_active_state():get_keybinding(rt.InputButton.LEFT)
+            local right, _ = rt.get_active_state():get_keybinding(rt.InputButton.RIGHT)
             indicator:create_as_four_keys(
                 rt.keyboard_key_to_string(up),
                 rt.keyboard_key_to_string(right),
@@ -65,7 +65,7 @@ function rt.ControlIndicator:_initialize_indicator_from_control_indicator_button
                 rt.keyboard_key_to_string(left)
             )
         else
-            local binding, _ = rt.InputControllerState:get_keybinding(button)
+            local binding, _ = rt.get_active_state():get_keybinding(button)
             indicator:create_from_keyboard_key(binding)
         end
     else
@@ -76,7 +76,7 @@ function rt.ControlIndicator:_initialize_indicator_from_control_indicator_button
         elseif button == rt.ControlIndicatorButton.ALL_DIRECTIONS then
             indicator:create_as_dpad(false, false, false, false)
         else
-            local _, binding = rt.InputControllerState:get_keybinding(button)
+            local _, binding = rt.get_active_state():get_keybinding(button)
             indicator:create_from_gamepad_button(binding)
         end
     end

@@ -22,6 +22,13 @@ rt.MSAAQuality = {
     MAX = 16
 }
 
+--- @brief
+--- @return rt.GameState
+function rt.get_active_state()
+    rt.error("In rt.get_active_state: Trying to access state, but no state was initialized")
+    return nil
+end
+
 --- @class rt.GameState
 rt.GameState = meta.new_type("GameState", function()
     local state = {
@@ -38,6 +45,7 @@ rt.GameState = meta.new_type("GameState", function()
         vfx_contrast_level = 1,
         deadzone = 0.15,
         show_diagnostics = true,
+        keybinding = {}, -- Table<rt.InputButton, Table<Union<rt.GamepadButton, rt.KeyboardKey>>>
 
         -- battle
         n_enemies = 0,
@@ -54,8 +62,6 @@ rt.GameState = meta.new_type("GameState", function()
         templates = {}
     }
 
-    state.deadzone = rt.InputControllerState.deadzone
-
     local out = meta.new(rt.GameState, {
         _state = state,
         _entity_index_to_entity = {},   -- Table<Number, bt.Entity>
@@ -69,18 +75,101 @@ rt.GameState = meta.new_type("GameState", function()
         _active_coroutines = {} -- Table<rt.Coroutine>
     })
 
-    out:load_input_mapping()
+    out:realize()
     return out
 end)
 
 --- @brief
-function rt.GameState:load_input_mapping()
-    self:load_default_input_mapping()
+function rt.GameState:realize()
+    self:load_input_mapping()
+    rt.get_active_state = function() return self end
 end
 
 --- @brief
-function rt.GameState:load_default_input_mapping()
-    rt.InputControllerState:load_default_mapping()
+function rt.GameState:load_input_mapping()
+    local mapping = {
+        [rt.InputButton.A] = {
+            rt.KeyboardKey.SPACE,
+            rt.GamepadButton.RIGHT
+        },
+
+        [rt.InputButton.B] = {
+            rt.KeyboardKey.B,
+            rt.GamepadButton.BOTTOM
+        },
+
+        [rt.InputButton.X] = {
+            rt.KeyboardKey.X,
+            rt.GamepadButton.TOP
+        },
+
+        [rt.InputButton.Y] = {
+            rt.KeyboardKey.Z,
+            rt.GamepadButton.LEFT
+        },
+
+        [rt.InputButton.L] = {
+            rt.KeyboardKey.L,
+            rt.GamepadButton.LEFT_SHOULDER
+        },
+
+        [rt.InputButton.R] = {
+            rt.KeyboardKey.R,
+            rt.GamepadButton.RIGHT_SHOULDER
+        },
+
+        [rt.InputButton.START] = {
+            rt.KeyboardKey.M,
+            rt.KeyboardKey.RETURN,
+            rt.GamepadButton.START
+        },
+
+        [rt.InputButton.SELECT] = {
+            rt.KeyboardKey.N,
+            rt.KeyboardKey.RIGHT_SQUARE_BRACKET,
+            rt.KeyboardKey.BACKSLASH,
+            rt.GamepadButton.SELECT
+        },
+
+        [rt.InputButton.UP] = {
+            rt.KeyboardKey.ARROW_UP,
+            rt.KeyboardKey.W,
+            rt.KeyboardKey.KEYPAD_EIGHT,
+            rt.GamepadButton.DPAD_UP,
+        },
+
+        [rt.InputButton.RIGHT] = {
+            rt.KeyboardKey.ARROW_RIGHT,
+            rt.KeyboardKey.D,
+            rt.KeyboardKey.KEYPAD_SIX,
+            rt.GamepadButton.DPAD_RIGHT
+        },
+
+        [rt.InputButton.DOWN] = {
+            rt.KeyboardKey.ARROW_DOWN,
+            rt.KeyboardKey.S,
+            rt.KeyboardKey.KEYPAD_FIVE,
+            rt.KeyboardKey.KEYPAD_TWO,
+            rt.GamepadButton.DPAD_DOWN
+        },
+
+        [rt.InputButton.LEFT] = {
+            rt.KeyboardKey.ARROW_LEFT,
+            rt.KeyboardKey.A,
+            rt.KeyboardKey.KEYPAD_FOUR,
+            rt.GamepadButton.DPAD_LEFT
+        },
+
+        [rt.InputButton.DEBUG] = {
+            rt.KeyboardKey.ESCAPE,
+            rt.GamepadButton.LEFT_STICK,
+            rt.GamepadButton.RIGHT_STICK
+        }
+    }
+
+    self._state.keybinding = mapping
+    rt.InputControllerState:load_mapping(mapping)
+    rt.InputControllerState.deadzone = self._state.deadzone
 end
 
 --- @brief
@@ -516,3 +605,31 @@ function rt.GameState:set_deadzone(fraction)
     self._state.deadzone = fraction
     rt.InputControllerState.deadzone = self._state.deadzone
 end
+
+--- @brief
+--- @return (rt.KeyboardKey, rt.GamepadButton)
+function rt.GameState:get_keybinding(input_button)
+    local first_keyboard_key, first_gamepad_button = nil, nil
+    for x in values(self._state.keybinding[input_button]) do
+        if meta.is_enum_value(x, rt.KeyboardKey) and not first_keyboard_key then
+            first_keyboard_key = x
+        elseif meta.is_enum_value(x, rt.GamepadButton) and not first_gamepad_button then
+            first_gamepad_button = x
+        end
+
+        if first_gamepad_button ~= nil and first_keyboard_key ~= nil then
+            return first_keyboard_key, first_gamepad_button
+        end
+    end
+
+    rt.error("In rt.InputControllerState: no keybinding for `" .. input_button .. "`")
+    return nil, nil
+end
+
+--- @brief
+function rt.GameState:set_keybinding(input_button, new_gamepad_button)
+    meta.assert_enum(input_button, rt.InputButton)
+    self._state.keybinding[input_button][1] = new_gamepad_button
+    rt.InputControllerState:load_mapping(self._state.keybinding)
+end
+
