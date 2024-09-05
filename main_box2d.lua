@@ -13,7 +13,7 @@ require "fast_physics.body"
 require "fast_physics.world"
 require "fast_physics.world_thread"
 
-world = b2.World:new_with_threads(0, 100, 8)
+world = b2.World:new_with_threads(0, 100, 4)
 local to_draw = {}
 
 love.load = function()
@@ -47,6 +47,8 @@ love.load = function()
     end
 end
 
+sum = 0
+n = 0
 love.update = function(dt)
     if love.keyboard.isDown("space") then
         spawn_ball()
@@ -54,7 +56,9 @@ love.update = function(dt)
 
     clock = rt.Clock()
     world:step(dt, 4)
-    --dbg(clock:restart():as_seconds() / (1 / 60))
+    sum = sum + clock:restart():as_seconds() / (1 / 60)
+    n = n + 1
+    dbg(sum / n)
 end
 
 love.draw = function()
