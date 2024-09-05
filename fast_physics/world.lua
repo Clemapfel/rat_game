@@ -29,7 +29,7 @@ end
 --- @brief
 function b2.World:new_from_id(id)
     local out = setmetatable({
-        _native = id,
+        _native = id
     }, {
         __index = b2.World
     })

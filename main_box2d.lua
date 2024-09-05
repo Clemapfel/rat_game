@@ -10,10 +10,10 @@ require "fast_physics.polygon"
 require "fast_physics.segment"
 require "fast_physics.shape"
 require "fast_physics.body"
-require "fast_physics.threads"
 require "fast_physics.world"
+require "fast_physics.world_thread"
 
-world = b2.World(0, 100, 3)
+world = b2.World:new_with_threads(0, 100, 8)
 local to_draw = {}
 
 love.load = function()
@@ -54,7 +54,7 @@ love.update = function(dt)
 
     clock = rt.Clock()
     world:step(dt, 4)
-    dbg(clock:restart():as_seconds() / (1 / 60))
+    --dbg(clock:restart():as_seconds() / (1 / 60))
 end
 
 love.draw = function()
