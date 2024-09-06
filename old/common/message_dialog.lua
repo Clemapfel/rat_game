@@ -13,7 +13,7 @@ rt.MessageDialogOption = meta.new_enum({
 --- @param message String
 --- @param submessage String
 --- @param option1 vararg
---- @signal selection (rt.MessageDialog, Unsigned) -> nil
+--- @signal selection (rt.MessageDialog, String) -> nil
 rt.MessageDialog = meta.new_type("MessageDialog", rt.Widget, rt.SignalEmitter, function(message, submessage, option1, ...)
     local out = meta.new(rt.MessageDialog, {
         _message = message,
@@ -32,6 +32,7 @@ rt.MessageDialog = meta.new_type("MessageDialog", rt.Widget, rt.SignalEmitter, f
 
         _is_active = false,
         _input = rt.InputController(),
+        _shadow = rt.Rectangle(0, 0, 1, 1),
 
         _elapsed = 0
     })
@@ -61,14 +62,22 @@ end
 --- @brief
 function rt.MessageDialog:close()
     self:set_is_active(false)
-    self:set_is_visible(false)
 end
 
 --- @brief
 function rt.MessageDialog:present()
     self._elapsed = 0
+    if self._is_realized == false then self:realize() end
+    if self._is_active == false then
+        for i, option in ipairs(self._options) do
+            if option == rt.MessageDialogOption.CANCEL then
+                self._selected_item_i = i
+                break
+            end
+        end
+    end
+
     self:set_is_active(true)
-    self:set_is_visible(true)
 end
 
 --- @override
@@ -156,12 +165,18 @@ function rt.MessageDialog:size_allocate(x, y, width, height)
     self._render_x_offset = math.floor(x + 0.5 * width - 0.5 * frame_w)
     self._render_y_offset = math.floor(y + 0.5 * height - 0.5 * frame_h)
 
+    local shadow_strength = rt.settings.message_dialog.shadow_strength;
+    self._shadow:set_color(rt.RGBA(shadow_strength, shadow_strength, shadow_strength, 1))
+    self._shadow:resize(x, y, width, height)
+
     self:_update_selected_item()
 end
 
 --- @override
 function rt.MessageDialog:draw()
-    if self:get_is_visible() == false then return end
+    rt.graphics.set_blend_mode(rt.BlendMode.MULTIPLY, rt.BlendMode.ADD)
+    self._shadow:draw()
+    rt.graphics.set_blend_mode()
 
     rt.graphics.translate(self._render_x_offset, self._render_y_offset)
 
@@ -206,6 +221,12 @@ function rt.MessageDialog:_handle_button_pressed(which)
         end
     elseif which == rt.InputButton.A then
         self:signal_emit("selection", self._options[self._selected_item_i])
+    elseif which == rt.InputButton.B then
+        for option in values(self._options) do
+            if option == rt.MessageDialogOption.CANCEL then
+                self:signal_emit("selection", rt.MessageDialogOption.CANCEL)
+            end
+        end
     end
 end
 

@@ -41,7 +41,6 @@ mn.InventoryScene = meta.new_type("InventoryScene", rt.Scene, function(state)
         _animation_queue = rt.AnimationQueue(),
         _input_controller = rt.InputController(),
 
-        _dialog_shadow = rt.Rectangle(0, 0, 1, 1),
         _template_confirm_load_dialog = rt.MessageDialog(),
         _template_confirm_delete_dialog = rt.MessageDialog(),
         _template_apply_unsuccesfull_dialog = rt.MessageDialog(),
@@ -327,10 +326,6 @@ function mn.InventoryScene:size_allocate(x, y, width, height)
     self:_set_shared_list_index(self._shared_list_index)
     self:_set_entity_index(self._entity_index)
 
-    local shadow_strength = rt.settings.message_dialog.shadow_strength;
-    self._dialog_shadow:set_color(rt.RGBA(shadow_strength, shadow_strength, shadow_strength, 1))
-    self._dialog_shadow:resize(x, y, width, height)
-
     self._template_rename_keyboard:fit_into(x, y, width, height)
     self._template_confirm_load_dialog:fit_into(x, y, width, height)
     self._template_confirm_delete_dialog:fit_into(x, y, width, height)
@@ -401,12 +396,6 @@ function mn.InventoryScene:draw()
     local template_delete_active = self._template_confirm_delete_dialog:get_is_active()
     local template_rename_active = self._template_rename_keyboard:get_is_active()
     local template_load_unsuccesfull_active = self._template_apply_unsuccesfull_dialog:get_is_active()
-
-    if template_load_active or template_delete_active or template_rename_active or template_load_unsuccesfull_active then
-        rt.graphics.set_blend_mode(rt.BlendMode.MULTIPLY, rt.BlendMode.ADD)
-        self._dialog_shadow:draw()
-        rt.graphics.set_blend_mode()
-    end
 
     if template_load_active then
         self._template_confirm_load_dialog:draw()

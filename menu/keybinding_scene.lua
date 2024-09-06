@@ -20,14 +20,16 @@ mn.KeybindingScene = meta.new_type("KeybindingScene", rt.Scene, function(state)
         _heading_label = nil,
         _heading_frame = rt.Frame(),
         _control_indicator = rt.ControlIndicator(),
-        _dialog_shadow = rt.Rectangle(0, 0, 1, 1),
-        _invalid_binding_dialog = nil, -- mn.MessageDialog
         _selection_graph = rt.SelectionGraph(),
 
         _input = rt.InputController(),
         _assignment_active = false,
         _assignment_button = nil, -- rt.InputButton
-        _skip_frame = 0
+        _skip_frame = 0,
+
+        _confirm_load_default_dialog = nil, -- rt.MessageDialog
+        _confirm_abort_dialog = nil, -- rt.MessageDialog
+        _keybinding_invalid_dialog = nil, -- rt.MessageDialog
     })
 end, {
     button_layout = {
@@ -46,7 +48,7 @@ function mn.KeybindingScene:realize()
     local labels = rt.TextAtlas:get(rt.settings.menu.keybinding_scene.text_atlas_id)
     self._accept_label = rt.Label(labels.accept)
     self._go_back_label = rt.Label(labels.go_back)
-    self._heading_label = rt.Label("TODO") -- initialize in input_method_changed
+    self._heading_label = rt.Label("TODO") -- initialized in input_method_changed
     self._restore_defaults_label = rt.Label(labels.restore_defaults)
 
     for label in range(self._accept_label, self._go_back_label, self._heading_label, self._restore_defaults_label) do
@@ -63,10 +65,12 @@ function mn.KeybindingScene:realize()
         for button in values(button_row) do
             local to_insert = {
                 button = button,
-                label = rt.Label(labels[button]),
+                label = rt.Label(rt.input_button_to_string(button)),
                 frame = rt.Frame(),
                 gamepad_indicator = rt.KeybindingIndicator(),
-                keyboard_indicator = rt.KeybindingIndicator()
+                gamepad_binding = nil,
+                keyboard_indicator = rt.KeybindingIndicator(),
+                keyboard_binding = nil,
             }
             self._button_to_item[button] = to_insert
 
@@ -91,22 +95,30 @@ function mn.KeybindingScene:realize()
     local scene = self
     self._input:set_treat_left_joystick_as_dpad(true)
     self._input:signal_disconnect_all()
+
+    local is_dialog_active = function()
+        return self._confirm_load_default_dialog:get_is_active() or
+            self._confirm_abort_dialog:get_is_active() or
+            self._keybinding_invalid_dialog:get_is_active()
+    end
+
     self._input:signal_connect("pressed", function(_, which)
-        if scene._skip_frame > 0 then return end
+        if scene._skip_frame > 0 or is_dialog_active() then return end
+
         if not scene._assignment_active then
             scene._selection_graph:handle_button(which)
         end
     end)
 
     self._input:signal_connect("keyboard_pressed", function(_, which)
-        if scene._skip_frame > 0 then return end
+        if scene._skip_frame > 0 or is_dialog_active() then return end
         if scene._assignment_active then
             scene:_finish_assignment(which)
         end
     end)
 
     self._input:signal_connect("gamepad_pressed", function(_, which)
-        if scene._skip_frame > 0 then return end
+        if scene._skip_frame > 0 or is_dialog_active() then return end
         if scene._assignment_active then
             scene:_finish_assignment(which)
         end
@@ -124,8 +136,58 @@ function mn.KeybindingScene:realize()
             self:reformat()
         end
     end)
-
     self._input:signal_emit("input_method_changed", self._input:get_input_method())
+
+    self._confirm_load_default_dialog = rt.MessageDialog(
+        labels.confirm_load_default_message,
+        labels.confirm_load_default_submessage,
+        rt.MessageDialogOption.ACCEPT, rt.MessageDialogOption.CANCEL
+    )
+    self._confirm_load_default_dialog:realize()
+
+    self._confirm_load_default_dialog:signal_disconnect_all()
+    self._confirm_load_default_dialog:signal_connect("selection", function(self, selection)
+        if selection == rt.MessageDialogOption.ACCEPT then
+            for item_row in values(scene._items) do
+                for item in values(item_row) do
+                    local keyboard, gamepad = scene._state:get_default_keybinding(item.button)
+                    item.gamepad_indicator:create_from_gamepad_button(gamepad)
+                    item.keyboard_indicator:create_from_keyboard_key(keyboard)
+                end
+            end
+        end
+        self:close()
+    end)
+
+    self._confirm_abort_dialog = rt.MessageDialog(
+        labels.confirm_abort_message,
+        labels.confirm_abort_submessage,
+        rt.MessageDialogOption.ACCEPT, rt.MessageDialogOption.CANCEL
+    )
+    self._confirm_abort_dialog:realize()
+
+    self._confirm_abort_dialog:signal_disconnect_all()
+    self._confirm_abort_dialog:signal_connect("selection", function(self, selection)
+        if selection == rt.MessageDialogOption.ACCEPT then
+            rt.warning("in mn.KeybindingsScene._confirm_abort_dialog:selection: go back to inventory todo")
+        else
+            -- do nothing
+        end
+        self:close()
+    end)
+
+    self._keybinding_invalid_dialog = rt.MessageDialog(
+        labels.keybinding_invalid_message,
+        "", -- set during present
+        rt.MessageDialogOption.ACCEPT
+    )
+    self._keybinding_invalid_dialog:realize()
+
+    self._keybinding_invalid_dialog:signal_disconnect_all()
+    self._keybinding_invalid_dialog:signal_connect("selection", function(self, selection)
+        self:close()
+    end)
+
     self._is_realized = true
 end
 
@@ -133,9 +195,11 @@ end
 function mn.KeybindingScene:create_from_state(state)
     for item_row in values(self._items) do
         for item in values(item_row) do
-            local keyboard, gamepad = rt.get_active_state():get_keybinding(item.button)
+            local keyboard, gamepad = self._state:get_keybinding(item.button)
             item.gamepad_indicator:create_from_gamepad_button(gamepad)
+            item.gamepad_binding = gamepad
             item.keyboard_indicator:create_from_keyboard_key(keyboard)
+            item.keyboard_binding = keyboard
         end
     end
 end
@@ -202,8 +266,6 @@ function mn.KeybindingScene:size_allocate(x, y, width, height)
         item_y = item_y + item_h + m
     end
 
-
-
     local last_row_h = control_h
     local last_row_x, last_row_y = item_x, item_y
     for frame_label in range(
@@ -220,12 +282,16 @@ function mn.KeybindingScene:size_allocate(x, y, width, height)
         last_row_x = last_row_x + item_w + item_xm
     end
 
-    self._selection_graph:clear()
+    self._confirm_load_default_dialog:fit_into(x, y, width, height)
+    self._confirm_abort_dialog:fit_into(x, y, width, height)
+    self._keybinding_invalid_dialog:fit_into(x, y, width, height)
     self:_regenerate_selection_nodes()
 end
 
 --- @breif
 function mn.KeybindingScene:_regenerate_selection_nodes()
+    self._selection_graph:clear()
+
     local item_rows = {{}}
     local n_rows = sizeof(self._items)
     for row_i, item_row in ipairs(self._items) do
@@ -266,14 +332,14 @@ function mn.KeybindingScene:_regenerate_selection_nodes()
     end
 
     local accept_node = rt.SelectionGraphNode(self._accept_frame:get_bounds())
-    local go_back_node = rt.SelectionGraphNode(self._go_back_frame:get_bounds())
+    local abort_node = rt.SelectionGraphNode(self._go_back_frame:get_bounds())
     local restore_defaults_node = rt.SelectionGraphNode(self._restore_defaults_frame:get_bounds())
-    self._selection_graph:add(accept_node, go_back_node, restore_defaults_node)
+    self._selection_graph:add(accept_node, abort_node, restore_defaults_node)
 
     local bottom_nodes = {}
     for node_frame in range(
         {accept_node, self._accept_frame},
-        {go_back_node, self._go_back_frame},
+        {abort_node, self._go_back_frame},
         {restore_defaults_node, self._restore_defaults_frame}
     ) do
         local node = node_frame[1]
@@ -307,9 +373,16 @@ function mn.KeybindingScene:_regenerate_selection_nodes()
         node:set_right(bottom_nodes[i + 1])
     end
 
+    accept_node:signal_connect(rt.InputButton.A, function(_)
+        scene:_accept()
+    end)
+
+    abort_node:signal_connect(rt.InputButton.A, function(_)
+        scene:_abort()
+    end)
+
     restore_defaults_node:signal_connect(rt.InputButton.A, function(_)
-        self._state:load_default_input_mapping()
-        self:create_from_state(self._state)
+        scene:_restore_defaults()
     end)
 
     self._selection_graph:set_current_node(item_rows[1][1])
@@ -318,6 +391,10 @@ end
 --- @override
 function mn.KeybindingScene:update(delta)
     self._skip_frame = self._skip_frame - 1
+
+    self._confirm_load_default_dialog:update(delta)
+    self._confirm_abort_dialog:update(delta)
+    self._keybinding_invalid_dialog:update(delta)
 end
 
 --- @brief
@@ -345,8 +422,10 @@ function mn.KeybindingScene:_finish_assignment(which)
     local item = self._button_to_item[self._assignment_button]
     if meta.is_enum_value(which, rt.KeyboardKey) then
         item.keyboard_indicator:create_from_keyboard_key(which)
+        item.keyboard_binding = which
     else
         item.gamepad_indicator:create_from_gamepad_button(which)
+        item.gamepad_binding = which
     end
     self._assignment_active = false
 
@@ -389,4 +468,64 @@ function mn.KeybindingScene:draw()
 
     self._restore_defaults_frame:draw()
     self._restore_defaults_label:draw()
+
+    if self._confirm_load_default_dialog:get_is_active() then
+        self._confirm_load_default_dialog:draw()
+    end
+
+    if self._confirm_abort_dialog:get_is_active() then
+        self._confirm_abort_dialog:draw()
+    end
+
+    if self._keybinding_invalid_dialog:get_is_active() then
+        self._keybinding_invalid_dialog:draw()
+    end
+end
+
+--- @brief
+function mn.KeybindingScene:_restore_defaults()
+    self._confirm_load_default_dialog:present()
+end
+
+--- @brief
+function mn.KeybindingScene:_abort()
+    for item_row in values(self._items) do
+        for item in values(item_row) do
+            local current_key, current_pad = self._state:get_keybinding(item.button)
+            local item_key, item_pad = item.keyboard_binding, item.gamepad_binding
+            if current_key ~= item_key or current_pad ~= item_pad then
+                self._confirm_abort_dialog:present()
+                return
+            end
+        end
+    end
+
+    rt.warning("in mn.KeybindingsScene._abort: go back to inventory todo")
+end
+
+--- @brief
+function mn.KeybindingScene:_accept()
+    local new_mapping = {}
+    for item_row in values(self._items) do
+        for item in values(item_row) do
+            new_mapping[item.button] = {
+                item.keyboard_binding,
+                item.gamepad_binding
+            }
+        end
+    end
+
+    local is_valid, message = rt.InputControllerState:validate_input_mapping(new_mapping)
+    if is_valid then
+        local pair_i = 1
+        for button, key_gamepad in pairs(new_mapping) do
+            self._state:set_keybinding(button, key_gamepad[1], false)
+            self._state:set_keybinding(button, key_gamepad[2], pair_i >= #new_mapping) -- notify on last only
+            pair_i = pair_i + 1
+        end
+        rt.warning("in mn.KeybindingsScene._accept: go back to inventory todo")
+    else
+        self._keybinding_invalid_dialog:set_submessage(message)
+        self._keybinding_invalid_dialog:present()
+    end
 end

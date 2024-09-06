@@ -22,18 +22,17 @@
     </configurations>
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="7fa9ba1b-2cff-4ecc-86fb-59ab2fa76ee1" name="Changes" comment="moved keybindings into game state">
-      <change afterPath="$PROJECT_DIR$/fast_physics/joint.lua" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/fast_physics/world_thread_sdl.lua" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/love/windows/enkiTS.dll" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/love/windows/enkiTS.exp" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/love/windows/enkiTS.lib" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/love/windows/enkiTS.pdb" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/.idea/vcs.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/vcs.xml" afterDir="false" />
+    <list default="true" id="7fa9ba1b-2cff-4ecc-86fb-59ab2fa76ee1" name="Changes" comment="added enkits">
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/fast_physics/world_thread.lua" beforeDir="false" afterPath="$PROJECT_DIR$/fast_physics/world_thread_love.lua" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/fast_physics/world_thread_worker.lua" beforeDir="false" afterPath="$PROJECT_DIR$/fast_physics/world_thread_worker.lua" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/main_box2d.lua" beforeDir="false" afterPath="$PROJECT_DIR$/main_box2d.lua" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/assets/text/english/menu.lua" beforeDir="false" afterPath="$PROJECT_DIR$/assets/text/english/menu.lua" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/common/game_state.lua" beforeDir="false" afterPath="$PROJECT_DIR$/common/game_state.lua" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/common/input_button.lua" beforeDir="false" afterPath="$PROJECT_DIR$/common/input_button.lua" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/common/input_controller.lua" beforeDir="false" afterPath="$PROJECT_DIR$/common/input_controller.lua" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/common/message_dialog.lua" beforeDir="false" afterPath="$PROJECT_DIR$/common/message_dialog.lua" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/main.lua" beforeDir="false" afterPath="$PROJECT_DIR$/main.lua" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/menu/inventory_scene.lua" beforeDir="false" afterPath="$PROJECT_DIR$/menu/inventory_scene.lua" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/menu/keybinding_scene.lua" beforeDir="false" afterPath="$PROJECT_DIR$/menu/keybinding_scene.lua" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/old/common/message_dialog.lua" beforeDir="false" afterPath="$PROJECT_DIR$/old/common/message_dialog.lua" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -141,7 +140,7 @@
       <recent name="C:\Users\cleme\Workspace\rat_game\menu" />
     </key>
   </component>
-  <component name="RunManager" selected="Lua Application.main_box2d">
+  <component name="RunManager" selected="Lua Application.main">
     <configuration name="main" type="lua.app" factoryName="Lua Application">
       <module name="rat_game" />
       <option name="program" value="C:\Users\cleme\Workspace\rat_game\love\windows\love.exe" />
@@ -513,15 +512,7 @@
       <workItem from="1725497293442" duration="2685000" />
       <workItem from="1725500236845" duration="1577000" />
       <workItem from="1725502219832" duration="13568000" />
-      <workItem from="1725574350718" duration="8039000" />
-    </task>
-    <task id="LOCAL-00984" summary="stashing interface">
-      <option name="closed" value="true" />
-      <created>1724297428785</created>
-      <option name="number" value="00984" />
-      <option name="presentableId" value="LOCAL-00984" />
-      <option name="project" value="LOCAL" />
-      <updated>1724297428785</updated>
+      <workItem from="1725574350718" duration="16719000" />
     </task>
     <task id="LOCAL-00985" summary="added draw call performance metrics">
       <option name="closed" value="true" />
@@ -907,7 +898,15 @@
       <option name="project" value="LOCAL" />
       <updated>1725552009823</updated>
     </task>
-    <option name="localTasksCounter" value="1033" />
+    <task id="LOCAL-01033" summary="added enkits">
+      <option name="closed" value="true" />
+      <created>1725582548500</created>
+      <option name="number" value="01033" />
+      <option name="presentableId" value="LOCAL-01033" />
+      <option name="project" value="LOCAL" />
+      <updated>1725582548502</updated>
+    </task>
+    <option name="localTasksCounter" value="1034" />
     <servers />
   </component>
   <component name="TypeScriptGeneratedFilesManager">
@@ -956,7 +955,6 @@
     </option>
   </component>
   <component name="VcsManagerConfiguration">
-    <MESSAGE value="stashing update, why does it impact fps instead of piling up coroutines?" />
     <MESSAGE value="added keyboard indicator" />
     <MESSAGE value="added button indicators" />
     <MESSAGE value="added buttons and dpad" />
@@ -981,7 +979,8 @@
     <MESSAGE value="polished scenes" />
     <MESSAGE value="added double button keybinding indicator" />
     <MESSAGE value="moved keybindings into game state" />
-    <option name="LAST_COMMIT_MESSAGE" value="moved keybindings into game state" />
+    <MESSAGE value="added enkits" />
+    <option name="LAST_COMMIT_MESSAGE" value="added enkits" />
   </component>
   <component name="XDebuggerManager">
     <breakpoint-manager>

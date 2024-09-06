@@ -43,6 +43,7 @@ rt.InputMethod = meta.new_enum({
 --- @signal gamepad_pressed   (self, rt.GamepadButton) -> nil
 --- @signal gamepad_released (self, rt.GamepadButton) -> nil
 --- @signal input_method_changed (self, rt.InputMethod) -> nil
+--- @signal input_mapping_changed (self) -> nil
 rt.InputController = meta.new_type("InputController", rt.SignalEmitter, function(bounds)
     if bounds ~= nil then meta.assert_aabb(bounds) end
     local out = meta.new(rt.InputController, {
@@ -56,6 +57,7 @@ rt.InputController = meta.new_type("InputController", rt.SignalEmitter, function
     out:signal_add("gamepad_pressed")
     out:signal_add("gamepad_released")
     out:signal_add("input_method_changed")
+    out:signal_add("input_mapping_changed")
 
     out:signal_add("pressed")
     out:signal_add("released")
@@ -371,7 +373,7 @@ end
 
 --- @brief
 --- @return (Boolean, String) is_valid, reason
-function rt.InputControllerState:validate_input_mapping()
+function rt.InputControllerState:validate_input_mapping(mapping)
     local no_keyboard_input_buttons = {}
     local no_gamepad_input_buttons = {}
     local double_bound_gamepad_buttons = {} -- Table<rt.GamepadButton, Table<rt.InputButton>>
@@ -383,33 +385,35 @@ function rt.InputControllerState:validate_input_mapping()
     local gamepad_to_button = {}
 
     for button in values(meta.instances(rt.InputButton)) do
-        local keyboard_mapped, gamepad_mapped = false, false
-        for native in values(self.mapping[button]) do
-            if  meta.is_enum_value(native, rt.KeyboardKey) then
-                keyboard_mapped = true
-                if keyboard_to_button[native] == nil then
-                    keyboard_to_button[native] = {}
+        if button ~= rt.InputButton.DEBUG then
+            local keyboard_mapped, gamepad_mapped = false, false
+            for native in values(mapping[button]) do
+                if  meta.is_enum_value(native, rt.KeyboardKey) then
+                    keyboard_mapped = true
+                    if keyboard_to_button[native] == nil then
+                        keyboard_to_button[native] = {}
+                    end
+                    table.insert(keyboard_to_button[native], button)
+                elseif  meta.is_enum_value(native, rt.GamepadButton) then
+                    gamepad_mapped = true
+                    if gamepad_to_button[native] == nil then
+                        gamepad_to_button[native] = {}
+                    end
+                    table.insert(gamepad_to_button[native], button)
+                else
+                    rt.error("In rt.InputController.validate_input_mapping: unexpected value `" .. native .. "` for mapping of `" .. button .. "`")
                 end
-                table.insert(keyboard_to_button[native], button)
-            elseif  meta.is_enum_value(native, rt.GamepadButton) then
-                gamepad_mapped = true
-                if gamepad_to_button[native] == nil then
-                    gamepad_to_button[native] = {}
-                end
-                table.insert(gamepad_to_button[native], button)
-            else
-                rt.error("In rt.InputController.validate_input_mapping: unexpected value `" .. native .. "` for mapping of `" .. button .. "`")
             end
-        end
 
-        if keyboard_mapped == false then
-            table.insert(no_keyboard_input_buttons, button)
-            is_valid = false
-        end
+            if keyboard_mapped == false then
+                table.insert(no_keyboard_input_buttons, button)
+                is_valid = false
+            end
 
-        if gamepad_mapped == false then
-            table.insert(no_gamepad_input_buttons, button)
-            is_valid = false
+            if gamepad_mapped == false then
+                table.insert(no_gamepad_input_buttons, button)
+                is_valid = false
+            end
         end
     end
 
@@ -430,8 +434,6 @@ function rt.InputControllerState:validate_input_mapping()
     local prefix = string.rep(" ", 8)
     local error_message = {}
     if not is_valid then
-        table.insert(error_message, "Error while validating keybindings, mapping is invalid.\n")
-
         if sizeof(no_keyboard_input_buttons) ~= 0 then
             table.insert(error_message, "The following actions have no assigned keyboard keys :\n")
             for button in values(no_keyboard_input_buttons) do
@@ -453,9 +455,9 @@ function rt.InputControllerState:validate_input_mapping()
                 local n_buttons = #buttons
                 for i, button in ipairs(buttons) do
                     if i < n_buttons then
-                        table.insert(error_message, button .. ", ")
+                        table.insert(error_message, rt.input_button_to_string(button) .. ", ")
                     else
-                        table.insert(error_message, button .. ")\n")
+                        table.insert(error_message, rt.input_button_to_string(button) .. ")\n")
                     end
                 end
             end
@@ -468,9 +470,9 @@ function rt.InputControllerState:validate_input_mapping()
                 local n_buttons = #buttons
                 for i, button in ipairs(buttons) do
                     if i < n_buttons then
-                        table.insert(error_message, button .. ", ")
+                        table.insert(error_message, rt.input_button_to_string(button) .. ", ")
                     else
-                        table.insert(error_message, button .. ")\n")
+                        table.insert(error_message, rt.input_button_to_string(button) .. ")\n")
                     end
                 end
             end
@@ -494,9 +496,16 @@ function rt.InputControllerState:load_mapping(mapping)
         end
     end
 
-    local is_valid, message = self:validate_input_mapping()
+    local is_valid, message = self:validate_input_mapping(self.mapping)
     if not is_valid then
-        rt.error("[FATAL] In rt.InputControllerState:load_mapping: " .. message)
+        rt.error("[FATAL] In rt.InputControllerState:load_mapping: Mapping is invalid.\n" .. message)
+    end
+
+    for _, component in pairs(rt.InputControllerState.components) do
+        dbg(self.mapping)
+        if not component._is_disabled then
+            component:signal_emit("input_mapping_changed")
+        end
     end
 end
 

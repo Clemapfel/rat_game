@@ -36,6 +36,7 @@ rt.MessageDialog = meta.new_type("MessageDialog", rt.Widget, rt.SignalEmitter, f
         _queue_activate = 0,
 
         _input = rt.InputController(),
+        _shadow = rt.Rectangle(0, 0, 1, 1),
 
         _elapsed = 0
     })
@@ -138,12 +139,20 @@ function rt.MessageDialog:size_allocate(x, y, width, height)
     self._render_x_offset = math.floor(x + 0.5 * width - 0.5 * frame_w)
     self._render_y_offset = math.floor(y + 0.5 * height - 0.5 * frame_h)
 
+    local shadow_strength = rt.settings.message_dialog.shadow_strength;
+    self._shadow:set_color(rt.RGBA(shadow_strength, shadow_strength, shadow_strength, 1))
+    self._shadow:resize(x, y, width, height)
+
     self:_update_selected_item()
 end
 
 --- @override
 function rt.MessageDialog:draw()
     if self._is_active == false then return end
+
+    rt.graphics.set_blend_mode(rt.BlendMode.MULTIPLY, rt.BlendMode.ADD)
+    self._shadow:draw()
+    rt.graphics.set_blend_mode()
 
     rt.graphics.translate(self._render_x_offset, self._render_y_offset)
 

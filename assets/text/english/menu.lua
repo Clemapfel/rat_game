@@ -44,21 +44,21 @@ return {
         control_indicator_left_right = "Change Value"
     },
 
-    -- input_button_to_string
-    a_action = "A",
-    b_action = "B",
-    x_action = "X",
-    y_action = "Y",
-    up_action = "Up",
-    right_action = "Right",
-    down_action = "Down",
-    left_action = "Left",
-    l_action = "L",
-    r_action = "R",
-    start_action = "start",
-    select_action = "select",
-    debug_action = "debug",
+    -- rt.input_button_to_string
+    [rt.InputButton.A] = "Accept",
+    [rt.InputButton.B] = "Cancel",
+    [rt.InputButton.X] = "X",
+    [rt.InputButton.Y] = "Y",
+    [rt.InputButton.UP] = "Move Up",
+    [rt.InputButton.RIGHT] = "Move Right",
+    [rt.InputButton.DOWN] = "Move Down",
+    [rt.InputButton.LEFT] = "Move Left",
+    [rt.InputButton.L] = "Left Alt",
+    [rt.InputButton.R] = "Right Alt",
+    [rt.InputButton.START] = "Start",
+    [rt.InputButton.SELECT] = "Select",
 
+    -- mn.KeybindingScene
     keybinding_scene = {
         accept = "Accept",
         go_back = "Abort",
@@ -66,21 +66,16 @@ return {
         heading_gamepad = "<b>Controls > Gamepad</b>",
         restore_defaults = "Restore Defaults",
 
-        [rt.InputButton.A] = "A",
-        [rt.InputButton.B] = "B",
-        [rt.InputButton.X] = "X",
-        [rt.InputButton.Y] = "Y",
-        [rt.InputButton.UP] = "Move Up",
-        [rt.InputButton.RIGHT] = "Move Right",
-        [rt.InputButton.DOWN] = "Move Down",
-        [rt.InputButton.LEFT] = "Move Left",
-        [rt.InputButton.L] = "Left Alt",
-        [rt.InputButton.R] = "Right Alt",
-        [rt.InputButton.START] = "Start",
-        [rt.InputButton.SELECT] = "Select",
-
         control_indicator_a = "Remap",
         control_indicator_all = "Select",
-        control_indicator_b = "Abort"
+        control_indicator_b = "Abort",
+
+        confirm_load_default_message = "Restore Default Keybindings?",
+        confirm_load_default_submessage = "This will override TODO",
+
+        confirm_abort_message = "Are you sure you want to abort?",
+        confirm_abort_submessage = "The current keybinding modification will not be applied",
+
+        keybinding_invalid_message = "Invalid Keybinding"
     }
 }

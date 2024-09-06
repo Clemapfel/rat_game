@@ -7,8 +7,6 @@ inventory_scene = mn.InventoryScene(state)
 option_scene = mn.OptionsScene(state)
 keybinding_scene = mn.KeybindingScene(state)
 
-state:set_keybinding(rt.InputButton.A, rt.KeyboardKey.NINE)
-
 input = rt.InputController()
 input:signal_connect("keyboard_pressed", function(_, which)
     if which == rt.KeyboardKey.ONE then

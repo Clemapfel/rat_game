@@ -86,8 +86,8 @@ function rt.GameState:realize()
 end
 
 --- @brief
-function rt.GameState:load_input_mapping()
-    local mapping = {
+function rt.GameState:_get_default_mapping()
+    return {
         [rt.InputButton.A] = {
             rt.KeyboardKey.SPACE,
             rt.GamepadButton.RIGHT
@@ -166,6 +166,11 @@ function rt.GameState:load_input_mapping()
             rt.GamepadButton.RIGHT_STICK
         }
     }
+end
+
+--- @brief
+function rt.GameState:load_input_mapping()
+    local mapping = self:_get_default_mapping()
 
     self._state.keybinding = mapping
     rt.InputControllerState:load_mapping(mapping)
@@ -627,9 +632,51 @@ function rt.GameState:get_keybinding(input_button)
 end
 
 --- @brief
-function rt.GameState:set_keybinding(input_button, new_gamepad_button)
-    meta.assert_enum(input_button, rt.InputButton)
-    self._state.keybinding[input_button][1] = new_gamepad_button
-    rt.InputControllerState:load_mapping(self._state.keybinding)
+function rt.GameState:get_default_keybinding(input_button)
+    local default = self:_get_default_mapping()
+    local first_keyboard_key, first_gamepad_button = nil, nil
+    for x in values(default[input_button]) do
+        if meta.is_enum_value(x, rt.KeyboardKey) and first_keyboard_key == nil then
+            first_keyboard_key = x
+        elseif meta.is_enum_value(x, rt.GamepadButton) and first_gamepad_button == nil then
+            first_gamepad_button = x
+        end
+
+        if first_gamepad_button ~= nil and first_keyboard_key ~= nil then
+            return first_keyboard_key, first_gamepad_button
+        end
+    end
+
+    return nil, nil
 end
 
+--- @brief
+function rt.GameState:set_keybinding(input_button, new_binding, notify_controller_state)
+    meta.assert_enum(input_button, rt.InputButton)
+    if not (meta.is_enum_value(new_binding, rt.KeyboardKey) or meta.is_enum_value(new_binding, rt.GamepadButton)) then
+        rt.error("In rt.Gamestate:set_keybinding: new binding `" .. meta.typeof(new_binding) .. "` is not a keyboard key or gamepad button")
+    end
+
+    if notify_controller_state == nil then notify_controller_state = true end
+
+    meta.assert_enum(input_button, rt.InputButton)
+    local current_binding = self._state.keybinding[input_button]
+
+    -- replace first binding of same type (keyboard or gamepad)
+    local keyboard_or_gamepad = meta.is_enum_value(new_binding, rt.KeyboardKey)
+    local replace_i = 1
+    for i = 1, #current_binding do
+        if meta.is_enum_value(current_binding[replace_i], rt.KeyboardKey) and keyboard_or_gamepad == true then
+            replace_i = i
+            break
+        elseif meta.is_enum_value(current_binding[replace_i], rt.GamepadButton) and keyboard_or_gamepad == false then
+            replace_i = i
+            break
+        end
+    end
+    current_binding[replace_i] = new_binding
+
+    if notify_controller_state then
+        rt.InputControllerState:load_mapping(self._state.keybinding)
+    end
+end
