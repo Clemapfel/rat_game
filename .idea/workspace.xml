@@ -24,9 +24,8 @@
   <component name="ChangeListManager">
     <list default="true" id="7fa9ba1b-2cff-4ecc-86fb-59ab2fa76ee1" name="Changes" comment="stashing before refactored mapping">
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/common/game_state.lua" beforeDir="false" afterPath="$PROJECT_DIR$/common/game_state.lua" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/common/input_controller.lua" beforeDir="false" afterPath="$PROJECT_DIR$/common/input_controller.lua" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/menu/keybinding_scene.lua" beforeDir="false" afterPath="$PROJECT_DIR$/menu/keybinding_scene.lua" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/fast_physics/world_thread_love.lua" beforeDir="false" afterPath="$PROJECT_DIR$/fast_physics/world_thread_love.lua" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/main_box2d.lua" beforeDir="false" afterPath="$PROJECT_DIR$/main_box2d.lua" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -134,7 +133,7 @@
       <recent name="C:\Users\cleme\Workspace\rat_game\menu" />
     </key>
   </component>
-  <component name="RunManager" selected="Lua Application.main">
+  <component name="RunManager" selected="Lua Application.main_box2d">
     <configuration name="main" type="lua.app" factoryName="Lua Application">
       <module name="rat_game" />
       <option name="program" value="C:\Users\cleme\Workspace\rat_game\love\windows\love.exe" />
@@ -506,15 +505,7 @@
       <workItem from="1725497293442" duration="2685000" />
       <workItem from="1725500236845" duration="1577000" />
       <workItem from="1725502219832" duration="13568000" />
-      <workItem from="1725574350718" duration="18410000" />
-    </task>
-    <task id="LOCAL-00986" summary="added info object constants">
-      <option name="closed" value="true" />
-      <created>1724432900678</created>
-      <option name="number" value="00986" />
-      <option name="presentableId" value="LOCAL-00986" />
-      <option name="project" value="LOCAL" />
-      <updated>1724432900678</updated>
+      <workItem from="1725574350718" duration="20188000" />
     </task>
     <task id="LOCAL-00987" summary="stashing before removing keymapper">
       <option name="closed" value="true" />
@@ -900,7 +891,15 @@
       <option name="project" value="LOCAL" />
       <updated>1725639645357</updated>
     </task>
-    <option name="localTasksCounter" value="1035" />
+    <task id="LOCAL-01035" summary="stashing before refactored mapping">
+      <option name="closed" value="true" />
+      <created>1725641409711</created>
+      <option name="number" value="01035" />
+      <option name="presentableId" value="LOCAL-01035" />
+      <option name="project" value="LOCAL" />
+      <updated>1725641409711</updated>
+    </task>
+    <option name="localTasksCounter" value="1036" />
     <servers />
   </component>
   <component name="TypeScriptGeneratedFilesManager">

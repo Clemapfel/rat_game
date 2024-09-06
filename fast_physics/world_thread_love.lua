@@ -10,8 +10,9 @@ function b2.World:new_with_threads(gravity_x, gravity_y, n_threads)
         })
     end
 
-    sdl2 = ffi.load("SDL2")
-    ffi.cdef[[
+    if sdl2 == nil then
+        sdl2 = ffi.load("SDL2")
+        ffi.cdef[[
 void* SDL_CreateThread(int(*fn)(void*), const char *name, void *data);
 void SDL_WaitThread(void* thread, int *status);
 
@@ -35,24 +36,24 @@ typedef struct b2Task {
 void* malloc(size_t size);
 void free(void *ptr);
 ]]
+    end
 
     local world = setmetatable({
         --_native = nil,
-        _worker_to_main = love.thread.newChannel(),
-        _main_to_worker_channels = {},
+        _main_to_worker = {},
         _threads = {},
         _enqueue_task = nil,
         _finish_task = nil,
         _n_threads = n_threads,
         _step_i = 1,
         _step_i_to_semaphore = {},
-        _n_sempahores = 32,
+        _n_semaphores = 32,
         _n_dispatched = 0,
     }, {
         __index = b2.World
     })
 
-    for i = 1, world._n_sempahores do
+    for i = 1, world._n_semaphores do
         table.insert(world._step_i_to_semaphore, love.thread.newChannel())
     end
 
@@ -60,11 +61,7 @@ void free(void *ptr);
     def.gravity = ffi.typeof("b2Vec2")(gravity_x, gravity_y)
     def.workerCount = n_threads
 
-    for i = 1, n_threads do
-        table.insert(world._main_to_worker_channels, love.thread.newChannel())
-    end
-
-    local user_context = ffi.cast("b2UserContext*", ffi.C.malloc(ffi.sizeof("b2UserContext")))
+    local user_context = ffi.new("b2UserContext")
     user_context.n_threads = n_threads
     def.userTaskContext = user_context
 
@@ -76,8 +73,8 @@ void free(void *ptr);
             return ffi.CNULL
         end
 
-        local tasks = {}
         local n_tasks = 0
+        min_range = math.ceil(item_count / world._n_threads)
 
         local step_i = world._step_i
         local channel = world._step_i_to_semaphore[step_i]
@@ -95,7 +92,7 @@ void free(void *ptr);
             local callback_ptr = love.data.newByteData(ffi.sizeof("void*"))
             ffi.cast("void**", callback_ptr:getFFIPointer())[0] = task_callback
 
-            world._main_to_worker_channels[worker_i + 1]:push({
+            world._main_to_worker[worker_i + 1]:push({
                 start_i = start_i,
                 end_i = end_i,
                 worker_i = worker_i,
@@ -110,17 +107,11 @@ void free(void *ptr);
             item_i = item_i + (end_i - start_i)
         end
 
-        for task in values(tasks) do
-            world._main_to_worker_channels[task.worker_i + 1]:push(task)
-        end
-
-        world._n_dispatched = world._n_dispatched + n_tasks
-
         local dispatch = ffi.cast("b2ThreadDispatch*", ffi.C.malloc(sizeof("b2ThreadDispatch")))
         dispatch.n_dispatched = n_tasks
         dispatch.step_i = step_i
 
-        world._step_i = (world._step_i + 1) % world._n_sempahores
+        world._step_i = (world._step_i + 1) % world._n_semaphores
         return dispatch
     end
 
@@ -142,8 +133,9 @@ void free(void *ptr);
     def.finishTask = world._finish_task
 
     for i = 1, n_threads do
+        world._main_to_worker[i] = love.thread.newChannel()
         local thread = love.thread.newThread("fast_physics/world_thread_worker.lua")
-        thread:start(world._main_to_worker_channels[i], i - 1)
+        thread:start(world._main_to_worker[i], i - 1)
     end
 
     world._native = box2d.b2CreateWorld(def)
