@@ -93,6 +93,10 @@ function rt.ControlIndicator:realize()
     self._input_controller:signal_connect("input_method_changed", function(_, new)
         self:_update_snapshot()
     end)
+
+    self._input_controller:signal_connect("input_mapping_changed", function(_)
+        self:create_from(self._layout)
+    end)
 end
 
 --- @brief

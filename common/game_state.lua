@@ -89,81 +89,68 @@ end
 function rt.GameState:_get_default_mapping()
     return {
         [rt.InputButton.A] = {
-            rt.KeyboardKey.SPACE,
-            rt.GamepadButton.RIGHT
+            keyboard = rt.KeyboardKey.SPACE,
+            gamepad = rt.GamepadButton.RIGHT
         },
 
         [rt.InputButton.B] = {
-            rt.KeyboardKey.B,
-            rt.GamepadButton.BOTTOM
+            keyboard = rt.KeyboardKey.B,
+            gamepad = rt.GamepadButton.BOTTOM
         },
 
         [rt.InputButton.X] = {
-            rt.KeyboardKey.X,
-            rt.GamepadButton.TOP
+            keyboard = rt.KeyboardKey.X,
+            gamepad = rt.GamepadButton.TOP
         },
 
         [rt.InputButton.Y] = {
-            rt.KeyboardKey.Z,
-            rt.GamepadButton.LEFT
+            keyboard = rt.KeyboardKey.Z,
+            gamepad = rt.GamepadButton.LEFT
         },
 
         [rt.InputButton.L] = {
-            rt.KeyboardKey.L,
-            rt.GamepadButton.LEFT_SHOULDER
+            keyboard = rt.KeyboardKey.L,
+            gamepad = rt.GamepadButton.LEFT_SHOULDER
         },
 
         [rt.InputButton.R] = {
-            rt.KeyboardKey.R,
-            rt.GamepadButton.RIGHT_SHOULDER
+            keyboard = rt.KeyboardKey.R,
+            gamepad = rt.GamepadButton.RIGHT_SHOULDER
         },
 
         [rt.InputButton.START] = {
-            rt.KeyboardKey.M,
-            rt.KeyboardKey.RETURN,
-            rt.GamepadButton.START
+            keyboard = rt.KeyboardKey.M,
+            gamepad = rt.GamepadButton.START
         },
 
         [rt.InputButton.SELECT] = {
-            rt.KeyboardKey.N,
-            rt.KeyboardKey.RIGHT_SQUARE_BRACKET,
-            rt.KeyboardKey.BACKSLASH,
-            rt.GamepadButton.SELECT
+            keyboard = rt.KeyboardKey.N,
+            gamepad = rt.GamepadButton.SELECT
         },
 
         [rt.InputButton.UP] = {
-            rt.KeyboardKey.ARROW_UP,
-            rt.KeyboardKey.W,
-            rt.KeyboardKey.KEYPAD_EIGHT,
-            rt.GamepadButton.DPAD_UP,
+            keyboard = rt.KeyboardKey.ARROW_UP,
+            gamepad = rt.GamepadButton.DPAD_UP,
         },
 
         [rt.InputButton.RIGHT] = {
-            rt.KeyboardKey.ARROW_RIGHT,
-            rt.KeyboardKey.D,
-            rt.KeyboardKey.KEYPAD_SIX,
-            rt.GamepadButton.DPAD_RIGHT
+            keyboard = rt.KeyboardKey.ARROW_RIGHT,
+            gamepad = rt.GamepadButton.DPAD_RIGHT
         },
 
         [rt.InputButton.DOWN] = {
-            rt.KeyboardKey.ARROW_DOWN,
-            rt.KeyboardKey.S,
-            rt.KeyboardKey.KEYPAD_FIVE,
-            rt.KeyboardKey.KEYPAD_TWO,
-            rt.GamepadButton.DPAD_DOWN
+            keyboard = rt.KeyboardKey.ARROW_DOWN,
+            gamepad = rt.GamepadButton.DPAD_DOWN
         },
 
         [rt.InputButton.LEFT] = {
-            rt.KeyboardKey.ARROW_LEFT,
-            rt.KeyboardKey.A,
-            rt.KeyboardKey.KEYPAD_FOUR,
-            rt.GamepadButton.DPAD_LEFT
+            keyboard = rt.KeyboardKey.ARROW_LEFT,
+            gamepad = rt.GamepadButton.DPAD_LEFT
         },
 
         [rt.InputButton.DEBUG] = {
-            rt.KeyboardKey.ESCAPE,
-            rt.GamepadButton.LEFT_STICK,
-            rt.GamepadButton.RIGHT_STICK
+            keyboard = rt.KeyboardKey.ESCAPE,
+            gamepad = rt.GamepadButton.RIGHT_STICK,
         }
     }
 end
@@ -604,6 +591,7 @@ end
 
 --- @brief
 function rt.GameState:set_deadzone(fraction)
+    meta.assert_number(fraction)
     if not (fraction >= 0 and fraction < 1) then
         rt.error("In rt.GameState:set_deadzone: value `" .. fraction .. "` is outside [0, 1)")
     end
@@ -614,67 +602,27 @@ end
 --- @brief
 --- @return (rt.KeyboardKey, rt.GamepadButton)
 function rt.GameState:get_keybinding(input_button)
-    local first_keyboard_key, first_gamepad_button = nil, nil
-    for x in values(self._state.keybinding[input_button]) do
-        if meta.is_enum_value(x, rt.KeyboardKey) and not first_keyboard_key then
-            first_keyboard_key = x
-        elseif meta.is_enum_value(x, rt.GamepadButton) and not first_gamepad_button then
-            first_gamepad_button = x
-        end
-
-        if first_gamepad_button ~= nil and first_keyboard_key ~= nil then
-            return first_keyboard_key, first_gamepad_button
-        end
-    end
-
-    rt.error("In rt.InputControllerState: no keybinding for `" .. input_button .. "`")
-    return nil, nil
+    meta.assert_enum(input_button, rt.InputButton)
+    local binding = self._state.keybinding[input_button]
+    return binding.keyboard, binding.gamepad
 end
 
 --- @brief
 function rt.GameState:get_default_keybinding(input_button)
-    local default = self:_get_default_mapping()
-    local first_keyboard_key, first_gamepad_button = nil, nil
-    for x in values(default[input_button]) do
-        if meta.is_enum_value(x, rt.KeyboardKey) and first_keyboard_key == nil then
-            first_keyboard_key = x
-        elseif meta.is_enum_value(x, rt.GamepadButton) and first_gamepad_button == nil then
-            first_gamepad_button = x
-        end
-
-        if first_gamepad_button ~= nil and first_keyboard_key ~= nil then
-            return first_keyboard_key, first_gamepad_button
-        end
-    end
-
-    return nil, nil
+    meta.assert_enum(input_button, rt.InputButton)
+    local binding = self:_get_default_mapping()[input_button]
+    return binding.keyboard, binding.gamepad
 end
 
 --- @brief
-function rt.GameState:set_keybinding(input_button, new_binding, notify_controller_state)
+function rt.GameState:set_keybinding(input_button, keyboard_binding, gamepad_binding, notify_controller_state)
     meta.assert_enum(input_button, rt.InputButton)
-    if not (meta.is_enum_value(new_binding, rt.KeyboardKey) or meta.is_enum_value(new_binding, rt.GamepadButton)) then
-        rt.error("In rt.Gamestate:set_keybinding: new binding `" .. meta.typeof(new_binding) .. "` is not a keyboard key or gamepad button")
-    end
+    meta.assert_enum(keyboard_binding, rt.KeyboardKey)
+    meta.assert_enum(gamepad_binding, rt.GamepadButton)
 
-    if notify_controller_state == nil then notify_controller_state = true end
-
-    meta.assert_enum(input_button, rt.InputButton)
-    local current_binding = self._state.keybinding[input_button]
-
-    -- replace first binding of same type (keyboard or gamepad)
-    local keyboard_or_gamepad = meta.is_enum_value(new_binding, rt.KeyboardKey)
-    local replace_i = 1
-    for i = 1, #current_binding do
-        if meta.is_enum_value(current_binding[replace_i], rt.KeyboardKey) and keyboard_or_gamepad == true then
-            replace_i = i
-            break
-        elseif meta.is_enum_value(current_binding[replace_i], rt.GamepadButton) and keyboard_or_gamepad == false then
-            replace_i = i
-            break
-        end
-    end
-    current_binding[replace_i] = new_binding
+    local binding = self._state.keybinding[input_button]
+    binding.keyboard = keyboard_binding
+    binding.gamepad = gamepad_binding
 
     if notify_controller_state then
         rt.InputControllerState:load_mapping(self._state.keybinding)

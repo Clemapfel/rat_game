@@ -22,17 +22,11 @@
     </configurations>
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="7fa9ba1b-2cff-4ecc-86fb-59ab2fa76ee1" name="Changes" comment="added enkits">
+    <list default="true" id="7fa9ba1b-2cff-4ecc-86fb-59ab2fa76ee1" name="Changes" comment="stashing before refactored mapping">
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/assets/text/english/menu.lua" beforeDir="false" afterPath="$PROJECT_DIR$/assets/text/english/menu.lua" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/common/game_state.lua" beforeDir="false" afterPath="$PROJECT_DIR$/common/game_state.lua" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/common/input_button.lua" beforeDir="false" afterPath="$PROJECT_DIR$/common/input_button.lua" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/common/input_controller.lua" beforeDir="false" afterPath="$PROJECT_DIR$/common/input_controller.lua" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/common/message_dialog.lua" beforeDir="false" afterPath="$PROJECT_DIR$/common/message_dialog.lua" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/main.lua" beforeDir="false" afterPath="$PROJECT_DIR$/main.lua" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/menu/inventory_scene.lua" beforeDir="false" afterPath="$PROJECT_DIR$/menu/inventory_scene.lua" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/menu/keybinding_scene.lua" beforeDir="false" afterPath="$PROJECT_DIR$/menu/keybinding_scene.lua" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/old/common/message_dialog.lua" beforeDir="false" afterPath="$PROJECT_DIR$/old/common/message_dialog.lua" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -512,15 +506,7 @@
       <workItem from="1725497293442" duration="2685000" />
       <workItem from="1725500236845" duration="1577000" />
       <workItem from="1725502219832" duration="13568000" />
-      <workItem from="1725574350718" duration="16719000" />
-    </task>
-    <task id="LOCAL-00985" summary="added draw call performance metrics">
-      <option name="closed" value="true" />
-      <created>1724432852782</created>
-      <option name="number" value="00985" />
-      <option name="presentableId" value="LOCAL-00985" />
-      <option name="project" value="LOCAL" />
-      <updated>1724432852782</updated>
+      <workItem from="1725574350718" duration="18410000" />
     </task>
     <task id="LOCAL-00986" summary="added info object constants">
       <option name="closed" value="true" />
@@ -906,7 +892,15 @@
       <option name="project" value="LOCAL" />
       <updated>1725582548502</updated>
     </task>
-    <option name="localTasksCounter" value="1034" />
+    <task id="LOCAL-01034" summary="stashing before refactored mapping">
+      <option name="closed" value="true" />
+      <created>1725639645357</created>
+      <option name="number" value="01034" />
+      <option name="presentableId" value="LOCAL-01034" />
+      <option name="project" value="LOCAL" />
+      <updated>1725639645357</updated>
+    </task>
+    <option name="localTasksCounter" value="1035" />
     <servers />
   </component>
   <component name="TypeScriptGeneratedFilesManager">
@@ -955,7 +949,6 @@
     </option>
   </component>
   <component name="VcsManagerConfiguration">
-    <MESSAGE value="added keyboard indicator" />
     <MESSAGE value="added button indicators" />
     <MESSAGE value="added buttons and dpad" />
     <MESSAGE value="added start select button" />
@@ -980,7 +973,8 @@
     <MESSAGE value="added double button keybinding indicator" />
     <MESSAGE value="moved keybindings into game state" />
     <MESSAGE value="added enkits" />
-    <option name="LAST_COMMIT_MESSAGE" value="added enkits" />
+    <MESSAGE value="stashing before refactored mapping" />
+    <option name="LAST_COMMIT_MESSAGE" value="stashing before refactored mapping" />
   </component>
   <component name="XDebuggerManager">
     <breakpoint-manager>

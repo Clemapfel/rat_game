@@ -387,22 +387,25 @@ function rt.InputControllerState:validate_input_mapping(mapping)
     for button in values(meta.instances(rt.InputButton)) do
         if button ~= rt.InputButton.DEBUG then
             local keyboard_mapped, gamepad_mapped = false, false
-            for native in values(mapping[button]) do
-                if  meta.is_enum_value(native, rt.KeyboardKey) then
-                    keyboard_mapped = true
-                    if keyboard_to_button[native] == nil then
-                        keyboard_to_button[native] = {}
-                    end
-                    table.insert(keyboard_to_button[native], button)
-                elseif  meta.is_enum_value(native, rt.GamepadButton) then
-                    gamepad_mapped = true
-                    if gamepad_to_button[native] == nil then
-                        gamepad_to_button[native] = {}
-                    end
-                    table.insert(gamepad_to_button[native], button)
-                else
-                    rt.error("In rt.InputController.validate_input_mapping: unexpected value `" .. native .. "` for mapping of `" .. button .. "`")
+            local pair = mapping[button]
+            if meta.is_enum_value(pair.keyboard, rt.KeyboardKey) then
+                keyboard_mapped = true
+                if keyboard_to_button[pair.keyboard] == nil then
+                    keyboard_to_button[pair.keyboard] = {}
                 end
+                table.insert(keyboard_to_button[pair.keyboard], button)
+            else
+                rt.error("In rt.InputController.validate_input_mapping: unexpected keyboard value `" .. meta.typeof(pair.keyboard) .. "` for mapping of `" .. button .. "`")
+            end
+
+            if meta.is_enum_value(pair.gamepad, rt.GamepadButton) then
+                gamepad_mapped = true
+                if gamepad_to_button[pair.gamepad] == nil then
+                    gamepad_to_button[pair.gamepad] = {}
+                end
+                table.insert(gamepad_to_button[pair.gamepad], button)
+            else
+                rt.error("In rt.InputController.validate_input_mapping: unexpected  gamepad value`" .. meta.typeof(pair.gamepad) .. "` for mapping of `" .. button .. "`")
             end
 
             if keyboard_mapped == false then
@@ -490,8 +493,11 @@ function rt.InputControllerState:load_mapping(mapping)
 
     self.reverse_mapping = {}
     for input_button, natives in pairs(mapping) do
-        for native in values(natives) do
-            table.insert(self.mapping[input_button], native)
+        for native in range(natives.keyboard, natives.gamepad) do
+            self.mapping[input_button] = {
+                keyboard = natives.keyboard,
+                gamepad = natives.gamepad
+            }
             self.reverse_mapping[native] = input_button
         end
     end
@@ -502,7 +508,6 @@ function rt.InputControllerState:load_mapping(mapping)
     end
 
     for _, component in pairs(rt.InputControllerState.components) do
-        dbg(self.mapping)
         if not component._is_disabled then
             component:signal_emit("input_mapping_changed")
         end

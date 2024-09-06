@@ -506,21 +506,23 @@ end
 --- @brief
 function mn.KeybindingScene:_accept()
     local new_mapping = {}
+    local n_pairs = 0
     for item_row in values(self._items) do
         for item in values(item_row) do
             new_mapping[item.button] = {
-                item.keyboard_binding,
-                item.gamepad_binding
+                keyboard = item.keyboard_binding,
+                gamepad = item.gamepad_binding
             }
+            n_pairs = n_pairs + 1
         end
     end
 
     local is_valid, message = rt.InputControllerState:validate_input_mapping(new_mapping)
+
     if is_valid then
         local pair_i = 1
-        for button, key_gamepad in pairs(new_mapping) do
-            self._state:set_keybinding(button, key_gamepad[1], false)
-            self._state:set_keybinding(button, key_gamepad[2], pair_i >= #new_mapping) -- notify on last only
+        for button, binding in pairs(new_mapping) do
+            self._state:set_keybinding(button, binding.keyboard, binding.gamepad, pair_i >= n_pairs) -- only notify on last
             pair_i = pair_i + 1
         end
         rt.warning("in mn.KeybindingsScene._accept: go back to inventory todo")
