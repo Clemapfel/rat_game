@@ -10,13 +10,14 @@ function b2.World:new_with_threads(gravity_x, gravity_y, n_threads)
         })
     end
 
-    enki = ffi.load("enkiTS")
-    MAX_TASKS = 64
+    if enki == nil then
+        enki = ffi.load("enkiTS")
+        MAX_TASKS = 64
 
-    local cdef = love.filesystem.read("fast_physics/enki_cdef.h")
-    ffi.cdef(cdef)
-    box2d_extension = ffi.load("box2d_extension")
-    ffi.cdef[[
+        local cdef = love.filesystem.read("fast_physics/enki_cdef.h")
+        ffi.cdef(cdef)
+        box2d_extension = ffi.load("box2d_extension")
+        ffi.cdef[[
     typedef struct TaskData {
         b2TaskCallback* callback;
         void* context;
@@ -30,10 +31,9 @@ function b2.World:new_with_threads(gravity_x, gravity_y, n_threads)
     } UserContext;
 
     void b2ExtensionTest();
-    void b2InvokeTask(int32_t start_i, int32_t end_i, int32_t worker_i, TaskData* context);
+    void b2InvokeTask(uint32_t start_i, uint32_t end_i, uint32_t worker_i, void* context);
     ]]
-
-    box2d_extension.b2ExtensionTest()
+    end
 
     task_main = function(start_i, end_i, worker_i, context)
         local data = ffi.cast("TaskData*", context)

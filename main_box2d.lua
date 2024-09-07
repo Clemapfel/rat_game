@@ -68,7 +68,7 @@ if BENCHMARK then
         dbg(n_threads, sum / n)
     end
 else
-    n_threads = 8
+    n_threads = 20
     world = b2.World:new_with_threads(0, 100, n_threads)
     bodies = {}
     radii = {}
@@ -91,7 +91,7 @@ else
     spawn_ball = function()
         local margin = 0.3
         local x, y = rt.random.number(0.5 * rt.graphics.get_width() - margin * world_w, 0.5 * rt.graphics.get_width() + margin * world_w), rt.random.number(0.5 * rt.graphics.get_height() - margin * world_h, 0.5 * rt.graphics.get_height() + margin * world_h)
-        local radius = rt.random.number(5, 10)
+        local radius = rt.random.number(3, 4)
         local body = b2.Body(world, b2.BodyType.DYNAMIC, x, y)
         local shape = b2.CircleShape(body, b2.Circle(radius))
         shape:set_restitution(1.5)
@@ -102,12 +102,14 @@ else
         n_balls = n_balls + 1
     end
 
-    for i = 1, 2000 do
+    for i = 1, idk  do
         spawn_ball()
     end
 
     love.update = function(dt)
+        clock = rt.Clock()
         world:step(dt, 4)
+        println(clock:restart():as_seconds() / (1 / 60))
     end
 
     love.draw = function()
