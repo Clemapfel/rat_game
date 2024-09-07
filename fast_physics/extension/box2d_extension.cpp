@@ -11,8 +11,8 @@ static void test_callback( int32_t startIndex, int32_t endIndex, uint32_t worker
 
 void b2ExtensionTest() {
     auto* data = new TaskData();
-    data.callback = test_callback;
-    data.context = nullptr;
+    data->callback = test_callback;
+    data->context = nullptr;
     b2InvokeTask(1234, 4567, 0, data);
     delete data;
 }

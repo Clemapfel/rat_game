@@ -35,13 +35,6 @@ function b2.World:new_with_threads(gravity_x, gravity_y, n_threads)
 
     box2d_extension.b2ExtensionTest()
 
-    task_data = ffi.new("TaskData")
-    task_data.callback = function(start_i, end_i, worker_i, context)
-        dbg(start_i, end_i, worker_i, "test")
-    end
-    task_data.context = ffi.CNULL
-    box2d_extension.b2InvokeTask(0, 1, 1, data)
-
     task_main = function(start_i, end_i, worker_i, context)
         local data = ffi.cast("TaskData*", context)
         data.callback(start_i, end_i, worker_i, data.context)
@@ -65,10 +58,10 @@ function b2.World:new_with_threads(gravity_x, gravity_y, n_threads)
             --enki.enkiAddTaskSet(context.scheduler, task)
             context.n_tasks = context.n_tasks + 1
 
-            box2d_extension.b2InvokeTask(0, n_items, 0, task_context);
+            box2d_extension.b2InvokeTask(0, n_items, 0, data);
             return ffi.CNULL
         else
-            task_callback(0, n_items, 0, context)
+            task_callback(0, n_items, 0, task_context)
             rt.warning("increase n tasks!")
             return ffi.CNULL
         end
