@@ -137,52 +137,56 @@ function rt.load_default_fonts()
 
     rt.settings.font.regular_fallbacks = {
         love.graphics.newFont("assets/fonts/NotoSans/NotoSans-Regular.ttf"),
+        love.graphics.newFont("assets/fonts/NotoSansJP/NotoSansJP-Regular.ttf"),
         noto_math,
         gnu_unifont
     }
 
     rt.settings.font.italic_fallbacks = {
         love.graphics.newFont("assets/fonts/NotoSans/NotoSans-Italic.ttf"),
+        love.graphics.newFont("assets/fonts/NotoSansJP/NotoSansJP-Regular.ttf"), -- no italic in japanese
         noto_math,
         gnu_unifont
     }
 
     rt.settings.font.bold_fallbacks = {
         love.graphics.newFont("assets/fonts/NotoSans/NotoSans-Bold.ttf"),
+        love.graphics.newFont("assets/fonts/NotoSansJP/NotoSansJP-Bold.ttf"),
         noto_math,
         gnu_unifont
     }
 
     rt.settings.font.bold_italic_fallbacks = {
         love.graphics.newFont("assets/fonts/NotoSans/NotoSans-BoldItalic.ttf"),
+        love.graphics.newFont("assets/fonts/NotoSansJP/NotoSansJP-Bold.ttf"), -- no italic in japanese
         noto_math,
         gnu_unifont
     }
 
     rt.settings.font.default = rt.Font(rt.settings.font.default_size,
-            "assets/fonts/DejaVuSans/DejaVuSans-Regular.ttf",
-            "assets/fonts/DejaVuSans/DejaVuSans-Bold.ttf",
-            "assets/fonts/DejaVuSans/DejaVuSans-Italic.ttf",
-            "assets/fonts/DejaVuSans/DejaVuSans-BoldItalic.ttf"
+        "assets/fonts/DejaVuSans/DejaVuSans-Regular.ttf",
+        "assets/fonts/DejaVuSans/DejaVuSans-Bold.ttf",
+        "assets/fonts/DejaVuSans/DejaVuSans-Italic.ttf",
+        "assets/fonts/DejaVuSans/DejaVuSans-BoldItalic.ttf"
     )
     rt.settings.font.default_mono = rt.Font(rt.settings.font.default_size,
-            "assets/fonts/DejaVuSansMono/DejaVuSansMono-Regular.ttf",
-            "assets/fonts/DejaVuSansMono/DejaVuSansMono-Bold.ttf",
-            "assets/fonts/DejaVuSansMono/DejaVuSansMono-Italic.ttf",
-            "assets/fonts/DejaVuSansMono/DejaVuSansMono-BoldItalic.ttf"
+        "assets/fonts/DejaVuSansMono/DejaVuSansMono-Regular.ttf",
+        "assets/fonts/DejaVuSansMono/DejaVuSansMono-Bold.ttf",
+        "assets/fonts/DejaVuSansMono/DejaVuSansMono-Italic.ttf",
+        "assets/fonts/DejaVuSansMono/DejaVuSansMono-BoldItalic.ttf"
     )
 
     rt.settings.font.default_small = rt.Font(rt.settings.font.default_size_small,
-            "assets/fonts/DejaVuSans/DejaVuSans-Regular.ttf",
-            "assets/fonts/DejaVuSans/DejaVuSans-Bold.ttf",
-            "assets/fonts/DejaVuSans/DejaVuSans-Italic.ttf",
-            "assets/fonts/DejaVuSans/DejaVuSans-BoldItalic.ttf"
+        "assets/fonts/DejaVuSans/DejaVuSans-Regular.ttf",
+        "assets/fonts/DejaVuSans/DejaVuSans-Bold.ttf",
+        "assets/fonts/DejaVuSans/DejaVuSans-Italic.ttf",
+        "assets/fonts/DejaVuSans/DejaVuSans-BoldItalic.ttf"
     )
     rt.settings.font.default_mono_small = rt.Font(rt.settings.font.default_size_small,
-            "assets/fonts/DejaVuSansMono/DejaVuSansMono-Regular.ttf",
-            "assets/fonts/DejaVuSansMono/DejaVuSansMono-Bold.ttf",
-            "assets/fonts/DejaVuSansMono/DejaVuSansMono-Italic.ttf",
-            "assets/fonts/DejaVuSansMono/DejaVuSansMono-BoldItalic.ttf"
+        "assets/fonts/DejaVuSansMono/DejaVuSansMono-Regular.ttf",
+        "assets/fonts/DejaVuSansMono/DejaVuSansMono-Bold.ttf",
+        "assets/fonts/DejaVuSansMono/DejaVuSansMono-Italic.ttf",
+        "assets/fonts/DejaVuSansMono/DejaVuSansMono-BoldItalic.ttf"
     )
 
     rt.settings.font.default_tiny = rt.Font(rt.settings.font.default_size_tiny,
@@ -199,16 +203,17 @@ function rt.load_default_fonts()
     )
 
     rt.settings.font.default_large = rt.Font(rt.settings.font.default_size_large,
-            "assets/fonts/DejaVuSans/DejaVuSans-Regular.ttf",
-            "assets/fonts/DejaVuSans/DejaVuSans-Bold.ttf",
-            "assets/fonts/DejaVuSans/DejaVuSans-Italic.ttf",
-            "assets/fonts/DejaVuSans/DejaVuSans-BoldItalic.ttf"
+        "assets/fonts/DejaVuSans/DejaVuSans-Regular.ttf",
+        "assets/fonts/DejaVuSans/DejaVuSans-Bold.ttf",
+        "assets/fonts/DejaVuSans/DejaVuSans-Italic.ttf",
+        "assets/fonts/DejaVuSans/DejaVuSans-BoldItalic.ttf"
     )
+
     rt.settings.font.default_mono_large = rt.Font(rt.settings.font.default_size_large,
-            "assets/fonts/DejaVuSansMono/DejaVuSansMono-Regular.ttf",
-            "assets/fonts/DejaVuSansMono/DejaVuSansMono-Bold.ttf",
-            "assets/fonts/DejaVuSansMono/DejaVuSansMono-Italic.ttf",
-            "assets/fonts/DejaVuSansMono/DejaVuSansMono-BoldItalic.ttf"
+        "assets/fonts/DejaVuSansMono/DejaVuSansMono-Regular.ttf",
+        "assets/fonts/DejaVuSansMono/DejaVuSansMono-Bold.ttf",
+        "assets/fonts/DejaVuSansMono/DejaVuSansMono-Italic.ttf",
+        "assets/fonts/DejaVuSansMono/DejaVuSansMono-BoldItalic.ttf"
     )
 end
 rt.load_default_fonts()

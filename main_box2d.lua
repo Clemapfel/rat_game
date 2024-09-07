@@ -70,41 +70,13 @@ if BENCHMARK then
 else
     n_threads = 20
     world = b2.World:new_with_threads(0, 100, n_threads)
-    bodies = {}
-    radii = {}
-    colors = {}
-    floor = nil
 
+    local center_x, center_y = 0.5 * rt.graphics.get_width(), 0.5 * rt.graphics.get_height()
     local world_w, world_h = rt.graphics.get_width(), rt.graphics.get_height()
-    local floor_body = b2.Body(world, b2.BodyType.STATIC, 0.5 * world_w, 0.5 * world_h)
-    world_w = world_w * 0.9
-    world_h = world_h * 0.9
-    local left_wall = b2.SegmentShape(floor_body, b2.Segment(-0.5 * world_w, -0.5 * world_h, -0.5 * world_w, 0.5 * world_h))
-    local right_wall = b2.SegmentShape(floor_body, b2.Segment(0.5 * world_w, -0.5 * world_h, 0.5 * world_w, 0.5 * world_h))
-    local top_wall = b2.SegmentShape(floor_body, b2.Segment(-0.5 * world_w, -0.5 * world_h, 0.5 * world_w, -0.5 * world_h))
-    local bottom_wall = b2.SegmentShape(floor_body, b2.Segment(-0.5 * world_w, 0.5 * world_h, 0.5 * world_w, 0.5 * world_h))
 
-    floor = floor_body
-
-    table.insert(bodies, floor_body)
-    n_balls = 0
-    spawn_ball = function()
-        local margin = 0.3
-        local x, y = rt.random.number(0.5 * rt.graphics.get_width() - margin * world_w, 0.5 * rt.graphics.get_width() + margin * world_w), rt.random.number(0.5 * rt.graphics.get_height() - margin * world_h, 0.5 * rt.graphics.get_height() + margin * world_h)
-        local radius = rt.random.number(3, 4)
-        local body = b2.Body(world, b2.BodyType.DYNAMIC, x, y)
-        local shape = b2.CircleShape(body, b2.Circle(radius))
-        shape:set_restitution(1.5)
-        table.insert(bodies, body)
-        table.insert(radii, radius)
-        local color = rt.HSVA((n_balls % 256) / 256, 1, 1, 1)
-        table.insert(colors, {rt.color_unpack(rt.hsva_to_rgba(color))})
-        n_balls = n_balls + 1
-    end
-
-    for i = 1, idk  do
-        spawn_ball()
-    end
+    local floor_radius = 0.4 * world_w
+    local floor_body = b2.Body(world, b2.BodyType.STATIC, center_x, center_y)
+    local floor_shape = b2.Segment()
 
     love.update = function(dt)
         clock = rt.Clock()

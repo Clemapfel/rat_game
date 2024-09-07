@@ -1,3 +1,12 @@
+rt.settings.keybinding_indicator = {
+    font = rt.Font(rt.settings.font.default_size,
+        "assets/fonts/NotoSans/NotoSans-Regular.ttf"
+    ),
+    font_small = rt.Font(rt.settings.font.default_size_tiny,
+        "assets/fonts/NotoSans/NotoSans-Regular.ttf"
+    ),
+}
+
 --- @class rt.KeybindingIndicator
 rt.KeybindingIndicator = meta.new_type("KeybindingIndicator", rt.Widget, function()
     return meta.new(rt.KeybindingIndicator, {
@@ -420,9 +429,9 @@ function rt.KeybindingIndicator:create_as_l_or_r(l_or_r)
         local x, y, height = 0, 0, width
         local label
         if l_or_r == true then
-            label = rt.Label("<o>L</o>")
+            label = rt.Label("<o>L</o>", rt.settings.keybinding_indicator.font)
         else
-            label = rt.Label("<o>R</o>")
+            label = rt.Label("<o>R</o>", rt.settings.keybinding_indicator.font)
         end
 
         label:realize()
@@ -575,9 +584,9 @@ function rt.KeybindingIndicator:_as_joystick(left_or_right, width)
 
     local label
     if left_or_right == true then
-        label = rt.Label("<o>L</o>")
+        label = rt.Label("<o>L</o>", rt.settings.keybinding_indicator.font)
     else
-        label = rt.Label("<o>R</o>")
+        label = rt.Label("<o>R</o>", rt.settings.keybinding_indicator.font)
     end
 
     label:realize()
@@ -697,9 +706,9 @@ function rt.KeybindingIndicator:create_as_joystick(left_or_right)
 
         local label
         if left_or_right == true then
-            label = rt.Label("<o>L</o>")
+            label = rt.Label("<o>L</o>", rt.settings.keybinding_indicator.font)
         else
-            label = rt.Label("<o>R</o>")
+            label = rt.Label("<o>R</o>", rt.settings.keybinding_indicator.font)
         end
 
         label:realize()
@@ -904,7 +913,7 @@ function rt.KeybindingIndicator:create_as_key(text, is_space)
         end
 
         local font = nil
-        if is_space then font = rt.settings.font.default_tiny end
+        if is_space then font = rt.settings.keybinding_indicator.font_small end
         local label = rt.Label("<o>" .. text .. "</o>", font)
         label:set_justify_mode(rt.JustifyMode.CENTER)
         label:realize()
@@ -944,8 +953,8 @@ function rt.KeybindingIndicator:create_as_two_horizontal_keys(left_text, right_t
         local x, y, height = 0, 0, width
         local radius = 0.5 * width / 2
 
-        local right_label = rt.Label("<o>" .. right_text .. "</o>", rt.settings.font.default_small)
-        local left_label = rt.Label("<o>" .. left_text .. "</o>", rt.settings.font.default_small)
+        local right_label = rt.Label("<o>" .. right_text .. "</o>", rt.settings.keybinding_indicator.font_small)
+        local left_label = rt.Label("<o>" .. left_text .. "</o>", rt.settings.keybinding_indicator.font_small)
 
         for label in range(right_label, left_label) do
             label:realize()
@@ -1028,10 +1037,10 @@ function rt.KeybindingIndicator:create_as_four_keys(up_text, right_text, bottom_
         local x, y, height = 0, 0, width
         local radius = 0.5 * width / 2
 
-        local top_label = rt.Label("<o>" .. up_text .. "</o>", rt.settings.font.default_tiny)
-        local right_label = rt.Label("<o>" .. right_text .. "</o>", rt.settings.font.default_tiny)
-        local bottom_label = rt.Label("<o>" .. bottom_text .. "</o>", rt.settings.font.default_tiny)
-        local left_label = rt.Label("<o>" .. left_text .. "</o>", rt.settings.font.default_tiny)
+        local top_label = rt.Label("<o>" .. up_text .. "</o>", rt.settings.keybinding_indicator.font_small)
+        local right_label = rt.Label("<o>" .. right_text .. "</o>", rt.settings.keybinding_indicator.font_small)
+        local bottom_label = rt.Label("<o>" .. bottom_text .. "</o>", rt.settings.keybinding_indicator.font_small)
+        local left_label = rt.Label("<o>" .. left_text .. "</o>", rt.settings.keybinding_indicator.font_small)
 
         for label in range(top_label, right_label, bottom_label, left_label) do
             label:realize()
