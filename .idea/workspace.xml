@@ -22,13 +22,14 @@
     </configurations>
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="7fa9ba1b-2cff-4ecc-86fb-59ab2fa76ee1" name="Changes" comment="added benchmark">
-      <change afterPath="$PROJECT_DIR$/fast_physics/enki_cdef.h" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/fast_physics/world_thread_enki.lua" afterDir="false" />
+    <list default="true" id="7fa9ba1b-2cff-4ecc-86fb-59ab2fa76ee1" name="Changes" comment="stashing">
+      <change afterPath="$PROJECT_DIR$/fast_physics/extension/CMakeLists.txt" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/fast_physics/extension/box2d_extension.cpp" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/love/windows/box2d_extension.dll" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/fast_physics/box2d/benchmark/main.c" beforeDir="false" afterPath="$PROJECT_DIR$/fast_physics/box2d/benchmark/main.c" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/fast_physics/world.lua" beforeDir="false" afterPath="$PROJECT_DIR$/fast_physics/world.lua" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/main_box2d.lua" beforeDir="false" afterPath="$PROJECT_DIR$/main_box2d.lua" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/fast_physics/enki_cdef.h" beforeDir="false" afterPath="$PROJECT_DIR$/fast_physics/enki_cdef.h" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/fast_physics/extension/enki_extension.hpp" beforeDir="false" afterPath="$PROJECT_DIR$/fast_physics/extension/box2d_extension.hpp" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/fast_physics/world_thread_enki.lua" beforeDir="false" afterPath="$PROJECT_DIR$/fast_physics/world_thread_enki.lua" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -42,7 +43,7 @@
   <component name="Git.Settings">
     <option name="RECENT_BRANCH_BY_REPOSITORY">
       <map>
-        <entry key="$PROJECT_DIR$" value="box2c" />
+        <entry key="$PROJECT_DIR$" value="main" />
       </map>
     </option>
     <option name="RECENT_GIT_ROOT_PATH" value="$PROJECT_DIR$" />
@@ -104,7 +105,7 @@
     &quot;cf.first.check.clang-format&quot;: &quot;false&quot;,
     &quot;cidr.known.project.marker&quot;: &quot;true&quot;,
     &quot;deletionFromPopupRequiresConfirmation&quot;: &quot;false&quot;,
-    &quot;git-widget-placeholder&quot;: &quot;main&quot;,
+    &quot;git-widget-placeholder&quot;: &quot;enki__test&quot;,
     &quot;ignore.virus.scanning.warn.message&quot;: &quot;true&quot;,
     &quot;last_opened_file_path&quot;: &quot;C:/Users/cleme/Workspace/rat_game/love/windows&quot;,
     &quot;node.js.detected.package.eslint&quot;: &quot;true&quot;,
@@ -510,23 +511,8 @@
       <workItem from="1725502219832" duration="13568000" />
       <workItem from="1725574350718" duration="21308000" />
       <workItem from="1725658209639" duration="3213000" />
-      <workItem from="1725663050033" duration="1420000" />
-    </task>
-    <task id="LOCAL-00988" summary="stashing options menu">
-      <option name="closed" value="true" />
-      <created>1724441183302</created>
-      <option name="number" value="00988" />
-      <option name="presentableId" value="LOCAL-00988" />
-      <option name="project" value="LOCAL" />
-      <updated>1724441183302</updated>
-    </task>
-    <task id="LOCAL-00989" summary="added vector benchmark">
-      <option name="closed" value="true" />
-      <created>1724444592462</created>
-      <option name="number" value="00989" />
-      <option name="presentableId" value="LOCAL-00989" />
-      <option name="project" value="LOCAL" />
-      <updated>1724444592462</updated>
+      <workItem from="1725663050033" duration="1763000" />
+      <workItem from="1725672030549" duration="1535000" />
     </task>
     <task id="LOCAL-00990" summary="options scene layout done">
       <option name="closed" value="true" />
@@ -904,7 +890,23 @@
       <option name="project" value="LOCAL" />
       <updated>1725642929039</updated>
     </task>
-    <option name="localTasksCounter" value="1037" />
+    <task id="LOCAL-01037" summary="stashing">
+      <option name="closed" value="true" />
+      <created>1725671710448</created>
+      <option name="number" value="01037" />
+      <option name="presentableId" value="LOCAL-01037" />
+      <option name="project" value="LOCAL" />
+      <updated>1725671710448</updated>
+    </task>
+    <task id="LOCAL-01038" summary="stashing">
+      <option name="closed" value="true" />
+      <created>1725672016072</created>
+      <option name="number" value="01038" />
+      <option name="presentableId" value="LOCAL-01038" />
+      <option name="project" value="LOCAL" />
+      <updated>1725672016072</updated>
+    </task>
+    <option name="localTasksCounter" value="1039" />
     <servers />
   </component>
   <component name="TypeScriptGeneratedFilesManager">
@@ -964,7 +966,6 @@
     <MESSAGE value="refactored with text atlas" />
     <MESSAGE value="stashing text atlas" />
     <MESSAGE value="text atlas working" />
-    <MESSAGE value="stashing" />
     <MESSAGE value="key bindings selection graph working" />
     <MESSAGE value="refacotred keybinding indicator, control indicator now uses it" />
     <MESSAGE value="stashing imperfect l/r" />
@@ -978,7 +979,8 @@
     <MESSAGE value="added enkits" />
     <MESSAGE value="stashing before refactored mapping" />
     <MESSAGE value="added benchmark" />
-    <option name="LAST_COMMIT_MESSAGE" value="added benchmark" />
+    <MESSAGE value="stashing" />
+    <option name="LAST_COMMIT_MESSAGE" value="stashing" />
   </component>
   <component name="XDebuggerManager">
     <breakpoint-manager>

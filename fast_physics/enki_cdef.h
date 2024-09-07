@@ -47,17 +47,5 @@ void enkiInitTaskSchedulerWithConfig( void* pETS_, struct enkiTaskSchedulerConfi
 typedef void (* enkiTaskExecuteRange)( uint32_t start_, uint32_t end_, uint32_t threadnum_, void* pArgs_ );
 void* enkiCreateTaskSet( void* pETS_, enkiTaskExecuteRange taskFunc_  );
 
-typedef struct TaskData {
-    b2TaskCallback* callback;
-    void* context;
-} TaskData;
-
-typedef struct UserContext {
-    void* scheduler;
-    void* tasks[64];
-    TaskData task_data[64];
-    int n_tasks;
-} UserContext;
-
 void* malloc(size_t size);
 void free(void *ptr);

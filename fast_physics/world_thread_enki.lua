@@ -15,6 +15,32 @@ function b2.World:new_with_threads(gravity_x, gravity_y, n_threads)
 
     local cdef = love.filesystem.read("fast_physics/enki_cdef.h")
     ffi.cdef(cdef)
+    box2d_extension = ffi.load("box2d_extension")
+    ffi.cdef[[
+    typedef struct TaskData {
+        b2TaskCallback* callback;
+        void* context;
+    } TaskData;
+
+    typedef struct UserContext {
+        void* scheduler;
+        void* tasks[64];
+        TaskData task_data[64];
+        int n_tasks;
+    } UserContext;
+
+    void b2ExtensionTest();
+    void b2InvokeTask(int32_t start_i, int32_t end_i, int32_t worker_i, TaskData* context);
+    ]]
+
+    box2d_extension.b2ExtensionTest()
+
+    task_data = ffi.new("TaskData")
+    task_data.callback = function(start_i, end_i, worker_i, context)
+        dbg(start_i, end_i, worker_i, "test")
+    end
+    task_data.context = ffi.CNULL
+    box2d_extension.b2InvokeTask(0, 1, 1, data)
 
     task_main = function(start_i, end_i, worker_i, context)
         local data = ffi.cast("TaskData*", context)
@@ -28,7 +54,6 @@ function b2.World:new_with_threads(gravity_x, gravity_y, n_threads)
             local data = context.task_data[context.n_tasks]
             data.callback = task_callback
             data.context = task_context
-            data.test = 1234
 
             local params = ffi.typeof("enkiParamsTaskSet")()
             params.minRange = min_range
@@ -36,11 +61,12 @@ function b2.World:new_with_threads(gravity_x, gravity_y, n_threads)
             params.pArgs = data
             params.priority = 0
 
-            enki.enkiSetParamsTaskSet(task, params)
-            enki.enkiAddTaskSet(context.scheduler, task)
+            --enki.enkiSetParamsTaskSet(task, params)
+            --enki.enkiAddTaskSet(context.scheduler, task)
             context.n_tasks = context.n_tasks + 1
-            task_callback(0, n_items, 0, task_context)
-            return task
+
+            box2d_extension.b2InvokeTask(0, n_items, 0, task_context);
+            return ffi.CNULL
         else
             task_callback(0, n_items, 0, context)
             rt.warning("increase n tasks!")
