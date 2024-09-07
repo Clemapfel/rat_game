@@ -54,12 +54,12 @@ function b2.World:new_with_threads(gravity_x, gravity_y, n_threads)
             params.pArgs = data
             params.priority = 0
 
-            --enki.enkiSetParamsTaskSet(task, params)
-            --enki.enkiAddTaskSet(context.scheduler, task)
+            enki.enkiSetParamsTaskSet(task, params)
+            enki.enkiAddTaskSet(context.scheduler, task)
             context.n_tasks = context.n_tasks + 1
 
-            box2d_extension.b2InvokeTask(0, n_items, 0, data);
-            return ffi.CNULL
+            --box2d_extension.b2InvokeTask(0, n_items, 0, data);
+            return task
         else
             task_callback(0, n_items, 0, task_context)
             rt.warning("increase n tasks!")
@@ -69,7 +69,7 @@ function b2.World:new_with_threads(gravity_x, gravity_y, n_threads)
 
     finish_task = function(task_ptr, user_context)
         if task_ptr == ffi.CNULL then return end
-        local context = ffi.cast("UserContext*", context)
+        local context = ffi.cast("UserContext*", user_context)
         local task = ffi.cast("void*", task_ptr) -- enkiTaskSet*
         enki.enkiWaitForTaskSet(context.scheduler, task)
     end
@@ -89,7 +89,7 @@ function b2.World:new_with_threads(gravity_x, gravity_y, n_threads)
     enki.enkiInitTaskSchedulerWithConfig(context.scheduler, config)
 
     for task_i = 1, MAX_TASKS do
-        context.tasks[task_i - 1] = enki.enkiCreateTaskSet(context.scheduler, task_main)
+        context.tasks[task_i - 1] = enki.enkiCreateTaskSet(context.scheduler, box2d_extension.b2InvokeTask)
     end
 
     def.userTaskContext = context

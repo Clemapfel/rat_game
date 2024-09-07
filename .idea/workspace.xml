@@ -22,9 +22,11 @@
     </configurations>
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="7fa9ba1b-2cff-4ecc-86fb-59ab2fa76ee1" name="Changes" comment="stashing">
+    <list default="true" id="7fa9ba1b-2cff-4ecc-86fb-59ab2fa76ee1" name="Changes" comment="box2d extension working">
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/fast_physics/extension/box2d_extension.cpp" beforeDir="false" afterPath="$PROJECT_DIR$/fast_physics/extension/box2d_extension.cpp" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/fast_physics/extension/box2d_extension.hpp" beforeDir="false" afterPath="$PROJECT_DIR$/fast_physics/extension/box2d_extension.hpp" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/fast_physics/world_thread_enki.lua" beforeDir="false" afterPath="$PROJECT_DIR$/fast_physics/world_thread_enki.lua" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -508,15 +510,7 @@
       <workItem from="1725658209639" duration="3213000" />
       <workItem from="1725663050033" duration="1763000" />
       <workItem from="1725672030549" duration="1551000" />
-      <workItem from="1725673641569" duration="98000" />
-    </task>
-    <task id="LOCAL-00991" summary="fixed slider alignment">
-      <option name="closed" value="true" />
-      <created>1724520350450</created>
-      <option name="number" value="00991" />
-      <option name="presentableId" value="LOCAL-00991" />
-      <option name="project" value="LOCAL" />
-      <updated>1724520350450</updated>
+      <workItem from="1725673641569" duration="887000" />
     </task>
     <task id="LOCAL-00992" summary="added gamma correction">
       <option name="closed" value="true" />
@@ -902,7 +896,15 @@
       <option name="project" value="LOCAL" />
       <updated>1725673584820</updated>
     </task>
-    <option name="localTasksCounter" value="1040" />
+    <task id="LOCAL-01040" summary="box2d extension working">
+      <option name="closed" value="true" />
+      <created>1725673923288</created>
+      <option name="number" value="01040" />
+      <option name="presentableId" value="LOCAL-01040" />
+      <option name="project" value="LOCAL" />
+      <updated>1725673923288</updated>
+    </task>
+    <option name="localTasksCounter" value="1041" />
     <servers />
   </component>
   <component name="TypeScriptGeneratedFilesManager">
@@ -951,7 +953,6 @@
     </option>
   </component>
   <component name="VcsManagerConfiguration">
-    <MESSAGE value="added buttons and dpad" />
     <MESSAGE value="added start select button" />
     <MESSAGE value="stashing r/l" />
     <MESSAGE value="stashing icons" />
@@ -976,7 +977,8 @@
     <MESSAGE value="stashing before refactored mapping" />
     <MESSAGE value="added benchmark" />
     <MESSAGE value="stashing" />
-    <option name="LAST_COMMIT_MESSAGE" value="stashing" />
+    <MESSAGE value="box2d extension working" />
+    <option name="LAST_COMMIT_MESSAGE" value="box2d extension working" />
   </component>
   <component name="XDebuggerManager">
     <breakpoint-manager>

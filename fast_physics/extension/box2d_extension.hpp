@@ -21,6 +21,6 @@ extern "C" {
         int n_tasks;
     } UserContext;
 
-    EXPORT extern void b2InvokeTask(int32_t start_i, int32_t end_i, int32_t worker_i, TaskData* context);
+    EXPORT extern void b2InvokeTask(uint32_t start, uint32_t end, uint32_t threadIndex, void* context);
     EXPORT extern void b2ExtensionTest();
 }
