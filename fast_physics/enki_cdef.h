@@ -50,7 +50,6 @@ void* enkiCreateTaskSet( void* pETS_, enkiTaskExecuteRange taskFunc_  );
 typedef struct TaskData {
     b2TaskCallback* callback;
     void* context;
-    int32_t test;
 } TaskData;
 
 typedef struct UserContext {
