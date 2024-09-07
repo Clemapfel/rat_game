@@ -52,6 +52,9 @@ end
 function b2.World:step(delta, n_iterations)
     if n_iterations == nil then n_iterations = 4 end
     box2d.b2World_Step(self._native, delta, n_iterations)
+    if self._user_context ~= nil then -- enki threading
+        self._user_context.n_tasks = 0
+    end
 end
 
 --- @brief

@@ -12,7 +12,8 @@ require "fast_physics.shape"
 require "fast_physics.body"
 require "fast_physics.world"
 --require "fast_physics.world_thread_sdl"
-require "fast_physics.world_thread_love"
+--require "fast_physics.world_thread_love"
+require "fast_physics.world_thread_enki"
 
 BENCHMARK = false
 if BENCHMARK then
