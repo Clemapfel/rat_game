@@ -84,8 +84,8 @@ function mn.EntityInfo:_update()
         local number_prefix = "<mono><o>"
         local number_postfix = "</mono></o>"
 
-        local stat_prefix = "<o><color=" .. stat[3] .. ">"
-        local stat_postfix = "</color></o>"
+        local stat_prefix = "<color=" .. stat[3] .. ">"
+        local stat_postfix = "</color>"
 
         local value_label = self["_" .. stat[1] .. "_value_label"]
         value_label:set_text(stat_prefix .. number_prefix .. self["_" .. stat[1] .. "_value"] .. number_postfix .. stat_postfix)
@@ -210,6 +210,7 @@ end
 
 --- @brief
 function mn.EntityInfo:set_values(hp, attack, defense, speed)
+    meta.assert_number(hp, attack, defense, speed)
     self._hp_value = hp
     self._attack_value = attack
     self._defense_value = defense

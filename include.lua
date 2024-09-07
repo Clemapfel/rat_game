@@ -155,5 +155,6 @@ require "menu.keybinding_scene"
 
 -- state
 require "common.game_state"
+require "common.game_state_scene"
 require "common.game_state_battle"
 

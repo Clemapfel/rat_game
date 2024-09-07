@@ -77,7 +77,8 @@ function rt.GameState:add_entity(entity)
         id = "",
         moves = {},
         equips = {},
-        consumables = {}
+        consumables = {},
+        statuses = {}
     }
 
     for i = 1, n_moves do
@@ -519,6 +520,28 @@ for which in range("move", "equip", "consumable") do
             return entry.count
         end
     end
+end
+
+--- @brief
+--- @return Number, Number, Number, Number
+function rt.GameState:entity_preview_equip(entity, slot_i, new_equip)
+
+    local previous = self:entity_get_equip(entity, slot_i)
+
+    if new_equip == nil then
+        self:entity_remove_equip(entity, slot_i)
+    else
+        self:entity_add_equip(entity, slot_i, new_equip)
+    end
+
+    local hp, attack, defense, speed = entity:get_hp(), entity:get_attack_current(), entity:get_defense_current(), entity:get_speed_current()
+
+    self:entity_remove_equip(entity, slot_i)
+    if previous ~= nil then
+        self:entity_add_equip(entity, slot_i, previous)
+    end
+
+    return hp, attack, defense, speed
 end
 
 --- @brief
@@ -1063,7 +1086,6 @@ function rt.GameState:initialize_debug_state()
     }
 
     for entity in values(entities) do
-
         local possible_moves = rt.random.shuffle({table.unpack(moves)})
         local move_i = 1
         for slot_i = 1, entity:get_n_move_slots() do

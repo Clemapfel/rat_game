@@ -217,7 +217,7 @@ for which in range("hp", "attack", "defense", "speed") do
             value = value * equip[which .. "_base_factor"]
         end
 
-        return math.ceil(value)
+        return math.max(0, math.ceil(value))
     end
 
     if which ~= "hp" then
@@ -234,13 +234,13 @@ for which in range("hp", "attack", "defense", "speed") do
                 value = value * status[which .. "_factor"]
             end
 
-            return math.ceil(value)
+            return math.max(0, math.ceil(value))
         end
     end
 
     --- @brief get_hp, get_attack, get_defense, get_speed
     bt.Entity["get_" .. which] = function(self)
-        return self["get_" .. which .. "_current"]
+        return self["get_" .. which .. "_current"](self)
     end
 end
 

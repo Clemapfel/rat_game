@@ -45,8 +45,8 @@ return {
     },
 
     -- rt.input_button_to_string
-    [rt.InputButton.A] = "Accept",
-    [rt.InputButton.B] = "Cancel",
+    [rt.InputButton.A] = "A",
+    [rt.InputButton.B] = "B",
     [rt.InputButton.X] = "X",
     [rt.InputButton.Y] = "Y",
     [rt.InputButton.UP] = "Move Up",

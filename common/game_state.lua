@@ -8,12 +8,14 @@ rt.settings.motion_intensity = 1.0
 rt.settings.music_level = 1.0
 rt.settings.sfx_level = 1.0
 
+--- @class rt.VSyncMode
 rt.VSyncMode = {
     ADAPTIVE = -1,
     OFF = 0,
     ON = 1
 }
 
+--- @class rt.MSAAQuality
 rt.MSAAQuality = {
     OFF = 0,
     GOOD = 2,
@@ -72,6 +74,7 @@ rt.GameState = meta.new_type("GameState", function()
         _render_shader = rt.Shader("common/game_state_render_shader.glsl"),
 
         _current_scene = nil,
+        _scenes = {}, -- Table<meta.Type, rt.Scene>
         _active_coroutines = {} -- Table<rt.Coroutine>
     })
 
@@ -434,29 +437,6 @@ function rt.GameState:_draw()
         self._current_scene:draw()
     end
 end
-
---- @brief
-function rt.GameState:set_current_scene(scene)
-    meta.assert_isa(scene, rt.Scene)
-    table.insert(self._active_coroutines, rt.Coroutine(function()
-        if self._current_scene ~= nil then
-            self._current_scene:set_is_active(false)
-        end
-        self._current_scene = scene
-        self._current_scene:set_is_active(true)
-        rt.savepoint_maybe()
-        self._current_scene:realize()
-        rt.savepoint_maybe()
-        self._current_scene:fit_into(0, 0, self._state.resolution_x, self._state.resolution_y)
-        rt.savepoint_maybe()
-    end))
-end
-
-rt.VSyncMode = {
-    ADAPTIVE = -1,
-    OFF = 0,
-    ON = 1
-}
 
 --- @brief
 function rt.GameState:set_vsync_mode(mode)

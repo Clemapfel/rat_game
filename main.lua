@@ -3,24 +3,20 @@ require "include"
 state = rt.GameState()
 state:initialize_debug_state()
 
-inventory_scene = mn.InventoryScene(state)
-option_scene = mn.OptionsScene(state)
-keybinding_scene = mn.KeybindingScene(state)
-
 input = rt.InputController()
 input:signal_connect("keyboard_pressed", function(_, which)
     if which == rt.KeyboardKey.ONE then
-        state:set_current_scene(inventory_scene)
+        state:set_current_scene(mn.InventoryScene)
     elseif which == rt.KeyboardKey.TWO then
-        state:set_current_scene(option_scene)
+        state:set_current_scene(mn.OptionsScene)
     elseif which == rt.KeyboardKey.THREE then
-        state:set_current_scene(keybinding_scene)
+        state:set_current_scene(mn.KeybindingScene)
     end
 end)
 
 love.load = function()
     state:_load()
-    state:set_current_scene(keybinding_scene)
+    state:set_current_scene(mn.InventoryScene)
     love.resize(love.graphics.getWidth(), love.graphics.getHeight())
 end
 

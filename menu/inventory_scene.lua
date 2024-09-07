@@ -122,10 +122,7 @@ function mn.InventoryScene:realize()
         rt.MessageDialogOption.ACCEPT
     )
     self._template_apply_unsuccesfull_dialog:realize()
-
-
     self._template_rename_keyboard:realize()
-
 
     self:create_from_state(self._state)
     self._is_realized = true
@@ -143,7 +140,6 @@ function mn.InventoryScene:create_from_state(state)
     table.sort(entities, function(a, b)
         return self._state:entity_get_party_index(a) < self._state:entity_get_party_index(b)
     end)
-
 
     for entity_i, entity in ipairs(entities) do
         local tab_sprite = rt.Sprite(entity:get_portrait_sprite_id())
@@ -269,7 +265,6 @@ function mn.InventoryScene:size_allocate(x, y, width, height)
 
     self._entity_tab_bar:fit_into(current_x, current_y, tab_w, height - outer_margin - (current_y - y))
     local entity_bar_selection_nodes = self._entity_tab_bar:get_selection_nodes()
-
 
     current_x = current_x + tile_size + 2 * m
     for page in values(self._entity_pages) do
@@ -1534,6 +1529,7 @@ function mn.InventoryScene:_regenerate_selection_nodes()
                         scene:_set_verbose_info_object(object)
                     end
                     scene:_set_grabbed_object_allowed(equip_slot_allow_deposit() or equip_slot_allow_swap())
+                    scene:_update_entity_info_preview(node_i)
                 else
                     local object = scene._state:entity_get_consumable(entity, node_i - n_equip_slots)
                     if object == nil and not scene._state:has_grabbed_object() then
@@ -1542,6 +1538,7 @@ function mn.InventoryScene:_regenerate_selection_nodes()
                         scene:_set_verbose_info_object(object)
                     end
                     scene:_set_grabbed_object_allowed(consumable_slot_allow_deposit() or consumable_slot_allow_swap())
+                    scene:_reset_entity_info_preview()
                 end
 
                 local slots = scene._entity_pages[page_i].equips_and_consumables
@@ -1554,6 +1551,7 @@ function mn.InventoryScene:_regenerate_selection_nodes()
                 local slots = scene._entity_pages[page_i].equips_and_consumables
                 slots:set_selection_state(rt.SelectionState.INACTIVE)
                 slots:set_slot_selection_state(node_i, rt.SelectionState.INACTIVE)
+                scene:_reset_entity_info_preview()
             end)
 
             node:signal_connect(rt.InputButton.B, on_b_undo_grab)
@@ -1624,6 +1622,9 @@ function mn.InventoryScene:_regenerate_selection_nodes()
                             scene._undo_grab = function() end
                         end
                     end
+                    
+                    scene:_update_entity_info()
+                    scene:_update_entity_info_preview(node_i)
                 else
                     local up = scene._state:peek_grabbed_object()
                     local slot_i = node_i - page.entity:get_n_equip_slots()
@@ -1738,6 +1739,8 @@ function mn.InventoryScene:_regenerate_selection_nodes()
                         )
                     end
                 end
+                scene:_update_entity_info()
+                scene:_update_entity_info_preview(node_i)
             end)
 
             node:signal_connect(rt.InputButton.Y, slots_sort_on_y)
@@ -1840,6 +1843,7 @@ function mn.InventoryScene:_regenerate_selection_nodes()
 
             scene._state:remove_shared_equip(to_equip)
             scene._state:entity_add_equip(entity, slot_i, to_equip)
+            scene:_update_entity_info()
             scene:_play_transfer_object_animation(
                 to_equip,
                 scene._shared_equip_list:get_item_aabb(scene._shared_equip_list:get_selected_item_i()),
@@ -2009,6 +2013,17 @@ function mn.InventoryScene:_regenerate_selection_nodes()
     self:_set_control_indicator_layout(self._selection_graph:get_current_node():get_control_layout())
 end
 
+--- @override
+function mn.InventoryScene:make_active()
+    if self._is_realized == false then self:realize() end
+    self._is_active = true
+end
+
+--- @override
+function mn.InventoryScene:make_inactive()
+    self._is_active = false
+end
+
 --- @brief
 function mn.InventoryScene:_set_verbose_info_object(...)
     self._verbose_info:show(self._state:peek_grabbed_object(), ...)
@@ -2045,6 +2060,32 @@ function mn.InventoryScene:_update_grabbed_object()
         self._grabbed_object_sprite_x = current.x + 0.5 * current.width
         self._grabbed_object_sprite_y = current.y + 0.5 * current.height
     end
+end
+
+--- @brief
+function mn.InventoryScene:_update_entity_info()
+    local info = self._entity_pages[self._entity_index].info
+    local entity = self._entity_pages[self._entity_index].entity
+    info:set_values(entity:get_hp(), entity:get_attack(), entity:get_defense(), entity:get_speed())
+end
+
+--- @brief
+function mn.InventoryScene:_update_entity_info_preview(equip_slot_i)
+    local up = self._state:peek_grabbed_object()
+    local page = self._entity_pages[self._entity_index]
+    local down = self._state:entity_get_equip(page.entity, equip_slot_i)
+
+    if up ~= nil and meta.isa(up, bt.Equip) then
+        page.info:set_preview_values(self._state:entity_preview_equip(page.entity, equip_slot_i, up))
+    else
+        page.info:set_preview_values(nil, nil, nil, nil)
+    end
+end
+
+--- @brief
+function mn.InventoryScene:_reset_entity_info_preview()
+    local page = self._entity_pages[self._entity_index]
+    page.info:set_preview_values(nil, nil, nil, nil)
 end
 
 --- @brief

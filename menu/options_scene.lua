@@ -11,6 +11,7 @@ mn.OptionsScene = meta.new_type("MenuOptionsScene", rt.Scene, function(state)
         _items = {},
         _verbose_info = mn.VerboseInfoPanel(),
         _selection_graph = rt.SelectionGraph(),
+        _default_node = nil, -- rt.SelectionGraphNode
         _input_controller = rt.InputController(),
         _control_indicator = rt.ControlIndicator(),
         _heading_label = nil, -- rt.Label
@@ -242,16 +243,6 @@ function mn.OptionsScene:realize()
         table.insert(scene._items, item)
     end
 
-    create_button_and_label("fullscreen", self._fullscreen_label_text, function(_, which)
-        local on
-        if which == scene._fullscreen_true_label then
-            on = true
-        elseif which == scene._fullscreen_false_label then
-            on = false
-        end
-        scene._state:set_is_fullscreen(on)
-    end)
-
     create_button_and_label("vsync", self._vsync_label_text, function(_, which)
         scene._state:set_vsync_mode(scene._vsync_label_to_vsync_mode[which])
     end)
@@ -279,6 +270,16 @@ function mn.OptionsScene:realize()
         end
 
         scene._state:set_resolution(x_res, y_res)
+    end)
+
+    create_button_and_label("fullscreen", self._fullscreen_label_text, function(_, which)
+        local on
+        if which == scene._fullscreen_true_label then
+            on = true
+        elseif which == scene._fullscreen_false_label then
+            on = false
+        end
+        scene._state:set_is_fullscreen(on)
     end)
 
     --
@@ -362,10 +363,12 @@ function mn.OptionsScene:realize()
 
     self._input_controller:signal_disconnect_all()
     self._input_controller:signal_connect("pressed", function(_, which)
+        if self._is_active == false then return end
         self:_handle_button_pressed(which)
     end)
 
     self._input_controller:signal_connect("released", function(_, which)
+        if self._is_active == false then return end
         if self._scale_is_selected then
             self._scale_delay_elapsed = 0
             self._scale_tick_elapsed = 0
@@ -583,7 +586,12 @@ function mn.OptionsScene:_regenerate_selection_nodes()
         scene._keymap_item.frame:set_selection_state(rt.SelectionState.INACTIVE)
     end)
 
-    self._selection_graph:set_current_node(item_to_node[self._items[1]])
+    keymap_node:signal_connect(rt.InputButton.A, function(_)
+        self._state:set_current_scene(mn.KeybindingScene)
+    end)
+
+    self._default_node = item_to_node[self._items[1]]
+    self._selection_graph:set_current_node(self._default_node)
 end
 
 --- @override
@@ -650,4 +658,16 @@ function mn.OptionsScene:_handle_button_pressed(which)
     if self._is_active ~= true then return end
 
     self._selection_graph:handle_button(which)
+end
+
+--- @override
+function mn.OptionsScene:make_active()
+    if self._is_realized == false then self:realize() end
+    self._is_active = true
+    self._selection_graph:set_current_node(self._default_node)
+end
+
+--- @override
+function mn.OptionsScene:make_inactive()
+    self._is_active = false
 end

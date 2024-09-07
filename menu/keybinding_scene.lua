@@ -21,6 +21,7 @@ mn.KeybindingScene = meta.new_type("KeybindingScene", rt.Scene, function(state)
         _heading_frame = rt.Frame(),
         _control_indicator = rt.ControlIndicator(),
         _selection_graph = rt.SelectionGraph(),
+        _accept_node = nil, -- rt.SelectionGraphNode
 
         _input = rt.InputController(),
         _assignment_active = false,
@@ -30,6 +31,7 @@ mn.KeybindingScene = meta.new_type("KeybindingScene", rt.Scene, function(state)
         _confirm_load_default_dialog = nil, -- rt.MessageDialog
         _confirm_abort_dialog = nil, -- rt.MessageDialog
         _keybinding_invalid_dialog = nil, -- rt.MessageDialog
+
     })
 end, {
     button_layout = {
@@ -103,22 +105,25 @@ function mn.KeybindingScene:realize()
     end
 
     self._input:signal_connect("pressed", function(_, which)
-        if scene._skip_frame > 0 or is_dialog_active() then return end
-
+        if self._is_active == false or scene._skip_frame > 0 or is_dialog_active() then return end
         if not scene._assignment_active then
-            scene._selection_graph:handle_button(which)
+            if which == rt.InputButton.B then
+                self:_exit_scene()
+            else
+                scene._selection_graph:handle_button(which)
+            end
         end
     end)
 
     self._input:signal_connect("keyboard_pressed", function(_, which)
-        if scene._skip_frame > 0 or is_dialog_active() then return end
+        if self._is_active == false or scene._skip_frame > 0 or is_dialog_active() then return end
         if scene._assignment_active then
             scene:_finish_assignment(which)
         end
     end)
 
     self._input:signal_connect("gamepad_pressed", function(_, which)
-        if scene._skip_frame > 0 or is_dialog_active() then return end
+        if self._is_active == false or scene._skip_frame > 0 or is_dialog_active() then return end
         if scene._assignment_active then
             scene:_finish_assignment(which)
         end
@@ -169,7 +174,7 @@ function mn.KeybindingScene:realize()
     self._confirm_abort_dialog:signal_disconnect_all()
     self._confirm_abort_dialog:signal_connect("selection", function(self, selection)
         if selection == rt.MessageDialogOption.ACCEPT then
-            rt.warning("in mn.KeybindingsScene._confirm_abort_dialog:selection: go back to inventory todo")
+            self:_exit_scene()
         else
             -- do nothing
         end
@@ -386,6 +391,7 @@ function mn.KeybindingScene:_regenerate_selection_nodes()
     end)
 
     self._selection_graph:set_current_node(item_rows[1][1])
+    self._accept_node = accept_node
 end
 
 --- @override
@@ -482,6 +488,18 @@ function mn.KeybindingScene:draw()
     end
 end
 
+--- @override
+function mn.KeybindingScene:make_active()
+    if not self._is_realized then self:realize() end
+    self._is_active = true
+    self._selection_graph:set_current_node(self._accept_node)
+end
+
+--- @override
+function mn.KeybindingScene:make_inactive()
+    self._is_active = false
+end
+
 --- @brief
 function mn.KeybindingScene:_restore_defaults()
     self._confirm_load_default_dialog:present()
@@ -499,8 +517,7 @@ function mn.KeybindingScene:_abort()
             end
         end
     end
-
-    rt.warning("in mn.KeybindingsScene._abort: go back to inventory todo")
+    self:_exit_scene()
 end
 
 --- @brief
@@ -525,9 +542,14 @@ function mn.KeybindingScene:_accept()
             self._state:set_keybinding(button, binding.keyboard, binding.gamepad, pair_i >= n_pairs) -- only notify on last
             pair_i = pair_i + 1
         end
-        rt.warning("in mn.KeybindingsScene._accept: go back to inventory todo")
+        self:_exit_scene()
     else
         self._keybinding_invalid_dialog:set_submessage(message)
         self._keybinding_invalid_dialog:present()
     end
+end
+
+--- @brief
+function mn.KeybindingScene:_exit_scene()
+    self._state:set_current_scene(mn.OptionsScene)
 end

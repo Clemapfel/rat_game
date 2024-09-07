@@ -4,8 +4,13 @@ rt.Scene = meta.new_abstract_type("Scene", rt.Widget, {
 })
 
 --- @brief
-function rt.Scene:set_is_active(b)
-    self._is_active = b
+function rt.Scene:make_active()
+    rt.error("In " .. meta.typeof(self) .. ".make_active: abstract method called")
+end
+
+--- @brief
+function rt.Scene:make_inactive()
+    rt.error("In " .. meta.typeof(self) .. ".make_active: abstract method called")
 end
 
 --- @brief
