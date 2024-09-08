@@ -22,77 +22,12 @@
     </configurations>
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="7fa9ba1b-2cff-4ecc-86fb-59ab2fa76ee1" name="Changes" comment="implemented scene transitions, entity info preview working">
-      <change afterPath="$PROJECT_DIR$/backgrounds/background.lua" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/backgrounds/background_implementation.lua" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/backgrounds/background_shader_only.lua" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/backgrounds/clouds.glsl" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/backgrounds/contrast_test.glsl" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/backgrounds/dot_matrix.glsl" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/backgrounds/eye.glsl" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/backgrounds/gradient_derivative.glsl" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/backgrounds/guitar_strings.glsl" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/backgrounds/ink_in_water.glsl" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/backgrounds/lavalamp.glsl" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/backgrounds/parallel_lines.glsl" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/backgrounds/stained_glass.glsl" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/.gitignore" beforeDir="false" afterPath="$PROJECT_DIR$/.gitignore" afterDir="false" />
+    <list default="true" id="7fa9ba1b-2cff-4ecc-86fb-59ab2fa76ee1" name="Changes" comment="refactored background">
+      <change afterPath="$PROJECT_DIR$/backgrounds/bubblegum.glsl" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/assets/configs/entities/GIRL.lua" beforeDir="false" afterPath="$PROJECT_DIR$/assets/configs/entities/GIRL.lua" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/assets/configs/entities/MC.lua" beforeDir="false" afterPath="$PROJECT_DIR$/assets/configs/entities/MC.lua" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/assets/configs/entities/PROF.lua" beforeDir="false" afterPath="$PROJECT_DIR$/assets/configs/entities/PROF.lua" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/assets/configs/entities/RAT.lua" beforeDir="false" afterPath="$PROJECT_DIR$/assets/configs/entities/RAT.lua" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/battle/backgrounds/brusselator.glsl" beforeDir="false" afterPath="$PROJECT_DIR$/old/backgrounds/brusselator.glsl" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/battle/backgrounds/brusselator.lua" beforeDir="false" afterPath="$PROJECT_DIR$/old/backgrounds/brusselator.lua" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/battle/backgrounds/clouds.glsl" beforeDir="false" afterPath="$PROJECT_DIR$/old/backgrounds/clouds.glsl" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/battle/backgrounds/clouds.lua" beforeDir="false" afterPath="$PROJECT_DIR$/old/backgrounds/clouds.lua" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/battle/backgrounds/contrast_test.glsl" beforeDir="false" afterPath="$PROJECT_DIR$/old/backgrounds/contrast_test.glsl" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/battle/backgrounds/contrast_test.lua" beforeDir="false" afterPath="$PROJECT_DIR$/old/backgrounds/contrast_test.lua" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/battle/backgrounds/dot_matrix.glsl" beforeDir="false" afterPath="$PROJECT_DIR$/old/backgrounds/dot_matrix.glsl" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/battle/backgrounds/dot_matrix.lua" beforeDir="false" afterPath="$PROJECT_DIR$/old/backgrounds/dot_matrix.lua" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/battle/backgrounds/eye.glsl" beforeDir="false" afterPath="$PROJECT_DIR$/old/backgrounds/eye.glsl" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/battle/backgrounds/eye.lua" beforeDir="false" afterPath="$PROJECT_DIR$/old/backgrounds/eye.lua" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/battle/backgrounds/focus_rack_dots.glsl" beforeDir="false" afterPath="$PROJECT_DIR$/old/backgrounds/focus_rack_dots.glsl" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/battle/backgrounds/focus_rack_dots.lua" beforeDir="false" afterPath="$PROJECT_DIR$/old/backgrounds/focus_rack_dots.lua" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/battle/backgrounds/gradient_derivative.glsl" beforeDir="false" afterPath="$PROJECT_DIR$/old/backgrounds/gradient_derivative.glsl" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/battle/backgrounds/gradient_derivative.lua" beforeDir="false" afterPath="$PROJECT_DIR$/old/backgrounds/gradient_derivative.lua" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/battle/backgrounds/guitar_strings.glsl" beforeDir="false" afterPath="$PROJECT_DIR$/old/backgrounds/guitar_strings.glsl" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/battle/backgrounds/guitar_strings.lua" beforeDir="false" afterPath="$PROJECT_DIR$/old/backgrounds/guitar_strings.lua" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/battle/backgrounds/ink_in_water.glsl" beforeDir="false" afterPath="$PROJECT_DIR$/old/backgrounds/ink_in_water.glsl" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/battle/backgrounds/ink_in_water.lua" beforeDir="false" afterPath="$PROJECT_DIR$/old/backgrounds/ink_in_water.lua" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/battle/backgrounds/lavalamp.glsl" beforeDir="false" afterPath="$PROJECT_DIR$/old/backgrounds/lavalamp.glsl" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/battle/backgrounds/lavalamp.lua" beforeDir="false" afterPath="$PROJECT_DIR$/old/backgrounds/lavalamp.lua" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/battle/backgrounds/lichen.glsl" beforeDir="false" afterPath="$PROJECT_DIR$/old/backgrounds/lichen.glsl" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/battle/backgrounds/lichen.lua" beforeDir="false" afterPath="$PROJECT_DIR$/old/backgrounds/lichen.lua" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/battle/backgrounds/noise_ball.glsl" beforeDir="false" afterPath="$PROJECT_DIR$/old/backgrounds/noise_ball.glsl" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/battle/backgrounds/noise_ball.lua" beforeDir="false" afterPath="$PROJECT_DIR$/old/backgrounds/noise_ball.lua" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/battle/backgrounds/overlap_lines.lua" beforeDir="false" afterPath="$PROJECT_DIR$/old/backgrounds/overlap_lines.lua" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/battle/backgrounds/parallell_lines.glsl" beforeDir="false" afterPath="$PROJECT_DIR$/old/backgrounds/parallell_lines.glsl" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/battle/backgrounds/parallell_lines.lua" beforeDir="false" afterPath="$PROJECT_DIR$/old/backgrounds/parallell_lines.lua" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/battle/backgrounds/polar_coordinates.glsl" beforeDir="false" afterPath="$PROJECT_DIR$/old/backgrounds/polar_coordinates.glsl" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/battle/backgrounds/polar_coordinates.lua" beforeDir="false" afterPath="$PROJECT_DIR$/old/backgrounds/polar_coordinates.lua" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/battle/backgrounds/sdf_meatballs.lua" beforeDir="false" afterPath="$PROJECT_DIR$/old/backgrounds/sdf_meatballs.lua" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/battle/backgrounds/sdf_meatballs_compute.glsl" beforeDir="false" afterPath="$PROJECT_DIR$/old/backgrounds/sdf_meatballs_compute.glsl" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/battle/backgrounds/sdf_meatballs_render.glsl" beforeDir="false" afterPath="$PROJECT_DIR$/old/backgrounds/sdf_meatballs_render.glsl" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/battle/backgrounds/stained_glass_butterfly.glsl" beforeDir="false" afterPath="$PROJECT_DIR$/old/backgrounds/stained_glass_butterfly.glsl" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/battle/backgrounds/stained_glass_butterfly.lua" beforeDir="false" afterPath="$PROJECT_DIR$/old/backgrounds/stained_glass_butterfly.lua" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/battle/backgrounds/topography.glsl" beforeDir="false" afterPath="$PROJECT_DIR$/old/backgrounds/topography.glsl" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/battle/backgrounds/topography.lua" beforeDir="false" afterPath="$PROJECT_DIR$/old/backgrounds/topography.lua" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/battle/backgrounds/triangle_tiling.glsl" beforeDir="false" afterPath="$PROJECT_DIR$/old/backgrounds/triangle_tiling.glsl" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/battle/backgrounds/triangle_tiling.lua" beforeDir="false" afterPath="$PROJECT_DIR$/old/backgrounds/triangle_tiling.lua" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/battle/backgrounds/voronoi_crystals.glsl" beforeDir="false" afterPath="$PROJECT_DIR$/old/backgrounds/voronoi_crystals.glsl" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/battle/backgrounds/voronoi_crystals.lua" beforeDir="false" afterPath="$PROJECT_DIR$/old/backgrounds/voronoi_crystals.lua" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/battle/backgrounds/voroworms.glsl" beforeDir="false" afterPath="$PROJECT_DIR$/old/backgrounds/voroworms.glsl" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/battle/backgrounds/voroworms.lua" beforeDir="false" afterPath="$PROJECT_DIR$/old/backgrounds/voroworms.lua" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/battle/backgrounds/worley.glsl" beforeDir="false" afterPath="$PROJECT_DIR$/old/backgrounds/worley.glsl" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/battle/backgrounds/worley.lua" beforeDir="false" afterPath="$PROJECT_DIR$/old/backgrounds/worley.lua" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/common/coroutine.lua" beforeDir="false" afterPath="$PROJECT_DIR$/common/coroutine.lua" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/backgrounds/background_shader_only.lua" beforeDir="false" afterPath="$PROJECT_DIR$/backgrounds/background_shader_only.lua" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/common/game_state.lua" beforeDir="false" afterPath="$PROJECT_DIR$/common/game_state.lua" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/common/graphics.lua" beforeDir="false" afterPath="$PROJECT_DIR$/common/graphics.lua" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/common/meta.lua" beforeDir="false" afterPath="$PROJECT_DIR$/common/meta.lua" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/include.lua" beforeDir="false" afterPath="$PROJECT_DIR$/include.lua" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/main.lua" beforeDir="false" afterPath="$PROJECT_DIR$/main.lua" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/menu/verbose_info_panel_item.lua" beforeDir="false" afterPath="$PROJECT_DIR$/menu/verbose_info_panel_item.lua" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -580,15 +515,7 @@
       <workItem from="1725663050033" duration="1763000" />
       <workItem from="1725672030549" duration="1551000" />
       <workItem from="1725673641569" duration="2761000" />
-      <workItem from="1725814509037" duration="10023000" />
-    </task>
-    <task id="LOCAL-00995" summary="added msaa widget">
-      <option name="closed" value="true" />
-      <created>1724609924998</created>
-      <option name="number" value="00995" />
-      <option name="presentableId" value="LOCAL-00995" />
-      <option name="project" value="LOCAL" />
-      <updated>1724609924998</updated>
+      <workItem from="1725814509037" duration="11550000" />
     </task>
     <task id="LOCAL-00996" summary="stashing">
       <option name="closed" value="true" />
@@ -974,7 +901,15 @@
       <option name="project" value="LOCAL" />
       <updated>1725734824159</updated>
     </task>
-    <option name="localTasksCounter" value="1044" />
+    <task id="LOCAL-01044" summary="refactored background">
+      <option name="closed" value="true" />
+      <created>1725824724799</created>
+      <option name="number" value="01044" />
+      <option name="presentableId" value="LOCAL-01044" />
+      <option name="project" value="LOCAL" />
+      <updated>1725824724799</updated>
+    </task>
+    <option name="localTasksCounter" value="1045" />
     <servers />
   </component>
   <component name="TypeScriptGeneratedFilesManager">
@@ -1023,7 +958,6 @@
     </option>
   </component>
   <component name="VcsManagerConfiguration">
-    <MESSAGE value="added joystick indicator" />
     <MESSAGE value="stashing before input rework" />
     <MESSAGE value="refatored input controller" />
     <MESSAGE value="refactored input controll" />
@@ -1048,7 +982,8 @@
     <MESSAGE value="working" />
     <MESSAGE value="added keybinding indicator font" />
     <MESSAGE value="implemented scene transitions, entity info preview working" />
-    <option name="LAST_COMMIT_MESSAGE" value="implemented scene transitions, entity info preview working" />
+    <MESSAGE value="refactored background" />
+    <option name="LAST_COMMIT_MESSAGE" value="refactored background" />
   </component>
   <component name="XDebuggerManager">
     <breakpoint-manager>

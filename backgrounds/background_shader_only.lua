@@ -71,3 +71,6 @@ rt.Background.PARALLEL_LINES = rt.Background.new_shader_only_background("PARALLE
 
 --- @class rt.Background.STAINED_GLASS
 rt.Background.STAINED_GLASS = rt.Background.new_shader_only_background("STAINED_GLASS", "backgrounds/stained_glass.glsl")
+
+--- @class rt.Background.BUBBLEGUM
+rt.Background.BUBBLEGUM = rt.Background.new_shader_only_background("BUBBLEGUM", "backgrounds/bubblegum.glsl")

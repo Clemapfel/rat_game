@@ -3,6 +3,9 @@ require "include"
 state = rt.GameState()
 state:initialize_debug_state()
 
+local background = rt.Background()
+background:set_implementation(rt.Background.BUBBLEGUM)
+
 local draw_state = true
 input = rt.InputController()
 input:signal_connect("keyboard_pressed", function(_, which)
@@ -13,7 +16,7 @@ input:signal_connect("keyboard_pressed", function(_, which)
     elseif which == rt.KeyboardKey.THREE then
         state:set_current_scene(mn.KeybindingScene)
     elseif which == rt.KeyboardKey.ESCAPE then
-        draw_state = false
+        background._shader:recompile()
     end
 end)
 
@@ -23,9 +26,6 @@ input:signal_connect("keyboard_released", function(_, which)
     end
 end)
 
-
-local background = rt.Background()
-background:set_implementation(rt.Background.CLOUDS)
 
 love.load = function()
     background:realize()
@@ -42,7 +42,7 @@ end
 love.draw = function()
     background:draw()
     if draw_state then
-        state:_draw()
+        --state:_draw()
     end
 end
 
