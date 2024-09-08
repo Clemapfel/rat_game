@@ -249,3 +249,20 @@ rt.graphics.frame_start = 0
 function rt.graphics.get_frame_duration()
     return love.timer.getTime() - rt.graphics.frame_start
 end
+
+rt.graphics.target_fps = (function()
+    local _, _, mode = love.window.getMode()
+    local out = mode.refreshrate
+    if out == 0 then out = 60 end
+    return out
+end)()
+
+--- @brief
+function rt.graphics.get_target_fps()
+    return rt.graphics.target_fps
+end
+
+--- @brief
+function rt.graphics.get_fps()
+    return love.timer.getFPS()
+end

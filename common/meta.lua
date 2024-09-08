@@ -257,6 +257,20 @@ function meta.assert_inherits(x, type)
     end
 end
 
+--- @brief
+function meta.assert_is_subtype(x, supertype)
+    meta.assert_isa(x, meta.Type)
+    meta.assert_isa(supertype, meta.Type)
+
+    for super in values(x._super) do
+        if super == supertype then
+            return
+        end
+    end
+
+    rt.error("In meta.assert_is_subtype: " .. x._typename .. "` is not a subtype of `" .. supertype._typename .. "`")
+end
+
 --- @brief [internal] add a property, set to intial value
 --- @param x meta.Object
 --- @param property_name String

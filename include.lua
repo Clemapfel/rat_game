@@ -127,13 +127,27 @@ require "common.cloth"
 
 require "common.scene"
 
+-- backgrounds
+require "backgrounds.background_implementation"
+require "backgrounds.background"
+require "backgrounds.background_shader_only"
+
+do -- include all backgrounds
+    local prefix = "backgrounds"
+    for _, name in pairs(love.filesystem.getDirectoryItems(prefix)) do
+        if rt.filesystem.is_file(prefix .. "/" .. name) and string.match(name, "%.lua$") ~= nil then
+            local path = prefix .. "/" .. string.gsub(name, "%.lua$", "")
+            require(string.gsub(path, "/", "."))
+        end
+    end
+end
+
 -- battle
 require "battle.move"
 require "battle.equip"
 require "battle.consumable"
 require "battle.status"
 require "battle.entity"
-require "battle.background"
 
 -- menu
 require "menu.template"

@@ -5,7 +5,7 @@ return {
     portrait_sprite_index = "PROF",
 
     is_enemy = false,
-    n_move_slots = 25,
+    n_move_slots = 16,
     n_equip_slots = 2,
     n_consumable_slots = 1
 }

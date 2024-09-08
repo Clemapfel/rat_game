@@ -1,26 +1,3 @@
-// Protean clouds by nimitz (twitter: @stormoid)
-// https://www.shadertoy.com/view/3l23Rh
-// License Creative Commons Attribution-NonCommercial-ShareAlike 3.0 Unported License
-// Contact the author for other licensing options
-
-/*
-	Technical details:
-
-	The main volume noise is generated from a deformed periodic grid, which can produce
-	a large range of noise-like patterns at very cheap evalutation cost. Allowing for multiple
-	fetches of volume gradient computation for improved lighting.
-
-	To further accelerate marching, since the volume is smooth, more than half the the density
-	information isn't used to rendering or shading but only as an underlying volume	distance to 
-	determine dynamic step size, by carefully selecting an equation	(polynomial for speed) to 
-	step as a function of overall density (not necessarily rendered) the visual results can be 
-	the	same as a naive implementation with ~40% increase in rendering performance.
-
-	Since the dynamic marching step size is even less uniform due to steps not being rendered at all
-	the fog is evaluated as the difference of the fog integral at each rendered step.
-
-*/
-
 uniform float elapsed;
 
 float linstep(in float mn, in float mx, in float x){
@@ -40,9 +17,9 @@ vec2 rotate(vec2 v, float angle) {
 /// @brief 3d discontinuous noise, in [0, 1]
 vec3 random_3d(in vec3 p) {
     return fract(sin(vec3(
-                         dot(p, vec3(127.1, 311.7, 74.7)),
-                         dot(p, vec3(269.5, 183.3, 246.1)),
-                         dot(p, vec3(113.5, 271.9, 124.6)))
+                     dot(p, vec3(127.1, 311.7, 74.7)),
+                     dot(p, vec3(269.5, 183.3, 246.1)),
+                     dot(p, vec3(113.5, 271.9, 124.6)))
                  ) * 43758.5453123);
 }
 
@@ -67,10 +44,11 @@ float gradient_noise(vec3 p) {
 #define FBM_N_STEPS 2
 vec2 map(vec3 p, float spikyness)
 {
+    // src: https://www.shadertoy.com/view/3l23Rh
     const mat3 m3 = mat3(
-         0.33338, 0.56034, -0.71817,
-        -0.87887, 0.32651, -0.15323,
-         0.15162, 0.69596,  0.61339
+    0.33338, 0.56034, -0.71817,
+    -0.87887, 0.32651, -0.15323,
+    0.15162, 0.69596,  0.61339
     ) * 2.5;
     float prm1 = spikyness + 0.5;
     float cl = length(p.xy) * length(p.xy);
@@ -91,6 +69,7 @@ vec2 map(vec3 p, float spikyness)
 
 #define STEPS 100
 #define STEP_SIZE 0.1
+
 /// @param spikyness in [-1, 1]
 vec4 render(in vec3 ray_direction, float spikyness, float time)
 {

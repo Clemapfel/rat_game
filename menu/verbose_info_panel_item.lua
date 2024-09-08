@@ -832,7 +832,7 @@ function mn.VerboseInfoPanel.Item:create_as_visual_effects_widget()
         self._is_realized = true
         self.frame:realize()
 
-        self.widget = bt.Background.CONTRAST_TEST()
+        self.widget = rt.Background(rt.Background.CONTRAST_TEST)
         self.widget:realize()
 
         self.content = {

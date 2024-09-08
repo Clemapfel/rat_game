@@ -5,7 +5,7 @@ return {
     portrait_sprite_index = "MC",
 
     is_enemy = false,
-    n_move_slots = 4 * 4,
+    n_move_slots = 16,
     n_equip_slots = 2,
     n_consumable_slots = 1,
 
