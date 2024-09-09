@@ -39,7 +39,7 @@ vec4 effect(vec4 vertex_color, Image image, vec2 texture_coords, vec2 vertex_pos
     vec3 pink = hsv_to_rgb(vec3(318. / 360., 60. / 100., 100. / 100.));
     vec3 light_pink = hsv_to_rgb(vec3(318. / 360., 36. / 100., 100.));
 
-    float signed_distance = smooth_min(light_1, light_2, smoothness) * light_pink; // + smooth_min(value_1, value_2, 0.02); //, smoothness);
+    float signed_distance = smooth_min(light_1, light_2, smoothness); // + smooth_min(value_1, value_2, 0.02); //, smoothness);
 
     const float border = 0.001;
     float final = smoothstep(-border, +border, signed_distance);

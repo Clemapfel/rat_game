@@ -10,12 +10,11 @@ rt.LocalizationLanguage = {
 
 --- @class
 rt.TextAtlas = meta.new_type("TextAtlas", function()
-    local out = meta.new(rt.TextAtlas, {
+    return meta.new(rt.TextAtlas, {
         _language = rt.LocalizationLanguage.ENGLISH,
         _folder = "",
         _content = {}
     })
-    return out
 end)
 
 --- @brief

@@ -101,6 +101,7 @@ require "common.vertex_shape"
 require "common.spline"
 
 require "common.text_atlas"
+require "common.sound_atlas"
 require "common.widget"
 require "common.font"
 require "common.glyph"

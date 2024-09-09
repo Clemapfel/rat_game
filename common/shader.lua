@@ -1,7 +1,12 @@
 --- @class rt.Shader
 rt.Shader = meta.new_type("Shader", function(filename)
+    local success, shader = pcall(love.graphics.newShader, filename)
+    if not success then
+        rt.error("In rt.Shader: Error when evaluating shader at `" .. filename .. "`:\n" .. shader)
+    end
+
     return meta.new(rt.Shader, {
-        _native = love.graphics.newShader(filename),
+        _native = shader,
         _filename = filename,
         _before = nil,
     })

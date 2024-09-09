@@ -510,6 +510,7 @@ function rt.GameState:set_sfx_level(fraction)
         fraction = clamp(fraction, 0, 1)
     end
     self._state.sfx_level = fraction
+    rt.settings.sfx_level = self._state.sfx_level
 end
 
 --- @brief
@@ -525,6 +526,7 @@ function rt.GameState:set_music_level(fraction)
         fraction = clamp(fraction, 0, 1)
     end
     self._state.music_level = fraction
+    rt.settings.music_level = self._state.music_level
 end
 
 --- @brief

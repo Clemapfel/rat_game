@@ -22,11 +22,16 @@
     </configurations>
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="7fa9ba1b-2cff-4ecc-86fb-59ab2fa76ee1" name="Changes" comment="stashing bubblegum">
+    <list default="true" id="7fa9ba1b-2cff-4ecc-86fb-59ab2fa76ee1" name="Changes" comment="stashing demo">
+      <change afterPath="$PROJECT_DIR$/assets/download_links.txt" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/common/sound_atlas.lua" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/common/common.lua" beforeDir="false" afterPath="$PROJECT_DIR$/common/common.lua" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/fast_physics/cdef.h" beforeDir="false" afterPath="$PROJECT_DIR$/fast_physics/cdef.h" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/main_box2d.lua" beforeDir="false" afterPath="$PROJECT_DIR$/main_box2d.lua" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/backgrounds/bubblegum.glsl" beforeDir="false" afterPath="$PROJECT_DIR$/backgrounds/bubblegum.glsl" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/common/game_state.lua" beforeDir="false" afterPath="$PROJECT_DIR$/common/game_state.lua" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/common/shader.lua" beforeDir="false" afterPath="$PROJECT_DIR$/common/shader.lua" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/common/text_atlas.lua" beforeDir="false" afterPath="$PROJECT_DIR$/common/text_atlas.lua" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/include.lua" beforeDir="false" afterPath="$PROJECT_DIR$/include.lua" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/old/common/easement_functions.lua" beforeDir="false" afterPath="$PROJECT_DIR$/old/common/easement_functions.lua" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -130,14 +135,14 @@
       <recent name="C:\Users\cleme\Workspace\rat_game\assets\sprites\battle" />
     </key>
     <key name="MoveFile.RECENT_KEYS">
+      <recent name="C:\Users\cleme\Workspace\rat_game\assets" />
       <recent name="C:\Users\cleme\Workspace\rat_game\old" />
       <recent name="C:\Users\cleme\Workspace\rat_game\assets\text\english" />
       <recent name="C:\Users\cleme\Workspace\rat_game\assets\sprites" />
       <recent name="C:\Users\cleme\Workspace\rat_game" />
-      <recent name="C:\Users\cleme\Workspace\rat_game\fast_physics" />
     </key>
   </component>
-  <component name="RunManager" selected="Lua Application.main_box2d">
+  <component name="RunManager" selected="Lua Application.main">
     <configuration name="main" type="lua.app" factoryName="Lua Application">
       <module name="rat_game" />
       <option name="program" value="C:\Users\cleme\Workspace\rat_game\love\windows\love.exe" />
@@ -514,15 +519,8 @@
       <workItem from="1725663050033" duration="1763000" />
       <workItem from="1725672030549" duration="1551000" />
       <workItem from="1725673641569" duration="2761000" />
-      <workItem from="1725814509037" duration="16836000" />
-    </task>
-    <task id="LOCAL-00997" summary="added round">
-      <option name="closed" value="true" />
-      <created>1724718694838</created>
-      <option name="number" value="00997" />
-      <option name="presentableId" value="LOCAL-00997" />
-      <option name="project" value="LOCAL" />
-      <updated>1724718694838</updated>
+      <workItem from="1725814509037" duration="16986000" />
+      <workItem from="1725901580447" duration="7296000" />
     </task>
     <task id="LOCAL-00998" summary="added round">
       <option name="closed" value="true" />
@@ -908,7 +906,15 @@
       <option name="project" value="LOCAL" />
       <updated>1725830208235</updated>
     </task>
-    <option name="localTasksCounter" value="1046" />
+    <task id="LOCAL-01046" summary="stashing demo">
+      <option name="closed" value="true" />
+      <created>1725841135513</created>
+      <option name="number" value="01046" />
+      <option name="presentableId" value="LOCAL-01046" />
+      <option name="project" value="LOCAL" />
+      <updated>1725841135513</updated>
+    </task>
+    <option name="localTasksCounter" value="1047" />
     <servers />
   </component>
   <component name="TypeScriptGeneratedFilesManager">
@@ -957,7 +963,6 @@
     </option>
   </component>
   <component name="VcsManagerConfiguration">
-    <MESSAGE value="refatored input controller" />
     <MESSAGE value="refactored input controll" />
     <MESSAGE value="refactored with text atlas" />
     <MESSAGE value="stashing text atlas" />
@@ -982,7 +987,8 @@
     <MESSAGE value="implemented scene transitions, entity info preview working" />
     <MESSAGE value="refactored background" />
     <MESSAGE value="stashing bubblegum" />
-    <option name="LAST_COMMIT_MESSAGE" value="stashing bubblegum" />
+    <MESSAGE value="stashing demo" />
+    <option name="LAST_COMMIT_MESSAGE" value="stashing demo" />
   </component>
   <component name="XDebuggerManager">
     <breakpoint-manager>
