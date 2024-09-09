@@ -275,6 +275,17 @@ function math.round(i)
     return math.floor(i + 0.5)
 end
 
+--- @brief
+function math.sign(x)
+    if x > 0 then
+        return 1
+    elseif x < 0 then
+        return -1
+    else
+        return 0
+    end
+end
+
 --- @brief evaluate erf integral
 --- @param x number
 --- @return number

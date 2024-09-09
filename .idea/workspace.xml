@@ -22,12 +22,11 @@
     </configurations>
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="7fa9ba1b-2cff-4ecc-86fb-59ab2fa76ee1" name="Changes" comment="refactored background">
-      <change afterPath="$PROJECT_DIR$/backgrounds/bubblegum.glsl" afterDir="false" />
+    <list default="true" id="7fa9ba1b-2cff-4ecc-86fb-59ab2fa76ee1" name="Changes" comment="stashing bubblegum">
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/backgrounds/background_shader_only.lua" beforeDir="false" afterPath="$PROJECT_DIR$/backgrounds/background_shader_only.lua" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/common/game_state.lua" beforeDir="false" afterPath="$PROJECT_DIR$/common/game_state.lua" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/main.lua" beforeDir="false" afterPath="$PROJECT_DIR$/main.lua" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/common/common.lua" beforeDir="false" afterPath="$PROJECT_DIR$/common/common.lua" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/fast_physics/cdef.h" beforeDir="false" afterPath="$PROJECT_DIR$/fast_physics/cdef.h" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/main_box2d.lua" beforeDir="false" afterPath="$PROJECT_DIR$/main_box2d.lua" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -138,7 +137,7 @@
       <recent name="C:\Users\cleme\Workspace\rat_game\fast_physics" />
     </key>
   </component>
-  <component name="RunManager" selected="Lua Application.main">
+  <component name="RunManager" selected="Lua Application.main_box2d">
     <configuration name="main" type="lua.app" factoryName="Lua Application">
       <module name="rat_game" />
       <option name="program" value="C:\Users\cleme\Workspace\rat_game\love\windows\love.exe" />
@@ -515,15 +514,7 @@
       <workItem from="1725663050033" duration="1763000" />
       <workItem from="1725672030549" duration="1551000" />
       <workItem from="1725673641569" duration="2761000" />
-      <workItem from="1725814509037" duration="11550000" />
-    </task>
-    <task id="LOCAL-00996" summary="stashing">
-      <option name="closed" value="true" />
-      <created>1724718515223</created>
-      <option name="number" value="00996" />
-      <option name="presentableId" value="LOCAL-00996" />
-      <option name="project" value="LOCAL" />
-      <updated>1724718515223</updated>
+      <workItem from="1725814509037" duration="16836000" />
     </task>
     <task id="LOCAL-00997" summary="added round">
       <option name="closed" value="true" />
@@ -909,7 +900,15 @@
       <option name="project" value="LOCAL" />
       <updated>1725824724799</updated>
     </task>
-    <option name="localTasksCounter" value="1045" />
+    <task id="LOCAL-01045" summary="stashing bubblegum">
+      <option name="closed" value="true" />
+      <created>1725830208235</created>
+      <option name="number" value="01045" />
+      <option name="presentableId" value="LOCAL-01045" />
+      <option name="project" value="LOCAL" />
+      <updated>1725830208235</updated>
+    </task>
+    <option name="localTasksCounter" value="1046" />
     <servers />
   </component>
   <component name="TypeScriptGeneratedFilesManager">
@@ -958,7 +957,6 @@
     </option>
   </component>
   <component name="VcsManagerConfiguration">
-    <MESSAGE value="stashing before input rework" />
     <MESSAGE value="refatored input controller" />
     <MESSAGE value="refactored input controll" />
     <MESSAGE value="refactored with text atlas" />
@@ -983,7 +981,8 @@
     <MESSAGE value="added keybinding indicator font" />
     <MESSAGE value="implemented scene transitions, entity info preview working" />
     <MESSAGE value="refactored background" />
-    <option name="LAST_COMMIT_MESSAGE" value="refactored background" />
+    <MESSAGE value="stashing bubblegum" />
+    <option name="LAST_COMMIT_MESSAGE" value="stashing bubblegum" />
   </component>
   <component name="XDebuggerManager">
     <breakpoint-manager>

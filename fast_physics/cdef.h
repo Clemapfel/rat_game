@@ -27,6 +27,8 @@ typedef struct b2AABB
     b2Vec2 upperBound;
 } b2AABB;
 
+void b2SetLengthUnitsPerMeter 	( 	float 	lengthUnits	);
+
 // ### WORLD ###
 
 typedef void b2TaskCallback( int32_t startIndex, int32_t endIndex, uint32_t workerIndex, void* taskContext );
