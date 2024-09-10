@@ -30,7 +30,9 @@ end)
 
 input:signal_connect("pressed", function(_, which)
     if which == rt.InputButton.A then
-        --rt.SoundAtlas:play("test/alarm")
+
+    elseif which == rt.InputButton.B then
+
     end
 end)
 
@@ -47,10 +49,10 @@ love.update = function(delta)
 end
 
 love.draw = function()
-    --background:draw()
-    --if draw_state then
+    background:draw()
+    if draw_state then
         state:_draw()
-    --end
+    end
 end
 
 love.resize = function(new_width, new_height)

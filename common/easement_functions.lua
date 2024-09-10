@@ -120,7 +120,7 @@ end
 rt.gaussian_lowpass = function(x, peak)
     peak = which(peak, 1)
     if x < 0 then return 1 end
-    return rt.gaussian_bandpass(x / 2 + 1, peak)
+    return 1 - rt.gaussian_highpass(x, peak)
 end
 
 --- @brief calculate skewed gaussian distribution probability

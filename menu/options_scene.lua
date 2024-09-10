@@ -84,9 +84,18 @@ mn.OptionsScene = meta.new_type("MenuOptionsScene", rt.Scene, function(state)
 
     fields._resolution_label_text = labels.resolution
     fields._resolution_1280_720_label = labels.resolution_1280_720
+    fields._resolution_1366_768_label = labels.resolution_1366_768
     fields._resolution_1600_900_label = labels.resolution_1600_900
     fields._resolution_1920_1080_label = labels.resolution_1920_1080
     fields._resolution_2560_1440_label = labels.resolution_2560_1440
+    fields._resolution_1280_800_label = labels.resolution_1280_800
+    fields._resolution_1440_900_label = labels.resolution_1440_900
+    fields._resolution_1680_1050_label = labels.resolution_1680_1050
+    fields._resolution_1920_1200_label = labels.resolution_1920_1200
+    fields._resolution_2560_1600_label = labels.resolution_2560_1600
+    fields._resolution_2560_1080_label = labels.resolution_2560_1080
+    fields._resolution_native_label = labels.resolution_native
+
     fields._resolution_label = nil
     fields._resolution_option_button = nil
     fields._resolution_item = nil
@@ -122,11 +131,18 @@ mn.OptionsScene = meta.new_type("MenuOptionsScene", rt.Scene, function(state)
 
         [fields._resolution_label_text] = {
             options = {
+                fields._resolution_native_label,
                 fields._resolution_1280_720_label,
+                fields._resolution_1280_800_label,
+                fields._resolution_1366_768_label,
+                fields._resolution_1440_900_label,
                 fields._resolution_1600_900_label,
+                fields._resolution_1680_1050_label,
                 fields._resolution_1920_1080_label,
+                fields._resolution_1920_1200_label,
                 fields._resolution_2560_1440_label,
-                fields._resolution_variable_label,
+                fields._resolution_2560_1600_label,
+                fields._resolution_2560_1080_label,
             },
             default = fields._resolution_1280_720_label
         }
@@ -259,17 +275,12 @@ function mn.OptionsScene:realize()
         end
 
         local x_res, y_res
-        if which == scene._resolution_1280_720_label then
-            x_res, y_res = 1280, 720
-        elseif which == scene._resolution_1600_900_label then
-            x_res, y_res = 1600, 900
-        elseif which == scene._resolution_1920_1080_label then
-            x_res, y_res = 1920, 1080
-        elseif which == scene._resolution_2560_1440_label then
-            x_res, y_res = 2560, 1440
+        if which == self._resolution_native_label then
+            x_res, y_res = love.window.getDesktopDimensions()
+        else
+            x_res, y_res = string.match(which, "(%d+)%s*x%s*(%d+)") -- first two numbers with x between
         end
-
-        scene._state:set_resolution(x_res, y_res)
+        scene._state:set_resolution(tonumber(x_res),tonumber(y_res))
     end)
 
     create_button_and_label("fullscreen", self._fullscreen_label_text, function(_, which)

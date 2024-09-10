@@ -5,6 +5,7 @@ rt.settings.loading_screen = {
 }
 
 --- @class rt.LoadingScreen
+--- @brief use show / hide to reveal, if hidden during show, interpolates and smoothly transitions
 --- @signal shown (self) -> nil
 --- @signal hidden (self) -> nil
 rt.LoadingScreen = meta.new_type("LoadingScreen", rt.Widget, rt.Animation, rt.SignalEmitter, function()
@@ -14,7 +15,9 @@ rt.LoadingScreen = meta.new_type("LoadingScreen", rt.Widget, rt.Animation, rt.Si
         _frame_i = 1,
         _elapsed = 0,
         _is_active = false,
-        _current_opacity = 1
+        _current_opacity = 0,
+        _fade_in_elapsed = 0,
+        _fade_out_elapsed = 0,
     })
 
     out._n_frames = 4
@@ -28,7 +31,7 @@ rt.LoadingScreen = meta.new_type("LoadingScreen", rt.Widget, rt.Animation, rt.Si
 
     out:_update_color()
 
-    out:signal_add("show")
+    out:signal_add("shown")
     out:signal_add("hidden")
     return out
 end)
@@ -82,22 +85,37 @@ function rt.LoadingScreen:update(delta)
         label:update(delta)
     end
 
+    -- when walking along `f(t)` by `dt`, step is `(f(t + dt) - f(t)) / dt`
+
+    local eps = 1 / 1000
+
     local opacity_changed = false
-    local step_up = 1 / rt.settings.loading_screen.fade_in_duration * delta
-    local step_down = 1 / rt.settings.loading_screen.fade_out_duration * delta
-    if self._is_active and self._current_opacity < 1 then
-        local before = self._current_opacity
-        self._current_opacity = self._current_opacity + step_up
-        opacity_changed = true
-        if before >= 1 then
+    if self._is_active and self._current_opacity <= 1 then
+        local fade_in_duration = rt.settings.loading_screen.fade_in_duration
+        local f_high = rt.gaussian_highpass(self._fade_in_elapsed / fade_in_duration + delta / fade_in_duration)
+        local f_low = rt.gaussian_highpass(self._fade_in_elapsed / fade_in_duration)
+        self._fade_in_elapsed = self._fade_in_elapsed + delta
+        local step = f_high - f_low
+        self._current_opacity = self._current_opacity + step
+
+        if self._current_opacity >= 1 - eps then
             self:signal_emit("shown")
         end
-    elseif self._is_active == false and self._current_opacity > 0 then
-        self._current_opacity = self._current_opacity - step_down
+
         opacity_changed = true
-        if self._current_opacity <= 0 then
+    elseif self._is_active == false and self._current_opacity > 0 then
+        local fade_out_duration = rt.settings.loading_screen.fade_out_duration
+        local f_high = 1 - rt.gaussian_highpass(self._fade_out_elapsed / fade_out_duration + delta / fade_out_duration)
+        local f_low = 1 - rt.gaussian_highpass(self._fade_out_elapsed / fade_out_duration)
+        self._fade_out_elapsed = self._fade_out_elapsed + delta
+        local step = f_high - f_low
+        self._current_opacity = self._current_opacity + step
+
+        if self._current_opacity <= 0 + eps then
             self:signal_emit("hidden")
         end
+
+        opacity_changed = true
     end
 
     if opacity_changed then
@@ -114,6 +132,10 @@ function rt.LoadingScreen:_update_color()
         1 - self._current_opacity,
         1
     ))
+
+    for labels in values(self._label_frames) do
+        labels:set_opacity(clamp(self._current_opacity, 0, 1))
+    end
 end
 
 --- @override
@@ -122,17 +144,24 @@ function rt.LoadingScreen:draw()
     self._shape:draw()
     rt.graphics.set_blend_mode()
 
-    if self._current_opacity >= 1 then
-        self._label_frames[self._frame_i]:draw()
-    end
+    self._label_frames[self._frame_i]:draw()
 end
 
 --- @brief
 function rt.LoadingScreen:show()
     self._is_active = true
+    self._fade_in_elapsed = 0
+    self._fade_out_elapsed = 0
 end
 
 --- @brief
 function rt.LoadingScreen:hide()
     self._is_active = false
+    self._fade_in_elapsed = 0
+    self._fade_out_elapsed = 0
+end
+
+--- @brief
+function rt.LoadingScreen:set_current_opacity(opacity)
+    self._current_opacity = clamp(opacity, 0, 1)
 end

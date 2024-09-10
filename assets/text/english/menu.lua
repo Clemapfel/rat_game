@@ -26,9 +26,19 @@ return {
 
         resolution = "Resolution",
         resolution_1280_720 = "1280x720 (16:9)",
+        resolution_1366_768 = "1366x768 (16:9)",
         resolution_1600_900 = "1600x900 (16:9)",
         resolution_1920_1080 = "1920x1080 (16:9)",
         resolution_2560_1440 = "2560x1400 (16:9)",
+
+        resolution_1280_800 = "1280x800 (16:10)",
+        resolution_1440_900 = "1440x900 (16:10)",
+        resolution_1680_1050 = "1680x1050 (16:10)",
+        resolution_1920_1200 = "1920x1200 (16:10)",
+        resolution_2560_1600 = "2560x1600 (16:10)",
+
+        resolution_2560_1080 = "2560x1080 (21:9)",
+        resolution_native = "Native",
 
         gamma = "Gamma",
         sfx_level = "Sound Effects",

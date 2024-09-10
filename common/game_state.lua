@@ -75,7 +75,7 @@ rt.GameState = meta.new_type("GameState", function()
 
         _loading_screen = rt.LoadingScreen(),
         _loading_screen_active = true,
-
+        _bounds = rt.AABB(0, 0, rt.graphics.get_width(), rt.graphics.get_height()),
         _current_scene = nil,
         _scenes = {}, -- Table<meta.Type, rt.Scene>
         _active_coroutines = {} -- Table<rt.Coroutine>
@@ -90,9 +90,7 @@ function rt.GameState:realize()
     self:load_input_mapping()
     rt.get_active_state = function() return self end
     self._loading_screen:realize()
-    self._loading_screen:signal_connect("hidden", function(_)
-        self._loading_screen_active = false
-    end)
+    self._loading_screen:set_current_opacity(1)
 end
 
 --- @brief
@@ -186,11 +184,13 @@ function rt.GameState:_update_window_mode()
         borderless = true
     end
 
+    local before_w, before_h = love.graphics.getWidth(), love.graphics.getHeight()
+
     love.window.updateMode(
         window_res_x,
         window_res_y,
         {
-            fullscreen = false,
+            fullscreen = self._state.is_fullscreen,
             fullscreentype = "desktop",
             vsync = self._state.vsync_mode,
             msaa = 16, --self._state.msaa_quality,
@@ -206,16 +206,19 @@ function rt.GameState:_update_window_mode()
     love.window.updateMode(window_res_x, window_res_y, {minwidth = window_res_x, minheight = window_res_y})
     -- for some reason window does not shrink unless updateMode is called twice
 
+    dbg(self._state.resolution_x, self._state.resolution_y)
     self._render_texture = rt.RenderTexture(
         self._state.resolution_x,
         self._state.resolution_y,
         self._state.msaa_quality
     )
     self._render_texture:set_scale_mode(rt.TextureScaleMode.LINEAR)
-    self:_resize(love.graphics.getWidth(), love.graphics.getHeight())
+    self._render_shape:set_texture(self._render_texture)
 
     rt.settings.contrast = self._state.vfx_contrast_level
     rt.settings.motion_intensity = self._state.vfx_motion_level
+
+    self:_resize(window_res_x, window_res_y)
 end
 
 --- @brief
@@ -395,18 +398,26 @@ end
 
 --- @brief
 function rt.GameState:_resize(new_width, new_height)
-    self._render_shape = rt.VertexRectangle(0, 0, new_width, new_height)
-    self._render_shape:set_texture(self._render_texture)
 
-    self._loading_screen:fit_into(0, 0, new_width, new_height)
+    local true_w, true_h = love.graphics.getWidth(), love.graphics.getHeight()
+    self._render_shape:reformat(
+        0, 0,
+        true_w, 0,
+        true_w, true_h,
+        0, true_h
+    )
+    self._loading_screen:fit_into(0, 0, true_w, true_h)
 
-    table.insert(self._active_coroutines, rt.Coroutine(function()
-        rt.savepoint_maybe()
-        if self._current_scene ~= nil then
-            self._current_scene:fit_into(0, 0, self._state.resolution_x, self._state.resolution_y)
-        end
-        rt.savepoint_maybe()
-    end))
+    self:_loading_screen_show(function()
+        table.insert(self._active_coroutines, rt.Coroutine(function()
+            rt.savepoint_maybe()
+            for scene in values(self._scenes) do
+                scene:fit_into(0, 0, self._state.resolution_x, self._state.resolution_y)
+                rt.savepoint_maybe()
+            end
+            self:_loading_screen_hide()
+        end))
+    end)
 end
 
 --- @brief
@@ -457,6 +468,28 @@ function rt.GameState:_draw()
 end
 
 --- @brief
+function rt.GameState:_loading_screen_show(on_show)
+    self._loading_screen:show()
+    self._loading_screen_active = true
+    if on_show ~= nil then
+        self._loading_screen:signal_disconnect("shown")
+        self._loading_screen:signal_connect("shown", on_show)
+    end
+end
+
+--- @brief
+function rt.GameState:_loading_screen_hide(on_hidden)
+    self._loading_screen:hide()
+    self._loading_screen:signal_disconnect("hidden")
+    self._loading_screen:signal_connect("hidden", function(loading_screen)
+        self._loading_screen_active = false
+        if on_hidden ~= nil then
+            on_hidden(loading_screen)
+        end
+    end)
+end
+
+--- @brief
 function rt.GameState:set_current_scene(scene_type)
     table.insert(self._active_coroutines, rt.Coroutine(function()
         if self._current_scene ~= nil then
@@ -471,26 +504,27 @@ function rt.GameState:set_current_scene(scene_type)
             self._scenes[scene_type] = scene
         end
 
-        self._current_scene = scene
-        local use_loading_screen = true--self._current_scene:get_is_realized() == false
+        local use_loading_screen = scene:get_is_realized() == false
         if use_loading_screen then
-            self._loading_screen:show()
-            self._loading_screen_active = true
+            self:_loading_screen_show(function()
+                self._current_scene = scene -- make sure graphics swap happens behind loading screen, old scene stays during fadeout
+            end)
         end
 
-        local realized = self._current_scene:get_is_realized()
+        local realized = scene:get_is_realized()
         if not realized then
-            self._current_scene:realize()
+            scene:realize()
             rt.savepoint_maybe()
-            self._current_scene:fit_into(0, 0, self._state.resolution_x, self._state.resolution_y)
+            scene:fit_into(0, 0, self._state.resolution_x, self._state.resolution_y)
             rt.savepoint_maybe()
         end
-        self._current_scene:make_active()
+
+        scene:make_active()
 
         if use_loading_screen then
-            self._loading_screen:hide()
-            -- loading_screen_active set on signal hidden
+           self:_loading_screen_hide()
         end
+        self._current_scene = scene -- failsafe if signal "shown" is skipped, because loading screen was too short
     end))
 end
 
