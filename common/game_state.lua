@@ -73,6 +73,9 @@ rt.GameState = meta.new_type("GameState", function()
         _render_texture = rt.RenderTexture(1, 1),
         _render_shader = rt.Shader("common/game_state_render_shader.glsl"),
 
+        _loading_screen = rt.LoadingScreen(),
+        _loading_screen_active = true,
+
         _current_scene = nil,
         _scenes = {}, -- Table<meta.Type, rt.Scene>
         _active_coroutines = {} -- Table<rt.Coroutine>
@@ -86,6 +89,10 @@ end)
 function rt.GameState:realize()
     self:load_input_mapping()
     rt.get_active_state = function() return self end
+    self._loading_screen:realize()
+    self._loading_screen:signal_connect("hidden", function(_)
+        self._loading_screen_active = false
+    end)
 end
 
 --- @brief
@@ -391,6 +398,8 @@ function rt.GameState:_resize(new_width, new_height)
     self._render_shape = rt.VertexRectangle(0, 0, new_width, new_height)
     self._render_shape:set_texture(self._render_texture)
 
+    self._loading_screen:fit_into(0, 0, new_width, new_height)
+
     table.insert(self._active_coroutines, rt.Coroutine(function()
         rt.savepoint_maybe()
         if self._current_scene ~= nil then
@@ -402,8 +411,11 @@ end
 
 --- @brief
 function rt.GameState:_update(delta)
-    local n = sizeof(self._active_coroutines)
+    if self._loading_screen_active then
+        self._loading_screen:update(delta)
+    end
 
+    local n = sizeof(self._active_coroutines)
     local to_remove = {}
     local max_n_routines = 2;
     local n_routines = 0;
@@ -438,6 +450,48 @@ function rt.GameState:_draw()
     if self._current_scene ~= nil then
         self._current_scene:draw()
     end
+
+    if self._loading_screen_active then
+        self._loading_screen:draw()
+    end
+end
+
+--- @brief
+function rt.GameState:set_current_scene(scene_type)
+    table.insert(self._active_coroutines, rt.Coroutine(function()
+        if self._current_scene ~= nil then
+            self._current_scene:make_inactive()
+        end
+
+        rt.savepoint_maybe()
+
+        local scene = self._scenes[scene_type]
+        if scene == nil then
+            scene = scene_type(self)
+            self._scenes[scene_type] = scene
+        end
+
+        self._current_scene = scene
+        local use_loading_screen = true--self._current_scene:get_is_realized() == false
+        if use_loading_screen then
+            self._loading_screen:show()
+            self._loading_screen_active = true
+        end
+
+        local realized = self._current_scene:get_is_realized()
+        if not realized then
+            self._current_scene:realize()
+            rt.savepoint_maybe()
+            self._current_scene:fit_into(0, 0, self._state.resolution_x, self._state.resolution_y)
+            rt.savepoint_maybe()
+        end
+        self._current_scene:make_active()
+
+        if use_loading_screen then
+            self._loading_screen:hide()
+            -- loading_screen_active set on signal hidden
+        end
+    end))
 end
 
 --- @brief

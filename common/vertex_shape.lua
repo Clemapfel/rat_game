@@ -139,8 +139,9 @@ end
 --- @param rgba rt.RGBA (or rt.HSVA)
 function rt.VertexShape:set_color(rgba)
     if meta.is_hsva(rgba) then rgba = rt.hsva_to_rgba(rgba) end
+    local r, g, b, a = rt.color_unpack(rgba)
     for i = 1, self:get_n_vertices() do
-        self:set_vertex_color(i, rgba)
+        self._native:setVertexAttribute(i, 3, r, g, b, a)
     end
 end
 

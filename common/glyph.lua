@@ -227,7 +227,7 @@ end
 --- @overload
 function rt.Glyph:update(delta)
     self._elapsed_time = self._elapsed_time + delta
-    if self._is_animated and self._is_outline then
+    if self._is_animated and self._is_outlined then
         self:_update_outline()
     end
 end

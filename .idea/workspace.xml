@@ -22,12 +22,13 @@
     </configurations>
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="7fa9ba1b-2cff-4ecc-86fb-59ab2fa76ee1" name="Changes" comment="implement sound atlas">
+    <list default="true" id="7fa9ba1b-2cff-4ecc-86fb-59ab2fa76ee1" name="Changes" comment="stashing loading screen">
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/common/animation_queue.lua" beforeDir="false" afterPath="$PROJECT_DIR$/common/animation_queue.lua" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/common/glyph_render.glsl" beforeDir="false" afterPath="$PROJECT_DIR$/common/glyph_render.glsl" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/common/game_state.lua" beforeDir="false" afterPath="$PROJECT_DIR$/common/game_state.lua" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/common/game_state_scene.lua" beforeDir="false" afterPath="$PROJECT_DIR$/common/game_state_scene.lua" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/common/glyph.lua" beforeDir="false" afterPath="$PROJECT_DIR$/common/glyph.lua" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/common/loading_screen.lua" beforeDir="false" afterPath="$PROJECT_DIR$/common/loading_screen.lua" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/include.lua" beforeDir="false" afterPath="$PROJECT_DIR$/include.lua" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/common/vertex_shape.lua" beforeDir="false" afterPath="$PROJECT_DIR$/common/vertex_shape.lua" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/main.lua" beforeDir="false" afterPath="$PROJECT_DIR$/main.lua" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
@@ -518,15 +519,8 @@
       <workItem from="1725673641569" duration="2761000" />
       <workItem from="1725814509037" duration="16986000" />
       <workItem from="1725901580447" duration="9607000" />
-      <workItem from="1725983643239" duration="2697000" />
-    </task>
-    <task id="LOCAL-01000" summary="update">
-      <option name="closed" value="true" />
-      <created>1724719040185</created>
-      <option name="number" value="01000" />
-      <option name="presentableId" value="LOCAL-01000" />
-      <option name="project" value="LOCAL" />
-      <updated>1724719040185</updated>
+      <workItem from="1725983643239" duration="2742000" />
+      <workItem from="1725986406074" duration="2774000" />
     </task>
     <task id="LOCAL-01001" summary="stashing coroutines">
       <option name="closed" value="true" />
@@ -912,7 +906,15 @@
       <option name="project" value="LOCAL" />
       <updated>1725932224613</updated>
     </task>
-    <option name="localTasksCounter" value="1049" />
+    <task id="LOCAL-01049" summary="stashing loading screen">
+      <option name="closed" value="true" />
+      <created>1725986391578</created>
+      <option name="number" value="01049" />
+      <option name="presentableId" value="LOCAL-01049" />
+      <option name="project" value="LOCAL" />
+      <updated>1725986391578</updated>
+    </task>
+    <option name="localTasksCounter" value="1050" />
     <servers />
   </component>
   <component name="TypeScriptGeneratedFilesManager">
@@ -961,7 +963,6 @@
     </option>
   </component>
   <component name="VcsManagerConfiguration">
-    <MESSAGE value="stashing text atlas" />
     <MESSAGE value="text atlas working" />
     <MESSAGE value="key bindings selection graph working" />
     <MESSAGE value="refacotred keybinding indicator, control indicator now uses it" />
@@ -986,7 +987,8 @@
     <MESSAGE value="stashing demo" />
     <MESSAGE value="added sound atlas, stashing" />
     <MESSAGE value="implement sound atlas" />
-    <option name="LAST_COMMIT_MESSAGE" value="implement sound atlas" />
+    <MESSAGE value="stashing loading screen" />
+    <option name="LAST_COMMIT_MESSAGE" value="stashing loading screen" />
   </component>
   <component name="XDebuggerManager">
     <breakpoint-manager>

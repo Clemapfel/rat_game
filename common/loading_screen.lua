@@ -1,27 +1,35 @@
 rt.settings.loading_screen = {
-    opacity_sweep_duration = 0.5,   -- seconds
-    label_frame_duration = 1 / 2,   -- seconds
+    fade_in_duration = 0.25,  -- seconds
+    fade_out_duration = 0.1, -- seconds
+    frame_duration = 1 / 2,  -- seconds
 }
 
 --- @class rt.LoadingScreen
-rt.LoadingScreen = meta.new_type("LoadingScreen", rt.Widget, rt.Animation, function()
+--- @signal shown (self) -> nil
+--- @signal hidden (self) -> nil
+rt.LoadingScreen = meta.new_type("LoadingScreen", rt.Widget, rt.Animation, rt.SignalEmitter, function()
     local out = meta.new(rt.LoadingScreen, {
         _shape = rt.VertexRectangle(0, 0, 1, 1),
         _label_frames = {},
         _frame_i = 1,
         _elapsed = 0,
         _is_active = false,
-        _current_opacity = 0
+        _current_opacity = 1
     })
 
     out._n_frames = 4
-    local prefix, postfix = "<b><wave><rainbow>", "</wave></rainbow></b>"
+    local prefix, postfix = "<o><b><wave><rainbow>", "</wave></rainbow></b></o>"
     for i = 1, out._n_frames do
         table.insert(out._label_frames, rt.Label(
             prefix .. "Loading" .. string.rep(".", i - 1) .. postfix,
             rt.settings.font.default_large, rt.settings.font.default_large_mono
         ))
     end
+
+    out:_update_color()
+
+    out:signal_add("show")
+    out:signal_add("hidden")
     return out
 end)
 
@@ -33,16 +41,13 @@ function rt.LoadingScreen:realize()
     for labels in values(self._label_frames) do
         labels:realize()
     end
+
+    self:_update_color()
 end
 
 --- @override
 function rt.LoadingScreen:size_allocate(x, y, width, height)
-    self._shape:reformat(
-        x, y,
-        x + width, y,
-        x + width, y + height,
-        x, y + height
-    )
+    self._shape:reformat(x, y, x + width, y, x + width, y + height, x, y + height)
 
     local max_label_w = NEGATIVE_INFINITY
     local label_hs = {}
@@ -58,14 +63,14 @@ function rt.LoadingScreen:size_allocate(x, y, width, height)
         label:fit_into(x + width - max_label_w - outer_margin, y + height - label_hs[i] - outer_margin)
     end
 
-    self._shape:set_color(rt.RGBA(0, 0, 0, self._current_opacity))
+    self:_update_color()
 end
 
 --- @override
 function rt.LoadingScreen:update(delta)
     self._elapsed = self._elapsed + delta
     local frame_duration = rt.settings.loading_screen.frame_duration
-    while self._elapsed > frame_duration do
+    while self._current_opacity > 0 and self._elapsed > frame_duration do
         self._elapsed = self._elapsed - frame_duration
         self._frame_i = self._frame_i + 1
         if self._frame_i > self._n_frames then
@@ -78,26 +83,48 @@ function rt.LoadingScreen:update(delta)
     end
 
     local opacity_changed = false
-    local step = 1 / rt.settings.opacity_sweep_duration * delta
+    local step_up = 1 / rt.settings.loading_screen.fade_in_duration * delta
+    local step_down = 1 / rt.settings.loading_screen.fade_out_duration * delta
     if self._is_active and self._current_opacity < 1 then
-        self._current_opacity = self._current_opacity + step
+        local before = self._current_opacity
+        self._current_opacity = self._current_opacity + step_up
         opacity_changed = true
+        if before >= 1 then
+            self:signal_emit("shown")
+        end
     elseif self._is_active == false and self._current_opacity > 0 then
-        self._current_opacity = self._current_opacity - step
+        self._current_opacity = self._current_opacity - step_down
         opacity_changed = true
+        if self._current_opacity <= 0 then
+            self:signal_emit("hidden")
+        end
     end
 
     if opacity_changed then
         self._current_opacity = clamp(self._current_opacity, 0, 1)
-        self._shape:set_color(rt.RGBA(0, 0, 0, self._current_opacity))
+        self:_update_color()
     end
+end
 
+--- @brief
+function rt.LoadingScreen:_update_color()
+    self._shape:set_color(rt.RGBA(
+        1 - self._current_opacity,
+        1 - self._current_opacity,
+        1 - self._current_opacity,
+        1
+    ))
 end
 
 --- @override
 function rt.LoadingScreen:draw()
+    rt.graphics.set_blend_mode(rt.BlendMode.MULTIPLY, rt.BlendMode.MULTIPLY)
     self._shape:draw()
-    self._label_frames[self._frame_i]:draw()
+    rt.graphics.set_blend_mode()
+
+    if self._current_opacity >= 1 then
+        self._label_frames[self._frame_i]:draw()
+    end
 end
 
 --- @brief
