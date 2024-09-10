@@ -69,7 +69,6 @@ function rt.Background:update(delta)
 
         self._dynamic_resolution_freeze_count = 0
     end
-    dbg(self._current_compression)
 end
 
 --- @override

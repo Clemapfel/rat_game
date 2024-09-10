@@ -27,6 +27,12 @@ input:signal_connect("keyboard_released", function(_, which)
 end)
 
 
+input:signal_connect("pressed", function(_, which)
+    if which == rt.InputButton.A then
+        rt.SoundAtlas:play("test/alarm")
+    end
+end)
+
 love.load = function()
     background:realize()
     state:_load()

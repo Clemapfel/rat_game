@@ -424,6 +424,8 @@ function rt.GameState:_update(delta)
     if self._current_scene ~= nil then
         self._current_scene:update(delta)
     end
+
+    rt.SoundAtlas:update(delta)
 end
 
 --- @brief
