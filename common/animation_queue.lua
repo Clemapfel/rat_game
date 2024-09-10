@@ -7,7 +7,7 @@ rt.QueueableAnimationResult = {
 --- @class rt.QueueableAnimationState
 rt.QueueableAnimationState = {
     IDLE = 1,       -- not yet start
-    STARTED = 2,      -- running
+    STARTED = 2,    -- running
     FINISHED = 3    -- done running
 }
 

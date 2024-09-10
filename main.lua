@@ -6,6 +6,9 @@ state:initialize_debug_state()
 local background = rt.Background()
 background:set_implementation(rt.Background.BUBBLEGUM)
 
+local loading_screen = rt.LoadingScreen()
+loading_screen:realize()
+
 local draw_state = true
 input = rt.InputController()
 input:signal_connect("keyboard_pressed", function(_, which)
@@ -29,7 +32,10 @@ end)
 
 input:signal_connect("pressed", function(_, which)
     if which == rt.InputButton.A then
-        rt.SoundAtlas:play("test/alarm")
+        loading_screen:show()
+        --rt.SoundAtlas:play("test/alarm")
+    elseif which == rt.InputButton.B then
+        loading_screen:hide()
     end
 end)
 
@@ -42,6 +48,7 @@ end
 
 love.update = function(delta)
     background:update(delta)
+    loading_screen:update(delta)
     state:_update(delta)
 end
 
@@ -50,10 +57,13 @@ love.draw = function()
     if draw_state then
         --state:_draw()
     end
+
+    loading_screen:draw()
 end
 
 love.resize = function(new_width, new_height)
     background:fit_into(0, 0, new_width, new_height)
+    loading_screen:fit_into(0, 0, new_width, new_height)
     state:_resize(new_width, new_height)
 end
 

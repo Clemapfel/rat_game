@@ -58,7 +58,6 @@ for _, name in pairs({"rt", "bt", "ow", "b2"}) do
 end
 
 -- includes
-
 require "common.common"
 require "common.serialize"
 require "common.meta"
@@ -126,6 +125,7 @@ require "common.collider"
 require "common.rope"
 require "common.cloth"
 
+require "common.loading_screen"
 require "common.scene"
 
 -- backgrounds
