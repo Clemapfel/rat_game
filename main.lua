@@ -30,11 +30,19 @@ end)
 
 input:signal_connect("pressed", function(_, which)
     if which == rt.InputButton.A then
-
+        rt.SoundAtlas:play("test")
     elseif which == rt.InputButton.B then
 
     end
 end)
+
+sound = love.audio.newSource("test.wav", "static")
+sound:setLooping(true)
+sound:play()
+
+angle = 0
+radius = 100
+local centerX, centerY
 
 love.load = function()
     background:realize()
@@ -46,6 +54,8 @@ end
 love.update = function(delta)
     background:update(delta)
     state:_update(delta)
+
+    angle = math.fmod(angle + delta, 2 * math.pi)
 end
 
 love.draw = function()

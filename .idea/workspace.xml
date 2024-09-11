@@ -22,15 +22,13 @@
     </configurations>
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="7fa9ba1b-2cff-4ecc-86fb-59ab2fa76ee1" name="Changes" comment="stashing loading screen done">
+    <list default="true" id="7fa9ba1b-2cff-4ecc-86fb-59ab2fa76ee1" name="Changes" comment="resolutions working">
+      <change afterPath="$PROJECT_DIR$/common/audio_playback.lua" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/assets/text/english/menu.lua" beforeDir="false" afterPath="$PROJECT_DIR$/assets/text/english/menu.lua" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/common/easement_functions.lua" beforeDir="false" afterPath="$PROJECT_DIR$/common/easement_functions.lua" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/common/game_state.lua" beforeDir="false" afterPath="$PROJECT_DIR$/common/game_state.lua" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/common/loading_screen.lua" beforeDir="false" afterPath="$PROJECT_DIR$/common/loading_screen.lua" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/common/sound_atlas.lua" beforeDir="false" afterPath="$PROJECT_DIR$/common/sound_atlas.lua" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/main.lua" beforeDir="false" afterPath="$PROJECT_DIR$/main.lua" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/menu/options_scene.lua" beforeDir="false" afterPath="$PROJECT_DIR$/menu/options_scene.lua" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/old/common/easement_functions.lua" beforeDir="false" afterPath="$PROJECT_DIR$/old/common/easement_functions.lua" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -521,15 +519,8 @@
       <workItem from="1725814509037" duration="16986000" />
       <workItem from="1725901580447" duration="9607000" />
       <workItem from="1725983643239" duration="2742000" />
-      <workItem from="1725986406074" duration="12621000" />
-    </task>
-    <task id="LOCAL-01002" summary="added coroutine architecture to scene loading">
-      <option name="closed" value="true" />
-      <created>1724871041929</created>
-      <option name="number" value="01002" />
-      <option name="presentableId" value="LOCAL-01002" />
-      <option name="project" value="LOCAL" />
-      <updated>1724871041930</updated>
+      <workItem from="1725986406074" duration="12813000" />
+      <workItem from="1726080004331" duration="2166000" />
     </task>
     <task id="LOCAL-01003" summary="stashing before moving save_point maybe to widget level">
       <option name="closed" value="true" />
@@ -915,7 +906,15 @@
       <option name="project" value="LOCAL" />
       <updated>1725989336196</updated>
     </task>
-    <option name="localTasksCounter" value="1051" />
+    <task id="LOCAL-01051" summary="resolutions working">
+      <option name="closed" value="true" />
+      <created>1725999193005</created>
+      <option name="number" value="01051" />
+      <option name="presentableId" value="LOCAL-01051" />
+      <option name="project" value="LOCAL" />
+      <updated>1725999193005</updated>
+    </task>
+    <option name="localTasksCounter" value="1052" />
     <servers />
   </component>
   <component name="TypeScriptGeneratedFilesManager">
@@ -964,7 +963,6 @@
     </option>
   </component>
   <component name="VcsManagerConfiguration">
-    <MESSAGE value="key bindings selection graph working" />
     <MESSAGE value="refacotred keybinding indicator, control indicator now uses it" />
     <MESSAGE value="stashing imperfect l/r" />
     <MESSAGE value="box2d thread hello world working" />
@@ -989,7 +987,8 @@
     <MESSAGE value="implement sound atlas" />
     <MESSAGE value="stashing loading screen" />
     <MESSAGE value="stashing loading screen done" />
-    <option name="LAST_COMMIT_MESSAGE" value="stashing loading screen done" />
+    <MESSAGE value="resolutions working" />
+    <option name="LAST_COMMIT_MESSAGE" value="resolutions working" />
   </component>
   <component name="XDebuggerManager">
     <breakpoint-manager>

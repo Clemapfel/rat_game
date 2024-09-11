@@ -5,8 +5,10 @@ rt.SourceTimeUnit = meta.new_enum({
 })
 
 --- @class rt.SoundAtlasEntry
-rt.SoundAtlasEntry = meta.new_type("SoundAtlasEntry", function(path)
-    return meta.new(rt.SoundAtlasEntry, {
+--- @signal started (self) -> nil
+--- @signal finished (self) -> nil
+rt.SoundAtlasEntry = meta.new_type("SoundAtlasEntry", rt.SignalEmitter, function(path)
+    local out = meta.new(rt.SoundAtlasEntry, {
         path = path,
         data = nil, -- love.AudioData
         sources = {}, -- Table<love.Source, { cf :play }>
@@ -14,6 +16,9 @@ rt.SoundAtlasEntry = meta.new_type("SoundAtlasEntry", function(path)
         volume_factor = 1,
         duration = 0,
     })
+
+    out:signal_add("started")
+    out:signal_add("finished")
 end, {
     fade_in_duration = 1,
     fade_out_duration = 1
@@ -42,9 +47,7 @@ function rt.SoundAtlasEntry:update(delta)
                     source:stop()
                 end
             end
-
-            dbg(entry.current_volume)
-
+            dbg(entry.current_volume * self.volume_factor * sfx_volume)
             source:setVolume(entry.current_volume * self.volume_factor * sfx_volume)
         end
     end
@@ -109,7 +112,9 @@ end)
 
 --- @brief
 function rt.SoundAtlas:update(delta)
-
+    for entry in self._active_entries do
+        entry:update(delta)
+    end
 end
 
 --- @brief
@@ -147,6 +152,7 @@ function rt.SoundAtlas:play(id)
     if entry.is_realized == false then
         entry.data = love.sound.newSoundData(entry.path)
     end
+
 
     entry:play()
 end

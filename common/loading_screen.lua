@@ -18,6 +18,7 @@ rt.LoadingScreen = meta.new_type("LoadingScreen", rt.Widget, rt.Animation, rt.Si
         _current_opacity = 0,
         _fade_in_elapsed = 0,
         _fade_out_elapsed = 0,
+        _label_visible = false
     })
 
     out._n_frames = 4
@@ -100,6 +101,7 @@ function rt.LoadingScreen:update(delta)
 
         if self._current_opacity >= 1 - eps then
             self:signal_emit("shown")
+            self._label_visible = true
         end
 
         opacity_changed = true
@@ -144,7 +146,9 @@ function rt.LoadingScreen:draw()
     self._shape:draw()
     rt.graphics.set_blend_mode()
 
-    self._label_frames[self._frame_i]:draw()
+    if self._label_visible then
+        self._label_frames[self._frame_i]:draw()
+    end
 end
 
 --- @brief
@@ -156,6 +160,7 @@ end
 
 --- @brief
 function rt.LoadingScreen:hide()
+    self._label_visible = false
     self._is_active = false
     self._fade_in_elapsed = 0
     self._fade_out_elapsed = 0

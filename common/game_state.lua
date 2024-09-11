@@ -426,6 +426,8 @@ function rt.GameState:_update(delta)
         self._loading_screen:update(delta)
     end
 
+    rt.SoundAtlas:update(delta)
+
     local n = sizeof(self._active_coroutines)
     local to_remove = {}
     local max_n_routines = 2;
@@ -447,8 +449,6 @@ function rt.GameState:_update(delta)
     if self._current_scene ~= nil then
         self._current_scene:update(delta)
     end
-
-    rt.SoundAtlas:update(delta)
 end
 
 --- @brief
