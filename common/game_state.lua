@@ -422,11 +422,11 @@ end
 
 --- @brief
 function rt.GameState:_update(delta)
+    rt.SoundAtlas:update(delta)
+
     if self._loading_screen_active then
         self._loading_screen:update(delta)
     end
-
-    rt.SoundAtlas:update(delta)
 
     local n = sizeof(self._active_coroutines)
     local to_remove = {}

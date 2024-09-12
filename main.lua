@@ -6,7 +6,6 @@ state:initialize_debug_state()
 local background = rt.Background()
 background:set_implementation(rt.Background.BUBBLEGUM)
 
-
 local draw_state = true
 input = rt.InputController()
 input:signal_connect("keyboard_pressed", function(_, which)
@@ -27,18 +26,18 @@ input:signal_connect("keyboard_released", function(_, which)
     end
 end)
 
+component = rt.SoundComponent()
+component:signal_connect("finished", function(_)
+    println("done")
+end)
 
 input:signal_connect("pressed", function(_, which)
     if which == rt.InputButton.A then
-        rt.SoundAtlas:play("test")
+       component:play("test/alarm")
     elseif which == rt.InputButton.B then
 
     end
 end)
-
-sound = love.audio.newSource("test.wav", "static")
-sound:setLooping(true)
-sound:play()
 
 angle = 0
 radius = 100
