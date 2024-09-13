@@ -3,6 +3,8 @@ require "include"
 state = rt.GameState()
 state:initialize_debug_state()
 
+world = b2.World
+
 local background = rt.Background()
 background:set_implementation(rt.Background.BUBBLEGUM)
 

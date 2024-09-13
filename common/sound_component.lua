@@ -7,6 +7,7 @@ rt.SoundComponent = meta.new_type("SoundComponent", rt.SignalEmitter, function()
         _last_id = nil,
         _native = nil,
         _is_active = false,
+        _last_tell = 0
     })
     out:signal_add("finished")
     rt.SoundAtlas:add_sound_component(out)

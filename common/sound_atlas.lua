@@ -79,11 +79,14 @@ function rt.SoundAtlas:update(delta)
     local unit = rt.SourceTimeUnit.SAMPLES
     for _, component in pairs(self._sound_components) do
         if component._native ~= nil then
-            dbg(component._native:tell("samples"), component._native:getDuration("samples"))
+            local tell = component._native:tell("samples")
+            if component._last_tell ~= 0 and tell == 0 then
+                dbg(component._native:tell("samples"), component._native:getDuration("samples"))
+                component:signal_emit("finished")
+                component._is_active = false
+            end
 
-                --component:signal_emit("finished")
-                --component._is_active = false
-
+            component._last_tell = tell
         end
     end
 end
