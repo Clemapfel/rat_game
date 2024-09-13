@@ -228,5 +228,73 @@ end
 
 --- @brief
 function b2.Shape:draw()
+    local type = box2d.b2Shape_GetType(self._native)
+    local body = box2d.b2Shape_GetBody(self._native)
+    local offset = box2d.b2Body_GetWorldPoint(body, ffi.typeof("b2Vec2")(0, 0))
+    love.graphics.translate(offset.x, offset.y)
+    if type == box2d.b2_circleShape then
+        b2._draw_circle(box2d.b2Shape_GetCircle(self._native))
+    elseif type == box2d.b2_polygonShape then
+        b2._draw_polygon(box2d.b2Shape_GetPolygon(self._native))
+    elseif type == box2d.b2_segmentShape then
+        b2._draw_segment(box2d.b2Shape_GetSegment(self._native))
+    elseif type == box2d.b2_capsuleShape then
+        b2._draw_segment(box2d.b2Shape_GetCapsule(self._native))
+    elseif type == box2d.b2_smoothSegmentShape then
+        b2._draw_smooth_segment(box2d.b2Shape_GetSmoothSegment(self._native))
+    else
+        error("In b2.Shape:draw: unhandlined shape type `" .. type .. "`")
+    end
+    love.graphics.translate(-offset.x, -offset.y)
+end
 
+--- @brief
+function b2._draw_circle(circle, body)
+    love.graphics.circle("fill", circle.center.x, circle.center.y, circle.radius)
+    love.graphics.circle("line", circle.center.x, circle.center.y, circle.radius)
+end
+
+--- @brief
+function b2._draw_polygon(polygon)
+    local points = {}
+    for i = 1, polygon.count do
+        table.insert(points, polygon.vertices[i-1].x)
+        table.insert(points, polygon.vertices[i-1].y)
+    end
+    love.graphics.polygon("fill", points)
+    love.graphics.polygon("line", points)
+end
+
+--- @brief
+function b2._draw_segment(segment)
+    love.graphics.line(segment.point1.x, segment.point1.y, segment.point2.x, segment.point2.y)
+end
+
+--- @brief
+function b2._draw_smooth_segment(smooth)
+    love.graphics.line(smooth.segment.point1.x, smooth.segment.point1.y, smooth.segment.point2.x, smooth.segment.point2.y)
+end
+
+--- @brief
+function b2._draw_capsule(capsule)
+    local x1, y1, x2, y2 = capsule.center1.x, capsule.center1.y, capsule.center2.x, capsule.center2.y
+
+    local dx = x2 - x1
+    local dy = y2 - y1
+    local length = math.sqrt(dx * dx + dy * dy)
+    local angle = math.atan2(dy, dx)
+    local radius = capsule.radius
+
+    love.graphics.translate(x1, y1)
+    love.graphics.rotate(angle)
+
+    love.graphics.rectangle("fill", 0, -radius, length, 2 * radius)
+    love.graphics.arc("fill", length, 0, radius, -math.pi / 2, math.pi / 2)
+    love.graphics.arc("fill", 0, 0, radius, math.pi / 2, 3 * math.pi / 2)
+
+    love.graphics.arc("line", length, 0, radius, -math.pi / 2, math.pi / 2)
+    love.graphics.arc("line", 0, 0, radius, math.pi / 2, 3 * math.pi / 2)
+
+    love.graphics.line(0, -radius, length, -radius)
+    love.graphics.line(0, radius, length, radius)
 end

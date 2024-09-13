@@ -148,6 +148,13 @@ end
 
 -- physics
 require "physics.world"
+require "physics.circle"
+require "physics.capsule"
+require "physics.segment"
+require "physics.polygon"
+require "physics.shape"
+require "physics.body"
+require "phiyscs.joint"
 
 -- battle
 require "battle.move"

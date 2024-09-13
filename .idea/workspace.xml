@@ -22,23 +22,11 @@
     </configurations>
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="7fa9ba1b-2cff-4ecc-86fb-59ab2fa76ee1" name="Changes" comment="stashing sound">
-      <change afterPath="$PROJECT_DIR$/physics/body.lua" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/physics/capsule.lua" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/physics/cdef.h" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/physics/circle.lua" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/physics/joint.lua" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/physics/polygon.lua" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/physics/segment.lua" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/physics/shape.lua" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/physics/world.lua" afterDir="false" />
+    <list default="true" id="7fa9ba1b-2cff-4ecc-86fb-59ab2fa76ee1" name="Changes" comment="added physics">
+      <change afterPath="$PROJECT_DIR$/main_rope.lua" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/common/collider.lua" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/common/physics_world.lua" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/common/sound_atlas.lua" beforeDir="false" afterPath="$PROJECT_DIR$/common/sound_atlas.lua" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/common/sound_component.lua" beforeDir="false" afterPath="$PROJECT_DIR$/common/sound_component.lua" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/include.lua" beforeDir="false" afterPath="$PROJECT_DIR$/include.lua" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/main.lua" beforeDir="false" afterPath="$PROJECT_DIR$/main.lua" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/physics/shape.lua" beforeDir="false" afterPath="$PROJECT_DIR$/physics/shape.lua" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -531,15 +519,7 @@
       <workItem from="1725983643239" duration="2742000" />
       <workItem from="1725986406074" duration="12813000" />
       <workItem from="1726080004331" duration="2183000" />
-      <workItem from="1726098165384" duration="8632000" />
-    </task>
-    <task id="LOCAL-01005" summary="stashing, why does update not stack with increased frame duration">
-      <option name="closed" value="true" />
-      <created>1724875621082</created>
-      <option name="number" value="01005" />
-      <option name="presentableId" value="LOCAL-01005" />
-      <option name="project" value="LOCAL" />
-      <updated>1724875621082</updated>
+      <workItem from="1726098165384" duration="9411000" />
     </task>
     <task id="LOCAL-01006" summary="refactored _is_realized to get_is_realized">
       <option name="closed" value="true" />
@@ -925,7 +905,15 @@
       <option name="project" value="LOCAL" />
       <updated>1726102305452</updated>
     </task>
-    <option name="localTasksCounter" value="1054" />
+    <task id="LOCAL-01054" summary="added physics">
+      <option name="closed" value="true" />
+      <created>1726187090988</created>
+      <option name="number" value="01054" />
+      <option name="presentableId" value="LOCAL-01054" />
+      <option name="project" value="LOCAL" />
+      <updated>1726187090988</updated>
+    </task>
+    <option name="localTasksCounter" value="1055" />
     <servers />
   </component>
   <component name="TypeScriptGeneratedFilesManager">
@@ -974,7 +962,6 @@
     </option>
   </component>
   <component name="VcsManagerConfiguration">
-    <MESSAGE value="box2d thread hello world working" />
     <MESSAGE value="works for a few cycles" />
     <MESSAGE value="stashing, finish_tasks seems to be called async too" />
     <MESSAGE value="stashing uses threads but runs serially" />
@@ -999,7 +986,8 @@
     <MESSAGE value="resolutions working" />
     <MESSAGE value="switchin to queueable source" />
     <MESSAGE value="stashing sound" />
-    <option name="LAST_COMMIT_MESSAGE" value="stashing sound" />
+    <MESSAGE value="added physics" />
+    <option name="LAST_COMMIT_MESSAGE" value="added physics" />
   </component>
   <component name="XDebuggerManager">
     <breakpoint-manager>
@@ -1013,6 +1001,11 @@
           <url>file://$PROJECT_DIR$/old/menu/scene.lua</url>
           <line>332</line>
           <option name="timeStamp" value="9" />
+        </line-breakpoint>
+        <line-breakpoint enabled="true" type="lua-line">
+          <url>file://$PROJECT_DIR$/fast_physics/shape.lua</url>
+          <line>231</line>
+          <option name="timeStamp" value="12" />
         </line-breakpoint>
         <line-breakpoint enabled="true" type="com.jetbrains.cidr.execution.debugger.OCBreakpointType">
           <url>file://$PROJECT_DIR$/fast_physics/enki_cdef.h</url>
