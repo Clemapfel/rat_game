@@ -23,7 +23,12 @@ function b2.DistanceJoint(
     def.bodyIdA = body_a._native
     def.bodyIdB = body_b._native
 
-    if length == nil then length = 0 end
+    if length <= 0 then
+        rt.warning("In b2.DistanceJoint: length <= 0")
+    end
+
+    if length == nil then length = 1 / 1000 end
+
     def.length = length
 
     if a_anchor_x == nil then a_anchor_x = 0 end
@@ -57,6 +62,7 @@ function b2.MouseJoint(
     world,
     body_a, body_b,
     position_x, position_y,
+    collide_connected,
     hertz, damping, max_force
 )
     local def = box2d.b2DefaultMouseJointDef()
@@ -64,11 +70,14 @@ function b2.MouseJoint(
     def.bodyIdB = body_b._native
     def.target = b2.Vec2(position_x, position_y)
 
+    if collide_connected == nil then collide_connected = true end
+    def.collideConnected = collide_connected
+
     if hertz == nil then hertz = 1.0 end
     if damping == nil then damping = 0 end
     if max_force == nil then max_force = POSITIVE_INFINITY end -- TODO
     def.hertz = hertz
-    def.damping = damping
+    def.dampingRatio = damping
     def.maxForce = max_force
 
     return meta.new(b2.Joint, {
@@ -141,10 +150,10 @@ end
 
 --- @brief
 function b2.Joint:draw()
-    local local_a = box2d.b2Joint_GetLocalAnchorA
-    local local_b = box2d.b2Joint_GetLocalAnchorB
-    local body_a = box2d.b2Joint_GetBodyA
-    local body_b = box2d.b2Joint_GetBodyB
+    local local_a = box2d.b2Joint_GetLocalAnchorA(self._native)
+    local local_b = box2d.b2Joint_GetLocalAnchorB(self._native)
+    local body_a = box2d.b2Joint_GetBodyA(self._native)
+    local body_b = box2d.b2Joint_GetBodyB(self._native)
 
     local a = box2d.b2Body_GetWorldPoint(body_a, local_a)
     local b = box2d.b2Body_GetWorldPoint(body_b, local_b)
