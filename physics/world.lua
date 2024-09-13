@@ -1,7 +1,7 @@
 --- @class b2.World
 b2.World = meta.new_type("PhysicsWorld", function(gravity_x, gravity_y)
     local def = box2d.b2DefaultWorldDef()
-    def.gravity = ffi.typeof("b2Vec2")(gravity_x, gravity_y)
+    def.gravity = b2.Vec2(gravity_x, gravity_y)
     return meta.new(b2.World, {
         _native = box2d.b2CreateWorld(def)
     })
@@ -16,12 +16,18 @@ end
 
 --- @brief
 function b2.World:set_gravity(gravity_x, gravity_y)
-    box2d.b2World_SetGravity(self._native, ffi.typeof("b2Vec2")(gravity_x, gravity_y))
+    box2d.b2World_SetGravity(self._native, b2.Vec2(gravity_x, gravity_y))
 end
 
 --- @brief
 function b2.World:step(delta, n_iterations)
     if n_iterations == nil then n_iterations = 4 end
+
+    local step = 1 / 60
+    while delta > step do
+        box2d.b2World_Step(self._native, step, n_iterations)
+        delta = delta - step
+    end
     box2d.b2World_Step(self._native, delta, n_iterations)
 end
 

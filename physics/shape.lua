@@ -4,6 +4,11 @@ b2.Shape = meta.new_type("PhysicsShape", function()
     return nil
 end)
 
+--- @brief
+function b2.Shape:destroy()
+    box2d.b2DestroyShape(self._native)
+end
+
 --- @enum b2.ShapeType
 b2.ShapeType = {
     CIRCLE = box2d.b2_circleShape,
@@ -16,14 +21,14 @@ b2.ShapeType = {
 --- @brief
 function b2.Shape._default_shape_def(is_sensor)
     local shape_def = box2d.b2DefaultShapeDef()
-    shape_def.density = 1
+    shape_def.density = 1 / 100
     if is_sensor ~= nil then shape_def.isSensor = is_sensor end
     return shape_def
 end
 
 --- @brief
 function b2.CircleShape(body, circle, is_sensor)
-    local shape_def = b2._default_shape_def(is_sensor)
+    local shape_def = b2.Shape._default_shape_def(is_sensor)
     return meta.new(b2.Shape, {
         _native = box2d.b2CreateCircleShape(body._native, shape_def, circle._native)
     })
@@ -31,7 +36,7 @@ end
 
 --- @brief
 function b2.CapsuleShape(body, capsule, is_sensor)
-    local shape_def = b2._default_shape_def(is_sensor)
+    local shape_def = b2.Shape._default_shape_def(is_sensor)
     return meta.new(b2.Shape, {
         _native = box2d.b2CreateCapsuleShape(body._native, shape_def, capsule._native)
     })
@@ -39,7 +44,7 @@ end
 
 --- @brief
 function b2.SegmentShape(body, segment, is_sensor)
-    local shape_def = b2._default_shape_def(is_sensor)
+    local shape_def = b2.Shape._default_shape_def(is_sensor)
     return meta.new(b2.Shape, {
         _native = box2d.b2CreateSegmentShape(body._native, shape_def, segment._native)
     })
@@ -47,19 +52,19 @@ end
 
 --- @brief
 function b2.PolygonShape(body, polygon, is_sensor)
-    local shape_def = b2._default_shape_def(is_sensor)
+    local shape_def = b2.Shape._default_shape_def(is_sensor)
     return meta.new(b2.Shape, {
         _native = box2d.b2CreatePolygonShape(body._native, shape_def, polygon._native)
     })
 end
 
---- @brief
+--[[
 function b2.ChainShape(body, ...)
     local chain_def = box2d.b2DefaultChainDef()
     local points = {...}
     local vec2s = ffi.new("b2Vec2[" .. #points / 2 .. "]")
     for i = 1, #points, 2 do
-        local vec2 = ffi.typeof("b2Vec2")(points[i], points[i+1])
+        local vec2 = b2.Vec2(points[i], points[i+1])
         vec2s[i] = vec2
         chain_def.count = chain_def.count + 1
     end
@@ -68,6 +73,7 @@ function b2.ChainShape(body, ...)
         _native = box2d.b2CreateChain(body._native, chain_def)
     })
 end
+]]--
 
 --- @brief
 function b2.Shape:get_body()
@@ -204,7 +210,7 @@ end
 
 --- @brief
 function b2.Shape:get_closest_point(position_x, position_y)
-    local out = box2d.b2Sape_GetClosestPoint(ffi.typeof("b2Vec2")(position_x, position_y))
+    local out = box2d.b2Sape_GetClosestPoint(b2.Vec2(position_x, position_y))
     return out.x, out.y
 end
 
@@ -227,11 +233,35 @@ function b2.Shape:set_filter_data(category_bits, mask_bits, group_index)
 end
 
 --- @brief
+function b2.Shape:set_collision_group(group)
+    local filter = box2d.b2DefaultFilter()
+    if group == b2.CollisionGroup.ALL then
+        filter.categoryBits = 0xFFFF
+        filter.maskBits = 0xFFFF
+        filter.groupIndex = 0
+    elseif group == b2.CollisionGroup.NONE then
+        filter.categoryBits = 0x0000
+        filter.maskBits = 0x0000
+        filter.groupIndex = 0
+    else
+        filter.categoryBits = group
+        filter.maskBits = group
+        filter.groupindex = 0
+    end
+
+    box2d.b2Shape_SetFilter(self._native, filter)
+end
+
+--- @brief
 function b2.Shape:draw()
     local type = box2d.b2Shape_GetType(self._native)
     local body = box2d.b2Shape_GetBody(self._native)
-    local offset = box2d.b2Body_GetWorldPoint(body, ffi.typeof("b2Vec2")(0, 0))
+    local offset = box2d.b2Body_GetWorldPoint(body, b2.Vec2(0, 0))
     love.graphics.translate(offset.x, offset.y)
+
+    local hue = (meta.hash(self) % 16) / 16
+    love.graphics.setColor(rt.color_unpack(rt.hsva_to_rgba(rt.HSVA(hue, 1, 1, 0.5))))
+
     if type == box2d.b2_circleShape then
         b2._draw_circle(box2d.b2Shape_GetCircle(self._native))
     elseif type == box2d.b2_polygonShape then
@@ -239,7 +269,7 @@ function b2.Shape:draw()
     elseif type == box2d.b2_segmentShape then
         b2._draw_segment(box2d.b2Shape_GetSegment(self._native))
     elseif type == box2d.b2_capsuleShape then
-        b2._draw_segment(box2d.b2Shape_GetCapsule(self._native))
+        b2._draw_capsule(box2d.b2Shape_GetCapsule(self._native))
     elseif type == box2d.b2_smoothSegmentShape then
         b2._draw_smooth_segment(box2d.b2Shape_GetSmoothSegment(self._native))
     else
@@ -278,23 +308,9 @@ end
 --- @brief
 function b2._draw_capsule(capsule)
     local x1, y1, x2, y2 = capsule.center1.x, capsule.center1.y, capsule.center2.x, capsule.center2.y
-
-    local dx = x2 - x1
-    local dy = y2 - y1
-    local length = math.sqrt(dx * dx + dy * dy)
-    local angle = math.atan2(dy, dx)
     local radius = capsule.radius
 
-    love.graphics.translate(x1, y1)
-    love.graphics.rotate(angle)
-
-    love.graphics.rectangle("fill", 0, -radius, length, 2 * radius)
-    love.graphics.arc("fill", length, 0, radius, -math.pi / 2, math.pi / 2)
-    love.graphics.arc("fill", 0, 0, radius, math.pi / 2, 3 * math.pi / 2)
-
-    love.graphics.arc("line", length, 0, radius, -math.pi / 2, math.pi / 2)
-    love.graphics.arc("line", 0, 0, radius, math.pi / 2, 3 * math.pi / 2)
-
-    love.graphics.line(0, -radius, length, -radius)
-    love.graphics.line(0, radius, length, radius)
+    love.graphics.line(x1, y1, x2, y2)
+    love.graphics.circle("line", x1, y1, radius)
+    love.graphics.circle("line", x2, y2, radius)
 end

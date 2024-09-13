@@ -4,10 +4,6 @@ rt.settings.battle.status = {
 
 --- @class bt.Status
 --- @brief cached instancing, moves with the same ID will always return the same instance
---- @field id String
---- @field name String
---- @field attack_offset Unsigned
---- @field defense_offset Unsigned
 bt.Status = meta.new_type("Status", function(id)
     local out = bt.Status._atlas[id]
     if out == nil then

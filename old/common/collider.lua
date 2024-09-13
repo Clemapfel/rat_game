@@ -430,6 +430,7 @@ function rt.Collider:set_collision_group(group)
     if love.getVersion() >= 12 then
         for _, shape in pairs(self._body:getShapes()) do
             if group == rt.ColliderCollisionGroup.ALL then
+                -- Fixture:setFilterData( categories, mask, group )
                 shape:setFilterData(0xFFFF, 0xFFFF, 0)
             elseif group == rt.ColliderCollisionGroup.NONE then
                 shape:setFilterData(0x0000, 0x0000, 0)

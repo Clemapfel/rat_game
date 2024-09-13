@@ -17,8 +17,9 @@ input:signal_connect("keyboard_pressed", function(_, which)
         state:set_current_scene(mn.OptionsScene)
     elseif which == rt.KeyboardKey.THREE then
         state:set_current_scene(mn.KeybindingScene)
+    elseif which == rt.KeyboardKey.FOUR then
+        state:set_current_scene(bt.BattleScene)
     elseif which == rt.KeyboardKey.ESCAPE then
-        background._shader:recompile()
     end
 end)
 
@@ -35,28 +36,22 @@ end)
 
 input:signal_connect("pressed", function(_, which)
     if which == rt.InputButton.A then
-       component:play("test/alarm")
+       --component:play("test/alarm")
     elseif which == rt.InputButton.B then
 
     end
 end)
 
-angle = 0
-radius = 100
-local centerX, centerY
-
 love.load = function()
     background:realize()
     state:_load()
-    state:set_current_scene(mn.InventoryScene)
+    state:set_current_scene(bt.BattleScene)
     love.resize(love.graphics.getWidth(), love.graphics.getHeight())
 end
 
 love.update = function(delta)
     background:update(delta)
     state:_update(delta)
-
-    angle = math.fmod(angle + delta, 2 * math.pi)
 end
 
 love.draw = function()

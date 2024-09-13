@@ -23,10 +23,33 @@
   </component>
   <component name="ChangeListManager">
     <list default="true" id="7fa9ba1b-2cff-4ecc-86fb-59ab2fa76ee1" name="Changes" comment="added physics">
-      <change afterPath="$PROJECT_DIR$/main_rope.lua" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/assets/configs/global_statuses/DEBUG_GLOBAL_STATUS.lua" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/assets/sprites/status_ailment.lua" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/assets/sprites/status_ailment.png" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/assets/sprites/status_ailment.pxo" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/battle/battle_scene.lua" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/battle/global_status.lua" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/battle/ordered_box.lua" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/battle/status_bar.lua" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/physics/math.lua" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/backgrounds/bubblegum.glsl" beforeDir="false" afterPath="$PROJECT_DIR$/backgrounds/bubblegum.glsl" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/battle/config_atlas.lua" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/battle/status.lua" beforeDir="false" afterPath="$PROJECT_DIR$/battle/status.lua" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/common/widget.lua" beforeDir="false" afterPath="$PROJECT_DIR$/common/widget.lua" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/fast_physics/shape.lua" beforeDir="false" afterPath="$PROJECT_DIR$/fast_physics/shape.lua" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/include.lua" beforeDir="false" afterPath="$PROJECT_DIR$/include.lua" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/main.lua" beforeDir="false" afterPath="$PROJECT_DIR$/main.lua" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/main_rope.lua" beforeDir="false" afterPath="$PROJECT_DIR$/main_rope.lua" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/old/common/collider.lua" beforeDir="false" afterPath="$PROJECT_DIR$/old/common/collider.lua" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/physics/body.lua" beforeDir="false" afterPath="$PROJECT_DIR$/physics/body.lua" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/physics/capsule.lua" beforeDir="false" afterPath="$PROJECT_DIR$/physics/capsule.lua" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/physics/circle.lua" beforeDir="false" afterPath="$PROJECT_DIR$/physics/circle.lua" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/physics/joint.lua" beforeDir="false" afterPath="$PROJECT_DIR$/physics/joint.lua" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/physics/polygon.lua" beforeDir="false" afterPath="$PROJECT_DIR$/physics/polygon.lua" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/physics/segment.lua" beforeDir="false" afterPath="$PROJECT_DIR$/physics/segment.lua" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/physics/shape.lua" beforeDir="false" afterPath="$PROJECT_DIR$/physics/shape.lua" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/physics/world.lua" beforeDir="false" afterPath="$PROJECT_DIR$/physics/world.lua" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -86,6 +109,7 @@
     "Lua Application.main_lichen.executor": "Run",
     "Lua Application.main_linux.executor": "Run",
     "Lua Application.main_overworld_windows.executor": "Run",
+    "Lua Application.main_rope.executor": "Run",
     "Lua Application.main_rope_windows.executor": "Run",
     "Lua Application.main_signal.executor": "Run",
     "Lua Application.main_swirl.executor": "Run",
@@ -107,7 +131,7 @@
     "deletionFromPopupRequiresConfirmation": "false",
     "git-widget-placeholder": "main",
     "ignore.virus.scanning.warn.message": "true",
-    "last_opened_file_path": "C:/Users/cleme/Workspace/rat_game/physics",
+    "last_opened_file_path": "C:/Users/cleme/Workspace/rat_game/assets/sprites",
     "node.js.detected.package.eslint": "true",
     "node.js.detected.package.tslint": "true",
     "node.js.selected.package.eslint": "(autodetect)",
@@ -123,21 +147,21 @@
   </component>
   <component name="RecentsManager">
     <key name="CopyFile.RECENT_KEYS">
+      <recent name="C:\Users\cleme\Workspace\rat_game\assets\sprites" />
       <recent name="C:\Users\cleme\Workspace\rat_game\physics" />
       <recent name="C:\Users\cleme\Workspace\rat_game\assets\sfx\test\test2" />
       <recent name="C:\Users\cleme\Workspace\rat_game\assets\sfx" />
       <recent name="C:\Users\cleme\Workspace\rat_game\assets\sfx\test" />
-      <recent name="C:\Users\cleme\Workspace\rat_game\love\windows" />
     </key>
     <key name="MoveFile.RECENT_KEYS">
+      <recent name="C:\Users\cleme\Workspace\rat_game\physics" />
+      <recent name="C:\Users\cleme\Workspace\rat_game\assets\configs" />
       <recent name="C:\Users\cleme\Workspace\rat_game\assets\sfx\test" />
       <recent name="C:\Users\cleme\Workspace\rat_game\assets" />
       <recent name="C:\Users\cleme\Workspace\rat_game\old" />
-      <recent name="C:\Users\cleme\Workspace\rat_game\assets\text\english" />
-      <recent name="C:\Users\cleme\Workspace\rat_game\assets\sprites" />
     </key>
   </component>
-  <component name="RunManager" selected="Lua Application.main">
+  <component name="RunManager" selected="Lua Application.main_rope">
     <configuration name="main" type="lua.app" factoryName="Lua Application">
       <module name="rat_game" />
       <option name="program" value="C:\Users\cleme\Workspace\rat_game\love\windows\love.exe" />
@@ -149,10 +173,10 @@
       <option name="showConsole" value="true" />
       <method v="2" />
     </configuration>
-    <configuration name="main_box2d" type="lua.app" factoryName="Lua Application">
+    <configuration name="main_rope" type="lua.app" factoryName="Lua Application">
       <module name="rat_game" />
       <option name="program" value="C:\Users\cleme\Workspace\rat_game\love\windows\love.exe" />
-      <option name="file" value="main_box2d.lua" />
+      <option name="file" value="main_rope.lua" />
       <option name="workingDir" value="$PROJECT_DIR$" />
       <option name="debuggerType" value="2" />
       <option name="params" value="" />
@@ -199,7 +223,7 @@
     <list>
       <item itemvalue="Emmy Debugger(NEW).remote_debugger" />
       <item itemvalue="Lua Application.main" />
-      <item itemvalue="Lua Application.main_box2d" />
+      <item itemvalue="Lua Application.main_rope" />
     </list>
   </component>
   <component name="SpellCheckerSettings" RuntimeDictionaries="0" Folders="0" CustomDictionaries="0" DefaultDictionary="application-level" UseSingleDictionary="true" transferred="true" />
@@ -519,15 +543,7 @@
       <workItem from="1725983643239" duration="2742000" />
       <workItem from="1725986406074" duration="12813000" />
       <workItem from="1726080004331" duration="2183000" />
-      <workItem from="1726098165384" duration="9411000" />
-    </task>
-    <task id="LOCAL-01006" summary="refactored _is_realized to get_is_realized">
-      <option name="closed" value="true" />
-      <created>1724875634091</created>
-      <option name="number" value="01006" />
-      <option name="presentableId" value="LOCAL-01006" />
-      <option name="project" value="LOCAL" />
-      <updated>1724875634091</updated>
+      <workItem from="1726098165384" duration="20659000" />
     </task>
     <task id="LOCAL-01007" summary="stashing update, why does it impact fps instead of piling up coroutines?">
       <option name="closed" value="true" />
@@ -913,7 +929,15 @@
       <option name="project" value="LOCAL" />
       <updated>1726187090988</updated>
     </task>
-    <option name="localTasksCounter" value="1055" />
+    <task id="LOCAL-01055" summary="added physics">
+      <option name="closed" value="true" />
+      <created>1726187807605</created>
+      <option name="number" value="01055" />
+      <option name="presentableId" value="LOCAL-01055" />
+      <option name="project" value="LOCAL" />
+      <updated>1726187807605</updated>
+    </task>
+    <option name="localTasksCounter" value="1056" />
     <servers />
   </component>
   <component name="TypeScriptGeneratedFilesManager">

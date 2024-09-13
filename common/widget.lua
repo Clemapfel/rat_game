@@ -83,6 +83,9 @@ end
 --- @brief resize widget such that it fits into the given bounds
 --- @param aabb rt.AxisAlignedRectangle
 function rt.Widget:fit_into(aabb, y, w, h)
+    if self._is_realized == false then
+        rt.warning("In `" .. meta.typeof(self) .. "`:fit_into: size allocate called before widget was realized")
+    end
     if meta.is_number(aabb) then
         local x = aabb
         if w == nil or h == nil then

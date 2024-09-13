@@ -5,6 +5,11 @@ b2.Joint = meta.new_type("PhysicsJoint", function()
 end)
 
 --- @brief
+function b2.Joint:destroy()
+    box2d.b2DestroyJoint(self._native)
+end
+
+--- @brief
 function b2.DistanceJoint(
     world,
     body_a, body_b,
@@ -26,8 +31,8 @@ function b2.DistanceJoint(
     if b_anchor_x == nil then b_anchor_x = 0 end
     if b_anchor_y == nil then b_anchor_y = 0 end
 
-    def.localAnchorA = ffi.typeof("b2Vec2")(a_anchor_x, a_anchor_y)
-    def.localAnchorB = ffi.typeof("b2Vec2")(b_anchor_x, b_anchor_y)
+    def.localAnchorA = b2.Vec2(a_anchor_x, a_anchor_y)
+    def.localAnchorB = b2.Vec2(b_anchor_x, b_anchor_y)
 
     if collide_connected == nil then collide_connected = true end
     def.collideConnected = collide_connected
@@ -57,7 +62,7 @@ function b2.MouseJoint(
     local def = box2d.b2DefaultMouseJointDef()
     def.bodyIdA = body_a._native
     def.bodyIdB = body_b._native
-    def.target = ffi.typeof("b2Vec2")(position_x, position_y)
+    def.target = b2.Vec2(position_x, position_y)
 
     if hertz == nil then hertz = 1.0 end
     if damping == nil then damping = 0 end
@@ -132,4 +137,17 @@ end
 --- @brief
 function b2.Joint:get_constraint_torque()
     return box2d.b2Joint_GetConstraintTorque(self._native)
+end
+
+--- @brief
+function b2.Joint:draw()
+    local local_a = box2d.b2Joint_GetLocalAnchorA
+    local local_b = box2d.b2Joint_GetLocalAnchorB
+    local body_a = box2d.b2Joint_GetBodyA
+    local body_b = box2d.b2Joint_GetBodyB
+
+    local a = box2d.b2Body_GetWorldPoint(body_a, local_a)
+    local b = box2d.b2Body_GetWorldPoint(body_b, local_b)
+
+    love.graphics.line(a.x, a.y, b.x, b.y)
 end

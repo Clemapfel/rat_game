@@ -1,8 +1,10 @@
 --- @class b2.Circle
 b2.Circle = meta.new_type("PhysicsCircle", function(radius, x, y)
+    if x == nil then x = 0 end
+    if y == nil then y = 0 end
     return meta.new(b2.Circle, {
         _native = ffi.typeof("b2Circle")(
-            ffi.typeof("b2Vec2")(x, y),
+            b2.Vec2(x, y),
             radius
         )
     })

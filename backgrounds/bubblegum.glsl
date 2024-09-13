@@ -28,13 +28,13 @@ vec4 effect(vec4 vertex_color, Image image, vec2 texture_coords, vec2 vertex_pos
     vec2 center = vec2(0.5, 0.5) * vec2(1, normalization_factor);
 
     const float radius = 0.1;
-    const float smoothness = 1;
+    const float smoothness = 0.3;
     float value_1 = sdf_circle(position, center + vec2(cos(elapsed) * 0.1, 0), radius);
-    float value_2 = sdf_circle(position, center + vec2(0, sin(elapsed) * 0.1), radius);
+    float value_2 = sdf_circle(position, center + vec2(0, sin( 2 * elapsed) * 0.1), radius);
 
     const float light_factor = 0.4;
-    float light_1 = sdf_circle(position, center + vec2(cos(elapsed) * 0.1, 0) - (1 - light_factor) * radius, light_factor * radius);
-    float light_2 = sdf_circle(position, center + vec2(0, sin(elapsed) * 0.1) - (1 - light_factor) * radius, light_factor * radius);
+    float light_1 = sdf_circle(position, center + vec2(cos(elapsed) * 0.1, 0) - (1 - light_factor) * radius * 2, light_factor * radius);
+    float light_2 = sdf_circle(position, center + vec2(0, sin(elapsed) * 0.1) - (1 - light_factor) * radius * 2, light_factor * radius);
 
     vec3 pink = hsv_to_rgb(vec3(318. / 360., 60. / 100., 100. / 100.));
     vec3 light_pink = hsv_to_rgb(vec3(318. / 360., 36. / 100., 100.));

@@ -147,6 +147,7 @@ do -- include all backgrounds
 end
 
 -- physics
+require "physics.math"
 require "physics.world"
 require "physics.circle"
 require "physics.capsule"
@@ -154,14 +155,19 @@ require "physics.segment"
 require "physics.polygon"
 require "physics.shape"
 require "physics.body"
-require "phiyscs.joint"
+require "physics.joint"
 
 -- battle
 require "battle.move"
 require "battle.equip"
 require "battle.consumable"
 require "battle.status"
+require "battle.global_status"
 require "battle.entity"
+
+require "battle.ordered_box"
+
+require "battle.battle_scene"
 
 -- menu
 require "menu.template"

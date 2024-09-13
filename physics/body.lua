@@ -5,17 +5,44 @@ b2.BodyType = {
     DYNAMIC = box2d.b2_dynamicBody
 }
 
+--- @class b2.CollisionGroup
+--- @brief only objects in the same group collide
+b2.CollisionGroup = meta.new_enum({
+    NONE = -1,
+    ALL = 0,
+    GROUP_01 = bit.lshift(1, 0),
+    GROUP_02 = bit.lshift(1, 1),
+    GROUP_03 = bit.lshift(1, 2),
+    GROUP_04 = bit.lshift(1, 3),
+    GROUP_05 = bit.lshift(1, 4),
+    GROUP_06 = bit.lshift(1, 5),
+    GROUP_07 = bit.lshift(1, 6),
+    GROUP_08 = bit.lshift(1, 7),
+    GROUP_09 = bit.lshift(1, 8),
+    GROUP_10 = bit.lshift(1, 9),
+    GROUP_11 = bit.lshift(1, 10),
+    GROUP_12 = bit.lshift(1, 11),
+    GROUP_13 = bit.lshift(1, 12),
+    GROUP_14 = bit.lshift(1, 13),
+    GROUP_15 = bit.lshift(1, 14),
+    GROUP_16 = bit.lshift(1, 15)
+})
+
 --- @class b2.Body
 b2.Body = meta.new_type("PhysicsBody", function(world, type, position_x, position_y)
     local def = box2d.b2DefaultBodyDef()
     def.type = type
-    def.position = ffi.typeof("b2Vec2")(position_x, position_y)
+    def.position = b2.Vec2(position_x, position_y)
 
     return meta.new(b2.Body, {
         _native = box2d.b2CreateBody(world._native, def)
     })
 end)
 
+--- @brief
+function b2.Body:destroy()
+    box2d.b2DestroyBody(self._native)
+end
 
 --- @brief
 function b2.Body:get_n_shapes()
@@ -47,7 +74,7 @@ end
 
 --- @brief
 function b2.Body:get_world_point(local_x, local_y)
-    local out = box2d.b2Body_GetWorldPoint(self._native, ffi.typeof("b2Vec2")(local_x, local_y))
+    local out = box2d.b2Body_GetWorldPoint(self._native, b2.Vec2(local_x, local_y))
     return out.x, out.y
 end
 
@@ -56,7 +83,7 @@ function b2.Body:get_world_points(local_x, local_y, ...)
     local points = {local_x, local_y, ...}
     local out = {}
     for i = 1, #points, 2 do
-        local vec2 = box2d.b2Body_GetWorldPoint(self._native, ffi.typeof("b2Vec2")(points[i], points[i+1]))
+        local vec2 = box2d.b2Body_GetWorldPoint(self._native, b2.Vec2(points[i], points[i+1]))
         table.insert(out, vec2.x)
         table.insert(out, vec2.y)
     end
@@ -65,7 +92,7 @@ end
 
 --- @brief
 function b2.Body:get_local_point(local_x, local_y)
-    local out = box2d.b2Body_GetLocalPoint(self._native, ffi.typeof("b2Vec2")(local_x, local_y))
+    local out = box2d.b2Body_GetLocalPoint(self._native, b2.Vec2(local_x, local_y))
     return out.x, out.y
 end
 
@@ -74,7 +101,7 @@ function b2.Body:get_local_points(local_x, local_y, ...)
     local points = {local_x, local_y, ...}
     local out = {}
     for i = 1, #points, 2 do
-        local vec2 = box2d.b2Body_GetLocalPoint(self._native, ffi.typeof("b2Vec2")(points[i], points[i+1]))
+        local vec2 = box2d.b2Body_GetLocalPoint(self._native, b2.Vec2(points[i], points[i+1]))
         table.insert(out, vec2.x)
         table.insert(out, vec2.y)
     end
@@ -93,8 +120,13 @@ end
 function b2.Body:get_centroid(local_offset_x, local_offset_y)
     if local_offset_x == nil then local_offset_x = 0 end
     if local_offset_y == nil then local_offset_y = 0 end
-    local out = box2d.b2Body_GetWorldPoint(self._native, ffi.typeof("b2Vec2")(local_offset_x, local_offset_y))
+    local out = box2d.b2Body_GetWorldPoint(self._native, b2.Vec2(local_offset_x, local_offset_y))
     return out.x, out.y
+end
+
+--- @brief
+function b2.Body:teleport(x, y)
+    box2d.b2Body_SetTransform(self._native, b2.Vec2(x, y), box2d.b2Body_GetRotation(self._native))
 end
 
 --- @brief
@@ -123,7 +155,7 @@ end
 
 --- @brief
 function b2.Body:set_linear_velocity(x, y)
-    box2d.b2Body_SetLinearVelocity(self._native, ffi.typeof("b2Vec2")(x, y))
+    box2d.b2Body_SetLinearVelocity(self._native, b2.Vec2(x, y))
 end
 
 --- @brief
@@ -147,7 +179,7 @@ function b2.Body:apply_force(force, local_point_x, local_point_y, should_wake_up
     if should_wake_up_body == nil then should_wake_up_body = true end
     if local_point_x == nil then local_point_x = 0 end
     if local_point_y == nil then local_point_y = 0 end
-    box2d.b2Body_ApplyForce(self._native, ffi.typeof("b2Vec2")(local_point_x, local_point_y), should_wake_up_body)
+    box2d.b2Body_ApplyForce(self._native, b2.Vec2(local_point_x, local_point_y), should_wake_up_body)
 end
 
 --- @brief
@@ -162,8 +194,8 @@ function b2.Body:apply_linear_impulse(impulse_x, impulse_y, local_point_x, local
     if local_point_x == nil then local_point_x = 0 end
     if local_point_y == nil then local_point_y = 0 end
     box2d.b2Body_ApplyLinearImpulse(self._native,
-        ffi.typeof("b2Vec2")(impulse_x, impulse_y),
-        ffi.typeof("b2Vec2")(local_point_x, local_point_y),
+        b2.Vec2(impulse_x, impulse_y),
+        b2.Vec2(local_point_x, local_point_y),
         should_wake_up_body
     )
 end
@@ -183,7 +215,7 @@ end
 function b2.Body:override_mass_data(mass, center_x, center_y, rotational_inertia)
     box2d.b2Body_SetMassData(self._native, ffi.typeof("b2MassData")(
         mass,
-        ffi.typeof("b2Vec2")(center_x, center_y),
+        b2.Vec2(center_x, center_y),
         rotational_inertia
     ))
     box2d.b2Body_SetAutomaticMass(self._native, false);
@@ -227,4 +259,31 @@ end
 --- @brief
 function b2.Body:get_is_bullet()
     return box2d.b2Body_IsBullet()
+end
+
+--- @brief
+function b2.Body:set_collision_group(group)
+    local n = box2d.b2Body_GetShapeCount(self._native)
+    local shapes = ffi.new("b2ShapeId*[" .. n .. "]")
+    local _ = box2d.b2Body_GetShapes(self._native, shapes, n)
+
+    local filter = box2d.b2DefaultFilter()
+    if group == b2.CollisionGroup.ALL then
+        filter.categoryBits = 0xFFFF
+        filter.maskBits = 0xFFFF
+        filter.groupIndex = 0
+    elseif group == b2.CollisionGroup.NONE then
+        filter.categoryBits = 0x0000
+        filter.maskBits = 0x0000
+        filter.groupIndex = 0
+    else
+        filter.categoryBits = group
+        filter.maskBits = group
+        filter.groupindex = 0
+    end
+
+    for i = 1, n do
+        local shape = shapes[i -1]
+        box2d.b2Shape_SetFilter(shape, filter)
+    end
 end

@@ -272,6 +272,7 @@ function b2._draw_capsule(capsule)
     local angle = math.atan2(dy, dx)
     local radius = capsule.radius
 
+    love.graphics.push()
     love.graphics.translate(x1, y1)
     love.graphics.rotate(angle)
 
@@ -284,4 +285,7 @@ function b2._draw_capsule(capsule)
 
     love.graphics.line(0, -radius, length, -radius)
     love.graphics.line(0, radius, length, radius)
+
+    love.graphics.rotate(-angle)
+    love.graphics.translate(-x1, -y1)
 end
