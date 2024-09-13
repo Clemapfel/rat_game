@@ -22,34 +22,10 @@
     </configurations>
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="7fa9ba1b-2cff-4ecc-86fb-59ab2fa76ee1" name="Changes" comment="added physics">
-      <change afterPath="$PROJECT_DIR$/assets/configs/global_statuses/DEBUG_GLOBAL_STATUS.lua" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/assets/sprites/status_ailment.lua" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/assets/sprites/status_ailment.png" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/assets/sprites/status_ailment.pxo" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/battle/battle_scene.lua" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/battle/global_status.lua" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/battle/ordered_box.lua" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/battle/status_bar.lua" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/physics/math.lua" afterDir="false" />
+    <list default="true" id="7fa9ba1b-2cff-4ecc-86fb-59ab2fa76ee1" name="Changes" comment="imported new physics to battle">
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/backgrounds/bubblegum.glsl" beforeDir="false" afterPath="$PROJECT_DIR$/backgrounds/bubblegum.glsl" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/battle/config_atlas.lua" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/battle/status.lua" beforeDir="false" afterPath="$PROJECT_DIR$/battle/status.lua" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/common/widget.lua" beforeDir="false" afterPath="$PROJECT_DIR$/common/widget.lua" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/fast_physics/shape.lua" beforeDir="false" afterPath="$PROJECT_DIR$/fast_physics/shape.lua" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/include.lua" beforeDir="false" afterPath="$PROJECT_DIR$/include.lua" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/main.lua" beforeDir="false" afterPath="$PROJECT_DIR$/main.lua" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/main_rope.lua" beforeDir="false" afterPath="$PROJECT_DIR$/main_rope.lua" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/old/common/collider.lua" beforeDir="false" afterPath="$PROJECT_DIR$/old/common/collider.lua" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/physics/body.lua" beforeDir="false" afterPath="$PROJECT_DIR$/physics/body.lua" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/physics/capsule.lua" beforeDir="false" afterPath="$PROJECT_DIR$/physics/capsule.lua" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/physics/circle.lua" beforeDir="false" afterPath="$PROJECT_DIR$/physics/circle.lua" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/physics/joint.lua" beforeDir="false" afterPath="$PROJECT_DIR$/physics/joint.lua" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/physics/polygon.lua" beforeDir="false" afterPath="$PROJECT_DIR$/physics/polygon.lua" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/physics/segment.lua" beforeDir="false" afterPath="$PROJECT_DIR$/physics/segment.lua" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/physics/shape.lua" beforeDir="false" afterPath="$PROJECT_DIR$/physics/shape.lua" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/physics/world.lua" beforeDir="false" afterPath="$PROJECT_DIR$/physics/world.lua" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -543,15 +519,7 @@
       <workItem from="1725983643239" duration="2742000" />
       <workItem from="1725986406074" duration="12813000" />
       <workItem from="1726080004331" duration="2183000" />
-      <workItem from="1726098165384" duration="20659000" />
-    </task>
-    <task id="LOCAL-01007" summary="stashing update, why does it impact fps instead of piling up coroutines?">
-      <option name="closed" value="true" />
-      <created>1724876081413</created>
-      <option name="number" value="01007" />
-      <option name="presentableId" value="LOCAL-01007" />
-      <option name="project" value="LOCAL" />
-      <updated>1724876081413</updated>
+      <workItem from="1726098165384" duration="21548000" />
     </task>
     <task id="LOCAL-01008" summary="added keyboard indicator">
       <option name="closed" value="true" />
@@ -937,7 +905,15 @@
       <option name="project" value="LOCAL" />
       <updated>1726187807605</updated>
     </task>
-    <option name="localTasksCounter" value="1056" />
+    <task id="LOCAL-01056" summary="imported new physics to battle">
+      <option name="closed" value="true" />
+      <created>1726255627840</created>
+      <option name="number" value="01056" />
+      <option name="presentableId" value="LOCAL-01056" />
+      <option name="project" value="LOCAL" />
+      <updated>1726255627840</updated>
+    </task>
+    <option name="localTasksCounter" value="1057" />
     <servers />
   </component>
   <component name="TypeScriptGeneratedFilesManager">
@@ -986,7 +962,6 @@
     </option>
   </component>
   <component name="VcsManagerConfiguration">
-    <MESSAGE value="works for a few cycles" />
     <MESSAGE value="stashing, finish_tasks seems to be called async too" />
     <MESSAGE value="stashing uses threads but runs serially" />
     <MESSAGE value="polished scenes" />
@@ -1011,7 +986,8 @@
     <MESSAGE value="switchin to queueable source" />
     <MESSAGE value="stashing sound" />
     <MESSAGE value="added physics" />
-    <option name="LAST_COMMIT_MESSAGE" value="added physics" />
+    <MESSAGE value="imported new physics to battle" />
+    <option name="LAST_COMMIT_MESSAGE" value="imported new physics to battle" />
   </component>
   <component name="XDebuggerManager">
     <breakpoint-manager>

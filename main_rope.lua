@@ -9,7 +9,7 @@ joints = {}
 love.load = function()
     local rope_x, rope_y = 0.5 * rt.graphics.get_width(), 0.3 * rt.graphics.get_height()
     local rope_length = 0.75 * rt.graphics.get_height()
-    local n_segments = 10
+    local n_segments = 4
 
     local segment_length = rope_length / n_segments
     local rope_width = 0.05 * rt.graphics.get_width()
@@ -19,6 +19,7 @@ love.load = function()
         local body = b2.Body(world, b2.BodyType.DYNAMIC, rope_x + current_y / 2, current_y - 0.5 * segment_length)
 
         local radius = rope_width / 2
+
         local shape = b2.CapsuleShape(body, b2.Capsule(
             0, -0.5 * segment_length + 0.5 * radius,
             0, 0.5 * segment_length - 0.5 * radius,
@@ -28,6 +29,8 @@ love.load = function()
         table.insert(bodies, body)
         table.insert(shapes, shape)
         current_y = current_y + segment_length
+
+        body:apply_linear_impulse(1, 0)
     end
 
     local margin_x, margin_y = 0.01 * rt.graphics.get_width(), 0.01 * rt.graphics.get_height()

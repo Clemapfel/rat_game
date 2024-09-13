@@ -256,8 +256,11 @@ end
 function b2.Shape:draw()
     local type = box2d.b2Shape_GetType(self._native)
     local body = box2d.b2Shape_GetBody(self._native)
-    local offset = box2d.b2Body_GetWorldPoint(body, b2.Vec2(0, 0))
-    love.graphics.translate(offset.x, offset.y)
+    local transform = box2d.b2Body_GetTransform(body)
+
+    love.graphics.push()
+    love.graphics.translate(transform.p.x, transform.p.y)
+    love.graphics.rotate(math.atan(transform.q.s, transform.q.c))
 
     local hue = (meta.hash(self) % 16) / 16
     love.graphics.setColor(rt.color_unpack(rt.hsva_to_rgba(rt.HSVA(hue, 1, 1, 0.5))))
@@ -275,7 +278,8 @@ function b2.Shape:draw()
     else
         error("In b2.Shape:draw: unhandlined shape type `" .. type .. "`")
     end
-    love.graphics.translate(-offset.x, -offset.y)
+
+    love.graphics.pop()
 end
 
 --- @brief
@@ -310,7 +314,9 @@ function b2._draw_capsule(capsule)
     local x1, y1, x2, y2 = capsule.center1.x, capsule.center1.y, capsule.center2.x, capsule.center2.y
     local radius = capsule.radius
 
-    love.graphics.line(x1, y1, x2, y2)
-    love.graphics.circle("line", x1, y1, radius)
-    love.graphics.circle("line", x2, y2, radius)
+    love.graphics.line(x1 - radius, y1, x2 - radius, y2)
+    love.graphics.line(x1 + radius, y1, x2 + radius, y2)
+
+    love.graphics.arc("line", "open", x1, y1, radius, -math.pi, 0)
+    love.graphics.arc("line", "open", x2, y2, radius, 0, math.pi)
 end
