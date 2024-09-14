@@ -36,7 +36,7 @@ love.load = function()
 
     local rope_x, rope_y = 0.5 * rt.graphics.get_width(), 8 * margin_x
     local rope_length = rt.graphics.get_height() - 8 * margin_x
-    local n_segments = 25
+    local n_segments = 35
 
     local segment_length = rope_length / n_segments
     local rope_width = 0.01 * rt.graphics.get_width()
@@ -57,25 +57,37 @@ love.load = function()
 
         local top_x, top_y = 0, -0.5 * segment_length + radius
         local bottom_x, bottom_y = 0, 0.5 * segment_length - radius
+
+        --[[
         local shape = b2.CapsuleShape(body, b2.Capsule(
             top_x, top_y,
             bottom_x, bottom_y,
             radius
         ))
-        local category = 0b0100000
-        shape:set_filter_data(category, category, 0)
+        ]]--
+
+        local shape = b2.CircleShape(body, b2.Circle(2 * radius))
 
         if i > 1 then
+            --[[
             local joint = b2.DistanceJoint(world, previous_body, body, 2 * radius,
                 previous_body_bottom_x, previous_body_bottom_y,
                 top_x, top_y,
                 true
             )
+            ]]--
+
+            local joint = b2.WeldJoint(world, previous_body, body,
+                previous_body_bottom_x, previous_body_bottom_y,
+                top_x, top_y,
+                true,
+                0, 0
+            )
             table.insert(joints, joint)
         end
 
         if i == 2 then
-            local joint = b2.MouseJoint(world, floor_body, body, rope_x, 0.5 * rt.graphics.get_height())
+            --local joint = b2.MouseJoint(world, floor_body, body, rope_x, 0.5 * rt.graphics.get_height())
         end
 
         table.insert(bodies, body)
@@ -85,9 +97,10 @@ love.load = function()
         previous_body_bottom_x, previous_body_bottom_y = bottom_x, bottom_y
     end
 
-    player = b2.Body(world, b2.BodyType.DYNAMIC, rt.graphics.get_width() * 0.5, rt.graphics.get_height() * 0.5)
-    table.insert(shapes, b2.CircleShape(player, b2.Circle(0.05 * rt.graphics.get_height())))
-    table.insert(joints, b2.DistanceJoint(world, player, chain_body, 0.1))
+    local player_radius = 25
+    player = b2.Body(world, b2.BodyType.DYNAMIC, 0.5 * rt.graphics.get_width(), rt.graphics.get_height() * 0.5)
+    table.insert(shapes, b2.CircleShape(player, b2.Circle(player_radius)))
+    table.insert(joints, b2.WeldJoint(world, player, chain_body, 0, -0.5 * player_radius, 0, 0, true))
 end
 
 love.update = function(delta)

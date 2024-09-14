@@ -22,9 +22,32 @@
     </configurations>
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="7fa9ba1b-2cff-4ecc-86fb-59ab2fa76ee1" name="Changes" comment="capsules working">
+    <list default="true" id="7fa9ba1b-2cff-4ecc-86fb-59ab2fa76ee1" name="Changes" comment="stashing rope">
+      <change beforePath="$PROJECT_DIR$/.idea/vcs.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/vcs.xml" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/battle/battle_scene.lua" beforeDir="false" afterPath="$PROJECT_DIR$/battle/battle_scene.lua" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/battle/ordered_box.lua" beforeDir="false" afterPath="$PROJECT_DIR$/battle/ordered_box.lua" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/fast_physics/body.lua" beforeDir="false" afterPath="$PROJECT_DIR$/old/fast_physics/body.lua" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/fast_physics/capsule.lua" beforeDir="false" afterPath="$PROJECT_DIR$/old/fast_physics/capsule.lua" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/fast_physics/cdef.h" beforeDir="false" afterPath="$PROJECT_DIR$/old/fast_physics/cdef.h" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/fast_physics/chain.lua" beforeDir="false" afterPath="$PROJECT_DIR$/old/fast_physics/chain.lua" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/fast_physics/circle.lua" beforeDir="false" afterPath="$PROJECT_DIR$/old/fast_physics/circle.lua" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/fast_physics/draw.lua" beforeDir="false" afterPath="$PROJECT_DIR$/old/fast_physics/draw.lua" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/fast_physics/enki_cdef.h" beforeDir="false" afterPath="$PROJECT_DIR$/old/fast_physics/enki_cdef.h" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/fast_physics/extension/CMakeLists.txt" beforeDir="false" afterPath="$PROJECT_DIR$/old/fast_physics/extension/CMakeLists.txt" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/fast_physics/extension/box2d_extension.cpp" beforeDir="false" afterPath="$PROJECT_DIR$/old/fast_physics/extension/box2d_extension.cpp" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/fast_physics/extension/box2d_extension.hpp" beforeDir="false" afterPath="$PROJECT_DIR$/old/fast_physics/extension/box2d_extension.hpp" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/fast_physics/joint.lua" beforeDir="false" afterPath="$PROJECT_DIR$/old/fast_physics/joint.lua" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/fast_physics/polygon.lua" beforeDir="false" afterPath="$PROJECT_DIR$/old/fast_physics/polygon.lua" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/fast_physics/segment.lua" beforeDir="false" afterPath="$PROJECT_DIR$/old/fast_physics/segment.lua" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/fast_physics/shape.lua" beforeDir="false" afterPath="$PROJECT_DIR$/old/fast_physics/shape.lua" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/fast_physics/world.lua" beforeDir="false" afterPath="$PROJECT_DIR$/old/fast_physics/world.lua" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/fast_physics/world_thread_enki.lua" beforeDir="false" afterPath="$PROJECT_DIR$/old/fast_physics/world_thread_enki.lua" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/fast_physics/world_thread_love.lua" beforeDir="false" afterPath="$PROJECT_DIR$/old/fast_physics/world_thread_love.lua" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/fast_physics/world_thread_sdl.lua" beforeDir="false" afterPath="$PROJECT_DIR$/old/fast_physics/world_thread_sdl.lua" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/fast_physics/world_thread_worker.lua" beforeDir="false" afterPath="$PROJECT_DIR$/old/fast_physics/world_thread_worker.lua" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/main_rope.lua" beforeDir="false" afterPath="$PROJECT_DIR$/main_rope.lua" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/physics/cdef.h" beforeDir="false" afterPath="$PROJECT_DIR$/physics/cdef.h" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/physics/joint.lua" beforeDir="false" afterPath="$PROJECT_DIR$/physics/joint.lua" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
@@ -130,14 +153,14 @@
       <recent name="C:\Users\cleme\Workspace\rat_game\assets\sfx\test" />
     </key>
     <key name="MoveFile.RECENT_KEYS">
+      <recent name="C:\Users\cleme\Workspace\rat_game\old" />
       <recent name="C:\Users\cleme\Workspace\rat_game\physics" />
       <recent name="C:\Users\cleme\Workspace\rat_game\assets\configs" />
       <recent name="C:\Users\cleme\Workspace\rat_game\assets\sfx\test" />
       <recent name="C:\Users\cleme\Workspace\rat_game\assets" />
-      <recent name="C:\Users\cleme\Workspace\rat_game\old" />
     </key>
   </component>
-  <component name="RunManager" selected="Lua Application.main_rope">
+  <component name="RunManager" selected="Lua Application.main">
     <configuration name="main" type="lua.app" factoryName="Lua Application">
       <module name="rat_game" />
       <option name="program" value="C:\Users\cleme\Workspace\rat_game\love\windows\love.exe" />
@@ -519,15 +542,7 @@
       <workItem from="1725983643239" duration="2742000" />
       <workItem from="1725986406074" duration="12813000" />
       <workItem from="1726080004331" duration="2183000" />
-      <workItem from="1726098165384" duration="24172000" />
-    </task>
-    <task id="LOCAL-01009" summary="added button indicators">
-      <option name="closed" value="true" />
-      <created>1724986518757</created>
-      <option name="number" value="01009" />
-      <option name="presentableId" value="LOCAL-01009" />
-      <option name="project" value="LOCAL" />
-      <updated>1724986518757</updated>
+      <workItem from="1726098165384" duration="32324000" />
     </task>
     <task id="LOCAL-01010" summary="added buttons and dpad">
       <option name="closed" value="true" />
@@ -913,7 +928,15 @@
       <option name="project" value="LOCAL" />
       <updated>1726256445866</updated>
     </task>
-    <option name="localTasksCounter" value="1058" />
+    <task id="LOCAL-01058" summary="stashing rope">
+      <option name="closed" value="true" />
+      <created>1726259173246</created>
+      <option name="number" value="01058" />
+      <option name="presentableId" value="LOCAL-01058" />
+      <option name="project" value="LOCAL" />
+      <updated>1726259173247</updated>
+    </task>
+    <option name="localTasksCounter" value="1059" />
     <servers />
   </component>
   <component name="TypeScriptGeneratedFilesManager">
@@ -962,7 +985,6 @@
     </option>
   </component>
   <component name="VcsManagerConfiguration">
-    <MESSAGE value="stashing uses threads but runs serially" />
     <MESSAGE value="polished scenes" />
     <MESSAGE value="added double button keybinding indicator" />
     <MESSAGE value="moved keybindings into game state" />
@@ -987,7 +1009,8 @@
     <MESSAGE value="added physics" />
     <MESSAGE value="imported new physics to battle" />
     <MESSAGE value="capsules working" />
-    <option name="LAST_COMMIT_MESSAGE" value="capsules working" />
+    <MESSAGE value="stashing rope" />
+    <option name="LAST_COMMIT_MESSAGE" value="stashing rope" />
   </component>
   <component name="XDebuggerManager">
     <breakpoint-manager>
@@ -1003,12 +1026,12 @@
           <option name="timeStamp" value="9" />
         </line-breakpoint>
         <line-breakpoint enabled="true" type="lua-line">
-          <url>file://$PROJECT_DIR$/fast_physics/shape.lua</url>
+          <url>file://$PROJECT_DIR$/old/fast_physics/shape.lua</url>
           <line>231</line>
           <option name="timeStamp" value="12" />
         </line-breakpoint>
         <line-breakpoint enabled="true" type="com.jetbrains.cidr.execution.debugger.OCBreakpointType">
-          <url>file://$PROJECT_DIR$/fast_physics/enki_cdef.h</url>
+          <url>file://$PROJECT_DIR$/old/fast_physics/enki_cdef.h</url>
           <line>21</line>
           <option name="timeStamp" value="10" />
         </line-breakpoint>

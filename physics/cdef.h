@@ -608,6 +608,25 @@ typedef struct b2MouseJointDef
 b2MouseJointDef b2DefaultMouseJointDef( void );
 b2JointId b2CreateMouseJoint( b2WorldId worldId, const b2MouseJointDef* def );
 
+typedef struct b2WeldJointDef
+{
+    b2BodyId bodyIdA;
+    b2BodyId bodyIdB;
+    b2Vec2 localAnchorA;
+    b2Vec2 localAnchorB;
+    float referenceAngle;
+    float linearHertz;
+    float angularHertz;
+    float linearDampingRatio;
+    float angularDampingRatio;
+    bool collideConnected;
+    void* userData;
+    int32_t internalValue;
+} b2WeldJointDef;
+
+b2WeldJointDef b2DefaultWeldJointDef( void );
+b2JointId b2CreateWeldJoint( b2WorldId worldId, const b2WeldJointDef* def );
+
 // ### CONTACTS ####
 
 //int b2Body_GetContactCapacity( b2BodyId bodyId );

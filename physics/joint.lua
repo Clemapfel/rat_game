@@ -85,6 +85,57 @@ function b2.MouseJoint(
     })
 end
 
+--- @class b2.WeldJoint
+function b2.WeldJoint(
+    world,
+    body_a, body_b,
+    a_anchor_x, a_anchor_y,
+    b_anchor_x, b_anchor_y,
+    collide_connected,
+    linear_hertz, linear_damping,
+    angular_hertz, angular_damping_ratio
+)
+    local def = box2d.b2DefaultWeldJointDef()
+    def.bodyIdA = body_a._native
+    def.bodyIdB = body_b._native
+    def.localAnchorA = b2.Vec2(a_anchor_x, a_anchor_y)
+    def.localAnchorB = b2.Vec2(b_anchor_x, b_anchor_y)
+
+    if collide_connected ~= nil then
+        def.collideConnected = collide_connected
+    else
+        def.collideConnected = true
+    end
+
+    if linear_hertz ~= nil then
+        def.linearHertz = linear_hertz
+    else
+        def.linearHertz = 0
+    end
+
+    if linear_damping ~= nil then
+        def.linearDampingRatio = linear_damping
+    else
+        def.linearDampingRatio = 0
+    end
+
+    if angular_hertz ~= nil then
+        def.angularHertz = angular_hertz
+    else
+        def.angularHertz = 0
+    end
+
+    if angular_damping_ratio ~= nil then
+        def.angularDampingRatio = angular_damping_ratio
+    else
+        def.angularDampingRatio = 0
+    end
+
+    return meta.new(b2.Joint, {
+        _native = box2d.b2CreateWeldJoint(world._native, def)
+    })
+end
+
 --- @class b2.JointType
 b2.JointType = meta.new_enum({
     DISTANCE_JOINT = box2d.b2_distanceJoint,
