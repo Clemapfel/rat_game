@@ -423,7 +423,7 @@ end
 --- @brief
 function rt.GameState:_update(delta)
     rt.SoundAtlas:update(delta)
-    rt.SmoothedMotion._world:step(delta)
+    rt.SmoothedMotion2D._world:step(delta)
 
     if self._loading_screen_active then
         self._loading_screen:update(delta)

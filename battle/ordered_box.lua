@@ -31,7 +31,7 @@ function bt.OrderedBox:add(widget, left_or_right)
         current_scale = 2,
         target_scale = 1,
 
-        position_animation = nil, -- rt.SmoothedMotion
+        position_animation = nil, -- rt.SmoothedMotion2D
         current_position_x = nil,
         current_position_y = nil,
 
@@ -59,7 +59,6 @@ function bt.OrderedBox:remove(widget, on_remove_done)
 
     item.target_opacity = 0
     item.on_opacity_reached_0 = function(widget)
-        item.position_animation:destroy()
         self._widget_to_item[widget] = nil
         for i, x in ipairs(self._widget_order) do
             if x == widget then
@@ -197,7 +196,7 @@ function bt.OrderedBox:size_allocate(x, y, width, height)
         end
 
         if item.position_animation == nil then
-            item.position_animation = rt.SmoothedMotion(item.current_position_x, item.current_position_y)
+            item.position_animation = rt.SmoothedMotion2D(item.current_position_x, item.current_position_y)
         end
         item.position_animation:set_target_position(target_position_x, target_position_y)
     end

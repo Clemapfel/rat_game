@@ -31,8 +31,7 @@ bt.HealthBar = meta.new_type("HealthBar", rt.Widget, rt.Animation, function(lowe
         _use_percentage = true,
         _state = bt.EntityState.ALIVE,
 
-        _value_animation_world = b2.World(0, 0),
-        _value_animation = rt.SmoothedMotion(value, 0),
+        _value_animation = rt.SmoothedMotion1D(value),
 
         _opacity = 1
     })
@@ -144,7 +143,7 @@ function bt.HealthBar:update(delta)
     if self._is_realized ~= true then return end
 
     self._value_animation:step()
-    self._current_value, _ = self._value_animation:get_position()
+    self._current_value = self._value_animation:get_value()
     self:_update_value()
 end
 
@@ -161,7 +160,7 @@ end
 function bt.HealthBar:set_value(value)
     value = clamp(value, self._lower, self._upper)
     self._target_value = value
-    self._value_animation:set_target_position(self._target_value, 0)
+    self._value_animation:set_target(self._target_value)
 end
 
 --- @brief

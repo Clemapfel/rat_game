@@ -157,7 +157,8 @@ require "physics.shape"
 require "physics.body"
 require "physics.joint"
 
-require "common.smoothed_motion"
+require "common.smoothed_motion_2d"
+require "common.smoothed_motion_1d"
 
 -- battle
 require "battle.move"

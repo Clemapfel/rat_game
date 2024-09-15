@@ -35,7 +35,7 @@ b2.Body = meta.new_type("PhysicsBody", function(world, type, position_x, positio
     def.position = b2.Vec2(position_x, position_y)
 
     return meta.new(b2.Body, {
-        _native = box2d.b2CreateBody(world._native, def)
+        _native = ffi.gc(box2d.b2CreateBody(world._native, def), box2d.b2DestroyBody)
     })
 end)
 
