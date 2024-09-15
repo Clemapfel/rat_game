@@ -115,7 +115,7 @@ else
                 local shape = b2.CircleShape(body, b2.Circle(item_w / 8))
                 --local shape = b2.CapsuleShape(body, b2.Capsule(pos_x - 0.5 * item_w, pos_y, pos_x + 0.5 * item_w, pos_y, 0.5 * item_w))
                 shape:set_restitution(0.3)
-                body:set_is_fixed_rotation(true)
+                body:set_rotation_fixed(true)
                 table.insert(ball_bodies, body)
                 table.insert(ball_shapes, shape)
 

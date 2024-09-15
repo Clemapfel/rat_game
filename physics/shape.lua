@@ -190,7 +190,7 @@ end
 
 --- @brief
 function b2.Shape:set_are_sensor_events_enabled(b)
-    box2d.b2Shape_SetSensorEventsEnabled(self._native, b)
+    box2d.b2Shape_EnableSensorEvents(self._native, b)
 end
 
 --- @brief
@@ -200,7 +200,7 @@ end
 
 --- @brief
 function b2.Shape:set_are_contact_events_enabled(b)
-    box2d.b2Shape_SetContactEventsEnabled(self._native, b)
+    box2d.b2Shape_EnableContactEvents(self._native, b)
 end
 
 --- @brief

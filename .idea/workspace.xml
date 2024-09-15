@@ -22,15 +22,18 @@
     </configurations>
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="7fa9ba1b-2cff-4ecc-86fb-59ab2fa76ee1" name="Changes" comment="ordered box working">
-      <change afterPath="$PROJECT_DIR$/battle/~ordered_box.lua" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/common/physics_based_animation.lua" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/common/~physics_based_animation.lua" afterDir="false" />
+    <list default="true" id="7fa9ba1b-2cff-4ecc-86fb-59ab2fa76ee1" name="Changes" comment="encapsulated physics 2d animation">
+      <change afterPath="$PROJECT_DIR$/battle/health_bar.lua" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/battle/battle_scene.lua" beforeDir="false" afterPath="$PROJECT_DIR$/battle/battle_scene.lua" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/battle/ordered_box.lua" beforeDir="false" afterPath="$PROJECT_DIR$/battle/ordered_box.lua" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/common/coroutine.lua" beforeDir="false" afterPath="$PROJECT_DIR$/common/coroutine.lua" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/common/physics_based_animation.lua" beforeDir="false" afterPath="$PROJECT_DIR$/common/smoothed_motion.lua" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/include.lua" beforeDir="false" afterPath="$PROJECT_DIR$/include.lua" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/main_box2d.lua" beforeDir="false" afterPath="$PROJECT_DIR$/main_box2d.lua" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/old/common/ordered_box.lua" beforeDir="false" afterPath="$PROJECT_DIR$/old/common/ordered_box.lua" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/physics/body.lua" beforeDir="false" afterPath="$PROJECT_DIR$/physics/body.lua" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/physics/shape.lua" beforeDir="false" afterPath="$PROJECT_DIR$/physics/shape.lua" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -524,15 +527,7 @@
       <workItem from="1725983643239" duration="2742000" />
       <workItem from="1725986406074" duration="12813000" />
       <workItem from="1726080004331" duration="2183000" />
-      <workItem from="1726098165384" duration="38920000" />
-    </task>
-    <task id="LOCAL-01011" summary="added start select button">
-      <option name="closed" value="true" />
-      <created>1725045728277</created>
-      <option name="number" value="01011" />
-      <option name="presentableId" value="LOCAL-01011" />
-      <option name="project" value="LOCAL" />
-      <updated>1725045728277</updated>
+      <workItem from="1726098165384" duration="44306000" />
     </task>
     <task id="LOCAL-01012" summary="stashing r/l">
       <option name="closed" value="true" />
@@ -918,7 +913,15 @@
       <option name="project" value="LOCAL" />
       <updated>1726341632042</updated>
     </task>
-    <option name="localTasksCounter" value="1060" />
+    <task id="LOCAL-01060" summary="encapsulated physics 2d animation">
+      <option name="closed" value="true" />
+      <created>1726437391899</created>
+      <option name="number" value="01060" />
+      <option name="presentableId" value="LOCAL-01060" />
+      <option name="project" value="LOCAL" />
+      <updated>1726437391899</updated>
+    </task>
+    <option name="localTasksCounter" value="1061" />
     <servers />
   </component>
   <component name="TypeScriptGeneratedFilesManager">
@@ -967,7 +970,6 @@
     </option>
   </component>
   <component name="VcsManagerConfiguration">
-    <MESSAGE value="added double button keybinding indicator" />
     <MESSAGE value="moved keybindings into game state" />
     <MESSAGE value="added enkits" />
     <MESSAGE value="stashing before refactored mapping" />
@@ -992,7 +994,8 @@
     <MESSAGE value="capsules working" />
     <MESSAGE value="stashing rope" />
     <MESSAGE value="ordered box working" />
-    <option name="LAST_COMMIT_MESSAGE" value="ordered box working" />
+    <MESSAGE value="encapsulated physics 2d animation" />
+    <option name="LAST_COMMIT_MESSAGE" value="encapsulated physics 2d animation" />
   </component>
   <component name="XDebuggerManager">
     <breakpoint-manager>

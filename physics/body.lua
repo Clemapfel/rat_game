@@ -144,12 +144,12 @@ function b2.Body:get_angle()
 end
 
 --- @brief
-function b2.Body:set_is_fixed_rotation(b)
+function b2.Body:set_rotation_fixed(b)
     box2d.b2Body_SetFixedRotation(self._native, b)
 end
 
 --- @brief
-function b2.Body:get_is_fixed_rotation()
+function b2.Body:get_rotation_fixed()
     return box2d.b2Body_IsFixedRotation(self._native)
 end
 
@@ -223,6 +223,7 @@ end
 
 --- @brief
 function b2.Body:set_linear_damping(value)
+    if value == POSITIVE_INFINITY then value = 2^32 end
     if value < 0 then value = 0 end
     box2d.b2Body_SetLinearDamping(self._native, value)
 end

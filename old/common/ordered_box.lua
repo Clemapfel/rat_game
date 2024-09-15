@@ -112,6 +112,7 @@ function rt.OrderedBox:update(delta)
 
     for index, id in pairs(self._order) do
         local entry = self._entries[id]
+
         -- update position
         local current_x, current_y = entry.collider:get_position()
         local target_x, target_y = entry.target_position_x, entry.target_position_y

@@ -9,7 +9,6 @@ bt.OrderedBox = meta.new_type("OrderedBox", rt.Widget, function()
     local out = meta.new(bt.OrderedBox, {
         _widget_to_item = {}, -- Table<rt.Widget, cf. add>
         _widget_order = {},
-        _world = b2.World(0, 0),
         _opacity = 1,
     })
     return out
@@ -28,16 +27,18 @@ function bt.OrderedBox:add(widget, left_or_right)
 
         current_opacity = 0,
         target_opacity = 1,
+
         current_scale = 2,
         target_scale = 1,
 
-        position_animation = nil, -- rt.PhysicsBasedAnimation
+        position_animation = nil, -- rt.SmoothedMotion
         current_position_x = nil,
         current_position_y = nil,
 
         on_scale_reached = nil, -- function
         on_opacity_reached_0 = nil, -- function
     }
+
 
     self._widget_to_item[widget] = to_add
     table.insert(self._widget_order, widget)
@@ -100,11 +101,12 @@ function bt.OrderedBox:update(delta)
         local fade_speed = rt.settings.battle.ordered_box.scale_speed
         local before = item.current_opacity
         if item.current_opacity < item.target_opacity then
-            item.current_opacity = clamp(item.current_opacity + scale_speed * delta, 0, item.target_opacity)
+            item.current_opacity = clamp(item.current_opacity + fade_speed * delta, 0, item.target_opacity)
         elseif item.current_opacity > item.target_opacity then
-            item.current_opacity = clamp(item.current_opacity - scale_speed * delta, 0)
+            item.current_opacity = clamp(item.current_opacity - fade_speed * delta, 0)
             if item.current_opacity <= 0 and item.on_opacity_reached_0 ~= nil then
                 item.on_opacity_reached_0(item.widget)
+                item.on_opacity_reached_0 = nil
             end
         end
 
@@ -112,8 +114,6 @@ function bt.OrderedBox:update(delta)
             item.widget:set_opacity(item.current_opacity * self._opacity)
         end
     end
-
-    self._world:step(delta)
 end
 
 --- @override
@@ -126,7 +126,6 @@ function bt.OrderedBox:realize()
     end
 end
 
---- @override
 --- @override
 function bt.OrderedBox:draw()
     for widget in values(self._widget_order) do
@@ -198,9 +197,9 @@ function bt.OrderedBox:size_allocate(x, y, width, height)
         end
 
         if item.position_animation == nil then
-            item.position_animation = rt.PhysicsBasedAnimation(self._world, item.current_position_x, item.current_position_y)
+            item.position_animation = rt.SmoothedMotion(item.current_position_x, item.current_position_y)
         end
-        item.position_animation:set_position(target_position_x, target_position_y)
+        item.position_animation:set_target_position(target_position_x, target_position_y)
     end
 
     self:update(0)
@@ -224,7 +223,24 @@ end
 
 --- @brief
 function bt.OrderedBox:skip()
-    self:update(60)
+    for item in values(self._widget_to_item) do
+        item.current_scale = 1
+        item.target_scale = 1
+        if item.on_scale_reached ~= nil then
+            item.on_scale_reached(item.widget)
+            item.on_scale_reached = nil
+        end
+
+        item.current_opacity = item.target_opacity
+        if item.on_opacity_reached_0 ~= nil then
+            item.on_opacity_reached_0(item.widget)
+            item.on_opacity_reached_0 = nil
+        end
+
+        item.current_position_x = item.target_position_x
+        item.current_position_y = item.target_position_y
+        item.position_animation:set_position(item.target_position_x, item.target_position_y)
+    end
 end
 
 --- @brief

@@ -157,7 +157,7 @@ require "physics.shape"
 require "physics.body"
 require "physics.joint"
 
-require "common.physics_based_animation"
+require "common.smoothed_motion"
 
 -- battle
 require "battle.move"
@@ -168,6 +168,7 @@ require "battle.global_status"
 require "battle.entity"
 
 require "battle.ordered_box"
+require "battle.health_bar"
 
 require "battle.battle_scene"
 
