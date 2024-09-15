@@ -22,33 +22,15 @@
     </configurations>
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="7fa9ba1b-2cff-4ecc-86fb-59ab2fa76ee1" name="Changes" comment="stashing rope">
-      <change beforePath="$PROJECT_DIR$/.idea/vcs.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/vcs.xml" afterDir="false" />
+    <list default="true" id="7fa9ba1b-2cff-4ecc-86fb-59ab2fa76ee1" name="Changes" comment="ordered box working">
+      <change afterPath="$PROJECT_DIR$/battle/~ordered_box.lua" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/common/physics_based_animation.lua" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/common/~physics_based_animation.lua" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/battle/battle_scene.lua" beforeDir="false" afterPath="$PROJECT_DIR$/battle/battle_scene.lua" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/battle/ordered_box.lua" beforeDir="false" afterPath="$PROJECT_DIR$/battle/ordered_box.lua" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/fast_physics/body.lua" beforeDir="false" afterPath="$PROJECT_DIR$/old/fast_physics/body.lua" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/fast_physics/capsule.lua" beforeDir="false" afterPath="$PROJECT_DIR$/old/fast_physics/capsule.lua" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/fast_physics/cdef.h" beforeDir="false" afterPath="$PROJECT_DIR$/old/fast_physics/cdef.h" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/fast_physics/chain.lua" beforeDir="false" afterPath="$PROJECT_DIR$/old/fast_physics/chain.lua" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/fast_physics/circle.lua" beforeDir="false" afterPath="$PROJECT_DIR$/old/fast_physics/circle.lua" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/fast_physics/draw.lua" beforeDir="false" afterPath="$PROJECT_DIR$/old/fast_physics/draw.lua" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/fast_physics/enki_cdef.h" beforeDir="false" afterPath="$PROJECT_DIR$/old/fast_physics/enki_cdef.h" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/fast_physics/extension/CMakeLists.txt" beforeDir="false" afterPath="$PROJECT_DIR$/old/fast_physics/extension/CMakeLists.txt" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/fast_physics/extension/box2d_extension.cpp" beforeDir="false" afterPath="$PROJECT_DIR$/old/fast_physics/extension/box2d_extension.cpp" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/fast_physics/extension/box2d_extension.hpp" beforeDir="false" afterPath="$PROJECT_DIR$/old/fast_physics/extension/box2d_extension.hpp" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/fast_physics/joint.lua" beforeDir="false" afterPath="$PROJECT_DIR$/old/fast_physics/joint.lua" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/fast_physics/polygon.lua" beforeDir="false" afterPath="$PROJECT_DIR$/old/fast_physics/polygon.lua" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/fast_physics/segment.lua" beforeDir="false" afterPath="$PROJECT_DIR$/old/fast_physics/segment.lua" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/fast_physics/shape.lua" beforeDir="false" afterPath="$PROJECT_DIR$/old/fast_physics/shape.lua" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/fast_physics/world.lua" beforeDir="false" afterPath="$PROJECT_DIR$/old/fast_physics/world.lua" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/fast_physics/world_thread_enki.lua" beforeDir="false" afterPath="$PROJECT_DIR$/old/fast_physics/world_thread_enki.lua" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/fast_physics/world_thread_love.lua" beforeDir="false" afterPath="$PROJECT_DIR$/old/fast_physics/world_thread_love.lua" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/fast_physics/world_thread_sdl.lua" beforeDir="false" afterPath="$PROJECT_DIR$/old/fast_physics/world_thread_sdl.lua" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/fast_physics/world_thread_worker.lua" beforeDir="false" afterPath="$PROJECT_DIR$/old/fast_physics/world_thread_worker.lua" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/main_rope.lua" beforeDir="false" afterPath="$PROJECT_DIR$/main_rope.lua" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/physics/cdef.h" beforeDir="false" afterPath="$PROJECT_DIR$/physics/cdef.h" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/physics/joint.lua" beforeDir="false" afterPath="$PROJECT_DIR$/physics/joint.lua" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/include.lua" beforeDir="false" afterPath="$PROJECT_DIR$/include.lua" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/physics/body.lua" beforeDir="false" afterPath="$PROJECT_DIR$/physics/body.lua" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -542,15 +524,7 @@
       <workItem from="1725983643239" duration="2742000" />
       <workItem from="1725986406074" duration="12813000" />
       <workItem from="1726080004331" duration="2183000" />
-      <workItem from="1726098165384" duration="32324000" />
-    </task>
-    <task id="LOCAL-01010" summary="added buttons and dpad">
-      <option name="closed" value="true" />
-      <created>1725044584854</created>
-      <option name="number" value="01010" />
-      <option name="presentableId" value="LOCAL-01010" />
-      <option name="project" value="LOCAL" />
-      <updated>1725044584854</updated>
+      <workItem from="1726098165384" duration="38920000" />
     </task>
     <task id="LOCAL-01011" summary="added start select button">
       <option name="closed" value="true" />
@@ -936,7 +910,15 @@
       <option name="project" value="LOCAL" />
       <updated>1726259173247</updated>
     </task>
-    <option name="localTasksCounter" value="1059" />
+    <task id="LOCAL-01059" summary="ordered box working">
+      <option name="closed" value="true" />
+      <created>1726341632042</created>
+      <option name="number" value="01059" />
+      <option name="presentableId" value="LOCAL-01059" />
+      <option name="project" value="LOCAL" />
+      <updated>1726341632042</updated>
+    </task>
+    <option name="localTasksCounter" value="1060" />
     <servers />
   </component>
   <component name="TypeScriptGeneratedFilesManager">
@@ -985,7 +967,6 @@
     </option>
   </component>
   <component name="VcsManagerConfiguration">
-    <MESSAGE value="polished scenes" />
     <MESSAGE value="added double button keybinding indicator" />
     <MESSAGE value="moved keybindings into game state" />
     <MESSAGE value="added enkits" />
@@ -1010,7 +991,8 @@
     <MESSAGE value="imported new physics to battle" />
     <MESSAGE value="capsules working" />
     <MESSAGE value="stashing rope" />
-    <option name="LAST_COMMIT_MESSAGE" value="stashing rope" />
+    <MESSAGE value="ordered box working" />
+    <option name="LAST_COMMIT_MESSAGE" value="ordered box working" />
   </component>
   <component name="XDebuggerManager">
     <breakpoint-manager>

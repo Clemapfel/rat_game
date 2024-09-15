@@ -12,11 +12,6 @@ end)
 --- @brief
 function bt.BattleScene:_add_item(object)
     local widget = rt.LabeledSprite(object:get_sprite_id())
-    if rt.random.toss_coin() then
-        widget:set_minimum_size(64, 32)
-    else
-        widget:set_minimum_size(32, 32)
-    end
     self._temp_object_to_widget[object] = widget
     self._temp:add(widget, not meta.isa(object, bt.Consumable))
     table.insert(self._temp_objects, object)

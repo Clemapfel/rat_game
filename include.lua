@@ -157,6 +157,8 @@ require "physics.shape"
 require "physics.body"
 require "physics.joint"
 
+require "common.physics_based_animation"
+
 -- battle
 require "battle.move"
 require "battle.equip"

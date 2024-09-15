@@ -175,11 +175,11 @@ function b2.Body:get_angular_velocity()
 end
 
 --- @brief
-function b2.Body:apply_force(force, local_point_x, local_point_y, should_wake_up_body)
+function b2.Body:apply_force(force_x, force_y, local_point_x, local_point_y, should_wake_up_body)
     if should_wake_up_body == nil then should_wake_up_body = true end
     if local_point_x == nil then local_point_x = 0 end
     if local_point_y == nil then local_point_y = 0 end
-    box2d.b2Body_ApplyForce(self._native, b2.Vec2(local_point_x, local_point_y), should_wake_up_body)
+    box2d.b2Body_ApplyForce(self._native, b2.Vec2(force_x, force_y), b2.Vec2(local_point_x, local_point_y), should_wake_up_body)
 end
 
 --- @brief
@@ -223,6 +223,7 @@ end
 
 --- @brief
 function b2.Body:set_linear_damping(value)
+    if value < 0 then value = 0 end
     box2d.b2Body_SetLinearDamping(self._native, value)
 end
 
