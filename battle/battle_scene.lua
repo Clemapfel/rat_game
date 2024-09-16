@@ -100,12 +100,12 @@ function bt.BattleScene:_handle_button_pressed(which)
     end
 
     if which == rt.InputButton.L then
-       local current = self._health:get_value()
-        current = current - 1
+        local current = self._health:get_value()
+        current = current - 10
         self._health:set_value(current)
     elseif which == rt.InputButton.R then
         local current = self._health:get_value()
-        current = current + 1
+        current = current + 10
         self._health:set_value(current)
     elseif which == rt.InputButton.X then
     elseif which == rt.InputButton.Y then

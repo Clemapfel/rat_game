@@ -47,6 +47,10 @@ function bt.HealthBar:realize()
         outline:set_color(rt.Palette.BACKGROUND_OUTLINE)
     end
 
+    for shape in range(self._backdrop, self._backdrop_outline) do
+        shape:set_corner_radius(rt.settings.frame.corner_radius)
+    end
+
     self._backdrop_outline:set_line_width(2)
     self._shape_outline:set_line_width(2)
 
@@ -71,9 +75,9 @@ function bt.HealthBar:_format_hp(value, max)
     elseif self._state == bt.EntityState.DEAD then
         return "", "DEAD", ""
     elseif self._use_percentage then
-        return "", value .. " %", ""
+        return "", (value - math.fmod(value, 1.0)) .. " %", ""
     else
-        return tostring(clamp(value, 0, max)), " / ", tostring(max)
+        return tostring(math.round(clamp(value, 0, max))), " / ", tostring(max)
     end
 end
 
@@ -128,8 +132,13 @@ end
 
 --- @override
 function bt.HealthBar:draw()
+
+    local stencil_value = meta.hash(self) % 254 + 1
     self._backdrop:draw()
+    rt.graphics.stencil(stencil_value, self._backdrop)
+    rt.graphics.set_stencil_test(rt.StencilCompareMode.EQUAL, stencil_value)
     self._shape:draw()
+    rt.graphics.set_stencil_test()
     self._backdrop_outline:draw()
     self._shape_outline:draw()
 
@@ -142,7 +151,7 @@ end
 function bt.HealthBar:update(delta)
     if self._is_realized ~= true then return end
 
-    self._value_animation:step()
+    self._value_animation:update(delta)
     self._current_value = self._value_animation:get_value()
     self:_update_value()
 end
@@ -165,5 +174,5 @@ end
 
 --- @brief
 function bt.HealthBar:get_value()
-    return self._current_value
+    return self._target_value
 end

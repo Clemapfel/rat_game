@@ -79,7 +79,7 @@ end
 function bt.OrderedBox:update(delta)
     for item in values(self._widget_to_item) do
         -- update position
-        item.position_animation:step()
+        item.position_animation:update(delta)
         item.current_position_x, item.current_position_y = item.position_animation:get_position()
 
         -- update scale

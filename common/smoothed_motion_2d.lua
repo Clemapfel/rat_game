@@ -36,7 +36,7 @@ function rt.SmoothedMotion2D:set_target_position(x, y)
 end
 
 --- @brief
-function rt.SmoothedMotion2D:step()
+function rt.SmoothedMotion2D:update(_)
     local current_x, current_y = self._current_position_x, self._current_position_y
     local target_x, target_y = self._target_position_x, self._target_position_y
     local distance = rt.distance(current_x, current_y, target_x, target_y)

@@ -55,7 +55,7 @@ love.update = function(delta)
 end
 
 love.draw = function()
-    background:draw()
+    --background:draw()
     if draw_state then
         state:_draw()
     end
