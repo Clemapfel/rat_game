@@ -6,6 +6,8 @@ bt.BattleScene = meta.new_type("BattleScene", rt.Scene, function(state)
         _temp_object_to_widget = {},
 
         _health = bt.HealthBar(0, 100),
+        _speed = bt.SpeedValue(55),
+
         _input = rt.InputController()
     })
 end)
@@ -34,6 +36,7 @@ function bt.BattleScene:realize()
 
     self._temp:realize()
     self._health:realize()
+    self._speed:realize()
 
     self._input:signal_connect("pressed", function(_, which)
         self:_handle_button_pressed(which)
@@ -50,6 +53,7 @@ function bt.BattleScene:size_allocate(x, y, width, height)
     local temp_w, temp_h = 0.5 * width, 50
     self._temp:fit_into(x + 0.5 * width - 0.5 * temp_w, y + 0.5 * height - 0.5 * temp_h, temp_w, temp_h)
     self._health:fit_into(x + 0.5 * width - 0.5 * temp_w, y + 0.5 * height - 0.5 * temp_h + 2 * temp_h, temp_w, temp_h)
+    self._speed:fit_into(x + 0.5 * width - 0.5 * temp_w, y + 0.5 * height - 0.5 * temp_h + 3 * temp_h, temp_w, temp_h)
 end
 
 --- @override
@@ -57,12 +61,14 @@ function bt.BattleScene:draw()
     self._temp:draw_bounds()
     self._temp:draw()
     self._health:draw()
+    self._speed:draw()
 end
 
 --- @override
 function bt.BattleScene:update(delta)
     self._temp:update(delta)
     self._health:update(delta)
+    self._speed:update(delta)
 end
 
 --- @override
@@ -103,10 +109,18 @@ function bt.BattleScene:_handle_button_pressed(which)
         local current = self._health:get_value()
         current = current - 10
         self._health:set_value(current)
+
+        local current = self._speed:get_value()
+        current = current - 5
+        self._speed:set_value(current)
     elseif which == rt.InputButton.R then
         local current = self._health:get_value()
         current = current + 10
         self._health:set_value(current)
+
+        local current = self._speed:get_value()
+        current = current + 5
+        self._speed:set_value(current)
     elseif which == rt.InputButton.X then
     elseif which == rt.InputButton.Y then
     elseif which == rt.InputButton.B then

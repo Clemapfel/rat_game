@@ -30,7 +30,7 @@ function rt.SmoothedMotion1D:update(delta)
     local tick_duration = 1 / 60
     self._elapsed = self._elapsed + delta
     while self._elapsed > tick_duration do
-        local offset = delta * math.max(diff * 2, 1) * self._speed
+        local offset = delta * math.max(diff * 3, 1) * self._speed
         if self._current_value > self._target_value then
             self._current_value = self._current_value - offset
             if self._current_value < self._target_value then

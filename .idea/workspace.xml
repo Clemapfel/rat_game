@@ -22,14 +22,15 @@
     </configurations>
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="7fa9ba1b-2cff-4ecc-86fb-59ab2fa76ee1" name="Changes" comment="refactored smoothed motion, TODO implement for 1d">
+    <list default="true" id="7fa9ba1b-2cff-4ecc-86fb-59ab2fa76ee1" name="Changes" comment="health bar done">
+      <change afterPath="$PROJECT_DIR$/battle/speed_value.lua" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/battle/battle_scene.lua" beforeDir="false" afterPath="$PROJECT_DIR$/battle/battle_scene.lua" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/battle/health_bar.lua" beforeDir="false" afterPath="$PROJECT_DIR$/battle/health_bar.lua" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/battle/ordered_box.lua" beforeDir="false" afterPath="$PROJECT_DIR$/battle/ordered_box.lua" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/common/game_state.lua" beforeDir="false" afterPath="$PROJECT_DIR$/common/game_state.lua" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/common/shape.lua" beforeDir="false" afterPath="$PROJECT_DIR$/common/shape.lua" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/common/smoothed_motion_1d.lua" beforeDir="false" afterPath="$PROJECT_DIR$/common/smoothed_motion_1d.lua" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/common/smoothed_motion_2d.lua" beforeDir="false" afterPath="$PROJECT_DIR$/common/smoothed_motion_2d.lua" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/main.lua" beforeDir="false" afterPath="$PROJECT_DIR$/main.lua" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/include.lua" beforeDir="false" afterPath="$PROJECT_DIR$/include.lua" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -525,15 +526,8 @@
       <workItem from="1726080004331" duration="2183000" />
       <workItem from="1726098165384" duration="45793000" />
       <workItem from="1726501645372" duration="880000" />
-      <workItem from="1726502551535" duration="2676000" />
-    </task>
-    <task id="LOCAL-01014" summary="added joystick indicator">
-      <option name="closed" value="true" />
-      <created>1725123333507</created>
-      <option name="number" value="01014" />
-      <option name="presentableId" value="LOCAL-01014" />
-      <option name="project" value="LOCAL" />
-      <updated>1725123333507</updated>
+      <workItem from="1726502551535" duration="2913000" />
+      <workItem from="1726525057926" duration="4503000" />
     </task>
     <task id="LOCAL-01015" summary="added joystick indicator">
       <option name="closed" value="true" />
@@ -919,7 +913,15 @@
       <option name="project" value="LOCAL" />
       <updated>1726443710094</updated>
     </task>
-    <option name="localTasksCounter" value="1063" />
+    <task id="LOCAL-01063" summary="health bar done">
+      <option name="closed" value="true" />
+      <created>1726506741432</created>
+      <option name="number" value="01063" />
+      <option name="presentableId" value="LOCAL-01063" />
+      <option name="project" value="LOCAL" />
+      <updated>1726506741432</updated>
+    </task>
+    <option name="localTasksCounter" value="1064" />
     <servers />
   </component>
   <component name="TypeScriptGeneratedFilesManager">
@@ -968,7 +970,6 @@
     </option>
   </component>
   <component name="VcsManagerConfiguration">
-    <MESSAGE value="added enkits" />
     <MESSAGE value="stashing before refactored mapping" />
     <MESSAGE value="added benchmark" />
     <MESSAGE value="stashing" />
@@ -993,7 +994,8 @@
     <MESSAGE value="ordered box working" />
     <MESSAGE value="encapsulated physics 2d animation" />
     <MESSAGE value="refactored smoothed motion, TODO implement for 1d" />
-    <option name="LAST_COMMIT_MESSAGE" value="refactored smoothed motion, TODO implement for 1d" />
+    <MESSAGE value="health bar done" />
+    <option name="LAST_COMMIT_MESSAGE" value="health bar done" />
   </component>
   <component name="XDebuggerManager">
     <breakpoint-manager>

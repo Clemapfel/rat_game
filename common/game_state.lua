@@ -301,6 +301,8 @@ function rt.GameState:_run()
             draw_duration = now - draw_before
             total_duration = now - update_before
             stats = love.graphics.getStats()
+            local n_batched_draws = stats.drawcallsbatched
+            local n_canvas_switches = stats.canvasswitches
 
             if self._state.show_diagnostics == true then
                 local fps = love.timer.getFPS()
@@ -311,7 +313,7 @@ function rt.GameState:_run()
                 local n_draws = tostring(durations.max_n_draws)
                 local n_texture_switches = tostring(durations.max_n_texture_switches)
 
-                local label = tostring(fps) .. " | " .. durations.format(update_percentage) .. "% | " ..  durations.format(draw_percentage) .. "% | " ..  durations.format(total_percentage) .. "% | " .. n_draws
+                local label = tostring(fps) .. " | " .. durations.format(update_percentage) .. "% | " ..  durations.format(draw_percentage) .. "% | " ..  durations.format(total_percentage) .. "% | " .. n_draws .. " (" .. n_batched_draws .. ")" .. " | " .. n_canvas_switches
                 love.graphics.setColor(1, 1, 1, 0.75)
                 local margin = 3
                 local label_w, label_h = love.graphics.getFont():getWidth(label), love.graphics.getFont():getHeight(label)

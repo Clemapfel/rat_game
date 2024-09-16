@@ -170,6 +170,7 @@ require "battle.entity"
 
 require "battle.ordered_box"
 require "battle.health_bar"
+require "battle.speed_value"
 
 require "battle.battle_scene"
 

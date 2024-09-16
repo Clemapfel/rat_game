@@ -46,6 +46,7 @@ function bt.OrderedBox:add(widget, left_or_right)
     if self._is_realized then
         widget:realize()
         self:reformat()
+        self:update(0)
     end
 end
 
