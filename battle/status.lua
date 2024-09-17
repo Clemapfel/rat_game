@@ -205,6 +205,7 @@ end, {
     end,
 
     description = "(no additional effect)",
+    flavor_text = "",
     sprite_id = "status_ailment",
     sprite_index = 1
 })
@@ -239,6 +240,7 @@ function bt.Status:realize()
 
     local template = {
         description = rt.STRING,
+        flavor_text = rt.STRING,
         sprite_id = rt.STRING,
         sprite_index = { rt.UNSIGNED, rt.STRING },
         name = rt.STRING,
@@ -299,4 +301,9 @@ end
 --- @brief
 function bt.Status:get_description()
     return self.description
+end
+
+--- @brief
+function bt.Status:get_flavor_text()
+    return self.flavor_text
 end

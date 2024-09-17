@@ -8,6 +8,8 @@ rt.VerboseInfoObject = meta.new_enum({
     CONSUMABLE = "consumable",
     EQUIP = "equip",
     TEMPLATE = "template",
+    STATUS = "status",
+    GLOBAL_STATUS = "global_status",
     HP = "hp",
     ATTACK = "attack",
     DEFENSE = "defense",
@@ -39,6 +41,7 @@ mn.VerboseInfoPanel = meta.new_type("MenuVerboseInfoPanel", rt.Widget, function(
         _y_offset = 0,
         _total_height = 0,
         _frame = rt.Frame(),
+        _frame_visible = true,
         _scroll_up_indicator = rt.Polygon(0, 0, 1, 1, 0.5, 0.5),
         _scroll_up_indicator_outline =  rt.Polygon(0, 0, 1, 1, 0.5, 0.5),
         _scroll_up_indicator_visible = true,
@@ -138,7 +141,9 @@ end
 
 --- @override
 function mn.VerboseInfoPanel:draw()
-    self._frame:draw()
+    if self._frame_visible == true then
+        self._frame:draw()
+    end
 
     self._frame:_bind_stencil()
     rt.graphics.translate(0, self._y_offset)
@@ -343,4 +348,9 @@ function mn.VerboseInfoPanel:_generate_hat_arrow_outline(centroid_x, centroid_y,
         left_top_x, left_top_y,
         center_top_x, center_top_y,
     }
+end
+
+--- @brief
+function mn.VerboseInfoPanel:set_backdrop_visible(b)
+    self._frame_visible = b
 end

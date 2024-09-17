@@ -26,6 +26,7 @@ end, {
 --- @brief
 function rt.SmoothedMotion2D:get_position()
     local x, y = self._position_body:get_centroid()
+    assert(x ~= nil and y ~= nil)
     return x, y
 end
 

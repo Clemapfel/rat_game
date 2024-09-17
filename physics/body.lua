@@ -35,7 +35,7 @@ b2.Body = meta.new_type("PhysicsBody", function(world, type, position_x, positio
     def.position = b2.Vec2(position_x, position_y)
 
     return meta.new(b2.Body, {
-        _native = ffi.gc(box2d.b2CreateBody(world._native, def), box2d.b2DestroyBody)
+        _native = box2d.b2CreateBody(world._native, def)
     })
 end)
 
@@ -118,6 +118,7 @@ end
 
 --- @brief
 function b2.Body:get_centroid(local_offset_x, local_offset_y)
+    assert(box2d.b2Body_IsValid(self._native) == true)
     if local_offset_x == nil then local_offset_x = 0 end
     if local_offset_y == nil then local_offset_y = 0 end
     local out = box2d.b2Body_GetWorldPoint(self._native, b2.Vec2(local_offset_x, local_offset_y))

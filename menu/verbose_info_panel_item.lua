@@ -39,6 +39,10 @@ function mn.VerboseInfoPanel.Item:create_from(object)
         self:create_from_move(object)
     elseif meta.isa(object, bt.Consumable) then
         self:create_from_consumable(object)
+    elseif meta.isa(object, bt.Status) then
+        self:create_from_status(object)
+    elseif meta.isa(object, bt.GlobalStatus) then
+        self:create_from_global_status(object)
     elseif meta.isa(object, mn.Template) then
         self:create_from_template(object)
     else
@@ -271,7 +275,7 @@ function mn.VerboseInfoPanel.Item:create_from_equip(equip)
                     local value_w, value_h = value_label:measure()
                     prefix_label:fit_into(current_x, current_y, POSITIVE_INFINITY)
                     local colon_w = select(1, colon_label:measure())
-                    colon_label:fit_into(current_x + w / 2 - colon_w, current_y, POSITIVE_INFINITY)
+                    colon_label:fit_into(current_x + w / 2 - colon_w / 2, current_y, POSITIVE_INFINITY)
                     value_label:fit_into(current_x + w - max_value_w, current_y, POSITIVE_INFINITY)
 
                     current_y = current_y + value_h
@@ -394,7 +398,7 @@ function mn.VerboseInfoPanel.Item:create_from_move(move)
             local value_w, value_h = value_label:measure()
             prefix_label:fit_into(current_x, current_y, POSITIVE_INFINITY)
             local colon_w = select(1, colon_label:measure())
-            colon_label:fit_into(current_x + w / 2 - colon_w, current_y, POSITIVE_INFINITY)
+            colon_label:fit_into(current_x + w / 2 - colon_w / 2, current_y, POSITIVE_INFINITY)
             value_label:fit_into(current_x + w - value_w, current_y, POSITIVE_INFINITY)
 
             current_y = current_y + value_h
@@ -489,6 +493,189 @@ function mn.VerboseInfoPanel.Item:create_from_consumable(consumable)
     return self
 end
 
+--- @brief
+function mn.VerboseInfoPanel.Item:create_from_status(status)
+    self.object = status
+    self._is_realized = false
+
+    self.realize = function(self)
+        self._is_realized = true
+        self.frame:realize()
+
+        self.title_label = self._title(status:get_name())
+        self.description_label = self._description(status:get_description())
+        self.sprite = self._sprite(status)
+
+        self.max_duration_prefix_label = self._prefix("Max Duration")
+        self.max_duration_colon_label = self._colon()
+
+        local duration = status:get_max_duration()
+        local duration_str
+        if duration == POSITIVE_INFINITY then
+            duration_str = "<b>\u{221E}</b>" -- infinity
+        else
+            duration_str = tostring(duration)
+        end
+        self.max_duration_value_label = self._number(duration_str)
+
+        local flavor_text = status:get_flavor_text()
+        if #flavor_text ~= 0 then
+            self.spacer = self._hrule()
+            self.flavor_text_label = self._flavor_text(status:get_flavor_text())
+        end
+
+        self.content = {
+            self.title_label,
+            self.sprite,
+            self.description_label,
+            self.max_duration_prefix_label,
+            self.max_duration_colon_label,
+            self.max_duration_value_label,
+
+            self.spacer, -- may be nil
+            self.flavor_text_label,
+        }
+    end
+
+    self.size_allocate = function(self, x, y, width, height)
+        local m, xm, ym = self._get_margin()
+        local start_y = y + ym
+        local current_x, current_y = x + xm, start_y
+        local w = width - 2 * xm
+
+        local sprite_w, sprite_h = self.sprite:measure()
+        local title_w, title_h = self.title_label:measure()
+
+        local title_max_h = math.max(sprite_h, title_h)
+        local title_y = current_y + 0.5 * title_max_h - 0.5 * title_h
+        self.title_label:fit_into(current_x, title_y, w, POSITIVE_INFINITY)
+        self.sprite:fit_into(current_x + w - sprite_w, current_y + 0.5 * title_max_h - 0.5 * sprite_h, sprite_w, sprite_h)
+
+        current_y = current_y + title_max_h
+
+        self.description_label:fit_into(current_x, current_y, w, POSITIVE_INFINITY) -- alloc to measure
+        current_y = current_y + select(2, self.description_label:measure()) + 2 * m
+
+        self.max_duration_prefix_label:fit_into(current_x, current_y, POSITIVE_INFINITY)
+        local value_w, value_h = self.max_duration_value_label:measure()
+        self.max_duration_value_label:fit_into(current_x + w - value_w, current_y, POSITIVE_INFINITY)
+        local colon_w, colon_h = self.max_duration_colon_label:measure()
+        self.max_duration_colon_label:fit_into(current_x + 0.5 * w - 0.5 * colon_w, current_y, POSITIVE_INFINITY)
+
+        TODO: status factors
+
+        current_y = current_y + math.max(value_h, colon_h) + m
+
+        if self.spacer ~= nil then
+            self.spacer:fit_into(current_x, current_y, w, 0)
+            current_y = current_y + select(2, self.spacer:measure()) + m
+
+            self.flavor_text_label:fit_into(current_x, current_y, w, POSITIVE_INFINITY)
+            current_y = current_y + select(2, self.flavor_text_label:measure()) + m
+        end
+
+        local total_height = current_y - start_y + 2 * ym
+        self.frame:fit_into(x, y, width, total_height)
+        self.final_height = total_height
+    end
+
+    self.measure = function(self)
+        return self._bounds.width, self.final_height
+    end
+
+    return self
+end
+
+--- @brief
+function mn.VerboseInfoPanel.Item:create_from_global_status(status)
+    self.object = status
+    self._is_realized = false
+
+    self.realize = function(self)
+        self._is_realized = true
+        self.frame:realize()
+
+        self.title_label = self._title(status:get_name())
+        self.description_label = self._description(status:get_description())
+        self.sprite = self._sprite(status)
+
+        self.max_duration_prefix_label = self._prefix("Max Duration")
+        self.max_duration_colon_label = self._colon()
+
+        local duration = status:get_max_duration()
+        local duration_str
+        if duration == POSITIVE_INFINITY then
+            duration_str = "<b>\u{221E}</b>" -- infinity
+        else
+            duration_str = tostring(duration)
+        end
+        self.max_duration_value_label = self._number(duration_str)
+
+        local flavor_text = status:get_flavor_text()
+        if #flavor_text ~= 0 then
+            self.spacer = self._hrule()
+            self.flavor_text_label = self._flavor_text(status:get_flavor_text())
+        end
+
+        self.content = {
+            self.title_label,
+            self.sprite,
+            self.description_label,
+            self.max_duration_prefix_label,
+            self.max_duration_colon_label,
+            self.max_duration_value_label,
+
+            self.spacer, -- may be nil
+            self.flavor_text_label,
+        }
+    end
+
+    self.size_allocate = function(self, x, y, width, height)
+        local m, xm, ym = self._get_margin()
+        local start_y = y + ym
+        local current_x, current_y = x + xm, start_y
+        local w = width - 2 * xm
+
+        local sprite_w, sprite_h = self.sprite:measure()
+        local title_w, title_h = self.title_label:measure()
+
+        local title_max_h = math.max(sprite_h, title_h)
+        local title_y = current_y + 0.5 * title_max_h - 0.5 * title_h
+        self.title_label:fit_into(current_x, title_y, w, POSITIVE_INFINITY)
+        self.sprite:fit_into(current_x + w - sprite_w, current_y + 0.5 * title_max_h - 0.5 * sprite_h, sprite_w, sprite_h)
+
+        current_y = current_y + title_max_h
+
+        self.description_label:fit_into(current_x, current_y, w, POSITIVE_INFINITY) -- alloc to measure
+        current_y = current_y + select(2, self.description_label:measure()) + 2 * m
+
+        self.max_duration_prefix_label:fit_into(current_x, current_y, POSITIVE_INFINITY)
+        local value_w, value_h = self.max_duration_value_label:measure()
+        self.max_duration_value_label:fit_into(current_x + w - value_w, current_y, POSITIVE_INFINITY)
+        local colon_w, colon_h = self.max_duration_colon_label:measure()
+        self.max_duration_colon_label:fit_into(current_x + 0.5 * w - 0.5 * colon_w, current_y, POSITIVE_INFINITY)
+
+        current_y = current_y + math.max(value_h, colon_h) + m
+
+        if self.spacer ~= nil then
+            self.spacer:fit_into(current_x, current_y, w, 0)
+            current_y = current_y + select(2, self.spacer:measure()) + m
+
+            self.flavor_text_label:fit_into(current_x, current_y, w, POSITIVE_INFINITY)
+            current_y = current_y + select(2, self.flavor_text_label:measure()) + m
+        end
+
+        local total_height = current_y - start_y + 2 * ym
+        self.frame:fit_into(x, y, width, total_height)
+        self.final_height = total_height
+    end
+
+    self.measure = function(self)
+        return self._bounds.width, self.final_height
+    end
+
+    return self
+end
 
 --- @brief party info
 function mn.VerboseInfoPanel.Item:create_from_template(template)

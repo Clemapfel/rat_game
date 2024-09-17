@@ -1,12 +1,13 @@
 return {
     name = "Debug Global Status",
 
-    max_duration = 0,
+    max_duration = POSITIVE_INFINITY,
     is_silent = false,
 
     sprite_id = "status_ailment",
     sprite_index = 2,
     description = "Prints messages for every trigger payload",
+    flavor_text = "Debug Flavored Cool-Aid",
 
     on_gained = function(self, entities)
         meta.assert_global_status_interface(self)

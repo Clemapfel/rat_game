@@ -130,16 +130,18 @@ end
 function bt.OrderedBox:draw()
     for widget in values(self._widget_order) do
         local item = self._widget_to_item[widget]
-        rt.graphics.push()
-        local w, h = item.size_x, item.size_y
-        local x_translate, y_translate = item.current_position_x - 0.5 * w, item.current_position_y - 0.5 * h
-        rt.graphics.translate(x_translate, y_translate)
-        rt.graphics.translate(0.5 * w, 0.5 * h)
-        rt.graphics.scale(item.current_scale)
-        rt.graphics.translate(-0.5 * w, -0.5 * h)
-        item.widget:draw()
+        if item.position_animation ~= nil then -- size_allocate called
+            rt.graphics.push()
+            local w, h = item.size_x, item.size_y
+            local x_translate, y_translate = item.current_position_x - 0.5 * w, item.current_position_y - 0.5 * h
+            rt.graphics.translate(x_translate, y_translate)
+            rt.graphics.translate(0.5 * w, 0.5 * h)
+            rt.graphics.scale(item.current_scale)
+            rt.graphics.translate(-0.5 * w, -0.5 * h)
+            item.widget:draw()
 
-        rt.graphics.pop()
+            rt.graphics.pop()
+        end
     end
 end
 

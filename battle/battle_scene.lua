@@ -8,6 +8,7 @@ bt.BattleScene = meta.new_type("BattleScene", rt.Scene, function(state)
         _health = bt.HealthBar(0, 100),
         _speed = bt.SpeedValue(55),
 
+        _verbose_info = mn.VerboseInfoPanel(),
         _input = rt.InputController()
     })
 end)
@@ -38,6 +39,9 @@ function bt.BattleScene:realize()
     self._health:realize()
     self._speed:realize()
 
+    self._verbose_info:realize()
+    self._verbose_info:set_backdrop_visible(false)
+
     self._input:signal_connect("pressed", function(_, which)
         self:_handle_button_pressed(which)
     end)
@@ -50,10 +54,15 @@ end
 
 --- @override
 function bt.BattleScene:size_allocate(x, y, width, height)
+    local m = rt.settings.margin_unit
     local temp_w, temp_h = 0.5 * width, 50
     self._temp:fit_into(x + 0.5 * width - 0.5 * temp_w, y + 0.5 * height - 0.5 * temp_h, temp_w, temp_h)
     self._health:fit_into(x + 0.5 * width - 0.5 * temp_w, y + 0.5 * height - 0.5 * temp_h + 2 * temp_h, temp_w, temp_h)
     self._speed:fit_into(x + 0.5 * width - 0.5 * temp_w, y + 0.5 * height - 0.5 * temp_h + 3 * temp_h, temp_w, temp_h)
+
+    local outer_margin = 2 * m
+    local verbose_w = 0.3 * width
+    self._verbose_info:fit_into(x + width - verbose_w - outer_margin, outer_margin, verbose_w, height - 2 * outer_margin)
 end
 
 --- @override
@@ -62,6 +71,9 @@ function bt.BattleScene:draw()
     self._temp:draw()
     self._health:draw()
     self._speed:draw()
+
+    self._verbose_info:draw_bounds()
+    self._verbose_info:draw()
 end
 
 --- @override
@@ -69,6 +81,10 @@ function bt.BattleScene:update(delta)
     self._temp:update(delta)
     self._health:update(delta)
     self._speed:update(delta)
+    self._verbose_info:update(delta)
+
+    -- TODO
+    self._verbose_info:show(bt.GlobalStatus("DEBUG_GLOBAL_STATUS"), bt.Status("DEBUG_STATUS"), bt.Equip("DEBUG_EQUIP"))
 end
 
 --- @override
