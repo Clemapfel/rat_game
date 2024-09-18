@@ -543,7 +543,7 @@ function mn.VerboseInfoPanel.Item:create_from_status(status)
             {"damage_dealt", "ATTACK", "Damage"},
             {"damage_received", "ATTACK", "Damage Taken"},
             {"healing_performed", "HEALTH", "Healing"},
-            {"healing_received", "HEALTH", "Healing Received"}
+            {"healing_received", "HEALTH", "Healing Done"}
         ) do
             local name, color, prefix = table.unpack(name_color_prefix)
 
