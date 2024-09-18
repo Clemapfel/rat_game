@@ -22,18 +22,13 @@
     </configurations>
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="7fa9ba1b-2cff-4ecc-86fb-59ab2fa76ee1" name="Changes" comment="imported speed value">
+    <list default="true" id="7fa9ba1b-2cff-4ecc-86fb-59ab2fa76ee1" name="Changes" comment="added status and global status to verbose info panel">
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/assets/configs/global_statuses/DEBUG_GLOBAL_STATUS.lua" beforeDir="false" afterPath="$PROJECT_DIR$/assets/configs/global_statuses/DEBUG_GLOBAL_STATUS.lua" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/assets/configs/statuses/DEBUG_STATUS.lua" beforeDir="false" afterPath="$PROJECT_DIR$/assets/configs/statuses/DEBUG_STATUS.lua" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/battle/battle_scene.lua" beforeDir="false" afterPath="$PROJECT_DIR$/battle/battle_scene.lua" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/battle/global_status.lua" beforeDir="false" afterPath="$PROJECT_DIR$/battle/global_status.lua" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/battle/ordered_box.lua" beforeDir="false" afterPath="$PROJECT_DIR$/battle/ordered_box.lua" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/battle/status.lua" beforeDir="false" afterPath="$PROJECT_DIR$/battle/status.lua" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/common/smoothed_motion_2d.lua" beforeDir="false" afterPath="$PROJECT_DIR$/common/smoothed_motion_2d.lua" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/menu/verbose_info_panel.lua" beforeDir="false" afterPath="$PROJECT_DIR$/menu/verbose_info_panel.lua" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/battle/health_bar.lua" beforeDir="false" afterPath="$PROJECT_DIR$/battle/health_bar.lua" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/common/palette.lua" beforeDir="false" afterPath="$PROJECT_DIR$/common/palette.lua" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/menu/verbose_info_panel_item.lua" beforeDir="false" afterPath="$PROJECT_DIR$/menu/verbose_info_panel_item.lua" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/physics/body.lua" beforeDir="false" afterPath="$PROJECT_DIR$/physics/body.lua" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -530,15 +525,8 @@
       <workItem from="1726098165384" duration="45793000" />
       <workItem from="1726501645372" duration="880000" />
       <workItem from="1726502551535" duration="2913000" />
-      <workItem from="1726525057926" duration="7384000" />
-    </task>
-    <task id="LOCAL-01016" summary="stashing before input rework">
-      <option name="closed" value="true" />
-      <created>1725194510958</created>
-      <option name="number" value="01016" />
-      <option name="presentableId" value="LOCAL-01016" />
-      <option name="project" value="LOCAL" />
-      <updated>1725194510958</updated>
+      <workItem from="1726525057926" duration="8488000" />
+      <workItem from="1726676152420" duration="782000" />
     </task>
     <task id="LOCAL-01017" summary="refatored input controller">
       <option name="closed" value="true" />
@@ -924,7 +912,15 @@
       <option name="project" value="LOCAL" />
       <updated>1726529595959</updated>
     </task>
-    <option name="localTasksCounter" value="1065" />
+    <task id="LOCAL-01065" summary="added status and global status to verbose info panel">
+      <option name="closed" value="true" />
+      <created>1726533861890</created>
+      <option name="number" value="01065" />
+      <option name="presentableId" value="LOCAL-01065" />
+      <option name="project" value="LOCAL" />
+      <updated>1726533861890</updated>
+    </task>
+    <option name="localTasksCounter" value="1066" />
     <servers />
   </component>
   <component name="TypeScriptGeneratedFilesManager">
@@ -973,7 +969,6 @@
     </option>
   </component>
   <component name="VcsManagerConfiguration">
-    <MESSAGE value="added benchmark" />
     <MESSAGE value="stashing" />
     <MESSAGE value="box2d extension working" />
     <MESSAGE value="working" />
@@ -998,7 +993,8 @@
     <MESSAGE value="refactored smoothed motion, TODO implement for 1d" />
     <MESSAGE value="health bar done" />
     <MESSAGE value="imported speed value" />
-    <option name="LAST_COMMIT_MESSAGE" value="imported speed value" />
+    <MESSAGE value="added status and global status to verbose info panel" />
+    <option name="LAST_COMMIT_MESSAGE" value="added status and global status to verbose info panel" />
   </component>
   <component name="XDebuggerManager">
     <breakpoint-manager>
@@ -1017,6 +1013,11 @@
           <url>file://$PROJECT_DIR$/old/fast_physics/shape.lua</url>
           <line>231</line>
           <option name="timeStamp" value="12" />
+        </line-breakpoint>
+        <line-breakpoint enabled="true" type="lua-line">
+          <url>file://$PROJECT_DIR$/include.lua</url>
+          <line>19</line>
+          <option name="timeStamp" value="13" />
         </line-breakpoint>
         <line-breakpoint enabled="true" type="com.jetbrains.cidr.execution.debugger.OCBreakpointType">
           <url>file://$PROJECT_DIR$/old/fast_physics/enki_cdef.h</url>

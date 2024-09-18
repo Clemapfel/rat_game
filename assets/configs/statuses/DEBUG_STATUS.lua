@@ -26,7 +26,7 @@ return {
     sprite_id = "status_ailment",
     sprite_index = 2,
     description = "Prints messages for every trigger payload",
-    description = "Flavor-flavored Debug-Aid",
+    flavor_text = "Flavor-flavored Debug-Aid",
 
     on_gained = function(self, afflicted)
         meta.assert_status_interface(self)

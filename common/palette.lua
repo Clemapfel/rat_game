@@ -146,6 +146,7 @@ rt.Palette.ATTACK = rt.Palette.ENEMY
 rt.Palette.DEFENSE = rt.Palette.ALLY
 rt.Palette.SPEED = rt.Palette.LIGHT_GREEN_2
 rt.Palette.HP = rt.Palette.PURPLE_1
+rt.Palette.HEALTH = rt.Palette.HP
 rt.Palette.DAMAGE = rt.Palette.ENEMY
 
 rt.Palette.DEAD = rt.Palette.GRAY_6

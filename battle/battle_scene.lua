@@ -63,6 +63,10 @@ function bt.BattleScene:size_allocate(x, y, width, height)
     local outer_margin = 2 * m
     local verbose_w = 0.3 * width
     self._verbose_info:fit_into(x + width - verbose_w - outer_margin, outer_margin, verbose_w, height - 2 * outer_margin)
+
+    -- TODO
+    self._verbose_info:show(bt.Status("DEBUG_STATUS"))
+    -- TODO
 end
 
 --- @override
@@ -82,9 +86,6 @@ function bt.BattleScene:update(delta)
     self._health:update(delta)
     self._speed:update(delta)
     self._verbose_info:update(delta)
-
-    -- TODO
-    self._verbose_info:show(bt.GlobalStatus("DEBUG_GLOBAL_STATUS"), bt.Status("DEBUG_STATUS"), bt.Equip("DEBUG_EQUIP"))
 end
 
 --- @override

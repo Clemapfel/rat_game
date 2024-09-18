@@ -133,6 +133,27 @@ function mn.VerboseInfoPanel.Item._prefix(str, color)
     return out
 end
 
+function mn.VerboseInfoPanel.Item._format_offset(x)
+    if x > 0 then
+        return "+" .. x
+    elseif x < 0 then
+        return "-" .. math.abs(x)
+    else
+        return "\u{00B1}" .. x -- plusminus
+    end
+end
+
+function mn.VerboseInfoPanel.Item._format_factor(x)
+    x = math.abs(x)
+    if x > 1 then
+        return "+" .. math.round((x - 1) * 100) .. "%"
+    elseif x < 1 then
+        return "-" .. math.round((1 - x) * 100) .. "%"
+    else
+        return "\u{00B1}0%" -- plusminus
+    end
+end
+
 --- @brief equip
 function mn.VerboseInfoPanel.Item:create_from_equip(equip)
     self.object = equip
@@ -160,27 +181,6 @@ function mn.VerboseInfoPanel.Item:create_from_equip(equip)
             self.flavor_text_label
         }
 
-        local function format_offset(x)
-            if x > 0 then
-                return "+" .. x
-            elseif x < 0 then
-                return "-" .. math.abs(x)
-            else
-                return "\u{00B1}" .. x -- plusminus
-            end
-        end
-
-        local function format_factor(x)
-            x = math.abs(x)
-            if x > 1 then
-                return "+" .. math.round((x - 1) * 100) .. "%"
-            elseif x < 1 then
-                return "-" .. math.round((1 - x) * 100) .. "%"
-            else
-                return "\u{00B1}0%" -- plusminus
-            end
-        end
-
         for stat_color_label in range(
             {"hp", "HP", "HP"},
             {"attack", "ATTACK", "ATK"},
@@ -195,7 +195,7 @@ function mn.VerboseInfoPanel.Item:create_from_equip(equip)
                 local prefix_label = self._prefix(stat_color_label[3], color)
                 prefix_label:realize()
                 local colon = self._colon()
-                local value_label = self._number(format_offset(offset), color)
+                local value_label = self._number(self._format_offset(offset), color)
 
                 self[stat .. "_offset_prefix_label"] = prefix_label
                 self[stat .. "_offset_colon_label"] = colon
@@ -211,7 +211,7 @@ function mn.VerboseInfoPanel.Item:create_from_equip(equip)
                 local prefix_label = self._prefix(stat_color_label[3], color)
                 prefix_label:realize()
                 local colon = self._colon()
-                local value_label = self._number(format_factor(factor), color)
+                local value_label = self._number(self._format_factor(factor), color)
 
                 self[stat .. "_factor_prefix_label"] = prefix_label
                 self[stat .. "_factor_colon_label"] = colon
@@ -535,6 +535,46 @@ function mn.VerboseInfoPanel.Item:create_from_status(status)
             self.spacer, -- may be nil
             self.flavor_text_label,
         }
+
+        for name_color_prefix in range(
+            {"attack", "ATTACK", "ATK"},
+            {"defense", "DEFENSE", "DEF"},
+            {"speed", "SPEED", "SPD"},
+            {"damage_dealt", "ATTACK", "Damage"},
+            {"damage_received", "ATTACK", "Damage Taken"},
+            {"healing_performed", "HEALTH", "Healing"},
+            {"healing_received", "HEALTH", "Healing Received"}
+        ) do
+            local name, color, prefix = table.unpack(name_color_prefix)
+
+            local offset = self.object[name .. "_offset"]
+            if offset ~= 0 then
+                local prefix_label = self._prefix(prefix)
+                local colon_label = self._colon()
+                local value_label = self._number(self._format_offset(offset), color)
+                self[name .. "_offset_prefix_label"] = prefix_label
+                self[name .. "_offset_colon_label"] = colon_label
+                self[name .. "_offset_value_label"] = value_label
+
+                for w in range(prefix_label, colon_label, value_label) do
+                    table.insert(self.content, w)
+                end
+            end
+
+            local factor = self.object[name .. "_factor"]
+            if factor ~= 1 then
+                local prefix_label = self._prefix(prefix)
+                local colon_label = self._colon()
+                local value_label = self._number(self._format_factor(offset), color)
+                self[name .. "_factor_prefix_label"] = prefix_label
+                self[name .. "_factor_colon_label"] = colon_label
+                self[name .. "_factor_value_label"] = value_label
+
+                for w in range(prefix_label, colon_label, value_label) do
+                    table.insert(self.content, w)
+                end
+            end
+        end
     end
 
     self.size_allocate = function(self, x, y, width, height)
@@ -562,9 +602,50 @@ function mn.VerboseInfoPanel.Item:create_from_status(status)
         local colon_w, colon_h = self.max_duration_colon_label:measure()
         self.max_duration_colon_label:fit_into(current_x + 0.5 * w - 0.5 * colon_w, current_y, POSITIVE_INFINITY)
 
-        TODO: status factors
-
         current_y = current_y + math.max(value_h, colon_h) + m
+
+        local attribute_active = false
+        for name in range(
+            "attack",
+            "defense",
+            "speed",
+            "damage_dealt",
+            "damage_received",
+            "healing_performed",
+            "healing_received"
+        ) do
+            local offset_prefix_label = self[name .. "_offset_prefix_label"]
+            local offset_colon_label = self[name .. "_offset_colon_label"]
+            local offset_value_label = self[name .. "_offset_value_label"]
+
+            if offset_prefix_label ~= nil then
+                local colon_w, colon_h = offset_colon_label:measure()
+                local value_w, value_h = offset_value_label:measure()
+                offset_prefix_label:fit_into(current_x, current_y, POSITIVE_INFINITY)
+                offset_colon_label:fit_into(current_x + 0.5 * w - 0.5 * colon_w, current_y, POSITIVE_INFINITY)
+                offset_value_label:fit_into(current_x + w - value_w, current_y, POSITIVE_INFINITY)
+                current_y = current_y + value_h
+
+                attribute_active = true
+            end
+
+            local factor_prefix_label = self[name .. "_factor_prefix_label"]
+            local factor_colon_label = self[name .. "_factor_colon_label"]
+            local factor_value_label = self[name .. "_factor_value_label"]
+
+            if factor_prefix_label ~= nil then
+                local colon_w, colon_h = factor_colon_label:measure()
+                local value_w, value_h = factor_value_label:measure()
+                factor_prefix_label:fit_into(current_x, current_y, POSITIVE_INFINITY)
+                factor_colon_label:fit_into(current_x + 0.5 * w - 0.5 * colon_w, current_y, POSITIVE_INFINITY)
+                factor_value_label:fit_into(current_x + w - value_w, current_y, POSITIVE_INFINITY)
+                current_y = current_y + value_h
+
+                attribute_active = true
+            end
+        end
+
+        if attribute_active then current_y = current_y + m end
 
         if self.spacer ~= nil then
             self.spacer:fit_into(current_x, current_y, w, 0)
