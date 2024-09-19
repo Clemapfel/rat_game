@@ -13,6 +13,7 @@ rt.SmoothedMotion2D = meta.new_type("SmoothedMotion2D", function(position_x, pos
     return meta.new(rt.SmoothedMotion2D, {
         _position_body = body,
         _position_shape = shape,
+        _velocity_factor = 1,
         _damping_factor = damping_to_distance_coefficient,
         _current_position_x = position_x,
         _current_position_y = position_y,
@@ -22,6 +23,11 @@ rt.SmoothedMotion2D = meta.new_type("SmoothedMotion2D", function(position_x, pos
 end, {
     _world = b2.World(0, 0)
 })
+
+--- @brief
+function rt.SmoothedMotion2D:set_velocity_factor(x)
+    self._velocity_factor = x
+end
 
 --- @brief
 function rt.SmoothedMotion2D:get_position()
@@ -42,7 +48,7 @@ function rt.SmoothedMotion2D:update(_)
     local target_x, target_y = self._target_position_x, self._target_position_y
     local distance = rt.distance(current_x, current_y, target_x, target_y)
     local angle = rt.angle(target_x - current_x, target_y - current_y)
-    local vx, vy = rt.translate_point_by_angle(0, 0, distance, angle)
+    local vx, vy = rt.translate_point_by_angle(0, 0, distance * self._velocity_factor, angle)
     self._position_body:set_linear_damping((1000 * self._damping_factor) / distance)
     self._position_body:apply_linear_impulse(vx, vy)
     self._current_position_x, self._current_position_y = self._position_body:get_centroid()

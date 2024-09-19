@@ -45,6 +45,8 @@ function rt.TextBox:realize()
     if self._is_realized == true then return end
     self._is_realized = true
 
+    self._drop_animation:set_velocity_factor(1)
+
     for widget in range(
         self._backdrop,
         self._scrollbar,
@@ -72,6 +74,7 @@ function rt.TextBox:size_allocate(x, y, width, height)
     local text_xm, text_ym = 3 * m, 2 * m
     local w = width - 2 * text_xm
 
+    local x, y = 0, 0 -- sic, override for drop_animation
     self._backdrop:fit_into(x, y, width, text_h + 2 * text_ym)
     self._label_aabb = rt.AABB(x + text_xm, y + text_ym, w, height - 2 * text_ym)
     self._label_stencil:resize(x + text_xm, y + text_ym, w, text_h)
@@ -79,17 +82,22 @@ function rt.TextBox:size_allocate(x, y, width, height)
     if w ~= self._last_width then
         -- TODO: reformat all
     end
+
+    self:present()
 end
 
 --- @override
 function rt.TextBox:draw()
+
+    rt.graphics.push()
+    rt.graphics.translate(self._drop_animation:get_position())
+
     self._backdrop:draw()
 
     local stencil_value = meta.hash(self) % 254 + 1
     rt.graphics.stencil(stencil_value, self._label_stencil)
     rt.graphics.set_stencil_test(rt.StencilCompareMode.EQUAL, stencil_value)
 
-    rt.graphics.push()
     rt.graphics.translate(self._label_aabb.x, self._label_aabb.y)
 
     do
@@ -156,6 +164,8 @@ function rt.TextBox:update(delta)
             end
         end
     end
+
+    self._drop_animation:update(delta)
 end
 
 --- @brief
@@ -200,4 +210,19 @@ end
 --- @brief
 function rt.TextBox:_emit_scrolling_done()
     self:signal_emit("scrolling_done")
+end
+
+--- @brief
+function rt.TextBox:present()
+    self._drop_animation:set_target_position(self._bounds.x, self._bounds.y)
+end
+
+--- @brief
+function rt.TextBox:close()
+    local overshoot_factor = 1.1
+    if self._alignment == rt.TextBoxAlignment.TOP then
+        self._drop_animation:set_target_position(self._bounds.x, 0 - self._bounds.height * overshoot_factor)
+    else
+        self._drop_animation:set_target_position(self._bounds.x, rt.graphics.get_height() + self._bounds_height * overshoot_factor)
+    end
 end

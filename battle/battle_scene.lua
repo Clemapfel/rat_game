@@ -174,5 +174,9 @@ function bt.BattleScene:_handle_button_pressed(which)
         self._log:scroll_up()
     elseif which == rt.InputButton.DOWN then
         self._log:scroll_down()
+    elseif which == rt.InputButton.X then
+        self._log:close()
+    elseif which == rt.InputButton.Y then
+        self._log:present()
     end
 end

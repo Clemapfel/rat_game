@@ -22,38 +22,11 @@
     </configurations>
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="7fa9ba1b-2cff-4ecc-86fb-59ab2fa76ee1" name="Changes" comment="stashing before renaming healing / damage callbacks">
-      <change afterPath="$PROJECT_DIR$/common/text_box.lua" afterDir="false" />
+    <list default="true" id="7fa9ba1b-2cff-4ecc-86fb-59ab2fa76ee1" name="Changes" comment="added textbox">
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/assets/configs/consumables/DEBUG_CONSUMABLE.lua" beforeDir="false" afterPath="$PROJECT_DIR$/assets/configs/consumables/DEBUG_CONSUMABLE.lua" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/assets/configs/consumables/ONE_CHERRY.lua" beforeDir="false" afterPath="$PROJECT_DIR$/assets/configs/consumables/ONE_CHERRY.lua" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/assets/configs/consumables/TWO_CHERRY.lua" beforeDir="false" afterPath="$PROJECT_DIR$/assets/configs/consumables/TWO_CHERRY.lua" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/assets/configs/global_statuses/DEBUG_GLOBAL_STATUS.lua" beforeDir="false" afterPath="$PROJECT_DIR$/assets/configs/global_statuses/DEBUG_GLOBAL_STATUS.lua" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/assets/configs/statuses/DEBUG_STATUS.lua" beforeDir="false" afterPath="$PROJECT_DIR$/assets/configs/statuses/DEBUG_STATUS.lua" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/battle/battle_scene.lua" beforeDir="false" afterPath="$PROJECT_DIR$/battle/battle_scene.lua" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/battle/consumable.lua" beforeDir="false" afterPath="$PROJECT_DIR$/battle/consumable.lua" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/battle/global_status.lua" beforeDir="false" afterPath="$PROJECT_DIR$/battle/global_status.lua" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/battle/status.lua" beforeDir="false" afterPath="$PROJECT_DIR$/battle/status.lua" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/common/label.lua" beforeDir="false" afterPath="$PROJECT_DIR$/common/label.lua" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/common/random.lua" beforeDir="false" afterPath="$PROJECT_DIR$/common/random.lua" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/include.lua" beforeDir="false" afterPath="$PROJECT_DIR$/include.lua" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/old/battle/configs/consumables/DEBUG_CONSUMABLE.lua" beforeDir="false" afterPath="$PROJECT_DIR$/old/battle/configs/consumables/DEBUG_CONSUMABLE.lua" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/old/battle/configs/consumables/ONE_CHERRY.lua" beforeDir="false" afterPath="$PROJECT_DIR$/old/battle/configs/consumables/ONE_CHERRY.lua" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/old/battle/configs/consumables/TWO_CHERRY.lua" beforeDir="false" afterPath="$PROJECT_DIR$/old/battle/configs/consumables/TWO_CHERRY.lua" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/old/battle/configs/global_statuses/DEBUG_GLOBAL_STATUS.lua" beforeDir="false" afterPath="$PROJECT_DIR$/old/battle/configs/global_statuses/DEBUG_GLOBAL_STATUS.lua" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/old/battle/configs/statuses/DEBUG_STATUS.lua" beforeDir="false" afterPath="$PROJECT_DIR$/old/battle/configs/statuses/DEBUG_STATUS.lua" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/old/battle/consumable.lua" beforeDir="false" afterPath="$PROJECT_DIR$/old/battle/consumable.lua" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/old/battle/global_status.lua" beforeDir="false" afterPath="$PROJECT_DIR$/old/battle/global_status.lua" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/old/battle/simulation_handler.lua" beforeDir="false" afterPath="$PROJECT_DIR$/old/battle/simulation_handler.lua" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/old/battle/status.lua" beforeDir="false" afterPath="$PROJECT_DIR$/old/battle/status.lua" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/older/~battle/configs/consumables/DEBUG_CONSUMABLE.lua" beforeDir="false" afterPath="$PROJECT_DIR$/older/~battle/configs/consumables/DEBUG_CONSUMABLE.lua" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/older/~battle/configs/docs.md" beforeDir="false" afterPath="$PROJECT_DIR$/older/~battle/configs/docs.md" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/older/~battle/configs/global_status/DEBUG_GLOBAL_STATUS.lua" beforeDir="false" afterPath="$PROJECT_DIR$/older/~battle/configs/global_status/DEBUG_GLOBAL_STATUS.lua" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/older/~battle/configs/status/DEBUG_STATUS.lua" beforeDir="false" afterPath="$PROJECT_DIR$/older/~battle/configs/status/DEBUG_STATUS.lua" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/older/~battle/consumable.lua" beforeDir="false" afterPath="$PROJECT_DIR$/older/~battle/consumable.lua" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/older/~battle/global_status.lua" beforeDir="false" afterPath="$PROJECT_DIR$/older/~battle/global_status.lua" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/older/~battle/simulation.lua" beforeDir="false" afterPath="$PROJECT_DIR$/older/~battle/simulation.lua" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/older/~battle/status.lua" beforeDir="false" afterPath="$PROJECT_DIR$/older/~battle/status.lua" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/common/smoothed_motion_2d.lua" beforeDir="false" afterPath="$PROJECT_DIR$/common/smoothed_motion_2d.lua" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/common/text_box.lua" beforeDir="false" afterPath="$PROJECT_DIR$/common/text_box.lua" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -552,23 +525,7 @@
       <workItem from="1726502551535" duration="2913000" />
       <workItem from="1726525057926" duration="8488000" />
       <workItem from="1726676152420" duration="3145000" />
-      <workItem from="1726771324741" duration="8546000" />
-    </task>
-    <task id="LOCAL-01019" summary="refactored with text atlas">
-      <option name="closed" value="true" />
-      <created>1725227046069</created>
-      <option name="number" value="01019" />
-      <option name="presentableId" value="LOCAL-01019" />
-      <option name="project" value="LOCAL" />
-      <updated>1725227046069</updated>
-    </task>
-    <task id="LOCAL-01020" summary="stashing text atlas">
-      <option name="closed" value="true" />
-      <created>1725229007250</created>
-      <option name="number" value="01020" />
-      <option name="presentableId" value="LOCAL-01020" />
-      <option name="project" value="LOCAL" />
-      <updated>1725229007250</updated>
+      <workItem from="1726771324741" duration="9394000" />
     </task>
     <task id="LOCAL-01021" summary="text atlas working">
       <option name="closed" value="true" />
@@ -946,7 +903,23 @@
       <option name="project" value="LOCAL" />
       <updated>1726677973656</updated>
     </task>
-    <option name="localTasksCounter" value="1068" />
+    <task id="LOCAL-01068" summary="renamed healing / damage callbacks">
+      <option name="closed" value="true" />
+      <created>1726780115772</created>
+      <option name="number" value="01068" />
+      <option name="presentableId" value="LOCAL-01068" />
+      <option name="project" value="LOCAL" />
+      <updated>1726780115773</updated>
+    </task>
+    <task id="LOCAL-01069" summary="added textbox">
+      <option name="closed" value="true" />
+      <created>1726780120987</created>
+      <option name="number" value="01069" />
+      <option name="presentableId" value="LOCAL-01069" />
+      <option name="project" value="LOCAL" />
+      <updated>1726780120987</updated>
+    </task>
+    <option name="localTasksCounter" value="1070" />
     <servers />
   </component>
   <component name="TypeScriptGeneratedFilesManager">
@@ -995,8 +968,6 @@
     </option>
   </component>
   <component name="VcsManagerConfiguration">
-    <MESSAGE value="working" />
-    <MESSAGE value="added keybinding indicator font" />
     <MESSAGE value="implemented scene transitions, entity info preview working" />
     <MESSAGE value="refactored background" />
     <MESSAGE value="stashing bubblegum" />
@@ -1020,7 +991,9 @@
     <MESSAGE value="added status and global status to verbose info panel" />
     <MESSAGE value="added verbose info item" />
     <MESSAGE value="stashing before renaming healing / damage callbacks" />
-    <option name="LAST_COMMIT_MESSAGE" value="stashing before renaming healing / damage callbacks" />
+    <MESSAGE value="renamed healing / damage callbacks" />
+    <MESSAGE value="added textbox" />
+    <option name="LAST_COMMIT_MESSAGE" value="added textbox" />
   </component>
   <component name="XDebuggerManager">
     <breakpoint-manager>
