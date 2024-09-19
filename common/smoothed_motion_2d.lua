@@ -25,11 +25,6 @@ end, {
 })
 
 --- @brief
-function rt.SmoothedMotion2D:set_velocity_factor(x)
-    self._velocity_factor = x
-end
-
---- @brief
 function rt.SmoothedMotion2D:get_position()
     local x, y = self._position_body:get_centroid()
     assert(x ~= nil and y ~= nil)
@@ -48,7 +43,7 @@ function rt.SmoothedMotion2D:update(_)
     local target_x, target_y = self._target_position_x, self._target_position_y
     local distance = rt.distance(current_x, current_y, target_x, target_y)
     local angle = rt.angle(target_x - current_x, target_y - current_y)
-    local vx, vy = rt.translate_point_by_angle(0, 0, distance * self._velocity_factor, angle)
+    local vx, vy = rt.translate_point_by_angle(0, 0, distance, angle)
     self._position_body:set_linear_damping((1000 * self._damping_factor) / distance)
     self._position_body:apply_linear_impulse(vx, vy)
     self._current_position_x, self._current_position_y = self._position_body:get_centroid()

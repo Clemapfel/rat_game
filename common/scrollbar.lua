@@ -1,5 +1,5 @@
 rt.settings.scrollbar = {
-    corner_radius = rt.settings.frame.corner_radius
+    corner_radius = rt.settings.frame.corner_radius / 2
 }
 
 --- @class

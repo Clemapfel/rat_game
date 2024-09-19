@@ -161,7 +161,7 @@ function bt.BattleScene:_handle_button_pressed(which)
 
     if which == rt.InputButton.A then
         local text = rt.random.string(64, " ", " ", " ", " ", " ", " ", " ", " ", " ", " ", " ", " ")
-        dbg(_i, text)
+        --dbg(_i, text)
         local colors = {"RED", "GREEN", "BLUE", "YELLOW"}
         self._log:append("<color=" .. colors[_i] .. ">" .. text .. "</color>")
         _i = _i + 1
@@ -178,5 +178,7 @@ function bt.BattleScene:_handle_button_pressed(which)
         self._log:close()
     elseif which == rt.InputButton.Y then
         self._log:present()
+    elseif which == rt.InputButton.L then
+        self._log:set_scrolling_active(not self._log:get_scrolling_active())
     end
 end

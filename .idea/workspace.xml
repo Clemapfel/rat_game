@@ -22,9 +22,11 @@
     </configurations>
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="7fa9ba1b-2cff-4ecc-86fb-59ab2fa76ee1" name="Changes" comment="added textbox">
+    <list default="true" id="7fa9ba1b-2cff-4ecc-86fb-59ab2fa76ee1" name="Changes" comment="stashing before refactoring smooth motion">
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/battle/battle_scene.lua" beforeDir="false" afterPath="$PROJECT_DIR$/battle/battle_scene.lua" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/common/scrollbar.lua" beforeDir="false" afterPath="$PROJECT_DIR$/common/scrollbar.lua" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/common/smoothed_motion_1d.lua" beforeDir="false" afterPath="$PROJECT_DIR$/common/smoothed_motion_1d.lua" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/common/smoothed_motion_2d.lua" beforeDir="false" afterPath="$PROJECT_DIR$/common/smoothed_motion_2d.lua" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/common/text_box.lua" beforeDir="false" afterPath="$PROJECT_DIR$/common/text_box.lua" afterDir="false" />
     </list>
@@ -525,15 +527,8 @@
       <workItem from="1726502551535" duration="2913000" />
       <workItem from="1726525057926" duration="8488000" />
       <workItem from="1726676152420" duration="3145000" />
-      <workItem from="1726771324741" duration="9394000" />
-    </task>
-    <task id="LOCAL-01021" summary="text atlas working">
-      <option name="closed" value="true" />
-      <created>1725309798119</created>
-      <option name="number" value="01021" />
-      <option name="presentableId" value="LOCAL-01021" />
-      <option name="project" value="LOCAL" />
-      <updated>1725309798120</updated>
+      <workItem from="1726771324741" duration="10102000" />
+      <workItem from="1726782290282" duration="6394000" />
     </task>
     <task id="LOCAL-01022" summary="stashing">
       <option name="closed" value="true" />
@@ -919,7 +914,15 @@
       <option name="project" value="LOCAL" />
       <updated>1726780120987</updated>
     </task>
-    <option name="localTasksCounter" value="1070" />
+    <task id="LOCAL-01070" summary="stashing before refactoring smooth motion">
+      <option name="closed" value="true" />
+      <created>1726781576652</created>
+      <option name="number" value="01070" />
+      <option name="presentableId" value="LOCAL-01070" />
+      <option name="project" value="LOCAL" />
+      <updated>1726781576652</updated>
+    </task>
+    <option name="localTasksCounter" value="1071" />
     <servers />
   </component>
   <component name="TypeScriptGeneratedFilesManager">
@@ -968,7 +971,6 @@
     </option>
   </component>
   <component name="VcsManagerConfiguration">
-    <MESSAGE value="implemented scene transitions, entity info preview working" />
     <MESSAGE value="refactored background" />
     <MESSAGE value="stashing bubblegum" />
     <MESSAGE value="stashing demo" />
@@ -993,7 +995,8 @@
     <MESSAGE value="stashing before renaming healing / damage callbacks" />
     <MESSAGE value="renamed healing / damage callbacks" />
     <MESSAGE value="added textbox" />
-    <option name="LAST_COMMIT_MESSAGE" value="added textbox" />
+    <MESSAGE value="stashing before refactoring smooth motion" />
+    <option name="LAST_COMMIT_MESSAGE" value="stashing before refactoring smooth motion" />
   </component>
   <component name="XDebuggerManager">
     <breakpoint-manager>
