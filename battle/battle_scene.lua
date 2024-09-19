@@ -161,8 +161,8 @@ function bt.BattleScene:_handle_button_pressed(which)
 
     if which == rt.InputButton.A then
         local text = rt.random.string(64, " ", " ", " ", " ", " ", " ", " ", " ", " ", " ", " ", " ")
-        --dbg(_i, text)
         local colors = {"RED", "GREEN", "BLUE", "YELLOW"}
+        self._log:clear()
         self._log:append("<color=" .. colors[_i] .. ">" .. text .. "</color>")
         _i = _i + 1
         if _i > sizeof(colors) then

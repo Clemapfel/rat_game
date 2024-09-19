@@ -2,18 +2,12 @@ rt.settings.textbox = {
     scroll_speed = 50, -- letters / s
 }
 
-rt.TextBoxAlignment = meta.new_enum({
-    TOP = "TOP",
-    BOTTOM = "BOTTOM"
-})
-
 --- @class rt.TextBox
 --- @signal scrolling_done (self) -> nil
 rt.TextBox = meta.new_type("TextBox", rt.Widget, rt.SignalEmitter, function()
     local out = meta.new(rt.TextBox, {
         _backdrop = rt.Frame(),
 
-        _alignment = rt.TextBoxAlignment.TOP,
         _last_width = 0,
 
         _scrollbar = rt.Scrollbar(),
@@ -28,13 +22,12 @@ rt.TextBox = meta.new_type("TextBox", rt.Widget, rt.SignalEmitter, function()
         _scrolling_labels = {},  -- Table<Number>
         _current_line_i = 1,
         _line_i_to_label_i = {}, -- Table<Number, { label_i, line_i }
-        _max_n_visible_lines = 16,
+        _max_n_visible_lines = 3,
         _n_visible_lines = 0,
+        _total_n_visible_lines = 0,
 
         _scrolling_active = false,
-        _maintain_minimum_size = true,
-        _current_height = 0,
-        _target_height = 0,
+        _maintain_minimum_size = false,
 
         _label_stencil = rt.Rectangle(0, 0, 1, 1),
         _label_aabb = rt.AABB(0, 0, 1, 1)
@@ -79,7 +72,13 @@ function rt.TextBox:size_allocate(x, y, width, height)
     local text_ym = 2 * m
     local scroll_area_w = 4 * m
     
-    local backdrop_height = self._n_visible_lines * self._line_height + 2 * text_ym + 2 * thickness
+    local backdrop_height
+    if self._maintain_minimum_size == true then
+        backdrop_height = self._n_visible_lines * self._line_height
+    else
+        backdrop_height = self._max_n_visible_lines * self._line_height
+    end
+    backdrop_height = backdrop_height + 2 * text_ym + 2 * thickness
 
     local indicator_radius = scroll_area_w * 0.5
 
@@ -143,7 +142,7 @@ end
 
 --- @override
 function rt.TextBox:draw()
-    if self._n_visible_lines == nil then return end
+    if self._n_visible_lines == 0 then return end
 
     self._backdrop:draw()
 
@@ -227,9 +226,16 @@ function rt.TextBox:update(delta)
         if entry.label:get_n_visible_characters() < entry.label:get_n_characters() then
             local is_done, n_lines_visible, rest_delta = entry.label:update_n_visible_characters_from_elapsed(entry.elapsed, rt.settings.textbox.scroll_speed)
             if entry.n_lines_visible ~= n_lines_visible then
+                local diff = math.abs(entry.n_lines_visible - n_lines_visible)
                 entry.n_lines_visible = n_lines_visible
                 self:_update_n_visible_lines()
+                self._total_n_visible_lines = self._total_n_visible_lines + diff
+
+                while self._current_line_i + self._max_n_visible_lines <= self._total_n_visible_lines do
+                    self._current_line_i = self._current_line_i + 1
+                end
             end
+
             if is_done then
                 table.remove(self._scrolling_labels, 1)
                 self:_update_indicators()
@@ -309,10 +315,14 @@ end
 
 --- @brief
 function rt.TextBox:clear()
-    self._lines = {}
+    self._labels = {}
+    self._scrolling_labels = {}
     self._line_i_to_label_i = {}
     self._n_labels = 0
     self._n_lines = 0
+    self._current_line_i = 1
+    self._n_visible_lines = 0
+    self._total_n_visible_lines = 0
 end
 
 --- @brief
