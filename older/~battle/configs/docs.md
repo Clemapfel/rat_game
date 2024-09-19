@@ -58,13 +58,13 @@ GlobalStatus {
     on_turn_end(self, all_entities),
 
     -- (GlobalStatus, Entity, Unsigned) -> nil
-    on_healing_received(self, entity, value),
+    on_hp_gained(self, entity, value),
 
     -- (GlobalStatus, Entity, Entity, Unsigned) -> nil
     on_healing_performed(self, entity, receiver, value),
 
     -- (GlobalStatus, Entity, Unsigned) -> nil
-    on_damage_taken(self, entity, value),
+    on_hp_lost(self, entity, value),
 
     -- (GlobalStatus, Entity, Entity, Unsigned) -> nil
     on_damage_dealt(self, damage_dealer, damage_taker, value),
@@ -208,13 +208,13 @@ Status {
     on_turn_end(self, affclited),
 
     -- (Status, Entity, Unsigned) -> nil
-    on_healing_received(self, afflicted, value),
+    on_hp_gained(self, afflicted, value),
 
     -- (Status, Entity, Entity, Unsigned) -> nil
     on_healing_performed(self, afflicted, receiver, value),
 
     -- (Status, Entity, Unsigned) -> nil
-    on_damage_taken(self, afflicted, value),
+    on_hp_lost(self, afflicted, value),
 
     -- (Status, Entity, Entity, Unsigned) -> nil
     on_damage_dealt(self, afflicted, damage_taker, value),
@@ -290,13 +290,13 @@ Consumable {
     on_turn_end(self, afflicted),
 
     -- (Consumable, Entity, Unsigned) -> nil
-    on_healing_received(self, afflicted, value),
+    on_hp_gained(self, afflicted, value),
 
     -- (Consumable, Entity, Entity, Unsigned) -> nil
     on_healing_performed(self, afflicted, receiver, value),
 
     -- (Consumable, Entity, Unsigned) -> nil
-    on_damage_taken(self, afflicted, value),
+    on_hp_lost(self, afflicted, value),
 
     -- (Consumable, Entity, Entity, Unsigned) -> nil
     on_damage_dealt(self, afflicted, damage_taker, value),

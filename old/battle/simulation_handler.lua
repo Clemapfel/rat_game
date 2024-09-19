@@ -1008,7 +1008,7 @@ function bt.Scene:increase_hp(entity, value)
     if offset <= 0 then return end
 
     -- invoke callbacks
-    local callback_id = "on_healing_received"
+    local callback_id = "on_hp_gained"
     for status in values(self._state:list_global_statuses()) do
         if status[callback_id] ~= nil then
             local self_proxy = bt.GlobalStatusInterface(self, status)
@@ -1111,7 +1111,7 @@ function bt.Scene:reduce_hp(entity, value)
     self:play_animations({lost, message}, on_start)
 
     -- invoke damage taken callbacks
-    local callback_id = "on_damage_taken"
+    local callback_id = "on_hp_lost"
     for status in values(self._state:list_global_statuses()) do
         if status[callback_id] ~= nil then
             local self_proxy = bt.GlobalStatusInterface(self, status)

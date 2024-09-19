@@ -28,11 +28,11 @@ return {
         return nil
     end,
 
-    on_healing_received = function(self, holder, value)
+    on_hp_gained = function(self, holder, value)
         meta.assert_consumable_interface(self)
         meta.assert_entity_interface(holder)
         meta.assert_number(value)
-        println("[DBG] In " .. self.id .. ".on_healing_received: " .. self:get_id() .. " gained " .. value .. " hp")
+        println("[DBG] In " .. self.id .. ".on_hp_gained: " .. self:get_id() .. " gained " .. value .. " hp")
         return nil
     end,
 
@@ -45,11 +45,11 @@ return {
         return nil
     end,
 
-    on_damage_taken = function(self, afflicted, value)
+    on_hp_lost = function(self, afflicted, value)
         meta.assert_consumable_interface(self)
         meta.assert_entity_interface(afflicted)
         meta.assert_number(value)
-        println("[DBG] In " .. self.id .. ".on_damage_taken: " .. self:get_id() .. " lost " .. value .. " hp")
+        println("[DBG] In " .. self.id .. ".on_hp_lost: " .. self:get_id() .. " lost " .. value .. " hp")
         return nil
     end,
 

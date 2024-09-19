@@ -670,6 +670,7 @@ function rt.Label:set_n_visible_characters(n)
 end
 
 --- @brief calculaten visible characters from scroll speed, respects beats and pauses on punctuation
+--- @return (Number, Number, Number) is_done, n_visible_rows, rest_delta
 function rt.Label:update_n_visible_characters_from_elapsed(elapsed, letters_per_second)
     local step = 1 / letters_per_second
     local n_letters = math.floor(elapsed / step)
@@ -715,7 +716,7 @@ function rt.Label:update_n_visible_characters_from_elapsed(elapsed, letters_per_
         glyph_i = glyph_i + 1
     end
 
-    return n_visible >= self._n_characters, max_row
+    return n_visible >= self._n_characters, max_row, clamp(elapsed - so_far, 0)
 end
 
 --- @brief

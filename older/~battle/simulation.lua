@@ -1033,7 +1033,7 @@ function bt.BattleScene:add_hp(entity, value)
 
     if offset > 0 then
         -- invoke callbacks on target
-        local callback_id = "on_healing_received"
+        local callback_id = "on_hp_gained"
         for status in values(self._state:list_global_statuses()) do
             if status[callback_id] ~= nil then
                 local self_proxy = bt.GlobalStatusInterface(self, status)
@@ -1136,7 +1136,7 @@ function bt.BattleScene:reduce_hp(entity, value)
     end)
 
     -- invoke damage taken callbacks
-    local callback_id = "on_damage_taken"
+    local callback_id = "on_hp_lost"
     for status in values(self._state:list_global_statuses()) do
         if status[callback_id] ~= nil then
             local self_proxy = bt.GlobalStatusInterface(self, status)

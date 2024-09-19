@@ -65,7 +65,7 @@ end, {
     end,
 
     -- (GlobalStatusInterface, EntityInterface, Unsigned) -> nil
-    on_healing_received = function(self, entity, hp_gained)
+    on_hp_gained = function(self, entity, hp_gained)
         meta.assert_global_status_interface(self)
         meta.assert_entity_interface(entity)
         meta.assert_number(hp_gained)
@@ -82,7 +82,7 @@ end, {
     end,
 
     -- (GlobalStatusInterface, EntityInterface, Unsigned) -> nil
-    on_damage_taken = function(self, entity, hp_lost)
+    on_hp_lost = function(self, entity, hp_lost)
         meta.assert_global_status_interface(self)
         meta.assert_entity_interface(entity)
         meta.assert_number(hp_lost)
@@ -201,9 +201,9 @@ function bt.GlobalStatus:realize()
         "on_gained",
         "on_lost",
         "on_turn_end",
-        "on_healing_received",
+        "on_hp_gained",
         "on_healing_performed",
-        "on_damage_taken",
+        "on_hp_lost",
         "on_damage_dealt",
         "on_status_gained",
         "on_status_lost",

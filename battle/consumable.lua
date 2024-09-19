@@ -42,7 +42,7 @@ end, {
     end,
 
     -- (ConsumableInterface, EntityInterface, Unsigned) -> nil
-    on_healing_received = function(self, holder, value)
+    on_hp_gained = function(self, holder, value)
         meta.assert_consumable_interface(self)
         meta.assert_entity_interface(holder)
         meta.assert_number(value)
@@ -59,7 +59,7 @@ end, {
     end,
 
     -- (ConsumableInterface, EntityInterface, Unsigned) -> nil
-    on_damage_taken = function(self, holder, hp_lost)
+    on_hp_lost = function(self, holder, hp_lost)
         meta.assert_global_status_interface(self)
         meta.assert_entity_interface(holder)
         meta.assert_number(hp_lost)
@@ -192,9 +192,9 @@ function bt.Consumable:realize()
     local functions = {
         "on_turn_start",
         "on_turn_end",
-        "on_healing_received",
+        "on_hp_gained",
         "on_healing_performed",
-        "on_damage_taken",
+        "on_hp_lost",
         "on_damage_dealt",
         "on_status_gained",
         "on_status_lost",

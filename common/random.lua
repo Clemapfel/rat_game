@@ -111,9 +111,15 @@ rt.random.CHAR_LIST = {
 --- @brief generate string
 --- @param length Number
 --- @param set Table<String> (or nil)
-function rt.random.string(length, set)
-    if meta.is_nil(set) then
+function rt.random.string(length, ...)
+    local set
+    if _G._select("#", ...) == 0 then
         set = rt.random.CHAR_LIST
+    else
+        set = {table.unpack(rt.random.CHAR_LIST)}
+        for c in range(...) do
+            table.insert(set, c)
+        end
     end
 
     local out = {}

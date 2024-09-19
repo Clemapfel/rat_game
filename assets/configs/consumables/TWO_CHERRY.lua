@@ -8,7 +8,7 @@ return {
     sprite_id = "menu_icons",
     sprite_index = 6,
 
-    on_damage_taken = function(self, holder, damage_taker, value)
+    on_hp_lost = function(self, holder, damage_taker, value)
         -- TODO: if below 50%, restore 25%
     end,
 }
