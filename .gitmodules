@@ -1,0 +1,3 @@
+[submodule "physics/box2d_extension/box2d"]
+	path = physics/box2d_extension/box2d
+	url = https://github.com/erincatto/box2d

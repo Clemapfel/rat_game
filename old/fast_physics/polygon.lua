@@ -30,7 +30,10 @@ function b2.Rectangle(width, height, center_x, center_y, angle)
     if center_x == nil then center_x = 0 end
     if center_y == nil then center_y = 0 end
     if angle == nil then angle = 0 end
-    return b2.Polygon:new_from_id(box2d.b2MakeOffsetBox(width, height, ffi.typeof("b2Vec2")(center_x, center_y), angle))
+    dbg("before")
+    local out = b2.Polygon:new_from_id(box2d.b2MakeOffsetBox(width, height, ffi.typeof("b2Vec2")(center_x, center_y), angle))
+    dbg("after")
+    return out
 end
 
 --- @brief

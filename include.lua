@@ -48,15 +48,10 @@ bt = rt.battle
 ow = rt.overworld
 b2 = rt.physics
 
-box2d = ffi.load("box2d_extension")
+box2d = ffi.load("box2d")
 local cdef = love.filesystem.read("physics/cdef.h")
 ffi.cdef(cdef)
-ffi.cdef([[
-    int test_library(void);
-]])
-
-print(box2d.test_library(), "\n")
-
+box2d.b2SetLengthUnitsPerMeter(30)
 
 for _, name in pairs({"rt", "bt", "ow", "b2"}) do
     local t = _G[name]

@@ -15,7 +15,7 @@ b2.ShapeType = {
     CAPSULE = box2d.b2_capsuleShape,
     SEGMENT = box2d.b2_segmentShape,
     POLYGON = box2d.b2_polygonShape,
-    SMOOTH_SEGMENT = box2d.b2_smoothSegmentShape
+    SMOOTH_SEGMENT = box2d.b2_chainSegmentShape
 }
 
 --- @brief
@@ -273,8 +273,8 @@ function b2.Shape:draw()
         b2._draw_segment(box2d.b2Shape_GetSegment(self._native))
     elseif type == box2d.b2_capsuleShape then
         b2._draw_capsule(box2d.b2Shape_GetCapsule(self._native))
-    elseif type == box2d.b2_smoothSegmentShape then
-        b2._draw_smooth_segment(box2d.b2Shape_GetSmoothSegment(self._native))
+    elseif type == box2d.b2_chainSegmentShape then
+        b2._draw_chain_segment(box2d.b2Shape_GetChainSegment(self._native))
     else
         error("In b2.Shape:draw: unhandlined shape type `" .. type .. "`")
     end
@@ -305,7 +305,7 @@ function b2._draw_segment(segment)
 end
 
 --- @brief
-function b2._draw_smooth_segment(smooth)
+function b2._draw_chain_segment(smooth)
     love.graphics.line(smooth.segment.point1.x, smooth.segment.point1.y, smooth.segment.point2.x, smooth.segment.point2.y)
 end
 

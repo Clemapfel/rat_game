@@ -12,7 +12,7 @@ file(GLOB_RECURSE BOX2D_HEADERS
     ${CMAKE_SOURCE_DIR}/box2d/include/box2d/*.h
 )
 
-set(LIBRARY_NAME box2d_extension) # name change here
+set(LIBRARY_NAME box2d) # name change here
 
 add_library(${LIBRARY_NAME} SHARED
     ${BOX2D_HEADERS}

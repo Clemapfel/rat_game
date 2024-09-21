@@ -25,11 +25,14 @@ function b2.Rectangle(width, height, center_x, center_y, angle)
     if center_y == nil then center_y = 0 end
     if angle == nil then angle = 0 end
 
+    local rot = b2.Rot()
+    rot.c = math.cos(angle)
+    rot.s = math.sin(angle)
     return meta.new(b2.Polygon, {
         _native = box2d.b2MakeOffsetBox(
             width, height,
             b2.Vec2(center_x, center_y),
-            angle
+            rot
         )
     })
 end

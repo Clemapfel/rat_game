@@ -22,10 +22,35 @@
     </configurations>
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="7fa9ba1b-2cff-4ecc-86fb-59ab2fa76ee1" name="Changes" comment="trying to get box2d extension to work">
+    <list default="true" id="7fa9ba1b-2cff-4ecc-86fb-59ab2fa76ee1" name="Changes" comment="export working">
+      <change afterPath="$PROJECT_DIR$/.gitmodules" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/love/windows/box2d.exp" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/love/windows/box2d.lib" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/love/windows/box2d.pdb" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/love/windows/box2dd.dll" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/love/windows/box2dd.pdb" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/physics/box2d_extension/box2d" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/physics/~cdef.h" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/include.lua" beforeDir="false" afterPath="$PROJECT_DIR$/include.lua" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/love/windows/box2d.dll" beforeDir="false" afterPath="$PROJECT_DIR$/love/windows/box2d.dll" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/love/windows/box2d_extension.dll" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/love/windows/box2d_extension.exp" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/love/windows/box2d_extension.lib" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/love/windows/box2d_extension.pdb" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/love/windows/enkiTS.dll" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/love/windows/enkiTS.exp" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/love/windows/enkiTS.lib" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/love/windows/enkiTS.pdb" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/main_rope.lua" beforeDir="false" afterPath="$PROJECT_DIR$/main_rope.lua" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/old/fast_physics/polygon.lua" beforeDir="false" afterPath="$PROJECT_DIR$/old/fast_physics/polygon.lua" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/physics/box2d_extension/CMakeLists.txt" beforeDir="false" afterPath="$PROJECT_DIR$/physics/box2d_extension/CMakeLists.txt" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/physics/box2d_extension/box2d_extension.c" beforeDir="false" afterPath="$PROJECT_DIR$/physics/box2d_extension/box2d_extension.c" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/physics/box2d_extension/box2d_extension.h" beforeDir="false" afterPath="$PROJECT_DIR$/physics/box2d_extension/box2d_extension.h" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/physics/cdef.h" beforeDir="false" afterPath="$PROJECT_DIR$/physics/cdef.h" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/physics/math.lua" beforeDir="false" afterPath="$PROJECT_DIR$/physics/math.lua" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/physics/polygon.lua" beforeDir="false" afterPath="$PROJECT_DIR$/physics/polygon.lua" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/physics/shape.lua" beforeDir="false" afterPath="$PROJECT_DIR$/physics/shape.lua" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -535,15 +560,8 @@
       <workItem from="1726782290282" duration="13338000" />
       <workItem from="1726942576915" duration="2000" />
       <workItem from="1726942790446" duration="418000" />
-      <workItem from="1726943710058" duration="2609000" />
-    </task>
-    <task id="LOCAL-01026" summary="box2d thread hello world working">
-      <option name="closed" value="true" />
-      <created>1725492342215</created>
-      <option name="number" value="01026" />
-      <option name="presentableId" value="LOCAL-01026" />
-      <option name="project" value="LOCAL" />
-      <updated>1725492342215</updated>
+      <workItem from="1726943710058" duration="2917000" />
+      <workItem from="1726946691418" duration="3783000" />
     </task>
     <task id="LOCAL-01027" summary="works for a few cycles">
       <option name="closed" value="true" />
@@ -929,7 +947,15 @@
       <option name="project" value="LOCAL" />
       <updated>1726946068573</updated>
     </task>
-    <option name="localTasksCounter" value="1075" />
+    <task id="LOCAL-01075" summary="export working">
+      <option name="closed" value="true" />
+      <created>1726946440069</created>
+      <option name="number" value="01075" />
+      <option name="presentableId" value="LOCAL-01075" />
+      <option name="project" value="LOCAL" />
+      <updated>1726946440069</updated>
+    </task>
+    <option name="localTasksCounter" value="1076" />
     <servers />
   </component>
   <component name="TypeScriptGeneratedFilesManager">
@@ -978,7 +1004,6 @@
     </option>
   </component>
   <component name="VcsManagerConfiguration">
-    <MESSAGE value="implement sound atlas" />
     <MESSAGE value="stashing loading screen" />
     <MESSAGE value="stashing loading screen done" />
     <MESSAGE value="resolutions working" />
@@ -1003,7 +1028,8 @@
     <MESSAGE value="textbox done" />
     <MESSAGE value="try to implement raycast" />
     <MESSAGE value="trying to get box2d extension to work" />
-    <option name="LAST_COMMIT_MESSAGE" value="trying to get box2d extension to work" />
+    <MESSAGE value="export working" />
+    <option name="LAST_COMMIT_MESSAGE" value="export working" />
   </component>
   <component name="XDebuggerManager">
     <breakpoint-manager>
