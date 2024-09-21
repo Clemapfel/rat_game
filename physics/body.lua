@@ -141,7 +141,7 @@ end
 --- @brief
 function b2.Body:get_angle()
     local transform = box2d.b2Body_GetTransform(self._native)
-    return math.atan(transform.q.y, transform.q.x)
+    return math.atan(transform.q.s, transform.q.c)
 end
 
 --- @brief
@@ -289,4 +289,12 @@ function b2.Body:set_collision_group(group)
         local shape = shapes[i -1]
         box2d.b2Shape_SetFilter(shape, filter)
     end
+end
+
+--- @brief
+function b2.Body:draw()
+    local centroid_x, centroid_y = self:get_centroid()
+    local angle = self:get_angle()
+
+    --love.graphics.line(centroid_x, centroid_y, rt.translate_point_by_angle(centroid_x, centroid_y, radius, angle))
 end

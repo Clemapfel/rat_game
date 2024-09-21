@@ -45,3 +45,22 @@ end
 function b2.World:draw()
     box2d.b2World_Draw(self._native, self._debug_draw)
 end
+
+--- @brief
+function b2.World._raycast_callback(shape_id, point, normal, fraction, context_ptr)
+    dbg(shape_id)
+end
+
+--- @brief
+function b2.World:raycast(origin_x, origin_y, end_x, end_y)
+    local origin_point = b2.Vec2(origin_x, origin_y)
+    local translation = b2.Vec2(end_x - origin_x, end_y - origin_y)
+
+    box2d.b2World_CastRay(
+        self._native,
+        origin_point, translation,
+        box2d.b2DefaultQueryFilter(),
+        b2.World._raycast_callback,
+        ffi.CNULL
+    )
+end

@@ -205,7 +205,6 @@ function rt.Collider:_draw_shape(shape, angle)
     local r, g, b = love.graphics.getColor()
     local type = shape:type()
     if type == "PolygonShape" then
-
         love.graphics.setColor(r, g, b, 0.5)
         love.graphics.setLineWidth(1)
         love.graphics.polygon("fill", self._body:getWorldPoints(shape:getPoints()))

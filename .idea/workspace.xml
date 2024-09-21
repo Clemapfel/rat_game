@@ -22,10 +22,13 @@
     </configurations>
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="7fa9ba1b-2cff-4ecc-86fb-59ab2fa76ee1" name="Changes" comment="stashing textbox">
+    <list default="true" id="7fa9ba1b-2cff-4ecc-86fb-59ab2fa76ee1" name="Changes" comment="textbox done">
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/battle/battle_scene.lua" beforeDir="false" afterPath="$PROJECT_DIR$/battle/battle_scene.lua" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/common/text_box.lua" beforeDir="false" afterPath="$PROJECT_DIR$/common/text_box.lua" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/main_rope.lua" beforeDir="false" afterPath="$PROJECT_DIR$/main_rope.lua" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/old/common/collider.lua" beforeDir="false" afterPath="$PROJECT_DIR$/old/common/collider.lua" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/physics/body.lua" beforeDir="false" afterPath="$PROJECT_DIR$/physics/body.lua" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/physics/cdef.h" beforeDir="false" afterPath="$PROJECT_DIR$/physics/cdef.h" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/physics/world.lua" beforeDir="false" afterPath="$PROJECT_DIR$/physics/world.lua" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -137,7 +140,7 @@
       <recent name="C:\Users\cleme\Workspace\rat_game\assets\sfx\test" />
     </key>
   </component>
-  <component name="RunManager" selected="Lua Application.main">
+  <component name="RunManager" selected="Lua Application.main_rope">
     <configuration name="main" type="lua.app" factoryName="Lua Application">
       <module name="rat_game" />
       <option name="program" value="C:\Users\cleme\Workspace\rat_game\love\windows\love.exe" />
@@ -525,15 +528,7 @@
       <workItem from="1726525057926" duration="8488000" />
       <workItem from="1726676152420" duration="3145000" />
       <workItem from="1726771324741" duration="10102000" />
-      <workItem from="1726782290282" duration="7437000" />
-    </task>
-    <task id="LOCAL-01023" summary="key bindings selection graph working">
-      <option name="closed" value="true" />
-      <created>1725410747824</created>
-      <option name="number" value="01023" />
-      <option name="presentableId" value="LOCAL-01023" />
-      <option name="project" value="LOCAL" />
-      <updated>1725410747835</updated>
+      <workItem from="1726782290282" duration="9893000" />
     </task>
     <task id="LOCAL-01024" summary="refacotred keybinding indicator, control indicator now uses it">
       <option name="closed" value="true" />
@@ -919,7 +914,15 @@
       <option name="project" value="LOCAL" />
       <updated>1726789360588</updated>
     </task>
-    <option name="localTasksCounter" value="1072" />
+    <task id="LOCAL-01072" summary="textbox done">
+      <option name="closed" value="true" />
+      <created>1726790230965</created>
+      <option name="number" value="01072" />
+      <option name="presentableId" value="LOCAL-01072" />
+      <option name="project" value="LOCAL" />
+      <updated>1726790230966</updated>
+    </task>
+    <option name="localTasksCounter" value="1073" />
     <servers />
   </component>
   <component name="TypeScriptGeneratedFilesManager">
@@ -968,7 +971,6 @@
     </option>
   </component>
   <component name="VcsManagerConfiguration">
-    <MESSAGE value="stashing bubblegum" />
     <MESSAGE value="stashing demo" />
     <MESSAGE value="added sound atlas, stashing" />
     <MESSAGE value="implement sound atlas" />
@@ -993,7 +995,8 @@
     <MESSAGE value="added textbox" />
     <MESSAGE value="stashing before refactoring smooth motion" />
     <MESSAGE value="stashing textbox" />
-    <option name="LAST_COMMIT_MESSAGE" value="stashing textbox" />
+    <MESSAGE value="textbox done" />
+    <option name="LAST_COMMIT_MESSAGE" value="textbox done" />
   </component>
   <component name="XDebuggerManager">
     <breakpoint-manager>

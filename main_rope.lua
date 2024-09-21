@@ -1,6 +1,6 @@
 require "include"
 
-world = b2.World(0, 50)
+world = b2.World(0, 200)
 
 bodies = {}
 shapes = {}
@@ -12,7 +12,7 @@ love.load = function()
     local margin_x, margin_y = 0.01 * rt.graphics.get_width(), 0.01 * rt.graphics.get_height()
     local floor_body = b2.Body(world, b2.BodyType.STATIC, 0.5 * rt.graphics.get_width(), 0.5 * rt.graphics.get_height())
     local floor_xr, floor_yr = 0.5 * rt.graphics.get_width() - 0.5 * margin_x, 0.5 * rt.graphics.get_height() - 0.5 * margin_y
-    local screen_w, screen_h = rt.graphics.get_width(), rt.graphics.get_height()
+    screen_w, screen_h = rt.graphics.get_width(), rt.graphics.get_height()
 
     table.insert(shapes, b2.PolygonShape(floor_body, b2.Rectangle(
         screen_w, margin_y,
@@ -34,9 +34,13 @@ love.load = function()
         -floor_xr + 0.5 * margin_x, 0
     )))
 
+    local player_radius = 25
+    player = b2.Body(world, b2.BodyType.DYNAMIC, 0.5 * rt.graphics.get_width(), rt.graphics.get_height() * 0.5)
+    player_shape = b2.CapsuleShape(player, b2.Capsule(0, -0.5 * player_radius, 0, 0.5 * player_radius, player_radius))
+
     local rope_x, rope_y = 0.5 * rt.graphics.get_width(), 8 * margin_x
-    local rope_length = rt.graphics.get_height() - 8 * margin_x
-    local n_segments = 35
+    local rope_length = (rt.graphics.get_height() - 8 * margin_x) * 0.75
+    local n_segments = 40
 
     local segment_length = rope_length / n_segments
     local rope_width = 0.01 * rt.graphics.get_width()
@@ -68,27 +72,24 @@ love.load = function()
 
         local shape = b2.CircleShape(body, b2.Circle(2 * radius))
 
-        if i > 1 then
+        if i == 1 then
+            local joint = b2.DistanceJoint(world, floor_body, body, 10, 0, -0.5 * screen_h)
+            --local joint = b2.DistanceJoint(world, player, body, 10, 0, 0.5 * player_radius, 0, 0)
+            table.insert(joints, joint)
+        else
             --[[
-            local joint = b2.DistanceJoint(world, previous_body, body, 2 * radius,
-                previous_body_bottom_x, previous_body_bottom_y,
-                top_x, top_y,
-                true
-            )
-            ]]--
-
             local joint = b2.WeldJoint(world, previous_body, body,
                 previous_body_bottom_x, previous_body_bottom_y,
                 top_x, top_y,
                 true,
                 0, 0
             )
+            ]]--
+
+            local join = b2.DistanceJoint(world, previous_body, body, 10, previous_body_bottom_x, previous_body_bottom_y, top_x, top_y)
             table.insert(joints, joint)
         end
 
-        if i == 2 then
-            --local joint = b2.MouseJoint(world, floor_body, body, rope_x, 0.5 * rt.graphics.get_height())
-        end
 
         table.insert(bodies, body)
         table.insert(shapes, shape)
@@ -97,10 +98,14 @@ love.load = function()
         previous_body_bottom_x, previous_body_bottom_y = bottom_x, bottom_y
     end
 
-    local player_radius = 25
-    player = b2.Body(world, b2.BodyType.DYNAMIC, 0.5 * rt.graphics.get_width(), rt.graphics.get_height() * 0.5)
-    table.insert(shapes, b2.CircleShape(player, b2.Circle(player_radius)))
-    table.insert(joints, b2.WeldJoint(world, player, chain_body, 0, -0.5 * player_radius, 0, 0, true))
+
+    --table.insert(joints, b2.WeldJoint(world, player, chain_body, 0, -0.5 * player_radius, 0, 0, true))
+end
+
+love.keypressed = function(which)
+    if which == "space" then
+        world:raycast(0.5 * screen_w, 0.5 * screen_h, 0.5 * screen_w, screen_h)
+    end
 end
 
 love.update = function(delta)
@@ -120,4 +125,6 @@ love.draw = function()
     for joint in values(joints) do
         joint:draw()
     end
+
+    player:draw()
 end

@@ -29,6 +29,73 @@ typedef struct b2AABB
 
 void b2SetLengthUnitsPerMeter 	( 	float 	lengthUnits	);
 
+float b2Atan2( float y, float x );
+float b2MinFloat( float a, float b );
+float b2MaxFloat( float a, float b );
+float b2AbsFloat( float a );
+float b2ClampFloat( float a, float lower, float upper );
+int b2MinInt( int a, int b );
+int b2MaxInt( int a, int b );
+int b2AbsInt( int a );
+int b2ClampInt( int a, int lower, int upper );
+float b2Dot( b2Vec2 a, b2Vec2 b );
+float b2Cross( b2Vec2 a, b2Vec2 b );
+b2Vec2 b2CrossVS( b2Vec2 v, float s );
+b2Vec2 b2CrossSV( float s, b2Vec2 v );
+b2Vec2 b2LeftPerp( b2Vec2 v );
+b2Vec2 b2RightPerp( b2Vec2 v );
+b2Vec2 b2Add( b2Vec2 a, b2Vec2 b );
+b2Vec2 b2Sub( b2Vec2 a, b2Vec2 b );
+b2Vec2 b2Neg( b2Vec2 a );
+b2Vec2 b2Lerp( b2Vec2 a, b2Vec2 b, float t );
+b2Vec2 b2Mul( b2Vec2 a, b2Vec2 b );
+b2Vec2 b2MulSV( float s, b2Vec2 v );
+b2Vec2 b2MulAdd( b2Vec2 a, float s, b2Vec2 b );
+b2Vec2 b2MulSub( b2Vec2 a, float s, b2Vec2 b );
+b2Vec2 b2Abs( b2Vec2 a );
+b2Vec2 b2Min( b2Vec2 a, b2Vec2 b );
+b2Vec2 b2Max( b2Vec2 a, b2Vec2 b );
+b2Vec2 b2Clamp( b2Vec2 v, b2Vec2 a, b2Vec2 b );
+float b2Length( b2Vec2 v );
+float b2Distance( b2Vec2 a, b2Vec2 b );
+b2Vec2 b2Normalize( b2Vec2 v );
+b2Vec2 b2GetLengthAndNormalize( float* length, b2Vec2 v );
+b2Rot b2NormalizeRot( b2Rot q );
+b2Rot b2IntegrateRotation( b2Rot q1, float deltaAngle );
+float b2LengthSquared( b2Vec2 v );
+float b2DistanceSquared( b2Vec2 a, b2Vec2 b );
+b2Rot b2MakeRot( float angle );
+bool b2IsNormalized( b2Rot q );
+b2Rot b2NLerp( b2Rot q1, b2Rot q2, float t );
+float b2ComputeAngularVelocity( b2Rot q1, b2Rot q2, float inv_h );
+float b2Rot_GetAngle( b2Rot q );
+b2Vec2 b2Rot_GetXAxis( b2Rot q );
+b2Vec2 b2Rot_GetYAxis( b2Rot q );
+b2Rot b2MulRot( b2Rot q, b2Rot r );
+b2Rot b2InvMulRot( b2Rot q, b2Rot r );
+float b2RelativeAngle( b2Rot b, b2Rot a );
+float b2UnwindAngle( float angle );
+float b2UnwindLargeAngle( float angle );
+b2Vec2 b2RotateVector( b2Rot q, b2Vec2 v );
+b2Vec2 b2InvRotateVector( b2Rot q, b2Vec2 v );
+b2Vec2 b2TransformPoint( b2Transform t, const b2Vec2 p );
+b2Vec2 b2InvTransformPoint( b2Transform t, const b2Vec2 p );
+b2Transform b2MulTransforms( b2Transform A, b2Transform B );
+b2Transform b2InvMulTransforms( b2Transform A, b2Transform B );
+b2Vec2 b2MulMV( b2Mat22 A, b2Vec2 v );
+b2Mat22 b2GetInverse22( b2Mat22 A );
+b2Vec2 b2Solve22( b2Mat22 A, b2Vec2 b );
+bool b2AABB_Contains( b2AABB a, b2AABB b );
+b2Vec2 b2AABB_Center( b2AABB a );
+b2Vec2 b2AABB_Extents( b2AABB a );
+b2AABB b2AABB_Union( b2AABB a, b2AABB b );
+bool b2IsValid( float a );
+bool b2Vec2_IsValid( b2Vec2 v );
+bool b2Rot_IsValid( b2Rot q );
+bool b2AABB_IsValid( b2AABB aabb );
+void b2SetLengthUnitsPerMeter( float lengthUnits );
+float b2GetLengthUnitsPerMeter( void );
+
 // ### WORLD ###
 
 typedef void b2TaskCallback( int32_t startIndex, int32_t endIndex, uint32_t workerIndex, void* taskContext );
@@ -425,6 +492,7 @@ typedef struct b2QueryFilter
     uint32_t categoryBits;
     uint32_t maskBits;
 } b2QueryFilter;
+b2QueryFilter b2DefaultQueryFilter( void );
 
 typedef bool b2OverlapResultFcn( b2ShapeId shapeId, void* context );
 void b2World_OverlapAABB( b2WorldId worldId, b2AABB aabb, b2QueryFilter filter, b2OverlapResultFcn* fcn, void* context );
