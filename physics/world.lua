@@ -1,10 +1,14 @@
 --- @class b2.World
-b2.World = meta.new_type("PhysicsWorld", function(gravity_x, gravity_y)
-    local def = box2d.b2DefaultWorldDef()
-    def.gravity = b2.Vec2(gravity_x, gravity_y)
-    return meta.new(b2.World, {
-        _native = box2d.b2CreateWorld(def)
-    })
+b2.World = meta.new_type("PhysicsWorld", function(gravity_x, gravity_y, n_threads)
+    if n_threads == nil or n_threads <= 1 then
+        local def = box2d.b2DefaultWorldDef()
+        def.gravity = b2.Vec2(gravity_x, gravity_y)
+        return meta.new(b2.World, {
+            _native = box2d.b2CreateWorld(def)
+        })
+    else
+
+    end
 end)
 
 --- @brief

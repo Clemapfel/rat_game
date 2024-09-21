@@ -91,9 +91,7 @@ love.load = function()
     --table.insert(joints, b2.WeldJoint(world, player, chain_body, 0, -0.5 * player_radius, 0, 0, true))
 end
 
-
 love.keypressed = function(which)
-
 end
 
 love.update = function(delta)
