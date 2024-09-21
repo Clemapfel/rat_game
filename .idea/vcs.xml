@@ -5,5 +5,8 @@
     <mapping directory="$PROJECT_DIR$/old/fast_physics/box2d" vcs="Git" />
     <mapping directory="$PROJECT_DIR$/old/fast_physics/box2d/build/_deps/enkits-src" vcs="Git" />
     <mapping directory="$PROJECT_DIR$/old/fast_physics/enkiTS" vcs="Git" />
+    <mapping directory="$PROJECT_DIR$/physics/box2d_extension/box2d" vcs="Git" />
+    <mapping directory="$PROJECT_DIR$/physics/box2d_extension/box2d/build/_deps/enkits-src" vcs="Git" />
+    <mapping directory="$PROJECT_DIR$/physics/box2d_extension/enkiTS" vcs="Git" />
   </component>
 </project>

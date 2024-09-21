@@ -47,8 +47,8 @@ function b2.World:draw()
 end
 
 --- @brief
-function b2.World._raycast_callback(shape_id, point, normal, fraction, context_ptr)
-    dbg(shape_id)
+function b2.World._raycast_callback(shape_id_ptr, point_ptr, normal_ptr, fraction, context_ptr)
+    return 0
 end
 
 --- @brief
@@ -60,7 +60,7 @@ function b2.World:raycast(origin_x, origin_y, end_x, end_y)
         self._native,
         origin_point, translation,
         box2d.b2DefaultQueryFilter(),
-        b2.World._raycast_callback,
+        ffi.cast("b2CastResultFcn*", b2.World._raycast_callback),
         ffi.CNULL
     )
 end
