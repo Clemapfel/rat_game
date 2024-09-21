@@ -51,6 +51,11 @@ b2 = rt.physics
 box2d = ffi.load("box2d_extension")
 local cdef = love.filesystem.read("physics/cdef.h")
 ffi.cdef(cdef)
+ffi.cdef([[
+    int test_library(void);
+]])
+
+print(box2d.test_library(), "\n")
 
 
 for _, name in pairs({"rt", "bt", "ow", "b2"}) do
