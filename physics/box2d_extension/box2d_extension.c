@@ -3,5 +3,5 @@
 
 int test_library(void) {
     printf("%s", "test");
-    return int(1234);
+    return 1234;
 }

@@ -22,20 +22,10 @@
     </configurations>
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="7fa9ba1b-2cff-4ecc-86fb-59ab2fa76ee1" name="Changes" comment="try to implement raycast">
-      <change afterPath="$PROJECT_DIR$/love/windows/box2d_extension.exp" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/love/windows/box2d_extension.lib" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/physics/box2d_extension/box2d_extension.c" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/physics/box2d_extension/box2d_extension.h" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/physics/box2d_extension/~CMakeLists.txt" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/.idea/vcs.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/vcs.xml" afterDir="false" />
+    <list default="true" id="7fa9ba1b-2cff-4ecc-86fb-59ab2fa76ee1" name="Changes" comment="trying to get box2d extension to work">
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/include.lua" beforeDir="false" afterPath="$PROJECT_DIR$/include.lua" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/love/windows/box2d_extension.dll" beforeDir="false" afterPath="$PROJECT_DIR$/love/windows/box2d_extension.dll" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/love/windows/box2d_extension.pdb" beforeDir="false" afterPath="$PROJECT_DIR$/love/windows/box2d_extension.pdb" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/physics/box2d_extension/CMakeLists.txt" beforeDir="false" afterPath="$PROJECT_DIR$/physics/box2d_extension/CMakeLists.txt" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/physics/box2d_extension/physics.cpp" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/physics/box2d_extension/physics.hpp" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/physics/box2d_extension/box2d_extension.c" beforeDir="false" afterPath="$PROJECT_DIR$/physics/box2d_extension/box2d_extension.c" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -545,15 +535,7 @@
       <workItem from="1726782290282" duration="13338000" />
       <workItem from="1726942576915" duration="2000" />
       <workItem from="1726942790446" duration="418000" />
-      <workItem from="1726943710058" duration="2212000" />
-    </task>
-    <task id="LOCAL-01025" summary="stashing imperfect l/r">
-      <option name="closed" value="true" />
-      <created>1725475813044</created>
-      <option name="number" value="01025" />
-      <option name="presentableId" value="LOCAL-01025" />
-      <option name="project" value="LOCAL" />
-      <updated>1725475813044</updated>
+      <workItem from="1726943710058" duration="2609000" />
     </task>
     <task id="LOCAL-01026" summary="box2d thread hello world working">
       <option name="closed" value="true" />
@@ -939,7 +921,15 @@
       <option name="project" value="LOCAL" />
       <updated>1726939341771</updated>
     </task>
-    <option name="localTasksCounter" value="1074" />
+    <task id="LOCAL-01074" summary="trying to get box2d extension to work">
+      <option name="closed" value="true" />
+      <created>1726946068573</created>
+      <option name="number" value="01074" />
+      <option name="presentableId" value="LOCAL-01074" />
+      <option name="project" value="LOCAL" />
+      <updated>1726946068573</updated>
+    </task>
+    <option name="localTasksCounter" value="1075" />
     <servers />
   </component>
   <component name="TypeScriptGeneratedFilesManager">
@@ -988,7 +978,6 @@
     </option>
   </component>
   <component name="VcsManagerConfiguration">
-    <MESSAGE value="added sound atlas, stashing" />
     <MESSAGE value="implement sound atlas" />
     <MESSAGE value="stashing loading screen" />
     <MESSAGE value="stashing loading screen done" />
@@ -1013,7 +1002,8 @@
     <MESSAGE value="stashing textbox" />
     <MESSAGE value="textbox done" />
     <MESSAGE value="try to implement raycast" />
-    <option name="LAST_COMMIT_MESSAGE" value="try to implement raycast" />
+    <MESSAGE value="trying to get box2d extension to work" />
+    <option name="LAST_COMMIT_MESSAGE" value="trying to get box2d extension to work" />
   </component>
   <component name="XDebuggerManager">
     <breakpoint-manager>
@@ -1037,6 +1027,11 @@
           <url>file://$PROJECT_DIR$/old/fast_physics/enki_cdef.h</url>
           <line>21</line>
           <option name="timeStamp" value="10" />
+        </line-breakpoint>
+        <line-breakpoint enabled="true" suspend="NONE" type="CMakeLineBreakpoint">
+          <url>file://$PROJECT_DIR$/physics/box2d_extension/CMakeLists.txt</url>
+          <log-expression expression="BUILD_SHARED_LIBS &quot;Build shared libraries&quot; ON)&#10;&#10;file(GLOB_RECURSE BOX2D_SOURCES&#10;    ${CMAKE_SOURCE_DIR}/box2d/src/*.c&#10;    ${CMAKE_SOURCE_DIR}/box2d/src/*.h&#10;)&#10;&#10;file(GLOB_RECURSE BOX2D_HEADERS&#10;    ${CMAKE_SOURCE_DIR}/box2d/include/box2d/*.h&#10;)&#10;&#10;set(LIBRARY_NAME box2d)&#10;&#10;add_library(${LIBRARY_NAME} SHARED&#10;    ${BOX2D_HEADERS}&#10;    ${BOX2D_SOURCES}&#10;    box2d_extension.h&#10;    box2d_extension.c&#10;)&#10;&#10;target_include_directories(${LIBRARY_NAME} PUBLIC&#10;    ${CMAKE_SOURCE_DIR}/box2d/include&#10;    ${CMAKE_SOURCE_DIR}/box2d/src&#10;)&#10;&#10;set_target_properties(${LIBRARY_NAME} PROPERTIES LINKER_LANGUAGE C)&#10;&#10;if (MSVC)&#10;    target_compile_options(${LIBRARY_NAME} PRIVATE /experimental:c11atomics /std:c17)&#10;endif()" />
+          <option name="timeStamp" value="13" />
         </line-breakpoint>
       </breakpoints>
     </breakpoint-manager>
