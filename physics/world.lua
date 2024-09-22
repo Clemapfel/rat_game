@@ -192,7 +192,7 @@ function b2.World:draw()
 end
 
 function b2.World._bind_color(red, green, blue)
-    love.graphics.setColor(red, 1 - green, blue)
+    love.graphics.setColor(red, 1 - green, blue, 0.5)
 end
 
 --- @brief
@@ -247,6 +247,8 @@ function b2.World._draw_solid_circle(transform, radius, red, green, blue)
     love.graphics.translate(translate_x, translate_y)
     love.graphics.rotate(angle)
     love.graphics.circle("fill", 0, 0, radius)
+    love.graphics.circle("line", 0, 0, radius)
+
     love.graphics.pop()
 end
 
