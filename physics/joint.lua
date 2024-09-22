@@ -10,6 +10,18 @@ function b2.Joint:destroy()
 end
 
 --- @brief
+--- @param world b2.World
+--- @param body_a b2.Body
+--- @param body_b b2.Body
+--- @param length Number
+--- @param a_anchor_x Number
+--- @param a_anchor_y Number
+--- @param b_anchor_x Number
+--- @param b_anchor_y Number
+--- @param collide_connected Boolean
+--- @param is_spring Boolean
+--- @param hertz Number
+--- @param damping Number
 function b2.DistanceJoint(
     world,
     body_a, body_b,

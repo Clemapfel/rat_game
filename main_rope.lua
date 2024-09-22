@@ -1,6 +1,6 @@
 require "include"
 
-world = b2.World(0, 200)
+world = b2.World(0, 200, 8)
 
 bodies = {}
 shapes = {}
@@ -9,7 +9,6 @@ chain_body = nil
 player = nil
 
 love.load = function()
-
     local margin_x, margin_y = 0.01 * rt.graphics.get_width(), 0.01 * rt.graphics.get_height()
     local floor_body = b2.Body(world, b2.BodyType.STATIC, 0.5 * rt.graphics.get_width(), 0.5 * rt.graphics.get_height())
     local floor_xr, floor_yr = 0.5 * rt.graphics.get_width() - 0.5 * margin_x, 0.5 * rt.graphics.get_height() - 0.5 * margin_y
@@ -39,13 +38,12 @@ love.load = function()
 
     player = b2.Body(world, b2.BodyType.DYNAMIC, 0.5 * rt.graphics.get_width(), rt.graphics.get_height() * 0.5)
 
-
     player_shape = b2.CapsuleShape(player, b2.Capsule(0, -0.5 * player_radius, 0, 0.5 * player_radius, player_radius))
-
+    table.insert(shapes, player_shape)
 
     local rope_x, rope_y = 0.5 * rt.graphics.get_width(), 8 * margin_x
     local rope_length = (rt.graphics.get_height() - 8 * margin_x) * 0.75
-    local n_segments = 40
+    local n_segments = 250
 
     local segment_length = rope_length / n_segments
     local rope_width = 0.01 * rt.graphics.get_width()
@@ -54,10 +52,10 @@ love.load = function()
     local previous_body = nil
     local previous_body_bottom_x, previous_body_bottom_y = nil, nil
 
+
     local first_body
     for i = 1, n_segments do
         local body = b2.Body(world, b2.BodyType.DYNAMIC, rope_x, current_y)
-
         if i == 1 then
             chain_body = body
         end
@@ -70,16 +68,21 @@ love.load = function()
 
         local shape = b2.CircleShape(body, b2.Circle(2 * radius))
 
+        local chain_category = 0x0002
+        local all_category = 0xFFFF
+        shape:set_filter_data(chain_category, bit.band(all_category, bit.bnot(chain_category)))
+
         if i == 1 then
             local joint = b2.DistanceJoint(world, floor_body, body, 10, 0, -0.5 * screen_h)
             --local joint = b2.DistanceJoint(world, player, body, 10, 0, 0.5 * player_radius, 0, 0)
             table.insert(joints, joint)
         else
+            --local joint = b2.DistanceJoint(world, previous_body, body, 10, previous_body_bottom_x, previous_body_bottom_y, top_x, top_y, true)--, true, 100, 1)
+            local stretch = 30
+            local joint = b2.WeldJoint(world, previous_body, body,  previous_body_bottom_x, previous_body_bottom_y - stretch, top_x, top_y + stretch, true)--, true, 100, 1)
 
-            local join = b2.DistanceJoint(world, previous_body, body, 10, previous_body_bottom_x, previous_body_bottom_y, top_x, top_y)
             table.insert(joints, joint)
         end
-
 
         table.insert(bodies, body)
         table.insert(shapes, shape)
@@ -87,15 +90,17 @@ love.load = function()
         previous_body = body
         previous_body_bottom_x, previous_body_bottom_y = bottom_x, bottom_y
     end
-
-    --table.insert(joints, b2.WeldJoint(world, player, chain_body, 0, -0.5 * player_radius, 0, 0, true))
 end
 
 love.keypressed = function(which)
+    local start_x, start_y, end_x, end_y = 0.5 * screen_w, 0.75 * screen_h, 0.5 * screen_w, 0.5 * screen_h + screen_h
+    --world:explode(start_x, start_y, math.max(screen_w, screen_h), 100)
 end
 
 love.update = function(delta)
-    world:step(delta, 16)
+    if love.keyboard.isDown("space") then
+        world:step(delta, 16)
+    end
 
     if player ~= nil then
         local mouse_x, mouse_y = love.mouse.getPosition()
@@ -106,6 +111,8 @@ love.update = function(delta)
 end
 
 love.draw = function()
+    world:draw()
+    --[[
     for shape in values(shapes) do
         shape:draw()
     end
@@ -117,4 +124,5 @@ love.draw = function()
     if player ~= nil then
         player:draw()
     end
+    ]]--
 end

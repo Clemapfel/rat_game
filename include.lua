@@ -48,10 +48,19 @@ bt = rt.battle
 ow = rt.overworld
 b2 = rt.physics
 
-box2d = ffi.load("box2d")
-local cdef = love.filesystem.read("physics/cdef.h")
-ffi.cdef(cdef)
-box2d.b2SetLengthUnitsPerMeter(30)
+do
+    -- load box2d wrapper
+    box2d = ffi.load("box2d")
+    local cdef = love.filesystem.read("physics/box2d_cdef.h")
+    ffi.cdef(cdef)
+    box2d.b2SetLengthUnitsPerMeter(30)
+
+
+    -- load enkiTS
+    enkiTS = ffi.load("enkiTS")
+    cdef = love.filesystem.read("physics/enkits_cdef.h")
+    ffi.cdef(cdef)
+end
 
 for _, name in pairs({"rt", "bt", "ow", "b2"}) do
     local t = _G[name]

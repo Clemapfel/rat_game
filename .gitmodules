@@ -1,3 +1,6 @@
 [submodule "physics/box2d_extension/box2d"]
 	path = physics/box2d_extension/box2d
 	url = https://github.com/erincatto/box2d
+[submodule "physics/box2d_extension/enkiTS"]
+	path = physics/box2d_extension/enkiTS
+	url = https://github.com/dougbinks/enkiTS

@@ -31,3 +31,10 @@ set_target_properties(${LIBRARY_NAME} PROPERTIES LINKER_LANGUAGE C)
 if (MSVC)
     target_compile_options(${LIBRARY_NAME} PRIVATE /experimental:c11atomics /std:c17)
 endif()
+
+# Copy dlls to love executable based on the operating system
+if(WIN32)
+    add_custom_command(TARGET ${LIBRARY_NAME} POST_BUILD
+        COMMAND ${CMAKE_COMMAND} -E copy_if_different "$<TARGET_FILE:${LIBRARY_NAME}>" "${CMAKE_SOURCE_DIR}\\..\\..\\love\\windows"
+    )
+endif()

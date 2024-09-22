@@ -22,11 +22,30 @@
     </configurations>
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="7fa9ba1b-2cff-4ecc-86fb-59ab2fa76ee1" name="Changes" comment="migrated to box2d v3.1">
+    <list default="true" id="7fa9ba1b-2cff-4ecc-86fb-59ab2fa76ee1" name="Changes" comment="stashing before adding enki">
+      <change afterPath="$PROJECT_DIR$/love/windows/enkiTS.dll" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/love/windows/enkiTS.exp" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/love/windows/enkiTS.lib" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/love/windows/enkiTS.pdb" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/physics/box2d_extension/enkiTS" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/physics/enkits_cdef.h" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/.gitmodules" beforeDir="false" afterPath="$PROJECT_DIR$/.gitmodules" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/include.lua" beforeDir="false" afterPath="$PROJECT_DIR$/include.lua" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/love/windows/box2d.dll" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/love/windows/box2d.exp" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/love/windows/box2d.lib" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/love/windows/box2d.pdb" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/love/windows/box2dd.dll" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/love/windows/box2dd.pdb" beforeDir="false" />
       <change beforePath="$PROJECT_DIR$/main_rope.lua" beforeDir="false" afterPath="$PROJECT_DIR$/main_rope.lua" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/old/fast_physics/enki_cdef.h" beforeDir="false" afterPath="$PROJECT_DIR$/old/fast_physics/enki_cdef.h" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/physics/box2d_extension/CMakeLists.txt" beforeDir="false" afterPath="$PROJECT_DIR$/physics/box2d_extension/CMakeLists.txt" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/physics/box2d_extension/box2d_extension.c" beforeDir="false" afterPath="$PROJECT_DIR$/physics/box2d_extension/box2d_extension.c" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/physics/box2d_extension/box2d_extension.h" beforeDir="false" afterPath="$PROJECT_DIR$/physics/box2d_extension/box2d_extension.h" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/physics/box2d_extension/~CMakeLists.txt" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/physics/cdef.h" beforeDir="false" afterPath="$PROJECT_DIR$/physics/box2d_cdef.h" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/physics/joint.lua" beforeDir="false" afterPath="$PROJECT_DIR$/physics/joint.lua" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/physics/world.lua" beforeDir="false" afterPath="$PROJECT_DIR$/physics/world.lua" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
@@ -538,15 +557,7 @@
       <workItem from="1726942576915" duration="2000" />
       <workItem from="1726942790446" duration="418000" />
       <workItem from="1726943710058" duration="2917000" />
-      <workItem from="1726946691418" duration="4620000" />
-    </task>
-    <task id="LOCAL-01028" summary="stashing, finish_tasks seems to be called async too">
-      <option name="closed" value="true" />
-      <created>1725502530627</created>
-      <option name="number" value="01028" />
-      <option name="presentableId" value="LOCAL-01028" />
-      <option name="project" value="LOCAL" />
-      <updated>1725502530627</updated>
+      <workItem from="1726946691418" duration="19849000" />
     </task>
     <task id="LOCAL-01029" summary="stashing uses threads but runs serially">
       <option name="closed" value="true" />
@@ -932,7 +943,15 @@
       <option name="project" value="LOCAL" />
       <updated>1726950715761</updated>
     </task>
-    <option name="localTasksCounter" value="1077" />
+    <task id="LOCAL-01077" summary="stashing before adding enki">
+      <option name="closed" value="true" />
+      <created>1726951351899</created>
+      <option name="number" value="01077" />
+      <option name="presentableId" value="LOCAL-01077" />
+      <option name="project" value="LOCAL" />
+      <updated>1726951351899</updated>
+    </task>
+    <option name="localTasksCounter" value="1078" />
     <servers />
   </component>
   <component name="TypeScriptGeneratedFilesManager">
@@ -981,7 +1000,6 @@
     </option>
   </component>
   <component name="VcsManagerConfiguration">
-    <MESSAGE value="stashing loading screen done" />
     <MESSAGE value="resolutions working" />
     <MESSAGE value="switchin to queueable source" />
     <MESSAGE value="stashing sound" />
@@ -1006,7 +1024,8 @@
     <MESSAGE value="trying to get box2d extension to work" />
     <MESSAGE value="export working" />
     <MESSAGE value="migrated to box2d v3.1" />
-    <option name="LAST_COMMIT_MESSAGE" value="migrated to box2d v3.1" />
+    <MESSAGE value="stashing before adding enki" />
+    <option name="LAST_COMMIT_MESSAGE" value="stashing before adding enki" />
   </component>
   <component name="XDebuggerManager">
     <breakpoint-manager>

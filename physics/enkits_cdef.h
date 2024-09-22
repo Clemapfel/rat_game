@@ -50,18 +50,4 @@ void* enkiCreateTaskSet( void* pETS_, enkiTaskExecuteRange taskFunc_  );
 void* malloc(size_t size);
 void free(void *ptr);
 
-typedef struct TaskData {
-    b2TaskCallback* callback; // ran after box2d cdef
-    void* context;
-} TaskData;
-
-typedef struct UserContext {
-    void* scheduler;
-    void* tasks[64];
-    TaskData task_data[64];
-    int n_tasks;
-} UserContext;
-
-void b2ExtensionTest();
-void b2InvokeTask(uint32_t start_i, uint32_t end_i, uint32_t worker_i, void* context);
 
