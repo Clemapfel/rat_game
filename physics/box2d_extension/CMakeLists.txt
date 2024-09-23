@@ -37,4 +37,5 @@ if(WIN32)
     add_custom_command(TARGET ${LIBRARY_NAME} POST_BUILD
         COMMAND ${CMAKE_COMMAND} -E copy_if_different "$<TARGET_FILE:${LIBRARY_NAME}>" "${CMAKE_SOURCE_DIR}\\..\\..\\love\\windows"
     )
+    message(STATUS "Copied $<TARGET_FILE:${LIBRARY_NAME}> to ${CMAKE_SOURCE_DIR}\\..\\..\\love\\windows")
 endif()

@@ -2,19 +2,60 @@
 #include <stdio.h>
 #include <stdlib.h>
 
+// MISC
+
+b2Transform b2MakeTransform(float x, float y, float angle_rad) {
+    b2Transform out;
+    b2Vec2 p;
+    p.x = x;
+    p.y = y;
+    out.p = p;
+    out.q = b2MakeRot(angle_rad);
+    return out;
+}
+
+// THREADS
+
 void b2InvokeTask(uint32_t start, uint32_t end, uint32_t threadIndex, void* context)
 {
     b2TaskData* data = (b2TaskData*) context;
     data->callback(start, end, threadIndex, data->context);
 }
 
+// RAY CAST
+
 float b2CastRayWrapperCallback(b2ShapeId shape_id, b2Vec2 point, b2Vec2 normal, float fraction, void* context ) {
     return ((b2CastResultFcnWrapper*) context)(&shape_id, &point, &normal, fraction);
 }
 
 void b2World_CastRayWrapper(b2WorldId world, b2Vec2 origin, b2Vec2 translation, b2QueryFilter filter, b2CastResultFcnWrapper* callback) {
+    fprintf(stderr, "called");
     b2World_CastRay(world, origin, translation, filter, b2CastRayWrapperCallback, callback);
 }
+
+// OVERLAP
+
+bool b2OverlapResultWrapperCallback(b2ShapeId shape, void* context) {
+    return ((b2OverlapResultFcnWrapper*) context)(&shape);
+}
+
+void b2World_OverlapCircleWrapper(b2WorldId world, b2Circle* circle, b2Transform transform, b2QueryFilter filter, b2OverlapResultFcnWrapper* callback) {
+    b2World_OverlapCircle(world, circle, transform, filter, b2OverlapResultWrapperCallback, (void*) callback);
+}
+
+void b2World_OverlapAABBWrapper(b2WorldId world, b2AABB aabb, b2QueryFilter filter, b2OverlapResultFcnWrapper* callback) {
+    b2World_OverlapAABB(world, aabb, filter, b2OverlapResultWrapperCallback, (void*) callback);
+}
+
+void b2World_OverlapPolygonWrapper(b2WorldId world, b2Polygon* polygon, b2Transform transform, b2QueryFilter filter, b2OverlapResultFcnWrapper* callback) {
+    b2World_OverlapPolygon(world, polygon, transform, filter, b2OverlapResultWrapperCallback, (void*) callback);
+}
+
+void b2World_OverlapCapsuleWrapper(b2WorldId world, b2Capsule* polygon, b2Transform transform, b2QueryFilter filter, b2OverlapResultFcnWrapper* callback) {
+    b2World_OverlapCapsule(world, polygon, transform, filter, b2OverlapResultWrapperCallback, (void*) callback);
+}
+
+// DRAW
 
 void b2HexColorToRGB(int hexColor, float* red, float* green, float* blue) {
     *red = ((hexColor >> 16) & 0xFF) / 255.0f;

@@ -2,22 +2,24 @@
 b2.Polygon = meta.new_type("PhysicsPolygon", function(a_x, a_y, b_x, b_y, c_x, c_y, ...)
     if _G._select == nil then _G._select = select end
     local n_points = _G._select("#", ...) + 3
+    assert(n_points >= 6 and n_points % 2 == 0 and n_points <= 16)
 
-    local points = {a_x, a_y, b_x, b_y, c_x, c_y, ...}
-    assert(#points >= 6 and #points % 2 == 0)
+    return meta.new(b2.Polygon, {
+        _native = b2.Polygon._create_native({a_x, a_y, b_x, b_y, c_x, c_y, ...})
+    })
+end)
 
+b2.Polygon._create_native = function(vertices)
+    local n_points = #vertices
     local vec2s = ffi.new("b2Vec2[" .. n_points .. "]")
     local ci = 0
-    for i = 1, 2 * n_points, 2 do
-        vec2s[ci] = b2.Vec2(points[i], points[i+1])
+    for i = 1, n_points, 2 do
+        vec2s[ci] = b2.Vec2(vertices[i], vertices[i+1])
         ci = ci + 1
     end
     local hull = box2d.b2ComputeHull(vec2s, n_points)
-
-    return meta.new(b2.Polygon, {
-        _native = box2d.b2MakePolygon(hull, 0)
-    })
-end)
+    return box2d.b2MakePolygon(hull, 0)
+end
 
 --- @brief
 function b2.Rectangle(width, height, center_x, center_y, angle)

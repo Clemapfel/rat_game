@@ -11,9 +11,10 @@
   </component>
   <component name="CMakeRunConfigurationManager">
     <generated>
-      <config projectName="rat_game" targetName="love" />
-      <config projectName="rat_game" targetName="battle_main" />
-      <config projectName="rat_game" targetName="rat_game" />
+      <config projectName="box2d_wrapper" targetName="box2d" />
+      <config projectName="box2d_wrapper" targetName="love" />
+      <config projectName="box2d_wrapper" targetName="rat_game" />
+      <config projectName="box2d_wrapper" targetName="battle_main" />
     </generated>
   </component>
   <component name="CMakeSettings">
@@ -22,30 +23,20 @@
     </configurations>
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="7fa9ba1b-2cff-4ecc-86fb-59ab2fa76ee1" name="Changes" comment="stashing before adding enki">
-      <change afterPath="$PROJECT_DIR$/love/windows/enkiTS.dll" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/love/windows/enkiTS.exp" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/love/windows/enkiTS.lib" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/love/windows/enkiTS.pdb" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/physics/box2d_extension/enkiTS" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/physics/enkits_cdef.h" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/.gitmodules" beforeDir="false" afterPath="$PROJECT_DIR$/.gitmodules" afterDir="false" />
+    <list default="true" id="7fa9ba1b-2cff-4ecc-86fb-59ab2fa76ee1" name="Changes" comment="debug drawing working">
+      <change beforePath="$PROJECT_DIR$/.idea/misc.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/misc.xml" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/include.lua" beforeDir="false" afterPath="$PROJECT_DIR$/include.lua" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/love/windows/box2d.dll" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/love/windows/box2d.exp" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/love/windows/box2d.lib" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/love/windows/box2d.pdb" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/love/windows/box2dd.dll" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/love/windows/box2dd.pdb" beforeDir="false" />
       <change beforePath="$PROJECT_DIR$/main_rope.lua" beforeDir="false" afterPath="$PROJECT_DIR$/main_rope.lua" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/old/fast_physics/enki_cdef.h" beforeDir="false" afterPath="$PROJECT_DIR$/old/fast_physics/enki_cdef.h" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/physics/box2d_cdef.h" beforeDir="false" afterPath="$PROJECT_DIR$/physics/box2d_cdef.h" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/physics/box2d_extension/CMakeLists.txt" beforeDir="false" afterPath="$PROJECT_DIR$/physics/box2d_extension/CMakeLists.txt" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/physics/box2d_extension/box2d_extension.c" beforeDir="false" afterPath="$PROJECT_DIR$/physics/box2d_extension/box2d_extension.c" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/physics/box2d_extension/box2d_extension.h" beforeDir="false" afterPath="$PROJECT_DIR$/physics/box2d_extension/box2d_extension.h" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/physics/box2d_extension/~CMakeLists.txt" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/physics/cdef.h" beforeDir="false" afterPath="$PROJECT_DIR$/physics/box2d_cdef.h" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/physics/joint.lua" beforeDir="false" afterPath="$PROJECT_DIR$/physics/joint.lua" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/physics/capsule.lua" beforeDir="false" afterPath="$PROJECT_DIR$/physics/capsule.lua" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/physics/circle.lua" beforeDir="false" afterPath="$PROJECT_DIR$/physics/circle.lua" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/physics/math.lua" beforeDir="false" afterPath="$PROJECT_DIR$/physics/math.lua" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/physics/polygon.lua" beforeDir="false" afterPath="$PROJECT_DIR$/physics/polygon.lua" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/physics/segment.lua" beforeDir="false" afterPath="$PROJECT_DIR$/physics/segment.lua" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/physics/world.lua" beforeDir="false" afterPath="$PROJECT_DIR$/physics/world.lua" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
@@ -166,6 +157,16 @@
     </key>
   </component>
   <component name="RunManager" selected="Lua Application.main_rope">
+    <configuration default="true" type="CLionExternalRunConfiguration" factoryName="Application" REDIRECT_INPUT="false" ELEVATE="false" USE_EXTERNAL_CONSOLE="false" EMULATE_TERMINAL="false" PASS_PARENT_ENVS_2="true">
+      <method v="2">
+        <option name="CLION.EXTERNAL.BUILD" enabled="true" />
+      </method>
+    </configuration>
+    <configuration name="box2d" type="CMakeRunConfiguration" factoryName="Application" REDIRECT_INPUT="false" ELEVATE="false" USE_EXTERNAL_CONSOLE="false" EMULATE_TERMINAL="false" PASS_PARENT_ENVS_2="true" PROJECT_NAME="box2d_wrapper" TARGET_NAME="box2d" CONFIG_NAME="Debug">
+      <method v="2">
+        <option name="com.jetbrains.cidr.execution.CidrBuildBeforeRunTaskProvider$BuildBeforeRunTask" enabled="true" />
+      </method>
+    </configuration>
     <configuration name="main" type="lua.app" factoryName="Lua Application">
       <module name="rat_game" />
       <option name="program" value="C:\Users\cleme\Workspace\rat_game\love\windows\love.exe" />
@@ -225,6 +226,7 @@
       <method v="2" />
     </configuration>
     <list>
+      <item itemvalue="CMake Application.box2d" />
       <item itemvalue="Emmy Debugger(NEW).remote_debugger" />
       <item itemvalue="Lua Application.main" />
       <item itemvalue="Lua Application.main_rope" />
@@ -557,23 +559,7 @@
       <workItem from="1726942576915" duration="2000" />
       <workItem from="1726942790446" duration="418000" />
       <workItem from="1726943710058" duration="2917000" />
-      <workItem from="1726946691418" duration="19849000" />
-    </task>
-    <task id="LOCAL-01029" summary="stashing uses threads but runs serially">
-      <option name="closed" value="true" />
-      <created>1725504423020</created>
-      <option name="number" value="01029" />
-      <option name="presentableId" value="LOCAL-01029" />
-      <option name="project" value="LOCAL" />
-      <updated>1725504423020</updated>
-    </task>
-    <task id="LOCAL-01030" summary="polished scenes">
-      <option name="closed" value="true" />
-      <created>1725549432919</created>
-      <option name="number" value="01030" />
-      <option name="presentableId" value="LOCAL-01030" />
-      <option name="project" value="LOCAL" />
-      <updated>1725549432919</updated>
+      <workItem from="1726946691418" duration="28961000" />
     </task>
     <task id="LOCAL-01031" summary="added double button keybinding indicator">
       <option name="closed" value="true" />
@@ -951,7 +937,23 @@
       <option name="project" value="LOCAL" />
       <updated>1726951351899</updated>
     </task>
-    <option name="localTasksCounter" value="1078" />
+    <task id="LOCAL-01078" summary="debug drawing working">
+      <option name="closed" value="true" />
+      <created>1726966868038</created>
+      <option name="number" value="01078" />
+      <option name="presentableId" value="LOCAL-01078" />
+      <option name="project" value="LOCAL" />
+      <updated>1726966868038</updated>
+    </task>
+    <task id="LOCAL-01079" summary="debug drawing working">
+      <option name="closed" value="true" />
+      <created>1726966943205</created>
+      <option name="number" value="01079" />
+      <option name="presentableId" value="LOCAL-01079" />
+      <option name="project" value="LOCAL" />
+      <updated>1726966943205</updated>
+    </task>
+    <option name="localTasksCounter" value="1080" />
     <servers />
   </component>
   <component name="TypeScriptGeneratedFilesManager">
@@ -1000,7 +1002,6 @@
     </option>
   </component>
   <component name="VcsManagerConfiguration">
-    <MESSAGE value="resolutions working" />
     <MESSAGE value="switchin to queueable source" />
     <MESSAGE value="stashing sound" />
     <MESSAGE value="added physics" />
@@ -1025,7 +1026,8 @@
     <MESSAGE value="export working" />
     <MESSAGE value="migrated to box2d v3.1" />
     <MESSAGE value="stashing before adding enki" />
-    <option name="LAST_COMMIT_MESSAGE" value="stashing before adding enki" />
+    <MESSAGE value="debug drawing working" />
+    <option name="LAST_COMMIT_MESSAGE" value="debug drawing working" />
   </component>
   <component name="XDebuggerManager">
     <breakpoint-manager>

@@ -11,11 +11,25 @@ ffi = require "ffi"
 utf8 = require "utf8"
 bit = require "bit"
 
--- other libs
-if jit.os == "Linux" then
-    fftw3 = ffi.load("fftw3")
-elseif jit.os == "Windows" then
-    fftw3 = ffi.load("libfftw3-3")
+-- foreign libraries
+do
+    -- load box2d wrapper
+    box2d = ffi.load("box2d")
+    local cdef = love.filesystem.read("physics/box2d_cdef.h")
+    ffi.cdef(cdef)
+    box2d.b2SetLengthUnitsPerMeter(love.physics.getMeter())
+
+    -- load enkiTS
+    enkiTS = ffi.load("enkiTS")
+    cdef = love.filesystem.read("physics/enkits_cdef.h")
+    ffi.cdef(cdef)
+
+    -- load fftw3
+    if jit.os == "Linux" then
+        fftw3 = ffi.load("fftw3")
+    elseif jit.os == "Windows" then
+        fftw3 = ffi.load("libfftw3-3")
+    end
 end
 
 -- debugger
@@ -47,20 +61,6 @@ mn = rt.menu
 bt = rt.battle
 ow = rt.overworld
 b2 = rt.physics
-
-do
-    -- load box2d wrapper
-    box2d = ffi.load("box2d")
-    local cdef = love.filesystem.read("physics/box2d_cdef.h")
-    ffi.cdef(cdef)
-    box2d.b2SetLengthUnitsPerMeter(30)
-
-
-    -- load enkiTS
-    enkiTS = ffi.load("enkiTS")
-    cdef = love.filesystem.read("physics/enkits_cdef.h")
-    ffi.cdef(cdef)
-end
 
 for _, name in pairs({"rt", "bt", "ow", "b2"}) do
     local t = _G[name]

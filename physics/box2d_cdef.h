@@ -14,6 +14,8 @@ typedef struct b2Rot
     float c, s;
 } b2Rot;
 
+b2Rot b2MakeRot(float angle);
+
 /// A 2D rigid transform
 typedef struct b2Transform
 {
@@ -2977,7 +2979,11 @@ float b2WheelJoint_GetMaxMotorTorque( b2JointId jointId );
 /// Get the wheel joint current motor torque, typically in newton-meters
 float b2WheelJoint_GetMotorTorque( b2JointId jointId );
 
-// extension
+// MISC
+
+b2Transform b2MakeTransform(float x, float y, float angle_rad);
+
+// MULTI THREADING
 
 typedef void b2TaskCallback( int32_t startIndex, int32_t endIndex, uint32_t workerIndex, void* taskContext );
 
@@ -2995,10 +3001,50 @@ typedef struct b2UserContext {
 
 extern void b2InvokeTask(uint32_t start, uint32_t end, uint32_t threadIndex, void* context);
 
+// RAY CAST
+
 typedef float b2CastResultFcnWrapper( b2ShapeId* shapeId, b2Vec2* point, b2Vec2* normal, float fraction);
 
 float b2CastRayWrapperCallback(b2ShapeId shape_id, b2Vec2 point, b2Vec2 normal, float fraction, void* context );
 void b2World_CastRayWrapper(b2WorldId world, b2Vec2 origin, b2Vec2 destination, b2QueryFilter filter, b2CastResultFcnWrapper* callback);
+
+// OVERLAP
+
+typedef bool b2OverlapResultFcnWrapper(b2ShapeId* shapeId);
+bool b2OverlapResultWrapperCallback(b2ShapeId, void* context);
+
+void b2World_OverlapCircleWrapper(
+    b2WorldId world,
+    b2Circle* circle,
+    b2Transform transform,
+    b2QueryFilter filter,
+    b2OverlapResultFcnWrapper* callback
+);
+
+void b2World_OverlapAABBWrapper(
+    b2WorldId world,
+    b2AABB aabb,
+    b2QueryFilter filter,
+    b2OverlapResultFcnWrapper* callback
+);
+
+void b2World_OverlapPolygonWrapper(
+    b2WorldId world,
+    b2Polygon* polygon,
+    b2Transform transform,
+    b2QueryFilter filter,
+    b2OverlapResultFcnWrapper* callback
+);
+
+void b2World_OverlapCapsuleWrapper(
+    b2WorldId world,
+    b2Capsule* capsule,
+    b2Transform transform,
+    b2QueryFilter filter,
+    b2OverlapResultFcnWrapper* callback
+);
+
+// DEBUG DRAW
 
 void b2HexColorToRGB(int hexColor, float* red, float* green, float* blue);
 

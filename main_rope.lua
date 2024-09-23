@@ -43,7 +43,7 @@ love.load = function()
 
     local rope_x, rope_y = 0.5 * rt.graphics.get_width(), 8 * margin_x
     local rope_length = (rt.graphics.get_height() - 8 * margin_x) * 0.75
-    local n_segments = 250
+    local n_segments = 300
 
     local segment_length = rope_length / n_segments
     local rope_width = 0.01 * rt.graphics.get_width()
@@ -93,15 +93,16 @@ love.load = function()
 end
 
 love.keypressed = function(which)
-    local start_x, start_y, end_x, end_y = 0.5 * screen_w, 0.75 * screen_h, 0.5 * screen_w, 0.5 * screen_h + screen_h
-    --world:explode(start_x, start_y, math.max(screen_w, screen_h), 100)
+    local player_x, player_y = player:get_centroid()
+    local rotation = player:get_angle()
+    world:overlap_shape(player_shape, player_x, player_y, rotation, function(shape)
+        dbg(shape:get_type())
+        return true
+    end)
 end
 
 love.update = function(delta)
-    if love.keyboard.isDown("space") then
-        world:step(delta, 16)
-    end
-
+    world:step(delta, 16)
     if player ~= nil then
         local mouse_x, mouse_y = love.mouse.getPosition()
         local body_x, body_y = player:get_centroid()

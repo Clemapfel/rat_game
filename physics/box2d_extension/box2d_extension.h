@@ -1,6 +1,10 @@
 #include <box2d/box2d.h>
 #include <stdbool.h>
 
+// MISC
+
+BOX2D_EXPORT b2Transform b2MakeTransform(float x, float y, float angle_rad);
+
 // THREADING
 
 BOX2D_EXPORT typedef struct b2TaskData {
@@ -30,6 +34,43 @@ BOX2D_EXPORT void b2World_CastRayWrapper(
     b2Vec2 translation,
     b2QueryFilter filter,
     b2CastResultFcnWrapper* callback
+);
+
+// OVERLAP
+
+// BOX2D_EXPORT typedef bool b2OverlapResultFcn(b2ShapeId shapeId);
+BOX2D_EXPORT typedef bool b2OverlapResultFcnWrapper(b2ShapeId* shapeId);
+BOX2D_EXPORT bool b2OverlapResultWrapperCallback(b2ShapeId, void* context);
+
+BOX2D_EXPORT void b2World_OverlapCircleWrapper(
+    b2WorldId world,
+    b2Circle* circle,
+    b2Transform transform,
+    b2QueryFilter filter,
+    b2OverlapResultFcnWrapper* callback
+);
+
+BOX2D_EXPORT void b2World_OverlapAABBWrapper(
+    b2WorldId world,
+    b2AABB aabb,
+    b2QueryFilter filter,
+    b2OverlapResultFcnWrapper* callback
+);
+
+BOX2D_EXPORT void b2World_OverlapPolygonWrapper(
+    b2WorldId world,
+    b2Polygon* polygon,
+    b2Transform transform,
+    b2QueryFilter filter,
+    b2OverlapResultFcnWrapper* callback
+);
+
+BOX2D_EXPORT void b2World_OverlapCapsuleWrapper(
+    b2WorldId world,
+    b2Capsule* capsule,
+    b2Transform transform,
+    b2QueryFilter filter,
+    b2OverlapResultFcnWrapper* callback
 );
 
 // DEBUG DRAW

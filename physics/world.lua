@@ -5,10 +5,11 @@ b2.World = meta.new_type("PhysicsWorld", function(gravity_x, gravity_y, n_thread
         local def = box2d.b2DefaultWorldDef()
         def.gravity = b2.Vec2(gravity_x, gravity_y)
         out = meta.new(b2.World, {
-            _native = box2d.b2CreateWorld(def)
+            _native = box2d.b2CreateWorld(def),
+            _user_context = nil
         })
     else
-        MAX_TASKS = 64
+        MAX_TASKS = 128
 
         task_main = function(start_i, end_i, worker_i, context)
             local data = ffi.cast("b2TaskData*", context)
@@ -50,7 +51,7 @@ b2.World = meta.new_type("PhysicsWorld", function(gravity_x, gravity_y, n_thread
         end
 
         local def = box2d.b2DefaultWorldDef()
-        def.gravity = ffi.typeof("b2Vec2")(gravity_x, gravity_y)
+        def.gravity = b2.Vec2(gravity_x, gravity_y)
 
         def.workerCount = n_threads
         def.enqueueTask = enqueue_task
@@ -69,7 +70,7 @@ b2.World = meta.new_type("PhysicsWorld", function(gravity_x, gravity_y, n_thread
 
         def.userTaskContext = context
 
-        out =  meta.new(b2.World, {
+        out = meta.new(b2.World, {
             _native = box2d.b2CreateWorld(def),
             _user_context = context
         })
@@ -184,6 +185,101 @@ end
 --- @brief
 function b2.World:explode(position_x, position_y, radius, impulse)
     box2d.b2World_Explode(self._native, b2.Vec2(position_x, position_y), radius, impulse)
+end
+
+--- @brief
+--- @param callback (b2.Shape) -> Boolean
+function b2.World:overlap_aabb(x, y, width, height, callback)
+    local aabb = b2.AABB(b2.Vec2(x, y), b2.Vec2(x + width, y + height))
+    box2d.b2World_OverlapAABBWrapper(self._native, aabb, box2d.b2DefaultQueryFilter(), function(shape_id_ptr)
+        local shape = meta.new(b2.Shape, {
+            _native = shape_id_ptr[0]
+        })
+        return callback(shape)
+    end)
+end
+
+b2.IdentityTransform = b2.Transform(b2.Vec2(0, 0), b2.Rot(1, 0))
+
+--- @brief
+--- @param callback (b2.Shape) -> Boolean
+function b2.World:overlap_circle(x, y, radius, callback)
+    local circle = b2.Circle._create_native(b2.Vec2(x, y), radius)
+    box2d.b2World_OverlapCircleWrapper(self._native, circle, b2.IdentityTransform, box2d.b2DefaultQueryFilter(), function(shape_id_ptr)
+        local shape = meta.new(b2.Shape, {
+            _native = shape_id_ptr[0]
+        })
+        return callback(shape)
+    end)
+end
+
+--- @brief
+--- @param callback (b2.Shape) -> Boolean
+function b2.World:overlap_capsule(a_x, a_y, b_x, b_y, radius, callback)
+    local capsule = b2.Capsule._create_native(
+        b2.Vec2(a_x, a_y),
+        b2.Vec2(b_x, b_y),
+        radius
+    )
+
+    box2d.b2World_OverlapCapsuleWrapper(self._native, capsule, b2.IdentityTransform, box2d.b2DefaultQueryFilter(), function(shape_id_ptr)
+        local shape = meta.new(b2.Shape, {
+            _native = shape_id_ptr[0]
+        })
+        return callback(shape)
+    end)
+end
+
+--- @brief
+--- @param vertices Table<Number> size 2*n, 6 <= size <= 16
+--- @param callback (b2.Shape) -> Boolean
+function b2.World:overlap_polygon(vertices, callback)
+    meta.assert_table(vertices)
+    local n_points = #vertices
+    assert(n_points >= 6 and n_points % 2 == 0 and n_points <= 16)
+
+    local polygon = b2.Polygon._create_native(vertices)
+    box2d.b2World_OverlapPolygonWrapper(self._native, polygon, b2.IdentityTransform, box2d.b2DefaultQueryFilter(), function(shape_id_ptr)
+        local shape = meta.new(b2.Shape, {
+            _native = shape_id_ptr[0]
+        })
+        return callback(shape)
+    end)
+end
+
+--- @brief
+--- @param x x_offset
+--- @param y y_offset
+--- @param angle rotation
+--- @param shape b2.Shape
+--- @param callback (b2.Shape) -> Boolean
+function b2.World:overlap_shape(shape, x, y, angle, callback)
+    local native = shape._native
+    local transform = box2d.b2MakeTransform(x, y, angle)
+    local type = box2d.b2Shape_GetType(native)
+
+    if type == box2d.b2_circleShape then
+        local circle = box2d.b2Shape_GetCircle(native)
+        box2d.b2World_OverlapCircleWrapper(self._native, circle, transform, box2d.b2DefaultQueryFilter(), function(shape_id_ptr)
+            return callback(meta.new(b2.Shape, { _native = shape_id_ptr[0] }))
+        end)
+    elseif type == box2d.b2_polygonShape then
+        local polygon = box2d.b2Shape_GetPolygon(native)
+        box2d.b2World_OverlapPolygonWrapper(self._native, polygon, transform, box2d.b2DefaultQueryFilter(), function(shape_id_ptr)
+            return callback(meta.new(b2.Shape, { _native = shape_id_ptr[0] }))
+        end)
+    elseif type == box2d.b2_capsuleShape then
+        local capsule = box2d.b2Shape_GetCapsule(native)
+        box2d.b2World_OverlapCapsuleWrapper(self._native, capsule, transform, box2d.b2DefaultQueryFilter(), function(shape_id_ptr)
+            return callback(meta.new(b2.Shape, { _native = shape_id_ptr[0] }))
+        end)
+    elseif type == box2d.b2_segmentShape then
+        rt.error("In b2.World:overlap_shape: Shape type `Segment` unsupported for overlap tests, use World:raycast")
+    elseif type == box2d.b2_chainSegmentShape then
+        rt.error("In b2.World:overlap_shape: Shape type `ChainSegment` unsupported for overlap tests, use World:raycast")
+    else
+        error("In b2.Shape:draw: unhandlined shape type `" .. type .. "`")
+    end
 end
 
 --- @brief
