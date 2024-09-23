@@ -9,62 +9,21 @@ b2.World = meta.new_type("PhysicsWorld", function(gravity_x, gravity_y, n_thread
             _user_context = nil
         })
     else
-        MAX_TASKS = 128
-
-        task_main = function(start_i, end_i, worker_i, context)
-            local data = ffi.cast("b2TaskData*", context)
-            data.callback(start_i, end_i, worker_i, data.context)
-        end
-
-        enqueue_task = function(task_callback, n_items, min_range, task_context, user_context_ptr)
-            local context = ffi.cast("b2UserContext*", user_context_ptr)
-            if context.n_tasks < 64 then
-                local task = ffi.cast("void*", context.tasks[context.n_tasks]) -- enkiTaskSet*
-                local data = context.task_data[context.n_tasks]
-                data.callback = task_callback
-                data.context = task_context
-
-                local params = ffi.typeof("enkiParamsTaskSet")()
-                params.minRange = min_range
-                params.setSize = n_items
-                params.pArgs = data
-                params.priority = 0
-
-                enkiTS.enkiSetParamsTaskSet(task, params)
-                enkiTS.enkiAddTaskSet(context.scheduler, task)
-                context.n_tasks = context.n_tasks + 1
-
-                return task
-            else
-                -- not enough tasks for this step
-                task_callback(0, n_items, 0, task_context)
-                rt.warning("In b2.World:step: multi-threading stepping exceeded number of available tasks")
-                return ffi.CNULL
-            end
-        end
-
-        finish_task = function(task_ptr, user_context)
-            if task_ptr == ffi.CNULL then return end
-            local context = ffi.cast("b2UserContext*", user_context)
-            local task = ffi.cast("void*", task_ptr) -- enkiTaskSet*
-            enkiTS.enkiWaitForTaskSet(context.scheduler, task)
-        end
-
         local def = box2d.b2DefaultWorldDef()
         def.gravity = b2.Vec2(gravity_x, gravity_y)
 
         def.workerCount = n_threads
-        def.enqueueTask = enqueue_task
-        def.finishTask = finish_task
+        def.enqueueTask = b2.World._enqueue_task
+        def.finishTask = b2.World._finish_task
 
-        local context = ffi.cast("b2UserContext*", ffi.C.malloc(ffi.sizeof("b2UserContext")))
+        local context = ffi.gc(ffi.new("b2UserContext"), b2.World._free_user_context)
         context.n_tasks = 0
         context.scheduler = enkiTS.enkiNewTaskScheduler()
         local config = enkiTS.enkiGetTaskSchedulerConfig(context.scheduler)
         config.numTaskThreadsToCreate = n_threads - 1
         enkiTS.enkiInitTaskSchedulerWithConfig(context.scheduler, config)
 
-        for task_i = 1, MAX_TASKS do
+        for task_i = 1, b2.World.MAX_N_TASKS do
             context.tasks[task_i - 1] = enkiTS.enkiCreateTaskSet(context.scheduler, box2d.b2InvokeTask)
         end
 
@@ -97,7 +56,60 @@ b2.World = meta.new_type("PhysicsWorld", function(gravity_x, gravity_y, n_thread
         false,  -- draw_contact_impulses,
         false   -- draw_friction_impulses,
     )
+
     return out
+end)
+
+b2.World.MAX_N_TASKS = 256
+
+--- @brief
+b2.World._free_user_context = ffi.cast("void(*)(b2UserContext*)", function(context)
+    if context == nil then return end
+    for i = 1, b2.World.MAX_N_TASKS do
+        enkiTS.enkiDeleteTaskSet(context.scheduler, context.tasks[i - 1])
+    end
+    enkiTS.enkiDeleteTaskScheduler(context.scheduler)
+    -- context itself is garbage collected
+end)
+
+do
+    local _enqueue_task_warning_printed
+    b2.World._enqueue_task = ffi.cast("b2EnqueueTaskCallback*", function(task_callback, n_items, min_range, task_context, user_context_ptr)
+        local context = ffi.cast("b2UserContext*", user_context_ptr)
+        if context.n_tasks < 64 then
+            local task = ffi.cast("void*", context.tasks[context.n_tasks]) -- enkiTaskSet*
+            local data = context.task_data[context.n_tasks]
+            data.callback = task_callback
+            data.context = task_context
+
+            local params = ffi.new("enkiParamsTaskSet")
+            params.minRange = min_range
+            params.setSize = n_items
+            params.pArgs = data
+            params.priority = 0
+
+            enkiTS.enkiSetParamsTaskSet(task, params)
+            enkiTS.enkiAddTaskSet(context.scheduler, task)
+            context.n_tasks = context.n_tasks + 1
+
+            return task
+        else
+            -- not enough tasks for this step, do work on main instead
+            task_callback(0, n_items, 0, task_context)
+            if _enqueue_task_warning_printed == false then
+                rt.warning("In b2.World:step: multi-threaded stepping exceeded number of available tasks for delta `" .. love.timer.getDelta() .. "`, reverting to serial execution")
+                _enqueue_task_warning_printed = true
+            end
+            return ffi.CNULL
+        end
+    end)
+end
+
+b2.World._finish_task = ffi.cast("b2FinishTaskCallback*", function(task_ptr, user_context)
+    if task_ptr == ffi.CNULL then return end
+    local context = ffi.cast("b2UserContext*", user_context)
+    local task = ffi.cast("void*", task_ptr) -- enkiTaskSet*
+    enkiTS.enkiWaitForTaskSet(context.scheduler, task)
 end)
 
 --- @brief
@@ -121,7 +133,7 @@ function b2.World:step(delta, n_iterations)
         box2d.b2World_Step(self._native, step, n_iterations)
         delta = delta - step
     end
-    box2d.b2World_Step(self._native, delta, n_iterations)
+    box2d.b2World_Step(self._native, delta, n_iterations) -- also use rest delta
 
     if self._user_context ~= nil then -- enki threading
         self._user_context.n_tasks = 0
@@ -187,98 +199,95 @@ function b2.World:explode(position_x, position_y, radius, impulse)
     box2d.b2World_Explode(self._native, b2.Vec2(position_x, position_y), radius, impulse)
 end
 
---- @brief
---- @param callback (b2.Shape) -> Boolean
-function b2.World:overlap_aabb(x, y, width, height, callback)
-    local aabb = b2.AABB(b2.Vec2(x, y), b2.Vec2(x + width, y + height))
-    box2d.b2World_OverlapAABBWrapper(self._native, aabb, box2d.b2DefaultQueryFilter(), function(shape_id_ptr)
-        local shape = meta.new(b2.Shape, {
-            _native = shape_id_ptr[0]
-        })
-        return callback(shape)
-    end)
+--- @brief [internal]
+b2.World._overlap_aabb_current_callback = nil
+function b2.World:_overlap_aabb_callback_wrapper(shape_id_ptr)
+    return b2.World._overlap_aabb
 end
 
-b2.IdentityTransform = b2.Transform(b2.Vec2(0, 0), b2.Rot(1, 0))
-
---- @brief
---- @param callback (b2.Shape) -> Boolean
-function b2.World:overlap_circle(x, y, radius, callback)
-    local circle = b2.Circle._create_native(b2.Vec2(x, y), radius)
-    box2d.b2World_OverlapCircleWrapper(self._native, circle, b2.IdentityTransform, box2d.b2DefaultQueryFilter(), function(shape_id_ptr)
-        local shape = meta.new(b2.Shape, {
-            _native = shape_id_ptr[0]
-        })
-        return callback(shape)
+do -- use upvalues to minimize luajit callback count
+    local _overlap_current_callback = nil
+    local _overlap_wrapper_callback = ffi.cast("bool(*)(b2ShapeId*)", function(shape_id_ptr)
+        return _overlap_current_callback(meta.new(b2.Shape, { _native = shape_id_ptr[0] }))
     end)
-end
 
---- @brief
---- @param callback (b2.Shape) -> Boolean
-function b2.World:overlap_capsule(a_x, a_y, b_x, b_y, radius, callback)
-    local capsule = b2.Capsule._create_native(
-        b2.Vec2(a_x, a_y),
-        b2.Vec2(b_x, b_y),
-        radius
-    )
+    --- @brief
+    --- @param callback (b2.Shape) -> Boolean
+    function b2.World:overlap_aabb(x, y, width, height, callback)
+        local aabb = b2.AABB(b2.Vec2(x, y), b2.Vec2(x + width, y + height))
+        _overlap_current_callback = callback
+        box2d.b2World_OverlapAABBWrapper(self._native, aabb, box2d.b2DefaultQueryFilter(), _overlap_wrapper_callback)
+        _overlap_current_callback = nil
+    end
 
-    box2d.b2World_OverlapCapsuleWrapper(self._native, capsule, b2.IdentityTransform, box2d.b2DefaultQueryFilter(), function(shape_id_ptr)
-        local shape = meta.new(b2.Shape, {
-            _native = shape_id_ptr[0]
-        })
-        return callback(shape)
-    end)
-end
+    --- @brief
+    --- @param callback (b2.Shape) -> Boolean
+    function b2.World:overlap_circle(x, y, radius, callback)
+        local circle = b2.Circle._create_native(b2.Vec2(x, y), radius)
+        _overlap_current_callback = callback
+        box2d.b2World_OverlapCircleWrapper(self._native, circle, b2.IdentityTransform, box2d.b2DefaultQueryFilter(), _overlap_wrapper_callback)
+        _overlap_current_callback = nil
+    end
 
---- @brief
---- @param vertices Table<Number> size 2*n, 6 <= size <= 16
---- @param callback (b2.Shape) -> Boolean
-function b2.World:overlap_polygon(vertices, callback)
-    meta.assert_table(vertices)
-    local n_points = #vertices
-    assert(n_points >= 6 and n_points % 2 == 0 and n_points <= 16)
+    --- @brief
+    --- @param callback (b2.Shape) -> Boolean
+    function b2.World:overlap_capsule(a_x, a_y, b_x, b_y, radius, callback)
+        local capsule = b2.Capsule._create_native(
+            b2.Vec2(a_x, a_y),
+            b2.Vec2(b_x, b_y),
+            radius
+        )
 
-    local polygon = b2.Polygon._create_native(vertices)
-    box2d.b2World_OverlapPolygonWrapper(self._native, polygon, b2.IdentityTransform, box2d.b2DefaultQueryFilter(), function(shape_id_ptr)
-        local shape = meta.new(b2.Shape, {
-            _native = shape_id_ptr[0]
-        })
-        return callback(shape)
-    end)
-end
+        _overlap_current_callback = callback
+        box2d.b2World_OverlapCapsuleWrapper(self._native, capsule, b2.IdentityTransform, box2d.b2DefaultQueryFilter(), _overlap_wrapper_callback)
+        _overlap_current_callback = nil
+    end
 
---- @brief
---- @param x x_offset
---- @param y y_offset
---- @param angle rotation
---- @param shape b2.Shape
---- @param callback (b2.Shape) -> Boolean
-function b2.World:overlap_shape(shape, x, y, angle, callback)
-    local native = shape._native
-    local transform = box2d.b2MakeTransform(x, y, angle)
-    local type = box2d.b2Shape_GetType(native)
+    --- @brief
+    --- @param vertices Table<Number> size 2*n, 6 <= size <= 16
+    --- @param callback (b2.Shape) -> Boolean
+    function b2.World:overlap_polygon(vertices, callback)
+        meta.assert_table(vertices)
+        local n_points = #vertices
+        assert(n_points >= 6 and n_points % 2 == 0 and n_points <= 16)
 
-    if type == box2d.b2_circleShape then
-        local circle = box2d.b2Shape_GetCircle(native)
-        box2d.b2World_OverlapCircleWrapper(self._native, circle, transform, box2d.b2DefaultQueryFilter(), function(shape_id_ptr)
-            return callback(meta.new(b2.Shape, { _native = shape_id_ptr[0] }))
-        end)
-    elseif type == box2d.b2_polygonShape then
-        local polygon = box2d.b2Shape_GetPolygon(native)
-        box2d.b2World_OverlapPolygonWrapper(self._native, polygon, transform, box2d.b2DefaultQueryFilter(), function(shape_id_ptr)
-            return callback(meta.new(b2.Shape, { _native = shape_id_ptr[0] }))
-        end)
-    elseif type == box2d.b2_capsuleShape then
-        local capsule = box2d.b2Shape_GetCapsule(native)
-        box2d.b2World_OverlapCapsuleWrapper(self._native, capsule, transform, box2d.b2DefaultQueryFilter(), function(shape_id_ptr)
-            return callback(meta.new(b2.Shape, { _native = shape_id_ptr[0] }))
-        end)
-    elseif type == box2d.b2_segmentShape then
-        rt.error("In b2.World:overlap_shape: Shape type `Segment` unsupported for overlap tests, use World:raycast")
-    elseif type == box2d.b2_chainSegmentShape then
-        rt.error("In b2.World:overlap_shape: Shape type `ChainSegment` unsupported for overlap tests, use World:raycast")
-    else
-        error("In b2.Shape:draw: unhandlined shape type `" .. type .. "`")
+        local polygon = b2.Polygon._create_native(vertices)
+        _overlap_current_callback = callback
+        box2d.b2World_OverlapPolygonWrapper(self._native, polygon, b2.IdentityTransform, box2d.b2DefaultQueryFilter(), _overlap_wrapper_callback)
+    end
+
+
+    --- @brief
+    --- @param x x_offset
+    --- @param y y_offset
+    --- @param angle rotation
+    --- @param shape b2.Shape
+    --- @param callback (b2.Shape) -> Boolean
+    function b2.World:overlap_shape(shape, x, y, angle, callback)
+        local native = shape._native
+        local transform = box2d.b2MakeTransform(x, y, angle)
+        local type = box2d.b2Shape_GetType(native)
+
+        _overlap_current_callback = callback
+
+        if type == box2d.b2_circleShape then
+            local circle = box2d.b2Shape_GetCircle(native)
+            box2d.b2World_OverlapCircleWrapper(self._native, circle, transform, box2d.b2DefaultQueryFilter(), _overlap_wrapper_callback)
+        elseif type == box2d.b2_polygonShape then
+            local polygon = box2d.b2Shape_GetPolygon(native)
+            box2d.b2World_OverlapPolygonWrapper(self._native, polygon, transform, box2d.b2DefaultQueryFilter(), _overlap_wrapper_callback)
+        elseif type == box2d.b2_capsuleShape then
+            local capsule = box2d.b2Shape_GetCapsule(native)
+            box2d.b2World_OverlapCapsuleWrapper(self._native, capsule, transform, box2d.b2DefaultQueryFilter(), _overlap_wrapper_callback)
+        elseif type == box2d.b2_segmentShape then
+            rt.error("In b2.World:overlap_shape: Shape type `Segment` unsupported for overlap tests, use World:raycast")
+        elseif type == box2d.b2_chainSegmentShape then
+            rt.error("In b2.World:overlap_shape: Shape type `ChainSegment` unsupported for overlap tests, use World:raycast")
+        else
+            rt.error("In b2.Shape:draw: unhandlined shape type `" .. type .. "`")
+        end
+
+        _overlap_current_callback = nil
     end
 end
 
@@ -293,7 +302,7 @@ end
 
 --- @brief
 --- void b2DrawPolygonFcn(const b2Vec2* vertices, int vertex_count, float red, float green, float blue);
-function b2.World._draw_polygon(vertices, vertex_count, red, green, blue)
+b2.World._draw_polygon = ffi.cast("b2DrawPolygonFcn*", function(vertices, vertex_count, red, green, blue)
     b2.World._bind_color(red, green, blue)
     local to_draw = {}
     for i = 1, vertex_count do
@@ -303,11 +312,11 @@ function b2.World._draw_polygon(vertices, vertex_count, red, green, blue)
     end
 
     love.graphics.polygon("line", table.unpack(to_draw))
-end
+end)
 
 --- @brief
 --- void b2DrawSolidPolygonFcn(b2Transform* transform, const b2Vec2* vertices, int vertex_count, float radius, float red, float green, float blue);
-function b2.World._draw_solid_polygon(transform, vertices, vertex_count, radius, red, green, blue)
+b2.World._draw_solid_polygon = ffi.cast("b2DrawSolidPolygonFcn*", function(transform, vertices, vertex_count, radius, red, green, blue)
     b2.World._bind_color(red, green, blue)
     local translate_x, translate_y = transform.p.x, transform.p.y
     local angle = math.atan2(transform.q.s, transform.q.c)
@@ -324,18 +333,18 @@ function b2.World._draw_solid_polygon(transform, vertices, vertex_count, radius,
 
     love.graphics.polygon("fill", table.unpack(to_draw))
     love.graphics.pop()
-end
+end)
 
 --- @brief
 --- void b2DrawCircleFcn(b2Vec2* center, float radius, float red, float green, float blue);
-function b2.World._draw_circle(center, radius, red, green, blue)
+b2.World._draw_circle = ffi.cast("b2DrawCircleFcn*", function(center, radius, red, green, blue)
     b2.World._bind_color(red, green, blue)
     love.graphics.circle("line", center.x, center.y, radius)
-end
+end)
 
 --- @brief
 --- void b2DrawSolidCircleFcn(b2Transform* transform, float radius, float red, float green, float blue);
-function b2.World._draw_solid_circle(transform, radius, red, green, blue)
+b2.World._draw_solid_circle = ffi.cast("b2DrawSolidCircleFcn*", function(transform, radius, red, green, blue)
     b2.World._bind_color(red, green, blue)
     local translate_x, translate_y = transform.p.x, transform.p.y
     local angle = math.atan2(transform.q.s, transform.q.c)
@@ -346,11 +355,11 @@ function b2.World._draw_solid_circle(transform, radius, red, green, blue)
     love.graphics.circle("line", 0, 0, radius)
 
     love.graphics.pop()
-end
+end)
 
 --- @brief
 --- void b2DrawSolidCapsuleFcn(b2Vec2* p1, b2Vec2* p2, float radius, float red, float green, float blue);
-function b2.World._draw_solid_capsule(p1, p2, radius, red, green, blue)
+b2.World._draw_solid_capsule = ffi.cast("b2DrawSolidCapsuleFcn*", function(p1, p2, radius, red, green, blue)
 
     local x1, y1, x2, y2 = p1.x, p1.y, p2.x, p2.y
 
@@ -379,34 +388,34 @@ function b2.World._draw_solid_capsule(p1, p2, radius, red, green, blue)
     love.graphics.rotate(-angle)
     love.graphics.translate(-x1, -y1)
     love.graphics.pop()
-end
+end)
 
 --- @brief
 --- void b2DrawSegmentFcn(b2Vec2* p1, b2Vec2* p2, float red, float green, float blue);
-function b2.World._draw_segment(p1, p2, red, green, blue)
+b2.World._draw_segment = ffi.cast("b2DrawSegmentFcn*", function(p1, p2, red, green, blue)
     love.graphics.setColor(red, green, blue)
     love.graphics.line(p1.x, p1.y, p2.x, p2.y)
-end
+end)
 
 --- @brief
 --- void b2DrawTransformFcn(b2Transform*)
-function b2.World._draw_transform(transform)
+b2.World._draw_transform = ffi.cast("b2DrawTransformFcn*", function(transform)
     local translate_x, translate_y = transform.p.x, transform.p.y
     local angle = math.atan2(transform.q.s, transform.q.c)
     -- noop
-end
+end)
 
 --- @brief
 --- void b2DrawPointFcn(b2Vec2* p, float size, float red, float green, float blue);
-function b2.World._draw_point(p, size, red, green, blue)
+b2.World._draw_point = ffi.cast("b2DrawPointFcn*", function(p, size, red, green, blue)
     love.graphics.setColor(red, green, blue)
     love.graphics.circle("fill", p.x, p.y, size / 2)
-end
+end)
 
 --- @brief
 --- void b2DrawString(b2Vec2* p, const char* s);
-function b2.World._draw_string(p, s)
+b2.World._draw_string = ffi.cast("b2DrawString*", function(p, s)
     love.graphics.printf(ffi.string(s), p.x, p.y, POSITIVE_INFINITY)
-end
+end)
 
 

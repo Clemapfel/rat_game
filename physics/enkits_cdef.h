@@ -41,11 +41,14 @@ void enkiAddTaskSet( void* pETS_, void* pTaskSet_ );
 void enkiWaitForTaskSet( void* pETS_, void* pTaskSet_ );
 
 void* enkiNewTaskScheduler();
+void enkiDeleteTaskScheduler(void* task_scheduler);
+
 struct enkiTaskSchedulerConfig enkiGetTaskSchedulerConfig( void* pETS_ );
 void enkiInitTaskSchedulerWithConfig( void* pETS_, struct enkiTaskSchedulerConfig config_ );
 
 typedef void (* enkiTaskExecuteRange)( uint32_t start_, uint32_t end_, uint32_t threadnum_, void* pArgs_ );
 void* enkiCreateTaskSet( void* pETS_, enkiTaskExecuteRange taskFunc_  );
+void enkiDeleteTaskSet( void* task_scheduler, void* task_set);
 
 void* malloc(size_t size);
 void free(void *ptr);

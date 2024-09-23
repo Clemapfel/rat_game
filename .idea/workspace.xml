@@ -23,20 +23,14 @@
     </configurations>
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="7fa9ba1b-2cff-4ecc-86fb-59ab2fa76ee1" name="Changes" comment="debug drawing working">
-      <change beforePath="$PROJECT_DIR$/.idea/misc.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/misc.xml" afterDir="false" />
+    <list default="true" id="7fa9ba1b-2cff-4ecc-86fb-59ab2fa76ee1" name="Changes" comment="added overlap tests">
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/include.lua" beforeDir="false" afterPath="$PROJECT_DIR$/include.lua" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/main_rope.lua" beforeDir="false" afterPath="$PROJECT_DIR$/main_rope.lua" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/old/fast_physics/enki_cdef.h" beforeDir="false" afterPath="$PROJECT_DIR$/old/fast_physics/enki_cdef.h" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/physics/box2d_cdef.h" beforeDir="false" afterPath="$PROJECT_DIR$/physics/box2d_cdef.h" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/physics/box2d_extension/CMakeLists.txt" beforeDir="false" afterPath="$PROJECT_DIR$/physics/box2d_extension/CMakeLists.txt" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/physics/box2d_extension/box2d_extension.c" beforeDir="false" afterPath="$PROJECT_DIR$/physics/box2d_extension/box2d_extension.c" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/physics/box2d_extension/box2d_extension.h" beforeDir="false" afterPath="$PROJECT_DIR$/physics/box2d_extension/box2d_extension.h" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/physics/capsule.lua" beforeDir="false" afterPath="$PROJECT_DIR$/physics/capsule.lua" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/physics/circle.lua" beforeDir="false" afterPath="$PROJECT_DIR$/physics/circle.lua" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/physics/enkits_cdef.h" beforeDir="false" afterPath="$PROJECT_DIR$/physics/enkits_cdef.h" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/physics/math.lua" beforeDir="false" afterPath="$PROJECT_DIR$/physics/math.lua" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/physics/polygon.lua" beforeDir="false" afterPath="$PROJECT_DIR$/physics/polygon.lua" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/physics/segment.lua" beforeDir="false" afterPath="$PROJECT_DIR$/physics/segment.lua" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/physics/world.lua" beforeDir="false" afterPath="$PROJECT_DIR$/physics/world.lua" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
@@ -559,15 +553,7 @@
       <workItem from="1726942576915" duration="2000" />
       <workItem from="1726942790446" duration="418000" />
       <workItem from="1726943710058" duration="2917000" />
-      <workItem from="1726946691418" duration="28961000" />
-    </task>
-    <task id="LOCAL-01031" summary="added double button keybinding indicator">
-      <option name="closed" value="true" />
-      <created>1725550772285</created>
-      <option name="number" value="01031" />
-      <option name="presentableId" value="LOCAL-01031" />
-      <option name="project" value="LOCAL" />
-      <updated>1725550772285</updated>
+      <workItem from="1726946691418" duration="35912000" />
     </task>
     <task id="LOCAL-01032" summary="moved keybindings into game state">
       <option name="closed" value="true" />
@@ -953,7 +939,15 @@
       <option name="project" value="LOCAL" />
       <updated>1726966943205</updated>
     </task>
-    <option name="localTasksCounter" value="1080" />
+    <task id="LOCAL-01080" summary="added overlap tests">
+      <option name="closed" value="true" />
+      <created>1727126100240</created>
+      <option name="number" value="01080" />
+      <option name="presentableId" value="LOCAL-01080" />
+      <option name="project" value="LOCAL" />
+      <updated>1727126100240</updated>
+    </task>
+    <option name="localTasksCounter" value="1081" />
     <servers />
   </component>
   <component name="TypeScriptGeneratedFilesManager">
@@ -1002,7 +996,6 @@
     </option>
   </component>
   <component name="VcsManagerConfiguration">
-    <MESSAGE value="switchin to queueable source" />
     <MESSAGE value="stashing sound" />
     <MESSAGE value="added physics" />
     <MESSAGE value="imported new physics to battle" />
@@ -1027,7 +1020,8 @@
     <MESSAGE value="migrated to box2d v3.1" />
     <MESSAGE value="stashing before adding enki" />
     <MESSAGE value="debug drawing working" />
-    <option name="LAST_COMMIT_MESSAGE" value="debug drawing working" />
+    <MESSAGE value="added overlap tests" />
+    <option name="LAST_COMMIT_MESSAGE" value="added overlap tests" />
   </component>
   <component name="XDebuggerManager">
     <breakpoint-manager>
@@ -1046,11 +1040,6 @@
           <url>file://$PROJECT_DIR$/old/fast_physics/shape.lua</url>
           <line>231</line>
           <option name="timeStamp" value="12" />
-        </line-breakpoint>
-        <line-breakpoint enabled="true" type="com.jetbrains.cidr.execution.debugger.OCBreakpointType">
-          <url>file://$PROJECT_DIR$/old/fast_physics/enki_cdef.h</url>
-          <line>21</line>
-          <option name="timeStamp" value="10" />
         </line-breakpoint>
         <line-breakpoint enabled="true" suspend="NONE" type="CMakeLineBreakpoint">
           <url>file://$PROJECT_DIR$/physics/box2d_extension/CMakeLists.txt</url>

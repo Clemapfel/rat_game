@@ -2985,8 +2985,6 @@ b2Transform b2MakeTransform(float x, float y, float angle_rad);
 
 // MULTI THREADING
 
-typedef void b2TaskCallback( int32_t startIndex, int32_t endIndex, uint32_t workerIndex, void* taskContext );
-
 typedef struct b2TaskData {
     b2TaskCallback* callback;
     void* context;
@@ -2994,8 +2992,8 @@ typedef struct b2TaskData {
 
 typedef struct b2UserContext {
     void* scheduler;
-    void* tasks[64];
-    b2TaskData task_data[64];
+    void* tasks[256];
+    b2TaskData task_data[256];
     int n_tasks;
 } b2UserContext;
 

@@ -14,8 +14,8 @@ BOX2D_EXPORT typedef struct b2TaskData {
 
 BOX2D_EXPORT typedef struct b2UserContext {
     void* scheduler;
-    void* tasks[64];
-    b2TaskData task_data[64];
+    void* tasks[256];
+    b2TaskData task_data[256];
     int n_tasks;
 } b2UserContext;
 

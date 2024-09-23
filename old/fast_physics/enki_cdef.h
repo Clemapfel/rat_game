@@ -41,6 +41,8 @@ void enkiAddTaskSet( void* pETS_, void* pTaskSet_ );
 void enkiWaitForTaskSet( void* pETS_, void* pTaskSet_ );
 
 void* enkiNewTaskScheduler();
+void enkiDeleteTaskScheduler(void* scheduler);
+
 struct enkiTaskSchedulerConfig enkiGetTaskSchedulerConfig( void* pETS_ );
 void enkiInitTaskSchedulerWithConfig( void* pETS_, struct enkiTaskSchedulerConfig config_ );
 

@@ -95,7 +95,7 @@ end
 love.keypressed = function(which)
     local player_x, player_y = player:get_centroid()
     local rotation = player:get_angle()
-    world:overlap_shape(player_shape, player_x, player_y, rotation, function(shape)
+    world:overlap_aabb(0, 0, screen_w, screen_h, function(shape)
         dbg(shape:get_type())
         return true
     end)
