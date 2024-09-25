@@ -43,19 +43,34 @@ input:signal_connect("pressed", function(_, which)
 end)
 
 love.load = function()
+    rt.profiler.start()
+
     background:realize()
     state:_load()
-    state:set_current_scene(bt.BattleScene)
+    state:set_current_scene(mn.InventoryScene)
     love.resize(love.graphics.getWidth(), love.graphics.getHeight())
+
+    rt.profiler.stop()
+    local str, data = rt.profiler.report()
+    println(str)
 end
 
 love.update = function(delta)
+    if once == true then
+        rt.profiler.start()
+    end
+
     background:update(delta)
     state:_update(delta)
+
+    if once == true then
+        rt.profiler.stop()
+        rt.profiler.report()
+        once = false
+    end
 end
 
 love.draw = function()
-    --background:draw()
     if draw_state then
         state:_draw()
     end

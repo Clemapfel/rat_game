@@ -35,6 +35,10 @@ function values(t)
     end
 end
 
+do
+    
+end
+
 --- @brief iterate over keys of tbale
 function keys(t)
     if t == nil then return function() return nil end end
@@ -45,32 +49,34 @@ function keys(t)
     end
 end
 
---- @brief iterate arbitrary number of elements, if vararg contains nils, they will be skipped
---- @vararg any
-function range(...)
-    local elements = {...}
-    local n_elements = _G._select('#', ...)
+do
+    local _range_iterator = function(state)
+        local index, n_elements = state.index, state.n_elements
+        if index > n_elements then return nil end
 
-    local state = {}
-    for i = 1, n_elements do
-        state[i] = elements[i]
+        while state[index] == nil and index <= n_elements do
+            index = index + 1
+        end
+        state.index = index + 1
+        return state[index], state
     end
 
-    state.index = 1
-    state.n_elements = n_elements
+    --- @brief iterate arbitrary number of elements, if vararg contains nils, they will be skipped
+    --- @vararg any
+    function range(...)
+        local elements = {...}
+        local n_elements = _G._select('#', ...)
 
-    return _range_iterator, state
-end
+        local state = {}
+        for i = 1, n_elements do
+            state[i] = elements[i]
+        end
 
-_range_iterator = function(state)
-    local index, n_elements = state.index, state.n_elements
-    if index > n_elements then return nil end
+        state.index = 1
+        state.n_elements = n_elements
 
-    while state[index] == nil and index <= n_elements do
-        index = index + 1
+        return _range_iterator, state
     end
-    state.index = index + 1
-    return state[index], state
 end
 
 function eachindex(t, size)

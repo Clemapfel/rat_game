@@ -62,6 +62,7 @@ bt = rt.battle
 ow = rt.overworld
 b2 = rt.physics
 
+
 for _, name in pairs({"rt", "bt", "ow", "b2"}) do
     local t = _G[name]
     setmetatable(t, {
@@ -76,6 +77,8 @@ require "common.common"
 require "common.serialize"
 require "common.meta"
 meta.make_auto_extend(rt.settings, true)
+
+rt.profiler = require "profiler.profiler"
 
 -- common
 require "common.time"

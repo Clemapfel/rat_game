@@ -27,6 +27,7 @@ profiler._clock_before = 0
 profiler._stacktrace_reversed = false
 profiler._delimiter = ";"
 profiler._zone_stack = {} -- Stack<String>
+profiler._stack_order_reversed = true
 
 profiler._native_cb = function(thread, n_samples, state)
     local stackdepth

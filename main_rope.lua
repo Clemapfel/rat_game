@@ -9,6 +9,7 @@ chain_body = nil
 player = nil
 
 love.load = function()
+    rt.profiler.start()
     local margin_x, margin_y = 0.01 * rt.graphics.get_width(), 0.01 * rt.graphics.get_height()
     local floor_body = b2.Body(world, b2.BodyType.STATIC, 0.5 * rt.graphics.get_width(), 0.5 * rt.graphics.get_height())
     local floor_xr, floor_yr = 0.5 * rt.graphics.get_width() - 0.5 * margin_x, 0.5 * rt.graphics.get_height() - 0.5 * margin_y
@@ -90,15 +91,21 @@ love.load = function()
         previous_body = body
         previous_body_bottom_x, previous_body_bottom_y = bottom_x, bottom_y
     end
+    rt.profiler.stop()
+    local str, _ = rt.profiler.report()
+    println(str)
 end
 
 love.keypressed = function(which)
+    rt.profiler.report()
+    --[[
     local player_x, player_y = player:get_centroid()
     local rotation = player:get_angle()
     world:overlap_aabb(0, 0, screen_w, screen_h, function(shape)
         dbg(shape:get_type())
         return true
     end)
+    ]]--
 end
 
 love.update = function(delta)
@@ -112,7 +119,11 @@ love.update = function(delta)
 end
 
 love.draw = function()
+
     world:draw()
+
+
+
     --[[
     for shape in values(shapes) do
         shape:draw()
