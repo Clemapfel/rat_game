@@ -1,5 +1,7 @@
 require "include"
 
+rt.profiler.push("load")
+
 state = rt.GameState()
 state:initialize_debug_state()
 
@@ -20,6 +22,7 @@ input:signal_connect("keyboard_pressed", function(_, which)
     elseif which == rt.KeyboardKey.FOUR then
         state:set_current_scene(bt.BattleScene)
     elseif which == rt.KeyboardKey.ESCAPE then
+        rt.profiler.report()
     end
 end)
 
@@ -36,44 +39,39 @@ end)
 
 input:signal_connect("pressed", function(_, which)
     if which == rt.InputButton.A then
-       --component:play("test/alarm")
+        --component:play("test/alarm")
     elseif which == rt.InputButton.B then
 
+    elseif which == rt.InputButton.DEBUG then
     end
 end)
 
 love.load = function()
-    rt.profiler.start()
+    rt.profiler.push("load")
 
     background:realize()
     state:_load()
     state:set_current_scene(mn.InventoryScene)
     love.resize(love.graphics.getWidth(), love.graphics.getHeight())
 
-    rt.profiler.stop()
-    local str, data = rt.profiler.report()
-    println(str)
+    rt.profiler.pop()
 end
 
 love.update = function(delta)
-    if once == true then
-        rt.profiler.start()
-    end
+    rt.profiler.push("update")
 
     background:update(delta)
     state:_update(delta)
 
-    if once == true then
-        rt.profiler.stop()
-        rt.profiler.report()
-        once = false
-    end
+    rt.profiler.pop()
 end
 
 love.draw = function()
+    rt.profiler.push("draw")
     if draw_state then
         state:_draw()
     end
+    rt.profiler.pop()
 end
 
 love.resize = function(new_width, new_height)

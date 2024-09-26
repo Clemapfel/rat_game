@@ -1,283 +1,211 @@
 local profiler = {}
 profiler._jit = require("jit.profile")
-profiler._socket = require "socket"
+
 profiler._run_i = 1
 profiler._is_running = false
-profiler._current_zone = nil
-profiler._data = {} -- cf. profiler.start for layout
 
-assert(profiler._jit ~= nil, "[FATAL] In profiler/profiler.lua: `jit.profile` not available, make sure you are running this file using luajit")
-assert(profiler._socket ~= nil, "[FATAL] In profiler/profiler.lua: `socket` not found, make sure you are using Love2D")
 
---- @brief [internal] get timestamp with nanosecond precision
-function profiler._get_time()
-    return profiler._socket.gettime()
-end
+profiler._data = {}
+profiler.n_samples = 0
 
---- @class profiler.VMState
-profiler.VMState = {
-    COMPILED_CODE = "N",
-    INTERPRETED_CODE = "I",
-    C_CODE = "C",
-    GARBAGE_COLLECTION = "G",
-    JIT_COMPILER = "J"
-}
+profiler._zone_name_to_index = {}
+profiler._zone_index_to_name = {}
+profiler._zone_index = 1
+profiler._current_zone_stack = {}
+profiler._n_zones = 0
 
+--- @brief [internal]
 do
     local _infinity = 1 / 0
-    local _valid_vm_states = {
-        [profiler.VMState.INTERPRETED_CODE] = true,
-        [profiler.VMState.COMPILED_CODE] = true,
-        [profiler.VMState.C_CODE] = true,
-        [profiler.VMState.GARBAGE_COLLECTION] = true,
-        [profiler.VMState.JIT_COMPILER] = false
-    }
-    local _format = "pl|fZ;" -- <path>:<line_number> <function_name>;
-
-    --- @brief [internal]
+    local _format = "f@plZ;" -- <path>:<line_number> <function_name>;
     profiler._sampling_callback = function(thread, n_samples, vmstate)
-        if _valid_vm_states[vmstate] then
-            local data = profiler._data[profiler._current_zone]
-            data.n_stacks = data.n_stacks + 1
-            table.insert(data.stacks, profiler._jit.dumpstack(thread, _format, _infinity))
-            table.insert(data.times, profiler._get_time())
-            table.insert(data.vmstate, vmstate)
+        local zones = {}
+        for i = 1, profiler._n_zones do
+            table.insert(zones, profiler._current_zone_stack[i])
         end
+
+        local data = {}
+        for _ = 1, n_samples do
+            data.callstack = profiler._jit.dumpstack(thread, _format, _infinity)
+            data.zones = zones
+            table.insert(profiler._data, data)
+        end
+
+        table.insert(profiler._data, data)
+        profiler.n_samples = profiler.n_samples + n_samples
     end
 end
 
 --- @brief
---- @param name String name of zone
---- @param mode profiler.SamplingMode mode
-function profiler.start(name)
-    if profiler._is_running then
-        error("In profiler.start: profiler is already running, zone `" .. profiler._current_zone .. "` is active")
-    end
-
+function profiler.push(name)
     if name == nil then
-        name = "Zone #" .. profiler._run_i
+        name = "Run #" .. profiler._run_i
         profiler._run_i = profiler._run_i + 1
     end
-    assert(type(name) == "string", "In profiler.start: name `" .. tostring(name) .. "` is not a string")
 
-    profiler._is_running = true
-    profiler._current_zone = name
+    assert(type(name) == "string")
 
-    if profiler._data[name] ~= nil then
-        error("In profiler.start: zone name `" .. name .. "` was already used, each zone name has to be unique")
+    local zone_index = profiler._zone_name_to_index[name]
+    if zone_index == nil then
+        zone_index = profiler._zone_index
+        profiler._zone_index = profiler._zone_index + 1
+
+        profiler._zone_name_to_index[name] = zone_index
+        profiler._zone_index_to_name[zone_index] = name
     end
 
-    profiler._data[name] = {
-        zone = name,
-        start_time = profiler._get_time(),
-        end_time = 0,
-        n_stacks = 0,
-        stacks = {},
-        times = {},
-        vmstate = {}
-    }
-    profiler._data[name].start_time = profiler._get_time()
-    profiler._jit.start("i0", profiler._sampling_callback) -- i0 = highest resolution sampling possible
-end
+    table.insert(profiler._current_zone_stack, zone_index)
+    profiler._n_zones = profiler._n_zones + 1
 
---- @brief
-function profiler.stop()
-    if profiler._is_running then
-        profiler._jit.stop()
-        local data = profiler._data[profiler._current_zone]
-        if data ~= nil then
-            data.end_time = profiler._get_time()
-        end
-        profiler._is_running = false
+    if profiler._is_running == false then
+        profiler._is_running = true
+        profiler._jit.start("i0", profiler._sampling_callback)
     end
 end
 
 --- @brief
---- @param name String? name of zone, if not specified, dumps all information collected so far
-function profiler.report(name, shorten_callback)
-    if name == nil then name = profiler._current_zone end
-    if shorten_callback == nil then shorten_callback = 3 end -- infinity
+function profiler.pop()
+    if profiler._n_zones >= 1 then
+        table.remove(profiler._current_zone_stack, profiler._n_zones)
+        profiler._n_zones = profiler._n_zones - 1
 
-    if name == nil or profiler._data[name] == nil then
-        io.write(io.stderr, "[WARNING] In profiler.report: no zone with name `" .. name .. "`, returning no data")
-        return {}
-    end
-
-    local vmstate_to_label = {
-        [profiler.VMState.INTERPRETED_CODE] = "INTERPRETED",
-        [profiler.VMState.COMPILED_CODE] = "COMPILED",
-        [profiler.VMState.C_CODE] = "C CODE",
-        [profiler.VMState.GARBAGE_COLLECTION] = "GC",
-        [profiler.VMState.JIT_COMPILER] = "JIT COMPILATION"
-    }
-
-    local data = profiler._data[name]
-
-    local callstacks = {}
-    local names = data.stacks
-    local durations = {}
-    local types = {}
-    local percentages = {}
-    local last_duration = data.start_time
-    local total_duration = data.end_time - data.start_time
-
-    for i = 1, data.n_stacks do
-        -- sanitize durations
-        local duration = data.times[i] - last_duration
-        local duration_ms = duration * 1000
-        durations[i] = tostring(math.floor(duration_ms * 10e4) / 10e4)
-
-        -- sanitize percentage
-        local fraction = duration / total_duration
-        local fraction_percentage = math.floor(fraction * 10e5) / 10e5 * 100
-        local percentage_prefix = ""
-        if fraction_percentage < 10 then
-            percentage_prefix = "0"
+        if profiler._n_zones == 0 then
+            profiler._jit.stop()
         end
-
-        percentages[i] = percentage_prefix .. tostring(fraction_percentage)
-
-        types[i] = vmstate_to_label[data.vmstate[i]]
-        last_duration = data.times[i]
     end
+end
 
-    -- eliminate redundant stack prefix
-    do
-        local splits = {}
-        local min_n = POSITIVE_INFINITY
-        local counts = {}
-        for i = 1, data.n_stacks do
-            local to_push = {}
-            for part, _ in string.gmatch(names[i], "([^".. ";" .."]+)") do -- split on ;
-                table.insert(to_push, part)
-                if counts[part] == nil then counts[part] = 0 end
-                counts[part] = counts[part] + 1
+---- @brief [internal]
+function profiler._format_callstack(stack)
+    return stack
+end
+
+--- @brief
+function profiler.report()
+    if #profiler._data == 0 then return end
+
+    local all_zones = {}
+
+    -- organize by zone
+    local zone_to_callback_counts = {}
+    local zone_to_total_count = {}
+    for _, data in pairs(profiler._data) do
+        for _, zone_i in pairs(data.zones) do
+            local zone_name = profiler._zone_index_to_name[zone_i]
+            all_zones[zone_name] = true
+
+            local callstack = data.callstack
+            local callback_counts = zone_to_callback_counts[zone_name]
+            if callback_counts == nil then
+                zone_to_callback_counts[zone_name] = {
+                    [callstack] = 1
+                }
+            else
+                if callback_counts[callstack] == nil then
+                    callback_counts[callstack] = 1
+                else
+                    callback_counts[callstack] = callback_counts[callstack] + 1
+                end
             end
-            if #to_push < min_n then min_n = #to_push end
-            table.insert(splits, to_push)
+
+            if zone_to_total_count[zone_name] == nil then
+                zone_to_total_count[zone_name] = 1
+            else
+                zone_to_total_count[zone_name] = zone_to_total_count[zone_name] + 1
+            end
+        end
+    end
+
+    local stack_depth = 3
+    local percentage_cutoff = 0.1
+
+    for zone, _ in pairs(all_zones) do
+        local names = {}
+        local paths = {}
+        local counts = {}
+        local percentages = {}
+        local n_rows = 0
+
+        local splits = {}
+        local split_to_split_count = {}
+
+        local total_count = 0
+        for callstack, count in pairs(zone_to_callback_counts[zone]) do
+            local to_insert = {}
+            for word in string.gmatch(callstack, "([^;]+)") do
+                table.insert(to_insert, word)
+                if split_to_split_count[word] == nil then
+                    split_to_split_count[word] = 1
+                else
+                    split_to_split_count[word] = split_to_split_count[word] + 1
+                end
+            end
+
+            table.insert(splits, to_insert)
+
+            table.insert(counts, count)
+            total_count = total_count + count
+            n_rows = n_rows + 1
         end
 
-        for i = 1, data.n_stacks do
-            local current_split = splits[i]
-            local to_remove = {}
-            for j = 1, #current_split do
-                if counts[current_split[j]] >= data.n_stacks then
-                    table.insert(to_remove, j)
+        -- filter common prefixes
+        for row_i = 1, n_rows do
+            local split = splits[row_i]
+            local to_skip = 0
+            for i = 1, #split do
+                if split_to_split_count[split[i]] >= n_rows then
+                    to_skip = to_skip + 1
                 else
                     break
                 end
             end
 
-            table.sort(to_remove, function(a, b) return a > b end)
-            for _, to_remove_i in pairs(to_remove) do
-                table.remove(current_split, to_remove_i)
+            local path = {}
+            for i = math.max(to_skip, #split - stack_depth), #split do
+                table.insert(path, split[i])
             end
+
+            table.insert(names, split[#split])
+            table.remove(split, #split)
+            table.insert(paths, table.concat(path, " > "))
+            table.insert(percentages, math.floor(counts[row_i] / total_count * 10e3) / 10e3 * 100)
         end
 
-        for i = 1, data.n_stacks do
-            local split = splits[i]
-            names[i] = string.match(split[#split], ".*|(.*)$") -- everything after last |
+        local indices_in_order = {}
+        for i = 1, n_rows do table.insert(indices_in_order, i) end
+        table.sort(indices_in_order, function(a_i, b_i)
+            return counts[a_i] > counts[b_i]
+        end)
 
-            local callstack = {}
+        local col_width = {}
+        local columns = {
+            {"Percentage %", percentages },
+            {"Samples", counts },
+            {"Name", names },
+            {"Callstack", paths}
+        }
 
-            for split_i = math.max(#split - shorten_callback + 1, 1), #split do
-                local element = split[split_i]
-                local sep_i = string.find(element, "|")
-                table.insert(callstack, string.sub(element, sep_i+1, #element) .. "@" .. string.sub(element, 1, sep_i-1))
-            end
-            callstacks[i] = table.concat(callstack, " > ")
+        local col_lenghts = {}
+        for _, header_values in pairs(columns) do
+
         end
+
+        local str = {zone .. " (" .. total_count .. " samples)" .. ":\n"}
+        for _, row_i in pairs(indices_in_order) do
+            if percentages[row_i] < percentage_cutoff then break end
+
+            table.insert(str, "\t" .. percentages[row_i])
+            table.insert(str, "\t" .. counts[row_i])
+            table.insert(str, "\t\t" .. names[row_i])
+            table.insert(str, "\t" .. paths[row_i])
+            table.insert(str, "\n")
+        end
+        table.insert(str, "\n")
+
+        dbg(table.concat(str, ""))
     end
-
-    -- calculate per-row width and format as string
-    local rows = {
-        names,
-        percentages,
-        durations,
-        --types,
-        callstacks
-    }
-
-    local row_headers = {
-        "Name",
-        "Percentage (%)",
-        "Duration (ms)",
-        --"Type",
-        "Callstack (Last " .. shorten_callback .. ")"
-    }
-
-    local row_lengths = {}
-    for row_i = 1, #rows do
-        local row = rows[row_i]
-        local row_length = #row_headers[row_i]
-        for i = 1, data.n_stacks do
-            row_length = math.max(row_length, #rows[row_i][i])
-        end
-        row_lengths[row_i] = row_length
-    end
-
-    local first_line =  {"| "}
-    local second_line = {"|-"}
-    for row_i = 1, #rows do
-        local header = row_headers[row_i]
-        table.insert(first_line, header .. string.rep(" ", row_lengths[row_i] - #header))
-        table.insert(second_line, string.rep("-", row_lengths[row_i]))
-
-        if row_i < #rows then
-            table.insert(first_line, " | ")
-            table.insert(second_line, "-|-")
-        else
-            table.insert(first_line, " |")
-            table.insert(second_line, "-|")
-        end
-    end
-
-    local lines = {
-        table.concat(first_line, ""),
-        table.concat(second_line, "")
-    }
-
-    local row_order = {}
-    for i = 1, data.n_stacks do row_order[i] = i end
-    table.sort(row_order, function(a_i, b_i)
-        return durations[a_i] > durations[b_i]
-    end)
-
-    for _, line_i in pairs(row_order) do
-        local line = {"| "}
-        for row_i = 1, #rows do
-            local value = rows[row_i][line_i]
-            table.insert(line, value .. string.rep(" ", row_lengths[row_i] - #value))
-            if row_i < #rows then
-                table.insert(line, " | ")
-            else
-                table.insert(line, " |")
-            end
-        end
-        table.insert(lines, table.concat(line, ""))
-    end
-
-   local out = "Total Duration: " .. total_duration * 1000 .. "ms\n" .. table.concat(lines, "\n")
-    return out
-end
-
---- @brief
-function profiler.is_running()
-    return profiler._is_running
-end
-
---- @brief
-function profiler.free_zone(name)
-    if profiler._current_zone == name then
-        if profiler._is_running then
-            io.write(io.stderr, "[WARNING] In profiler.free_zone: attempint to free zone `" .. name .. "` but it is currently active and profiling. No operation will be performed.")
-            return
-        end
-        profiler._current_zone = nil
-    end
-
-    profiler._data[name] = nil
-    collectgarbage("collect")
 end
 
 return profiler
+
+

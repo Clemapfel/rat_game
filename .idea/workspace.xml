@@ -23,15 +23,11 @@
     </configurations>
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="7fa9ba1b-2cff-4ecc-86fb-59ab2fa76ee1" name="Changes" comment="refactored to minimize luajit callback count">
-      <change afterPath="$PROJECT_DIR$/profiler/profiler.lua" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/.idea/vcs.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/vcs.xml" afterDir="false" />
+    <list default="true" id="7fa9ba1b-2cff-4ecc-86fb-59ab2fa76ee1" name="Changes" comment="stashing profiler">
+      <change afterPath="$PROJECT_DIR$/profiler/~profiler.lua" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/common/common.lua" beforeDir="false" afterPath="$PROJECT_DIR$/common/common.lua" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/include.lua" beforeDir="false" afterPath="$PROJECT_DIR$/include.lua" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/main.lua" beforeDir="false" afterPath="$PROJECT_DIR$/main.lua" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/main_rope.lua" beforeDir="false" afterPath="$PROJECT_DIR$/main_rope.lua" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/older/~common/profiler.lua" beforeDir="false" afterPath="$PROJECT_DIR$/older/~common/profiler.lua" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/profiler/profiler.lua" beforeDir="false" afterPath="$PROJECT_DIR$/profiler/profiler.lua" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -150,7 +146,7 @@
       <recent name="C:\Users\cleme\Workspace\rat_game\assets\configs" />
     </key>
   </component>
-  <component name="RunManager" selected="Lua Application.main_rope">
+  <component name="RunManager" selected="Lua Application.main">
     <configuration name="box2d" type="CMakeRunConfiguration" factoryName="Application" REDIRECT_INPUT="false" ELEVATE="false" USE_EXTERNAL_CONSOLE="false" EMULATE_TERMINAL="false" PASS_PARENT_ENVS_2="true" PROJECT_NAME="box2d_wrapper" TARGET_NAME="box2d" CONFIG_NAME="Debug">
       <method v="2">
         <option name="com.jetbrains.cidr.execution.CidrBuildBeforeRunTaskProvider$BuildBeforeRunTask" enabled="true" />
@@ -550,15 +546,7 @@
       <workItem from="1726943710058" duration="2917000" />
       <workItem from="1726946691418" duration="37119000" />
       <workItem from="1727197616942" duration="776000" />
-      <workItem from="1727276997949" duration="23026000" />
-    </task>
-    <task id="LOCAL-01033" summary="added enkits">
-      <option name="closed" value="true" />
-      <created>1725582548500</created>
-      <option name="number" value="01033" />
-      <option name="presentableId" value="LOCAL-01033" />
-      <option name="project" value="LOCAL" />
-      <updated>1725582548502</updated>
+      <workItem from="1727276997949" duration="34364000" />
     </task>
     <task id="LOCAL-01034" summary="stashing before refactored mapping">
       <option name="closed" value="true" />
@@ -944,7 +932,15 @@
       <option name="project" value="LOCAL" />
       <updated>1727133136406</updated>
     </task>
-    <option name="localTasksCounter" value="1082" />
+    <task id="LOCAL-01082" summary="stashing profiler">
+      <option name="closed" value="true" />
+      <created>1727300612482</created>
+      <option name="number" value="01082" />
+      <option name="presentableId" value="LOCAL-01082" />
+      <option name="project" value="LOCAL" />
+      <updated>1727300612483</updated>
+    </task>
+    <option name="localTasksCounter" value="1083" />
     <servers />
   </component>
   <component name="TypeScriptGeneratedFilesManager">
@@ -993,7 +989,6 @@
     </option>
   </component>
   <component name="VcsManagerConfiguration">
-    <MESSAGE value="added physics" />
     <MESSAGE value="imported new physics to battle" />
     <MESSAGE value="capsules working" />
     <MESSAGE value="stashing rope" />
@@ -1018,7 +1013,8 @@
     <MESSAGE value="debug drawing working" />
     <MESSAGE value="added overlap tests" />
     <MESSAGE value="refactored to minimize luajit callback count" />
-    <option name="LAST_COMMIT_MESSAGE" value="refactored to minimize luajit callback count" />
+    <MESSAGE value="stashing profiler" />
+    <option name="LAST_COMMIT_MESSAGE" value="stashing profiler" />
   </component>
   <component name="XDebuggerManager">
     <breakpoint-manager>
