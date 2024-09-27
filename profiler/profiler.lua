@@ -148,7 +148,6 @@ function profiler.report()
             n_rows = n_rows + 1
         end
 
-        -- filter common prefixes
         for row_i = 1, n_rows do
             local split = splits[row_i]
             local to_skip = 0
@@ -165,10 +164,12 @@ function profiler.report()
                 table.insert(path, split[i])
             end
 
-            table.insert(names, split[#split])
-            table.remove(split, #split)
-            table.insert(paths, table.concat(path, " > "))
-            table.insert(percentages, math.floor(counts[row_i] / total_count * 10e3) / 10e3 * 100)
+            for split_i = 1, #split do
+                table.insert(names, split[split_i])
+                table.remove(split, #split)
+                table.insert(paths, table.concat(path, " > "))
+                table.insert(percentages, math.floor(counts[row_i] / total_count * 10e3) / 10e3 * 100)
+            end
         end
 
         local indices_in_order = {}
@@ -182,28 +183,74 @@ function profiler.report()
             {"Percentage %", percentages },
             {"Samples", counts },
             {"Name", names },
-            {"Callstack", paths}
+            --{"Callstack", paths}
         }
 
-        local col_lenghts = {}
-        for _, header_values in pairs(columns) do
-
+        local cutoff_i = 1
+        while cutoff_i <= #percentages and percentages[cutoff_i] >= 1 do
+            cutoff_i = cutoff_i + 1
         end
 
-        local str = {zone .. " (" .. total_count .. " samples)" .. ":\n"}
+        local col_lengths = {}
+        for i, _ in ipairs(columns) do col_lengths[i] = #columns[i][1] end
+
+        for col_i, column in ipairs(columns) do
+            for i, value in ipairs(column[2]) do
+                col_lengths[col_i] = math.max(col_lengths[col_i],  #tostring(value))
+            end
+        end
+
+        local header = {" | "}
+        local sub_header = {" |-"}
+        for col_i, col in ipairs(columns) do
+            table.insert(header, col[1] .. string.rep(" ", col_lengths[col_i] - #col[1]))
+            table.insert(sub_header, string.rep("-", col_lengths[col_i]))
+            if col_i < sizeof(columns) then
+                table.insert(header, " | ")
+                table.insert(sub_header, "-|-")
+            end
+        end
+
+        table.insert(header, " |")
+        table.insert(sub_header, "-|")
+
+        local str = {
+            " | Zone `" .. zone .. "` (" .. total_count .. " samples)" .. "\n",
+            table.concat(header, "") .. "\n",
+            table.concat(sub_header, "") .. "\n"
+        }
+
+        local rows_printed = 0
+        local cutoff_n_samples = 0
+        local cutoff_total_percentage = 0
+
         for _, row_i in pairs(indices_in_order) do
-            if percentages[row_i] < percentage_cutoff then break end
+            if rows_printed >= cutoff_i then
+                cutoff_n_samples = cutoff_n_samples + counts[row_i]
+                cutoff_total_percentage = cutoff_total_percentage + percentages[row_i]
+            else
+                for col_i = 1, sizeof(columns) do
+                    local value = tostring(columns[col_i][2][row_i])
+                    value = value .. string.rep(" ", col_lengths[col_i] - #value)
+                    table.insert(str, " | " .. value)
+                end
+                table.insert(str, " |\n")
+            end
 
-            table.insert(str, "\t" .. percentages[row_i])
-            table.insert(str, "\t" .. counts[row_i])
-            table.insert(str, "\t\t" .. names[row_i])
-            table.insert(str, "\t" .. paths[row_i])
-            table.insert(str, "\n")
+            rows_printed = rows_printed + 1
         end
-        table.insert(str, "\n")
 
+        local last_row_percentage = "< 1"--tostring(cutoff_total_percentage)
+        local last_row = {" | "}
+        table.insert(last_row,  last_row_percentage .. string.rep(" ", col_lengths[1] - #last_row_percentage) .. " | ")
+        table.insert(last_row,tostring(cutoff_n_samples) .. string.rep(" ", col_lengths[2] - #tostring(cutoff_n_samples)) .. " | ")
+        table.insert(last_row, "..." .. string.rep(" ", col_lengths[3] - #("...")) .. " |")
+        table.insert(str, table.concat(last_row, ""))
+
+        table.insert(str, "\n")
         dbg(table.concat(str, ""))
     end
+
 end
 
 return profiler
