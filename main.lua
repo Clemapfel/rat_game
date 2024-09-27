@@ -1,7 +1,5 @@
 require "include"
 
-rt.profiler.push("test")
-
 state = rt.GameState()
 state:initialize_debug_state()
 
@@ -59,9 +57,11 @@ love.update = function(delta)
 end
 
 love.draw = function()
+    rt.profiler.push("draw")
     if draw_state then
         state:_draw()
     end
+    rt.profiler.pop()
 end
 
 love.resize = function(new_width, new_height)

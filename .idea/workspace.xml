@@ -23,10 +23,8 @@
     </configurations>
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="7fa9ba1b-2cff-4ecc-86fb-59ab2fa76ee1" name="Changes" comment="stashing profiler">
+    <list default="true" id="7fa9ba1b-2cff-4ecc-86fb-59ab2fa76ee1" name="Changes" comment="profiler done">
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/common/coroutine.lua" beforeDir="false" afterPath="$PROJECT_DIR$/common/coroutine.lua" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/common/game_state.lua" beforeDir="false" afterPath="$PROJECT_DIR$/common/game_state.lua" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/main.lua" beforeDir="false" afterPath="$PROJECT_DIR$/main.lua" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/profiler/profiler.lua" beforeDir="false" afterPath="$PROJECT_DIR$/profiler/profiler.lua" afterDir="false" />
     </list>
@@ -547,15 +545,7 @@
       <workItem from="1726943710058" duration="2917000" />
       <workItem from="1726946691418" duration="37119000" />
       <workItem from="1727197616942" duration="776000" />
-      <workItem from="1727276997949" duration="42006000" />
-    </task>
-    <task id="LOCAL-01036" summary="added benchmark">
-      <option name="closed" value="true" />
-      <created>1725642929038</created>
-      <option name="number" value="01036" />
-      <option name="presentableId" value="LOCAL-01036" />
-      <option name="project" value="LOCAL" />
-      <updated>1725642929039</updated>
+      <workItem from="1727276997949" duration="43344000" />
     </task>
     <task id="LOCAL-01037" summary="stashing">
       <option name="closed" value="true" />
@@ -941,7 +931,15 @@
       <option name="project" value="LOCAL" />
       <updated>1727467634654</updated>
     </task>
-    <option name="localTasksCounter" value="1085" />
+    <task id="LOCAL-01085" summary="profiler done">
+      <option name="closed" value="true" />
+      <created>1727476018798</created>
+      <option name="number" value="01085" />
+      <option name="presentableId" value="LOCAL-01085" />
+      <option name="project" value="LOCAL" />
+      <updated>1727476018798</updated>
+    </task>
+    <option name="localTasksCounter" value="1086" />
     <servers />
   </component>
   <component name="TypeScriptGeneratedFilesManager">
@@ -990,7 +988,6 @@
     </option>
   </component>
   <component name="VcsManagerConfiguration">
-    <MESSAGE value="imported new physics to battle" />
     <MESSAGE value="capsules working" />
     <MESSAGE value="stashing rope" />
     <MESSAGE value="ordered box working" />
@@ -1015,7 +1012,8 @@
     <MESSAGE value="added overlap tests" />
     <MESSAGE value="refactored to minimize luajit callback count" />
     <MESSAGE value="stashing profiler" />
-    <option name="LAST_COMMIT_MESSAGE" value="stashing profiler" />
+    <MESSAGE value="profiler done" />
+    <option name="LAST_COMMIT_MESSAGE" value="profiler done" />
   </component>
   <component name="XDebuggerManager">
     <breakpoint-manager>

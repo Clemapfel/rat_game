@@ -13,7 +13,8 @@ profiler._zone_index_to_name = {}
 profiler._zone_index = 1
 profiler._current_zone_stack = {}
 profiler._n_zones = 0
-profiler._start_time = 0
+profiler._zone_to_start_time = {}
+profiler._zone_to_duration = {}
 profiler._start_date = nil
 
 --- @brief [internal]
@@ -21,21 +22,23 @@ do
     local _infinity = 1 / 0
     local _format = "f @ plZ;" -- <function_name> @ <file>:<line>;
     profiler._sampling_callback = function(thread, n_samples, vmstate)
-        local zones = {}
-        for i = 1, profiler._n_zones do
-            table.insert(zones, profiler._current_zone_stack[i])
-        end
+        if profiler._n_zones > 0 then
+            local zones = {}
+            for i = 1, profiler._n_zones do
+                table.insert(zones, profiler._current_zone_stack[i])
+            end
 
-        local data = {}
-        for _ = 1, n_samples do
-            data.callstack = profiler._jit.dumpstack(thread, _format, _infinity)
-            data.zones = zones
-            data.vmstate = vmstate
+            local data = {}
+            for _ = 1, n_samples do
+                data.callstack = profiler._jit.dumpstack(thread, _format, _infinity)
+                data.zones = zones
+                data.vmstate = vmstate
+                table.insert(profiler._data, data)
+            end
+
             table.insert(profiler._data, data)
+            profiler.n_samples = profiler.n_samples + n_samples
         end
-
-        table.insert(profiler._data, data)
-        profiler.n_samples = profiler.n_samples + n_samples
     end
 end
 
@@ -63,20 +66,32 @@ function profiler.push(name)
     if profiler._is_running == false then
         profiler._is_running = true
         profiler._jit.start("i0", profiler._sampling_callback)
-        profiler._start_time = profiler._socket.gettime()
         profiler._start_date = os.date("%c")
+    end
+
+    if profiler._zone_to_start_time[name] == nil then
+        profiler._zone_to_start_time[name] = profiler._socket.gettime()
+    end
+
+    if profiler._zone_to_duration[name] == nil then
+        profiler._zone_to_duration[name] = 0
     end
 end
 
 --- @brief
 function profiler.pop()
     if profiler._n_zones >= 1 then
+        local last_zone = profiler._zone_index_to_name[profiler._current_zone_stack[#profiler._current_zone_stack]]
         table.remove(profiler._current_zone_stack, profiler._n_zones)
         profiler._n_zones = profiler._n_zones - 1
 
         if profiler._n_zones == 0 then
             --profiler._jit.stop()
         end
+
+        local now = profiler._socket.gettime()
+        profiler._zone_to_duration[last_zone] = profiler._zone_to_duration[last_zone] + (now - profiler._zone_to_start_time[last_zone])
+        profiler._zone_to_start_time[last_zone] = nil
     end
 end
 
@@ -88,6 +103,8 @@ end
 --- @brief
 function profiler.report()
     if #profiler._data == 0 then return end
+    while (profiler._n_zones > 0) do profiler.pop() end
+
     local zone_data = {}
     for _, data in pairs(profiler._data) do
         for _, zone_i in pairs(data.zones) do
@@ -194,7 +211,8 @@ function profiler.report()
         local c_percentage = profiler._format_percentage(entry.n_c_code_samples / (entry.n_interpreted_samples + entry.n_compiled_samples + entry.n_c_code_samples))
         local interpreted_percentage = profiler._format_percentage(entry.n_interpreted_samples / (entry.n_interpreted_samples + entry.n_compiled_samples))
 
-        local duration = profiler._socket.gettime() - profiler._start_time
+
+        local duration = math.round(profiler._zone_to_duration[zone_name] * 10e5) / 10e5
         local samples_per_second = math.round(entry.n_samples / duration)
 
         local str = {
