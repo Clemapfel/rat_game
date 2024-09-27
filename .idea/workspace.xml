@@ -25,6 +25,9 @@
   <component name="ChangeListManager">
     <list default="true" id="7fa9ba1b-2cff-4ecc-86fb-59ab2fa76ee1" name="Changes" comment="stashing profiler">
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/common/coroutine.lua" beforeDir="false" afterPath="$PROJECT_DIR$/common/coroutine.lua" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/common/game_state.lua" beforeDir="false" afterPath="$PROJECT_DIR$/common/game_state.lua" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/main.lua" beforeDir="false" afterPath="$PROJECT_DIR$/main.lua" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/profiler/profiler.lua" beforeDir="false" afterPath="$PROJECT_DIR$/profiler/profiler.lua" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
@@ -121,7 +124,7 @@
     "node.js.selected.package.tslint": "(autodetect)",
     "nodejs_package_manager_path": "npm",
     "run.code.analysis.last.selected.profile": "pProject Default",
-    "settings.editor.selected.configurable": "preferences.pluginManager",
+    "settings.editor.selected.configurable": "preferences.keymap",
     "vue.rearranger.settings.migration": "true"
   }
 }]]></component>
@@ -544,15 +547,7 @@
       <workItem from="1726943710058" duration="2917000" />
       <workItem from="1726946691418" duration="37119000" />
       <workItem from="1727197616942" duration="776000" />
-      <workItem from="1727276997949" duration="36290000" />
-    </task>
-    <task id="LOCAL-01035" summary="stashing before refactored mapping">
-      <option name="closed" value="true" />
-      <created>1725641409711</created>
-      <option name="number" value="01035" />
-      <option name="presentableId" value="LOCAL-01035" />
-      <option name="project" value="LOCAL" />
-      <updated>1725641409711</updated>
+      <workItem from="1727276997949" duration="42006000" />
     </task>
     <task id="LOCAL-01036" summary="added benchmark">
       <option name="closed" value="true" />
@@ -938,7 +933,15 @@
       <option name="project" value="LOCAL" />
       <updated>1727386277966</updated>
     </task>
-    <option name="localTasksCounter" value="1084" />
+    <task id="LOCAL-01084" summary="stashing profiler">
+      <option name="closed" value="true" />
+      <created>1727467634654</created>
+      <option name="number" value="01084" />
+      <option name="presentableId" value="LOCAL-01084" />
+      <option name="project" value="LOCAL" />
+      <updated>1727467634654</updated>
+    </task>
+    <option name="localTasksCounter" value="1085" />
     <servers />
   </component>
   <component name="TypeScriptGeneratedFilesManager">

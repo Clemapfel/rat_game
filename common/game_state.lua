@@ -492,6 +492,7 @@ function rt.GameState:_loading_screen_hide(on_hidden)
     end)
 end
 
+
 --- @brief
 function rt.GameState:set_current_scene(scene_type)
     table.insert(self._active_coroutines, rt.Coroutine(function()

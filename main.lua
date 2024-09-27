@@ -1,6 +1,6 @@
 require "include"
 
-rt.profiler.push("load")
+rt.profiler.push("test")
 
 state = rt.GameState()
 state:initialize_debug_state()
@@ -47,31 +47,21 @@ input:signal_connect("pressed", function(_, which)
 end)
 
 love.load = function()
-    rt.profiler.push("load")
-
     background:realize()
     state:_load()
     state:set_current_scene(mn.InventoryScene)
     love.resize(love.graphics.getWidth(), love.graphics.getHeight())
-
-    rt.profiler.pop()
 end
 
 love.update = function(delta)
-    rt.profiler.push("update")
-
     background:update(delta)
     state:_update(delta)
-
-    rt.profiler.pop()
 end
 
 love.draw = function()
-    rt.profiler.push("draw")
     if draw_state then
         state:_draw()
     end
-    rt.profiler.pop()
 end
 
 love.resize = function(new_width, new_height)

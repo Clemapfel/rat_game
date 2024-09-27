@@ -11,12 +11,12 @@ rt.CoroutineStatus = meta.new_enum({
 })
 
 --- @class rt.Coroutine
-rt.Coroutine = meta.new_type("Coroutine", function(f, start_immediately)
+rt.Coroutine = meta.new_type("Coroutine", function(coroutine_callback, start_immediately)
     if start_immediately == nil then start_immediately = false end
     local out = meta.new(rt.Coroutine, {
         _native = coroutine.create(function(...)
             rt.coroutine.n_active = rt.coroutine.n_active + 1
-            f(...)
+            coroutine_callback(...)
             rt.coroutine.n_active = rt.coroutine.n_active - 1
         end)
     })
