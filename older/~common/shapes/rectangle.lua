@@ -14,7 +14,7 @@ end)
 function rt.Rectangle:draw()
     self:_bind_properties()
     love.graphics.rectangle(
-        ternary(self:get_is_outline(), "line", "fill"),
+        self._outline_mode,
         self._x, self._y,
         self._width, self._height,
         self._corner_radius, self._corner_radius, self._corner_radius * 2

@@ -4,7 +4,6 @@ profiler._socket = require("socket")
 profiler._run_i = 1
 profiler._is_running = false
 
-
 profiler._data = {}
 profiler.n_samples = 0
 
@@ -86,7 +85,7 @@ function profiler.pop()
         profiler._n_zones = profiler._n_zones - 1
 
         if profiler._n_zones == 0 then
-            --profiler._jit.stop()
+            profiler._jit.stop()
         end
 
         local now = profiler._socket.gettime()
@@ -210,7 +209,6 @@ function profiler.report()
         local jit_percentage = profiler._format_percentage(entry.n_jit_samples / entry.n_samples)
         local c_percentage = profiler._format_percentage(entry.n_c_code_samples / (entry.n_interpreted_samples + entry.n_compiled_samples + entry.n_c_code_samples))
         local interpreted_percentage = profiler._format_percentage(entry.n_interpreted_samples / (entry.n_interpreted_samples + entry.n_compiled_samples))
-
 
         local duration = math.round(profiler._zone_to_duration[zone_name] * 10e5) / 10e5
         local samples_per_second = math.round(entry.n_samples / duration)

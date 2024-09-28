@@ -32,6 +32,9 @@ mn.KeybindingScene = meta.new_type("KeybindingScene", rt.Scene, function(state)
         _confirm_abort_dialog = nil, -- rt.MessageDialog
         _keybinding_invalid_dialog = nil, -- rt.MessageDialog
 
+        _snapshots = {}, -- Table<rt.RenderTexture>
+        _active_frame = nil, -- rt.Frame
+        _active_label = nil, -- rt.Label
     })
 end, {
     button_layout = {
@@ -291,9 +294,53 @@ function mn.KeybindingScene:size_allocate(x, y, width, height)
     self._confirm_abort_dialog:fit_into(x, y, width, height)
     self._keybinding_invalid_dialog:fit_into(x, y, width, height)
     self:_regenerate_selection_nodes()
+
+    self:_update_snapshots()
 end
 
---- @breif
+--- @brief
+function mn.KeybindingScene:_update_snapshots()
+    self._snapshots = {
+        rt.RenderTexture(self._bounds.width, self._bounds.height, self._state:get_msaa_quality())
+    }
+
+    self._snapshots[1]:bind_as_render_target()
+
+    local function draw_frame(frame)
+        local before = frame:get_selection_state()
+        frame:set_selection_state(rt.SelectionState.INACTIVE)
+        frame:draw()
+        frame:set_selection_state(before)
+    end
+
+    for frame in range(
+        self._heading_frame,
+        self._go_back_frame,
+        self._accept_frame,
+        self._restore_defaults_frame
+    ) do
+        draw_frame(frame)
+    end
+
+    self._heading_label:draw()
+    self._control_indicator:draw()
+
+    local keyboard_or_gamepad = self._input:get_input_method() == rt.InputMethod.KEYBOARD
+    for item_row in values(self._items) do
+        for item in values(item_row) do
+            draw_frame(item.frame)
+            item.label:draw()
+        end
+    end
+
+    self._go_back_label:draw()
+    self._accept_label:draw()
+    self._restore_defaults_label:draw()
+
+    self._snapshots[1]:unbind_as_render_target()
+end
+
+--- @brief
 function mn.KeybindingScene:_regenerate_selection_nodes()
     self._selection_graph:clear()
 
@@ -324,10 +371,14 @@ function mn.KeybindingScene:_regenerate_selection_nodes()
 
             node:signal_connect("enter", function(self)
                 self.item.frame:set_selection_state(rt.SelectionState.ACTIVE)
+                scene._active_frame = self.item.frame
+                scene._active_label = self.item.label
             end)
 
             node:signal_connect("exit", function(self)
                 self.item.frame:set_selection_state(rt.SelectionState.INACTIVE)
+                scene._active_frame = nil
+                scene._active_label = nil
             end)
 
             node:signal_connect(rt.InputButton.A, function(self)
@@ -342,20 +393,23 @@ function mn.KeybindingScene:_regenerate_selection_nodes()
     self._selection_graph:add(accept_node, abort_node, restore_defaults_node)
 
     local bottom_nodes = {}
-    for node_frame in range(
-        {accept_node, self._accept_frame},
-        {abort_node, self._go_back_frame},
-        {restore_defaults_node, self._restore_defaults_frame}
+    for node_frame_label in range(
+        {accept_node, self._accept_frame, self._accept_label},
+        {abort_node, self._go_back_frame, self._go_back_label},
+        {restore_defaults_node, self._restore_defaults_frame, self._restore_defaults_label}
     ) do
-        local node = node_frame[1]
-        local frame = node_frame[2]
+        local node, frame, label = table.unpack(node_frame_label)
 
         node:signal_connect("enter", function(_)
             frame:set_selection_state(rt.SelectionState.ACTIVE)
+            scene._active_frame = frame
+            scene._active_label = label
         end)
 
         node:signal_connect("exit", function(_)
             frame:set_selection_state(rt.SelectionState.INACTIVE)
+            scene._active_frame = nil
+            scene._active_label = nil
         end)
 
         local min_x_distance = POSITIVE_INFINITY
@@ -448,16 +502,22 @@ end
 --- @override
 function mn.KeybindingScene:draw()
     if self._is_realized ~= true then return end
-    self._heading_frame:draw()
-    self._heading_label:draw()
-    self._control_indicator:draw()
+
+    for snapshot in values(self._snapshots) do
+        snapshot:draw()
+    end
+
+    if self._active_frame ~= nil then
+        self._active_frame:draw()
+    end
+
+    if self._active_label ~= nil then
+        self._active_label:draw()
+    end
 
     local keyboard_or_gamepad = self._input:get_input_method() == rt.InputMethod.KEYBOARD
     for item_row in values(self._items) do
         for item in values(item_row) do
-            item.frame:draw()
-            item.label:draw()
-
             if keyboard_or_gamepad then
                 item.keyboard_indicator:draw()
             else
@@ -465,15 +525,6 @@ function mn.KeybindingScene:draw()
             end
         end
     end
-
-    self._go_back_frame:draw()
-    self._go_back_label:draw()
-
-    self._accept_frame:draw()
-    self._accept_label:draw()
-
-    self._restore_defaults_frame:draw()
-    self._restore_defaults_label:draw()
 
     if self._confirm_load_default_dialog:get_is_active() then
         self._confirm_load_default_dialog:draw()
@@ -493,11 +544,13 @@ function mn.KeybindingScene:make_active()
     if not self._is_realized then self:realize() end
     self._is_active = true
     self._selection_graph:set_current_node(self._accept_node)
+    self:_update_snapshots()
 end
 
 --- @override
 function mn.KeybindingScene:make_inactive()
     self._is_active = false
+    self._snapshots = {}
 end
 
 --- @brief

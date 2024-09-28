@@ -18,7 +18,7 @@ function mn.MSAAIntensityWidget:realize()
     self._is_realized = true
 
     self._shape:set_color(rt.Palette.TRUE_BLACK)
-    --self._shape:set_is_outline(true)
+    self._shape:set_is_outline(true)
     self._shape:set_line_width(2 * rt.settings.margin_unit)
     self._shape:set_line_join(rt.LineJoin.MITER)
     self._shape_background:set_color(rt.Palette.TRUE_WHITE)

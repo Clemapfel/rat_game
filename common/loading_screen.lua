@@ -18,7 +18,9 @@ rt.LoadingScreen = meta.new_type("LoadingScreen", rt.Widget, rt.Animation, rt.Si
         _current_opacity = 0,
         _fade_in_elapsed = 0,
         _fade_out_elapsed = 0,
-        _label_visible = false
+        _label_visible = false,
+        _shown_emitted = false,
+        _hidden_emitted = false,
     })
 
     out._n_frames = 4
@@ -100,7 +102,10 @@ function rt.LoadingScreen:update(delta)
         self._current_opacity = self._current_opacity + step
 
         if self._current_opacity >= 1 - eps then
-            self:signal_emit("shown")
+            if self._shown_emitted == false then
+                self:signal_emit("shown")
+                self._shown_emitted = true
+            end
             self._label_visible = true
         end
 
@@ -114,7 +119,10 @@ function rt.LoadingScreen:update(delta)
         self._current_opacity = self._current_opacity + step
 
         if self._current_opacity <= 0 + eps then
-            self:signal_emit("hidden")
+            if self._hidden_emitted == false then
+                self:signal_emit("hidden")
+                self._hidden_emitted = true
+            end
         end
 
         opacity_changed = true
@@ -156,6 +164,8 @@ function rt.LoadingScreen:show()
     self._is_active = true
     self._fade_in_elapsed = 0
     self._fade_out_elapsed = 0
+    self._shown_emitted = false
+    self._hidden_emitted = false
 end
 
 --- @brief
@@ -164,6 +174,8 @@ function rt.LoadingScreen:hide()
     self._is_active = false
     self._fade_in_elapsed = 0
     self._fade_out_elapsed = 0
+    self._shown_emitted = false
+    self._hidden_emitted = false
 end
 
 --- @brief

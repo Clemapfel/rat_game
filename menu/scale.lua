@@ -182,3 +182,20 @@ end
 function mn.Scale:measure()
     return self._bounds.width, self._bounds.height
 end
+
+--- @brief
+function mn.Scale:_draw_rail()
+    self._rail_left:draw()
+    self._rail_left_outline:draw()
+    self._rail_right:draw()
+    self._rail_right_outline:draw()
+    self._rail_center:draw()
+    self._rail_center_outline_top:draw()
+    self._rail_center_outline_bottom:draw()
+end
+
+--- @brief
+function mn.Scale:_draw_slider()
+    self._slider_body:draw()
+    self._slider_outline:draw()
+end

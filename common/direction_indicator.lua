@@ -31,6 +31,7 @@ rt.DirectionIndicator = meta.new_type("DirectionIndicator", rt.Widget, function(
 
     out._arrow:set_color(out._color)
     out._arrow_outline:set_color(rt.Palette.BASE_OUTLINE)
+    out._arrow_outline:set_is_outline(true)
     return out
 end)
 

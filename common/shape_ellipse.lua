@@ -12,16 +12,19 @@ rt.Circle = rt.Ellipse
 
 --- @overload
 function rt.Ellipse:draw()
-    self:_bind_properties()
+    love.graphics.setColor(self._color_r, self._color_g, self._color_b, self._color_a)
+    if self._outline_mode == "line" then
+        love.graphics.setLineWidth(self._line_width)
+    end
+
     love.graphics.ellipse(
-        ternary(self:get_is_outline(), "line", "fill"),
+        self._outline_mode,
         self._x,
         self._y,
         self._x_radius,
         self._y_radius,
         self._n_outer_vertices
     )
-    self:_unbind_properties()
 end
 
 --- @overload

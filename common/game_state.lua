@@ -35,7 +35,7 @@ end
 rt.GameState = meta.new_type("GameState", function()
     local state = {
         -- system settings
-        vsync_mode = rt.VSyncMode.ADAPTIVE,
+        vsync_mode = rt.VSyncMode.OFF,
         msaa_quality = rt.MSAAQuality.BEST,
         gamma = 1,
         is_fullscreen = false,
@@ -72,6 +72,7 @@ rt.GameState = meta.new_type("GameState", function()
         _render_shape = rt.VertexRectangle(0, 0, 1, 1),
         _render_texture = rt.RenderTexture(1, 1),
         _render_shader = rt.Shader("common/game_state_render_shader.glsl"),
+        _use_render_texture = false,
 
         _loading_screen = rt.LoadingScreen(),
         _loading_screen_active = true,
@@ -206,7 +207,6 @@ function rt.GameState:_update_window_mode()
     love.window.updateMode(window_res_x, window_res_y, {minwidth = window_res_x, minheight = window_res_y})
     -- for some reason window does not shrink unless updateMode is called twice
 
-    dbg(self._state.resolution_x, self._state.resolution_y)
     self._render_texture = rt.RenderTexture(
         self._state.resolution_x,
         self._state.resolution_y,
@@ -288,7 +288,9 @@ function rt.GameState:_run()
         local stats
         local background_color = rt.Palette.TRUE_MAGENTA
         if love.graphics.isActive() then
-            self._render_texture:bind_as_render_target()
+            if self._use_render_texture then
+                self._render_texture:bind_as_render_target()
+            end
 
             love.graphics.clear(true, true, true)
             rt.graphics.reset()
@@ -312,21 +314,25 @@ function rt.GameState:_run()
                 local total_percentage = tostring(math.floor(durations.max_total_duration / frame_duration * 100))
                 local n_draws = tostring(durations.max_n_draws)
                 local n_texture_switches = tostring(durations.max_n_texture_switches)
+                local gpu_side_memory = tostring(math.round(stats.texturememory / 1024 / 1024 * 10) / 10)
 
-                local label = tostring(fps) .. " | " .. durations.format(update_percentage) .. "% | " ..  durations.format(draw_percentage) .. "% | " ..  durations.format(total_percentage) .. "% | " .. n_draws .. " (" .. n_batched_draws .. ")" .. " | " .. n_canvas_switches
+                local label = tostring(fps) .. " | " .. durations.format(update_percentage) .. "% | " ..  durations.format(draw_percentage) .. "% | " ..  durations.format(total_percentage) .. "% | " .. n_draws .. " (" .. n_batched_draws .. ")" .. " | " .. gpu_side_memory .. " mb"
                 love.graphics.setColor(1, 1, 1, 0.75)
                 local margin = 3
                 local label_w, label_h = love.graphics.getFont():getWidth(label), love.graphics.getFont():getHeight(label)
                 love.graphics.print(label, math.floor(rt.graphics.get_width() - label_w - 2 * margin), math.floor(0.5 * margin))
             end
 
-            self._render_texture:unbind_as_render_target()
-            love.graphics.clear()
-            love.graphics.reset()
-            self._render_shader:bind()
-            self._render_shader:send("gamma", self._state.gamma)
-            self._render_shape:draw()
-            self._render_shader:unbind()
+            if self._use_render_texture then
+                self._render_texture:unbind_as_render_target()
+                love.graphics.clear()
+                love.graphics.reset()
+                self._render_shader:bind()
+                self._render_shader:send("gamma", self._state.gamma)
+                self._render_shape:draw()
+                self._render_shader:unbind()
+            end
+
             love.graphics.present()
         end
 
@@ -400,7 +406,6 @@ end
 
 --- @brief
 function rt.GameState:_resize(new_width, new_height)
-
     local true_w, true_h = love.graphics.getWidth(), love.graphics.getHeight()
     self._render_shape:reformat(
         0, 0,
@@ -496,10 +501,6 @@ end
 --- @brief
 function rt.GameState:set_current_scene(scene_type)
     table.insert(self._active_coroutines, rt.Coroutine(function()
-        if self._current_scene ~= nil then
-            self._current_scene:make_inactive()
-        end
-
         rt.savepoint_maybe()
 
         local scene = self._scenes[scene_type]
@@ -511,8 +512,17 @@ function rt.GameState:set_current_scene(scene_type)
         local use_loading_screen = scene:get_is_realized() == false
         if use_loading_screen then
             self:_loading_screen_show(function()
-                self._current_scene = scene -- make sure graphics swap happens behind loading screen, old scene stays during fadeout
+                -- make sure graphics swap happens behind loading screen, old scene stays during fadeout
+                if self._current_scene ~= nil then
+                    self._current_scene:make_inactive()
+                end
+
+                self._current_scene = scene
             end)
+        else
+            if self._current_scene ~= nil then
+                self._current_scene:make_inactive()
+            end
         end
 
         local realized = scene:get_is_realized()

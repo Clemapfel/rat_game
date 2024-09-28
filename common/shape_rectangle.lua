@@ -12,14 +12,20 @@ end)
 
 --- @overload
 function rt.Rectangle:draw()
-    self:_bind_properties()
+    love.graphics.setColor(self._color_r, self._color_g, self._color_b, self._color_a)
+    if self._outline_mode == "line" then
+        love.graphics.setLineWidth(self._line_width)
+        if self._line_join ~= nil then
+            love.graphics.setLineJoin(self._line_join)
+        end
+    end
+
     love.graphics.rectangle(
-        ternary(self:get_is_outline(), "line", "fill"),
+        self._outline_mode,
         self._x, self._y,
         self._width, self._height,
-        self._corner_radius, self._corner_radius, self._corner_radius * 2
+        self._corner_radius
     )
-    self:_unbind_properties()
 end
 
 --- @brief
@@ -90,7 +96,7 @@ function rt.Rectangle:get_centroid()
     return self._x + 0.5 * self._width, self._y + 0.5 * self._height
 end
 
---- @breif
+--- @brief
 function rt.Rectangle:set_size(w, h)
     self._width = which(w, 1)
     self._height = which(h, 1)

@@ -10,6 +10,7 @@ mn.OptionsScene = meta.new_type("MenuOptionsScene", rt.Scene, function(state)
         _state = state,
         _items = {},
         _verbose_info = mn.VerboseInfoPanel(),
+        _verbose_info_frame = rt.Frame(),
         _selection_graph = rt.SelectionGraph(),
         _default_node = nil, -- rt.SelectionGraphNode
         _input_controller = rt.InputController(),
@@ -25,7 +26,9 @@ mn.OptionsScene = meta.new_type("MenuOptionsScene", rt.Scene, function(state)
         _scale_tick_duration = 1 / rt.settings.menu.options_scene.scale_n_ticks_per_second,
         _scale_tick_direction = true, -- true = right
 
-        _load_coroutine = nil, -- rt.Coroutine
+        _snapshot = nil, -- rt.RenderTexture
+        _active_frame = nil, -- rt.Frame
+        _active_label = nil  -- rt.Label
     }
 
     -- nil items set during :realize
@@ -355,6 +358,8 @@ function mn.OptionsScene:realize()
 
     self:create_from_state(self._state)
     self._verbose_info:realize()
+    self._verbose_info_frame:realize()
+    self._verbose_info:set_frame_visible(false)
 
     local keymap_item = {
         label = rt.Label(label_prefix .. self._keymap_text .. label_postfix),
@@ -500,14 +505,40 @@ function mn.OptionsScene:size_allocate(x, y, width, height)
         current_y = current_y + item_h + item_vertical_m
     end
 
-    self._verbose_info:fit_into(
-        x + width - verbose_info_right_m - verbose_info_w,
-        start_y,
-        verbose_info_w,
-        y + height - start_y - outer_margin
-    )
+    for info in range(self._verbose_info, self._verbose_info_frame) do
+        info:fit_into(
+            x + width - verbose_info_right_m - verbose_info_w,
+            start_y,
+            verbose_info_w,
+            y + height - start_y - outer_margin
+        )
+    end
 
+    self:_update_snapshot()
     self:_regenerate_selection_nodes()
+end
+
+--- @brief
+function mn.OptionsScene:_update_snapshot()
+    if self._snapshot == nil or self._snapshot:get_width() ~= self._bounds.width or self._snapshot:get_height() ~= self._bounds.height then
+        self._snapshot = rt.RenderTexture(self._bounds.width, self._bounds.height, self._state:get_msaa_quality())
+    end
+
+    self._snapshot:bind_as_render_target()
+    for item in values(self._items) do
+        local before = item.frame:get_selection_state()
+        item.frame:set_selection_state(rt.SelectionState.INACTIVE)
+        item.frame:draw()
+        item.frame:set_selection_state(before)
+        item.label:draw()
+    end
+
+    self._verbose_info_frame:draw()
+    self._heading_frame:draw()
+    self._heading_label:draw()
+    self._control_indicator:draw()
+
+    self._snapshot:unbind_as_render_target()
 end
 
 --- @brief
@@ -561,12 +592,18 @@ function mn.OptionsScene:_regenerate_selection_nodes()
             end
             scene._scale_tick_elapsed = 0
             scene._scale_delay_elapsed = 0
+
+            scene._active_frame = item.frame
+            scene._active_label = item.label
         end)
 
         node:signal_connect("exit", function(_)
             item.frame:set_selection_state(rt.SelectionState.INACTIVE)
             scene._scale_is_selected = false
             scene._selected_scale = nil
+
+            scene._active_frame = nil
+            scene._active_label = nil
         end)
 
         node:signal_connect(rt.InputButton.RIGHT, function(_)
@@ -591,10 +628,14 @@ function mn.OptionsScene:_regenerate_selection_nodes()
     local keymap_node = item_to_node[self._keymap_item]
     keymap_node:signal_connect("enter", function(_)
         scene._keymap_item.frame:set_selection_state(rt.SelectionState.ACTIVE)
+        scene._active_frame = scene._keymap_item.frame
+        scene._active_label = scene._keymap_item.label
     end)
 
     keymap_node:signal_connect("exit", function(_)
         scene._keymap_item.frame:set_selection_state(rt.SelectionState.INACTIVE)
+        scene._active_frame = nil
+        scene._active_label = nil
     end)
 
     keymap_node:signal_connect(rt.InputButton.A, function(_)
@@ -608,19 +649,25 @@ end
 --- @override
 function mn.OptionsScene:draw()
     if not self:get_is_allocated() then return end
-    for item in values(self._items) do
-        item.frame:draw()
-        item.label:draw()
+    if self._snapshot ~= nil then
+        self._snapshot:draw()
+    end
 
+    if self._active_frame ~= nil then
+        self._active_frame:draw()
+    end
+
+    if self._active_label ~= nil then
+        self._active_label:draw()
+    end
+
+    for item in values(self._items) do
         rt.graphics.translate(item.x_offset, 0)
         item.widget:draw()
         rt.graphics.translate(-item.x_offset, 0)
     end
 
     self._verbose_info:draw()
-    self._heading_frame:draw()
-    self._heading_label:draw()
-    self._control_indicator:draw()
 end
 
 --- @override
@@ -668,7 +715,11 @@ end
 function mn.OptionsScene:_handle_button_pressed(which)
     if self._is_active ~= true then return end
 
-    self._selection_graph:handle_button(which)
+    if which == rt.InputButton.B then
+        self._state:set_current_scene(mn.InventoryScene)
+    else
+        self._selection_graph:handle_button(which)
+    end
 end
 
 --- @override
@@ -676,9 +727,11 @@ function mn.OptionsScene:make_active()
     if self._is_realized == false then self:realize() end
     self._is_active = true
     self._selection_graph:set_current_node(self._default_node)
+    self:_update_snapshot()
 end
 
 --- @override
 function mn.OptionsScene:make_inactive()
     self._is_active = false
+    self._snapshot = nil
 end

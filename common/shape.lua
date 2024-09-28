@@ -5,13 +5,14 @@ rt.LineJoin = meta.new_enum({
     BEVEL = "bevel"
 })
 
+
 --- @class rt.Shape
 rt.Shape = meta.new_abstract_type("Shape", rt.Drawable, {
     _color_r = 1,
     _color_g = 1,
     _color_b = 1,
     _color_a = 1,
-    _is_outline = false,
+    _outline_mode = "fill",
     _use_anti_aliasing = true,
     _line_width = 1,
     _opacity = 1
@@ -53,12 +54,12 @@ end
 
 --- @brief
 function rt.Shape:set_is_outline(b)
-    self._is_outline = b
+    if b then self._outline_mode = "line" else self._outline_mode = "fill" end
 end
 
 --- @brief
 function rt.Shape:get_is_outline()
-    return self._is_outline
+    return self._outline_mode == "line"
 end
 
 --- @brief

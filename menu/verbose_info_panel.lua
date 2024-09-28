@@ -351,6 +351,6 @@ function mn.VerboseInfoPanel:_generate_hat_arrow_outline(centroid_x, centroid_y,
 end
 
 --- @brief
-function mn.VerboseInfoPanel:set_backdrop_visible(b)
+function mn.VerboseInfoPanel:set_frame_visible(b)
     self._frame_visible = b
 end

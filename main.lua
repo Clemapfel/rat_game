@@ -1,5 +1,7 @@
 require "include"
 
+rt.profiler.push("test")
+
 state = rt.GameState()
 state:initialize_debug_state()
 

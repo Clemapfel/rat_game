@@ -1,8 +1,8 @@
 --- @class PolygonType
 rt.PolygonType = meta.new_enum({
-    LINE_STRIP = "LINE_STRIP",
-    DOTS = "DOTS",
-    POLYGON = "POLYGON"
+    LINE_STRIP = 0,
+    DOTS = 1,
+    POLYGON = 2
 })
 
 --- @class
@@ -21,10 +21,17 @@ end)
 
 --- @brief
 function rt.Polygon:draw()
-    self:_bind_properties()
+    love.graphics.setColor(self._color_r, self._color_g, self._color_b, self._color_a)
+    if self._outline_mode == "line" or self._type == rt.PolygonType.LINE then
+        love.graphics.setLineWidth(self._line_width)
+        if self._line_join ~= nil then
+            love.graphics.setLineJoin(self._line_join)
+        end
+    end
+
     if self._type == rt.PolygonType.POLYGON then
         love.graphics.polygon(
-            ternary(self:get_is_outline(), "line", "fill"),
+            self._outline_mode,
             table.unpack(self._vertices)
         )
     elseif self._type == rt.PolygonType.DOTS then
@@ -32,7 +39,6 @@ function rt.Polygon:draw()
     elseif self._type == rt.PolygonType.LINE_STRIP then
         love.graphics.line(table.unpack(self._vertices))
     end
-    self._unbind_properties()
 end
 
 --- @brief

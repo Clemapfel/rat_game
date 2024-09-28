@@ -28,6 +28,7 @@ mn.InventoryScene = meta.new_type("InventoryScene", rt.Scene, function(state)
         _shared_template_list = mn.ScrollableList(),
 
         _verbose_info = mn.VerboseInfoPanel(),
+        _verbose_info_frame = rt.Frame(),
         _selection_graph = rt.SelectionGraph(),
         _grabbed_object_sprite = nil,
         _grabbed_object_sprite_x = 0,
@@ -88,7 +89,8 @@ function mn.InventoryScene:realize()
         self._shared_consumable_list,
         self._shared_template_list,
         self._shared_list_frame,
-        self._verbose_info
+        self._verbose_info,
+        self._verbose_info_frame
     ) do
         widget:realize()
     end
@@ -294,6 +296,7 @@ function mn.InventoryScene:size_allocate(x, y, width, height)
         verbose_info_h
     )
     self._verbose_info:fit_into(verbose_info_bounds)
+    self._verbose_info_frame:fit_into(verbose_info_bounds)
 
     current_y = current_y + shared_tab_h + m
 
@@ -384,6 +387,7 @@ function mn.InventoryScene:draw()
         rt.graphics.translate(-self._grabbed_object_sprite_x, -self._grabbed_object_sprite_y)
     end
 
+    self._verbose_info_frame:draw()
     self._verbose_info:draw()
     self._animation_queue:draw()
 
@@ -909,9 +913,17 @@ function mn.InventoryScene:_regenerate_selection_nodes()
         }
     end
 
+    local option_tab_node_control_layout = function()
+        return {
+            {rt.ControlIndicatorButton.A, "Go To Options"},
+            drop_grabbed_object_entry()
+        }
+    end
+
     for node in values(entity_tab_nodes) do
         node:set_control_layout(entity_tab_node_control_layout)
     end
+    entity_tab_nodes[#entity_tab_nodes]:set_control_layout(option_tab_node_control_layout)
 
     verbose_info_node:set_control_layout(function()
         return {
@@ -1279,9 +1291,15 @@ function mn.InventoryScene:_regenerate_selection_nodes()
             scene._entity_tab_bar:set_tab_selected(entity_i, false)
         end)
 
-        node:signal_connect(rt.InputButton.A, function(_)
-            scene:_set_entity_index(entity_i)
-        end)
+        if entity_i <= n_entities then
+            node:signal_connect(rt.InputButton.A, function(_)
+                scene:_set_entity_index(entity_i)
+            end)
+        else
+            node:signal_connect(rt.InputButton.A, function(_)
+                scene._state:set_current_scene(mn.OptionsScene)
+            end)
+        end
 
         node:signal_connect(rt.InputButton.B, on_b_undo_grab)
     end

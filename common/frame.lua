@@ -72,8 +72,6 @@ end
 
 --- @overload rt.Drawable.draw
 function rt.Frame:draw()
-    if not self:get_is_visible() or not self:get_is_allocated() then return end
-
     if self._child_valid then
         self:_bind_stencil()
         self._child:draw()
@@ -82,12 +80,8 @@ function rt.Frame:draw()
         self._stencil_mask:draw()
     end
 
-    if self._thickness > 0 then
-        if self._thickness > 1 then
-            self._frame_outline:draw()
-        end
-        self._frame:draw()
-    end
+    self._frame_outline:draw()
+    self._frame:draw()
 end
 
 --- @overload rt.Widget.size_allocate

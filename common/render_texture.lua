@@ -35,3 +35,8 @@ function rt.RenderTexture:as_image()
         return rt.Image(self._native:newImageData())
     end
 end
+
+--- @brief
+function rt.RenderTexture:free()
+    self._native:release()
+end

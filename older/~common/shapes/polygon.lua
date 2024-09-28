@@ -22,7 +22,7 @@ function rt.Polygon:draw()
     self:_bind_properties()
     if self._type == rt.PolygonType.POLYGON then
         love.graphics.polygon(
-            ternary(self:get_is_outline(), "line", "fill"),
+            self._outline_mode,
             splat(self._vertices)
         )
     elseif self._type == rt.PolygonType.DOTS then

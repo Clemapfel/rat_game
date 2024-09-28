@@ -193,6 +193,8 @@ end
 
 --- @override
 function rt.ControlIndicator:draw()
+    if #self._layout == 0 then return end
+
     local x_offset, y_offset = self._bounds.x - self._snapshot_offset_x, self._bounds.y - self._snapshot_offset_y
     rt.graphics.translate(x_offset, y_offset)
     self._snapshot:draw()
