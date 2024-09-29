@@ -134,6 +134,11 @@ function bt.Entity:get_id()
     return self.id .. self.id_suffix
 end
 
+--- qbrief
+function bt.Entity:get_id_suffix()
+    return self.id_suffix
+end
+
 --- @brief
 function bt.Entity:get_config_id()
     return self._config_id

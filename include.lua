@@ -174,20 +174,6 @@ require "physics.joint"
 require "common.smoothed_motion_2d"
 require "common.smoothed_motion_1d"
 
--- battle
-require "battle.move"
-require "battle.equip"
-require "battle.consumable"
-require "battle.status"
-require "battle.global_status"
-require "battle.entity"
-
-require "battle.ordered_box"
-require "battle.health_bar"
-require "battle.speed_value"
-
-require "battle.battle_scene"
-
 -- menu
 require "menu.template"
 require "menu.verbose_info_panel"
@@ -203,8 +189,25 @@ require "menu.option_button"
 require "menu.scale"
 require "menu.shake_intensity_widget"
 require "menu.msaa_intensity_widget"
+require "menu.deadzone_visualization_widget"
 require "menu.options_scene"
 require "menu.keybinding_scene"
+
+
+-- battle
+require "battle.move"
+require "battle.equip"
+require "battle.consumable"
+require "battle.status"
+require "battle.global_status"
+require "battle.entity"
+
+require "battle.ordered_box"
+require "battle.health_bar"
+require "battle.speed_value"
+require "battle.priority_queue"
+
+require "battle.battle_scene"
 
 -- state
 require "common.game_state"

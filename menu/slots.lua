@@ -267,7 +267,6 @@ end
 --- @override
 function mn.Slots:measure()
     local slot_w = rt.settings.menu.slots.sprite_resolution * rt.settings.menu.slots.sprite_scale
-
     local n_rows, max_row_width = 0, NEGATIVE_INFINITY
     for row in values(self._items) do
         n_rows = n_rows + 1
@@ -291,7 +290,7 @@ function mn.Slots:set_object(slot_i, object)
             item.sprite = nil
             self._item_to_sprite[item] = nil
         else
-            item.sprite = rt.Sprite(object:get_sprite_id())
+            item.sprite = rt.LabeledSprite(object:get_sprite_id())
             item.sprite:realize()
             item.sprite:fit_into(item.bounds)
             self._item_to_sprite[item] = item.sprite
@@ -302,15 +301,6 @@ function mn.Slots:set_object(slot_i, object)
 end
 
 --- @brief
-function mn.Slots:get_object(slot_i)
-    if self._is_realized == false then
-        return self._pre_realize_items[slot_i]
-    else
-        local item = self._slot_i_to_item[slot_i]
-        if item == nil then return nil end
-        return item.object
-    end
-end
 
 
 --- @brief

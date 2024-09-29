@@ -72,12 +72,12 @@ end
 
 --- @overload rt.Drawable.draw
 function rt.Frame:draw()
+
+    self._stencil_mask:draw()
     if self._child_valid then
         self:_bind_stencil()
         self._child:draw()
         self:_unbind_stencil()
-    else
-        self._stencil_mask:draw()
     end
 
     self._frame_outline:draw()

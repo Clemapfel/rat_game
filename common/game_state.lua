@@ -69,10 +69,9 @@ rt.GameState = meta.new_type("GameState", function()
         _entity_index_to_entity = {},   -- Table<Number, bt.Entity>
         _entity_to_entity_index = {},   -- Table<bt.Entity, Number>
         _grabbed_object = nil, -- helper for mn.InventoryScene
-        _render_shape = rt.VertexRectangle(0, 0, 1, 1),
         _render_texture = rt.RenderTexture(1, 1),
         _render_shader = rt.Shader("common/game_state_render_shader.glsl"),
-        _use_render_texture = false,
+        _use_render_texture = true,
 
         _loading_screen = rt.LoadingScreen(),
         _loading_screen_active = true,
@@ -187,6 +186,11 @@ function rt.GameState:_update_window_mode()
 
     local before_w, before_h = love.graphics.getWidth(), love.graphics.getHeight()
 
+    local native_msaa = self._state.msaa_quality
+    if self._use_render_texture == true then
+        native_msaa = 0
+    end
+
     love.window.updateMode(
         window_res_x,
         window_res_y,
@@ -194,7 +198,7 @@ function rt.GameState:_update_window_mode()
             fullscreen = self._state.is_fullscreen,
             fullscreentype = "desktop",
             vsync = self._state.vsync_mode,
-            msaa = 16, --self._state.msaa_quality,
+            msaa = native_msaa,
             stencil = true,
             depth = false,
             resizable = resizable,
@@ -205,7 +209,7 @@ function rt.GameState:_update_window_mode()
     )
 
     love.window.updateMode(window_res_x, window_res_y, {minwidth = window_res_x, minheight = window_res_y})
-    -- for some reason window does not shrink unless updateMode is called twice
+    -- window does not shrink unless updateMode is called twice
 
     self._render_texture = rt.RenderTexture(
         self._state.resolution_x,
@@ -213,7 +217,7 @@ function rt.GameState:_update_window_mode()
         self._state.msaa_quality
     )
     self._render_texture:set_scale_mode(rt.TextureScaleMode.LINEAR)
-    self._render_shape:set_texture(self._render_texture)
+    self._render_shader:send("gamma", self._state.gamma)
 
     rt.settings.contrast = self._state.vfx_contrast_level
     rt.settings.motion_intensity = self._state.vfx_motion_level
@@ -292,7 +296,7 @@ function rt.GameState:_run()
                 self._render_texture:bind_as_render_target()
             end
 
-            love.graphics.clear(true, true, true)
+            love.graphics.clear()
             rt.graphics.reset()
             love.graphics.setColor(background_color.r, background_color.g, background_color.b, 1)
             love.graphics.rectangle("fill", 0, 0, love.graphics.getWidth(), love.graphics.getHeight())
@@ -316,7 +320,7 @@ function rt.GameState:_run()
                 local n_texture_switches = tostring(durations.max_n_texture_switches)
                 local gpu_side_memory = tostring(math.round(stats.texturememory / 1024 / 1024 * 10) / 10)
 
-                local label = tostring(fps) .. " | " .. durations.format(update_percentage) .. "% | " ..  durations.format(draw_percentage) .. "% | " ..  durations.format(total_percentage) .. "% | " .. n_draws .. " (" .. n_batched_draws .. ")" .. " | " .. gpu_side_memory .. " mb"
+                local label = tostring(fps) .. " fps | " .. durations.format(update_percentage) .. "% | " ..  durations.format(draw_percentage) .. "% | " ..  durations.format(total_percentage) .. "% | " .. n_draws .. " (" .. n_batched_draws .. ")" .. " | " .. gpu_side_memory .. " mb"
                 love.graphics.setColor(1, 1, 1, 0.75)
                 local margin = 3
                 local label_w, label_h = love.graphics.getFont():getWidth(label), love.graphics.getFont():getHeight(label)
@@ -325,11 +329,8 @@ function rt.GameState:_run()
 
             if self._use_render_texture then
                 self._render_texture:unbind_as_render_target()
-                love.graphics.clear()
-                love.graphics.reset()
                 self._render_shader:bind()
-                self._render_shader:send("gamma", self._state.gamma)
-                self._render_shape:draw()
+                self._render_texture:draw()
                 self._render_shader:unbind()
             end
 
@@ -407,12 +408,6 @@ end
 --- @brief
 function rt.GameState:_resize(new_width, new_height)
     local true_w, true_h = love.graphics.getWidth(), love.graphics.getHeight()
-    self._render_shape:reformat(
-        0, 0,
-        true_w, 0,
-        true_w, true_h,
-        0, true_h
-    )
     self._loading_screen:fit_into(0, 0, true_w, true_h)
 
     self:_loading_screen_show(function()
@@ -569,6 +564,7 @@ end
 --- @brief
 function rt.GameState:set_gamma_level(level)
     self._state.gamma = level
+    self._render_shader:send("gamma", self._state.gamma)
 end
 
 --- @brief

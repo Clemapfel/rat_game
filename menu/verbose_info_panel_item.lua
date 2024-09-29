@@ -229,7 +229,7 @@ function mn.VerboseInfoPanel.Item:create_from_equip(equip)
     self.size_allocate = function(self, x, y, width, height)
         local m, xm, ym = self._get_margin()
         local start_y = y + ym
-        local current_x, current_y = x + xm, start_y + ym
+        local current_x, current_y = x + xm, start_y
         local w = width - 2 * xm
 
         local sprite_w, sprite_h = self.sprite:measure()
@@ -948,6 +948,9 @@ function mn.VerboseInfoPanel.Item:create_from_enum(which)
     elseif which == rt.VerboseInfoObject.VISUAL_EFFECTS_WIDGET then
         self:create_as_visual_effects_widget()
         return
+    elseif which == rt.VerboseInfoObject.DEADZONE_WIDGET then
+        self:create_as_deadzone_widget()
+        return
     end
 
     local format_title = function(str)
@@ -1176,6 +1179,43 @@ function mn.VerboseInfoPanel.Item:create_as_msaa_widget()
         self.frame:realize()
 
         self.widget = mn.MSAAIntensityWidget()
+        self.widget:realize()
+
+        self.content = {
+            self.widget
+        }
+    end
+
+    self.size_allocate = function(self, x, y, width, height)
+        local m, xm, ym = self._get_margin()
+        ym = 2 * ym
+        local w = 0.75 * (width - 2 * xm)
+        height = w + 2 * ym
+        self.widget:fit_into(
+            x + 0.5 * width - 0.5 * w,
+            y + 0.5 * height - 0.5 * w,
+            w,
+            w
+        )
+
+        self.frame:fit_into(x, y, width, height)
+        self.final_height = height
+    end
+
+    self.update = function(self, delta)
+        self.widget:update(delta)
+    end
+end
+
+function mn.VerboseInfoPanel.Item:create_as_deadzone_widget()
+    self.object = nil
+    self._is_realized = false
+
+    self.realize = function()
+        self._is_realized = true
+        self.frame:realize()
+
+        self.widget = mn.DeadzoneVisualizationWidget()
         self.widget:realize()
 
         self.content = {

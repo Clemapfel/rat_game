@@ -90,7 +90,6 @@ end
 --- @brief
 --- @param order Table<bt.Entity>
 function bt.PriorityQueue:reorder(order, next_order)
-
     next_order = which(next_order, {})
     if not self._is_realized then
         self._current.order = order
@@ -100,9 +99,7 @@ function bt.PriorityQueue:reorder(order, next_order)
     self._current.order = {}
 
     local function handle(which, order)
-        which.order = order
-
-        -- generate or remove new elements if entity or entity multiplicity is seen for the first time
+        which.order = order-- generate or remove new elements if entity or entity multiplicity is seen for the first time
         local n_seen = {}
         for _, entity in pairs(order) do
             if n_seen[entity] == nil then n_seen[entity] = 0 end

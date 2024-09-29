@@ -223,6 +223,14 @@ function b2.Body:override_mass_data(mass, center_x, center_y, rotational_inertia
 end
 
 --- @brief
+function b2.Body:set_mass(mass)
+    local data = box2d.b2Body_GetMassData(self._native)
+    data.mass = mass
+    box2d.b2Body_SetMassData(self._native, data)
+    box2d.b2Body_SetAutomaticMass(self._native, false)
+end
+
+--- @brief
 function b2.Body:set_linear_damping(value)
     if value == POSITIVE_INFINITY then value = 2^32 end
     if value < 0 then value = 0 end

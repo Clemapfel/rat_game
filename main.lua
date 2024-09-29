@@ -1,7 +1,5 @@
 require "include"
 
-rt.profiler.push("test")
-
 state = rt.GameState()
 state:initialize_debug_state()
 
@@ -49,7 +47,7 @@ end)
 love.load = function()
     background:realize()
     state:_load()
-    state:set_current_scene(mn.InventoryScene)
+    state:set_current_scene(bt.BattleScene)
     love.resize(love.graphics.getWidth(), love.graphics.getHeight())
 end
 

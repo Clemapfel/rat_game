@@ -22,7 +22,7 @@ end)
 --- @brief
 function rt.Polygon:draw()
     love.graphics.setColor(self._color_r, self._color_g, self._color_b, self._color_a)
-    if self._outline_mode == "line" or self._type == rt.PolygonType.LINE then
+    if self._outline_mode == "line" or self._type == rt.PolygonType.LINE_STRIP then
         love.graphics.setLineWidth(self._line_width)
         if self._line_join ~= nil then
             love.graphics.setLineJoin(self._line_join)

@@ -15,6 +15,8 @@ mn.OptionsScene = meta.new_type("MenuOptionsScene", rt.Scene, function(state)
         _default_node = nil, -- rt.SelectionGraphNode
         _input_controller = rt.InputController(),
         _control_indicator = rt.ControlIndicator(),
+        _keymap_item_active = false,
+
         _heading_label = nil, -- rt.Label
         _heading_frame = rt.Frame(),
 
@@ -392,24 +394,34 @@ function mn.OptionsScene:realize()
     end)
 
     self._control_indicator:realize()
-    self:_update_control_indicator(true)
+    self:_update_control_indicator()
     self:create_from_state(self._state)
 end
 
 --- @brief
-function mn.OptionsScene:_update_control_indicator(left_right_allowed)
-    meta.assert_boolean(left_right_allowed)
+function mn.OptionsScene:_update_control_indicator()
     local labels = rt.TextAtlas:get(rt.settings.menu.options_scene.text_atlas_id)
-    local left_right_label = labels.control_indicator_a
-    if not left_right_allowed then
+
+    if self._keymap_item_active == false then
+        local left_right_label = labels.control_indicator_a
         left_right_label = "<s><color=GRAY>" .. left_right_label .. "</s></color>"
+
+        self._control_indicator:create_from({
+            {rt.ControlIndicatorButton.LEFT_RIGHT, labels.control_indicator_left_right},
+            {rt.ControlIndicatorButton.Y, labels.control_indicator_y},
+            {rt.ControlIndicatorButton.B, labels.control_indicator_b}
+        })
+    else
+        self._control_indicator:create_from({
+            {rt.ControlIndicatorButton.A, labels.control_indicator_keymap_item_select}
+        })
     end
 
-    self._control_indicator:create_from({
-        {rt.ControlIndicatorButton.LEFT_RIGHT, labels.control_indicator_left_right},
-        {rt.ControlIndicatorButton.Y, labels.control_indicator_y},
-        {rt.ControlIndicatorButton.B, labels.control_indicator_b}
-    })
+    local m = rt.settings.margin_unit
+    local outer_margin = 2 * m
+    local start_y = self._bounds.y + outer_margin
+    local control_w, control_h = self._control_indicator:measure()
+    self._control_indicator:fit_into(self._bounds.x + self._bounds.width - outer_margin - control_w, start_y, control_w, control_h)
 end
 
 --- @override
@@ -536,7 +548,6 @@ function mn.OptionsScene:_update_snapshot()
     self._verbose_info_frame:draw()
     self._heading_frame:draw()
     self._heading_label:draw()
-    self._control_indicator:draw()
 
     self._snapshot:unbind_as_render_target()
 end
@@ -595,6 +606,10 @@ function mn.OptionsScene:_regenerate_selection_nodes()
 
             scene._active_frame = item.frame
             scene._active_label = item.label
+
+            local current = scene._keymap_item_active
+            scene._keymap_item_active = item == scene._keymap_item
+            self:_update_control_indicator()
         end)
 
         node:signal_connect("exit", function(_)
@@ -604,6 +619,7 @@ function mn.OptionsScene:_regenerate_selection_nodes()
 
             scene._active_frame = nil
             scene._active_label = nil
+            scene._keymap_item_active = false
         end)
 
         node:signal_connect(rt.InputButton.RIGHT, function(_)
@@ -652,6 +668,8 @@ function mn.OptionsScene:draw()
     if self._snapshot ~= nil then
         self._snapshot:draw()
     end
+
+    self._control_indicator:draw()
 
     if self._active_frame ~= nil then
         self._active_frame:draw()

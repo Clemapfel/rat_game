@@ -23,28 +23,27 @@
     </configurations>
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="7fa9ba1b-2cff-4ecc-86fb-59ab2fa76ee1" name="Changes" comment="profiler done">
+    <list default="true" id="7fa9ba1b-2cff-4ecc-86fb-59ab2fa76ee1" name="Changes" comment="optimized drawing of various scenes">
+      <change afterPath="$PROJECT_DIR$/battle/priority_queue.lua" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/menu/deadzone_visualization_widget.lua" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/common/control_indicator.lua" beforeDir="false" afterPath="$PROJECT_DIR$/common/control_indicator.lua" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/assets/text/english/menu.lua" beforeDir="false" afterPath="$PROJECT_DIR$/assets/text/english/menu.lua" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/battle/battle_scene.lua" beforeDir="false" afterPath="$PROJECT_DIR$/battle/battle_scene.lua" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/battle/entity.lua" beforeDir="false" afterPath="$PROJECT_DIR$/battle/entity.lua" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/common/frame.lua" beforeDir="false" afterPath="$PROJECT_DIR$/common/frame.lua" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/common/game_state.lua" beforeDir="false" afterPath="$PROJECT_DIR$/common/game_state.lua" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/common/label.lua" beforeDir="false" afterPath="$PROJECT_DIR$/common/label.lua" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/common/loading_screen.lua" beforeDir="false" afterPath="$PROJECT_DIR$/common/loading_screen.lua" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/common/render_texture.lua" beforeDir="false" afterPath="$PROJECT_DIR$/common/render_texture.lua" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/common/shape.lua" beforeDir="false" afterPath="$PROJECT_DIR$/common/shape.lua" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/common/shape_ellipse.lua" beforeDir="false" afterPath="$PROJECT_DIR$/common/shape_ellipse.lua" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/common/game_state_render_shader.glsl" beforeDir="false" afterPath="$PROJECT_DIR$/common/game_state_render_shader.glsl" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/common/shape_polygon.lua" beforeDir="false" afterPath="$PROJECT_DIR$/common/shape_polygon.lua" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/common/shape_rectangle.lua" beforeDir="false" afterPath="$PROJECT_DIR$/common/shape_rectangle.lua" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/common/smoothed_motion_2d.lua" beforeDir="false" afterPath="$PROJECT_DIR$/common/smoothed_motion_2d.lua" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/common/widget.lua" beforeDir="false" afterPath="$PROJECT_DIR$/common/widget.lua" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/include.lua" beforeDir="false" afterPath="$PROJECT_DIR$/include.lua" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/main.lua" beforeDir="false" afterPath="$PROJECT_DIR$/main.lua" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/menu/inventory_scene.lua" beforeDir="false" afterPath="$PROJECT_DIR$/menu/inventory_scene.lua" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/menu/keybinding_scene.lua" beforeDir="false" afterPath="$PROJECT_DIR$/menu/keybinding_scene.lua" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/menu/options_scene.lua" beforeDir="false" afterPath="$PROJECT_DIR$/menu/options_scene.lua" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/menu/scale.lua" beforeDir="false" afterPath="$PROJECT_DIR$/menu/scale.lua" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/menu/slots.lua" beforeDir="false" afterPath="$PROJECT_DIR$/menu/slots.lua" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/menu/verbose_info_panel.lua" beforeDir="false" afterPath="$PROJECT_DIR$/menu/verbose_info_panel.lua" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/older/~common/shapes/ellipse.lua" beforeDir="false" afterPath="$PROJECT_DIR$/older/~common/shapes/ellipse.lua" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/older/~common/shapes/polygon.lua" beforeDir="false" afterPath="$PROJECT_DIR$/older/~common/shapes/polygon.lua" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/older/~common/shapes/rectangle.lua" beforeDir="false" afterPath="$PROJECT_DIR$/older/~common/shapes/rectangle.lua" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/profiler/profiler.lua" beforeDir="false" afterPath="$PROJECT_DIR$/profiler/profiler.lua" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/menu/verbose_info_panel_item.lua" beforeDir="false" afterPath="$PROJECT_DIR$/menu/verbose_info_panel_item.lua" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/old/battle/priority_queue.lua" beforeDir="false" afterPath="$PROJECT_DIR$/old/battle/priority_queue.lua" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/physics/body.lua" beforeDir="false" afterPath="$PROJECT_DIR$/physics/body.lua" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -564,15 +563,7 @@
       <workItem from="1726946691418" duration="37119000" />
       <workItem from="1727197616942" duration="776000" />
       <workItem from="1727276997949" duration="43344000" />
-      <workItem from="1727542096317" duration="7980000" />
-    </task>
-    <task id="LOCAL-01037" summary="stashing">
-      <option name="closed" value="true" />
-      <created>1725671710448</created>
-      <option name="number" value="01037" />
-      <option name="presentableId" value="LOCAL-01037" />
-      <option name="project" value="LOCAL" />
-      <updated>1725671710448</updated>
+      <workItem from="1727542096317" duration="20172000" />
     </task>
     <task id="LOCAL-01038" summary="stashing">
       <option name="closed" value="true" />
@@ -958,7 +949,15 @@
       <option name="project" value="LOCAL" />
       <updated>1727476018798</updated>
     </task>
-    <option name="localTasksCounter" value="1086" />
+    <task id="LOCAL-01086" summary="optimized drawing of various scenes">
+      <option name="closed" value="true" />
+      <created>1727557551822</created>
+      <option name="number" value="01086" />
+      <option name="presentableId" value="LOCAL-01086" />
+      <option name="project" value="LOCAL" />
+      <updated>1727557551824</updated>
+    </task>
+    <option name="localTasksCounter" value="1087" />
     <servers />
   </component>
   <component name="TypeScriptGeneratedFilesManager">
@@ -1007,7 +1006,6 @@
     </option>
   </component>
   <component name="VcsManagerConfiguration">
-    <MESSAGE value="capsules working" />
     <MESSAGE value="stashing rope" />
     <MESSAGE value="ordered box working" />
     <MESSAGE value="encapsulated physics 2d animation" />
@@ -1032,7 +1030,8 @@
     <MESSAGE value="refactored to minimize luajit callback count" />
     <MESSAGE value="stashing profiler" />
     <MESSAGE value="profiler done" />
-    <option name="LAST_COMMIT_MESSAGE" value="profiler done" />
+    <MESSAGE value="optimized drawing of various scenes" />
+    <option name="LAST_COMMIT_MESSAGE" value="optimized drawing of various scenes" />
   </component>
   <component name="XDebuggerManager">
     <breakpoint-manager>
@@ -1051,11 +1050,6 @@
           <url>file://$PROJECT_DIR$/old/fast_physics/shape.lua</url>
           <line>231</line>
           <option name="timeStamp" value="12" />
-        </line-breakpoint>
-        <line-breakpoint enabled="true" type="lua-line">
-          <url>file://$PROJECT_DIR$/common/shape_polygon.lua</url>
-          <line>24</line>
-          <option name="timeStamp" value="16" />
         </line-breakpoint>
         <line-breakpoint enabled="true" suspend="NONE" type="CMakeLineBreakpoint">
           <url>file://$PROJECT_DIR$/physics/box2d_extension/CMakeLists.txt</url>

@@ -7,7 +7,7 @@ rt.SmoothedMotion2D = meta.new_type("SmoothedMotion2D", function(position_x, pos
     body:set_rotation_fixed(true)
     local shape = b2.CircleShape(body, b2.Circle(1), true)
     shape:set_are_sensor_events_enabled(false)
-    shape:set_density(1)
+    body:set_mass(50)
 
     if damping_to_distance_coefficient == nil then damping_to_distance_coefficient = 1 end
     return meta.new(rt.SmoothedMotion2D, {
@@ -41,11 +41,16 @@ end
 function rt.SmoothedMotion2D:update(_)
     local current_x, current_y = self._current_position_x, self._current_position_y
     local target_x, target_y = self._target_position_x, self._target_position_y
-    local distance = rt.distance(current_x, current_y, target_x, target_y)
+
     local angle = rt.angle(target_x - current_x, target_y - current_y)
-    local vx, vy = rt.translate_point_by_angle(0, 0, distance, angle)
-    self._position_body:set_linear_damping((1000 * self._damping_factor) / distance)
+    local magnitude = 2000
+    local vx, vy = rt.translate_point_by_angle(0, 0, magnitude, angle)
     self._position_body:apply_linear_impulse(vx, vy)
+
+    local distance = rt.magnitude(target_x - current_x, target_y - current_y)
+    local damping = magnitude / (4 * distance)
+    self._position_body:set_linear_damping(damping)
+
     self._current_position_x, self._current_position_y = self._position_body:get_centroid()
 end
 

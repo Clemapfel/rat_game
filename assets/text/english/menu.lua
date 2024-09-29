@@ -6,7 +6,7 @@ return {
 
     -- mn.OptionsScene
     options_scene = {
-        heading = "<b>Settings</b>",
+        heading = "<b>Inventory > Settings</b>",
 
         vsync = "VSync",
         vsync_on = "ON",
@@ -51,7 +51,8 @@ return {
         control_indicator_a = "Change Value",
         control_indicator_b = "Exit",
         control_indicator_y = "Restore Default",
-        control_indicator_left_right = "Change Value"
+        control_indicator_left_right = "Change Value",
+        control_indicator_keymap_item_select = "Select"
     },
 
     -- rt.input_button_to_string
@@ -72,8 +73,8 @@ return {
     keybinding_scene = {
         accept = "Accept",
         go_back = "Abort",
-        heading_keyboard = "<b>Controls > Keyboard</b>",
-        heading_gamepad = "<b>Controls > Gamepad</b>",
+        heading_keyboard = "<b>Settings > Controls > Keyboard</b>",
+        heading_gamepad = "<b>Settings > Controls > Gamepad</b>",
         restore_defaults = "Restore Defaults",
 
         control_indicator_a = "Remap",
