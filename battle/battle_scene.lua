@@ -125,5 +125,13 @@ end
 
 --- @brief
 function bt.BattleScene:_handle_button_pressed(which)
-    self._priority_queue:reorder(rt.random.shuffle(self._state:list_entities()))
+    local entities = {}
+    local list = self._state:list_entities()
+    for _ = 1, 2  do
+        for entity in values(list) do
+            table.insert(entities, entity)
+        end
+    end
+
+    self._priority_queue:reorder(rt.random.shuffle(entities))
 end

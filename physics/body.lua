@@ -29,13 +29,18 @@ b2.CollisionGroup = meta.new_enum({
 })
 
 --- @class b2.Body
-b2.Body = meta.new_type("PhysicsBody", function(world, type, position_x, position_y)
+b2.Body = meta.new_type("PhysicsBody", function(world, type, position_x, position_y, automatic_mass)
     local def = box2d.b2DefaultBodyDef()
     def.type = type
     def.position = b2.Vec2(position_x, position_y)
+    if automatic_mass ~= nil then
+        def.automaticMass = automatic_mass
+    end
+
+    def.allowFastRotation = true
 
     return meta.new(b2.Body, {
-        _native = box2d.b2CreateBody(world._native, def)
+        _native = ffi.gc(box2d.b2CreateBody(world._native, def), box2d.b2DestroyBody)
     })
 end)
 
@@ -118,7 +123,6 @@ end
 
 --- @brief
 function b2.Body:get_centroid(local_offset_x, local_offset_y)
-    assert(box2d.b2Body_IsValid(self._native) == true)
     if local_offset_x == nil then local_offset_x = 0 end
     if local_offset_y == nil then local_offset_y = 0 end
     local out = box2d.b2Body_GetWorldPoint(self._native, b2.Vec2(local_offset_x, local_offset_y))
@@ -224,9 +228,9 @@ end
 
 --- @brief
 function b2.Body:set_mass(mass)
-    local data = box2d.b2Body_GetMassData(self._native)
-    data.mass = mass
-    box2d.b2Body_SetMassData(self._native, data)
+    local current = box2d.b2Body_GetMassData(self._native)
+    current.mass = mass
+    box2d.b2Body_SetMassData(self._native, current)
     box2d.b2Body_SetAutomaticMass(self._native, false)
 end
 
