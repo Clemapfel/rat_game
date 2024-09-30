@@ -94,7 +94,7 @@ end
 --- @return b2.Circle
 function b2.Shape:get_circle()
     assert(self:get_is_circle())
-    return b2.Circle:new_from_id(box2d.b2Shape_GetCircle(self._native))
+    return meta.new(b2.Circle, { _native = box2d.b2Shape_GetCircle(self._native) })
 end
 
 --- @brief
@@ -111,7 +111,7 @@ end
 --- @return b2.Capsule
 function b2.Shape:get_capsule()
     assert(self:get_is_capsule())
-    return b2.Capsule:new_from_id(box2d.b2Shape_GetCircle(self._native))
+    return meta.new(b2.Capsule, { _native = box2d.b2Shape_GetCircle(self._native) })
 end
 
 --- @brief
@@ -128,7 +128,7 @@ end
 --- @return b2.Polygon
 function b2.Shape:get_polygon()
     assert(self:get_is_polygon())
-    return b2.Polygon:new_from_id(box2d.b2Shape_GetCircle(self._native))
+    return meta.new(b2.Polygon, { _native = box2d.b2Shape_GetCircle(self._native) })
 end
 
 --- @brief
@@ -145,7 +145,7 @@ end
 --- @return b2.Segment
 function b2.Shape:get_segment()
     assert(self:get_is_segment())
-    return b2.Segment:new_from_id(box2d.b2Shape_GetCircle(self._native))
+    return meta.new(b2.Segment, { _native = box2d.b2Shape_GetCircle(self._native) })
 end
 
 --- @brief
@@ -284,16 +284,18 @@ end
 
 --- @brief
 function b2._draw_circle(circle, body)
-    love.graphics.circle("fill", circle.center.x, circle.center.y, circle.radius)
-    love.graphics.circle("line", circle.center.x, circle.center.y, circle.radius)
+    local scale = B2_METER_TO_PIXEL
+    love.graphics.circle("fill", circle.center.x * scale, circle.center.y * scale, circle.radius * scale)
+    love.graphics.circle("line", circle.center.x * scale, circle.center.y * scale, circle.radius * scale)
 end
 
 --- @brief
 function b2._draw_polygon(polygon)
+    local scale = B2_METER_TO_PIXEL
     local points = {}
     for i = 1, polygon.count do
-        table.insert(points, polygon.vertices[i-1].x)
-        table.insert(points, polygon.vertices[i-1].y)
+        table.insert(points, polygon.vertices[i-1].x * scale)
+        table.insert(points, polygon.vertices[i-1].y * scale)
     end
     love.graphics.polygon("fill", points)
     love.graphics.polygon("line", points)
@@ -301,18 +303,21 @@ end
 
 --- @brief
 function b2._draw_segment(segment)
-    love.graphics.line(segment.point1.x, segment.point1.y, segment.point2.x, segment.point2.y)
+    local scale = B2_METER_TO_PIXEL
+    love.graphics.line(segment.point1.x * scale, segment.point1.y * scale, segment.point2.x * scale, segment.point2.y * scale)
 end
 
 --- @brief
 function b2._draw_chain_segment(smooth)
-    love.graphics.line(smooth.segment.point1.x, smooth.segment.point1.y, smooth.segment.point2.x, smooth.segment.point2.y)
+    local scale = B2_METER_TO_PIXEL
+    love.graphics.line(smooth.segment.point1.x * scale, smooth.segment.point1.y * scale, smooth.segment.point2.x * scale, smooth.segment.point2.y * scale)
 end
 
 --- @brief
 function b2._draw_capsule(capsule)
-    local x1, y1, x2, y2 = capsule.center1.x, capsule.center1.y, capsule.center2.x, capsule.center2.y
-    local radius = capsule.radius
+    local scale = B2_METER_TO_PIXEL
+    local x1, y1, x2, y2 = capsule.center1.x * scale, capsule.center1.y * scale, capsule.center2.x * scale, capsule.center2.y * scale
+    local radius = capsule.radius * scale
 
     love.graphics.line(x1 - radius, y1, x2 - radius, y2)
     love.graphics.line(x1 + radius, y1, x2 + radius, y2)

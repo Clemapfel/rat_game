@@ -206,3 +206,8 @@ rt.continuous_step = function(x, n_steps, smoothness)
     return h * ((math.tanh((a * x / h) - a * math.floor(x / h) - a / 2) / (2 * math.tanh(a / 2)) + 0.5 + math.floor(x / h)))
 end
 
+--- @brief
+function rt.smooth_min(a, b, smoothness)
+    return -math.log(math.exp(-smoothness * a) + math.exp(-smoothness * b)) / smoothness
+end
+

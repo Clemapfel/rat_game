@@ -274,6 +274,9 @@ POSITIVE_INFINITY = INFINITY
 --- @brief negative infinity
 NEGATIVE_INFINITY = -1/0
 
+--- @brief nan
+NAN = 0/0
+
 --- @brief round to nearest integer
 --- @param i number
 --- @return number

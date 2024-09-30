@@ -4,3 +4,6 @@
 [submodule "physics/box2d_extension/enkiTS"]
 	path = physics/box2d_extension/enkiTS
 	url = https://github.com/dougbinks/enkiTS
+[submodule "love/love"]
+	path = love/love
+	url = https://github.com/love2d/love

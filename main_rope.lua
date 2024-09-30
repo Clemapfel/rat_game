@@ -1,6 +1,6 @@
 require "include"
 
-world = b2.World(0, 200, 8)
+world = b2.World(0, 200, 16)
 
 bodies = {}
 shapes = {}
@@ -9,7 +9,6 @@ chain_body = nil
 player = nil
 
 love.load = function()
-    rt.profiler.start()
     local margin_x, margin_y = 0.01 * rt.graphics.get_width(), 0.01 * rt.graphics.get_height()
     local floor_body = b2.Body(world, b2.BodyType.STATIC, 0.5 * rt.graphics.get_width(), 0.5 * rt.graphics.get_height())
     local floor_xr, floor_yr = 0.5 * rt.graphics.get_width() - 0.5 * margin_x, 0.5 * rt.graphics.get_height() - 0.5 * margin_y
@@ -53,7 +52,6 @@ love.load = function()
     local previous_body = nil
     local previous_body_bottom_x, previous_body_bottom_y = nil, nil
 
-
     local first_body
     for i = 1, n_segments do
         local body = b2.Body(world, b2.BodyType.DYNAMIC, rope_x, current_y)
@@ -67,7 +65,7 @@ love.load = function()
         local bottom_x, bottom_y = 0, 0.5 * segment_length - radius
 
 
-        local shape = b2.CircleShape(body, b2.Circle(2 * radius))
+        local shape = b2.CircleShape(body, b2.Circle(10))
 
         local chain_category = 0x0002
         local all_category = 0xFFFF
@@ -91,9 +89,6 @@ love.load = function()
         previous_body = body
         previous_body_bottom_x, previous_body_bottom_y = bottom_x, bottom_y
     end
-    rt.profiler.stop()
-    local str, _ = rt.profiler.report()
-    println(str)
 end
 
 love.keypressed = function(which)
@@ -122,7 +117,8 @@ love.draw = function()
 
     world:draw()
 
-
+    love.graphics.setColor(1, 1, 1, 1)
+    love.graphics.printf(love.timer.getFPS(), 0, 0, POSITIVE_INFINITY)
 
     --[[
     for shape in values(shapes) do

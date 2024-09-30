@@ -23,12 +23,23 @@
     </configurations>
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="7fa9ba1b-2cff-4ecc-86fb-59ab2fa76ee1" name="Changes" comment="added deadzone widget, imported priority queue">
+    <list default="true" id="7fa9ba1b-2cff-4ecc-86fb-59ab2fa76ee1" name="Changes" comment="stashing smooth motion">
+      <change afterPath="$PROJECT_DIR$/love/love" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/.gitmodules" beforeDir="false" afterPath="$PROJECT_DIR$/.gitmodules" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/battle/battle_scene.lua" beforeDir="false" afterPath="$PROJECT_DIR$/battle/battle_scene.lua" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/common/common.lua" beforeDir="false" afterPath="$PROJECT_DIR$/common/common.lua" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/common/smoothed_motion_2d.lua" beforeDir="false" afterPath="$PROJECT_DIR$/common/smoothed_motion_2d.lua" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/include.lua" beforeDir="false" afterPath="$PROJECT_DIR$/include.lua" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/main_rope.lua" beforeDir="false" afterPath="$PROJECT_DIR$/main_rope.lua" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/old/common/easement_functions.lua" beforeDir="false" afterPath="$PROJECT_DIR$/old/common/easement_functions.lua" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/physics/body.lua" beforeDir="false" afterPath="$PROJECT_DIR$/physics/body.lua" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/physics/capsule.lua" beforeDir="false" afterPath="$PROJECT_DIR$/physics/capsule.lua" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/physics/circle.lua" beforeDir="false" afterPath="$PROJECT_DIR$/physics/circle.lua" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/physics/joint.lua" beforeDir="false" afterPath="$PROJECT_DIR$/physics/joint.lua" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/physics/polygon.lua" beforeDir="false" afterPath="$PROJECT_DIR$/physics/polygon.lua" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/physics/segment.lua" beforeDir="false" afterPath="$PROJECT_DIR$/physics/segment.lua" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/physics/shape.lua" beforeDir="false" afterPath="$PROJECT_DIR$/physics/shape.lua" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/physics/world.lua" beforeDir="false" afterPath="$PROJECT_DIR$/physics/world.lua" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -548,15 +559,7 @@
       <workItem from="1726946691418" duration="37119000" />
       <workItem from="1727197616942" duration="776000" />
       <workItem from="1727276997949" duration="43344000" />
-      <workItem from="1727542096317" duration="24729000" />
-    </task>
-    <task id="LOCAL-01039" summary="stashing">
-      <option name="closed" value="true" />
-      <created>1725673584820</created>
-      <option name="number" value="01039" />
-      <option name="presentableId" value="LOCAL-01039" />
-      <option name="project" value="LOCAL" />
-      <updated>1725673584820</updated>
+      <workItem from="1727542096317" duration="32047000" />
     </task>
     <task id="LOCAL-01040" summary="box2d extension working">
       <option name="closed" value="true" />
@@ -942,7 +945,15 @@
       <option name="project" value="LOCAL" />
       <updated>1727642799403</updated>
     </task>
-    <option name="localTasksCounter" value="1088" />
+    <task id="LOCAL-01088" summary="stashing smooth motion">
+      <option name="closed" value="true" />
+      <created>1727647354390</created>
+      <option name="number" value="01088" />
+      <option name="presentableId" value="LOCAL-01088" />
+      <option name="project" value="LOCAL" />
+      <updated>1727647354390</updated>
+    </task>
+    <option name="localTasksCounter" value="1089" />
     <servers />
   </component>
   <component name="TypeScriptGeneratedFilesManager">
@@ -991,7 +1002,6 @@
     </option>
   </component>
   <component name="VcsManagerConfiguration">
-    <MESSAGE value="ordered box working" />
     <MESSAGE value="encapsulated physics 2d animation" />
     <MESSAGE value="refactored smoothed motion, TODO implement for 1d" />
     <MESSAGE value="health bar done" />
@@ -1016,7 +1026,8 @@
     <MESSAGE value="profiler done" />
     <MESSAGE value="optimized drawing of various scenes" />
     <MESSAGE value="added deadzone widget, imported priority queue" />
-    <option name="LAST_COMMIT_MESSAGE" value="added deadzone widget, imported priority queue" />
+    <MESSAGE value="stashing smooth motion" />
+    <option name="LAST_COMMIT_MESSAGE" value="stashing smooth motion" />
   </component>
   <component name="XDebuggerManager">
     <breakpoint-manager>

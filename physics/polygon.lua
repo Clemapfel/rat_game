@@ -13,8 +13,9 @@ b2.Polygon._create_native = function(vertices)
     local n_points = #vertices
     local vec2s = ffi.new("b2Vec2[" .. n_points .. "]")
     local ci = 0
+    local scale = B2_PIXEL_TO_METER
     for i = 1, n_points, 2 do
-        vec2s[ci] = b2.Vec2(vertices[i], vertices[i+1])
+        vec2s[ci] = b2.Vec2(vertices[i] * scale, vertices[i+1] * scale)
         ci = ci + 1
     end
     local hull = box2d.b2ComputeHull(vec2s, n_points)
@@ -27,26 +28,24 @@ function b2.Rectangle(width, height, center_x, center_y, angle)
     if center_y == nil then center_y = 0 end
     if angle == nil then angle = 0 end
 
-    local rot = b2.Rot()
-    rot.c = math.cos(angle)
-    rot.s = math.sin(angle)
+    local scale = B2_PIXEL_TO_METER
     return meta.new(b2.Polygon, {
         _native = box2d.b2MakeOffsetBox(
-            width, height,
-            b2.Vec2(center_x, center_y),
-            rot
+            width * scale, height * scale,
+            b2.Vec2(center_x * scale, center_y * scale),
+            box2d.b2MakeRot(angle)
         )
     })
 end
 
 --- @brief
 function b2.Polygon:set_corner_radius(r)
-    self._native.radius = r
+    self._native.radius = r * B2_PIXEL_TO_METER
 end
 
 --- @brief
 function b2.Polygon:get_corner_radius()
-    return self._native.radius
+    return self._native.radius * B2_METER_TO_PIXEL
 end
 
 --- @brief
@@ -58,10 +57,11 @@ end
 function b2.Polygon:get_points()
     local n_points = self._native.count
     local out = {}
+    local scale = B2_METER_TO_PIXEL
     for i = 1, n_points do
         local vec2 = self._native.vertices[i]
-        table.insert(out, vec2.x)
-        table.insert(out, vec2.y)
+        table.insert(out, vec2.x * scale)
+        table.insert(out, vec2.y * scale)
     end
     return out
 end

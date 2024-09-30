@@ -35,21 +35,23 @@ function b2.DistanceJoint(
     def.bodyIdA = body_a._native
     def.bodyIdB = body_b._native
 
+    local scale = B2_PIXEL_TO_METER
+
     if length <= 0 then
         rt.warning("In b2.DistanceJoint: length <= 0")
     end
 
     if length == nil then length = 1 / 1000 end
 
-    def.length = length
+    def.length = length * scale
 
     if a_anchor_x == nil then a_anchor_x = 0 end
     if a_anchor_y == nil then a_anchor_y = 0 end
     if b_anchor_x == nil then b_anchor_x = 0 end
     if b_anchor_y == nil then b_anchor_y = 0 end
 
-    def.localAnchorA = b2.Vec2(a_anchor_x, a_anchor_y)
-    def.localAnchorB = b2.Vec2(b_anchor_x, b_anchor_y)
+    def.localAnchorA = b2.Vec2(a_anchor_x * scale, a_anchor_y * scale)
+    def.localAnchorB = b2.Vec2(b_anchor_x * scale, b_anchor_y * scale)
 
     if collide_connected == nil then collide_connected = true end
     def.collideConnected = collide_connected
@@ -77,10 +79,12 @@ function b2.MouseJoint(
     collide_connected,
     hertz, damping, max_force
 )
+    local scale = B2_PIXEL_TO_METER
+
     local def = box2d.b2DefaultMouseJointDef()
     def.bodyIdA = body_a._native
     def.bodyIdB = body_b._native
-    def.target = b2.Vec2(position_x, position_y)
+    def.target = b2.Vec2(position_x * scale, position_y * scale)
 
     if collide_connected == nil then collide_connected = true end
     def.collideConnected = collide_connected
@@ -107,11 +111,13 @@ function b2.WeldJoint(
     linear_hertz, linear_damping,
     angular_hertz, angular_damping_ratio
 )
+    local scale = B2_PIXEL_TO_METER
+
     local def = box2d.b2DefaultWeldJointDef()
     def.bodyIdA = body_a._native
     def.bodyIdB = body_b._native
-    def.localAnchorA = b2.Vec2(a_anchor_x, a_anchor_y)
-    def.localAnchorB = b2.Vec2(b_anchor_x, b_anchor_y)
+    def.localAnchorA = b2.Vec2(a_anchor_x * scale, a_anchor_y * scale)
+    def.localAnchorB = b2.Vec2(b_anchor_x * scale, b_anchor_y * scale)
 
     if collide_connected ~= nil then
         def.collideConnected = collide_connected
@@ -180,9 +186,10 @@ end
 --- @brief
 --- @return Number, Number, Number, Number a_anchor_x, a_anchor_y, b_anchor_x, b_anchor_y
 function b2.Joint:get_local_anchors()
+    local scale = B2_METER_TO_PIXEL
     local a_anchor = box2d.b2Joint_GetLocalAnchorA(self._native)
     local b_anchor = box2d.b2Joint_GetLocalAnchorB(self._native)
-    return a_anchor.x, a_anchor.y, b_anchor.x, b_anchor.y
+    return a_anchor.x * scale, a_anchor.y * scale, b_anchor.x * scale, b_anchor.y * scale
 end
 
 --- @brief
@@ -221,5 +228,6 @@ function b2.Joint:draw()
     local a = box2d.b2Body_GetWorldPoint(body_a, local_a)
     local b = box2d.b2Body_GetWorldPoint(body_b, local_b)
 
-    love.graphics.line(a.x, a.y, b.x, b.y)
+    local scale = B2_METER_TO_PIXEL
+    love.graphics.line(a.x * scale, a.y * scale, b.x * scale, b.y * scale)
 end

@@ -17,7 +17,6 @@ do
     box2d = ffi.load("box2d")
     local cdef = love.filesystem.read("physics/box2d_cdef.h")
     ffi.cdef(cdef)
-    box2d.b2SetLengthUnitsPerMeter(love.physics.getMeter())
 
     -- load enkiTS
     enkiTS = ffi.load("enkiTS")
@@ -61,6 +60,8 @@ mn = rt.menu
 bt = rt.battle
 ow = rt.overworld
 b2 = rt.physics
+B2_METER_TO_PIXEL = 100
+B2_PIXEL_TO_METER = 1 / B2_METER_TO_PIXEL
 
 for _, name in pairs({"rt", "bt", "ow", "b2"}) do
     local t = _G[name]

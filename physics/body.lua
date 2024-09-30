@@ -32,7 +32,7 @@ b2.CollisionGroup = meta.new_enum({
 b2.Body = meta.new_type("PhysicsBody", function(world, type, position_x, position_y, automatic_mass)
     local def = box2d.b2DefaultBodyDef()
     def.type = type
-    def.position = b2.Vec2(position_x, position_y)
+    def.position = b2.Vec2(position_x * B2_PIXEL_TO_METER, position_y * B2_PIXEL_TO_METER)
     if automatic_mass ~= nil then
         def.automaticMass = automatic_mass
     end
@@ -40,7 +40,7 @@ b2.Body = meta.new_type("PhysicsBody", function(world, type, position_x, positio
     def.allowFastRotation = true
 
     return meta.new(b2.Body, {
-        _native = ffi.gc(box2d.b2CreateBody(world._native, def), box2d.b2DestroyBody)
+        _native = box2d.b2CreateBody(world._native, def)--ffi.gc(box2d.b2CreateBody(world._native, def), box2d.b2DestroyBody)
     })
 end)
 
@@ -62,7 +62,20 @@ function b2.Body:get_shapes()
     local _ = box2d.b2Body_GetShapes(self._native, shapes, n)
     local out = {}
     for i = 1, n do
-        table.insert(out, b2.Shape:new_from_id(out))
+        local type = box2d.b2Shape_GetType(shapes[i-1])
+        local to_insert
+        if type == box2d.b2_circleShape then
+            to_insert = meta.new(b2.Circle, { _native = box2d.b2Shape_GetCircle(self._native)})
+        elseif type == box2d.b2_polygonShape then
+            to_insert = meta.new(b2.Polygon, { _native = box2d.b2Shape_GetPolygon(self._native)})
+        elseif type == box2d.b2_segmentShape then
+            to_insert = meta.new(b2.Segment, { _native = box2d.b2Shape_GetSegment(self._native)})
+        elseif type == box2d.b2_capsuleShape then
+            to_insert = meta.new(b2.Capsule, { _native = box2d.b2Shape_GetCapsule(self._native)})
+        elseif type == box2d.b2_chainSegmentShape then
+            error("In b2.Shape:draw: unhandlined shape type `" .. type .. "`")
+        end
+        table.insert(out, to_insert)
     end
     return out
 end
@@ -79,45 +92,53 @@ end
 
 --- @brief
 function b2.Body:get_world_point(local_x, local_y)
-    local out = box2d.b2Body_GetWorldPoint(self._native, b2.Vec2(local_x, local_y))
-    return out.x, out.y
+    local scale_down = B2_PIXEL_TO_METER
+    local out = box2d.b2Body_GetWorldPoint(self._native, b2.Vec2(local_x * scale_down, local_y * scale_down))
+    local scale_up = B2_METER_TO_PIXEL
+    return out.x * scale_up, out.y * scale_up
 end
 
 --- @brief
 function b2.Body:get_world_points(local_x, local_y, ...)
+    local scale_down = B2_PIXEL_TO_METER
+    local scale_up = B2_METER_TO_PIXEL
     local points = {local_x, local_y, ...}
     local out = {}
     for i = 1, #points, 2 do
-        local vec2 = box2d.b2Body_GetWorldPoint(self._native, b2.Vec2(points[i], points[i+1]))
-        table.insert(out, vec2.x)
-        table.insert(out, vec2.y)
+        local vec2 = box2d.b2Body_GetWorldPoint(self._native, b2.Vec2(points[i] * scale_down, points[i+1] * scale_down))
+        table.insert(out, vec2.x * scale_up)
+        table.insert(out, vec2.y * scale_up)
     end
     return table.unpack(out)
 end
 
 --- @brief
 function b2.Body:get_local_point(local_x, local_y)
+    local scale = B2_METER_TO_PIXEL
     local out = box2d.b2Body_GetLocalPoint(self._native, b2.Vec2(local_x, local_y))
-    return out.x, out.y
+    return out.x * scale, out.y * scale
 end
 
 --- @brief
 function b2.Body:get_local_points(local_x, local_y, ...)
+    local scale_down = B2_PIXEL_TO_METER
+    local scale_up = B2_METER_TO_PIXEL
     local points = {local_x, local_y, ...}
     local out = {}
     for i = 1, #points, 2 do
-        local vec2 = box2d.b2Body_GetLocalPoint(self._native, b2.Vec2(points[i], points[i+1]))
-        table.insert(out, vec2.x)
-        table.insert(out, vec2.y)
+        local vec2 = box2d.b2Body_GetLocalPoint(self._native, b2.Vec2(points[i] * scale_down, points[i+1] * scale_down))
+        table.insert(out, vec2.x * scale_up)
+        table.insert(out, vec2.y * scale_up)
     end
     return table.unpack(out)
 end
 
 --- @brief
 function b2.Body:set_centroid(point_x, point_y)
+    local scale = B2_PIXEL_TO_METER
     local current = box2d.b2Body_GetTransform(self._native)
-    if point_x ~= nil then current.p.x = point_x end
-    if point_y ~= nil then current.p.y = point_y end
+    if point_x ~= nil then current.p.x = point_x * scale end
+    if point_y ~= nil then current.p.y = point_y * scale end
     box2d.b2Body_SetTransform(self._native, current)
 end
 
@@ -125,13 +146,16 @@ end
 function b2.Body:get_centroid(local_offset_x, local_offset_y)
     if local_offset_x == nil then local_offset_x = 0 end
     if local_offset_y == nil then local_offset_y = 0 end
-    local out = box2d.b2Body_GetWorldPoint(self._native, b2.Vec2(local_offset_x, local_offset_y))
-    return out.x, out.y
+    local scale_down = B2_PIXEL_TO_METER
+    local scale_up = B2_METER_TO_PIXEL
+    local out = box2d.b2Body_GetWorldPoint(self._native, b2.Vec2(local_offset_x * scale_down, local_offset_y * scale_down))
+    return out.x * scale_up, out.y * scale_up
 end
 
 --- @brief
 function b2.Body:teleport(x, y)
-    box2d.b2Body_SetTransform(self._native, b2.Vec2(x, y), box2d.b2Body_GetRotation(self._native))
+    local scale = B2_PIXEL_TO_METER
+    box2d.b2Body_SetTransform(self._native, b2.Vec2(x * scale, y * scale), box2d.b2Body_GetRotation(self._native))
 end
 
 --- @brief
@@ -158,19 +182,31 @@ function b2.Body:get_rotation_fixed()
     return box2d.b2Body_IsFixedRotation(self._native)
 end
 
+local max_value = 10e7 -- clamp to avoid float32 overflow
+
 --- @brief
 function b2.Body:set_linear_velocity(x, y)
+    local scale = B2_PIXEL_TO_METER
+    if x == NAN then x = 0 end
+    if y == NAN then y = 0 end
+    x = x * scale
+    y = y * scale
+    if x > max_value then x = max_value end
+    if y > max_value then y = max_value end
     box2d.b2Body_SetLinearVelocity(self._native, b2.Vec2(x, y))
 end
 
 --- @brief
 function b2.Body:get_linear_velocity()
+    local scale = B2_METER_TO_PIXEL
     local vec2 = box2d.b2Body_GetLinearVelocity(self._native)
-    return vec2.x, vec2.y
+    return vec2.x * scale, vec2.y * scale
 end
 
 --- @brief
 function b2.Body:set_angular_velocity(value)
+    if value == NAN then value = 0 end
+    if value > max_value then value = max_value end
     box2d.b2Body_SetAngularVelocity(self._native, value)
 end
 
@@ -181,15 +217,29 @@ end
 
 --- @brief
 function b2.Body:apply_force(force_x, force_y, local_point_x, local_point_y, should_wake_up_body)
+    local scale = B2_PIXEL_TO_METER
     if should_wake_up_body == nil then should_wake_up_body = true end
     if local_point_x == nil then local_point_x = 0 end
     if local_point_y == nil then local_point_y = 0 end
-    box2d.b2Body_ApplyForce(self._native, b2.Vec2(force_x, force_y), b2.Vec2(local_point_x, local_point_y), should_wake_up_body)
+    if force_x == NAN then force_x = 0 end
+    if force_y == NAN then force_y = 0 end
+    force_x = force_x * scale
+    force_y = force_y * scale
+    if force_x > max_value then force_x = max_value end
+    if force_y > max_value then force_y = max_value end
+    box2d.b2Body_ApplyForce(self._native,
+        b2.Vec2(force_x, force_y),
+        b2.Vec2(local_point_x * scale, local_point_y * scale),
+        should_wake_up_body
+    )
 end
 
 --- @brief
 function b2.Body:apply_torque(value, should_wake_up_body)
     if should_wake_up_body == nil then should_wake_up_body = true end
+    value = value * B2_PIXEL_TO_METER * B2_PIXEL_TO_METER
+    if value == NAN then value = 0 end
+    if value > max_value then value = max_value end
     box2d.b2Body_ApplyTorque(self._native, value, should_wake_up_body)
 end
 
@@ -198,9 +248,16 @@ function b2.Body:apply_linear_impulse(impulse_x, impulse_y, local_point_x, local
     if should_wake_up_body == nil then should_wake_up_body = true end
     if local_point_x == nil then local_point_x = 0 end
     if local_point_y == nil then local_point_y = 0 end
+    local scale = B2_PIXEL_TO_METER
+    impulse_x = impulse_x * scale
+    impulse_y = impulse_y * scale
+    if impulse_x == NAN then impulse_x = 0 end
+    if impulse_y == NAN then impulse_y = 0 end
+    if impulse_x > max_value then impulse_x = max_value end
+    if impulse_y > max_value then impulse_y = max_value end
     box2d.b2Body_ApplyLinearImpulse(self._native,
         b2.Vec2(impulse_x, impulse_y),
-        b2.Vec2(local_point_x, local_point_y),
+        b2.Vec2(local_point_x * scale, local_point_y * scale),
         should_wake_up_body
     )
 end
@@ -208,6 +265,10 @@ end
 --- @brief
 function b2.Body:apply_angular_impulse(value, should_wake_up_body)
     if should_wake_up_body == nil then should_wake_up_body = true end
+    local scale = B2_PIXEL_TO_METER * B2_PIXEL_TO_METER
+    if value == NAN then value = 0 end
+    value = value * scale
+    if value > max_value then value = max_value end
     box2d.b2Body_ApplyTorque(self._native, value, should_wake_up_body)
 end
 
@@ -218,9 +279,12 @@ end
 
 --- @brief
 function b2.Body:override_mass_data(mass, center_x, center_y, rotational_inertia)
+    local scale = B2_PIXEL_TO_METER
+    if mass == NAN then mass = 0 end
+    if mass > max_value then mass = max_value end
     box2d.b2Body_SetMassData(self._native, ffi.typeof("b2MassData")(
         mass,
-        b2.Vec2(center_x, center_y),
+        b2.Vec2(center_x * scale, center_y * scale),
         rotational_inertia
     ))
     box2d.b2Body_SetAutomaticMass(self._native, false);
@@ -230,14 +294,15 @@ end
 function b2.Body:set_mass(mass)
     local current = box2d.b2Body_GetMassData(self._native)
     current.mass = mass
+    if mass > max_value then mass = max_value end
     box2d.b2Body_SetMassData(self._native, current)
     box2d.b2Body_SetAutomaticMass(self._native, false)
 end
 
 --- @brief
 function b2.Body:set_linear_damping(value)
-    if value == POSITIVE_INFINITY then value = 2^32 end
     if value < 0 then value = 0 end
+    if value > max_value then value = max_value end
     box2d.b2Body_SetLinearDamping(self._native, value)
 end
 
@@ -308,5 +373,11 @@ function b2.Body:draw()
     local centroid_x, centroid_y = self:get_centroid()
     local angle = self:get_angle()
 
-    --love.graphics.line(centroid_x, centroid_y, rt.translate_point_by_angle(centroid_x, centroid_y, radius, angle))
+    love.graphics.push()
+    love.graphics.translate(centroid_x, centroid_y)
+    love.graphics.rotate(angle)
+    for shape in values(self:get_shapes()) do
+        shape:draw()
+    end
+    love.graphics.pop()
 end

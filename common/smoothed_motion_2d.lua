@@ -3,7 +3,7 @@ rt.SmoothedMotion2D = meta.new_type("SmoothedMotion2D", function(position_x, pos
     if position_y == nil then position_y = 0 end
     meta.assert_number(position_x, position_y)
 
-    local body = b2.Body(rt.SmoothedMotion2D._world, b2.BodyType.KINEMATIC, position_x, position_y, true  )
+    local body = b2.Body(rt.SmoothedMotion2D._world, b2.BodyType.DYNAMIC, position_x, position_y, true  )
       local shape = b2.CircleShape(body, b2.Circle(1))
     shape:set_collision_group(b2.CollisionGroup.NONE)
     --body:set_mass(1)
@@ -45,20 +45,15 @@ function rt.SmoothedMotion2D:update(_)
 
     local distance = rt.magnitude(target_x - current_x, target_y - current_y)
     local angle = rt.angle(target_x - current_x, target_y - current_y)
-    local vx, vy = rt.translate_point_by_angle(0, 0, distance, angle)
+    local magnitude = 0.01
+    local vx, vy = rt.translate_point_by_angle(0, 0, clamp(distance, 0, 0.01 * self._velocity_factor), angle)
+    self._position_body:apply_linear_impulse(vx, vy)
+    self._position_body:set_linear_damping(clamp(rt.graphics.get_width() - distance, 0))
 
-    self._position_body:set_linear_velocity(vx, vy)
-    --[[
-
-    local distance = rt.magnitude(target_x - current_x, target_y - current_y)
-    local angle = rt.angle(target_x - current_x, target_y - current_y)
-    local magnitude = 0.1
-    local vx, vy = rt.translate_point_by_angle(0, 0, magnitude * distance, angle)
-    self._position_body:apply_force(vx, vy)
-
-    local damping = 1 / (magnitude * distance)
-    self._position_body:set_linear_damping(damping)
-    ]]--
+    if distance < 2 then
+        self._position_body:set_linear_velocity(0, 0)
+        self._current_position_x, self._current_position_y = self._target_position_x, self._target_position_y
+    end
 end
 
 --- @brief
