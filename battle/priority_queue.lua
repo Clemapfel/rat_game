@@ -85,10 +85,13 @@ function bt.PriorityQueue:_element_set_multiplicity(element, n)
 end
 
 --- @brief [internal]
-function bt.PriorityQueue:_element_draw(element, x, y)
-    love.graphics.translate(-element.padding, -element.padding)
+function bt.PriorityQueue:_element_draw(element, x, y, scale)
+    love.graphics.push()
+    love.graphics.translate(0.5 * element.width - x, 0.5 * element.height - y)
+    love.graphics.scale(scale, scale)
+    love.graphics.translate(-0.5 * element.width + y, -0.5 * element.height + y)
     element.snapshot:draw(x, y)
-    love.graphics.translate(element.padding, element.padding)
+    love.graphics.pop()
 end
 
 --- @brief
@@ -135,19 +138,32 @@ function bt.PriorityQueue:size_allocate(x, y, width, height)
 
     self._render_order = {}
     local current_x, current_y = start_x, y
+
+    local total_height = 0
+    local n_items = 0
+    for entity in values(self._order) do
+        local item = self._entity_to_item[entity]
+        total_height = total_height + item.height
+        n_items = n_items + 1
+    end
+
+    local margin = clamp((height - total_height) / (n_items - 1), NEGATIVE_INFINITY, 0)
+    local is_first = true
     for entity in values(self._order) do
         local multiplicity_offset = entity_to_multiplicity_offset[entity]
         if multiplicity_offset == nil then
             multiplicity_offset = 0
-            entity_to_multiplicity_offset[entity] = multiplicity_offset
         end
+
+        entity_to_multiplicity_offset[entity] = multiplicity_offset + 1
 
         local item = self._entity_to_item[entity]
         local motion = item.motions[1 + multiplicity_offset]
         motion:set_target_position(current_x, current_y)
-        current_y = current_y + item.height
+        current_y = current_y + item.height + margin
 
-        table.insert(self._render_order, {item, motion})
+        table.insert(self._render_order, 1, {item, motion, ternary(is_first, 2, 1)})
+        is_first = false
     end
 end
 
@@ -163,7 +179,8 @@ end
 --- @override
 function bt.PriorityQueue:draw()
     for item_motion in values(self._render_order) do
-        local item, motion = table.unpack(item_motion)
-        self:_element_draw(item, motion:get_position())
+        local item, motion, scale = table.unpack(item_motion)
+        local x, y = motion:get_position()
+        self:_element_draw(item, x, y, scale)
     end
 end

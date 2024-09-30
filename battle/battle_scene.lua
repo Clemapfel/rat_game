@@ -127,7 +127,7 @@ end
 function bt.BattleScene:_handle_button_pressed(which)
     local entities = {}
     local list = self._state:list_entities()
-    for _ = 1, 2  do
+    for _ = 1, 4  do
         for entity in values(list) do
             table.insert(entities, entity)
         end
