@@ -53,9 +53,10 @@ function rt.Background:update(delta)
     self:_update_render_texture()
 
     self._dynamic_resolution_freeze_count = self._dynamic_resolution_freeze_count + 1
-    if self._dynamic_resolution_freeze_count > 60 then
+    if self._dynamic_resolution_freeze_count > 120 then
         local before = self._current_compression
         local step = 0.025
+
         if rt.graphics.get_fps() < 0.98 * rt.graphics.get_target_fps() then
             self._current_compression = self._current_compression - step
         elseif rt.graphics.get_fps() >= 0.99 * rt.graphics.get_target_fps() then

@@ -6,7 +6,7 @@ state:initialize_debug_state()
 world = b2.World
 
 local background = rt.Background()
-background:set_implementation(rt.Background.BUBBLEGUM)
+background:set_implementation(rt.Background.COMPLEX_PLOT)
 
 local draw_state = true
 input = rt.InputController()
@@ -52,16 +52,19 @@ love.load = function()
 end
 
 love.update = function(delta)
-    background:update(delta)
+    if love.keyboard.isDown("space") then
+        background:update(delta)
+    elseif love.keyboard.isDown("b") then
+        background:update(-delta)
+    end
     state:_update(delta)
 end
 
 love.draw = function()
-    rt.profiler.push("draw")
+    background:draw()
     if draw_state then
-        state:_draw()
+        --state:_draw()
     end
-    rt.profiler.pop()
 end
 
 love.resize = function(new_width, new_height)

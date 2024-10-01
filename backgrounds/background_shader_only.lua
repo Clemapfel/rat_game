@@ -74,3 +74,6 @@ rt.Background.STAINED_GLASS = rt.Background.new_shader_only_background("STAINED_
 
 --- @class rt.Background.BUBBLEGUM
 rt.Background.BUBBLEGUM = rt.Background.new_shader_only_background("BUBBLEGUM", "backgrounds/bubblegum.glsl")
+
+--- @class rt.Background.COMPLEX_PLOT
+rt.Background.COMPLEX_PLOT = rt.Background.new_shader_only_background("COMPLEX_PLOT", "backgrounds/complex_plot.glsl")
