@@ -120,11 +120,6 @@ vec4 effect(vec4 vertex_color, Image image, vec2 texture_coords, vec2 vertex_pos
     highp vec2 as_polar = complex_to_polar(complex);
     as_polar.x *= cos(complex.x - elapsed) + sin(complex.y + elapsed);
     as_polar = complex_div(as_polar * signal, as_polar.yx);
-    //as_polar.y += time * as_polar.x;
-    //as_polar.x *= atanh(as_polar.y);
-    //as_polar.x = as_polar.x * (cos(as_polar.x + time) + sin(as_polar.y + time));
-    //as_polar.y += elapsed * as_polar.x;
-    //as_polar.x = cos(as_polar.x);
 
     float angle = as_polar.y;
     float magnitude = as_polar.x;

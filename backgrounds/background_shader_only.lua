@@ -77,3 +77,6 @@ rt.Background.BUBBLEGUM = rt.Background.new_shader_only_background("BUBBLEGUM", 
 
 --- @class rt.Background.COMPLEX_PLOT
 rt.Background.COMPLEX_PLOT = rt.Background.new_shader_only_background("COMPLEX_PLOT", "backgrounds/complex_plot.glsl")
+
+--- @class rt.Background.COMPLEX_TILING
+rt.Background.COMPLEX_TILING = rt.Background.new_shader_only_background("COMPLEX_TILING", "backgrounds/complex_tiling.glsl")
