@@ -98,7 +98,7 @@ function rt.Background:size_allocate(x, y, width, height)
     end
 
     if self._implementation ~= nil then
-        self._implementation:resize(0, 0, width, height)
+        self._implementation:size_allocate(0, 0, width, height)
     end
 
     self:_update_render_texture()

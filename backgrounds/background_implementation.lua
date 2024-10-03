@@ -7,7 +7,7 @@ function rt.BackgroundImplementation:realize()
 end
 
 --- @brief
-function rt.BackgroundImplementation:resize(x, y, width, height)
+function rt.BackgroundImplementation:size_allocate(x, y, width, height)
     rt.error("In " .. meta.typeof(self) .. ".size_allocate: abstract method called")
 end
 

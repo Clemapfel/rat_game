@@ -1,12 +1,14 @@
 require "include"
 
+require "midi.midi"
+
 state = rt.GameState()
 state:initialize_debug_state()
 
 world = b2.World
 
 local background = rt.Background()
-background:set_implementation(rt.Background.COMPLEX_PLOT)
+background:set_implementation(rt.Background.VECTOR_FIELD)
 
 local draw_state = true
 input = rt.InputController()

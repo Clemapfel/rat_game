@@ -7,3 +7,6 @@
 [submodule "love/love"]
 	path = love/love
 	url = https://github.com/love2d/love
+[submodule "midi/rtmidi"]
+	path = midi/rtmidi
+	url = https://github.com/thestk/rtmidi

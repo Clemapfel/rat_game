@@ -1,6 +1,7 @@
 do
     local paths = {
         ";?.lua",
+        ";?.lib"
     }
     love.filesystem.setRequirePath(love.filesystem.getRequirePath() .. table.concat(paths))
     io.stdout:setvbuf("no") -- makes it so love2d error message is printed to console immediately
@@ -29,6 +30,11 @@ do
     elseif jit.os == "Windows" then
         fftw3 = ffi.load("libfftw3-3")
     end
+
+    -- load rtmidi
+    rtmidi = ffi.load("rtmidi")
+    cdef = love.filesystem.read("midi/rtmidi_cdef.h")
+    ffi.cdef(cdef)
 end
 
 -- debugger
@@ -109,6 +115,7 @@ require "common.image"
 require "common.texture"
 require "common.render_texture"
 require "common.shader"
+require "common.compute_shader"
 require "common.shape"
 require "common.shape_rectangle"
 require "common.shape_polygon"
@@ -192,7 +199,6 @@ require "menu.msaa_intensity_widget"
 require "menu.deadzone_visualization_widget"
 require "menu.options_scene"
 require "menu.keybinding_scene"
-
 
 -- battle
 require "battle.move"
