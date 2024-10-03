@@ -1,8 +1,9 @@
 return {
     animations = {
-        idle_front = 1,
-        idle_back = 2,
-        thinking = 3,
-        flinching = 4
+        reveal = {1, 6},
+        idle = 7,
+        hide = {8, 11},
+        selection = {12, 17},
+        hit = {17, 29}
     }
 }
