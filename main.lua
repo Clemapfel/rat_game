@@ -6,6 +6,8 @@ midi:signal_connect("message", function(self, timestamp, ...)
     dbg(timestamp, ...)
 end)
 
+rt.profiler.push("test")
+
 state = rt.GameState()
 state:initialize_debug_state()
 
@@ -13,6 +15,9 @@ world = b2.World
 
 local background = rt.Background()
 background:set_implementation(rt.Background.VECTOR_FIELD)
+
+rt.profiler.pop()
+dbg(rt.profiler.report())
 
 local draw_state = true
 input = rt.InputController()

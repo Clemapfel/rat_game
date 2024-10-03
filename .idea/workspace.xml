@@ -22,8 +22,9 @@
     </configurations>
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="7fa9ba1b-2cff-4ecc-86fb-59ab2fa76ee1" name="Changes" comment="added midi messages">
+    <list default="true" id="7fa9ba1b-2cff-4ecc-86fb-59ab2fa76ee1" name="Changes" comment="stashing profiler">
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/main.lua" beforeDir="false" afterPath="$PROJECT_DIR$/main.lua" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/profiler/profiler.lua" beforeDir="false" afterPath="$PROJECT_DIR$/profiler/profiler.lua" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
@@ -557,15 +558,7 @@
       <workItem from="1727197616942" duration="776000" />
       <workItem from="1727276997949" duration="43344000" />
       <workItem from="1727542096317" duration="43560000" />
-      <workItem from="1727894489985" duration="19545000" />
-    </task>
-    <task id="LOCAL-01048" summary="implement sound atlas">
-      <option name="closed" value="true" />
-      <created>1725932224613</created>
-      <option name="number" value="01048" />
-      <option name="presentableId" value="LOCAL-01048" />
-      <option name="project" value="LOCAL" />
-      <updated>1725932224613</updated>
+      <workItem from="1727894489985" duration="20411000" />
     </task>
     <task id="LOCAL-01049" summary="stashing loading screen">
       <option name="closed" value="true" />
@@ -951,7 +944,15 @@
       <option name="project" value="LOCAL" />
       <updated>1727996819997</updated>
     </task>
-    <option name="localTasksCounter" value="1097" />
+    <task id="LOCAL-01097" summary="stashing profiler">
+      <option name="closed" value="true" />
+      <created>1727997574802</created>
+      <option name="number" value="01097" />
+      <option name="presentableId" value="LOCAL-01097" />
+      <option name="project" value="LOCAL" />
+      <updated>1727997574802</updated>
+    </task>
+    <option name="localTasksCounter" value="1098" />
     <servers />
   </component>
   <component name="TypeScriptGeneratedFilesManager">
@@ -1012,7 +1013,6 @@
     <MESSAGE value="debug drawing working" />
     <MESSAGE value="added overlap tests" />
     <MESSAGE value="refactored to minimize luajit callback count" />
-    <MESSAGE value="stashing profiler" />
     <MESSAGE value="profiler done" />
     <MESSAGE value="optimized drawing of various scenes" />
     <MESSAGE value="added deadzone widget, imported priority queue" />
@@ -1025,7 +1025,8 @@
     <MESSAGE value="added rat battle sprite" />
     <MESSAGE value="added rtmidi" />
     <MESSAGE value="added midi messages" />
-    <option name="LAST_COMMIT_MESSAGE" value="added midi messages" />
+    <MESSAGE value="stashing profiler" />
+    <option name="LAST_COMMIT_MESSAGE" value="stashing profiler" />
   </component>
   <component name="XDebuggerManager">
     <breakpoint-manager>

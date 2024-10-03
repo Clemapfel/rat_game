@@ -32,16 +32,50 @@ do
                 data.callstack = profiler._jit.dumpstack(thread, _format, _infinity)
                 data.zones = zones
                 data.vmstate = vmstate
-                table.insert(profiler._data, data)
             end
 
-            table.insert(profiler._data, data)
+            local splits = {}
+            if data.vmstate == "N" or data.vmstate == "J" or data.vmstate == "C" then
+                for split in string.gmatch(data.callstack, "([^;]+)") do -- split into individual function names
+                    table.insert(splits, split)
+                end
+            end
+
+            for _, zone_i in pairs(data.zones) do
+                local zone_name = profiler._zone_index_to_name[zone_i]
+                local zone = profiler._data[zone_name]
+
+                if data.vmstate == "N" then
+                    zone.n_compiled_samples = zone.n_compiled_samples + n_samples
+                elseif data.vmstate == "I" then
+                    zone.n_interpreted_samples = zone.n_interpreted_samples + n_samples
+                elseif data.vmstate == "C" then
+                    zone.n_c_code_samples = zone.n_c_code_samples + n_samples
+                elseif data.vmstate == "J" then
+                    zone.n_jit_samples = zone.n_jit_samples + n_samples
+                elseif data.vmstate == "G" then
+                    zone.n_gc_samples = zone.n_gc_samples + n_samples
+                else
+                    error("In profiler._callback: unhandled vmstate `" .. data.vmstate .. "`")
+                end
+
+                for _, split in pairs(splits) do
+                    if zone.function_to_count[split] == nil then
+                        zone.function_to_count[split] = n_samples
+                    else
+                        zone.function_to_count[split] = zone.function_to_count[split] + n_samples
+                    end
+                end
+
+                zone.n_samples = zone.n_samples + 1
+            end
+
             profiler.n_samples = profiler.n_samples + n_samples
         end
     end
 end
 
---- @brief
+--- @brief add a zone to the current stack, if the stack was empty, this starts the profiler
 function profiler.push(name)
     if name == nil then
         name = "Run #" .. profiler._run_i
@@ -78,9 +112,22 @@ function profiler.push(name)
     if profiler._zone_to_duration[name] == nil then
         profiler._zone_to_duration[name] = 0
     end
+
+    if profiler._data[name] == nil then
+        profiler._data[name] = {
+            function_to_count = {},
+            function_to_percentage = {},
+            n_samples = 0,
+            n_gc_samples = 0,
+            n_jit_samples = 0,
+            n_interpreted_samples = 0,
+            n_compiled_samples = 0,
+            n_c_code_samples = 0
+        }
+    end
 end
 
---- @brief
+--- @brief remove the last pushed zone from the stack. If the stack reaches size 0, the profiler stops
 function profiler.pop()
     if profiler._n_zones >= 1 then
         local last_zone = profiler._zone_index_to_name[profiler._current_zone_stack[#profiler._current_zone_stack]]
@@ -100,66 +147,18 @@ function profiler.pop()
 end
 
 --- @brief [internal]
-function profiler._format_percentage(fraction)
-    return clamp(math.floor(fraction * 10e3) / 10e3 * 100, 0, 100)
-end
+do
+    local function _format_percentage(fraction)
+        return clamp(math.floor(fraction * 10e3) / 10e3 * 100, 0, 100)
+    end
 
 --- @brief get state of the profiling data pretty-printed
 function profiler.report()
-    if #profiler._data == 0 then return end
-    while (profiler._n_zones > 0) do profiler.pop() end
-
-    local zone_data = {}
-    for _, data in pairs(profiler._data) do
-        for _, zone_i in pairs(data.zones) do
-            local zone_name = profiler._zone_index_to_name[zone_i]
-            local zone = zone_data[zone_name]
-            if zone == nil then
-                zone = {
-                    function_to_count = {},
-                    function_to_percentage = {},
-                    n_samples = 0,
-                    n_gc_samples = 0,
-                    n_jit_samples = 0,
-                    n_interpreted_samples = 0,
-                    n_compiled_samples = 0,
-                    n_c_code_samples = 0
-                }
-                zone_data[zone_name] = zone
-            end
-
-            if data.vmstate == "N" then
-                zone.n_compiled_samples = zone.n_compiled_samples + 1
-            elseif data.vmstate == "I" then
-                zone.n_interpreted_samples = zone.n_interpreted_samples + 1
-            elseif data.vmstate == "C" then
-                zone.n_c_code_samples = zone.n_c_code_samples + 1
-            elseif data.vmstate == "J" then
-                zone.n_jit_samples = zone.n_jit_samples + 1
-            elseif data.vmstate == "G" then
-                zone.n_gc_samples = zone.n_gc_samples + 1
-            else
-                error("In profiler.report: unhandled vmstate `" .. data.vmstate .. "`")
-            end
-
-            if data.vmstate == "N" or data.vmstate == "J" or data.vmstate == "C" then
-                for split in string.gmatch(data.callstack, "([^;]+)") do -- split into individual function names
-                    if zone.function_to_count[split] == nil then
-                        zone.function_to_count[split] = 1
-                    else
-                        zone.function_to_count[split] = zone.function_to_count[split] + 1
-                    end
-                end
-            end
-
-            zone.n_samples = zone.n_samples + 1
-        end
-    end
-
-    for zone_name, entry in pairs(zone_data) do
+    local out = {}
+    for zone_name, entry in pairs(profiler._data) do
         local names_in_order = {}
         for name, count in pairs(entry.function_to_count) do
-            entry.function_to_percentage[name] = profiler._format_percentage(count / entry.n_samples)
+            entry.function_to_percentage[name] = _format_percentage(count / entry.n_samples)
             entry.function_to_count[name] = clamp(entry.function_to_count[name], 0, entry.n_samples)
             -- percentage may be > if function name occurs twice in same callstack
             table.insert(names_in_order, name)
@@ -210,10 +209,10 @@ function profiler.report()
         table.insert(header, " |")
         table.insert(sub_header, "-|")
 
-        local gc_percentage = profiler._format_percentage(entry.n_gc_samples / entry.n_samples)
-        local jit_percentage = profiler._format_percentage(entry.n_jit_samples / entry.n_samples)
-        local c_percentage = profiler._format_percentage(entry.n_c_code_samples / (entry.n_interpreted_samples + entry.n_compiled_samples + entry.n_c_code_samples))
-        local interpreted_percentage = profiler._format_percentage(entry.n_interpreted_samples / (entry.n_interpreted_samples + entry.n_compiled_samples))
+        local gc_percentage = _format_percentage(entry.n_gc_samples / entry.n_samples)
+        local jit_percentage = _format_percentage(entry.n_jit_samples / entry.n_samples)
+        local c_percentage = _format_percentage(entry.n_c_code_samples / (entry.n_interpreted_samples + entry.n_compiled_samples + entry.n_c_code_samples))
+        local interpreted_percentage = _format_percentage(entry.n_interpreted_samples / (entry.n_interpreted_samples + entry.n_compiled_samples))
 
         local duration = math.round(profiler._zone_to_duration[zone_name] * 10e5) / 10e5
         local samples_per_second = math.round(entry.n_samples / duration)
@@ -257,9 +256,11 @@ function profiler.report()
         end
 
         table.insert(str, "\n")
+        table.insert(out, table.concat(str, ""))
     end
+
+    return table.concat(out, "\n")
 end
+end -- do-end
 
 return profiler
-
-
