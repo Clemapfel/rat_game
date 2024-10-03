@@ -22,14 +22,9 @@
     </configurations>
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="7fa9ba1b-2cff-4ecc-86fb-59ab2fa76ee1" name="Changes" comment="added rtmidi">
+    <list default="true" id="7fa9ba1b-2cff-4ecc-86fb-59ab2fa76ee1" name="Changes" comment="added midi messages">
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/main.lua" beforeDir="false" afterPath="$PROJECT_DIR$/main.lua" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/midi/midi.lua" beforeDir="false" afterPath="$PROJECT_DIR$/midi/midi.lua" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/midi/rtmidi_cdef.h" beforeDir="false" afterPath="$PROJECT_DIR$/midi/rtmidi_cdef.h" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/physics/box2d_cdef.h" beforeDir="false" afterPath="$PROJECT_DIR$/physics/box2d_cdef.h" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/physics/box2d_extension/box2d_extension.c" beforeDir="false" afterPath="$PROJECT_DIR$/physics/box2d_extension/box2d_extension.c" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/physics/box2d_extension/box2d_extension.h" beforeDir="false" afterPath="$PROJECT_DIR$/physics/box2d_extension/box2d_extension.h" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/profiler/profiler.lua" beforeDir="false" afterPath="$PROJECT_DIR$/profiler/profiler.lua" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -562,15 +557,7 @@
       <workItem from="1727197616942" duration="776000" />
       <workItem from="1727276997949" duration="43344000" />
       <workItem from="1727542096317" duration="43560000" />
-      <workItem from="1727894489985" duration="18854000" />
-    </task>
-    <task id="LOCAL-01047" summary="added sound atlas, stashing">
-      <option name="closed" value="true" />
-      <created>1725909623040</created>
-      <option name="number" value="01047" />
-      <option name="presentableId" value="LOCAL-01047" />
-      <option name="project" value="LOCAL" />
-      <updated>1725909623041</updated>
+      <workItem from="1727894489985" duration="19545000" />
     </task>
     <task id="LOCAL-01048" summary="implement sound atlas">
       <option name="closed" value="true" />
@@ -956,7 +943,15 @@
       <option name="project" value="LOCAL" />
       <updated>1727975875426</updated>
     </task>
-    <option name="localTasksCounter" value="1096" />
+    <task id="LOCAL-01096" summary="added midi messages">
+      <option name="closed" value="true" />
+      <created>1727996819997</created>
+      <option name="number" value="01096" />
+      <option name="presentableId" value="LOCAL-01096" />
+      <option name="project" value="LOCAL" />
+      <updated>1727996819997</updated>
+    </task>
+    <option name="localTasksCounter" value="1097" />
     <servers />
   </component>
   <component name="TypeScriptGeneratedFilesManager">
@@ -1005,7 +1000,6 @@
     </option>
   </component>
   <component name="VcsManagerConfiguration">
-    <MESSAGE value="renamed healing / damage callbacks" />
     <MESSAGE value="added textbox" />
     <MESSAGE value="stashing before refactoring smooth motion" />
     <MESSAGE value="stashing textbox" />
@@ -1030,7 +1024,8 @@
     <MESSAGE value="stashing vector field" />
     <MESSAGE value="added rat battle sprite" />
     <MESSAGE value="added rtmidi" />
-    <option name="LAST_COMMIT_MESSAGE" value="added rtmidi" />
+    <MESSAGE value="added midi messages" />
+    <option name="LAST_COMMIT_MESSAGE" value="added midi messages" />
   </component>
   <component name="XDebuggerManager">
     <breakpoint-manager>

@@ -49,6 +49,9 @@ function profiler.push(name)
     end
 
     assert(type(name) == "string")
+    if profiler._zone_name_to_index[name] ~= nil then
+        error("In profiler.push: Zone `" .. name .. "` is already active, each zone name has to be unique. Use `push()` for a unique name to be chosen automatically")
+    end
 
     local zone_index = profiler._zone_name_to_index[name]
     if zone_index == nil then
@@ -91,6 +94,8 @@ function profiler.pop()
         local now = profiler._socket.gettime()
         profiler._zone_to_duration[last_zone] = profiler._zone_to_duration[last_zone] + (now - profiler._zone_to_start_time[last_zone])
         profiler._zone_to_start_time[last_zone] = nil
+    else
+        error("In profiler.pop: Trying to pop, but no zone is active")
     end
 end
 
@@ -99,7 +104,7 @@ function profiler._format_percentage(fraction)
     return clamp(math.floor(fraction * 10e3) / 10e3 * 100, 0, 100)
 end
 
---- @brief
+--- @brief get state of the profiling data pretty-printed
 function profiler.report()
     if #profiler._data == 0 then return end
     while (profiler._n_zones > 0) do profiler.pop() end
@@ -239,7 +244,7 @@ function profiler.report()
                 end
                 table.insert(str, " |\n")
             else
-                local last_row_percentage = "< 0.1"--tostring(cutoff_total_percentage)
+                local last_row_percentage = "< 0.1"
                 local last_row = {" | "}
                 table.insert(last_row,  last_row_percentage .. string.rep(" ", col_lengths[1] - #last_row_percentage) .. " | ")
                 table.insert(last_row,tostring(cutoff_sample_count) .. string.rep(" ", col_lengths[2] - #tostring(cutoff_n_samples)) .. " | ")
@@ -252,7 +257,6 @@ function profiler.report()
         end
 
         table.insert(str, "\n")
-        dbg(table.concat(str, ""))
     end
 end
 
