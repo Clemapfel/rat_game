@@ -130,3 +130,11 @@ BOX2D_EXPORT b2DebugDraw b2CreateDebugDraw(
     bool draw_contact_impulses,
     bool draw_friction_impulses
 );
+
+// MIDI
+
+typedef void(* RtMidiCCallback) (double timeStamp, const unsigned char* message,
+size_t messageSize, void *userData);
+
+void rtmidi_message_callback(double timeStamp, const unsigned char* message,
+size_t messageSize, void *userData);

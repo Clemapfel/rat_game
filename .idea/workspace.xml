@@ -22,30 +22,14 @@
     </configurations>
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="7fa9ba1b-2cff-4ecc-86fb-59ab2fa76ee1" name="Changes" comment="added complex tiling">
-      <change afterPath="$PROJECT_DIR$/backgrounds/vector_field.lua" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/backgrounds/vector_field_compute.glsl" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/backgrounds/vector_field_render.glsl" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/battle/entity_sprite.lua" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/battle/party_sprite.lua" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/common/compute_shader.lua" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/love/windows/luamidi.lib" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/love/windows/rtmidi.dll" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/midi/midi.lua" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/midi/rtmidi" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/midi/rtmidi_cdef.h" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/.gitmodules" beforeDir="false" afterPath="$PROJECT_DIR$/.gitmodules" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/.idea/misc.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/misc.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/.idea/vcs.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/vcs.xml" afterDir="false" />
+    <list default="true" id="7fa9ba1b-2cff-4ecc-86fb-59ab2fa76ee1" name="Changes" comment="added rtmidi">
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/assets/sprites/battle/rat_battle.lua" beforeDir="false" afterPath="$PROJECT_DIR$/assets/sprites/battle/rat_battle.lua" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/assets/sprites/battle/rat_battle.png" beforeDir="false" afterPath="$PROJECT_DIR$/assets/sprites/battle/rat_battle.png" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/backgrounds/background.lua" beforeDir="false" afterPath="$PROJECT_DIR$/backgrounds/background.lua" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/backgrounds/background_implementation.lua" beforeDir="false" afterPath="$PROJECT_DIR$/backgrounds/background_implementation.lua" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/battle/status_bar.lua" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/common/render_texture.lua" beforeDir="false" afterPath="$PROJECT_DIR$/common/render_texture.lua" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/include.lua" beforeDir="false" afterPath="$PROJECT_DIR$/include.lua" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/main.lua" beforeDir="false" afterPath="$PROJECT_DIR$/main.lua" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/midi/midi.lua" beforeDir="false" afterPath="$PROJECT_DIR$/midi/midi.lua" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/midi/rtmidi_cdef.h" beforeDir="false" afterPath="$PROJECT_DIR$/midi/rtmidi_cdef.h" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/physics/box2d_cdef.h" beforeDir="false" afterPath="$PROJECT_DIR$/physics/box2d_cdef.h" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/physics/box2d_extension/box2d_extension.c" beforeDir="false" afterPath="$PROJECT_DIR$/physics/box2d_extension/box2d_extension.c" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/physics/box2d_extension/box2d_extension.h" beforeDir="false" afterPath="$PROJECT_DIR$/physics/box2d_extension/box2d_extension.h" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -578,31 +562,7 @@
       <workItem from="1727197616942" duration="776000" />
       <workItem from="1727276997949" duration="43344000" />
       <workItem from="1727542096317" duration="43560000" />
-      <workItem from="1727894489985" duration="9361000" />
-    </task>
-    <task id="LOCAL-01044" summary="refactored background">
-      <option name="closed" value="true" />
-      <created>1725824724799</created>
-      <option name="number" value="01044" />
-      <option name="presentableId" value="LOCAL-01044" />
-      <option name="project" value="LOCAL" />
-      <updated>1725824724799</updated>
-    </task>
-    <task id="LOCAL-01045" summary="stashing bubblegum">
-      <option name="closed" value="true" />
-      <created>1725830208235</created>
-      <option name="number" value="01045" />
-      <option name="presentableId" value="LOCAL-01045" />
-      <option name="project" value="LOCAL" />
-      <updated>1725830208235</updated>
-    </task>
-    <task id="LOCAL-01046" summary="stashing demo">
-      <option name="closed" value="true" />
-      <created>1725841135513</created>
-      <option name="number" value="01046" />
-      <option name="presentableId" value="LOCAL-01046" />
-      <option name="project" value="LOCAL" />
-      <updated>1725841135513</updated>
+      <workItem from="1727894489985" duration="18854000" />
     </task>
     <task id="LOCAL-01047" summary="added sound atlas, stashing">
       <option name="closed" value="true" />
@@ -972,7 +932,31 @@
       <option name="project" value="LOCAL" />
       <updated>1727900460833</updated>
     </task>
-    <option name="localTasksCounter" value="1093" />
+    <task id="LOCAL-01093" summary="stashing vector field">
+      <option name="closed" value="true" />
+      <created>1727975832349</created>
+      <option name="number" value="01093" />
+      <option name="presentableId" value="LOCAL-01093" />
+      <option name="project" value="LOCAL" />
+      <updated>1727975832349</updated>
+    </task>
+    <task id="LOCAL-01094" summary="added rat battle sprite">
+      <option name="closed" value="true" />
+      <created>1727975863117</created>
+      <option name="number" value="01094" />
+      <option name="presentableId" value="LOCAL-01094" />
+      <option name="project" value="LOCAL" />
+      <updated>1727975863118</updated>
+    </task>
+    <task id="LOCAL-01095" summary="added rtmidi">
+      <option name="closed" value="true" />
+      <created>1727975875426</created>
+      <option name="number" value="01095" />
+      <option name="presentableId" value="LOCAL-01095" />
+      <option name="project" value="LOCAL" />
+      <updated>1727975875426</updated>
+    </task>
+    <option name="localTasksCounter" value="1096" />
     <servers />
   </component>
   <component name="TypeScriptGeneratedFilesManager">
@@ -1021,9 +1005,6 @@
     </option>
   </component>
   <component name="VcsManagerConfiguration">
-    <MESSAGE value="added status and global status to verbose info panel" />
-    <MESSAGE value="added verbose info item" />
-    <MESSAGE value="stashing before renaming healing / damage callbacks" />
     <MESSAGE value="renamed healing / damage callbacks" />
     <MESSAGE value="added textbox" />
     <MESSAGE value="stashing before refactoring smooth motion" />
@@ -1046,7 +1027,10 @@
     <MESSAGE value="stashing priority queue" />
     <MESSAGE value="cool heart thing" />
     <MESSAGE value="added complex tiling" />
-    <option name="LAST_COMMIT_MESSAGE" value="added complex tiling" />
+    <MESSAGE value="stashing vector field" />
+    <MESSAGE value="added rat battle sprite" />
+    <MESSAGE value="added rtmidi" />
+    <option name="LAST_COMMIT_MESSAGE" value="added rtmidi" />
   </component>
   <component name="XDebuggerManager">
     <breakpoint-manager>

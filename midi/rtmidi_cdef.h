@@ -230,3 +230,4 @@ enum RtMidiApi rtmidi_out_get_current_api (RtMidiPtr device);
 //! \brief Immediately send a single message out an open MIDI output port.
 //! See \ref RtMidiOut::sendMessage().
 int rtmidi_out_send_message (RtMidiOutPtr device, const unsigned char *message, int length);
+

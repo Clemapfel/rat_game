@@ -180,3 +180,9 @@ b2DebugDraw b2CreateDebugDraw(
     draw.context = (void*) context;
     return draw;
 }
+
+// MIDI
+
+void rtmidi_message_callback(double timeStamp, const unsigned char* message, size_t messageSize, void *userData) {
+    printf("%s\n", message);
+}

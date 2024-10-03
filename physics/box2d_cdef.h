@@ -3099,3 +3099,8 @@ b2DebugDraw b2CreateDebugDraw(
     bool draw_contact_impulses,
     bool draw_friction_impulses
 );
+
+
+// custom wrapped
+void rtmidi_message_callback(double timeStamp, const unsigned char* message,
+size_t messageSize, void *userData);

@@ -1,6 +1,10 @@
 require "include"
 
 require "midi.midi"
+midi = rt.MidiInput()
+midi:signal_connect("message", function(self, timestamp, ...)
+    dbg(timestamp, ...)
+end)
 
 state = rt.GameState()
 state:initialize_debug_state()
@@ -60,6 +64,8 @@ love.update = function(delta)
         background:update(-delta)
     end
     state:_update(delta)
+
+    midi:update(delta)
 end
 
 love.draw = function()
