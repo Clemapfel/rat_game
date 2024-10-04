@@ -211,3 +211,18 @@ function rt.smooth_min(a, b, smoothness)
     return -math.log(math.exp(-smoothness * a) + math.exp(-smoothness * b)) / smoothness
 end
 
+--- @brief synth-like envelope function
+--- @param attack Number [0, 1]
+--- @param release Number [0, 1]
+rt.envelope = function(x, attack, release)
+    assert(attack >= 0 and attack <= 1 and release >= 0 and release <= 1 and attack + release <= 1)
+    if x < attack then
+        -- linear attack, 0 to 1
+        return x / attack
+    elseif x > 1 - release then
+        -- exponential release, 1 to 0
+        return math.sqrt((1 - (x - (1 - release)) / release)^3)
+    else
+        return 1 -- sustain
+    end
+end

@@ -186,7 +186,6 @@ function bt.PriorityQueue:size_allocate(x, y, width, height)
         end
 
         current_y = current_y + item.height + margin
-
         table.insert(self._render_order, 1, {item, motion, ternary(is_first, 2, 1)})
         is_first = false
     end
