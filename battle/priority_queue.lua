@@ -82,7 +82,7 @@ end
 --- @brief [internal]
 function bt.PriorityQueue:_element_set_multiplicity(element, n)
     while element.multiplicity < n do
-        table.insert(element.motions, rt.SmoothedMotion2D(rt.graphics.get_width() + element.width, 0.5 * rt.graphics.get_height()))
+        table.insert(element.motions, rt.SmoothedMotion2D(0.5 * rt.graphics.get_width(), 0.5 * rt.graphics.get_height())) --rt.graphics.get_width() + element.width, 0.5 * rt.graphics.get_height()))
         element.multiplicity = element.multiplicity + 1
     end
 
@@ -204,7 +204,7 @@ function bt.PriorityQueue:update(delta)
         local first = self._entity_to_item[self._order[1]]
         if #first.motions > 1 then
             local x, y = first.motions[1]:get_position()
-            self._scale_factor = 1 - self._bounds.y / rt.graphics.get_height()
+            self._scale_factor = 1 - (y - self._bounds.y) / self._bounds.height
             -- scale animation when moving item towards first
         end
     end
@@ -223,6 +223,7 @@ function bt.PriorityQueue:draw()
         if i == #self._render_order then
             scale = first_scale
         end
+
         self:_element_draw(item, x, y, scale)
     end
 end

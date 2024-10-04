@@ -45,8 +45,8 @@ function rt.SmoothedMotion2D:update(_)
 
     local distance = rt.magnitude(target_x - current_x, target_y - current_y)
     local angle = rt.angle(target_x - current_x, target_y - current_y)
-    local magnitude = 0.01
-    local vx, vy = rt.translate_point_by_angle(0, 0, clamp(distance, 0, 0.01 * self._velocity_factor), angle)
+    local magnitude = 1
+    local vx, vy = rt.translate_point_by_angle(0, 0, clamp(distance, 0, magnitude * self._velocity_factor), angle)
     self._position_body:apply_linear_impulse(vx, vy)
     self._position_body:set_linear_damping(clamp(rt.graphics.get_width() - distance, 0))
 

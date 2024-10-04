@@ -10,7 +10,7 @@ base = 0
 hi = 0
 speed = 1
 
-world = b2.World(0, -100)
+world = b2.World(0, 1000)
 shape_circle = b2.Circle(20)
 body_y = rt.graphics.get_height() * 0.8
 base_body = b2.Body(world, b2.BodyType.DYNAMIC, 0.25 * rt.graphics.get_width(), body_y)
@@ -32,12 +32,25 @@ floor_shape = b2.SegmentShape(floor_body, b2.Segment(
     0.5 * rt.graphics.get_width(), 0
 ))
 
+for body in range(hi_body, base_body, speed_body, floor_body) do
+    body:set_rotation_fixed(true)
+end
+
 midi:signal_connect("message", function(type, value)
     value = value * 2 - 1
     if type == rt.MidInput.is_pad(type) then
 
     end
 end)
+
+love.keypressed = function(which)
+    local magnitude = 50
+    if which == "m" then
+        hi_body:apply_linear_impulse(0, -magnitude)
+    elseif which == "y" then
+        base_body:apply_linear_impulse(0, -magnitude)
+    end
+end
 
 love.load = function()
     background:realize()

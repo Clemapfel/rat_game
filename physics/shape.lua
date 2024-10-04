@@ -21,7 +21,7 @@ b2.ShapeType = {
 --- @brief
 function b2.Shape._default_shape_def(is_sensor)
     local shape_def = box2d.b2DefaultShapeDef()
-    shape_def.density = 1 / 100
+    shape_def.density = 1
     if is_sensor ~= nil then shape_def.isSensor = is_sensor end
     return shape_def
 end
