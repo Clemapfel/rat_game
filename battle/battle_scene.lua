@@ -24,8 +24,9 @@ bt.BattleScene = meta.new_type("BattleScene", rt.Scene, function(state)
         _priority_queue = bt.PriorityQueue(),
 
         _verbose_info = mn.VerboseInfoPanel(),
-        _input = rt.InputController()
+        _input = rt.InputController(),
 
+        _entities = {}, -- Table<bt.Entity, cf. add_entity>
     })
 end)
 
@@ -64,6 +65,14 @@ function bt.BattleScene:realize()
     self._input:signal_connect("pressed", function(_, which)
         self:_handle_button_pressed(which)
     end)
+
+    for entity in values(self._state:list_entities()) do
+        self:add_entity(entity)
+    end
+
+    for entity, entry in pairs(self._entities) do
+        entry.sprite:realize()
+    end
 end
 
 --- @override
@@ -91,16 +100,69 @@ function bt.BattleScene:size_allocate(x, y, width, height)
     self._verbose_info:show(bt.Status("DEBUG_STATUS"))
     -- TODO
 
-    local prio_w = 0.1 * width
-    local prio_x = x + width - outer_margin - prio_w
-    local prio_y = y + outer_margin
-    local prio_h = height - 2 * outer_margin
+    local xm, ym = self:_get_margin()
+
+    local prio_w = xm
+    local prio_x = x + width - prio_w
+    local prio_y = y + ym
+    local prio_h = height - 2 * ym
     self._priority_queue:fit_into(prio_x, prio_y, prio_w, prio_h)
+
+    local party_sprites, enemy_sprites = {}, {}
+    for entity, entry in pairs(self._entities) do
+        if entity:get_is_enemy() == true then
+            table.insert(enemy_sprites, entry.sprite)
+        else
+            table.insert(party_sprites, entry.sprite)
+        end
+    end
+
+    self:_reformat_party_sprites(party_sprites)
+    self:_reformat_enemy_sprites(enemy_sprites)
+end
+
+--- @brief [internal]
+function bt.BattleScene:_get_margin()
+    local width_4_by_3 = self._bounds.height * (4 / 3)
+    local xm = (self._bounds.width - width_4_by_3) / 2
+    local ym = 2 * rt.settings.margin_unit
+    return xm, ym
+end
+
+--- @brief [internal]
+function bt.BattleScene:_reformat_party_sprites(sprites)
+    local m = rt.settings.margin_unit
+    local xm, ym = self:_get_margin()
+    local x = self._bounds.x + xm
+    local width = self._bounds.width - 2 * xm
+
+    local n_sprites = sizeof(sprites)
+    local default_w_n_sprites = 3
+    local frame_thickness = 0
+    local w = math.min((width - (n_sprites - 1) * (m + 2 * frame_thickness)) / n_sprites, (width - (default_w_n_sprites - 1) * (m + 2 * frame_thickness)) / default_w_n_sprites)
+    local h = self._bounds.height * (3 / 9)
+    local y = self._bounds.y + self._bounds.height - h - ym
+    x = x + 0.5 * width - 0.5 * (n_sprites * w + (n_sprites - 1) * m)
+
+    for i = 1, n_sprites do
+        local sprite = sprites[i]
+        sprite:fit_into(x, y, w, h)
+        x = x + w + m
+    end
+end
+
+--- @brief [internal]
+function bt.BattleScene:_reformat_enemy_sprites(sprites)
+
 end
 
 --- @override
 function bt.BattleScene:draw()
     self._priority_queue:draw()
+
+    for entry in values(self._entities) do
+        entry.sprite:draw()
+    end
 end
 
 --- @override
@@ -134,4 +196,24 @@ function bt.BattleScene:_handle_button_pressed(which)
     end
 
     self._priority_queue:reorder(rt.random.shuffle(entities))
+end
+
+--- @brief
+function bt.BattleScene:add_entity(entity)
+    if self._entities[entity] == nil then
+        local entry = {
+            sprite = nil, -- bt.EntitySprite
+        }
+        if entity:get_is_enemy() == false then
+            entry.sprite = bt.PartySprite(entity)
+        else
+            -- TODo
+        end
+
+        if self._is_realized then
+            entry.sprite:realize()
+        end
+
+        self._entities[entity] = entry
+    end
 end

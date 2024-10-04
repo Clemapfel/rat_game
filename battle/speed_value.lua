@@ -93,3 +93,8 @@ function bt.SpeedValue:draw()
         self._label:draw()
     end
 end
+
+--- @override
+function bt.SpeedValue:measure()
+    return self._label:get_size()
+end

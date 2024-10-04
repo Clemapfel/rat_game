@@ -504,7 +504,7 @@ function rt.GameState:set_current_scene(scene_type)
             self._scenes[scene_type] = scene
         end
 
-        local use_loading_screen = scene:get_is_realized() == false
+        local use_loading_screen = true --scene:get_is_realized() == false
         if use_loading_screen then
             self:_loading_screen_show(function()
                 -- make sure graphics swap happens behind loading screen, old scene stays during fadeout

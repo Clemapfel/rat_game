@@ -53,7 +53,7 @@ rt.Frame = meta.new_type("Frame", rt.Widget, function(type)
         local corner_radius = out._corner_radius
         out._frame:set_corner_radius(corner_radius)
         out._frame_outline:set_corner_radius(corner_radius)
-        out._stencil_mask:set_corner_radius(corner_radius)
+        out._stencil_mask:set_corner_radius(corner_radius - 2)
     end
     return out
 end, {

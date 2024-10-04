@@ -39,8 +39,6 @@ function bt.PriorityQueue:_element_new(entity)
     sprite_w = sprite_w * 2
     sprite_h = sprite_h * 2
     element.sprite:set_minimum_size(sprite_w, sprite_h)
-    element.width = sprite_w
-    element.height = sprite_h
 
     element.frame:fit_into(0, 0, sprite_w, sprite_h)
     element.sprite:fit_into(0, 0, sprite_w, sprite_h)
@@ -50,6 +48,10 @@ function bt.PriorityQueue:_element_new(entity)
         sprite_w, sprite_h,
         0, sprite_h
     )
+
+    local thickness = element.frame:get_thickness()
+    element.width = sprite_w + 2 * thickness
+    element.height = sprite_h + 2 * thickness
 
     local padding = element.frame:get_thickness() * 2
     element.padding = padding
@@ -87,9 +89,7 @@ end
 --- @brief [internal]
 function bt.PriorityQueue:_element_draw(element, x, y, scale)
     love.graphics.push()
-    love.graphics.translate(0.5 * element.width - x, 0.5 * element.height - y)
-    love.graphics.scale(scale, scale)
-    love.graphics.translate(-0.5 * element.width + y, -0.5 * element.height + y)
+    love.graphics.translate(-0.5 * element.width, 0)
     element.snapshot:draw(x, y)
     love.graphics.pop()
 end

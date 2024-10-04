@@ -83,11 +83,15 @@ function profiler.push(name)
     end
 
     assert(type(name) == "string")
-    if profiler._zone_name_to_index[name] ~= nil then
-        error("In profiler.push: Zone `" .. name .. "` is already active, each zone name has to be unique. Use `push()` for a unique name to be chosen automatically")
+    local zone_index = profiler._zone_name_to_index[name]
+    if zone_index ~= nil then
+        for _, zone in pairs(profiler._current_zone_stack) do
+            if zone == zone_index then
+                error("In profiler.push: Zone `" .. name .. "` is already active, each zone name has to be unique. Use `push()` for a unique name to be chosen automatically")
+            end
+        end
     end
 
-    local zone_index = profiler._zone_name_to_index[name]
     if zone_index == nil then
         zone_index = profiler._zone_index
         profiler._zone_index = profiler._zone_index + 1
@@ -135,7 +139,7 @@ function profiler.pop()
         profiler._n_zones = profiler._n_zones - 1
 
         if profiler._n_zones == 0 then
-            profiler._jit.stop()
+            --profiler._jit.stop()
         end
 
         local now = profiler._socket.gettime()
@@ -154,7 +158,6 @@ do
 
 --- @brief get state of the profiling data pretty-printed
 function profiler.report()
-    local out = {}
     for zone_name, entry in pairs(profiler._data) do
         local names_in_order = {}
         for name, count in pairs(entry.function_to_count) do
@@ -246,7 +249,7 @@ function profiler.report()
                 local last_row_percentage = "< 0.1"
                 local last_row = {" | "}
                 table.insert(last_row,  last_row_percentage .. string.rep(" ", col_lengths[1] - #last_row_percentage) .. " | ")
-                table.insert(last_row,tostring(cutoff_sample_count) .. string.rep(" ", col_lengths[2] - #tostring(cutoff_n_samples)) .. " | ")
+                table.insert(last_row,tostring(cutoff_sample_count) .. string.rep(" ", col_lengths[2] - #tostring(cutoff_sample_count)) .. " | ")
                 table.insert(last_row, "..." .. string.rep(" ", col_lengths[3] - #("...")) .. " |")
                 table.insert(str, table.concat(last_row, ""))
                 break
@@ -255,11 +258,9 @@ function profiler.report()
             rows_printed = rows_printed + 1
         end
 
-        table.insert(str, "\n")
-        table.insert(out, table.concat(str, ""))
+        return table.concat(str, "") .. "\n"
     end
-
-    return table.concat(out, "\n")
+    return ""
 end
 end -- do-end
 

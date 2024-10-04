@@ -212,6 +212,8 @@ require "battle.ordered_box"
 require "battle.health_bar"
 require "battle.speed_value"
 require "battle.priority_queue"
+require "battle.entity_sprite"
+require "battle.party_sprite"
 
 require "battle.battle_scene"
 

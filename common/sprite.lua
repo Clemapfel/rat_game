@@ -34,6 +34,8 @@ function rt.Sprite:realize()
     self._is_realized = true
 
     self._spritesheet = rt.SpriteAtlas:get(self._id)
+    if self._spritesheet == nil then return end
+
     self._frame_duration = 1 / self._spritesheet:get_fps()
     self._n_frames = self._spritesheet:get_n_frames()
     self._width, self._height = self._spritesheet:get_frame_size()

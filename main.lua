@@ -1,12 +1,13 @@
 require "include"
 
+--[[
 require "midi.midi"
 midi = rt.MidiInput()
 midi:signal_connect("message", function(self, timestamp, ...)
     dbg(timestamp, ...)
 end)
+]]--
 
-rt.profiler.push("test")
 
 state = rt.GameState()
 state:initialize_debug_state()
@@ -14,10 +15,11 @@ state:initialize_debug_state()
 world = b2.World
 
 local background = rt.Background()
-background:set_implementation(rt.Background.VECTOR_FIELD)
+--background:set_implementation(rt.Background.BUBBLEGUM)
 
-rt.profiler.pop()
-dbg(rt.profiler.report())
+function expensive_function()
+    state:_run()
+end
 
 local draw_state = true
 input = rt.InputController()
@@ -30,8 +32,6 @@ input:signal_connect("keyboard_pressed", function(_, which)
         state:set_current_scene(mn.KeybindingScene)
     elseif which == rt.KeyboardKey.FOUR then
         state:set_current_scene(bt.BattleScene)
-    elseif which == rt.KeyboardKey.ESCAPE then
-        rt.profiler.report()
     end
 end)
 
@@ -63,20 +63,21 @@ love.load = function()
 end
 
 love.update = function(delta)
+    --[[
     if love.keyboard.isDown("space") then
         background:update(delta)
     elseif love.keyboard.isDown("b") then
         background:update(-delta)
     end
+    ]]--
     state:_update(delta)
-
-    midi:update(delta)
+    --midi:update(delta)
 end
 
 love.draw = function()
     background:draw()
     if draw_state then
-        --state:_draw()
+        state:_draw()
     end
 end
 
@@ -87,4 +88,5 @@ end
 
 love.run = function()
     state:_run()
+
 end
