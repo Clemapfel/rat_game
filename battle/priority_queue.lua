@@ -1,3 +1,8 @@
+rt.settings.battle.priority_queue = {
+    first_element_scale_factor = 1.5,
+    scale_speed = 4, -- 1x per second
+}
+
 --- @class bt.PriorityQueue
 bt.PriorityQueue = meta.new_type("PriorityQueue", rt.Widget, rt.Animation, function(scene)
     return meta.new(bt.PriorityQueue, {
@@ -89,7 +94,11 @@ end
 --- @brief [internal]
 function bt.PriorityQueue:_element_draw(element, x, y, scale)
     love.graphics.push()
+    love.graphics.translate(-1 * element.width * scale + element.width, 0)
     love.graphics.translate(-0.5 * element.width, 0)
+    love.graphics.translate(x, y)
+    love.graphics.scale(scale, scale)
+    love.graphics.translate(-x, -y)
     element.snapshot:draw(x, y)
     love.graphics.pop()
 end
@@ -133,7 +142,15 @@ end
 
 --- @override
 function bt.PriorityQueue:size_allocate(x, y, width, height)
-    local start_x = x + 0.5 * width
+    local first_scale_width_delta, first_scale_height_delta = 0, 0
+    if #self._order >= 1 then
+        local first_scale_factor = rt.settings.battle.priority_queue.first_element_scale_factor
+        local first = self._entity_to_item[self._order[1]]
+        first_scale_width_delta = (first.width * first_scale_factor - first.width)
+        first_scale_height_delta = (first.height * first_scale_factor - first.height)
+    end
+
+    local start_x = x + 0.5 * width + 0.5 * first_scale_width_delta
     local entity_to_multiplicity_offset = {}
 
     self._render_order = {}
@@ -147,7 +164,8 @@ function bt.PriorityQueue:size_allocate(x, y, width, height)
         n_items = n_items + 1
     end
 
-    local margin = clamp((height - total_height) / (n_items - 1), NEGATIVE_INFINITY, 0)
+    local margin = clamp((height - total_height - first_scale_height_delta) / (n_items - 1), NEGATIVE_INFINITY, 0)
+
     local is_first = true
     for entity in values(self._order) do
         local multiplicity_offset = entity_to_multiplicity_offset[entity]
@@ -159,7 +177,12 @@ function bt.PriorityQueue:size_allocate(x, y, width, height)
 
         local item = self._entity_to_item[entity]
         local motion = item.motions[1 + multiplicity_offset]
-        motion:set_target_position(current_x, current_y)
+        if is_first then
+            motion:set_target_position(current_x, current_y)
+        else
+            motion:set_target_position(current_x, current_y + first_scale_height_delta)
+        end
+
         current_y = current_y + item.height + margin
 
         table.insert(self._render_order, 1, {item, motion, ternary(is_first, 2, 1)})
@@ -173,14 +196,36 @@ function bt.PriorityQueue:update(delta)
         for motion in values(item.motions) do
             motion:update(delta)
         end
+
+        --[[
+        local first_scale = rt.settings.battle.priority_queue.first_element_scale_factor
+        local scale_speed = rt.settings.battle.priority_queue.scale_speed
+        local target_scale = ternary(item.is_first, first_scale, 1)
+        if item.current_scale < target_scale then
+            item.current_scale = item.current_scale + scale_speed * delta
+            if item.current_scale > target_scale then
+                item.current_scale = target_scale
+            end
+        elseif item.current_scale < target_scale then
+            item.current_scale = item.current_scale - scale_speed * delta
+            if item.current_scale < target_scale then
+                item.current_scale = target_scale
+            end
+        end
+        ]]--
     end
 end
 
 --- @override
 function bt.PriorityQueue:draw()
-    for item_motion in values(self._render_order) do
-        local item, motion, scale = table.unpack(item_motion)
+    for i, item_motion in ipairs(self._render_order) do
+        local item, motion = table.unpack(item_motion)
         local x, y = motion:get_position()
+
+        local scale = 1
+        if i == #self._render_order then
+            scale = rt.settings.battle.priority_queue.first_element_scale_factor
+        end
         self:_element_draw(item, x, y, scale)
     end
 end

@@ -46,10 +46,9 @@ function rt.Background:_update_render_texture()
 end
 
 --- @overrider
-function rt.Background:update(delta)
+function rt.Background:update(delta, ...)
     if self._is_realized ~= true or self._implementation == nil then return end
-    local spectrum = table.rep(256, 0.5)
-    self._implementation:update(delta, spectrum)
+    self._implementation:update(delta, ...)
     self:_update_render_texture()
 
     self._dynamic_resolution_freeze_count = self._dynamic_resolution_freeze_count + 1

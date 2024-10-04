@@ -29,13 +29,15 @@ function b2.Rectangle(width, height, center_x, center_y, angle)
     if angle == nil then angle = 0 end
 
     local scale = B2_PIXEL_TO_METER
-    return meta.new(b2.Polygon, {
+    local out = meta.new(b2.Polygon, {
         _native = box2d.b2MakeOffsetBox(
             width * scale, height * scale,
             b2.Vec2(center_x * scale, center_y * scale),
             box2d.b2MakeRot(angle)
         )
     })
+    dbg("native", out._native)
+    return out
 end
 
 --- @brief

@@ -9,8 +9,8 @@ rt.MidiInput = meta.new_type("MidiInput", rt.SignalEmitter, function()
     return out
 end)
 
---- @class rt.MidiSignalType
-rt.MidiSignalType = meta.new_enum({
+--- @class rt.MidiMessageType
+rt.MidiMessageType = meta.new_enum({
     -- SCENE 6 LIVE, Octave -1
     PAD_1 = 0,
     PAD_2 = 1,
@@ -28,6 +28,9 @@ rt.MidiSignalType = meta.new_enum({
     PAD_14 = 13,
     PAD_15 = 14,
     PAD_16 = 15,
+    
+    PAD_MIN = 0,
+    PAD_MAX = 15,
 
     KNOB_1 = 16,
     KNOB_2 = 17,
@@ -37,6 +40,9 @@ rt.MidiSignalType = meta.new_enum({
     KNOB_6 = 21,
     KNOB_7 = 22,
     KNOB_8 = 23,
+    
+    KNOB_MIN = 16,
+    KNOB_MAX = 23,
 
     SLIDER_1 = 24,
     SLIDER_2 = 24,
@@ -47,6 +53,9 @@ rt.MidiSignalType = meta.new_enum({
     SLIDER_7 = 29,
     SLIDER_8 = 30,
     SLIDER_9 = 31,
+    
+    SLIDER_MIN = 24,
+    SLIDER_MAX = 31,
 
     JOYSTICK_UP_DOWN = 32,
     JOYSTICK_LEFT_RIGHT = 33,
@@ -60,6 +69,18 @@ rt.MidiSignalType = meta.new_enum({
     STOP = 252
 })
 
+function rt.MidiInput.is_slider(type)
+    return type >= rt.MidiMessageType.SLIDER_1 or type <= rt.MidiMessageType.SLIDER_8
+end
+
+function rt.MidiInput.is_pad(type)
+    return type >= rt.MidiMessageType.PAD_1 or type <= rt.MidiMessageType.PAD_16
+end
+
+function rt.MidiInput.is_key(type)
+    return type >= rt.MidiMessageType.MIN_NOTE or type <= rt.MidiMessageType.MAX_NOTE
+end
+
 --- @brief work through current message queue
 function rt.MidiInput:update(_)
     local ref_size = 256
@@ -71,7 +92,7 @@ function rt.MidiInput:update(_)
         local status = message[0]
         local controller = message[1]
         local value = message[2]
-        if not (meta.is_enum_value(controller, rt.MidiSignalType) or controller >= rt.MidiSignalType.MIN_NOTE and controller <= rt.MidiSignaltype.MAX_NOTE) then
+        if not (meta.is_enum_value(controller, rt.MidiMessageType) or controller >= rt.MidiMessageType.MIN_NOTE and controller <= rt.MidiSignaltype.MAX_NOTE) then
             rt.warning("In rt.MidiInput:update: Unhandled control message `" .. controller .. "`")
         end
         self:signal_emit("message", timestamp, controller, tonumber(value) / 127.0)

@@ -16,7 +16,7 @@ function rt.Background.new_shader_only_background(name, shader_path)
         self._elapsed = 0
     end
 
-    function out:resize(x, y, width, height)
+    function out:size_allocate(x, y, width, height)
         self._shape:set_vertex_position(1, x, y)
         self._shape:set_vertex_position(2, x + width, y)
         self._shape:set_vertex_position(3, x + width, y + height)
