@@ -22,17 +22,9 @@
     </configurations>
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="7fa9ba1b-2cff-4ecc-86fb-59ab2fa76ee1" name="Changes" comment="added party sprite">
-      <change afterPath="$PROJECT_DIR$/backgrounds/midi_tiling.glsl" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/backgrounds/midi_tiling.lua" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/main_midi.lua" afterDir="false" />
+    <list default="true" id="7fa9ba1b-2cff-4ecc-86fb-59ab2fa76ee1" name="Changes" comment="stashing midi example">
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/backgrounds/background.lua" beforeDir="false" afterPath="$PROJECT_DIR$/backgrounds/background.lua" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/backgrounds/background_shader_only.lua" beforeDir="false" afterPath="$PROJECT_DIR$/backgrounds/background_shader_only.lua" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/battle/battle_scene.lua" beforeDir="false" afterPath="$PROJECT_DIR$/battle/battle_scene.lua" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/battle/priority_queue.lua" beforeDir="false" afterPath="$PROJECT_DIR$/battle/priority_queue.lua" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/midi/midi.lua" beforeDir="false" afterPath="$PROJECT_DIR$/midi/midi_input.lua" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/physics/polygon.lua" beforeDir="false" afterPath="$PROJECT_DIR$/physics/polygon.lua" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -579,15 +571,7 @@
       <workItem from="1727276997949" duration="43344000" />
       <workItem from="1727542096317" duration="43560000" />
       <workItem from="1727894489985" duration="20566000" />
-      <workItem from="1727999521829" duration="17514000" />
-    </task>
-    <task id="LOCAL-01052" summary="switchin to queueable source">
-      <option name="closed" value="true" />
-      <created>1726088565308</created>
-      <option name="number" value="01052" />
-      <option name="presentableId" value="LOCAL-01052" />
-      <option name="project" value="LOCAL" />
-      <updated>1726088565308</updated>
+      <workItem from="1727999521829" duration="19184000" />
     </task>
     <task id="LOCAL-01053" summary="stashing sound">
       <option name="closed" value="true" />
@@ -973,7 +957,15 @@
       <option name="project" value="LOCAL" />
       <updated>1728059498679</updated>
     </task>
-    <option name="localTasksCounter" value="1101" />
+    <task id="LOCAL-01101" summary="stashing midi example">
+      <option name="closed" value="true" />
+      <created>1728070559855</created>
+      <option name="number" value="01101" />
+      <option name="presentableId" value="LOCAL-01101" />
+      <option name="project" value="LOCAL" />
+      <updated>1728070559855</updated>
+    </task>
+    <option name="localTasksCounter" value="1102" />
     <servers />
   </component>
   <component name="TypeScriptGeneratedFilesManager">
@@ -1022,7 +1014,6 @@
     </option>
   </component>
   <component name="VcsManagerConfiguration">
-    <MESSAGE value="textbox done" />
     <MESSAGE value="try to implement raycast" />
     <MESSAGE value="trying to get box2d extension to work" />
     <MESSAGE value="export working" />
@@ -1047,7 +1038,8 @@
     <MESSAGE value="refactored profiler" />
     <MESSAGE value="stashing" />
     <MESSAGE value="added party sprite" />
-    <option name="LAST_COMMIT_MESSAGE" value="added party sprite" />
+    <MESSAGE value="stashing midi example" />
+    <option name="LAST_COMMIT_MESSAGE" value="stashing midi example" />
   </component>
   <component name="XDebuggerManager">
     <breakpoint-manager>

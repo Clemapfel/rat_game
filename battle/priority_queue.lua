@@ -9,6 +9,7 @@ bt.PriorityQueue = meta.new_type("PriorityQueue", rt.Widget, rt.Animation, funct
         _order = {}, -- Table<Entity>,
         _entity_to_item = {}, -- Table<Entity, cf. _new_element>
         _render_order = {}, -- Table<Pair<Item, Motion>>
+        _scale_factor = 1
     })
 end)
 
@@ -81,7 +82,7 @@ end
 --- @brief [internal]
 function bt.PriorityQueue:_element_set_multiplicity(element, n)
     while element.multiplicity < n do
-        table.insert(element.motions, rt.SmoothedMotion2D(0, 0))
+        table.insert(element.motions, rt.SmoothedMotion2D(rt.graphics.get_width() + element.width, 0.5 * rt.graphics.get_height()))
         element.multiplicity = element.multiplicity + 1
     end
 
@@ -106,6 +107,7 @@ end
 --- @brief
 function bt.PriorityQueue:reorder(new_order)
     self._order = new_order
+    self._scale_elapsed = 1
 
     local to_remove = {}
     for entity in keys(self._entity_to_item) do
@@ -196,35 +198,30 @@ function bt.PriorityQueue:update(delta)
         for motion in values(item.motions) do
             motion:update(delta)
         end
+    end
 
-        --[[
-        local first_scale = rt.settings.battle.priority_queue.first_element_scale_factor
-        local scale_speed = rt.settings.battle.priority_queue.scale_speed
-        local target_scale = ternary(item.is_first, first_scale, 1)
-        if item.current_scale < target_scale then
-            item.current_scale = item.current_scale + scale_speed * delta
-            if item.current_scale > target_scale then
-                item.current_scale = target_scale
-            end
-        elseif item.current_scale < target_scale then
-            item.current_scale = item.current_scale - scale_speed * delta
-            if item.current_scale < target_scale then
-                item.current_scale = target_scale
-            end
+    if #self._order >= 1 then
+        local first = self._entity_to_item[self._order[1]]
+        if #first.motions > 1 then
+            local x, y = first.motions[1]:get_position()
+            self._scale_factor = 1 - self._bounds.y / rt.graphics.get_height()
+            -- scale animation when moving item towards first
         end
-        ]]--
     end
 end
 
 --- @override
 function bt.PriorityQueue:draw()
+    local target_scale = rt.settings.battle.priority_queue.first_element_scale_factor
+    local first_scale = clamp(target_scale * self._scale_factor, 1, target_scale)
+
     for i, item_motion in ipairs(self._render_order) do
         local item, motion = table.unpack(item_motion)
         local x, y = motion:get_position()
 
         local scale = 1
         if i == #self._render_order then
-            scale = rt.settings.battle.priority_queue.first_element_scale_factor
+            scale = first_scale
         end
         self:_element_draw(item, x, y, scale)
     end
