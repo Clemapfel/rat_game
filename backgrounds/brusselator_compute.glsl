@@ -1,10 +1,7 @@
 //#pragma language glsl4
 
-
 layout(rgba16f) uniform image2D texture_in;
 layout(rgba16f) uniform image2D texture_out;
-//layout(rgb16) uniform image2D vector_field;
-
 
 layout (local_size_x = 1, local_size_y = 1, local_size_z = 1) in;
 void computemain()
@@ -16,5 +13,6 @@ void computemain()
     int height = image_size.y;
 
     vec4 current = imageLoad(texture_in, ivec2(x, y));
-    imageStore(texture_out, ivec2(x, y), vec4(current.xyz + vec3(0.02), 0));
+    current.xy += vec2(0.1);
+    imageStore(texture_out, ivec2(x, y), vec4(current.xyz, 0));
 }

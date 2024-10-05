@@ -22,6 +22,7 @@ function expensive_function()
 end
 
 
+
 local draw_state = false
 input = rt.InputController()
 input:signal_connect("keyboard_pressed", function(_, which)

@@ -11,7 +11,7 @@ vec4 effect(vec4 vertex_color, Image image, vec2 texture_coords, vec2 vertex_pos
         vec4 value = Texel(image, texture_coords);
         return vec4(value.xyz, 1);
     }
-    else if (mode == MODE_INITIALIZE) {
+    else {
         return vec4(0, 0, 0, 1);
     }
 }

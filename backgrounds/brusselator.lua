@@ -80,6 +80,7 @@ function rt.Background.BRUSSELATOR:update(delta)
         self._compute_shader:send("texture_in", input)
         self._compute_shader:send("texture_out", output)
         self._compute_shader:dispatch(self._resolution_x, self._resolution_y)
+        self._texture_swap_state = not self._texture_swap_state
     end
 end
 
