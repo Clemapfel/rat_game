@@ -1,5 +1,6 @@
 rt.settings.background = {
-    target_frame_fraction = 0.15 -- how much of a frame the background is allowed to take up before automatic compression kicks in
+    target_frame_fraction = 0.15, -- how much of a frame the background is allowed to take up before automatic compression kicks in
+    use_dynamic_resolution = false,
 }
 
 --- @class rt.Background
@@ -52,7 +53,7 @@ function rt.Background:update(delta, ...)
     self:_update_render_texture()
 
     self._dynamic_resolution_freeze_count = self._dynamic_resolution_freeze_count + 1
-    if self._dynamic_resolution_freeze_count > 120 then
+    if rt.settings.background.use_dynamic_resolution and self._dynamic_resolution_freeze_count > 120 then
         local before = self._current_compression
         local step = 0.025
 

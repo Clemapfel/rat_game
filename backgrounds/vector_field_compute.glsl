@@ -1,8 +1,8 @@
 //#pragma language glsl4
 
 
-layout(rgba16f) uniform image2D texture_in;
-layout(rgba16f) uniform image2D texture_out;
+layout(rg32f) uniform image2D texture_in;
+layout(rg32f) uniform image2D texture_out;
 //layout(rgb16) uniform image2D vector_field;
 
 

@@ -23,7 +23,7 @@ function rt.Background.VECTOR_FIELD:realize()
 
     local settings = {
         computewrite = true,
-        format = "rgba16f"
+        format = "rg32f"
     }
     self._textures[1] = love.graphics.newImage(self._resolution_x, self._resolution_y, settings)
     self._textures[2] = love.graphics.newImage(self._resolution_x, self._resolution_y, settings)
