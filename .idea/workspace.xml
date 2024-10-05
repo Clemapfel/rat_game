@@ -22,10 +22,11 @@
     </configurations>
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="7fa9ba1b-2cff-4ecc-86fb-59ab2fa76ee1" name="Changes" comment="fixed physics scaling">
+    <list default="true" id="7fa9ba1b-2cff-4ecc-86fb-59ab2fa76ee1" name="Changes" comment="stashing old opactiy fade animation not working">
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/battle/battle_scene.lua" beforeDir="false" afterPath="$PROJECT_DIR$/battle/battle_scene.lua" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/battle/priority_queue.lua" beforeDir="false" afterPath="$PROJECT_DIR$/battle/priority_queue.lua" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/old/common/easement_functions.lua" beforeDir="false" afterPath="$PROJECT_DIR$/old/common/easement_functions.lua" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/common/common.lua" beforeDir="false" afterPath="$PROJECT_DIR$/common/common.lua" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -146,7 +147,7 @@
       <recent name="C:\Users\cleme\Workspace\rat_game\assets\configs" />
     </key>
   </component>
-  <component name="RunManager" selected="Lua Application.main_midi">
+  <component name="RunManager" selected="Lua Application.main">
     <configuration default="true" type="CMakeRunConfiguration" factoryName="Application" REDIRECT_INPUT="false" ELEVATE="false" USE_EXTERNAL_CONSOLE="false" EMULATE_TERMINAL="false" PASS_PARENT_ENVS_2="true">
       <method v="2">
         <option name="com.jetbrains.cidr.execution.CidrBuildBeforeRunTaskProvider$BuildBeforeRunTask" enabled="true" />
@@ -572,23 +573,7 @@
       <workItem from="1727276997949" duration="43344000" />
       <workItem from="1727542096317" duration="43560000" />
       <workItem from="1727894489985" duration="20566000" />
-      <workItem from="1727999521829" duration="20842000" />
-    </task>
-    <task id="LOCAL-01055" summary="added physics">
-      <option name="closed" value="true" />
-      <created>1726187807605</created>
-      <option name="number" value="01055" />
-      <option name="presentableId" value="LOCAL-01055" />
-      <option name="project" value="LOCAL" />
-      <updated>1726187807605</updated>
-    </task>
-    <task id="LOCAL-01056" summary="imported new physics to battle">
-      <option name="closed" value="true" />
-      <created>1726255627840</created>
-      <option name="number" value="01056" />
-      <option name="presentableId" value="LOCAL-01056" />
-      <option name="project" value="LOCAL" />
-      <updated>1726255627840</updated>
+      <workItem from="1727999521829" duration="24529000" />
     </task>
     <task id="LOCAL-01057" summary="capsules working">
       <option name="closed" value="true" />
@@ -966,7 +951,23 @@
       <option name="project" value="LOCAL" />
       <updated>1728076427589</updated>
     </task>
-    <option name="localTasksCounter" value="1104" />
+    <task id="LOCAL-01104" summary="added envelope function">
+      <option name="closed" value="true" />
+      <created>1728077353180</created>
+      <option name="number" value="01104" />
+      <option name="presentableId" value="LOCAL-01104" />
+      <option name="project" value="LOCAL" />
+      <updated>1728077353181</updated>
+    </task>
+    <task id="LOCAL-01105" summary="stashing old opactiy fade animation not working">
+      <option name="closed" value="true" />
+      <created>1728086834311</created>
+      <option name="number" value="01105" />
+      <option name="presentableId" value="LOCAL-01105" />
+      <option name="project" value="LOCAL" />
+      <updated>1728086834311</updated>
+    </task>
+    <option name="localTasksCounter" value="1106" />
     <servers />
   </component>
   <component name="TypeScriptGeneratedFilesManager">
@@ -1015,8 +1016,6 @@
     </option>
   </component>
   <component name="VcsManagerConfiguration">
-    <MESSAGE value="export working" />
-    <MESSAGE value="migrated to box2d v3.1" />
     <MESSAGE value="stashing before adding enki" />
     <MESSAGE value="debug drawing working" />
     <MESSAGE value="added overlap tests" />
@@ -1040,7 +1039,9 @@
     <MESSAGE value="stashing midi example" />
     <MESSAGE value="polishing animation" />
     <MESSAGE value="fixed physics scaling" />
-    <option name="LAST_COMMIT_MESSAGE" value="fixed physics scaling" />
+    <MESSAGE value="added envelope function" />
+    <MESSAGE value="stashing old opactiy fade animation not working" />
+    <option name="LAST_COMMIT_MESSAGE" value="stashing old opactiy fade animation not working" />
   </component>
   <component name="XDebuggerManager">
     <breakpoint-manager>

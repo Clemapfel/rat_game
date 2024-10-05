@@ -200,7 +200,7 @@ function bt.BattleScene:_handle_button_pressed(which)
     elseif which == rt.InputButton.B then
         self._priority_queue:set_selection(rt.random.choose_multiple(self._state:list_entities(), 3), true)
     elseif which == rt.InputButton.Y then
-        self._priority_queue:set_n_consumed(rt.random.integer(0, 4))
+        self._priority_queue:consume_first()
     end
 end
 

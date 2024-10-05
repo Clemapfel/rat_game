@@ -35,9 +35,21 @@ function values(t)
     end
 end
 
+--[[
 do
-    
+    local _k, _v, _t
+    local _noop = function() return nil end
+    local _callback = function()
+        _k, _v = next(_t, _k)
+        return _v
+    end
+    function values(t)
+        if t == nil then return _noop end
+        _k, _v, _t = nil, nil, t
+        return _callback
+    end
 end
+]]
 
 --- @brief iterate over keys of tbale
 function keys(t)

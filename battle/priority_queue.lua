@@ -10,7 +10,9 @@ bt.PriorityQueue = meta.new_type("PriorityQueue", rt.Widget, rt.Animation, funct
         _entity_to_item = {}, -- Table<Entity, cf. _new_element>
         _render_order = {}, -- Table<Pair<Item, Motion>>
         _scale_factor = 1,
-        _n_consumed = 0
+        _n_consumed = 0,
+        _consume_buffer = {},
+        _consumed_y_offset = 0
     })
 end)
 
@@ -29,8 +31,6 @@ function bt.PriorityQueue:_element_new(entity)
         height = 0,
         selection_state = rt.SelectionState.INACTIVE,
         entity_state = bt.EntityState.ALIVE,
-        opacity = 1,
-        opacity_x_offset = 0,
         r = 1,
         g = 1,
         b = 1,
@@ -90,14 +90,13 @@ function bt.PriorityQueue:_element_set_multiplicity(element, n)
 end
 
 --- @brief [internal]
-function bt.PriorityQueue:_element_draw(element, x, y, scale)
-
+function bt.PriorityQueue:_element_draw(element, x, y, scale, opacity, opacity_offset)
     love.graphics.push()
-    love.graphics.setColor(element.r, element.g, element.b, math.min(element.a, element.opacity))
+    love.graphics.setColor(element.r, element.g, element.b, math.min(element.a, opacity))
     love.graphics.translate(-1 * element.width * scale + element.width, 0)
     love.graphics.translate(-0.5 * element.width, 0)
+    love.graphics.translate(opacity_offset, self._consumed_y_offset)
     love.graphics.translate(x, y)
-    love.graphics.translate(element.opacity_offset, 0)
     love.graphics.scale(scale, scale)
     love.graphics.translate(-x, -y)
     love.graphics.draw(element.snapshot._native, x, y)
@@ -129,6 +128,7 @@ function bt.PriorityQueue:reorder(new_order)
     self._order = new_order
     self._scale_elapsed = 1
     self._n_consumed = 0
+    self._consumed_y_offset = 0
 
     local to_remove = {}
     for entity in keys(self._entity_to_item) do
@@ -177,6 +177,7 @@ function bt.PriorityQueue:size_allocate(x, y, width, height)
     local entity_to_multiplicity_offset = {}
 
     self._render_order = {}
+    self._consume_buffer = {}
     local current_x, current_y = start_x, y
 
     local total_height = 0
@@ -208,6 +209,7 @@ function bt.PriorityQueue:size_allocate(x, y, width, height)
 
         current_y = current_y + item.height + margin
         table.insert(self._render_order, 1, {item, motion, ternary(is_first, 2, 1)})
+        table.insert(self._consume_buffer, {opacity_offset = 0, opacity = 1, y_offset_added = false})
         is_first = false
     end
 end
@@ -220,20 +222,23 @@ function bt.PriorityQueue:update(delta)
         end
     end
 
-    local opacity_speed = 1 -- 1x per second
-    local opacity_offset_speed = 100 -- px per second
-    local n = 1
-    for entity in values(self._order) do
-        local item = self._entity_to_item[entity]
-        if n <= self._n_consumed then
-            item.opacity = item.opacity - opacity_speed * delta
-            item.opacity_offset = item.opacity_offset - opacity_offset_speed * delta
-        else
-            item.opacity = 1
-            item.opacity_offset = 0
-        end
+    local opacity_speed = 1
+    local opacity_offset_speed = 100
+    local item_i = 1
+    for i = #self._consume_buffer, math.max(#self._consume_buffer - self._n_consumed + 1, 1), -1 do
+        -- render_order is backwards, so iterate backwards to update `self._n_consumed` first element
+        local buffer = self._consume_buffer[i]
+        buffer.opacity = buffer.opacity - opacity_speed * delta
+        buffer.opacity_offset = buffer.opacity_offset - opacity_offset_speed * delta
 
-        n = n + 1
+        if buffer.y_offset_added == false and buffer.opacity <= 0 then
+            local item = self._entity_to_item[self._order[item_i]]
+            self._consumed_y_offset = self._consumed_y_offset - (1 - clamp(buffer.opacity, 0, 1))  * item.height
+            buffer.y_offset_added = true
+
+            TODO first element has to scale too
+        end
+        item_i = item_i + 1
     end
 
     if #self._order >= 1 then
@@ -260,7 +265,8 @@ function bt.PriorityQueue:draw()
             scale = first_scale
         end
 
-        self:_element_draw(item, x, y, scale)
+        local consume_item = self._consume_buffer[i]
+        self:_element_draw(item, x, y, scale, consume_item.opacity, consume_item.opacity_offset)
     end
 end
 
@@ -313,6 +319,6 @@ function bt.PriorityQueue:set_state(entity, state)
 end
 
 --- @brief
-function bt.PriorityQueue:set_n_consumed(n)
-    self._n_consumed = n
+function bt.PriorityQueue:consume_first(n)
+    self._n_consumed = self._n_consumed + 1
 end
