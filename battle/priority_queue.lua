@@ -9,7 +9,8 @@ bt.PriorityQueue = meta.new_type("PriorityQueue", rt.Widget, rt.Animation, funct
         _order = {}, -- Table<Entity>,
         _entity_to_item = {}, -- Table<Entity, cf. _new_element>
         _render_order = {}, -- Table<Pair<Item, Motion>>
-        _scale_factor = 1
+        _scale_factor = 1,
+        _n_consumed = 0
     })
 end)
 
@@ -25,13 +26,20 @@ function bt.PriorityQueue:_element_new(entity)
         snapshot = rt.RenderTexture(1, 1),
         padding = 0,
         width = 0,
-        height = 0
+        height = 0,
+        selection_state = rt.SelectionState.INACTIVE,
+        entity_state = bt.EntityState.ALIVE,
+        opacity = 1,
+        opacity_x_offset = 0,
+        r = 1,
+        g = 1,
+        b = 1,
+        a = 1
     }
 
     element.frame:realize()
     element.sprite:realize()
     element.frame:set_child(element.sprite)
-    element.frame._stencil_mask:set_color(rt.Palette.FOREGROUND_OUTLINE)
 
     local top_color = rt.RGBA(1, 1, 1, 1)
     local bottom_color = rt.RGBA(0.4, 0.4, 0.4, 1)
@@ -58,23 +66,12 @@ function bt.PriorityQueue:_element_new(entity)
     local thickness = element.frame:get_thickness()
     element.width = sprite_w + 2 * thickness
     element.height = sprite_h + 2 * thickness
-
     local padding = element.frame:get_thickness() * 2
     element.padding = padding
     element.snapshot = rt.RenderTexture(sprite_w + 2 * padding, sprite_h + 2 * padding)
-    element.snapshot:bind_as_render_target()
-    love.graphics.translate(padding, padding)
-    element.frame:draw()
 
-    local value = meta.hash(self) % 254 + 1
-    rt.graphics.stencil(value, element.frame._frame)
-    rt.graphics.set_stencil_test(rt.StencilCompareMode.EQUAL, value)
-    rt.graphics.set_blend_mode(rt.BlendMode.MULTIPLY, rt.BlendMode.NORMAL)
-    element.gradient:draw()
-    rt.graphics.set_stencil_test()
-    rt.graphics.set_blend_mode()
-    love.graphics.translate(-padding, -padding)
-    element.snapshot:unbind_as_render_target()
+    self:_element_update_state(element)
+    self:_element_snapshot(element)
 
     return element
 end
@@ -94,20 +91,44 @@ end
 
 --- @brief [internal]
 function bt.PriorityQueue:_element_draw(element, x, y, scale)
+
     love.graphics.push()
+    love.graphics.setColor(element.r, element.g, element.b, math.min(element.a, element.opacity))
     love.graphics.translate(-1 * element.width * scale + element.width, 0)
     love.graphics.translate(-0.5 * element.width, 0)
     love.graphics.translate(x, y)
+    love.graphics.translate(element.opacity_offset, 0)
     love.graphics.scale(scale, scale)
     love.graphics.translate(-x, -y)
-    element.snapshot:draw(x, y)
+    love.graphics.draw(element.snapshot._native, x, y)
     love.graphics.pop()
+end
+
+--- @brief [internal]
+function bt.PriorityQueue:_element_snapshot(element)
+    element.snapshot:bind_as_render_target()
+    love.graphics.translate(element.padding, element.padding)
+    element.frame:draw()
+
+    if element.selection_state ~= rt.SelectionState.ACTIVE then
+        local value = meta.hash(self) % 254 + 1
+        rt.graphics.stencil(value, element.frame._frame)
+        rt.graphics.set_stencil_test(rt.StencilCompareMode.EQUAL, value)
+        rt.graphics.set_blend_mode(rt.BlendMode.MULTIPLY, rt.BlendMode.NORMAL)
+        element.gradient:draw()
+        rt.graphics.set_stencil_test()
+        rt.graphics.set_blend_mode()
+    end
+
+    love.graphics.translate(-element.padding, -element.padding)
+    element.snapshot:unbind_as_render_target()
 end
 
 --- @brief
 function bt.PriorityQueue:reorder(new_order)
     self._order = new_order
     self._scale_elapsed = 1
+    self._n_consumed = 0
 
     local to_remove = {}
     for entity in keys(self._entity_to_item) do
@@ -199,6 +220,22 @@ function bt.PriorityQueue:update(delta)
         end
     end
 
+    local opacity_speed = 1 -- 1x per second
+    local opacity_offset_speed = 100 -- px per second
+    local n = 1
+    for entity in values(self._order) do
+        local item = self._entity_to_item[entity]
+        if n <= self._n_consumed then
+            item.opacity = item.opacity - opacity_speed * delta
+            item.opacity_offset = item.opacity_offset - opacity_offset_speed * delta
+        else
+            item.opacity = 1
+            item.opacity_offset = 0
+        end
+
+        n = n + 1
+    end
+
     if #self._order >= 1 then
         local first = self._entity_to_item[self._order[1]]
         if #first.motions > 1 then
@@ -225,4 +262,57 @@ function bt.PriorityQueue:draw()
 
         self:_element_draw(item, x, y, scale)
     end
+end
+
+--- @brief [internal]
+function bt.PriorityQueue:_element_update_state(element)
+    element.frame:set_selection_state(element.selection_state)
+    element.frame._stencil_mask:set_color(rt.Palette.FOREGROUND_OUTLINE)
+    self:_element_snapshot(element)
+
+    local r, g, b, a = 1, 1, 1, 1
+    if element.selection_state == rt.SelectionState.UNSELECTED then
+        a = 0.75
+    end
+
+    if element.entity_state == bt.EntityState.DEAD then
+        r = 0.2
+        g, b = r, r
+    elseif element.entity_state == bt.EntityState.KNOCKED_OUT then
+        r, g, b = 1, 0.5, 0.5
+    end
+
+    element.r, element.g, element.b, element.a = r, g, b, a
+end
+
+--- @override
+function bt.PriorityQueue:set_selection(selected_entities, should_unselect_others)
+    local is_selected = {}
+    for entity in values(selected_entities) do is_selected[entity] = true end
+
+    for entity, item in pairs(self._entity_to_item) do
+        local before = item.selection_state
+        if is_selected[entity] then
+            item.selection_state = rt.SelectionState.ACTIVE
+        elseif should_unselect_others then
+            item.selection_state = rt.SelectionState.UNSELECTED
+        else
+            item.selection_state = rt.SelectionState.INACTIVE
+        end
+        if item.selection_state ~= before then
+            self:_element_update_state(item)
+        end
+    end
+end
+
+--- @override
+function bt.PriorityQueue:set_state(entity, state)
+    local item = self._entity_to_item[entity]
+    item.entity_state = state
+    self:_element_update_state(item)
+end
+
+--- @brief
+function bt.PriorityQueue:set_n_consumed(n)
+    self._n_consumed = n
 end

@@ -187,15 +187,21 @@ end
 
 --- @brief
 function bt.BattleScene:_handle_button_pressed(which)
-    local entities = {}
-    local list = self._state:list_entities()
-    for _ = 1, 5  do
-        for entity in values(list) do
-            table.insert(entities, entity)
+    if which == rt.InputButton.A then
+        local entities = {}
+        local list = self._state:list_entities()
+        for _ = 1, 5  do
+            for entity in values(list) do
+                table.insert(entities, entity)
+            end
         end
-    end
 
-    self._priority_queue:reorder(rt.random.shuffle(entities))
+        self._priority_queue:reorder(rt.random.shuffle(entities))
+    elseif which == rt.InputButton.B then
+        self._priority_queue:set_selection(rt.random.choose_multiple(self._state:list_entities(), 3), true)
+    elseif which == rt.InputButton.Y then
+        self._priority_queue:set_n_consumed(rt.random.integer(0, 4))
+    end
 end
 
 --- @brief
