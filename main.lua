@@ -15,13 +15,14 @@ state:initialize_debug_state()
 world = b2.World
 
 local background = rt.Background()
---background:set_implementation(rt.Background.BUBBLEGUM)
+background:set_implementation(rt.Background.BRUSSELATOR)
 
 function expensive_function()
     state:_run()
 end
 
-local draw_state = true
+
+local draw_state = false
 input = rt.InputController()
 input:signal_connect("keyboard_pressed", function(_, which)
     if which == rt.KeyboardKey.ONE then
@@ -35,11 +36,6 @@ input:signal_connect("keyboard_pressed", function(_, which)
     end
 end)
 
-input:signal_connect("keyboard_released", function(_, which)
-    if which == rt.KeyboardKey.ESCAPE then
-        draw_state = true
-    end
-end)
 
 component = rt.SoundComponent()
 component:signal_connect("finished", function(_)
@@ -63,13 +59,7 @@ love.load = function()
 end
 
 love.update = function(delta)
-    --[[
-    if love.keyboard.isDown("space") then
-        background:update(delta)
-    elseif love.keyboard.isDown("b") then
-        background:update(-delta)
-    end
-    ]]--
+    background:update(delta)
     state:_update(delta)
     --midi:update(delta)
 end

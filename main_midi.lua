@@ -1,5 +1,57 @@
 require "include"
 
+love.window.setMode(400, 400, {
+    resizable = true
+})
+
+
+player_x, player_y = love.graphics.getWidth() / 2, love.graphics.getHeight() / 2
+player_radius = 50
+
+local scale = 2
+
+love.draw = function()
+
+    local w, h = love.graphics.getWidth(), love.graphics.getHeight()
+
+    local normalization_factor
+    if w > h then
+        normalization_factor = w / h
+        love.graphics.translate(player_x * normalization_factor, player_y)
+        love.graphics.scale(scale * normalization_factor, scale)
+        love.graphics.translate(-player_x, -player_y)
+    else
+        normalization_factor = w
+        love.graphics.translate(player_x , player_y * normalization_factor)
+        love.graphics.scale(scale, scale * normalization_factor)
+        love.graphics.translate(-player_x, -player_y)
+    end
+
+
+
+    love.graphics.setColor(0.5, 0.5, 0.5, 1)
+    love.graphics.circle("fill", player_x, player_y, player_radius)
+
+    local mouse_x, mouse_y = love.mouse.getPosition()
+
+    love.graphics.push()
+    love.graphics.translate(player_x, player_y)
+    love.graphics.rotate(math.atan2(player_y - mouse_y, player_x - mouse_x) - (math.pi) / 2)
+    love.graphics.translate(-player_x, -player_y)
+
+    love.graphics.setColor(1, 0, 1, 1)
+    love.graphics.setLineWidth(5)
+    love.graphics.line(player_x, player_y, player_x, player_y - player_radius * 2)
+
+    love.graphics.pop()
+end
+
+love.resize = function(w, h)
+
+end
+
+
+--[[
 background = rt.Background()
 background:set_implementation(rt.Background.MIDI_TILING)
 
@@ -71,3 +123,4 @@ love.draw = function()
 
     world:draw()
 end
+]]--
