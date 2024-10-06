@@ -1,11 +1,16 @@
 rt.Background.BRUSSELATOR = meta.new_type("BRUSSELATOR", rt.BackgroundImplementation, function()
+    local defines =  {
+        defines = {
+            TEXTURE_FORMAT = rt.Background.BRUSSELATOR.texture_format
+        }
+    }
     return meta.new(rt.Background.BRUSSELATOR, {
         _textures = {},  -- Tuple<love.Texture, love.Texture>
         _texture_swap_state = true,
 
-        _render_shader = rt.Shader("backgrounds/brusselator_render.glsl"),
-        _initialize_shader = rt.Shader("backgrounds/brusselator_initialize.glsl"),
-        _compute_shader = rt.ComputeShader("backgrounds/brusselator_compute.glsl"),
+        _render_shader = rt.Shader("backgrounds/brusselator_render.glsl", defines),
+        _initialize_shader = rt.ComputeShader("backgrounds/brusselator_initialize.glsl", defines),
+        _compute_shader = rt.ComputeShader("backgrounds/brusselator_compute.glsl", defines),
 
         _resolution_x =1,
         _resolution_y = 1,
@@ -13,30 +18,39 @@ rt.Background.BRUSSELATOR = meta.new_type("BRUSSELATOR", rt.BackgroundImplementa
         _n_updates_per_second = 60,
     })
 end, {
-    MODE_RENDER = 1,
-    MODE_INITIALIZE = 2,
 
+    texture_format = "rg32f",
+
+    a = 4,
+    b = 12,
+    diffusivity = {0.005, 0.005},
+    perturbation = 0.1,
+
+    --[[
     a = 1,
     b = 3,
-    diffusivity = {1, 1}
+    diffusivity = {1, 0.1},
+    perturbation = 0.1
+    ]]--
 })
 
 --- @brief [internal]
-do
+function rt.Background.BRUSSELATOR:_initialize_textures(x, y)
     local settings = {
         computewrite = true,
-        format = "rg32f",
+        format = self.texture_format,
     }
-    function rt.Background.BRUSSELATOR:_initialize_textures(x, y)
-        self._textures[1] = love.graphics.newCanvas(self._resolution_x, self._resolution_y, settings)
-        self._textures[2] = love.graphics.newCanvas(self._resolution_x, self._resolution_y, settings)
 
-        --self._initialize_shader:send("a", self.a)
-        --self._initialize_shader:send("b", self.b)
-        for texture in values(self._textures) do
-            self._initialize_shader:send("texture_out", texture)
-            self._initialize_shader:dispatch(self._resolution_x, self._resolution_y)
-        end
+    self._textures[1] = love.graphics.newCanvas(self._resolution_x, self._resolution_y, settings)
+    self._textures[2] = love.graphics.newCanvas(self._resolution_x, self._resolution_y, settings)
+
+    self._initialize_shader:send("a", self.a)
+    self._initialize_shader:send("b", self.b)
+    self._initialize_shader:send("perturbation", self.perturbation)
+    for texture in values(self._textures) do
+        texture:setWrap(rt.TextureWrapMode.CLAMP)
+        self._initialize_shader:send("texture_out", texture)
+        self._initialize_shader:dispatch(self._resolution_x, self._resolution_y)
     end
 end
 
@@ -83,7 +97,8 @@ function rt.Background.BRUSSELATOR:update(delta)
         self._compute_shader:send("diffusivity", self.diffusivity)
         self._compute_shader:send("texture_in", input)
         self._compute_shader:send("texture_out", output)
-        --self._compute_shader:dispatch(self._resolution_x, self._resolution_y)
+        self._compute_shader:send("delta", delta)
+        self._compute_shader:dispatch(self._resolution_x, self._resolution_y)
         self._texture_swap_state = not self._texture_swap_state
     end
 end

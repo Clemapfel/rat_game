@@ -1,6 +1,6 @@
 --- @class rt.ComputeShader
-rt.ComputeShader = meta.new_type("ComputeShader", function(filename)
-    local success, shader = pcall(love.graphics.newComputeShader, filename)
+rt.ComputeShader = meta.new_type("ComputeShader", function(filename, ...)
+    local success, shader = pcall(love.graphics.newComputeShader, filename, ...)
     if not success then
         rt.error("In rt.ComputeShader: Error when evaluating shader at `" .. filename .. "`:\n" .. shader)
     end

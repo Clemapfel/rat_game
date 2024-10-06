@@ -21,7 +21,11 @@ function expensive_function()
     state:_run()
 end
 
-
+local shader = love.graphics.newComputeShader("backgrounds/brusselator_compute.glsl", {
+    defines = {
+        TEXTURE_FORMAT = "rg32f"
+    }
+})
 
 local draw_state = false
 input = rt.InputController()
