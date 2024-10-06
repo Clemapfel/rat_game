@@ -26,8 +26,7 @@ float gradient_noise(vec3 p) {
 }
 
 float noise(vec2 position, float offset) {
-    const float scale = 20;
-    float value = gradient_noise(vec3(position * scale, offset));
+    float value = gradient_noise(vec3(position, offset));
     if (value > 0.7)
         return value * 2 - 1;
     else
@@ -43,6 +42,7 @@ layout(TEXTURE_FORMAT) uniform image2D texture_out;
 uniform float a;
 uniform float b;
 uniform float perturbation;
+uniform float scale = 10;
 
 layout (local_size_x = 1, local_size_y = 1, local_size_z = 1) in;
 void computemain()
@@ -50,11 +50,18 @@ void computemain()
     ivec2 image_size = imageSize(texture_out);
     ivec2 position = ivec2(gl_GlobalInvocationID.x, gl_GlobalInvocationID.y);
 
-    float rand_1 = noise(vec2(position.xy) / image_size, 1);
-    float rand_2 = noise(vec2(position.xy) / image_size, 10);
+    // Calculate the distance from the current fragment to the circle center
+    float circle = smoothstep(0.3, 0.3 + 0.05, distance(position / image_size, vec2(0)));
+
+    imageStore(texture_out, position, vec4(position.y / image_size.y));
+
+    /*
+    float rand_1 = noise(vec2(position.xy) / image_size * scale, 1);
+    float rand_2 = smoothstep(-0.1, 0.1, distance(position / image_size, vec2(0))); //noise(vec2(position.xy) / image_size * scale, 10);
     imageStore(texture_out, position, vec4(
-        a + perturbation * rand_1,
-        b / a + perturbation * rand_2,
+        (a + perturbation * rand_2),
+        (b / a + perturbation * rand_2),
         0, 1
     ));
+*/
 }

@@ -73,7 +73,7 @@ rt.GameState = meta.new_type("GameState", function()
         _render_shader = rt.Shader("common/game_state_render_shader.glsl"),
         _use_render_texture = true,
 
-        _loading_screen = rt.LoadingScreen(),
+        _loading_screen = rt.LoadingScreen.DEFAULT(),
         _loading_screen_active = true,
         _bounds = rt.AABB(0, 0, rt.graphics.get_width(), rt.graphics.get_height()),
         _current_scene = nil,
@@ -90,7 +90,6 @@ function rt.GameState:realize()
     self:load_input_mapping()
     rt.get_active_state = function() return self end
     self._loading_screen:realize()
-    self._loading_screen:set_current_opacity(1)
 end
 
 --- @brief
@@ -708,5 +707,15 @@ function rt.GameState:set_keybinding(input_button, keyboard_binding, gamepad_bin
 
     if notify_controller_state then
         rt.InputControllerState:load_mapping(self._state.keybinding)
+    end
+end
+
+--- @brief
+function rt.GameState:set_loading_screen(loading_screen_type)
+    meta.assert_isa(loading_screen_type, meta.Type)
+    self._loading_screen = loading_screen_type()
+    if self._is_realized then
+        self._loading_screen:realize()
+        self._loading_screen:fit_into(self._bounds)
     end
 end

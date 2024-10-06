@@ -28,14 +28,14 @@ void computemain()
     //   1   2   1
     vec2 laplacian = vec2(0.0);
     laplacian += imageLoad(texture_in, position).xy * -12;
-    laplacian -= imageLoad(texture_in, (position + ivec2(-1,  0) + image_size) % image_size).xy * 2;
-    laplacian -= imageLoad(texture_in, (position + ivec2( 0, -1) + image_size) % image_size).xy * 2;
-    laplacian -= imageLoad(texture_in, (position + ivec2( 0,  1) + image_size) % image_size).xy * 2;
-    laplacian -= imageLoad(texture_in, (position + ivec2( 1,  0) + image_size) % image_size).xy * 10;
-    laplacian -= imageLoad(texture_in, (position + ivec2(-1,  1) + image_size) % image_size).xy * 1;
-    laplacian -= imageLoad(texture_in, (position + ivec2( 1, -1) + image_size) % image_size).xy * 1;
-    laplacian -= imageLoad(texture_in, (position + ivec2( 1,  1) + image_size) % image_size).xy * 1;
-    laplacian -= imageLoad(texture_in, (position + ivec2( 1,  1) + image_size) % image_size).xy * 1;
+    laplacian += imageLoad(texture_in, (position + ivec2(-1,  0) + image_size) % image_size).xy * 2;
+    laplacian += imageLoad(texture_in, (position + ivec2( 0, -1) + image_size) % image_size).xy * 2;
+    laplacian += imageLoad(texture_in, (position + ivec2( 0,  1) + image_size) % image_size).xy * 2;
+    laplacian += imageLoad(texture_in, (position + ivec2( 1,  0) + image_size) % image_size).xy * 2;
+    laplacian += imageLoad(texture_in, (position + ivec2(-1,  1) + image_size) % image_size).xy * 1;
+    laplacian += imageLoad(texture_in, (position + ivec2( 1, -1) + image_size) % image_size).xy * 1;
+    laplacian += imageLoad(texture_in, (position + ivec2( 1,  1) + image_size) % image_size).xy * 1;
+    laplacian += imageLoad(texture_in, (position + ivec2( 1,  1) + image_size) % image_size).xy * 1;
 
     vec2 uv = imageLoad(texture_in, position).xy;
     float u = uv.x;
@@ -48,5 +48,5 @@ void computemain()
     //rhs.x = diffusivity.x * laplacian.x + v * u_squared + (1 + b) * u + a;
     //rhs.y = diffusivity.y * laplacian.y - v * u_squared + b * u;
 
-    imageStore(texture_out, position, vec4(uv + rhs * delta / 4, 0, 0));
+    imageStore(texture_out, position, vec4(uv + rhs * delta, 0, 0));
 }

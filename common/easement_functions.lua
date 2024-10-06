@@ -1,6 +1,5 @@
 --- @brief easement functions, defined in [0, 1] with f(0) = 0, f(1) = 1
 
---- @brief linear, maps [0, 1] to [min, max]
 rt.linear = function(x, min, max)
     min = which(min, 0)
     max = which(max, 1)
@@ -199,6 +198,22 @@ rt.continuous_step = function(x, n_steps, smoothness)
     -- https://www.desmos.com/calculator/ggoaqtlh7c
     smoothness = which(smoothness, 11.5)
     local a, h = smoothness, ternary(n_steps > 0, 1 / n_steps, 2)
+    return h * ((math.tanh((a * x / h) - a * math.floor(x / h) - a / 2) / (2 * math.tanh(a / 2)) + 0.5 + math.floor(x / h)))
+end
+
+--- @brief n steps in [0, 1], monotonically increasing, continuous, trends towards discontinuous step for smoothness towards infinity
+rt.continuous_step = function(x, n_steps, smoothness)
+    -- https://www.desmos.com/calculator/ggoaqtlh7c
+    if smoothness == nil then smoothness = 11.5 end
+    local a = smoothness
+
+    local h
+    if n_steps > 0 then
+        h = 1 / n_steps
+    else
+        h = 2
+    end
+
     return h * ((math.tanh((a * x / h) - a * math.floor(x / h) - a / 2) / (2 * math.tanh(a / 2)) + 0.5 + math.floor(x / h)))
 end
 

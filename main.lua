@@ -10,6 +10,7 @@ end)
 
 
 state = rt.GameState()
+--state:set_loading_screen(rt.LoadingScreen.DEFAULT)
 state:initialize_debug_state()
 
 world = b2.World
@@ -27,7 +28,7 @@ local shader = love.graphics.newComputeShader("backgrounds/brusselator_compute.g
     }
 })
 
-local draw_state = false
+local draw_state = true
 input = rt.InputController()
 input:signal_connect("keyboard_pressed", function(_, which)
     if which == rt.KeyboardKey.ONE then

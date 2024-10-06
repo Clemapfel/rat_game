@@ -150,6 +150,9 @@ require "common.rope"
 require "common.cloth"
 
 require "common.loading_screen"
+require "common.loading_screen_default"
+require "common.loading_screen_shatter"
+
 require "common.scene"
 
 -- backgrounds
