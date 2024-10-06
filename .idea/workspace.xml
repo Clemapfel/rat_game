@@ -22,15 +22,12 @@
     </configurations>
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="7fa9ba1b-2cff-4ecc-86fb-59ab2fa76ee1" name="Changes" comment="stashing initialize as compute">
+    <list default="true" id="7fa9ba1b-2cff-4ecc-86fb-59ab2fa76ee1" name="Changes" comment="brusselator working">
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/backgrounds/brusselator.lua" beforeDir="false" afterPath="$PROJECT_DIR$/backgrounds/brusselator.lua" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/backgrounds/brusselator_compute.glsl" beforeDir="false" afterPath="$PROJECT_DIR$/backgrounds/brusselator_compute.glsl" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/backgrounds/brusselator_initialize.glsl" beforeDir="false" afterPath="$PROJECT_DIR$/backgrounds/brusselator_initialize.glsl" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/backgrounds/brusselator_render.glsl" beforeDir="false" afterPath="$PROJECT_DIR$/backgrounds/brusselator_render.glsl" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/common/compute_shader.lua" beforeDir="false" afterPath="$PROJECT_DIR$/common/compute_shader.lua" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/common/shader.lua" beforeDir="false" afterPath="$PROJECT_DIR$/common/shader.lua" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/main.lua" beforeDir="false" afterPath="$PROJECT_DIR$/main.lua" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -573,15 +570,7 @@
       <workItem from="1727542096317" duration="43560000" />
       <workItem from="1727894489985" duration="20566000" />
       <workItem from="1727999521829" duration="26745000" />
-      <workItem from="1728160868435" duration="11104000" />
-    </task>
-    <task id="LOCAL-01061" summary="refactored smoothed motion, TODO implement for 1d">
-      <option name="closed" value="true" />
-      <created>1726443038671</created>
-      <option name="number" value="01061" />
-      <option name="presentableId" value="LOCAL-01061" />
-      <option name="project" value="LOCAL" />
-      <updated>1726443038671</updated>
+      <workItem from="1728160868435" duration="12566000" />
     </task>
     <task id="LOCAL-01062" summary="refactored smoothed motion, TODO implement for 1d">
       <option name="closed" value="true" />
@@ -967,7 +956,15 @@
       <option name="project" value="LOCAL" />
       <updated>1728169828553</updated>
     </task>
-    <option name="localTasksCounter" value="1110" />
+    <task id="LOCAL-01110" summary="brusselator working">
+      <option name="closed" value="true" />
+      <created>1728177249380</created>
+      <option name="number" value="01110" />
+      <option name="presentableId" value="LOCAL-01110" />
+      <option name="project" value="LOCAL" />
+      <updated>1728177249380</updated>
+    </task>
+    <option name="localTasksCounter" value="1111" />
     <servers />
   </component>
   <component name="TypeScriptGeneratedFilesManager">
@@ -1016,7 +1013,6 @@
     </option>
   </component>
   <component name="VcsManagerConfiguration">
-    <MESSAGE value="profiler done" />
     <MESSAGE value="optimized drawing of various scenes" />
     <MESSAGE value="added deadzone widget, imported priority queue" />
     <MESSAGE value="stashing smooth motion" />
@@ -1041,7 +1037,8 @@
     <MESSAGE value="added brusselator" />
     <MESSAGE value="mwe working" />
     <MESSAGE value="stashing initialize as compute" />
-    <option name="LAST_COMMIT_MESSAGE" value="stashing initialize as compute" />
+    <MESSAGE value="brusselator working" />
+    <option name="LAST_COMMIT_MESSAGE" value="brusselator working" />
   </component>
   <component name="XDebuggerManager">
     <breakpoint-manager>

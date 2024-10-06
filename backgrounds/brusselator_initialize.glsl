@@ -25,6 +25,14 @@ float gradient_noise(vec3 p) {
                           dot( -1 + 2 * random_3d(i + vec3(1.0,1.0,1.0)), v - vec3(1.0,1.0,1.0)), u.x), u.y), u.z );
 }
 
+float noise(vec2 position, float offset) {
+    const float scale = 20;
+    float value = gradient_noise(vec3(position * scale, offset));
+    if (value > 0.7)
+        return value * 2 - 1;
+    else
+        return value;
+}
 
 #ifndef TEXTURE_FORMAT
 #define TEXTURE_FORMAT rg16f
@@ -42,10 +50,8 @@ void computemain()
     ivec2 image_size = imageSize(texture_out);
     ivec2 position = ivec2(gl_GlobalInvocationID.x, gl_GlobalInvocationID.y);
 
-    const float scale = 20;
-
-    float rand_1 = (gradient_noise(vec3(vec2(position.xy) / image_size * scale, 0)) * 2 - 1);
-    float rand_2 = (gradient_noise(vec3(vec2(position.xy) / image_size * scale, 1) * 2 - 1));
+    float rand_1 = noise(vec2(position.xy) / image_size, 1);
+    float rand_2 = noise(vec2(position.xy) / image_size, 10);
     imageStore(texture_out, position, vec4(
         a + perturbation * rand_1,
         b / a + perturbation * rand_2,

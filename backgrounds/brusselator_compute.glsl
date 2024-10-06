@@ -31,7 +31,7 @@ void computemain()
     laplacian -= imageLoad(texture_in, (position + ivec2(-1,  0) + image_size) % image_size).xy * 2;
     laplacian -= imageLoad(texture_in, (position + ivec2( 0, -1) + image_size) % image_size).xy * 2;
     laplacian -= imageLoad(texture_in, (position + ivec2( 0,  1) + image_size) % image_size).xy * 2;
-    laplacian -= imageLoad(texture_in, (position + ivec2( 1,  0) + image_size) % image_size).xy * 2;
+    laplacian -= imageLoad(texture_in, (position + ivec2( 1,  0) + image_size) % image_size).xy * 10;
     laplacian -= imageLoad(texture_in, (position + ivec2(-1,  1) + image_size) % image_size).xy * 1;
     laplacian -= imageLoad(texture_in, (position + ivec2( 1, -1) + image_size) % image_size).xy * 1;
     laplacian -= imageLoad(texture_in, (position + ivec2( 1,  1) + image_size) % image_size).xy * 1;
@@ -44,6 +44,9 @@ void computemain()
     vec2 rhs = vec2(0);
     rhs.x = diffusivity.x * laplacian.x + a - (1.0 + b) * u + v * u_squared;
     rhs.y = diffusivity.y * laplacian.y + b * u - v * u_squared;
+
+    //rhs.x = diffusivity.x * laplacian.x + v * u_squared + (1 + b) * u + a;
+    //rhs.y = diffusivity.y * laplacian.y - v * u_squared + b * u;
 
     imageStore(texture_out, position, vec4(uv + rhs * delta / 4, 0, 0));
 }

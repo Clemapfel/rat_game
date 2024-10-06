@@ -21,10 +21,10 @@ end, {
 
     texture_format = "rg32f",
 
-    a = 4,
+    a = 3,
     b = 12,
-    diffusivity = {0.005, 0.005},
-    perturbation = 0.1,
+    diffusivity = {0.003, 0.001},
+    perturbation = 0.05,
 
     --[[
     a = 1,
