@@ -1,5 +1,4 @@
 --- @brief easement functions, defined in [0, 1] with f(0) = 0, f(1) = 1
-
 rt.linear = function(x, min, max)
     min = which(min, 0)
     max = which(max, 1)
@@ -156,7 +155,9 @@ end
 
 --- @brief sine wave with amptliude 1 and given frequency
 rt.sine_wave = function(x, frequency)
-    return (math.sin(2 * math.pi * x * frequency - math.pi / 2) + 1) * 0.5
+    if frequency == nil then frequency = 2 end
+    -- \frac{\cos\left(2\pi\left(fx-0.5\right)\right)}{2}+0.5
+    return math.cos(2 * math.pi * (frequency * x - 0.5)) / 2 + 0.5
 end
 
 --- @brief triangle wave with amplitude 1 and given frequency

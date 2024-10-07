@@ -22,17 +22,13 @@
     </configurations>
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="7fa9ba1b-2cff-4ecc-86fb-59ab2fa76ee1" name="Changes" comment="stashing">
-      <change afterPath="$PROJECT_DIR$/common/loading_screen_default.lua" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/common/loading_screen_shatter.lua" afterDir="false" />
+    <list default="true" id="7fa9ba1b-2cff-4ecc-86fb-59ab2fa76ee1" name="Changes" comment="added loading screen class">
+      <change afterPath="$PROJECT_DIR$/backgrounds/temp_triangle_tiling.lua" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/common/timed_animation.lua" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/backgrounds/brusselator.lua" beforeDir="false" afterPath="$PROJECT_DIR$/backgrounds/brusselator.lua" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/backgrounds/brusselator_compute.glsl" beforeDir="false" afterPath="$PROJECT_DIR$/backgrounds/brusselator_compute.glsl" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/backgrounds/brusselator_initialize.glsl" beforeDir="false" afterPath="$PROJECT_DIR$/backgrounds/brusselator_initialize.glsl" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/backgrounds/brusselator_render.glsl" beforeDir="false" afterPath="$PROJECT_DIR$/backgrounds/brusselator_render.glsl" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/common/easement_functions.lua" beforeDir="false" afterPath="$PROJECT_DIR$/common/easement_functions.lua" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/common/game_state.lua" beforeDir="false" afterPath="$PROJECT_DIR$/common/game_state.lua" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/common/loading_screen.lua" beforeDir="false" afterPath="$PROJECT_DIR$/common/loading_screen.lua" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/common/random.lua" beforeDir="false" afterPath="$PROJECT_DIR$/common/random.lua" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/include.lua" beforeDir="false" afterPath="$PROJECT_DIR$/include.lua" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/main.lua" beforeDir="false" afterPath="$PROJECT_DIR$/main.lua" afterDir="false" />
     </list>
@@ -579,15 +575,8 @@
       <workItem from="1727999521829" duration="26745000" />
       <workItem from="1728160868435" duration="14796000" />
       <workItem from="1728184556022" duration="443000" />
-      <workItem from="1728232792660" duration="3449000" />
-    </task>
-    <task id="LOCAL-01063" summary="health bar done">
-      <option name="closed" value="true" />
-      <created>1726506741432</created>
-      <option name="number" value="01063" />
-      <option name="presentableId" value="LOCAL-01063" />
-      <option name="project" value="LOCAL" />
-      <updated>1726506741432</updated>
+      <workItem from="1728232792660" duration="7024000" />
+      <workItem from="1728320028333" duration="4502000" />
     </task>
     <task id="LOCAL-01064" summary="imported speed value">
       <option name="closed" value="true" />
@@ -973,7 +962,15 @@
       <option name="project" value="LOCAL" />
       <updated>1728182137098</updated>
     </task>
-    <option name="localTasksCounter" value="1112" />
+    <task id="LOCAL-01112" summary="added loading screen class">
+      <option name="closed" value="true" />
+      <created>1728250772867</created>
+      <option name="number" value="01112" />
+      <option name="presentableId" value="LOCAL-01112" />
+      <option name="project" value="LOCAL" />
+      <updated>1728250772867</updated>
+    </task>
+    <option name="localTasksCounter" value="1113" />
     <servers />
   </component>
   <component name="TypeScriptGeneratedFilesManager">
@@ -1022,7 +1019,6 @@
     </option>
   </component>
   <component name="VcsManagerConfiguration">
-    <MESSAGE value="optimized drawing of various scenes" />
     <MESSAGE value="added deadzone widget, imported priority queue" />
     <MESSAGE value="stashing smooth motion" />
     <MESSAGE value="introduced physics scaling factor" />
@@ -1047,7 +1043,8 @@
     <MESSAGE value="stashing initialize as compute" />
     <MESSAGE value="brusselator working" />
     <MESSAGE value="stashing" />
-    <option name="LAST_COMMIT_MESSAGE" value="stashing" />
+    <MESSAGE value="added loading screen class" />
+    <option name="LAST_COMMIT_MESSAGE" value="added loading screen class" />
   </component>
   <component name="XDebuggerManager">
     <breakpoint-manager>

@@ -8,25 +8,18 @@ midi:signal_connect("message", function(self, timestamp, ...)
 end)
 ]]--
 
-
 state = rt.GameState()
---state:set_loading_screen(rt.LoadingScreen.DEFAULT)
+state:set_loading_screen(rt.LoadingScreen.DEFAULT)
 state:initialize_debug_state()
 
 world = b2.World
 
-local background = rt.Background()
-background:set_implementation(rt.Background.BRUSSELATOR)
-
-function expensive_function()
-    state:_run()
+for i = 1, 10 do
+    println(love.math.simplexNoise(i / math.pi))
 end
 
-local shader = love.graphics.newComputeShader("backgrounds/brusselator_compute.glsl", {
-    defines = {
-        TEXTURE_FORMAT = "rg32f"
-    }
-})
+local background = rt.Background()
+background:set_implementation(rt.Background.TEMP_TRIANGLE_TILING)
 
 local draw_state = true
 input = rt.InputController()
@@ -73,7 +66,7 @@ end
 love.draw = function()
     background:draw()
     if draw_state then
-        state:_draw()
+        --state:_draw()
     end
 end
 

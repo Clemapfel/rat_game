@@ -129,3 +129,7 @@ function rt.random.string(length, ...)
     return table.concat(out, "")
 end
 
+--- @brief
+function rt.random.noise(x, ...)
+    return love.math.simplexNoise(x * math.pi, ...)
+end

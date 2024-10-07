@@ -714,8 +714,6 @@ end
 function rt.GameState:set_loading_screen(loading_screen_type)
     meta.assert_isa(loading_screen_type, meta.Type)
     self._loading_screen = loading_screen_type()
-    if self._is_realized then
-        self._loading_screen:realize()
-        self._loading_screen:fit_into(self._bounds)
-    end
+    self._loading_screen:realize()
+    self._loading_screen:fit_into(self._bounds)
 end
