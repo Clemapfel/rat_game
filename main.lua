@@ -8,6 +8,12 @@ midi:signal_connect("message", function(self, timestamp, ...)
 end)
 ]]--
 
+local animation = rt.TimedAnimation(1, 0, 2, rt.InterpolationFunctions.LINEAR)
+animation:signal_connect("done", function(self)
+    dbg("done")
+end)
+animation:update(200)
+
 state = rt.GameState()
 state:set_loading_screen(rt.LoadingScreen.DEFAULT)
 state:initialize_debug_state()

@@ -151,12 +151,14 @@ rt.TimedAnimation = meta.new_type("TimedAnimation", rt.SignalEmitter, function(d
     return out
 end)
 
+meta.add_signal(rt.TimedAnimation, "done")
+
 --- @brief
 function rt.TimedAnimation:update(delta)
     local before = self._elapsed
     self._elapsed = self._elapsed + delta
     if before < self._duration and self._elapsed > self._duration then
-        self:signal_emit("finish")
+        self:signal_emit("done")
     end
 end
 

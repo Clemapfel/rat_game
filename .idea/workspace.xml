@@ -22,15 +22,12 @@
     </configurations>
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="7fa9ba1b-2cff-4ecc-86fb-59ab2fa76ee1" name="Changes" comment="added loading screen class">
-      <change afterPath="$PROJECT_DIR$/backgrounds/temp_triangle_tiling.lua" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/common/timed_animation.lua" afterDir="false" />
+    <list default="true" id="7fa9ba1b-2cff-4ecc-86fb-59ab2fa76ee1" name="Changes" comment="added timed animation">
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/common/easement_functions.lua" beforeDir="false" afterPath="$PROJECT_DIR$/common/easement_functions.lua" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/common/game_state.lua" beforeDir="false" afterPath="$PROJECT_DIR$/common/game_state.lua" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/common/random.lua" beforeDir="false" afterPath="$PROJECT_DIR$/common/random.lua" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/include.lua" beforeDir="false" afterPath="$PROJECT_DIR$/include.lua" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/common/meta.lua" beforeDir="false" afterPath="$PROJECT_DIR$/common/meta.lua" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/common/timed_animation.lua" beforeDir="false" afterPath="$PROJECT_DIR$/common/timed_animation.lua" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/main.lua" beforeDir="false" afterPath="$PROJECT_DIR$/main.lua" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/older/~common/meta.lua" beforeDir="false" afterPath="$PROJECT_DIR$/older/~common/meta.lua" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -576,15 +573,7 @@
       <workItem from="1728160868435" duration="14796000" />
       <workItem from="1728184556022" duration="443000" />
       <workItem from="1728232792660" duration="7024000" />
-      <workItem from="1728320028333" duration="4502000" />
-    </task>
-    <task id="LOCAL-01064" summary="imported speed value">
-      <option name="closed" value="true" />
-      <created>1726529595958</created>
-      <option name="number" value="01064" />
-      <option name="presentableId" value="LOCAL-01064" />
-      <option name="project" value="LOCAL" />
-      <updated>1726529595959</updated>
+      <workItem from="1728320028333" duration="5858000" />
     </task>
     <task id="LOCAL-01065" summary="added status and global status to verbose info panel">
       <option name="closed" value="true" />
@@ -970,7 +959,15 @@
       <option name="project" value="LOCAL" />
       <updated>1728250772867</updated>
     </task>
-    <option name="localTasksCounter" value="1113" />
+    <task id="LOCAL-01113" summary="added timed animation">
+      <option name="closed" value="true" />
+      <created>1728324708889</created>
+      <option name="number" value="01113" />
+      <option name="presentableId" value="LOCAL-01113" />
+      <option name="project" value="LOCAL" />
+      <updated>1728324708890</updated>
+    </task>
+    <option name="localTasksCounter" value="1114" />
     <servers />
   </component>
   <component name="TypeScriptGeneratedFilesManager">
@@ -1019,7 +1016,6 @@
     </option>
   </component>
   <component name="VcsManagerConfiguration">
-    <MESSAGE value="added deadzone widget, imported priority queue" />
     <MESSAGE value="stashing smooth motion" />
     <MESSAGE value="introduced physics scaling factor" />
     <MESSAGE value="stashing priority queue" />
@@ -1044,7 +1040,8 @@
     <MESSAGE value="brusselator working" />
     <MESSAGE value="stashing" />
     <MESSAGE value="added loading screen class" />
-    <option name="LAST_COMMIT_MESSAGE" value="added loading screen class" />
+    <MESSAGE value="added timed animation" />
+    <option name="LAST_COMMIT_MESSAGE" value="added timed animation" />
   </component>
   <component name="XDebuggerManager">
     <breakpoint-manager>

@@ -75,7 +75,7 @@ function meta._new(typename)
     -- uses indices instead of proper names or getmetatable for micro optimization
     local out = {}
     out[1] = {}  -- metatable
-    metatable = out[1]
+    local metatable = out[1]
 
     metatable.__name = typename._typename
     metatable.__hash = meta._hash
@@ -305,7 +305,7 @@ end
 meta.Object = "Object"
 
 --- @brief [internal] recursively install all types and super types of types, used in meta.new
-function meta._install_super(super)
+function meta._install_super(metatable, super)
     if metatable.super[super._typename] ~= true then
         metatable.super[super._typename] = true
         for key, value in pairs(super[1][1]) do  -- getmetatable(super).properties
@@ -337,7 +337,7 @@ function meta.new(type, fields)
         metatable[1][key] = value
     end
 
-    meta._install_super(type)
+    meta._install_super(metatable, type)
     return out
 end
 

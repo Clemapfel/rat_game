@@ -100,7 +100,7 @@ function meta._new(typename)
     -- uses indices instead of proper names or getmetatable for micro optimization
     local out = {}
     out[1] = {}  -- metatable
-    metatable = out[1]
+    local metatable = out[1]
 
     metatable[meta._properties_index] = {}
     metatable[meta._is_mutable_index] = true
@@ -338,18 +338,29 @@ function meta.get_is_mutable(x)
 end
 
 --- @brief [internal] recursively install all types and super types of types, used in meta.new
-function meta._install_super(super)
-    if metatable[meta._super_index][super._typename] ~= true then
-        metatable[meta._super_index][super._typename] = true
-        for key, value in pairs(super[1][1]) do  -- getmetatable(super).properties
+function meta._install_super(metatable, type)
+    if metatable[meta._super_index][type._typename] ~= true then
+        metatable[meta._super_index][type._typename] = true
+        for key, value in pairs(type[1][1]) do  -- getmetatable(type).properties
             if metatable[1][key] == nil then -- properties[key]
                 metatable[1][key] = value
             end
         end
 
-        for _, supersuper in pairs(super._super) do
-            meta._install_super(supersuper)
+        for _, supersuper in pairs(type._super) do
+            meta._install_super(metatable, supersuper)
         end
+    end
+end
+
+--- @brief [internal]
+function meta._install_signals(instance, type)
+    for name in values(type._signals) do
+        instance:signal_add(name)
+    end
+
+    for super in values(type._super) do
+        meta._install_signals(instance, super)
     end
 end
 
@@ -369,7 +380,8 @@ function meta.new(type, fields)
         metatable[1][key] = value
     end
 
-    meta._install_super(type)
+    meta._install_super(metatable, type)
+    --meta._install_signals(out, type)
     return out
 end
 
@@ -524,7 +536,8 @@ function meta.new_type(typename, ...)
 
     metatable[1]._typename = typename
     metatable[1]._type_id = string.hash(typename)
-    metatable[1]._super = which(super, {})
+    metatable[1]._super = super
+    metatable[1]._signals = {}
 
     if not meta.is_nil(ctor) then
         -- custom constructor
@@ -550,6 +563,24 @@ function meta.new_type(typename, ...)
         meta.install_property(out, key, value)
     end
     return out
+end
+
+--- @brief
+function meta.add_signal(type, name)
+    local properties = type[1][1]
+    local signal_emitter_seen = false
+    for super in values(properties._super) do
+        if super == rt.SignalEmitter then
+            signal_emitter_seen = true
+        end
+    end
+
+    if not signal_emitter_seen then
+        rt.warning("In meta.add_signal: Trying to add signal to type `" .. properties._typename .. "`, but it is not a subtype of rt.SignalEmitter")
+        table.insert(properties._super, rt.SignalEmitter)
+    end
+
+    table.insert(properties._signals, name)
 end
 
 --- @brief
