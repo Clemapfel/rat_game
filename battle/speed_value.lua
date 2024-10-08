@@ -31,20 +31,17 @@ function bt.SpeedValue:realize()
     self._is_realized = true
 
     local speed_string = self:_format_value()
-    self._label = rt.Glyph(rt.settings.battle.speed_value.font, speed_string, {
-        is_outlined = true,
-        is_bold = true,
-        outline_color = rt.Palette.TRUE_BLACK,
-        color = rt.Palette.TRUE_WHITE
-    })
+    self._label = rt.Label("<o><b>" .. speed_string .. "</o></b>")
+    self._label:set_justify_mode(rt.JustifyMode.LEFT)
+    self._label:realize()
     self._motion_animation:set_value(self._current_value)
     self:update(0)
 end
 
 --- @override
 function bt.SpeedValue:size_allocate(x, y, width, height)
-    local label_w, label_h = self._label:get_size()
-    self._label:set_position(x + 0.5 * width - 0.5 * label_w, y + 0.5 * height - 0.5 * label_h)
+    local label_w, label_h = self._label:measure()
+    self._label:fit_into(x + 0.5 * width - 0.5 * label_w, y + 0.5 * height - 0.5 * label_h)
 end
 
 --- @override
@@ -58,12 +55,6 @@ function bt.SpeedValue:update(delta)
         self:_update_value()
     end
 end
-
---- @override
-function bt.SpeedValue:measure()
-    self._label:get_size()
-end
-
 --- @brief
 function bt.SpeedValue:set_value(value)
     self._target_value = value
@@ -96,5 +87,5 @@ end
 
 --- @override
 function bt.SpeedValue:measure()
-    return self._label:get_size()
+    return self._label:measure()
 end

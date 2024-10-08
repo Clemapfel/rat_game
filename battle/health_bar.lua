@@ -25,9 +25,9 @@ bt.HealthBar = meta.new_type("HealthBar", rt.Widget, rt.Animation, function(lowe
         _backdrop = rt.Rectangle(0, 0, 1, 1),
         _backdrop_outline = rt.Rectangle(0, 0, 1, 1),
 
-        _label_left = {},
-        _label_center = {},
-        _label_right = {},
+        _label_left = {},   -- rt.Label
+        _label_center = {}, -- rt.Label
+        _label_right = {},  -- rt.Label
         _use_percentage = true,
         _state = bt.EntityState.ALIVE,
 
@@ -61,9 +61,17 @@ function bt.HealthBar:realize()
         color = rt.Palette.TRUE_WHITE
     }
 
-    self._label_left = rt.Glyph(rt.settings.battle.health_bar.hp_font, left, settings)
-    self._label_center = rt.Glyph(rt.settings.battle.health_bar.hp_font, center, settings)
-    self._label_right = rt.Glyph(rt.settings.battle.health_bar.hp_font, right, settings)
+    local format_prefix = "<o>"
+    local format_postfix = "</o>"
+
+    self._label_left = rt.Label(format_prefix .. left .. format_postfix, rt.settings.battle.health_bar.hp_font)
+    self._label_center = rt.Label(format_prefix .. center .. format_postfix, rt.settings.battle.health_bar.hp_font)
+    self._label_right = rt.Label(format_prefix .. right .. format_postfix, rt.settings.battle.health_bar.hp_font)
+
+    for label in range(self._label_left, self._label_center, self._label_right) do
+        label:set_justify_mode(rt.JustifyMode.LEFT)
+        label:realize()
+    end
 
     self:_update_value()
 end
@@ -117,15 +125,15 @@ function bt.HealthBar:size_allocate(x, y, width, height)
     self._backdrop:resize(x, y, width, height)
     self._backdrop_outline:resize(x, y, width, height)
 
-    local center_w, h1 = self._label_center:get_size()
-    local left_w, h2 = self._label_left:get_size()
-    local right_w, h3 = self._label_right:get_size()
+    local center_w, h1 = self._label_center:measure()
+    local left_w, h2 = self._label_left:measure()
+    local right_w, h3 = self._label_right:measure()
     local label_h = math.max(h1, h2, h3)
 
     local label_y = y + 0.5 * height - 0.5 * label_h
-    self._label_center:set_position(x + 0.5 * width - 0.5 * center_w, label_y)
-    self._label_left:set_position(x + 0.5 * width - 0.5 * center_w - left_w, label_y)
-    self._label_right:set_position(x + 0.5 * width + 0.5 * center_w, label_y)
+    self._label_center:fit_into(x + 0.5 * width - 0.5 * center_w, label_y, POSITIVE_INFINITY)
+    self._label_left:fit_into(x + 0.5 * width - 0.5 * center_w - left_w, label_y, POSITIVE_INFINITY)
+    self._label_right:fit_into(x + 0.5 * width + 0.5 * center_w, label_y, POSITIVE_INFINITY)
 
     self:_update_value()
 end

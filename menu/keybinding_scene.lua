@@ -23,7 +23,7 @@ mn.KeybindingScene = meta.new_type("KeybindingScene", rt.Scene, function(state)
         _selection_graph = rt.SelectionGraph(),
         _accept_node = nil, -- rt.SelectionGraphNode
 
-        _input = rt.InputController(),
+        _input_controller = rt.InputController(),
         _assignment_active = false,
         _assignment_button = nil, -- rt.InputButton
         _skip_frame = 0,
@@ -49,7 +49,7 @@ end, {
 function mn.KeybindingScene:realize()
     if self._is_realized == true then return end
 
-    self._input_method = self._input:get_input_method()
+    self._input_method = self._input_controller:get_input_method()
     local labels = rt.TextAtlas:get(rt.settings.menu.keybinding_scene.text_atlas_id)
     self._accept_label = rt.Label(labels.accept)
     self._go_back_label = rt.Label(labels.go_back)
@@ -98,8 +98,8 @@ function mn.KeybindingScene:realize()
     self:create_from_state(self._state)
 
     local scene = self
-    self._input:set_treat_left_joystick_as_dpad(true)
-    self._input:signal_disconnect_all()
+    self._input_controller:set_treat_left_joystick_as_dpad(true)
+    self._input_controller:signal_disconnect_all()
 
     local is_dialog_active = function()
         return self._confirm_load_default_dialog:get_is_active() or
@@ -107,7 +107,7 @@ function mn.KeybindingScene:realize()
             self._keybinding_invalid_dialog:get_is_active()
     end
 
-    self._input:signal_connect("pressed", function(_, which)
+    self._input_controller:signal_connect("pressed", function(_, which)
         if self._is_active == false or scene._skip_frame > 0 or is_dialog_active() then return end
         if not scene._assignment_active then
             if which == rt.InputButton.B then
@@ -118,21 +118,21 @@ function mn.KeybindingScene:realize()
         end
     end)
 
-    self._input:signal_connect("keyboard_pressed", function(_, which)
+    self._input_controller:signal_connect("keyboard_pressed", function(_, which)
         if self._is_active == false or scene._skip_frame > 0 or is_dialog_active() then return end
         if scene._assignment_active then
             scene:_finish_assignment(which)
         end
     end)
 
-    self._input:signal_connect("gamepad_pressed", function(_, which)
+    self._input_controller:signal_connect("gamepad_pressed", function(_, which)
         if self._is_active == false or scene._skip_frame > 0 or is_dialog_active() then return end
         if scene._assignment_active then
             scene:_finish_assignment(which)
         end
     end)
 
-    self._input:signal_connect("input_method_changed", function(_, new)
+    self._input_controller:signal_connect("input_method_changed", function(_, new)
         scene._input_method = new
         if scene._input_method == rt.InputMethod.KEYBOARD then
             scene._heading_label:set_text(labels.heading_keyboard)
@@ -144,7 +144,7 @@ function mn.KeybindingScene:realize()
             self:reformat()
         end
     end)
-    self._input:signal_emit("input_method_changed", self._input:get_input_method())
+    self._input_controller:signal_emit("input_method_changed", self._input_controller:get_input_method())
 
     self._confirm_load_default_dialog = rt.MessageDialog(
         labels.confirm_load_default_message,
@@ -325,7 +325,7 @@ function mn.KeybindingScene:_update_snapshots()
     self._heading_label:draw()
     self._control_indicator:draw()
 
-    local keyboard_or_gamepad = self._input:get_input_method() == rt.InputMethod.KEYBOARD
+    local keyboard_or_gamepad = self._input_controller:get_input_method() == rt.InputMethod.KEYBOARD
     for item_row in values(self._items) do
         for item in values(item_row) do
             draw_frame(item.frame)
@@ -515,7 +515,7 @@ function mn.KeybindingScene:draw()
         self._active_label:draw()
     end
 
-    local keyboard_or_gamepad = self._input:get_input_method() == rt.InputMethod.KEYBOARD
+    local keyboard_or_gamepad = self._input_controller:get_input_method() == rt.InputMethod.KEYBOARD
     for item_row in values(self._items) do
         for item in values(item_row) do
             if keyboard_or_gamepad then
