@@ -3,7 +3,7 @@ rt.coroutine.frame_start = love.timer.getTime()
 rt.coroutine.n_active = 0
 
 --- @class rt.CoroutineStatus
-rt.CoroutineStatus = meta.new_enum({
+rt.CoroutineStatus = meta.new_enum("CoroutineStatus", {
     IDLE = "normal",
     RUNNING = "running",
     SUSPENDED = "suspended",

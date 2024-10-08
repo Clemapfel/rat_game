@@ -1,6 +1,6 @@
 --- @class rt.SoundComponent
 --- @signal finished (self) -> nil
-rt.SoundComponent = meta.new_type("SoundComponent", rt.SignalEmitter, function()
+rt.SoundComponent = meta.new_type("SoundComponent", function()
     local out = meta.new(rt.SoundComponent, {
         _position_x = 0,
         _position_y = 0,
@@ -9,10 +9,11 @@ rt.SoundComponent = meta.new_type("SoundComponent", rt.SignalEmitter, function()
         _is_active = false,
         _last_tell = 0
     })
-    out:signal_add("finished")
     rt.SoundAtlas:add_sound_component(out)
     return out
 end)
+
+meta.add_signal(rt.SoundComponent, "finished")
 
 --- @brief
 function rt.SoundComponent:play(id)

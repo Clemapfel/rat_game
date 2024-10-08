@@ -5,7 +5,7 @@ rt.settings.direction_indicator = {
 
 --- @class rt.DirectionIndicator
 rt.DirectionIndicator = meta.new_type("DirectionIndicator", rt.Widget, function(direction)
-    if meta.is_nil(direction) then
+    if direction == nil then
         direction = rt.Direction.NONE
     end
 

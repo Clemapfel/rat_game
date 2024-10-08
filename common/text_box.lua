@@ -4,7 +4,7 @@ rt.settings.textbox = {
 
 --- @class rt.TextBox
 --- @signal scrolling_done (self) -> nil
-rt.TextBox = meta.new_type("TextBox", rt.Widget, rt.SignalEmitter, function()
+rt.TextBox = meta.new_type("TextBox", rt.Widget, function()
     local out = meta.new(rt.TextBox, {
         _backdrop = rt.Frame(),
 
@@ -33,9 +33,10 @@ rt.TextBox = meta.new_type("TextBox", rt.Widget, rt.SignalEmitter, function()
         _label_aabb = rt.AABB(0, 0, 1, 1)
     })
 
-    out:signal_add("scrolling_done")
     return out
 end)
+
+meta.add_signal(rt.TextBox, "scrolling_done")
 
 --- @override
 function rt.TextBox:realize()

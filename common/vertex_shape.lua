@@ -1,12 +1,12 @@
 --- @class rt.SpriteBatchUsage
-rt.SpriteBatchUsage = meta.new_enum({
+rt.SpriteBatchUsage = meta.new_enum("SpriteBatchUsage", {
     DYNAMIC = "dynamic",
     STATIC = "static",
     STREAM = "stream"
 })
 
 --- @class rt.MeshDrawMode
-rt.MeshDrawMode = meta.new_enum({
+rt.MeshDrawMode = meta.new_enum("MeshDrawMode", {
     TRIANGLE_FAN = "fan",
     TRIANGLE_STRIP = "strip",
     TRIANGLES = "triangles",
@@ -14,7 +14,7 @@ rt.MeshDrawMode = meta.new_enum({
 })
 
 --- @class rt.VertexAttribute
-rt.VertexAttribute = meta.new_enum({
+rt.VertexAttribute = meta.new_enum("VertexAttribute", {
     POSITION = "VertexPosition",
     TEXTURE_COORDINATES = "VertexTexCoord",
     COLOR = "VertexColor"
@@ -42,7 +42,7 @@ end
 --- @param texture_coordinate_y Number in [0, 1]
 --- @param color rt.RGBA
 function rt.Vertex(x, y, texture_coordinate_x, texture_coordinate_y, color)
-    if meta.is_nil(color) then
+    if color == nil then
         color = rt.RGBA(1, 1, 1, 1)
     end
     return {
@@ -178,10 +178,10 @@ end
 --- @brief set texture
 --- @param texture rt.Texture
 function rt.VertexShape:set_texture(texture)
-    if not meta.is_nil(texture) then
-        self._native:setTexture(texture._native)
-    else
+    if texture == nil then
         self._native:setTexture(nil)
+    else
+        self._native:setTexture(texture._native)
     end
 end
 

@@ -4,14 +4,14 @@ rt.settings.battle.entity = {
 }
 
 --- @class EntityState
-bt.EntityState = meta.new_enum({
+bt.EntityState = meta.new_enum("EntityState", {
     ALIVE = "ALIVE",
     KNOCKED_OUT = "KNOCKED_OUT",
     DEAD = "DEAD"
 })
 
 --- @class AILevel
-bt.AILevel = meta.new_enum({
+bt.AILevel = meta.new_enum("AILevel", {
     RANDOM = 0,
     LEVEL_1 = 1,
     LEVEL_2 = 2

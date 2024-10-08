@@ -8,7 +8,11 @@ rt.settings.loading_screen = {
 --- @brief use show / hide to reveal, if hidden during show, interpolates and smoothly transitions
 --- @signal shown (self) -> nil
 --- @signal hidden (self) -> nil
-rt.LoadingScreen = meta.new_abstract_type("LoadingScreen", rt.Widget, rt.Animation, rt.SignalEmitter)
+rt.LoadingScreen = meta.new_abstract_type("LoadingScreen", rt.Widget, rt.Animation)
+meta.add_signals(rt.LoadingScreen,
+    "shown",
+    "hidden"
+)
 
 --- @override
 function rt.LoadingScreen:realize()

@@ -3,7 +3,7 @@ rt.settings.menu.verbose_info_panel = {
     indicator_base_color = rt.Palette.FOREGROUND
 }
 
-rt.VerboseInfoObject = meta.new_enum({
+rt.VerboseInfoObject = meta.new_enum("VerboseInfoObject", {
     MOVE = "move",
     CONSUMABLE = "consumable",
     EQUIP = "equip",

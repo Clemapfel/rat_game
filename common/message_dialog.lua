@@ -3,7 +3,7 @@ rt.settings.message_dialog = {
     shadow_strength = 0.2
 }
 
-rt.MessageDialogOption = meta.new_enum({
+rt.MessageDialogOption = meta.new_enum("MessageDialogOption", {
     ACCEPT = "OK",
     CANCEL = "Cancel"
 })
@@ -13,7 +13,7 @@ rt.MessageDialogOption = meta.new_enum({
 --- @param submessage String
 --- @param option1 vararg
 --- @signal selection (rt.MessageDialog, Unsigned) -> nil
-rt.MessageDialog = meta.new_type("MessageDialog", rt.Widget, rt.SignalEmitter, function(message, submessage, option1, ...)
+rt.MessageDialog = meta.new_type("MessageDialog", rt.Widget, function(message, submessage, option1, ...)
     message = which(message, " ")
     submessage = which(submessage, " ")
     local out = meta.new(rt.MessageDialog, {
@@ -50,9 +50,10 @@ rt.MessageDialog = meta.new_type("MessageDialog", rt.Widget, rt.SignalEmitter, f
         end
     end
 
-    out:signal_add("selection")
     return out
 end)
+
+meta.add_signal(rt.MessageDialog, "selection")
 
 --- @override
 function rt.MessageDialog:realize()

@@ -2,7 +2,7 @@ rt.KeyboardKeyPrefix = "KEY_"
 
 --- @class rt.KeyboardKey
 --- @see https://love2d.org/wiki/Scancode
-rt.KeyboardKey = meta.new_enum({
+rt.KeyboardKey = meta.new_enum("KeyboardKey", {
     A = rt.KeyboardKeyPrefix .."a",
     B = rt.KeyboardKeyPrefix .."b",
     C = rt.KeyboardKeyPrefix .."c",
@@ -203,7 +203,7 @@ rt.KeyboardKey = meta.new_enum({
 rt.GamepadButtonPrefix = "BUTTON_"
 
 --- @class rt.GamepadButton
-rt.GamepadButton = meta.new_enum({
+rt.GamepadButton = meta.new_enum("GamepadButton", {
     TOP = rt.GamepadButtonPrefix .. "y",
     RIGHT = rt.GamepadButtonPrefix .. "b",
     BOTTOM = rt.GamepadButtonPrefix .. "a",
@@ -223,7 +223,7 @@ rt.GamepadButton = meta.new_enum({
 })
 
 --- @class rt.GamepadAxis
-rt.GamepadAxis = meta.new_enum({
+rt.GamepadAxis = meta.new_enum("GamepadAxis", {
     LEFT_X = "leftx",
     LEFT_Y = "lefty",
     RIGHT_X = "rightx",
@@ -233,14 +233,14 @@ rt.GamepadAxis = meta.new_enum({
 })
 
 --- @class rt.JoystickPosition
-rt.JoystickPosition = meta.new_enum({
+rt.JoystickPosition = meta.new_enum("JoystickPosition", {
     LEFT = "LEFT",
     RIGHT = "RIGHT",
     UNKNOWN = "UNKNON"
 })
 
 --- @class rt.MouseButton
-rt.MouseButton = meta.new_enum({
+rt.MouseButton = meta.new_enum("MouseButton", {
     LEFT = 1,
     MIDDLE = 2,
     RIGHT = 3,
@@ -248,7 +248,7 @@ rt.MouseButton = meta.new_enum({
 })
 
 --- @class rt.InputButton
-rt.InputButton = meta.new_enum({
+rt.InputButton = meta.new_enum("InputButton", {
     A = "A",
     B = "B",
     X = "X",

@@ -7,7 +7,7 @@ b2.BodyType = {
 
 --- @class b2.CollisionGroup
 --- @brief only objects in the same group collide
-b2.CollisionGroup = meta.new_enum({
+b2.CollisionGroup = meta.new_enum("CollisionGroup", {
     NONE = -1,
     ALL = 0,
     GROUP_01 = bit.lshift(1, 0),

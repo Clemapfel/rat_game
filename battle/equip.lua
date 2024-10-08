@@ -3,15 +3,6 @@ rt.settings.battle.equip = {
     name = "Gear"
 }
 
-bt.EquipType = meta.new_enum({
-    TRINKET = "TRINKET",
-    MALE_CLOTHING = "MALE_CLOTHING",
-    FEMALE_CLOTHING = "FEMALE_CLOTHING",
-    UNISEX_CLOTHING = "UNISEX_CLOTHING",
-    WEAPON = "MELEE_WEAPON",
-    UNKNOWN = "UNKNOWN"
-})
-
 --- @class bt.Equip
 bt.Equip = meta.new_type("Equip", function(id)
     local out = bt.Equip._atlas[id]
@@ -45,8 +36,6 @@ end, {
         meta.assert_equip_interface(self)
         meta.assert_entity_interface(holder)
     end,
-
-    type = bt.EquipType.UNKNOWN,
 
     description = "(no description)",
     flavor_text = "",

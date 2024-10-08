@@ -1,16 +1,16 @@
-rt.VSyncMode = {
+rt.VSyncMode = meta.new_enum("VSyncMode", {
     ADAPTIVE = -1,
     OFF = 0,
     ON = 1
-}
+})
 
-rt.MSAAQuality = {
+rt.MSAAQuality = meta.new_enum("MSAAQuality", {
     OFF = 0,
     GOOD = 2,
     BETTER = 4,
     BEST = 8,
     MAX = 16
-}
+})
 
 --- @class rt.GameState
 rt.GameState = meta.new_type("GameState", function()

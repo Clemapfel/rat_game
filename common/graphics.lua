@@ -24,7 +24,7 @@ rt.graphics.get_width = love.graphics.getWidth
 rt.graphics.get_height = love.graphics.getHeight
 
 --- @class rt.BlendMode
-rt.BlendMode = meta.new_enum({
+rt.BlendMode = meta.new_enum("BlendMode", {
     NONE = -1,
     NORMAL = 0,
     ADD = 1,
@@ -35,7 +35,7 @@ rt.BlendMode = meta.new_enum({
 })
 
 --- @class rt.BlendOperation
-rt.BlendOperation = meta.new_enum({
+rt.BlendOperation = meta.new_enum("BlendOperation", {
     ADD = "add",
     SUBTRACT = "subtract",
     REVERSE_SUBTRACT = "reversesubtract",
@@ -44,7 +44,7 @@ rt.BlendOperation = meta.new_enum({
 })
 
 --- @class rt.BlendFactor
-rt.BlendFactor = meta.new_enum({
+rt.BlendFactor = meta.new_enum("BlendFactor", {
     ZERO = "zero",
     ONE = "one",
     SOURCE_COLOR = "srccolor",
@@ -163,7 +163,7 @@ end
 if love.getVersion() >= 12 then
 
     --- @class rt.StencilMode
-    rt.StencilMode = meta.new_enum({
+    rt.StencilMode = meta.new_enum("StencilMode", {
         REPLACE = "replace",
         INCREMENT = "increment",
         DECREMENT = "decrement"
@@ -196,7 +196,7 @@ function rt.graphics.clear_stencil()
     love.graphics.clear(false, true, false)
 end
 
-rt.StencilCompareMode = meta.new_enum({
+rt.StencilCompareMode = meta.new_enum("StencilCompareMode", {
     EQUAL = "equal",
     NOT_EQUAL = "notequal",
     LESS_THAN = "less",

@@ -1,12 +1,12 @@
 rt.settings.margin_unit = 10
 rt.settings.widget = {}
 
-rt.Orientation = meta.new_enum({
+rt.Orientation = meta.new_enum("Orientation", {
     HORIZONTAL = "HORIZONTAL",
     VERTICAL = "VERTICAL"
 })
 
-rt.Alignment = meta.new_enum({
+rt.Alignment = meta.new_enum("Alignment", {
     START = "START",
     CENTER = "CENTER",
     END = "END"

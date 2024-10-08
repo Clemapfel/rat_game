@@ -1,6 +1,6 @@
 --- @class mn.Scale
 --- @signal value_changed (mn.Scale, fraction) -> nil
-mn.Scale = meta.new_type("MenuScale", rt.Widget, rt.SignalEmitter, function(min, max, n_steps, initial_value)
+mn.Scale = meta.new_type("MenuScale", rt.Widget, function(min, max, n_steps, initial_value)
     meta.assert_number(min, max, n_steps)
     if initial_value ~= nil then
         meta.assert_number(initial_value)
@@ -26,9 +26,9 @@ mn.Scale = meta.new_type("MenuScale", rt.Widget, rt.SignalEmitter, function(min,
         _value = initial_value
     })
 
-    out:signal_add("value_changed")
     return out
 end)
+meta.add_signal(mn.Scale, "value_changed")
 
 --- @override
 function mn.Scale:realize()

@@ -5,7 +5,7 @@ rt.settings.menu.slots = {
     frame_selected_thickness = 2
 }
 
-mn.SlotType = meta.new_enum({
+mn.SlotType = meta.new_enum("SlotType", {
     MOVE = "MOVE",
     EQUIP = "EQUIP",
     CONSUMABLE = "CONSUMABLE",

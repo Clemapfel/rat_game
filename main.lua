@@ -1,28 +1,15 @@
 require "include"
 
---[[
-require "midi.midi"
-midi = rt.MidiInput()
-midi:signal_connect("message", function(self, timestamp, ...)
-    dbg(timestamp, ...)
-end)
-]]--
-
 local animation = rt.TimedAnimation(1, 0, 2, rt.InterpolationFunctions.LINEAR)
 animation:signal_connect("done", function(self)
     dbg("done")
 end)
-animation:update(200)
 
 state = rt.GameState()
 state:set_loading_screen(rt.LoadingScreen.DEFAULT)
 state:initialize_debug_state()
 
 world = b2.World
-
-for i = 1, 10 do
-    println(love.math.simplexNoise(i / math.pi))
-end
 
 local background = rt.Background()
 background:set_implementation(rt.Background.TEMP_TRIANGLE_TILING)
@@ -72,7 +59,7 @@ end
 love.draw = function()
     background:draw()
     if draw_state then
-        --state:_draw()
+        state:_draw()
     end
 end
 
@@ -83,5 +70,4 @@ end
 
 love.run = function()
     state:_run()
-
 end

@@ -1,5 +1,5 @@
 --- @class PolygonType
-rt.PolygonType = meta.new_enum({
+rt.PolygonType = meta.new_enum("PolygonType", {
     LINE_STRIP = 0,
     DOTS = 1,
     POLYGON = 2

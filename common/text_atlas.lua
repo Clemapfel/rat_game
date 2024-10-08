@@ -2,11 +2,10 @@ rt.settings.text_atlas = {
 
 }
 
-rt.LocalizationLanguage = {
+rt.LocalizationLanguage = meta.new_enum("LocalizationLanguage", {
     ENGLISH = "english",
-    JAPANESE = "japanese",
-    GERMAN = "german"
-}
+    JAPANESE = "japanese"
+})
 
 --- @class
 rt.TextAtlas = meta.new_type("TextAtlas", function()
@@ -19,7 +18,7 @@ end)
 
 --- @brief
 function rt.TextAtlas:initialize(folder, language)
-    meta.assert_enum(language, rt.LocalizationLanguage)
+    meta.assert_enum_value(language, rt.LocalizationLanguage)
     self._content = {}
     self._folder = folder .. "/" .. language
 

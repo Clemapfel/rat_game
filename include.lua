@@ -89,7 +89,6 @@ rt.profiler = require "profiler.profiler"
 -- common
 require "common.time"
 require "common.log"
-require "common.signal_emitter"
 require "common.coroutine"
 require "common.thread"
 

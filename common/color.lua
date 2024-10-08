@@ -9,10 +9,10 @@ rt.RGBA = function(r_or_string, g, b, a)
         return rt.html_code_to_color(code)
     else
         local r = r_or_string
-        if meta.is_nil(r) then r = 1 end
-        if meta.is_nil(g) then g = 1 end
-        if meta.is_nil(b) then b = 1 end
-        if meta.is_nil(a) then a = 1 end
+        if r == nil then r = 1 end
+        if g == nil then g = 1 end
+        if b == nil then b = 1 end
+        if a == nil then a = 1 end
 
         local out = {}
         out.r = r
@@ -23,14 +23,16 @@ rt.RGBA = function(r_or_string, g, b, a)
     end
 end
 
+local _is_number = meta.is_number
+
 --- @brief [internal] check if object is rt.RGBA
 --- @param object any
 function meta.is_rgba(object)
     return sizeof(object) == 4 and
-        meta.is_number(object.r) and
-        meta.is_number(object.g) and
-        meta.is_number(object.b) and
-        meta.is_number(object.a)
+        _is_number(object.r) and
+        _is_number(object.g) and
+        _is_number(object.b) and
+        _is_number(object.a)
 end
 
 --- @brief [internal] throw if object is not rt.RGBA
@@ -46,10 +48,10 @@ end
 --- @param v Number
 --- @param a Number
 function rt.HSVA(h, s, v, a)
-    if meta.is_nil(h) then h = 1 end
-    if meta.is_nil(s) then s = 1 end
-    if meta.is_nil(v) then v = 1 end
-    if meta.is_nil(a) then a = 1 end
+    if h == nil then h = 1 end
+    if s == nil then s = 1 end
+    if v == nil then v = 1 end
+    if a == nil then a = 1 end
 
     local out = {}
     out.h = h

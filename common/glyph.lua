@@ -12,7 +12,7 @@ rt.settings.glyph = {
 }
 
 --- @class rt.TextEffect
-rt.TextEffect = meta.new_enum({
+rt.TextEffect = meta.new_enum("TextEffect", {
     NONE = "TEXT_EFFECT_NONE",
     SHAKE = "TEXT_EFFECT_SHAKE",
     WAVE = "TEXT_EFFECT_WAVE",
@@ -34,13 +34,13 @@ rt.Glyph = meta.new_type("Glyph", rt.Drawable, rt.Animation, function(font, cont
     local outline_color = look.outline_color
     local effects = look.effects
 
-    if meta.is_nil(font_style) then font_style = rt.FontStyle.REGULAR end
-    if meta.is_nil(color) then color = rt.RGBA(1, 1, 1, 1) end
-    if meta.is_nil(effects) then effects = {} end
-    if meta.is_nil(is_underlined) then is_underlined = false end
-    if meta.is_nil(is_strikethrough) then is_strikethrough = false end
-    if meta.is_nil(is_outlined) then is_outlined = false end
-    if meta.is_nil(outline_color) then outline_color = rt.settings.glyph.default_outline_color end
+    if font_style == nil then font_style = rt.FontStyle.REGULAR end
+    if color == nil then color = rt.RGBA(1, 1, 1, 1) end
+    if effects == nil then effects = {} end
+    if is_underlined == nil then is_underlined = false end
+    if is_strikethrough == nil then is_strikethrough = false end
+    if is_outlined == nil then is_outlined = false end
+    if outline_color == nil then outline_color = rt.settings.glyph.default_outline_color end
 
     local is_animated = sizeof(effects) ~= 0
 

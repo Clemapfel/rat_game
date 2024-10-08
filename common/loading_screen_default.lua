@@ -33,9 +33,6 @@ rt.LoadingScreen.DEFAULT = meta.new_type("LoadingScreen_DEFAULT", rt.LoadingScre
     end
 
     out:_update_color()
-
-    out:signal_add("shown")
-    out:signal_add("hidden")
     return out
 end)
 

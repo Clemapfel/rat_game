@@ -1,5 +1,5 @@
 --- @class rt.LineJoin
-rt.LineJoin = meta.new_enum({
+rt.LineJoin = meta.new_enum("LineJoin", {
     MITER = "miter",
     NONE = "none",
     BEVEL = "bevel"

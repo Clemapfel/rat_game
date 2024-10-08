@@ -12,6 +12,4 @@ return {
 
     sprite_id = "menu_icons",
     sprite_index = 1,
-
-    type = bt.EquipType.WEAPON
 }

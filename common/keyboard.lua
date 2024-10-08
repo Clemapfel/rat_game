@@ -8,7 +8,7 @@ rt.settings.keyboard = {
 --- @class rt.Keyboard
 --- @signal accept (rt.Keyboard, String) -> nil
 --- @signal cancel (rt.Keyboard) -> nil
-rt.Keyboard = meta.new_type("Keyboard", rt.Widget, rt.SignalEmitter, function(max_n_entry_chars, suggestion)
+rt.Keyboard = meta.new_type("Keyboard", rt.Widget, function(max_n_entry_chars, suggestion)
     meta.assert_number(max_n_entry_chars)
     meta.assert_string(suggestion)
     local out = meta.new(rt.Keyboard, {
@@ -60,10 +60,13 @@ rt.Keyboard = meta.new_type("Keyboard", rt.Widget, rt.SignalEmitter, function(ma
         _snapshot_texture = rt.RenderTexture()
     })
 
-    out:signal_add("accept")
-    out:signal_add("cancel")
     return out
 end)
+
+meta.add_signals(rt.Keyboard,
+    "accept",
+    "cancel"
+)
 
 rt.Keyboard._layout = {
     --[[

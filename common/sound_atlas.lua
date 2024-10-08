@@ -1,5 +1,5 @@
 --- @class rt.SourceTimeUnit
-rt.SourceTimeUnit = meta.new_enum({
+rt.SourceTimeUnit = meta.new_enum("SourceTimeUnit", {
     SECONDS = "seconds",
     SAMPLES = "samples"
 })

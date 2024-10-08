@@ -1,5 +1,5 @@
 --- @class rt.InterpolationFunction
-rt.InterpolationFunctions = meta.new_enum({
+rt.InterpolationFunctions = meta.new_enum("InterpolationFunction", {
     LINEAR = function(x)
         -- x
         return x
@@ -132,7 +132,7 @@ rt.InterpolationFunctions = meta.new_enum({
 --- @param interpolation_function
 --- @param should_loop
 --- @signal finish (self) -> nil
-rt.TimedAnimation = meta.new_type("TimedAnimation", rt.SignalEmitter, function(duration, start_value, end_value, interpolation_function, should_loop)
+rt.TimedAnimation = meta.new_type("TimedAnimation", function(duration, start_value, end_value, interpolation_function, should_loop)
     meta.assert_number(duration)
     if start_value == nil then start_value = 0 end
     if end_value == nil then end_value = 0 end

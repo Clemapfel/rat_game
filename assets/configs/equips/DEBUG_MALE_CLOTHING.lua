@@ -12,6 +12,4 @@ return {
 
     sprite_id = "menu_icons",
     sprite_index = 2,
-
-    type = bt.EquipType.FEMALE_CLOTHING
 }

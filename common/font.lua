@@ -38,15 +38,15 @@ rt.Font = meta.new_type("Font", function(size, regular_path, bold_path, italic_p
         _bold_italic_rasterizer = {}
     })
 
-    if not meta.is_nil(bold_path) then
+    if not bold_path == nil then
         out._bold_path = bold_path
     end
 
-    if not meta.is_nil(italic_path) then
+    if not italic_path == nil then
         out._italic_path = italic_path
     end
 
-    if not meta.is_nil(bold_italic_path) then
+    if not bold_italic_path == nil then
         out._bold_italic_path = bold_italic_path
     end
 
@@ -57,7 +57,7 @@ end)
 --- @class love.Font
 ---
 --- @class rt.FontStyle
-rt.FontStyle = meta.new_enum({
+rt.FontStyle = meta.new_enum("FontStyle", {
     REGULAR = "FONT_STYLE_REGULAR",
     ITALIC = "FONT_STYLE_ITALIC",
     BOLD = "FONT_STYLE_BOLD",

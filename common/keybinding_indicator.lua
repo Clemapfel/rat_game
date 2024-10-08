@@ -1136,13 +1136,13 @@ end
 
 --- @brief
 function rt.KeybindingIndicator:create_from_keyboard_key(keyboard_key)
-    meta.assert_enum(keyboard_key, rt.KeyboardKey)
+    meta.assert_enum_value(keyboard_key, rt.KeyboardKey)
     self:create_as_key(rt.keyboard_key_to_string(keyboard_key), keyboard_key == rt.KeyboardKey.SPACE)
 end
 
 --- @brief
 function rt.KeybindingIndicator:create_from_gamepad_button(button)
-    meta.assert_enum(button, rt.GamepadButton)
+    meta.assert_enum_value(button, rt.GamepadButton)
     if button == rt.GamepadButton.TOP then
         self:create_as_button(true, false, false, false)
     elseif button == rt.GamepadButton.RIGHT then

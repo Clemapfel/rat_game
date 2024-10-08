@@ -9,20 +9,20 @@ rt.settings.music_level = 1.0
 rt.settings.sfx_level = 1.0
 
 --- @class rt.VSyncMode
-rt.VSyncMode = {
+rt.VSyncMode = meta.new_enum("VSyncMode", {
     ADAPTIVE = -1,
     OFF = 0,
     ON = 1
-}
+})
 
 --- @class rt.MSAAQuality
-rt.MSAAQuality = {
+rt.MSAAQuality = meta.new_enum("MSAAQuality", {
     OFF = 0,
     GOOD = 2,
     BETTER = 4,
     BEST = 8,
     MAX = 16
-}
+})
 
 --- @brief
 --- @return rt.GameState
@@ -474,7 +474,7 @@ function rt.GameState:_loading_screen_show(on_show)
     self._loading_screen:show()
     self._loading_screen_active = true
     if on_show ~= nil then
-        self._loading_screen:signal_disconnect("shown")
+        self._loading_screen:signal_disconnect_all("shown")
         self._loading_screen:signal_connect("shown", on_show)
     end
 end
@@ -482,7 +482,7 @@ end
 --- @brief
 function rt.GameState:_loading_screen_hide(on_hidden)
     self._loading_screen:hide()
-    self._loading_screen:signal_disconnect("hidden")
+    self._loading_screen:signal_disconnect_all("hidden")
     self._loading_screen:signal_connect("hidden", function(loading_screen)
         self._loading_screen_active = false
         if on_hidden ~= nil then
@@ -538,7 +538,7 @@ end
 
 --- @brief
 function rt.GameState:set_vsync_mode(mode)
-    meta.assert_enum(mode, rt.VSyncMode)
+    meta.assert_enum_value(mode, rt.VSyncMode)
     self._state.vsync_mode = mode
     love.window.setVSync(mode)
 end
@@ -573,7 +573,7 @@ end
 
 --- @brief
 function rt.GameState:set_msaa_quality(msaa)
-    meta.assert_enum(msaa, rt.MSAAQuality)
+    meta.assert_enum_value(msaa, rt.MSAAQuality)
     if msaa ~= self._state.msaa_quality then
         self._state.msaa_quality = msaa
         self:_update_window_mode()
@@ -683,23 +683,23 @@ end
 --- @brief
 --- @return (rt.KeyboardKey, rt.GamepadButton)
 function rt.GameState:get_keybinding(input_button)
-    meta.assert_enum(input_button, rt.InputButton)
+    meta.assert_enum_value(input_button, rt.InputButton)
     local binding = self._state.keybinding[input_button]
     return binding.keyboard, binding.gamepad
 end
 
 --- @brief
 function rt.GameState:get_default_keybinding(input_button)
-    meta.assert_enum(input_button, rt.InputButton)
+    meta.assert_enum_value(input_button, rt.InputButton)
     local binding = self:_get_default_mapping()[input_button]
     return binding.keyboard, binding.gamepad
 end
 
 --- @brief
 function rt.GameState:set_keybinding(input_button, keyboard_binding, gamepad_binding, notify_controller_state)
-    meta.assert_enum(input_button, rt.InputButton)
-    meta.assert_enum(keyboard_binding, rt.KeyboardKey)
-    meta.assert_enum(gamepad_binding, rt.GamepadButton)
+    meta.assert_enum_value(input_button, rt.InputButton)
+    meta.assert_enum_value(keyboard_binding, rt.KeyboardKey)
+    meta.assert_enum_value(gamepad_binding, rt.GamepadButton)
 
     local binding = self._state.keybinding[input_button]
     binding.keyboard = keyboard_binding

@@ -5,7 +5,7 @@ rt.settings.menu.option_button = {
 
 --- @class mn.OptionButton
 --- @signal selection (mn.OptionButton, string) -> nil
-mn.OptionButton = meta.new_type("OptionButton", rt.Widget, rt.SignalEmitter, function(...)
+mn.OptionButton = meta.new_type("OptionButton", rt.Widget, function(...)
     assert(_G._select("#", ...) > 0)
     local out = meta.new(mn.OptionButton, {
         _options = {...},
@@ -32,9 +32,10 @@ mn.OptionButton = meta.new_type("OptionButton", rt.Widget, rt.SignalEmitter, fun
         out._item_label_to_item_i[option] = i
     end
 
-    out:signal_add("selection")
     return out
 end)
+
+meta.add_signal(mn.OptionButton, "selection")
 
 --- @brief
 function mn.OptionButton:_emit_selection()

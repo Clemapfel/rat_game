@@ -4,7 +4,7 @@ rt.settings.label = {
 }
 
 ---@class rt.JustifyMode
-rt.JustifyMode = meta.new_enum({
+rt.JustifyMode = meta.new_enum("JustifyMode", {
     LEFT = "left",
     RIGHT = "right",
     CENTER = "center"
@@ -14,19 +14,9 @@ rt.JustifyMode = meta.new_enum({
 --- @param text String
 --- @param font rt.Font (or nil)
 rt.Label = meta.new_type("Label", rt.Widget, function(text, font, monospace_font)
-    meta.assert_string(text)
-
-    if meta.is_nil(text) then
-        text = ""
-    end
-
-    if meta.is_nil(font) then
-        font = rt.settings.font.default
-    end
-
-    if meta.is_nil(monospace_font) then
-        monospace_font = rt.settings.font.default_mono
-    end
+    if text == nil then text = "" end
+    if font == nil then font = rt.settings.font.default end
+    if monospace_font == nil then monospace_font = rt.settings.font.default_mono end
 
     local out = meta.new(rt.Label, {
         _raw = text,
@@ -248,7 +238,6 @@ rt.Label._syntax = {
     MONOSPACE_TAG_END = rt.Set("</tt>", "</mono>")
 }
 
-
 --- @brief [internal] transform _raw into set of glyphs
 function rt.Label:_parse()
     local first_parse = sizeof(self._glyphs) == 0
@@ -333,7 +322,7 @@ function rt.Label:_parse()
 
     -- advance n characters
     local function step(n)
-        if meta.is_nil(n) then n = 1 end
+        if n == nil then n = 1 end
         i = i + n
         s = string.sub(self._raw, i, i)
     end
@@ -352,7 +341,7 @@ function rt.Label:_parse()
         until sequence_s == ">"
 
         for tag in pairs(tags) do
-            if not meta.is_nil(string.find(sequence, tag)) then
+            if not (string.find(sequence, tag) == nil) then
                 step(string.len(sequence))
                 return true
             end
@@ -375,7 +364,7 @@ function rt.Label:_parse()
 
         for tag in pairs(which) do
             local _, _, new_color = string.find(sequence, tag)
-            if not meta.is_nil(new_color) then
+            if not (new_color == nil) then
                 if not meta.is_rgba(rt.Palette[new_color]) then
                     throw_parse_error("malformed color tag: color `" .. new_color .. "` unknown")
                 end

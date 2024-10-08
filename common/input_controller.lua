@@ -25,13 +25,25 @@ rt.InputControllerState = {
 }
 
 --- @class rt.InputMethod
-rt.InputMethod = meta.new_enum({
+rt.InputMethod = meta.new_enum("InputMethod", {
     KEYBOARD = false,
     GAMEPAD = true
 })
 
 --- @class rt.InputController
 --- @brief combines all input methods into one, fully abstracted controller
+rt.InputController = meta.new_type("InputController", function(bounds)
+    if bounds ~= nil then meta.assert_aabb(bounds) end
+    local out = meta.new(rt.InputController, {
+        _is_disabled = false,
+        _treat_left_joystick_as_dpad = true,
+        _aabb = bounds, -- Optional<rt.AABB>
+    })
+
+    rt.InputControllerState.components[meta.hash(out)] = out
+    return out
+end)
+
 --- @signal pressed   (self, rt.InputButton) -> nil
 --- @signal released  (self, rt.InputButton) -> nil
 --- @signal joystick  (self, x, y, rt.JoystickPosition) -> nil
@@ -44,35 +56,25 @@ rt.InputMethod = meta.new_enum({
 --- @signal gamepad_released (self, rt.GamepadButton) -> nil
 --- @signal input_method_changed (self, rt.InputMethod) -> nil
 --- @signal input_mapping_changed (self) -> nil
-rt.InputController = meta.new_type("InputController", rt.SignalEmitter, function(bounds)
-    if bounds ~= nil then meta.assert_aabb(bounds) end
-    local out = meta.new(rt.InputController, {
-        _is_disabled = false,
-        _treat_left_joystick_as_dpad = true,
-        _aabb = bounds, -- Optional<rt.AABB>
-    })
+meta.add_signals(rt.InputController,
+    "keyboard_pressed",
+    "keyboard_released",
+    "gamepad_pressed",
+    "gamepad_released",
+    "input_method_changed",
+    "input_mapping_changed",
 
-    out:signal_add("keyboard_pressed")
-    out:signal_add("keyboard_released")
-    out:signal_add("gamepad_pressed")
-    out:signal_add("gamepad_released")
-    out:signal_add("input_method_changed")
-    out:signal_add("input_mapping_changed")
+    "pressed",
+    "released",
+    "joystick",
+    "controller_connected",
+    "controller_disconnected",
 
-    out:signal_add("pressed")
-    out:signal_add("released")
-    out:signal_add("joystick")
-    out:signal_add("controller_connected")
-    out:signal_add("controller_disconnected")
-    
-    out:signal_add("motion")
-    
-    out:signal_add("leave")
-    out:signal_add("text_input")
+    "motion",
 
-    rt.InputControllerState.components[meta.hash(out)] = out
-    return out
-end)
+    "leave",
+    "text_input"
+)
 
 --- @brief
 function rt.InputController:is_down(key)

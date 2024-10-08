@@ -18,7 +18,7 @@ rt.ControlIndicator = meta.new_type("ControlIndicator", rt.Widget, function(layo
     })
 end)
 
-rt.ControlIndicatorButton = meta.new_enum({
+rt.ControlIndicatorButton = meta.new_enum("ControlIndicatorButton", {
     A = rt.InputButton.A,
     B = rt.InputButton.B,
     X = rt.InputButton.X,

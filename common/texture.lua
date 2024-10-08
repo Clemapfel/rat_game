@@ -1,11 +1,11 @@
 --- @class rt.TextureScaleMode
-rt.TextureScaleMode = meta.new_enum({
+rt.TextureScaleMode = meta.new_enum("TextureScaleMode", {
     LINEAR = "linear",
     NEAREST = "nearest"
 })
 
 --- @class rt.TextureWrapMode
-rt.TextureWrapMode = meta.new_enum({
+rt.TextureWrapMode = meta.new_enum("TextureWrapMode", {
     ZERO = "clampzero",
     ONE = "clampone",
     CLAMP = "clamp",
@@ -33,7 +33,7 @@ rt.Texture = meta.new_type("Texture", rt.Drawable, function(path_or_image_or_wid
         out = meta.new(rt.Texture, {
             _native = love.graphics.newImage(width, height)
         })
-    elseif meta.is_nil(path_or_image_or_width) then
+    elseif path_or_image_or_width == nil then
         out = meta.new(rt.Texture, {
             _native = love.graphics.newImage()
         })

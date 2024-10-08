@@ -18,7 +18,7 @@ end)
 --- @signal rt.InputButton.B (rt.SelectionGraphNode) -> nil
 --- @signal rt.InputButton.X (rt.SelectionGraphNode) -> nil
 --- @signal rt.InputButton.Y (rt.SelectionGraphNode) -> nil
-rt.SelectionGraphNode = meta.new_type("SelectionGraphNode", rt.SignalEmitter, rt.Drawable, function(aabb)
+rt.SelectionGraphNode = meta.new_type("SelectionGraphNode", rt.Drawable, function(aabb)
     local out = meta.new(rt.SelectionGraphNode, {
         _aabb = rt.AABB(0, 0, 1, 1),
         _control_layout_function = function() return {} end,
@@ -31,24 +31,21 @@ rt.SelectionGraphNode = meta.new_type("SelectionGraphNode", rt.SignalEmitter, rt
         out._centroid_x = aabb.x + 0.5 * aabb.width
         out._centroid_y = aabb.y + 0.5 * aabb.height
     end
-
-    for id in range(
-        "enter",
-        "exit",
-        rt.InputButton.UP,
-        rt.InputButton.RIGHT,
-        rt.InputButton.DOWN,
-        rt.InputButton.LEFT,
-        rt.InputButton.A,
-        rt.InputButton.B,
-        rt.InputButton.X,
-        rt.InputButton.Y
-    ) do
-        out:signal_add(id)
-    end
-
     return out
 end)
+
+meta.add_signals(rt.SelectionGraphNode,
+    "enter",
+    "exit",
+    rt.InputButton.UP,
+    rt.InputButton.RIGHT,
+    rt.InputButton.DOWN,
+    rt.InputButton.LEFT,
+    rt.InputButton.A,
+    rt.InputButton.B,
+    rt.InputButton.X,
+    rt.InputButton.Y
+)
 
 --- @brief
 function rt.SelectionGraphNode:set_bounds(aabb_or_x, y, w, h)
@@ -65,31 +62,6 @@ end
 --- @brief
 function rt.SelectionGraphNode:get_bounds()
     return self._aabb
-end
-
-function rt.SelectionGraphNode:draw(color)
-    local color = which(color, rt.Palette.SELECTION)
-
-    love.graphics.setLineWidth(3)
-    love.graphics.setColor(rt.color_unpack(color))
-    love.graphics.rectangle("line", self._aabb.x, self._aabb.y, self._aabb.width, self._aabb.height)
-
-    local from_x, from_y = self._centroid_x, self._centroid_y
-    love.graphics.setColor(rt.color_unpack(rt.Palette.BLACK))
-    love.graphics.circle("fill", from_x, from_y, 7)
-    love.graphics.setColor(rt.color_unpack(color))
-    love.graphics.circle("fill", from_x, from_y, 6)
-
-    for direction in range(
-        "up", "right", "down", "left"
-    ) do
-        local next = self:signal_emit(direction)
-        if next ~= nil then
-            love.graphics.setColor(rt.color_unpack(color))
-            local to_x, to_y = next._centroid_x, next._centroid_y
-            love.graphics.line(from_x, from_y, to_x, to_y)
-        end
-    end
 end
 
 --- @brief

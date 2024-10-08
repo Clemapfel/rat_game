@@ -1,5 +1,5 @@
 --- @class rt.FrameType
-rt.FrameType = meta.new_enum({
+rt.FrameType = meta.new_enum("FrameType", {
     RECTANGULAR = 1,
     CIRCULAR = 2,
     ELLIPTICAL = 3
@@ -23,7 +23,7 @@ rt.settings.frame = {
 
 --- @class rt.Frame
 rt.Frame = meta.new_type("Frame", rt.Widget, function(type)
-    if meta.is_nil(type) then type = rt.FrameType.RECTANGULAR end
+    if type == nil then type = rt.FrameType.RECTANGULAR end
     local out = meta.new(rt.Frame, {
         _type = type,
         _child = {},

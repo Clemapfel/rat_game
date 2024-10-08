@@ -2,7 +2,7 @@ rt.KeyboardKeyPrefix = "KEY_"
 
 -- @class rt.KeyboardKey
 --- @see https://love2d.org/wiki/KeyConstant
-rt.KeyboardKey = meta.new_enum({
+rt.KeyboardKey = meta.new_enum("KeyboardKey", {
     UNKNOWN = "unknown",
     A = rt.KeyboardKeyPrefix .. "a",
     B = rt.KeyboardKeyPrefix .. "b",
@@ -138,7 +138,7 @@ rt.KeyboardKey = meta.new_enum({
 rt.GamepadButtonPrefix = "BUTTON_"
 
 --- @class rt.GamepadButton
-rt.GamepadButton = meta.new_enum({
+rt.GamepadButton = meta.new_enum("GamepadButton", {
     TOP = rt.GamepadButtonPrefix .. "y",
     RIGHT = rt.GamepadButtonPrefix .. "b",
     BOTTOM = rt.GamepadButtonPrefix .. "a",
@@ -157,7 +157,7 @@ rt.GamepadButton = meta.new_enum({
 })
 
 --- @class rt.GamepadAxis
-rt.GamepadAxis = meta.new_enum({
+rt.GamepadAxis = meta.new_enum("GamepadAxis", {
     LEFT_X = "leftx",
     LEFT_Y = "lefty",
     RIGHT_X = "rightx",
@@ -167,7 +167,7 @@ rt.GamepadAxis = meta.new_enum({
 })
 
 --- @class
-rt.JoystickPosition = meta.new_enum({
+rt.JoystickPosition = meta.new_enum("JoystickPosition", {
     LEFT = "LEFT",
     RIGHT = "RIGHT",
     UNKNOWN = "UNKNON"

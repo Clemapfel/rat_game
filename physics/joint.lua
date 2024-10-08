@@ -155,7 +155,7 @@ function b2.WeldJoint(
 end
 
 --- @class b2.JointType
-b2.JointType = meta.new_enum({
+b2.JointType = meta.new_enum("JointType", {
     DISTANCE_JOINT = box2d.b2_distanceJoint,
     MOTOR_JOINT = box2d.b2_motorJoint,
     MOUSE_JOINT = box2d.b2_mouseJoint,

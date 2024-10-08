@@ -12,7 +12,7 @@ rt.QueueableAnimationState = {
 }
 
 --- @class rt.QueueableAnimation
-rt.QueueableAnimation = meta.new_abstract_type("QueueableAnimation", rt.Drawable, rt.SignalEmitter, {
+rt.QueueableAnimation = meta.new_abstract_type("QueueableAnimation", rt.Drawable, {
     _state = rt.QueueableAnimationState.IDLE
 })
 

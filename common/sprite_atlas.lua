@@ -85,7 +85,7 @@ function rt.SpriteAtlasEntry:load()
     end
     config.height = which(config.height, data:getHeight())
 
-    if not meta.is_nil(config.fps) and config.fps > 0 then
+    if not (config.fps == nil) and config.fps > 0 then
         self.fps = config.fps
     end
 
@@ -277,7 +277,7 @@ end
 --- @brief
 function rt.SpriteAtlas:get(id)
     local out = self._data[self._folder .. "/" .. id]
-    if meta.is_nil(out) then
+    if out == nil then
         rt.warning("In rt.SpriteAtlas: no spritesheet with id `" .. id .. "`")
         return self._fallback
     end

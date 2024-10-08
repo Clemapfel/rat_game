@@ -1,7 +1,7 @@
 rt.random = {}
 
 rt.random.DEFAULT_SEED = os.time()
-if not meta.is_nil(love) then
+if not love == nil then
     love.math.setRandomSeed(rt.random.DEFAULT_SEED)
 else
     math.randomseed(rt.random.DEFAULT_SEED)
@@ -11,7 +11,7 @@ end
 --- @param seed_maybe Number (or nil)
 --- @return Number
 function rt.rand(seed_maybe)
-    if not meta.is_nil(seed_maybe) then
+    if not (seed_maybe == nil) then
         love.math.setRandomSeed(seed_maybe)
     end
     return love.math.random()

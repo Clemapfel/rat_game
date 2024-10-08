@@ -2,13 +2,13 @@ rt.settings.battle.entity = {
     config_path = "battle/configs/entities"
 }
 
-bt.BattleEntityState = meta.new_enum({
+bt.BattleEntityState = meta.new_enum("BattleEntityState", {
     ALIVE = "ALIVE",
     KNOCKED_OUT = "KNOCKED_OUT",
     DEAD = "DEAD"
 })
 
-bt.Gender = meta.new_enum({
+bt.Gender = meta.new_enum("BattleGender", {
     NEUTRAL = "NEUTRAL",
     MALE = "MALE",
     FEMALE = "FEMALE",

@@ -1,4 +1,4 @@
-mn.ScrollableListSortMode = meta.new_enum({
+mn.ScrollableListSortMode = meta.new_enum("ScrollableListSortMode", {
     BY_ID = 0,
     BY_NAME = 1,
     BY_QUANTITY = 2,
