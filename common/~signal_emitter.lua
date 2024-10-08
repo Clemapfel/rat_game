@@ -16,7 +16,7 @@ end
 --- @brief add a signal component to object, use `object.signal:add_signal` to add new signals
 --- @param object meta.Object
 function rt.add_signal_component(object)
-    if not meta.is_nil(object[1][meta._components_index].signal) then
+    if not (object[1][meta._components_index].signal == nil) then
         rt.error("In add_signal_component: Object already has a signal component")
     end
 

@@ -746,10 +746,12 @@ function mn.OptionsScene:make_active()
     self._is_active = true
     self._selection_graph:set_current_node(self._default_node)
     self:_update_snapshot()
+    self._input_controller:signal_unblock_all()
 end
 
 --- @override
 function mn.OptionsScene:make_inactive()
     self._is_active = false
     self._snapshot = nil
+    self._input_controller:signal_block_all()
 end

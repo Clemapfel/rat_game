@@ -258,7 +258,7 @@ end
 --- @param use_alpha Boolean (or nil)
 --- @return String "#RRGGBB" or "#RRGGBBAA" if `use_alpha`
 function rt.color_to_html_code(rgba, use_alpha)
-    if meta.is_nil(use_alpha) then
+    if use_alpha == nil then
         use_alpha = false
     end
 

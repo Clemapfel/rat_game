@@ -459,7 +459,7 @@ end
 
 --- @brief
 function mn.KeybindingScene:_start_assignment(button)
-    meta.assert_enum(button, rt.InputButton)
+    meta.assert_enum_value(button, rt.InputButton)
     self._assignment_button = button
     self._assignment_active = true
     self._skip_frame = 2
@@ -545,12 +545,14 @@ function mn.KeybindingScene:make_active()
     self._is_active = true
     self._selection_graph:set_current_node(self._accept_node)
     self:_update_snapshots()
+    self._input_controller:signal_unblock_all()
 end
 
 --- @override
 function mn.KeybindingScene:make_inactive()
     self._is_active = false
     self._snapshots = {}
+    self._input_controller:signal_block_all()
 end
 
 --- @brief

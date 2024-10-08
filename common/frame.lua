@@ -145,7 +145,7 @@ end
 
 --- @brief remove child
 function rt.Frame:remove_child()
-    if not meta.is_nil(self._child) then
+    if not (self._child == nil) then
         self._child = {}
         self._child_valid = false
     end

@@ -260,7 +260,7 @@ function rt.Palette:export()
     local image = rt.Image(sizeof(ordered)+1, 1)
     for i, key in ipairs(ordered) do
         local color = rt.Palette[key]
-        if not meta.is_nil(color) then
+        if not (color == nil) then
             image:set_pixel(i, 1, color)
         end
     end

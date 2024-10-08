@@ -58,7 +58,7 @@ end
 --- @brief determines how many particles are emitted
 function rt.ParticleEmitter:set_density(emissions_per_second, max_number_of_particles)
     self._native:setEmissionRate(emissions_per_second)
-    if not meta.is_nil(max_number_of_particles) then
+    if not (max_number_of_particles == nil) then
         self._native:setBufferSize(max_number_of_particles)
     end
 end

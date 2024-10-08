@@ -15,7 +15,7 @@ rt.Image = meta.new_type("Image", function(width_or_filename, height, color)
             _native = love.image.newImageData(width_or_filename, height, rt.Image.FORMAT)
         })
 
-        if not meta.is_nil(color) then
+        if not (color == nil) then
             for x = 1, width_or_filename do
                 for y = 1, height do
                     out:set_pixel(x, y, color)

@@ -340,8 +340,9 @@ function rt.Label:_parse()
             sequence_i = sequence_i + 1
         until sequence_s == ">"
 
+
         for tag in pairs(tags) do
-            if not (string.find(sequence, tag) == nil) then
+            if string.find(sequence, tag) ~= nil then
                 step(string.len(sequence))
                 return true
             end

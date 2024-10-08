@@ -2035,11 +2035,13 @@ end
 function mn.InventoryScene:make_active()
     if self._is_realized == false then self:realize() end
     self._is_active = true
+    self._input_controller:signal_unblock_all()
 end
 
 --- @override
 function mn.InventoryScene:make_inactive()
     self._is_active = false
+    self._input_controller:signal_block_all()
 end
 
 --- @brief

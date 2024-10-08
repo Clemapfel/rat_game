@@ -132,7 +132,7 @@ end
 
 --- @brief
 function mn.ScrollableList:set_sort_mode(mode)
-    meta.assert_enum(mode, mn.ScrollableListSortMode)
+    meta.assert_enum_value(mode, mn.ScrollableListSortMode)
     self._current_sort_mode = mode
 end
 

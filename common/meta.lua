@@ -1,5 +1,4 @@
 if meta == nil then meta = {} end
-meta._current_hash = 3
 
 do
     -- use consecutive indices instead of string keys for better performance
@@ -11,8 +10,24 @@ do
     local _typename_hash_index = 4
     local _super_hashes_index = 5
     local _signal_component_index = 6
+
+    local _type_super_index = 7
+    local _type_fields_index = 8
+    local _type_signals_index = 9
+    local _type_typename_index = 10
+    local _type_typename_hash_index = 11
+    local _type_super_hashes_index = 12
+
     local _enum_instances_index = 7
     local _enum_typename_index = 8
+    
+    -- upvalues instead of globals
+    local _meta_current_hash = 3
+    local _type_typename_hash = 1
+    local _meta_types = {}
+    local _meta_type_hash_to_name = {
+        [_type_typename_hash] = "Type"
+    }
 
     --- @param typename_hash Number
     function meta._new(typename_hash)
@@ -24,9 +39,9 @@ do
         metatable[_is_mutable_index] = true                  -- Boolean
         metatable[_typename_hash_index] = typename_hash      -- Number
         metatable[_super_hashes_index] = {}                  -- Set<Number>
-        metatable[_instance_hash_index] = meta._current_hash -- Number
+        metatable[_instance_hash_index] = _meta_current_hash -- Number
 
-        meta._current_hash = meta._current_hash + 1
+        _meta_current_hash = _meta_current_hash + 1
 
         local properties = metatable[_properties_index]
         metatable.__index = properties
@@ -51,7 +66,7 @@ do
             if metatable == nil then return native_type end
             local typename_hash = metatable[_typename_hash_index]
             if typename_hash == nil then return native_type end
-            local typename = meta._type_hash_to_name[typename_hash]
+            local typename = _meta_type_hash_to_name[typename_hash]
             if typename == nil then return native_type end
             return typename
         else
@@ -81,21 +96,15 @@ do
         return metatable.__newindex == metatable[_properties_index]
     end
 
-    local _type_typename_hash = 1
-
-    meta._types = {}
-    meta._type_hash_to_name = {
-        [_type_typename_hash] = "Type"
-    }
-
     local _select = _G._select
 
+    local _meta_new = meta.new
     local _new_type_default_constructor = function(self)
-        return meta.new(self, {})
+        return _meta_new(self, {})
     end
 
     local _new_type_define_type_assertion = function(typename_hash)
-        local typename = meta._type_hash_to_name[typename_hash]
+        local typename = _meta_type_hash_to_name[typename_hash]
         local as_snake_case = {}
         table.insert(as_snake_case, string.lower(string.sub(typename, 1, 1)))
         for i = 2, #typename do
@@ -139,36 +148,38 @@ do
 
     local function _new_type_collect_fields_and_signals(self, fields, signals, super_hashes)
         local metatable = rawget(self, _metatable_index)
-        super_hashes[metatable.typename_hash] = true
+        super_hashes[metatable[_type_typename_hash_index]] = true
 
-        for name, value in pairs(metatable.fields) do
+        for name, value in pairs(metatable[_type_fields_index]) do
             if fields[name] == nil then
                 fields[name] = value
             end
         end
 
-        for name, _ in pairs(metatable.signals) do
+        for name, _ in pairs(metatable[_type_signals_index]) do
             signals[name] = true
         end
 
-        for super, _ in pairs(metatable.supers) do
+        for super, _ in pairs(metatable[_type_super_index]) do
             _new_type_collect_fields_and_signals(super, fields, signals, super_hashes)
         end
     end
 
+    local _meta__new = meta._new
+
     --- @brief
     function meta.new_type(typename, ...)
         assert(type(typename) == "string", "In meta.new_type: expected typename as string for argument #1, got `" .. type(typename) .. "`")
-        local out, metatable = meta._new(_type_typename_hash)
+        local out, metatable = _meta__new(_type_typename_hash)
 
-        metatable.supers = {}   -- Set<Type>
-        metatable.fields = {}   -- Table<String, Any>
-        metatable.signals = {}  -- Set<String>
+        metatable[_type_super_index] = {}    -- Set<Type>
+        metatable[_type_fields_index] = {}   -- Table<String, Any>
+        metatable[_type_signals_index] = {}  -- Set<String>
         local constructor = nil
-        metatable.typename = typename   -- String
-        metatable.typename_hash = meta._current_hash -- Number
-        metatable.super_hashes = {} -- Set<Number>
-        meta._current_hash = meta._current_hash + 1
+        metatable[_type_typename_index] = typename   -- String
+        metatable[_type_typename_hash_index] = _meta_current_hash -- Number
+        metatable[_type_super_hashes_index] = {}     -- Set<Number>
+        _meta_current_hash = _meta_current_hash + 1
 
         local n_args = _select("#", ...)
         for i = 1, n_args do
@@ -180,9 +191,9 @@ do
                 constructor = arg
             elseif type(arg) == "table" then
                 if _typeof(arg) == "Type" then
-                    metatable.supers[arg] = true
+                    metatable[_type_super_index][arg] = true
                 else
-                    metatable.fields = arg
+                    metatable[_type_fields_index] = arg
                 end
             else
                 error("In meta.new_type: more than one table of static fields when creating type `" .. typename .. "`")
@@ -194,14 +205,14 @@ do
         end
 
         -- collect all fields / signals from super types
-        _new_type_collect_fields_and_signals(out, metatable.fields, metatable.signals, metatable.super_hashes)
+        _new_type_collect_fields_and_signals(out, metatable[_type_fields_index], metatable[_type_signals_index], metatable[_type_super_hashes_index])
 
-        if meta._type_hash_to_name[metatable.typename_hash]  ~= nil then
+        if _meta_type_hash_to_name[metatable[_type_typename_hash_index]]  ~= nil then
             error("In meta.new_type: A type with name `" .. typename .. "` already exists")
         end
-        meta._type_hash_to_name[metatable.typename_hash] = metatable.typename
+        _meta_type_hash_to_name[metatable[_type_typename_hash_index]] = metatable[_type_typename_index]
 
-        local fields = metatable.fields
+        local fields = metatable[_type_fields_index]
         metatable.__index = fields
         metatable.__newindex = function(_, key, value)
             fields[key] = value
@@ -220,7 +231,7 @@ do
             return out
         end
 
-        _new_type_define_type_assertion(metatable.typename_hash)
+        _new_type_define_type_assertion(metatable[_type_typename_hash_index])
         return out
     end
 
@@ -230,19 +241,21 @@ do
         for i = 1, n_args do
             local arg = _select(i, ...)
             assert(_G.type(arg) == "string")
-            metatable.signals[arg] = true
+            metatable[_type_signals_index][arg] = true
         end
     end
     meta.add_signal = meta.add_signals
 
     local _new_abstract_type_constructor = function(self)
-        error("In " .. self.typename .. ".__call: Trying to instantiate abstract type")
+        error("In " .. self[_type_typename_index] .. ".__call: Trying to instantiate abstract type")
         return nil
     end
 
+    local _meta_new_type = meta.new_type
+
     --- @brief
     function meta.new_abstract_type(name, ...)
-        local out = meta.new_type(name, ...)
+        local out = _meta_new_type(name, ...)
         rawget(out, _metatable_index).__call = _new_abstract_type_constructor
         return out
     end
@@ -252,13 +265,139 @@ do
     local _signal_n_callbacks_index = 3
 
     --- @brief
+    local _meta_signal_emit = function(self, name, ...)
+        local handler = self[_metatable_index][_signal_component_index][name]
+        local outputs = {}
+        if handler[_signal_is_blocked_index] ~= true then
+            for i = 1, handler[_signal_n_callbacks_index] do
+                local results = {handler[_signal_callbacks_index][i](self, ...)}
+                for _, v in pairs(results) do
+                    table.insert(outputs, v)
+                end
+            end
+        end
+
+        return table.unpack(outputs)
+    end
+
+    --- @brief
+    local _meta_signal_connect = function(self, name, callback)
+        local handler = self[_metatable_index][_signal_component_index][name]
+        if handler == nil then
+            error("In " .. _typeof(self) .. ".signal_connect: object has no signal with id `" .. name .. "`")
+            return
+        end
+
+        table.insert(handler[_signal_callbacks_index], callback)
+        local handler_index = handler[_signal_n_callbacks_index]
+        handler[_signal_n_callbacks_index] = handler_index + 1
+        return handler_index
+    end
+
+    --- @brief
+    local _meta_signal_disconnect = function(self, name, handler_id)
+        local handler = self[_metatable_index][_signal_component_index][name]
+        if handler == nil then
+            error("In " .. _typeof(self) .. ".signal_disconnect: object has no signal with id `" .. name .. "`")
+            return
+        end
+
+        if handler_id == nil then
+            handler[_signal_callbacks_index] = {}
+            handler[_signal_n_callbacks_index] = 0
+        elseif handler[_signal_callbacks_index][handler_id] ~= nil then
+            handler[_signal_callbacks_index][handler_id] = nil
+            handler[_signal_n_callbacks_index] = handler[_signal_n_callbacks_index] - 1
+        end
+    end
+
+    --- @brief
+    local _meta_signal_list_handler_ids = function(self, name)
+        local handler = self[_metatable_index][_signal_component_index][name]
+        if handler == nil then
+            error("In " .. _typeof(self) .. ".signal_list_handler_ids: object has no signal with id `" .. name .. "`")
+            return
+        end
+
+        local out = {}
+        for i = 1, handler[_signal_n_callbacks_index] do
+            table.insert(out, i)
+        end
+        return out
+    end
+
+    --- @brief
+    local _meta_signal_disconnect_all = function(self, name)
+        if name == nil then
+            local component = self[_metatable_index][_signal_component_index]
+            for _, handler in pairs(component) do
+                handler[_signal_callbacks_index] = {}
+                handler[_signal_n_callbacks_index] = 0
+            end
+        else
+            local handler = self[_metatable_index][_signal_component_index][name]
+            if handler == nil then
+                error("In " .. _typeof(self) .. ".signal_disconnect_all: object has no signal with id `" .. name .. "`")
+                return
+            end
+
+            handler[_signal_callbacks_index] = {}
+            handler[_signal_n_callbacks_index] = 0
+        end
+    end
+
+    --- @brief
+    local _meta_signal_set_is_blocked = function(self, name, is_blocked)
+        local handler = self[_metatable_index][_signal_component_index][name]
+        if handler == nil then
+            error("In " .. _typeof(self) .. ".signal_set_is_blocked: object has no signal with id `" .. name .. "`")
+            return
+        end
+
+        handler[_signal_is_blocked_index] = is_blocked
+    end
+
+    --- @brief
+    local _meta_signal_block_all = function(self)
+        local component = self[_metatable_index][_signal_component_index]
+        for _, handler in pairs(component) do
+            handler[_signal_is_blocked_index] = true
+        end
+    end
+
+    --- @brief
+    local _meta_signal_unblock_all = function(self)
+        local component = self[_metatable_index][_signal_component_index]
+        for _, handler in pairs(component) do
+            handler[_signal_is_blocked_index] = false
+        end
+    end
+
+    --- @brief
+    local _meta_signal_get_is_blocked = function(self, name)
+        local handler = self[_metatable_index][_signal_component_index][name]
+        if handler == nil then
+            error("In " .. _typeof(self) .. ".signal_get_is_blocked: object has no signal with id `" .. name .. "`")
+            return
+        end
+
+        return handler[_signal_is_blocked_index]
+    end
+
+    --- @brief
+    local _meta_signal_has_signal = function(self, name)
+        local handler = self[_metatable_index][_signal_component_index][name]
+        return handler ~= nil
+    end
+
+    --- @brief
     function meta.new(type, fields)
         local type_metatable = rawget(type, _metatable_index)
-        local out, metatable = meta._new(type_metatable.typename_hash)
+        local out, metatable = _meta__new(type_metatable[_type_typename_hash_index])
         local properties = metatable[_properties_index]
 
         -- install inherited static fields
-        for name, value in pairs(type_metatable.fields) do
+        for name, value in pairs(type_metatable[_type_fields_index]) do
             properties[name] = value
         end
 
@@ -270,10 +409,10 @@ do
         end
 
         -- install super hash (reference)
-        metatable[_super_hashes_index] = type_metatable.super_hashes
+        metatable[_super_hashes_index] = type_metatable[_type_super_hashes_index]
 
         -- install signals
-        local signals = type_metatable.signals
+        local signals = type_metatable[_type_signals_index]
         local is_initialized, signal_component = false, nil
         for name, _ in pairs(signals) do
             if is_initialized == false then
@@ -289,33 +428,37 @@ do
             }
         end
 
-        properties.signal_emit = meta.signal_emit
-        properties.signal_connect = meta.signal_connect
-        properties.signal_disconnect = meta.signal_disconnect
-        properties.signal_list_handler_ids = meta.signal_list_handler_ids
-        properties.signal_disconnect_all = meta.signal_disconnect_all
-        properties.signal_set_is_blocked = meta.signal_set_is_blocked
-        properties.signal_get_is_blocked = meta.signal_get_is_blocked
-        properties.signal_has_signal = meta.signal_has_signal
+        properties.signal_emit = _meta_signal_emit
+        properties.signal_connect = _meta_signal_connect
+        properties.signal_disconnect = _meta_signal_disconnect
+        properties.signal_list_handler_ids = _meta_signal_list_handler_ids
+        properties.signal_disconnect_all = _meta_signal_disconnect_all
+        properties.signal_set_is_blocked = _meta_signal_set_is_blocked
+        properties.signal_get_is_blocked = _meta_signal_get_is_blocked
+        properties.signal_block_all = _meta_signal_block_all
+        properties.signal_unblock_all = _meta_signal_unblock_all
+        properties.signal_has_signal = _meta_signal_has_signal
 
         return out
     end
+
+    local _meta_set_is_mutable = meta.set_is_mutable
 
     --- @brief
     function meta.new_enum(name, fields)
         assert(type(name) == "string", "In meta.new_enum: wrong argument #1, expected `string`, got `" .. _typeof(name) .. "`")
 
-        local typename_hash = meta._current_hash
+        local typename_hash = _meta_current_hash
         local typename = name
-        meta._current_hash = meta._current_hash + 1
+        _meta_current_hash = _meta_current_hash + 1
 
-        if meta._type_hash_to_name[typename_hash]  ~= nil then
+        if _meta_type_hash_to_name[typename_hash]  ~= nil then
             error("In meta.new_enum: A type with name `" .. typename .. "` already exists")
         end
 
-        meta._type_hash_to_name[typename_hash] = typename
+        _meta_type_hash_to_name[typename_hash] = typename
 
-        local out, metatable = meta._new(typename_hash)
+        local out, metatable = _meta__new(typename_hash)
         local properties = metatable[_properties_index]
         local values = {} -- for fast checking if value is in enum
         for name, value in pairs(fields) do
@@ -333,7 +476,7 @@ do
             return res
         end
 
-        meta.set_is_mutable(out, false)
+        _meta_set_is_mutable(out, false)
         return out
     end
 
@@ -387,7 +530,7 @@ do
                 return false
             end
 
-            local typename_hash = rawget(super, _metatable_index).typename_hash
+            local typename_hash = rawget(super, _metatable_index)[_type_typename_hash_index]
             for hash, _ in pairs(metatable[_super_hashes_index]) do
                 if hash == typename_hash then return true end
             end
@@ -416,7 +559,7 @@ do
                 _assert_isa_throw(x, super)
             end
 
-            local typename_hash = rawget(super, _metatable_index).typename_hash
+            local typename_hash = rawget(super, _metatable_index)[_type_typename_hash_index]
             for hash, _ in pairs(metatable[_super_hashes_index]) do
                 if hash == typename_hash then return end
             end
@@ -466,7 +609,7 @@ do
 
     --- @brief
     function meta.is_subtype(sub, super)
-        local supers = rawget(sub, _metatable_index).supers
+        local supers = rawget(sub, _metatable_index)[_type_super_index]
         for type, _ in pairs(supers) do
             if type == super then return true end
         end
@@ -475,7 +618,7 @@ do
 
     --- @brief
     function meta.assert_is_subtype(sub, super)
-        local supers = rawget(sub, _metatable_index).supers
+        local supers = rawget(sub, _metatable_index)[_type_super_index]
         for type, _ in pairs(supers) do
             if type == super then return end
         end
@@ -485,116 +628,6 @@ do
     --- @brief
     function meta.get_properties(x)
         return rawget(x, _metatable_index)[_properties_index]
-    end
-    
-    --- @brief
-    meta.signal_emit = function(self, name, ...)
-        local handler = self[_metatable_index][_signal_component_index][name]
-        local outputs = {}
-        if handler[_signal_is_blocked_index] ~= true then
-            for i = 1, handler[_signal_n_callbacks_index] do
-                local results = {handler[_signal_callbacks_index][i](self, ...)}
-                for _, v in pairs(results) do
-                    table.insert(outputs, v)
-                end
-            end
-        end
-
-        return table.unpack(outputs)
-    end
-    
-    --- @brief
-    meta.signal_connect = function(self, name, callback)
-        local handler = self[_metatable_index][_signal_component_index][name]
-        if handler == nil then
-            error("In " .. _typeof(self) .. ".signal_connect: object has no signal with id `" .. name .. "`")
-            return
-        end
-        
-        table.insert(handler[_signal_callbacks_index], callback)
-        local handler_index = handler[_signal_n_callbacks_index]
-        handler[_signal_n_callbacks_index] = handler_index + 1
-        return handler_index
-    end
-
-    --- @brief
-    meta.signal_disconnect = function(self, name, handler_id)
-        local handler = self[_metatable_index][_signal_component_index][name]
-        if handler == nil then
-            error("In " .. _typeof(self) .. ".signal_disconnect: object has no signal with id `" .. name .. "`")
-            return
-        end
-
-        if handler_id == nil then
-            handler[_signal_callbacks_index] = {}
-            handler[_signal_n_callbacks_index] = 0
-        elseif handler[_signal_callbacks_index][handler_id] ~= nil then
-            handler[_signal_callbacks_index][handler_id] = nil
-            handler[_signal_n_callbacks_index] = handler[_signal_n_callbacks_index] - 1
-        end
-    end
-
-    --- @brief
-    meta.signal_list_handler_ids = function(self, name)
-        local handler = self[_metatable_index][_signal_component_index][name]
-        if handler == nil then
-            error("In " .. _typeof(self) .. ".signal_list_handler_ids: object has no signal with id `" .. name .. "`")
-            return
-        end
-
-        local out = {}
-        for i = 1, handler[_signal_n_callbacks_index] do
-            table.insert(out, i)
-        end
-        return out
-    end
-
-    --- @brief
-    meta.signal_disconnect_all = function(self, name)
-        if name == nil then
-            local component = self[_metatable_index][_signal_component_index]
-            for _, handler in pairs(component) do
-                handler[_signal_callbacks_index] = {}
-                handler[_signal_n_callbacks_index] = 0
-            end
-        else
-            local handler = self[_metatable_index][_signal_component_index][name]
-            if handler == nil then
-                error("In " .. _typeof(self) .. ".signal_disconnect_all: object has no signal with id `" .. name .. "`")
-                return
-            end
-
-            handler[_signal_callbacks_index] = {}
-            handler[_signal_n_callbacks_index] = 0
-        end
-    end
-
-    --- @brief
-    meta.signal_set_is_blocked = function(self, name, is_blocked)
-        local handler = self[_metatable_index][_signal_component_index][name]
-        if handler == nil then
-            error("In " .. _typeof(self) .. ".signal_set_is_blocked: object has no signal with id `" .. name .. "`")
-            return
-        end
-
-        handler[_signal_is_blocked_index] = is_blocked
-    end
-    
-    --- @brief
-    meta.signal_get_is_blocked = function(self, name)
-        local handler = self[_metatable_index][_signal_component_index][name]
-        if handler == nil then
-            error("In " .. _typeof(self) .. ".signal_get_is_blocked: object has no signal with id `" .. name .. "`")
-            return
-        end
-        
-        return handler[_signal_is_blocked_index]
-    end
-
-    --- @brief
-    meta.signal_has_signal = function(self, name)
-        local handler = self[_metatable_index][_signal_component_index][name]
-        return handler ~= nil
     end
 end
 
