@@ -34,7 +34,9 @@ rt.Label = meta.new_type("Label", rt.Widget, rt.Animation, function(text, font, 
         _render_shader = rt.Shader("common/glyph_render.glsl"),
 
         _glyphs = {},
-        _render_order = {}
+        _render_order = {},
+        _width = 0,
+        _height = 0
     })
 end)
 
@@ -60,16 +62,33 @@ function rt.Label:_glyph_new(
         rainbow = is_effect_rainbow,
         wave = is_effect_wave,
         n_visible_characters = utf8.len(text),
+        justify_center_offset = 0,
+        justify_right_offset = 0,
+        row_index = 1,
         y = 0,
-        x = 0
+        x = 0,
+        width = 0,
+        height = 0
     }
+
+    out.width = out.glyph:getWidth()
+    out.height = out.glyph:getHeight()
 
     return out
 end
 
 --- @brief
 function rt.Label:_glyph_draw(glyph)
-    love.graphics.draw(glyph.glyph, glyph.x, glyph.y)
+    local x_offset = 0
+    if self._justify_mode == rt.JustifyMode.CENTER then
+        x_offset = glyph.justify_center_offset
+    elseif self._justify_mode == rt.JustifyMode.RIGHT then
+        x_offset = glyph.justify_right_offset
+    end
+
+    local hue = glyph.row_index / self._n_rows
+    love.graphics.setColor(rt.color_unpack(rt.hsva_to_rgba(rt.HSVA(hue, 1, 1, 1))))
+    love.graphics.draw(glyph.glyph, glyph.x + x_offset, glyph.y)
 end
 
 --- @override
@@ -82,12 +101,12 @@ end
 
 --- @override
 function rt.Label:size_allocate(x, y, width, height)
-
+    self:_apply_wrapping(width)
 end
 
 --- @override
 function rt.Label:measure()
-    return 100, 100
+    return self._width, self._height
 end
 
 --- @override
@@ -97,9 +116,13 @@ end
 --- @override
 function rt.Label:draw()
     local render_order = self._render_order
+    love.graphics.push()
+    love.graphics.setColor(1, 1, 1, 1)
+    love.graphics.translate(self._bounds.x, self._bounds.y)
     for glyph in values(render_order) do
         self:_glyph_draw(glyph)
     end
+    love.graphics.pop()
 end
 
 --- @brief
@@ -312,7 +335,7 @@ do
             if settings.outline_color_active then
                 outline_color_r, outline_color_g, outline_color_b = _rt_color_unpack(_rt_palette[settings.outline_color])
             end
-            
+
             local to_insert = self:_glyph_new(
                 _concat(current_word), font, style,
                 color_r, color_g, color_b,
@@ -330,6 +353,7 @@ do
 
             self._n_characters = self._n_characters + to_insert.n_visible_characters
             self._n_glyphs = self._n_glyphs + 1
+            current_word = {}
         end
 
         local function throw_parse_error(reason)
@@ -352,8 +376,7 @@ do
                 step(1)
                 goto continue;
             elseif s == " " then
-                _insert(current_word, " ")
-                push_glyph() -- remove?
+                push_glyph()
                 _insert(glyphs, _syntax.SPACE)
             elseif s == "\n" then
                 push_glyph()
@@ -460,146 +483,72 @@ do
         if settings.is_strikethrough then throw_parse_error("reached end of text, but effect strikethrough region is still open") end
         if settings.is_outlined then throw_parse_error("reached end of text, but effect outline region is still open") end
     end
-end  -- do-end
 
---[[
-function rt.Label:_parse()
+    --- @brief [internal]
+    function rt.Label:_apply_wrapping()
+        local current_line_width = 0
+        local max_line_w = 0
 
-    -- TODO: get full tag, then compare, instead of getting full tag for all of these cases
-    if tag_matches(_syntax.BOLD_TAG_START) then
-        if is_bold == true then
-            throw_parse_error("trying to open a bold region, but one is already open")
-        end
-        is_bold = true
-    elseif tag_matches(_syntax.BOLD_TAG_END) then
-        if is_bold == false then
-            throw_parse_error("trying to close a bold region, but one is not open")
-        end
-        is_bold = false
-        -- italic
-    elseif tag_matches(_syntax.ITALIC_TAG_START) then
-        if is_italic == true then
-            throw_parse_error("trying to open an italic region, but one is already open")
-        end
-        is_italic = true
-    elseif tag_matches(_syntax.ITALIC_TAG_END) then
-        if is_italic == false then
-            throw_parse_error("trying to close an italic region, but one is not open")
-        end
-        is_italic = false
-        -- underlined
-    elseif tag_matches(_syntax.UNDERLINED_TAG_START) then
-        if is_underlined == true then
-            throw_parse_error("trying to open an underlined region, but one is already open")
-        end
-        is_underlined = true
-    elseif tag_matches(_syntax.UNDERLINED_TAG_END) then
-        if is_underlined == false then
-            throw_parse_error("trying to close an underlined region, but one is not open")
-        end
-        is_underlined = false
-        -- strikethrough
-    elseif tag_matches(_syntax.STRIKETHROUGH_TAG_START) then
-        if is_strikethrough == true then
-            throw_parse_error("trying to open an strikethrough region, but one is already open")
-        end
-        is_strikethrough = true
-    elseif tag_matches(_syntax.STRIKETHROUGH_TAG_END) then
-        if is_strikethrough == false then
-            throw_parse_error("trying to close an strikethrough region, but one is not open")
-        end
-        is_strikethrough = false
-        -- mono
-    elseif tag_matches(_syntax.MONOSPACE_TAG_START) then
-        if is_mono == true then
-            throw_parse_error("trying to open an monospace region, but one is already open")
-        end
-        is_mono = true
-    elseif tag_matches(_syntax.MONOSPACE_TAG_END) then
-        if is_mono == false then
-            throw_parse_error("trying to close an monospace region, but one is not open")
-        end
-        is_mono = false
-        -- outlined
-    elseif tag_matches(_syntax.OUTLINE_TAG_START) then
-        if is_outlined == true then
-            throw_parse_error("trying to open an outlined region, but one is already open")
-        end
-        is_outlined = true
-    elseif tag_matches(_syntax.OUTLINE_TAG_END) then
-        if is_outlined == false then
-            throw_parse_error("trying to close an outlined region, but one is not open")
-        end
-        is_outlined = false
-        -- color
-    elseif color_tag_matches(_syntax.COLOR_TAG_START, color) then
-        if is_colored == true then
-            throw_parse_error("trying to open a color region, but one is already open")
-        end
-        is_colored = true
-    elseif tag_matches(_syntax.COLOR_TAG_END) then
-        if is_colored == false then
-            throw_parse_error("trying to close a color region, but one is not open")
-        end
-        is_colored = false
-        color[1] = "TRUE_WHITE"
-        -- outline color
-    elseif color_tag_matches(_syntax.OUTLINE_COLOR_TAG_START, outline_color) then
-        if outline_color_active == true then
-            throw_parse_error("trying to open a outline color region, but one is already open")
-        end
-        outline_color_active = true
-    elseif tag_matches(_syntax.OUTLINE_COLOR_TAG_END) then
-        if outline_color_active == false then
-            throw_parse_error("trying to close a outline color region, but one is not open")
-        end
-        outline_color_active = false
-        color[1] = "TRUE_BLACK"
-        -- effect: shake
-    elseif tag_matches(_syntax.EFFECT_SHAKE_TAG_START) then
-        if is_effect_shake == true then
-            throw_parse_error("trying to open an effect shake region, but one is already open")
-        end
-        is_effect_shake = true
-    elseif tag_matches(_syntax.EFFECT_SHAKE_TAG_END) then
-        if is_effect_shake == false then
-            throw_parse_error("trying to close an effect shake region, but one is not open")
-        end
-        is_effect_shake = false
-        -- effect: wave
-    elseif tag_matches(_syntax.EFFECT_WAVE_TAG_START) then
-        if is_effect_wave == true then
-            throw_parse_error("trying to open an effect wave region, but one is already open")
-        end
-        is_effect_wave = true
-    elseif tag_matches(_syntax.EFFECT_WAVE_TAG_END) then
-        if is_effect_wave == false then
-            throw_parse_error("trying to close an effect wave region, but one is not open")
-        end
-        is_effect_wave = false
-        -- effect: rainbow
-    elseif tag_matches(_syntax.EFFECT_RAINBOW_TAG_START) then
-        if is_effect_rainbow == true then
-            throw_parse_error("trying to open an effect rainbow region, but one is already open")
-        end
-        is_effect_rainbow = true
-    elseif tag_matches(_syntax.EFFECT_RAINBOW_TAG_END) then
-        if is_effect_rainbow == false then
-            throw_parse_error("trying to close an effect rainbow region, but one is not open")
-        end
-        is_effect_rainbow = false
-    else -- unknown tag
-        local sequence = {}
-        local sequence_i = 0
-        repeat
-            if i + sequence_i > n_characters then
-                throw_parse_error("malformed tag, reached end of text")
+        local space_w = self._font:get_bold_italic():getWidth(_syntax.SPACE)
+        local tab_w = self._font:get_bold_italic():getWidth(_syntax.TAB)
+        local line_height = self._font:get_bold_italic():getHeight()
+
+        local glyph_x, glyph_y = 0, 0
+        local max_w = self._bounds.width
+        local row_i = 1
+        local is_first_word = true
+
+        local row_widths = {}
+        local row_w = 0
+        local max_glyph_x = 0
+        local newline = function()
+            max_glyph_x = math.max(max_glyph_x, glyph_x)
+            table.insert(row_widths, glyph_x)
+            if is_first_word ~= true then
+                glyph_x = 0
+                glyph_y = glyph_y + line_height
+                row_i = row_i + 1
             end
-            local sequence_s = at(i + sequence_i)
-            _insert(sequence, sequence_s)
-            sequence_i = sequence_i + 1
-        until sequence_s == ">"
-        throw_parse_error("unknown control sequence: " .. _concat(sequence))
+        end
+
+        for glyph in values(self._glyphs) do
+            if glyph == _syntax.SPACE then
+                if glyph_x ~= 0 then -- skip pre-trailing whitespaces
+                    glyph_x = glyph_x + space_w
+                    row_w = row_w + space_w
+                end
+                if glyph_x > max_w then newline() end
+            elseif glyph == _syntax.TAB then
+                glyph_x = glyph_x + tab_w
+                row_w = row_w + tab_w
+                if glyph_x > max_w then newline() end
+            elseif glyph == _syntax.NEWLINE then
+                newline()
+            else
+                if glyph_x + glyph.width >= max_w then
+                    newline()
+                end
+
+                glyph.x = math.floor(glyph_x)
+                glyph.y = math.floor(glyph_y)
+                glyph.row_index = row_i
+
+                glyph_x = glyph_x + glyph.width
+            end
+
+            is_first_word = false
+        end
+        table.insert(row_widths, glyph_x)
+
+        -- update justify offsets
+        for glyph in values(self._render_order) do
+            glyph.justify_center_offset = (max_w - row_widths[glyph.row_index]) / 2
+            glyph.justify_right_offset = (max_w - row_widths[glyph.row_index])
+        end
+
+        self._width = max_glyph_x
+        self._height = row_i * line_height
+        self._n_rows = row_i
     end
-end
-]]--
+
+end  -- do-end

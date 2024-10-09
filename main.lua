@@ -14,6 +14,11 @@ world = b2.World
 local background = rt.Background()
 background:set_implementation(rt.Background.TEMP_TRIANGLE_TILING)
 
+label = rt.Label("Lorem ipsum dolor sit amet,\n consectetur adipiscing elit. Sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum.")
+label:set_justify_mode(rt.JustifyMode.RIGHT)
+label:realize()
+label:fit_into(50, 50, 500)
+
 local draw_state = true
 input = rt.InputController()
 input:signal_connect("keyboard_pressed", function(_, which)
@@ -57,10 +62,17 @@ love.update = function(delta)
 end
 
 love.draw = function()
-    background:draw()
+    --background:draw()
     if draw_state then
-        state:_draw()
+        --state:_draw()
     end
+
+    love.graphics.setColor(0, 0, 0, 1)
+    love.graphics.rectangle("fill", 0, 0, rt.graphics.get_width(), rt.graphics.get_height())
+    love.graphics.setColor(1, 1, 1, 1)
+    label:draw()
+
+    love.graphics.rectangle("line", 50, 50, 500, 10000)
 end
 
 love.resize = function(new_width, new_height)
