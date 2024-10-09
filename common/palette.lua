@@ -275,10 +275,10 @@ end
 
 rt._PaletteMetatable = {
     __index = function(self, key)
-        rt.error("In Palette:__index: No color with name `" .. key .. "` in rt.Palette")
+        rt.error("In Palette:__index: No color with name `" .. tostring(key) .. "` in rt.Palette")
     end,
     __newindex = function(self, key, new_value)
-        rt.error("In Palette:__new_index: No color with name `" .. key .. "` in rt.Palette")
+        rt.error("In Palette:__new_index: No color with name `" .. tostring(key) .. "` in rt.Palette")
     end
 }
 setmetatable(rt.Palette, rt._PaletteMetatable)

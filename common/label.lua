@@ -69,7 +69,9 @@ end
 
 --- @brief
 function rt.Label:_glyph_draw(glyph)
+    --[[
     love.graphics.draw(glyph.glyph, glyph.x, glyph.y)
+    ]]--
 end
 
 --- @override
@@ -142,7 +144,7 @@ function rt.Label:get_line_height()
 end
 
 do
-    local _make_set = function(...)  
+    local _make_set = function(...)
         local n_args = _G._select("#", ...)
         local out = {}
         for i = 1, n_args do
@@ -194,14 +196,50 @@ do
         EFFECT_SHAKE_TAG_START = _make_set("<shake>", "<fx_shake>"),
         EFFECT_SHAKE_TAG_END = _make_set("</shake>", "</fx_shake>"),
         EFFECT_WAVE_TAG_START = _make_set("<wave>", "<fx_wave>"),
-        EFFECT_WAVE_TAG_END = _make_set("</wave", "</fx_wave>"),
+        EFFECT_WAVE_TAG_END = _make_set("</wave>", "</fx_wave>"),
         EFFECT_RAINBOW_TAG_START = _make_set("<rainbow>", "<fx_rainbow>"),
         EFFECT_RAINBOW_TAG_END = _make_set("</rainbow>", "</fx_rainbow>"),
 
         MONOSPACE_TAG_START = _make_set("<tt>", "<mono>"),
         MONOSPACE_TAG_END = _make_set("</tt>", "</mono>")
     }
-        
+
+    local _sequence_to_settings_key = {}
+    for set_settings_key in range(
+        {_syntax.BOLD_TAG_START, "is_bold"},
+        {_syntax.BOLD_TAG_END, "is_bold"},
+
+        {_syntax.ITALIC_TAG_START, "is_italic"},
+        {_syntax.ITALIC_TAG_END, "is_italic"},
+
+        {_syntax.UNDERLINED_TAG_START, "is_underlined"},
+        {_syntax.UNDERLINED_TAG_END, "is_underlined"},
+
+        {_syntax.STRIKETHROUGH_TAG_START, "is_strikethrough"},
+        {_syntax.STRIKETHROUGH_TAG_END, "is_strikethrough"},
+
+        {_syntax.COLOR_TAG_START, "is_colored"},
+        {_syntax.COLOR_TAG_END, "is_colored"},
+
+        {_syntax.OUTLINE_TAG_START, "is_outlined"},
+        {_syntax.OUTLINE_TAG_END, "is_outlined"},
+
+        {_syntax.EFFECT_SHAKE_TAG_START, "is_effect_shake"},
+        {_syntax.EFFECT_SHAKE_TAG_END, "is_effect_shake"},
+        {_syntax.EFFECT_WAVE_TAG_START, "is_effect_wave"},
+        {_syntax.EFFECT_WAVE_TAG_END, "is_effect_wave"},
+        {_syntax.EFFECT_RAINBOW_TAG_START, "is_effect_rainbow"},
+        {_syntax.EFFECT_RAINBOW_TAG_END, "is_effect_rainbow"},
+
+        {_syntax.MONOSPACE_TAG_START, "is_mono"},
+        {_syntax.MONOSPACE_TAG_END, "is_mono"}
+    ) do
+        local set, settings_key = table.unpack(set_settings_key)
+        for x in keys(set) do
+            _sequence_to_settings_key[x] = settings_key
+        end
+    end
+
     local _string_sub = string.sub
     local _insert = table.insert
     local _concat = table.concat
@@ -219,22 +257,27 @@ do
         local glyphs = self._glyphs
         local glyph_indices = self._glyph_indices
 
-        local is_bold = false
-        local is_italic = false
-        local is_colored = false
-        local is_outlined = false
-        local is_underlined = false
-        local is_strikethrough = false
+        local settings = {
+            is_bold = false,
+            is_italic = false,
+            is_colored = false,
+            is_bold = false,
+            is_italic = false,
+            is_colored = false,
+            is_outlined = false,
+            is_underlined = false,
+            is_strikethrough = false,
 
-        local color = {"TRUE_WHITE"} -- string reference
-        local outline_color = {"TRUE_BLACK"}
-        local outline_color_active = false
+            color = "TRUE_WHITE",
+            outline_color = "TRUE_BLACK",
+            outline_color_active = false,
 
-        local is_mono = false
+            is_mono = false,
 
-        local is_effect_rainbow = false
-        local is_effect_shake = false
-        local is_effect_wave = false
+            is_effect_rainbow = false,
+            is_effect_shake = false,
+            is_effect_wave = false
+        }
 
         local at = function(i)
             return _string_sub(self._raw, i, i)
@@ -248,39 +291,39 @@ do
             if #current_word == 0 then return end
 
             local style = rt.FontStyle.REGULAR
-            if is_bold and is_italic then
+            if settings.is_bold and settings.is_italic then
                 style = rt.FontStyle.BOLD_ITALIC
-            elseif is_bold then
+            elseif settings.is_bold then
                 style = rt.FontStyle.BOLD
-            elseif is_italic then
+            elseif settings.is_italic then
                 style = rt.FontStyle.ITALIC
             end
 
             local font = self._font
-            if is_mono == true then
+            if settings.is_mono == true then
                 font = self._monospace_font
             end
             
             local color_r, color_g, color_b = 1, 1, 1
-            if not is_effect_rainbow then
-                color_r, color_g, color_b = _rt_color_unpack(_rt_palette[color])
+            if not settings.is_effect_rainbow then
+                color_r, color_g, color_b = _rt_color_unpack(_rt_palette[settings.color])
             end
             
             local outline_color_r, outline_color_g, outline_color_b = 0, 0, 0
-            if outline_color_active then
-                outline_color_r, outline_color_g, outline_color_b = _rt_color_unpack(_rt_palette[outline_color])
+            if settings.outline_color_active then
+                outline_color_r, outline_color_g, outline_color_b = _rt_color_unpack(_rt_palette[settings.outline_color])
             end
             
             local to_insert = self:_glyph_new(
                 _concat(current_word), font, style,
                 color_r, color_g, color_b,
-                is_underlined,
-                is_strikethrough,
-                is_outlined,
+                settings.is_underlined,
+                settings.is_strikethrough,
+                settings.is_outlined,
                 outline_color_r, outline_color_g, outline_color_b,
-                is_effect_shake,
-                is_effect_wave,
-                is_effect_rainbow
+                settings.is_effect_shake,
+                settings.is_effect_wave,
+                settings.is_effect_rainbow
             )
             
             _insert(glyphs, to_insert)
@@ -300,30 +343,7 @@ do
         end
         
         local n_characters = utf8.len(self._raw)
-        
-        local function tag_matches(tags)
-            local sequence = {}
-            local sequence_i = 0
-            local sequence_s
-            repeat
-                if i + sequence_i > n_characters then
-                    throw_parse_error("malformed tag, reached end of text")
-                end
-                
-                sequence_s = at(i + sequence_i)
-                _insert(sequence, sequence_s)
-                sequence_i = sequence_i + 1
-            until sequence_s == ">"
 
-            sequence = _concat(sequence)
-            if tags[sequence] == true then
-                step(sequence_i)
-                return true
-            end
-            
-            return false
-        end
-        
         local function color_tag_matches(which, to_assign)  
             local sequence = {}
             local color_i = 0
@@ -377,143 +397,54 @@ do
             elseif s == "<" then
                 push_glyph()
 
-                -- TODO: get full tag, then compare, instead of getting full tag for all of these cases
-                if tag_matches(_syntax.BOLD_TAG_START) then
-                    if is_bold == true then
-                        throw_parse_error("trying to open a bold region, but one is already open")
+                -- get tag
+                local sequence = {}
+                local sequence_i = 0
+                local sequence_s
+                local is_closing_tag = false
+                repeat
+                    if i + sequence_i > n_characters then
+                        throw_parse_error("malformed tag, reached end of text")
                     end
-                    is_bold = true
-                elseif tag_matches(_syntax.BOLD_TAG_END) then
-                    if is_bold == false then
-                        throw_parse_error("trying to close a bold region, but one is not open")
+
+                    sequence_s = at(i + sequence_i)
+                    if sequence_s == "/" then
+                        is_closing_tag = true
                     end
-                    is_bold = false
-                    -- italic
-                elseif tag_matches(_syntax.ITALIC_TAG_START) then
-                    if is_italic == true then
-                        throw_parse_error("trying to open an italic region, but one is already open")
-                    end
-                    is_italic = true
-                elseif tag_matches(_syntax.ITALIC_TAG_END) then
-                    if is_italic == false then
-                        throw_parse_error("trying to close an italic region, but one is not open")
-                    end
-                    is_italic = false
-                    -- underlined
-                elseif tag_matches(_syntax.UNDERLINED_TAG_START) then
-                    if is_underlined == true then
-                        throw_parse_error("trying to open an underlined region, but one is already open")
-                    end
-                    is_underlined = true
-                elseif tag_matches(_syntax.UNDERLINED_TAG_END) then
-                    if is_underlined == false then
-                        throw_parse_error("trying to close an underlined region, but one is not open")
-                    end
-                    is_underlined = false
-                    -- strikethrough
-                elseif tag_matches(_syntax.STRIKETHROUGH_TAG_START) then
-                    if is_strikethrough == true then
-                        throw_parse_error("trying to open an strikethrough region, but one is already open")
-                    end
-                    is_strikethrough = true
-                elseif tag_matches(_syntax.STRIKETHROUGH_TAG_END) then
-                    if is_strikethrough == false then
-                        throw_parse_error("trying to close an strikethrough region, but one is not open")
-                    end
-                    is_strikethrough = false
-                    -- mono
-                elseif tag_matches(_syntax.MONOSPACE_TAG_START) then
-                    if is_mono == true then
-                        throw_parse_error("trying to open an monospace region, but one is already open")
-                    end
-                    is_mono = true
-                elseif tag_matches(_syntax.MONOSPACE_TAG_END) then
-                    if is_mono == false then
-                        throw_parse_error("trying to close an monospace region, but one is not open")
-                    end
-                    is_mono = false
-                    -- outlined
-                elseif tag_matches(_syntax.OUTLINE_TAG_START) then
-                    if is_outlined == true then
-                        throw_parse_error("trying to open an outlined region, but one is already open")
-                    end
-                    is_outlined = true
-                elseif tag_matches(_syntax.OUTLINE_TAG_END) then
-                    if is_outlined == false then
-                        throw_parse_error("trying to close an outlined region, but one is not open")
-                    end
-                    is_outlined = false
-                    -- color
-                elseif color_tag_matches(_syntax.COLOR_TAG_START, color) then
-                    if is_colored == true then
-                        throw_parse_error("trying to open a color region, but one is already open")
-                    end
-                    is_colored = true
-                elseif tag_matches(_syntax.COLOR_TAG_END) then
-                    if is_colored == false then
-                        throw_parse_error("trying to close a color region, but one is not open")
-                    end
-                    is_colored = false
-                    color[1] = "TRUE_WHITE"
-                    -- outline color
-                elseif color_tag_matches(_syntax.OUTLINE_COLOR_TAG_START, outline_color) then
-                    if outline_color_active == true then
-                        throw_parse_error("trying to open a outline color region, but one is already open")
-                    end
-                    outline_color_active = true
-                elseif tag_matches(_syntax.OUTLINE_COLOR_TAG_END) then
-                    if outline_color_active == false then
-                        throw_parse_error("trying to close a outline color region, but one is not open")
-                    end
-                    outline_color_active = false
-                    color[1] = "TRUE_BLACK"
-                    -- effect: shake
-                elseif tag_matches(_syntax.EFFECT_SHAKE_TAG_START) then
-                    if is_effect_shake == true then
-                        throw_parse_error("trying to open an effect shake region, but one is already open")
-                    end
-                    is_effect_shake = true
-                elseif tag_matches(_syntax.EFFECT_SHAKE_TAG_END) then
-                    if is_effect_shake == false then
-                        throw_parse_error("trying to close an effect shake region, but one is not open")
-                    end
-                    is_effect_shake = false
-                    -- effect: wave
-                elseif tag_matches(_syntax.EFFECT_WAVE_TAG_START) then
-                    if is_effect_wave == true then
-                        throw_parse_error("trying to open an effect wave region, but one is already open")
-                    end
-                    is_effect_wave = true
-                elseif tag_matches(_syntax.EFFECT_WAVE_TAG_END) then
-                    if is_effect_wave == false then
-                        throw_parse_error("trying to close an effect wave region, but one is not open")
-                    end
-                    is_effect_wave = false
-                    -- effect: rainbow
-                elseif tag_matches(_syntax.EFFECT_RAINBOW_TAG_START) then
-                    if is_effect_rainbow == true then
-                        throw_parse_error("trying to open an effect rainbow region, but one is already open")
-                    end
-                    is_effect_rainbow = true
-                elseif tag_matches(_syntax.EFFECT_RAINBOW_TAG_END) then
-                    if is_effect_rainbow == false then
-                        throw_parse_error("trying to close an effect rainbow region, but one is not open")
-                    end
-                    is_effect_rainbow = false
-                else -- unknown tag
-                    local sequence = {}
-                    local sequence_i = 0
-                    repeat
-                        if i + sequence_i > n_characters then
-                            throw_parse_error("malformed tag, reached end of text")
+
+                    _insert(sequence, sequence_s)
+                    sequence_i = sequence_i + 1
+                until sequence_s == ">"
+
+                sequence = _concat(sequence)
+
+                local settings_key = _sequence_to_settings_key[sequence]
+                dbg(sequence, is_closing_tag)
+                if settings_key ~= nil then
+                    if is_closing_tag then
+                        if settings[settings_key] == false then
+                            throw_parse_error("trying to close region with `" .. sequence .. "`, but not such region is open")
                         end
-                        local sequence_s = at(i + sequence_i)
-                        _insert(sequence, sequence_s)
-                        sequence_i = sequence_i + 1
-                    until sequence_s == ">"
-                    throw_parse_error("unknown control sequence: " .. _concat(sequence))
+
+                        settings[settings_key] = false
+                    else
+                        if settings[settings_key] == true then
+                            throw_parse_error("trying to open region with `" .. sequence .. "`, but such a region is already open")
+                        end
+
+                        settings[settings_key] = true
+                    end
+                else
+                    if sequence == _syntax.COLOR_TAG_START then
+
+                    elseif sequence == _syntax.OUTLINE_COLOR_TAG_START then
+
+                    else
+                        throw_parse_error("unrecognized tag `" .. sequence .. "`")
+                    end
                 end
-                goto continue
+
+                step(sequence_i - 1)
             else
                 table.insert(current_word, s)
             end
@@ -535,4 +466,144 @@ do
     end
 end  -- do-end
 
-function rt.Label:_parse() end
+--[[
+function rt.Label:_parse()
+
+    -- TODO: get full tag, then compare, instead of getting full tag for all of these cases
+    if tag_matches(_syntax.BOLD_TAG_START) then
+        if is_bold == true then
+            throw_parse_error("trying to open a bold region, but one is already open")
+        end
+        is_bold = true
+    elseif tag_matches(_syntax.BOLD_TAG_END) then
+        if is_bold == false then
+            throw_parse_error("trying to close a bold region, but one is not open")
+        end
+        is_bold = false
+        -- italic
+    elseif tag_matches(_syntax.ITALIC_TAG_START) then
+        if is_italic == true then
+            throw_parse_error("trying to open an italic region, but one is already open")
+        end
+        is_italic = true
+    elseif tag_matches(_syntax.ITALIC_TAG_END) then
+        if is_italic == false then
+            throw_parse_error("trying to close an italic region, but one is not open")
+        end
+        is_italic = false
+        -- underlined
+    elseif tag_matches(_syntax.UNDERLINED_TAG_START) then
+        if is_underlined == true then
+            throw_parse_error("trying to open an underlined region, but one is already open")
+        end
+        is_underlined = true
+    elseif tag_matches(_syntax.UNDERLINED_TAG_END) then
+        if is_underlined == false then
+            throw_parse_error("trying to close an underlined region, but one is not open")
+        end
+        is_underlined = false
+        -- strikethrough
+    elseif tag_matches(_syntax.STRIKETHROUGH_TAG_START) then
+        if is_strikethrough == true then
+            throw_parse_error("trying to open an strikethrough region, but one is already open")
+        end
+        is_strikethrough = true
+    elseif tag_matches(_syntax.STRIKETHROUGH_TAG_END) then
+        if is_strikethrough == false then
+            throw_parse_error("trying to close an strikethrough region, but one is not open")
+        end
+        is_strikethrough = false
+        -- mono
+    elseif tag_matches(_syntax.MONOSPACE_TAG_START) then
+        if is_mono == true then
+            throw_parse_error("trying to open an monospace region, but one is already open")
+        end
+        is_mono = true
+    elseif tag_matches(_syntax.MONOSPACE_TAG_END) then
+        if is_mono == false then
+            throw_parse_error("trying to close an monospace region, but one is not open")
+        end
+        is_mono = false
+        -- outlined
+    elseif tag_matches(_syntax.OUTLINE_TAG_START) then
+        if is_outlined == true then
+            throw_parse_error("trying to open an outlined region, but one is already open")
+        end
+        is_outlined = true
+    elseif tag_matches(_syntax.OUTLINE_TAG_END) then
+        if is_outlined == false then
+            throw_parse_error("trying to close an outlined region, but one is not open")
+        end
+        is_outlined = false
+        -- color
+    elseif color_tag_matches(_syntax.COLOR_TAG_START, color) then
+        if is_colored == true then
+            throw_parse_error("trying to open a color region, but one is already open")
+        end
+        is_colored = true
+    elseif tag_matches(_syntax.COLOR_TAG_END) then
+        if is_colored == false then
+            throw_parse_error("trying to close a color region, but one is not open")
+        end
+        is_colored = false
+        color[1] = "TRUE_WHITE"
+        -- outline color
+    elseif color_tag_matches(_syntax.OUTLINE_COLOR_TAG_START, outline_color) then
+        if outline_color_active == true then
+            throw_parse_error("trying to open a outline color region, but one is already open")
+        end
+        outline_color_active = true
+    elseif tag_matches(_syntax.OUTLINE_COLOR_TAG_END) then
+        if outline_color_active == false then
+            throw_parse_error("trying to close a outline color region, but one is not open")
+        end
+        outline_color_active = false
+        color[1] = "TRUE_BLACK"
+        -- effect: shake
+    elseif tag_matches(_syntax.EFFECT_SHAKE_TAG_START) then
+        if is_effect_shake == true then
+            throw_parse_error("trying to open an effect shake region, but one is already open")
+        end
+        is_effect_shake = true
+    elseif tag_matches(_syntax.EFFECT_SHAKE_TAG_END) then
+        if is_effect_shake == false then
+            throw_parse_error("trying to close an effect shake region, but one is not open")
+        end
+        is_effect_shake = false
+        -- effect: wave
+    elseif tag_matches(_syntax.EFFECT_WAVE_TAG_START) then
+        if is_effect_wave == true then
+            throw_parse_error("trying to open an effect wave region, but one is already open")
+        end
+        is_effect_wave = true
+    elseif tag_matches(_syntax.EFFECT_WAVE_TAG_END) then
+        if is_effect_wave == false then
+            throw_parse_error("trying to close an effect wave region, but one is not open")
+        end
+        is_effect_wave = false
+        -- effect: rainbow
+    elseif tag_matches(_syntax.EFFECT_RAINBOW_TAG_START) then
+        if is_effect_rainbow == true then
+            throw_parse_error("trying to open an effect rainbow region, but one is already open")
+        end
+        is_effect_rainbow = true
+    elseif tag_matches(_syntax.EFFECT_RAINBOW_TAG_END) then
+        if is_effect_rainbow == false then
+            throw_parse_error("trying to close an effect rainbow region, but one is not open")
+        end
+        is_effect_rainbow = false
+    else -- unknown tag
+        local sequence = {}
+        local sequence_i = 0
+        repeat
+            if i + sequence_i > n_characters then
+                throw_parse_error("malformed tag, reached end of text")
+            end
+            local sequence_s = at(i + sequence_i)
+            _insert(sequence, sequence_s)
+            sequence_i = sequence_i + 1
+        until sequence_s == ">"
+        throw_parse_error("unknown control sequence: " .. _concat(sequence))
+    end
+end
+]]--
