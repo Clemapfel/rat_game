@@ -488,10 +488,25 @@ function string.size(str)
 end
 
 --- @brief
-function utf8.sub(str, i, j)
-    i = utf8.offset(str, i)
-    j = utf8.offset(str,j + 1) - 1
-    return string.sub(str, i, j)
+function utf8.sub(s,i,j)
+    -- src: http://lua-users.org/lists/lua-l/2014-04/msg00590.html
+    i = i or 1
+    j = j or -1
+    if i<1 or j<1 then
+        local n = utf8.len(s)
+        if not n then return nil end
+        if i<0 then i = n+1+i end
+        if j<0 then j = n+1+j end
+        if i<0 then i = 1 elseif i>n then i = n end
+        if j<0 then j = 1 elseif j>n then j = n end
+    end
+    if j<i then return "" end
+    i = utf8.offset(s,i)
+    j = utf8.offset(s,j+1)
+    if i and j then return string.sub(s, i,j-1)
+    elseif i then return string.sub(s, i)
+    else return ""
+    end
 end
 
 --- @brief

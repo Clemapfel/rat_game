@@ -34,7 +34,7 @@ rt.Label = meta.new_type("Label", rt.Widget, rt.Animation, function(text, font, 
         _render_shader = rt.Shader("common/glyph_render.glsl"),
 
         _glyphs = {},
-        _glyph_indices = {}
+        _render_order = {}
     })
 end)
 
@@ -69,9 +69,7 @@ end
 
 --- @brief
 function rt.Label:_glyph_draw(glyph)
-    --[[
     love.graphics.draw(glyph.glyph, glyph.x, glyph.y)
-    ]]--
 end
 
 --- @override
@@ -98,11 +96,9 @@ end
 
 --- @override
 function rt.Label:draw()
-    local glyph_indices = self._glyph_indices
-    local glyph_draw = self._glyph_draw
-    local glyphs = self._glyphs
-    for i in values(glyph_indices) do
-        glyph_draw(glyphs[i])
+    local render_order = self._render_order
+    for glyph in values(render_order) do
+        self:_glyph_draw(glyph)
     end
 end
 
@@ -218,8 +214,11 @@ do
         {_syntax.STRIKETHROUGH_TAG_START, "is_strikethrough"},
         {_syntax.STRIKETHROUGH_TAG_END, "is_strikethrough"},
 
-        {_syntax.COLOR_TAG_START, "is_colored"},
-        {_syntax.COLOR_TAG_END, "is_colored"},
+        --{_syntax.COLOR_TAG_START, "color_active"},
+        {_syntax.COLOR_TAG_END, "color_active"},
+
+        --{_syntax.OUTLINE_COLOR_TAG_START, "outline_color_active"},
+        {_syntax.OUTLINE_COLOR_TAG_END, "outline_color_active"},
 
         {_syntax.OUTLINE_TAG_START, "is_outlined"},
         {_syntax.OUTLINE_TAG_END, "is_outlined"},
@@ -240,17 +239,18 @@ do
         end
     end
 
-    local _string_sub = string.sub
+    local _sub = utf8.sub
     local _insert = table.insert
     local _concat = table.concat
-    local _find = string.find
+    local _find = string.find   -- safe as non-utf8 because it is only used on control sequences
     local _rt_palette = rt.Palette
     local _rt_color_unpack = rt.color_unpack
     
     --- @brief [internal]
     function rt.Label:_parse()
         self._glyphs = {}
-        self._glyph_indices = {}
+        self._render_order = {}
+
         self._n_glyphs = 0
         self._n_characters = 0
 
@@ -260,15 +260,14 @@ do
         local settings = {
             is_bold = false,
             is_italic = false,
-            is_colored = false,
             is_bold = false,
             is_italic = false,
-            is_colored = false,
             is_outlined = false,
             is_underlined = false,
             is_strikethrough = false,
 
             color = "TRUE_WHITE",
+            color_active = false,
             outline_color = "TRUE_BLACK",
             outline_color_active = false,
 
@@ -280,7 +279,7 @@ do
         }
 
         local at = function(i)
-            return _string_sub(self._raw, i, i)
+            return _sub(self._raw, i, i)
         end
 
         local i = 1
@@ -305,7 +304,7 @@ do
             end
             
             local color_r, color_g, color_b = 1, 1, 1
-            if not settings.is_effect_rainbow then
+            if not settings.is_effect_rainbow and settings.color_active then
                 color_r, color_g, color_b = _rt_color_unpack(_rt_palette[settings.color])
             end
             
@@ -325,9 +324,9 @@ do
                 settings.is_effect_wave,
                 settings.is_effect_rainbow
             )
-            
+
             _insert(glyphs, to_insert)
-            _insert(glyph_indices, self._n_glyphs)
+            _insert(self._render_order, to_insert)
 
             self._n_characters = self._n_characters + to_insert.n_visible_characters
             self._n_glyphs = self._n_glyphs + 1
@@ -344,35 +343,6 @@ do
         
         local n_characters = utf8.len(self._raw)
 
-        local function color_tag_matches(which, to_assign)  
-            local sequence = {}
-            local color_i = 0
-            local color_s 
-            repeat
-                if i + color_i > n_characters then
-                    throw_parse_error("malformed color tag, reached end of text")
-                end
-                
-                local color_s = at(i + color_i)
-                _insert(sequence, color_s)
-                color_i = color_i + 1
-            until color_s == ">"
-
-            sequence = _concat(sequence)
-
-            for tag in keys(which) do
-                local _, _, new_color = _find(sequence, tag)
-                if not (new_color == nil) then
-                    if _rt_palette[new_color] == nil then
-                        throw_parse_error("malformed color tag: color `" .. new_color .. "` unknown")
-                    end
-                    to_assign[1] = new_color
-                    step(color_i)
-                    return true
-                end
-            end
-        end
-        
         local glyphs = self._glyphs
 
         while i <= n_characters do
@@ -404,7 +374,7 @@ do
                 local is_closing_tag = false
                 repeat
                     if i + sequence_i > n_characters then
-                        throw_parse_error("malformed tag, reached end of text")
+                        throw_parse_error("malformed tag, `" .. _concat(sequence) .. "` reached end of text")
                     end
 
                     sequence_s = at(i + sequence_i)
@@ -419,7 +389,6 @@ do
                 sequence = _concat(sequence)
 
                 local settings_key = _sequence_to_settings_key[sequence]
-                dbg(sequence, is_closing_tag)
                 if settings_key ~= nil then
                     if is_closing_tag then
                         if settings[settings_key] == false then
@@ -435,11 +404,38 @@ do
                         settings[settings_key] = true
                     end
                 else
-                    if sequence == _syntax.COLOR_TAG_START then
+                    -- parse out color string
+                    local found, new_color
+                    for color_tag in keys(_syntax.COLOR_TAG_START) do
+                        found, _, new_color = _find(sequence, color_tag)
+                        if found ~= nil then
+                            if rt.Palette[new_color] == nil then
+                                throw_parse_error("malformed color tag: color `" .. new_color .. "` unknown")
+                            end
 
-                    elseif sequence == _syntax.OUTLINE_COLOR_TAG_START then
+                            settings.color = new_color
+                            settings.color_active = true
+                            break
+                        end
+                    end
 
-                    else
+                    if found == nil then
+                        for color_tag in keys(_syntax.OUTLINE_COLOR_TAG_START) do
+                            found, _, new_color = _find(sequence, color_tag)
+                            dbg(sequence, color_tag, found, _, new_color)
+                            if found ~= nil then
+                                if rt.Palette[new_color] == nil then
+                                    throw_parse_error("malformed color tag: color `" .. new_color .. "` unknown")
+                                end
+
+                                settings.outline_color = new_color
+                                settings.outline_color_active = true
+                                break
+                            end
+                        end
+                    end
+
+                    if found == nil then
                         throw_parse_error("unrecognized tag `" .. sequence .. "`")
                     end
                 end
@@ -453,16 +449,16 @@ do
         end
         push_glyph()
 
-        if is_bold then throw_parse_error("reached end of text, but bold region is still open") end
-        if is_italic then throw_parse_error("reached end of text, but italic region is still open") end
-        if is_colored then throw_parse_error("reached end of text, but colored region is still open") end
-        if outline_color_active then throw_parse_error("reached end of text, but outline color region is still open") end
-        if is_effect_shake then throw_parse_error("reached end of text, but effect shake region is still open") end
-        if is_effect_wave then throw_parse_error("reached end of text, but effect wave region is still open") end
-        if is_effect_rainbow then throw_parse_error("reached end of text, but effect rainbow region is still open") end
-        if is_underlined then throw_parse_error("reached end of text, but effect underlined region is still open") end
-        if is_strikethrough then throw_parse_error("reached end of text, but effect strikethrough region is still open") end
-        if is_outlined then throw_parse_error("reached end of text, but effect outline region is still open") end
+        if settings.is_bold then throw_parse_error("reached end of text, but bold region is still open") end
+        if settings.is_italic then throw_parse_error("reached end of text, but italic region is still open") end
+        if settings.color_active then throw_parse_error("reached end of text, but colored region is still open") end
+        if settings.outline_color_active then throw_parse_error("reached end of text, but outline color region is still open") end
+        if settings.is_effect_shake then throw_parse_error("reached end of text, but effect shake region is still open") end
+        if settings.is_effect_wave then throw_parse_error("reached end of text, but effect wave region is still open") end
+        if settings.is_effect_rainbow then throw_parse_error("reached end of text, but effect rainbow region is still open") end
+        if settings.is_underlined then throw_parse_error("reached end of text, but effect underlined region is still open") end
+        if settings.is_strikethrough then throw_parse_error("reached end of text, but effect strikethrough region is still open") end
+        if settings.is_outlined then throw_parse_error("reached end of text, but effect outline region is still open") end
     end
 end  -- do-end
 

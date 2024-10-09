@@ -22,10 +22,11 @@
     </configurations>
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="7fa9ba1b-2cff-4ecc-86fb-59ab2fa76ee1" name="Changes" comment="stashing">
+    <list default="true" id="7fa9ba1b-2cff-4ecc-86fb-59ab2fa76ee1" name="Changes" comment="stashing parse optimization">
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/common/common.lua" beforeDir="false" afterPath="$PROJECT_DIR$/common/common.lua" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/common/game_state.lua" beforeDir="false" afterPath="$PROJECT_DIR$/common/game_state.lua" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/common/label.lua" beforeDir="false" afterPath="$PROJECT_DIR$/common/label.lua" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/common/palette.lua" beforeDir="false" afterPath="$PROJECT_DIR$/common/palette.lua" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -584,15 +585,7 @@
       <workItem from="1728160868435" duration="14796000" />
       <workItem from="1728184556022" duration="443000" />
       <workItem from="1728232792660" duration="7024000" />
-      <workItem from="1728320028333" duration="43024000" />
-    </task>
-    <task id="LOCAL-01071" summary="stashing textbox">
-      <option name="closed" value="true" />
-      <created>1726789360588</created>
-      <option name="number" value="01071" />
-      <option name="presentableId" value="LOCAL-01071" />
-      <option name="project" value="LOCAL" />
-      <updated>1726789360588</updated>
+      <workItem from="1728320028333" duration="45742000" />
     </task>
     <task id="LOCAL-01072" summary="textbox done">
       <option name="closed" value="true" />
@@ -978,7 +971,15 @@
       <option name="project" value="LOCAL" />
       <updated>1728438272335</updated>
     </task>
-    <option name="localTasksCounter" value="1120" />
+    <task id="LOCAL-01120" summary="stashing parse optimization">
+      <option name="closed" value="true" />
+      <created>1728509353503</created>
+      <option name="number" value="01120" />
+      <option name="presentableId" value="LOCAL-01120" />
+      <option name="project" value="LOCAL" />
+      <updated>1728509353503</updated>
+    </task>
+    <option name="localTasksCounter" value="1121" />
     <servers />
   </component>
   <component name="TypeScriptGeneratedFilesManager">
@@ -1027,7 +1028,6 @@
     </option>
   </component>
   <component name="VcsManagerConfiguration">
-    <MESSAGE value="stashing vector field" />
     <MESSAGE value="added rat battle sprite" />
     <MESSAGE value="added rtmidi" />
     <MESSAGE value="added midi messages" />
@@ -1052,7 +1052,8 @@
     <MESSAGE value="removed all glyph use to prepare for label rewrite" />
     <MESSAGE value="stashing label rework" />
     <MESSAGE value="stashing" />
-    <option name="LAST_COMMIT_MESSAGE" value="stashing" />
+    <MESSAGE value="stashing parse optimization" />
+    <option name="LAST_COMMIT_MESSAGE" value="stashing parse optimization" />
   </component>
   <component name="XDebuggerManager">
     <breakpoint-manager>

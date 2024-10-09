@@ -72,6 +72,7 @@ rt.GameState = meta.new_type("GameState", function()
         _render_texture = rt.RenderTexture(1, 1),
         _render_shader = rt.Shader("common/game_state_render_shader.glsl"),
         _use_render_texture = true,
+        _use_coroutines = false,
 
         _loading_screen = rt.LoadingScreen.DEFAULT(),
         _loading_screen_active = true,
@@ -408,16 +409,22 @@ function rt.GameState:_resize(new_width, new_height)
     local true_w, true_h = love.graphics.getWidth(), love.graphics.getHeight()
     self._loading_screen:fit_into(0, 0, true_w, true_h)
 
-    self:_loading_screen_show(function()
-        table.insert(self._active_coroutines, rt.Coroutine(function()
-            rt.savepoint_maybe()
-            for scene in values(self._scenes) do
-                scene:fit_into(0, 0, self._state.resolution_x, self._state.resolution_y)
+    if self._use_coroutines then
+        self:_loading_screen_show(function()
+            table.insert(self._active_coroutines, rt.Coroutine(function()
                 rt.savepoint_maybe()
-            end
-            self:_loading_screen_hide()
-        end))
-    end)
+                for scene in values(self._scenes) do
+                    scene:fit_into(0, 0, self._state.resolution_x, self._state.resolution_y)
+                    rt.savepoint_maybe()
+                end
+                self:_loading_screen_hide()
+            end))
+        end)
+    else
+        for scene in values(self._scenes) do
+            scene:fit_into(0, 0, self._state.resolution_x, self._state.resolution_y)
+        end
+    end
 end
 
 --- @brief
@@ -429,22 +436,24 @@ function rt.GameState:_update(delta)
         self._loading_screen:update(delta)
     end
 
-    local n = sizeof(self._active_coroutines)
-    local to_remove = {}
-    local max_n_routines = 2;
-    local n_routines = 0;
-    for i, routine in ipairs(self._active_coroutines) do
-        if not routine:get_is_done() then
-            routine:resume()
-            return; -- work trough all routines until first update
-        else
-            table.insert(to_remove, i)
+    if self._use_coroutines then
+        local n = sizeof(self._active_coroutines)
+        local to_remove = {}
+        local max_n_routines = 2;
+        local n_routines = 0;
+        for i, routine in ipairs(self._active_coroutines) do
+            if not routine:get_is_done() then
+                routine:resume()
+                return; -- work trough all routines until first update
+            else
+                table.insert(to_remove, i)
+            end
         end
-    end
 
-    table.sort(to_remove, function(a, b) return a > b end)
-    for i in values(to_remove) do
-        table.remove(self._active_coroutines, i)
+        table.sort(to_remove, function(a, b) return a > b end)
+        for i in values(to_remove) do
+            table.remove(self._active_coroutines, i)
+        end
     end
 
     if self._current_scene ~= nil then
@@ -493,46 +502,73 @@ end
 
 --- @brief
 function rt.GameState:set_current_scene(scene_type)
-    table.insert(self._active_coroutines, rt.Coroutine(function()
-        rt.savepoint_maybe()
+    if self._use_coroutines then
+        table.insert(self._active_coroutines, rt.Coroutine(function()
+            rt.savepoint_maybe()
 
+            local scene = self._scenes[scene_type]
+            if scene == nil then
+                scene = scene_type(self)
+                self._scenes[scene_type] = scene
+            end
+
+            local use_loading_screen = true --scene:get_is_realized() == false
+            if use_loading_screen then
+                self:_loading_screen_show(function()
+                    -- make sure graphics swap happens behind loading screen, old scene stays during fadeout
+                    if self._current_scene ~= nil then
+                        self._current_scene:make_inactive()
+                    end
+
+                    self._current_scene = scene
+                end)
+            else
+                if self._current_scene ~= nil then
+                    self._current_scene:make_inactive()
+                end
+            end
+
+            local realized = scene:get_is_realized()
+            if not realized then
+                scene:realize()
+                rt.savepoint_maybe()
+                scene:fit_into(0, 0, self._state.resolution_x, self._state.resolution_y)
+                rt.savepoint_maybe()
+            end
+
+            scene:make_active()
+
+            if use_loading_screen then
+                self:_loading_screen_hide()
+            end
+            self._current_scene = scene -- failsafe if signal "shown" is skipped, because loading screen was too short
+        end))
+    else
         local scene = self._scenes[scene_type]
         if scene == nil then
             scene = scene_type(self)
             self._scenes[scene_type] = scene
         end
 
-        local use_loading_screen = true --scene:get_is_realized() == false
-        if use_loading_screen then
-            self:_loading_screen_show(function()
-                -- make sure graphics swap happens behind loading screen, old scene stays during fadeout
-                if self._current_scene ~= nil then
-                    self._current_scene:make_inactive()
-                end
+        if self._current_scene ~= nil then
+            self._current_scene:make_inactive()
+        end
 
-                self._current_scene = scene
-            end)
-        else
-            if self._current_scene ~= nil then
-                self._current_scene:make_inactive()
-            end
+        self._current_scene = scene
+
+        if self._current_scene ~= nil then
+        self._current_scene:make_inactive()
         end
 
         local realized = scene:get_is_realized()
         if not realized then
             scene:realize()
-            rt.savepoint_maybe()
             scene:fit_into(0, 0, self._state.resolution_x, self._state.resolution_y)
-            rt.savepoint_maybe()
         end
 
         scene:make_active()
-
-        if use_loading_screen then
-           self:_loading_screen_hide()
-        end
         self._current_scene = scene -- failsafe if signal "shown" is skipped, because loading screen was too short
-    end))
+    end
 end
 
 --- @brief
