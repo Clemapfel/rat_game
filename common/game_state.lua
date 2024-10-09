@@ -295,8 +295,7 @@ function rt.GameState:_run()
                 self._render_texture:bind_as_render_target()
             end
 
-            love.graphics.clear()
-            rt.graphics.reset()
+            love.graphics.reset()
             love.graphics.setColor(background_color.r, background_color.g, background_color.b, 1)
             love.graphics.rectangle("fill", 0, 0, love.graphics.getWidth(), love.graphics.getHeight())
 

@@ -534,3 +534,5 @@ do
         if is_outlined then throw_parse_error("reached end of text, but effect outline region is still open") end
     end
 end  -- do-end
+
+function rt.Label:_parse() end
