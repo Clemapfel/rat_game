@@ -76,7 +76,6 @@ function rt.Label:_glyph_new(
     is_effect_rainbow
 )
     local out = {
-        text = text, -- TODO: remove
         glyph = love.graphics.newTextBatch(font[style], text),
         is_underlined = is_underlined,
         is_strikethrough = is_strikethrough,
@@ -654,11 +653,21 @@ do
             self.outline_shader:send("_outline_color", { rt.color_unpack(rt.Palette.BLACK) })
             self.outline_shader:send("_opacity", self._opacity)
         end
+
+        self:_update_n_visible_characters()
     end
-    
-    local function _draw_glyph(glyph)
-        love.graphics.setColor(glyph.color_r, glyph.color_g, glyph.color_b)
-        love.graphics.draw(glyph.glyph, glyph.x + _padding, glyph.y + _padding)
+
+    --- @brief [internal]
+    function rt.Label:_update_n_visible_characters()
+        local n_characters_drawn = 0
+        for glyph in values(self._glyphs_only) do
+            if n_characters_drawn > self._n_visible_characters then
+                glyph.n_visible_characters = 0
+            else
+                glyph.n_visible_characters = self._n_visible_characters - n_characters_drawn
+            end
+            n_characters_drawn = n_characters_drawn + glyph.n_characters
+        end
     end
 
     --- @brief [internal]
@@ -670,19 +679,13 @@ do
             self._swap_texture:bind_as_render_target()
 
             self.render_shader:bind()
-            local n_characters_drawn = 0
-            local glyph_i = 1
-            local n_glyphs = sizeof(self._outlined_glyphs)
-            while n_characters_drawn < self._n_visible_characters and glyph_i <= n_glyphs do
-                local glyph = self._outlined_glyphs[glyph_i]
-                self.render_shader:send("_n_visible_characters", self._n_visible_characters - n_characters_drawn)
+            for glyph in values(self._outlined_glyphs) do
+                self.render_shader:send("_n_visible_characters", glyph.n_visible_characters)
                 love.graphics.setColor(glyph.color_r, glyph.color_g, glyph.color_b)
                 love.graphics.draw(glyph.glyph, glyph.x + _padding, glyph.y + _padding)
-                n_characters_drawn = n_characters_drawn + glyph.n_characters
-                glyph_i = glyph_i + 1
             end
-
             self.render_shader:unbind()
+
             self._swap_texture:unbind_as_render_target()
 
             self._outline_texture:bind_as_render_target()
@@ -695,9 +698,13 @@ do
 
         self._swap_texture:bind_as_render_target()
         love.graphics.clear()
-        for glyph in values(self._non_outlined_glyphs) do
-            _draw_glyph(glyph)
+        self.render_shader:bind()
+        for glyph in values(self._outlined_glyphs) do
+            self.render_shader:send("_n_visible_characters", glyph.n_visible_characters)
+            love.graphics.setColor(glyph.color_r, glyph.color_g, glyph.color_b)
+            love.graphics.draw(glyph.glyph, glyph.x + _padding, glyph.y + _padding)
         end
+        self.render_shader:unbind()
         self._swap_texture:unbind_as_render_target()
 
         love.graphics.pop()

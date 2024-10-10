@@ -22,9 +22,7 @@
     </configurations>
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="7fa9ba1b-2cff-4ecc-86fb-59ab2fa76ee1" name="Changes" comment="stashing before moving to fully cached render texture">
-      <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/common/game_state.lua" beforeDir="false" afterPath="$PROJECT_DIR$/common/game_state.lua" afterDir="false" />
+    <list default="true" id="7fa9ba1b-2cff-4ecc-86fb-59ab2fa76ee1" name="Changes" comment="n_visible_characters working">
       <change beforePath="$PROJECT_DIR$/common/label.lua" beforeDir="false" afterPath="$PROJECT_DIR$/common/label.lua" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/main.lua" beforeDir="false" afterPath="$PROJECT_DIR$/main.lua" afterDir="false" />
     </list>
@@ -585,15 +583,7 @@
       <workItem from="1728160868435" duration="14796000" />
       <workItem from="1728184556022" duration="443000" />
       <workItem from="1728232792660" duration="7024000" />
-      <workItem from="1728320028333" duration="62828000" />
-    </task>
-    <task id="LOCAL-01077" summary="stashing before adding enki">
-      <option name="closed" value="true" />
-      <created>1726951351899</created>
-      <option name="number" value="01077" />
-      <option name="presentableId" value="LOCAL-01077" />
-      <option name="project" value="LOCAL" />
-      <updated>1726951351899</updated>
+      <workItem from="1728320028333" duration="63162000" />
     </task>
     <task id="LOCAL-01078" summary="debug drawing working">
       <option name="closed" value="true" />
@@ -979,7 +969,15 @@
       <option name="project" value="LOCAL" />
       <updated>1728582536300</updated>
     </task>
-    <option name="localTasksCounter" value="1126" />
+    <task id="LOCAL-01126" summary="n_visible_characters working">
+      <option name="closed" value="true" />
+      <created>1728586597756</created>
+      <option name="number" value="01126" />
+      <option name="presentableId" value="LOCAL-01126" />
+      <option name="project" value="LOCAL" />
+      <updated>1728586597756</updated>
+    </task>
+    <option name="localTasksCounter" value="1127" />
     <servers />
   </component>
   <component name="TypeScriptGeneratedFilesManager">
@@ -1028,7 +1026,6 @@
     </option>
   </component>
   <component name="VcsManagerConfiguration">
-    <MESSAGE value="added party sprite" />
     <MESSAGE value="stashing midi example" />
     <MESSAGE value="polishing animation" />
     <MESSAGE value="fixed physics scaling" />
@@ -1053,7 +1050,8 @@
     <MESSAGE value="stashing label" />
     <MESSAGE value="outline working but too big" />
     <MESSAGE value="stashing before moving to fully cached render texture" />
-    <option name="LAST_COMMIT_MESSAGE" value="stashing before moving to fully cached render texture" />
+    <MESSAGE value="n_visible_characters working" />
+    <option name="LAST_COMMIT_MESSAGE" value="n_visible_characters working" />
   </component>
   <component name="XDebuggerManager">
     <breakpoint-manager>
