@@ -34,7 +34,7 @@ rt.Label = meta.new_type("Label", rt.Widget, rt.Animation, function(text, font, 
         _monospace_font = monospace_font,
         _justify_mode = rt.JustifyMode.LEFT,
         
-        _n_visible_characters = 3,
+        _n_visible_characters = -1,
 
         _glyphs = {},
         _n_glyphs = 0,
@@ -63,6 +63,9 @@ end, {
     render_shader = rt.Shader("common/glyph_render.glsl"),
 })
 
+_bold_font = love.graphics.newFont("assets/fonts/DejaVuSans/DejaVuSans-BoldItalic.ttf", 20)
+_regular_font = love.graphics.newFont("assets/fonts/DejaVuSans/DejaVuSans-Regular.ttf", 20)
+
 --- @brief
 function rt.Label:_glyph_new(
     text, font, style,
@@ -76,6 +79,7 @@ function rt.Label:_glyph_new(
     is_effect_rainbow
 )
     local out = {
+        text = text, -- TODO
         glyph = love.graphics.newTextBatch(font[style], text),
         is_underlined = is_underlined,
         is_strikethrough = is_strikethrough,
@@ -123,6 +127,15 @@ function rt.Label:draw()
     end
 
     self._swap_texture:draw(justify_offset + self._outline_texture_offset_x, self._outline_texture_offset_y)
+
+
+    local padding = rt.settings.label.outline_offset_padding
+    for glyph in values(self._non_outlined_glyphs) do
+        self.render_shader:send("_n_visible_characters", glyph.n_visible_characters)
+        love.graphics.setColor(glyph.color_r, glyph.color_g, glyph.color_b)
+        love.graphics.draw(glyph.glyph, glyph.x + padding, glyph.y)
+    end
+
     love.graphics.translate(-self._bounds.x, -self._bounds.y)
 end
 
@@ -485,7 +498,6 @@ do
                     if found == nil then
                         for color_tag in keys(_syntax.OUTLINE_COLOR_TAG_START) do
                             found, _, new_color = _find(sequence, color_tag)
-                            dbg(sequence, color_tag, found, _, new_color)
                             if found ~= nil then
                                 if rt.Palette[new_color] == nil then
                                     throw_parse_error("malformed color tag: color `" .. new_color .. "` unknown")
@@ -547,6 +559,10 @@ do
 
         self._width = _max(max_width, width)
         self._height = n_rows * self._font:get_bold_italic():getHeight()
+
+        if self._n_visible_characters == -1 then
+            self._n_visible_characters = n_characters
+        end
     end
 
     local _padding = rt.settings.label.outline_offset_padding
@@ -600,8 +616,8 @@ do
                     newline()
                 end
 
-                glyph.x = _floor(glyph_x)
-                glyph.y = _floor(glyph_y)
+                glyph.x = glyph_x
+                glyph.y = glyph_y
                 glyph.row_index = row_i
 
                 if glyph.is_outlined then
@@ -619,7 +635,11 @@ do
 
             is_first_word = false
         end
-       _insert(row_widths, glyph_x)
+        _insert(row_widths, glyph_x)
+
+        if max_w == POSITIVE_INFINITY then
+            max_w = _min(max_w, self._width)
+        end
 
         -- update justify offsets
         for glyph in values(self._glyphs_only) do
@@ -627,13 +647,11 @@ do
             glyph.justify_right_offset = (max_w - row_widths[glyph.row_index])
         end
 
+
         self._width = max_x - min_x
         self._height = line_height * row_i --max_y - min_y
         self._n_rows = row_i
 
-        if max_w == POSITIVE_INFINITY then
-            max_w = _max(max_w, self._width)
-        end
         self._outline_texture_offset_x = 0
         self._outline_texture_offset_y = -_padding
         local outline_texture_w = self._width + 2 * _padding
@@ -696,16 +714,18 @@ do
             self._outline_texture:unbind_as_render_target()
         end
 
+        --[[
         self._swap_texture:bind_as_render_target()
-        love.graphics.clear()
+        love.graphics.clear(true, false, false)
         self.render_shader:bind()
-        for glyph in values(self._outlined_glyphs) do
+        for glyph in values(self._non_outlined_glyphs) do
             self.render_shader:send("_n_visible_characters", glyph.n_visible_characters)
             love.graphics.setColor(glyph.color_r, glyph.color_g, glyph.color_b)
             love.graphics.draw(glyph.glyph, glyph.x + _padding, glyph.y + _padding)
         end
         self.render_shader:unbind()
         self._swap_texture:unbind_as_render_target()
+        ]]--
 
         love.graphics.pop()
     end

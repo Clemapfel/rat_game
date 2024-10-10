@@ -45,7 +45,7 @@ rt.Font = meta.new_type("Font", function(size, regular_path, bold_path, italic_p
 end)
 
 --- @class love.Font
----
+
 --- @class rt.FontStyle
 rt.FontStyle = meta.new_enum({
     REGULAR = "FONT_STYLE_REGULAR",
@@ -53,11 +53,6 @@ rt.FontStyle = meta.new_enum({
     BOLD = "FONT_STYLE_BOLD",
     BOLD_ITALIC = "FONT_STYLE_BOLD_ITALIC"
 })
-
-rt.Font[rt.FontStyle.REGULAR] = love.graphics.getFont()
-rt.Font[rt.FontStyle.BOLD] = love.graphics.getFont()
-rt.Font[rt.FontStyle.ITALIC] = love.graphics.getFont()
-rt.Font[rt.FontStyle.BOLD_ITALIC] = love.graphics.getFont()
 
 --- @brief [internal] update held fonts
 function rt.Font:_update()

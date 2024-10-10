@@ -38,15 +38,15 @@ rt.Font = meta.new_type("Font", function(size, regular_path, bold_path, italic_p
         _bold_italic_rasterizer = {}
     })
 
-    if not bold_path == nil then
+    if bold_path ~= nil then
         out._bold_path = bold_path
     end
 
-    if not italic_path == nil then
+    if italic_path ~= nil then
         out._italic_path = italic_path
     end
 
-    if not bold_italic_path == nil then
+    if bold_italic_path ~= nil then
         out._bold_italic_path = bold_italic_path
     end
 
