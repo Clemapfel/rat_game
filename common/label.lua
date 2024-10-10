@@ -4,6 +4,10 @@ render all animated glyphs on top
     group by animation and shader
 ]]
 
+rt.settings.label = {
+    outline_offset_padding = 5
+}
+
 --- @class rt.TextEffect
 rt.TextEffect = meta.new_enum("TextEffect", {
     NONE = "NONE",
@@ -44,7 +48,8 @@ rt.Label = meta.new_type("Label", rt.Widget, rt.Animation, function(text, font, 
 
         _outline_texture_offset_x = 0,
         _outline_texture_offset_y = 0,
-        _outline_offset_padding = 5,
+        _outline_texture_justify_center_offset = 0,
+        _outline_texture_justify_right_offset = 0,
         _outline_texture = rt.RenderTexture(1, 1),
 
         _width = 0,
@@ -112,7 +117,15 @@ function rt.Label:draw()
     if self._use_outline then
         self._outline_shader:bind()
         love.graphics.setColor(1, 1, 1, 1)
-        self._outline_texture:draw(self._outline_texture_offset_x - self._outline_offset_padding, self._outline_texture_offset_y - self._outline_offset_padding)
+
+        local justify_offset = 0
+        if self._justify_mode == rt.JustifyMode.CENTER then
+            justify_offset = self._outline_texture_justify_center_offset
+        elseif self._justify_mode == rt.JustifyMode.RIGHT then
+            justify_offset = self._outline_texture_justify_right_offset
+        end
+
+        self._outline_texture:draw(self._outline_texture_offset_x + justify_offset, self._outline_texture_offset_y)
         self._outline_shader:unbind()
     end
 
@@ -425,8 +438,6 @@ do
         
         local n_characters = utf8.len(self._raw)
 
-        local glyphs = self._glyphs
-
         while i <= n_characters do
             if s == _syntax.ESCAPE_CHARACTER then
                 step(1)
@@ -567,6 +578,8 @@ do
         self._height = n_rows * self._font:get_bold_italic():getHeight()
     end
 
+    local _padding = rt.settings.label.outline_offset_padding
+
     --- @brief [internal]
     function rt.Label:_apply_wrapping()
         local current_line_width = 0
@@ -647,14 +660,16 @@ do
         self._height = max_y - min_y
         self._n_rows = row_i
 
-        self._outline_texture_offset_x = 0
-        self._outline_texture_offset_y = min_outline_y
-        local outline_texture_w = self._width + 2 * self._outline_offset_padding
-        local outline_texture_h = max_outline_y - min_outline_y + 2 * self._outline_offset_padding
+        self._outline_texture_offset_x = -_padding
+        self._outline_texture_offset_y = min_outline_y - _padding
+        local outline_texture_w = max_w + 2 * _padding
+        local outline_texture_h = max_outline_y - min_outline_y + 2 * _padding
 
         if outline_texture_w < 1 then outline_texture_w = 1 end
         if outline_texture_h < 1 then outline_texture_h = 1 end
-        dbg(self._raw, outline_texture_w, outline_texture_h)
+
+        self._outline_texture_justify_center_offset = 0
+        self._outline_texture_justify_right_offset = 0
 
         if self._use_outline and self._width > 0 and self._height > 0 then
             self._outline_texture = rt.RenderTexture(outline_texture_w, outline_texture_h)
@@ -663,21 +678,23 @@ do
             self._outline_shader:send("_opacity", self._opacity)
         end
     end
+
+    --- @brief [internal]
+    function rt.Label:_update_outline_texture()
+        if self._use_outline and self._width > 0 and self._height > 0 then
+            love.graphics.push()
+            love.graphics.reset()
+            love.graphics.translate(-self._outline_texture_offset_x, -self._outline_texture_offset_y)
+            self._outline_texture:bind_as_render_target()
+            love.graphics.setColor(0, 0, 0, 1)
+            love.graphics.rectangle("fill", 0, 0, rt.graphics.get_width(), rt.graphics.get_height())
+            for glyph in values(self._outlined_glyphs) do
+                self:_glyph_draw(glyph)
+            end
+            self._outline_texture:unbind_as_render_target()
+            love.graphics.pop()
+        end
+    end
 end  -- do-end
 
---- @brief [internal]
-function rt.Label:_update_outline_texture()
-    if self._use_outline and self._width > 0 and self._height > 0 then
-        love.graphics.push()
-        love.graphics.reset()
-        love.graphics.translate(-self._outline_texture_offset_x + self._outline_offset_padding, -self._outline_texture_offset_y + self._outline_offset_padding)
-        self._outline_texture:bind_as_render_target()
-        love.graphics.setColor(0, 0, 0, 1)
-        --love.graphics.rectangle("fill", 0, 0, rt.graphics.get_width(), rt.graphics.get_height())
-        for glyph in values(self._outlined_glyphs) do
-            self:_glyph_draw(glyph)
-        end
-        self._outline_texture:unbind_as_render_target()
-        love.graphics.pop()
-    end
-end
+
