@@ -27,8 +27,6 @@ love.draw = function()
         love.graphics.translate(-player_x, -player_y)
     end
 
-
-
     love.graphics.setColor(0.5, 0.5, 0.5, 1)
     love.graphics.circle("fill", player_x, player_y, player_radius)
 

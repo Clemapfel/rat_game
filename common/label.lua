@@ -34,7 +34,19 @@ rt.Label = meta.new_type("Label", rt.Widget, rt.Animation, function(text, font, 
         _render_shader = rt.Shader("common/glyph_render.glsl"),
 
         _glyphs = {},
-        _render_order = {},
+        _glyphs_only = meta.make_weak({}),
+        _standard_render = meta.make_weak({}),
+        _outlined_glyphs = meta.make_weak({}),
+        _animation_render = meta.make_weak({}),
+
+        _use_outline = false,
+        _use_animation = false,
+
+        _outline_texture_offset_x = 0,
+        _outline_texture_offset_y = 0,
+        _outline_offset_padding = 5,
+        _outline_texture = rt.RenderTexture(1, 1),
+
         _width = 0,
         _height = 0
     })
@@ -86,9 +98,42 @@ function rt.Label:_glyph_draw(glyph)
         x_offset = glyph.justify_right_offset
     end
 
-    local hue = glyph.row_index / self._n_rows
-    love.graphics.setColor(rt.color_unpack(rt.hsva_to_rgba(rt.HSVA(hue, 1, 1, 1))))
     love.graphics.draw(glyph.glyph, glyph.x + x_offset, glyph.y)
+end
+
+--- @override
+function rt.Label:draw()
+    local render_order = self._glyphs_only
+    love.graphics.push()
+    love.graphics.setColor(1, 1, 1, 1)
+    love.graphics.translate(self._bounds.x, self._bounds.y)
+
+    -- draw outlines
+    if self._use_outline then
+        self._outline_shader:bind()
+        love.graphics.setColor(1, 1, 1, 1)
+        self._outline_texture:draw(self._outline_texture_offset_x - self._outline_offset_padding, self._outline_texture_offset_y - self._outline_offset_padding)
+        self._outline_shader:unbind()
+    end
+
+    if self._justify_mode == rt.JustifyMode.LEFT then
+        for glyph in values(self._standard_render) do
+            love.graphics.draw(glyph.glyph, glyph.x, glyph.y)
+        end
+    else
+        local justify_key = "justify_center_offset"
+        if self._justify_mode == rt.JustifyMode.RIGHT then
+            justify_key = "justify_right_offset"
+        end
+
+        for glyph in values(self._standard_render) do
+            local x_offset = glyph[justify_key]
+            love.graphics.draw(glyph.glyph, glyph.x + x_offset, glyph.y)
+        end
+    end
+    -- draw regular glyphs
+    love.graphics.setColor(1, 1, 1, self._opacity)
+    love.graphics.pop()
 end
 
 --- @override
@@ -102,27 +147,17 @@ end
 --- @override
 function rt.Label:size_allocate(x, y, width, height)
     self:_apply_wrapping(width)
+    self:_update_outline_texture()
 end
 
 --- @override
 function rt.Label:measure()
+    if self._is_realized == false then self:realize() end
     return self._width, self._height
 end
 
 --- @override
 function rt.Label:update(delta)
-end
-
---- @override
-function rt.Label:draw()
-    local render_order = self._render_order
-    love.graphics.push()
-    love.graphics.setColor(1, 1, 1, 1)
-    love.graphics.translate(self._bounds.x, self._bounds.y)
-    for glyph in values(render_order) do
-        self:_glyph_draw(glyph)
-    end
-    love.graphics.pop()
 end
 
 --- @brief
@@ -156,6 +191,8 @@ end
 
 --- @brief
 function rt.Label:set_opacity(alpha)
+    self._opacity = alpha
+    self._outline_shader:send("_opacity", self._opacity)
 end
 
 --- @brief
@@ -241,7 +278,7 @@ do
         {_syntax.COLOR_TAG_END, "color_active"},
 
         --{_syntax.OUTLINE_COLOR_TAG_START, "outline_color_active"},
-        {_syntax.OUTLINE_COLOR_TAG_END, "outline_color_active"},
+        --{_syntax.OUTLINE_COLOR_TAG_END, "outline_color_active"},
 
         {_syntax.OUTLINE_TAG_START, "is_outlined"},
         {_syntax.OUTLINE_TAG_END, "is_outlined"},
@@ -266,16 +303,24 @@ do
     local _insert = table.insert
     local _concat = table.concat
     local _find = string.find   -- safe as non-utf8 because it is only used on control sequences
+    local _max = math.max
+    local _min = math.min
+    local _floor = math.floor
     local _rt_palette = rt.Palette
     local _rt_color_unpack = rt.color_unpack
     
     --- @brief [internal]
     function rt.Label:_parse()
         self._glyphs = {}
-        self._render_order = {}
+        self._glyphs_only = meta.make_weak({})
+        self._standard_render = meta.make_weak({})
+        self._outlined_glyphs = meta.make_weak({})
+        self._animation_render = meta.make_weak({})
 
         self._n_glyphs = 0
         self._n_characters = 0
+        self._use_outline = false
+        self._use_animation = false
 
         local glyphs = self._glyphs
         local glyph_indices = self._glyph_indices
@@ -349,7 +394,20 @@ do
             )
 
             _insert(glyphs, to_insert)
-            _insert(self._render_order, to_insert)
+
+            if settings.is_outlined then
+               _insert(self._outlined_glyphs, to_insert)
+                self._use_outline = true
+            end
+
+            if settings.is_effect_wave or settings.is_effect_shake or settings.is_effect_rainbow then
+               _insert(self._animation_render, to_insert)
+                self._use_animation = true
+            else
+               _insert(self._standard_render, to_insert)
+            end
+
+            _insert(self._glyphs_only, to_insert)
 
             self._n_characters = self._n_characters + to_insert.n_visible_characters
             self._n_glyphs = self._n_glyphs + 1
@@ -465,7 +523,7 @@ do
 
                 step(sequence_i - 1)
             else
-                table.insert(current_word, s)
+               _insert(current_word, s)
             end
             step(1)
             ::continue::
@@ -482,6 +540,31 @@ do
         if settings.is_underlined then throw_parse_error("reached end of text, but effect underlined region is still open") end
         if settings.is_strikethrough then throw_parse_error("reached end of text, but effect strikethrough region is still open") end
         if settings.is_outlined then throw_parse_error("reached end of text, but effect outline region is still open") end
+
+        -- estimate size before wrapping
+        local max_width = 0
+        local width = 0
+        local n_rows = 1
+
+        local space_w = self._font:get_bold_italic():getWidth(_syntax.SPACE)
+        local tab_w = self._font:get_bold_italic():getWidth(_syntax.TAB)
+
+        for glyph in values(self._glyphs) do
+            if glyph == _syntax.SPACE then
+                width = width + space_w
+            elseif glyph == _syntax.TAB then
+                width = width + tab_w
+            elseif glyph == _syntax.NEWLINE then
+                max_width = _max(max_width, width)
+                width = 0
+                n_rows = n_rows + 1
+            else
+                width = width + glyph.width
+            end
+        end
+
+        self._width = _max(max_width, width)
+        self._height = n_rows * self._font:get_bold_italic():getHeight()
     end
 
     --- @brief [internal]
@@ -502,14 +585,18 @@ do
         local row_w = 0
         local max_glyph_x = 0
         local newline = function()
-            max_glyph_x = math.max(max_glyph_x, glyph_x)
-            table.insert(row_widths, glyph_x)
+            max_glyph_x = _max(max_glyph_x, glyph_x)
+           _insert(row_widths, glyph_x)
             if is_first_word ~= true then
                 glyph_x = 0
                 glyph_y = glyph_y + line_height
                 row_i = row_i + 1
             end
         end
+
+        local min_x, max_x, min_y, max_y = POSITIVE_INFINITY, NEGATIVE_INFINITY, POSITIVE_INFINITY, NEGATIVE_INFINITY
+        local min_outline_y, max_outline_y = POSITIVE_INFINITY, NEGATIVE_INFINITY
+        local max_outline_row_w = NEGATIVE_INFINITY
 
         for glyph in values(self._glyphs) do
             if glyph == _syntax.SPACE then
@@ -529,26 +616,68 @@ do
                     newline()
                 end
 
-                glyph.x = math.floor(glyph_x)
-                glyph.y = math.floor(glyph_y)
+                glyph.x = _floor(glyph_x)
+                glyph.y = _floor(glyph_y)
                 glyph.row_index = row_i
+
+                if glyph.is_outlined then
+                    min_outline_y = _min(min_outline_y, glyph.y)
+                    max_outline_y = _max(max_outline_y, glyph.y + glyph.height)
+                end
+
+                min_x = _min(min_x, glyph.x)
+                min_y = _min(min_y, glyph.y)
+                max_x = _max(max_x, glyph.x + glyph.width)
+                max_y = _max(max_y, glyph.y + glyph.height)
 
                 glyph_x = glyph_x + glyph.width
             end
 
             is_first_word = false
         end
-        table.insert(row_widths, glyph_x)
+       _insert(row_widths, glyph_x)
 
         -- update justify offsets
-        for glyph in values(self._render_order) do
+        for glyph in values(self._glyphs_only) do
             glyph.justify_center_offset = (max_w - row_widths[glyph.row_index]) / 2
             glyph.justify_right_offset = (max_w - row_widths[glyph.row_index])
         end
 
-        self._width = max_glyph_x
-        self._height = row_i * line_height
+        self._width = max_x - min_x
+        self._height = max_y - min_y
         self._n_rows = row_i
-    end
 
+        self._outline_texture_offset_x = 0
+        self._outline_texture_offset_y = min_outline_y
+        local outline_texture_w = self._width + 2 * self._outline_offset_padding
+        local outline_texture_h = max_outline_y - min_outline_y + 2 * self._outline_offset_padding
+
+        if outline_texture_w < 1 then outline_texture_w = 1 end
+        if outline_texture_h < 1 then outline_texture_h = 1 end
+        dbg(self._raw, outline_texture_w, outline_texture_h)
+
+        if self._use_outline and self._width > 0 and self._height > 0 then
+            self._outline_texture = rt.RenderTexture(outline_texture_w, outline_texture_h)
+            self._outline_shader:send("_texture_resolution", {outline_texture_w, outline_texture_h})
+            self._outline_shader:send("_outline_color", { rt.color_unpack(rt.Palette.BLACK) })
+            self._outline_shader:send("_opacity", self._opacity)
+        end
+    end
 end  -- do-end
+
+--- @brief [internal]
+function rt.Label:_update_outline_texture()
+    if self._use_outline and self._width > 0 and self._height > 0 then
+        love.graphics.push()
+        love.graphics.reset()
+        love.graphics.translate(-self._outline_texture_offset_x + self._outline_offset_padding, -self._outline_texture_offset_y + self._outline_offset_padding)
+        self._outline_texture:bind_as_render_target()
+        love.graphics.setColor(0, 0, 0, 1)
+        --love.graphics.rectangle("fill", 0, 0, rt.graphics.get_width(), rt.graphics.get_height())
+        for glyph in values(self._outlined_glyphs) do
+            self:_glyph_draw(glyph)
+        end
+        self._outline_texture:unbind_as_render_target()
+        love.graphics.pop()
+    end
+end

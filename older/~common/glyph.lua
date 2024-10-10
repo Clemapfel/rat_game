@@ -60,9 +60,9 @@ rt.Glyph = meta.new_type("Glyph", rt.Drawable, rt.Animation, function(font, cont
 
         _is_outlined = is_outlined,
         _outline_color = outline_color,
-        _outline_render_texture = {}, -- rt.RenderTexture
-        _outline_render_offset_x = 0,
-        _outline_render_offset_y = 0,
+        _outlined_glyphs_texture = {}, -- rt.RenderTexture
+        _outlined_glyphs_offset_x = 0,
+        _outlined_glyphs_offset_y = 0,
 
         _underline = {},        -- rt.VertexRectangleSegments
         _strikethrough = {}     -- rt.VertexRectangleSegments
@@ -113,12 +113,12 @@ function rt.Glyph:_update()
             y_offset = y_offset + rt.settings.glyph.shake_offset
         end
 
-        if not meta.isa(self._outline_render_texture, rt.RenderTexture) or self._outline_render_texture:get_width() ~= w or self._outline_render_texture:get_height() ~= h then
-            self._outline_render_texture = rt.RenderTexture(w, h)
+        if not meta.isa(self._outlined_glyphs_texture, rt.RenderTexture) or self._outlined_glyphs_texture:get_width() ~= w or self._outlined_glyphs_texture:get_height() ~= h then
+            self._outlined_glyphs_texture = rt.RenderTexture(w, h)
         end
 
-        self._outline_render_offset_x = x_offset
-        self._outline_render_offset_y = y_offset
+        self._outlined_glyphs_offset_x = x_offset
+        self._outlined_glyphs_offset_y = y_offset
     end
 
     if self._is_underlined or self._is_strikethrough then
@@ -227,22 +227,22 @@ function rt.Glyph:draw(opacity)
 
     if self._is_outlined then
         -- paste glyph to render texture
-        self._outline_render_texture:bind_as_render_target()
+        self._outlined_glyphs_texture:bind_as_render_target()
         love.graphics.clear(0, 0, 0, 0)
         love.graphics.setColor(1, 1, 1, opacity)
         love.graphics.push()
         love.graphics.origin()
-        draw_glyph(self._outline_render_offset_x, self._outline_render_offset_y)
+        draw_glyph(self._outlined_glyphs_offset_x, self._outlined_glyphs_offset_y)
         love.graphics.pop()
-        self._outline_render_texture:unbind_as_render_target()
+        self._outlined_glyphs_texture:unbind_as_render_target()
 
         -- render product using outline shader
         self._outline_shader:bind()
         love.graphics.setColor(1, 1, 1, opacity)
-        self._outline_shader:send("_texture_resolution", {self._outline_render_texture:get_size()})
+        self._outline_shader:send("_texture_resolution", {self._outlined_glyphs_texture:get_size()})
         self._outline_shader:send("_opacity", opacity)
         self._outline_shader:send("_outline_color", {self._outline_color.r, self._outline_color.g, self._outline_color.b, self._outline_color.a})
-        love.graphics.draw(self._outline_render_texture._native, x - self._outline_render_offset_x, y - self._outline_render_offset_y)
+        love.graphics.draw(self._outlined_glyphs_texture._native, x - self._outlined_glyphs_offset_x, y - self._outlined_glyphs_offset_y)
         self._outline_shader:unbind()
     end
 
