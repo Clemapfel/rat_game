@@ -618,7 +618,6 @@ end
 --- @brief access raw text
 --- @return String
 function rt.Label:get_text()
-
     return self._raw;
 end
 

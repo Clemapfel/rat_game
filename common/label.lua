@@ -35,9 +35,12 @@ rt.Label = meta.new_type("Label", rt.Widget, rt.Animation, function(text, font, 
         _justify_mode = rt.JustifyMode.LEFT,
         
         _n_visible_characters = -1,
+        _elapsed = 0,
 
         _glyphs = {},
         _n_glyphs = 0,
+        _n_characters = 0,
+        _n_lines = 0,
         _glyphs_only = meta.make_weak({}),
         _non_outlined_glyphs = meta.make_weak({}),
         _outlined_glyphs = meta.make_weak({}),
@@ -79,15 +82,15 @@ function rt.Label:_glyph_new(
     is_effect_rainbow
 )
     local out = {
-        text = text, -- TODO
+        text = text, -- necessary for beat weights
         glyph = love.graphics.newTextBatch(font[style], text),
         is_underlined = is_underlined,
         is_strikethrough = is_strikethrough,
         is_outlined = is_outlined,
         outline_color = {outline_r, outline_g, outline_b, 1},
-        shake = is_effect_shake,
-        rainbow = is_effect_rainbow,
-        wave = is_effect_wave,
+        is_effect_shake = is_effect_shake,
+        is_effect_rainbow = is_effect_rainbow,
+        is_effect_wave = is_effect_wave,
         color_r = color_r,
         color_g = color_g,
         color_b = color_b,
@@ -122,20 +125,16 @@ function rt.Label:draw()
         justify_offset = self._outline_texture_justify_right_offset
     end
 
+    love.graphics.setBlendMode("alpha", "premultiplied")
+    -- canvas needs to be drawn premultiplied to avoid artifacting
+
     if self._use_outline then
         self._outline_texture:draw(justify_offset + self._outline_texture_offset_x, self._outline_texture_offset_y)
     end
 
     self._swap_texture:draw(justify_offset + self._outline_texture_offset_x, self._outline_texture_offset_y)
 
-
-    local padding = rt.settings.label.outline_offset_padding
-    for glyph in values(self._non_outlined_glyphs) do
-        self.render_shader:send("_n_visible_characters", glyph.n_visible_characters)
-        love.graphics.setColor(glyph.color_r, glyph.color_g, glyph.color_b)
-        love.graphics.draw(glyph.glyph, glyph.x + padding, glyph.y)
-    end
-
+    love.graphics.setBlendMode("alpha")
     love.graphics.translate(-self._bounds.x, -self._bounds.y)
 end
 
@@ -151,6 +150,7 @@ end
 function rt.Label:size_allocate(x, y, width, height)
     self:_apply_wrapping(width)
     self:_update_textures()
+    self:_update_n_visible_characters()
 end
 
 --- @override
@@ -161,6 +161,11 @@ end
 
 --- @override
 function rt.Label:update(delta)
+    self._elapsed = self._elapsed + delta
+
+    if self._use_animation then
+        self:_update_textures()
+    end
 end
 
 --- @brief
@@ -170,36 +175,43 @@ end
 
 --- @brief
 function rt.Label:set_text(text)
+    self._raw = text
+
+    if self._is_realized then
+        self:_parse()
+        self:reformat()
+    end
 end
 
 --- @brief
 function rt.Label:set_n_visible_characters(n)
+    self._n_visible_characters = n
+    self:_update_n_visible_characters()
 end
 
 --- @brief
 function rt.Label:get_n_visible_characters()
-end
-
---- @brief
-function rt.Label:update_n_visible_characters_from_elapsed(elapsed, letters_per_second)
+    return self._n_visible_characters
 end
 
 --- @brief
 function rt.Label:get_n_characters()
+    return self._n_characters
 end
 
 --- @brief
 function rt.Label:get_n_lines()
+    return self._n_lines
 end
 
 --- @brief
 function rt.Label:set_opacity(alpha)
     self._opacity = alpha
-    self.outline_shader:send("_opacity", self._opacity)
 end
 
 --- @brief
 function rt.Label:get_line_height()
+    return self._font:get_bold_italic():getHeight()
 end
 
 do
@@ -404,6 +416,10 @@ do
                 _insert(self._non_outlined_glyphs, to_insert)
             end
 
+            if settings.is_effect_shake or settings.is_effect_wave or settings.is_effect_rainbow then
+                self._use_animation = true
+            end
+
             _insert(self._glyphs_only, to_insert)
 
             self._n_characters = self._n_characters + to_insert.n_visible_characters
@@ -552,6 +568,8 @@ do
                 max_width = _max(max_width, width)
                 width = 0
                 n_rows = n_rows + 1
+            elseif glyph == _syntax.BEAT then
+                -- noop
             else
                 width = width + glyph.width
             end
@@ -611,6 +629,8 @@ do
                 if glyph_x > max_w then newline() end
             elseif glyph == _syntax.NEWLINE then
                 newline()
+            elseif glyph == _syntax.BEAT then
+                -- noop
             else
                 if glyph_x + glyph.width >= max_w then
                     newline()
@@ -647,10 +667,9 @@ do
             glyph.justify_right_offset = (max_w - row_widths[glyph.row_index])
         end
 
-
         self._width = max_x - min_x
         self._height = line_height * row_i --max_y - min_y
-        self._n_rows = row_i
+        self._n_lines = row_i
 
         self._outline_texture_offset_x = 0
         self._outline_texture_offset_y = -_padding
@@ -665,13 +684,12 @@ do
         self._outline_texture_width = outline_texture_w
         self._outline_texture_height = outline_texture_h
         if self._use_outline and self._width > 0 and self._height > 0 then
-            self._outline_texture = rt.RenderTexture(outline_texture_w, outline_texture_h, 2)
-            self._swap_texture = rt.RenderTexture(outline_texture_w, outline_texture_h, 2)
-            self.outline_shader:send("_texture_resolution", {outline_texture_w, outline_texture_h})
-            self.outline_shader:send("_outline_color", { rt.color_unpack(rt.Palette.BLACK) })
-            self.outline_shader:send("_opacity", self._opacity)
+            self._outline_texture = rt.RenderTexture(outline_texture_w, outline_texture_h, 16)
+            self.outline_shader:send("texture_resolution", {outline_texture_w, outline_texture_h})
+            self.outline_shader:send("outline_color", { rt.color_unpack(rt.Palette.BLACK) })
         end
 
+        self._swap_texture = rt.RenderTexture(outline_texture_w, outline_texture_h, 16)
         self:_update_n_visible_characters()
     end
 
@@ -695,11 +713,15 @@ do
 
         if self._use_outline then
             self._swap_texture:bind_as_render_target()
-
+            love.graphics.clear(true, false, false)
             self.render_shader:bind()
             for glyph in values(self._outlined_glyphs) do
-                self.render_shader:send("_n_visible_characters", glyph.n_visible_characters)
-                love.graphics.setColor(glyph.color_r, glyph.color_g, glyph.color_b)
+                self.render_shader:send("n_visible_characters", glyph.n_visible_characters)
+                self.render_shader:send("is_effect_rainbow", glyph.is_effect_rainbow)
+                self.render_shader:send("is_effect_wave", glyph.is_effect_wave)
+                self.render_shader:send("is_effect_shake", glyph.is_effect_shake)
+                self.render_shader:send("elapsed", self._elapsed)
+                love.graphics.setColor(glyph.color_r, glyph.color_g, glyph.color_b, 1)
                 love.graphics.draw(glyph.glyph, glyph.x + _padding, glyph.y + _padding)
             end
             self.render_shader:unbind()
@@ -707,27 +729,79 @@ do
             self._swap_texture:unbind_as_render_target()
 
             self._outline_texture:bind_as_render_target()
+            love.graphics.clear(true, false, false)
             self.outline_shader:bind()
-            self.outline_shader:send("_texture_resolution", {self._outline_texture_width, self._outline_texture_height})
+            self.outline_shader:send("texture_resolution", {self._outline_texture_width, self._outline_texture_height})
             self._swap_texture:draw(0, 0)
             self.outline_shader:unbind()
             self._outline_texture:unbind_as_render_target()
         end
 
-        --[[
         self._swap_texture:bind_as_render_target()
         love.graphics.clear(true, false, false)
         self.render_shader:bind()
         for glyph in values(self._non_outlined_glyphs) do
-            self.render_shader:send("_n_visible_characters", glyph.n_visible_characters)
-            love.graphics.setColor(glyph.color_r, glyph.color_g, glyph.color_b)
-            love.graphics.draw(glyph.glyph, glyph.x + _padding, glyph.y + _padding)
+            self.render_shader:send("n_visible_characters", glyph.n_visible_characters)
+            self.render_shader:send("is_effect_rainbow", glyph.is_effect_rainbow)
+            self.render_shader:send("is_effect_wave", glyph.is_effect_wave)
+            self.render_shader:send("is_effect_shake", glyph.is_effect_shake)
+            self.render_shader:send("elapsed", self._elapsed)
+            love.graphics.setColor(glyph.color_r, glyph.color_g, glyph.color_b, 1)
+            love.graphics.draw(glyph.glyph, glyph.x, glyph.y + _padding)
         end
         self.render_shader:unbind()
         self._swap_texture:unbind_as_render_target()
-        ]]--
 
         love.graphics.pop()
+    end
+
+    --- @brief
+    function rt.Label:update_n_visible_characters_from_elapsed(elapsed, letters_per_second)
+        local step = 1 / letters_per_second
+        local n_letters = math.floor(elapsed / step)
+        local so_far = 0
+        local glyph_i = 1
+        local n_visible = 0
+        local beat_weight = _syntax.BEAT_WEIGHTS[_syntax.BEAT]
+        local already_done_scrolling = false
+
+        local weights = _syntax.BEAT_WEIGHTS
+        local beat_character = _syntax.BEAT
+        local max_row = 0
+
+        while glyph_i <= #self._glyphs and so_far < elapsed do
+            local glyph = self._glyphs[glyph_i]
+            if meta.is_table(glyph) then
+                if already_done_scrolling then
+                    glyph:set_n_visible_characters(0)
+                else
+                    local text = glyph.text
+                    local n_seen = 1
+                    for i = 1, #text do
+                        local weight = weights[string.at(text, i)]
+                        if weight == nil then
+                            so_far = so_far + step
+                        else
+                            so_far = so_far + weight * step
+                        end
+
+                        if so_far > elapsed then
+                            already_done_scrolling = false -- mark so all subsequent glyphs can be skipped
+                            break
+                        end
+                        n_visible = n_visible + 1
+                        n_seen = n_seen + 1
+                        max_row = _max(max_row, glyph.row_index)
+                    end
+                    glyph.n_visible_characters = n_seen
+                end
+            elseif glyph == weights then
+                so_far = so_far + beat_weight * step
+            end
+            glyph_i = glyph_i + 1
+        end
+
+        return n_visible >= self._n_characters, max_row, clamp(elapsed - so_far, 0)
     end
 end  -- do-end
 

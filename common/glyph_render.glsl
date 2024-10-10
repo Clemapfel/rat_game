@@ -32,19 +32,74 @@ vec3 lch_to_rgb(vec3 lch) {
     return vec3(clamp(R, 0.0, 1.0), clamp(G, 0.0, 1.0), clamp(B, 0.0, 1.0));
 }
 
+vec2 hash(vec2 p) {
+    p = vec2(dot(p, vec2(127.1, 311.7)),
+    dot(p, vec2(269.5, 183.3)));
+    return -1.0 + 2.0 * fract(sin(p) * 43758.5453123);
+}
+
+float noise(vec2 p) {
+    const float K1 = 0.366025404; // (sqrt(3)-1)/2
+    const float K2 = 0.211324865; // (3-sqrt(3))/6
+
+    vec2 i = floor(p + (p.x + p.y) * K1);
+    vec2 a = p - i + (i.x + i.y) * K2;
+    vec2 o = step(a.yx, a.xy);
+    vec2 b = a - o + K2;
+    vec2 c = a - 1.0 + 2.0 * K2;
+
+    vec3 h = max(0.5 - vec3(dot(a, a), dot(b, b), dot(c, c)), 0.0);
+    vec3 n = h * h * h * h * vec3(dot(a, hash(i + 0.0)),
+    dot(b, hash(i + o)),
+    dot(c, hash(i + 1.0)));
+
+    return dot(n, vec3(70.0));
+}
 
 // ###############################
 
-uniform int _n_visible_characters;
-uniform float _time;
+#define PI 3.14159265359
+
+const float rainbow_width = 150;
+
+uniform float shake_offset = 1;
+const float shake_speed = 10; // steps per second
+
+const float wave_period = 10;
+const float wave_offset = 5;
+const float wave_speed = 4;
+
+uniform int n_visible_characters;
+uniform bool is_effect_rainbow;
+uniform bool is_effect_wave;
+uniform bool is_effect_shake;
+uniform float elapsed;
 
 #ifdef VERTEX
 
-flat varying int _letter_index;
+flat varying int letter_index;
 
 vec4 position(mat4 transform, vec4 vertex_position)
 {
-    _letter_index = gl_VertexID / 4;
+    letter_index = gl_VertexID / 4;
+
+    vec2 position = vertex_position.xy;
+    float time = elapsed;
+
+    if (is_effect_shake)
+    {
+        float i_offset = round(time * shake_speed);
+        position.x += noise(position * vec2(i_offset)) * shake_offset;
+        position.y += noise(position * vec2(i_offset + 1234.5678)) * shake_offset;
+    }
+
+    if (is_effect_wave)
+    {
+        float x = ((time * wave_speed) + letter_index);
+        position.y += sin((x * 2 * PI) / wave_period) * wave_offset;
+    }
+
+    vertex_position.xy = position;
     return transform * vertex_position;
 }
 
@@ -52,14 +107,20 @@ vec4 position(mat4 transform, vec4 vertex_position)
 
 #ifdef PIXEL
 
-flat varying int _letter_index;
+flat varying int letter_index;
 
 vec4 effect(vec4 vertex_color, Image image, vec2 texture_coords, vec2 vertex_position)
 {
-    if (_letter_index >= _n_visible_characters)
+    if (letter_index >= n_visible_characters)
         discard;
 
     vec4 color = Texel(image, texture_coords) * vertex_color;
+    if (is_effect_rainbow)  {
+        float time = elapsed * 0.3;
+        vec3 rainbow = lch_to_rgb(vec3(0.75, 1, fract(vertex_position / rainbow_width - time)));
+        color.rgb = color.rgb * rainbow;
+    }
+
     return color;
 }
 
