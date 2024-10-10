@@ -22,8 +22,12 @@
     </configurations>
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="7fa9ba1b-2cff-4ecc-86fb-59ab2fa76ee1" name="Changes" comment="stashing label">
+    <list default="true" id="7fa9ba1b-2cff-4ecc-86fb-59ab2fa76ee1" name="Changes" comment="outline working but too big">
+      <change afterPath="$PROJECT_DIR$/common/~glyph_render.glsl" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/common/game_state.lua" beforeDir="false" afterPath="$PROJECT_DIR$/common/game_state.lua" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/common/glyph_outline.glsl" beforeDir="false" afterPath="$PROJECT_DIR$/common/glyph_outline.glsl" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/common/glyph_render.glsl" beforeDir="false" afterPath="$PROJECT_DIR$/common/glyph_render.glsl" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/common/label.lua" beforeDir="false" afterPath="$PROJECT_DIR$/common/label.lua" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/main.lua" beforeDir="false" afterPath="$PROJECT_DIR$/main.lua" afterDir="false" />
     </list>
@@ -584,15 +588,7 @@
       <workItem from="1728160868435" duration="14796000" />
       <workItem from="1728184556022" duration="443000" />
       <workItem from="1728232792660" duration="7024000" />
-      <workItem from="1728320028333" duration="55169000" />
-    </task>
-    <task id="LOCAL-01075" summary="export working">
-      <option name="closed" value="true" />
-      <created>1726946440069</created>
-      <option name="number" value="01075" />
-      <option name="presentableId" value="LOCAL-01075" />
-      <option name="project" value="LOCAL" />
-      <updated>1726946440069</updated>
+      <workItem from="1728320028333" duration="58669000" />
     </task>
     <task id="LOCAL-01076" summary="migrated to box2d v3.1">
       <option name="closed" value="true" />
@@ -978,7 +974,15 @@
       <option name="project" value="LOCAL" />
       <updated>1728521487204</updated>
     </task>
-    <option name="localTasksCounter" value="1124" />
+    <task id="LOCAL-01124" summary="outline working but too big">
+      <option name="closed" value="true" />
+      <created>1728579136525</created>
+      <option name="number" value="01124" />
+      <option name="presentableId" value="LOCAL-01124" />
+      <option name="project" value="LOCAL" />
+      <updated>1728579136525</updated>
+    </task>
+    <option name="localTasksCounter" value="1125" />
     <servers />
   </component>
   <component name="TypeScriptGeneratedFilesManager">
@@ -1027,7 +1031,6 @@
     </option>
   </component>
   <component name="VcsManagerConfiguration">
-    <MESSAGE value="stashing profiler" />
     <MESSAGE value="refactored profiler" />
     <MESSAGE value="added party sprite" />
     <MESSAGE value="stashing midi example" />
@@ -1052,7 +1055,8 @@
     <MESSAGE value="parsing working" />
     <MESSAGE value="wrapping working" />
     <MESSAGE value="stashing label" />
-    <option name="LAST_COMMIT_MESSAGE" value="stashing label" />
+    <MESSAGE value="outline working but too big" />
+    <option name="LAST_COMMIT_MESSAGE" value="outline working but too big" />
   </component>
   <component name="XDebuggerManager">
     <breakpoint-manager>

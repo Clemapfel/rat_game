@@ -33,11 +33,11 @@ rt.Label = meta.new_type("Label", rt.Widget, rt.Animation, function(text, font, 
         _font = font,
         _monospace_font = monospace_font,
         _justify_mode = rt.JustifyMode.LEFT,
-
-        _outline_shader = rt.Shader("common/glyph_outline.glsl"),
-        _render_shader = rt.Shader("common/glyph_render.glsl"),
+        
+        _n_visible_characters = 3,
 
         _glyphs = {},
+        _n_glyphs = 0,
         _glyphs_only = meta.make_weak({}),
         _standard_render = meta.make_weak({}),
         _outlined_glyphs = meta.make_weak({}),
@@ -55,7 +55,10 @@ rt.Label = meta.new_type("Label", rt.Widget, rt.Animation, function(text, font, 
         _width = 0,
         _height = 0
     })
-end)
+end, {
+    outline_shader = rt.Shader("common/glyph_outline.glsl"),
+    render_shader = rt.Shader("common/glyph_render.glsl"),
+})
 
 --- @brief
 function rt.Label:_glyph_new(
@@ -79,6 +82,8 @@ function rt.Label:_glyph_new(
         rainbow = is_effect_rainbow,
         wave = is_effect_wave,
         n_visible_characters = utf8.len(text),
+        n_characters = utf8.len(text),
+        justify_left_offset = 0,
         justify_center_offset = 0,
         justify_right_offset = 0,
         row_index = 1,
@@ -94,18 +99,6 @@ function rt.Label:_glyph_new(
     return out
 end
 
---- @brief
-function rt.Label:_glyph_draw(glyph)
-    local x_offset = 0
-    if self._justify_mode == rt.JustifyMode.CENTER then
-        x_offset = glyph.justify_center_offset
-    elseif self._justify_mode == rt.JustifyMode.RIGHT then
-        x_offset = glyph.justify_right_offset
-    end
-
-    love.graphics.draw(glyph.glyph, glyph.x + x_offset, glyph.y)
-end
-
 --- @override
 function rt.Label:draw()
     local render_order = self._glyphs_only
@@ -113,9 +106,8 @@ function rt.Label:draw()
     love.graphics.setColor(1, 1, 1, 1)
     love.graphics.translate(self._bounds.x, self._bounds.y)
 
-    -- draw outlines
     if self._use_outline then
-        self._outline_shader:bind()
+        self.outline_shader:bind()
         love.graphics.setColor(1, 1, 1, 1)
 
         local justify_offset = 0
@@ -125,27 +117,32 @@ function rt.Label:draw()
             justify_offset = self._outline_texture_justify_right_offset
         end
 
-        self._outline_texture:draw(self._outline_texture_offset_x + justify_offset, self._outline_texture_offset_y)
-        self._outline_shader:unbind()
-    end
-
-    if self._justify_mode == rt.JustifyMode.LEFT then
-        for glyph in values(self._standard_render) do
-            love.graphics.draw(glyph.glyph, glyph.x, glyph.y)
-        end
+        self._outline_texture:draw(justify_offset + self._outline_texture_offset_x, self._outline_texture_offset_y)
+        self.outline_shader:unbind()
     else
-        local justify_key = "justify_center_offset"
-        if self._justify_mode == rt.JustifyMode.RIGHT then
+        local justify_key = "justify_left_offset"
+        if self._justify_mode == rt.JustifyMode.CENTER then
+            justify_key = "justify_center_offset"
+        elseif self._justify_mode == rt.JustifyMode.RIGHT then
             justify_key = "justify_right_offset"
         end
 
-        for glyph in values(self._standard_render) do
-            local x_offset = glyph[justify_key]
-            love.graphics.draw(glyph.glyph, glyph.x + x_offset, glyph.y)
+        if self._n_visible_characters < self._n_characters then
+            self.render_shader:bind()
+            self.render_shader:send("_n_visible_characters", self._n_visible_characters)
+            for glyph in values(self._standard_render) do
+                local x_offset = glyph[justify_key]
+                love.graphics.draw(glyph.glyph, glyph.x + x_offset, glyph.y)
+            end
+            self.render_shader:unbind()
+        else
+            for glyph in values(self._standard_render) do
+                local x_offset = glyph[justify_key]
+                love.graphics.draw(glyph.glyph, glyph.x + x_offset, glyph.y)
+            end
         end
     end
-    -- draw regular glyphs
-    love.graphics.setColor(1, 1, 1, self._opacity)
+
     love.graphics.pop()
 end
 
@@ -205,7 +202,7 @@ end
 --- @brief
 function rt.Label:set_opacity(alpha)
     self._opacity = alpha
-    self._outline_shader:send("_opacity", self._opacity)
+    self.outline_shader:send("_opacity", self._opacity)
 end
 
 --- @brief
@@ -253,8 +250,8 @@ do
         COLOR_TAG_START = _make_set("<col=(.*)>", "<color=(.*)>"),
         COLOR_TAG_END = _make_set("</col>", "</color>"),
 
-        OUTLINE_COLOR_TAG_START = _make_set("<ocol=(.*)>", "<outline_color=(.*)>"),
-        OUTLINE_COLOR_TAG_END = _make_set("</ocol>", "</outline_color>"),
+        -- OUTLINE_COLOR_TAG_START = _make_set("<ocol=(.*)>", "<outline_color=(.*)>"),
+        -- OUTLINE_COLOR_TAG_END = _make_set("</ocol>", "</outline_color>"),
 
         OUTLINE_TAG_START = _make_set("<o>", "<outline>"),
         OUTLINE_TAG_END = _make_set("</o>", "</outline>"),
@@ -657,25 +654,26 @@ do
         end
 
         self._width = max_x - min_x
-        self._height = max_y - min_y
+        self._height = line_height * row_i --max_y - min_y
         self._n_rows = row_i
 
-        self._outline_texture_offset_x = -_padding
-        self._outline_texture_offset_y = min_outline_y - _padding
-        local outline_texture_w = max_w + 2 * _padding
-        local outline_texture_h = max_outline_y - min_outline_y + 2 * _padding
+        max_w = _max(max_w, self._width)
+        self._outline_texture_offset_x = 0
+        self._outline_texture_offset_y = -_padding
+        local outline_texture_w = self._width + 2 * _padding
+        local outline_texture_h = self._height + 2 * _padding
 
         if outline_texture_w < 1 then outline_texture_w = 1 end
         if outline_texture_h < 1 then outline_texture_h = 1 end
 
-        self._outline_texture_justify_center_offset = 0
-        self._outline_texture_justify_right_offset = 0
+        self._outline_texture_justify_center_offset = _floor((max_w - outline_texture_w) * 0.5)
+        self._outline_texture_justify_right_offset = (max_w - outline_texture_w)
 
         if self._use_outline and self._width > 0 and self._height > 0 then
-            self._outline_texture = rt.RenderTexture(outline_texture_w, outline_texture_h)
-            self._outline_shader:send("_texture_resolution", {outline_texture_w, outline_texture_h})
-            self._outline_shader:send("_outline_color", { rt.color_unpack(rt.Palette.BLACK) })
-            self._outline_shader:send("_opacity", self._opacity)
+            self._outline_texture = rt.RenderTexture(outline_texture_w, outline_texture_h, 2)
+            self.outline_shader:send("_texture_resolution", {outline_texture_w, outline_texture_h})
+            self.outline_shader:send("_outline_color", { rt.color_unpack(rt.Palette.BLACK) })
+            self.outline_shader:send("_opacity", self._opacity)
         end
     end
 
@@ -684,12 +682,26 @@ do
         if self._use_outline and self._width > 0 and self._height > 0 then
             love.graphics.push()
             love.graphics.reset()
-            love.graphics.translate(-self._outline_texture_offset_x, -self._outline_texture_offset_y)
             self._outline_texture:bind_as_render_target()
-            love.graphics.setColor(0, 0, 0, 1)
-            love.graphics.rectangle("fill", 0, 0, rt.graphics.get_width(), rt.graphics.get_height())
-            for glyph in values(self._outlined_glyphs) do
-                self:_glyph_draw(glyph)
+            love.graphics.translate(_padding, _padding)
+
+            if self._n_visible_characters < self._n_characters then
+                local n_characters_drawn = 0
+                local glyph_i = 1
+
+                self.render_shader:bind()
+                while n_characters_drawn < self._n_visible_characters and glyph_i < self._n_glyphs do
+                    self.render_shader:send("_n_visible_characters", self._n_visible_characters - n_characters_drawn)
+                    local glyph = self._glyphs[glyph_i]
+                    love.graphics.draw(glyph.glyph, glyph.x, glyph.y)
+                    n_characters_drawn = n_characters_drawn + glyph.n_characters
+                    glyph_i = glyph_i + 1
+                end
+                self.render_shader:unbind()
+            else
+                for glyph in values(self._outlined_glyphs) do
+                    love.graphics.draw(glyph.glyph, glyph.x, glyph.y)
+                end
             end
             self._outline_texture:unbind_as_render_target()
             love.graphics.pop()
