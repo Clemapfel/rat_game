@@ -72,7 +72,8 @@ rt.GameState = meta.new_type("GameState", function()
         _render_texture = rt.RenderTexture(1, 1),
         _render_shader = rt.Shader("common/game_state_render_shader.glsl"),
         _use_render_texture = true,
-        _use_coroutines = false, -- use loading screens and background loading
+        _use_coroutines = false,    -- use loading screens and background loading
+        _use_scene_caching = false, -- deallocate a scene
 
         _loading_screen = rt.LoadingScreen.DEFAULT(),
         _loading_screen_active = true,
@@ -413,16 +414,28 @@ function rt.GameState:_resize(new_width, new_height)
         self:_loading_screen_show(function()
             table.insert(self._active_coroutines, rt.Coroutine(function()
                 rt.savepoint_maybe()
-                for scene in values(self._scenes) do
-                    scene:fit_into(0, 0, self._state.resolution_x, self._state.resolution_y)
-                    rt.savepoint_maybe()
+                if self._use_scene_caching then
+                    for scene in values(self._scenes) do
+                        scene:fit_into(0, 0, self._state.resolution_x, self._state.resolution_y)
+                        rt.savepoint_maybe()
+                    end
+                else
+                    if self._current_scene ~= nil then
+                        self._current_scene:fit_into(0, 0, self._state.resolution_x, self._state.resolution_y)
+                    end
                 end
                 self:_loading_screen_hide()
             end))
         end)
     else
-        for scene in values(self._scenes) do
-            scene:fit_into(0, 0, self._state.resolution_x, self._state.resolution_y)
+        if self._use_scene_caching then
+            for scene in values(self._scenes) do
+                scene:fit_into(0, 0, self._state.resolution_x, self._state.resolution_y)
+            end
+        else
+            if self._current_scene ~= nil then
+                self._current_scene:fit_into(0, 0, self._state.resolution_x, self._state.resolution_y)
+            end
         end
     end
 end
@@ -511,10 +524,16 @@ function rt.GameState:set_current_scene(scene_type)
         table.insert(self._active_coroutines, rt.Coroutine(function()
             rt.savepoint_maybe()
 
-            local scene = self._scenes[scene_type]
-            if scene == nil then
+            local scene
+
+            if self._use_scene_caching then
+                scene = self._scenes[scene_type]
+                if scene == nil then
+                    scene = scene_type(self)
+                    self._scenes[scene_type] = scene
+                end
+            else
                 scene = scene_type(self)
-                self._scenes[scene_type] = scene
             end
 
             local use_loading_screen = true --scene:get_is_realized() == false
@@ -549,10 +568,15 @@ function rt.GameState:set_current_scene(scene_type)
             self._current_scene = scene -- failsafe if signal "shown" is skipped, because loading screen was too short
         end))
     else
-        local scene = self._scenes[scene_type]
-        if scene == nil then
+        local scene
+        if self._use_scene_caching then
+            scene = self._scenes[scene_type]
+            if scene == nil then
+                scene = scene_type(self)
+                self._scenes[scene_type] = scene
+            end
+        else
             scene = scene_type(self)
-            self._scenes[scene_type] = scene
         end
 
         if self._current_scene ~= nil then

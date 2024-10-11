@@ -11,7 +11,6 @@ state = rt.GameState()
 state:set_loading_screen(rt.LoadingScreen.DEFAULT)
 state:initialize_debug_state()
 
-
 world = b2.World
 
 local background = rt.Background()

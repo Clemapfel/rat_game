@@ -10,10 +10,6 @@ rt.ControlIndicator = meta.new_type("ControlIndicator", rt.Widget, function(layo
         _final_width = 1,
         _final_height = 1,
 
-        _snapshot = rt.RenderTexture(1, 1),
-        _snapshot_offset_x = 0,
-        _snapshot_offset_y = 0,
-
         _input_controller = rt.InputController()
     })
 end)
@@ -90,10 +86,6 @@ function rt.ControlIndicator:realize()
     self._frame:realize()
     self:create_from(self._layout)
 
-    self._input_controller:signal_connect("input_method_changed", function(_, new)
-        self:_update_snapshot()
-    end)
-
     self._input_controller:signal_connect("input_mapping_changed", function(_)
         self:create_from(self._layout)
     end)
@@ -164,18 +156,16 @@ function rt.ControlIndicator:size_allocate(x, y, width, height)
     self._final_height = height
     self._final_width = current_x - x
     self._frame:fit_into(0, 0, self._final_width, self._final_height)
-    self:_update_snapshot()
 end
 
---- @brief
-function rt.ControlIndicator:_update_snapshot()
-    local use_keyboard = self._input_controller:get_input_method() == rt.InputMethod.KEYBOARD
-    local offset = 2
-    self._snapshot_offset_x, self._snapshot_offset_y = offset, offset
-    self._snapshot = rt.RenderTexture(self._final_width + 2 * offset, self._final_height + 2 * offset)
-    self._snapshot:bind_as_render_target()
-    rt.graphics.translate(offset, offset)
+--- @override
+function rt.ControlIndicator:draw()
+    if #self._layout == 0 then return end
 
+    local x_offset, y_offset = self._bounds.x, self._bounds.y
+    rt.graphics.translate(x_offset, y_offset)
+
+    local use_keyboard = self._input_controller:get_input_method() == rt.InputMethod.KEYBOARD
     self._frame:draw()
     for i = 1, #self._labels do
         local keyboard_indicator, gamepad_indicator, label = self._keyboard_indicators[i], self._gamepad_indicators[i], self._labels[i]
@@ -187,17 +177,6 @@ function rt.ControlIndicator:_update_snapshot()
 
         label:draw()
     end
-    rt.graphics.translate(-offset, -offset)
-    self._snapshot:unbind_as_render_target()
-end
-
---- @override
-function rt.ControlIndicator:draw()
-    if #self._layout == 0 then return end
-
-    local x_offset, y_offset = self._bounds.x - self._snapshot_offset_x, self._bounds.y - self._snapshot_offset_y
-    rt.graphics.translate(x_offset, y_offset)
-    self._snapshot:draw()
     rt.graphics.translate(-x_offset, -y_offset)
 end
 
@@ -222,6 +201,5 @@ function rt.ControlIndicator:set_selection_state(state)
     local current = self._frame:get_selection_state()
     if state ~= current then
         self._frame:set_selection_state(state)
-        self:_update_snapshot()
     end
 end

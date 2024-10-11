@@ -1,4 +1,6 @@
 
+N_CANVASES = 0
+
 --- @class rt.RenderTexture
 --- @param width Number
 --- @param height Number
@@ -14,6 +16,7 @@ rt.RenderTexture = meta.new_type("RenderTexture", rt.Texture, function(width, he
     })
     out:set_scale_mode(rt.TextureScaleMode.NEAREST)
     out:set_wrap_mode(rt.TextureWrapMode.CLAMP)
+
     return out
 end)
 

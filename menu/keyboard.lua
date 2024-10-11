@@ -478,6 +478,7 @@ function rt.Keyboard:size_allocate(x, y, width, height)
     self._y_offset = math.floor((height - final_h) / 2)
 
     local padding = self._snapshot_padding
+    if self._snapshot_texture ~= nil then self._snapshot_texture:free() end
     self._snapshot_texture = rt.RenderTexture(final_w + 2 * padding, final_h + 2 * padding)
     self._snapshot_texture:bind_as_render_target()
     rt.graphics.translate(padding, padding)

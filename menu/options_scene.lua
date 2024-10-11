@@ -533,6 +533,7 @@ end
 --- @brief
 function mn.OptionsScene:_update_snapshot()
     if self._snapshot == nil or self._snapshot:get_width() ~= self._bounds.width or self._snapshot:get_height() ~= self._bounds.height then
+        if self._snapshot ~= nil then self._snapshot:free() end
         self._snapshot = rt.RenderTexture(self._bounds.width, self._bounds.height, self._state:get_msaa_quality())
     end
 

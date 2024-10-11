@@ -51,6 +51,7 @@ rt.Label = meta.new_type("Label", rt.Widget, rt.Animation, function(text, font, 
 
         _outline_texture_offset_x = 0,
         _outline_texture_offset_y = 0,
+        _outline_texture_justify_left_offse = 0,
         _outline_texture_justify_center_offset = 0,
         _outline_texture_justify_right_offset = 0,
         _outline_texture = rt.RenderTexture(1, 1),
@@ -118,7 +119,7 @@ function rt.Label:draw()
     love.graphics.setColor(1, 1, 1, 1)
     love.graphics.translate(self._bounds.x, self._bounds.y)
 
-    local justify_offset = 0
+    local justify_offset = self._outline_texture_justify_left_offset
     if self._justify_mode == rt.JustifyMode.CENTER then
         justify_offset = self._outline_texture_justify_center_offset
     elseif self._justify_mode == rt.JustifyMode.RIGHT then
@@ -673,7 +674,7 @@ do
         self._height = line_height * row_i --max_y - min_y
         self._n_lines = row_i
 
-        self._outline_texture_offset_x = 0
+        self._outline_texture_offset_x = -_padding
         self._outline_texture_offset_y = -_padding
         local outline_texture_w = self._width + 2 * _padding
         local outline_texture_h = self._height + 2 * _padding
@@ -681,16 +682,19 @@ do
         if outline_texture_w < 1 then outline_texture_w = 1 end
         if outline_texture_h < 1 then outline_texture_h = 1 end
 
-        self._outline_texture_justify_center_offset = _floor((max_w - outline_texture_w) * 0.5)
-        self._outline_texture_justify_right_offset = (max_w - outline_texture_w)
+        self._outline_texture_justify_left_offset = 0
+        self._outline_texture_justify_center_offset = _floor((max_w - outline_texture_w) * 0.5) + _padding
+        self._outline_texture_justify_right_offset = (max_w - outline_texture_w) + _padding
         self._outline_texture_width = outline_texture_w
         self._outline_texture_height = outline_texture_h
         if self._use_outline and self._width > 0 and self._height > 0 then
+            self._outline_texture:free()
             self._outline_texture = rt.RenderTexture(outline_texture_w, outline_texture_h, 16)
             self.outline_shader:send("texture_resolution", {outline_texture_w, outline_texture_h})
             self.outline_shader:send("outline_color", { rt.color_unpack(rt.Palette.BLACK) })
         end
 
+        self._swap_texture:free()
         self._swap_texture = rt.RenderTexture(outline_texture_w, outline_texture_h, 16)
         self:_update_n_visible_characters()
     end

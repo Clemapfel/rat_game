@@ -231,6 +231,7 @@ function mn.Slots:size_allocate(x, y, width, height)
     end
     self._pre_realize_items = {}
 
+    if self._snapshot ~= nil then self._snapshot:free() end
     self._snapshot = rt.RenderTexture(width, height, 8)
     self._snapshot_x, self._snapshot_y = x, y
 

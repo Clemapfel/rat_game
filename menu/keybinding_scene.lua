@@ -300,6 +300,11 @@ end
 
 --- @brief
 function mn.KeybindingScene:_update_snapshots()
+
+    for snapshot in values(self._snapshots) do
+        snapshot:free()
+    end
+
     self._snapshots = {
         rt.RenderTexture(self._bounds.width, self._bounds.height, self._state:get_msaa_quality())
     }

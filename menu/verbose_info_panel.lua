@@ -118,6 +118,7 @@ function mn.VerboseInfoPanel:size_allocate(x, y, width, height)
         current_y = current_y + h
 
         if item.update == nil then
+            if item.snapshot ~= nil then item.snapshot:free() end
             item.snapshot = rt.RenderTexture(item.aabb.width, item.aabb.height)
             rt.graphics.translate(-item.aabb.x, -item.aabb.y)
             item.snapshot:bind_as_render_target()

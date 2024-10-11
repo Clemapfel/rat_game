@@ -158,6 +158,9 @@ function mn.EntityInfo:size_allocate(x, y, width, height)
 
     self._snapshot_x = x
     self._snapshot_y = y
+    if self._snapshot ~= nil then
+        self._snapshot:free()
+    end
     self._snapshot = rt.RenderTexture(width, height)
 
     self._snapshot:bind_as_render_target()

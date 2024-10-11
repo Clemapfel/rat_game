@@ -24,11 +24,17 @@
   <component name="ChangeListManager">
     <list default="true" id="7fa9ba1b-2cff-4ecc-86fb-59ab2fa76ee1" name="Changes" comment="labels working">
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/common/control_indicator.lua" beforeDir="false" afterPath="$PROJECT_DIR$/common/control_indicator.lua" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/common/game_state.lua" beforeDir="false" afterPath="$PROJECT_DIR$/common/game_state.lua" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/common/label.lua" beforeDir="false" afterPath="$PROJECT_DIR$/common/label.lua" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/common/render_texture.lua" beforeDir="false" afterPath="$PROJECT_DIR$/common/render_texture.lua" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/main.lua" beforeDir="false" afterPath="$PROJECT_DIR$/main.lua" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/menu/entity_info.lua" beforeDir="false" afterPath="$PROJECT_DIR$/menu/entity_info.lua" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/menu/keybinding_scene.lua" beforeDir="false" afterPath="$PROJECT_DIR$/menu/keybinding_scene.lua" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/menu/keyboard.lua" beforeDir="false" afterPath="$PROJECT_DIR$/menu/keyboard.lua" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/menu/options_scene.lua" beforeDir="false" afterPath="$PROJECT_DIR$/menu/options_scene.lua" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/profiler/profiler.lua" beforeDir="false" afterPath="$PROJECT_DIR$/profiler/profiler.lua" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/menu/slots.lua" beforeDir="false" afterPath="$PROJECT_DIR$/menu/slots.lua" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/menu/verbose_info_panel.lua" beforeDir="false" afterPath="$PROJECT_DIR$/menu/verbose_info_panel.lua" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -79,58 +85,58 @@
     <option name="hideEmptyMiddlePackages" value="true" />
     <option name="showLibraryContents" value="true" />
   </component>
-  <component name="PropertiesComponent"><![CDATA[{
-  "keyToString": {
-    "CMake Application.box2d.executor": "Run",
-    "CMake Application.test.executor": "Run",
-    "Emmy Debugger(NEW).remote_debugger.executor": "Debug",
-    "Emmy Debugger(NEW).remote_debugger_v2.executor": "Debug",
-    "Lua Application.Unnamed.executor": "Run",
-    "Lua Application.keybinding_scene.lua.executor": "Run",
-    "Lua Application.love.executor": "Run",
-    "Lua Application.love11.executor": "Run",
-    "Lua Application.love12.executor": "Run",
-    "Lua Application.main.executor": "Run",
-    "Lua Application.main_box2d.executor": "Run",
-    "Lua Application.main_lichen.executor": "Run",
-    "Lua Application.main_linux.executor": "Run",
-    "Lua Application.main_midi.executor": "Run",
-    "Lua Application.main_overworld_windows.executor": "Run",
-    "Lua Application.main_rope.executor": "Run",
-    "Lua Application.main_rope_windows.executor": "Run",
-    "Lua Application.main_signal.executor": "Run",
-    "Lua Application.main_swirl.executor": "Run",
-    "Lua Application.main_thread.executor": "Run",
-    "Lua Application.main_windows.executor": "Run",
-    "Lua Application.main_windows_battle.executor": "Run",
-    "Lua Application.main_windows_menu.executor": "Run",
-    "Lua Application.meta.lua.executor": "Run",
-    "Lua Application.overworld.executor": "Run",
-    "Lua Application.rope.executor": "Run",
-    "Makefile Target.Makefile.executor": "Run",
-    "RunOnceActivity.OpenProjectViewOnStart": "true",
-    "RunOnceActivity.RadMigrateCodeStyle": "true",
-    "RunOnceActivity.ShowReadmeOnStart": "true",
-    "RunOnceActivity.cidr.known.project.marker": "true",
-    "RunOnceActivity.readMode.enableVisualFormatting": "true",
-    "WebServerToolWindowFactoryState": "false",
-    "cf.advertisement.text.has.clang-format": "true",
-    "cf.first.check.clang-format": "false",
-    "cidr.known.project.marker": "true",
-    "deletionFromPopupRequiresConfirmation": "false",
-    "git-widget-placeholder": "main",
-    "ignore.virus.scanning.warn.message": "true",
-    "last_opened_file_path": "C:/Users/cleme/Workspace/rat_game/backgrounds",
-    "node.js.detected.package.eslint": "true",
-    "node.js.detected.package.tslint": "true",
-    "node.js.selected.package.eslint": "(autodetect)",
-    "node.js.selected.package.tslint": "(autodetect)",
-    "nodejs_package_manager_path": "npm",
-    "run.code.analysis.last.selected.profile": "pProject Default",
-    "settings.editor.selected.configurable": "preferences.keymap",
-    "vue.rearranger.settings.migration": "true"
+  <component name="PropertiesComponent">{
+  &quot;keyToString&quot;: {
+    &quot;CMake Application.box2d.executor&quot;: &quot;Run&quot;,
+    &quot;CMake Application.test.executor&quot;: &quot;Run&quot;,
+    &quot;Emmy Debugger(NEW).remote_debugger.executor&quot;: &quot;Debug&quot;,
+    &quot;Emmy Debugger(NEW).remote_debugger_v2.executor&quot;: &quot;Debug&quot;,
+    &quot;Lua Application.Unnamed.executor&quot;: &quot;Run&quot;,
+    &quot;Lua Application.keybinding_scene.lua.executor&quot;: &quot;Run&quot;,
+    &quot;Lua Application.love.executor&quot;: &quot;Run&quot;,
+    &quot;Lua Application.love11.executor&quot;: &quot;Run&quot;,
+    &quot;Lua Application.love12.executor&quot;: &quot;Run&quot;,
+    &quot;Lua Application.main.executor&quot;: &quot;Run&quot;,
+    &quot;Lua Application.main_box2d.executor&quot;: &quot;Run&quot;,
+    &quot;Lua Application.main_lichen.executor&quot;: &quot;Run&quot;,
+    &quot;Lua Application.main_linux.executor&quot;: &quot;Run&quot;,
+    &quot;Lua Application.main_midi.executor&quot;: &quot;Run&quot;,
+    &quot;Lua Application.main_overworld_windows.executor&quot;: &quot;Run&quot;,
+    &quot;Lua Application.main_rope.executor&quot;: &quot;Run&quot;,
+    &quot;Lua Application.main_rope_windows.executor&quot;: &quot;Run&quot;,
+    &quot;Lua Application.main_signal.executor&quot;: &quot;Run&quot;,
+    &quot;Lua Application.main_swirl.executor&quot;: &quot;Run&quot;,
+    &quot;Lua Application.main_thread.executor&quot;: &quot;Run&quot;,
+    &quot;Lua Application.main_windows.executor&quot;: &quot;Run&quot;,
+    &quot;Lua Application.main_windows_battle.executor&quot;: &quot;Run&quot;,
+    &quot;Lua Application.main_windows_menu.executor&quot;: &quot;Run&quot;,
+    &quot;Lua Application.meta.lua.executor&quot;: &quot;Run&quot;,
+    &quot;Lua Application.overworld.executor&quot;: &quot;Run&quot;,
+    &quot;Lua Application.rope.executor&quot;: &quot;Run&quot;,
+    &quot;Makefile Target.Makefile.executor&quot;: &quot;Run&quot;,
+    &quot;RunOnceActivity.OpenProjectViewOnStart&quot;: &quot;true&quot;,
+    &quot;RunOnceActivity.RadMigrateCodeStyle&quot;: &quot;true&quot;,
+    &quot;RunOnceActivity.ShowReadmeOnStart&quot;: &quot;true&quot;,
+    &quot;RunOnceActivity.cidr.known.project.marker&quot;: &quot;true&quot;,
+    &quot;RunOnceActivity.readMode.enableVisualFormatting&quot;: &quot;true&quot;,
+    &quot;WebServerToolWindowFactoryState&quot;: &quot;false&quot;,
+    &quot;cf.advertisement.text.has.clang-format&quot;: &quot;true&quot;,
+    &quot;cf.first.check.clang-format&quot;: &quot;false&quot;,
+    &quot;cidr.known.project.marker&quot;: &quot;true&quot;,
+    &quot;deletionFromPopupRequiresConfirmation&quot;: &quot;false&quot;,
+    &quot;git-widget-placeholder&quot;: &quot;main&quot;,
+    &quot;ignore.virus.scanning.warn.message&quot;: &quot;true&quot;,
+    &quot;last_opened_file_path&quot;: &quot;C:/Users/cleme/Workspace/rat_game/backgrounds&quot;,
+    &quot;node.js.detected.package.eslint&quot;: &quot;true&quot;,
+    &quot;node.js.detected.package.tslint&quot;: &quot;true&quot;,
+    &quot;node.js.selected.package.eslint&quot;: &quot;(autodetect)&quot;,
+    &quot;node.js.selected.package.tslint&quot;: &quot;(autodetect)&quot;,
+    &quot;nodejs_package_manager_path&quot;: &quot;npm&quot;,
+    &quot;run.code.analysis.last.selected.profile&quot;: &quot;pProject Default&quot;,
+    &quot;settings.editor.selected.configurable&quot;: &quot;preferences.keymap&quot;,
+    &quot;vue.rearranger.settings.migration&quot;: &quot;true&quot;
   }
-}]]></component>
+}</component>
   <component name="ReadonlyStatusHandler">
     <option name="SHOW_DIALOG" value="false" />
   </component>
@@ -588,6 +594,7 @@
       <workItem from="1728184556022" duration="443000" />
       <workItem from="1728232792660" duration="7024000" />
       <workItem from="1728320028333" duration="76347000" />
+      <workItem from="1728659220559" duration="1379000" />
     </task>
     <task id="LOCAL-01081" summary="refactored to minimize luajit callback count">
       <option name="closed" value="true" />
