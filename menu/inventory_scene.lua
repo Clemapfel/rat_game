@@ -1989,7 +1989,7 @@ function mn.InventoryScene:_regenerate_selection_nodes()
 
     shared_template_node:signal_connect(rt.InputButton.Y, function(_)
         if template_list_allow_delete() then
-            local current = scene._shared_template_list:get_select_object()
+            local current = scene._shared_template_list:get_selected_object()
             if current ~= nil then
                 scene._template_confirm_delete_dialog:set_message(scene:_template_confirm_delete_dialog_message(current:get_name()))
                 scene._template_confirm_delete_dialog:present()

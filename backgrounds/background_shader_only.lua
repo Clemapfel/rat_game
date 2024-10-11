@@ -80,3 +80,6 @@ rt.Background.COMPLEX_PLOT = rt.Background.new_shader_only_background("COMPLEX_P
 
 --- @class rt.Background.COMPLEX_TILING
 rt.Background.COMPLEX_TILING = rt.Background.new_shader_only_background("COMPLEX_TILING", "backgrounds/complex_tiling.glsl")
+
+--- @class rt.Background.FIREWORKS
+rt.Background.FIREWORKS = rt.Background.new_shader_only_background("FIREWORKS", "backgrounds/fireworks.glsl")

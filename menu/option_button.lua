@@ -138,7 +138,7 @@ function mn.OptionButton:draw()
 
     local stencil_value = meta.hash(self) % 254 + 1
     rt.graphics.stencil(stencil_value, self._stencil)
-    rt.graphics.set_stencil_test(rt.StencilCompareMode.NOT_EQUAL)
+    rt.graphics.set_stencil_test(rt.StencilCompareMode.EQUAL, stencil_value)
 
     local offset = self._current_offset
     rt.graphics.translate(-offset, 0)

@@ -88,7 +88,7 @@ function rt.Spline._catmull_rom(points, loop, quality)
 
     -- source: https://gist.github.com/HoraceBury/4afb0e68cd807d8ead220a709219db2e
 
-    if meta.is_nil(loop) then loop = false end
+    if loop == nil then loop = false end
     meta.assert_boolean(loop)
     loop = which(loop, false)
     local steprate = clamp(which(quality, rt.settings.spline.steprate), 1)

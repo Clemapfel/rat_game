@@ -71,9 +71,9 @@ rt.GameState = meta.new_type("GameState", function()
         _grabbed_object = nil, -- helper for mn.InventoryScene
         _render_texture = rt.RenderTexture(1, 1),
         _render_shader = rt.Shader("common/game_state_render_shader.glsl"),
-        _use_render_texture = true,
-        _use_coroutines = false,    -- use loading screens and background loading
-        _use_scene_caching = false, -- deallocate a scene
+        _use_render_texture = false,
+        _use_coroutines = true,    -- use loading screens and background loading
+        _use_scene_caching = true, -- deallocate a scene
 
         _loading_screen = rt.LoadingScreen.DEFAULT(),
         _loading_screen_active = true,
@@ -212,13 +212,15 @@ function rt.GameState:_update_window_mode()
     love.window.updateMode(window_res_x, window_res_y, {minwidth = window_res_x, minheight = window_res_y})
     -- window does not shrink unless updateMode is called twice
 
-    self._render_texture = rt.RenderTexture(
-        self._state.resolution_x,
-        self._state.resolution_y,
-        self._state.msaa_quality
-    )
-    self._render_texture:set_scale_mode(rt.TextureScaleMode.LINEAR)
-    self._render_shader:send("gamma", self._state.gamma)
+    if self._use_render_texture then
+        self._render_texture = rt.RenderTexture(
+            self._state.resolution_x,
+            self._state.resolution_y,
+            self._state.msaa_quality
+        )
+        self._render_texture:set_scale_mode(rt.TextureScaleMode.LINEAR)
+        self._render_shader:send("gamma", self._state.gamma)
+    end
 
     rt.settings.contrast = self._state.vfx_contrast_level
     rt.settings.motion_intensity = self._state.vfx_motion_level
@@ -320,7 +322,7 @@ function rt.GameState:_run()
                 local n_texture_switches = tostring(durations.max_n_texture_switches)
                 local gpu_side_memory = tostring(math.round(stats.texturememory / 1024 / 1024 * 10) / 10)
 
-                local label = tostring(fps) .. " fps | " .. durations.format(update_percentage) .. "% | " ..  durations.format(draw_percentage) .. "% | " ..  durations.format(total_percentage) .. "% | " .. n_draws .. " (" .. n_batched_draws .. ")" .. " | " .. gpu_side_memory .. " mb"
+                local label = tostring(fps) .. " fps | " .. durations.format(update_percentage) .. "% | " ..  durations.format(draw_percentage) .. "% | " .. n_draws .. " (" .. n_batched_draws .. ")" .. " | " .. gpu_side_memory .. " mb (" .. stats.textures .. ")"
                 love.graphics.setColor(1, 1, 1, 0.75)
                 local margin = 3
                 local label_w, label_h = love.graphics.getFont():getWidth(label), love.graphics.getFont():getHeight(label)
@@ -422,6 +424,7 @@ function rt.GameState:_resize(new_width, new_height)
                 else
                     if self._current_scene ~= nil then
                         self._current_scene:fit_into(0, 0, self._state.resolution_x, self._state.resolution_y)
+                        rt.savepoint_maybe()
                     end
                 end
                 self:_loading_screen_hide()

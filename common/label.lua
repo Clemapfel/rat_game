@@ -28,7 +28,7 @@ rt.Label = meta.new_type("Label", rt.Widget, rt.Animation, function(text, font, 
     if font == nil then font = rt.settings.font.default end
     if monospace_font == nil then monospace_font = rt.settings.font.default_mono end
 
-    return meta.new(rt.Label, {
+    local out = meta.new(rt.Label, {
         _raw = text,
         _font = font,
         _monospace_font = monospace_font,
@@ -51,7 +51,7 @@ rt.Label = meta.new_type("Label", rt.Widget, rt.Animation, function(text, font, 
 
         _outline_texture_offset_x = 0,
         _outline_texture_offset_y = 0,
-        _outline_texture_justify_left_offse = 0,
+        _outline_texture_justify_left_offset = 0,
         _outline_texture_justify_center_offset = 0,
         _outline_texture_justify_right_offset = 0,
         _outline_texture = rt.RenderTexture(1, 1),
@@ -62,6 +62,7 @@ rt.Label = meta.new_type("Label", rt.Widget, rt.Animation, function(text, font, 
         _width = 0,
         _height = 0
     })
+    return out
 end, {
     outline_shader = rt.Shader("common/glyph_outline.glsl"),
     render_shader = rt.Shader("common/glyph_render.glsl"),
@@ -129,11 +130,13 @@ function rt.Label:draw()
     love.graphics.setBlendMode("alpha", "premultiplied")
     -- canvas needs to be drawn premultiplied to avoid artifacting
 
-    if self._use_outline then
+    if self._use_outline and self._outline_texture ~= nil then
         self._outline_texture:draw(justify_offset + self._outline_texture_offset_x, self._outline_texture_offset_y)
     end
 
-    self._swap_texture:draw(justify_offset + self._outline_texture_offset_x, self._outline_texture_offset_y)
+    if self._swap_texture ~= nil then
+        self._swap_texture:draw(justify_offset + self._outline_texture_offset_x, self._outline_texture_offset_y)
+    end
 
     love.graphics.setBlendMode("alpha")
     love.graphics.translate(-self._bounds.x, -self._bounds.y)
@@ -687,14 +690,20 @@ do
         self._outline_texture_justify_right_offset = (max_w - outline_texture_w) + _padding
         self._outline_texture_width = outline_texture_w
         self._outline_texture_height = outline_texture_h
+
         if self._use_outline and self._width > 0 and self._height > 0 then
-            self._outline_texture:free()
+            if self._outline_texture ~= nil then
+                self._outline_texture:free()
+            end
             self._outline_texture = rt.RenderTexture(outline_texture_w, outline_texture_h, 16)
             self.outline_shader:send("texture_resolution", {outline_texture_w, outline_texture_h})
             self.outline_shader:send("outline_color", { rt.color_unpack(rt.Palette.BLACK) })
         end
 
-        self._swap_texture:free()
+        if self._swap_texture ~= nil then
+            self._swap_texture:free()
+        end
+
         self._swap_texture = rt.RenderTexture(outline_texture_w, outline_texture_h, 16)
         self:_update_n_visible_characters()
     end

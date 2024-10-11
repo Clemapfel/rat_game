@@ -557,7 +557,6 @@ end)
 --- @param weak_keys Boolean
 --- @param weak_values Boolean
 function meta.make_weak(table, weak_keys, weak_values)
-
     if meta.is_nil(weak_keys) then weak_keys = true end
     if meta.is_nil(weak_values) then weak_values = true end
 

@@ -5,6 +5,26 @@ animation:signal_connect("done", function(self)
     dbg("done")
 end)
 
+--[[
+local test = setmetatable({}, {
+    __mode = "kv"
+})
+
+local test_instance = {
+    test_field = nil
+}
+
+for i = 1, 10000 do
+    do
+        local label = rt.Label()
+        test_instance.test_field = label
+        table.insert(test, label)
+    end
+    collectgarbage("collect")
+    dbg(sizeof(test))
+end
+]]--
+
 profiler_active = false
 
 state = rt.GameState()
@@ -14,6 +34,7 @@ state:initialize_debug_state()
 world = b2.World
 
 local background = rt.Background()
+background:set_implementation(rt.Background.FIREWORKS)
 
 local draw_state = true
 input = rt.InputController()
@@ -76,6 +97,8 @@ love.load = function()
 end
 
 love.update = function(delta)
+    background:update(delta)
+
     if profiler_active then
         rt.profiler.push("update")
     end

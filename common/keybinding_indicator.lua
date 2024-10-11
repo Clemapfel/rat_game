@@ -12,7 +12,6 @@ rt.KeybindingIndicator = meta.new_type("KeybindingIndicator", rt.Widget, functio
     return meta.new(rt.KeybindingIndicator, {
         _font = nil, -- rt.Font
         _draw = function() end,
-        _snapshot = rt.RenderTexture(1, 1),
         _final_width = 0,
         _initializer = function(self, width)  end
     })
@@ -33,17 +32,14 @@ function rt.KeybindingIndicator:size_allocate(x, y, width, height)
     if self._final_width == -1 then
         self._final_width = width
     end
-    self._snapshot = rt.RenderTexture(self._final_width, height)
-    self._snapshot:bind_as_render_target()
-    self:_draw()
-    self._snapshot:unbind_as_render_target()
+
 end
 
 --- @override
 function rt.KeybindingIndicator:draw()
-    love.graphics.setColor(1, 1, 1, self._opacity)
-    love.graphics.draw(self._snapshot._native, self._bounds.x, self._bounds.y)
-    love.graphics.setColor(1, 1, 1, 1)
+    love.graphics.translate(self._bounds.x, self._bounds.y)
+    self._draw()
+    love.graphics.translate(-self._bounds.x, -self._bounds.y)
 end
 
 --- @brief

@@ -186,17 +186,22 @@ end
 function mn.TabBar:draw()
     if not self:get_is_allocated() then return end
     local item_i = 1
+
     for item in values(self._items) do
         item.frame:draw()
-
-        local stencil_value = (meta.hash(self) + item_i) % 254 + 1
-        rt.graphics.stencil(stencil_value, item.stencil)
-        rt.graphics.set_stencil_test(rt.StencilCompareMode.EQUAL, stencil_value)
-        item.widget:draw()
-        rt.graphics.set_stencil_test()
-
-        item_i = item_i + 1
     end
+
+    local stencil_value = (meta.hash(self) + item_i) % 254 + 1
+    for item in values(self._items) do
+        rt.graphics.stencil(stencil_value, item.stencil)
+    end
+    rt.graphics.set_stencil_test(rt.StencilCompareMode.EQUAL, stencil_value)
+
+    for item in values(self._items) do
+        item.widget:draw()
+    end
+
+    rt.graphics.set_stencil_test()
 end
 
 --- @brief set how many of the items at the end of the list should be pushed to the other site

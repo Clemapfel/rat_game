@@ -22,19 +22,26 @@
     </configurations>
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="7fa9ba1b-2cff-4ecc-86fb-59ab2fa76ee1" name="Changes" comment="labels working">
+    <list default="true" id="7fa9ba1b-2cff-4ecc-86fb-59ab2fa76ee1" name="Changes" comment="stashing before removing render texture usage">
+      <change afterPath="$PROJECT_DIR$/backgrounds/fireworks.glsl" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/common/control_indicator.lua" beforeDir="false" afterPath="$PROJECT_DIR$/common/control_indicator.lua" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/backgrounds/background_shader_only.lua" beforeDir="false" afterPath="$PROJECT_DIR$/backgrounds/background_shader_only.lua" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/common/game_state.lua" beforeDir="false" afterPath="$PROJECT_DIR$/common/game_state.lua" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/common/keybinding_indicator.lua" beforeDir="false" afterPath="$PROJECT_DIR$/common/keybinding_indicator.lua" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/common/keyboard.lua" beforeDir="false" afterPath="$PROJECT_DIR$/common/keyboard.lua" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/common/label.lua" beforeDir="false" afterPath="$PROJECT_DIR$/common/label.lua" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/common/render_texture.lua" beforeDir="false" afterPath="$PROJECT_DIR$/common/render_texture.lua" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/common/spline.lua" beforeDir="false" afterPath="$PROJECT_DIR$/common/spline.lua" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/main.lua" beforeDir="false" afterPath="$PROJECT_DIR$/main.lua" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/menu/entity_info.lua" beforeDir="false" afterPath="$PROJECT_DIR$/menu/entity_info.lua" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/menu/keybinding_scene.lua" beforeDir="false" afterPath="$PROJECT_DIR$/menu/keybinding_scene.lua" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/menu/keyboard.lua" beforeDir="false" afterPath="$PROJECT_DIR$/menu/keyboard.lua" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/menu/options_scene.lua" beforeDir="false" afterPath="$PROJECT_DIR$/menu/options_scene.lua" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/menu/inventory_scene.lua" beforeDir="false" afterPath="$PROJECT_DIR$/menu/inventory_scene.lua" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/menu/keyboard.lua" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/menu/option_button.lua" beforeDir="false" afterPath="$PROJECT_DIR$/menu/option_button.lua" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/menu/slots.lua" beforeDir="false" afterPath="$PROJECT_DIR$/menu/slots.lua" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/menu/tab_bar.lua" beforeDir="false" afterPath="$PROJECT_DIR$/menu/tab_bar.lua" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/menu/verbose_info_panel.lua" beforeDir="false" afterPath="$PROJECT_DIR$/menu/verbose_info_panel.lua" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/menu/verbose_info_panel_item.lua" beforeDir="false" afterPath="$PROJECT_DIR$/menu/verbose_info_panel_item.lua" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/older/~common/meta.lua" beforeDir="false" afterPath="$PROJECT_DIR$/older/~common/meta.lua" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -594,15 +601,7 @@
       <workItem from="1728184556022" duration="443000" />
       <workItem from="1728232792660" duration="7024000" />
       <workItem from="1728320028333" duration="76347000" />
-      <workItem from="1728659220559" duration="1379000" />
-    </task>
-    <task id="LOCAL-01081" summary="refactored to minimize luajit callback count">
-      <option name="closed" value="true" />
-      <created>1727133136406</created>
-      <option name="number" value="01081" />
-      <option name="presentableId" value="LOCAL-01081" />
-      <option name="project" value="LOCAL" />
-      <updated>1727133136406</updated>
+      <workItem from="1728659220559" duration="8522000" />
     </task>
     <task id="LOCAL-01082" summary="stashing profiler">
       <option name="closed" value="true" />
@@ -988,7 +987,15 @@
       <option name="project" value="LOCAL" />
       <updated>1728595283573</updated>
     </task>
-    <option name="localTasksCounter" value="1130" />
+    <task id="LOCAL-01130" summary="stashing before removing render texture usage">
+      <option name="closed" value="true" />
+      <created>1728660744283</created>
+      <option name="number" value="01130" />
+      <option name="presentableId" value="LOCAL-01130" />
+      <option name="project" value="LOCAL" />
+      <updated>1728660744283</updated>
+    </task>
+    <option name="localTasksCounter" value="1131" />
     <servers />
   </component>
   <component name="TypeScriptGeneratedFilesManager">
@@ -1037,7 +1044,6 @@
     </option>
   </component>
   <component name="VcsManagerConfiguration">
-    <MESSAGE value="added envelope function" />
     <MESSAGE value="stashing old opactiy fade animation not working" />
     <MESSAGE value="stashing priority queue animation" />
     <MESSAGE value="added brusselator" />
@@ -1062,7 +1068,8 @@
     <MESSAGE value="fixed n characters for mixed outlined labels" />
     <MESSAGE value="fixed font issue" />
     <MESSAGE value="labels working" />
-    <option name="LAST_COMMIT_MESSAGE" value="labels working" />
+    <MESSAGE value="stashing before removing render texture usage" />
+    <option name="LAST_COMMIT_MESSAGE" value="stashing before removing render texture usage" />
   </component>
   <component name="XDebuggerManager">
     <breakpoint-manager>

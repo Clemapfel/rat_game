@@ -21,10 +21,6 @@ mn.Slots = meta.new_type("MenuSlots", rt.Widget, function(layout)
         _n_slots = 0,
         _slot_i_to_item = {},
         _pre_realize_items = {},
-
-        _snapshot = rt.RenderTexture(), -- render optimization
-        _snapshot_x = 0,
-        _snapshot_y = 0,
         _item_to_sprite = {},
         _selected_slots = {},
 
@@ -230,13 +226,13 @@ function mn.Slots:size_allocate(x, y, width, height)
         self:set_object(i, self._pre_realize_items[i])
     end
     self._pre_realize_items = {}
+end
 
-    if self._snapshot ~= nil then self._snapshot:free() end
-    self._snapshot = rt.RenderTexture(width, height, 8)
-    self._snapshot_x, self._snapshot_y = x, y
+--- @override
+function mn.Slots:draw()
+    if not self:get_is_allocated() then return end
+    self._frame:draw()
 
-    rt.graphics.translate(-x, -y)
-    self._snapshot:bind_as_render_target()
     for row in values(self._items) do
         for item in values(row) do
             item.base:draw()
@@ -245,15 +241,6 @@ function mn.Slots:size_allocate(x, y, width, height)
             item.frame:draw()
         end
     end
-    self._snapshot:unbind_as_render_target()
-    rt.graphics.translate(x, y)
-end
-
---- @override
-function mn.Slots:draw()
-    if not self:get_is_allocated() then return end
-    self._frame:draw()
-    self._snapshot:draw(self._snapshot_x, self._snapshot_y)
 
     for _, sprite in pairs(self._item_to_sprite) do
         sprite:draw()
