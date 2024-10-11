@@ -175,16 +175,19 @@ end
 
 --- @brief
 function rt.Label:set_text(text)
-    self._raw = text
+    if self._raw == text then return end
 
+    self._raw = text
     if self._is_realized then
         self:_parse()
-        self:reformat()
+        self._n_visible_characters = self._n_characters
+        self:_update_textures()
     end
 end
 
 --- @brief
 function rt.Label:set_n_visible_characters(n)
+    if self._n_visible_characters == n then return end
     self._n_visible_characters = n
     self:_update_n_visible_characters()
 end
@@ -437,7 +440,6 @@ do
         end
         
         local n_characters = utf8.len(self._raw)
-
         while i <= n_characters do
             if s == _syntax.ESCAPE_CHARACTER then
                 step(1)

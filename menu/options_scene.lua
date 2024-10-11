@@ -623,12 +623,16 @@ function mn.OptionsScene:_regenerate_selection_nodes()
         end)
 
         node:signal_connect(rt.InputButton.RIGHT, function(_)
-            item.widget:move_right()
+            if item.widget.move_right ~= nil then
+                item.widget:move_right()
+            end
             self._scale_tick_direction = true
         end)
 
         node:signal_connect(rt.InputButton.LEFT, function(_)
-            item.widget:move_left()
+            if item.widget.move_left ~= nil then
+                item.widget:move_left()
+            end
             self._scale_tick_direction = false
         end)
 

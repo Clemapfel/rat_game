@@ -502,6 +502,11 @@ end
 
 --- @brief
 function rt.GameState:set_current_scene(scene_type)
+    if scene_type == nil then
+        self._current_scene = nil
+        return
+    end
+
     if self._use_coroutines then
         table.insert(self._active_coroutines, rt.Coroutine(function()
             rt.savepoint_maybe()

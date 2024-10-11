@@ -5,9 +5,12 @@ animation:signal_connect("done", function(self)
     dbg("done")
 end)
 
+profiler_active = false
+
 state = rt.GameState()
 state:set_loading_screen(rt.LoadingScreen.DEFAULT)
 state:initialize_debug_state()
+
 
 world = b2.World
 
@@ -24,6 +27,9 @@ input:signal_connect("keyboard_pressed", function(_, which)
         state:set_current_scene(mn.KeybindingScene)
     elseif which == rt.KeyboardKey.FOUR then
         state:set_current_scene(bt.BattleScene)
+    elseif which == rt.KeyboardKey.RETURN then
+        profiler_active = true
+        dbg("activated profiler")
     elseif which == rt.KeyboardKey.ESCAPE then
         println(rt.profiler.report())
     end
@@ -39,16 +45,6 @@ input:signal_connect("pressed", function(_, which)
         rt.Label.render_shader:send("shake_offset", offset)
     end
 end)
-
-label = rt.Label("<shake>I think you can do the Undertale one with just </shake><mono><b>Text:addf</b></mono><shake>, but mine are all </shake><wave><rainbow>SHADERS</rainbow></wave>", rt.settings.font.default_large, rt.settings.font.default_mono_large)
-label:realize()
-label:fit_into(50, 50, 500)
-label:set_n_visible_characters(0)
-label:update(0)
-
-font = rt.settings.font.default[rt.FontStyle.REGULAR]
-font = love.graphics.newFont("assets/fonts/DejaVuSans/DejaVuSans-BoldItalic.ttf", 20)
-test = love.graphics.newTextBatch(font, "TEST ADNALSNUD")
 
 component = rt.SoundComponent()
 component:signal_connect("finished", function(_)
@@ -67,41 +63,48 @@ end)
 love.load = function()
     background:realize()
     state:_load()
-    state:set_current_scene(mn.InventoryScene)
+    for scene in range(
+        mn.InventoryScene,
+        mn.KeybindingScene,
+        mn.OptionsScene,
+        bt.BattleScene
+    ) do
+        state:set_current_scene(scene)
+    end
+    --state:set_current_scene(bt.BattleScene)
+    state:set_current_scene(nil)
     love.resize(love.graphics.getWidth(), love.graphics.getHeight())
 end
 
-elapsed = 0
-label:set_n_visible_characters(0)
 love.update = function(delta)
-    background:update(delta)
-    state:_update(delta)
-    --midi:update(delta)
-
-    if love.keyboard.isDown("space") then
-        label:update(delta)
-        elapsed = elapsed + delta
-        label:update_n_visible_characters_from_elapsed(elapsed, 20)
+    if profiler_active then
+        rt.profiler.push("update")
     end
+
+    state:_update(delta)
+
+    if profiler_active then
+        rt.profiler.pop("update")
+    end
+    --midi:update(delta)
 end
 
 love.draw = function()
-    love.graphics.setColor(0.3, 0.1, 0.3,  1)
-    love.graphics.rectangle("fill", 0, 0, rt.graphics.get_width(), rt.graphics.get_height())
     background:draw()
     if draw_state then
-        rt.profiler.push("draw")
-        --state:_draw()
-        rt.profiler.pop("draw")
-    end
+        if profiler_active then
+            rt.profiler.push("draw")
+        end
 
-    label:draw()
-    --love.graphics.setColor(0, 0, 0, 1)
-    --love.graphics.draw(test, 50, 50)
+        state:_draw()
+
+        if profiler_active then
+            rt.profiler.pop("draw")
+        end
+    end
 end
 
 love.resize = function(new_width, new_height)
-    background:fit_into(0, 0, new_width, new_height)
     state:_resize(new_width, new_height)
 end
 

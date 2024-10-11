@@ -22,15 +22,13 @@
     </configurations>
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="7fa9ba1b-2cff-4ecc-86fb-59ab2fa76ee1" name="Changes" comment="fixed font issue">
+    <list default="true" id="7fa9ba1b-2cff-4ecc-86fb-59ab2fa76ee1" name="Changes" comment="labels working">
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/common/font.lua" beforeDir="false" afterPath="$PROJECT_DIR$/common/font.lua" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/common/glyph_outline.glsl" beforeDir="false" afterPath="$PROJECT_DIR$/common/glyph_outline.glsl" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/common/glyph_render.glsl" beforeDir="false" afterPath="$PROJECT_DIR$/common/glyph_render.glsl" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/common/game_state.lua" beforeDir="false" afterPath="$PROJECT_DIR$/common/game_state.lua" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/common/label.lua" beforeDir="false" afterPath="$PROJECT_DIR$/common/label.lua" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/common/render_texture.lua" beforeDir="false" afterPath="$PROJECT_DIR$/common/render_texture.lua" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/common/~label.lua" beforeDir="false" afterPath="$PROJECT_DIR$/common/~label.lua" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/main.lua" beforeDir="false" afterPath="$PROJECT_DIR$/main.lua" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/menu/options_scene.lua" beforeDir="false" afterPath="$PROJECT_DIR$/menu/options_scene.lua" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/profiler/profiler.lua" beforeDir="false" afterPath="$PROJECT_DIR$/profiler/profiler.lua" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -589,15 +587,7 @@
       <workItem from="1728160868435" duration="14796000" />
       <workItem from="1728184556022" duration="443000" />
       <workItem from="1728232792660" duration="7024000" />
-      <workItem from="1728320028333" duration="71298000" />
-    </task>
-    <task id="LOCAL-01080" summary="added overlap tests">
-      <option name="closed" value="true" />
-      <created>1727126100240</created>
-      <option name="number" value="01080" />
-      <option name="presentableId" value="LOCAL-01080" />
-      <option name="project" value="LOCAL" />
-      <updated>1727126100240</updated>
+      <workItem from="1728320028333" duration="76347000" />
     </task>
     <task id="LOCAL-01081" summary="refactored to minimize luajit callback count">
       <option name="closed" value="true" />
@@ -983,7 +973,15 @@
       <option name="project" value="LOCAL" />
       <updated>1728589420217</updated>
     </task>
-    <option name="localTasksCounter" value="1129" />
+    <task id="LOCAL-01129" summary="labels working">
+      <option name="closed" value="true" />
+      <created>1728595283573</created>
+      <option name="number" value="01129" />
+      <option name="presentableId" value="LOCAL-01129" />
+      <option name="project" value="LOCAL" />
+      <updated>1728595283573</updated>
+    </task>
+    <option name="localTasksCounter" value="1130" />
     <servers />
   </component>
   <component name="TypeScriptGeneratedFilesManager">
@@ -1032,7 +1030,6 @@
     </option>
   </component>
   <component name="VcsManagerConfiguration">
-    <MESSAGE value="fixed physics scaling" />
     <MESSAGE value="added envelope function" />
     <MESSAGE value="stashing old opactiy fade animation not working" />
     <MESSAGE value="stashing priority queue animation" />
@@ -1057,7 +1054,8 @@
     <MESSAGE value="n_visible_characters working" />
     <MESSAGE value="fixed n characters for mixed outlined labels" />
     <MESSAGE value="fixed font issue" />
-    <option name="LAST_COMMIT_MESSAGE" value="fixed font issue" />
+    <MESSAGE value="labels working" />
+    <option name="LAST_COMMIT_MESSAGE" value="labels working" />
   </component>
   <component name="XDebuggerManager">
     <breakpoint-manager>
