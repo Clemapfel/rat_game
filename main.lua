@@ -34,7 +34,7 @@ state:initialize_debug_state()
 world = b2.World
 
 local background = rt.Background()
-background:set_implementation(rt.Background.FIREWORKS)
+background:set_implementation(rt.Background.CONFUSION)
 
 local draw_state = true
 input = rt.InputController()
@@ -51,7 +51,9 @@ input:signal_connect("keyboard_pressed", function(_, which)
         profiler_active = true
         dbg("activated profiler")
     elseif which == rt.KeyboardKey.ESCAPE then
-        println(rt.profiler.report())
+        --println(rt.profiler.report())
+        dbg("recompile")
+        background._implementation._shader:recompile()
     end
 end)
 
@@ -94,8 +96,8 @@ love.load = function()
     ) do
         state:set_current_scene(scene)
     end
-    state:set_current_scene(bt.BattleScene)
     ]]--
+    state:set_current_scene(bt.BattleScene)
     love.resize(love.graphics.getWidth(), love.graphics.getHeight())
 end
 
@@ -115,7 +117,7 @@ love.update = function(delta)
 end
 
 love.draw = function()
-    background:draw()
+    --[[
     if draw_state then
         if profiler_active then
             rt.profiler.push("draw")
@@ -127,9 +129,12 @@ love.draw = function()
             rt.profiler.pop("draw")
         end
     end
+     ]]--
+    background:draw()
 end
 
 love.resize = function(new_width, new_height)
+    background:fit_into(0, 0, new_width, new_height)
     state:_resize(new_width, new_height)
 end
 

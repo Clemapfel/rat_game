@@ -158,6 +158,23 @@ function rt.GameState:list_entities()
 end
 
 --- @brief
+function rt.GameState:list_entities_by_speed()
+    local out = self:list_entities()
+    table.sort(out, function(a, b)
+        if a:get_priority() == b:get_priority() then
+            if a:get_speed() == b:get_speed() then
+                return a:get_name() < b:get_name()
+            else
+                return a:get_speed() > b:get_speed()
+            end
+        else
+            return a:get_priority() > b:get_priority()
+        end
+    end)
+    return out
+end
+
+--- @brief
 function rt.GameState:get_n_entities()
     return self._state.n_allies + self._state.n_enemies
 end

@@ -142,6 +142,7 @@ end
 --- @override
 function bt.HealthBar:draw()
     if self._is_realized == false then return end
+
     local stencil_value = meta.hash(self) % 254 + 1
     self._backdrop:draw()
     rt.graphics.stencil(stencil_value, self._backdrop)

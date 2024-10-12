@@ -15,7 +15,7 @@ rt.TextBox = meta.new_type("TextBox", rt.Widget, function()
         _scroll_down_indicator = rt.DirectionIndicator(rt.Direction.DOWN),
         _advance_indicator = rt.DirectionIndicator(rt.Direction.DOWN),
 
-        _line_height = rt.settings.font.default:get_bold_italic():getHeight(),
+        _line_height = rt.settings.font.default:get_native(rt.FontStyle.BOLD_ITALIC):getHeight(),
         _labels = {},            -- Table<cf. append>
         _n_labels = 0,
         _n_lines = 0,

@@ -3,6 +3,7 @@ rt.settings.menu.inventory_scene = {
     verbose_info_scroll_speed = 150,
     sprite_factor = 2,
     grabbed_object_sprite_offset = -0.1,
+    tile_size = 100
 }
 
 --- @class mn.InventoryScene
@@ -256,7 +257,7 @@ function mn.InventoryScene:size_allocate(x, y, width, height)
         max_info_w = math.max(max_info_w, select(1, page.info:measure()))
     end
 
-    tile_size = math.max(tile_size, 100)
+    tile_size = math.max(tile_size, rt.settings.menu.inventory_scene.tile_size)
     local page_w = math.ceil(math.max(max_move_w, max_info_w) / tile_size) * tile_size
     page_w = page_w + 0.5 * tile_size
 

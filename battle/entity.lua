@@ -41,8 +41,8 @@ end, {
     defense_base = 0,
     speed_base = 0,
 
-    n_move_slots = 25,
-    n_equip_slots = 2,
+    n_move_slots = 16,
+    n_equip_slots = 0,
     n_consumable_slots = 1,
 
     ai_level = bt.AILevel.RANDOM,

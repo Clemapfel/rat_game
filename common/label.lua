@@ -126,6 +126,8 @@ end
 
 --- @override
 function rt.Label:draw()
+    if self._n_glyphs == 0 then return end
+
     local render_order = self._glyphs_only
     love.graphics.setColor(1, 1, 1, 1)
     love.graphics.translate(self._bounds.x, self._bounds.y)
@@ -197,6 +199,11 @@ function rt.Label:set_text(text)
         self._n_visible_characters = self._n_characters
         self:_update_textures()
     end
+end
+
+--- @brief
+function rt.Label:get_text()
+    return self._raw
 end
 
 --- @brief
@@ -754,6 +761,8 @@ do
 
     --- @brief [internal]
     function rt.Label:_update_textures()
+        if self._n_glyphs == 0 then return end
+
         love.graphics.push()
         love.graphics.reset()
 

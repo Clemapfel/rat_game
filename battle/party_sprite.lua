@@ -113,8 +113,8 @@ end
 
 --- @override
 function bt.PartySprite:update(delta)
-    self._health_bar:update()
-    self._speed_value:update()
-    self._status_consumable_bar:update()
-    self._sprite:update()
+    self._health_bar:update(delta)
+    self._speed_value:update(delta)
+    self._status_consumable_bar:update(delta)
+    self._sprite:update(delta)
 end
