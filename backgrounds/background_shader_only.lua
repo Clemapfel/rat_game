@@ -4,7 +4,7 @@ function rt.Background.new_shader_only_background(name, shader_path)
         return meta.new(rt.Background[name], {
             _shader_path = shader_path,
             _shader = nil, -- rt.Shader
-            _shape = rt.VertexRectangle(0, 0, 1, 1),
+            _bounds = rt.AABB(0, 0, 1, 1),
             _elapsed = 0
         })
     end)
@@ -17,16 +17,13 @@ function rt.Background.new_shader_only_background(name, shader_path)
     end
 
     function out:size_allocate(x, y, width, height)
-        self._shape:set_vertex_position(1, x, y)
-        self._shape:set_vertex_position(2, x + width, y)
-        self._shape:set_vertex_position(3, x + width, y + height)
-        self._shape:set_vertex_position(4, x, y + height)
+        self._bounds = rt.AABB(x, y, width, height)
     end
 
     function out:draw()
         if self._is_realized ~= true then return end
         self._shader:bind()
-        self._shape:draw()
+        love.graphics.rectangle("fill", self._bounds.x, self._bounds.y, self._bounds.width, self._bounds.height)
         self._shader:unbind()
     end
 
@@ -83,3 +80,7 @@ rt.Background.COMPLEX_TILING = rt.Background.new_shader_only_background("COMPLEX
 
 --- @class rt.Background.FIREWORKS
 rt.Background.FIREWORKS = rt.Background.new_shader_only_background("FIREWORKS", "backgrounds/fireworks.glsl")
+
+--- @class rt.Background.CONFUSION
+rt.Background.CONFUSION = rt.Background.new_shader_only_background("CONFUSION", "backgrounds/confusion.glsl")
+
