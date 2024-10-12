@@ -115,9 +115,10 @@ function bt.HealthBar:_update_value()
     self._backdrop:set_color(rt.color_darken(color, 0.25))
 
     local left, center, right = self:_format_hp(self._current_value, self._upper)
-    self._label_left:set_text(left)
-    self._label_center:set_text(center)
-    self._label_right:set_text(right)
+    local format_prefix, format_postfix = "<o>", "</o>"
+    self._label_left:set_text(format_prefix .. left .. format_postfix)
+    self._label_center:set_text(format_prefix .. center .. format_postfix)
+    self._label_right:set_text(format_prefix .. right .. format_postfix)
 end
 
 --- @override

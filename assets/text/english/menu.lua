@@ -1,7 +1,7 @@
 return {
     -- mn.InventoryScene
     inventory_scene = {
-        heading = "<b>Inventory</b>"
+        heading = "Inventory" -- <b> appened in inventory_scene
     },
 
     -- mn.OptionsScene

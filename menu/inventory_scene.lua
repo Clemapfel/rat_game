@@ -11,7 +11,7 @@ mn.InventoryScene = meta.new_type("InventoryScene", rt.Scene, function(state)
     return meta.new(mn.InventoryScene, {
         _state = state,
 
-        _heading_label = rt.Label(rt.TextAtlas:get("menu.inventory_scene.heading")),
+        _heading_label = rt.Label(""),
         _heading_frame = rt.Frame(),
 
         _entity_tab_bar = mn.TabBar(),
@@ -245,9 +245,7 @@ function mn.InventoryScene:size_allocate(x, y, width, height)
     local control_w, control_h = self._control_indicator:measure()
     self._control_indicator:fit_into(x + width - control_w - outer_margin, y + outer_margin, control_w, control_h)
 
-    local heading_w, heading_h = self._heading_label:measure()
-    self._heading_frame:fit_into(x + outer_margin, current_y, heading_w + 2 * outer_margin, control_h)
-    self._heading_label:fit_into(x + outer_margin + outer_margin, current_y + 0.5 * control_h - 0.5 * heading_h, POSITIVE_INFINITY)
+    self:_update_heading_label()
 
     current_y = current_y + control_h + m
 
@@ -526,12 +524,27 @@ function mn.InventoryScene:_set_shared_list_index(tab_i)
 end
 
 --- @brief
+function mn.InventoryScene:_update_heading_label()
+    local name = self._entity_pages[self._entity_index].entity:get_name()
+    local prefix = rt.TextAtlas:get("menu.inventory_scene.heading")
+    self._heading_label:set_text("<b>" .. prefix .. " > " .. name .. "</b>")
+    local heading_w, heading_h = self._heading_label:measure()
+
+    local outer_margin = 2 * rt.settings.margin_unit
+    local _, control_h = self._control_indicator:measure()
+    local x, y = self._bounds.x, self._bounds.y
+    self._heading_frame:fit_into(x + outer_margin, y + outer_margin, heading_w + 2 * outer_margin, control_h)
+    self._heading_label:fit_into(x + outer_margin + outer_margin, y + outer_margin + 0.5 * control_h - 0.5 * heading_h, POSITIVE_INFINITY)
+end
+
+--- @brief
 function mn.InventoryScene:_set_entity_index(entity_i)
     self._entity_index = entity_i
     local n = self._state:get_n_allies()
     for i = 1, n do
         self._entity_tab_bar:set_tab_active(i, i == self._entity_index)
     end
+    self:_update_heading_label()
 end
 
 --- @brief

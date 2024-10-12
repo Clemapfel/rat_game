@@ -29,7 +29,6 @@ end
 function rt.RenderTexture:unbind_as_render_target()
     local hue = (meta.hash(self) % 255) / 255
     love.graphics.setColor(rt.color_unpack(rt.hsva_to_rgba(rt.HSVA(hue, 1, 1, 1))))
-    love.graphics.rectangle("fill", 0, 0, rt.graphics.get_width(), rt.graphics.get_height())
     love.graphics.setCanvas({self._before, stencil = true})
 end
 
