@@ -83,9 +83,11 @@ function rt.Label:_glyph_new(
     is_effect_wave,
     is_effect_rainbow
 )
+    local font_native = font:get_native(style)
     local out = {
         text = text, -- necessary for beat weights
-        glyph = love.graphics.newTextBatch(font[style], text),
+        glyph = love.graphics.newTextBatch(font_native, text),
+        font = font_native,
         is_underlined = is_underlined,
         is_strikethrough = is_strikethrough,
         is_outlined = is_outlined,
@@ -105,7 +107,15 @@ function rt.Label:_glyph_new(
         y = 0,
         x = 0,
         width = 0,
-        height = 0
+        height = 0,
+        strikethrough_ax = nil,
+        strikethrough_ay = nil,
+        strikethrough_bx = nil,
+        strikethrough_by = nil,
+        underline_ax = nil,
+        underline_ay = nil,
+        underline_bx = nil,
+        underline_by = nil
     }
 
     out.width = out.glyph:getWidth()
@@ -562,8 +572,8 @@ do
         local width = 0
         local n_rows = 1
 
-        local space_w = self._font:get_bold_italic():getWidth(_syntax.SPACE)
-        local tab_w = self._font:get_bold_italic():getWidth(_syntax.TAB)
+        local space_w = self._font:measure_glyph(_syntax.SPACE)
+        local tab_w = self._font:measure_glyph(_syntax.TAB)
 
         for glyph in values(self._glyphs) do
             if glyph == _syntax.SPACE then
@@ -582,7 +592,7 @@ do
         end
 
         self._width = _max(max_width, width)
-        self._height = n_rows * self._font:get_bold_italic():getHeight()
+        self._height = n_rows * self._font:get_native(rt.FontStyle.BOLD_ITALIC):getHeight()
 
         if self._n_visible_characters == -1 then
             self._n_visible_characters = n_characters
@@ -596,9 +606,10 @@ do
         local current_line_width = 0
         local max_line_w = 0
 
-        local space_w = self._font:get_bold_italic():getWidth(_syntax.SPACE)
-        local tab_w = self._font:get_bold_italic():getWidth(_syntax.TAB)
-        local line_height = self._font:get_bold_italic():getHeight()
+        local bold_italic = self._font:get_native(rt.FontStyle.BOLD_ITALIC)
+        local space_w = bold_italic:getWidth(_syntax.SPACE)
+        local tab_w = bold_italic:getWidth(_syntax.TAB)
+        local line_height = bold_italic:getHeight()
 
         local glyph_x, glyph_y = 0, 0
         local max_w = self._bounds.width
@@ -649,6 +660,26 @@ do
                 if glyph.is_outlined then
                     min_outline_y = _min(min_outline_y, glyph.y)
                     max_outline_y = _max(max_outline_y, glyph.y + glyph.height)
+                end
+
+                if glyph.is_underlined or glyph.is_strikethrough then
+                    local font = glyph.font
+                    local underline_y = font:getBaseline() - font:getDescent() + 2
+                    local strikethrough_y = font:getBaseline() - 2
+
+                    if glyph.is_underlined then
+                        glyph.underline_ax = glyph.x
+                        glyph.underline_ay = _floor(glyph.y + underline_y)
+                        glyph.underline_bx = glyph.x + glyph.width
+                        glyph.underline_by = glyph.underline_ay
+                    end
+
+                    if glyph.is_strikethrough then
+                        glyph.strikethrough_ax = glyph.x
+                        glyph.strikethrough_ay = _floor(glyph.y + strikethrough_y)
+                        glyph.strikethrough_bx = glyph.x + glyph.width
+                        glyph.strikethrough_by = glyph.strikethrough_ay
+                    end
                 end
 
                 min_x = _min(min_x, glyph.x)
@@ -726,6 +757,8 @@ do
         love.graphics.push()
         love.graphics.reset()
 
+        love.graphics.setLineWidth(2)
+
         if self._use_outline then
             self._swap_texture:bind_as_render_target()
             love.graphics.clear(true, false, false)
@@ -738,6 +771,14 @@ do
                 self.render_shader:send("elapsed", self._elapsed)
                 love.graphics.setColor(glyph.color_r, glyph.color_g, glyph.color_b, 1)
                 love.graphics.draw(glyph.glyph, glyph.x + _padding, glyph.y + _padding)
+
+                if glyph.is_underlined then
+                    love.graphics.line(glyph.underline_ax, glyph.underline_ay, glyph.underline_bx, glyph.underline_by)
+                end
+
+                if glyph.is_strikethrough then
+                    love.graphics.line(glyph.strikethrough_ax, glyph.strikethrough_ay, glyph.strikethrough_bx, glyph.strikethrough_by)
+                end
             end
             self.render_shader:unbind()
 
@@ -763,6 +804,14 @@ do
             self.render_shader:send("elapsed", self._elapsed)
             love.graphics.setColor(glyph.color_r, glyph.color_g, glyph.color_b, 1)
             love.graphics.draw(glyph.glyph, glyph.x, glyph.y + _padding)
+
+            if glyph.is_underlined then
+                love.graphics.line(glyph.underline_ax, glyph.underline_ay, glyph.underline_bx, glyph.underline_by)
+            end
+
+            if glyph.is_strikethrough then
+                love.graphics.line(glyph.strikethrough_ax, glyph.strikethrough_ay, glyph.strikethrough_bx, glyph.strikethrough_by)
+            end
         end
         self.render_shader:unbind()
         self._swap_texture:unbind_as_render_target()

@@ -20,8 +20,6 @@ rt.settings.font = {
     bold_fallbacks = {},        -- Table<love.Font>
 }
 
-N_FONTS = 0
-
 --- @class rt.Font
 --- @param regular_path String
 --- @param bold_path String (or nil)
@@ -60,28 +58,28 @@ end)
 ---
 --- @class rt.FontStyle
 rt.FontStyle = meta.new_enum("FontStyle", {
-    REGULAR = "FONT_STYLE_REGULAR",
-    ITALIC = "FONT_STYLE_ITALIC",
-    BOLD = "FONT_STYLE_BOLD",
-    BOLD_ITALIC = "FONT_STYLE_BOLD_ITALIC"
+    REGULAR = 0,
+    ITALIC = 1,
+    BOLD = 2,
+    BOLD_ITALIC = 3
 })
 
-rt.Font[rt.FontStyle.REGULAR] = love.graphics.getFont()
-rt.Font[rt.FontStyle.BOLD] = love.graphics.getFont()
-rt.Font[rt.FontStyle.ITALIC] = love.graphics.getFont()
-rt.Font[rt.FontStyle.BOLD_ITALIC] = love.graphics.getFont()
+rt.Font._regular = love.graphics.getFont()
+rt.Font._bold = love.graphics.getFont()
+rt.Font._italic = love.graphics.getFont()
+rt.Font._bold_italic = love.graphics.getFont()
 
 --- @brief [internal] update held fonts
 function rt.Font:_update()
-    self[rt.FontStyle.REGULAR] = love.graphics.newFont(self._regular_path, self._size)
-    self[rt.FontStyle.BOLD] = love.graphics.newFont(self._bold_path, self._size)
-    self[rt.FontStyle.ITALIC] = love.graphics.newFont(self._italic_path, self._size)
-    self[rt.FontStyle.BOLD_ITALIC] = love.graphics.newFont(self._bold_italic_path, self._size)
+    self._regular = love.graphics.newFont(self._regular_path, self._size)
+    self._bold = love.graphics.newFont(self._bold_path, self._size)
+    self._italic = love.graphics.newFont(self._italic_path, self._size)
+    self._bold_italic = love.graphics.newFont(self._bold_italic_path, self._size)
 
-    self[rt.FontStyle.REGULAR]:setFallbacks(splat(rt.settings.font.regular_fallbacks))
-    self[rt.FontStyle.BOLD]:setFallbacks(splat(rt.settings.font.bold_fallbacks))
-    self[rt.FontStyle.ITALIC]:setFallbacks(splat(rt.settings.font.italic_fallbacks))
-    self[rt.FontStyle.BOLD_ITALIC]:setFallbacks(splat(rt.settings.font.bold_italic_fallbacks))
+    self._regular:setFallbacks(splat(rt.settings.font.regular_fallbacks))
+    self._bold:setFallbacks(splat(rt.settings.font.bold_fallbacks))
+    self._italic:setFallbacks(splat(rt.settings.font.italic_fallbacks))
+    self._bold_italic:setFallbacks(splat(rt.settings.font.bold_italic_fallbacks))
 
     self._regular_rasterizer = love.font.newRasterizer(self._regular_path, self._size)
     self._bold_rasterizer = love.font.newRasterizer(self._bold_path, self._size)
@@ -102,33 +100,22 @@ function rt.Font:get_size()
     return self._size
 end
 
---- @brief get regular version of font
---- @return love.Font
-function rt.Font:get_regular()
-    return self[rt.FontStyle.REGULAR]
-end
-
---- @brief get bold version of font
---- @return love.Font
-function rt.Font:get_bold()
-    return self[rt.FontStyle.BOLD]
-end
-
---- @brief get italic version of font
---- @return love.Font
-function rt.Font:get_italic()
-    return self[rt.FontStyle.ITALIC]
-end
-
---- @brief get bold-italic version of font
---- @return love.Font
-function rt.Font:get_bold_italic()
-    return self[rt.FontStyle.BOLD_ITALIC]
+do
+    local _font_style_to_field = {
+        [rt.FontStyle.REGULAR] = "_regular",
+        [rt.FontStyle.BOLD] = "_bold",
+        [rt.FontStyle.ITALIC] = "_italic",
+        [rt.FontStyle.BOLD_ITALIC] = "_bold_italic"
+    }
+    --- @brief
+    function rt.Font:get_native(style)
+        return self[_font_style_to_field[style]]
+    end
 end
 
 --- @brief
 function rt.Font:measure_glyph(label)
-    return self[rt.FontStyle.REGULAR]:getWidth(label), self[rt.FontStyle.REGULAR]:getHeight(label)
+    return self._bold_italic:getWidth(label), self._bold_italic:getHeight(label)
 end
 
 --- @brief [internal] load default fonts and fallbacks

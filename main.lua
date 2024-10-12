@@ -83,6 +83,9 @@ end)
 love.load = function()
     background:realize()
     state:_load()
+
+    --[[
+    -- pre load scenes
     for scene in range(
         mn.InventoryScene,
         mn.KeybindingScene,
@@ -91,8 +94,8 @@ love.load = function()
     ) do
         state:set_current_scene(scene)
     end
-    --state:set_current_scene(bt.BattleScene)
-    state:set_current_scene(nil)
+    state:set_current_scene(bt.BattleScene)
+    ]]--
     love.resize(love.graphics.getWidth(), love.graphics.getHeight())
 end
 

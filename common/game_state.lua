@@ -72,8 +72,8 @@ rt.GameState = meta.new_type("GameState", function()
         _render_texture = rt.RenderTexture(1, 1),
         _render_shader = rt.Shader("common/game_state_render_shader.glsl"),
         _use_render_texture = false,
-        _use_coroutines = true,    -- use loading screens and background loading
-        _use_scene_caching = true, -- deallocate a scene
+        _use_coroutines = false,    -- use loading screens and background loading
+        _use_scene_caching = true,  -- deallocate a scene
 
         _loading_screen = rt.LoadingScreen.DEFAULT(),
         _loading_screen_active = true,
@@ -515,91 +515,72 @@ function rt.GameState:_loading_screen_hide(on_hidden)
     end)
 end
 
-
 --- @brief
 function rt.GameState:set_current_scene(scene_type)
     if scene_type == nil then
+        if self._current_scene ~= nil then
+            self._current_scene:make_inactive()
+        end
         self._current_scene = nil
         return
+    end
+
+    local new_scene
+    if self._use_scene_caching then
+        new_scene = self._scenes[scene_type]
+        if new_scene == nil then
+            new_scene = scene_type(self)
+            self._scenes[scene_type] = new_scene
+        end
+    else
+        new_scene = scene_type(self)
     end
 
     if self._use_coroutines then
         table.insert(self._active_coroutines, rt.Coroutine(function()
             rt.savepoint_maybe()
+            local use_loading_screen = not new_scene:get_is_realized()
 
-            local scene
-
-            if self._use_scene_caching then
-                scene = self._scenes[scene_type]
-                if scene == nil then
-                    scene = scene_type(self)
-                    self._scenes[scene_type] = scene
-                end
-            else
-                scene = scene_type(self)
-            end
-
-            local use_loading_screen = true --scene:get_is_realized() == false
             if use_loading_screen then
                 self:_loading_screen_show(function()
-                    -- make sure graphics swap happens behind loading screen, old scene stays during fadeout
+                    -- code duplication because make_inactive and make active have to happen behind loading screen
                     if self._current_scene ~= nil then
                         self._current_scene:make_inactive()
+                        rt.savepoint_maybe()
                     end
 
-                    self._current_scene = scene
+                    self._current_scene = new_scene
+                    self._current_scene:realize()
+                    rt.savepoint_maybe()
+                    self._current_scene:fit_into(0, 0, self._state.resolution_x, self._state.resolution_y)
+                    rt.savepoint_maybe()
+                    self._current_scene:make_active()
+
+                    self:_loading_screen_hide()
                 end)
             else
                 if self._current_scene ~= nil then
                     self._current_scene:make_inactive()
+                    rt.savepoint_maybe()
                 end
-            end
 
-            local realized = scene:get_is_realized()
-            if not realized then
-                scene:realize()
-                rt.savepoint_maybe()
-                scene:fit_into(0, 0, self._state.resolution_x, self._state.resolution_y)
-                rt.savepoint_maybe()
+                self._current_scene = new_scene
+                self._current_scene:make_active()
             end
-
-            scene:make_active()
-
-            if use_loading_screen then
-                self:_loading_screen_hide()
-            end
-            self._current_scene = scene -- failsafe if signal "shown" is skipped, because loading screen was too short
         end))
     else
-        local scene
-        if self._use_scene_caching then
-            scene = self._scenes[scene_type]
-            if scene == nil then
-                scene = scene_type(self)
-                self._scenes[scene_type] = scene
-            end
-        else
-            scene = scene_type(self)
-        end
-
         if self._current_scene ~= nil then
             self._current_scene:make_inactive()
         end
 
-        self._current_scene = scene
-
-        if self._current_scene ~= nil then
-        self._current_scene:make_inactive()
+        self._current_scene = new_scene
+        local before = love.timer.getTime()
+        if self._current_scene:get_is_realized() == false then
+            self._current_scene:realize()
+            self._current_scene:fit_into(0, 0, self._state.resolution_x, self._state.resolution_y)
         end
-
-        local realized = scene:get_is_realized()
-        if not realized then
-            scene:realize()
-            scene:fit_into(0, 0, self._state.resolution_x, self._state.resolution_y)
-        end
-
-        scene:make_active()
-        self._current_scene = scene -- failsafe if signal "shown" is skipped, because loading screen was too short
+        self._current_scene:make_active()
+        dbg(meta.get_typename(scene_type), (love.timer.getTime() - before) / (1 / 60))
     end
 end
 

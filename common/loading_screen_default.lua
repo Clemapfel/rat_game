@@ -159,6 +159,7 @@ end
 --- @brief
 function rt.LoadingScreen.DEFAULT:show()
     self._is_active = true
+    self._elapsed = 0
     self._fade_in_elapsed = 0
     self._fade_out_elapsed = 0
     self._shown_emitted = false

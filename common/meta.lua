@@ -246,6 +246,10 @@ do
     end
     meta.add_signal = meta.add_signals
 
+    function meta.get_typename(type)
+        return rawget(type, _metatable_index)[_type_typename_index]
+    end
+
     local _new_abstract_type_constructor = function(self)
         error("In " .. self[_type_typename_index] .. ".__call: Trying to instantiate abstract type")
         return nil
