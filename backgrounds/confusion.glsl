@@ -74,34 +74,42 @@ float sine_wave(float x)
     return (sin(x) + 1) / 2;
 }
 
+float gaussian(float x, float ramp)
+{
+    // e^{-\frac{4\pi}{3}\left(r\cdot\left(x-c\right)\right)^{2}}
+    return exp(((-4 * PI) / 3) * (ramp * x) * (ramp * x));
+}
+
 uniform float elapsed;
 
 vec4 effect(vec4 vertex_color, Image image, vec2 texture_coords, vec2 vertex_position)
 {
     vec2 uv = texture_coords.xy;
     uv /= 1.2;
-
+    
+    float time = elapsed / 2;
+    
     uv -= vec2(0.5);
     const float angle = PI / 2.5;
-    uv = rotate(uv, angle + elapsed / 100);
+    uv = rotate(uv, angle + time / 100);
     uv += vec2(0.5);
 
     const float frequency = 40;
 
     uv.y += sin(uv.x * 20) / 100;
-    float value = sin(uv.y * frequency + elapsed);
+    float value = sin(uv.y * frequency + time);
 
-    float magnitude = fwidth(value) * 2;
+    float magnitude = fwidth(value) * 1.2;
     uv -= vec2(0.5);
-    uv = rotate(uv, angle + PI / 4 + sin(elapsed) * 0.1);
+    uv = rotate(uv, angle + PI / 4 + sin(time) * 0.1);
     uv += vec2(0.5);
 
     uv.y += sin(uv.x * 20) / 50;
-    value = value + sin(uv.y * frequency + elapsed * 3);
+    value = value + sin(uv.y * frequency + time * 3);
 
-    float rng = gradient_noise(vec3(vertex_position / 200, elapsed)) / 8;
-    float hue = fract(value * magnitude * (1 + 2 * sine_wave(elapsed + rng)) + elapsed / 10 );
+    float rng = gradient_noise(vec3(vertex_position / 200, time)) / 8;
+    float hue = fract(value * magnitude * (1 + 2 * sine_wave(time + rng)) + time / 10) + 0.3;
 
-    vec3 color = lch_to_rgb(vec3(0.8, 1, hue));
+    vec3 color = lch_to_rgb(vec3(0.1 + 0.7 * gaussian(texture_coords.y * 2 - 1, 0.5), 1, hue));
     return vec4(color, 1);
 }

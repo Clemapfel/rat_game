@@ -117,7 +117,7 @@ love.update = function(delta)
 end
 
 love.draw = function()
-    --[[
+    background:draw()
     if draw_state then
         if profiler_active then
             rt.profiler.push("draw")
@@ -129,8 +129,6 @@ love.draw = function()
             rt.profiler.pop("draw")
         end
     end
-     ]]--
-    background:draw()
 end
 
 love.resize = function(new_width, new_height)

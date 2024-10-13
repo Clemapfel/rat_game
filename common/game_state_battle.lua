@@ -429,11 +429,12 @@ for which in range("move", "equip", "consumable") do
         --- @brief entity_get_move_n_used, entity_get_consumable_n_used
         rt.GameState["entity_get_" .. which .. "_n_used"] = function(self, entity, slot_i)
             meta.assert_isa(entity, bt.Entity)
+            meta.assert_number(slot_i)
 
             local n_slots = entity["get_n_" .. which .. "_slots"](entity)
-            if slot_i <= 0 or math.fmod(slot_i, 1) ~= 0 or slot_i > n_slots() then
+            if slot_i <= 0 or math.fmod(slot_i, 1) ~= 0 or slot_i > n_slots then
                 rt.error("In rt.GameState:entity_" .. which .. "_get_n_used" .. which .. ": slot index `" .. slot_i .. "` is out of range for an entity with `" .. n_slots .. "` slots")
-                return
+                return 0
             end
 
             local entry = self:_get_entity_entry(entity)
@@ -441,7 +442,7 @@ for which in range("move", "equip", "consumable") do
                 rt.error("In rt.GameState:entity_" .. which .."_get_n_used: entity `" .. entity:get_id() .. "` is not part of state")
                 return 0
             else
-                return entry[which .. "s"].n_used
+                return entry[which .. "s"][slot_i].n_used
             end
         end
 

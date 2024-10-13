@@ -54,7 +54,8 @@ function bt.PartySprite:size_allocate(x, y, width, height)
     local current_y = y + height - ym
 
     local label_w, label_h = self._name:measure()
-    self._name:fit_into(x + 0.5 * width - 0.5 * label_w, current_y - label_h)
+    self._name:set_justify_mode(rt.JustifyMode.CENTER)
+    self._name:fit_into(x, current_y - label_h, width)
     local speed_value_w, speed_value_h = self._speed_value:measure()
     self._speed_value:fit_into(x + width - xm - speed_value_w, current_y - label_h - speed_value_h + 0.5 * speed_value_h + 0.5 * label_h)
     current_y = current_y - label_h - ym

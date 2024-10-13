@@ -257,13 +257,6 @@ end
 
 _G._select = _G.select
 
---- @brief get n-th element of varag, overrides _G.select
---- @param n number
---- @vararg
-function select(n, ...)
-    return ({...})[n]
-end
-
 --- @brief convert arbitrary object to string
 --- @param id string
 --- @param object any

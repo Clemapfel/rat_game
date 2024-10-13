@@ -152,6 +152,8 @@ function rt.Label:draw()
 
     love.graphics.setBlendMode("alpha")
     love.graphics.translate(-self._bounds.x, -self._bounds.y)
+
+    self:draw_bounds()
 end
 
 --- @override

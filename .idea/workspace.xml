@@ -22,20 +22,16 @@
     </configurations>
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="7fa9ba1b-2cff-4ecc-86fb-59ab2fa76ee1" name="Changes" comment="added strikethrough/underline">
-      <change afterPath="$PROJECT_DIR$/backgrounds/confusion.glsl" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/battle/~battle_scene.lua" afterDir="false" />
+    <list default="true" id="7fa9ba1b-2cff-4ecc-86fb-59ab2fa76ee1" name="Changes" comment="stashing battle scene layout">
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/backgrounds/background_shader_only.lua" beforeDir="false" afterPath="$PROJECT_DIR$/backgrounds/background_shader_only.lua" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/backgrounds/confusion.glsl" beforeDir="false" afterPath="$PROJECT_DIR$/backgrounds/confusion.glsl" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/battle/battle_scene.lua" beforeDir="false" afterPath="$PROJECT_DIR$/battle/battle_scene.lua" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/battle/entity.lua" beforeDir="false" afterPath="$PROJECT_DIR$/battle/entity.lua" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/battle/health_bar.lua" beforeDir="false" afterPath="$PROJECT_DIR$/battle/health_bar.lua" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/battle/party_sprite.lua" beforeDir="false" afterPath="$PROJECT_DIR$/battle/party_sprite.lua" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/common/game_state_battle.lua" beforeDir="false" afterPath="$PROJECT_DIR$/common/game_state_battle.lua" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/common/label.lua" beforeDir="false" afterPath="$PROJECT_DIR$/common/label.lua" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/common/text_box.lua" beforeDir="false" afterPath="$PROJECT_DIR$/common/text_box.lua" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/main.lua" beforeDir="false" afterPath="$PROJECT_DIR$/main.lua" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/menu/inventory_scene.lua" beforeDir="false" afterPath="$PROJECT_DIR$/menu/inventory_scene.lua" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/menu/slots.lua" beforeDir="false" afterPath="$PROJECT_DIR$/menu/slots.lua" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/older/~common/common.lua" beforeDir="false" afterPath="$PROJECT_DIR$/older/~common/common.lua" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -597,23 +593,7 @@
       <workItem from="1728320028333" duration="76347000" />
       <workItem from="1728659220559" duration="9271000" />
       <workItem from="1728742030886" duration="9596000" />
-      <workItem from="1728756757386" duration="3531000" />
-    </task>
-    <task id="LOCAL-01085" summary="profiler done">
-      <option name="closed" value="true" />
-      <created>1727476018798</created>
-      <option name="number" value="01085" />
-      <option name="presentableId" value="LOCAL-01085" />
-      <option name="project" value="LOCAL" />
-      <updated>1727476018798</updated>
-    </task>
-    <task id="LOCAL-01086" summary="optimized drawing of various scenes">
-      <option name="closed" value="true" />
-      <created>1727557551822</created>
-      <option name="number" value="01086" />
-      <option name="presentableId" value="LOCAL-01086" />
-      <option name="project" value="LOCAL" />
-      <updated>1727557551824</updated>
+      <workItem from="1728756757386" duration="10606000" />
     </task>
     <task id="LOCAL-01087" summary="added deadzone widget, imported priority queue">
       <option name="closed" value="true" />
@@ -991,7 +971,23 @@
       <option name="project" value="LOCAL" />
       <updated>1728746458822</updated>
     </task>
-    <option name="localTasksCounter" value="1134" />
+    <task id="LOCAL-01134" summary="added confusion">
+      <option name="closed" value="true" />
+      <created>1728760348253</created>
+      <option name="number" value="01134" />
+      <option name="presentableId" value="LOCAL-01134" />
+      <option name="project" value="LOCAL" />
+      <updated>1728760348254</updated>
+    </task>
+    <task id="LOCAL-01135" summary="stashing battle scene layout">
+      <option name="closed" value="true" />
+      <created>1728760361310</created>
+      <option name="number" value="01135" />
+      <option name="presentableId" value="LOCAL-01135" />
+      <option name="project" value="LOCAL" />
+      <updated>1728760361310</updated>
+    </task>
+    <option name="localTasksCounter" value="1136" />
     <servers />
   </component>
   <component name="TypeScriptGeneratedFilesManager">
@@ -1040,8 +1036,6 @@
     </option>
   </component>
   <component name="VcsManagerConfiguration">
-    <MESSAGE value="mwe working" />
-    <MESSAGE value="stashing initialize as compute" />
     <MESSAGE value="brusselator working" />
     <MESSAGE value="added loading screen class" />
     <MESSAGE value="added timed animation" />
@@ -1065,7 +1059,9 @@
     <MESSAGE value="reworked render texture caching" />
     <MESSAGE value="added entity name to heading label" />
     <MESSAGE value="added strikethrough/underline" />
-    <option name="LAST_COMMIT_MESSAGE" value="added strikethrough/underline" />
+    <MESSAGE value="added confusion" />
+    <MESSAGE value="stashing battle scene layout" />
+    <option name="LAST_COMMIT_MESSAGE" value="stashing battle scene layout" />
   </component>
   <component name="XDebuggerManager">
     <breakpoint-manager>

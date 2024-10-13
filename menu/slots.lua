@@ -64,7 +64,7 @@ function mn.Slots:realize()
                     frame = rt.Polygon(0, 0, 1, 1, 1, 0, 0, 1),
                     frame_outline = rt.Polygon(0, 0, 1, 1, 1, 0, 0, 1),
                 }
-            elseif type == mn.SlotType.MOVE then
+            elseif type == mn.SlotType.MOVE or type == mn.SlotType.INTRINSIC then
                 to_insert = {
                     base = rt.Rectangle(0, 0, 1, 1),
                     base_inlay = rt.Circle(0, 0, 1, 1),
@@ -81,6 +81,7 @@ function mn.Slots:realize()
                     frame = rt.Circle(0, 0, 1, 1),
                     frame_outline = rt.Circle(0, 0, 1, 1)
                 }
+                --[[
             elseif type == mn.SlotType.INTRINSIC then
                 to_insert = {
                     base = rt.Polygon(0, 0, 1, 1, 1, 0, 0, 1),
@@ -88,6 +89,7 @@ function mn.Slots:realize()
                     frame = rt.Polygon(0, 0, 1, 1, 1, 0, 0, 1),
                     frame_outline = rt.Polygon(0, 0, 1, 1, 1, 0, 0, 1),
                 }
+                ]]--
             else
                 rt.error("In mn.Slots:realize: unrecognized slot type at `" .. row_i .. ", " .. column_i .. "`: `" .. type .. "`")
             end
@@ -157,10 +159,11 @@ function mn.Slots:size_allocate(x, y, width, height)
                 for shape in range(slot.base, slot.frame, slot.frame_outline) do
                     shape:resize(current_x + 0.5 * slot_w, current_y + 0.5 * slot_w, 0.5 * slot_w, 0.5 * slot_h)
                 end
-            elseif slot.type == mn.SlotType.MOVE then
+            elseif slot.type == mn.SlotType.MOVE or slot.type == mn.SlotType.INTRINSIC then
                 for shape in range(slot.base, slot.frame, slot.frame_outline) do
                     shape:resize(current_x, current_y, slot_w, slot_h)
                 end
+            --[[
             elseif slot.type == mn.SlotType.INTRINSIC then
                 local points = {}
                 local center_x, center_y = current_x + 0.5 * slot_w, current_y + 0.5 * slot_h
@@ -173,6 +176,7 @@ function mn.Slots:size_allocate(x, y, width, height)
                 for shape in range(slot.base, slot.frame, slot.frame_outline) do
                     shape:resize(table.unpack(points))
                 end
+                ]]--
             end
 
             slot.bounds = rt.AABB(current_x, current_y, slot_w, slot_w)
@@ -261,11 +265,15 @@ function mn.Slots:measure()
         max_row_width = math.max(max_row_width, sizeof(row))
     end
 
-    return max_row_width * slot_w, n_rows * slot_w
+    local m = rt.settings.margin_unit
+    local thickness = self._frame:get_thickness()
+    local slot_thickness = rt.settings.menu.slots.frame_unselected_thickness
+    return max_row_width * slot_w + (max_row_width + 2) * m + 2 * thickness + max_row_width * slot_thickness * 2,
+        n_rows * slot_w + (n_rows + 1) * m + 2 * thickness + n_rows * slot_thickness * 2
 end
 
 --- @brief
-function mn.Slots:set_object(slot_i, object)
+function mn.Slots:set_object(slot_i, object, label)
     if self._is_realized == false then
         self._pre_realize_items[slot_i] = object
     else
@@ -279,6 +287,9 @@ function mn.Slots:set_object(slot_i, object)
             self._item_to_sprite[item] = nil
         else
             item.sprite = rt.LabeledSprite(object:get_sprite_id())
+            if label ~= nil then
+                item.sprite:set_label(label)
+            end
             item.sprite:realize()
             item.sprite:fit_into(item.bounds)
             self._item_to_sprite[item] = item.sprite

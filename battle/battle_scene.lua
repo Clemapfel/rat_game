@@ -9,9 +9,10 @@ bt.BattleScene = meta.new_type("BattleScene", rt.Scene, function(state)
         _sprites = {},        -- Table<bt.Entity, Union<bt.PartySprite, bt.EnemySprite>>
         _party_sprites = meta.make_weak({}), -- Table<bt.PartySprite>
         _enemy_sprites = meta.make_weak({}), -- Table<bt.EnemySprite>
-        _move_selection = {}, -- Table<bt.Entity, cf. add_entity>
         _global_status_bar = bt.OrderedBox(),
-        _input = rt.InputController(),
+
+        _move_selection = {}, -- Table<bt.Entity, { moves:rt.Slots, intrinsices:rt:Slots, selection_graph:rt.SelectionGraph }>
+        _selecting_entity = nil,
 
         _party_order_priority = {
             ["MC"] = 0,
@@ -20,7 +21,9 @@ bt.BattleScene = meta.new_type("BattleScene", rt.Scene, function(state)
             ["PROF"] = 3,
             ["GIRL"] = 4,
             ["SCOUT"] = 5
-        }
+        },
+
+        _input = rt.InputController(),
     })
 end)
 
@@ -35,6 +38,10 @@ function bt.BattleScene:realize()
     self._global_status_bar:realize()
 
     self:create_from_state()
+
+    self._input:signal_connect("pressed", function(_, which)
+        self:_handle_button_pressed(which)
+    end)
 end
 
 --- @override
@@ -76,7 +83,8 @@ function bt.BattleScene:add_entity(entity)
 
         self._move_selection[entity] = {
             moves = move_slots,
-            intrinsics = intrinsic_slots
+            intrinsics = intrinsic_slots,
+            selection_graph = rt.SelectionGraph()
         }
 
         table.insert(self._party_sprites, sprite)
@@ -88,6 +96,9 @@ function bt.BattleScene:add_entity(entity)
             if b_prio == nil then b_prio = POSITIVE_INFINITY end
             return a_prio < b_prio
         end)
+
+        -- TODO
+        if self._selecting_entity == nil then self._selecting_entity = entity end
     else
         -- todo enemy sprite
     end
@@ -118,6 +129,17 @@ function bt.BattleScene:size_allocate(x, y, width, height)
     local party_sprites_w = (width - 2 * outer_margin - 2 * tile_size - 2 * m)
     local log_w = party_sprites_w - 2 * tile_size
     self._log:fit_into(x + 0.5 * width - 0.5 * log_w, current_y, log_w, tile_size)
+
+    current_x = current_x + tile_size + m
+    --current_y = current_y + tile_size + m
+
+    for entity, entry in pairs(self._move_selection) do
+        local move_w, move_h = entry.moves:measure()
+        local _, intrinsic_h = entry.intrinsics:measure()
+        entry.intrinsics:fit_into(current_x, current_y, move_w, intrinsic_h)
+        entry.moves:fit_into(current_x, current_y + intrinsic_h + m / 2, move_w, move_h)
+        self:_update_slots(entity)
+    end
 
     self:_reformat_party_sprites(
         x + outer_margin + tile_size + m,
@@ -151,6 +173,117 @@ function bt.BattleScene:_reformat_party_sprites(x, bottom_y, width, height)
     end
 end
 
+
+--- @brief
+function bt.BattleScene:_update_slots(entity)
+    local entry = self._move_selection[entity]
+    local moves = entry.moves
+    local intrinsics = entry.intrinsics
+
+    local n_slots, move_slots = self._state:entity_list_move_slots(entity)
+    for slot_i = 1, n_slots do
+        local move = move_slots[slot_i]
+        if move == nil then
+            moves:set_object(slot_i, nil)
+        else
+            local n_used = self._state:entity_get_move_n_used(entity, slot_i)
+            local n_left = move:get_max_n_uses() - n_used
+            local n_left_label = tostring(n_left)
+            if n_left == POSITIVE_INFINITY then
+                n_left_label = "\u{221E}" -- infinity
+            end
+
+            moves:set_object(slot_i, move, "<o>" .. n_left_label .. "</o>")
+        end
+    end
+
+
+    local intrinsic_nodes = intrinsics:get_selection_nodes()
+    local move_nodes = moves:get_selection_nodes()
+    local both = {}
+
+    local last_move_node = nil -- cursor memory
+    for node_i, node in ipairs(intrinsic_nodes) do
+
+        local closest_x, closest_node = POSITIVE_INFINITY, nil
+        for other_i = 1, 4 do
+            local other_node = move_nodes[other_i]
+            local distance = math.abs(other_node:get_bounds().x - node:get_bounds().x)
+            if distance < closest_x then
+                closest_x = distance
+                closest_node = other_node
+            end
+        end
+
+        node:signal_connect(rt.InputButton.DOWN, function(_)
+            if last_move_node == nil then
+                return closest_node
+            else
+                return last_move_node
+            end
+        end)
+
+        node.slots = intrinsics
+        node.slot_i = node_i
+        node.entity = entity
+        table.insert(both, node)
+    end
+
+    for node_i, node in ipairs(move_nodes) do
+        local closest_x, closest_node = POSITIVE_INFINITY, nil
+        for other_i = 1, #intrinsic_nodes do
+            local other_node = intrinsic_nodes[other_i]
+            local distance = math.abs(other_node:get_bounds().x - node:get_bounds().x)
+            if distance < closest_x then
+                closest_x = distance
+                closest_node = other_node
+            end
+        end
+        node:set_up(closest_node)
+
+        node.slots = moves
+        node.slot_i = node_i
+        node.entity = entity
+        table.insert(both, node)
+    end
+
+    local scene = self
+    for node in values(intrinsic_nodes) do
+        node:signal_connect("enter", function(self)
+            self.slots:set_slot_selection_state(self.slot_i, rt.SelectionState.ACTIVE)
+            scene._verbose_info:show(scene._state:entity_get_move(self.entity, self.slot_i))
+        end)
+
+        node:signal_connect("exit", function(self)
+            self.slots:set_slot_selection_state(self.slot_i, rt.SelectionState.INACTIVE)
+            scene._verbose_info:show(nil)
+            last_move_node = nil
+        end)
+    end
+
+    for node in values(move_nodes) do
+        node:signal_connect("enter", function(self)
+            self.slots:set_slot_selection_state(self.slot_i, rt.SelectionState.ACTIVE)
+            scene._verbose_info:show(scene._state:entity_get_move(self.entity, self.slot_i))
+        end)
+
+        node:signal_connect("exit", function(self)
+            self.slots:set_slot_selection_state(self.slot_i, rt.SelectionState.INACTIVE)
+            scene._verbose_info:show(nil)
+            last_move_node = self
+        end)
+    end
+
+    local first = true
+    for node in values(both) do
+        entry.selection_graph.add(node)
+        if first then
+            entry.selection_graph:set_current_node(node)
+            first = false
+        end
+    end
+end
+
 --- @override
 function bt.BattleScene:draw()
     for sprite in values(self._sprites) do
@@ -165,6 +298,12 @@ function bt.BattleScene:draw()
     ) do
         x:draw()
         x:draw_bounds()
+    end
+
+    if self._selecting_entity ~= nil then
+        local entry = self._move_selection[self._selecting_entity]
+        entry.intrinsics:draw()
+        entry.moves:draw()
     end
 end
 
@@ -186,4 +325,14 @@ end
 --- @override
 function bt.BattleScene:make_inactive()
     self._input:signal_block_all()
+end
+
+--- @brief [internal]
+function bt.BattleScene:_handle_button_pressed(which)
+    if self._selecting_entity ~= nil then
+        local entry = self._move_selection[self._selecting_entity]
+        entry.selection_graph:handle_button(which)
+    else
+
+    end
 end
