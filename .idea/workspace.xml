@@ -22,13 +22,8 @@
     </configurations>
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="7fa9ba1b-2cff-4ecc-86fb-59ab2fa76ee1" name="Changes" comment="move selection working">
+    <list default="true" id="7fa9ba1b-2cff-4ecc-86fb-59ab2fa76ee1" name="Changes" comment="added entity info">
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/battle/battle_scene.lua" beforeDir="false" afterPath="$PROJECT_DIR$/battle/battle_scene.lua" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/battle/entity.lua" beforeDir="false" afterPath="$PROJECT_DIR$/battle/entity.lua" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/menu/inventory_scene.lua" beforeDir="false" afterPath="$PROJECT_DIR$/menu/inventory_scene.lua" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/menu/options_scene.lua" beforeDir="false" afterPath="$PROJECT_DIR$/menu/options_scene.lua" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/menu/verbose_info_panel.lua" beforeDir="false" afterPath="$PROJECT_DIR$/menu/verbose_info_panel.lua" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/menu/verbose_info_panel_item.lua" beforeDir="false" afterPath="$PROJECT_DIR$/menu/verbose_info_panel_item.lua" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
@@ -591,15 +586,7 @@
       <workItem from="1728320028333" duration="76347000" />
       <workItem from="1728659220559" duration="9271000" />
       <workItem from="1728742030886" duration="9596000" />
-      <workItem from="1728756757386" duration="14639000" />
-    </task>
-    <task id="LOCAL-01088" summary="stashing smooth motion">
-      <option name="closed" value="true" />
-      <created>1727647354390</created>
-      <option name="number" value="01088" />
-      <option name="presentableId" value="LOCAL-01088" />
-      <option name="project" value="LOCAL" />
-      <updated>1727647354390</updated>
+      <workItem from="1728756757386" duration="15686000" />
     </task>
     <task id="LOCAL-01089" summary="introduced physics scaling factor">
       <option name="closed" value="true" />
@@ -985,7 +972,15 @@
       <option name="project" value="LOCAL" />
       <updated>1728843763464</updated>
     </task>
-    <option name="localTasksCounter" value="1137" />
+    <task id="LOCAL-01137" summary="added entity info">
+      <option name="closed" value="true" />
+      <created>1728848075268</created>
+      <option name="number" value="01137" />
+      <option name="presentableId" value="LOCAL-01137" />
+      <option name="project" value="LOCAL" />
+      <updated>1728848075268</updated>
+    </task>
+    <option name="localTasksCounter" value="1138" />
     <servers />
   </component>
   <component name="TypeScriptGeneratedFilesManager">
@@ -1034,7 +1029,6 @@
     </option>
   </component>
   <component name="VcsManagerConfiguration">
-    <MESSAGE value="added loading screen class" />
     <MESSAGE value="added timed animation" />
     <MESSAGE value="stashing before reworking meta" />
     <MESSAGE value="rewrote meta" />
@@ -1059,7 +1053,8 @@
     <MESSAGE value="added confusion" />
     <MESSAGE value="stashing battle scene layout" />
     <MESSAGE value="move selection working" />
-    <option name="LAST_COMMIT_MESSAGE" value="move selection working" />
+    <MESSAGE value="added entity info" />
+    <option name="LAST_COMMIT_MESSAGE" value="added entity info" />
   </component>
   <component name="XDebuggerManager">
     <breakpoint-manager>

@@ -988,14 +988,21 @@ function mn.VerboseInfoPanel.Item:create_from_entity(entity)
         local font, mono_font = rt.settings.font.default_small, rt.settings.font.default_mono_small
         self.move_label = rt.Label(move_name .. "s:", font, mono_font)
         self.move_sprites = {}
-        self.equip_and_consumable_label = rt.Label("Equipment:", font, mono_font)
+        self.move_names = {}
+
+        self.equip_label = rt.Label(equip_name .. "s:", font, mono_font)
         self.equip_sprites = {}
+        self.equip_names = {}
+
+        self.consumable_label = rt.Label(consumable_name .. "s:", font, mono_font)
         self.consumable_sprites = {}
+        self.consumable_names = {}
 
         local n_move_slots, move_slots = entity:list_move_slots()
         for i = 1, n_move_slots do
             if move_slots[i] ~= nil then
                 table.insert(self.move_sprites, rt.Sprite(move_slots[i]:get_sprite_id()))
+                table.insert(self.move_names, self._prefix_label(move_slots[i]:get_name()))
             end
         end
 
@@ -1007,6 +1014,7 @@ function mn.VerboseInfoPanel.Item:create_from_entity(entity)
         for i = 1, n_equip_slots do
             if equip_slots[i] ~= nil then
                 table.insert(self.equip_sprites, rt.Sprite(equip_slots[i]:get_sprite_id()))
+                table.insert(self.equip_names, self._prefix_label(equip_slots[i]:get_name()))
             end
         end
 
@@ -1014,6 +1022,7 @@ function mn.VerboseInfoPanel.Item:create_from_entity(entity)
         for i = 1, n_consumable_slots do
             if consumable_slots[i] ~= nil then
                 table.insert(self.consumable_sprites, rt.Sprite(consumable_slots[i]:get_sprite_id()))
+                table.insert(self.consumable_names, self._prefix_label(consumable_slots[i]:get_name()))
             end
         end
 
@@ -1030,6 +1039,12 @@ function mn.VerboseInfoPanel.Item:create_from_entity(entity)
             for sprite in values(t) do
                 sprite:realize()
                 table.insert(self.content, sprite)
+            end
+        end
+
+        for t in range(self.move_names, self.equip_names, self.consumable_names) do
+            for label in values(t) do
+                table.insert(self.content, label)
             end
         end
 
@@ -1078,6 +1093,8 @@ function mn.VerboseInfoPanel.Item:create_from_entity(entity)
 
         local sprite_start_x = current_x + xm
         local sprite_x = sprite_start_x
+
+        TODO: aligns sprites next to names
 
         local n_moves = sizeof(self.move_sprites)
         for i = 1, n_moves do
