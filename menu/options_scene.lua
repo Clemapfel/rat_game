@@ -10,7 +10,6 @@ mn.OptionsScene = meta.new_type("MenuOptionsScene", rt.Scene, function(state)
         _state = state,
         _items = {},
         _verbose_info = mn.VerboseInfoPanel(),
-        _verbose_info_frame = rt.Frame(),
         _selection_graph = rt.SelectionGraph(),
         _default_node = nil, -- rt.SelectionGraphNode
         _input_controller = rt.InputController(),
@@ -360,8 +359,7 @@ function mn.OptionsScene:realize()
 
     self:create_from_state(self._state)
     self._verbose_info:realize()
-    self._verbose_info_frame:realize()
-    self._verbose_info:set_frame_visible(false)
+    self._verbose_info:set_frame_visible(true)
 
     local keymap_item = {
         label = rt.Label(label_prefix .. self._keymap_text .. label_postfix),
@@ -517,7 +515,7 @@ function mn.OptionsScene:size_allocate(x, y, width, height)
         current_y = current_y + item_h + item_vertical_m
     end
 
-    for info in range(self._verbose_info, self._verbose_info_frame) do
+    for info in range(self._verbose_info) do
         info:fit_into(
             x + width - verbose_info_right_m - verbose_info_w,
             start_y,
@@ -546,7 +544,6 @@ function mn.OptionsScene:_update_snapshot()
         item.label:draw()
     end
 
-    self._verbose_info_frame:draw()
     self._heading_frame:draw()
     self._heading_label:draw()
 

@@ -65,7 +65,7 @@ end, {
 
     name = "",
     name_suffix = "",
-    description = "(no description)",
+    flavor_text = "(no flavor_text)",
 })
 
 --- @brief
@@ -98,6 +98,8 @@ function bt.Entity:realize()
         n_move_slots = rt.INTEGER,
         n_equip_slots = rt.INTEGER,
         n_consumable_slots = rt.INTEGER,
+
+        flavor_text = rt.STRING
     }
 
     rt.load_config(self._path, self, template)
@@ -150,8 +152,8 @@ function bt.Entity:get_name()
 end
 
 --- @brief
-function bt.Entity:get_description()
-    return self.description
+function bt.Entity:get_flavor_text()
+    return self.flavor_text
 end
 
 --- @brief
@@ -249,22 +251,15 @@ for which in range("hp", "attack", "defense", "speed") do
     end
 end
 
---- @brief
-function bt.Entity:list_moves()
-    return self._state:entity_list_moves(self)
-end
+for which in range("move", "equip", "consumable") do
+    --- @brief list_moves, list_equips, list_consumables
+    bt.Entity["list_" .. which .. "s"] = function(self)
+        return self._state["entity_list_" .. which .. "s"](self._state, self)
+    end
 
---- @brief
-function bt.Entity:list_equips()
-    return self._state:entity_list_equips(self)
-end
-
---- @brief
-function bt.Entity:list_consumables()
-    return self._state:entity_list_consumables(self)
-end
-
---- @brief
-function bt.Entity:list_statuses()
-    return self._state:entity_list_statuses(self)
+    --- @brief list_move_slots, list_equip_slots, list_consumable_slots
+    --- @return Unsigned, Table
+    bt.Entity["list_" .. which .. "_slots"] = function(self)
+        return self._state["entity_list_" .. which .. "_slots"](self._state, self)
+    end
 end

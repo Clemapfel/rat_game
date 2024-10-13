@@ -133,16 +133,26 @@ end
 
 --- @override
 function mn.VerboseInfoPanel:draw()
-    if self._frame_visible == true then
+    if self._frame_visible then
         self._frame:draw()
+        self._frame:_bind_stencil()
     end
 
-    self._frame:_bind_stencil()
     rt.graphics.translate(0, self._y_offset)
+
     for item in values(self._items) do
+        if self._frame_visible then
+            item.divider:draw()
+        else
+            item.frame:draw()
+        end
         item:draw()
     end
-    self._frame:_unbind_stencil()
+
+    if self._frame_visible then
+        self._frame:_unbind_stencil()
+    end
+
     rt.graphics.translate(0, -self._y_offset)
 
     if self._scroll_up_indicator_visible then
@@ -226,7 +236,7 @@ end
 function mn.VerboseInfoPanel:can_scroll_up()
     local last_item = self._items[#self._items]
     if last_item == nil then return false end
-    return self._y_offset + select(2, last_item:measure()) - self._bounds.y > 0
+    return last_item._bounds.y + select(2, last_item:measure()) + self._y_offset > self._bounds.y + self._bounds.height
 end
 
 --- @brief

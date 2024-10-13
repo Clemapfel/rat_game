@@ -34,6 +34,8 @@ function bt.BattleScene:realize()
 
     self._log:realize()
     self._priority_queue:realize()
+
+    self._verbose_info:set_frame_visible(false)
     self._verbose_info:realize()
     self._global_status_bar:realize()
 
@@ -133,13 +135,19 @@ function bt.BattleScene:size_allocate(x, y, width, height)
     current_x = current_x + tile_size + m
     --current_y = current_y + tile_size + m
 
+    local max_slot_w = NEGATIVE_INFINITY
     for entity, entry in pairs(self._move_selection) do
         local move_w, move_h = entry.moves:measure()
-        local _, intrinsic_h = entry.intrinsics:measure()
+        local intrinsic_w, intrinsic_h = entry.intrinsics:measure()
         entry.intrinsics:fit_into(current_x, current_y, move_w, intrinsic_h)
         entry.moves:fit_into(current_x, current_y + intrinsic_h + m / 2, move_w, move_h)
         self:_update_slots(entity)
+
+        max_slot_w = math.max(max_slot_w, move_w, intrinsic_w)
     end
+
+    current_x = current_x + max_slot_w + m
+    self._verbose_info:fit_into(current_x, current_y, max_slot_w, y + height - current_y - outer_margin)
 
     self:_reformat_party_sprites(
         x + outer_margin + tile_size + m,
@@ -296,8 +304,8 @@ function bt.BattleScene:draw()
         self._verbose_info,
         self._global_status_bar
     ) do
-        x:draw()
         x:draw_bounds()
+        x:draw()
     end
 
     if self._selecting_entity ~= nil then

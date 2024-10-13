@@ -589,7 +589,7 @@ function mn.InventoryScene:_regenerate_selection_nodes()
     local shared_template_node = shared_list_nodes[self.shared_template_list_index]
 
     local entity_tab_nodes = {}
-    for node in values(self._entity_tab_bar:get_selection_nodes()) do
+    for node_i, node in ipairs(self._entity_tab_bar:get_selection_nodes()) do
         table.insert(entity_tab_nodes, node)
     end
     table.sort(entity_tab_nodes, function(a, b) return a:get_bounds().y < b:get_bounds().y end)
@@ -1295,7 +1295,10 @@ function mn.InventoryScene:_regenerate_selection_nodes()
     for entity_i, node in ipairs(entity_tab_nodes) do
         node:signal_connect("enter", function(_)
             scene._entity_tab_bar:set_tab_selected(entity_i, true)
-            scene:_set_verbose_info_object(nil)
+            local page = scene._entity_pages[entity_i]
+            if page ~= nil then
+                scene:_set_verbose_info_object(page.entity)
+            end
 
             scene:_update_grabbed_object()
             scene:_set_grabbed_object_allowed(false)
@@ -1303,6 +1306,7 @@ function mn.InventoryScene:_regenerate_selection_nodes()
 
         node:signal_connect("exit", function(_)
             scene._entity_tab_bar:set_tab_selected(entity_i, false)
+            scene:_set_verbose_info_object(nil)
         end)
 
         if entity_i <= n_entities then

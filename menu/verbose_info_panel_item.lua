@@ -5,19 +5,20 @@ mn.VerboseInfoPanel.Item = meta.new_type("MenuVerboseInfoPanelItem", rt.Widget, 
         height_above = 0,
         height_below = 0,
         frame = rt.Frame(),
+        divider = rt.Line(0, 0, 1, 1),
         object = nil,
         final_height = 1,
         content = {} -- Table<rt.Drawable>
     })
 
+    out.divider:set_color(rt.Palette.WHITE)
     out.frame:set_corner_radius(1)
-    out.frame:set_color(rt.Palette.GRAY_3)
+    --out.frame:set_color(rt.Palette.GRAY_3)
     return out
 end)
 
 --- @override
 function mn.VerboseInfoPanel.Item:draw()
-    self.frame:draw()
     for object in values(self.content) do
         object:draw()
     end
@@ -32,6 +33,8 @@ end
 function mn.VerboseInfoPanel.Item:create_from(object)
     if meta.is_enum_value(object, rt.VerboseInfoObject) then
         self:create_from_enum(object)
+    elseif meta.isa(object, bt.Entity) then
+        self:create_from_entity(object)
     elseif meta.isa(object, bt.Equip) then
         self:create_from_equip(object)
     elseif meta.isa(object, bt.Move) then
@@ -113,7 +116,7 @@ function mn.VerboseInfoPanel.Item._number(value, color)
     if color ~= nil then
         out = rt.Label("<color=" .. color .. "><mono>" .. value .. "</mono></color>", mn.VerboseInfoPanel.Item._font())
     else
-        out = rt.Label(value, mn.VerboseInfoPanel.Item._font())
+        out = rt.Label("<mono>" .. value .. "</mono>", mn.VerboseInfoPanel.Item._font())
     end
     out:realize()
     out:set_justify_mode(rt.JustifyMode.LEFT)
@@ -298,6 +301,7 @@ function mn.VerboseInfoPanel.Item:create_from_equip(equip)
 
         local total_height = current_y - start_y + ym
         self.frame:fit_into(x, y, width, total_height)
+        self.divider:resize(x, y + total_height, x + width, y + total_height)
         self.final_height = total_height
     end
 
@@ -418,6 +422,7 @@ function mn.VerboseInfoPanel.Item:create_from_move(move)
 
         local total_height = current_y - start_y + 2 * ym
         self.frame:fit_into(x, y, width, total_height)
+        self.divider:resize(x, y + total_height, x + width, y + total_height)
         self.final_height = total_height
     end
 
@@ -482,6 +487,7 @@ function mn.VerboseInfoPanel.Item:create_from_consumable(consumable)
 
         local total_height = current_y - start_y + 2 * ym
         self.frame:fit_into(x, y, width, total_height)
+        self.divider:resize(x, y + total_height, x + width, y + total_height)
         self.final_height = total_height
     end
 
@@ -656,6 +662,7 @@ function mn.VerboseInfoPanel.Item:create_from_status(status)
 
         local total_height = current_y - start_y + 2 * ym
         self.frame:fit_into(x, y, width, total_height)
+        self.divider:resize(x, y + total_height, x + width, y + total_height)
         self.final_height = total_height
     end
 
@@ -747,6 +754,7 @@ function mn.VerboseInfoPanel.Item:create_from_global_status(status)
 
         local total_height = current_y - start_y + 2 * ym
         self.frame:fit_into(x, y, width, total_height)
+        self.divider:resize(x, y + total_height, x + width, y + total_height)
         self.final_height = total_height
     end
 
@@ -920,6 +928,213 @@ function mn.VerboseInfoPanel.Item:create_from_template(template)
 
         local total_height = current_y - y
         self.frame:fit_into(x, y, width, total_height)
+        self.divider:resize(x, y + total_height, x + width, y + total_height)
+        self.final_height = total_height
+    end
+
+    self.measure = function(self)
+        return self._bounds.width, self.final_height
+    end
+
+    return self
+end
+
+--- @brief party info
+function mn.VerboseInfoPanel.Item:create_from_entity(entity)
+    self.object = entity
+    self._is_realized = false
+
+    local format_title = function(str)
+        return "<b><u>" .. str .. "</u></b>"
+    end
+
+    self.realize = function()
+        self._is_realized = true
+        self.frame:realize()
+
+        self.title_label = rt.Label(format_title(entity:get_name()))
+        self.title_label:realize()
+        self.title_label:set_justify_mode(rt.JustifyMode.LEFT)
+
+        self.content = {
+            self.title_label
+        }
+
+        for stat_color_label in range(
+            {"hp", "HP", "HP"},
+            {"attack", "ATTACK", "ATK"},
+            {"defense", "DEFENSE", "DEF"},
+            {"speed", "SPEED", "SPD"}
+        ) do
+            local stat, color, label = table.unpack(stat_color_label)
+            local prefix_label = self._prefix(label, color)
+            prefix_label:realize()
+            local colon = self._colon()
+            local value_label = self._number("<color=" .. color .. ">" .. tostring(entity["get_" .. stat](entity)) .. "</color>")
+
+            self[stat .. "_prefix_label"] = prefix_label
+            self[stat .. "_colon_label"] = colon
+            self[stat .. "_value_label"] = value_label
+
+            for label in range(prefix_label, colon, value_label) do
+                table.insert(self.content, label)
+            end
+        end
+
+        local equip_name = rt.settings.battle.equip.name
+        local consumable_name = rt.settings.battle.consumable.name
+        local move_name = rt.settings.battle.move.name
+
+        local font, mono_font = rt.settings.font.default_small, rt.settings.font.default_mono_small
+        self.move_label = rt.Label(move_name .. "s:", font, mono_font)
+        self.move_sprites = {}
+        self.equip_and_consumable_label = rt.Label("Equipment:", font, mono_font)
+        self.equip_sprites = {}
+        self.consumable_sprites = {}
+
+        local n_move_slots, move_slots = entity:list_move_slots()
+        for i = 1, n_move_slots do
+            if move_slots[i] ~= nil then
+                table.insert(self.move_sprites, rt.Sprite(move_slots[i]:get_sprite_id()))
+            end
+        end
+
+        if sizeof(self.move_sprites) == 0 then
+            table.insert(self.move_sprites, self._description("<color=GRAY>(none)</color>"))
+        end
+
+        local n_equip_slots, equip_slots = entity:list_equip_slots()
+        for i = 1, n_equip_slots do
+            if equip_slots[i] ~= nil then
+                table.insert(self.equip_sprites, rt.Sprite(equip_slots[i]:get_sprite_id()))
+            end
+        end
+
+        local n_consumable_slots, consumable_slots = entity:list_consumable_slots()
+        for i = 1, n_consumable_slots do
+            if consumable_slots[i] ~= nil then
+                table.insert(self.consumable_sprites, rt.Sprite(consumable_slots[i]:get_sprite_id()))
+            end
+        end
+
+        if sizeof(self.equip_sprites) == 0 and sizeof(self.consumable_sprites) == 0 then
+            table.insert(self.equip_sprites, self._description("<color=GRAY>(none)</color>"))
+        end
+
+        for widget in range(self.name_label, self.move_label, self.equip_and_consumable_label, self.hrule) do
+            widget:realize()
+            table.insert(self.content, widget)
+        end
+
+        for t in range(self.move_sprites, self.equip_sprites, self.consumable_sprites) do
+            for sprite in values(t) do
+                sprite:realize()
+                table.insert(self.content, sprite)
+            end
+        end
+
+        local flavor_text = entity:get_flavor_text()
+        if #flavor_text ~= 0 then
+            self.spacer = self._hrule()
+            self.flavor_text_label = self._flavor_text(flavor_text)
+
+            table.insert(self.content, self.spacer)
+            table.insert(self.content, self.flavor_text_label)
+        end
+    end
+
+    self.size_allocate = function(self, x, y, width, height)
+        local m, xm, ym = self._get_margin()
+        local start_y = y + 2 * ym
+        local start_x = x + xm
+        local current_x, current_y = start_x, start_y
+        local w = width - 2 * xm
+
+        self.title_label:fit_into(current_x, current_y, w)
+        current_y = current_y + select(2, self.title_label:measure()) + m
+
+        for stat in range("hp", "attack", "defense", "speed") do
+            local prefix_label = self[stat .. "_prefix_label"]
+            local colon_label = self[stat .. "_colon_label"]
+            local value_label = self[stat .. "_value_label"]
+
+            if value_label ~= nil then
+                local value_w, value_h = value_label:measure()
+                prefix_label:fit_into(current_x, current_y, POSITIVE_INFINITY)
+                local colon_w = select(1, colon_label:measure())
+                colon_label:fit_into(current_x + w / 2 - colon_w / 2, current_y, POSITIVE_INFINITY)
+                value_label:fit_into(current_x + w - value_w, current_y, POSITIVE_INFINITY)
+
+                current_y = current_y + value_h
+            end
+        end
+
+        current_y = current_y + m
+
+        local sprite_w, sprite_h = 32, 32
+        local tab = 2 * xm
+        self.move_label:fit_into(current_x, current_y)
+        current_y = current_y + select(2, self.move_label:measure()) + 0.5 * m
+
+        local sprite_start_x = current_x + xm
+        local sprite_x = sprite_start_x
+
+        local n_moves = sizeof(self.move_sprites)
+        for i = 1, n_moves do
+            local sprite = self.move_sprites[i]
+            sprite:fit_into(sprite_x, current_y, sprite_w, sprite_h)
+            sprite_x = sprite_x + sprite_w
+
+            if sprite_x + sprite_w > start_x + w - xm and i ~= n_moves then
+                sprite_x = sprite_start_x
+                current_y = current_y + sprite_w
+            end
+        end
+
+        current_y = current_y + sprite_w + m
+
+        self.equip_and_consumable_label:fit_into(current_x, current_y)
+        current_y = current_y + select(2, self.move_label:measure()) + 0.5 * m
+
+        sprite_x = sprite_start_x
+        local n_equips = sizeof(self.equip_sprites)
+        for i = 1, n_equips do
+            local sprite = self.equip_sprites[i]
+            sprite:fit_into(sprite_x, current_y, sprite_w, sprite_h)
+            sprite_x = sprite_x + sprite_w
+
+            if sprite_x + sprite_w > start_x + w - xm then
+                sprite_x = sprite_start_x
+                current_y = current_y + sprite_h
+            end
+        end
+
+        local n_consumables = sizeof(self.consumable_sprites)
+        for i = 1, n_consumables do
+            local sprite = self.consumable_sprites[i]
+            sprite:fit_into(sprite_x, current_y, sprite_w, sprite_h)
+            sprite_x = sprite_x + sprite_w
+
+            if sprite_x + sprite_w > start_x + w - xm and i + n_equips < n_equips + n_consumables then
+                sprite_x = sprite_start_x
+                current_y = current_y + sprite_h
+            end
+        end
+
+        current_y = current_y + sprite_h + m
+
+        if self.spacer ~= nil then
+            self.spacer:fit_into(current_x, current_y, w, 0)
+            current_y = current_y + select(2, self.spacer:measure()) + m
+
+            self.flavor_text_label:fit_into(current_x, current_y, w, POSITIVE_INFINITY)
+            current_y = current_y + select(2, self.flavor_text_label:measure()) + m
+            current_y = current_y + ym
+        end
+
+        local total_height = current_y - y
+        self.frame:fit_into(x, y, width, total_height)
+        self.divider:resize(x, y + total_height, x + width, y + total_height)
         self.final_height = total_height
     end
 
@@ -1045,6 +1260,7 @@ function mn.VerboseInfoPanel.Item:create_from_enum(which)
 
         local total_height = current_y - start_y + 2 * ym
         self.frame:fit_into(x, y, width, total_height)
+        self.divider:resize(x, y + total_height, x + width, y + total_height)
         self.final_height = total_height
     end
 
@@ -1084,6 +1300,7 @@ function mn.VerboseInfoPanel.Item:create_as_gamma_widget()
         )
 
         self.frame:fit_into(x, y, width, height)
+        self.divider:resize(x, y + height, x + width, y + height)
         self.final_height = height
     end
 
@@ -1123,6 +1340,7 @@ function mn.VerboseInfoPanel.Item:create_as_visual_effects_widget()
         )
 
         self.frame:fit_into(x, y, width, height)
+        self.divider:resize(x, y + height, x + width, y + height)
         self.final_height = height
     end
 
@@ -1160,6 +1378,7 @@ function mn.VerboseInfoPanel.Item:create_as_motion_effects_widget()
         )
 
         self.frame:fit_into(x, y, width, height)
+        self.divider:resize(x, y + height, x + width, y + height)
         self.final_height = height
     end
 
@@ -1198,6 +1417,7 @@ function mn.VerboseInfoPanel.Item:create_as_msaa_widget()
         )
 
         self.frame:fit_into(x, y, width, height)
+        self.divider:resize(x, y + height, x + width, y + height)
         self.final_height = height
     end
 
@@ -1235,6 +1455,7 @@ function mn.VerboseInfoPanel.Item:create_as_deadzone_widget()
         )
 
         self.frame:fit_into(x, y, width, height)
+        self.divider:resize(x, y + height, x + width, y + height)
         self.final_height = height
     end
 
