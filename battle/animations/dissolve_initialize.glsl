@@ -63,10 +63,10 @@ uniform vec2 snapshot_size;
 layout (local_size_x = 1, local_size_y = 1, local_size_z = 1) in;
 void computemain()
 {
-    float instance_id = float(gl_GlobalInvocationID.x);
-    vec2 texture_coords = vec2(mod(instance_id, snapshot_size.x), instance_id / snapshot_size.x) / snapshot_size;
+    vec2 position = gl_GlobalInvocationID.xy;
+    vec2 texture_coords = position / snapshot_size;
     vec4 color = texture(snapshot, texture_coords);
-    imageStore(color_texture, ivec2(instance_id, 0), color);
+    imageStore(color_texture, ivec2(position.x, position.y), color);
 
     float x = aabb.x;
     float y = aabb.y;
@@ -74,7 +74,7 @@ void computemain()
     float height = aabb.w;
     vec2 center = aabb.xy + 0.5 * aabb.zw;
 
-    vec2 position = vec2(x, y) + texture_coords * vec2(width, height);
-    vec2 previous = translate_point_by_angle(position, 2 + random(gl_GlobalInvocationID.xy) * 2, distance(position, center));
-    imageStore(position_texture, ivec2(instance_id, 0), vec4(position, previous));
+    vec2 current = vec2(x, y) + texture_coords * vec2(width, height);
+    vec2 previous = translate_point_by_angle(current, 1 + random(gl_GlobalInvocationID.xy) * 4, distance(current, center));
+    imageStore(position_texture, ivec2(position.x, position.y), vec4(current, previous));
 }

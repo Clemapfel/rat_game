@@ -2,24 +2,21 @@
 
 uniform sampler2D position_texture;
 uniform sampler2D color_texture;
+uniform vec2 snapshot_size;
 
 #ifdef VERTEX
 
 varying vec4 vertex_color;
 
-vec2 instance_id_to_texture_coordinates(int i) {
-    return vec2(i, 0);
-}
-
 vec4 position(mat4 transform, vec4 vertex_position)
 {
     int instance_id = love_InstanceID;
 
-    ivec2 texture_coordinates = ivec2(instance_id, 0);
-    vec4 position_data = texelFetch(position_texture, texture_coordinates, 0);
+    vec2 texture_coordinates = vec2(instance_id / snapshot_size.x, mod(instance_id, snapshot_size.x));
+    vec4 position_data = texelFetch(position_texture, ivec2(texture_coordinates), 0);
     vertex_position.xy += position_data.xy;
 
-    vec4 color_data = texelFetch(color_texture, texture_coordinates, 0);
+    vec4 color_data = texelFetch(color_texture, ivec2(texture_coordinates), 0);
     vertex_color = color_data;
 
     return transform * vertex_position;

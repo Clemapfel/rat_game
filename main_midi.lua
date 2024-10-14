@@ -4,12 +4,12 @@ love.window.setMode(800, 600, {
     resizable = true
 })
 
-local sprite_scale = 1
+local sprite_scale = 2
 local sprite_x, sprite_y, sprite_w, sprite_h
 local sprite = {
     _texture = love.graphics.newImage("assets/why.png"),
     draw = function(self)
-        love.graphics.draw(self._texture, sprite_x, sprite_y)
+        love.graphics.draw(self._texture, sprite_x, sprite_y, 0, sprite_scale, sprite_scale)
     end,
     measure = function()
         return sprite_w * sprite_scale, sprite_h * sprite_scale
