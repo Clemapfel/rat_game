@@ -64,6 +64,8 @@ rt.physics = {}
 
 mn = rt.menu
 bt = rt.battle
+bt.Animation = {}
+
 ow = rt.overworld
 b2 = rt.physics
 B2_METER_TO_PIXEL = 100
@@ -217,7 +219,6 @@ require "battle.priority_queue"
 require "battle.entity_sprite"
 require "battle.party_sprite"
 
-if bt.Animation == nil then bt.Animation = {} end
 require "battle.animations.dissolve"
 
 require "battle.battle_scene"

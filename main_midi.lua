@@ -1,16 +1,27 @@
 require "include"
 
-love.window.setMode(400, 400, {
+love.window.setMode(800, 600, {
     resizable = true
 })
 
+local sprite_scale = 1
+local sprite_x, sprite_y, sprite_w, sprite_h
 local sprite = {
     _texture = love.graphics.newImage("assets/why.png"),
     draw = function(self)
-        local w, h = self._texture:getDimension()
-        love.graphics.draw(self._texture, 0, 0)--, 0.5 * love.graphics.getWidth() - 0.5 * w, 0.5 * love.graphics.getHeight() - 0.5 * h)
+        love.graphics.draw(self._texture, sprite_x, sprite_y)
+    end,
+    measure = function()
+        return sprite_w * sprite_scale, sprite_h * sprite_scale
+    end,
+
+    get_bounds = function()
+        return rt.AABB(sprite_x, sprite_y, sprite_w * sprite_scale, sprite_h * sprite_scale)
     end
 }
+
+sprite_w, sprite_h = sprite._texture:getDimensions()
+sprite_x, sprite_y = 0.5 * love.graphics.getWidth() - 0.5 * sprite_w, 0.5 * love.graphics.getHeight() - 0.5 * sprite_h
 
 local animation = bt.Animation.DISSOLVE(sprite)
 animation:realize()
