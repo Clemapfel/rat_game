@@ -217,6 +217,9 @@ require "battle.priority_queue"
 require "battle.entity_sprite"
 require "battle.party_sprite"
 
+if bt.Animation == nil then bt.Animation = {} end
+require "battle.animations.dissolve"
+
 require "battle.battle_scene"
 
 -- state

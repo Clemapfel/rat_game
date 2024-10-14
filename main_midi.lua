@@ -4,6 +4,30 @@ love.window.setMode(400, 400, {
     resizable = true
 })
 
+local sprite = {
+    _texture = love.graphics.newImage("assets/why.png"),
+    draw = function(self)
+        local w, h = self._texture:getDimension()
+        love.graphics.draw(self._texture, 0, 0)--, 0.5 * love.graphics.getWidth() - 0.5 * w, 0.5 * love.graphics.getHeight() - 0.5 * h)
+    end
+}
+
+local animation = bt.Animation.DISSOLVE(sprite)
+animation:realize()
+
+love.update = function(delta)
+    if love.keyboard.isDown("space") then
+        animation:update(delta)
+    end
+end
+
+love.draw = function()
+    animation:draw()
+end
+
+
+--[[
+
 
 player_x, player_y = love.graphics.getWidth() / 2, love.graphics.getHeight() / 2
 player_radius = 50

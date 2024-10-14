@@ -1094,7 +1094,7 @@ function mn.VerboseInfoPanel.Item:create_from_entity(entity)
         local sprite_start_x = current_x + xm
         local sprite_x = sprite_start_x
 
-        TODO: aligns sprites next to names
+        --TODO: aligns sprites next to names
 
         local n_moves = sizeof(self.move_sprites)
         for i = 1, n_moves do
