@@ -56,15 +56,18 @@ vec2 translate_point_by_angle(vec2 xy, float dist, float angle)
 layout(rgba16f) uniform image2D position_texture;
 layout(rgba8) uniform image2D color_texture;
 
+const float PI = 3.14159265359;
+
 uniform vec4 aabb;
 uniform sampler2D snapshot;
 uniform vec2 snapshot_size;
+uniform float pixel_size;
 
 layout (local_size_x = 1, local_size_y = 1, local_size_z = 1) in;
 void computemain()
 {
     vec2 position = gl_GlobalInvocationID.xy;
-    vec2 texture_coords = position / snapshot_size;
+    vec2 texture_coords = position / snapshot_size * pixel_size;
     vec4 color = texture(snapshot, texture_coords);
     imageStore(color_texture, ivec2(position.x, position.y), color);
 
@@ -75,6 +78,15 @@ void computemain()
     vec2 center = aabb.xy + 0.5 * aabb.zw;
 
     vec2 current = vec2(x, y) + texture_coords * vec2(width, height);
-    vec2 previous = translate_point_by_angle(current, 1 + random(gl_GlobalInvocationID.xy) * 4, distance(current, center));
+
+    float direction = sign(current.y - center.y);
+    vec2 diff = current - center;
+
+    vec2 previous = translate_point_by_angle(current, 1 + abs(random(gl_GlobalInvocationID.xy) * 10), -PI * 1.5 + random(gl_GlobalInvocationID.xy) * PI / 12);
+    previous.x = previous.x + 2;
+
+    if (abs(diff.y + 0.1 * height) < height * 0.05)
+        previous.x = previous.x + 20;
+
     imageStore(position_texture, ivec2(position.x, position.y), vec4(current, previous));
 }

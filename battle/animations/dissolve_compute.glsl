@@ -14,7 +14,7 @@ uniform vec2 screen_size;
 uniform float floor_y;
 
 const float position_acceleration = 2;
-const float color_velocity = 0.3;
+const float color_velocity = 2;
 const vec2 gravity = vec2(0, 1000);
 
 layout (local_size_x = 1, local_size_y = 1, local_size_z = 1) in;
@@ -35,11 +35,4 @@ void computemain()
     next.y = clamp(next.y, 0.1 * screen_size.y, min(floor_y, 0.9 + screen_size.y));
 
     imageStore(position_texture, position, vec4(next, current.xy));
-
-    // update color
-
-    vec4 color_data = imageLoad(color_texture, position);
-    color_data.a = clamp(color_data.a - color_velocity * delta, 0, 1);
-
-    imageStore(color_texture, position, color_data);
 }

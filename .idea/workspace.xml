@@ -22,13 +22,12 @@
     </configurations>
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="7fa9ba1b-2cff-4ecc-86fb-59ab2fa76ee1" name="Changes" comment="working">
+    <list default="true" id="7fa9ba1b-2cff-4ecc-86fb-59ab2fa76ee1" name="Changes" comment="dissolve working">
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/battle/animations/dissolve.lua" beforeDir="false" afterPath="$PROJECT_DIR$/battle/animations/dissolve.lua" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/battle/animations/dissolve_compute.glsl" beforeDir="false" afterPath="$PROJECT_DIR$/battle/animations/dissolve_compute.glsl" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/battle/animations/dissolve_initialize.glsl" beforeDir="false" afterPath="$PROJECT_DIR$/battle/animations/dissolve_initialize.glsl" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/battle/animations/dissolve_render.glsl" beforeDir="false" afterPath="$PROJECT_DIR$/battle/animations/dissolve_render.glsl" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/main_midi.lua" beforeDir="false" afterPath="$PROJECT_DIR$/main_midi.lua" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -593,15 +592,7 @@
       <workItem from="1728756757386" duration="16239000" />
       <workItem from="1728863771206" duration="1251000" />
       <workItem from="1728941260132" duration="2112000" />
-      <workItem from="1728943385470" duration="5776000" />
-    </task>
-    <task id="LOCAL-01092" summary="added complex tiling">
-      <option name="closed" value="true" />
-      <created>1727900460833</created>
-      <option name="number" value="01092" />
-      <option name="presentableId" value="LOCAL-01092" />
-      <option name="project" value="LOCAL" />
-      <updated>1727900460833</updated>
+      <workItem from="1728943385470" duration="9065000" />
     </task>
     <task id="LOCAL-01093" summary="stashing vector field">
       <option name="closed" value="true" />
@@ -987,7 +978,15 @@
       <option name="project" value="LOCAL" />
       <updated>1728947214757</updated>
     </task>
-    <option name="localTasksCounter" value="1141" />
+    <task id="LOCAL-01141" summary="dissolve working">
+      <option name="closed" value="true" />
+      <created>1728949376556</created>
+      <option name="number" value="01141" />
+      <option name="presentableId" value="LOCAL-01141" />
+      <option name="project" value="LOCAL" />
+      <updated>1728949376556</updated>
+    </task>
+    <option name="localTasksCounter" value="1142" />
     <servers />
   </component>
   <component name="TypeScriptGeneratedFilesManager">
@@ -1036,7 +1035,6 @@
     </option>
   </component>
   <component name="VcsManagerConfiguration">
-    <MESSAGE value="rewrote meta" />
     <MESSAGE value="meta working" />
     <MESSAGE value="removed all glyph use to prepare for label rewrite" />
     <MESSAGE value="stashing label rework" />
@@ -1061,7 +1059,8 @@
     <MESSAGE value="stashing" />
     <MESSAGE value="stashing dissolve animation" />
     <MESSAGE value="working" />
-    <option name="LAST_COMMIT_MESSAGE" value="working" />
+    <MESSAGE value="dissolve working" />
+    <option name="LAST_COMMIT_MESSAGE" value="dissolve working" />
   </component>
   <component name="XDebuggerManager">
     <breakpoint-manager>
