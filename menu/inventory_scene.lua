@@ -1,7 +1,7 @@
 rt.settings.menu.inventory_scene = {
     outer_margin = 2 * rt.settings.margin_unit,
     verbose_info_scroll_speed = 150,
-    sprite_factor = 2,
+    sprite_factor = 1,
     grabbed_object_sprite_offset = -0.1,
     tile_size = 100
 }
@@ -133,7 +133,7 @@ end
 
 --- @override
 function mn.InventoryScene:create_from_state(state)
-    local tab_sprite_scale_factor = 3
+    local tab_sprite_scale_factor = 1
     self._state = state
     self._entity_pages = {}
 
@@ -205,7 +205,7 @@ function mn.InventoryScene:create_from_state(state)
         self._entity_pages[entity_i] = page
     end
 
-    local sprite = rt.Sprite("opal", 19)
+    local sprite = rt.Sprite("menu_icons", "options")
     sprite:realize()
     local sprite_w, sprite_h = sprite:get_resolution()
     sprite:set_minimum_size(sprite_w * tab_sprite_scale_factor, sprite_h * tab_sprite_scale_factor)
@@ -214,7 +214,6 @@ function mn.InventoryScene:create_from_state(state)
     self._entity_tab_bar:set_n_post_aligned_items(1)
     self._entity_tab_bar:set_orientation(rt.Orientation.VERTICAL)
     self._entity_tab_bar:realize()
-
 
     self._shared_move_list:clear()
     for move, quantity in pairs(self._state:list_shared_move_quantities()) do
@@ -1298,6 +1297,8 @@ function mn.InventoryScene:_regenerate_selection_nodes()
             local page = scene._entity_pages[entity_i]
             if page ~= nil then
                 scene:_set_verbose_info_object(page.entity)
+            else
+                scene:_set_verbose_info_object(rt.VerboseInfoObject.OPTIONS)
             end
 
             scene:_update_grabbed_object()

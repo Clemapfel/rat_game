@@ -1,5 +1,6 @@
 rt.settings.sprite = {
-    shader_path = "common/sprite_scale_correction.glsl"
+    shader_path = "common/sprite_scale_correction.glsl",
+    scale_factor = 2
 }
 
 --- @class rt.Sprite
@@ -8,6 +9,7 @@ rt.Sprite = meta.new_type("Sprite", rt.Widget, rt.Animation, function(id, index)
     return meta.new(rt.Sprite, {
         _id = id,
         _spritesheet = {}, -- rt.SpriteAtlasEntry
+        _is_valid = false,
         _texture_resolution = {0, 0},
         _width = 0, -- 0 -> use frame resolution
         _height = 0,
@@ -34,7 +36,13 @@ function rt.Sprite:realize()
     self._is_realized = true
 
     self._spritesheet = rt.SpriteAtlas:get(self._id)
-    if self._spritesheet == nil then return end
+    if self._spritesheet == nil then
+        self._is_valid = false
+        self._shape:set_color(rt.RGBA(1, 0, 1, 1))
+        return
+    else
+        self._is_valid = true
+    end
 
     self._frame_duration = 1 / self._spritesheet:get_fps()
     self._n_frames = self._spritesheet:get_n_frames()
@@ -44,7 +52,9 @@ function rt.Sprite:realize()
 
     self:reformat()
     self:set_frame(self._current_frame)
-    self:set_minimum_size(self._width, self._height)
+
+    local scale_factor = rt.settings.sprite.scale_factor
+    self:set_minimum_size(self._width * scale_factor, self._height * scale_factor)
 
     if self._animation_id == "" then
         self._frame_range_start = 1
@@ -58,6 +68,10 @@ end
 
 --- @override
 function rt.Sprite:draw()
+    if self._is_valid == false then
+        self._shape:draw()
+        return
+    end
     if self._use_corrective_shader then
         self._shader:bind()
         self._shader:send("texture_resolution", self._texture_resolution)
@@ -70,7 +84,7 @@ end
 
 --- @override
 function rt.Sprite:update(delta)
-    if self._is_realized == true then
+    if self._is_realized == true and self._is_valid then
         self._elapsed = self._elapsed + delta
         local start = self._frame_range_start
         local n_frames = self._frame_range_end - self._frame_range_start + 1
@@ -88,7 +102,7 @@ end
 --- @brief
 function rt.Sprite:set_frame(i)
     self._current_frame = i
-    if self._is_realized == true then
+    if self._is_realized == true and self._is_valid then
         local frame = self._spritesheet:get_frame(self._current_frame)
         self._shape:reformat_texture_coordinates(
             frame.x, frame.y,
@@ -102,6 +116,7 @@ end
 --- @brief
 function rt.Sprite:set_animation(id)
     if self:get_is_realized() == false then self:realize() end
+    if not self._is_valid then return end
     if id == "" or id == nil then
         self:set_frame(1)
         self._frame_range_start = 1
@@ -110,7 +125,7 @@ function rt.Sprite:set_animation(id)
         self:set_frame(id)
     else
         if self._spritesheet:has_frame(id) == false then
-            rt.warning("In rt.Sprite:set_animation: sprite at `" .. self._spritesheet.path .. "` has no animation with id `" .. id .. "`")
+            rt.warning("In rt.Sprite:set_animation: sprite at `" .. self._spritesheet.path .. "/" .. self._spritesheet.id .. "` has no animation with id `" .. id .. "`")
             return
         end
 
@@ -129,6 +144,7 @@ end
 
 --- @brief
 function rt.Sprite:has_animation(id)
+    if self._is_valid == false then return false end
     return self._spritesheet:has_frame(id)
 end
 
@@ -146,7 +162,14 @@ end
 --- @brief
 function rt.Sprite:get_resolution()
     if not self._is_realized then self:realize() end
+    if not self._is_valid then return 16, 16 end
     return self._width, self._height
+end
+
+--- @overrride
+function rt.Sprite:measure()
+    local scale_factor = rt.settings.sprite.scale_factor
+    return self._width * scale_factor, self._height * scale_factor
 end
 
 --- @brief
@@ -167,13 +190,10 @@ end
 
 --- @brief
 function rt.Sprite:get_n_frames(animation_id_maybe)
+    if self._is_valid == false then return 1 end
     return self._spritesheet:get_n_frames(animation_id_maybe)
 end
 
---- @brief
-function rt.Sprite:get_origin()
-    return self._spritesheet.origin_x, self._spritesheet.origin_y
-end
 
 --- @brief
 function rt.Sprite:set_use_corrective_shader(b)

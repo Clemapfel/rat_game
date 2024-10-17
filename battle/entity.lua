@@ -66,6 +66,10 @@ end, {
     name = "",
     name_suffix = "",
     flavor_text = "(no flavor_text)",
+
+    intrinsic_moves = {
+        "STRUGGLE"
+    }
 })
 
 --- @brief
@@ -81,6 +85,8 @@ function bt.Entity:realize()
         attack_base = rt.UNSIGNED,
         defense_base = rt.UNSIGNED,
         speed_base = rt.UNSIGNED,
+
+        intrinsic_moves = rt.TABLE,
 
         ai_level = rt.UNSIGNED,
         sprite_id = rt.STRING,
@@ -103,10 +109,6 @@ function bt.Entity:realize()
     }
 
     rt.load_config(self._path, self, template)
-    assert(self.n_move_slots < POSITIVE_INFINITY)
-    assert(self.n_equip_slots < POSITIVE_INFINITY)
-    assert(self.n_equip_slots < POSITIVE_INFINITY)
-
     self._state:add_entity(self)
 
     meta.set_is_mutable(self, false)
@@ -262,4 +264,13 @@ for which in range("move", "equip", "consumable") do
     bt.Entity["list_" .. which .. "_slots"] = function(self)
         return self._state["entity_list_" .. which .. "_slots"](self._state, self)
     end
+end
+
+--- @brief
+function bt.Entity:list_intrinsic_move_ids()
+    local out = {}
+    for id in values(self.intrinsic_moves) do
+        table.insert(out, id)
+    end
+    return out
 end

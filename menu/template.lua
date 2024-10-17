@@ -55,5 +55,5 @@ end
 
 --- @brief
 function mn.Template:get_sprite_id()
-    return "orbs", "generic_overlay"
+    return "moves", "DEBUG_MOVE"
 end

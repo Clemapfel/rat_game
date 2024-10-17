@@ -50,6 +50,8 @@ function rt.load_config(path, to_assign, template)
             return meta.is_boolean(value)
         elseif type == rt.FUNCTION then
             return meta.is_function(value)
+        elseif type == rt.TABLE then
+            return meta.is_table(value)
         else
             rt.error("In rt.load_config.is: error when loading config at `" .. path .. "`: unknown template type `" .. type .. "`")
         end

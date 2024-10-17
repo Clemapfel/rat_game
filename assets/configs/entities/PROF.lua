@@ -1,11 +1,22 @@
 return {
-    name = "Prof",
-    sprite_id = "battle/prof_battle",
-    portrait_sprite_id = "menu_portraits",
+    name = "PROF",
+    flavor_text = "PROF flavor text",
+
+    sprite_id = "",
+    portrait_sprite_id = "portraits",
     portrait_sprite_index = "PROF",
 
     is_enemy = false,
-    n_move_slots = 16,
     n_equip_slots = 2,
-    n_consumable_slots = 1
+    n_consumable_slots = 2,
+
+    attack_base = 100,
+    defense_base = 100,
+    speed_base = 100,
+
+    intrinsic_moves = {
+        "STRUGGLE",
+        "PROTECT",
+        "INSPECT"
+    }
 }

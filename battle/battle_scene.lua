@@ -188,6 +188,13 @@ function bt.BattleScene:_update_slots(entity)
     local moves = entry.moves
     local intrinsics = entry.intrinsics
 
+    local infinity = "\u{221E}"
+
+    local intrinsic_moves = self._state:entity_list_intrinsic_moves(entity)
+    for i, move in ipairs(intrinsic_moves) do
+        intrinsics:set_object(i, move, infinity)
+    end
+
     local n_slots, move_slots = self._state:entity_list_move_slots(entity)
     for slot_i = 1, n_slots do
         local move = move_slots[slot_i]
@@ -198,7 +205,7 @@ function bt.BattleScene:_update_slots(entity)
             local n_left = move:get_max_n_uses() - n_used
             local n_left_label = tostring(n_left)
             if n_left == POSITIVE_INFINITY then
-                n_left_label = "\u{221E}" -- infinity
+                n_left_label = infinity -- infinity
             end
 
             moves:set_object(slot_i, move, "<o>" .. n_left_label .. "</o>")
@@ -259,7 +266,7 @@ function bt.BattleScene:_update_slots(entity)
     for node in values(intrinsic_nodes) do
         node:signal_connect("enter", function(self)
             self.slots:set_slot_selection_state(self.slot_i, rt.SelectionState.ACTIVE)
-            scene._verbose_info:show(scene._state:entity_get_move(self.entity, self.slot_i))
+            scene._verbose_info:show(scene._state:entity_list_intrinsic_moves(self.entity)[self.slot_i])
         end)
 
         node:signal_connect("exit", function(self)

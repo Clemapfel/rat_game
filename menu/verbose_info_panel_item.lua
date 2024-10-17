@@ -83,10 +83,6 @@ end
 
 function mn.VerboseInfoPanel.Item._sprite(object)
     local out = rt.Sprite(object:get_sprite_id())
-    local res_w, res_h = out:get_resolution()
-    res_w = res_w * 2
-    res_h = res_h * 2
-    out:set_minimum_size(res_w, res_h)
     out:realize()
     return out
 end
@@ -807,10 +803,16 @@ function mn.VerboseInfoPanel.Item:create_from_template(template)
                 hrule = self._hrule()
             }
 
+            local small_sprite = function(...)
+                local out = rt.Sprite(...)
+                out:set_minimum_size(out:get_resolution())
+                return out
+            end
+
             local n_move_slots, move_slots = template:list_move_slots(entity)
             for i = 1, n_move_slots do
                 if move_slots[i] ~= nil then
-                    table.insert(to_push.move_sprites, rt.Sprite(move_slots[i]:get_sprite_id()))
+                    table.insert(to_push.move_sprites, small_sprite(move_slots[i]:get_sprite_id()))
                 end
             end
 
@@ -821,14 +823,14 @@ function mn.VerboseInfoPanel.Item:create_from_template(template)
             local n_equip_slots, equip_slots = template:list_equip_slots(entity)
             for i = 1, n_equip_slots do
                 if equip_slots[i] ~= nil then
-                    table.insert(to_push.equip_sprites, rt.Sprite(equip_slots[i]:get_sprite_id()))
+                    table.insert(to_push.equip_sprites, small_sprite(equip_slots[i]:get_sprite_id()))
                 end
             end
 
             local n_consumable_slots, consumable_slots = template:list_consumable_slots(entity)
             for i = 1, n_consumable_slots do
                 if consumable_slots[i] ~= nil then
-                    table.insert(to_push.consumable_sprites, rt.Sprite(consumable_slots[i]:get_sprite_id()))
+                    table.insert(to_push.consumable_sprites, small_sprite(consumable_slots[i]:get_sprite_id()))
                 end
             end
 
@@ -990,7 +992,7 @@ function mn.VerboseInfoPanel.Item:create_from_entity(entity)
         self.move_sprites = {}
         self.move_names = {}
 
-        self.equip_label = rt.Label(equip_name .. "s:", font, mono_font)
+        self.equip_label = rt.Label(equip_name .. ":", font, mono_font)
         self.equip_sprites = {}
         self.equip_names = {}
 
@@ -1002,41 +1004,46 @@ function mn.VerboseInfoPanel.Item:create_from_entity(entity)
         for i = 1, n_move_slots do
             if move_slots[i] ~= nil then
                 table.insert(self.move_sprites, rt.Sprite(move_slots[i]:get_sprite_id()))
-                table.insert(self.move_names, self._prefix_label(move_slots[i]:get_name()))
+                table.insert(self.move_names, self._prefix(move_slots[i]:get_name()))
             end
         end
 
         if sizeof(self.move_sprites) == 0 then
-            table.insert(self.move_sprites, self._description("<color=GRAY>(none)</color>"))
+            table.insert(self.move_names, self._description("<color=GRAY>(none)</color>"))
         end
 
         local n_equip_slots, equip_slots = entity:list_equip_slots()
         for i = 1, n_equip_slots do
             if equip_slots[i] ~= nil then
                 table.insert(self.equip_sprites, rt.Sprite(equip_slots[i]:get_sprite_id()))
-                table.insert(self.equip_names, self._prefix_label(equip_slots[i]:get_name()))
+                table.insert(self.equip_names, self._prefix(equip_slots[i]:get_name()))
             end
+        end
+
+        if sizeof(self.equip_sprites) == 0 then
+            table.insert(self.equip_names, self._description("<color=GRAY>(none)</color>"))
         end
 
         local n_consumable_slots, consumable_slots = entity:list_consumable_slots()
         for i = 1, n_consumable_slots do
             if consumable_slots[i] ~= nil then
                 table.insert(self.consumable_sprites, rt.Sprite(consumable_slots[i]:get_sprite_id()))
-                table.insert(self.consumable_names, self._prefix_label(consumable_slots[i]:get_name()))
+                table.insert(self.consumable_names, self._prefix(consumable_slots[i]:get_name()))
             end
         end
 
-        if sizeof(self.equip_sprites) == 0 and sizeof(self.consumable_sprites) == 0 then
-            table.insert(self.equip_sprites, self._description("<color=GRAY>(none)</color>"))
+        if sizeof(self.consumable_sprites) == 0 then
+            table.insert(self.consumable_names, self._description("<color=GRAY>(none)</color>"))
         end
 
-        for widget in range(self.name_label, self.move_label, self.equip_and_consumable_label, self.hrule) do
+        for widget in range(self.name_label, self.move_label, self.equip_label, self.consumable_label, self.hrule) do
             widget:realize()
             table.insert(self.content, widget)
         end
 
         for t in range(self.move_sprites, self.equip_sprites, self.consumable_sprites) do
             for sprite in values(t) do
+                sprite:set_minimum_size(sprite:get_resolution())
                 sprite:realize()
                 table.insert(self.content, sprite)
             end
@@ -1088,57 +1095,32 @@ function mn.VerboseInfoPanel.Item:create_from_entity(entity)
 
         local sprite_w, sprite_h = 32, 32
         local tab = 2 * xm
-        self.move_label:fit_into(current_x, current_y)
-        current_y = current_y + select(2, self.move_label:measure()) + 0.5 * m
 
         local sprite_start_x = current_x + xm
         local sprite_x = sprite_start_x
 
-        --TODO: aligns sprites next to names
+        for which in range("move", "consumable", "equip") do
+            self[which .. "_label"]:fit_into(current_x, current_y)
+            current_y = current_y + select(2, self.move_label:measure()) + 0.5 * m
 
-        local n_moves = sizeof(self.move_sprites)
-        for i = 1, n_moves do
-            local sprite = self.move_sprites[i]
-            sprite:fit_into(sprite_x, current_y, sprite_w, sprite_h)
-            sprite_x = sprite_x + sprite_w
+            local n = sizeof(self[which .. "_names"])
+            for i = 1, n do
+                local sprite = self[which .. "_sprites"][i]
+                local label = self[which .. "_names"][i]
 
-            if sprite_x + sprite_w > start_x + w - xm and i ~= n_moves then
-                sprite_x = sprite_start_x
-                current_y = current_y + sprite_w
+                local label_w, label_h = label:measure()
+                local row_h = math.max(label_h, sprite_h)
+
+                if sprite ~= nil then
+                    sprite:fit_into(sprite_x, current_y + 0.5 * row_h - 0.5 * sprite_h, sprite_w, sprite_h)
+                end
+                label:fit_into(sprite_x + sprite_w + m, current_y + 0.5 * row_h - 0.5 * label_h, POSITIVE_INFINITY)
+
+                current_y = current_y + row_h
             end
         end
 
-        current_y = current_y + sprite_w + m
-
-        self.equip_and_consumable_label:fit_into(current_x, current_y)
-        current_y = current_y + select(2, self.move_label:measure()) + 0.5 * m
-
-        sprite_x = sprite_start_x
-        local n_equips = sizeof(self.equip_sprites)
-        for i = 1, n_equips do
-            local sprite = self.equip_sprites[i]
-            sprite:fit_into(sprite_x, current_y, sprite_w, sprite_h)
-            sprite_x = sprite_x + sprite_w
-
-            if sprite_x + sprite_w > start_x + w - xm then
-                sprite_x = sprite_start_x
-                current_y = current_y + sprite_h
-            end
-        end
-
-        local n_consumables = sizeof(self.consumable_sprites)
-        for i = 1, n_consumables do
-            local sprite = self.consumable_sprites[i]
-            sprite:fit_into(sprite_x, current_y, sprite_w, sprite_h)
-            sprite_x = sprite_x + sprite_w
-
-            if sprite_x + sprite_w > start_x + w - xm and i + n_equips < n_equips + n_consumables then
-                sprite_x = sprite_start_x
-                current_y = current_y + sprite_h
-            end
-        end
-
-        current_y = current_y + sprite_h + m
+        current_y = current_y + m
 
         if self.spacer ~= nil then
             self.spacer:fit_into(current_x, current_y, w, 0)

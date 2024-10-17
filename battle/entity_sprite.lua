@@ -17,6 +17,11 @@ end
 
 --- @brief
 function bt.EntitySprite:set_selection(selection_state)
+end
+
+--- @brief
+--- @return rt.RenderTexture
+function bt.EntitySprite:get_snapshot()
 
 end
 

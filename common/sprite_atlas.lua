@@ -92,7 +92,6 @@ function rt.SpriteAtlasEntry:load()
     self.frame_width = config.width
     self.frame_height = config.height
 
-
     local min_frame_i = POSITIVE_INFINITY
     local max_frame_i = NEGATIVE_INFINITY
     local frames_seen = {}
@@ -123,10 +122,6 @@ function rt.SpriteAtlasEntry:load()
     for _ in pairs(frames_seen) do
         self.n_frames = self.n_frames + 1
     end
-
-    self.origin_x = which(config.origin_x, 0.5)
-    self.origin_y = which(config.origin_y, 0.5)
-    meta.assert_number(self.origin_x, self.origin_y)
 
     -- initialize
     self.data = data
@@ -178,7 +173,7 @@ function rt.SpriteAtlasEntry:load()
         end
     end
 
-    assert(#self.frame_to_name == #self.texture_rectangles)
+    self.n_frames = sizeof(self.frame_to_name)
     self.is_realized = true
 end
 
@@ -218,14 +213,14 @@ end
 
 --- @brief
 function rt.SpriteAtlasEntry:get_n_frames()
-    return #self.frame_to_name
+    return self.n_frames
 end
 
 --- @brief
 function rt.SpriteAtlasEntry:get_frame_range(id)
     local out = self.name_to_frame[id]
     if out == nil then
-        rt.error("In rt.SpriteAtlasEntry: spritesheet at `" .. self.path .. "` has no animation with id `" .. id .. "`")
+        rt.error("In rt.SpriteAtlasEntry: spritesheet at `" .. self.path .. "/" .. self.id .. "` has no animation with id `" .. id .. "`")
     end
     return out
 end

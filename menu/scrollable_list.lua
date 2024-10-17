@@ -240,9 +240,8 @@ function mn.ScrollableList:size_allocate(x, y, width, height)
     for item in values(self._items) do
         local x, y = 0, 0
         local sprite_w, sprite_h = item.sprite:get_resolution()
-        sprite_w = sprite_w * 1
-        sprite_h = sprite_h * 1
         local sprite_x = x + 0.5 * m
+        item.sprite:set_minimum_size(sprite_w, sprite_h)
         item.sprite:fit_into(sprite_x, y, sprite_w, sprite_h)
 
         if item.quantity_label ~= nil then

@@ -1,5 +1,5 @@
 return {
-    name = "HP Restoring Berry",
+    name = "Single Cherry",
     description = "Restores 25% HP once if holders HP falls below 50%",
 
     max_n_uses = 1,

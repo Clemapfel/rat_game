@@ -3,12 +3,14 @@ mn.TabBar = meta.new_type("TabBar", rt.Widget, function()
     return meta.new(mn.TabBar, {
         _items = {},
         _n_items = 0,
-        _selected_item_i = 0,
         _n_post_aligned_items = 1,
         _orientation = rt.Orientation.HORIZONTAL,
         _final_w = 1,
         _final_h = 1,
         _selection_nodes = {}, -- List<rt.SelectionGraphNode>
+        _tab_active = {},
+        _selection_offset_x = 0,
+        _selection_offset_y = 0
     })
 end)
 
@@ -19,7 +21,8 @@ function mn.TabBar:push(widget)
         stencil = rt.Rectangle(0, 0, 1, 1),
         frame = rt.Frame(),
         base = rt.Spacer(),
-        is_selected = false
+        is_selected = false,
+        is_active = false
     }
 
     to_insert.frame:set_child(to_insert.base)
@@ -32,6 +35,8 @@ function mn.TabBar:push(widget)
     end
 
     table.insert(self._items, to_insert)
+    table.insert(self._tab_active, false)
+
     self._n_items = self._n_items + 1
     if self._is_realized then self:reformat() end
 end
@@ -66,14 +71,7 @@ function mn.TabBar:size_allocate(x, y, width, height)
         item_m = math.min(m, (height - 2 * m - item_h - (self._n_items - n_post_aligned_items) * item_h) / (self._n_items + 1))
     end
 
-    local start_x, start_y
-    if self._orientation == rt.Orientation.HORIZONTAL then
-        start_x = x
-        start_y = y
-    else
-        start_x = x
-        start_y = y
-    end
+    local start_x, start_y = x, y
 
     local size_allocate_item = function(item, current_x, current_y)
         local frame_thickness = item.frame:get_thickness() + 2
@@ -153,6 +151,14 @@ function mn.TabBar:size_allocate(x, y, width, height)
     self._final_w = max_x - min_x
     self._final_h = max_y - min_y
 
+    if self._orientation == rt.Orientation.VERTICAL then
+        self._selection_offset_x = 0.1 * item_w
+        self._selection_offset_y = 0
+    else
+        self._selection_offset_x = 0
+        self._selection_offset_y = -0.1 * item_h
+    end
+
     for i = 1, self._n_items do
         local previous = self._selection_nodes[i-1]
         local current = self._selection_nodes[i]
@@ -185,23 +191,17 @@ end
 --- @override
 function mn.TabBar:draw()
     if not self:get_is_allocated() then return end
-    local item_i = 1
 
-    for item in values(self._items) do
+    local stencil_value = (meta.hash(self)) % 254 + 1
+    for i, item in ipairs(self._items) do
+        if item.is_active then rt.graphics.translate(self._selection_offset_x, self._selection_offset_y) end
         item.frame:draw()
-    end
-
-    local stencil_value = (meta.hash(self) + item_i) % 254 + 1
-    for item in values(self._items) do
         rt.graphics.stencil(stencil_value, item.stencil)
-    end
-    rt.graphics.set_stencil_test(rt.StencilCompareMode.EQUAL, stencil_value)
-
-    for item in values(self._items) do
+        rt.graphics.set_stencil_test(rt.StencilCompareMode.EQUAL, stencil_value)
         item.widget:draw()
+        rt.graphics.set_stencil_test()
+        if  item.is_active then rt.graphics.translate(-self._selection_offset_x, -self._selection_offset_y) end
     end
-
-    rt.graphics.set_stencil_test()
 end
 
 --- @brief set how many of the items at the end of the list should be pushed to the other site
@@ -238,33 +238,29 @@ end
 function mn.TabBar:set_tab_selected(tab_i, b)
     local item =  self._items[tab_i]
     item.frame:set_selection_state(ternary(b, rt.SelectionState.ACTIVE, rt.SelectionState.INACTIVE))
+    item.is_selected = b
 
-    if item.is_selected then
-        item.base:set_color(rt.Palette.GRAY_3)
+    if b then
+        item.base:set_color(rt.settings.frame.selected_base_color)
     else
-        if b then
-            item.base:set_color(rt.settings.frame.selected_base_color)
-        else
-            item.base:set_color(rt.Palette.BACKGROUND)
-        end
+        item.base:set_color(rt.Palette.BACKGROUND)
     end
 end
 
 --- @brief
 function mn.TabBar:set_tab_active(tab_i, b)
     local item = self._items[tab_i]
+    item.is_active = b
     if b == true then
         item.base:set_color(rt.Palette.GRAY_3)
     else
         item.base:set_color(rt.Palette.BACKGROUND)
     end
-    item.is_selected = b
 end
 
 --- @brief
 function mn.TabBar:clear()
     self._items = {}
     self._n_items = 0
-    self._selected_item_i = 0
     self._selection_nodes = {}
 end

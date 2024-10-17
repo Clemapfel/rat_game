@@ -1,21 +1,20 @@
 return {
     name = "Inspect",
-    description = "Reveal information about Enemey",
+    description = "Reveals additional information about target enemy",
+    flavor_text = "",
 
-    sprite_id = "orbs",
-    sprite_index = "INSPECT",
+    max_n_uses = POSITIVE_INFINITY,
 
-    animation_id = "",
-
+    is_intrinsic = true,
     can_target_multiple = false,
     can_target_self = false,
     can_target_enemy = true,
     can_target_ally = false,
 
-    priority = 0,
-    max_n_uses = POSITIVE_INFINITY,
+    sprite_id = "moves",
+    sprite_index = "INSPECT",
 
-    effect = function(self, user, targets)
-        assert(false)
+    effect = function(self, user_targets)
+        -- TODO
     end
 }

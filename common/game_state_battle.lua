@@ -14,6 +14,10 @@
             n_used
         }
 
+        intrinsic_moves = {
+            id
+        }
+
         equips[slot_i] = {
             id  -- EquipID
         }
@@ -78,7 +82,8 @@ function rt.GameState:add_entity(entity)
         moves = {},
         equips = {},
         consumables = {},
-        statuses = {}
+        statuses = {},
+        intrinsic_moves = {}
     }
 
     for i = 1, n_moves do
@@ -99,6 +104,10 @@ function rt.GameState:add_entity(entity)
             id = "",
             n_used = 0
         }
+    end
+
+    for id in values(entity:list_intrinsic_move_ids()) do
+        table.insert(to_add.intrinsic_moves, id)
     end
 
     if entity:get_is_enemy() then
@@ -538,6 +547,24 @@ for which in range("move", "equip", "consumable") do
             return entry.count
         end
     end
+end
+
+--- @brief
+function rt.GameState:entity_list_intrinsic_moves(entity)
+    meta.assert_isa(entity, bt.Entity)
+
+    local entry = self:_get_entity_entry(entity)
+    if entry == nil then
+        rt.error("In rt.GameState:entity_list_intrinsic_moves: entity `" .. entity:get_id() .. "` is not part of state")
+        return {}
+    end
+
+    local out = {}
+    for move_id in values(entry.intrinsic_moves) do
+        table.insert(out, bt.Move(move_id))
+    end
+
+    return out
 end
 
 --- @brief
@@ -1073,27 +1100,21 @@ end
 --- @brief
 function rt.GameState:initialize_debug_state()
     local moves = {
-        "DEBUG_MOVE",
-        "INSPECT",
-        "PROTECT",
-        "STRUGGLE",
-        "SURF",
-        "WISH"
+        "BOMB",
+        "DEBUG_MOVE"
     }
 
     local equips = {
         "DEBUG_EQUIP",
-        "DEBUG_CLOTHING",
-        "DEBUG_FEMALE_CLOTHING",
-        "DEBUG_MALE_CLOTHING",
-        "DEBUG_WEAPON",
-        "DEBUG_TRINKET"
+        "FAST_SHOES",
+        "HELMET",
+        "KITCHEN_KNIFE"
     }
 
     local consumables = {
         "DEBUG_CONSUMABLE",
-        "ONE_CHERRY",
-        "TWO_CHERRY"
+        "SINGLE_CHERRY",
+        "DOUBLE_CHERRY"
     }
 
     local entities = {
@@ -1102,6 +1123,8 @@ function rt.GameState:initialize_debug_state()
         bt.Entity(self, "GIRL"),
         bt.Entity(self, "RAT"),
     }
+
+    rt.random.seed(0)
 
     for entity in values(entities) do
         local possible_moves = rt.random.shuffle({table.unpack(moves)})
