@@ -580,7 +580,6 @@ function rt.GameState:set_current_scene(scene_type)
             self._current_scene:fit_into(0, 0, self._state.resolution_x, self._state.resolution_y)
         end
         self._current_scene:make_active()
-        dbg(meta.get_typename(scene_type), (love.timer.getTime() - before) / (1 / 60))
     end
 end
 

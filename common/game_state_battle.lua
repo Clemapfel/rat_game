@@ -162,7 +162,6 @@ function rt.GameState:list_entities()
     for i, entity in ipairs(self._entity_index_to_entity) do
         table.insert(out, entity)
     end
-
     return out
 end
 
@@ -180,6 +179,28 @@ function rt.GameState:list_entities_by_speed()
             return a:get_priority() > b:get_priority()
         end
     end)
+    return out
+end
+
+--- @brief
+function rt.GameState:list_allies()
+    local out = {}
+    for i, entity in ipairs(self._entity_index_to_entity) do
+        if entity:get_is_enemy() == false then
+            table.insert(out, entity)
+        end
+    end
+    return out
+end
+
+--- @brief
+function rt.GameState:list_enemies()
+    local out = {}
+    for i, entity in ipairs(self._entity_index_to_entity) do
+        if entity:get_is_enemy() == true then
+            table.insert(out, entity)
+        end
+    end
     return out
 end
 
@@ -1057,7 +1078,6 @@ end
 
 --- @brief
 function rt.GameState:set_grabbed_object(object)
-
     if not (meta.isa(object, bt.Move) or meta.isa(object, bt.Equip) or meta.isa(object, bt.Consumable)) then
         rt.error("In rt.GameState:set_grabbed_object: Objet `" .. meta.typeof(object) .. "` is not a bt.Move, bt.Consumable, or bt.Equip")
         return
@@ -1122,7 +1142,12 @@ function rt.GameState:initialize_debug_state()
         bt.Entity(self, "PROF"),
         bt.Entity(self, "GIRL"),
         bt.Entity(self, "RAT"),
+        bt.Entity(self, "BOULDER"),
     }
+
+    for i = 1, 3 do
+        table.insert(entities, bt.Entity(self, "WALKING_SPROUT"))
+    end
 
     rt.random.seed(0)
 

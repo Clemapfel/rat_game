@@ -97,7 +97,7 @@ love.load = function()
         state:set_current_scene(scene)
     end
     ]]--
-    state:set_current_scene(mn.InventoryScene)
+    state:set_current_scene(bt.BattleScene)
     love.resize(love.graphics.getWidth(), love.graphics.getHeight())
 end
 

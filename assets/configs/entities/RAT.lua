@@ -1,5 +1,5 @@
 return {
-    name = "RAT",
+    name = "Rat",
     flavor_text = "May actually be a mouse",
 
     sprite_id = "",

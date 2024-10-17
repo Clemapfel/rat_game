@@ -139,7 +139,7 @@ function mn.InventoryScene:create_from_state(state)
 
     self._entity_tab_bar:clear()
 
-    local entities = self._state:list_entities()
+    local entities = self._state:list_allies()
     table.sort(entities, function(a, b)
         return self._state:entity_get_party_index(a) < self._state:entity_get_party_index(b)
     end)
@@ -596,7 +596,7 @@ function mn.InventoryScene:_regenerate_selection_nodes()
     table.sort(entity_tab_nodes, function(a, b) return a:get_bounds().y < b:get_bounds().y end)
 
     local entity_page_nodes = {}
-    local n_entities = self._state:get_n_entities()
+    local n_entities = self._state:get_n_allies()
     for entity_i = 1, n_entities do
         local page = self._entity_pages[entity_i]
         local info_node = rt.SelectionGraphNode(page.info:get_bounds())
@@ -1196,7 +1196,6 @@ function mn.InventoryScene:_regenerate_selection_nodes()
         end
 
         page.slot_nodes[1]:set_left(entity_tab_nodes[#entity_tab_nodes])
-
         page.slot_nodes[#(page.slot_nodes)]:signal_connect(rt.InputButton.RIGHT, function(_)
             return shared_list_nodes[scene._shared_list_index]
         end)

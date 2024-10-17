@@ -218,6 +218,7 @@ require "battle.speed_value"
 require "battle.priority_queue"
 require "battle.entity_sprite"
 require "battle.party_sprite"
+require "battle.enemy_sprite"
 
 require "battle.animations.dissolve"
 

@@ -1,5 +1,5 @@
 return {
-    name = "PROF",
+    name = "Prof",
     flavor_text = "PROF flavor text",
 
     sprite_id = "",

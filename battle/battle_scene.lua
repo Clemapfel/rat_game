@@ -9,6 +9,9 @@ bt.BattleScene = meta.new_type("BattleScene", rt.Scene, function(state)
         _sprites = {},        -- Table<bt.Entity, Union<bt.PartySprite, bt.EnemySprite>>
         _party_sprites = meta.make_weak({}), -- Table<bt.PartySprite>
         _enemy_sprites = meta.make_weak({}), -- Table<bt.EnemySprite>
+        _enemy_sprite_render_order = meta.make_weak({}),
+        _enemy_sprite_x_offset = 0,
+
         _global_status_bar = bt.OrderedBox(),
 
         _move_selection = {}, -- Table<bt.Entity, { moves:rt.Slots, intrinsices:rt:Slots, selection_graph:rt.SelectionGraph }>
@@ -49,63 +52,70 @@ end
 --- @override
 function bt.BattleScene:create_from_state()
     self._sprites = {}
+    self._enemy_sprites = {}
+    self._party_sprites = {}
     self._move_selection = {}
 
-    for entity in values(self._state:list_entities()) do
-        self:add_entity(entity)
-    end
+    self:add_entity(table.unpack(self._state:list_entities()))
 end
 
 --- @override
-function bt.BattleScene:add_entity(entity)
-    if not entity:get_is_enemy() then
-        local sprite = bt.PartySprite(entity)
-        local move_layout = {
-            {mn.SlotType.MOVE, mn.SlotType.MOVE, mn.SlotType.MOVE, mn.SlotType.MOVE},
-            {mn.SlotType.MOVE, mn.SlotType.MOVE, mn.SlotType.MOVE, mn.SlotType.MOVE},
-            {mn.SlotType.MOVE, mn.SlotType.MOVE, mn.SlotType.MOVE, mn.SlotType.MOVE},
-            {mn.SlotType.MOVE, mn.SlotType.MOVE, mn.SlotType.MOVE, mn.SlotType.MOVE}
-        }
+function bt.BattleScene:add_entity(...)
+    for entity in range(...) do
+        if not entity:get_is_enemy() then
+            local sprite = bt.PartySprite(entity)
+            local move_layout = {
+                {mn.SlotType.MOVE, mn.SlotType.MOVE, mn.SlotType.MOVE, mn.SlotType.MOVE},
+                {mn.SlotType.MOVE, mn.SlotType.MOVE, mn.SlotType.MOVE, mn.SlotType.MOVE},
+                {mn.SlotType.MOVE, mn.SlotType.MOVE, mn.SlotType.MOVE, mn.SlotType.MOVE},
+                {mn.SlotType.MOVE, mn.SlotType.MOVE, mn.SlotType.MOVE, mn.SlotType.MOVE}
+            }
 
-        local intrinsic_layout = {
-            {mn.SlotType.INTRINSIC, mn.SlotType.INTRINSIC, mn.SlotType.INTRINSIC}
-        }
+            local intrinsic_layout = {
+                {mn.SlotType.INTRINSIC, mn.SlotType.INTRINSIC, mn.SlotType.INTRINSIC}
+            }
 
-        local move_slots = mn.Slots(move_layout)
-        local intrinsic_slots = mn.Slots(intrinsic_layout)
+            local move_slots = mn.Slots(move_layout)
+            local intrinsic_slots = mn.Slots(intrinsic_layout)
 
-        if self._is_realized then
-            sprite:realize()
-            move_slots:realize()
-            intrinsic_slots:realize()
+            if self._is_realized then
+                sprite:realize()
+                move_slots:realize()
+                intrinsic_slots:realize()
+            end
+
+            self._sprites[entity] = sprite
+            sprite.entity = entity
+
+            self._move_selection[entity] = {
+                moves = move_slots,
+                intrinsics = intrinsic_slots,
+                selection_graph = rt.SelectionGraph()
+            }
+
+            table.insert(self._party_sprites, sprite)
+            table.sort(self._party_sprites, function(a, b)
+                local a_prio = self._party_order_priority[a.entity:get_id()]
+                local b_prio = self._party_order_priority[b.entity:get_id()]
+
+                if a_prio == nil then a_prio = POSITIVE_INFINITY end
+                if b_prio == nil then b_prio = POSITIVE_INFINITY end
+                return a_prio < b_prio
+            end)
+        else
+            local sprite = bt.EnemySprite(entity)
+            if self._is_realized then
+                sprite:realize()
+            end
+
+            self._sprites[entity] = sprite
+            table.insert(self._enemy_sprites, sprite)
         end
-
-        self._sprites[entity] = sprite
-        sprite.entity = entity
-
-        self._move_selection[entity] = {
-            moves = move_slots,
-            intrinsics = intrinsic_slots,
-            selection_graph = rt.SelectionGraph()
-        }
-
-        table.insert(self._party_sprites, sprite)
-        table.sort(self._party_sprites, function(a, b)
-            local a_prio = self._party_order_priority[a.entity:get_id()]
-            local b_prio = self._party_order_priority[b.entity:get_id()]
-
-            if a_prio == nil then a_prio = POSITIVE_INFINITY end
-            if b_prio == nil then b_prio = POSITIVE_INFINITY end
-            return a_prio < b_prio
-        end)
-
-        -- TODO
-        if self._selecting_entity == nil then self._selecting_entity = entity end
-    else
-        -- todo enemy sprite
     end
 
-    self:reformat()
+    if self._is_realized then
+        self:reformat()
+    end
 end
 
 --- @brief
@@ -133,7 +143,6 @@ function bt.BattleScene:size_allocate(x, y, width, height)
     self._log:fit_into(x + 0.5 * width - 0.5 * log_w, current_y, log_w, tile_size)
 
     current_x = current_x + tile_size + m
-    --current_y = current_y + tile_size + m
 
     local max_slot_w = NEGATIVE_INFINITY
     for entity, entry in pairs(self._move_selection) do
@@ -155,11 +164,74 @@ function bt.BattleScene:size_allocate(x, y, width, height)
         party_sprites_w,
         tile_size
     )
-    self:_reformat_enemy_sprites()
+
+    local max_party_sprite_h = NEGATIVE_INFINITY
+    for sprite in values(self._party_sprites) do
+        max_party_sprite_h = math.max(max_party_sprite_h, select(2, sprite:measure()))
+    end
+
+    self:_reformat_enemy_sprites(
+        x + outer_margin + tile_size + m,
+        y + outer_margin + tile_size + m,
+        width - 2 * outer_margin - 2 * tile_size - 2 * m,
+        height - 2 * outer_margin - tile_size - max_party_sprite_h - 2 * m
+    )
 end
 
 --- @brief
 function bt.BattleScene:_reformat_enemy_sprites(x, y, width, height)
+    local n_enemies = sizeof(self._enemy_sprites)
+    if n_enemies < 1 then return end
+
+    local total_w, max_h, max_sprite_only_h = 0, NEGATIVE_INFINITY, NEGATIVE_INFINITY
+    for sprite in values(self._enemy_sprites) do
+        local sprite_w, sprite_h = sprite:measure()
+        total_w = total_w + sprite_w
+        max_h = math.max(max_h, sprite_h)
+        max_sprite_only_h = math.max(max_sprite_only_h, select(2, sprite._sprite:measure()))
+    end
+
+    local m = rt.settings.margin_unit
+    m = math.min(m, (width - total_w) / (n_enemies - 1))
+    local center_x, center_y = x + 0.5 * width, y + 0.5 * height + (max_h - max_sprite_only_h) + m
+
+    self._enemy_sprite_render_order = {}
+    local left_x, right_x
+    do
+        local center_sprite = self._enemy_sprites[1]
+        local sprite_w, sprite_h = center_sprite:measure()
+        center_sprite:fit_into(
+            center_x - 0.5 * sprite_w,
+            center_y - sprite_h,
+            sprite_w, sprite_h
+        )
+
+        left_x = center_x - 0.5 * sprite_w - m
+        right_x = center_x + 0.5 * sprite_w + m
+        table.insert(self._enemy_sprite_render_order, center_sprite)
+    end
+
+    local min_x, max_x = POSITIVE_INFINITY, NEGATIVE_INFINITY
+
+    local sprite_i = 2
+    while sprite_i <= n_enemies do
+        local sprite = self._enemy_sprites[sprite_i]
+        local sprite_w, sprite_h = sprite:measure()
+        if sprite_i % 2 == 0 then
+            sprite:fit_into(right_x, center_y - sprite_h, sprite_w, sprite_h)
+            max_x = right_x + sprite_w
+            right_x = right_x + sprite_w + m
+        else
+            sprite:fit_into(left_x - sprite_w, center_y - sprite_h, sprite_w, sprite_h)
+            min_x = left_x - sprite_w
+            left_x = left_x - sprite_w - m
+        end
+
+        table.insert(self._enemy_sprite_render_order, sprite)
+        sprite_i = sprite_i + 1
+    end
+
+    self._enemy_sprite_x_offset = ((x - min_x) + (x + width - max_x)) / 2
 end
 
 --- @brief
@@ -297,13 +369,21 @@ function bt.BattleScene:_update_slots(entity)
             first = false
         end
     end
+
+    self._verbose_info:show(nil)
 end
 
 --- @override
 function bt.BattleScene:draw()
-    for sprite in values(self._sprites) do
+    for sprite in values(self._party_sprites) do
         sprite:draw()
     end
+
+    love.graphics.translate(self._enemy_sprite_x_offset, 0)
+    for sprite in values(self._enemy_sprite_render_order) do
+        sprite:draw()
+    end
+    love.graphics.translate(-self._enemy_sprite_x_offset, 0)
 
     for x in range(
         self._log,
@@ -320,6 +400,9 @@ function bt.BattleScene:draw()
         entry.intrinsics:draw()
         entry.moves:draw()
     end
+
+    love.graphics.line(0.5 * love.graphics.getWidth(), 0, 0.5 * love.graphics.getWidth(), love.graphics.getHeight())
+    love.graphics.line(0, 0.5 * love.graphics.getHeight(), love.graphics.getWidth(), 0.5 * love.graphics.getHeight())
 end
 
 --- @override

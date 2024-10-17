@@ -1,7 +1,6 @@
 
 --- @class bt.PartySprite
 bt.PartySprite = meta.new_type("BattlePartySprite", bt.EntitySprite, function(entity)
-
     local entity_id_to_sprite_id = {
         ["RAT"] = "battle/rat_battle",
         ["GIRL"] = "battle/girl_battle",
@@ -20,7 +19,6 @@ bt.PartySprite = meta.new_type("BattlePartySprite", bt.EntitySprite, function(en
         _gradient = rt.VertexRectangle(0, 0, 1, 1),
 
         _sprite = rt.Sprite(entity_id_to_sprite_id[entity:get_id()]),
-        _sprite_is_visible = false,
     })
 end)
 
