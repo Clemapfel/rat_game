@@ -160,6 +160,12 @@ rt.sine_wave = function(x, frequency)
     return math.cos(2 * math.pi * (frequency * x - 0.5)) / 2 + 0.5
 end
 
+--- @brief
+rt.cosine_wave = function(x, frequency)
+    if frequency == nil then frequency = 2 end
+    return math.sin(2 * math.pi * (frequency * x - 0.5)) / 2 + 0.5
+end
+
 --- @brief triangle wave with amplitude 1 and given frequency
 rt.triangle_wave = function(x)
     return 4 * math.abs((x / math.pi) + 0.25 - math.floor((x / math.pi) + 0.75)) - 1

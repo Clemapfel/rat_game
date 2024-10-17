@@ -335,6 +335,8 @@ function mn.InventoryScene:update(delta)
     self._animation_queue:update(delta)
     self._verbose_info:update(delta)
 
+    self._entity_tab_bar:update(delta)
+
     if self._template_rename_keyboard:get_is_active() then
         self._template_rename_keyboard:update(delta)
     elseif self._template_confirm_delete_dialog:get_is_active() then

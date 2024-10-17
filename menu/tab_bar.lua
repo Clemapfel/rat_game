@@ -1,5 +1,5 @@
 --- @class mn.TabBar
-mn.TabBar = meta.new_type("TabBar", rt.Widget, function()
+mn.TabBar = meta.new_type("TabBar", rt.Widget, rt.Animation, function()
     return meta.new(mn.TabBar, {
         _items = {},
         _n_items = 0,
@@ -10,7 +10,8 @@ mn.TabBar = meta.new_type("TabBar", rt.Widget, function()
         _selection_nodes = {}, -- List<rt.SelectionGraphNode>
         _tab_active = {},
         _selection_offset_x = 0,
-        _selection_offset_y = 0
+        _selection_offset_y = 0,
+        _elapsed = 0
     })
 end)
 
@@ -22,7 +23,9 @@ function mn.TabBar:push(widget)
         frame = rt.Frame(),
         base = rt.Spacer(),
         is_selected = false,
-        is_active = false
+        is_active = false,
+        width = 1,
+        height = 1
     }
 
     to_insert.frame:set_child(to_insert.base)
@@ -96,6 +99,9 @@ function mn.TabBar:size_allocate(x, y, width, height)
         min_y = math.min(min_y, current_y)
         max_y = math.max(max_y, current_y + item_h)
 
+        item.width = item_w
+        item.height = item_h
+
         if self._orientation == rt.Orientation.HORIZONTAL then
             current_x = current_x + item_w + item_m
         else
@@ -151,14 +157,6 @@ function mn.TabBar:size_allocate(x, y, width, height)
     self._final_w = max_x - min_x
     self._final_h = max_y - min_y
 
-    if self._orientation == rt.Orientation.VERTICAL then
-        self._selection_offset_x = 0.1 * item_w
-        self._selection_offset_y = 0
-    else
-        self._selection_offset_x = 0
-        self._selection_offset_y = -0.1 * item_h
-    end
-
     for i = 1, self._n_items do
         local previous = self._selection_nodes[i-1]
         local current = self._selection_nodes[i]
@@ -186,6 +184,8 @@ function mn.TabBar:size_allocate(x, y, width, height)
             end
         end
     end
+
+    self:update(0)
 end
 
 --- @override
@@ -200,7 +200,7 @@ function mn.TabBar:draw()
         rt.graphics.set_stencil_test(rt.StencilCompareMode.EQUAL, stencil_value)
         item.widget:draw()
         rt.graphics.set_stencil_test()
-        if  item.is_active then rt.graphics.translate(-self._selection_offset_x, -self._selection_offset_y) end
+        if item.is_active then rt.graphics.translate(-self._selection_offset_x, -self._selection_offset_y) end
     end
 end
 
@@ -263,4 +263,23 @@ function mn.TabBar:clear()
     self._items = {}
     self._n_items = 0
     self._selection_nodes = {}
+end
+
+--- @brief
+function mn.TabBar:update(delta)
+    self._elapsed = self._elapsed + delta
+
+    local bounce_f = function(x)
+        return math.sqrt(math.abs(math.cos(x)))
+    end
+
+    local item = self._items[1]
+    if item == nil then return end
+    if self._orientation == rt.Orientation.VERTICAL then
+        self._selection_offset_x = 0.1 * bounce_f(self._elapsed) * item.width
+        self._selection_offset_y = 0
+    else
+        self._selection_offset_x = 0
+        self._selection_offset_y = 0.1 * bounce_f(self._elapsed) *  item.height
+    end
 end
