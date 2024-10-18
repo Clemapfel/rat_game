@@ -5,6 +5,7 @@ return {
         PROTECT = 3,
         INSPECT = 4,
         HELP_UP = 5,
-        BOMB = 6
+        BOMB = 6,
+        STAB = 7
     }
 }

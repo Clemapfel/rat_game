@@ -15,7 +15,7 @@ return {
     sprite_id = "moves",
     sprite_index = "DEBUG_MOVE",
 
-    effect = function(self, user_targets)
-        -- TODO
+    effect = function(self, user, targets)
+
     end
 }

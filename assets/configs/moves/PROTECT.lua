@@ -14,7 +14,13 @@ return {
     sprite_id = "moves",
     sprite_index = "PROTECT",
 
-    effect = function(self, user_targets)
-        -- TODO
+    effect = function(self, user, targets)
+        if get_flag(user, "ALREADY_PROTECTED") == true then
+            -- no protect
+        end
+
+        add_status(user, STATUS_PROTECTED)
+        add_flag(user, "ALREADY_PROTECTED", 1)
+
     end
 }

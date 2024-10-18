@@ -357,7 +357,7 @@ function serialize(object_identifier, object, inject_sourcecode)
         return table.concat(str_buffer)
     end
 
-    _serialize_inner = function (buffer, object, n_indent_tabs, seen)
+    local function _serialize_inner(buffer, object, n_indent_tabs, seen)
 
         if type(object) == "number" then
             insert(buffer, object)

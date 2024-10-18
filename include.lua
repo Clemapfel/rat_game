@@ -54,8 +54,8 @@ pcall(function()
 end)
 
 do -- splash screen until compilation is done
-    local screen_w, screen_h = 300, 300
-    love.window.setMode(screen_w, screen_h)
+    local screen_w, screen_h = love.graphics.getWidth(), love.graphics.getHeight()
+    --love.window.setMode(screen_w, screen_h)
     love.graphics.setColor(0, 0, 0, 1)
     local label = "rat_game"
     local font = love.graphics.newFont(50)
@@ -242,6 +242,7 @@ require "battle.enemy_sprite"
 require "battle.animations.dissolve"
 
 require "battle.battle_scene"
+require "battle.simulation_handler"
 
 -- state
 require "common.game_state"

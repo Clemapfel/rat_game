@@ -7,6 +7,7 @@
     entities = {
         id      -- EntityID
         hp      -- Unsigned
+        state   -- bt.EntityState
         index   -- Unsigned
         
         moves[slot_i] = {
@@ -79,6 +80,7 @@ function rt.GameState:add_entity(entity)
         index = -1,
         hp = -1,
         id = "",
+        state = bt.EntityState.ALIVE,
         moves = {},
         equips = {},
         consumables = {},
@@ -282,6 +284,31 @@ function rt.GameState:entity_set_hp(entity, new_hp)
     end
 
     entry.hp = math.ceil(new_hp)
+end
+
+--- @brief
+function rt.GameState:entity_set_state(entity, new_state)
+    meta.assert_isa(entity, bt.Entity)
+    meta.assert_enum_value(new_state, bt.EntityState)
+
+    local entry = self:_get_entity_entry(entity)
+    if entry == nil then
+        rt.error("In rt.GameState:entity_set_state: entity `" .. entity:get_id() .. "` is not part of state")
+        return
+    end
+    entry.state = new_state
+end
+
+function rt.GameState:entity_get_state(entity, new_state)
+    meta.assert_isa(entity, bt.Entity)
+    meta.assert_enum_value(new_state, bt.EntityState)
+
+    local entry = self:_get_entity_entry(entity)
+    if entry == nil then
+        rt.error("In rt.GameState:entity_get_state: entity `" .. entity:get_id() .. "` is not part of state")
+        return
+    end
+    return entry.state
 end
 
 for which in range("move", "equip", "consumable") do

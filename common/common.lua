@@ -270,13 +270,6 @@ end
 
 _G._select = _G.select
 
---- @brief get n-th element of varag, overrides _G.select
---- @param n number
---- @vararg
-function select(n, ...)
-    return ({...})[n]
-end
-
 --- @brief positive infinity
 INFINITY = 1/0
 

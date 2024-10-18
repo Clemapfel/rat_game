@@ -408,6 +408,9 @@ end
 
 --- @override
 function bt.BattleScene:update(delta)
+
+    dbg(self:create_simulation_environment())
+
     self._log:update(delta)
     self._global_status_bar:update(delta)
     for sprite in values(self._sprites) do
