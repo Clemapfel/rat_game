@@ -22,21 +22,13 @@
     </configurations>
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="7fa9ba1b-2cff-4ecc-86fb-59ab2fa76ee1" name="Changes" comment="added tab bar animation">
-      <change afterPath="$PROJECT_DIR$/battle/enemy_sprite.lua" afterDir="false" />
+    <list default="true" id="7fa9ba1b-2cff-4ecc-86fb-59ab2fa76ee1" name="Changes" comment="enemy alignment working">
+      <change afterPath="$PROJECT_DIR$/battle/battle_animation.lua" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/battle/simulation_handler.lua" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/assets/configs/entities/GIRL.lua" beforeDir="false" afterPath="$PROJECT_DIR$/assets/configs/entities/GIRL.lua" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/assets/configs/entities/PROF.lua" beforeDir="false" afterPath="$PROJECT_DIR$/assets/configs/entities/PROF.lua" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/assets/configs/entities/RAT.lua" beforeDir="false" afterPath="$PROJECT_DIR$/assets/configs/entities/RAT.lua" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/assets/sprites/menu_icons.hxl" beforeDir="false" afterPath="$PROJECT_DIR$/assets/sprites/menu_icons.hxl" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/battle/battle_scene.lua" beforeDir="false" afterPath="$PROJECT_DIR$/battle/battle_scene.lua" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/battle/entity_sprite.lua" beforeDir="false" afterPath="$PROJECT_DIR$/battle/entity_sprite.lua" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/battle/party_sprite.lua" beforeDir="false" afterPath="$PROJECT_DIR$/battle/party_sprite.lua" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/common/game_state.lua" beforeDir="false" afterPath="$PROJECT_DIR$/common/game_state.lua" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/common/game_state_battle.lua" beforeDir="false" afterPath="$PROJECT_DIR$/common/game_state_battle.lua" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/include.lua" beforeDir="false" afterPath="$PROJECT_DIR$/include.lua" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/main.lua" beforeDir="false" afterPath="$PROJECT_DIR$/main.lua" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/menu/inventory_scene.lua" beforeDir="false" afterPath="$PROJECT_DIR$/menu/inventory_scene.lua" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -603,15 +595,8 @@
       <workItem from="1728941260132" duration="2112000" />
       <workItem from="1728943385470" duration="10368000" />
       <workItem from="1729098138796" duration="20580000" />
-      <workItem from="1729180777153" duration="6154000" />
-    </task>
-    <task id="LOCAL-01096" summary="added midi messages">
-      <option name="closed" value="true" />
-      <created>1727996819997</created>
-      <option name="number" value="01096" />
-      <option name="presentableId" value="LOCAL-01096" />
-      <option name="project" value="LOCAL" />
-      <updated>1727996819997</updated>
+      <workItem from="1729180777153" duration="8566000" />
+      <workItem from="1729267430460" duration="1535000" />
     </task>
     <task id="LOCAL-01097" summary="stashing profiler">
       <option name="closed" value="true" />
@@ -997,7 +982,15 @@
       <option name="project" value="LOCAL" />
       <updated>1729126524586</updated>
     </task>
-    <option name="localTasksCounter" value="1145" />
+    <task id="LOCAL-01145" summary="enemy alignment working">
+      <option name="closed" value="true" />
+      <created>1729187113588</created>
+      <option name="number" value="01145" />
+      <option name="presentableId" value="LOCAL-01145" />
+      <option name="project" value="LOCAL" />
+      <updated>1729187113588</updated>
+    </task>
+    <option name="localTasksCounter" value="1146" />
     <servers />
   </component>
   <component name="TypeScriptGeneratedFilesManager">
@@ -1046,7 +1039,6 @@
     </option>
   </component>
   <component name="VcsManagerConfiguration">
-    <MESSAGE value="stashing parse optimization" />
     <MESSAGE value="parsing working" />
     <MESSAGE value="wrapping working" />
     <MESSAGE value="stashing label" />
@@ -1071,7 +1063,8 @@
     <MESSAGE value="migrated to hexels" />
     <MESSAGE value="resized sprites" />
     <MESSAGE value="added tab bar animation" />
-    <option name="LAST_COMMIT_MESSAGE" value="added tab bar animation" />
+    <MESSAGE value="enemy alignment working" />
+    <option name="LAST_COMMIT_MESSAGE" value="enemy alignment working" />
   </component>
   <component name="XDebuggerManager">
     <breakpoint-manager>

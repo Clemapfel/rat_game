@@ -26,6 +26,7 @@ bt.BattleScene = meta.new_type("BattleScene", rt.Scene, function(state)
             ["SCOUT"] = 5
         },
 
+        _animation_queue = rt.AnimationQueue(),
         _input = rt.InputController(),
     })
 end)

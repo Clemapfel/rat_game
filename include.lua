@@ -53,6 +53,25 @@ pcall(function()
     end
 end)
 
+do -- splash screen until compilation is done
+    local screen_w, screen_h = 300, 300
+    love.window.setMode(screen_w, screen_h)
+    love.graphics.setColor(0, 0, 0, 1)
+    local label = "rat_game"
+    local font = love.graphics.newFont(50)
+    local label_w, label_h = font:getWidth(label), font:getHeight(label)
+
+    love.graphics.setColor(0, 0, 0, 1)
+    love.graphics.rectangle("fill", 0, 0, love.graphics.getWidth(), love.graphics.getHeight())
+
+    love.graphics.setColor(0.1, 0.1, 0.1, 1)
+    love.graphics.print(label, font,
+        math.floor(0.5 * screen_w - 0.5 * label_w),
+        math.floor(0.5 * screen_h - 0.5 * label_h)
+    )
+    love.graphics.present()
+end
+
 -- modules
 rt = {}
 

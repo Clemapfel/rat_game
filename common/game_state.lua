@@ -72,7 +72,7 @@ rt.GameState = meta.new_type("GameState", function()
         _render_texture = rt.RenderTexture(1, 1),
         _render_shader = rt.Shader("common/game_state_render_shader.glsl"),
         _use_render_texture = false,
-        _use_coroutines = false,    -- use loading screens and background loading
+        _use_coroutines = true,    -- use loading screens and background loading
         _use_scene_caching = true,  -- deallocate a scene
 
         _loading_screen = rt.LoadingScreen.DEFAULT(),
