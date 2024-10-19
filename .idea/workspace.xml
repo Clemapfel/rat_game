@@ -22,14 +22,7 @@
     </configurations>
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="7fa9ba1b-2cff-4ecc-86fb-59ab2fa76ee1" name="Changes" comment="added triangle tiling">
-      <change afterPath="$PROJECT_DIR$/backgrounds/temp_triangle_tilling_gradient.glsl" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/backgrounds/background.lua" beforeDir="false" afterPath="$PROJECT_DIR$/backgrounds/background.lua" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/backgrounds/temp_triangle_tiling.lua" beforeDir="false" afterPath="$PROJECT_DIR$/backgrounds/temp_triangle_tiling.lua" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/common/graphics.lua" beforeDir="false" afterPath="$PROJECT_DIR$/common/graphics.lua" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/main.lua" beforeDir="false" afterPath="$PROJECT_DIR$/main.lua" afterDir="false" />
-    </list>
+    <list default="true" id="7fa9ba1b-2cff-4ecc-86fb-59ab2fa76ee1" name="Changes" comment="circular wipe working" />
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
     <option name="HIGHLIGHT_NON_ACTIVE_CHANGELIST" value="false" />
@@ -597,15 +590,7 @@
       <workItem from="1729098138796" duration="20580000" />
       <workItem from="1729180777153" duration="8566000" />
       <workItem from="1729267430460" duration="1705000" />
-      <workItem from="1729269158294" duration="31244000" />
-    </task>
-    <task id="LOCAL-01101" summary="stashing midi example">
-      <option name="closed" value="true" />
-      <created>1728070559855</created>
-      <option name="number" value="01101" />
-      <option name="presentableId" value="LOCAL-01101" />
-      <option name="project" value="LOCAL" />
-      <updated>1728070559855</updated>
+      <workItem from="1729269158294" duration="31501000" />
     </task>
     <task id="LOCAL-01102" summary="polishing animation">
       <option name="closed" value="true" />
@@ -991,7 +976,15 @@
       <option name="project" value="LOCAL" />
       <updated>1729362119106</updated>
     </task>
-    <option name="localTasksCounter" value="1150" />
+    <task id="LOCAL-01150" summary="circular wipe working">
+      <option name="closed" value="true" />
+      <created>1729364433600</created>
+      <option name="number" value="01150" />
+      <option name="presentableId" value="LOCAL-01150" />
+      <option name="project" value="LOCAL" />
+      <updated>1729364433600</updated>
+    </task>
+    <option name="localTasksCounter" value="1151" />
     <servers />
   </component>
   <component name="TypeScriptGeneratedFilesManager">
@@ -1040,7 +1033,6 @@
     </option>
   </component>
   <component name="VcsManagerConfiguration">
-    <MESSAGE value="outline working but too big" />
     <MESSAGE value="stashing before moving to fully cached render texture" />
     <MESSAGE value="n_visible_characters working" />
     <MESSAGE value="fixed n characters for mixed outlined labels" />
@@ -1065,7 +1057,8 @@
     <MESSAGE value="added simulation environment sandbox" />
     <MESSAGE value="added battle script function declarations" />
     <MESSAGE value="added triangle tiling" />
-    <option name="LAST_COMMIT_MESSAGE" value="added triangle tiling" />
+    <MESSAGE value="circular wipe working" />
+    <option name="LAST_COMMIT_MESSAGE" value="circular wipe working" />
   </component>
   <component name="XDebuggerManager">
     <breakpoint-manager>

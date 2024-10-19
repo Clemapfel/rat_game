@@ -11,7 +11,7 @@ rt.Background.TEMP_TRIANGLE_TILING = meta.new_type("TEMP_TRIANGLE_TILING", rt.Ba
         _shader_shape = rt.VertexRectangle(0, 0, 1, 1),
 
         _ramp_shader = rt.Shader("backgrounds/temp_triangle_tiling_gradient.glsl"),
-        _bloom_shader = rt.Shader("backgrounds/temp_triangle_tiling_bloom.glsl")
+        --_bloom_shader = rt.Shader("backgrounds/temp_triangle_tiling_bloom.glsl")
     })
 end)
 
