@@ -34,7 +34,7 @@ state:initialize_debug_state()
 
 
 local background = rt.Background()
-background:set_implementation(rt.Background.CONFUSION)
+background:set_implementation(rt.Background.TEMP_TRIANGLE_TILING)
 
 local draw_state = true
 input = rt.InputController()
@@ -102,7 +102,9 @@ love.load = function()
 end
 
 love.update = function(delta)
-    background:update(delta)
+    if love.keyboard.isDown("space") then
+        background:update(delta)
+    end
 
     if profiler_active then
         rt.profiler.push("update")
@@ -123,7 +125,7 @@ love.draw = function()
             rt.profiler.push("draw")
         end
 
-        state:_draw()
+        --state:_draw()
 
         if profiler_active then
             rt.profiler.pop("draw")

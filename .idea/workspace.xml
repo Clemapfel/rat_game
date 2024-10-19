@@ -22,13 +22,10 @@
     </configurations>
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="7fa9ba1b-2cff-4ecc-86fb-59ab2fa76ee1" name="Changes" comment="added simulation environment sandbox">
+    <list default="true" id="7fa9ba1b-2cff-4ecc-86fb-59ab2fa76ee1" name="Changes" comment="added battle script function declarations">
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/assets/configs/moves/STAB.lua" beforeDir="false" afterPath="$PROJECT_DIR$/assets/configs/moves/STAB.lua" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/battle/simulation_handler.lua" beforeDir="false" afterPath="$PROJECT_DIR$/battle/simulation_handler.lua" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/common/game_state.lua" beforeDir="false" afterPath="$PROJECT_DIR$/common/game_state.lua" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/common/game_state_battle.lua" beforeDir="false" afterPath="$PROJECT_DIR$/common/game_state_battle.lua" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/common/label.lua" beforeDir="false" afterPath="$PROJECT_DIR$/common/label.lua" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/backgrounds/temp_triangle_tiling.lua" beforeDir="false" afterPath="$PROJECT_DIR$/backgrounds/temp_triangle_tiling.lua" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/battle/battle_scene.lua" beforeDir="false" afterPath="$PROJECT_DIR$/battle/battle_scene.lua" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/main.lua" beforeDir="false" afterPath="$PROJECT_DIR$/main.lua" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
@@ -598,15 +595,7 @@
       <workItem from="1729098138796" duration="20580000" />
       <workItem from="1729180777153" duration="8566000" />
       <workItem from="1729267430460" duration="1705000" />
-      <workItem from="1729269158294" duration="22756000" />
-    </task>
-    <task id="LOCAL-01099" summary="stashing">
-      <option name="closed" value="true" />
-      <created>1728057441347</created>
-      <option name="number" value="01099" />
-      <option name="presentableId" value="LOCAL-01099" />
-      <option name="project" value="LOCAL" />
-      <updated>1728057441347</updated>
+      <workItem from="1729269158294" duration="29054000" />
     </task>
     <task id="LOCAL-01100" summary="added party sprite">
       <option name="closed" value="true" />
@@ -992,7 +981,15 @@
       <option name="project" value="LOCAL" />
       <updated>1729279090892</updated>
     </task>
-    <option name="localTasksCounter" value="1148" />
+    <task id="LOCAL-01148" summary="added battle script function declarations">
+      <option name="closed" value="true" />
+      <created>1729296889426</created>
+      <option name="number" value="01148" />
+      <option name="presentableId" value="LOCAL-01148" />
+      <option name="project" value="LOCAL" />
+      <updated>1729296889426</updated>
+    </task>
+    <option name="localTasksCounter" value="1149" />
     <servers />
   </component>
   <component name="TypeScriptGeneratedFilesManager">
@@ -1041,7 +1038,6 @@
     </option>
   </component>
   <component name="VcsManagerConfiguration">
-    <MESSAGE value="wrapping working" />
     <MESSAGE value="stashing label" />
     <MESSAGE value="outline working but too big" />
     <MESSAGE value="stashing before moving to fully cached render texture" />
@@ -1066,7 +1062,8 @@
     <MESSAGE value="enemy alignment working" />
     <MESSAGE value="stashing" />
     <MESSAGE value="added simulation environment sandbox" />
-    <option name="LAST_COMMIT_MESSAGE" value="added simulation environment sandbox" />
+    <MESSAGE value="added battle script function declarations" />
+    <option name="LAST_COMMIT_MESSAGE" value="added battle script function declarations" />
   </component>
   <component name="XDebuggerManager">
     <breakpoint-manager>

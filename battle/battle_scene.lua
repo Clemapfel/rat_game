@@ -2,6 +2,7 @@
 bt.BattleScene = meta.new_type("BattleScene", rt.Scene, function(state)
     return meta.new(bt.BattleScene, {
         _state = state,
+        _simulation_environment = nil,
 
         _log = rt.TextBox(),
         _priority_queue = bt.PriorityQueue(),
@@ -58,6 +59,8 @@ function bt.BattleScene:create_from_state()
     self._move_selection = {}
 
     self:add_entity(table.unpack(self._state:list_entities()))
+
+    self._simulation_environment = self:create_simulation_environment()
 end
 
 --- @override
@@ -408,9 +411,6 @@ end
 
 --- @override
 function bt.BattleScene:update(delta)
-
-    dbg(self:create_simulation_environment())
-
     self._log:update(delta)
     self._global_status_bar:update(delta)
     for sprite in values(self._sprites) do
@@ -431,10 +431,15 @@ end
 
 --- @brief [internal]
 function bt.BattleScene:_handle_button_pressed(which)
+    if which == rt.InputButton.A then
+
+    end
+    --[[
     if self._selecting_entity ~= nil then
         local entry = self._move_selection[self._selecting_entity]
         entry.selection_graph:handle_button(which)
     else
 
     end
+    ]]--
 end
