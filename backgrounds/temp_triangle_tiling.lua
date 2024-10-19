@@ -6,7 +6,12 @@ rt.Background.TEMP_TRIANGLE_TILING = meta.new_type("TEMP_TRIANGLE_TILING", rt.Ba
         _perturbation = {},
         _max_perturbation = 100,
         _n_rows = 0,
-        _n_cols = 0
+        _n_cols = 0,
+
+        _shader_shape = rt.VertexRectangle(0, 0, 1, 1),
+
+        _ramp_shader = rt.Shader("backgrounds/temp_triangle_tiling_gradient.glsl"),
+        _bloom_shader = rt.Shader("backgrounds/temp_triangle_tiling_bloom.glsl")
     })
 end)
 
@@ -40,17 +45,27 @@ function rt.Background.TEMP_TRIANGLE_TILING:size_allocate(x, y, width, height)
             local current_y = start_y + (row_i - 1) * step
             if row_i % 2 == 0 then current_x = current_x + 0.5 * step end
 
-            local perturbation_x = 0--rt.random.number(-perturbation_magnitude, perturbation_magnitude)
-            local perturbation_y = 0--rt.random.number(-perturbation_magnitude, perturbation_magnitude)
+            local perturbation = {0, 0}
+            if row_i > 1 and row_i < row_n and col_i > 1 and col_i < col_n then
+                perturbation[1] = math.sin(self._elapsed + love.math.simplexNoise(row_i * math.pi, col_i * math.pi)) * self._max_perturbation
+                perturbation[2] = math.cos(self._elapsed + love.math.simplexNoise(row_i * math.pi, col_i * math.pi)) * self._max_perturbation
+            end
 
             table.insert(row, {current_x, current_y})
-            table.insert(perturbation_row, {perturbation_x, perturbation_y})
+            table.insert(perturbation_row, perturbation)
         end
         table.insert(self._vertices, row)
         table.insert(self._perturbation, perturbation_row)
     end
 
     self:_update_triangles()
+
+    self._shader_shape:reformat(
+        x, y,
+        x + width, y,
+        x + width, y + height,
+        x, y + height
+    )
 end
 
 --- @brief
@@ -118,12 +133,13 @@ function rt.Background.TEMP_TRIANGLE_TILING:update(delta)
             local perturbation = self._perturbation[row_i][col_i]
             --perturbation[1] = clamp(perturbation[1] + delta * speed * rt.random.number(-1, 1), -bound, bound)
             --perturbation[2] = clamp(perturbation[1] + delta * speed * rt.random.number(-1, 1), -bound, bound)
-            perturbation[1] = math.sin(self._elapsed + love.math.simplexNoise(row_i * math.pi, col_i * math.pi)) * self._max_perturbation
-            perturbation[2] = math.cos(self._elapsed + love.math.simplexNoise(row_i * math.pi, col_i * math.pi)) * self._max_perturbation
+            perturbation[1] = math.sin(self._elapsed + love.math.simplexNoise(row_i * math.pi, col_i * math.pi)) * self._max_perturbation / 3
+            perturbation[2] = math.cos(self._elapsed + love.math.simplexNoise(row_i * math.pi, col_i * math.pi)) * self._max_perturbation / 3
         end
     end
 
     self:_update_triangles()
+    self._ramp_shader:send("elapsed", self._elapsed)
 end
 
 --- @override
@@ -142,10 +158,31 @@ function rt.Background.TEMP_TRIANGLE_TILING:draw()
     for triangle in values(self._triangles) do
         love.graphics.setColor(rt.color_unpack(rt.hsva_to_rgba(rt.HSVA(hue, 1, 1, 1))))
         love.graphics.polygon("fill", triangle)
-        love.graphics.setColor(0, 0, 0, 1)
-        love.graphics.polygon("line", triangle)
+
         hue = (hue + hue_step) % 1
     end
 
+    for triangle in values(self._triangles) do
+        love.graphics.setColor(rt.color_unpack(rt.hsva_to_rgba(rt.HSVA(hue, 1, 1, 1))))
+
+        love.graphics.setLineWidth(6)
+        love.graphics.setColor(0, 0, 0, 1)
+        love.graphics.polygon("line", triangle)
+    end
+
+    for triangle in values(self._triangles) do
+        love.graphics.setColor(rt.color_unpack(rt.hsva_to_rgba(rt.HSVA(hue, 1, 1, 1))))
+
+        love.graphics.setLineWidth(4)
+        love.graphics.setColor(1, 1, 1, 1)
+        love.graphics.polygon("line", triangle)
+    end
+
     love.graphics.pop()
+
+    rt.graphics.set_blend_mode(rt.BlendMode.MULTIPLY, rt.BlendMode.MULTIPLY)
+    self._ramp_shader:bind()
+    self._shader_shape:draw()
+    self._ramp_shader:unbind()
+    rt.graphics.set_blend_mode()
 end

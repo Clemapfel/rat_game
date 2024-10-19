@@ -40,6 +40,7 @@ function rt.Background:_update_render_texture()
 
     local before = love.timer.getTime()
     self._render_texture:bind_as_render_target()
+    love.graphics.clear(true, false, false)
     self._implementation:draw()
     self._render_texture:unbind_as_render_target()
     local after = love.timer.getTime()

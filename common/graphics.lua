@@ -66,8 +66,8 @@ function rt.graphics.set_blend_mode(blend_mode_rgb, blend_mode_alpha)
         local rgb_operation, rgb_source_factor, rgb_destination_factor
         if blend_mode_rgb == rt.BlendMode.NONE then
             rgb_operation = rt.BlendOperation.ADD
-            rgb_source_factor = rt.BlendOperator.ZERO
-            rgb_destination_factor = rt.BlendOperator.ONE
+            rgb_source_factor = rt.BlendFactor.ZERO
+            rgb_destination_factor = rt.BlendFactor.ONE
         elseif blend_mode_rgb == rt.BlendMode.NORMAL then
             rgb_operation = rt.BlendOperation.ADD
             rgb_source_factor = rt.BlendFactor.SOURCE_ALPHA
@@ -99,8 +99,8 @@ function rt.graphics.set_blend_mode(blend_mode_rgb, blend_mode_alpha)
         local alpha_operation, alpha_source_factor, alpha_destination_factor
         if blend_mode_alpha == rt.BlendMode.NONE then
             alpha_operation = rt.BlendOperation.ADD
-            alpha_source_factor = rt.BlendOperator.ZERO
-            alpha_destination_factor = rt.BlendOperator.ONE
+            alpha_source_factor = rt.BlendFactor.ZERO
+            alpha_destination_factor = rt.BlendFactor.ONE
         elseif blend_mode_alpha == rt.BlendMode.NORMAL or blend_mode_alpha == rt.BlendMode.ADD then
             alpha_operation = rt.BlendOperation.ADD
             alpha_source_factor = rt.BlendFactor.ONE
