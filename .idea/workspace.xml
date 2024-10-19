@@ -22,23 +22,14 @@
     </configurations>
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="7fa9ba1b-2cff-4ecc-86fb-59ab2fa76ee1" name="Changes" comment="stashing">
-      <change afterPath="$PROJECT_DIR$/assets/configs/moves/STAB.lua" afterDir="false" />
+    <list default="true" id="7fa9ba1b-2cff-4ecc-86fb-59ab2fa76ee1" name="Changes" comment="added simulation environment sandbox">
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/assets/configs/global_status/DEBUG_GLOBAL_STATUS.lua" beforeDir="false" afterPath="$PROJECT_DIR$/assets/configs/global_statuses/DEBUG_GLOBAL_STATUS.lua" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/assets/configs/global_status/RAIN.lua" beforeDir="false" afterPath="$PROJECT_DIR$/assets/configs/global_statuses/RAIN.lua" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/assets/configs/moves/DEBUG_MOVE.lua" beforeDir="false" afterPath="$PROJECT_DIR$/assets/configs/moves/DEBUG_MOVE.lua" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/assets/configs/moves/PROTECT.lua" beforeDir="false" afterPath="$PROJECT_DIR$/assets/configs/moves/PROTECT.lua" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/assets/sprites/moves.lua" beforeDir="false" afterPath="$PROJECT_DIR$/assets/sprites/moves.lua" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/assets/sprites/moves.png" beforeDir="false" afterPath="$PROJECT_DIR$/assets/sprites/moves.png" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/battle/battle_scene.lua" beforeDir="false" afterPath="$PROJECT_DIR$/battle/battle_scene.lua" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/assets/configs/moves/STAB.lua" beforeDir="false" afterPath="$PROJECT_DIR$/assets/configs/moves/STAB.lua" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/battle/simulation_handler.lua" beforeDir="false" afterPath="$PROJECT_DIR$/battle/simulation_handler.lua" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/common/common.lua" beforeDir="false" afterPath="$PROJECT_DIR$/common/common.lua" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/common/game_state.lua" beforeDir="false" afterPath="$PROJECT_DIR$/common/game_state.lua" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/common/game_state_battle.lua" beforeDir="false" afterPath="$PROJECT_DIR$/common/game_state_battle.lua" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/include.lua" beforeDir="false" afterPath="$PROJECT_DIR$/include.lua" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/common/label.lua" beforeDir="false" afterPath="$PROJECT_DIR$/common/label.lua" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/main.lua" beforeDir="false" afterPath="$PROJECT_DIR$/main.lua" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/old/common/common.lua" beforeDir="false" afterPath="$PROJECT_DIR$/old/common/common.lua" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/older/~common/common.lua" beforeDir="false" afterPath="$PROJECT_DIR$/older/~common/common.lua" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -607,15 +598,7 @@
       <workItem from="1729098138796" duration="20580000" />
       <workItem from="1729180777153" duration="8566000" />
       <workItem from="1729267430460" duration="1705000" />
-      <workItem from="1729269158294" duration="9803000" />
-    </task>
-    <task id="LOCAL-01098" summary="refactored profiler">
-      <option name="closed" value="true" />
-      <created>1727998475721</created>
-      <option name="number" value="01098" />
-      <option name="presentableId" value="LOCAL-01098" />
-      <option name="project" value="LOCAL" />
-      <updated>1727998475721</updated>
+      <workItem from="1729269158294" duration="22756000" />
     </task>
     <task id="LOCAL-01099" summary="stashing">
       <option name="closed" value="true" />
@@ -1001,7 +984,15 @@
       <option name="project" value="LOCAL" />
       <updated>1729269141893</updated>
     </task>
-    <option name="localTasksCounter" value="1147" />
+    <task id="LOCAL-01147" summary="added simulation environment sandbox">
+      <option name="closed" value="true" />
+      <created>1729279090891</created>
+      <option name="number" value="01147" />
+      <option name="presentableId" value="LOCAL-01147" />
+      <option name="project" value="LOCAL" />
+      <updated>1729279090892</updated>
+    </task>
+    <option name="localTasksCounter" value="1148" />
     <servers />
   </component>
   <component name="TypeScriptGeneratedFilesManager">
@@ -1050,7 +1041,6 @@
     </option>
   </component>
   <component name="VcsManagerConfiguration">
-    <MESSAGE value="parsing working" />
     <MESSAGE value="wrapping working" />
     <MESSAGE value="stashing label" />
     <MESSAGE value="outline working but too big" />
@@ -1075,7 +1065,8 @@
     <MESSAGE value="added tab bar animation" />
     <MESSAGE value="enemy alignment working" />
     <MESSAGE value="stashing" />
-    <option name="LAST_COMMIT_MESSAGE" value="stashing" />
+    <MESSAGE value="added simulation environment sandbox" />
+    <option name="LAST_COMMIT_MESSAGE" value="added simulation environment sandbox" />
   </component>
   <component name="XDebuggerManager">
     <breakpoint-manager>
@@ -1104,6 +1095,11 @@
           <url>file://$PROJECT_DIR$/common/~label.lua</url>
           <line>23</line>
           <option name="timeStamp" value="23" />
+        </line-breakpoint>
+        <line-breakpoint enabled="true" type="lua-line">
+          <url>file://$PROJECT_DIR$/common/label.lua</url>
+          <line>833</line>
+          <option name="timeStamp" value="25" />
         </line-breakpoint>
         <line-breakpoint enabled="true" suspend="NONE" type="CMakeLineBreakpoint">
           <url>file://$PROJECT_DIR$/physics/box2d_extension/CMakeLists.txt</url>

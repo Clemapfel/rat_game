@@ -56,6 +56,7 @@ rt.GameState = meta.new_type("GameState", function()
         entity_id_to_index = {},
         entities = {},
 
+        global_statuses = {},
         shared_moves = {},
         shared_equips = {},
         shared_consumables = {},

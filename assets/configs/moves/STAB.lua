@@ -20,6 +20,8 @@ return {
         if has_status(user, STATUS_BLEEDING) then
             local current = get_value(user, N_BLEEDING_STACKS)
             set_value(user, N_BLEEDING_STACKS, current + 1)
+        else
+            set_value(user, N_BLEEDING_STACK, 1)
         end
     end
 }

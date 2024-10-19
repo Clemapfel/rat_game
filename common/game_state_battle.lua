@@ -13,6 +13,7 @@
         moves[slot_i] = {
             id  -- MoveID
             n_used
+            is_disabled = false
         }
 
         intrinsic_moves = {
@@ -21,16 +22,22 @@
 
         equips[slot_i] = {
             id  -- EquipID
+            is_disabled = false
         }
 
         consumables[slot_i] = {
             id  -- ConsumableID
             n_used
+            is_disabled = false
         }
 
         statuses[status_id] = {
             n_turns_elapsed
         }
+    }
+
+    global_statuses[status_id] = {
+        n_turns_elapsed
     }
 
     shared_moves[move_id] = {
@@ -91,20 +98,23 @@ function rt.GameState:add_entity(entity)
     for i = 1, n_moves do
         to_add.moves[i] = {
             id = "",
-            n_used = 0
+            n_used = 0,
+            is_disabled = false
         }
     end
 
     for i = 1, n_equips do
         to_add.equips[i] = {
-            id = ""
+            id = "",
+            is_disabled = false
         }
     end
 
     for i = 1, n_consumables do
         to_add.consumables[i] = {
             id = "",
-            n_used = 0
+            n_used = 0,
+            is_disabled = false
         }
     end
 
@@ -520,6 +530,11 @@ for which in range("move", "equip", "consumable") do
             end
             entry[which .. "s"].n_used = entry[which .. "s"].n_used + 1
         end
+
+        --- @brief entity_set_move_n_used, entity_set_consumable_n_used
+        rt.GameState["entity_set_" .. which .. "_n_used"] = function(self, entity, object, n)
+
+        end
     end
 
     --- @brief list_shared_moves, list_shared_equips, list_shared_consumables
@@ -594,6 +609,53 @@ for which in range("move", "equip", "consumable") do
         else
             return entry.count
         end
+    end
+end
+
+for which_type in range(
+    {"move", bt.Move},
+    {"equip", bt.Equip},
+    {"consumable", bt.Consumable}
+) do
+    local which, type = table.unpack(which_type)
+    --- @brief entity_get_move_is_disabled, entity_get_equip_is_disabled, entity_get_consumable_is_disabled
+    rt.GameState["entity_get_" .. which .. "_is_disabled"] = function(self, entity, object)
+        meta.assert_isa(entity, bt.Entity)
+        meta.assert_isa(object, type)
+
+        local entity_entry = self:_get_entity_entry(entity)
+        if entity_entry == nil then
+            rt.error("In rt.GameState:entity_get_is_" .. which .."_disabled: entity `" .. entity:get_id() .. "` is not part of state")
+            return true
+        end
+
+        local object_entry = entity_entry[which .. "s"][object:get_id()]
+        if object_entry == nil then
+            return true
+        end
+
+        return object_entry.is_disabled
+    end
+
+    --- @brief entity_set_is_move_disabled, entity_set_is_equip_disabled, entity_set_is_consumable_disabled
+    rt.GameState["entity_set_is_" .. which .. "_disabled"] = function(self, entity, object, b)
+        meta.assert_isa(entity, bt.Entity)
+        meta.assert_isa(object, type)
+        meta.assert_boolean(b)
+
+        local entity_entry = self:_get_entity_entry(entity)
+        if entity_entry == nil then
+            rt.error("In rt.GameState:entity_set_is_" .. which .."_disabled: entity `" .. entity:get_id() .. "` is not part of state")
+            return
+        end
+
+        local object_entry = entity_entry[which .. "s"][object:get_id()]
+        if object_entry == nil then
+            rt.error("In rt.GameState:entity_set_is_" .. which .."_disabled: entity `" .. entity:get_id() .. "` has no " .. which .. "`" .. object:get_id() .. "`")
+            return
+        end
+
+        object_entry.is_disabled = b
     end
 end
 
@@ -724,6 +786,21 @@ function rt.GameState:entity_add_status(entity, status)
 end
 
 --- @brief
+function rt.GameState:entity_has_status(entity, status)
+    meta.assert_isa(entity, bt.Entity)
+    meta.assert_isa(status, bt.Status)
+
+
+    local entry = self:_get_entity_entry(entity)
+    if entry == nil then
+        rt.error("In rt.GameState:entity_has_status: entity `" .. entity:get_id() .. "` is not part of state")
+        return
+    end
+
+    return entry.statuses[status:get_id()] ~= nil
+end
+
+--- @brief
 --- @return Table<bt.Status>
 function rt.GameState:entity_list_statuses(entity)
     meta.assert_isa(entity, bt.Entity)
@@ -757,6 +834,26 @@ function rt.GameState:entity_get_status_n_turns_elapsed(entity, status)
 end
 
 --- @brief
+function rt.GameState:entity_set_status_n_turns_elapsed(entity, status, n_turns)
+    meta.assert_isa(entity, bt.Entity)
+    meta.assert_isa(status, bt.Status)
+    meta.assert_unsigned(n_turns)
+    local entry = self:_get_entity_entry(entity)
+    if entry == nil then
+        rt.error("In rt.GameState:entity_set_status_n_turns_elapsed: entity `" .. entity:get_id() .. "` is not part of state")
+        return 0
+    end
+
+    local item = entry.statuses[status:get_id()]
+    if item == nil then
+        rt.error("In rt.GameState:entity_set_status_n_turns_elapsed: entity `" .. entity:get_id() .. "` has no status `" .. status:get_id() .. "`")
+        return 0
+    end
+
+    item.n_turns_elapsed = clamp(n_turns, 0, status:get_max_duration())
+end
+
+--- @brief
 function rt.GameState:entity_has_status(entity, status)
     meta.assert_isa(entity, bt.Entity)
     meta.assert_isa(status, bt.Status)
@@ -784,6 +881,59 @@ function rt.GameState:entity_remove_status(entity, status)
     entry.statuses[status.get_id()] = nil
 end
 
+--- @brief
+function rt.GameState:add_global_status(global_status)
+    meta.assert_isa(global_status, bt.GlobalStatus)
+    self._state.global_statuses[global_status:get_id()] = {
+        n_turns_elapsed = 0
+    }
+end
+
+--- @brief
+function rt.GameState:has_global_status(global_status)
+    meta.assert_isa(global_status, bt.GlobalStatus)
+    return self._state.global_status[global_status:get_id()] ~= nil
+end
+
+--- @brief
+function rt.GameState:list_global_statuses()
+    local out = {}
+    for status in values(self._state.global_statuses) do
+        table.insert(out, status)
+    end
+    return out
+end
+
+--- @brief
+function rt.GameState:get_global_status_n_turns_elapsed(global_status)
+    meta.assert_isa(global_status, bt.GlobalStatus)
+    local entry = self._state.global_statuses[global_status:get_id()]
+    if entry == nil then
+        return 0
+    else
+        return entry.n_turns_elapsed
+    end
+end
+
+--- @brief
+function rt.GameState:set_global_status_n_turns_elapsed(global_status, n_turns)
+    meta.assert_isa(global_status, bt.GlobalStatus)
+    meta.assert_unsigned(n_turns)
+
+    local entry = self._state.global_statuses[global_status:get_id()]
+    if entry == nil then
+        rt.error("In rt.GameState.set_global_status_n_turns_elapsed: global status `" .. global_status:get_id() .. "` is not present")
+        return 0
+    end
+
+    entry.n_turns_elapsed = clamp(n_turns, 0, global_status:get_max_duration())
+end
+
+--- @brief
+function rt.GameState:has_global_status(global_status)
+    meta.assert_isa(global_status, bt.GlobalStatus)
+    return self._state.global_statuses[global_status:get_id()] ~= nil
+end
 
 --- @brief
 function rt.GameState:list_templates()

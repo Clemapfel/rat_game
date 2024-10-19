@@ -831,7 +831,7 @@ do
     end
 
     --- @brief
-    function rt.Label:update_n_visible_characters_from_elapsed(elapsed, letters_per_second)
+        function rt.Label:update_n_visible_characters_from_elapsed(elapsed, letters_per_second)
         local step = 1 / letters_per_second
         local n_letters = math.floor(elapsed / step)
         local so_far = 0
