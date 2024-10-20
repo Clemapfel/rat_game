@@ -152,8 +152,6 @@ function rt.Label:draw()
 
     love.graphics.setBlendMode("alpha")
     love.graphics.translate(-self._bounds.x, -self._bounds.y)
-
-    self:draw_bounds()
 end
 
 --- @override
@@ -213,6 +211,7 @@ function rt.Label:set_n_visible_characters(n)
     if self._n_visible_characters == n then return end
     self._n_visible_characters = n
     self:_update_n_visible_characters()
+    self:_update_textures()
 end
 
 --- @brief
@@ -237,7 +236,7 @@ end
 
 --- @brief
 function rt.Label:get_line_height()
-    return self._font:get_bold_italic():getHeight()
+    return self._font:get_native(rt.FontStyle.BOLD_ITALIC):getHeight()
 end
 
 do
@@ -735,7 +734,7 @@ do
             if self._outline_texture ~= nil then
                 self._outline_texture:free()
             end
-            self._outline_texture = rt.RenderTexture(outline_texture_w, outline_texture_h, 0, "rgba4")
+            self._outline_texture = rt.RenderTexture(outline_texture_w, outline_texture_h, 4, "rgba4")
             self.outline_shader:send("texture_resolution", {outline_texture_w, outline_texture_h})
             self.outline_shader:send("outline_color", { rt.color_unpack(rt.Palette.BLACK) })
         end
@@ -744,7 +743,7 @@ do
             self._swap_texture:free()
         end
 
-        self._swap_texture = rt.RenderTexture(outline_texture_w, outline_texture_h, 0, "rgba4")
+        self._swap_texture = rt.RenderTexture(outline_texture_w, outline_texture_h, 4, "rgba4")
         self:_update_n_visible_characters()
     end
 

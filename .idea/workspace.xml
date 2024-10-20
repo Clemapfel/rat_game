@@ -22,19 +22,14 @@
     </configurations>
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="7fa9ba1b-2cff-4ecc-86fb-59ab2fa76ee1" name="Changes" comment="refactored animation and animation queue">
-      <change afterPath="$PROJECT_DIR$/battle/animations/message.lua" afterDir="false" />
+    <list default="true" id="7fa9ba1b-2cff-4ecc-86fb-59ab2fa76ee1" name="Changes" comment="stashing before reworking textbox">
+      <change afterPath="$PROJECT_DIR$/common/~text_box.lua" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/battle/battle_animation.lua" beforeDir="false" afterPath="$PROJECT_DIR$/battle/battle_animation.lua" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/battle/animations/message.lua" beforeDir="false" afterPath="$PROJECT_DIR$/battle/animations/message.lua" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/battle/battle_scene.lua" beforeDir="false" afterPath="$PROJECT_DIR$/battle/battle_scene.lua" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/battle/simulation_handler.lua" beforeDir="false" afterPath="$PROJECT_DIR$/battle/simulation_handler.lua" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/common/animation_queue.lua" beforeDir="false" afterPath="$PROJECT_DIR$/common/animation_queue.lua" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/common/label.lua" beforeDir="false" afterPath="$PROJECT_DIR$/common/label.lua" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/common/text_box.lua" beforeDir="false" afterPath="$PROJECT_DIR$/common/text_box.lua" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/include.lua" beforeDir="false" afterPath="$PROJECT_DIR$/include.lua" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/main.lua" beforeDir="false" afterPath="$PROJECT_DIR$/main.lua" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/old/battle/scene.lua" beforeDir="false" afterPath="$PROJECT_DIR$/old/battle/scene.lua" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/older/~common/render_texture.lua" beforeDir="false" afterPath="$PROJECT_DIR$/older/~common/render_texture.lua" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -603,15 +598,7 @@
       <workItem from="1729098138796" duration="20580000" />
       <workItem from="1729180777153" duration="8566000" />
       <workItem from="1729267430460" duration="1705000" />
-      <workItem from="1729269158294" duration="43091000" />
-    </task>
-    <task id="LOCAL-01104" summary="added envelope function">
-      <option name="closed" value="true" />
-      <created>1728077353180</created>
-      <option name="number" value="01104" />
-      <option name="presentableId" value="LOCAL-01104" />
-      <option name="project" value="LOCAL" />
-      <updated>1728077353181</updated>
+      <workItem from="1729269158294" duration="47036000" />
     </task>
     <task id="LOCAL-01105" summary="stashing old opactiy fade animation not working">
       <option name="closed" value="true" />
@@ -997,7 +984,15 @@
       <option name="project" value="LOCAL" />
       <updated>1729386143139</updated>
     </task>
-    <option name="localTasksCounter" value="1153" />
+    <task id="LOCAL-01153" summary="stashing before reworking textbox">
+      <option name="closed" value="true" />
+      <created>1729447286433</created>
+      <option name="number" value="01153" />
+      <option name="presentableId" value="LOCAL-01153" />
+      <option name="project" value="LOCAL" />
+      <updated>1729447286433</updated>
+    </task>
+    <option name="localTasksCounter" value="1154" />
     <servers />
   </component>
   <component name="TypeScriptGeneratedFilesManager">
@@ -1046,7 +1041,6 @@
     </option>
   </component>
   <component name="VcsManagerConfiguration">
-    <MESSAGE value="n_visible_characters working" />
     <MESSAGE value="fixed n characters for mixed outlined labels" />
     <MESSAGE value="fixed font issue" />
     <MESSAGE value="labels working" />
@@ -1071,7 +1065,8 @@
     <MESSAGE value="circular wipe working" />
     <MESSAGE value="stashing" />
     <MESSAGE value="refactored animation and animation queue" />
-    <option name="LAST_COMMIT_MESSAGE" value="refactored animation and animation queue" />
+    <MESSAGE value="stashing before reworking textbox" />
+    <option name="LAST_COMMIT_MESSAGE" value="stashing before reworking textbox" />
   </component>
   <component name="XDebuggerManager">
     <breakpoint-manager>

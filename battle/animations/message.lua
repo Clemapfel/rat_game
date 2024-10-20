@@ -12,7 +12,7 @@ end)
 
 --- @override
 function bt.Animation.MESSAGE:start()
-    self._text_box:present()
+    self._text_box:show()
     self._text_box:append(self._message)
     self._signal_handler = self._text_box:signal_connect("scrolling_done", function()
         self._scrolling_done = true
@@ -27,5 +27,6 @@ end
 --- @override
 function bt.Animation.MESSAGE:finish()
     self._text_box:signal_disconnect("scrolling_done", self._signal_handler)
-    self._text_box:close()
+    self._text_box:clear()
+    self._text_box:hide()
 end

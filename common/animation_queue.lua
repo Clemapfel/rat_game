@@ -126,8 +126,9 @@ do
 
     function rt.AnimationQueue:update(delta)
         if self._n_nodes == 0 then return end
+
         local first = self._nodes[1]
-        local is_done = false
+        local is_done = true
         for animation in values(first.animations) do
             if animation._state == rt.AnimationState.IDLE then
                 _start_animation(animation)
