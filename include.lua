@@ -239,7 +239,7 @@ require "battle.entity_sprite"
 require "battle.party_sprite"
 require "battle.enemy_sprite"
 
-require "battle.animations.dissolve"
+require "battle.battle_animation"
 
 require "battle.battle_scene"
 require "battle.simulation_handler"

@@ -340,7 +340,6 @@ function bt.Scene:get_sprite(entity)
     end
 end
 
-
 --- @brief
 function bt.Scene:set_selected(entities, unselect_others)
     unselect_others = which(unselect_others, true)

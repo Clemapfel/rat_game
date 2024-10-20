@@ -735,7 +735,7 @@ do
             if self._outline_texture ~= nil then
                 self._outline_texture:free()
             end
-            self._outline_texture = rt.RenderTexture(outline_texture_w, outline_texture_h, 16)
+            self._outline_texture = rt.RenderTexture(outline_texture_w, outline_texture_h, 0, "rgba4")
             self.outline_shader:send("texture_resolution", {outline_texture_w, outline_texture_h})
             self.outline_shader:send("outline_color", { rt.color_unpack(rt.Palette.BLACK) })
         end
@@ -744,7 +744,7 @@ do
             self._swap_texture:free()
         end
 
-        self._swap_texture = rt.RenderTexture(outline_texture_w, outline_texture_h, 16)
+        self._swap_texture = rt.RenderTexture(outline_texture_w, outline_texture_h, 0, "rgba4")
         self:_update_n_visible_characters()
     end
 
@@ -831,52 +831,46 @@ do
     end
 
     --- @brief
-        function rt.Label:update_n_visible_characters_from_elapsed(elapsed, letters_per_second)
+    function rt.Label:update_n_visible_characters_from_elapsed(elapsed, letters_per_second)
+        local so_far = elapsed
         local step = 1 / letters_per_second
-        local n_letters = math.floor(elapsed / step)
-        local so_far = 0
-        local glyph_i = 1
         local n_visible = 0
-        local beat_weight = _syntax.BEAT_WEIGHTS[_syntax.BEAT]
-        local already_done_scrolling = false
-
         local weights = _syntax.BEAT_WEIGHTS
-        local beat_character = _syntax.BEAT
         local max_row = 0
-
-        while glyph_i <= #self._glyphs and so_far < elapsed do
-            local glyph = self._glyphs[glyph_i]
+        for glyph in values(self._glyphs) do
             if meta.is_table(glyph) then
-                if already_done_scrolling then
-                    glyph:set_n_visible_characters(0)
+                if so_far <= 0 then
+                    glyph.n_visible_characters = 0
                 else
                     local text = glyph.text
                     local n_seen = 1
-                    for i = 1, #text do
-                        local weight = weights[string.at(text, i)]
+                    for i = 1, glyph.n_characters do
+                        local weight = weights[string.sub(glyph.text, i, i)]
                         if weight == nil then
-                            so_far = so_far + step
+                            so_far = so_far - step
                         else
-                            so_far = so_far + weight * step
+                            so_far = so_far - weight * step
                         end
 
-                        if so_far > elapsed then
-                            already_done_scrolling = false -- mark so all subsequent glyphs can be skipped
-                            break
-                        end
                         n_visible = n_visible + 1
                         n_seen = n_seen + 1
-                        max_row = _max(max_row, glyph.row_index)
+                        if so_far < 0 then break end
                     end
                     glyph.n_visible_characters = n_seen
+                    max_row = math.max(max_row, glyph.row_index)
                 end
-            elseif glyph == weights then
-                so_far = so_far + beat_weight * step
+            else
+                local weight = weights[glyph]
+                if weight ~= nil then
+                    so_far = so_far - weight * step
+                end
             end
-            glyph_i = glyph_i + 1
         end
 
-        return n_visible >= self._n_characters, max_row, clamp(elapsed - so_far, 0)
+        self:_update_textures()
+        local is_done = n_visible >= self._n_characters
+        local rest_delta = so_far
+        return is_done, max_row, so_far
     end
 end  -- do-end
 

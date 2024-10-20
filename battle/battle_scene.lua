@@ -4,7 +4,7 @@ bt.BattleScene = meta.new_type("BattleScene", rt.Scene, function(state)
         _state = state,
         _simulation_environment = nil,
 
-        _log = rt.TextBox(),
+        _text_box = rt.TextBox(),
         _priority_queue = bt.PriorityQueue(),
         _verbose_info = mn.VerboseInfoPanel(),
         _sprites = {},        -- Table<bt.Entity, Union<bt.PartySprite, bt.EnemySprite>>
@@ -37,7 +37,7 @@ function bt.BattleScene:realize()
     if self._is_realized == true then return end
     self._is_realized = true
 
-    self._log:realize()
+    self._text_box:realize()
     self._priority_queue:realize()
 
     self._verbose_info:set_frame_visible(false)
@@ -59,7 +59,6 @@ function bt.BattleScene:create_from_state()
     self._move_selection = {}
 
     self:add_entity(table.unpack(self._state:list_entities()))
-
     self._simulation_environment = self:create_simulation_environment()
 end
 
@@ -144,7 +143,7 @@ function bt.BattleScene:size_allocate(x, y, width, height)
 
     local party_sprites_w = (width - 2 * outer_margin - 2 * tile_size - 2 * m)
     local log_w = party_sprites_w - 2 * tile_size
-    self._log:fit_into(x + 0.5 * width - 0.5 * log_w, current_y, log_w, tile_size)
+    self._text_box:fit_into(x + 0.5 * width - 0.5 * log_w, current_y, log_w, tile_size)
 
     current_x = current_x + tile_size + m
 
@@ -390,12 +389,11 @@ function bt.BattleScene:draw()
     love.graphics.translate(-self._enemy_sprite_x_offset, 0)
 
     for x in range(
-        self._log,
+        self._text_box,
         self._priority_queue,
         self._verbose_info,
         self._global_status_bar
     ) do
-        x:draw_bounds()
         x:draw()
     end
 
@@ -405,18 +403,22 @@ function bt.BattleScene:draw()
         entry.moves:draw()
     end
 
-    love.graphics.line(0.5 * love.graphics.getWidth(), 0, 0.5 * love.graphics.getWidth(), love.graphics.getHeight())
-    love.graphics.line(0, 0.5 * love.graphics.getHeight(), love.graphics.getWidth(), 0.5 * love.graphics.getHeight())
+    --love.graphics.line(0.5 * love.graphics.getWidth(), 0, 0.5 * love.graphics.getWidth(), love.graphics.getHeight())
+    --love.graphics.line(0, 0.5 * love.graphics.getHeight(), love.graphics.getWidth(), 0.5 * love.graphics.getHeight())
+
+    self._animation_queue:draw()
 end
 
 --- @override
 function bt.BattleScene:update(delta)
-    self._log:update(delta)
+    self._text_box:update(delta)
     self._global_status_bar:update(delta)
     for sprite in values(self._sprites) do
         sprite:update(delta)
     end
     self._priority_queue:update(delta)
+
+    self._animation_queue:update(delta)
 end
 
 --- @override
@@ -429,12 +431,24 @@ function bt.BattleScene:make_inactive()
     self._input:signal_block_all()
 end
 
+--- @brief
+function bt.BattleScene:_push_animation(...)
+    self._animation_queue:push(...)
+end
+
+--- @brief
+function bt.BattleScene:_append_animation(...)
+    self._animation_queue:append(...)
+end
+
 --- @brief [internal]
 function bt.BattleScene:_handle_button_pressed(which)
     if which == rt.InputButton.A then
-        self:invoke(function()
-            message("test")
-        end)
+        self._simulation_environment.message("<b>test</b>\n")
+        self._simulation_environment.message("<b>t2est</b>\n")
+        self._simulation_environment.message("<b>test12</b>\n")
+        self._simulation_environment.message("<b>t4est</b>\n")
+
     end
     --[[
     if self._selecting_entity ~= nil then

@@ -1,5 +1,5 @@
 rt.settings.textbox = {
-    scroll_speed = 50, -- letters / s
+    scroll_speed = 10, -- letters / s
 }
 
 --- @class rt.TextBox
@@ -20,6 +20,7 @@ rt.TextBox = meta.new_type("TextBox", rt.Widget, function()
         _n_labels = 0,
         _n_lines = 0,
         _scrolling_labels = {},  -- Table<Number>
+        _n_scrolling_labels = 0,
         _current_line_i = 1,
         _line_i_to_label_i = {}, -- Table<Number, { label_i, line_i }
         _max_n_visible_lines = 3,
@@ -119,7 +120,6 @@ function rt.TextBox:size_allocate(x, y, width, height)
     self._label_stencil:resize(self._label_aabb)
     self._backdrop:fit_into(x, y, width, backdrop_height)
 
-    --[[
     if text_w ~= self._last_width then
         self._line_i_to_label_i = {}
         for entry in values(self._labels) do
@@ -136,7 +136,6 @@ function rt.TextBox:size_allocate(x, y, width, height)
             end
         end
     end
-    ]]--
 
     self:_update_indicators()
 end
@@ -214,6 +213,7 @@ function rt.TextBox:append(formatted_text)
     end
 
     table.insert(self._scrolling_labels, self._n_labels)
+    self._n_scrolling_labels = self._n_scrolling_labels + 1
     self:_update_indicators()
     self:_update_n_visible_lines()
 end
@@ -239,9 +239,11 @@ function rt.TextBox:update(delta)
 
             if is_done then
                 table.remove(self._scrolling_labels, 1)
+                self._n_scrolling_labels = self._n_scrolling_labels - 1
                 self:_update_indicators()
                 if self._n_scrolling_labels == 0 then
                     self:_emit_scrolling_done()
+                    dbg("emit")
                 end
             end
         end
@@ -255,6 +257,7 @@ function rt.TextBox:skip()
         entry.label:set_n_visible_characters(POSITIVE_INFINITY)
     end
     self._scrolling_labels = {}
+    self._n_scrolling_labels = 0
     self:_update_n_visible_lines()
     self:_emit_scrolling_done()
 end
@@ -311,13 +314,13 @@ end
 
 --- @brief
 function rt.TextBox:close()
-
 end
 
 --- @brief
 function rt.TextBox:clear()
     self._labels = {}
     self._scrolling_labels = {}
+    self._n_scrolling_labels = 0
     self._line_i_to_label_i = {}
     self._n_labels = 0
     self._n_lines = 0

@@ -22,32 +22,19 @@
     </configurations>
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="7fa9ba1b-2cff-4ecc-86fb-59ab2fa76ee1" name="Changes" comment="stashing">
-      <change afterPath="$PROJECT_DIR$/common/~animation_queue.lua" afterDir="false" />
+    <list default="true" id="7fa9ba1b-2cff-4ecc-86fb-59ab2fa76ee1" name="Changes" comment="refactored animation and animation queue">
+      <change afterPath="$PROJECT_DIR$/battle/animations/message.lua" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/assets/sprites/moves.hxl" beforeDir="false" afterPath="$PROJECT_DIR$/assets/sprites/moves.hxl" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/battle/animations/dissolve.lua" beforeDir="false" afterPath="$PROJECT_DIR$/battle/animations/dissolve.lua" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/battle/battle_animation.lua" beforeDir="false" afterPath="$PROJECT_DIR$/battle/battle_animation.lua" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/battle/battle_scene.lua" beforeDir="false" afterPath="$PROJECT_DIR$/battle/battle_scene.lua" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/battle/health_bar.lua" beforeDir="false" afterPath="$PROJECT_DIR$/battle/health_bar.lua" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/battle/priority_queue.lua" beforeDir="false" afterPath="$PROJECT_DIR$/battle/priority_queue.lua" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/battle/simulation_handler.lua" beforeDir="false" afterPath="$PROJECT_DIR$/battle/simulation_handler.lua" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/common/animation.lua" beforeDir="false" afterPath="$PROJECT_DIR$/common/updatable.lua" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/common/animation_queue.lua" beforeDir="false" afterPath="$PROJECT_DIR$/common/animation_queue.lua" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/common/label.lua" beforeDir="false" afterPath="$PROJECT_DIR$/common/label.lua" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/common/loading_screen.lua" beforeDir="false" afterPath="$PROJECT_DIR$/common/loading_screen.lua" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/common/particle_emitter.lua" beforeDir="false" afterPath="$PROJECT_DIR$/common/particle_emitter.lua" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/common/random.lua" beforeDir="false" afterPath="$PROJECT_DIR$/common/random.lua" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/common/sprite.lua" beforeDir="false" afterPath="$PROJECT_DIR$/common/sprite.lua" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/common/~glyph.lua" beforeDir="false" afterPath="$PROJECT_DIR$/common/~glyph.lua" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/common/text_box.lua" beforeDir="false" afterPath="$PROJECT_DIR$/common/text_box.lua" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/include.lua" beforeDir="false" afterPath="$PROJECT_DIR$/include.lua" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/main.lua" beforeDir="false" afterPath="$PROJECT_DIR$/main.lua" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/menu/deadzone_visualization_widget.lua" beforeDir="false" afterPath="$PROJECT_DIR$/menu/deadzone_visualization_widget.lua" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/menu/inventory_scene.lua" beforeDir="false" afterPath="$PROJECT_DIR$/menu/inventory_scene.lua" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/menu/inventory_scene_object_moved_animation.lua" beforeDir="false" afterPath="$PROJECT_DIR$/menu/inventory_scene_object_moved_animation.lua" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/menu/msaa_intensity_widget.lua" beforeDir="false" afterPath="$PROJECT_DIR$/menu/msaa_intensity_widget.lua" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/menu/shake_intensity_widget.lua" beforeDir="false" afterPath="$PROJECT_DIR$/menu/shake_intensity_widget.lua" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/menu/tab_bar.lua" beforeDir="false" afterPath="$PROJECT_DIR$/menu/tab_bar.lua" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/old/battle/scene.lua" beforeDir="false" afterPath="$PROJECT_DIR$/old/battle/scene.lua" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/older/~common/render_texture.lua" beforeDir="false" afterPath="$PROJECT_DIR$/older/~common/render_texture.lua" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -616,15 +603,7 @@
       <workItem from="1729098138796" duration="20580000" />
       <workItem from="1729180777153" duration="8566000" />
       <workItem from="1729267430460" duration="1705000" />
-      <workItem from="1729269158294" duration="38834000" />
-    </task>
-    <task id="LOCAL-01103" summary="fixed physics scaling">
-      <option name="closed" value="true" />
-      <created>1728076427589</created>
-      <option name="number" value="01103" />
-      <option name="presentableId" value="LOCAL-01103" />
-      <option name="project" value="LOCAL" />
-      <updated>1728076427589</updated>
+      <workItem from="1729269158294" duration="43091000" />
     </task>
     <task id="LOCAL-01104" summary="added envelope function">
       <option name="closed" value="true" />
@@ -1010,7 +989,15 @@
       <option name="project" value="LOCAL" />
       <updated>1729378670984</updated>
     </task>
-    <option name="localTasksCounter" value="1152" />
+    <task id="LOCAL-01152" summary="refactored animation and animation queue">
+      <option name="closed" value="true" />
+      <created>1729386143139</created>
+      <option name="number" value="01152" />
+      <option name="presentableId" value="LOCAL-01152" />
+      <option name="project" value="LOCAL" />
+      <updated>1729386143139</updated>
+    </task>
+    <option name="localTasksCounter" value="1153" />
     <servers />
   </component>
   <component name="TypeScriptGeneratedFilesManager">
@@ -1059,7 +1046,6 @@
     </option>
   </component>
   <component name="VcsManagerConfiguration">
-    <MESSAGE value="stashing before moving to fully cached render texture" />
     <MESSAGE value="n_visible_characters working" />
     <MESSAGE value="fixed n characters for mixed outlined labels" />
     <MESSAGE value="fixed font issue" />
@@ -1084,7 +1070,8 @@
     <MESSAGE value="added triangle tiling" />
     <MESSAGE value="circular wipe working" />
     <MESSAGE value="stashing" />
-    <option name="LAST_COMMIT_MESSAGE" value="stashing" />
+    <MESSAGE value="refactored animation and animation queue" />
+    <option name="LAST_COMMIT_MESSAGE" value="refactored animation and animation queue" />
   </component>
   <component name="XDebuggerManager">
     <breakpoint-manager>
@@ -1113,11 +1100,6 @@
           <url>file://$PROJECT_DIR$/common/~label.lua</url>
           <line>23</line>
           <option name="timeStamp" value="23" />
-        </line-breakpoint>
-        <line-breakpoint enabled="true" type="lua-line">
-          <url>file://$PROJECT_DIR$/common/label.lua</url>
-          <line>833</line>
-          <option name="timeStamp" value="25" />
         </line-breakpoint>
         <line-breakpoint enabled="true" suspend="NONE" type="CMakeLineBreakpoint">
           <url>file://$PROJECT_DIR$/physics/box2d_extension/CMakeLists.txt</url>

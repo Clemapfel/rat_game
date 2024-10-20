@@ -14,7 +14,7 @@ rt.AnimationState = {
 --- @class rt.QueuableAnimation
 --- @signal start (self) -> nil
 --- @signal finish (self) -> nil
-rt.Animation = meta.new_abstract_type("Animation", rt.Drawable, rt.Updatable, { -- sic, non-abstract
+rt.Animation = meta.new_abstract_type("Animation", rt.Drawable, rt.Updatable, {
     _state = rt.AnimationState.IDLE
 })
 
@@ -80,6 +80,7 @@ function rt.AnimationQueue:_new_node(...)
         dbg("push", meta.typeof(select(i, ...)))
     end
     return {
+        was_started = false,
         animations = {...}
     }
 end
@@ -87,10 +88,8 @@ end
 --- @brief
 function rt.AnimationQueue:push(animation, ...)
     if self._n_nodes == 0 then self._start_should_trigger = true end
-    local was_empty = self._n_nodes == 0
     table.insert(self._nodes, self:_new_node(animation, ...))
     self._n_nodes = self._n_nodes + 1
-    if was_empty then self:update(0) end
 end
 
 --- @brief
@@ -105,7 +104,9 @@ function rt.AnimationQueue:append(...)
             table.insert(last_node.animations, select(i, ...))
         end
 
-        if was_only_node then self:update(0) end
+        if last_node.was_started then
+            self:update(0) -- invoke signal callbacks the same frame it is queue, if the queue is already active
+        end
     end
 end
 
@@ -157,7 +158,7 @@ do
             table.remove(self._nodes, 1)
             self._n_nodes = self._n_nodes - 1
             if self._n_nodes > 0 then
-                return self:update(0) -- cycle to trigger more 1-frame callbacks on the same frame
+                return self:update(0) -- cycle to trigger more 1-frame callbacks of the next nodes on the same frame
             else
                 self:signal_emit("emptied")
             end

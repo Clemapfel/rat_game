@@ -2,10 +2,13 @@
 --- @class rt.RenderTexture
 --- @param width Number
 --- @param height Number
-rt.RenderTexture = meta.new_type("RenderTexture", rt.Texture, function(width, height, msaa)
+rt.RenderTexture = meta.new_type("RenderTexture", rt.Texture, function(width, height, msaa, format)
     msaa = which(msaa, 0)
     local out = meta.new(rt.RenderTexture, {
-        _native = love.graphics.newCanvas(width, height, {msaa = msaa}),
+        _native = love.graphics.newCanvas(width, height, {
+            msaa = msaa,
+            format = format
+        }),
         _before = {}, -- love.Canvas
     })
     out:set_scale_mode(rt.TextureScaleMode.NEAREST)

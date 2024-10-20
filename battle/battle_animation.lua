@@ -1,24 +1,12 @@
 --- @class bt.Animation
-bt.Animation = meta.new_abstract_type("BattleAnimation", rt.Animation, {
-    _elapsed = 0
-})
+bt.Animation = rt.Animation
 
---- @brief
-function bt.Animation:start()
-    error("abstract method called")
+-- include all implementations
+for _, name in pairs(love.filesystem.getDirectoryItems("battle/animations")) do
+    if string.match(name, "%.lua$") ~= nil then
+        local path = "battle.animations." .. string.gsub(name, "%.lua$", "")
+        require(path)
+    end
 end
 
---- @brief
-function bt.Animation:update()
-    error("abstract method called")
-end
 
---- @brief
-function bt.Animation:finish()
-    error("abstract method called")
-end
-
---- @brief
-function bt.Animation:draw()
-    error("abstract method called")
-end
