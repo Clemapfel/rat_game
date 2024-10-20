@@ -31,7 +31,11 @@ state = rt.GameState()
 state:set_loading_screen(rt.LoadingScreen.DEFAULT)
 state:initialize_debug_state()
 
-
+queue = rt.AnimationQueue()
+queue:push(rt.AnimationAction(
+    function() println "start"  end,
+    function() println "end"  end
+))
 
 local background = rt.Background()
 background:set_implementation(rt.Background.TEMP_TRIANGLE_TILING)

@@ -5,7 +5,7 @@ rt.settings.menu.animation.object_moved = {
 }
 
 --- @class mn.ObjectMovedAnimation
-mn.Animation.OBJECT_MOVED = meta.new_type("OBJECT_MOVED", rt.QueueableAnimation, function(object, from, to)
+mn.Animation.OBJECT_MOVED = meta.new_type("OBJECT_MOVED", rt.Animation, function(object, from, to)
     meta.assert_aabb(from)
     meta.assert_aabb(to)
 

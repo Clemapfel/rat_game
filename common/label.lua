@@ -24,7 +24,7 @@ rt.JustifyMode = meta.new_enum("JustifyMode", {
 })
 
 --- @class rt.Label
-rt.Label = meta.new_type("Label", rt.Widget, rt.Animation, function(text, font, monospace_font)
+rt.Label = meta.new_type("Label", rt.Widget, rt.Updatable, function(text, font, monospace_font)
     if font == nil then font = rt.settings.font.default end
     if monospace_font == nil then monospace_font = rt.settings.font.default_mono end
 

@@ -1,5 +1,5 @@
 --- @class
-bt.Animation.DISSOLVE = meta.new_type("DISSOLVE", rt.QueueableAnimation, function(target)
+bt.Animation.DISSOLVE = meta.new_type("DISSOLVE", rt.Animation, function(target)
     return meta.new(bt.Animation.DISSOLVE, {
         _step_shader = rt.ComputeShader("battle/animations/dissolve_compute.glsl"),
         _render_shader = rt.Shader("battle/animations/dissolve_render.glsl"),

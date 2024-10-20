@@ -432,7 +432,9 @@ end
 --- @brief [internal]
 function bt.BattleScene:_handle_button_pressed(which)
     if which == rt.InputButton.A then
-
+        self:invoke(function()
+            message("test")
+        end)
     end
     --[[
     if self._selecting_entity ~= nil then

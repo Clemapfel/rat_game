@@ -12,7 +12,7 @@ rt.settings.battle.health_bar = {
 }
 
 --- @class bt.HealthBar
-bt.HealthBar = meta.new_type("HealthBar", rt.Widget, rt.Animation, function(lower, upper, value)
+bt.HealthBar = meta.new_type("HealthBar", rt.Widget, rt.Updatable, function(lower, upper, value)
     if value == nil then value = lower + (upper - lower) / 2 end
     return meta.new(bt.HealthBar, {
         _lower = lower,

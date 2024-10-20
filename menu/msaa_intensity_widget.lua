@@ -1,5 +1,5 @@
 --- @class mn.MSAAIntensityWidget
-mn.MSAAIntensityWidget = meta.new_type("MSAAIntensityWidget", rt.Widget, rt.Animation, function()
+mn.MSAAIntensityWidget = meta.new_type("MSAAIntensityWidget", rt.Widget, rt.Updatable, function()
     return meta.new(mn.MSAAIntensityWidget, {
         _shape = rt.Line(0, 0, 1),
         _shape_radius_x = 1,

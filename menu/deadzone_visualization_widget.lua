@@ -1,5 +1,5 @@
 --- @class mn.DeadzoneVisualizationWidget
-mn.DeadzoneVisualizationWidget = meta.new_type("DeadzoneVisualizationWidget", rt.Widget, rt.Animation, function()
+mn.DeadzoneVisualizationWidget = meta.new_type("DeadzoneVisualizationWidget", rt.Widget, rt.Updatable, function()
     return meta.new(mn.DeadzoneVisualizationWidget, {
         _inner_shape = rt.Circle(0, 0, 1),
         _outer_shape = rt.Circle(0, 0, 1),

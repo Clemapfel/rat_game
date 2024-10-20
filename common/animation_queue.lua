@@ -1,220 +1,179 @@
---- @class rt.QueueableAnimationResult
-rt.QueueableAnimationResult = {
+--- @class rt.AnimationResult
+rt.AnimationResult = {
     CONTINUE = true,
     DISCONTINUE = false
 }
 
---- @class rt.QueueableAnimationState
-rt.QueueableAnimationState = {
-    IDLE = 1,       -- not yet start
+--- @class rt.AnimationState
+rt.AnimationState = {
+    IDLE = 1,       -- not yet started
     STARTED = 2,    -- running
     FINISHED = 3    -- done running
 }
 
---- @class rt.QueueableAnimation
-rt.QueueableAnimation = meta.new_abstract_type("QueueableAnimation", rt.Drawable, {
-    _state = rt.QueueableAnimationState.IDLE
+--- @class rt.QueuableAnimation
+--- @signal start (self) -> nil
+--- @signal finish (self) -> nil
+rt.Animation = meta.new_abstract_type("Animation", rt.Drawable, rt.Updatable, { -- sic, non-abstract
+    _state = rt.AnimationState.IDLE
 })
 
+meta.add_signals(rt.Animation,
+    "before_start",
+    "after_finish"
+)
+
 --- @brief
-function rt.QueueableAnimation:start()
+function rt.Animation:start()
     -- noop
 end
 
 --- @brief
-function rt.QueueableAnimation:finish()
+function rt.Animation:finish()
     -- noop
 end
 
 --- @brief
-function rt.QueueableAnimation:update(delta)
-    -- noop
-    return rt.QueueableAnimationResult.DISCONTINUE
+function rt.Animation:update(delta)
+    return rt.AnimationResult.DISCONTINUE
 end
 
---- @overload
-function rt.QueueableAnimation:draw()
+--- @brief
+function rt.Animation:draw()
     -- noop
 end
 
 --- @brief
-function rt.QueueableAnimation:get_state()
+function rt.Animation:get_state()
     return self._state
 end
 
---- @brief
-function rt.QueueableAnimation:get_is_started()
-    return self._state == rt.QueueableAnimationState.STARTED
-end
-
--- ###
-
---- @class
-rt.AnimationQueue = meta.new_type("AnimationQueue", rt.Drawable, rt.Animation, function()
-    local out = meta.new(rt.AnimationQueue, {
-        _animations = {}, -- Table<cf. push>
-    })
+--- @brief convenience function for no-draw, no-update animations
+rt.AnimationAction = meta.new_type("ActionAnimation", rt.Animation, function(on_start, on_finish)
+    local out = meta.new(rt.AnimationAction)
+    out:signal_connect("before_start", on_start)
+    out:signal_connect("after_finish", on_finish)
     return out
 end)
 
---- @brief
-function rt.AnimationQueue:push(animations, start_callback, finish_callback)
-    if meta.isa(animations, rt.QueueableAnimation) then
-        animations = { animations }
-    end
+-- ###
 
-    local node = {}
-    node.on_start = start_callback
-    node.on_finish = finish_callback
-    node.is_started = false
-    node.is_finished = false
-    node.animations = {}
-    for animation in values(animations) do
-        meta.assert_isa(animation, rt.QueueableAnimation)
-        table.insert(node.animations, animation)
-    end
+--- @class rt.AnimationQueue
+rt.AnimationQueue = meta.new_type("AnimationQueue", rt.Drawable, rt.Updatable, function()
+    return meta.new(rt.AnimationQueue, {
+        _nodes = {},
+        _n_nodes = 0,
+        _start_should_trigger = true
+    })
+end)
 
-    table.insert(self._animations, {node})
+meta.add_signals(rt.AnimationQueue,
+    "emptied"
+)
+
+--- @brief [internal]
+function rt.AnimationQueue:_new_node(...)
+    local n_args = select("#", ...)
+    if n_args == 0 then return nil end
+    for i = 1, n_args do
+        meta.assert_isa(select(i, ...), rt.Animation)
+        dbg("push", meta.typeof(select(i, ...)))
+    end
+    return {
+        animations = {...}
+    }
 end
 
 --- @brief
-function rt.AnimationQueue:append(animations, start_callback, finish_callback)
-    if meta.isa(animations, rt.QueueableAnimation) then
-        animations = { animations }
-    end
+function rt.AnimationQueue:push(animation, ...)
+    if self._n_nodes == 0 then self._start_should_trigger = true end
+    local was_empty = self._n_nodes == 0
+    table.insert(self._nodes, self:_new_node(animation, ...))
+    self._n_nodes = self._n_nodes + 1
+    if was_empty then self:update(0) end
+end
 
-    if sizeof(self._animations) == 0 then
-        self:push(animations, start_callback, finish_callback)
+--- @brief
+function rt.AnimationQueue:append(...)
+    if self._n_nodes == 0 then
+        self:push(...)
     else
-        local node = {}
-        node.on_start = start_callback
-        node.on_finish = finish_callback
-        node.is_started = false
-        node.is_finished = false
-        node.animations = {}
-        for animation in values(animations) do
-            meta.assert_isa(animation, rt.QueueableAnimation)
-            table.insert(node.animations, animation)
+        local was_only_node = self._n_nodes == 1
+        local last_node = self._nodes[self._n_nodes]
+        local n_args = select("#", ...)
+        for i = 1, n_args do
+            table.insert(last_node.animations, select(i, ...))
         end
 
-        table.insert(self._animations[#self._animations], node)
+        if was_only_node then self:update(0) end
     end
 end
 
 --- @brief
-function rt.AnimationQueue:_start_animation(animation)
-    if animation._state ~= rt.QueueableAnimationState.IDLE then return end
-    animation._state = rt.QueueableAnimationState.STARTED
-    animation:start()
-    animation:update(0)
-end
-
---- @brief
-function rt.AnimationQueue:_finish_animation(animation)
-    if animation._state == rt.QueueableAnimationState.FINISHED then return end
-    animation:update(0)
-    animation._state = rt.QueueableAnimationState.FINISHED
-    animation:finish()
-end
-
---- @brief
-function rt.AnimationQueue:skip()
-    for node in values(self._animations[1]) do
-        if node == nil then return end
-
-        if node._is_started == false then
-            node._is_started = true
-            if node.on_start ~= nil then
-                node.on_start()
-            end
-        end
-
-        for animation in values(node.animations) do
-            if animation._state == rt.QueueableAnimationState.IDLE then
-                self:_start_animation(animation)
-            end
-
-            animation:update(0)
-            self:_finish_animation(animation)
-        end
-
-        if node.on_finish ~= nil and node.is_finished == false then
-            node.on_finish()
-            node.is_finished = true
-        end
+do
+    local _finish_animation = function(animation)
+        animation._state = rt.AnimationState.FINISHED
+        animation:finish()
+        animation:signal_emit("after_finish")
     end
 
-    table.remove(self._animations, 1)
-end
+    local _start_animation = function(animation)
+        animation._state = rt.AnimationState.STARTED
+        animation:signal_emit("before_start")
+        animation:start()
+    end
 
---- @brief
-function rt.AnimationQueue:update(delta)
-    ::restart::
-    if sizeof(self._animations) == 0 then return end
-
-    for node in values(self._animations[1]) do
-        if node.is_started == false then
-            node.is_started = true
-
-            if node.on_start ~= nil then
-                node.on_start()
-            end
-        end
-
-        local depleted = true
-        for animation in values(node.animations) do
-            if animation._state == rt.QueueableAnimationState.IDLE then
-                self:_start_animation(animation)
-            end
-
-            if animation._state ~= rt.QueueableAnimationState.FINISHED then
-                local res = animation:update(delta)
-                if res == rt.QueueableAnimationResult.DISCONTINUE then
-                    self:_finish_animation(animation)
-                elseif res == rt.QueueableAnimationResult.CONTINUE then
-                    depleted = false
+    function rt.AnimationQueue:update(delta)
+        if self._n_nodes == 0 then return end
+        local first = self._nodes[1]
+        local is_done = false
+        for animation in values(first.animations) do
+            if animation._state == rt.AnimationState.IDLE then
+                _start_animation(animation)
+                local res = animation:update(0)
+                if res == rt.AnimationResult.CONTINUE then
+                    is_done = false
                 else
-                    rt.error("In rt.AnimationQueue: animation `" .. meta.typeof(animation) .. "`.update does not return rt.QueueableAnimationResult, instead returns `" .. serialize(res) .. "`")
+                    if res ~= rt.AnimationResult.DISCONTINUE then
+                        rt.error("In rt.AnimationQueue.update: animation `" .. meta.typeof(animation) .. "`s update function does not return an rt.AnimationResult")
+                    end
+
+                    -- 1-frame callbacks
+                    _finish_animation(animation)
                 end
+            elseif animation._state == rt.AnimationState.STARTED then
+                local res = animation:update(delta)
+                if res == rt.AnimationResult.DISCONTINUE then
+                    _finish_animation(animation)
+                else
+                    is_done = false
+                end
+            else
+                -- noop
             end
         end
 
-        if depleted == true then
-            if node.on_finish ~= nil and node.is_finished == false then
-                node.on_finish()
+        if is_done then
+            table.remove(self._nodes, 1)
+            self._n_nodes = self._n_nodes - 1
+            if self._n_nodes > 0 then
+                return self:update(0) -- cycle to trigger more 1-frame callbacks on the same frame
+            else
+                self:signal_emit("emptied")
             end
-            node.is_finished = true
         end
-    end
-
-    local done = true
-    for node in values(self._animations[1]) do
-        if node.is_finished ~= true then
-            done = false
-            break
-        end
-    end
-
-    if done == true then
-        table.remove(self._animations, 1)
-        delta = 0
-        goto restart
     end
 end
 
 --- @brief
 function rt.AnimationQueue:draw()
-    for node in values(self._animations[1]) do
-        if node == nil or node.is_started == false then return end
+    if self._n_nodes == 0 then return end
+    for node in values(self._nodes) do
         for animation in values(node.animations) do
-            if animation:get_state() ~= rt.QueueableAnimationState.FINISHED then
+            if animation._state > rt.AnimationState.IDLE then
+                -- also renders finished animations after they area done, is this intended behavior?
                 animation:draw()
             end
         end
     end
-end
-
---- @brief
-function rt.AnimationQueue:get_is_empty()
-    return sizeof(self._animations) == 0
 end

@@ -1,5 +1,5 @@
 --- @class bt.Animation
-bt.Animation = meta.new_abstract_type("BattleAnimation", rt.QueueableAnimation, {
+bt.Animation = meta.new_abstract_type("BattleAnimation", rt.Animation, {
     _elapsed = 0
 })
 

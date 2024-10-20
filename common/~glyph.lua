@@ -23,7 +23,7 @@ rt.TextEffect = meta.new_enum("TextEffect", {
 --- @param font rt.Font
 --- @param content String
 --- @param look Table
-rt.Glyph = meta.new_type("Glyph", rt.Drawable, rt.Animation, function(font, content, look)
+rt.Glyph = meta.new_type("Glyph", rt.Drawable, rt.Updatable, function(font, content, look)
     look = which(look, {})
     meta.assert_table(look)
     local font_style = look.font_style

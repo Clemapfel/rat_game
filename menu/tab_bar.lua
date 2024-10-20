@@ -1,5 +1,5 @@
 --- @class mn.TabBar
-mn.TabBar = meta.new_type("TabBar", rt.Widget, rt.Animation, function()
+mn.TabBar = meta.new_type("TabBar", rt.Widget, rt.Updatable, function()
     return meta.new(mn.TabBar, {
         _items = {},
         _n_items = 0,

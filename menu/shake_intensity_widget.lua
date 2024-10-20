@@ -1,5 +1,5 @@
 --- @class mn.ShakeIntensityWidget
-mn.ShakeIntensityWidget = meta.new_type("ShakeIntensityWidget", rt.Widget, rt.Animation, function()
+mn.ShakeIntensityWidget = meta.new_type("ShakeIntensityWidget", rt.Widget, rt.Updatable, function()
     return meta.new(mn.ShakeIntensityWidget, {
         _shape = rt.Rectangle(0, 0, 1, 1),
         _shape_outline = rt.Rectangle(0, 0, 1, 1),

@@ -4,7 +4,7 @@ rt.settings.sprite = {
 }
 
 --- @class rt.Sprite
-rt.Sprite = meta.new_type("Sprite", rt.Widget, rt.Animation, function(id, index)
+rt.Sprite = meta.new_type("Sprite", rt.Widget, rt.Updatable, function(id, index)
     meta.assert_string(id)
     return meta.new(rt.Sprite, {
         _id = id,

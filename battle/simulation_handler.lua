@@ -849,6 +849,7 @@ function bt.BattleScene:create_simulation_environment()
             table.insert(out, select(i, ...))
         end
         local msg = table.concat(out)
+
         -- TODO
     end
 

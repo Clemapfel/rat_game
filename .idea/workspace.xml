@@ -22,7 +22,33 @@
     </configurations>
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="7fa9ba1b-2cff-4ecc-86fb-59ab2fa76ee1" name="Changes" comment="circular wipe working" />
+    <list default="true" id="7fa9ba1b-2cff-4ecc-86fb-59ab2fa76ee1" name="Changes" comment="stashing">
+      <change afterPath="$PROJECT_DIR$/common/~animation_queue.lua" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/assets/sprites/moves.hxl" beforeDir="false" afterPath="$PROJECT_DIR$/assets/sprites/moves.hxl" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/battle/animations/dissolve.lua" beforeDir="false" afterPath="$PROJECT_DIR$/battle/animations/dissolve.lua" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/battle/battle_animation.lua" beforeDir="false" afterPath="$PROJECT_DIR$/battle/battle_animation.lua" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/battle/battle_scene.lua" beforeDir="false" afterPath="$PROJECT_DIR$/battle/battle_scene.lua" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/battle/health_bar.lua" beforeDir="false" afterPath="$PROJECT_DIR$/battle/health_bar.lua" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/battle/priority_queue.lua" beforeDir="false" afterPath="$PROJECT_DIR$/battle/priority_queue.lua" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/battle/simulation_handler.lua" beforeDir="false" afterPath="$PROJECT_DIR$/battle/simulation_handler.lua" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/common/animation.lua" beforeDir="false" afterPath="$PROJECT_DIR$/common/updatable.lua" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/common/animation_queue.lua" beforeDir="false" afterPath="$PROJECT_DIR$/common/animation_queue.lua" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/common/label.lua" beforeDir="false" afterPath="$PROJECT_DIR$/common/label.lua" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/common/loading_screen.lua" beforeDir="false" afterPath="$PROJECT_DIR$/common/loading_screen.lua" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/common/particle_emitter.lua" beforeDir="false" afterPath="$PROJECT_DIR$/common/particle_emitter.lua" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/common/random.lua" beforeDir="false" afterPath="$PROJECT_DIR$/common/random.lua" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/common/sprite.lua" beforeDir="false" afterPath="$PROJECT_DIR$/common/sprite.lua" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/common/~glyph.lua" beforeDir="false" afterPath="$PROJECT_DIR$/common/~glyph.lua" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/include.lua" beforeDir="false" afterPath="$PROJECT_DIR$/include.lua" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/main.lua" beforeDir="false" afterPath="$PROJECT_DIR$/main.lua" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/menu/deadzone_visualization_widget.lua" beforeDir="false" afterPath="$PROJECT_DIR$/menu/deadzone_visualization_widget.lua" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/menu/inventory_scene.lua" beforeDir="false" afterPath="$PROJECT_DIR$/menu/inventory_scene.lua" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/menu/inventory_scene_object_moved_animation.lua" beforeDir="false" afterPath="$PROJECT_DIR$/menu/inventory_scene_object_moved_animation.lua" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/menu/msaa_intensity_widget.lua" beforeDir="false" afterPath="$PROJECT_DIR$/menu/msaa_intensity_widget.lua" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/menu/shake_intensity_widget.lua" beforeDir="false" afterPath="$PROJECT_DIR$/menu/shake_intensity_widget.lua" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/menu/tab_bar.lua" beforeDir="false" afterPath="$PROJECT_DIR$/menu/tab_bar.lua" afterDir="false" />
+    </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
     <option name="HIGHLIGHT_NON_ACTIVE_CHANGELIST" value="false" />
@@ -590,15 +616,7 @@
       <workItem from="1729098138796" duration="20580000" />
       <workItem from="1729180777153" duration="8566000" />
       <workItem from="1729267430460" duration="1705000" />
-      <workItem from="1729269158294" duration="31501000" />
-    </task>
-    <task id="LOCAL-01102" summary="polishing animation">
-      <option name="closed" value="true" />
-      <created>1728075734344</created>
-      <option name="number" value="01102" />
-      <option name="presentableId" value="LOCAL-01102" />
-      <option name="project" value="LOCAL" />
-      <updated>1728075734344</updated>
+      <workItem from="1729269158294" duration="38834000" />
     </task>
     <task id="LOCAL-01103" summary="fixed physics scaling">
       <option name="closed" value="true" />
@@ -984,7 +1002,15 @@
       <option name="project" value="LOCAL" />
       <updated>1729364433600</updated>
     </task>
-    <option name="localTasksCounter" value="1151" />
+    <task id="LOCAL-01151" summary="stashing">
+      <option name="closed" value="true" />
+      <created>1729378670984</created>
+      <option name="number" value="01151" />
+      <option name="presentableId" value="LOCAL-01151" />
+      <option name="project" value="LOCAL" />
+      <updated>1729378670984</updated>
+    </task>
+    <option name="localTasksCounter" value="1152" />
     <servers />
   </component>
   <component name="TypeScriptGeneratedFilesManager">
@@ -1053,12 +1079,12 @@
     <MESSAGE value="resized sprites" />
     <MESSAGE value="added tab bar animation" />
     <MESSAGE value="enemy alignment working" />
-    <MESSAGE value="stashing" />
     <MESSAGE value="added simulation environment sandbox" />
     <MESSAGE value="added battle script function declarations" />
     <MESSAGE value="added triangle tiling" />
     <MESSAGE value="circular wipe working" />
-    <option name="LAST_COMMIT_MESSAGE" value="circular wipe working" />
+    <MESSAGE value="stashing" />
+    <option name="LAST_COMMIT_MESSAGE" value="stashing" />
   </component>
   <component name="XDebuggerManager">
     <breakpoint-manager>

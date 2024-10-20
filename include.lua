@@ -127,7 +127,7 @@ require "common.input_controller"
 
 require "common.graphics"
 require "common.drawable"
-require "common.animation"
+require "common.updatable"
 require "common.color"
 require "common.palette"
 require "common.animation_queue"

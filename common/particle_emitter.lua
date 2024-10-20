@@ -6,7 +6,7 @@ rt.settings.particle_emitter = {
 }
 
 --- @class rt.ParticleEmitter
-rt.ParticleEmitter = meta.new_type("ParticleEmitter", rt.Widget, rt.Animation, function(particle)
+rt.ParticleEmitter = meta.new_type("ParticleEmitter", rt.Widget, rt.Updatable, function(particle)
     meta.assert_isa(particle, rt.Drawable)
     local out = meta.new(rt.ParticleEmitter, {
         _particle = particle,

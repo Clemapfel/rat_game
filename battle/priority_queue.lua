@@ -4,7 +4,7 @@ rt.settings.battle.priority_queue = {
 }
 
 --- @class bt.PriorityQueue
-bt.PriorityQueue = meta.new_type("PriorityQueue", rt.Widget, rt.Animation, function(scene)
+bt.PriorityQueue = meta.new_type("PriorityQueue", rt.Widget, rt.Updatable, function(scene)
     return meta.new(bt.PriorityQueue, {
         _order = {}, -- Table<Entity>,
         _entity_to_item = {}, -- Table<Entity, cf. _new_element>

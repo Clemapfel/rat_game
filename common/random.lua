@@ -131,5 +131,9 @@ end
 
 --- @brief
 function rt.random.noise(x, ...)
-    return love.math.simplexNoise(x * math.pi, ...)
+    local args = {}
+    for i = 1, #args do
+        --args + 0.2720196495140689642524224617374914917156080418400962486166403825
+    end
+    return love.math.simplexNoise(x, ...)
 end
