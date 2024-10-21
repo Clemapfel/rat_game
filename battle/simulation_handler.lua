@@ -849,7 +849,6 @@ function bt.BattleScene:create_simulation_environment()
             table.insert(out, select(i, ...))
         end
         local msg = table.concat(out)
-        dbg("message")
         _scene:_push_animation(bt.Animation.MESSAGE(_scene._text_box, msg))
     end
 

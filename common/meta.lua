@@ -20,7 +20,7 @@ do
 
     local _enum_instances_index = 7
     local _enum_typename_index = 8
-    
+
     -- upvalues instead of globals
     local _meta_current_hash = 3
     local _type_typename_hash = 1
@@ -266,67 +266,61 @@ do
 
     local _signal_is_blocked_index = 1
     local _signal_callbacks_index = 2
-    local _signal_n_callbacks_index = 3
+    local _handler_hash = 1
 
     --- @brief
     local _meta_signal_emit = function(self, name, ...)
-        local handler = self[_metatable_index][_signal_component_index][name]
-        local outputs = {}
-        if handler[_signal_is_blocked_index] ~= true then
-            for i = 1, handler[_signal_n_callbacks_index] do
-                local results = {handler[_signal_callbacks_index][i](self, ...)}
-                for _, v in pairs(results) do
-                    table.insert(outputs, v)
-                end
+        local component = self[_metatable_index][_signal_component_index][name]
+        if component[_signal_is_blocked_index] ~= true then
+            local last
+            for callback in values(component[_signal_callbacks_index]) do
+                last = callback(self, ...)
             end
+            return last
         else
+            return nil
         end
-
-        return table.unpack(outputs)
     end
 
     --- @brief
     local _meta_signal_connect = function(self, name, callback)
-        local handler = self[_metatable_index][_signal_component_index][name]
-        if handler == nil then
+        local component = self[_metatable_index][_signal_component_index][name]
+        if component == nil then
             error("In " .. _typeof(self) .. ".signal_connect: object has no signal with id `" .. name .. "`")
             return
         end
 
-        table.insert(handler[_signal_callbacks_index], callback)
-        local handler_index = handler[_signal_n_callbacks_index]
-        handler[_signal_n_callbacks_index] = handler_index + 1
+        local handler_index = _handler_hash
+        component[_signal_callbacks_index][handler_index] = callback
+        _handler_hash = _handler_hash + 1
         return handler_index
     end
 
     --- @brief
     local _meta_signal_disconnect = function(self, name, handler_id)
-        local handler = self[_metatable_index][_signal_component_index][name]
-        if handler == nil then
+        local component = self[_metatable_index][_signal_component_index][name]
+        if component == nil then
             error("In " .. _typeof(self) .. ".signal_disconnect: object has no signal with id `" .. name .. "`")
             return
         end
 
         if handler_id == nil then
-            handler[_signal_callbacks_index] = {}
-            handler[_signal_n_callbacks_index] = 0
-        elseif handler[_signal_callbacks_index][handler_id] ~= nil then
-            handler[_signal_callbacks_index][handler_id] = nil
-            handler[_signal_n_callbacks_index] = handler[_signal_n_callbacks_index] - 1
+            component[_signal_callbacks_index] = {}
+        elseif component[_signal_callbacks_index][handler_id] ~= nil then
+            component[_signal_callbacks_index][handler_id] = nil
         end
     end
 
     --- @brief
     local _meta_signal_list_handler_ids = function(self, name)
-        local handler = self[_metatable_index][_signal_component_index][name]
-        if handler == nil then
+        local component = self[_metatable_index][_signal_component_index][name]
+        if component == nil then
             error("In " .. _typeof(self) .. ".signal_list_handler_ids: object has no signal with id `" .. name .. "`")
             return
         end
-
         local out = {}
-        for i = 1, handler[_signal_n_callbacks_index] do
-            table.insert(out, i)
+        for id, _ in pairs(component[_signal_callbacks_index]) do
+            table.insert(out, id)
         end
         return out
     end
@@ -334,65 +328,61 @@ do
     --- @brief
     local _meta_signal_disconnect_all = function(self, name)
         if name == nil then
-            local component = self[_metatable_index][_signal_component_index]
-            for _, handler in pairs(component) do
-                handler[_signal_callbacks_index] = {}
-                handler[_signal_n_callbacks_index] = 0
+            local signals = self[_metatable_index][_signal_component_index]
+            for _, signal in pairs(signals) do
+                signals[_signal_callbacks_index] = {}
             end
         else
-            local handler = self[_metatable_index][_signal_component_index][name]
-            if handler == nil then
+            local component = self[_metatable_index][_signal_component_index][name]
+            if component == nil then
                 error("In " .. _typeof(self) .. ".signal_disconnect_all: object has no signal with id `" .. name .. "`")
                 return
             end
-
-            handler[_signal_callbacks_index] = {}
-            handler[_signal_n_callbacks_index] = 0
+            component[_signal_callbacks_index] = {}
         end
     end
 
     --- @brief
     local _meta_signal_set_is_blocked = function(self, name, is_blocked)
-        local handler = self[_metatable_index][_signal_component_index][name]
-        if handler == nil then
+        local component = self[_metatable_index][_signal_component_index][name]
+        if component == nil then
             error("In " .. _typeof(self) .. ".signal_set_is_blocked: object has no signal with id `" .. name .. "`")
             return
         end
 
-        handler[_signal_is_blocked_index] = is_blocked
+        component[_signal_is_blocked_index] = is_blocked
     end
 
     --- @brief
-    local _meta_signal_block_all = function(self)
-        local component = self[_metatable_index][_signal_component_index]
-        for _, handler in pairs(component) do
+    local _meta_signal_get_is_blocked = function(self, name)
+        local component = self[_metatable_index][_signal_component_index][name]
+        if component == nil then
+            error("In " .. _typeof(self) .. ".signal_get_is_blocked: object has no signal with id `" .. name .. "`")
+            return
+        end
+
+        return component[_signal_is_blocked_index]
+    end
+
+    --- @brief
+    local _meta_signal_unblock_all = function(self, name)
+        local signals = self[_metatable_index][_signal_component_index]
+        for _, handler in pairs(signals) do
             handler[_signal_is_blocked_index] = true
         end
     end
 
     --- @brief
-    local _meta_signal_unblock_all = function(self)
-        local component = self[_metatable_index][_signal_component_index]
-        for _, handler in pairs(component) do
+    local _meta_signal_unblock_all = function(self, name)
+        local signals = self[_metatable_index][_signal_component_index]
+        for _, handler in pairs(signals) do
             handler[_signal_is_blocked_index] = false
         end
     end
 
     --- @brief
-    local _meta_signal_get_is_blocked = function(self, name)
-        local handler = self[_metatable_index][_signal_component_index][name]
-        if handler == nil then
-            error("In " .. _typeof(self) .. ".signal_get_is_blocked: object has no signal with id `" .. name .. "`")
-            return
-        end
-
-        return handler[_signal_is_blocked_index]
-    end
-
-    --- @brief
     local _meta_signal_has_signal = function(self, name)
-        local handler = self[_metatable_index][_signal_component_index][name]
-        return handler ~= nil
+        return self[_metatable_index][_signal_component_index][name] ~= nil
     end
 
     --- @brief

@@ -647,10 +647,15 @@ end
 --- @brief [internal]
 function bt.BattleScene:_handle_button_pressed(which)
     if which == rt.InputButton.A then
+        self._simulation_environment.message("test")
+    end
+    --[[
+    if which == rt.InputButton.A then
         self._entity_selection_graph = self:_generate_entity_selection_graph_from_move(self._state:list_allies()[1], bt.Move("DEBUG_MOVE"))
     end
 
     if self._entity_selection_graph ~= nil then
         self._entity_selection_graph:handle_button(which)
     end
+    ]]
 end

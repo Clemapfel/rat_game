@@ -77,7 +77,6 @@ function rt.AnimationQueue:_new_node(...)
     if n_args == 0 then return nil end
     for i = 1, n_args do
         meta.assert_isa(select(i, ...), rt.Animation)
-        dbg("push", meta.typeof(select(i, ...)))
     end
     return {
         was_started = false,
