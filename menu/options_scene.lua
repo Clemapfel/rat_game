@@ -620,14 +620,14 @@ function mn.OptionsScene:_regenerate_selection_nodes()
             scene._keymap_item_active = false
         end)
 
-        node:signal_connect(rt.InputButton.RIGHT, function(_)
+        node:set_right(function(_)
             if item.widget.move_right ~= nil then
                 item.widget:move_right()
             end
             self._scale_tick_direction = true
         end)
 
-        node:signal_connect(rt.InputButton.LEFT, function(_)
+        node:set_left(function(_)
             if item.widget.move_left ~= nil then
                 item.widget:move_left()
             end

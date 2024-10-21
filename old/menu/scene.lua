@@ -802,7 +802,7 @@ function mn.Scene:_regenerate_selection_nodes()
 
         page.info_node:set_left(entity_tab_nodes[1])
         page.info_node:set_right(shared_tab_nodes[1])
-        page.info_node:signal_connect(rt.InputButton.DOWN, function()
+        page.info_node:set_down(function()
             for node in values(page.top_move_nodes) do
                 if node == scene._previous_selection_node then
                     return scene._previous_selection_node
@@ -813,7 +813,7 @@ function mn.Scene:_regenerate_selection_nodes()
 
         -- down to slots, unless locked
         for node in values(page.bottom_move_nodes) do
-            node:signal_connect(rt.InputButton.DOWN, function()
+            node:set_down(function()
                 for node in values(page.slot_nodes) do
                     if node == scene._previous_selection_node then
                         return scene._previous_selection_node
@@ -835,14 +835,14 @@ function mn.Scene:_regenerate_selection_nodes()
 
         -- right to shared, unless locked
         for node in values(page.right_move_nodes) do
-            node:signal_connect(rt.InputButton.RIGHT, function()
+            node:set_right(function()
                 return shared_list_nodes[scene._shared_list_index]
             end)
         end
 
         -- slots up or down, unless locked
         for node in values(page.slot_nodes) do
-            node:signal_connect(rt.InputButton.UP, function()
+            node:set_up(function()
                 for node in values(page.bottom_move_nodes) do
                     if node == scene._previous_selection_node then
                         return scene._previous_selection_node
@@ -856,7 +856,7 @@ function mn.Scene:_regenerate_selection_nodes()
         page.slot_nodes[1]:set_left(entity_tab_nodes[#entity_tab_nodes])
 
         -- slots right, unless locked
-        page.slot_nodes[#(page.slot_nodes)]:signal_connect(rt.InputButton.RIGHT, function(_)
+        page.slot_nodes[#(page.slot_nodes)]:set_right(function(_)
             return shared_list_nodes[scene._shared_list_index]
         end)
     end
@@ -872,7 +872,7 @@ function mn.Scene:_regenerate_selection_nodes()
                 }, "y"
             )
         end
-        entity_tab_node:signal_connect(rt.InputButton.RIGHT, function()
+        entity_tab_node:set_right(function()
             local page = entity_page_nodes[scene._entity_index]
             for node in range(page.info_node, page.slot_nodes[1], table.unpack(page.left_move_nodes)) do
                 if node == scene._previous_selection_node then
@@ -886,12 +886,12 @@ function mn.Scene:_regenerate_selection_nodes()
     entity_tab_nodes[1]:set_up(exit_node)
     exit_node:set_down(entity_tab_nodes[1])
 
-    shared_tab_nodes[1]:signal_connect(rt.InputButton.LEFT, function()
+    shared_tab_nodes[1]:set_left(function()
         return entity_page_nodes[scene._entity_index].info_node
     end)
 
     --[[
-    shared_tab_nodes[#shared_tab_nodes]:signal_connect(rt.InputButton.RIGHT, function()
+    shared_tab_nodes[#shared_tab_nodes]:set_right(function()
         return verbose_info_node
     end)
     ]]--
@@ -924,26 +924,26 @@ function mn.Scene:_regenerate_selection_nodes()
     end
 
     for node in values(shared_list_nodes) do
-        node:signal_connect(rt.InputButton.LEFT, function(_)
+        node:set_left(function(_)
             return shared_list_left()
         end)
 
-        node:signal_connect(rt.InputButton.RIGHT, function(_)
+        node:set_right(function(_)
             return nil --shared_list_right()
         end)
 
-        node:signal_connect(rt.InputButton.UP, function(_)
+        node:set_up(function(_)
             return shared_list_up()
         end)
     end
 
     for node in values(shared_tab_nodes) do
-        node:signal_connect(rt.InputButton.DOWN, function(_)
+        node:set_down(function(_)
             return shared_list_nodes[scene._shared_list_index]
         end)
     end
 
-    verbose_info_node:signal_connect(rt.InputButton.LEFT, function(_)
+    verbose_info_node:set_left(function(_)
         return shared_tab_nodes[#shared_tab_nodes]
     end)
 

@@ -453,7 +453,7 @@ function rt.Keyboard:size_allocate(x, y, width, height)
             end
         end
 
-        item.node:signal_connect(rt.InputButton.UP, function(self)
+        item.node:set_up(function(self)
             for candidate in values(special_item_memory_candidates[item]) do
                 if candidate == keyboard._last_selected_item then
                     return candidate

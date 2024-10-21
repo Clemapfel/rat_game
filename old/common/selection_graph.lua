@@ -97,7 +97,7 @@ function rt.SelectionGraphNode:set_up(next)
         self:signal_disconnect(rt.InputButton.UP)
     else
         meta.assert_isa(next, rt.SelectionGraphNode)
-        self:signal_connect(rt.InputButton.UP, function(self)
+        self:set_up(function(self)
             return next
         end)
     end
@@ -114,7 +114,7 @@ function rt.SelectionGraphNode:set_right(next)
         self:signal_disconnect(rt.InputButton.RIGHT)
     else
         meta.assert_isa(next, rt.SelectionGraphNode)
-        self:signal_connect(rt.InputButton.RIGHT, function(self)
+        self:set_right(function(self)
             return next
         end)
     end
@@ -131,7 +131,7 @@ function rt.SelectionGraphNode:set_down(next)
         self:signal_disconnect(rt.InputButton.DOWN)
     else
         meta.assert_isa(next, rt.SelectionGraphNode)
-        self:signal_connect(rt.InputButton.DOWN, function(self)
+        self:set_down(function(self)
             return next
         end)
     end
@@ -148,7 +148,7 @@ function rt.SelectionGraphNode:set_left(next)
         self:signal_disconnect(rt.InputButton.LEFT)
     else
         meta.assert_isa(next, rt.SelectionGraphNode)
-        self:signal_connect(rt.InputButton.LEFT, function(self)
+        self:set_left(function(self)
             return next
         end)
     end

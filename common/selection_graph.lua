@@ -7,6 +7,8 @@ rt.SelectionGraph = meta.new_type("SelectionGraph", rt.Drawable, function()
     })
 end)
 
+local _noop_function = function() return nil end
+
 --- @class rt.SelectionGraphNode
 --- @signal enter (rt.SelectionGraphNode) -> nil
 --- @signal exit (rt.SelectionGraphNode) -> nil
@@ -24,6 +26,10 @@ rt.SelectionGraphNode = meta.new_type("SelectionGraphNode", rt.Drawable, functio
         _control_layout_function = function() return {} end,
         _centroid_x = 0,
         _centroid_y = 0,
+        _up = _noop_function,
+        _right = _noop_function,
+        _down = _noop_function,
+        _left = _noop_function
     })
 
     if aabb ~= nil then
@@ -37,10 +43,6 @@ end)
 meta.add_signals(rt.SelectionGraphNode,
     "enter",
     "exit",
-    rt.InputButton.UP,
-    rt.InputButton.RIGHT,
-    rt.InputButton.DOWN,
-    rt.InputButton.LEFT,
     rt.InputButton.A,
     rt.InputButton.B,
     rt.InputButton.X,
@@ -65,71 +67,29 @@ function rt.SelectionGraphNode:get_bounds()
 end
 
 --- @brief
-function rt.SelectionGraphNode:set_up(next)
-    if next == nil then
-        self:signal_disconnect(rt.InputButton.UP)
-    else
-        meta.assert_isa(next, rt.SelectionGraphNode)
-        self:signal_connect(rt.InputButton.UP, function(self)
-            return next
-        end)
+function rt.SelectionGraphNode:get_centroid()
+    return self._centroid_x, self._centroid_y
+end
+
+for which in range("_up", "_right", "_down", "_left") do
+    --- @brief set_up, set_right, set_down, set_left
+    rt.SelectionGraphNode["set" .. which] = function(self, next)
+        if next == nil then
+            self[which] = _noop_function
+        elseif meta.is_function(next) then
+            self[which] = next
+        else
+            meta.assert_isa(next, rt.SelectionGraphNode)
+            self[which] = function(self)
+                return next
+            end
+        end
     end
-end
 
---- @brief
-function rt.SelectionGraphNode:get_up()
-    return self:signal_emit(rt.InputButton.UP)
-end
-
---- @brief
-function rt.SelectionGraphNode:set_right(next)
-    if next == nil then
-        self:signal_disconnect(rt.InputButton.RIGHT)
-    else
-        meta.assert_isa(next, rt.SelectionGraphNode)
-        self:signal_connect(rt.InputButton.RIGHT, function(self)
-            return next
-        end)
+    --- @brief get_up, get_right, get_down, get_left
+    rt.SelectionGraphNode["get" .. which] = function(self)
+        return self[which](self)
     end
-end
-
---- @brief
-function rt.SelectionGraphNode:get_right()
-    return self:signal_emit(rt.InputButton.RIGHT)
-end
-
---- @brief
-function rt.SelectionGraphNode:set_down(next)
-    if next == nil then
-        self:signal_disconnect(rt.InputButton.DOWN)
-    else
-        meta.assert_isa(next, rt.SelectionGraphNode)
-        self:signal_connect(rt.InputButton.DOWN, function(self)
-            return next
-        end)
-    end
-end
-
---- @brief
-function rt.SelectionGraphNode:get_down()
-    return self:signal_emit(rt.InputButton.DOWN)
-end
-
---- @brief
-function rt.SelectionGraphNode:set_left(next)
-    if next == nil then
-        self:signal_disconnect(rt.InputButton.LEFT)
-    else
-        meta.assert_isa(next, rt.SelectionGraphNode)
-        self:signal_connect(rt.InputButton.LEFT, function(self)
-            return next
-        end)
-    end
-end
-
---- @brief
-function rt.SelectionGraphNode:get_left()
-    return self:signal_emit(rt.InputButton.LEFT)
 end
 
 --- @brief
@@ -151,30 +111,50 @@ end
 --- @brief
 
 function rt.SelectionGraphNode:draw(color)
+    error("do not call this")
     love.graphics.setColor(rt.color_unpack(color))
 
-    local top, right, bottom, left = self:
+    local centroid_x, centroid_y = self._centroid_x, self._centroid_y
+    local top, right, bottom, left = self._up(self), self._right(self), self._down(self), self._left(self)
+    for node in range(top, right, bottom, left) do -- automatically skips nils
+        love.graphics.line(centroid_x, centroid_y, node._centroid_x, node._centroid_y)
+    end
+
+    love.graphics.circle("fill", centroid_x, centroid_y, 4)
+    love.graphics.rectangle("line", self._aabb.x, self._aabb.y, self._aabb.width, self._aabb.height)
 end
 
 --- ###
 
---- @brief
-function rt.SelectionGraph:handle_button(button)
-    local current = self._current_node
-    if current == nil then return end
+do
+    local _button_to_function_member = {
+        [rt.InputButton.UP] = "_up",
+        [rt.InputButton.RIGHT] = "_right",
+        [rt.InputButton.DOWN] = "_down",
+        [rt.InputButton.LEFT] = "_left"
+    }
 
-    if button == rt.InputButton.A or button == rt.InputButton.B or button == rt.InputButton.X or button == rt.InputButton.Y then
-        current:signal_emit(button)
-    elseif button == rt.InputButton.UP or button == rt.InputButton.RIGHT or button == rt.InputButton.DOWN or button == rt.InputButton.LEFT then
-        local next = current:signal_emit(button)
-        if next ~= nil then
-            if not meta.isa(next, rt.SelectionGraphNode) then
-                rt.error("In rt.SelectionGraph:handle_button: node #" .. meta.hash(current) .. " returns object of type `" .. meta.typeof(next) .. "` on `" .. button .. "` instead of rt.SelectionGraphNode")
-                return
+    --- @brief
+    function rt.SelectionGraph:handle_button(button)
+        local current = self._current_node
+        if current == nil then return end
+
+        if button == rt.InputButton.A or button == rt.InputButton.B or button == rt.InputButton.X or button == rt.InputButton.Y then
+            current:signal_emit(button)
+        else
+            local f = _button_to_function_member[button]
+            if f ~= nil then
+                local next = current[f](current)
+                if next ~= nil then
+                    if not meta.isa(next, rt.SelectionGraphNode) then
+                        rt.error("In rt.SelectionGraph:handle_button: node #" .. meta.hash(current) .. " returns object of type `" .. meta.typeof(next) .. "` on `" .. button .. "` instead of rt.SelectionGraphNode")
+                        return
+                    end
+                    current:signal_emit("exit")
+                    self._current_node = next
+                    next:signal_emit("enter")
+                end
             end
-            current:signal_emit("exit")
-            self._current_node = next
-            next:signal_emit("enter")
         end
     end
 end
@@ -232,6 +212,7 @@ end
 
 --- @brief
 function rt.SelectionGraph:draw()
+    love.graphics.setLineWidth(3)
     for node in keys(self._nodes) do
         node:draw(rt.Palette.GRAY_4)
     end

@@ -521,6 +521,8 @@ do
     --- @type Function
     meta.Function = "function"
 
+    meta.noop_function = function() return nil end
+
     --- @brief
     function meta.isa(x, super)
         if type(super) == "string" then

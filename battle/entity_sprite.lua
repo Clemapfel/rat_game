@@ -45,6 +45,11 @@ function bt.EntitySprite:remove_consumable(value)
     error("abstract method called")
 end
 
+--- @brief
+function bt.EntitySprite:set_selection_state(state)
+    error("abstract method called")
+end
+
 
 
 

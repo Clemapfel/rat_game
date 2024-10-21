@@ -16,6 +16,8 @@ bt.PartySprite = meta.new_type("BattlePartySprite", bt.EntitySprite, function(en
         _speed_value = bt.SpeedValue(entity:get_speed()),
         _status_consumable_bar = bt.OrderedBox(),
         _name = rt.Label("<o>" .. entity:get_name() .. "</o>"),
+
+        _gradient_visible = true,
         _gradient = rt.VertexRectangle(0, 0, 1, 1),
 
         _sprite = rt.Sprite(entity_id_to_sprite_id[entity:get_id()]),
@@ -93,21 +95,20 @@ function bt.PartySprite:draw()
     self._sprite:draw()
     self._frame:draw()
 
-    local value = meta.hash(self) % 254 + 1
-    rt.graphics.stencil(value, self._frame._frame)
-    rt.graphics.set_stencil_test(rt.StencilCompareMode.EQUAL, value)
-    rt.graphics.set_blend_mode(rt.BlendMode.MULTIPLY, rt.BlendMode.NORMAL)
-    self._gradient:draw()
-    rt.graphics.set_stencil_test()
-    rt.graphics.set_blend_mode()
+    if self._gradient_visible then
+        local value = meta.hash(self) % 254 + 1
+        rt.graphics.stencil(value, self._frame._frame)
+        rt.graphics.set_stencil_test(rt.StencilCompareMode.EQUAL, value)
+        rt.graphics.set_blend_mode(rt.BlendMode.MULTIPLY, rt.BlendMode.NORMAL)
+        self._gradient:draw()
+        rt.graphics.set_stencil_test()
+        rt.graphics.set_blend_mode()
+    end
 
     self._name:draw()
     self._speed_value:draw()
     self._health_bar:draw()
     self._status_consumable_bar:draw()
-
-    self._speed_value:draw_bounds()
-    self._status_consumable_bar:draw_bounds()
 end
 
 --- @override
@@ -116,4 +117,10 @@ function bt.PartySprite:update(delta)
     self._speed_value:update(delta)
     self._status_consumable_bar:update(delta)
     self._sprite:update(delta)
+end
+
+--- @override
+function bt.PartySprite:set_selection_state(state)
+    self._frame:set_selection_state(state)
+    self._gradient_visible = state ~= rt.SelectionState.ACTIVE
 end

@@ -8,7 +8,9 @@ bt.EnemySprite = meta.new_type("EnemySprite", bt.EntitySprite, function(entity)
         _sprite = rt.Sprite(entity:get_sprite_id()),
 
         _health_visible = true,
-        _speed_visible = true
+        _speed_visible = true,
+
+        _selection_frame = rt.Frame(),
     })
 end)
 
@@ -22,6 +24,7 @@ function bt.EnemySprite:realize()
     self._status_consumable_bar:realize()
     self._name:realize()
     self._sprite:realize()
+    self._selection_frame:realize()
 end
 
 --- @brief
@@ -50,10 +53,21 @@ function bt.EnemySprite:size_allocate(x, y, width, height)
         sprite_w,
         sprite_h
     )
+
+    self._selection_frame:fit_into(
+        x + 0.5 * width - 0.5 * sprite_w,
+        current_y,
+        sprite_w,
+        sprite_h
+    )
 end
 
 --- @override
 function bt.EnemySprite:draw()
+    self._status_consumable_bar:draw()
+    self._selection_frame:draw()
+    self._sprite:draw()
+
     if self._health_visible then
         self._health_bar:draw()
     end
@@ -62,11 +76,7 @@ function bt.EnemySprite:draw()
         self._speed_value:draw()
     end
 
-    self._status_consumable_bar:draw()
-    self._sprite:draw()
     self._name:draw()
-
-    self:draw_bounds()
 end
 
 --- @override
@@ -82,4 +92,9 @@ function bt.EnemySprite:measure()
     local label_w, label_h = self._name:measure()
     local sprite_w, sprite_h = self._sprite:measure()
     return sprite_w, 2 * label_h + sprite_h
+end
+
+--- @override
+function bt.EnemySprite:set_selection_state(state)
+    self._selection_frame:set_selection_state(state)
 end
