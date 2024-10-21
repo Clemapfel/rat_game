@@ -307,7 +307,7 @@ function bt.BattleScene:_update_slots(entity)
             end
         end
 
-        node:signal_connect(rt.InputButton.DOWN, function(_)
+        node:set_down(function(_)
             if last_move_node == nil then
                 return closest_node
             else
@@ -409,10 +409,6 @@ function bt.BattleScene:draw()
     --love.graphics.line(0, 0.5 * love.graphics.getHeight(), love.graphics.getWidth(), 0.5 * love.graphics.getHeight())
 
     self._animation_queue:draw()
-
-    if self._entity_selection_graph ~= nil then
-        self._entity_selection_graph:draw()
-    end
 end
 
 --- @override
@@ -447,90 +443,203 @@ function bt.BattleScene:_append_animation(...)
     self._animation_queue:append(...)
 end
 
---- @brief [internal]
-function bt.BattleScene:_generate_entity_selection_graph_from_move(user, move)
-    meta.assert_isa(user, bt.Entity)
-
-    local can_target_self = move:get_can_target_self()
-    local can_target_multiple = move:get_can_target_multiple()
-    local can_target_enemy = move:get_can_target_enemy()
-    local can_target_ally = move:get_can_target_ally()
-
-    local graph = rt.SelectionGraph()
-    if can_target_multiple == false then
-        local party_nodes, enemy_nodes = {}, {}
-        for entity in values(self._state:list_entities()) do
-            if (entity == user and can_target_self) or
-                (user:get_is_enemy() == entity:get_is_enemy() and can_target_ally) or
-                (user:get_is_enemy() ~= entity:get_is_enemy() and can_target_enemy)
-            then
-                local sprite = self._sprites[entity]
-                local node = rt.SelectionGraphNode(sprite:get_bounds())
-                node.entities = {entity}
-                graph:add(node)
-
-                if entity:get_is_enemy() then
-                    table.insert(enemy_nodes, node)
-                else
-                    table.insert(party_nodes, node)
-                end
-            end
-        end
-
-        -- linking
-        local _single_target_sort_f = function(node_a, node_b)
-            local sprite_a = self._sprites[node_a.entities[1]]
-            local sprite_b = self._sprites[node_b.entities[1]]
-            return sprite_a:get_bounds().x < sprite_b:get_bounds().x
-        end
-
-        table.sort(party_nodes, _single_target_sort_f)
-        table.sort(enemy_nodes, _single_target_sort_f)
-
-        for node_i, node in ipairs(party_nodes) do
-            node:set_left(party_nodes[node_i - 1])
-            node:set_right(party_nodes[node_i + 1])
-        end
-
-        for node_i, node in ipairs(enemy_nodes) do
-            node:set_left(enemy_nodes[node_i - 1])
-            node:set_right(enemy_nodes[node_i + 1])
-        end
-
-        -- TODO vertical linking
-    else
-        local entities = {}
-        local min_x, min_y, max_x, max_y = POSITIVE_INFINITY, POSITIVE_INFINITY, NEGATIVE_INFINITY, NEGATIVE_INFINITY
-        for entity in values(self._state:list_entities()) do
-            if (entity == user and can_target_self) or
-                (user:get_is_enemy() == entity:get_is_enemy() and can_target_ally) or
-                (user:get_is_enemy() ~= entity:get_is_enemy() and can_target_enemy)
-            then
-                table.insert(entities, entity)
-                local bounds = self._sprites[entity]:get_bounds()
-                min_x = math.min(min_x, bounds.x)
-                min_y = math.min(min_y, bounds.y)
-                max_x = math.max(max_x, bounds.x + bounds.width)
-                max_y = math.max(max_x, bounds.y + bounds.height)
-            end
-        end
-        local node = rt.SelectionGraphNode()
-        node.entities = entities
-        node:set_bounds(min_x, min_y, max_x - min_x, max_y - min_y)
-        graph:add(node)
+--- @brief
+function bt.BattleScene:_set_selection(entities, state)
+    for entity in values(entities) do
+        local sprite = self._sprites[entity]
+        sprite:set_selection_state(state)
     end
 
-    return graph
+    -- todo: prio selection
 end
 
---- @brief [internal]
-function bt.BattleScene:_generate_inspection_graph()
+do
+    local _find_closest_node = function(self, others, n_others, scene_center_x)
+        local closest_distance, closest_node = POSITIVE_INFINITY, nil
+        local my_x, _ = self:get_centroid()
 
+        local lower_i, upper_i, step = 1, n_others, 1
+        if my_x >= scene_center_x then
+            -- if sprite is right of center screen, search from right to left
+            lower_i = n_others
+            upper_i = 1
+            step = -1
+        end
+
+        local last_distance = POSITIVE_INFINITY
+        for i = lower_i, upper_i, step do
+            local other = others[i]
+            local other_x, _ = other:get_centroid()
+            local distance = math.abs(my_x - other_x)
+            if distance < closest_distance then
+                closest_distance = distance
+                closest_node = other
+            end
+
+            if distance > last_distance then
+                -- if distance starts increasing, further nodes will
+                -- never be closer since they are sorted by x coords
+                break
+            end
+            last_distance = distance
+        end
+
+        return closest_node
+    end
+
+    --- @brief [internal]
+    function bt.BattleScene:_generate_entity_selection_graph_from_move(user, move)
+        meta.assert_isa(user, bt.Entity)
+
+        local can_target_self = move:get_can_target_self()
+        local can_target_multiple = move:get_can_target_multiple()
+        local can_target_enemy = move:get_can_target_enemy()
+        local can_target_ally = move:get_can_target_ally()
+
+        local get_sprite_bounds = function(entity)
+            local bounds = self._sprites[entity]:get_bounds()
+            if entity:get_is_enemy() == true then
+                bounds.x = bounds.x + self._enemy_sprite_x_offset
+            end
+            return bounds
+        end
+
+        local graph = rt.SelectionGraph()
+        if can_target_multiple == false then
+            local party_nodes, enemy_nodes = {}, {}
+            local n_allies, n_enemies = 0, 0
+            for entity in values(self._state:list_entities()) do
+                if (entity == user and can_target_self) or
+                    (user:get_is_enemy() == entity:get_is_enemy() and can_target_ally) or
+                    (user:get_is_enemy() ~= entity:get_is_enemy() and can_target_enemy)
+                then
+                    local node = rt.SelectionGraphNode(get_sprite_bounds(entity))
+                    node.entities = {entity}
+                    graph:add(node)
+
+                    if entity:get_is_enemy() then
+                        table.insert(enemy_nodes, node)
+                        n_enemies = n_enemies + 1
+                    else
+                        table.insert(party_nodes, node)
+                        n_allies = n_allies + 1
+                    end
+                end
+            end
+
+            -- linking
+            local _single_target_sort_f = function(node_a, node_b)
+                local entity_a = node_a.entities[1]
+                local entity_b = node_b.entities[1]
+                return get_sprite_bounds(entity_a).x < get_sprite_bounds(entity_b).x
+            end
+
+            local scene_center_x = self._bounds.x + self._bounds.width * 0.5
+
+            table.sort(party_nodes, _single_target_sort_f)
+            table.sort(enemy_nodes, _single_target_sort_f)
+
+            local n_diff = math.round(math.abs(n_enemies - n_allies) / 2)
+            local _scene = self
+
+            local _last_enemy, _last_ally = nil, nil -- cursor memory
+            for node_i, node in ipairs(party_nodes) do
+                node:set_left(function(self)
+                    _last_enemy = nil
+                    return party_nodes[node_i - 1]
+                end)
+
+                node:set_right(function(self)
+                    _last_enemy = nil
+                    return party_nodes[node_i + 1]
+                end)
+
+                local _closest = _find_closest_node(node, enemy_nodes, n_enemies, scene_center_x)
+                node:set_up(function(self)
+                    _last_ally = node
+                    if _last_enemy ~= nil then
+                        return _last_enemy
+                    else
+                        return _closest
+                    end
+                end)
+
+                node:signal_connect("exit", function(self)
+                    _scene:_set_selection(self.entities, rt.SelectionState.INACTIVE)
+                end)
+
+                node:signal_connect("enter", function(self)
+                    _scene:_set_selection(self.entities, rt.SelectionState.ACTIVE)
+                end)
+            end
+
+            for node_i, node in ipairs(enemy_nodes) do
+                node:set_left(function(self)
+                    _last_ally = nil
+                    return enemy_nodes[node_i - 1]
+                end)
+
+                node:set_right(function(self)
+                    _last_ally = nil
+                    return enemy_nodes[node_i + 1]
+                end)
+
+                local _closest = _find_closest_node(node, party_nodes, n_allies, scene_center_x)
+                node:set_down(function(self)
+                    _last_enemy = node
+                    if _last_ally ~= nil then
+                        return _last_ally
+                    else
+                        return _closest
+                    end
+                end)
+
+                node:signal_connect("exit", function(self)
+                    _scene:_set_selection(self.entities, rt.SelectionState.INACTIVE)
+                end)
+
+                node:signal_connect("enter", function(self)
+                    _scene:_set_selection(self.entities, rt.SelectionState.ACTIVE)
+                end)
+            end
+        else
+            local entities = {}
+            local min_x, min_y, max_x, max_y = POSITIVE_INFINITY, POSITIVE_INFINITY, NEGATIVE_INFINITY, NEGATIVE_INFINITY
+            for entity in values(self._state:list_entities()) do
+                if (entity == user and can_target_self) or
+                    (user:get_is_enemy() == entity:get_is_enemy() and can_target_ally) or
+                    (user:get_is_enemy() ~= entity:get_is_enemy() and can_target_enemy)
+                then
+                    table.insert(entities, entity)
+                    local bounds = get_sprite_bounds(entity)
+                    min_x = math.min(min_x, bounds.x)
+                    min_y = math.min(min_y, bounds.y)
+                    max_x = math.max(max_x, bounds.x + bounds.width)
+                    max_y = math.max(max_x, bounds.y + bounds.height)
+                end
+            end
+            local node = rt.SelectionGraphNode()
+            node.entities = entities
+            node:set_bounds(min_x, min_y, max_x - min_x, max_y - min_y)
+            graph:add(node)
+        end
+
+        return graph
+    end
+
+    --- @brief [internal]
+    function bt.BattleScene:_generate_inspection_graph()
+
+    end
 end
 
 --- @brief [internal]
 function bt.BattleScene:_handle_button_pressed(which)
     if which == rt.InputButton.A then
         self._entity_selection_graph = self:_generate_entity_selection_graph_from_move(self._state:list_allies()[1], bt.Move("DEBUG_MOVE"))
+    end
+
+    if self._entity_selection_graph ~= nil then
+        self._entity_selection_graph:handle_button(which)
     end
 end
