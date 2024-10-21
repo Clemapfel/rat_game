@@ -274,3 +274,8 @@ function bt.Entity:list_intrinsic_move_ids()
     end
     return out
 end
+
+--- @brief
+function bt.Entity:get_priority()
+    return self._state:entity_get_priority(self)
+end

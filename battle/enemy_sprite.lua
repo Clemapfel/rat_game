@@ -11,6 +11,7 @@ bt.EnemySprite = meta.new_type("EnemySprite", bt.EntitySprite, function(entity)
         _speed_visible = true,
 
         _selection_frame = rt.Frame(),
+        _selection_state = rt.SelectionState.INACTIVE
     })
 end)
 
@@ -65,7 +66,11 @@ end
 --- @override
 function bt.EnemySprite:draw()
     self._status_consumable_bar:draw()
-    self._selection_frame:draw()
+
+    if self._selection_state == rt.SelectionState.ACTIVE then
+        self._selection_frame:draw()
+    end
+
     self._sprite:draw()
 
     if self._health_visible then
@@ -96,5 +101,6 @@ end
 
 --- @override
 function bt.EnemySprite:set_selection_state(state)
+    self._selection_state = state
     self._selection_frame:set_selection_state(state)
 end

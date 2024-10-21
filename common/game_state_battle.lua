@@ -5,10 +5,11 @@
     n_enemies = 0
 
     entities = {
-        id      -- EntityID
-        hp      -- Unsigned
-        state   -- bt.EntityState
-        index   -- Unsigned
+        id       -- EntityID
+        hp       -- Unsigned
+        state    -- bt.EntityState
+        index    -- Unsigned
+        priority -- Signed
         
         moves[slot_i] = {
             id  -- MoveID
@@ -241,6 +242,12 @@ function rt.GameState:entity_get_multiplicity(entity)
     else
         return current_multiplicity
     end
+end
+
+--- @brief
+function rt.GameState:entity_get_priority(entity)
+    meta.assert_isa(entity, bt.Entity)
+    return self:_get_entity_entry(entity).priority
 end
 
 --- @brief

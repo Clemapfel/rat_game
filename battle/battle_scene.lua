@@ -62,6 +62,8 @@ function bt.BattleScene:create_from_state()
 
     self:add_entity(table.unpack(self._state:list_entities()))
     self._simulation_environment = self:create_simulation_environment()
+
+    self._priority_queue:reorder(self._state:list_entities_by_speed())
 end
 
 --- @override
@@ -504,6 +506,8 @@ do
             return bounds
         end
 
+        local _scene = self
+
         local graph = rt.SelectionGraph()
         if can_target_multiple == false then
             local party_nodes, enemy_nodes = {}, {}
@@ -540,7 +544,6 @@ do
             table.sort(enemy_nodes, _single_target_sort_f)
 
             local n_diff = math.round(math.abs(n_enemies - n_allies) / 2)
-            local _scene = self
 
             local _last_enemy, _last_ally = nil, nil -- cursor memory
             for node_i, node in ipairs(party_nodes) do
@@ -622,6 +625,14 @@ do
             node.entities = entities
             node:set_bounds(min_x, min_y, max_x - min_x, max_y - min_y)
             graph:add(node)
+
+            node:signal_connect("enter", function(self)
+                _scene:_set_selection(self.entities, rt.SelectionState.ACTIVE)
+            end)
+
+            node:signal_connect("exit", function(self)
+                _scene:_set_selection(self.entities, rt.SelectionState.INACTIVE)
+            end)
         end
 
         return graph
