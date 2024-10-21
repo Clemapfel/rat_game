@@ -1,5 +1,6 @@
-rt.settings.textbox = {
-    scroll_speed = 10, -- letters / s
+rt.settings.text_box = {
+    show_delay = 0.2, -- seconds
+    hide_delay = 1.5, -- seconds
 }
 
 --- @class rt.TextBox
@@ -21,6 +22,10 @@ rt.TextBox = meta.new_type("TextBox", rt.Widget, rt.Updatable, function()
         _label_stencil = rt.Rectangle(0, 0, 1, 1),
 
         _is_visible = false,
+        _show_delay_elapsed = 0,
+        _hide_delay_elapsed = 0,
+        _should_emit_scrolling_done = false,
+        
         _current_y_offset = 0,
         _max_y_offset = 0
     })
@@ -87,6 +92,7 @@ function rt.TextBox:append(msg)
     entry.label:set_n_visible_characters(0)
     table.insert(self._scrolling_labels, entry)
     self._n_scrolling_labels = self._n_scrolling_labels + 1
+    self._should_emit_scrolling_done = false
 end
 
 --- @brief
@@ -97,38 +103,47 @@ function rt.TextBox:update(delta)
         self._current_y_offset = self._current_y_offset + delta * y_offset_speed
     elseif self._is_shown and self._current_y_offset > 0 then
         self._current_y_offset = self._current_y_offset - delta * y_offset_speed
+    else
+        if self._is_shown then
+            self._show_delay_elapsed = self._show_delay_elapsed + delta
+        end
+
+        -- labels
+        local letters_per_second = rt.settings.text_box.scroll_speed
+        ::next_label::
+        local first = self._scrolling_labels[1]
+        if first ~= nil and self._show_delay_elapsed >= rt.settings.text_box.show_delay then
+            first.elapsed = first.elapsed + delta
+            local is_done, new_n_lines_visible, rest_delta = first.label:update_n_visible_characters_from_elapsed(first.elapsed)
+
+            -- scroll up
+            while first.n_lines_visible < new_n_lines_visible do
+                first.n_lines_visible = first.n_lines_visible + 1
+                local line_height = first.height
+
+                self._total_line_height = self._total_line_height + line_height
+                if self._total_line_height > self._label_aabb.height then
+                    self._line_offset = self._line_offset - line_height
+                end
+            end
+
+            if is_done then
+                table.remove(self._scrolling_labels, 1)
+                self._n_scrolling_labels = self._n_scrolling_labels - 1
+                self._should_emit_scrolling_done = true
+            end
+
+            delta = rest_delta
+            if delta > 0 then
+                goto next_label
+            end
+        end
     end
 
-    -- labels
-    local letters_per_second = rt.settings.textbox.scroll_speed
-    ::next_label::
-    local first = self._scrolling_labels[1]
-    if first ~= nil then
-        first.elapsed = first.elapsed + delta
-        local is_done, new_n_lines_visible, rest_delta = first.label:update_n_visible_characters_from_elapsed(first.elapsed, letters_per_second)
-
-        -- scroll up
-        while first.n_lines_visible < new_n_lines_visible do
-            first.n_lines_visible = first.n_lines_visible + 1
-            local line_height = first.height
-
-            self._total_line_height = self._total_line_height + line_height
-            if self._total_line_height > self._label_aabb.height then
-                self._line_offset = self._line_offset - line_height
-            end
-        end
-
-        if is_done then
-            table.remove(self._scrolling_labels, 1)
-            self._n_scrolling_labels = self._n_scrolling_labels - 1
-            if self._n_scrolling_labels == 0 then
-                self:signal_emit("scrolling_done")
-            end
-        end
-
-        delta = rest_delta
-        if delta > 0 then
-            goto next_label
+    if self._should_emit_scrolling_done then
+        self._hide_delay_elapsed = self._hide_delay_elapsed + delta
+        if self._hide_delay_elapsed >= rt.settings.text_box.hide_delay then
+            self:signal_emit("scrolling_done")
         end
     end
 end
@@ -159,11 +174,13 @@ end
 --- @brief
 function rt.TextBox:show()
     self._is_shown = true
+    self._show_delay_elapsed = 0
 end
 
 --- @brief
 function rt.TextBox:hide()
     self._is_shown = false
+    self._hide_delay_elapsed = 0
 end
 
 --- @brief

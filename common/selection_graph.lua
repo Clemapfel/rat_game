@@ -148,6 +148,14 @@ function rt.SelectionGraphNode:get_control_layout()
     return self._control_layout_function()
 end
 
+--- @brief
+
+function rt.SelectionGraphNode:draw(color)
+    love.graphics.setColor(rt.color_unpack(color))
+
+    local top, right, bottom, left = self:
+end
+
 --- ###
 
 --- @brief

@@ -121,7 +121,7 @@ love.update = function(delta)
 end
 
 love.draw = function()
-    background:draw()
+    --background:draw()
     if draw_state then
         if profiler_active then
             rt.profiler.push("draw")

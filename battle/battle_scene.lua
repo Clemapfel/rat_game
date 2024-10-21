@@ -29,6 +29,8 @@ bt.BattleScene = meta.new_type("BattleScene", rt.Scene, function(state)
 
         _animation_queue = rt.AnimationQueue(),
         _input = rt.InputController(),
+
+        _entity_selection_graph = nil, -- rt.SelectionGraph
     })
 end)
 
@@ -407,6 +409,10 @@ function bt.BattleScene:draw()
     --love.graphics.line(0, 0.5 * love.graphics.getHeight(), love.graphics.getWidth(), 0.5 * love.graphics.getHeight())
 
     self._animation_queue:draw()
+
+    if self._entity_selection_graph ~= nil then
+        self._entity_selection_graph:draw()
+    end
 end
 
 --- @override
@@ -442,8 +448,89 @@ function bt.BattleScene:_append_animation(...)
 end
 
 --- @brief [internal]
+function bt.BattleScene:_generate_entity_selection_graph_from_move(user, move)
+    meta.assert_isa(user, bt.Entity)
+
+    local can_target_self = move:get_can_target_self()
+    local can_target_multiple = move:get_can_target_multiple()
+    local can_target_enemy = move:get_can_target_enemy()
+    local can_target_ally = move:get_can_target_ally()
+
+    local graph = rt.SelectionGraph()
+    if can_target_multiple == false then
+        local party_nodes, enemy_nodes = {}, {}
+        for entity in values(self._state:list_entities()) do
+            if (entity == user and can_target_self) or
+                (user:get_is_enemy() == entity:get_is_enemy() and can_target_ally) or
+                (user:get_is_enemy() ~= entity:get_is_enemy() and can_target_enemy)
+            then
+                local sprite = self._sprites[entity]
+                local node = rt.SelectionGraphNode(sprite:get_bounds())
+                node.entities = {entity}
+                graph:add(node)
+
+                if entity:get_is_enemy() then
+                    table.insert(enemy_nodes, node)
+                else
+                    table.insert(party_nodes, node)
+                end
+            end
+        end
+
+        -- linking
+        local _single_target_sort_f = function(node_a, node_b)
+            local sprite_a = self._sprites[node_a.entities[1]]
+            local sprite_b = self._sprites[node_b.entities[1]]
+            return sprite_a:get_bounds().x < sprite_b:get_bounds().x
+        end
+
+        table.sort(party_nodes, _single_target_sort_f)
+        table.sort(enemy_nodes, _single_target_sort_f)
+
+        for node_i, node in ipairs(party_nodes) do
+            node:set_left(party_nodes[node_i - 1])
+            node:set_right(party_nodes[node_i + 1])
+        end
+
+        for node_i, node in ipairs(enemy_nodes) do
+            node:set_left(enemy_nodes[node_i - 1])
+            node:set_right(enemy_nodes[node_i + 1])
+        end
+
+        -- TODO vertical linking
+    else
+        local entities = {}
+        local min_x, min_y, max_x, max_y = POSITIVE_INFINITY, POSITIVE_INFINITY, NEGATIVE_INFINITY, NEGATIVE_INFINITY
+        for entity in values(self._state:list_entities()) do
+            if (entity == user and can_target_self) or
+                (user:get_is_enemy() == entity:get_is_enemy() and can_target_ally) or
+                (user:get_is_enemy() ~= entity:get_is_enemy() and can_target_enemy)
+            then
+                table.insert(entities, entity)
+                local bounds = self._sprites[entity]:get_bounds()
+                min_x = math.min(min_x, bounds.x)
+                min_y = math.min(min_y, bounds.y)
+                max_x = math.max(max_x, bounds.x + bounds.width)
+                max_y = math.max(max_x, bounds.y + bounds.height)
+            end
+        end
+        local node = rt.SelectionGraphNode()
+        node.entities = entities
+        node:set_bounds(min_x, min_y, max_x - min_x, max_y - min_y)
+        graph:add(node)
+    end
+
+    return graph
+end
+
+--- @brief [internal]
+function bt.BattleScene:_generate_inspection_graph()
+
+end
+
+--- @brief [internal]
 function bt.BattleScene:_handle_button_pressed(which)
     if which == rt.InputButton.A then
-        self._simulation_environment.message("<b><o><color=RED>" .. rt.random.string(16) .. "</color></o></b>")
+        self._entity_selection_graph = self:_generate_entity_selection_graph_from_move(self._state:list_allies()[1], bt.Move("DEBUG_MOVE"))
     end
 end

@@ -5,7 +5,8 @@ render all animated glyphs on top
 ]]
 
 rt.settings.label = {
-    outline_offset_padding = 5
+    outline_offset_padding = 5,
+    scroll_speed = 10, -- beats per second
 }
 
 --- @class rt.TextEffect
@@ -830,9 +831,9 @@ do
     end
 
     --- @brief
-    function rt.Label:update_n_visible_characters_from_elapsed(elapsed, letters_per_second)
+    function rt.Label:update_n_visible_characters_from_elapsed(elapsed)
         local so_far = elapsed
-        local step = 1 / letters_per_second
+        local step = 1 / rt.settings.label.scroll_speed
         local n_visible = 0
         local weights = _syntax.BEAT_WEIGHTS
         local max_row = 0
