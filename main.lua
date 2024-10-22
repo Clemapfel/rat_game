@@ -106,7 +106,7 @@ love.load = function()
 end
 
 love.update = function(delta)
-    background:update(delta)
+    --background:update(delta)
 
     if profiler_active then
         rt.profiler.push("update")

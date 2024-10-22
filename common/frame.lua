@@ -94,7 +94,6 @@ function rt.Frame:size_allocate(x, y, width, height)
     end
 
     local thickness = self._thickness + 2
-
     if self._type == rt.FrameType.RECTANGULAR then
         self._frame:resize(rt.AABB(pos_x + 0.5 * thickness, pos_y + 0.5 * thickness, w - thickness, h - thickness))
         self._frame_outline:resize(rt.AABB(pos_x + 0.5 * thickness, pos_y + 0.5 * thickness, w - thickness, h - thickness))

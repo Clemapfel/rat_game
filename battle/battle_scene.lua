@@ -647,7 +647,7 @@ end
 --- @brief [internal]
 function bt.BattleScene:_handle_button_pressed(which)
     if which == rt.InputButton.A then
-        self._simulation_environment.message("test")
+        self._simulation_environment.message("<color=WHITE>L_pqtt MESSAGE L_pqtt MESSSAGE L_pqtt MESSAGE L_pqtt MESSSAGE L_pqtt MESSAGE L_pqtt MESSSAGE L_pqtt MESSAGE L_pqtt MESSSAGE L_pqtt MESSAGE L_pqtt MESSSAGE L_pqtt MESSAGE L_pqtt MESSSAGE L_pqtt MESSAGE L_pqtt MESSSAGE L_pqtt MESSAGE L_pqtt MESSSAGE</color>")
     end
     --[[
     if which == rt.InputButton.A then

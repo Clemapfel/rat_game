@@ -32,10 +32,10 @@ rt.Font = meta.new_type("Font", function(size, regular_path, bold_path, italic_p
         _bold_path = regular_path,
         _bold_italic_path = regular_path,
         _size = size,
-        _regular_rasterizer = {},
-        _italic_rasterizer = {},
-        _bold_rasterizer = {},
-        _bold_italic_rasterizer = {}
+        _regular = nil, -- love.Font
+        _bold = nil,
+        _italic = nil,
+        _bold_italic = nil
     })
 
     if bold_path ~= nil then
@@ -81,10 +81,11 @@ function rt.Font:_update()
     self._italic:setFallbacks(splat(rt.settings.font.italic_fallbacks))
     self._bold_italic:setFallbacks(splat(rt.settings.font.bold_italic_fallbacks))
 
-    self._regular_rasterizer = love.font.newRasterizer(self._regular_path, self._size)
-    self._bold_rasterizer = love.font.newRasterizer(self._bold_path, self._size)
-    self._italic_rasterizer = love.font.newRasterizer(self._italic_path, self._size)
-    self._bold_italic_rasterizer = love.font.newRasterizer(self._bold_italic_path, self._size)
+    --[[
+    for font in range(self._regular, self._bold, self._italic, self._bold_italic) do
+        font:setLineHeight(0)
+    end
+    ]]--
 end
 
 --- @brief set font size, in px

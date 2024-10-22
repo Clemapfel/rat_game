@@ -5,8 +5,8 @@ render all animated glyphs on top
 ]]
 
 rt.settings.label = {
-    outline_offset_padding = 5,
-    scroll_speed = 10, -- beats per second
+    outline_offset_padding = 7,
+    scroll_speed = 40, -- beats per second
 }
 
 --- @class rt.TextEffect
@@ -69,9 +69,6 @@ end, {
     render_shader = rt.Shader("common/glyph_render.glsl"),
 })
 
-_bold_font = love.graphics.newFont("assets/fonts/DejaVuSans/DejaVuSans-BoldItalic.ttf", 20)
-_regular_font = love.graphics.newFont("assets/fonts/DejaVuSans/DejaVuSans-Regular.ttf", 20)
-
 --- @brief
 function rt.Label:_glyph_new(
     text, font, style,
@@ -105,8 +102,8 @@ function rt.Label:_glyph_new(
         justify_center_offset = 0,
         justify_right_offset = 0,
         row_index = 1,
-        y = 0,
         x = 0,
+        y = 0,
         width = 0,
         height = 0,
         strikethrough_ax = nil,
@@ -625,6 +622,8 @@ do
         local row_i = 1
         local is_first_word = true
 
+        local line_spacing = 0
+
         local row_widths = {}
         local row_w = 0
         local max_glyph_x = 0
@@ -633,7 +632,7 @@ do
            _insert(row_widths, glyph_x)
             if is_first_word ~= true then
                 glyph_x = 0
-                glyph_y = glyph_y + line_height
+                glyph_y = glyph_y + line_height + line_spacing
                 row_i = row_i + 1
             end
         end
@@ -780,6 +779,7 @@ do
                 self.render_shader:send("is_effect_wave", glyph.is_effect_wave)
                 self.render_shader:send("is_effect_shake", glyph.is_effect_shake)
                 self.render_shader:send("elapsed", self._elapsed)
+
                 love.graphics.setColor(glyph.color_r, glyph.color_g, glyph.color_b, 1)
                 love.graphics.draw(glyph.glyph, glyph.x + _padding, glyph.y + _padding)
 
@@ -813,8 +813,9 @@ do
             self.render_shader:send("is_effect_wave", glyph.is_effect_wave)
             self.render_shader:send("is_effect_shake", glyph.is_effect_shake)
             self.render_shader:send("elapsed", self._elapsed)
+
             love.graphics.setColor(glyph.color_r, glyph.color_g, glyph.color_b, 1)
-            love.graphics.draw(glyph.glyph, glyph.x, glyph.y + _padding)
+            love.graphics.draw(glyph.glyph, glyph.x + _padding, glyph.y + _padding)
 
             if glyph.is_underlined then
                 love.graphics.line(glyph.underline_ax, glyph.underline_ay, glyph.underline_bx, glyph.underline_by)

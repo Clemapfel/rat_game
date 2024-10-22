@@ -22,12 +22,15 @@
     </configurations>
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="7fa9ba1b-2cff-4ecc-86fb-59ab2fa76ee1" name="Changes" comment="added get_priority">
+    <list default="true" id="7fa9ba1b-2cff-4ecc-86fb-59ab2fa76ee1" name="Changes" comment="refactored signals">
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/battle/battle_scene.lua" beforeDir="false" afterPath="$PROJECT_DIR$/battle/battle_scene.lua" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/battle/simulation_handler.lua" beforeDir="false" afterPath="$PROJECT_DIR$/battle/simulation_handler.lua" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/common/animation_queue.lua" beforeDir="false" afterPath="$PROJECT_DIR$/common/animation_queue.lua" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/common/font.lua" beforeDir="false" afterPath="$PROJECT_DIR$/common/font.lua" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/common/frame.lua" beforeDir="false" afterPath="$PROJECT_DIR$/common/frame.lua" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/common/label.lua" beforeDir="false" afterPath="$PROJECT_DIR$/common/label.lua" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/common/meta.lua" beforeDir="false" afterPath="$PROJECT_DIR$/common/meta.lua" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/common/text_box.lua" beforeDir="false" afterPath="$PROJECT_DIR$/common/text_box.lua" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/main.lua" beforeDir="false" afterPath="$PROJECT_DIR$/main.lua" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -596,15 +599,7 @@
       <workItem from="1729098138796" duration="20580000" />
       <workItem from="1729180777153" duration="8566000" />
       <workItem from="1729267430460" duration="1705000" />
-      <workItem from="1729269158294" duration="59004000" />
-    </task>
-    <task id="LOCAL-01110" summary="brusselator working">
-      <option name="closed" value="true" />
-      <created>1728177249380</created>
-      <option name="number" value="01110" />
-      <option name="presentableId" value="LOCAL-01110" />
-      <option name="project" value="LOCAL" />
-      <updated>1728177249380</updated>
+      <workItem from="1729269158294" duration="66285000" />
     </task>
     <task id="LOCAL-01111" summary="stashing">
       <option name="closed" value="true" />
@@ -990,7 +985,15 @@
       <option name="project" value="LOCAL" />
       <updated>1729536223944</updated>
     </task>
-    <option name="localTasksCounter" value="1159" />
+    <task id="LOCAL-01159" summary="refactored signals">
+      <option name="closed" value="true" />
+      <created>1729550289025</created>
+      <option name="number" value="01159" />
+      <option name="presentableId" value="LOCAL-01159" />
+      <option name="project" value="LOCAL" />
+      <updated>1729550289025</updated>
+    </task>
+    <option name="localTasksCounter" value="1160" />
     <servers />
   </component>
   <component name="TypeScriptGeneratedFilesManager">
@@ -1039,7 +1042,6 @@
     </option>
   </component>
   <component name="VcsManagerConfiguration">
-    <MESSAGE value="added entity name to heading label" />
     <MESSAGE value="added strikethrough/underline" />
     <MESSAGE value="added confusion" />
     <MESSAGE value="stashing battle scene layout" />
@@ -1064,7 +1066,8 @@
     <MESSAGE value="refactored selection graph" />
     <MESSAGE value="entity move selection graph done" />
     <MESSAGE value="added get_priority" />
-    <option name="LAST_COMMIT_MESSAGE" value="added get_priority" />
+    <MESSAGE value="refactored signals" />
+    <option name="LAST_COMMIT_MESSAGE" value="refactored signals" />
   </component>
   <component name="XDebuggerManager">
     <breakpoint-manager>

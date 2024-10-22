@@ -365,7 +365,7 @@ do
     end
 
     --- @brief
-    local _meta_signal_unblock_all = function(self, name)
+    local _meta_signal_block_all = function(self, name)
         local signals = self[_metatable_index][_signal_component_index]
         for _, handler in pairs(signals) do
             handler[_signal_is_blocked_index] = true
@@ -419,7 +419,6 @@ do
             signal_component[name] = {
                 [_signal_is_blocked_index] = false,
                 [_signal_callbacks_index] = {},
-                [_signal_n_callbacks_index] = 0
             }
         end
 
