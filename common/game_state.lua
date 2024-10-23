@@ -297,7 +297,7 @@ function rt.GameState:_run()
         local background_color = rt.Palette.TRUE_MAGENTA
         if love.graphics.isActive() then
             if self._use_render_texture then
-                self._render_texture:bind_as_render_target()
+                self._render_texture:bind()
             end
 
             love.graphics.reset()
@@ -331,7 +331,7 @@ function rt.GameState:_run()
             end
 
             if self._use_render_texture then
-                self._render_texture:unbind_as_render_target()
+                self._render_texture:unbind()
                 self._render_shader:bind()
                 self._render_texture:draw()
                 self._render_shader:unbind()

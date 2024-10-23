@@ -33,9 +33,9 @@ function bt.Background.BRUSSELATOR:size_allocate(x, y, width, height)
 
     self._shader:bind()
     self._shader:send("mode", 0) -- initialize
-    self._texture:bind_as_render_target()
+    self._texture:bind()
     self._shape:draw()
-    self._texture:unbind_as_render_target()
+    self._texture:unbind()
     self._shader:unbind()
 
 end
@@ -47,9 +47,9 @@ function bt.Background.BRUSSELATOR:update(delta, intensity)
 
     self._shader:bind()
     self._shader:send("mode", 1) -- step
-    self._texture:bind_as_render_target()
+    self._texture:bind()
     self._texture:draw()
-    self._texture:unbind_as_render_target()
+    self._texture:unbind()
     self._shader:unbind()
 end
 

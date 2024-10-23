@@ -21,6 +21,10 @@ bt.PartySprite = meta.new_type("BattlePartySprite", bt.EntitySprite, function(en
         _gradient = rt.VertexRectangle(0, 0, 1, 1),
 
         _sprite = rt.Sprite(entity_id_to_sprite_id[entity:get_id()]),
+
+        _snapshot = rt.RenderTexture(1, 1),
+        _snapshot_position_x = 0,
+        _snapshot_position_y = 0
     })
 end)
 
@@ -83,11 +87,21 @@ function bt.PartySprite:size_allocate(x, y, width, height)
     sprite_w = sprite_w * 3
     sprite_h = sprite_h * 3
     self._sprite:fit_into(
-        frame_aabb.x + 0.5 * frame_aabb.width - 0.5 * sprite_w - 0.25 * frame_aabb.width,
-        frame_aabb.y - (1 - sprite_overlap) * sprite_h,
+        0, 0,
         sprite_w,
         sprite_h
     )
+
+    self._snapshot_position_x = frame_aabb.x + 0.5 * frame_aabb.width - 0.5 * sprite_w - 0.25 * frame_aabb.width
+    self._snapshot_position_y = frame_aabb.y - (1 - sprite_overlap) * sprite_h
+
+    local current_w, current_h = self._snapshot:get_size()
+    if current_w ~= sprite_w or current_h ~= sprite_h then
+        self._snapshot = rt.RenderTexture(sprite_w, sprite_h)
+        self._snapshot:bind()
+        self._sprite:draw()
+        self._snapshot:unbind()
+    end
 end
 
 --- @override
@@ -116,7 +130,14 @@ function bt.PartySprite:update(delta)
     self._health_bar:update(delta)
     self._speed_value:update(delta)
     self._status_consumable_bar:update(delta)
+
+    local before = self._sprite:get_frame()
     self._sprite:update(delta)
+    if self._sprite:get_frame() ~= before then
+        self._snapshot:bind()
+        self._sprite:draw()
+        self._snapshot:unbind()
+    end
 end
 
 --- @override

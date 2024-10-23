@@ -17,13 +17,13 @@ rt.RenderTexture = meta.new_type("RenderTexture", rt.Texture, function(width, he
 end)
 
 --- @brief bind texture as render target, needs to be unbound manually later
-function rt.RenderTexture:bind_as_render_target()
+function rt.RenderTexture:bind()
     self._before = love.graphics.getCanvas()
     love.graphics.setCanvas({self._native, stencil = true})
 end
 
 --- @brief unbind texture
-function rt.RenderTexture:unbind_as_render_target()
+function rt.RenderTexture:unbind()
     love.graphics.setCanvas({self._before, stencil = true})
 end
 

@@ -1,5 +1,10 @@
 --- @class bt.EntitySprite
-bt.EntitySprite = meta.new_abstract_type("BattleEntitySprite", rt.Widget)
+bt.EntitySprite = meta.new_abstract_type("BattleEntitySprite", rt.Widget, {
+    _is_visible = true,
+    _snapshot = nil, -- rt.RenderTexture
+    _snapshot_position_x = 0,
+    _snapshot_position_y = 0
+})
 
 --- @brief
 function bt.EntitySprite:set_hp(value)
@@ -53,6 +58,28 @@ end
 --- @brief
 function bt.EntitySprite:set_is_stunned(b)
     error("abstract method called")
+end
+
+--- @brief
+function bt.EntitySprite:set_is_visible(b)
+    self._is_visible = b
+end
+
+--- @brief
+function bt.EntitySprite:get_is_visible()
+    return self._is_visible
+end
+
+--- @brief
+function bt.EntitySprite:draw_snapshot(x, y)
+    if x == nil then x = 0 end
+    if y == nil then y = 0 end
+    self._snapshot:draw(self._snapshot_position_x + x, self._snapshot_position_y + y)
+end
+
+--- @brief
+function bt.EntitySprite:get_position()
+    return self._snapshot_position_x, self._snapshot_position_y
 end
 
 

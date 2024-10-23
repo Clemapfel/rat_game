@@ -12,7 +12,6 @@ rt.RenderTexture = meta.new_type("RenderTexture", rt.Texture, function(width, he
         }),
         _width = width,
         _height = height,
-        _before = {}, -- love.Canvas
     })
     out:set_scale_mode(rt.TextureScaleMode.NEAREST)
     out:set_wrap_mode(rt.TextureWrapMode.CLAMP)
@@ -20,16 +19,13 @@ rt.RenderTexture = meta.new_type("RenderTexture", rt.Texture, function(width, he
 end)
 
 --- @brief bind texture as render target, needs to be unbound manually later
-function rt.RenderTexture:bind_as_render_target()
-    self._before = love.graphics.getCanvas()
+function rt.RenderTexture:bind()
     love.graphics.setCanvas({self._native, stencil = true})
 end
 
 --- @brief unbind texture
-function rt.RenderTexture:unbind_as_render_target()
-    local hue = (meta.hash(self) % 255) / 255
-    love.graphics.setColor(rt.color_unpack(rt.hsva_to_rgba(rt.HSVA(hue, 1, 1, 1))))
-    love.graphics.setCanvas({self._before, stencil = true})
+function rt.RenderTexture:unbind()
+    love.graphics.setCanvas()
 end
 
 --- @brief

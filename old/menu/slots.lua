@@ -228,7 +228,7 @@ function mn.Slots:size_allocate(x, y, width, height)
 
     self._snapshot = rt.RenderTexture(width, height)
     rt.graphics.translate(-x, -y)
-    self._snapshot:bind_as_render_target()
+    self._snapshot:bind()
     for row in values(self._items) do
         for item in values(row) do
             item.base:draw()
@@ -237,7 +237,7 @@ function mn.Slots:size_allocate(x, y, width, height)
             item.frame:draw()
         end
     end
-    self._snapshot:unbind_as_render_target()
+    self._snapshot:unbind()
     rt.graphics.translate(x, y)
 end
 

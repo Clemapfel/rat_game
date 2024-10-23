@@ -62,12 +62,12 @@ function bt.ShaderOnlyBackground:update(delta)
         self._shader:send("compression", rt.settings.battle.background.compression)
     end
 
-    self._render_texture:bind_as_render_target()
+    self._render_texture:bind()
     love.graphics.clear(0, 0, 0, 0)
     self._shader:bind()
     self._shape:draw()
     self._shader:unbind()
-    self._render_texture:unbind_as_render_target()
+    self._render_texture:unbind()
 end
 
 --- @override

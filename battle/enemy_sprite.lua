@@ -54,11 +54,11 @@ function bt.EnemySprite:size_allocate(x, y, width, height)
     current_y = current_y - sprite_h
     self._sprite:fit_into(
         0, 0,
-        current_y,
         sprite_w,
         sprite_h
     )
-    self._snapshot_position_x, self._snapshot_position_y = x + 0.5 * width - 0.5 * sprite_w,
+    self._snapshot_position_x = x + 0.5 * width - 0.5 * sprite_w
+    self._snapshot_position_y = current_y
 
     self._selection_frame:fit_into(
         x + 0.5 * width - 0.5 * sprite_w,
@@ -70,9 +70,9 @@ function bt.EnemySprite:size_allocate(x, y, width, height)
     local current_w, current_h = self._snapshot:get_size()
     if current_w ~= sprite_w or current_h ~= sprite_h then
         self._snapshot = rt.RenderTexture(sprite_w, sprite_h)
-        self._snapshot:bind_as_render_target()
+        self._snapshot:bind()
         self._sprite:draw()
-        self._snapshot:unbind_as_render_target()
+        self._snapshot:unbind()
     end
 end
 
@@ -84,7 +84,9 @@ function bt.EnemySprite:draw()
         self._selection_frame:draw()
     end
 
-    self._snapshot:draw(self._snapshot_position_x, self._snapshot_position_y)
+    if self._is_visible then
+        self:draw_snapshot()
+    end
 
     if self._health_visible then
         self._health_bar:draw()
@@ -106,9 +108,9 @@ function bt.EnemySprite:update(delta)
     local before = self._sprite:get_frame()
     self._sprite:update(delta)
     if self._sprite:get_frame() ~= before then
-        self._snapshot:bind_as_render_target()
+        self._snapshot:bind()
         self._sprite:draw()
-        self._snapshot:unbind_as_render_target()
+        self._snapshot:unbind()
     end
 end
 

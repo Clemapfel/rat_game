@@ -39,10 +39,10 @@ function rt.Background:_update_render_texture()
     if self._implementation == nil then return end
 
     local before = love.timer.getTime()
-    self._render_texture:bind_as_render_target()
+    self._render_texture:bind()
     love.graphics.clear(true, false, false)
     self._implementation:draw()
-    self._render_texture:unbind_as_render_target()
+    self._render_texture:unbind()
     local after = love.timer.getTime()
     local fraction = (after - before) / (1 / rt.graphics.get_target_fps())
 end

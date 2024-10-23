@@ -220,25 +220,35 @@ function bt.BattleScene:_reformat_enemy_sprites(x, y, width, height)
 
     local min_x, max_x = POSITIVE_INFINITY, NEGATIVE_INFINITY
 
-    local sprite_i = 2
-    while sprite_i <= n_enemies do
-        local sprite = self._enemy_sprites[sprite_i]
-        local sprite_w, sprite_h = sprite:measure()
-        if sprite_i % 2 == 0 then
-            sprite:fit_into(right_x, center_y - sprite_h, sprite_w, sprite_h)
-            max_x = right_x + sprite_w
-            right_x = right_x + sprite_w + m
-        else
-            sprite:fit_into(left_x - sprite_w, center_y - sprite_h, sprite_w, sprite_h)
-            min_x = left_x - sprite_w
-            left_x = left_x - sprite_w - m
-        end
+    local sprite_i_to_aabb = {}
+    do -- delay fit_into to measure enemy_sprite_x_offset
+        local sprite_i = 2
+        while sprite_i <= n_enemies do
+            local sprite = self._enemy_sprites[sprite_i]
+            local sprite_w, sprite_h = sprite:measure()
+            if sprite_i % 2 == 0 then
+                sprite_i_to_aabb[sprite_i] = rt.AABB(right_x, center_y - sprite_h, sprite_w, sprite_h)
+                max_x = right_x + sprite_w
+                right_x = right_x + sprite_w + m
+            else
+                sprite_i_to_aabb[sprite_i] = rt.AABB(left_x - sprite_w, center_y - sprite_h, sprite_w, sprite_h)
+                min_x = left_x - sprite_w
+                left_x = left_x - sprite_w - m
+            end
 
-        table.insert(self._enemy_sprite_render_order, sprite)
-        sprite_i = sprite_i + 1
+            table.insert(self._enemy_sprite_render_order, sprite)
+            sprite_i = sprite_i + 1
+        end
     end
 
-    self._enemy_sprite_x_offset = ((x - min_x) + (x + width - max_x)) / 2
+    local enemy_sprite_x_offset = ((x - min_x) + (x + width - max_x)) / 2
+    for sprite_i = 2, n_enemies do
+        local aabb = sprite_i_to_aabb[sprite_i]
+        self._enemy_sprites[sprite_i]:fit_into(
+            aabb.x + enemy_sprite_x_offset,
+            aabb.y, aabb.width, aabb.height
+        )
+    end
 end
 
 --- @brief
@@ -386,11 +396,9 @@ function bt.BattleScene:draw()
         sprite:draw()
     end
 
-    love.graphics.translate(self._enemy_sprite_x_offset, 0)
     for sprite in values(self._enemy_sprite_render_order) do
         sprite:draw()
     end
-    love.graphics.translate(-self._enemy_sprite_x_offset, 0)
 
     for x in range(
         self._text_box,
@@ -652,7 +660,7 @@ end
 --- @brief [internal]
 function bt.BattleScene:_handle_button_pressed(which)
     if which == rt.InputButton.A then
-        self._simulation_environment.message("<color=WHITE>L_pqtt MESSAGE L_pqtt MESSSAGE L_pqtt MESSAGE L_pqtt MESSSAGE L_pqtt MESSAGE L_pqtt MESSSAGE L_pqtt MESSAGE L_pqtt MESSSAGE L_pqtt MESSAGE L_pqtt MESSSAGE L_pqtt MESSAGE L_pqtt MESSSAGE L_pqtt MESSAGE L_pqtt MESSSAGE L_pqtt MESSAGE L_pqtt MESSSAGE</color>")
+        self:_push_animation(bt.Animation.STUN_GAINED(self, table.first(self._enemy_sprites)))
     end
     --[[
     if which == rt.InputButton.A then

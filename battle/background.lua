@@ -77,12 +77,12 @@ function bt.ShaderOnlyBackground:update(delta)
         self._mask_shape:set_vertex_color(i, rt.RGBA(contrast, contrast, contrast, 1))
     end
 
-    self._render_texture:bind_as_render_target()
+    self._render_texture:bind()
     love.graphics.clear(0, 0, 0, 0)
     self._shader:bind()
     self._shape:draw()
     self._shader:unbind()
-    self._render_texture:unbind_as_render_target()
+    self._render_texture:unbind()
 end
 
 --- @override

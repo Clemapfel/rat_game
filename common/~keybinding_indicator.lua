@@ -58,9 +58,9 @@ function rt.KeybindingIndicator:size_allocate(x, y, width, height)
     end
 
     self._snapshot = rt.RenderTexture(width, height)
-    self._snapshot:bind_as_render_target()
+    self._snapshot:bind()
     self:_draw()
-    self._snapshot:unbind_as_render_target()
+    self._snapshot:unbind()
 end
 
 --- @override

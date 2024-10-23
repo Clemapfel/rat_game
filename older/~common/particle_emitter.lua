@@ -49,10 +49,10 @@ function rt.ParticleEmitter:_snapshot_particle()
         end
     end
 
-    self._particle_texture:bind_as_render_target()
+    self._particle_texture:bind()
     rt.graphics.clear(0, 0, 0, 0)
     particle:draw()
-    self._particle_texture:unbind_as_render_target()
+    self._particle_texture:unbind()
 end
 
 --- @brief determines how many particles are emitted

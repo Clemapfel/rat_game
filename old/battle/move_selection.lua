@@ -66,7 +66,7 @@ end
 
 function bt.MoveSelection:_update_snapshot()
     rt.graphics.translate(self._snapshot_offset_x, self._snapshot_offset_y)
-    self._snapshot:bind_as_render_target()
+    self._snapshot:bind()
 
     self._frame:draw()
     for entry in values(self._tiles) do
@@ -78,7 +78,7 @@ function bt.MoveSelection:_update_snapshot()
         end
     end
 
-    self._snapshot:unbind_as_render_target()
+    self._snapshot:unbind()
     rt.graphics.translate(-1 * self._snapshot_offset_x, -1 * self._snapshot_offset_y)
 end
 

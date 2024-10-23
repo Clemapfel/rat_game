@@ -90,8 +90,17 @@ function rt.Texture:get_height()
 end
 
 --- @overload rt.Drawable.draw
-function rt.Texture:draw(x, y)
-    love.graphics.setColor(1, 1, 1, 1)
+function rt.Texture:draw(x, y, r, g, b, a)
+    if r == nil then
+        love.graphics.setColor(1, 1, 1, 1)
+    else
+        if r == nil then r = 1 end
+        if g == nil then g = 1 end
+        if b == nil then b = 1 end
+        if a == nil then a = 1 end
+        love.graphics.setColor(r, g, b, a)
+    end
+
     love.graphics.draw(self._native, x, y)
 end
 

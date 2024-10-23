@@ -127,7 +127,7 @@ function rt.ControlIndicator:_update_snapshot()
     local offset = 2;
     self._snapshot_offset_x, self._snapshot_offset_y = offset, offset
     self._snapshot = rt.RenderTexture(self._final_width + 2 * offset, self._final_height + 2 * offset)
-    self._snapshot:bind_as_render_target()
+    self._snapshot:bind()
     rt.graphics.translate(offset, offset)
     self._frame:draw()
     for i = 1, #self._labels do
@@ -136,7 +136,7 @@ function rt.ControlIndicator:_update_snapshot()
         label:draw()
     end
     rt.graphics.translate(-offset, -offset)
-    self._snapshot:unbind_as_render_target()
+    self._snapshot:unbind()
 end
 
 --- @override

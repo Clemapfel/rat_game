@@ -266,6 +266,6 @@ function bt.Status:get_flavor_text()
 end
 
 --- @brief
-function bt.Statu:get_is_stun()
+function bt.Status:get_is_stun()
     return self.is_stun
 end

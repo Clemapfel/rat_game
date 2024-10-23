@@ -33,7 +33,7 @@ rt.SnapshotLayout._shader_source = love.filesystem.read("assets/shaders/snapshot
 --- @brief update internally held render canvas
 function rt.SnapshotLayout:snapshot(to_draw)
     if to_draw == nil then to_draw = self._child end
-    self._canvas:bind_as_render_target()
+    self._canvas:bind()
     rt.graphics.clear(0, 0, 0, 0)
     if meta.is_drawable(to_draw) then
         love.graphics.push()
@@ -42,7 +42,7 @@ function rt.SnapshotLayout:snapshot(to_draw)
         if to_draw.snapshot ~= nil then to_draw:snapshot() else to_draw:draw() end
         love.graphics.pop()
     end
-    self._canvas:unbind_as_render_target()
+    self._canvas:unbind()
 end
 
 --- @overload rt.Drawable.draw

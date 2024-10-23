@@ -35,13 +35,13 @@ end, {
 --- @brief
 function rt.Snapshot:snapshot(to_draw)
     rt.graphics.push()
-    self._canvas:bind_as_render_target()
+    self._canvas:bind()
     rt.graphics.clear(0, 0, 0, 0)
     local x, y = to_draw:get_position()
     rt.graphics.translate(-x, -y)
     rt.graphics.translate(self._padding_horizontal, self._padding_vertical)
     if to_draw.snapshot ~= nil then to_draw:snapshot() else to_draw:draw() end
-    self._canvas:unbind_as_render_target()
+    self._canvas:unbind()
     rt.graphics.pop()
 end
 

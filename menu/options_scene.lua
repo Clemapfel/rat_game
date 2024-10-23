@@ -535,7 +535,7 @@ function mn.OptionsScene:_update_snapshot()
         self._snapshot = rt.RenderTexture(self._bounds.width, self._bounds.height, self._state:get_msaa_quality())
     end
 
-    self._snapshot:bind_as_render_target()
+    self._snapshot:bind()
     for item in values(self._items) do
         local before = item.frame:get_selection_state()
         item.frame:set_selection_state(rt.SelectionState.INACTIVE)
@@ -547,7 +547,7 @@ function mn.OptionsScene:_update_snapshot()
     self._heading_frame:draw()
     self._heading_label:draw()
 
-    self._snapshot:unbind_as_render_target()
+    self._snapshot:unbind()
 end
 
 --- @brief

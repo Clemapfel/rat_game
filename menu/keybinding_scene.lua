@@ -309,7 +309,7 @@ function mn.KeybindingScene:_update_snapshots()
         rt.RenderTexture(self._bounds.width, self._bounds.height, self._state:get_msaa_quality())
     }
 
-    self._snapshots[1]:bind_as_render_target()
+    self._snapshots[1]:bind()
 
     local function draw_frame(frame)
         local before = frame:get_selection_state()
@@ -342,7 +342,7 @@ function mn.KeybindingScene:_update_snapshots()
     self._accept_label:draw()
     self._restore_defaults_label:draw()
 
-    self._snapshots[1]:unbind_as_render_target()
+    self._snapshots[1]:unbind()
 end
 
 --- @brief

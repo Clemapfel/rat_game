@@ -181,3 +181,12 @@ function rt.TimedAnimation:get_value()
     return self._lower + y * (self._upper - self._lower)
 end
 
+--- @brief
+function rt.TimedAnimation:get_is_done()
+    return self._elapsed >= self._duration
+end
+
+--- @brief
+function rt.TimedAnimation:get_elapsed()
+    return self._elapsed
+end

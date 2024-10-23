@@ -39,10 +39,10 @@ function bt.Animation.MOVE:start()
         self._entity_texture = rt.RenderTexture(w + 2 * buffer_w, h + 2 * buffer_h)
 
         love.graphics.push()
-        self._entity_texture:bind_as_render_target()
+        self._entity_texture:bind()
         rt.graphics.translate(buffer_w, buffer_h)
         label:draw()
-        self._entity_texture:unbind_as_render_target()
+        self._entity_texture:unbind()
         love.graphics.pop()
 
         self._entity_shape = rt.VertexRectangle(bounds.x, bounds.y, bounds.width, bounds.height)
@@ -63,10 +63,10 @@ function bt.Animation.MOVE:start()
         self._screen_texture:set_scale_mode(rt.TextureScaleMode.LINEAR)
 
         love.graphics.push()
-        self._screen_texture:bind_as_render_target()
+        self._screen_texture:bind()
         rt.graphics.translate(buffer_w, buffer_h)
         label:draw()
-        self._screen_texture:unbind_as_render_target()
+        self._screen_texture:unbind()
         love.graphics.pop()
 
         local min_x = w

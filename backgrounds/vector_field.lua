@@ -54,9 +54,9 @@ function rt.Background.VECTOR_FIELD:size_allocate(x, y, width, height)
     self._render_shader:bind()
     self._render_shader:send("mode", self.MODE_RENDER)
     for texture in range(input, output) do
-        texture:bind_as_render_target()
+        texture:bind()
         love.graphics.rectangle("fill", 0, 0, self._resolution_x, self._resolution_y)
-        texture:unbind_as_render_target()
+        texture:unbind()
     end
     self._render_shader:unbind()
 end

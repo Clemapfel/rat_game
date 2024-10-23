@@ -43,9 +43,9 @@ end
 function bt.Background.OVERLAP_LINES:update(delta)
     self._elapsed = self._elapsed + delta
 
-    self._canvas:bind_as_render_target()
+    self._canvas:bind()
     -- do not clear
-    self._canvas:unbind_as_render_target()
+    self._canvas:unbind()
 end
 
 --- @override

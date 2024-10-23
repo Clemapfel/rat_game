@@ -770,7 +770,7 @@ do
         love.graphics.setLineWidth(2)
 
         if self._use_outline then
-            self._swap_texture:bind_as_render_target()
+            self._swap_texture:bind()
             love.graphics.clear(true, false, false)
             self.render_shader:bind()
             for glyph in values(self._outlined_glyphs) do
@@ -793,18 +793,18 @@ do
             end
             self.render_shader:unbind()
 
-            self._swap_texture:unbind_as_render_target()
+            self._swap_texture:unbind()
 
-            self._outline_texture:bind_as_render_target()
+            self._outline_texture:bind()
             love.graphics.clear(true, false, false)
             self.outline_shader:bind()
             self.outline_shader:send("texture_resolution", {self._outline_texture_width, self._outline_texture_height})
             self._swap_texture:draw(0, 0)
             self.outline_shader:unbind()
-            self._outline_texture:unbind_as_render_target()
+            self._outline_texture:unbind()
         end
 
-        self._swap_texture:bind_as_render_target()
+        self._swap_texture:bind()
         love.graphics.clear(true, false, false)
         self.render_shader:bind()
         for glyph in values(self._non_outlined_glyphs) do
@@ -826,7 +826,7 @@ do
             end
         end
         self.render_shader:unbind()
-        self._swap_texture:unbind_as_render_target()
+        self._swap_texture:unbind()
 
         love.graphics.pop()
     end

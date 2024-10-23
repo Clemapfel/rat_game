@@ -38,11 +38,11 @@ function bt.Background.CLOUDS:update(delta)
     self._shader:send("elapsed", self._elapsed)
 
     self._shape:set_texture(nil)
-    self._canvas:bind_as_render_target()
+    self._canvas:bind()
     self._shader:bind()
     self._shape:draw()
     self._shader:unbind()
-    self._canvas:unbind_as_render_target()
+    self._canvas:unbind()
     self._shape:set_texture(self._canvas)
 end
 

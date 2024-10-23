@@ -111,11 +111,6 @@ function rt.Widget:get_size()
 end
 
 --- @brief
-function rt.Widget:get_position()
-    return self._bounds.x + self._margin_top, self._bounds.y + self._margin_left
-end
-
---- @brief
 function rt.Widget:get_bounds()
     return rt.aabb_copy(self._bounds)
 end

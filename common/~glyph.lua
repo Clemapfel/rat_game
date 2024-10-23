@@ -97,7 +97,7 @@ function rt.Glyph:_update_outline()
     love.graphics.push()
     love.graphics.setColor(1, 1, 1, self._opacity)
 
-    self._outline_swap_texture:bind_as_render_target()
+    self._outline_swap_texture:bind()
     love.graphics.clear(0, 0, 0, 0)
 
     if self._is_animated == true or self._n_visible_characters ~= self._max_n_visible_characters then
@@ -123,9 +123,9 @@ function rt.Glyph:_update_outline()
         self:_draw_glyph(offset_x, offset_x)
     end
 
-    self._outline_swap_texture:unbind_as_render_target()
+    self._outline_swap_texture:unbind()
 
-    self._outlined_glyphs_texture:bind_as_render_target()
+    self._outlined_glyphs_texture:bind()
     love.graphics.clear(0, 0, 0, 0)
     self._outline_shader:bind()
     self._outline_shader:send("_texture_resolution", {self._outlined_glyphs_texture:get_size()})
@@ -133,7 +133,7 @@ function rt.Glyph:_update_outline()
     self._outline_shader:send("_outline_color", {self._outline_color.r, self._outline_color.g, self._outline_color.b, self._outline_color.a})
     love.graphics.draw(self._outline_swap_texture._native, 0, 0)
     self._outline_shader:unbind()
-    self._outlined_glyphs_texture:unbind_as_render_target()
+    self._outlined_glyphs_texture:unbind()
 
     love.graphics.pop()
 end

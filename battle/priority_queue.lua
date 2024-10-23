@@ -105,7 +105,7 @@ end
 
 --- @brief [internal]
 function bt.PriorityQueue:_element_snapshot(element)
-    element.snapshot:bind_as_render_target()
+    element.snapshot:bind()
     love.graphics.translate(element.padding, element.padding)
     element.frame:draw()
 
@@ -120,7 +120,7 @@ function bt.PriorityQueue:_element_snapshot(element)
     end
 
     love.graphics.translate(-element.padding, -element.padding)
-    element.snapshot:unbind_as_render_target()
+    element.snapshot:unbind()
 end
 
 --- @brief

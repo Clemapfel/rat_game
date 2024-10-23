@@ -485,7 +485,7 @@ function rt.Keyboard:size_allocate(x, y, width, height)
         self._snapshot_texture:free()
     end
     self._snapshot_texture = rt.RenderTexture(final_w + 2 * padding, final_h + 2 * padding)
-    self._snapshot_texture:bind_as_render_target()
+    self._snapshot_texture:bind()
     rt.graphics.translate(padding, padding)
     self._entry_label_frame:draw()
     self._letter_frame:draw()
@@ -496,7 +496,7 @@ function rt.Keyboard:size_allocate(x, y, width, height)
     end
     self._control_indicator:draw()
     rt.graphics.translate(-padding, -padding)
-    self._snapshot_texture:unbind_as_render_target()
+    self._snapshot_texture:unbind()
 end
 
 --- @override
