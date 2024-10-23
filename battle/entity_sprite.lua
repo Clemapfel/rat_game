@@ -22,7 +22,7 @@ end
 --- @brief
 --- @return rt.RenderTexture
 function bt.EntitySprite:get_snapshot()
-
+    error("abstract method called")
 end
 
 --- @brief

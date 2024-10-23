@@ -114,6 +114,11 @@ function rt.Sprite:set_frame(i)
 end
 
 --- @brief
+function rt.Sprite:get_frame()
+    return self._current_frame
+end
+
+--- @brief
 function rt.Sprite:set_animation(id)
     if self:get_is_realized() == false then self:realize() end
     if not self._is_valid then return end

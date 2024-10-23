@@ -11,7 +11,11 @@ bt.EnemySprite = meta.new_type("EnemySprite", bt.EntitySprite, function(entity)
         _speed_visible = true,
 
         _selection_frame = rt.Frame(),
-        _selection_state = rt.SelectionState.INACTIVE
+        _selection_state = rt.SelectionState.INACTIVE,
+
+        _snapshot = rt.RenderTexture(1, 1),
+        _snapshot_position_x = 0,
+        _snapshot_position_y = 0
     })
 end)
 
@@ -49,11 +53,12 @@ function bt.EnemySprite:size_allocate(x, y, width, height)
 
     current_y = current_y - sprite_h
     self._sprite:fit_into(
-        x + 0.5 * width - 0.5 * sprite_w,
+        0, 0,
         current_y,
         sprite_w,
         sprite_h
     )
+    self._snapshot_position_x, self._snapshot_position_y = x + 0.5 * width - 0.5 * sprite_w,
 
     self._selection_frame:fit_into(
         x + 0.5 * width - 0.5 * sprite_w,
@@ -61,6 +66,14 @@ function bt.EnemySprite:size_allocate(x, y, width, height)
         sprite_w,
         sprite_h
     )
+
+    local current_w, current_h = self._snapshot:get_size()
+    if current_w ~= sprite_w or current_h ~= sprite_h then
+        self._snapshot = rt.RenderTexture(sprite_w, sprite_h)
+        self._snapshot:bind_as_render_target()
+        self._sprite:draw()
+        self._snapshot:unbind_as_render_target()
+    end
 end
 
 --- @override
@@ -71,7 +84,7 @@ function bt.EnemySprite:draw()
         self._selection_frame:draw()
     end
 
-    self._sprite:draw()
+    self._snapshot:draw(self._snapshot_position_x, self._snapshot_position_y)
 
     if self._health_visible then
         self._health_bar:draw()
@@ -89,7 +102,14 @@ function bt.EnemySprite:update(delta)
     self._health_bar:update(delta)
     self._speed_value:update(delta)
     self._status_consumable_bar:update(delta)
+
+    local before = self._sprite:get_frame()
     self._sprite:update(delta)
+    if self._sprite:get_frame() ~= before then
+        self._snapshot:bind_as_render_target()
+        self._sprite:draw()
+        self._snapshot:unbind_as_render_target()
+    end
 end
 
 --- @override
