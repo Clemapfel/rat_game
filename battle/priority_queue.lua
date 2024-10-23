@@ -235,8 +235,6 @@ function bt.PriorityQueue:update(delta)
             local item = self._entity_to_item[self._order[item_i]]
             self._consumed_y_offset = self._consumed_y_offset - (1 - clamp(buffer.opacity, 0, 1))  * item.height
             buffer.y_offset_added = true
-
-            --TODO first element has to scale too
         end
         item_i = item_i + 1
     end

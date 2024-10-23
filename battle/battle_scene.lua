@@ -63,7 +63,7 @@ function bt.BattleScene:create_from_state()
     self:add_entity(table.unpack(self._state:list_entities()))
     self._simulation_environment = self:create_simulation_environment()
 
-    self._priority_queue:reorder(self._state:list_entities_by_speed())
+    self._priority_queue:reorder(self._state:list_entities_in_order())
 end
 
 --- @override
@@ -453,6 +453,11 @@ function bt.BattleScene:_set_selection(entities, state)
     end
 
     -- todo: prio selection
+end
+
+--- @brief
+function bt.BattleScene:set_priority_order(entities)
+    self._priority_queue:reorder(entities)
 end
 
 do

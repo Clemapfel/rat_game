@@ -1,6 +1,8 @@
 --- @class bt.Animation.MESSAGE
-bt.Animation.MESSAGE = meta.new_type("MESSAGE", rt.Animation, function(text_box, message)
-    meta.assert_isa(text_box, rt.TextBox)
+--- @param text_box rt.TextBox
+--- @param msg String
+bt.Animation.MESSAGE = meta.new_type("MESSAGE", rt.Animation, function(scene, message, text_box)
+    meta.assert_isa(scene, bt.BattleScene)
     meta.assert_string(message)
     return meta.new(bt.Animation.MESSAGE, {
         _text_box = text_box,

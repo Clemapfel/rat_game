@@ -22,15 +22,39 @@
     </configurations>
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="7fa9ba1b-2cff-4ecc-86fb-59ab2fa76ee1" name="Changes" comment="refactored signals">
+    <list default="true" id="7fa9ba1b-2cff-4ecc-86fb-59ab2fa76ee1" name="Changes" comment="fixed cutoff line in text box stencil">
+      <change afterPath="$PROJECT_DIR$/assets/configs/statuses/BURNED.lua" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/assets/sprites/status_burn.hxl" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/assets/sprites/status_burn.png" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/battle/animations/consumable_applied.lua" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/battle/animations/consumable_gained.lua" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/battle/animations/consumable_lost.lua" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/battle/animations/global_status_applied.lua" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/battle/animations/global_status_gained.lua" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/battle/animations/global_status_lost.lua" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/battle/animations/status_applied.lua" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/battle/animations/status_gained.lua" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/battle/animations/status_lost.lua" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/battle/animations/stun_gained.lua" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/battle/animations/stun_lost.lua" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/assets/sprites/statuses.lua" beforeDir="false" afterPath="$PROJECT_DIR$/assets/sprites/statuses.lua" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/assets/sprites/statuses.png" beforeDir="false" afterPath="$PROJECT_DIR$/assets/sprites/statuses.png" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/battle/animations/message.lua" beforeDir="false" afterPath="$PROJECT_DIR$/battle/animations/message.lua" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/battle/battle_scene.lua" beforeDir="false" afterPath="$PROJECT_DIR$/battle/battle_scene.lua" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/common/font.lua" beforeDir="false" afterPath="$PROJECT_DIR$/common/font.lua" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/common/frame.lua" beforeDir="false" afterPath="$PROJECT_DIR$/common/frame.lua" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/common/label.lua" beforeDir="false" afterPath="$PROJECT_DIR$/common/label.lua" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/common/meta.lua" beforeDir="false" afterPath="$PROJECT_DIR$/common/meta.lua" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/battle/consumable.lua" beforeDir="false" afterPath="$PROJECT_DIR$/battle/consumable.lua" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/battle/entity.lua" beforeDir="false" afterPath="$PROJECT_DIR$/battle/entity.lua" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/battle/entity_sprite.lua" beforeDir="false" afterPath="$PROJECT_DIR$/battle/entity_sprite.lua" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/battle/equip.lua" beforeDir="false" afterPath="$PROJECT_DIR$/battle/equip.lua" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/battle/global_status.lua" beforeDir="false" afterPath="$PROJECT_DIR$/battle/global_status.lua" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/battle/move.lua" beforeDir="false" afterPath="$PROJECT_DIR$/battle/move.lua" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/battle/priority_queue.lua" beforeDir="false" afterPath="$PROJECT_DIR$/battle/priority_queue.lua" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/battle/simulation_handler.lua" beforeDir="false" afterPath="$PROJECT_DIR$/battle/simulation_handler.lua" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/battle/status.lua" beforeDir="false" afterPath="$PROJECT_DIR$/battle/status.lua" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/common/animation_queue.lua" beforeDir="false" afterPath="$PROJECT_DIR$/common/animation_queue.lua" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/common/game_state_battle.lua" beforeDir="false" afterPath="$PROJECT_DIR$/common/game_state_battle.lua" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/common/text_box.lua" beforeDir="false" afterPath="$PROJECT_DIR$/common/text_box.lua" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/main.lua" beforeDir="false" afterPath="$PROJECT_DIR$/main.lua" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/menu/inventory_scene.lua" beforeDir="false" afterPath="$PROJECT_DIR$/menu/inventory_scene.lua" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -599,15 +623,7 @@
       <workItem from="1729098138796" duration="20580000" />
       <workItem from="1729180777153" duration="8566000" />
       <workItem from="1729267430460" duration="1705000" />
-      <workItem from="1729269158294" duration="66285000" />
-    </task>
-    <task id="LOCAL-01111" summary="stashing">
-      <option name="closed" value="true" />
-      <created>1728182137098</created>
-      <option name="number" value="01111" />
-      <option name="presentableId" value="LOCAL-01111" />
-      <option name="project" value="LOCAL" />
-      <updated>1728182137098</updated>
+      <workItem from="1729269158294" duration="78169000" />
     </task>
     <task id="LOCAL-01112" summary="added loading screen class">
       <option name="closed" value="true" />
@@ -993,7 +1009,15 @@
       <option name="project" value="LOCAL" />
       <updated>1729550289025</updated>
     </task>
-    <option name="localTasksCounter" value="1160" />
+    <task id="LOCAL-01160" summary="fixed cutoff line in text box stencil">
+      <option name="closed" value="true" />
+      <created>1729630104771</created>
+      <option name="number" value="01160" />
+      <option name="presentableId" value="LOCAL-01160" />
+      <option name="project" value="LOCAL" />
+      <updated>1729630104771</updated>
+    </task>
+    <option name="localTasksCounter" value="1161" />
     <servers />
   </component>
   <component name="TypeScriptGeneratedFilesManager">
@@ -1042,7 +1066,6 @@
     </option>
   </component>
   <component name="VcsManagerConfiguration">
-    <MESSAGE value="added strikethrough/underline" />
     <MESSAGE value="added confusion" />
     <MESSAGE value="stashing battle scene layout" />
     <MESSAGE value="move selection working" />
@@ -1067,7 +1090,8 @@
     <MESSAGE value="entity move selection graph done" />
     <MESSAGE value="added get_priority" />
     <MESSAGE value="refactored signals" />
-    <option name="LAST_COMMIT_MESSAGE" value="refactored signals" />
+    <MESSAGE value="fixed cutoff line in text box stencil" />
+    <option name="LAST_COMMIT_MESSAGE" value="fixed cutoff line in text box stencil" />
   </component>
   <component name="XDebuggerManager">
     <breakpoint-manager>

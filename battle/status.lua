@@ -1,5 +1,6 @@
 rt.settings.battle.status = {
-    config_path = "assets/configs/statuses"
+    config_path = "assets/configs/statuses",
+    default_animation_id = "STATUS_GAINED",
 }
 
 --- @class bt.Status
@@ -19,6 +20,14 @@ bt.Status = meta.new_type("Status", function(id)
     end
     return out
 end, {
+    name = "",
+    description = "(no additional effect)",
+    flavor_text = "",
+
+    sprite_id = "status_ailment",
+    sprite_index = 1,
+    animation_id = rt.settings.battle.default_animation_id,
+
     attack_offset = 0,   -- Signed
     defense_offset = 0,  -- Signed
     speed_offset = 0,    -- Signed
@@ -42,172 +51,114 @@ end, {
     max_duration = POSITIVE_INFINITY,
     is_silent = false,
 
-    -- (StatusInterface, EntityInterface) -> nil
+    -- (StatusProxy, EntityProxy) -> nil
     on_gained = function(self, afflicted)
-        meta.assert_status_interface(self)
-        meta.assert_entity_interface(afflicted)
         return nil
     end,
 
-    -- (StatusInterface, EntityInterface) -> nil
+    -- (StatusProxy, EntityProxy) -> nil
     on_lost = function(self, afflicted)
-        meta.assert_status_interface(self)
-        meta.assert_entity_interface(afflicted)
         return nil
     end,
 
-    -- (StatusInterface, EntityInterface) -> nil
+    -- (StatusProxy, EntityProxy) -> nil
+    on_already_present = function(self, afflicted)
+        return nil
+    end,
+
+    -- (StatusProxy, EntityProxy) -> nil
     on_turn_start = function(self, afflicted)
-        meta.assert_status_interface(self)
-        meta.assert_entity_interface(afflicted)
         return nil
     end,
 
+    -- (StatusProxy, EntityProxy) -> nil
     on_turn_end = function(self, afflicted)
-        meta.assert_status_interface(self)
-        meta.assert_entity_interface(afflicted)
         return nil
     end,
 
+    -- (StatusProxy, EntityProxy) -> nil
     on_battle_end = function(self, afflicted)
-        meta.assert_status_interface(self)
-        meta.assert_entity_interface(afflicted)
         return nil
     end,
 
-    -- (StatusInterface, EntityInterface, Unsigned) -> nil
+    -- (StatusProxy, EntityProxy, Unsigned) -> nil
     on_hp_gained = function(self, afflicted, value)
-        meta.assert_status_interface(self)
-        meta.assert_entity_interface(afflicted)
-        meta.assert_number(value)
         return nil
     end,
 
-    -- (StatusInterface, EntityInterface, EntityInterface, Unsigned) -> nil
-    on_healing_performed = function(self, afflicted, receiver, value)
-        meta.assert_status_interface(self)
-        meta.assert_entity_interface(afflicted)
-        meta.assert_entity_interface(receiver)
-        meta.assert_number(value)
-        return nil
-    end,
-
-    -- (StatusInterface, EntityInterface, Unsigned) -> nil
+    -- (StatusProxy, EntityProxy, Unsigned) -> nil
     on_hp_lost = function(self, afflicted, hp_lost)
-        meta.assert_global_status_interface(self)
-        meta.assert_entity_interface(afflicted)
-        meta.assert_number(hp_lost)
         return nil
     end,
 
-    -- (StatusInterface, EntityInterface, EntityInterface, Unsigned) -> nil
+    -- (StatusProxy, EntityProxy, EntityProxy, Unsigned) -> nil
+    on_healing_performed = function(self, afflicted, receiver, value)
+        return nil
+    end,
+
+    -- (StatusProxy, EntityProxy, EntityProxy, Unsigned) -> nil
     on_damage_dealt = function(self, afflicted, damage_taker, value)
-        meta.assert_global_status_interface(self)
-        meta.assert_entity_interface(afflicted)
-        meta.assert_entity_interface(damage_taker)
-        meta.assert_number(value)
         return nil
     end,
 
-    -- (StatusInterface, EntityInterface, StatusInterface) -> nil
+    -- (StatusProxy, EntityProxy, StatusProxy) -> nil
     on_status_gained = function(self, afflicted, gained_status)
-        meta.assert_status_interface(self)
-        meta.assert_entity_interface(afflicted)
-        meta.assert_status_interface(gained_status)
         return nil
     end,
 
-    -- (StatusInterface, EntityInterface, StatusInterface) -> nil
+    -- (StatusProxy, EntityProxy, StatusProxy) -> nil
     on_status_lost = function(self, afflicted, lost_status)
-        meta.assert_status_interface(self)
-        meta.assert_entity_interface(afflicted)
-        meta.assert_status_interface(lost_status)
         return nil
     end,
 
-    -- (StatusInterface, EntityInterface, GlobalStatusInterface) -> nil
+    -- (StatusProxy, EntityProxy, GlobalStatusProxy) -> nil
     on_global_status_gained = function(self, afflicted, gained_status)
-        meta.assert_status_interface(self)
-        meta.assert_entity_interface(afflicted)
-        meta.assert_global_status_interface(gained_status)
         return nil
     end,
 
-    -- (StatusInterface, EntityInterface, GlobalStatusInterface) -> nil
+    -- (StatusProxy, EntityProxy, GlobalStatusProxy) -> nil
     on_global_status_lost = function(self, afflicted, lost_status)
-        meta.assert_status_interface(self)
-        meta.assert_entity_interface(afflicted)
-        meta.assert_global_status_interface(lost_status)
         return nil
     end,
 
-    -- (StatusInterface, EntityInterface) -> nil
+    -- (StatusProxy, EntityProxy) -> nil
     on_knocked_out = function(self, afflicted)
-        meta.assert_status_interface(self)
-        meta.assert_entity_interface(afflicted)
         return nil
     end,
 
-    -- (StatusInterface, EntityInterface)
+    -- (StatusProxy, EntityProxy)
     on_killed = function(self, afflicted)
-        meta.assert_status_interface(self)
-        meta.assert_entity_interface(afflicted)
         return nil
     end,
 
-    -- (StatusInterface, EntityInterface, EntityInterface) -> nil
+    -- (StatusProxy, EntityProxy, EntityProxy) -> nil
     on_switch = function(self, afflicted, entity_at_old_position)
-        meta.assert_status_interface(self)
-        meta.assert_entity_interface(afflicted)
-        meta.assert_entity_interface(entity_at_old_position)
         return nil
     end,
 
-    -- (StatusInterface, EntityInterface, MoveInterface, Table<EntityInterface>)
+    -- (StatusProxy, EntityProxy, MoveProxy, Table<EntityProxy>)
     on_move_used = function(self, afflicted_user, move, targets)
-        meta.assert_status_interface(self)
-        meta.assert_entity_interface(afflicted_user)
-        meta.assert_move_interface(move)
-        for target in values(targets) do
-            meta.assert_entity_interface(target)
-        end
         return nil
     end,
 
-    -- (StatusInterface, EntityInterface, ConsumableInterface) -> nil
+    -- (StatusProxy, EntityProxy, ConsumableProxy) -> nil
     on_consumable_consumed = function(self, afflicted, consumable)
-        meta.assert_status_interface(self)
-        meta.assert_entity_interface(afflicted)
-        meta.assert_consumable_interface(consumable)
         return nil
     end,
 
-    -- (StatusInterface, EntityInterface, ConsumableInterface) -> nil
+    -- (StatusProxy, EntityProxy, ConsumableProxy) -> nil
     on_consumable_gained = function(self, afflicted, consumable)
-        meta.assert_status_interface(self)
-        meta.assert_entity_interface(afflicted)
-        meta.assert_consumable_interface(consumable)
         return nil
     end,
 
-    -- (StatusInterface, EntityInterface, ConsumableInterface) -> nil
+    -- (StatusProxy, EntityProxy, ConsumableProxy) -> nil
     on_consumable_lost = function(self, afflicted, consumable)
-        meta.assert_status_interface(self)
-        meta.assert_entity_interface(afflicted)
-        meta.assert_consumable_interface(consumable)
         return nil
     end,
 
-    -- (StatusInterface, EntityInterface)
+    -- (StatusProxy, EntityProxy)
     on_entity_spawned = function(self, afflicted)
-        meta.assert_status_interface(self)
-        meta.assert_entity_interface(afflicted)
     end,
-
-    description = "(no additional effect)",
-    flavor_text = "",
-    sprite_id = "status_ailment",
-    sprite_index = 1
 })
 bt.Status._atlas = {}
 
@@ -243,6 +194,7 @@ function bt.Status:realize()
         flavor_text = rt.STRING,
         sprite_id = rt.STRING,
         sprite_index = { rt.UNSIGNED, rt.STRING },
+        animation_id = rt.STRING,
         name = rt.STRING,
         max_duration = rt.UNSIGNED,
         is_silent = rt.BOOLEAN,
@@ -279,6 +231,11 @@ function bt.Status:get_sprite_id()
 end
 
 --- @brief
+function bt.Status:get_animation_id()
+    return self.animation_id
+end
+
+--- @brief
 function bt.Status:get_id()
     return self.id
 end
@@ -306,4 +263,9 @@ end
 --- @brief
 function bt.Status:get_flavor_text()
     return self.flavor_text
+end
+
+--- @brief
+function bt.Statu:get_is_stun()
+    return self.is_stun
 end

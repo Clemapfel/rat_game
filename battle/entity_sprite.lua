@@ -50,6 +50,10 @@ function bt.EntitySprite:set_selection_state(state)
     error("abstract method called")
 end
 
+--- @brief
+function bt.EntitySprite:set_is_stunned(b)
+    error("abstract method called")
+end
 
 
 

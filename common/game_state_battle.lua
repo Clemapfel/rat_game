@@ -179,7 +179,7 @@ function rt.GameState:list_entities()
 end
 
 --- @brief
-function rt.GameState:list_entities_by_speed()
+function rt.GameState:list_entities_in_order()
     local out = self:list_entities()
     table.sort(out, function(a, b)
         if a:get_priority() == b:get_priority() then
@@ -248,6 +248,30 @@ end
 function rt.GameState:entity_get_priority(entity)
     meta.assert_isa(entity, bt.Entity)
     return self:_get_entity_entry(entity).priority
+end
+
+--- @brie
+--- @return Boolean, Unsigned is_stunned, number of turns left
+function rt.GameState:get_is_stunned(entity)
+    meta.assert_isa(entity, bt.Entity)
+
+    local entry = self:_get_entity_entry(entity)
+    if entry == nil then
+        rt.error("In rt.GameState:entity_list_statuses: entity `" .. entity:get_id() .. "` is not part of state")
+        return {}
+    end
+
+    local is_stunned = false
+    local max_n_turns = 0
+    for id, n_turns_elapsed in pairs(entry.statuses) do
+        local status = bt.Status(id)
+        if status:get_is_stun() then
+            is_stunned = true
+            max_n_turns = math.max(max_n_turns, status:get_max_duration() - n_turns_elapsed)
+        end
+    end
+
+    return is_stunned, max_n_turns
 end
 
 --- @brief

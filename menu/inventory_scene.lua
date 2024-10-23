@@ -2151,8 +2151,8 @@ end
 --- @brief
 function mn.InventoryScene:_play_transfer_object_animation(object, from_aabb, to_aabb, before, after)
     local animation = mn.Animation.OBJECT_MOVED(object, from_aabb, to_aabb)
-    animation:signal_connect("before_start", before)
-    animation:signal_connect("after_finish", after)
+    animation:signal_connect("start", before)
+    animation:signal_connect("finish", after)
     self._animation_queue:append(animation)
 end
 

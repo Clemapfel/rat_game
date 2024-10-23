@@ -22,159 +22,102 @@ end, {
     max_n_uses = POSITIVE_INFINITY,
     restore_uses_after_battle = false,
 
-    -- (ConsumableInterface, EntityInterface) -> nil
+    -- (ConsumableProxy, EntityProxy) -> nil
     on_turn_start = function(self, holder)
-        meta.assert_consumable_interface(self)
-        meta.assert_entity_interface(holder)
         return nil
     end,
 
+    -- (ConsumableProxy, EntityProxy) -> nil
     on_turn_end = function(self, holder)
-        meta.assert_consumable_interface(self)
-        meta.assert_entity_interface(holder)
         return nil
     end,
 
     on_battle_end = function(self, holder)
-        meta.assert_consumable_interface(self)
-        meta.assert_entity_interface(holder)
         return nil
     end,
 
-    -- (ConsumableInterface, EntityInterface, Unsigned) -> nil
+    -- (ConsumableProxy, EntityProxy, Unsigned) -> nil
     on_hp_gained = function(self, holder, value)
-        meta.assert_consumable_interface(self)
-        meta.assert_entity_interface(holder)
-        meta.assert_number(value)
         return nil
     end,
 
-    -- (ConsumableInterface, EntityInterface, EntityInterface, Unsigned) -> nil
-    on_healing_performed = function(self, holder, receiver, value)
-        meta.assert_consumable_interface(self)
-        meta.assert_entity_interface(holder)
-        meta.assert_entity_interface(receiver)
-        meta.assert_number(value)
-        return nil
-    end,
-
-    -- (ConsumableInterface, EntityInterface, Unsigned) -> nil
+    -- (ConsumableProxy, EntityProxy, Unsigned) -> nil
     on_hp_lost = function(self, holder, hp_lost)
-        meta.assert_global_status_interface(self)
-        meta.assert_entity_interface(holder)
-        meta.assert_number(hp_lost)
         return nil
     end,
 
-    -- (ConsumableInterface, EntityInterface, EntityInterface, Unsigned) -> nil
+    -- (ConsumableProxy, EntityProxy, EntityProxy, Unsigned) -> nil
+    on_healing_performed = function(self, holder, receiver, value)
+        return nil
+    end,
+
+    -- (ConsumableProxy, EntityProxy, EntityProxy, Unsigned) -> nil
     on_damage_dealt = function(self, holder, damage_taker, value)
-        meta.assert_global_status_interface(self)
-        meta.assert_entity_interface(holder)
-        meta.assert_entity_interface(damage_taker)
-        meta.assert_number(value)
         return nil
     end,
 
-    -- (ConsumableInterface, EntityInterface, StatusInterface) -> nil
+    -- (ConsumableProxy, EntityProxy, StatusProxy) -> nil
     on_status_gained = function(self, holder, gained_status)
-        meta.assert_consumable_interface(self)
-        meta.assert_entity_interface(holder)
-        meta.assert_status_interface(gained_status)
         return nil
     end,
 
-    -- (ConsumableInterface, EntityInterface, StatusInterface)
+    -- (ConsumableProxy, EntityProxy, StatusProxy)
     on_status_lost = function(self, holder, lost_status)
-        meta.assert_consumable_interface(self)
-        meta.assert_entity_interface(holder)
-        meta.assert_status_interface(lost_status)
         return nil
     end,
 
-    -- (ConsumableInterface, EntityInterface, GlobalStatusInterface) -> nil
+    -- (ConsumableProxy, EntityProxy, GlobalStatusProxy) -> nil
     on_global_status_gained = function(self, holder, gained_status)
-        meta.assert_consumable_interface(self)
-        meta.assert_entity_interface(holder)
-        meta.assert_global_status_interface(gained_status)
         return nil
     end,
 
-    -- (ConsumableInterface, EntityInterface, GlobalStatusInterface) -> nil
+    -- (ConsumableProxy, EntityProxy, GlobalStatusProxy) -> nil
     on_global_status_lost = function(self, holder, lost_status)
-        meta.assert_consumable_interface(self)
-        meta.assert_entity_interface(holder)
-        meta.assert_global_status_interface(lost_status)
         return nil
     end,
 
-    -- (ConsumableInterface, EntityInterface) -> nil
+    -- (ConsumableProxy, EntityProxy) -> nil
     on_knocked_out = function(self, holder)
-        meta.assert_consumable_interface(self)
-        meta.assert_entity_interface(holder)
         return nil
     end,
 
-    -- (ConsumableInterface, EntityInterface) -> nil
+    -- (ConsumableProxy, EntityProxy) -> nil
     on_helped_up = function(self, holder)
-        meta.assert_consumable_interface(self)
-        meta.assert_entity_interface(holder)
         return nil
     end,
 
-    -- (ConsumableInterface, EntityInterface) -> nil
+    -- (ConsumableProxy, EntityProxy) -> nil
     on_killed = function(self, holder)
-        meta.assert_consumable_interface(self)
-        meta.assert_entity_interface(holder)
         return nil
     end,
 
-    -- (ConsumableInterface, EntityInterface, EntityInterface) -> nil
+    -- (ConsumableProxy, EntityProxy, EntityProxy) -> nil
     on_switch = function(self, holder, entity_at_old_position)
-        meta.assert_consumable_interface(self)
-        meta.assert_entity_interface(holder)
-        meta.assert_entity_interface(entity_at_old_position)
         return nil
     end,
 
-    -- (ConsumableInterface, EntityInterface, MoveInterface, Table<EntityInterface>)
-    on_move_used= function(self, holding_user, move, targets)
-        meta.assert_consumable_interface(self)
-        meta.assert_entity_interface(holding_user)
-        meta.assert_move_interface(move)
-        for target in values(targets) do
-            meta.assert_entity_interface(target)
-        end
+    -- (ConsumableProxy, EntityProxy, MoveProxy, Table<EntityProxy>)
+    on_move_used = function(self, holding_user, move, targets)
         return nil
     end,
 
-    -- (ConsumableInterface, EntityInterface, ConsumableInterface)
+    -- (ConsumableProxy, EntityProxy, ConsumableProxy)
     on_consumable_consumed = function(self, holder, other_consumable)
-        meta.assert_consumable_interface(self)
-        meta.assert_entity_interface(holder)
-        meta.assert_consumable_interface(other_consumable)
         return nil
     end,
 
-    -- (ConsumableInterface, EntityInterface, ConsumableInterface)
+    -- (ConsumableProxy, EntityProxy, ConsumableProxy)
     on_consumable_gained = function(self, holder, other_consumable)
-        meta.assert_consumable_interface(self)
-        meta.assert_entity_interface(holder)
-        meta.assert_consumable_interface(other_consumable)
         return nil
     end,
 
-    -- (ConsumableInterface, EntityInterface, ConsumableInterface)
+    -- (ConsumableProxy, EntityProxy, ConsumableProxy)
     on_consumable_lost = function(self, holder, other_consumable)
-        meta.assert_consumable_interface(self)
-        meta.assert_entity_interface(holder)
-        meta.assert_consumable_interface(other_consumable)
         return nil
     end,
 
-    -- (ConsumableInterface, EntityInterface)
+    -- (ConsumableProxy, EntityProxy)
     on_entity_spawned = function(self, holder, other_consumable)
-        meta.assert_consumable_interface(self)
-        meta.assert_entity_interface(holder)
         return nil
     end,
 

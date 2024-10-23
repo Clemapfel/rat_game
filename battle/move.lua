@@ -1,6 +1,7 @@
 rt.settings.battle.move = {
     config_path = "assets/configs/moves",
-    name = "Move"
+    name = "Move",
+    default_animation_id = "MOVE_DEFAULT"
 }
 
 --- @class bt.Move
@@ -21,6 +22,13 @@ bt.Move = meta.new_type("Move", function(id)
     end
     return out
 end, {
+    sprite_id = "",
+    sprite_index = 1,
+    animation_id = rt.settings.battle.move.default_animation_id,
+
+    description = "(no effect)",
+    flavor_text = "",
+
     max_n_uses = POSITIVE_INFINITY,
 
     is_intrinsic = false,
@@ -38,14 +46,6 @@ end, {
             meta.assert_entity_interface(target)
         end
     end,
-
-    sprite_id = "",
-    sprite_index = 1,
-    animation_id = "",
-    animation_index = 1,
-
-    description = "(no effect)",
-    flavor_text = ""
 })
 bt.Move._atlas = {}
 
@@ -70,7 +70,6 @@ function bt.Move:realize()
         sprite_id = rt.STRING,
         sprite_index = { rt.UNSIGNED, rt.STRING },
         animation_id = rt.STRING,
-        animation_index = rt.UNSIGNED,
         effect = rt.FUNCTION
     }
 

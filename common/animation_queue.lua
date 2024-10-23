@@ -19,8 +19,8 @@ rt.Animation = meta.new_abstract_type("Animation", rt.Drawable, rt.Updatable, {
 })
 
 meta.add_signals(rt.Animation,
-    "before_start",
-    "after_finish"
+    "start", -- before start invocation
+    "finish" -- after finish invocation
 )
 
 --- @brief

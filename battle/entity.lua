@@ -279,3 +279,8 @@ end
 function bt.Entity:get_priority()
     return self._state:entity_get_priority(self)
 end
+
+--- @brief
+function bt.Entity:get_is_stunned()
+    return self._state:entity_get_is_stunned(self)
+end

@@ -31,7 +31,7 @@ end, {
 
     is_silent = false,
 
-    -- (EquipInterface, EntityInterface) -> nil
+    -- (EquipProxy, EntityProxy) -> nil
     effect = function(self, holder)
         meta.assert_equip_interface(self)
         meta.assert_entity_interface(holder)
