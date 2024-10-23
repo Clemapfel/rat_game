@@ -1,7 +1,7 @@
 --- @class rt.AnimationResult
 rt.AnimationResult = {
-    CONTINUE = true,
-    DISCONTINUE = false
+    CONTINUE = false,
+    DISCONTINUE = true
 }
 
 --- @class rt.AnimationState
@@ -49,10 +49,10 @@ function rt.Animation:get_state()
 end
 
 --- @brief convenience function for no-draw, no-update animations
-rt.AnimationAction = meta.new_type("ActionAnimation", rt.Animation, function(on_start, on_finish)
+rt.AnimationAction = meta.new_type("AnimationAction", rt.Animation, function(on_start, on_finish)
     local out = meta.new(rt.AnimationAction)
-    out:signal_connect("before_start", on_start)
-    out:signal_connect("after_finish", on_finish)
+    out:signal_connect("start", on_start)
+    out:signal_connect("finish", on_finish)
     return out
 end)
 
@@ -114,12 +114,12 @@ do
     local _finish_animation = function(animation)
         animation._state = rt.AnimationState.FINISHED
         animation:finish()
-        animation:signal_emit("after_finish")
+        animation:signal_emit("finish")
     end
 
     local _start_animation = function(animation)
         animation._state = rt.AnimationState.STARTED
-        animation:signal_emit("before_start")
+        animation:signal_emit("start")
         animation:start()
     end
 
