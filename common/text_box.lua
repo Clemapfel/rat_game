@@ -1,6 +1,7 @@
 rt.settings.text_box = {
     show_delay = 0.2, -- seconds
     hide_delay = 1.5, -- seconds
+    n_lines = 2
 }
 
 --- @class rt.TextBox
@@ -25,6 +26,8 @@ rt.TextBox = meta.new_type("TextBox", rt.Widget, rt.Updatable, function()
         _show_delay_elapsed = 0,
         _hide_delay_elapsed = 0,
         _should_emit_scrolling_done = false,
+
+        _n_lines = rt.settings.text_box.n_lines,
         
         _current_y_offset = 0,
         _max_y_offset = 0
@@ -59,14 +62,12 @@ end
 
 --- @brief
 function rt.TextBox:size_allocate(x, y, width, height)
-    self._frame:fit_into(x, y, width, height)
     local m = rt.settings.margin_unit
     local xm = 2 * m + self._frame:get_thickness()
     local ym = m + self._frame:get_thickness()
 
-    local line_height = rt.settings.font.default_size
-    local n_lines = math.floor((height - 2 * ym ) / line_height)
-    local labels_h = n_lines * line_height
+    local font = rt.settings.font.default:get_native(rt.FontStyle.BOLD_ITALIC)
+    local labels_h = self._n_lines * font:getHeight()
     self._label_aabb = rt.AABB(
     x + xm,
     y + 0.5 * height - 0.5 * labels_h,
@@ -74,14 +75,10 @@ function rt.TextBox:size_allocate(x, y, width, height)
         labels_h
     )
 
-    local font = rt.settings.font.default:get_native(rt.FontStyle.BOLD_ITALIC)
-    local stencil_padding = -0.5 * font:getDescent()
-    self._label_stencil:resize(
-        self._label_aabb.x,
-        self._label_aabb.y + stencil_padding,
-        self._label_aabb.width,
-        self._label_aabb.height - 2 * stencil_padding
-    )
+    local frame_h = math.max(labels_h + 2 * ym, height)
+    self._frame:fit_into(x, y, width, frame_h)
+
+    self._label_stencil:resize(self._label_aabb)
 
     self._max_y_offset = 1.3 * (y + height)
     if self._is_visible == false then
@@ -173,10 +170,12 @@ function rt.TextBox:draw()
 
     local stencil_value = meta.hash(self) % 254 + 1
     rt.graphics.stencil(stencil_value, self._label_stencil)
-    self._label_stencil:draw()
 
-    love.graphics.translate(0, -1 * self._current_y_offset) -- or 1 * for bottom alignemnt
-    --self._frame:draw()
+    love.graphics.translate(0, -1 * self._current_y_offset)
+    self._frame:draw()
+    love.graphics.translate(0, 1 * self._current_y_offset)
+
+    --self._label_stencil:draw()
 
     if self._n_entries > 0 then
         rt.graphics.set_stencil_test(rt.StencilCompareMode.EQUAL, stencil_value)
