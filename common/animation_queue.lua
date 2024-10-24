@@ -164,6 +164,31 @@ do
             end
         end
     end
+
+    --- @brief
+    function rt.AnimationQueue:skip()
+        local before = self._n_nodes
+        while self._n_nodes > 0 do
+            local first = self._nodes[1]
+            for animation in values(first.animations) do
+                if animation._state == rt.AnimationState.IDLE then
+                    _start_animation(animation)
+                    animation:update(0)
+                elseif animation._state == rt.AnimationState.STARTED then
+                    animation:update(0)
+                end
+
+                _finish_animation(animation)
+            end
+
+            table.remove(self._nodes, 1)
+            self._n_nodes = self._n_nodes - 1
+        end
+
+        if before > 0 then
+            self:signal_emit("emptied")
+        end
+    end
 end
 
 --- @brief

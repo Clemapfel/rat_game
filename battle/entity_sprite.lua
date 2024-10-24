@@ -26,12 +26,6 @@ function bt.EntitySprite:set_selection(selection_state)
 end
 
 --- @brief
---- @return rt.RenderTexture
-function bt.EntitySprite:get_snapshot()
-    error("abstract method called")
-end
-
---- @brief
 function bt.EntitySprite:add_status(value)
     error("abstract method called")
 end
@@ -76,6 +70,12 @@ function bt.EntitySprite:draw_snapshot(x, y)
     if x == nil then x = 0 end
     if y == nil then y = 0 end
     self._snapshot:draw(self._snapshot_position_x + x, self._snapshot_position_y + y)
+end
+
+--- @brief
+--- @return rt.RenderTexture
+function bt.EntitySprite:get_snapshot()
+    return self._snapshot
 end
 
 --- @brief

@@ -22,12 +22,20 @@
     </configurations>
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="7fa9ba1b-2cff-4ecc-86fb-59ab2fa76ee1" name="Changes" comment="refactored widget realization">
+    <list default="true" id="7fa9ba1b-2cff-4ecc-86fb-59ab2fa76ee1" name="Changes" comment="fixed battle scene layout">
+      <change afterPath="$PROJECT_DIR$/battle/animations/kill.lua" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/battle/animations/kill_initialize.glsl" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/battle/animations/kill_render.glsl" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/battle/animations/kill_step.glsl" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/backgrounds/complex_tiling.glsl" beforeDir="false" afterPath="$PROJECT_DIR$/backgrounds/complex_tiling.glsl" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/battle/animations/dissolve.lua" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/battle/animations/dissolve_compute.glsl" beforeDir="false" afterPath="$PROJECT_DIR$/battle/animations/~kill_compute.glsl" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/battle/animations/dissolve_initialize.glsl" beforeDir="false" afterPath="$PROJECT_DIR$/battle/animations/~kill_initialize.glsl" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/battle/animations/dissolve_render.glsl" beforeDir="false" afterPath="$PROJECT_DIR$/battle/animations/~kill_render.glsl" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/battle/battle_scene.lua" beforeDir="false" afterPath="$PROJECT_DIR$/battle/battle_scene.lua" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/battle/priority_queue.lua" beforeDir="false" afterPath="$PROJECT_DIR$/battle/priority_queue.lua" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/common/game_state_battle.lua" beforeDir="false" afterPath="$PROJECT_DIR$/common/game_state_battle.lua" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/battle/entity_sprite.lua" beforeDir="false" afterPath="$PROJECT_DIR$/battle/entity_sprite.lua" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/common/animation_queue.lua" beforeDir="false" afterPath="$PROJECT_DIR$/common/animation_queue.lua" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/older/~common/animation.lua" beforeDir="false" afterPath="$PROJECT_DIR$/older/~common/animation.lua" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -596,15 +604,7 @@
       <workItem from="1729098138796" duration="20580000" />
       <workItem from="1729180777153" duration="8566000" />
       <workItem from="1729267430460" duration="1705000" />
-      <workItem from="1729269158294" duration="97672000" />
-    </task>
-    <task id="LOCAL-01119" summary="stashing">
-      <option name="closed" value="true" />
-      <created>1728438272335</created>
-      <option name="number" value="01119" />
-      <option name="presentableId" value="LOCAL-01119" />
-      <option name="project" value="LOCAL" />
-      <updated>1728438272335</updated>
+      <workItem from="1729269158294" duration="101651000" />
     </task>
     <task id="LOCAL-01120" summary="stashing parse optimization">
       <option name="closed" value="true" />
@@ -990,7 +990,15 @@
       <option name="project" value="LOCAL" />
       <updated>1729793618780</updated>
     </task>
-    <option name="localTasksCounter" value="1168" />
+    <task id="LOCAL-01168" summary="fixed battle scene layout">
+      <option name="closed" value="true" />
+      <created>1729795131224</created>
+      <option name="number" value="01168" />
+      <option name="presentableId" value="LOCAL-01168" />
+      <option name="project" value="LOCAL" />
+      <updated>1729795131224</updated>
+    </task>
+    <option name="localTasksCounter" value="1169" />
     <servers />
   </component>
   <component name="TypeScriptGeneratedFilesManager">
@@ -1039,7 +1047,6 @@
     </option>
   </component>
   <component name="VcsManagerConfiguration">
-    <MESSAGE value="migrated to hexels" />
     <MESSAGE value="resized sprites" />
     <MESSAGE value="added tab bar animation" />
     <MESSAGE value="enemy alignment working" />
@@ -1064,7 +1071,8 @@
     <MESSAGE value="refactored render texture" />
     <MESSAGE value="implemented stun animation" />
     <MESSAGE value="refactored widget realization" />
-    <option name="LAST_COMMIT_MESSAGE" value="refactored widget realization" />
+    <MESSAGE value="fixed battle scene layout" />
+    <option name="LAST_COMMIT_MESSAGE" value="fixed battle scene layout" />
   </component>
   <component name="XDebuggerManager">
     <breakpoint-manager>

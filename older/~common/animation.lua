@@ -28,8 +28,9 @@ function rt.AnimationHandler:update(delta)
 end
 
 --- @class rt.Animation
-rt.Animation = meta.new_abstract_type("Animation")
-rt.Animation._is_animated = false
+rt.Animation = meta.new_abstract_type("Animation", {
+    _elapsed = 0
+})
 
 --- @brief abstract method, must be override
 function rt.Animation:update(delta)

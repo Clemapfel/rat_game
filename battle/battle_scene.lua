@@ -163,7 +163,7 @@ function bt.BattleScene:size_allocate(x, y, width, height)
     current_x = current_x + max_slot_w + m
     self._verbose_info:fit_into(current_x, current_y, max_slot_w, y + height - current_y - outer_margin)
 
-    local sprite_w = 4 / 3 * height
+    local sprite_w = 4 / 3 * height -- sprite is 4:3, like snes, but screen is 16:9
 
     local queue_w = (width - sprite_w) / 2 - 2 * outer_margin
     self._priority_queue:fit_into(x + outer_margin, current_y, queue_w, height - 2 * outer_margin)
@@ -671,7 +671,9 @@ end
 --- @brief [internal]
 function bt.BattleScene:_handle_button_pressed(which)
     if which == rt.InputButton.A then
-        self._animation_queue:push(bt.Animation.STUN_GAINED(self, self._enemy_sprites[1]))
+        self._animation_queue:push(bt.Animation.KILL(self, self._enemy_sprites[1]))
+    elseif which == rt.InputButton.B then
+        self._animation_queue:skip()
     end
     --[[
     if which == rt.InputButton.A then
