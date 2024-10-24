@@ -1,5 +1,5 @@
 rt.settings.battle.priority_queue = {
-    first_element_scale_factor = 1.5,
+    first_element_scale_factor = 1.2,
     scale_speed = 4, -- 1x per second
 }
 
@@ -93,12 +93,11 @@ end
 function bt.PriorityQueue:_element_draw(element, x, y, scale, opacity, opacity_offset)
     love.graphics.push()
     love.graphics.setColor(element.r, element.g, element.b, math.min(element.a, opacity))
-    love.graphics.translate(-1 * element.width * scale + element.width, 0)
-    love.graphics.translate(-0.5 * element.width, 0)
     love.graphics.translate(opacity_offset, self._consumed_y_offset)
-    love.graphics.translate(x, y)
+    love.graphics.translate(-0.5 * (element.width + element.padding), 0)
+    love.graphics.translate(x + 0.5 * element.width * scale, y)
     love.graphics.scale(scale, scale)
-    love.graphics.translate(-x, -y)
+    love.graphics.translate(-(x + 0.5 * element.width * scale), -y)
     love.graphics.draw(element.snapshot._native, x, y)
     love.graphics.pop()
 end
@@ -173,7 +172,8 @@ function bt.PriorityQueue:size_allocate(x, y, width, height)
         first_scale_height_delta = (first.height * first_scale_factor - first.height)
     end
 
-    local start_x = x + 0.5 * width + 0.5 * first_scale_width_delta
+    local m = 2 * rt.settings.margin_unit
+    local start_x = x + 0.5 * width
     local entity_to_multiplicity_offset = {}
 
     self._render_order = {}
@@ -271,7 +271,7 @@ end
 --- @brief [internal]
 function bt.PriorityQueue:_element_update_state(element)
     element.frame:set_selection_state(element.selection_state)
-    element.frame._stencil_mask:set_color(rt.Palette.FOREGROUND_OUTLINE)
+    element.frame._stencil_mask:set_color(rt.Palette.BACKGROUND)
     self:_element_snapshot(element)
 
     local r, g, b, a = 1, 1, 1, 1

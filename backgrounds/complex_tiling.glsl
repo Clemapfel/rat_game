@@ -115,7 +115,7 @@ vec4 effect(vec4 vertex_color, Image image, vec2 texture_coords, vec2 vertex_pos
     complex.y += 1.5;
     complex *= 4;
 
-    float signal = (sin(time / 5) + 1) / 2;
+    float signal = clamp((sin(time / 5) + 1) / 2, 0.01, 1);
 
     highp vec2 as_polar = complex_to_polar(complex);
     as_polar.x *= cos(complex.x - elapsed) + sin(complex.y + elapsed);

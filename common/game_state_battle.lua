@@ -1353,7 +1353,7 @@ function rt.GameState:initialize_debug_state()
         bt.Entity(self, "BOULDER"),
     }
 
-    local n_sprouts = 15
+    local n_sprouts = 2
     for i = 1, n_sprouts do
         table.insert(entities, bt.Entity(self, "WALKING_SPROUT"))
     end

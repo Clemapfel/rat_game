@@ -138,7 +138,6 @@ function bt.BattleScene:size_allocate(x, y, width, height)
     local current_x = x + outer_margin
     local current_y = y + outer_margin
 
-    self._priority_queue:fit_into(current_x, current_y, tile_size, height - 2 * outer_margin)
     self._global_status_bar:fit_into(
         x + width - outer_margin - tile_size, current_y,
         tile_size, height - 2 * outer_margin
@@ -164,10 +163,15 @@ function bt.BattleScene:size_allocate(x, y, width, height)
     current_x = current_x + max_slot_w + m
     self._verbose_info:fit_into(current_x, current_y, max_slot_w, y + height - current_y - outer_margin)
 
+    local sprite_w = 4 / 3 * height
+
+    local queue_w = (width - sprite_w) / 2 - 2 * outer_margin
+    self._priority_queue:fit_into(x + outer_margin, current_y, queue_w, height - 2 * outer_margin)
+
     self:_reformat_party_sprites(
-        x + outer_margin + tile_size + m,
+        x + 0.5 * width - 0.5 * sprite_w + outer_margin,
         y + height - outer_margin,
-        party_sprites_w,
+        sprite_w - 2 * outer_margin,
         tile_size
     )
 
@@ -177,9 +181,9 @@ function bt.BattleScene:size_allocate(x, y, width, height)
     end
 
     self:_reformat_enemy_sprites(
-        x + outer_margin + tile_size + m,
+        x + 0.5 * width - 0.5 * sprite_w,
         y + outer_margin + tile_size + m,
-        width - 2 * outer_margin - 2 * tile_size - 2 * m,
+        sprite_w,
         height - 2 * outer_margin - tile_size - max_party_sprite_h - 2 * m
     )
 end
@@ -401,6 +405,8 @@ function bt.BattleScene:draw()
         sprite:draw()
     end
 
+    self._priority_queue:draw_bounds()
+
     for x in range(
         self._text_box,
         self._priority_queue,
@@ -417,8 +423,12 @@ function bt.BattleScene:draw()
     end
 
     --love.graphics.line(0.5 * love.graphics.getWidth(), 0, 0.5 * love.graphics.getWidth(), love.graphics.getHeight())
-    love.graphics.line(0, 0.5 * love.graphics.getHeight(), love.graphics.getWidth(), 0.5 * love.graphics.getHeight())
+    local w, h = love.graphics.getDimensions()
+    love.graphics.line(0, 0.5 * h, w, 0.5 * h)
 
+    local left_w = (w - (4 / 3) * h) / 2
+    love.graphics.line(left_w, 0, left_w, h)
+    love.graphics.line(w - left_w, 0, w - left_w, h)
     self._animation_queue:draw()
 end
 
