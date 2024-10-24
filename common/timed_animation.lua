@@ -145,6 +145,7 @@ rt.TimedAnimation = meta.new_type("TimedAnimation", function(duration, start_val
         _duration = duration,
         _f = interpolation_function,
         _should_loop = should_loop,
+        _direction = ternary(start_value <= end_value, 1, -1),
         _elapsed = 0
     })
 
@@ -178,7 +179,7 @@ function rt.TimedAnimation:get_value()
         y = self._f(math.fmod(x, 1))
     end
 
-    return self._lower + y * (self._upper - self._lower)
+    return self._lower + y * self._direction * math.abs(self._upper - self._lower)
 end
 
 --- @brief

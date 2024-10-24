@@ -30,8 +30,7 @@ end)
 
 --- @override
 function mn.Slots:realize()
-    if self._is_realized == true then return end
-    self._is_realized = true
+    if self:already_realized() then return end
 
     self._frame:realize()
 

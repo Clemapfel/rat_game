@@ -16,7 +16,9 @@ end)
 --- @param name String
 --- @param value
 function rt.ComputeShader:send(name, value)
-    self._native:send(name, value)
+    if self._native:hasUniform(name) then
+        self._native:send(name, value)
+    end
 end
 
 --- @brief

@@ -36,8 +36,7 @@ end)
 
 --- @override
 function bt.BattleScene:realize()
-    if self._is_realized == true then return end
-    self._is_realized = true
+    if self:already_realized() then return end
 
     self._text_box:realize()
     self._priority_queue:realize()
@@ -191,16 +190,20 @@ function bt.BattleScene:_reformat_enemy_sprites(x, y, width, height)
     if n_enemies < 1 then return end
 
     local total_w, max_h, max_sprite_only_h = 0, NEGATIVE_INFINITY, NEGATIVE_INFINITY
+    local average_h = 0
     for sprite in values(self._enemy_sprites) do
         local sprite_w, sprite_h = sprite:measure()
         total_w = total_w + sprite_w
         max_h = math.max(max_h, sprite_h)
         max_sprite_only_h = math.max(max_sprite_only_h, select(2, sprite._sprite:measure()))
+        average_h = average_h + sprite_h
     end
+
+    average_h = average_h / n_enemies
 
     local m = rt.settings.margin_unit
     m = math.min(m, (width - total_w) / (n_enemies - 1))
-    local center_x, center_y = x + 0.5 * width, y + 0.5 * height + (max_h - max_sprite_only_h) + m
+    local center_x, center_y = x + 0.5 * width, y + 0.5 * height
 
     self._enemy_sprite_render_order = {}
     local left_x, right_x
@@ -270,7 +273,6 @@ function bt.BattleScene:_reformat_party_sprites(x, bottom_y, width, height)
     end
 end
 
-
 --- @brief
 function bt.BattleScene:_update_slots(entity)
     local entry = self._move_selection[entity]
@@ -300,7 +302,6 @@ function bt.BattleScene:_update_slots(entity)
             moves:set_object(slot_i, move, "<o>" .. n_left_label .. "</o>")
         end
     end
-
 
     local intrinsic_nodes = intrinsics:get_selection_nodes()
     local move_nodes = moves:get_selection_nodes()
@@ -416,7 +417,7 @@ function bt.BattleScene:draw()
     end
 
     --love.graphics.line(0.5 * love.graphics.getWidth(), 0, 0.5 * love.graphics.getWidth(), love.graphics.getHeight())
-    --love.graphics.line(0, 0.5 * love.graphics.getHeight(), love.graphics.getWidth(), 0.5 * love.graphics.getHeight())
+    love.graphics.line(0, 0.5 * love.graphics.getHeight(), love.graphics.getWidth(), 0.5 * love.graphics.getHeight())
 
     self._animation_queue:draw()
 end
@@ -660,7 +661,7 @@ end
 --- @brief [internal]
 function bt.BattleScene:_handle_button_pressed(which)
     if which == rt.InputButton.A then
-        self:_push_animation(bt.Animation.STUN_GAINED(self, table.first(self._enemy_sprites)))
+        self._animation_queue:push(bt.Animation.STUN_GAINED(self, self._enemy_sprites[1]))
     end
     --[[
     if which == rt.InputButton.A then

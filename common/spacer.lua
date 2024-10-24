@@ -12,8 +12,7 @@ end)
 
 --- @override
 function rt.Spacer:realize()
-    if self._is_realized == true then return end
-    self._is_realized = true
+    if self:already_realized() then return end
 
     self._shape:set_color(self._color)
 end

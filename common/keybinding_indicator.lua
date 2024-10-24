@@ -21,8 +21,7 @@ end, {
 
 --- @override
 function rt.KeybindingIndicator:realize()
-    if self:get_is_realized() == true then return end
-    self._is_realized = true
+    if self:already_realized() then return end
 end
 
 --- @brief

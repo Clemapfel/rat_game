@@ -32,8 +32,7 @@ meta.add_signal(mn.Scale, "value_changed")
 
 --- @override
 function mn.Scale:realize()
-    if self._is_realized == true then return end
-    self._is_realized = true
+    if self:already_realized() then return end
 
     for shape in range(self._rail_center, self._rail_left, self._rail_right) do
         shape:set_color(rt.Palette.BASE)

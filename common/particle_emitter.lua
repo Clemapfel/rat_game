@@ -114,6 +114,7 @@ end
 
 --- @overload
 function rt.ParticleEmitter:realize()
+    if self:already_realized() then return end
     if meta.is_widget(self._particle) and not self._particle:get_is_realized() then
         self._particle:realize()
         self:_snapshot_particle()

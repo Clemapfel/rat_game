@@ -49,8 +49,7 @@ end
 
 --- @brief
 function rt.TextBox:realize()
-    if self._is_realized == true then return end
-    self._is_realized = true
+    if self:already_realized() then return end
     self._frame:realize()
 
     self._label_stencil:set_color(rt.RGBA(0.3, 0.3, 0.3, 0.8))

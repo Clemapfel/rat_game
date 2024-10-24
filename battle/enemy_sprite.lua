@@ -1,3 +1,7 @@
+rt.settings.battle.enemy_sprite = {
+    stunned_animation_width_to_height_ratio = 0.1
+}
+
 --- @class bt.EnemySprite
 bt.EnemySprite = meta.new_type("EnemySprite", bt.EntitySprite, function(entity)
     return meta.new(bt.EnemySprite, {
@@ -15,14 +19,15 @@ bt.EnemySprite = meta.new_type("EnemySprite", bt.EntitySprite, function(entity)
 
         _snapshot = rt.RenderTexture(1, 1),
         _snapshot_position_x = 0,
-        _snapshot_position_y = 0
+        _snapshot_position_y = 0,
+
+        _stunned_animation = bt.StunnedParticleAnimation()
     })
 end)
 
 --- @brief
 function bt.EnemySprite:realize()
-    if self._is_realized == true then return end
-    self._is_realized = true
+    if self:already_realized() then return end
 
     self._health_bar:realize()
     self._speed_value:realize()
@@ -30,6 +35,7 @@ function bt.EnemySprite:realize()
     self._name:realize()
     self._sprite:realize()
     self._selection_frame:realize()
+    self._stunned_animation:realize()
 end
 
 --- @brief
@@ -74,6 +80,15 @@ function bt.EnemySprite:size_allocate(x, y, width, height)
         self._sprite:draw()
         self._snapshot:unbind()
     end
+
+    local stunned_animation_w = sprite_w
+    local stunned_animation_h = sprite_w * rt.settings.battle.enemy_sprite.stunned_animation_width_to_height_ratio
+    self._stunned_animation:fit_into(
+        self._snapshot_position_x,
+        self._snapshot_position_y - 0.5 * stunned_animation_h,
+        sprite_w,
+        stunned_animation_h
+    )
 end
 
 --- @override
@@ -96,6 +111,10 @@ function bt.EnemySprite:draw()
         self._speed_value:draw()
     end
 
+    if self._is_stunned then
+        self._stunned_animation:draw()
+    end
+
     self._name:draw()
 end
 
@@ -104,6 +123,10 @@ function bt.EnemySprite:update(delta)
     self._health_bar:update(delta)
     self._speed_value:update(delta)
     self._status_consumable_bar:update(delta)
+
+    if self._is_stunned then
+        self._stunned_animation:update(delta)
+    end
 
     local before = self._sprite:get_frame()
     self._sprite:update(delta)
@@ -125,4 +148,9 @@ end
 function bt.EnemySprite:set_selection_state(state)
     self._selection_state = state
     self._selection_frame:set_selection_state(state)
+end
+
+--- @override
+function bt.EnemySprite:set_is_stunned(b)
+    self._is_stunned = b
 end

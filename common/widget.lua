@@ -243,6 +243,16 @@ function rt.Widget:get_is_allocated()
 end
 
 --- @brief
+function rt.Widget:already_realized()
+    if self._is_realized ~= true then
+        self._is_realized = true
+        return false
+    else
+        return true
+    end
+end
+
+--- @brief
 function rt.Widget:draw_bounds()
     love.graphics.setLineWidth(2)
     local as_hsva = rt.HSVA((meta.hash(self) % 100) / 100, 1, 1, 1)

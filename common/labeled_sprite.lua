@@ -19,8 +19,7 @@ end)
 
 --- @override
 function rt.LabeledSprite:realize()
-    if self._is_realized then return end
-    self._is_realized = true
+    if self:already_realized() then return end
 
     self._sprite:realize()
     self._label = rt.Label(self._label_text)

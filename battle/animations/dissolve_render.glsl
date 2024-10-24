@@ -90,8 +90,17 @@ vec4 effect(vec4 _, Image image, vec2 texture_coords, vec2 screen_coords)
     vec2 distance_normalization = (snapshot_size / 20);
     float time = elapsed * distance(position_data.xy / distance_normalization, position_data.zw / distance_normalization) ;
 
+    float border = 100;
+    //if (position_data.x < border || position_data.x > love_ScreenSize.x - border || position_data.y < border || position_data.y > love_ScreenSize.y - border)
+      //  discard;
+
     vec3 darkened_red = red - (random(vec2(instance_id)) / 2 + 1) * 0.4 - elapsed / 2;
     vec3 color = mix(vertex_color.rgb, darkened_red, clamp(time * color_velocity, 0, 1));
+
+    float outline = 0.001;
+    //if (texture_coordinates.x < outline || texture_coordinates.x > 1 - outline || texture_coordinates.y < outline || texture_coordinates.y >= 1)
+      //  color = vec3(0);
+
     return vec4(color, 1);
 }
 #endif

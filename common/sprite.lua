@@ -32,8 +32,7 @@ end,
 
 --- @override
 function rt.Sprite:realize()
-    if self._is_realized == true then return end
-    self._is_realized = true
+    if self:already_realized() then return end
 
     self._spritesheet = rt.SpriteAtlas:get(self._id)
     if self._spritesheet == nil then

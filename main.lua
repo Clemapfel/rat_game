@@ -38,7 +38,7 @@ queue:push(rt.AnimationAction(
 ))
 
 local background = rt.Background()
-background:set_implementation(rt.Background.TEMP_TRIANGLE_TILING)
+background:set_implementation(rt.Background.COMPLEX_TILING)
 
 local draw_state = true
 input = rt.InputController()
@@ -106,7 +106,7 @@ love.load = function()
 end
 
 love.update = function(delta)
-    --background:update(delta)
+    background:update(delta)
 
     if profiler_active then
         rt.profiler.push("update")
@@ -121,7 +121,7 @@ love.update = function(delta)
 end
 
 love.draw = function()
-    --background:draw()
+    background:draw()
     if draw_state then
         if profiler_active then
             rt.profiler.push("draw")

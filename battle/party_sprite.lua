@@ -24,14 +24,15 @@ bt.PartySprite = meta.new_type("BattlePartySprite", bt.EntitySprite, function(en
 
         _snapshot = rt.RenderTexture(1, 1),
         _snapshot_position_x = 0,
-        _snapshot_position_y = 0
+        _snapshot_position_y = 0,
+
+        _stunned_animation = bt.StunnedParticleAnimation()
     })
 end)
 
 --- @override
 function bt.PartySprite:realize()
-    if self._is_realized == true then return end
-    self._is_realized = true
+    if self:already_realized() then return end
 
     self._frame:realize()
     self._health_bar:realize()
@@ -40,6 +41,8 @@ function bt.PartySprite:realize()
     self._sprite:realize()
     self._name:realize()
     self._name:set_justify_mode(rt.JustifyMode.LEFT)
+
+    self._stunned_animation:realize()
 
     local top_color = rt.RGBA(1, 1, 1, 1)
     local bottom_color = rt.RGBA(0.4, 0.4, 0.4, 1)
@@ -102,12 +105,21 @@ function bt.PartySprite:size_allocate(x, y, width, height)
         self._sprite:draw()
         self._snapshot:unbind()
     end
+
+    local stunned_animation_w = sprite_w
+    local stunned_animation_h = sprite_w * rt.settings.battle.enemy_sprite.stunned_animation_width_to_height_ratio
+    self._stunned_animation:fit_into(
+        self._snapshot_position_x,
+        self._snapshot_position_y - 0.5 * stunned_animation_h,
+        sprite_w,
+        stunned_animation_h
+    )
 end
 
 --- @override
 function bt.PartySprite:draw()
-    self._sprite:draw()
     self._frame:draw()
+    self._snapshot:draw(self._snapshot_position_x, self._snapshot_position_y)
 
     if self._gradient_visible then
         local value = meta.hash(self) % 254 + 1
@@ -123,6 +135,10 @@ function bt.PartySprite:draw()
     self._speed_value:draw()
     self._health_bar:draw()
     self._status_consumable_bar:draw()
+
+    if self._is_stunned then
+        self._stunned_animation:draw()
+    end
 end
 
 --- @override
@@ -137,6 +153,10 @@ function bt.PartySprite:update(delta)
         self._snapshot:bind()
         self._sprite:draw()
         self._snapshot:unbind()
+    end
+
+    if self._is_stunned then
+        self._stunned_animation:update(delta)
     end
 end
 

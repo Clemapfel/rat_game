@@ -117,6 +117,7 @@ end
 
 --- @overload rt.Widget.realize
 function rt.Frame:realize()
+    if self:already_realized() then return end
     if meta.is_widget(self._child) then
         self._child:realize()
     end

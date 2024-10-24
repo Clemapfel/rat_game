@@ -108,8 +108,7 @@ rt.Keyboard._layout = {
 
 --- @override
 function rt.Keyboard:realize()
-    if self._is_realized == true then return end
-    self._is_realized = true
+    if self:already_realized() then return end
 
     self._letter_frame:realize()
     self._labels = {}

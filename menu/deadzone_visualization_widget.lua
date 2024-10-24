@@ -9,8 +9,7 @@ end)
 
 --- @override
 function mn.DeadzoneVisualizationWidget:realize()
-    if self._is_realized then return end
-    self._is_realized = true
+    if self:already_realized() then return end
     self._inner_shape:set_color(rt.Palette.FOREGROUND)
     self._outer_shape:set_color(rt.Palette.FOREGROUND_OUTLINE)
 end

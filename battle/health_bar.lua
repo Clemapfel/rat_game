@@ -39,8 +39,7 @@ end)
 
 --- @override
 function bt.HealthBar:realize()
-    if self._is_realized == true then return end
-    self._is_realized = true
+    if self:already_realized() then return end
 
     for outline in range(self._backdrop_outline, self._shape_outline) do
         outline:set_is_outline(true)

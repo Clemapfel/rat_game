@@ -14,8 +14,7 @@ end)
 
 --- @override
 function mn.MSAAIntensityWidget:realize()
-    if self._is_realized == true then return end
-    self._is_realized = true
+    if self:already_realized() then return end
 
     self._shape:set_color(rt.Palette.TRUE_BLACK)
     self._shape:set_is_outline(true)

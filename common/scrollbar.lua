@@ -19,7 +19,7 @@ end)
 
 --- @brief
 function rt.Scrollbar:realize()
-    if self._is_realized == true then return end
+    if self:already_realized() then return end
     self._base:set_color(rt.Palette.GRAY_5)
     self._base_outline:set_color(rt.Palette.BACKGROUND_OUTLINE)
     self._base_outline:set_is_outline(true)

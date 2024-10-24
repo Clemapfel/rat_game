@@ -151,7 +151,6 @@ end
 
 --- @brief
 rt.cosine_wave = function(x, frequency)
-
     return (math.cos(2 * math.pi * x * frequency - math.pi / 2) + 1) * 0.5
 end
 

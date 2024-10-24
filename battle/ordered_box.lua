@@ -118,8 +118,7 @@ end
 
 --- @override
 function bt.OrderedBox:realize()
-    if self._is_realized == true then return end
-    self._is_realized = true
+    if self:already_realized() then return end
 
     for item in values(self._widget_to_item) do
         item.widget:realize()

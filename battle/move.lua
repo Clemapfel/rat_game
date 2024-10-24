@@ -52,7 +52,6 @@ bt.Move._atlas = {}
 --- @brief
 function bt.Move:realize()
     if self._is_realized == true then return end
-
     self.effect = nil
 
     local template = {

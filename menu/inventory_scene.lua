@@ -63,7 +63,7 @@ end, {
 
 --- @override
 function mn.InventoryScene:realize()
-    if self._is_realized == true then return end
+    if self:already_realized() then return end
 
     local tab_bar_sprite_id = "menu_icons"
     local tab_sprites = {

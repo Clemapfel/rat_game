@@ -82,11 +82,6 @@ void computemain()
     float direction = sign(current.y - center.y);
     vec2 diff = current - center;
 
-    vec2 previous = translate_point_by_angle(current, 1 + abs(random(gl_GlobalInvocationID.xy) * 10), -PI * 1.5 + random(gl_GlobalInvocationID.xy) * PI / 12);
-    previous.x = previous.x + 2;
-
-    if (abs(diff.y + 0.1 * height) < height * 0.05)
-        previous.x = previous.x + 20;
-
+    vec2 previous = translate_point_by_angle(current, 1 + abs(random(gl_GlobalInvocationID.xy)), atan(current.y - center.y, current.x - center.x));
     imageStore(position_texture, ivec2(position.x, position.y), vec4(current, previous));
 }

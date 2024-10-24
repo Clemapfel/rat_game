@@ -27,8 +27,7 @@ end
 
 --- @brief
 function bt.SpeedValue:realize()
-    if self._is_realized == true then return end
-    self._is_realized = true
+    if self:already_realized() then return end
 
     local speed_string = self:_format_value()
     self._label = rt.Label("<o><b>" .. speed_string .. "</o></b>")

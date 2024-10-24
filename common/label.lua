@@ -141,11 +141,19 @@ function rt.Label:draw()
     -- canvas needs to be drawn premultiplied to avoid artifacting
 
     if self._use_outline and self._outline_texture ~= nil then
-        self._outline_texture:draw(justify_offset + self._outline_texture_offset_x, self._outline_texture_offset_y)
+        self._outline_texture:draw(
+            justify_offset + self._outline_texture_offset_x,
+            self._outline_texture_offset_y,
+            1, 1, 1, self._opacity
+        )
     end
 
     if self._swap_texture ~= nil then
-        self._swap_texture:draw(justify_offset + self._outline_texture_offset_x, self._outline_texture_offset_y)
+        self._swap_texture:draw(
+            justify_offset + self._outline_texture_offset_x,
+            self._outline_texture_offset_y,
+            1, 1, 1, self._opacity
+        )
     end
 
     love.graphics.setBlendMode("alpha")
@@ -154,9 +162,7 @@ end
 
 --- @override
 function rt.Label:realize()
-    if self._is_realized == true then return end
-    self._is_realized = true
-
+    if self:already_realized() then return end
     self:_parse()
 end
 

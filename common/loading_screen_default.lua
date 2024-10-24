@@ -38,8 +38,7 @@ end)
 
 --- @override
 function rt.LoadingScreen.DEFAULT:realize()
-    if self._is_realized == true then return end
-    self._is_realized = true
+    if self:already_realized() then return end
 
     for labels in values(self._label_frames) do
         labels:realize()

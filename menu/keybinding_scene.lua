@@ -47,7 +47,7 @@ end, {
 
 --- @override
 function mn.KeybindingScene:realize()
-    if self._is_realized == true then return end
+    if self:already_realized() then return end
 
     self._input_method = self._input_controller:get_input_method()
     local labels = rt.TextAtlas:get(rt.settings.menu.keybinding_scene.text_atlas_id)

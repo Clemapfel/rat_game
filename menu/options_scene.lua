@@ -225,8 +225,7 @@ end)
 
 --- @override
 function mn.OptionsScene:realize()
-    if self._is_realized then return end
-    self._is_realized = true
+    if self:already_realized() then return end
 
     local scene = self
 

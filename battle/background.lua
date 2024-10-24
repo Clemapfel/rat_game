@@ -29,7 +29,7 @@ end)
 
 --- @override
 function bt.ShaderOnlyBackground:realize()
-    if self._is_realized == true then return end
+    if self:already_realized() then return end
     self._is_realized = true
     self._shader = rt.Shader(self._path)
     self._shape = rt.VertexRectangle(0, 0, 1, 1)
