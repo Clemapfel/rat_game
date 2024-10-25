@@ -22,20 +22,15 @@
     </configurations>
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="7fa9ba1b-2cff-4ecc-86fb-59ab2fa76ee1" name="Changes" comment="fixed battle scene layout">
-      <change afterPath="$PROJECT_DIR$/battle/animations/kill.lua" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/battle/animations/kill_initialize.glsl" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/battle/animations/kill_render.glsl" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/battle/animations/kill_step.glsl" afterDir="false" />
+    <list default="true" id="7fa9ba1b-2cff-4ecc-86fb-59ab2fa76ee1" name="Changes" comment="refactored kill animation">
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/battle/animations/dissolve.lua" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/battle/animations/dissolve_compute.glsl" beforeDir="false" afterPath="$PROJECT_DIR$/battle/animations/~kill_compute.glsl" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/battle/animations/dissolve_initialize.glsl" beforeDir="false" afterPath="$PROJECT_DIR$/battle/animations/~kill_initialize.glsl" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/battle/animations/dissolve_render.glsl" beforeDir="false" afterPath="$PROJECT_DIR$/battle/animations/~kill_render.glsl" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/battle/battle_scene.lua" beforeDir="false" afterPath="$PROJECT_DIR$/battle/battle_scene.lua" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/battle/entity_sprite.lua" beforeDir="false" afterPath="$PROJECT_DIR$/battle/entity_sprite.lua" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/common/animation_queue.lua" beforeDir="false" afterPath="$PROJECT_DIR$/common/animation_queue.lua" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/older/~common/animation.lua" beforeDir="false" afterPath="$PROJECT_DIR$/older/~common/animation.lua" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/assets/configs/entities/BOULDER.lua" beforeDir="false" afterPath="$PROJECT_DIR$/assets/configs/entities/BOULDER.lua" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/assets/why.png" beforeDir="false" afterPath="$PROJECT_DIR$/assets/sprites/why.png" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/battle/animations/kill.lua" beforeDir="false" afterPath="$PROJECT_DIR$/battle/animations/kill.lua" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/battle/animations/kill_initialize.glsl" beforeDir="false" afterPath="$PROJECT_DIR$/battle/animations/kill_initialize.glsl" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/battle/animations/kill_render.glsl" beforeDir="false" afterPath="$PROJECT_DIR$/battle/animations/kill_render.glsl" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/battle/animations/kill_step.glsl" beforeDir="false" afterPath="$PROJECT_DIR$/battle/animations/kill_step.glsl" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/main.lua" beforeDir="false" afterPath="$PROJECT_DIR$/main.lua" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -150,11 +145,11 @@
       <recent name="C:\Users\cleme\Workspace\rat_game\love\windows" />
     </key>
     <key name="MoveFile.RECENT_KEYS">
+      <recent name="C:\Users\cleme\Workspace\rat_game\assets\sprites" />
       <recent name="C:\Users\cleme\Workspace\rat_game\assets\configs\moves\old" />
       <recent name="C:\Users\cleme\Workspace\rat_game\physics\box2d_extension" />
       <recent name="C:\Users\cleme\Workspace\rat_game\common" />
       <recent name="C:\Users\cleme\Workspace\rat_game\old" />
-      <recent name="C:\Users\cleme\Workspace\rat_game\physics" />
     </key>
   </component>
   <component name="RunManager" selected="Lua Application.main">
@@ -604,15 +599,7 @@
       <workItem from="1729098138796" duration="20580000" />
       <workItem from="1729180777153" duration="8566000" />
       <workItem from="1729267430460" duration="1705000" />
-      <workItem from="1729269158294" duration="101651000" />
-    </task>
-    <task id="LOCAL-01120" summary="stashing parse optimization">
-      <option name="closed" value="true" />
-      <created>1728509353503</created>
-      <option name="number" value="01120" />
-      <option name="presentableId" value="LOCAL-01120" />
-      <option name="project" value="LOCAL" />
-      <updated>1728509353503</updated>
+      <workItem from="1729269158294" duration="124933000" />
     </task>
     <task id="LOCAL-01121" summary="parsing working">
       <option name="closed" value="true" />
@@ -998,7 +985,15 @@
       <option name="project" value="LOCAL" />
       <updated>1729795131224</updated>
     </task>
-    <option name="localTasksCounter" value="1169" />
+    <task id="LOCAL-01169" summary="refactored kill animation">
+      <option name="closed" value="true" />
+      <created>1729799109485</created>
+      <option name="number" value="01169" />
+      <option name="presentableId" value="LOCAL-01169" />
+      <option name="project" value="LOCAL" />
+      <updated>1729799109485</updated>
+    </task>
+    <option name="localTasksCounter" value="1170" />
     <servers />
   </component>
   <component name="TypeScriptGeneratedFilesManager">
@@ -1047,7 +1042,6 @@
     </option>
   </component>
   <component name="VcsManagerConfiguration">
-    <MESSAGE value="resized sprites" />
     <MESSAGE value="added tab bar animation" />
     <MESSAGE value="enemy alignment working" />
     <MESSAGE value="added simulation environment sandbox" />
@@ -1072,7 +1066,8 @@
     <MESSAGE value="implemented stun animation" />
     <MESSAGE value="refactored widget realization" />
     <MESSAGE value="fixed battle scene layout" />
-    <option name="LAST_COMMIT_MESSAGE" value="fixed battle scene layout" />
+    <MESSAGE value="refactored kill animation" />
+    <option name="LAST_COMMIT_MESSAGE" value="refactored kill animation" />
   </component>
   <component name="XDebuggerManager">
     <breakpoint-manager>

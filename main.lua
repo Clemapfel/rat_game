@@ -122,12 +122,21 @@ end
 
 love.draw = function()
     background:draw()
+    love.graphics.clear(0, 0, 0, 0)
     if draw_state then
         if profiler_active then
             rt.profiler.push("draw")
         end
 
-        state:_draw()
+       -- state:_draw()
+
+        if state._current_scene ~= nil then
+            local sprite = state._current_scene._enemy_sprites[1]
+            if sprite._is_visible then
+                sprite:draw_snapshot()
+            end
+            state._current_scene._animation_queue:draw()
+        end
 
         if profiler_active then
             rt.profiler.pop("draw")

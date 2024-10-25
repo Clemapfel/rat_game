@@ -28,6 +28,9 @@ varying vec4 vertex_color;
 
 vec4 effect(vec4 _, Image image, vec2 texture_coords, vec2 screen_coords)
 {
+    const float boundary = 0.1;
+    bool within_boundary = all(greaterThanEqual(texture_coords, vec2(boundary))) && all(lessThanEqual(texture_coords, vec2(1.0 - boundary)));
     return vertex_color;
+    return within_boundary ? vertex_color : vec4(vec3(1), 1);
 }
 #endif

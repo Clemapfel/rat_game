@@ -2,7 +2,7 @@ return {
     name = "Overlay Optimistic Boulder",
     flavor_text = "Just rolling'",
 
-    sprite_id = "battle/boulder",
+    sprite_id = "why",
 
     portrait_sprite_id = "portraits",
     portrait_sprite_index = "BOULDER",
