@@ -9,7 +9,7 @@ bt.Animation.KILL = meta.new_type("KILL", rt.Animation, function(scene, target)
         _initialize_shader = rt.ComputeShader("battle/animations/kill_initialize.glsl"),
 
         _pixel_shape = rt.VertexRectangle(0, 0, 1, 1),
-        _pixel_size = rt.settings.sprite.scale_factor,
+        _pixel_size = 4, --rt.settings.sprite.scale_factor,
         _n_instances = 1,
 
         _scene = scene,

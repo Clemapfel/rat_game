@@ -100,10 +100,12 @@ void computemain()
     vec2 previous = position_data.zw;
     float mass_data = imageLoad(mass_texture, position).x; // in [0, 1]
 
+    float velocity_loss = clamp(pow(elapsed, 1.55), 0, 1);
+
     highp vec2 gravity = normalize(vec2(current - center_of_gravity));
-    gravity = rotate(gravity, noise(position) * (PI / 4));
-    gravity.y += elapsed / 100;
-    gravity *= 400 * project(clamp(elapsed, 0, 1), 0.3, 1);
+    gravity = rotate(gravity, noise(position) * (PI / 16) * (1 - velocity_loss));
+    gravity *= 1000 * (1 - clamp(pow(velocity_loss, 2) * 2500, 0, 1));
+
     float delta_squared = delta * delta;
 
     const float mass_factor = 10;
@@ -116,21 +118,25 @@ void computemain()
     float damping = 1 - gaussian(distance(position, 0.5 * dispatch_size) / max(dispatch_size.x, dispatch_size.y), 1);
     //imageStore(color_texture, position, vec4(vec3(damping), 1));
 
-    vec2 downward_force = vec2(0, elapsed / 100); // term unaffected by mass, in case mass is 0
+    vec2 downward_force = vec2(0, pow(elapsed + 1.2, 2)); // term unaffected by mass, in case mass is 0
 
     damping = project(damping, min_damping, max_damping);
+    damping -= project(velocity_loss, 0, 0.1);
 
-    vec2 next = current + (current - previous) * damping + mass * gravity * delta_squared + downward_force;
+    vec2 next = current + (current - previous) + damping * mass * gravity * delta_squared + downward_force * delta;
 
     imageStore(position_texture, position, vec4(next, current.xy));
+
+    vec4 color_data = imageLoad(color_texture, position);
+    color_data.xyz = mix(color_data.xyz, vec3(1, 0, 0), elapsed / 20);
+    imageStore(color_texture, position, color_data);
 
     // check if particle left screen
     float x = screen_aabb.x;
     float y = screen_aabb.y;
     float w = screen_aabb.z;
     float h = screen_aabb.w;
-    if (current.x <= x || current.y <= y || current.x >= x + w || current.y >= y + h) {
-        vec4 color_data = imageLoad(color_texture, position);
+    if (current.y > y + h) {//(current.x <= x || current.y <= y || current.x >= x + w || current.y >= y + h) {
         if (color_data.a >= 0) {
             atomicAdd(n[0], 1);
             imageStore(color_texture, position, vec4(-1));

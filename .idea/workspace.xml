@@ -22,15 +22,11 @@
     </configurations>
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="7fa9ba1b-2cff-4ecc-86fb-59ab2fa76ee1" name="Changes" comment="refactored kill animation">
+    <list default="true" id="7fa9ba1b-2cff-4ecc-86fb-59ab2fa76ee1" name="Changes" comment="stashing kill explosion">
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/assets/configs/entities/BOULDER.lua" beforeDir="false" afterPath="$PROJECT_DIR$/assets/configs/entities/BOULDER.lua" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/assets/why.png" beforeDir="false" afterPath="$PROJECT_DIR$/assets/sprites/why.png" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/battle/animations/kill.lua" beforeDir="false" afterPath="$PROJECT_DIR$/battle/animations/kill.lua" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/battle/animations/kill_initialize.glsl" beforeDir="false" afterPath="$PROJECT_DIR$/battle/animations/kill_initialize.glsl" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/battle/animations/kill_render.glsl" beforeDir="false" afterPath="$PROJECT_DIR$/battle/animations/kill_render.glsl" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/battle/animations/kill_step.glsl" beforeDir="false" afterPath="$PROJECT_DIR$/battle/animations/kill_step.glsl" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/main.lua" beforeDir="false" afterPath="$PROJECT_DIR$/main.lua" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/love/love" beforeDir="false" afterPath="$PROJECT_DIR$/love/love" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -599,15 +595,7 @@
       <workItem from="1729098138796" duration="20580000" />
       <workItem from="1729180777153" duration="8566000" />
       <workItem from="1729267430460" duration="1705000" />
-      <workItem from="1729269158294" duration="124933000" />
-    </task>
-    <task id="LOCAL-01121" summary="parsing working">
-      <option name="closed" value="true" />
-      <created>1728513517766</created>
-      <option name="number" value="01121" />
-      <option name="presentableId" value="LOCAL-01121" />
-      <option name="project" value="LOCAL" />
-      <updated>1728513517767</updated>
+      <workItem from="1729269158294" duration="128139000" />
     </task>
     <task id="LOCAL-01122" summary="wrapping working">
       <option name="closed" value="true" />
@@ -993,7 +981,15 @@
       <option name="project" value="LOCAL" />
       <updated>1729799109485</updated>
     </task>
-    <option name="localTasksCounter" value="1170" />
+    <task id="LOCAL-01170" summary="stashing kill explosion">
+      <option name="closed" value="true" />
+      <created>1729886401036</created>
+      <option name="number" value="01170" />
+      <option name="presentableId" value="LOCAL-01170" />
+      <option name="project" value="LOCAL" />
+      <updated>1729886401036</updated>
+    </task>
+    <option name="localTasksCounter" value="1171" />
     <servers />
   </component>
   <component name="TypeScriptGeneratedFilesManager">
@@ -1042,7 +1038,6 @@
     </option>
   </component>
   <component name="VcsManagerConfiguration">
-    <MESSAGE value="added tab bar animation" />
     <MESSAGE value="enemy alignment working" />
     <MESSAGE value="added simulation environment sandbox" />
     <MESSAGE value="added battle script function declarations" />
@@ -1067,7 +1062,8 @@
     <MESSAGE value="refactored widget realization" />
     <MESSAGE value="fixed battle scene layout" />
     <MESSAGE value="refactored kill animation" />
-    <option name="LAST_COMMIT_MESSAGE" value="refactored kill animation" />
+    <MESSAGE value="stashing kill explosion" />
+    <option name="LAST_COMMIT_MESSAGE" value="stashing kill explosion" />
   </component>
   <component name="XDebuggerManager">
     <breakpoint-manager>
