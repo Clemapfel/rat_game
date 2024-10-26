@@ -232,7 +232,7 @@ end
 --- @brief
 function rt.GameState:_run()
     love.window.setTitle("rat_game")
-    love.window.setIcon(love.image.newImageData("assets/favicon.png"))
+    --love.window.setIcon("assets/favicon.ico")
     love.filesystem.setIdentity("rat_game")
     self:_update_window_mode()
 
