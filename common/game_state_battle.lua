@@ -252,7 +252,7 @@ end
 
 --- @brie
 --- @return Boolean, Unsigned is_stunned, number of turns left
-function rt.GameState:get_is_stunned(entity)
+function rt.GameState:entity_get_is_stunned(entity)
     meta.assert_isa(entity, bt.Entity)
 
     local entry = self:_get_entity_entry(entity)
@@ -340,9 +340,8 @@ function rt.GameState:entity_set_state(entity, new_state)
     entry.state = new_state
 end
 
-function rt.GameState:entity_get_state(entity, new_state)
+function rt.GameState:entity_get_state(entity)
     meta.assert_isa(entity, bt.Entity)
-    meta.assert_enum_value(new_state, bt.EntityState)
 
     local entry = self:_get_entity_entry(entity)
     if entry == nil then

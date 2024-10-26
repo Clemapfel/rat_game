@@ -101,7 +101,7 @@ for name_type_proxy in range(
     end
 
     meta["is_" .. name .. "_proxy"] = function(x)
-        if type(x) ~= "table" then return end
+        if _G.type(x) ~= "table" then return end
         local metatable = getmetatable(x)
         return metatable._type == proxy and meta.isa(metatable._native, type)
     end
@@ -331,9 +331,10 @@ function bt.BattleScene:create_simulation_environment()
     end
 
     --- @param callback_id String
-    --- @param status bt.Status
+    --- @param status_proxy bt.StatusProxy
     --- @param afflicted_proxy bt.EntityProxy
-    local _try_invoke_status_callback = function(callback_id, status, afflicted_proxy, ...)
+    local _try_invoke_status_callback = function(callback_id, status_proxy, afflicted_proxy, ...)
+        local status = _get_native(status_proxy)
         if status[callback_id] == nil then return end
         local afflicted = _get_native(afflicted_proxy)
         local afflicted_sprite = _scene._sprites[afflicted]
@@ -341,50 +342,37 @@ function bt.BattleScene:create_simulation_environment()
             _scene, status, afflicted_sprite
         )
         _scene:_push_animation(animation)
-        _scene:invoke(status[callback_id], status, afflicted_proxy, ...)
-    end
-
-    local _invoke_all_status_callbacks = function(callback_id, afflicted_proxy, ...)
-        local afflicted = _get_native(afflicted_proxy)
-        for status in values(_state:entity_list_statuses(afflicted)) do
-            _try_invoke_status_callback(callback_id, status, afflicted_proxy)
-        end
+        _scene:invoke(status[callback_id], status_proxy, afflicted_proxy, ...)
     end
 
     --- @param callback_id String
-    --- @param consumable bt.Consumable
-    --- @param holder_proxy bt.EntityProxy
-    local _try_invoke_consumable_callback = function(callback_id, consumable, holder_proxy, ...)
-        if consumable[callback_id] == nil then return end
-        local holder = _get_native(holder_proxy)
-        local holder_sprite = _scene._sprites[holder]
-        local animation = bt.Animation.STATUS_APPLIED(
-            _scene, consumable, holder_sprite
+    --- @param global_status_proxy bt.GlobalStatusProxy
+    --- @param afflicted_proxy bt.EntityProxy
+    local _try_invoke_global_status_callback = function(callback_id, global_status_proxy, afflicted_proxy, ...)
+        local status = _get_native(global_status_proxy)
+        if status[callback_id] == nil then return end
+        local afflicted = _get_native(afflicted_proxy)
+        local afflicted_sprite = _scene._sprites[afflicted]
+        local animation = bt.Animation.GLOBAL_STATUS_APPLIED(
+            _scene, status, afflicted_sprite
         )
         _scene:_push_animation(animation)
-        _scene:invoke(consumable[callback_id], consumable, holder_proxy, ...)
-    end
-
-    local _invoke_all_consumable_callbacks = function(callback_id, holder_proxy, ...)
-        local holder = _get_native(holder_proxy)
-        for consumable in values(_state:entity_list_consumables(holder)) do
-            _try_invoke_consumable_callback(callback_id, consumable, holder_proxy, ...)
-        end
+        _scene:invoke(status[callback_id], global_status_proxy, afflicted_proxy, ...)
     end
 
     --- @param callback_id String
-    --- @param global_status bt.GlobalStatusProxy
-    local _try_invoke_global_status_callback = function(callback_id, global_status, ...)
-        if global_status[callback_id] == nil then return end
-        local animation bt.Animation.GLOBAL_STATUS_APPLIED(_scene, global_status)
+    --- @param consumable_proxy bt.ConsumableProxy
+    --- @param holder_proxy bt.EntityProxy
+    local _try_invoke_consumable_callback = function(callback_id, consumable_proxy, holder_proxy, ...)
+        local consumable = _get_native(consumable_proxy)
+        if consumable[callback_id] == nil then return end
+        local afflicted = _get_native(holder_proxy)
+        local afflicted_sprite = _scene._sprites[afflicted]
+        local animation = bt.Animation.CONSUMABLE_APPLIED(
+            _scene, consumable, afflicted_sprite
+        )
         _scene:_push_animation(animation)
-        _scene:invoke(global_status[callback_id], global_status, ...)
-    end
-
-    local _invoke_all_global_status_callbacks = function(callback_id, ...)
-        for global_status in values(_state:list_global_statuses()) do
-            _try_invoke_global_status_callback(callback_id, global_status, ...)
-        end
+        _scene:invoke(consumable[callback_id], consumable_proxy, holder_proxy, ...)
     end
 
     --- @brief add numerical value to entity cache, is reduced by `per_turn_offset` at end of turn
@@ -497,6 +485,24 @@ function bt.BattleScene:create_simulation_environment()
     function env.get_state(entity_proxy)
         bt.assert_args("get_state", entity_proxy, bt.EntityProxy)
         return _state:entity_get_state(_get_native(entity_proxy))
+    end
+
+    --- @brief
+    function env.get_is_dead(entity_proxy)
+        bt.assert_args("get_is_dead", entity_proxy, bt.EntityProxy)
+        return _state:entity_get_state(_get_native(entity_proxy)) == bt.EntityState.DEAD
+    end
+
+    --- @brief
+    function env.get_is_knocked_out(entity_proxy)
+        bt.assert_args("get_is_knocked_out", entity_proxy, bt.EntityProxy)
+        return _state:entity_get_state(_get_native(entity_proxy)) == bt.EntityState.KNOCKED_OUT
+    end
+
+    --- @brief
+    function env.get_is_alive(entity_proxy)
+        bt.assert_args("get_is_knocked_out", entity_proxy, bt.EntityProxy)
+        return _state:entity_get_state(_get_native(entity_proxy)) == bt.EntityState.ALIVE
     end
 
     --- @brief
@@ -629,9 +635,19 @@ function bt.BattleScene:create_simulation_environment()
         -- callbacks
         _try_invoke_status_callback("on_gained", status_proxy, entity_proxy)
 
-        _invoke_all_consumable_callbacks("on_status_gained", entity_proxy, status_proxy)
-        _invoke_all_status_callbacks("on_status_gained", entity_proxy, status_proxy)
-        _invoke_all_global_status_callbacks("on_status_gained", entity_proxy, status_proxy)
+        for other_status in values(env.get_statuses(entity_proxy)) do
+            if other_status ~= status_proxy then
+                _try_invoke_status_callback("on_status_gained", other_status, entity_proxy, status_proxy)
+            end
+        end
+
+        for consumable in values(env.get_consumables(entity_proxy)) do
+            _try_invoke_consumable_callback("on_status_gained", consumable, entity_proxy, status_proxy)
+        end
+
+        for global_status in values(env.get_global_statuses()) do
+            _try_invoke_global_status_callback("on_status_gained", global_status, entity_proxy, status_proxy)
+        end
     end
 
     --- @brief
@@ -683,6 +699,12 @@ function bt.BattleScene:create_simulation_environment()
         )
 
         --TODO#
+    end
+
+    --- @brief
+    function env.get_is_stunned(entity_proxy)
+        bt.assert_args("get_is_stunned", entity_proxy, bt.EntityProxy)
+        return _state:entity_get_is_stunned(_get_native(entity_proxy))
     end
 
     --- @brief

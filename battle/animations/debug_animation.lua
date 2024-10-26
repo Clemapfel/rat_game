@@ -6,9 +6,18 @@ function bt.Animation._create_debug_animation(animation_id)
     label:fit_into(0, 0, label:measure())
 
     getmetatable(out).__call = function(self, scene, ...)
+        local targets = {}
+        local n_args = select("#", ...)
+        for i = 1, n_args do
+            local arg = select(i, ...)
+            if meta.isa(arg, bt.EntitySprite) then
+                table.insert(targets, arg)
+            end
+        end
+
         return meta.new(out, {
             _scene = scene,
-            _targets = {...},
+            _targets = targets,
             _label_positions = {},
             _label = label,
             _label_w = 1,
@@ -46,7 +55,6 @@ function bt.Animation._create_debug_animation(animation_id)
 
         self._angle = self._angle_animation:get_value()
         self._label:set_opacity(self._opacity_animation:get_value())
-        dbg(self._opacity_animation:get_value())
 
         return self._angle_animation:get_is_done() and self._opacity_animation:get_is_done()
     end

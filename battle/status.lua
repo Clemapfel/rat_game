@@ -26,7 +26,7 @@ end, {
 
     sprite_id = "status_ailment",
     sprite_index = 1,
-    animation_id = rt.settings.battle.default_animation_id,
+    animation_id = rt.settings.battle.status.default_animation_id,
 
     attack_offset = 0,   -- Signed
     defense_offset = 0,  -- Signed

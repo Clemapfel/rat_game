@@ -111,6 +111,15 @@ rt.InterpolationFunctions = meta.new_enum("InterpolationFunction", {
         return h * ((math.tanh((a * x / h) - a * math.floor(x / h) - a / 2) / (2 * math.tanh(a / 2)) + 0.5 + math.floor(x / h)))
     end,
 
+    SHELF = function(x, shelf_width, order)
+        -- https://www.desmos.com/calculator/zxo1os3qen
+        if shelf_width == nil then shelf_width = 0.5 end
+        shelf_width = clamp(shelf_width, 0, 1)
+        if order == nil then order = 6 end
+        if order % 2 ~= 0 then order = order + 1 end
+        return 1 - math.tanh(math.pow(2 * ((x - 0.5) / shelf_width), order))
+    end,
+
     SINE_WAVE = function(x, frequency)
         -- \frac{\cos\left(3\pi\left(bx-1\right)\right)}{2}+0.5
         if frequency == nil then frequency = 2 end
@@ -158,6 +167,26 @@ rt.TimedAnimation = meta.new_type("TimedAnimation", function(duration, start_val
 end)
 
 meta.add_signal(rt.TimedAnimation, "done")
+
+--- @brief
+function rt.TimedAnimation:set_lower(lower)
+    self._lower = lower
+end
+
+--- @brief
+function rt.TimedAnimation:set_upper(upper)
+    self._upper = upper
+end
+
+--- @brief
+function rt.TimedAnimation:set_duration(duration)
+    self._duration = duration
+end
+
+--- @brief
+function rt.TimedAnimation:set_should_loop(b)
+    self._should_loop = b
+end
 
 --- @brief
 function rt.TimedAnimation:update(delta)

@@ -6,6 +6,6 @@ return {
     max_duration = POSITIVE_INFINITY,
     is_stun = false,
 
-    sprite_id = "status",
+    sprite_id = "statuses",
     sprite_index = "DEBUG_STATUS"
 }
