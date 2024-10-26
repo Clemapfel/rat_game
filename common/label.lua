@@ -137,7 +137,9 @@ function rt.Label:draw()
         justify_offset = self._outline_texture_justify_right_offset
     end
 
-    love.graphics.setBlendMode("alpha", "premultiplied")
+    if self._opacity == 1 then
+        love.graphics.setBlendMode("alpha", "premultiplied")
+    end
     -- canvas needs to be drawn premultiplied to avoid artifacting
 
     if self._use_outline and self._outline_texture ~= nil then
@@ -156,7 +158,9 @@ function rt.Label:draw()
         )
     end
 
-    love.graphics.setBlendMode("alpha")
+    if self._opacity == 1 then
+        love.graphics.setBlendMode("alpha")
+    end
     love.graphics.translate(-self._bounds.x, -self._bounds.y)
 end
 

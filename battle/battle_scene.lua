@@ -671,7 +671,7 @@ end
 --- @brief [internal]
 function bt.BattleScene:_handle_button_pressed(which)
     if which == rt.InputButton.A then
-        self._animation_queue:push(bt.Animation.KILL(self, self._enemy_sprites[1]))
+        self._animation_queue:push(bt.Animation._create_debug_animation("TEST")(self, table.unpack(self._enemy_sprites)))
     elseif which == rt.InputButton.B then
         self._animation_queue:skip()
     end

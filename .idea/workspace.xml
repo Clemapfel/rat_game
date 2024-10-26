@@ -22,13 +22,13 @@
     </configurations>
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="7fa9ba1b-2cff-4ecc-86fb-59ab2fa76ee1" name="Changes" comment="explosion looks natural now">
-      <change afterPath="$PROJECT_DIR$/love/windows/love.svg" afterDir="false" />
+    <list default="true" id="7fa9ba1b-2cff-4ecc-86fb-59ab2fa76ee1" name="Changes" comment="added favicon">
+      <change afterPath="$PROJECT_DIR$/battle/animations/debug_animation.lua" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/common/game_state.lua" beforeDir="false" afterPath="$PROJECT_DIR$/common/game_state.lua" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/love/windows/game.ico" beforeDir="false" afterPath="$PROJECT_DIR$/love/windows/game.ico" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/love/windows/love.exe" beforeDir="false" afterPath="$PROJECT_DIR$/love/windows/love.exe" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/love/windows/love.ico" beforeDir="false" afterPath="$PROJECT_DIR$/love/windows/love.ico" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/battle/battle_scene.lua" beforeDir="false" afterPath="$PROJECT_DIR$/battle/battle_scene.lua" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/common/label.lua" beforeDir="false" afterPath="$PROJECT_DIR$/common/label.lua" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/common/timed_animation.lua" beforeDir="false" afterPath="$PROJECT_DIR$/common/timed_animation.lua" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/main.lua" beforeDir="false" afterPath="$PROJECT_DIR$/main.lua" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -597,15 +597,7 @@
       <workItem from="1729098138796" duration="20580000" />
       <workItem from="1729180777153" duration="8566000" />
       <workItem from="1729267430460" duration="1705000" />
-      <workItem from="1729269158294" duration="131366000" />
-    </task>
-    <task id="LOCAL-01123" summary="stashing label">
-      <option name="closed" value="true" />
-      <created>1728521487204</created>
-      <option name="number" value="01123" />
-      <option name="presentableId" value="LOCAL-01123" />
-      <option name="project" value="LOCAL" />
-      <updated>1728521487204</updated>
+      <workItem from="1729269158294" duration="133689000" />
     </task>
     <task id="LOCAL-01124" summary="outline working but too big">
       <option name="closed" value="true" />
@@ -991,7 +983,15 @@
       <option name="project" value="LOCAL" />
       <updated>1729889754703</updated>
     </task>
-    <option name="localTasksCounter" value="1172" />
+    <task id="LOCAL-01172" summary="added favicon">
+      <option name="closed" value="true" />
+      <created>1729978943252</created>
+      <option name="number" value="01172" />
+      <option name="presentableId" value="LOCAL-01172" />
+      <option name="project" value="LOCAL" />
+      <updated>1729978943252</updated>
+    </task>
+    <option name="localTasksCounter" value="1173" />
     <servers />
   </component>
   <component name="TypeScriptGeneratedFilesManager">
@@ -1040,7 +1040,6 @@
     </option>
   </component>
   <component name="VcsManagerConfiguration">
-    <MESSAGE value="added simulation environment sandbox" />
     <MESSAGE value="added battle script function declarations" />
     <MESSAGE value="added triangle tiling" />
     <MESSAGE value="circular wipe working" />
@@ -1065,7 +1064,8 @@
     <MESSAGE value="refactored kill animation" />
     <MESSAGE value="stashing kill explosion" />
     <MESSAGE value="explosion looks natural now" />
-    <option name="LAST_COMMIT_MESSAGE" value="explosion looks natural now" />
+    <MESSAGE value="added favicon" />
+    <option name="LAST_COMMIT_MESSAGE" value="added favicon" />
   </component>
   <component name="XDebuggerManager">
     <breakpoint-manager>

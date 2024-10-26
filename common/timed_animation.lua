@@ -5,6 +5,11 @@ rt.InterpolationFunctions = meta.new_enum("InterpolationFunction", {
         return x
     end,
 
+    LINEAR_BANDPASS = function(x)
+        -- 1\ -\operatorname{abs}\left(2\left(x-0.5\right)\right)
+        return 1 - math.abs(2 * (x - 0.5))
+    end,
+
     SINUSOID_EASE_IN = function(x)
         -- -1\ \cdot\ \cos\left(x\ \cdot\left(\frac{\pi}{2}\right)\right)+1
         return -1.0 * math.cos(x * (math.pi / 2)) + 1.0;
