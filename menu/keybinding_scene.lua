@@ -95,8 +95,6 @@ function mn.KeybindingScene:realize()
     })
     self._control_indicator:realize()
 
-    self:create_from_state(self._state)
-
     local scene = self
     self._input_controller:set_treat_left_joystick_as_dpad(true)
     self._input_controller:signal_disconnect_all()
@@ -140,11 +138,10 @@ function mn.KeybindingScene:realize()
             scene._heading_label:set_text(labels.heading_gamepad)
         end
 
-        if scene._is_realized then
+        if self:get_is_realized() then
             self:reformat()
         end
     end)
-    self._input_controller:signal_emit("input_method_changed", self._input_controller:get_input_method())
 
     self._confirm_load_default_dialog = rt.MessageDialog(
         labels.confirm_load_default_message,
@@ -196,6 +193,8 @@ function mn.KeybindingScene:realize()
         self:close()
     end)
 
+    self._input_controller:signal_emit("input_method_changed", self._input_controller:get_input_method())
+    self:create_from_state(self._state)
     self._is_realized = true
 end
 

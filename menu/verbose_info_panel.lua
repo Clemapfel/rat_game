@@ -57,8 +57,23 @@ end)
 
 --- @brief
 function mn.VerboseInfoPanel:show(...)
+    local see_also = {}
     self._items = {}
     for object in values({...}) do
+        local item = mn.VerboseInfoPanel.Item()
+        item:create_from(object)
+        item:realize()
+        table.insert(self._items, item)
+        rt.savepoint_maybe()
+
+        if meta.is_table(object) and object.see_also ~= nil then
+            for x in values(object.see_also) do
+                table.insert(see_also, x)
+            end
+        end
+    end
+
+    for object in values(see_also) do
         local item = mn.VerboseInfoPanel.Item()
         item:create_from(object)
         item:realize()

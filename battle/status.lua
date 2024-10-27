@@ -221,6 +221,7 @@ function bt.Status:realize()
     end
 
     meta.set_is_mutable(self, true)
+    self.see_also = {}
     rt.load_config(self._path, self, template)
     self._is_realized = true
     meta.set_is_mutable(self, false)
