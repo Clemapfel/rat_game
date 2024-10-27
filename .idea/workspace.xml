@@ -22,12 +22,13 @@
     </configurations>
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="7fa9ba1b-2cff-4ecc-86fb-59ab2fa76ee1" name="Changes" comment="implemented status bar">
+    <list default="true" id="7fa9ba1b-2cff-4ecc-86fb-59ab2fa76ee1" name="Changes" comment="stashing">
+      <change afterPath="$PROJECT_DIR$/battle/string_formatting.lua" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/battle/animations/status_applied.lua" beforeDir="false" afterPath="$PROJECT_DIR$/battle/animations/status_applied.lua" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/battle/enemy_sprite.lua" beforeDir="false" afterPath="$PROJECT_DIR$/battle/enemy_sprite.lua" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/battle/entity_sprite.lua" beforeDir="false" afterPath="$PROJECT_DIR$/battle/entity_sprite.lua" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/battle/animations/message.lua" beforeDir="false" afterPath="$PROJECT_DIR$/battle/animations/message.lua" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/battle/simulation_handler.lua" beforeDir="false" afterPath="$PROJECT_DIR$/battle/simulation_handler.lua" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/include.lua" beforeDir="false" afterPath="$PROJECT_DIR$/include.lua" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/main.lua" beforeDir="false" afterPath="$PROJECT_DIR$/main.lua" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -596,23 +597,7 @@
       <workItem from="1729098138796" duration="20580000" />
       <workItem from="1729180777153" duration="8566000" />
       <workItem from="1729267430460" duration="1705000" />
-      <workItem from="1729269158294" duration="139755000" />
-    </task>
-    <task id="LOCAL-01127" summary="fixed n characters for mixed outlined labels">
-      <option name="closed" value="true" />
-      <created>1728586968470</created>
-      <option name="number" value="01127" />
-      <option name="presentableId" value="LOCAL-01127" />
-      <option name="project" value="LOCAL" />
-      <updated>1728586968471</updated>
-    </task>
-    <task id="LOCAL-01128" summary="fixed font issue">
-      <option name="closed" value="true" />
-      <created>1728589420217</created>
-      <option name="number" value="01128" />
-      <option name="presentableId" value="LOCAL-01128" />
-      <option name="project" value="LOCAL" />
-      <updated>1728589420217</updated>
+      <workItem from="1729269158294" duration="144015000" />
     </task>
     <task id="LOCAL-01129" summary="labels working">
       <option name="closed" value="true" />
@@ -990,7 +975,23 @@
       <option name="project" value="LOCAL" />
       <updated>1729988101135</updated>
     </task>
-    <option name="localTasksCounter" value="1176" />
+    <task id="LOCAL-01176" summary="status applied working">
+      <option name="closed" value="true" />
+      <created>1729988980434</created>
+      <option name="number" value="01176" />
+      <option name="presentableId" value="LOCAL-01176" />
+      <option name="project" value="LOCAL" />
+      <updated>1729988980434</updated>
+    </task>
+    <task id="LOCAL-01177" summary="stashing">
+      <option name="closed" value="true" />
+      <created>1729989108666</created>
+      <option name="number" value="01177" />
+      <option name="presentableId" value="LOCAL-01177" />
+      <option name="project" value="LOCAL" />
+      <updated>1729989108666</updated>
+    </task>
+    <option name="localTasksCounter" value="1178" />
     <servers />
   </component>
   <component name="TypeScriptGeneratedFilesManager">
@@ -1039,8 +1040,6 @@
     </option>
   </component>
   <component name="VcsManagerConfiguration">
-    <MESSAGE value="stashing" />
-    <MESSAGE value="refactored animation and animation queue" />
     <MESSAGE value="stashing before reworking textbox" />
     <MESSAGE value="stashing textbox" />
     <MESSAGE value="stashing before refactoring selection graph nodes" />
@@ -1064,7 +1063,9 @@
     <MESSAGE value="added debug animation" />
     <MESSAGE value="status gained done" />
     <MESSAGE value="implemented status bar" />
-    <option name="LAST_COMMIT_MESSAGE" value="implemented status bar" />
+    <MESSAGE value="status applied working" />
+    <MESSAGE value="stashing" />
+    <option name="LAST_COMMIT_MESSAGE" value="stashing" />
   </component>
   <component name="XDebuggerManager">
     <breakpoint-manager>

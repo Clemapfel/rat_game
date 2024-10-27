@@ -627,6 +627,9 @@ function bt.BattleScene:create_simulation_environment()
         end)
 
         _scene:_push_animation(animation)
+        if animation_id == rt.settings.battle.status.default_animation_id then
+            _scene:_append_animation(bt.Animation.MESSAGE(_scene, "TODO" )) -- TODO: message formatting
+        end
 
         if stun_before == false and will_stun == true then
             _scene._push_animation(bt.Animation.STUN_GAINED(_scene, sprite))

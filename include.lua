@@ -230,6 +230,7 @@ require "battle.consumable"
 require "battle.status"
 require "battle.global_status"
 require "battle.entity"
+require "battle.string_formatting"
 
 require "battle.ordered_box"
 require "battle.health_bar"
