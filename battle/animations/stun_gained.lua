@@ -55,7 +55,7 @@ end, {
 function bt.Animation.STUN_GAINED:start()
     self._sprite_timer = rt.TimedAnimation(
         self._duration, 0, 1,
-        rt.InterpolationFunctions.GAUSSIAN_BANDPASS
+        rt.InterpolationFunctions.GAUSSIAN
     )
 
     self._target:set_is_visible(false)

@@ -22,18 +22,16 @@
     </configurations>
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="7fa9ba1b-2cff-4ecc-86fb-59ab2fa76ee1" name="Changes" comment="added battle string formatting">
+    <list default="true" id="7fa9ba1b-2cff-4ecc-86fb-59ab2fa76ee1" name="Changes" comment="added automatic text formatting">
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/battle/animations/message.lua" beforeDir="false" afterPath="$PROJECT_DIR$/battle/animations/message.lua" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/battle/animations/debug_animation.lua" beforeDir="false" afterPath="$PROJECT_DIR$/battle/animations/debug_animation.lua" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/battle/animations/status_lost.lua" beforeDir="false" afterPath="$PROJECT_DIR$/battle/animations/status_lost.lua" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/battle/animations/stun_gained.lua" beforeDir="false" afterPath="$PROJECT_DIR$/battle/animations/stun_gained.lua" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/battle/battle_scene.lua" beforeDir="false" afterPath="$PROJECT_DIR$/battle/battle_scene.lua" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/battle/equip.lua" beforeDir="false" afterPath="$PROJECT_DIR$/battle/equip.lua" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/battle/global_status.lua" beforeDir="false" afterPath="$PROJECT_DIR$/battle/global_status.lua" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/battle/move.lua" beforeDir="false" afterPath="$PROJECT_DIR$/battle/move.lua" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/battle/enemy_sprite.lua" beforeDir="false" afterPath="$PROJECT_DIR$/battle/enemy_sprite.lua" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/battle/simulation_handler.lua" beforeDir="false" afterPath="$PROJECT_DIR$/battle/simulation_handler.lua" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/battle/status.lua" beforeDir="false" afterPath="$PROJECT_DIR$/battle/status.lua" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/battle/string_formatting.lua" beforeDir="false" afterPath="$PROJECT_DIR$/battle/string_formatting.lua" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/common/label.lua" beforeDir="false" afterPath="$PROJECT_DIR$/common/label.lua" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/main.lua" beforeDir="false" afterPath="$PROJECT_DIR$/main.lua" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/common/game_state_battle.lua" beforeDir="false" afterPath="$PROJECT_DIR$/common/game_state_battle.lua" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/common/timed_animation.lua" beforeDir="false" afterPath="$PROJECT_DIR$/common/timed_animation.lua" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -602,15 +600,7 @@
       <workItem from="1729098138796" duration="20580000" />
       <workItem from="1729180777153" duration="8566000" />
       <workItem from="1729267430460" duration="1705000" />
-      <workItem from="1729269158294" duration="147438000" />
-    </task>
-    <task id="LOCAL-01130" summary="stashing before removing render texture usage">
-      <option name="closed" value="true" />
-      <created>1728660744283</created>
-      <option name="number" value="01130" />
-      <option name="presentableId" value="LOCAL-01130" />
-      <option name="project" value="LOCAL" />
-      <updated>1728660744283</updated>
+      <workItem from="1729269158294" duration="152653000" />
     </task>
     <task id="LOCAL-01131" summary="reworked render texture caching">
       <option name="closed" value="true" />
@@ -996,7 +986,15 @@
       <option name="project" value="LOCAL" />
       <updated>1730052344034</updated>
     </task>
-    <option name="localTasksCounter" value="1179" />
+    <task id="LOCAL-01179" summary="added automatic text formatting">
+      <option name="closed" value="true" />
+      <created>1730055728618</created>
+      <option name="number" value="01179" />
+      <option name="presentableId" value="LOCAL-01179" />
+      <option name="project" value="LOCAL" />
+      <updated>1730055728618</updated>
+    </task>
+    <option name="localTasksCounter" value="1180" />
     <servers />
   </component>
   <component name="TypeScriptGeneratedFilesManager">
@@ -1045,7 +1043,6 @@
     </option>
   </component>
   <component name="VcsManagerConfiguration">
-    <MESSAGE value="stashing textbox" />
     <MESSAGE value="stashing before refactoring selection graph nodes" />
     <MESSAGE value="refactored selection graph" />
     <MESSAGE value="entity move selection graph done" />
@@ -1070,7 +1067,8 @@
     <MESSAGE value="status applied working" />
     <MESSAGE value="stashing" />
     <MESSAGE value="added battle string formatting" />
-    <option name="LAST_COMMIT_MESSAGE" value="added battle string formatting" />
+    <MESSAGE value="added automatic text formatting" />
+    <option name="LAST_COMMIT_MESSAGE" value="added automatic text formatting" />
   </component>
   <component name="XDebuggerManager">
     <breakpoint-manager>

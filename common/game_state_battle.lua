@@ -908,7 +908,7 @@ function rt.GameState:entity_remove_status(entity, status)
         return
     end
 
-    entry.statuses[status.get_id()] = nil
+    entry.statuses[status:get_id()] = nil
 end
 
 --- @brief

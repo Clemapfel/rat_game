@@ -29,7 +29,7 @@ function bt.Animation._create_debug_animation(animation_id)
             ),
             _opacity_animation = rt.TimedAnimation(
                 1, 0, 1,
-                rt.InterpolationFunctions.BUTTERWORTH_BANDPASS, 5
+                rt.InterpolationFunctions.BUTTERWORTH, 5
             ),
         })
     end

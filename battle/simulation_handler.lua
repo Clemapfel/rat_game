@@ -677,29 +677,28 @@ function bt.BattleScene:create_simulation_environment()
         end
 
         if stun_before == false and will_stun == true then
-            _scene._push_animation(bt.Animation.STUN_GAINED(_scene, sprite))
+            _scene:_push_animation(bt.Animation.STUN_GAINED(_scene, sprite))
         end
+
+        _scene:_push_animation(bt.Animation.STATUS_APPLIED(_scene, status, sprite))
 
         -- callbacks
         _try_invoke_status_callback("on_gained", status_proxy, entity_proxy)
 
+        local callback_id = "on_status_gained"
         for other_status in values(env.get_statuses(entity_proxy)) do
             if other_status ~= status_proxy then
-                _try_invoke_status_callback("on_status_gained", other_status, entity_proxy, status_proxy)
+                _try_invoke_status_callback(callback_id, other_status, entity_proxy, status_proxy)
             end
         end
 
         for consumable in values(env.get_consumables(entity_proxy)) do
-            _try_invoke_consumable_callback("on_status_gained", consumable, entity_proxy, status_proxy)
+            _try_invoke_consumable_callback(callback_id, consumable, entity_proxy, status_proxy)
         end
 
         for global_status in values(env.get_global_statuses()) do
-            _try_invoke_global_status_callback("on_status_gained", global_status, entity_proxy, status_proxy)
+            _try_invoke_global_status_callback(callback_id, global_status, entity_proxy, status_proxy)
         end
-
-        -- TODO
-        _scene:_push_animation(bt.Animation.STATUS_APPLIED(_scene, status, sprite))
-        _scene:_append_animation(bt.Animation.MESSAGE(_scene, status:get_name() .. " activated"))
     end
 
     --- @brief
@@ -708,7 +707,46 @@ function bt.BattleScene:create_simulation_environment()
             entity_proxy, bt.EntityProxy,
             status_proxy, bt.StatusProxy
         )
-        -- TODO#
+
+        if env.has_status(entity_proxy, status_proxy) == false then return end
+
+        local entity, status = _get_native(entity_proxy), _get_native(status_proxy)
+        local sprite = _scene._sprites[entity]
+        local animation = bt.Animation.STATUS_LOST(_scene, status, sprite)
+
+        local stun_before = _state:entity_get_is_stunned(entity)
+        _state:entity_remove_status(entity, status)
+        local stun_after = _state:entity_get_is_stunned(entity)
+
+        animation:signal_connect("start", function(_)
+            sprite:remove_status(status)
+            _scene:set_priority_order(_state:list_entities_in_order())
+        end)
+
+        _scene:_push_animation(animation)
+        env.message(entity_proxy, "has lost", status_proxy)
+
+        if stun_before == true and stun_after == false then
+            _scene:_push_animation(bt.Animation.STUN_LOST(_scene, sprite))
+        end
+
+        -- callbacks
+        _try_invoke_status_callback("on_lost", status_proxy, entity_proxy)
+
+        local callback_id = "on_status_lost"
+        for other_status in values(env.get_statuses(entity_proxy)) do
+            if other_status ~= status_proxy then
+                _try_invoke_status_callback(callback_id, other_status, entity_proxy, status_proxy)
+            end
+        end
+
+        for consumable in values(env.get_consumables(entity_proxy)) do
+            _try_invoke_consumable_callback(callback_id, consumable, entity_proxy, status_proxy)
+        end
+
+        for global_status in values(env.get_global_statuses()) do
+            _try_invoke_global_status_callback(callback_id, global_status, entity_proxy, status_proxy)
+        end
     end
 
     --- @brief
@@ -1077,7 +1115,7 @@ function bt.BattleScene:create_simulation_environment()
                 table.insert(msg, bt.format_name(arg))
             end
         end
-        _scene:_push_animation(bt.Animation.MESSAGE(_scene, table.concat(msg, " ")))
+        _scene:_append_animation(bt.Animation.MESSAGE(_scene, table.concat(msg, " ")))
     end
 
     return meta.as_immutable(env)

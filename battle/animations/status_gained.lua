@@ -20,6 +20,7 @@ bt.Animation.STATUS_GAINED = meta.new_type("STATUS_GAINED", rt.Animation, functi
         _sprite_x = 0,
         _sprite_y = 0,
         _sprite_angle = 0,
+        _sprite_opacity = 0,
 
         _rotation_animation = rt.TimedAnimation(duration,
             -2 * rotation, 0,
@@ -28,7 +29,7 @@ bt.Animation.STATUS_GAINED = meta.new_type("STATUS_GAINED", rt.Animation, functi
 
         _opacity_animation = rt.TimedAnimation(2 * duration, -- hold for 1s after others are done
             0, 1,
-            rt.InterpolationFunctions.SHELF, 1, 20
+            rt.InterpolationFunctions.SHELF, 0.6
         ),
 
         _position_animation = rt.TimedAnimation(duration,
@@ -37,13 +38,24 @@ bt.Animation.STATUS_GAINED = meta.new_type("STATUS_GAINED", rt.Animation, functi
         ),
         _sprite_path = nil, -- rt.Spline
     })
-end)
+end, {
+    status_to_sprite = {}
+})
 
 --- @brief
 function bt.Animation.STATUS_GAINED:start()
-    self._sprite:realize()
-    local sprite_w, sprite_h = self._sprite:measure()
-    self._sprite:fit_into(-0.5 * sprite_w, -0.5 * sprite_h)
+    local sprite = bt.Animation.STATUS_LOST.status_to_sprite[self._status]
+    local sprite_w, sprite_h
+
+    if sprite == nil then
+        sprite = rt.Sprite(self._status:get_sprite_id())
+        sprite:realize()
+        sprite:set_opacity(0)
+        sprite_w, sprite_h = sprite:measure()
+        sprite:fit_into(-0.5 * sprite_w, -0.5 * sprite_h)
+        bt.Animation.STATUS_LOST.status_to_sprite[self._status] = sprite
+    end
+    self._sprite = sprite
 
     local x, y = self._target:get_position()
     local w, h = self._target:measure()
@@ -56,6 +68,7 @@ end
 
 --- @brief
 function bt.Animation.STATUS_GAINED:finish()
+    self._sprite:set_opacity(0)
 end
 
 --- @brief
@@ -69,7 +82,7 @@ function bt.Animation.STATUS_GAINED:update(delta)
     end
 
     self._sprite_x, self._sprite_y = self._sprite_path:at(self._position_animation:get_value())
-    self._sprite:set_opacity(self._opacity_animation:get_value())
+    self._sprite_opacity = self._opacity_animation:get_value()
     self._sprite_angle = self._rotation_animation:get_value()
 
     return self._rotation_animation:get_is_done() and
@@ -79,6 +92,8 @@ end
 
 --- @brie
 function bt.Animation.STATUS_GAINED:draw()
+    self._sprite:set_opacity(self._sprite_opacity) -- in draw because of caching
+
     love.graphics.push()
     love.graphics.translate(self._sprite_x, self._sprite_y)
     love.graphics.scale(2)

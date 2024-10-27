@@ -187,6 +187,7 @@ function bt.EnemySprite:remove_status(status)
         rt.error("In bt.EnemySprite:remove_status: status is not present")
         return
     end
+    self._status_to_labeled_sprite[status] = nil
     self._status_consumable_bar:remove(sprite)
 end
 

@@ -676,11 +676,20 @@ end
 --- @brief [internal]
 function bt.BattleScene:_handle_button_pressed(which)
     if which == rt.InputButton.A then
-        self._simulation_environment.message(
+        --[[
+        self._simulation_environment.add_status(
             bt.create_entity_proxy(self, self._state:list_enemies()[1]),
-            "test",
             bt.create_status_proxy(self, bt.Status("DEBUG_STATUS"))
         )
+        self._simulation_environment.remove_status(
+            bt.create_entity_proxy(self, self._state:list_enemies()[1]),
+            bt.create_status_proxy(self, bt.Status("DEBUG_STATUS"))
+        )]]--
+
+        for sprite in values(self._enemy_sprites) do
+            self:_append_animation(bt.Animation.STATUS_GAINED(self, bt.Status("DEBUG_STATUS"), sprite))
+        end
+
     elseif which == rt.InputButton.B then
         self._animation_queue:skip()
     end

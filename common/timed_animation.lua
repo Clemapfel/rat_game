@@ -61,7 +61,7 @@ rt.InterpolationFunctions = meta.new_enum("InterpolationFunction", {
         return 4 * (x - 0.5)^3 + 0.5
     end,
 
-    HANN_BANDPASS = function(x)
+    HANN = function(x)
         -- \frac{-\cos\left(-2\pi x\right)}{2}+0.5
         return (-1 * math.cos(-2 * math.pi * x) + 1) / 2
     end,
@@ -76,7 +76,7 @@ rt.InterpolationFunctions = meta.new_enum("InterpolationFunction", {
         return math.cos(-math.pi * x) / 2 + 0.5
     end,
 
-    GAUSSIAN_BANDPASS = function(x)
+    GAUSSIAN = function(x)
         -- e^{-\left(4.4\cdot\frac{\pi}{3}\right)\left(2x-1\right)^{2}}
         return math.exp(-1 * ((4.4 * math.pi / 3) * (2 * x - 1))^2)
     end,
@@ -91,7 +91,7 @@ rt.InterpolationFunctions = meta.new_enum("InterpolationFunction", {
         return math.exp(-4.4 * math.pi / 3 * (-1 * x)^2)
     end,
 
-    BUTTERWORTH_BANDPASS = function(x, order)
+    BUTTERWORTH = function(x, order)
         if order == nil then order = 6 end
         if order % 2 ~= 0 then order = order + 1 end
         -- \frac{1}{\left(1+\left(4\left(x-0.5\right)\right)^{6}\right)}
@@ -101,6 +101,12 @@ rt.InterpolationFunctions = meta.new_enum("InterpolationFunction", {
     STEP = function(x, n_steps)
         -- \frac{\operatorname{floor}\left(4\cdot x+0.5\right)}{4}
         return math.floor(n_steps * x + 0.5) / n_steps
+    end,
+
+    SKEWED_GAUSSIAN_DECAY = function(x, n)
+        -- \left(\left(e^{-\frac{x}{n}^{2}}\cdot\sin\left(\frac{x}{n}\right)\right)2\pi\cdot n\right)
+        if n == nil then n = 0.4 end
+        return math.exp(-((x / n) ^ 2)) * math.sin(x / n) * 2 * math.pi * n
     end,
 
     CONTINUOUS_STEP = function(x, n_steps, smoothness)
@@ -126,6 +132,10 @@ rt.InterpolationFunctions = meta.new_enum("InterpolationFunction", {
         return math.cos(3 * math.pi * (frequency * x - 1)) / 2 + 0.5
     end,
 
+    INVERTED_SINE_WAVE = function(x, frequency)
+        return 1 - rt.InterpolationFunctions.SINE_WAVE(x, frequency)
+    end,
+
     TRIANGLE_WAVE = function(x, frequency)
         -- 2\cdot\left|\frac{x}{f}-\operatorname{floor}\left(\frac{x}{f}+0.5\right)\right|
         if frequency == nil then frequency = 2 end
@@ -146,19 +156,19 @@ rt.InterpolationFunctions = meta.new_enum("InterpolationFunction", {
 --- @param interpolation_function
 --- @param should_loop
 --- @signal finish (self) -> nil
-rt.TimedAnimation = meta.new_type("TimedAnimation", function(duration, start_value, end_value, interpolation_function, should_loop)
+rt.TimedAnimation = meta.new_type("TimedAnimation", function(duration, start_value, end_value, interpolation_function, ...)
     meta.assert_number(duration)
     if start_value == nil then start_value = 0 end
     if end_value == nil then end_value = 0 end
     if interpolation_function == nil then interpolation_function = rt.InterpolationFunctions.LINEAR end
-    if should_loop == nil then should_loop = false end
 
     local out = meta.new(rt.TimedAnimation, {
         _lower = start_value,
         _upper = end_value,
         _duration = duration,
         _f = interpolation_function,
-        _should_loop = should_loop,
+        _args = {...},
+        _should_loop = false,
         _direction = ternary(start_value <= end_value, 1, -1),
         _elapsed = 0
     })
@@ -207,10 +217,10 @@ function rt.TimedAnimation:get_value()
         elseif x < 0 then
             y = 0
         else
-            y = self._f(x)
+            y = self._f(x, table.unpack(self._args))
         end
     else
-        y = self._f(math.fmod(x, 1))
+        y = self._f(math.fmod(x, 1), table.unpack(self._args))
     end
 
     return self._lower + y * self._direction * math.abs(self._upper - self._lower)
