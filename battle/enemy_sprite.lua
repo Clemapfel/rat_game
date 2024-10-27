@@ -206,3 +206,16 @@ function bt.EnemySprite:set_status_n_turns_left(status, n_turns_left)
         sprite:set_label("<o>" .. n_turns_left .. "</o>")
     end
 end
+
+--- @brief
+function bt.EnemySprite:activate_status(status, on_done_notify)
+    meta.assert_isa(status, bt.Status)
+
+    local sprite = self._status_to_labeled_sprite[status]
+    if sprite == nil then
+        rt.error("In bt.EnemySprite:activate_status: status is not present")
+        return
+    end
+
+    self._status_consumable_bar:activate(sprite, on_done_notify)
+end

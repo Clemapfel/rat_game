@@ -41,6 +41,11 @@ function bt.EntitySprite:set_status_n_turns_left()
 end
 
 --- @brief
+function bt.EntitySprite:activate_status(status, on_done_notify)
+    error("abtract method called")
+end
+
+--- @brief
 function bt.EntitySprite:add_consumable(value)
     error("abstract method called")
 end
@@ -48,6 +53,16 @@ end
 --- @brief
 function bt.EntitySprite:remove_consumable(value)
     error("abstract method called")
+end
+
+--- @brief
+function bt.EntitySprite:set_consumable_n_uses_left(status)
+    error("abtract method called")
+end
+
+--- @brief
+function bt.EntitySprite:activate_consumable(status, on_done_notify)
+    error("abtract method called")
 end
 
 --- @brief

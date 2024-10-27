@@ -22,9 +22,9 @@
     </configurations>
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="7fa9ba1b-2cff-4ecc-86fb-59ab2fa76ee1" name="Changes" comment="status gained done">
+    <list default="true" id="7fa9ba1b-2cff-4ecc-86fb-59ab2fa76ee1" name="Changes" comment="implemented status bar">
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/battle/battle_scene.lua" beforeDir="false" afterPath="$PROJECT_DIR$/battle/battle_scene.lua" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/battle/animations/status_applied.lua" beforeDir="false" afterPath="$PROJECT_DIR$/battle/animations/status_applied.lua" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/battle/enemy_sprite.lua" beforeDir="false" afterPath="$PROJECT_DIR$/battle/enemy_sprite.lua" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/battle/entity_sprite.lua" beforeDir="false" afterPath="$PROJECT_DIR$/battle/entity_sprite.lua" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/battle/simulation_handler.lua" beforeDir="false" afterPath="$PROJECT_DIR$/battle/simulation_handler.lua" afterDir="false" />
@@ -596,15 +596,7 @@
       <workItem from="1729098138796" duration="20580000" />
       <workItem from="1729180777153" duration="8566000" />
       <workItem from="1729267430460" duration="1705000" />
-      <workItem from="1729269158294" duration="138636000" />
-    </task>
-    <task id="LOCAL-01126" summary="n_visible_characters working">
-      <option name="closed" value="true" />
-      <created>1728586597756</created>
-      <option name="number" value="01126" />
-      <option name="presentableId" value="LOCAL-01126" />
-      <option name="project" value="LOCAL" />
-      <updated>1728586597756</updated>
+      <workItem from="1729269158294" duration="139755000" />
     </task>
     <task id="LOCAL-01127" summary="fixed n characters for mixed outlined labels">
       <option name="closed" value="true" />
@@ -990,7 +982,15 @@
       <option name="project" value="LOCAL" />
       <updated>1729986932555</updated>
     </task>
-    <option name="localTasksCounter" value="1175" />
+    <task id="LOCAL-01175" summary="implemented status bar">
+      <option name="closed" value="true" />
+      <created>1729988101135</created>
+      <option name="number" value="01175" />
+      <option name="presentableId" value="LOCAL-01175" />
+      <option name="project" value="LOCAL" />
+      <updated>1729988101135</updated>
+    </task>
+    <option name="localTasksCounter" value="1176" />
     <servers />
   </component>
   <component name="TypeScriptGeneratedFilesManager">
@@ -1039,7 +1039,6 @@
     </option>
   </component>
   <component name="VcsManagerConfiguration">
-    <MESSAGE value="circular wipe working" />
     <MESSAGE value="stashing" />
     <MESSAGE value="refactored animation and animation queue" />
     <MESSAGE value="stashing before reworking textbox" />
@@ -1064,7 +1063,8 @@
     <MESSAGE value="added favicon" />
     <MESSAGE value="added debug animation" />
     <MESSAGE value="status gained done" />
-    <option name="LAST_COMMIT_MESSAGE" value="status gained done" />
+    <MESSAGE value="implemented status bar" />
+    <option name="LAST_COMMIT_MESSAGE" value="implemented status bar" />
   </component>
   <component name="XDebuggerManager">
     <breakpoint-manager>

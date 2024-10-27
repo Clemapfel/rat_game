@@ -648,6 +648,9 @@ function bt.BattleScene:create_simulation_environment()
         for global_status in values(env.get_global_statuses()) do
             _try_invoke_global_status_callback("on_status_gained", global_status, entity_proxy, status_proxy)
         end
+
+        -- TODO
+        _scene:_push_animation(bt.Animation.STATUS_APPLIED(_scene, status, sprite))
     end
 
     --- @brief
