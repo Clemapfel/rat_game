@@ -599,7 +599,7 @@ function bt.BattleScene:create_simulation_environment()
         local already_present = false
         for already in values(env.get_statuses(entity_proxy))  do
             if already == status_proxy then
-                _try_invoke_status_callback("on_already_present", status, entity)
+                _try_invoke_status_callback("on_already_present", status_proxy, entity_proxy)
                 return
             end
         end
@@ -614,7 +614,7 @@ function bt.BattleScene:create_simulation_environment()
         -- status animation
         local sprite = _scene._sprites[entity]
         local animation_id = status:get_animation_id()
-        local animation = bt.Animation[animation_id]
+        local animation = bt.Animation[animation_id](self, status, sprite)
 
         if animation == nil then
             rt.warning("In env.add_status: Status `" .. status:get_id() .. "`s animation id `" .. animation_id .. "` does not point to a valid animation, falling back on default animation.")
@@ -622,7 +622,7 @@ function bt.BattleScene:create_simulation_environment()
         end
 
         animation:signal_connect("start", function(_)
-            sprite:add_status(status)
+            sprite:add_status(status, status:get_max_duration())
             _scene:set_priority_order(_state:list_entities_in_order())
         end)
 
@@ -676,7 +676,7 @@ function bt.BattleScene:create_simulation_environment()
         bt.assert_args("get_statuses", entity_proxy, bt.EntityProxy)
         local out = {}
         for status in values(_state:entity_list_statuses(_get_native(entity_proxy))) do
-            table.insert(out, bt.create_status_proxy(status))
+            table.insert(out, bt.create_status_proxy(self, status))
         end
         return out
     end

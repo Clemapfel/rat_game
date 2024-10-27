@@ -26,13 +26,18 @@ function bt.EntitySprite:set_selection(selection_state)
 end
 
 --- @brief
-function bt.EntitySprite:add_status(value)
-    error("abstract method called")
+function bt.EntitySprite:add_status(status, n_turns_left)
+   error("abstract method called")
 end
 
 --- @brief
 function bt.EntitySprite:remove_status(value)
     error("abstract method called")
+end
+
+--- @brief
+function bt.EntitySprite:set_status_n_turns_left()
+    error("abtract method called")
 end
 
 --- @brief

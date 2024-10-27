@@ -21,7 +21,9 @@ bt.EnemySprite = meta.new_type("EnemySprite", bt.EntitySprite, function(entity)
         _snapshot_position_x = 0,
         _snapshot_position_y = 0,
 
-        _stunned_animation = bt.StunnedParticleAnimation()
+        _stunned_animation = bt.StunnedParticleAnimation(),
+
+        _status_to_labeled_sprite = {}, -- Table<Status, rt.LabeledSprite>
     })
 end)
 
@@ -153,4 +155,54 @@ end
 --- @override
 function bt.EnemySprite:set_is_stunned(b)
     self._is_stunned = b
+end
+
+
+--- @brief
+function bt.EnemySprite:add_status(status, n_turns_left)
+    meta.assert_isa(status, bt.Status)
+    meta.assert_number(n_turns_left)
+
+    if self._status_to_labeled_sprite[status] ~= nil then
+        self:set_status_n_turns_left(status, n_turns_left)
+        return
+    end
+
+    local sprite = rt.LabeledSprite(status:get_sprite_id())
+    if n_turns_left ~= POSITIVE_INFINITY then
+        sprite:set_label("<o>" .. n_turns_left .. "</o>")
+    end
+    sprite._sprite:set_minimum_size(sprite._sprite:get_resolution())
+
+    self._status_to_labeled_sprite[status] = sprite
+    self._status_consumable_bar:add(sprite, true)
+end
+
+--- @brief
+function bt.EnemySprite:remove_status(status)
+    meta.assert_isa(status, bt.Status)
+
+    local sprite = self._status_to_labeled_sprite[status]
+    if sprite == nil then
+        rt.error("In bt.EnemySprite:remove_status: status is not present")
+        return
+    end
+    self._status_consumable_bar:remove(sprite)
+end
+
+--- @brief
+function bt.EnemySprite:set_status_n_turns_left(status, n_turns_left)
+    meta.assert_isa(status, bt.Status)
+    meta.assert_number(n_turns_left)
+
+    local sprite = self._status_to_labeled_sprite[status]
+    if sprite == nil then
+        rt.error("In bt.EnemySprite:set_status_n_turns_left: status is not yet present")
+        return
+    end
+    if n_turns_left == POSITIVE_INFINITY then
+        sprite:set_label("")
+    else
+        sprite:set_label("<o>" .. n_turns_left .. "</o>")
+    end
 end
