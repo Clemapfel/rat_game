@@ -355,6 +355,7 @@ do
     local _max = math.max
     local _min = math.min
     local _floor = math.floor
+    local _ceil = math.ceil
     local _rt_palette = rt.Palette
     local _rt_color_unpack = rt.color_unpack
     
@@ -683,20 +684,20 @@ do
 
                 if glyph.is_underlined or glyph.is_strikethrough then
                     local font = glyph.font
-                    local underline_y = font:getBaseline() - font:getDescent() + 2
+                    local underline_y = font:getBaseline() + 0.5 * font:getHeight() + font:getDescent() + 2
                     local strikethrough_y = font:getBaseline() - 2
 
                     if glyph.is_underlined then
-                        glyph.underline_ax = glyph.x
-                        glyph.underline_ay = _floor(glyph.y + underline_y)
-                        glyph.underline_bx = glyph.x + glyph.width
+                        glyph.underline_ax = glyph.x + _padding
+                        glyph.underline_ay = _ceil(glyph.y + underline_y)
+                        glyph.underline_bx = glyph.x + glyph.width + _padding
                         glyph.underline_by = glyph.underline_ay
                     end
 
                     if glyph.is_strikethrough then
-                        glyph.strikethrough_ax = glyph.x
-                        glyph.strikethrough_ay = _floor(glyph.y + strikethrough_y)
-                        glyph.strikethrough_bx = glyph.x + glyph.width
+                        glyph.strikethrough_ax = glyph.x + _padding
+                        glyph.strikethrough_ay = _ceil(glyph.y + strikethrough_y)
+                        glyph.strikethrough_bx = glyph.x + glyph.width + _padding
                         glyph.strikethrough_by = glyph.strikethrough_ay
                     end
                 end

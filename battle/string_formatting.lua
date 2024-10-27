@@ -15,13 +15,13 @@ do
             if color == nil then color = "RED" end -- enemies
             return "<b><color=RED>" .. object:get_name() .. "</color></b>"
         elseif meta.isa(object, bt.Move) then
-            return "<b><u>" .. object:get_name() .. "</u></b>"
+            return "<b><i>" .. object:get_name() .. "<i></b>"
         elseif meta.isa(object, bt.Consumable)
             or meta.isa(object, bt.Status)
             or meta.isa(object, bt.GlobalStatus)
             or meta.isa(object, bt.Equip)
         then
-            return "<b><i>" .. object:get_name() .. "</i></b>"
+            return "<b><u>" .. object:get_name() .. "</u></b>"
         else
             return tostring(object)
         end
@@ -29,6 +29,7 @@ do
 end
 
 do -- pre-load all immutable configs, parse description and replace with formatted names
+    assert(bt.Status ~= nil and bt.Move ~= nil and bt.Equip ~= nil and bt.Consumable ~= nil and bt.GlobalStatus ~= nil)
     local _id_to_object = (function()
         local out = {}
         for path_type in range(

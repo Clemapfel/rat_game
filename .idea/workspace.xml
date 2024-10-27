@@ -22,9 +22,10 @@
     </configurations>
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="7fa9ba1b-2cff-4ecc-86fb-59ab2fa76ee1" name="Changes" comment="status animations done">
+    <list default="true" id="7fa9ba1b-2cff-4ecc-86fb-59ab2fa76ee1" name="Changes" comment="added see_also">
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/menu/keybinding_scene.lua" beforeDir="false" afterPath="$PROJECT_DIR$/menu/keybinding_scene.lua" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/battle/string_formatting.lua" beforeDir="false" afterPath="$PROJECT_DIR$/battle/string_formatting.lua" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/common/label.lua" beforeDir="false" afterPath="$PROJECT_DIR$/common/label.lua" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/menu/verbose_info_panel.lua" beforeDir="false" afterPath="$PROJECT_DIR$/menu/verbose_info_panel.lua" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
@@ -594,15 +595,7 @@
       <workItem from="1729098138796" duration="20580000" />
       <workItem from="1729180777153" duration="8566000" />
       <workItem from="1729267430460" duration="1705000" />
-      <workItem from="1729269158294" duration="153347000" />
-    </task>
-    <task id="LOCAL-01132" summary="added entity name to heading label">
-      <option name="closed" value="true" />
-      <created>1728742653313</created>
-      <option name="number" value="01132" />
-      <option name="presentableId" value="LOCAL-01132" />
-      <option name="project" value="LOCAL" />
-      <updated>1728742653314</updated>
+      <workItem from="1729269158294" duration="154118000" />
     </task>
     <task id="LOCAL-01133" summary="added strikethrough/underline">
       <option name="closed" value="true" />
@@ -988,7 +981,15 @@
       <option name="project" value="LOCAL" />
       <updated>1730061052862</updated>
     </task>
-    <option name="localTasksCounter" value="1181" />
+    <task id="LOCAL-01181" summary="added see_also">
+      <option name="closed" value="true" />
+      <created>1730061662706</created>
+      <option name="number" value="01181" />
+      <option name="presentableId" value="LOCAL-01181" />
+      <option name="project" value="LOCAL" />
+      <updated>1730061662706</updated>
+    </task>
+    <option name="localTasksCounter" value="1182" />
     <servers />
   </component>
   <component name="TypeScriptGeneratedFilesManager">
@@ -1037,7 +1038,6 @@
     </option>
   </component>
   <component name="VcsManagerConfiguration">
-    <MESSAGE value="refactored selection graph" />
     <MESSAGE value="entity move selection graph done" />
     <MESSAGE value="added get_priority" />
     <MESSAGE value="refactored signals" />
@@ -1062,7 +1062,8 @@
     <MESSAGE value="added battle string formatting" />
     <MESSAGE value="added automatic text formatting" />
     <MESSAGE value="status animations done" />
-    <option name="LAST_COMMIT_MESSAGE" value="status animations done" />
+    <MESSAGE value="added see_also" />
+    <option name="LAST_COMMIT_MESSAGE" value="added see_also" />
   </component>
   <component name="XDebuggerManager">
     <breakpoint-manager>

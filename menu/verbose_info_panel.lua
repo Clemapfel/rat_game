@@ -57,9 +57,10 @@ end)
 
 --- @brief
 function mn.VerboseInfoPanel:show(...)
-    local see_also = {}
     self._items = {}
-    for object in values({...}) do
+
+    -- recursively list all items and their see_also
+    local function process_item(object)
         local item = mn.VerboseInfoPanel.Item()
         item:create_from(object)
         item:realize()
@@ -67,18 +68,14 @@ function mn.VerboseInfoPanel:show(...)
         rt.savepoint_maybe()
 
         if meta.is_table(object) and object.see_also ~= nil then
-            for x in values(object.see_also) do
-                table.insert(see_also, x)
+            for other in values(object.see_also) do
+                process_item(other)
             end
         end
     end
 
-    for object in values(see_also) do
-        local item = mn.VerboseInfoPanel.Item()
-        item:create_from(object)
-        item:realize()
-        table.insert(self._items, item)
-        rt.savepoint_maybe()
+    for object in range(...) do
+        process_item(object)
     end
 
     self._n_items = sizeof(self._items)
