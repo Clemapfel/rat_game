@@ -668,6 +668,11 @@ do
     end
 end
 
+--- @brief
+function bt.BattleScene:get_text_box()
+    return self._text_box
+end
+
 --- @brief [internal]
 function bt.BattleScene:_handle_button_pressed(which)
     if which == rt.InputButton.A then

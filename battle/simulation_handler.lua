@@ -651,6 +651,7 @@ function bt.BattleScene:create_simulation_environment()
 
         -- TODO
         _scene:_push_animation(bt.Animation.STATUS_APPLIED(_scene, status, sprite))
+        _scene:_append_animation(bt.Animation.MESSAGE(_scene, status:get_name() .. " activated"))
     end
 
     --- @brief
