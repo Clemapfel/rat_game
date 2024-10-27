@@ -23,6 +23,7 @@ end, {
     name = "",
     description = "(no additional effect)",
     flavor_text = "",
+    see_also = {},
 
     sprite_id = "status_ailment",
     sprite_index = 1,

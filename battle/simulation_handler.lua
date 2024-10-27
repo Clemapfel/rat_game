@@ -86,7 +86,7 @@ for name_type_proxy in range(
         metatable._values = {} -- Table<String, { value::Number, per_turn_offset::Number }>
 
         metatable.__tostring = function(self)
-            return "<" .. meta.get_typename(type) .. " #" .. meta.hash(native) .. ">"
+            return bt.format_name(self)
         end
 
         metatable.__eq = function(self, other)
@@ -97,14 +97,35 @@ for name_type_proxy in range(
             return native:get_id() == other_native:get_id()
         end
 
+        metatable.__concat = function(self, other)
+            return bt.format_name(self) .. bt.format_name(other)
+        end
+
+        metatable.__index = function(self, key)
+            bt.error_function("In " .. meta.get_typename(proxy) ..  ".__index: trying to access proxy directly, but it can only be accessed with outer functions, use `get_*` instead")
+        end
+
+        metatable.__newindex = function(self, key, value)
+            bt.error_function("In " .. meta.get_typename(proxy) ..  ".__newindex: trying to modify proxy directly, but it can only be modified with outer functions, use `set_*` instead")
+        end
+
         return out
     end
 
     meta["is_" .. name .. "_proxy"] = function(x)
-        if _G.type(x) ~= "table" then return end
+        if _G.type(x) ~= "table" then return false end
         local metatable = getmetatable(x)
         return metatable._type == proxy and meta.isa(metatable._native, type)
     end
+end
+
+meta.is_proxy = function(x)
+    return meta.is_entity_proxy(x) or
+        meta.is_move_proxy(x) or
+        meta.is_equip_proxy(x) or
+        meta.is_status_proxy(x) or
+        meta.is_global_status_proxy(x) or
+        meta.is_consumable_proxy(x)
 end
 
 for which_type in range(
@@ -148,7 +169,7 @@ do
             local type = select(i+1, ...)
             local assert_f = _type_to_function[type]
             if assert_f == nil then
-                rt.error("In bt.assert_args: unhandled type `" .. type .. "`")
+                bt.error_function("In bt.assert_args: unhandled type `" .. type .. "`")
             end
 
             assert_f(arg, scope, arg_i)
@@ -375,6 +396,32 @@ function bt.BattleScene:create_simulation_environment()
         _scene:invoke(consumable[callback_id], consumable_proxy, holder_proxy, ...)
     end
 
+    --- @brief get object name
+    function env.get_name(object)
+        if not (meta.is_entity_proxy(object) or
+            meta.is_move_proxy(object) or
+            meta.is_status_proxy(object) or
+            meta.is_global_status_proxy(object) or
+            meta.is_equip_proxy(object) or
+            meta.is_consumable_proxy(object)) then
+            bt.error_function("In env.get_id: objects of type `" .. meta.typeof(object) .. "` do not have a name")
+        end
+        return bt.format_name(_get_native(object))
+    end
+
+    --- @brief get object id
+    function env.get_id(object)
+        if not (meta.is_entity_proxy(object) or
+            meta.is_move_proxy(object) or
+            meta.is_status_proxy(object) or
+            meta.is_global_status_proxy(object) or
+            meta.is_equip_proxy(object) or
+            meta.is_consumable_proxy(object)) then
+            bt.error_function("In env.get_id: objects of type `" .. meta.typeof(object) .. "` do not have an ID")
+        end
+        return _get_native(object):get_id()
+    end
+
     --- @brief add numerical value to entity cache, is reduced by `per_turn_offset` at end of turn
     --- @param entity_proxy bt.EntityProxy
     --- @param name String
@@ -444,8 +491,6 @@ function bt.BattleScene:create_simulation_environment()
         "attack_base",
         "defense_base",
         "speed_base",
-        "name",
-        "id",
         "n_move_slots",
         "n_equip_slots",
         "n_consumable_slots",
@@ -628,7 +673,7 @@ function bt.BattleScene:create_simulation_environment()
 
         _scene:_push_animation(animation)
         if animation_id == rt.settings.battle.status.default_animation_id then
-            _scene:_append_animation(bt.Animation.MESSAGE(_scene, "TODO" )) -- TODO: message formatting
+            env.message(entity_proxy, "has gained", status_proxy)
         end
 
         if stun_before == false and will_stun == true then
@@ -1017,15 +1062,22 @@ function bt.BattleScene:create_simulation_environment()
         -- TODO
     end
 
-    --- @brief
-    function env.message(str, ...)
-        local n = select("#", ...)
-        local out = {str}
-        for i = 1, n do
-            table.insert(out, select(i, ...))
+    --- @brief print message to battle log
+    --- @param vararg any
+    function env.message(...)
+        local n_args = select("#", ...)
+        if n_args == 0 then return end
+
+        local msg = {}
+        for i = 1, n_args do
+            local arg = select(i, ...)
+            if meta.is_proxy(arg) then
+                table.insert(msg, bt.format_name(_get_native(arg)))
+            else
+                table.insert(msg, bt.format_name(arg))
+            end
         end
-        local msg = table.concat(out)
-        _scene:_push_animation(bt.Animation.MESSAGE(_scene._text_box, msg))
+        _scene:_push_animation(bt.Animation.MESSAGE(_scene, table.concat(msg, " ")))
     end
 
     return meta.as_immutable(env)

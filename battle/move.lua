@@ -28,6 +28,7 @@ end, {
 
     description = "(no effect)",
     flavor_text = "",
+    see_also = {},
 
     max_n_uses = POSITIVE_INFINITY,
 

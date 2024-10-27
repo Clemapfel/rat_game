@@ -1,9 +1,10 @@
 --- @class bt.Animation.MESSAGE
 --- @param text_box rt.TextBox
 --- @param msg String
-bt.Animation.MESSAGE = meta.new_type("MESSAGE", rt.Animation, function(scene, ...)
+bt.Animation.MESSAGE = meta.new_type("MESSAGE", rt.Animation, function(scene, msg, _)
     meta.assert_isa(scene, bt.BattleScene)
-    local msg = bt.format_message(scene, ...)
+    meta.assert_string(msg)
+    meta.assert_nil(_)
     return meta.new(bt.Animation.MESSAGE, {
         _text_box = scene:get_text_box(),
         _message = msg,

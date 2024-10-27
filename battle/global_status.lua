@@ -22,6 +22,13 @@ end, {
     max_duration = POSITIVE_INFINITY,
     is_silent = false,
 
+    description = "(no effect)",
+    flavor_text = "",
+    see_also = {},
+
+    sprite_id = "",
+    sprite_index = 1,
+
     -- (GlobalStatusProxy, Table<EntityProxy>) -> nil
     on_gained = function(self, entities)
         return nil
@@ -128,12 +135,7 @@ end, {
     -- (GlobalStatusProxy, Table<EntityProxy>)
     on_entity_spawned = function(self, entities)
         return nil
-    end,
-
-    description = "(no effect)",
-    flavor_text = "",
-    sprite_id = "",
-    sprite_index = 1
+    end
 })
 bt.GlobalStatus._atlas = {}
 

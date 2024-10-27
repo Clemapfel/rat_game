@@ -569,7 +569,8 @@ do
         "number",
         "boolean",
         "function",
-        "string"
+        "string",
+        "nil"
     }) do
         --- @brief
         meta["is_" .. which] = function(x)

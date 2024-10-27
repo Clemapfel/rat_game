@@ -103,11 +103,6 @@ love.load = function()
     ]]--
     state:set_current_scene(bt.BattleScene)
     love.resize(love.graphics.getWidth(), love.graphics.getHeight())
-
-    local description, see_also = bt.format_description({
-        get_description = function() return "This is a $TEST$ description, that should replace $DEBUG_CONSUMABLE$, $DEBUG_EQUIP$, $DEBUG_GLOBAL_STATUS$, $DEBUG_MOVE$, $DEBUG_STATUS$" end
-    })
-    dbg(description)
 end
 
 love.update = function(delta)

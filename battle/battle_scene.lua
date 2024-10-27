@@ -676,8 +676,9 @@ end
 --- @brief [internal]
 function bt.BattleScene:_handle_button_pressed(which)
     if which == rt.InputButton.A then
-        self._simulation_environment.add_status(
+        self._simulation_environment.message(
             bt.create_entity_proxy(self, self._state:list_enemies()[1]),
+            "test",
             bt.create_status_proxy(self, bt.Status("DEBUG_STATUS"))
         )
     elseif which == rt.InputButton.B then

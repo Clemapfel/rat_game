@@ -22,50 +22,50 @@ do
             or meta.isa(object, bt.Equip)
         then
             return "<b><i>" .. object:get_name() .. "</i></b>"
+        else
+            return tostring(object)
         end
     end
 end
 
-do
-    local _initialized = false
-    local _id_to_object = {}
-
-    --- @brief parse object description, injecting names and returning "see also" objects
-    --- @return String, Table<any> formatted message, see_also
-    function bt.format_description(object)
-        if not _initialized then
-            for path_type in range(
-                {"statuses", bt.Status},
-                {"moves", bt.Move},
-                {"equips", bt.Equip},
-                {"consumables", bt.Consumable},
-                {"global_statuses", bt.GlobalStatus}
-            ) do
-                local path, type = table.unpack(path_type)
-                for _, name in pairs(love.filesystem.getDirectoryItems("assets/configs/" .. path)) do
-                    local id = string.match(name, "^(.-)%.lua$") -- "NAME.lua" -> NAME
-                    if id ~= nil then
-                        _id_to_object[id] = type(id)
-                    end
+do -- pre-load all immutable configs, parse description and replace with formatted names
+    local _id_to_object = (function()
+        local out = {}
+        for path_type in range(
+            {"statuses", bt.Status},
+            {"moves", bt.Move},
+            {"equips", bt.Equip},
+            {"consumables", bt.Consumable},
+            {"global_statuses", bt.GlobalStatus}
+        ) do
+            local path, type = table.unpack(path_type)
+            for _, name in pairs(love.filesystem.getDirectoryItems("assets/configs/" .. path)) do
+                local id = string.match(name, "^(.-)%.lua$") -- "NAME.lua" -> NAME
+                if id ~= nil then
+                    out[id] = type(id)
                 end
             end
-
-            _initialized = true
         end
+        return out
+    end)()
 
-        local c = "$"
+    local c = "$"
+    local match_pattern = "%" .. c .. "([^%" .. c .. "]+)%" .. c -- $NAME$ -> NAME
+    for object in values(_id_to_object) do
+        meta.set_is_mutable(object, true)
+
         local str = object:get_description()
-        local see_also = {}
-        for id in string.gmatch(str, "%" .. c .. "([^%" .. c .. "]+)%" .. c) do -- $NAME$ -> NAME
+        for id in string.gmatch(str, match_pattern) do
             local other = _id_to_object[id]
             if other ~= nil then
                 str = string.gsub(str, "%" .. c .. id .. "%" .. c, bt.format_name(other))
-                table.insert(see_also, other)
+                table.insert(object.see_also, other)
             else
                 rt.warning("In bt.format_description: object `" .. object:get_id() .. "`: cannot find reference `" .. id .. "` from description `" .. str .. "`" )
             end
         end
 
-        return str, see_also
+        object.description = str
+        meta.set_is_mutable(object, false)
     end
 end

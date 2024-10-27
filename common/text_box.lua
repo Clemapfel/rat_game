@@ -87,6 +87,7 @@ end
 
 --- @brief
 function rt.TextBox:append(msg)
+    if msg == nil then return end
     local entry = {
         label = rt.Label(msg),
         width = 0,

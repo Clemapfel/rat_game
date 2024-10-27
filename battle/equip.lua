@@ -39,6 +39,7 @@ end, {
 
     description = "(no description)",
     flavor_text = "",
+    see_also = {},
 
     sprite_id = "",
     sprite_index = 1
