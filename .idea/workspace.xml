@@ -22,15 +22,15 @@
     </configurations>
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="7fa9ba1b-2cff-4ecc-86fb-59ab2fa76ee1" name="Changes" comment="added karo background">
+    <list default="true" id="7fa9ba1b-2cff-4ecc-86fb-59ab2fa76ee1" name="Changes" comment="consumable lost animation done">
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/battle/animations/consumable_gained.lua" beforeDir="false" afterPath="$PROJECT_DIR$/battle/animations/consumable_gained.lua" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/battle/animations/consumable_lost.lua" beforeDir="false" afterPath="$PROJECT_DIR$/battle/animations/consumable_lost.lua" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/battle/animations/status_lost.lua" beforeDir="false" afterPath="$PROJECT_DIR$/battle/animations/status_lost.lua" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/battle/battle_scene.lua" beforeDir="false" afterPath="$PROJECT_DIR$/battle/battle_scene.lua" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/common/game_state.lua" beforeDir="false" afterPath="$PROJECT_DIR$/common/game_state.lua" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/common/scene.lua" beforeDir="false" afterPath="$PROJECT_DIR$/common/scene.lua" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/main.lua" beforeDir="false" afterPath="$PROJECT_DIR$/main.lua" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/physics/body.lua" beforeDir="false" afterPath="$PROJECT_DIR$/physics/body.lua" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/physics/polygon.lua" beforeDir="false" afterPath="$PROJECT_DIR$/physics/polygon.lua" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/common/sprite.lua" beforeDir="false" afterPath="$PROJECT_DIR$/common/sprite.lua" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/common/timed_animation.lua" beforeDir="false" afterPath="$PROJECT_DIR$/common/timed_animation.lua" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/common/vertex_shape.lua" beforeDir="false" afterPath="$PROJECT_DIR$/common/vertex_shape.lua" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -599,15 +599,7 @@
       <workItem from="1729098138796" duration="20580000" />
       <workItem from="1729180777153" duration="8566000" />
       <workItem from="1729267430460" duration="1705000" />
-      <workItem from="1729269158294" duration="169569000" />
-    </task>
-    <task id="LOCAL-01135" summary="stashing battle scene layout">
-      <option name="closed" value="true" />
-      <created>1728760361310</created>
-      <option name="number" value="01135" />
-      <option name="presentableId" value="LOCAL-01135" />
-      <option name="project" value="LOCAL" />
-      <updated>1728760361310</updated>
+      <workItem from="1729269158294" duration="173832000" />
     </task>
     <task id="LOCAL-01136" summary="move selection working">
       <option name="closed" value="true" />
@@ -993,7 +985,15 @@
       <option name="project" value="LOCAL" />
       <updated>1730073644606</updated>
     </task>
-    <option name="localTasksCounter" value="1184" />
+    <task id="LOCAL-01184" summary="consumable lost animation done">
+      <option name="closed" value="true" />
+      <created>1730144150697</created>
+      <option name="number" value="01184" />
+      <option name="presentableId" value="LOCAL-01184" />
+      <option name="project" value="LOCAL" />
+      <updated>1730144150697</updated>
+    </task>
+    <option name="localTasksCounter" value="1185" />
     <servers />
   </component>
   <component name="TypeScriptGeneratedFilesManager">
@@ -1042,7 +1042,6 @@
     </option>
   </component>
   <component name="VcsManagerConfiguration">
-    <MESSAGE value="refactored signals" />
     <MESSAGE value="fixed cutoff line in text box stencil" />
     <MESSAGE value="refactored to new sim handler" />
     <MESSAGE value="added new animations" />
@@ -1067,7 +1066,8 @@
     <MESSAGE value="added see_also" />
     <MESSAGE value="fixed underline misalignment" />
     <MESSAGE value="added karo background" />
-    <option name="LAST_COMMIT_MESSAGE" value="added karo background" />
+    <MESSAGE value="consumable lost animation done" />
+    <option name="LAST_COMMIT_MESSAGE" value="consumable lost animation done" />
   </component>
   <component name="XDebuggerManager">
     <breakpoint-manager>

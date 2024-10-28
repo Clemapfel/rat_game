@@ -1,12 +1,15 @@
 --- @class rt.InterpolationFunction
 rt.InterpolationFunctions = meta.new_enum("InterpolationFunction", {
-    LINEAR = function(x)
-        -- x
-        return x
+    LINEAR = function(x, slope)
+        -- ax
+        if x <= 0 then return 0 elseif x >= 1 then return 1 end
+        if slope == nil then slope = 1 end
+        return slope * x
     end,
 
     LINEAR_BANDPASS = function(x)
         -- 1\ -\operatorname{abs}\left(2\left(x-0.5\right)\right)
+        if x <= 0 then return 0 elseif x >= 1 then return 0 end
         return 1 - math.abs(2 * (x - 0.5))
     end,
 
@@ -27,6 +30,7 @@ rt.InterpolationFunctions = meta.new_enum("InterpolationFunction", {
 
     EXPONENTIAL_ACCELERATION = function(x)
         -- 0.045\cdot e^{\ln\left(\frac{1}{0.045}+1\right)x}-0.045
+        if x <= 0 then return 0 elseif x >= 1 then return 1 end
         return 0.045 * math.exp(math.log(1 / 0.045 + 1) * x) - 0.045
     end,
 
@@ -98,15 +102,33 @@ rt.InterpolationFunctions = meta.new_enum("InterpolationFunction", {
         return 1 / (1 + (4 * (x - 0.5))^order)
     end,
 
+    BUTTERWORTH_LOWPASS = function(x, order)
+        if order == nil then order = 6 end
+        if order % 2 ~= 0 then order = order + 1 end
+        -- \frac{1}{\left(1+\left(3x\right)^{n}\right)}
+        return 1 / (1 + (3 * x)^order)
+    end,
+
+    BUTTERWORTH_HIGHPASS = function(x, order)
+        if order == nil then order = 6 end
+        if order % 2 ~= 0 then order = order + 1 end
+        -- \frac{1}{\left(1+\left(3x\right)^{n}\right)}
+        return 1 / (1 + (3 * (x - 1))^order)
+    end,
+
     STEP = function(x, n_steps)
         -- \frac{\operatorname{floor}\left(4\cdot x+0.5\right)}{4}
         return math.floor(n_steps * x + 0.5) / n_steps
     end,
 
-    SKEWED_GAUSSIAN_DECAY = function(x, n)
+    DERIVATIVE_OF_GAUSSIAN_EASE_OUT = function(x)
         -- \left(\left(e^{-\frac{x}{n}^{2}}\cdot\sin\left(\frac{x}{n}\right)\right)2\pi\cdot n\right)
-        if n == nil then n = 0.4 end
+        local n = 0.4
         return math.exp(-((x / n) ^ 2)) * math.sin(x / n) * 2 * math.pi * n
+    end,
+
+    DERIVATIVE_OF_GAUSSIAN_EASE_IN = function(x)
+        return 1 - rt.InterpolationFunctions.DERIVATIVE_OF_GAUSSIAN_EASE_OUT(x - 1) - 1
     end,
 
     CONTINUOUS_STEP = function(x, n_steps, smoothness)
@@ -205,6 +227,8 @@ function rt.TimedAnimation:update(delta)
     if before < self._duration and self._elapsed > self._duration then
         self:signal_emit("done")
     end
+
+    return self:get_is_done()
 end
 
 --- @brief
@@ -212,13 +236,7 @@ function rt.TimedAnimation:get_value()
     local x = self._elapsed / self._duration
     local y
     if self._should_loop == false then
-        if x > 1 then
-            y = 1
-        elseif x < 0 then
-            y = 0
-        else
-            y = self._f(x, table.unpack(self._args))
-        end
+        y = self._f(x, table.unpack(self._args))
     else
         y = self._f(math.fmod(x, 1), table.unpack(self._args))
     end

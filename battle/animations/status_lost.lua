@@ -25,7 +25,7 @@ bt.Animation.STATUS_LOST = meta.new_type("STATUS_LOST", rt.Animation, function(s
             1, 4, rt.InterpolationFunctions.LINEAR
         ),
         _opacity_animation = rt.TimedAnimation(duration,
-            0, 1, rt.InterpolationFunctions.SKEWED_GAUSSIAN_DECAY
+            0, 1, rt.InterpolationFunctions.DERIVATIVE_OF_GAUSSIAN_EASE_OUT
         ),
 
         _position_path = nil, -- rt.Spline

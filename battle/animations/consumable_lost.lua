@@ -15,6 +15,7 @@ bt.Animation.CONSUMABLE_LOST = meta.new_type("CONSUMABLE_LOST", rt.Animation, fu
         _sprite_x = 0,
         _sprite_y = 0,
         _sprite_rotation = 0,
+        _sprite_opacity = 0,
 
         _opacity_animation = rt.TimedAnimation(2,
             1, 0,
@@ -87,13 +88,15 @@ function bt.Animation.CONSUMABLE_LOST:update(delta)
 
     self._sprite_x, self._sprite_y = self._ball_body:get_centroid()
     self._sprite_rotation = self._ball_body:get_angle()
+    self._sprite_opacity = self._opacity_animation:get_value()
 
-    self._sprite:set_opacity(self._opacity_animation:get_value())
     return self._opacity_animation:get_is_done() and rt.magnitude(self._ball_body:get_linear_velocity()) < 10e-3
 end
 
 --- @override
 function bt.Animation.CONSUMABLE_LOST:draw()
+    self._sprite:set_opacity(self._sprite_opacity) -- in draw because of cached sprites
+
     love.graphics.push()
     love.graphics.translate(self._sprite_x, self._sprite_y)
     love.graphics.rotate(2 * self._sprite_rotation)

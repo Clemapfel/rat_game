@@ -687,7 +687,7 @@ function bt.BattleScene:_handle_button_pressed(which)
         )]]--
 
         for sprite in values(self._enemy_sprites) do
-            self:_append_animation(bt.Animation.CONSUMABLE_LOST(self, bt.Consumable("DEBUG_CONSUMABLE"), sprite))
+            self:_append_animation(bt.Animation.CONSUMABLE_GAINED(self, bt.Consumable("DEBUG_CONSUMABLE"), sprite))
         end
 
     elseif which == rt.InputButton.B then

@@ -90,11 +90,11 @@ end
 function rt.VertexShape:set_vertex_color(i, r_or_rgba, g, b, a)
     if meta.is_number(r_or_rgba) then
         local r = r_or_rgba
-        self._native:setVertexAttribute(i, 3, r, g, b, self._opacity)
+        self._native:setVertexAttribute(i, 3, r, g, b, a * self._opacity)
     else
         local rgba = r_or_rgba
         if meta.is_hsva(rgba) then rgba = rt.hsva_to_rgba(rgba) end
-        self._native:setVertexAttribute(i, 3, rgba.r, rgba.g, rgba.b, self._opacity)
+        self._native:setVertexAttribute(i, 3, rgba.r, rgba.g, rgba.b, rgba.a * self._opacity)
     end
 end
 
@@ -326,7 +326,7 @@ function rt.VertexShape:set_opacity(alpha)
     self._opacity = alpha
     for i = 1, self:get_n_vertices() do
         local r, g, b, a = self._native:getVertexAttribute(i, 3)
-        self:set_vertex_color(i, r, g, b, a) -- applies alpha
+        self:set_vertex_color(i, r, g, b, a * self._opacity)
     end
 end
 

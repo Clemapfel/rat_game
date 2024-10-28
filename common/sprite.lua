@@ -178,7 +178,7 @@ end
 
 --- @brief
 function rt.Sprite:set_opacity(alpha)
-    self._opacity = alpha
+    self._opacity = clamp(alpha, 0, 1)
 
     if self._is_realized == true then
         self._shape:set_opacity(self._opacity)
