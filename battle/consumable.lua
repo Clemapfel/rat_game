@@ -23,6 +23,16 @@ end, {
     restore_uses_after_battle = false,
 
     -- (ConsumableProxy, EntityProxy) -> nil
+    on_gained = function(self, holder)
+        return nil
+    end,
+
+    -- (ConsumableProxy, EntityProxy) -> nil
+    on_lost = function(self, holder)
+        return nil
+    end,
+
+    -- (ConsumableProxy, EntityProxy) -> nil
     on_turn_start = function(self, holder)
         return nil
     end,
@@ -148,6 +158,8 @@ function bt.Consumable:realize()
         "on_killed",
         "on_switch",
         "on_move_used",
+        "on_gained",
+        "on_lost",
         "on_consumable_consumed",
         "on_consumable_gained",
         "on_consumable_lost",

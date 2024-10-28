@@ -22,15 +22,18 @@
     </configurations>
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="7fa9ba1b-2cff-4ecc-86fb-59ab2fa76ee1" name="Changes" comment="consumable lost animation done">
+    <list default="true" id="7fa9ba1b-2cff-4ecc-86fb-59ab2fa76ee1" name="Changes" comment="underlined / strikethrough now also respects n_visible_characters">
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/battle/animations/consumable_gained.lua" beforeDir="false" afterPath="$PROJECT_DIR$/battle/animations/consumable_gained.lua" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/battle/animations/consumable_lost.lua" beforeDir="false" afterPath="$PROJECT_DIR$/battle/animations/consumable_lost.lua" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/battle/animations/status_lost.lua" beforeDir="false" afterPath="$PROJECT_DIR$/battle/animations/status_lost.lua" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/assets/configs/entities/BOULDER.lua" beforeDir="false" afterPath="$PROJECT_DIR$/assets/configs/entities/BOULDER.lua" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/battle/battle_scene.lua" beforeDir="false" afterPath="$PROJECT_DIR$/battle/battle_scene.lua" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/battle/consumable.lua" beforeDir="false" afterPath="$PROJECT_DIR$/battle/consumable.lua" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/battle/enemy_sprite.lua" beforeDir="false" afterPath="$PROJECT_DIR$/battle/enemy_sprite.lua" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/battle/ordered_box.lua" beforeDir="false" afterPath="$PROJECT_DIR$/battle/ordered_box.lua" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/battle/simulation_handler.lua" beforeDir="false" afterPath="$PROJECT_DIR$/battle/simulation_handler.lua" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/common/labeled_sprite.lua" beforeDir="false" afterPath="$PROJECT_DIR$/common/labeled_sprite.lua" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/common/sprite.lua" beforeDir="false" afterPath="$PROJECT_DIR$/common/sprite.lua" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/common/timed_animation.lua" beforeDir="false" afterPath="$PROJECT_DIR$/common/timed_animation.lua" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/common/vertex_shape.lua" beforeDir="false" afterPath="$PROJECT_DIR$/common/vertex_shape.lua" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/main.lua" beforeDir="false" afterPath="$PROJECT_DIR$/main.lua" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/old/common/~labeled_sprite.lua" beforeDir="false" afterPath="$PROJECT_DIR$/old/common/~labeled_sprite.lua" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -599,23 +602,7 @@
       <workItem from="1729098138796" duration="20580000" />
       <workItem from="1729180777153" duration="8566000" />
       <workItem from="1729267430460" duration="1705000" />
-      <workItem from="1729269158294" duration="173832000" />
-    </task>
-    <task id="LOCAL-01136" summary="move selection working">
-      <option name="closed" value="true" />
-      <created>1728843763464</created>
-      <option name="number" value="01136" />
-      <option name="presentableId" value="LOCAL-01136" />
-      <option name="project" value="LOCAL" />
-      <updated>1728843763464</updated>
-    </task>
-    <task id="LOCAL-01137" summary="added entity info">
-      <option name="closed" value="true" />
-      <created>1728848075268</created>
-      <option name="number" value="01137" />
-      <option name="presentableId" value="LOCAL-01137" />
-      <option name="project" value="LOCAL" />
-      <updated>1728848075268</updated>
+      <workItem from="1729269158294" duration="178193000" />
     </task>
     <task id="LOCAL-01138" summary="stashing">
       <option name="closed" value="true" />
@@ -993,7 +980,23 @@
       <option name="project" value="LOCAL" />
       <updated>1730144150697</updated>
     </task>
-    <option name="localTasksCounter" value="1185" />
+    <task id="LOCAL-01185" summary="consumable gained done">
+      <option name="closed" value="true" />
+      <created>1730148500223</created>
+      <option name="number" value="01185" />
+      <option name="presentableId" value="LOCAL-01185" />
+      <option name="project" value="LOCAL" />
+      <updated>1730148500223</updated>
+    </task>
+    <task id="LOCAL-01186" summary="underlined / strikethrough now also respects n_visible_characters">
+      <option name="closed" value="true" />
+      <created>1730150566186</created>
+      <option name="number" value="01186" />
+      <option name="presentableId" value="LOCAL-01186" />
+      <option name="project" value="LOCAL" />
+      <updated>1730150566186</updated>
+    </task>
+    <option name="localTasksCounter" value="1187" />
     <servers />
   </component>
   <component name="TypeScriptGeneratedFilesManager">
@@ -1042,8 +1045,6 @@
     </option>
   </component>
   <component name="VcsManagerConfiguration">
-    <MESSAGE value="fixed cutoff line in text box stencil" />
-    <MESSAGE value="refactored to new sim handler" />
     <MESSAGE value="added new animations" />
     <MESSAGE value="made line number fixed" />
     <MESSAGE value="added snapshot" />
@@ -1067,7 +1068,9 @@
     <MESSAGE value="fixed underline misalignment" />
     <MESSAGE value="added karo background" />
     <MESSAGE value="consumable lost animation done" />
-    <option name="LAST_COMMIT_MESSAGE" value="consumable lost animation done" />
+    <MESSAGE value="consumable gained done" />
+    <MESSAGE value="underlined / strikethrough now also respects n_visible_characters" />
+    <option name="LAST_COMMIT_MESSAGE" value="underlined / strikethrough now also respects n_visible_characters" />
   </component>
   <component name="XDebuggerManager">
     <breakpoint-manager>

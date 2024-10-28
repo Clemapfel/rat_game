@@ -117,7 +117,7 @@ end
 
 love.draw = function()
     --background:draw()
-    love.graphics.clear(0, 0, 0, 0)
+    --love.graphics.clear(0, 0, 0, 0)
     if draw_state then
         if profiler_active then
             rt.profiler.push("draw")

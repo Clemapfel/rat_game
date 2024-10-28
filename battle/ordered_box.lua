@@ -137,6 +137,7 @@ function bt.OrderedBox:draw()
             rt.graphics.translate(0.5 * w, 0.5 * h)
             rt.graphics.scale(item.current_scale)
             rt.graphics.translate(-0.5 * w, -0.5 * h)
+
             item.widget:draw()
 
             rt.graphics.pop()

@@ -8,8 +8,8 @@ return {
     portrait_sprite_index = "BOULDER",
 
     is_enemy = true,
-    n_equip_slots = 0,
-    n_consumable_slots = 0,
+    n_equip_slots = 3,
+    n_consumable_slots = 3,
 
     attack_base = 100,
     defense_base = 100,

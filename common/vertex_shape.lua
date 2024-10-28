@@ -326,7 +326,7 @@ function rt.VertexShape:set_opacity(alpha)
     self._opacity = alpha
     for i = 1, self:get_n_vertices() do
         local r, g, b, a = self._native:getVertexAttribute(i, 3)
-        self:set_vertex_color(i, r, g, b, a * self._opacity)
+        self:set_vertex_color(i, r, g, b, math.max(a, self._opacity))
     end
 end
 

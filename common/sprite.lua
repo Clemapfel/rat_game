@@ -25,10 +25,9 @@ rt.Sprite = meta.new_type("Sprite", rt.Widget, rt.Updatable, function(id, index)
         _opacity = 1,
         _use_corrective_shader = false
     })
-end,
-    {
-        _shader = rt.Shader(rt.settings.sprite.shader_path)
-    })
+end, {
+    _shader = rt.Shader(rt.settings.sprite.shader_path)
+})
 
 --- @override
 function rt.Sprite:realize()
@@ -61,16 +60,10 @@ function rt.Sprite:realize()
     else
         self:set_animation(self._animation_id)
     end
-
-    self:set_opacity(self._opacity)
 end
 
 --- @override
 function rt.Sprite:draw()
-    if self._is_valid == false then
-        self._shape:draw()
-        return
-    end
     if self._use_corrective_shader then
         self._shader:bind()
         self._shader:send("texture_resolution", self._texture_resolution)
@@ -170,19 +163,10 @@ function rt.Sprite:get_resolution()
     return self._width, self._height
 end
 
---- @overrride
-function rt.Sprite:measure()
-    local scale_factor = rt.settings.sprite.scale_factor
-    return self._width * scale_factor, self._height * scale_factor
-end
-
 --- @brief
 function rt.Sprite:set_opacity(alpha)
     self._opacity = clamp(alpha, 0, 1)
-
-    if self._is_realized == true then
-        self._shape:set_opacity(self._opacity)
-    end
+    self._shape:set_opacity(alpha)
 end
 
 --- @brief

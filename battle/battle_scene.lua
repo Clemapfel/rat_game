@@ -686,9 +686,10 @@ function bt.BattleScene:_handle_button_pressed(which)
             bt.create_status_proxy(self, bt.Status("DEBUG_STATUS"))
         )]]--
 
-        for sprite in values(self._enemy_sprites) do
-            self:_append_animation(bt.Animation.CONSUMABLE_GAINED(self, bt.Consumable("DEBUG_CONSUMABLE"), sprite))
-        end
+        self._simulation_environment.add_consumable(
+            bt.create_entity_proxy(self, self._state:list_enemies()[1]),
+            bt.create_consumable_proxy(self, bt.Consumable("DEBUG_CONSUMABLE"))
+        )
 
     elseif which == rt.InputButton.B then
         self._animation_queue:skip()

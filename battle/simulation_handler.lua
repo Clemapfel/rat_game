@@ -673,7 +673,7 @@ function bt.BattleScene:create_simulation_environment()
 
         _scene:_push_animation(animation)
         if animation_id == rt.settings.battle.status.default_animation_id then
-            env.message(entity_proxy, "has gained", status_proxy)
+            env.append_message(entity_proxy, "has gained", status_proxy)
         end
 
         if stun_before == false and will_stun == true then
@@ -724,7 +724,7 @@ function bt.BattleScene:create_simulation_environment()
         end)
 
         _scene:_push_animation(animation)
-        env.message(entity_proxy, "has lost", status_proxy)
+        env.append_message(entity_proxy, "has lost", status_proxy)
 
         if stun_before == true and stun_after == false then
             _scene:_push_animation(bt.Animation.STUN_LOST(_scene, sprite))
@@ -842,8 +842,56 @@ function bt.BattleScene:create_simulation_environment()
             entity_proxy, bt.EntityProxy,
             consumable_proxy, bt.ConsumableProxy
         )
-        -- TODO#
-    end
+
+        local entity = _get_native(entity_proxy)
+        local consumable = _get_native(consumable_proxy)
+
+        local new_slot = -1
+        for i = 1, entity:get_n_consumable_slots() do
+            if _state:entity_get_consumable(entity, i) == nil then
+                new_slot = i
+                break
+            end
+        end
+        if new_slot == -1 then
+            env.push_message(entity_proxy, "has no space for", consumable_proxy)
+            return
+        end
+
+        _state:entity_add_consumable(entity, new_slot, consumable)
+
+        local sprite = self._sprites[entity]
+        --[[
+        local animation = bt.Animation.CONSUMABLE_GAINED(_scene, consumable, sprite)
+        animation:signal_connect("start", function(_)
+            sprite:add_consumable(consumable, consumable:get_max_n_uses())
+        end)
+        ]]--
+
+        sprite:add_consumable(consumable, consumable:get_max_n_uses())
+        sprite:add_status(bt.Status("DEBUG_STATUS"), POSITIVE_INFINITY)
+
+        --_scene:_push_animation(animation)
+        env.message(entity_proxy, "gained", consumable_proxy)
+
+        -- callbacks
+        _try_invoke_consumable_callback("on_gained", consumable_proxy, entity_proxy)
+
+        local callback_id = "on_consumable_gained"
+        for status_proxy in values(env.get_statuses(entity_proxy)) do
+            _try_invoke_status_callback(callback_id, status_proxy, entity_proxy, consumable_proxy)
+        end
+
+        for other_proxy in values(env.get_consumables(entity_proxy)) do
+            if other_proxy ~= consumable_proxy then
+                _try_invoke_consumable_callback(callback_id, other_proxy, entity_proxy, consumable_proxy)
+            end
+        end
+
+        for status_proxy in values(env.get_global_statuses()) do
+            _try_invoke_global_status_callback(callback_id, status_proxy, entity_proxy, consumable_proxy)
+        end
+  end
 
     --- @brief
     function env.get_consumables(entity_proxy)
@@ -1100,9 +1148,7 @@ function bt.BattleScene:create_simulation_environment()
         -- TODO
     end
 
-    --- @brief print message to battle log
-    --- @param vararg any
-    function env.message(...)
+    local _message = function(append_or_push, ...)
         local n_args = select("#", ...)
         if n_args == 0 then return end
 
@@ -1115,9 +1161,25 @@ function bt.BattleScene:create_simulation_environment()
                 table.insert(msg, bt.format_name(arg))
             end
         end
-        _scene:_append_animation(bt.Animation.MESSAGE(_scene, table.concat(msg, " ")))
+
+        if append_or_push then
+            _scene:_append_animation(bt.Animation.MESSAGE(_scene, table.concat(msg, " ")))
+        else
+            _scene:_push_animation(bt.Animation.MESSAGE(_scene, table.concat(msg, " ")))
+        end
     end
 
+    --- @brief
+    function env.push_message(...)
+        _message(false, ...)
+    end
+
+    --- @brief
+    function env.append_message(...)
+        _message(true, ...)
+    end
+
+    env.message = env.append_message
     return meta.as_immutable(env)
 end
 

@@ -111,8 +111,7 @@ end
 
 --- @override
 function rt.LabeledSprite:measure()
-    local w, h = self._spritesheet:get_frame_size()
-    return w * self._sprite_scale, h * self._sprite_scale
+    return self._sprite:measure()
 end
 
 --- @brief

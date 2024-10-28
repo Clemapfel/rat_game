@@ -24,6 +24,7 @@ bt.EnemySprite = meta.new_type("EnemySprite", bt.EntitySprite, function(entity)
         _stunned_animation = bt.StunnedParticleAnimation(),
 
         _status_to_labeled_sprite = {}, -- Table<Status, rt.LabeledSprite>
+        _consumable_slot_to_labeled_sprite = {}, -- Table<rt.LabeledSprite>
     })
 end)
 
@@ -157,7 +158,6 @@ function bt.EnemySprite:set_is_stunned(b)
     self._is_stunned = b
 end
 
-
 --- @brief
 function bt.EnemySprite:add_status(status, n_turns_left)
     meta.assert_isa(status, bt.Status)
@@ -219,4 +219,33 @@ function bt.EnemySprite:activate_status(status, on_done_notify)
     end
 
     self._status_consumable_bar:activate(sprite, on_done_notify)
+end
+
+--- @brief
+function bt.EnemySprite:add_consumable(consumable, n_uses_left)
+    meta.assert_isa(consumable, bt.Consumable)
+    meta.assert_number(n_uses_left)
+
+    if self._status_to_labeled_sprite[consumable] ~= nil then
+        self:set_consumable_n_uses_left(consumable, n_uses_left)
+        return
+    end
+
+    local sprite = rt.LabeledSprite(consumable:get_sprite_id())
+    if n_uses_left ~= POSITIVE_INFINITY then
+        sprite:set_label("<o>" .. n_uses_left .. "</o>")
+    end
+    sprite._sprite:set_minimum_size(sprite._sprite:get_resolution())
+
+    self._status_consumable_bar:add(sprite, false)
+end
+
+--- @brief
+function bt.EnemySprite:remove_consumable(consumable)
+
+end
+
+--- @brief
+function bt.EnemySprite:set_consumable_n_uses_left(consumable, n_uses_left)
+
 end

@@ -46,13 +46,13 @@ end
 
 --- @override
 function rt.LabeledSprite:draw()
-    if self._is_realized then
+    --if self._is_realized then
         self._sprite:draw()
 
         if self._label_is_visible == true then
             self._label:draw()
         end
-    end
+    --end
 end
 
 
@@ -102,4 +102,9 @@ end
 --- @brief
 function rt.LabeledSprite:get_label()
     return self._label
+end
+
+--- @brief
+function rt.LabeledSprite:measure()
+    return self._sprite:measure()
 end
