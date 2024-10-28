@@ -123,6 +123,22 @@ function rt.Label:_glyph_new(
     return out
 end
 
+--- @brief [internal]
+function rt.Label:_glyph_set_n_visible_characters(glyph, n)
+    glyph.n_visible_characters = n
+    if glyph.is_underlined or glyph.is_strikethrough then
+        local new_width = glyph.font:getWidth(string.sub(glyph.text, 1, glyph.n_visible_characters))
+
+        if glyph.is_underlined then
+            glyph.underline_bx = glyph.underline_ax + new_width
+        end
+
+        if glyph.is_strikethrough then
+            glyph.strikethrough_bx = glyph.strikethrough_bx + new_width
+        end
+    end
+end
+
 --- @override
 function rt.Label:draw()
     if self._n_glyphs == 0 then return end
@@ -764,9 +780,9 @@ do
         local n_characters_drawn = 0
         for glyph in values(self._glyphs_only) do
             if n_characters_drawn > self._n_visible_characters then
-                glyph.n_visible_characters = 0
+                self:_glyph_set_n_visible_characters(glyph, 0)
             else
-                glyph.n_visible_characters = self._n_visible_characters - n_characters_drawn
+                self:_glyph_set_n_visible_characters(glyph, self._n_visible_characters - n_characters_drawn)
             end
             n_characters_drawn = n_characters_drawn + glyph.n_characters
         end
@@ -853,7 +869,7 @@ do
         for glyph in values(self._glyphs) do
             if meta.is_table(glyph) then
                 if so_far <= 0 then
-                    glyph.n_visible_characters = 0
+                    self:_glyph_set_n_visible_characters(glyph, 0)
                 else
                     local text = glyph.text
                     local n_seen = 1
@@ -869,7 +885,7 @@ do
                         n_seen = n_seen + 1
                         if so_far < 0 then break end
                     end
-                    glyph.n_visible_characters = n_seen
+                    self:_glyph_set_n_visible_characters(glyph, n_seen)
                     max_row = math.max(max_row, glyph.row_index)
                 end
             else
