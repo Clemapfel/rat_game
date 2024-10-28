@@ -40,7 +40,7 @@ b2.Body = meta.new_type("PhysicsBody", function(world, type, position_x, positio
     def.allowFastRotation = true
 
     return meta.new(b2.Body, {
-        _native = box2d.b2CreateBody(world._native, def)--ffi.gc(box2d.b2CreateBody(world._native, def), box2d.b2DestroyBody)
+        _native = ffi.gc(box2d.b2CreateBody(world._native, def), box2d.b2DestroyBody)
     })
 end)
 
@@ -58,24 +58,13 @@ end
 --- @return Table<b2.Shape>
 function b2.Body:get_shapes()
     local n = box2d.b2Body_GetShapeCount(self._native)
-    local shapes = ffi.new("b2ShapeId*[" .. n .. "]")
+    local shapes = ffi.new("b2ShapeId[" .. n .. "]")
     local _ = box2d.b2Body_GetShapes(self._native, shapes, n)
     local out = {}
     for i = 1, n do
-        local type = box2d.b2Shape_GetType(shapes[i-1])
-        local to_insert
-        if type == box2d.b2_circleShape then
-            to_insert = meta.new(b2.Circle, { _native = box2d.b2Shape_GetCircle(self._native)})
-        elseif type == box2d.b2_polygonShape then
-            to_insert = meta.new(b2.Polygon, { _native = box2d.b2Shape_GetPolygon(self._native)})
-        elseif type == box2d.b2_segmentShape then
-            to_insert = meta.new(b2.Segment, { _native = box2d.b2Shape_GetSegment(self._native)})
-        elseif type == box2d.b2_capsuleShape then
-            to_insert = meta.new(b2.Capsule, { _native = box2d.b2Shape_GetCapsule(self._native)})
-        elseif type == box2d.b2_chainSegmentShape then
-            error("In b2.Shape:draw: unhandlined shape type `" .. type .. "`")
-        end
-        table.insert(out, to_insert)
+        table.insert(out, meta.new(b2.Shape, {
+            _native = shapes[i-1]
+        }))
     end
     return out
 end
@@ -244,20 +233,16 @@ function b2.Body:apply_torque(value, should_wake_up_body)
 end
 
 --- @brief
-function b2.Body:apply_linear_impulse(impulse_x, impulse_y, local_point_x, local_point_y, should_wake_up_body)
+function b2.Body:apply_linear_impulse(impulse_x, impulse_y, should_wake_up_body)
     if should_wake_up_body == nil then should_wake_up_body = true end
-    if local_point_x == nil then local_point_x = 0 end
-    if local_point_y == nil then local_point_y = 0 end
     local scale = B2_PIXEL_TO_METER
     impulse_x = impulse_x * scale
     impulse_y = impulse_y * scale
     if impulse_x == NAN then impulse_x = 0 end
     if impulse_y == NAN then impulse_y = 0 end
-    if impulse_x > max_value then impulse_x = max_value end
-    if impulse_y > max_value then impulse_y = max_value end
-    box2d.b2Body_ApplyLinearImpulse(self._native,
+
+    box2d.b2Body_ApplyLinearImpulseToCenter(self._native,
         b2.Vec2(impulse_x, impulse_y),
-        b2.Vec2(local_point_x * scale, local_point_y * scale),
         should_wake_up_body
     )
 end
@@ -267,7 +252,6 @@ function b2.Body:apply_angular_impulse(value, should_wake_up_body)
     if should_wake_up_body == nil then should_wake_up_body = true end
     local scale = B2_PIXEL_TO_METER * B2_PIXEL_TO_METER
     if value == NAN then value = 0 end
-    value = value * scale
     if value > max_value then value = max_value end
     box2d.b2Body_ApplyTorque(self._native, value, should_wake_up_body)
 end

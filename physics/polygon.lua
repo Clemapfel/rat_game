@@ -36,7 +36,6 @@ function b2.Rectangle(width, height, center_x, center_y, angle)
             box2d.b2MakeRot(angle)
         )
     })
-    dbg("native", out._native)
     return out
 end
 

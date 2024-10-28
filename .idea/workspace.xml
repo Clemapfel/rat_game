@@ -22,12 +22,15 @@
     </configurations>
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="7fa9ba1b-2cff-4ecc-86fb-59ab2fa76ee1" name="Changes" comment="fixed underline misalignment">
-      <change afterPath="$PROJECT_DIR$/backgrounds/karo_crosses.glsl" afterDir="false" />
+    <list default="true" id="7fa9ba1b-2cff-4ecc-86fb-59ab2fa76ee1" name="Changes" comment="added karo background">
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/backgrounds/background_shader_only.lua" beforeDir="false" afterPath="$PROJECT_DIR$/backgrounds/background_shader_only.lua" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/common/shader.lua" beforeDir="false" afterPath="$PROJECT_DIR$/common/shader.lua" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/battle/animations/consumable_lost.lua" beforeDir="false" afterPath="$PROJECT_DIR$/battle/animations/consumable_lost.lua" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/battle/battle_scene.lua" beforeDir="false" afterPath="$PROJECT_DIR$/battle/battle_scene.lua" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/common/game_state.lua" beforeDir="false" afterPath="$PROJECT_DIR$/common/game_state.lua" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/common/scene.lua" beforeDir="false" afterPath="$PROJECT_DIR$/common/scene.lua" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/main.lua" beforeDir="false" afterPath="$PROJECT_DIR$/main.lua" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/physics/body.lua" beforeDir="false" afterPath="$PROJECT_DIR$/physics/body.lua" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/physics/polygon.lua" beforeDir="false" afterPath="$PROJECT_DIR$/physics/polygon.lua" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -596,15 +599,7 @@
       <workItem from="1729098138796" duration="20580000" />
       <workItem from="1729180777153" duration="8566000" />
       <workItem from="1729267430460" duration="1705000" />
-      <workItem from="1729269158294" duration="162613000" />
-    </task>
-    <task id="LOCAL-01134" summary="added confusion">
-      <option name="closed" value="true" />
-      <created>1728760348253</created>
-      <option name="number" value="01134" />
-      <option name="presentableId" value="LOCAL-01134" />
-      <option name="project" value="LOCAL" />
-      <updated>1728760348254</updated>
+      <workItem from="1729269158294" duration="169569000" />
     </task>
     <task id="LOCAL-01135" summary="stashing battle scene layout">
       <option name="closed" value="true" />
@@ -990,7 +985,15 @@
       <option name="project" value="LOCAL" />
       <updated>1730062361811</updated>
     </task>
-    <option name="localTasksCounter" value="1183" />
+    <task id="LOCAL-01183" summary="added karo background">
+      <option name="closed" value="true" />
+      <created>1730073644606</created>
+      <option name="number" value="01183" />
+      <option name="presentableId" value="LOCAL-01183" />
+      <option name="project" value="LOCAL" />
+      <updated>1730073644606</updated>
+    </task>
+    <option name="localTasksCounter" value="1184" />
     <servers />
   </component>
   <component name="TypeScriptGeneratedFilesManager">
@@ -1039,7 +1042,6 @@
     </option>
   </component>
   <component name="VcsManagerConfiguration">
-    <MESSAGE value="added get_priority" />
     <MESSAGE value="refactored signals" />
     <MESSAGE value="fixed cutoff line in text box stencil" />
     <MESSAGE value="refactored to new sim handler" />
@@ -1064,7 +1066,8 @@
     <MESSAGE value="status animations done" />
     <MESSAGE value="added see_also" />
     <MESSAGE value="fixed underline misalignment" />
-    <option name="LAST_COMMIT_MESSAGE" value="fixed underline misalignment" />
+    <MESSAGE value="added karo background" />
+    <option name="LAST_COMMIT_MESSAGE" value="added karo background" />
   </component>
   <component name="XDebuggerManager">
     <breakpoint-manager>

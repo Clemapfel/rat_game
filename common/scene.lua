@@ -1,7 +1,12 @@
 --- @class rt.Scene
+--- @signal update (rt.Scene) -> nil
 rt.Scene = meta.new_abstract_type("Scene", rt.Widget, {
     _is_active = false
 })
+
+meta.add_signals(rt.Scene,
+    "update"
+)
 
 --- @brief
 function rt.Scene:make_active()

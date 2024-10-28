@@ -33,7 +33,7 @@ state:initialize_debug_state()
 
 
 local background = rt.Background()
-background:set_implementation(rt.Background.HEARTBEAT)
+background:set_implementation(rt.Background.KARO_CROSSES)
 
 local draw_state = true
 input = rt.InputController()
@@ -116,14 +116,14 @@ love.update = function(delta)
 end
 
 love.draw = function()
-    background:draw()
-    --love.graphics.clear(0, 0, 0, 0)
+    --background:draw()
+    love.graphics.clear(0, 0, 0, 0)
     if draw_state then
         if profiler_active then
             rt.profiler.push("draw")
         end
 
-        --state:_draw()
+        state:_draw()
 
         --[[
         if state._current_scene ~= nil then

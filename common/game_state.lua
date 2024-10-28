@@ -475,6 +475,7 @@ function rt.GameState:_update(delta)
 
     if self._current_scene ~= nil then
         self._current_scene:update(delta)
+        self._current_scene:signal_emit("update")
     end
 end
 
