@@ -84,3 +84,7 @@ rt.Background.FIREWORKS = rt.Background.new_shader_only_background("FIREWORKS", 
 --- @class rt.Background.CONFUSION
 rt.Background.CONFUSION = rt.Background.new_shader_only_background("CONFUSION", "backgrounds/confusion.glsl")
 
+--- @class rt.Background.HEART_BEAT
+rt.Background.KARO_CROSSES = rt.Background.new_shader_only_background("KARO_CROSSES", "backgrounds/karo_crosses.glsl")
+
+

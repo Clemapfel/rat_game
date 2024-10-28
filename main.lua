@@ -31,14 +31,9 @@ state = rt.GameState()
 state:set_loading_screen(rt.LoadingScreen.DEFAULT)
 state:initialize_debug_state()
 
-queue = rt.AnimationQueue()
-queue:push(rt.AnimationAction(
-    function() println "start"  end,
-    function() println "end"  end
-))
 
 local background = rt.Background()
-background:set_implementation(rt.Background.COMPLEX_TILING)
+background:set_implementation(rt.Background.HEARTBEAT)
 
 local draw_state = true
 input = rt.InputController()
@@ -122,13 +117,13 @@ end
 
 love.draw = function()
     background:draw()
-    love.graphics.clear(0, 0, 0, 0)
+    --love.graphics.clear(0, 0, 0, 0)
     if draw_state then
         if profiler_active then
             rt.profiler.push("draw")
         end
 
-        state:_draw()
+        --state:_draw()
 
         --[[
         if state._current_scene ~= nil then
