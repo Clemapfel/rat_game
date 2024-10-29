@@ -177,7 +177,7 @@ if love.getVersion() >= 12 then
         local mask_r, mask_g, mask_b, mask_a = love.graphics.getColorMask()
         love.graphics.setStencilState(mode, "always", new_value, 255)
         love.graphics.setColorMask(false, false, false, false)
-        stencil:draw()
+        if meta.is_function(stencil) then stencil() else stencil:draw() end
         love.graphics.setColorMask(mask_r, mask_g, mask_b, mask_a)
         love.graphics.setStencilState()
     end

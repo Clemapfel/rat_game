@@ -170,6 +170,10 @@ end
 
 --- @brief
 function b2.Shape:set_friction(friction)
+    if friction < 0 then
+        rt.error("In b2.Shape:set_friction: value cannot be negative")
+        friction = 0
+    end
     box2d.b2Shape_SetFriction(self._native, friction)
 end
 

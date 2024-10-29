@@ -285,9 +285,9 @@ function mn.Slots:set_object(slot_i, object, label)
             item.sprite = nil
             self._item_to_sprite[item] = nil
         else
-            item.sprite = rt.LabeledSprite(object:get_sprite_id())
+            item.sprite = rt.Sprite(object:get_sprite_id())
             if label ~= nil then
-                item.sprite:set_label(label)
+                item.sprite:set_bottom_right_child(label)
             end
             item.sprite:realize()
             item.sprite:fit_into(item.bounds)
@@ -297,9 +297,6 @@ function mn.Slots:set_object(slot_i, object, label)
         item.object = object
     end
 end
-
---- @brief
-
 
 --- @brief
 function mn.Slots:clear()

@@ -9,6 +9,27 @@ bt.Animation.CONSUMABLE_APPLIED = meta.new_type("CONSUMABLE_APPLIED", rt.Animati
     return meta.new(bt.Animation.CONSUMABLE_APPLIED, {
         _scene = scene,
         _consumable = consumable,
-        _target = sprite
+        _target = sprite,
+        _is_done = false
     })
 end)
+
+--- @override
+function bt.Animation.CONSUMABLE_APPLIED:start()
+    self._target:activate_consumable(self._consumable, function()
+        self._is_done = true
+    end)
+end
+
+--- @override
+function bt.Animation.CONSUMABLE_APPLIED:finish()
+end
+
+--- @override
+function bt.Animation.CONSUMABLE_APPLIED:update(delta)
+    return self._is_done
+end
+
+--- @override
+function bt.Animation.CONSUMABLE_APPLIED:draw()
+end

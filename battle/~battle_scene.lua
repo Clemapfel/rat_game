@@ -24,7 +24,7 @@ end)
 
 --- @brief
 function bt.BattleScene:_add_item(object)
-    local widget = rt.LabeledSprite(object:get_sprite_id())
+    local widget = rt.Sprite(object:get_sprite_id())
     self._temp_object_to_widget[object] = widget
     self._temp:add(widget, not meta.isa(object, bt.Consumable))
 

@@ -837,6 +837,7 @@ function bt.BattleScene:create_simulation_environment()
     end
 
     --- @brief
+    --- @return Number new_slot
     function env.add_consumable(entity_proxy, consumable_proxy)
         bt.assert_args("add_consumable",
             entity_proxy, bt.EntityProxy,
@@ -861,18 +862,14 @@ function bt.BattleScene:create_simulation_environment()
         _state:entity_add_consumable(entity, new_slot, consumable)
 
         local sprite = self._sprites[entity]
-        --[[
         local animation = bt.Animation.CONSUMABLE_GAINED(_scene, consumable, sprite)
-        animation:signal_connect("start", function(_)
-            sprite:add_consumable(consumable, consumable:get_max_n_uses())
+        animation:signal_connect("finish", function(_)
+            sprite:add_consumable(new_slot, consumable, consumable:get_max_n_uses())
         end)
-        ]]--
 
-        sprite:add_consumable(consumable, consumable:get_max_n_uses())
-        sprite:add_status(bt.Status("DEBUG_STATUS"), POSITIVE_INFINITY)
-
-        --_scene:_push_animation(animation)
-        env.message(entity_proxy, "gained", consumable_proxy)
+        _scene:_push_animation(animation)
+        env.message(entity_proxy, "is now holding", consumable_proxy)
+        _scene:_push_animation(bt.Animation.CONSUMABLE_APPLIED(_scene, consumable, sprite))
 
         -- callbacks
         _try_invoke_consumable_callback("on_gained", consumable_proxy, entity_proxy)
@@ -891,6 +888,8 @@ function bt.BattleScene:create_simulation_environment()
         for status_proxy in values(env.get_global_statuses()) do
             _try_invoke_global_status_callback(callback_id, status_proxy, entity_proxy, consumable_proxy)
         end
+
+        return new_slot
   end
 
     --- @brief
@@ -928,12 +927,65 @@ function bt.BattleScene:create_simulation_environment()
     end
 
     --- @brief
-    function env.remove_consumable(entity_proxy, consumable_proxy)
-        bt.assert_args("remove_consumable",
-            entity_proxy, bt.EntityProxy,
-            consumable_proxy, bt.ConsumableProxy
-        )
-        -- TODO# disable
+    --- @param slot_i Union<bt.Consumableproxy, Number>
+    function env.remove_consumable(entity_proxy, slot_i_or_consumable_proxy)
+        bt.assert_args("remove_consumable", entity_proxy, bt.EntityProxy)
+
+        local entity = _get_native(entity_proxy)
+        local consumable, consumable_proxy, slot_i
+        if meta.is_consumable_proxy(slot_i_or_consumable_proxy) then
+            -- find first consumable
+            consumable_proxy = slot_i_or_consumable_proxy
+            local found = false
+            consumable = _get_native(consumable_proxy)
+            for i = 1, entity:get_n_consumable_slots() do
+                if _state:entity_get_consumable(entity, i) == consumable then
+                    slot_i = i
+                    found = true
+                    break
+                end
+            end
+
+            if found == false then
+                rt.error("In env.remove_consumable: entity `" .. entity:get_id() .. "` does not have consumable `" .. consumable:get_id() .. "`")
+                return
+            end
+        else
+            bt.assert_is_number(slot_i_or_consumable_proxy)
+            slot_i = slot_i_or_consumable_proxy
+            consumable = _state:entity_get_consumable(entity, slot_i_or_consumable_proxy)
+            consumable_proxy = bt.create_consumable_proxy(self, consumable)
+            if consumable == nil then return end
+        end
+
+        _state:entity_remove_consumable(entity, slot_i)
+
+        local sprite = self._sprites[entity]
+        local animation = bt.Animation.CONSUMABLE_LOST(_scene, consumable, sprite)
+        animation:signal_connect("start", function(_)
+            sprite:remove_consumable(slot_i)
+        end)
+
+        _scene:_push_animation(animation)
+        env.message(entity_proxy, "lost", consumable_proxy)
+
+        -- callbacks
+        _try_invoke_consumable_callback("on_lost", consumable_proxy, entity_proxy)
+
+        local callback_id = "on_consumable_lost"
+        for status_proxy in values(env.get_statuses(entity_proxy)) do
+            _try_invoke_status_callback(callback_id, status_proxy, entity_proxy, consumable_proxy)
+        end
+
+        for other_proxy in values(env.get_consumables(entity_proxy)) do
+            if other_proxy ~= consumable_proxy then
+                _try_invoke_consumable_callback(callback_id, other_proxy, entity_proxy, consumable_proxy)
+            end
+        end
+
+        for status_proxy in values(env.get_global_statuses()) do
+            _try_invoke_global_status_callback(callback_id, status_proxy, entity_proxy, consumable_proxy)
+        end
     end
 
     --- @brief
@@ -954,7 +1006,7 @@ function bt.BattleScene:create_simulation_environment()
             consumable_proxy, bt.ConsumableProxy
         )
 
-        -- TODO#
+
     end
 
     --- @brief

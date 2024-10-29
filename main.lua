@@ -135,6 +135,7 @@ love.draw = function()
         end
         ]]--
 
+
         if profiler_active then
             rt.profiler.pop("draw")
         end

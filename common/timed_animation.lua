@@ -116,8 +116,9 @@ rt.InterpolationFunctions = meta.new_enum("InterpolationFunction", {
         return 1 / (1 + (3 * (x - 1))^order)
     end,
 
-    STEP = function(x, n_steps)
+    STEPS = function(x, n_steps)
         -- \frac{\operatorname{floor}\left(4\cdot x+0.5\right)}{4}
+        if n_steps == nil then n_steps = 3 end
         return math.floor(n_steps * x + 0.5) / n_steps
     end,
 

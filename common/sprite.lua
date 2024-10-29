@@ -23,7 +23,12 @@ rt.Sprite = meta.new_type("Sprite", rt.Widget, rt.Updatable, function(id, index)
         _frame_range_start = 1,
         _frame_range_end = 1,
         _opacity = 1,
-        _use_corrective_shader = false
+        _use_corrective_shader = false,
+
+        _bottom_right_child = nil,
+        _top_right_child = nil,
+        _bottom_left_child = nil,
+        _top_left_child = nil,
     })
 end, {
     _shader = rt.Shader(rt.settings.sprite.shader_path)
@@ -60,6 +65,15 @@ function rt.Sprite:realize()
     else
         self:set_animation(self._animation_id)
     end
+
+    for child in range(
+        self._top_right_child,
+        self._bottom_right_child,
+        self._bottom_left_child,
+        self._top_left_child
+    ) do
+        child:realize()
+    end
 end
 
 --- @override
@@ -69,6 +83,15 @@ function rt.Sprite:draw()
         self._shader:send("texture_resolution", self._texture_resolution)
         self._shape:draw()
         self._shader:unbind()
+
+        for child in range(
+            self._top_right_child,
+            self._bottom_right_child,
+            self._bottom_left_child,
+            self._top_left_child
+        ) do
+            child:draw()
+        end
     else
         self._shape:draw()
     end
@@ -88,6 +111,15 @@ function rt.Sprite:update(delta)
             offset = math.min(offset, n_frames)
         end
         self:set_frame(start + offset)
+    end
+
+    for child in range(
+        self._top_right_child,
+        self._bottom_right_child,
+        self._bottom_left_child,
+        self._top_left_child
+    ) do
+        child:update()
     end
 end
 
@@ -147,12 +179,62 @@ end
 
 --- @override
 function rt.Sprite:size_allocate(x, y, width, height)
-    if self._is_realized == true then
-        self._shape:set_vertex_position(1, x, y)
-        self._shape:set_vertex_position(2, x + width, y)
-        self._shape:set_vertex_position(3, x + width, y + height)
-        self._shape:set_vertex_position(4, x, y + height)
-        self:set_frame(self._current_frame)
+    self._shape:set_vertex_position(1, x, y)
+    self._shape:set_vertex_position(2, x + width, y)
+    self._shape:set_vertex_position(3, x + width, y + height)
+    self._shape:set_vertex_position(4, x, y + height)
+    self:set_frame(self._current_frame)
+
+    if self._top_left_child ~= nil then
+        local w, h = self._top_left_child:measure()
+        self._top_left_child:fit_into(
+            x - w,
+            y - h,
+            w, h
+        )
+    end
+
+    if self._top_right_child ~= nil then
+        local w, h = self._top_right_child:measure()
+        self._top_right_child:fit_into(
+            x + width - w,
+            y + h,
+            w, h
+        )
+    end
+
+    if self._bottom_right_child ~= nil then
+        local w, h = self._bottom_right_child:measure()
+        self._bottom_right_child:fit_into(
+            x + width - w,
+            y + height - h,
+            w, h
+        )
+    end
+
+    if self._bottom_left_child ~= nil then
+        local w, h = self._bottom_left_child:measure()
+        self._bottom_left_child:fit_into(
+            x - w,
+            y + height - h,
+            w, h
+        )
+    end
+end
+
+for which in range("top_right", "bottom_right", "bottom_left", "top_left") do
+    --- @brief set_top_right_child, set_bottom_right_child, set_bottom_left_child, set_top_left_child
+    rt.Sprite["set_" .. which .. "_child"] = function(self, widget)
+        if meta.is_string(widget) then widget = rt.Label(widget) end
+        meta.assert_isa(widget, rt.Widget)
+        self["_" .. which .. "_child"] = widget
+        if self:get_is_realized() then widget:realize() end
+        self:reformat()
+    end
+
+    --- @brief get_top_right_child, get_bottom_right_child, get_bottom_left_child, get_top_left_child
+    rt.Sprite["get_" .. which .. "_child"] = function(self)
+        return self["_" .. which .. "_child"]
     end
 end
 
@@ -181,7 +263,6 @@ function rt.Sprite:get_n_frames(animation_id_maybe)
     if self._is_valid == false then return 1 end
     return self._spritesheet:get_n_frames(animation_id_maybe)
 end
-
 
 --- @brief
 function rt.Sprite:set_use_corrective_shader(b)

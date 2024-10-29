@@ -196,11 +196,13 @@ end
 function rt.TextBox:show()
     self._is_shown = true
     self._show_delay_elapsed = 0
+    self._hide_delay_elapsed = 0
 end
 
 --- @brief
 function rt.TextBox:hide()
     self._is_shown = false
+    self._show_delay_elapsed = 0
     self._hide_delay_elapsed = 0
 end
 

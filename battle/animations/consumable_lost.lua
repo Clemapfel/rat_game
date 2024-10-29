@@ -44,7 +44,8 @@ function bt.Animation.CONSUMABLE_LOST:start()
 
     self._ball_body = b2.Body(self.world, b2.BodyType.DYNAMIC, ball_x, ball_y)
     self._ball_shape = b2.CircleShape(self._ball_body, b2.Circle(ball_r))
-    self._ball_shape:set_restitution(0.7)
+    self._ball_shape:set_restitution(0.6)
+    self._ball_shape:set_friction(0.1)
     self._ball_body:set_rotation_fixed(true)
 
     self._floor_body = b2.Body(self.world, b2.BodyType.STATIC, floor_x, floor_y)
@@ -90,7 +91,7 @@ function bt.Animation.CONSUMABLE_LOST:update(delta)
     self._sprite_rotation = self._ball_body:get_angle()
     self._sprite_opacity = self._opacity_animation:get_value()
 
-    return self._opacity_animation:get_is_done() and rt.magnitude(self._ball_body:get_linear_velocity()) < 10e-3
+    return self._opacity_animation:get_is_done() and select(2, self._ball_body:get_linear_velocity()) < 10e-3
 end
 
 --- @override

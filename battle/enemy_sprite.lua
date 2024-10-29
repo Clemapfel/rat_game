@@ -23,8 +23,8 @@ bt.EnemySprite = meta.new_type("EnemySprite", bt.EntitySprite, function(entity)
 
         _stunned_animation = bt.StunnedParticleAnimation(),
 
-        _status_to_labeled_sprite = {}, -- Table<Status, rt.LabeledSprite>
-        _consumable_slot_to_labeled_sprite = {}, -- Table<rt.LabeledSprite>
+        _status_to_sprite = {}, -- Table<Status, rt.Sprite>
+        _consumable_slot_to_sprite = {}, -- Table<rt.Sprite>
     })
 end)
 
@@ -163,18 +163,18 @@ function bt.EnemySprite:add_status(status, n_turns_left)
     meta.assert_isa(status, bt.Status)
     meta.assert_number(n_turns_left)
 
-    if self._status_to_labeled_sprite[status] ~= nil then
+    if self._status_to_sprite[status] ~= nil then
         self:set_status_n_turns_left(status, n_turns_left)
         return
     end
 
-    local sprite = rt.LabeledSprite(status:get_sprite_id())
+    local sprite = rt.Sprite(status:get_sprite_id())
     if n_turns_left ~= POSITIVE_INFINITY then
-        sprite:set_label("<o>" .. n_turns_left .. "</o>")
+        sprite:set_bottom_right_child("<o>" .. n_turns_left .. "</o>")
     end
-    sprite._sprite:set_minimum_size(sprite._sprite:get_resolution())
+    sprite:set_minimum_size(sprite:get_resolution())
 
-    self._status_to_labeled_sprite[status] = sprite
+    self._status_to_sprite[status] = sprite
     self._status_consumable_bar:add(sprite, true)
 end
 
@@ -182,12 +182,12 @@ end
 function bt.EnemySprite:remove_status(status)
     meta.assert_isa(status, bt.Status)
 
-    local sprite = self._status_to_labeled_sprite[status]
+    local sprite = self._status_to_sprite[status]
     if sprite == nil then
         rt.error("In bt.EnemySprite:remove_status: status is not present")
         return
     end
-    self._status_to_labeled_sprite[status] = nil
+    self._status_to_sprite[status] = nil
     self._status_consumable_bar:remove(sprite)
 end
 
@@ -196,15 +196,16 @@ function bt.EnemySprite:set_status_n_turns_left(status, n_turns_left)
     meta.assert_isa(status, bt.Status)
     meta.assert_number(n_turns_left)
 
-    local sprite = self._status_to_labeled_sprite[status]
+    local sprite = self._status_to_sprite[status]
     if sprite == nil then
         rt.error("In bt.EnemySprite:set_status_n_turns_left: status is not yet present")
         return
     end
+    
     if n_turns_left == POSITIVE_INFINITY then
-        sprite:set_label("")
+        sprite:set_bottom_right_child("")
     else
-        sprite:set_label("<o>" .. n_turns_left .. "</o>")
+        sprite:set_bottom_right_child("<o>" .. n_turns_left .. "</o>")
     end
 end
 
@@ -212,7 +213,7 @@ end
 function bt.EnemySprite:activate_status(status, on_done_notify)
     meta.assert_isa(status, bt.Status)
 
-    local sprite = self._status_to_labeled_sprite[status]
+    local sprite = self._status_to_sprite[status]
     if sprite == nil then
         rt.error("In bt.EnemySprite:activate_status: status is not present")
         return
@@ -222,30 +223,64 @@ function bt.EnemySprite:activate_status(status, on_done_notify)
 end
 
 --- @brief
-function bt.EnemySprite:add_consumable(consumable, n_uses_left)
+function bt.EnemySprite:add_consumable(slot_i, consumable, n_uses_left)
+    meta.assert_number(slot_i)
     meta.assert_isa(consumable, bt.Consumable)
     meta.assert_number(n_uses_left)
 
-    if self._status_to_labeled_sprite[consumable] ~= nil then
-        self:set_consumable_n_uses_left(consumable, n_uses_left)
-        return
+    if self._consumable_slot_to_sprite[slot_i] ~= nil then
+        self:set_consumable_n_uses_left(slot_i, consumable, n_uses_left)
     end
-
-    local sprite = rt.LabeledSprite(consumable:get_sprite_id())
+    
+    local sprite = rt.Sprite(consumable:get_sprite_id())
     if n_uses_left ~= POSITIVE_INFINITY then
-        sprite:set_label("<o>" .. n_uses_left .. "</o>")
+        sprite:set_bottom_right_child("<o>" .. n_uses_left .. "</o>")
     end
-    sprite._sprite:set_minimum_size(sprite._sprite:get_resolution())
+    sprite:set_minimum_size(sprite:get_resolution())
 
+    self._consumable_slot_to_sprite[slot_i] = sprite
     self._status_consumable_bar:add(sprite, false)
 end
 
 --- @brief
-function bt.EnemySprite:remove_consumable(consumable)
-
+function bt.EnemySprite:remove_consumable(slot_i)
+    meta.assert_number(slot_i)
+    local sprite = self._consumable_slot_to_sprite[slot_i]
+    if sprite == nil then
+        rt.error("In bt.EnemySprite:remove_consumable: no consumable at slot `" .. slot_i .. "`")
+        return
+    end
+    
+    self._consumable_slot_to_sprite[slot_i] = nil
+    self._status_consumable_bar:remove(sprite)
 end
 
 --- @brief
-function bt.EnemySprite:set_consumable_n_uses_left(consumable, n_uses_left)
+function bt.EnemySprite:set_consumable_n_uses_left(slot_i, n_uses_left)
+    meta.assert_number(slot_i, n_uses_left)
 
+    local sprite = self._consumable_slot_to_sprite[slot_i]
+    if sprite == nil then
+        rt.error("In bt.EnemySprite:set_consumable_n_uses_left: consumable at slot `" .. slot_i .. "` not present")
+        return
+    end
+
+    if n_uses_left == POSITIVE_INFINITY then
+        sprite:set_bottom_right_child("")
+    else
+        sprite:set_bottom_right_child("<o>" .. n_uses_left .. "</o>")
+    end
+end
+
+--- @brief
+function bt.EnemySprite:activate_consumable(slot_i, on_done_notify)
+    meta.assert_number(slot_i)
+
+    local sprite = self._consumable_slot_to_sprite[slot_i]
+    if sprite == nil then
+        rt.error("In bt.EnemySprite:activate_consumable: status is not present")
+        return
+    end
+
+    self._status_consumable_bar:activate(sprite, on_done_notify)
 end
