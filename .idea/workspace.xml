@@ -22,23 +22,9 @@
     </configurations>
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="7fa9ba1b-2cff-4ecc-86fb-59ab2fa76ee1" name="Changes" comment="stashing consumable display rework">
-      <change afterPath="$PROJECT_DIR$/battle/animations/consumable_consumed.lua" afterDir="false" />
+    <list default="true" id="7fa9ba1b-2cff-4ecc-86fb-59ab2fa76ee1" name="Changes" comment="stashing TODO">
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/battle/animations/consumable_applied.lua" beforeDir="false" afterPath="$PROJECT_DIR$/battle/animations/consumable_applied.lua" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/battle/animations/consumable_lost.lua" beforeDir="false" afterPath="$PROJECT_DIR$/battle/animations/consumable_lost.lua" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/battle/battle_scene.lua" beforeDir="false" afterPath="$PROJECT_DIR$/battle/battle_scene.lua" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/battle/enemy_sprite.lua" beforeDir="false" afterPath="$PROJECT_DIR$/battle/enemy_sprite.lua" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/battle/simulation_handler.lua" beforeDir="false" afterPath="$PROJECT_DIR$/battle/simulation_handler.lua" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/battle/~battle_scene.lua" beforeDir="false" afterPath="$PROJECT_DIR$/battle/~battle_scene.lua" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/common/graphics.lua" beforeDir="false" afterPath="$PROJECT_DIR$/common/graphics.lua" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/common/sprite.lua" beforeDir="false" afterPath="$PROJECT_DIR$/common/sprite.lua" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/common/text_box.lua" beforeDir="false" afterPath="$PROJECT_DIR$/common/text_box.lua" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/common/timed_animation.lua" beforeDir="false" afterPath="$PROJECT_DIR$/common/timed_animation.lua" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/include.lua" beforeDir="false" afterPath="$PROJECT_DIR$/include.lua" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/main.lua" beforeDir="false" afterPath="$PROJECT_DIR$/main.lua" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/menu/slots.lua" beforeDir="false" afterPath="$PROJECT_DIR$/menu/slots.lua" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/physics/shape.lua" beforeDir="false" afterPath="$PROJECT_DIR$/physics/shape.lua" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/battle/animations/consumable_consumed.lua" beforeDir="false" afterPath="$PROJECT_DIR$/battle/animations/consumable_consumed.lua" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -607,15 +593,7 @@
       <workItem from="1729098138796" duration="20580000" />
       <workItem from="1729180777153" duration="8566000" />
       <workItem from="1729267430460" duration="1705000" />
-      <workItem from="1729269158294" duration="186557000" />
-    </task>
-    <task id="LOCAL-01139" summary="stashing dissolve animation">
-      <option name="closed" value="true" />
-      <created>1728865017319</created>
-      <option name="number" value="01139" />
-      <option name="presentableId" value="LOCAL-01139" />
-      <option name="project" value="LOCAL" />
-      <updated>1728865017319</updated>
+      <workItem from="1729269158294" duration="187172000" />
     </task>
     <task id="LOCAL-01140" summary="working">
       <option name="closed" value="true" />
@@ -1001,7 +979,15 @@
       <option name="project" value="LOCAL" />
       <updated>1730153086231</updated>
     </task>
-    <option name="localTasksCounter" value="1188" />
+    <task id="LOCAL-01188" summary="stashing TODO">
+      <option name="closed" value="true" />
+      <created>1730162767789</created>
+      <option name="number" value="01188" />
+      <option name="presentableId" value="LOCAL-01188" />
+      <option name="project" value="LOCAL" />
+      <updated>1730162767789</updated>
+    </task>
+    <option name="localTasksCounter" value="1189" />
     <servers />
   </component>
   <component name="TypeScriptGeneratedFilesManager">
@@ -1050,7 +1036,6 @@
     </option>
   </component>
   <component name="VcsManagerConfiguration">
-    <MESSAGE value="made line number fixed" />
     <MESSAGE value="added snapshot" />
     <MESSAGE value="refactored render texture" />
     <MESSAGE value="implemented stun animation" />
@@ -1075,7 +1060,8 @@
     <MESSAGE value="consumable gained done" />
     <MESSAGE value="underlined / strikethrough now also respects n_visible_characters" />
     <MESSAGE value="stashing consumable display rework" />
-    <option name="LAST_COMMIT_MESSAGE" value="stashing consumable display rework" />
+    <MESSAGE value="stashing TODO" />
+    <option name="LAST_COMMIT_MESSAGE" value="stashing TODO" />
   </component>
   <component name="XDebuggerManager">
     <breakpoint-manager>

@@ -25,10 +25,9 @@ bt.Animation.CONSUMABLE_CONSUMED = meta.new_type("CONSUMABLE_CONSUMED", rt.Anima
             2, 1, rt.InterpolationFunctions.STEPS, n_bites
         ),
         _target_animation = rt.TimedAnimation(duration,
-            1, 0.8, rt.InterpolationFunctions.STEPS, n_bites
+            0.8, 1, rt.InterpolationFunctions.TRIANGLE_WAVE, n_bites
         ),
-        _target_max_offset = 0,
-        _target_offset = 0,
+        _target_scale = 1,
 
         _circles = {},
         _generate_circle = nil, -- Function
@@ -55,8 +54,7 @@ function bt.Animation.CONSUMABLE_CONSUMED:start()
     local x, y = self._target:get_position()
     local w, h = self._target:get_snapshot():get_size()
     self._sprite_x, self._sprite_y = x + 0.5 * w, y + 0.5 * h
-    self._target_max_offset = 0.25 * w
-
+    self._target_aabb = rt.AABB(x, y, w, h)
     self._circle_aabb = rt.AABB(x, y, w, h)
     self._circle_aabb.x, self._circle_aabb.y = 0.1 * math.min(w, h), 0.4 * math.min(w, h)
     self._generate_circle = function()
@@ -107,20 +105,23 @@ function bt.Animation.CONSUMABLE_CONSUMED:update(delta)
     end
 
     self._sprite_scale = self._scale_animation:get_value()
-    self._target_offset = self._target_animation:get_value()
+    self._target_scale = self._target_animation:get_value()
     return self._scale_animation:get_is_done()
 end
 
 --- @override
 function bt.Animation.CONSUMABLE_CONSUMED:draw()
 
-    --love.graphics.translate(self._target_offset, 0)
-    love.graphics.translate(-self._sprite_x, -self._sprite_y)
-    love.graphics.scale(self._target_offset)
+    love.graphics.push()
+    local x, y, w, h = rt.aabb_unpack(self._target_aabb)
+    x = x + 0.5 * w
+    y = y + 0.5 * h
+    love.graphics.translate(x, y)
+    love.graphics.scale(1, self._target_scale)
+    love.graphics.translate(-x, -y)
+    love.graphics.translate(0, 0.5 * (1 - self._target_scale) * h)
     self._target:draw_snapshot()
-    love.graphics.scale(1 / self._target_offset)
-    love.graphics.translate(self._sprite_x, self._sprite_y)
-    --love.graphics.translate(-self._target_offset, 0)
+    love.graphics.pop()
 
     love.graphics.push()
     love.graphics.translate(self._sprite_x, self._sprite_y)
