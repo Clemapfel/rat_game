@@ -104,7 +104,7 @@ function rt.random.string(length, set)
     return table.concat(out, "")
 end
 
---- @brief test random
-function rt.test.random()
-   error("TODO")
+--- @brief
+function rt.random.noise(x, y)
+    return love.math.simplexNoise(x, y)
 end

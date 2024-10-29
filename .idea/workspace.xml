@@ -22,13 +22,12 @@
     </configurations>
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="7fa9ba1b-2cff-4ecc-86fb-59ab2fa76ee1" name="Changes" comment="one light working">
-      <change afterPath="$PROJECT_DIR$/assets/rat_game.hxp" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/common/~normal_map_lighting.glsl" afterDir="false" />
+    <list default="true" id="7fa9ba1b-2cff-4ecc-86fb-59ab2fa76ee1" name="Changes" comment="added normal map palette">
+      <change afterPath="$PROJECT_DIR$/battle/animations/object_disabled.lua" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/common/normal_map_lighting.glsl" beforeDir="false" afterPath="$PROJECT_DIR$/common/normal_map_lighting.glsl" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/battle/battle_scene.lua" beforeDir="false" afterPath="$PROJECT_DIR$/battle/battle_scene.lua" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/main.lua" beforeDir="false" afterPath="$PROJECT_DIR$/main.lua" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/main_normal_map.lua" beforeDir="false" afterPath="$PROJECT_DIR$/main_normal_map.lua" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/older/~common/random.lua" beforeDir="false" afterPath="$PROJECT_DIR$/older/~common/random.lua" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -154,7 +153,7 @@
       <recent name="C:\Users\cleme\Workspace\rat_game\old" />
     </key>
   </component>
-  <component name="RunManager" selected="Lua Application.main_normal_map">
+  <component name="RunManager" selected="Lua Application.main">
     <configuration name="Makefile" type="MAKEFILE_TARGET_RUN_CONFIGURATION" factoryName="Makefile" temporary="true">
       <makefile filename="$PROJECT_DIR$/midi/lovemidi/Makefile" target="" workingDirectory="" arguments="">
         <envs />
@@ -601,15 +600,7 @@
       <workItem from="1729098138796" duration="20580000" />
       <workItem from="1729180777153" duration="8566000" />
       <workItem from="1729267430460" duration="1705000" />
-      <workItem from="1729269158294" duration="202266000" />
-    </task>
-    <task id="LOCAL-01142" summary="stashing">
-      <option name="closed" value="true" />
-      <created>1728952496808</created>
-      <option name="number" value="01142" />
-      <option name="presentableId" value="LOCAL-01142" />
-      <option name="project" value="LOCAL" />
-      <updated>1728952496808</updated>
+      <workItem from="1729269158294" duration="206657000" />
     </task>
     <task id="LOCAL-01143" summary="resized sprites">
       <option name="closed" value="true" />
@@ -995,7 +986,15 @@
       <option name="project" value="LOCAL" />
       <updated>1730227333087</updated>
     </task>
-    <option name="localTasksCounter" value="1191" />
+    <task id="LOCAL-01191" summary="added normal map palette">
+      <option name="closed" value="true" />
+      <created>1730235219365</created>
+      <option name="number" value="01191" />
+      <option name="presentableId" value="LOCAL-01191" />
+      <option name="project" value="LOCAL" />
+      <updated>1730235219365</updated>
+    </task>
+    <option name="localTasksCounter" value="1192" />
     <servers />
   </component>
   <component name="TypeScriptGeneratedFilesManager">
@@ -1044,7 +1043,6 @@
     </option>
   </component>
   <component name="VcsManagerConfiguration">
-    <MESSAGE value="implemented stun animation" />
     <MESSAGE value="refactored widget realization" />
     <MESSAGE value="fixed battle scene layout" />
     <MESSAGE value="refactored kill animation" />
@@ -1069,7 +1067,8 @@
     <MESSAGE value="stashing TODO" />
     <MESSAGE value="added eating animation" />
     <MESSAGE value="one light working" />
-    <option name="LAST_COMMIT_MESSAGE" value="one light working" />
+    <MESSAGE value="added normal map palette" />
+    <option name="LAST_COMMIT_MESSAGE" value="added normal map palette" />
   </component>
   <component name="XDebuggerManager">
     <breakpoint-manager>

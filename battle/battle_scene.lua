@@ -698,8 +698,7 @@ function bt.BattleScene:_handle_button_pressed(which)
         )
         ]]--
 
-        self:_push_animation(bt.Animation.CONSUMABLE_CONSUMED(self, bt.Consumable("DEBUG_CONSUMABLE"), self._enemy_sprites[1]))
-        self._simulation_environment.message("yum yum")
+        self:_push_animation(bt.Animation.OBJECT_DISABLED(self, bt.Consumable("DEBUG_CONSUMABLE"), self._enemy_sprites[1]))
     elseif which == rt.InputButton.B then
         self._animation_queue:skip()
     end
