@@ -1,36 +1,54 @@
-#ifdef PIXEL
+#pragma language glsl4
 
 float gaussian(float x, float ramp)
 {
     return exp(((-4 * 3.14159265359) / 3) * (ramp * x) * (ramp * x));
 }
 
-uniform vec3 light_position; // Define the light position as a uniform
-const float ambient_intensity = 0.2; // Set ambient intensity for ambient lighting
-const vec4 light_color = vec4(1, 1, 1, 1);
-const vec4 ambient_color = vec4(1, 1, 1, 1);
-const vec3 attenuation_coefficients = vec3(0, 0, 1); // constant, linear, and quadratic terms
+#ifdef PIXEL
 
-vec4 effect(vec4 vertex_color, Image normals, vec2 texture_coords, vec2 vertex_position)
-{
-    vec3 normal_map = Texel(normals, texture_coords).rgb;
-    normal_map.y = 1 - normal_map.y;
+struct Light {
+    vec2 position;
+    float intensity;
+    vec3 color;
+};
 
-    const float light_z = 30;
-    vec3 light_direction = vec3(light_position.xy - vertex_position, light_z);
-    light_direction.x *= love_ScreenSize.x / love_ScreenSize.y;
+layout(std430) readonly buffer light_buffer {
+    Light lights[];
+};
 
-    vec3 N = normalize(normal_map * 2.0 - 1.0);
-    vec3 L = normalize(light_direction);
+uniform int n_lights;
 
-    vec3 diffuse = max(dot(N, L), 0.0) * light_color.rgb * light_color.a;
+vec4 effect(vec4 _, Image normals, vec2 texture_coords, vec2 vertex_position) {
 
-    float attenuation = gaussian(distance(
-        light_position.xy / love_ScreenSize.xy,
-        vertex_position.xy / love_ScreenSize.xy
-    ), 1);
+    vec3 normal_raw = Texel(normals, texture_coords).rgb;
+    normal_raw.y = 1 - normal_raw.y;
+    vec3 normal = normalize(normal_raw * 2 - 1.0);
 
-    return vec4(diffuse * attenuation, 1);
+    float light_z = 0; //max(0, length(normal.xy));
+
+    vec3 color = vec3(0);
+    for (int i = 0; i < n_lights; ++i) {
+
+        Light light = lights[i];
+
+        vec2 light_position = light.position.xy;
+        light_position.x += love_ScreenSize.y / love_ScreenSize.x;
+        vec3 light_direction = vec3(light.position.xy - vertex_position, light_z);
+        float value = max(dot(normal, normalize(light_direction)), 0);
+        vec3 light_color = light.color.rgb;
+
+        float attenuation = gaussian(distance(
+            light.position.xy / love_ScreenSize.xy,
+            vertex_position.xy / love_ScreenSize.xy
+        ), 1) * light.intensity;
+
+        color += light_color * attenuation * value;
+    }
+
+    color = clamp(color, vec3(0), vec3(1));
+
+    return vec4(color, 1);
 }
 
 #endif

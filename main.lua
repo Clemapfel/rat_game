@@ -72,7 +72,7 @@ component:signal_connect("finished", function(_)
     println("done")
 end)
 
-input:signal_connect("pressed", function(_, which)
+input:signal_connect("pressed", function(_, whgich)
     if which == rt.InputButton.A then
         --component:play("test/alarm")
     elseif which == rt.InputButton.B then
