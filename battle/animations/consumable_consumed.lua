@@ -1,5 +1,5 @@
 rt.settings.battle.animation.consumable_consumed = {
-    duration = 3
+    duration = 1.5
 }
 
 --- @class bt.Animation.CONSUMABLE_CONSUMED
@@ -11,7 +11,7 @@ bt.Animation.CONSUMABLE_CONSUMED = meta.new_type("CONSUMABLE_CONSUMED", rt.Anima
     meta.assert_isa(consumable, bt.Consumable)
     meta.assert_isa(sprite, bt.EntitySprite)
     local duration = rt.settings.battle.animation.consumable_consumed.duration
-    local n_bites = 5
+    local n_bites = 3
     return meta.new(bt.Animation.CONSUMABLE_CONSUMED, {
         _scene = scene,
         _consumable = consumable,

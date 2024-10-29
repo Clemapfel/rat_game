@@ -22,9 +22,11 @@
     </configurations>
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="7fa9ba1b-2cff-4ecc-86fb-59ab2fa76ee1" name="Changes" comment="stashing TODO">
+    <list default="true" id="7fa9ba1b-2cff-4ecc-86fb-59ab2fa76ee1" name="Changes" comment="added eating animation">
+      <change afterPath="$PROJECT_DIR$/common/normal_map_lighting.glsl" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/battle/animations/consumable_consumed.lua" beforeDir="false" afterPath="$PROJECT_DIR$/battle/animations/consumable_consumed.lua" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/main_midi.lua" beforeDir="false" afterPath="$PROJECT_DIR$/main_normal_map.lua" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -56,6 +58,9 @@
   </component>
   <component name="GitLabMergeRequestsSettings">{}</component>
   <component name="GithubPullRequestsUISettings">{}</component>
+  <component name="HighlightingSettingsPerFile">
+    <setting file="file://$USER_HOME$/AppData/Local/Temp/8b0c9148-a53e-46d2-ac12-301c14bb690c_Normal Map Lighting(1).zip.90c/Normal Map Lighting.frag" root0="FORCE_HIGHLIGHTING" />
+  </component>
   <component name="MarkdownSettingsMigration">
     <option name="stateVersion" value="1" />
   </component>
@@ -91,6 +96,7 @@
     "Lua Application.main_lichen.executor": "Run",
     "Lua Application.main_linux.executor": "Run",
     "Lua Application.main_midi.executor": "Run",
+    "Lua Application.main_normal_map.executor": "Run",
     "Lua Application.main_overworld_windows.executor": "Run",
     "Lua Application.main_rope.executor": "Run",
     "Lua Application.main_rope_windows.executor": "Run",
@@ -146,7 +152,7 @@
       <recent name="C:\Users\cleme\Workspace\rat_game\old" />
     </key>
   </component>
-  <component name="RunManager" selected="Lua Application.main">
+  <component name="RunManager" selected="Lua Application.main_normal_map">
     <configuration name="Makefile" type="MAKEFILE_TARGET_RUN_CONFIGURATION" factoryName="Makefile" temporary="true">
       <makefile filename="$PROJECT_DIR$/midi/lovemidi/Makefile" target="" workingDirectory="" arguments="">
         <envs />
@@ -164,10 +170,10 @@
       <option name="showConsole" value="true" />
       <method v="2" />
     </configuration>
-    <configuration name="main_midi" type="lua.app" factoryName="Lua Application">
+    <configuration name="main_normal_map" type="lua.app" factoryName="Lua Application">
       <module name="rat_game" />
       <option name="program" value="C:\Users\cleme\Workspace\rat_game\love\windows\love.exe" />
-      <option name="file" value="main_midi.lua" />
+      <option name="file" value="main_normal_map.lua" />
       <option name="workingDir" value="$PROJECT_DIR$" />
       <option name="debuggerType" value="2" />
       <option name="params" value="" />
@@ -235,7 +241,7 @@
     <list>
       <item itemvalue="Emmy Debugger(NEW).remote_debugger" />
       <item itemvalue="Lua Application.main" />
-      <item itemvalue="Lua Application.main_midi" />
+      <item itemvalue="Lua Application.main_normal_map" />
       <item itemvalue="Lua Application.main_rope" />
       <item itemvalue="Lua Application.meta.lua" />
       <item itemvalue="Makefile Target.Makefile" />
@@ -593,15 +599,7 @@
       <workItem from="1729098138796" duration="20580000" />
       <workItem from="1729180777153" duration="8566000" />
       <workItem from="1729267430460" duration="1705000" />
-      <workItem from="1729269158294" duration="187172000" />
-    </task>
-    <task id="LOCAL-01140" summary="working">
-      <option name="closed" value="true" />
-      <created>1728947214757</created>
-      <option name="number" value="01140" />
-      <option name="presentableId" value="LOCAL-01140" />
-      <option name="project" value="LOCAL" />
-      <updated>1728947214757</updated>
+      <workItem from="1729269158294" duration="194336000" />
     </task>
     <task id="LOCAL-01141" summary="dissolve working">
       <option name="closed" value="true" />
@@ -987,7 +985,15 @@
       <option name="project" value="LOCAL" />
       <updated>1730162767789</updated>
     </task>
-    <option name="localTasksCounter" value="1189" />
+    <task id="LOCAL-01189" summary="added eating animation">
+      <option name="closed" value="true" />
+      <created>1730163458294</created>
+      <option name="number" value="01189" />
+      <option name="presentableId" value="LOCAL-01189" />
+      <option name="project" value="LOCAL" />
+      <updated>1730163458294</updated>
+    </task>
+    <option name="localTasksCounter" value="1190" />
     <servers />
   </component>
   <component name="TypeScriptGeneratedFilesManager">
@@ -1036,7 +1042,6 @@
     </option>
   </component>
   <component name="VcsManagerConfiguration">
-    <MESSAGE value="added snapshot" />
     <MESSAGE value="refactored render texture" />
     <MESSAGE value="implemented stun animation" />
     <MESSAGE value="refactored widget realization" />
@@ -1061,7 +1066,8 @@
     <MESSAGE value="underlined / strikethrough now also respects n_visible_characters" />
     <MESSAGE value="stashing consumable display rework" />
     <MESSAGE value="stashing TODO" />
-    <option name="LAST_COMMIT_MESSAGE" value="stashing TODO" />
+    <MESSAGE value="added eating animation" />
+    <option name="LAST_COMMIT_MESSAGE" value="added eating animation" />
   </component>
   <component name="XDebuggerManager">
     <breakpoint-manager>
@@ -1085,6 +1091,11 @@
           <url>file://$PROJECT_DIR$/common/~label.lua</url>
           <line>23</line>
           <option name="timeStamp" value="23" />
+        </line-breakpoint>
+        <line-breakpoint enabled="true" type="lua-line">
+          <url>file://$PROJECT_DIR$/main_rope.lua</url>
+          <line>22</line>
+          <option name="timeStamp" value="43" />
         </line-breakpoint>
         <line-breakpoint enabled="true" suspend="NONE" type="CMakeLineBreakpoint">
           <url>file://$PROJECT_DIR$/physics/box2d_extension/CMakeLists.txt</url>
