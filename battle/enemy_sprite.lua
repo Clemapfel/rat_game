@@ -17,7 +17,7 @@ bt.EnemySprite = meta.new_type("EnemySprite", bt.EntitySprite, function(entity)
         _selection_frame = rt.Frame(),
         _selection_state = rt.SelectionState.INACTIVE,
 
-        _snapshot = rt.RenderTexture(1, 1),
+        _snapshot = rt.RenderTexture(),
         _snapshot_position_x = 0,
         _snapshot_position_y = 0,
 
@@ -278,7 +278,7 @@ function bt.EnemySprite:activate_consumable(slot_i, on_done_notify)
 
     local sprite = self._consumable_slot_to_sprite[slot_i]
     if sprite == nil then
-        rt.error("In bt.EnemySprite:activate_consumable: status is not present")
+        rt.error("In bt.EnemySprite:activate_consumable: consumable is not present")
         return
     end
 

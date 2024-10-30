@@ -22,7 +22,7 @@ bt.PartySprite = meta.new_type("BattlePartySprite", bt.EntitySprite, function(en
 
         _sprite = rt.Sprite(entity_id_to_sprite_id[entity:get_id()]),
 
-        _snapshot = rt.RenderTexture(1, 1),
+        _snapshot = rt.RenderTexture(),
         _snapshot_position_x = 0,
         _snapshot_position_y = 0,
 

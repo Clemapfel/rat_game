@@ -38,4 +38,4 @@ function rt.RenderTexture:as_image()
     end
 end
 
-rt.RenderTexture.default_instance = rt.RenderTexture(1, 1)
+rt.RenderTexture.default_instance = rt.RenderTexture()

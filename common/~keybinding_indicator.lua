@@ -11,7 +11,7 @@ rt.KeybindingIndicator = meta.new_type("KeybindingIndicator", rt.Widget, functio
         _key = key,
         _font = nil, -- rt.Font
         _draw = function() end,
-        _snapshot = rt.RenderTexture(1, 1)
+        _snapshot = rt.RenderTexture()
     })
 end, {
     font_size_to_font = {},

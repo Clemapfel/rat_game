@@ -1,10 +1,11 @@
 rt.settings.battle.animation.object_disabled = {
     hold_duration = 1,
-    fade_out_duration = 1
+    shatter_duration = 1,
+    fade_out_duration = 1,
+    triangle_radius = 30
 }
 
 --- @class bt.Animation.OBJECT_DISABLED
--- TODO
 bt.Animation.OBJECT_DISABLED = meta.new_type("OBJECT_DISABLED", rt.Animation, function(scene, object, sprite)
     meta.assert_isa(scene, bt.BattleScene)
     meta.assert_isa(sprite, bt.EnemySprite)
@@ -13,36 +14,51 @@ bt.Animation.OBJECT_DISABLED = meta.new_type("OBJECT_DISABLED", rt.Animation, fu
         _scene = scene,
         _object = object,
         _target = sprite,
-        _sprite = rt.Sprite("why"),
         _triangles = {},
-        _render_texture = rt.RenderTexture(),
-        _render_texture_padding = 5,
         _opacity_animation = rt.TimedAnimation(rt.settings.battle.animation.object_disabled.fade_out_duration, 0, 1, rt.InterpolationFunctions.GAUSSIAN_LOWPASS),
         _opacity = 1,
+
+        _render_texture = rt.RenderTexture(),
         _render_texture_x = 0,
         _render_texture_y = 0,
+        _sprite_texture = rt.RenderTexture(),
 
-        _elapsed = 0
+        _hold_elapsed = 0,
+        _shatter_elapsed = 0
     })
 end)
 
 --- @override
 function bt.Animation.OBJECT_DISABLED:start()
-    local x, y = self._target:get_position()
-    local width, height = self._target:get_snapshot():get_size()
+    local sprite = rt.Sprite(self._object:get_sprite_id())
+    sprite:realize()
+    local sprite_w, sprite_h = sprite:measure()
+    sprite:fit_into(0, 0)
 
-    local step = 30
+    self._sprite_texture = rt.RenderTexture(sprite_w, sprite_h)
+    self._sprite_texture:bind()
+    sprite:draw()
+    self._sprite_texture:unbind()
+
+    local target_x, target_y = self._target:get_position()
+    local target_width, target_height = self._target:get_snapshot():get_size()
+
+    local x = target_x + 0.5 * target_width - 0.5 * sprite_w
+    local y = target_y + 0.5 * target_height - 0.5 * sprite_h
+    local width, height = sprite_w, sprite_h
+
+
+    local step = rt.settings.battle.animation.object_disabled.triangle_radius
+    local perturbation_magnitude = step / 4
 
     local n_rows = math.ceil(height / step) + 1
     local n_cols = math.ceil(width / step) + 1 + 2
 
     local start_x = x + 0.5 * width - 0.5 * ((n_cols - 1) * step)
     local start_y = y + 0.5 * height - 0.5 * ((n_rows - 1) * step)
-
-    local perturbation_magnitude = step / 4
+    local min_x, min_y, max_x, max_y = POSITIVE_INFINITY, POSITIVE_INFINITY, NEGATIVE_INFINITY, NEGATIVE_INFINITY
 
     self._vertices = {}
-    local min_x, min_y, max_x, max_y = POSITIVE_INFINITY, POSITIVE_INFINITY, NEGATIVE_INFINITY, NEGATIVE_INFINITY
     for row_i = 1, n_rows do
         local row = {}
         local perturbation_row = {}
@@ -66,14 +82,21 @@ function bt.Animation.OBJECT_DISABLED:start()
         table.insert(self._vertices, row)
     end
 
+    local padding = step
+    local w, h = max_x - min_x + 2 * padding, max_y - min_y + 2 * padding
+    if self._render_texture:get_width() ~= w or self._render_texture:get_height() ~= h then
+        self._render_texture = rt.RenderTexture(w, h)
+    end
+    self._render_texture_x = min_x - padding
+    self._render_texture_y = min_y - padding
+
     self._triangles = {}
     local function get(i, j)
         local v = self._vertices[i][j]
         return v[1], v[2]
     end
 
-    local perturbation_magnitude = 10
-    function push_triangle(a_x, a_y, b_x, b_y, c_x, c_y)
+    local function push_triangle(a_x, a_y, b_x, b_y, c_x, c_y)
         local centroid_x = (a_x + b_x + c_x) / 3
         local centroid_y = (a_y + b_y + c_y) / 3
 
@@ -91,17 +114,17 @@ function bt.Animation.OBJECT_DISABLED:start()
         shape.current_x = 0
         shape.current_y = 0
 
-        local angle =  rt.angle(shape.centroid_x - (x + 0.5 * width), shape.centroid_y - (y + 0.5 * height))
+        local angle = rt.angle(shape.centroid_x - (x + 0.5 * width), shape.centroid_y - (y + 0.5 * height))
         shape.last_x, shape.last_y = rt.translate_point_by_angle(
             0, 0,
-            -1 * rt.random.number(0.05, 0.15),
+            -1 * rt.random.number(0.2, 0.4),
             angle
         )
 
         shape:set_vertex_texture_coordinate(1, (a_x - x) / width, (a_y - y) / height)
         shape:set_vertex_texture_coordinate(2, (b_x - x) / width, (b_y - y) / height)
         shape:set_vertex_texture_coordinate(3, (c_x - x) / width, (c_y - y) / height)
-        shape:set_texture(self._target:get_snapshot())
+        shape:set_texture(self._sprite_texture)
         table.insert(self._triangles, shape)
     end
 
@@ -138,39 +161,32 @@ function bt.Animation.OBJECT_DISABLED:start()
             end
         end
     end
-
-    local padding = step
-    local w, h = max_x - min_x + 2 * padding, max_y - min_y + 2 * padding
-    if self._render_texture:get_width() ~= w or self._render_texture:get_height() ~= h then
-        self._render_texture = rt.RenderTexture(w, h)
-    end
-    self._render_texture_x = min_x - padding
-    self._render_texture_y = min_y - padding
-    self._target:set_is_visible(false)
-end
-
---- @override
-function bt.Animation.OBJECT_DISABLED:finish()
-    self._target:set_is_visible(true)
 end
 
 --- @override
 function bt.Animation.OBJECT_DISABLED:update(delta)
-    self._elapsed = self._elapsed + delta
-
-    if self._elapsed > rt.settings.battle.animation.object_disabled.hold_duration then
-        self._opacity_animation:update(delta)
+    -- hold still, then shatter, then fade out
+    self._hold_elapsed = self._hold_elapsed + delta
+    local should_shatter = false
+    if self._hold_elapsed > rt.settings.battle.animation.object_disabled.hold_duration then
+        self._shatter_elapsed = self._shatter_elapsed + delta
+        should_shatter = true
+        if self._shatter_elapsed > rt.settings.battle.animation.object_disabled.shatter_duration then
+            self._opacity_animation:update(delta)
+        end
     end
 
-    local acceleration = 1 * self._elapsed
-    local angular_acceleration = 10e-3
-    for shape in values(self._triangles) do
-        local current_x, current_y = shape.current_x, shape.current_y
-        local next_x = shape.current_x + (shape.current_x - shape.last_x) + acceleration * delta * delta
-        local next_y = shape.current_y + (shape.current_y - shape.last_y) + acceleration * delta * delta
-        shape.current_x, shape.current_y = next_x, next_y
-        shape.last_x, shape.last_y = current_x, current_y
-        shape.angle = shape.angle + angular_acceleration * delta * math.pi * 2 * shape.rotation_weight
+    if should_shatter then
+        local acceleration = 1 * self._shatter_elapsed
+        local angular_acceleration = 10e-3
+        for shape in values(self._triangles) do
+            local current_x, current_y = shape.current_x, shape.current_y
+            local next_x = shape.current_x + (shape.current_x - shape.last_x) + acceleration * delta * delta
+            local next_y = shape.current_y + (shape.current_y - shape.last_y) + acceleration * delta * delta
+            shape.current_x, shape.current_y = next_x, next_y
+            shape.last_x, shape.last_y = current_x, current_y
+            shape.angle = shape.angle + angular_acceleration * delta * math.pi * 2 * shape.rotation_weight
+        end
     end
 
     self._render_texture:bind()

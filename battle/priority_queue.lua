@@ -25,7 +25,7 @@ function bt.PriorityQueue:_element_new(entity)
         frame = rt.Frame(),
         gradient = rt.VertexRectangle(0, 0, 1, 1),
         id_offset_label = rt.Label(entity:get_id_suffix()),
-        snapshot = rt.RenderTexture(1, 1),
+        snapshot = rt.RenderTexture(),
         padding = 0,
         width = 0,
         height = 0,

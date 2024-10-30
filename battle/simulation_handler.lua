@@ -97,10 +97,6 @@ for name_type_proxy in range(
             return native:get_id() == other_native:get_id()
         end
 
-        metatable.__concat = function(self, other)
-            return bt.format_name(self) .. bt.format_name(other)
-        end
-
         metatable.__index = function(self, key)
             bt.error_function("In " .. meta.get_typename(proxy) ..  ".__index: trying to access proxy directly, but it can only be accessed with outer functions, use `get_*` instead")
         end
@@ -141,7 +137,7 @@ for which_type in range(
     local which, type = table.unpack(which_type)
 
     --- @brief bt.assert_is_number, bt.assert_is_string, bt.assert_is_boolean, bt.assert_is_entity_proxy, bt.assert_is_status_proxy, bt.assert_is_global_status_proxy, bt.assert_is_consumable_proxy
-    bt["assert_" .. which] = function(x, function_name, arg_i)
+    bt["assert_" .. which] = function(function_name, x, arg_i)
         if not meta[which](x) then
             bt.error_function("In " .. function_name .. ": Wrong argument #" .. arg_i .. ", expected `" .. type .. "`, got `" .. meta.typeof(x) .. "`")
         end
@@ -162,17 +158,18 @@ do
 
     --- @brief
     function bt.assert_args(scope, ...)
-        local n_types = select("#", ...)
+        local n_args = select("#", ...)
         local arg_i = 1
-        for i = 1, n_types, 2 do
+        for i = 1, n_args, 2 do
             local arg = select(i, ...)
             local type = select(i+1, ...)
             local assert_f = _type_to_function[type]
+
             if assert_f == nil then
                 bt.error_function("In bt.assert_args: unhandled type `" .. type .. "`")
             end
 
-            assert_f(arg, scope, arg_i)
+            assert_f(scope, arg, arg_i)
             arg_i = arg_i + 1
         end
     end
@@ -387,6 +384,10 @@ function bt.BattleScene:create_simulation_environment()
     local _try_invoke_consumable_callback = function(callback_id, consumable_proxy, holder_proxy, ...)
         local consumable = _get_native(consumable_proxy)
         if consumable[callback_id] == nil then return end
+
+        local is_disabled = _state:entity_get_consumable_is_disabled(_get_native(holder_proxy), _get_native(consumable_proxy))
+        if is_disabled then return end
+
         local afflicted = _get_native(holder_proxy)
         local afflicted_sprite = _scene._sprites[afflicted]
         local animation = bt.Animation.CONSUMABLE_APPLIED(
@@ -947,11 +948,11 @@ function bt.BattleScene:create_simulation_environment()
             end
 
             if found == false then
-                rt.error("In env.remove_consumable: entity `" .. entity:get_id() .. "` does not have consumable `" .. consumable:get_id() .. "`")
+                bt.error_function("In env.remove_consumable: entity `" .. entity:get_id() .. "` does not have consumable `" .. consumable:get_id() .. "`")
                 return
             end
         else
-            bt.assert_is_number(slot_i_or_consumable_proxy)
+            bt.assert_is_number("remove_consumable", slot_i_or_consumable_proxy, 2)
             slot_i = slot_i_or_consumable_proxy
             consumable = _state:entity_get_consumable(entity, slot_i_or_consumable_proxy)
             consumable_proxy = bt.create_consumable_proxy(self, consumable)
@@ -1006,7 +1007,45 @@ function bt.BattleScene:create_simulation_environment()
             consumable_proxy, bt.ConsumableProxy
         )
 
+        -- TODO
+    end
 
+    --- @brief
+    --- @param slot_i_or_consumable_proxy Union<bt.ConsumableProxy, Unsigned>
+    function env.set_consumable_disabled(entity_proxy, slot_i_or_consumable_proxy, b)
+        bt.assert_args("set_consumable_disabled",
+            entity_proxy, bt.EntityProxy
+        )
+        bt.assert_is_boolean("set_consumable_disabled", b, 3)
+
+        local entity = _get_native(entity_proxy)
+        local slot_i = slot_i_or_consumable_proxy
+        local consumable, consumable_proxy
+        if meta.is_consumable_proxy(slot_i_or_consumable_proxy) then
+            consumable_proxy = slot_i_or_consumable_proxy
+            consumable = _get_native(slot_i_or_consumable_proxy)
+            for i = 1, entity:get_n_consumable_slots() do
+                local other = _state:entity_get_consumable(entity, i)
+                if other:get_id() == consumable:get_id() then
+                    slot_i = i
+                    break
+                end
+            end
+        else
+            bt.assert_is_number("set_consumable_disabled", slot_i, 2)
+            consumable = _state:entity_get_consumable(entity, slot_i)
+            consumable_proxy = bt.create_consumable_proxy(_scene, consumable)
+            if consumable == nil then
+                bt.error_function("In env.disable_consumable: entity `" .. entity:get_id() .. "` has no consumable in slot `" .. slot_i .. "`")
+            end
+        end
+
+        local sprite = self._sprites[entity]
+        _scene:_push_animation(bt.Animation.OBJECT_DISABLED(_scene, consumable, sprite))
+        _scene:_append_animation(bt.Animation.CONSUMABLE_APPLIED(_scene, slot_i, sprite))
+        env.append_message(entity_proxy, "s ", consumable_proxy, "was disabled")
+
+        -- no callbacks
     end
 
     --- @brief

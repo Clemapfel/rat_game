@@ -407,6 +407,7 @@ for which in range("move", "equip", "consumable") do
     --- @brief entity_get_move, entity_get_equip, entity_get_consumable
     rt.GameState["entity_get_" .. which] = function(self, entity, slot_i)
         meta.assert_isa(entity, bt.Entity)
+        meta.assert_number(slot_i)
 
         local n_slots = entity["get_n_" .. which .. "_slots"](entity)
         if slot_i <= 0 or math.fmod(slot_i, 1) ~= 0 or slot_i > n_slots then
@@ -649,43 +650,44 @@ for which_type in range(
 ) do
     local which, type = table.unpack(which_type)
     --- @brief entity_get_move_is_disabled, entity_get_equip_is_disabled, entity_get_consumable_is_disabled
-    rt.GameState["entity_get_" .. which .. "_is_disabled"] = function(self, entity, object)
+    rt.GameState["entity_get_" .. which .. "_is_disabled"] = function(self, entity, slot_i)
         meta.assert_isa(entity, bt.Entity)
-        meta.assert_isa(object, type)
+        meta.assert_number(slot_i)
 
         local entity_entry = self:_get_entity_entry(entity)
         if entity_entry == nil then
-            rt.error("In rt.GameState:entity_get_is_" .. which .."_disabled: entity `" .. entity:get_id() .. "` is not part of state")
-            return true
+            rt.error("In rt.GameState:entity_get_is_" .. which .. "_disabled: entity `" .. entity:get_id() .. "` is not part of state")
+            return
         end
 
-        local object_entry = entity_entry[which .. "s"][object:get_id()]
-        if object_entry == nil then
-            return true
+        local object_entry = entity_entry[which .. "s"][slot_i]
+        if object_entry == nil or object_entry.id == nil then
+            rt.error("In rt.GameState:entity_get_is_" .. which .. "_disabled: entity `" .. entity:get_id() .. "` has no consumable in slot `" .. slot_i .. "`")
+            return
         end
 
         return object_entry.is_disabled
     end
 
-    --- @brief entity_set_is_move_disabled, entity_set_is_equip_disabled, entity_set_is_consumable_disabled
-    rt.GameState["entity_set_is_" .. which .. "_disabled"] = function(self, entity, object, b)
+    --- @brief entity_set_move_is_disabled, entity_set_equip_is_disabled, entity_set_consumable_is_disabled
+    rt.GameState["entity_set_" .. which .. "_is_disabled"] = function(self, entity, slot_i, b)
         meta.assert_isa(entity, bt.Entity)
-        meta.assert_isa(object, type)
+        meta.assert_number(slot_i)
         meta.assert_boolean(b)
 
         local entity_entry = self:_get_entity_entry(entity)
         if entity_entry == nil then
-            rt.error("In rt.GameState:entity_set_is_" .. which .."_disabled: entity `" .. entity:get_id() .. "` is not part of state")
+            rt.error("In rt.GameState:entity_set_is_" .. which .. "_disabled: entity `" .. entity:get_id() .. "` is not part of state")
             return
         end
 
-        local object_entry = entity_entry[which .. "s"][object:get_id()]
-        if object_entry == nil then
-            rt.error("In rt.GameState:entity_set_is_" .. which .."_disabled: entity `" .. entity:get_id() .. "` has no " .. which .. "`" .. object:get_id() .. "`")
+        local object_entry = entity_entry[which .. "s"][slot_i]
+        if object_entry == nil or object_entry.id == nil then
+            rt.error("In rt.GameState:entity_set_is_" .. which .. "_disabled: entity `" .. entity:get_id() .. "` has no consumable in slot `" .. slot_i .. "`")
             return
         end
 
-        object_entry.is_disabled = b
+        object_entry.is_disabled = true
     end
 end
 
@@ -1377,9 +1379,7 @@ function rt.GameState:initialize_debug_state()
         end
 
         for slot_i = 1, entity:get_n_consumable_slots() do
-            if rt.random.toss_coin(0.8) then
-                self:entity_add_consumable(entity, slot_i, bt.Consumable(consumables[rt.random.integer(1, #consumables)]))
-            end
+            self:entity_add_consumable(entity, slot_i, bt.Consumable("DEBUG_CONSUMABLE"))
         end
 
         self:entity_set_hp(entity, entity:get_hp_base())

@@ -22,8 +22,10 @@ do
             or meta.isa(object, bt.Equip)
         then
             return "<b><u>" .. object:get_name() .. "</u></b>"
-        else
+        elseif meta.is_number(object) or meta.is_string(object) then
             return tostring(object)
+        else
+            rt.error("In bt.format_name: unhandled object type `" .. meta.typeof(object) .. "`")
         end
     end
 end

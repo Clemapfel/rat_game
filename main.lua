@@ -123,7 +123,7 @@ love.draw = function()
             rt.profiler.push("draw")
         end
 
-        --state:_draw()
+        state:_draw()
 
         if state._current_scene ~= nil then
             local sprite = state._current_scene._enemy_sprites[1]

@@ -15,7 +15,7 @@ end)
 function bt.Background.BRUSSELATOR:realize()
     if self._is_realized == true then return end
     self._is_realized = true
-    self._texture = rt.RenderTexture(1, 1)
+    self._texture = rt.RenderTexture()
     self._shader = rt.Shader(rt.settings.battle.background.brusselator.shader_path)
     self._shape = rt.VertexRectangle(0, 0, 1, 1)
 end
