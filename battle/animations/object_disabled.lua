@@ -15,7 +15,13 @@ bt.Animation.OBJECT_DISABLED = meta.new_type("OBJECT_DISABLED", rt.Animation, fu
         _target = sprite,
         _sprite = rt.Sprite("why"),
         _triangles = {},
+        _render_texture = rt.RenderTexture(),
+        _render_texture_padding = 5,
         _opacity_animation = rt.TimedAnimation(rt.settings.battle.animation.object_disabled.fade_out_duration, 0, 1, rt.InterpolationFunctions.GAUSSIAN_LOWPASS),
+        _opacity = 1,
+        _render_texture_x = 0,
+        _render_texture_y = 0,
+
         _elapsed = 0
     })
 end)
@@ -36,6 +42,7 @@ function bt.Animation.OBJECT_DISABLED:start()
     local perturbation_magnitude = step / 4
 
     self._vertices = {}
+    local min_x, min_y, max_x, max_y = POSITIVE_INFINITY, POSITIVE_INFINITY, NEGATIVE_INFINITY, NEGATIVE_INFINITY
     for row_i = 1, n_rows do
         local row = {}
         local perturbation_row = {}
@@ -49,7 +56,12 @@ function bt.Animation.OBJECT_DISABLED:start()
                 perturbation_x, perturbation_y = rt.translate_point_by_angle(0, 0, perturbation_magnitude, rt.random.number(0, 1) * math.pi * 2)
             end
 
-            table.insert(row, {current_x + perturbation_x, current_y + perturbation_y})
+            local x, y = current_x + perturbation_x, current_y + perturbation_y
+            table.insert(row, {x, y})
+            min_x = math.min(min_x, x)
+            min_y = math.min(min_y, y)
+            max_x = math.max(max_x, x)
+            max_y = math.max(max_y, y)
         end
         table.insert(self._vertices, row)
     end
@@ -127,6 +139,13 @@ function bt.Animation.OBJECT_DISABLED:start()
         end
     end
 
+    local padding = step
+    local w, h = max_x - min_x + 2 * padding, max_y - min_y + 2 * padding
+    if self._render_texture:get_width() ~= w or self._render_texture:get_height() ~= h then
+        self._render_texture = rt.RenderTexture(w, h)
+    end
+    self._render_texture_x = min_x - padding
+    self._render_texture_y = min_y - padding
     self._target:set_is_visible(false)
 end
 
@@ -145,7 +164,6 @@ function bt.Animation.OBJECT_DISABLED:update(delta)
 
     local acceleration = 1 * self._elapsed
     local angular_acceleration = 10e-3
-    local opacity = self._opacity_animation:get_value()
     for shape in values(self._triangles) do
         local current_x, current_y = shape.current_x, shape.current_y
         local next_x = shape.current_x + (shape.current_x - shape.last_x) + acceleration * delta * delta
@@ -153,14 +171,11 @@ function bt.Animation.OBJECT_DISABLED:update(delta)
         shape.current_x, shape.current_y = next_x, next_y
         shape.last_x, shape.last_y = current_x, current_y
         shape.angle = shape.angle + angular_acceleration * delta * math.pi * 2 * shape.rotation_weight
-        shape:set_opacity(opacity)
     end
 
-    return self._opacity_animation:get_is_done()
-end
-
---- @override
-function bt.Animation.OBJECT_DISABLED:draw()
+    self._render_texture:bind()
+    love.graphics.clear(true, false, false)
+    love.graphics.translate(-1 * self._render_texture_x, -1 * self._render_texture_y)
     for shape in values(self._triangles) do
         love.graphics.push()
         love.graphics.translate(shape.centroid_x, shape.centroid_y)
@@ -170,4 +185,16 @@ function bt.Animation.OBJECT_DISABLED:draw()
         shape:draw()
         love.graphics.pop()
     end
+    love.graphics.translate(1 * self._render_texture_x, 1 * self._render_texture_y)
+    self._render_texture:unbind()
+
+    return self._opacity_animation:get_is_done()
+end
+
+--- @override
+function bt.Animation.OBJECT_DISABLED:draw()
+    self._render_texture:draw(
+        self._render_texture_x, self._render_texture_y,
+        1, 1, 1, self._opacity_animation:get_value()
+    )
 end

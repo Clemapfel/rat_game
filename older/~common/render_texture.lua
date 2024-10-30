@@ -3,6 +3,8 @@
 --- @param width Number
 --- @param height Number
 rt.RenderTexture = meta.new_type("RenderTexture", rt.Texture, function(width, height, msaa, format)
+    if width == nil and height == nil then return rt.RenderTexture.default_instance end
+
     msaa = which(msaa, 0)
     local out = meta.new(rt.RenderTexture, {
         _native = love.graphics.newCanvas(width, height, {
@@ -35,3 +37,5 @@ function rt.RenderTexture:as_image()
         return rt.Image(self._native:newImageData())
     end
 end
+
+rt.RenderTexture.default_instance = rt.RenderTexture(1, 1)

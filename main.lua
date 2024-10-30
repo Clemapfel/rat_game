@@ -133,7 +133,6 @@ love.draw = function()
             state._current_scene._animation_queue:draw()
         end
 
-
         if profiler_active then
             rt.profiler.pop("draw")
         end
