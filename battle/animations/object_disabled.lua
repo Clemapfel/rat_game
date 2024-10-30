@@ -161,7 +161,6 @@ end
 
 --- @override
 function bt.Animation.OBJECT_DISABLED:draw()
-    rt.graphics.set_blend_mode(rt.BlendMode.NORMAL, rt.BlendMode.MIN)
     for shape in values(self._triangles) do
         love.graphics.push()
         love.graphics.translate(shape.centroid_x, shape.centroid_y)
@@ -171,5 +170,4 @@ function bt.Animation.OBJECT_DISABLED:draw()
         shape:draw()
         love.graphics.pop()
     end
-    rt.graphics.set_blend_mode()
 end
