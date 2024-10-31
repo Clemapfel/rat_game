@@ -523,6 +523,127 @@ function bt.BattleScene:create_simulation_environment()
 
         return new_value
     end
+
+    --- @brief
+    env.has_acted_this_turn = function(entity_proxy)
+        bt.assert_args("has_acted_this_turn", entity_proxy, bt.EntityProxy)
+    end
+
+    --- ### MOVE ###
+
+    --- ### EQUIP ###
+
+    --- ## CONSUMABLE ###
+
+    --- ### STATUS ###
+
+    env.list_statuses = function(entity_proxy)
+        bt.assert_args("list_statuses", entity_proxy, bt.EntityProxy)
+        local out = {}
+        for status in values(_state:entity_list_statuses()) do
+            table.insert(bt.create_status_proxy(_scene, status, _get_native(entity_proxy)))
+        end
+        return out
+    end
+
+    env.add_status = function(entity_proxy, status_id)
+        bt.assert_args("add_status",
+            entity_proxy, bt.EntityProxy,
+            status_id, bt.String
+        )
+
+        local real_id = env[status_id]
+        if real_id == nil then
+            bt.error_function("In env.add_status: no status with id `" .. global_status_id .. "` exists")
+            return
+        end
+
+        -- TODO
+    end
+
+    env.remove_status = function(status_proxy)
+        bt.assert_args("remove_status",
+            status_proxy, bt.Statusproxy
+        )
+
+        local entity = _get_holder(status_proxy)
+        local status = _get_native(status_proxy)
+
+        -- TODO
+    end
+
+    env.get_status_max_duration = function(status_proxy)
+        bt.assert_args("get_status_max_duration", status_proxy, bt.StatusProxy)
+        return _get_native(status_proxy):get_max_duration()
+    end
+
+    env.get_status_n_turns_elapsed = function(status_proxy)
+        bt.assert_args("get_status_n_turns_elapsed", status_proxy, bt.StatusProxy)
+        return _state:entity_get_status_n_turns_elapsed(_get_holder(status_proxy), _get_native(status_proxy))
+    end
+
+    env.get_status_n_turns_left = function(status_proxy)
+        bt.assert_args("get_status_n_turns_left", status_proxy, bt.StatusProxy)
+        local max = env.get_status_max_duration(status_proxy)
+        local elapsed = env.get_status_n_turns_elapesd(status_proxy)
+        return max - elapsed
+    end
+
+    env.get_status_is_stun = function(status_proxy)
+        bt.assert_args("get_status_max_duration", status_proxy, bt.StatusProxy)
+        return _get_native(status_proxy):get_is_stun()
+    end
+
+    --- ### GLOBAL STATUS ###
+
+    env.add_global_status = function(global_status_id)
+        bt.assert_args("add_global_status",
+            global_status_id, bt.String
+        )
+
+        local real_id = env[global_status_id]
+        if real_id == nil then
+            bt.error_function("In env.add_global_status: no global status with id `" .. global_status_id .. "` exists")
+            return
+        end
+
+        -- TODO
+    end
+
+    env.remove_global_status = function(global_status_proxy)
+        bt.assert_args("remove_global_status",
+            global_status_proxy, bt.String
+        )
+
+        -- TODO
+    end
+
+    env.list_global_statuses = function()
+        local out = {}
+        for status in values(_state:list_global_statuses()) do
+            table.insert(out, bt.create_global_status(_scene, status))
+        end
+        return out
+    end
+
+    env.get_global_status_max_duration = function(global_status_proxy)
+        bt.assert_args("get_global_status_n_turns_elapsed", global_status_proxy, bt.GlobalStatusProxy)
+        return _get_native(global_status_proxy):get_max_duration()
+    end
+
+    env.get_global_status_n_turns_left = function(global_status_proxy)
+        bt.assert_args("get_global_status_n_turns_left", global_status_proxy, bt.GlobalStatusProxy)
+        return _state:get_global_status_n_turns_elapsed(_get_native(global_status_proxy))
+    end
+
+    env.get_global_status_n_turns_elapsed = function(global_status_proxy)
+        bt.assert_args("set_global_status_n_turns_elapsed", global_status_proxy, bt.GlobalStatusProxy)
+        local max = env.get_global_status_max_duration(global_status_proxy)
+        local elapsed = env.get_global_status_n_turns_elapsed(global_status_proxy)
+        return max - elapsed
+    end
+
+    --- ### ENTITY ###
 end
 
 --- @brief

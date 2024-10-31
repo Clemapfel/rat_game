@@ -271,7 +271,7 @@ function rt.GameState:entity_get_is_stunned(entity)
 
     local entry = self:_get_entity_entry(entity)
     if entry == nil then
-        rt.error("In rt.GameState:entity_list_statuses: entity `" .. entity:get_id() .. "` is not part of state")
+        rt.error("In rt.GameState:entity_get_is_stunned: entity `" .. entity:get_id() .. "` is not part of state")
         return {}
     end
 
