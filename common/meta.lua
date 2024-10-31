@@ -675,6 +675,26 @@ function meta.make_weak(t, weak_keys, weak_values)
     return t
 end
 
+--- @brief adds proxy table such that original table is read-only
+function meta.as_immutable(t)
+    local metatable ={
+        __index = function(_, key)
+            local out = t[key]
+            if out == nil then
+                bt.error_function("trying to access `" .. key .. "` of `" .. tostring(t) .. "`, but this value does not exist")
+                return nil
+            end
+            return out
+        end,
+
+        __newindex = function(_, key, value)
+            bt.error_function("trying to modify table `" .. tostring(t) .. "`, but it is immutable")
+        end
+    }
+
+    return setmetatable({}, metatable), metatable
+end
+
 -- TEST
 do
     SuperA = meta.new_type("SuperA")

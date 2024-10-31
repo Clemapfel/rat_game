@@ -10,35 +10,45 @@
         state    -- bt.EntityState
         index    -- Unsigned
         priority -- Signed
+
+        storage = {}, -- Table<String, Any>
         
         moves[slot_i] = {
             id  -- MoveID
             n_used
-            is_disabled = false
+            is_disabled = false,
+            storage = {}
         }
 
         intrinsic_moves = {
-            id
+            id,
+            storage = {}
         }
 
         equips[slot_i] = {
             id  -- EquipID
-            is_disabled = false
+            is_disabled = false,
+            storage = {}
         }
 
         consumables[slot_i] = {
             id  -- ConsumableID
             n_used
-            is_disabled = false
+            is_disabled = false,
+            storage = {}
         }
 
-        statuses[status_id] = {
-            n_turns_elapsed
+        statuses = {
+            id,
+            n_turns_elapsed,
+            storage = {}
         }
     }
 
-    global_statuses[status_id] = {
-        n_turns_elapsed
+    global_statuses = {
+        id,
+        n_turns_elapsed,
+        storage = {}
     }
 
     shared_moves[move_id] = {
@@ -93,21 +103,24 @@ function rt.GameState:add_entity(entity)
         equips = {},
         consumables = {},
         statuses = {},
-        intrinsic_moves = {}
+        intrinsic_moves = {},
+        storage = {}
     }
 
     for i = 1, n_moves do
         to_add.moves[i] = {
             id = "",
             n_used = 0,
-            is_disabled = false
+            is_disabled = false,
+            storage = {}
         }
     end
 
     for i = 1, n_equips do
         to_add.equips[i] = {
             id = "",
-            is_disabled = false
+            is_disabled = false,
+            storage = {}
         }
     end
 
@@ -115,7 +128,8 @@ function rt.GameState:add_entity(entity)
         to_add.consumables[i] = {
             id = "",
             n_used = 0,
-            is_disabled = false
+            is_disabled = false,
+            storage = {}
         }
     end
 
@@ -468,6 +482,7 @@ for which in range("move", "equip", "consumable") do
 
         local object_entry = entry[which .. "s"][slot_i]
         object_entry.id = object:get_id()
+        object_entry.storage = {}
 
         if object_entry.n_used ~= nil then
             object_entry.n_used = 0
@@ -493,6 +508,7 @@ for which in range("move", "equip", "consumable") do
         local object_entry = entry[which .. "s"]
         local current_id = object_entry[slot_i].id
         object_entry[slot_i].id = ""
+        object_entry[slot_i].storage = {}
 
         if object_entry.n_used ~= nil then
             object_entry.n_used = 0
@@ -692,6 +708,48 @@ for which_type in range(
 end
 
 --- @brief
+function rt.GameState:entity_set_storage_value(entity, id, new_value)
+    meta.assert_isa(entity, bt.Entity)
+    meta.assert_string(id)
+
+    local entry = self:_get_entity_entry(entity)
+    if entry == nil then
+        rt.error("In rt.GameState:entity_set_storage_value: entity `" .. entity:get_id() .. "` is not part of state")
+        return nil
+    end
+
+    entry.storage[id] = new_value
+end
+
+--- @brief
+function rt.GameState:entity_get_storage_value(entity, id)
+    meta.assert_isa(entity, bt.Entity)
+    meta.assert_string(id)
+
+    local entry = self:_get_entity_entry(entity)
+    if entry == nil then
+        rt.error("In rt.GameState:entity_set_storage_value: entity `" .. entity:get_id() .. "` is not part of state")
+        return nil
+    end
+
+    return entry.storage[id]
+end
+
+--- @brief
+function rt.GameState:entity_replace_storage_value(entity, new_table)
+    meta.assert_isa(entity, bt.Entity)
+    meta.assert_table(new_table)
+
+    local entry = self:_get_entity_entry(entity)
+    if entry == nil then
+        rt.error("In rt.GameState:entity_set_storage_value: entity `" .. entity:get_id() .. "` is not part of state")
+        return nil
+    end
+
+    entry.storage = new_table
+end
+
+--- @brief
 function rt.GameState:entity_list_intrinsic_moves(entity)
     meta.assert_isa(entity, bt.Entity)
 
@@ -813,7 +871,8 @@ function rt.GameState:entity_add_status(entity, status)
     end
 
     entry.statuses[status:get_id()] = {
-        n_turns_elapsed = 0
+        n_turns_elapsed = 0,
+        storage = {}
     }
 end
 
@@ -821,7 +880,6 @@ end
 function rt.GameState:entity_has_status(entity, status)
     meta.assert_isa(entity, bt.Entity)
     meta.assert_isa(status, bt.Status)
-
 
     local entry = self:_get_entity_entry(entity)
     if entry == nil then
@@ -917,7 +975,8 @@ end
 function rt.GameState:add_global_status(global_status)
     meta.assert_isa(global_status, bt.GlobalStatus)
     self._state.global_statuses[global_status:get_id()] = {
-        n_turns_elapsed = 0
+        n_turns_elapsed = 0,
+        storage = {}
     }
 end
 
@@ -965,6 +1024,182 @@ end
 function rt.GameState:has_global_status(global_status)
     meta.assert_isa(global_status, bt.GlobalStatus)
     return self._state.global_statuses[global_status:get_id()] ~= nil
+end
+
+
+--- @brief
+function rt.GameState:entity_set_status_storage_value(entity, status, id, new_value)
+    meta.assert_isa(entity, bt.Entity)
+    meta.assert_isa(status, bt.Status)
+    meta.assert_string(id)
+
+    local entry = self:_get_entity_entry(entity)
+    if entry == nil then
+        rt.error("In rt.GameState:entity_set_status_storage_value: entity `" .. entity:get_id() .. "` is not part of state")
+        return nil
+    end
+
+    local status_entry = entry.statuses[status:get_id()]
+    if status_entry == nil then
+        rt.error("In rt.GameState:entity_set_status_storage_value: entity `" .. entity:get_id() .. "` is not part of state")
+        return nil
+    end
+
+    status_entry.storage[id] = new_value
+end
+
+--- @brief
+function rt.GameState:entity_get_status_storage_value(entity, status, id)
+    meta.assert_isa(entity, bt.Entity)
+    meta.assert_isa(status, bt.Status)
+    meta.assert_string(id)
+
+    local entry = self:_get_entity_entry(entity)
+    if entry == nil then
+        rt.error("In rt.GameState:entity_set_status_storage_value: entity `" .. entity:get_id() .. "` is not part of state")
+        return nil
+    end
+
+    local status_entry = entry.statuses[status:get_id()]
+    if status_entry == nil then
+        rt.error("In rt.GameState:entity_set_status_storage_value: entity `" .. entity:get_id() .. "` is not part of state")
+        return nil
+    end
+
+    return status_entry.storage[id]
+end
+
+--- @brief
+function rt.GameState:entity_replace_status_storage(entity, new_table)
+    meta.assert_isa(entity, bt.Entity)
+    meta.assert_table(new_table)
+
+    local entry = self:_get_entity_entry(entity)
+    if entry == nil then
+        rt.error("In rt.GameState:entity_set_status_storage_value: entity `" .. entity:get_id() .. "` is not part of state")
+        return nil
+    end
+
+    local status_entry = entry.statuses[status:get_id()]
+    if status_entry == nil then
+        rt.error("In rt.GameState:entity_set_status_storage_value: entity `" .. entity:get_id() .. "` is not part of state")
+        return nil
+    end
+
+    status_entry.storage = new_table
+end
+
+--- @brief
+function rt.GameState:get_global_status_storage_value(status, id, new_value)
+    meta.assert_isa(status, bt.GlobalStatus)
+    meta.assert_string(id)
+
+    local status_entry = self._state.global_statuses[status:get_id()]
+    if status_entry == nil then
+        rt.error("In rt.GameState:set_global_status_storage_value: entity `" .. entity:get_id() .. "` is not part of state")
+        return nil
+    end
+
+    status_entry.storage[id] = new_value
+end
+
+--- @brief
+function rt.GameState:get_global_status_storage_value(status, id, new_value)
+    meta.assert_isa(status, bt.GlobalStatus)
+    meta.assert_string(id)
+
+    local status_entry = self._state.global_statuses[status:get_id()]
+    if status_entry == nil then
+        rt.error("In rt.GameState:set_global_status_storage_value: entity `" .. entity:get_id() .. "` is not part of state")
+        return nil
+    end
+
+    return status_entry.storage[id]
+end
+
+--- @brief
+function rt.GameState:replace_global_status_storage(status, new_table)
+    meta.assert_isa(status, bt.GlobalStatus)
+    meta.assert_table(new_table)
+
+    local status_entry = self._state.global_statuses[status:get_id()]
+    if status_entry == nil then
+        rt.error("In rt.GameState:set_global_status_storage_value: entity `" .. entity:get_id() .. "` is not part of state")
+        return nil
+    end
+
+    status_entry.storage = new_table
+end
+
+for which_type in range(
+    {"move", bt.Move},
+    {"equip", bt.Equip},
+    {"consumable", bt.Consumable}
+) do
+    local which, type = table.unpack(which_type)
+
+    --- @brief entity_set_move_storage_value, entity_set_status_storage_value, entity_set_equip_storage_value, entity_set_consumable_storage_value
+    bt.GameState["entity_set_" .. which .. "_storage_value"] = function(self, entity, slot_i, id, new_value)
+        meta.assert_isa(entity, bt.Entity)
+        meta.assert_number(slot_i)
+        meta.assert_string(id)
+
+        local entity_entry = self:_get_entity_entry(entity)
+        if entity_entry == nil then
+            rt.error("In rt.GameState:entity_set_" .. which .. "_storage_value: entity `" .. entity:get_id() .. "` is not part of state")
+            return
+        end
+
+        local object_entry = entity_entry[which .. "s"][slot_i]
+        if object_entry == nil or object_entry.id == nil then
+            rt.error("In rt.GameState:entity_set_" .. which .. "_storage_value: entity `" .. entity:get_id() .. "` has no valid object at slot `" .. slot_i .. "`")
+            return
+        end
+
+        object_entry.storage[id] = new_value
+    end
+
+    --- @brief entity_get_move_storage_value, entity_get_status_storage_value, entity_get_equip_storage_value, entity_get_consumable_storage_value
+    bt.GameState["entity_get_" .. which .. "_storage_value"] = function(self, entity, slot_i, id, new_value)
+        meta.assert_isa(entity, bt.Entity)
+        meta.assert_number(slot_i)
+        meta.assert_string(id)
+
+        local entity_entry = self:_get_entity_entry(entity)
+        if entity_entry == nil then
+            rt.error("In rt.GameState:entity_get_" .. which .. "_storage_value: entity `" .. entity:get_id() .. "` is not part of state")
+            return
+        end
+
+        local object_entry = entity_entry[which .. "s"][slot_i]
+        if object_entry == nil or object_entry.id == nil then
+            rt.error("In rt.GameState:entity_get_" .. which .. "_storage_value: entity `" .. entity:get_id() .. "` has no valid object at slot `" .. slot_i .. "`")
+            return
+        end
+
+        return object_entry.storage[id]
+    end
+
+    --- @brief entity_replace_move_storage_value, entity_replace_status_storage_value, entity_replace_equip_storage_value, entity_replace_consumable_storage_value
+    bt.GameState["entity_replace_" .. which .. "_storage_value"] = function(self, entity, slot_i, new_table)
+        meta.assert_isa(entity, bt.Entity)
+        meta.assert_number(slot_i)
+        meta.assert_table(new_table)
+
+        local entity_entry = self:_get_entity_entry(entity)
+        if entity_entry == nil then
+            rt.error("In rt.GameState:entity_get_" .. which .. "_storage_value: entity `" .. entity:get_id() .. "` is not part of state")
+            return
+        end
+
+        local object_entry = entity_entry[which .. "s"][slot_i]
+        if object_entry == nil or object_entry.id == nil then
+            rt.error("In rt.GameState:entity_get_" .. which .. "_storage_value: entity `" .. entity:get_id() .. "` has no valid object at slot `" .. slot_i .. "`")
+            return
+        end
+
+        object_entry.storage = new_table
+    end
 end
 
 --- @brief
@@ -1053,10 +1288,6 @@ for which in range("move", "consumable", "equip") do
 
         return n, out
     end
-end
-
-function rt.GameState:_template_id_from_count(n)
-
 end
 
 --- @brief
@@ -1378,8 +1609,13 @@ function rt.GameState:initialize_debug_state()
             end
         end
 
-        for slot_i = 1, entity:get_n_consumable_slots() do
-            self:entity_add_consumable(entity, slot_i, bt.Consumable("DEBUG_CONSUMABLE"))
+        if entity:get_n_consumable_slots() > 0 then
+            self:entity_add_consumable(entity, 1, bt.Consumable("DEBUG_CONSUMABLE"))
+        end
+        for slot_i = 2, entity:get_n_consumable_slots() do
+            if rt.random.toss_coin(0.8) then
+                self:entity_add_consumable(entity, slot_i,  bt.Consumable(consumables[rt.random.integer(1, #consumables)]))
+            end
         end
 
         self:entity_set_hp(entity, entity:get_hp_base())

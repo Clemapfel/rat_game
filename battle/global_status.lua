@@ -2,7 +2,7 @@ rt.settings.battle.global_status = {
     config_path = "assets/configs/global_statuses"
 }
 
---- @class GlobalStatus
+--- @class bt.GlobalStatus
 --- @brief cached instancing, moves with the same ID will always return the same instance
 bt.GlobalStatus = meta.new_type("GlobalStatus", function(id)
     local out = bt.GlobalStatus._atlas[id]

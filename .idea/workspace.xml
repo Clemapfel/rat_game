@@ -22,28 +22,15 @@
     </configurations>
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="7fa9ba1b-2cff-4ecc-86fb-59ab2fa76ee1" name="Changes" comment="disabled animation done">
+    <list default="true" id="7fa9ba1b-2cff-4ecc-86fb-59ab2fa76ee1" name="Changes" comment="stashing">
+      <change afterPath="$PROJECT_DIR$/battle/~simulation_handler.lua" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/backgrounds/background.lua" beforeDir="false" afterPath="$PROJECT_DIR$/backgrounds/background.lua" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/battle/animations/consumable_applied.lua" beforeDir="false" afterPath="$PROJECT_DIR$/battle/animations/consumable_applied.lua" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/battle/animations/object_disabled.lua" beforeDir="false" afterPath="$PROJECT_DIR$/battle/animations/object_disabled.lua" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/battle/background.lua" beforeDir="false" afterPath="$PROJECT_DIR$/battle/background.lua" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/battle/animations/global_status_applied.lua" beforeDir="false" afterPath="$PROJECT_DIR$/battle/animations/global_status_applied.lua" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/battle/battle_scene.lua" beforeDir="false" afterPath="$PROJECT_DIR$/battle/battle_scene.lua" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/battle/enemy_sprite.lua" beforeDir="false" afterPath="$PROJECT_DIR$/battle/enemy_sprite.lua" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/battle/party_sprite.lua" beforeDir="false" afterPath="$PROJECT_DIR$/battle/party_sprite.lua" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/battle/priority_queue.lua" beforeDir="false" afterPath="$PROJECT_DIR$/battle/priority_queue.lua" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/battle/global_status.lua" beforeDir="false" afterPath="$PROJECT_DIR$/battle/global_status.lua" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/battle/simulation_handler.lua" beforeDir="false" afterPath="$PROJECT_DIR$/battle/simulation_handler.lua" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/battle/string_formatting.lua" beforeDir="false" afterPath="$PROJECT_DIR$/battle/string_formatting.lua" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/common/game_state.lua" beforeDir="false" afterPath="$PROJECT_DIR$/common/game_state.lua" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/common/game_state_battle.lua" beforeDir="false" afterPath="$PROJECT_DIR$/common/game_state_battle.lua" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/common/label.lua" beforeDir="false" afterPath="$PROJECT_DIR$/common/label.lua" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/common/timed_animation.lua" beforeDir="false" afterPath="$PROJECT_DIR$/common/timed_animation.lua" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/common/~control_indicator.lua" beforeDir="false" afterPath="$PROJECT_DIR$/common/~control_indicator.lua" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/common/~keybinding_indicator.lua" beforeDir="false" afterPath="$PROJECT_DIR$/common/~keybinding_indicator.lua" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/main.lua" beforeDir="false" afterPath="$PROJECT_DIR$/main.lua" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/old/backgrounds/brusselator.lua" beforeDir="false" afterPath="$PROJECT_DIR$/old/backgrounds/brusselator.lua" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/old/battle/backgrounds/brusselator.lua" beforeDir="false" afterPath="$PROJECT_DIR$/old/battle/backgrounds/brusselator.lua" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/older/~common/render_texture.lua" beforeDir="false" afterPath="$PROJECT_DIR$/older/~common/render_texture.lua" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/common/meta.lua" beforeDir="false" afterPath="$PROJECT_DIR$/common/meta.lua" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -616,15 +603,7 @@
       <workItem from="1729098138796" duration="20580000" />
       <workItem from="1729180777153" duration="8566000" />
       <workItem from="1729267430460" duration="1705000" />
-      <workItem from="1729269158294" duration="215383000" />
-    </task>
-    <task id="LOCAL-01146" summary="stashing">
-      <option name="closed" value="true" />
-      <created>1729269141892</created>
-      <option name="number" value="01146" />
-      <option name="presentableId" value="LOCAL-01146" />
-      <option name="project" value="LOCAL" />
-      <updated>1729269141893</updated>
+      <workItem from="1729269158294" duration="224373000" />
     </task>
     <task id="LOCAL-01147" summary="added simulation environment sandbox">
       <option name="closed" value="true" />
@@ -1010,7 +989,15 @@
       <option name="project" value="LOCAL" />
       <updated>1730248614571</updated>
     </task>
-    <option name="localTasksCounter" value="1195" />
+    <task id="LOCAL-01195" summary="stashing">
+      <option name="closed" value="true" />
+      <created>1730311743442</created>
+      <option name="number" value="01195" />
+      <option name="presentableId" value="LOCAL-01195" />
+      <option name="project" value="LOCAL" />
+      <updated>1730311743442</updated>
+    </task>
+    <option name="localTasksCounter" value="1196" />
     <servers />
   </component>
   <component name="TypeScriptGeneratedFilesManager">
@@ -1066,7 +1053,6 @@
     <MESSAGE value="status gained done" />
     <MESSAGE value="implemented status bar" />
     <MESSAGE value="status applied working" />
-    <MESSAGE value="stashing" />
     <MESSAGE value="added battle string formatting" />
     <MESSAGE value="added automatic text formatting" />
     <MESSAGE value="status animations done" />
@@ -1084,7 +1070,8 @@
     <MESSAGE value="added object shatter animation" />
     <MESSAGE value="stashing shatter" />
     <MESSAGE value="disabled animation done" />
-    <option name="LAST_COMMIT_MESSAGE" value="disabled animation done" />
+    <MESSAGE value="stashing" />
+    <option name="LAST_COMMIT_MESSAGE" value="stashing" />
   </component>
   <component name="XDebuggerManager">
     <breakpoint-manager>

@@ -59,9 +59,30 @@ function bt.BattleScene:create_from_state()
     self._party_sprites = {}
     self._move_selection = {}
 
-    self:add_entity(table.unpack(self._state:list_entities()))
-    self._simulation_environment = self:create_simulation_environment()
+    local entities = self._state:list_entities()
+    self:add_entity(table.unpack(entities))
 
+    for entity in values(entities) do
+        local sprite = self._sprites[entity]
+        if entity:get_is_enemy() then
+            for status in values(self._state:entity_list_statuses(entity)) do
+                local max = status:get_max_duration()
+                local duration = self._state:entity_get_status_n_turns_elapsed(entity, status)
+                sprite:add_status(status, max - duration)
+            end
+
+            for i = 1, entity:get_n_consumable_slots() do
+                local consumable = self._state:entity_get_consumable(entity, i)
+                if consumable ~= nil then
+                    local max = consumable:get_max_n_uses()
+                    local used = self._state:entity_get_consumable_n_used(entity, i)
+                    sprite:add_consumable(i, consumable, max - used)
+                end
+            end
+        end
+    end
+
+    self._simulation_environment = self:create_simulation_environment()
     self._priority_queue:reorder(self._state:list_entities_in_order())
 end
 
