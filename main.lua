@@ -84,8 +84,9 @@ end)
 local points = {}
 local w, h = love.graphics.getDimensions()
 local padding = 50
-for i = 1, 10 do
-    table.insert(points, 50 + i * 100)
+local n = 1000
+for i = 1, n do
+    table.insert(points, 0 + w / n * i)
     table.insert(points, rt.random.number(300, 500))
 end
 path = rt.Path(points)

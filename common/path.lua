@@ -1,17 +1,14 @@
 --- @class rt.Path
+--- @brief arc-length parameterized chain of line segments, unlike spline, extremely fast to evaluate
 rt.Path = meta.new_type("Path", function(points, ...)
-    if meta.is_number(points) then points = {points, ...} end
-    local n_points = sizeof(points)
-    if n_points % 2 ~= 0 then rt.error("In rt.Path: number of point coordinates is not a multiple of two") end
-
     local out = meta.new(rt.Path, {
         _points = points,
         _distances = {},
-        _n_points = n_points,
+        _n_points = 0,
         _first_distance = 0,
         _last_distance = 0
     })
-    out:_update()
+    out:create_from(points, ...)
     return out
 end)
 
@@ -19,10 +16,7 @@ do
     local _sqrt = math.sqrt -- upvalues for optimization
     local _insert = table.insert
     local _atan2, _sin, _cos = math.atan2, math.sin, math.cos
-    local _advance = function(x, y, angle, fraction, distance)
-        local delta = fraction * distance
-        return x + delta * _cos(angle), y + delta * _sin(angle)
-    end
+    local _floor, _ceil = math.floor, math.ceil
 
     --- @brief
     function rt.Path:_update()
@@ -31,7 +25,7 @@ do
 
         local points = self._points
         local n = self._n_points
-        local distance_sum = 0
+        local total_length = 0
         local n_entries = 0
 
         local first_distance, last_distance
@@ -41,46 +35,41 @@ do
             local x2, y2 = self._points[i+2], self._points[i+3]
 
             local distance = _sqrt((x1 - x2) * (x1 - x2) + (y1 - y2) * (y1 - y2))
-
-            if first_distance == nil then first_distance = distance end
-            last_distance = distance
-
             local slope = (y2 - y1) / (x2 - x1)
             local to_insert = {
                 from_x = x1,
                 from_y = y1,
                 angle = _atan2(y2 - y1, x2 - x1),
                 distance = distance,
-                cumulative_distance = distance_sum
+                cumulative_distance = total_length,
+                fraction = nil,
+                fraction_length = nil
             }
             _insert(distances, to_insert)
-            distance_sum = distance_sum + distance
+            total_length = total_length + distance
             n_entries = n_entries + 1
         end
 
-        self._first_distance = first_distance
-        self._last_distance = last_distance
+        for i = 1, n_entries - 1 do
+            local current = distances[i]
+            local next = distances[i + 1]
 
-        local fraction = 0
-        local length = distance_sum
-        for entry_i = 1, n_entries do
-            local entry = distances[entry_i]
-            entry.fraction = entry.cumulative_distance / length
+            current.fraction = current.cumulative_distance / total_length
+            next.fraction = next.cumulative_distance / total_length
+            current.fraction_length = next.fraction - current.fraction
+
+            if i == 1 then self._first_distance = current.fraction end
+            if i == n_entries - 1 then self._last_distance = next.fraction end
         end
 
-        for entry_i = 1, n_entries do
-            local current = distances[entry_i]
-            local next = distances[entry_i + 1]
-
-            if entry_i < n_entries then
-                current.fraction_length = next.fraction - current.fraction
-            else
-                current.fraction_length = 1 - current.fraction
-            end
+        do
+            local last = distances[n_entries]
+            last.fraction_length = 1 - last.fraction
         end
+
         self._entries = distances
         self._n_entries = n_entries
-        self._length = distance_sum
+        self._length = total_length
     end
 
     --- @brief
@@ -90,22 +79,42 @@ do
 
         if t > 1 then t = 1 end
         local closest_entry
-        for i = 1, n_entries - 1 do
-            if entries[i].fraction <= t and entries[i + 1].fraction >= t then
-                closest_entry = entries[i]
-                break
+        if t <= self._first_distance then
+            closest_entry = entries[1]
+        elseif t >= self._last_distance then
+            closest_entry = entries[n_entries]
+        else
+            -- binary search for closest fraction
+            local low = 1
+            local high = n_entries
+            while low <= high do
+                local mid = _ceil((low + high) / 2)
+                closest_entry = entries[mid]
+                local right = entries[mid + 1]
+                if right == nil or (closest_entry.fraction <= t and right.fraction >= t) then
+                    break
+                elseif closest_entry.fraction < t then
+                    low = mid + 1
+                elseif closest_entry.fraction > t then
+                    high = mid - 1
+                end
             end
         end
-        if closest_entry == nil then closest_entry = entries[n_entries] end
 
-        return _advance(
-            closest_entry.from_x,
-            closest_entry.from_y,
-            closest_entry.angle,
-            (t - closest_entry.fraction) / closest_entry.fraction_length,
-            closest_entry.distance
-        )
+        -- translate point along line from current to next entry
+        local delta = (t - closest_entry.fraction) / closest_entry.fraction_length * closest_entry.distance
+        return closest_entry.from_x + delta * _cos(closest_entry.angle),
+            closest_entry.from_y + delta * _sin(closest_entry.angle)
     end
+end
+
+--- @brief
+function rt.Path:create_from(points, ...)
+    if meta.is_number(points) then points = {points, ...} end
+    local n_points = sizeof(points)
+    if n_points % 2 ~= 0 then rt.error("In rt.Path: number of point coordinates is not a multiple of two") end
+    self._n_points = n_points
+    self:_update()
 end
 
 --- @brief

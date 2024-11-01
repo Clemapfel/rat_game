@@ -22,7 +22,7 @@
     </configurations>
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="7fa9ba1b-2cff-4ecc-86fb-59ab2fa76ee1" name="Changes" comment="stashing">
+    <list default="true" id="7fa9ba1b-2cff-4ecc-86fb-59ab2fa76ee1" name="Changes" comment="stashing linear search path">
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/common/path.lua" beforeDir="false" afterPath="$PROJECT_DIR$/common/path.lua" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/main.lua" beforeDir="false" afterPath="$PROJECT_DIR$/main.lua" afterDir="false" />
@@ -598,15 +598,7 @@
       <workItem from="1729098138796" duration="20580000" />
       <workItem from="1729180777153" duration="8566000" />
       <workItem from="1729267430460" duration="1705000" />
-      <workItem from="1729269158294" duration="242714000" />
-    </task>
-    <task id="LOCAL-01150" summary="circular wipe working">
-      <option name="closed" value="true" />
-      <created>1729364433600</created>
-      <option name="number" value="01150" />
-      <option name="presentableId" value="LOCAL-01150" />
-      <option name="project" value="LOCAL" />
-      <updated>1729364433600</updated>
+      <workItem from="1729269158294" duration="244566000" />
     </task>
     <task id="LOCAL-01151" summary="stashing">
       <option name="closed" value="true" />
@@ -992,7 +984,15 @@
       <option name="project" value="LOCAL" />
       <updated>1730424816448</updated>
     </task>
-    <option name="localTasksCounter" value="1199" />
+    <task id="LOCAL-01199" summary="stashing linear search path">
+      <option name="closed" value="true" />
+      <created>1730494260244</created>
+      <option name="number" value="01199" />
+      <option name="presentableId" value="LOCAL-01199" />
+      <option name="project" value="LOCAL" />
+      <updated>1730494260244</updated>
+    </task>
+    <option name="localTasksCounter" value="1200" />
     <servers />
   </component>
   <component name="TypeScriptGeneratedFilesManager">
@@ -1041,7 +1041,6 @@
     </option>
   </component>
   <component name="VcsManagerConfiguration">
-    <MESSAGE value="added favicon" />
     <MESSAGE value="added debug animation" />
     <MESSAGE value="status gained done" />
     <MESSAGE value="implemented status bar" />
@@ -1066,7 +1065,8 @@
     <MESSAGE value="refactoring simulation, set_value now stores state-side" />
     <MESSAGE value="refactor starting" />
     <MESSAGE value="stashing" />
-    <option name="LAST_COMMIT_MESSAGE" value="stashing" />
+    <MESSAGE value="stashing linear search path" />
+    <option name="LAST_COMMIT_MESSAGE" value="stashing linear search path" />
   </component>
   <component name="XDebuggerManager">
     <breakpoint-manager>
