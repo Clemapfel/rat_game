@@ -84,12 +84,11 @@ end)
 local points = {}
 local w, h = love.graphics.getDimensions()
 local padding = 50
-for i = 1, 4 do
-    table.insert(points, rt.random.number(padding, w - padding))
-    table.insert(points, rt.random.number(padding, h - padding))
+for i = 1, 10 do
+    table.insert(points, 50 + i * 100)
+    table.insert(points, rt.random.number(300, 500))
 end
 path = rt.Path(points)
-path_elapsed = 0
 
 love.load = function()
     background:realize()
@@ -110,7 +109,7 @@ love.load = function()
     love.resize(love.graphics.getWidth(), love.graphics.getHeight())
 end
 
-path_duration = 2
+path_duration = 10
 path_elapsed = 0
 
 love.update = function(delta)

@@ -66,39 +66,43 @@ do
         for entry_i = 1, n_entries do
             local entry = distances[entry_i]
             entry.fraction = entry.cumulative_distance / length
-            dbg(entry_i, fraction)
         end
 
+        for entry_i = 1, n_entries do
+            local current = distances[entry_i]
+            local next = distances[entry_i + 1]
+
+            if entry_i < n_entries then
+                current.fraction_length = next.fraction - current.fraction
+            else
+                current.fraction_length = 1 - current.fraction
+            end
+        end
         self._entries = distances
         self._n_entries = n_entries
         self._length = distance_sum
-
-        dbg(self._entries)
     end
 
     --- @brief
     function rt.Path:at(t)
-
         local n_entries = self._n_entries
         local entries = self._entries
 
+        if t > 1 then t = 1 end
         local closest_entry
-
-        if t <= self._first_distance then
-            closest_entry = entries[1]
-        elseif t >= self._last_distance then
-            closest_entry = entries[n_entries]
-        elseif t <= 0.5 then
-            -- scan from left
-        elseif t > 0.5 then
-            -- scan from right
+        for i = 1, n_entries - 1 do
+            if entries[i].fraction <= t and entries[i + 1].fraction >= t then
+                closest_entry = entries[i]
+                break
+            end
         end
+        if closest_entry == nil then closest_entry = entries[n_entries] end
 
         return _advance(
             closest_entry.from_x,
             closest_entry.from_y,
             closest_entry.angle,
-            t - closest_entry.cumulative_distance,
+            (t - closest_entry.fraction) / closest_entry.fraction_length,
             closest_entry.distance
         )
     end
