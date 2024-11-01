@@ -694,9 +694,17 @@ function bt.BattleScene:get_text_box()
     return self._text_box
 end
 
+--- @brief
+function bt.BattleScene:get_sprite(entity)
+    return self._sprites[entity]
+end
+
 --- @brief [internal]
 function bt.BattleScene:_handle_button_pressed(which)
     if which == rt.InputButton.A then
+
+        local env = self._simulation_environment
+        local target = self._state:list_enemies()[1]
         --[[
         self._simulation_environment.add_status(
             bt.create_entity_proxy(self, self._state:list_enemies()[1]),
@@ -717,9 +725,7 @@ function bt.BattleScene:_handle_button_pressed(which)
             bt.create_entity_proxy(self, self._state:list_enemies()[1]),
             slot
         )
-        ]]--
-
-        --self:_push_animation(bt.Animation.OBJECT_DISABLED(self, bt.Consumable("DEBUG_CONSUMABLE"), self._enemy_sprites[1]))
+        self:_push_animation(bt.Animation.OBJECT_DISABLED(self, bt.Consumable("DEBUG_CONSUMABLE"), self._enemy_sprites[1]))
 
         self._simulation_environment.add_consumable(
             bt.create_entity_proxy(self, self._state:list_enemies()[1]),
@@ -730,6 +736,23 @@ function bt.BattleScene:_handle_button_pressed(which)
             bt.create_consumable_proxy(self, bt.Consumable("DEBUG_CONSUMABLE")),
             true
         )
+
+
+        env.set_move_is_disabled(
+            bt.create_entity_proxy(self, self._state:list_enemies()[1]),
+            bt.create_move_proxy(self, self._state:entity_list_moves(target)[1]),
+            true
+        )
+
+        env.set_move_is_disabled(
+            bt.create_entity_proxy(self, self._state:list_enemies()[1]),
+            bt.create_move_proxy(self, self._state:entity_list_moves(target)[1]),
+            false
+        )
+        ]]--
+
+        local sprite = self:get_sprite(target)
+        self:_push_animation(bt.Animation.OBJECT_ENABLED(self, bt.Consumable("DEBUG_CONSUMABLE"), sprite))
 
     elseif which == rt.InputButton.B then
         self._animation_queue:skip()

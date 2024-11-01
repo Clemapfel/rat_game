@@ -15,7 +15,7 @@ do
             if color == nil then color = "RED" end -- enemies
             return "<b><color=RED>" .. object:get_name() .. "</color></b>"
         elseif meta.isa(object, bt.Move) then
-            return "<b><i>" .. object:get_name() .. "<i></b>"
+            return "<b><i>" .. object:get_name() .. "</i></b>"
         elseif meta.isa(object, bt.Consumable)
             or meta.isa(object, bt.Status)
             or meta.isa(object, bt.GlobalStatus)

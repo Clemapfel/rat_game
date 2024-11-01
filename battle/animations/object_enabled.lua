@@ -1,35 +1,34 @@
-rt.settings.battle.animation.object_disabled = {
+rt.settings.battle.animation.object_enabled = {
+    pre_compute_duration = 2,
     hold_duration = 1,
-    shatter_duration = 1,
-    fade_out_duration = 1,
-    triangle_radius = 30
+    duration = 1
 }
 
---- @class bt.Animation.OBJECT_DISABLED
-bt.Animation.OBJECT_DISABLED = meta.new_type("OBJECT_DISABLED", rt.Animation, function(scene, object, sprite)
+--- @class bt.Animation.OBJECT_ENABLED
+bt.Animation.OBJECT_ENABLED = meta.new_type("OBJECT_ENABLED", rt.Animation, function(scene, object, sprite)
     meta.assert_isa(scene, bt.BattleScene)
     meta.assert_isa(sprite, bt.EnemySprite)
     assert(object.get_sprite_id ~= nil)
-    return meta.new(bt.Animation.OBJECT_DISABLED, {
+    return meta.new(bt.Animation.OBJECT_ENABLED, {
         _scene = scene,
         _object = object,
         _target = sprite,
         _triangles = {},
-        _opacity_animation = rt.TimedAnimation(rt.settings.battle.animation.object_disabled.fade_out_duration, 0, 1, rt.InterpolationFunctions.GAUSSIAN_LOWPASS),
+
+        _fade_out_animation = rt.TimedAnimation(0.3, 0, 1, rt.InterpolationFunctions.GAUSSIAN_LOWPASS),
+        _position_animation = rt.TimedAnimation(rt.settings.battle.animation.object_enabled.duration,
+            0, 1, rt.InterpolationFunctions.EXPONENTIAL_ACCELERATION
+        ),
+        _hold_elapsed = 0,
         _opacity = 1,
 
-        _render_texture = rt.RenderTexture(),
-        _render_texture_x = 0,
-        _render_texture_y = 0,
         _sprite_texture = rt.RenderTexture(),
-
-        _hold_elapsed = 0,
-        _shatter_elapsed = 0
+        _triangles = {}
     })
 end)
 
 --- @override
-function bt.Animation.OBJECT_DISABLED:start()
+function bt.Animation.OBJECT_ENABLED:start()
     local sprite = rt.Sprite(self._object:get_sprite_id())
     sprite:realize()
     local sprite_w, sprite_h = sprite:measure()
@@ -47,8 +46,7 @@ function bt.Animation.OBJECT_DISABLED:start()
     local y = target_y + 0.5 * target_height - 0.5 * sprite_h
     local width, height = sprite_w, sprite_h
 
-
-    local step = rt.settings.battle.animation.object_disabled.triangle_radius
+    local step = 2 * rt.settings.battle.animation.object_disabled.triangle_radius
     local perturbation_magnitude = step / 4
 
     local n_rows = math.ceil(height / step) + 1
@@ -82,14 +80,6 @@ function bt.Animation.OBJECT_DISABLED:start()
         table.insert(self._vertices, row)
     end
 
-    local padding = step
-    local w, h = max_x - min_x + 2 * padding, max_y - min_y + 2 * padding
-    if self._render_texture:get_width() ~= w or self._render_texture:get_height() ~= h then
-        self._render_texture = rt.RenderTexture(w, h)
-    end
-    self._render_texture_x = min_x - padding
-    self._render_texture_y = min_y - padding
-
     self._triangles = {}
     local function get(i, j)
         local v = self._vertices[i][j]
@@ -117,7 +107,7 @@ function bt.Animation.OBJECT_DISABLED:start()
         local angle = rt.angle(shape.centroid_x - (x + 0.5 * width), shape.centroid_y - (y + 0.5 * height))
         shape.last_x, shape.last_y = rt.translate_point_by_angle(
             0, 0,
-            -1 * rt.random.number(0.2, 0.4),
+            -1,
             angle
         )
 
@@ -162,56 +152,67 @@ function bt.Animation.OBJECT_DISABLED:start()
         end
     end
 
-end
+    -- pre-generate paths
+    local step = 1 / 60
+    for shape in values(self._triangles) do
+        local points = {
+            shape.current_x,
+            shape.current_y
+        }
 
---- @override
-function bt.Animation.OBJECT_DISABLED:update(delta)
-    -- hold still, then shatter, then fade out
-    self._hold_elapsed = self._hold_elapsed + delta
-    local should_shatter = false
-    if self._hold_elapsed > rt.settings.battle.animation.object_disabled.hold_duration then
-        self._shatter_elapsed = self._shatter_elapsed + delta
-        should_shatter = true
-        if self._shatter_elapsed > rt.settings.battle.animation.object_disabled.shatter_duration then
-            self._opacity_animation:update(delta)
-        end
-    end
-
-    if should_shatter then
-        local acceleration = 1 * self._shatter_elapsed
-        local angular_acceleration = 10e-3
-        for shape in values(self._triangles) do
+        local elapsed = 0
+        local n = 0
+        while elapsed < rt.settings.battle.animation.object_enabled.pre_compute_duration do
+            local acceleration = 1 * elapsed
+            local angular_acceleration = 10e-3
             local current_x, current_y = shape.current_x, shape.current_y
-            local next_x = shape.current_x + (shape.current_x - shape.last_x) + acceleration * delta * delta
-            local next_y = shape.current_y + (shape.current_y - shape.last_y) + acceleration * delta * delta
+            local next_x = shape.current_x + (shape.current_x - shape.last_x) + acceleration * step * step
+            local next_y = shape.current_y + (shape.current_y - shape.last_y) + acceleration * step * step
             shape.current_x, shape.current_y = next_x, next_y
             shape.last_x, shape.last_y = current_x, current_y
-            shape.angle = shape.angle + angular_acceleration * delta * math.pi * 2 * shape.rotation_weight
+            shape.angle = shape.angle + angular_acceleration * step * math.pi * 2 * shape.rotation_weight
+
+            table.insert(points, 1, shape.current_y)
+            table.insert(points, 1, shape.current_x)
+            n = n + 1
+            elapsed = elapsed + step
+        end
+
+        shape.points = points
+        shape.n_points = n
+        rt.savepoint_maybe()
+    end
+end
+
+hang = 0
+
+--- @override
+function bt.Animation.OBJECT_ENABLED:update(delta)
+    if self._position_animation:update(delta) then
+        self._hold_elapsed = self._hold_elapsed + delta
+        if self._hold_elapsed > rt.settings.battle.animation.object_enabled.hold_duration then
+            self._fade_out_animation:update(delta)
+            self._opacity = self._fade_out_animation:get_value()
+            for shape in values(self._triangles) do
+                shape:set_opacity(self._opacity)
+            end
         end
     end
 
-    self._render_texture:bind()
-    love.graphics.clear(true, false, false)
-    love.graphics.translate(-1 * self._render_texture_x, -1 * self._render_texture_y)
+    local fraction = self._position_animation:get_value()
     for shape in values(self._triangles) do
-        love.graphics.push()
-        love.graphics.translate(shape.centroid_x, shape.centroid_y)
-        love.graphics.rotate(shape.angle)
-        love.graphics.translate(-shape.centroid_x, -shape.centroid_y)
-        love.graphics.translate(shape.current_x, shape.current_y)
-        shape:draw()
-        love.graphics.pop()
+        shape.current_x, shape.current_y = shape.path:at(0.5)
     end
-    love.graphics.translate(1 * self._render_texture_x, 1 * self._render_texture_y)
-    self._render_texture:unbind()
 
-    return self._opacity_animation:get_is_done()
+    return self._fade_out_animation:get_is_done() and self._fade_out_animation:get_is_done()
 end
 
 --- @override
-function bt.Animation.OBJECT_DISABLED:draw()
-    self._render_texture:draw(
-        self._render_texture_x, self._render_texture_y,
-        1, 1, 1, self._opacity_animation:get_value()
-    )
+function bt.Animation.OBJECT_ENABLED:draw()
+    for shape in values(self._triangles) do
+        love.graphics.translate(shape.current_x, shape.current_y)
+        shape:draw()
+        love.graphics.translate(-shape.current_x, -shape.current_y)
+    end
 end
+

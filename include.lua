@@ -143,6 +143,7 @@ require "common.shape_polygon"
 require "common.shape_ellipse"
 require "common.vertex_shape"
 require "common.spline"
+require "common.path"
 
 require "common.text_atlas"
 require "common.sound_atlas"

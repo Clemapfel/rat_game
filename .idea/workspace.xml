@@ -22,15 +22,18 @@
     </configurations>
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="7fa9ba1b-2cff-4ecc-86fb-59ab2fa76ee1" name="Changes" comment="stashing">
-      <change afterPath="$PROJECT_DIR$/battle/~simulation_handler.lua" afterDir="false" />
+    <list default="true" id="7fa9ba1b-2cff-4ecc-86fb-59ab2fa76ee1" name="Changes" comment="refactor starting">
+      <change afterPath="$PROJECT_DIR$/battle/animations/object_enabled.lua" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/battle/~~simulation_handler.lua" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/common/path.lua" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/battle/animations/global_status_applied.lua" beforeDir="false" afterPath="$PROJECT_DIR$/battle/animations/global_status_applied.lua" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/battle/animations/object_disabled.lua" beforeDir="false" afterPath="$PROJECT_DIR$/battle/animations/object_disabled.lua" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/battle/battle_scene.lua" beforeDir="false" afterPath="$PROJECT_DIR$/battle/battle_scene.lua" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/battle/global_status.lua" beforeDir="false" afterPath="$PROJECT_DIR$/battle/global_status.lua" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/battle/simulation_handler.lua" beforeDir="false" afterPath="$PROJECT_DIR$/battle/simulation_handler.lua" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/battle/string_formatting.lua" beforeDir="false" afterPath="$PROJECT_DIR$/battle/string_formatting.lua" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/common/game_state_battle.lua" beforeDir="false" afterPath="$PROJECT_DIR$/common/game_state_battle.lua" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/common/meta.lua" beforeDir="false" afterPath="$PROJECT_DIR$/common/meta.lua" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/include.lua" beforeDir="false" afterPath="$PROJECT_DIR$/include.lua" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/main.lua" beforeDir="false" afterPath="$PROJECT_DIR$/main.lua" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -603,23 +606,7 @@
       <workItem from="1729098138796" duration="20580000" />
       <workItem from="1729180777153" duration="8566000" />
       <workItem from="1729267430460" duration="1705000" />
-      <workItem from="1729269158294" duration="224373000" />
-    </task>
-    <task id="LOCAL-01147" summary="added simulation environment sandbox">
-      <option name="closed" value="true" />
-      <created>1729279090891</created>
-      <option name="number" value="01147" />
-      <option name="presentableId" value="LOCAL-01147" />
-      <option name="project" value="LOCAL" />
-      <updated>1729279090892</updated>
-    </task>
-    <task id="LOCAL-01148" summary="added battle script function declarations">
-      <option name="closed" value="true" />
-      <created>1729296889426</created>
-      <option name="number" value="01148" />
-      <option name="presentableId" value="LOCAL-01148" />
-      <option name="project" value="LOCAL" />
-      <updated>1729296889426</updated>
+      <workItem from="1729269158294" duration="240311000" />
     </task>
     <task id="LOCAL-01149" summary="added triangle tiling">
       <option name="closed" value="true" />
@@ -997,7 +984,23 @@
       <option name="project" value="LOCAL" />
       <updated>1730311743442</updated>
     </task>
-    <option name="localTasksCounter" value="1196" />
+    <task id="LOCAL-01196" summary="refactoring simulation, set_value now stores state-side">
+      <option name="closed" value="true" />
+      <created>1730333187248</created>
+      <option name="number" value="01196" />
+      <option name="presentableId" value="LOCAL-01196" />
+      <option name="project" value="LOCAL" />
+      <updated>1730333187248</updated>
+    </task>
+    <task id="LOCAL-01197" summary="refactor starting">
+      <option name="closed" value="true" />
+      <created>1730334391017</created>
+      <option name="number" value="01197" />
+      <option name="presentableId" value="LOCAL-01197" />
+      <option name="project" value="LOCAL" />
+      <updated>1730334391017</updated>
+    </task>
+    <option name="localTasksCounter" value="1198" />
     <servers />
   </component>
   <component name="TypeScriptGeneratedFilesManager">
@@ -1046,8 +1049,6 @@
     </option>
   </component>
   <component name="VcsManagerConfiguration">
-    <MESSAGE value="stashing kill explosion" />
-    <MESSAGE value="explosion looks natural now" />
     <MESSAGE value="added favicon" />
     <MESSAGE value="added debug animation" />
     <MESSAGE value="status gained done" />
@@ -1071,7 +1072,9 @@
     <MESSAGE value="stashing shatter" />
     <MESSAGE value="disabled animation done" />
     <MESSAGE value="stashing" />
-    <option name="LAST_COMMIT_MESSAGE" value="stashing" />
+    <MESSAGE value="refactoring simulation, set_value now stores state-side" />
+    <MESSAGE value="refactor starting" />
+    <option name="LAST_COMMIT_MESSAGE" value="refactor starting" />
   </component>
   <component name="XDebuggerManager">
     <breakpoint-manager>

@@ -539,6 +539,29 @@ for which in range("move", "equip", "consumable") do
         return false
     end
 
+    --- @brief entity_get_move_slot_i, entity_get_equip_slot_i, entity_get_consumable_slot_i
+    rt.GameState["entity_get_" .. which .. "_slot_i"] = function(self, entity, object)
+        meta.assert_isa(entity, bt.Entity)
+        meta.assert_isa(object, Type)
+
+        local entry = self:_get_entity_entry(entity)
+        if entry == nil then
+            rt.error("In rt.GameState:entity_has_" .. which ..": entity `" .. entity:get_id() .. "` is not part of state")
+            return
+        end
+        local slots = entry[which .. "s"]
+        local n_slots = entity["get_n_" .. which .. "_slots"](entity)
+
+        local out = {}
+        for i = 1, n_slots do
+            if slots[i].id == object:get_id() then
+                table.insert(out, i)
+            end
+        end
+
+        return table.unpack(out)
+    end
+
     if which == "move" or which == "consumable" then
         --- @brief entity_get_move_n_used, entity_get_consumable_n_used
         rt.GameState["entity_get_" .. which .. "_n_used"] = function(self, entity, slot_i)
@@ -1139,7 +1162,7 @@ for which_type in range(
     local which, type = table.unpack(which_type)
 
     --- @brief entity_set_move_storage_value, entity_set_status_storage_value, entity_set_equip_storage_value, entity_set_consumable_storage_value
-    bt.GameState["entity_set_" .. which .. "_storage_value"] = function(self, entity, slot_i, id, new_value)
+    rt.GameState["entity_set_" .. which .. "_storage_value"] = function(self, entity, slot_i, id, new_value)
         meta.assert_isa(entity, bt.Entity)
         meta.assert_number(slot_i)
         meta.assert_string(id)
@@ -1160,7 +1183,7 @@ for which_type in range(
     end
 
     --- @brief entity_get_move_storage_value, entity_get_status_storage_value, entity_get_equip_storage_value, entity_get_consumable_storage_value
-    bt.GameState["entity_get_" .. which .. "_storage_value"] = function(self, entity, slot_i, id, new_value)
+    rt.GameState["entity_get_" .. which .. "_storage_value"] = function(self, entity, slot_i, id, new_value)
         meta.assert_isa(entity, bt.Entity)
         meta.assert_number(slot_i)
         meta.assert_string(id)
@@ -1181,7 +1204,7 @@ for which_type in range(
     end
 
     --- @brief entity_replace_move_storage_value, entity_replace_status_storage_value, entity_replace_equip_storage_value, entity_replace_consumable_storage_value
-    bt.GameState["entity_replace_" .. which .. "_storage_value"] = function(self, entity, slot_i, new_table)
+    rt.GameState["entity_replace_" .. which .. "_storage_value"] = function(self, entity, slot_i, new_table)
         meta.assert_isa(entity, bt.Entity)
         meta.assert_number(slot_i)
         meta.assert_table(new_table)
