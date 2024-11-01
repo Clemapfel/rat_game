@@ -702,57 +702,7 @@ end
 --- @brief [internal]
 function bt.BattleScene:_handle_button_pressed(which)
     if which == rt.InputButton.A then
-
-        local env = self._simulation_environment
-        local target = self._state:list_enemies()[1]
-        --[[
-        self._simulation_environment.add_status(
-            bt.create_entity_proxy(self, self._state:list_enemies()[1]),
-            bt.create_status_proxy(self, bt.Status("DEBUG_STATUS"))
-        )
-        self._simulation_environment.remove_status(
-            bt.create_entity_proxy(self, self._state:list_enemies()[1]),
-            bt.create_status_proxy(self, bt.Status("DEBUG_STATUS"))
-        )]]--
-
-        --[[
-        local slot = self._simulation_environment.add_consumable(
-            bt.create_entity_proxy(self, self._state:list_enemies()[1]),
-            bt.create_consumable_proxy(self, bt.Consumable("DEBUG_CONSUMABLE"))
-        )
-
-        self._simulation_environment.remove_consumable(
-            bt.create_entity_proxy(self, self._state:list_enemies()[1]),
-            slot
-        )
-        self:_push_animation(bt.Animation.OBJECT_DISABLED(self, bt.Consumable("DEBUG_CONSUMABLE"), self._enemy_sprites[1]))
-
-        self._simulation_environment.add_consumable(
-            bt.create_entity_proxy(self, self._state:list_enemies()[1]),
-            bt.create_consumable_proxy(self, bt.Consumable("DEBUG_CONSUMABLE"))
-        )
-        self._simulation_environment.set_consumable_disabled(
-            bt.create_entity_proxy(self, self._state:list_enemies()[1]),
-            bt.create_consumable_proxy(self, bt.Consumable("DEBUG_CONSUMABLE")),
-            true
-        )
-
-
-        env.set_move_is_disabled(
-            bt.create_entity_proxy(self, self._state:list_enemies()[1]),
-            bt.create_move_proxy(self, self._state:entity_list_moves(target)[1]),
-            true
-        )
-
-        env.set_move_is_disabled(
-            bt.create_entity_proxy(self, self._state:list_enemies()[1]),
-            bt.create_move_proxy(self, self._state:entity_list_moves(target)[1]),
-            false
-        )
-        ]]--
-
-        local sprite = self:get_sprite(target)
-        self:_push_animation(bt.Animation.OBJECT_ENABLED(self, bt.Consumable("DEBUG_CONSUMABLE"), sprite))
+        self:_test_simulation()
 
     elseif which == rt.InputButton.B then
         self._animation_queue:skip()

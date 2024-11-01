@@ -131,6 +131,7 @@ do
         for animation in values(first.animations) do
             if animation._state == rt.AnimationState.IDLE then
                 _start_animation(animation)
+                rt.savepoint_maybe()
                 local res = animation:update(0)
                 if res == rt.AnimationResult.CONTINUE then
                     is_done = false
@@ -167,26 +168,27 @@ do
 
     --- @brief
     function rt.AnimationQueue:skip()
-        local before = self._n_nodes
-        while self._n_nodes > 0 do
-            local first = self._nodes[1]
-            for animation in values(first.animations) do
-                if animation._state == rt.AnimationState.IDLE then
-                    _start_animation(animation)
-                    animation:update(0)
-                elseif animation._state == rt.AnimationState.STARTED then
-                    animation:update(0)
-                end
-
-                _finish_animation(animation)
+        local first = self._nodes[1]
+        for animation in values(first.animations) do
+            if animation._state == rt.AnimationState.IDLE then
+                _start_animation(animation)
+                animation:update(0)
+            elseif animation._state == rt.AnimationState.STARTED then
+                animation:update(0)
             end
 
-            table.remove(self._nodes, 1)
-            self._n_nodes = self._n_nodes - 1
+            _finish_animation(animation)
         end
 
-        if before > 0 then
-            self:signal_emit("emptied")
+        table.remove(self._nodes, 1)
+        self._n_nodes = self._n_nodes - 1
+        if self._n_nodes == 0 then self:signal_emit("emptied") end
+    end
+
+    --- @brief
+    function rt.AnimationQueue:clear()
+        while self._n_nodes > 0 do
+            self:skip()
         end
     end
 end

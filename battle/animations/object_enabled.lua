@@ -1,7 +1,8 @@
 rt.settings.battle.animation.object_enabled = {
     pre_compute_duration = 2,
     hold_duration = 1,
-    duration = 1
+    duration = 1,
+    use_caching = true
 }
 
 --- @class bt.Animation.OBJECT_ENABLED
@@ -17,7 +18,7 @@ bt.Animation.OBJECT_ENABLED = meta.new_type("OBJECT_ENABLED", rt.Animation, func
 
         _fade_out_animation = rt.TimedAnimation(0.3, 0, 1, rt.InterpolationFunctions.GAUSSIAN_LOWPASS),
         _position_animation = rt.TimedAnimation(rt.settings.battle.animation.object_enabled.duration,
-            0, 1, rt.InterpolationFunctions.EXPONENTIAL_ACCELERATION
+            1, 0, rt.InterpolationFunctions.GAUSSIAN_LOWPASS
         ),
         _hold_elapsed = 0,
         _opacity = 1,
@@ -25,7 +26,9 @@ bt.Animation.OBJECT_ENABLED = meta.new_type("OBJECT_ENABLED", rt.Animation, func
         _sprite_texture = rt.RenderTexture(),
         _triangles = {}
     })
-end)
+end, {
+    _cache = {} -- store shards if caching enabled
+})
 
 --- @override
 function bt.Animation.OBJECT_ENABLED:start()
@@ -46,7 +49,23 @@ function bt.Animation.OBJECT_ENABLED:start()
     local y = target_y + 0.5 * target_height - 0.5 * sprite_h
     local width, height = sprite_w, sprite_h
 
-    local step = 2 * rt.settings.battle.animation.object_disabled.triangle_radius
+    -- only compute shards once per sprite size
+    if rt.settings.battle.animation.object_enabled.use_caching then
+        local cache = bt.Animation.OBJECT_ENABLED._cache[sprite_w]
+        if cache ~= nil then cache = cache[sprite_h] end
+        if cache ~= nil then
+            self._triangles = cache
+            for shape in values(self._triangles) do
+                shape.current_x = 0
+                shape.current_y = 0
+                shape:set_opacity(1)
+                shape:set_texture(self._sprite_texture)
+            end
+            return
+        end
+    end
+
+    local step = rt.settings.battle.animation.object_disabled.triangle_radius
     local perturbation_magnitude = step / 4
 
     local n_rows = math.ceil(height / step) + 1
@@ -153,7 +172,8 @@ function bt.Animation.OBJECT_ENABLED:start()
     end
 
     -- pre-generate paths
-    local step = 1 / 60
+    local duration = rt.settings.battle.animation.object_enabled.pre_compute_duration
+    local step = duration / 100
     for shape in values(self._triangles) do
         local points = {
             shape.current_x,
@@ -162,7 +182,7 @@ function bt.Animation.OBJECT_ENABLED:start()
 
         local elapsed = 0
         local n = 0
-        while elapsed < rt.settings.battle.animation.object_enabled.pre_compute_duration do
+        while elapsed < duration do
             local acceleration = 1 * elapsed
             local angular_acceleration = 10e-3
             local current_x, current_y = shape.current_x, shape.current_y
@@ -178,13 +198,16 @@ function bt.Animation.OBJECT_ENABLED:start()
             elapsed = elapsed + step
         end
 
-        shape.points = points
+        shape.path = rt.Path(points)
         shape.n_points = n
-        rt.savepoint_maybe()
+    end
+
+    if rt.settings.battle.animation.object_enabled.use_caching then
+        bt.Animation.OBJECT_ENABLED._cache[sprite_w] = {
+            [sprite_h] = self._triangles
+        }
     end
 end
-
-hang = 0
 
 --- @override
 function bt.Animation.OBJECT_ENABLED:update(delta)
@@ -201,7 +224,7 @@ function bt.Animation.OBJECT_ENABLED:update(delta)
 
     local fraction = self._position_animation:get_value()
     for shape in values(self._triangles) do
-        shape.current_x, shape.current_y = shape.path:at(0.5)
+        shape.current_x, shape.current_y = shape.path:at(fraction)
     end
 
     return self._fade_out_animation:get_is_done() and self._fade_out_animation:get_is_done()

@@ -454,6 +454,13 @@ function rt.GameState:_update(delta)
     end
 
     if self._use_coroutines then
+        table.insert(self._active_coroutines, rt.Coroutine(function()
+            if self._current_scene ~= nil then
+                self._current_scene:update(delta)
+                self._current_scene:signal_emit("update")
+            end
+        end))
+
         local n = sizeof(self._active_coroutines)
         local to_remove = {}
         local max_n_routines = 2;
@@ -471,11 +478,11 @@ function rt.GameState:_update(delta)
         for i in values(to_remove) do
             table.remove(self._active_coroutines, i)
         end
-    end
-
-    if self._current_scene ~= nil then
-        self._current_scene:update(delta)
-        self._current_scene:signal_emit("update")
+    else
+        if self._current_scene ~= nil then
+            self._current_scene:update(delta)
+            self._current_scene:signal_emit("update")
+        end
     end
 end
 

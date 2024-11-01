@@ -726,7 +726,7 @@ for which_type in range(
             return
         end
 
-        object_entry.is_disabled = true
+        object_entry.is_disabled = b
     end
 end
 
@@ -1012,8 +1012,8 @@ end
 --- @brief
 function rt.GameState:list_global_statuses()
     local out = {}
-    for status in values(self._state.global_statuses) do
-        table.insert(out, status)
+    for id in keys(self._state.global_statuses) do
+        table.insert(out, bt.GlobalStatus(id))
     end
     return out
 end
@@ -1113,7 +1113,7 @@ function rt.GameState:entity_replace_status_storage(entity, new_table)
 end
 
 --- @brief
-function rt.GameState:get_global_status_storage_value(status, id, new_value)
+function rt.GameState:set_global_status_storage_value(status, id, new_value)
     meta.assert_isa(status, bt.GlobalStatus)
     meta.assert_string(id)
 
@@ -1641,8 +1641,11 @@ function rt.GameState:initialize_debug_state()
             end
         end
 
+        self:entity_add_status(entity, bt.Status("DEBUG_STATUS"))
         self:entity_set_hp(entity, entity:get_hp_base())
     end
+
+    self:add_global_status(bt.GlobalStatus("DEBUG_GLOBAL_STATUS"))
 
     local max_count = 99
     for move in values(moves) do

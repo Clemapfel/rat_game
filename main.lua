@@ -81,16 +81,6 @@ input:signal_connect("pressed", function(_, whgich)
     end
 end)
 
-local points = {}
-local w, h = love.graphics.getDimensions()
-local padding = 50
-local n = 1000
-for i = 1, n do
-    table.insert(points, 0 + w / n * i)
-    table.insert(points, rt.random.number(300, 500))
-end
-path = rt.Path(points)
-
 love.load = function()
     background:realize()
     state:_load()
@@ -110,9 +100,6 @@ love.load = function()
     love.resize(love.graphics.getWidth(), love.graphics.getHeight())
 end
 
-path_duration = 10
-path_elapsed = 0
-
 love.update = function(delta)
     background:update(delta)
 
@@ -126,12 +113,9 @@ love.update = function(delta)
         rt.profiler.pop("update")
     end
     --midi:update(delta)
-
-    path_elapsed = path_elapsed + delta
 end
 
 love.draw = function()
-    --[[
     --background:draw()
     --love.graphics.clear(0, 0, 0, 0)
     if draw_state then
@@ -153,12 +137,6 @@ love.draw = function()
             rt.profiler.pop("draw")
         end
     end
-    ]]
-
-    love.graphics.setColor(0, 0, 0, 1)
-    love.graphics.setPointSize(10)
-    path:draw()
-    love.graphics.points(path:at(path_elapsed / path_duration))
 end
 
 love.resize = function(new_width, new_height)

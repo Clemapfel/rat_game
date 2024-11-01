@@ -32,28 +32,31 @@ bt.String = "String"
 bt.Boolean = "Boolean"
 
 do
+    local _eq = function(self, other) return self.id == other.id end
+
+    local _tostring = function(self)
+        return bt.format_name(self)
+    end
+
+    local _index = function(self, key)
+        if key == "id" then return getmetatable(self)._native:get_id() end
+        bt.error_function("In bt.EntityProxy.__index: trying to access proxy directly, but it can only be accessed with outer functions, use `get_*` instead")
+        return nil
+    end
+
+    local _newindex = function(self, key)
+        bt.error_function("In bt.EntityProxy.__newindex: trying to modify proxy directly, but it can only be accessed with outer functions, use `set_*` instead")
+    end
+
     local _create_proxy_metatable = function(type, scene)
         return {
             _type = type,
             _scene = scene,
-
-            __eq = function(self, other)
-                return getmetatable(self)._native:get_id() == getmetatable(self)._native:get_id()
-            end,
-
-            __tostring = function(self)
-                return bt.format_name(self)
-            end,
-
-            __index = function(self, key)
-                if key == "id" then return getmetatable(self)._native:get_id() end
-                bt.error_function("In bt.EntityProxy.__index: trying to access proxy directly, but it can only be accessed with outer functions, use `get_*` instead")
-                return nil
-            end,
-
-            __newindex = function(self, key)
-                bt.error_function("In bt.EntityProxy.__newindex: trying to modify proxy directly, but it can only be accessed with outer functions, use `set_*` instead")
-            end
+            _native = nil,
+            __eq = _eq,
+            __tostring = _tostring,
+            __index = _index,
+            __newindex = _newindex
         }
     end
 
@@ -88,7 +91,7 @@ do
         meta.assert_isa(scene, bt.BattleScene)
         meta.assert_isa(native, bt.Status)
 
-        local metatable = _create_proxy_metatable(bt.GlobalStatusProxy, scene, native)
+        local metatable = _create_proxy_metatable(bt.StatusProxy, scene, native)
         metatable._native = native
         return setmetatable({}, metatable)
     end
@@ -166,15 +169,25 @@ for which_type in range(
     {"is_move_proxy", bt.MoveProxy},
     {"is_status_proxy", bt.StatusProxy},
     {"is_global_status_proxy", bt.GlobalStatusProxy},
-    {"is_consumable_proxy", bt.ConsumableProxy}
+    {"is_consumable_proxy", bt.ConsumableProxy},
+    {"is_equip_proxy", bt.EquipProxy}
 ) do
     local which, type = table.unpack(which_type)
 
     --- @brief bt.assert_is_number, bt.assert_is_string, bt.assert_is_boolean, bt.assert_is_entity_proxy, bt.assert_is_status_proxy, bt.assert_is_global_status_proxy, bt.assert_is_consumable_proxy
     bt["assert_" .. which] = function(function_name, x, arg_i)
         if not meta[which](x) then
-            bt.error_function("In " .. function_name .. ": Wrong argument #" .. arg_i .. ", expected `" .. type .. "`, got `" .. meta.typeof(x) .. "`")
+            local true_type = getmetatable(x)._type
+            if true_type == nil then true_type = meta.typeof(x) end
+            bt.error_function("In " .. function_name .. ": Wrong argument #" .. arg_i .. ", expected `" .. type .. "`, got `" .. true_type .. "`")
         end
+    end
+end
+
+--- @brief
+function bt.assert_is_primitive(scope, x, arg_i)
+    if getmetatable(x) ~= nil or not (type(x) == "nil" or type(x) == "string" or type(x) == "number") then
+        bt.error_function("In " .. scope .. ": argument #" .. arg_i .. " is not a string, number, or nil")
     end
 end
 
@@ -187,7 +200,8 @@ do
         [bt.MoveProxy] = bt.assert_is_move_proxy,
         [bt.StatusProxy] = bt.assert_is_status_proxy,
         [bt.GlobalStatusProxy] = bt.assert_is_global_status_proxy,
-        [bt.ConsumableProxy] = bt.assert_is_consumable_proxy
+        [bt.ConsumableProxy] = bt.assert_is_consumable_proxy,
+        [bt.EquipProxy] = bt.assert_is_equip_proxy
     }
 
     --- @brief
@@ -445,9 +459,10 @@ function bt.BattleScene:create_simulation_environment()
     --- @brief
     function env.entity_set_value(entity_proxy, name, new_value)
         bt.assert_args("entity_set_value",
-            entity_proxy, bt.Entityproxy,
+            entity_proxy, bt.EntityProxy,
             name, bt.String
         )
+        bt.assert_is_primitive("entity_set_value", new_value, 3)
 
         _state:entity_set_storage_value(_get_native(entity_proxy), name, new_value)
     end
@@ -455,7 +470,7 @@ function bt.BattleScene:create_simulation_environment()
     --- @brief
     function env.entity_get_value(entity_proxy, name)
         bt.assert_args("entity_get_value",
-            entity_proxy, bt.Entityproxy,
+            entity_proxy, bt.EntityProxy,
             name, bt.String
         )
         return _state:entity_get_storage_value(_get_native(entity_proxy), name)
@@ -467,8 +482,9 @@ function bt.BattleScene:create_simulation_environment()
             global_status_proxy, bt.GlobalStatusProxy,
             name, bt.String
         )
+        bt.assert_is_primitive("global_status_set_value", new_value, 3)
 
-        _state:global_status_set_storage_value(_get_native(global_status_proxy), name)
+        _state:set_global_status_storage_value(_get_native(global_status_proxy), name, new_value)
     end
 
     --- @brief
@@ -478,16 +494,17 @@ function bt.BattleScene:create_simulation_environment()
             name, bt.String
         )
 
-        return _state:global_status_get_storage_value(_get_native(global_status_proxy), name)
+        return _state:get_global_status_storage_value(_get_native(global_status_proxy), name)
     end
 
     --- @brief
     function env.status_set_value(entity_proxy, status_proxy, name, new_value)
         bt.assert_args("status_set_value",
-            entity_proxy, bt.Entityproxy,
+            entity_proxy, bt.EntityProxy,
             status_proxy, bt.StatusProxy,
             name, bt.String
         )
+        bt.assert_is_primitive("status_set_value", new_value, 4)
 
         _state:entity_set_status_storage_value(_get_native(entity_proxy), _get_native(status_proxy), name, new_value)
     end
@@ -495,7 +512,7 @@ function bt.BattleScene:create_simulation_environment()
     --- @brief
     function env.status_get_value(entity_proxy, status_proxy, name, new_value)
         bt.assert_args("status_get_value",
-            entity_proxy, bt.Entityproxy,
+            entity_proxy, bt.EntityProxy,
             status_proxy, bt.StatusProxy,
             name, bt.String
         )
@@ -510,17 +527,20 @@ function bt.BattleScene:create_simulation_environment()
     ) do
         local which, type = table.unpack(which_type)
 
+        local name = which .. "_set_value"
+
         --- @brief consumable_set_value, move_set_value, equip_set_value
-        env[which .. "_set_value"] = function(entity_proxy, object_proxy, name, new_value)
-            bt.assert_args(which .. "_set_value",
+        env[name] = function(entity_proxy, object_proxy, name, new_value)
+            bt.assert_args(name,
                 entity_proxy, bt.EntityProxy,
                 object_proxy, type
             )
+            bt.assert_is_primitive(name, new_value, 4)
 
             local entity = _get_native(entity_proxy)
             local object = _get_native(object_proxy)
-            local slot_i = _state["entity_get_" .. which .. "_slot_i"](entity, object)
-            _state["entity_set_" .. which .. "_storage_value"](entity, slot_i, name, new_value)
+            local slot_i = _state["entity_get_" .. which .. "_slot_i"](_state, entity, object)
+            _state["entity_set_" .. which .. "_storage_value"](_state, entity, slot_i, name, new_value)
         end
 
         --- @brief consumable_get_value, move_get_value, equip_get_value
@@ -532,8 +552,8 @@ function bt.BattleScene:create_simulation_environment()
 
             local entity = _get_native(entity_proxy)
             local object = _get_native(object_proxy)
-            local slot_i = _state["entity_get_" .. which .. "_slot_i"](entity, object)
-            return _state["entity_get_" .. which .. "_storage_value"](entity, slot_i, name)
+            local slot_i = _state["entity_get_" .. which .. "_slot_i"](_state, entity, object)
+            return _state["entity_get_" .. which .. "_storage_value"](_state, entity, slot_i, name)
         end
 
         --- ### MOVE ###
@@ -541,20 +561,23 @@ function bt.BattleScene:create_simulation_environment()
         env.list_moves = function(entity_proxy)
             bt.assert_args("list_moves", entity_proxy, bt.EntityProxy)
             local out = {}
-            local n, slots = _state:entity_list_moves(_get_native(entity_proxy))
+            local n, slots = _state:entity_list_move_slots(_get_native(entity_proxy))
             for i = 1, n do
                 local move = slots[i]
                 if move ~= nil then
-                    table.insert(bt.create_move_proxy(_scene, move))
+                    table.insert(out, bt.create_move_proxy(_scene, move))
                 end
             end
 
             return out
         end
 
-        env.has_move = function(entity_proxy)
-            bt.assert_args("has_move", entity_proxy, bt.EntityProxy)
-            return _state:entity_has_move(_get_native(entity_proxy))
+        env.has_move = function(entity_proxy, move_proxy)
+            bt.assert_args("has_move",
+                entity_proxy, bt.EntityProxy,
+                move_proxy, bt.MoveProxy
+            )
+            return _state:entity_has_move(_get_native(entity_proxy), _get_native(move_proxy))
         end
 
         env.get_move_n_used = function(entity_proxy, move_proxy)
@@ -567,7 +590,8 @@ function bt.BattleScene:create_simulation_environment()
             if not _state:entity_has_move(entity, move) then
                 return 0
             else
-                return _state:entity_get_move_n_used(_get_native(entity_proxy), _get_native(move_proxy))
+                local slot_i = _state:entity_get_move_slot_i(entity, move)
+                return _state:entity_get_move_n_used(_get_native(entity_proxy), slot_i)
             end
         end
 
@@ -615,9 +639,19 @@ function bt.BattleScene:create_simulation_environment()
                 n_left = math.ceil(n_left)
             end
 
+            local slot_i = _state:entity_get_move_slot_i(entity, move)
             local max = move:get_max_n_uses()
             local n_used = max - n_left
+
+            local before = _state:entity_get_move_n_used(entity, slot_i)
             _state:entity_set_move_n_used(entity, move, n_used)
+            local after = _state:entity_get_move_n_used(entity, slot_i)
+
+            if before < after then
+                env.message(entity_proxy, "s ", move_proxy, " gained PP")
+            elseif before > after then
+                env.message(entity_proxy, "s ", move_proxy, " lost PP")
+            end -- else, noop, for example if move has infinty PP
         end
 
         for which in range(
@@ -630,9 +664,9 @@ function bt.BattleScene:create_simulation_environment()
             local name = "get_move_" .. which
             --- @brief get_move_priority, get_move_is_intrinsict, get_move_can_target_multiple, get_move_can_target_ally
             env[name] = function(move_proxy)
-                bt.assert_args(name, move_proxy, bt.Moveproxy)
+                bt.assert_args(name, move_proxy, bt.MoveProxy)
                 local move = _get_native(move_proxy)
-                return move[name](move)
+                return move["get_" .. which](move)
             end
         end
 
@@ -671,20 +705,13 @@ function bt.BattleScene:create_simulation_environment()
 
             if before ~= now then -- fizzle unless state changes
                 local sprite, animation = _scene:get_sprite(entity), nil
-
                 if before == false and now == true then
-                    animation = bt.Animation.OBJECT_DISABLED(_scene, move, sprite)
-                    animation:signal_connect("start", function()
-                        env.message(entity_proxy, " can no longer use ", move_proxy)
-                    end)
+                    _scene:_push_animation(bt.Animation.OBJECT_DISABLED(_scene, move, sprite))
+                    env.message(entity_proxy, " can no longer use ", move_proxy)
                 elseif before == true and now == false then
-                    animation = bt.Animation.OBJECT_ENABLED(_scene, move, sprite)
-                    animation:signal_connect("start", function()
-                        env.message(entity_proxy, "s " , move_proxy, " is no longer disabled")
-                    end)
+                    _scene:_push_animation(bt.Animation.OBJECT_ENABLED(_scene, move, sprite))
+                    env.message(entity_proxy, "s " , move_proxy, " is no longer disabled")
                 end
-
-                _scene:_push_animation(animation)
 
                 -- no callbacks
             end
@@ -698,8 +725,73 @@ function bt.BattleScene:create_simulation_environment()
 
         --- ### GLOBAL STATUS ###
     end
-
-
-
     return env
+end
+
+function bt.BattleScene:_test_simulation()
+    self._simulation_environment = self:create_simulation_environment()
+    local env = self._simulation_environment
+    local entity = self._state:list_enemies()[1]
+    local target = bt.create_entity_proxy(self, entity)
+    local status = bt.create_status_proxy(self, self._state:entity_list_statuses(entity)[1])
+    local move = bt.create_move_proxy(self, self._state:entity_list_moves(entity)[1])
+    local equip = bt.create_equip_proxy(self, self._state:entity_list_equips(entity)[1])
+    local consumable = bt.create_consumable_proxy(self, self._state:entity_list_consumables(entity)[1])
+    local global_status = bt.create_global_status_proxy(self, self._state:list_global_statuses()[1])
+
+    do -- test storage values
+        local id, value = "test", 1234
+        env.entity_set_value(target, id, value)
+        assert(env.entity_get_value(target, id) == value)
+        env.entity_set_value(target, id, nil)
+
+        env.global_status_set_value(global_status, id, value)
+        assert(env.global_status_get_value(global_status, id) == value)
+        env.global_status_set_value(global_status, id, nil)
+
+        env.status_set_value(target, status, id, value)
+        assert(env.status_get_value(target, status, id) == value)
+        env.status_set_value(target, status, id, nil)
+
+        env.move_set_value(target, move, id, value)
+        assert(env.move_get_value(target, move, id) == value)
+        env.move_set_value(target, move, id, nil)
+
+        env.equip_set_value(target, equip, id, value)
+        assert(env.equip_get_value(target, equip, id) == value)
+        env.equip_set_value(target, equip, id, nil)
+
+        env.consumable_set_value(target, consumable, id, value)
+        assert(env.consumable_get_value(target, consumable, id) == value)
+        env.consumable_set_value(target, consumable, id, nil)
+    end
+
+    do -- test moves
+        local found = false
+        for proxy in values(env.list_moves(target)) do
+            if proxy == move then found = true; break; end
+        end
+        assert(found)
+        assert(env.has_move(target, move))
+        env.set_move_is_disabled(target, move, true)
+        assert(env.get_move_is_disabled(target, move) == true)
+        env.set_move_is_disabled(target, move, false)
+        assert(env.get_move_is_disabled(target, move) == false)
+        assert(meta.is_number(env.get_move_n_used(target, move)))
+        assert(meta.is_number(env.get_move_max_n_uses(move)))
+        assert(meta.is_number(env.get_move_n_uses_left(target, move)))
+        env.set_move_n_uses_left(target, move, 0)
+        assert(meta.is_number(env.get_move_priority(move)))
+        for which in range(
+            "is_intrinsic",
+            "can_target_multiple",
+            "can_target_self",
+            "can_target_ally"
+        ) do
+            assert(meta.is_boolean(env["get_move_" .. which](move)))
+        end
+    end
+
+    self._animation_queue:clear()
+    rt.log("In bt.BattleScene:_test_simulation: all tests passed")
 end
