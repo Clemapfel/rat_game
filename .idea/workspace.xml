@@ -22,8 +22,9 @@
     </configurations>
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="7fa9ba1b-2cff-4ecc-86fb-59ab2fa76ee1" name="Changes" comment="refactored labeled sprite">
+    <list default="true" id="7fa9ba1b-2cff-4ecc-86fb-59ab2fa76ee1" name="Changes" comment="stashing">
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/battle/equip.lua" beforeDir="false" afterPath="$PROJECT_DIR$/battle/equip.lua" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/battle/simulation_handler.lua" beforeDir="false" afterPath="$PROJECT_DIR$/battle/simulation_handler.lua" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
@@ -598,15 +599,7 @@
       <workItem from="1729180777153" duration="8566000" />
       <workItem from="1729267430460" duration="1705000" />
       <workItem from="1729269158294" duration="251396000" />
-      <workItem from="1730582354116" duration="4630000" />
-    </task>
-    <task id="LOCAL-01154" summary="stashing textbox">
-      <option name="closed" value="true" />
-      <created>1729451327019</created>
-      <option name="number" value="01154" />
-      <option name="presentableId" value="LOCAL-01154" />
-      <option name="project" value="LOCAL" />
-      <updated>1729451327019</updated>
+      <workItem from="1730582354116" duration="6867000" />
     </task>
     <task id="LOCAL-01155" summary="stashing before refactoring selection graph nodes">
       <option name="closed" value="true" />
@@ -992,7 +985,15 @@
       <option name="project" value="LOCAL" />
       <updated>1730650485658</updated>
     </task>
-    <option name="localTasksCounter" value="1203" />
+    <task id="LOCAL-01203" summary="stashing">
+      <option name="closed" value="true" />
+      <created>1730653454663</created>
+      <option name="number" value="01203" />
+      <option name="presentableId" value="LOCAL-01203" />
+      <option name="project" value="LOCAL" />
+      <updated>1730653454663</updated>
+    </task>
+    <option name="localTasksCounter" value="1204" />
     <servers />
   </component>
   <component name="TypeScriptGeneratedFilesManager">
@@ -1061,12 +1062,12 @@
     <MESSAGE value="disabled animation done" />
     <MESSAGE value="refactoring simulation, set_value now stores state-side" />
     <MESSAGE value="refactor starting" />
-    <MESSAGE value="stashing" />
     <MESSAGE value="stashing linear search path" />
     <MESSAGE value="path done and optimized" />
     <MESSAGE value="tests passing" />
     <MESSAGE value="refactored labeled sprite" />
-    <option name="LAST_COMMIT_MESSAGE" value="refactored labeled sprite" />
+    <MESSAGE value="stashing" />
+    <option name="LAST_COMMIT_MESSAGE" value="stashing" />
   </component>
   <component name="XDebuggerManager">
     <breakpoint-manager>

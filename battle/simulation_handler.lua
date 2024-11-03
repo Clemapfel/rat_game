@@ -670,60 +670,13 @@ function bt.BattleScene:create_simulation_environment()
             end
         end
 
-        env.get_move_is_disabled = function(entity_proxy, move_proxy)
-            bt.assert_args("get_move_disabled",
-                entity_proxy, bt.EntityProxy,
-                move_proxy, bt.MoveProxy
-            )
-
-            local entity, move = _get_native(entity_proxy), _get_native(move_proxy)
-            if not _state:entity_has_move(entity, move) then
-                bt.error_function("In env.get_move_disabled: entity `" .. env.get_id(entity_proxy) .. "` does not have move `" .. env.get_id(move_proxy ).. "`")
-                return nil
-            end
-
-            local slot_i = _state:entity_get_move_slot_i(entity, move)
-            return _state:entity_get_move_is_disabled(entity, slot_i)
-        end
-
-        env.set_move_is_disabled = function(entity_proxy, move_proxy, b)
-            bt.assert_args("set_move_disabled",
-                entity_proxy, bt.EntityProxy,
-                move_proxy, bt.MoveProxy
-            )
-
-            local entity, move = _get_native(entity_proxy), _get_native(move_proxy)
-            if not _state:entity_has_move(entity, move) then
-                rt.warning("In env.set_move_disabled: entity `" .. env.get_id(entity_proxy) .. "` does not have move `" .. env.get_id(move_proxy ).. "`")
-                return nil
-            end
-
-            local slot_i = _state:entity_get_move_slot_i(entity, move)
-            local before = _state:entity_get_move_is_disabled(entity, slot_i)
-            local now = b
-            _state:entity_set_move_is_disabled(entity, slot_i, b)
-
-            if before ~= now then -- fizzle unless state changes
-                local sprite, animation = _scene:get_sprite(entity), nil
-                if before == false and now == true then
-                    _scene:_push_animation(bt.Animation.OBJECT_DISABLED(_scene, move, sprite))
-                    env.message(entity_proxy, " can no longer use ", move_proxy)
-                elseif before == true and now == false then
-                    _scene:_push_animation(bt.Animation.OBJECT_ENABLED(_scene, move, sprite))
-                    env.message(entity_proxy, "s " , move_proxy, " is no longer disabled")
-                end
-
-                -- no callbacks
-            end
-        end
-
         --- ### EQUIP ###
 
         env.list_equips = function(entity_proxy)
             bt.assert_args("list_equips", entity_proxy, bt.EntityProxy)
             local out = {}
             for equip in values(_state:entity_list_equips(_get_native(entity_proxy))) do
-                table.insert(out, bt.create_equip_proxy(self, bt.create_equip_proxy(_scene, equip)))
+                table.insert(out,  bt.create_equip_proxy(_scene, equip))
             end
             return out
         end
@@ -736,83 +689,25 @@ function bt.BattleScene:create_simulation_environment()
             return _state:entity_has_equip(_get_native(entity_proxy), _get_native(equip_proxy))
         end
 
-        env.set_equip_slot_is_disabled = function(entity_proxy, slot_i, b)
-            bt.assert_args("set_equip_slot_is_disabled",
-                entity_proxy, bt.EntityProxy,
-                slot_i, bt.Number,
-                b, bt.Boolean
-            )
-
-            local entity = _get_native(entity_proxy)
-            local equip = _state:entity_get_equip(entity, slot_i)
-            if equip == nil then
-                bt.error_function("In env.set_equip_slot_is_disabled: entity `" .. entity_proxy.id .. "` has no move in slot `" .. slot_i .. "` equipped")
-                return
-            end
-
-            local before = _state:entity_get_equip_is_disabled(entity, slot_i)
-            local now = b
-            _state:entity_set_equip_is_disabled(entity, slot_i, b)
-
-            if before ~= now then
-                local sprite, animation = _scene:get_sprite(entity), nil
-                local equip_proxy = bt.create_equip_proxy(_scene, equip)
-                if before == false and now == true then
-                    _scene:_push_animation(bt.Animation.OBJECT_DISABLED(_scene, equip, sprite))
-                    env.message(entity_proxy, " s ", equip_proxy, " was made useless")
-                elseif before == true and now == false then
-                    _scene:_push_animation(bt.Animation.OBJECT_ENABLED(_scene, equip, sprite))
-                    env.message(entity_proxy, " s", equip_proxy, " is working again")
-                end
-            end
-
-            -- no callbacks
-        end
-
-        env.get_equip_slot_is_disabled = function(entity_proxy, slot_i)
-            bt.assert_args("get_equip_is_disabled",
-                entity_proxy, bt.EntityProxy,
-                slot_i, bt.Number
-            )
-
-            local entity = _get_native(entity_proxy)
-            if _state:entity_get_equip(entity, slot_i) ~= nil then
-                return _state:entity_get_equip_is_disabled(entity, slot_i)
-            else
-                rt.warning("In env.get_equip_slot_is_disabled: entity ´" .. entity_proxy.id .. "` does not have an equip equipped in slot `" .. slot_i .. "`")
-                return true
+        for which in range(
+            "hp_base_offset",
+            "attack_base_offset",
+            "defense_base_offset",
+            "speed_base_offset",
+            "hp_base_factor",
+            "attack_base_factor",
+            "defense_base_factor",
+            "speed_base_factor"
+        ) do
+            local get_name = "get_equip_" .. which
+            env[get_name] = function(equip_proxy)
+                bt.assert_args(get_name, equip_proxy, bt.EquipProxy)
+                local native = _get_native(equip_proxy)
+                return native["get_" .. which](native)
             end
         end
 
-        env.set_equip_is_disabled = function(entity_proxy, equip_proxy, b)
-            bt.assert_args("set_equip_is_disabled",
-                entity_proxy, bt.EntityProxy,
-                equip_proxy, bt.EquipProxy,
-                b, bt.Boolean
-            )
-
-            -- only disabled first copy, if multiple are equipped
-            local slot_i = _state:entity_get_equip_slot_i(_get_native(entity_proxy), _get_native(equip_proxy))
-            if slot_i ~= nil then
-                env.set_equip_slot_is_disabled(entity_proxy, slot_i, b)
-            else
-                bt.error_function("In env.set_equip_is_disabled: entity `" .. entity_proxy.id .. "` does not have equip `" .. equip_proxy.id .. "` equipped")
-            end
-        end
-
-        env.get_equip_is_disabled = function(entity_proxy, equip_proxy)
-            bt.assert_args("get_equip_is_disabled",
-                entity_proxy, bt.EntityProxy,
-                equip_proxy, bt.EquipProxy
-            )
-
-            local slot_i = _state:entity_get_equip_slot_i(_get_native(entity_proxy), _get_native(equip_proxy))
-            if slot_i == nil then
-                rt.warning("In env.get_equip_is_disabled: entity ´" .. entity_proxy.id .. "` does not have `" .. equip_proxy.id .. "` equipped")
-                return true
-            end
-            return _state:entity_get_equip_is_disabled(_get_native(entity_proxy), _get_native())
-        end
+        ---
 
         for which_proxy in range(
             { "move", bt.MoveProxy },
@@ -866,12 +761,11 @@ function bt.BattleScene:create_simulation_environment()
                     b, bt.Boolean
                 )
 
-                local object = _state["entity_get_" .. which](_state, slot_i)
+                local entity = _get_native(entity_proxy)
+                local object = _state["entity_get_" .. which](_state, entity, slot_i)
                 if object == nil then
                     return -- fizzle if unequipped
                 end
-
-                local entity = _get_native(entity_proxy)
 
                 local before = _state["entity_get_" .. which .. "_is_disabled"](_state, entity, slot_i)
                 local now = b
@@ -982,6 +876,31 @@ function bt.BattleScene:_test_simulation()
         end
     end
 
-    self._animation_queue:clear()
+    do -- test equips
+        local list = env.list_equips(target)
+        assert(sizeof(list) > 0)
+
+        local equip = list[1]
+        assert(env.has_equip(target, equip))
+        env.set_equip_is_disabled(target, equip, true)
+        assert(env.get_equip_is_disabled(target, equip) == true)
+        env.set_equip_is_disabled(target, equip, false)
+        assert(env.get_equip_is_disabled(target, equip) == false)
+
+        for which in range(
+            "hp_base_offset",
+            "attack_base_offset",
+            "defense_base_offset",
+            "speed_base_offset",
+            "hp_base_factor",
+            "attack_base_factor",
+            "defense_base_factor",
+            "speed_base_factor"
+        ) do
+            assert(meta.is_number(env["get_equip_" .. which](equip)))
+        end
+    end
+
+    --self._animation_queue:clear()
     rt.log("In bt.BattleScene:_test_simulation: all tests passed")
 end

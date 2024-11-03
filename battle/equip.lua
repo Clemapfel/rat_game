@@ -143,8 +143,3 @@ end
 function bt.Equip:get_flavor_text()
     return self.flavor_text
 end
-
---- @brief
-function bt.Equip:get_type()
-    return self.type
-end
