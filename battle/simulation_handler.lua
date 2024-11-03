@@ -719,6 +719,196 @@ function bt.BattleScene:create_simulation_environment()
 
         --- ### EQUIP ###
 
+        env.list_equips = function(entity_proxy)
+            bt.assert_args("list_equips", entity_proxy, bt.EntityProxy)
+            local out = {}
+            for equip in values(_state:entity_list_equips(_get_native(entity_proxy))) do
+                table.insert(out, bt.create_equip_proxy(self, bt.create_equip_proxy(_scene, equip)))
+            end
+            return out
+        end
+
+        env.has_equip = function(entity_proxy, equip_proxy)
+            bt.assert_args("has_equip",
+                entity_proxy, bt.EntityProxy,
+                equip_proxy, bt.EquipProxy
+            )
+            return _state:entity_has_equip(_get_native(entity_proxy), _get_native(equip_proxy))
+        end
+
+        env.set_equip_slot_is_disabled = function(entity_proxy, slot_i, b)
+            bt.assert_args("set_equip_slot_is_disabled",
+                entity_proxy, bt.EntityProxy,
+                slot_i, bt.Number,
+                b, bt.Boolean
+            )
+
+            local entity = _get_native(entity_proxy)
+            local equip = _state:entity_get_equip(entity, slot_i)
+            if equip == nil then
+                bt.error_function("In env.set_equip_slot_is_disabled: entity `" .. entity_proxy.id .. "` has no move in slot `" .. slot_i .. "` equipped")
+                return
+            end
+
+            local before = _state:entity_get_equip_is_disabled(entity, slot_i)
+            local now = b
+            _state:entity_set_equip_is_disabled(entity, slot_i, b)
+
+            if before ~= now then
+                local sprite, animation = _scene:get_sprite(entity), nil
+                local equip_proxy = bt.create_equip_proxy(_scene, equip)
+                if before == false and now == true then
+                    _scene:_push_animation(bt.Animation.OBJECT_DISABLED(_scene, equip, sprite))
+                    env.message(entity_proxy, " s ", equip_proxy, " was made useless")
+                elseif before == true and now == false then
+                    _scene:_push_animation(bt.Animation.OBJECT_ENABLED(_scene, equip, sprite))
+                    env.message(entity_proxy, " s", equip_proxy, " is working again")
+                end
+            end
+
+            -- no callbacks
+        end
+
+        env.get_equip_slot_is_disabled = function(entity_proxy, slot_i)
+            bt.assert_args("get_equip_is_disabled",
+                entity_proxy, bt.EntityProxy,
+                slot_i, bt.Number
+            )
+
+            local entity = _get_native(entity_proxy)
+            if _state:entity_get_equip(entity, slot_i) ~= nil then
+                return _state:entity_get_equip_is_disabled(entity, slot_i)
+            else
+                rt.warning("In env.get_equip_slot_is_disabled: entity ´" .. entity_proxy.id .. "` does not have an equip equipped in slot `" .. slot_i .. "`")
+                return true
+            end
+        end
+
+        env.set_equip_is_disabled = function(entity_proxy, equip_proxy, b)
+            bt.assert_args("set_equip_is_disabled",
+                entity_proxy, bt.EntityProxy,
+                equip_proxy, bt.EquipProxy,
+                b, bt.Boolean
+            )
+
+            -- only disabled first copy, if multiple are equipped
+            local slot_i = _state:entity_get_equip_slot_i(_get_native(entity_proxy), _get_native(equip_proxy))
+            if slot_i ~= nil then
+                env.set_equip_slot_is_disabled(entity_proxy, slot_i, b)
+            else
+                bt.error_function("In env.set_equip_is_disabled: entity `" .. entity_proxy.id .. "` does not have equip `" .. equip_proxy.id .. "` equipped")
+            end
+        end
+
+        env.get_equip_is_disabled = function(entity_proxy, equip_proxy)
+            bt.assert_args("get_equip_is_disabled",
+                entity_proxy, bt.EntityProxy,
+                equip_proxy, bt.EquipProxy
+            )
+
+            local slot_i = _state:entity_get_equip_slot_i(_get_native(entity_proxy), _get_native(equip_proxy))
+            if slot_i == nil then
+                rt.warning("In env.get_equip_is_disabled: entity ´" .. entity_proxy.id .. "` does not have `" .. equip_proxy.id .. "` equipped")
+                return true
+            end
+            return _state:entity_get_equip_is_disabled(_get_native(entity_proxy), _get_native())
+        end
+
+        for which_proxy in range(
+            { "move", bt.MoveProxy },
+            { "equip", bt.EquipProxy },
+            { "consumable", bt.ConsumableProxy }
+        ) do
+            local which, proxy = table.unpack(which_proxy)
+            local get_name = "get_" .. which .. "_is_disabled"
+            local get_slot_name = "get_" .. which .. "_slot_is_disabled"
+            local set_slot_disabled_name = "set_" .. which .. "_slot_is_disabled"
+            local set_disabled_name = "set_" .. which .. "_is_disabled"
+
+            --- @brief get_move_is_disabled, get_equip_is_disabled, get_consumable_is_disabled
+            env[get_name] = function(entity_proxy, object_proxy)
+                bt.assert_args(get_name,
+                    entity_proxy, bt.EntityProxy,
+                    object_proxy, proxy
+                )
+
+                local entity, object = _get_native(entity_proxy), _get_native(object_proxy)
+                if not _state["entity_has_" .. which](_state, entity, object) then
+                    bt.error_function("In env." .. get_name .. ": entity `" .. entity_proxy.id .. "` does not have `" .. object_proxy.id .. "` equipped")
+                    return false
+                end
+
+                local slot_i = _state["entity_get_" .. which .. "_slot_i"](_state, entity, object)
+                return _state["entity_get_" .. which .. "_is_disabled"](_state, entity, slot_i)
+            end
+
+            --- @brief get_move_slot_is_disabled, get_equip_slot_is_disabled, get_consumable_slot_is_disabled
+            env[get_slot_name] = function(entity_proxy, slot_i)
+                bt.assert_args(get_slot_name,
+                    entity_proxy, bt.EntityProxy,
+                    slot_i, bt.Number
+                )
+
+                local entity = _get_native(entity_proxy)
+                local object_maybe = _state["entity_get_" .. which](_state, entity, slot_i)
+                if object_maybe == nil then
+                    return false
+                else
+                    return _state["entity_" .. which .. "_is_disabled"](_state, entity, slot_i)
+                end
+            end
+
+            --- @brief set_move_slot_is_disabled, set_equip_slot_is_disabled, set_consumable_slot_is_disabled
+            env[set_slot_disabled_name] = function(entity_proxy, slot_i, b)
+                bt.assert_args(set_slot_disabled_name,
+                    entity_proxy, bt.EntityProxy,
+                    slot_i, bt.Number,
+                    b, bt.Boolean
+                )
+
+                local object = _state["entity_get_" .. which](_state, slot_i)
+                if object == nil then
+                    return -- fizzle if unequipped
+                end
+
+                local entity = _get_native(entity_proxy)
+
+                local before = _state["entity_get_" .. which .. "_is_disabled"](_state, entity, slot_i)
+                local now = b
+                _state["entity_set_" .. which .. "_is_disabled"](_state, entity, slot_i, b)
+
+                if before ~= now then -- fizzle unless state changes
+                    local object_proxy = bt["create_" .. which .. "_proxy"](_scene, object)
+                    local sprite, animation = _scene:get_sprite(entity), nil
+                    if before == false and now == true then
+                        _scene:_push_animation(bt.Animation.OBJECT_DISABLED(_scene, object, sprite))
+                        env.message(entity_proxy, "s ", object_proxy, " was disabled")
+                    elseif before == true and now == false then
+                        _scene:_push_animation(bt.Animation.OBJECT_ENABLED(_scene, object, sprite))
+                        env.message(entity_proxy, "s " , object_proxy, " is no longer disabled")
+                    end
+
+                    -- no callbacks?
+                end
+            end
+
+            --- @brief set_move_is_disabled, set_equip_is_disabled, set_consumable_is_disabled
+            env[set_disabled_name] = function(entity_proxy, object_proxy, b)
+                bt.assert_args(set_disabled_name,
+                    entity_proxy, bt.EntityProxy,
+                    object_proxy, proxy,
+                    b, bt.Boolean
+                )
+
+                local slot_i = _state["entity_get_" .. which .. "_slot_i"](_state, _get_native(entity_proxy), _get_native(object_proxy))
+                if slot_i == nil then
+                    return -- fizzle if not equipped
+                else
+                    env[set_slot_disabled_name](entity_proxy, slot_i, b)
+                end
+            end
+        end
+
         --- ### CONSUMABLE ###
 
         --- ### STATUS ###

@@ -22,18 +22,9 @@
     </configurations>
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="7fa9ba1b-2cff-4ecc-86fb-59ab2fa76ee1" name="Changes" comment="tests passing">
+    <list default="true" id="7fa9ba1b-2cff-4ecc-86fb-59ab2fa76ee1" name="Changes" comment="refactored labeled sprite">
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/assets/favicon.hxl" beforeDir="false" afterPath="$PROJECT_DIR$/assets/favicon.hxl" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/assets/favicon.png" beforeDir="false" afterPath="$PROJECT_DIR$/assets/favicon.png" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/common/animation_queue.lua" beforeDir="false" afterPath="$PROJECT_DIR$/common/animation_queue.lua" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/common/game_state.lua" beforeDir="false" afterPath="$PROJECT_DIR$/common/game_state.lua" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/common/label.lua" beforeDir="false" afterPath="$PROJECT_DIR$/common/label.lua" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/common/sprite.lua" beforeDir="false" afterPath="$PROJECT_DIR$/common/sprite.lua" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/common/widget.lua" beforeDir="false" afterPath="$PROJECT_DIR$/common/widget.lua" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/main.lua" beforeDir="false" afterPath="$PROJECT_DIR$/main.lua" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/menu/inventory_scene.lua" beforeDir="false" afterPath="$PROJECT_DIR$/menu/inventory_scene.lua" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/old/battle/global_status_bar.lua" beforeDir="false" afterPath="$PROJECT_DIR$/old/battle/global_status_bar.lua" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/battle/simulation_handler.lua" beforeDir="false" afterPath="$PROJECT_DIR$/battle/simulation_handler.lua" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -607,15 +598,7 @@
       <workItem from="1729180777153" duration="8566000" />
       <workItem from="1729267430460" duration="1705000" />
       <workItem from="1729269158294" duration="251396000" />
-      <workItem from="1730582354116" duration="2002000" />
-    </task>
-    <task id="LOCAL-01153" summary="stashing before reworking textbox">
-      <option name="closed" value="true" />
-      <created>1729447286433</created>
-      <option name="number" value="01153" />
-      <option name="presentableId" value="LOCAL-01153" />
-      <option name="project" value="LOCAL" />
-      <updated>1729447286433</updated>
+      <workItem from="1730582354116" duration="4630000" />
     </task>
     <task id="LOCAL-01154" summary="stashing textbox">
       <option name="closed" value="true" />
@@ -1001,7 +984,15 @@
       <option name="project" value="LOCAL" />
       <updated>1730502386665</updated>
     </task>
-    <option name="localTasksCounter" value="1202" />
+    <task id="LOCAL-01202" summary="refactored labeled sprite">
+      <option name="closed" value="true" />
+      <created>1730650485658</created>
+      <option name="number" value="01202" />
+      <option name="presentableId" value="LOCAL-01202" />
+      <option name="project" value="LOCAL" />
+      <updated>1730650485658</updated>
+    </task>
+    <option name="localTasksCounter" value="1203" />
     <servers />
   </component>
   <component name="TypeScriptGeneratedFilesManager">
@@ -1050,7 +1041,6 @@
     </option>
   </component>
   <component name="VcsManagerConfiguration">
-    <MESSAGE value="implemented status bar" />
     <MESSAGE value="status applied working" />
     <MESSAGE value="added battle string formatting" />
     <MESSAGE value="added automatic text formatting" />
@@ -1075,7 +1065,8 @@
     <MESSAGE value="stashing linear search path" />
     <MESSAGE value="path done and optimized" />
     <MESSAGE value="tests passing" />
-    <option name="LAST_COMMIT_MESSAGE" value="tests passing" />
+    <MESSAGE value="refactored labeled sprite" />
+    <option name="LAST_COMMIT_MESSAGE" value="refactored labeled sprite" />
   </component>
   <component name="XDebuggerManager">
     <breakpoint-manager>
