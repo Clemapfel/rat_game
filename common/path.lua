@@ -1,6 +1,10 @@
 --- @class rt.Path
 --- @brief arc-length parameterized chain of line segments, unlike spline, extremely fast to evaluate
 rt.Path = meta.new_type("Path", function(points, ...)
+    if meta.is_number(points) then
+        points = {points, ...}
+    end
+
     local out = meta.new(rt.Path, {
         _points = points,
         _distances = {},
@@ -20,9 +24,7 @@ do
 
     --- @brief
     function rt.Path:_update()
-        self._fraction_to_node = {}
         local distances = {}
-
         local points = self._points
         local n = self._n_points
         local total_length = 0
@@ -50,21 +52,27 @@ do
             n_entries = n_entries + 1
         end
 
-        for i = 1, n_entries - 1 do
-            local current = distances[i]
-            local next = distances[i + 1]
+        if n_entries == 1 then
+            local entry = distances[1]
+            entry.fraction = 0
+            entry.fraction_length = 1
+        else
+            for i = 1, n_entries - 1 do
+                local current = distances[i]
+                local next = distances[i + 1]
 
-            current.fraction = current.cumulative_distance / total_length
-            next.fraction = next.cumulative_distance / total_length
-            current.fraction_length = next.fraction - current.fraction
+                current.fraction = current.cumulative_distance / total_length
+                next.fraction = next.cumulative_distance / total_length
+                current.fraction_length = next.fraction - current.fraction
 
-            if i == 1 then self._first_distance = current.fraction end
-            if i == n_entries - 1 then self._last_distance = next.fraction end
-        end
+                if i == 1 then self._first_distance = current.fraction end
+                if i == n_entries - 1 then self._last_distance = next.fraction end
+            end
 
-        do
-            local last = distances[n_entries]
-            last.fraction_length = 1 - last.fraction
+            do
+                local last = distances[n_entries]
+                last.fraction_length = 1 - last.fraction
+            end
         end
 
         self._entries = distances

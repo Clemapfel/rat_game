@@ -505,6 +505,7 @@ for which in range("move", "equip", "consumable") do
             rt.error("In rt.GameState:entity_remove_" .. which ..": entity `" .. entity:get_id() .. "` is not part of state")
             return 
         end
+
         local object_entry = entry[which .. "s"]
         local current_id = object_entry[slot_i].id
         object_entry[slot_i].id = ""
@@ -1588,14 +1589,14 @@ function rt.GameState:initialize_debug_state()
     }
 
     local equips = {
-        "DEBUG_EQUIP",
+        --"DEBUG_EQUIP",
         "FAST_SHOES",
         "HELMET",
         "KITCHEN_KNIFE"
     }
 
     local consumables = {
-        "DEBUG_CONSUMABLE",
+        --"DEBUG_CONSUMABLE",
         "SINGLE_CHERRY",
         "DOUBLE_CHERRY"
     }
@@ -1626,7 +1627,10 @@ function rt.GameState:initialize_debug_state()
             end
         end
 
-        for slot_i = 1, entity:get_n_equip_slots() do
+        if entity:get_n_equip_slots() > 0 then
+            self:entity_add_equip(entity, 1, bt.Equip("DEBUG_EQUIP"))
+        end
+        for slot_i = 2, entity:get_n_equip_slots() do
             if rt.random.toss_coin(0.8) then
                 self:entity_add_equip(entity, slot_i, bt.Equip(equips[rt.random.integer(1, #equips)]))
             end

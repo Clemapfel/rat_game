@@ -1,20 +1,19 @@
-rt.settings.battle.animation.consumable_gained = {
+rt.settings.battle.animation.object_gained = {
     duration = 2
 }
 
---- @class bt.Animation.CONSUMABLE_GAINED
+--- @class bt.Animation.OBJECT_GAINED
 --- @param scene bt.BattleScene
---- @param consumable bt.Consumable
+--- @param object
 --- @param sprite bt.EntitySprite
-bt.Animation.CONSUMABLE_GAINED = meta.new_type("CONSUMABLE_GAINED", rt.Animation, function(scene, consumable, sprite)
+bt.Animation.OBJECT_GAINED = meta.new_type("OBJECT_GAINED", rt.Animation, function(scene, object, sprite)
     meta.assert_isa(scene, bt.BattleScene)
-    meta.assert_isa(consumable, bt.Consumable)
     meta.assert_isa(sprite, bt.EntitySprite)
 
-    local duration = rt.settings.battle.animation.consumable_gained.duration
-    return meta.new(bt.Animation.CONSUMABLE_GAINED, {
+    local duration = rt.settings.battle.animation.object_gained.duration
+    return meta.new(bt.Animation.OBJECT_GAINED, {
         _scene = scene,
-        _consumable = consumable,
+        _object = object,
         _target = sprite,
 
         _sprite = nil, -- rt.Sprite,
@@ -41,15 +40,15 @@ bt.Animation.CONSUMABLE_GAINED = meta.new_type("CONSUMABLE_GAINED", rt.Animation
         _position_animation = rt.TimedAnimation
     })
 end, {
-    consumable_to_sprite = {}
+    object_to_sprite = {}
 })
 
 --- @override
-function bt.Animation.CONSUMABLE_GAINED:start()
-    local sprite = self.consumable_to_sprite[self._consumable]
+function bt.Animation.OBJECT_GAINED:start()
+    local sprite = self.object_to_sprite[self._object]
     local sprite_w, sprite_h
     if sprite == nil then
-        sprite = rt.Sprite(self._consumable:get_sprite_id())
+        sprite = rt.Sprite(self._object:get_sprite_id())
         sprite:realize()
         sprite_w, sprite_h = sprite:measure()
         sprite:fit_into(-0.5 * sprite_w, -0.5 * sprite_h)
@@ -72,7 +71,7 @@ function bt.Animation.CONSUMABLE_GAINED:start()
 end
 
 --- @override
-function bt.Animation.CONSUMABLE_GAINED:update(delta)
+function bt.Animation.OBJECT_GAINED:update(delta)
     if self._path_animation:update(delta) then
         self._opacity_animation:update(delta)
         self._scale_animation:update(delta)
@@ -105,7 +104,7 @@ function bt.Animation.CONSUMABLE_GAINED:update(delta)
 end
 
 --- @override
-function bt.Animation.CONSUMABLE_GAINED:draw()
+function bt.Animation.OBJECT_GAINED:draw()
     self._sprite:set_opacity(self._sprite_opacity) -- in draw because of cached sprites
     self._ray:draw()
 

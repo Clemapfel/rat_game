@@ -1,14 +1,13 @@
---- @class bt.Animation.CONSUMABLE_LOST
+--- @class bt.Animation.OBJECT_LOST
 --- @param scene bt.BattleScene
---- @param consumable bt.Consumable
+--- @param object
 --- @param sprite bt.EntitySprite
-bt.Animation.CONSUMABLE_LOST = meta.new_type("CONSUMABLE_LOST", rt.Animation, function(scene, consumable, sprite)
+bt.Animation.OBJECT_LOST = meta.new_type("OBJECT_LOST", rt.Animation, function(scene, object, sprite)
     meta.assert_isa(scene, bt.BattleScene)
-    meta.assert_isa(consumable, bt.Consumable)
     meta.assert_isa(sprite, bt.EntitySprite)
-    return meta.new(bt.Animation.CONSUMABLE_LOST, {
+    return meta.new(bt.Animation.OBJECT_LOST, {
         _scene = scene,
-        _consumable = consumable,
+        _object = object,
         _target = sprite,
 
         _sprite = nil, -- rt.Sprite
@@ -29,12 +28,12 @@ bt.Animation.CONSUMABLE_LOST = meta.new_type("CONSUMABLE_LOST", rt.Animation, fu
         _floor_shape = nil, -- b2.Shape
 })
 end, {
-    consumable_to_sprite = {},
+    object_to_sprite = {},
     world = b2.World(0, 1000),
 })
 
 --- @override
-function bt.Animation.CONSUMABLE_LOST:start()
+function bt.Animation.OBJECT_LOST:start()
     local x, y = self._target:get_position()
     local w, h = self._target:measure()
 
@@ -59,10 +58,10 @@ function bt.Animation.CONSUMABLE_LOST:start()
     ))
     self._ball_body:apply_angular_impulse(1)
 
-    local sprite = self.consumable_to_sprite[self._consumable]
+    local sprite = self.object_to_sprite[self._object]
     local sprite_w, sprite_h
     if sprite == nil then
-        sprite = rt.Sprite(self._consumable:get_sprite_id())
+        sprite = rt.Sprite(self._object:get_sprite_id())
         sprite:realize()
         sprite_w, sprite_h = sprite:measure()
         sprite:fit_into(-0.5 * sprite_w, -0.5 * sprite_h)
@@ -75,12 +74,12 @@ function bt.Animation.CONSUMABLE_LOST:start()
 end
 
 --- @override
-function bt.Animation.CONSUMABLE_LOST:finish()
+function bt.Animation.OBJECT_LOST:finish()
     self._scene:signal_disconnect("update", self._signal_handler)
 end
 
 --- @override
-function bt.Animation.CONSUMABLE_LOST:update(delta)
+function bt.Animation.OBJECT_LOST:update(delta)
     self._opacity_animation:update(delta)
     if self.world.updated_this_frame ~= true then
         self.world:step(delta)
@@ -95,7 +94,7 @@ function bt.Animation.CONSUMABLE_LOST:update(delta)
 end
 
 --- @override
-function bt.Animation.CONSUMABLE_LOST:draw()
+function bt.Animation.OBJECT_LOST:draw()
     self._sprite:set_opacity(self._sprite_opacity) -- in draw because of cached sprites
 
     love.graphics.push()

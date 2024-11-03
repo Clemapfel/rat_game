@@ -117,6 +117,11 @@ end, {
         return nil
     end,
 
+    -- (GlobalStatusproxy, EntityProxy, MoveProxy) -> nil
+    on_move_disabled = function(self, move_user, move)
+        return nil
+    end,
+
     -- (GlobalStatusProxy, EntityProxy, ConsumableProxy)
     on_consumable_consumed = function(self, holder, consumable)
         return nil
@@ -132,8 +137,18 @@ end, {
         return nil
     end,
 
+    -- (GlobalStatusProxy, EntityProxy, ConsumableProxy) -> nil
+    on_consumable_disabled = function(self, holder, consumable)
+        return nil
+    end,
+
     -- (GlobalStatusProxy, Table<EntityProxy>)
     on_entity_spawned = function(self, entities)
+        return nil
+    end,
+
+    -- (GlobalStatusProxy, EntityProxy, EquipProxy) -> nil
+    on_equip_disabled = function(self, holder, equip)
         return nil
     end
 })
@@ -161,10 +176,13 @@ function bt.GlobalStatus:realize()
         "on_killed",
         "on_switch",
         "on_move_used",
+        "on_move_disabled",
         "on_consumable_consumed",
         "on_consumable_gained",
         "on_consumable_lost",
-        "on_entity_spawned"
+        "on_consumable_disabled",
+        "on_entity_spawned",
+        "on_equip_disabled"
     }
 
     local template = {

@@ -32,10 +32,7 @@ end, {
     is_silent = false,
 
     -- (EquipProxy, EntityProxy) -> nil
-    effect = function(self, holder)
-        meta.assert_equip_interface(self)
-        meta.assert_entity_interface(holder)
-    end,
+    effect = nil,
 
     description = "(no description)",
     flavor_text = "",

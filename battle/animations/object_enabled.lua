@@ -20,7 +20,10 @@ bt.Animation.OBJECT_ENABLED = meta.new_type("OBJECT_ENABLED", rt.Animation, func
         _position_animation = rt.TimedAnimation(rt.settings.battle.animation.object_enabled.duration,
             1, 0, rt.InterpolationFunctions.GAUSSIAN_LOWPASS
         ),
-        _hold_elapsed = 0,
+        _hold_animation = rt.TimedAnimation(rt.settings.battle.animation.object_enabled.hold_duration,
+            1, 1, rt.InterpolationFunctions.CONSTANT
+        ),
+
         _opacity = 1,
 
         _sprite_texture = rt.RenderTexture(),
@@ -212,8 +215,7 @@ end
 --- @override
 function bt.Animation.OBJECT_ENABLED:update(delta)
     if self._position_animation:update(delta) then
-        self._hold_elapsed = self._hold_elapsed + delta
-        if self._hold_elapsed > rt.settings.battle.animation.object_enabled.hold_duration then
+        if self._hold_animation:update(delta) then
             self._fade_out_animation:update(delta)
             self._opacity = self._fade_out_animation:get_value()
             for shape in values(self._triangles) do

@@ -7,5 +7,5 @@ return {
     sprite_id = "consumables",
     sprite_index = "DEBUG_CONSUMABLE",
 
-    max_n_uses = POSITIVE_INFINITY
+    max_n_uses = 1
 }

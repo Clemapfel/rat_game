@@ -137,9 +137,14 @@ end, {
         return nil
     end,
 
-    -- (StatusProxy, EntityProxy, MoveProxy, Table<EntityProxy>)
+    -- (StatusProxy, EntityProxy, MoveProxy, Table<EntityProxy>) -> nil
     on_move_used = function(self, afflicted_user, move, targets)
         return nil
+    end,
+
+    -- (StatusProxy, EntityProxy, MoveProxy) -> nil
+    on_move_disabled = function(self, afflicted, move)
+
     end,
 
     -- (StatusProxy, EntityProxy, ConsumableProxy) -> nil
@@ -157,9 +162,19 @@ end, {
         return nil
     end,
 
+    -- (StatusProxy, EntityProxy, ConsumableProxy) -> nil
+    on_consumable_disabled = function(self, afflicted, consumable)
+        return nil
+    end,
+
     -- (StatusProxy, EntityProxy)
     on_entity_spawned = function(self, afflicted)
     end,
+
+    -- (StatusProxy, EntityProxy, EquipProxy) -> nil
+    on_equip_disabled = function(self, afflicted, equip)
+        return nil
+    end
 })
 bt.Status._atlas = {}
 
@@ -184,10 +199,13 @@ function bt.Status:realize()
         "on_killed",
         "on_switch",
         "on_move_used",
+        "on_move_disabled",
         "on_consumable_consumed",
         "on_consumable_gained",
         "on_consumable_lost",
-        "on_entity_spawned"
+        "on_consumable_disabled",
+        "on_entity_spawned",
+        "on_equip_disabled"
     }
 
     local template = {

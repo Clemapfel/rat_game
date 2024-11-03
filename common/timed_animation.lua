@@ -1,5 +1,14 @@
 --- @class rt.InterpolationFunction
 rt.InterpolationFunctions = meta.new_enum("InterpolationFunction", {
+
+    CONSTANT_ZERO = function(x)
+        return 0
+    end,
+
+    CONSTANT = function(x)
+        return 1
+    end,
+
     LINEAR = function(x, slope)
         -- ax
         if x <= 0 then return 0 elseif x >= 1 then return 1 end
@@ -15,16 +24,19 @@ rt.InterpolationFunctions = meta.new_enum("InterpolationFunction", {
 
     SINUSOID_EASE_IN = function(x)
         -- -1\ \cdot\ \cos\left(x\ \cdot\left(\frac{\pi}{2}\right)\right)+1
+        if x > 1 then return 1 elseif x < 0 then return 0 end
         return -1.0 * math.cos(x * (math.pi / 2)) + 1.0;
     end,
 
     SINUSOID_EASE_OUT = function(x)
         -- \sin\left(x\cdot\left(\frac{\pi}{2}\right)\right)
+        if x > 1 then return 1 elseif x < 0 then return 0 end
         return math.sin(x * (math.pi / 2))
     end,
 
     SINUSOID_EASE_IN_OUT = function(x)
         -- -0.5\ \cdot\cos\left(\pi\ \cdot x\right)+0.5
+        if x > 1 then return 1 elseif x < 0 then return 0 end
         return -0.5 * math.cos(math.pi * x) + 0.5
     end,
 
@@ -56,42 +68,50 @@ rt.InterpolationFunctions = meta.new_enum("InterpolationFunction", {
 
     SIGMOID = function(x)
         -- \frac{1}{1+e^{-a\left(x-0.5\right)}}
+        if x > 1 then return 1 elseif x < 0 then return 0 end
         local slope = 9
         return 1 / (1 + math.exp(-1 * slope * (x - 0.5)))
     end,
 
     SIGMOID_HOLD = function(x)
        -- 4\left(x-0.5\right)^{3}+0.5
+        if x > 1 then return 1 elseif x < 0 then return 0 end
         return 4 * (x - 0.5)^3 + 0.5
     end,
 
     HANN = function(x)
         -- \frac{-\cos\left(-2\pi x\right)}{2}+0.5
+        if x > 1 then return 0 elseif x < 0 then return 0 end
         return (-1 * math.cos(-2 * math.pi * x) + 1) / 2
     end,
 
     HANN_HIGHPASS = function(x)
         -- \frac{-\cos\left(-\pi x\right)}{2}+0.5
+        if x > 1 then return 1 elseif x < 0 then return 0 end
         return -1 * math.cos(-math.pi * x) / 2 + 0.5
     end,
 
     HANN_LOWPASS = function(x)
         -- \frac{\cos\left(-\pi x\right)}{2}+0.5
+        if x > 1 then return 0 elseif x < 0 then return 1 end
         return math.cos(-math.pi * x) / 2 + 0.5
     end,
 
     GAUSSIAN = function(x)
         -- e^{-\left(4.4\cdot\frac{\pi}{3}\right)\left(2x-1\right)^{2}}
+        if x > 1 then return 0 elseif x < 0 then return 0 end
         return math.exp(-1 * ((4.4 * math.pi / 3) * (2 * x - 1))^2)
     end,
     
     GAUSSIAN_HIGHPASS = function(x)
         -- e^{-4.4\frac{\pi}{3}\left(x-1\right)^{2}}
+        if x > 1 then return 1 elseif x < 0 then return 0 end
         return math.exp(-1 * ((4.4 * math.pi / 3) * (x - 1))^2)
     end,
 
     GAUSSIAN_LOWPASS = function(x)
         -- e^{-4.4\frac{\pi}{3}\left(-x\right)^{2}}
+        if x > 1 then return 0 elseif x < 0 then return 1 end
         return math.exp(-4.4 * math.pi / 3 * (-1 * x)^2)
     end,
 

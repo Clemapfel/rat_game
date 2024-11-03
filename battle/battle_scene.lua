@@ -703,7 +703,7 @@ end
 function bt.BattleScene:_handle_button_pressed(which)
     if which == rt.InputButton.A then
         self:_test_simulation()
-
+        --self:_push_animation(bt.Animation.EQUIP_APPLIED(self, bt.Equip("DEBUG_EQUIP"), self._enemy_sprites[1]))
     elseif which == rt.InputButton.B then
         self._animation_queue:skip()
     end

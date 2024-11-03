@@ -16,4 +16,8 @@ return {
     attack_base_factor = 1,
     defense_base_factor = 1,
     speed_base_factor = 1,
+
+    effect = function(self, entity)
+        message("test")
+    end
 }

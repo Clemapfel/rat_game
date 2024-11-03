@@ -111,6 +111,11 @@ end, {
         return nil
     end,
 
+    -- (ConsumableProxy, EntityProxy, MoveProxy) -> nil
+    on_move_disabled = function(self, holding_user, move)
+        return nil
+    end,
+
     -- (ConsumableProxy, EntityProxy, ConsumableProxy)
     on_consumable_consumed = function(self, holder, other_consumable)
         return nil
@@ -126,8 +131,18 @@ end, {
         return nil
     end,
 
+    -- (ConsumableProxy, EntityProxy, ConsumableProxy)
+    on_consumable_disabled = function(self, holder, other_consumable)
+        return nil
+    end,
+
     -- (ConsumableProxy, EntityProxy)
     on_entity_spawned = function(self, holder, other_consumable)
+        return nil
+    end,
+
+    -- (ConsumableProxy, EntityProxy, EquipProxy) -> nil
+    on_equip_disabled = function(self, holder, equip)
         return nil
     end,
 
@@ -158,12 +173,15 @@ function bt.Consumable:realize()
         "on_killed",
         "on_switch",
         "on_move_used",
+        "on_move_disabled",
         "on_gained",
         "on_lost",
         "on_consumable_consumed",
         "on_consumable_gained",
         "on_consumable_lost",
-        "on_entity_spawned"
+        "on_consumable_disabled",
+        "on_entity_spawned",
+        "on_equip_disabled"
     }
 
     local template = {

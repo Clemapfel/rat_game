@@ -2,6 +2,15 @@ rt.settings.battle.simulation = {
     illegal_action_is_error = true
 }
 
+--- @brief
+function bt.BattleScene:invoke(f, ...)
+    if self._simulation_environment == nil then
+        self._simulation_environment = self:create_simulation_environment()
+    end
+    debug.setfenv(f, self._simulation_environment)
+    return f(...)
+end
+
 -- ### PROXIES ###
 
 --- @type bt.EntityProxy
@@ -378,7 +387,7 @@ function bt.BattleScene:create_simulation_environment()
         local holder_sprite = _scene._sprites[entity]
         local animation = bt.Animation.CONSUMABLE_APPLIED(_scene, consumable, holder_sprite)
         _scene:_push_animation(animation)
-        _scene:invoke(consumable[callback_id], consumable_proxy, holder_proxy, ...)
+        return _scene:invoke(consumable[callback_id], consumable_proxy, holder_proxy, ...)
     end
 
     --- @param callback_id String
@@ -394,7 +403,7 @@ function bt.BattleScene:create_simulation_environment()
 
         local animation = bt.Animation.GLOBAL_STATUS_APPLIED(_scene, global_status)
         _scene:_push_animation(animation)
-        _scene:invoke(global_status[callback_id], global_status_proxy, ...)
+        return _scene:invoke(global_status[callback_id], global_status_proxy, ...)
     end
 
     --- @brief
@@ -452,9 +461,11 @@ function bt.BattleScene:create_simulation_environment()
         end
     end
 
+    env.push_message = function(...) _message(false, ...) end
+    env.append_message = function(...) _message(true, ...) end
+
     --- @brief
-    env.message = function(...)  _message(true, ...) end
-    env.queue_message = function(...) _message(false, ...) end
+    env.message = env.append_message
 
     --- @brief
     function env.entity_set_value(entity_proxy, name, new_value)
@@ -558,26 +569,20 @@ function bt.BattleScene:create_simulation_environment()
 
         --- ### MOVE ###
 
-        env.list_moves = function(entity_proxy)
-            bt.assert_args("list_moves", entity_proxy, bt.EntityProxy)
-            local out = {}
-            local n, slots = _state:entity_list_move_slots(_get_native(entity_proxy))
-            for i = 1, n do
-                local move = slots[i]
-                if move ~= nil then
-                    table.insert(out, bt.create_move_proxy(_scene, move))
-                end
+        env.get_move_slot_n_used = function(entity_proxy, slot_i)
+            bt.assert_args("get_move_slot_n_used",
+                entity_proxy, bt.EntityProxy,
+                slot_i, bt.Number
+            )
+
+            local entity = _get_native(entity_proxy)
+            local move = _state:entity_get_move(entity, slot_i)
+            if move == nil then
+                bt.error_function("In get_move_slot_n_used: entity `" .. entity.id .. "` has no move in slot `" .. slot_i .. "`")
+                return
             end
 
-            return out
-        end
-
-        env.has_move = function(entity_proxy, move_proxy)
-            bt.assert_args("has_move",
-                entity_proxy, bt.EntityProxy,
-                move_proxy, bt.MoveProxy
-            )
-            return _state:entity_has_move(_get_native(entity_proxy), _get_native(move_proxy))
+            return _state:entity_get_move_n_used(entity, slot_i)
         end
 
         env.get_move_n_used = function(entity_proxy, move_proxy)
@@ -587,17 +592,29 @@ function bt.BattleScene:create_simulation_environment()
             )
 
             local entity, move = _get_native(entity_proxy), _get_native(move_proxy)
-            if not _state:entity_has_move(entity, move) then
-                return 0
-            else
-                local slot_i = _state:entity_get_move_slot_i(entity, move)
-                return _state:entity_get_move_n_used(_get_native(entity_proxy), slot_i)
-            end
+            local slot_i = _state:entity_get_move_slot_i(entity, move)
+            return env.get_move_slot_n_used(entity_proxy, slot_i)
         end
 
         env.get_move_max_n_uses = function(move_proxy)
             bt.assert_args("get_move_max_n_uses", move_proxy, bt.MoveProxy)
             return _get_native(move_proxy):get_max_n_uses()
+        end
+
+        env.get_move_slot_n_uses_left = function(entity_proxy, slot_i)
+            bt.assert_args("get_move_slot_n_uses_left",
+                entity_proxy, bt.EntityProxy,
+                slot_i, bt.Number
+            )
+
+            local entity = _get_native(entity_proxy)
+            local move = _state:entity_get_move(entity, slot_i)
+            if move == nil then
+                bt.error_function("In get_move_slot_n_uses_left: entity `" .. entity.id .. "` has no move in slot `" .. slot_i .. "`")
+                return
+            end
+
+            return move:get_max_n_uses() - env.get_move_slot_n_used(entity_proxy, slot_i)
         end
 
         env.get_move_n_uses_left = function(entity_proxy, move_proxy)
@@ -606,26 +623,21 @@ function bt.BattleScene:create_simulation_environment()
                 move_proxy, bt.MoveProxy
             )
 
-            local entity, move = _get_native(entity_proxy), _get_native(move_proxy)
-            if not _state:entity_has_move(entity, move) then
-                return 0
-            else
-                local max = env.get_move_max_n_uses(move_proxy)
-                local used = env.get_move_n_used(entity_proxy, move_proxy)
-                return max - used
-            end
+            local slot_i = _state:entity_get_move_slot_i(_get_native(entity_proxy), _get_native(move_proxy))
+            return env.get_move_slot_n_uses_left(entity_proxy, slot_i)
         end
 
-        env.set_move_n_uses_left = function(entity_proxy, move_proxy, n_left)
-            bt.assert_args("set_move_n_uses_left",
+        env.set_move_slot_n_uses_left = function(entity_proxy, slot_i, n_left)
+            bt.assert_args("set_move_slot_n_uses_left",
                 entity_proxy, bt.EntityProxy,
-                move_proxy, bt.MoveProxy,
+                slot_i, bt.Number,
                 n_left, bt.Number
             )
 
-            local entity, move = _get_native(entity_proxy), _get_native(move_proxy)
-            if not _state:entity_has_move(entity, move) then
-                bt.error_function("In env.set_move_n_uses_left: entity `" .. env.get_id(entity_proxy) .. "` does not have move `" .. env.get_id(move_proxy ).. "`")
+            local entity = _get_native(entity_proxy)
+            local move = _state:entity_get_move(entity, slot_i)
+            if move == nil then
+                bt.error_function("In set_move_slot_n_uses_left: entity `" .. entity.id .. "` has no move in slot `" .. slot_i .. "`")
                 return
             end
 
@@ -639,7 +651,6 @@ function bt.BattleScene:create_simulation_environment()
                 n_left = math.ceil(n_left)
             end
 
-            local slot_i = _state:entity_get_move_slot_i(entity, move)
             local max = move:get_max_n_uses()
             local n_used = max - n_left
 
@@ -647,11 +658,23 @@ function bt.BattleScene:create_simulation_environment()
             _state:entity_set_move_n_used(entity, move, n_used)
             local after = _state:entity_get_move_n_used(entity, slot_i)
 
+            local move_proxy = bt.create_move_proxy(_scene, move)
             if before < after then
                 env.message(entity_proxy, "s ", move_proxy, " gained PP")
             elseif before > after then
                 env.message(entity_proxy, "s ", move_proxy, " lost PP")
             end -- else, noop, for example if move has infinty PP
+        end
+
+        env.set_move_n_uses_left = function(entity_proxy, move_proxy, n_left)
+            bt.assert_args("set_move_n_uses_left",
+                entity_proxy, bt.EntityProxy,
+                move_proxy, bt.MoveProxy,
+                n_left, bt.Number
+            )
+
+            local slot_i = _state:entity_get_move_slot_i(_get_native(entity_proxy), _get_native(move_proxy))
+            env.set_move_slot_n_uses_left(entity_proxy, slot_i, n_left)
         end
 
         for which in range(
@@ -672,23 +695,6 @@ function bt.BattleScene:create_simulation_environment()
 
         --- ### EQUIP ###
 
-        env.list_equips = function(entity_proxy)
-            bt.assert_args("list_equips", entity_proxy, bt.EntityProxy)
-            local out = {}
-            for equip in values(_state:entity_list_equips(_get_native(entity_proxy))) do
-                table.insert(out,  bt.create_equip_proxy(_scene, equip))
-            end
-            return out
-        end
-
-        env.has_equip = function(entity_proxy, equip_proxy)
-            bt.assert_args("has_equip",
-                entity_proxy, bt.EntityProxy,
-                equip_proxy, bt.EquipProxy
-            )
-            return _state:entity_has_equip(_get_native(entity_proxy), _get_native(equip_proxy))
-        end
-
         for which in range(
             "hp_base_offset",
             "attack_base_offset",
@@ -707,6 +713,287 @@ function bt.BattleScene:create_simulation_environment()
             end
         end
 
+        env.apply_equip_slot = function(entity_proxy, slot_i)
+            bt.assert_args("apply_equip",
+                entity_proxy, bt.EntityProxy,
+                slot_i, bt.Number
+            )
+
+            local entity = _get_native(entity_proxy)
+            local equip = _state:entity_get_equip(entity, slot_i)
+            if equip == nil then return end
+
+            if equip.effect ~= nil and (not _state:entity_get_equip_is_disabled(entity, slot_i)) then
+                local equip_proxy = bt.create_equip_proxy(_scene, equip)
+                local sprite = _scene:get_sprite(entity)
+                local animation = bt.Animation.EQUIP_APPLIED(_scene, equip, sprite)
+                _scene:_push_animation(animation)
+                env.append_message(entity_proxy, "s ", equip_proxy, " activated")
+                _scene:invoke(equip.effect, equip_proxy, entity_proxy)
+            end
+        end
+
+        env.apply_equip = function(entity_proxy, equip_proxy)
+            bt.assert_args("apply_equip",
+                entity_proxy, bt.EntityProxy,
+                equip_proxy, bt.EquipProxy
+            )
+
+            local slot_i = _state:entity_get_equip_slot_i(_get_native(entity_proxy), _get_native(equip_proxy))
+            if slot_i == nil then
+                bt.error_function("In env.apply_equip: entity `" .. entity_proxy.id .. "` does not have equip `" .. equip_proxy.id .. "` equipped")
+                return
+            else
+                env.apply_equip_slot(entity_proxy, slot_i)
+            end
+        end
+
+        --- ### CONSUMABLE ###
+
+        env.get_consumable_max_n_uses = function(consumable_proxy)
+            bt.assert_args("get_consumable_max_n_uses", consumable_proxy, bt.ConsumableProxy)
+            return _get_native(consumable_proxy):get_max_n_uses()
+        end
+
+        env.get_consumable_slot_n_used = function(entity_proxy, slot_i)
+            bt.assert_args("get_consumable_slot_n_used",
+                entity_proxy, bt.EntityProxy,
+                slot_i, bt.Number
+            )
+            return _state:entity_get_consumable_n_used(_get_native(entity_proxy), slot_i)
+        end
+
+        env.get_consumable_n_used = function(entity_proxy, consumable)
+            bt.assert_args("get_consumable_n_used",
+                entity_proxy, bt.EntityProxy,
+                consumable, bt.ConsumableProxy
+            )
+
+            local slot_i = _state:entity_get_consumable_slot_i(_get_native(entity_proxy), _get_native(consumable))
+            return env.get_consumable_slot_n_used(entity_proxy, slot_i)
+        end
+
+        env.get_consumable_slot_n_uses_left = function(entity_proxy, slot_i)
+            bt.assert_args("get_consumable_slot_n_uses_left",
+                entity_proxy, bt.EntityProxy,
+                slot_i, bt.Number
+            )
+
+            local entity = _get_native(entity_proxy)
+            local consumable = _state:entity_get_consumable(entity, slot_i)
+            if consumable == nil then
+                bt.error_function("In env.get_consumable_slot_n_uses_left: entity `" .. entity_proxy.id .. "` has no consumable in slot `" .. slot_i .. "`")
+                return
+            end
+
+            local n_used = _state:entity_get_consumable_n_used(entity, slot_i)
+            return consumable:get_max_n_uses() - n_used
+        end
+
+        env.get_consumable_n_uses_left = function(entity_proxy, consumable)
+            bt.assert_args("get_consumable_n_uses_left",
+                entity_proxy, bt.EntityProxy,
+                consumable, bt.ConsumableProxy
+            )
+
+            local slot_i = _state:entity_get_consumable_slot_i(_get_native(entity_proxy), _get_native(consumable))
+            return env.get_consumable_slot_n_uses_left(entity_proxy, slot_i)
+        end
+
+        env.remove_consumable_slot = function(entity_proxy, slot_i)
+            bt.assert_args("remove_consumable_slot",
+                entity_proxy, bt.EntityProxy,
+                slot_i, bt.Number
+            )
+
+            local entity = _get_native(entity_proxy)
+            local consumable = _state:entity_get_consumable(entity, slot_i)
+            if consumable == nil then -- fizzle if slot is empty
+                bt.error_function("In env.remove_consumable_slot: entity `" .. entity_proxy.id .. "` has no consumable in slot ´" .. slot_i .. "`")
+                return
+            end
+
+            _state:entity_remove_consumable(entity, slot_i)
+
+            local sprite = self._sprites[entity]
+            local animation = bt.Animation.OBJECT_LOST(_scene, consumable, sprite)
+
+            animation:signal_connect("start", function(_)
+                sprite:remove_consumable(slot_i)
+            end)
+
+            _scene:_push_animation(animation)
+
+            local consumable_proxy = bt.create_consumable_proxy(_scene, consumable)
+            env.message(entity_proxy, " lost ", consumable_proxy)
+
+            -- callbacks
+            _try_invoke_consumable_callback("on_lost", consumable_proxy, entity_proxy)
+
+            local callback_id = "on_consumable_lost"
+            for status_proxy in values(env.list_statuses(entity_proxy)) do
+                _try_invoke_status_callback(callback_id, status_proxy, entity_proxy, consumable_proxy)
+            end
+
+            for other_proxy in values(env.list_consumables(entity_proxy)) do
+                if other_proxy ~= consumable_proxy then
+                    _try_invoke_consumable_callback(callback_id, other_proxy, entity_proxy, consumable_proxy)
+                end
+            end
+
+            for status_proxy in values(env.list_global_statuses()) do
+                _try_invoke_global_status_callback(callback_id, status_proxy, entity_proxy, consumable_proxy)
+            end
+        end
+
+        env.remove_consumable = function(entity_proxy, consumable_proxy)
+            bt.assert_args("remove_consumable",
+                entity_proxy, bt.EntityProxy,
+                consumable_proxy, bt.ConsumableProxy
+            )
+
+            env.remove_consumable_slot(
+                entity_proxy,
+                _state:entity_get_consumable_slot_i(_get_native(entity_proxy), _get_native(consumable_proxy))
+            )
+        end
+
+        env.get_consumable_count = function(entity_proxy, consumable_proxy)
+            bt.assert_args("get_consumable_count",
+                entity_proxy, bt.EntityProxy,
+                consumable_proxy, bt.ConsumableProxy
+            )
+            return select("#", _state:entity_get_consumable_slot_i(_get_native(entity_proxy), _get_native(consumable_proxy)))
+        end
+
+        env.add_consumable = function(entity_proxy, consumable_proxy)
+            bt.assert_args("add_consumable",
+                entity_proxy, bt.EntityProxy,
+                consumable_proxy, bt.ConsumableProxy
+            )
+
+            local entity = _get_native(entity_proxy)
+            local consumable = _get_native(consumable_proxy)
+
+            env.push_message(entity_proxy, " gained ", consumable_proxy)
+
+            local new_slot = nil
+            for i = 1, entity:get_n_consumable_slots() do
+                if _state:entity_get_consumable(entity, i) == nil then
+                    new_slot = i
+                    break
+                end
+            end
+            if new_slot == nil then
+                env.append_message("but ", entity_proxy, "has no space for", consumable_proxy)
+                return
+            end
+
+            local sprite = self._sprites[entity]
+            local animation = bt.Animation.OBJECT_GAINED(_scene, consumable, sprite)
+            animation:signal_connect("finish", function(_)
+                sprite:add_consumable(new_slot, consumable, consumable:get_max_n_uses())
+            end)
+            _scene:_append_animation(animation)
+
+            _state:entity_add_consumable(entity, new_slot, consumable)
+
+            -- callbacks
+            _try_invoke_consumable_callback("on_gained", consumable_proxy, entity_proxy)
+
+            local callback_id = "on_consumable_gained"
+            for status_proxy in values(env.list_statuses(entity_proxy)) do
+                _try_invoke_status_callback(callback_id, status_proxy, entity_proxy, consumable_proxy)
+            end
+
+            for other_proxy in values(env.list_consumables(entity_proxy)) do
+                if other_proxy ~= consumable_proxy then
+                    _try_invoke_consumable_callback(callback_id, other_proxy, entity_proxy, consumable_proxy)
+                end
+            end
+
+            for status_proxy in values(env.list_global_statuses()) do
+                _try_invoke_global_status_callback(callback_id, status_proxy, entity_proxy, consumable_proxy)
+            end
+
+            return new_slot
+        end
+
+        env.consume_consumable_slot = function(entity_proxy, slot_i, n)
+            bt.assert_args("consume_consumable_slot",
+                entity_proxy, bt.EntityProxy,
+                slot_i, bt.Number
+            )
+
+            if n == nil then n = 1 end
+
+            local entity = _get_native(entity_proxy)
+            local consumable = _state:entity_get_consumable(entity, slot_i)
+            if consumable == nil then
+                bt.error_function("In env.consume_consumable_slot: entity `" .. entity_proxy.id .. "` has no consumable in slot `" .. slot_i .. "`")
+                return
+            end
+
+            local consumable_proxy = bt.create_consumable_proxy(_scene, consumable)
+
+            local max = consumable:get_max_n_uses()
+            if max == POSITIVE_INFINITY then return end
+
+            local n_used = _state:entity_get_consumable_n_used(entity, slot_i)
+            local used_up = max - (n_used + n) <= 0
+
+            env.push_message(entity_proxy, " consumed ", consumable_proxy)
+
+            local sprite = _scene:get_sprite(entity)
+            if used_up then -- used up
+                local animation = bt.Animation.CONSUMABLE_CONSUMED(_scene, consumable, sprite)
+                animation:signal_connect("finish", function()
+                    sprite:remove_consumable(slot_i)
+                end)
+                _scene:_append_animation(animation)
+
+                _state:entity_set_consumable_n_used(entity, slot_i, 0)
+                _state:entity_remove_consumable(entity, slot_i)
+            else
+                local animation = bt.Animation.CONSUMABLE_APPLIED(_scene, consumable, sprite)
+                animation:signal_connect("start", function()
+                    sprite:set_consumable_n_uses_left(max - (n_used + n))
+                end)
+
+                _scene:_append_animation(animation)
+                _state:entity_set_consumable_n_used(entity, slot_i, n_used + n)
+            end
+
+            -- callbacks
+            _try_invoke_consumable_callback("on_consumable_consumed", consumable_proxy, entity_proxy, consumable_proxy)
+
+            local callback_id = "on_consumable_consumed"
+            for status_proxy in values(env.list_statuses(entity_proxy)) do
+                _try_invoke_status_callback(callback_id, status_proxy, entity_proxy, consumable_proxy)
+            end
+
+            for other_consumable_proxy in values(env.list_consumables(entity_proxy)) do
+                if other_consumable_proxy ~= consumable_proxy then
+                    _try_invoke_consumable_callback(callback_id, other_consumable_proxy, entity_proxy, consumable_proxy)
+                end
+            end
+
+            for global_status_proxy in values(env.list_global_statuses()) do
+                _try_invoke_global_status_callback(callback_id, global_status_proxy, entity_proxy, consumable_proxy)
+            end
+        end
+
+        env.consume_consumable = function(entity_proxy, consumable_proxy)
+            bt.assert_args("consume_consumable",
+                entity_proxy, bt.EntityProxy,
+                consumable_proxy, bt.ConsumableProxy
+            )
+
+            if _get_native(consumable_proxy):get_max_n_uses() == POSITIVE_INFINITY then return end
+            local slot_i = _state:entity_get_consumable_slot_i(_get_native(entity_proxy), _get_native(consumable_proxy))
+            env.consume_consumable_slot(entity_proxy, slot_i)
+        end
+
         ---
 
         for which_proxy in range(
@@ -715,21 +1002,50 @@ function bt.BattleScene:create_simulation_environment()
             { "consumable", bt.ConsumableProxy }
         ) do
             local which, proxy = table.unpack(which_proxy)
-            local get_name = "get_" .. which .. "_is_disabled"
+            local list_name = "list_" .. which .. "s"
+            local has_name = "has_" .. which
+            local get_disabled_name = "get_" .. which .. "_is_disabled"
             local get_slot_name = "get_" .. which .. "_slot_is_disabled"
             local set_slot_disabled_name = "set_" .. which .. "_slot_is_disabled"
             local set_disabled_name = "set_" .. which .. "_is_disabled"
+            local add_name = "add_" .. which
+            local remove_name = "remove_" .. which
+            local remove_slot_name = "remove_" .. which .. "_slot"
+
+            --- @brief has_move, has_equip, has_consumable
+            env[has_name] = function(entity_proxy, object_proxy)
+                bt.assert_args(has_name,
+                    entity_proxy, bt.EntityProxy,
+                    object_proxy, proxy
+                )
+                return _state["entity_has_" .. which](_state, _get_native(entity_proxy), _get_native(object_proxy))
+            end
+
+            --- @brief list_moves, list_equips, list_consumables
+            env[list_name] = function(entity_proxy)
+                bt.assert_args(list_name, entity_proxy, bt.EntityProxy)
+                local out = {}
+                local n, slots = _state["entity_list_" .. which .. "_slots"](_state, _get_native(entity_proxy))
+                for i = 1, n do
+                    local object = slots[i]
+                    if object ~= nil then
+                        table.insert(out, bt["create_" .. which .. "_proxy"](_scene, object))
+                    end
+                end
+
+                return out
+            end
 
             --- @brief get_move_is_disabled, get_equip_is_disabled, get_consumable_is_disabled
-            env[get_name] = function(entity_proxy, object_proxy)
-                bt.assert_args(get_name,
+            env[get_disabled_name] = function(entity_proxy, object_proxy)
+                bt.assert_args(get_disabled_name,
                     entity_proxy, bt.EntityProxy,
                     object_proxy, proxy
                 )
 
                 local entity, object = _get_native(entity_proxy), _get_native(object_proxy)
                 if not _state["entity_has_" .. which](_state, entity, object) then
-                    bt.error_function("In env." .. get_name .. ": entity `" .. entity_proxy.id .. "` does not have `" .. object_proxy.id .. "` equipped")
+                    bt.error_function("In env." .. get_disabled_name .. ": entity `" .. entity_proxy.id .. "` does not have `" .. object_proxy.id .. "` equipped")
                     return false
                 end
 
@@ -777,12 +1093,25 @@ function bt.BattleScene:create_simulation_environment()
                     if before == false and now == true then
                         _scene:_push_animation(bt.Animation.OBJECT_DISABLED(_scene, object, sprite))
                         env.message(entity_proxy, "s ", object_proxy, " was disabled")
+
+                        -- callbacks
+                        local callback_id = "on_" .. which .. "_disabled"
+                        for status_proxy in values(env.list_statuses(entity_proxy)) do
+                            _try_invoke_status_callback(callback_id, status_proxy, entity_proxy, object_proxy)
+                        end
+
+                        for consumable_proxy in values(env.list_consumables(entity_proxy)) do
+                            _try_invoke_consumable_callback(callback_id, consumable_proxy, entity_proxy, object_proxy)
+                        end
+
+                        for global_status_proxy in values(env.list_global_statuses()) do
+                            _try_invoke_global_status_callback(callback_id, global_status_proxy, entity_proxy, object_proxy)
+                        end
                     elseif before == true and now == false then
                         _scene:_push_animation(bt.Animation.OBJECT_ENABLED(_scene, object, sprite))
                         env.message(entity_proxy, "s " , object_proxy, " is no longer disabled")
+                        -- no callbacks on enable
                     end
-
-                    -- no callbacks?
                 end
             end
 
@@ -803,11 +1132,27 @@ function bt.BattleScene:create_simulation_environment()
             end
         end
 
-        --- ### CONSUMABLE ###
-
         --- ### STATUS ###
 
+        env.list_statuses = function(entity_proxy)
+            bt.assert_args("list_statuses", entity_proxy, bt.EntityProxy)
+            local out = {}
+            local entity = _get_native(entity_proxy)
+            for status in values(_state:entity_list_statuses(entity)) do
+                table.insert(out, bt.create_status_proxy(_scene, status, entity))
+            end
+            return out
+        end
+
         --- ### GLOBAL STATUS ###
+
+        env.list_global_statuses = function()
+            local out = {}
+            for global_status in values(_state:list_global_statuses()) do
+                table.insert(out, bt.create_global_status_proxy(_scene, global_status))
+            end
+            return out
+        end
     end
     return env
 end
@@ -899,8 +1244,35 @@ function bt.BattleScene:_test_simulation()
         ) do
             assert(meta.is_number(env["get_equip_" .. which](equip)))
         end
+
+        env.apply_equip(target, equip)
     end
 
-    --self._animation_queue:clear()
+    do -- test consumables
+        local list = env.list_consumables(target)
+        assert(sizeof(list) > 0)
+
+        local consumable = list[1]
+
+        assert(env.has_consumable(target, consumable))
+        env.set_consumable_is_disabled(target, consumable, true)
+        assert(env.get_consumable_is_disabled(target, consumable) == true)
+        env.set_consumable_is_disabled(target, consumable, false)
+        assert(env.get_consumable_is_disabled(target, consumable) == false)
+
+        assert(meta.is_number(env.get_consumable_max_n_uses(consumable)))
+        assert(meta.is_number(env.get_consumable_n_uses_left(target, consumable)))
+        assert(meta.is_number(env.get_consumable_n_used(target, consumable)))
+
+        local before = env.get_consumable_count(target, consumable)
+        env.remove_consumable(target, consumable)
+        assert(env.get_consumable_count(target, consumable) == before - 1)
+        env.add_consumable(target, consumable)
+        assert(env.get_consumable_count(target, consumable) == before)
+
+        env.consume_consumable(target, consumable)
+    end
+
+    -- self._animation_queue:clear()
     rt.log("In bt.BattleScene:_test_simulation: all tests passed")
 end
