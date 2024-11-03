@@ -141,7 +141,7 @@ end
 
 --- @override
 function rt.Label:draw()
-    if self._n_glyphs == 0 then return end
+    if self._n_glyphs == 0 or self._is_visible ~= true then return end
 
     local render_order = self._glyphs_only
     love.graphics.setColor(1, 1, 1, 1)

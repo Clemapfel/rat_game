@@ -761,7 +761,7 @@ function mn.InventoryScene:_regenerate_selection_nodes()
         local slot_i = scene._selection_graph:get_current_node().slot_i
         local down = scene._state:entity_get_move(entity, slot_i)
 
-        return meta.isa(up, bt.Move) and down ~= nil
+        return meta.isa(up, bt.Move) and down ~= nil and (not scene._state:entity_has_move(entity, down))
     end
 
     local equip_slot_allow_swap = function()
@@ -2081,8 +2081,8 @@ function mn.InventoryScene:_update_grabbed_object()
         local sprite_w, sprite_h
         if grabbed:get_id() ~= self._grabbed_object_id then
             self._grabbed_object_id = grabbed:get_id()
-            self._grabbed_object_sprite = rt.LabeledSprite(grabbed:get_sprite_id())
-            self._grabbed_object_sprite:set_label("<color=LIGHT_RED_3><o>\u{00D7}</o></color>")
+            self._grabbed_object_sprite = rt.Sprite(grabbed:get_sprite_id())
+            self._grabbed_object_sprite:set_bottom_right_child(rt.Label("<color=LIGHT_RED_3><o>\u{00D7}</o></color>"))
             self._grabbed_object_sprite:realize()
             sprite_w, sprite_h = self._grabbed_object_sprite:get_resolution()
             local sprite_factor = rt.settings.menu.inventory_scene.sprite_factor
@@ -2092,7 +2092,7 @@ function mn.InventoryScene:_update_grabbed_object()
             local offset = rt.settings.menu.inventory_scene.grabbed_object_sprite_offset
 
             self._grabbed_object_sprite:fit_into(-0.5 * sprite_w + offset * sprite_w, -0.5 * sprite_h + offset * sprite_w, sprite_w, sprite_h)
-            self._grabbed_object_sprite:get_sprite():set_opacity(0.5)
+            self._grabbed_object_sprite:set_opacity(0.5)
             self:_set_grabbed_object_allowed(self._grabbed_object_allowed)
         end
 
@@ -2132,7 +2132,7 @@ end
 function mn.InventoryScene:_set_grabbed_object_allowed(b)
     self._grabbed_object_allowed = b
     if self._grabbed_object_sprite ~= nil then
-        self._grabbed_object_sprite:set_label_is_visible(not self._grabbed_object_allowed)
+        self._grabbed_object_sprite:get_bottom_right_child():set_is_visible(not self._grabbed_object_allowed)
     end
 end
 

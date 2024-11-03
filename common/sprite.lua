@@ -83,17 +83,17 @@ function rt.Sprite:draw()
         self._shader:send("texture_resolution", self._texture_resolution)
         self._shape:draw()
         self._shader:unbind()
-
-        for child in range(
-            self._top_right_child,
-            self._bottom_right_child,
-            self._bottom_left_child,
-            self._top_left_child
-        ) do
-            child:draw()
-        end
     else
         self._shape:draw()
+    end
+
+    for child in range(
+        self._top_right_child,
+        self._bottom_right_child,
+        self._bottom_left_child,
+        self._top_left_child
+    ) do
+        child:draw()
     end
 end
 
@@ -228,7 +228,7 @@ for which in range("top_right", "bottom_right", "bottom_left", "top_left") do
         if meta.is_string(widget) then widget = rt.Label(widget) end
         meta.assert_isa(widget, rt.Widget)
         self["_" .. which .. "_child"] = widget
-        if self:get_is_realized() then widget:realize() end
+        widget:realize()
         self:reformat()
     end
 

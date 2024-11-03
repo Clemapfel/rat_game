@@ -23,6 +23,7 @@ rt.Widget = meta.new_abstract_type("Widget", rt.Drawable, {
     _minimum_height = 1,
     _is_realized = false,
     _is_allocated = false,
+    _is_visible = true,
     _opacity = 1
 })
 
@@ -250,6 +251,16 @@ function rt.Widget:already_realized()
     else
         return true
     end
+end
+
+--- @brief
+function rt.Widget:set_is_visible(b)
+    self._is_visible = b
+end
+
+--- @brief
+function rt.Widget:get_is_visible(b)
+    return self._is_visible
 end
 
 --- @brief

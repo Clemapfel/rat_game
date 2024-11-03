@@ -109,7 +109,6 @@ function rt.AnimationQueue:append(...)
     end
 end
 
---- @brief
 do
     local _finish_animation = function(animation)
         animation._state = rt.AnimationState.FINISHED
@@ -123,6 +122,7 @@ do
         animation:start()
     end
 
+    --- @brief
     function rt.AnimationQueue:update(delta)
         if self._n_nodes == 0 then return end
 

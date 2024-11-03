@@ -33,11 +33,11 @@ function bt.GlobalStatusBar:add(status, elapsed)
     end
 
     local to_insert = {
-        element = rt.LabeledSprite(status:get_sprite_id()),
+        element = rt.Sprite(status:get_sprite_id()),
         elapsed = elapsed
     }
 
-    to_insert.element:set_label(self:_format_elapsed(status, elapsed))
+    to_insert.element:set_bottom_right_child(rt.Label(self:_format_elapsed(status, elapsed)))
     to_insert.element:set_sprite_scale(self._sprite_scale)
     self._elements[status] = to_insert
 
