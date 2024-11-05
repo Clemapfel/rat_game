@@ -169,6 +169,8 @@ do
     --- @brief
     function rt.AnimationQueue:skip()
         local first = self._nodes[1]
+        if first == nil then return end
+
         for animation in values(first.animations) do
             if animation._state == rt.AnimationState.IDLE then
                 _start_animation(animation)

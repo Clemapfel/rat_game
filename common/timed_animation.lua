@@ -202,7 +202,7 @@ rt.InterpolationFunctions = meta.new_enum("InterpolationFunction", {
 rt.TimedAnimation = meta.new_type("TimedAnimation", function(duration, start_value, end_value, interpolation_function, ...)
     meta.assert_number(duration)
     if start_value == nil then start_value = 0 end
-    if end_value == nil then end_value = 0 end
+    if end_value == nil then end_value = 1 end
     if interpolation_function == nil then interpolation_function = rt.InterpolationFunctions.LINEAR end
 
     local out = meta.new(rt.TimedAnimation, {

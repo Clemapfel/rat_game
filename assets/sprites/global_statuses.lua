@@ -1,4 +1,6 @@
 return {
-    DEBUG_GLOBAL_STATUS = 1,
-    RAIN = 2
+    animations = {
+        DEBUG_GLOBAL_STATUS = 1,
+        RAIN = 2
+    },
 }

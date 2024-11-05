@@ -21,8 +21,6 @@ bt.Animation.KILL = meta.new_type("KILL", rt.Animation, function(scene, target)
         _mass_texture = nil,        -- love.Canvas
         _n_done_counter = nil,      -- love.GraphicsBuffer
 
-
-
         _elapsed = 0
     })
 end)

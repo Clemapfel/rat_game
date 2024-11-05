@@ -184,7 +184,7 @@ function bt.EnemySprite:remove_status(status)
 
     local sprite = self._status_to_sprite[status]
     if sprite == nil then
-        rt.error("In bt.EnemySprite:remove_status: status is not present")
+        rt.error("In bt.EnemySprite:remove_status: status `" .. status:get_id() .. "` is not present")
         return
     end
     self._status_to_sprite[status] = nil
@@ -215,7 +215,7 @@ function bt.EnemySprite:activate_status(status, on_done_notify)
 
     local sprite = self._status_to_sprite[status]
     if sprite == nil then
-        rt.error("In bt.EnemySprite:activate_status: status is not present")
+        rt.error("In bt.EnemySprite:activate_status: status is not yet present")
         return
     end
 

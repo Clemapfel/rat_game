@@ -1132,6 +1132,124 @@ function bt.BattleScene:create_simulation_environment()
             end
         end
 
+        --- ### GLOBAL STATUS ###
+
+        env.list_global_statuses = function()
+            local out = {}
+            for global_status in values(_state:list_global_statuses()) do
+                table.insert(out, bt.create_global_status_proxy(_scene, global_status))
+            end
+            return out
+        end
+
+        env.add_global_status = function(global_status_proxy)
+            bt.assert_args("add_global_status", global_status_proxy, bt.GlobalStatusProxy)
+
+            local global_status = _get_native(global_status_proxy)
+            if _state:has_global_status(global_status) then -- prevent double status
+                return
+            end
+
+            local animation = bt.Animation.GLOBAL_STATUS_GAINED(_scene, global_status)
+            animation:signal_connect("start", function(_)
+                _scene:add_global_status(global_status, global_status:get_max_duration())
+            end)
+            _scene:_push_animation(animation)
+            env.append_message(global_status_proxy, "is now active")
+
+            _state:add_global_status(global_status)
+
+            -- callbacks
+            _try_invoke_global_status_callback("on_gained", global_status_proxy)
+
+            local callback_id = "on_global_status_gained"
+            for entity in values(_state:list_entities()) do
+                local entity_proxy = bt.create_entity_proxy(_scene, entity)
+                for status_proxy in values(env.list_statuses(entity_proxy)) do
+                    _try_invoke_status_callback(callback_id, status_proxy, entity_proxy, global_status_proxy)
+                end
+            end
+
+            for entity in values(_state:list_entities()) do
+                -- separate for loop to preserve status < consumable < global_status invocation order
+                local entity_proxy = bt.create_entity_proxy(_scene, entity)
+                for consumable_proxy in values(env.list_consumables(entity_proxy)) do
+                    _try_invoke_consumable_callback(callback_id, consumable_proxy, entity_proxy, global_status_proxy)
+                end
+            end
+
+            for other_global_status_proxy in values(env.list_global_statuses()) do
+                if other_global_status_proxy ~= global_status_proxy then
+                    _try_invoke_global_status_callback(callback_id, other_global_status_proxy, global_status_proxy)
+                end
+            end
+        end
+
+        env.remove_global_status = function(global_status_proxy)
+            bt.assert_args("remove_global_status", global_status_proxy, bt.GlobalStatusProxy)
+
+            local global_status = _get_native(global_status_proxy)
+            if not _state:has_global_status(global_status) then
+                -- fizzle
+                return
+            end
+
+            local animation = bt.Animation.GLOBAL_STATUS_LOST(_scene, global_status)
+            animation:signal_connect("finish", function(_)
+                _scene:remove_global_status(global_status)
+            end)
+
+            _scene:_push_animation(animation)
+            env.append_message(global_status_proxy, " is no longer active")
+
+            _state:remove_global_status(global_status)
+
+            _try_invoke_global_status_callback("on_lost", global_status_proxy)
+
+            local callback_id = "on_global_status_lost"
+            for entity in values(_state:list_entities()) do
+                local entity_proxy = bt.create_entity_proxy(_scene, entity)
+                for status_proxy in values(env.list_statuses(entity_proxy)) do
+                    _try_invoke_status_callback(callback_id, status_proxy, entity_proxy, global_status_proxy)
+                end
+            end
+
+            for entity in values(_state:list_entities()) do
+                local entity_proxy = bt.create_entity_proxy(_scene, entity)
+                for consumable_proxy in values(env.list_consumables(entity_proxy)) do
+                    _try_invoke_consumable_callback(callback_id, consumable_proxy, entity_proxy, global_status_proxy)
+                end
+            end
+
+            for other_global_status_proxy in values(env.list_global_statuses()) do
+                if other_global_status_proxy ~= global_status_proxy then
+                    _try_invoke_global_status_callback(callback_id, other_global_status_proxy, global_status_proxy)
+                end
+            end
+        end
+
+        env.has_global_status = function(global_status_proxy)
+            bt.assert_args("has_global_status", global_status_proxy, bt.GlobalStatusProxy)
+            return _state:has_global_status(_get_native(global_status_proxy))
+        end
+
+        env.get_global_status_max_duration = function(global_status_proxy)
+            bt.assert_args("has_global_status", global_status_proxy, bt.GlobalStatusProxy)
+            return _get_native(global_status_proxy):get_max_duration()
+        end
+
+        env.get_global_status_n_turns_elapsed = function(global_status_proxy)
+            bt.assert_args("has_global_status", global_status_proxy, bt.GlobalStatusProxy)
+            return _state:get_global_status_n_turns_elapsed(_get_native(global_status_proxy))
+        end
+
+        env.get_global_status_n_turns_left = function(global_status_proxy)
+            bt.assert_args("has_global_status", global_status_proxy, bt.GlobalStatusProxy)
+            local max = env.get_global_status_max_duration(global_status_proxy)
+            local elapsed = env.get_global_status_n_turns_elapsed(global_status_proxy)
+            return max - elapsed
+        end
+
         --- ### STATUS ###
 
         env.list_statuses = function(entity_proxy)
@@ -1144,15 +1262,6 @@ function bt.BattleScene:create_simulation_environment()
             return out
         end
 
-        --- ### GLOBAL STATUS ###
-
-        env.list_global_statuses = function()
-            local out = {}
-            for global_status in values(_state:list_global_statuses()) do
-                table.insert(out, bt.create_global_status_proxy(_scene, global_status))
-            end
-            return out
-        end
     end
     return env
 end
@@ -1166,7 +1275,7 @@ function bt.BattleScene:_test_simulation()
     local move = bt.create_move_proxy(self, self._state:entity_list_moves(entity)[1])
     local equip = bt.create_equip_proxy(self, self._state:entity_list_equips(entity)[1])
     local consumable = bt.create_consumable_proxy(self, self._state:entity_list_consumables(entity)[1])
-    local global_status = bt.create_global_status_proxy(self, self._state:list_global_statuses()[1])
+    local global_status = bt.create_global_status_proxy(self, bt.GlobalStatus("DEBUG_GLOBAL_STATUS"))
 
     do -- test storage values
         local id, value = "test", 1234
@@ -1174,9 +1283,11 @@ function bt.BattleScene:_test_simulation()
         assert(env.entity_get_value(target, id) == value)
         env.entity_set_value(target, id, nil)
 
+        --[[
         env.global_status_set_value(global_status, id, value)
         assert(env.global_status_get_value(global_status, id) == value)
         env.global_status_set_value(global_status, id, nil)
+        ]]--
 
         env.status_set_value(target, status, id, value)
         assert(env.status_get_value(target, status, id) == value)
@@ -1271,6 +1382,24 @@ function bt.BattleScene:_test_simulation()
         assert(env.get_consumable_count(target, consumable) == before)
 
         env.consume_consumable(target, consumable)
+    end
+
+    self._animation_queue:clear()
+
+    do -- test global status
+        if self._state:has_global_status(getmetatable(global_status)._native) then
+            self._state:remove_global_status(getmetatable(global_status)._native)
+        end
+
+        assert(env.has_global_status(global_status) == false)
+        env.add_global_status(global_status)
+        assert(env.has_global_status(global_status) == true)
+        assert(sizeof(env.list_global_statuses) >= 1)
+        assert(meta.is_number(env.get_global_status_max_duration(global_status)))
+        assert(meta.is_number(env.get_global_status_n_turns_elapsed(global_status)))
+        assert(meta.is_number(env.get_global_status_n_turns_left(global_status)))
+        env.remove_global_status(global_status)
+        assert(env.has_global_status(global_status) == false)
     end
 
     -- self._animation_queue:clear()

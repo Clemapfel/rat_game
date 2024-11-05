@@ -14,6 +14,7 @@ bt.BattleScene = meta.new_type("BattleScene", rt.Scene, function(state)
         _enemy_sprite_x_offset = 0,
 
         _global_status_bar = bt.OrderedBox(),
+        _global_status_to_sprite = {}, -- Table<bt.GlobalStatus, rt.Sprite>
 
         _move_selection = {}, -- Table<bt.Entity, { moves:rt.Slots, intrinsices:rt:Slots, selection_graph:rt.SelectionGraph }>
         _selecting_entity = nil,
@@ -428,15 +429,6 @@ function bt.BattleScene:draw()
 
     self._priority_queue:draw_bounds()
 
-    for x in range(
-        self._text_box,
-        self._priority_queue,
-        self._verbose_info,
-        self._global_status_bar
-    ) do
-        x:draw()
-    end
-
     if self._selecting_entity ~= nil then
         local entry = self._move_selection[self._selecting_entity]
         entry.intrinsics:draw()
@@ -451,6 +443,16 @@ function bt.BattleScene:draw()
     love.graphics.line(left_w, 0, left_w, h)
     love.graphics.line(w - left_w, 0, w - left_w, h)
     self._animation_queue:draw()
+
+
+    for x in range(
+        self._text_box,
+        self._priority_queue,
+        self._verbose_info,
+        self._global_status_bar
+    ) do
+        x:draw()
+    end
 end
 
 --- @override
@@ -699,11 +701,77 @@ function bt.BattleScene:get_sprite(entity)
     return self._sprites[entity]
 end
 
+--- @brief
+function bt.BattleScene:add_global_status(status, n_turns_left)
+    meta.assert_isa(status, bt.GlobalStatus)
+    meta.assert_number(n_turns_left)
+
+    if self._global_status_to_sprite[status] ~= nil then
+        self:set_global_status_n_turns_left(status, n_turns_left)
+        return
+    end
+
+    local sprite = rt.Sprite(status:get_sprite_id())
+    if n_turns_left ~= POSITIVE_INFINITY then
+        sprite:set_bottom_right_child("<o>" .. n_turns_left .. "</o>")
+    end
+    sprite:set_minimum_size(sprite:get_resolution())
+
+    self._global_status_to_sprite[status] = sprite
+    self._global_status_bar:add(sprite, true)
+end
+
+--- @brief
+function bt.BattleScene:remove_global_status(status)
+    meta.assert_isa(status, bt.GlobalStatus)
+
+    local sprite = self._global_status_to_sprite[status]
+    if sprite == nil then
+        rt.error("In bt.BattleScene:remove_global_status: global status `" .. status:get_id() .. "` is not present")
+        return
+    end
+
+    self._global_status_to_sprite[status] = nil
+    self._global_status_bar:remove(sprite)
+end
+
+--- @brief
+function bt.BattleScene:set_global_status_n_turns_left(status, n_turns_left)
+    meta.assert_isa(status, bt.GlobalStatus)
+    meta.assert_number(n_turns_left)
+
+    local sprite = self._global_status_to_sprite[status]
+    if sprite == nil then
+        rt.error("In bt.BattleScene:set_global_status_n_turns_left: global status `" .. status:get_id() .. "` is not present")
+        return
+    end
+
+    if n_turns_left == POSITIVE_INFINITY then
+        sprite:set_bottom_right_child("")
+    else
+        sprite:set_bottom_right_child("<o>" .. n_turns_left .. "</o>")
+    end
+end
+
+--- @brief
+function bt.BattleScene:activate_global_status(status, on_done_notify)
+    meta.assert_isa(status, bt.Status)
+
+    local sprite = self._global_status_to_sprite[status]
+    if sprite == nil then
+        rt.error("In bt.BattleScene:activate_global_status: status `" .. status:get_id() .. "` is not present")
+        return
+    end
+
+    self._global_status_bar:activate(sprite, on_done_notify)
+end
+
 --- @brief [internal]
 function bt.BattleScene:_handle_button_pressed(which)
     if which == rt.InputButton.A then
         self:_test_simulation()
-        --self:_push_animation(bt.Animation.EQUIP_APPLIED(self, bt.Equip("DEBUG_EQUIP"), self._enemy_sprites[1]))
+        --self:_push_animation(bt.Animation.GLOBAL_STATUS_GAINED(self, bt.GlobalStatus("DEBUG_GLOBAL_STATUS")))
+        --self:_push_animation(bt.Animation.GLOBAL_STATUS_LOST(self, bt.GlobalStatus("DEBUG_GLOBAL_STATUS")))
     elseif which == rt.InputButton.B then
         self._animation_queue:skip()
     end

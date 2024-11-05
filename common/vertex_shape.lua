@@ -198,6 +198,12 @@ function rt.VertexShape:draw()
     end
 end
 
+--- @brief
+function rt.VertexShape:draw_instanced(n)
+    love.graphics.setColor(1, 1, 1, 1)
+    love.graphics.drawInstanced(self._native, n)
+end
+
 --- @brief create vertex shape as rectangle
 --- @param x Number in px
 --- @param y Number in px

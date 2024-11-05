@@ -22,23 +22,22 @@
     </configurations>
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="7fa9ba1b-2cff-4ecc-86fb-59ab2fa76ee1" name="Changes" comment="added equip sim">
-      <change afterPath="$PROJECT_DIR$/battle/animations/equip_applied.lua" afterDir="false" />
+    <list default="true" id="7fa9ba1b-2cff-4ecc-86fb-59ab2fa76ee1" name="Changes" comment="move, equip, and consumable sim done">
+      <change afterPath="$PROJECT_DIR$/battle/animations/global_status_gained.glsl" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/battle/animations/global_status_lost.glsl" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/assets/configs/consumables/DEBUG_CONSUMABLE.lua" beforeDir="false" afterPath="$PROJECT_DIR$/assets/configs/consumables/DEBUG_CONSUMABLE.lua" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/assets/configs/equips/DEBUG_EQUIP.lua" beforeDir="false" afterPath="$PROJECT_DIR$/assets/configs/equips/DEBUG_EQUIP.lua" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/battle/animations/consumable_gained.lua" beforeDir="false" afterPath="$PROJECT_DIR$/battle/animations/object_gained.lua" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/battle/animations/consumable_lost.lua" beforeDir="false" afterPath="$PROJECT_DIR$/battle/animations/object_lost.lua" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/battle/animations/object_enabled.lua" beforeDir="false" afterPath="$PROJECT_DIR$/battle/animations/object_enabled.lua" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/assets/favicon.hxl" beforeDir="false" afterPath="$PROJECT_DIR$/assets/favicon.hxl" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/assets/sprites/global_statuses.lua" beforeDir="false" afterPath="$PROJECT_DIR$/assets/sprites/global_statuses.lua" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/battle/animations/global_status_applied.lua" beforeDir="false" afterPath="$PROJECT_DIR$/battle/animations/global_status_applied.lua" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/battle/animations/global_status_gained.lua" beforeDir="false" afterPath="$PROJECT_DIR$/battle/animations/global_status_gained.lua" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/battle/animations/global_status_lost.lua" beforeDir="false" afterPath="$PROJECT_DIR$/battle/animations/global_status_lost.lua" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/battle/animations/kill.lua" beforeDir="false" afterPath="$PROJECT_DIR$/battle/animations/kill.lua" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/battle/battle_scene.lua" beforeDir="false" afterPath="$PROJECT_DIR$/battle/battle_scene.lua" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/battle/consumable.lua" beforeDir="false" afterPath="$PROJECT_DIR$/battle/consumable.lua" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/battle/equip.lua" beforeDir="false" afterPath="$PROJECT_DIR$/battle/equip.lua" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/battle/enemy_sprite.lua" beforeDir="false" afterPath="$PROJECT_DIR$/battle/enemy_sprite.lua" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/battle/global_status.lua" beforeDir="false" afterPath="$PROJECT_DIR$/battle/global_status.lua" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/battle/simulation_handler.lua" beforeDir="false" afterPath="$PROJECT_DIR$/battle/simulation_handler.lua" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/battle/status.lua" beforeDir="false" afterPath="$PROJECT_DIR$/battle/status.lua" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/common/game_state.lua" beforeDir="false" afterPath="$PROJECT_DIR$/common/game_state.lua" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/common/animation_queue.lua" beforeDir="false" afterPath="$PROJECT_DIR$/common/animation_queue.lua" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/common/game_state_battle.lua" beforeDir="false" afterPath="$PROJECT_DIR$/common/game_state_battle.lua" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/common/path.lua" beforeDir="false" afterPath="$PROJECT_DIR$/common/path.lua" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/common/timed_animation.lua" beforeDir="false" afterPath="$PROJECT_DIR$/common/timed_animation.lua" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
@@ -613,15 +612,7 @@
       <workItem from="1729180777153" duration="8566000" />
       <workItem from="1729267430460" duration="1705000" />
       <workItem from="1729269158294" duration="251396000" />
-      <workItem from="1730582354116" duration="17651000" />
-    </task>
-    <task id="LOCAL-01156" summary="refactored selection graph">
-      <option name="closed" value="true" />
-      <created>1729535575723</created>
-      <option name="number" value="01156" />
-      <option name="presentableId" value="LOCAL-01156" />
-      <option name="project" value="LOCAL" />
-      <updated>1729535575723</updated>
+      <workItem from="1730582354116" duration="28714000" />
     </task>
     <task id="LOCAL-01157" summary="entity move selection graph done">
       <option name="closed" value="true" />
@@ -1007,7 +998,15 @@
       <option name="project" value="LOCAL" />
       <updated>1730655877363</updated>
     </task>
-    <option name="localTasksCounter" value="1205" />
+    <task id="LOCAL-01205" summary="move, equip, and consumable sim done">
+      <option name="closed" value="true" />
+      <created>1730666576992</created>
+      <option name="number" value="01205" />
+      <option name="presentableId" value="LOCAL-01205" />
+      <option name="project" value="LOCAL" />
+      <updated>1730666576992</updated>
+    </task>
+    <option name="localTasksCounter" value="1206" />
     <servers />
   </component>
   <component name="TypeScriptGeneratedFilesManager">
@@ -1056,7 +1055,6 @@
     </option>
   </component>
   <component name="VcsManagerConfiguration">
-    <MESSAGE value="added battle string formatting" />
     <MESSAGE value="added automatic text formatting" />
     <MESSAGE value="status animations done" />
     <MESSAGE value="added see_also" />
@@ -1081,7 +1079,8 @@
     <MESSAGE value="refactored labeled sprite" />
     <MESSAGE value="stashing" />
     <MESSAGE value="added equip sim" />
-    <option name="LAST_COMMIT_MESSAGE" value="added equip sim" />
+    <MESSAGE value="move, equip, and consumable sim done" />
+    <option name="LAST_COMMIT_MESSAGE" value="move, equip, and consumable sim done" />
   </component>
   <component name="XDebuggerManager">
     <breakpoint-manager>

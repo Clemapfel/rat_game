@@ -1005,9 +1005,22 @@ function rt.GameState:add_global_status(global_status)
 end
 
 --- @brief
+function rt.GameState:remove_global_status(global_status)
+    meta.assert_isa(global_status, bt.GlobalStatus)
+    local entry = self._state.global_statuses[global_status:get_id()]
+
+    if entry == nil then
+        rt.error("In rt.GameState:remove_global_status: status `" .. global_status:get_id() .. "` is not present")
+        return
+    end
+
+    self._state.global_statuses[global_status:get_id()] = nil
+end
+
+--- @brief
 function rt.GameState:has_global_status(global_status)
     meta.assert_isa(global_status, bt.GlobalStatus)
-    return self._state.global_status[global_status:get_id()] ~= nil
+    return self._state.global_statuses[global_status:get_id()] ~= nil
 end
 
 --- @brief
@@ -1049,7 +1062,6 @@ function rt.GameState:has_global_status(global_status)
     meta.assert_isa(global_status, bt.GlobalStatus)
     return self._state.global_statuses[global_status:get_id()] ~= nil
 end
-
 
 --- @brief
 function rt.GameState:entity_set_status_storage_value(entity, status, id, new_value)
@@ -1120,7 +1132,7 @@ function rt.GameState:set_global_status_storage_value(status, id, new_value)
 
     local status_entry = self._state.global_statuses[status:get_id()]
     if status_entry == nil then
-        rt.error("In rt.GameState:set_global_status_storage_value: entity `" .. entity:get_id() .. "` is not part of state")
+        rt.error("In rt.GameState:set_global_status_storage_value: global status `" .. status:get_id() .. "` is not present")
         return nil
     end
 

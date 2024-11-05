@@ -28,6 +28,7 @@ end, {
 
     sprite_id = "",
     sprite_index = 1,
+    animation_id = "GLOBAL_STATUS_GAINED",
 
     -- (GlobalStatusProxy, Table<EntityProxy>) -> nil
     on_gained = function(self, entities)
