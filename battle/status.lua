@@ -289,3 +289,29 @@ end
 function bt.Status:get_is_stun()
     return self.is_stun
 end
+
+for which in range(
+    "attack_offset",
+    "defense_offset",
+    "speed_offset",
+    "attack_factor",
+    "defense_factor",
+    "speed_factor",
+
+    "damage_dealt_factor",
+    "damage_received_factor",
+    "healing_performed_factor",
+    "healing_received_factor",
+
+    "damage_dealt_offset",
+    "damage_received_offset",
+    "healing_performed_offset",
+    "healing_received_offset",
+
+    "is_stun",
+    "max_duration"
+) do
+    bt.Status["get_" .. which] = function(self)
+        return self[which]
+    end
+end

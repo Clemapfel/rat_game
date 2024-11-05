@@ -22,23 +22,14 @@
     </configurations>
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="7fa9ba1b-2cff-4ecc-86fb-59ab2fa76ee1" name="Changes" comment="move, equip, and consumable sim done">
-      <change afterPath="$PROJECT_DIR$/battle/animations/global_status_gained.glsl" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/battle/animations/global_status_lost.glsl" afterDir="false" />
+    <list default="true" id="7fa9ba1b-2cff-4ecc-86fb-59ab2fa76ee1" name="Changes" comment="global status sim working">
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/assets/favicon.hxl" beforeDir="false" afterPath="$PROJECT_DIR$/assets/favicon.hxl" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/assets/sprites/global_statuses.lua" beforeDir="false" afterPath="$PROJECT_DIR$/assets/sprites/global_statuses.lua" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/battle/animations/global_status_applied.lua" beforeDir="false" afterPath="$PROJECT_DIR$/battle/animations/global_status_applied.lua" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/battle/animations/global_status_gained.lua" beforeDir="false" afterPath="$PROJECT_DIR$/battle/animations/global_status_gained.lua" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/battle/animations/global_status_lost.lua" beforeDir="false" afterPath="$PROJECT_DIR$/battle/animations/global_status_lost.lua" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/battle/animations/kill.lua" beforeDir="false" afterPath="$PROJECT_DIR$/battle/animations/kill.lua" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/battle/animations/status_lost.lua" beforeDir="false" afterPath="$PROJECT_DIR$/battle/animations/status_lost.lua" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/battle/battle_scene.lua" beforeDir="false" afterPath="$PROJECT_DIR$/battle/battle_scene.lua" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/battle/enemy_sprite.lua" beforeDir="false" afterPath="$PROJECT_DIR$/battle/enemy_sprite.lua" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/battle/global_status.lua" beforeDir="false" afterPath="$PROJECT_DIR$/battle/global_status.lua" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/battle/simulation_handler.lua" beforeDir="false" afterPath="$PROJECT_DIR$/battle/simulation_handler.lua" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/common/animation_queue.lua" beforeDir="false" afterPath="$PROJECT_DIR$/common/animation_queue.lua" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/battle/status.lua" beforeDir="false" afterPath="$PROJECT_DIR$/battle/status.lua" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/common/game_state_battle.lua" beforeDir="false" afterPath="$PROJECT_DIR$/common/game_state_battle.lua" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/common/timed_animation.lua" beforeDir="false" afterPath="$PROJECT_DIR$/common/timed_animation.lua" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/main.lua" beforeDir="false" afterPath="$PROJECT_DIR$/main.lua" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -612,15 +603,7 @@
       <workItem from="1729180777153" duration="8566000" />
       <workItem from="1729267430460" duration="1705000" />
       <workItem from="1729269158294" duration="251396000" />
-      <workItem from="1730582354116" duration="28714000" />
-    </task>
-    <task id="LOCAL-01157" summary="entity move selection graph done">
-      <option name="closed" value="true" />
-      <created>1729535594999</created>
-      <option name="number" value="01157" />
-      <option name="presentableId" value="LOCAL-01157" />
-      <option name="project" value="LOCAL" />
-      <updated>1729535594999</updated>
+      <workItem from="1730582354116" duration="35985000" />
     </task>
     <task id="LOCAL-01158" summary="added get_priority">
       <option name="closed" value="true" />
@@ -1006,7 +989,15 @@
       <option name="project" value="LOCAL" />
       <updated>1730666576992</updated>
     </task>
-    <option name="localTasksCounter" value="1206" />
+    <task id="LOCAL-01206" summary="global status sim working">
+      <option name="closed" value="true" />
+      <created>1730767718548</created>
+      <option name="number" value="01206" />
+      <option name="presentableId" value="LOCAL-01206" />
+      <option name="project" value="LOCAL" />
+      <updated>1730767718548</updated>
+    </task>
+    <option name="localTasksCounter" value="1207" />
     <servers />
   </component>
   <component name="TypeScriptGeneratedFilesManager">
@@ -1055,7 +1046,6 @@
     </option>
   </component>
   <component name="VcsManagerConfiguration">
-    <MESSAGE value="added automatic text formatting" />
     <MESSAGE value="status animations done" />
     <MESSAGE value="added see_also" />
     <MESSAGE value="fixed underline misalignment" />
@@ -1080,7 +1070,8 @@
     <MESSAGE value="stashing" />
     <MESSAGE value="added equip sim" />
     <MESSAGE value="move, equip, and consumable sim done" />
-    <option name="LAST_COMMIT_MESSAGE" value="move, equip, and consumable sim done" />
+    <MESSAGE value="global status sim working" />
+    <option name="LAST_COMMIT_MESSAGE" value="global status sim working" />
   </component>
   <component name="XDebuggerManager">
     <breakpoint-manager>

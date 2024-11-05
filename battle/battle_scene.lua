@@ -769,7 +769,8 @@ end
 --- @brief [internal]
 function bt.BattleScene:_handle_button_pressed(which)
     if which == rt.InputButton.A then
-        self:_test_simulation()
+        --self:_test_simulation()
+        self:_push_animation(bt.Animation.STATUS_LOST(self, bt.Status("DEBUG_STATUS"), self._enemy_sprites[1]))
         --self:_push_animation(bt.Animation.GLOBAL_STATUS_GAINED(self, bt.GlobalStatus("DEBUG_GLOBAL_STATUS")))
         --self:_push_animation(bt.Animation.GLOBAL_STATUS_LOST(self, bt.GlobalStatus("DEBUG_GLOBAL_STATUS")))
     elseif which == rt.InputButton.B then

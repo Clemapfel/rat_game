@@ -1657,7 +1657,7 @@ function rt.GameState:initialize_debug_state()
             end
         end
 
-        self:entity_add_status(entity, bt.Status("DEBUG_STATUS"))
+        --self:entity_add_status(entity, bt.Status("DEBUG_STATUS"))
         self:entity_set_hp(entity, entity:get_hp_base())
     end
 

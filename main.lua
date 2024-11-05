@@ -125,6 +125,12 @@ love.draw = function()
 
         state:_draw()
 
+        --[[
+        if state._current_scene ~= nil and state._current_scene._animation_queue ~= nil then
+            state._current_scene._animation_queue:draw()
+        end
+        ]]--
+
         if profiler_active then
             rt.profiler.pop("draw")
         end

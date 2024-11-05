@@ -1190,8 +1190,7 @@ function bt.BattleScene:create_simulation_environment()
 
             local global_status = _get_native(global_status_proxy)
             if not _state:has_global_status(global_status) then
-                -- fizzle
-                return
+                return -- fizzle
             end
 
             local animation = bt.Animation.GLOBAL_STATUS_LOST(_scene, global_status)
@@ -1262,6 +1261,155 @@ function bt.BattleScene:create_simulation_environment()
             return out
         end
 
+        env.has_status = function(entity_proxy, status_proxy)
+            bt.assert_args("has_status",
+                entity_proxy, bt.EntityProxy,
+                status_proxy, bt.StatusProxy
+            )
+
+            return _state:entity_has_status(_get_native(entity_proxy), _get_native(status_proxy))
+        end
+
+        env.add_status = function(entity_proxy, status_proxy)
+            bt.assert_args("add_status",
+                entity_proxy, bt.EntityProxy,
+                status_proxy, bt.StatusProxy
+            )
+
+            local entity, status = _get_native(entity_proxy), _get_native(status_proxy)
+            if _state:entity_has_status(entity, status) then
+                return -- fizzle
+            end
+
+            local sprite = _scene:get_sprite(entity)
+            local animation = bt.Animation.STATUS_GAINED(_scene, status, sprite)
+            animation:signal_connect("start", function(_)
+                sprite:add_status(status, status:get_max_duration())
+            end)
+            _scene:_push_animation(animation)
+            env.append_message(entity_proxy, " is not afflicted with ", status_proxy)
+
+            _state:entity_add_status(entity, status)
+
+            -- callbacks
+            _try_invoke_status_callback("on_gained", status_proxy, entity_proxy)
+
+            local callback_id = "on_status_gained"
+            for other_status_proxy in values(env.list_statuses(entity_proxy)) do
+                if other_status_proxy ~= status then
+                    _try_invoke_status_callback(callback_id, other_status_proxy, entity_proxy, status_proxy)
+                end
+            end
+
+            for consumable_proxy in values(env.list_consumables(entity_proxy)) do
+                _try_invoke_consumable_callback(callback_id, consumable_proxy, entity_proxy, status_proxy)
+            end
+
+            for global_status_proxy in values(env.list_global_statuses()) do
+                _try_invoke_global_status_callback(callback_id, global_status_proxy, entity_proxy, status_proxy)
+            end
+        end
+
+        env.remove_status = function(entity_proxy, status_proxy)
+            bt.assert_args("remove_status",
+                entity_proxy, bt.EntityProxy,
+                status_proxy, bt.StatusProxy
+            )
+
+            local entity, status = _get_native(entity_proxy), _get_native(status_proxy)
+
+            if not _state:entity_has_status(entity, status) then
+                return -- fizzle
+            end
+
+            local sprite = _scene:get_sprite(entity)
+            local animation = bt.Animation.STATUS_GAINED(_scene, status, sprite)
+            animation:signal_connect("finish", function(_)
+                sprite:remove_status(status)
+            end)
+
+            _scene:_push_animation(animation)
+            env.append_message(entity_proxy, " is no longer afflicted with ", status_proxy)
+
+            _state:entity_remove_status(entity, status)
+
+            _try_invoke_status_callback("on_lost", status_proxy, entity_proxy)
+
+            local callback_id = "on_status_lost"
+            for other_status_proxy in values(env.list_statuses(entity_proxy)) do
+                if other_status_proxy ~= status then
+                    _try_invoke_status_callback(callback_id, other_status_proxy, entity_proxy, status_proxy)
+                end
+            end
+
+            for consumable_proxy in values(env.list_consumables(entity_proxy)) do
+                _try_invoke_consumable_callback(callback_id, consumable_proxy, entity_proxy, status_proxy)
+            end
+
+            for global_status_proxy in values(env.list_global_statuses()) do
+                _try_invoke_global_status_callback(callback_id, global_status_proxy, entity_proxy, status_proxy)
+            end
+        end
+
+        for which in range(
+            "attack_offset",
+            "defense_offset",
+            "speed_offset",
+            "attack_factor",
+            "defense_factor",
+            "speed_factor",
+
+            "damage_dealt_factor",
+            "damage_received_factor",
+            "healing_performed_factor",
+            "healing_received_factor",
+
+            "damage_dealt_offset",
+            "damage_received_offset",
+            "healing_performed_offset",
+            "healing_received_offset",
+
+            "is_stun",
+            "max_duration"
+        ) do
+            env["get_status_" .. which] = function(status_proxy)
+                bt.assert_args("get_status_" .. which, status_proxy, bt.StatusProxy)
+                local status = _get_native(status_proxy)
+                return status["get_" .. which](status)
+            end
+        end
+
+        env.get_status_n_turns_elapsed = function(status_proxy, entity_proxy)
+            bt.assert_args("get_status_n_turns_elapsed",
+                status_proxy, bt.StatusProxy,
+                entity_proxy, bt.EntityProxy
+            )
+
+            local entity, status = _get_native(entity_proxy), _get_native(status_proxy)
+            if not _state:entity_has_status(entity, status) then
+                rt.warning("In get_status_n_turns_elapsed: entity `" .. entity:get_id() .. "` does not have status `" .. status:get_id() .. "`")
+                return 0
+            else
+                return _state:entity_get_status_n_turns_elapsed(entity, status)
+            end
+        end
+
+        env.get_status_n_turns_left = function(status_proxy, entity_proxy)
+            bt.assert_args("get_status_n_turns_left",
+                status_proxy, bt.StatusProxy,
+                entity_proxy, bt.EntityProxy
+            )
+
+            local entity, status = _get_native(entity_proxy), _get_native(status_proxy)
+            if not _state:entity_has_status(entity, status) then
+                rt.warning("In get_status_n_turns_left: entity `" .. entity:get_id() .. "` does not have status `" .. status:get_id() .. "`")
+                return POSITIVE_INFINITY
+            else
+                local elapsed = _state:entity_get_status_n_turns_elapsed(entity, status)
+                local max = status:get_max_duration()
+                return max - elapsed
+            end
+        end
     end
     return env
 end
@@ -1271,40 +1419,11 @@ function bt.BattleScene:_test_simulation()
     local env = self._simulation_environment
     local entity = self._state:list_enemies()[1]
     local target = bt.create_entity_proxy(self, entity)
-    local status = bt.create_status_proxy(self, self._state:entity_list_statuses(entity)[1])
+    local status = bt.create_status_proxy(self, bt.Status("DEBUG_STATUS"))
     local move = bt.create_move_proxy(self, self._state:entity_list_moves(entity)[1])
     local equip = bt.create_equip_proxy(self, self._state:entity_list_equips(entity)[1])
     local consumable = bt.create_consumable_proxy(self, self._state:entity_list_consumables(entity)[1])
     local global_status = bt.create_global_status_proxy(self, bt.GlobalStatus("DEBUG_GLOBAL_STATUS"))
-
-    do -- test storage values
-        local id, value = "test", 1234
-        env.entity_set_value(target, id, value)
-        assert(env.entity_get_value(target, id) == value)
-        env.entity_set_value(target, id, nil)
-
-        --[[
-        env.global_status_set_value(global_status, id, value)
-        assert(env.global_status_get_value(global_status, id) == value)
-        env.global_status_set_value(global_status, id, nil)
-        ]]--
-
-        env.status_set_value(target, status, id, value)
-        assert(env.status_get_value(target, status, id) == value)
-        env.status_set_value(target, status, id, nil)
-
-        env.move_set_value(target, move, id, value)
-        assert(env.move_get_value(target, move, id) == value)
-        env.move_set_value(target, move, id, nil)
-
-        env.equip_set_value(target, equip, id, value)
-        assert(env.equip_get_value(target, equip, id) == value)
-        env.equip_set_value(target, equip, id, nil)
-
-        env.consumable_set_value(target, consumable, id, value)
-        assert(env.consumable_get_value(target, consumable, id) == value)
-        env.consumable_set_value(target, consumable, id, nil)
-    end
 
     do -- test moves
         local found = false
@@ -1382,6 +1501,7 @@ function bt.BattleScene:_test_simulation()
         assert(env.get_consumable_count(target, consumable) == before)
 
         env.consume_consumable(target, consumable)
+        env.add_consumable(target, consumable)
     end
 
     self._animation_queue:clear()
@@ -1400,6 +1520,71 @@ function bt.BattleScene:_test_simulation()
         assert(meta.is_number(env.get_global_status_n_turns_left(global_status)))
         env.remove_global_status(global_status)
         assert(env.has_global_status(global_status) == false)
+
+        env.add_global_status(global_status)
+    end
+
+    do -- test status
+        assert(env.has_status(target, status) == false)
+        env.add_status(target, status)
+        assert(env.has_status(target, status) == true)
+        assert(meta.is_number(env.get_status_n_turns_elapsed(status, target)))
+        assert(meta.is_number(env.get_status_n_turns_left(status, target)))
+
+        for which in range(
+            "attack_offset",
+            "defense_offset",
+            "speed_offset",
+            "attack_factor",
+            "defense_factor",
+            "speed_factor",
+
+            "damage_dealt_factor",
+            "damage_received_factor",
+            "healing_performed_factor",
+            "healing_received_factor",
+
+            "damage_dealt_offset",
+            "damage_received_offset",
+            "healing_performed_offset",
+            "healing_received_offset",
+            "max_duration"
+        ) do
+            assert(meta.is_number(env["get_status_" .. which](status)), which)
+        end
+        assert(meta.is_boolean(env.get_status_is_stun(status)))
+
+        env.remove_status(target, status)
+        assert(env.has_status(target, status) == false)
+
+        env.add_status(target, status)
+    end
+
+    do -- test storage values
+        local id, value = "test", 1234
+        env.entity_set_value(target, id, value)
+        assert(env.entity_get_value(target, id) == value)
+        env.entity_set_value(target, id, nil)
+
+        env.global_status_set_value(global_status, id, value)
+        assert(env.global_status_get_value(global_status, id) == value)
+        env.global_status_set_value(global_status, id, nil)
+
+        env.status_set_value(target, status, id, value)
+        assert(env.status_get_value(target, status, id) == value)
+        env.status_set_value(target, status, id, nil)
+
+        env.move_set_value(target, move, id, value)
+        assert(env.move_get_value(target, move, id) == value)
+        env.move_set_value(target, move, id, nil)
+
+        env.equip_set_value(target, equip, id, value)
+        assert(env.equip_get_value(target, equip, id) == value)
+        env.equip_set_value(target, equip, id, nil)
+
+        env.consumable_set_value(target, consumable, id, value)
+        assert(env.consumable_get_value(target, consumable, id) == value)
+        env.consumable_set_value(target, consumable, id, nil)
     end
 
     -- self._animation_queue:clear()
