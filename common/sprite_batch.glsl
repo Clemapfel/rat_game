@@ -2,46 +2,47 @@
 
 #ifdef VERTEX
 
-varying vec4 vertex_color;
 varying vec2 texture_coordinates;
 varying flat int should_discard;
 
-layout(std430) readonly buffer position_buffer {
-    vec2 position_data[];
+#define BUFFER_LAYOUT layout(std430) readonly
+
+BUFFER_LAYOUT buffer offset_buffer {
+    vec2 offsets[];
 };
 
-layout(std430) readonly buffer texcoord_buffer {
-    vec2 texcoords_data[];
+BUFFER_LAYOUT buffer position_buffer {
+    mat2x4 positions[];
 };
 
-layout(std430) readonly buffer discard_buffer {
-    int should_discard_data[];
+BUFFER_LAYOUT buffer texcoord_buffer {
+    mat4x2 texcoords[];
 };
+
+BUFFER_LAYOUT buffer discard_buffer {
+    int discards[];
+};
+
+uniform int n_vertices_per_instance = 4;
 
 vec4 position(mat4 transform, vec4 vertex_position)
 {
     int instance_id = gl_InstanceID;
-    should_discard = should_discard_data[instance_id];
+    int vertex_index = instance_id % n_vertices_per_instance;
 
-    int vertex_id = 0;
-    if (vertex_position.x < 0 && vertex_position.y < 0) {
-        vertex_id = 0;
-        vertex_color = vec4(1, 0, 1, 1);
-    }
-    else if (vertex_position.x > 0 && vertex_position.y < 0) {
-        vertex_id = 1;
-        vertex_color = vec4(1, 1, 0, 1);
-    }
-    else if (vertex_position.x > 0 && vertex_position.y > 0) {
-        vertex_id = 2;
-        vertex_color = vec4(0, 1, 1, 1);
-    }
-    else if (vertex_position.x < 0 && vertex_position.y > 0) {
-        vertex_id = 3;
-        vertex_color = vec4(0, 1, 1, 1);
-    }
+    vertex_position.xy = vec2(
+        positions[instance_id][vertex_index][0],
+        positions[instance_id][vertex_index][1]
+    );
 
-    vertex_position.xy += position_data[instance_id];
+    vec2 texture_coordinates = vec2(
+        texcoords[instance_id][vertex_index][0],
+        texcoords[instance_id][vertex_index][1]
+    );
+
+    should_discard = discards[instance_id];
+
+    vertex_position.xy += offsets[instance_id];
     return transform * vertex_position;
 }
 
@@ -49,13 +50,12 @@ vec4 position(mat4 transform, vec4 vertex_position)
 
 #ifdef PIXEL
 
-varying vec4 vertex_color;
 varying vec2 texture_coordinates;
 varying flat int should_discard;
 
 vec4 effect(vec4, Image image, vec2, vec2)
 {
-    if (should_discard > 0) discard;
-    return Texel(image, texture_coordinates) * vertex_color;
+    //if (should_discard > 0) discard;
+    return vec4(1); //Texel(image, texture_coordinates);
 }
 #endif

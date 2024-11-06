@@ -22,14 +22,11 @@
     </configurations>
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="7fa9ba1b-2cff-4ecc-86fb-59ab2fa76ee1" name="Changes" comment="stashing status animation">
-      <change afterPath="$PROJECT_DIR$/common/sprite_batch.glsl" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/common/sprite_batch.lua" afterDir="false" />
+    <list default="true" id="7fa9ba1b-2cff-4ecc-86fb-59ab2fa76ee1" name="Changes" comment="stashing">
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/battle/animations/status_lost.lua" beforeDir="false" afterPath="$PROJECT_DIR$/battle/animations/status_lost.lua" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/common/~normal_map_lighting.glsl" beforeDir="false" afterPath="$PROJECT_DIR$/common/~normal_map_lighting.glsl" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/include.lua" beforeDir="false" afterPath="$PROJECT_DIR$/include.lua" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/main.lua" beforeDir="false" afterPath="$PROJECT_DIR$/main.lua" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/common/sprite_batch.glsl" beforeDir="false" afterPath="$PROJECT_DIR$/common/sprite_batch.glsl" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/common/sprite_batch.lua" beforeDir="false" afterPath="$PROJECT_DIR$/common/sprite_batch.lua" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -603,23 +600,7 @@
       <workItem from="1729180777153" duration="8566000" />
       <workItem from="1729267430460" duration="1705000" />
       <workItem from="1729269158294" duration="251396000" />
-      <workItem from="1730582354116" duration="42677000" />
-    </task>
-    <task id="LOCAL-01159" summary="refactored signals">
-      <option name="closed" value="true" />
-      <created>1729550289025</created>
-      <option name="number" value="01159" />
-      <option name="presentableId" value="LOCAL-01159" />
-      <option name="project" value="LOCAL" />
-      <updated>1729550289025</updated>
-    </task>
-    <task id="LOCAL-01160" summary="fixed cutoff line in text box stencil">
-      <option name="closed" value="true" />
-      <created>1729630104771</created>
-      <option name="number" value="01160" />
-      <option name="presentableId" value="LOCAL-01160" />
-      <option name="project" value="LOCAL" />
-      <updated>1729630104771</updated>
+      <workItem from="1730582354116" duration="45722000" />
     </task>
     <task id="LOCAL-01161" summary="refactored to new sim handler">
       <option name="closed" value="true" />
@@ -997,7 +978,23 @@
       <option name="project" value="LOCAL" />
       <updated>1730835852312</updated>
     </task>
-    <option name="localTasksCounter" value="1208" />
+    <task id="LOCAL-01208" summary="stashing sprite batch">
+      <option name="closed" value="true" />
+      <created>1730851229682</created>
+      <option name="number" value="01208" />
+      <option name="presentableId" value="LOCAL-01208" />
+      <option name="project" value="LOCAL" />
+      <updated>1730851229682</updated>
+    </task>
+    <task id="LOCAL-01209" summary="stashing">
+      <option name="closed" value="true" />
+      <created>1730851482564</created>
+      <option name="number" value="01209" />
+      <option name="presentableId" value="LOCAL-01209" />
+      <option name="project" value="LOCAL" />
+      <updated>1730851482564</updated>
+    </task>
+    <option name="localTasksCounter" value="1210" />
     <servers />
   </component>
   <component name="TypeScriptGeneratedFilesManager">
@@ -1046,7 +1043,6 @@
     </option>
   </component>
   <component name="VcsManagerConfiguration">
-    <MESSAGE value="added see_also" />
     <MESSAGE value="fixed underline misalignment" />
     <MESSAGE value="added karo background" />
     <MESSAGE value="consumable lost animation done" />
@@ -1066,12 +1062,13 @@
     <MESSAGE value="path done and optimized" />
     <MESSAGE value="tests passing" />
     <MESSAGE value="refactored labeled sprite" />
-    <MESSAGE value="stashing" />
     <MESSAGE value="added equip sim" />
     <MESSAGE value="move, equip, and consumable sim done" />
     <MESSAGE value="global status sim working" />
     <MESSAGE value="stashing status animation" />
-    <option name="LAST_COMMIT_MESSAGE" value="stashing status animation" />
+    <MESSAGE value="stashing sprite batch" />
+    <MESSAGE value="stashing" />
+    <option name="LAST_COMMIT_MESSAGE" value="stashing" />
   </component>
   <component name="XDebuggerManager">
     <breakpoint-manager>

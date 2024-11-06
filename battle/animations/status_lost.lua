@@ -65,9 +65,9 @@ function bt.Animation.STATUS_LOST:start()
 
             local shape = {}
             shape.id = self._batch:add(
+                x, y, step, step,
                 texture_x, texture_y,
-                texture_w, texture_h,
-                x, y, step, step
+                texture_w, texture_h
             )
 
             shape.current_x = x
@@ -102,7 +102,7 @@ function bt.Animation.STATUS_LOST:update(delta)
             local next_y = shape.current_y + (shape.current_y - shape.last_y) + acceleration * delta * delta
             shape.current_x, shape.current_y = next_x, next_y
             shape.last_x, shape.last_y = current_x, current_y
-            self._batch:set_position(shape.id, shape.current_x, shape.current_y)
+            self._batch:set_offset(shape.id, shape.current_x, shape.current_y)
         end
 
         self._fade_out_animation:update(delta)

@@ -6,7 +6,8 @@ rt.SpriteBatch = meta.new_type("SpriteBatch", rt.Drawable, function(texture, n_i
         _texture = texture,
         _shader = love.graphics.newShader("common/sprite_batch.glsl"),
         _n_instances = n_instances,
-        _n_added = 0
+        _n_vertices = 4,
+        _n_added = 1,
     })
     out:realize()
     return out
@@ -25,13 +26,17 @@ do
         { x + width, y + height, 1, 1 },
         { x, y + height, 0, 1 }
     }
+
+    local _offset_format = {
+        { name = "offsets", format = "floatvec2" }
+    }
     
     local _position_format = {
-        { name = "position", format = "floatvec2" }
+        { name = "positions", format = "floatmat2x4" }
     }
 
     local _texcoord_format = {
-        { name = "texture_coordinate", format = "floatvec2"}
+        { name = "texcoords", format = "floatmat2x4"}
     }
 
     local _discard_format = {
@@ -46,83 +51,121 @@ do
     --- @brief
     function rt.SpriteBatch:realize()
         self._shape = love.graphics.newMesh(_vertex_format, _vertex_data, "fan", "static")
-        --self._shape:setTexture(self._texture._native)
+        --self._n_vertices = sizeof(_vertex_data)
+        self._shader:send("n_vertices_per_instance", self._n_vertices)
+
         self._position_buffer = love.graphics.newBuffer(_position_format, self._n_instances, _buffer_mode)
         self._texcoord_buffer = love.graphics.newBuffer(_texcoord_format, self._n_instances, _buffer_mode)
         self._discard_buffer = love.graphics.newBuffer(_discard_format, self._n_instances, _buffer_mode)
+        self._offset_buffer = love.graphics.newBuffer(_offset_format, self._n_instances, _buffer_mode)
 
         self._position_data = {}
         self._texcoord_data = {}
         self._discard_data = {}
+        self._offset_data = {}
 
         for i = 1, self._n_instances do
             table.insert(self._position_data, {
-                0, 0
+                -1, -1,
+                -1,  1,
+                 1,  1,
+                 1, -1
             })
 
             table.insert(self._texcoord_data, {
-                0, 0
+                0, 0,
+                1, 0,
+                1, 1,
+                0, 1,
             })
 
             table.insert(self._discard_data, {
                 1
             })
+
+            table.insert(self._offset_data, {
+                0, 0
+            })
         end
 
-        self._needs_update = true
+        self._texcoord_needs_update = true
+        self._position_needs_update = true
+        self._discard_needs_update = true
+        self._offset_needs_update = true
     end
 
     --- @brief
     function rt.SpriteBatch:_update()
-        self._position_buffer:setArrayData(self._position_data)
-        self._texcoord_buffer:setArrayData(self._texcoord_data)
-        self._discard_buffer:setArrayData(self._discard_data)
-
-        if self._shader:hasUniform("position_buffer") then
+        if self._position_needs_update == true then
+            self._position_buffer:setArrayData(self._position_data)
             self._shader:send("position_buffer", self._position_buffer)
+            self._position_needs_update = false
         end
 
-        if self._shader:hasUniform("texcoord_buffer") then
+        if self._offset_needs_update == true then
+            self._offset_buffer:setArrayData(self._offset_data)
+            self._shader:send("offset_buffer", self._offset_buffer)
+            self._offset_needs_update = false
+        end
+
+        if self._texcoord_needs_update == true then
+            self._texcoord_buffer:setArrayData(self._texcoord_data)
             self._shader:send("texcoord_buffer", self._texcoord_buffer)
+            self._texcoord_need_update = false
         end
 
-        if self._shader:hasUniform("discard_buffer") then
+        if self._discard_needs_update == true then
+            self._discard_buffer:setArrayData(self._discard_data)
             self._shader:send("discard_buffer", self._discard_buffer)
+            self._discard_needs_update = false
         end
     end
 end
 
 --- @brief
 --- @return Number shape id
-function rt.SpriteBatch:add(x, y, w, h, texture_x, texture_y, texture_w, texture_h)
-    meta.assert_number(x, y, w, h, texture_x, texture_y, texture_w, texture_h)
+function rt.SpriteBatch:add(position_x, position_y, position_w, position_h, texture_x, texture_y, texture_w, texture_h)
+    meta.assert_number(position_x, position_y, position_w, position_h, texture_x, texture_y, texture_w, texture_h)
     local id = self._n_added
-    self._position_data[id + 1] = {x, y}
-    self._texcoord_data[id + 1] = {0, 0}
-    self._discard_data[id + 1] = 0
+
+    local px, py, pw, ph = position_x, position_y, position_w, position_h
+    self._position_data[id] = {
+        px, py,
+        px + pw, py,
+        px + pw, py + ph,
+        px, py + ph
+    }
+
+    local tx, ty, tw, th = texture_x, texture_y, texture_w, texture_h
+    self._texcoord_data[id] = {
+        tx, ty,
+        tx + tw, ty,
+        tx + tw, ty + th,
+        tx, ty + th
+    }
+
+    self._discard_data[id] = {0}
+    self._offset_data[id] = {0, 0}
+
+    self._position_needs_update = true
+    self._discard_needs_update = true
+    self._texcoord_need_update = true
 
     self._n_added = self._n_added + 1
-    self._needs_update = true
     return id
 end
 
 --- @brief
-function rt.SpriteBatch:set_position(id, position_x, position_y)
-    self._position_data[id] = { position_x, position_y }
-    self._needs_update = true
-end
-
---- @brief
-function rt.SpriteBatch:set_texture_coordinates(texture_x, texture_y, texture_w, texture_h)
+function rt.SpriteBatch:set_offset(id, x, y)
+    local offset = self._offset_data[id]
+    offset[1] = x
+    offset[2] = y
+    self._offset_needs_update = true
 end
 
 --- @brief
 function rt.SpriteBatch:draw()
-    if self._needs_update then
-        self._needs_update = false
-        self:_update()
-    end
-
+    self:_update()
     love.graphics.setShader(self._shader)
     love.graphics.drawInstanced(self._shape, self._n_instances)
     love.graphics.setShader()
