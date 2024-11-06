@@ -3,6 +3,7 @@
 #ifdef VERTEX
 
 varying vec2 texture_coordinates;
+varying vec4 vertex_color;
 varying flat int should_discard;
 
 #define BUFFER_LAYOUT layout(std430) readonly
@@ -11,8 +12,15 @@ BUFFER_LAYOUT buffer offset_buffer {
     vec2 offsets[];
 };
 
+struct Position {
+    vec2 _01;
+    vec2 _02;
+    vec2 _03;
+    vec2 _04;
+};
+
 BUFFER_LAYOUT buffer position_buffer {
-    mat2x4 positions[];
+    Position positions[];
 };
 
 BUFFER_LAYOUT buffer texcoord_buffer {
@@ -28,17 +36,29 @@ uniform int n_vertices_per_instance = 4;
 vec4 position(mat4 transform, vec4 vertex_position)
 {
     int instance_id = gl_InstanceID;
-    int vertex_index = instance_id % n_vertices_per_instance;
+    int vertex_id = gl_VertexID % n_vertices_per_instance;
 
-    vertex_position.xy = vec2(
-        positions[instance_id][vertex_index][0],
-        positions[instance_id][vertex_index][1]
-    );
+    vec2 position;
+    if (vertex_id == 0)
+        position = positions[instance_id]._01;
 
+    if (vertex_id == 1)
+        position = positions[instance_id]._02;
+
+    if (vertex_id == 2)
+        position = positions[instance_id]._03;
+
+    if (vertex_id == 3)
+        position = positions[instance_id]._04;
+
+    vertex_position.xy += position.xy;
+
+    /*
     vec2 texture_coordinates = vec2(
-        texcoords[instance_id][vertex_index][0],
-        texcoords[instance_id][vertex_index][1]
+        texcoords[instance_id][vertex_id][0],
+        texcoords[instance_id][vertex_id][1]
     );
+    */
 
     should_discard = discards[instance_id];
 
@@ -51,11 +71,12 @@ vec4 position(mat4 transform, vec4 vertex_position)
 #ifdef PIXEL
 
 varying vec2 texture_coordinates;
+varying vec4 vertex_color;
 varying flat int should_discard;
 
 vec4 effect(vec4, Image image, vec2, vec2)
 {
-    //if (should_discard > 0) discard;
-    return vec4(1); //Texel(image, texture_coordinates);
+    if (should_discard > 0) discard;
+    return Texel(image, texture_coordinates);
 }
 #endif

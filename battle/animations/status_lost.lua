@@ -70,8 +70,8 @@ function bt.Animation.STATUS_LOST:start()
                 texture_w, texture_h
             )
 
-            shape.current_x = x
-            shape.current_y = y
+            shape.current_x = 0
+            shape.current_y = 0
             shape.centroid_x = x + 0.5 * step
             shape.centroid_y = y + 0.5 * step
             shape.rotation = 0

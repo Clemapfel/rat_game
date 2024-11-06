@@ -22,9 +22,8 @@
     </configurations>
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="7fa9ba1b-2cff-4ecc-86fb-59ab2fa76ee1" name="Changes" comment="stashing">
+    <list default="true" id="7fa9ba1b-2cff-4ecc-86fb-59ab2fa76ee1" name="Changes" comment="stashing matrices">
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/battle/animations/status_lost.lua" beforeDir="false" afterPath="$PROJECT_DIR$/battle/animations/status_lost.lua" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/common/sprite_batch.glsl" beforeDir="false" afterPath="$PROJECT_DIR$/common/sprite_batch.glsl" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/common/sprite_batch.lua" beforeDir="false" afterPath="$PROJECT_DIR$/common/sprite_batch.lua" afterDir="false" />
     </list>
@@ -600,15 +599,7 @@
       <workItem from="1729180777153" duration="8566000" />
       <workItem from="1729267430460" duration="1705000" />
       <workItem from="1729269158294" duration="251396000" />
-      <workItem from="1730582354116" duration="45722000" />
-    </task>
-    <task id="LOCAL-01161" summary="refactored to new sim handler">
-      <option name="closed" value="true" />
-      <created>1729708698548</created>
-      <option name="number" value="01161" />
-      <option name="presentableId" value="LOCAL-01161" />
-      <option name="project" value="LOCAL" />
-      <updated>1729708698548</updated>
+      <workItem from="1730582354116" duration="47170000" />
     </task>
     <task id="LOCAL-01162" summary="added new animations">
       <option name="closed" value="true" />
@@ -994,7 +985,15 @@
       <option name="project" value="LOCAL" />
       <updated>1730851482564</updated>
     </task>
-    <option name="localTasksCounter" value="1210" />
+    <task id="LOCAL-01210" summary="stashing matrices">
+      <option name="closed" value="true" />
+      <created>1730854566509</created>
+      <option name="number" value="01210" />
+      <option name="presentableId" value="LOCAL-01210" />
+      <option name="project" value="LOCAL" />
+      <updated>1730854566509</updated>
+    </task>
+    <option name="localTasksCounter" value="1211" />
     <servers />
   </component>
   <component name="TypeScriptGeneratedFilesManager">
@@ -1043,7 +1042,6 @@
     </option>
   </component>
   <component name="VcsManagerConfiguration">
-    <MESSAGE value="fixed underline misalignment" />
     <MESSAGE value="added karo background" />
     <MESSAGE value="consumable lost animation done" />
     <MESSAGE value="consumable gained done" />
@@ -1068,7 +1066,8 @@
     <MESSAGE value="stashing status animation" />
     <MESSAGE value="stashing sprite batch" />
     <MESSAGE value="stashing" />
-    <option name="LAST_COMMIT_MESSAGE" value="stashing" />
+    <MESSAGE value="stashing matrices" />
+    <option name="LAST_COMMIT_MESSAGE" value="stashing matrices" />
   </component>
   <component name="XDebuggerManager">
     <breakpoint-manager>
