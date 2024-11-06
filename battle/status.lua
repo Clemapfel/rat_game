@@ -133,7 +133,7 @@ end, {
     end,
 
     -- (StatusProxy, EntityProxy, EntityProxy) -> nil
-    on_switch = function(self, afflicted, entity_at_old_position)
+    on_swap = function(self, afflicted, entity_at_old_position)
         return nil
     end,
 
@@ -197,7 +197,7 @@ function bt.Status:realize()
         "on_global_status_lost",
         "on_knocked_out",
         "on_killed",
-        "on_switch",
+        "on_swap",
         "on_move_used",
         "on_move_disabled",
         "on_consumable_consumed",

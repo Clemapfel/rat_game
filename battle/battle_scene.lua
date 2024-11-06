@@ -197,16 +197,16 @@ function bt.BattleScene:size_allocate(x, y, width, height)
         tile_size
     )
 
-    local max_party_sprite_h = NEGATIVE_INFINITY
-    for sprite in values(self._party_sprites) do
-        max_party_sprite_h = math.max(max_party_sprite_h, select(2, sprite:measure()))
+    local max_enemy_sprite_h = NEGATIVE_INFINITY
+    for sprite in values(self._enemy_sprites) do
+        max_enemy_sprite_h = math.max(max_enemy_sprite_h, select(2, sprite:measure()))
     end
 
     self:_reformat_enemy_sprites(
         x + 0.5 * width - 0.5 * sprite_w,
         y + outer_margin + tile_size + m,
         sprite_w,
-        height - 2 * outer_margin - tile_size - max_party_sprite_h - 2 * m
+        0.5 * love.graphics.getHeight() + max_enemy_sprite_h
     )
 end
 
@@ -769,10 +769,20 @@ end
 --- @brief [internal]
 function bt.BattleScene:_handle_button_pressed(which)
     if which == rt.InputButton.A then
+        self._simulation_environment.spawn(self._simulation_environment.ENTITY_BOULDER)
+        --[[
         --self:_test_simulation()
-        self:_push_animation(bt.Animation.STATUS_LOST(self, bt.Status("DEBUG_STATUS"), self._enemy_sprites[1]))
+        for sprite in values(self._enemy_sprites) do
+            self:_append_animation(bt.Animation.ENEMY_APPEARED(self, sprite))
+        end
+
+        for sprite in values(self._party_sprites) do
+            self:_append_animation(bt.Animation.ALLY_APPEARED(self, sprite))
+        end
+        --self:_push_animation(bt.Animation.STATUS_LOST(self, bt.Status("DEBUG_STATUS"), self._enemy_sprites[1]))
         --self:_push_animation(bt.Animation.GLOBAL_STATUS_GAINED(self, bt.GlobalStatus("DEBUG_GLOBAL_STATUS")))
         --self:_push_animation(bt.Animation.GLOBAL_STATUS_LOST(self, bt.GlobalStatus("DEBUG_GLOBAL_STATUS")))
+        ]]--
     elseif which == rt.InputButton.B then
         self._animation_queue:skip()
     end

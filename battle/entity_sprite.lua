@@ -1,6 +1,9 @@
 --- @class bt.EntitySprite
 bt.EntitySprite = meta.new_abstract_type("BattleEntitySprite", rt.Widget, {
     _is_visible = true,
+    _speed_visible = true,
+    _health_visible = true,
+    _status_visible = true,
     _is_stunned = false,
     _snapshot = nil, -- rt.RenderTexture
     _snapshot_position_x = 0,
@@ -78,6 +81,21 @@ end
 --- @brief
 function bt.EntitySprite:set_is_visible(b)
     self._is_visible = b
+end
+
+--- @brief
+function bt.EntitySprite:set_health_visible(b)
+    self._health_visible = b
+end
+
+--- @brief
+function bt.EntitySprite:set_speed_visible(b)
+    self._speed_visible = b
+end
+
+--- @brief
+function bt.EntitySprite:set_status_visible(b)
+    self._status_visible = b
 end
 
 --- @brief

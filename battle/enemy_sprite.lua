@@ -96,7 +96,9 @@ end
 
 --- @override
 function bt.EnemySprite:draw()
-    self._status_consumable_bar:draw()
+    if self._status_visible then
+        self._status_consumable_bar:draw()
+    end
 
     if self._selection_state == rt.SelectionState.ACTIVE then
         self._selection_frame:draw()

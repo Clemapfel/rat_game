@@ -118,6 +118,8 @@ end
 
 --- @override
 function bt.PartySprite:draw()
+    if self._is_visible ~= true then return end
+
     self._frame:draw()
     self._snapshot:draw(self._snapshot_position_x, self._snapshot_position_y)
 
@@ -132,9 +134,18 @@ function bt.PartySprite:draw()
     end
 
     self._name:draw()
-    self._speed_value:draw()
-    self._health_bar:draw()
-    self._status_consumable_bar:draw()
+
+    if self._speed_visible then
+        self._speed_value:draw()
+    end
+
+    if self._health_visible then
+        self._health_bar:draw()
+    end
+
+    if self._status_visible then
+        self._status_consumable_bar:draw()
+    end
 
     if self._is_stunned then
         self._stunned_animation:draw()
@@ -164,4 +175,19 @@ end
 function bt.PartySprite:set_selection_state(state)
     self._frame:set_selection_state(state)
     self._gradient_visible = state ~= rt.SelectionState.ACTIVE
+end
+
+--- @override
+function bt.PartySprite:get_position()
+    local frame_x, frame_y, frame_w, frame_h = rt.aabb_unpack(self._frame:get_bounds())
+    local sprite_x, sprite_y, sprite_w, sprite_h = rt.aabb_unpack(self._sprite:get_bounds())
+    return frame_x, frame_y - sprite_h
+end
+
+--- @override
+function bt.PartySprite:measure()
+    local frame_x, frame_y, frame_w, frame_h = rt.aabb_unpack(self._frame:get_bounds())
+    local sprite_x, sprite_y, sprite_w, sprite_h = rt.aabb_unpack(self._sprite:get_bounds())
+
+    return frame_w, frame_y + frame_h - sprite_y
 end

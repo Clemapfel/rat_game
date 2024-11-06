@@ -190,6 +190,13 @@ rt.InterpolationFunctions = meta.new_enum("InterpolationFunction", {
         if frequency == nil then frequency = 2 end
         return math.sign(math.sin(math.pi * frequency * x)) / 2 + 0.5
     end,
+
+    CUBE_EASE_OUT = function(x, order)
+        -- \left(x-1\right)^{3}+1
+        if order == nil then order = 1 end
+        if x < 0 then return 0 elseif x > 1 then return 1 end
+        return (x - 1)^(2 * order + 1) + 1
+    end
 })
 
 --- @class rt.TimedAnimation

@@ -102,7 +102,7 @@ end, {
     end,
 
     -- (ConsumableProxy, EntityProxy, EntityProxy) -> nil
-    on_switch = function(self, holder, entity_at_old_position)
+    on_swap = function(self, holder, entity_at_old_position)
         return nil
     end,
 
@@ -171,7 +171,7 @@ function bt.Consumable:realize()
         "on_knocked_out",
         "on_helped_up",
         "on_killed",
-        "on_switch",
+        "on_swap",
         "on_move_used",
         "on_move_disabled",
         "on_gained",

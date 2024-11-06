@@ -114,12 +114,14 @@ do
         animation._state = rt.AnimationState.FINISHED
         animation:finish()
         animation:signal_emit("finish")
+        rt.savepoint_maybe()
     end
 
     local _start_animation = function(animation)
         animation._state = rt.AnimationState.STARTED
         animation:signal_emit("start")
         animation:start()
+        rt.savepoint_maybe()
     end
 
     --- @brief
@@ -131,7 +133,6 @@ do
         for animation in values(first.animations) do
             if animation._state == rt.AnimationState.IDLE then
                 _start_animation(animation)
-                rt.savepoint_maybe()
                 local res = animation:update(0)
                 if res == rt.AnimationResult.CONTINUE then
                     is_done = false

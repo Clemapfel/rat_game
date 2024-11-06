@@ -57,6 +57,9 @@ bt.String = "String"
 --- @type bt.Boolean
 bt.Boolean = "Boolean"
 
+--- @type bt.Table
+bt.Table = "Table"
+
 for name_type_proxy in range(
     {"entity", bt.Entity, bt.EntityProxy},
     {"move", bt.Move, bt.MoveProxy},
@@ -130,6 +133,7 @@ for which_type in range(
     {"is_number", bt.Number},
     {"is_string", bt.String},
     {"is_boolean", bt.Boolean},
+    {"is_table", bt.Table},
     {"is_entity_proxy", bt.EntityProxy},
     {"is_move_proxy", bt.MoveProxy},
     {"is_status_proxy", bt.StatusProxy},

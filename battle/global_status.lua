@@ -109,7 +109,7 @@ end, {
     end,
 
     -- (GlobalStatusProxy, EntityProxy, EntityProxy) -> nil
-    on_switch = function(self, switched_entity, entity_at_old_position)
+    on_swap = function(self, switched_entity, entity_at_old_position)
         return nil
     end,
 
@@ -175,7 +175,7 @@ function bt.GlobalStatus:realize()
         "on_knocked_out",
         "on_helped_up",
         "on_killed",
-        "on_switch",
+        "on_swap",
         "on_move_used",
         "on_move_disabled",
         "on_consumable_consumed",
