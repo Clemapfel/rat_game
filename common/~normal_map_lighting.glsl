@@ -18,7 +18,6 @@ layout(std430) readonly buffer n_done_counter {
 
 uniform int n_lights;
 
-
 uniform vec3 light_position; // Define the light position as a uniform
 const float ambient_intensity = 0.2; // Set ambient intensity for ambient lighting
 const vec4 light_color = vec4(1, 1, 1, 1);

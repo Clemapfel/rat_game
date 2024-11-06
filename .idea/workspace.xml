@@ -22,13 +22,13 @@
     </configurations>
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="7fa9ba1b-2cff-4ecc-86fb-59ab2fa76ee1" name="Changes" comment="global status sim working">
+    <list default="true" id="7fa9ba1b-2cff-4ecc-86fb-59ab2fa76ee1" name="Changes" comment="stashing status animation">
+      <change afterPath="$PROJECT_DIR$/common/sprite_batch.glsl" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/common/sprite_batch.lua" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/battle/animations/status_lost.lua" beforeDir="false" afterPath="$PROJECT_DIR$/battle/animations/status_lost.lua" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/battle/battle_scene.lua" beforeDir="false" afterPath="$PROJECT_DIR$/battle/battle_scene.lua" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/battle/simulation_handler.lua" beforeDir="false" afterPath="$PROJECT_DIR$/battle/simulation_handler.lua" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/battle/status.lua" beforeDir="false" afterPath="$PROJECT_DIR$/battle/status.lua" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/common/game_state_battle.lua" beforeDir="false" afterPath="$PROJECT_DIR$/common/game_state_battle.lua" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/common/~normal_map_lighting.glsl" beforeDir="false" afterPath="$PROJECT_DIR$/common/~normal_map_lighting.glsl" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/include.lua" beforeDir="false" afterPath="$PROJECT_DIR$/include.lua" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/main.lua" beforeDir="false" afterPath="$PROJECT_DIR$/main.lua" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
@@ -603,15 +603,7 @@
       <workItem from="1729180777153" duration="8566000" />
       <workItem from="1729267430460" duration="1705000" />
       <workItem from="1729269158294" duration="251396000" />
-      <workItem from="1730582354116" duration="35985000" />
-    </task>
-    <task id="LOCAL-01158" summary="added get_priority">
-      <option name="closed" value="true" />
-      <created>1729536223944</created>
-      <option name="number" value="01158" />
-      <option name="presentableId" value="LOCAL-01158" />
-      <option name="project" value="LOCAL" />
-      <updated>1729536223944</updated>
+      <workItem from="1730582354116" duration="42677000" />
     </task>
     <task id="LOCAL-01159" summary="refactored signals">
       <option name="closed" value="true" />
@@ -997,7 +989,15 @@
       <option name="project" value="LOCAL" />
       <updated>1730767718548</updated>
     </task>
-    <option name="localTasksCounter" value="1207" />
+    <task id="LOCAL-01207" summary="stashing status animation">
+      <option name="closed" value="true" />
+      <created>1730835852311</created>
+      <option name="number" value="01207" />
+      <option name="presentableId" value="LOCAL-01207" />
+      <option name="project" value="LOCAL" />
+      <updated>1730835852312</updated>
+    </task>
+    <option name="localTasksCounter" value="1208" />
     <servers />
   </component>
   <component name="TypeScriptGeneratedFilesManager">
@@ -1046,7 +1046,6 @@
     </option>
   </component>
   <component name="VcsManagerConfiguration">
-    <MESSAGE value="status animations done" />
     <MESSAGE value="added see_also" />
     <MESSAGE value="fixed underline misalignment" />
     <MESSAGE value="added karo background" />
@@ -1071,7 +1070,8 @@
     <MESSAGE value="added equip sim" />
     <MESSAGE value="move, equip, and consumable sim done" />
     <MESSAGE value="global status sim working" />
-    <option name="LAST_COMMIT_MESSAGE" value="global status sim working" />
+    <MESSAGE value="stashing status animation" />
+    <option name="LAST_COMMIT_MESSAGE" value="stashing status animation" />
   </component>
   <component name="XDebuggerManager">
     <breakpoint-manager>
