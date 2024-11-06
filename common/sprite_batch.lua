@@ -30,6 +30,10 @@ do
     local _offset_format = {
         { name = "offsets", format = "floatvec2" }
     }
+
+    local _alt_position_format = {
+        { name = "positions", format = "floatmat4x2" }
+    }
     
     local _position_format = {
         { name = "_01", format = "floatvec2" },
@@ -54,12 +58,15 @@ do
     --- @brief
     function rt.SpriteBatch:realize()
         self._shape = love.graphics.newMesh(_vertex_format, _vertex_data, "fan", "static")
-        --self._n_vertices = sizeof(_vertex_data)
+        self._n_vertices = sizeof(_vertex_data)
+        --self._shape:setTexture(self._texture._native)
+
         if self._shader:hasUniform("n_vertices_per_instance") then
             self._shader:send("n_vertices_per_instance", self._n_vertices)
         end
 
         self._position_buffer = love.graphics.newBuffer(_position_format, self._n_instances, _buffer_mode)
+        self._alt_position_buffer = love.graphics.newBuffer(_alt_position_format, self._n_instances, _buffer_mode)
         self._texcoord_buffer = love.graphics.newBuffer(_texcoord_format, self._n_instances, _buffer_mode)
         self._discard_buffer = love.graphics.newBuffer(_discard_format, self._n_instances, _buffer_mode)
         self._offset_buffer = love.graphics.newBuffer(_offset_format, self._n_instances, _buffer_mode)
@@ -71,10 +78,14 @@ do
 
         for i = 1, self._n_instances do
             table.insert(self._position_data, {
+                0, 100, 100, 0,
+                0, 0, 100, 100
+                --[[
                 0, 0,
                 100, 0,
                 100, 100,
                 0, 100
+                ]]--
             })
 
             table.insert(self._texcoord_data, {
@@ -108,6 +119,10 @@ do
         if self._position_needs_update == true then
             self._position_buffer:setArrayData(self._position_data)
             if has("position_buffer") then self._shader:send("position_buffer", self._position_buffer) end
+
+            self._alt_position_buffer:setArrayData(self._position_data)
+            if has("alt_position_buffer") then self._shader:send("alt_position_buffer", self._alt_position_buffer) end
+
             self._position_needs_update = false
         end
 
@@ -143,6 +158,11 @@ function rt.SpriteBatch:add(position_x, position_y, position_w, position_h, text
         px + pw, py,
         px + pw, py + ph,
         px, py + ph,
+    }
+
+    self._position_data[id] = {
+       px, px + pw, px + pw, px,
+       py, py, py + ph, py + ph
     }
 
     local tx, ty, tw, th = texture_x, texture_y, texture_w, texture_h

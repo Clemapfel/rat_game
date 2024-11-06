@@ -23,6 +23,10 @@ BUFFER_LAYOUT buffer position_buffer {
     Position positions[];
 };
 
+BUFFER_LAYOUT buffer position_alt_buffer {
+    mat4x2 alt_positions[];
+};
+
 BUFFER_LAYOUT buffer texcoord_buffer {
     mat4x2 texcoords[];
 };
@@ -51,14 +55,18 @@ vec4 position(mat4 transform, vec4 vertex_position)
     if (vertex_id == 3)
         position = positions[instance_id]._04;
 
-    vertex_position.xy += position.xy;
 
-    /*
-    vec2 texture_coordinates = vec2(
+    position.xy = vec2(
+        alt_positions[instance_id][vertex_id][0],
+        alt_positions[instance_id][vertex_id][1]
+    );
+
+    vertex_position.xy = position.xy;
+
+    texture_coordinates += vec2(
         texcoords[instance_id][vertex_id][0],
         texcoords[instance_id][vertex_id][1]
     );
-    */
 
     should_discard = discards[instance_id];
 
