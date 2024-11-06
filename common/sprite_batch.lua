@@ -18,7 +18,7 @@ do
         {name = "VertexTexCoord", format = "floatvec2"},
     }
 
-    local x, y, width, height = -1, -1, 2, 2
+    local x, y, width, height = -10, -10, 20, 20
     local _vertex_data = {
         { x, y, 0, 0 },
         { x + width, y, 1, 0 },
@@ -87,7 +87,7 @@ do
         end
 
         if self._shader:hasUniform("discard_buffer") then
-            self._sahder:send("discard_buffer", self._discard_buffer)
+            self._shader:send("discard_buffer", self._discard_buffer)
         end
     end
 end

@@ -4,6 +4,7 @@
 
 varying vec4 vertex_color;
 varying vec2 texture_coordinates;
+varying flat int should_discard;
 
 layout(std430) readonly buffer position_buffer {
     vec2 position_data[];
@@ -20,6 +21,8 @@ layout(std430) readonly buffer discard_buffer {
 vec4 position(mat4 transform, vec4 vertex_position)
 {
     int instance_id = gl_InstanceID;
+    should_discard = should_discard_data[instance_id];
+
     int vertex_id = 0;
     if (vertex_position.x < 0 && vertex_position.y < 0) {
         vertex_id = 0;
@@ -48,9 +51,11 @@ vec4 position(mat4 transform, vec4 vertex_position)
 
 varying vec4 vertex_color;
 varying vec2 texture_coordinates;
+varying flat int should_discard;
 
 vec4 effect(vec4, Image image, vec2, vec2)
 {
+    if (should_discard > 0) discard;
     return Texel(image, texture_coordinates) * vertex_color;
 }
 #endif
