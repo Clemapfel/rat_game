@@ -72,7 +72,6 @@ end
 
 --- @overload rt.Drawable.draw
 function rt.Frame:draw()
-
     self._stencil_mask:draw()
     if self._child_valid then
         self:_bind_stencil()
@@ -83,6 +82,8 @@ function rt.Frame:draw()
     self._frame_outline:draw()
     self._frame:draw()
 end
+
+--rt.Frame.draw = function()  end
 
 --- @overload rt.Widget.size_allocate
 function rt.Frame:size_allocate(x, y, width, height)

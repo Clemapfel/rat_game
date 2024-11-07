@@ -29,6 +29,7 @@ rt.Sprite = meta.new_type("Sprite", rt.Widget, rt.Updatable, function(id, index)
         _top_right_child = nil,
         _bottom_left_child = nil,
         _top_left_child = nil,
+        _has_child = false
     })
 end, {
     _shader = rt.Shader(rt.settings.sprite.shader_path)
@@ -83,13 +84,15 @@ function rt.Sprite:draw()
         self._shape:draw()
     end
 
-    for child in range(
-        self._top_right_child,
-        self._bottom_right_child,
-        self._bottom_left_child,
-        self._top_left_child
-    ) do
-        child:draw()
+    if self._has_child then
+        for child in range(
+            self._top_right_child,
+            self._bottom_right_child,
+            self._bottom_left_child,
+            self._top_left_child
+        ) do
+            child:draw()
+        end
     end
 end
 

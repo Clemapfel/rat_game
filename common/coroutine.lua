@@ -55,6 +55,7 @@ rt.savepoint_maybe = function(frame_percentage)
     end
 
     if frame_duration > frame_percentage then
+        dbg("yield")
         coroutine.yield()
     end
 end

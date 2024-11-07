@@ -1,7 +1,7 @@
 rt.settings.battle.priority_queue = {
     first_element_scale_factor = 1.2,
     scale_speed = 4, -- 1x per second
-    element_speed = 10, -- px per second
+    element_speed = 500, -- px per second
 }
 
 --- @class bt.PriorityQueue

@@ -1,3 +1,7 @@
+rt.settings.battle.battle_scene = {
+    enemy_sprite_speed = 100 -- px per second
+}
+
 --- @class bt.BattleScene
 bt.BattleScene = meta.new_type("BattleScene", rt.Scene, function(state)
     return meta.new(bt.BattleScene, {
@@ -282,7 +286,7 @@ function bt.BattleScene:_reformat_enemy_sprites(x, y, width, height)
             aabb.width, aabb.height
         )
         if sprite._battle_scene_motion == nil then
-            sprite._battle_scene_motion = rt.SmoothedMotion1D(0, 5)
+            sprite._battle_scene_motion = rt.SmoothedMotion1D(0, rt.settings.battle.battle_scene.enemy_sprite_speed)
             sprite._battle_scene_motion:set_target_value(0)
         else
             sprite._battle_scene_motion:set_value(old.x - new.x) -- warp so it stays at old position

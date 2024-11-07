@@ -73,8 +73,8 @@ rt.GameState = meta.new_type("GameState", function()
         _render_texture = rt.RenderTexture(),
         _render_shader = rt.Shader("common/game_state_render_shader.glsl"),
         _use_render_texture = false,
-        _use_coroutines = false,    -- use loading screens and background loading
-        _use_scene_caching = true,  -- deallocate a scene
+        _use_coroutines = true,    -- use loading screens and background loading
+        _use_scene_caching = false,  -- deallocate a scene
 
         _loading_screen = rt.LoadingScreen.DEFAULT(),
         _loading_screen_active = true,
@@ -467,7 +467,6 @@ function rt.GameState:_update(delta)
         for i, routine in ipairs(self._active_coroutines) do
             if not routine:get_is_done() then
                 routine:resume()
-                return; -- work trough all routines until first update
             else
                 table.insert(to_remove, i)
             end

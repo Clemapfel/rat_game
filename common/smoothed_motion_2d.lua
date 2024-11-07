@@ -25,8 +25,8 @@ function rt.SmoothedMotion2D:update(delta)
     local distance_x = self._target_position_x - self._current_position_x
     local distance_y = self._target_position_y - self._current_position_y
 
-    local step_x = distance_x * math.sqrt(self._speed) * delta
-    local step_y = distance_y * math.sqrt(self._speed) * delta
+    local step_x = distance_x * self._speed * delta * delta
+    local step_y = distance_y * self._speed * delta * delta
 
     self._current_position_x = self._current_position_x + step_x
     self._current_position_y = self._current_position_y + step_y

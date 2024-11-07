@@ -2,7 +2,7 @@ rt.settings.battle.ordered_box = {
     max_scale = 2,
     scale_speed = 2.5,      -- fraction per second
     opacity_speed = 1.2,    -- fraction per second
-    speed = 10, -- px per second
+    speed = 300, -- px per second
 }
 
 --- @class bt.OrderedBox

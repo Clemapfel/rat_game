@@ -47,11 +47,9 @@ input:signal_connect("keyboard_pressed", function(_, which)
     elseif which == rt.KeyboardKey.FOUR then
         state:set_current_scene(bt.BattleScene)
     elseif which == rt.KeyboardKey.RETURN then
-        profiler_active = true
-        dbg("activated profiler")
+        profiler_active = not profiler_active
     elseif which == rt.KeyboardKey.ESCAPE then
-        --println(rt.profiler.report())
-        dbg("recompile")
+        println(rt.profiler.report())
         background._implementation._shader:recompile()
     end
 end)
@@ -78,6 +76,7 @@ input:signal_connect("pressed", function(_, whgich)
     elseif which == rt.InputButton.B then
 
     elseif which == rt.InputButton.DEBUG then
+        profiler:report()
     end
 end)
 
@@ -96,23 +95,19 @@ love.load = function()
         state:set_current_scene(scene)
     end
     ]]--
-    state:set_current_scene(bt.BattleScene)
+    state:set_current_scene(mn.InventoryScene)
     love.resize(love.graphics.getWidth(), love.graphics.getHeight())
 end
 
 love.update = function(delta)
     background:update(delta)
-
     if profiler_active then
         rt.profiler.push("update")
     end
-
     state:_update(delta)
-
     if profiler_active then
         rt.profiler.pop("update")
     end
-    --midi:update(delta)
 end
 
 love.draw = function()

@@ -5,6 +5,7 @@ rt.SmoothedMotion1D = meta.new_type("SmoothedMotion1D", function(value, speed)
         _speed = speed,
         _current_value = value,
         _target_value = value,
+        _elapsed = 0
     })
 end)
 
@@ -26,7 +27,7 @@ end
 --- @brief
 function rt.SmoothedMotion1D:update(delta)
     local distance = self._target_value - self._current_value
-    local step = distance * math.sqrt(self._speed) * delta
+    local step = distance * self._speed * delta * delta
 
     self._current_value = self._current_value + step
     if  (distance > 0 and self._current_value > self._target_value) or

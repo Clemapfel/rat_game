@@ -56,8 +56,8 @@ rt.Label = meta.new_type("Label", rt.Widget, rt.Updatable, function(text, font, 
         _outline_texture_justify_left_offset = 0,
         _outline_texture_justify_center_offset = 0,
         _outline_texture_justify_right_offset = 0,
-        _outline_texture = rt.RenderTexture(),
-        _swap_texture = rt.RenderTexture(),
+        _outline_texture = nil,
+        _swap_texture = nil,
         _outline_texture_w = 1,
         _outline_texture_h = 1,
 
@@ -790,7 +790,7 @@ do
 
     --- @brief [internal]
     function rt.Label:_update_textures()
-        if self._n_glyphs == 0 then return end
+        if self._n_glyphs == 0 or self._swap_texture == nil then return end
 
         love.graphics.push()
         love.graphics.reset()
