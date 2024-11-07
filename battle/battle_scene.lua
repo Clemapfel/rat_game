@@ -232,11 +232,12 @@ function bt.BattleScene:_reformat_enemy_sprites(x, y, width, height)
     local center_x, center_y = x + 0.5 * width, y + 0.5 * height
 
     self._enemy_sprite_render_order = {}
+    local sprite_i_to_aabb = {}
     local left_x, right_x
     do
         local center_sprite = self._enemy_sprites[1]
         local sprite_w, sprite_h = center_sprite:measure()
-        center_sprite:fit_into(
+        sprite_i_to_aabb[1] = rt.AABB(
             center_x - 0.5 * sprite_w,
             center_y - sprite_h,
             sprite_w, sprite_h
@@ -249,7 +250,6 @@ function bt.BattleScene:_reformat_enemy_sprites(x, y, width, height)
 
     local min_x, max_x = POSITIVE_INFINITY, NEGATIVE_INFINITY
 
-    local sprite_i_to_aabb = {}
     do -- delay fit_into to measure enemy_sprite_x_offset
         local sprite_i = 2
         while sprite_i <= n_enemies do
@@ -271,12 +271,16 @@ function bt.BattleScene:_reformat_enemy_sprites(x, y, width, height)
     end
 
     local enemy_sprite_x_offset = ((x - min_x) + (x + width - max_x)) / 2
-    for sprite_i = 2, n_enemies do
+    for sprite_i = 1, n_enemies do
         local aabb = sprite_i_to_aabb[sprite_i]
-        self._enemy_sprites[sprite_i]:fit_into(
-            aabb.x + enemy_sprite_x_offset,
-            aabb.y, aabb.width, aabb.height
+        local sprite = self._enemy_sprites[sprite_i]
+        local old = sprite:get_bounds()
+        local new = rt.AABB(
+            (aabb.x + enemy_sprite_x_offset), aabb.y,
+            aabb.width, aabb.height
         )
+        sprite._battle_scene_current_x = old.x - new.x
+        sprite:fit_into(new)
     end
 end
 
@@ -423,9 +427,13 @@ function bt.BattleScene:draw()
         sprite:draw()
     end
 
+    love.graphics.translate(self._enemy_sprite_x_offset, 0)
     for sprite in values(self._enemy_sprite_render_order) do
+        love.graphics.translate(sprite._battle_scene_current_x, 0)
         sprite:draw()
+        love.graphics.translate(-sprite._battle_scene_current_x, 0)
     end
+    love.graphics.translate(-self._enemy_sprite_x_offset, 0)
 
     self._priority_queue:draw_bounds()
 
@@ -444,7 +452,6 @@ function bt.BattleScene:draw()
     love.graphics.line(w - left_w, 0, w - left_w, h)
     self._animation_queue:draw()
 
-
     for x in range(
         self._text_box,
         self._priority_queue,
@@ -459,8 +466,25 @@ end
 function bt.BattleScene:update(delta)
     self._text_box:update(delta)
     self._global_status_bar:update(delta)
+
+    local speed = 100
     for sprite in values(self._sprites) do
         sprite:update(delta)
+
+        if sprite._battle_scene_current_x ~= nil then
+            local distance = sprite._battle_scene_current_x
+            if distance < 0 then
+                sprite._battle_scene_current_x = sprite._battle_scene_current_x + speed * delta
+                if sprite._battle_scene_current_x > 0 then
+                    sprite._battle_scene_current_x = 0
+                end
+            else
+                sprite._battle_scene_current_x = sprite._battle_scene_current_x - speed * delta
+                if sprite._battle_scene_current_x < 0 then
+                    sprite._battle_scene_current_x = 0
+                end
+            end
+        end
     end
     self._priority_queue:update(delta)
 

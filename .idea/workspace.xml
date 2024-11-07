@@ -22,23 +22,9 @@
     </configurations>
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="7fa9ba1b-2cff-4ecc-86fb-59ab2fa76ee1" name="Changes" comment="stashing">
-      <change afterPath="$PROJECT_DIR$/battle/animations/ally_appeared.lua" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/battle/animations/enemy_appeared.lua" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/battle/animations/entity_appeared.glsl" afterDir="false" />
+    <list default="true" id="7fa9ba1b-2cff-4ecc-86fb-59ab2fa76ee1" name="Changes" comment="added spawn related animations and sim">
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/battle/battle_scene.lua" beforeDir="false" afterPath="$PROJECT_DIR$/battle/battle_scene.lua" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/battle/consumable.lua" beforeDir="false" afterPath="$PROJECT_DIR$/battle/consumable.lua" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/battle/enemy_sprite.lua" beforeDir="false" afterPath="$PROJECT_DIR$/battle/enemy_sprite.lua" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/battle/entity_sprite.lua" beforeDir="false" afterPath="$PROJECT_DIR$/battle/entity_sprite.lua" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/battle/global_status.lua" beforeDir="false" afterPath="$PROJECT_DIR$/battle/global_status.lua" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/battle/party_sprite.lua" beforeDir="false" afterPath="$PROJECT_DIR$/battle/party_sprite.lua" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/battle/simulation_handler.lua" beforeDir="false" afterPath="$PROJECT_DIR$/battle/simulation_handler.lua" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/battle/status.lua" beforeDir="false" afterPath="$PROJECT_DIR$/battle/status.lua" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/battle/~simulation_handler.lua" beforeDir="false" afterPath="$PROJECT_DIR$/battle/~simulation_handler.lua" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/common/animation_queue.lua" beforeDir="false" afterPath="$PROJECT_DIR$/common/animation_queue.lua" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/common/timed_animation.lua" beforeDir="false" afterPath="$PROJECT_DIR$/common/timed_animation.lua" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/main.lua" beforeDir="false" afterPath="$PROJECT_DIR$/main.lua" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -612,15 +598,7 @@
       <workItem from="1729180777153" duration="8566000" />
       <workItem from="1729267430460" duration="1705000" />
       <workItem from="1729269158294" duration="251396000" />
-      <workItem from="1730582354116" duration="57604000" />
-    </task>
-    <task id="LOCAL-01164" summary="added snapshot">
-      <option name="closed" value="true" />
-      <created>1729709679604</created>
-      <option name="number" value="01164" />
-      <option name="presentableId" value="LOCAL-01164" />
-      <option name="project" value="LOCAL" />
-      <updated>1729709679604</updated>
+      <workItem from="1730582354116" duration="60175000" />
     </task>
     <task id="LOCAL-01165" summary="refactored render texture">
       <option name="closed" value="true" />
@@ -1006,7 +984,15 @@
       <option name="project" value="LOCAL" />
       <updated>1730858136885</updated>
     </task>
-    <option name="localTasksCounter" value="1213" />
+    <task id="LOCAL-01213" summary="added spawn related animations and sim">
+      <option name="closed" value="true" />
+      <created>1730929092459</created>
+      <option name="number" value="01213" />
+      <option name="presentableId" value="LOCAL-01213" />
+      <option name="project" value="LOCAL" />
+      <updated>1730929092459</updated>
+    </task>
+    <option name="localTasksCounter" value="1214" />
     <servers />
   </component>
   <component name="TypeScriptGeneratedFilesManager">
@@ -1055,7 +1041,6 @@
     </option>
   </component>
   <component name="VcsManagerConfiguration">
-    <MESSAGE value="consumable lost animation done" />
     <MESSAGE value="consumable gained done" />
     <MESSAGE value="underlined / strikethrough now also respects n_visible_characters" />
     <MESSAGE value="stashing consumable display rework" />
@@ -1080,7 +1065,8 @@
     <MESSAGE value="stashing matrices" />
     <MESSAGE value="working" />
     <MESSAGE value="stashing" />
-    <option name="LAST_COMMIT_MESSAGE" value="stashing" />
+    <MESSAGE value="added spawn related animations and sim" />
+    <option name="LAST_COMMIT_MESSAGE" value="added spawn related animations and sim" />
   </component>
   <component name="XDebuggerManager">
     <breakpoint-manager>
