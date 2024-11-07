@@ -2,7 +2,8 @@ rt.settings.menu.slots = {
     sprite_resolution = 32,
     sprite_scale = 2,
     frame_unselected_thickness = 1,
-    frame_selected_thickness = 2
+    frame_selected_thickness = 2,
+    snapshot_padding = 5
 }
 
 mn.SlotType = meta.new_enum("SlotType", {
@@ -25,6 +26,11 @@ mn.Slots = meta.new_type("MenuSlots", rt.Widget, function(layout)
         _selected_slots = {},
 
         _frame = rt.Frame(),
+        _snapshot = rt.RenderTexture(),
+        _snapshot_x = 0,
+        _snapshot_y = 0,
+        _slot_x = 0,
+        _slot_y = 0
     })
 end)
 
@@ -61,6 +67,7 @@ function mn.Slots:realize()
                     base = rt.Polygon(0, 0, 1, 1, 1, 0, 0, 1),
                     base_inlay = rt.Circle(0, 0, 1, 1),
                     frame = rt.Polygon(0, 0, 1, 1, 1, 0, 0, 1),
+                    frame_selected = rt.Polygon(0, 0, 1, 1, 1, 0, 0, 1),
                     frame_outline = rt.Polygon(0, 0, 1, 1, 1, 0, 0, 1),
                 }
             elseif type == mn.SlotType.MOVE or type == mn.SlotType.INTRINSIC then
@@ -68,16 +75,20 @@ function mn.Slots:realize()
                     base = rt.Rectangle(0, 0, 1, 1),
                     base_inlay = rt.Circle(0, 0, 1, 1),
                     frame = rt.Rectangle(0, 0, 1, 1),
+                    frame_selected = rt.Rectangle(0, 0, 1, 1),
                     frame_outline = rt.Rectangle(0, 0, 1, 1)
                 }
                 to_insert.base:set_corner_radius(rt.settings.frame.corner_radius)
-                to_insert.frame:set_corner_radius(rt.settings.frame.corner_radius)
+                for frame in range(to_insert.frame, to_insert.frame_selected) do
+                    frame:set_corner_radius(rt.settings.frame.corner_radius)
+                end
                 to_insert.frame_outline:set_corner_radius(rt.settings.frame.corner_radius)
             elseif type == mn.SlotType.CONSUMABLE then
                 to_insert = {
                     base = rt.Circle(0, 0, 1, 1),
                     base_inlay = rt.Circle(0, 0, 1, 1),
                     frame = rt.Circle(0, 0, 1, 1),
+                    frame_selected = rt.Circle(0, 0, 1, 1),
                     frame_outline = rt.Circle(0, 0, 1, 1)
                 }
                 --[[
@@ -99,9 +110,16 @@ function mn.Slots:realize()
             local base_color = rt.Palette.GRAY_5
             to_insert.base:set_color(base_color)
             to_insert.base_inlay:set_color(rt.color_darken(base_color, 0.1))
+
+            for frame in range(to_insert.frame, to_insert.frame_selected) do
+                frame:set_is_outline(true)
+            end
+
             to_insert.frame:set_color(rt.Palette.GRAY_4)
             to_insert.frame:set_line_width(rt.settings.menu.slots.frame_unselected_thickness)
-            to_insert.frame:set_is_outline(true)
+            to_insert.frame_selected:set_color(rt.Palette.SELECTION)
+            to_insert.frame_selected:set_line_width(rt.settings.menu.slots.frame_selected_thickness)
+
             to_insert.frame_outline:set_color(rt.Palette.BACKGROUND_OUTLINE)
             to_insert.frame_outline:set_line_width(3)
             to_insert.frame_outline:set_is_outline(true)
@@ -123,7 +141,8 @@ function mn.Slots:size_allocate(x, y, width, height)
     local m = rt.settings.margin_unit
     local inlay_factor = 0.7
 
-    local start_x, start_y = x + m, y + m
+    local start_x, start_y = 0 + m, 0 + m
+    self._slot_x, self._slot_y = x, y
     local current_x, current_y = start_x, start_y
     local slot_w = rt.settings.menu.slots.sprite_resolution * rt.settings.menu.slots.sprite_scale
     local slot_h = slot_w
@@ -151,15 +170,15 @@ function mn.Slots:size_allocate(x, y, width, height)
                     table.insert(points, point_y)
                 end
 
-                for shape in range(slot.base, slot.frame, slot.frame_outline) do
+                for shape in range(slot.base, slot.frame, slot.frame_selected, slot.frame_outline) do
                     shape:resize(table.unpack(points))
                 end
             elseif slot.type == mn.SlotType.CONSUMABLE then
-                for shape in range(slot.base, slot.frame, slot.frame_outline) do
+                for shape in range(slot.base, slot.frame, slot.frame_selected, slot.frame_outline) do
                     shape:resize(current_x + 0.5 * slot_w, current_y + 0.5 * slot_w, 0.5 * slot_w, 0.5 * slot_h)
                 end
             elseif slot.type == mn.SlotType.MOVE or slot.type == mn.SlotType.INTRINSIC then
-                for shape in range(slot.base, slot.frame, slot.frame_outline) do
+                for shape in range(slot.base, slot.frame, slot.frame_selected, slot.frame_outline) do
                     shape:resize(current_x, current_y, slot_w, slot_h)
                 end
             --[[
@@ -185,7 +204,7 @@ function mn.Slots:size_allocate(x, y, width, height)
 
             slot.base_inlay:resize(current_x + 0.5 * slot_w, current_y + 0.5 * slot_w, 0.5 * inlay_factor * slot_w, 0.5 * inlay_factor * slot_w)
 
-            slot.selection_node:set_bounds(current_x, current_y, slot_w, slot_w)
+            slot.selection_node:set_bounds(current_x + self._slot_x, current_y + self._slot_y, slot_w, slot_w)
 
             local left, right = row[slot_i - 1], row[slot_i + 1]
             slot.selection_node:set_left(nil)
@@ -223,19 +242,31 @@ function mn.Slots:size_allocate(x, y, width, height)
         current_y = current_y + slot_h + slot_vertical_m
     end
 
-    self._frame:fit_into(x, y, width, height)
+    self._frame:fit_into(0, 0, width, height)
 
     for i = 1, self._n_slots do
         self:set_object(i, self._pre_realize_items[i])
     end
     self._pre_realize_items = {}
+
+    local padding = rt.settings.menu.slots.snapshot_padding
+    local snapshot_w, snapshot_h = width + 2 * padding, height + 2 * padding
+    if self._snapshot:get_width() ~= snapshot_w or self._snapshot:get_height() ~= snapshot_h then
+        self._snapshot = rt.RenderTexture(snapshot_w, snapshot_h)
+    end
+
+    self:_update_snapshot()
+    self._snapshot_x, self._snapshot_y = x - padding, y - padding
 end
 
---- @override
-function mn.Slots:draw()
-    if not self:get_is_allocated() then return end
-    self._frame:draw()
+function mn.Slots:_update_snapshot()
+    local padding = rt.settings.menu.slots.snapshot_padding
 
+    love.graphics.push()
+    self._snapshot:bind()
+
+    love.graphics.translate(padding, padding)
+    self._frame:draw()
     for row in values(self._items) do
         for item in values(row) do
             item.base:draw()
@@ -249,10 +280,20 @@ function mn.Slots:draw()
         sprite:draw()
     end
 
+    self._snapshot:unbind()
+    love.graphics.pop()
+end
+
+--- @override
+function mn.Slots:draw()
+    if not self:get_is_allocated() then return end
+    self._snapshot:draw(self._snapshot_x, self._snapshot_y)
+
+    love.graphics.translate(self._slot_x, self._slot_y)
     for item in keys(self._selected_slots) do
-        item.frame_outline:draw()
-        item.frame:draw()
+        item.frame_selected:draw()
     end
+    love.graphics.translate(-self._slot_x, -self._slot_y)
 end
 
 --- @override
@@ -296,6 +337,8 @@ function mn.Slots:set_object(slot_i, object, label)
 
         item.object = object
     end
+
+    self:_update_snapshot()
 end
 
 --- @brief
@@ -308,6 +351,7 @@ function mn.Slots:clear()
     end
 
     self._item_to_sprite = {}
+    self:_update_snapshot()
 end
 
 --- @brief
@@ -326,15 +370,11 @@ function mn.Slots:set_slot_selection_state(slot_i, selection_state)
     local item = self._slot_i_to_item[slot_i]
     local unselected_opacity = 0.5
     if selection_state == rt.SelectionState.ACTIVE then
-        item.frame:set_color(rt.Palette.SELECTION)
-        item.frame:set_line_width(rt.settings.menu.slots.frame_selected_thickness)
         for shape in range(item.base, item.base_inlay, item.frame) do
             shape:set_opacity(1)
         end
         self._selected_slots[item] = true
     elseif selection_state == rt.SelectionState.INACTIVE then
-        item.frame:set_color(rt.Palette.GRAY_4)
-        item.frame:set_line_width(rt.settings.menu.slots.frame_unselected_thickness)
         for shape in range(item.base, item.base_inlay, item.frame) do
             shape:set_opacity(1)
         end
@@ -350,6 +390,7 @@ end
 --- @brief
 function mn.Slots:set_selection_state(state)
     self._frame:set_selection_state(state)
+    self:_update_snapshot()
 end
 
 --- @brief
@@ -366,8 +407,10 @@ function mn.Slots:set_opacity(alpha)
         item.base:set_opacity(alpha)
         item.base_inlay:set_opacity(alpha)
         item.frame:set_opacity(alpha)
+        item.frame_selected:set_opacity(alpha)
         item.frame_outline:set_opacity(alpha)
     end
+    self:_update_snapshot()
 end
 
 --- @brief
@@ -391,9 +434,12 @@ function mn.Slots:sort()
         local to_push = table.pop_front(by_type[item.type])
         self:set_object(slot_i, to_push)
     end
+
+    self:_update_snapshot()
 end
 
 --- @brief
 function mn.Slots:set_slot_object_visible(slot_i, b)
     self._slot_i_to_item[slot_i].is_visible = b
+    self:_update_snapshot()
 end

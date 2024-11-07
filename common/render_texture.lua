@@ -1,8 +1,5 @@
 rt._render_texture_dummy = love.graphics.newCanvas(1, 1)
 
-COUNT = 0
-DELETE_COUNT = 0
-
 -- @class rt.RenderTexture
 --- @param width Number
 --- @param height Number
@@ -29,20 +26,16 @@ rt.RenderTexture = meta.new_type("RenderTexture", rt.Texture, function(width, he
     })
     out:set_scale_mode(rt.TextureScaleMode.NEAREST)
     out:set_wrap_mode(rt.TextureWrapMode.CLAMP)
-    COUNT = COUNT + 1
-    dbg(COUNT, DELETE_COUNT, COUNT - DELETE_COUNT, string.find(debug.traceback(1, 1, 2), "label") ~= nil)
     return out
 end)
 
 --- @brief bind texture as render target, needs to be unbound manually later
 function rt.RenderTexture:bind()
-    if not self._is_valid then return end
     love.graphics.setCanvas({self._native, stencil = true})
 end
 
 --- @brief unbind texture
 function rt.RenderTexture:unbind()
-    if not self._is_valid then return end
     love.graphics.setCanvas()
 end
 
@@ -57,8 +50,6 @@ end
 
 --- @brief
 function rt.RenderTexture:free()
-    if not self._is_valid then return end
+    if self._is_valid == false then return end
     assert(self._native:release(), "RenderTexture was already released")
-    DELETE_COUNT = DELETE_COUNT + 1
-    dbg(COUNT, DELETE_COUNT, COUNT - DELETE_COUNT, string.find(debug.traceback(1, 1, 2), "label") ~= nil)
 end

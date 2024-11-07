@@ -5,7 +5,7 @@ rt.settings.input_controller_state = {
 --- @class rt.InputControllerState
 --- @note if two controllers are connected, both write to the same state, this is intended
 rt.InputControllerState = {
-    components = {},      -- Table<rt.InputController>
+    components = meta.make_weak({}),      -- Table<rt.InputController>
     mapping = {},         -- Table<rt.InputButton, Table<Union<rt.GamepadButton, rt.KeyboardKey>>>
     reverse_mapping = {}, -- Table<love.KeyConstant, Union<rt.GamepadButton, rt.Keyboardkey>>
     deadzone = 0.1,       -- in [0, 1)

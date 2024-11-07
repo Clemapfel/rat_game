@@ -28,7 +28,6 @@ function mn.TabBar:push(widget)
         height = 1
     }
 
-    to_insert.frame:set_child(to_insert.base)
     to_insert.stencil:set_corner_radius(rt.settings.frame.corner_radius)
 
     if self._is_realized == true then
@@ -195,10 +194,9 @@ function mn.TabBar:draw()
     for i, item in ipairs(self._items) do
         if item.is_active then rt.graphics.translate(self._selection_offset_x, self._selection_offset_y) end
         item.frame:draw()
-        rt.graphics.stencil(stencil_value, item.stencil)
-        rt.graphics.set_stencil_test(rt.StencilCompareMode.EQUAL, stencil_value)
+        item.frame:bind_stencil()
         item.widget:draw()
-        rt.graphics.set_stencil_test()
+        item.frame:unbind_stencil()
         if item.is_active then rt.graphics.translate(-self._selection_offset_x, -self._selection_offset_y) end
     end
 end

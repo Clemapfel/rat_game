@@ -146,7 +146,7 @@ end
 function mn.VerboseInfoPanel:draw()
     if self._frame_visible then
         self._frame:draw()
-        self._frame:_bind_stencil()
+        self._frame:bind_stencil()
     end
 
     rt.graphics.translate(0, self._y_offset)
@@ -161,7 +161,7 @@ function mn.VerboseInfoPanel:draw()
     end
 
     if self._frame_visible then
-        self._frame:_unbind_stencil()
+        self._frame:unbind_stencil()
     end
 
     rt.graphics.translate(0, -self._y_offset)

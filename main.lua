@@ -1,4 +1,6 @@
 require "include"
+require "common.leak_scene"
+
 
 local animation = rt.TimedAnimation(1, 0, 2, rt.InterpolationFunctions.LINEAR)
 animation:signal_connect("done", function(self)
@@ -31,7 +33,6 @@ state = rt.GameState()
 state:set_loading_screen(rt.LoadingScreen.DEFAULT)
 state:initialize_debug_state()
 
-
 local background = rt.Background()
 background:set_implementation(rt.Background.KARO_CROSSES)
 
@@ -46,37 +47,15 @@ input:signal_connect("keyboard_pressed", function(_, which)
         state:set_current_scene(mn.KeybindingScene)
     elseif which == rt.KeyboardKey.FOUR then
         state:set_current_scene(bt.BattleScene)
+    elseif which == rt.KeyboardKey.FIVE then
+        state:set_current_scene(rt.LeakScene)
+    elseif which == rt.KeyboardKey.ZERO then
+        state:set_current_scene(nil)
     elseif which == rt.KeyboardKey.RETURN then
         profiler_active = not profiler_active
     elseif which == rt.KeyboardKey.ESCAPE then
         println(rt.profiler.report())
         background._implementation._shader:recompile()
-    end
-end)
-
-local offset = 1
-input:signal_connect("pressed", function(_, which)
-    if which == rt.InputButton.UP then
-        offset = offset + 0.5
-        rt.Label.render_shader:send("shake_offset", offset)
-    elseif which == rt.InputButton.DOWN then
-        offset = offset - 0.5
-        rt.Label.render_shader:send("shake_offset", offset)
-    end
-end)
-
-component = rt.SoundComponent()
-component:signal_connect("finished", function(_)
-    println("done")
-end)
-
-input:signal_connect("pressed", function(_, whgich)
-    if which == rt.InputButton.A then
-        --component:play("test/alarm")
-    elseif which == rt.InputButton.B then
-
-    elseif which == rt.InputButton.DEBUG then
-        profiler:report()
     end
 end)
 
@@ -96,7 +75,9 @@ love.load = function()
     end
     ]]--
 
-    state:set_current_scene(mn.InventoryScene)
+
+    --state:set_current_scene(mn.InventoryScene)
+
     love.resize(love.graphics.getWidth(), love.graphics.getHeight())
 end
 
