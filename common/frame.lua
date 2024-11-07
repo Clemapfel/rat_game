@@ -25,6 +25,8 @@ rt.Frame = meta.new_type("Frame", rt.Widget, function(type)
 
         _color = rt.Palette.FOREGROUND,
         _stencil_color = rt.Palette.BACKGROUND,
+        _stencil_color_override = nil,
+
         _frame_color = rt.Palette.FOREGROUND,
         _outline_color = rt.Palette.BASE_OUTLINE,
 
@@ -38,7 +40,7 @@ end)
 
 function rt.Frame:_update_draw()
     local x, y, w, h = rt.aabb_unpack(self._bounds)
-    local stencil_r, stencil_g, stencil_b, stencil_a = rt.color_unpack(self._stencil_color)
+    local stencil_r, stencil_g, stencil_b, stencil_a = rt.color_unpack(which(self._stencil_color_override, self._stencil_color))
     local frame_r, frame_g, frame_b, frame_a = rt.color_unpack(self._frame_color)
     local outline_r, outline_g, outline_b, outline_a = rt.color_unpack(self._outline_color)
 
@@ -47,6 +49,7 @@ function rt.Frame:_update_draw()
     local corner_radius = self._corner_radius
 
     self.draw = function(self)
+        love.graphics.setLineWidth(thickness + 2)
         love.graphics.setColor(stencil_r, stencil_g, stencil_b, opacity)
         love.graphics.rectangle(
             "fill",
@@ -54,7 +57,6 @@ function rt.Frame:_update_draw()
             corner_radius, corner_radius
         )
 
-        love.graphics.setLineWidth(thickness + 2)
         love.graphics.setColor(outline_r, outline_g, outline_b, opacity)
         love.graphics.rectangle(
             "line",
@@ -69,8 +71,25 @@ function rt.Frame:_update_draw()
             x, y, w, h,
             corner_radius, corner_radius
         )
+    end
 
-        love.graphics.setColor(1, 1, 1, 1)
+    self._draw_frame = function(self)
+        love.graphics.setLineWidth(thickness + 2)
+
+        love.graphics.setColor(outline_r, outline_g, outline_b, opacity)
+        love.graphics.rectangle(
+            "line",
+            x, y, w, h,
+            corner_radius, corner_radius
+        )
+
+        love.graphics.setLineWidth(thickness)
+        love.graphics.setColor(frame_r, frame_g, frame_b, opacity)
+        love.graphics.rectangle(
+            "line",
+            x, y, w, h,
+            corner_radius, corner_radius
+        )
     end
 end
 
@@ -79,9 +98,10 @@ function rt.Frame:bind_stencil()
     love.graphics.setStencilMode("draw", stencil_value)
     local x, y, w, h = rt.aabb_unpack(self._bounds)
     local corner_radius = self._corner_radius
+    local thickness = self._thickness
     love.graphics.rectangle(
         "fill",
-        x, y, w, h,
+        x + thickness, y + thickness, w - 2 * thickness, h - 2 * thickness,
         corner_radius, corner_radius
     )
     love.graphics.setStencilMode("test")
@@ -107,19 +127,18 @@ function rt.Frame:size_allocate(x, y, w, h)
 end
 
 --- @brief
-function rt.Frame:set_color(color, base_color)
+function rt.Frame:set_color(color)
     if meta.is_hsva(color) then
         color = rt.rgba_to_hsva(color)
     end
 
     self._frame_color = color
+    self:_update_draw()
+end
 
-    if base_color ~= nil then
-        self._stencil_color = base_color
-    else
-        self._stencil_color = rt.Palette.BACKGROUND
-    end
-
+--- @brief
+function rt.Frame:set_base_color(color)
+    self._stencil_color_override = color
     self:_update_draw()
 end
 

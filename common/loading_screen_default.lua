@@ -169,6 +169,7 @@ end
 function rt.LoadingScreen.DEFAULT:hide()
     self._label_visible = false
     self._is_active = false
+    self._elapsed = 0
     self._fade_in_elapsed = 0
     self._fade_out_elapsed = 0
     self._shown_emitted = false

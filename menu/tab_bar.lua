@@ -21,7 +21,6 @@ function mn.TabBar:push(widget)
         widget = widget,
         stencil = rt.Rectangle(0, 0, 1, 1),
         frame = rt.Frame(),
-        base = rt.Spacer(),
         is_selected = false,
         is_active = false,
         width = 1,
@@ -236,12 +235,6 @@ function mn.TabBar:set_tab_selected(tab_i, b)
     local item =  self._items[tab_i]
     item.frame:set_selection_state(ternary(b, rt.SelectionState.ACTIVE, rt.SelectionState.INACTIVE))
     item.is_selected = b
-
-    if b then
-        item.base:set_color(rt.settings.frame.selected_base_color)
-    else
-        item.base:set_color(rt.Palette.BACKGROUND)
-    end
 end
 
 --- @brief
@@ -249,9 +242,9 @@ function mn.TabBar:set_tab_active(tab_i, b)
     local item = self._items[tab_i]
     item.is_active = b
     if b == true then
-        item.base:set_color(rt.Palette.GRAY_3)
+        item.frame:set_base_color(rt.color_mix(rt.Palette.GRAY_4, rt.Palette.GRAY_5, 0.5))
     else
-        item.base:set_color(rt.Palette.BACKGROUND)
+        item.frame:set_base_color(rt.Palette.BACKGROUND)
     end
 end
 
@@ -277,6 +270,6 @@ function mn.TabBar:update(delta)
         self._selection_offset_y = 0
     else
         self._selection_offset_x = 0
-        self._selection_offset_y = 0.1 * bounce_f(self._elapsed) *  item.height
+        self._selection_offset_y = 0 --0.1 * bounce_f(self._elapsed) *  item.height
     end
 end

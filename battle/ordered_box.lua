@@ -83,6 +83,8 @@ function bt.OrderedBox:update(delta)
         -- update position
         item.position_animation:update(delta)
         item.current_position_x, item.current_position_y = item.position_animation:get_position()
+        item.current_position_x = math.floor(item.current_position_x)
+        item.current_position_y = math.floor(item.current_position_y)
 
         -- update scale
         local scale_speed = rt.settings.battle.ordered_box.scale_speed

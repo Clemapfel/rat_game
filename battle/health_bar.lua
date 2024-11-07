@@ -46,9 +46,8 @@ function bt.HealthBar:realize()
         outline:set_color(rt.Palette.BACKGROUND_OUTLINE)
     end
 
-    for shape in range(self._backdrop, self._backdrop_outline) do
-        shape:set_corner_radius(rt.settings.frame.corner_radius)
-    end
+    self._backdrop:set_corner_radius(rt.settings.frame.corner_radius)
+    self._backdrop_outline:set_corner_radius(rt.settings.frame.corner_radius - 1)
 
     self._backdrop_outline:set_line_width(2)
     self._shape_outline:set_line_width(2)
@@ -142,14 +141,27 @@ end
 function bt.HealthBar:draw()
     if self._is_realized == false then return end
 
-    local stencil_value = meta.hash(self) % 254 + 1
+    local stencil_value = meta.hash(bt.HealthBar) % 254 + 2
+    rt.graphics.stencil(0, function()
+        local x, y, w, h = rt.aabb_unpack(self._bounds)
+        x = x - 5
+        y = y - 5
+        w = w + 10
+        h = h + 10
+        love.graphics.rectangle("fill", x, y, w, h)
+    end)
+
     self._backdrop:draw()
-    rt.graphics.stencil(stencil_value, self._backdrop)
+    rt.graphics.stencil(stencil_value, function()
+        self._backdrop:draw()
+        self._backdrop_outline:draw()
+    end)
+
     rt.graphics.set_stencil_test(rt.StencilCompareMode.EQUAL, stencil_value)
     self._shape:draw()
     self._shape_outline:draw()
-    rt.graphics.set_stencil_test()
     self._backdrop_outline:draw()
+    rt.graphics.set_stencil_test()
 
     self._label_left:draw()
     self._label_center:draw()

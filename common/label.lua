@@ -227,7 +227,9 @@ function rt.Label:set_text(text)
     if self._is_realized then
         self:_parse()
         self._n_visible_characters = self._n_characters
+        self:_apply_wrapping(self._bounds.width)
         self:_update_textures()
+        self:_update_n_visible_characters()
     end
 end
 

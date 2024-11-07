@@ -123,7 +123,7 @@ function bt.PartySprite:draw()
 
     if self._gradient_visible then
         local value = meta.hash(self) % 254 + 1
-        rt.graphics.stencil(value, self._frame._frame)
+        rt.graphics.stencil(value, self._frame)
         rt.graphics.set_stencil_test(rt.StencilCompareMode.EQUAL, value)
         rt.graphics.set_blend_mode(rt.BlendMode.MULTIPLY, rt.BlendMode.NORMAL)
         self._gradient:draw()

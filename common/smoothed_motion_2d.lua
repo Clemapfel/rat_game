@@ -51,5 +51,5 @@ end
 
 --- @brief
 function rt.SmoothedMotion2D:skip()
-    self._current_position_x, self._current_position_y = self._current_position_x, self._current_position_y
+    self._current_position_x, self._current_position_y = self._target_position_x, self._target_position_y
 end

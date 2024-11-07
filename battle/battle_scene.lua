@@ -1,5 +1,5 @@
 rt.settings.battle.battle_scene = {
-    enemy_sprite_speed = 100 -- px per second
+    enemy_sprite_speed = 500 -- px per second
 }
 
 --- @class bt.BattleScene
@@ -484,7 +484,7 @@ function bt.BattleScene:update(delta)
         sprite:update(delta)
 
         if sprite._battle_scene_motion ~= nil then
-            sprite._battle_scene_motion:update(delta)
+            sprite._battle_scene_motion:update(math.min(delta, 1 / 60)) -- to compensate for lag frames
         end
     end
 

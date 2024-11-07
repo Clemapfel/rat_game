@@ -22,16 +22,17 @@
     </configurations>
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="7fa9ba1b-2cff-4ecc-86fb-59ab2fa76ee1" name="Changes" comment="stashing canvas leak">
-      <change afterPath="$PROJECT_DIR$/common/~frame.lua" afterDir="false" />
+    <list default="true" id="7fa9ba1b-2cff-4ecc-86fb-59ab2fa76ee1" name="Changes" comment="optimized frame">
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/battle/battle_scene.lua" beforeDir="false" afterPath="$PROJECT_DIR$/battle/battle_scene.lua" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/battle/health_bar.lua" beforeDir="false" afterPath="$PROJECT_DIR$/battle/health_bar.lua" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/battle/ordered_box.lua" beforeDir="false" afterPath="$PROJECT_DIR$/battle/ordered_box.lua" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/battle/party_sprite.lua" beforeDir="false" afterPath="$PROJECT_DIR$/battle/party_sprite.lua" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/battle/priority_queue.lua" beforeDir="false" afterPath="$PROJECT_DIR$/battle/priority_queue.lua" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/common/frame.lua" beforeDir="false" afterPath="$PROJECT_DIR$/common/frame.lua" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/common/input_controller.lua" beforeDir="false" afterPath="$PROJECT_DIR$/common/input_controller.lua" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/common/render_texture.lua" beforeDir="false" afterPath="$PROJECT_DIR$/common/render_texture.lua" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/main.lua" beforeDir="false" afterPath="$PROJECT_DIR$/main.lua" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/menu/slots.lua" beforeDir="false" afterPath="$PROJECT_DIR$/menu/slots.lua" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/common/label.lua" beforeDir="false" afterPath="$PROJECT_DIR$/common/label.lua" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/common/smoothed_motion_2d.lua" beforeDir="false" afterPath="$PROJECT_DIR$/common/smoothed_motion_2d.lua" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/menu/tab_bar.lua" beforeDir="false" afterPath="$PROJECT_DIR$/menu/tab_bar.lua" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/menu/verbose_info_panel.lua" beforeDir="false" afterPath="$PROJECT_DIR$/menu/verbose_info_panel.lua" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -606,15 +607,7 @@
       <workItem from="1729267430460" duration="1705000" />
       <workItem from="1729269158294" duration="251396000" />
       <workItem from="1730582354116" duration="62506000" />
-      <workItem from="1730999275580" duration="18233000" />
-    </task>
-    <task id="LOCAL-01169" summary="refactored kill animation">
-      <option name="closed" value="true" />
-      <created>1729799109485</created>
-      <option name="number" value="01169" />
-      <option name="presentableId" value="LOCAL-01169" />
-      <option name="project" value="LOCAL" />
-      <updated>1729799109485</updated>
+      <workItem from="1730999275580" duration="22488000" />
     </task>
     <task id="LOCAL-01170" summary="stashing kill explosion">
       <option name="closed" value="true" />
@@ -1000,7 +993,15 @@
       <option name="project" value="LOCAL" />
       <updated>1731005874320</updated>
     </task>
-    <option name="localTasksCounter" value="1218" />
+    <task id="LOCAL-01218" summary="optimized frame">
+      <option name="closed" value="true" />
+      <created>1731017833262</created>
+      <option name="number" value="01218" />
+      <option name="presentableId" value="LOCAL-01218" />
+      <option name="project" value="LOCAL" />
+      <updated>1731017833262</updated>
+    </task>
+    <option name="localTasksCounter" value="1219" />
     <servers />
   </component>
   <component name="TypeScriptGeneratedFilesManager">
@@ -1049,7 +1050,6 @@
     </option>
   </component>
   <component name="VcsManagerConfiguration">
-    <MESSAGE value="added eating animation" />
     <MESSAGE value="one light working" />
     <MESSAGE value="added normal map palette" />
     <MESSAGE value="added object shatter animation" />
@@ -1074,7 +1074,8 @@
     <MESSAGE value="refactored smoothed motion" />
     <MESSAGE value="stashing coroutine memory leak bug" />
     <MESSAGE value="stashing canvas leak" />
-    <option name="LAST_COMMIT_MESSAGE" value="stashing canvas leak" />
+    <MESSAGE value="optimized frame" />
+    <option name="LAST_COMMIT_MESSAGE" value="optimized frame" />
   </component>
   <component name="XDebuggerManager">
     <breakpoint-manager>

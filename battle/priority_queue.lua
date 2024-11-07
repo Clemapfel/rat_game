@@ -38,9 +38,9 @@ function bt.PriorityQueue:_element_new(entity)
         a = 1
     }
 
+    element.frame:set_thickness(rt.settings.frame.thickness + 1)
     element.frame:realize()
     element.sprite:realize()
-    element.frame:set_child(element.sprite)
 
     local top_color = rt.RGBA(1, 1, 1, 1)
     local bottom_color = rt.RGBA(0.4, 0.4, 0.4, 1)
@@ -57,11 +57,13 @@ function bt.PriorityQueue:_element_new(entity)
 
     element.frame:fit_into(0, 0, sprite_w, sprite_h)
     element.sprite:fit_into(0, 0, sprite_w, sprite_h)
+
+    local frame_w, frame_h = sprite_w + 2 * element.frame:get_thickness(), sprite_h + 2 * element.frame:get_thickness()
     element.gradient:reformat(
         0, 0,
-        sprite_w, 0,
-        sprite_w, sprite_h,
-        0, sprite_h
+        frame_w, 0,
+        frame_w, frame_h,
+        0, frame_h
     )
 
     local thickness = element.frame:get_thickness()
@@ -111,16 +113,23 @@ end
 function bt.PriorityQueue:_element_snapshot(element)
     element.snapshot:bind()
     love.graphics.translate(element.padding, element.padding)
+
     element.frame:draw()
+    element.frame:bind_stencil()
+    element.sprite:draw()
+    element.frame:unbind_stencil()
 
     if element.selection_state ~= rt.SelectionState.ACTIVE then
-        local value = meta.hash(self) % 254 + 1
-        rt.graphics.stencil(value, element.frame._frame)
+        local value = meta.hash(element.frame) % 254 + 1
+        rt.graphics.stencil(value, function()
+            element.frame:_draw_frame()
+        end)
         rt.graphics.set_stencil_test(rt.StencilCompareMode.EQUAL, value)
         rt.graphics.set_blend_mode(rt.BlendMode.MULTIPLY, rt.BlendMode.NORMAL)
         element.gradient:draw()
         rt.graphics.set_stencil_test()
         rt.graphics.set_blend_mode()
+        love.graphics.setStencilMode()
     end
 
     love.graphics.translate(-element.padding, -element.padding)
@@ -276,7 +285,7 @@ end
 --- @brief [internal]
 function bt.PriorityQueue:_element_update_state(element)
     element.frame:set_selection_state(element.selection_state)
-    element.frame._stencil_mask:set_color(rt.Palette.BACKGROUND)
+    element.frame:set_base_color(rt.Palette.BACKGROUND)
     self:_element_snapshot(element)
 
     local r, g, b, a = 1, 1, 1, 1
