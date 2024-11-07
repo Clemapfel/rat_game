@@ -22,9 +22,19 @@
     </configurations>
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="7fa9ba1b-2cff-4ecc-86fb-59ab2fa76ee1" name="Changes" comment="added spawn related animations and sim">
+    <list default="true" id="7fa9ba1b-2cff-4ecc-86fb-59ab2fa76ee1" name="Changes" comment="added enemy sprite reorder">
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/battle/battle_scene.lua" beforeDir="false" afterPath="$PROJECT_DIR$/battle/battle_scene.lua" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/battle/entity_sprite.lua" beforeDir="false" afterPath="$PROJECT_DIR$/battle/entity_sprite.lua" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/battle/health_bar.lua" beforeDir="false" afterPath="$PROJECT_DIR$/battle/health_bar.lua" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/battle/ordered_box.lua" beforeDir="false" afterPath="$PROJECT_DIR$/battle/ordered_box.lua" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/battle/priority_queue.lua" beforeDir="false" afterPath="$PROJECT_DIR$/battle/priority_queue.lua" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/battle/speed_value.lua" beforeDir="false" afterPath="$PROJECT_DIR$/battle/speed_value.lua" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/common/game_state.lua" beforeDir="false" afterPath="$PROJECT_DIR$/common/game_state.lua" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/common/smoothed_motion_1d.lua" beforeDir="false" afterPath="$PROJECT_DIR$/common/smoothed_motion_1d.lua" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/common/smoothed_motion_2d.lua" beforeDir="false" afterPath="$PROJECT_DIR$/common/smoothed_motion_2d.lua" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/common/sprite.lua" beforeDir="false" afterPath="$PROJECT_DIR$/common/sprite.lua" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/physics/body.lua" beforeDir="false" afterPath="$PROJECT_DIR$/physics/body.lua" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -598,15 +608,8 @@
       <workItem from="1729180777153" duration="8566000" />
       <workItem from="1729267430460" duration="1705000" />
       <workItem from="1729269158294" duration="251396000" />
-      <workItem from="1730582354116" duration="60175000" />
-    </task>
-    <task id="LOCAL-01165" summary="refactored render texture">
-      <option name="closed" value="true" />
-      <created>1729712484932</created>
-      <option name="number" value="01165" />
-      <option name="presentableId" value="LOCAL-01165" />
-      <option name="project" value="LOCAL" />
-      <updated>1729712484932</updated>
+      <workItem from="1730582354116" duration="62506000" />
+      <workItem from="1730999275580" duration="865000" />
     </task>
     <task id="LOCAL-01166" summary="implemented stun animation">
       <option name="closed" value="true" />
@@ -992,7 +995,15 @@
       <option name="project" value="LOCAL" />
       <updated>1730929092459</updated>
     </task>
-    <option name="localTasksCounter" value="1214" />
+    <task id="LOCAL-01214" summary="added enemy sprite reorder">
+      <option name="closed" value="true" />
+      <created>1730938144461</created>
+      <option name="number" value="01214" />
+      <option name="presentableId" value="LOCAL-01214" />
+      <option name="project" value="LOCAL" />
+      <updated>1730938144461</updated>
+    </task>
+    <option name="localTasksCounter" value="1215" />
     <servers />
   </component>
   <component name="TypeScriptGeneratedFilesManager">
@@ -1041,7 +1052,6 @@
     </option>
   </component>
   <component name="VcsManagerConfiguration">
-    <MESSAGE value="consumable gained done" />
     <MESSAGE value="underlined / strikethrough now also respects n_visible_characters" />
     <MESSAGE value="stashing consumable display rework" />
     <MESSAGE value="stashing TODO" />
@@ -1066,7 +1076,8 @@
     <MESSAGE value="working" />
     <MESSAGE value="stashing" />
     <MESSAGE value="added spawn related animations and sim" />
-    <option name="LAST_COMMIT_MESSAGE" value="added spawn related animations and sim" />
+    <MESSAGE value="added enemy sprite reorder" />
+    <option name="LAST_COMMIT_MESSAGE" value="added enemy sprite reorder" />
   </component>
   <component name="XDebuggerManager">
     <breakpoint-manager>

@@ -128,7 +128,7 @@ function b2.Body:set_centroid(point_x, point_y)
     local current = box2d.b2Body_GetTransform(self._native)
     if point_x ~= nil then current.p.x = point_x * scale end
     if point_y ~= nil then current.p.y = point_y * scale end
-    box2d.b2Body_SetTransform(self._native, current)
+    box2d.b2Body_SetTransform(self._native, current.p, current.q)
 end
 
 --- @brief

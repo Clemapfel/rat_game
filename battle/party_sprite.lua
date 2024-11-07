@@ -87,8 +87,6 @@ function bt.PartySprite:size_allocate(x, y, width, height)
 
     local sprite_overlap = 0.3;
     local sprite_w, sprite_h = self._sprite:get_resolution()
-    sprite_w = sprite_w * 3
-    sprite_h = sprite_h * 3
     self._sprite:fit_into(
         0, 0,
         sprite_w,

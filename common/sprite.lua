@@ -40,11 +40,7 @@ function rt.Sprite:realize()
 
     self._spritesheet = rt.SpriteAtlas:get(self._id)
     if self._spritesheet == nil then
-        self._is_valid = false
-        self._shape:set_color(rt.RGBA(1, 0, 1, 1))
-        return
-    else
-        self._is_valid = true
+        self._spritesheet = rt.SpriteAtlas:get("why")
     end
 
     self._frame_duration = 1 / self._spritesheet:get_fps()
@@ -99,7 +95,7 @@ end
 
 --- @override
 function rt.Sprite:update(delta)
-    if self._is_realized == true and self._is_valid then
+    if self._is_realized == true then
         self._elapsed = self._elapsed + delta
         local start = self._frame_range_start
         local n_frames = self._frame_range_end - self._frame_range_start + 1
@@ -126,7 +122,7 @@ end
 --- @brief
 function rt.Sprite:set_frame(i)
     self._current_frame = i
-    if self._is_realized == true and self._is_valid then
+    if self._is_realized == true then
         local frame = self._spritesheet:get_frame(self._current_frame)
         self._shape:reformat_texture_coordinates(
             frame.x, frame.y,
@@ -145,7 +141,6 @@ end
 --- @brief
 function rt.Sprite:set_animation(id)
     if self:get_is_realized() == false then self:realize() end
-    if not self._is_valid then return end
     if id == "" or id == nil then
         self:set_frame(1)
         self._frame_range_start = 1
@@ -173,7 +168,6 @@ end
 
 --- @brief
 function rt.Sprite:has_animation(id)
-    if self._is_valid == false then return false end
     return self._spritesheet:has_frame(id)
 end
 
@@ -241,7 +235,6 @@ end
 --- @brief
 function rt.Sprite:get_resolution()
     if not self._is_realized then self:realize() end
-    if not self._is_valid then return 16, 16 end
     return self._width, self._height
 end
 
@@ -260,7 +253,6 @@ end
 
 --- @brief
 function rt.Sprite:get_n_frames(animation_id_maybe)
-    if self._is_valid == false then return 1 end
     return self._spritesheet:get_n_frames(animation_id_maybe)
 end
 

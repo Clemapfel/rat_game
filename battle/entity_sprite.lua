@@ -121,6 +121,13 @@ function bt.EntitySprite:get_position()
     return self._snapshot_position_x, self._snapshot_position_y
 end
 
+--- @brief
+function bt.EntitySprite:skip()
+    self._health_bar:skip()
+    self._speed_value:skip()
+    self._status_consumable_bar:skip()
+end
+
 
 
 

@@ -85,6 +85,8 @@ function bt.BattleScene:create_from_state()
 
     self._simulation_environment = self:create_simulation_environment()
     self._priority_queue:reorder(self._state:list_entities_in_order())
+
+    self:skip()
 end
 
 --- @override
@@ -279,7 +281,12 @@ function bt.BattleScene:_reformat_enemy_sprites(x, y, width, height)
             (aabb.x + enemy_sprite_x_offset), aabb.y,
             aabb.width, aabb.height
         )
-        sprite._battle_scene_current_x = old.x - new.x
+        if sprite._battle_scene_motion == nil then
+            sprite._battle_scene_motion = rt.SmoothedMotion1D(0, 5)
+            sprite._battle_scene_motion:set_target_value(0)
+        else
+            sprite._battle_scene_motion:set_value(old.x - new.x) -- warp so it stays at old position
+        end
         sprite:fit_into(new)
     end
 end
@@ -429,9 +436,10 @@ function bt.BattleScene:draw()
 
     love.graphics.translate(self._enemy_sprite_x_offset, 0)
     for sprite in values(self._enemy_sprite_render_order) do
-        love.graphics.translate(sprite._battle_scene_current_x, 0)
+        local offset = sprite._battle_scene_motion:get_value()
+        love.graphics.translate(offset, 0)
         sprite:draw()
-        love.graphics.translate(-sprite._battle_scene_current_x, 0)
+        love.graphics.translate(-offset, 0)
     end
     love.graphics.translate(-self._enemy_sprite_x_offset, 0)
 
@@ -467,27 +475,16 @@ function bt.BattleScene:update(delta)
     self._text_box:update(delta)
     self._global_status_bar:update(delta)
 
-    local speed = 100
+    local speed = 300
     for sprite in values(self._sprites) do
         sprite:update(delta)
 
-        if sprite._battle_scene_current_x ~= nil then
-            local distance = sprite._battle_scene_current_x
-            if distance < 0 then
-                sprite._battle_scene_current_x = sprite._battle_scene_current_x + speed * delta
-                if sprite._battle_scene_current_x > 0 then
-                    sprite._battle_scene_current_x = 0
-                end
-            else
-                sprite._battle_scene_current_x = sprite._battle_scene_current_x - speed * delta
-                if sprite._battle_scene_current_x < 0 then
-                    sprite._battle_scene_current_x = 0
-                end
-            end
+        if sprite._battle_scene_motion ~= nil then
+            sprite._battle_scene_motion:update(delta)
         end
     end
-    self._priority_queue:update(delta)
 
+    self._priority_queue:update(delta)
     self._animation_queue:update(delta)
 end
 
@@ -790,6 +787,22 @@ function bt.BattleScene:activate_global_status(status, on_done_notify)
     self._global_status_bar:activate(sprite, on_done_notify)
 end
 
+--- @brief
+function bt.BattleScene:skip()
+    for sprite in values(self._enemy_sprites) do
+        if sprite._battle_scene_motion ~= nil then
+            sprite._battle_scene_motion:skip()
+        end
+    end
+
+    for sprite in values(self._sprites) do
+        sprite:skip()
+    end
+
+    self._priority_queue:skip()
+    self._animation_queue:skip()
+end
+
 --- @brief [internal]
 function bt.BattleScene:_handle_button_pressed(which)
     if which == rt.InputButton.A then
@@ -808,7 +821,7 @@ function bt.BattleScene:_handle_button_pressed(which)
         --self:_push_animation(bt.Animation.GLOBAL_STATUS_LOST(self, bt.GlobalStatus("DEBUG_GLOBAL_STATUS")))
         ]]--
     elseif which == rt.InputButton.B then
-        self._animation_queue:skip()
+        self:skip()
     end
     --[[
     if which == rt.InputButton.A then

@@ -185,3 +185,9 @@ end
 function bt.HealthBar:get_value()
     return self._target_value
 end
+
+--- @brief
+function bt.HealthBar:skip()
+    self._current_value = self._target_value
+    self:_update_value()
+end

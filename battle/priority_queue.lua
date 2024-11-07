@@ -1,6 +1,7 @@
 rt.settings.battle.priority_queue = {
     first_element_scale_factor = 1.2,
     scale_speed = 4, -- 1x per second
+    element_speed = 10, -- px per second
 }
 
 --- @class bt.PriorityQueue
@@ -79,7 +80,11 @@ end
 --- @brief [internal]
 function bt.PriorityQueue:_element_set_multiplicity(element, n)
     while element.multiplicity < n do
-        table.insert(element.motions, rt.SmoothedMotion2D(0.5 * rt.graphics.get_width(), 0.5 * rt.graphics.get_height())) --rt.graphics.get_width() + element.width, 0.5 * rt.graphics.get_height()))
+        table.insert(element.motions, rt.SmoothedMotion2D(
+            0.5 * rt.graphics.get_width(),
+            0.5 * rt.graphics.get_height(),
+            rt.settings.battle.priority_queue.element_speed
+        )) --rt.graphics.get_width() + element.width, 0.5 * rt.graphics.get_height()))
         element.multiplicity = element.multiplicity + 1
     end
 
@@ -319,4 +324,13 @@ end
 --- @brief
 function bt.PriorityQueue:consume_first(n)
     self._n_consumed = self._n_consumed + 1
+end
+
+--- @brief
+function bt.PriorityQueue:skip()
+    for item in values(self._entity_to_item) do
+        for motion in values(item.motions) do
+            motion:skip()
+        end
+    end
 end

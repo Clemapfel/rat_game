@@ -16,7 +16,7 @@ end)
 
 --- @brief
 function bt.SpeedValue:_format_value()
-    return tostring(math.round(self._current_value))
+    return "<o><b>" .. tostring(math.round(self._current_value)) .. "</o></b>"
 end
 
 --- @brief
@@ -29,8 +29,7 @@ end
 function bt.SpeedValue:realize()
     if self:already_realized() then return end
 
-    local speed_string = self:_format_value()
-    self._label = rt.Label("<o><b>" .. speed_string .. "</o></b>")
+    self._label = rt.Label(self:_format_value())
     self._label:set_justify_mode(rt.JustifyMode.LEFT)
     self._label:realize()
     self._motion_animation:set_value(self._current_value)

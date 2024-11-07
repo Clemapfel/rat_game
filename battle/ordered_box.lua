@@ -2,6 +2,7 @@ rt.settings.battle.ordered_box = {
     max_scale = 2,
     scale_speed = 2.5,      -- fraction per second
     opacity_speed = 1.2,    -- fraction per second
+    speed = 10, -- px per second
 }
 
 --- @class bt.OrderedBox
@@ -199,7 +200,7 @@ function bt.OrderedBox:size_allocate(x, y, width, height)
         end
 
         if item.position_animation == nil then
-            item.position_animation = rt.SmoothedMotion2D(item.current_position_x, item.current_position_y)
+            item.position_animation = rt.SmoothedMotion2D(item.current_position_x, item.current_position_y, rt.settings.battle.ordered_box.speed)
         end
         item.position_animation:set_target_position(target_position_x, target_position_y)
     end
@@ -239,9 +240,7 @@ function bt.OrderedBox:skip()
             item.on_opacity_reached_0 = nil
         end
 
-        item.current_position_x = item.target_position_x
-        item.current_position_y = item.target_position_y
-        item.position_animation:set_position(item.target_position_x, item.target_position_y)
+        item.position_animation:skip()
     end
 end
 
