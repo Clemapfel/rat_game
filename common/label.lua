@@ -62,7 +62,8 @@ rt.Label = meta.new_type("Label", rt.Widget, rt.Updatable, function(text, font, 
         _outline_texture_h = 1,
 
         _width = 0,
-        _height = 0
+        _height = 0,
+        _first_wrap = true
     })
     return out
 end, {
@@ -189,9 +190,13 @@ end
 
 --- @override
 function rt.Label:size_allocate(x, y, width, height)
-    self:_apply_wrapping(width)
+    if self._first_wrap or width ~= self._bounds.width then
+        self:_apply_wrapping(width)
+    end
+
     self:_update_textures()
     self:_update_n_visible_characters()
+    self._first_wrap = false
 end
 
 --- @override
@@ -759,18 +764,13 @@ do
         self._outline_texture_height = outline_texture_h
 
         if self._use_outline and self._width > 0 and self._height > 0 then
-            if self._outline_texture ~= nil then
-                self._outline_texture:free()
-            end
+            if self._outline_texture ~= nil then self._outline_texture:free() end
             self._outline_texture = rt.RenderTexture(outline_texture_w, outline_texture_h, 4, "rgba4")
             self.outline_shader:send("texture_resolution", {outline_texture_w, outline_texture_h})
             self.outline_shader:send("outline_color", { rt.color_unpack(rt.Palette.BLACK) })
         end
 
-        if self._swap_texture ~= nil then
-            self._swap_texture:free()
-        end
-
+        if self._swap_texture ~= nil then self._swap_texture:free() end
         self._swap_texture = rt.RenderTexture(outline_texture_w, outline_texture_h, 4, "rgba4")
         self:_update_n_visible_characters()
     end

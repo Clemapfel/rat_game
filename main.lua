@@ -95,6 +95,7 @@ love.load = function()
         state:set_current_scene(scene)
     end
     ]]--
+
     state:set_current_scene(mn.InventoryScene)
     love.resize(love.graphics.getWidth(), love.graphics.getHeight())
 end

@@ -1,6 +1,4 @@
 rt.coroutine = {}
-rt.coroutine.frame_start = love.timer.getTime()
-rt.coroutine.n_active = 0
 
 --- @class rt.CoroutineStatus
 rt.CoroutineStatus = meta.new_enum("CoroutineStatus", {
@@ -10,20 +8,34 @@ rt.CoroutineStatus = meta.new_enum("CoroutineStatus", {
     DONE = "dead"
 })
 
---- @class rt.Coroutine
-rt.Coroutine = meta.new_type("Coroutine", function(coroutine_callback, start_immediately)
-    if start_immediately == nil then start_immediately = false end
-    local out = meta.new(rt.Coroutine, {
-        _native = coroutine.create(function(...)
-            rt.coroutine.n_active = rt.coroutine.n_active + 1
-            coroutine_callback(...)
-            rt.coroutine.n_active = rt.coroutine.n_active - 1
-        end)
-    })
+do
+    local _frame_start = love.timer.getTime()
+    local _n_active = 0
 
-    if start_immediately == true then coroutine.resume(out._native) end
-    return out
-end)
+    --- @class rt.Coroutine
+    rt.Coroutine = meta.new_type("Coroutine", function(coroutine_callback, start_immediately)
+        if start_immediately == nil then start_immediately = false end
+        local out = meta.new(rt.Coroutine, {
+            _native = coroutine.create(function(...)
+                _n_active = _n_active + 1
+                coroutine_callback(...)
+                _n_active = _n_active - 1
+            end)
+        })
+
+        if start_immediately == true then coroutine.resume(out._native) end
+        return out
+    end)
+
+    local _get_time = love.timer.getTime
+    rt.savepoint_maybe = function(frame_percentage)
+        if _n_active <= 0 then return end
+        if _get_time() - rt.graphics.frame_start > 2 / 60 then
+            coroutine.yield()
+        end
+    end
+
+end -- do-end
 
 --- @brief
 function rt.Coroutine:start(...)
@@ -42,22 +54,6 @@ end
 --- @brief
 rt.savepoint = function()
     coroutine.yield()
-end
-
---- @brief
-rt.savepoint_maybe = function(frame_percentage)
-    if rt.coroutine.n_active <= 0 then return end
-    if frame_percentage == nil then frame_percentage = 0.5 end
-    local frame_duration = rt.graphics.get_frame_duration() / (1 / rt.graphics.get_target_fps())
-
-    if frame_duration > 2 then
-        --rt.log("In rt.savepoint_maybe: Lag frame detected, exceeded frame duration by " .. math.round((frame_duration - 1) * 100) .. "%\n" .. debug.traceback())
-    end
-
-    if frame_duration > frame_percentage then
-        dbg("yield")
-        coroutine.yield()
-    end
 end
 
 --- @brief

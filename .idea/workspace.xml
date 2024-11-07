@@ -22,20 +22,11 @@
     </configurations>
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="7fa9ba1b-2cff-4ecc-86fb-59ab2fa76ee1" name="Changes" comment="refactored smoothed motion">
+    <list default="true" id="7fa9ba1b-2cff-4ecc-86fb-59ab2fa76ee1" name="Changes" comment="stashing coroutine memory leak bug">
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/battle/battle_scene.lua" beforeDir="false" afterPath="$PROJECT_DIR$/battle/battle_scene.lua" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/battle/ordered_box.lua" beforeDir="false" afterPath="$PROJECT_DIR$/battle/ordered_box.lua" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/battle/priority_queue.lua" beforeDir="false" afterPath="$PROJECT_DIR$/battle/priority_queue.lua" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/common/coroutine.lua" beforeDir="false" afterPath="$PROJECT_DIR$/common/coroutine.lua" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/common/frame.lua" beforeDir="false" afterPath="$PROJECT_DIR$/common/frame.lua" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/common/game_state.lua" beforeDir="false" afterPath="$PROJECT_DIR$/common/game_state.lua" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/common/label.lua" beforeDir="false" afterPath="$PROJECT_DIR$/common/label.lua" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/common/render_texture.lua" beforeDir="false" afterPath="$PROJECT_DIR$/common/render_texture.lua" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/common/smoothed_motion_1d.lua" beforeDir="false" afterPath="$PROJECT_DIR$/common/smoothed_motion_1d.lua" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/common/smoothed_motion_2d.lua" beforeDir="false" afterPath="$PROJECT_DIR$/common/smoothed_motion_2d.lua" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/common/sprite.lua" beforeDir="false" afterPath="$PROJECT_DIR$/common/sprite.lua" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/main.lua" beforeDir="false" afterPath="$PROJECT_DIR$/main.lua" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -610,15 +601,7 @@
       <workItem from="1729267430460" duration="1705000" />
       <workItem from="1729269158294" duration="251396000" />
       <workItem from="1730582354116" duration="62506000" />
-      <workItem from="1730999275580" duration="3839000" />
-    </task>
-    <task id="LOCAL-01167" summary="refactored widget realization">
-      <option name="closed" value="true" />
-      <created>1729793618780</created>
-      <option name="number" value="01167" />
-      <option name="presentableId" value="LOCAL-01167" />
-      <option name="project" value="LOCAL" />
-      <updated>1729793618780</updated>
+      <workItem from="1730999275580" duration="6307000" />
     </task>
     <task id="LOCAL-01168" summary="fixed battle scene layout">
       <option name="closed" value="true" />
@@ -1004,7 +987,15 @@
       <option name="project" value="LOCAL" />
       <updated>1731000318840</updated>
     </task>
-    <option name="localTasksCounter" value="1216" />
+    <task id="LOCAL-01216" summary="stashing coroutine memory leak bug">
+      <option name="closed" value="true" />
+      <created>1731003239018</created>
+      <option name="number" value="01216" />
+      <option name="presentableId" value="LOCAL-01216" />
+      <option name="project" value="LOCAL" />
+      <updated>1731003239018</updated>
+    </task>
+    <option name="localTasksCounter" value="1217" />
     <servers />
   </component>
   <component name="TypeScriptGeneratedFilesManager">
@@ -1053,7 +1044,6 @@
     </option>
   </component>
   <component name="VcsManagerConfiguration">
-    <MESSAGE value="stashing consumable display rework" />
     <MESSAGE value="stashing TODO" />
     <MESSAGE value="added eating animation" />
     <MESSAGE value="one light working" />
@@ -1078,7 +1068,8 @@
     <MESSAGE value="added spawn related animations and sim" />
     <MESSAGE value="added enemy sprite reorder" />
     <MESSAGE value="refactored smoothed motion" />
-    <option name="LAST_COMMIT_MESSAGE" value="refactored smoothed motion" />
+    <MESSAGE value="stashing coroutine memory leak bug" />
+    <option name="LAST_COMMIT_MESSAGE" value="stashing coroutine memory leak bug" />
   </component>
   <component name="XDebuggerManager">
     <breakpoint-manager>

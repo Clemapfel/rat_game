@@ -74,14 +74,15 @@ rt.GameState = meta.new_type("GameState", function()
         _render_shader = rt.Shader("common/game_state_render_shader.glsl"),
         _use_render_texture = false,
         _use_coroutines = true,    -- use loading screens and background loading
-        _use_scene_caching = false,  -- deallocate a scene
+        _use_scene_caching = false,  -- keep scenes after allocating them once
 
         _loading_screen = rt.LoadingScreen.DEFAULT(),
         _loading_screen_active = true,
         _bounds = rt.AABB(0, 0, rt.graphics.get_width(), rt.graphics.get_height()),
         _current_scene = nil,
         _scenes = {}, -- Table<meta.Type, rt.Scene>
-        _active_coroutines = {} -- Table<rt.Coroutine>
+        _active_coroutines = {}, -- Table<rt.Coroutine>
+        _n_active_coroutines = 0
     })
 
     out:realize()
@@ -416,30 +417,17 @@ function rt.GameState:_resize(new_width, new_height)
     if self._use_coroutines then
         self:_loading_screen_show(function()
             table.insert(self._active_coroutines, rt.Coroutine(function()
-                rt.savepoint_maybe()
-                if self._use_scene_caching then
-                    for scene in values(self._scenes) do
-                        scene:fit_into(0, 0, self._state.resolution_x, self._state.resolution_y)
-                        rt.savepoint_maybe()
-                    end
-                else
-                    if self._current_scene ~= nil then
-                        self._current_scene:fit_into(0, 0, self._state.resolution_x, self._state.resolution_y)
-                        rt.savepoint_maybe()
-                    end
+                if self._current_scene ~= nil then
+                    self._current_scene:fit_into(0, 0, self._state.resolution_x, self._state.resolution_y)
+                    rt.savepoint_maybe()
                 end
                 self:_loading_screen_hide()
             end))
+            self._n_active_coroutines = self._n_active_coroutines + 1
         end)
     else
-        if self._use_scene_caching then
-            for scene in values(self._scenes) do
-                scene:fit_into(0, 0, self._state.resolution_x, self._state.resolution_y)
-            end
-        else
-            if self._current_scene ~= nil then
-                self._current_scene:fit_into(0, 0, self._state.resolution_x, self._state.resolution_y)
-            end
+        if self._current_scene ~= nil then
+            self._current_scene:fit_into(0, 0, self._state.resolution_x, self._state.resolution_y)
         end
     end
 end
@@ -450,36 +438,24 @@ function rt.GameState:_update(delta)
 
     if self._loading_screen_active then
         self._loading_screen:update(delta)
+    elseif self._current_scene ~= nil then
+        self._current_scene:update(delta)
+        self._current_scene:signal_emit("update")
     end
 
     if self._use_coroutines then
-        table.insert(self._active_coroutines, rt.Coroutine(function()
-            if self._current_scene ~= nil then
-                self._current_scene:update(delta)
-                self._current_scene:signal_emit("update")
-            end
-        end))
-
-        local n = sizeof(self._active_coroutines)
         local to_remove = {}
-        local max_n_routines = 2;
-        local n_routines = 0;
-        for i, routine in ipairs(self._active_coroutines) do
-            if not routine:get_is_done() then
-                routine:resume()
+        for i, coroutine in ipairs(self._active_coroutines) do
+            if coroutine:get_is_done() then
+                table.insert(to_remove, 1, i)
             else
-                table.insert(to_remove, i)
+                coroutine:resume()
             end
         end
 
-        table.sort(to_remove, function(a, b) return a > b end)
         for i in values(to_remove) do
             table.remove(self._active_coroutines, i)
-        end
-    else
-        if self._current_scene ~= nil then
-            self._current_scene:update(delta)
-            self._current_scene:signal_emit("update")
+            self._n_active_coroutines = self._n_active_coroutines - 1
         end
     end
 end
@@ -575,6 +551,7 @@ function rt.GameState:set_current_scene(scene_type)
                 self._current_scene:make_active()
             end
         end))
+        self._n_active_coroutines = self._n_active_coroutines + 1
     else
         if self._current_scene ~= nil then
             self._current_scene:make_inactive()
