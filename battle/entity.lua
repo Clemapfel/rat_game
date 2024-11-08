@@ -184,8 +184,14 @@ function bt.Entity:get_ai_level()
 end
 
 --- @brief
-function bt.Entity:get_sprite_id()
-    return self.sprite_id, self.sprite_index
+function bt.Entity:get_sprite_id(state)
+    if state == nil or self._state == bt.EntityState.ALIVE then
+        return self.sprite_id, self.sprite_index
+    elseif self._state == bt.EntityState.KNOCKED_OUT then
+        return self.knocked_out_sprite_id, self.knocked_out_sprite_index
+    elseif self._state == bt.EntityState.DEAD then
+        return self.dead_sprite_id, self.dead_sprite_index
+    end
 end
 
 --- @brief

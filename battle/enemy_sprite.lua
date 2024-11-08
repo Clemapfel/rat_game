@@ -5,6 +5,8 @@ rt.settings.battle.enemy_sprite = {
 --- @class bt.EnemySprite
 bt.EnemySprite = meta.new_type("EnemySprite", bt.EntitySprite, function(entity)
     return meta.new(bt.EnemySprite, {
+        _entity = entity,
+
         _health_bar = bt.HealthBar(0, entity:get_hp_base(), entity:get_hp()),
         _speed_value = bt.SpeedValue(entity:get_speed()),
         _status_consumable_bar = bt.OrderedBox(),
@@ -285,4 +287,11 @@ function bt.EnemySprite:activate_consumable(slot_i, on_done_notify)
     end
 
     self._status_consumable_bar:activate(sprite, on_done_notify)
+end
+
+--- @brief
+function bt.EnemySprite:set_state(state)
+    self._state = state
+    dbg(self._entity:get_sprite_id(self._state))
+    self._sprite:set_animation(self._entity:get_sprite_id(self._state))
 end

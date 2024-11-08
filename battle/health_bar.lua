@@ -47,7 +47,7 @@ function bt.HealthBar:realize()
     end
 
     self._backdrop:set_corner_radius(rt.settings.frame.corner_radius)
-    self._backdrop_outline:set_corner_radius(rt.settings.frame.corner_radius - 1)
+    self._backdrop_outline:set_corner_radius(rt.settings.frame.corner_radius + 2)
 
     self._backdrop_outline:set_line_width(2)
     self._shape_outline:set_line_width(2)

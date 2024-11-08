@@ -7,7 +7,8 @@ bt.EntitySprite = meta.new_abstract_type("BattleEntitySprite", rt.Widget, {
     _is_stunned = false,
     _snapshot = nil, -- rt.RenderTexture
     _snapshot_position_x = 0,
-    _snapshot_position_y = 0
+    _snapshot_position_y = 0,
+    _state = bt.EntityState.ALIVE
 })
 
 --- @brief

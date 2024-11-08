@@ -4,9 +4,11 @@ rt.settings.battle.battle_scene = {
 
 --- @class bt.BattleScene
 bt.BattleScene = meta.new_type("BattleScene", rt.Scene, function(state)
-    return meta.new(bt.BattleScene, {
+    local out = meta.new(bt.BattleScene, {
         _state = state,
         _simulation_environment = nil,
+        _background = rt.Background(),
+        _background_speed = 1,
 
         _text_box = rt.TextBox(),
         _priority_queue = bt.PriorityQueue(),
@@ -37,12 +39,15 @@ bt.BattleScene = meta.new_type("BattleScene", rt.Scene, function(state)
 
         _entity_selection_graph = nil, -- rt.SelectionGraph
     })
+    out._background:set_implementation(rt.Background.CONFUSION) -- TODO
+    return out
 end)
 
 --- @override
 function bt.BattleScene:realize()
     if self:already_realized() then return end
 
+    self._background:realize()
     self._text_box:realize()
     self._priority_queue:realize()
 
@@ -154,6 +159,8 @@ end
 
 --- @brief
 function bt.BattleScene:size_allocate(x, y, width, height)
+    self._background:fit_into(x, y, width, height)
+
     local tile_size = rt.settings.menu.inventory_scene.tile_size
     for entry in values(self._move_selection) do
         tile_size = math.max(tile_size, select(2, entry.intrinsics:measure()))
@@ -434,6 +441,8 @@ end
 
 --- @override
 function bt.BattleScene:draw()
+    self._background:draw()
+
     for sprite in values(self._party_sprites) do
         sprite:draw()
     end
@@ -462,7 +471,6 @@ function bt.BattleScene:draw()
     local left_w = (w - (4 / 3) * h) / 2
     love.graphics.line(left_w, 0, left_w, h)
     love.graphics.line(w - left_w, 0, w - left_w, h)
-    self._animation_queue:draw()
 
     for x in range(
         self._text_box,
@@ -472,10 +480,24 @@ function bt.BattleScene:draw()
     ) do
         x:draw()
     end
+
+    self._animation_queue:draw()
+end
+
+--- @brief
+function bt.BattleScene:set_background(implementation)
+    self._background:set_implementation(implementation)
+end
+
+--- @brief
+function bt.BattleScene:set_background_speed(f)
+    self._background_speed = f
 end
 
 --- @override
 function bt.BattleScene:update(delta)
+    self._background:update(delta * self._background_speed)
+
     self._text_box:update(delta)
     self._global_status_bar:update(delta)
 
@@ -810,7 +832,10 @@ end
 --- @brief [internal]
 function bt.BattleScene:_handle_button_pressed(which)
     if which == rt.InputButton.A then
-        self._simulation_environment.spawn(self._simulation_environment.ENTITY_BOULDER)
+        --self._simulation_environment.spawn(self._simulation_environment.ENTITY_BOULDER)
+        local sprite = self._enemy_sprites[2]
+        self:_push_animation(bt.Animation.ENEMY_KNOCKED_OUT(self, sprite))
+
         --[[
         --self:_test_simulation()
         for sprite in values(self._enemy_sprites) do

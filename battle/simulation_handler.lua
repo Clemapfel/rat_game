@@ -1577,6 +1577,57 @@ function bt.BattleScene:create_simulation_environment()
     env.knock_out = function(entity_proxy)
         bt.assert_args("knock_out", entity_proxy, bt.EntityProxy)
         local entity = _get_native(entity_proxy)
+
+        if _state:entity_get_state(entity) ~= bt.EntityState.ALIVE then
+            return -- fizzle on dead or already knocked out
+        end
+
+        local sprite = _state:get_sprite(entity)
+        local animation
+        if entity:get_is_enemy() then
+            animation = bt.Animation.ENEMY_KNOCKED_OUT(_scene, sprite)
+        else
+            animation = bt.Animation.ALLY_KNOCKED_OUT(_scene, sprite)
+        end
+
+        animation:signal_connect("finish", function(_)
+            sprite:set_state(bt.EntityState.KNOCKED_OUT)
+        end)
+
+        _scene:_push_animation(animation)
+
+        local status_backup = {}
+        for proxy in values(env.list_statuses(entity_proxy)) do
+            table.insert(status_backup, proxy)
+        end
+
+        -- clear state
+        _state:entity_set_state(entity, bt.EntityState.KNOCKED_OUT)
+        for proxy in values(status_backup) do
+            _state:entity_remove_status(entity, _get_native(proxy))
+            -- does not remove set_value, so they are still available for callbacks
+        end
+        _state:entity_set_hp(entity, 0)
+
+        -- callbacks
+        local callback_id = "on_knocked_out"
+        for status_proxy in values(status_backup) do
+            _try_invoke_status_callback(callback_id, status_proxy, entity_proxy)
+        end
+
+        for consumable_proxy in values(env.list_consumables(entity_proxy)) do
+            _try_invoke_consumable_callback(callback_id, consumable_proxy, entity_proxy)
+        end
+
+        for global_status_proxy in values(env.list_global_statuses()) do
+            _try_invoke_global_status_callback(callback_id, global_status_proxy, entity_proxy)
+        end
+
+        -- now clear values
+        for status_proxy in values(status_backup) do
+            _state:entity_replace_storage_value(entity, _get_native(status_proxy), {})
+        end
+        -- consumable stays, so storage stays too
     end
 
     env.help_up = function(entity_proxy)

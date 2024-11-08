@@ -3,6 +3,10 @@ return {
     flavor_text = "Just walkin'",
 
     sprite_id = "battle/walking_sprout",
+    sprite_index = "idle",
+
+    knocked_out_sprite_id = "battle/walking_sprout",
+    knocked_out_sprite_index = "knocked_out",
 
     portrait_sprite_id = "portraits",
     portrait_sprite_index = "WALKING_SPROUT",

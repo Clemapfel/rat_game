@@ -33,9 +33,6 @@ state = rt.GameState()
 state:set_loading_screen(rt.LoadingScreen.DEFAULT)
 state:initialize_debug_state()
 
-local background = rt.Background()
-background:set_implementation(rt.Background.KARO_CROSSES)
-
 local draw_state = true
 input = rt.InputController()
 input:signal_connect("keyboard_pressed", function(_, which)
@@ -60,7 +57,6 @@ input:signal_connect("keyboard_pressed", function(_, which)
 end)
 
 love.load = function()
-    background:realize()
     state:_load()
 
     --[[
@@ -76,13 +72,11 @@ love.load = function()
     ]]--
 
 
-    --state:set_current_scene(mn.InventoryScene)
-
+    state:set_current_scene(bt.BattleScene)
     love.resize(love.graphics.getWidth(), love.graphics.getHeight())
 end
 
 love.update = function(delta)
-    background:update(delta)
     if profiler_active then
         rt.profiler.push("update")
     end
@@ -93,8 +87,6 @@ love.update = function(delta)
 end
 
 love.draw = function()
-    --background:draw()
-    --love.graphics.clear(0, 0, 0, 0)
     if draw_state then
         if profiler_active then
             rt.profiler.push("draw")
@@ -115,7 +107,6 @@ love.draw = function()
 end
 
 love.resize = function(new_width, new_height)
-    background:fit_into(0, 0, new_width, new_height)
     state:_resize(new_width, new_height)
 end
 
