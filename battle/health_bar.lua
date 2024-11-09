@@ -201,5 +201,7 @@ end
 --- @brief
 function bt.HealthBar:skip()
     self._current_value = self._target_value
-    self:_update_value()
+    if self._is_realized then
+        self:_update_value()
+    end
 end

@@ -53,9 +53,9 @@ rt.Label = meta.new_type("Label", rt.Widget, rt.Updatable, function(text, font, 
 
         _outline_texture_offset_x = 0,
         _outline_texture_offset_y = 0,
-        _outline_texture_justify_left_offset = 0,
-        _outline_texture_justify_center_offset = 0,
-        _outline_texture_justify_right_offset = 0,
+        _justify_left_offset = 0,
+        _justify_center_offset = 0,
+        _justify_right_offset = 0,
         _outline_texture = nil,
         _swap_texture = nil,
         _outline_texture_w = 1,
@@ -148,11 +148,11 @@ function rt.Label:draw()
     love.graphics.setColor(1, 1, 1, 1)
     love.graphics.translate(self._bounds.x, self._bounds.y)
 
-    local justify_offset = self._outline_texture_justify_left_offset
+    local justify_offset = self._justify_left_offset
     if self._justify_mode == rt.JustifyMode.CENTER then
-        justify_offset = self._outline_texture_justify_center_offset
+        justify_offset = self._justify_center_offset
     elseif self._justify_mode == rt.JustifyMode.RIGHT then
-        justify_offset = self._outline_texture_justify_right_offset
+        justify_offset = self._justify_right_offset
     end
 
     if self._opacity == 1 then
@@ -190,10 +190,7 @@ end
 
 --- @override
 function rt.Label:size_allocate(x, y, width, height)
-    if self._first_wrap or width ~= self._bounds.width then
-        self:_apply_wrapping(width)
-    end
-
+    self:_apply_wrapping(width)
     self:_update_textures()
     self:_update_n_visible_characters()
     self._first_wrap = false
@@ -634,7 +631,6 @@ do
 
         self._width = _max(max_width, width)
         self._height = n_rows * self._font:get_native(rt.FontStyle.BOLD_ITALIC):getHeight()
-
         if self._n_visible_characters == -1 then
             self._n_visible_characters = n_characters
         end
@@ -653,7 +649,7 @@ do
         local line_height = bold_italic:getHeight()
 
         local glyph_x, glyph_y = 0, 0
-        local max_w = self._bounds.width
+        local max_w = math.max(self._width, self._bounds.width)
         local row_i = 1
         local is_first_word = true
 
@@ -738,7 +734,7 @@ do
         _insert(row_widths, glyph_x)
 
         if max_w == POSITIVE_INFINITY then
-            max_w = _min(max_w, self._width)
+            max_w = self._width
         end
 
         -- update justify offsets
@@ -748,7 +744,7 @@ do
         end
 
         self._width = max_x - min_x
-        self._height = line_height * row_i --max_y - min_y
+        self._height = line_height * row_i
         self._n_lines = row_i
 
         self._outline_texture_offset_x = -_padding
@@ -759,9 +755,17 @@ do
         if outline_texture_w < 1 then outline_texture_w = 1 end
         if outline_texture_h < 1 then outline_texture_h = 1 end
 
-        self._outline_texture_justify_left_offset = 0
-        self._outline_texture_justify_center_offset = _floor((max_w - outline_texture_w) * 0.5) + _padding
-        self._outline_texture_justify_right_offset = (max_w - outline_texture_w) + _padding
+        self._justify_left_offset = 0
+        self._justify_center_offset = (self._bounds.width - self._width) * 0.5
+        self._justify_right_offset = (self._bounds.width - self._width)
+
+        if string.find(self._raw, "MC") then
+            dbg(self._bounds.width, self._width)
+        end
+
+        if self._justify_center_offset < 0 then self._justify_center_offset = 0 end
+        if self._justify_right_offset < 0 then self._justify_right_offset = 0 end
+
         self._outline_texture_width = outline_texture_w
         self._outline_texture_height = outline_texture_h
 

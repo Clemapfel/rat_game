@@ -229,6 +229,8 @@ end
 
 --- @brief
 function bt.OrderedBox:skip()
+    if not self._is_realized then return end
+
     for item in values(self._widget_to_item) do
         item.current_scale = 1
         item.target_scale = 1

@@ -117,9 +117,9 @@ end
 
 --- @brief
 function rt.Sprite:set_frame(i)
+    i = clamp(i, 0, self._spritesheet:get_n_frames())
     self._current_frame = i
     local tx, ty, tw, th = table.unpack(self._frames[self._current_frame])
-
     self._mesh:setVertexAttribute(1, 2, tx, ty)
     self._mesh:setVertexAttribute(2, 2, tx + tw, ty)
     self._mesh:setVertexAttribute(3, 2, tx + tw, ty + th)
@@ -236,11 +236,11 @@ end
 --- @brief
 function rt.Sprite:set_animation(id)
     self._current_animation = id
-    self._frame_range_start, self._frame_range_end = self._spritesheet:get_frame_range()
+    self._frame_range_start, self._frame_range_end = self._spritesheet:get_frame_range(id)
     if self._current_frame < self._frame_range_start or self._current_frame > self._frame_range_end then
         self._current_frame = self._frame_range_start
     end
-    self:update(0)
+    self:set_frame(self._current_frame)
 end
 
 --- @override
@@ -250,7 +250,11 @@ function rt.Sprite:update(delta)
 
     local start = self._frame_range_start
     local n_frames = self._frame_range_end - self._frame_range_start
-    if n_frames == 0 then return end
+
+    if n_frames == 0 then
+        self:set_frame(self._frame_range_start)
+        return
+    end
 
     local offset = math.round(self._elapsed / self._frame_duration)
     if self._should_loop then

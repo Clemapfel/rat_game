@@ -103,6 +103,9 @@ function rt.Widget:fit_into(aabb, y, w, h)
         math.round(aabb.x), math.round(aabb.y),
         math.round(aabb.width), math.round(aabb.height)
     )
+
+    if self._bounds.width < 0 then self._bounds.width = 0 end
+    if self._bounds.height < 0 then self._bounds.height = 0 end
     self:reformat()
 end
 

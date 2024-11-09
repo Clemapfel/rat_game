@@ -21,7 +21,9 @@ end
 
 --- @brief
 function bt.SpeedValue:_update_value()
-    self._label:set_text(self:_format_value())
+    if self._is_realized then
+        self._label:set_text(self:_format_value())
+    end
     self:reformat()
 end
 

@@ -40,7 +40,7 @@ function bt.PartySprite:realize()
     self._status_consumable_bar:realize()
     self._sprite:realize()
 
-    self._name:set_justify_mode(rt.JustifyMode.RIGHT)
+    self._name:set_justify_mode(rt.JustifyMode.LEFT)
     self._name:realize()
 
     self._stunned_animation:realize()
@@ -62,7 +62,7 @@ function bt.PartySprite:size_allocate(x, y, width, height)
     local current_y = y + height - ym
 
     local label_w, label_h = self._name:measure()
-    self._name:fit_into(x, current_y - label_h, POSITIVE_INFINITY, POSITIVE_INFINITY)
+    self._name:fit_into(x + xm, current_y - label_h, width - 2 * xm)
     local speed_value_w, speed_value_h = self._speed_value:measure()
     self._speed_value:fit_into(x + width - xm - speed_value_w, current_y - label_h - speed_value_h + 0.5 * speed_value_h + 0.5 * label_h)
     current_y = current_y - label_h - ym
@@ -133,8 +133,6 @@ function bt.PartySprite:draw()
         rt.graphics.set_blend_mode()
     end
 
-    self._name:draw()
-
     if self._speed_visible then
         self._speed_value:draw()
     end
@@ -150,6 +148,9 @@ function bt.PartySprite:draw()
     if self._is_stunned then
         self._stunned_animation:draw()
     end
+
+    self._name:draw()
+    self._name:draw_bounds()
 end
 
 --- @override

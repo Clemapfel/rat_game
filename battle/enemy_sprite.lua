@@ -82,6 +82,7 @@ function bt.EnemySprite:size_allocate(x, y, width, height)
     if current_w ~= sprite_w or current_h ~= sprite_h then
         self._snapshot = rt.RenderTexture(sprite_w, sprite_h)
         self._snapshot:bind()
+        love.graphics.clear()
         self._sprite:draw()
         self._snapshot:unbind()
     end
@@ -293,6 +294,11 @@ end
 --- @brief
 function bt.EnemySprite:set_state(state)
     self._state = state
-    dbg(self._entity:get_sprite_id(self._state))
-    self._sprite:set_animation(self._entity:get_sprite_id(self._state))
+    local id, animation = self._entity:get_sprite_id(self._state)
+    self._sprite:set_animation(animation)
+
+    self._snapshot:bind()
+    love.graphics.clear()
+    self._sprite:draw()
+    self._snapshot:unbind()
 end

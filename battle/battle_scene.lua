@@ -55,6 +55,7 @@ function bt.BattleScene:realize()
     self._verbose_info:realize()
     self._global_status_bar:realize()
 
+    self._bounds = rt.AABB(0, 0, love.graphics.getDimensions()) -- pre-size, to avoid allocating with (0, 0, 1, 1)
     self:create_from_state()
 
     self._input:signal_connect("pressed", function(_, which)
@@ -834,7 +835,6 @@ function bt.BattleScene:_handle_button_pressed(which)
     if which == rt.InputButton.A then
         --self._simulation_environment.spawn(self._simulation_environment.ENTITY_BOULDER)
         local sprite = self._enemy_sprites[2]
-        self._simulation_environment.push_message("TEST")
         self:_push_animation(bt.Animation.ENEMY_KNOCKED_OUT(self, sprite))
 
         --[[

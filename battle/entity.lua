@@ -50,11 +50,7 @@ end, {
     -- non simulation
     sprite_id = "",
     sprite_index = 1,
-
-    knocked_out_sprite_id = nil,
     knocked_out_sprite_index = nil,
-
-    dead_sprite_id = nil,
     dead_sprite_index = nil,
 
     portrait_sprite_id = nil,
@@ -91,11 +87,7 @@ function bt.Entity:realize()
         ai_level = rt.UNSIGNED,
         sprite_id = rt.STRING,
         sprite_index = {rt.UNSIGNED, rt.STRING},
-
-        knocked_out_sprite_id = rt.STRING,
         knocked_out_sprite_index = {rt.UNSIGNED, rt.STRING},
-
-        dead_sprite_id = rt.STRING,
         dead_sprite_index = {rt.UNSIGNED, rt.STRING},
 
         portrait_sprite_id = rt.STRING,
@@ -185,12 +177,12 @@ end
 
 --- @brief
 function bt.Entity:get_sprite_id(state)
-    if state == nil or self._state == bt.EntityState.ALIVE then
+    if state == nil or state == bt.EntityState.ALIVE then
         return self.sprite_id, self.sprite_index
-    elseif self._state == bt.EntityState.KNOCKED_OUT then
-        return self.knocked_out_sprite_id, self.knocked_out_sprite_index
-    elseif self._state == bt.EntityState.DEAD then
-        return self.dead_sprite_id, self.dead_sprite_index
+    elseif state == bt.EntityState.KNOCKED_OUT then
+        return self.sprite_id, self.knocked_out_sprite_index
+    elseif state == bt.EntityState.DEAD then
+        return self.sprite_id, self.dead_sprite_index
     end
 end
 
