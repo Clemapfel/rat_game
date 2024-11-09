@@ -22,18 +22,15 @@
     </configurations>
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="7fa9ba1b-2cff-4ecc-86fb-59ab2fa76ee1" name="Changes" comment="refactor frame">
-      <change afterPath="$PROJECT_DIR$/battle/animations/enemy_knocked_out.glsl" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/battle/animations/enemy_knocked_out.lua" afterDir="false" />
+    <list default="true" id="7fa9ba1b-2cff-4ecc-86fb-59ab2fa76ee1" name="Changes" comment="stashing, sprite animation rework necessary">
+      <change afterPath="$PROJECT_DIR$/common/~sprite.lua" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/assets/favicon.hxl" beforeDir="false" afterPath="$PROJECT_DIR$/assets/favicon.hxl" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/assets/favicon.png" beforeDir="false" afterPath="$PROJECT_DIR$/assets/favicon.png" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/battle/battle_scene.lua" beforeDir="false" afterPath="$PROJECT_DIR$/battle/battle_scene.lua" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/battle/enemy_sprite.lua" beforeDir="false" afterPath="$PROJECT_DIR$/battle/enemy_sprite.lua" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/battle/entity.lua" beforeDir="false" afterPath="$PROJECT_DIR$/battle/entity.lua" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/battle/entity_sprite.lua" beforeDir="false" afterPath="$PROJECT_DIR$/battle/entity_sprite.lua" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/battle/health_bar.lua" beforeDir="false" afterPath="$PROJECT_DIR$/battle/health_bar.lua" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/battle/simulation_handler.lua" beforeDir="false" afterPath="$PROJECT_DIR$/battle/simulation_handler.lua" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/battle/ordered_box.lua" beforeDir="false" afterPath="$PROJECT_DIR$/battle/ordered_box.lua" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/battle/party_sprite.lua" beforeDir="false" afterPath="$PROJECT_DIR$/battle/party_sprite.lua" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/common/labeled_sprite.lua" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/common/sprite.lua" beforeDir="false" afterPath="$PROJECT_DIR$/common/sprite.lua" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/common/sprite_atlas.lua" beforeDir="false" afterPath="$PROJECT_DIR$/common/sprite_atlas.lua" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/main.lua" beforeDir="false" afterPath="$PROJECT_DIR$/main.lua" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
@@ -609,15 +606,8 @@
       <workItem from="1729267430460" duration="1705000" />
       <workItem from="1729269158294" duration="251396000" />
       <workItem from="1730582354116" duration="62506000" />
-      <workItem from="1730999275580" duration="32128000" />
-    </task>
-    <task id="LOCAL-01171" summary="explosion looks natural now">
-      <option name="closed" value="true" />
-      <created>1729889754703</created>
-      <option name="number" value="01171" />
-      <option name="presentableId" value="LOCAL-01171" />
-      <option name="project" value="LOCAL" />
-      <updated>1729889754703</updated>
+      <workItem from="1730999275580" duration="32404000" />
+      <workItem from="1731171166230" duration="5166000" />
     </task>
     <task id="LOCAL-01172" summary="added favicon">
       <option name="closed" value="true" />
@@ -1003,7 +993,15 @@
       <option name="project" value="LOCAL" />
       <updated>1731022113454</updated>
     </task>
-    <option name="localTasksCounter" value="1220" />
+    <task id="LOCAL-01220" summary="stashing, sprite animation rework necessary">
+      <option name="closed" value="true" />
+      <created>1731096453207</created>
+      <option name="number" value="01220" />
+      <option name="presentableId" value="LOCAL-01220" />
+      <option name="project" value="LOCAL" />
+      <updated>1731096453207</updated>
+    </task>
+    <option name="localTasksCounter" value="1221" />
     <servers />
   </component>
   <component name="TypeScriptGeneratedFilesManager">
@@ -1052,7 +1050,6 @@
     </option>
   </component>
   <component name="VcsManagerConfiguration">
-    <MESSAGE value="added normal map palette" />
     <MESSAGE value="added object shatter animation" />
     <MESSAGE value="stashing shatter" />
     <MESSAGE value="disabled animation done" />
@@ -1077,7 +1074,8 @@
     <MESSAGE value="stashing canvas leak" />
     <MESSAGE value="optimized frame" />
     <MESSAGE value="refactor frame" />
-    <option name="LAST_COMMIT_MESSAGE" value="refactor frame" />
+    <MESSAGE value="stashing, sprite animation rework necessary" />
+    <option name="LAST_COMMIT_MESSAGE" value="stashing, sprite animation rework necessary" />
   </component>
   <component name="XDebuggerManager">
     <breakpoint-manager>

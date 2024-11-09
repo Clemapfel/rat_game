@@ -218,11 +218,15 @@ end
 
 --- @brief
 function rt.SpriteAtlasEntry:get_frame_range(id)
+    if id == nil then
+        return 1, self.n_frames
+    end
+
     local out = self.name_to_frame[id]
     if out == nil then
         rt.error("In rt.SpriteAtlasEntry: spritesheet at `" .. self.path .. "/" .. self.id .. "` has no animation with id `" .. id .. "`")
     end
-    return out
+    return table.unpack(out)
 end
 
 --- @brief

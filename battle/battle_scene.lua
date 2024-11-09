@@ -834,6 +834,7 @@ function bt.BattleScene:_handle_button_pressed(which)
     if which == rt.InputButton.A then
         --self._simulation_environment.spawn(self._simulation_environment.ENTITY_BOULDER)
         local sprite = self._enemy_sprites[2]
+        self._simulation_environment.push_message("TEST")
         self:_push_animation(bt.Animation.ENEMY_KNOCKED_OUT(self, sprite))
 
         --[[

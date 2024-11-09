@@ -142,6 +142,7 @@ function bt.OrderedBox:draw()
             rt.graphics.translate(-0.5 * w, -0.5 * h)
 
             item.widget:draw()
+            item.widget:draw_bounds()
 
             rt.graphics.pop()
         end
@@ -179,8 +180,8 @@ function bt.OrderedBox:size_allocate(x, y, width, height)
     end
 
     local m = rt.settings.margin_unit
-    local left_item_m = math.min((0.5 * width - largest_w - total_left_item_w) / (n_left_items), m)
-    local right_item_m = math.min((0.5 * width - largest_w - total_right_item_w) / (n_right_items), m)
+    local left_item_m = math.min((0.5 * width - total_left_item_w)  / (n_left_items - 1), 0)
+    local right_item_m = math.min((0.5 * width - total_right_item_w) / (n_right_items - 1), 0)
 
     for widget in values(self._widget_order) do
         local item = self._widget_to_item[widget]

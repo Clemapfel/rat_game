@@ -1,6 +1,4 @@
 require "include"
-require "common.leak_scene"
-
 
 local animation = rt.TimedAnimation(1, 0, 2, rt.InterpolationFunctions.LINEAR)
 animation:signal_connect("done", function(self)

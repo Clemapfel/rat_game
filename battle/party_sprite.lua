@@ -39,8 +39,9 @@ function bt.PartySprite:realize()
     self._speed_value:realize()
     self._status_consumable_bar:realize()
     self._sprite:realize()
+
+    self._name:set_justify_mode(rt.JustifyMode.RIGHT)
     self._name:realize()
-    self._name:set_justify_mode(rt.JustifyMode.LEFT)
 
     self._stunned_animation:realize()
 
@@ -61,8 +62,7 @@ function bt.PartySprite:size_allocate(x, y, width, height)
     local current_y = y + height - ym
 
     local label_w, label_h = self._name:measure()
-    self._name:set_justify_mode(rt.JustifyMode.CENTER)
-    self._name:fit_into(x, current_y - label_h, width)
+    self._name:fit_into(x, current_y - label_h, POSITIVE_INFINITY, POSITIVE_INFINITY)
     local speed_value_w, speed_value_h = self._speed_value:measure()
     self._speed_value:fit_into(x + width - xm - speed_value_w, current_y - label_h - speed_value_h + 0.5 * speed_value_h + 0.5 * label_h)
     current_y = current_y - label_h - ym
@@ -123,7 +123,9 @@ function bt.PartySprite:draw()
 
     if self._gradient_visible then
         local value = meta.hash(self) % 254 + 1
-        rt.graphics.stencil(value, self._frame)
+        rt.graphics.stencil(value, function()
+            self._frame:_draw_frame()
+        end)
         rt.graphics.set_stencil_test(rt.StencilCompareMode.EQUAL, value)
         rt.graphics.set_blend_mode(rt.BlendMode.MULTIPLY, rt.BlendMode.NORMAL)
         self._gradient:draw()

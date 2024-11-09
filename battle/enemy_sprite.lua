@@ -139,6 +139,7 @@ function bt.EnemySprite:update(delta)
     self._sprite:update(delta)
     if self._sprite:get_frame() ~= before then
         self._snapshot:bind()
+        love.graphics.clear(true, false, false)
         self._sprite:draw()
         self._snapshot:unbind()
     end
