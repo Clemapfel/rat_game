@@ -1582,13 +1582,17 @@ function bt.BattleScene:create_simulation_environment()
             return -- fizzle on dead or already knocked out
         end
 
-        local sprite = _state:get_sprite(entity)
+        local sprite = _scene:get_sprite(entity)
         local animation
         if entity:get_is_enemy() then
             animation = bt.Animation.ENEMY_KNOCKED_OUT(_scene, sprite)
         else
             animation = bt.Animation.ALLY_KNOCKED_OUT(_scene, sprite)
         end
+
+        animation:signal_connect("start", function(_)
+            sprite:set_hp(0)
+        end)
 
         animation:signal_connect("finish", function(_)
             sprite:set_state(bt.EntityState.KNOCKED_OUT)

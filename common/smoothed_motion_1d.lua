@@ -1,6 +1,6 @@
 --- @class rt.SmoothedMotion1D
 rt.SmoothedMotion1D = meta.new_type("SmoothedMotion1D", function(value, speed)
-    if speed == nil then speed = 1 end
+    if speed == nil then speed = 100 end
     return meta.new(rt.SmoothedMotion1D, {
         _speed = speed,
         _current_value = value,

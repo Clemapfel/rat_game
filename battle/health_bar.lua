@@ -9,6 +9,7 @@ rt.settings.battle.health_bar = {
     hp_color_0 = rt.Palette.YELLOW_2,
 
     hp_background_color = rt.Palette.GREEN_3,
+    scroll_speed = 200,
 }
 
 --- @class bt.HealthBar
@@ -24,6 +25,7 @@ bt.HealthBar = meta.new_type("HealthBar", rt.Widget, rt.Updatable, function(lowe
         _shape_outline = rt.Line(0, 0, 1, 1),
         _backdrop = rt.Rectangle(0, 0, 1, 1),
         _backdrop_outline = rt.Rectangle(0, 0, 1, 1),
+        _stencil = rt.Rectangle(0, 0, 1, 1),
 
         _label_left = {},   -- rt.Label
         _label_center = {}, -- rt.Label
@@ -31,7 +33,7 @@ bt.HealthBar = meta.new_type("HealthBar", rt.Widget, rt.Updatable, function(lowe
         _use_percentage = true,
         _state = bt.EntityState.ALIVE,
 
-        _value_animation = rt.SmoothedMotion1D(value),
+        _value_animation = rt.SmoothedMotion1D(value, rt.settings.battle.health_bar.scroll_speed),
 
         _opacity = 1
     })
@@ -47,9 +49,9 @@ function bt.HealthBar:realize()
     end
 
     self._backdrop:set_corner_radius(rt.settings.frame.corner_radius)
-    self._backdrop_outline:set_corner_radius(rt.settings.frame.corner_radius + 2)
+    self._backdrop_outline:set_corner_radius(rt.settings.frame.corner_radius)
 
-    self._backdrop_outline:set_line_width(2)
+    self._backdrop_outline:set_line_width(1)
     self._shape_outline:set_line_width(2)
 
     local left, center, right = self:_format_hp(self._current_value, self._upper)
@@ -142,26 +144,16 @@ function bt.HealthBar:draw()
     if self._is_realized == false then return end
 
     local stencil_value = meta.hash(bt.HealthBar) % 254 + 2
-    rt.graphics.stencil(0, function()
-        local x, y, w, h = rt.aabb_unpack(self._bounds)
-        x = x - 5
-        y = y - 5
-        w = w + 10
-        h = h + 10
-        love.graphics.rectangle("fill", x, y, w, h)
-    end)
-
     self._backdrop:draw()
     rt.graphics.stencil(stencil_value, function()
         self._backdrop:draw()
-        self._backdrop_outline:draw()
     end)
 
     rt.graphics.set_stencil_test(rt.StencilCompareMode.EQUAL, stencil_value)
     self._shape:draw()
     self._shape_outline:draw()
-    self._backdrop_outline:draw()
     rt.graphics.set_stencil_test()
+    self._backdrop_outline:draw()
 
     self._label_left:draw()
     self._label_center:draw()
@@ -190,7 +182,7 @@ end
 function bt.HealthBar:set_value(value)
     value = clamp(value, self._lower, self._upper)
     self._target_value = value
-    self._value_animation:set_target(self._target_value)
+    self._value_animation:set_target_value(self._target_value)
 end
 
 --- @brief

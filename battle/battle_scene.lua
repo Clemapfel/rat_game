@@ -833,10 +833,14 @@ end
 --- @brief [internal]
 function bt.BattleScene:_handle_button_pressed(which)
     if which == rt.InputButton.A then
+
+        local target = bt.create_entity_proxy(self, self._state:list_enemies()[2])
+        self._simulation_environment.knock_out(target)
+
+
         --self._simulation_environment.spawn(self._simulation_environment.ENTITY_BOULDER)
         local sprite = self._enemy_sprites[2]
-        self:_push_animation(bt.Animation.ENEMY_KNOCKED_OUT(self, sprite))
-
+        --self:_push_animation(bt.Animation.ENEMY_KNOCKED_OUT(self, sprite))
         --[[
         --self:_test_simulation()
         for sprite in values(self._enemy_sprites) do
