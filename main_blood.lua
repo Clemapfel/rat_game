@@ -1,5 +1,60 @@
 require "include"
 
+--[[
+sources
+    https://developer.nvidia.com/gpugems/gpugems3/part-v-physics-simulation/chapter-32-broad-phase-collision-detection-cuda
+    https://gpuopen.com/download/publications/Introduction_to_GPU_Radix_Sort.pdf
+]]--
+
+do
+    local input = {}
+    for i = 1, 100 do
+        table.insert(input, math.round(love.math.random(0, 2^8)))
+    end
+
+    local bits_per_step = 8
+    local n_buckets = 2^(bits_per_step)
+    local counts, offsets = {}, {}
+    local output = {}
+
+    for pass = 0, (32 / bits_per_step) - 1 do
+        for i = 1, n_buckets do
+            counts[i] = 0
+            offsets[i] = 0
+        end
+
+        local bitmask = bit.lshift(0xFF, pass * bits_per_step)
+
+        -- count occurences
+        for x in values(input) do
+            local mask = bit.rshift(bit.band(x, bitmask), pass * bits_per_step)
+            counts[mask + 1] = counts[mask + 1] + 1
+        end
+
+        -- prefix sum
+        local sum = 0
+        for i = 1, n_buckets do
+            offsets[i] = sum
+            sum = sum + counts[i]
+        end
+
+        -- reorder elements
+        for x in values(input) do
+            local mask = bit.rshift(bit.band(x, bitmask), pass * bits_per_step)
+            output[offsets[mask + 1] + 1] = x
+            offsets[mask + 1] = offsets[mask + 1] + 1
+        end
+
+        -- copy output back to input for the next pass
+        for i = 1, #input do
+            input[i] = output[i]
+        end
+    end
+
+    dbg(input)
+
+end
+
 -- config
 
 local n_particles = 100 * 1000
@@ -45,11 +100,12 @@ love.load = function()
     end
 
     do -- init graphics buffers
-        local buffer_format = {
+        local particle_buffer_format = {
             {name = "current_position", format = "floatvec2"},
             {name = "previous_position", format = "floatvec2"},
             {name = "radius", format = "float"},
-            {name = "color", format = "float"}
+            {name = "color", format = "float"},
+            {name = "cell_hash", format = "uint32"}
         }
 
         local buffer_usage = {
@@ -57,7 +113,12 @@ love.load = function()
             shaderstorage = true
         }
 
-        particle_buffer = love.graphics.newBuffer(buffer_format, n_particles, buffer_usage)
+        --[[
+        for each particle: which cell
+        for each cell: which particles
+        ]]--
+
+        particle_buffer = love.graphics.newBuffer(particle_buffer_format, n_particles, buffer_usage)
         local data = {}
         for i = 1, n_particles do
             local position_x, position_y = love.math.random(0, love.graphics.getWidth()), love.math.random(0, love.graphics.getHeight())
@@ -65,10 +126,13 @@ love.load = function()
                 position_x, position_y,
                 position_x, position_y,
                 love.math.random(0, 1) * particle_radius,
-                love.math.random(0.25, 1)
+                love.math.random(0.25, 1),
+
             })
         end
         particle_buffer:setArrayData(data)
+
+
     end
 end
 

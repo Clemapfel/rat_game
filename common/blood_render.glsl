@@ -12,6 +12,7 @@ struct Particle {
     vec2 previous_position;
     float radius;
     float color;
+    uint cell_hash;
 };
 
 layout(std430) readonly buffer particle_buffer {

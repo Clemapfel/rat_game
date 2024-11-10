@@ -25,6 +25,8 @@ assert(table.unpack ~= nil)
 if debug.setfenv == nil then debug.setfenv = setfenv end
 assert(debug.setfenv ~= nil)
 
+require("table.new")
+
 --- @brief iterate over values of table
 function values(t)
     if t == nil then return function() return nil end end
