@@ -2,9 +2,14 @@
 
 #ifdef VERTEX
 
+vec2 translate_point_by_angle(vec2 xy, float dist, float angle)
+{
+    return xy + vec2(cos(angle), sin(angle)) * dist;
+}
+
 struct Particle {
     vec2 current_position;
-    vec2 last_position;
+    vec2 previous_position;
     float radius;
     float color;
 };
@@ -14,13 +19,18 @@ layout(std430) readonly buffer particle_buffer {
 };
 
 varying float value;
+uniform float radius;
 
 vec4 position(mat4 transform, vec4 vertex_position)
 {
     Particle particle = particles[love_InstanceID];
-    vertex_position.xy += particle.current_position;
-    value = particle.color;
 
+    vec2 center = vec2(0);
+    float angle = atan(vertex_position.y - center.y, vertex_position.x - center.x);
+    vertex_position.xy = translate_point_by_angle(vec2(0), particle.radius * radius, angle);
+    vertex_position.xy += particle.current_position;
+
+    value = particle.color;
     return transform * vertex_position;
 }
 

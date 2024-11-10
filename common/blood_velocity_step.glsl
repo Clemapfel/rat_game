@@ -46,12 +46,13 @@ float noise(vec2 v)
     return 130.0 * dot(m, g);
 }
 
-const float PI = 3.1415926535897932384626433832795;
+// ###
 
-vec2 rotate(vec2 v, float angle) {
-    float s = sin(angle);
-    float c = cos(angle);
-    return v * mat2(c, -s, s, c);
+#define PI 3.1415926535897932384626433832795
+
+float project(float lower, float upper, float value)
+{
+    return value * abs(upper - lower) + min(lower, upper);
 }
 
 vec2 translate_point_by_angle(vec2 xy, float dist, float angle)
@@ -59,87 +60,68 @@ vec2 translate_point_by_angle(vec2 xy, float dist, float angle)
     return xy + vec2(cos(angle), sin(angle)) * dist;
 }
 
-float gaussian(float x, float ramp)
-{
-    return exp(((-4 * PI) / 3) * (ramp * x) * (ramp * x));
+float sine_wave(float x, float frequency) {
+    return (sin(2.0 * PI * x * frequency - PI / 2.0) + 1.0) * 0.5;
 }
 
-float project(float x, float min, float max)
-{
-    return min + x * (max - min);
+uniform int thread_group_stride = 1;
+int get_particle_index(int x, int y) {
+    return y * thread_group_stride + x;
 }
 
-// ###
+struct Particle {
+    vec2 current_position;
+    vec2 previous_position;
+    float radius;
+    float color;
+};
 
-layout(rgba32f) uniform image2D position_texture;
-layout(rgba16f) uniform image2D color_texture;
-layout(r8) uniform image2D mass_texture;
+layout(std430) buffer particle_buffer {
+    Particle particles[];
+};
 
 uniform float delta;
 uniform float elapsed;
+uniform vec2 screen_size;
+uniform int n_particles;
 uniform vec2 center_of_gravity;
-uniform vec4 screen_aabb;
-uniform vec2 dispatch_size;
-
-const float acceleration = 1;
-
-layout(std430) writeonly buffer n_done_counter
-{
-    uint n[];
-};
 
 layout (local_size_x = 1, local_size_y = 1, local_size_z = 1) in;
 void computemain()
 {
-    ivec2 position = ivec2(gl_GlobalInvocationID.x, gl_GlobalInvocationID.y);
+    const float position_speed = 100;
+    const float color_min = 0.1;
+    const float color_max = 1;
+    const float color_speed = 0.2;
+
+    const float radius_speed = 2;
+    const float radius_min = 0.4;
+    const float radius_max = 2;
+
+    int particle_i = get_particle_index(int(gl_GlobalInvocationID.x), int(gl_GlobalInvocationID.y));
+    Particle particle = particles[particle_i];
 
     // update position
+    vec2 previous = particle.previous_position;
+    vec2 current = particle.current_position;
 
-    vec4 position_data = imageLoad(position_texture, position);
-    vec2 current = position_data.xy;
-    vec2 previous = position_data.zw;
-    float mass_data = imageLoad(mass_texture, position).x; // in [0, 1]
+    vec2 gravity = -1 * normalize(vec2(current - center_of_gravity));
 
-    float velocity_loss = clamp(pow(elapsed, 1.55), 0, 1);
+    vec2 next = current;
+    next += (current - previous) + position_speed * gravity * delta * delta;
 
-    highp vec2 gravity = normalize(vec2(current - center_of_gravity));
-    gravity = rotate(gravity, noise(position) * (PI / 16) * (1 - velocity_loss));
-    gravity *= 1000 * (1 - clamp(pow(velocity_loss, 2) * 2500, 0, 1));
+    particles[particle_i].previous_position = current;
+    particles[particle_i].current_position = next;
 
-    float delta_squared = delta * delta;
+    // update color
+    float value = particle.color;
+    value = project(noise(vec2(particle_i, particle_i) + elapsed * color_speed), color_min, color_max);
 
-    const float mass_factor = 10;
-    const float min_mass = 0;
-    const float max_mass = 1;
-    float mass = project(mass_data, min_mass, max_mass) * mass_factor;
+    particles[particle_i].color = value;
 
-    const float min_damping = 0.98;
-    const float max_damping = 1;
-    float damping = 1 - gaussian(distance(position, 0.5 * dispatch_size) / max(dispatch_size.x, dispatch_size.y), 1);
-    //imageStore(color_texture, position, vec4(vec3(damping), 1));
+    // update radius
+    float radius = particle.radius;
+    radius = project(sine_wave(particle_i + elapsed / 10, radius_speed), radius_min, radius_max);
 
-    vec2 downward_force = vec2(0, pow(elapsed + 1.2, 2)); // term unaffected by mass, in case mass is 0
-
-    damping = project(damping, min_damping, max_damping);
-    damping -= project(velocity_loss, 0, 0.1);
-
-    vec2 next = current + (current - previous) + damping * mass * gravity * delta_squared + downward_force * delta;
-
-    imageStore(position_texture, position, vec4(next, current.xy));
-
-    vec4 color_data = imageLoad(color_texture, position);
-    color_data.xyz = mix(color_data.xyz, vec3(1, 0, 0), elapsed / 20);
-    imageStore(color_texture, position, color_data);
-
-    // check if particle left screen
-    float x = screen_aabb.x;
-    float y = screen_aabb.y;
-    float w = screen_aabb.z;
-    float h = screen_aabb.w;
-    if (current.y > y + h) {//(current.x <= x || current.y <= y || current.x >= x + w || current.y >= y + h) {
-        if (color_data.a >= 0) {
-            atomicAdd(n[0], 1);
-            imageStore(color_texture, position, vec4(-1));
-        }
-    }
+    particles[particle_i].radius = radius;
 }
