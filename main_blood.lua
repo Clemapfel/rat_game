@@ -4,6 +4,19 @@ require "include"
 sources
     https://developer.nvidia.com/gpugems/gpugems3/part-v-physics-simulation/chapter-32-broad-phase-collision-detection-cuda
     https://gpuopen.com/download/publications/Introduction_to_GPU_Radix_Sort.pdf
+
+    for each particle, create cell hash as particle_x | particle_y, 32-bit uint
+    create buffer valid_cells with n_cells many entires, initialized as false
+    write particle id unordered to buffer, during scan set valid_cells at cell hash to true
+    radix-sort particle id buffer by cell hash
+    create buffer cell hash to list of particles
+    iterate through sorted buffer, writing to hash-to-particle buffer, anytime the hash transitions, new cell is seen
+
+    hash-to-particle-buffer layout:
+        list of all particle ids, in order of cell
+        second buffer with cell-hash to offset
+
+
 ]]--
 
 do
@@ -50,9 +63,6 @@ do
             input[i] = output[i]
         end
     end
-
-    dbg(input)
-
 end
 
 -- config
