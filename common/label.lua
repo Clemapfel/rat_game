@@ -649,7 +649,7 @@ do
         local line_height = bold_italic:getHeight()
 
         local glyph_x, glyph_y = 0, 0
-        local max_w = math.max(self._width, self._bounds.width)
+        local max_w = self._bounds.width
         local row_i = 1
         local is_first_word = true
 
@@ -758,10 +758,6 @@ do
         self._justify_left_offset = 0
         self._justify_center_offset = (self._bounds.width - self._width) * 0.5
         self._justify_right_offset = (self._bounds.width - self._width)
-
-        if string.find(self._raw, "MC") then
-            dbg(self._bounds.width, self._width)
-        end
 
         if self._justify_center_offset < 0 then self._justify_center_offset = 0 end
         if self._justify_right_offset < 0 then self._justify_right_offset = 0 end

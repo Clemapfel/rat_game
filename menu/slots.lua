@@ -107,7 +107,7 @@ function mn.Slots:realize()
             to_insert.sprite = nil
             to_insert.type = type
 
-            local base_color = rt.Palette.GRAY_5
+            local base_color = rt.Palette.GRAY_7
             to_insert.base:set_color(base_color)
             to_insert.base_inlay:set_color(rt.color_darken(base_color, 0.1))
 
@@ -115,7 +115,7 @@ function mn.Slots:realize()
                 frame:set_is_outline(true)
             end
 
-            to_insert.frame:set_color(rt.Palette.GRAY_4)
+            to_insert.frame:set_color(rt.Palette.GRAY_5)
             to_insert.frame:set_line_width(rt.settings.menu.slots.frame_unselected_thickness)
             to_insert.frame_selected:set_color(rt.Palette.SELECTION)
             to_insert.frame_selected:set_line_width(rt.settings.menu.slots.frame_selected_thickness)

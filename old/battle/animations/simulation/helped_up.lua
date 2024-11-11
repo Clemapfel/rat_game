@@ -18,13 +18,13 @@ end)
 --- @override
 function bt.Animation.HELPED_UP:start()
 
-    self._label = rt.Label("<<o><b><color=LIGHT_GREEN_1>Got Up</color></b></o>")
+    self._label = rt.Label("<<o><b><color=MINT_1>Got Up</color></b></o>")
     self._label:set_justify_mode(rt.JustifyMode.CENTER)
     self._label:realize()
 
     self._target_snapshot = rt.Snapshot()
     self._target_snapshot:realize()
-    self._target_snapshot:set_mix_color(rt.Palette.LIGHT_GREEN_1)
+    self._target_snapshot:set_mix_color(rt.Palette.MINT_1)
     self._target_snapshot:set_mix_weight(0)
 
     self._target:set_is_visible(true)

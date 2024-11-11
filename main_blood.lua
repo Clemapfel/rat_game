@@ -15,8 +15,6 @@ sources
     hash-to-particle-buffer layout:
         list of all particle ids, in order of cell
         second buffer with cell-hash to offset
-
-
 ]]--
 
 do

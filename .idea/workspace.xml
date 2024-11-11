@@ -22,9 +22,20 @@
     </configurations>
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="7fa9ba1b-2cff-4ecc-86fb-59ab2fa76ee1" name="Changes" comment="implemented radix sort">
+    <list default="true" id="7fa9ba1b-2cff-4ecc-86fb-59ab2fa76ee1" name="Changes" comment="stashing">
+      <change afterPath="$PROJECT_DIR$/common/~palette.lua" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/assets/rat_game.hxp" beforeDir="false" afterPath="$PROJECT_DIR$/assets/rat_game.hxp" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/battle/health_bar.lua" beforeDir="false" afterPath="$PROJECT_DIR$/battle/health_bar.lua" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/common/frame.lua" beforeDir="false" afterPath="$PROJECT_DIR$/common/frame.lua" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/common/label.lua" beforeDir="false" afterPath="$PROJECT_DIR$/common/label.lua" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/common/palette.lua" beforeDir="false" afterPath="$PROJECT_DIR$/common/palette.lua" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/main_blood.lua" beforeDir="false" afterPath="$PROJECT_DIR$/main_blood.lua" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/menu/slots.lua" beforeDir="false" afterPath="$PROJECT_DIR$/menu/slots.lua" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/old/battle/animations/simulation/helped_up.lua" beforeDir="false" afterPath="$PROJECT_DIR$/old/battle/animations/simulation/helped_up.lua" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/old/battle/health_bar.lua" beforeDir="false" afterPath="$PROJECT_DIR$/old/battle/health_bar.lua" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/older/~battle/animations/helped_up.lua" beforeDir="false" afterPath="$PROJECT_DIR$/older/~battle/animations/helped_up.lua" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/older/~battle/simulation.lua" beforeDir="false" afterPath="$PROJECT_DIR$/older/~battle/simulation.lua" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -151,7 +162,7 @@
       <recent name="C:\Users\cleme\Workspace\rat_game\old" />
     </key>
   </component>
-  <component name="RunManager" selected="Lua Application.main_blood">
+  <component name="RunManager" selected="Lua Application.main">
     <configuration name="Makefile" type="MAKEFILE_TARGET_RUN_CONFIGURATION" factoryName="Makefile" temporary="true">
       <makefile filename="$PROJECT_DIR$/midi/lovemidi/Makefile" target="" workingDirectory="" arguments="">
         <envs />
@@ -616,14 +627,7 @@
       <workItem from="1731171166230" duration="11668000" />
       <workItem from="1731194564473" duration="10736000" />
       <workItem from="1731259144941" duration="7707000" />
-    </task>
-    <task id="LOCAL-01178" summary="added battle string formatting">
-      <option name="closed" value="true" />
-      <created>1730052344034</created>
-      <option name="number" value="01178" />
-      <option name="presentableId" value="LOCAL-01178" />
-      <option name="project" value="LOCAL" />
-      <updated>1730052344034</updated>
+      <workItem from="1731346058202" duration="5063000" />
     </task>
     <task id="LOCAL-01179" summary="added automatic text formatting">
       <option name="closed" value="true" />
@@ -1009,7 +1013,15 @@
       <option name="project" value="LOCAL" />
       <updated>1731264945121</updated>
     </task>
-    <option name="localTasksCounter" value="1227" />
+    <task id="LOCAL-01227" summary="stashing">
+      <option name="closed" value="true" />
+      <created>1731340588173</created>
+      <option name="number" value="01227" />
+      <option name="presentableId" value="LOCAL-01227" />
+      <option name="project" value="LOCAL" />
+      <updated>1731340588173</updated>
+    </task>
+    <option name="localTasksCounter" value="1228" />
     <servers />
   </component>
   <component name="TypeScriptGeneratedFilesManager">
@@ -1081,9 +1093,9 @@
     <MESSAGE value="sprite animation working" />
     <MESSAGE value="fixed stencil outline showing" />
     <MESSAGE value="added blood spray playground" />
-    <MESSAGE value="stashing" />
     <MESSAGE value="implemented radix sort" />
-    <option name="LAST_COMMIT_MESSAGE" value="implemented radix sort" />
+    <MESSAGE value="stashing" />
+    <option name="LAST_COMMIT_MESSAGE" value="stashing" />
   </component>
   <component name="XDebuggerManager">
     <breakpoint-manager>
@@ -1107,11 +1119,6 @@
           <url>file://$PROJECT_DIR$/common/~label.lua</url>
           <line>23</line>
           <option name="timeStamp" value="23" />
-        </line-breakpoint>
-        <line-breakpoint enabled="true" type="lua-line">
-          <url>file://$PROJECT_DIR$/common/label.lua</url>
-          <line>762</line>
-          <option name="timeStamp" value="47" />
         </line-breakpoint>
         <line-breakpoint enabled="true" suspend="NONE" type="CMakeLineBreakpoint">
           <url>file://$PROJECT_DIR$/physics/box2d_extension/CMakeLists.txt</url>

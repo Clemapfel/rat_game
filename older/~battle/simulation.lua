@@ -669,7 +669,7 @@ function bt.BattleScene:help_up(entity)
     -- animation
     local animation, sprite = self:play_animation(entity, "HELPED_UP")
     animation:register_start_callback(function()
-        self._ui:send_message(self:format_name(entity) .. " got <b><color=LIGHT_GREEN_2><u>back up</u></color></b>")
+        self._ui:send_message(self:format_name(entity) .. " got <b><color=MINT_2><u>back up</u></color></b>")
         sprite:set_hp(1, entity.hp_base)
         self._ui:set_state(entity, bt.BattleEntityState.ALIVE)
         self._ui:set_priority_order(self._state:get_entities_in_order())

@@ -2,7 +2,7 @@ rt.settings.frame = {
     thickness = 2, -- px
     corner_radius = 10,
     selected_base_color = (function()
-        local a = rt.Palette.GRAY_5
+        local a = rt.Palette.GRAY_7
         local b = rt.Palette.BACKGROUND
         local weight = 0.25
         return rt.RGBA(

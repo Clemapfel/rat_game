@@ -23,7 +23,7 @@ function bt.Animation.HELPED_UP:start()
         self._target:realize()
     end
 
-    self._label = rt.Label("<o><b><color=LIGHT_GREEN_1>Got Up</color></b></o>")
+    self._label = rt.Label("<o><b><color=MINT_1>Got Up</color></b></o>")
     self._label:realize()
     self._label_path = {}
 

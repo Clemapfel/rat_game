@@ -1,7 +1,7 @@
 rt.settings.battle.health_bar = {
     hp_font = rt.settings.font.default_mono_small,
 
-    hp_color_100 = rt.Palette.LIGHT_GREEN_2,
+    hp_color_100 = rt.Palette.MINT_2,
     hp_color_75 = rt.Palette.GREEN_1,
     hp_color_50 = rt.Palette.YELLOW_2,
     hp_color_25 = rt.Palette.YELLOW_2,
