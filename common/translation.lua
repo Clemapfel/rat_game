@@ -316,7 +316,57 @@ rt.Translation = rt.initialize_translation({
         stun_gained_label = "STUNNED",
         
         message = {
-            gained_pp_f = function()  end
+            move_gained_pp_f = function(entity, move)
+                return entity .. "s " .. move .. " gained PP"
+            end,
+
+            move_lost_pp_f = function(entity, move)
+                return entity .. "s " .. move .. " lost PP"
+            end,
+
+            equip_applied_f = function(entity, equip)
+                return entity .. "s " .. equip .. " activated"
+            end,
+
+            consumable_removed_f = function(entity, consumable)
+                return entity .. " lost " .. consumable
+            end,
+
+            consumable_added_f = function(entity, consumable)
+                return entity .. " gained " .. consumable
+            end,
+
+            consumable_no_space_f = function(entity, consumable)
+                return "but " .. entity .. " has no space for " .. consumable
+            end,
+
+            consumable_consumed_f = function(entity, consumable)
+                return entity .. " consumed " .. consumable
+            end,
+
+            object_disabled_f = function(entity, object)
+                return entity .. "s " .. object .. " was_disabled"
+            end,
+
+            object_no_longer_disabled_f = function(entity, object)
+                return entity .. "s " .. object  .. " is no longer disabled"
+            end,
+
+            global_status_added_f = function(global_status)
+                return global_status .. " is now active"
+            end,
+
+            global_status_removed_f = function(global_status)
+                return global_status .. " is no longer active"
+            end,
+
+            status_added_f = function(entity, status)
+                return entity .. " is no afflicted with " .. status
+            end,
+
+            status_removed_f = function(entity, status)
+                return entity .. " is no longer afflicted with " .. status
+            end
         }
     }
 })

@@ -281,3 +281,9 @@ function rt.Sprite:update(delta)
         self._bottom_left_chlid:update(delta)
     end
 end
+
+--- @brief
+function rt.Sprite:set_opacity(alpha)
+    self._opacity = alpha
+    -- child widgets retain their opacity
+end

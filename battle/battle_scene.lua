@@ -833,16 +833,20 @@ end
 --- @brief [internal]
 function bt.BattleScene:_handle_button_pressed(which)
     if which == rt.InputButton.A then
+        self:_test_simulation()
 
+        --[[
         local target = bt.create_entity_proxy(self, self._state:list_enemies()[2])
-        self._simulation_environment.knock_out(target)
+        local status = bt.create_status_proxy(self, bt.Status("DEBUG_STATUS"))
+        self._simulation_environment.message(target, status)
+        --self._simulation_environment.message(target, "test", status)
+        --self._simulation_environment.knock_out(target)
 
 
         --self._simulation_environment.spawn(self._simulation_environment.ENTITY_BOULDER)
         local sprite = self._enemy_sprites[2]
         --self:_push_animation(bt.Animation.ENEMY_KNOCKED_OUT(self, sprite))
         --[[
-        --self:_test_simulation()
         for sprite in values(self._enemy_sprites) do
             self:_append_animation(bt.Animation.ENEMY_APPEARED(self, sprite))
         end

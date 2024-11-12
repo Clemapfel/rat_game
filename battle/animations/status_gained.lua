@@ -44,7 +44,7 @@ end, {
 
 --- @brief
 function bt.Animation.STATUS_GAINED:start()
-    local sprite = bt.Animation.STATUS_LOST.status_to_sprite[self._status]
+    local sprite = bt.Animation.STATUS_GAINED.status_to_sprite[self._status]
     local sprite_w, sprite_h
 
     if sprite == nil then
@@ -53,7 +53,7 @@ function bt.Animation.STATUS_GAINED:start()
         sprite:set_opacity(0)
         sprite_w, sprite_h = sprite:measure()
         sprite:fit_into(-0.5 * sprite_w, -0.5 * sprite_h)
-        bt.Animation.STATUS_LOST.status_to_sprite[self._status] = sprite
+        bt.Animation.STATUS_GAINED.status_to_sprite[self._status] = sprite
     end
     self._sprite = sprite
 

@@ -22,26 +22,14 @@
     </configurations>
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="7fa9ba1b-2cff-4ecc-86fb-59ab2fa76ee1" name="Changes" comment="refactored palette">
-      <change afterPath="$PROJECT_DIR$/assets/text/english.lua" afterDir="false" />
+    <list default="true" id="7fa9ba1b-2cff-4ecc-86fb-59ab2fa76ee1" name="Changes" comment="refactored translation">
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/assets/text/english/battle.lua" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/assets/text/english/menu.lua" beforeDir="false" afterPath="$PROJECT_DIR$/common/translation.lua" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/battle/animations/stun_gained.lua" beforeDir="false" afterPath="$PROJECT_DIR$/battle/animations/stun_gained.lua" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/battle/consumable.lua" beforeDir="false" afterPath="$PROJECT_DIR$/battle/consumable.lua" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/battle/entity.lua" beforeDir="false" afterPath="$PROJECT_DIR$/battle/entity.lua" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/battle/equip.lua" beforeDir="false" afterPath="$PROJECT_DIR$/battle/equip.lua" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/battle/global_status.lua" beforeDir="false" afterPath="$PROJECT_DIR$/battle/global_status.lua" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/battle/health_bar.lua" beforeDir="false" afterPath="$PROJECT_DIR$/battle/health_bar.lua" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/battle/move.lua" beforeDir="false" afterPath="$PROJECT_DIR$/battle/move.lua" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/battle/status.lua" beforeDir="false" afterPath="$PROJECT_DIR$/battle/status.lua" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/common/input_button.lua" beforeDir="false" afterPath="$PROJECT_DIR$/common/input_button.lua" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/common/text_atlas.lua" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/include.lua" beforeDir="false" afterPath="$PROJECT_DIR$/include.lua" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/menu/inventory_scene.lua" beforeDir="false" afterPath="$PROJECT_DIR$/menu/inventory_scene.lua" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/menu/keybinding_scene.lua" beforeDir="false" afterPath="$PROJECT_DIR$/menu/keybinding_scene.lua" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/menu/options_scene.lua" beforeDir="false" afterPath="$PROJECT_DIR$/menu/options_scene.lua" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/menu/verbose_info_panel_item.lua" beforeDir="false" afterPath="$PROJECT_DIR$/menu/verbose_info_panel_item.lua" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/battle/animations/status_gained.lua" beforeDir="false" afterPath="$PROJECT_DIR$/battle/animations/status_gained.lua" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/battle/battle_scene.lua" beforeDir="false" afterPath="$PROJECT_DIR$/battle/battle_scene.lua" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/battle/simulation_handler.lua" beforeDir="false" afterPath="$PROJECT_DIR$/battle/simulation_handler.lua" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/battle/string_formatting.lua" beforeDir="false" afterPath="$PROJECT_DIR$/battle/string_formatting.lua" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/common/sprite.lua" beforeDir="false" afterPath="$PROJECT_DIR$/common/sprite.lua" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/common/translation.lua" beforeDir="false" afterPath="$PROJECT_DIR$/common/translation.lua" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -634,15 +622,7 @@
       <workItem from="1731194564473" duration="10736000" />
       <workItem from="1731259144941" duration="7707000" />
       <workItem from="1731346058202" duration="5093000" />
-      <workItem from="1731438296642" duration="6677000" />
-    </task>
-    <task id="LOCAL-01180" summary="status animations done">
-      <option name="closed" value="true" />
-      <created>1730061052862</created>
-      <option name="number" value="01180" />
-      <option name="presentableId" value="LOCAL-01180" />
-      <option name="project" value="LOCAL" />
-      <updated>1730061052862</updated>
+      <workItem from="1731438296642" duration="8631000" />
     </task>
     <task id="LOCAL-01181" summary="added see_also">
       <option name="closed" value="true" />
@@ -1028,7 +1008,15 @@
       <option name="project" value="LOCAL" />
       <updated>1731364903020</updated>
     </task>
-    <option name="localTasksCounter" value="1229" />
+    <task id="LOCAL-01229" summary="refactored translation">
+      <option name="closed" value="true" />
+      <created>1731445017872</created>
+      <option name="number" value="01229" />
+      <option name="presentableId" value="LOCAL-01229" />
+      <option name="project" value="LOCAL" />
+      <updated>1731445017872</updated>
+    </task>
+    <option name="localTasksCounter" value="1230" />
     <servers />
   </component>
   <component name="TypeScriptGeneratedFilesManager">
@@ -1077,7 +1065,6 @@
     </option>
   </component>
   <component name="VcsManagerConfiguration">
-    <MESSAGE value="path done and optimized" />
     <MESSAGE value="tests passing" />
     <MESSAGE value="refactored labeled sprite" />
     <MESSAGE value="added equip sim" />
@@ -1102,7 +1089,8 @@
     <MESSAGE value="implemented radix sort" />
     <MESSAGE value="stashing" />
     <MESSAGE value="refactored palette" />
-    <option name="LAST_COMMIT_MESSAGE" value="refactored palette" />
+    <MESSAGE value="refactored translation" />
+    <option name="LAST_COMMIT_MESSAGE" value="refactored translation" />
   </component>
   <component name="XDebuggerManager">
     <breakpoint-manager>

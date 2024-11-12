@@ -46,10 +46,6 @@ bt.Table = "Table"
 do
     local _eq = function(self, other) return self.id == other.id end
 
-    local _tostring = function(self)
-        return bt.format_name(self)
-    end
-
     local _index = function(self, key)
         if key == "id" then return getmetatable(self)._native:get_id() end
         bt.error_function("In bt.EntityProxy.__index: trying to access proxy directly, but it can only be accessed with outer functions, use `get_*` instead")
@@ -60,6 +56,22 @@ do
         bt.error_function("In bt.EntityProxy.__newindex: trying to modify proxy directly, but it can only be accessed with outer functions, use `set_*` instead")
     end
 
+    local _concat = function(self, other)
+        local self_native = getmetatable(self)._native
+        local other_native = getmetatable(other)
+        if other_native ~= nil then
+            other_native = other_native._native
+            if other_native ~= nil then
+                return bt.format_name(self_native) .. bt.format_name(other_native)
+            end
+        end
+        return bt.format_name(self_native) .. other
+    end
+
+    local _tostring = function(self)
+        return bt.format_name(getmetatable(self)._native)
+    end
+
     local _create_proxy_metatable = function(type, scene)
         return {
             _type = type,
@@ -68,7 +80,9 @@ do
             __eq = _eq,
             __tostring = _tostring,
             __index = _index,
-            __newindex = _newindex
+            __newindex = _newindex,
+            __concat = _concat,
+            __tostring = _tostring
         }
     end
 
@@ -461,24 +475,15 @@ function bt.BattleScene:create_simulation_environment()
     end
 
     local _message = function(append_or_push, ...)
-        local n_args = select("#", ...)
-        if n_args == 0 then return end
-
-        local msg = {}
-        for i = 1, n_args do
-            local arg = select(i, ...)
-            local native_maybe = getmetatable(arg)._native
-            if native_maybe ~= nil then
-                table.insert(msg, bt.format_name(native_maybe))
-            else
-                table.insert(msg, bt.format_name(arg))
-            end
+        local to_concat = {} -- table.concat does not invoke __concat metamethods
+        for x in range(...) do
+            table.insert(to_concat, tostring(x))
         end
 
         if append_or_push then
-            _scene:_append_animation(bt.Animation.MESSAGE(_scene, table.concat(msg, " ")))
+            _scene:_append_animation(bt.Animation.MESSAGE(_scene, table.concat(to_concat, " ")))
         else
-            _scene:_push_animation(bt.Animation.MESSAGE(_scene, table.concat(msg, " ")))
+            _scene:_push_animation(bt.Animation.MESSAGE(_scene, table.concat(to_concat, " ")))
         end
     end
 
@@ -681,9 +686,9 @@ function bt.BattleScene:create_simulation_environment()
 
         local move_proxy = bt.create_move_proxy(_scene, move)
         if before < after then
-            env.message(entity_proxy, "s ", move_proxy, " gained PP")
+            env.message(rt.Translation.battle.message.move_gained_pp_f(entity_proxy, equip_proxy))
         elseif before > after then
-            env.message(entity_proxy, "s ", move_proxy, " lost PP")
+            env.message(rt.Translation.battle.message.move_lost_pp_f(entity_proxy, equip_proxy))
         end -- else, noop, for example if move has infinty PP
     end
 
@@ -749,7 +754,7 @@ function bt.BattleScene:create_simulation_environment()
             local sprite = _scene:get_sprite(entity)
             local animation = bt.Animation.EQUIP_APPLIED(_scene, equip, sprite)
             _scene:_push_animation(animation)
-            env.append_message(entity_proxy, "s ", equip_proxy, " activated")
+            env.append_message(rt.Translation.battle.message.equip_applied_f(entity_proxy, equip_proxy))
             _scene:invoke(equip.effect, equip_proxy, entity_proxy)
         end
     end
@@ -846,7 +851,7 @@ function bt.BattleScene:create_simulation_environment()
         _scene:_push_animation(animation)
 
         local consumable_proxy = bt.create_consumable_proxy(_scene, consumable)
-        env.message(entity_proxy, " lost ", consumable_proxy)
+        env.message(rt.Translation.battle.message.consumable_removed_f(entity_proxy, consumable_proxy))
 
         -- callbacks
         _try_invoke_consumable_callback("on_lost", consumable_proxy, entity_proxy)
@@ -896,7 +901,7 @@ function bt.BattleScene:create_simulation_environment()
         local entity = _get_native(entity_proxy)
         local consumable = _get_native(consumable_proxy)
 
-        env.push_message(entity_proxy, " gained ", consumable_proxy)
+        env.push_message(rt.Translation.battle.message.consumable_added_f(entity_proxy, consumable_proxy))
 
         local new_slot = nil
         for i = 1, entity:get_n_consumable_slots() do
@@ -906,7 +911,7 @@ function bt.BattleScene:create_simulation_environment()
             end
         end
         if new_slot == nil then
-            env.append_message("but ", entity_proxy, "has no space for", consumable_proxy)
+            env.push_message(rt.Translation.battle.message.consumable_no_space_f(entity_proxy, consumable_proxy))
             return
         end
 
@@ -963,7 +968,7 @@ function bt.BattleScene:create_simulation_environment()
         local n_used = _state:entity_get_consumable_n_used(entity, slot_i)
         local used_up = max - (n_used + n) <= 0
 
-        env.push_message(entity_proxy, " consumed ", consumable_proxy)
+        env.push_message(rt.Translation.battle.message.consumable_consumed_f(entity_proxy, consumable_proxy))
 
         local sprite = _scene:get_sprite(entity)
         if used_up then -- used up
@@ -1113,7 +1118,7 @@ function bt.BattleScene:create_simulation_environment()
                 local sprite, animation = _scene:get_sprite(entity), nil
                 if before == false and now == true then
                     _scene:_push_animation(bt.Animation.OBJECT_DISABLED(_scene, object, sprite))
-                    env.message(entity_proxy, "s ", object_proxy, " was disabled")
+                    env.message(rt.Translation.battle.message.object_disabled_f(entity_proxy, object_proxy))
 
                     -- callbacks
                     local callback_id = "on_" .. which .. "_disabled"
@@ -1130,7 +1135,7 @@ function bt.BattleScene:create_simulation_environment()
                     end
                 elseif before == true and now == false then
                     _scene:_push_animation(bt.Animation.OBJECT_ENABLED(_scene, object, sprite))
-                    env.message(entity_proxy, "s " , object_proxy, " is no longer disabled")
+                    env.message(rt.Translation.battle.message.object_no_longer_disabled_f(entity_proxy, object_proxy))
                     -- no callbacks on enable
                 end
             end
@@ -1176,7 +1181,7 @@ function bt.BattleScene:create_simulation_environment()
             _scene:add_global_status(global_status, global_status:get_max_duration())
         end)
         _scene:_push_animation(animation)
-        env.append_message(global_status_proxy, "is now active")
+        env.append_message(rt.Translation.battle.message.global_status_added_f(global_status_proxy))
 
         _state:add_global_status(global_status)
 
@@ -1220,7 +1225,7 @@ function bt.BattleScene:create_simulation_environment()
         end)
 
         _scene:_push_animation(animation)
-        env.append_message(global_status_proxy, " is no longer active")
+        env.append_message(rt.Translation.battle.message.global_status_removed_f(global_status_proxy))
 
         _state:remove_global_status(global_status)
 
@@ -1308,7 +1313,7 @@ function bt.BattleScene:create_simulation_environment()
             sprite:add_status(status, status:get_max_duration())
         end)
         _scene:_push_animation(animation)
-        env.append_message(entity_proxy, " is not afflicted with ", status_proxy)
+        env.append_message(rt.Translation.battle.message.status_added_f(entity_proxy, status_proxy))
 
         _state:entity_add_status(entity, status)
 
@@ -1350,7 +1355,7 @@ function bt.BattleScene:create_simulation_environment()
         end)
 
         _scene:_push_animation(animation)
-        env.append_message(entity_proxy, " is no longer afflicted with ", status_proxy)
+        env.append_message(rt.Translation.battle.message.status_removed_f(entity_proxy, status_proxy))
 
         _state:entity_remove_status(entity, status)
 
