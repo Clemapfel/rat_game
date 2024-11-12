@@ -26,8 +26,8 @@ end, {
     sprite_index = 1,
     animation_id = rt.settings.battle.move.default_animation_id,
 
-    description = "(no effect)",
-    flavor_text = "",
+    description = rt.Translation.battle.move_default_description,
+    flavor_text = rt.Translation.battle.move_default_flavor_text,
     see_also = {},
 
     max_n_uses = POSITIVE_INFINITY,

@@ -137,7 +137,7 @@ function mn.VerboseInfoPanel.Item._format_offset(x)
     elseif x < 0 then
         return "-" .. math.abs(x)
     else
-        return "\u{00B1}" .. x -- plusminus
+        return rt.Translation.plus_minus .. x
     end
 end
 
@@ -148,7 +148,7 @@ function mn.VerboseInfoPanel.Item._format_factor(x)
     elseif x < 1 then
         return "-" .. math.round((1 - x) * 100) .. "%"
     else
-        return "\u{00B1}0%" -- plusminus
+        return rt.Translation.plus_minus .. "0%"
     end
 end
 
@@ -179,11 +179,13 @@ function mn.VerboseInfoPanel.Item:create_from_equip(equip)
             self.flavor_text_label
         }
 
+        local translation = rt.Translation.verbose_info
+
         for stat_color_label in range(
-            {"hp", "HP", "HP"},
-            {"attack", "ATTACK", "ATK"},
-            {"defense", "DEFENSE", "DEF"},
-            {"speed", "SPEED", "SPD"}
+            {"hp", "HP", translation.hp_label},
+            {"attack", "ATTACK", translation.attack_label},
+            {"defense", "DEFENSE", translation.defense_label},
+            {"speed", "SPEED", translation.speed_label}
         ) do
             local stat = stat_color_label[1]
             local color = stat_color_label[2]
@@ -323,19 +325,19 @@ function mn.VerboseInfoPanel.Item:create_from_move(move)
             self.flavor_text_label = self._flavor_text(move:get_flavor_text())
         end
 
-        self.n_uses_prefix_label = self._prefix("Uses")
+        self.n_uses_prefix_label = self._prefix(rt.Translation.verbose_info.move_n_uses)
         self.n_uses_colon_label = self._colon()
 
         local n_uses = move:get_max_n_uses()
         local n_uses_str
         if n_uses == POSITIVE_INFINITY then
-            n_uses_str = "<b>\u{221E}</b>" -- infinity
+            n_uses_str = "<b>" .. rt.Translation.infinity .. "</b>"
         else
             n_uses_str = tostring(n_uses)
         end
         self.n_uses_value_label = self._number(n_uses_str)
 
-        self.priority_prefix_label = self._prefix("Priority")
+        self.priority_prefix_label = self._prefix(rt.Translation.verbose_info.move_priority)
         self.priority_colon_label = self._colon()
 
         local prio = move:get_priority()
@@ -345,7 +347,7 @@ function mn.VerboseInfoPanel.Item:create_from_move(move)
         elseif prio < 0 then
             priority_str = "-"
         else
-            priority_str = "\u{00B1}" -- plusminus
+            priority_str = rt.Translation.plus_minus
         end
         priority_str = priority_str .. prio
         self.priority_value_label = self._number(priority_str)
@@ -507,13 +509,13 @@ function mn.VerboseInfoPanel.Item:create_from_status(status)
         self.description_label = self._description(status:get_description())
         self.sprite = self._sprite(status)
 
-        self.max_duration_prefix_label = self._prefix("Max Duration")
+        self.max_duration_prefix_label = self._prefix(rt.Translation.status_max_duration)
         self.max_duration_colon_label = self._colon()
 
         local duration = status:get_max_duration()
         local duration_str
         if duration == POSITIVE_INFINITY then
-            duration_str = "<b>\u{221E}</b>" -- infinity
+            duration_str = "<b>" .. rt.Translation.infinity .. "</b>"
         else
             duration_str = tostring(duration)
         end
@@ -537,14 +539,15 @@ function mn.VerboseInfoPanel.Item:create_from_status(status)
             self.flavor_text_label,
         }
 
+        local translation = rt.Translation.verbose_info
         for name_color_prefix in range(
-            {"attack", "ATTACK", "ATK"},
-            {"defense", "DEFENSE", "DEF"},
-            {"speed", "SPEED", "SPD"},
-            {"damage_dealt", "ATTACK", "Damage"},
-            {"damage_received", "ATTACK", "Damage Taken"},
-            {"healing_performed", "HEALTH", "Healing"},
-            {"healing_received", "HEALTH", "Healing Done"}
+            {"attack", "ATTACK", translation.attack_label},
+            {"defense", "DEFENSE", translation.defense_label},
+            {"speed", "SPEED", translation.speed_label},
+            {"damage_dealt", "ATTACK", translation.damage_dealt_label},
+            {"damage_received", "ATTACK", translation.damage_taken_label},
+            {"healing_performed", "HEALTH", translation.healing_performed_label},
+            {"healing_received", "HEALTH", translation.healing_received_label}
         ) do
             local name, color, prefix = table.unpack(name_color_prefix)
 
@@ -682,13 +685,13 @@ function mn.VerboseInfoPanel.Item:create_from_global_status(status)
         self.description_label = self._description(status:get_description())
         self.sprite = self._sprite(status)
 
-        self.max_duration_prefix_label = self._prefix("Max Duration")
+        self.max_duration_prefix_label = self._prefix(rt.Translation.verbose_info.global_status_max_duration)
         self.max_duration_colon_label = self._colon()
 
         local duration = status:get_max_duration()
         local duration_str
         if duration == POSITIVE_INFINITY then
-            duration_str = "<b>\u{221E}</b>" -- infinity
+            duration_str = "<b>" .. rt.Translation.infinity .. "</b>"
         else
             duration_str = tostring(duration)
         end
@@ -774,20 +777,20 @@ function mn.VerboseInfoPanel.Item:create_from_template(template)
         self._is_realized = true
         self.frame:realize()
 
+        local translation = rt.Translation.verbose_info
+
         self.title_label = rt.Label(format_title(template:get_name()))
         self.title_label:realize()
         self.title_label:set_justify_mode(rt.JustifyMode.LEFT)
 
-        self.created_on_label = self._flavor_text("Created: " .. template:get_creation_date())
+        self.created_on_label = self._flavor_text(translation.template_created_on_f(template:get_creation_date()))
 
         self.content = {
             self.title_label,
             self.created_on_label
         }
 
-        local equip_name = rt.settings.battle.equip.name
-        local consumable_name = rt.settings.battle.consumable.name
-        local move_name = rt.settings.battle.move.name
+        local translation = rt.Translation.verbose_info
 
         self.entities = {}
         local font, mono_font = rt.settings.font.default_small, rt.settings.font.default_mono_small
@@ -795,9 +798,9 @@ function mn.VerboseInfoPanel.Item:create_from_template(template)
             local to_push = {
                 entity = entity,
                 name_label = rt.Label("<u>" .. entity:get_name() .. "</u>", font, mono_font),
-                move_label = rt.Label(move_name .. "s:", font, mono_font),
+                move_label = rt.Label(translation.template_move_heading, font, mono_font),
                 move_sprites = {},
-                equip_and_consumable_label = rt.Label("Equipment:", font, mono_font),
+                equip_and_consumable_label = rt.Label(translation.template_equipment_heading, font, mono_font),
                 equip_sprites = {},
                 consumable_sprites = {},
                 hrule = self._hrule()
@@ -817,7 +820,7 @@ function mn.VerboseInfoPanel.Item:create_from_template(template)
             end
 
             if sizeof(to_push.move_sprites) == 0 then
-                table.insert(to_push.move_sprites, self._description("<color=GRAY>(none)</color>"))
+                table.insert(to_push.move_sprites, self._description(translation.no_moves))
             end
 
             local n_equip_slots, equip_slots = template:list_equip_slots(entity)
@@ -835,7 +838,7 @@ function mn.VerboseInfoPanel.Item:create_from_template(template)
             end
 
             if sizeof(to_push.equip_sprites) == 0 and sizeof(to_push.consumable_sprites) == 0 then
-                table.insert(to_push.equip_sprites, self._description("<color=GRAY>(none)</color>"))
+                table.insert(to_push.equip_sprites, self._description(translation.no_equips))
             end
 
             for widget in range(to_push.name_label, to_push.move_label, to_push.equip_and_consumable_label, to_push.hrule) do
@@ -962,11 +965,13 @@ function mn.VerboseInfoPanel.Item:create_from_entity(entity)
             self.title_label
         }
 
+        local translation = rt.Translation.verbose_info
+
         for stat_color_label in range(
-            {"hp", "HP", "HP"},
-            {"attack", "ATTACK", "ATK"},
-            {"defense", "DEFENSE", "DEF"},
-            {"speed", "SPEED", "SPD"}
+            {"hp", "HP", translation.hp_label},
+            {"attack", "ATTACK", translation.attack_label},
+            {"defense", "DEFENSE", translation.defense_label},
+            {"speed", "SPEED", translation.speed_label}
         ) do
             local stat, color, label = table.unpack(stat_color_label)
             local prefix_label = self._prefix(label, color)
@@ -983,20 +988,16 @@ function mn.VerboseInfoPanel.Item:create_from_entity(entity)
             end
         end
 
-        local equip_name = rt.settings.battle.equip.name
-        local consumable_name = rt.settings.battle.consumable.name
-        local move_name = rt.settings.battle.move.name
-
         local font, mono_font = rt.settings.font.default_small, rt.settings.font.default_mono_small
-        self.move_label = rt.Label(move_name .. "s:", font, mono_font)
+        self.move_label = rt.Label(translation.entity_move_heading, font, mono_font)
         self.move_sprites = {}
         self.move_names = {}
 
-        self.equip_label = rt.Label(equip_name .. ":", font, mono_font)
+        self.equip_label = rt.Label(translation.entity_equip_heading, font, mono_font)
         self.equip_sprites = {}
         self.equip_names = {}
 
-        self.consumable_label = rt.Label(consumable_name .. "s:", font, mono_font)
+        self.consumable_label = rt.Label(translation.entity_consumable_heading, font, mono_font)
         self.consumable_sprites = {}
         self.consumable_names = {}
 
@@ -1009,7 +1010,7 @@ function mn.VerboseInfoPanel.Item:create_from_entity(entity)
         end
 
         if sizeof(self.move_sprites) == 0 then
-            table.insert(self.move_names, self._description("<color=GRAY>(none)</color>"))
+            table.insert(self.move_names, self._description(translation.no_moves))
         end
 
         local n_equip_slots, equip_slots = entity:list_equip_slots()
@@ -1021,7 +1022,7 @@ function mn.VerboseInfoPanel.Item:create_from_entity(entity)
         end
 
         if sizeof(self.equip_sprites) == 0 then
-            table.insert(self.equip_names, self._description("<color=GRAY>(none)</color>"))
+            table.insert(self.equip_names, self._description(translation.no_equips))
         end
 
         local n_consumable_slots, consumable_slots = entity:list_consumable_slots()
@@ -1033,7 +1034,7 @@ function mn.VerboseInfoPanel.Item:create_from_entity(entity)
         end
 
         if sizeof(self.consumable_sprites) == 0 then
-            table.insert(self.consumable_names, self._description("<color=GRAY>(none)</color>"))
+            table.insert(self.consumable_names, self._description(translation.no_consumables))
         end
 
         for widget in range(self.name_label, self.move_label, self.equip_label, self.consumable_label, self.hrule) do
@@ -1170,62 +1171,59 @@ function mn.VerboseInfoPanel.Item:create_from_enum(which)
         return "<b><u>" .. str .. "</u></b>"
     end
 
-    local consumable_name = rt.settings.battle.consumable.name
-    local equip_name = rt.settings.battle.equip.name
-    local move_name = rt.settings.battle.move.name
-
+    local translation = rt.Translation.verbose_info.objects
     local titles = {
-        [rt.VerboseInfoObject.HP] = format_title("Health") .. " (<color=HP>HP</color>)",
-        [rt.VerboseInfoObject.ATTACK] = format_title("Attack") .. " (<color=ATTACK>ATK</color>)",
-        [rt.VerboseInfoObject.DEFENSE] = format_title("Defense") ..  " (<color=DEFENSE>DEF</color>)",
-        [rt.VerboseInfoObject.SPEED] = format_title("Speed") .." (<color=SPEED>SPD</color>)",
+        [rt.VerboseInfoObject.HP] = format_title(translation.hp_title),
+        [rt.VerboseInfoObject.ATTACK] = format_title(translation.attack_title),
+        [rt.VerboseInfoObject.DEFENSE] = format_title(translation.defense_title),
+        [rt.VerboseInfoObject.SPEED] = format_title(translation.speed_title),
 
-        [rt.VerboseInfoObject.CONSUMABLE] = format_title(consumable_name .. "s") .. " \u{25CF}",
-        [rt.VerboseInfoObject.EQUIP] = format_title(equip_name .. "s") .. "  \u{2B23}",
-        [rt.VerboseInfoObject.MOVE] = format_title(move_name .. "s") .. "  \u{25A0}",
-        [rt.VerboseInfoObject.TEMPLATE] = format_title("Templates"),
+        [rt.VerboseInfoObject.CONSUMABLE] = format_title(translation.consumables_title),
+        [rt.VerboseInfoObject.EQUIP] = format_title(translation.equips_title),
+        [rt.VerboseInfoObject.MOVE] = format_title(translation.moves_title),
+        [rt.VerboseInfoObject.TEMPLATE] = format_title(translation.templates_title),
 
-        [rt.VerboseInfoObject.OPTIONS] = format_title("Options"),
-        [rt.VerboseInfoObject.VSYNC] = format_title("Vertical Synchronization"),
-        [rt.VerboseInfoObject.GAMMA] = format_title("Brightness (Gamma)"),
-        [rt.VerboseInfoObject.FULLSCREEN] = format_title("Fullscreen"),
-        [rt.VerboseInfoObject.RESOLUTION] = format_title("Screen Resolution"),
-        [rt.VerboseInfoObject.SOUND_EFFECTS] = format_title("Sound Effect Audio Level"),
-        [rt.VerboseInfoObject.MUSIC] = format_title("Music Audio Level"),
+        [rt.VerboseInfoObject.OPTIONS] = format_title(translation.options_title),
+        [rt.VerboseInfoObject.VSYNC] = format_title(translation.vsync_title),
+        [rt.VerboseInfoObject.GAMMA] = format_title(translation.gamma_title),
+        [rt.VerboseInfoObject.FULLSCREEN] = format_title(translation.fullscreen_title),
+        [rt.VerboseInfoObject.RESOLUTION] = format_title(translation.resolution_title),
+        [rt.VerboseInfoObject.SOUND_EFFECTS] = format_title(translation.sound_effects_title),
+        [rt.VerboseInfoObject.MUSIC] = format_title(translation.music_title),
 
-        [rt.VerboseInfoObject.MOTION_EFFECTS] = format_title("Screen Shake"),
-        [rt.VerboseInfoObject.VISUAL_EFFECTS] = format_title("Background Intensity"),
-        [rt.VerboseInfoObject.MSAA] = format_title("Multi Sample Anti Aliasing (MSAA)"),
-        [rt.VerboseInfoObject.DEADZONE] = format_title("Deadzone"),
-        [rt.VerboseInfoObject.KEYMAP] = format_title("Controls")
+        [rt.VerboseInfoObject.MOTION_EFFECTS] = format_title(translation.motion_effects_title),
+        [rt.VerboseInfoObject.VISUAL_EFFECTS] = format_title(translation.visual_effects_title),
+        [rt.VerboseInfoObject.MSAA] = format_title(translation.msaa_title),
+        [rt.VerboseInfoObject.DEADZONE] = format_title(translation.deadzone_title),
+        [rt.VerboseInfoObject.KEYMAP] = format_title(translation.keymap_title)
     }
 
     local descriptions = {
-        [rt.VerboseInfoObject.HP] = "When a characters HP reaches 0, they are knocked out. If damaged while knocked out, they die",
-        [rt.VerboseInfoObject.ATTACK] = "For most moves, user's ATK increases damage dealt to the target",
-        [rt.VerboseInfoObject.DEFENSE] = "For most moves, target's DEF decreases damage dealt to target",
-        [rt.VerboseInfoObject.SPEED] = "Along with Move Priority, influences in what order participants act each turn",
+        [rt.VerboseInfoObject.HP] = translation.hp_description,
+        [rt.VerboseInfoObject.ATTACK] = translation.attack_description,
+        [rt.VerboseInfoObject.DEFENSE] = translation.defense_description,
+        [rt.VerboseInfoObject.SPEED] = translation.speed_description,
 
-        [rt.VerboseInfoObject.CONSUMABLE] = "Consumable Description, TODO",
-        [rt.VerboseInfoObject.EQUIP] = "Equip Description, TODO",
-        [rt.VerboseInfoObject.MOVE] = "Move Description, TODO",
-        [rt.VerboseInfoObject.TEMPLATE] = "Template Description, TODO",
+        [rt.VerboseInfoObject.CONSUMABLE] = translation.consumables_description,
+        [rt.VerboseInfoObject.EQUIP] = translation.equips_description,
+        [rt.VerboseInfoObject.MOVE] = translation.moves_description,
+        [rt.VerboseInfoObject.TEMPLATE] = translation.templates_description,
 
-        [rt.VerboseInfoObject.OPTIONS] = "Option Description, TODO",
+        [rt.VerboseInfoObject.OPTIONS] = translation.options_description,
 
-        [rt.VerboseInfoObject.VSYNC] = "Synchronizes game refresh rate with that of the screen, preventing screen tearing. When 'adaptive', dynamically turns of vsync depending on the frame rate. When `off`, frame rate is no longer capped by the monitor refresh rate.",
-        [rt.VerboseInfoObject.MSAA] = "Reduces artifacting along lines and sharp edges, but decreases performance",
-        [rt.VerboseInfoObject.GAMMA] = "Changes brightness of the screen",
-        [rt.VerboseInfoObject.FULLSCREEN] = "Whether the window should fill the entire screen",
-        [rt.VerboseInfoObject.RESOLUTION] = "Resolution of the window, also sets minimum size.",
-        [rt.VerboseInfoObject.SOUND_EFFECTS] = "Loudness of all sounds except music",
-        [rt.VerboseInfoObject.MUSIC] = "Loudness of music",
+        [rt.VerboseInfoObject.VSYNC] = translation.vsync_description,
+        [rt.VerboseInfoObject.MSAA] = translation.msaa_description,
+        [rt.VerboseInfoObject.GAMMA] = translation.gamma_description,
+        [rt.VerboseInfoObject.FULLSCREEN] = translation.fullscreen_description,
+        [rt.VerboseInfoObject.RESOLUTION] = translation.resolution_description,
+        [rt.VerboseInfoObject.SOUND_EFFECTS] = translation.sound_effects_description,
+        [rt.VerboseInfoObject.MUSIC] = translation.music_description,
 
-        [rt.VerboseInfoObject.MOTION_EFFECTS] = "Intensity of screen shake and other motion-based animations",
-        [rt.VerboseInfoObject.VISUAL_EFFECTS] = "Intensity of background TODO",
+        [rt.VerboseInfoObject.MOTION_EFFECTS] = translation.motion_effects_description,
+        [rt.VerboseInfoObject.VISUAL_EFFECTS] = translation.visual_effects_description,
 
-        [rt.VerboseInfoObject.KEYMAP] = "Remap keyboard / controller controls",
-        [rt.VerboseInfoObject.DEADZONE] = "Minimum distance from center the joysticks have to be moved for an input to register"
+        [rt.VerboseInfoObject.DEADZONE] = translation.deadzone_description,
+        [rt.VerboseInfoObject.KEYMAP] = translation.keymap_description
     }
 
     self.realize = function()

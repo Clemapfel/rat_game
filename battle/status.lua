@@ -21,8 +21,8 @@ bt.Status = meta.new_type("Status", function(id)
     return out
 end, {
     name = "",
-    description = "(no additional effect)",
-    flavor_text = "",
+    description = rt.Translation.battle.status_default_description,
+    flavor_text = rt.Translation.battle.status_default_flavor_text,
     see_also = {},
 
     sprite_id = "status_ailment",

@@ -79,9 +79,9 @@ end
 --- @brief [internal]
 function bt.HealthBar:_format_hp(value, max)
     if self._state == bt.EntityState.KNOCKED_OUT then
-        return "", "KNOCKED OUT", ""
+        return "", rt.Translation.battle.health_bar_knocked_out_label, ""
     elseif self._state == bt.EntityState.DEAD then
-        return "", "DEAD", ""
+        return "", rt.Translation.battle.health_bar_dead_label, ""
     elseif self._use_percentage then
         return "", (value - math.fmod(value, 1.0)) .. " %", ""
     else

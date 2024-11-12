@@ -145,7 +145,7 @@ require "common.vertex_shape"
 require "common.spline"
 require "common.path"
 
-require "common.text_atlas"
+require "common.translation"
 require "common.sound_atlas"
 require "common.sound_component"
 require "common.widget"

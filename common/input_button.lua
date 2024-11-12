@@ -332,7 +332,6 @@ end
 
 --- @brief
 function rt.input_button_to_string(button)
-    local names = rt.TextAtlas:get("menu")
-    return names[button]
+    return rt.Translation[button]
 end
 

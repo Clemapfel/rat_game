@@ -146,8 +146,8 @@ end, {
         return nil
     end,
 
-    description = "(no effect)",
-    flavor_text = "",
+    description = rt.Translation.battle.consumable_default_description,
+    flavor_text = rt.Translation.battle.consumable_default_flavor_text,
     sprite_id = "",
     sprite_index = 1
 })

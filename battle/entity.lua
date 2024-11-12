@@ -61,7 +61,9 @@ end, {
 
     name = "",
     name_suffix = "",
-    flavor_text = "(no flavor_text)",
+
+    description = rt.Translation.battle.entity_default_description,
+    flavor_text = rt.Translation.battle.entity_default_flavor_text,
 
     intrinsic_moves = {
         "STRUGGLE"
@@ -97,6 +99,7 @@ function bt.Entity:realize()
         n_equip_slots = rt.INTEGER,
         n_consumable_slots = rt.INTEGER,
 
+        description = rt.STRING,
         flavor_text = rt.STRING
     }
 

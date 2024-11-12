@@ -70,7 +70,7 @@ return {
     [rt.InputButton.SELECT] = "Select",
 
     -- mn.KeybindingScene
-    keybinding_scene = {
+    keybindings_scene = {
         accept = "Accept",
         go_back = "Abort",
         heading_keyboard = "<b>Settings > Controls > Keyboard</b>",

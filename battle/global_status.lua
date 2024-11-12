@@ -22,8 +22,8 @@ end, {
     max_duration = POSITIVE_INFINITY,
     is_silent = false,
 
-    description = "(no effect)",
-    flavor_text = "",
+    description = rt.Translation.battle.global_status_default_description,
+    flavor_text = rt.Translation.battle.global_status_default_flavor_text,
     see_also = {},
 
     sprite_id = "",

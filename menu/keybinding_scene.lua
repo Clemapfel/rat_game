@@ -1,7 +1,3 @@
-rt.settings.menu.keybinding_scene = {
-    text_atlas_id = "menu/keybinding_scene"
-}
-
 --- @class rt.KeybindingScene
 mn.KeybindingScene = meta.new_type("KeybindingScene", rt.Scene, function(state)
     return meta.new(mn.KeybindingScene, {
@@ -50,7 +46,7 @@ function mn.KeybindingScene:realize()
     if self:already_realized() then return end
 
     self._input_method = self._input_controller:get_input_method()
-    local labels = rt.TextAtlas:get(rt.settings.menu.keybinding_scene.text_atlas_id)
+    local labels = rt.Translation.keybindings_scene
     self._accept_label = rt.Label(labels.accept)
     self._go_back_label = rt.Label(labels.go_back)
     self._heading_label = rt.Label("TODO") -- initialized in input_method_changed

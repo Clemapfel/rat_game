@@ -45,7 +45,7 @@ end, {
     _path = nil, -- rt.Spline
     _duration = 1, -- seconds
     _n_shakes = 2,
-    _label = rt.Label("<o><b>" .. rt.TextAtlas:get("battle.animations.stun_gained_label") .. "</o></b>"),
+    _label = rt.Label("<o><b>" .. rt.Translation.battle.stun_gained_label .. "</o></b>"),
     _label_w = 0,
     _label_h = 0,
     _initialized = false

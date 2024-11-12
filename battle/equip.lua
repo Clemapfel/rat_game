@@ -34,8 +34,8 @@ end, {
     -- (EquipProxy, EntityProxy) -> nil
     effect = nil,
 
-    description = "(no description)",
-    flavor_text = "",
+    description = rt.Translation.battle.equip_default_description,
+    flavor_text = rt.Translation.battle.equip_default_flavor_text,
     see_also = {},
 
     sprite_id = "",

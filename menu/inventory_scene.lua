@@ -528,7 +528,7 @@ end
 --- @brief
 function mn.InventoryScene:_update_heading_label()
     local name = self._entity_pages[self._entity_index].entity:get_name()
-    local prefix = rt.TextAtlas:get("menu.inventory_scene.heading")
+    local prefix = rt.Translation.inventory_scene.heading
     self._heading_label:set_text("<b>" .. prefix .. " > " .. name .. "</b>")
     local heading_w, heading_h = self._heading_label:measure()
 
@@ -822,26 +822,29 @@ function mn.InventoryScene:_regenerate_selection_nodes()
         return "<s><color=GRAY>" .. label .. "</s></color>"
     end
 
+
     local function sort_mode_to_label(mode)
         local next = self._shared_list_sort_mode_order[mode]
+        local translation = rt.Translation.inventory_scene
         if next == mn.ScrollableListSortMode.BY_ID then
-            return "Sort by Default"
+            return translation.sort_mode_by_id
         elseif next == mn.ScrollableListSortMode.BY_QUANTITY then
-            return "Sort by Quantity"
+            return translation.sort_mode_by_quantity
         elseif next == mn.ScrollableListSortMode.BY_NAME then
-            return "Sort by Name"
+            return translation.sort_mode_by_name
         end
     end
 
+    local control_indicator_translation = rt.Translation.inventory_scene.control_indicator
     local drop_grabbed_object_entry = function()
         if scene._state:peek_grabbed_object() ~= nil then
-            return {rt.ControlIndicatorButton.B, "Drop"}
+            return {rt.ControlIndicatorButton.B, control_indicator_translation.drop}
         else
             return nil
         end
     end
 
-    local shared_list_up_down_label = "Select"
+    local shared_list_up_down_label = control_indicator_translation.shared_list_up_down
 
     for node_list_name in range(
         {shared_move_node, scene._shared_move_list, move_name},
@@ -857,18 +860,18 @@ function mn.InventoryScene:_regenerate_selection_nodes()
 
             local a_label
             if is_grabbing then
-                a_label = "Deposit " .. name
+                a_label = control_indicator_translation.deposit_item_f(name)
                 if not shared_list_allow_deposit() then
                     a_label = disable(a_label)
                 end
             else
-                a_label = "Take " .. name
+                a_label = control_indicator_translation.take_item_f(name)
                 if not shared_list_allow_take() then
                     a_label = disable(a_label)
                 end
             end
 
-            local x_label = "Equip " .. name
+            local x_label = control_indicator_translation.equip_item_f(name)
             if not shared_list_allow_equip() then
                 x_label = disable(x_label)
             end
@@ -886,17 +889,18 @@ function mn.InventoryScene:_regenerate_selection_nodes()
     end
 
     shared_template_node:set_control_layout(function()
-        local a_label = "Load Template"
+        local translation = rt.Translation.inventory_scene
+        local a_label = translation.template_load
         if not template_list_allow_delete() then
             a_label = disable(a_label)
         end
 
-        local x_label = "Rename"
+        local x_label = translation.template_rename
         if not template_list_allow_rename() then
             x_label = disable(x_label)
         end
 
-        local y_label = "Delete"
+        local y_label = translation.template_delete
         if not template_list_allow_delete() then
             y_label = disable(y_label)
         end
@@ -912,7 +916,7 @@ function mn.InventoryScene:_regenerate_selection_nodes()
 
     local shared_tab_node_control_layout = function()
         return {
-            {rt.ControlIndicatorButton.A, "Select Tab"},
+            {rt.ControlIndicatorButton.A, rt.Translation.inventory_scene.shared_tab_select},
             drop_grabbed_object_entry()
         }
     end
@@ -923,14 +927,14 @@ function mn.InventoryScene:_regenerate_selection_nodes()
 
     local entity_tab_node_control_layout = function()
         return {
-            {rt.ControlIndicatorButton.A, "Select Character"},
+            {rt.ControlIndicatorButton.A, rt.Translation.inventory_scene.entity_tab_select},
             drop_grabbed_object_entry()
         }
     end
 
     local option_tab_node_control_layout = function()
         return {
-            {rt.ControlIndicatorButton.A, "Go To Options"},
+            {rt.ControlIndicatorButton.A, rt.Translation.inventory_scene.option_tab_select},
             drop_grabbed_object_entry()
         }
     end
@@ -958,34 +962,33 @@ function mn.InventoryScene:_regenerate_selection_nodes()
         local slot_i = scene._selection_graph:get_current_node().slot_i
         local down = scene._state:entity_get_move(entity, slot_i)
         local name = move_name
+
+        local translation = rt.Translation.inventory_scene
+
         local a_label
         if up ~= nil and down == nil then
-            a_label = "Place"
+            a_label = translation.move_node_place_f(name)
             if not move_slot_allow_deposit() then
                 a_label = disable(a_label)
-            else
-                a_label = a_label .. " " .. name
             end
         elseif up ~= nil and down ~= nil then
-            a_label = "Swap"
+            a_label = translation.move_node_swap_f(name)
             if not move_slot_allow_swap() then
                 a_label = disable(a_label)
-            else
-                a_label = a_label .. " " .. name
             end
         elseif up == nil then
-            a_label = "Take " .. name
+            a_label = translation.move_node_take_f(name)
             if not move_slot_allow_take() then
                 a_label = disable(a_label)
             end
         end
 
-        local x_label = "Unequip"
+        local x_label = translation.move_node_unequip
         if not move_slot_allow_unequip() then
             x_label = disable(x_label)
         end
 
-        local y_label = "Sort"
+        local y_label = translation.move_node_sort
         if not slots_allow_sort() then
             y_label = disable(y_label)
         end
@@ -1003,35 +1006,32 @@ function mn.InventoryScene:_regenerate_selection_nodes()
         local entity = scene:_get_current_entity()
         local slot_i = scene._selection_graph:get_current_node().slot_i
         local down = scene._state:entity_get_equip(entity, slot_i)
+        local translation = rt.Translation.inventory_scene
 
         local a_label
         if up ~= nil and down == nil then
-            a_label = "Place"
+            a_label = translation.equip_node_place_f(equip_name)
             if not equip_slot_allow_deposit() then
                 a_label = disable(a_label)
-            else
-                a_label = a_label .. " " .. equip_name
             end
         elseif up ~= nil and down ~= nil then
-            a_label = "Swap"
+            a_label = translation.equip_node_swap_f(equip_name)
             if not equip_slot_allow_swap() then
                 a_label = disable(a_label)
-            else
-                a_label = a_label .. " " .. equip_name
             end
         elseif up == nil then
-            a_label = "Take " .. equip_name
+            a_label = translation.equip_node_take_f(equip_name)
             if not equip_slot_allow_take() then
                 a_label = disable(a_label)
             end
         end
 
-        local x_label = "Unequip"
+        local x_label = translation.equip_node_unequip
         if not equip_slot_allow_unequip() then
             x_label = disable(x_label)
         end
 
-        local y_label = "Sort"
+        local y_label = translation.equip_node_sort
         if not slots_allow_sort() then
             y_label = disable(y_label)
         end
@@ -1049,35 +1049,32 @@ function mn.InventoryScene:_regenerate_selection_nodes()
         local entity = scene:_get_current_entity()
         local slot_i = scene._selection_graph:get_current_node().slot_i
         local down = scene._state:entity_get_consumable(entity, slot_i - entity:get_n_equip_slots())
+        local translation = rt.Translation.inventory_scene
 
         local a_label
         if up ~= nil and down == nil then
-            a_label = "Place"
+            a_label = translation.consumable_node_place_f(consumable_name)
             if not consumable_slot_allow_deposit() then
                 a_label = disable(a_label)
-            else
-                a_label = a_label .. " " .. consumable_name
             end
         elseif up ~= nil and down ~= nil then
-            a_label = "Swap"
+            a_label = translation.consumable_node_swap_f(consumable_name)
             if not consumable_slot_allow_swap() then
                 a_label = disable(a_label)
-            else
-                a_label = a_label .. " " .. consumable_name
             end
         elseif up == nil then
-            a_label = "Take " .. consumable_name
+            a_label = translation.consumable_node_take_f(consumable_name)
             if not consumable_slot_allow_take() then
                 a_label = disable(a_label)
             end
         end
 
-        local x_label = "Unequip"
+        local x_label = translation.consumable_node_unequip
         if not consumable_slot_allow_unequip() then
             x_label = disable(x_label)
         end
 
-        local y_label = "Sort"
+        local y_label = translation.consumable_node_sort
         if not slots_allow_sort() then
             y_label = disable(y_label)
         end
@@ -1953,7 +1950,7 @@ function mn.InventoryScene:_regenerate_selection_nodes()
 
                 if success == false then
                     scene._template_apply_unsuccesfull_dialog:set_message(
-                        scene:_template_apply_unsuccesfull_dialog_message(current:get_name())
+                        rt.Translation.inventory_scene.template_apply_unsuccessful_dialog_f(current:get_name())
                     )
                     scene._template_apply_unsuccesfull_dialog:present()
                 end
@@ -1968,7 +1965,7 @@ function mn.InventoryScene:_regenerate_selection_nodes()
             local current = scene._shared_template_list:get_selected_object()
             if current ~= nil then
                 scene._template_confirm_load_dialog:set_message(
-                    scene:_template_confirm_load_dialog_message(current:get_name())
+                    rt.Translation.inventory_scene.template_confirm_dialog_f(current:get_name())
                 )
                 scene._template_confirm_load_dialog:present()
             end
@@ -2011,7 +2008,7 @@ function mn.InventoryScene:_regenerate_selection_nodes()
         if template_list_allow_delete() then
             local current = scene._shared_template_list:get_selected_object()
             if current ~= nil then
-                scene._template_confirm_delete_dialog:set_message(scene:_template_confirm_delete_dialog_message(current:get_name()))
+                scene._template_confirm_delete_dialog:set_message(rt.Translation.inventory_scene.template_delete_dialog_f(current:get_name()))
                 scene._template_confirm_delete_dialog:present()
             end
         end
@@ -2082,7 +2079,7 @@ function mn.InventoryScene:_update_grabbed_object()
         if grabbed:get_id() ~= self._grabbed_object_id then
             self._grabbed_object_id = grabbed:get_id()
             self._grabbed_object_sprite = rt.Sprite(grabbed:get_sprite_id())
-            self._grabbed_object_sprite:set_bottom_right_child(rt.Label("<color=LIGHT_RED_3><o>\u{00D7}</o></color>"))
+            self._grabbed_object_sprite:set_bottom_right_child(rt.Label(rt.Translation.inventory_scene.grabbed_object_bottom_right_indicator))
             self._grabbed_object_sprite:realize()
             sprite_w, sprite_h = self._grabbed_object_sprite:get_resolution()
             local sprite_factor = rt.settings.menu.inventory_scene.sprite_factor
@@ -2154,21 +2151,4 @@ function mn.InventoryScene:_play_transfer_object_animation(object, from_aabb, to
     animation:signal_connect("start", before)
     animation:signal_connect("finish", after)
     self._animation_queue:append(animation)
-end
-
---- @brief
-function mn.InventoryScene:_template_confirm_load_dialog_message(name)
-    return "Overwrite current Equipment?",
-        "This will return all currently equipped items back to the shared inventory"
-end
-
---- @brief
-function mn.InventoryScene:_template_confirm_delete_dialog_message(name)
-    return "Delete Template \"" .. name .. "\" permanently?",
-        "This action cannot be undone"
-end
-
---- @brief
-function mn.InventoryScene:_template_apply_unsuccesfull_dialog_message(name)
-    return "Some Elements of Template \"" .. name .. "\" could not be applied", ""
 end

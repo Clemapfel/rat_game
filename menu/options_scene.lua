@@ -1,7 +1,6 @@
 rt.settings.menu.options_scene = {
     scale_n_ticks_per_second = 32,
-    scale_delay = 1 / 3, -- seconds,
-    text_atlas_id = "menu/options_scene"
+    scale_delay = 1 / 3, -- seconds
 }
 
 --- @class mn.OptionsScene
@@ -34,7 +33,7 @@ mn.OptionsScene = meta.new_type("MenuOptionsScene", rt.Scene, function(state)
 
     -- nil items set during :realize
 
-    local labels = rt.TextAtlas:get(rt.settings.menu.options_scene.text_atlas_id)
+    local labels = rt.Translation.options_scene
     fields._heading_label = rt.Label(labels.heading)
 
     fields._vsync_label_text = labels.vsync
@@ -397,7 +396,7 @@ end
 
 --- @brief
 function mn.OptionsScene:_update_control_indicator()
-    local labels = rt.TextAtlas:get(rt.settings.menu.options_scene.text_atlas_id)
+    local labels = rt.Translation.options_scene
 
     if self._keymap_item_active == false then
         local left_right_label = labels.control_indicator_a
