@@ -7,6 +7,7 @@ bt.Animation.QUICKSAVE = meta.new_type("QUICKSAVE", rt.Animation, function(scene
     return meta.new(bt.Animation.QUICKSAVE, {
         _scene = scene,
         _screenshot = rt.RenderTexture(screen_w, screen_h, 0, "rgba4"),
+        _blur_texture = rt.RenderTexture(screen_w, screen_h, 0, "rgba4"),
         _n_vertices = 32,
         _vertex_data = {},
         _mesh = nil, -- love.mesh

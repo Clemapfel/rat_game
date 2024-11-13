@@ -22,9 +22,8 @@
     </configurations>
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="7fa9ba1b-2cff-4ecc-86fb-59ab2fa76ee1" name="Changes" comment="stashing">
+    <list default="true" id="7fa9ba1b-2cff-4ecc-86fb-59ab2fa76ee1" name="Changes" comment="stashing shader blur">
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/battle/animations/quicksave_blur.glsl" beforeDir="false" afterPath="$PROJECT_DIR$/battle/animations/quicksave_blur.glsl" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -618,15 +617,7 @@
       <workItem from="1731259144941" duration="7707000" />
       <workItem from="1731346058202" duration="5093000" />
       <workItem from="1731438296642" duration="15681000" />
-      <workItem from="1731524708247" duration="308000" />
-    </task>
-    <task id="LOCAL-01185" summary="consumable gained done">
-      <option name="closed" value="true" />
-      <created>1730148500223</created>
-      <option name="number" value="01185" />
-      <option name="presentableId" value="LOCAL-01185" />
-      <option name="project" value="LOCAL" />
-      <updated>1730148500223</updated>
+      <workItem from="1731524708247" duration="1176000" />
     </task>
     <task id="LOCAL-01186" summary="underlined / strikethrough now also respects n_visible_characters">
       <option name="closed" value="true" />
@@ -1012,7 +1003,15 @@
       <option name="project" value="LOCAL" />
       <updated>1731524692675</updated>
     </task>
-    <option name="localTasksCounter" value="1234" />
+    <task id="LOCAL-01234" summary="stashing shader blur">
+      <option name="closed" value="true" />
+      <created>1731525318510</created>
+      <option name="number" value="01234" />
+      <option name="presentableId" value="LOCAL-01234" />
+      <option name="project" value="LOCAL" />
+      <updated>1731525318510</updated>
+    </task>
+    <option name="localTasksCounter" value="1235" />
     <servers />
   </component>
   <component name="TypeScriptGeneratedFilesManager">
@@ -1061,7 +1060,6 @@
     </option>
   </component>
   <component name="VcsManagerConfiguration">
-    <MESSAGE value="added equip sim" />
     <MESSAGE value="move, equip, and consumable sim done" />
     <MESSAGE value="global status sim working" />
     <MESSAGE value="stashing status animation" />
@@ -1086,7 +1084,8 @@
     <MESSAGE value="refactored translation for battle messages" />
     <MESSAGE value="added quicksave animation" />
     <MESSAGE value="stashing" />
-    <option name="LAST_COMMIT_MESSAGE" value="stashing" />
+    <MESSAGE value="stashing shader blur" />
+    <option name="LAST_COMMIT_MESSAGE" value="stashing shader blur" />
   </component>
   <component name="XDebuggerManager">
     <breakpoint-manager>
