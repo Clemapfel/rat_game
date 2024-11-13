@@ -2,6 +2,8 @@
 bt.Animation.QUICKSAVE = meta.new_type("QUICKSAVE", rt.Animation, function(scene)
     local screen_w, screen_h = love.graphics.getDimensions()
     local scale_duration = 2
+    local hold_duration = 3
+    local fade_out_duration = 0.5
     return meta.new(bt.Animation.QUICKSAVE, {
         _scene = scene,
         _screenshot = rt.RenderTexture(screen_w, screen_h, 0, "rgba4"),
@@ -13,6 +15,12 @@ bt.Animation.QUICKSAVE = meta.new_type("QUICKSAVE", rt.Animation, function(scene
         _path_timer = rt.TimedAnimation(scale_duration, 0, 1, rt.InterpolationFunctions.SINUSOID_EASE_OUT),
         _hold_timer = rt.TimedAnimation(3),
         _shade = rt.VertexRectangle(0, 0, screen_w, screen_h),
+        _shade_factor = 0,
+        _shade_factor_animation = rt.TimedAnimation(
+            scale_duration + hold_duration,
+            1, 1 - 0.8,
+            rt.InterpolationFunctions.SHELF, 0.8
+        ),
         _started = false
     })
 end)
@@ -97,9 +105,6 @@ function bt.Animation.QUICKSAVE:start()
     self._screenshot:unbind()
     self._mesh:setTexture(self._screenshot._native)
     self._screenshot:set_scale_mode(rt.TextureScaleMode.LINEAR)
-
-    local shade_factor = 0.4
-    self._shade:set_color(rt.RGBA(shade_factor, shade_factor, shade_factor, 1))
     self._started = true
 end
 
@@ -114,6 +119,9 @@ function bt.Animation.QUICKSAVE:update(delta)
         self._hold_timer:update(delta)
     end
 
+    self._shade_factor_animation:update(delta)
+    self._shade_factor = self._shade_factor_animation:get_value()
+
     local t = self._path_timer:get_value()
     self._blur_shader:send("strength", t)
     for i = 1, self._n_vertices do
@@ -121,8 +129,10 @@ function bt.Animation.QUICKSAVE:update(delta)
         self._vertex_data[i][1] = x
         self._vertex_data[i][2] = y
     end
-    self._mesh:setVertices(self._vertex_data)
-    return self._path_timer:get_is_done() and self._hold_timer:get_is_done()
+    --self._mesh:setVertices(self._vertex_data)
+    return self._path_timer:get_is_done() and
+        self._hold_timer:get_is_done() and
+        self._shade_factor_animation:get_is_done()
 end
 
 --- @override
@@ -130,7 +140,8 @@ function bt.Animation.QUICKSAVE:draw()
     if self._started ~= true then return end
 
     rt.graphics.set_blend_mode(rt.BlendMode.MULTIPLY)
-    self._shade:draw()
+    love.graphics.setColor(self._shade_factor, self._shade_factor, self._shade_factor, 1)
+    love.graphics.draw(self._shade._native)
     rt.graphics.set_blend_mode()
 
     self._blur_shader:bind()

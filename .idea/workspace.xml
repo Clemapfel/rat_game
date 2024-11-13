@@ -23,9 +23,9 @@
   </component>
   <component name="ChangeListManager">
     <list default="true" id="7fa9ba1b-2cff-4ecc-86fb-59ab2fa76ee1" name="Changes" comment="added quicksave animation">
-      <change afterPath="$PROJECT_DIR$/battle/animations/quicksave_blur.glsl" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/battle/animations/quicksave.lua" beforeDir="false" afterPath="$PROJECT_DIR$/battle/animations/quicksave.lua" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/battle/animations/quicksave_blur.glsl" beforeDir="false" afterPath="$PROJECT_DIR$/battle/animations/quicksave_blur.glsl" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -618,15 +618,7 @@
       <workItem from="1731194564473" duration="10736000" />
       <workItem from="1731259144941" duration="7707000" />
       <workItem from="1731346058202" duration="5093000" />
-      <workItem from="1731438296642" duration="14340000" />
-    </task>
-    <task id="LOCAL-01183" summary="added karo background">
-      <option name="closed" value="true" />
-      <created>1730073644606</created>
-      <option name="number" value="01183" />
-      <option name="presentableId" value="LOCAL-01183" />
-      <option name="project" value="LOCAL" />
-      <updated>1730073644606</updated>
+      <workItem from="1731438296642" duration="15656000" />
     </task>
     <task id="LOCAL-01184" summary="consumable lost animation done">
       <option name="closed" value="true" />
@@ -1012,7 +1004,15 @@
       <option name="project" value="LOCAL" />
       <updated>1731522777865</updated>
     </task>
-    <option name="localTasksCounter" value="1232" />
+    <task id="LOCAL-01232" summary="added quicksave animation">
+      <option name="closed" value="true" />
+      <created>1731523647298</created>
+      <option name="number" value="01232" />
+      <option name="presentableId" value="LOCAL-01232" />
+      <option name="project" value="LOCAL" />
+      <updated>1731523647298</updated>
+    </task>
+    <option name="localTasksCounter" value="1233" />
     <servers />
   </component>
   <component name="TypeScriptGeneratedFilesManager">
