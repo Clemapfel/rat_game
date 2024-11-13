@@ -129,7 +129,7 @@ function bt.Animation.QUICKSAVE:update(delta)
         self._vertex_data[i][1] = x
         self._vertex_data[i][2] = y
     end
-    --self._mesh:setVertices(self._vertex_data)
+    self._mesh:setVertices(self._vertex_data)
     return self._path_timer:get_is_done() and
         self._hold_timer:get_is_done() and
         self._shade_factor_animation:get_is_done()

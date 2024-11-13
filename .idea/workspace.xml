@@ -22,9 +22,8 @@
     </configurations>
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="7fa9ba1b-2cff-4ecc-86fb-59ab2fa76ee1" name="Changes" comment="added quicksave animation">
+    <list default="true" id="7fa9ba1b-2cff-4ecc-86fb-59ab2fa76ee1" name="Changes" comment="stashing">
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/battle/animations/quicksave.lua" beforeDir="false" afterPath="$PROJECT_DIR$/battle/animations/quicksave.lua" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/battle/animations/quicksave_blur.glsl" beforeDir="false" afterPath="$PROJECT_DIR$/battle/animations/quicksave_blur.glsl" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
@@ -618,15 +617,8 @@
       <workItem from="1731194564473" duration="10736000" />
       <workItem from="1731259144941" duration="7707000" />
       <workItem from="1731346058202" duration="5093000" />
-      <workItem from="1731438296642" duration="15656000" />
-    </task>
-    <task id="LOCAL-01184" summary="consumable lost animation done">
-      <option name="closed" value="true" />
-      <created>1730144150697</created>
-      <option name="number" value="01184" />
-      <option name="presentableId" value="LOCAL-01184" />
-      <option name="project" value="LOCAL" />
-      <updated>1730144150697</updated>
+      <workItem from="1731438296642" duration="15681000" />
+      <workItem from="1731524708247" duration="308000" />
     </task>
     <task id="LOCAL-01185" summary="consumable gained done">
       <option name="closed" value="true" />
@@ -1012,7 +1004,15 @@
       <option name="project" value="LOCAL" />
       <updated>1731523647298</updated>
     </task>
-    <option name="localTasksCounter" value="1233" />
+    <task id="LOCAL-01233" summary="stashing">
+      <option name="closed" value="true" />
+      <created>1731524692675</created>
+      <option name="number" value="01233" />
+      <option name="presentableId" value="LOCAL-01233" />
+      <option name="project" value="LOCAL" />
+      <updated>1731524692675</updated>
+    </task>
+    <option name="localTasksCounter" value="1234" />
     <servers />
   </component>
   <component name="TypeScriptGeneratedFilesManager">
@@ -1081,12 +1081,12 @@
     <MESSAGE value="fixed stencil outline showing" />
     <MESSAGE value="added blood spray playground" />
     <MESSAGE value="implemented radix sort" />
-    <MESSAGE value="stashing" />
     <MESSAGE value="refactored palette" />
     <MESSAGE value="refactored translation" />
     <MESSAGE value="refactored translation for battle messages" />
     <MESSAGE value="added quicksave animation" />
-    <option name="LAST_COMMIT_MESSAGE" value="added quicksave animation" />
+    <MESSAGE value="stashing" />
+    <option name="LAST_COMMIT_MESSAGE" value="stashing" />
   </component>
   <component name="XDebuggerManager">
     <breakpoint-manager>
