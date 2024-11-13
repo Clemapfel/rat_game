@@ -1,6 +1,7 @@
 --- @class bt.Animation.QUICKSAVE
 bt.Animation.QUICKSAVE = meta.new_type("QUICKSAVE", rt.Animation, function(scene)
     local screen_w, screen_h = love.graphics.getDimensions()
+    local scale_duration = 2
     return meta.new(bt.Animation.QUICKSAVE, {
         _scene = scene,
         _screenshot = rt.RenderTexture(screen_w, screen_h, 0, "rgba4"),
@@ -8,7 +9,8 @@ bt.Animation.QUICKSAVE = meta.new_type("QUICKSAVE", rt.Animation, function(scene
         _vertex_data = {},
         _mesh = nil, -- love.mesh
         _vertex_paths = {}, -- Table<rt.Path>
-        _path_timer = rt.TimedAnimation(2, 0, 1, rt.InterpolationFunctions.SINUSOID_EASE_OUT),
+        _blur_shader = rt.Shader("battle/animations/quicksave_blur.glsl"),
+        _path_timer = rt.TimedAnimation(scale_duration, 0, 1, rt.InterpolationFunctions.SINUSOID_EASE_OUT),
         _hold_timer = rt.TimedAnimation(3),
         _shade = rt.VertexRectangle(0, 0, screen_w, screen_h),
         _started = false
@@ -94,8 +96,10 @@ function bt.Animation.QUICKSAVE:start()
     self._scene:draw()
     self._screenshot:unbind()
     self._mesh:setTexture(self._screenshot._native)
+    self._screenshot:set_scale_mode(rt.TextureScaleMode.LINEAR)
 
-    self._shade:set_color(rt.Palette.BLACK)
+    local shade_factor = 0.4
+    self._shade:set_color(rt.RGBA(shade_factor, shade_factor, shade_factor, 1))
     self._started = true
 end
 
@@ -111,6 +115,7 @@ function bt.Animation.QUICKSAVE:update(delta)
     end
 
     local t = self._path_timer:get_value()
+    self._blur_shader:send("strength", t)
     for i = 1, self._n_vertices do
         local x, y = self._vertex_paths[i]:at(t)
         self._vertex_data[i][1] = x
@@ -124,6 +129,11 @@ end
 function bt.Animation.QUICKSAVE:draw()
     if self._started ~= true then return end
 
+    rt.graphics.set_blend_mode(rt.BlendMode.MULTIPLY)
     self._shade:draw()
+    rt.graphics.set_blend_mode()
+
+    self._blur_shader:bind()
     love.graphics.draw(self._mesh)
+    self._blur_shader:unbind()
 end
