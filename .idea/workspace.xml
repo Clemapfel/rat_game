@@ -22,14 +22,12 @@
     </configurations>
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="7fa9ba1b-2cff-4ecc-86fb-59ab2fa76ee1" name="Changes" comment="refactored translation">
+    <list default="true" id="7fa9ba1b-2cff-4ecc-86fb-59ab2fa76ee1" name="Changes" comment="refactored translation for battle messages">
+      <change afterPath="$PROJECT_DIR$/battle/animations/quicksave.lua" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/battle/animations/status_gained.lua" beforeDir="false" afterPath="$PROJECT_DIR$/battle/animations/status_gained.lua" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/battle/animations/enemy_knocked_out.lua" beforeDir="false" afterPath="$PROJECT_DIR$/battle/animations/enemy_knocked_out.lua" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/battle/battle_scene.lua" beforeDir="false" afterPath="$PROJECT_DIR$/battle/battle_scene.lua" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/battle/simulation_handler.lua" beforeDir="false" afterPath="$PROJECT_DIR$/battle/simulation_handler.lua" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/battle/string_formatting.lua" beforeDir="false" afterPath="$PROJECT_DIR$/battle/string_formatting.lua" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/common/sprite.lua" beforeDir="false" afterPath="$PROJECT_DIR$/common/sprite.lua" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/common/translation.lua" beforeDir="false" afterPath="$PROJECT_DIR$/common/translation.lua" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/common/timed_animation.lua" beforeDir="false" afterPath="$PROJECT_DIR$/common/timed_animation.lua" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -622,15 +620,7 @@
       <workItem from="1731194564473" duration="10736000" />
       <workItem from="1731259144941" duration="7707000" />
       <workItem from="1731346058202" duration="5093000" />
-      <workItem from="1731438296642" duration="8631000" />
-    </task>
-    <task id="LOCAL-01181" summary="added see_also">
-      <option name="closed" value="true" />
-      <created>1730061662706</created>
-      <option name="number" value="01181" />
-      <option name="presentableId" value="LOCAL-01181" />
-      <option name="project" value="LOCAL" />
-      <updated>1730061662706</updated>
+      <workItem from="1731438296642" duration="13731000" />
     </task>
     <task id="LOCAL-01182" summary="fixed underline misalignment">
       <option name="closed" value="true" />
@@ -1016,7 +1006,15 @@
       <option name="project" value="LOCAL" />
       <updated>1731445017872</updated>
     </task>
-    <option name="localTasksCounter" value="1230" />
+    <task id="LOCAL-01230" summary="refactored translation for battle messages">
+      <option name="closed" value="true" />
+      <created>1731447239634</created>
+      <option name="number" value="01230" />
+      <option name="presentableId" value="LOCAL-01230" />
+      <option name="project" value="LOCAL" />
+      <updated>1731447239635</updated>
+    </task>
+    <option name="localTasksCounter" value="1231" />
     <servers />
   </component>
   <component name="TypeScriptGeneratedFilesManager">
@@ -1065,7 +1063,6 @@
     </option>
   </component>
   <component name="VcsManagerConfiguration">
-    <MESSAGE value="tests passing" />
     <MESSAGE value="refactored labeled sprite" />
     <MESSAGE value="added equip sim" />
     <MESSAGE value="move, equip, and consumable sim done" />
@@ -1090,7 +1087,8 @@
     <MESSAGE value="stashing" />
     <MESSAGE value="refactored palette" />
     <MESSAGE value="refactored translation" />
-    <option name="LAST_COMMIT_MESSAGE" value="refactored translation" />
+    <MESSAGE value="refactored translation for battle messages" />
+    <option name="LAST_COMMIT_MESSAGE" value="refactored translation for battle messages" />
   </component>
   <component name="XDebuggerManager">
     <breakpoint-manager>

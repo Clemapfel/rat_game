@@ -149,6 +149,7 @@ rt.InterpolationFunctions = meta.new_enum("InterpolationFunction", {
     end,
 
     DERIVATIVE_OF_GAUSSIAN_EASE_IN = function(x)
+        -- 1-\left(\left(e^{-\frac{\left(x-1\right)}{n}^{2}}\cdot\sin\left(\frac{\left(x-1\right)}{n}\right)\right)2\pi\cdot n\right)-1
         return 1 - rt.InterpolationFunctions.DERIVATIVE_OF_GAUSSIAN_EASE_OUT(x - 1) - 1
     end,
 
