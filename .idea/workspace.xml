@@ -22,11 +22,9 @@
     </configurations>
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="7fa9ba1b-2cff-4ecc-86fb-59ab2fa76ee1" name="Changes" comment="camera shake working">
+    <list default="true" id="7fa9ba1b-2cff-4ecc-86fb-59ab2fa76ee1" name="Changes" comment="camera interpolation done">
+      <change afterPath="$PROJECT_DIR$/main_bounce.lua" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/common/camera.lua" beforeDir="false" afterPath="$PROJECT_DIR$/common/camera.lua" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/common/texture.lua" beforeDir="false" afterPath="$PROJECT_DIR$/common/texture.lua" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/main.lua" beforeDir="false" afterPath="$PROJECT_DIR$/main.lua" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -93,6 +91,7 @@
     &quot;Lua Application.love12.executor&quot;: &quot;Run&quot;,
     &quot;Lua Application.main.executor&quot;: &quot;Run&quot;,
     &quot;Lua Application.main_blood.executor&quot;: &quot;Run&quot;,
+    &quot;Lua Application.main_bounce.executor&quot;: &quot;Run&quot;,
     &quot;Lua Application.main_box2d.executor&quot;: &quot;Run&quot;,
     &quot;Lua Application.main_lichen.executor&quot;: &quot;Run&quot;,
     &quot;Lua Application.main_linux.executor&quot;: &quot;Run&quot;,
@@ -153,7 +152,7 @@
       <recent name="C:\Users\cleme\Workspace\rat_game\old" />
     </key>
   </component>
-  <component name="RunManager" selected="Lua Application.main">
+  <component name="RunManager" selected="Lua Application.main_bounce">
     <configuration name="Makefile" type="MAKEFILE_TARGET_RUN_CONFIGURATION" factoryName="Makefile" temporary="true">
       <makefile filename="$PROJECT_DIR$/midi/lovemidi/Makefile" target="" workingDirectory="" arguments="">
         <envs />
@@ -175,6 +174,17 @@
       <module name="rat_game" />
       <option name="program" value="C:\Users\cleme\Workspace\rat_game\love\windows\love.exe" />
       <option name="file" value="main_blood.lua" />
+      <option name="workingDir" value="$PROJECT_DIR$" />
+      <option name="debuggerType" value="2" />
+      <option name="params" value="" />
+      <option name="charset" value="UTF-8" />
+      <option name="showConsole" value="true" />
+      <method v="2" />
+    </configuration>
+    <configuration name="main_bounce" type="lua.app" factoryName="Lua Application">
+      <module name="rat_game" />
+      <option name="program" value="C:\Users\cleme\Workspace\rat_game\love\windows\love.exe" />
+      <option name="file" value="main_bounce.lua" />
       <option name="workingDir" value="$PROJECT_DIR$" />
       <option name="debuggerType" value="2" />
       <option name="params" value="" />
@@ -254,6 +264,7 @@
       <item itemvalue="Emmy Debugger(NEW).remote_debugger" />
       <item itemvalue="Lua Application.main" />
       <item itemvalue="Lua Application.main_blood" />
+      <item itemvalue="Lua Application.main_bounce" />
       <item itemvalue="Lua Application.main_normal_map" />
       <item itemvalue="Lua Application.main_rope" />
       <item itemvalue="Lua Application.meta.lua" />
@@ -622,15 +633,8 @@
       <workItem from="1731438296642" duration="15681000" />
       <workItem from="1731524708247" duration="3571000" />
       <workItem from="1731537261451" duration="6323000" />
-      <workItem from="1731603156937" duration="12176000" />
-    </task>
-    <task id="LOCAL-01193" summary="stashing shatter">
-      <option name="closed" value="true" />
-      <created>1730247739010</created>
-      <option name="number" value="01193" />
-      <option name="presentableId" value="LOCAL-01193" />
-      <option name="project" value="LOCAL" />
-      <updated>1730247739010</updated>
+      <workItem from="1731603156937" duration="13264000" />
+      <workItem from="1731621962991" duration="1475000" />
     </task>
     <task id="LOCAL-01194" summary="disabled animation done">
       <option name="closed" value="true" />
@@ -1016,7 +1020,15 @@
       <option name="project" value="LOCAL" />
       <updated>1731609891274</updated>
     </task>
-    <option name="localTasksCounter" value="1242" />
+    <task id="LOCAL-01242" summary="camera interpolation done">
+      <option name="closed" value="true" />
+      <created>1731615629891</created>
+      <option name="number" value="01242" />
+      <option name="presentableId" value="LOCAL-01242" />
+      <option name="project" value="LOCAL" />
+      <updated>1731615629891</updated>
+    </task>
+    <option name="localTasksCounter" value="1243" />
     <servers />
   </component>
   <component name="TypeScriptGeneratedFilesManager">
@@ -1065,7 +1077,6 @@
     </option>
   </component>
   <component name="VcsManagerConfiguration">
-    <MESSAGE value="working" />
     <MESSAGE value="added spawn related animations and sim" />
     <MESSAGE value="added enemy sprite reorder" />
     <MESSAGE value="refactored smoothed motion" />
@@ -1090,7 +1101,8 @@
     <MESSAGE value="stashing blur working" />
     <MESSAGE value="added camera" />
     <MESSAGE value="camera shake working" />
-    <option name="LAST_COMMIT_MESSAGE" value="camera shake working" />
+    <MESSAGE value="camera interpolation done" />
+    <option name="LAST_COMMIT_MESSAGE" value="camera interpolation done" />
   </component>
   <component name="XDebuggerManager">
     <breakpoint-manager>
