@@ -22,13 +22,10 @@
     </configurations>
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="7fa9ba1b-2cff-4ecc-86fb-59ab2fa76ee1" name="Changes" comment="stashing blur working">
-      <change afterPath="$PROJECT_DIR$/common/camera.lua" afterDir="false" />
+    <list default="true" id="7fa9ba1b-2cff-4ecc-86fb-59ab2fa76ee1" name="Changes" comment="camera shake working">
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/battle/animations/quicksave_blur.glsl" beforeDir="false" afterPath="$PROJECT_DIR$/battle/animations/quicksave_blur.glsl" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/battle/battle_scene.lua" beforeDir="false" afterPath="$PROJECT_DIR$/battle/battle_scene.lua" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/common/path.lua" beforeDir="false" afterPath="$PROJECT_DIR$/common/path.lua" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/include.lua" beforeDir="false" afterPath="$PROJECT_DIR$/include.lua" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/common/camera.lua" beforeDir="false" afterPath="$PROJECT_DIR$/common/camera.lua" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/common/texture.lua" beforeDir="false" afterPath="$PROJECT_DIR$/common/texture.lua" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/main.lua" beforeDir="false" afterPath="$PROJECT_DIR$/main.lua" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
@@ -625,23 +622,7 @@
       <workItem from="1731438296642" duration="15681000" />
       <workItem from="1731524708247" duration="3571000" />
       <workItem from="1731537261451" duration="6323000" />
-      <workItem from="1731603156937" duration="6456000" />
-    </task>
-    <task id="LOCAL-01191" summary="added normal map palette">
-      <option name="closed" value="true" />
-      <created>1730235219365</created>
-      <option name="number" value="01191" />
-      <option name="presentableId" value="LOCAL-01191" />
-      <option name="project" value="LOCAL" />
-      <updated>1730235219365</updated>
-    </task>
-    <task id="LOCAL-01192" summary="added object shatter animation">
-      <option name="closed" value="true" />
-      <created>1730246387188</created>
-      <option name="number" value="01192" />
-      <option name="presentableId" value="LOCAL-01192" />
-      <option name="project" value="LOCAL" />
-      <updated>1730246387188</updated>
+      <workItem from="1731603156937" duration="12176000" />
     </task>
     <task id="LOCAL-01193" summary="stashing shatter">
       <option name="closed" value="true" />
@@ -1019,7 +1000,23 @@
       <option name="project" value="LOCAL" />
       <updated>1731543286037</updated>
     </task>
-    <option name="localTasksCounter" value="1240" />
+    <task id="LOCAL-01240" summary="added camera">
+      <option name="closed" value="true" />
+      <created>1731609723050</created>
+      <option name="number" value="01240" />
+      <option name="presentableId" value="LOCAL-01240" />
+      <option name="project" value="LOCAL" />
+      <updated>1731609723050</updated>
+    </task>
+    <task id="LOCAL-01241" summary="camera shake working">
+      <option name="closed" value="true" />
+      <created>1731609891274</created>
+      <option name="number" value="01241" />
+      <option name="presentableId" value="LOCAL-01241" />
+      <option name="project" value="LOCAL" />
+      <updated>1731609891274</updated>
+    </task>
+    <option name="localTasksCounter" value="1242" />
     <servers />
   </component>
   <component name="TypeScriptGeneratedFilesManager">
@@ -1068,8 +1065,6 @@
     </option>
   </component>
   <component name="VcsManagerConfiguration">
-    <MESSAGE value="stashing sprite batch" />
-    <MESSAGE value="stashing matrices" />
     <MESSAGE value="working" />
     <MESSAGE value="added spawn related animations and sim" />
     <MESSAGE value="added enemy sprite reorder" />
@@ -1093,7 +1088,9 @@
     <MESSAGE value="stashing separated kernels" />
     <MESSAGE value="stashing" />
     <MESSAGE value="stashing blur working" />
-    <option name="LAST_COMMIT_MESSAGE" value="stashing blur working" />
+    <MESSAGE value="added camera" />
+    <MESSAGE value="camera shake working" />
+    <option name="LAST_COMMIT_MESSAGE" value="camera shake working" />
   </component>
   <component name="XDebuggerManager">
     <breakpoint-manager>

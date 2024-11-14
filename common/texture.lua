@@ -13,6 +13,31 @@ rt.TextureWrapMode = meta.new_enum("TextureWrapMode", {
     MIRROR = "mirroredrepeat"
 })
 
+--- @class rt.TextureFormat
+rt.TextureFormat = meta.new_enum("TextureFormat", {
+    --                      | #  | Size | Range
+    --                      |----|------|-----------------
+    NORMAL = "normal",   --	| 4  | 32 	| [0, 1]
+    R8 = "r8",           --	| 1  | 8 	| [0, 1]
+    RG8 = "rg8",         -- | 2  | 16 	| [0, 1]
+    RGBA8 = "rgba8",     -- | 4  | 32 	| [0, 1]
+    SRGBA8 = "srgba8",   -- | 4  | 32 	| [0, 1]
+    R16 = "r16",         -- | 1  | 16 	| [0, 1]
+    RG16 = "rg16",       -- | 2  | 32 	| [0, 1]
+    RGBA16 = "rgba16",   -- | 4  | 64 	| [0, 1]
+    R16F = "r16f",       -- | 1  | 16 	| [-65504, +65504]
+    RG16F = "rg16f",     -- | 2  | 32 	| [-65504, +65504]
+    RGBA16F = "rgba16f", -- | 4  | 64 	| [-65504, +65504]
+    R32F = "r32f",       -- | 1  | 32 	| [-3.4028235e38, 3.4028235e38]
+    RG32F = "rg32f",     -- | 2  | 64 	| [-3.4028235e38, 3.4028235e38]
+    RGBA32F = "rgba32f", -- | 4  | 128 	| [-3.4028235e38, 3.4028235e38]
+    RGBA4 = "rgba4",     -- | 4  | 16 	| [0, 1]
+    RGB5A1 = "rgb5a1",   -- | 4  | 16 	| [0, 1]
+    RGB565 = "rgb565",   -- | 3  | 16 	| [0, 1]
+    RGB10a2 = "rgb10a2", -- | 4  | 32 	| [0, 1]
+    RG11b10 = "rg11b10", -- | 3  | 32 	| [0, 65024]
+})
+
 --- @class rt.Texture
 --- @param pathor_width String (or Number)
 --- @param height Number (or nil)
