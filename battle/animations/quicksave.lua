@@ -155,28 +155,27 @@ function bt.Animation.QUICKSAVE:update(delta)
     love.graphics.push()
     love.graphics.origin()
     self._blur_shader:send("texture_size", {self._blur_texture._native:getDimensions()}) -- == b:getDimensions
+    self._blur_shader:bind()
 
     self._blur_elapsed = self._blur_elapsed + delta
-    local step = 1 / 15 -- steps per second
+    local step = 1 / 30 -- steps per second
     while self._blur_elapsed >= step do
-        local a, b = self._blur_texture._native, self._screenshot._native
-        local shader = self._blur_shader._native
-        local lg = love.graphics
+        local a, b = self._screenshot, self._blur_texture
 
-        lg.setShader(shader)
+        a:bind()
+        self._blur_shader:send("horizontal_or_vertical", true)
+        b:draw()
+        a:unbind()
 
-        lg.setCanvas(a)
-        shader:send("vertical_or_horizontal", true)
-        lg.draw(b)
-
-        shader:send("vertical_or_horizontal", false)
-        lg.setCanvas(b)
-        lg.draw(a)
-        lg.setCanvas()
+        b:bind()
+        self._blur_shader:send("horizontal_or_vertical", false)
+        a:draw()
+        b:unbind()
 
         self._blur_elapsed = self._blur_elapsed - step
     end
 
+    self._blur_shader:unbind()
     love.graphics.pop()
 
 
@@ -223,10 +222,6 @@ function bt.Animation.QUICKSAVE:draw()
     love.graphics.draw(self._shade._native)
     rt.graphics.set_blend_mode()
 
-    love.graphics.push()
     love.graphics.setColor(1, 1, 1, 1)
-    self._blur_shader:bind()
     love.graphics.draw(self._mesh)
-    self._blur_shader:unbind()
-    love.graphics.pop()
 end
