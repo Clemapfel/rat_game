@@ -120,31 +120,31 @@ end
 
 --- @brief
 function rt.Camera:shake(duration, x_radius, y_radius, n_shakes_per_second)
-    self._offset_path_duration = self._offset_path_duration + duration
-
-    local shake_intensity = rt.settings.camera.shake_intensity
-    x_radius, y_radius = x_radius * shake_intensity, y_radius * shake_intensity
-
+    if x_radius == nil then x_radius = 0 end
+    if y_radius == nil then y_radius = 0 end
     if n_shakes_per_second == nil then
         n_shakes_per_second = rt.settings.camera.n_shakes_per_second
     end
+    meta.assert_number(duration, x_radius, y_radius, n_shakes_per_second)
+
+    local shake_intensity = rt.settings.camera.shake_intensity
+    x_radius, y_radius = x_radius * shake_intensity, y_radius * shake_intensity
 
     local vertices = {}
     table.insert(vertices, 0)
     table.insert(vertices, 0)
     for i = 1, math.floor(n_shakes_per_second * duration) do
-        local angle = rt.random.number(-math.pi, math.pi)
-        table.insert(vertices, math.cos(angle) * x_radius)
-        table.insert(vertices, math.sin(angle) * y_radius)
+        table.insert(vertices, rt.random.number(-x_radius, x_radius))
+        table.insert(vertices, rt.random.number(-y_radius, y_radius))
     end
     table.insert(vertices, 0)
     table.insert(vertices, 0)
 
+    -- append if already shaking
     if self._offset_path ~= nil then
         for point in values(self._offset_path:list_points()) do
             table.insert(vertices, 1, point[2])
             table.insert(vertices, 1, point[1])
-
         end
     end
 
