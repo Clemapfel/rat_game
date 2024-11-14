@@ -838,7 +838,7 @@ function bt.BattleScene:_handle_button_pressed(which)
         local target = bt.create_entity_proxy(self, self._state:list_enemies()[2])
         local status = bt.create_status_proxy(self, bt.Status("DEBUG_STATUS"))
         local sprite = self:get_sprite(self._state:list_enemies()[2])
-        self:_push_animation(bt.Animation.QUICKSAVE(self, sprite))
+        --self:_push_animation(bt.Animation.QUICKSAVE(self, sprite))
         --self._simulation_environment.message(target, "test", status)
         --self._simulation_environment.knock_out(target)
 

@@ -13,15 +13,15 @@ vec4 effect(vec4 vertex_color, Image image, vec2 texture_coords, vec2 frag_posit
     if (horizontal_or_vertical) {
         for (int i = 1; i < 3; i++) {
             float offset = offset[i] / texture_size.y;
-            color += texture2D(image, (texture_coords + vec2(0.0, offset))) * weight[i];
-            color += texture2D(image, (texture_coords - vec2(0.0, offset))) * weight[i];
+            color += texture(image, (texture_coords + vec2(0.0, offset))) * weight[i];
+            color += texture(image, (texture_coords - vec2(0.0, offset))) * weight[i];
         }
     }
     else {
         for (int i = 1; i < 3; i++) {
             float offset = offset[i] / texture_size.x;
-            color += texture2D(image, (texture_coords + vec2(offset, 0.0))) * weight[i];
-            color += texture2D(image, (texture_coords - vec2(offset, 0.0))) * weight[i];
+            color += texture(image, (texture_coords + vec2(offset, 0.0))) * weight[i];
+            color += texture(image, (texture_coords - vec2(offset, 0.0))) * weight[i];
         }
     }
 

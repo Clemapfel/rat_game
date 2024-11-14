@@ -126,6 +126,15 @@ function rt.Path:create_from(points, ...)
 end
 
 --- @brief
+function rt.Path:list_points()
+    local out = {}
+    for i = 1, #self._points, 2 do
+        table.insert(out, {self._points[i], self._points[i+1]})
+    end
+    return out
+end
+
+--- @brief
 function rt.Path:draw()
     love.graphics.line(self._points)
 end

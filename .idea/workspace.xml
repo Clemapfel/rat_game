@@ -23,8 +23,13 @@
   </component>
   <component name="ChangeListManager">
     <list default="true" id="7fa9ba1b-2cff-4ecc-86fb-59ab2fa76ee1" name="Changes" comment="stashing blur working">
-      <change beforePath="$PROJECT_DIR$/battle/animations/quicksave.lua" beforeDir="false" afterPath="$PROJECT_DIR$/battle/animations/quicksave.lua" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/common/camera.lua" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/battle/animations/quicksave_blur.glsl" beforeDir="false" afterPath="$PROJECT_DIR$/battle/animations/quicksave_blur.glsl" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/battle/battle_scene.lua" beforeDir="false" afterPath="$PROJECT_DIR$/battle/battle_scene.lua" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/common/path.lua" beforeDir="false" afterPath="$PROJECT_DIR$/common/path.lua" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/include.lua" beforeDir="false" afterPath="$PROJECT_DIR$/include.lua" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/main.lua" beforeDir="false" afterPath="$PROJECT_DIR$/main.lua" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -620,6 +625,7 @@
       <workItem from="1731438296642" duration="15681000" />
       <workItem from="1731524708247" duration="3571000" />
       <workItem from="1731537261451" duration="6323000" />
+      <workItem from="1731603156937" duration="6456000" />
     </task>
     <task id="LOCAL-01191" summary="added normal map palette">
       <option name="closed" value="true" />

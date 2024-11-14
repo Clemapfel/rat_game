@@ -1,30 +1,5 @@
 require "include"
 
-local animation = rt.TimedAnimation(1, 0, 2, rt.InterpolationFunctions.LINEAR)
-animation:signal_connect("done", function(self)
-    dbg("done")
-end)
-
---[[
-local test = setmetatable({}, {
-    __mode = "kv"
-})
-
-local test_instance = {
-    test_field = nil
-}
-
-for i = 1, 10000 do
-    do
-        local label = rt.Label()
-        test_instance.test_field = label
-        table.insert(test, label)
-    end
-    collectgarbage("collect")
-    dbg(sizeof(test))
-end
-]]--
-
 profiler_active = false
 
 state = rt.GameState()
@@ -52,7 +27,13 @@ input:signal_connect("keyboard_pressed", function(_, which)
         println(rt.profiler.report())
         background._implementation._shader:recompile()
     end
+
+    if which == rt.KeyboardKey.SPACE then
+        camera:shake(0.2, 10, 0)
+    end
 end)
+
+camera = rt.Camera()
 
 love.load = function()
     state:_load()
@@ -78,7 +59,11 @@ love.update = function(delta)
     if profiler_active then
         rt.profiler.push("update")
     end
+
     state:_update(delta)
+    camera:move_to(love.mouse.getPosition())
+    camera:update(delta)
+
     if profiler_active then
         rt.profiler.pop("update")
     end
@@ -90,7 +75,10 @@ love.draw = function()
             rt.profiler.push("draw")
         end
 
+        camera:bind()
         state:_draw()
+        camera:unbind()
+        camera:draw()
 
         --[[
         if state._current_scene ~= nil and state._current_scene._animation_queue ~= nil then
@@ -106,6 +94,8 @@ end
 
 love.resize = function(new_width, new_height)
     state:_resize(new_width, new_height)
+    camera:set_viewport(0, 0, new_width, new_height)
+    camera:set_position(0.5 * new_width, 0.5 * new_height)
 end
 
 love.run = function()
