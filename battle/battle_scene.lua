@@ -443,7 +443,7 @@ end
 --- @override
 function bt.BattleScene:draw()
     self._background:draw()
-
+    --[[
     for sprite in values(self._party_sprites) do
         sprite:draw()
     end
@@ -481,7 +481,8 @@ function bt.BattleScene:draw()
     ) do
         x:draw()
     end
-
+    ]]--
+    self._enemy_sprites[1]:draw_snapshot()
     self._animation_queue:draw()
 end
 
