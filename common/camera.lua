@@ -3,6 +3,10 @@ rt.settings.camera = {
     position_speed = 1000, -- px per second
     angle_speed = 1000, -- rad per second
     scale_speed = 500, -- 1x per second
+    position_inertia_decay_speed = 0.65, -- decreases to 0 per second
+    angle_inertia_decay_speed = 0.5, -- decreases to 0 per second
+    scale_inertia_decay_speed = 2, -- decreases to 0 per second
+
     n_shakes_per_second = 100
 }
 
@@ -17,6 +21,13 @@ rt.Camera = meta.new_type("Camera", rt.Drawable, rt.Updatable, function()
         _target_x = aabb.x + 0.5 * aabb.width,
         _target_y = aabb.y + 0.5 * aabb.height,
         _position_speed = rt.settings.camera.position_speed,
+
+        _position_inertia = 0,
+        _angle_inertia = 0,
+        _scale_inertia = 0,
+        _position_inertia_speed = rt.settings.camera.position_inertia_decay_speed,
+        _angle_inertia_speed = rt.settings.camera.angle_inertia_decay_speed,
+        _scale_inertia_speed = rt.settings.camera.scale_inertia_decay_speed,
 
         _position_path = nil, -- rt.Path
 
@@ -64,16 +75,19 @@ end
 
 --- @brief move to point with interpolation
 function rt.Camera:set_position(center_x, center_y)
+    self._position_inertia = 0
     self._target_x, self._target_y = center_x, center_y
 end
 
 --- @brief
 function rt.Camera:set_angle(angle)
+    self._position_inertia = 0
     self._target_angle = angle
 end
 
 --- @brief
 function rt.Camera:set_scale(scale)
+    self._scale_inertia = 0
     self._target_scale = scale
 end
 
@@ -112,6 +126,12 @@ function rt.Camera:update(delta)
         local step_x = distance_x * self._position_speed * delta * delta
         local step_y = distance_y * self._position_speed * delta * delta
 
+        step_x = step_x * self._position_inertia
+        step_y = step_y * self._position_inertia
+
+        self._position_inertia = self._position_inertia + delta * self._position_inertia_speed
+        if self._position_inertia > 1 then self._position_inertia = 1 end
+
         local max_step = self._position_speed * delta
         if step_x > max_step then step_x = max_step end
         if step_y > max_step then step_y = max_step end
@@ -141,6 +161,10 @@ function rt.Camera:update(delta)
         local step = distance * self._angle_speed * delta * delta
         step = math.min(math.abs(step), self._angle_speed * delta)
         if distance < 0 then step = step * -1 end
+        
+        step = step * self._angle_inertia
+        self._angle_inertia = self._angle_inertia + delta * self._angle_inertia_speed
+        if self._angle_inertia > 1 then self._angle_inertia = 1 end
 
         self._current_angle = self._current_angle + step
 
@@ -154,8 +178,13 @@ function rt.Camera:update(delta)
     -- update scale
     if self._current_scale ~= self._target_scale then
         local distance = self._target_scale - self._current_scale
-        local step = distance * self._scale_speed * delta * delta
+        local step = math.sign(distance) * math.sqrt(math.abs(distance)) * self._scale_speed * delta * delta
         step = math.min(self._scale_speed * delta * delta, step)
+        -- modulate slowdown for asthetic reasons
+
+        step = step * self._scale_inertia
+        self._scale_inertia = self._scale_inertia + delta * self._scale_inertia_speed
+        if self._scale_inertia > 1 then self._scale_inertia = 1 end
 
         self._current_scale = self._current_scale + step
 

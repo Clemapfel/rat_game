@@ -29,8 +29,11 @@ input:signal_connect("keyboard_pressed", function(_, which)
     end
 
     if which == rt.KeyboardKey.SPACE then
-        camera:set_angle(rt.random.number(-math.pi, math.pi))
-        --camera:set_scale(rt.random.number(1 / 4, 4))
+        --camera:set_angle(rt.random.number(-math.pi, math.pi))
+        camera:set_scale(rt.random.number(1 / 4, 4))
+        --camera:set_position(love.mouse.getPosition())
+    elseif which == rt.KeyboardKey.B then
+        camera:shake(5)
     end
 end)
 
@@ -63,7 +66,7 @@ love.update = function(delta)
 
     state:_update(delta)
     camera:update(delta)
-    camera:set_position(love.mouse.getPosition())
+    --camera:set_position(love.mouse.getPosition())
 
     if profiler_active then
         rt.profiler.pop("update")

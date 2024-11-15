@@ -105,6 +105,7 @@ do
                     low = mid + 1
                 elseif closest_entry.fraction > t then
                     high = mid - 1
+                    TODO: which does this deadllcok
                 end
             end
         end

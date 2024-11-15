@@ -5,6 +5,7 @@ b2.World = meta.new_type("PhysicsWorld", function(gravity_x, gravity_y, n_thread
     if n_threads == nil or n_threads <= 1 then
         local def = box2d.b2DefaultWorldDef()
         def.gravity = b2.Vec2(gravity_x * scale, gravity_y * scale)
+        def.restitutionThreshold = 0
         out = meta.new(b2.World, {
             _native = box2d.b2CreateWorld(def),
             _user_context = nil
@@ -12,6 +13,7 @@ b2.World = meta.new_type("PhysicsWorld", function(gravity_x, gravity_y, n_thread
     else
         local def = box2d.b2DefaultWorldDef()
         def.gravity = b2.Vec2(gravity_x * scale, gravity_y * scale)
+        def.restitutionThreshold = 0
 
         def.workerCount = n_threads
         def.enqueueTask = b2.World._enqueue_task
