@@ -33,7 +33,9 @@ input:signal_connect("keyboard_pressed", function(_, which)
         --camera:set_scale(rt.random.number(1 / 4, 4))
         --camera:set_position(love.mouse.getPosition())
     elseif which == rt.KeyboardKey.B then
-        camera:shake(3)
+        camera:shake(10 / 60)
+    elseif which == rt.KeyboardKey.X then
+        camera:skip()
     end
 end)
 
@@ -83,6 +85,8 @@ love.draw = function()
         state:_draw()
         camera:unbind()
 
+        camera:draw()
+
         --[[
         if state._current_scene ~= nil and state._current_scene._animation_queue ~= nil then
             state._current_scene._animation_queue:draw()
@@ -99,7 +103,7 @@ love.resize = function(new_width, new_height)
     state:_resize(new_width, new_height)
     camera:set_viewport(0, 0, new_width, new_height)
     camera:set_position(0.5 * new_width, 0.5 * new_height)
-    camera:set_scale(0.5)
+    camera:set_scale(1)
 end
 
 love.run = function()

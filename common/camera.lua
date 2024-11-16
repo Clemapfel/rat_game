@@ -13,7 +13,7 @@ rt.settings.camera = {
 --- @class rt.Camera
 rt.Camera = meta.new_type("Camera", rt.Drawable, rt.Updatable, function()
     local aabb = rt.AABB(0, 0, love.graphics.getWidth(), love.graphics.getHeight())
-    return meta.new(rt.Camera, {
+    local out = meta.new(rt.Camera, {
         _aabb = aabb,
 
         _current_x = aabb.x + 0.5 * aabb.width,
@@ -28,8 +28,6 @@ rt.Camera = meta.new_type("Camera", rt.Drawable, rt.Updatable, function()
         _position_inertia_speed = rt.settings.camera.position_inertia_decay_speed,
         _angle_inertia_speed = rt.settings.camera.angle_inertia_decay_speed,
         _scale_inertia_speed = rt.settings.camera.scale_inertia_decay_speed,
-
-        _position_path = nil, -- rt.Path
 
         _offset_path = nil,
         _offset_path_duration = 0,
@@ -61,8 +59,12 @@ rt.Camera = meta.new_type("Camera", rt.Drawable, rt.Updatable, function()
             defines = {
                 HORIZONTAL_OR_VERTICAL = 0
             }
-        })
+        }),
+        _blur_strength = 0,
     })
+
+    out:set_viewport(rt.aabb_unpack(aabb))
+    return out
 end)
 
 --- @brief override position
@@ -114,6 +116,7 @@ function rt.Camera:skip()
     self._offset_path = nil
     self._offset_path_elapsed = 0
     self._offset_path_duration = 0
+    self._blur_strength = 0
 end
 
 --- @override
@@ -127,14 +130,13 @@ function rt.Camera:update(delta)
         local previous_x, previous_y = self._offset_x, self._offset_y
         self._offset_x, self._offset_y = self._offset_path:at(offset_fraction)
 
-        self._post_fx_active = offset_fraction <= 1
         self._offset_velocity = rt.distance(previous_x, previous_y, self._offset_x, self._offset_y)
-
+        self._blur_strength = math.max(self._blur_strength, math.ceil(self._offset_velocity / self:_get_shake_radius()) * 3)
         if self._offset_path_elapsed > self._offset_path_duration then
             self._offset_path = nil
             self._offset_path_duration = 0
             self._offset_path_elapsed = 0
-            self._post_fx_active = false
+            self._blur_strength = 0
         end
     end
 
@@ -222,11 +224,15 @@ do
     --- @brief
     function rt.Camera:bind()
         lg.push()
-        lg.setCanvas({ self._render_texture_b, stencil = true })
-        lg.clear(true, false, false)
-
         lg.origin()
-        lg.translate(self._offset_x, self._offset_y)
+
+        if self._blur_strength > 0 then
+            lg.setCanvas({ self._render_texture_b, stencil = true })
+            lg.clear(true, false, false)
+        else
+            lg.translate(self._offset_x, self._offset_y) -- shake separate, applied to padded mesh to avoid bordering
+        end
+
         lg.translate(self._current_x, self._current_y)
         lg.scale(self._current_scale)
         lg.rotate(self._current_angle)
@@ -237,22 +243,24 @@ do
 
     --- @brief
     function rt.Camera:unbind()
-        lg.origin()
+        if self._blur_strength > 0 then
+            lg.origin()
 
-        if self._post_fx_active then
             local a, b = self._render_texture_a, self._render_texture_b
-            lg.setShader(self._blur_shader_horizontal)
-            lg.setCanvas(a)
-            lg.clear(true, false, false)
-            lg.draw(b)
+            for i = 1, self._blur_strength do
+                lg.setShader(self._blur_shader_horizontal)
+                lg.setCanvas(a)
+                lg.draw(b)
 
-            lg.setShader(self._blur_shader_vertical)
-            lg.setCanvas(b)
-            lg.draw(a)
+                lg.setShader(self._blur_shader_vertical)
+                lg.setCanvas(b)
+                lg.draw(a)
+            end
+
+            lg.setCanvas()
+            lg.translate(self._offset_x, self._offset_y)
+            lg.draw(self._render_texture_mesh)
         end
-
-        lg.setCanvas()
-        lg.draw(self._render_texture_mesh)
 
         lg.pop()
     end
@@ -260,11 +268,10 @@ end
 
 --- @brief
 function rt.Camera:draw()
-    --[[
     love.graphics.push()
-    love.graphics.origin()
+    love.graphics.reset()
     local radius = 0.5 * self._aabb.height / 4
-    do
+    do -- draw scale
         local current_r = self._current_scale * radius
         local target_r = self._target_scale * radius
         local cx, cy = self._current_x, self._current_y
@@ -284,7 +291,7 @@ function rt.Camera:draw()
         love.graphics.circle("line", cx, cy, target_r)
     end
 
-    do
+    do -- draw angle
         local cx, cy = self._current_x, self._current_y
         local current_x, current_y = rt.translate_point_by_angle(cx, cy, radius * 2, self._current_angle)
         local target_x, target_y = rt.translate_point_by_angle(cx, cy, radius * 2, self._target_angle)
@@ -304,26 +311,32 @@ function rt.Camera:draw()
         love.graphics.line(cx, cy, target_x, target_y)
     end
 
+    -- draw position
     love.graphics.setColor(0, 0, 0, 1)
-    love.graphics.setPointSize(6)
-    love.graphics.points(self._target_x, self._target_y)
+    love.graphics.circle("fill", self._target_x, self._target_y, 5)
     love.graphics.setColor(1, 0, 1, 1)
-    love.graphics.setPointSize(4)
-    love.graphics.points(self._target_x, self._target_y)
+    love.graphics.circle("fill", self._target_x, self._target_y, 4)
 
     love.graphics.setColor(0, 0, 0, 1)
-    love.graphics.setPointSize(6)
-    love.graphics.points(self._current_x, self._current_y)
+    love.graphics.circle("fill", self._current_x, self._current_y, 5)
     love.graphics.setColor(0, 1, 1, 1)
-    love.graphics.setPointSize(4)
-    love.graphics.points(self._current_x, self._current_y)
+    love.graphics.circle("fill", self._current_x, self._current_y, 4)
 
-    if self._offset_path ~= nil then
-        self._offset_path:draw()
+    do -- draw offset
+        local cx, cy = self._current_x, self._current_y
+
+        love.graphics.setColor(0, 0, 0, 1)
+        local r = self:_get_shake_radius()
+        local x, y = self._offset_x / r * radius, self._offset_y / r * radius
+        love.graphics.setLineWidth(4)
+        love.graphics.line(cx, cy, cx + x, cy + y)
+
+        love.graphics.setColor(1, 1, 1, 1)
+        love.graphics.setLineWidth(3)
+        love.graphics.line(cx, cy, cx + x, cy + y)
     end
 
     love.graphics.pop()
-    ]]--
 end
 
 --- @brief
@@ -331,7 +344,7 @@ function rt.Camera:set_viewport(x, y, w, h)
     self._aabb = rt.AABB(x, y, w, h)
     local settings = {
         msaa = 0,
-        format = rt.TextureFormat.NORMAL
+        format = rt.TextureFormat.RGB565 -- 16-bit, fully opaque
     }
     self._render_texture_a = love.graphics.newCanvas(w, h, settings)
     self._render_texture_b = love.graphics.newCanvas(w, h, settings)
@@ -378,13 +391,14 @@ function rt.Camera:shake(duration, x_radius, y_radius, n_shakes_per_second)
     local shake_intensity = rt.settings.camera.shake_intensity
     x_radius, y_radius = x_radius * shake_intensity, y_radius * shake_intensity
 
-    local step = 0.3 -- noise increment, the smaller the smoother the path
+    local step = 0.075 -- noise increment, the smaller the smoother the path
     local vertices = {}
+    local seed = rt.random.number(0, 65536 - 1) -- so shake is different every time
     table.insert(vertices, 0)
     table.insert(vertices, 0)
     for i = 1, math.ceil(n_shakes_per_second * duration) do
-        table.insert(vertices,  (rt.random.noise(0, i * step) * 2 - 1) * x_radius)
-        table.insert(vertices,  (rt.random.noise(-i * step, 0) * 2 - 1) * y_radius)
+        table.insert(vertices,  (rt.random.noise(seed, i * step) * 2 - 1) * x_radius)
+        table.insert(vertices,  (rt.random.noise(-i * step, seed) * 2 - 1) * y_radius)
     end
     table.insert(vertices, 0)
     table.insert(vertices, 0)
@@ -399,5 +413,4 @@ function rt.Camera:shake(duration, x_radius, y_radius, n_shakes_per_second)
 
     self._offset_path = rt.Path(vertices)
     self._offset_path_duration = self._offset_path_duration + duration
-    self._post_fx_active = true
 end
