@@ -49,13 +49,21 @@ rt.Camera = meta.new_type("Camera", rt.Drawable, rt.Updatable, function()
         _is_bound = false,
         _elapsed = 0,
 
-        _render_texture_a = rt.RenderTexture(),
-        _render_texture_b = rt.RenderTexture(),
-        _post_fx_active = false,
+        _render_texture_a = nil, -- love.Canvas
+        _render_texture_b = nil, -- love.Canvas
+        _render_texture_mesh = nil, -- love.Mesh
+        _blur_shader_horizontal = love.graphics.newShader("common/camera_blur.glsl", {
+            defines = {
+                HORIZONTAL_OR_VERTICAL = 1
+            }
+        }),
+        _blur_shader_vertical = love.graphics.newShader("common/camera_blur.glsl", {
+            defines = {
+                HORIZONTAL_OR_VERTICAL = 0
+            }
+        })
     })
-end, {
-    blur_shader = rt.Shader("common/camera_blur.glsl")
-})
+end)
 
 --- @brief override position
 function rt.Camera:override_position(center_x, center_y)
@@ -208,53 +216,45 @@ function rt.Camera:update(delta)
     end
 end
 
---- @brief
-function rt.Camera:bind()
-    if self._post_fx_active then
-        self._render_texture_b:bind()
-        love.graphics.clear(true, false, false)
-    else
-        love.graphics.push()
-        love.graphics.translate(self._offset_x, self._offset_y)
-        love.graphics.translate(self._current_x, self._current_y)
-        love.graphics.scale(self._current_scale)
-        love.graphics.rotate(self._current_angle)
-        love.graphics.translate( -0.5 * self._aabb.width, -0.5 * self._aabb.height)
+do
+    local lg = love.graphics
+
+    --- @brief
+    function rt.Camera:bind()
+        lg.push()
+        lg.setCanvas({ self._render_texture_b, stencil = true })
+        lg.clear(true, false, false)
+
+        lg.origin()
+        lg.translate(self._offset_x, self._offset_y)
+        lg.translate(self._current_x, self._current_y)
+        lg.scale(self._current_scale)
+        lg.rotate(self._current_angle)
+        lg.translate( -0.5 * self._aabb.width, -0.5 * self._aabb.height)
     end
-end
 
---- @brief
-function rt.Camera:unbind()
-    if self._post_fx_active then
-        self._render_texture_b:unbind()
-        self.blur_shader:bind()
-        self.blur_shader:send("texture_size", {self._aabb.width, self._aabb.height})
+    -- scene draw here
 
-        local n_blur_passes = 1 -- math.ceil(self._offset_velocity / self:_get_shake_radius() * 2)
-        for i = 1, n_blur_passes do
+    --- @brief
+    function rt.Camera:unbind()
+        lg.origin()
+
+        if self._post_fx_active then
             local a, b = self._render_texture_a, self._render_texture_b
-            a:bind()
-            self.blur_shader:send("horizontal_or_vertical", true)
-            b:draw()
-            a:unbind()
+            lg.setShader(self._blur_shader_horizontal)
+            lg.setCanvas(a)
+            lg.clear(true, false, false)
+            lg.draw(b)
 
-            b:bind()
-            self.blur_shader:send("horizontal_or_vertical", false)
-            a:draw()
-            b:unbind()
+            lg.setShader(self._blur_shader_vertical)
+            lg.setCanvas(b)
+            lg.draw(a)
         end
 
-        love.graphics.push()
-        rt.graphics.origin()
-        love.graphics.translate(self._offset_x, self._offset_y)
-        love.graphics.translate(self._current_x, self._current_y)
-        love.graphics.scale(self._current_scale)
-        love.graphics.rotate(self._current_angle)
-        love.graphics.translate( -0.5 * self._aabb.width, -0.5 * self._aabb.height)
-        self._render_texture_b:draw()
-        love.graphics.pop()
-    else
-        love.graphics.pop()
+        lg.setCanvas()
+        lg.draw(self._render_texture_mesh)
+
+        lg.pop()
     end
 end
 
@@ -329,8 +329,36 @@ end
 --- @brief
 function rt.Camera:set_viewport(x, y, w, h)
     self._aabb = rt.AABB(x, y, w, h)
-    self._render_texture_a = rt.RenderTexture(w, h, state:get_msaa_quality(), rt.TextureFormat.NORMAL)
-    self._render_texture_b = rt.RenderTexture(w, h, state:get_msaa_quality(), rt.TextureFormat.NORMAL)
+    local settings = {
+        msaa = 0,
+        format = rt.TextureFormat.NORMAL
+    }
+    self._render_texture_a = love.graphics.newCanvas(w, h, settings)
+    self._render_texture_b = love.graphics.newCanvas(w, h, settings)
+    self._blur_shader_horizontal:send("texture_size", { self._aabb.width, self._aabb.height })
+    self._blur_shader_vertical:send("texture_size", { self._aabb.width, self._aabb.height })
+
+
+    local vertex_format = {
+        {name = "VertexPosition", format = "floatvec2"},
+        {name = "VertexTexCoord", format = "floatvec2"},
+    }
+
+    -- use padded mesh that is larger than the screen, such that when the
+    -- camera shakes, the texture wrap mode hides the edges of the screen
+    local padding = -0.5
+    local vertex_data = {
+        {      padding * w,       padding * h,      padding,     padding},
+        {(1 - padding) * w,       padding * h,  1 - padding,     padding},
+        {(1 - padding) * w, (1 - padding) * h,  1 - padding, 1 - padding},
+              {padding * w, (1 - padding) * h,      padding, 1 - padding}
+    }
+    self._render_texture_mesh = love.graphics.newMesh(vertex_format, vertex_data, rt.MeshDrawMode.TRIANGLE_FAN)
+    self._render_texture_mesh:setTexture(self._render_texture_b)
+
+    for texture in range(self._render_texture_a, self._render_texture_b) do
+        texture:setWrap(rt.TextureWrapMode.MIRROR)
+    end
 end
 
 --- @brief

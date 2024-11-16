@@ -30,7 +30,7 @@ input:signal_connect("keyboard_pressed", function(_, which)
 
     if which == rt.KeyboardKey.SPACE then
         --camera:set_angle(rt.random.number(-math.pi, math.pi))
-        camera:set_scale(rt.random.number(1 / 4, 4))
+        --camera:set_scale(rt.random.number(1 / 4, 4))
         --camera:set_position(love.mouse.getPosition())
     elseif which == rt.KeyboardKey.B then
         camera:shake(3)
@@ -99,6 +99,7 @@ love.resize = function(new_width, new_height)
     state:_resize(new_width, new_height)
     camera:set_viewport(0, 0, new_width, new_height)
     camera:set_position(0.5 * new_width, 0.5 * new_height)
+    camera:set_scale(0.5)
 end
 
 love.run = function()

@@ -22,11 +22,12 @@
     </configurations>
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="7fa9ba1b-2cff-4ecc-86fb-59ab2fa76ee1" name="Changes" comment="fixed deadlock when path length is 0">
-      <change afterPath="$PROJECT_DIR$/common/camera_blur.glsl" afterDir="false" />
+    <list default="true" id="7fa9ba1b-2cff-4ecc-86fb-59ab2fa76ee1" name="Changes" comment="stashing blur">
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/battle/animations/quicksave_blur.glsl" beforeDir="false" afterPath="$PROJECT_DIR$/battle/animations/quicksave_blur.glsl" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/common/camera.lua" beforeDir="false" afterPath="$PROJECT_DIR$/common/camera.lua" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/include.lua" beforeDir="false" afterPath="$PROJECT_DIR$/include.lua" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/common/camera_blur.glsl" beforeDir="false" afterPath="$PROJECT_DIR$/common/camera_blur.glsl" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/common/game_state.lua" beforeDir="false" afterPath="$PROJECT_DIR$/common/game_state.lua" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/main.lua" beforeDir="false" afterPath="$PROJECT_DIR$/main.lua" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
@@ -637,15 +638,7 @@
       <workItem from="1731524708247" duration="3571000" />
       <workItem from="1731537261451" duration="6323000" />
       <workItem from="1731603156937" duration="13264000" />
-      <workItem from="1731621962991" duration="12837000" />
-    </task>
-    <task id="LOCAL-01197" summary="refactor starting">
-      <option name="closed" value="true" />
-      <created>1730334391017</created>
-      <option name="number" value="01197" />
-      <option name="presentableId" value="LOCAL-01197" />
-      <option name="project" value="LOCAL" />
-      <updated>1730334391017</updated>
+      <workItem from="1731621962991" duration="16198000" />
     </task>
     <task id="LOCAL-01198" summary="stashing">
       <option name="closed" value="true" />
@@ -1031,7 +1024,15 @@
       <option name="project" value="LOCAL" />
       <updated>1731777706285</updated>
     </task>
-    <option name="localTasksCounter" value="1246" />
+    <task id="LOCAL-01246" summary="stashing blur">
+      <option name="closed" value="true" />
+      <created>1731781335829</created>
+      <option name="number" value="01246" />
+      <option name="presentableId" value="LOCAL-01246" />
+      <option name="project" value="LOCAL" />
+      <updated>1731781335829</updated>
+    </task>
+    <option name="localTasksCounter" value="1247" />
     <servers />
   </component>
   <component name="TypeScriptGeneratedFilesManager">
@@ -1080,7 +1081,6 @@
     </option>
   </component>
   <component name="VcsManagerConfiguration">
-    <MESSAGE value="refactored smoothed motion" />
     <MESSAGE value="stashing coroutine memory leak bug" />
     <MESSAGE value="stashing canvas leak" />
     <MESSAGE value="optimized frame" />
@@ -1105,7 +1105,8 @@
     <MESSAGE value="stashing love physics" />
     <MESSAGE value="stashing" />
     <MESSAGE value="fixed deadlock when path length is 0" />
-    <option name="LAST_COMMIT_MESSAGE" value="fixed deadlock when path length is 0" />
+    <MESSAGE value="stashing blur" />
+    <option name="LAST_COMMIT_MESSAGE" value="stashing blur" />
   </component>
   <component name="XDebuggerManager">
     <breakpoint-manager>

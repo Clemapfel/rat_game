@@ -39,8 +39,8 @@ rt.GameState = meta.new_type("GameState", function()
         msaa_quality = rt.MSAAQuality.BEST,
         gamma = 1,
         is_fullscreen = false,
-        resolution_x = 1280,
-        resolution_y = 720,
+        resolution_x = 1920, --1280,
+        resolution_y = 1080, --720,
         sfx_level = 1,
         music_level = 1,
         vfx_motion_level = 1,
@@ -72,7 +72,6 @@ rt.GameState = meta.new_type("GameState", function()
         _grabbed_object = nil, -- helper for mn.InventoryScene
         _render_texture = rt.RenderTexture(),
         _render_shader = rt.Shader("common/game_state_render_shader.glsl"),
-        _use_render_texture = false,
         _use_coroutines = false,    -- use loading screens and background loading
         _use_scene_caching = true,  -- keep scenes after allocating them once
 
@@ -190,10 +189,6 @@ function rt.GameState:_update_window_mode()
     local before_w, before_h = love.graphics.getWidth(), love.graphics.getHeight()
 
     local native_msaa = self._state.msaa_quality
-    if self._use_render_texture == true then
-        native_msaa = 0
-    end
-
     love.window.updateMode(
         window_res_x,
         window_res_y,
@@ -213,16 +208,6 @@ function rt.GameState:_update_window_mode()
 
     love.window.updateMode(window_res_x, window_res_y, {minwidth = window_res_x, minheight = window_res_y})
     -- window does not shrink unless updateMode is called twice
-
-    if self._use_render_texture then
-        self._render_texture = rt.RenderTexture(
-            self._state.resolution_x,
-            self._state.resolution_y,
-            self._state.msaa_quality
-        )
-        self._render_texture:set_scale_mode(rt.TextureScaleMode.LINEAR)
-        self._render_shader:send("gamma", self._state.gamma)
-    end
 
     rt.settings.contrast = self._state.vfx_contrast_level
     rt.settings.motion_intensity = self._state.vfx_motion_level
@@ -297,10 +282,6 @@ function rt.GameState:_run()
         local stats
         local background_color = rt.Palette.TRUE_MAGENTA
         if love.graphics.isActive() then
-            if self._use_render_texture then
-                self._render_texture:bind()
-            end
-
             love.graphics.reset()
             love.graphics.setColor(background_color.r, background_color.g, background_color.b, 1)
             love.graphics.rectangle("fill", 0, 0, love.graphics.getWidth(), love.graphics.getHeight())
@@ -329,13 +310,6 @@ function rt.GameState:_run()
                 local margin = 3
                 local label_w, label_h = love.graphics.getFont():getWidth(label), love.graphics.getFont():getHeight(label)
                 love.graphics.print(label, math.floor(rt.graphics.get_width() - label_w - 2 * margin), math.floor(0.5 * margin))
-            end
-
-            if self._use_render_texture then
-                self._render_texture:unbind()
-                self._render_shader:bind()
-                self._render_texture:draw()
-                self._render_shader:unbind()
             end
 
             love.graphics.present()

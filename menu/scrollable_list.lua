@@ -287,8 +287,8 @@ function mn.ScrollableList:draw()
         local entry = self._sortings[self._current_sort_mode][i]
         local item = self._items[entry.item_i]
 
-        rt.graphics.origin()
-        rt.graphics.translate(entry.x, entry.y + self._selection_offset_y)
+        local x, y = entry.x, entry.y + self._selection_offset_y
+        rt.graphics.translate(x, y)
 
         if active and i == self._selected_item_i then
             item.selected_base:draw()
@@ -303,6 +303,7 @@ function mn.ScrollableList:draw()
         if item.quantity_label ~= nil then
             item.quantity_label:draw()
         end
+        rt.graphics.translate(-x, -y)
     end
 
     rt.graphics.pop()
