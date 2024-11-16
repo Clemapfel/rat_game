@@ -1,4 +1,5 @@
 rt.settings.camera = {
+    shake_intensity = 1, -- in [0, 1]
     position_speed = 1000, -- px per second
     angle_speed = 1000, -- rad per second
     scale_speed = 500, -- 1x per second
@@ -6,17 +7,13 @@ rt.settings.camera = {
     angle_inertia_decay_speed = 0.5, -- decreases to 0 per second
     scale_inertia_decay_speed = 2, -- decreases to 0 per second
 
-    shake_intensity = 1,
-    n_shakes_per_second = 75,
-    motion_blur = true
+    n_shakes_per_second = 75
 }
 
 --- @class rt.Camera
-rt.Camera = meta.new_type("Camera", rt.Drawable, rt.Updatable, function(state)
-    meta.assert_isa(state, rt.GameState)
+rt.Camera = meta.new_type("Camera", rt.Drawable, rt.Updatable, function()
     local aabb = rt.AABB(0, 0, love.graphics.getWidth(), love.graphics.getHeight())
     local out = meta.new(rt.Camera, {
-        _state = state,
         _aabb = aabb,
 
         _current_x = aabb.x + 0.5 * aabb.width,
@@ -24,66 +21,74 @@ rt.Camera = meta.new_type("Camera", rt.Drawable, rt.Updatable, function(state)
         _target_x = aabb.x + 0.5 * aabb.width,
         _target_y = aabb.y + 0.5 * aabb.height,
         _position_speed = rt.settings.camera.position_speed,
-        _position_inertia = 0,
-        _position_inertia_speed = rt.settings.camera.position_inertia_decay_speed,
 
-        _offset_path = nil, -- rt.Path
+        _position_inertia = 0,
+        _angle_inertia = 0,
+        _scale_inertia = 0,
+        _position_inertia_speed = rt.settings.camera.position_inertia_decay_speed,
+        _angle_inertia_speed = rt.settings.camera.angle_inertia_decay_speed,
+        _scale_inertia_speed = rt.settings.camera.scale_inertia_decay_speed,
+
+        _offset_path = nil,
         _offset_path_duration = 0,
         _offset_path_elapsed = 0,
         _offset_x = 0,
         _offset_y = 0,
+        _offset_velocity = 0,
 
         _current_angle = 0,
         _target_angle = 0,
         _angle_speed = rt.settings.camera.angle_speed,
-        _angle_inertia = 0,
-        _angle_inertia_speed = rt.settings.camera.angle_inertia_decay_speed,
 
         _current_scale = 1,
         _target_scale = 1,
         _scale_speed = rt.settings.camera.scale_speed,
-        _scale_inertia = 0,
-        _scale_inertia_speed = rt.settings.camera.scale_inertia_decay_speed,
 
+        _is_bound = false,
         _elapsed = 0,
 
-        _blur_strength = 0,
         _render_texture_a = nil, -- love.Canvas
         _render_texture_b = nil, -- love.Canvas
         _render_texture_mesh = nil, -- love.Mesh
         _blur_shader_horizontal = love.graphics.newShader("common/camera_blur.glsl", {
-            defines = { HORIZONTAL_OR_VERTICAL = 1 }
+            defines = {
+                HORIZONTAL_OR_VERTICAL = 1
+            }
         }),
         _blur_shader_vertical = love.graphics.newShader("common/camera_blur.glsl", {
-            defines = { HORIZONTAL_OR_VERTICAL = 0 }
+            defines = {
+                HORIZONTAL_OR_VERTICAL = 0
+            }
         }),
+        _blur_strength = 0,
     })
 
     out:set_viewport(rt.aabb_unpack(aabb))
     return out
 end)
 
---- @brief
+--- @brief override position
 function rt.Camera:override_position(center_x, center_y)
     self._current_x = center_x
     self._current_y = center_y
     self._target_x = center_x
     self._target_y = center_y
+    self._path = nil
 end
 
---- @brief
+--- @brief override scale
 function rt.Camera:override_scale(level)
     self._current_scale = level
     self._target_scale = level
 end
 
---- @brief
+--- @brief override angle
 function rt.Camera:override_angle(angle)
     self._current_angle = angle
     self._target_angle = angle
 end
 
---- @brief
+--- @brief move to point with interpolation
 function rt.Camera:set_position(center_x, center_y)
     self._position_inertia = 0
     self._target_x, self._target_y = center_x, center_y
@@ -114,47 +119,102 @@ function rt.Camera:skip()
     self._blur_strength = 0
 end
 
---- @brief
-function rt.Camera:reset()
-    local x, y, w, h = rt.aabb_unpack(self._aabb)
-    self:override_position(x + 0.5 * w, y + 0.5 * h)
-    self:override_scale(1)
-    self:override_angle(0)
-    self:skip()
-end
+--- @override
+function rt.Camera:update(delta)
+    self._elapsed = self._elapsed + delta
 
---- @brief
-function rt.Camera:set_viewport(x, y, w, h)
-    self._aabb = rt.AABB(x, y, w, h)
-    local settings = {
-        msaa = 0,
-        format = rt.TextureFormat.RGB565 -- 16-bit, fully opaque
-    }
+    -- update shake
+    if self._offset_path ~= nil then
+        self._offset_path_elapsed = self._offset_path_elapsed + delta
+        local offset_fraction = self._offset_path_elapsed / self._offset_path_duration
+        local previous_x, previous_y = self._offset_x, self._offset_y
+        self._offset_x, self._offset_y = self._offset_path:at(offset_fraction)
 
-    self._render_texture_a = love.graphics.newCanvas(w, h, settings)
-    self._render_texture_b = love.graphics.newCanvas(w, h, settings)
-    self._blur_shader_horizontal:send("texture_size", { self._aabb.width, self._aabb.height })
-    self._blur_shader_vertical:send("texture_size", { self._aabb.width, self._aabb.height })
+        self._offset_velocity = rt.distance(previous_x, previous_y, self._offset_x, self._offset_y)
+        self._blur_strength = math.max(self._blur_strength, math.ceil(self._offset_velocity / self:_get_shake_radius()) * 3)
+        if self._offset_path_elapsed > self._offset_path_duration then
+            self._offset_path = nil
+            self._offset_path_duration = 0
+            self._offset_path_elapsed = 0
+            self._blur_strength = 0
+        end
+    end
 
-    local vertex_format = {
-        {name = "VertexPosition", format = "floatvec2"},
-        {name = "VertexTexCoord", format = "floatvec2"},
-    }
+    -- update position
+    if self._current_x ~= self._target_x or self._current_y ~= self._target_y then
+        local distance_x = self._target_x - self._current_x
+        local distance_y = self._target_y - self._current_y
 
-    -- use padded mesh that is larger than the screen, such that when the
-    -- camera shakes, the texture wrap mode hides the edges of the screen
-    local padding = -0.5
-    local vertex_data = {
-        {      padding * w,       padding * h,      padding,     padding},
-        {(1 - padding) * w,       padding * h,  1 - padding,     padding},
-        {(1 - padding) * w, (1 - padding) * h,  1 - padding, 1 - padding},
-        {      padding * w, (1 - padding) * h,      padding, 1 - padding}
-    }
-    self._render_texture_mesh = love.graphics.newMesh(vertex_format, vertex_data, rt.MeshDrawMode.TRIANGLE_FAN)
-    self._render_texture_mesh:setTexture(self._render_texture_b)
+        local step_x = distance_x * self._position_speed * delta * delta
+        local step_y = distance_y * self._position_speed * delta * delta
 
-    for texture in range(self._render_texture_a, self._render_texture_b) do
-        texture:setWrap(rt.TextureWrapMode.MIRROR)
+        step_x = step_x * self._position_inertia
+        step_y = step_y * self._position_inertia
+
+        self._position_inertia = self._position_inertia + delta * self._position_inertia_speed
+        if self._position_inertia > 1 then self._position_inertia = 1 end
+
+        local max_step = self._position_speed * delta
+        if step_x > max_step then step_x = max_step end
+        if step_y > max_step then step_y = max_step end
+
+        self._current_x = self._current_x + step_x
+        self._current_y = self._current_y + step_y
+
+        if  (distance_x > 0 and self._current_x > self._target_x) or
+            (distance_x < 0 and self._current_x < self._target_x)
+        then
+            self._current_x = self._target_x
+        end
+
+        if  (distance_y > 0 and self._current_y > self._target_y) or
+            (distance_y < 0 and self._current_y < self._target_y)
+        then
+            self._current_y = self._target_y
+        end
+    end
+
+    -- update angle
+    if self._current_angle ~= self._target_angle then
+        -- always chooses shortest path along the circle
+        local distance = self._target_angle - self._current_angle
+        distance = (distance + math.pi) % (2 * math.pi) - math.pi
+
+        local step = distance * self._angle_speed * delta * delta
+        step = math.min(math.abs(step), self._angle_speed * delta)
+        if distance < 0 then step = step * -1 end
+        
+        step = step * self._angle_inertia
+        self._angle_inertia = self._angle_inertia + delta * self._angle_inertia_speed
+        if self._angle_inertia > 1 then self._angle_inertia = 1 end
+
+        self._current_angle = self._current_angle + step
+
+        if  (distance > 0 and self._current_angle > self._current_angle) or
+            (distance < 0 and self._current_angle < self._current_angle)
+        then
+            self._current_angle = self._current_angle
+        end
+    end
+    
+    -- update scale
+    if self._current_scale ~= self._target_scale then
+        local distance = self._target_scale - self._current_scale
+        local step = math.sign(distance) * math.sqrt(math.abs(distance)) * self._scale_speed * delta * delta
+        step = math.min(self._scale_speed * delta * delta, step)
+        -- modulate slowdown for asthetic reasons
+
+        step = step * self._scale_inertia
+        self._scale_inertia = self._scale_inertia + delta * self._scale_inertia_speed
+        if self._scale_inertia > 1 then self._scale_inertia = 1 end
+
+        self._current_scale = self._current_scale + step
+
+        if  (distance > 0 and self._current_scale > self._target_scale) or
+            (distance < 0 and self._current_scale < self._target_scale)
+        then
+            self._current_scale = self._target_scale
+        end
     end
 end
 
@@ -185,6 +245,7 @@ do
     function rt.Camera:unbind()
         if self._blur_strength > 0 then
             lg.origin()
+
             local a, b = self._render_texture_a, self._render_texture_b
             for i = 1, self._blur_strength do
                 lg.setShader(self._blur_shader_horizontal)
@@ -205,7 +266,7 @@ do
     end
 end
 
---- @brief debug draw
+--- @brief
 function rt.Camera:draw()
     love.graphics.push()
     love.graphics.reset()
@@ -279,110 +340,44 @@ function rt.Camera:draw()
 end
 
 --- @brief
+function rt.Camera:set_viewport(x, y, w, h)
+    self._aabb = rt.AABB(x, y, w, h)
+    local settings = {
+        msaa = 0,
+        format = rt.TextureFormat.RGB565 -- 16-bit, fully opaque
+    }
+    self._render_texture_a = love.graphics.newCanvas(w, h, settings)
+    self._render_texture_b = love.graphics.newCanvas(w, h, settings)
+    self._blur_shader_horizontal:send("texture_size", { self._aabb.width, self._aabb.height })
+    self._blur_shader_vertical:send("texture_size", { self._aabb.width, self._aabb.height })
+
+
+    local vertex_format = {
+        {name = "VertexPosition", format = "floatvec2"},
+        {name = "VertexTexCoord", format = "floatvec2"},
+    }
+
+    -- use padded mesh that is larger than the screen, such that when the
+    -- camera shakes, the texture wrap mode hides the edges of the screen
+    local padding = -0.5
+    local vertex_data = {
+        {      padding * w,       padding * h,      padding,     padding},
+        {(1 - padding) * w,       padding * h,  1 - padding,     padding},
+        {(1 - padding) * w, (1 - padding) * h,  1 - padding, 1 - padding},
+              {padding * w, (1 - padding) * h,      padding, 1 - padding}
+    }
+    self._render_texture_mesh = love.graphics.newMesh(vertex_format, vertex_data, rt.MeshDrawMode.TRIANGLE_FAN)
+    self._render_texture_mesh:setTexture(self._render_texture_b)
+
+    for texture in range(self._render_texture_a, self._render_texture_b) do
+        texture:setWrap(rt.TextureWrapMode.MIRROR)
+    end
+end
+
+--- @brief
 function rt.Camera:_get_shake_radius()
-    return 0.01 * math.min(self._aabb.width, self._aabb.height) * rt.settings.camera.shake_intensity
+    return 0.01 * math.min(self._aabb.width, self._aabb.height)
 end
-
---- @override
-function rt.Camera:update(delta)
-    self._elapsed = self._elapsed + delta
-
-    -- update position
-    if self._current_x ~= self._target_x or self._current_y ~= self._target_y then
-        local distance_x = self._target_x - self._current_x
-        local distance_y = self._target_y - self._current_y
-
-        local step_x = distance_x * self._position_speed * delta * delta
-        local step_y = distance_y * self._position_speed * delta * delta
-
-        step_x = step_x * self._position_inertia
-        step_y = step_y * self._position_inertia
-
-        self._blur_strength = math.round(rt.magnitude(distance_x, distance_y) / math.min(self._aabb.width, self._aabb.height))
-
-        self._position_inertia = self._position_inertia + delta * self._position_inertia_speed
-        if self._position_inertia > 1 then self._position_inertia = 1 end
-
-        local max_step = self._position_speed * delta
-        if step_x > max_step then step_x = max_step end
-        if step_y > max_step then step_y = max_step end
-
-        self._current_x = self._current_x + step_x
-        self._current_y = self._current_y + step_y
-
-        if  (distance_x > 0 and self._current_x > self._target_x) or
-            (distance_x < 0 and self._current_x < self._target_x)
-        then
-            self._current_x = self._target_x
-        end
-
-        if  (distance_y > 0 and self._current_y > self._target_y) or
-            (distance_y < 0 and self._current_y < self._target_y)
-        then
-            self._current_y = self._target_y
-        end
-    end
-
-    -- update shake
-    if self._offset_path ~= nil then
-        self._offset_path_elapsed = self._offset_path_elapsed + delta
-        local offset_fraction = self._offset_path_elapsed / self._offset_path_duration
-        local previous_x, previous_y = self._offset_x, self._offset_y
-        self._offset_x, self._offset_y = self._offset_path:at(offset_fraction)
-
-        self._offset_velocity = rt.distance(previous_x, previous_y, self._offset_x, self._offset_y)
-        self._blur_strength = math.max(self._blur_strength, math.ceil(self._offset_velocity / self:_get_shake_radius()) * 3)
-
-        if self._offset_path_elapsed > self._offset_path_duration then
-            self._offset_path = nil
-            self._offset_path_duration = 0
-            self._offset_path_elapsed = 0
-            self._blur_strength = 0
-        end
-    end
-
-    -- update angle
-    if self._current_angle ~= self._target_angle then
-        local distance = self._target_angle - self._current_angle
-        distance = (distance + math.pi) % (2 * math.pi) - math.pi -- always chooses shortest path along the circle
-
-        local step = distance * self._angle_speed * delta * delta
-        step = math.min(math.abs(step), self._angle_speed * delta)
-        if distance < 0 then step = step * -1 end
-
-        step = step * self._angle_inertia
-        self._angle_inertia = self._angle_inertia + delta * self._angle_inertia_speed
-        if self._angle_inertia > 1 then self._angle_inertia = 1 end
-
-        self._current_angle = self._current_angle + step
-
-        if  (distance > 0 and self._current_angle > self._current_angle) or
-            (distance < 0 and self._current_angle < self._current_angle)
-        then
-            self._current_angle = self._current_angle
-        end
-    end
-
-    -- update scale
-    if self._current_scale ~= self._target_scale then
-        local distance = self._target_scale - self._current_scale
-        local step = math.sign(distance) * math.sqrt(math.abs(distance)) * self._scale_speed * delta * delta
-        step = math.min(self._scale_speed * delta * delta, step) -- modulate slowdown for asthetic reasons
-
-        step = step * self._scale_inertia
-        self._scale_inertia = self._scale_inertia + delta * self._scale_inertia_speed
-        if self._scale_inertia > 1 then self._scale_inertia = 1 end
-
-        self._current_scale = self._current_scale + step
-
-        if  (distance > 0 and self._current_scale > self._target_scale) or
-            (distance < 0 and self._current_scale < self._target_scale)
-        then
-            self._current_scale = self._target_scale
-        end
-    end
-end
-
 
 --- @brief
 function rt.Camera:shake(duration, x_radius, y_radius, n_shakes_per_second)
@@ -392,6 +387,9 @@ function rt.Camera:shake(duration, x_radius, y_radius, n_shakes_per_second)
         n_shakes_per_second = rt.settings.camera.n_shakes_per_second
     end
     meta.assert_number(duration, x_radius, y_radius, n_shakes_per_second)
+
+    local shake_intensity = rt.settings.camera.shake_intensity
+    x_radius, y_radius = x_radius * shake_intensity, y_radius * shake_intensity
 
     local step = 0.075 -- noise increment, the smaller the smoother the path
     local vertices = {}

@@ -81,9 +81,11 @@ rt.GameState = meta.new_type("GameState", function()
         _current_scene = nil,
         _scenes = {}, -- Table<meta.Type, rt.Scene>
         _active_coroutines = {}, -- Table<rt.Coroutine>
-        _n_active_coroutines = 0
-    })
+        _n_active_coroutines = 0,
 
+        _camera = nil, -- rt.Camera
+    })
+    out._camera = rt.Camera(out)
     out:realize()
     return out
 end)
@@ -212,11 +214,11 @@ function rt.GameState:_update_window_mode()
     rt.settings.contrast = self._state.vfx_contrast_level
     rt.settings.motion_intensity = self._state.vfx_motion_level
 
-    self:_resize(window_res_x, window_res_y)
+    self:resize(window_res_x, window_res_y)
 end
 
 --- @brief
-function rt.GameState:_run()
+function rt.GameState:run()
     love.window.setTitle("rat_game")
     love.window.setIcon(love.image.newImageData("assets/favicon.png"))
     love.filesystem.setIdentity("rat_game")
@@ -384,7 +386,7 @@ function rt.GameState:_run()
 end
 
 --- @brief
-function rt.GameState:_resize(new_width, new_height)
+function rt.GameState:resize(new_width, new_height)
     local true_w, true_h = love.graphics.getWidth(), love.graphics.getHeight()
     self._loading_screen:fit_into(0, 0, true_w, true_h)
 
@@ -395,6 +397,7 @@ function rt.GameState:_resize(new_width, new_height)
                     self._current_scene:fit_into(0, 0, self._state.resolution_x, self._state.resolution_y)
                     rt.savepoint_maybe()
                 end
+                self._camera:set_viewport(0, 0, self._state.resolution_x, self._state.resolution_y)
                 self:_loading_screen_hide()
             end))
             self._n_active_coroutines = self._n_active_coroutines + 1
@@ -403,16 +406,18 @@ function rt.GameState:_resize(new_width, new_height)
         if self._current_scene ~= nil then
             self._current_scene:fit_into(0, 0, self._state.resolution_x, self._state.resolution_y)
         end
+        self._camera:set_viewport(0, 0, self._state.resolution_x, self._state.resolution_y)
     end
 end
 
 --- @brief
-function rt.GameState:_update(delta)
+function rt.GameState:update(delta)
     rt.SoundAtlas:update(delta)
 
     if self._loading_screen_active then
         self._loading_screen:update(delta)
     elseif self._current_scene ~= nil then
+        self._camera:update(delta)
         self._current_scene:update(delta)
         self._current_scene:signal_emit("update")
     end
@@ -435,14 +440,17 @@ function rt.GameState:_update(delta)
 end
 
 --- @brief
-function rt.GameState:_load()
-    -- noop, done on first update
+function rt.GameState:load()
+    self._camera:reset()
+    -- noop otherwise, work done on first update
 end
 
 --- @brief
-function rt.GameState:_draw()
+function rt.GameState:draw()
     if self._current_scene ~= nil then
+        self._camera:bind()
         self._current_scene:draw()
+        self._camera:unbind()
     end
 
     if self._loading_screen_active then
@@ -721,4 +729,9 @@ function rt.GameState:set_loading_screen(loading_screen_type)
     self._loading_screen = loading_screen_type()
     self._loading_screen:realize()
     self._loading_screen:fit_into(self._bounds)
+end
+
+--- @brief
+function rt.GameState:get_camera()
+    return self._camera
 end

@@ -22,9 +22,12 @@
     </configurations>
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="7fa9ba1b-2cff-4ecc-86fb-59ab2fa76ee1" name="Changes" comment="shake working">
+    <list default="true" id="7fa9ba1b-2cff-4ecc-86fb-59ab2fa76ee1" name="Changes" comment="camera done">
+      <change afterPath="$PROJECT_DIR$/common/~camera.lua" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/common/camera.lua" beforeDir="false" afterPath="$PROJECT_DIR$/common/camera.lua" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/common/camera_blur.glsl" beforeDir="false" afterPath="$PROJECT_DIR$/common/camera_blur.glsl" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/common/game_state.lua" beforeDir="false" afterPath="$PROJECT_DIR$/common/game_state.lua" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/main.lua" beforeDir="false" afterPath="$PROJECT_DIR$/main.lua" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
@@ -635,15 +638,7 @@
       <workItem from="1731524708247" duration="3571000" />
       <workItem from="1731537261451" duration="6323000" />
       <workItem from="1731603156937" duration="13264000" />
-      <workItem from="1731621962991" duration="18262000" />
-    </task>
-    <task id="LOCAL-01199" summary="stashing linear search path">
-      <option name="closed" value="true" />
-      <created>1730494260244</created>
-      <option name="number" value="01199" />
-      <option name="presentableId" value="LOCAL-01199" />
-      <option name="project" value="LOCAL" />
-      <updated>1730494260244</updated>
+      <workItem from="1731621962991" duration="20454000" />
     </task>
     <task id="LOCAL-01200" summary="path done and optimized">
       <option name="closed" value="true" />
@@ -1029,7 +1024,15 @@
       <option name="project" value="LOCAL" />
       <updated>1731784718153</updated>
     </task>
-    <option name="localTasksCounter" value="1248" />
+    <task id="LOCAL-01248" summary="camera done">
+      <option name="closed" value="true" />
+      <created>1731786666735</created>
+      <option name="number" value="01248" />
+      <option name="presentableId" value="LOCAL-01248" />
+      <option name="project" value="LOCAL" />
+      <updated>1731786666735</updated>
+    </task>
+    <option name="localTasksCounter" value="1249" />
     <servers />
   </component>
   <component name="TypeScriptGeneratedFilesManager">
@@ -1078,7 +1081,6 @@
     </option>
   </component>
   <component name="VcsManagerConfiguration">
-    <MESSAGE value="stashing canvas leak" />
     <MESSAGE value="optimized frame" />
     <MESSAGE value="refactor frame" />
     <MESSAGE value="stashing, sprite animation rework necessary" />
@@ -1103,7 +1105,8 @@
     <MESSAGE value="fixed deadlock when path length is 0" />
     <MESSAGE value="stashing blur" />
     <MESSAGE value="shake working" />
-    <option name="LAST_COMMIT_MESSAGE" value="shake working" />
+    <MESSAGE value="camera done" />
+    <option name="LAST_COMMIT_MESSAGE" value="camera done" />
   </component>
   <component name="XDebuggerManager">
     <breakpoint-manager>
@@ -1132,6 +1135,12 @@
           <url>file://$PROJECT_DIR$/common/translation.lua</url>
           <line>252</line>
           <option name="timeStamp" value="24" />
+        </line-breakpoint>
+        <line-breakpoint enabled="true" suspend="NONE" type="lua-line">
+          <url>file://$PROJECT_DIR$/common/~camera.lua</url>
+          <line>220</line>
+          <log-expression expression="o&#10;    local lg = love.graphics&#10;&#10;    --- @brief&#10;    function rt.Camera:bind()&#10;        lg.push()&#10;        lg.origin()&#10;&#10;        if self._blur_strength &gt; 0 then&#10;            lg.setCanvas({ self._render_texture_b, stencil = true })&#10;            lg.clear(true, false, false)&#10;        else&#10;            lg.translate(self._offset_x, self._offset_y) -- shake separate, applied to padded mesh to avoid bordering&#10;        end&#10;&#10;        lg.translate(self._current_x, self._current_y)&#10;        lg.scale(self._current_scale)&#10;        lg.rotate(self._current_angle)&#10;        lg.translate( -0.5 * self._aabb.width, -0.5 * self._aabb.height)&#10;    end&#10;&#10;    -- scene draw here&#10;&#10;    --- @brief&#10;    function rt.Camera:unbind()&#10;        if self._blur_strength &gt; 0 then&#10;            lg.origin()&#10;&#10;            local a, b = self._render_texture_a, self._render_texture_b&#10;            for i = 1, self._blur_strength do&#10;                lg.setShader(self._blur_shader_horizontal)&#10;                lg.setCanvas(a)&#10;                lg.draw(b)&#10;&#10;                lg.setShader(self._blur_shader_vertical)&#10;                lg.setCanvas(b)&#10;                lg.draw(a)&#10;            end&#10;&#10;            lg.setCanvas()&#10;            lg.translate(self._offset_x, self._offset_y)&#10;            lg.draw(self._render_texture_mesh)&#10;        end&#10;&#10;        lg.pop()&#10;    end&#10;end" language="Lua" />
+          <option name="timeStamp" value="28" />
         </line-breakpoint>
         <line-breakpoint enabled="true" suspend="NONE" type="CMakeLineBreakpoint">
           <url>file://$PROJECT_DIR$/physics/box2d_extension/CMakeLists.txt</url>
