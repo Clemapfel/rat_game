@@ -7,7 +7,7 @@ rt.settings.camera = {
     angle_inertia_decay_speed = 0.5, -- decreases to 0 per second
     scale_inertia_decay_speed = 2, -- decreases to 0 per second
 
-    n_shakes_per_second = 100
+    n_shakes_per_second = 75
 }
 
 --- @class rt.Camera
@@ -283,14 +283,18 @@ function rt.Camera:draw()
     love.graphics.setPointSize(4)
     love.graphics.points(self._current_x, self._current_y)
 
+    if self._offset_path ~= nil then
+        self._offset_path:draw()
+    end
+
     love.graphics.pop()
 end
 
 
 --- @brief
 function rt.Camera:shake(duration, x_radius, y_radius, n_shakes_per_second)
-    if x_radius == nil then x_radius = 0 end
-    if y_radius == nil then y_radius = 0 end
+    if x_radius == nil then x_radius = 0.01 * math.min(self._aabb.width, self._aabb.height) end
+    if y_radius == nil then y_radius = 0.01 * math.min(self._aabb.width, self._aabb.height) end
     if n_shakes_per_second == nil then
         n_shakes_per_second = rt.settings.camera.n_shakes_per_second
     end
@@ -302,7 +306,7 @@ function rt.Camera:shake(duration, x_radius, y_radius, n_shakes_per_second)
     local vertices = {}
     table.insert(vertices, 0)
     table.insert(vertices, 0)
-    for i = 1, math.floor(n_shakes_per_second * duration) do
+    for i = 1, math.ceil(n_shakes_per_second * duration) do
         table.insert(vertices, rt.random.number(-x_radius, x_radius))
         table.insert(vertices, rt.random.number(-y_radius, y_radius))
     end

@@ -22,12 +22,11 @@
     </configurations>
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="7fa9ba1b-2cff-4ecc-86fb-59ab2fa76ee1" name="Changes" comment="stashing love physics">
+    <list default="true" id="7fa9ba1b-2cff-4ecc-86fb-59ab2fa76ee1" name="Changes" comment="stashing">
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/common/camera.lua" beforeDir="false" afterPath="$PROJECT_DIR$/common/camera.lua" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/common/path.lua" beforeDir="false" afterPath="$PROJECT_DIR$/common/path.lua" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/main.lua" beforeDir="false" afterPath="$PROJECT_DIR$/main.lua" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/main_bounce.lua" beforeDir="false" afterPath="$PROJECT_DIR$/main_bounce.lua" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/physics/world.lua" beforeDir="false" afterPath="$PROJECT_DIR$/physics/world.lua" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -637,15 +636,7 @@
       <workItem from="1731524708247" duration="3571000" />
       <workItem from="1731537261451" duration="6323000" />
       <workItem from="1731603156937" duration="13264000" />
-      <workItem from="1731621962991" duration="5025000" />
-    </task>
-    <task id="LOCAL-01195" summary="stashing">
-      <option name="closed" value="true" />
-      <created>1730311743442</created>
-      <option name="number" value="01195" />
-      <option name="presentableId" value="LOCAL-01195" />
-      <option name="project" value="LOCAL" />
-      <updated>1730311743442</updated>
+      <workItem from="1731621962991" duration="9070000" />
     </task>
     <task id="LOCAL-01196" summary="refactoring simulation, set_value now stores state-side">
       <option name="closed" value="true" />
@@ -1031,7 +1022,15 @@
       <option name="project" value="LOCAL" />
       <updated>1731623446492</updated>
     </task>
-    <option name="localTasksCounter" value="1244" />
+    <task id="LOCAL-01244" summary="stashing">
+      <option name="closed" value="true" />
+      <created>1731637884767</created>
+      <option name="number" value="01244" />
+      <option name="presentableId" value="LOCAL-01244" />
+      <option name="project" value="LOCAL" />
+      <updated>1731637884767</updated>
+    </task>
+    <option name="localTasksCounter" value="1245" />
     <servers />
   </component>
   <component name="TypeScriptGeneratedFilesManager">
@@ -1099,13 +1098,13 @@
     <MESSAGE value="stashing shader blur" />
     <MESSAGE value="stashing before using scale blur" />
     <MESSAGE value="stashing separated kernels" />
-    <MESSAGE value="stashing" />
     <MESSAGE value="stashing blur working" />
     <MESSAGE value="added camera" />
     <MESSAGE value="camera shake working" />
     <MESSAGE value="camera interpolation done" />
     <MESSAGE value="stashing love physics" />
-    <option name="LAST_COMMIT_MESSAGE" value="stashing love physics" />
+    <MESSAGE value="stashing" />
+    <option name="LAST_COMMIT_MESSAGE" value="stashing" />
   </component>
   <component name="XDebuggerManager">
     <breakpoint-manager>

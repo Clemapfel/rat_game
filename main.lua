@@ -33,7 +33,7 @@ input:signal_connect("keyboard_pressed", function(_, which)
         camera:set_scale(rt.random.number(1 / 4, 4))
         --camera:set_position(love.mouse.getPosition())
     elseif which == rt.KeyboardKey.B then
-        camera:shake(5)
+        camera:shake(3)
     end
 end)
 

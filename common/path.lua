@@ -61,9 +61,15 @@ do
                 local current = distances[i]
                 local next = distances[i + 1]
 
-                current.fraction = current.cumulative_distance / total_length
-                next.fraction = next.cumulative_distance / total_length
-                current.fraction_length = next.fraction - current.fraction
+                if total_length == 0 then
+                    current.fraction = 0
+                    next.fraction = 0
+                    current.fraction_length = 0
+                else
+                    current.fraction = current.cumulative_distance / total_length
+                    next.fraction = next.cumulative_distance / total_length
+                    current.fraction_length = next.fraction - current.fraction
+                end
 
                 if i == 1 then self._first_distance = current.fraction end
                 if i == n_entries - 1 then self._last_distance = next.fraction end
@@ -105,7 +111,6 @@ do
                     low = mid + 1
                 elseif closest_entry.fraction > t then
                     high = mid - 1
-                    TODO: which does this deadllcok
                 end
             end
         end
