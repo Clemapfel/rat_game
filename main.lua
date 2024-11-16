@@ -82,7 +82,6 @@ love.draw = function()
         camera:bind()
         state:_draw()
         camera:unbind()
-        camera:draw()
 
         --[[
         if state._current_scene ~= nil and state._current_scene._animation_queue ~= nil then

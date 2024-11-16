@@ -128,7 +128,6 @@ require "common.input_controller"
 require "common.graphics"
 require "common.drawable"
 require "common.updatable"
-require "common.camera"
 require "common.color"
 require "common.palette"
 require "common.animation_queue"
@@ -176,6 +175,7 @@ require "common.loading_screen_default"
 require "common.loading_screen_shatter"
 
 require "common.scene"
+require "common.camera"
 
 -- backgrounds
 require "backgrounds.background_implementation"

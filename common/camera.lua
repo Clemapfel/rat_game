@@ -36,6 +36,7 @@ rt.Camera = meta.new_type("Camera", rt.Drawable, rt.Updatable, function()
         _offset_path_elapsed = 0,
         _offset_x = 0,
         _offset_y = 0,
+        _offset_velocity = 0,
 
         _current_angle = 0,
         _target_angle = 0,
@@ -48,9 +49,13 @@ rt.Camera = meta.new_type("Camera", rt.Drawable, rt.Updatable, function()
         _is_bound = false,
         _elapsed = 0,
 
-        _render_texture = rt.RenderTexture(1, 1)
+        _render_texture_a = rt.RenderTexture(),
+        _render_texture_b = rt.RenderTexture(),
+        _post_fx_active = false,
     })
-end)
+end, {
+    blur_shader = rt.Shader("common/camera_blur.glsl")
+})
 
 --- @brief override position
 function rt.Camera:override_position(center_x, center_y)
@@ -110,11 +115,18 @@ function rt.Camera:update(delta)
     -- update shake
     if self._offset_path ~= nil then
         self._offset_path_elapsed = self._offset_path_elapsed + delta
-        self._offset_x, self._offset_y = self._offset_path:at(self._offset_path_elapsed / self._offset_path_duration)
+        local offset_fraction = self._offset_path_elapsed / self._offset_path_duration
+        local previous_x, previous_y = self._offset_x, self._offset_y
+        self._offset_x, self._offset_y = self._offset_path:at(offset_fraction)
+
+        self._post_fx_active = offset_fraction <= 1
+        self._offset_velocity = rt.distance(previous_x, previous_y, self._offset_x, self._offset_y)
+
         if self._offset_path_elapsed > self._offset_path_duration then
             self._offset_path = nil
             self._offset_path_duration = 0
             self._offset_path_elapsed = 0
+            self._post_fx_active = false
         end
     end
 
@@ -198,37 +210,60 @@ end
 
 --- @brief
 function rt.Camera:bind()
-    love.graphics.push()
-
-    rt.graphics.origin()
-
-    love.graphics.translate(self._offset_x, self._offset_y)
-    love.graphics.translate(self._current_x, self._current_y)
-    love.graphics.scale(self._current_scale)
-    love.graphics.rotate(self._current_angle)
-    love.graphics.translate( -0.5 * self._aabb.width, -0.5 * self._aabb.height)
+    if self._post_fx_active then
+        self._render_texture_b:bind()
+        love.graphics.clear(true, false, false)
+    else
+        love.graphics.push()
+        love.graphics.translate(self._offset_x, self._offset_y)
+        love.graphics.translate(self._current_x, self._current_y)
+        love.graphics.scale(self._current_scale)
+        love.graphics.rotate(self._current_angle)
+        love.graphics.translate( -0.5 * self._aabb.width, -0.5 * self._aabb.height)
+    end
 end
 
 --- @brief
 function rt.Camera:unbind()
-    love.graphics.pop()
-end
+    if self._post_fx_active then
+        self._render_texture_b:unbind()
+        self.blur_shader:bind()
+        self.blur_shader:send("texture_size", {self._aabb.width, self._aabb.height})
 
---- @brief
-function rt.Camera:set_viewport(x, y, w, h)
-    self._aabb = rt.AABB(x, y, w, h)
-    local current_w, current_h = self._render_texture:get_size()
-    if current_w ~= w or current_h ~= h then
-        self._render_texture = rt.RenderTexture(w, h, state:get_msaa_quality(), rt.TextureFormat.NORMAL) -- TODO
+        local n_blur_passes = 1 -- math.ceil(self._offset_velocity / self:_get_shake_radius() * 2)
+        for i = 1, n_blur_passes do
+            local a, b = self._render_texture_a, self._render_texture_b
+            a:bind()
+            self.blur_shader:send("horizontal_or_vertical", true)
+            b:draw()
+            a:unbind()
+
+            b:bind()
+            self.blur_shader:send("horizontal_or_vertical", false)
+            a:draw()
+            b:unbind()
+        end
+
+        love.graphics.push()
+        rt.graphics.origin()
+        love.graphics.translate(self._offset_x, self._offset_y)
+        love.graphics.translate(self._current_x, self._current_y)
+        love.graphics.scale(self._current_scale)
+        love.graphics.rotate(self._current_angle)
+        love.graphics.translate( -0.5 * self._aabb.width, -0.5 * self._aabb.height)
+        self._render_texture_b:draw()
+        love.graphics.pop()
+    else
+        love.graphics.pop()
     end
 end
 
 --- @brief
 function rt.Camera:draw()
+    --[[
     love.graphics.push()
     love.graphics.origin()
     local radius = 0.5 * self._aabb.height / 4
-
     do
         local current_r = self._current_scale * radius
         local target_r = self._target_scale * radius
@@ -288,13 +323,25 @@ function rt.Camera:draw()
     end
 
     love.graphics.pop()
+    ]]--
 end
 
+--- @brief
+function rt.Camera:set_viewport(x, y, w, h)
+    self._aabb = rt.AABB(x, y, w, h)
+    self._render_texture_a = rt.RenderTexture(w, h, state:get_msaa_quality(), rt.TextureFormat.NORMAL)
+    self._render_texture_b = rt.RenderTexture(w, h, state:get_msaa_quality(), rt.TextureFormat.NORMAL)
+end
+
+--- @brief
+function rt.Camera:_get_shake_radius()
+    return 0.01 * math.min(self._aabb.width, self._aabb.height)
+end
 
 --- @brief
 function rt.Camera:shake(duration, x_radius, y_radius, n_shakes_per_second)
-    if x_radius == nil then x_radius = 0.01 * math.min(self._aabb.width, self._aabb.height) end
-    if y_radius == nil then y_radius = 0.01 * math.min(self._aabb.width, self._aabb.height) end
+    if x_radius == nil then x_radius = self:_get_shake_radius() end
+    if y_radius == nil then y_radius = self:_get_shake_radius() end
     if n_shakes_per_second == nil then
         n_shakes_per_second = rt.settings.camera.n_shakes_per_second
     end
@@ -303,12 +350,13 @@ function rt.Camera:shake(duration, x_radius, y_radius, n_shakes_per_second)
     local shake_intensity = rt.settings.camera.shake_intensity
     x_radius, y_radius = x_radius * shake_intensity, y_radius * shake_intensity
 
+    local step = 0.3 -- noise increment, the smaller the smoother the path
     local vertices = {}
     table.insert(vertices, 0)
     table.insert(vertices, 0)
     for i = 1, math.ceil(n_shakes_per_second * duration) do
-        table.insert(vertices, rt.random.number(-x_radius, x_radius))
-        table.insert(vertices, rt.random.number(-y_radius, y_radius))
+        table.insert(vertices,  (rt.random.noise(0, i * step) * 2 - 1) * x_radius)
+        table.insert(vertices,  (rt.random.noise(-i * step, 0) * 2 - 1) * y_radius)
     end
     table.insert(vertices, 0)
     table.insert(vertices, 0)
@@ -323,4 +371,5 @@ function rt.Camera:shake(duration, x_radius, y_radius, n_shakes_per_second)
 
     self._offset_path = rt.Path(vertices)
     self._offset_path_duration = self._offset_path_duration + duration
+    self._post_fx_active = true
 end
