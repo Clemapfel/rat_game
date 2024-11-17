@@ -1,7 +1,7 @@
 rt.settings.menu.inventory_scene = {
     outer_margin = 2 * rt.settings.margin_unit,
     verbose_info_scroll_speed = 150,
-    sprite_factor = 1,
+    sprite_factor = 2,
     grabbed_object_sprite_offset = -0.1,
     tile_size = 100
 }

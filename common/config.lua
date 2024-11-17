@@ -23,14 +23,28 @@ where Type is one of the above
 --- @brief
 --- @param template Table<String, rt.ConfigTemplateType>
 function rt.load_config(path, to_assign, template)
-    local chunk, error_maybe = love.filesystem.load(path)
-    if error_maybe ~= nil then
-        rt.error("In rt.load_config: error when loading config at `" .. path .. "`: " .. error_maybe)
+    local load_success, chunk_or_error, love_error = pcall(love.filesystem.load, path)
+    if not load_success then
+        rt.error("In rt.load_config: error when parsing config at `" .. path .. "`: " .. chunk_or_error)
+        return
     end
 
-    local config = chunk()
+    if love_error ~= nil then
+        rt.error("In rt.load_config: error when loading config at `" .. path .. "`: " .. love_error)
+        return
+    end
+
+    local chunk_success, config_or_error = pcall(chunk_or_error)
+    if not chunk_success then
+        rt.error("In rt.load_config: error when running config at `" .. path .. "`: " .. config_or_error)
+        return
+    end
+
+    local config = config_or_error
+
     local throw_on_unexpected = function(key, expected, got)
         rt.error("In rt.load_config: error when loading config at `" .. path .. "` for key `" .. key .. "`: expected `" .. expected .. "`, got `" .. got .. "`")
+        return
     end
 
     local function is(value, type)
@@ -54,6 +68,7 @@ function rt.load_config(path, to_assign, template)
             return meta.is_table(value)
         else
             rt.error("In rt.load_config.is: error when loading config at `" .. path .. "`: unknown template type `" .. type .. "`")
+            return
         end
     end
 

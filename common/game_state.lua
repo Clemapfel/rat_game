@@ -28,7 +28,7 @@ rt.MSAAQuality = meta.new_enum("MSAAQuality", {
 --- @return rt.GameState
 function rt.get_active_state()
     rt.error("In rt.get_active_state: Trying to access state, but no state was initialized")
-    return nil
+    return
 end
 
 --- @class rt.GameState
@@ -39,8 +39,8 @@ rt.GameState = meta.new_type("GameState", function()
         msaa_quality = rt.MSAAQuality.BEST,
         gamma = 1,
         is_fullscreen = false,
-        resolution_x = 1920, --1280,
-        resolution_y = 1080, --720,
+        resolution_x = 1280,
+        resolution_y = 720,
         sfx_level = 1,
         music_level = 1,
         vfx_motion_level = 1,
@@ -688,6 +688,7 @@ function rt.GameState:set_deadzone(fraction)
     meta.assert_number(fraction)
     if not (fraction >= 0 and fraction < 1) then
         rt.error("In rt.GameState:set_deadzone: value `" .. fraction .. "` is outside [0, 1)")
+        fraction = clamp(fraction, 0, 1)
     end
     self._state.deadzone = fraction
     rt.InputControllerState.deadzone = self._state.deadzone

@@ -224,6 +224,7 @@ function rt.VertexRectangleSegments(thickness, vertices)
 
     if not (n_vertices >= 4 and n_vertices % 2 == 0) then
         rt.error("In rt.VertexRectangleSegments: Need at least 2 vertices")
+        return
     end
 
     function translate_point(point_x, point_y, distance, angle_dg)

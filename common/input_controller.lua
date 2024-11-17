@@ -506,7 +506,8 @@ function rt.InputControllerState:load_mapping(mapping)
 
     local is_valid, message = self:validate_input_mapping(self.mapping)
     if not is_valid then
-        rt.error("[FATAL] In rt.InputControllerState:load_mapping: Mapping is invalid.\n" .. message)
+        rt.error("In rt.InputControllerState:load_mapping: Mapping is invalid.\n" .. message)
+        return
     end
 
     for _, component in pairs(rt.InputControllerState.components) do

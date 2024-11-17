@@ -336,6 +336,7 @@ function rt.GameState:entity_set_hp(entity, new_hp)
 
     if new_hp < 0 then
         rt.error("In rt.GameState:entity_set_hp: hp value `" .. new_hp .. "` is invalid")
+        new_hp = 0
     end
 
     entry.hp = math.ceil(new_hp)

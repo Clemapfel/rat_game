@@ -48,6 +48,7 @@ function rt.Coroutine:resume()
     if error_maybe ~= nil then
         local stacktrace = debug.traceback(self._native, error_maybe)
         rt.error("In rt.Coroutine:resume:\n" .. stacktrace)
+        return
     end
 end
 

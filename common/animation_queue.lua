@@ -139,6 +139,7 @@ do
                 else
                     if res ~= rt.AnimationResult.DISCONTINUE then
                         rt.error("In rt.AnimationQueue.update: animation `" .. meta.typeof(animation) .. "`s update function does not return an rt.AnimationResult")
+                        return
                     end
 
                     -- 1-frame callbacks

@@ -94,6 +94,7 @@ function rt.graphics.set_blend_mode(blend_mode_rgb, blend_mode_alpha)
             rgb_destination_factor = rt.BlendFactor.ONE
         else
             rt.error("In rt.graphics.set_blend_mode: invalid rgb blend mode `" .. tostring(blend_mode_rgb) .. "`")
+            return
         end
         
         local alpha_operation, alpha_source_factor, alpha_destination_factor
@@ -123,6 +124,7 @@ function rt.graphics.set_blend_mode(blend_mode_rgb, blend_mode_alpha)
             alpha_destination_factor = rt.BlendFactor.ONE
         else
             rt.error("In rt.graphics.set_blend_mode: invalid alpha blend mode `" .. tostring(blend_mode_alpha) .. "`")
+            return
         end
         love.graphics.setBlendState(rgb_operation, alpha_operation, rgb_source_factor, alpha_source_factor, rgb_destination_factor, alpha_destination_factor)
     else
@@ -143,6 +145,7 @@ function rt.graphics.set_blend_mode(blend_mode_rgb, blend_mode_alpha)
             love.graphics.setBlendMode("lighten", "premultiplied")
         else
             rt.error("In rt.graphics.set_blend_mode: invalid blend mode `" .. tostring(blend_mode) .. "`")
+            return
         end
     end
 end
