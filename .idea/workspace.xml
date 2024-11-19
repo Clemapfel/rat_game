@@ -22,22 +22,11 @@
     </configurations>
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="7fa9ba1b-2cff-4ecc-86fb-59ab2fa76ee1" name="Changes" comment="camera done">
-      <change afterPath="$PROJECT_DIR$/assets/sprites/portraits_v2.hxl" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/common/temp.lua" afterDir="false" />
+    <list default="true" id="7fa9ba1b-2cff-4ecc-86fb-59ab2fa76ee1" name="Changes" comment="added portrait rework">
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/common/animation_queue.lua" beforeDir="false" afterPath="$PROJECT_DIR$/common/animation_queue.lua" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/common/compute_shader.lua" beforeDir="false" afterPath="$PROJECT_DIR$/common/compute_shader.lua" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/common/config.lua" beforeDir="false" afterPath="$PROJECT_DIR$/common/config.lua" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/common/coroutine.lua" beforeDir="false" afterPath="$PROJECT_DIR$/common/coroutine.lua" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/common/frame.lua" beforeDir="false" afterPath="$PROJECT_DIR$/common/frame.lua" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/common/game_state.lua" beforeDir="false" afterPath="$PROJECT_DIR$/common/game_state.lua" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/common/game_state_battle.lua" beforeDir="false" afterPath="$PROJECT_DIR$/common/game_state_battle.lua" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/common/graphics.lua" beforeDir="false" afterPath="$PROJECT_DIR$/common/graphics.lua" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/common/image.lua" beforeDir="false" afterPath="$PROJECT_DIR$/common/image.lua" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/common/input_controller.lua" beforeDir="false" afterPath="$PROJECT_DIR$/common/input_controller.lua" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/common/vertex_shape.lua" beforeDir="false" afterPath="$PROJECT_DIR$/common/vertex_shape.lua" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/menu/inventory_scene.lua" beforeDir="false" afterPath="$PROJECT_DIR$/menu/inventory_scene.lua" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/assets/sprites/portraits_v2.hxl" beforeDir="false" afterPath="$PROJECT_DIR$/assets/sprites/portraits_v2.hxl" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/common/common.lua" beforeDir="false" afterPath="$PROJECT_DIR$/common/common.lua" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/main.lua" beforeDir="false" afterPath="$PROJECT_DIR$/main.lua" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -647,23 +636,9 @@
       <workItem from="1731524708247" duration="3571000" />
       <workItem from="1731537261451" duration="6323000" />
       <workItem from="1731603156937" duration="13264000" />
-      <workItem from="1731621962991" duration="25698000" />
-    </task>
-    <task id="LOCAL-01201" summary="tests passing">
-      <option name="closed" value="true" />
-      <created>1730502386665</created>
-      <option name="number" value="01201" />
-      <option name="presentableId" value="LOCAL-01201" />
-      <option name="project" value="LOCAL" />
-      <updated>1730502386665</updated>
-    </task>
-    <task id="LOCAL-01202" summary="refactored labeled sprite">
-      <option name="closed" value="true" />
-      <created>1730650485658</created>
-      <option name="number" value="01202" />
-      <option name="presentableId" value="LOCAL-01202" />
-      <option name="project" value="LOCAL" />
-      <updated>1730650485658</updated>
+      <workItem from="1731621962991" duration="29140000" />
+      <workItem from="1731969751996" duration="4000" />
+      <workItem from="1731969851166" duration="5641000" />
     </task>
     <task id="LOCAL-01203" summary="stashing">
       <option name="closed" value="true" />
@@ -1041,7 +1016,23 @@
       <option name="project" value="LOCAL" />
       <updated>1731789510118</updated>
     </task>
-    <option name="localTasksCounter" value="1250" />
+    <task id="LOCAL-01250" summary="now returns on error">
+      <option name="closed" value="true" />
+      <created>1731883126293</created>
+      <option name="number" value="01250" />
+      <option name="presentableId" value="LOCAL-01250" />
+      <option name="project" value="LOCAL" />
+      <updated>1731883126293</updated>
+    </task>
+    <task id="LOCAL-01251" summary="added portrait rework">
+      <option name="closed" value="true" />
+      <created>1731883134105</created>
+      <option name="number" value="01251" />
+      <option name="presentableId" value="LOCAL-01251" />
+      <option name="project" value="LOCAL" />
+      <updated>1731883134105</updated>
+    </task>
+    <option name="localTasksCounter" value="1252" />
     <servers />
   </component>
   <component name="TypeScriptGeneratedFilesManager">
@@ -1090,8 +1081,6 @@
     </option>
   </component>
   <component name="VcsManagerConfiguration">
-    <MESSAGE value="optimized frame" />
-    <MESSAGE value="refactor frame" />
     <MESSAGE value="stashing, sprite animation rework necessary" />
     <MESSAGE value="refactored sprite" />
     <MESSAGE value="sprite animation working" />
@@ -1115,7 +1104,9 @@
     <MESSAGE value="stashing blur" />
     <MESSAGE value="shake working" />
     <MESSAGE value="camera done" />
-    <option name="LAST_COMMIT_MESSAGE" value="camera done" />
+    <MESSAGE value="now returns on error" />
+    <MESSAGE value="added portrait rework" />
+    <option name="LAST_COMMIT_MESSAGE" value="added portrait rework" />
   </component>
   <component name="XDebuggerManager">
     <breakpoint-manager>

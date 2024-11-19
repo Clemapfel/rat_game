@@ -1,23 +1,4 @@
 -- luajit compat
-_G._pairs = pairs
-function pairs(x)
-    local meta = getmetatable(x)
-    if meta ~= nil and meta.__pairs ~= nil then
-        return meta.__pairs(x)
-    else
-        return _G._pairs(x)
-    end
-end
-
-_G._ipairs = ipairs
-function ipairs(x)
-    local meta = getmetatable(x)
-    if meta ~= nil and meta.__pairs ~= nil then
-        return meta.__ipairs(x)
-    else
-        return _G._ipairs(x)
-    end
-end
 
 if table.unpack == nil then table.unpack = unpack end
 assert(table.unpack ~= nil)
@@ -26,70 +7,58 @@ if debug.setfenv == nil then debug.setfenv = setfenv end
 assert(debug.setfenv ~= nil)
 
 require("table.new")
+assert(table.new ~= nil, "Unable to load table.new, is this LuaJIT?")
 
---- @brief iterate over values of table
-function values(t)
-    if t == nil then return function() return nil end end
-    local k, v
-    return function()
-        k, v = next(t, k)
-        return v
-    end
-end
+_G._pairs = pairs
+_G._ipairs = ipairs
 
---[[
+
 do
-    local _k, _v, _t
     local _noop = function() return nil end
-    local _callback = function()
-        _k, _v = next(_t, _k)
-        return _v
+
+    --[[
+    function pairs(t)
+        if t == nil then return _noop end
+        return _G._pairs
     end
+
+    function ipairs(t)
+        if t == nil then return _noop end
+        return _G._ipairs
+    end
+    ]]--
+
+    local _keys_iterator = function(t, k)
+        local next_key, _ = next(t, k)
+        return next_key
+    end
+
+    --- @brief iterate all keys of a table
+    function keys(t)
+        if t == nil then return _noop end
+        return _keys_iterator, t
+    end
+
+    --- @brief iterate all values of a table
     function values(t)
         if t == nil then return _noop end
-        _k, _v, _t = nil, nil, t
-        return _callback
-    end
-end
-]]
-
---- @brief iterate over keys of tbale
-function keys(t)
-    if t == nil then return function() return nil end end
-    local k, v
-    return function()
-        k, v = next(t, k)
-        return k
-    end
-end
-
-do
-    local _range_iterator = function(state)
-        local index, n_elements = state.index, state.n_elements
-        if index > n_elements then return nil end
-
-        while state[index] == nil and index <= n_elements do
-            index = index + 1
+        local k, v
+        return function() -- impossible to do without closure
+            k, v = next(t, k)
+            return v
         end
-        state.index = index + 1
-        return state[index], state
     end
 
-    --- @brief iterate arbitrary number of elements, if vararg contains nils, they will be skipped
-    --- @vararg any
+    local function _range_iterator(state)
+        local next_i, out = next(state, state[1])
+        state[1] = next_i
+        return out, state
+    end
+
+    --- @brief iterate vararg
     function range(...)
-        local elements = {...}
-        local n_elements = _G._select('#', ...)
-
-        local state = {}
-        for i = 1, n_elements do
-            state[i] = elements[i]
-        end
-
-        state.index = 1
-        state.n_elements = n_elements
-
-        return _range_iterator, state
+        if select("#", ...) == 0 then return _noop end
+        return _range_iterator, {1, ...} -- start at 1, because because actual table is by one
     end
 end
 

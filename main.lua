@@ -1,5 +1,14 @@
 require "include"
 
+
+for x, y in range2(
+    1, 2,
+    "a", "b",
+    13, 14
+) do
+    dbg(x, y)
+end
+
 profiler_active = false
 
 state = rt.GameState()
