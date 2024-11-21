@@ -73,6 +73,7 @@ struct Particle {
     vec2 current_position;
     vec2 previous_position;
     float radius;
+    float angle;
     float color;
     uint cell_hash;
 };

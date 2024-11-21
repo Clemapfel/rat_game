@@ -66,8 +66,8 @@ end
 -- config
 
 local n_particles = 100 * 1000
-local particle_radius = 2
-local particle_n_outer_vertices = 16
+local particle_radius = 10
+local particle_n_outer_vertices = 3
 local particle_color = rt.Palette.RED
 
 -- globals
@@ -96,10 +96,11 @@ love.load = function()
 
         local vertices = {}
         local step = 2 * math.pi / particle_n_outer_vertices
+        local offset = 2 * math.pi * 0.25
         for angle = 0, 2 * math.pi, step do
             table.insert(vertices, {
-                center_x + math.cos(angle) * particle_radius,
-                center_y + math.sin(angle) * particle_radius,
+                center_x + math.cos(angle - offset) * particle_radius,
+                center_y + math.sin(angle - offset) * particle_radius,
                 1, 1, 1, 1
             })
         end
@@ -112,6 +113,7 @@ love.load = function()
             {name = "current_position", format = "floatvec2"},
             {name = "previous_position", format = "floatvec2"},
             {name = "radius", format = "float"},
+            {name = "angle", format = "float"},
             {name = "color", format = "float"},
             {name = "cell_hash", format = "uint32"}
         }

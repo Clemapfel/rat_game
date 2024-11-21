@@ -63,7 +63,6 @@ end
 --- @brief
 function rt.Rope:draw()
     if self.is_realized == false then return end
-
     love.graphics.setLineWidth(3)
     local n = 2 * (self._n_nodes - 1)
     for i = 1, n, 2 do

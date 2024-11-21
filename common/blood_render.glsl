@@ -7,11 +7,18 @@ vec2 translate_point_by_angle(vec2 xy, float dist, float angle)
     return xy + vec2(cos(angle), sin(angle)) * dist;
 }
 
+vec2 rotate(vec2 v, float angle) {
+    float c = cos(angle);
+    float s = sin(angle);
+    return mat2(c, -s, s, c) * v;
+}
+
 struct Particle {
     vec2 current_position;
     vec2 previous_position;
     float radius;
     float color;
+    float angle;
     uint cell_hash;
 };
 
@@ -30,6 +37,8 @@ vec4 position(mat4 transform, vec4 vertex_position)
     float angle = atan(vertex_position.y - center.y, vertex_position.x - center.x);
     vertex_position.xy = translate_point_by_angle(vec2(0), particle.radius * radius, angle);
     vertex_position.xy += particle.current_position;
+
+    vertex_position.xy = rotate(vertex_position.xy, particle.angle);
 
     value = particle.color;
     return transform * vertex_position;
