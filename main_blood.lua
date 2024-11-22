@@ -1,5 +1,143 @@
 require "include"
 
+do
+    local input = {}
+    for i = 1, 100 do
+        table.insert(input, math.round(love.math.random(0, 2^8)))
+    end
+
+    local bits_per_step = 8
+    local n_buckets = 2^(bits_per_step)
+    local counts, offsets = {}, {}
+    local output = {}
+
+    for pass = 0, (32 / bits_per_step) - 1 do
+        for i = 1, n_buckets do
+            counts[i] = 0
+            offsets[i] = 0
+        end
+
+        local bitmask = bit.lshift(0xFF, pass * bits_per_step)
+
+        -- count occurences
+        for x in values(input) do
+            local mask = bit.rshift(bit.band(x, bitmask), pass * bits_per_step)
+            counts[mask + 1] = counts[mask + 1] + 1
+        end
+
+        -- prefix sum
+        local sum = 0
+        for i = 1, n_buckets do
+            offsets[i] = sum
+            sum = sum + counts[i]
+        end
+
+        -- reorder elements
+        for x in values(input) do
+            local mask = bit.rshift(bit.band(x, bitmask), pass * bits_per_step)
+            output[offsets[mask + 1] + 1] = x
+            offsets[mask + 1] = offsets[mask + 1] + 1
+        end
+
+        -- copy output back to input for the next pass
+        for i = 1, #input do
+            input[i] = output[i]
+        end
+    end
+end
+
+to_sort_buffer = nil
+to_sort_swap_buffer = nil
+shared_counts_buffer = nil
+shared_offsets_buffer = nil
+
+sort_shader = love.graphics.newComputeShader("common/blood_sort_temp.glsl")
+n_numbers = 256^2
+n_bits_per_step = 8
+
+n_threads_x = 1
+n_threads_y = 1
+
+love.load = function()
+    local buffer_usage = {
+        usage = "dynamic",
+        shaderstorage = true
+    }
+
+    local to_sort_buffer_format = sort_shader:getBufferFormat("to_sort_buffer")
+    to_sort_buffer = love.graphics.newBuffer(to_sort_buffer_format, n_numbers, buffer_usage)
+
+    local to_sort_swap_buffer_format = sort_shader:getBufferFormat("to_sort_swap_buffer")
+    to_sort_swap_buffer = love.graphics.newBuffer(to_sort_swap_buffer_format, n_numbers, buffer_usage)
+
+    local shared_counts_buffer_format = sort_shader:getBufferFormat("shared_counts_buffer")
+    shared_counts_buffer = love.graphics.newBuffer(shared_counts_buffer_format, 2^n_bits_per_step, buffer_usage)
+
+    local shared_offsets_buffer_format = sort_shader:getBufferFormat("shared_offsets_buffer")
+    shared_offsets_buffer = love.graphics.newBuffer(shared_offsets_buffer_format, 2^n_bits_per_step, buffer_usage)
+
+    do
+        local data = {}
+        for i = 1, n_numbers do
+            table.insert(data, {
+                i,
+                rt.random.integer(0, 999)
+            })
+        end
+        to_sort_buffer:setArrayData(data)
+        to_sort_swap_buffer:setArrayData(data)
+
+        local data = {}
+        for i = 1, 2^n_bits_per_step do
+            data[i] = 0
+        end
+        shared_counts_buffer:setArrayData(data)
+        shared_offsets_buffer:setArrayData(data)
+    end
+
+    sort_shader:send("to_sort_buffer", to_sort_buffer)
+    sort_shader:send("to_sort_swap_buffer", to_sort_swap_buffer)
+    sort_shader:send("shared_counts_buffer", shared_counts_buffer)
+    sort_shader:send("shared_offsets_buffer", shared_offsets_buffer)
+
+    sort_shader:send("n_threads_x", n_threads_x)
+    sort_shader:send("n_threads_y", n_threads_y)
+    sort_shader:send("n_numbers", n_numbers)
+    sort_shader:send("n_bits_per_step", n_bits_per_step)
+
+    local function print_buffer()
+        local byte_offset = 4
+        local data = love.graphics.readbackBuffer(to_sort_buffer);
+        for i = 1, 256, 2 do
+            local index = data:getUInt32((i - 1) * byte_offset)
+            local hash = data:getUInt32((i - 1 + 1) * byte_offset)
+            println(index, " ", hash)
+        end
+    end
+
+    function get_index_range(thread_x, thread_y)
+        local linear_index = thread_y * n_threads_x + thread_x
+        local n_per_thread = n_numbers / (n_threads_x * n_threads_y)
+        local start = linear_index * n_per_thread
+        local finish = clamp(start + n_per_thread, 0, n_numbers)
+        dbg(thread_x, thread_y, math.round(start), math.round(finish))
+
+        for x = 0, n_threads_x - 1 do
+            for y = 0, n_threads_y - 1 do
+                get_index_range(x, y)
+            end
+        end
+    end
+
+    --print_buffer()
+    love.graphics.dispatchThreadgroups(sort_shader, n_threads_x, n_threads_y)
+    print_buffer()
+
+    exit()
+end
+
+
+--[[
 --[[
 sources
     https://developer.nvidia.com/gpugems/gpugems3/part-v-physics-simulation/chapter-32-broad-phase-collision-detection-cuda
@@ -15,7 +153,6 @@ sources
     hash-to-particle-buffer layout:
         list of all particle ids, in order of cell
         second buffer with cell-hash to offset
-]]--
 
 do
     local input = {}
@@ -92,7 +229,6 @@ local cell_radius = particle_radius * 2;
 local screen_w, screen_h = love.graphics.getDimensions()
 local cell_n_rows = screen_h / cell_radius
 local cell_n_columns = screen_w / cell_radius
-
 
 love.load = function()
     love.window.setMode(800, 600, {
@@ -219,3 +355,4 @@ love.draw = function()
     love.graphics.setColor(1, 1, 1, 0.75)
     love.graphics.print(label, margin, math.floor(0.5 * margin))
 end
+]]--

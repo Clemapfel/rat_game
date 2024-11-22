@@ -70,6 +70,19 @@ BUFFER_LAYOUT buffer particle_cell_pairs_buffer {
     ParticleCellHashPair particle_cell_pairs[];
 }; // size: n_particles
 
+BUFFER_LAYOUT buffer particle_cell_pairs_swap_buffer {
+    ParticleCellHashPair particle_cell_pairs_swap[];
+}; // size: n_particles
+
+uniform uint bits_per_step = 8;
+BUFFER_LAYOUT buffer shared_radix_counts_buffer {
+    uint shared_radix_counts[];
+}; // size 2^bits_per_step
+
+BUFFER_LAYOUT buffer shader_radix_offsets_buffer {
+    uint shared_radix_offsets[];
+}; // size 2^bits_per_step
+
 uniform int n_threads_x; // number of thread groups
 uniform int n_threads_y;
 
@@ -81,6 +94,8 @@ void computemain()
     int thread_y = int(gl_GlobalInvocationID.y);
     ivec2 particle_id_range = thread_group_to_particle_id_range(thread_x, thread_y);
     ivec2 cell_xy = thread_group_to_cell_xy(thread_x, thread_y);
+
+    bool is_sequential_worker = thread_x == 1 && thread_y == 1;
 
     // initialize cell is valid
     uint cell_i = cell_xy_to_linear_index(cell_xy.x, cell_xy.y);
@@ -110,12 +125,60 @@ void computemain()
 
     // radix sort buffer based on cell hash
 
+    const uint n_buckets = 1 << n_bits_per_step; // 2^n_bits_per_step
+    uint counts[n_buckets];
+    uint offsets[n_buckets];
+
+    // sort pass #1
+    for (pass = 0; pass < 32 / n_bits_per_step; ++pass)
+    {
+        for (int i = 0; i < n_buckets; ++i)
+            counts[i] = 0;
+
+        uint bitmask = 0xFFu << (pass * bits_per_step);
+
+        // count occurrences in local buffer
+        for (int i = particle_id_range.x; i < particle_id_range.y; ++i) {
+            CellHash hash = particle_cell_pairs[i].cell_hash;
+            uint masked = (hash & bitmask) << (pass * bits_per_step);
+            counts[masked] += 1;
+        }
+
+        // accumulate in shared buffer
+        for (int i = 0; i < n_buckets; ++i) {
+            atomicAdd(shared_radix_counts[i], counts[i]);
+        }
+
+        barrier();
+
+        // compute prefix sum sequentially
+        // could be non-sequential: https://developer.nvidia.com/gpugems/gpugems3/part-vi-gpu-computing/chapter-39-parallel-prefix-sum-scan-cuda
+        if (is_sequential_worker) {
+            int sum = 0;
+            for (int i = 0; i < n_buckets; ++i) {
+                shared_radix_offsets[i] = sum;
+                sum += shared_radix_counts[i];
+            }
+        }
+        
+        barrier();
+
+        for (int i = particle_id_range.x; i < particle_id_range.y; ++i) {
+            CellHash hash = particle_cell_pairs[i].cell_hash;
+            uint masked = (hash & bitmask) << (pass * bits_per_step);
+            particle_cell_pairs_swap[shared_radix_offsets[mask]] =
+        }
+
+    }
+
+
+
 
     barrier();
 
     // construct cell mapping from sorted buffer sequentially
 
-    if (thread_x == 0 && thread_y == 0) {
+    if (is_sequential_worker) {
         CellHash last_hash = CELL_INVALID_HASH;
         int n_particles_this_cell = 0;
         int current_start = 0;
