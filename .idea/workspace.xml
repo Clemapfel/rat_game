@@ -22,7 +22,8 @@
     </configurations>
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="7fa9ba1b-2cff-4ecc-86fb-59ab2fa76ee1" name="Changes" comment="stashing">
+    <list default="true" id="7fa9ba1b-2cff-4ecc-86fb-59ab2fa76ee1" name="Changes" comment="stashing before refactoring cell occupation">
+      <change afterPath="$PROJECT_DIR$/common/~blood_spatial_hash_step.glsl" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/common/blood_spatial_hash_step.glsl" beforeDir="false" afterPath="$PROJECT_DIR$/common/blood_spatial_hash_step.glsl" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/main_blood.lua" beforeDir="false" afterPath="$PROJECT_DIR$/main_blood.lua" afterDir="false" />
@@ -637,15 +638,7 @@
       <workItem from="1731603156937" duration="13264000" />
       <workItem from="1731621962991" duration="29140000" />
       <workItem from="1731969751996" duration="4000" />
-      <workItem from="1731969851166" duration="13836000" />
-    </task>
-    <task id="LOCAL-01206" summary="global status sim working">
-      <option name="closed" value="true" />
-      <created>1730767718548</created>
-      <option name="number" value="01206" />
-      <option name="presentableId" value="LOCAL-01206" />
-      <option name="project" value="LOCAL" />
-      <updated>1730767718548</updated>
+      <workItem from="1731969851166" duration="20093000" />
     </task>
     <task id="LOCAL-01207" summary="stashing status animation">
       <option name="closed" value="true" />
@@ -1031,7 +1024,15 @@
       <option name="project" value="LOCAL" />
       <updated>1732233721228</updated>
     </task>
-    <option name="localTasksCounter" value="1255" />
+    <task id="LOCAL-01255" summary="stashing before refactoring cell occupation">
+      <option name="closed" value="true" />
+      <created>1732291124697</created>
+      <option name="number" value="01255" />
+      <option name="presentableId" value="LOCAL-01255" />
+      <option name="project" value="LOCAL" />
+      <updated>1732291124697</updated>
+    </task>
+    <option name="localTasksCounter" value="1256" />
     <servers />
   </component>
   <component name="TypeScriptGeneratedFilesManager">
@@ -1080,7 +1081,6 @@
     </option>
   </component>
   <component name="VcsManagerConfiguration">
-    <MESSAGE value="sprite animation working" />
     <MESSAGE value="fixed stencil outline showing" />
     <MESSAGE value="added blood spray playground" />
     <MESSAGE value="implemented radix sort" />
@@ -1105,7 +1105,8 @@
     <MESSAGE value="refactor iterators" />
     <MESSAGE value="added angle" />
     <MESSAGE value="stashing" />
-    <option name="LAST_COMMIT_MESSAGE" value="stashing" />
+    <MESSAGE value="stashing before refactoring cell occupation" />
+    <option name="LAST_COMMIT_MESSAGE" value="stashing before refactoring cell occupation" />
   </component>
   <component name="XDebuggerManager">
     <breakpoint-manager>

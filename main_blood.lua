@@ -79,12 +79,20 @@ local spatial_hash_shader = love.graphics.newComputeShader("common/blood_spatial
 
 local particle_buffer = nil -- love.GraphicsBuffer
 local cell_occupation_buffer = nil
+local cell_occupation_mapping_buffer = nil
+local cell_is_valid_buffer = nil
 
 local elapsed = 0
 local color_r, color_g, color_b, color_a = rt.color_unpack(rt.rgba_to_hsva(particle_color)) -- sic, encode hsva by using rgba
 
 local thread_group_stride = love.graphics.getSystemLimits()["threadgroupsx"] / 8 -- arrange dispatch as matrix to get above group limit
 local cell_invalid_hash = 0xFFFFFFFF
+
+local cell_radius = particle_radius * 2;
+local screen_w, screen_h = love.graphics.getDimensions()
+local cell_n_rows = screen_h / cell_radius
+local cell_n_columns = screen_w / cell_radius
+
 
 love.load = function()
     love.window.setMode(800, 600, {
@@ -127,22 +135,36 @@ love.load = function()
             for i = 1, n_particles do
                 local position_x, position_y = love.math.random(0, love.graphics.getWidth()), love.math.random(0, love.graphics.getHeight())
                 table.insert(data, {
-                    position_x, position_y,
-                    position_x, position_y,
+                    position_x, position_y, -- current_position
+                    position_x, position_y, -- previous_position
                     love.math.random(0, 1) * particle_radius, -- radius
                     love.math.random(0, 2 * math.pi), -- angle
                     love.math.random(0.25, 1), -- color
-                    0, -- cell hash
                 })
             end
             particle_buffer:setArrayData(data)
         end
 
-        local occupation_buffer_format = spatial_hash_shader:getBufferFormat("cell_occupations_buffer")
-        cell_occupation_buffer = love.graphics.newBuffer(occupation_buffer_format, n_particles, buffer_usage)
-        -- initialized in compute shader
+        local cell_is_valid_buffer_format = spatial_hash_shader:getBufferFormat("cell_is_valid_buffer")
+        cell_is_valid_buffer = love.graphics.newBuffer(
+            cell_is_valid_buffer_format,
+            cell_n_rows * cell_n_columns,
+            buffer_usage
+        )
 
+        local cell_occupation_mapping_buffer_format = spatial_hash_shader:getBufferFormat("cell_occupation_mapping_buffer")
+        cell_occupation_mapping_buffer = love.graphics.newBuffer(
+            cell_occupation_mapping_buffer_format,
+            cell_n_rows * cell_n_columns,
+            buffer_usage
+        )
 
+        local cell_occupation_buffer_format = spatial_hash_shader:getBufferformat("cell_occupations_buffer")
+        cell_occupation_buffer = love.graphics.newBuffer(
+            cell_occupation_buffer_format,
+            n_particles,
+            buffer_usage
+        )
     end
 end
 

@@ -1,7 +1,9 @@
 #define BUFFER_LAYOUT layout(std430)
 
-uniform uint n_particles;
+#define CellHash uint
+#define ParticleID uint
 
+uniform uint n_particles;
 struct Particle {
     vec2 current_position;
     vec2 previous_position;
@@ -10,146 +12,187 @@ struct Particle {
     float color;
 };
 
+// particle id to particle
 BUFFER_LAYOUT buffer particle_buffer {
     Particle particles[];
 }; // size: n_particles
 
-// thread group to particle i
+// thread group to particle id
 uniform int thread_group_stride = 1;
-int get_particle_index(int x, int y) {
+int thread_group_to_particle_id(int x, int y) {
     return y * thread_group_stride + x;
 }
 
-// particle position to spatial subdivison cell hash, first 16bit are x-index, second 16bit are y
 uniform int n_rows;
 uniform int n_columns;
 uniform vec2 screen_size;
 
 const uint X_SHIFT = 16u;
 const uint Y_SHIFT = 0u;
+const uint CELL_INVALID_HASH = 0xFFFFFFFu;
 
-uniform uint CELL_INVALID_HASH = 0xFFFFFFFu;
-struct ParticleCellOccupation {
-    uint center;
-    uint top_left;
-    uint top;
-    uint top_right;
-    uint right;
-    uint bottom_right;
-    uint bottom;
-    uint bottom_left;
-    uint left;
-};
-
-BUFFER_LAYOUT buffer cell_occupations_buffer {
-    ParticleCellOccupation cell_occupations[];
+BUFFER_LAYOUT buffer cell_occupation_buffer {
+    ParticleID cell_occupation[];
 }; // size: n_particles
 
-uint cell_hash(int x, int y) {
-    if (x < 0 || x > n_columns || y < 0 || y > n_rows)
-        return CELL_INVALID_HASH;
-    else
-        return x << X_SHIFT | y << Y_SHIFT;
-}
-
-// determine which of the possible 9 cells a particle overlaps
-void intialize_particle_cell_occupation(in Particle particle, out ParticleCellOccupation occupation) {
-    float cell_width = screen_size.x / float(n_columns);
-    float cell_height = screen_size.y / float(n_rows);
-    float radius = particle.radius;
-    vec2 position = particle.current_position;
-
-    int cell_x = int(position.x / cell_width);
-    int cell_y = int(position.y / cell_height);
-
-    float left_x = (cell_x - 1) * cell_width;
-    float center_x = (cell_x) * cell_width;
-    float right_x = (cell_x + 1) * cell_width;
-
-    float top_y = (cell_y - 1) * cell_height;
-    float center_y = (cell_y) * cell_height;
-    float bottom_y = (cell_y + 1) * cell_height;
-
-    float particle_left_x = position.x - radius;
-    float particle_right_x = position.x + radius;
-    float particle_top_y = position.y - radius;
-    float particle_bottom_y = position.y + radius;
-
-    bool top = particle_top_y < top_y;
-    bool bottom = particle_bottom_y > bottom_y;
-
-    bool left = particle_left_x < left_x;
-    bool right = particle_right_x > right_x;
-
-    occupation.top_left = CELL_INVALID_HASH;
-    occupation.top = CELL_INVALID_HASH;
-    occupation.top_right = CELL_INVALID_HASH;
-    occupation.left = CELL_INVALID_HASH;
-    occupation.center = CELL_INVALID_HASH;
-    occupation.right = CELL_INVALID_HASH;
-    occupation.bottom_left = CELL_INVALID_HASH;
-    occupation.bottom = CELL_INVALID_HASH;
-    occupation.bottom_right = CELL_INVALID_HASH;
-
-    // center is always occupied
-    occupation.center = cell_hash(cell_x, cell_y);
-
-    if (top && left)
-        occupation.top_left = cell_hash(cell_x - 1, cell_y - 1);
-
-    if (top)
-        occupation.top = cell_hash(cell_x - 0, cell_y - 1);
-
-    if (top && right)
-        occupation.top_right = cell_hash(cell_x + 1, cell_y - 1);
-
-    if (left)
-        occupation.left = cell_hash(cell_x - 1, cell_y - 0);
-
-    if (right)
-        occupation.right = cell_hash(cell_x + 1, cell_y - 0);
-
-    if (bottom && left)
-        occupation.bottom_left = cell_hash(cell_x - 1, cell_y + 1);
-
-    if (bottom)
-        occupation.bottom = cell_hash(cell_x, cell_y + 1);
-
-    if (bottom && right)
-        occupation.bottom_right = cell_hash(cell_x + 1, cell_y + 1);
-}
-
-//
-
-BUFFER_LAYOUT buffer cell_order_buffer {
-    uint cell_order[];
+// for each cell, xy-indexed, the start and end range for lookup of particles in that cell
+struct CellOccupationMapping {
+    uint start_i;
+    uint end_i;
 };
 
-struct CellOrderMapping {
-    uint offset;
-    uint n_elements;
-};
+BUFFER_LAYOUT buffer cell_occupation_mapping_buffer {
+    CellOccupationMapping cell_occupation_mapping[];
+}; // size: n_rows * n_columns
 
-BUFFER_LAYOUT buffer cell_hash_to_cell_order_mapping_buffer {
-    CellOrderMapping cell_hash_to_cell_order_mapping[]; // linear indexed matrix
-};
+const int CELL_IS_VALID = 1;
+const int CELL_IS_INVALID = 0;
 
-CellOrderMapping get_cell_order_mapping(int cell_x, int cell_y) {
-    return cell_hash_to_cell_order_mapping[cell_y * n_columns + cell_x];
+BUFFER_LAYOUT buffer cell_is_valid_buffer {
+    int cell_is_valid_buffer[];
+}; // size: n_rows * n_columns
+
+int cell_xy_to_linear_index(int cell_x, int cell_y) {
+    return cell_y * n_columns + cell_x ;
 }
 
+ivec2 thread_group_to_cell_xy(int x, int y) {
+    return ivec2(x, y);
+}
 
+struct ParticleCellHashPair {
+    ParticleID particle_id;
+    CellHash cell_hash;
+};
+
+// for each particle, which cell it occupies
+BUFFER_LAYOUT buffer particle_cell_pairs_buffer {
+    ParticleCellHashPair particle_cell_pairs[];
+}; // size: n_particles
+
+uniform int n_threads_x; // number of thread groups
+uniform int n_threads_y;
 
 layout (local_size_x = 1, local_size_y = 1, local_size_z = 1) in;
 void computemain()
 {
-    // initialize cell occupation for each particle
-    int particle_i = get_particle_index(int(gl_GlobalInvocationID.x), int(gl_GlobalInvocationID.y));
-    intialize_particle_cell_occupation(particles[particle_i], cell_occupations[particle_i]);
+    // get list of objects each thread operates on
+    int thread_x = int(gl_GlobalInvocationID.x);
+    int thread_y = int(gl_GlobalInvocationID.y);
+    ivec2 particle_id_range = thread_group_to_particle_id_range(thread_x, thread_y);
+    ivec2 cell_xy = thread_group_to_cell_xy(thread_x, thread_y);
+
+    // initialize cell is valid
+    uint cell_i = cell_xy_to_linear_index(cell_xy.x, cell_xy.y);
+    cell_is_valid[cell_i] = CELL_IS_INVALID;
+
+    // initialize cell occupation
+    for (ParticleID id = particle_id_range.x; id < particle_id_range.y; ++id)
+        particle_occupation_buffer[id] = id;
 
     barrier();
 
+    // for each particle, get cell xy-coords, then hash
+    for (ParticleID id = particle_id_range.x; id < particle_id_range.y; ++id)
+    {
+        Particle particle = particle_id_to_particle[id];
+        uint cell_x = uint(particle.current_position.x / cell_width);
+        uint cell_y = uint(particle.current_position.y / cell_height);
+        uint cell_hash = cell_x << X_SHIFT | cell_y << Y_SHIFT;
+
+        particle_id_to_cell_hash[particle_id].particle_id = particle_id;
+        particle_id_to_cell_hash[particle_id].cell_hash = cell_hash;
+
+        cell_is_valid_buffer[cell_xy_to_linear_index(cell_x, cell_y)] = CELL_IS_VALID;
+    }
+
+    barrier();
+
+    // radix sort buffer based on cell hash
 
 
+    barrier();
 
+    // construct cell mapping from sorted buffer sequentially
+
+    if (thread_x == 0 && thread_y == 0) {
+        CellHash last_hash = CELL_INVALID_HASH;
+        int n_particles_this_cell = 0;
+        int current_start = 0;
+
+        for (int i = 0; i < n_particles; ++i) {
+            CellHash cell_hash = particle_cell_pairs[i].cell_hash;
+            if (cell_hash != last_hash)
+            {
+                // get cell xy from hash
+                uint cell_x = cell_hash | 0xFFFF0000u;
+                uint cell_y = cell_hash | 0x0000FFFFu;
+                int cell_i = cell_xy_to_linear_index(cell_x, cell_y);
+
+                CellOccupationMapping mapping = cell_occupation_mapping[cell_i];
+                mapping.start_i = current_start;
+                mapping.end_i = current_start + n_particles_this_cell;
+
+                n_particles_this_cell = 0;
+                current_start = i;
+                last_hash = cell_hash;
+            }
+            else {
+                n_particles_this_cell += 1;
+            }
+        }
+    } else return;
 }
+
+/*
+ int n_threads = n_threads_x * n_threads_y;
+    int start_i = int(round(float(n_particles) / float(n_threads)));
+    CellHash hash = particle_cell_pairs[start_i].cell_hash;
+
+    // scan to the right and left until transition to get range
+    int right_i = start_i + 1;
+    while (right_i < n_particles) {
+        CellHash next_hash = particle_cell_pairs[right_i].cell_hash;
+        if (next_hash != hash)
+        break;
+
+        right_i += 1;
+    }
+
+    int left_i = start_i - 1;
+    while(left_i > 0) {
+        CellHash next_hash = particle_cell_pairs[left_i].cell_hash;
+        if (next_hash != hash)
+        break;
+
+        left_i -= 1;
+    }
+
+    // get cell xy from hash
+    uint cell_x = hash | 0xFFFF0000u;
+    uint cell_y = hash | 0x0000FFFFu;
+    int cell_i = cell_xy_to_linear_index(cell_x, cell_y);
+
+    //cell_occupation_mapping[cell_i].start_i = left_i;
+    //cell_occupation_mapping[cell_i].end_i = right_i;
+
+    atomicExchange(cell_occupation_mapping[cell_i].start_i, left_i);
+    atomicExchange(cell_occupation_mapping[cell_i].end_i, right_i);
+*/
+
+/*
+void particle_id_to_cell_occupation(ParticleID id) {
+    Particle particle = particles[id];
+    uint cell_x = uint(particle.current_position.x / cell_width);
+    uint cell_y = uint(particle.current_position.y / cell_height);
+
+    // linear index matrix of cells
+    CellOccupationMapping occupation = cell_occupation_mapping[cell_y * n_columns + cell_x];
+
+    for (uint i = occupation.start_i; i < occupation.end_i; ++i) {
+        ParticleID other_id = cell_occupation[i];
+        Particle other = particles[id];
+        // treat particle here
+    }
+}
+*/
