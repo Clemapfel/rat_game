@@ -45,8 +45,11 @@ BUFFER_LAYOUT buffer cell_occupations_buffer {
     ParticleCellOccupation cell_occupations[];
 }; // size: n_particles
 
-uint hash_cell(uint x, uint y) {
-    return x << X_SHIFT | y << Y_SHIFT;
+uint cell_hash(int x, int y) {
+    if (x < 0 || x > n_columns || y < 0 || y > n_rows)
+        return CELL_INVALID_HASH;
+    else
+        return x << X_SHIFT | y << Y_SHIFT;
 }
 
 // determine which of the possible 9 cells a particle overlaps
@@ -54,9 +57,10 @@ void intialize_particle_cell_occupation(in Particle particle, out ParticleCellOc
     float cell_width = screen_size.x / float(n_columns);
     float cell_height = screen_size.y / float(n_rows);
     float radius = particle.radius;
+    vec2 position = particle.current_position;
 
-    uint cell_x = uint(position.x / cell_width);
-    uint cell_y = uint(position.y / cell_height);
+    int cell_x = int(position.x / cell_width);
+    int cell_y = int(position.y / cell_height);
 
     float left_x = (cell_x - 1) * cell_width;
     float center_x = (cell_x) * cell_width;
@@ -66,17 +70,16 @@ void intialize_particle_cell_occupation(in Particle particle, out ParticleCellOc
     float center_y = (cell_y) * cell_height;
     float bottom_y = (cell_y + 1) * cell_height;
 
-    vec2 position = particle.current_position;
     float particle_left_x = position.x - radius;
     float particle_right_x = position.x + radius;
     float particle_top_y = position.y - radius;
     float particle_bottom_y = position.y + radius;
 
-    bool top = particle_y < top_y;
-    bool bottom = particle_y > bottom_y;
+    bool top = particle_top_y < top_y;
+    bool bottom = particle_bottom_y > bottom_y;
 
-    bool left = particle_x < left_x;
-    bool right = particle_x > right_x;
+    bool left = particle_left_x < left_x;
+    bool right = particle_right_x > right_x;
 
     occupation.top_left = CELL_INVALID_HASH;
     occupation.top = CELL_INVALID_HASH;
@@ -118,23 +121,24 @@ void intialize_particle_cell_occupation(in Particle particle, out ParticleCellOc
 
 //
 
-struct CellData {
-    uint start_index;
-    uint n_particles;
+BUFFER_LAYOUT buffer cell_order_buffer {
+    uint cell_order[];
 };
 
-BUFFER_LAYOUT buffer cell_data_buffer {
-    CellData cell_data[];
+struct CellOrderMapping {
+    uint offset;
+    uint n_elements;
 };
 
-struct ParticleData {
-    uint cell_hash;
-    uint particle_i;
+BUFFER_LAYOUT buffer cell_hash_to_cell_order_mapping_buffer {
+    CellOrderMapping cell_hash_to_cell_order_mapping[]; // linear indexed matrix
 };
 
-BUFFER_LAYOUT buffer particle_data_buffer {
-    ParticleData particle_data[];
-};
+CellOrderMapping get_cell_order_mapping(int cell_x, int cell_y) {
+    return cell_hash_to_cell_order_mapping[cell_y * n_columns + cell_x];
+}
+
+
 
 layout (local_size_x = 1, local_size_y = 1, local_size_z = 1) in;
 void computemain()

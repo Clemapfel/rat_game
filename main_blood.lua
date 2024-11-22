@@ -75,11 +75,16 @@ local particle_color = rt.Palette.RED
 local mesh -- love.Mesh
 local render_shader = love.graphics.newShader("common/blood_render.glsl")
 local velocity_step_shader = love.graphics.newComputeShader("common/blood_velocity_step.glsl")
+local spatial_hash_shader = love.graphics.newComputeShader("common/blood_spatial_hash_step.glsl")
+
 local particle_buffer = nil -- love.GraphicsBuffer
+local cell_occupation_buffer = nil
+
 local elapsed = 0
 local color_r, color_g, color_b, color_a = rt.color_unpack(rt.rgba_to_hsva(particle_color)) -- sic, encode hsva by using rgba
 
 local thread_group_stride = love.graphics.getSystemLimits()["threadgroupsx"] / 8 -- arrange dispatch as matrix to get above group limit
+local cell_invalid_hash = 0xFFFFFFFF
 
 love.load = function()
     love.window.setMode(800, 600, {
@@ -109,33 +114,33 @@ love.load = function()
     end
 
     do -- init graphics buffers
-
-        local particle_buffer_format = velocity_step_shader:getBufferFormat("particle_buffer")
-
         local buffer_usage = {
             usage = "dynamic",
             shaderstorage = true
         }
 
-        --[[
-        for each particle: which cell
-        for each cell: which particles
-        ]]--
-
+        local particle_buffer_format = spatial_hash_shader:getBufferFormat("particle_buffer")
         particle_buffer = love.graphics.newBuffer(particle_buffer_format, n_particles, buffer_usage)
-        local data = {}
-        for i = 1, n_particles do
-            local position_x, position_y = love.math.random(0, love.graphics.getWidth()), love.math.random(0, love.graphics.getHeight())
-            table.insert(data, {
-                position_x, position_y,
-                position_x, position_y,
-                love.math.random(0, 1) * particle_radius, -- radius
-                love.math.random(0, 2 * math.pi), -- angle
-                love.math.random(0.25, 1), -- color
-                0, -- cell hash
-            })
+
+        do -- init particles
+            local data = {}
+            for i = 1, n_particles do
+                local position_x, position_y = love.math.random(0, love.graphics.getWidth()), love.math.random(0, love.graphics.getHeight())
+                table.insert(data, {
+                    position_x, position_y,
+                    position_x, position_y,
+                    love.math.random(0, 1) * particle_radius, -- radius
+                    love.math.random(0, 2 * math.pi), -- angle
+                    love.math.random(0.25, 1), -- color
+                    0, -- cell hash
+                })
+            end
+            particle_buffer:setArrayData(data)
         end
-        particle_buffer:setArrayData(data)
+
+        local occupation_buffer_format = spatial_hash_shader:getBufferFormat("cell_occupations_buffer")
+        cell_occupation_buffer = love.graphics.newBuffer(occupation_buffer_format, n_particles, buffer_usage)
+        -- initialized in compute shader
 
 
     end
