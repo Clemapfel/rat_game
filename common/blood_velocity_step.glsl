@@ -75,7 +75,6 @@ struct Particle {
     float radius;
     float angle;
     float color;
-    uint cell_hash;
 };
 
 layout(std430) buffer particle_buffer {
@@ -99,6 +98,8 @@ void computemain()
     const float radius_speed = 2;
     const float radius_min = 0.4;
     const float radius_max = 2;
+
+    const float angle_speed = 0.1 * 2 * PI;
 
     int particle_i = get_particle_index(int(gl_GlobalInvocationID.x), int(gl_GlobalInvocationID.y));
     Particle particle = particles[particle_i];
@@ -126,4 +127,8 @@ void computemain()
     radius = project(sine_wave(particle_i + elapsed / 10, radius_speed), radius_min, radius_max);
 
     particles[particle_i].radius = radius;
+
+    // update angle
+    float angle = particles[particle_i].angle;
+    particles[particle_i].angle = mod(angle + delta * angle_speed, 2 * PI);
 }

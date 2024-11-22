@@ -17,9 +17,8 @@ struct Particle {
     vec2 current_position;
     vec2 previous_position;
     float radius;
-    float color;
     float angle;
-    uint cell_hash;
+    float color;
 };
 
 layout(std430) readonly buffer particle_buffer {
@@ -36,9 +35,8 @@ vec4 position(mat4 transform, vec4 vertex_position)
     vec2 center = vec2(0);
     float angle = atan(vertex_position.y - center.y, vertex_position.x - center.x);
     vertex_position.xy = translate_point_by_angle(vec2(0), particle.radius * radius, angle);
-    vertex_position.xy += particle.current_position;
-
     vertex_position.xy = rotate(vertex_position.xy, particle.angle);
+    vertex_position.xy += particle.current_position;
 
     value = particle.color;
     return transform * vertex_position;

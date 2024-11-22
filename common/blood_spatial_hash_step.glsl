@@ -1,145 +1,151 @@
-vec3 mod289(vec3 x) {
-    return x - floor(x * (1.0 / 289.0)) * 289.0;
+#define BUFFER_LAYOUT layout(std430)
+
+uniform uint n_particles;
+
+struct Particle {
+    vec2 current_position;
+    vec2 previous_position;
+    float radius;
+    float angle;
+    float color;
+};
+
+BUFFER_LAYOUT buffer particle_buffer {
+    Particle particles[];
+}; // size: n_particles
+
+// thread group to particle i
+uniform int thread_group_stride = 1;
+int get_particle_index(int x, int y) {
+    return y * thread_group_stride + x;
 }
 
-vec2 mod289(vec2 x) {
-    return x - floor(x * (1.0 / 289.0)) * 289.0;
+// particle position to spatial subdivison cell hash, first 16bit are x-index, second 16bit are y
+uniform int n_rows;
+uniform int n_columns;
+uniform vec2 screen_size;
+
+const uint X_SHIFT = 16u;
+const uint Y_SHIFT = 0u;
+
+uniform uint CELL_INVALID_HASH = 0xFFFFFFFu;
+struct ParticleCellOccupation {
+    uint center;
+    uint top_left;
+    uint top;
+    uint top_right;
+    uint right;
+    uint bottom_right;
+    uint bottom;
+    uint bottom_left;
+    uint left;
+};
+
+BUFFER_LAYOUT buffer cell_occupations_buffer {
+    ParticleCellOccupation cell_occupations[];
+}; // size: n_particles
+
+uint hash_cell(uint x, uint y) {
+    return x << X_SHIFT | y << Y_SHIFT;
 }
 
-vec3 permute(vec3 x) {
-    return mod289(((x*34.0)+1.0)*x);
+// determine which of the possible 9 cells a particle overlaps
+void intialize_particle_cell_occupation(in Particle particle, out ParticleCellOccupation occupation) {
+    float cell_width = screen_size.x / float(n_columns);
+    float cell_height = screen_size.y / float(n_rows);
+    float radius = particle.radius;
+
+    uint cell_x = uint(position.x / cell_width);
+    uint cell_y = uint(position.y / cell_height);
+
+    float left_x = (cell_x - 1) * cell_width;
+    float center_x = (cell_x) * cell_width;
+    float right_x = (cell_x + 1) * cell_width;
+
+    float top_y = (cell_y - 1) * cell_height;
+    float center_y = (cell_y) * cell_height;
+    float bottom_y = (cell_y + 1) * cell_height;
+
+    vec2 position = particle.current_position;
+    float particle_left_x = position.x - radius;
+    float particle_right_x = position.x + radius;
+    float particle_top_y = position.y - radius;
+    float particle_bottom_y = position.y + radius;
+
+    bool top = particle_y < top_y;
+    bool bottom = particle_y > bottom_y;
+
+    bool left = particle_x < left_x;
+    bool right = particle_x > right_x;
+
+    occupation.top_left = CELL_INVALID_HASH;
+    occupation.top = CELL_INVALID_HASH;
+    occupation.top_right = CELL_INVALID_HASH;
+    occupation.left = CELL_INVALID_HASH;
+    occupation.center = CELL_INVALID_HASH;
+    occupation.right = CELL_INVALID_HASH;
+    occupation.bottom_left = CELL_INVALID_HASH;
+    occupation.bottom = CELL_INVALID_HASH;
+    occupation.bottom_right = CELL_INVALID_HASH;
+
+    // center is always occupied
+    occupation.center = cell_hash(cell_x, cell_y);
+
+    if (top && left)
+        occupation.top_left = cell_hash(cell_x - 1, cell_y - 1);
+
+    if (top)
+        occupation.top = cell_hash(cell_x - 0, cell_y - 1);
+
+    if (top && right)
+        occupation.top_right = cell_hash(cell_x + 1, cell_y - 1);
+
+    if (left)
+        occupation.left = cell_hash(cell_x - 1, cell_y - 0);
+
+    if (right)
+        occupation.right = cell_hash(cell_x + 1, cell_y - 0);
+
+    if (bottom && left)
+        occupation.bottom_left = cell_hash(cell_x - 1, cell_y + 1);
+
+    if (bottom)
+        occupation.bottom = cell_hash(cell_x, cell_y + 1);
+
+    if (bottom && right)
+        occupation.bottom_right = cell_hash(cell_x + 1, cell_y + 1);
 }
 
-float noise(vec2 v)
-{
-    const vec4 C = vec4(0.211324865405187,  // (3.0-sqrt(3.0))/6.0
-    0.366025403784439,  // 0.5*(sqrt(3.0)-1.0)
-    -0.577350269189626,  // -1.0 + 2.0 * C.x
-    0.024390243902439); // 1.0 / 41.0
+//
 
-    vec2 i  = floor(v + dot(v, C.yy) );
-    vec2 x0 = v -   i + dot(i, C.xx);
+struct CellData {
+    uint start_index;
+    uint n_particles;
+};
 
-    vec2 i1;
-    i1 = (x0.x > x0.y) ? vec2(1.0, 0.0) : vec2(0.0, 1.0);
-    vec4 x12 = x0.xyxy + C.xxzz;
-    x12.xy -= i1;
+BUFFER_LAYOUT buffer cell_data_buffer {
+    CellData cell_data[];
+};
 
-    i = mod289(i);
-    vec3 p = permute( permute( i.y + vec3(0.0, i1.y, 1.0 ))
-    + i.x + vec3(0.0, i1.x, 1.0 ));
+struct ParticleData {
+    uint cell_hash;
+    uint particle_i;
+};
 
-    vec3 m = max(0.5 - vec3(dot(x0,x0), dot(x12.xy,x12.xy), dot(x12.zw,x12.zw)), 0.0);
-    m = m*m ;
-    m = m*m ;
-
-    vec3 x = 2.0 * fract(p * C.www) - 1.0;
-    vec3 h = abs(x) - 0.5;
-    vec3 ox = floor(x + 0.5);
-    vec3 a0 = x - ox;
-
-    m *= 1.79284291400159 - 0.85373472095314 * ( a0*a0 + h*h );
-
-    vec3 g;
-    g.x  = a0.x  * x0.x  + h.x  * x0.y;
-    g.yz = a0.yz * x12.xz + h.yz * x12.yw;
-    return 130.0 * dot(m, g);
-}
-
-const float PI = 3.1415926535897932384626433832795;
-
-vec2 rotate(vec2 v, float angle) {
-    float s = sin(angle);
-    float c = cos(angle);
-    return v * mat2(c, -s, s, c);
-}
-
-vec2 translate_point_by_angle(vec2 xy, float dist, float angle)
-{
-    return xy + vec2(cos(angle), sin(angle)) * dist;
-}
-
-float gaussian(float x, float ramp)
-{
-    return exp(((-4 * PI) / 3) * (ramp * x) * (ramp * x));
-}
-
-float project(float x, float min, float max)
-{
-    return min + x * (max - min);
-}
-
-// ###
-
-layout(rgba32f) uniform image2D position_texture;
-layout(rgba16f) uniform image2D color_texture;
-layout(r8) uniform image2D mass_texture;
-
-uniform float delta;
-uniform float elapsed;
-uniform vec2 center_of_gravity;
-uniform vec4 screen_aabb;
-uniform vec2 dispatch_size;
-
-const float acceleration = 1;
-
-layout(std430) writeonly buffer n_done_counter
-{
-    uint n[];
+BUFFER_LAYOUT buffer particle_data_buffer {
+    ParticleData particle_data[];
 };
 
 layout (local_size_x = 1, local_size_y = 1, local_size_z = 1) in;
 void computemain()
 {
-    ivec2 position = ivec2(gl_GlobalInvocationID.x, gl_GlobalInvocationID.y);
+    // initialize cell occupation for each particle
+    int particle_i = get_particle_index(int(gl_GlobalInvocationID.x), int(gl_GlobalInvocationID.y));
+    intialize_particle_cell_occupation(particles[particle_i], cell_occupations[particle_i]);
 
-    // update position
+    barrier();
 
-    vec4 position_data = imageLoad(position_texture, position);
-    vec2 current = position_data.xy;
-    vec2 previous = position_data.zw;
-    float mass_data = imageLoad(mass_texture, position).x; // in [0, 1]
 
-    float velocity_loss = clamp(pow(elapsed, 1.55), 0, 1);
 
-    highp vec2 gravity = normalize(vec2(current - center_of_gravity));
-    gravity = rotate(gravity, noise(position) * (PI / 16) * (1 - velocity_loss));
-    gravity *= 1000 * (1 - clamp(pow(velocity_loss, 2) * 2500, 0, 1));
 
-    float delta_squared = delta * delta;
-
-    const float mass_factor = 10;
-    const float min_mass = 0;
-    const float max_mass = 1;
-    float mass = project(mass_data, min_mass, max_mass) * mass_factor;
-
-    const float min_damping = 0.98;
-    const float max_damping = 1;
-    float damping = 1 - gaussian(distance(position, 0.5 * dispatch_size) / max(dispatch_size.x, dispatch_size.y), 1);
-    //imageStore(color_texture, position, vec4(vec3(damping), 1));
-
-    vec2 downward_force = vec2(0, pow(elapsed + 1.2, 2)); // term unaffected by mass, in case mass is 0
-
-    damping = project(damping, min_damping, max_damping);
-    damping -= project(velocity_loss, 0, 0.1);
-
-    vec2 next = current + (current - previous) + damping * mass * gravity * delta_squared + downward_force * delta;
-
-    imageStore(position_texture, position, vec4(next, current.xy));
-
-    vec4 color_data = imageLoad(color_texture, position);
-    color_data.xyz = mix(color_data.xyz, vec3(1, 0, 0), elapsed / 20);
-    imageStore(color_texture, position, color_data);
-
-    // check if particle left screen
-    float x = screen_aabb.x;
-    float y = screen_aabb.y;
-    float w = screen_aabb.z;
-    float h = screen_aabb.w;
-    if (current.y > y + h) {//(current.x <= x || current.y <= y || current.x >= x + w || current.y >= y + h) {
-        if (color_data.a >= 0) {
-            atomicAdd(n[0], 1);
-            imageStore(color_texture, position, vec4(-1));
-        }
-    }
 }

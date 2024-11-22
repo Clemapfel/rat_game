@@ -109,14 +109,8 @@ love.load = function()
     end
 
     do -- init graphics buffers
-        local particle_buffer_format = {
-            {name = "current_position", format = "floatvec2"},
-            {name = "previous_position", format = "floatvec2"},
-            {name = "radius", format = "float"},
-            {name = "angle", format = "float"},
-            {name = "color", format = "float"},
-            {name = "cell_hash", format = "uint32"}
-        }
+
+        local particle_buffer_format = velocity_step_shader:getBufferFormat("particle_buffer")
 
         local buffer_usage = {
             usage = "dynamic",
@@ -135,9 +129,10 @@ love.load = function()
             table.insert(data, {
                 position_x, position_y,
                 position_x, position_y,
-                love.math.random(0, 1) * particle_radius,
-                love.math.random(0.25, 1),
-
+                love.math.random(0, 1) * particle_radius, -- radius
+                love.math.random(0, 2 * math.pi), -- angle
+                love.math.random(0.25, 1), -- color
+                0, -- cell hash
             })
         end
         particle_buffer:setArrayData(data)
@@ -154,14 +149,17 @@ do
     end
 
     love.update = function(delta)
-        if love.keyboard.isDown("space") then
+        if not love.keyboard.isDown("space") then
             elapsed = elapsed + delta
+
+            local w, h = love.graphics.getDimensions()
             _shader_try_send(velocity_step_shader, "thread_group_stride", thread_group_stride)
             _shader_try_send(velocity_step_shader, "delta", delta)
             _shader_try_send(velocity_step_shader, "elapsed", elapsed)
-            _shader_try_send(velocity_step_shader, "screen_size", {love.graphics.getDimensions()})
+            _shader_try_send(velocity_step_shader, "screen_size", {w, h})
             _shader_try_send(velocity_step_shader, "n_particles", n_particles)
             _shader_try_send(velocity_step_shader, "particle_buffer", particle_buffer)
+            _shader_try_send(velocity_step_shader, "center_of_gravity", {w / 2, h / 2})
             love.graphics.dispatchThreadgroups(velocity_step_shader,
                 thread_group_stride,
                 math.ceil(n_particles / thread_group_stride)
