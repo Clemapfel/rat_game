@@ -22,6 +22,8 @@ bt.BattleScene = meta.new_type("BattleScene", rt.Scene, function(state)
         _global_status_bar = bt.OrderedBox(),
         _global_status_to_sprite = {}, -- Table<bt.GlobalStatus, rt.Sprite>
 
+        _quicksave_indicator = bt.QuicksaveIndicator(),
+
         _move_selection = {}, -- Table<bt.Entity, { moves:rt.Slots, intrinsices:rt:Slots, selection_graph:rt.SelectionGraph }>
         _selecting_entity = nil,
 
@@ -39,7 +41,7 @@ bt.BattleScene = meta.new_type("BattleScene", rt.Scene, function(state)
 
         _entity_selection_graph = nil, -- rt.SelectionGraph
     })
-    out._background:set_implementation(rt.Background.CONFUSION) -- TODO
+    out._background:set_implementation(rt.Background.MESH_RING) -- TODO
     return out
 end)
 
@@ -50,6 +52,7 @@ function bt.BattleScene:realize()
     self._background:realize()
     self._text_box:realize()
     self._priority_queue:realize()
+    self._quicksave_indicator:realize()
 
     self._verbose_info:set_frame_visible(false)
     self._verbose_info:realize()
@@ -95,6 +98,7 @@ function bt.BattleScene:create_from_state()
 
     self._simulation_environment = self:create_simulation_environment()
     self._priority_queue:reorder(self._state:list_entities_in_order())
+    self._quicksave_indicator:set_screenshot(self._state:get_quicksave_screenshot())
 
     self:skip()
 end
@@ -209,6 +213,12 @@ function bt.BattleScene:size_allocate(x, y, width, height)
         y + height - outer_margin,
         sprite_w - 2 * outer_margin,
         tile_size
+    )
+
+    self._quicksave_indicator:fit_into(
+        x + width - outer_margin - tile_size,
+        y + height - outer_margin - tile_size,
+        tile_size, tile_size
     )
 
     local max_enemy_sprite_h = NEGATIVE_INFINITY
@@ -443,7 +453,7 @@ end
 --- @override
 function bt.BattleScene:draw()
     self._background:draw()
-    --[[
+
     for sprite in values(self._party_sprites) do
         sprite:draw()
     end
@@ -456,8 +466,6 @@ function bt.BattleScene:draw()
         love.graphics.translate(-offset, 0)
     end
     love.graphics.translate(-self._enemy_sprite_x_offset, 0)
-
-    self._priority_queue:draw_bounds()
 
     if self._selecting_entity ~= nil then
         local entry = self._move_selection[self._selecting_entity]
@@ -477,11 +485,12 @@ function bt.BattleScene:draw()
         self._text_box,
         self._priority_queue,
         self._verbose_info,
-        self._global_status_bar
+        self._global_status_bar,
+        self._quicksave_indicator
     ) do
         x:draw()
     end
-    ]]--
+
     self._enemy_sprites[1]:draw_snapshot()
     self._animation_queue:draw()
 end
@@ -838,7 +847,7 @@ function bt.BattleScene:_handle_button_pressed(which)
         local target = bt.create_entity_proxy(self, self._state:list_enemies()[2])
         local status = bt.create_status_proxy(self, bt.Status("DEBUG_STATUS"))
         local sprite = self:get_sprite(self._state:list_enemies()[2])
-        --self:_push_animation(bt.Animation.QUICKSAVE(self, sprite))
+        self:_push_animation(bt.Animation.QUICKSAVE(self, sprite))
         --self._simulation_environment.message(target, "test", status)
         --self._simulation_environment.knock_out(target)
 

@@ -55,7 +55,7 @@ sort_shader = love.graphics.newComputeShader("common/blood_sort_temp.glsl")
 n_numbers = 256^2
 n_bits_per_step = 8
 
-n_threads_x = 1
+n_threads_x = 16
 n_threads_y = 1
 
 love.load = function()
@@ -70,12 +70,6 @@ love.load = function()
     local to_sort_swap_buffer_format = sort_shader:getBufferFormat("to_sort_swap_buffer")
     to_sort_swap_buffer = love.graphics.newBuffer(to_sort_swap_buffer_format, n_numbers, buffer_usage)
 
-    local shared_counts_buffer_format = sort_shader:getBufferFormat("shared_counts_buffer")
-    shared_counts_buffer = love.graphics.newBuffer(shared_counts_buffer_format, 2^n_bits_per_step, buffer_usage)
-
-    local shared_offsets_buffer_format = sort_shader:getBufferFormat("shared_offsets_buffer")
-    shared_offsets_buffer = love.graphics.newBuffer(shared_offsets_buffer_format, 2^n_bits_per_step, buffer_usage)
-
     do
         local data = {}
         for i = 1, n_numbers do
@@ -86,19 +80,10 @@ love.load = function()
         end
         to_sort_buffer:setArrayData(data)
         to_sort_swap_buffer:setArrayData(data)
-
-        local data = {}
-        for i = 1, 2^n_bits_per_step do
-            data[i] = 0
-        end
-        shared_counts_buffer:setArrayData(data)
-        shared_offsets_buffer:setArrayData(data)
     end
 
     sort_shader:send("to_sort_buffer", to_sort_buffer)
     sort_shader:send("to_sort_swap_buffer", to_sort_swap_buffer)
-    sort_shader:send("shared_counts_buffer", shared_counts_buffer)
-    sort_shader:send("shared_offsets_buffer", shared_offsets_buffer)
 
     sort_shader:send("n_threads_x", n_threads_x)
     sort_shader:send("n_threads_y", n_threads_y)

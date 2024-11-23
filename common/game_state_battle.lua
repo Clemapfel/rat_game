@@ -1592,7 +1592,16 @@ function rt.GameState:peek_grabbed_object()
     return self._grabbed_object
 end
 
+--- @brief
+function rt.GameState:set_quicksave_screenshot(texture)
+    meta.assert_isa(texture, rt.RenderTexture)
+    self._quicksave_screenshot = texture
+end
 
+--- @brief
+function rt.GameState:get_quicksave_screenshot()
+    return self._quicksave_screenshot
+end
 
 --- @brief
 function rt.GameState:initialize_debug_state()

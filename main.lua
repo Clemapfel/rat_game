@@ -33,11 +33,11 @@ input:signal_connect("keyboard_pressed", function(_, which)
     if which == rt.KeyboardKey.SPACE then
         --camera:set_angle(rt.random.number(-math.pi, math.pi))
         --camera:set_scale(rt.random.number(1 / 4, 4))
-        camera:set_position(love.mouse.getPosition())
+        --camera:set_position(love.mouse.getPosition())
     elseif which == rt.KeyboardKey.B then
-        camera:shake(10 / 60)
+        --camera:shake(10 / 60)
     elseif which == rt.KeyboardKey.X then
-        camera:skip()
+        --camera:skip()
     end
 end)
 
