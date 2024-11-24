@@ -1,5 +1,3 @@
-
-
 #define BUFFER_LAYOUT layout(std430)
 
 uniform uint n_bits_per_step = 8;
@@ -9,12 +7,12 @@ struct Pair {
     uint hash;
 };
 
-BUFFER_LAYOUT buffer to_sort_buffer {
-    Pair to_sort_a[];
+BUFFER_LAYOUT buffer elements_in_buffer {
+    uint elements_in[];
 };
 
-BUFFER_LAYOUT buffer to_sort_swap_buffer {
-    Pair to_sort_b[];
+BUFFER_LAYOUT buffer elements_out_buffer {
+    uint elements_out[];
 };
 
 #define N_BINS 256
@@ -35,7 +33,7 @@ ivec2 get_index_range(int thread_x, int thread_y) {
     return ivec2(start, end);
 }
 
-layout (local_size_x = 16) in;
+layout (local_size_x = 1, local_size_y = 1, local_size_z = 1) in;
 void computemain()
 {
     int thread_x = int(gl_GlobalInvocationID.x);
@@ -59,7 +57,7 @@ void computemain()
 
         // count occurrences in local buffer
         for (int i = index_range.x; i < index_range.y; ++i) {
-            uint hash = pass % 2 == 0 ? to_sort_a[i].hash : to_sort_b[i].hash;
+            uint hash = elements_in[i].hash;
             uint masked = (hash & bitmask) >> (pass * n_bits_per_step);
             counts[masked] += 1;
         }
@@ -88,25 +86,18 @@ void computemain()
 
         // reorder in swap
         for (int old_index = index_range.x; old_index < index_range.y; ++old_index) {
-            uint hash = pass % 2 == 0 ? to_sort_a[old_index].hash : to_sort_b[old_index].hash;
+            uint hash = elements_in[old_index].hash;
             uint masked = (hash & bitmask) >> (pass * n_bits_per_step);
             uint new_index = atomicAdd(shared_offsets[masked], 1);
-
-            if (pass % 2 == 0)
-                to_sort_b[new_index] = to_sort_a[old_index];
-            else
-                to_sort_a[new_index] = to_sort_b[old_index];
+            elements_out[new_index] = elements_in[old_index];
         }
 
         barrier();
 
-        // trade swap and to_sort
-        if (pass % 2 == 0)
-            for (int i = index_range.x; i < index_range.y; ++i)
-                to_sort_a[i] = to_sort_b[i];
-        else
-            for (int i = index_range.x; i < index_range.y; ++i)
-                to_sort_b[i] = to_sort_a[i];
+        // trade swap and elements_in
+        for (int i = index_range.x; i < index_range.y; ++i) {
+            elements_in[i] = elements_out[i];
+        }
 
         barrier();
     }

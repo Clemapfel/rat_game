@@ -46,8 +46,8 @@ do
     end
 end
 
-to_sort_buffer = nil
-to_sort_swap_buffer = nil
+elements_in_buffer = nil
+elements_out_buffer = nil
 shared_counts_buffer = nil
 shared_offsets_buffer = nil
 
@@ -64,26 +64,23 @@ love.load = function()
         shaderstorage = true
     }
 
-    local to_sort_buffer_format = sort_shader:getBufferFormat("to_sort_buffer")
-    to_sort_buffer = love.graphics.newBuffer(to_sort_buffer_format, n_numbers, buffer_usage)
+    local elements_in_buffer_format = sort_shader:getBufferFormat("elements_in_buffer")
+    elements_in_buffer = love.graphics.newBuffer(elements_in_buffer_format, n_numbers, buffer_usage)
 
-    local to_sort_swap_buffer_format = sort_shader:getBufferFormat("to_sort_swap_buffer")
-    to_sort_swap_buffer = love.graphics.newBuffer(to_sort_swap_buffer_format, n_numbers, buffer_usage)
+    local elements_out_buffer_format = sort_shader:getBufferFormat("elements_out_buffer")
+    elements_out_buffer = love.graphics.newBuffer(elements_out_buffer_format, n_numbers, buffer_usage)
 
     do
         local data = {}
         for i = 1, n_numbers do
-            table.insert(data, {
-                i,
-                rt.random.integer(0, 999)
-            })
+            table.insert(data, rt.random.integer(0, 999))
         end
-        to_sort_buffer:setArrayData(data)
-        to_sort_swap_buffer:setArrayData(data)
+        elements_in_buffer:setArrayData(data)
+        elements_out_buffer:setArrayData(data)
     end
 
-    sort_shader:send("to_sort_buffer", to_sort_buffer)
-    sort_shader:send("to_sort_swap_buffer", to_sort_swap_buffer)
+    sort_shader:send("elements_in_buffer", elements_in_buffer)
+    sort_shader:send("elements_out_buffer", elements_out_buffer)
 
     sort_shader:send("n_threads_x", n_threads_x)
     sort_shader:send("n_threads_y", n_threads_y)
@@ -92,7 +89,7 @@ love.load = function()
 
     local function print_buffer()
         local byte_offset = 4
-        local data = love.graphics.readbackBuffer(to_sort_buffer);
+        local data = love.graphics.readbackBuffer(elements_in_buffer);
         for i = 1, 256, 2 do
             local index = data:getUInt32((i - 1) * byte_offset)
             local hash = data:getUInt32((i - 1 + 1) * byte_offset)

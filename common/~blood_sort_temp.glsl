@@ -1,140 +1,105 @@
-/**
-* VkRadixSort written by Mirco Werner: https://github.com/MircoWerner/VkRadixSort
-* Based on implementation of Intel's Embree: https://github.com/embree/embree/blob/v4.0.0-ploc/kernels/rthwif/builder/gpu/sort.h
-*/
-#version 460
-#extension GL_GOOGLE_include_directive: enable
-#extension GL_KHR_shader_subgroup_basic: enable
-#extension GL_KHR_shader_subgroup_arithmetic: enable
 
-#define WORKGROUP_SIZE 256// assert WORKGROUP_SIZE >= RADIX_SORT_BINS
-#define RADIX_SORT_BINS 256
-#define SUBGROUP_SIZE 32// 32 NVIDIA; 64 AMD
+#define BUFFER_LAYOUT layout(std430)
 
-#define ITERATIONS 4// 4 iterations, sorting 8 bits per iteration
+uniform uint n_bits_per_step = 8;
 
-layout (local_size_x = WORKGROUP_SIZE) in;
-
-layout (push_constant, std430) uniform PushConstants {
-    uint g_num_elements;
+struct Pair {
+    uint id;
+    uint hash;
 };
 
-layout (std430, set = 0, binding = 0) buffer elements_in {
-    uint g_elements_in[];
+BUFFER_LAYOUT buffer to_sort_buffer {
+    Pair to_sort[];
 };
 
-layout (std430, set = 0, binding = 1) buffer elements_out {
-    uint g_elements_out[];
+BUFFER_LAYOUT buffer to_sort_swap_buffer {
+    Pair to_sort_swap[];
 };
 
-shared uint[RADIX_SORT_BINS] histogram;
-shared uint[RADIX_SORT_BINS / SUBGROUP_SIZE] sums;// subgroup reductions
-shared uint[RADIX_SORT_BINS] local_offsets;// local exclusive scan (prefix sum) (inside subgroups)
-shared uint[RADIX_SORT_BINS] global_offsets;// global exclusive scan (prefix sum)
+#define N_BINS 256
+shared uint shared_counts[N_BINS];
+shared uint shared_offsets[N_BINS];
 
-struct BinFlags {
-    uint flags[WORKGROUP_SIZE / 32];
-};
-shared BinFlags[RADIX_SORT_BINS] bin_flags;
+uniform int n_threads_x; // number of thread groups
+uniform int n_threads_y;
+uniform int n_numbers; // count of numbers to sort
 
-#define ELEMENT_IN(index, iteration) (iteration % 2 == 0 ? g_elements_in[index] : g_elements_out[index])
+// get index range for each thread
+ivec2 get_index_range(int thread_x, int thread_y) {
+    float n_threads = n_threads_x * n_threads_y;
+    int linear_index = thread_y * n_threads_x + thread_x;
+    int n_per_thread = int(ceil(n_numbers / n_threads));
+    int start = clamp(int((linear_index / n_threads) * n_numbers), 0, n_numbers);
+    int end = clamp(start + n_per_thread, 0, n_numbers);
+    return ivec2(start, end);
+}
 
-void main() {
-    uint lID = gl_LocalInvocationID.x;
-    uint sID = gl_SubgroupID;
-    uint lsID = gl_SubgroupInvocationID;
+layout (local_size_x = 1, local_size_y = 1, local_size_z = 1) in;
+void computemain()
+{
+    int thread_x = int(gl_GlobalInvocationID.x);
+    int thread_y = int(gl_GlobalInvocationID.y);
+    ivec2 index_range = get_index_range(thread_x, thread_y);
 
-    for (uint iteration = 0; iteration < ITERATIONS; iteration++) {
-        uint shift = 8 * iteration;
+    bool is_sequential_worker = thread_x == 0 && thread_y == 0;
 
-        // initialize histogram
-        if (lID < RADIX_SORT_BINS) {
-            histogram[lID] = 0U;
+    const int n_buckets = 256; // 2^n_bits_per_step
+    uint counts[n_buckets];
+    uint offsets[n_buckets];
+
+    for (int pass = 0; pass < int(32 / n_bits_per_step); ++pass)
+    {
+        // initialize local counts
+        for (int i = 0; i < n_buckets; ++i) {
+            counts[i] = 0;
         }
+
+        uint bitmask = ((1u << n_bits_per_step) - 1u) << (pass * n_bits_per_step);
+
+        // count occurrences in local buffer
+        for (int i = index_range.x; i < index_range.y; ++i) {
+            uint hash = to_sort[i].hash;
+            uint masked = (hash & bitmask) >> (pass * n_bits_per_step);
+            counts[masked] += 1;
+        }
+
         barrier();
 
-        for (uint ID = lID; ID < g_num_elements; ID += WORKGROUP_SIZE) {
-            // determine the bin
-            const uint bin = uint(ELEMENT_IN(ID, iteration) >> shift) & uint(RADIX_SORT_BINS - 1);
-            // increment the histogram
-            atomicAdd(histogram[bin], 1U);
+        // accumulate in shared buffer
+        for (int i = 0; i < n_buckets; ++i) {
+            atomicAdd(shared_counts[i], counts[i]);
         }
+
         barrier();
 
-        // subgroup reductions and subgroup prefix sums
-        if (lID < RADIX_SORT_BINS) {
-            uint histogram_count = histogram[lID];
-            uint sum = subgroupAdd(histogram_count);
-            uint prefix_sum = subgroupExclusiveAdd(histogram_count);
-            local_offsets[lID] = prefix_sum;
-            if (subgroupElect()) {
-                // one thread inside the warp/subgroup enters this section
-                sums[sID] = sum;
+        // sequentially compute prefix sum
+        // TODO: make parallel https://developer.nvidia.com/gpugems/gpugems3/part-vi-gpu-computing/chapter-39-parallel-prefix-sum-scan-cuda
+        if (is_sequential_worker) {
+            uint sum = 0;
+            for (int i = 0; i < n_buckets; ++i) {
+                shared_offsets[i] = sum;
+                sum += shared_counts[i];
+                shared_counts[i] = 0; // Reset shared_counts for next pass
             }
         }
+
         barrier();
 
-        // global prefix sums (offsets)
-        if (sID == 0) {
-            uint offset = 0;
-            for (uint i = lsID; i < RADIX_SORT_BINS; i += SUBGROUP_SIZE) {
-                global_offsets[i] = offset + local_offsets[i];
-                offset += sums[i / SUBGROUP_SIZE];
-            }
+        // reorder in swap
+        for (int old_index = index_range.x; old_index < index_range.y; ++old_index) {
+            uint hash = to_sort[old_index].hash;
+            uint masked = (hash & bitmask) >> (pass * n_bits_per_step);
+            uint new_index = atomicAdd(shared_offsets[masked], 1);
+            to_sort_swap[new_index] = to_sort[old_index];
         }
+
         barrier();
 
-        //     ==== scatter keys according to global offsets =====
-        const uint flags_bin = lID / 32;
-        const uint flags_bit = 1 << (lID % 32);
-
-        for (uint blockID = 0; blockID < g_num_elements; blockID += WORKGROUP_SIZE) {
-            barrier();
-
-            const uint ID = blockID + lID;
-
-            // initialize bin flags
-            if (lID < RADIX_SORT_BINS) {
-                for (int i = 0; i < WORKGROUP_SIZE / 32; i++) {
-                    bin_flags[lID].flags[i] = 0U;// init all bin flags to 0
-                }
-            }
-            barrier();
-
-            uint element_in = 0;
-            uint binID = 0;
-            uint binOffset = 0;
-            if (ID < g_num_elements) {
-                element_in = ELEMENT_IN(ID, iteration);
-                binID = uint((element_in >> shift)) & uint(RADIX_SORT_BINS - 1);
-                // offset for group
-                binOffset = global_offsets[binID];
-                // add bit to flag
-                atomicAdd(bin_flags[binID].flags[flags_bin], flags_bit);
-            }
-            barrier();
-
-            if (ID < g_num_elements) {
-                // calculate output index of element
-                uint prefix = 0;
-                uint count = 0;
-                for (uint i = 0; i < WORKGROUP_SIZE / 32; i++) {
-                    const uint bits = bin_flags[binID].flags[i];
-                    const uint full_count = bitCount(bits);
-                    const uint partial_count = bitCount(bits & (flags_bit - 1));
-                    prefix += (i < flags_bin) ? full_count : 0U;
-                    prefix += (i == flags_bin) ? partial_count : 0U;
-                    count += full_count;
-                }
-                if (iteration % 2 == 0) {
-                    g_elements_out[binOffset + prefix] = element_in;
-                } else {
-                    g_elements_in[binOffset + prefix] = element_in;
-                }
-                if (prefix == count - 1) {
-                    atomicAdd(global_offsets[binID], count);
-                }
-            }
+        // trade swap and to_sort
+        for (int i = index_range.x; i < index_range.y; ++i) {
+            to_sort[i] = to_sort_swap[i];
         }
+
+        barrier();
     }
 }
