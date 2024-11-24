@@ -4,7 +4,6 @@ elements_in_buffer = nil
 elements_out_buffer = nil
 
 n_numbers = 1024
-workgroup_size = 256
 sort_shader = love.graphics.newComputeShader("common/blood_sort_temp.glsl", {
     defines = {
         WORKGROUP_SIZE = workgroup_size
@@ -49,7 +48,7 @@ love.load = function()
 
     println(is_buffer_sorted());
     local before = love.timer.getTime()
-    love.graphics.dispatchThreadgroups(sort_shader, workgroup_size, 1)
+    love.graphics.dispatchThreadgroups(sort_shader, 1, 1)
     println((love.timer.getTime() - before) / (1 / 60))
     println(is_buffer_sorted());
 end
