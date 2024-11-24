@@ -1,14 +1,56 @@
 require "include"
 
+do
+    local input = {}
+    for i = 1, 100 do
+        table.insert(input, math.round(love.math.random(0, 2^8)))
+    end
+
+    local bits_per_step = 8
+    local n_buckets = 2^(bits_per_step)
+    local counts, offsets = {}, {}
+    local output = {}
+
+    for pass = 0, (32 / bits_per_step) - 1 do
+        for i = 1, n_buckets do
+            counts[i] = 0
+            offsets[i] = 0
+        end
+
+        local bitmask = bit.lshift(0xFF, pass * bits_per_step)
+
+        -- count occurences
+        for x in values(input) do
+            local mask = bit.rshift(bit.band(x, bitmask), pass * bits_per_step)
+            counts[mask + 1] = counts[mask + 1] + 1
+        end
+
+        -- prefix sum
+        local sum = 0
+        for i = 1, n_buckets do
+            offsets[i] = sum
+            sum = sum + counts[i]
+        end
+
+        -- reorder elements
+        for x in values(input) do
+            local mask = bit.rshift(bit.band(x, bitmask), pass * bits_per_step)
+            output[offsets[mask + 1] + 1] = x
+            offsets[mask + 1] = offsets[mask + 1] + 1
+        end
+
+        -- copy output back to input for the next pass
+        for i = 1, #input do
+            input[i] = output[i]
+        end
+    end
+end
+
 elements_in_buffer = nil
 elements_out_buffer = nil
 
-n_numbers = 1024
-sort_shader = love.graphics.newComputeShader("common/blood_sort_temp.glsl", {
-    defines = {
-        WORKGROUP_SIZE = workgroup_size
-    }
-})
+sort_shader = love.graphics.newComputeShader("common/blood_sort_temp.glsl")
+n_numbers = 100000
 
 love.load = function()
     local buffer_usage = {
@@ -37,20 +79,20 @@ love.load = function()
 
     local function is_buffer_sorted()
         local byte_offset = 4
-        local data = love.graphics.readbackBuffer(elements_out_buffer);
-        for i = 1, n_numbers - 1 do
+        local data = love.graphics.readbackBuffer(elements_in_buffer);
+        for i = 1, n_numbers - 2, 1 do
             local a = data:getUInt32((i - 1) * byte_offset)
             local b = data:getUInt32((i - 1 + 1) * byte_offset)
-            if not (a <= b) then return false end
+            if not (a <= b) then println(a, " ", b, " ", false); return end
         end
-        return true
+        println(true)
     end
 
-    println(is_buffer_sorted());
+    is_buffer_sorted()
     local before = love.timer.getTime()
     love.graphics.dispatchThreadgroups(sort_shader, 1, 1)
-    println((love.timer.getTime() - before) / (1 / 60))
-    println(is_buffer_sorted());
+    println(love.timer.getTime() - before)
+    is_buffer_sorted()
 end
 
 
