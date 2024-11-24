@@ -22,12 +22,11 @@
     </configurations>
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="7fa9ba1b-2cff-4ecc-86fb-59ab2fa76ee1" name="Changes" comment="stashing mesh">
+    <list default="true" id="7fa9ba1b-2cff-4ecc-86fb-59ab2fa76ee1" name="Changes" comment="stashing">
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/backgrounds/mesh_ring.lua" beforeDir="false" afterPath="$PROJECT_DIR$/backgrounds/mesh_ring.lua" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/battle/battle_scene.lua" beforeDir="false" afterPath="$PROJECT_DIR$/battle/battle_scene.lua" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/battle/quicksave_indicator.lua" beforeDir="false" afterPath="$PROJECT_DIR$/battle/quicksave_indicator.lua" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/common/blood_sort_temp.glsl" beforeDir="false" afterPath="$PROJECT_DIR$/common/blood_sort_temp.glsl" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/common/~blood_sort_temp.glsl" beforeDir="false" afterPath="$PROJECT_DIR$/common/~blood_sort_temp.glsl" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/main_blood.lua" beforeDir="false" afterPath="$PROJECT_DIR$/main_blood.lua" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
@@ -640,15 +639,7 @@
       <workItem from="1731603156937" duration="13264000" />
       <workItem from="1731621962991" duration="29140000" />
       <workItem from="1731969751996" duration="4000" />
-      <workItem from="1731969851166" duration="45177000" />
-    </task>
-    <task id="LOCAL-01210" summary="stashing matrices">
-      <option name="closed" value="true" />
-      <created>1730854566509</created>
-      <option name="number" value="01210" />
-      <option name="presentableId" value="LOCAL-01210" />
-      <option name="project" value="LOCAL" />
-      <updated>1730854566509</updated>
+      <workItem from="1731969851166" duration="49318000" />
     </task>
     <task id="LOCAL-01211" summary="working">
       <option name="closed" value="true" />
@@ -1034,7 +1025,15 @@
       <option name="project" value="LOCAL" />
       <updated>1732387563293</updated>
     </task>
-    <option name="localTasksCounter" value="1259" />
+    <task id="LOCAL-01259" summary="stashing">
+      <option name="closed" value="true" />
+      <created>1732467877636</created>
+      <option name="number" value="01259" />
+      <option name="presentableId" value="LOCAL-01259" />
+      <option name="project" value="LOCAL" />
+      <updated>1732467877636</updated>
+    </task>
+    <option name="localTasksCounter" value="1260" />
     <servers />
   </component>
   <component name="TypeScriptGeneratedFilesManager">
@@ -1105,10 +1104,10 @@
     <MESSAGE value="refactor iterators" />
     <MESSAGE value="added angle" />
     <MESSAGE value="stashing before refactoring cell occupation" />
-    <MESSAGE value="stashing" />
     <MESSAGE value="at least works with 1 thread now" />
     <MESSAGE value="stashing mesh" />
-    <option name="LAST_COMMIT_MESSAGE" value="stashing mesh" />
+    <MESSAGE value="stashing" />
+    <option name="LAST_COMMIT_MESSAGE" value="stashing" />
   </component>
   <component name="XDebuggerManager">
     <breakpoint-manager>
@@ -1143,11 +1142,6 @@
           <line>220</line>
           <log-expression expression="o&#10;    local lg = love.graphics&#10;&#10;    --- @brief&#10;    function rt.Camera:bind()&#10;        lg.push()&#10;        lg.origin()&#10;&#10;        if self._blur_strength &gt; 0 then&#10;            lg.setCanvas({ self._render_texture_b, stencil = true })&#10;            lg.clear(true, false, false)&#10;        else&#10;            lg.translate(self._offset_x, self._offset_y) -- shake separate, applied to padded mesh to avoid bordering&#10;        end&#10;&#10;        lg.translate(self._current_x, self._current_y)&#10;        lg.scale(self._current_scale)&#10;        lg.rotate(self._current_angle)&#10;        lg.translate( -0.5 * self._aabb.width, -0.5 * self._aabb.height)&#10;    end&#10;&#10;    -- scene draw here&#10;&#10;    --- @brief&#10;    function rt.Camera:unbind()&#10;        if self._blur_strength &gt; 0 then&#10;            lg.origin()&#10;&#10;            local a, b = self._render_texture_a, self._render_texture_b&#10;            for i = 1, self._blur_strength do&#10;                lg.setShader(self._blur_shader_horizontal)&#10;                lg.setCanvas(a)&#10;                lg.draw(b)&#10;&#10;                lg.setShader(self._blur_shader_vertical)&#10;                lg.setCanvas(b)&#10;                lg.draw(a)&#10;            end&#10;&#10;            lg.setCanvas()&#10;            lg.translate(self._offset_x, self._offset_y)&#10;            lg.draw(self._render_texture_mesh)&#10;        end&#10;&#10;        lg.pop()&#10;    end&#10;end" language="Lua" />
           <option name="timeStamp" value="28" />
-        </line-breakpoint>
-        <line-breakpoint enabled="true" type="lua-line">
-          <url>file://$PROJECT_DIR$/battle/quicksave_indicator.lua</url>
-          <line>88</line>
-          <option name="timeStamp" value="38" />
         </line-breakpoint>
         <line-breakpoint enabled="true" suspend="NONE" type="CMakeLineBreakpoint">
           <url>file://$PROJECT_DIR$/physics/box2d_extension/CMakeLists.txt</url>

@@ -42,7 +42,7 @@ function bt.QuicksaveIndicator:size_allocate(x, y, width, height)
     local inner_color_factor = 0.7
     local inner_color = rt.RGBA(inner_color_factor, inner_color_factor, inner_color_factor, 1)
 
-    local n_outer_vertices = 8
+    local n_outer_vertices = 32
     local step = 2 * math.pi / n_outer_vertices
     local n_vertices = 0
     for angle = 0, 2 * math.pi, step do
@@ -54,8 +54,8 @@ function bt.QuicksaveIndicator:size_allocate(x, y, width, height)
         })
 
         table.insert(vertices, {
-            center_x + math.cos(angle + 0.25 * step) * (x_radius + 0.5 * self._thickness),
-            center_y + math.sin(angle + 0.25 * step) * (y_radius + 0.5 * self._thickness),
+            center_x + math.cos(angle) * (x_radius + 0.5 * self._thickness),
+            center_y + math.sin(angle) * (y_radius + 0.5 * self._thickness),
             0, 0,
             inner_color.r, inner_color.g, inner_color.b, inner_color.a
         })
@@ -87,16 +87,15 @@ end
 
 --- @override
 function bt.QuicksaveIndicator:draw()
-    --self._base:draw()
-    --self._frame_outline:draw()
-    --self._frame:draw()
+    self._base:draw()
+    self._frame_outline:draw()
+    self._frame:draw()
 
-    --rt.graphics.set_blend_mode(rt.BlendMode.MULTIPLY)
-    love.graphics.setWireframe(true)
+    rt.graphics.set_blend_mode(rt.BlendMode.MULTIPLY)
     love.graphics.setColor(1, 1, 1, 1)
     love.graphics.draw(self._gradient)
     love.graphics.setWireframe(false)
-    --rt.graphics.set_blend_mode()
+    rt.graphics.set_blend_mode()
 end
 
 --- @override

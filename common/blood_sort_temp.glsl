@@ -33,6 +33,8 @@ ivec2 get_index_range(int thread_x, int thread_y) {
     return ivec2(start, end);
 }
 
+#define GET(pass, i) pass % 2 == 0 ? elements_in[i] : elements_out[i]
+
 layout (local_size_x = 1, local_size_y = 1, local_size_z = 1) in;
 void computemain()
 {
@@ -57,7 +59,7 @@ void computemain()
 
         // count occurrences in local buffer
         for (int i = index_range.x; i < index_range.y; ++i) {
-            uint hash = elements_in[i].hash;
+            uint hash = elements_in[i];
             uint masked = (hash & bitmask) >> (pass * n_bits_per_step);
             counts[masked] += 1;
         }
@@ -72,21 +74,24 @@ void computemain()
         barrier();
 
         // sequentially compute prefix sum
-        // TODO: make parallel https://developer.nvidia.com/gpugems/gpugems3/part-vi-gpu-computing/chapter-39-parallel-prefix-sum-scan-cuda
         if (is_sequential_worker) {
             uint sum = 0;
             for (int i = 0; i < n_buckets; ++i) {
                 shared_offsets[i] = sum;
                 sum += shared_counts[i];
-                shared_counts[i] = 0; // Reset shared_counts for next pass
             }
         }
 
         barrier();
 
+        if (thread_x < n_buckets)
+            shared_counts[thread_x] = 0u;
+
+        barrier();
+
         // reorder in swap
         for (int old_index = index_range.x; old_index < index_range.y; ++old_index) {
-            uint hash = elements_in[old_index].hash;
+            uint hash = elements_in[old_index];
             uint masked = (hash & bitmask) >> (pass * n_bits_per_step);
             uint new_index = atomicAdd(shared_offsets[masked], 1);
             elements_out[new_index] = elements_in[old_index];
