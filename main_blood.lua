@@ -3,8 +3,13 @@ require "include"
 elements_in_buffer = nil
 elements_out_buffer = nil
 
-sort_shader = love.graphics.newComputeShader("common/blood_sort_temp.glsl")
-n_numbers = 100000
+n_numbers = 1024
+workgroup_size = 256
+sort_shader = love.graphics.newComputeShader("common/blood_sort_temp.glsl", {
+    defines = {
+        WORKGROUP_SIZE = workgroup_size
+    }
+})
 
 love.load = function()
     local buffer_usage = {
@@ -31,19 +36,22 @@ love.load = function()
     sort_shader:send("elements_out_buffer", elements_out_buffer)
     sort_shader:send("n_numbers", n_numbers)
 
-    local function print_buffer()
+    local function is_buffer_sorted()
         local byte_offset = 4
         local data = love.graphics.readbackBuffer(elements_out_buffer);
-        for i = 1, 256, 1 do
-            local index = data:getUInt32((i - 1) * byte_offset)
-            println(index, " ", hash)
+        for i = 1, n_numbers - 1 do
+            local a = data:getUInt32((i - 1) * byte_offset)
+            local b = data:getUInt32((i - 1 + 1) * byte_offset)
+            if not (a <= b) then return false end
         end
+        return true
     end
 
-    --print_buffer()
+    println(is_buffer_sorted());
     local before = love.timer.getTime()
-    love.graphics.dispatchThreadgroups(sort_shader, 16, 1)
-    print(love.timer.getTime() - before)
+    love.graphics.dispatchThreadgroups(sort_shader, workgroup_size, 1)
+    println((love.timer.getTime() - before) / (1 / 60))
+    println(is_buffer_sorted());
 end
 
 
