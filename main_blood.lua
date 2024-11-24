@@ -50,7 +50,7 @@ elements_in_buffer = nil
 elements_out_buffer = nil
 
 sort_shader = love.graphics.newComputeShader("common/blood_sort_temp.glsl")
-n_numbers = 100000
+n_numbers = 200000
 
 love.load = function()
     local buffer_usage = {
@@ -67,7 +67,7 @@ love.load = function()
     --do
         local data = {}
         for i = 1, n_numbers do
-            table.insert(data, rt.random.integer(0, 99999))
+            table.insert(data, { i, rt.random.integer(0, 99999) })
         end
         elements_in_buffer:setArrayData(data)
         elements_out_buffer:setArrayData(data)
@@ -80,10 +80,13 @@ love.load = function()
     local function is_buffer_sorted()
         local byte_offset = 4
         local data = love.graphics.readbackBuffer(elements_in_buffer);
-        for i = 1, n_numbers - 2, 1 do
+        for i = 1, n_numbers - 4, 2 do
             local a = data:getUInt32((i - 1) * byte_offset)
             local b = data:getUInt32((i - 1 + 1) * byte_offset)
-            if not (a <= b) then println(a, " ", b, " ", false); return end
+            local c = data:getUInt32((i - 1 + 2) * byte_offset)
+            local d = data:getUInt32((i - 1 + 3) * byte_offset)
+            dbg(a, b)
+            if not (b <= d) then println(false); return end
         end
         println(true)
     end

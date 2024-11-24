@@ -1,11 +1,16 @@
 #define BUFFER_LAYOUT layout(std430)
 
+struct Pair {
+    uint id;
+    uint hash;
+};
+
 BUFFER_LAYOUT buffer elements_in_buffer {
-    uint elements_in[];
+    Pair elements_in[];
 };
 
 BUFFER_LAYOUT buffer elements_out_buffer {
-    uint elements_out[];
+    Pair elements_out[];
 };
 
 #define N_BINS 256
@@ -13,7 +18,7 @@ BUFFER_LAYOUT buffer elements_out_buffer {
 
 uniform int n_numbers; // count of numbers to sort
 
-#define GET(pass, i) pass % 2 == 0 ? elements_in[i] : elements_out[i]
+#define GET(pass, i) pass % 2 == 0 ? elements_in[i].hash : elements_out[i].hash
 
 layout (local_size_x = 1, local_size_y = 1, local_size_z = 1) in;
 void computemain()
@@ -48,10 +53,16 @@ void computemain()
             uint x = GET(pass, i);
             uint mask = (x & bitmask) >> (pass * BITS_PER_STEP);
 
-            if (pass % 2 == 0)
-                elements_out[offsets[mask]] = x;
-            else
-                elements_in[offsets[mask]] = x;
+            if (pass % 2 == 0) {
+                Pair old = elements_in[i];
+                elements_out[offsets[mask]].hash = old.hash;
+                elements_out[offsets[mask]].id = old.id;
+            }
+            else {
+                Pair old = elements_out[i];
+                elements_in[offsets[mask]].hash = old.hash;
+                elements_in[offsets[mask]].id = old.id;
+            }
 
             offsets[mask] += 1;
         }
