@@ -11,14 +11,14 @@ rt.InterpolationFunctions = meta.new_enum("InterpolationFunction", {
 
     LINEAR = function(x, slope)
         -- ax
-        if x <= 0 then return 0 elseif x >= 1 then return 1 end
+        if x >= 1 then return 1 elseif x <= 0 then return 0 end
         if slope == nil then slope = 1 end
         return slope * x
     end,
 
     LINEAR_BANDPASS = function(x)
         -- 1\ -\operatorname{abs}\left(2\left(x-0.5\right)\right)
-        if x <= 0 then return 0 elseif x >= 1 then return 0 end
+        if x >= 1 then return 0 elseif x <= 0 then return 0 end
         return 1 - math.abs(2 * (x - 0.5))
     end,
 
@@ -42,27 +42,25 @@ rt.InterpolationFunctions = meta.new_enum("InterpolationFunction", {
 
     EXPONENTIAL_ACCELERATION = function(x)
         -- 0.045\cdot e^{\ln\left(\frac{1}{0.045}+1\right)x}-0.045
-        if x <= 0 then return 0 elseif x >= 1 then return 1 end
+        if x <= 0 then return 0 end
         return 0.045 * math.exp(math.log(1 / 0.045 + 1) * x) - 0.045
     end,
 
     EXPONENTIAL_DECELERATION = function(x)
         -- 0.045\cdot e^{\ln\left(\frac{1}{0.045}+1\right)\left(-x+1\right)}-0.045
+        if x >= 1 then return 0 end
         return 0.045 * math.exp(math.log(1 / 0.045 + 1) * (-1 * x + 1)) - 0.045
-    end,
-
-    EXPONENTIAL_SHELF = function(x)
-        -- e^{\left(\frac{\left(x-0.5\right)}{0.565}\right)^{3}}-0.5
-        return math.exp(((x - 0.5) / 0.565)^3) - 0.5
     end,
 
     SQUARE_ACCELERATION = function(x)
         -- x^{2}
+        if x <= 0 then return 0 end
         return x * x
     end,
 
     SQUARE_DECELERATION = function(x)
         -- \left(x-1\right)^{2}
+        if x >= 1 then return 0 end
         return (x - 1) * (x - 1)
     end,
 
@@ -75,47 +73,48 @@ rt.InterpolationFunctions = meta.new_enum("InterpolationFunction", {
 
     SIGMOID_HOLD = function(x)
        -- 4\left(x-0.5\right)^{3}+0.5
-        if x > 1 then return 1 elseif x < 0 then return 0 end
+        if x >= 1 then return 1 elseif x <= 0 then return 0 end
         return 4 * (x - 0.5)^3 + 0.5
     end,
 
     HANN = function(x)
         -- \frac{-\cos\left(-2\pi x\right)}{2}+0.5
-        if x > 1 then return 0 elseif x < 0 then return 0 end
+        if x >= 1 then return 0 elseif x <= 0 then return 0 end
         return (-1 * math.cos(-2 * math.pi * x) + 1) / 2
     end,
 
     HANN_HIGHPASS = function(x)
         -- \frac{-\cos\left(-\pi x\right)}{2}+0.5
-        if x > 1 then return 1 elseif x < 0 then return 0 end
+        if x >= 1 then return 1 elseif x <= 0 then return 0 end
         return -1 * math.cos(-math.pi * x) / 2 + 0.5
     end,
 
     HANN_LOWPASS = function(x)
         -- \frac{\cos\left(-\pi x\right)}{2}+0.5
-        if x > 1 then return 0 elseif x < 0 then return 1 end
+        if x >= 1 then return 0 elseif x <= 0 then return 1 end
         return math.cos(-math.pi * x) / 2 + 0.5
     end,
 
     GAUSSIAN = function(x)
         -- e^{-\left(4.4\cdot\frac{\pi}{3}\right)\left(2x-1\right)^{2}}
-        if x > 1 then return 0 elseif x < 0 then return 0 end
+        if x >= 1 then return 0 elseif x <= 0 then return 0 end
         return math.exp(-1 * ((4.4 * math.pi / 3) * (2 * x - 1))^2)
     end,
     
     GAUSSIAN_HIGHPASS = function(x)
         -- e^{-4.4\frac{\pi}{3}\left(x-1\right)^{2}}
-        if x > 1 then return 1 elseif x < 0 then return 0 end
+        if x >= 1 then return 1 elseif x <= 0 then return 0 end
         return math.exp(-1 * ((4.4 * math.pi / 3) * (x - 1))^2)
     end,
 
     GAUSSIAN_LOWPASS = function(x)
         -- e^{-4.4\frac{\pi}{3}\left(-x\right)^{2}}
-        if x > 1 then return 0 elseif x < 0 then return 1 end
+        if x >= 1 then return 0 elseif x <= 0 then return 1 end
         return math.exp(-4.4 * math.pi / 3 * (-1 * x)^2)
     end,
 
     BUTTERWORTH = function(x, order)
+        if x >= 1 then return 0 elseif x <= 0 then return 0 end
         if order == nil then order = 6 end
         if order % 2 ~= 0 then order = order + 1 end
         -- \frac{1}{\left(1+\left(4\left(x-0.5\right)\right)^{6}\right)}
@@ -123,6 +122,7 @@ rt.InterpolationFunctions = meta.new_enum("InterpolationFunction", {
     end,
 
     BUTTERWORTH_LOWPASS = function(x, order)
+        if x >= 1 then return 0 elseif x <= 0 then return 1 end
         if order == nil then order = 6 end
         if order % 2 ~= 0 then order = order + 1 end
         -- \frac{1}{\left(1+\left(3x\right)^{n}\right)}
@@ -130,6 +130,7 @@ rt.InterpolationFunctions = meta.new_enum("InterpolationFunction", {
     end,
 
     BUTTERWORTH_HIGHPASS = function(x, order)
+        if x >= 1 then return 1 elseif x <= 0 then return 0 end
         if order == nil then order = 6 end
         if order % 2 ~= 0 then order = order + 1 end
         -- \frac{1}{\left(1+\left(3x\right)^{n}\right)}
@@ -138,17 +139,20 @@ rt.InterpolationFunctions = meta.new_enum("InterpolationFunction", {
 
     STEPS = function(x, n_steps)
         -- \frac{\operatorname{floor}\left(4\cdot x+0.5\right)}{4}
+        if x >= 1 then return 1 elseif x <= 0 then return 0 end
         if n_steps == nil then n_steps = 3 end
         return math.floor(n_steps * x + 0.5) / n_steps
     end,
 
     DERIVATIVE_OF_GAUSSIAN_EASE_OUT = function(x)
+        if x >= 1 then return 0 elseif x <= 0 then return 0 end
         -- \left(\left(e^{-\frac{x}{n}^{2}}\cdot\sin\left(\frac{x}{n}\right)\right)2\pi\cdot n\right)
         local n = 0.4
         return math.exp(-((x / n) ^ 2)) * math.sin(x / n) * 2 * math.pi * n
     end,
 
     DERIVATIVE_OF_GAUSSIAN_EASE_IN = function(x)
+        if x >= 1 then return 0 elseif x <= 0 then return 0 end
         -- 1-\left(\left(e^{-\frac{\left(x-1\right)}{n}^{2}}\cdot\sin\left(\frac{\left(x-1\right)}{n}\right)\right)2\pi\cdot n\right)-1
         return 1 - rt.InterpolationFunctions.DERIVATIVE_OF_GAUSSIAN_EASE_OUT(x - 1) - 1
     end,
@@ -163,6 +167,7 @@ rt.InterpolationFunctions = meta.new_enum("InterpolationFunction", {
 
     SHELF = function(x, shelf_width, order)
         -- https://www.desmos.com/calculator/zxo1os3qen
+        if x >= 1 then return 1 elseif x <= 0 then return 0 end
         if shelf_width == nil then shelf_width = 0.5 end
         shelf_width = clamp(shelf_width, 0, 1)
         if order == nil then order = 6 end
@@ -194,8 +199,8 @@ rt.InterpolationFunctions = meta.new_enum("InterpolationFunction", {
 
     CUBE_EASE_OUT = function(x, order)
         -- \left(x-1\right)^{3}+1
+        if x >= 1 then return 1 elseif x <= 0 then return 0 end
         if order == nil then order = 1 end
-        if x < 0 then return 0 elseif x > 1 then return 1 end
         return (x - 1)^(2 * order + 1) + 1
     end
 })
@@ -263,12 +268,8 @@ end
 --- @brief
 function rt.TimedAnimation:get_value()
     local x = self._elapsed / self._duration
-    local y
-    if self._should_loop == false then
-        y = self._f(x, table.unpack(self._args))
-    else
-        y = self._f(math.fmod(x, 1), table.unpack(self._args))
-    end
+    if self._should_loop then x = math.fmod(x, 1) end
+    local y = self._f(x, table.unpack(self._args))
 
     return self._lower + y * self._direction * math.abs(self._upper - self._lower)
 end
