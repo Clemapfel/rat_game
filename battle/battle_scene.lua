@@ -522,6 +522,7 @@ function bt.BattleScene:update(delta)
     end
 
     self._priority_queue:update(delta)
+    self._quicksave_indicator:update(delta)
     self._animation_queue:update(delta)
 end
 
@@ -844,6 +845,8 @@ end
 function bt.BattleScene:_handle_button_pressed(which)
     if which == rt.InputButton.A then
 
+        self._quicksave_indicator:set_is_expanded(not self._quicksave_indicator:get_is_expanded())
+        --[[
         local target = bt.create_entity_proxy(self, self._state:list_enemies()[2])
         local status = bt.create_status_proxy(self, bt.Status("DEBUG_STATUS"))
         local sprite = self:get_sprite(self._state:list_enemies()[2])

@@ -282,3 +282,13 @@ end
 function rt.TimedAnimation:get_elapsed()
     return self._elapsed
 end
+
+--- @brief
+function rt.TimedAnimation:reset()
+    self._elapsed = 0
+end
+
+--- @brief
+function rt.TimedAnimation:set_elapsed(elapsed)
+    self._elapsed = elapsed
+end

@@ -18,8 +18,6 @@ BUFFER_LAYOUT buffer elements_out_buffer {
 
 uniform int n_numbers; // count of numbers to sort
 
-#define GET(pass, i) pass % 2 == 0 ? elements_in[i].hash : elements_out[i].hash
-
 layout (local_size_x = 1, local_size_y = 1, local_size_z = 1) in;
 void computemain()
 {
@@ -38,7 +36,7 @@ void computemain()
         uint bitmask = 0x000000FF << (pass * BITS_PER_STEP);
 
         for (int i = 0; i < n_numbers; ++i) {
-            uint x = GET(pass, i);
+            uint x = pass % 2 == 0 ? elements_in[i].hash : elements_out[i].hash;
             uint mask = (x & bitmask) >> (pass * BITS_PER_STEP);
             counts[mask] += 1;
         }
@@ -50,7 +48,7 @@ void computemain()
         }
 
         for (int i = 0; i < n_numbers; ++i) {
-            uint x = GET(pass, i);
+            uint x = pass % 2 == 0 ? elements_in[i].hash : elements_out[i].hash;
             uint mask = (x & bitmask) >> (pass * BITS_PER_STEP);
 
             if (pass % 2 == 0) {
