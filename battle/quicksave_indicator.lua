@@ -9,7 +9,7 @@ bt.QuicksaveIndicator = meta.new_type("BattleQuicksaveIndicator", rt.Widget, fun
         _frame = rt.Circle(0, 0, 1, 1),
         _frame_outline = rt.Circle(0, 0, 1, 1),
         _base = rt.Circle(0, 0, 1, 1),
-        _thickness = rt.settings.frame.thickness * 5,
+        _thickness = rt.settings.frame.thickness,
 
         _screenshot = nil, -- rt.RenderTexture
         _mesh = nil, -- love.Mesh
@@ -17,10 +17,12 @@ bt.QuicksaveIndicator = meta.new_type("BattleQuicksaveIndicator", rt.Widget, fun
         _paths = {}, -- Table<rt.Path>
 
         _duration = duration,
-        _value = 0,
+        _value = 1,
         _direction = true -- true: rectangle -> circle, false: circle -> rectangle
     })
 end)
+
+meta.add_signal(bt.QuicksaveIndicator, "done")
 
 --- @override
 function bt.QuicksaveIndicator:realize()
@@ -58,41 +60,54 @@ do
         local n_vertices = self._n_vertices
 
         local circle_vertices = {}
+        local thickness = self._thickness + 2
         do -- generate circle
             local step = 2 * math.pi / n_vertices
             local offset = math.rad(-1 * (90 + 45))
             for angle = 0, 2 * math.pi, step do
                 table.insert(circle_vertices, {
-                    center_x + math.cos(angle + offset) * x_radius,
-                    center_y + math.sin(angle + offset) * y_radius
+                    center_x + math.cos(angle + offset) * (x_radius - thickness),
+                    center_y + math.sin(angle + offset) * (y_radius - thickness)
                 })
             end
         end
 
         local rectangle_vertices = {}
-        -- generate equally spaced vertices around rectangle perimeter
         local w, h = love.graphics.getDimensions()
-        local x_step = w / (n_vertices / 4)
-        local y_step = h / (n_vertices / 4)
+        do
+            local rectangle_x, rectangle_y = 0, 0
+            local rectangle_top_path = rt.Path(
+                rectangle_x, rectangle_y,
+                rectangle_x + w, rectangle_y
+            )
 
-        table.insert(rectangle_vertices, {0, 0})
-        for x = x_step, w - x_step, x_step do
-            table.insert(rectangle_vertices, {x, 0})
-        end
+            local rectangle_right_path = rt.Path(
+                rectangle_x + w, rectangle_y,
+                rectangle_x + w, rectangle_y + h
+            )
 
-        table.insert(rectangle_vertices, {w, 0})
-        for y = y_step, h - y_step, y_step do
-            table.insert(rectangle_vertices, {w, y})
-        end
+            local rectangle_bottom_path = rt.Path(
+                rectangle_x + w, rectangle_y + h,
+                rectangle_x, rectangle_y + h
+            )
 
-        table.insert(rectangle_vertices, {w, h})
-        for x = x_step, w - x_step, x_step do
-            table.insert(rectangle_vertices, {x, h})
-        end
+            local rectangle_left_path = rt.Path(
+                rectangle_x, rectangle_y + h,
+                rectangle_x, rectangle_y
+            )
 
-        table.insert(rectangle_vertices, {0, h})
-        for y = y_step, h - y_step, y_step do
-            table.insert(rectangle_vertices, {0, y})
+            local n_vertices_per_side = self._n_vertices / 4
+
+            for path in range(
+                rectangle_top_path,
+                rectangle_right_path,
+                rectangle_bottom_path,
+                rectangle_left_path
+            ) do
+                for i = 1, n_vertices_per_side do
+                    table.insert(rectangle_vertices, {path:at((i - 1) / n_vertices_per_side)})
+                end
+            end
         end
 
         self._paths = {}
@@ -107,7 +122,7 @@ do
 
             local hue = i / n_vertices
             table.insert(self._vertex_data, {
-                rectangle_x, rectangle_y,
+                circle_x, circle_y,
                 rectangle_x / w, rectangle_y / h,
                 rt.color_unpack(rt.hsva_to_rgba(rt.HSVA(hue, 1, 1, 1)))
             })
@@ -121,10 +136,17 @@ do
     function bt.QuicksaveIndicator:update(delta)
 
         local step = delta * (1 / self._duration)
+        local before = self._value
         if self._direction then
             self._value = self._value + step
+            if before < 1 and self._value >= 1 then
+                self:signal_emit("done")
+            end
         else
             self._value = self._value - step
+            if before > 0 and self._value <= 0 then
+                self:signal_emit("done")
+            end
         end
         self._value = clamp(self._value, 0, 1)
 
