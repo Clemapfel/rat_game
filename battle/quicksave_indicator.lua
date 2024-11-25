@@ -14,8 +14,9 @@ bt.QuicksaveIndicator = meta.new_type("BattleQuicksaveIndicator", rt.Widget, fun
         _screenshot = nil, -- rt.RenderTexture
         _mesh = nil, -- love.Mesh
         _n_vertices = 128,
-        _to_center_paths = {}, -- Table<rt.Path>
-        _expand_paths = {},
+        _paths = {}, -- Table<rt.Path>
+        _shortest_path_length = 0,
+        _longest_path_length = 0,
 
         _duration = duration,
         _value = 1,
@@ -111,33 +112,31 @@ do
             end
         end
 
-        self._to_center_paths = {}
-        self._expand_paths = {}
+        self._paths = {}
         self._vertex_data = {}
+
+        self._longest_path_length = NEGATIVE_INFINITY
+        self._shortest_path_length = POSITIVE_INFINITY
 
         for i = 1, n_vertices do
             local rectangle_x, rectangle_y = table.unpack(rectangle_vertices[i])
             local circle_x, circle_y = table.unpack(circle_vertices[i])
 
-            table.insert(self._to_center_paths, rt.Path(
-                0.5 * w + circle_x, 0.5 * h + circle_y,
-                center_x + circle_x, center_y + circle_y
-            ))
-
-            table.insert(self._expand_paths, rt.Path(
-                rectangle_x, rectangle_y,
-                0.5 * w + circle_x, 0.5 * h + circle_y
-            ))
-
-            table.insert(self._paths, rt.Path(
+            local path = rt.Path(
                 rectangle_x, rectangle_y,
                 0.5 * w + circle_x, 0.5 * h + circle_y,
                 center_x + circle_x, center_y + circle_y
-            ))
+            )
+            path:override_parameterization(0.5, 0.5)
+
+            table.insert(self._paths, path)
+
+            self._longest_path_length = math.max(self._longest_path_length, path:get_length())
+            self._shortest_path_length = math.min(self._shortest_path_length, path:get_length())
 
             local hue = i / n_vertices
             table.insert(self._vertex_data, {
-                center_x + circle_x, center_y + circle_y,
+                circle_x, circle_y,
                 rectangle_x / w, rectangle_y / h,
                 rt.color_unpack(rt.hsva_to_rgba(rt.HSVA(hue, 1, 1, 1)))
             })
@@ -169,15 +168,10 @@ do
             (self._direction == false and self._value > 0)
 
         if should_update then
-            local value = rt.InterpolationFunctions.SINUSOID_EASE_IN_OUT(self._value)
             for i = 1, self._n_vertices do
-                local x, y
-                if value < 0.5 then
-                    x, y = self._expand_paths[i]:at(value * 2)
-                else
-                    x, y = self._to_center_paths[i]:at((value - 0.5) * 2)
-                end
+                local path = self._paths[i]
 
+                local x, y = path:at(self._value)
                 local data = self._vertex_data[i]
                 data[1] = x
                 data[2] = y
@@ -197,11 +191,19 @@ end
 
 --- @brief
 function bt.QuicksaveIndicator:draw_mesh()
+    for path in values(self._paths) do
+        path:draw()
+    end
+
     -- needs to be drawn separately, so it can be on top of entire scene
     if self._mesh ~= nil then
         love.graphics.setColor(1, 1, 1, 1)
         love.graphics.draw(self._mesh)
     end
+
+    love.graphics.setPointSize(5)
+    love.graphics.setColor(0, 0, 0, 1)
+    love.graphics.points(self._paths[math.round(self._n_vertices / 2)]:at(self._value))
 end
 
 --- @brief

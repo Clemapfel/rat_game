@@ -155,3 +155,29 @@ end
 function rt.Path:draw()
     love.graphics.line(self._points)
 end
+
+--- @brief override arclength parameterization with custom per-edge value
+--- @param ... Number n-1 values, where n is the number of points, has to sum to 1
+function rt.Path:override_parameterization(...)
+    local total = 0
+    if select("#", ...) ~= self._n_entries then
+        rt.error("In rt.Path.override_parametrization: expected `" .. self._n_entries .. "` parameters, got `" .. select("#", ...) .. "`")
+        return
+    end
+
+    local fraction = 0
+    for i = 1, self._n_entries do
+        local arg = select(i, ...)
+        local entry = self._entries[i]
+        entry.fraction = fraction
+        entry.fraction_length = arg
+
+        fraction = fraction + arg
+        total = total + arg
+    end
+
+    if not total == 1 then
+        rt.error("In rt.Path:override_parametrization: total length of override paramters is `" .. total .. "`, but `1` was expected")
+        return
+    end
+end
