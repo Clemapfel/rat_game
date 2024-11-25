@@ -22,9 +22,9 @@
     </configurations>
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="7fa9ba1b-2cff-4ecc-86fb-59ab2fa76ee1" name="Changes" comment="fixed path at for 3 vertex paths">
+    <list default="true" id="7fa9ba1b-2cff-4ecc-86fb-59ab2fa76ee1" name="Changes" comment="stashing, needs path length normalization">
+      <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/battle/quicksave_indicator.lua" beforeDir="false" afterPath="$PROJECT_DIR$/battle/quicksave_indicator.lua" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/common/path.lua" beforeDir="false" afterPath="$PROJECT_DIR$/common/path.lua" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -637,15 +637,7 @@
       <workItem from="1731603156937" duration="13264000" />
       <workItem from="1731621962991" duration="29140000" />
       <workItem from="1731969751996" duration="4000" />
-      <workItem from="1731969851166" duration="66957000" />
-    </task>
-    <task id="LOCAL-01219" summary="refactor frame">
-      <option name="closed" value="true" />
-      <created>1731022113454</created>
-      <option name="number" value="01219" />
-      <option name="presentableId" value="LOCAL-01219" />
-      <option name="project" value="LOCAL" />
-      <updated>1731022113454</updated>
+      <workItem from="1731969851166" duration="68229000" />
     </task>
     <task id="LOCAL-01220" summary="stashing, sprite animation rework necessary">
       <option name="closed" value="true" />
@@ -1031,7 +1023,15 @@
       <option name="project" value="LOCAL" />
       <updated>1732560165331</updated>
     </task>
-    <option name="localTasksCounter" value="1268" />
+    <task id="LOCAL-01268" summary="stashing, needs path length normalization">
+      <option name="closed" value="true" />
+      <created>1732560745369</created>
+      <option name="number" value="01268" />
+      <option name="presentableId" value="LOCAL-01268" />
+      <option name="project" value="LOCAL" />
+      <updated>1732560745369</updated>
+    </task>
+    <option name="localTasksCounter" value="1269" />
     <servers />
   </component>
   <component name="TypeScriptGeneratedFilesManager">
@@ -1080,7 +1080,6 @@
     </option>
   </component>
   <component name="VcsManagerConfiguration">
-    <MESSAGE value="stashing blur working" />
     <MESSAGE value="added camera" />
     <MESSAGE value="camera shake working" />
     <MESSAGE value="camera interpolation done" />
@@ -1105,7 +1104,8 @@
     <MESSAGE value="stashing malformatted mesh" />
     <MESSAGE value="mesh working" />
     <MESSAGE value="fixed path at for 3 vertex paths" />
-    <option name="LAST_COMMIT_MESSAGE" value="fixed path at for 3 vertex paths" />
+    <MESSAGE value="stashing, needs path length normalization" />
+    <option name="LAST_COMMIT_MESSAGE" value="stashing, needs path length normalization" />
   </component>
   <component name="XDebuggerManager">
     <breakpoint-manager>
