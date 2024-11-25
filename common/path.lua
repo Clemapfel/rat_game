@@ -20,7 +20,7 @@ do
     local _sqrt = math.sqrt -- upvalues for optimization
     local _insert = table.insert
     local _atan2, _sin, _cos = math.atan2, math.sin, math.cos
-    local _floor, _ceil, _round = math.floor, math.ceil, math.round
+    local _ceil = math.ceil
 
     --- @brief
     function rt.Path:_update()
@@ -144,6 +144,11 @@ function rt.Path:list_points()
         table.insert(out, {self._points[i], self._points[i+1]})
     end
     return out
+end
+
+--- @brief
+function rt.Path:get_length()
+    return self._length
 end
 
 --- @brief

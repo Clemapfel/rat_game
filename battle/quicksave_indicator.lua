@@ -15,6 +15,8 @@ bt.QuicksaveIndicator = meta.new_type("BattleQuicksaveIndicator", rt.Widget, fun
         _mesh = nil, -- love.Mesh
         _n_vertices = 128,
         _paths = {}, -- Table<rt.Path>
+        _shortest_path_length = 0,
+        _longest_path_length = 0,
 
         _duration = duration,
         _value = 1,
@@ -113,14 +115,22 @@ do
         self._paths = {}
         self._vertex_data = {}
 
+        self._longest_path_length = NEGATIVE_INFINITY
+        self._shortest_path_length = POSITIVE_INFINITY
+
         for i = 1, n_vertices do
             local rectangle_x, rectangle_y = table.unpack(rectangle_vertices[i])
             local circle_x, circle_y = table.unpack(circle_vertices[i])
-            table.insert(self._paths, rt.Path(
+
+            local path = rt.Path(
                 rectangle_x, rectangle_y,
                 0.5 * w + circle_x, 0.5 * h + circle_y,
                 center_x + circle_x, center_y + circle_y
-            ))
+            )
+            table.insert(self._paths, path)
+
+            self._longest_path_length = math.max(self._longest_path_length, path:get_length())
+            self._shortest_path_length = math.min(self._shortest_path_length, path:get_length())
 
             local hue = i / n_vertices
             table.insert(self._vertex_data, {
@@ -130,13 +140,14 @@ do
             })
         end
 
+        dbg(self._shortest_path_length, self._longest_path_length)
+
         self._mesh = love.graphics.newMesh(_vertex_format, self._vertex_data, rt.MeshDrawMode.TRIANGLE_FAN)
         if self._screenshot ~= nil then self._mesh:setTexture(self._screenshot._native) end
     end
 
     --- @override
     function bt.QuicksaveIndicator:update(delta)
-
         local step = delta * (1 / self._duration)
         local before = self._value
         if self._direction then
@@ -158,7 +169,9 @@ do
 
         if should_update then
             for i = 1, self._n_vertices do
-                local x, y = self._paths[i]:at(self._value)
+                local path = self._paths[i]
+
+                local x, y = path:at(self._value)
                 local data = self._vertex_data[i]
                 data[1] = x
                 data[2] = y
@@ -187,7 +200,6 @@ function bt.QuicksaveIndicator:draw_mesh()
         love.graphics.setColor(1, 1, 1, 1)
         love.graphics.draw(self._mesh)
     end
-
 
     love.graphics.setPointSize(5)
     love.graphics.setColor(0, 0, 0, 1)
