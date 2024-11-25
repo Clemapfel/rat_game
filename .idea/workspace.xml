@@ -22,9 +22,11 @@
     </configurations>
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="7fa9ba1b-2cff-4ecc-86fb-59ab2fa76ee1" name="Changes" comment="stashing malformatted mesh">
+    <list default="true" id="7fa9ba1b-2cff-4ecc-86fb-59ab2fa76ee1" name="Changes" comment="mesh working">
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/battle/battle_scene.lua" beforeDir="false" afterPath="$PROJECT_DIR$/battle/battle_scene.lua" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/battle/quicksave_indicator.lua" beforeDir="false" afterPath="$PROJECT_DIR$/battle/quicksave_indicator.lua" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/common/path.lua" beforeDir="false" afterPath="$PROJECT_DIR$/common/path.lua" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -637,15 +639,7 @@
       <workItem from="1731603156937" duration="13264000" />
       <workItem from="1731621962991" duration="29140000" />
       <workItem from="1731969751996" duration="4000" />
-      <workItem from="1731969851166" duration="63708000" />
-    </task>
-    <task id="LOCAL-01217" summary="stashing canvas leak">
-      <option name="closed" value="true" />
-      <created>1731005874320</created>
-      <option name="number" value="01217" />
-      <option name="presentableId" value="LOCAL-01217" />
-      <option name="project" value="LOCAL" />
-      <updated>1731005874320</updated>
+      <workItem from="1731969851166" duration="66560000" />
     </task>
     <task id="LOCAL-01218" summary="optimized frame">
       <option name="closed" value="true" />
@@ -1031,7 +1025,15 @@
       <option name="project" value="LOCAL" />
       <updated>1732556804563</updated>
     </task>
-    <option name="localTasksCounter" value="1266" />
+    <task id="LOCAL-01266" summary="mesh working">
+      <option name="closed" value="true" />
+      <created>1732557470711</created>
+      <option name="number" value="01266" />
+      <option name="presentableId" value="LOCAL-01266" />
+      <option name="project" value="LOCAL" />
+      <updated>1732557470711</updated>
+    </task>
+    <option name="localTasksCounter" value="1267" />
     <servers />
   </component>
   <component name="TypeScriptGeneratedFilesManager">
@@ -1080,7 +1082,6 @@
     </option>
   </component>
   <component name="VcsManagerConfiguration">
-    <MESSAGE value="stashing before using scale blur" />
     <MESSAGE value="stashing separated kernels" />
     <MESSAGE value="stashing blur working" />
     <MESSAGE value="added camera" />
@@ -1105,7 +1106,8 @@
     <MESSAGE value="sequential radix sort optimized" />
     <MESSAGE value="pair sort working for small n_numbers" />
     <MESSAGE value="stashing malformatted mesh" />
-    <option name="LAST_COMMIT_MESSAGE" value="stashing malformatted mesh" />
+    <MESSAGE value="mesh working" />
+    <option name="LAST_COMMIT_MESSAGE" value="mesh working" />
   </component>
   <component name="XDebuggerManager">
     <breakpoint-manager>

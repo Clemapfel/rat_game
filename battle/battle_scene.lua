@@ -452,6 +452,7 @@ end
 
 --- @override
 function bt.BattleScene:draw()
+    --[[
     self._background:draw()
 
     for sprite in values(self._party_sprites) do
@@ -491,8 +492,9 @@ function bt.BattleScene:draw()
         x:draw()
     end
 
-    self._enemy_sprites[1]:draw_snapshot()
     self._animation_queue:draw()
+    ]]--
+    self._quicksave_indicator:draw_mesh()
 end
 
 --- @brief

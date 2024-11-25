@@ -66,8 +66,8 @@ do
             local offset = math.rad(-1 * (90 + 45))
             for angle = 0, 2 * math.pi, step do
                 table.insert(circle_vertices, {
-                    center_x + math.cos(angle + offset) * (x_radius - thickness),
-                    center_y + math.sin(angle + offset) * (y_radius - thickness)
+                    0 + math.cos(angle + offset) * (x_radius - thickness),
+                    0 + math.sin(angle + offset) * (y_radius - thickness)
                 })
             end
         end
@@ -117,7 +117,9 @@ do
             local rectangle_x, rectangle_y = table.unpack(rectangle_vertices[i])
             local circle_x, circle_y = table.unpack(circle_vertices[i])
             table.insert(self._paths, rt.Path(
-                rectangle_x, rectangle_y, circle_x, circle_y
+                rectangle_x, rectangle_y,
+                0.5 * w + circle_x, 0.5 * h + circle_y,
+                center_x + circle_x, center_y + circle_y
             ))
 
             local hue = i / n_vertices
@@ -172,8 +174,24 @@ function bt.QuicksaveIndicator:draw()
     self._base:draw()
     self._frame_outline:draw()
     self._frame:draw()
+end
 
-    if self._mesh ~= nil then love.graphics.draw(self._mesh) end
+--- @brief
+function bt.QuicksaveIndicator:draw_mesh()
+    for path in values(self._paths) do
+        path:draw()
+    end
+
+    -- needs to be drawn separately, so it can be on top of entire scene
+    if self._mesh ~= nil then
+        love.graphics.setColor(1, 1, 1, 1)
+        love.graphics.draw(self._mesh)
+    end
+
+
+    love.graphics.setPointSize(5)
+    love.graphics.setColor(0, 0, 0, 1)
+    love.graphics.points(self._paths[math.round(self._n_vertices / 2)]:at(self._value))
 end
 
 --- @brief

@@ -20,7 +20,7 @@ do
     local _sqrt = math.sqrt -- upvalues for optimization
     local _insert = table.insert
     local _atan2, _sin, _cos = math.atan2, math.sin, math.cos
-    local _floor, _ceil = math.floor, math.ceil
+    local _floor, _ceil, _round = math.floor, math.ceil, math.round
 
     --- @brief
     function rt.Path:_update()
@@ -44,6 +44,7 @@ do
                 angle = _atan2(y2 - y1, x2 - x1),
                 distance = distance,
                 cumulative_distance = total_length,
+                cumulative_fraction = nil,
                 fraction = nil,
                 fraction_length = nil
             }
@@ -56,6 +57,7 @@ do
             local entry = distances[1]
             entry.fraction = 0
             entry.fraction_length = 1
+            entry.cumulate_fraction = 0
         else
             for i = 1, n_entries - 1 do
                 local current = distances[i]
@@ -88,15 +90,19 @@ do
 
     --- @brief
     function rt.Path:at(t)
+        if t > 1 then t = 1 elseif t < 0 then t = 0 end
         local n_entries = self._n_entries
         local entries = self._entries
 
-        if t > 1 then t = 1 end
         local closest_entry
-        if t <= self._first_distance then
-            closest_entry = entries[1]
-        elseif t >= self._last_distance then
-            closest_entry = entries[n_entries]
+        if n_entries == 1 then
+            closest_entry = self._entries[1]
+        elseif n_entries == 2 then
+            if t <= self._entries[2].fraction then
+                closest_entry = self._entries[1]
+            else
+                closest_entry = self._entries[2]
+            end
         else
             -- binary search for closest fraction
             local low = 1
