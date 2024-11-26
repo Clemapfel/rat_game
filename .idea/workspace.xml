@@ -22,11 +22,10 @@
     </configurations>
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="7fa9ba1b-2cff-4ecc-86fb-59ab2fa76ee1" name="Changes" comment="stashing split paths">
+    <list default="true" id="7fa9ba1b-2cff-4ecc-86fb-59ab2fa76ee1" name="Changes" comment="added path parameterization override">
+      <change afterPath="$PROJECT_DIR$/common/~vertex_shape.lua" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/battle/quicksave_indicator.lua" beforeDir="false" afterPath="$PROJECT_DIR$/battle/quicksave_indicator.lua" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/common/path.lua" beforeDir="false" afterPath="$PROJECT_DIR$/common/path.lua" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/common/timed_animation.lua" beforeDir="false" afterPath="$PROJECT_DIR$/common/timed_animation.lua" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/main_blood.lua" beforeDir="false" afterPath="$PROJECT_DIR$/main_blood.lua" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -155,7 +154,7 @@
       <recent name="C:\Users\cleme\Workspace\rat_game\old" />
     </key>
   </component>
-  <component name="RunManager" selected="Lua Application.main">
+  <component name="RunManager" selected="Lua Application.main_blood">
     <configuration name="Makefile" type="MAKEFILE_TARGET_RUN_CONFIGURATION" factoryName="Makefile" temporary="true">
       <makefile filename="$PROJECT_DIR$/midi/lovemidi/Makefile" target="" workingDirectory="" arguments="">
         <envs />
@@ -639,23 +638,7 @@
       <workItem from="1731603156937" duration="13264000" />
       <workItem from="1731621962991" duration="29140000" />
       <workItem from="1731969751996" duration="4000" />
-      <workItem from="1731969851166" duration="70421000" />
-    </task>
-    <task id="LOCAL-01221" summary="refactored sprite">
-      <option name="closed" value="true" />
-      <created>1731176623763</created>
-      <option name="number" value="01221" />
-      <option name="presentableId" value="LOCAL-01221" />
-      <option name="project" value="LOCAL" />
-      <updated>1731176623764</updated>
-    </task>
-    <task id="LOCAL-01222" summary="sprite animation working">
-      <option name="closed" value="true" />
-      <created>1731180458598</created>
-      <option name="number" value="01222" />
-      <option name="presentableId" value="LOCAL-01222" />
-      <option name="project" value="LOCAL" />
-      <updated>1731180458598</updated>
+      <workItem from="1731969851166" duration="72933000" />
     </task>
     <task id="LOCAL-01223" summary="fixed stencil outline showing">
       <option name="closed" value="true" />
@@ -1033,7 +1016,23 @@
       <option name="project" value="LOCAL" />
       <updated>1732562042807</updated>
     </task>
-    <option name="localTasksCounter" value="1270" />
+    <task id="LOCAL-01270" summary="fixed out of bounds behavior of interpolation functions">
+      <option name="closed" value="true" />
+      <created>1732564122022</created>
+      <option name="number" value="01270" />
+      <option name="presentableId" value="LOCAL-01270" />
+      <option name="project" value="LOCAL" />
+      <updated>1732564122023</updated>
+    </task>
+    <task id="LOCAL-01271" summary="added path parameterization override">
+      <option name="closed" value="true" />
+      <created>1732564132174</created>
+      <option name="number" value="01271" />
+      <option name="presentableId" value="LOCAL-01271" />
+      <option name="project" value="LOCAL" />
+      <updated>1732564132174</updated>
+    </task>
+    <option name="localTasksCounter" value="1272" />
     <servers />
   </component>
   <component name="TypeScriptGeneratedFilesManager">
@@ -1082,8 +1081,6 @@
     </option>
   </component>
   <component name="VcsManagerConfiguration">
-    <MESSAGE value="camera shake working" />
-    <MESSAGE value="camera interpolation done" />
     <MESSAGE value="stashing love physics" />
     <MESSAGE value="fixed deadlock when path length is 0" />
     <MESSAGE value="stashing blur" />
@@ -1107,7 +1104,9 @@
     <MESSAGE value="fixed path at for 3 vertex paths" />
     <MESSAGE value="stashing, needs path length normalization" />
     <MESSAGE value="stashing split paths" />
-    <option name="LAST_COMMIT_MESSAGE" value="stashing split paths" />
+    <MESSAGE value="fixed out of bounds behavior of interpolation functions" />
+    <MESSAGE value="added path parameterization override" />
+    <option name="LAST_COMMIT_MESSAGE" value="added path parameterization override" />
   </component>
   <component name="XDebuggerManager">
     <breakpoint-manager>
