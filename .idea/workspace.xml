@@ -22,9 +22,15 @@
     </configurations>
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="7fa9ba1b-2cff-4ecc-86fb-59ab2fa76ee1" name="Changes" comment="added path parameterization override">
-      <change afterPath="$PROJECT_DIR$/common/~vertex_shape.lua" afterDir="false" />
+    <list default="true" id="7fa9ba1b-2cff-4ecc-86fb-59ab2fa76ee1" name="Changes" comment="naive implementation working">
+      <change afterPath="$PROJECT_DIR$/common/blood_construct_spatial_hash.glsl" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/common/blood_sort.glsl" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/common/blood_render.glsl" beforeDir="false" afterPath="$PROJECT_DIR$/common/~blood_render.glsl" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/common/blood_sort_ref.glsl" beforeDir="false" afterPath="$PROJECT_DIR$/common/~blood_sort_ref.glsl" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/common/blood_sort_temp.glsl" beforeDir="false" afterPath="$PROJECT_DIR$/common/~~blood_sort_temp.glsl" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/common/blood_spatial_hash_step.glsl" beforeDir="false" afterPath="$PROJECT_DIR$/common/~~blood_spatial_hash_step.glsl" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/common/blood_velocity_step.glsl" beforeDir="false" afterPath="$PROJECT_DIR$/common/~~blood_velocity_step.glsl" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/main_blood.lua" beforeDir="false" afterPath="$PROJECT_DIR$/main_blood.lua" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
@@ -638,15 +644,7 @@
       <workItem from="1731603156937" duration="13264000" />
       <workItem from="1731621962991" duration="29140000" />
       <workItem from="1731969751996" duration="4000" />
-      <workItem from="1731969851166" duration="72933000" />
-    </task>
-    <task id="LOCAL-01223" summary="fixed stencil outline showing">
-      <option name="closed" value="true" />
-      <created>1731182378377</created>
-      <option name="number" value="01223" />
-      <option name="presentableId" value="LOCAL-01223" />
-      <option name="project" value="LOCAL" />
-      <updated>1731182378377</updated>
+      <workItem from="1731969851166" duration="77789000" />
     </task>
     <task id="LOCAL-01224" summary="added blood spray playground">
       <option name="closed" value="true" />
@@ -1032,7 +1030,15 @@
       <option name="project" value="LOCAL" />
       <updated>1732564132174</updated>
     </task>
-    <option name="localTasksCounter" value="1272" />
+    <task id="LOCAL-01272" summary="naive implementation working">
+      <option name="closed" value="true" />
+      <created>1732641868616</created>
+      <option name="number" value="01272" />
+      <option name="presentableId" value="LOCAL-01272" />
+      <option name="project" value="LOCAL" />
+      <updated>1732641868616</updated>
+    </task>
+    <option name="localTasksCounter" value="1273" />
     <servers />
   </component>
   <component name="TypeScriptGeneratedFilesManager">
@@ -1081,7 +1087,6 @@
     </option>
   </component>
   <component name="VcsManagerConfiguration">
-    <MESSAGE value="stashing love physics" />
     <MESSAGE value="fixed deadlock when path length is 0" />
     <MESSAGE value="stashing blur" />
     <MESSAGE value="shake working" />
@@ -1106,7 +1111,8 @@
     <MESSAGE value="stashing split paths" />
     <MESSAGE value="fixed out of bounds behavior of interpolation functions" />
     <MESSAGE value="added path parameterization override" />
-    <option name="LAST_COMMIT_MESSAGE" value="added path parameterization override" />
+    <MESSAGE value="naive implementation working" />
+    <option name="LAST_COMMIT_MESSAGE" value="naive implementation working" />
   </component>
   <component name="XDebuggerManager">
     <breakpoint-manager>

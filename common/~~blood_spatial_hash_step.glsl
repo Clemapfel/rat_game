@@ -171,9 +171,6 @@ void computemain()
 
     }
 
-
-
-
     barrier();
 
     // construct cell mapping from sorted buffer sequentially

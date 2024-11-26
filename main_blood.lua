@@ -1,10 +1,12 @@
 require "include"
 
+-- construct unsorted spatial hash
+
 elements_in_buffer = nil
 elements_out_buffer = nil
 
 sort_shader = love.graphics.newComputeShader("common/blood_sort.glsl")
-n_numbers = 300000
+n_numbers = 1000000
 
 love.load = function()
     local buffer_usage = {
@@ -18,8 +20,8 @@ love.load = function()
     local elements_out_buffer_format = sort_shader:getBufferFormat("elements_out_buffer")
     elements_out_buffer = love.graphics.newBuffer(elements_out_buffer_format, n_numbers, buffer_usage)
 
+    local data = {}
     do
-        local data = {}
         for i = 1, n_numbers do
             table.insert(data, { i, rt.random.integer(0, 99999) })
         end
@@ -33,14 +35,12 @@ love.load = function()
 
     local function is_buffer_sorted()
         local byte_offset = 4
-        local data = love.graphics.readbackBuffer(elements_out_buffer);
+        local data = love.graphics.readbackBuffer(elements_in_buffer);
         for i = 1, n_numbers - 4, 2 do
             local a = data:getUInt32((i - 1) * byte_offset)
             local b = data:getUInt32((i - 1 + 1) * byte_offset)
             local c = data:getUInt32((i - 1 + 2) * byte_offset)
             local d = data:getUInt32((i - 1 + 3) * byte_offset)
-            if i < 256 then dbg(a, b) end
-
             if not (b <= d) then println(false); return end
         end
         println(true)
@@ -48,11 +48,19 @@ love.load = function()
 
     is_buffer_sorted()
     local before = love.timer.getTime()
-    love.graphics.dispatchThreadgroups(sort_shader, 1, 1)
+    love.graphics.dispatchThreadgroups(sort_shader, 256, 1)
     println((love.timer.getTime() - before) / (1 / 60))
     is_buffer_sorted()
-end
 
+    local to_sort = {}
+    for i = 1, n_numbers do
+        table.insert(to_sort, love.math.random(0, 999999))
+    end
+
+    local before = love.timer.getTime()
+    table.sort(to_sort)
+    println((love.timer.getTime() - before) / (1 / 60))
+end
 
 --[[
 --[[
