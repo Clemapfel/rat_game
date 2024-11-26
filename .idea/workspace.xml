@@ -22,11 +22,10 @@
     </configurations>
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="7fa9ba1b-2cff-4ecc-86fb-59ab2fa76ee1" name="Changes" comment="stashing before shader rework">
-      <change afterPath="$PROJECT_DIR$/common/blood_initialize_spatial_hash.glsl" afterDir="false" />
+    <list default="true" id="7fa9ba1b-2cff-4ecc-86fb-59ab2fa76ee1" name="Changes" comment="first two steps working">
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/common/blood_construct_spatial_hash.glsl" beforeDir="false" afterPath="$PROJECT_DIR$/common/blood_construct_spatial_hash.glsl" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/common/blood_sort.glsl" beforeDir="false" afterPath="$PROJECT_DIR$/common/blood_sort.glsl" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/common/blood_initialize_spatial_hash.glsl" beforeDir="false" afterPath="$PROJECT_DIR$/common/blood_initialize_spatial_hash.glsl" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/main_blood.lua" beforeDir="false" afterPath="$PROJECT_DIR$/main_blood.lua" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
@@ -640,15 +639,7 @@
       <workItem from="1731603156937" duration="13264000" />
       <workItem from="1731621962991" duration="29140000" />
       <workItem from="1731969751996" duration="4000" />
-      <workItem from="1731969851166" duration="81188000" />
-    </task>
-    <task id="LOCAL-01225" summary="stashing">
-      <option name="closed" value="true" />
-      <created>1731210189158</created>
-      <option name="number" value="01225" />
-      <option name="presentableId" value="LOCAL-01225" />
-      <option name="project" value="LOCAL" />
-      <updated>1731210189158</updated>
+      <workItem from="1731969851166" duration="86570000" />
     </task>
     <task id="LOCAL-01226" summary="implemented radix sort">
       <option name="closed" value="true" />
@@ -1034,7 +1025,15 @@
       <option name="project" value="LOCAL" />
       <updated>1732646801652</updated>
     </task>
-    <option name="localTasksCounter" value="1274" />
+    <task id="LOCAL-01274" summary="first two steps working">
+      <option name="closed" value="true" />
+      <created>1732650062648</created>
+      <option name="number" value="01274" />
+      <option name="presentableId" value="LOCAL-01274" />
+      <option name="project" value="LOCAL" />
+      <updated>1732650062648</updated>
+    </task>
+    <option name="localTasksCounter" value="1275" />
     <servers />
   </component>
   <component name="TypeScriptGeneratedFilesManager">
@@ -1083,7 +1082,6 @@
     </option>
   </component>
   <component name="VcsManagerConfiguration">
-    <MESSAGE value="stashing blur" />
     <MESSAGE value="shake working" />
     <MESSAGE value="camera done" />
     <MESSAGE value="now returns on error" />
@@ -1108,7 +1106,8 @@
     <MESSAGE value="added path parameterization override" />
     <MESSAGE value="naive implementation working" />
     <MESSAGE value="stashing before shader rework" />
-    <option name="LAST_COMMIT_MESSAGE" value="stashing before shader rework" />
+    <MESSAGE value="first two steps working" />
+    <option name="LAST_COMMIT_MESSAGE" value="first two steps working" />
   </component>
   <component name="XDebuggerManager">
     <breakpoint-manager>

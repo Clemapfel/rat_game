@@ -36,6 +36,18 @@ uint cell_xy_to_linear_index(uint cell_x, uint cell_y) {
     return cell_y * n_columns + cell_x;
 }
 
+const uint x_shift = 16u;
+const uint y_shift = 0u;
+uint cell_xy_to_cell_hash(uint cell_x, uint cell_y) {
+    return cell_x << x_shift | cell_y << y_shift;
+}
+
+ivec2 cell_hash_to_cell_xy(uint cell_hash) {
+    uint cell_x = cell_hash >> x_shift;
+    uint cell_y = cell_hash & ((1u << x_shift) - 1u);
+    return ivec2(int(cell_x), int(cell_y));
+}
+
 layout (local_size_x = 1, local_size_y = 1, local_size_z = 1) in;
 void computemain() // n_columns, n_rows invocations
 {
@@ -51,10 +63,6 @@ void computemain() // n_columns, n_rows invocations
 
     n_particles_per_cell[cell_linear_index] = 0;
 
-    // for each particle, write cell hash, to be sorted in the next step
-    const uint x_shift = 16u;
-    const uint y_shift = 0u;
-
     // distribute particles per thread, where number of threads is equal to number of cells
     uint particle_count_per_thread = uint(ceil(float(n_particles) / float(n_cells)));
     uint particle_start_i = cell_linear_index * particle_count_per_thread;
@@ -67,7 +75,7 @@ void computemain() // n_columns, n_rows invocations
 
         // write cell hash for each particle
         particle_occupations[particle_i].id = particle_i;
-        particle_occupations[particle_i].hash = particle_cell_x << x_shift | particle_cell_y << y_shift;
+        particle_occupations[particle_i].hash = cell_xy_to_cell_hash(particle_cell_x, particle_cell_y);
 
         // increment particles per cell counter
         uint cell_i = cell_xy_to_linear_index(particle_cell_x, particle_cell_y);
