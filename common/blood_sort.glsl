@@ -8,16 +8,16 @@ struct ParticleOccupation {
 };
 
 layout(std430) buffer particle_occupation_buffer {
-    ParticleOccupation occupations[];
+    ParticleOccupation particle_occupations[];
 }; // size: n_particles
 
 layout(std430) buffer particle_occupation_swap_buffer {
     ParticleOccupation swap[];
 }; // size: n_particles
 
-uniform uint n_numbers;
+uniform uint n_particles;
 
-#define GET(pass, i) (pass % 2 == 0 ? occupations[i].hash : swap[i].hash)
+#define GET(pass, i) (pass % 2 == 0 ? particle_occupations[i].hash : swap[i].hash)
 
 layout (local_size_x = 1, local_size_y = 1, local_size_z = 1) in;
 void computemain() // 1, 1 invocations
@@ -36,7 +36,7 @@ void computemain() // 1, 1 invocations
         for (uint i = 0; i < n_bins; ++i)
             counts[i] = 0u;
 
-        for (uint i = 0; i < n_numbers; ++i) {
+        for (uint i = 0; i < n_particles; ++i) {
             uint masked = (GET(pass, i) >> shift) & bitmask;
             counts[masked]++;
         }
@@ -48,15 +48,18 @@ void computemain() // 1, 1 invocations
             sum += count;
         }
 
-        for (uint i = 0; i < n_numbers; ++i) {
+        for (uint i = 0; i < n_particles; ++i) {
             uint masked = (GET(pass, i) >> shift) & bitmask;
 
             if (pass % 2 == 0)
-                swap[counts[masked]] = occupations[i];
+                swap[counts[masked]] = particle_occupations[i];
             else
-                occupations[counts[masked]] = swap[i];
+                particle_occupations[counts[masked]] = swap[i];
 
             counts[masked]++;
         }
     }
+
+    for (int i = 1; i < n_particles; ++i)
+        particle_occupations[i] = swap[i];
 }

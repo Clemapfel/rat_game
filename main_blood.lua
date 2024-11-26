@@ -1,65 +1,154 @@
 require "include"
 
--- construct unsorted spatial hash
-
-elements_in_buffer = nil
-elements_out_buffer = nil
-
-sort_shader = love.graphics.newComputeShader("common/blood_sort.glsl")
-n_numbers = 1000000
-
 love.load = function()
-    local buffer_usage = {
-        usage = "dynamic",
+    -- config
+    n_rows = 128
+    n_columns = 128
+    n_particles = 10000
+    particle_radius = 30
+
+    -- globals
+    screen_size = love.graphics.getDimensions()
+
+    particle_buffer = nil -- particle data
+    particle_occupation_buffer = nil  -- buffer of pairs { particle_i, cell_hash }
+    particle_occupation_swap_buffer = nil -- copy, needed for radix sort
+    n_particles_per_cell_buffer = nil -- n particles per cell
+
+    initialize_spatial_hash_shader = love.graphics.newComputeShader("common/blood_initialize_spatial_hash.glsl")
+    sort_shader = love.graphics.newComputeShader("common/blood_sort.glsl")
+
+    -- initialize buffers
+    local particle_data = {}
+    local particle_occupation_data = {}
+    for i = 1, n_particles do
+        local position_x, position_y = love.math.random(0, love.graphics.getWidth()), love.math.random(0, love.graphics.getHeight())
+        table.insert(particle_data, {
+            position_x, position_y, -- current_position
+            position_x, position_y, -- previous_position
+            love.math.random(0, 1) * particle_radius, -- radius
+            love.math.random(0, 2 * math.pi), -- angle
+            love.math.random(0.25, 1), -- color
+        })
+
+        table.insert(particle_occupation_data, {
+            i, 0
+        })
+    end
+
+    local usage = {
+        --usage = "dynamic",
         shaderstorage = true
     }
 
-    local elements_in_buffer_format = sort_shader:getBufferFormat("elements_in_buffer")
-    elements_in_buffer = love.graphics.newBuffer(elements_in_buffer_format, n_numbers, buffer_usage)
+    particle_buffer = love.graphics.newBuffer(
+        initialize_spatial_hash_shader:getBufferFormat("particle_buffer"),
+        n_particles,
+        usage
+    )
+    particle_buffer:setArrayData(particle_data)
 
-    local elements_out_buffer_format = sort_shader:getBufferFormat("elements_out_buffer")
-    elements_out_buffer = love.graphics.newBuffer(elements_out_buffer_format, n_numbers, buffer_usage)
+    particle_occupation_buffer = love.graphics.newBuffer(
+        sort_shader:getBufferFormat("particle_occupation_buffer"),
+        n_particles,
+        usage
+    )
+    particle_occupation_buffer:setArrayData(particle_occupation_data)
 
-    local data = {}
-    do
-        for i = 1, n_numbers do
-            table.insert(data, { i, rt.random.integer(0, 99999) })
-        end
-        elements_in_buffer:setArrayData(data)
-        elements_out_buffer:setArrayData(data)
+    particle_occupation_swap_buffer = love.graphics.newBuffer(
+        sort_shader:getBufferFormat("particle_occupation_swap_buffer"),
+        n_particles,
+        usage
+    )
+    particle_occupation_swap_buffer:setArrayData(particle_occupation_data)
+
+    local n_particles_per_cell_data = {}
+    for i = 1, n_rows * n_columns do
+        table.insert(n_particles_per_cell_data, 0)
     end
+    n_particles_per_cell_buffer = love.graphics.newBuffer(
+        initialize_spatial_hash_shader:getBufferFormat("n_particles_per_cell_buffer"),
+        n_rows * n_columns,
+        usage
+    )
+    n_particles_per_cell_buffer:setArrayData(n_particles_per_cell_data)
 
-    sort_shader:send("elements_in_buffer", elements_in_buffer)
-    sort_shader:send("elements_out_buffer", elements_out_buffer)
-    sort_shader:send("n_numbers", n_numbers)
+    -- bind buffers and uniforms
+    initialize_spatial_hash_shader:send("particle_buffer", particle_buffer)
+    initialize_spatial_hash_shader:send("particle_occupation_buffer", particle_occupation_buffer)
+    initialize_spatial_hash_shader:send("n_particles_per_cell_buffer", n_particles_per_cell_buffer)
+    initialize_spatial_hash_shader:send("n_rows", n_rows)
+    initialize_spatial_hash_shader:send("n_columns", n_columns)
+    initialize_spatial_hash_shader:send("n_particles", n_particles)
+    initialize_spatial_hash_shader:send("screen_size", {love.graphics.getDimensions()})
 
-    local function is_buffer_sorted()
-        local byte_offset = 4
-        local data = love.graphics.readbackBuffer(elements_in_buffer);
-        for i = 1, n_numbers - 4, 2 do
+    sort_shader:send("particle_occupation_buffer", particle_occupation_buffer)
+    sort_shader:send("particle_occupation_swap_buffer", particle_occupation_swap_buffer)
+    sort_shader:send("n_particles", n_particles)
+
+    -- run
+    love.graphics.dispatchThreadgroups(initialize_spatial_hash_shader, n_columns, n_rows)
+    love.graphics.dispatchThreadgroups(sort_shader, 1, 1)
+
+    -- debug
+    local _byte = 4
+    function print_particle_buffer()
+        local data = love.graphics.readbackBuffer(particle_buffer)
+        local step = 8
+        for i = 1, n_particles * step - step, step do
+            local current_position_x  = data:getFloat((i - 1 + 0) * _byte)
+            local current_position_y  = data:getFloat((i - 1 + 1) * _byte)
+            local previous_position_x = data:getFloat((i - 1 + 2) * _byte)
+            local previous_position_y = data:getFloat((i - 1 + 3) * _byte)
+            local radius = data:getFloat((i - 1 + 4) * _byte)
+            local angle  = data:getFloat((i - 1 + 5) * _byte)
+            local color  = data:getFloat((i - 1 + 6) * _byte)
+
+            println(table.concat({
+                i - 1,
+                current_position_x, current_position_y,
+                previous_position_x, previous_position_y,
+                radius,
+                angle,
+                color
+            }, "\t"))
+        end
+    end
+    --print_particle_buffer()
+
+    function print_n_particles_per_cell_buffer()
+        local data = love.graphics.readbackBuffer(n_particles_per_cell_buffer)
+        for i = 1, n_rows * n_columns do
+            local count = data:getUInt32((i - 1) * _byte)
+            if count > 0 then
+                println(i - 1, "\t", count)
+            end
+        end
+    end
+    --print_n_particles_per_cell_buffer()
+
+    function print_particle_occupation_buffer()
+        local data = love.graphics.readbackBuffer(particle_occupation_buffer)
+        local step = 2
+        for i = 1, n_particles * step, step do
+            local id = data:getUInt32((i - 1 + 0) * _byte)
+            local hash = data:getUInt32((i - 1 + 1) * _byte)
+            println(id, "\t", hash)
+        end
+    end
+    print_particle_occupation_buffer()
+
+    --[[
+
+    do
+        local data = love.graphics.readbackBuffer(particle_occupation_buffer);
+        for i = 1, n_numbers - 2, 2 do
             local a = data:getUInt32((i - 1) * byte_offset)
             local b = data:getUInt32((i - 1 + 1) * byte_offset)
-            local c = data:getUInt32((i - 1 + 2) * byte_offset)
-            local d = data:getUInt32((i - 1 + 3) * byte_offset)
-            if not (b <= d) then println(false); return end
+            dbg(i, a, b)
         end
-        println(true)
     end
-
-    is_buffer_sorted()
-    local before = love.timer.getTime()
-    love.graphics.dispatchThreadgroups(sort_shader, 256, 1)
-    println((love.timer.getTime() - before) / (1 / 60))
-    is_buffer_sorted()
-
-    local to_sort = {}
-    for i = 1, n_numbers do
-        table.insert(to_sort, love.math.random(0, 999999))
-    end
-
-    local before = love.timer.getTime()
-    table.sort(to_sort)
-    println((love.timer.getTime() - before) / (1 / 60))
+    ]]--
 end
 
 --[[
