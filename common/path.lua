@@ -156,7 +156,7 @@ function rt.Path:draw()
     love.graphics.line(self._points)
 end
 
---- @brief override arclength parameterization with custom per-edge value
+--- @brief override arclength parameterization with custom per-edge fraction
 --- @param ... Number n-1 values, where n is the number of points, has to sum to 1
 function rt.Path:override_parameterization(...)
     local total = 0

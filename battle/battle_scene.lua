@@ -41,7 +41,7 @@ bt.BattleScene = meta.new_type("BattleScene", rt.Scene, function(state)
 
         _entity_selection_graph = nil, -- rt.SelectionGraph
     })
-    out._background:set_implementation(rt.Background.MESH_RING) -- TODO
+    out._background:set_implementation(rt.Background.CONFUSION) -- TODO
     return out
 end)
 
@@ -845,12 +845,12 @@ end
 function bt.BattleScene:_handle_button_pressed(which)
     if which == rt.InputButton.A then
 
-        self._quicksave_indicator:set_is_expanded(not self._quicksave_indicator:get_is_expanded())
+        self:_push_animation(bt.Animation.QUICKSAVE(self, self._quicksave_indicator))
+
         --[[
         local target = bt.create_entity_proxy(self, self._state:list_enemies()[2])
         local status = bt.create_status_proxy(self, bt.Status("DEBUG_STATUS"))
         local sprite = self:get_sprite(self._state:list_enemies()[2])
-        self:_push_animation(bt.Animation.QUICKSAVE(self, sprite))
         --self._simulation_environment.message(target, "test", status)
         --self._simulation_environment.knock_out(target)
 

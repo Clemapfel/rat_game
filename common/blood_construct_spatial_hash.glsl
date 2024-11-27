@@ -12,7 +12,7 @@ layout(std430) readonly buffer particle_occupation_buffer {
 }; // size: n_particles
 
 struct CellMemoryMapping {
-    uint is_valid;
+    uint n_particles; // 0: invalid
     uint start_index;
     uint end_index;
 };
@@ -64,9 +64,11 @@ void computemain() // 1, 1 invocations
 
         if (current.hash != next.hash) {
             uint current_i = cell_hash_to_cell_linear_index(current.hash);
+            atomicAdd(cell_i_to_memory_mapping[current_i].n_particles, 1);
             atomicExchange(cell_i_to_memory_mapping[current_i].end_index, i);
 
             uint next_i = cell_hash_to_cell_linear_index(next.hash);
+            atomicAdd(cell_i_to_memory_mapping[next_i].n_particles, 1);
             atomicExchange(cell_i_to_memory_mapping[next_i].start_index, i);
         }
     }

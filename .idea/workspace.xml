@@ -22,10 +22,16 @@
     </configurations>
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="7fa9ba1b-2cff-4ecc-86fb-59ab2fa76ee1" name="Changes" comment="first two steps working">
+    <list default="true" id="7fa9ba1b-2cff-4ecc-86fb-59ab2fa76ee1" name="Changes" comment="stashing before removing n particles per cell">
+      <change afterPath="$PROJECT_DIR$/battle/quicksave_indicator_blur.glsl" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/battle/animations/quicksave.lua" beforeDir="false" afterPath="$PROJECT_DIR$/battle/animations/quicksave.lua" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/battle/battle_scene.lua" beforeDir="false" afterPath="$PROJECT_DIR$/battle/battle_scene.lua" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/battle/quicksave_indicator.lua" beforeDir="false" afterPath="$PROJECT_DIR$/battle/quicksave_indicator.lua" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/common/blood_construct_spatial_hash.glsl" beforeDir="false" afterPath="$PROJECT_DIR$/common/blood_construct_spatial_hash.glsl" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/common/blood_initialize_spatial_hash.glsl" beforeDir="false" afterPath="$PROJECT_DIR$/common/blood_initialize_spatial_hash.glsl" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/common/path.lua" beforeDir="false" afterPath="$PROJECT_DIR$/common/path.lua" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/common/timed_animation.lua" beforeDir="false" afterPath="$PROJECT_DIR$/common/timed_animation.lua" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/main_blood.lua" beforeDir="false" afterPath="$PROJECT_DIR$/main_blood.lua" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
@@ -155,7 +161,7 @@
       <recent name="C:\Users\cleme\Workspace\rat_game\old" />
     </key>
   </component>
-  <component name="RunManager" selected="Lua Application.main_blood">
+  <component name="RunManager" selected="Lua Application.main">
     <configuration name="Makefile" type="MAKEFILE_TARGET_RUN_CONFIGURATION" factoryName="Makefile" temporary="true">
       <makefile filename="$PROJECT_DIR$/midi/lovemidi/Makefile" target="" workingDirectory="" arguments="">
         <envs />
@@ -639,15 +645,7 @@
       <workItem from="1731603156937" duration="13264000" />
       <workItem from="1731621962991" duration="29140000" />
       <workItem from="1731969751996" duration="4000" />
-      <workItem from="1731969851166" duration="86570000" />
-    </task>
-    <task id="LOCAL-01226" summary="implemented radix sort">
-      <option name="closed" value="true" />
-      <created>1731264945121</created>
-      <option name="number" value="01226" />
-      <option name="presentableId" value="LOCAL-01226" />
-      <option name="project" value="LOCAL" />
-      <updated>1731264945121</updated>
+      <workItem from="1731969851166" duration="95439000" />
     </task>
     <task id="LOCAL-01227" summary="stashing">
       <option name="closed" value="true" />
@@ -1033,7 +1031,15 @@
       <option name="project" value="LOCAL" />
       <updated>1732650062648</updated>
     </task>
-    <option name="localTasksCounter" value="1275" />
+    <task id="LOCAL-01275" summary="stashing before removing n particles per cell">
+      <option name="closed" value="true" />
+      <created>1732655461490</created>
+      <option name="number" value="01275" />
+      <option name="presentableId" value="LOCAL-01275" />
+      <option name="project" value="LOCAL" />
+      <updated>1732655461490</updated>
+    </task>
+    <option name="localTasksCounter" value="1276" />
     <servers />
   </component>
   <component name="TypeScriptGeneratedFilesManager">
@@ -1082,7 +1088,6 @@
     </option>
   </component>
   <component name="VcsManagerConfiguration">
-    <MESSAGE value="shake working" />
     <MESSAGE value="camera done" />
     <MESSAGE value="now returns on error" />
     <MESSAGE value="added portrait rework" />
@@ -1107,7 +1112,8 @@
     <MESSAGE value="naive implementation working" />
     <MESSAGE value="stashing before shader rework" />
     <MESSAGE value="first two steps working" />
-    <option name="LAST_COMMIT_MESSAGE" value="first two steps working" />
+    <MESSAGE value="stashing before removing n particles per cell" />
+    <option name="LAST_COMMIT_MESSAGE" value="stashing before removing n particles per cell" />
   </component>
   <component name="XDebuggerManager">
     <breakpoint-manager>

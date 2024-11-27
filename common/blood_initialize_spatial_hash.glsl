@@ -23,10 +23,6 @@ layout(std430) writeonly buffer particle_occupation_buffer {
     ParticleOccupation particle_occupations[];
 }; // size: n_particles
 
-layout(std430) writeonly buffer n_particles_per_cell_buffer {
-    uint n_particles_per_cell[];
-}; // size: n_rows * n_columns
-
 uniform uint n_rows;
 uniform uint n_columns;
 uniform uint n_particles;
@@ -61,8 +57,6 @@ void computemain() // n_columns, n_rows invocations
         uint(gl_GlobalInvocationID.y)
     );
 
-    n_particles_per_cell[cell_linear_index] = 0;
-
     // distribute particles per thread, where number of threads is equal to number of cells
     uint particle_count_per_thread = uint(ceil(float(n_particles) / float(n_cells)));
     uint particle_start_i = cell_linear_index * particle_count_per_thread;
@@ -76,9 +70,5 @@ void computemain() // n_columns, n_rows invocations
         // write cell hash for each particle
         particle_occupations[particle_i].id = particle_i;
         particle_occupations[particle_i].hash = cell_xy_to_cell_hash(particle_cell_x, particle_cell_y);
-
-        // increment particles per cell counter
-        uint cell_i = cell_xy_to_linear_index(particle_cell_x, particle_cell_y);
-        atomicAdd(n_particles_per_cell[cell_i], 1u);
     }
 }

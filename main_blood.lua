@@ -4,7 +4,7 @@ love.load = function()
     -- config
     n_rows = 128
     n_columns = 128
-    n_particles = 10000
+    n_particles = 100000
     particle_radius = 30
 
     -- globals
@@ -13,7 +13,6 @@ love.load = function()
     particle_buffer = nil -- particle data
     particle_occupation_buffer = nil  -- buffer of pairs { particle_i, cell_hash }
     particle_occupation_swap_buffer = nil -- copy, needed for radix sort
-    n_particles_per_cell_buffer = nil -- n particles per cell
     cell_i_to_memory_mapping_buffer = nil -- cell linear index to start / end range of particle occupations
 
     initialize_spatial_hash_shader = love.graphics.newComputeShader("common/blood_initialize_spatial_hash.glsl")
@@ -64,20 +63,9 @@ love.load = function()
     )
     particle_occupation_swap_buffer:setArrayData(particle_occupation_data)
 
-    local n_particles_per_cell_data = {}
-    for i = 1, n_rows * n_columns do
-        table.insert(n_particles_per_cell_data, 0)
-    end
-    n_particles_per_cell_buffer = love.graphics.newBuffer(
-        initialize_spatial_hash_shader:getBufferFormat("n_particles_per_cell_buffer"),
-        n_rows * n_columns,
-        usage
-    )
-    n_particles_per_cell_buffer:setArrayData(n_particles_per_cell_data)
-
     local cell_i_to_memory_mapping_data = {}
     for i = 1, n_rows * n_columns do
-        table.insert(cell_i_to_memory_mapping_data, {0, 0})
+        table.insert(cell_i_to_memory_mapping_data, {0, 0, 0})
     end
     cell_i_to_memory_mapping_buffer = love.graphics.newBuffer(
         construct_spatial_hash_shader:getBufferFormat("cell_i_to_memory_mapping_buffer"),
@@ -89,7 +77,6 @@ love.load = function()
     -- bind buffers and uniforms
     initialize_spatial_hash_shader:send("particle_buffer", particle_buffer)
     initialize_spatial_hash_shader:send("particle_occupation_buffer", particle_occupation_buffer)
-    initialize_spatial_hash_shader:send("n_particles_per_cell_buffer", n_particles_per_cell_buffer)
     initialize_spatial_hash_shader:send("n_rows", n_rows)
     initialize_spatial_hash_shader:send("n_columns", n_columns)
     initialize_spatial_hash_shader:send("n_particles", n_particles)
@@ -143,17 +130,6 @@ love.load = function()
     end
     --print_particle_buffer()
 
-    function print_n_particles_per_cell_buffer()
-        local data = love.graphics.readbackBuffer(n_particles_per_cell_buffer)
-        for i = 1, n_rows * n_columns do
-            local count = data:getUInt32((i - 1) * _byte)
-            if count > 0 then
-                println(i - 1, "\t", count)
-            end
-        end
-    end
-    --print_n_particles_per_cell_buffer()
-
     function print_particle_occupation_buffer()
         local data = love.graphics.readbackBuffer(particle_occupation_buffer)
         local step = 2
@@ -167,11 +143,16 @@ love.load = function()
 
     function print_cell_i_to_memory_mapping_buffer()
         local data = love.graphics.readbackBuffer(cell_i_to_memory_mapping_buffer)
-        local step = 2
-        for i = 1, (n_rows * n_columns) * step, step do
-            local start_i = data:getUInt32((i - 1) * _byte)
-            local end_i = data:getUInt32((i - 1 + 1) * _byte)
-            println(start_i, "\t", end_i)
+        local step = 3
+        for i = 1, n_rows * n_columns * step, step do
+            local n_particles = data:getUInt32((i - 1) * _byte)
+            local start_i = data:getUInt32((i - 1 + 1) * _byte)
+            local end_i = data:getUInt32((i - 1 + 2) * _byte)
+            if n_particles > 0 then
+                println(table.concat({
+                    i, n_particles, start_i, end_i
+                }, "\t"))
+            end
         end
     end
     print_cell_i_to_memory_mapping_buffer()

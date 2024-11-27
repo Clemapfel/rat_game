@@ -1,5 +1,5 @@
 rt.settings.battle.quicksave_indicator = {
-    duration = 2, -- seconds
+    duration = 3, -- seconds
 }
 
 --- @class bt.QuicksaveIndicator
@@ -9,18 +9,22 @@ bt.QuicksaveIndicator = meta.new_type("BattleQuicksaveIndicator", rt.Widget, fun
         _frame = rt.Circle(0, 0, 1, 1),
         _frame_outline = rt.Circle(0, 0, 1, 1),
         _base = rt.Circle(0, 0, 1, 1),
+        _frame_opacity = 0,
+        _frame_snapshot = nil, -- rt.RenderTexture
         _thickness = rt.settings.frame.thickness,
 
         _screenshot = nil, -- rt.RenderTexture
         _mesh = nil, -- love.Mesh
         _n_vertices = 128,
         _paths = {}, -- Table<rt.Path>
-        _shortest_path_length = 0,
-        _longest_path_length = 0,
+        _texture_paths = {}, -- Table<rt.Path>
 
         _duration = duration,
         _value = 1,
-        _direction = true -- true: rectangle -> circle, false: circle -> rectangle
+        _direction = true, -- true: rectangle -> circle, false: circle -> rectangle
+
+        _blur_shader = rt.Shader("battle/quicksave_indicator_blur.glsl"),
+        _screenshot = nil
     })
 end)
 
@@ -45,8 +49,7 @@ end
 do
     local _vertex_format = {
         {name = "VertexPosition", format = "floatvec2"},
-        {name = "VertexTexCoord", format = "floatvec2"},
-        {name = "VertexColor", format = "floatvec4"},
+        {name = "VertexTexCoord", format = "floatvec2"}
     }
 
     --- @override
@@ -56,20 +59,40 @@ do
         local m = rt.settings.margin_unit
 
         for shape in range(self._frame, self._frame_outline, self._base) do
-            shape:resize(center_x, center_y, x_radius, y_radius)
+            shape:resize(0.5 * width, 0.5 * height, x_radius, y_radius)
         end
+
+        self._frame_snapshot = rt.RenderTexture(width, height, 4)
+        self._frame_x = x
+        self._frame_y = y
+        love.graphics.push()
+        love.graphics.origin()
+        love.graphics.clear(true, false, false)
+        self._frame_snapshot:bind()
+        self._base:draw()
+        self._frame_outline:draw()
+        self._frame:draw()
+        self._frame_snapshot:unbind()
+        love.graphics.pop()
 
         local n_vertices = self._n_vertices
 
         local circle_vertices = {}
+        local circle_texture_coordinates = {}
         local thickness = self._thickness + 2
         do -- generate circle
             local step = 2 * math.pi / n_vertices
             local offset = math.rad(-1 * (90 + 45))
+            local screen_w, screen_h = love.graphics.getDimensions()
             for angle = 0, 2 * math.pi, step do
                 table.insert(circle_vertices, {
                     0 + math.cos(angle + offset) * (x_radius - thickness),
                     0 + math.sin(angle + offset) * (y_radius - thickness)
+                })
+
+                table.insert(circle_texture_coordinates, {
+                    0.5 + math.cos(angle + offset) * x_radius / width * (screen_h / screen_w),
+                    0.5 + math.sin(angle + offset) * y_radius / height
                 })
             end
         end
@@ -128,22 +151,26 @@ do
                 center_x + circle_x, center_y + circle_y
             )
             path:override_parameterization(0.5, 0.5)
-
             table.insert(self._paths, path)
+
+            local texture_path = rt.Path(
+                rectangle_x / w, rectangle_y / h,
+                table.unpack(circle_texture_coordinates[i])
+            )
+            table.insert(self._texture_paths, texture_path)
 
             self._longest_path_length = math.max(self._longest_path_length, path:get_length())
             self._shortest_path_length = math.min(self._shortest_path_length, path:get_length())
 
             local hue = i / n_vertices
             table.insert(self._vertex_data, {
-                circle_x, circle_y,
-                rectangle_x / w, rectangle_y / h,
-                rt.color_unpack(rt.hsva_to_rgba(rt.HSVA(hue, 1, 1, 1)))
+                center_x + circle_x, center_y + circle_y,
+                rectangle_x / w, rectangle_y / h
             })
         end
 
         self._mesh = love.graphics.newMesh(_vertex_format, self._vertex_data, rt.MeshDrawMode.TRIANGLE_FAN)
-        if self._screenshot ~= nil then self._mesh:setTexture(self._screenshot._native) end
+        if self._render_texture_a ~= nil then self._mesh:setTexture(self._render_texture_a._native) end
     end
 
     --- @override
@@ -162,6 +189,8 @@ do
             end
         end
         self._value = clamp(self._value, 0, 1)
+        local value = rt.InterpolationFunctions.SIGMOID(self._value)
+        self._frame_opacity = rt.InterpolationFunctions.SINUSOID_EASE_IN(2 * self._value)
 
         local should_update =
             (self._direction == true and self._value < 1) or
@@ -169,12 +198,13 @@ do
 
         if should_update then
             for i = 1, self._n_vertices do
-                local path = self._paths[i]
-
-                local x, y = path:at(self._value)
+                local x, y = self._paths[i]:at(value)
+                local tx, ty = self._texture_paths[i]:at(value)
                 local data = self._vertex_data[i]
                 data[1] = x
                 data[2] = y
+                data[3] = tx
+                data[4] = ty
             end
 
             self._mesh:setVertices(self._vertex_data)
@@ -184,36 +214,42 @@ end
 
 --- @override
 function bt.QuicksaveIndicator:draw()
-    self._base:draw()
-    self._frame_outline:draw()
-    self._frame:draw()
+    if self._is_visible == true and self._mesh ~= nil and self._screenshot ~= nil then
+        love.graphics.setColor(1, 1, 1, self._frame_opacity)
+        love.graphics.draw(self._frame_snapshot._native, self._frame_x, self._frame_y)
+    end
 end
 
 --- @brief
 function bt.QuicksaveIndicator:draw_mesh()
-    for path in values(self._paths) do
-        path:draw()
-    end
-
     -- needs to be drawn separately, so it can be on top of entire scene
-    if self._mesh ~= nil then
+    if self._is_visible == true and self._mesh ~= nil and self._screenshot ~= nil then
+        self._blur_shader:bind()
+        self._blur_shader:send("radius", self._value * 20)
         love.graphics.setColor(1, 1, 1, 1)
         love.graphics.draw(self._mesh)
+        self._blur_shader:unbind()
     end
-
-    love.graphics.setPointSize(5)
-    love.graphics.setColor(0, 0, 0, 1)
-    love.graphics.points(self._paths[math.round(self._n_vertices / 2)]:at(self._value))
 end
 
 --- @brief
 function bt.QuicksaveIndicator:set_is_expanded(b)
-    self._direction = b
+    self._direction = not b
 end
 
 --- @brief
 function bt.QuicksaveIndicator:get_is_expanded()
-    return self._direction
+    return not self._direction
+end
+
+--- @brief
+function bt.QuicksaveIndicator:skip()
+    if self._direction == true then
+        self._value = 1
+    else
+        self._value = 0
+    end
+    self:update(0)
 end
 
 --- @brief
@@ -222,7 +258,9 @@ function bt.QuicksaveIndicator:set_screenshot(texture)
         self._mesh:setTexture(nil)
     else
         meta.assert_isa(texture, rt.RenderTexture)
-        self._mesh:setTexture(texture._native)
+        local next_w, next_h = texture:get_size()
+        self._screenshot = texture
+        self._mesh:setTexture(self._screenshot._native)
     end
 end
 

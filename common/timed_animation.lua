@@ -64,11 +64,11 @@ rt.InterpolationFunctions = meta.new_enum("InterpolationFunction", {
         return (x - 1) * (x - 1)
     end,
 
-    SIGMOID = function(x)
-        -- \frac{1}{1+e^{-a\left(x-0.5\right)}}
+    SIGMOID = function(x, k)
+        -- \frac{\tanh\left(k\left(x-0.5\right)\right)}{2}+0.5
         if x >= 1 then return 1 elseif x <= 0 then return 0 end
-        local slope = 9
-        return 1 / (1 + math.exp(-1 * slope * (x - 0.5)))
+        if k == nil then k = 9 end
+        return math.tanh(k * (x - 0.5)) / 2 + 0.5
     end,
 
     SIGMOID_HOLD = function(x)
