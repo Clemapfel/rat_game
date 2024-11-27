@@ -845,7 +845,13 @@ end
 function bt.BattleScene:_handle_button_pressed(which)
     if which == rt.InputButton.A then
 
-        self:_push_animation(bt.Animation.QUICKSAVE(self, self._quicksave_indicator))
+        local screenshot = rt.RenderTexture(love.graphics.getDimensions())
+        screenshot:bind()
+        self:draw()
+        screenshot:unbind()
+        self._quicksave_indicator:set_screenshot(screenshot)
+
+        self._quicksave_indicator:set_is_expanded(not self._quicksave_indicator:get_is_expanded())
 
         --[[
         local target = bt.create_entity_proxy(self, self._state:list_enemies()[2])
