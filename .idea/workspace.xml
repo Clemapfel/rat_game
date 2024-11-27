@@ -22,9 +22,12 @@
     </configurations>
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="7fa9ba1b-2cff-4ecc-86fb-59ab2fa76ee1" name="Changes" comment="refactored quicksave indicator">
-      <change beforePath="$PROJECT_DIR$/backgrounds/background.lua" beforeDir="false" afterPath="$PROJECT_DIR$/backgrounds/background.lua" afterDir="false" />
+    <list default="true" id="7fa9ba1b-2cff-4ecc-86fb-59ab2fa76ee1" name="Changes" comment="added elapsed override">
+      <change afterPath="$PROJECT_DIR$/common/blood_draw.glsl" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/battle/battle_scene.lua" beforeDir="false" afterPath="$PROJECT_DIR$/battle/battle_scene.lua" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/common/blood_sort.glsl" beforeDir="false" afterPath="$PROJECT_DIR$/common/blood_sort.glsl" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/main_blood.lua" beforeDir="false" afterPath="$PROJECT_DIR$/main_blood.lua" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -153,7 +156,7 @@
       <recent name="C:\Users\cleme\Workspace\rat_game\old" />
     </key>
   </component>
-  <component name="RunManager" selected="Lua Application.main">
+  <component name="RunManager" selected="Lua Application.main_blood">
     <configuration name="Makefile" type="MAKEFILE_TARGET_RUN_CONFIGURATION" factoryName="Makefile" temporary="true">
       <makefile filename="$PROJECT_DIR$/midi/lovemidi/Makefile" target="" workingDirectory="" arguments="">
         <envs />
@@ -637,15 +640,7 @@
       <workItem from="1731603156937" duration="13264000" />
       <workItem from="1731621962991" duration="29140000" />
       <workItem from="1731969751996" duration="4000" />
-      <workItem from="1731969851166" duration="97186000" />
-    </task>
-    <task id="LOCAL-01229" summary="refactored translation">
-      <option name="closed" value="true" />
-      <created>1731445017872</created>
-      <option name="number" value="01229" />
-      <option name="presentableId" value="LOCAL-01229" />
-      <option name="project" value="LOCAL" />
-      <updated>1731445017872</updated>
+      <workItem from="1731969851166" duration="98877000" />
     </task>
     <task id="LOCAL-01230" summary="refactored translation for battle messages">
       <option name="closed" value="true" />
@@ -1031,7 +1026,15 @@
       <option name="project" value="LOCAL" />
       <updated>1732734749378</updated>
     </task>
-    <option name="localTasksCounter" value="1278" />
+    <task id="LOCAL-01278" summary="added elapsed override">
+      <option name="closed" value="true" />
+      <created>1732734985538</created>
+      <option name="number" value="01278" />
+      <option name="presentableId" value="LOCAL-01278" />
+      <option name="project" value="LOCAL" />
+      <updated>1732734985538</updated>
+    </task>
+    <option name="localTasksCounter" value="1279" />
     <servers />
   </component>
   <component name="TypeScriptGeneratedFilesManager">
@@ -1080,7 +1083,6 @@
     </option>
   </component>
   <component name="VcsManagerConfiguration">
-    <MESSAGE value="added portrait rework" />
     <MESSAGE value="refactor iterators" />
     <MESSAGE value="added angle" />
     <MESSAGE value="stashing before refactoring cell occupation" />
@@ -1105,7 +1107,8 @@
     <MESSAGE value="stashing before removing n particles per cell" />
     <MESSAGE value="quicksave indicator done" />
     <MESSAGE value="refactored quicksave indicator" />
-    <option name="LAST_COMMIT_MESSAGE" value="refactored quicksave indicator" />
+    <MESSAGE value="added elapsed override" />
+    <option name="LAST_COMMIT_MESSAGE" value="added elapsed override" />
   </component>
   <component name="XDebuggerManager">
     <breakpoint-manager>

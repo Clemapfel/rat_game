@@ -1,11 +1,17 @@
 require "include"
 
 love.load = function()
+    love.window.setMode(800, 600, {
+        msaa = 8,
+        vsync = 0,
+    })
+
     -- config
     n_rows = 128
     n_columns = 128
-    n_particles = 100000
+    n_particles = 10000
     particle_radius = 30
+    particle_n_outer_vertices = 3
 
     -- globals
     screen_size = love.graphics.getDimensions()
@@ -18,6 +24,31 @@ love.load = function()
     initialize_spatial_hash_shader = love.graphics.newComputeShader("common/blood_initialize_spatial_hash.glsl")
     sort_shader = love.graphics.newComputeShader("common/blood_sort.glsl")
     construct_spatial_hash_shader = love.graphics.newComputeShader("common/blood_construct_spatial_hash.glsl")
+    draw_shader = love.graphics.newShader("common/blood_draw.glsl")
+
+    mesh = nil -- love.Mesh
+
+    do -- init circle mesh
+        local mesh_format = {
+            {name = "VertexPosition", format = "floatvec2"},
+            {name = "VertexColor", format = "floatvec4"},
+        }
+
+        local center_x, center_y = 0, 0
+
+        local vertices = {}
+        local step = 2 * math.pi / particle_n_outer_vertices
+        local offset = 2 * math.pi * 0.25
+        for angle = 0, 2 * math.pi, step do
+            table.insert(vertices, {
+                center_x + math.cos(angle - offset) * particle_radius,
+                center_y + math.sin(angle - offset) * particle_radius,
+                1, 1, 1, 1
+            })
+        end
+
+        mesh = love.graphics.newMesh(mesh_format, vertices, "fan", "static")
+    end
 
     -- initialize buffers
     local particle_data = {}
@@ -96,13 +127,14 @@ love.load = function()
     construct_spatial_hash_shader:send("n_rows", n_rows)
     construct_spatial_hash_shader:send("n_threads_x", construct_shader_n_thread_x)
     construct_spatial_hash_shader:send("n_threads_y", construct_shader_n_thread_y)
+    
+    draw_shader:send("particle_buffer", particle_buffer)
 
-    -- run
-    local start = love.timer.getTime()
+    local before = love.timer.getTime()
     love.graphics.dispatchThreadgroups(initialize_spatial_hash_shader, n_columns, n_rows)
-    love.graphics.dispatchThreadgroups(sort_shader, 1, 1)
+    love.graphics.dispatchThreadgroups(sort_shader, 256, 1)
     love.graphics.dispatchThreadgroups(construct_spatial_hash_shader, construct_shader_n_thread_x, construct_shader_n_thread_y)
-    local duration = (love.timer.getTime() - start) / (1 / 60)
+    println((love.timer.getTime() - before) / (1 / 60))
 
     -- debug
     local _byte = 4
@@ -156,8 +188,36 @@ love.load = function()
         end
     end
     print_cell_i_to_memory_mapping_buffer()
+    exit(0)
+end
 
-    println("duration: ", duration)
+love.update = function(delta)
+    local before = love.timer.getTime()
+    love.graphics.dispatchThreadgroups(initialize_spatial_hash_shader, n_columns, n_rows)
+    love.graphics.dispatchThreadgroups(sort_shader, 1, 1)
+    love.graphics.dispatchThreadgroups(construct_spatial_hash_shader, construct_shader_n_thread_x, construct_shader_n_thread_y)
+    println((love.timer.getTime() - before) / (1 / 60))
+end
+
+love.draw = function()
+    love.graphics.clear(0, 0, 0, 1)
+
+    local scale = 2
+    local w, h = love.graphics.getDimensions()
+    love.graphics.translate(0.5 * w, 0.5 * h)
+    love.graphics.scale(1 / scale, 1 / scale)
+    love.graphics.translate(-0.5 * w, -0.5 * h)
+
+    love.graphics.setShader(draw_shader)
+    love.graphics.setColor(1, 1, 1, 1)
+    love.graphics.drawInstanced(mesh, n_particles)
+    love.graphics.setShader()
+
+    love.graphics.origin()
+    local margin = 5
+    local label = love.timer.getFPS() .. " | " .. n_particles .. " particles"
+    love.graphics.setColor(1, 1, 1, 0.75)
+    love.graphics.print(label, margin, math.floor(0.5 * margin))
 end
 
 --[[
@@ -233,7 +293,7 @@ local particle_color = rt.Palette.RED
 -- globals
 
 local mesh -- love.Mesh
-local render_shader = love.graphics.newShader("common/blood_render.glsl")
+local draw_shader = love.graphics.newShader("common/blood_render.glsl")
 local velocity_step_shader = love.graphics.newComputeShader("common/blood_velocity_step.glsl")
 local spatial_hash_shader = love.graphics.newComputeShader("common/blood_spatial_hash_step.glsl")
 
@@ -365,9 +425,9 @@ love.draw = function()
     love.graphics.translate(-0.5 * w, -0.5 * h)
 
     love.graphics.setLineStyle("smooth")
-    render_shader:send("particle_buffer", particle_buffer)
-    render_shader:send("radius", particle_radius)
-    love.graphics.setShader(render_shader)
+    draw_shader:send("particle_buffer", particle_buffer)
+    draw_shader:send("radius", particle_radius)
+    love.graphics.setShader(draw_shader)
     love.graphics.setColor(color_r, color_g, color_b, 1)
     love.graphics.drawInstanced(mesh, n_particles)
     love.graphics.setShader()

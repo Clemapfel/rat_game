@@ -454,6 +454,7 @@ end
 function bt.BattleScene:draw()
     self._background:draw()
 
+    --[[
     for sprite in values(self._party_sprites) do
         sprite:draw()
     end
@@ -492,6 +493,9 @@ function bt.BattleScene:draw()
     end
 
     self._animation_queue:draw()
+    ]]--
+    self._quicksave_indicator:draw()
+    self._enemy_sprites[1]:draw_snapshot()
     self._quicksave_indicator:draw_mesh()
 end
 
@@ -846,19 +850,21 @@ local last = 0
 function bt.BattleScene:_handle_button_pressed(which)
     if which == rt.InputButton.A then
 
-        local screenshot = rt.RenderTexture(love.graphics.getDimensions())
-        screenshot:bind()
-        self:draw()
-        screenshot:unbind()
-        self._quicksave_indicator:set_screenshot(screenshot)
-
         local current = self._quicksave_indicator:get_is_expanded()
+        if current == true then
+            local screenshot = rt.RenderTexture(love.graphics.getDimensions())
+            screenshot:bind()
+            self:draw()
+            screenshot:unbind()
+            self._quicksave_indicator:set_screenshot(screenshot)
+        end
+
         self._quicksave_indicator:signal_disconnect_all("done")
         self._quicksave_indicator:signal_connect("done", function()
             if current then
-                last = self._background:get_elapsed()
-            else
                 self._background:set_elapsed(last)
+            else
+                last = self._background:get_elapsed()
             end
         end)
 
