@@ -35,6 +35,20 @@ function rt.Background:set_implementation(implementation_type)
 end
 
 --- @brief
+function rt.Background:set_elapsed(elapsed)
+    if self._implementation ~= nil then self._implementation._elapsed = elapsed end
+end
+
+--- @brief
+function rt.Background:get_elapsed()
+    if self._implementation ~= nil then
+        return self._implementation._elapsed
+    else
+        return 0
+    end
+end
+
+--- @brief
 function rt.Background:_update_render_texture()
     if self._implementation == nil then return end
 

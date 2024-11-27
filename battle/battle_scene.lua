@@ -841,6 +841,7 @@ function bt.BattleScene:skip()
     self._animation_queue:skip()
 end
 
+local last = 0
 --- @brief [internal]
 function bt.BattleScene:_handle_button_pressed(which)
     if which == rt.InputButton.A then
@@ -851,7 +852,17 @@ function bt.BattleScene:_handle_button_pressed(which)
         screenshot:unbind()
         self._quicksave_indicator:set_screenshot(screenshot)
 
-        self._quicksave_indicator:set_is_expanded(not self._quicksave_indicator:get_is_expanded())
+        local current = self._quicksave_indicator:get_is_expanded()
+        self._quicksave_indicator:signal_disconnect_all("done")
+        self._quicksave_indicator:signal_connect("done", function()
+            if current then
+                last = self._background:get_elapsed()
+            else
+                self._background:set_elapsed(last)
+            end
+        end)
+
+        self._quicksave_indicator:set_is_expanded(not current)
 
         --[[
         local target = bt.create_entity_proxy(self, self._state:list_enemies()[2])
