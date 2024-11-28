@@ -22,10 +22,8 @@
     </configurations>
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="7fa9ba1b-2cff-4ecc-86fb-59ab2fa76ee1" name="Changes" comment="mwe working">
+    <list default="true" id="7fa9ba1b-2cff-4ecc-86fb-59ab2fa76ee1" name="Changes" comment="stashing">
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/common/blood_sort.glsl" beforeDir="false" afterPath="$PROJECT_DIR$/common/blood_sort.glsl" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/main_blood.lua" beforeDir="false" afterPath="$PROJECT_DIR$/main_blood.lua" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -640,15 +638,7 @@
       <workItem from="1731969751996" duration="4000" />
       <workItem from="1731969851166" duration="104473000" />
       <workItem from="1732750395425" duration="169000" />
-      <workItem from="1732750573945" duration="2604000" />
-    </task>
-    <task id="LOCAL-01233" summary="stashing">
-      <option name="closed" value="true" />
-      <created>1731524692675</created>
-      <option name="number" value="01233" />
-      <option name="presentableId" value="LOCAL-01233" />
-      <option name="project" value="LOCAL" />
-      <updated>1731524692675</updated>
+      <workItem from="1732750573945" duration="2671000" />
     </task>
     <task id="LOCAL-01234" summary="stashing shader blur">
       <option name="closed" value="true" />
@@ -1034,7 +1024,15 @@
       <option name="project" value="LOCAL" />
       <updated>1732748969796</updated>
     </task>
-    <option name="localTasksCounter" value="1282" />
+    <task id="LOCAL-01282" summary="stashing">
+      <option name="closed" value="true" />
+      <created>1732753186870</created>
+      <option name="number" value="01282" />
+      <option name="presentableId" value="LOCAL-01282" />
+      <option name="project" value="LOCAL" />
+      <updated>1732753186870</updated>
+    </task>
+    <option name="localTasksCounter" value="1283" />
     <servers />
   </component>
   <component name="TypeScriptGeneratedFilesManager">
@@ -1085,7 +1083,6 @@
   <component name="VcsManagerConfiguration">
     <MESSAGE value="at least works with 1 thread now" />
     <MESSAGE value="stashing mesh" />
-    <MESSAGE value="stashing" />
     <MESSAGE value="working?" />
     <MESSAGE value="stashing before doing single threaded" />
     <MESSAGE value="sequential radix sort" />
@@ -1108,7 +1105,8 @@
     <MESSAGE value="stashing before paralellizing sort step" />
     <MESSAGE value="stashing before parallelizing" />
     <MESSAGE value="mwe working" />
-    <option name="LAST_COMMIT_MESSAGE" value="mwe working" />
+    <MESSAGE value="stashing" />
+    <option name="LAST_COMMIT_MESSAGE" value="stashing" />
   </component>
   <component name="XDebuggerManager">
     <breakpoint-manager>

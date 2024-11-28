@@ -94,4 +94,5 @@ function rt.Background.MESH_RING:draw()
     --love.graphics.draw(self._mesh)
     love.graphics.setLineJoin(rt.LineJoin.BEVEL)
     love.graphics.line(self._vertices)
+
 end
