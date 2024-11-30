@@ -22,15 +22,8 @@
     </configurations>
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="7fa9ba1b-2cff-4ecc-86fb-59ab2fa76ee1" name="Changes" comment="refactored vertex shape">
-      <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
+    <list default="true" id="7fa9ba1b-2cff-4ecc-86fb-59ab2fa76ee1" name="Changes" comment="stashing before moving away from mesh">
       <change beforePath="$PROJECT_DIR$/backgrounds/mesh_ring.lua" beforeDir="false" afterPath="$PROJECT_DIR$/backgrounds/mesh_ring.lua" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/battle/battle_scene.lua" beforeDir="false" afterPath="$PROJECT_DIR$/battle/battle_scene.lua" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/common/cloth.lua" beforeDir="false" afterPath="$PROJECT_DIR$/common/cloth.lua" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/common/common.lua" beforeDir="false" afterPath="$PROJECT_DIR$/common/common.lua" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/common/vertex_shape.lua" beforeDir="false" afterPath="$PROJECT_DIR$/common/vertex_shape.lua" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/common/~cloth.lua" beforeDir="false" afterPath="$PROJECT_DIR$/common/~cloth.lua" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/common/~vertex_shape.lua" beforeDir="false" afterPath="$PROJECT_DIR$/common/~vertex_shape.lua" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -646,15 +639,7 @@
       <workItem from="1731969851166" duration="104473000" />
       <workItem from="1732750395425" duration="169000" />
       <workItem from="1732750573945" duration="4500000" />
-      <workItem from="1732836260477" duration="14632000" />
-    </task>
-    <task id="LOCAL-01237" summary="stashing separated kernels">
-      <option name="closed" value="true" />
-      <created>1731540399522</created>
-      <option name="number" value="01237" />
-      <option name="presentableId" value="LOCAL-01237" />
-      <option name="project" value="LOCAL" />
-      <updated>1731540399522</updated>
+      <workItem from="1732836260477" duration="14999000" />
     </task>
     <task id="LOCAL-01238" summary="stashing">
       <option name="closed" value="true" />
@@ -1040,7 +1025,15 @@
       <option name="project" value="LOCAL" />
       <updated>1732986076032</updated>
     </task>
-    <option name="localTasksCounter" value="1286" />
+    <task id="LOCAL-01286" summary="stashing before moving away from mesh">
+      <option name="closed" value="true" />
+      <created>1732992678192</created>
+      <option name="number" value="01286" />
+      <option name="presentableId" value="LOCAL-01286" />
+      <option name="project" value="LOCAL" />
+      <updated>1732992678192</updated>
+    </task>
+    <option name="localTasksCounter" value="1287" />
     <servers />
   </component>
   <component name="TypeScriptGeneratedFilesManager">
@@ -1089,7 +1082,6 @@
     </option>
   </component>
   <component name="VcsManagerConfiguration">
-    <MESSAGE value="stashing before doing single threaded" />
     <MESSAGE value="sequential radix sort" />
     <MESSAGE value="sequential radix sort optimized" />
     <MESSAGE value="pair sort working for small n_numbers" />
@@ -1114,7 +1106,8 @@
     <MESSAGE value="stashing before reworking mesh ring" />
     <MESSAGE value="quicksave quickload animation done" />
     <MESSAGE value="refactored vertex shape" />
-    <option name="LAST_COMMIT_MESSAGE" value="refactored vertex shape" />
+    <MESSAGE value="stashing before moving away from mesh" />
+    <option name="LAST_COMMIT_MESSAGE" value="stashing before moving away from mesh" />
   </component>
   <component name="XDebuggerManager">
     <breakpoint-manager>
