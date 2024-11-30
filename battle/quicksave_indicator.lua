@@ -207,6 +207,8 @@ function bt.QuicksaveIndicator:draw()
         love.graphics.setColor(1, 1, 1, self._frame_opacity)
         love.graphics.draw(self._frame_snapshot._native, self._frame_x, self._frame_y)
     end
+
+    self:draw_mesh()
 end
 
 --- @brief

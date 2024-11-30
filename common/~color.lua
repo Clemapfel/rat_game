@@ -1,4 +1,8 @@
 --- @class rt.RGBA
+--- @param r Number (or String)
+--- @param g Number (or nil)
+--- @param b Number (or nil)
+--- @param a Number (or nil)
 rt.RGBA = function(r_or_string, g, b, a)
     if type(r_or_string) == "string" then --meta.is_string(r_or_string) then
         local code = r_or_string
@@ -38,8 +42,11 @@ function meta.assert_rgba(object)
     end
 end
 
-
 --- @class rt.HSVA
+--- @param h Number
+--- @param s Number
+--- @param v Number
+--- @param a Number
 function rt.HSVA(h, s, v, a)
     if h == nil then h = 1 end
     if s == nil then s = 1 end
@@ -59,10 +66,10 @@ end
 --- @return Boolean
 function meta.is_hsva(object)
     return sizeof(object) == 4 and
-        _is_number(object.h) and
-        _is_number(object.s) and
-        _is_number(object.v) and
-        _is_number(object.a)
+        meta.is_number(object.h) and
+        meta.is_number(object.s) and
+        meta.is_number(object.v) and
+        meta.is_number(object.a)
 end
 
 --- @brief [internal] throw if object is not rt.HSVA
@@ -72,22 +79,6 @@ function meta.assert_hsva(object)
         rt.error("In " .. debug.getinfo(2, "n").name .. ": Excpected `HSVA`, got `" .. meta.typeof(object) .. "`")
     end
 end
-
---- @class rt.LCHA
-function rt.LCHA(l, c, h, a)
-    if l == nil then l = 1 end
-    if c == nil then c = 0 end
-    if h == nil then h = 0 end
-    if a == nil then a = 1 end
-
-    return {
-        l = l,
-        c = c,
-        h = h,
-        a = a
-    }
-end
-
 
 --- @brief conver rgba to hsva
 --- @param rgba rt.RGBA
@@ -177,67 +168,22 @@ function rt.hsva_to_rgba(hsva)
     return rt.RGBA(r, g, b, a)
 end
 
---- @brief convert lcha to rgba
-function rt.lcha_to_rgba(lcha)
-    local L = lcha.l * 100.0
-    local C = lcha.c * 100.0
-    local H = lcha.h * 360.0
-
-    local a = math.cos(math.rad(H)) * C
-    local b = math.sin(math.rad(H)) * C
-
-    local Y = (L + 16.0) / 116.0
-    local X = a / 500.0 + Y
-    local Z = Y - b / 200.0
-
-    if X * X * X > 0.008856 then
-        X = 0.95047 * X * X * X
-    else
-        X = 0.95047 * (X - 16.0 / 116.0) / 7.787
-    end
-
-    if Y * Y * Y > 0.008856 then
-        Y = 1.00000 * Y * Y * Y
-    else
-        Y = 1.00000 * (Y - 16.0 / 116.0) / 7.787
-    end
-
-    if Z * Z * Z > 0.008856 then
-        Z = 1.08883 * Z * Z * Z
-    else
-        Z = 1.08883 * (Z - 16.0 / 116.0) / 7.787
-    end
-
-    local R = X *  3.2406 + Y * -1.5372 + Z * -0.4986
-    local G = X * -0.9689 + Y *  1.8758 + Z *  0.0415
-    local B = X *  0.0557 + Y * -0.2040 + Z *  1.0570
-
-    if R > 0.0031308 then
-        R = 1.055 * R^(1.0 / 2.4) - 0.055
-    else
-        R = 12.92 * R
-    end
-
-    if G > 0.0031308 then
-        G = 1.055 * G^(1.0 / 2.4) - 0.055
-    else
-        G = 12.92 * G
-    end
-
-    if B > 0.0031308 then
-        B = 1.055 * B^(1.0 / 2.4) - 0.055
-    else
-        B = 12.92 * B
-    end
-
-    return rt.RGBA(
-        clamp(R, 0.0, 1.0),
-        clamp(G, 0.0, 1.0),
-        clamp(B, 0.0, 1.0),
-        lcha.a
-    )
+--- @brief compare colors
+--- @param c1 rt.RGBA
+--- @param c2 rt.RGBA
+--- @return Boolean
+function rt.compare_rgba(c1, c2)
+    return c1.r == c2.r and c1.g == c2.g and c1.b == c2.b and c1.a == c2.a
 end
 
+--- @brief compare colors
+--- @param c1 rt.HSVA
+--- @param c2 rt.HSVA
+--- @return Boolean
+function rt.compare_hsva(c1, c2)
+    local hue_matches = ternary(math.abs(c1.h - c2.h) == 1, true, c1.h == c2.h)
+    return hue_matches and c1.s == c2.s and c1.v == c2.v and c1.a == c2.a
+end
 
 --- @brief convert html hexadecimal to rgba
 --- @param code String "#RRGGBB(AA)"
@@ -392,4 +338,3 @@ function rt.color_mix(a, b, ratio)
         )
     end
 end
-
