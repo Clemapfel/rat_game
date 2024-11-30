@@ -1,8 +1,14 @@
 rt.Background.MESH_RING = meta.new_type("MESH_RING", rt.BackgroundImplementation, function()
     return meta.new(rt.Background.MESH_RING, {
-        _triangles = {}, -- Table<Array<3>>
-        _colors = {},    -- Table<Array<4>>
-        _n_outer_vertices = 64,
+        _mesh = nil, -- love.Mesh
+        _center_x = 0,
+        _center_y = 0,
+        _data = {},
+        _lines = {},
+
+        _n_outer_vertices = 6,
+        _n_rings = 10,
+
         _elapsed = 0,
         _duration = 5
     })
@@ -15,77 +21,225 @@ end
 
 --- @override
 function rt.Background.MESH_RING:size_allocate(x, y, width, height)
-    local center_x, center_y = x + 0.5 * width, y + 0.5 * height
+    self._center_x = x + 0.5 * width
+    self._center_y = y + 0.5 * height
     local m = rt.settings.margin_unit
-    local radius = math.min(width, height) / 2 - 2 * m
-
-    self._center_x = center_x
-    self._center_y = center_y
-    self._x_radius = radius
-    self._y_radius = radius
-    self._thickness = 6 * m
-
-    self:update(0)
+    self._radius_x = math.min(width, height) / 2
+    self._radius_y = self._radius_x
 end
 
 --- @override
 function rt.Background.MESH_RING:update(delta)
     self._elapsed = self._elapsed + delta
 
-    local fraction = (math.sin(self._elapsed) + 1) / 2
-    local inner_angle_offset = fraction * math.pi
-    local outer_angle_offset = 0.5 * inner_angle_offset
+    self._data = {}
+    self._lines = {}
 
-    local vertices = {}
-    local step = 2 * math.pi / self._n_outer_vertices
-    local n_vertices = 0
-    for angle = 0, 2 * math.pi + step, step do
-        local outer_x = self._center_x + math.cos(angle + outer_angle_offset) * (self._x_radius)
-        local outer_y = self._center_y + math.sin(angle + outer_angle_offset) * (self._y_radius)
+    local x_radius = self._radius_x
+    local y_radius = self._radius_y
 
-        local inner_x = self._center_x + math.cos(angle + inner_angle_offset) * (self._x_radius - self._thickness)
-        local inner_y = self._center_y + math.sin(angle + inner_angle_offset) * (self._y_radius - self._thickness)
+    local n_rings = self._n_rings
+    local n_outer_vertices = self._n_outer_vertices
+    local step = 2 * math.pi / n_outer_vertices
 
-        table.insert(vertices, {outer_x, outer_y})
-        table.insert(vertices, {inner_x, inner_y})
+    local positions = {}
+    for ring_i = 1, n_rings do
+        local fraction = (ring_i - 1) / n_rings
+        local ring_x_radius = x_radius * fraction
+        local ring_y_radius = y_radius * fraction
 
-        n_vertices = n_vertices + 2
-    end
+        local extra = 0
+        if ring_i == n_rings then extra = 1 end -- close last triangle
 
-    self._triangles = {}
-    self._n_triangles = 0
-    for i = 1, n_vertices - 2 do
-        local tri_a = {}
-        for index in range(
-            i, i + 1, i + 2
-        ) do
-            local vertex = vertices[index]
-            table.insert(tri_a, vertex[1])
-            table.insert(tri_a, vertex[2])
+        local angle_offset = 0 --(ring_i / n_rings) * 2 * math.pi / 2 + ((ring_i + 1) / n_rings) * (self._elapsed)
+
+        local line = {} -- circular line
+        for i = 1, n_outer_vertices + extra, 1 do
+            local color = rt.lcha_to_rgba(rt.LCHA(0.8, 1, fract(i / n_outer_vertices / 3) * 3, 1))
+            local position_x = 0 + math.cos((i - 1) * step + angle_offset) * ring_x_radius
+            local position_y = 0 + math.sin((i - 1) * step + angle_offset) * ring_y_radius
+            table.insert(self._data, {
+                position_x, position_y, color.r, color.g, color.b, color.a
+            })
+
+            table.insert(positions, { position_x, position_y })
+            table.insert(line, position_x)
+            table.insert(line, position_y)
         end
 
-        table.insert(self._triangles, tri_a)
-        self._n_triangles = self._n_triangles + 1
+        table.insert(line, line[1])
+        table.insert(line, line[2])
+        --table.insert(self._lines, line)
     end
 
-    self._colors = {}
-    local hue = 0
-    for i = 1, self._n_triangles do
-        local color = rt.lcha_to_rgba(rt.LCHA(0.75, 1, hue, 1))
-        table.insert(self._colors, { color.r, color.g, color.b, color.a })
-        hue = hue + 1 / self._n_triangles
+    -- perpendicular lines
+    for i = 1, n_outer_vertices do
+        local line = {}
+        for ring_i = 1, n_rings do
+            local pos = positions[(ring_i - 1) * n_outer_vertices + i]
+            table.insert(line, pos[1])
+            table.insert(line, pos[2])
+        end
+        --table.insert(self._lines, line)
+    end
+
+    local vertex_map = {}
+    for outer_i = 1, n_outer_vertices do
+        for ring_i = 1, n_rings - 1 do
+            local line = {}
+
+            local color = rt.lcha_to_rgba(rt.LCHA(0.8, 1, fract(ring_i / n_outer_vertices, 1)))
+
+            for vertex_i in range(
+                (ring_i - 1) * n_outer_vertices + outer_i,
+                (ring_i - 1) * n_outer_vertices + outer_i + 1,
+                (ring_i - 1 + 1) * n_outer_vertices + outer_i
+            ) do
+                table.insert(vertex_map, vertex_i)
+
+                local pos = positions[vertex_i]
+                table.insert(line, pos[1])
+                table.insert(line, pos[2])
+            end
+
+            table.insert(line, line[1])
+            table.insert(line, line[2])
+            table.insert(self._lines, line)
+
+            local line = {}
+            for vertex_i in range(
+                (ring_i - 1) * n_outer_vertices + outer_i + 1,
+                (ring_i - 1 + 1) * n_outer_vertices + outer_i,
+                (ring_i - 1 + 1) * n_outer_vertices + outer_i + 1
+            ) do
+                table.insert(vertex_map, vertex_i)
+
+                local pos = positions[vertex_i]
+                table.insert(line, pos[1])
+                table.insert(line, pos[2])
+            end
+
+            table.insert(line, line[1])
+            table.insert(line, line[2])
+            table.insert(self._lines, line)
+        end
+    end
+
+    if self._mesh == nil then
+        self._mesh = love.graphics.newMesh({
+            {name = "VertexPosition", format = "floatvec2"},
+            {name = "VertexColor", format = "floatvec4"},
+        }, self._data, rt.MeshDrawMode.TRIANGLE_FAN, rt.GraphicsBufferUsage.STREAM)
+
+    else
+        self._mesh:setVertices(self._data)
+    end
+end
+
+--- @override
+function rt.Background.MESH_RING:update(delta)
+    self._elapsed = self._elapsed + delta
+
+    -- generate positions
+    local positions = {}
+    local x_radius = self._radius_x
+    local y_radius = self._radius_y
+
+    local n_rings = self._n_rings
+    local n_outer_vertices = self._n_outer_vertices
+    local step = 2 * math.pi / n_outer_vertices
+
+    for ring_i = 1, n_rings do
+        local fraction = (ring_i - 1) / n_rings
+        local ring_x_radius = x_radius * fraction
+        local ring_y_radius = y_radius * fraction
+
+        local extra = 0
+        if ring_i == n_rings then extra = 1 end -- close last triangle
+
+        local angle_offset = (ring_i / n_rings) * 2 * math.pi / 2 + ((ring_i + 1) / n_rings) * (self._elapsed)
+        for i = 1, n_outer_vertices + extra, 1 do
+            local position_x = 0 + math.cos((i - 1) * step + angle_offset) * ring_x_radius
+            local position_y = 0 + math.sin((i - 1) * step + angle_offset) * ring_y_radius
+            table.insert(positions, { position_x, position_y })
+        end
+    end
+
+    -- generate lines and vertex map
+    self._lines = {}
+    local vertex_map = {}
+    for outer_i = 1, n_outer_vertices do
+        for ring_i = 1, n_rings - 1 do
+            for tri in range({
+                (ring_i - 1) * n_outer_vertices + outer_i,
+                (ring_i - 1) * n_outer_vertices + outer_i + 1,
+                (ring_i - 1 + 1) * n_outer_vertices + outer_i
+            }, {
+                (ring_i - 1) * n_outer_vertices + outer_i + 1,
+                (ring_i - 1 + 1) * n_outer_vertices + outer_i,
+                (ring_i - 1 + 1) * n_outer_vertices + outer_i + 1
+            }) do
+
+                local line = {}
+                for vertex_i in values(tri) do
+                    local pos = positions[vertex_i]
+                    table.insert(line, pos[1])
+                    table.insert(line, pos[2])
+
+                    if self._mesh == nil then
+                        table.insert(vertex_map, vertex_i)
+                    end
+                end
+
+                table.insert(line, line[1])
+                table.insert(line, line[2])
+                table.insert(self._lines, line)
+            end
+        end
+    end
+
+    -- generate colors
+    self._data = {}
+    for ring_i = 1, n_rings do
+        local hue = (ring_i - 1) / n_rings
+        local color = rt.lcha_to_rgba(rt.LCHA(0.8, 1, hue, 1))
+        for vertex_i = 1, n_outer_vertices + ternary(ring_i == n_rings, 1, 0) do
+            local position_i = (ring_i - 1) * n_outer_vertices + vertex_i
+            self._data[position_i] = {
+                positions[position_i][1], positions[position_i][2],
+                color.r, color.g, color.b, color.a
+            }
+        end
+    end
+
+    if self._mesh == nil then
+        self._mesh = love.graphics.newMesh({
+            {name = "VertexPosition", format = "floatvec2"},
+            {name = "VertexColor", format = "floatvec4"},
+        }, self._data, rt.MeshDrawMode.TRIANGLES, rt.GraphicsBufferUsage.STREAM)
+        self._mesh:setVertexMap(vertex_map)
+    else
+        self._mesh:setVertices(self._data)
     end
 end
 
 --- @override
 function rt.Background.MESH_RING:draw()
-    love.graphics.setLineStyle("smooth")
-    love.graphics.setLineJoin("bevel")
-    love.graphics.setLineWidth(2)
-    for i = 1, self._n_triangles do
-        love.graphics.setColor(table.unpack(self._colors[i]))
-        love.graphics.polygon("fill", self._triangles[i])
-        love.graphics.setColor(0, 0, 0, 1)
-        love.graphics.polygon("line", self._triangles[i])
+    love.graphics.setColor(1, 1, 1, 1)
+    love.graphics.rectangle("fill", 0, 0, love.graphics.getDimensions())
+
+    --love.graphics.setWireframe(true)
+    love.graphics.push()
+    love.graphics.translate(self._center_x, self._center_y)
+    love.graphics.setColor(1, 1, 1, 1)
+    if self._mesh ~= nil then
+        love.graphics.draw(self._mesh)
     end
+
+    love.graphics.setLineWidth(1)
+    love.graphics.setColor(0, 0, 0, 1)
+    for line in values(self._lines) do
+        love.graphics.line(line)
+    end
+    love.graphics.pop()
 end

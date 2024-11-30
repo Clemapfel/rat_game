@@ -109,7 +109,7 @@ function rt.Cloth:realize()
     end
 
     self._vertices = vertices
-    self._mesh = love.graphics.newMesh(vertices, rt.MeshDrawMode.TRIANGLES, rt.SpriteBatchUsage.DYNAMIC)
+    self._mesh = love.graphics.newMesh(vertices, rt.MeshDrawMode.TRIANGLES, rt.GraphicsBufferUsage.DYNAMIC)
     self._mesh:setVertexMap(vertex_map)
 
     self._is_realized = true

@@ -1,5 +1,5 @@
---- @class rt.SpriteBatchUsage
-rt.SpriteBatchUsage = meta.new_enum("SpriteBatchUsage", {
+--- @class rt.GraphicsBufferUsage
+rt.GraphicsBufferUsage = meta.new_enum("GraphicsBufferUsage", {
     DYNAMIC = "dynamic",
     STATIC = "static",
     STREAM = "stream"
@@ -65,7 +65,7 @@ rt.VertexShape = meta.new_type("VertexShape", rt.Drawable, function(points)
             rt.VertexFormat,
             vertices,
             rt.MeshDrawMode.TRIANGLE_FAN,
-            rt.SpriteBatchUsage.DYNAMIC
+            rt.GraphicsBufferUsage.DYNAMIC
         ),
         _opacity = 1
     })

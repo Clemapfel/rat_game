@@ -1,5 +1,5 @@
---- @class rt.SpriteBatchUsage
-rt.SpriteBatchUsage = meta.new_enum("SpriteBatchUsage", {
+--- @class rt.GraphicsBufferUsage
+rt.GraphicsBufferUsage = meta.new_enum("GraphicsBufferUsage", {
     DYNAMIC = "dynamic",
     STATIC = "static",
     STREAM = "stream"
@@ -33,7 +33,7 @@ rt.VertexShape = meta.new_type("VertexShape", rt.Drawable, function(data, draw_m
             rt.VertexFormat,
             data,
             which(draw_mode, rt.MeshDrawMode.TRIANGLE_FAN),
-            rt.SpriteBatchUsage.DYNAMIC
+            rt.GraphicsBufferUsage.DYNAMIC
         ),
         _r = 1,
         _g = 1,
@@ -57,7 +57,7 @@ rt.VertexRectangle = function(x, y, width, height)
             rt.VertexFormat,
             data,
             rt.MeshDrawMode.TRIANGLE_FAN,
-            rt.SpriteBatchUsage.STATIC
+            rt.GraphicsBufferUsage.STATIC
         ),
         _r = 1,
         _g = 1,
@@ -88,7 +88,7 @@ rt.VertexCircle = function(center_x, center_y, x_radius, y_radius, n_outer_verti
             rt.VertexFormat,
             data,
             rt.MeshDrawMode.TRIANGLE_FAN,
-            rt.SpriteBatchUsage.STATIC
+            rt.GraphicsBufferUsage.STATIC
         ),
         _r = 1,
         _g = 1,
