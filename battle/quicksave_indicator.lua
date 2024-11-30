@@ -14,6 +14,9 @@ bt.QuicksaveIndicator = meta.new_type("BattleQuicksaveIndicator", rt.Widget, fun
         _frame_snapshot = nil, -- rt.RenderTexture
         _thickness = rt.settings.frame.thickness,
 
+        _n_turns_elapsed = 0,
+        _n_turns_label = nil, -- rt.Label
+
         _screenshot = nil, -- rt.RenderTexture
         _mesh = nil, -- love.Mesh
         _paths = {}, -- Table<rt.Path>
@@ -42,6 +45,14 @@ function bt.QuicksaveIndicator:realize()
     self._frame:set_is_outline(true)
     self._frame_outline:set_is_outline(true)
     self._base:set_is_outline(false)
+
+    self._n_turns_label = rt.Label(
+        "<b><o>" .. self._n_turns_elapsed .. "</o></b>"--,
+        --rt.settings.font.default_large,
+        --rt.settings.font.default_mono_large
+    )
+
+    self._n_turns_label:realize()
 end
 
 do
@@ -56,20 +67,32 @@ do
         local x_radius, y_radius = 0.5 * width - self._thickness, 0.5 * height - self._thickness
         local m = rt.settings.margin_unit
 
+        local local_center_x, local_center_y = 0.5 * width, 0.5 * height
         for shape in range(self._frame, self._frame_outline, self._base) do
-            shape:resize(0.5 * width, 0.5 * height, x_radius, y_radius)
+            shape:resize(local_center_x, local_center_y, x_radius, y_radius)
         end
 
-        self._frame_snapshot = rt.RenderTexture(width, height, 4)
+        local label_w, label_h = self._n_turns_label:measure()
+        local label_x = local_center_x + x_radius - label_w
+        local label_y = local_center_y + y_radius - 0.75 * label_h
+        self._n_turns_label:fit_into(label_x, label_y)
+
+        local padding = rt.settings.label.outline_offset_padding
+        self._frame_snapshot = rt.RenderTexture(
+            width + label_w + padding,
+            height + label_h + padding,
+            4
+        )
+        
         self._frame_x = x
         self._frame_y = y
         love.graphics.push()
         love.graphics.origin()
-        love.graphics.clear(true, false, false)
         self._frame_snapshot:bind()
         self._base:draw()
         self._frame_outline:draw()
         self._frame:draw()
+        self._n_turns_label:draw()
         self._frame_snapshot:unbind()
         love.graphics.pop()
 
@@ -254,3 +277,11 @@ function bt.QuicksaveIndicator:set_screenshot(texture)
         self._mesh:setTexture(self._screenshot._native)
     end
 end
+
+--- @brief
+function bt.QuicksaveIndicator:set_n_turns_elapsed(n)
+    self._n_turns_elapsed = n
+    if self._is_realized then
+        self._n_turns_label:set_text("<b><o>" .. n .. "</o></b>")
+    end
+end 

@@ -26,7 +26,6 @@ end
 
 --- @override
 function bt.Animation.QUICKLOAD:update(delta)
-    dbg(self._is_done)
     return self._is_done
 end
 

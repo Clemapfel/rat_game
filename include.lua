@@ -7,6 +7,25 @@ do
     io.stdout:setvbuf("no") -- makes it so love2d error message is printed to console immediately
 end
 
+do -- splash screen until compilation is done
+    local screen_w, screen_h = love.graphics.getWidth(), love.graphics.getHeight()
+    love.graphics.setColor(0, 0, 0, 1)
+    local label = "loading..."
+    local font = love.graphics.newFont(50)
+    local label_w, label_h = font:getWidth(label), font:getHeight(label)
+
+    love.graphics.setColor(0, 0, 0, 1)
+    love.graphics.rectangle("fill", 0, 0, screen_w, screen_h)
+
+    local value = 0.3
+    love.graphics.setColor(value, value, value, 1)
+    love.graphics.print(label, font,
+        math.floor(0.5 * screen_w - 0.5 * label_w),
+        math.floor(0.5 * screen_h - 0.5 * label_h)
+    )
+    love.graphics.present()
+end
+
 -- standard libs
 ffi = require "ffi"
 utf8 = require "utf8"
@@ -52,25 +71,6 @@ pcall(function()
         return nil -- exit
     end
 end)
-
-do -- splash screen until compilation is done
-    local screen_w, screen_h = love.graphics.getWidth(), love.graphics.getHeight()
-    --love.window.setMode(screen_w, screen_h)
-    love.graphics.setColor(0, 0, 0, 1)
-    local label = "rat_game"
-    local font = love.graphics.newFont(50)
-    local label_w, label_h = font:getWidth(label), font:getHeight(label)
-
-    love.graphics.setColor(0, 0, 0, 1)
-    love.graphics.rectangle("fill", 0, 0, love.graphics.getWidth(), love.graphics.getHeight())
-
-    love.graphics.setColor(0.1, 0.1, 0.1, 1)
-    love.graphics.print(label, font,
-        math.floor(0.5 * screen_w - 0.5 * label_w),
-        math.floor(0.5 * screen_h - 0.5 * label_h)
-    )
-    love.graphics.present()
-end
 
 -- modules
 rt = {}

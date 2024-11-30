@@ -843,7 +843,6 @@ end
 function bt.BattleScene:_handle_button_pressed(which)
     if which == rt.InputButton.A then
         self:_push_animation(bt.Animation.QUICKSAVE(self, self._quicksave_indicator))
-        self._animation_queue:skip()
         self:_push_animation(bt.Animation.QUICKLOAD(self, self._quicksave_indicator))
 
         --[[

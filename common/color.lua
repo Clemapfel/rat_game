@@ -88,6 +88,21 @@ function rt.LCHA(l, c, h, a)
     }
 end
 
+--- @brief
+function meta.is_lcha(object)
+    return sizeof(object) == 4 and
+        _is_number(object.h) and
+        _is_number(object.s) and
+        _is_number(object.v) and
+        _is_number(object.a)
+end
+
+--- @brief
+function meta.assert_lcha(object)
+    if not meta.is_lcha(object) then
+        rt.error("In " .. debug.getinfo(2, "n").name .. ": Excpected `LCHA`, got `" .. meta.typeof(object) .. "`")
+    end
+end
 
 --- @brief conver rgba to hsva
 --- @param rgba rt.RGBA
@@ -359,8 +374,10 @@ end
 function rt.color_unpack(color)
     if meta.is_rgba(color) then
         return color.r, color.g, color.b, color.a
-    else
+    elseif meta.is_hsva(color) then
         return color.h, color.s, color.v, color.a
+    elseif meta.is_lcha(color) then
+        return color.l, color.c, color.h, color.a
     end
 end
 
@@ -368,8 +385,10 @@ end
 function rt.color_copy(color)
     if meta.is_rgba(color) then
         return rt.RGBA(color.r, color.g, color.b, color.a)
-    else
+    elseif meta.is_hsva(color) then
         return rt.HSVA(color.h, color.s, color.v, color.a)
+    elseif meta.is_lcha(color) then
+        return rt.LCHA(color.l, color.c, color.h, color.a)
     end
 end
 --- @brief

@@ -22,15 +22,16 @@
     </configurations>
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="7fa9ba1b-2cff-4ecc-86fb-59ab2fa76ee1" name="Changes" comment="stashing before reworking mesh ring">
-      <change afterPath="$PROJECT_DIR$/battle/animations/quicksave.lua" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/common/~color.lua" afterDir="false" />
+    <list default="true" id="7fa9ba1b-2cff-4ecc-86fb-59ab2fa76ee1" name="Changes" comment="quicksave quickload animation done">
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/backgrounds/mesh_ring.lua" beforeDir="false" afterPath="$PROJECT_DIR$/backgrounds/mesh_ring.lua" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/battle/animations/quickload.lua" beforeDir="false" afterPath="$PROJECT_DIR$/battle/animations/quickload.lua" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/battle/animations/quicksave.lua" beforeDir="false" afterPath="$PROJECT_DIR$/battle/animations/quicksave.lua" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/battle/battle_scene.lua" beforeDir="false" afterPath="$PROJECT_DIR$/battle/battle_scene.lua" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/battle/quicksave_indicator.lua" beforeDir="false" afterPath="$PROJECT_DIR$/battle/quicksave_indicator.lua" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/common/color.lua" beforeDir="false" afterPath="$PROJECT_DIR$/common/color.lua" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/common/vertex_shape.lua" beforeDir="false" afterPath="$PROJECT_DIR$/common/vertex_shape.lua" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/common/~vertex_shape.lua" beforeDir="false" afterPath="$PROJECT_DIR$/common/~vertex_shape.lua" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/include.lua" beforeDir="false" afterPath="$PROJECT_DIR$/include.lua" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -646,15 +647,7 @@
       <workItem from="1731969851166" duration="104473000" />
       <workItem from="1732750395425" duration="169000" />
       <workItem from="1732750573945" duration="4500000" />
-      <workItem from="1732836260477" duration="4973000" />
-    </task>
-    <task id="LOCAL-01235" summary="stashing before using scale blur">
-      <option name="closed" value="true" />
-      <created>1731534184438</created>
-      <option name="number" value="01235" />
-      <option name="presentableId" value="LOCAL-01235" />
-      <option name="project" value="LOCAL" />
-      <updated>1731534184438</updated>
+      <workItem from="1732836260477" duration="8886000" />
     </task>
     <task id="LOCAL-01236" summary="stashing">
       <option name="closed" value="true" />
@@ -1040,7 +1033,15 @@
       <option name="project" value="LOCAL" />
       <updated>1732834424018</updated>
     </task>
-    <option name="localTasksCounter" value="1284" />
+    <task id="LOCAL-01284" summary="quicksave quickload animation done">
+      <option name="closed" value="true" />
+      <created>1732982288989</created>
+      <option name="number" value="01284" />
+      <option name="presentableId" value="LOCAL-01284" />
+      <option name="project" value="LOCAL" />
+      <updated>1732982288989</updated>
+    </task>
+    <option name="localTasksCounter" value="1285" />
     <servers />
   </component>
   <component name="TypeScriptGeneratedFilesManager">
@@ -1089,7 +1090,6 @@
     </option>
   </component>
   <component name="VcsManagerConfiguration">
-    <MESSAGE value="stashing mesh" />
     <MESSAGE value="working?" />
     <MESSAGE value="stashing before doing single threaded" />
     <MESSAGE value="sequential radix sort" />
@@ -1114,7 +1114,8 @@
     <MESSAGE value="mwe working" />
     <MESSAGE value="stashing" />
     <MESSAGE value="stashing before reworking mesh ring" />
-    <option name="LAST_COMMIT_MESSAGE" value="stashing before reworking mesh ring" />
+    <MESSAGE value="quicksave quickload animation done" />
+    <option name="LAST_COMMIT_MESSAGE" value="quicksave quickload animation done" />
   </component>
   <component name="XDebuggerManager">
     <breakpoint-manager>
