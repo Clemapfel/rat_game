@@ -366,6 +366,10 @@ rt.Translation = rt.initialize_translation({
 
             status_removed_f = function(entity, status)
                 return entity .. " is no longer afflicted with " .. status
+            end,
+
+            hp_gained_f = function(entity, value)
+                return entity .. " gained <color=HP>" .. value .. "</color> HP"
             end
         }
     }

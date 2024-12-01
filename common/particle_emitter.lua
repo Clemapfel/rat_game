@@ -93,6 +93,12 @@ function rt.ParticleEmitter:set_angular_velocity(x)
 end
 
 --- @brief
+function rt.ParticleEmitter:set_spin(min, max)
+    if max == nil then max = min end
+    self._native:setSpin(min, max)
+end
+
+--- @brief
 function rt.ParticleEmitter:emit(n)
     self._native:emit(n)
 end

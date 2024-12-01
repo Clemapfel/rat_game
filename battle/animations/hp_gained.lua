@@ -35,10 +35,10 @@ bt.Animation.HP_GAINED = meta.new_type("HP_GAINED", rt.Animation, function(scene
         _target_offset_y = 0,
 
         _particle_emitter = nil, -- rt.ParticlEmitter
-        _particle = nil, -- rt.Label
         _duration = settings.duration,
 
-        _color_gradient_shader = rt.Shader("battle/animations/hp_gained.glsl"),
+        _color_gradient_shader = nil, -- rt.Shader
+        _color_gradient_weight = 0,
         _color_gradient_animation = rt.TimedAnimation(
             settings.duration, 1, 1 - 0.3,
             rt.InterpolationFunctions.BUTTERWORTH, 4
@@ -46,74 +46,89 @@ bt.Animation.HP_GAINED = meta.new_type("HP_GAINED", rt.Animation, function(scene
     })
 end)
 
---- @override
-function bt.Animation.HP_GAINED:start()
-    self._label = rt.Label(
-        "<b><o><color=HP>" .. self._value .. "</color></o></b>",
-        rt.settings.font.default_large,
-        rt.settings.font.default_mono_large
-    )
-    self._label:set_justify_mode(rt.JustifyMode.CENTER)
-    self._label:realize()
-    local label_w, label_h = self._label:measure()
-    self._label:fit_into(-0.5 * label_w, -0.5 * label_h)
+do
+    -- shared static objects
+    local _particle = nil -- rt.Label
+    local _particle_texture = nil -- rt.RenderTexture
+    local _color_gradient_shader = nil
 
-    local target_x, target_y = self._target:get_position()
-    local target_w, target_h = self._target:measure()
-    local center_x, center_y = target_x + 0.5 * target_w, target_y + 0.5 * target_h
-    local offset = 0.25 * target_h
-    self._label_path = rt.Path(
-        center_x, center_y,
-        center_x, center_y - offset
-    )
+    --- @override
+    function bt.Animation.HP_GAINED:start()
+        self._label = rt.Label(
+            "<b><o><color=HP>" .. self._value .. "</color></o></b>",
+            rt.settings.font.default_large,
+            rt.settings.font.default_mono_large
+        )
+        self._label:set_justify_mode(rt.JustifyMode.CENTER)
+        self._label:realize()
+        local label_w, label_h = self._label:measure()
+        self._label:fit_into(-0.5 * label_w, -0.5 * label_h)
 
-    local m = rt.settings.margin_unit
-    self._target_path = rt.Path(
-        0, 0,
-        -2 * m, 0,
-         2 * m, 0,
-        0, 0
-    )
+        local target_x, target_y = self._target:get_position()
+        local target_w, target_h = self._target:measure()
+        local center_x, center_y = target_x + 0.5 * target_w, target_y + 0.5 * target_h
+        local offset = 0.25 * target_h
+        self._label_path = rt.Path(
+            center_x, center_y,
+            center_x, center_y - offset
+        )
 
-    self._particle = rt.Label(
-        "<b><o><mono><color=HP>+</color></mono></o></b>",
-        rt.settings.font.default_large,
-        rt.settings.font.default_mono_large
-    )
-    self._particle:realize()
-    self._particle:fit_into(0, 0)
+        local m = rt.settings.margin_unit
+        self._target_path = rt.Path(
+            0, 0,
+            -2 * m, 0,
+            2 * m, 0,
+            0, 0
+        )
 
-    local particle_w, particle_h = self._particle:measure()
-    local padding = rt.settings.margin_unit
-    local texture = rt.RenderTexture(particle_w + 2 * padding, particle_h + 2 * padding)
-    love.graphics.push()
-    love.graphics.origin()
-    texture:bind()
-    love.graphics.translate(padding, padding)
-    self._particle:draw()
-    texture:unbind()
-    love.graphics.pop()
+        if _particle == nil then
+            _particle = rt.Label(
+                "<b><o><mono><color=HP>+</color></mono></o></b>",
+                rt.settings.font.default_large,
+                rt.settings.font.default_mono_large
+            )
+            _particle:realize()
+            _particle:fit_into(0, 0)
 
-    self._particle_emitter = rt.ParticleEmitter(texture)
-    self._particle_emitter:realize()
-    local frame = 2 * padding
-    self._particle_emitter:fit_into(
-        target_x + frame,
-        target_y + frame,
-        target_w - 2 * frame,
-        target_h - 2 * frame
-    )
-    self._particle_emitter:set_emission_rate(7 / self._duration)
-    self._particle_emitter:set_linear_velocity(0, -2 * padding)
+            local particle_w, particle_h = _particle:measure()
+            local padding = 10
+            _particle_texture = rt.RenderTexture(particle_w + 2 * padding, particle_h + 2 * padding)
+            love.graphics.push()
+            love.graphics.origin()
+            _particle_texture:bind()
+            love.graphics.translate(padding, padding)
+            _particle:draw()
+            _particle_texture:unbind()
+            love.graphics.pop()
+        end
 
-    local darkening = 0.7
-    self._particle_emitter:set_color(rt.RGBA(darkening, darkening, darkening, 1))
-    self._particle_emitter:emit(3)
+        self._particle_emitter = rt.ParticleEmitter(_particle_texture)
+        self._particle_emitter:realize()
+        local frame = 2 * rt.settings.margin_unit
+        self._particle_emitter:fit_into(
+            target_x + frame,
+            target_y + frame,
+            target_w - 2 * frame,
+            target_h - 2 * frame
+        )
+        self._particle_emitter:set_emission_rate(7 / self._duration)
+        self._particle_emitter:set_linear_velocity(0, -1 * frame)
 
-    self._color_gradient_shader:send("color", {rt.color_unpack(rt.Palette.HP)})
-    self._color_gradient_shader:send("weight", 0)
+        local spin = 0.25 * math.pi
+        self._particle_emitter:set_spin(-spin, spin)
 
-    self._target:set_is_visible(false)
+        local darkening = 0.7
+        self._particle_emitter:set_color(rt.RGBA(darkening, darkening, darkening, 1))
+        self._particle_emitter:emit(3)
+
+        if _color_gradient_shader == nil then
+            _color_gradient_shader = rt.Shader("battle/animations/hp_gained.glsl")
+            _color_gradient_shader:send("color", {rt.color_unpack(rt.Palette.HP)})
+        end
+        self._color_gradient_shader = _color_gradient_shader
+
+        self._target:set_is_visible(false)
+    end
 end
 
 --- @override
@@ -142,7 +157,7 @@ function bt.Animation.HP_GAINED:update(delta)
     self._particle_emitter:set_opacity(opacity)
     self._particle_emitter:update(delta)
 
-    self._color_gradient_shader:send("weight", self._color_gradient_animation:get_value())
+    self._color_gradient_weight = self._color_gradient_animation:get_value()
     return is_done
 end
 
@@ -151,6 +166,7 @@ function bt.Animation.HP_GAINED:draw()
     love.graphics.push()
     love.graphics.translate(self._target_offset_x, self._target_offset_y)
     self._color_gradient_shader:bind()
+    self._color_gradient_shader:send("weight", self._color_gradient_weight)
     self._target:draw_snapshot()
     self._color_gradient_shader:unbind()
     love.graphics.pop()

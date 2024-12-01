@@ -686,9 +686,9 @@ function bt.BattleScene:create_simulation_environment()
 
         local move_proxy = bt.create_move_proxy(_scene, move)
         if before < after then
-            env.message(rt.Translation.battle.message.move_gained_pp_f(entity_proxy, equip_proxy))
+            env.message(rt.Translation.battle.message.move_gained_pp_f(entity_proxy, move_proxy))
         elseif before > after then
-            env.message(rt.Translation.battle.message.move_lost_pp_f(entity_proxy, equip_proxy))
+            env.message(rt.Translation.battle.message.move_lost_pp_f(entity_proxy, move_proxy))
         end -- else, noop, for example if move has infinty PP
     end
 
@@ -1661,9 +1661,43 @@ function bt.BattleScene:create_simulation_environment()
         local entity = _get_native(entity_proxy)
         if value < 0 then
             rt.warning("In env.add_hp: value `" .. value .. "` is negative, reducing hp of `" .. entity:get_id() .. "` instead")
+            env.reduce_hp(entity_proxy, math.abs(value))
+            return
         end
 
-        -- TODO
+        local hp_current = env.get_hp(entity_proxy)
+        local hp_base = env.get_hp_base(entity_proxy)
+
+        -- fizzle on already full
+        if hp_current >= hp_base or value == 0 then return end
+
+        local difference = clamp(value, 0, (hp_base - hp_current))
+        local sprite = _scene:get_sprite(entity)
+        local animation = bt.Animation.HP_GAINED(_scene, sprite, difference)
+
+        _scene:_push_animation(animation)
+        env.message(rt.Translation.battle.message.hp_gained_f(entity_proxy, difference))
+
+        _state:entity_set_hp(entity, clamp(hp_current + difference, 0, hp_base))
+
+        local callback_id = "on_healing_performed"
+        local performer_proxy = env.get_
+
+        -- TODO: how to get acting entity?
+
+
+        callback_id = "on_hp_gained"
+        for status_proxy in values(env.list_statuses(entity_proxy)) do
+            _try_invoke_status_callback(callback_id, status_proxy, entity_proxy, value)
+        end
+
+        for consumable_proxy in values(env.list_consumables(entity_proxy)) do
+            _try_invoke_consumable_callback(callback_id, consumable_proxy, entity_proxy, value)
+        end
+
+        for global_status_proxy in values(env.list_global_statuses()) do
+            _try_invoke_global_status_callback(callback_id, global_status_proxy, entity_proxy, value)
+        end
     end
 
     env.reduce_hp = function(entity_proxy, value)
