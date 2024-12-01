@@ -182,6 +182,11 @@ function rt.Label:draw()
     love.graphics.translate(-self._bounds.x, -self._bounds.y)
 end
 
+--- @brief
+function rt.Label:get_snapshot()
+    return self._swap_texture
+end
+
 --- @override
 function rt.Label:realize()
     if self:already_realized() then return end

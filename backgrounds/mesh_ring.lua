@@ -6,8 +6,8 @@ rt.Background.MESH_RING = meta.new_type("MESH_RING", rt.BackgroundImplementation
         _data = {},
         _lines = {},
 
-        _n_outer_vertices = 7,
-        _n_rings = 13,
+        _n_outer_vertices = 3,
+        _n_rings = 8,
 
         _elapsed = 0,
         _duration = 5
@@ -24,7 +24,7 @@ function rt.Background.MESH_RING:size_allocate(x, y, width, height)
     self._center_x = x + 0.5 * width
     self._center_y = y + 0.5 * height
     local m = rt.settings.margin_unit
-    self._radius_x = math.max(width, height)
+    self._radius_x = math.min(width, height) / 2
     self._radius_y = self._radius_x
 end
 

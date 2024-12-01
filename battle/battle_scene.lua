@@ -41,7 +41,7 @@ bt.BattleScene = meta.new_type("BattleScene", rt.Scene, function(state)
 
         _entity_selection_graph = nil, -- rt.SelectionGraph
     })
-    out._background:set_implementation(rt.Background.MESH_RING) -- TODO
+    out._background:set_implementation(rt.Background.CONFUSION) -- TODO
     return out
 end)
 
@@ -454,7 +454,6 @@ end
 function bt.BattleScene:draw()
     self._background:draw()
 
-    --[[
     for sprite in values(self._party_sprites) do
         sprite:draw()
     end
@@ -493,7 +492,6 @@ function bt.BattleScene:draw()
     end
 
     self._animation_queue:draw()
-    ]]--
 end
 
 --- @brief
@@ -845,8 +843,8 @@ end
 --- @brief [internal]
 function bt.BattleScene:_handle_button_pressed(which)
     if which == rt.InputButton.A then
-        self:_push_animation(bt.Animation.QUICKSAVE(self, self._quicksave_indicator))
-        self:_push_animation(bt.Animation.QUICKLOAD(self, self._quicksave_indicator))
+        self:_push_animation(bt.Animation.HP_GAINED(self, self._enemy_sprites[1], 123))
+        self:_append_animation(bt.Animation.MESSAGE(self, "Toast gained 123 HP"))
 
         --[[
         local target = bt.create_entity_proxy(self, self._state:list_enemies()[2])

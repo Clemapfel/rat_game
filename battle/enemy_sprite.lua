@@ -150,7 +150,7 @@ end
 function bt.EnemySprite:measure()
     local label_w, label_h = self._name:measure()
     local sprite_w, sprite_h = self._sprite:measure()
-    return sprite_w, 2 * label_h + sprite_h
+    return sprite_w, sprite_h
 end
 
 --- @override

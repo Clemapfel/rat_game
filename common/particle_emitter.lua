@@ -7,156 +7,104 @@ rt.settings.particle_emitter = {
 
 --- @class rt.ParticleEmitter
 rt.ParticleEmitter = meta.new_type("ParticleEmitter", rt.Widget, rt.Updatable, function(particle)
-    meta.assert_isa(particle, rt.Drawable)
-    local out = meta.new(rt.ParticleEmitter, {
+    meta.assert_isa(particle, rt.Texture)
+    return meta.new(rt.ParticleEmitter, {
         _particle = particle,
-        _particle_texture = rt.RenderTexture(),
-        _native = {}, -- love.ParticleSystem
+        _native = love.graphics.newParticleSystem(particle._native),
         _bounds = rt.AABB(0, 0, 1, 1),
         _direction = rt.Direction.UP,
         _speed = rt.settings.particle_emitter.default_speed,
         _color = rt.RGBA(1, 1, 1, 1),
         _opacity = 1
     })
-
-    out:_snapshot_particle()
-    out._native = love.graphics.newParticleSystem(out._particle_texture._native)
-    out._native:setEmissionRate(rt.settings.particle_emitter.default_emission_rate)
-
-    out._native:setParticleLifetime(rt.settings.particle_emitter.default_particle_lifetime)
-    out._native:setSpeed(0, 0)
-    out._native:setSpread(rt.degrees_to_radians(0))
-    out._native:setDirection(rt.degrees_to_radians(-90))
-
-    out:_update_colors()
-    out._native:setSizes(1, 1)
-    out._native:setInsertMode("bottom")
-    out:set_direction(out._direction)
-
-    return out
 end)
 
---- @brief [internal]
-function rt.ParticleEmitter:_snapshot_particle()
-    local particle = self._particle
-    local w, h = particle:get_size()
-    if w ~= self._particle_texture:get_width() or h ~= self._particle_texture:get_height() then
-        self._particle_texture = rt.RenderTexture(clamp(w, 1), clamp(h, 1))
-        self._particle_texture:set_scale_mode(rt.TextureScaleMode.LINEAR)
-
-        if not meta.is_table(self._native) then
-            self._native:setTexture(self._particle_texture._native)
-        end
-    end
-
-    self._particle_texture:bind()
-    rt.graphics.clear(0, 0, 0, 0)
-    particle:draw()
-    self._particle_texture:unbind()
-end
-
---- @brief determines how many particles are emitted
-function rt.ParticleEmitter:set_density(emissions_per_second, max_number_of_particles)
-    self._native:setEmissionRate(emissions_per_second)
-    if not (max_number_of_particles == nil) then
-        self._native:setBufferSize(max_number_of_particles)
-    end
-end
-
---- @brief
-function rt.ParticleEmitter:set_scale(lower_bound, upper_bound)
-    self._native:setSizes(lower_bound, upper_bound)
-end
-
---- @brief
-function rt.ParticleEmitter:set_speed(speed)
-    self._native:setLinearAcceleration(0, -1 * speed)
-end
-
---- @brief
-function rt.ParticleEmitter:set_particle_lifetime(min, max)
-    self._native:setParticleLifetime(min, which(max, min))
-end
-
---- @brief
---- @param direction rt.Direction
-function rt.ParticleEmitter:set_direction(direction)
-    self._direction = direction
-    local x, y = 0, 0
-    if direction == rt.Direction.UP then
-        x, y = 0, -1
-    elseif direction == rt.Direction.RIGHT then
-        x, y = 1, 0
-    elseif direction == rt.Direction.DOWN then
-        x, y = 0, 1
-    elseif direction == rt.Direction.LEFT then
-        x, y = -1, 0
-    elseif direction == rt.Direction.NONE then
-        x, y = 0, 0
-    end
-
-    self._native:setLinearAcceleration(x * self._speed, y * self._speed)
-end
-
---- @overload
-function rt.ParticleEmitter:draw()
-    love.graphics.setColor(1, 1, 1, 1)
-    love.graphics.draw(self._native)
-end
-
---- @overload
-function rt.ParticleEmitter:size_allocate(x, y, w, h)
-    self._native:setPosition(x + w / 2, y + h / 2)
-    self._native:setEmissionArea("uniform", w / 2, h / 2, 0, true)
-    self._bounds = rt.AABB(x, y, w, h)
-    self:_snapshot_particle()
-end
-
---- @overload
+--- @override
 function rt.ParticleEmitter:realize()
     if self:already_realized() then return end
-    if meta.is_widget(self._particle) and not self._particle:get_is_realized() then
-        self._particle:realize()
-        self:_snapshot_particle()
-    end
+
+    self._native:setEmissionRate(rt.settings.particle_emitter.default_emission_rate)
+    self._native:setParticleLifetime(rt.settings.particle_emitter.default_particle_lifetime)
+    self._native:setSpeed(0, 0)
+    self._native:setSpread(0)
+    self._native:setDirection(-0.5 * math.pi)
+
+    self._native:setSizes(1, 1)
+    self._native:setInsertMode("bottom")
+    
+    self:set_opacity(self._opacity)
+    if self._particle ~= nil then self._native:setTexture(self._particle._native) end
 
     self._native:start()
-    rt.Widget.realize(self)
 end
 
---- @overload
+--- @override
+function rt.ParticleEmitter:size_allocate(x, y, width, height)
+    self._native:setPosition(x + 0.5 * width, y + 0.5 * height)
+    self._native:setEmissionArea("uniform", width / 2, height / 2)
+end
+
+--- @override
 function rt.ParticleEmitter:update(delta)
     self._native:update(delta)
 end
 
---- @brief
-function rt.ParticleEmitter:set_color(color)
-    if meta.is_hsva(color) then color = rt.hvsa_to_rgba(color) end
-    self._color = color
-    self._update_colors()
+--- @override
+function rt.ParticleEmitter:draw()
+    love.graphics.setColor(self._color.r, self._color.g, self._color.b, 1) -- opacity set in setColors
+    love.graphics.draw(self._native)
 end
 
---- @brief [internal]
-function rt.ParticleEmitter:_update_colors()
-    local r, g, b, a = self._color.r, self._color.g, self._color.b, self._color.a
+--- @brief
+function rt.ParticleEmitter:set_particle(texture)
+    meta.assert_isa(texture, rt.Texture)
+    self._particle = texture
+    self._native:setTexture(texture._native)
+end
+
+--- @brief
+function rt.ParticleEmitter:set_opacity(alpha)
+    self._opacity = alpha
+    local r, g, b, a = 1, 1, 1, self._opacity
     self._native:setColors(
         r, g, b, 0, -- 1 : 5 : 1, ratio determines how long the particle will stay at given opacity
-        r, g, b, a * self._opacity,
-        r, g, b, a * self._opacity,
-        r, g, b, a * self._opacity,
-        r, g, b, a * self._opacity,
-        r, g, b, a * self._opacity,
+        r, g, b, a,
+        r, g, b, a,
+        r, g, b, a,
+        r, g, b, a,
+        r, g, b, a,
         r, g, b, 0
     )
 end
 
---- @override
-function rt.ParticleEmitter:set_opacity(alpha)
-    self._opacity = alpha
-    self:_update_colors()
+--- @brief
+function rt.ParticleEmitter:set_emission_rate(n_per_second)
+    self._native:setEmissionRate(n_per_second)
+end
+
+--- @brief
+function rt.ParticleEmitter:set_linear_velocity(x, y)
+    self._native:setLinearAcceleration(x, y, x, y)
+end
+
+--- @brief
+function rt.ParticleEmitter:set_angular_velocity(x)
+    self._native:setRadialAcceleration(x, x)
 end
 
 --- @brief
 function rt.ParticleEmitter:emit(n)
     self._native:emit(n)
+end
+
+--- @brief
+function rt.ParticleEmitter:set_color(color)
+    if meta.is_hsva(color) then
+        self._color = rt.hsva_to_rgba(color)
+    elseif meta.is_lcha(color) then
+        self._color = rt.lcha_to_rgba(color)
+    else
+        meta.assert_rgba(color)
+        self._color = color
+    end
 end

@@ -174,6 +174,20 @@ rt.InterpolationFunctions = meta.new_enum("InterpolationFunction", {
         if order % 2 ~= 0 then order = order + 1 end
         return 1 - math.tanh(math.pow(2 * ((x - 0.5) / shelf_width), order))
     end,
+    
+    SHELF_EASE_OUT = function(x, k)
+        -- \tanh\left(k\left(x-1\right)\right)^{2}
+        if x <= 0 then return 1 elseif x >= 1 then return 0 end
+        if k == nil then k = 6.5 end
+        return math.tanh(k * (x - 1))^2
+    end,
+    
+    SHELF_EASE_IN = function(x, k)
+        -- \tanh\left(k\left(x\right)\right)^{2}
+        if x <= 0 then return 0 elseif x >= 1 then return 1 end
+        if k == nil then k = 6.5 end
+        return math.tanh(k * (x - 1))^2
+    end,
 
     SINE_WAVE = function(x, frequency)
         -- \frac{\cos\left(3\pi\left(bx-1\right)\right)}{2}+0.5
@@ -202,6 +216,17 @@ rt.InterpolationFunctions = meta.new_enum("InterpolationFunction", {
         if x >= 1 then return 1 elseif x <= 0 then return 0 end
         if order == nil then order = 1 end
         return (x - 1)^(2 * order + 1) + 1
+    end,
+
+    SQUARE_ROOT_INFLECTION = function(x)
+        if x <= 0 then return 0 elseif x >= 1 then return 1 end
+        if x < 0.5 then
+            -- -\sqrt{-0.5\left(x-0.5\right)}+0.5
+            return -1 * math.sqrt(-0.5 * (x - 0.5)) + 0.5
+        else
+            -- \sqrt{\left(0.5\left(x-0.5\right)\right)}+0.5
+            return math.sqrt(0.5 * (x - 0.5)) + 0.5
+        end
     end
 })
 
