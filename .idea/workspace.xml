@@ -22,22 +22,11 @@
     </configurations>
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="7fa9ba1b-2cff-4ecc-86fb-59ab2fa76ee1" name="Changes" comment="stashing shader">
-      <change afterPath="$PROJECT_DIR$/battle/animations/hp_lost.glsl" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/battle/animations/hp_lost.lua" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/battle/animations/hp_lost_render.glsl" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/battle/animations/hp_lost_step.glsl" afterDir="false" />
+    <list default="true" id="7fa9ba1b-2cff-4ecc-86fb-59ab2fa76ee1" name="Changes" comment="added hp lost">
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/assets/configs/entities/BOULDER.lua" beforeDir="false" afterPath="$PROJECT_DIR$/assets/configs/entities/BOULDER.lua" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/backgrounds/overlapping_dots.glsl" beforeDir="false" afterPath="$PROJECT_DIR$/backgrounds/overlapping_dots.glsl" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/battle/animations/hp_gained.lua" beforeDir="false" afterPath="$PROJECT_DIR$/battle/animations/hp_gained.lua" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/battle/battle_scene.lua" beforeDir="false" afterPath="$PROJECT_DIR$/battle/battle_scene.lua" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/battle/simulation_handler.lua" beforeDir="false" afterPath="$PROJECT_DIR$/battle/simulation_handler.lua" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/common/compute_shader.lua" beforeDir="false" afterPath="$PROJECT_DIR$/common/compute_shader.lua" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/common/graphics_buffer.lua" beforeDir="false" afterPath="$PROJECT_DIR$/common/graphics_buffer.lua" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/common/particle_emitter.lua" beforeDir="false" afterPath="$PROJECT_DIR$/common/particle_emitter.lua" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/common/translation.lua" beforeDir="false" afterPath="$PROJECT_DIR$/common/translation.lua" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/common/vertex_shape.lua" beforeDir="false" afterPath="$PROJECT_DIR$/common/vertex_shape.lua" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/battle/animations/hp_lost.lua" beforeDir="false" afterPath="$PROJECT_DIR$/battle/animations/hp_lost.lua" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/battle/animations/hp_lost_render.glsl" beforeDir="false" afterPath="$PROJECT_DIR$/battle/animations/hp_lost_render.glsl" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/battle/animations/hp_lost_step.glsl" beforeDir="false" afterPath="$PROJECT_DIR$/battle/animations/hp_lost_step.glsl" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -654,15 +643,7 @@
       <workItem from="1732750395425" duration="169000" />
       <workItem from="1732750573945" duration="4500000" />
       <workItem from="1732836260477" duration="54940000" />
-      <workItem from="1733258374228" duration="2358000" />
-    </task>
-    <task id="LOCAL-01244" summary="stashing">
-      <option name="closed" value="true" />
-      <created>1731637884767</created>
-      <option name="number" value="01244" />
-      <option name="presentableId" value="LOCAL-01244" />
-      <option name="project" value="LOCAL" />
-      <updated>1731637884767</updated>
+      <workItem from="1733258374228" duration="6694000" />
     </task>
     <task id="LOCAL-01245" summary="fixed deadlock when path length is 0">
       <option name="closed" value="true" />
@@ -1048,7 +1029,15 @@
       <option name="project" value="LOCAL" />
       <updated>1733187033408</updated>
     </task>
-    <option name="localTasksCounter" value="1293" />
+    <task id="LOCAL-01293" summary="added hp lost">
+      <option name="closed" value="true" />
+      <created>1733260919107</created>
+      <option name="number" value="01293" />
+      <option name="presentableId" value="LOCAL-01293" />
+      <option name="project" value="LOCAL" />
+      <updated>1733260919108</updated>
+    </task>
+    <option name="localTasksCounter" value="1294" />
     <servers />
   </component>
   <component name="TypeScriptGeneratedFilesManager">
@@ -1097,7 +1086,6 @@
     </option>
   </component>
   <component name="VcsManagerConfiguration">
-    <MESSAGE value="mesh working" />
     <MESSAGE value="fixed path at for 3 vertex paths" />
     <MESSAGE value="stashing, needs path length normalization" />
     <MESSAGE value="stashing split paths" />
@@ -1122,7 +1110,8 @@
     <MESSAGE value="added hp animation" />
     <MESSAGE value="stashing" />
     <MESSAGE value="stashing shader" />
-    <option name="LAST_COMMIT_MESSAGE" value="stashing shader" />
+    <MESSAGE value="added hp lost" />
+    <option name="LAST_COMMIT_MESSAGE" value="added hp lost" />
   </component>
   <component name="XDebuggerManager">
     <breakpoint-manager>

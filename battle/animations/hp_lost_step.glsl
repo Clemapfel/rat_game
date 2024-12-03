@@ -4,6 +4,7 @@ struct Particle {
     float velocity;
     float damping;
     float hue;
+    float radius;
 };
 
 layout(std430) buffer particle_buffer {
@@ -22,6 +23,5 @@ void computemain()
     vec2 direction = vec2(cos(particle.angle), sin(particle.angle));
     particle.current += direction * delta * particle.velocity * (1 - particle.damping);
     particle.damping = clamp(particle.damping + delta / damping_speed, 0, 1);
-
     particles[particle_i] = particle;
 }
