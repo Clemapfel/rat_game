@@ -22,14 +22,17 @@
     </configurations>
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="7fa9ba1b-2cff-4ecc-86fb-59ab2fa76ee1" name="Changes" comment="added hp animation">
+    <list default="true" id="7fa9ba1b-2cff-4ecc-86fb-59ab2fa76ee1" name="Changes" comment="stashing">
+      <change afterPath="$PROJECT_DIR$/backgrounds/overlapping_dots.glsl" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/backgrounds/overlapping_dots.lua" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/common/graphics_buffer.lua" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/assets/text/english.lua" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/battle/animations/hp_gained.lua" beforeDir="false" afterPath="$PROJECT_DIR$/battle/animations/hp_gained.lua" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/battle/battle_scene.lua" beforeDir="false" afterPath="$PROJECT_DIR$/battle/battle_scene.lua" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/battle/simulation_handler.lua" beforeDir="false" afterPath="$PROJECT_DIR$/battle/simulation_handler.lua" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/common/particle_emitter.lua" beforeDir="false" afterPath="$PROJECT_DIR$/common/particle_emitter.lua" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/common/translation.lua" beforeDir="false" afterPath="$PROJECT_DIR$/common/translation.lua" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/common/shader.lua" beforeDir="false" afterPath="$PROJECT_DIR$/common/shader.lua" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/common/vertex_shape.lua" beforeDir="false" afterPath="$PROJECT_DIR$/common/vertex_shape.lua" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/common/~vertex_shape.lua" beforeDir="false" afterPath="$PROJECT_DIR$/common/~vertex_shape.lua" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/include.lua" beforeDir="false" afterPath="$PROJECT_DIR$/include.lua" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/older/~common/vertex_shape.lua" beforeDir="false" afterPath="$PROJECT_DIR$/older/~common/vertex_shape.lua" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -645,15 +648,7 @@
       <workItem from="1731969851166" duration="104473000" />
       <workItem from="1732750395425" duration="169000" />
       <workItem from="1732750573945" duration="4500000" />
-      <workItem from="1732836260477" duration="30357000" />
-    </task>
-    <task id="LOCAL-01242" summary="camera interpolation done">
-      <option name="closed" value="true" />
-      <created>1731615629891</created>
-      <option name="number" value="01242" />
-      <option name="presentableId" value="LOCAL-01242" />
-      <option name="project" value="LOCAL" />
-      <updated>1731615629891</updated>
+      <workItem from="1732836260477" duration="43286000" />
     </task>
     <task id="LOCAL-01243" summary="stashing love physics">
       <option name="closed" value="true" />
@@ -1039,7 +1034,15 @@
       <option name="project" value="LOCAL" />
       <updated>1733082804005</updated>
     </task>
-    <option name="localTasksCounter" value="1291" />
+    <task id="LOCAL-01291" summary="stashing">
+      <option name="closed" value="true" />
+      <created>1733085038372</created>
+      <option name="number" value="01291" />
+      <option name="presentableId" value="LOCAL-01291" />
+      <option name="project" value="LOCAL" />
+      <updated>1733085038372</updated>
+    </task>
+    <option name="localTasksCounter" value="1292" />
     <servers />
   </component>
   <component name="TypeScriptGeneratedFilesManager">
@@ -1110,10 +1113,10 @@
     <MESSAGE value="refactored vertex shape" />
     <MESSAGE value="stashing before moving away from mesh" />
     <MESSAGE value="stashing non-mesh version" />
-    <MESSAGE value="stashing" />
     <MESSAGE value="done" />
     <MESSAGE value="added hp animation" />
-    <option name="LAST_COMMIT_MESSAGE" value="added hp animation" />
+    <MESSAGE value="stashing" />
+    <option name="LAST_COMMIT_MESSAGE" value="stashing" />
   </component>
   <component name="XDebuggerManager">
     <breakpoint-manager>
@@ -1148,6 +1151,11 @@
           <line>220</line>
           <log-expression expression="o&#10;    local lg = love.graphics&#10;&#10;    --- @brief&#10;    function rt.Camera:bind()&#10;        lg.push()&#10;        lg.origin()&#10;&#10;        if self._blur_strength &gt; 0 then&#10;            lg.setCanvas({ self._render_texture_b, stencil = true })&#10;            lg.clear(true, false, false)&#10;        else&#10;            lg.translate(self._offset_x, self._offset_y) -- shake separate, applied to padded mesh to avoid bordering&#10;        end&#10;&#10;        lg.translate(self._current_x, self._current_y)&#10;        lg.scale(self._current_scale)&#10;        lg.rotate(self._current_angle)&#10;        lg.translate( -0.5 * self._aabb.width, -0.5 * self._aabb.height)&#10;    end&#10;&#10;    -- scene draw here&#10;&#10;    --- @brief&#10;    function rt.Camera:unbind()&#10;        if self._blur_strength &gt; 0 then&#10;            lg.origin()&#10;&#10;            local a, b = self._render_texture_a, self._render_texture_b&#10;            for i = 1, self._blur_strength do&#10;                lg.setShader(self._blur_shader_horizontal)&#10;                lg.setCanvas(a)&#10;                lg.draw(b)&#10;&#10;                lg.setShader(self._blur_shader_vertical)&#10;                lg.setCanvas(b)&#10;                lg.draw(a)&#10;            end&#10;&#10;            lg.setCanvas()&#10;            lg.translate(self._offset_x, self._offset_y)&#10;            lg.draw(self._render_texture_mesh)&#10;        end&#10;&#10;        lg.pop()&#10;    end&#10;end" language="Lua" />
           <option name="timeStamp" value="28" />
+        </line-breakpoint>
+        <line-breakpoint enabled="true" type="lua-line">
+          <url>file://$PROJECT_DIR$/older/~common/vertex_shape.lua</url>
+          <line>376</line>
+          <option name="timeStamp" value="31" />
         </line-breakpoint>
         <line-breakpoint enabled="true" suspend="NONE" type="CMakeLineBreakpoint">
           <url>file://$PROJECT_DIR$/physics/box2d_extension/CMakeLists.txt</url>

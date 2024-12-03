@@ -41,7 +41,7 @@ bt.BattleScene = meta.new_type("BattleScene", rt.Scene, function(state)
 
         _entity_selection_graph = nil, -- rt.SelectionGraph
     })
-    out._background:set_implementation(rt.Background.CONFUSION) -- TODO
+    out._background:set_implementation(rt.Background.OVERLAPPING_DOTS) -- TODO
     return out
 end)
 
@@ -454,6 +454,7 @@ end
 function bt.BattleScene:draw()
     self._background:draw()
 
+    --[[
     for sprite in values(self._party_sprites) do
         sprite:draw()
     end
@@ -492,6 +493,7 @@ function bt.BattleScene:draw()
     end
 
     self._animation_queue:draw()
+    ]]--
 end
 
 --- @brief

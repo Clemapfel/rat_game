@@ -66,41 +66,71 @@ rt.VertexRectangle = function(x, y, width, height)
     })
 end
 
---- @class rt.VertexCircle
-rt.VertexCircle = function(center_x, center_y, x_radius, y_radius, n_outer_vertices)
-    if y_radius == nil then y_radius = x_radius end
-    if n_outer_vertices == nil then n_outer_vertices = 16 end
-    local data = {
-        {center_x, center_y, 0.5, 0.5, 1, 1, 1, 1}
-    }
+do
+    local _n_outer_vertices_to_vertex_map = {}
 
-    local step = 2 * math.pi / n_outer_vertices
-    for angle = 0, 2 * math.pi, step do
-        local x, y = center_x + math.cos(step) * x_radius, center_y + math.sin(step) * y_radius
-        local tx, ty = (x - center_x) / (2 * x_radius), (y - center_y) / (2 * y_radius)
-        table.insert(data, {
-           x, y, tx, ty, 1, 1, 1, 1
+    --- @class rt.VertexCircle
+    rt.VertexCircle = function(center_x, center_y, x_radius, y_radius, n_outer_vertices)
+        y_radius = which(y_radius, x_radius)
+        n_outer_vertices = which(n_outer_vertices, 8)
+        local vertices = {
+            {center_x, center_y, 0, 0, 1, 1, 1, 1}
+        }
+
+        local step = (2 * math.pi) / n_outer_vertices
+        for angle = 0, 2 * math.pi, step do
+            table.insert(vertices, {
+                center_x + math.cos(angle) * x_radius,
+                center_y + math.sin(angle) * y_radius,
+                0, 0,
+                1, 1, 1, 1
+            })
+        end
+
+        local map = _n_outer_vertices_to_vertex_map[n_outer_vertices]
+        if map == nil then
+            local indices = {}
+            for outer_i = 1, n_outer_vertices - 1 do
+                for i in range(1, outer_i, outer_i + 1) do
+                    table.insert(indices, i)
+                end
+            end
+
+            for i in range(n_outer_vertices, 1, 2) do
+                table.insert(indices, i)
+            end
+            _n_outer_vertices_to_vertex_map[n_outer_vertices] = indices
+            map = indices
+        end
+
+        local native = love.graphics.newMesh(
+            rt.VertexFormat,
+            vertices,
+            rt.MeshDrawMode.TRIANGLES,
+            rt.GraphicsBufferUsage.STATIC
+        )
+        native:setVertexMap(map)
+
+        return meta.new(rt.VertexShape, {
+            _native = native,
+            _r = 1,
+            _g = 1,
+            _b = 1,
+            _opacity = 1
         })
     end
-
-    return meta.new(rt.VertexShape, {
-        _native = love.graphics.newMesh(
-            rt.VertexFormat,
-            data,
-            rt.MeshDrawMode.TRIANGLE_FAN,
-            rt.GraphicsBufferUsage.STATIC
-        ),
-        _r = 1,
-        _g = 1,
-        _b = 1,
-        _opacity = 1
-    })
 end
 
 --- @override
 function rt.VertexShape:draw()
     love.graphics.setColor(self._r, self._g, self._b, self._opacity)
     love.graphics.draw(self._native)
+end
+
+--- @brief
+function rt.VertexShape:draw_instanced(n_instances)
+    love.graphics.setColor(self._r, self._g, self._b, self._opacity)
+    love.graphics.drawInstanced(self._native, n_instances)
 end
 
 --- @brief
@@ -168,4 +198,9 @@ end
 --- @brief
 function rt.VertexShape:set_texture(texture)
     self._native:setTexture(texture._native)
+end
+
+--- @brief
+function rt.VertexShape:get_n_vertices()
+    return self._native:getVertexCount()
 end

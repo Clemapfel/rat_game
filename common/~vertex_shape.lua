@@ -1,10 +1,3 @@
---- @class rt.GraphicsBufferUsage
-rt.GraphicsBufferUsage = meta.new_enum("GraphicsBufferUsage", {
-    DYNAMIC = "dynamic",
-    STATIC = "static",
-    STREAM = "stream"
-})
-
 --- @class rt.MeshDrawMode
 rt.MeshDrawMode = meta.new_enum("MeshDrawMode", {
     TRIANGLE_FAN = "fan",

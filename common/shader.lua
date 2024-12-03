@@ -22,6 +22,11 @@ function rt.Shader:send(name, value)
 end
 
 --- @brief
+function rt.Shader:get_buffer_format(name)
+    return self._native:getBufferFormat(name)
+end
+
+--- @brief
 function rt.Shader:has_uniform(name)
     return self._native:hasUniform(name)
 end
