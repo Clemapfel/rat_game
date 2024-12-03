@@ -363,6 +363,24 @@ function bt.BattleScene:create_simulation_environment()
         end
     end
 
+    -- keep track of currently invoking entity
+
+    local _current_move_user_stack = {} -- Table<Union<Nil, EntityProxy>>
+    local _push_current_move_user = function(entity_proxy)
+        if entity_proxy ~= nil then bt.assert_is_entity_proxy(entity_proxy) end
+        table.insert(_current_move_user_stack, 1, entity_proxy)
+    end
+
+    local _pop_current_move_user = function()
+        local current = _current_move_user_stack[1]
+        table.remove(_current_move_user_stack, 1)
+        return current
+    end
+
+    local _get_current_move_user = function()
+        return _current_move_user_stack[1]
+    end
+
     -- callback invocations
 
     --- @param callback_id String
@@ -377,10 +395,14 @@ function bt.BattleScene:create_simulation_environment()
 
         local status = _get_native(status_proxy)
         if status[callback_id] == nil then return end
+
+        _push_current_move_user(nil)
         local afflicted_sprite = _scene._sprites[_get_native(entity_proxy)]
         local animation = bt.Animation.STATUS_APPLIED(_scene, status, afflicted_sprite)
         _scene:_push_animation(animation)
-        return _scene:invoke(status[callback_id], status_proxy, entity_proxy, ...)
+        local out = _scene:invoke(status[callback_id], status_proxy, entity_proxy, ...)
+        _pop_current_move_user()
+        return out
     end
 
     --- @param callback_id String
@@ -396,6 +418,7 @@ function bt.BattleScene:create_simulation_environment()
         local consumable = _get_native(consumable_proxy)
         if consumable[callback_id] == nil then return end
 
+        _push_current_move_user(nil)
         local entity = _get_native(consumable_proxy)
 
         local slot_i = _state:entity_get_consumable_slot_i(entity, consumable)
@@ -406,7 +429,9 @@ function bt.BattleScene:create_simulation_environment()
         local holder_sprite = _scene._sprites[entity]
         local animation = bt.Animation.CONSUMABLE_APPLIED(_scene, consumable, holder_sprite)
         _scene:_push_animation(animation)
-        return _scene:invoke(consumable[callback_id], consumable_proxy, holder_proxy, ...)
+        local out = _scene:invoke(consumable[callback_id], consumable_proxy, holder_proxy, ...)
+        _pop_current_move_user()
+        return out
     end
 
     --- @param callback_id String
@@ -420,9 +445,12 @@ function bt.BattleScene:create_simulation_environment()
         local global_status = _get_native(global_status_proxy)
         if global_status[callback_id] == nil then return end
 
+        _push_current_move_user(nil)
         local animation = bt.Animation.GLOBAL_STATUS_APPLIED(_scene, global_status)
         _scene:_push_animation(animation)
-        return _scene:invoke(global_status[callback_id], global_status_proxy, ...)
+        local out = _scene:invoke(global_status[callback_id], global_status_proxy, ...)
+        _pop_current_move_user()
+        return out
     end
 
     --- @param callback_id String
@@ -436,9 +464,12 @@ function bt.BattleScene:create_simulation_environment()
         local equip = _get_native(equip_proxy)
         if equip[callback_id] == nil then return end
 
+        _push_current_move_user(nil)
         local animation = bt.Animation.EQUIP_APPLIED(_scene, equip)
         _scene:_push_animation(animation)
-        return _scene:invoke(equip[callback_id], equip_proxy, ...)
+        local out = _scene:invoke(equip[callback_id], equip_proxy, ...)
+        _pop_current_move_user()
+        return out
     end
 
     --- @brief
@@ -750,12 +781,15 @@ function bt.BattleScene:create_simulation_environment()
         if equip == nil then return end
 
         if equip.effect ~= nil and (not _state:entity_get_equip_is_disabled(entity, slot_i)) then
+            _push_current_move_user(nil)
             local equip_proxy = bt.create_equip_proxy(_scene, equip)
             local sprite = _scene:get_sprite(entity)
             local animation = bt.Animation.EQUIP_APPLIED(_scene, equip, sprite)
             _scene:_push_animation(animation)
             env.append_message(rt.Translation.battle.message.equip_applied_f(entity_proxy, equip_proxy))
-            _scene:invoke(equip.effect, equip_proxy, entity_proxy)
+            local out = _scene:invoke(equip.effect, equip_proxy, entity_proxy)
+            _pop_current_move_user()
+            return out
         end
     end
 
@@ -1668,35 +1702,56 @@ function bt.BattleScene:create_simulation_environment()
         local hp_current = env.get_hp(entity_proxy)
         local hp_base = env.get_hp_base(entity_proxy)
 
-        -- fizzle on already full
-        if hp_current >= hp_base or value == 0 then return end
+        if
+            hp_current >= hp_base or value == 0 or
+            env.is_knocked_out(entity_proxy) or
+            env.is_dead(entity_proxy)
+        then
+            return
+        end
 
-        local difference = clamp(value, 0, (hp_base - hp_current))
+        local difference = value -- no clamp
         local sprite = _scene:get_sprite(entity)
         local animation = bt.Animation.HP_GAINED(_scene, sprite, difference)
+
+        animation:signal_connect("start", function(_)
+            sprite:set_hp(clamp(hp_current + difference, 0, hp_base))
+        end)
 
         _scene:_push_animation(animation)
         env.message(rt.Translation.battle.message.hp_gained_f(entity_proxy, difference))
 
-        _state:entity_set_hp(entity, clamp(hp_current + difference, 0, hp_base))
+        _state:entity_set_hp(entity, hp_current + difference)
 
-        local callback_id = "on_healing_performed"
-        local performer_proxy = env.get_
+        do
+            local callback_id = "on_hp_gained"
+            for status_proxy in values(env.list_statuses(entity_proxy)) do
+                _try_invoke_status_callback(callback_id, status_proxy, entity_proxy, value)
+            end
 
-        -- TODO: how to get acting entity?
+            for consumable_proxy in values(env.list_consumables(entity_proxy)) do
+                _try_invoke_consumable_callback(callback_id, consumable_proxy, entity_proxy, value)
+            end
 
-
-        callback_id = "on_hp_gained"
-        for status_proxy in values(env.list_statuses(entity_proxy)) do
-            _try_invoke_status_callback(callback_id, status_proxy, entity_proxy, value)
+            for global_status_proxy in values(env.list_global_statuses()) do
+                _try_invoke_global_status_callback(callback_id, global_status_proxy, entity_proxy, value)
+            end
         end
 
-        for consumable_proxy in values(env.list_consumables(entity_proxy)) do
-            _try_invoke_consumable_callback(callback_id, consumable_proxy, entity_proxy, value)
-        end
+        local performer_proxy = _get_current_move_user()
+        if performer_proxy ~= nil then
+            local callback_id = "on_healing_performed"
+            for status_proxy in values(env.list_statuses(performer_proxy)) do
+                _try_invoke_status_callback(callback_id, status_proxy, performer_proxy, value)
+            end
 
-        for global_status_proxy in values(env.list_global_statuses()) do
-            _try_invoke_global_status_callback(callback_id, global_status_proxy, entity_proxy, value)
+            for consumable_proxy in values(env.list_consumables(performer_proxy)) do
+                _try_invoke_consumable_callback(callback_id, consumable_proxy, performer_proxy, value)
+            end
+
+            for global_status_proxy in values(env.list_global_statuses()) do
+                _try_invoke_global_status_callback(callback_id, global_status_proxy, performer_proxy, value)
+            end
         end
     end
 
@@ -1709,9 +1764,73 @@ function bt.BattleScene:create_simulation_environment()
         local entity = _get_native(entity_proxy)
         if value < 0 then
             rt.warning("In env.reduce_hp: value `" .. value .. "` is negative, increasing hp of `" .. entity:get_id() .. "` instead")
+            env.add_hp(entity_proxy, math.abs(value))
+            return
         end
 
-        -- TODO
+        if value == 0 or env.is_dead(entity_proxy) then
+            -- if dead, fizzle
+            return
+        end
+
+        if env.is_knocked_out(entity_proxy) then
+            -- if knocked out, any damage > 0 kills
+            env.kill(entity_proxy)
+            return
+        end
+
+        local hp_before = env.get_hp(entity_proxy)
+        local difference = value -- no clamp
+
+        local sprite = _scene:get_sprite(entity)
+        local animation = bt.Animation.HP_LOST(_scene, sprite, difference)
+
+        animation:signal_connect("start", function(_)
+            sprite:set_hp(hp_before - difference)
+        end)
+
+        _scene:_push_animation(animation)
+        env.message(rt.Translation.battle.message.hp_lost_f(entity_proxy, difference))
+
+        _state:entity_set_hp(entity, clamp(hp_before - difference, 0))
+        local hp_after = _state:entity_get_hp(entity)
+
+        do
+            local callback_id = "on_hp_lost"
+            for status_proxy in values(env.list_statuses(entity_proxy)) do
+                _try_invoke_status_callback(callback_id, status_proxy, entity_proxy, value)
+            end
+
+            for consumable_proxy in values(env.list_consumables(entity_proxy)) do
+                _try_invoke_consumable_callback(callback_id, consumable_proxy, entity_proxy, value)
+            end
+
+            for global_status_proxy in values(env.list_global_statuses()) do
+                _try_invoke_global_status_callback(callback_id, global_status_proxy, entity_proxy, value)
+            end
+        end
+
+        local performer_proxy = _get_current_move_user()
+        if performer_proxy ~= nil then
+            local callback_id = "on_damage_dealt"
+            for status_proxy in values(env.list_statuses(performer_proxy)) do
+                _try_invoke_status_callback(callback_id, status_proxy, performer_proxy, value)
+            end
+
+            for consumable_proxy in values(env.list_consumables(performer_proxy)) do
+                _try_invoke_consumable_callback(callback_id, consumable_proxy, performer_proxy, value)
+            end
+
+            for global_status_proxy in values(env.list_global_statuses()) do
+                _try_invoke_global_status_callback(callback_id, global_status_proxy, performer_proxy, value)
+            end
+        end
+
+        if hp_after == 0 then
+            -- if reaching 0, knock out
+            env.knock_out(entity_proxy)
+            return
+        end
     end
 
     env.set_hp = function(entity_proxy, value)
@@ -1849,6 +1968,148 @@ function bt.BattleScene:create_simulation_environment()
     end
 
     --- ### COMMON ###
+
+    env.compute_damage = function(
+        attacking_entity_proxy,
+        defending_entity_proxy,
+        damage
+    )
+        bt.assert_args("compute_damage",
+            attacking_entity_proxy, bt.EntityProxy,
+            defending_entity_proxy, bt.EntityProxy,
+            damage, bt.Number
+        )
+
+        local value = damage
+        local attack_statuses = {}
+        for status_proxy in values(env.list_statuses(attacking_entity_proxy)) do
+            table.insert(attack_statuses, _get_native(status_proxy))
+        end
+
+        local defense_statuses = {}
+        for status_proxy in values(env.list_statuses(defending_entity_proxy)) do
+            table.insert(defense_statuses, _get_native(status_proxy))
+        end
+
+        local attack_consumables = {}
+        for consumable_proxy in values(env.list_consumables(attacking_entity_proxy)) do
+            table.insert(attack_consumables, _get_native(consumable_proxy))
+        end
+
+        local defense_consumables = {}
+        for consumable_proxy in values(env.list_consumables(defending_entity_proxy)) do
+            table.insert(defense_consumables, _get_native(consumable_proxy))
+        end
+
+        -- factors
+        for status in values(attack_statuses) do
+            value = value * status:get_damage_dealt_factor()
+        end
+
+        for status in values(defense_statuses) do
+            value = value * status:get_damage_received_factor()
+        end
+
+        for consumable in values(attack_consumables) do
+            value = value * consumable:get_damage_dealt_factor()
+        end
+
+        for consumable in values(defense_consumables) do
+            value = value * consumable:get_damage_received_factor()
+        end
+
+        -- offsets
+        for status in values(attack_statuses) do
+            value = value + status:get_damage_dealt_offset()
+        end
+
+        for status in values(defense_statuses) do
+            value = value + status:get_damage_received_offset()
+        end
+
+        for consumable in values(attack_consumables) do
+            value = value + consumable:get_damage_dealt_offset()
+        end
+
+        for consumable in values(defense_consumables) do
+            value = value + consumable:get_damage_received_offset()
+        end
+
+        value = value - env.get_defense(defending_entity_proxy) -- TODO?
+
+        value = math.ceil(value)
+        if value < 1 then value = 1 end
+        return value
+    end
+
+    env.compute_healing = function(
+        healing_performing_entity_proxy,
+        healing_receiving_entity_proxy,
+        healing
+    )
+        bt.assert_args("compute_damage",
+            healing_performing_entity_proxy, bt.EntityProxy,
+            healing_receiving_entity_proxy, bt.EntityProxy,
+            healing, bt.Number
+        )
+
+        local value = healing
+        local performing_statuses = {}
+        for status_proxy in values(env.list_statuses(healing_performing_entity_proxy)) do
+            table.insert(performing_statuses, _get_native(status_proxy))
+        end
+
+        local receiving_statuses = {}
+        for status_proxy in values(env.list_statuses(healing_receiving_entity_proxy)) do
+            table.insert(receiving_statuses, _get_native(status_proxy))
+        end
+
+        local performing_consumables = {}
+        for consumable_proxy in values(env.list_consumables(healing_performing_entity_proxy)) do
+            table.insert(performing_consumables, _get_native(consumable_proxy))
+        end
+
+        local receiving_consumables = {}
+        for consumable_proxy in values(env.list_consumables(healing_receiving_entity_proxy)) do
+            table.insert(receiving_consumables, _get_native(consumable_proxy))
+        end
+
+        -- factors
+        for status in values(performing_statuses) do
+            value = value * status:get_healing_performed_factor()
+        end
+
+        for status in values(receiving_statuses) do
+            value = value * status:get_healing_received_factor()
+        end
+
+        for consumable in values(performing_consumables) do
+            value = value * consumable:get_healing_performed_factor()
+        end
+
+        for consumable in values(receiving_consumables) do
+            value = value * consumable:get_healing_received_factor()
+        end
+
+        -- offsets
+        for status in values(performing_statuses) do
+            value = value + status:get_healing_performed_offset()
+        end
+
+        for status in values(receiving_statuses) do
+            value = value + status:get_healing_received_offset()
+        end
+
+        for consumable in values(performing_consumables) do
+            value = value + consumable:get_healing_performed_offset()
+        end
+
+        for consumable in values(receiving_consumables) do
+            value = value + consumable:get_healing_received_offset()
+        end
+
+        return value
+    end
 
     env.start_turn = function()
         -- TODO

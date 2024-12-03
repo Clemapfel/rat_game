@@ -369,7 +369,11 @@ rt.Translation = rt.initialize_translation({
             end,
 
             hp_gained_f = function(entity, value)
-                return entity .. " gained <color=HP>" .. value .. "</color> HP"
+                return entity .. " gained <color=HP><mono>" .. value .. "</mono></color> HP"
+            end,
+
+            hp_lost_f = function(entity, value)
+                return entity .. " lost <color=HP><mono>" .. value .. "</mono></color> HP"
             end
         }
     }

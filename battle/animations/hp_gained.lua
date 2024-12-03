@@ -55,7 +55,7 @@ do
     --- @override
     function bt.Animation.HP_GAINED:start()
         self._label = rt.Label(
-            "<b><o><color=HP>" .. self._value .. "</color></o></b>",
+            "<b><o><color=HP><mono>" .. self._value .. "</mono></color></o></b>",
             rt.settings.font.default_large,
             rt.settings.font.default_mono_large
         )

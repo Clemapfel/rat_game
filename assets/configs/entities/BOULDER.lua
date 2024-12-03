@@ -1,5 +1,5 @@
 return {
-    name = "Overlay Optimistic Boulder",
+    name = "Overly Optimistic Boulder",
     flavor_text = "Just rolling'",
 
     sprite_id = "why",

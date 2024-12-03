@@ -73,13 +73,13 @@ do
     rt.VertexCircle = function(center_x, center_y, x_radius, y_radius, n_outer_vertices)
         y_radius = which(y_radius, x_radius)
         n_outer_vertices = which(n_outer_vertices, 8)
-        local vertices = {
-            {center_x, center_y, 0, 0, 1, 1, 1, 1}
+        local data = {
+            {0, 0, 0, 0, 1, 1, 1, 1}
         }
 
-        local step = (2 * math.pi) / n_outer_vertices
+        local step = 2 * math.pi / n_outer_vertices
         for angle = 0, 2 * math.pi, step do
-            table.insert(vertices, {
+            table.insert(data, {
                 center_x + math.cos(angle) * x_radius,
                 center_y + math.sin(angle) * y_radius,
                 0, 0,
@@ -87,25 +87,20 @@ do
             })
         end
 
-        local map = _n_outer_vertices_to_vertex_map[n_outer_vertices]
-        if map == nil then
-            local indices = {}
-            for outer_i = 1, n_outer_vertices - 1 do
-                for i in range(1, outer_i, outer_i + 1) do
-                    table.insert(indices, i)
-                end
+        local map = {}
+        for outer_i = 2, n_outer_vertices do
+            for i in range(1, outer_i, outer_i + 1) do
+                table.insert(map, i)
             end
+        end
 
-            for i in range(n_outer_vertices, 1, 2) do
-                table.insert(indices, i)
-            end
-            _n_outer_vertices_to_vertex_map[n_outer_vertices] = indices
-            map = indices
+        for i in range(n_outer_vertices + 1, 1, 2) do
+            table.insert(map, i)
         end
 
         local native = love.graphics.newMesh(
             rt.VertexFormat,
-            vertices,
+            data,
             rt.MeshDrawMode.TRIANGLES,
             rt.GraphicsBufferUsage.STATIC
         )

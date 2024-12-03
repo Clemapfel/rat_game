@@ -112,7 +112,7 @@ vec4 position(mat4 transform, vec4 vertex_position)
     int instance_id = love_InstanceID;
     InstanceData data = instance_data[instance_id];
 
-    float time = elapsed / 3;
+    float time = elapsed / 5;
 
     float omit_first = distance(vertex_position.xy, vec2(0)); // 0 for center, 1 for everything else
     float angle = atan(vertex_position.y, vertex_position.x) + data.rotation + elapsed;

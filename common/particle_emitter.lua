@@ -88,7 +88,7 @@ function rt.ParticleEmitter:set_linear_velocity(x, y)
 end
 
 --- @brief
-function rt.ParticleEmitter:set_angular_velocity(x)
+function rt.ParticleEmitter:set_radial_velocity(x)
     self._native:setRadialAcceleration(x, x)
 end
 
