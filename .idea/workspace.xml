@@ -22,12 +22,9 @@
     </configurations>
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="7fa9ba1b-2cff-4ecc-86fb-59ab2fa76ee1" name="Changes" comment="sequential working">
-      <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
+    <list default="true" id="7fa9ba1b-2cff-4ecc-86fb-59ab2fa76ee1" name="Changes" comment="multi-pass shader working">
       <change beforePath="$PROJECT_DIR$/common/blood_sort.glsl" beforeDir="false" afterPath="$PROJECT_DIR$/common/blood_sort.glsl" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/main_blood.lua" beforeDir="false" afterPath="$PROJECT_DIR$/main_blood.lua" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/sort_main.lua" beforeDir="false" afterPath="$PROJECT_DIR$/sort_main.lua" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/sort_pass.glsl" beforeDir="false" afterPath="$PROJECT_DIR$/sort_pass.glsl" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -660,15 +657,7 @@
       <workItem from="1733258374228" duration="6911000" />
       <workItem from="1733268551317" duration="7549000" />
       <workItem from="1733334970865" duration="24000" />
-      <workItem from="1733335003286" duration="3148000" />
-    </task>
-    <task id="LOCAL-01248" summary="camera done">
-      <option name="closed" value="true" />
-      <created>1731786666735</created>
-      <option name="number" value="01248" />
-      <option name="presentableId" value="LOCAL-01248" />
-      <option name="project" value="LOCAL" />
-      <updated>1731786666735</updated>
+      <workItem from="1733335003286" duration="3446000" />
     </task>
     <task id="LOCAL-01249" summary="camera done">
       <option name="closed" value="true" />
@@ -1054,7 +1043,15 @@
       <option name="project" value="LOCAL" />
       <updated>1733336318102</updated>
     </task>
-    <option name="localTasksCounter" value="1297" />
+    <task id="LOCAL-01297" summary="multi-pass shader working">
+      <option name="closed" value="true" />
+      <created>1733338217462</created>
+      <option name="number" value="01297" />
+      <option name="presentableId" value="LOCAL-01297" />
+      <option name="project" value="LOCAL" />
+      <updated>1733338217462</updated>
+    </task>
+    <option name="localTasksCounter" value="1298" />
     <servers />
   </component>
   <component name="TypeScriptGeneratedFilesManager">
@@ -1103,7 +1100,6 @@
     </option>
   </component>
   <component name="VcsManagerConfiguration">
-    <MESSAGE value="fixed out of bounds behavior of interpolation functions" />
     <MESSAGE value="added path parameterization override" />
     <MESSAGE value="naive implementation working" />
     <MESSAGE value="stashing before shader rework" />
@@ -1128,7 +1124,8 @@
     <MESSAGE value="added radius fade out" />
     <MESSAGE value="stashing parallel count" />
     <MESSAGE value="sequential working" />
-    <option name="LAST_COMMIT_MESSAGE" value="sequential working" />
+    <MESSAGE value="multi-pass shader working" />
+    <option name="LAST_COMMIT_MESSAGE" value="multi-pass shader working" />
   </component>
   <component name="XDebuggerManager">
     <breakpoint-manager>

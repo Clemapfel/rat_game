@@ -186,12 +186,7 @@ love.load = function()
 
     local before = love.timer.getTime()
     love.graphics.dispatchThreadgroups(initialize_spatial_hash_shader, n_columns, n_rows)
-
-    for pass = 0, 3 do
-        sort_shader:send("pass", pass)
-        love.graphics.dispatchThreadgroups(sort_shader, 1, 1)
-    end
-
+    love.graphics.dispatchThreadgroups(sort_shader, 1, 1)
     love.graphics.dispatchThreadgroups(construct_spatial_hash_shader, construct_shader_n_thread_x, construct_shader_n_thread_y)
     println((love.timer.getTime() - before) / (1 / 60))
     print_particle_occupation_buffer()
@@ -213,10 +208,7 @@ end
 
 love.update = function(delta)
     love.graphics.dispatchThreadgroups(initialize_spatial_hash_shader, n_columns, n_rows)
-    for pass = 0, 3 do
-        sort_shader:send("pass", pass)
-        love.graphics.dispatchThreadgroups(sort_shader, 1, 1)
-    end
+    love.graphics.dispatchThreadgroups(sort_shader, 1, 1)
     love.graphics.dispatchThreadgroups(construct_spatial_hash_shader, construct_shader_n_thread_x, construct_shader_n_thread_y)
 end
 
