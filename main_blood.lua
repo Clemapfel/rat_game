@@ -183,22 +183,23 @@ love.load = function()
     end
     --print_cell_i_to_memory_mapping_buffer()
 
-    global_counts_buffer = love.graphics.newBuffer(sort_shader:getBufferFormat("global_counts_buffer"), 256, usage);
-    global_offsets_buffer = love.graphics.newBuffer(sort_shader:getBufferFormat("global_offsets_buffer"), 256, usage);
-    sort_shader:send("global_counts_buffer", global_counts_buffer)
-    sort_shader:send("global_offsets_buffer", global_offsets_buffer)
 
     local before = love.timer.getTime()
     love.graphics.dispatchThreadgroups(initialize_spatial_hash_shader, n_columns, n_rows)
-    love.graphics.dispatchThreadgroups(sort_shader, 1, 1)
-    --love.graphics.dispatchThreadgroups(construct_spatial_hash_shader, construct_shader_n_thread_x, construct_shader_n_thread_y)
-    --println((love.timer.getTime() - before) / (1 / 60))
+
+    for pass = 0, 3 do
+        sort_shader:send("pass", pass)
+        love.graphics.dispatchThreadgroups(sort_shader, 1, 1)
+    end
+
+    love.graphics.dispatchThreadgroups(construct_spatial_hash_shader, construct_shader_n_thread_x, construct_shader_n_thread_y)
+    println((love.timer.getTime() - before) / (1 / 60))
     print_particle_occupation_buffer()
 
     do
         local data = love.graphics.readbackBuffer(particle_occupation_buffer)
         local step = 2
-        for i = 1, n_particles * step, step do
+        for i = 1, n_particles * step - 2, step do
             local id1 = data:getUInt32((i - 1 + 0) * _byte)
             local hash1 = data:getUInt32((i - 1 + 1) * _byte)
             local id2 = data:getUInt32((i - 1 + 2) * _byte)
@@ -212,7 +213,10 @@ end
 
 love.update = function(delta)
     love.graphics.dispatchThreadgroups(initialize_spatial_hash_shader, n_columns, n_rows)
-    love.graphics.dispatchThreadgroups(sort_shader, 1, 1)
+    for pass = 0, 3 do
+        sort_shader:send("pass", pass)
+        love.graphics.dispatchThreadgroups(sort_shader, 1, 1)
+    end
     love.graphics.dispatchThreadgroups(construct_spatial_hash_shader, construct_shader_n_thread_x, construct_shader_n_thread_y)
 end
 
