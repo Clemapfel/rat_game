@@ -23,3 +23,8 @@ end
 function rt.GraphicsBuffer:replace_data(data)
     self._native:setArrayData(data)
 end
+
+--- @brief
+function rt.GraphicsBuffer:readback_data()
+    return love.graphics.readbackBuffer(self._native)
+end

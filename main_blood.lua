@@ -194,6 +194,20 @@ love.load = function()
     --love.graphics.dispatchThreadgroups(construct_spatial_hash_shader, construct_shader_n_thread_x, construct_shader_n_thread_y)
     --println((love.timer.getTime() - before) / (1 / 60))
     print_particle_occupation_buffer()
+
+    do
+        local data = love.graphics.readbackBuffer(particle_occupation_buffer)
+        local step = 2
+        for i = 1, n_particles * step, step do
+            local id1 = data:getUInt32((i - 1 + 0) * _byte)
+            local hash1 = data:getUInt32((i - 1 + 1) * _byte)
+            local id2 = data:getUInt32((i - 1 + 2) * _byte)
+            local hash2 = data:getUInt32((i - 1 + 3) * _byte)
+
+            dbg(id2, hash2)
+            assert(hash1 <= hash2, i .. " " .. hash1 .. " " .. hash2)
+        end
+    end
 end
 
 love.update = function(delta)
