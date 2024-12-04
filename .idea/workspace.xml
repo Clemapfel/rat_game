@@ -22,9 +22,20 @@
     </configurations>
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="7fa9ba1b-2cff-4ecc-86fb-59ab2fa76ee1" name="Changes" comment="multi-pass shader working">
+    <list default="true" id="7fa9ba1b-2cff-4ecc-86fb-59ab2fa76ee1" name="Changes" comment="1 pass radix sort done">
+      <change afterPath="$PROJECT_DIR$/backgrounds/overlapping_dots_render.glsl" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/backgrounds/overlapping_dots_sort.glsl" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/backgrounds/overlapping_dots_update.glsl" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/common/blood_step.glsl" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/backgrounds/overlapping_dots.glsl" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/backgrounds/overlapping_dots.lua" beforeDir="false" afterPath="$PROJECT_DIR$/backgrounds/overlapping_dots.lua" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/battle/battle_scene.lua" beforeDir="false" afterPath="$PROJECT_DIR$/battle/battle_scene.lua" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/common/blood_sort.glsl" beforeDir="false" afterPath="$PROJECT_DIR$/common/blood_sort.glsl" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/common/compute_shader.lua" beforeDir="false" afterPath="$PROJECT_DIR$/common/compute_shader.lua" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/main_blood.lua" beforeDir="false" afterPath="$PROJECT_DIR$/main_blood.lua" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/sort_main.lua" beforeDir="false" afterPath="$PROJECT_DIR$/sort_main.lua" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/sort_pass.glsl" beforeDir="false" afterPath="$PROJECT_DIR$/sort_pass.glsl" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -154,7 +165,7 @@
       <recent name="C:\Users\cleme\Workspace\rat_game\old" />
     </key>
   </component>
-  <component name="RunManager" selected="Lua Application.main_blood">
+  <component name="RunManager" selected="Lua Application.main">
     <configuration name="Makefile" type="MAKEFILE_TARGET_RUN_CONFIGURATION" factoryName="Makefile" temporary="true">
       <makefile filename="$PROJECT_DIR$/midi/lovemidi/Makefile" target="" workingDirectory="" arguments="">
         <envs />
@@ -657,15 +668,7 @@
       <workItem from="1733258374228" duration="6911000" />
       <workItem from="1733268551317" duration="7549000" />
       <workItem from="1733334970865" duration="24000" />
-      <workItem from="1733335003286" duration="3446000" />
-    </task>
-    <task id="LOCAL-01249" summary="camera done">
-      <option name="closed" value="true" />
-      <created>1731789510118</created>
-      <option name="number" value="01249" />
-      <option name="presentableId" value="LOCAL-01249" />
-      <option name="project" value="LOCAL" />
-      <updated>1731789510118</updated>
+      <workItem from="1733335003286" duration="12329000" />
     </task>
     <task id="LOCAL-01250" summary="now returns on error">
       <option name="closed" value="true" />
@@ -1051,7 +1054,15 @@
       <option name="project" value="LOCAL" />
       <updated>1733338217462</updated>
     </task>
-    <option name="localTasksCounter" value="1298" />
+    <task id="LOCAL-01298" summary="1 pass radix sort done">
+      <option name="closed" value="true" />
+      <created>1733338575667</created>
+      <option name="number" value="01298" />
+      <option name="presentableId" value="LOCAL-01298" />
+      <option name="project" value="LOCAL" />
+      <updated>1733338575667</updated>
+    </task>
+    <option name="localTasksCounter" value="1299" />
     <servers />
   </component>
   <component name="TypeScriptGeneratedFilesManager">
@@ -1100,7 +1111,6 @@
     </option>
   </component>
   <component name="VcsManagerConfiguration">
-    <MESSAGE value="added path parameterization override" />
     <MESSAGE value="naive implementation working" />
     <MESSAGE value="stashing before shader rework" />
     <MESSAGE value="first two steps working" />
@@ -1125,7 +1135,8 @@
     <MESSAGE value="stashing parallel count" />
     <MESSAGE value="sequential working" />
     <MESSAGE value="multi-pass shader working" />
-    <option name="LAST_COMMIT_MESSAGE" value="multi-pass shader working" />
+    <MESSAGE value="1 pass radix sort done" />
+    <option name="LAST_COMMIT_MESSAGE" value="1 pass radix sort done" />
   </component>
   <component name="XDebuggerManager">
     <breakpoint-manager>

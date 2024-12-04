@@ -2,11 +2,16 @@ rt.Background.OVERLAPPING_DOTS = meta.new_type("OVERLAPPING_DOTS", rt.Background
     return meta.new(rt.Background.OVERLAPPING_DOTS, {
         _circle_mesh = nil, -- rt.VertexShape
         _n_outer_vertices = 5,
-        _min_radius = 10,
-        _max_radius = 14,
+        _cell_radius = 12,
+        _max_radius = 40,
         _n_instances = 0, -- set during size_allocate
         _data = nil, -- love.GraphicsBuffer
-        _shader = rt.Shader("backgrounds/overlapping_dots.glsl"),
+        _data_swap = nil, -- "
+
+        _radius_denominator = 2^17,
+        _render_shader = rt.Shader("backgrounds/overlapping_dots_render.glsl"),
+        _update_shader = rt.ComputeShader("backgrounds/overlapping_dots_update.glsl"),
+        _sort_shader = rt.ComputeShader("backgrounds/overlapping_dots_sort.glsl"),
         _elapsed = 0
     })
 end)
@@ -44,45 +49,63 @@ end
 
 --- @override
 function rt.Background.OVERLAPPING_DOTS:size_allocate(x, y, width, height)
-    local n_cols = math.ceil(width / self._max_radius) + 2
-    local n_rows = math.ceil(height / self._max_radius) + 2
+    local n_cols = math.ceil(width / self._cell_radius) + 2
+    local n_rows = math.ceil(height / self._cell_radius) + 2
     self._n_instances = n_rows * n_cols
 
-    local format = self._shader:get_buffer_format("instance_data_buffer")
+    local format = self._render_shader:get_buffer_format("instance_data_buffer")
     local instance_data_buffer = rt.GraphicsBuffer(format, self._n_instances)
+    local instance_data_swap_buffer = rt.GraphicsBuffer(format, self._n_instances)
 
     local data = {}
-    local cell_w = self._max_radius
+    local cell_w = self._cell_radius
     local cell_h = cell_w
     for col_i = 1, n_cols do
         for row_i = 1, n_rows do
             local cell_x, cell_y = (col_i - 1) * cell_w, (row_i - 1) * cell_h
             table.insert(data, {
                 cell_x + 0.5 * cell_w, cell_y + 0.5 * cell_h,
-                mix(self._min_radius, self._max_radius, math.random()), -- radius
-                mix(-math.pi, math.pi, math.random()), -- rotation
-                math.random(), -- hue
+                rt.random.integer(0, self._radius_denominator), -- radius
+                rt.random.number(-math.pi, math.pi), -- rotation
+                rt.random.number(0, 1), -- hue
             })
         end
     end
 
-    data = rt.random.shuffle(data)
+    -- radius quantized to uint, so it can be radix sorted
+
     instance_data_buffer:replace_data(data)
-    self._shader:send("instance_data_buffer", instance_data_buffer._native)
-    self._shader:send("n_instances", self._n_instances)
+    self._render_shader:send("instance_data_buffer", instance_data_buffer._native)
+    self._render_shader:send("radius_denominator", self._radius_denominator)
+    self._render_shader:send("max_radius", self._max_radius)
+    self._render_shader:send("n_instances", self._n_instances)
+
+    self._update_shader:send("instance_data_buffer", instance_data_buffer._native)
+    self._update_shader:send("n_instances", self._n_instances)
+    self._update_shader:send("radius_denominator", self._radius_denominator)
+    self._update_shader:send("max_radius", self._max_radius)
+    self._update_shader:send("screen_size", {love.graphics.getDimensions()})
+
+    self._sort_shader:send("instance_data_buffer", instance_data_buffer._native)
+    self._sort_shader:send("instance_data_swap_buffer", instance_data_swap_buffer._native)
+    self._sort_shader:send("n_instances", self._n_instances)
+
+    dbg(self._n_instances)
 end
 
 --- @override
 function rt.Background.OVERLAPPING_DOTS:update(delta)
     self._elapsed = self._elapsed + delta
-    self._shader:send("elapsed", self._elapsed)
+    self._update_shader:send("elapsed", self._elapsed)
+    self._update_shader:dispatch(math.ceil(self._n_instances / 64), 1)
+    self._sort_shader:dispatch(1, 1)
 end
 
 --- @override
 function rt.Background.OVERLAPPING_DOTS:draw()
     love.graphics.setColor(rt.color_unpack(rt.Palette.GRAY_9))
     love.graphics.rectangle("fill", 0, 0, love.graphics.getDimensions())
-    self._shader:bind()
+    self._render_shader:bind()
     self._mesh:draw_instanced(self._n_instances)
-    self._shader:unbind()
+    self._render_shader:unbind()
 end

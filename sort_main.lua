@@ -9,8 +9,8 @@ input_buffer = rt.GraphicsBuffer(shader:get_buffer_format("input_buffer"), n_num
 output_buffer = rt.GraphicsBuffer(shader:get_buffer_format("output_buffer"), n_numbers)
 --count_buffer = rt.GraphicsBuffer(shader:get_buffer_format("global_counts_buffer"), 256)
 
-shader:send("input_buffer", input_buffer)
-shader:send("output_buffer", output_buffer)
+shader:send("input_buffer", input_buffer._native)
+shader:send("output_buffer", output_buffer._native)
 --shader:send("global_counts_buffer", count_buffer)
 shader:send("n_numbers", n_numbers)
 
@@ -37,10 +37,6 @@ end
 
 --test_buffer()
 
-for pass = 0, 3 do
-    shader:send("pass", pass)
-    shader:dispatch(1, 1)
-end
-
+shader:dispatch(1, 1)
 test_buffer()
 

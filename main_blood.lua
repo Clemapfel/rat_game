@@ -9,9 +9,9 @@ love.load = function()
     -- config
     n_rows = 128
     n_columns = 128
-    n_particles = 10000
+    n_particles = 15000
     particle_radius = 30
-    particle_n_outer_vertices = 3
+    particle_n_outer_vertices = 8
 
     -- globals
     screen_size = love.graphics.getDimensions()
@@ -24,6 +24,7 @@ love.load = function()
     initialize_spatial_hash_shader = love.graphics.newComputeShader("common/blood_initialize_spatial_hash.glsl")
     sort_shader = love.graphics.newComputeShader("common/blood_sort.glsl")
     construct_spatial_hash_shader = love.graphics.newComputeShader("common/blood_construct_spatial_hash.glsl")
+    step_shader = love.graphics.newComputeShader("common/blood_step.glsl")
     draw_shader = love.graphics.newShader("common/blood_draw.glsl")
 
     mesh = nil -- love.Mesh
@@ -58,9 +59,9 @@ love.load = function()
         table.insert(particle_data, {
             position_x, position_y, -- current_position
             position_x, position_y, -- previous_position
-            love.math.random(0, 1) * particle_radius, -- radius
+            love.math.random(5, 7), -- radius
             love.math.random(0, 2 * math.pi), -- angle
-            love.math.random(0.25, 1), -- color
+            love.math.random(0, 1), -- color
         })
 
         table.insert(particle_occupation_data, {
@@ -130,6 +131,14 @@ love.load = function()
     
     draw_shader:send("particle_buffer", particle_buffer)
 
+    step_shader:send("particle_buffer", particle_buffer)
+
+    step_shader:send("particle_occupation_buffer", particle_occupation_buffer)
+    step_shader:send("cell_i_to_memory_mapping_buffer", cell_i_to_memory_mapping_buffer)
+    step_shader:send("n_columns", n_columns)
+    step_shader:send("n_rows", n_rows)
+    step_shader:send("screen_size", {love.graphics.getDimensions()})
+
     -- debug
     local _byte = 4
     function print_particle_buffer()
@@ -165,7 +174,7 @@ love.load = function()
             println(id, "\t", hash)
         end
     end
-    print_particle_occupation_buffer()
+    --print_particle_occupation_buffer()
 
     function print_cell_i_to_memory_mapping_buffer()
         local data = love.graphics.readbackBuffer(cell_i_to_memory_mapping_buffer)
@@ -182,34 +191,13 @@ love.load = function()
         end
     end
     --print_cell_i_to_memory_mapping_buffer()
-
-
-    local before = love.timer.getTime()
-    love.graphics.dispatchThreadgroups(initialize_spatial_hash_shader, n_columns, n_rows)
-    love.graphics.dispatchThreadgroups(sort_shader, 1, 1)
-    love.graphics.dispatchThreadgroups(construct_spatial_hash_shader, construct_shader_n_thread_x, construct_shader_n_thread_y)
-    println((love.timer.getTime() - before) / (1 / 60))
-    print_particle_occupation_buffer()
-
-    do
-        local data = love.graphics.readbackBuffer(particle_occupation_buffer)
-        local step = 2
-        for i = 1, n_particles * step - 2, step do
-            local id1 = data:getUInt32((i - 1 + 0) * _byte)
-            local hash1 = data:getUInt32((i - 1 + 1) * _byte)
-            local id2 = data:getUInt32((i - 1 + 2) * _byte)
-            local hash2 = data:getUInt32((i - 1 + 3) * _byte)
-
-            dbg(id2, hash2)
-            assert(hash1 <= hash2, i .. " " .. hash1 .. " " .. hash2)
-        end
-    end
 end
 
 love.update = function(delta)
     love.graphics.dispatchThreadgroups(initialize_spatial_hash_shader, n_columns, n_rows)
     love.graphics.dispatchThreadgroups(sort_shader, 1, 1)
     love.graphics.dispatchThreadgroups(construct_spatial_hash_shader, construct_shader_n_thread_x, construct_shader_n_thread_y)
+    love.graphics.dispatchThreadgroups(step_shader, math.ceil(n_particles / 64), 1)
 end
 
 love.draw = function()
