@@ -25,50 +25,50 @@ layout(std430) buffer global_offsets_buffer {
 
 uniform uint n_particles;
 
-#define n_bins 256
 #define GET(pass, i) (pass % 2 == 0 ? particle_occupations[i].hash : swap[i].hash)
+#define n_threads 256 // assert(n_threads >= n_bins)
 
-layout (local_size_x = 1, local_size_y = 1, local_size_z = 1) in;
-void computemain() // 1, 1 invocations
+layout (local_size_x = n_threads, local_size_y = 1, local_size_z = 1) in;
+void computemain()
 {
-    uint global_x = gl_GlobalInvocationID.x;
-    uint local_x = gl_LocalInvocationID.x;
-    uint group_x = gl_WorkGroupID.x;
+    uint thread_x = gl_LocalInvocationID.x; // == gl_GlobalInvocationID bc 1 workgroup
+    bool is_sequential_worker = thread_x == 0 && gl_WorkGroupID.x == 0;
 
-    bool is_sequential_worker = global_x == 0 && local_x == 0;
-
+    const uint n_bins = 256;
     const uint bitmask = 0xFFu;
+
+    uint n_per_thread = uint(ceil(float(n_particles) / n_threads));
+    uint start_i = thread_x * n_per_thread;
+    uint end_i = clamp(start_i + n_per_thread, 0, n_particles);
+
     uint local_counts[n_bins];
 
     for (uint pass = 0u; pass < 4u; pass++)
     {
         uint shift = 8 * pass;
 
-        if (global_x < n_bins) {
-            global_counts[global_x] = 0u;
-            global_offsets[global_x] = 0u;
+        if (thread_x < 255)
+            global_counts[thread_x] = 0u;
+
+        barrier();
+
+        for (uint i = 0; i < 256; ++i)
+            local_counts[i] = 0u;
+
+        for (uint i = start_i; i <= end_i; ++i) {
+            uint masked = (GET(pass, i) >> shift) & bitmask;
+            local_counts[masked] += 1u;
         }
 
         barrier();
 
-        for (uint i = 0; i < n_bins; ++i)
-            local_counts[i] = 0u;
-
-        uint n_per_thread = n_particles / gl_NumWorkGroups.x;
-        uint start_i = global_x * n_per_thread;
-        uint end_i = min(start_i + n_per_thread, n_particles);
-
-        for (uint i = start_i; i < end_i; ++i) {
-            uint masked = (GET(pass, i) >> shift) & bitmask;
-            local_counts[masked]++;
-        }
-
-        for (uint i = 0; i < n_bins; ++i)
+        for (uint i = 0; i < 256; ++i)
             atomicAdd(global_counts[i], local_counts[i]);
 
         barrier();
 
-        if (is_sequential_worker) {
+        if (is_sequential_worker)
+        {
             uint sum = 0u;
             for (uint i = 0; i < n_bins; ++i) {
                 uint count = global_counts[i];
