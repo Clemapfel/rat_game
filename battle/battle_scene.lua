@@ -161,7 +161,7 @@ function bt.BattleScene:size_allocate(x, y, width, height)
         tile_size, height - 2 * outer_margin
     )
 
-    local text_box_w = width - 2 * outer_margin - 2 * tile_size - 2 * m
+    local text_box_w = (4 / 3 * self._bounds.height) - 2 * outer_margin - 2 * tile_size
     self._text_box:fit_into(
         x + 0.5 * width - 0.5 * text_box_w, y + outer_margin,
         text_box_w, tile_size
@@ -190,72 +190,35 @@ end
 
 --- @brief
 function bt.BattleScene:_reformat_enemy_sprites()
-    local total_w, max_h = 0, NEGATIVE_INFINITY
-    for sprite in values(self._enemy_sprites) do
-        local w, h = sprite:measure()
-        total_w = total_w + w
-        max_h = math.max(max_h, h)
-    end
-
-    local m = rt.settings.margin_unit
-    local outer_margin = 2 * m
-    local width = 4 / 3 * self._bounds.height
-    local tile_size = rt.settings.menu.inventory_scene.tile_size
-
-    local x = self._bounds.x + 0.5 * self._bounds.width - 0.5 * width
-    local y = self._bounds.y + outer_margin + tile_size + m
-    local height = 0.5 * self._bounds.height + max_h
     local n_enemies = sizeof(self._enemy_sprites)
-
-    local sprite_m = math.min(m, (width - total_w) / (n_enemies - 1))
-    local center_x, center_y = x + 0.5 * width, y + 0.5 * height
-
-    self._enemy_sprites_render_order = {}
-    local i_to_enemy_sprite = {}
+    local i_to_sprite = {}
+    local total_w = 0
+    local max_h = NEGATIVE_INFINITY
     do
         local i = 1
-        for sprite in values(self._enemy_sprites) do
-            i_to_enemy_sprite[i] = sprite
+        for entity in values(self._state:list_enemies()) do -- use state instead of self._enemy_sprites because key order is not deterministic
+            local sprite = self._enemy_sprites[entity]
+            i_to_sprite[i] = sprite
+            local w, h = sprite:measure()
+            total_w = total_w + w
+            max_h = math.max(max_h, h)
             i = i + 1
         end
     end
 
-    -- precompute aabbs
-    local sprite_i_to_aabb = {}
-    local left_x, right_x
-    do
-        local center_sprite = i_to_enemy_sprite[1]
-        local sprite_w, sprite_h = center_sprite:measure()
-        sprite_i_to_aabb[1] = rt.AABB(
-            center_x - 0.5 * sprite_w,
-            center_y - sprite_h,
-            sprite_w, sprite_h
-        )
+    local m = rt.settings.margin_unit
+    local outer_margin = 2 * m
 
-        left_x = center_x - 0.5 * sprite_w - m
-        right_x = center_x + 0.5 * sprite_w + m
-        table.insert(self._enemy_sprites_render_order, center_sprite)
-    end
+    local y = 0.5 * self._bounds.height + 0.5 * max_h
+    local width = (4 / 3 * self._bounds.height) - 2 * outer_margin
+    local sprite_m = math.min(m, (width - total_w) / (n_enemies - 1))
 
-    local min_x, max_x = POSITIVE_INFINITY, NEGATIVE_INFINITY
-    do
-        local sprite_i = 2
-        while sprite_i <= n_enemies do
-            local sprite = i_to_enemy_sprite[sprite_i]
-            local sprite_w, sprite_h = sprite:measure()
-            if sprite_i % 2 == 0 then
-                sprite_i_to_aabb[sprite_i] = rt.AABB(right_x, center_y - sprite_h, sprite_w, sprite_h)
-                right_x = right_x + sprite_w + m
-            else
-                sprite_i_to_aabb[sprite_i] = rt.AABB(left_x - sprite_w, center_y - sprite_h, sprite_w, sprite_h)
-                left_x = left_x - sprite_w - m
-            end
-
-            min_x = left_x - sprite_w
-            max_x = right_x + sprite_w
-
-            table.insert(self._enemy_sprites_render_order, sprite)
-            sprite_i = sprite_i + 1
+    local sprite_order = {1}
+    for i = 2, n_enemies do
+        if i % 2 == 0 then
+            table.insert(sprite_order, i)
+        else
+            table.insert(sprite_order, 1, i)
         end
     end
 
@@ -265,29 +228,27 @@ function bt.BattleScene:_reformat_enemy_sprites()
     end
     self._enemy_sprites_motion = {}
 
-    local motion_speed = rt.settings.battle.battle_scene.enemy_sprite_speed
-    local enemy_sprite_x_offset = ((x - min_x) + (x + width - max_x)) / 2
-    assert(enemy_sprite_x_offset ~= NEGATIVE_INFINITY)
-    local sprite_i = 1
-    for sprite in values(self._enemy_sprites) do
-        local old = sprite:get_bounds()
-        local aabb = sprite_i_to_aabb[sprite_i]
-        local new = rt.AABB(
-            (aabb.x + enemy_sprite_x_offset), aabb.y,
-            aabb.width, aabb.height
-        )
+    self._enemy_sprites_render_order = {}
+    local speed = rt.settings.battle.battle_scene.enemy_sprite_speed
+    local current_x = self._bounds.x + 0.5 * self._bounds.width - 0.5 * (total_w + (n_enemies + 1) * sprite_m)
+    for i in values(sprite_order) do
+        local sprite = i_to_sprite[i]
+        local sprite_w, sprite_h = sprite:measure()
 
+        local new_x, new_y = current_x, y - sprite_h
         local motion = sprite_to_motion_backup[sprite]
         if motion == nil then
-            motion = rt.SmoothedMotion1D(0, motion_speed)
-            motion:set_target_value(0)
+            motion = rt.SmoothedMotion2D(0, 0, speed)
         else
-            motion:set_value(old.x - new.x)
+            local sprite_bounds = sprite:get_bounds()
+            motion:set_position(sprite_bounds.x - new_x, sprite_bounds.y - new_y)
         end
-        self._enemy_sprites_motion[sprite] = motion
+        sprite:fit_into(new_x, new_y, sprite_w, sprite_h)
 
-        sprite:fit_into(new)
-        sprite_i = sprite_i + 1
+        self._enemy_sprites_motion[sprite] = motion
+        table.insert(self._enemy_sprites_render_order, sprite)
+
+        current_x = current_x + sprite_w + sprite_m
     end
 end
 
@@ -306,7 +267,8 @@ function bt.BattleScene:_reformat_party_sprites()
     local sprite_y = self._bounds.y + self._bounds.height - outer_margin - sprite_h
     local sprite_x = self._bounds.x + 0.5 * self._bounds.width - 0.5 * sprite_w * n_sprites
 
-    for sprite in values(self._party_sprites) do
+    for entity in values(self._state:list_allies()) do
+        local sprite = self._party_sprites[entity]
         sprite:fit_into(sprite_x, sprite_y, sprite_w, sprite_h)
         sprite_x = sprite_x + sprite_w + m
     end
@@ -323,7 +285,7 @@ function bt.BattleScene:draw()
     for sprite in values(self._enemy_sprites_render_order) do
         local motion = self._enemy_sprites_motion[sprite]
         love.graphics.push()
-        love.graphics.translate(motion:get_value(), 0)
+        love.graphics.translate(motion:get_position())
         sprite:draw()
         love.graphics.pop()
     end
