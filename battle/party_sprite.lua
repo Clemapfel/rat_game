@@ -192,3 +192,13 @@ function bt.PartySprite:measure()
 
     return frame_w, frame_y + frame_h - sprite_y
 end
+
+--- @override
+function bt.PartySprite:add_status()
+    dbg("TODO: bt.PartySprite:add_status")
+end
+
+--- @override
+function bt.PartySprite:add_consumable()
+    dbg("TODO: bt.PartySprite:add_consumable")
+end

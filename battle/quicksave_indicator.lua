@@ -184,7 +184,7 @@ do
         end
 
         self._mesh = love.graphics.newMesh(_vertex_format, self._vertex_data, rt.MeshDrawMode.TRIANGLE_FAN)
-        if self._render_texture_a ~= nil then self._mesh:setTexture(self._render_texture_a._native) end
+        if self._screenshot ~= nil then self._mesh:setTexture(self._screenshot._native) end
     end
 end
 
@@ -270,11 +270,15 @@ end
 function bt.QuicksaveIndicator:set_screenshot(texture)
     if texture == nil then
         self._screenshot = nil
-        self._mesh:setTexture(nil)
+        if self._mesh ~= nil then
+            self._mesh:setTexture(nil)
+        end
     else
         meta.assert_isa(texture, rt.RenderTexture)
         self._screenshot = texture
-        self._mesh:setTexture(self._screenshot._native)
+        if self._mesh ~= nil then
+            self._mesh:setTexture(self._screenshot._native)
+        end
     end
 end
 
