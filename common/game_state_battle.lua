@@ -234,7 +234,7 @@ end
 function rt.GameState:list_allies()
     local out = {}
     for i, entity in ipairs(self._entity_index_to_entity) do
-        if entity:get_is_enemy() == false then
+        if self:entity_get_state(entity) ~= bt.EntityState.DEAD and entity:get_is_enemy() == false then
             table.insert(out, entity)
         end
     end
@@ -245,7 +245,7 @@ end
 function rt.GameState:list_enemies()
     local out = {}
     for i, entity in ipairs(self._entity_index_to_entity) do
-        if entity:get_is_enemy() == true then
+        if self:entity_get_state(entity) ~= bt.EntityState.DEAD and entity:get_is_enemy() == true then
             table.insert(out, entity)
         end
     end
@@ -920,6 +920,19 @@ function rt.GameState:entity_add_status(entity, status)
         n_turns_elapsed = 0,
         storage = {}
     }
+end
+
+--- @brief
+function rt.GameState:entity_clear_statuses(entity)
+    meta.assert_isa(entity, bt.Entity)
+
+    local entry = self:_get_entity_entry(entity)
+    if entry == nil then
+        rt.error("In rt.GameState:entity_add_status: entity `" .. entity:get_id() .. "` is not part of state")
+        return
+    end
+
+    entry.statuses = {}
 end
 
 --- @brief

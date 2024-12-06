@@ -1684,11 +1684,8 @@ function bt.BattleScene:create_simulation_environment()
 
         local entity = _get_native(entity_proxy)
         local sprite = _scene:get_sprite(entity)
+
         local animation = bt.Animation.KILL(self, sprite)
-
-        local statuses_backup = env.list_statuses(entity_proxy)
-        local consumables_backup = env.list_consumables(entity_proxy)
-
         animation:signal_connect("finish", function(_)
             _scene:remove_entity(entity)
             _scene:set_priority_order(_state:list_entities_in_order())
@@ -1697,13 +1694,17 @@ function bt.BattleScene:create_simulation_environment()
         _scene:_push_animation(animation)
         env.append_message(rt.Translation.battle.message.entity_killed_f(entity_proxy))
 
-        _state:remove_entity(entity)
+        _state:entity_set_state(entity, bt.EntityState.DEAD)
+        local statuses_backup = env.list_statuses(entity_proxy)
+        local consumables_backup = env.list_consumables(entity_proxy)
 
         -- callbacks after death
         local callback_id = "on_killed"
         for status_proxy in values(statuses_backup) do
             _try_invoke_status_callback(callback_id, status_proxy, entity_proxy)
         end
+
+        _state:entity_clear_statuses(entity) -- delayed to after callback
 
         for consumable_proxy in values(consumables_backup) do
             _try_invoke_consumable_callback(callback_id, consumable_proxy, entity_proxy)

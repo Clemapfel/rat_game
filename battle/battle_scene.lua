@@ -167,7 +167,7 @@ function bt.BattleScene:remove_entity(...)
     for entity in range(...) do
         local sprite = self._sprites[entity]
         if sprite == nil then
-            rt.error("In bt.BattleScene.remove_entity: entity `" .. entity:get_id() .. "` is not part of scen")
+            rt.error("In bt.BattleScene.remove_entity: entity `" .. entity:get_id() .. "` is not part of scene")
             return
         end
 
@@ -180,7 +180,11 @@ function bt.BattleScene:remove_entity(...)
         end
 
         self._sprites[entity] = nil
-        self:reformat()
+        if entity:get_is_enemy() then
+            self:_reformat_enemy_sprites()
+        else
+            self:_reformat_party_sprites()
+        end
     end
 end
 
@@ -230,12 +234,7 @@ function bt.BattleScene:size_allocate(x, y, width, height)
     local queue_w = (width - sprite_w) / 2 - 2 * outer_margin
     self._priority_queue:fit_into(x + outer_margin, current_y, queue_w, height - 2 * outer_margin)
 
-    self:_reformat_party_sprites(
-        x + 0.5 * width - 0.5 * sprite_w + outer_margin,
-        y + height - outer_margin,
-        sprite_w - 2 * outer_margin,
-        tile_size
-    )
+    self:_reformat_party_sprites()
 
     self._quicksave_indicator:fit_into(
         x + width - outer_margin - tile_size,
@@ -243,21 +242,26 @@ function bt.BattleScene:size_allocate(x, y, width, height)
         tile_size, tile_size
     )
 
+    self:_reformat_enemy_sprites()
+end
+
+--- @brief
+function bt.BattleScene:_reformat_enemy_sprites()
+
     local max_enemy_sprite_h = NEGATIVE_INFINITY
     for sprite in values(self._enemy_sprites) do
         max_enemy_sprite_h = math.max(max_enemy_sprite_h, select(2, sprite:measure()))
     end
+    local m = rt.settings.margin_unit
+    local sprite_w = 4 / 3 * self._bounds.height -- sprite is 4:3, like snes, but screen is 16:9
+    local tile_size = rt.settings.menu.inventory_scene.tile_size
 
-    self:_reformat_enemy_sprites(
-        x + 0.5 * width - 0.5 * sprite_w,
-        y + outer_margin + tile_size + m,
-        sprite_w,
-        0.5 * love.graphics.getHeight() + max_enemy_sprite_h
-    )
-end
+    local outer_margin = 2 * rt.settings.margin_unit
+    local x = self._bounds.x + 0.5 * self._bounds.width - 0.5 * sprite_w
+    local y = self._bounds.y + outer_margin + tile_size + m
+    local width = sprite_w
+    local height = 0.5 * love.graphics.getHeight() + max_enemy_sprite_h
 
---- @brief
-function bt.BattleScene:_reformat_enemy_sprites(x, y, width, height)
     local n_enemies = sizeof(self._enemy_sprites)
     if n_enemies < 1 then return end
 
@@ -336,8 +340,16 @@ function bt.BattleScene:_reformat_enemy_sprites(x, y, width, height)
 end
 
 --- @brief
-function bt.BattleScene:_reformat_party_sprites(x, bottom_y, width, height)
+function bt.BattleScene:_reformat_party_sprites()
     local m = rt.settings.margin_unit
+    local outer_margin = 2 * m
+    local sprite_w = 4 / 3 * self._bounds.height -- sprite is 4:3, like snes, but screen is 16:9
+    local x = self._bounds.x + 0.5 * self._bounds.width - 0.5 * sprite_w + outer_margin
+    local bottom_y = self._bounds.y + self._bounds.height - outer_margin
+    local width = sprite_w - 2 * outer_margin
+    local height = rt.settings.menu.inventory_scene.tile_size
+
+
     local n_sprites = sizeof(self._party_sprites)
     local sprite_w = math.min(
     (width - 2 * m - (n_sprites - 1) * m) / n_sprites,
@@ -865,9 +877,13 @@ end
 function bt.BattleScene:_handle_button_pressed(which)
     if which == rt.InputButton.A then
 
+        self:remove_entity(self._state:list_allies()[1])
+
+        --[[
         local env = self._simulation_environment
         local target = bt.create_entity_proxy(self, self._state:list_enemies()[1])
         env.kill(target)
+        ]]--
 
         --[[
         local target = bt.create_entity_proxy(self, self._state:list_enemies()[2])

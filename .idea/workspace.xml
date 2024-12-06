@@ -22,13 +22,11 @@
     </configurations>
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="7fa9ba1b-2cff-4ecc-86fb-59ab2fa76ee1" name="Changes" comment="enemy revived animation done">
+    <list default="true" id="7fa9ba1b-2cff-4ecc-86fb-59ab2fa76ee1" name="Changes" comment="stashing kill removes entity from state">
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/battle/animations/kill.lua" beforeDir="false" afterPath="$PROJECT_DIR$/battle/animations/kill.lua" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/battle/battle_scene.lua" beforeDir="false" afterPath="$PROJECT_DIR$/battle/battle_scene.lua" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/battle/simulation_handler.lua" beforeDir="false" afterPath="$PROJECT_DIR$/battle/simulation_handler.lua" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/common/game_state_battle.lua" beforeDir="false" afterPath="$PROJECT_DIR$/common/game_state_battle.lua" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/common/translation.lua" beforeDir="false" afterPath="$PROJECT_DIR$/common/translation.lua" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -663,15 +661,7 @@
       <workItem from="1733334970865" duration="24000" />
       <workItem from="1733335003286" duration="13005000" />
       <workItem from="1733440232414" duration="9504000" />
-      <workItem from="1733502567573" duration="6187000" />
-    </task>
-    <task id="LOCAL-01254" summary="stashing">
-      <option name="closed" value="true" />
-      <created>1732233721228</created>
-      <option name="number" value="01254" />
-      <option name="presentableId" value="LOCAL-01254" />
-      <option name="project" value="LOCAL" />
-      <updated>1732233721228</updated>
+      <workItem from="1733502567573" duration="7871000" />
     </task>
     <task id="LOCAL-01255" summary="stashing before refactoring cell occupation">
       <option name="closed" value="true" />
@@ -1057,7 +1047,15 @@
       <option name="project" value="LOCAL" />
       <updated>1733506235399</updated>
     </task>
-    <option name="localTasksCounter" value="1303" />
+    <task id="LOCAL-01303" summary="stashing kill removes entity from state">
+      <option name="closed" value="true" />
+      <created>1733508993136</created>
+      <option name="number" value="01303" />
+      <option name="presentableId" value="LOCAL-01303" />
+      <option name="project" value="LOCAL" />
+      <updated>1733508993136</updated>
+    </task>
+    <option name="localTasksCounter" value="1304" />
     <servers />
   </component>
   <component name="TypeScriptGeneratedFilesManager">
@@ -1106,7 +1104,6 @@
     </option>
   </component>
   <component name="VcsManagerConfiguration">
-    <MESSAGE value="quicksave indicator done" />
     <MESSAGE value="refactored quicksave indicator" />
     <MESSAGE value="added elapsed override" />
     <MESSAGE value="stashing before paralellizing sort step" />
@@ -1131,7 +1128,8 @@
     <MESSAGE value="stashing enemy revived animation" />
     <MESSAGE value="stashing revive animation" />
     <MESSAGE value="enemy revived animation done" />
-    <option name="LAST_COMMIT_MESSAGE" value="enemy revived animation done" />
+    <MESSAGE value="stashing kill removes entity from state" />
+    <option name="LAST_COMMIT_MESSAGE" value="stashing kill removes entity from state" />
   </component>
   <component name="XDebuggerManager">
     <breakpoint-manager>
