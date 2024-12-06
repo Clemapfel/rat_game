@@ -22,14 +22,9 @@
     </configurations>
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="7fa9ba1b-2cff-4ecc-86fb-59ab2fa76ee1" name="Changes" comment="sorting working">
-      <change afterPath="$PROJECT_DIR$/battle/animations/enemy_revived.lua" afterDir="false" />
+    <list default="true" id="7fa9ba1b-2cff-4ecc-86fb-59ab2fa76ee1" name="Changes" comment="stashing enemy revived animation">
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/battle/animations/object_gained.lua" beforeDir="false" afterPath="$PROJECT_DIR$/battle/animations/object_gained.lua" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/battle/battle_scene.lua" beforeDir="false" afterPath="$PROJECT_DIR$/battle/battle_scene.lua" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/battle/simulation_handler.lua" beforeDir="false" afterPath="$PROJECT_DIR$/battle/simulation_handler.lua" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/common/particle_emitter.lua" beforeDir="false" afterPath="$PROJECT_DIR$/common/particle_emitter.lua" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/common/vertex_shape.lua" beforeDir="false" afterPath="$PROJECT_DIR$/common/vertex_shape.lua" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/battle/animations/enemy_revived.lua" beforeDir="false" afterPath="$PROJECT_DIR$/battle/animations/enemy_revived.lua" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -663,15 +658,7 @@
       <workItem from="1733268551317" duration="7549000" />
       <workItem from="1733334970865" duration="24000" />
       <workItem from="1733335003286" duration="13005000" />
-      <workItem from="1733440232414" duration="7221000" />
-    </task>
-    <task id="LOCAL-01251" summary="added portrait rework">
-      <option name="closed" value="true" />
-      <created>1731883134105</created>
-      <option name="number" value="01251" />
-      <option name="presentableId" value="LOCAL-01251" />
-      <option name="project" value="LOCAL" />
-      <updated>1731883134105</updated>
+      <workItem from="1733440232414" duration="8477000" />
     </task>
     <task id="LOCAL-01252" summary="refactor iterators">
       <option name="closed" value="true" />
@@ -1057,7 +1044,15 @@
       <option name="project" value="LOCAL" />
       <updated>1733347665628</updated>
     </task>
-    <option name="localTasksCounter" value="1300" />
+    <task id="LOCAL-01300" summary="stashing enemy revived animation">
+      <option name="closed" value="true" />
+      <created>1733449309306</created>
+      <option name="number" value="01300" />
+      <option name="presentableId" value="LOCAL-01300" />
+      <option name="project" value="LOCAL" />
+      <updated>1733449309306</updated>
+    </task>
+    <option name="localTasksCounter" value="1301" />
     <servers />
   </component>
   <component name="TypeScriptGeneratedFilesManager">
@@ -1106,7 +1101,6 @@
     </option>
   </component>
   <component name="VcsManagerConfiguration">
-    <MESSAGE value="stashing before shader rework" />
     <MESSAGE value="first two steps working" />
     <MESSAGE value="stashing before removing n particles per cell" />
     <MESSAGE value="quicksave indicator done" />
@@ -1131,7 +1125,8 @@
     <MESSAGE value="multi-pass shader working" />
     <MESSAGE value="1 pass radix sort done" />
     <MESSAGE value="sorting working" />
-    <option name="LAST_COMMIT_MESSAGE" value="sorting working" />
+    <MESSAGE value="stashing enemy revived animation" />
+    <option name="LAST_COMMIT_MESSAGE" value="stashing enemy revived animation" />
   </component>
   <component name="XDebuggerManager">
     <breakpoint-manager>

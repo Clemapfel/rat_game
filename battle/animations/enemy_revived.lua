@@ -10,9 +10,9 @@ bt.Animation.ENEMY_REVIVED = meta.new_type("ENEMY_REVIVED", rt.Animation, functi
         _scene = scene,
         _sprite = sprite,
 
-        _snapshot = nil, -- rt.RenderTexture
         _sprite_x = 0,
         _sprite_y = 0,
+        _sprite_path = nil, -- rt.Path
 
         _circle = nil, -- rt.VertexShape
         _trapezoid = nil, -- "
@@ -22,10 +22,15 @@ bt.Animation.ENEMY_REVIVED = meta.new_type("ENEMY_REVIVED", rt.Animation, functi
 
         _sprite_path = nil, -- rt.Path
         _sprite_path_animation = rt.TimedAnimation(settings.duration),
+        _sprite_x = 0,
+        _sprite_y = 0,
 
-        _n_particles = 16,
+        _n_particles = 256,
         _particle_shape = nil, -- rt.VertexShape
-        _particles = {}
+        _particles = {},
+        _particle_opacity = 1,
+        _particle_floor = 0,
+        _particle_opacity_animation = rt.TimedAnimation(0.3 * settings.duration, 0, 1, rt.InterpolationFunctions.HANN_LOWPASS, 6)
     })
 end)
 
@@ -39,7 +44,7 @@ do
         local sprite_w, sprite_h = self._sprite:get_size()
         local m = rt.settings.margin_unit
 
-        local center_x, center_y = x + 0.5 * w, y + 0.5 * h
+        local center_x, center_y = x + 0.5 * w, sprite_y + sprite_h
         local circle_w = sprite_w + 2 * m
         local circle_h = 0.2 * circle_w
 
@@ -123,18 +128,25 @@ do
             end
         end
         self._particle_shape = _particle_mesh
+        self._particle_floor = center_y
 
         for i = 1, self._n_particles do
-            local particle_x = love.math.random(center_x - lower_r, center_x + lower_r)
-            local particle_y = love.math.random(y, sprite_y)
+            local particle_x = rt.random.number(center_x - lower_r, center_x + lower_r)
+            local particle_y = rt.random.number(0, sprite_y + sprite_h)
 
             table.insert(self._particles, {
                 x = particle_x,
                 y = particle_y,
-                mass = love.math.random(0.8, 1)
+                mass = rt.random.number(0.8, 1.3),
+                scale = rt.random.number(0.7, 1)
             })
         end
 
+        self._sprite_path = rt.Path(
+            -sprite_x - 0.5 * sprite_w + center_x, 0 - sprite_h,
+            -sprite_x - 0.5 * sprite_w + center_x, 0 + sprite_y - sprite_h
+
+        )
     end
 end
 
@@ -142,6 +154,8 @@ end
 function bt.Animation.ENEMY_REVIVED:update(delta)
     local is_done = true
     for animation in range(
+        self._sprite_path_animation,
+        self._particle_opacity_animation,
         self._sprite_path_animation
     ) do
         animation:update(delta)
@@ -151,20 +165,34 @@ function bt.Animation.ENEMY_REVIVED:update(delta)
     local gravity = rt.settings.battle.animations.enemy_revived.particle_gravity
     for particle in values(self._particles) do
         particle.y = particle.y + gravity * delta * particle.mass
+        if particle.y > self._particle_floor then particle.y = self._particle_floor end
     end
 
+    self._sprite_x, self._sprite_y = self._sprite_path:at(self._sprite_path_animation:get_value())
+    self._particle_opacity = self._particle_opacity_animation:get_value()
     return is_done
 end
 
 --- @override
 function bt.Animation.ENEMY_REVIVED:draw()
     self._shadow:draw()
+
+    love.graphics.push()
+    love.graphics.translate(self._sprite_x, self._sprite_y)
+    self._sprite:draw_snapshot()
+    love.graphics.pop()
+
     self._circle:draw()
     self._trapezoid_left_aa:draw()
     self._trapezoid:draw()
     self._trapezoid_right_aa:draw()
 
     for particle in values(self._particles) do
-        self._particle_shape:draw(particle.x, particle.y)
+        love.graphics.push()
+        love.graphics.setColor(1, 1, 1, self._particle_opacity)
+        love.graphics.translate(particle.x, particle.y)
+        love.graphics.scale(particle.scale, particle.scale)
+        love.graphics.draw(self._particle_shape._native)
+        love.graphics.pop()
     end
 end
