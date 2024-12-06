@@ -22,20 +22,14 @@
     </configurations>
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="7fa9ba1b-2cff-4ecc-86fb-59ab2fa76ee1" name="Changes" comment="1 pass radix sort done">
-      <change afterPath="$PROJECT_DIR$/backgrounds/overlapping_dots_render.glsl" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/backgrounds/overlapping_dots_sort.glsl" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/backgrounds/overlapping_dots_update.glsl" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/common/blood_step.glsl" afterDir="false" />
+    <list default="true" id="7fa9ba1b-2cff-4ecc-86fb-59ab2fa76ee1" name="Changes" comment="sorting working">
+      <change afterPath="$PROJECT_DIR$/battle/animations/enemy_revived.lua" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/backgrounds/overlapping_dots.glsl" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/backgrounds/overlapping_dots.lua" beforeDir="false" afterPath="$PROJECT_DIR$/backgrounds/overlapping_dots.lua" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/battle/animations/object_gained.lua" beforeDir="false" afterPath="$PROJECT_DIR$/battle/animations/object_gained.lua" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/battle/battle_scene.lua" beforeDir="false" afterPath="$PROJECT_DIR$/battle/battle_scene.lua" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/common/blood_sort.glsl" beforeDir="false" afterPath="$PROJECT_DIR$/common/blood_sort.glsl" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/common/compute_shader.lua" beforeDir="false" afterPath="$PROJECT_DIR$/common/compute_shader.lua" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/main_blood.lua" beforeDir="false" afterPath="$PROJECT_DIR$/main_blood.lua" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/sort_main.lua" beforeDir="false" afterPath="$PROJECT_DIR$/sort_main.lua" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/sort_pass.glsl" beforeDir="false" afterPath="$PROJECT_DIR$/sort_pass.glsl" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/battle/simulation_handler.lua" beforeDir="false" afterPath="$PROJECT_DIR$/battle/simulation_handler.lua" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/common/particle_emitter.lua" beforeDir="false" afterPath="$PROJECT_DIR$/common/particle_emitter.lua" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/common/vertex_shape.lua" beforeDir="false" afterPath="$PROJECT_DIR$/common/vertex_shape.lua" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -668,15 +662,8 @@
       <workItem from="1733258374228" duration="6911000" />
       <workItem from="1733268551317" duration="7549000" />
       <workItem from="1733334970865" duration="24000" />
-      <workItem from="1733335003286" duration="12329000" />
-    </task>
-    <task id="LOCAL-01250" summary="now returns on error">
-      <option name="closed" value="true" />
-      <created>1731883126293</created>
-      <option name="number" value="01250" />
-      <option name="presentableId" value="LOCAL-01250" />
-      <option name="project" value="LOCAL" />
-      <updated>1731883126293</updated>
+      <workItem from="1733335003286" duration="13005000" />
+      <workItem from="1733440232414" duration="7221000" />
     </task>
     <task id="LOCAL-01251" summary="added portrait rework">
       <option name="closed" value="true" />
@@ -1062,7 +1049,15 @@
       <option name="project" value="LOCAL" />
       <updated>1733338575667</updated>
     </task>
-    <option name="localTasksCounter" value="1299" />
+    <task id="LOCAL-01299" summary="sorting working">
+      <option name="closed" value="true" />
+      <created>1733347665628</created>
+      <option name="number" value="01299" />
+      <option name="presentableId" value="LOCAL-01299" />
+      <option name="project" value="LOCAL" />
+      <updated>1733347665628</updated>
+    </task>
+    <option name="localTasksCounter" value="1300" />
     <servers />
   </component>
   <component name="TypeScriptGeneratedFilesManager">
@@ -1111,7 +1106,6 @@
     </option>
   </component>
   <component name="VcsManagerConfiguration">
-    <MESSAGE value="naive implementation working" />
     <MESSAGE value="stashing before shader rework" />
     <MESSAGE value="first two steps working" />
     <MESSAGE value="stashing before removing n particles per cell" />
@@ -1136,7 +1130,8 @@
     <MESSAGE value="sequential working" />
     <MESSAGE value="multi-pass shader working" />
     <MESSAGE value="1 pass radix sort done" />
-    <option name="LAST_COMMIT_MESSAGE" value="1 pass radix sort done" />
+    <MESSAGE value="sorting working" />
+    <option name="LAST_COMMIT_MESSAGE" value="sorting working" />
   </component>
   <component name="XDebuggerManager">
     <breakpoint-manager>

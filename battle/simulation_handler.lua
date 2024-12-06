@@ -1675,6 +1675,7 @@ function bt.BattleScene:create_simulation_environment()
 
     env.help_up = function(entity_proxy)
         bt.assert_args("help_up", entity_proxy, bt.EntityProxy)
+        -- TODO
     end
 
     env.kill = function(entity_proxy)
@@ -1684,6 +1685,7 @@ function bt.BattleScene:create_simulation_environment()
 
     env.revive = function(entity_proxy)
         bt.assert_args("revive", entity_proxy, bt.EntityProxy)
+        -- TODO
     end
 
     env.add_hp = function(entity_proxy, value)

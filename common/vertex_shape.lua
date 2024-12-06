@@ -74,7 +74,7 @@ do
         y_radius = which(y_radius, x_radius)
         n_outer_vertices = which(n_outer_vertices, 8)
         local data = {
-            {0, 0, 0, 0, 1, 1, 1, 1}
+            {center_x, center_y, 0, 0, 1, 1, 1, 1}
         }
 
         local step = 2 * math.pi / n_outer_vertices
@@ -117,9 +117,9 @@ do
 end
 
 --- @override
-function rt.VertexShape:draw()
+function rt.VertexShape:draw(...)
     love.graphics.setColor(self._r, self._g, self._b, self._opacity)
-    love.graphics.draw(self._native)
+    love.graphics.draw(self._native, ...)
 end
 
 --- @brief
@@ -179,15 +179,20 @@ function rt.VertexShape:set_opacity(alpha)
 end
 
 --- @brief
-function rt.VertexShape:set_color(color)
-    if meta.is_hsva(color) then
-        color = rt.hsva_to_rgba(color)
-    elseif meta.is_lcha(color) then
-        color = rt.lcha_to_rgba(color)
-    end
+function rt.VertexShape:set_color(color, g, b, a)
+    if meta.is_number(color) then
+        self._r, self._g, self._b = color, g, b
+        self._opacity = math.min(self._opacity, a)
+    else
+        if meta.is_hsva(color) then
+            color = rt.hsva_to_rgba(color)
+        elseif meta.is_lcha(color) then
+            color = rt.lcha_to_rgba(color)
+        end
 
-    self._r, self._g, self._b = color.r, color.g, color.b
-    self._opacity = math.min(self._opacity, color.a)
+        self._r, self._g, self._b = color.r, color.g, color.b
+        self._opacity = math.min(self._opacity, color.a)
+    end
 end
 
 --- @brief

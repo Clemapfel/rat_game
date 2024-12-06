@@ -93,6 +93,11 @@ function rt.ParticleEmitter:set_radial_velocity(x)
 end
 
 --- @brief
+function rt.ParticleEmitter:set_particle_lifetime(seconds)
+    self._native:setParticleLifetime(seconds)
+end
+
+--- @brief
 function rt.ParticleEmitter:set_spin(min, max)
     if max == nil then max = min end
     self._native:setSpin(min, max)

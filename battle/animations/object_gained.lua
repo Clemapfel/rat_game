@@ -29,7 +29,7 @@ bt.Animation.OBJECT_GAINED = meta.new_type("OBJECT_GAINED", rt.Animation, functi
             0, 1, rt.InterpolationFunctions.EXPONENTIAL_ACCELERATION
         ),
 
-        _opacity_animation = rt.TimedAnimation(0.5 * duration,
+        _opacity_animation = rt.TimedAnimation(0.5 * duration - 0.075,
             1, 0, rt.InterpolationFunctions.GAUSSIAN_HIGHPASS, 10
         ),
 

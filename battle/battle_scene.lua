@@ -453,8 +453,6 @@ end
 --- @override
 function bt.BattleScene:draw()
     self._background:draw()
-
-    --[[
     for sprite in values(self._party_sprites) do
         sprite:draw()
     end
@@ -493,7 +491,6 @@ function bt.BattleScene:draw()
     end
 
     self._animation_queue:draw()
-    ]]--
 end
 
 --- @brief
@@ -846,6 +843,12 @@ end
 function bt.BattleScene:_handle_button_pressed(which)
     if which == rt.InputButton.A then
 
+        for sprite in values(self._enemy_sprites) do
+            self:_append_animation(bt.Animation.ENEMY_REVIVED(self, sprite))
+            break
+        end
+
+        --[[
         local env = self._simulation_environment
         local target = bt.create_entity_proxy(self, self._state:list_enemies()[1])
         ---env.add_hp(target, 123)
