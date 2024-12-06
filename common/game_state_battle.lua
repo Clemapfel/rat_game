@@ -168,7 +168,9 @@ function rt.GameState:remove_entity(entity)
     meta.assert_isa(entity, bt.Entity)
 
     local state = self._state
-    if state.entities[entity:get_id()] == nil then
+
+    local entity_i = self._entity_to_entity_index[entity]
+    if entity_i == nil then
         rt.error("In rt.GameState:entity_remove: trying to remove entity `" .. entity:get_id() .. "`, but entity was not yet added to game state")
         return
     end
@@ -179,8 +181,27 @@ function rt.GameState:remove_entity(entity)
         state.n_allies = state.n_allies - 1
     end
 
-    state.entities[entity:get_id()] = nil
+    local entities = self:list_entities()
+    for i, e in ipairs(entities) do
+        if e == entity then
+            table.remove(entities, i)
+            break
+        end
+    end
+
+    table.remove(state.entities[entity_i])
+
+    -- rebuild indices
+    state.entity_id_to_index = {}
+    self._entity_index_to_entity = {}
+    self._entity_to_entity_index = {}
     -- do not reset multiplicity
+
+    for i, entity in ipairs(entities) do
+        state.entity_id_to_index[entity:get_id()] = i
+        self._entity_index_to_entity[i] = entity
+        self._entity_to_entity_index[entity] = i
+    end
 end
 
 --- @brief

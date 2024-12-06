@@ -21,6 +21,8 @@ bt.Animation.KILL = meta.new_type("KILL", rt.Animation, function(scene, target)
         _mass_texture = nil,        -- love.Canvas
         _n_done_counter = nil,      -- love.GraphicsBuffer
 
+        _duration = rt.TimedAnimation(2),
+
         _elapsed = 0
     })
 end)
@@ -126,6 +128,10 @@ function bt.Animation.KILL:update(delta)
     })
     self:_dispatch(self._step_shader)
 
+    self._duration:update(delta)
+    return self._duration:get_is_done()
+
+    --[[
     local readback = love.graphics.readbackBuffer(self._n_done_counter)
     local n_done = ffi.cast("uint32_t*", readback:getFFIPointer())[0]
     if n_done >= (self._n_instances / 2) then -- TODO: why / 2 ?
@@ -133,4 +139,5 @@ function bt.Animation.KILL:update(delta)
     else
         return rt.AnimationResult.CONTINUE
     end
+    ]]--
 end

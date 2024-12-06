@@ -163,6 +163,28 @@ function bt.BattleScene:add_entity(...)
 end
 
 --- @brief
+function bt.BattleScene:remove_entity(...)
+    for entity in range(...) do
+        local sprite = self._sprites[entity]
+        if sprite == nil then
+            rt.error("In bt.BattleScene.remove_entity: entity `" .. entity:get_id() .. "` is not part of scen")
+            return
+        end
+
+        local sprites = ternary(entity:get_is_enemy(), self._enemy_sprites, self._party_sprites)
+        for i, other_sprite in ipairs(sprites) do
+            if sprite == other_sprite then
+                table.remove(sprites, i)
+                break
+            end
+        end
+
+        self._sprites[entity] = nil
+        self:reformat()
+    end
+end
+
+--- @brief
 function bt.BattleScene:size_allocate(x, y, width, height)
     self._background:fit_into(x, y, width, height)
 
@@ -843,19 +865,9 @@ end
 function bt.BattleScene:_handle_button_pressed(which)
     if which == rt.InputButton.A then
 
-        for sprite in values(self._enemy_sprites) do
-            self:_append_animation(bt.Animation.ENEMY_REVIVED(self, sprite))
-            break
-        end
-
-        --[[
         local env = self._simulation_environment
         local target = bt.create_entity_proxy(self, self._state:list_enemies()[1])
-        ---env.add_hp(target, 123)
-
-        for sprite in values(self._enemy_sprites) do
-            self:_append_animation(bt.Animation.HP_LOST(self, sprite, 123))
-        end
+        env.kill(target)
 
         --[[
         local target = bt.create_entity_proxy(self, self._state:list_enemies()[2])

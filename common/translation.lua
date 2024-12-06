@@ -374,6 +374,10 @@ rt.Translation = rt.initialize_translation({
 
             hp_lost_f = function(entity, value)
                 return entity .. " lost <color=HP><mono>" .. value .. "</mono></color> HP"
+            end,
+
+            entity_killed_f = function(entity)
+                return entity .. " was killed"
             end
         }
     }

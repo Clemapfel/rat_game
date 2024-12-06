@@ -1680,11 +1680,49 @@ function bt.BattleScene:create_simulation_environment()
 
     env.kill = function(entity_proxy)
         bt.assert_args("kill", entity_proxy, bt.EntityProxy)
-        -- TODO
+        if env.is_dead(entity_proxy) then return end
+
+        local entity = _get_native(entity_proxy)
+        local sprite = _scene:get_sprite(entity)
+        local animation = bt.Animation.KILL(self, sprite)
+
+        local statuses_backup = env.list_statuses(entity_proxy)
+        local consumables_backup = env.list_consumables(entity_proxy)
+
+        animation:signal_connect("finish", function(_)
+            _scene:remove_entity(entity)
+            _scene:set_priority_order(_state:list_entities_in_order())
+        end)
+
+        _scene:_push_animation(animation)
+        env.append_message(rt.Translation.battle.message.entity_killed_f(entity_proxy))
+
+        _state:remove_entity(entity)
+
+        -- callbacks after death
+        local callback_id = "on_killed"
+        for status_proxy in values(statuses_backup) do
+            _try_invoke_status_callback(callback_id, status_proxy, entity_proxy)
+        end
+
+        for consumable_proxy in values(consumables_backup) do
+            _try_invoke_consumable_callback(callback_id, consumable_proxy, entity_proxy)
+        end
+
+        for global_status_proxy in values(env.list_global_statuses()) do
+            _try_invoke_global_status_callback(callback_id, global_status_proxy, entity_proxy)
+        end
     end
 
     env.revive = function(entity_proxy)
         bt.assert_args("revive", entity_proxy, bt.EntityProxy)
+
+        if env.is_dead(entity_proxy) ~= true then return end
+
+        local entity = _get_native(entity_proxy)
+        local sprite = _scene:get_sprite(entity)
+        local animation = bt.Animation.ENTITY_REVIVED(self, sprite)
+
         -- TODO
     end
 
