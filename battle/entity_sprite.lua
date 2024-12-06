@@ -8,7 +8,8 @@ bt.EntitySprite = meta.new_abstract_type("BattleEntitySprite", rt.Widget, {
     _snapshot = nil, -- rt.RenderTexture
     _snapshot_position_x = 0,
     _snapshot_position_y = 0,
-    _state = bt.EntityState.ALIVE
+    _state = bt.EntityState.ALIVE,
+    _opacity = 1
 })
 
 --- @brief
@@ -108,7 +109,13 @@ end
 function bt.EntitySprite:draw_snapshot(x, y)
     if x == nil then x = 0 end
     if y == nil then y = 0 end
-    self._snapshot:draw(self._snapshot_position_x + x, self._snapshot_position_y + y)
+    love.graphics.setColor(1, 1, 1, self._opacity)
+    love.graphics.draw(self._snapshot._native, self._snapshot_position_x + x, self._snapshot_position_y + y)
+end
+
+--- @brief
+function bt.EntitySprite:set_opacity(alpha)
+    self._opacity = alpha
 end
 
 --- @brief
