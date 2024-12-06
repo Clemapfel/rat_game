@@ -18,6 +18,8 @@ bt.BattleScene = meta.new_type("BattleScene", rt.Scene, function(state)
         _global_status_to_sprite = {}, -- Table<bt.GlobalStatus, rt.Sprite>
 
         _party_sprites = {}, -- Table<bt.Entity, bt.PartySprite>
+        _party_sprites_motion = {}, -- Table<bt.PartySprite, bt.SmoothedMotion2D>
+
         _enemy_sprites = {}, -- Table<bt.Entity, bt.EnemySprites>
         _enemy_sprites_render_order = meta.make_weak({}),
         _enemy_sprites_motion = {}, -- Table<bt.EnemySprite, bt.SmoothedMotion1D>
@@ -198,11 +200,13 @@ function bt.BattleScene:_reformat_enemy_sprites()
         local i = 1
         for entity in values(self._state:list_enemies()) do -- use state instead of self._enemy_sprites because key order is not deterministic
             local sprite = self._enemy_sprites[entity]
-            i_to_sprite[i] = sprite
-            local w, h = sprite:measure()
-            total_w = total_w + w
-            max_h = math.max(max_h, h)
-            i = i + 1
+            if sprite ~= nil then -- entity may be dead or unlisted
+                i_to_sprite[i] = sprite
+                local w, h = sprite:measure()
+                total_w = total_w + w
+                max_h = math.max(max_h, h)
+                i = i + 1
+            end
         end
     end
 
@@ -267,10 +271,28 @@ function bt.BattleScene:_reformat_party_sprites()
     local sprite_y = self._bounds.y + self._bounds.height - outer_margin - sprite_h
     local sprite_x = self._bounds.x + 0.5 * self._bounds.width - 0.5 * sprite_w * n_sprites
 
+    local sprite_to_motion_backup = {}
+    for sprite, motion in pairs(self._party_sprites_motion) do
+        sprite_to_motion_backup[sprite] = motion
+    end
+    self._party_sprites_motion = {}
+
+    local speed = rt.settings.battle.battle_scene.enemy_sprite_speed
     for entity in values(self._state:list_allies()) do
         local sprite = self._party_sprites[entity]
-        sprite:fit_into(sprite_x, sprite_y, sprite_w, sprite_h)
-        sprite_x = sprite_x + sprite_w + m
+        if sprite ~= nil then
+            local motion = sprite_to_motion_backup[sprite]
+            if motion == nil then
+                motion = rt.SmoothedMotion2D(0, 0, speed)
+            else
+                local sprite_bounds = sprite:get_bounds()
+                motion:set_position(sprite_bounds.x - sprite_x, sprite_bounds.y - sprite_y)
+            end
+            sprite:fit_into(sprite_x, sprite_y, sprite_w, sprite_h)
+            self._party_sprites_motion[sprite] = motion
+
+            sprite_x = sprite_x + sprite_w + m
+        end
     end
 end
 
@@ -279,7 +301,11 @@ function bt.BattleScene:draw()
     self._background:draw()
 
     for sprite in values(self._party_sprites) do
+        local motion = self._party_sprites_motion[sprite]
+        love.graphics.push()
+        love.graphics.translate(motion:get_position())
         sprite:draw()
+        love.graphics.pop()
     end
 
     for sprite in values(self._enemy_sprites_render_order) do
@@ -324,6 +350,10 @@ function bt.BattleScene:update(delta)
     end
 
     for motion in values(self._enemy_sprites_motion) do
+        motion:update(delta)
+    end
+
+    for motion in values(self._party_sprites_motion) do
         motion:update(delta)
     end
 end
@@ -447,6 +477,10 @@ function bt.BattleScene:skip()
         sprite:skip()
     end
 
+    for motion in values(self._party_sprites_motion) do
+        motion:skip()
+    end
+
     for to_skip in range(
         self._priority_queue,
         self._global_status_bar,
@@ -457,11 +491,39 @@ function bt.BattleScene:skip()
 end
 
 --- @brief
+function bt.BattleScene:get_are_sprites_done_repositioning()
+    for list in range(self._enemy_sprites_motion, self._party_sprites_motion) do
+        for motion in values(list) do
+            local cx, cy = motion:get_position()
+            local tx, ty = motion:get_target_position()
+            if rt.distance(cx, cy, tx, ty) > 1 then return false end
+        end
+    end
+
+    return true
+end
+
+--- @brief
 function bt.BattleScene:_handle_button_pressed(which)
     if which == rt.InputButton.A then
         local target = self._state:list_enemies()[1]
-        self._env.kill(bt.create_entity_proxy(self, target))
+        local proxy = bt.create_entity_proxy(self, target)
+        --self._env.kill(proxy)
+        --self._env.revive(proxy)
         --self:remove_entity(self._state:list_enemies()[1])
+
+        local first, second = nil, nil
+        for _, sprite in pairs(self._enemy_sprites) do
+            if first == nil then
+                first = sprite
+            elseif second == nil then
+                second = sprite
+            else
+                break
+            end
+        end
+        self:_push_animation(bt.Animation.SWAP(self, first, second))
+
     elseif which == rt.InputButton.B then
         self:skip()
     end

@@ -11,6 +11,11 @@ rt.SmoothedMotion2D = meta.new_type("SmoothedMotion2D", function(position_x, pos
 end)
 
 --- @brief
+function rt.SmoothedMotion2D:set_position(x, y)
+    self._current_position_x, self._current_position_y = x, y
+end
+
+--- @brief
 function rt.SmoothedMotion2D:get_position()
     return self._current_position_x, self._current_position_y
 end
@@ -18,6 +23,11 @@ end
 --- @brief
 function rt.SmoothedMotion2D:set_target_position(x, y)
     self._target_position_x, self._target_position_y = x, y
+end
+
+--- @brief
+function rt.SmoothedMotion2D:get_target_position()
+    return self._target_position_x, self._target_position_y
 end
 
 --- @brief
@@ -44,10 +54,6 @@ function rt.SmoothedMotion2D:update(delta)
     end
 end
 
---- @brief
-function rt.SmoothedMotion2D:set_position(x, y)
-    self._current_position_x, self._current_position_y = x, y
-end
 
 --- @brief
 function rt.SmoothedMotion2D:skip()

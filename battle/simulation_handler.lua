@@ -860,6 +860,17 @@ function bt.BattleScene:create_simulation_environment()
         return env.get_consumable_slot_n_uses_left(entity_proxy, slot_i)
     end
 
+    env.get_consumable_slot = function(entity_proxy, slot_i)
+        bt.assert_args("remove_consumable_slot",
+            entity_proxy, bt.EntityProxy,
+            slot_i, bt.Number
+        )
+
+        local entity = _get_native(entity_proxy)
+        local consumable = _state:entity_get_consumable(entity, slot_i)
+        return bt.create_consumable_proxy(self, entity, consumable)
+    end
+
     env.remove_consumable_slot = function(entity_proxy, slot_i)
         bt.assert_args("remove_consumable_slot",
             entity_proxy, bt.EntityProxy,
@@ -1685,7 +1696,21 @@ function bt.BattleScene:create_simulation_environment()
         local entity = _get_native(entity_proxy)
         local sprite = _scene:get_sprite(entity)
 
+        local statuses_backup = env.list_statuses(entity_proxy)
+        local consumables_backup = env.list_consumables(entity_proxy)
+
         local animation = bt.Animation.KILL(self, sprite)
+        animation:signal_connect("start", function(_)
+            sprite:set_hp(0)
+            for status_proxy in values(statuses_backup) do
+                sprite:remove_status(_get_native(status_proxy))
+            end
+
+            for i = 1, env.get_n_consumable_slots(entity_proxy) do
+                sprite:remove_consumable(i)
+            end
+        end)
+
         animation:signal_connect("finish", function(_)
             _scene:remove_entity(entity)
             _scene:set_priority_order(_state:list_entities_in_order())
@@ -1695,8 +1720,7 @@ function bt.BattleScene:create_simulation_environment()
         env.append_message(rt.Translation.battle.message.entity_killed_f(entity_proxy))
 
         _state:entity_set_state(entity, bt.EntityState.DEAD)
-        local statuses_backup = env.list_statuses(entity_proxy)
-        local consumables_backup = env.list_consumables(entity_proxy)
+        _state:entity_set_hp(entity, 0)
 
         -- callbacks after death
         local callback_id = "on_killed"
@@ -1704,7 +1728,7 @@ function bt.BattleScene:create_simulation_environment()
             _try_invoke_status_callback(callback_id, status_proxy, entity_proxy)
         end
 
-        _state:entity_clear_statuses(entity) -- delayed to after callback
+        _state:entity_clear_statuses(entity) -- delayed to after status callbacks
 
         for consumable_proxy in values(consumables_backup) do
             _try_invoke_consumable_callback(callback_id, consumable_proxy, entity_proxy)
@@ -1721,10 +1745,46 @@ function bt.BattleScene:create_simulation_environment()
         if env.is_dead(entity_proxy) ~= true then return end
 
         local entity = _get_native(entity_proxy)
-        local sprite = _scene:get_sprite(entity)
-        local animation = bt.Animation.ENTITY_REVIVED(self, sprite)
+        _state:entity_set_state(entity, bt.EntityState.ALIVE)
+        _state:entity_set_hp(entity, 1)
 
-        -- TODO
+        local animation = bt.Animation.REVIVE(self, nil)
+        animation:signal_connect("start", function(_)
+            _scene:add_entity(_get_native(entity_proxy))
+
+            local sprite = _scene:get_sprite(entity)
+            animation._sprite = sprite
+
+            for status_proxy in values(env.list_statuses(entity_proxy)) do
+                local status = _get_native(status_proxy)
+                sprite:add_status(_get_native(status_proxy), status:get_max_duration() - _state:entity_get_status_n_turns_elapsed(entity, status))
+            end
+
+            for i = 1, env.get_n_consumable_slots(entity_proxy) do
+                local consumable = _state:entity_get_consumable(entity, i)
+                if consumable ~= nil then
+                    sprite:add_consumable(i, consumable, consumable:get_max_n_uses() - _state:entity_get_consumable_n_used(entity, i))
+                end
+            end
+
+            sprite:set_hp(1)
+            _scene:set_priority_order(_state:list_entities_in_order())
+        end)
+
+        _scene:_push_animation(animation)
+
+        local callback_id = "on_revived"
+        for status_proxy in values(env.list_statuses(entity_proxy)) do
+            _try_invoke_status_callback(callback_id, status_proxy, entity_proxy)
+        end
+
+        for consumable_proxy in values(env.list_consumables(entity_proxy)) do
+            _try_invoke_consumable_callback(callback_id, consumable_proxy, entity_proxy)
+        end
+
+        for global_status_proxy in values(env.list_global_statuses()) do
+            _try_invoke_global_status_callback(callback_id, global_status_proxy, entity_proxy)
+        end
     end
 
     env.add_hp = function(entity_proxy, value)

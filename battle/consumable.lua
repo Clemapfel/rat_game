@@ -101,6 +101,11 @@ end, {
         return nil
     end,
 
+    -- (ConsumableProxy, EntityProxy) -> nil
+    on_revived = function(self, holder)
+        return nil
+    end,
+
     -- (ConsumableProxy, EntityProxy, EntityProxy) -> nil
     on_swap = function(self, holder, entity_at_old_position)
         return nil
@@ -171,6 +176,7 @@ function bt.Consumable:realize()
         "on_knocked_out",
         "on_helped_up",
         "on_killed",
+        "on_revived",
         "on_swap",
         "on_move_used",
         "on_move_disabled",

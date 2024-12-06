@@ -1,12 +1,12 @@
-rt.settings.battle.animations.enemy_revived = {
+rt.settings.battle.animations.revive = {
     duration = 6,
     n_particles = 16
 }
 
---- @class bt.Animation.ENEMY_REVIVED
-bt.Animation.ENEMY_REVIVED = meta.new_type("ENEMY_REVIVED", rt.Animation, function(scene, sprite)
-    local settings = rt.settings.battle.animations.enemy_revived
-    return meta.new(bt.Animation.ENEMY_REVIVED, {
+--- @class bt.Animation.REVIVE
+bt.Animation.REVIVE = meta.new_type("REVIVE", rt.Animation, function(scene, sprite)
+    local settings = rt.settings.battle.animations.revive
+    return meta.new(bt.Animation.REVIVE, {
         _scene = scene,
         _sprite = sprite,
 
@@ -22,9 +22,9 @@ bt.Animation.ENEMY_REVIVED = meta.new_type("ENEMY_REVIVED", rt.Animation, functi
         _shadow_fade_in_animation = rt.TimedAnimation(0.1, 0, 1),
         _shadow_fade_out_animation = rt.TimedAnimation(0.1, 1, 0),
 
-        _before_light_animation = rt.TimedAnimation(0.5),
-        _after_light_before_descend_animation = rt.TimedAnimation(0.5),
-        _after_descend_animation = rt.TimedAnimation(0.75),
+        _before_light_hold = rt.TimedAnimation(0.5),
+        _after_light_before_descend_hold = rt.TimedAnimation(0.5),
+        _after_descend_hold = rt.TimedAnimation(0.25),
 
         _sprite_path = nil, -- rt.Path
         _sprite_animation = rt.TimedAnimation(settings.duration, 1, 0, rt.InterpolationFunctions.EXPONENTIAL_DECELERATION),
@@ -49,7 +49,7 @@ do
     local _particle_mesh = nil
 
     --- @override
-    function rt.Animation.ENEMY_REVIVED:start()
+    function rt.Animation.REVIVE:start()
         local x, y, w, h = rt.aabb_unpack(self._scene:get_bounds())
         local sprite_x, sprite_y = self._sprite:get_position()
         local sprite_w, sprite_h = self._sprite:get_size()
@@ -167,19 +167,24 @@ do
 end
 
 --- @override
-function bt.Animation.ENEMY_REVIVED:update(delta)
+function bt.Animation.REVIVE:finish()
+    self._sprite:set_opacity(1)
+end
+
+--- @override
+function bt.Animation.REVIVE:update(delta)
     self._shadow_fade_in_animation:update(delta)
     self._shadow:set_opacity(self._shadow_fade_in_animation:get_value())
 
     if self._shadow_fade_in_animation:get_is_done() then
-        self._before_light_animation:update(delta)
-        if not self._before_light_animation:get_is_done() then
+        self._before_light_hold:update(delta)
+        if not self._before_light_hold:get_is_done() then
             return rt.AnimationResult.CONTINUE
         end
 
-        if self._before_light_animation:get_is_done() then
-            self._after_light_before_descend_animation:update(delta)
-            if not self._after_light_before_descend_animation:get_is_done() then
+        if self._before_light_hold:get_is_done() then
+            self._after_light_before_descend_hold:update(delta)
+            if not self._after_light_before_descend_hold:get_is_done() then
                 return rt.AnimationResult.CONTINUE
             end
         end
@@ -196,13 +201,12 @@ function bt.Animation.ENEMY_REVIVED:update(delta)
         is_done = is_done and animation:get_is_done()
     end
     if is_done then
-        if self._after_descend_animation:update(delta) then
-            self._shadow_fade_out_animation:update(delta)
-            self._shadow:set_opacity(self._shadow_fade_out_animation:get_value())
-        end
+        self._shadow_fade_out_animation:update(delta)
+        self._shadow:set_opacity(self._shadow_fade_out_animation:get_value())
+        self._after_descend_hold:update(delta)
     end
 
-    local gravity = rt.settings.battle.animations.enemy_revived.particle_gravity
+    local gravity = rt.settings.battle.animations.revive.particle_gravity
     for particle in values(self._particles) do
         local _, particle_y = self._particle_path:at(self._particle_path_animation:get_value() * particle.mass)
         particle.y = particle_y
@@ -214,17 +218,17 @@ function bt.Animation.ENEMY_REVIVED:update(delta)
     self._sprite:set_opacity(sprite_value)
     self._sprite_scale = self._sprite_animation:get_value()
     self._particle_opacity = self._particle_opacity_animation:get_value()
-    return self._shadow_fade_out_animation:get_is_done()
+    return self._shadow_fade_out_animation:get_is_done() and self._scene:get_are_sprites_done_repositioning()
 end
 
 --- @override
-function bt.Animation.ENEMY_REVIVED:draw()
+function bt.Animation.REVIVE:draw()
     self._shadow:draw()
     if  self._shadow_fade_in_animation:get_is_done() and
-        self._before_light_animation:get_is_done()
+        self._before_light_hold:get_is_done()
     then
         self._circle:draw()
-        if self._after_light_before_descend_animation:get_is_done() then
+        if self._after_light_before_descend_hold:get_is_done() then
             love.graphics.push()
             love.graphics.translate(self._sprite_x, self._sprite_y)
             love.graphics.translate(-self._sprite_scale_offset_x, -self._sprite_scale_offset_y)
@@ -238,7 +242,7 @@ function bt.Animation.ENEMY_REVIVED:draw()
         self._trapezoid:draw()
         self._trapezoid_right_aa:draw()
 
-        if self._after_light_before_descend_animation:get_is_done() then
+        if self._after_light_before_descend_hold:get_is_done() then
             for particle in values(self._particles) do
                 love.graphics.push()
                 love.graphics.origin()

@@ -129,7 +129,7 @@ function bt.Animation.KILL:update(delta)
     self:_dispatch(self._step_shader)
 
     self._duration:update(delta)
-    return self._duration:get_is_done()
+    return self._duration:get_is_done() and self._scene:get_are_sprites_done_repositioning()
 
     --[[
     local readback = love.graphics.readbackBuffer(self._n_done_counter)
