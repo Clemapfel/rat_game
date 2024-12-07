@@ -127,8 +127,8 @@ function bt.BattleScene:add_entity(...)
         end
     end
 
-    if reformat_allies then self:_reformat_party_sprites() end
-    if reformat_enemies then self:_reformat_enemy_sprites() end
+    if reformat_allies then self:reformat_party_sprites() end
+    if reformat_enemies then self:reformat_enemy_sprites() end
 end
 
 --- @brief
@@ -146,8 +146,8 @@ function bt.BattleScene:remove_entity(...)
         end
     end
 
-    if reformat_allies then self:_reformat_party_sprites() end
-    if reformat_enemies then self:_reformat_enemy_sprites() end
+    if reformat_allies then self:reformat_party_sprites() end
+    if reformat_enemies then self:reformat_enemy_sprites() end
 end
 
 --- @override
@@ -181,8 +181,8 @@ function bt.BattleScene:size_allocate(x, y, width, height)
         tile_size, tile_size
     )
 
-    self:_reformat_enemy_sprites()
-    self:_reformat_party_sprites()
+    self:reformat_enemy_sprites()
+    self:reformat_party_sprites()
 
     if self._is_first_size_allocate then
         self:skip()
@@ -191,7 +191,7 @@ function bt.BattleScene:size_allocate(x, y, width, height)
 end
 
 --- @brief
-function bt.BattleScene:_reformat_enemy_sprites()
+function bt.BattleScene:reformat_enemy_sprites()
     local n_enemies = sizeof(self._enemy_sprites)
     local i_to_sprite = {}
     local total_w = 0
@@ -257,7 +257,7 @@ function bt.BattleScene:_reformat_enemy_sprites()
 end
 
 --- @brief
-function bt.BattleScene:_reformat_party_sprites()
+function bt.BattleScene:reformat_party_sprites()
     local m = rt.settings.margin_unit
     local outer_margin = 2 * m
     local width = (4 / 3) * self._bounds.height - 2 * outer_margin
@@ -512,17 +512,12 @@ function bt.BattleScene:_handle_button_pressed(which)
         --self._env.revive(proxy)
         --self:remove_entity(self._state:list_enemies()[1])
 
-        local first, second = nil, nil
-        for _, sprite in pairs(self._enemy_sprites) do
-            if first == nil then
-                first = sprite
-            elseif second == nil then
-                second = sprite
-            else
-                break
-            end
-        end
-        self:_push_animation(bt.Animation.SWAP(self, first, second))
+        local enemies = self._state:list_enemies()
+        self._env.swap(
+            bt.create_entity_proxy(self, enemies[1]),
+            bt.create_entity_proxy(self, enemies[2])
+        )
+        --self:_push_animation(bt.Animation.SWAP(self, self:get_sprite(enemies[1]), self:get_sprite(enemies[2])))
 
     elseif which == rt.InputButton.B then
         self:skip()

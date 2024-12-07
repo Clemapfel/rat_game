@@ -1,8 +1,7 @@
 --[[
     entity_id_to_multiplicity[entity_id] = count,
     entity_id_to_index[entity_id] = index,
-    n_allies = 0
-    n_enemies = 0
+    n_entities = 0,
 
     entities = {
         id       -- EntityID
@@ -85,12 +84,6 @@ function rt.GameState:add_entity(entity)
 
     local state = self._state
 
-    if entity:get_is_enemy() then
-        state.n_enemies = state.n_enemies + 1
-    else
-        state.n_allies = state.n_allies + 1
-    end
-
     local n_moves = entity:get_n_move_slots()
     local n_equips = entity:get_n_equip_slots()
     local n_consumables = entity:get_n_consumable_slots()
@@ -137,11 +130,8 @@ function rt.GameState:add_entity(entity)
         table.insert(to_add.intrinsic_moves, id)
     end
 
-    if entity:get_is_enemy() then
-        to_add.index = state.n_enemies
-    else
-        to_add.index = state.n_allies
-    end
+    state.n_entities = state.n_entities + 1
+    to_add.index = state.n_entities
 
     table.insert(state.entities, to_add)
 
@@ -175,11 +165,7 @@ function rt.GameState:remove_entity(entity)
         return
     end
 
-    if entity:get_is_enemy() then
-        state.n_enemies = state.n_enemies - 1
-    else
-        state.n_allies = state.n_allies - 1
-    end
+    state.n_entities = state.n_entities - 1
 
     local entities = self:list_entities()
     for i, e in ipairs(entities) do
@@ -254,17 +240,36 @@ end
 
 --- @brief
 function rt.GameState:get_n_entities()
-    return self._state.n_allies + self._state.n_enemies
+    local entities = self:list_entities()
+    local n = 0
+    for _ in values(entities) do
+        n = n + 1
+    end
+    return n
 end
 
 --- @brief
 function rt.GameState:get_n_allies()
-    return self._state.n_allies
+    local entities = self:list_entities()
+    local n = 0
+    for entity in values(entities) do
+        if entity:get_is_enemy() == false then
+            n = n + 1
+        end
+    end
+    return n
 end
 
 --- @brief
 function rt.GameState:get_n_enemies()
-    return self._state.n_enemies
+    local entities = self:list_entities()
+    local n = 0
+    for entity in values(entities) do
+        if entity:get_is_enemy() == true then
+            n = n + 1
+        end
+    end
+    return n
 end
 
 --- @brief
@@ -330,6 +335,39 @@ function rt.GameState:entity_get_party_index(entity)
         return -1
     end
     return entry.index
+end
+
+--- @brief
+function rt.GameState:entity_swap_indices(entity_a, entity_b)
+    meta.assert_isa(entity_a, bt.Entity)
+    meta.assert_isa(entity_b, bt.Entity)
+
+    local a_entry = self:_get_entity_entry(entity_a)
+    local b_entry = self:_get_entity_entry(entity_b)
+
+    local error_entity
+    if a_entry == nil then error_entity = entity_a end
+    if b_entry == nil then error_entity = entity_b end
+    if error_entity ~= nil then
+        rt.error("In rt.GameState:entity_swap_indices: entity `" .. error_entity:get_id() .. "` is not part of state")
+        return
+    end
+
+    local new_b_index = a_entry.index
+    local new_a_index = b_entry.index
+    a_entry.index = new_a_index
+    b_entry.index = new_b_index
+
+
+    local state = self._state
+    state.entities[new_a_index] = a_entry
+    state.entities[new_b_index] = b_entry
+    state.entity_id_to_index[entity_a:get_id()] = new_a_index
+    state.entity_id_to_index[entity_b:get_id()] = new_b_index
+    self._entity_index_to_entity[new_a_index] = entity_a
+    self._entity_index_to_entity[new_b_index] = entity_b
+    self._entity_to_entity_index[entity_a] = new_a_index
+    self._entity_to_entity_index[entity_b] = new_b_index
 end
 
 --- @brief

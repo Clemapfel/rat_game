@@ -22,17 +22,14 @@
     </configurations>
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="7fa9ba1b-2cff-4ecc-86fb-59ab2fa76ee1" name="Changes" comment="sprite order is now determinstic">
-      <change afterPath="$PROJECT_DIR$/battle/animations/swap.lua" afterDir="false" />
+    <list default="true" id="7fa9ba1b-2cff-4ecc-86fb-59ab2fa76ee1" name="Changes" comment="stashing swap animation">
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/battle/animations/enemy_revived.lua" beforeDir="false" afterPath="$PROJECT_DIR$/battle/animations/revive.lua" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/battle/animations/kill.lua" beforeDir="false" afterPath="$PROJECT_DIR$/battle/animations/kill.lua" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/battle/animations/swap.lua" beforeDir="false" afterPath="$PROJECT_DIR$/battle/animations/swap.lua" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/battle/battle_scene.lua" beforeDir="false" afterPath="$PROJECT_DIR$/battle/battle_scene.lua" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/battle/consumable.lua" beforeDir="false" afterPath="$PROJECT_DIR$/battle/consumable.lua" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/battle/global_status.lua" beforeDir="false" afterPath="$PROJECT_DIR$/battle/global_status.lua" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/battle/simulation_handler.lua" beforeDir="false" afterPath="$PROJECT_DIR$/battle/simulation_handler.lua" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/battle/status.lua" beforeDir="false" afterPath="$PROJECT_DIR$/battle/status.lua" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/common/smoothed_motion_2d.lua" beforeDir="false" afterPath="$PROJECT_DIR$/common/smoothed_motion_2d.lua" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/common/game_state_battle.lua" beforeDir="false" afterPath="$PROJECT_DIR$/common/game_state_battle.lua" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/common/path.lua" beforeDir="false" afterPath="$PROJECT_DIR$/common/path.lua" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/common/translation.lua" beforeDir="false" afterPath="$PROJECT_DIR$/common/translation.lua" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -667,15 +664,7 @@
       <workItem from="1733334970865" duration="24000" />
       <workItem from="1733335003286" duration="13005000" />
       <workItem from="1733440232414" duration="9504000" />
-      <workItem from="1733502567573" duration="24844000" />
-    </task>
-    <task id="LOCAL-01258" summary="stashing mesh">
-      <option name="closed" value="true" />
-      <created>1732387563293</created>
-      <option name="number" value="01258" />
-      <option name="presentableId" value="LOCAL-01258" />
-      <option name="project" value="LOCAL" />
-      <updated>1732387563293</updated>
+      <workItem from="1733502567573" duration="29269000" />
     </task>
     <task id="LOCAL-01259" summary="stashing">
       <option name="closed" value="true" />
@@ -1061,7 +1050,15 @@
       <option name="project" value="LOCAL" />
       <updated>1733516305135</updated>
     </task>
-    <option name="localTasksCounter" value="1307" />
+    <task id="LOCAL-01307" summary="stashing swap animation">
+      <option name="closed" value="true" />
+      <created>1733529463656</created>
+      <option name="number" value="01307" />
+      <option name="presentableId" value="LOCAL-01307" />
+      <option name="project" value="LOCAL" />
+      <updated>1733529463656</updated>
+    </task>
+    <option name="localTasksCounter" value="1308" />
     <servers />
   </component>
   <component name="TypeScriptGeneratedFilesManager">
@@ -1110,7 +1107,6 @@
     </option>
   </component>
   <component name="VcsManagerConfiguration">
-    <MESSAGE value="stashing before parallelizing" />
     <MESSAGE value="mwe working" />
     <MESSAGE value="stashing before reworking mesh ring" />
     <MESSAGE value="quicksave quickload animation done" />
@@ -1135,7 +1131,8 @@
     <MESSAGE value="stashing before battle scene refactor" />
     <MESSAGE value="scene refactored, kill working" />
     <MESSAGE value="sprite order is now determinstic" />
-    <option name="LAST_COMMIT_MESSAGE" value="sprite order is now determinstic" />
+    <MESSAGE value="stashing swap animation" />
+    <option name="LAST_COMMIT_MESSAGE" value="stashing swap animation" />
   </component>
   <component name="XDebuggerManager">
     <breakpoint-manager>

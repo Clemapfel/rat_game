@@ -378,6 +378,10 @@ rt.Translation = rt.initialize_translation({
 
             entity_killed_f = function(entity)
                 return entity .. " was killed"
+            end,
+
+            swap_f = function(entity_a, entity_b)
+                return entity_a .. " and " .. entity_b .. " swapped places"
             end
         }
     }

@@ -2053,19 +2053,73 @@ function bt.BattleScene:create_simulation_environment()
         end
     end
 
-    env.swap = function(entity_proxy_a, entity_proxy_b)
+    env.swap = function(entity_a_proxy, entity_b_proxy)
         bt.assert_args("swap",
-            entity_proxy_a, bt.EntityProxy,
-            entity_proxy_b, bt.EntityProxy
+            entity_a_proxy, bt.EntityProxy,
+            entity_b_proxy, bt.EntityProxy
         )
 
-        local entity_a, entity_b = _get_native(entity_proxy_a), _get_native(entity_proxy_b)
+        local entity_a, entity_b = _get_native(entity_a_proxy), _get_native(entity_b_proxy)
         if entity_a:get_is_enemy() ~= entity_b:get_is_enemy() then
             bt.error_function("In env.swap: entity `" .. entity_a:get_id() .. "` and entity `" .. entity_b:get_id() .. "` are ally and enemy, only entities on the same side can be swapped")
             return
         end
 
-        -- TODO
+        if env.is_dead(entity_a_proxy) or env.is_dead(entity_a_proxy) then return end
+
+        _state:entity_swap_indices(entity_a, entity_b)
+
+        local a_sprite, b_sprite = _scene:get_sprite(entity_a), _scene:get_sprite(entity_b)
+        local animation = bt.Animation.SWAP(_scene, a_sprite, b_sprite)
+        animation:signal_connect("finish", function(_)
+            if entity_a:get_is_enemy() then -- == entity_b:get_is_enemy()
+                _scene:reformat_enemy_sprites()
+            else
+                _scene:reformat_party_sprites()
+            end
+        end)
+
+        _scene:_push_animation(animation)
+        env.append_message(rt.Translation.battle.message.swap_f(entity_a_proxy, entity_b_proxy))
+
+        -- sort by priority for deterministic ordering
+        local a_index, b_index
+        for i, entity in ipairs(_state:list_entities_in_order()) do
+            if entity == entity_a then
+                a_index = i
+            elseif entity == entity_b then
+                b_index = i
+            end
+            if a_index ~= nil and b_index ~= nil then break end
+        end
+
+        local first_entity, second_entity
+        if a_index < b_index then
+            first_entity, second_entity = entity_a_proxy, entity_b_proxy
+        else
+            first_entity, second_entity = entity_b_proxy, entity_a_proxy
+        end
+
+        local callback_id = "on_swap"
+        for status_proxy in values(env.list_statuses(first_entity)) do
+            _try_invoke_status_callback(callback_id, status_proxy, first_entity, second_entity)
+        end
+
+        for status_proxy in values(env.list_statuses(entity_b_proxy)) do
+            _try_invoke_status_callback(callback_id, status_proxy, second_entity, first_entity)
+        end
+
+        for consumable_proxy in values(env.list_consumables(first_entity)) do
+            _try_invoke_consumable_callback(callback_id, consumable_proxy, first_entity, second_entity)
+        end
+
+        for consumable_proxy in values(env.list_consumables(entity_b_proxy)) do
+            _try_invoke_consumable_callback(callback_id, consumable_proxy, second_entity, first_entity)
+        end
+
+        for global_status_proxy in values(env.list_global_statuses()) do
+            _try_invoke_global_status_callback(callback_id, global_status_proxy, first_entity, second_entity)
+        end
     end
 
     --- ### COMMON ###

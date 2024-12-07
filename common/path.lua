@@ -5,6 +5,7 @@ rt.Path = meta.new_type("Path", function(points, ...)
         points = {points, ...}
     end
 
+    assert(#points >= 2 and #points % 2 == 0)
     local out = meta.new(rt.Path, {
         _points = points,
         _distances = {},
