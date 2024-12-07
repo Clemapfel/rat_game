@@ -358,7 +358,6 @@ function rt.GameState:entity_swap_indices(entity_a, entity_b)
     a_entry.index = new_a_index
     b_entry.index = new_b_index
 
-
     local state = self._state
     state.entities[new_a_index] = a_entry
     state.entities[new_b_index] = b_entry

@@ -1,5 +1,6 @@
 rt.settings.battle.animations.swap = {
-    duration = 4
+    duration = 4,
+    n_swaps = 6
 }
 
 --- @class bt.Animation.SWAP
@@ -25,21 +26,16 @@ bt.Animation.SWAP = meta.new_type("SWAP", rt.Animation, function(scene, sprite_a
 
         _a_x = 0,
         _a_y = 0,
-        _a_x_offset = 0,
-        _a_y_offset = 0,
         _a_scale = 1,
 
         _b_x = 0,
         _b_y = 0,
-        _b_x_offset = 0,
-        _b_y_offset = 0,
         _b_scale = 1,
 
-        _draw_order = function() end,
+        _center_line_y = 0,
 
-        _elapsed = 0,
-        _duration = duration,
-        _time_multiplier = 1,
+        _draw_order = function() end,
+        _path_animation = rt.TimedAnimation(duration, 0, 1, rt.InterpolationFunctions.EXPONENTIAL_ACCELERATION),
 
         _a_path = nil, -- rt.Path
         _b_path = nil, -- rt.Path
@@ -48,31 +44,35 @@ end)
 
 --- @override
 function rt.Animation.SWAP:start()
-    local target_a_x, target_a_y, target_a_w, target_a_h = rt.aabb_unpack(self._target_a:get_bounds())
-    local target_b_x, target_b_y, target_b_w, target_b_h = rt.aabb_unpack(self._target_b:get_bounds())
-
-    -- a is always left of b
+    local target_a_x, target_a_y = self._target_a:get_position()
+    local target_b_x, target_b_y = self._target_b:get_position()
 
     local n_vertices = 16
     local step = 2 * math.pi / n_vertices / 2
 
-    local center_x = mix(target_a_x + 0.5 * target_a_w, target_b_x + 0.5 * target_b_w, 0.5)
-    local center_y = mix(target_a_y + 0.5 * target_a_h, target_b_y + 0.5 * target_b_h, 0.5)
+    self._center_line_y = 0
     local x_radius = 0.5 * math.abs(target_b_x - target_a_x)
     local y_radius = 1 * rt.settings.margin_unit
 
     local a_vertices = {}
     local b_vertices = {}
-    for angle = 0, 2 * math.pi, step do
-        table.insert(a_vertices, x_radius + math.cos(angle) * x_radius)
-        table.insert(a_vertices, 0 + math.sin(angle) * y_radius)
 
-        table.insert(b_vertices, -x_radius - math.cos(angle + 2 * math.pi) * x_radius)
-        table.insert(b_vertices, 0 + math.sin(angle + 2 * math.pi) * y_radius)
+    local n_swaps = rt.settings.battle.animations.swap.n_swaps
+    for i = 1, n_swaps do
+        for angle = 0, 2 * math.pi, step do
+            table.insert(a_vertices, x_radius + math.cos(angle - math.pi) * x_radius)
+            table.insert(a_vertices, 0 + math.sin(angle - math.pi) * y_radius)
+
+            table.insert(b_vertices, -x_radius + math.cos(angle) * x_radius)
+            table.insert(b_vertices, 0 + math.sin(angle) * y_radius)
+        end
     end
 
     self._a_path = rt.Path(a_vertices)
     self._b_path = rt.Path(b_vertices)
+
+    self._target_a:set_is_visible(false)
+    self._target_b:set_is_visible(false)
 end
 
 --- @override
@@ -81,48 +81,49 @@ function bt.Animation.SWAP:finish()
     self._target_b:set_is_visible(true)
 end
 
---- @override
-function bt.Animation.SWAP:update(delta)
-    self._elapsed = self._elapsed + delta
-    --self._time_multiplier = self._time_multiplier + 4 * delta
+do
+    local _a_before_b_draw = function(self)
+        love.graphics.push()
+        love.graphics.translate(self._a_x, self._a_y)
+        self._target_a:draw_snapshot()
+        love.graphics.pop()
 
-    local value = math.fmod((self._elapsed * self._time_multiplier) / self._duration, 1)
-
-    if value > 0.5 then
-        self._draw_order = function()
-            love.graphics.push()
-            love.graphics.translate(self._a_x + self._a_x_offset, self._a_y + self._a_y_offset)
-            self._target_a:draw()
-            love.graphics.pop()
-
-            love.graphics.push()
-            love.graphics.translate(self._b_x + self._b_x_offset, self._b_y + self._b_y_offset)
-            self._target_b:draw()
-            love.graphics.pop()
-        end
-    else
-        self._draw_order = function()
-            love.graphics.push()
-            love.graphics.translate(self._b_x + self._b_x_offset, self._b_y + self._b_y_offset)
-            self._target_b:draw()
-            love.graphics.pop()
-
-            love.graphics.push()
-            love.graphics.translate(self._a_x + self._a_x_offset, self._a_y + self._a_y_offset)
-            self._target_a:draw()
-            love.graphics.pop()
-        end
+        love.graphics.push()
+        love.graphics.translate(self._b_x, self._b_y)
+        self._target_b:draw_snapshot()
+        love.graphics.pop()
     end
 
-    self._a_x, self._a_y = self._a_path:at(math.fmod(value + 0.5, 1))
-    self._b_x, self._b_y = self._b_path:at(value)
+    local _b_before_a_draw = function(self)
+        love.graphics.push()
+        love.graphics.translate(self._b_x, self._b_y)
+        self._target_b:draw_snapshot()
+        love.graphics.pop()
 
-    return self._elapsed >= self._duration
-end
+        love.graphics.push()
+        love.graphics.translate(self._a_x, self._a_y)
+        self._target_a:draw_snapshot()
+        love.graphics.pop()
+    end
 
---- @override
-function bt.Animation.SWAP:draw()
-    self._draw_order()
-    self._a_path:draw()
-    self._b_path:draw()
+    --- @override
+    function bt.Animation.SWAP:update(delta)
+        self._path_animation:update(delta)
+
+        local n_swaps = rt.settings.battle.animations.swap.n_swaps
+        local value =self._path_animation:get_value()
+
+        self._a_x, self._a_y = self._a_path:at(value)
+        self._b_x, self._b_y = self._b_path:at(value)
+
+        if self._a_y <= 0 then
+            self.draw = _a_before_b_draw
+        else
+            self.draw = _b_before_a_draw
+        end
+
+        return self._path_animation:get_is_done()
+    end
+
+    bt.Animation.SWAP.draw = _a_before_b_draw
 end
