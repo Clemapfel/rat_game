@@ -17,7 +17,7 @@ shader:send("n_numbers", n_numbers)
 do
     local data = {}
     for _ = 1, n_numbers do
-        table.insert(data, rt.random.integer(0, 9999))
+        table.insert(data, rt.random.integer(0, 999999))
     end
     input_buffer:replace_data(data)
     output_buffer:replace_data(data)
@@ -29,7 +29,7 @@ function test_buffer()
         local a = data:getUInt32(((i - 1) + 0) * (32 / 8))
         local b = data:getUInt32(((i - 1) + 1) * (32 / 8))
         assert(a <= b, i .. " " .. a .. " " .. b)
-        print(a, " ", b, " ", "\n")
+        print(b, " ", "\n")
     end
 end
 

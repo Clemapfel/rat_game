@@ -54,6 +54,8 @@ rt.GameState = meta.new_type("GameState", function()
         entity_id_to_multiplicity = {},
         entity_id_to_index = {},
         entities = {},
+        turn_i = 1,
+        quicksave = nil,
 
         global_statuses = {},
         shared_moves = {},

@@ -138,6 +138,7 @@ end
 
 --- @brief
 function bt.PriorityQueue:reorder(new_order)
+    assert(new_order ~= nil)
     self._order = new_order
     self._scale_elapsed = 1
     self._n_consumed = 0
@@ -179,7 +180,7 @@ end
 --- @override
 function bt.PriorityQueue:size_allocate(x, y, width, height)
     local first_scale_width_delta, first_scale_height_delta = 0, 0
-    if #self._order >= 1 then
+    if self._order ~= nil and #self._order >= 1 then
         local first_scale_factor = rt.settings.battle.priority_queue.first_element_scale_factor
         local first = self._entity_to_item[self._order[1]]
         first_scale_width_delta = (first.width * first_scale_factor - first.width)

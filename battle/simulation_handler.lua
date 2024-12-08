@@ -399,7 +399,7 @@ function bt.BattleScene:create_simulation_environment()
         _push_current_move_user(nil)
         local afflicted_sprite = _scene._sprites[_get_native(entity_proxy)]
         local animation = bt.Animation.STATUS_APPLIED(_scene, status, afflicted_sprite)
-        _scene:_push_animation(animation)
+        _scene:push_animation(animation)
         local out = _scene:invoke(status[callback_id], status_proxy, entity_proxy, ...)
         _pop_current_move_user()
         return out
@@ -428,7 +428,7 @@ function bt.BattleScene:create_simulation_environment()
 
         local holder_sprite = _scene._sprites[entity]
         local animation = bt.Animation.CONSUMABLE_APPLIED(_scene, consumable, holder_sprite)
-        _scene:_push_animation(animation)
+        _scene:push_animation(animation)
         local out = _scene:invoke(consumable[callback_id], consumable_proxy, holder_proxy, ...)
         _pop_current_move_user()
         return out
@@ -447,7 +447,7 @@ function bt.BattleScene:create_simulation_environment()
 
         _push_current_move_user(nil)
         local animation = bt.Animation.GLOBAL_STATUS_APPLIED(_scene, global_status)
-        _scene:_push_animation(animation)
+        _scene:push_animation(animation)
         local out = _scene:invoke(global_status[callback_id], global_status_proxy, ...)
         _pop_current_move_user()
         return out
@@ -466,7 +466,7 @@ function bt.BattleScene:create_simulation_environment()
 
         _push_current_move_user(nil)
         local animation = bt.Animation.EQUIP_APPLIED(_scene, equip)
-        _scene:_push_animation(animation)
+        _scene:push_animation(animation)
         local out = _scene:invoke(equip[callback_id], equip_proxy, ...)
         _pop_current_move_user()
         return out
@@ -512,9 +512,9 @@ function bt.BattleScene:create_simulation_environment()
         end
 
         if append_or_push then
-            _scene:_append_animation(bt.Animation.MESSAGE(_scene, table.concat(to_concat, " ")))
+            _scene:append_animation(bt.Animation.MESSAGE(_scene, table.concat(to_concat, " ")))
         else
-            _scene:_push_animation(bt.Animation.MESSAGE(_scene, table.concat(to_concat, " ")))
+            _scene:push_animation(bt.Animation.MESSAGE(_scene, table.concat(to_concat, " ")))
         end
     end
 
@@ -523,6 +523,10 @@ function bt.BattleScene:create_simulation_environment()
 
     --- @brief
     env.message = env.append_message
+
+    env.get_turn_i = function()
+        return _state:get_turn_i()
+    end
 
     --- @brief
     function env.entity_set_value(entity_proxy, name, new_value)
@@ -785,7 +789,7 @@ function bt.BattleScene:create_simulation_environment()
             local equip_proxy = bt.create_equip_proxy(_scene, equip)
             local sprite = _scene:get_sprite(entity)
             local animation = bt.Animation.EQUIP_APPLIED(_scene, equip, sprite)
-            _scene:_push_animation(animation)
+            _scene:push_animation(animation)
             env.append_message(rt.Translation.battle.message.equip_applied_f(entity_proxy, equip_proxy))
             local out = _scene:invoke(equip.effect, equip_proxy, entity_proxy)
             _pop_current_move_user()
@@ -893,7 +897,7 @@ function bt.BattleScene:create_simulation_environment()
             sprite:remove_consumable(slot_i)
         end)
 
-        _scene:_push_animation(animation)
+        _scene:push_animation(animation)
 
         local consumable_proxy = bt.create_consumable_proxy(_scene, consumable)
         env.message(rt.Translation.battle.message.consumable_removed_f(entity_proxy, consumable_proxy))
@@ -965,7 +969,7 @@ function bt.BattleScene:create_simulation_environment()
         animation:signal_connect("finish", function(_)
             sprite:add_consumable(new_slot, consumable, consumable:get_max_n_uses())
         end)
-        _scene:_append_animation(animation)
+        _scene:append_animation(animation)
 
         _state:entity_add_consumable(entity, new_slot, consumable)
 
@@ -1021,7 +1025,7 @@ function bt.BattleScene:create_simulation_environment()
             animation:signal_connect("finish", function()
                 sprite:remove_consumable(slot_i)
             end)
-            _scene:_append_animation(animation)
+            _scene:append_animation(animation)
 
             _state:entity_set_consumable_n_used(entity, slot_i, 0)
             _state:entity_remove_consumable(entity, slot_i)
@@ -1031,7 +1035,7 @@ function bt.BattleScene:create_simulation_environment()
                 sprite:set_consumable_n_uses_left(max - (n_used + n))
             end)
 
-            _scene:_append_animation(animation)
+            _scene:append_animation(animation)
             _state:entity_set_consumable_n_used(entity, slot_i, n_used + n)
         end
 
@@ -1162,7 +1166,7 @@ function bt.BattleScene:create_simulation_environment()
                 local object_proxy = bt["create_" .. which .. "_proxy"](_scene, object)
                 local sprite, animation = _scene:get_sprite(entity), nil
                 if before == false and now == true then
-                    _scene:_push_animation(bt.Animation.OBJECT_DISABLED(_scene, object, sprite))
+                    _scene:push_animation(bt.Animation.OBJECT_DISABLED(_scene, object, sprite))
                     env.message(rt.Translation.battle.message.object_disabled_f(entity_proxy, object_proxy))
 
                     -- callbacks
@@ -1179,7 +1183,7 @@ function bt.BattleScene:create_simulation_environment()
                         _try_invoke_global_status_callback(callback_id, global_status_proxy, entity_proxy, object_proxy)
                     end
                 elseif before == true and now == false then
-                    _scene:_push_animation(bt.Animation.OBJECT_ENABLED(_scene, object, sprite))
+                    _scene:push_animation(bt.Animation.OBJECT_ENABLED(_scene, object, sprite))
                     env.message(rt.Translation.battle.message.object_no_longer_disabled_f(entity_proxy, object_proxy))
                     -- no callbacks on enable
                 end
@@ -1225,7 +1229,7 @@ function bt.BattleScene:create_simulation_environment()
         animation:signal_connect("start", function(_)
             _scene:add_global_status(global_status, global_status:get_max_duration())
         end)
-        _scene:_push_animation(animation)
+        _scene:push_animation(animation)
         env.append_message(rt.Translation.battle.message.global_status_added_f(global_status_proxy))
 
         _state:add_global_status(global_status)
@@ -1269,7 +1273,7 @@ function bt.BattleScene:create_simulation_environment()
             _scene:remove_global_status(global_status)
         end)
 
-        _scene:_push_animation(animation)
+        _scene:push_animation(animation)
         env.append_message(rt.Translation.battle.message.global_status_removed_f(global_status_proxy))
 
         _state:remove_global_status(global_status)
@@ -1357,7 +1361,7 @@ function bt.BattleScene:create_simulation_environment()
         animation:signal_connect("start", function(_)
             sprite:add_status(status, status:get_max_duration())
         end)
-        _scene:_push_animation(animation)
+        _scene:push_animation(animation)
         env.append_message(rt.Translation.battle.message.status_added_f(entity_proxy, status_proxy))
 
         _state:entity_add_status(entity, status)
@@ -1399,7 +1403,7 @@ function bt.BattleScene:create_simulation_environment()
             sprite:remove_status(status)
         end)
 
-        _scene:_push_animation(animation)
+        _scene:push_animation(animation)
         env.append_message(rt.Translation.battle.message.status_removed_f(entity_proxy, status_proxy))
 
         _state:entity_remove_status(entity, status)
@@ -1502,12 +1506,20 @@ function bt.BattleScene:create_simulation_environment()
         return out
     end
 
-    function env.list_allies()
+    function env.list_party()
         local out = {}
         for entity in values(_state:list_entities_in_order()) do
             if entity:get_is_enemy() == false then
                 table.insert(out, bt.create_entity_proxy(_scene, entity))
             end
+        end
+        return out
+    end
+
+    function env.list_dead_entities()
+        local out = {}
+        for entity in values(_state:list_dead_entities()) do
+            table.insert(out, bt.create_entity_proxy(_scene, entity))
         end
         return out
     end
@@ -1524,8 +1536,8 @@ function bt.BattleScene:create_simulation_environment()
         return out
     end
 
-    function env.list_allies_of(entity_proxy)
-        bt.assert_args("list_allies_of", entity_proxy, bt.EntityProxy)
+    function env.list_party_of(entity_proxy)
+        bt.assert_args("list_party_of", entity_proxy, bt.EntityProxy)
         local self_is_enemy = _get_native(entity_proxy):get_is_enemy()
         local out = {}
         for entity in values(_state:list_entities_in_order()) do
@@ -1648,7 +1660,7 @@ function bt.BattleScene:create_simulation_environment()
             sprite:set_state(bt.EntityState.KNOCKED_OUT)
         end)
 
-        _scene:_push_animation(animation)
+        _scene:push_animation(animation)
 
         local status_backup = {}
         for proxy in values(env.list_statuses(entity_proxy)) do
@@ -1686,7 +1698,48 @@ function bt.BattleScene:create_simulation_environment()
 
     env.help_up = function(entity_proxy)
         bt.assert_args("help_up", entity_proxy, bt.EntityProxy)
-        -- TODO
+
+        if env.is_dead(entity_proxy) or not env.is_knocked_out(entity_proxy) then
+            return
+        end
+
+        local statuses_backup = env.list_statuses(entity_proxy)
+
+        local entity = _get_native(entity_proxy)
+        _state:entity_set_state(entity, bt.EntityState.KNOCKED_OUT)
+        _state:entity_set_hp(entity, 0)
+        _state:entity_clear_statuses(entity)
+
+        local sprite = _scene:get_sprite(entity)
+        local animation = bt.Animation.KNOCKED_OUT(_scene, sprite)
+        animation:signal_connect("start", function(_)
+            sprite:set_hp(0)
+            sprite:set_state(bt.EntityState.KNOCKED_OUT)
+
+            for status_proxy in values(statuses_backup) do
+                sprite:remove_status(_get_native(status_proxy))
+            end
+        end)
+
+        animation:signal_connect("finish", function(_)
+            _scene:set_priority_order(_state:list_entities_in_order())
+        end)
+
+        _scene:push_animation(animation)
+        env.append_message(rt.Translation.battle.message.knocked_out_f(entity_proxy))
+
+        local callback_id = "on_helped_up"
+        for status_proxy in values(env.list_statuses(entity_proxy)) do
+            _try_invoke_status_callback(callback_id, status_proxy, entity_proxy)
+        end
+
+        for consumable_proxy in values(env.list_consumables(entity_proxy)) do
+            _try_invoke_consumable_callback(callback_id, consumable_proxy, entity_proxy)
+        end
+
+        for global_status_proxy in values(env.list_global_statuses()) do
+            _try_invoke_global_status_callback(callback_id, global_status_proxy, entity_proxy)
+        end
     end
 
     env.kill = function(entity_proxy)
@@ -1702,6 +1755,7 @@ function bt.BattleScene:create_simulation_environment()
         local animation = bt.Animation.KILL(self, sprite)
         animation:signal_connect("start", function(_)
             sprite:set_hp(0)
+            sprite:set_state(bt.EntityState.DEAD)
             for status_proxy in values(statuses_backup) do
                 sprite:remove_status(_get_native(status_proxy))
             end
@@ -1716,8 +1770,8 @@ function bt.BattleScene:create_simulation_environment()
             _scene:set_priority_order(_state:list_entities_in_order())
         end)
 
-        _scene:_push_animation(animation)
-        env.append_message(rt.Translation.battle.message.entity_killed_f(entity_proxy))
+        _scene:push_animation(animation)
+        env.append_message(rt.Translation.battle.message.killed_f(entity_proxy))
 
         _state:entity_set_state(entity, bt.EntityState.DEAD)
         _state:entity_set_hp(entity, 0)
@@ -1771,7 +1825,7 @@ function bt.BattleScene:create_simulation_environment()
             _scene:set_priority_order(_state:list_entities_in_order())
         end)
 
-        _scene:_push_animation(animation)
+        _scene:push_animation(animation)
 
         local callback_id = "on_revived"
         for status_proxy in values(env.list_statuses(entity_proxy)) do
@@ -1819,7 +1873,7 @@ function bt.BattleScene:create_simulation_environment()
             sprite:set_hp(clamp(hp_current + difference, 0, hp_base))
         end)
 
-        _scene:_push_animation(animation)
+        _scene:push_animation(animation)
         env.message(rt.Translation.battle.message.hp_gained_f(entity_proxy, difference))
 
         _state:entity_set_hp(entity, hp_current + difference)
@@ -1890,7 +1944,7 @@ function bt.BattleScene:create_simulation_environment()
             sprite:set_hp(hp_before - difference)
         end)
 
-        _scene:_push_animation(animation)
+        _scene:push_animation(animation)
         env.message(rt.Translation.battle.message.hp_lost_f(entity_proxy, difference))
 
         _state:entity_set_hp(entity, clamp(hp_before - difference, 0))
@@ -2018,7 +2072,7 @@ function bt.BattleScene:create_simulation_environment()
             animation = bt.Animation.ALLY_APPEARED(_scene, sprite)
         end
 
-        _scene:_push_animation(animation)
+        _scene:push_animation(animation)
 
         -- invoke added items
         for equip_proxy in values(env.list_equips(entity_proxy)) do
@@ -2079,7 +2133,7 @@ function bt.BattleScene:create_simulation_environment()
             end
         end)
 
-        _scene:_push_animation(animation)
+        _scene:push_animation(animation)
         env.append_message(rt.Translation.battle.message.swap_f(entity_a_proxy, entity_b_proxy))
 
         -- sort by priority for deterministic ordering
@@ -2266,12 +2320,145 @@ function bt.BattleScene:create_simulation_environment()
         return value
     end
 
-    env.start_turn = function()
+    env.use_move = function(entity_proxy, move_proxy, ...)
+        bt.assert_args("use_move",
+            entity_proxy, bt.EntityProxy,
+            move_proxy, bt.MoveProxy
+        )
+
+        local targets = {...}
+        for i = 1, select("#", ...) do
+            local target = select(i, ...)
+            bt.assert_args("use_move", target, bt.EntityProxy)
+            table.insert(targets, target)
+        end
+
         -- TODO
     end
 
+    env.start_turn = function()
+        local animation = bt.Animation.TURN_START(_scene)
+        _scene:push_animation(animation)
+
+        local callback_id = "on_turn_start"
+        local entity_proxies = env.list_entities()
+        for entity_proxy in values(entity_proxies) do
+            for status_proxy in values(env.list_statuses(entity_proxy)) do
+                _try_invoke_status_callback(callback_id, status_proxy, entity_proxy)
+            end
+        end
+
+        for entity_proxy in values(entity_proxies) do
+            for consumable_proxy in values(env.list_consumables(entity_proxy)) do
+                _try_invoke_consumable_callback(callback_id, consumable_proxy, entity_proxy)
+            end
+        end
+
+        for global_status_proxy in values(env.list_global_statuses()) do
+            _try_invoke_global_status_callback(callback_id, global_status_proxy)
+        end
+    end
+
     env.end_turn = function()
-        -- TODO
+        -- enumerate all entities including dead to determined end of battle
+        -- delayed to end of turn to allow for passive reviving
+
+        local party, enemies = {}
+        local n_dead_allies, n_knocked_out_allies, n_allies = 0, 0, 0
+        local n_dead_enemies, n_knocked_out_enemies, n_enemies = 0, 0, 0
+        for entity in values(_state:list_all_entities()) do
+            local state = _state:entity_get_state(entity)
+            if entity:get_is_enemy() then
+                n_enemies = n_enemies + 1
+                if state == bt.EntityState.DEAD then
+                    n_dead_enemies = n_dead_enemies + 1
+                elseif state == bt.EntityState.KNOCKED_OUT then
+                    n_knocked_out_enemies = n_knocked_out_enemies + 1
+                end
+            else
+                n_allies = n_allies + 1
+                if state == bt.EntityState.DEAD then
+                    n_dead_allies = n_dead_allies + 1
+                elseif state == bt.EntityState.KNOCKED_OUT then
+                    n_knocked_out_allies = n_knocked_out_allies + 1
+                end
+            end
+        end
+
+        if n_dead_allies >= 1 then -- or n_knocked_out_allies == n_allies then
+            env.loose_battle()
+            return
+        end
+
+        if (n_dead_enemies + n_knocked_out_enemies) == n_enemies then
+            env.win_battle()
+            return
+        end
+
+        local animation = bt.Animation.TURN_END(_scene)
+        animation:signal_connect("finish", function(_)
+            if _state:get_quicksave_exists() then
+                _scene._quicksave_indicator:set_n_turns_elapsed(_state:get_quicksave_n_turns_elapsed() + 1)
+                -- increased in state only after callbacks
+            end
+        end)
+        _scene:push_animation(animation)
+
+        -- callbacks
+
+        local callback_id = "on_turn_end"
+        local entity_proxies = env.list_entities()
+        for entity_proxy in values(entity_proxies) do
+            for status_proxy in values(env.list_statuses(entity_proxy)) do
+                _try_invoke_status_callback(callback_id, status_proxy, entity_proxy)
+            end
+        end
+
+        for entity_proxy in values(entity_proxies) do
+            for consumable_proxy in values(env.list_consumables(entity_proxy)) do
+                _try_invoke_consumable_callback(callback_id, consumable_proxy, entity_proxy)
+            end
+        end
+
+        for global_status_proxy in values(env.list_global_statuses()) do
+            _try_invoke_global_status_callback(callback_id, global_status_proxy)
+        end
+
+        -- remove expired statuses
+
+        for entity_proxy in values(entity_proxies) do
+            local entity = _get_native(entity_proxy)
+            local to_remove = {}
+            for status_proxy in values(env.list_statuses(entity_proxy)) do
+                local status = _get_native(status_proxy)
+                local n = _state:entity_get_status_n_turns_elapsed(entity, status)
+                if _state:entity_set_status_n_turns_elapsed(entity, status, n + 1) then
+                    table.insert(to_remove, status_proxy)
+                end
+            end
+
+            for status_proxy in values(to_remove) do
+                env.remove_status(entity_proxy, status_proxy)
+            end
+        end
+
+        do
+            local to_remove = {}
+            for global_status_proxy in values(env.list_global_statuses()) do
+                local global_status = _get_native(global_status_proxy)
+                local n = _state:get_global_status_n_turns_elapsed(global_status)
+                if _state:set_global_status_n_turns_elapsed(global_status, n + 1) then
+                    table.insert(to_remove, global_status_proxy)
+                end
+            end
+
+            for global_status_proxy in values(to_remove) do
+                env.remove_global_status(global_status_proxy)
+            end
+        end
+        
+        -- increment turn counter
+        _state:set_turn_i(_state:get_turn_i() + 1)
     end
 
     env.quicksave = function()
@@ -2279,6 +2466,22 @@ function bt.BattleScene:create_simulation_environment()
     end
 
     env.quickload = function()
+        -- TODO
+    end
+
+    env.start_battle = function()
+        -- TODO
+    end
+
+    env.win_battle = function()
+        -- TODO
+    end
+
+    env.loose_battle = function()
+        -- TODO
+    end
+
+    env.finish_battle = function()
         -- TODO
     end
 

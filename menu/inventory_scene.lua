@@ -139,7 +139,7 @@ function mn.InventoryScene:create_from_state(state)
 
     self._entity_tab_bar:clear()
 
-    local entities = self._state:list_allies()
+    local entities = self._state:list_party()
     table.sort(entities, function(a, b)
         return self._state:entity_get_party_index(a) < self._state:entity_get_party_index(b)
     end)

@@ -19,7 +19,7 @@ uniform uint n_particles;
 //uniform uint pass; // [0, 3)
 
 shared uint global_counts[256];
-shared uint mask_locks[256];
+shared uint count_locks[256];
 
 #define GET(pass, i) (pass % 2 == 0 ? particle_occupations[i].hash : swap[i].hash)
 
@@ -36,16 +36,15 @@ void computemain()
     uint start = thread_x * n_per_thread;
     uint end = min(start + n_per_thread, n_particles);
 
-    if (thread_x < n_bins)
-        mask_locks[thread_x] = 0u;
-
     for (uint pass = 0; pass < 4; pass++) {
         uint shift = 8 * pass;
 
         // init counts
 
-        if (thread_x < n_bins)
+        if (thread_x < n_bins) {
             global_counts[thread_x] = 0u;
+            count_locks[thread_x] = 0u;
+        }
 
         barrier();
 
@@ -99,6 +98,23 @@ void computemain()
                 global_counts[masked]++;
             }
         }
+
+        /*
+        for (uint i = 0; i < n_particles; ++i) {
+            uint masked = (GET(pass, i) >> shift) & bitmask;
+            if (atomicExchange(count_locks[masked], 1) != 0)
+                break;
+
+            uint count = global_counts[masked];
+            if (pass % 2 == 0)
+                swap[count] = particle_occupations[i];
+            else
+                particle_occupations[count] = swap[i];
+
+            global_counts[masked]++;
+            atomicExchange(count_locks[masked], 0);
+        }
+        */
 
         barrier();
     }

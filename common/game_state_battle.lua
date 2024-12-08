@@ -2,6 +2,7 @@
     entity_id_to_multiplicity[entity_id] = count,
     entity_id_to_index[entity_id] = index,
     n_entities = 0,
+    turn_i = 1,
 
     entities = {
         id       -- EntityID
@@ -48,6 +49,11 @@
         id,
         n_turns_elapsed,
         storage = {}
+    }
+
+    quicksave = {
+        turn_i,
+        state = {}
     }
 
     shared_moves[move_id] = {
@@ -191,7 +197,29 @@ function rt.GameState:remove_entity(entity)
 end
 
 --- @brief
+function rt.GameState:list_dead_entities()
+    local out = {}
+    for i, entity in ipairs(self._entity_index_to_entity) do
+        if self:entity_get_state(entity) == bt.EntityState.DEAD then
+            table.insert(out, entity)
+        end
+    end
+    return out
+end
+
+--- @brief
 function rt.GameState:list_entities()
+    local out = {}
+    for i, entity in ipairs(self._entity_index_to_entity) do
+        if self:entity_get_state(entity) ~= bt.EntityState.DEAD then
+            table.insert(out, entity)
+        end
+    end
+    return out
+end
+
+--- @brief also list dead
+function rt.GameState:list_all_entities()
     local out = {}
     for i, entity in ipairs(self._entity_index_to_entity) do
         table.insert(out, entity)
@@ -199,25 +227,36 @@ function rt.GameState:list_entities()
     return out
 end
 
---- @brief
-function rt.GameState:list_entities_in_order()
-    local out = self:list_entities()
-    table.sort(out, function(a, b)
-        if a:get_priority() == b:get_priority() then
-            if a:get_speed() == b:get_speed() then
-                return a:get_name() < b:get_name()
+do
+    local _sort_by_priority = function(t)
+        local out = t
+        table.sort(t, function(a, b)
+            if a:get_priority() == b:get_priority() then
+                if a:get_speed() == b:get_speed() then
+                    return a:get_name() < b:get_name()
+                else
+                    return a:get_speed() > b:get_speed()
+                end
             else
-                return a:get_speed() > b:get_speed()
+                return a:get_priority() > b:get_priority()
             end
-        else
-            return a:get_priority() > b:get_priority()
-        end
-    end)
-    return out
+        end)
+        return out
+    end
+
+    --- @brief
+    function rt.GameState:list_entities_in_order()
+        return _sort_by_priority(self:list_entities())
+    end
+
+    --- @brief also list dead
+    function rt.GameState:list_all_entities_in_order()
+        return _sort_by_priority(self:list_all_entities())
+    end
 end
 
 --- @brief
-function rt.GameState:list_allies()
+function rt.GameState:list_party()
     local out = {}
     for i, entity in ipairs(self._entity_index_to_entity) do
         if self:entity_get_state(entity) ~= bt.EntityState.DEAD and entity:get_is_enemy() == false then
@@ -853,7 +892,6 @@ end
 --- @brief
 --- @return Number, Number, Number, Number
 function rt.GameState:entity_preview_equip(entity, slot_i, new_equip)
-
     local previous = self:entity_get_equip(entity, slot_i)
 
     if new_equip == nil then
@@ -1020,10 +1058,12 @@ function rt.GameState:entity_get_status_n_turns_elapsed(entity, status)
 end
 
 --- @brief
+--- @return Boolean should expire
 function rt.GameState:entity_set_status_n_turns_elapsed(entity, status, n_turns)
     meta.assert_isa(entity, bt.Entity)
     meta.assert_isa(status, bt.Status)
-    meta.assert_unsigned(n_turns)
+    meta.assert_number(n_turns)
+    
     local entry = self:_get_entity_entry(entity)
     if entry == nil then
         rt.error("In rt.GameState:entity_set_status_n_turns_elapsed: entity `" .. entity:get_id() .. "` is not part of state")
@@ -1036,7 +1076,8 @@ function rt.GameState:entity_set_status_n_turns_elapsed(entity, status, n_turns)
         return 0
     end
 
-    item.n_turns_elapsed = clamp(n_turns, 0, status:get_max_duration())
+    item.n_turns_elapsed = n_turns
+    return item.n_turns_elapsed >= status:get_max_duration()
 end
 
 --- @brief
@@ -1118,7 +1159,7 @@ end
 --- @brief
 function rt.GameState:set_global_status_n_turns_elapsed(global_status, n_turns)
     meta.assert_isa(global_status, bt.GlobalStatus)
-    meta.assert_unsigned(n_turns)
+    meta.assert_number(n_turns)
 
     local entry = self._state.global_statuses[global_status:get_id()]
     if entry == nil then
@@ -1670,8 +1711,33 @@ function rt.GameState:set_quicksave_screenshot(texture)
 end
 
 --- @brief
+function rt.GameState:get_quicksave_n_turns_elapsed()
+    if self._state.quicksave == nil then
+        rt.error("In rt.GameState:get_quicksave_n_turns_elapsed: no quicksave present")
+        return 0
+    end
+    return self._state.turn_i  - self._state.quicksave.turn_i
+end
+
+--- @brief
+function rt.GameState:get_quicksave_exists()
+    return self._state.quicksave ~= nil
+end
+
+--- @brief
 function rt.GameState:get_quicksave_screenshot()
     return self._quicksave_screenshot
+end
+
+--- @brief
+function rt.GameState:set_turn_i(i)
+    meta.assert_number(i)
+    self._state.turn_i = i
+end
+
+--- @brief
+function rt.GameState:get_turn_i()
+    return self._state.turn_i
 end
 
 --- @brief

@@ -13,6 +13,7 @@ layout(std430) buffer output_buffer {
 uniform uint n_numbers;
 
 shared uint global_counts[256];
+shared uint count_locks[256];
 
 #define GET(pass, i) (pass % 2 == 0 ? data_in[i] : data_out[i])
 
@@ -36,7 +37,10 @@ void computemain()
         // init global counts
 
         if (thread_x < n_bins)
-        global_counts[thread_x] = 0u;
+        {
+            global_counts[thread_x] = 0u;
+            count_locks[thread_x] = 0u;
+        }
 
         barrier();
 
@@ -77,15 +81,21 @@ void computemain()
 
         barrier();
 
-        if (is_sequential_worker) {
-            for (uint i = 0; i < n_numbers; ++i) {
-                uint masked = (GET(pass, i) >> shift) & bitmask;
-                uint count = global_counts[masked]++;
-                if (pass % 2 == 0)
-                    data_out[count] = data_in[i];
-                else
-                    data_in[count] = data_out[i];
+        for (uint i = 0; i < n_numbers; ++i) {
+            uint masked = (GET(pass, i) >> shift) & bitmask;
+            if (atomicExchange(count_locks[masked], 1) != 0) {
+                // if count is being modified, bail out and wait at barrier
+                // this is suboptimal but faster than waiting in this loop
+                break;
             }
+
+            uint count = global_counts[masked]++;
+            if (pass % 2 == 0)
+                data_out[count] = data_in[i];
+            else
+                data_in[count] = data_out[i];
+
+            atomicExchange(count_locks[masked], 0);
         }
 
         barrier();

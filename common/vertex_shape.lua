@@ -204,3 +204,8 @@ end
 function rt.VertexShape:get_n_vertices()
     return self._native:getVertexCount()
 end
+
+--- @brief
+function rt.VertexShape:replace_data(data)
+    self._native:setVertices(data)
+end

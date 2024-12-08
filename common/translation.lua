@@ -314,6 +314,8 @@ rt.Translation = rt.initialize_translation({
         health_bar_dead_label = "DEAD",
         
         stun_gained_label = "STUNNED",
+        turn_start_label = "TURN START",
+        turn_end_label = "TURN END",
         
         message = {
             move_gained_pp_f = function(entity, move)
@@ -376,13 +378,17 @@ rt.Translation = rt.initialize_translation({
                 return entity .. " lost <color=HP><mono>" .. value .. "</mono></color> HP"
             end,
 
-            entity_killed_f = function(entity)
+            killed_f = function(entity)
                 return entity .. " was killed"
+            end,
+
+            knocked_out_f = function(entity)
+                return entity .. " was knocked out"
             end,
 
             swap_f = function(entity_a, entity_b)
                 return entity_a .. " and " .. entity_b .. " swapped places"
-            end
+            end,
         }
     }
 })

@@ -35,7 +35,6 @@ end)
 function bt.Animation.ENEMY_KNOCKED_OUT:start()
     self._fade_in_shape = rt.VertexRectangle(0, 0, love.graphics.getWidth(), love.graphics.getHeight())
     self._fade_in_shape:set_opacity(0)
-    self._scene:set_background_speed(1)
     self._vignette_shader:send("value", 0)
     self._target:set_is_visible(false)
 
@@ -53,7 +52,6 @@ end
 
 --- @override
 function bt.Animation.ENEMY_KNOCKED_OUT:finish()
-    self._scene:set_background_speed(1)
     self._target:set_is_visible(true)
 end
 
@@ -78,7 +76,6 @@ function bt.Animation.ENEMY_KNOCKED_OUT:update(delta)
     if self._fade_in_animation:get_is_done() then
         fraction = self._fade_out_animation:get_value()
     end
-    self._scene:set_background_speed(1 - fraction)
     self._vignette_shader:send("value", self._vignette_value:get_value())
 
     self._fade_in_shape:set_color(rt.color_mix(

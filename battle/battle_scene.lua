@@ -278,7 +278,7 @@ function bt.BattleScene:reformat_party_sprites()
     self._party_sprites_motion = {}
 
     local speed = rt.settings.battle.battle_scene.enemy_sprite_speed
-    for entity in values(self._state:list_allies()) do
+    for entity in values(self._state:list_party()) do
         local sprite = self._party_sprites[entity]
         if sprite ~= nil then
             local motion = sprite_to_motion_backup[sprite]
@@ -369,12 +369,12 @@ function bt.BattleScene:make_inactive()
 end
 
 --- @brief
-function bt.BattleScene:_push_animation(...)
+function bt.BattleScene:push_animation(...)
     self._animation_queue:push(...)
 end
 
 --- @brief
-function bt.BattleScene:_append_animation(...)
+function bt.BattleScene:append_animation(...)
     self._animation_queue:append(...)
 end
 
@@ -508,17 +508,23 @@ function bt.BattleScene:_handle_button_pressed(which)
     if which == rt.InputButton.A then
         local target = self._state:list_enemies()[1]
         local proxy = bt.create_entity_proxy(self, target)
+        --self._env.knock_out(proxy)
         --self._env.kill(proxy)
         --self._env.revive(proxy)
         --self:remove_entity(self._state:list_enemies()[1])
 
+        --self:push_animation(bt.Animation.TURN_START(self))
+        self._env.start_turn()
+        self._env.end_turn()
+
+        --[[
         local enemies = self._state:list_enemies()
         self._env.swap(
             bt.create_entity_proxy(self, enemies[1]),
             bt.create_entity_proxy(self, enemies[2])
         )
-        --self:_push_animation(bt.Animation.SWAP(self, self:get_sprite(enemies[1]), self:get_sprite(enemies[2])))
-
+        --self:push_animation(bt.Animation.SWAP(self, self:get_sprite(enemies[1]), self:get_sprite(enemies[2])))
+        ]]--
     elseif which == rt.InputButton.B then
         self:skip()
     end

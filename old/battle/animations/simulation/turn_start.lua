@@ -40,7 +40,6 @@ function bt.Animation.TURN_START:start()
     self._tunnel_bottom:resize(x, y + 0.5 * tunnel_h, w, gradient_h)
 end
 
-
 --- @override
 function bt.Animation.TURN_START:update(delta)
     local duration = rt.settings.battle.animations.turn_start.duration

@@ -127,6 +127,11 @@ end, {
         return nil
     end,
 
+    -- (StatusProxy, EntityProxy) -> nil
+    on_helped_up = function(self, afflicted)
+        return nil
+    end,
+
     -- (StatusProxy, EntityProxy)
     on_killed = function(self, afflicted)
         return nil
@@ -201,6 +206,7 @@ function bt.Status:realize()
         "on_global_status_gained",
         "on_global_status_lost",
         "on_knocked_out",
+        "on_helped_up",
         "on_killed",
         "on_revived",
         "on_swap",
