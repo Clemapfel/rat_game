@@ -3,8 +3,9 @@ rt.settings.battle.animations.quicksave = {
 }
 
 --- @class bt.Animation.QUICKSAVE
-bt.Animation.QUICKSAVE = meta.new_type("QUICKSAVE", rt.Animation, function(scene, target)
+bt.Animation.QUICKSAVE = meta.new_type("QUICKSAVE", rt.Animation, function(scene, target, snapshot)
     meta.assert_isa(target, bt.QuicksaveIndicator)
+    meta.assert_isa(snapshot, rt.RenderTexture)
     local flash = rt.settings.battle.animations.quicksave.flash_intensity
     return meta.new(bt.Animation.QUICKSAVE, {
         _scene = scene,
@@ -12,7 +13,7 @@ bt.Animation.QUICKSAVE = meta.new_type("QUICKSAVE", rt.Animation, function(scene
         _is_done = false,
         _is_visible = true,
 
-        _snapshot = nil, -- rt.RenderTexture
+        _snapshot = snapshot, -- rt.RenderTexture
         _snapshot_done = false,
 
         _flash_color = rt.RGBA(flash, flash, flash, 0),
@@ -23,38 +24,6 @@ bt.Animation.QUICKSAVE = meta.new_type("QUICKSAVE", rt.Animation, function(scene
         )
     })
 end)
-
-do
-    local snapshot = nil
-
-    --- @override
-    function bt.Animation.QUICKSAVE:_snapshot()
-        local bounds = self._scene:get_bounds()
-
-        if snapshot == nil or snapshot:get_width() ~= bounds.width or snapshot:get_height() ~= bounds.height then
-            snapshot = rt.RenderTexture(bounds.width, bounds.height, 0)
-        end
-
-        self._snapshot = snapshot
-        self._snapshot:bind()
-        self._is_visible = false
-        love.graphics.clear(0, 0, 0, 0)
-        self._scene:draw()
-        self._is_visible = true
-        self._snapshot:unbind()
-
-        -- overlay mesh over entire screen
-        self._target:set_screenshot(self._snapshot)
-        self._target:set_is_expanded(true)
-        self._target:skip()
-
-        -- start animation
-        self._target:set_is_expanded(false)
-        self._signal_id = self._target:signal_connect("done", function()
-            self._is_done = true
-        end)
-    end
-end
 
 --- @override
 function bt.Animation.QUICKSAVE:start()
@@ -75,7 +44,18 @@ do
         self._flash_color.a = value
 
         if self._snapshot_done == false and (value - previous < 0) then -- trigger once inflection point is reached
-            self:_snapshot()
+            local bounds = self._scene:get_bounds()
+
+            -- overlay mesh over entire screen
+            self._target:set_screenshot(self._snapshot)
+            self._target:set_is_expanded(true)
+            self._target:skip()
+
+            -- start animation
+            self._target:set_is_expanded(false)
+            self._signal_id = self._target:signal_connect("done", function()
+                self._is_done = true
+            end)
             self._snapshot_done = true
         end
 

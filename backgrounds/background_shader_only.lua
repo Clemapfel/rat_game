@@ -87,4 +87,7 @@ rt.Background.CONFUSION = rt.Background.new_shader_only_background("CONFUSION", 
 --- @class rt.Background.HEART_BEAT
 rt.Background.KARO_CROSSES = rt.Background.new_shader_only_background("KARO_CROSSES", "backgrounds/karo_crosses.glsl")
 
+--- @class rt.Background.SQUIGGLY_DANCE
+rt.Background.SQUIGGLY_DANCE = rt.Background.new_shader_only_background("SQUIGGLY_DANCE", "backgrounds/squiggly_dance.glsl")
+
 

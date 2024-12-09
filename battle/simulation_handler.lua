@@ -2462,11 +2462,36 @@ function bt.BattleScene:create_simulation_environment()
     end
 
     env.quicksave = function()
-        -- TODO
+        local texture = _state:create_quicksave()
+        local animation = rt.Animation.QUICKSAVE(self, _scene._quicksave_indicator, texture)
+        animation:signal_connect("finish", function(_)
+            _scene._quicksave_indicator:set_n_turns_elapsed(0)
+        end)
+        _scene:push_animation(animation)
+        env.append_message(rt.Translation.battle.message.quicksave_created_f())
     end
 
     env.quickload = function()
-        -- TODO
+        if _state:has_quicksave() == false then
+            bt.error_function("In env.quickload: trying to load a quicksave, but none is present")
+            return
+        end
+
+        _state:load_quicksave()
+        local animation = rt.Animation.QUICKLOAD(self, _scene._quicksave_indicator)
+        local signal_id
+        animation:signal_connect("start", function(_)
+            signal_id = _scene._quicksave_indicator:signal_connect("done", function(_)
+                _scene:create_from_state(self._state)
+            end)
+        end)
+        animation:signal_connect("finish", function(_)
+            _scene._quicksave_indicator:set_screenshot(nil)
+            _scene._quicksave_indicator:set_is_visible(false)
+            _scene._quicksave_indicator:signal_disconnect(signal_id)
+        end)
+        _scene:push_animation(animation)
+        env.push_message(rt.Translation.battle.message.quicksave_loaded_f())
     end
 
     env.start_battle = function()

@@ -22,23 +22,18 @@
     </configurations>
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="7fa9ba1b-2cff-4ecc-86fb-59ab2fa76ee1" name="Changes" comment="swap done">
-      <change afterPath="$PROJECT_DIR$/battle/animations/turn_start_end.lua" afterDir="false" />
+    <list default="true" id="7fa9ba1b-2cff-4ecc-86fb-59ab2fa76ee1" name="Changes" comment="turn start end working">
+      <change afterPath="$PROJECT_DIR$/backgrounds/squiggly_dance.glsl" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/battle/animations/enemy_knocked_out.lua" beforeDir="false" afterPath="$PROJECT_DIR$/battle/animations/enemy_knocked_out.lua" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/backgrounds/background_shader_only.lua" beforeDir="false" afterPath="$PROJECT_DIR$/backgrounds/background_shader_only.lua" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/battle/animations/quicksave.lua" beforeDir="false" afterPath="$PROJECT_DIR$/battle/animations/quicksave.lua" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/battle/battle_scene.lua" beforeDir="false" afterPath="$PROJECT_DIR$/battle/battle_scene.lua" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/battle/priority_queue.lua" beforeDir="false" afterPath="$PROJECT_DIR$/battle/priority_queue.lua" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/battle/enemy_sprite.lua" beforeDir="false" afterPath="$PROJECT_DIR$/battle/enemy_sprite.lua" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/battle/simulation_handler.lua" beforeDir="false" afterPath="$PROJECT_DIR$/battle/simulation_handler.lua" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/battle/status.lua" beforeDir="false" afterPath="$PROJECT_DIR$/battle/status.lua" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/common/blood_sort.glsl" beforeDir="false" afterPath="$PROJECT_DIR$/common/blood_sort.glsl" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/common/game_state.lua" beforeDir="false" afterPath="$PROJECT_DIR$/common/game_state.lua" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/common/game_state_battle.lua" beforeDir="false" afterPath="$PROJECT_DIR$/common/game_state_battle.lua" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/common/translation.lua" beforeDir="false" afterPath="$PROJECT_DIR$/common/translation.lua" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/common/vertex_shape.lua" beforeDir="false" afterPath="$PROJECT_DIR$/common/vertex_shape.lua" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/menu/inventory_scene.lua" beforeDir="false" afterPath="$PROJECT_DIR$/menu/inventory_scene.lua" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/old/battle/animations/simulation/turn_start.lua" beforeDir="false" afterPath="$PROJECT_DIR$/old/battle/animations/simulation/turn_start.lua" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/sort_main.lua" beforeDir="false" afterPath="$PROJECT_DIR$/sort_main.lua" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/sort_pass.glsl" beforeDir="false" afterPath="$PROJECT_DIR$/sort_pass.glsl" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/main.lua" beforeDir="false" afterPath="$PROJECT_DIR$/main.lua" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -673,15 +668,7 @@
       <workItem from="1733334970865" duration="24000" />
       <workItem from="1733335003286" duration="13005000" />
       <workItem from="1733440232414" duration="9504000" />
-      <workItem from="1733502567573" duration="44096000" />
-    </task>
-    <task id="LOCAL-01261" summary="stashing before doing single threaded">
-      <option name="closed" value="true" />
-      <created>1732473913456</created>
-      <option name="number" value="01261" />
-      <option name="presentableId" value="LOCAL-01261" />
-      <option name="project" value="LOCAL" />
-      <updated>1732473913456</updated>
+      <workItem from="1733502567573" duration="51190000" />
     </task>
     <task id="LOCAL-01262" summary="sequential radix sort">
       <option name="closed" value="true" />
@@ -1067,7 +1054,15 @@
       <option name="project" value="LOCAL" />
       <updated>1733597625240</updated>
     </task>
-    <option name="localTasksCounter" value="1310" />
+    <task id="LOCAL-01310" summary="turn start end working">
+      <option name="closed" value="true" />
+      <created>1733686864090</created>
+      <option name="number" value="01310" />
+      <option name="presentableId" value="LOCAL-01310" />
+      <option name="project" value="LOCAL" />
+      <updated>1733686864090</updated>
+    </task>
+    <option name="localTasksCounter" value="1311" />
     <servers />
   </component>
   <component name="TypeScriptGeneratedFilesManager">
@@ -1116,7 +1111,6 @@
     </option>
   </component>
   <component name="VcsManagerConfiguration">
-    <MESSAGE value="quicksave quickload animation done" />
     <MESSAGE value="refactored vertex shape" />
     <MESSAGE value="stashing before moving away from mesh" />
     <MESSAGE value="stashing non-mesh version" />
@@ -1141,7 +1135,8 @@
     <MESSAGE value="stashing swap animation" />
     <MESSAGE value="swap working" />
     <MESSAGE value="swap done" />
-    <option name="LAST_COMMIT_MESSAGE" value="swap done" />
+    <MESSAGE value="turn start end working" />
+    <option name="LAST_COMMIT_MESSAGE" value="turn start end working" />
   </component>
   <component name="XDebuggerManager">
     <breakpoint-manager>

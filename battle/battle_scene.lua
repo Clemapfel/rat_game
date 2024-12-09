@@ -29,7 +29,8 @@ bt.BattleScene = meta.new_type("BattleScene", rt.Scene, function(state)
 
         _is_first_size_allocate = true
     })
-    out._background:set_implementation(rt.Background.CONFUSION) -- TODO
+
+    out._background:set_implementation(rt.Background.SQUIGGLY_DANCE) -- TODO
     return out
 end)
 
@@ -142,7 +143,6 @@ function bt.BattleScene:remove_entity(...)
         else
             reformat_allies = true
             self._party_sprites[entity] = nil
-            -- TODO: remove UI
         end
     end
 
@@ -317,7 +317,6 @@ function bt.BattleScene:draw()
     end
 
     for widget in range(
-        self._text_box,
         self._priority_queue,
         self._global_status_bar,
         self._quicksave_indicator
@@ -326,6 +325,7 @@ function bt.BattleScene:draw()
     end
 
     self._animation_queue:draw()
+    self._text_box:draw()
 end
 
 --- @override
@@ -514,8 +514,11 @@ function bt.BattleScene:_handle_button_pressed(which)
         --self:remove_entity(self._state:list_enemies()[1])
 
         --self:push_animation(bt.Animation.TURN_START(self))
-        self._env.start_turn()
-        self._env.end_turn()
+        --self._env.start_turn()
+        --self._env.end_turn()
+        self._env.quicksave()
+        self._env.kill(bt.create_entity_proxy(self, self._state:list_enemies()[1]))
+        self._env.quickload()
 
         --[[
         local enemies = self._state:list_enemies()
@@ -527,5 +530,7 @@ function bt.BattleScene:_handle_button_pressed(which)
         ]]--
     elseif which == rt.InputButton.B then
         self:skip()
+    elseif which == rt.InputButton.DEBUG then
+        out._background:set_implementation(rt.Background.SQUIGGLY_DANCE)
     end
 end

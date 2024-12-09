@@ -6,6 +6,7 @@
 
     entities = {
         id       -- EntityID
+        suffix   -- string
         hp       -- Unsigned
         state    -- bt.EntityState
         index    -- Unsigned
@@ -52,7 +53,7 @@
     }
 
     quicksave = {
-        turn_i,
+        time = "",
         state = {}
     }
 
@@ -153,7 +154,8 @@ function rt.GameState:add_entity(entity)
     local count = sizeof(state.entities)
     state.entity_id_to_index[entity:get_id()] = count
     to_add.hp = entity:get_hp_base()
-    to_add.id = entity:get_id()
+    to_add.id = entity:get_config_id()
+    to_add.suffix = entity:get_id_suffix()
 
     self._entity_index_to_entity[count] = entity
     self._entity_to_entity_index[entity] = count
@@ -1704,10 +1706,123 @@ function rt.GameState:peek_grabbed_object()
     return self._grabbed_object
 end
 
+do
+    local function _deep_copy(original)
+        if not meta.is_table(original) then return original end
+        local out = {}
+        for key, value in pairs(original) do
+            if meta.is_table(value) then
+                out[key] = _deep_copy(value)
+            else
+                out[key] = value
+            end
+        end
+        return out
+    end
+
+    -- fields that will be copied during in-battle quicksave
+    local _quicksaved_state_member_names = {
+        "n_entities",
+        "entity_id_to_multiplicity",
+        "entity_id_to_index",
+        "entities",
+        "turn_i",
+        "global_statuses",
+        "shared_moves",
+        "shared_equips",
+        "shared_consumables"
+    }
+
+    --- @brief
+    --- @return rt.RenderTexture
+    function rt.GameState:create_quicksave()
+        local scene = self._current_scene
+
+        if not meta.isa(scene, bt.BattleScene) then
+            rt.error("In rt.GameState.create_quicksave: trying to quicksave, but no or non-battle scene is active")
+            return
+        end
+
+        local bounds = scene:get_bounds()
+        if not (self._quicksave_screenshot ~= nil and
+            self._quicksave_screenshot:get_width() == bounds.width and
+            self._quicksave_screenshot:get_height() == bounds.height)
+        then
+            self._quicksave_screenshot = rt.RenderTexture(bounds.width, bounds.height, 0, rt.TextureFormat.RGB5A1)
+        end
+
+        self._quicksave_screenshot:bind()
+        love.graphics.clear(0, 0, 0, 0)
+        scene:draw()
+        self._quicksave_screenshot:unbind()
+
+        self._state.quicksave = nil
+        local state_copy = _deep_copy(self._state)
+        local quicksave = {
+            time = os.time(),
+            state = {}
+        }
+
+        for name in values(_quicksaved_state_member_names) do
+            quicksave.state[name] = state_copy[name]
+        end
+        self._state.quicksave = quicksave
+
+        return self._quicksave_screenshot
+    end
+
+    --- @brief
+    function rt.GameState:load_quicksave()
+        if self._state.quicksave == nil then
+            rt.error("In rt.GameState.load_quicksave: Trying to load quicksave, but none is present")
+            return
+        end
+
+        local state = self._state
+        local saved = state.quicksave.state
+
+        state.n_entities = 0
+        state.entity_id_to_multiplicity = {}
+        state.entities = {}
+        state.turn_i = saved.turn_i
+        state.global_statuses = saved.global_statuses
+        state.shared_moves = saved.shared_moves
+        state.shared_equips = saved.shared_equips
+        state.shared_consumables = saved.shared_consumables
+
+        self._entity_index_to_entity = {}
+        self._entity_to_entity_index = {}
+        self._state.entity_id_to_multiplicity = {}
+
+        -- create entity proxies freshly, also builds indices
+        local entities = {}
+        for i, entry in ipairs(saved.entities) do
+            local entity = bt.Entity(self, entry.id)
+            self:add_entity(entity)
+            table.insert(entities, entity)
+        end
+
+        -- override states
+        for i, entity in values(entities) do
+            state.entities[i] = _deep_copy(saved.entities[i])
+        end
+    end
+end
+
+--- @brief
+function rt.GameState:has_quicksave()
+    return self._state.quicksave ~= nil
+end
+
 --- @brief
 function rt.GameState:set_quicksave_screenshot(texture)
     meta.assert_isa(texture, rt.RenderTexture)
     self._quicksave_screenshot = texture
+end
+
+--- @brief
+function rt.GameState:get_quicksave_screenshot()
+    return self._quicksave_screenshot
 end
 
 --- @brief

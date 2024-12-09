@@ -551,6 +551,11 @@ function rt.GameState:set_current_scene(scene_type)
 end
 
 --- @brief
+function rt.GameState:get_current_scene()
+    return self._current_scene
+end
+
+--- @brief
 function rt.GameState:set_vsync_mode(mode)
     meta.assert_enum_value(mode, rt.VSyncMode)
     self._state.vsync_mode = mode

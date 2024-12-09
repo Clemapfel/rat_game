@@ -389,6 +389,14 @@ rt.Translation = rt.initialize_translation({
             swap_f = function(entity_a, entity_b)
                 return entity_a .. " and " .. entity_b .. " swapped places"
             end,
+
+            quicksave_created_f = function()
+                return "quicksave created"
+            end,
+
+            quicksave_loaded_f = function()
+                return "quicksave restored"
+            end
         }
     }
 })
