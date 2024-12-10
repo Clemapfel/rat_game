@@ -29,6 +29,9 @@ bt.BattleScene = meta.new_type("BattleScene", rt.Scene, function(state)
         _input = rt.InputController(),
         _animation_queue = rt.AnimationQueue(),
 
+        _game_over_screen = bt.GameOverScreen(),
+        _game_over_screen_active = true,
+
         _is_first_size_allocate = true
     })
 
@@ -45,7 +48,8 @@ function bt.BattleScene:realize()
         self._text_box,
         self._priority_queue,
         self._global_status_bar,
-        self._quicksave_indicator
+        self._quicksave_indicator,
+        self._game_over_screen
     ) do
         widget:realize()
     end
@@ -168,6 +172,7 @@ end
 --- @override
 function bt.BattleScene:size_allocate(x, y, width, height)
     self._background:fit_into(x, y, width, height)
+    self._game_over_screen:fit_into(x, y, width, height)
 
     local tile_size = rt.settings.menu.inventory_scene.tile_size
     local m = rt.settings.margin_unit
@@ -311,9 +316,13 @@ end
 
 --- @override
 function bt.BattleScene:draw()
+    if self._game_over_screen_active then
+        self._game_over_screen:draw()
+        return
+    end
+
     self._background:draw()
 
-    --[[
     for sprite in values(self._party_sprites) do
         local motion = self._party_sprites_motion[sprite]
         love.graphics.push()
@@ -340,11 +349,15 @@ function bt.BattleScene:draw()
 
     self._animation_queue:draw()
     self._text_box:draw()
-    ]]--
 end
 
 --- @override
 function bt.BattleScene:update(delta)
+    if self._game_over_screen_active then
+        self._game_over_screen:update(delta)
+        return
+    end
+
     for updatable in range(
         self._background,
         self._text_box,
@@ -536,6 +549,6 @@ function bt.BattleScene:_handle_button_pressed(which)
     elseif which == rt.InputButton.B then
         self:skip()
     elseif which == rt.InputButton.DEBUG then
-        self._background:set_implementation(rt.Background.SQUIGGLY_DANCE)
+        self._game_over_screen._vignette_shader:recompile()
     end
 end

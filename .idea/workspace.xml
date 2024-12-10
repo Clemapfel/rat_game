@@ -22,15 +22,13 @@
     </configurations>
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="7fa9ba1b-2cff-4ecc-86fb-59ab2fa76ee1" name="Changes" comment="stashing scene before indexed sprite rework">
+    <list default="true" id="7fa9ba1b-2cff-4ecc-86fb-59ab2fa76ee1" name="Changes" comment="added shader">
+      <change afterPath="$PROJECT_DIR$/battle/game_over_screen.glsl" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/battle/game_over_screen.lua" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/backgrounds/squiggly_dance.glsl" beforeDir="false" afterPath="$PROJECT_DIR$/backgrounds/squiggly_dance.glsl" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/backgrounds/ink_in_water.glsl" beforeDir="false" afterPath="$PROJECT_DIR$/backgrounds/ink_in_water.glsl" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/battle/battle_scene.lua" beforeDir="false" afterPath="$PROJECT_DIR$/battle/battle_scene.lua" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/battle/enemy_sprite.lua" beforeDir="false" afterPath="$PROJECT_DIR$/battle/enemy_sprite.lua" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/battle/party_sprite.lua" beforeDir="false" afterPath="$PROJECT_DIR$/battle/party_sprite.lua" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/battle/simulation_handler.lua" beforeDir="false" afterPath="$PROJECT_DIR$/battle/simulation_handler.lua" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/common/game_state_battle.lua" beforeDir="false" afterPath="$PROJECT_DIR$/common/game_state_battle.lua" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/main.lua" beforeDir="false" afterPath="$PROJECT_DIR$/main.lua" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/include.lua" beforeDir="false" afterPath="$PROJECT_DIR$/include.lua" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -666,15 +664,8 @@
       <workItem from="1733335003286" duration="13005000" />
       <workItem from="1733440232414" duration="9504000" />
       <workItem from="1733502567573" duration="53480000" />
-      <workItem from="1733775630553" duration="4861000" />
-    </task>
-    <task id="LOCAL-01263" summary="sequential radix sort optimized">
-      <option name="closed" value="true" />
-      <created>1732475266007</created>
-      <option name="number" value="01263" />
-      <option name="presentableId" value="LOCAL-01263" />
-      <option name="project" value="LOCAL" />
-      <updated>1732475266008</updated>
+      <workItem from="1733775630553" duration="4991000" />
+      <workItem from="1733850643234" duration="5150000" />
     </task>
     <task id="LOCAL-01264" summary="pair sort working for small n_numbers">
       <option name="closed" value="true" />
@@ -1060,7 +1051,15 @@
       <option name="project" value="LOCAL" />
       <updated>1733771856610</updated>
     </task>
-    <option name="localTasksCounter" value="1312" />
+    <task id="LOCAL-01312" summary="added shader">
+      <option name="closed" value="true" />
+      <created>1733791972967</created>
+      <option name="number" value="01312" />
+      <option name="presentableId" value="LOCAL-01312" />
+      <option name="project" value="LOCAL" />
+      <updated>1733791972967</updated>
+    </task>
+    <option name="localTasksCounter" value="1313" />
     <servers />
   </component>
   <component name="TypeScriptGeneratedFilesManager">
@@ -1109,7 +1108,6 @@
     </option>
   </component>
   <component name="VcsManagerConfiguration">
-    <MESSAGE value="stashing before moving away from mesh" />
     <MESSAGE value="stashing non-mesh version" />
     <MESSAGE value="done" />
     <MESSAGE value="added hp animation" />
@@ -1134,7 +1132,8 @@
     <MESSAGE value="swap done" />
     <MESSAGE value="turn start end working" />
     <MESSAGE value="stashing scene before indexed sprite rework" />
-    <option name="LAST_COMMIT_MESSAGE" value="stashing scene before indexed sprite rework" />
+    <MESSAGE value="added shader" />
+    <option name="LAST_COMMIT_MESSAGE" value="added shader" />
   </component>
   <component name="XDebuggerManager">
     <breakpoint-manager>

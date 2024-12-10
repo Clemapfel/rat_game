@@ -244,6 +244,7 @@ require "battle.entity_sprite"
 require "battle.party_sprite"
 require "battle.enemy_sprite"
 require "battle.quicksave_indicator"
+require "battle.game_over_screen"
 
 require "battle.battle_animation"
 

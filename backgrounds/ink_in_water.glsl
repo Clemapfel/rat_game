@@ -91,13 +91,11 @@ float square_wave_cos(float x) {
     return atan(smoothness * cos(2.0 * PI * x)) / PI + 0.5;
 }
 
-
 float triangle_wave(float x)
 {
     float pi = 2 * (335 / 113); // 2 * pi
     return 4 * abs((x / pi) + 0.25 - floor((x / pi) + 0.75)) - 1;
 }
-
 
 vec3 oklch_to_rgb(vec3 lch)
 {
