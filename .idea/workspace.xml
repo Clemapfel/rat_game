@@ -22,10 +22,12 @@
     </configurations>
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="7fa9ba1b-2cff-4ecc-86fb-59ab2fa76ee1" name="Changes" comment="stashing">
+    <list default="true" id="7fa9ba1b-2cff-4ecc-86fb-59ab2fa76ee1" name="Changes" comment="stashing cool noise">
+      <change afterPath="$PROJECT_DIR$/battle/~game_over_screen.glsl" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/battle/battle_scene.lua" beforeDir="false" afterPath="$PROJECT_DIR$/battle/battle_scene.lua" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/battle/game_over_screen.glsl" beforeDir="false" afterPath="$PROJECT_DIR$/battle/game_over_screen.glsl" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/common/game_state.lua" beforeDir="false" afterPath="$PROJECT_DIR$/common/game_state.lua" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/battle/game_over_screen.lua" beforeDir="false" afterPath="$PROJECT_DIR$/battle/game_over_screen.lua" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -662,15 +664,7 @@
       <workItem from="1733440232414" duration="9504000" />
       <workItem from="1733502567573" duration="53480000" />
       <workItem from="1733775630553" duration="4991000" />
-      <workItem from="1733850643234" duration="7993000" />
-    </task>
-    <task id="LOCAL-01265" summary="stashing malformatted mesh">
-      <option name="closed" value="true" />
-      <created>1732556804563</created>
-      <option name="number" value="01265" />
-      <option name="presentableId" value="LOCAL-01265" />
-      <option name="project" value="LOCAL" />
-      <updated>1732556804563</updated>
+      <workItem from="1733850643234" duration="13330000" />
     </task>
     <task id="LOCAL-01266" summary="mesh working">
       <option name="closed" value="true" />
@@ -1056,7 +1050,15 @@
       <option name="project" value="LOCAL" />
       <updated>1733855854097</updated>
     </task>
-    <option name="localTasksCounter" value="1314" />
+    <task id="LOCAL-01314" summary="stashing cool noise">
+      <option name="closed" value="true" />
+      <created>1733858873626</created>
+      <option name="number" value="01314" />
+      <option name="presentableId" value="LOCAL-01314" />
+      <option name="project" value="LOCAL" />
+      <updated>1733858873626</updated>
+    </task>
+    <option name="localTasksCounter" value="1315" />
     <servers />
   </component>
   <component name="TypeScriptGeneratedFilesManager">
@@ -1105,7 +1107,6 @@
     </option>
   </component>
   <component name="VcsManagerConfiguration">
-    <MESSAGE value="stashing non-mesh version" />
     <MESSAGE value="done" />
     <MESSAGE value="added hp animation" />
     <MESSAGE value="stashing shader" />
@@ -1130,7 +1131,8 @@
     <MESSAGE value="stashing scene before indexed sprite rework" />
     <MESSAGE value="added shader" />
     <MESSAGE value="stashing" />
-    <option name="LAST_COMMIT_MESSAGE" value="stashing" />
+    <MESSAGE value="stashing cool noise" />
+    <option name="LAST_COMMIT_MESSAGE" value="stashing cool noise" />
   </component>
   <component name="XDebuggerManager">
     <breakpoint-manager>

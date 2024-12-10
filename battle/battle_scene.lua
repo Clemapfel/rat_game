@@ -502,7 +502,8 @@ function bt.BattleScene:skip()
     for to_skip in range(
         self._priority_queue,
         self._global_status_bar,
-        self._animation_queue
+        self._animation_queue,
+        self._game_over_screen
     ) do
         to_skip:skip()
     end
@@ -546,6 +547,9 @@ function bt.BattleScene:_handle_button_pressed(which)
         )
         --self:push_animation(bt.Animation.SWAP(self, self:get_sprite(enemies[1]), self:get_sprite(enemies[2])))
         ]]--
+
+        self._game_over_screen:set_is_expanded(not self._game_over_screen:get_is_expanded())
+
     elseif which == rt.InputButton.B then
         self:skip()
     elseif which == rt.InputButton.DEBUG then
