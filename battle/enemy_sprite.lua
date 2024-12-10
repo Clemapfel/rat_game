@@ -242,6 +242,7 @@ function bt.EnemySprite:add_consumable(slot_i, consumable, n_uses_left)
     if n_uses_left ~= POSITIVE_INFINITY then
         sprite:set_bottom_right_child("<o>" .. n_uses_left .. "</o>")
     end
+    sprite:set_minimum_size(sprite:get_resolution())
 
     self._consumable_slot_to_sprite[slot_i] = sprite
     self._status_consumable_bar:add(sprite, false)

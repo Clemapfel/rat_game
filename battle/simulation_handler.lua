@@ -1763,11 +1763,12 @@ function bt.BattleScene:create_simulation_environment()
             for i = 1, env.get_n_consumable_slots(entity_proxy) do
                 sprite:remove_consumable(i)
             end
+
+            _scene:set_priority_order(_state:list_entities_in_order())
         end)
 
         animation:signal_connect("finish", function(_)
             _scene:remove_entity(entity)
-            _scene:set_priority_order(_state:list_entities_in_order())
         end)
 
         _scene:push_animation(animation)
@@ -2479,16 +2480,9 @@ function bt.BattleScene:create_simulation_environment()
 
         _state:load_quicksave()
         local animation = rt.Animation.QUICKLOAD(self, _scene._quicksave_indicator)
-        local signal_id
-        animation:signal_connect("start", function(_)
-            signal_id = _scene._quicksave_indicator:signal_connect("done", function(_)
-                _scene:create_from_state(self._state)
-            end)
-        end)
         animation:signal_connect("finish", function(_)
             _scene._quicksave_indicator:set_screenshot(nil)
-            _scene._quicksave_indicator:set_is_visible(false)
-            _scene._quicksave_indicator:signal_disconnect(signal_id)
+            _scene:create_from_state(self._state)
         end)
         _scene:push_animation(animation)
         env.push_message(rt.Translation.battle.message.quicksave_loaded_f())

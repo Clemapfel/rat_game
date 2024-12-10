@@ -17,10 +17,12 @@ bt.BattleScene = meta.new_type("BattleScene", rt.Scene, function(state)
         _global_status_bar = bt.OrderedBox(),
         _global_status_to_sprite = {}, -- Table<bt.GlobalStatus, rt.Sprite>
 
-        _party_sprites = {}, -- Table<bt.Entity, bt.PartySprite>
+        _entity_to_sprite = {},
+
+        _party_sprites = {}, -- Table<bt.PartySprite>
         _party_sprites_motion = {}, -- Table<bt.PartySprite, bt.SmoothedMotion2D>
 
-        _enemy_sprites = {}, -- Table<bt.Entity, bt.EnemySprites>
+        _enemy_sprites = {}, -- Table<bt.EnemySprites>
         _enemy_sprites_render_order = meta.make_weak({}),
         _enemy_sprites_motion = {}, -- Table<bt.EnemySprite, bt.SmoothedMotion1D>
 
@@ -30,7 +32,7 @@ bt.BattleScene = meta.new_type("BattleScene", rt.Scene, function(state)
         _is_first_size_allocate = true
     })
 
-    out._background:set_implementation(rt.Background.SQUIGGLY_DANCE) -- TODO
+    out._background:set_implementation(rt.Background.EYE) -- TODO
     return out
 end)
 
@@ -66,23 +68,21 @@ end
 --- @brief
 function bt.BattleScene:get_sprite(entity)
     meta.assert_isa(entity, bt.Entity)
-    if entity:get_is_enemy() == true then
-        return self._enemy_sprites[entity]
-    else
-        return self._party_sprites[entity]
-    end
+    return self._entity_to_sprite[entity]
 end
 
 --- @override
 function bt.BattleScene:create_from_state()
     self._enemy_sprites = {}
     self._party_sprites = {}
+    self._entity_to_sprite = {}
 
     local entities = self._state:list_entities()
     self:add_entity(table.unpack(entities))
 
     for entity in values(entities) do
         local sprite = self:get_sprite(entity)
+        assert(sprite ~= nil)
         for status in values(self._state:entity_list_statuses(entity)) do
             local max = status:get_max_duration()
             local duration = self._state:entity_get_status_n_turns_elapsed(entity, status)
@@ -108,24 +108,27 @@ end
 function bt.BattleScene:add_entity(...)
     local reformat_enemies, reformat_allies = false, false
     for entity in range(...) do
+        local sprite
         if entity:get_is_enemy() == true then
             reformat_enemies = true
-            local sprite = bt.EnemySprite(entity)
+            sprite = bt.EnemySprite(entity)
             if self._is_realized == true then
                 sprite:realize()
             end
 
-            self._enemy_sprites[entity] = sprite
+            table.insert(self._enemy_sprites, sprite)
         else
             reformat_allies = true
-            local sprite = bt.PartySprite(entity)
+            sprite = bt.PartySprite(entity)
             if self._is_realized == true then
                 sprite:realize()
             end
 
             -- TODO: setup UI
-            self._party_sprites[entity] = sprite
+            table.insert(self._party_sprites, sprite)
         end
+        self._entity_to_sprite[entity] = sprite
+        assert(self._entity_to_sprite[entity] == sprite)
     end
 
     if reformat_allies then self:reformat_party_sprites() end
@@ -137,13 +140,25 @@ function bt.BattleScene:remove_entity(...)
     local reformat_enemies, reformat_allies = false, false
 
     for entity in range(...) do
-        if entity:get_is_enemy() == true then
-            reformat_enemies = true
-            self._enemy_sprites[entity] = nil
-        else
-            reformat_allies = true
-            self._party_sprites[entity] = nil
+        local sprite = self:get_sprite(entity)
+        if sprite ~= nil then
+            if entity:get_is_enemy() then
+                for i, other in ipairs(self._enemy_sprites) do
+                    if other == sprite then
+                        table.remove(self._enemy_sprites, i)
+                        break
+                    end
+                end
+            else
+                for i, other in ipairs(self._party_sprites) do
+                    if other == sprite then
+                        table.remove(self._party_sprites, i)
+                        break
+                    end
+                end
+            end
         end
+        self._entity_to_sprite[entity] = nil
     end
 
     if reformat_allies then self:reformat_party_sprites() end
@@ -198,8 +213,7 @@ function bt.BattleScene:reformat_enemy_sprites()
     local max_h = NEGATIVE_INFINITY
     do
         local i = 1
-        for entity in values(self._state:list_enemies()) do -- use state instead of self._enemy_sprites because key order is not deterministic
-            local sprite = self._enemy_sprites[entity]
+        for sprite in values(self._enemy_sprites) do -- use state instead of self._enemy_sprites because key order is not deterministic
             if sprite ~= nil then -- entity may be dead or unlisted
                 i_to_sprite[i] = sprite
                 local w, h = sprite:measure()
@@ -278,8 +292,7 @@ function bt.BattleScene:reformat_party_sprites()
     self._party_sprites_motion = {}
 
     local speed = rt.settings.battle.battle_scene.enemy_sprite_speed
-    for entity in values(self._state:list_party()) do
-        local sprite = self._party_sprites[entity]
+    for sprite in values(self._party_sprites) do
         if sprite ~= nil then
             local motion = sprite_to_motion_backup[sprite]
             if motion == nil then
@@ -300,6 +313,7 @@ end
 function bt.BattleScene:draw()
     self._background:draw()
 
+    --[[
     for sprite in values(self._party_sprites) do
         local motion = self._party_sprites_motion[sprite]
         love.graphics.push()
@@ -326,6 +340,7 @@ function bt.BattleScene:draw()
 
     self._animation_queue:draw()
     self._text_box:draw()
+    ]]--
 end
 
 --- @override
@@ -386,16 +401,6 @@ end
 --- @brief
 function bt.BattleScene:get_text_box()
     return self._text_box
-end
-
---- @brief
-function bt.BattleScene:get_sprite(entity)
-    meta.assert_isa(entity, bt.Entity)
-    if entity:get_is_enemy() then
-        return self._enemy_sprites[entity]
-    else
-        return self._party_sprites[entity]
-    end
 end
 
 --- @brief
@@ -516,9 +521,9 @@ function bt.BattleScene:_handle_button_pressed(which)
         --self:push_animation(bt.Animation.TURN_START(self))
         --self._env.start_turn()
         --self._env.end_turn()
-        self._env.quicksave()
-        self._env.kill(bt.create_entity_proxy(self, self._state:list_enemies()[1]))
-        self._env.quickload()
+        --self._env.quicksave()
+        --self._env.kill(bt.create_entity_proxy(self, self._state:list_enemies()[1]))
+        --self._env.quickload()
 
         --[[
         local enemies = self._state:list_enemies()
@@ -531,6 +536,6 @@ function bt.BattleScene:_handle_button_pressed(which)
     elseif which == rt.InputButton.B then
         self:skip()
     elseif which == rt.InputButton.DEBUG then
-        out._background:set_implementation(rt.Background.SQUIGGLY_DANCE)
+        self._background:set_implementation(rt.Background.SQUIGGLY_DANCE)
     end
 end

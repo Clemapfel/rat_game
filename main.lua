@@ -26,7 +26,6 @@ input:signal_connect("keyboard_pressed", function(_, which)
     elseif which == rt.KeyboardKey.RETURN then
         profiler_active = not profiler_active
     elseif which == rt.KeyboardKey.ESCAPE then
-        state._current_schene._background._implementation._shader:recompile()
     end
 
     if which == rt.KeyboardKey.SPACE then

@@ -22,17 +22,14 @@
     </configurations>
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="7fa9ba1b-2cff-4ecc-86fb-59ab2fa76ee1" name="Changes" comment="turn start end working">
-      <change afterPath="$PROJECT_DIR$/backgrounds/squiggly_dance.glsl" afterDir="false" />
+    <list default="true" id="7fa9ba1b-2cff-4ecc-86fb-59ab2fa76ee1" name="Changes" comment="stashing scene before indexed sprite rework">
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/backgrounds/background_shader_only.lua" beforeDir="false" afterPath="$PROJECT_DIR$/backgrounds/background_shader_only.lua" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/battle/animations/quicksave.lua" beforeDir="false" afterPath="$PROJECT_DIR$/battle/animations/quicksave.lua" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/backgrounds/squiggly_dance.glsl" beforeDir="false" afterPath="$PROJECT_DIR$/backgrounds/squiggly_dance.glsl" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/battle/battle_scene.lua" beforeDir="false" afterPath="$PROJECT_DIR$/battle/battle_scene.lua" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/battle/enemy_sprite.lua" beforeDir="false" afterPath="$PROJECT_DIR$/battle/enemy_sprite.lua" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/battle/party_sprite.lua" beforeDir="false" afterPath="$PROJECT_DIR$/battle/party_sprite.lua" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/battle/simulation_handler.lua" beforeDir="false" afterPath="$PROJECT_DIR$/battle/simulation_handler.lua" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/common/game_state.lua" beforeDir="false" afterPath="$PROJECT_DIR$/common/game_state.lua" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/common/game_state_battle.lua" beforeDir="false" afterPath="$PROJECT_DIR$/common/game_state_battle.lua" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/common/translation.lua" beforeDir="false" afterPath="$PROJECT_DIR$/common/translation.lua" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/main.lua" beforeDir="false" afterPath="$PROJECT_DIR$/main.lua" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
@@ -668,15 +665,8 @@
       <workItem from="1733334970865" duration="24000" />
       <workItem from="1733335003286" duration="13005000" />
       <workItem from="1733440232414" duration="9504000" />
-      <workItem from="1733502567573" duration="51190000" />
-    </task>
-    <task id="LOCAL-01262" summary="sequential radix sort">
-      <option name="closed" value="true" />
-      <created>1732474127117</created>
-      <option name="number" value="01262" />
-      <option name="presentableId" value="LOCAL-01262" />
-      <option name="project" value="LOCAL" />
-      <updated>1732474127117</updated>
+      <workItem from="1733502567573" duration="53480000" />
+      <workItem from="1733775630553" duration="4861000" />
     </task>
     <task id="LOCAL-01263" summary="sequential radix sort optimized">
       <option name="closed" value="true" />
@@ -1062,7 +1052,15 @@
       <option name="project" value="LOCAL" />
       <updated>1733686864090</updated>
     </task>
-    <option name="localTasksCounter" value="1311" />
+    <task id="LOCAL-01311" summary="stashing scene before indexed sprite rework">
+      <option name="closed" value="true" />
+      <created>1733771856610</created>
+      <option name="number" value="01311" />
+      <option name="presentableId" value="LOCAL-01311" />
+      <option name="project" value="LOCAL" />
+      <updated>1733771856610</updated>
+    </task>
+    <option name="localTasksCounter" value="1312" />
     <servers />
   </component>
   <component name="TypeScriptGeneratedFilesManager">
@@ -1111,7 +1109,6 @@
     </option>
   </component>
   <component name="VcsManagerConfiguration">
-    <MESSAGE value="refactored vertex shape" />
     <MESSAGE value="stashing before moving away from mesh" />
     <MESSAGE value="stashing non-mesh version" />
     <MESSAGE value="done" />
@@ -1136,7 +1133,8 @@
     <MESSAGE value="swap working" />
     <MESSAGE value="swap done" />
     <MESSAGE value="turn start end working" />
-    <option name="LAST_COMMIT_MESSAGE" value="turn start end working" />
+    <MESSAGE value="stashing scene before indexed sprite rework" />
+    <option name="LAST_COMMIT_MESSAGE" value="stashing scene before indexed sprite rework" />
   </component>
   <component name="XDebuggerManager">
     <breakpoint-manager>

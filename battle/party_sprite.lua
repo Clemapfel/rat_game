@@ -8,6 +8,7 @@ bt.PartySprite = meta.new_type("BattlePartySprite", bt.EntitySprite, function(en
         ["PROF"] = "battle/prof_battle",
         ["WILDCARD"] = "battle/wildcard_battle"
     }
+    assert(entity_id_to_sprite_id[entity:get_config_id()] ~= nil)
 
     return meta.new(bt.PartySprite, {
         _frame = rt.Frame(),
@@ -20,7 +21,7 @@ bt.PartySprite = meta.new_type("BattlePartySprite", bt.EntitySprite, function(en
         _gradient_visible = true,
         _gradient = rt.VertexRectangle(0, 0, 1, 1),
 
-        _sprite = rt.Sprite(entity_id_to_sprite_id[entity:get_id()]),
+        _sprite = rt.Sprite(entity_id_to_sprite_id[entity:get_config_id()]),
 
         _snapshot = rt.RenderTexture(),
         _snapshot_position_x = 0,

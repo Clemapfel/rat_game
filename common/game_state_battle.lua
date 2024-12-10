@@ -1794,17 +1794,14 @@ do
         self._entity_to_entity_index = {}
         self._state.entity_id_to_multiplicity = {}
 
-        -- create entity proxies freshly, also builds indices
         local entities = {}
         for i, entry in ipairs(saved.entities) do
-            local entity = bt.Entity(self, entry.id)
-            self:add_entity(entity)
-            table.insert(entities, entity)
+            local entity = bt.Entity(self, entry.id) -- calls self:add_entity
+            state.entities[i] = entry
         end
 
-        -- override states
-        for i, entity in values(entities) do
-            state.entities[i] = _deep_copy(saved.entities[i])
+        for entity in values(self:list_all_entities()) do
+            dbg(entity:get_id())
         end
     end
 end
