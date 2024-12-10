@@ -22,13 +22,10 @@
     </configurations>
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="7fa9ba1b-2cff-4ecc-86fb-59ab2fa76ee1" name="Changes" comment="added shader">
-      <change afterPath="$PROJECT_DIR$/battle/game_over_screen.glsl" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/battle/game_over_screen.lua" afterDir="false" />
+    <list default="true" id="7fa9ba1b-2cff-4ecc-86fb-59ab2fa76ee1" name="Changes" comment="stashing">
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/backgrounds/ink_in_water.glsl" beforeDir="false" afterPath="$PROJECT_DIR$/backgrounds/ink_in_water.glsl" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/battle/battle_scene.lua" beforeDir="false" afterPath="$PROJECT_DIR$/battle/battle_scene.lua" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/include.lua" beforeDir="false" afterPath="$PROJECT_DIR$/include.lua" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/battle/game_over_screen.glsl" beforeDir="false" afterPath="$PROJECT_DIR$/battle/game_over_screen.glsl" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/common/game_state.lua" beforeDir="false" afterPath="$PROJECT_DIR$/common/game_state.lua" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -665,15 +662,7 @@
       <workItem from="1733440232414" duration="9504000" />
       <workItem from="1733502567573" duration="53480000" />
       <workItem from="1733775630553" duration="4991000" />
-      <workItem from="1733850643234" duration="5150000" />
-    </task>
-    <task id="LOCAL-01264" summary="pair sort working for small n_numbers">
-      <option name="closed" value="true" />
-      <created>1732482177000</created>
-      <option name="number" value="01264" />
-      <option name="presentableId" value="LOCAL-01264" />
-      <option name="project" value="LOCAL" />
-      <updated>1732482177000</updated>
+      <workItem from="1733850643234" duration="7993000" />
     </task>
     <task id="LOCAL-01265" summary="stashing malformatted mesh">
       <option name="closed" value="true" />
@@ -1059,7 +1048,15 @@
       <option name="project" value="LOCAL" />
       <updated>1733791972967</updated>
     </task>
-    <option name="localTasksCounter" value="1313" />
+    <task id="LOCAL-01313" summary="stashing">
+      <option name="closed" value="true" />
+      <created>1733855854097</created>
+      <option name="number" value="01313" />
+      <option name="presentableId" value="LOCAL-01313" />
+      <option name="project" value="LOCAL" />
+      <updated>1733855854097</updated>
+    </task>
+    <option name="localTasksCounter" value="1314" />
     <servers />
   </component>
   <component name="TypeScriptGeneratedFilesManager">
@@ -1111,7 +1108,6 @@
     <MESSAGE value="stashing non-mesh version" />
     <MESSAGE value="done" />
     <MESSAGE value="added hp animation" />
-    <MESSAGE value="stashing" />
     <MESSAGE value="stashing shader" />
     <MESSAGE value="added hp lost" />
     <MESSAGE value="added radius fade out" />
@@ -1133,7 +1129,8 @@
     <MESSAGE value="turn start end working" />
     <MESSAGE value="stashing scene before indexed sprite rework" />
     <MESSAGE value="added shader" />
-    <option name="LAST_COMMIT_MESSAGE" value="added shader" />
+    <MESSAGE value="stashing" />
+    <option name="LAST_COMMIT_MESSAGE" value="stashing" />
   </component>
   <component name="XDebuggerManager">
     <breakpoint-manager>

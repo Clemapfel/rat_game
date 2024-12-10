@@ -1,5 +1,17 @@
 #define PI 3.1415926535897932384626433832795
 
+//
+// Description : Array and textureless GLSL 2D/3D/4D simplex
+//               noise functions.
+//      Author : Ian McEwan, Ashima Arts.
+//  Maintainer : stegu
+//     Lastmod : 20201014 (stegu)
+//     License : Copyright (C) 2011 Ashima Arts. All rights reserved.
+//               Distributed under the MIT License. See LICENSE file.
+//               https://github.com/ashima/webgl-noise
+//               https://github.com/stegu/webgl-noise
+//
+
 vec3 mod_289(vec3 x) {
     return x - floor(x * (1.0 / 289.0)) * 289.0;
 }
@@ -94,58 +106,44 @@ uniform vec4 red = vec4(1, 0, 0, 1);
 
 uniform float fraction; // in [0, 1]
 
-float fbm(vec3 pos, int octaves, float persistence, float lacunarity) {
-    float amplitude = 1.0;
-    float frequency = 1.0;
-    float total = 0.0;
-    float max_value = 0.0; // Used for normalization
-
-    for (int i = 0; i < octaves; i++) {
-        float noise = simplex_noise(pos * frequency) * amplitude;
-
-        max_value += amplitude;
-        amplitude *= persistence;
-        frequency *= lacunarity;
-    }
-
-    return total / max_value;
-}
-
 vec4 effect(vec4 vertex_color, Image image, vec2 texture_coords, vec2 fragment_position) {
     float y_normalization = love_ScreenSize.y / love_ScreenSize.x;
     vec2 pos = texture_coords.xy;
 
     pos *= vec2(1, y_normalization);
+    pos *= 10;
     vec2 center = vec2(0.5) * vec2(1, y_normalization);
 
-    int octaves = 2;
-    float persistence = 1;
-    float lacunarity = 5.0;
-    // float noise_value = fbm(vec3(pos, 0.0), octaves, persistence, lacunarity);
-
-    vec2 uv = (pos - 0.5) * 10;
-    const float n_steps = 5;
-    lacunarity = 0.25;
-    const float step_multiplier = 1.0;
-
-    for(int i = 1; i < n_steps; i++)
+    float other_value = 0;
     {
-        uv.x += lacunarity / i * sin(i * uv.y * step_multiplier) + 0.5 * i;
-        uv.y += lacunarity / i * cos(i * uv.x * step_multiplier) - 0.5 * i;
+        int octaves = 5;
+        float persistence = 0.5;
+        float lacunarity = 5.5;
+
+        float amplitude = 1.0;
+        float frequency = 0.2;
+        float total = 0.0;
+        float max_value = 0.0; // Used for normalization
+
+        for (int i = 0; i < octaves; i++) {
+            total += simplex_noise(vec3(pos.xy, 0) * frequency * amplitude);
+            max_value += amplitude;
+            amplitude *= persistence;
+            frequency *= lacunarity;
+
+            pos.xy += vec2(cos(total * 2 * PI), sin(total * 2 * PI)) * frequency * (2 * fraction - 1) * 0.1 ;
+        }
+
+        pos += total / max_value * 0.05;
+        other_value = total / max_value;
     }
 
-    float x_bias = (cos(uv.x * 3) + 1) / 2;
-    float y_bias = (sin((uv.y + 0.5) * 3) + 1) / 2;
-    pos = uv / length(vec2(x_bias, y_bias));
-
-    //pos += noise_value * 0.2;
-
     float dist = distance(pos, center);
-    float eps = 0.4;
+    float eps = 0.1;
     float radius = fraction * (1 + eps + y_normalization);
-    //float value = 1 - smoothstep(radius, radius + eps, dist * 2 + eps);
-    float value = pos.x;
-    return vec4(vec3(value), 1);
+    float value = 1 - smoothstep(radius, radius + eps, dist * 2 + eps);
+
+    return vec4(1 - other_value) * black;
 }
 
 #endif
