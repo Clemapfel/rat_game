@@ -22,12 +22,17 @@
     </configurations>
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="7fa9ba1b-2cff-4ecc-86fb-59ab2fa76ee1" name="Changes" comment="stashing cool noise">
-      <change afterPath="$PROJECT_DIR$/battle/~game_over_screen.glsl" afterDir="false" />
+    <list default="true" id="7fa9ba1b-2cff-4ecc-86fb-59ab2fa76ee1" name="Changes" comment="game over vignette done">
+      <change afterPath="$PROJECT_DIR$/battle/animations/stat_changed.glsl" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/battle/animations/stat_changed.lua" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/battle/battle_scene.lua" beforeDir="false" afterPath="$PROJECT_DIR$/battle/battle_scene.lua" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/battle/game_over_screen.glsl" beforeDir="false" afterPath="$PROJECT_DIR$/battle/game_over_screen.glsl" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/battle/entity.lua" beforeDir="false" afterPath="$PROJECT_DIR$/battle/entity.lua" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/battle/game_over_screen.lua" beforeDir="false" afterPath="$PROJECT_DIR$/battle/game_over_screen.lua" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/battle/simulation_handler.lua" beforeDir="false" afterPath="$PROJECT_DIR$/battle/simulation_handler.lua" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/common/game_state_battle.lua" beforeDir="false" afterPath="$PROJECT_DIR$/common/game_state_battle.lua" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/common/translation.lua" beforeDir="false" afterPath="$PROJECT_DIR$/common/translation.lua" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/main.lua" beforeDir="false" afterPath="$PROJECT_DIR$/main.lua" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -664,15 +669,7 @@
       <workItem from="1733440232414" duration="9504000" />
       <workItem from="1733502567573" duration="53480000" />
       <workItem from="1733775630553" duration="4991000" />
-      <workItem from="1733850643234" duration="13330000" />
-    </task>
-    <task id="LOCAL-01266" summary="mesh working">
-      <option name="closed" value="true" />
-      <created>1732557470711</created>
-      <option name="number" value="01266" />
-      <option name="presentableId" value="LOCAL-01266" />
-      <option name="project" value="LOCAL" />
-      <updated>1732557470711</updated>
+      <workItem from="1733850643234" duration="22397000" />
     </task>
     <task id="LOCAL-01267" summary="fixed path at for 3 vertex paths">
       <option name="closed" value="true" />
@@ -1058,7 +1055,15 @@
       <option name="project" value="LOCAL" />
       <updated>1733858873626</updated>
     </task>
-    <option name="localTasksCounter" value="1315" />
+    <task id="LOCAL-01315" summary="game over vignette done">
+      <option name="closed" value="true" />
+      <created>1733864020193</created>
+      <option name="number" value="01315" />
+      <option name="presentableId" value="LOCAL-01315" />
+      <option name="project" value="LOCAL" />
+      <updated>1733864020193</updated>
+    </task>
+    <option name="localTasksCounter" value="1316" />
     <servers />
   </component>
   <component name="TypeScriptGeneratedFilesManager">
@@ -1107,7 +1112,6 @@
     </option>
   </component>
   <component name="VcsManagerConfiguration">
-    <MESSAGE value="done" />
     <MESSAGE value="added hp animation" />
     <MESSAGE value="stashing shader" />
     <MESSAGE value="added hp lost" />
@@ -1132,7 +1136,8 @@
     <MESSAGE value="added shader" />
     <MESSAGE value="stashing" />
     <MESSAGE value="stashing cool noise" />
-    <option name="LAST_COMMIT_MESSAGE" value="stashing cool noise" />
+    <MESSAGE value="game over vignette done" />
+    <option name="LAST_COMMIT_MESSAGE" value="game over vignette done" />
   </component>
   <component name="XDebuggerManager">
     <breakpoint-manager>

@@ -3,7 +3,7 @@ rt.settings.battle.entity = {
     name = "Character",
 }
 
---- @class EntityState
+--- @class bt.EntityState
 bt.EntityState = meta.new_enum("EntityState", {
     ALIVE = "ALIVE",
     KNOCKED_OUT = "KNOCKED_OUT",
@@ -15,6 +15,15 @@ bt.AILevel = meta.new_enum("AILevel", {
     RANDOM = 0,
     LEVEL_1 = 1,
     LEVEL_2 = 2
+})
+
+--- @enum bt.StatType
+bt.StatType = meta.new_enum("StatType", {
+    HP = "HP",
+    ATTACK = "ATTACk",
+    DEFENSE = "DEFENSE",
+    SPEED = "SPEED",
+    PRIORITY = "PRIORITY"
 })
 
 --- @class bt.Entity

@@ -30,7 +30,7 @@ bt.BattleScene = meta.new_type("BattleScene", rt.Scene, function(state)
         _animation_queue = rt.AnimationQueue(),
 
         _game_over_screen = bt.GameOverScreen(),
-        _game_over_screen_active = true,
+        _game_over_screen_active = false,
 
         _is_first_size_allocate = true
     })
@@ -548,7 +548,10 @@ function bt.BattleScene:_handle_button_pressed(which)
         --self:push_animation(bt.Animation.SWAP(self, self:get_sprite(enemies[1]), self:get_sprite(enemies[2])))
         ]]--
 
-        self._game_over_screen:set_is_expanded(not self._game_over_screen:get_is_expanded())
+        self:push_animation(bt.Animation.PRIORITY_RAISED(self, self:get_sprite(self._state:list_enemies()[1])))
+
+
+        --self._game_over_screen:set_is_expanded(not self._game_over_screen:get_is_expanded())
 
     elseif which == rt.InputButton.B then
         self:skip()

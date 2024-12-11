@@ -1356,6 +1356,10 @@ function bt.BattleScene:create_simulation_environment()
             return -- fizzle
         end
 
+        if env.is_dead(entity_proxy) or env.is_knocked_out(entity_proxy) then
+            return
+        end
+
         local sprite = _scene:get_sprite(entity)
         local animation = bt.Animation.STATUS_GAINED(_scene, status, sprite)
         animation:signal_connect("start", function(_)
@@ -1556,6 +1560,31 @@ function bt.BattleScene:create_simulation_environment()
     function env.get_priority(entity_proxy)
         bt.assert_args("get_priority", entity_proxy, bt.EntityProxy)
         return _state:entity_get_priority(_get_native(entity_proxy))
+    end
+
+    function env.set_priority(entity_proxy, value)
+        bt.assert_args("add_priority",
+            entity_proxy, bt.EntityProxy,
+            value, bt.Number
+        )
+
+        local before = env.get_priority(entity_proxy)
+        local after = value
+        if before == after then return end
+
+        local entity = _get_native(entity_proxy)
+        _state:entity_set_priority(entity, value)
+
+        local animation = rt.Animation.PRIORITY_CHANGED(
+            _scene,
+            _scene:get_sprite(entity),
+            ternary(before < after, rt.Direction.UP, rt.Direction.DOWN)
+        )
+
+        _scene:push_animation(animation)
+        env.append_message(rt.Translation.battle.message.priority_raised_f(entity_proxy, after))
+
+        -- no callbacks
     end
 
     for which in range(
@@ -1857,7 +1886,6 @@ function bt.BattleScene:create_simulation_environment()
 
         local hp_current = env.get_hp(entity_proxy)
         local hp_base = env.get_hp_base(entity_proxy)
-
         if
             hp_current >= hp_base or value == 0 or
             env.is_knocked_out(entity_proxy) or
@@ -2252,6 +2280,18 @@ function bt.BattleScene:create_simulation_environment()
         return value
     end
 
+    env.deal_damage = function(target_proxy, value)
+        bt.assert_args("deal_damage",
+            target_proxy, bt.EntityProxy,
+            value, bt.Number
+        )
+        local user_proxy = _get_current_move_user()
+        if user_proxy ~= nil then
+            value = env.compute_damage(user_proxy, target_proxy, value)
+        end
+        env.reduce_hp(target_proxy, math.max(value, 0))
+    end
+
     env.compute_healing = function(
         healing_performing_entity_proxy,
         healing_receiving_entity_proxy,
@@ -2319,6 +2359,18 @@ function bt.BattleScene:create_simulation_environment()
         end
 
         return value
+    end
+
+    env.heal = function(target_proxy, value)
+        bt.assert_args("deal_damage",
+            target_proxy, bt.EntityProxy,
+            value, bt.Number
+        )
+        local user_proxy = _get_current_move_user()
+        if user_proxy ~= nil then
+            value = env.compute_healing(user_proxy, target_proxy, value)
+        end
+        env.add_hp(target_proxy, math.max(value, 0))
     end
 
     env.use_move = function(entity_proxy, move_proxy, ...)
@@ -2460,6 +2512,11 @@ function bt.BattleScene:create_simulation_environment()
         
         -- increment turn counter
         _state:set_turn_i(_state:get_turn_i() + 1)
+
+        -- reset priority
+        for entity in values(_state:list_all_entities()) do
+            _state:entity_set_priority(entity, 0)
+        end
     end
 
     env.quicksave = function()

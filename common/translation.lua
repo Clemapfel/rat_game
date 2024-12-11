@@ -316,7 +316,18 @@ rt.Translation = rt.initialize_translation({
         stun_gained_label = "STUNNED",
         turn_start_label = "TURN START",
         turn_end_label = "TURN END",
-        
+
+        hp_up_label = "<color=HP>HP +</color>",
+        hp_down_label = "<color=HP>HP -</color>",
+        attack_up_label = "<color=ATTACK>ATK +</color>",
+        attack_down_label = "<color=ATTACK>ATK -</color>",
+        defense_up_label = "<color=DEFENSE>DEF +</color>",
+        defense_down_label = "<color=DEFENSE>DEF -</color>",
+        speed_up_label = "<color=SPEED>SPD +</color>",
+        speed_down_label = "<color=SPEED>SPD -</color>",
+        priority_up_label = "<color=SPEED>Priority +</color>",
+        priority_down_label = "<color=SPEED>Priority -</color>",
+
         message = {
             move_gained_pp_f = function(entity, move)
                 return entity .. "s " .. move .. " gained PP"
@@ -396,6 +407,10 @@ rt.Translation = rt.initialize_translation({
 
             quicksave_loaded_f = function()
                 return "quicksave restored"
+            end,
+
+            priority_changed_f = function(entity, value)
+                return entity .. "s <color=SPEED>Priority</color> is now <mono>" .. value .. "</value>"
             end
         }
     }

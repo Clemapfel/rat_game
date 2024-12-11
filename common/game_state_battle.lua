@@ -328,7 +328,23 @@ end
 --- @brief
 function rt.GameState:entity_get_priority(entity)
     meta.assert_isa(entity, bt.Entity)
-    return self:_get_entity_entry(entity).priority
+    local entry = self:_get_entity_entry(entity)
+    if entry == nil then
+        rt.error("In rt.GameState.entity_get_priority: entity `" .. entity:get_id() .. "` is not part of state")
+        return 0
+    end
+    return entry.priority
+end
+
+--- @brief
+function rt.GameState:entity_set_priority(entity, new_value)
+    meta.assert_isa(entity, bt.Entity)
+    local entry = self:_get_entity_entry(entity)
+    if entry == nil then
+        rt.error("In rt.GameState.entity_set_priority: entity `" .. entity:get_id() .. "` is not part of state")
+        return
+    end
+    entry.priority = new_value
 end
 
 --- @brie

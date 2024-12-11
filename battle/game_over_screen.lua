@@ -37,7 +37,7 @@ end
 
 --- @brief
 --- @brief
-function bt.QuicksaveIndicator:skip()
+function bt.GameOverScreen:skip()
     if self._direction == true then
         self._value = 1
     else
@@ -45,6 +45,7 @@ function bt.QuicksaveIndicator:skip()
     end
     self:update(0)
 end
+
 --- @override
 function bt.GameOverScreen:size_allocate(x, y, width, height)
     self._vignette_shape:reformat(
