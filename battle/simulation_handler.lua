@@ -209,6 +209,7 @@ for which_type in range(
             bt.error_function("In " .. function_name .. ": Wrong argument #" .. arg_i .. ", expected `" .. type .. "`, got `" .. true_type .. "`")
         end
     end
+
 end
 
 --- @brief
@@ -327,6 +328,23 @@ function bt.BattleScene:create_simulation_environment()
         "debug"
     ) do
         env[no] = nil
+    end
+
+    -- debug
+    for which in range(
+        "is_number",
+        "is_string",
+        "is_boolean",
+        "is_table",
+        "is_entity_proxy",
+        "is_move_proxy",
+        "is_status_proxy",
+        "is_global_status_proxy",
+        "is_consumable_proxy",
+        "is_equip_proxy"
+    ) do
+        env[which] = bt[which]
+        env["assert_" .. which] = bt["assert_" .. which]
     end
 
     -- bind IDs of immutables to globals, used by add_status, spawn, etc.
@@ -1353,7 +1371,13 @@ function bt.BattleScene:create_simulation_environment()
 
         local entity, status = _get_native(entity_proxy), _get_native(status_proxy)
         if _state:entity_has_status(entity, status) then
-            return -- fizzle
+            -- if already there, invoke callback, then fizzle
+            for other_status_proxy in values(env.list_statuses()) do
+                if env.get_id(status_proxy) == env.get_id(other_status_proxy) then
+                    _try_invoke_status_callback("on_already_present", other_status_proxy)
+                end
+            end
+            return
         end
 
         if env.is_dead(entity_proxy) or env.is_knocked_out(entity_proxy) then

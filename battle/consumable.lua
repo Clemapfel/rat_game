@@ -42,6 +42,12 @@ end, {
         return nil
     end,
 
+    -- (ConsumableProxy, EntityProxy) -> nil
+    on_battle_start = function(self, holder)
+
+    end,
+
+    -- (ConsumableProxy, EntityProxy) -> nil
     on_battle_end = function(self, holder)
         return nil
     end,
@@ -112,12 +118,12 @@ end, {
     end,
 
     -- (ConsumableProxy, EntityProxy, MoveProxy, Table<EntityProxy>)
-    on_move_used = function(self, holding_user, move, targets)
+    on_move_used = function(self, holder, move, targets)
         return nil
     end,
 
     -- (ConsumableProxy, EntityProxy, MoveProxy) -> nil
-    on_move_disabled = function(self, holding_user, move)
+    on_move_disabled = function(self, holder, move)
         return nil
     end,
 
@@ -141,8 +147,8 @@ end, {
         return nil
     end,
 
-    -- (ConsumableProxy, EntityProxy)
-    on_entity_spawned = function(self, holder, other_consumable)
+    -- (ConsumableProxy, EntityProxy, EntityProxy)
+    on_entity_spawned = function(self, holder, other_entity)
         return nil
     end,
 
@@ -187,7 +193,9 @@ function bt.Consumable:realize()
         "on_consumable_lost",
         "on_consumable_disabled",
         "on_entity_spawned",
-        "on_equip_disabled"
+        "on_equip_disabled",
+        "on_battle_start",
+        "on_battle_end"
     }
 
     local template = {

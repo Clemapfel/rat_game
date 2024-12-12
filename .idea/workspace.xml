@@ -22,14 +22,17 @@
     </configurations>
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="7fa9ba1b-2cff-4ecc-86fb-59ab2fa76ee1" name="Changes" comment="stat changed up working">
-      <change afterPath="$PROJECT_DIR$/common/twinkle.lua" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/menu/item_get_screen.lua" afterDir="false" />
+    <list default="true" id="7fa9ba1b-2cff-4ecc-86fb-59ab2fa76ee1" name="Changes" comment="added twinkle, stashing">
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/battle/animations/stat_changed.glsl" beforeDir="false" afterPath="$PROJECT_DIR$/battle/animations/stat_changed.glsl" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/battle/animations/stat_changed.lua" beforeDir="false" afterPath="$PROJECT_DIR$/battle/animations/stat_changed.lua" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/include.lua" beforeDir="false" afterPath="$PROJECT_DIR$/include.lua" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/main.lua" beforeDir="false" afterPath="$PROJECT_DIR$/main.lua" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/assets/configs/consumables/DEBUG_CONSUMABLE.lua" beforeDir="false" afterPath="$PROJECT_DIR$/assets/configs/consumables/DEBUG_CONSUMABLE.lua" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/assets/configs/equips/DEBUG_EQUIP.lua" beforeDir="false" afterPath="$PROJECT_DIR$/assets/configs/equips/DEBUG_EQUIP.lua" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/assets/configs/global_statuses/DEBUG_GLOBAL_STATUS.lua" beforeDir="false" afterPath="$PROJECT_DIR$/assets/configs/global_statuses/DEBUG_GLOBAL_STATUS.lua" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/assets/configs/moves/DEBUG_MOVE.lua" beforeDir="false" afterPath="$PROJECT_DIR$/assets/configs/moves/DEBUG_MOVE.lua" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/assets/configs/statuses/DEBUG_STATUS.lua" beforeDir="false" afterPath="$PROJECT_DIR$/assets/configs/statuses/DEBUG_STATUS.lua" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/battle/consumable.lua" beforeDir="false" afterPath="$PROJECT_DIR$/battle/consumable.lua" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/battle/global_status.lua" beforeDir="false" afterPath="$PROJECT_DIR$/battle/global_status.lua" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/battle/simulation_handler.lua" beforeDir="false" afterPath="$PROJECT_DIR$/battle/simulation_handler.lua" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/battle/status.lua" beforeDir="false" afterPath="$PROJECT_DIR$/battle/status.lua" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -667,15 +670,7 @@
       <workItem from="1733502567573" duration="53480000" />
       <workItem from="1733775630553" duration="4991000" />
       <workItem from="1733850643234" duration="23919000" />
-      <workItem from="1733958947216" duration="2040000" />
-    </task>
-    <task id="LOCAL-01268" summary="stashing, needs path length normalization">
-      <option name="closed" value="true" />
-      <created>1732560745369</created>
-      <option name="number" value="01268" />
-      <option name="presentableId" value="LOCAL-01268" />
-      <option name="project" value="LOCAL" />
-      <updated>1732560745369</updated>
+      <workItem from="1733958947216" duration="8049000" />
     </task>
     <task id="LOCAL-01269" summary="stashing split paths">
       <option name="closed" value="true" />
@@ -1061,7 +1056,15 @@
       <option name="project" value="LOCAL" />
       <updated>1733947980060</updated>
     </task>
-    <option name="localTasksCounter" value="1317" />
+    <task id="LOCAL-01317" summary="added twinkle, stashing">
+      <option name="closed" value="true" />
+      <created>1733963918275</created>
+      <option name="number" value="01317" />
+      <option name="presentableId" value="LOCAL-01317" />
+      <option name="project" value="LOCAL" />
+      <updated>1733963918275</updated>
+    </task>
+    <option name="localTasksCounter" value="1318" />
     <servers />
   </component>
   <component name="TypeScriptGeneratedFilesManager">
@@ -1110,7 +1113,6 @@
     </option>
   </component>
   <component name="VcsManagerConfiguration">
-    <MESSAGE value="stashing shader" />
     <MESSAGE value="added hp lost" />
     <MESSAGE value="added radius fade out" />
     <MESSAGE value="stashing parallel count" />
@@ -1135,7 +1137,8 @@
     <MESSAGE value="stashing cool noise" />
     <MESSAGE value="game over vignette done" />
     <MESSAGE value="stat changed up working" />
-    <option name="LAST_COMMIT_MESSAGE" value="stat changed up working" />
+    <MESSAGE value="added twinkle, stashing" />
+    <option name="LAST_COMMIT_MESSAGE" value="added twinkle, stashing" />
   </component>
   <component name="XDebuggerManager">
     <breakpoint-manager>
@@ -1175,6 +1178,11 @@
           <url>file://$PROJECT_DIR$/older/~common/vertex_shape.lua</url>
           <line>376</line>
           <option name="timeStamp" value="31" />
+        </line-breakpoint>
+        <line-breakpoint enabled="true" type="lua-line">
+          <url>file://$PROJECT_DIR$/battle/global_status.lua</url>
+          <line>20</line>
+          <option name="timeStamp" value="32" />
         </line-breakpoint>
         <line-breakpoint enabled="true" suspend="NONE" type="CMakeLineBreakpoint">
           <url>file://$PROJECT_DIR$/physics/box2d_extension/CMakeLists.txt</url>

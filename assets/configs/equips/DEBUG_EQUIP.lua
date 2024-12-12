@@ -18,6 +18,8 @@ return {
     speed_base_factor = 1,
 
     effect = function(self, entity)
-        message("test")
+        assert_is_equip_proxy(self)
+        assert_is_entity_proxy(entity)
+        println(get_id(self) .. " effect")
     end
 }

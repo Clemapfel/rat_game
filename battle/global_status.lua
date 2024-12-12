@@ -45,10 +45,17 @@ end, {
         return nil
     end,
 
+    -- (GlobalStatusProxy, Table<EntityProxy>) -> nil
     on_turn_end = function(self, entities)
         return nil
     end,
 
+    -- (GlobalStatusProxy, Table<EntityProxy>) -> nil
+    on_battle_start = function(self, entities)
+        return nil
+    end,
+
+    -- (GlobalStatusProxy, Table<EntityProxy>) -> nil
     on_battle_end = function(self, entities)
         return nil
     end,
@@ -83,13 +90,13 @@ end, {
         return nil
     end,
 
-    -- (GlobalStatusProxy, GlobalStatusProxy, Table<Entity>) -> nil
-    on_global_status_gained = function(self, gained_status, entities)
+    -- (GlobalStatusProxy, GlobalStatusProxy) -> nil
+    on_global_status_gained = function(self, gained_status)
         return nil
     end,
 
-    -- (GlobalStatusProxy, GlobalStatusProxy, Table<Entity>) -> nil
-    on_global_status_lost = function(self, lost_status, entities)
+    -- (GlobalStatusProxy, GlobalStatusProxy) -> nil
+    on_global_status_lost = function(self, lost_status)
         return nil
     end,
 
@@ -189,7 +196,9 @@ function bt.GlobalStatus:realize()
         "on_consumable_lost",
         "on_consumable_disabled",
         "on_entity_spawned",
-        "on_equip_disabled"
+        "on_equip_disabled",
+        "on_battle_start",
+        "on_battle_end"
     }
 
     local template = {

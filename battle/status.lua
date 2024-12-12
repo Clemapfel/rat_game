@@ -78,6 +78,11 @@ end, {
     end,
 
     -- (StatusProxy, EntityProxy) -> nil
+    on_battle_start = function(self, afflicted)
+        return nil
+    end,
+
+    -- (StatusProxy, EntityProxy) -> nil
     on_battle_end = function(self, afflicted)
         return nil
     end,
@@ -154,7 +159,7 @@ end, {
 
     -- (StatusProxy, EntityProxy, MoveProxy) -> nil
     on_move_disabled = function(self, afflicted, move)
-
+        return nil
     end,
 
     -- (StatusProxy, EntityProxy, ConsumableProxy) -> nil
@@ -217,7 +222,9 @@ function bt.Status:realize()
         "on_consumable_lost",
         "on_consumable_disabled",
         "on_entity_spawned",
-        "on_equip_disabled"
+        "on_equip_disabled",
+        "on_battle_start",
+        "on_battle_end"
     }
 
     local template = {

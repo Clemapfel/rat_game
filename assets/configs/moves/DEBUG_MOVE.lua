@@ -16,6 +16,11 @@ return {
     sprite_index = "DEBUG_MOVE",
 
     effect = function(self, user, targets)
-
+        assert_is_move_proxy(self)
+        assert_is_entity_proxy(user)
+        for entity in values(targets) do
+            assert_is_entity_proxy(entity)
+        end
+        println(get_id(self) .. " effect")
     end
 }
