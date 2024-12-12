@@ -1,5 +1,5 @@
 rt.settings.battle.animation.stat_changed = {
-    duration = 1
+    duration = 3
 }
 
 function bt.Animation.ATTACK_RAISED(scene, sprite)
@@ -59,8 +59,10 @@ bt.Animation.STAT_CHANGED = meta.new_type("STAT_CHANGED", rt.Animation, function
         _label_x = 0,
         _label_y = 0,
         _label_path_animation = rt.TimedAnimation(settings.duration, 0, 1),
-        _label_opacity_animation = rt.TimedAnimation(settings.duration,
-            0, 1, rt.InterpolationFunctions.SHELF
+
+        _opacity = 0,
+        _opacity_animation = rt.TimedAnimation(settings.duration,
+            0, 1, rt.InterpolationFunctions.SHELF, 0.97, 10
         ),
 
         _elapsed = 0
@@ -97,15 +99,24 @@ do
             stat = rt.Translation.battle.priority_down_label
         end
         self._label = rt.Label("<b><o>" .. stat .. "</o></b>")
+        self._label:realize()
         local label_w, label_h = self._label:measure()
         self._label:fit_into(-0.5 * label_w, -0.5 * label_h, POSITIVE_INFINITY)
 
         local target_x, target_y = self._target:get_position()
         local target_w, target_h = self._target:get_size()
-        self._label_path = rt.Path(
-            target_x + 0.5 * target_w, target_y + 0.5 * target_h,
-            target_x + 0.5 * target_w, target_y + 0.7 * target_h
-        )
+
+        if self._direction == true then
+            self._label_path = rt.Path(
+                target_x + 0.5 * target_w, target_y + 0.75 * target_h,
+                target_x + 0.5 * target_w, target_y + 0.25 * target_h
+            )
+        else
+            self._label_path = rt.Path(
+                target_x + 0.5 * target_w, target_y + 0.25 * target_h,
+                target_x + 0.5 * target_w, target_y + 0.75 * target_h
+            )
+        end
 
         local color
         if self._stat == bt.StatType.ATTACK then
@@ -130,16 +141,13 @@ do
     end
 end
 
-
-
-
 --- @override
 function bt.Animation.STAT_CHANGED:update(delta)
-    local is_done = false
+    local is_done = true
     for animation in range(
         self._shader_animation,
         self._label_path_animation,
-        self._label_opacity_animation
+        self._opacity_animation
     ) do
         animation:update(delta)
         is_done = is_done and animation:get_is_done()
@@ -147,23 +155,25 @@ function bt.Animation.STAT_CHANGED:update(delta)
     self._elapsed = self._elapsed + delta
 
     self._label_x, self._label_y = self._label_path:at(self._label_path_animation:get_value())
-    self._label:set_opacity(self._label_opacity_animation:get_value())
+    self._opacity = self._opacity_animation:get_value()
+    self._label:set_opacity(self._opacity)
 
     return is_done
 end
 
 --- @override
 function bt.Animation.STAT_CHANGED:draw()
-    love.graphics.push()
-    love.graphics.translate(self._label_x, self._label_y)
-    self._label:draw()
-    love.graphics.pop()
-
     self._shader:bind()
     self._shader:send("elapsed", self._elapsed)
     self._shader:send("color", self._color)
     self._shader:send("direction", self._direction)
+    self._shader:send("weight", self._opacity)
     self._target:draw_snapshot()
     self._shader:unbind()
+
+    love.graphics.push()
+    love.graphics.translate(self._label_x, self._label_y)
+    self._label:draw()
+    love.graphics.pop()
 end
 

@@ -167,6 +167,7 @@ require "common.message_dialog"
 require "common.keyboard"
 require "common.direction_indicator"
 require "common.text_box"
+require "common.twinkle"
 
 require "common.rope"
 require "common.cloth"

@@ -34,25 +34,29 @@ float random(float seed) {
 
 #ifdef PIXEL
 
-uniform vec4 color;
+uniform vec4 color = vec4(1);
 uniform float elapsed;
-uniform bool direction;
+uniform bool direction = true;
+uniform float weight = 1;
 
 vec4 effect(vec4 vertex_color, Image image, vec2 texture_coords, vec2 screen_coords)
 {
     const int n_columns = 5;
     const float arrow_length = 1.5; // the higher, the shorter the arrow
-    float time = elapsed / 10;
+    float time = -1 * elapsed / 10;
+
+    float sign = direction ? 1 : -1;
 
     vec4 texel = Texel(image, texture_coords);
-    float y = texture_coords.y + elapsed;
+    float y = texture_coords.y + sign * elapsed;
     float column_i = floor(texture_coords.x * n_columns);
     float column_width = 1.0 / n_columns;
     float column_center = column_i * column_width + 0.5 * column_width;
     float offset = (column_i / n_columns * -1) * sqrt(2 * n_columns);
-    y = fract(column_i + y + offset + time - distance(texture_coords.x, column_center));
+    y = fract(column_i + sign * y + offset + time - distance(texture_coords.x, column_center));
     y = clamp(sqrt(arrow_length * y), 0, 1);
+
     float mask = 1.0 - y;
-    return vec4(mix(texel.rgb, color.rgb, mask), texel.a);
+    return vec4(mix(texel.rgb, color.rgb, mask * weight), texel.a);
 }
 #endif
