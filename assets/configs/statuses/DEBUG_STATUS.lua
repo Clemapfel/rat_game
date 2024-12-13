@@ -108,10 +108,24 @@ return {
         println(get_id(self) .. " on_knocked_out")
     end,
 
+    on_knocked_out_other = function(self, afflicted, knocked_out_entity)
+        assert_is_status_proxy(self)
+        assert_is_entity_proxy(afflicted)
+        assert_is_entity_proxy(knocked_out_entity)
+        println(get_id(self) .. "on_knocked_out_other")
+    end,
+
     on_helped_up = function(self, afflicted)
         assert_is_status_proxy(self)
         assert_is_entity_proxy(afflicted)
         println(get_id(self) .. " on_helped_up")
+    end,
+
+    on_helped_up_other = function(self, afflicted, helped_up_entity)
+        assert_is_status_proxy(self)
+        assert_is_entity_proxy(afflicted)
+        assert_is_entity_proxy(helped_up_entity)
+        println(get_id(self) .. "on_helped_up_other")
     end,
 
     on_killed = function(self, afflicted)
@@ -120,10 +134,24 @@ return {
         println(get_id(self) .. " on_killed")
     end,
 
+    on_killed_other = function(self, afflicted, killed_entity)
+        assert_is_status_proxy(self)
+        assert_is_entity_proxy(afflicted)
+        assert_is_entity_proxy(killed_entity)
+        println(get_id(self) .. "on_killed_other")
+    end,
+
     on_revived = function(self, afflicted)
         assert_is_status_proxy(self)
         assert_is_entity_proxy(afflicted)
         println(get_id(self) .. " on_revived")
+    end,
+
+    on_revived_other = function(self, afflicted, revived_entity)
+        assert_is_status_proxy(self)
+        assert_is_entity_proxy(afflicted)
+        assert_is_entity_proxy(revived_entity)
+        println(get_id(self) .. "on_revived_other")
     end,
 
     on_swap = function(self, afflicted, entity_at_old_position)

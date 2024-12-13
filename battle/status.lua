@@ -132,8 +132,18 @@ end, {
         return nil
     end,
 
+    -- (StatusProxy, EntityProxy, EntityProxy) -> nil
+    on_knocked_out_other = function(self, afflicted, knocked_out_entity)
+        return nil
+    end,
+
     -- (StatusProxy, EntityProxy) -> nil
     on_helped_up = function(self, afflicted)
+        return nil
+    end,
+
+    -- (StatusProxy, EntityProxy, EntityProxy) -> nil
+    on_helped_up_other = function(self, afflicted, helping_up_entity)
         return nil
     end,
 
@@ -142,8 +152,18 @@ end, {
         return nil
     end,
 
+    -- (StatusProxy, EntityProxy, EntityProxy) -> nil
+    on_killed_other = function(self, afflicted, killed_entity)
+        return nil
+    end,
+
     -- (StatusProxy, EntityProxy)
     on_revived = function(self, afflicted)
+        return nil
+    end,
+
+    -- (StatusProxy, EntityProxy, EntityProxy) -> nil
+    on_revived_other = function(self, afflicted, revived_entity)
         return nil
     end,
 
@@ -211,9 +231,13 @@ function bt.Status:realize()
         "on_global_status_gained",
         "on_global_status_lost",
         "on_knocked_out",
+        "on_knocked_out_other",
         "on_helped_up",
+        "on_helped_up_other",
         "on_killed",
+        "on_killed_other",
         "on_revived",
+        "on_revived_other",
         "on_swap",
         "on_move_used",
         "on_move_disabled",
@@ -224,7 +248,7 @@ function bt.Status:realize()
         "on_entity_spawned",
         "on_equip_disabled",
         "on_battle_start",
-        "on_battle_end"
+        "on_battle_end",
     }
 
     local template = {

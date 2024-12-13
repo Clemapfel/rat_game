@@ -22,11 +22,18 @@
     </configurations>
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="7fa9ba1b-2cff-4ecc-86fb-59ab2fa76ee1" name="Changes" comment="added debug configs">
-      <change afterPath="$PROJECT_DIR$/main_tesselation.lua" afterDir="false" />
+    <list default="true" id="7fa9ba1b-2cff-4ecc-86fb-59ab2fa76ee1" name="Changes" comment="stashing 4 vertices">
+      <change afterPath="$PROJECT_DIR$/assets/configs/battles/DEBUG_BATTLE.lua" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/battle/battle.lua" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/assets/configs/statuses/DEBUG_STATUS.lua" beforeDir="false" afterPath="$PROJECT_DIR$/assets/configs/statuses/DEBUG_STATUS.lua" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/battle/consumable.lua" beforeDir="false" afterPath="$PROJECT_DIR$/battle/consumable.lua" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/battle/global_status.lua" beforeDir="false" afterPath="$PROJECT_DIR$/battle/global_status.lua" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/battle/move.lua" beforeDir="false" afterPath="$PROJECT_DIR$/battle/move.lua" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/battle/simulation_handler.lua" beforeDir="false" afterPath="$PROJECT_DIR$/battle/simulation_handler.lua" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/battle/status.lua" beforeDir="false" afterPath="$PROJECT_DIR$/battle/status.lua" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/main.lua" beforeDir="false" afterPath="$PROJECT_DIR$/main.lua" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/main_tesselation.lua" beforeDir="false" afterPath="$PROJECT_DIR$/main_tesselation.lua" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -157,7 +164,7 @@
       <recent name="C:\Users\cleme\Workspace\rat_game\old" />
     </key>
   </component>
-  <component name="RunManager" selected="Lua Application.main_tesselation">
+  <component name="RunManager" selected="Lua Application.main">
     <configuration name="Makefile" type="MAKEFILE_TARGET_RUN_CONFIGURATION" factoryName="Makefile" temporary="true">
       <makefile filename="$PROJECT_DIR$/midi/lovemidi/Makefile" target="" workingDirectory="" arguments="">
         <envs />
@@ -678,15 +685,7 @@
       <workItem from="1733775630553" duration="4991000" />
       <workItem from="1733850643234" duration="23919000" />
       <workItem from="1733958947216" duration="8190000" />
-      <workItem from="1734050208171" duration="2863000" />
-    </task>
-    <task id="LOCAL-01270" summary="fixed out of bounds behavior of interpolation functions">
-      <option name="closed" value="true" />
-      <created>1732564122022</created>
-      <option name="number" value="01270" />
-      <option name="presentableId" value="LOCAL-01270" />
-      <option name="project" value="LOCAL" />
-      <updated>1732564122023</updated>
+      <workItem from="1734050208171" duration="11529000" />
     </task>
     <task id="LOCAL-01271" summary="added path parameterization override">
       <option name="closed" value="true" />
@@ -1072,7 +1071,15 @@
       <option name="project" value="LOCAL" />
       <updated>1734034183119</updated>
     </task>
-    <option name="localTasksCounter" value="1319" />
+    <task id="LOCAL-01319" summary="stashing 4 vertices">
+      <option name="closed" value="true" />
+      <created>1734058738606</created>
+      <option name="number" value="01319" />
+      <option name="presentableId" value="LOCAL-01319" />
+      <option name="project" value="LOCAL" />
+      <updated>1734058738607</updated>
+    </task>
+    <option name="localTasksCounter" value="1320" />
     <servers />
   </component>
   <component name="TypeScriptGeneratedFilesManager">
@@ -1121,7 +1128,6 @@
     </option>
   </component>
   <component name="VcsManagerConfiguration">
-    <MESSAGE value="added radius fade out" />
     <MESSAGE value="stashing parallel count" />
     <MESSAGE value="sequential working" />
     <MESSAGE value="multi-pass shader working" />
@@ -1146,7 +1152,8 @@
     <MESSAGE value="stat changed up working" />
     <MESSAGE value="added twinkle, stashing" />
     <MESSAGE value="added debug configs" />
-    <option name="LAST_COMMIT_MESSAGE" value="added debug configs" />
+    <MESSAGE value="stashing 4 vertices" />
+    <option name="LAST_COMMIT_MESSAGE" value="stashing 4 vertices" />
   </component>
   <component name="XDebuggerManager">
     <breakpoint-manager>

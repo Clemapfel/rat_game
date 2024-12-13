@@ -48,8 +48,7 @@ love.load = function(delta)
     
     a_x, a_y = center_x, center_y
     b_x, b_y = center_x + x_radius, center_y
-    c_x, c_y = center_x + x_radius, center_y + y_radius
-    d_x, d_y = center_x, center_y + y_radius
+    c_x, c_y = center_x, center_y + y_radius
 end
 
 love.mousepressed = function(x, y)
@@ -59,8 +58,6 @@ love.mousepressed = function(x, y)
         active_vertex = 2
     elseif ts.distance(x, y, c_x, c_y) < vertex_radius then
         active_vertex = 3
-    elseif ts.distance(x, y, d_x, d_y) < vertex_radius then
-        active_vertex = 4
     end
 end
 
@@ -76,8 +73,6 @@ love.mousemoved = function(x, y)
             b_x, b_y = x, y
         elseif active_vertex == 3 then
             c_x, c_y = x, y
-        elseif active_vertex == 4 then
-            d_x, d_y = x, y
         end
     end
 end
@@ -102,6 +97,10 @@ do
     end
 
     love.draw = function()
+
+        d_x = c_x + a_x - b_x
+        d_y = c_y + a_y - b_y
+
         love.graphics.setLineWidth(3)
         love.graphics.setColor(table.unpack(line_color))
         love.graphics.line(
@@ -115,7 +114,7 @@ do
         _draw_vertex(1, a_x, a_y)
         _draw_vertex(2, b_x, b_y)
         _draw_vertex(3, c_x, c_y)
-        _draw_vertex(4, d_x, d_y)
+        _draw_vertex(nil, d_x, d_y)
     end
 end
 

@@ -8,7 +8,6 @@ state:initialize_debug_state()
 
 camera = state:get_camera()
 
-
 local draw_state = true
 input = rt.InputController()
 input:signal_connect("keyboard_pressed", function(_, which)

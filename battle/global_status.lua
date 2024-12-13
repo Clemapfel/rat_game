@@ -101,22 +101,22 @@ end, {
     end,
 
     -- (GlobalStatusProxy, EntityProxy) -> nil
-    on_knocked_out = function(self, knocked_out_entitymain)
+    on_knocked_out = function(self, knocked_out_entity, knocked_out_by_entity)
         return nil
     end,
 
     -- (GlobalStatusProxy, EntityProxy) -> nil
-    on_helped_up = function(self, helped_up_entity)
+    on_helped_up = function(self, helped_up_entity, helped_up_by_entity)
         return nil
     end,
 
     -- (GlobalStatusProxy, EntityProxy) -> nil
-    on_killed = function(self, killed_entity)
+    on_killed = function(self, killed_entity, killed_by_entity)
         return nil
     end,
 
     -- (GlobalStatusProxy, EntityProxy) -> nil
-    on_revived = function(self, killed_entity)
+    on_revived = function(self, killed_entity, revived_by_entity)
         return nil
     end,
 

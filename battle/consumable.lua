@@ -97,8 +97,18 @@ end, {
         return nil
     end,
 
+    -- (ConsumableProxy, EntityProxy, EntityProxy) -> nil
+    on_knocked_out_other = function(self, holder, knocked_out_entity)
+        return nil
+    end,
+
     -- (ConsumableProxy, EntityProxy) -> nil
     on_helped_up = function(self, holder)
+        return nil
+    end,
+
+    -- (ConsumableProxy, EntityProxy, EntityProxy) -> nil
+    on_helped_up_other = function(self, holder, helped_up_entity)
         return nil
     end,
 
@@ -107,8 +117,18 @@ end, {
         return nil
     end,
 
+    -- (ConsumableProxy, EntityProxy, EntityProxy) -> nil
+    on_killed_other = function(self, holder, killed_entity)
+        return nil
+    end,
+
     -- (ConsumableProxy, EntityProxy) -> nil
     on_revived = function(self, holder)
+        return nil
+    end,
+
+    -- (ConsumableProxy, EntityProxy, EntityProxy) -> nil
+    on_revived_other = function(self, holder, revived_entity)
         return nil
     end,
 
@@ -180,9 +200,13 @@ function bt.Consumable:realize()
         "on_global_status_gained",
         "on_global_status_lost",
         "on_knocked_out",
+        "on_knocked_out_other",
         "on_helped_up",
+        "on_helped_up_other",
         "on_killed",
+        "on_killed_other",
         "on_revived",
+        "on_revived_other",
         "on_swap",
         "on_move_used",
         "on_move_disabled",
@@ -195,7 +219,8 @@ function bt.Consumable:realize()
         "on_entity_spawned",
         "on_equip_disabled",
         "on_battle_start",
-        "on_battle_end"
+        "on_battle_end",
+        "on_knocked_out_other"
     }
 
     local template = {

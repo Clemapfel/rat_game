@@ -209,7 +209,6 @@ for which_type in range(
             bt.error_function("In " .. function_name .. ": Wrong argument #" .. arg_i .. ", expected `" .. type .. "`, got `" .. true_type .. "`")
         end
     end
-
 end
 
 --- @brief
@@ -328,6 +327,52 @@ function bt.BattleScene:create_simulation_environment()
         "debug"
     ) do
         env[no] = nil
+    end
+
+    -- debug assertions
+    for metas in range(
+        "is_number",
+        "is_table",
+        "is_string",
+        "is_boolean",
+        "is_nil"
+    ) do
+        env[metas] = function(x)
+            return meta[metas](x)
+        end
+    end
+
+    for name_type in range(
+        {"entity_proxy", bt.EntityProxy},
+        {"move_proxy", bt.MoveProxy},
+        {"status_proxy", bt.StatusProxy},
+        {"global_status_proxy", bt.GlobalStatusProxy},
+        {"consumable_proxy", bt.ConsumableProxy},
+        {"equip_proxy", bt.EquipProxy}
+    ) do
+        local name, type = table.unpack(name, type)
+        env["is_" .. name] = function(x)
+            if meta.is_table(x) then
+                local metatable = getmetatable(x)
+                if metatable == nil then
+                    return metatable._type == type
+                end
+            else return false end
+        end
+
+        env["assert_is_" .. name] = function(x)
+            if meta.is_table(x) then
+                local metatable = getmetatable(x)
+                if metatable ~= nil then
+                    if metatable._type == type then
+                        return
+                    else
+                        bt.error_function("In assert_is_" .. name .. ": excpected `" .. type .. "`, got `" .. metatable._type .. "`")
+                    end
+                end
+            end
+            bt.error_function("In assert_is_" .. name .. ": excpected `" .. type .. "`, got `" .. meta.typeof(x) .. "`")
+        end
     end
 
     -- bind IDs of immutables to globals, used by add_status, spawn, etc.
@@ -1712,17 +1757,27 @@ function bt.BattleScene:create_simulation_environment()
         _state:entity_set_hp(entity, 0)
 
         -- callbacks
-        local callback_id = "on_knocked_out"
         for status_proxy in values(status_backup) do
-            _try_invoke_status_callback(callback_id, status_proxy, entity_proxy)
+            _try_invoke_status_callback("on_knocked_out", status_proxy, entity_proxy)
         end
 
         for consumable_proxy in values(env.list_consumables(entity_proxy)) do
-            _try_invoke_consumable_callback(callback_id, consumable_proxy, entity_proxy)
+            _try_invoke_consumable_callback("on_knocked_out", consumable_proxy, entity_proxy)
+        end
+
+        local user_proxy = _get_current_move_user()
+        if user_proxy ~= nil then
+            for status_proxy in values(env.list_statuses(user_proxy)) do
+                _try_invoke_status_callback("on_knocked_out_other", status_proxy, user_proxy, entity_proxy)
+            end
+
+            for consumable_proxy in values(env.list_consumables(user_proxy)) do
+                _try_invoke_consumable_callback("on_knocked_out_other", consumable_proxy, user_proxy, entity_proxy)
+            end
         end
 
         for global_status_proxy in values(env.list_global_statuses()) do
-            _try_invoke_global_status_callback(callback_id, global_status_proxy, entity_proxy)
+            _try_invoke_global_status_callback("on_knocked_out", global_status_proxy, entity_proxy, user_proxy)
         end
 
         -- now clear values
@@ -1764,17 +1819,27 @@ function bt.BattleScene:create_simulation_environment()
         _scene:push_animation(animation)
         env.append_message(rt.Translation.battle.message.knocked_out_f(entity_proxy))
 
-        local callback_id = "on_helped_up"
         for status_proxy in values(env.list_statuses(entity_proxy)) do
-            _try_invoke_status_callback(callback_id, status_proxy, entity_proxy)
+            _try_invoke_status_callback("on_helped_up", status_proxy, entity_proxy)
         end
 
         for consumable_proxy in values(env.list_consumables(entity_proxy)) do
-            _try_invoke_consumable_callback(callback_id, consumable_proxy, entity_proxy)
+            _try_invoke_consumable_callback("on_helped_up", consumable_proxy, entity_proxy)
+        end
+
+        local user_proxy = _get_current_move_user()
+        if user_proxy ~= nil then
+            for status_proxy in values(env.list_statuses(user_proxy)) do
+                _try_invoke_status_callback("on_helped_up_other", status_proxy, user_proxy, entity_proxy)
+            end
+
+            for consumable_proxy in values(env.list_consumables(user_proxy)) do
+                _try_invoke_consumable_callback("on_helped_up_other", consumable_proxy, user_proxy, entity_proxy)
+            end
         end
 
         for global_status_proxy in values(env.list_global_statuses()) do
-            _try_invoke_global_status_callback(callback_id, global_status_proxy, entity_proxy)
+            _try_invoke_global_status_callback("on_helped_up", global_status_proxy, entity_proxy, user_proxy)
         end
     end
 
@@ -1814,19 +1879,29 @@ function bt.BattleScene:create_simulation_environment()
         _state:entity_set_hp(entity, 0)
 
         -- callbacks after death
-        local callback_id = "on_killed"
         for status_proxy in values(statuses_backup) do
-            _try_invoke_status_callback(callback_id, status_proxy, entity_proxy)
+            _try_invoke_status_callback("on_killed", status_proxy, entity_proxy)
         end
 
         _state:entity_clear_statuses(entity) -- delayed to after status callbacks
 
         for consumable_proxy in values(consumables_backup) do
-            _try_invoke_consumable_callback(callback_id, consumable_proxy, entity_proxy)
+            _try_invoke_consumable_callback("on_killed", consumable_proxy, entity_proxy)
+        end
+
+        local user_proxy = _get_current_move_user()
+        if user_proxy ~= nil then
+            for status_proxy in values(env.list_statuses(user_proxy)) do
+                _try_invoke_status_callback("on_killed_other", status_proxy, user_proxy, entity_proxy)
+            end
+
+            for consumable_proxy in values(env.list_consumables(user_proxy)) do
+                _try_invoke_consumable_callback("on_killed_other", consumable_proxy, user_proxy, entity_proxy)
+            end
         end
 
         for global_status_proxy in values(env.list_global_statuses()) do
-            _try_invoke_global_status_callback(callback_id, global_status_proxy, entity_proxy)
+            _try_invoke_global_status_callback("on_killed", global_status_proxy, entity_proxy, user_proxy)
         end
     end
 
@@ -1864,17 +1939,27 @@ function bt.BattleScene:create_simulation_environment()
 
         _scene:push_animation(animation)
 
-        local callback_id = "on_revived"
         for status_proxy in values(env.list_statuses(entity_proxy)) do
-            _try_invoke_status_callback(callback_id, status_proxy, entity_proxy)
+            _try_invoke_status_callback("on_revived", status_proxy, entity_proxy)
         end
 
         for consumable_proxy in values(env.list_consumables(entity_proxy)) do
-            _try_invoke_consumable_callback(callback_id, consumable_proxy, entity_proxy)
+            _try_invoke_consumable_callback("on_revived", consumable_proxy, entity_proxy)
+        end
+
+        local user_proxy = _get_current_move_user()
+        if user_proxy then
+            for status_proxy in values(env.list_statuses(user_proxy)) do
+                _try_invoke_status_callback("on_revived_other", status_proxy, user_proxy, entity_proxy)
+            end
+
+            for consumable_proxy in values(env.list_consumables(user_proxy)) do
+                _try_invoke_consumable_callback("on_revived_other", consumable_proxy, user_proxy, entity_proxy)
+            end
         end
 
         for global_status_proxy in values(env.list_global_statuses()) do
-            _try_invoke_global_status_callback(callback_id, global_status_proxy, entity_proxy)
+            _try_invoke_global_status_callback("on_revived", global_status_proxy, entity_proxy, user_proxy)
         end
     end
 
@@ -2380,20 +2465,42 @@ function bt.BattleScene:create_simulation_environment()
         env.add_hp(target_proxy, math.max(value, 0))
     end
 
-    env.use_move = function(entity_proxy, move_proxy, ...)
+    env.use_move = function(user_proxy, move_proxy, ...)
         bt.assert_args("use_move",
-            entity_proxy, bt.EntityProxy,
+            user_proxy, bt.EntityProxy,
             move_proxy, bt.MoveProxy
         )
 
-        local targets = {...}
-        for i = 1, select("#", ...) do
-            local target = select(i, ...)
+        local target_proxies = { ...}
+        for target in values(target_proxies) do
             bt.assert_args("use_move", target, bt.EntityProxy)
-            table.insert(targets, target)
+            table.insert(target_proxies, target)
         end
 
-        -- TODO
+        _push_current_move_user(user_proxy)
+        local move = _get_native(move_proxy)
+        if move.effect == nil then
+            bt.error_function("In use_move: move `" .. move:get_id() .. "` has no `effect` function")
+            return
+        end
+
+        do
+            local callback_id = "on_move_used"
+            for status_proxy in values(env.list_statuses(user_proxy)) do
+                _try_invoke_status_callback(callback_id, status_proxy, user_proxy)
+            end
+
+            for consumable_proxy in values(env.list_consumables(user_proxy)) do
+                _try_invoke_consumable_callback(callback_id, consumable_proxy, user_proxy)
+            end
+
+            for global_status_proxy in values(env.list_global_statuses()) do
+                _try_invoke_global_status_callback(callback_id, global_status_proxy, user_proxy, target_proxies)
+            end
+        end
+
+        _scene:invoke(move.effect, move, user_proxy, target_proxies)
+        _pop_current_move_user()
     end
 
     env.start_turn = function()
@@ -2552,8 +2659,8 @@ function bt.BattleScene:create_simulation_environment()
         env.push_message(rt.Translation.battle.message.quicksave_loaded_f())
     end
 
-    env.start_battle = function()
-        -- TODO
+    env.start_battle = function(id)
+
     end
 
     env.win_battle = function()

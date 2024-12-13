@@ -40,12 +40,9 @@ end, {
 
     priority = 0,
 
-    effect = function(self, user, targets)
-        meta.assert_move_interface(self)
-        meta.assert_entity_interface(user)
-        for target in values(targets) do
-            meta.assert_entity_interface(target)
-        end
+    --- (MoveProxy, EntityProxy, Table<EntityProxy>) -> nil
+    effect = function(move_proxy, user_proxy, target_proxies)
+        return nil
     end,
 })
 bt.Move._atlas = {}
