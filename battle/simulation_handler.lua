@@ -350,7 +350,7 @@ function bt.BattleScene:create_simulation_environment()
         {"consumable_proxy", bt.ConsumableProxy},
         {"equip_proxy", bt.EquipProxy}
     ) do
-        local name, type = table.unpack(name, type)
+        local name, type = table.unpack(name_type)
         env["is_" .. name] = function(x)
             if meta.is_table(x) then
                 local metatable = getmetatable(x)
@@ -2660,7 +2660,43 @@ function bt.BattleScene:create_simulation_environment()
     end
 
     env.start_battle = function(id)
+        local battle = bt.Battle(id)
 
+        -- clear state if present
+        for enemy in values(_state:list_all_enemies()) do
+            _state:remove_entity(enemy)
+        end
+
+        for global_status in values(_state:list_global_statuses()) do
+            _state:remove_global_status(global_status)
+        end
+
+        local n_enemies = battle:get_n_enemies()
+        for enemy_i = 1, n_enemies do
+            local entity = bt.Entity(_state, battle:get_enemy_id(enemy_i))
+            _state:add_entity(entity)
+            for move in values(battle:get_enemy_moves(enemy_i)) do
+                _state:entity_add_move(entity, move)
+            end
+
+            for equip_i, equip in ipairs(battle:get_enemy_equips(enemy_i)) do
+                _state:entity_add_equip(entity, equip_i, equip)
+            end
+
+            for consumable_i, consumable in ipairs(battle:get_enemy_consumables(enemy_i)) do
+                _state:entity_add_consumable(entity, consumable_i, consumable)
+            end
+
+            for status in values(battle:get_enemy_statuses(enemy_i)) do
+                _state:entity_add_status(entity, status)
+            end
+        end
+
+        for global_status in values(battle:get_global_statuses()) do
+            _state:add_global_status(global_status)
+        end
+
+        _scene:create_from_state()
     end
 
     env.win_battle = function()

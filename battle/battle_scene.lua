@@ -236,7 +236,8 @@ function bt.BattleScene:reformat_enemy_sprites()
     local width = (4 / 3 * self._bounds.height) - 2 * outer_margin
     local sprite_m = math.min(m, (width - total_w) / (n_enemies - 1))
 
-    local sprite_order = {1}
+    local sprite_order = {}
+    if n_enemies >= 1 then table.insert(sprite_order, 1) end
     for i = 2, n_enemies do
         if i % 2 == 0 then
             table.insert(sprite_order, i)
@@ -525,6 +526,8 @@ end
 --- @brief
 function bt.BattleScene:_handle_button_pressed(which)
     if which == rt.InputButton.A then
+        self._env.start_battle("DEBUG_BATTLE")
+        --[[
         local target = self._state:list_enemies()[1]
         local proxy = bt.create_entity_proxy(self, target)
         --self._env.knock_out(proxy)
@@ -547,9 +550,6 @@ function bt.BattleScene:_handle_button_pressed(which)
         )
         --self:push_animation(bt.Animation.SWAP(self, self:get_sprite(enemies[1]), self:get_sprite(enemies[2])))
         ]]--
-
-        self:push_animation(bt.Animation.PRIORITY_RAISED(self, self:get_sprite(self._state:list_enemies()[1])))
-
 
         --self._game_over_screen:set_is_expanded(not self._game_over_screen:get_is_expanded())
 

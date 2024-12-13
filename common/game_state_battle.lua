@@ -166,35 +166,29 @@ function rt.GameState:remove_entity(entity)
     meta.assert_isa(entity, bt.Entity)
 
     local state = self._state
-
     local entity_i = self._entity_to_entity_index[entity]
     if entity_i == nil then
         rt.error("In rt.GameState:entity_remove: trying to remove entity `" .. entity:get_id() .. "`, but entity was not yet added to game state")
         return
     end
 
-    state.n_entities = state.n_entities - 1
-
-    local entities = self:list_entities()
-    for i, e in ipairs(entities) do
-        if e == entity then
-            table.remove(entities, i)
-            break
-        end
+    local i_to_entity_backup = {}
+    for i, e in pairs(self._entity_index_to_entity) do
+        i_to_entity_backup[i] = e
     end
 
-    table.remove(state.entities[entity_i])
+    table.remove(state.entities, entity_i)
+    table.remove(i_to_entity_backup, entity_i)
 
-    -- rebuild indices
     state.entity_id_to_index = {}
     self._entity_index_to_entity = {}
     self._entity_to_entity_index = {}
-    -- do not reset multiplicity
 
-    for i, entity in ipairs(entities) do
-        state.entity_id_to_index[entity:get_id()] = i
-        self._entity_index_to_entity[i] = entity
-        self._entity_to_entity_index[entity] = i
+    for i, entry in ipairs(state.entities) do
+        entry.index = i
+        state.entity_id_to_index[entry.id] = i
+        self._entity_index_to_entity[i] = i_to_entity_backup[i]
+        self._entity_to_entity_index[i_to_entity_backup[i]] = i
     end
 end
 
@@ -269,10 +263,32 @@ function rt.GameState:list_party()
 end
 
 --- @brief
+function rt.GameState:list_all_party()
+    local out = {}
+    for i, entity in ipairs(self._entity_index_to_entity) do
+        if entity:get_is_enemy() == false then
+            table.insert(out, entity)
+        end
+    end
+    return out
+end
+
+--- @brief
 function rt.GameState:list_enemies()
     local out = {}
     for i, entity in ipairs(self._entity_index_to_entity) do
         if self:entity_get_state(entity) ~= bt.EntityState.DEAD and entity:get_is_enemy() == true then
+            table.insert(out, entity)
+        end
+    end
+    return out
+end
+
+--- @brief
+function rt.GameState:list_all_enemies()
+    local out = {}
+    for i, entity in ipairs(self._entity_index_to_entity) do
+        if entity:get_is_enemy() == true then
             table.insert(out, entity)
         end
     end
@@ -1892,13 +1908,11 @@ function rt.GameState:initialize_debug_state()
         bt.Entity(self, "MC"),
         bt.Entity(self, "PROF"),
         bt.Entity(self, "GIRL"),
-        bt.Entity(self, "RAT"),
-        bt.Entity(self, "BOULDER"),
+        bt.Entity(self, "RAT")
     }
 
-    local n_sprouts = 2
-    for i = 1, n_sprouts do
-        table.insert(entities, bt.Entity(self, "WALKING_SPROUT"))
+    for entity in values(entities) do
+        self:add_entity(entity)
     end
 
     rt.random.seed(0)
@@ -1932,7 +1946,6 @@ function rt.GameState:initialize_debug_state()
             end
         end
 
-        --self:entity_add_status(entity, bt.Status("DEBUG_STATUS"))
         self:entity_set_hp(entity, entity:get_hp_base())
     end
 

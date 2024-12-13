@@ -113,8 +113,6 @@ function bt.Entity:realize()
     }
 
     rt.load_config(self._path, self, template)
-    self._state:add_entity(self)
-
     meta.set_is_mutable(self, false)
 end
 

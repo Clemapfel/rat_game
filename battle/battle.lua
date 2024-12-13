@@ -130,7 +130,7 @@ end
 
 --- @brief
 function bt.Battle:load_config(id)
-    local path = rt.settings.battle.battle .. "/" .. id
+    local path = rt.settings.battle.battle.config_path .. "/" .. id .. ".lua"
     local load_success, chunk_or_error, love_error = pcall(love.filesystem.load, path)
     if not load_success then
         rt.error("In bt.Battle.load_config: error when parsing config at `" .. path .. "`: " .. chunk_or_error)
@@ -149,16 +149,10 @@ function bt.Battle:load_config(id)
     end
 
     local function throw(reason)
-        rt.error("In bt.Battle.load_config: error when loading config at `" .. path .. "`: " .. throw)
+        rt.error("In bt.Battle.load_config: error when loading config at `" .. path .. "`: " .. reason)
     end
 
     local config = config_or_error
-    if config.id == nil or not meta.is_string(config.id) then
-        throw("expected `id`, got `" .. meta.typeof(config.id) .. "`")
-        return
-    else
-        self._id = config.id
-    end
 
     if config.global_statuses == nil then config.global_statuses = {} end
     self._global_statuses = {}
@@ -197,12 +191,16 @@ function bt.Battle:load_config(id)
             return
         end
 
-        for move_i, move_id in values(config_entry.moves) do
-            if not meta.is_string(move_id) then
-                throw("in config.enemies[" .. enemy_i .. "].moves[" .. move_i .. "]: expected `string`, got `" .. meta.typeof(move_id) .. "`")
-                return
+        do
+            local move_i = 1
+            for _, move_id in pairs(config_entry.moves) do
+                if not meta.is_string(move_id) then
+                    throw("in config.enemies[" .. enemy_i .. "].moves[" .. move_i .. "]: expected `string`, got `" .. meta.typeof(move_id) .. "`")
+                    return
+                end
+                table.insert(entry.moves, bt.Move(move_id))
+                move_i = move_i + 1
             end
-            table.insert(entry.moves, bt.Move(move_id))
         end
 
         if config_entry.statuses == nil then config_entry.statuses = {} end
@@ -211,12 +209,16 @@ function bt.Battle:load_config(id)
             return
         end
 
-        for status_i, status_id in values(config_entry.statuses) do
-            if not meta.is_string(move_id) then
-                throw("in config.enemies[" .. enemy_i .. "].statuses[" .. status_i .. "]: expected `string`, got `" .. meta.typeof(status_id) .. "`")
-                return
+        do
+            local status_i = 1
+            for _, status_id in pairs(config_entry.statuses) do
+                if not meta.is_string(status_id) then
+                    throw("in config.enemies[" .. enemy_i .. "].statuses[" .. status_i .. "]: expected `string`, got `" .. meta.typeof(status_id) .. "`")
+                    return
+                end
+                table.insert(entry.statuses, bt.Status(status_id))
+                status_i = status_i + 1
             end
-            table.insert(entry.moves, bt.Status(status_id))
         end
 
         if config_entry.consumables == nil then config_entry.consumables = {} end
@@ -225,12 +227,16 @@ function bt.Battle:load_config(id)
             return
         end
 
-        for consumable_i, consumable_id in values(config_entry.consumables) do
-            if not meta.is_string(consumable_id) then
-                throw("in config.enemies[" .. enemy_i .. "].consumables[" .. consumable_i .. "]: expected `string`, got `" .. meta.typeof(consumable_id) .. "`")
-                return
+        do
+            local consumable_i = 1
+            for _, consumable_id in pairs(config_entry.consumables) do
+                if not meta.is_string(consumable_id) then
+                    throw("in config.enemies[" .. enemy_i .. "].consumables[" .. consumable_i .. "]: expected `string`, got `" .. meta.typeof(consumable_id) .. "`")
+                    return
+                end
+                table.insert(entry.consumables, bt.Consumable(consumable_id))
+                consumable_i = consumable_i + 1
             end
-            table.insert(entry.moves, bt.Consumable(consumable_id))
         end
 
         if config_entry.equips == nil then config_entry.equips = {} end
@@ -239,14 +245,19 @@ function bt.Battle:load_config(id)
             return
         end
 
-        for equip_i, equip_id in values(config_entry.equips) do
-            if not meta.is_string(equip_id) then
-                throw("in config.enemies[" .. enemy_i .. "].equips[" .. equip_i .. "]: expected `string`, got `" .. meta.typeof(equip_id) .. "`")
-                return
+        do
+            local equip_i = 1
+            for _, equip_id in pairs(config_entry.equips) do
+                if not meta.is_string(equip_id) then
+                    throw("in config.enemies[" .. enemy_i .. "].equips[" .. equip_i .. "]: expected `string`, got `" .. meta.typeof(equip_id) .. "`")
+                    return
+                end
+                table.insert(entry.equips, bt.Equip(equip_id))
+                equip_i = equip_i + 1
             end
-            table.insert(entry.moves, bt.Equip(equip_id))
         end
 
+        table.insert(self._enemies, entry)
         enemy_i = enemy_i + 1
     end
 end
@@ -254,4 +265,18 @@ end
 --- @brief
 function bt.Battle:get_background()
     return rt.Background[self._background_id]
+end
+
+--- @brief
+function bt.Battle:get_n_enemies()
+    return sizeof(self._enemies)
+end
+
+--- @brief
+function bt.Battle:get_global_statuses()
+    local out = {}
+    for status in values(self._global_statuses) do
+        table.insert(out, status)
+    end
+    return out
 end

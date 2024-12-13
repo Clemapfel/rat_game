@@ -22,18 +22,14 @@
     </configurations>
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="7fa9ba1b-2cff-4ecc-86fb-59ab2fa76ee1" name="Changes" comment="stashing 4 vertices">
-      <change afterPath="$PROJECT_DIR$/assets/configs/battles/DEBUG_BATTLE.lua" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/battle/battle.lua" afterDir="false" />
+    <list default="true" id="7fa9ba1b-2cff-4ecc-86fb-59ab2fa76ee1" name="Changes" comment="stashing before starting battle from env">
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/assets/configs/statuses/DEBUG_STATUS.lua" beforeDir="false" afterPath="$PROJECT_DIR$/assets/configs/statuses/DEBUG_STATUS.lua" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/battle/consumable.lua" beforeDir="false" afterPath="$PROJECT_DIR$/battle/consumable.lua" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/battle/global_status.lua" beforeDir="false" afterPath="$PROJECT_DIR$/battle/global_status.lua" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/battle/move.lua" beforeDir="false" afterPath="$PROJECT_DIR$/battle/move.lua" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/battle/battle.lua" beforeDir="false" afterPath="$PROJECT_DIR$/battle/battle.lua" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/battle/battle_scene.lua" beforeDir="false" afterPath="$PROJECT_DIR$/battle/battle_scene.lua" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/battle/entity.lua" beforeDir="false" afterPath="$PROJECT_DIR$/battle/entity.lua" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/battle/simulation_handler.lua" beforeDir="false" afterPath="$PROJECT_DIR$/battle/simulation_handler.lua" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/battle/status.lua" beforeDir="false" afterPath="$PROJECT_DIR$/battle/status.lua" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/main.lua" beforeDir="false" afterPath="$PROJECT_DIR$/main.lua" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/main_tesselation.lua" beforeDir="false" afterPath="$PROJECT_DIR$/main_tesselation.lua" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/common/game_state_battle.lua" beforeDir="false" afterPath="$PROJECT_DIR$/common/game_state_battle.lua" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/include.lua" beforeDir="false" afterPath="$PROJECT_DIR$/include.lua" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -685,15 +681,7 @@
       <workItem from="1733775630553" duration="4991000" />
       <workItem from="1733850643234" duration="23919000" />
       <workItem from="1733958947216" duration="8190000" />
-      <workItem from="1734050208171" duration="11529000" />
-    </task>
-    <task id="LOCAL-01271" summary="added path parameterization override">
-      <option name="closed" value="true" />
-      <created>1732564132174</created>
-      <option name="number" value="01271" />
-      <option name="presentableId" value="LOCAL-01271" />
-      <option name="project" value="LOCAL" />
-      <updated>1732564132174</updated>
+      <workItem from="1734050208171" duration="14582000" />
     </task>
     <task id="LOCAL-01272" summary="naive implementation working">
       <option name="closed" value="true" />
@@ -1079,7 +1067,15 @@
       <option name="project" value="LOCAL" />
       <updated>1734058738607</updated>
     </task>
-    <option name="localTasksCounter" value="1320" />
+    <task id="LOCAL-01320" summary="stashing before starting battle from env">
+      <option name="closed" value="true" />
+      <created>1734115436607</created>
+      <option name="number" value="01320" />
+      <option name="presentableId" value="LOCAL-01320" />
+      <option name="project" value="LOCAL" />
+      <updated>1734115436607</updated>
+    </task>
+    <option name="localTasksCounter" value="1321" />
     <servers />
   </component>
   <component name="TypeScriptGeneratedFilesManager">
@@ -1128,7 +1124,6 @@
     </option>
   </component>
   <component name="VcsManagerConfiguration">
-    <MESSAGE value="stashing parallel count" />
     <MESSAGE value="sequential working" />
     <MESSAGE value="multi-pass shader working" />
     <MESSAGE value="1 pass radix sort done" />
@@ -1153,7 +1148,8 @@
     <MESSAGE value="added twinkle, stashing" />
     <MESSAGE value="added debug configs" />
     <MESSAGE value="stashing 4 vertices" />
-    <option name="LAST_COMMIT_MESSAGE" value="stashing 4 vertices" />
+    <MESSAGE value="stashing before starting battle from env" />
+    <option name="LAST_COMMIT_MESSAGE" value="stashing before starting battle from env" />
   </component>
   <component name="XDebuggerManager">
     <breakpoint-manager>
@@ -1193,11 +1189,6 @@
           <url>file://$PROJECT_DIR$/older/~common/vertex_shape.lua</url>
           <line>376</line>
           <option name="timeStamp" value="31" />
-        </line-breakpoint>
-        <line-breakpoint enabled="true" type="lua-line">
-          <url>file://$PROJECT_DIR$/battle/global_status.lua</url>
-          <line>20</line>
-          <option name="timeStamp" value="32" />
         </line-breakpoint>
         <line-breakpoint enabled="true" suspend="NONE" type="CMakeLineBreakpoint">
           <url>file://$PROJECT_DIR$/physics/box2d_extension/CMakeLists.txt</url>
