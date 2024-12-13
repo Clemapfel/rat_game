@@ -101,7 +101,7 @@ end, {
     end,
 
     -- (GlobalStatusProxy, EntityProxy) -> nil
-    on_knocked_out = function(self, knocked_out_entity)
+    on_knocked_out = function(self, knocked_out_entitymain)
         return nil
     end,
 

@@ -330,23 +330,6 @@ function bt.BattleScene:create_simulation_environment()
         env[no] = nil
     end
 
-    -- debug
-    for which in range(
-        "is_number",
-        "is_string",
-        "is_boolean",
-        "is_table",
-        "is_entity_proxy",
-        "is_move_proxy",
-        "is_status_proxy",
-        "is_global_status_proxy",
-        "is_consumable_proxy",
-        "is_equip_proxy"
-    ) do
-        env[which] = bt[which]
-        env["assert_" .. which] = bt["assert_" .. which]
-    end
-
     -- bind IDs of immutables to globals, used by add_status, spawn, etc.
     local entity_prefix = "ENTITY"
     local consumable_prefix = "CONSUMABLE"
