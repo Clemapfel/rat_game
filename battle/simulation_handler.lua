@@ -2671,8 +2671,11 @@ function bt.BattleScene:create_simulation_environment()
             _state:remove_global_status(global_status)
         end
 
+        local animations = {}
+
         local n_enemies = battle:get_n_enemies()
         for enemy_i = 1, n_enemies do
+            --rework animation to poll sprite on startup
             local entity = bt.Entity(_state, battle:get_enemy_id(enemy_i))
             _state:add_entity(entity)
             for move in values(battle:get_enemy_moves(enemy_i)) do

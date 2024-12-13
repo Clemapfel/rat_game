@@ -31,49 +31,41 @@ end
 
 --- ### GLOBALS ###
 
-n_horizontal_vertices = 0
-n_vertical_vertices = 0
-
-a_x, a_y = 0, 0
-b_x, b_y = 0, 0
-c_x, c_y = 0, 0
-d_x, d_y = 0, 0
-
-active_vertex = 0 -- 0 none, 1 top left, 2 top right, 3 bottom right, 4 bottom left
+vertices = {}
+active_vertex_i = 0
+n_vertices = 0
 vertex_radius = 15
 
 love.load = function(delta)
     local center_x, center_y = 0.5 * love.graphics.getWidth(), 0.5 * love.graphics.getHeight()
     local x_radius, y_radius = 200, 100
-    
-    a_x, a_y = center_x, center_y
-    b_x, b_y = center_x + x_radius, center_y
-    c_x, c_y = center_x, center_y + y_radius
+
+    local origin_x, origin_y = center_x, center_y
+    local w, h = 100, 100
+    vertices = {}
+    table.insert(vertices, {origin_x, origin_y})
+    table.insert(vertices, {origin_x + w, origin_y})
+    table.insert(vertices, {origin_x, origin_y + h})
+    n_vertices = sizeof(vertices)
 end
 
 love.mousepressed = function(x, y)
-    if ts.distance(x, y, a_x, a_y) < vertex_radius then
-        active_vertex = 1
-    elseif ts.distance(x, y, b_x, b_y) < vertex_radius then
-        active_vertex = 2
-    elseif ts.distance(x, y, c_x, c_y) < vertex_radius then
-        active_vertex = 3
+    for i, point in ipairs(vertices) do
+        if ts.distance(x, y, point[1], point[2]) < vertex_radius then
+            active_vertex_i = i
+            break
+        end
     end
 end
 
 love.mousereleased = function()
-    active_vertex = 0
+    active_vertex_i = 0
 end
 
 love.mousemoved = function(x, y)
-    if active_vertex > 0 then
-        if active_vertex == 1 then
-            a_x, a_y = x, y
-        elseif active_vertex == 2 then
-            b_x, b_y = x, y
-        elseif active_vertex == 3 then
-            c_x, c_y = x, y
-        end
+    if active_vertex_i > 0 then
+        vertices[active_vertex_i][1] = x
+        vertices[active_vertex_i][2] = y
     end
 end
 
@@ -82,13 +74,30 @@ local active_vertex_color = {rt.color_unpack(rt.Palette.GREEN_1)}
 
 local black = {rt.color_unpack(rt.Palette.BLACK)}
 local line_color = {rt.color_unpack(rt.Palette.RED_3)}
+local vector_line_color = {rt.color_unpack(rt.Palette.BLUE_2)}
+love.draw = function()
+    if n_vertices == 0 then return end
 
-do
-    local _draw_vertex = function(i, x, y)
+
+    local a_x, a_y = table.unpack(vertices[1])
+    local b_x, b_y = table.unpack(vertices[2])
+    local c_x, c_y = table.unpack(vertices[3])
+    local d_x, d_y = b_x + c_x - a_x, b_y + c_y - a_y
+
+    love.graphics.setColor(table.unpack(line_color))
+    love.graphics.line(a_x, a_y, b_x, b_y)
+    love.graphics.line(a_x, a_y, c_x, c_y)
+
+    love.graphics.setColor(table.unpack(vector_line_color))
+    love.graphics.line(b_x, b_y, d_x, d_y)
+    love.graphics.line(c_x, c_y, d_x, d_y)
+
+    for i = 1, n_vertices do
+        local x,y = table.unpack(vertices[i])
         love.graphics.setColor(table.unpack(black))
         love.graphics.circle("fill", x, y, vertex_radius + 2)
 
-        if active_vertex == i then
+        if i == active_vertex_i then
             love.graphics.setColor(table.unpack(active_vertex_color))
         else
             love.graphics.setColor(table.unpack(vertex_color))
@@ -96,26 +105,8 @@ do
         love.graphics.circle("fill", x, y, vertex_radius)
     end
 
-    love.draw = function()
-
-        d_x = c_x + a_x - b_x
-        d_y = c_y + a_y - b_y
-
-        love.graphics.setLineWidth(3)
-        love.graphics.setColor(table.unpack(line_color))
-        love.graphics.line(
-            a_x, a_y,
-            b_x, b_y,
-            c_x, c_y,
-            d_x, d_y,
-            a_x, a_y
-        )
-
-        _draw_vertex(1, a_x, a_y)
-        _draw_vertex(2, b_x, b_y)
-        _draw_vertex(3, c_x, c_y)
-        _draw_vertex(nil, d_x, d_y)
-    end
+    love.graphics.setColor(table.unpack(vector_line_color))
+    love.graphics.circle("fill", d_x, d_y, vertex_radius)
 end
 
 --[[

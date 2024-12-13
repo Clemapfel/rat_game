@@ -22,14 +22,10 @@
     </configurations>
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="7fa9ba1b-2cff-4ecc-86fb-59ab2fa76ee1" name="Changes" comment="stashing before starting battle from env">
+    <list default="true" id="7fa9ba1b-2cff-4ecc-86fb-59ab2fa76ee1" name="Changes" comment="start battle with no animation working">
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/battle/battle.lua" beforeDir="false" afterPath="$PROJECT_DIR$/battle/battle.lua" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/battle/battle_scene.lua" beforeDir="false" afterPath="$PROJECT_DIR$/battle/battle_scene.lua" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/battle/entity.lua" beforeDir="false" afterPath="$PROJECT_DIR$/battle/entity.lua" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/battle/simulation_handler.lua" beforeDir="false" afterPath="$PROJECT_DIR$/battle/simulation_handler.lua" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/common/game_state_battle.lua" beforeDir="false" afterPath="$PROJECT_DIR$/common/game_state_battle.lua" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/include.lua" beforeDir="false" afterPath="$PROJECT_DIR$/include.lua" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/main_tesselation.lua" beforeDir="false" afterPath="$PROJECT_DIR$/main_tesselation.lua" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -160,7 +156,7 @@
       <recent name="C:\Users\cleme\Workspace\rat_game\old" />
     </key>
   </component>
-  <component name="RunManager" selected="Lua Application.main">
+  <component name="RunManager" selected="Lua Application.main_tesselation">
     <configuration name="Makefile" type="MAKEFILE_TARGET_RUN_CONFIGURATION" factoryName="Makefile" temporary="true">
       <makefile filename="$PROJECT_DIR$/midi/lovemidi/Makefile" target="" workingDirectory="" arguments="">
         <envs />
@@ -681,15 +677,7 @@
       <workItem from="1733775630553" duration="4991000" />
       <workItem from="1733850643234" duration="23919000" />
       <workItem from="1733958947216" duration="8190000" />
-      <workItem from="1734050208171" duration="14582000" />
-    </task>
-    <task id="LOCAL-01272" summary="naive implementation working">
-      <option name="closed" value="true" />
-      <created>1732641868616</created>
-      <option name="number" value="01272" />
-      <option name="presentableId" value="LOCAL-01272" />
-      <option name="project" value="LOCAL" />
-      <updated>1732641868616</updated>
+      <workItem from="1734050208171" duration="16853000" />
     </task>
     <task id="LOCAL-01273" summary="stashing before shader rework">
       <option name="closed" value="true" />
@@ -1075,7 +1063,15 @@
       <option name="project" value="LOCAL" />
       <updated>1734115436607</updated>
     </task>
-    <option name="localTasksCounter" value="1321" />
+    <task id="LOCAL-01321" summary="start battle with no animation working">
+      <option name="closed" value="true" />
+      <created>1734118697179</created>
+      <option name="number" value="01321" />
+      <option name="presentableId" value="LOCAL-01321" />
+      <option name="project" value="LOCAL" />
+      <updated>1734118697180</updated>
+    </task>
+    <option name="localTasksCounter" value="1322" />
     <servers />
   </component>
   <component name="TypeScriptGeneratedFilesManager">
@@ -1124,7 +1120,6 @@
     </option>
   </component>
   <component name="VcsManagerConfiguration">
-    <MESSAGE value="sequential working" />
     <MESSAGE value="multi-pass shader working" />
     <MESSAGE value="1 pass radix sort done" />
     <MESSAGE value="sorting working" />
@@ -1149,7 +1144,8 @@
     <MESSAGE value="added debug configs" />
     <MESSAGE value="stashing 4 vertices" />
     <MESSAGE value="stashing before starting battle from env" />
-    <option name="LAST_COMMIT_MESSAGE" value="stashing before starting battle from env" />
+    <MESSAGE value="start battle with no animation working" />
+    <option name="LAST_COMMIT_MESSAGE" value="start battle with no animation working" />
   </component>
   <component name="XDebuggerManager">
     <breakpoint-manager>
