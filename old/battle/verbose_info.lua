@@ -43,7 +43,7 @@ function bt.VerboseInfo:_add(make_visible, ...)
                 page = bt.VerboseInfo.Page.GLOBAL_STATUS(table.unpack(t))
             elseif meta.isa(object, bt.Consumable) then
                 page = bt.VerboseInfo.Page.CONSUMABLE(table.unpack(t))
-            elseif meta.isa(object, bt.Equip) then
+            elseif meta.isa(object, bt.EquipConfig) then
                 page = bt.VerboseInfo.Page.EQUIP(table.unpack(t))
             else
                 rt.error("In bt.VerboseInfo.add: unhandled entity type `" .. meta.typeof(object) .. "`")

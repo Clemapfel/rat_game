@@ -47,7 +47,7 @@ function mn.Template:list_equips(entity)
     meta.assert_isa(entity, bt.Entity)
     local out = {}
     for id in values(self._entities[entity].equips) do
-        table.insert(out, bt.Equip(id))
+        table.insert(out, bt.EquipConfig(id))
     end
     return out
 end
@@ -57,7 +57,7 @@ function mn.Template:list_consumables(entity)
     meta.assert_isa(entity, bt.Entity)
     local out = {}
     for id in values(self._entities[entity].consumables) do
-        table.insert(out, bt.Consumable(id))
+        table.insert(out, bt.ConsumableConfig(id))
     end
     return out
 end

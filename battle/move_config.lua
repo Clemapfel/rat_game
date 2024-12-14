@@ -4,13 +4,13 @@ rt.settings.battle.move = {
     default_animation_id = "MOVE_DEFAULT"
 }
 
---- @class bt.Move
+--- @class bt.MoveConfig
 --- @brief cached instancing, moves with the same ID will always return the same instance
-bt.Move = meta.new_type("Move", function(id)
-    local out = bt.Move._atlas[id]
+bt.MoveConfig = meta.new_type("Move", function(id)
+    local out = bt.MoveConfig._atlas[id]
     if out == nil then
         local path = rt.settings.battle.move.config_path .. "/" .. id .. ".lua"
-        out = meta.new(bt.Move, {
+        out = meta.new(bt.MoveConfig, {
             id = id,
             name = "UNINITIALIZED MOVE @" .. path,
             _path = path,
@@ -18,7 +18,7 @@ bt.Move = meta.new_type("Move", function(id)
         })
         out:realize()
         meta.set_is_mutable(out, false)
-        bt.Move._atlas[id] = out
+        bt.MoveConfig._atlas[id] = out
     end
     return out
 end, {
@@ -45,10 +45,10 @@ end, {
         return nil
     end,
 })
-bt.Move._atlas = {}
+bt.MoveConfig._atlas = {}
 
 --- @brief
-function bt.Move:realize()
+function bt.MoveConfig:realize()
     if self._is_realized == true then return end
     self.effect = nil
 
@@ -77,74 +77,74 @@ function bt.Move:realize()
     meta.set_is_mutable(self, false)
 
     if self.effect == nil then
-        rt.error("In bt.Move:realize: config at `" .. self._path .. "` does not implement `effect`, value is left nil")
+        rt.error("In bt.MoveConfig:realize: config at `" .. self._path .. "` does not implement `effect`, value is left nil")
     end
 end
 
 --- @brief
-function bt.Move:get_id()
+function bt.MoveConfig:get_id()
     return self.id
 end
 
 --- @brief
-function bt.Move:get_name()
+function bt.MoveConfig:get_name()
     return self.name
 end
 
 --- @brief
-function bt.Move:get_max_n_uses()
+function bt.MoveConfig:get_max_n_uses()
     return self.max_n_uses
 end
 
 --- @brief
-function bt.Move:get_can_target_multiple()
+function bt.MoveConfig:get_can_target_multiple()
     return self.can_target_multiple
 end
 
 --- @brief
-function bt.Move:get_can_target_self()
+function bt.MoveConfig:get_can_target_self()
     return self.can_target_self
 end
 
 --- @brief
-function bt.Move:get_can_target_ally()
+function bt.MoveConfig:get_can_target_ally()
     return self.can_target_ally
 end
 
-function bt.Move:get_can_target_allies()
+function bt.MoveConfig:get_can_target_allies()
     return self:get_can_target_ally()
 end
 
 --- @brief
-function bt.Move:get_can_target_enemy()
+function bt.MoveConfig:get_can_target_enemy()
     return self.can_target_enemy
 end
 
-function bt.Move:get_can_target_enemies()
+function bt.MoveConfig:get_can_target_enemies()
     return self:get_can_target_enemy()
 end
 
 --- @brief
-function bt.Move:get_sprite_id()
+function bt.MoveConfig:get_sprite_id()
     return self.sprite_id, self.sprite_index
 end
 
 --- @brief
-function bt.Move:get_description()
+function bt.MoveConfig:get_description()
     return self.description
 end
 
 --- @brief
-function bt.Move:get_flavor_text()
+function bt.MoveConfig:get_flavor_text()
     return self.flavor_text
 end
 
 --- @brief
-function bt.Move:get_priority()
+function bt.MoveConfig:get_priority()
     return self.priority
 end
 
 --- @brief
-function bt.Move:get_is_intrinsic()
+function bt.MoveConfig:get_is_intrinsic()
     return self.is_intrinsic
 end

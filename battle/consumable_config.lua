@@ -3,19 +3,19 @@ rt.settings.battle.consumable = {
     name = "Item"
 }
 
---- @class bt.Consumable
-bt.Consumable = meta.new_type("Consumable", function(id)
-    local out = bt.Consumable._atlas[id]
+--- @class bt.ConsumableConfig
+bt.ConsumableConfig = meta.new_type("ConsumableConfig", function(id)
+    local out = bt.ConsumableConfig._atlas[id]
     if out == nil then
         local path = rt.settings.battle.consumable.config_path .. "/" .. id .. ".lua"
-        out = meta.new(bt.Consumable, {
+        out = meta.new(bt.ConsumableConfig, {
             id = id,
             _path = path,
             _is_realized = false
         })
         out:realize()
         meta.set_is_mutable(out, false)
-        bt.Consumable._atlas[id] = out
+        bt.ConsumableConfig._atlas[id] = out
     end
     return out
 end, {
@@ -182,10 +182,10 @@ end, {
     sprite_id = "",
     sprite_index = 1
 })
-bt.Consumable._atlas = {}
+bt.ConsumableConfig._atlas = {}
 
 --- @brief
-function bt.Consumable:realize()
+function bt.ConsumableConfig:realize()
     if self._is_realized == true then return end
 
     local functions = {
@@ -247,37 +247,37 @@ function bt.Consumable:realize()
 end
 
 --- @brief
-function bt.Consumable:get_id()
+function bt.ConsumableConfig:get_id()
     return self.id
 end
 
 --- @brief
-function bt.Consumable:get_name()
+function bt.ConsumableConfig:get_name()
     return self.name
 end
 
 --- @brief
-function bt.Consumable:get_max_n_uses()
+function bt.ConsumableConfig:get_max_n_uses()
     return self.max_n_uses
 end
 
 --- @brief
-function bt.Consumable:get_sprite_id()
+function bt.ConsumableConfig:get_sprite_id()
     return self.sprite_id, self.sprite_index
 end
 
 --- @brief
-function bt.Consumable:get_is_silent()
+function bt.ConsumableConfig:get_is_silent()
     return self.is_silent
 end
 
 --- @brief
-function bt.Consumable:get_description()
+function bt.ConsumableConfig:get_description()
     return self.description
 end
 
 --- @brief
-function bt.Consumable:get_flavor_text()
+function bt.ConsumableConfig:get_flavor_text()
     return self.flavor_text
 end
 

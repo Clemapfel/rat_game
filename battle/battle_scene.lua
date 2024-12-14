@@ -15,7 +15,7 @@ bt.BattleScene = meta.new_type("BattleScene", rt.Scene, function(state)
         _quicksave_indicator = bt.QuicksaveIndicator(),
 
         _global_status_bar = bt.OrderedBox(),
-        _global_status_to_sprite = {}, -- Table<bt.GlobalStatus, rt.Sprite>
+        _global_status_to_sprite = {}, -- Table<bt.GlobalStatusConfig, rt.Sprite>
 
         _entity_to_sprite = {},
 
@@ -419,7 +419,7 @@ end
 
 --- @brief
 function bt.BattleScene:add_global_status(status, n_turns_left)
-    meta.assert_isa(status, bt.GlobalStatus)
+    meta.assert_isa(status, bt.GlobalStatusConfig)
     meta.assert_number(n_turns_left)
 
     if self._global_status_to_sprite[status] ~= nil then
@@ -439,7 +439,7 @@ end
 
 --- @brief
 function bt.BattleScene:remove_global_status(status)
-    meta.assert_isa(status, bt.GlobalStatus)
+    meta.assert_isa(status, bt.GlobalStatusConfig)
 
     local sprite = self._global_status_to_sprite[status]
     if sprite == nil then
@@ -453,7 +453,7 @@ end
 
 --- @brief
 function bt.BattleScene:set_global_status_n_turns_left(status, n_turns_left)
-    meta.assert_isa(status, bt.GlobalStatus)
+    meta.assert_isa(status, bt.GlobalStatusConfig)
     meta.assert_number(n_turns_left)
 
     local sprite = self._global_status_to_sprite[status]
@@ -471,7 +471,7 @@ end
 
 --- @brief
 function bt.BattleScene:activate_global_status(status, on_done_notify)
-    meta.assert_isa(status, bt.Status)
+    meta.assert_isa(status, bt.StatusConfig)
 
     local sprite = self._global_status_to_sprite[status]
     if sprite == nil then

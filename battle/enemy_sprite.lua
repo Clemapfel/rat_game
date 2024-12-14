@@ -166,7 +166,7 @@ end
 
 --- @brief
 function bt.EnemySprite:add_status(status, n_turns_left)
-    meta.assert_isa(status, bt.Status)
+    meta.assert_isa(status, bt.StatusConfig)
     meta.assert_number(n_turns_left)
 
     if self._status_to_sprite[status] ~= nil then
@@ -186,7 +186,7 @@ end
 
 --- @brief
 function bt.EnemySprite:remove_status(status)
-    meta.assert_isa(status, bt.Status)
+    meta.assert_isa(status, bt.StatusConfig)
 
     local sprite = self._status_to_sprite[status]
     if sprite == nil then
@@ -199,7 +199,7 @@ end
 
 --- @brief
 function bt.EnemySprite:set_status_n_turns_left(status, n_turns_left)
-    meta.assert_isa(status, bt.Status)
+    meta.assert_isa(status, bt.StatusConfig)
     meta.assert_number(n_turns_left)
 
     local sprite = self._status_to_sprite[status]
@@ -217,7 +217,7 @@ end
 
 --- @brief
 function bt.EnemySprite:activate_status(status, on_done_notify)
-    meta.assert_isa(status, bt.Status)
+    meta.assert_isa(status, bt.StatusConfig)
 
     local sprite = self._status_to_sprite[status]
     if sprite == nil then
@@ -231,7 +231,7 @@ end
 --- @brief
 function bt.EnemySprite:add_consumable(slot_i, consumable, n_uses_left)
     meta.assert_number(slot_i)
-    meta.assert_isa(consumable, bt.Consumable)
+    meta.assert_isa(consumable, bt.ConsumableConfig)
     meta.assert_number(n_uses_left)
 
     if self._consumable_slot_to_sprite[slot_i] ~= nil then

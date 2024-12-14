@@ -62,11 +62,11 @@ bt.Table = "Table"
 
 for name_type_proxy in range(
     {"entity", bt.Entity, bt.EntityProxy},
-    {"move", bt.Move, bt.MoveProxy},
-    {"equip", bt.Equip, bt.EquipProxy},
-    {"status", bt.Status, bt.StatusProxy},
-    {"global_status", bt.GlobalStatus, bt.GlobalStatusProxy},
-    {"consumable", bt.Consumable, bt.ConsumableProxy}
+    {"move", bt.MoveConfig, bt.MoveProxy},
+    {"equip", bt.EquipConfig, bt.EquipProxy},
+    {"status", bt.StatusConfig, bt.StatusProxy},
+    {"global_status", bt.GlobalStatusConfig, bt.GlobalStatusProxy},
+    {"consumable", bt.ConsumableConfig, bt.ConsumableProxy}
 ) do
     local name, type, proxy = table.unpack(name_type_proxy)
 
@@ -279,7 +279,7 @@ function bt.BattleScene:create_simulation_environment()
     _initialize_non_entities(
         consumable_prefix,
         rt.settings.battle.consumable.config_path,
-        bt.Consumable,
+        bt.ConsumableConfig,
         bt.create_consumable_proxy
     )
 
@@ -287,7 +287,7 @@ function bt.BattleScene:create_simulation_environment()
     _initialize_non_entities(
         equip_prefix,
         rt.settings.battle.equip.config_path,
-        bt.Equip,
+        bt.EquipConfig,
         bt.create_equip_proxy
     )
 
@@ -295,7 +295,7 @@ function bt.BattleScene:create_simulation_environment()
     _initialize_non_entities(
         move_prefix,
         rt.settings.battle.move.config_path,
-        bt.Move,
+        bt.MoveConfig,
         bt.create_move_proxy
     )
 
@@ -303,7 +303,7 @@ function bt.BattleScene:create_simulation_environment()
     _initialize_non_entities(
         global_status_prefix,
         rt.settings.battle.global_status.config_path,
-        bt.GlobalStatus,
+        bt.GlobalStatusConfig,
         bt.create_global_status_proxy
     )
 
@@ -311,7 +311,7 @@ function bt.BattleScene:create_simulation_environment()
     _initialize_non_entities(
         status_prefix,
         rt.settings.battle.status.config_path,
-        bt.Status,
+        bt.StatusConfig,
         bt.create_status_proxy
     )
 

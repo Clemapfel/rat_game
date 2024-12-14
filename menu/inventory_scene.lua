@@ -646,11 +646,11 @@ function mn.InventoryScene:_regenerate_selection_nodes()
         local grabbed = scene._state:peek_grabbed_object()
         if grabbed == nil then return end
         if scene._shared_list_index == scene.shared_move_list_index then
-            return meta.isa(grabbed, bt.Move)
+            return meta.isa(grabbed, bt.MoveConfig)
         elseif scene._shared_list_index == scene.shared_equip_list_index then
-            return meta.isa(grabbed, bt.Equip)
+            return meta.isa(grabbed, bt.EquipConfig)
         elseif scene._shared_list_index == scene.shared_consumable_list_index then
-            return meta.isa(grabbed, bt.Consumable)
+            return meta.isa(grabbed, bt.ConsumableConfig)
         else
             return false
         end
@@ -731,7 +731,7 @@ function mn.InventoryScene:_regenerate_selection_nodes()
         if slot_i == nil then return false end
 
         local grabbed = scene._state:peek_grabbed_object()
-        if grabbed == nil or not meta.isa(grabbed, bt.Move) then return false end
+        if grabbed == nil or not meta.isa(grabbed, bt.MoveConfig) then return false end
 
         local slot_is_free = scene._state:entity_get_move(entity, slot_i) == nil
         local entity_has_move = scene._state:entity_has_move(entity, grabbed)
@@ -744,7 +744,7 @@ function mn.InventoryScene:_regenerate_selection_nodes()
         if slot_i == nil then return false end
 
         local grabbed = scene._state:peek_grabbed_object()
-        if grabbed == nil or not meta.isa(grabbed, bt.Equip) then return false end
+        if grabbed == nil or not meta.isa(grabbed, bt.EquipConfig) then return false end
 
         return scene._state:entity_get_equip(entity, slot_i) == nil
     end
@@ -755,7 +755,7 @@ function mn.InventoryScene:_regenerate_selection_nodes()
         if slot_i == nil then return false end
 
         local grabbed = scene._state:peek_grabbed_object()
-        if grabbed == nil or not meta.isa(grabbed, bt.Consumable) then return false end
+        if grabbed == nil or not meta.isa(grabbed, bt.ConsumableConfig) then return false end
 
         return scene._state:entity_get_consumable(entity, slot_i) == nil
     end
@@ -766,7 +766,7 @@ function mn.InventoryScene:_regenerate_selection_nodes()
         local slot_i = scene._selection_graph:get_current_node().slot_i
         local down = scene._state:entity_get_move(entity, slot_i)
 
-        return meta.isa(up, bt.Move) and down ~= nil and (not scene._state:entity_has_move(entity, down))
+        return meta.isa(up, bt.MoveConfig) and down ~= nil and (not scene._state:entity_has_move(entity, down))
     end
 
     local equip_slot_allow_swap = function()
@@ -775,7 +775,7 @@ function mn.InventoryScene:_regenerate_selection_nodes()
         local slot_i = scene._selection_graph:get_current_node().slot_i
         local down = scene._state:entity_get_equip(entity, slot_i)
 
-        return meta.isa(up, bt.Equip) and down ~= nil
+        return meta.isa(up, bt.EquipConfig) and down ~= nil
     end
 
     local consumable_slot_allow_swap = function()
@@ -784,7 +784,7 @@ function mn.InventoryScene:_regenerate_selection_nodes()
         local slot_i = scene._selection_graph:get_current_node().slot_i - self._state:entity_get_n_equip_slots(entity)
         local down = scene._state:entity_get_consumable(entity, slot_i)
 
-        return meta.isa(up, bt.Consumable) and down ~= nil
+        return meta.isa(up, bt.ConsumableConfig) and down ~= nil
     end
 
     local move_slot_allow_unequip = function()
@@ -1360,15 +1360,15 @@ function mn.InventoryScene:_regenerate_selection_nodes()
             scene._state:take_grabbed_object()
 
             local list, list_i
-            if meta.isa(up, bt.Move) then
+            if meta.isa(up, bt.MoveConfig) then
                 scene._state:add_shared_move(up)
                 list = scene._shared_move_list
                 list_i = scene.shared_move_list_index
-            elseif meta.isa(up, bt.Equip) then
+            elseif meta.isa(up, bt.EquipConfig) then
                 scene._state:add_shared_equip(up)
                 list = scene._shared_equip_list
                 list_i = scene.shared_equip_list_index
-            elseif meta.isa(up, bt.Consumable) then
+            elseif meta.isa(up, bt.ConsumableConfig) then
                 scene._state:add_shared_consumable(up)
                 list = scene._shared_consumable_list
                 list_i = scene.shared_consumable_list_index
@@ -1743,7 +1743,7 @@ function mn.InventoryScene:_regenerate_selection_nodes()
                         local down = scene._state:entity_get_equip(page.entity, slot_i)
                         scene._state:entity_remove_equip(page.entity, slot_i)
                         scene._state:add_shared_equip(down)
-                        assert(meta.isa(down, bt.Equip))
+                        assert(meta.isa(down, bt.EquipConfig))
 
                         scene:_play_transfer_object_animation(
                             down,
@@ -1763,7 +1763,7 @@ function mn.InventoryScene:_regenerate_selection_nodes()
                         local down = scene._state:entity_get_consumable(page.entity, slot_i - n_equip_slots)
                         scene._state:entity_remove_consumable(page.entity, slot_i - n_equip_slots)
                         scene._state:add_shared_consumable(down)
-                        assert(meta.isa(down, bt.Consumable))
+                        assert(meta.isa(down, bt.ConsumableConfig))
 
                         scene:_play_transfer_object_animation(
                             down,
@@ -1788,9 +1788,9 @@ function mn.InventoryScene:_regenerate_selection_nodes()
     end
 
     for node_list_type in range(
-        {shared_move_node, scene._shared_move_list, bt.Move},
-        {shared_equip_node, scene._shared_equip_list, bt.Equip},
-        {shared_consumable_node, scene._shared_consumable_list, bt.Consumable}
+        {shared_move_node, scene._shared_move_list, bt.MoveConfig},
+        {shared_equip_node, scene._shared_equip_list, bt.EquipConfig},
+        {shared_consumable_node, scene._shared_consumable_list, bt.ConsumableConfig}
     ) do
         local node, list, type = table.unpack(node_list_type)
         node:signal_connect("enter", function(_)
@@ -2122,7 +2122,7 @@ function mn.InventoryScene:_update_entity_info_preview(equip_slot_i)
     local page = self._entity_pages[self._entity_index]
     local down = self._state:entity_get_equip(page.entity, equip_slot_i)
 
-    if up ~= nil and meta.isa(up, bt.Equip) then
+    if up ~= nil and meta.isa(up, bt.EquipConfig) then
         page.info:set_preview_values(self._state:entity_preview_equip(page.entity, equip_slot_i, up))
     else
         page.info:set_preview_values(nil, nil, nil, nil)

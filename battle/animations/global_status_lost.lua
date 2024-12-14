@@ -5,10 +5,10 @@ rt.settings.battle.animation.global_status_lost = {
 }
 
 --- @class bt.Animation
---- @param status bt.GlobalStatus
+--- @param status bt.GlobalStatusConfig
 bt.Animation.GLOBAL_STATUS_LOST = meta.new_type("GLOBAL_STATUS_LOST", rt.Animation, function(scene, status)
     meta.assert_isa(scene, bt.BattleScene)
-    meta.assert_isa(status, bt.GlobalStatus)
+    meta.assert_isa(status, bt.GlobalStatusConfig)
     local hold = rt.settings.battle.animation.global_status_lost.hold_duration
     local total = rt.settings.battle.animation.global_status_lost.duration
     local blow = total - hold

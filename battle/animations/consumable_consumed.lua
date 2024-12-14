@@ -4,11 +4,11 @@ rt.settings.battle.animation.consumable_consumed = {
 
 --- @class bt.Animation.CONSUMABLE_CONSUMED
 --- @param scene bt.BattleScene
---- @param consumable bt.Consumable
+--- @param consumable bt.ConsumableConfig
 --- @param sprite bt.EntitySprite
 bt.Animation.CONSUMABLE_CONSUMED = meta.new_type("CONSUMABLE_CONSUMED", rt.Animation, function(scene, consumable, sprite)
     meta.assert_isa(scene, bt.BattleScene)
-    meta.assert_isa(consumable, bt.Consumable)
+    meta.assert_isa(consumable, bt.ConsumableConfig)
     meta.assert_isa(sprite, bt.EntitySprite)
     local duration = rt.settings.battle.animation.consumable_consumed.duration
     local n_bites = 3

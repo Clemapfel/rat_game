@@ -70,10 +70,10 @@ do
 
     --- @brief
     --- @param scene bt.BattleScene
-    --- @param status bt.GlobalStatus
+    --- @param status bt.GlobalStatusConfig
     function bt.create_global_status_proxy(scene, native)
         meta.assert_isa(scene, bt.Scene)
-        meta.assert_isa(native, bt.GlobalStatus)
+        meta.assert_isa(native, bt.GlobalStatusConfig)
 
         local metatable = _create_proxy_metatable(bt.GlobalStatusProxy, scene, native)
         metatable._native = native
@@ -82,10 +82,10 @@ do
 
     --- @brief
     --- @param scene bt.BattleScene
-    --- @param status bt.Status
+    --- @param status bt.StatusConfig
     function bt.create_status_proxy(scene, native, afflicted)
         meta.assert_isa(scene, bt.Scene)
-        meta.assert_isa(native, bt.Status)
+        meta.assert_isa(native, bt.StatusConfig)
         meta.assert_isa(afflicted, bt.Entity)
 
         local metatable = _create_proxy_metatable(bt.GlobalStatusProxy, scene, native)
@@ -96,7 +96,7 @@ do
     
     --- @brief
     --- @param scene bt.BattleScene
-    --- @param status bt.Status
+    --- @param status bt.StatusConfig
 
     --- @brief
     --- @param scene bt.BattleScene
@@ -127,7 +127,7 @@ do
 
         local metatable = _create_proxy_metatable(bt.EquipProxy, scene)
         local native = scene._state:entity_get_equip(holder, slot_i)
-        meta.assert_isa(native, bt.Equip)
+        meta.assert_isa(native, bt.EquipConfig)
         metatable._native = native
         metatable._entity = holder
         metatable._slot_i = slot_i
@@ -145,7 +145,7 @@ do
 
         local metatable = _create_proxy_metatable(bt.MoveProxy, scene)
         local native = scene._state:entity_get_move(holder, slot_i)
-        meta.assert_isa(native, bt.Move)
+        meta.assert_isa(native, bt.MoveConfig)
         metatable._native = native
         metatable._entity = holder
         metatable._slot_i = slot_i
@@ -159,11 +159,11 @@ bt.error_function = ternary(rt.settings.battle.simulation.illegal_action_is_erro
 
 for name_type_proxy in range(
     {"entity", bt.Entity, bt.EntityProxy},
-    {"move", bt.Move, bt.MoveProxy},
-    {"equip", bt.Equip, bt.EquipProxy},
-    {"status", bt.Status, bt.StatusProxy},
-    {"global_status", bt.GlobalStatus, bt.GlobalStatusProxy},
-    {"consumable", bt.Consumable, bt.ConsumableProxy}
+    {"move", bt.MoveConfig, bt.MoveProxy},
+    {"equip", bt.EquipConfig, bt.EquipProxy},
+    {"status", bt.StatusConfig, bt.StatusProxy},
+    {"global_status", bt.GlobalStatusConfig, bt.GlobalStatusProxy},
+    {"consumable", bt.ConsumableConfig, bt.ConsumableProxy}
 ) do
     local name, type, proxy = table.unpack(name_type_proxy)
     --- @brief bt.is_entity_proxy, bt.is_move_proxy, bt.is_equip_proxy, bt.is_status_proxy, bt.is_global_status_proxy, bt.is_consumable_proxy,
@@ -607,7 +607,7 @@ function bt.BattleScene:create_simulation_environment()
             return nil
         end
 
-        return _state:entity_has_status(_get_native(entity_proxy), bt.Status(native_id))
+        return _state:entity_has_status(_get_native(entity_proxy), bt.StatusConfig(native_id))
     end
 
     env.get_status = function(entity_proxy, status_id)
@@ -622,7 +622,7 @@ function bt.BattleScene:create_simulation_environment()
             return nil
         end
 
-        return bt.create_status_proxy(_scene, _get_native(entity_proxy), bt.Status(native_id))
+        return bt.create_status_proxy(_scene, _get_native(entity_proxy), bt.StatusConfig(native_id))
     end
 
     env.get_status_max_duration = function(status_proxy)

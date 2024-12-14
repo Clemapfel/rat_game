@@ -5,11 +5,11 @@ rt.settings.battle.animation.status_lost = {
 
 --- @class bt.Animation.STATUS_LOST
 --- @param scene bt.BattleScene
---- @param status bt.Status
+--- @param status bt.StatusConfig
 --- @param sprite bt.EntitySprite
 bt.Animation.STATUS_LOST = meta.new_type("STATUS_LOST", rt.Animation, function(scene, status, sprite)
     meta.assert_isa(scene, bt.BattleScene)
-    meta.assert_isa(status, bt.Status)
+    meta.assert_isa(status, bt.StatusConfig)
     meta.assert_isa(sprite, bt.EntitySprite)
     return meta.new(bt.Animation.STATUS_LOST, {
         _scene = scene,

@@ -52,7 +52,7 @@ end, {
 
     status = {}, -- Table<bt.Status, {status: bt.Status, elapsed: Number}>
     moves = {}, -- Table<MoveID, {move: bt:move, n_uses: Number}>
-    equips = {}, -- Table<EquipID, {equip: bt.Equip}>
+    equips = {}, -- Table<EquipID, {equip: bt.EquipConfig}>
     consumables = {}, --Table<ConsumableID, {consumable: bt.Consumable, n_consumed: Number}
 
     state = bt.BattleEntityState.ALIVE,
@@ -139,7 +139,7 @@ function bt.BattleEntity:realize()
         if not meta.is_string(equip_id) then
             rt.error("In bt.BattleEntity:realize: error when loading config at `" .. self._path .. "`, expected string for id in `equip`, got: `" .. meta.typeof(equip_id) .. "`")
         end
-        self:add_equip(bt.Equip(equip_id))
+        self:add_equip(bt.EquipConfig(equip_id))
     end
 
     if not meta.is_table(config.consumables) then config.consumables = {config.consumables} end
@@ -147,7 +147,7 @@ function bt.BattleEntity:realize()
         if not meta.is_string(consumable_id) then
             rt.error("In bt.BattleEntity:realize: error when loading config at `" .. self._path .. "`, expected string for id in `consumables`, got: `" .. meta.typeof(equip_id) .. "`")
         end
-        self:add_consumable(bt.Consumable(consumable_id))
+        self:add_consumable(bt.ConsumableConfig(consumable_id))
     end
 
     self._is_realized = true

@@ -3,20 +3,20 @@ rt.settings.battle.status = {
     default_animation_id = "STATUS_GAINED",
 }
 
---- @class bt.Status
+--- @class bt.StatusConfig
 --- @brief cached instancing, moves with the same ID will always return the same instance
-bt.Status = meta.new_type("Status", function(id)
-    local out = bt.Status._atlas[id]
+bt.StatusConfig = meta.new_type("StatusConfig", function(id)
+    local out = bt.StatusConfig._atlas[id]
     if out == nil then
         local path = rt.settings.battle.status.config_path .. "/" .. id .. ".lua"
-        out = meta.new(bt.Status, {
+        out = meta.new(bt.StatusConfig, {
             id = id,
             _path = path,
             _is_realized = false
         })
         out:realize()
         meta.set_is_mutable(out, false)
-        bt.Status._atlas[id] = out
+        bt.StatusConfig._atlas[id] = out
     end
     return out
 end, {
@@ -211,10 +211,10 @@ end, {
         return nil
     end
 })
-bt.Status._atlas = {}
+bt.StatusConfig._atlas = {}
 
 --- @brief
-function bt.Status:realize()
+function bt.StatusConfig:realize()
     if self._is_realized == true then return end
 
     local functions = {
@@ -289,47 +289,47 @@ function bt.Status:realize()
 end
 
 --- @brief
-function bt.Status:get_sprite_id()
+function bt.StatusConfig:get_sprite_id()
     return self.sprite_id, self.sprite_index
 end
 
 --- @brief
-function bt.Status:get_animation_id()
+function bt.StatusConfig:get_animation_id()
     return self.animation_id
 end
 
 --- @brief
-function bt.Status:get_id()
+function bt.StatusConfig:get_id()
     return self.id
 end
 
 --- @brief
-function bt.Status:get_name()
+function bt.StatusConfig:get_name()
     return self.name
 end
 
 --- @brief
-function bt.Status:get_max_duration()
+function bt.StatusConfig:get_max_duration()
     return self.max_duration
 end
 
 --- @brief
-function bt.Status:get_is_silent()
+function bt.StatusConfig:get_is_silent()
     return self.is_silent
 end
 
 --- @brief
-function bt.Status:get_description()
+function bt.StatusConfig:get_description()
     return self.description
 end
 
 --- @brief
-function bt.Status:get_flavor_text()
+function bt.StatusConfig:get_flavor_text()
     return self.flavor_text
 end
 
 --- @brief
-function bt.Status:get_is_stun()
+function bt.StatusConfig:get_is_stun()
     return self.is_stun
 end
 
@@ -354,7 +354,7 @@ for which in range(
     "is_stun",
     "max_duration"
 ) do
-    bt.Status["get_" .. which] = function(self)
+    bt.StatusConfig["get_" .. which] = function(self)
         return self[which]
     end
 end

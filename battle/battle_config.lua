@@ -2,18 +2,18 @@ rt.settings.battle.battle = {
     config_path = "assets/configs/battles",
 }
 
---- @class bt.Battle
-bt.Battle = meta.new_type("Battle", function(id)
-    local out = meta.new(bt.Battle, {
+--- @class bt.BattleConfig
+bt.BattleConfig = meta.new_type("BattleConfig", function(id)
+    local out = meta.new(bt.BattleConfig, {
         _background_id = nil,
-        _global_statuses = {}, -- Table<bt.GlobalStatus>
+        _global_statuses = {}, -- Table<bt.GlobalStatusConfig>
         _enemies = {} --[[
             [i] = {
                 id = String,
                 moves = Table<bt.Attack>,
-                statuses = Table<bt.Statuses>,
-                consumables = Table<bt.Consumables>
-                equips = Table<bt.Equips>
+                statuses = Table<bt.StatusConfiges>,
+                consumables = Table<bt.ConsumableConfigs>
+                equips = Table<bt.EquipConfigs>
             }
         ]]--
     })
@@ -29,20 +29,20 @@ do
     local _get_entry = function(self, scope, i)
         local entry = self._enemies[i]
         if entry == nil then
-            rt.error("In bt.Battle." .. scope .. ": no enemy at position #" .. i)
+            rt.error("In bt.BattleConfig." .. scope .. ": no enemy at position #" .. i)
             return nil
         end
         return entry
     end
 
     --- @brief
-    function bt.Battle:get_enemy_id(i)
+    function bt.BattleConfig:get_enemy_id(i)
         local entry = _get_entry(self, "get_enemy_id", i)
         if entry ~= nil then return entry.id end
     end
 
     --- @brief
-    function bt.Battle:get_enemy_moves(i)
+    function bt.BattleConfig:get_enemy_moves(i)
         local entry = _get_entry(self, "get_enemy_moves", i)
         local out = {}
         if entry ~= nil and entry.moves ~= nil then
@@ -54,7 +54,7 @@ do
     end
 
     --- @brief
-    function bt.Battle:get_enemy_statuses(i)
+    function bt.BattleConfig:get_enemy_statuses(i)
         local entry = _get_entry(self, "get_enemy_statuses", i)
         local out = {}
         if entry ~= nil and entry.statuses ~= nil then
@@ -66,7 +66,7 @@ do
     end
 
     --- @brief
-    function bt.Battle:get_enemy_equips(i)
+    function bt.BattleConfig:get_enemy_equips(i)
         local entry = _get_entry(self, "get_enemy_statuses", i)
         local out = {}
         if entry ~= nil and entry.equips ~= nil then
@@ -78,7 +78,7 @@ do
     end
 
     --- @brief
-    function bt.Battle:get_enemy_consumables(i)
+    function bt.BattleConfig:get_enemy_consumables(i)
         local entry = _get_entry(self, "get_enemy_consumables", i)
         local out = {}
         if entry ~= nil and entry.consumables ~= nil then
@@ -91,7 +91,7 @@ do
 end
 
 --- @brief
-function bt.Battle:add_enemy(id, moves, consumables, equips, statuses)
+function bt.BattleConfig:add_enemy(id, moves, consumables, equips, statuses)
     meta.assert_string(id)
     local entry = {
         id = id,
@@ -103,25 +103,25 @@ function bt.Battle:add_enemy(id, moves, consumables, equips, statuses)
 
     if moves == nil then moves = {} end
     for move in values(moves) do
-        meta.assert_isa(move, bt.Move)
+        meta.assert_isa(move, bt.MoveConfig)
         table.insert(entry.moves, move)
     end
 
     if consumables == nil then consumables = {} end
     for consumable in values(consumables) do
-        meta.assert_isa(consumable, bt.Consumable)
+        meta.assert_isa(consumable, bt.ConsumableConfig)
         table.insert(entry.consumables, consumable)
     end
 
     if equips == nil then equips = {} end
     for equip in values(equips) do
-        meta.assert_isa(equip, bt.Equip)
+        meta.assert_isa(equip, bt.EquipConfig)
         table.insert(entry.equips, equip)
     end
 
     if statuses == nil then statuses = {} end
     for status in values(statuses) do
-        meta.assert_isa(status, bt.Status)
+        meta.assert_isa(status, bt.StatusConfig)
         table.insert(entry.statuses, status)
     end
 
@@ -129,27 +129,27 @@ function bt.Battle:add_enemy(id, moves, consumables, equips, statuses)
 end
 
 --- @brief
-function bt.Battle:load_config(id)
+function bt.BattleConfig:load_config(id)
     local path = rt.settings.battle.battle.config_path .. "/" .. id .. ".lua"
     local load_success, chunk_or_error, love_error = pcall(love.filesystem.load, path)
     if not load_success then
-        rt.error("In bt.Battle.load_config: error when parsing config at `" .. path .. "`: " .. chunk_or_error)
+        rt.error("In bt.BattleConfig.load_config: error when parsing config at `" .. path .. "`: " .. chunk_or_error)
         return
     end
 
     if love_error ~= nil then
-        rt.error("In bt.Battle.load_config: error when loading config at `" .. path .. "`: " .. love_error)
+        rt.error("In bt.BattleConfig.load_config: error when loading config at `" .. path .. "`: " .. love_error)
         return
     end
 
     local chunk_success, config_or_error = pcall(chunk_or_error)
     if not chunk_success then
-        rt.error("In bt.Battle.load_config: error when running config at `" .. path .. "`: " .. config_or_error)
+        rt.error("In bt.BattleConfig.load_config: error when running config at `" .. path .. "`: " .. config_or_error)
         return
     end
 
     local function throw(reason)
-        rt.error("In bt.Battle.load_config: error when loading config at `" .. path .. "`: " .. reason)
+        rt.error("In bt.BattleConfig.load_config: error when loading config at `" .. path .. "`: " .. reason)
     end
 
     local config = config_or_error
@@ -161,7 +161,7 @@ function bt.Battle:load_config(id)
             throw("in config.global_statuses: expected `string`, got `" .. meta.typeof(status_id) .. "`")
             return
         end
-        table.insert(self._global_statuses, bt.GlobalStatus(status_id))
+        table.insert(self._global_statuses, bt.GlobalStatusConfig(status_id))
     end
 
     if config.enemies == nil or #config.enemies == 0 then
@@ -198,7 +198,7 @@ function bt.Battle:load_config(id)
                     throw("in config.enemies[" .. enemy_i .. "].moves[" .. move_i .. "]: expected `string`, got `" .. meta.typeof(move_id) .. "`")
                     return
                 end
-                table.insert(entry.moves, bt.Move(move_id))
+                table.insert(entry.moves, bt.MoveConfig(move_id))
                 move_i = move_i + 1
             end
         end
@@ -216,7 +216,7 @@ function bt.Battle:load_config(id)
                     throw("in config.enemies[" .. enemy_i .. "].statuses[" .. status_i .. "]: expected `string`, got `" .. meta.typeof(status_id) .. "`")
                     return
                 end
-                table.insert(entry.statuses, bt.Status(status_id))
+                table.insert(entry.statuses, bt.StatusConfig(status_id))
                 status_i = status_i + 1
             end
         end
@@ -234,7 +234,7 @@ function bt.Battle:load_config(id)
                     throw("in config.enemies[" .. enemy_i .. "].consumables[" .. consumable_i .. "]: expected `string`, got `" .. meta.typeof(consumable_id) .. "`")
                     return
                 end
-                table.insert(entry.consumables, bt.Consumable(consumable_id))
+                table.insert(entry.consumables, bt.ConsumableConfig(consumable_id))
                 consumable_i = consumable_i + 1
             end
         end
@@ -252,7 +252,7 @@ function bt.Battle:load_config(id)
                     throw("in config.enemies[" .. enemy_i .. "].equips[" .. equip_i .. "]: expected `string`, got `" .. meta.typeof(equip_id) .. "`")
                     return
                 end
-                table.insert(entry.equips, bt.Equip(equip_id))
+                table.insert(entry.equips, bt.EquipConfig(equip_id))
                 equip_i = equip_i + 1
             end
         end
@@ -263,17 +263,17 @@ function bt.Battle:load_config(id)
 end
 
 --- @brief
-function bt.Battle:get_background()
+function bt.BattleConfig:get_background()
     return rt.Background[self._background_id]
 end
 
 --- @brief
-function bt.Battle:get_n_enemies()
+function bt.BattleConfig:get_n_enemies()
     return sizeof(self._enemies)
 end
 
 --- @brief
-function bt.Battle:get_global_statuses()
+function bt.BattleConfig:get_global_statuses()
     local out = {}
     for status in values(self._global_statuses) do
         table.insert(out, status)

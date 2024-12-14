@@ -28,21 +28,21 @@ function mn.Template:list_entities()
 end
 
 --- @brief
---- @return Unsigned, Table<bt.Move>
+--- @return Unsigned, Table<bt.MoveConfig>
 function mn.Template:list_move_slots(entity)
     meta.assert_isa(entity, bt.Entity)
     return self._state:template_list_entity_move_slots(self._id, entity:get_id())
 end
 
 --- @brief
---- @return Unsigned, Table<bt.Consumable>
+--- @return Unsigned, Table<bt.ConsumableConfig>
 function mn.Template:list_consumable_slots(entity)
     meta.assert_isa(entity, bt.Entity)
     return self._state:template_list_entity_consumable_slots(self._id, entity:get_id())
 end
 
 --- @brief
---- @return Unsigned, Table<bt.Equip>
+--- @return Unsigned, Table<bt.EquipConfig>
 function mn.Template:list_equip_slots(entity)
     meta.assert_isa(entity, bt.Entity)
     return self._state:template_list_entity_equip_slots(self._id, entity:get_id())

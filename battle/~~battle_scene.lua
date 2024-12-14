@@ -20,7 +20,7 @@ bt.BattleScene = meta.new_type("BattleScene", rt.Scene, function(state)
         _enemy_sprite_x_offset = 0,
 
         _global_status_bar = bt.OrderedBox(),
-        _global_status_to_sprite = {}, -- Table<bt.GlobalStatus, rt.Sprite>
+        _global_status_to_sprite = {}, -- Table<bt.GlobalStatusConfig, rt.Sprite>
 
         _quicksave_indicator = bt.QuicksaveIndicator(),
 
@@ -793,7 +793,7 @@ end
 
 --- @brief
 function bt.BattleScene:add_global_status(status, n_turns_left)
-    meta.assert_isa(status, bt.GlobalStatus)
+    meta.assert_isa(status, bt.GlobalStatusConfig)
     meta.assert_number(n_turns_left)
 
     if self._global_status_to_sprite[status] ~= nil then
@@ -813,7 +813,7 @@ end
 
 --- @brief
 function bt.BattleScene:remove_global_status(status)
-    meta.assert_isa(status, bt.GlobalStatus)
+    meta.assert_isa(status, bt.GlobalStatusConfig)
 
     local sprite = self._global_status_to_sprite[status]
     if sprite == nil then
@@ -827,7 +827,7 @@ end
 
 --- @brief
 function bt.BattleScene:set_global_status_n_turns_left(status, n_turns_left)
-    meta.assert_isa(status, bt.GlobalStatus)
+    meta.assert_isa(status, bt.GlobalStatusConfig)
     meta.assert_number(n_turns_left)
 
     local sprite = self._global_status_to_sprite[status]
@@ -845,7 +845,7 @@ end
 
 --- @brief
 function bt.BattleScene:activate_global_status(status, on_done_notify)
-    meta.assert_isa(status, bt.Status)
+    meta.assert_isa(status, bt.StatusConfig)
 
     local sprite = self._global_status_to_sprite[status]
     if sprite == nil then
@@ -886,7 +886,7 @@ function bt.BattleScene:_handle_button_pressed(which)
 
         --[[
         local target = bt.create_entity_proxy(self, self._state:list_enemies()[2])
-        local status = bt.create_status_proxy(self, bt.Status("DEBUG_STATUS"))
+        local status = bt.create_status_proxy(self, bt.StatusConfig("DEBUG_STATUS"))
         local sprite = self:get_sprite(self._state:list_enemies()[2])
         --self._simulation_environment.message(target, "test", status)
         --self._simulation_environment.knock_out(target)
@@ -902,16 +902,16 @@ function bt.BattleScene:_handle_button_pressed(which)
         for sprite in values(self._party_sprites) do
             self:_append_animation(bt.Animation.ALLY_APPEARED(self, sprite))
         end
-        --self:_push_animation(bt.Animation.STATUS_LOST(self, bt.Status("DEBUG_STATUS"), self._enemy_sprites[1]))
-        --self:_push_animation(bt.Animation.GLOBAL_STATUS_GAINED(self, bt.GlobalStatus("DEBUG_GLOBAL_STATUS")))
-        --self:_push_animation(bt.Animation.GLOBAL_STATUS_LOST(self, bt.GlobalStatus("DEBUG_GLOBAL_STATUS")))
+        --self:_push_animation(bt.Animation.STATUS_LOST(self, bt.StatusConfig("DEBUG_STATUS"), self._enemy_sprites[1]))
+        --self:_push_animation(bt.Animation.GLOBAL_STATUS_GAINED(self, bt.GlobalStatusConfig("DEBUG_GLOBAL_STATUS")))
+        --self:_push_animation(bt.Animation.GLOBAL_STATUS_LOST(self, bt.GlobalStatusConfig("DEBUG_GLOBAL_STATUS")))
         ]]--
     elseif which == rt.InputButton.B then
         self:skip()
     end
     --[[
     if which == rt.InputButton.A then
-        self._entity_selection_graph = self:_generate_entity_selection_graph_from_move(self._state:list_allies()[1], bt.Move("DEBUG_MOVE"))
+        self._entity_selection_graph = self:_generate_entity_selection_graph_from_move(self._state:list_allies()[1], bt.MoveConfig("DEBUG_MOVE"))
     end
 
     if self._entity_selection_graph ~= nil then

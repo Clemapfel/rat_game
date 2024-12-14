@@ -35,15 +35,15 @@ function mn.VerboseInfoPanel.Item:create_from(object)
         self:create_from_enum(object)
     elseif meta.isa(object, bt.Entity) then
         self:create_from_entity(object)
-    elseif meta.isa(object, bt.Equip) then
+    elseif meta.isa(object, bt.EquipConfig) then
         self:create_from_equip(object)
-    elseif meta.isa(object, bt.Move) then
+    elseif meta.isa(object, bt.MoveConfig) then
         self:create_from_move(object)
-    elseif meta.isa(object, bt.Consumable) then
+    elseif meta.isa(object, bt.ConsumableConfig) then
         self:create_from_consumable(object)
-    elseif meta.isa(object, bt.Status) then
+    elseif meta.isa(object, bt.StatusConfig) then
         self:create_from_status(object)
-    elseif meta.isa(object, bt.GlobalStatus) then
+    elseif meta.isa(object, bt.GlobalStatusConfig) then
         self:create_from_global_status(object)
     elseif meta.isa(object, mn.Template) then
         self:create_from_template(object)

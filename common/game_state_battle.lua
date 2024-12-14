@@ -371,7 +371,7 @@ function rt.GameState:entity_get_is_stunned(entity)
     local is_stunned = false
     local max_n_turns = 0
     for id, n_turns_elapsed in pairs(entry.statuses) do
-        local status = bt.Status(id)
+        local status = bt.StatusConfig(id)
         if status:get_is_stun() then
             is_stunned = true
             max_n_turns = math.max(max_n_turns, status:get_max_duration() - n_turns_elapsed)
@@ -516,11 +516,11 @@ end
 for which in range("move", "equip", "consumable") do
     local Type
     if which == "move" then
-        Type = bt.Move
+        Type = bt.MoveConfig
     elseif which == "equip" then
-        Type = bt.Equip
+        Type = bt.EquipConfig
     elseif which == "consumable" then
-        Type = bt.Consumable
+        Type = bt.ConsumableConfig
     end
 
     --- @brief entity_list_moves, entity_list_equips, entity_list_consumables
@@ -827,9 +827,9 @@ for which in range("move", "equip", "consumable") do
 end
 
 for which_type in range(
-    {"move", bt.Move},
-    {"equip", bt.Equip},
-    {"consumable", bt.Consumable}
+    {"move", bt.MoveConfig},
+    {"equip", bt.EquipConfig},
+    {"consumable", bt.ConsumableConfig}
 ) do
     local which, type = table.unpack(which_type)
     --- @brief entity_get_move_is_disabled, entity_get_equip_is_disabled, entity_get_consumable_is_disabled
@@ -928,7 +928,7 @@ function rt.GameState:entity_list_intrinsic_moves(entity)
 
     local out = {}
     for move_id in values(entry.intrinsic_moves) do
-        table.insert(out, bt.Move(move_id))
+        table.insert(out, bt.MoveConfig(move_id))
     end
 
     return out
@@ -939,7 +939,7 @@ end
 function rt.GameState:entity_preview_equip(entity, slot_i, new_equip)
     meta.assert_isa(entity, bt.Entity)
     meta.assert_number(slot_i)
-    meta.assert_isa(new_equip, bt.Equip)
+    meta.assert_isa(new_equip, bt.EquipConfig)
 
     local previous = self:entity_get_equip(entity, slot_i)
     if new_equip == nil then
@@ -963,14 +963,14 @@ end
 
 --- @brief
 function rt.GameState:add_shared_object(object)
-    if meta.isa(object, bt.Move) then
+    if meta.isa(object, bt.MoveConfig) then
         self:add_shared_move(object)
-    elseif meta.isa(object, bt.Equip) then
+    elseif meta.isa(object, bt.EquipConfig) then
         self:add_shared_equip(object)
-    elseif meta.isa(object, bt.Consumable) then
+    elseif meta.isa(object, bt.ConsumableConfig) then
         self:add_shareD_consumable(object)
     else
-        rt.error("In rt.GameState:add_shared_object: object `" .. meta.typeof(object) .. "` is not a bt.Move, bt.Equip, or bt.Consumable")
+        rt.error("In rt.GameState:add_shared_object: object `" .. meta.typeof(object) .. "` is not a bt.MoveConfig, bt.EquipConfig, or bt.Consumable")
     end
 end
 
@@ -993,7 +993,7 @@ function rt.GameState:entity_sort_inventory(entity)
     for i = 1, n_move_slots do
         local id = entry.moves[i].id
         if id ~= "" then
-            local move = bt.Move(id)
+            local move = bt.MoveConfig(id)
             table.insert(moves, move)
             self:entity_remove_move(entity, i)
         end
@@ -1002,7 +1002,7 @@ function rt.GameState:entity_sort_inventory(entity)
     for i = 1, n_equip_slots do
         local id = entry.equips[i].id
         if id ~= "" then
-            local equip = bt.Equip(id)
+            local equip = bt.EquipConfig(id)
             table.insert(equips, equip)
             self:entity_remove_equip(entity, i)
         end
@@ -1011,7 +1011,7 @@ function rt.GameState:entity_sort_inventory(entity)
     for i = 1, n_consumable_slots do
         local id = entry.consumables[i].id
         if id ~= "" then
-            local consumable = bt.Consumable(id)
+            local consumable = bt.ConsumableConfig(id)
             table.insert(consumables, consumable)
             self:entity_remove_consumable(entity, i)
         end
@@ -1035,7 +1035,7 @@ end
 --- @brief
 function rt.GameState:entity_add_status(entity, status)
     meta.assert_isa(entity, bt.Entity)
-    meta.assert_isa(status, bt.Status)
+    meta.assert_isa(status, bt.StatusConfig)
 
     local entry = self:_get_entity_entry(entity)
     if entry == nil then
@@ -1065,7 +1065,7 @@ end
 --- @brief
 function rt.GameState:entity_has_status(entity, status)
     meta.assert_isa(entity, bt.Entity)
-    meta.assert_isa(status, bt.Status)
+    meta.assert_isa(status, bt.StatusConfig)
 
     local entry = self:_get_entity_entry(entity)
     if entry == nil then
@@ -1089,7 +1089,7 @@ function rt.GameState:entity_list_statuses(entity)
 
     local out = {}
     for id, _ in pairs(entry.statuses) do
-        table.insert(out, bt.Status(id))
+        table.insert(out, bt.StatusConfig(id))
     end
     return out
 end
@@ -1097,7 +1097,7 @@ end
 --- @brief
 function rt.GameState:entity_get_status_n_turns_elapsed(entity, status)
     meta.assert_isa(entity, bt.Entity)
-    meta.assert_isa(status, bt.Status)
+    meta.assert_isa(status, bt.StatusConfig)
     local entry = self:_get_entity_entry(entity)
     if entry == nil then
         rt.error("In rt.GameState:entity_get_status_n_turns_elapsed: entity `" .. entity:get_id() .. "` is not part of state")
@@ -1113,7 +1113,7 @@ end
 --- @return Boolean should expire
 function rt.GameState:entity_set_status_n_turns_elapsed(entity, status, n_turns)
     meta.assert_isa(entity, bt.Entity)
-    meta.assert_isa(status, bt.Status)
+    meta.assert_isa(status, bt.StatusConfig)
     meta.assert_number(n_turns)
 
     local entry = self:_get_entity_entry(entity)
@@ -1135,7 +1135,7 @@ end
 --- @brief
 function rt.GameState:entity_has_status(entity, status)
     meta.assert_isa(entity, bt.Entity)
-    meta.assert_isa(status, bt.Status)
+    meta.assert_isa(status, bt.StatusConfig)
 
     local entry = self:_get_entity_entry(entity)
     if entry == nil then
@@ -1149,7 +1149,7 @@ end
 --- @brief
 function rt.GameState:entity_remove_status(entity, status)
     meta.assert_isa(entity, bt.Entity)
-    meta.assert_isa(status, bt.Status)
+    meta.assert_isa(status, bt.StatusConfig)
 
     local entry = self:_get_entity_entry(entity)
     if entry == nil then
@@ -1162,7 +1162,7 @@ end
 
 --- @brief
 function rt.GameState:add_global_status(global_status)
-    meta.assert_isa(global_status, bt.GlobalStatus)
+    meta.assert_isa(global_status, bt.GlobalStatusConfig)
     self._state.global_statuses[global_status:get_id()] = {
         n_turns_elapsed = 0,
         storage = {}
@@ -1171,7 +1171,7 @@ end
 
 --- @brief
 function rt.GameState:remove_global_status(global_status)
-    meta.assert_isa(global_status, bt.GlobalStatus)
+    meta.assert_isa(global_status, bt.GlobalStatusConfig)
     local entry = self._state.global_statuses[global_status:get_id()]
 
     if entry == nil then
@@ -1184,7 +1184,7 @@ end
 
 --- @brief
 function rt.GameState:has_global_status(global_status)
-    meta.assert_isa(global_status, bt.GlobalStatus)
+    meta.assert_isa(global_status, bt.GlobalStatusConfig)
     return self._state.global_statuses[global_status:get_id()] ~= nil
 end
 
@@ -1192,14 +1192,14 @@ end
 function rt.GameState:list_global_statuses()
     local out = {}
     for id in keys(self._state.global_statuses) do
-        table.insert(out, bt.GlobalStatus(id))
+        table.insert(out, bt.GlobalStatusConfig(id))
     end
     return out
 end
 
 --- @brief
 function rt.GameState:get_global_status_n_turns_elapsed(global_status)
-    meta.assert_isa(global_status, bt.GlobalStatus)
+    meta.assert_isa(global_status, bt.GlobalStatusConfig)
     local entry = self._state.global_statuses[global_status:get_id()]
     if entry == nil then
         return 0
@@ -1210,7 +1210,7 @@ end
 
 --- @brief
 function rt.GameState:set_global_status_n_turns_elapsed(global_status, n_turns)
-    meta.assert_isa(global_status, bt.GlobalStatus)
+    meta.assert_isa(global_status, bt.GlobalStatusConfig)
     meta.assert_number(n_turns)
 
     local entry = self._state.global_statuses[global_status:get_id()]
@@ -1224,14 +1224,14 @@ end
 
 --- @brief
 function rt.GameState:has_global_status(global_status)
-    meta.assert_isa(global_status, bt.GlobalStatus)
+    meta.assert_isa(global_status, bt.GlobalStatusConfig)
     return self._state.global_statuses[global_status:get_id()] ~= nil
 end
 
 --- @brief
 function rt.GameState:entity_set_status_storage_value(entity, status, id, new_value)
     meta.assert_isa(entity, bt.Entity)
-    meta.assert_isa(status, bt.Status)
+    meta.assert_isa(status, bt.StatusConfig)
     meta.assert_string(id)
 
     local entry = self:_get_entity_entry(entity)
@@ -1252,7 +1252,7 @@ end
 --- @brief
 function rt.GameState:entity_get_status_storage_value(entity, status, id)
     meta.assert_isa(entity, bt.Entity)
-    meta.assert_isa(status, bt.Status)
+    meta.assert_isa(status, bt.StatusConfig)
     meta.assert_string(id)
 
     local entry = self:_get_entity_entry(entity)
@@ -1292,7 +1292,7 @@ end
 
 --- @brief
 function rt.GameState:set_global_status_storage_value(status, id, new_value)
-    meta.assert_isa(status, bt.GlobalStatus)
+    meta.assert_isa(status, bt.GlobalStatusConfig)
     meta.assert_string(id)
 
     local status_entry = self._state.global_statuses[status:get_id()]
@@ -1306,7 +1306,7 @@ end
 
 --- @brief
 function rt.GameState:get_global_status_storage_value(status, id, new_value)
-    meta.assert_isa(status, bt.GlobalStatus)
+    meta.assert_isa(status, bt.GlobalStatusConfig)
     meta.assert_string(id)
 
     local status_entry = self._state.global_statuses[status:get_id()]
@@ -1320,7 +1320,7 @@ end
 
 --- @brief
 function rt.GameState:replace_global_status_storage(status, new_table)
-    meta.assert_isa(status, bt.GlobalStatus)
+    meta.assert_isa(status, bt.GlobalStatusConfig)
     meta.assert_table(new_table)
 
     local status_entry = self._state.global_statuses[status:get_id()]
@@ -1333,9 +1333,9 @@ function rt.GameState:replace_global_status_storage(status, new_table)
 end
 
 for which_type in range(
-    {"move", bt.Move},
-    {"equip", bt.Equip},
-    {"consumable", bt.Consumable}
+    {"move", bt.MoveConfig},
+    {"equip", bt.EquipConfig},
+    {"consumable", bt.ConsumableConfig}
 ) do
     local which, type = table.unpack(which_type)
 
@@ -1456,11 +1456,11 @@ end
 for which in range("move", "consumable", "equip") do
     local Type
     if which == "move" then
-        Type = bt.Move
+        Type = bt.MoveConfig
     elseif which == "equip" then
-        Type = bt.Equip
+        Type = bt.EquipConfig
     elseif which == "consumable" then
-        Type = bt.Consumable
+        Type = bt.ConsumableConfig
     end
 
     --- @brief template_list_entity_move_slots, template_list_entity_consumable_slots, template_list_entity_equip_slots
@@ -1557,7 +1557,7 @@ function rt.GameState:load_template(template)
         local entity = bt.Entity(bt.EntityConfig(entity_entry.id), entity_entry.multiplicity)
         for slot_i, move_entry in ipairs(entity_entry.moves) do
             if move_entry.id ~= "" then
-                local move = bt.Move(move_entry.id)
+                local move = bt.MoveConfig(move_entry.id)
                 self:entity_remove_move(entity, slot_i)
                 self:add_shared_move(move)
             end
@@ -1565,7 +1565,7 @@ function rt.GameState:load_template(template)
 
         for slot_i, equip_entry in ipairs(entity_entry.equips) do
             if equip_entry.id ~= "" then
-                local equip = bt.Equip(equip_entry.id)
+                local equip = bt.EquipConfig(equip_entry.id)
                 self:entity_remove_equip(entity, slot_i)
                 self:add_shared_equip(equip)
             end
@@ -1573,7 +1573,7 @@ function rt.GameState:load_template(template)
 
         for slot_i, consumable_entry in ipairs(entity_entry.consumables) do
             if consumable_entry.id ~= "" then
-                local consumable = bt.Consumable(consumable_entry.id)
+                local consumable = bt.ConsumableConfig(consumable_entry.id)
                 self:entity_remove_consumable(entity, slot_i)
                 self:add_shared_consumable(consumable)
             end
@@ -1660,9 +1660,9 @@ end
 
 --- @brief
 --- @param entity bt.Entity
---- @param moves Table<bt.Move>
---- @param equips Table<bt.Equips>
---- @param consumables Table<bt.Consumables>
+--- @param moves Table<bt.MoveConfig>
+--- @param equips Table<bt.EquipConfigs>
+--- @param consumables Table<bt.ConsumableConfig>
 function rt.GameState:template_add_entity(id, entity, moves, equips, consumables)
     meta.assert_string(id)
     meta.assert_table(moves, equips, consumables)
@@ -1687,7 +1687,7 @@ function rt.GameState:template_add_entity(id, entity, moves, equips, consumables
     for i = 1, n_move_slots do
         local move = moves[i]
         if move ~= nil then
-            meta.assert_isa(move, bt.Move)
+            meta.assert_isa(move, bt.MoveConfig)
             setup.moves[i] = move:get_id()
         else
             setup.moves[i] = ""
@@ -1697,7 +1697,7 @@ function rt.GameState:template_add_entity(id, entity, moves, equips, consumables
     for i = 1, n_equip_slots do
         local equip = equips[i]
         if equip ~= nil then
-            meta.assert_isa(equip, bt.Equip)
+            meta.assert_isa(equip, bt.EquipConfig)
             setup.equips[i] = equip:get_id()
         else
             setup.equips[i] = ""
@@ -1707,7 +1707,7 @@ function rt.GameState:template_add_entity(id, entity, moves, equips, consumables
     for i = 1, n_consumable_slots do
         local consumable = consumables[i]
         if consumable ~= nil then
-            meta.assert_isa(consumable, bt.Consumable)
+            meta.assert_isa(consumable, bt.ConsumableConfig)
             setup.consumables[i] = consumable:get_id()
         else
             setup.consumables[i] = ""
@@ -1719,17 +1719,17 @@ end
 
 --- @brief
 function rt.GameState:set_grabbed_object(object)
-    if not (meta.isa(object, bt.Move) or meta.isa(object, bt.Equip) or meta.isa(object, bt.Consumable)) then
-        rt.error("In rt.GameState:set_grabbed_object: Objet `" .. meta.typeof(object) .. "` is not a bt.Move, bt.Consumable, or bt.Equip")
+    if not (meta.isa(object, bt.MoveConfig) or meta.isa(object, bt.EquipConfig) or meta.isa(object, bt.ConsumableConfig)) then
+        rt.error("In rt.GameState:set_grabbed_object: Objet `" .. meta.typeof(object) .. "` is not a bt.MoveConfig, bt.ConsumableConfig, or bt.EquipConfig")
         return
     end
 
     if self._grabbed_object ~= nil then
-        if meta.isa(self._grabbed_object, bt.Move) then
+        if meta.isa(self._grabbed_object, bt.MoveConfig) then
             self:add_shared_move(self._grabbed_object)
-        elseif meta.isa(self._grabbed_object, bt.Equip) then
+        elseif meta.isa(self._grabbed_object, bt.EquipConfig) then
             self:add_shared_equip(self._grabbed_object)
-        elseif meta.isa(self._grabbed_object, bt.Consumable) then
+        elseif meta.isa(self._grabbed_object, bt.ConsumableConfig) then
             self:add_shared_consumable(self._grabbed_object)
         else
             -- unreachable
@@ -1923,46 +1923,46 @@ function rt.GameState:initialize_debug_state()
         local move_i = 1
         for slot_i = 1, self:entity_get_n_move_slots(entity) do
             if rt.random.toss_coin(0.2) then
-                self:entity_add_move(entity, slot_i, bt.Move(possible_moves[move_i]))
+                self:entity_add_move(entity, slot_i, bt.MoveConfig(possible_moves[move_i]))
                 move_i = move_i + 1
                 if move_i > #moves then break end
             end
         end
 
         if self:entity_get_n_equip_slots(entity) > 0 then
-            self:entity_add_equip(entity, 1, bt.Equip("DEBUG_EQUIP"))
+            self:entity_add_equip(entity, 1, bt.EquipConfig("DEBUG_EQUIP"))
         end
         for slot_i = 2, self:entity_get_n_equip_slots(entity) do
             if rt.random.toss_coin(0.8) then
-                self:entity_add_equip(entity, slot_i, bt.Equip(equips[rt.random.integer(1, #equips)]))
+                self:entity_add_equip(entity, slot_i, bt.EquipConfig(equips[rt.random.integer(1, #equips)]))
             end
         end
 
         if self:entity_get_n_consumable_slots(entity) > 0 then
-            self:entity_add_consumable(entity, 1, bt.Consumable("DEBUG_CONSUMABLE"))
+            self:entity_add_consumable(entity, 1, bt.ConsumableConfig("DEBUG_CONSUMABLE"))
         end
         for slot_i = 2, self:entity_get_n_consumable_slots(entity) do
             if rt.random.toss_coin(0.8) then
-                self:entity_add_consumable(entity, slot_i,  bt.Consumable(consumables[rt.random.integer(1, #consumables)]))
+                self:entity_add_consumable(entity, slot_i,  bt.ConsumableConfig(consumables[rt.random.integer(1, #consumables)]))
             end
         end
 
         self:entity_set_hp(entity, self:entity_get_hp_base(entity))
     end
 
-    self:add_global_status(bt.GlobalStatus("DEBUG_GLOBAL_STATUS"))
+    self:add_global_status(bt.GlobalStatusConfig("DEBUG_GLOBAL_STATUS"))
 
     local max_count = 99
     for move in values(moves) do
-        self:add_shared_move(bt.Move(move), rt.random.integer(1, max_count))
+        self:add_shared_move(bt.MoveConfig(move), rt.random.integer(1, max_count))
     end
 
     for consumable in values(consumables) do
-        self:add_shared_consumable(bt.Consumable(consumable), rt.random.integer(1, max_count))
+        self:add_shared_consumable(bt.ConsumableConfig(consumable), rt.random.integer(1, max_count))
     end
 
     for equip in values(equips) do
-        self:add_shared_equip(bt.Equip(equip), rt.random.integer(1, max_count))
+        self:add_shared_equip(bt.EquipConfig(equip), rt.random.integer(1, max_count))
     end
 
     local empty_template = self:add_template("Empty Template")
@@ -1983,6 +1983,6 @@ function rt.GameState:initialize_debug_state()
 
     local error_template = self:add_template("Error Template")
     for entity in range(entities[1]) do
-        self:template_add_entity(error_template, entity, table.rep(bt.Move("DEBUG_MOVE"), 16), {}, {})
+        self:template_add_entity(error_template, entity, table.rep(bt.MoveConfig("DEBUG_MOVE"), 16), {}, {})
     end
 end

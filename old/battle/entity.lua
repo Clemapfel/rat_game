@@ -54,8 +54,8 @@ end, {
     move_to_move_slot_i = {}, -- Table<bt.Move Number>
 
     n_equip_slots = 2,
-    equips = {}, -- List<{equip: bt.Equip}>
-    equip_to_equip_slot_i = {}, -- Table<bt.Equip, Number>
+    equips = {}, -- List<{equip: bt.EquipConfig}>
+    equip_to_equip_slot_i = {}, -- Table<bt.EquipConfig, Number>
 
     n_consumable_slots = 1,
     consumables = {}, -- List<{consumable: bt.Consumable, n_consumed: Number}>

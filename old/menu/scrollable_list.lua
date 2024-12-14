@@ -104,7 +104,7 @@ function mn.ScrollableList:_regenerate_sortings()
         for item in range(item_a, item_b) do
             if meta.isa(item, bt.Move) then
                 properties[i] = item:get_id()
-            elseif meta.isa(item, bt.Equip) then
+            elseif meta.isa(item, bt.EquipConfig) then
                 properties[i] = item:get_type()
             elseif meta.isa(item, bt.Consumable) then
                 properties[i] = item:get_max_n_uses()

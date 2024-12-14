@@ -62,7 +62,7 @@ end, {
     moves = {}, -- List<{move: bt.Move, n_uses: Number}>
 
     n_equip_slots = 2,
-    equips = {}, -- List<{equip: bt.Equip, type: bt.EquipType}>
+    equips = {}, -- List<{equip: bt.EquipConfig, type: bt.EquipType}>
 
     n_consumable_slots = 1,
     consumables = {}, -- List<{consumable: bt.Consumable, n_consumed: Number}>

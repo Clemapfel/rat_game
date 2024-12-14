@@ -3,19 +3,19 @@ rt.settings.battle.equip = {
     name = "Gear"
 }
 
---- @class bt.Equip
-bt.Equip = meta.new_type("Equip", function(id)
-    local out = bt.Equip._atlas[id]
+--- @class bt.EquipConfig
+bt.EquipConfig = meta.new_type("EquipConfig", function(id)
+    local out = bt.EquipConfig._atlas[id]
     if out == nil then
         local path = rt.settings.battle.equip.config_path .. "/" .. id .. ".lua"
-        out = meta.new(bt.Equip, {
+        out = meta.new(bt.EquipConfig, {
             id = id,
             _path = path,
             _is_realized = false
         })
         out:realize()
         meta.set_is_mutable(out, false)
-        bt.Equip._atlas[id] = out
+        bt.EquipConfig._atlas[id] = out
     end
     return out
 end, {
@@ -41,10 +41,10 @@ end, {
     sprite_id = "",
     sprite_index = 1
 })
-bt.Equip._atlas = {}
+bt.EquipConfig._atlas = {}
 
 --- @brief
-function bt.Equip:realize()
+function bt.EquipConfig:realize()
     if self._is_realized == true then return end
 
     local template = {
@@ -77,66 +77,66 @@ function bt.Equip:realize()
 end
 
 --- @brief
-function bt.Equip:get_id()
+function bt.EquipConfig:get_id()
     return self.id
 end
 
 --- @brief
-function bt.Equip:get_name()
+function bt.EquipConfig:get_name()
     return self.name
 end
 
 --- @brief
-function bt.Equip:get_hp_base_offset()
+function bt.EquipConfig:get_hp_base_offset()
     return self.hp_base_offset
 end
 
 --- @brief
-function bt.Equip:get_attack_base_offset()
+function bt.EquipConfig:get_attack_base_offset()
     return self.attack_base_offset
 end
 
 --- @brief
-function bt.Equip:get_defense_base_offset()
+function bt.EquipConfig:get_defense_base_offset()
     return self.defense_base_offset
 end
 
 --- @brief
-function bt.Equip:get_speed_base_offset()
+function bt.EquipConfig:get_speed_base_offset()
     return self.speed_base_offset
 end
 
 --- @brief
-function bt.Equip:get_hp_base_factor()
+function bt.EquipConfig:get_hp_base_factor()
     return self.hp_base_factor
 end
 
 --- @brief
-function bt.Equip:get_attack_base_factor()
+function bt.EquipConfig:get_attack_base_factor()
     return self.attack_base_factor
 end
 
 --- @brief
-function bt.Equip:get_defense_base_factor()
+function bt.EquipConfig:get_defense_base_factor()
     return self.defense_base_factor
 end
 
 --- @brief
-function bt.Equip:get_speed_base_factor()
+function bt.EquipConfig:get_speed_base_factor()
     return self.speed_base_factor
 end
 
 --- @brief
-function bt.Equip:get_sprite_id()
+function bt.EquipConfig:get_sprite_id()
     return self.sprite_id, self.sprite_index
 end
 
 --- @brief
-function bt.Equip:get_description()
+function bt.EquipConfig:get_description()
     return self.description
 end
 
 --- @brief
-function bt.Equip:get_flavor_text()
+function bt.EquipConfig:get_flavor_text()
     return self.flavor_text
 end

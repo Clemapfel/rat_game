@@ -14,12 +14,12 @@ do
             local color = _entity_id_to_color[object:get_id()]
             if color == nil then color = "RED" end -- enemies
             return "<b><color=RED>" .. object:get_name() .. "</color></b>"
-        elseif meta.isa(object, bt.Move) then
+        elseif meta.isa(object, bt.MoveConfig) then
             return "<b><i>" .. object:get_name() .. "</i></b>"
-        elseif meta.isa(object, bt.Consumable)
-            or meta.isa(object, bt.Status)
-            or meta.isa(object, bt.GlobalStatus)
-            or meta.isa(object, bt.Equip)
+        elseif meta.isa(object, bt.ConsumableConfig)
+            or meta.isa(object, bt.StatusConfig)
+            or meta.isa(object, bt.GlobalStatusConfig)
+            or meta.isa(object, bt.EquipConfig)
         then
             return "<b><u>" .. object:get_name() .. "</u></b>"
         elseif meta.is_number(object) or meta.is_string(object) then
@@ -33,15 +33,15 @@ do
 end
 
 do -- pre-load all immutable configs, parse description and replace with formatted names
-    assert(bt.Status ~= nil and bt.Move ~= nil and bt.Equip ~= nil and bt.Consumable ~= nil and bt.GlobalStatus ~= nil)
+    assert(bt.StatusConfig ~= nil and bt.MoveConfig ~= nil and bt.EquipConfig ~= nil and bt.ConsumableConfig ~= nil and bt.GlobalStatusConfig ~= nil)
     local _id_to_object = (function()
         local out = {}
         for path_type in range(
-            {"statuses", bt.Status},
-            {"moves", bt.Move},
-            {"equips", bt.Equip},
-            {"consumables", bt.Consumable},
-            {"global_statuses", bt.GlobalStatus}
+            {"statuses", bt.StatusConfig},
+            {"moves", bt.MoveConfig},
+            {"equips", bt.EquipConfig},
+            {"consumables", bt.ConsumableConfig},
+            {"global_statuses", bt.GlobalStatusConfig}
         ) do
             local path, type = table.unpack(path_type)
             for _, name in pairs(love.filesystem.getDirectoryItems("assets/configs/" .. path)) do

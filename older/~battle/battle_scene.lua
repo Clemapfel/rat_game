@@ -95,7 +95,7 @@ function bt.BattleScene:format_name(entity)
         name = "<b><i>" .. entity:get_name() .. "</b></i>"
     elseif meta.isa(entity, bt.GlobalStatus) then
         name = "<b><i>" .. entity:get_name() .. "</b></i>"
-    elseif meta.isa(entity, bt.Equip) then
+    elseif meta.isa(entity, bt.EquipConfig) then
         name = "<b>" .. entity:get_name() .. "</b>"
     elseif meta.isa(entity, bt.Consumable) then
         name = "<b>" .. entity:get_name() .. "</b>"

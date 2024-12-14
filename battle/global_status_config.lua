@@ -2,20 +2,20 @@ rt.settings.battle.global_status = {
     config_path = "assets/configs/global_statuses"
 }
 
---- @class bt.GlobalStatus
+--- @class bt.GlobalStatusConfig
 --- @brief cached instancing, moves with the same ID will always return the same instance
-bt.GlobalStatus = meta.new_type("GlobalStatus", function(id)
-    local out = bt.GlobalStatus._atlas[id]
+bt.GlobalStatusConfig = meta.new_type("GlobalStatus", function(id)
+    local out = bt.GlobalStatusConfig._atlas[id]
     if out == nil then
         local path = rt.settings.battle.global_status.config_path .. "/" .. id .. ".lua"
-        out = meta.new(bt.GlobalStatus, {
+        out = meta.new(bt.GlobalStatusConfig, {
             id = id,
             name = "UNINITIALIZED GLOBAL_STATUS @" .. path,
             _path = path,
             _is_realized = false
         })
         out:realize()
-        bt.GlobalStatus._atlas[id] = out
+        bt.GlobalStatusConfig._atlas[id] = out
     end
     return out
 end, {
@@ -165,10 +165,10 @@ end, {
         return nil
     end
 })
-bt.GlobalStatus._atlas = {}
+bt.GlobalStatusConfig._atlas = {}
 
 --- @brief
-function bt.GlobalStatus:realize()
+function bt.GlobalStatusConfig:realize()
     if self._is_realized == true then return end
 
     local functions = {
@@ -225,36 +225,36 @@ function bt.GlobalStatus:realize()
 end
 
 --- @brief
-function bt.GlobalStatus:get_sprite_id()
+function bt.GlobalStatusConfig:get_sprite_id()
     return self.sprite_id, self.sprite_index
 end
 
 --- @brief
-function bt.GlobalStatus:get_id()
+function bt.GlobalStatusConfig:get_id()
     return self.id
 end
 
 --- @brief
-function bt.GlobalStatus:get_name()
+function bt.GlobalStatusConfig:get_name()
     return self.name
 end
 
 --- @brief
-function bt.GlobalStatus:get_is_silent()
+function bt.GlobalStatusConfig:get_is_silent()
     return self.is_silent
 end
 
 --- @brief
-function bt.GlobalStatus:get_max_duration()
+function bt.GlobalStatusConfig:get_max_duration()
     return self.max_duration
 end
 
 --- @brief
-function bt.GlobalStatus:get_description()
+function bt.GlobalStatusConfig:get_description()
     return self.description
 end
 
 --- @brief
-function bt.GlobalStatus:get_flavor_text()
+function bt.GlobalStatusConfig:get_flavor_text()
     return self.flavor_text
 end

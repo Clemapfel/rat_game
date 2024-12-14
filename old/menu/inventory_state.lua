@@ -3,7 +3,7 @@ mn.InventoryState = meta.new_type("MenuInventoryState", function()
     local self = meta.new(mn.InventoryState, {
         shared_moves = {},          -- Table<bt.Move, Integer>
         shared_consumables = {},    -- Table<bt.Consumable, Integer>
-        shared_equips = {},         -- Table<bt.Equip, Integer>
+        shared_equips = {},         -- Table<bt.EquipConfig, Integer>
         templates = {},             -- Table<mn.Template>
         active = mn.Template("Active Template")      -- mn.Template
     })
@@ -26,12 +26,12 @@ mn.InventoryState = meta.new_type("MenuInventoryState", function()
     end
 
     local equips = {
-        bt.Equip("DEBUG_EQUIP"),
-        bt.Equip("DEBUG_CLOTHING"),
-        bt.Equip("DEBUG_FEMALE_CLOTHING"),
-        bt.Equip("DEBUG_MALE_CLOTHING"),
-        bt.Equip("DEBUG_WEAPON"),
-        bt.Equip("DEBUG_TRINKET")
+        bt.EquipConfig("DEBUG_EQUIP"),
+        bt.EquipConfig("DEBUG_CLOTHING"),
+        bt.EquipConfig("DEBUG_FEMALE_CLOTHING"),
+        bt.EquipConfig("DEBUG_MALE_CLOTHING"),
+        bt.EquipConfig("DEBUG_WEAPON"),
+        bt.EquipConfig("DEBUG_TRINKET")
     }
 
     for equip in values(equips) do
@@ -42,9 +42,9 @@ mn.InventoryState = meta.new_type("MenuInventoryState", function()
     end
 
     local consumables = {
-        bt.Consumable("DEBUG_CONSUMABLE"),
-        bt.Consumable("ONE_CHERRY"),
-        bt.Consumable("TWO_CHERRY")
+        bt.ConsumableConfig("DEBUG_CONSUMABLE"),
+        bt.ConsumableConfig("ONE_CHERRY"),
+        bt.ConsumableConfig("TWO_CHERRY")
     }
 
     for consumable in values(consumables) do
@@ -97,8 +97,8 @@ mn.InventoryState = meta.new_type("MenuInventoryState", function()
         self:add_equipped_move(entity, 2, bt.Move("DEBUG_MOVE"))
         self:add_equipped_move(entity, 4, bt.Move("WISH"))
 
-        self:add_equipped_equip(entity, 1, bt.Equip("DEBUG_EQUIP"))
-        self:add_equipped_consumable(entity, 1, bt.Consumable("DEBUG_CONSUMABLE"))
+        self:add_equipped_equip(entity, 1, bt.EquipConfig("DEBUG_EQUIP"))
+        self:add_equipped_consumable(entity, 1, bt.ConsumableConfig("DEBUG_CONSUMABLE"))
     end
     return self
 end)
@@ -185,12 +185,12 @@ function mn.InventoryState:deserialize(str)
 
     self.shared_equips = {}
     for id, quantity in pairs(parsed.shared_equips) do
-        self.shared_equips[bt.Equip(id)] = quantity
+        self.shared_equips[bt.EquipConfig(id)] = quantity
     end
 
     self.shared_consumables = {}
     for id, quantity in pairs(parsed.shared_consumables) do
-        self.shared_consumables[bt.Consumable(id)] = quantity
+        self.shared_consumables[bt.ConsumableConfig(id)] = quantity
     end
 
     local deserialize_template = function(parsed)
@@ -213,11 +213,11 @@ function mn.InventoryState:deserialize(str)
             end
 
             for slot_i, equip_id in pairs(setup.equips) do
-                to_insert.equips[slot_i] = bt.Equip(equip_id)
+                to_insert.equips[slot_i] = bt.EquipConfig(equip_id)
             end
 
             for slot_i, consumable_id in pairs(setup.consumables) do
-                to_insert.consumables[slot_i] = bt.Consumable(consumable_id)
+                to_insert.consumables[slot_i] = bt.ConsumableConfig(consumable_id)
             end
 
             template.entities[bt.Entity(entity_id)] = to_insert
@@ -298,7 +298,7 @@ for which in range("move", "equip", "consumable") do
         if current ~= nil then
             if meta.isa(self.grabbed_object, bt.Move) then
                 self:add_shared_move(current)
-            elseif meta.isa(self.grabbed_object, bt.Equip) then
+            elseif meta.isa(self.grabbed_object, bt.EquipConfig) then
                 self:add_shared_equip(current)
             elseif meta.isa(self.grabbed_object, bt.Consumable) then
                 self:add_shared_consumable(current)
@@ -363,7 +363,7 @@ end
 function mn.InventoryState:add_shared_object(object)
     if meta.isa(object, bt.Move) then
         self:add_shared_move(object)
-    elseif meta.isa(object, bt.Equip) then
+    elseif meta.isa(object, bt.EquipConfig) then
         self:add_shared_equip(object)
     elseif meta.isa(object, bt.Consumable) then
         self:add_shared_consumable(object)
@@ -377,7 +377,7 @@ function mn.InventoryState:set_grabbed_object(object)
     if self.grabbed_object ~= nil then
         if meta.isa(self.grabbed_object, bt.Move) then
             self:add_shared_move(self.grabbed_object)
-        elseif meta.isa(self.grabbed_object, bt.Equip) then
+        elseif meta.isa(self.grabbed_object, bt.EquipConfig) then
             self:add_shared_equip(self.grabbed_object)
         elseif meta.isa(self.grabbed_object, bt.Consumable) then
             self:add_shared_consumable(self.grabbed_object)
@@ -391,7 +391,7 @@ function mn.InventoryState:set_grabbed_object(object)
 end
 
 --- @brief
---- @return Table<bt.Move>, Table<bt.Equip>, Table<bt.Consumable>
+--- @return Table<bt.Move>, Table<bt.EquipConfig>, Table<bt.Consumable>
 function mn.InventoryState:entity_sort_inventory(entity)
     meta.assert_isa(entity, bt.Entity)
 

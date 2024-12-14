@@ -29,7 +29,7 @@ end
 function mn.VerboseInfoPanel.Item:create_from(object)
     if meta.is_string(object) then
         self:create_from_string(object)
-    elseif meta.isa(object, bt.Equip) then
+    elseif meta.isa(object, bt.EquipConfig) then
         self:create_from_equip(object)
     elseif meta.isa(object, bt.Move) then
         self:create_from_move(object)

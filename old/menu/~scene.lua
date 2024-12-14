@@ -11,8 +11,8 @@ mn.InventoryState = meta.new_type("MenuInventoryState", function()
     return meta.new(mn.InventoryState, {
         shared_moves = {},       -- Table<bt.Move, Number>
         shared_consumables = {}, -- Table<bt.Consumable, Number>
-        shared_equips = {},      -- Table<bt.Equip, Number>
-        stack = {},              -- Stack<Union<bt.Move, bt.Equip, bt.Consumable>>
+        shared_equips = {},      -- Table<bt.EquipConfig, Number>
+        stack = {},              -- Stack<Union<bt.Move, bt.EquipConfig, bt.Consumable>>
         entities = {},           -- Queue<bt.Entity>
     })
 end)
@@ -754,7 +754,7 @@ function mn.Scene:_regenerate_selection_nodes()
             if scene._grabbed_object ~= nil then
                 if meta.isa(scene._grabbed_object, bt.Move) then
                     scene:set_current_shared_list_page(self._shared_move_tab_index)
-                elseif meta.isa(scene._grabbed_object, bt.Equip) then
+                elseif meta.isa(scene._grabbed_object, bt.EquipConfig) then
                     scene:set_current_shared_list_page(self._shared_equip_tab_index)
                 elseif meta.isa(scene._grabbed_object, bt.Consumable) then
                     scene:set_current_shared_list_page(self._shared_consumable_tab_index)
@@ -858,7 +858,7 @@ function mn.Scene:_regenerate_selection_nodes()
 
                 local n_equip_slots = scene._state.entities[page_i]:get_n_equip_slots()
                 if node_i <= n_equip_slots then
-                    scene:_set_grabbed_object_allowed(meta.isa(scene._grabbed_object, bt.Equip))
+                    scene:_set_grabbed_object_allowed(meta.isa(scene._grabbed_object, bt.EquipConfig))
                 else
                     scene:_set_grabbed_object_allowed(meta.isa(scene._grabbed_object, bt.Consumable))
                 end
@@ -1071,7 +1071,7 @@ function mn.Scene:_regenerate_selection_nodes()
                 local down = page.equips_and_consumables:get_object(node_i)
                 local up = scene._grabbed_object
 
-                if up ~= nil and not meta.isa(up, bt.Equip) then
+                if up ~= nil and not meta.isa(up, bt.EquipConfig) then
                     return
                 end
 

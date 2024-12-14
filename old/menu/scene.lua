@@ -514,7 +514,7 @@ function mn.Scene:_regenerate_selection_nodes()
 
         local a_label, x_label
         local is_grabbing = scene._state:peek_grabbed_object() ~= nil
-        local is_move =  meta.isa(scene._state:peek_grabbed_object(), bt.Equip)
+        local is_move =  meta.isa(scene._state:peek_grabbed_object(), bt.EquipConfig)
         if is_grabbing and is_move then
             a_label = "Deposit " .. equip_name
             x_label = "<s><color=GRAY>Equip</color></s>"
@@ -590,7 +590,7 @@ function mn.Scene:_regenerate_selection_nodes()
         if up ~= nil then
             if meta.isa(up, bt.Move) then
                 up_name = move_name
-            elseif meta.isa(up, bt.Equip) then
+            elseif meta.isa(up, bt.EquipConfig) then
                 up_name = equip_name
             elseif meta.isa(up, bt.Consumable) then
                 up_name = consumable_name
@@ -601,7 +601,7 @@ function mn.Scene:_regenerate_selection_nodes()
         if down ~= nil then
             if meta.isa(down, bt.Move) then
                 down_name = move_name
-            elseif meta.isa(down, bt.Equip) then
+            elseif meta.isa(down, bt.EquipConfig) then
                 down_name = equip_name
             elseif meta.isa(down, bt.Consumable) then
                 down_name = consumable_name
@@ -1223,7 +1223,7 @@ function mn.Scene:_regenerate_selection_nodes()
                     else
                         scene:_set_verbose_info_object(object)
                     end
-                    scene:_set_grabbed_object_allowed(meta.isa(scene._state:peek_grabbed_object(), bt.Equip))
+                    scene:_set_grabbed_object_allowed(meta.isa(scene._state:peek_grabbed_object(), bt.EquipConfig))
                 else
                     local object = scene._state:get_consumable_at(page.entity, node_i - n_equips)
                     if object == nil and scene._state:peek_grabbed_object() == nil then
@@ -1250,7 +1250,7 @@ function mn.Scene:_regenerate_selection_nodes()
                     local down = page.equips_and_consumables:get_object(node_i)
 
                     if up ~= nil and down == nil then -- deposit
-                        if not meta.isa(up, bt.Equip) then return end
+                        if not meta.isa(up, bt.EquipConfig) then return end
 
                         scene._state:take_grabbed_object()
                         scene._state:add_equipped_equip(page.entity, node_i, up)
@@ -1283,7 +1283,7 @@ function mn.Scene:_regenerate_selection_nodes()
                             scene._undo_grab = function() end
                         end
                     elseif up ~= nil and down ~= nil then -- swap
-                        if not meta.isa(up, bt.Equip) then return end
+                        if not meta.isa(up, bt.EquipConfig) then return end
 
                         local new_equipped = scene._state:take_grabbed_object()
                         local new_grabbed = scene._state:take_equipped_equip(page.entity, node_i)
@@ -1571,7 +1571,7 @@ function mn.Scene:_regenerate_selection_nodes()
         scene._shared_equip_list:set_selection_state(rt.SelectionState.ACTIVE)
         scene:_set_verbose_info_object(scene._shared_equip_list:get_selected_object())
         scene:_update_grabbed_object()
-        scene:_set_grabbed_object_allowed(meta.isa(scene._state:peek_grabbed_object(), bt.Equip))
+        scene:_set_grabbed_object_allowed(meta.isa(scene._state:peek_grabbed_object(), bt.EquipConfig))
     end)
 
     shared_equip_node:signal_connect("exit", function(_)
@@ -1581,7 +1581,7 @@ function mn.Scene:_regenerate_selection_nodes()
     shared_equip_node:signal_connect(rt.InputButton.A, function(_)
         local up = scene._state:peek_grabbed_object()
         if up ~= nil then -- deposit
-            if not meta.isa(up, bt.Equip) then return end
+            if not meta.isa(up, bt.EquipConfig) then return end
             scene._shared_equip_list:add(up)
             scene._state:take_grabbed_object()
             scene._state:add_shared_equip(up)
@@ -1606,7 +1606,7 @@ function mn.Scene:_regenerate_selection_nodes()
             end
         end
         scene:_update_grabbed_object()
-        scene:_set_grabbed_object_allowed(meta.isa(scene._state:peek_grabbed_object(), bt.Equip))
+        scene:_set_grabbed_object_allowed(meta.isa(scene._state:peek_grabbed_object(), bt.EquipConfig))
     end)
 
     shared_equip_node:signal_connect(rt.InputButton.X, function(_)

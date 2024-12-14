@@ -6,11 +6,11 @@ rt.settings.battle.animation.equip_applied = {
 
 --- @class bt.Animation.EQUIP_APPLIED
 --- @param scene bt.BattleScene
---- @param equip bt.Equip
+--- @param equip bt.EquipConfig
 --- @param sprite bt.EntitySprite
 bt.Animation.EQUIP_APPLIED = meta.new_type("EQUIP_APPLIED", rt.Animation, function(scene, equip, sprite)
     meta.assert_isa(scene, bt.BattleScene)
-    meta.assert_isa(equip, bt.Equip)
+    meta.assert_isa(equip, bt.EquipConfig)
     meta.assert_isa(sprite, bt.EntitySprite)
     local move_duration = rt.settings.battle.animation.equip_applied.move_duration
     local hold_duration = rt.settings.battle.animation.equip_applied.hold_duration

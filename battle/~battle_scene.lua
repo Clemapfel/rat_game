@@ -37,9 +37,9 @@ function bt.BattleScene:realize()
     self._is_realized = true
 
     for object in range(
-        bt.Status("DEBUG_STATUS"),
-        bt.Consumable("DEBUG_CONSUMABLE"),
-        bt.GlobalStatus("DEBUG_GLOBAL_STATUS")
+        bt.StatusConfig("DEBUG_STATUS"),
+        bt.ConsumableConfig("DEBUG_CONSUMABLE"),
+        bt.GlobalStatusConfig("DEBUG_GLOBAL_STATUS")
     ) do
         self:_add_item(object)
     end
@@ -89,7 +89,7 @@ function bt.BattleScene:size_allocate(x, y, width, height)
     self._verbose_info:fit_into(x + width - verbose_w - outer_margin, outer_margin, verbose_w, height - 2 * outer_margin)
 
     -- TODO
-    self._verbose_info:show(bt.Status("DEBUG_STATUS"))
+    self._verbose_info:show(bt.StatusConfig("DEBUG_STATUS"))
     -- TODO
 
     local xm, ym = self:_get_margin()
