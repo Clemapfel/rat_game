@@ -93,7 +93,7 @@ function bt.BattleScene:create_from_state()
             sprite:add_status(status, max - duration)
         end
 
-        for i = 1, entity:get_n_consumable_slots() do
+        for i = 1, self._state:entity_get_n_consumable_slots(entity) do
             local consumable = self._state:entity_get_consumable(entity, i)
             if consumable ~= nil then
                 local max = consumable:get_max_n_uses()
@@ -113,7 +113,7 @@ function bt.BattleScene:add_entity(...)
     local reformat_enemies, reformat_allies = false, false
     for entity in range(...) do
         local sprite
-        if entity:get_is_enemy() == true then
+        if self._state:entity_get_is_enemy(entity) == true then
             reformat_enemies = true
             sprite = bt.EnemySprite(entity)
             if self._is_realized == true then
@@ -146,7 +146,7 @@ function bt.BattleScene:remove_entity(...)
     for entity in range(...) do
         local sprite = self:get_sprite(entity)
         if sprite ~= nil then
-            if entity:get_is_enemy() then
+            if self._state:entity_get_is_enemy(entity) then
                 for i, other in ipairs(self._enemy_sprites) do
                     if other == sprite then
                         table.remove(self._enemy_sprites, i)

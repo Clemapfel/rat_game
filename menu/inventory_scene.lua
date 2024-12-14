@@ -145,7 +145,7 @@ function mn.InventoryScene:create_from_state(state)
     end)
 
     for entity_i, entity in ipairs(entities) do
-        local tab_sprite = rt.Sprite(entity:get_portrait_sprite_id())
+        local tab_sprite = rt.Sprite(entity:get_config():get_portrait_sprite_id())
         local sprite_w, sprite_h = tab_sprite:get_resolution()
         tab_sprite:set_minimum_size(sprite_w * tab_sprite_scale_factor, sprite_h * tab_sprite_scale_factor)
         self._entity_tab_bar:push(tab_sprite)
@@ -154,7 +154,7 @@ function mn.InventoryScene:create_from_state(state)
         local move_layout = {}
         do
             -- split into rows of 4
-            local n_move_slots = entity:get_n_move_slots()
+            local n_move_slots = self._state:entity_get_n_move_slots(entity)
             table.insert(move_layout, {})
             for i = 1, n_move_slots do
                 table.insert(move_layout[#move_layout], mn.SlotType.MOVE)
@@ -164,19 +164,24 @@ function mn.InventoryScene:create_from_state(state)
             end
 
             -- single row
-            local n_equips = entity:get_n_equip_slots()
+            local n_equips = self._state:entity_get_n_equip_slots(entity)
             for i = 1, n_equips do
                 table.insert(equip_consumable_layout, mn.SlotType.EQUIP)
             end
 
-            for i = 1, entity:get_n_consumable_slots() do
+            for i = 1, self._state:entity_get_n_consumable_slots(entity) do
                 table.insert(equip_consumable_layout, mn.SlotType.CONSUMABLE)
             end
         end
 
         local page = {
             entity = entity,
-            info = mn.EntityInfo(entity),
+            info = mn.EntityInfo(
+                self._state:entity_get_hp(entity),
+                self._state:entity_get_attack(entity),
+                self._state:entity_get_defense(entity),
+                self._state:entity_get_speed(entity)
+            ),
             equips_and_consumables = mn.Slots({equip_consumable_layout}),
             moves = mn.Slots(move_layout)
         }
@@ -542,7 +547,7 @@ end
 --- @brief
 function mn.InventoryScene:_set_entity_index(entity_i)
     self._entity_index = entity_i
-    local n = self._state:get_n_allies()
+    local n = self._state:get_n_party()
     for i = 1, n do
         self._entity_tab_bar:set_tab_active(i, i == self._entity_index)
     end
@@ -596,7 +601,7 @@ function mn.InventoryScene:_regenerate_selection_nodes()
     table.sort(entity_tab_nodes, function(a, b) return a:get_bounds().y < b:get_bounds().y end)
 
     local entity_page_nodes = {}
-    local n_entities = self._state:get_n_allies()
+    local n_entities = self._state:get_n_party()
     for entity_i = 1, n_entities do
         local page = self._entity_pages[entity_i]
         local info_node = rt.SelectionGraphNode(page.info:get_bounds())
@@ -714,7 +719,7 @@ function mn.InventoryScene:_regenerate_selection_nodes()
     local consumable_slot_allow_take = function()
         local up = scene._state:peek_grabbed_object()
         local entity = scene:_get_current_entity()
-        local slot_i = scene._selection_graph:get_current_node().slot_i - entity:get_n_equip_slots()
+        local slot_i = scene._selection_graph:get_current_node().slot_i - self._state:entity_get_n_equip_slots(entity)
         local down = scene._state:entity_get_consumable(entity, slot_i)
 
         return up == nil and down ~= nil
@@ -746,7 +751,7 @@ function mn.InventoryScene:_regenerate_selection_nodes()
 
     local consumable_slot_allow_deposit = function()
         local entity = scene:_get_current_entity()
-        local slot_i = scene._selection_graph:get_current_node().slot_i - entity:get_n_equip_slots()
+        local slot_i = scene._selection_graph:get_current_node().slot_i - self._state:entity_get_n_consumable_slots(entity)
         if slot_i == nil then return false end
 
         local grabbed = scene._state:peek_grabbed_object()
@@ -776,7 +781,7 @@ function mn.InventoryScene:_regenerate_selection_nodes()
     local consumable_slot_allow_swap = function()
         local up = scene._state:peek_grabbed_object()
         local entity = scene:_get_current_entity()
-        local slot_i = scene._selection_graph:get_current_node().slot_i - entity:get_n_equip_slots()
+        local slot_i = scene._selection_graph:get_current_node().slot_i - self._state:entity_get_n_equip_slots(entity)
         local down = scene._state:entity_get_consumable(entity, slot_i)
 
         return meta.isa(up, bt.Consumable) and down ~= nil
@@ -802,7 +807,7 @@ function mn.InventoryScene:_regenerate_selection_nodes()
     local consumable_slot_allow_unequip = function()
         local up = scene._state:peek_grabbed_object()
         local entity = scene:_get_current_entity()
-        local slot_i = scene._selection_graph:get_current_node().slot_i - entity:get_n_equip_slots()
+        local slot_i = scene._selection_graph:get_current_node().slot_i - self._state:entity_get_n_equip_slots(entity)
         local down = scene._state:entity_get_consumable(entity, slot_i)
 
         return up ~= nil or down ~= nil
@@ -1048,7 +1053,7 @@ function mn.InventoryScene:_regenerate_selection_nodes()
         local up = scene._state:peek_grabbed_object()
         local entity = scene:_get_current_entity()
         local slot_i = scene._selection_graph:get_current_node().slot_i
-        local down = scene._state:entity_get_consumable(entity, slot_i - entity:get_n_equip_slots())
+        local down = scene._state:entity_get_consumable(entity, slot_i - self._state:entity_get_n_equip_slots(entity))
         local translation = rt.Translation.inventory_scene
 
         local a_label
@@ -1095,7 +1100,7 @@ function mn.InventoryScene:_regenerate_selection_nodes()
         end
 
         local entity = scene._entity_pages[page_i].entity
-        local n_equip_slots = entity:get_n_equip_slots()
+        local n_equip_slots = self._state:entity_get_n_equip_slots(entity)
         for slot_i, node in ipairs(node_page.slot_nodes) do
             if slot_i <= n_equip_slots then
                 node:set_control_layout(equip_node_control_layout)
@@ -1418,7 +1423,7 @@ function mn.InventoryScene:_regenerate_selection_nodes()
                     page.moves:set_object(i, move)
                 end
 
-                local n_equip_slots = page.entity:get_n_equip_slots()
+                local n_equip_slots = page.self._state:entity_get_n_equip_slots(entity)
                 for i, equip in ipairs(equips) do
                     page.equips_and_consumables:set_object(i, equip)
                 end
@@ -1553,7 +1558,7 @@ function mn.InventoryScene:_regenerate_selection_nodes()
         end
 
         local entity = self._entity_pages[page_i].entity
-        local n_equip_slots = entity:get_n_equip_slots()
+        local n_equip_slots = self._state:entity_get_n_equip_slots(entity)
         for node_i, node in ipairs(node_page.slot_nodes) do
             node:signal_connect("enter", function(_)
                 if node_i <= n_equip_slots then
@@ -1662,7 +1667,7 @@ function mn.InventoryScene:_regenerate_selection_nodes()
                     scene:_update_entity_info_preview(node_i)
                 else
                     local up = scene._state:peek_grabbed_object()
-                    local slot_i = node_i - page.entity:get_n_equip_slots()
+                    local slot_i = node_i - page.self._state:entity_get_n_equip_slots(entity)
                     local down = scene._state:entity_get_consumable(page.entity, slot_i)
                     if up ~= nil and down == nil and consumable_slot_allow_deposit() then
                         scene._state:take_grabbed_object()
@@ -1732,7 +1737,7 @@ function mn.InventoryScene:_regenerate_selection_nodes()
 
                 local page = scene._entity_pages[page_i]
                 local slot_i = node_i
-                local n_equip_slots = page.entity:get_n_equip_slots()
+                local n_equip_slots = page.self._state:entity_get_n_equip_slots(entity)
                 if slot_i <= n_equip_slots then
                     if equip_slot_allow_unequip() then
                         local down = scene._state:entity_get_equip(page.entity, slot_i)
@@ -1899,7 +1904,7 @@ function mn.InventoryScene:_regenerate_selection_nodes()
             local page = scene._entity_pages[scene._entity_index]
             local entity = page.entity
             local slot_i = scene._state:entity_get_first_free_consumable_slot(entity)
-            local n_equip_slots = entity:get_n_equip_slots()
+            local n_equip_slots = self._state:entity_get_n_equip_slots(entity)
             assert(slot_i ~= nil)
 
             scene._state:remove_shared_consumable(to_equip)
@@ -2103,7 +2108,12 @@ end
 function mn.InventoryScene:_update_entity_info()
     local info = self._entity_pages[self._entity_index].info
     local entity = self._entity_pages[self._entity_index].entity
-    info:set_values(entity:get_hp(), entity:get_attack(), entity:get_defense(), entity:get_speed())
+    info:set_values(
+        self._state:entity_get_hp(entity),
+        self._state:entity_get_attack(entity),
+        self._state:entity_get_defense(entity),
+        self._state:entity_get_speed(entity)
+    )
 end
 
 --- @brief

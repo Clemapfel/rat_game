@@ -3,8 +3,8 @@ do
         ["RAT"] = "PUPRLE",
         ["MC"] = "ORANGE",
         ["GIRL"] = "LILAC",
-        ["WILDCARD"] = "NEON_RED",
-        ["PROF"] = "LIGHT_BLUE",
+        ["WILDCARD"] = "RED_2",
+        ["PROF"] = "BLUE_1",
         ["SCOUT"] = "YELLOW"
     }
 

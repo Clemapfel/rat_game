@@ -509,7 +509,7 @@ function mn.VerboseInfoPanel.Item:create_from_status(status)
         self.description_label = self._description(status:get_description())
         self.sprite = self._sprite(status)
 
-        self.max_duration_prefix_label = self._prefix(rt.Translation.status_max_duration)
+        self.max_duration_prefix_label = self._prefix(rt.Translation.verbose_info.status_max_duration)
         self.max_duration_colon_label = self._colon()
 
         local duration = status:get_max_duration()
@@ -953,6 +953,8 @@ function mn.VerboseInfoPanel.Item:create_from_entity(entity)
         return "<b><u>" .. str .. "</u></b>"
     end
 
+    -- TODO: don't use global STATE
+
     self.realize = function()
         self._is_realized = true
         self.frame:realize()
@@ -977,7 +979,7 @@ function mn.VerboseInfoPanel.Item:create_from_entity(entity)
             local prefix_label = self._prefix(label, color)
             prefix_label:realize()
             local colon = self._colon()
-            local value_label = self._number("<color=" .. color .. ">" .. tostring(entity["get_" .. stat](entity)) .. "</color>")
+            local value_label = self._number("<color=" .. color .. ">" .. tostring(STATE["entity_get_" .. stat](STATE, entity)) .. "</color>")
 
             self[stat .. "_prefix_label"] = prefix_label
             self[stat .. "_colon_label"] = colon
@@ -1001,7 +1003,7 @@ function mn.VerboseInfoPanel.Item:create_from_entity(entity)
         self.consumable_sprites = {}
         self.consumable_names = {}
 
-        local n_move_slots, move_slots = entity:list_move_slots()
+        local n_move_slots, move_slots = STATE:entity_list_move_slots(entity)
         for i = 1, n_move_slots do
             if move_slots[i] ~= nil then
                 table.insert(self.move_sprites, rt.Sprite(move_slots[i]:get_sprite_id()))
@@ -1013,7 +1015,7 @@ function mn.VerboseInfoPanel.Item:create_from_entity(entity)
             table.insert(self.move_names, self._description(translation.no_moves))
         end
 
-        local n_equip_slots, equip_slots = entity:list_equip_slots()
+        local n_equip_slots, equip_slots = STATE:entity_list_equip_slots(entity)
         for i = 1, n_equip_slots do
             if equip_slots[i] ~= nil then
                 table.insert(self.equip_sprites, rt.Sprite(equip_slots[i]:get_sprite_id()))
@@ -1025,7 +1027,7 @@ function mn.VerboseInfoPanel.Item:create_from_entity(entity)
             table.insert(self.equip_names, self._description(translation.no_equips))
         end
 
-        local n_consumable_slots, consumable_slots = entity:list_consumable_slots()
+        local n_consumable_slots, consumable_slots = STATE:entity_list_consumable_slots(entity)
         for i = 1, n_consumable_slots do
             if consumable_slots[i] ~= nil then
                 table.insert(self.consumable_sprites, rt.Sprite(consumable_slots[i]:get_sprite_id()))
@@ -1056,7 +1058,7 @@ function mn.VerboseInfoPanel.Item:create_from_entity(entity)
             end
         end
 
-        local flavor_text = entity:get_flavor_text()
+        local flavor_text = entity:get_config():get_flavor_text()
         if #flavor_text ~= 0 then
             self.spacer = self._hrule()
             self.flavor_text_label = self._flavor_text(flavor_text)

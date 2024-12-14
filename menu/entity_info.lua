@@ -1,12 +1,12 @@
 --- @class mn.EntityInfo
-mn.EntityInfo = meta.new_type("MenuEntityInfo", rt.Widget, function(entity)
+mn.EntityInfo = meta.new_type("MenuEntityInfo", rt.Widget, function(hp, attack, defense, speed)
     return meta.new(mn.EntityInfo, {
         _frame = rt.Frame(),
 
-        _hp_value = entity:get_hp_base(),
-        _attack_value = entity:get_attack_base(),
-        _defense_value = entity:get_defense_base(),
-        _speed_value = entity:get_speed_base(),
+        _hp_value = hp,
+        _attack_value = attack,
+        _defense_value = defense,
+        _speed_value = speed,
 
         _hp_preview_value = 0,
         _hp_preview_active = false,

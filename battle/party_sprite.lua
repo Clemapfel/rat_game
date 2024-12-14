@@ -8,20 +8,20 @@ bt.PartySprite = meta.new_type("BattlePartySprite", bt.EntitySprite, function(en
         ["PROF"] = "battle/prof_battle",
         ["WILDCARD"] = "battle/wildcard_battle"
     }
-    assert(entity_id_to_sprite_id[entity:get_config_id()] ~= nil)
+    assert(entity_id_to_sprite_id[entity:get_id()] ~= nil)
 
     return meta.new(bt.PartySprite, {
         _frame = rt.Frame(),
 
-        _health_bar = bt.HealthBar(0, entity:get_hp_base(), entity:get_hp()),
-        _speed_value = bt.SpeedValue(entity:get_speed()),
+        _health_bar = bt.HealthBar(0, 0, 0),
+        _speed_value = bt.SpeedValue(0),
         _status_consumable_bar = bt.OrderedBox(),
         _name = rt.Label("<o>" .. entity:get_name() .. "</o>"),
 
         _gradient_visible = true,
         _gradient = rt.VertexRectangle(0, 0, 1, 1),
 
-        _sprite = rt.Sprite(entity_id_to_sprite_id[entity:get_config_id()]),
+        _sprite = rt.Sprite(entity_id_to_sprite_id[entity:get_config():get_id()]),
 
         _snapshot = rt.RenderTexture(),
         _snapshot_position_x = 0,

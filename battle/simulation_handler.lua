@@ -999,7 +999,7 @@ function bt.BattleScene:create_simulation_environment()
         env.push_message(rt.Translation.battle.message.consumable_added_f(entity_proxy, consumable_proxy))
 
         local new_slot = nil
-        for i = 1, entity:get_n_consumable_slots() do
+        for i = 1, _state:entity_get_n_consumable_slots(entity) do
             if _state:entity_get_consumable(entity, i) == nil then
                 new_slot = i
                 break
@@ -1555,7 +1555,7 @@ function bt.BattleScene:create_simulation_environment()
     function env.list_enemies()
         local out = {}
         for entity in values(_state:list_entities_in_order()) do
-            if entity:get_is_enemy() == true then
+            if _state:entity_get_is_enemy(entity) == true then
                 table.insert(out, bt.create_entity_proxy(_scene, entity))
             end
         end
@@ -1565,7 +1565,7 @@ function bt.BattleScene:create_simulation_environment()
     function env.list_party()
         local out = {}
         for entity in values(_state:list_entities_in_order()) do
-            if entity:get_is_enemy() == false then
+            if _state:entity_get_is_enemy(entity) == false then
                 table.insert(out, bt.create_entity_proxy(_scene, entity))
             end
         end
@@ -1585,7 +1585,7 @@ function bt.BattleScene:create_simulation_environment()
         local self_is_enemy = _get_native(entity_proxy):get_is_enemy()
         local out = {}
         for entity in values(_state:list_entities_in_order()) do
-            if entity:get_is_enemy() ~= self_is_enemy then
+            if _state:entity_get_is_enemy(entity) ~= self_is_enemy then
                 table.insert(out, bt.create_entity_proxy(_scene, entity))
             end
         end
@@ -1597,7 +1597,7 @@ function bt.BattleScene:create_simulation_environment()
         local self_is_enemy = _get_native(entity_proxy):get_is_enemy()
         local out = {}
         for entity in values(_state:list_entities_in_order()) do
-            if entity:get_is_enemy() == self_is_enemy then
+            if _state:entity_get_is_enemy(entity) == self_is_enemy then
                 table.insert(out, bt.create_entity_proxy(_scene, entity))
             end
         end
@@ -1647,15 +1647,19 @@ function bt.BattleScene:create_simulation_environment()
         "attack_base",
         "defense_base",
         "speed_base",
+        "attack_base_raw",
+        "defense_base_raw",
+        "speed_base_raw",
         "n_move_slots",
         "n_equip_slots",
         "n_consumable_slots",
         "is_stunned"
     ) do
+        --- @brief get_hp_base, get_attack, get_defense, get_speed, get_attack_base, get_defense_base, get_speed_base, get_attack_base_raw, get_defense_base_raw, get_speed_base_raw, get_n_move_slots, get_n_consumable_slots, get_n_equip_slots, get_is_stunned
         env["get_" .. which] = function(entity_proxy)
             bt.assert_args("get_" .. which, entity_proxy, bt.EntityProxy)
             local native = _get_native(entity_proxy)
-            return native["get_" .. which](native)
+            return _state["entity_get_" .. which](_state, native)
         end
     end
 
@@ -1665,6 +1669,7 @@ function bt.BattleScene:create_simulation_environment()
         {"list_consumable_slots", bt.create_consumable_proxy}
     ) do
         local which, proxy_f = table.unpack(which_proxy)
+        --- @brief list_move_slots, list_equip_slots, list_consumable_slots
         env[which] = function(entity_proxy)
             bt.assert_args(which, entity_proxy, bt.EntityProxy)
             local n, slots = _state["entity_" .. which](_state, _get_native(entity_proxy))
@@ -1727,7 +1732,7 @@ function bt.BattleScene:create_simulation_environment()
 
         local sprite = _scene:get_sprite(entity)
         local animation
-        if entity:get_is_enemy() then
+        if _state:entity_get_is_enemy(entity) then
             animation = bt.Animation.ENEMY_KNOCKED_OUT(_scene, sprite)
         else
             animation = bt.Animation.ALLY_KNOCKED_OUT(_scene, sprite)
@@ -2117,7 +2122,7 @@ function bt.BattleScene:create_simulation_environment()
 
         local entity = _get_native(entity_proxy)
         local current = _state:entity_get_hp(entity)
-        local diff = current - clamp(value, 0, entity:get_hp_base())
+        local diff = current - clamp(value, 0, _state:entity_get_hp_base(entity))
         if diff > 0 then
             env.add_hp(entity_proxy, diff)
         elseif diff < 0 then
@@ -2127,12 +2132,12 @@ function bt.BattleScene:create_simulation_environment()
 
     env.get_is_enemy = function(entity_proxy)
         bt.assert_args("get_is_enemy", entity_proxy, bt.EntityProxy)
-        return _get_native(entity_proxy):get_is_enemy() == true
+        return _state:entity_get_is_enemy(_get_native(entity_proxy)) == true
     end
 
     env.get_is_ally = function(entity_proxy)
         bt.assert_args("get_is_enemy", entity_proxy, bt.EntityProxy)
-        return _get_native(entity_proxy):get_is_enemy() == false
+        return _state:entity_get_is_enemy(_get_native(entity_proxy)) == false
     end
 
     -- init valid entity IDs
@@ -2187,7 +2192,7 @@ function bt.BattleScene:create_simulation_environment()
         sprite:set_is_visible(false)
 
         local animation
-        if entity:get_is_enemy() then
+        if _state:entity_get_is_enemy(entity) then
             animation = bt.Animation.ENEMY_APPEARED(_scene, sprite)
         else
             animation = bt.Animation.ALLY_APPEARED(_scene, sprite)
@@ -2535,7 +2540,7 @@ function bt.BattleScene:create_simulation_environment()
         local n_dead_enemies, n_knocked_out_enemies, n_enemies = 0, 0, 0
         for entity in values(_state:list_all_entities()) do
             local state = _state:entity_get_state(entity)
-            if entity:get_is_enemy() then
+            if _state:entity_get_is_enemy(entity) then
                 n_enemies = n_enemies + 1
                 if state == bt.EntityState.DEAD then
                     n_dead_enemies = n_dead_enemies + 1
@@ -2676,8 +2681,9 @@ function bt.BattleScene:create_simulation_environment()
         local n_enemies = battle:get_n_enemies()
         for enemy_i = 1, n_enemies do
             --rework animation to poll sprite on startup
-            local entity = bt.Entity(_state, battle:get_enemy_id(enemy_i))
-            _state:add_entity(entity)
+            local entity = _state:create_entity(bt.EntityConfig(battle:get_enemy_id(enemy_i)))
+            _state:entity_set_hp(entity, _state:entity_get_hp_base(entity))
+
             for move in values(battle:get_enemy_moves(enemy_i)) do
                 _state:entity_add_move(entity, move)
             end

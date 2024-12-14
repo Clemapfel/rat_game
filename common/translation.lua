@@ -10,7 +10,7 @@ function rt.initialize_translation(x)
                 local value = t[key]
                 if value == nil then
                     rt.warning("In rt.Translation: key `" .. key .. "` does not point to valid text")
-                    return "<#" .. key .. ">"
+                    return "(#" .. key .. ")"
                 end
                 return value
             end,
@@ -84,7 +84,7 @@ rt.Translation = rt.initialize_translation({
         consumable_node_unequip = "Unequip",
         consumable_node_sort = "Sort",
 
-        grabbed_object_bottom_right_indicator = "<color=LIGHT_RED_3><o>\u{00D7}</o></color>",
+        grabbed_object_bottom_right_indicator = "<color=RED_2><o>\u{00D7}</o></color>",
 
         template_confirm_dialog_f = function(name)
             return "Overwrite current Equipment?",

@@ -7,11 +7,11 @@ bt.EnemySprite = meta.new_type("EnemySprite", bt.EntitySprite, function(entity)
     return meta.new(bt.EnemySprite, {
         _entity = entity,
 
-        _health_bar = bt.HealthBar(0, entity:get_hp_base(), entity:get_hp()),
-        _speed_value = bt.SpeedValue(entity:get_speed()),
+        _health_bar = bt.HealthBar(0, 0, 0),
+        _speed_value = bt.SpeedValue(0),
         _status_consumable_bar = bt.OrderedBox(),
         _name = rt.Label(entity:get_name()),
-        _sprite = rt.Sprite(entity:get_sprite_id()),
+        _sprite = rt.Sprite(entity:get_config():get_sprite_id()),
 
         _health_visible = true,
         _speed_visible = true,
