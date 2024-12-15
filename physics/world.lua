@@ -273,7 +273,6 @@ do -- use upvalues to minimize luajit callback count
         box2d.b2World_OverlapPolygonWrapper(self._native, polygon, b2.IdentityTransform, box2d.b2DefaultQueryFilter(), _overlap_wrapper_callback)
     end
 
-
     --- @brief
     --- @param x x_offset
     --- @param y y_offset
@@ -305,6 +304,52 @@ do -- use upvalues to minimize luajit callback count
         end
 
         _overlap_current_callback = nil
+    end
+end
+
+--- @param begin_callback Function (b2.Shape, b2.Shape) -> nil
+--- @param end_callback Function (b2.Shape, b2.Shape) -> nil
+--- @param hit_callback Function (b2.Shape, b2.Shape, normal_x, normal_y, point_x, point_y) -> nil
+function b2.World:get_contact_events(begin_callback, end_callback, hit_callback)
+    local native = self._native
+    local events = box2d.b2World_GetContactEvents(native)
+
+    if begin_callback ~= nil then
+        for i = 1, events.beginCount do
+            local event = events.beginEvents[i]
+            local native_a, native_b = event.shapeIdA, event.shapeIdB
+            if box2d.b2Shape_IsValid(native_a) and box2d.b2Shape_IsValid(native_b) then
+                local shape_a = b2.Shape._create_from_native(native_a)
+                local shape_b = b2.Shape._create_from_native(native_b)
+                begin_callback(shape_a, shape_b)
+            end
+        end
+    end
+
+    if end_callback ~= nil then
+        for i = 1, events.endCount do
+            local event = events.endEvents[i]
+            local native_a, native_b = event.shapeIdA, event.shapeIdB
+            if box2d.b2Shape_IsValid(native_a) and box2d.b2Shape_IsValid(native_b) then
+                local shape_a = b2.Shape._create_from_native(native_a)
+                local shape_b = b2.Shape._create_from_native(native_b)
+                end_callback(shape_a, shape_b)
+            end
+        end
+    end
+
+    if hit_callback ~= nil then
+        for i = 1, events.hitCount do
+            local event = events.hitEvents[i]
+            local native_a, native_b = event.shapeIdA, event.shapeIdB
+            if box2d.b2Shape_IsValid(native_a) and box2d.b2Shape_IsValid(native_b) then
+                local normal_x, normal_y = event.normal.x, event.normal.y
+                local point_x, point_y = event.point.x, event.point.y
+                local shape_a = b2.Shape._create_from_native(event.shapeIdA)
+                local shape_b = b2.Shape._create_from_native(event.shapeIdB)
+                hit_callback(shape_a, shape_b, normal_x, normal_y, point_x, point_y)
+            end
+        end
     end
 end
 

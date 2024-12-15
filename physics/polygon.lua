@@ -1,11 +1,10 @@
 --- @class b2.Polygon
-b2.Polygon = meta.new_type("PhysicsPolygon", function(a_x, a_y, b_x, b_y, c_x, c_y, ...)
-    if _G._select == nil then _G._select = select end
-    local n_points = _G._select("#", ...) + 3
+b2.Polygon = meta.new_type("PhysicsPolygon", function(...)
+    local n_points = select("#", ...)
     assert(n_points >= 6 and n_points % 2 == 0 and n_points <= 16)
 
     return meta.new(b2.Polygon, {
-        _native = b2.Polygon._create_native({a_x, a_y, b_x, b_y, c_x, c_y, ...})
+        _native = b2.Polygon._create_native({...})
     })
 end)
 

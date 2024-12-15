@@ -45,6 +45,13 @@ b2.Body = meta.new_type("PhysicsBody", function(world, type, position_x, positio
 end)
 
 --- @brief
+function b2.Body._create_from_native(native)
+    return meta.new(b2.Body, {
+        _native = native
+    })
+end
+
+--- @brief
 function b2.Body:destroy()
     box2d.b2DestroyBody(self._native)
 end

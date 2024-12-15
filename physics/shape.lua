@@ -27,35 +27,42 @@ function b2.Shape._default_shape_def(is_sensor)
 end
 
 --- @brief
+function b2.Shape._create_from_native(native)
+    return meta.new(b2.Shape, {
+        _native = native
+    })
+end
+
+--- @brief
 function b2.CircleShape(body, circle, is_sensor)
     local shape_def = b2.Shape._default_shape_def(is_sensor)
-    return meta.new(b2.Shape, {
-        _native = box2d.b2CreateCircleShape(body._native, shape_def, circle._native)
-    })
+    return b2.Shape._create_from_native(
+        box2d.b2CreateCircleShape(body._native, shape_def, circle._native)
+    )
 end
 
 --- @brief
 function b2.CapsuleShape(body, capsule, is_sensor)
     local shape_def = b2.Shape._default_shape_def(is_sensor)
-    return meta.new(b2.Shape, {
-        _native = box2d.b2CreateCapsuleShape(body._native, shape_def, capsule._native)
-    })
+    return b2.Shape._create_from_native(
+        box2d.b2CreateCapsuleShape(body._native, shape_def, capsule._native)
+    )
 end
 
 --- @brief
 function b2.SegmentShape(body, segment, is_sensor)
     local shape_def = b2.Shape._default_shape_def(is_sensor)
-    return meta.new(b2.Shape, {
-        _native = box2d.b2CreateSegmentShape(body._native, shape_def, segment._native)
-    })
+    return b2.Shape._create_from_native(
+        box2d.b2CreateSegmentShape(body._native, shape_def, segment._native)
+    )
 end
 
 --- @brief
 function b2.PolygonShape(body, polygon, is_sensor)
     local shape_def = b2.Shape._default_shape_def(is_sensor)
-    return meta.new(b2.Shape, {
-        _native = box2d.b2CreatePolygonShape(body._native, shape_def, polygon._native)
-    })
+    return b2.Shape._create_from_native(
+        box2d.b2CreatePolygonShape(body._native, shape_def, polygon._native)
+    )
 end
 
 --[[
@@ -77,7 +84,7 @@ end
 
 --- @brief
 function b2.Shape:get_body()
-    return b2.Body:new_from_id(box2d.b2Shape_GetBody(self._native))
+    return b2.Body._create_from_native(box2d.b2Shape_GetBody(self._native))
 end
 
 --- @brief
@@ -254,6 +261,11 @@ function b2.Shape:set_collision_group(group)
     end
 
     box2d.b2Shape_SetFilter(self._native, filter)
+end
+
+--- @brief
+function b2.Shape:is_valid()
+    return box2d.b2Shape_IsValid(self._native)
 end
 
 --- @brief
