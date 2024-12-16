@@ -22,14 +22,15 @@
     </configurations>
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="7fa9ba1b-2cff-4ecc-86fb-59ab2fa76ee1" name="Changes" comment="stashing config renaming">
-      <change afterPath="$PROJECT_DIR$/main_physics_blood.glsl" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/main_physics_blood.lua" afterDir="false" />
+    <list default="true" id="7fa9ba1b-2cff-4ecc-86fb-59ab2fa76ee1" name="Changes" comment="stashing metaballs">
+      <change afterPath="$PROJECT_DIR$/temp.lua" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/common/game_state.lua" beforeDir="false" afterPath="$PROJECT_DIR$/common/game_state.lua" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/include.lua" beforeDir="false" afterPath="$PROJECT_DIR$/include.lua" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/main.lua" beforeDir="false" afterPath="$PROJECT_DIR$/main.lua" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/main_physics_blood.lua" beforeDir="false" afterPath="$PROJECT_DIR$/main_physics_blood.lua" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/old/common/game_state.lua" beforeDir="false" afterPath="$PROJECT_DIR$/old/common/game_state.lua" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/physics/body.lua" beforeDir="false" afterPath="$PROJECT_DIR$/physics/body.lua" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/physics/polygon.lua" beforeDir="false" afterPath="$PROJECT_DIR$/physics/polygon.lua" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/physics/shape.lua" beforeDir="false" afterPath="$PROJECT_DIR$/physics/shape.lua" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/physics/world.lua" beforeDir="false" afterPath="$PROJECT_DIR$/physics/world.lua" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -161,7 +162,7 @@
       <recent name="C:\Users\cleme\Workspace\rat_game\old" />
     </key>
   </component>
-  <component name="RunManager" selected="Lua Application.main_physics_blood">
+  <component name="RunManager" selected="Lua Application.main">
     <configuration name="Makefile" type="MAKEFILE_TARGET_RUN_CONFIGURATION" factoryName="Makefile" temporary="true">
       <makefile filename="$PROJECT_DIR$/midi/lovemidi/Makefile" target="" workingDirectory="" arguments="">
         <envs />
@@ -696,15 +697,7 @@
       <workItem from="1733958947216" duration="8190000" />
       <workItem from="1734050208171" duration="17043000" />
       <workItem from="1734131064062" duration="308000" />
-      <workItem from="1734193768056" duration="31138000" />
-    </task>
-    <task id="LOCAL-01276" summary="quicksave indicator done">
-      <option name="closed" value="true" />
-      <created>1732733295381</created>
-      <option name="number" value="01276" />
-      <option name="presentableId" value="LOCAL-01276" />
-      <option name="project" value="LOCAL" />
-      <updated>1732733295381</updated>
+      <workItem from="1734193768056" duration="35832000" />
     </task>
     <task id="LOCAL-01277" summary="refactored quicksave indicator">
       <option name="closed" value="true" />
@@ -1090,7 +1083,15 @@
       <option name="project" value="LOCAL" />
       <updated>1734208787747</updated>
     </task>
-    <option name="localTasksCounter" value="1325" />
+    <task id="LOCAL-01325" summary="stashing metaballs">
+      <option name="closed" value="true" />
+      <created>1734296666471</created>
+      <option name="number" value="01325" />
+      <option name="presentableId" value="LOCAL-01325" />
+      <option name="project" value="LOCAL" />
+      <updated>1734296666471</updated>
+    </task>
+    <option name="localTasksCounter" value="1326" />
     <servers />
   </component>
   <component name="TypeScriptGeneratedFilesManager">
@@ -1139,7 +1140,6 @@
     </option>
   </component>
   <component name="VcsManagerConfiguration">
-    <MESSAGE value="stashing enemy revived animation" />
     <MESSAGE value="stashing revive animation" />
     <MESSAGE value="enemy revived animation done" />
     <MESSAGE value="stashing kill removes entity from state" />
@@ -1164,7 +1164,8 @@
     <MESSAGE value="stashing paralellogram" />
     <MESSAGE value="entity refactoring done" />
     <MESSAGE value="stashing config renaming" />
-    <option name="LAST_COMMIT_MESSAGE" value="stashing config renaming" />
+    <MESSAGE value="stashing metaballs" />
+    <option name="LAST_COMMIT_MESSAGE" value="stashing metaballs" />
   </component>
   <component name="XDebuggerManager">
     <breakpoint-manager>

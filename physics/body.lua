@@ -157,9 +157,9 @@ end
 --- @brief
 function b2.Body:set_angle(angle_rad)
     local transform = box2d.b2Body_GetTransform(self._native)
-    transform.q.x = math.cos(angle_rad)
-    transform.q.y = math.sin(angle_rad)
-    box2d.b2Body_SetTransform(transform)
+    transform.q.c = math.cos(angle_rad)
+    transform.q.s = math.sin(angle_rad)
+    box2d.b2Body_SetTransform(self._native, transform.p, transform.q)
 end
 
 --- @brief

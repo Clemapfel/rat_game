@@ -24,8 +24,10 @@ ball_friction = 0
 ball_restitution = 0.05
 ball_damping = 0.1 -- 1 - viscosity
 
+ball_texture = rt.Texture("assets/sprites/why.png")
+
 shader = rt.Shader("main_physics_blood.glsl")._native
-threshold = 0.7
+threshold = 0.4--0.7
 canvas = nil -- love.Canvas
 
 love.load = function()
@@ -82,8 +84,11 @@ love.load = function()
 
         body:set_is_bullet(true)
         body:set_linear_damping(ball_damping)
+        body:set_rotation_fixed(false)
         shape:set_restitution(ball_restitution)
         shape:set_friction(ball_friction)
+
+        body:set_angle(rt.random.number(0, 2 * math.pi))
         table.insert(ball_bodies, body)
 
         local r, g, b, a = rt.color_unpack(rt.lcha_to_rgba(rt.LCHA(
@@ -94,30 +99,42 @@ love.load = function()
         )))
 
         local ball_data = {
-            {0, 0, 0, 0, 1, 1, 1, 0.5}
+            {0, 0, 0.5, 0.5, 1, 1, 1, 0.5}
         }
 
         local glow_data = {
-            {0, 0, 0, 0, 1, 1, 1, 1}
+            {0, 0, 0.5, 0.5, 1, 1, 1, 1}
         }
 
         local n_outer_vertices = 64
         local step = 2 * math.pi / n_outer_vertices
         local vertex_map = {}
 
+        local texture_path = rt.Path(
+            0, 0,
+            0, 1,
+            1, 1,
+            1, 0
+        )
+
         local vertex_i = 2
         for angle = 0, 2 * math.pi, step do
+
+            local current_radius = radius
+            local cx, cy = math.cos(angle) * current_radius, math.sin(angle) * current_radius
             table.insert(ball_data, {
-                math.cos(angle) * radius,
-                math.sin(angle) * radius,
-                0, 0,
+                cx, cy,
+                (cx / (2 * current_radius)) + 0.5,
+                (cy / (2 * current_radius)) + 0.5,
                 1, 1, 1, 0
             })
 
+            current_radius = radius * glow_ring_factor
+            cx, cy = math.cos(angle) * current_radius, math.sin(angle) * current_radius
             table.insert(glow_data, {
-                math.cos(angle) * (radius * glow_ring_factor),
-                math.sin(angle) * (radius * glow_ring_factor),
-                0, 0,
+                cx, cy,
+                (cx / (2 * current_radius)) + 0.5,
+                (cy / (2 * current_radius)) + 0.5,
                 1, 1, 1, 0
             })
 
@@ -133,8 +150,10 @@ love.load = function()
         local ball_mesh = rt.VertexShape(ball_data, rt.MeshDrawMode.TRIANGLES)
         local glow_mesh = rt.VertexShape(glow_data, rt.MeshDrawMode.TRIANGLES)
 
-        ball_mesh._native:setVertexMap(vertex_map)
-        glow_mesh._native:setVertexMap(vertex_map)
+        for mesh in range(ball_mesh, glow_mesh) do
+            mesh._native:setVertexMap(vertex_map)
+            mesh:set_texture(ball_texture)
+        end
 
         table.insert(ball_meshes, ball_mesh._native)
         table.insert(ball_glow_meshes, glow_mesh._native)
@@ -167,9 +186,11 @@ love.draw = function()
     rt.graphics.set_blend_mode(rt.BlendMode.NORMAL, rt.BlendMode.ADD)
     for i = 1, n_balls do
         local x, y = ball_bodies[i]:get_centroid()
-        lg.setColor(unpack(ball_colors[i]))
-        lg.draw(ball_glow_meshes[i], x, y)
-        --lg.draw(ball_meshes[i], x, y)
+        local angle = ball_bodies[i]:get_angle()
+
+        --lg.setColor(unpack(ball_colors[i]))
+        lg.draw(ball_glow_meshes[i], x, y, angle)
+        lg.draw(ball_meshes[i], x, y, angle)
     end
     lg.setBlendMode("alpha")
     lg.setCanvas(nil)
@@ -234,7 +255,7 @@ do
         disturbance_body:set_linear_velocity((mouse_x - current_x) * disturbance_strength, (mouse_y - current_y) * disturbance_strength)
 
         n_called = 0
-        world:get_contact_events(nil, _callback, nil)
+        --world:get_contact_events(nil, _callback, nil)
     end
 end
 

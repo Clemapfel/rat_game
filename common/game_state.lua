@@ -1,38 +1,3 @@
--- config
-local persistence = 0.5 -- float in [0, 1)
-local n_octaves = 3     -- unsigned integer
-
-local scale = 20        -- float > 1
-local x_offset, y_offset = 0, 0 -- signed float
-
--- helper function
-local function translate_point_by_angle(x, y, angle, distance)
-    return x + math.cos(angle) * distance, y + math.sin(angle) * distance
-end
-
-local image_w, image_h = 500, 500
-local data = love.image.newImageData(image_w, image_h)
-
--- fractal brownian motion to offset noise coordinates
-for row_i = 1, image_h do
-    for col_i = 1, image_w do
-        local x = (col_i / image_w + x_offset) * scale
-        local y = (row_i / image_h + y_offset) * scale
-        local distance = 1
-        for _ = 1, n_octaves do
-            x, y = translate_point_by_angle(
-                x, y,
-                love.math.perlinNoise(x, y) * math.pi * 2,
-                distance
-            )
-            distance = distance / (1 / persistence)
-        end
-
-        local noise = love.math.perlinNoise(x, y)
-        data:setPixel(row_i - 1, col_i - 1, noise, noise, noise, 1)
-    end
-end
-
 rt.settings.game_state = {
     lower_gamma_bound = 0.4,
     upper_gamma_bound = 2.2 + 0.5

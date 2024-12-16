@@ -12,6 +12,8 @@ rt.MSAAQuality = meta.new_enum("MSAAQuality", {
     MAX = 16
 })
 
+local now = love.timer.getTime()
+
 --- @class rt.GameState
 rt.GameState = meta.new_type("GameState", function()
     local state = {
@@ -177,7 +179,6 @@ function rt.GameState:load_input_mapping()
     end
 
     rt.InputControllerState.load_from_state(self)
-    rt.log("Successfully loaded input mapping from `" .. file .. "`")
 end
 
 --- @brief
@@ -324,3 +325,5 @@ function rt.GameState:run()
         if love.timer then love.timer.sleep(0.001) end -- limit max tick rate of while true
     end
 end
+
+println("state", love.timer.getTime() - now)

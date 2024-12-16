@@ -49,7 +49,6 @@ love.load = function()
     twinkle:realize()
     twinkle:fit_into(500, 500, 64, 64)
     twinkle:fit_into(0, 0, love.graphics.getDimensions())
-
 end
 
 love.update = function(delta)

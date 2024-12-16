@@ -184,6 +184,7 @@ require "backgrounds.background_implementation"
 require "backgrounds.background"
 require "backgrounds.background_shader_only"
 
+local now = love.timer.getTime()
 do -- include all backgrounds
     local prefix = "backgrounds"
     for _, name in pairs(love.filesystem.getDirectoryItems(prefix)) do
