@@ -7,7 +7,7 @@ bt.Animation.STATUS_APPLIED = meta.new_type("STATUS_APPLIED", rt.Animation, func
         _scene = scene,
         _status = status,
         _entity = entity,
-        _target = nil, -- bt.EntitySprite
+        _target = nil,
         _is_done = false
     })
 end)
@@ -26,6 +26,7 @@ end
 
 --- @override
 function bt.Animation.STATUS_APPLIED:update(delta)
+    dbg(meta.hash(self), "update", self._is_done)
     return self._is_done
 end
 

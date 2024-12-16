@@ -41,9 +41,7 @@ function bt.Animation.ENEMY_APPEARED:start()
     self._target = self._scene:get_sprite(self._entity)
 
     self._target:set_is_visible(false)
-    self._target:set_health_visible(false)
-    self._target:set_speed_visible(false)
-    self._target:set_status_visible(false)
+    self._target:set_animation_active(false)
 
     local x, y = self._target:get_position()
     local w, h = self._target:measure()
@@ -59,9 +57,7 @@ end
 --- @override
 function bt.Animation.ENEMY_APPEARED:finish()
     self._target:set_is_visible(true)
-    self._target:set_health_visible(true)
-    self._target:set_speed_visible(true)
-    self._target:set_status_visible(true)
+    self._target:set_animation_active(true)
 end
 
 --- @override

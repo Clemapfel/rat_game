@@ -1,6 +1,7 @@
 rt.settings.battle.stunned_particle_animation = {
     rounds_per_second = 0.3,
-    n_particles = 2
+    n_particles = 2,
+    height_to_width = 0.1
 }
 
 --- @class bt.StunnedParticleAnimation

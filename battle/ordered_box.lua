@@ -5,6 +5,11 @@ rt.settings.battle.ordered_box = {
     speed = 300, -- px per second
 }
 
+bt.OrderedBoxPositioning = meta.new_enum("OrderedBoxPositioning", {
+    LEFT = true,
+    RIGHT = false
+})
+
 --- @class bt.OrderedBox
 bt.OrderedBox = meta.new_type("OrderedBox", rt.Widget, function()
     local out = meta.new(bt.OrderedBox, {

@@ -126,6 +126,16 @@ function rt.Sprite:set_frame(i)
     self._mesh:setVertexAttribute(4, 2, tx, ty + th)
 end
 
+--- @brief
+function rt.Sprite:get_id()
+    return self._id
+end
+
+--- @brief
+function rt.Sprite:skip()
+    rt.warning("TODO: rt.Sprite.skip")
+end
+
 --- @override
 function rt.Sprite:size_allocate(x, y, width, height)
     if self._mesh_w ~= width or self._mesh_h ~= height then
@@ -241,6 +251,11 @@ function rt.Sprite:set_animation(id)
         self._current_frame = self._frame_range_start
     end
     self:set_frame(self._current_frame)
+end
+
+--- @brief
+function rt.Sprite:has_animation(id)
+    return self._spritesheet:has_frame(id)
 end
 
 --- @override

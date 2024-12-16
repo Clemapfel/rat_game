@@ -22,38 +22,21 @@
     </configurations>
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="7fa9ba1b-2cff-4ecc-86fb-59ab2fa76ee1" name="Changes" comment="stashing before reworking animation to query sprite on start">
+    <list default="true" id="7fa9ba1b-2cff-4ecc-86fb-59ab2fa76ee1" name="Changes" comment="refactored animations">
+      <change afterPath="$PROJECT_DIR$/battle/~enemy_sprite.lua" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/battle/~entity_sprite.lua" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/battle/~party_sprite.lua" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/battle/animations/ally_appeared.lua" beforeDir="false" afterPath="$PROJECT_DIR$/battle/animations/ally_appeared.lua" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/battle/animations/consumable_applied.lua" beforeDir="false" afterPath="$PROJECT_DIR$/battle/animations/consumable_applied.lua" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/battle/animations/consumable_consumed.lua" beforeDir="false" afterPath="$PROJECT_DIR$/battle/animations/consumable_consumed.lua" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/battle/animations/debug_animation.lua" beforeDir="false" />
       <change beforePath="$PROJECT_DIR$/battle/animations/enemy_appeared.lua" beforeDir="false" afterPath="$PROJECT_DIR$/battle/animations/enemy_appeared.lua" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/battle/animations/enemy_knocked_out.lua" beforeDir="false" afterPath="$PROJECT_DIR$/battle/animations/enemy_knocked_out.lua" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/battle/animations/equip_applied.lua" beforeDir="false" afterPath="$PROJECT_DIR$/battle/animations/equip_applied.lua" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/battle/animations/global_status_applied.lua" beforeDir="false" afterPath="$PROJECT_DIR$/battle/animations/global_status_applied.lua" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/battle/animations/global_status_gained.lua" beforeDir="false" afterPath="$PROJECT_DIR$/battle/animations/global_status_gained.lua" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/battle/animations/hp_gained.lua" beforeDir="false" afterPath="$PROJECT_DIR$/battle/animations/hp_gained.lua" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/battle/animations/hp_lost.lua" beforeDir="false" afterPath="$PROJECT_DIR$/battle/animations/hp_lost.lua" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/battle/animations/kill.lua" beforeDir="false" afterPath="$PROJECT_DIR$/battle/animations/kill.lua" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/battle/animations/object_disabled.lua" beforeDir="false" afterPath="$PROJECT_DIR$/battle/animations/object_disabled.lua" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/battle/animations/object_enabled.lua" beforeDir="false" afterPath="$PROJECT_DIR$/battle/animations/object_enabled.lua" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/battle/animations/object_gained.lua" beforeDir="false" afterPath="$PROJECT_DIR$/battle/animations/object_gained.lua" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/battle/animations/object_lost.lua" beforeDir="false" afterPath="$PROJECT_DIR$/battle/animations/object_lost.lua" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/battle/animations/revive.lua" beforeDir="false" afterPath="$PROJECT_DIR$/battle/animations/revive.lua" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/battle/animations/stat_changed.lua" beforeDir="false" afterPath="$PROJECT_DIR$/battle/animations/stat_changed.lua" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/battle/animations/status_applied.lua" beforeDir="false" afterPath="$PROJECT_DIR$/battle/animations/status_applied.lua" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/battle/animations/status_gained.lua" beforeDir="false" afterPath="$PROJECT_DIR$/battle/animations/status_gained.lua" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/battle/animations/status_lost.lua" beforeDir="false" afterPath="$PROJECT_DIR$/battle/animations/status_lost.lua" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/battle/animations/stun_gained.lua" beforeDir="false" afterPath="$PROJECT_DIR$/battle/animations/stun_gained.lua" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/battle/animations/stun_lost.lua" beforeDir="false" afterPath="$PROJECT_DIR$/battle/animations/stun_lost.lua" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/battle/animations/swap.lua" beforeDir="false" afterPath="$PROJECT_DIR$/battle/animations/swap.lua" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/battle/animations/turn_start_end.lua" beforeDir="false" afterPath="$PROJECT_DIR$/battle/animations/turn_start_end.lua" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/battle/battle_scene.lua" beforeDir="false" afterPath="$PROJECT_DIR$/battle/battle_scene.lua" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/battle/enemy_sprite.lua" beforeDir="false" afterPath="$PROJECT_DIR$/battle/enemy_sprite.lua" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/battle/entity_config.lua" beforeDir="false" afterPath="$PROJECT_DIR$/battle/entity_config.lua" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/battle/entity_sprite.lua" beforeDir="false" afterPath="$PROJECT_DIR$/battle/entity_sprite.lua" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/battle/ordered_box.lua" beforeDir="false" afterPath="$PROJECT_DIR$/battle/ordered_box.lua" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/battle/party_sprite.lua" beforeDir="false" afterPath="$PROJECT_DIR$/battle/party_sprite.lua" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/battle/simulation_handler.lua" beforeDir="false" afterPath="$PROJECT_DIR$/battle/simulation_handler.lua" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/common/game_state_battle.lua" beforeDir="false" afterPath="$PROJECT_DIR$/common/game_state_battle.lua" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/common/translation.lua" beforeDir="false" afterPath="$PROJECT_DIR$/common/translation.lua" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/battle/stunned_particle_animation.lua" beforeDir="false" afterPath="$PROJECT_DIR$/battle/stunned_particle_animation.lua" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/common/sprite.lua" beforeDir="false" afterPath="$PROJECT_DIR$/common/sprite.lua" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -720,15 +703,7 @@
       <workItem from="1733958947216" duration="8190000" />
       <workItem from="1734050208171" duration="17043000" />
       <workItem from="1734131064062" duration="308000" />
-      <workItem from="1734193768056" duration="42937000" />
-    </task>
-    <task id="LOCAL-01278" summary="added elapsed override">
-      <option name="closed" value="true" />
-      <created>1732734985538</created>
-      <option name="number" value="01278" />
-      <option name="presentableId" value="LOCAL-01278" />
-      <option name="project" value="LOCAL" />
-      <updated>1732734985538</updated>
+      <workItem from="1734193768056" duration="51135000" />
     </task>
     <task id="LOCAL-01279" summary="stashing before paralellizing sort step">
       <option name="closed" value="true" />
@@ -1114,7 +1089,15 @@
       <option name="project" value="LOCAL" />
       <updated>1734367585762</updated>
     </task>
-    <option name="localTasksCounter" value="1327" />
+    <task id="LOCAL-01327" summary="refactored animations">
+      <option name="closed" value="true" />
+      <created>1734375984504</created>
+      <option name="number" value="01327" />
+      <option name="presentableId" value="LOCAL-01327" />
+      <option name="project" value="LOCAL" />
+      <updated>1734375984504</updated>
+    </task>
+    <option name="localTasksCounter" value="1328" />
     <servers />
   </component>
   <component name="TypeScriptGeneratedFilesManager">
@@ -1163,7 +1146,6 @@
     </option>
   </component>
   <component name="VcsManagerConfiguration">
-    <MESSAGE value="enemy revived animation done" />
     <MESSAGE value="stashing kill removes entity from state" />
     <MESSAGE value="stashing before battle scene refactor" />
     <MESSAGE value="scene refactored, kill working" />
@@ -1188,7 +1170,8 @@
     <MESSAGE value="stashing config renaming" />
     <MESSAGE value="stashing metaballs" />
     <MESSAGE value="stashing before reworking animation to query sprite on start" />
-    <option name="LAST_COMMIT_MESSAGE" value="stashing before reworking animation to query sprite on start" />
+    <MESSAGE value="refactored animations" />
+    <option name="LAST_COMMIT_MESSAGE" value="refactored animations" />
   </component>
   <component name="XDebuggerManager">
     <breakpoint-manager>
@@ -1228,6 +1211,11 @@
           <url>file://$PROJECT_DIR$/older/~common/vertex_shape.lua</url>
           <line>376</line>
           <option name="timeStamp" value="31" />
+        </line-breakpoint>
+        <line-breakpoint enabled="true" type="lua-line">
+          <url>file://$PROJECT_DIR$/battle/animations/status_applied.lua</url>
+          <line>4</line>
+          <option name="timeStamp" value="47" />
         </line-breakpoint>
         <line-breakpoint enabled="true" suspend="NONE" type="CMakeLineBreakpoint">
           <url>file://$PROJECT_DIR$/physics/box2d_extension/CMakeLists.txt</url>

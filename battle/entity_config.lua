@@ -61,8 +61,6 @@ end, {
     
     sprite_id = "",
     sprite_index = 1,
-    knocked_out_sprite_index = nil,
-    dead_sprite_index = nil,
 
     portrait_sprite_id = nil,
     portrait_sprite_index = nil,
@@ -168,14 +166,8 @@ function bt.EntityConfig:get_ai_level()
 end
 
 --- @brief
-function bt.EntityConfig:get_sprite_id(state)
-    if state == nil or state == bt.EntityConfigState.ALIVE then
-        return self.sprite_id, self.sprite_index
-    elseif state == bt.EntityConfigState.KNOCKED_OUT then
-        return self.sprite_id, self.knocked_out_sprite_index
-    elseif state == bt.EntityConfigState.DEAD then
-        return self.sprite_id, self.dead_sprite_index
-    end
+function bt.EntityConfig:get_sprite_id()
+    return self.sprite_id, self.sprite_index
 end
 
 --- @brief
