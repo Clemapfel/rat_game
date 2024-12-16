@@ -3,19 +3,18 @@ rt.settings.battle.animation.status_gained = {
 }
 
 --- @class bt.Animation.STATUS_APPLIED
---- @param status bt.StatusConfig
---- @param sprite bt.EntitySprite
-bt.Animation.STATUS_GAINED = meta.new_type("STATUS_GAINED", rt.Animation, function(scene, status, sprite)
+bt.Animation.STATUS_GAINED = meta.new_type("STATUS_GAINED", rt.Animation, function(scene, status, entity)
     meta.assert_isa(scene, bt.BattleScene)
     meta.assert_isa(status, bt.StatusConfig)
-    meta.assert_isa(sprite, bt.EntitySprite)
+    meta.assert_isa(entity, bt.Entity)
 
     local duration = rt.settings.battle.animation.status_gained.duration
     local rotation = math.pi / 10
     return meta.new(bt.Animation.STATUS_GAINED, {
         _scene = scene,
         _status = status,
-        _target = sprite,
+        _entity = entity,
+        _target = nil, -- bt.EntitySprite
         _sprite = rt.Sprite(status:get_sprite_id()),
         _sprite_x = 0,
         _sprite_y = 0,
@@ -44,6 +43,8 @@ end, {
 
 --- @brief
 function bt.Animation.STATUS_GAINED:start()
+    self._target = self._scene:get_sprite(self._entity)
+
     local sprite = bt.Animation.STATUS_GAINED.status_to_sprite[self._status]
     local sprite_w, sprite_h
 

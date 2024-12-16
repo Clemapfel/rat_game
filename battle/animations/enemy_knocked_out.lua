@@ -1,9 +1,7 @@
 --- @class bt.Animation.ENEMY_KNOCKED_OUT
---- @param scene bt.BattleScene
---- @param sprite bt.EntitySprite
-bt.Animation.ENEMY_KNOCKED_OUT = meta.new_type("ENEMY_KNOCKED_OUT", rt.Animation, function(scene, sprite)
+bt.Animation.ENEMY_KNOCKED_OUT = meta.new_type("ENEMY_KNOCKED_OUT", rt.Animation, function(scene, entity)
     meta.assert_isa(scene, bt.BattleScene)
-    meta.assert_isa(sprite, bt.EntitySprite)
+    meta.assert_isa(entity, bt.Entity)
 
     local fade_in = 0.1
     local hold = 2
@@ -11,7 +9,8 @@ bt.Animation.ENEMY_KNOCKED_OUT = meta.new_type("ENEMY_KNOCKED_OUT", rt.Animation
     local total = fade_in + hold + fade_out
     return meta.new(bt.Animation.ENEMY_KNOCKED_OUT, {
         _scene = scene,
-        _target = sprite,
+        _entity = entity,
+        _target = nil,
 
         _fade_in_animation = rt.TimedAnimation(fade_in, 0, 1, rt.InterpolationFunctions.LINEAR),
         _fade_in_shape = nil, -- rt.VertexRectangle
@@ -33,6 +32,8 @@ end)
 
 --- @override
 function bt.Animation.ENEMY_KNOCKED_OUT:start()
+    self._target = self._scene:get_sprite(self._entity)
+
     self._fade_in_shape = rt.VertexRectangle(0, 0, love.graphics.getWidth(), love.graphics.getHeight())
     self._fade_in_shape:set_opacity(0)
     self._vignette_shader:send("value", 0)

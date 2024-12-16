@@ -1,7 +1,4 @@
 --- @class bt.Animation.GLOBAL_STATUS_APPLIED
---- @param scene bt.BattleScene
---- @param status bt.GlobalStatusConfig
---- @param sprite bt.EntitySprite
 bt.Animation.GLOBAL_STATUS_APPLIED = meta.new_type("GLOBAL_STATUS_APPLIED", rt.Animation, function(scene, global_status)
     meta.assert_isa(scene, bt.BattleScene)
     meta.assert_isa(global_status, bt.GlobalStatusConfig)

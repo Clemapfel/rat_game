@@ -1,11 +1,12 @@
 --- @class bt.Animation.ALLY_APPEARED
-bt.Animation.ALLY_APPEARED = meta.new_type("ALLY_APPEARED", rt.Animation, function(scene, sprite)
+bt.Animation.ALLY_APPEARED = meta.new_type("ALLY_APPEARED", rt.Animation, function(scene, entity)
     meta.assert_isa(scene, bt.BattleScene)
-    meta.assert_isa(sprite, bt.EntitySprite)
+    meta.assert_isa(sprite, bt.Entity)
     local duration = rt.settings.battle.animation.enemy_appeared.duration
     return meta.new(bt.Animation.ALLY_APPEARED, {
         _scene = scene,
-        _target = sprite,
+        _entity = entity,
+        _target = nil, -- bt.EntitySprite
 
         _path = nil, -- rt.Path
         _position_x = 0,
@@ -35,6 +36,8 @@ end, {
 
 --- @override
 function bt.Animation.ALLY_APPEARED:start()
+    self._target = self._scene:get_sprite(self._entity)
+
     local x, y = self._target:get_position()
     local w, h = self._target:measure()
 

@@ -3,18 +3,16 @@ rt.settings.battle.animation.object_gained = {
 }
 
 --- @class bt.Animation.OBJECT_GAINED
---- @param scene bt.BattleScene
---- @param object
---- @param sprite bt.EntitySprite
-bt.Animation.OBJECT_GAINED = meta.new_type("OBJECT_GAINED", rt.Animation, function(scene, object, sprite)
+bt.Animation.OBJECT_GAINED = meta.new_type("OBJECT_GAINED", rt.Animation, function(scene, object, entity)
     meta.assert_isa(scene, bt.BattleScene)
-    meta.assert_isa(sprite, bt.EntitySprite)
+    meta.assert_isa(entity, bt.Entity)
 
     local duration = rt.settings.battle.animation.object_gained.duration
     return meta.new(bt.Animation.OBJECT_GAINED, {
         _scene = scene,
         _object = object,
-        _target = sprite,
+        _entity = entity,
+        _target = nil, -- bt.EntitySprite
 
         _sprite = nil, -- rt.Sprite,
         _sprite_x = 0,
@@ -45,6 +43,8 @@ end, {
 
 --- @override
 function bt.Animation.OBJECT_GAINED:start()
+    self._target = self._scene:get_sprite(self._entity)
+
     local sprite = self.object_to_sprite[self._object]
     local sprite_w, sprite_h
     if sprite == nil then

@@ -1,14 +1,12 @@
 --- @class bt.Animation.OBJECT_LOST
---- @param scene bt.BattleScene
---- @param object
---- @param sprite bt.EntitySprite
-bt.Animation.OBJECT_LOST = meta.new_type("OBJECT_LOST", rt.Animation, function(scene, object, sprite)
+bt.Animation.OBJECT_LOST = meta.new_type("OBJECT_LOST", rt.Animation, function(scene, object, entity)
     meta.assert_isa(scene, bt.BattleScene)
-    meta.assert_isa(sprite, bt.EntitySprite)
+    meta.assert_isa(entity, bt.Entity)
     return meta.new(bt.Animation.OBJECT_LOST, {
         _scene = scene,
         _object = object,
-        _target = sprite,
+        _entity = entity,
+        _target = nil,
 
         _sprite = nil, -- rt.Sprite
         _sprite_x = 0,
@@ -34,6 +32,8 @@ end, {
 
 --- @override
 function bt.Animation.OBJECT_LOST:start()
+    self._target = self._scene:get_sprite(self._entity)
+
     local x, y = self._target:get_position()
     local w, h = self._target:measure()
 

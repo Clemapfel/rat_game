@@ -4,25 +4,17 @@ rt.settings.battle.animations.swap = {
 }
 
 --- @class bt.Animation.SWAP
-bt.Animation.SWAP = meta.new_type("SWAP", rt.Animation, function(scene, sprite_a, sprite_b)
-    meta.assert_isa(sprite_a, bt.EntitySprite)
-    meta.assert_isa(sprite_b, bt.EntitySprite)
-
-    local a_x, _ = sprite_a:get_position()
-    local b_x, _ = sprite_b:get_position()
-
-    local a, b
-    if a_x < b_x then
-        a, b = sprite_a, sprite_b
-    else
-        a, b = sprite_b, sprite_a
-    end
+bt.Animation.SWAP = meta.new_type("SWAP", rt.Animation, function(scene, entity_a, entity_b)
+    meta.assert_isa(entity_a, bt.Entity)
+    meta.assert_isa(entity_b, bt.Entity)
 
     local duration = rt.settings.battle.animations.swap.duration
     return meta.new(bt.Animation.SWAP, {
         _scene = scene,
-        _target_a = a,
-        _target_b = b,
+        _entity_a = entity_a,
+        _entity_b = entity_b,
+        _target_a = nil, -- bt.EntitySprite
+        _target_b = nil, -- "
 
         _a_x = 0,
         _a_y = 0,
@@ -44,6 +36,20 @@ end)
 
 --- @override
 function rt.Animation.SWAP:start()
+    local sprite_a, sprite_b = self._scene:get_sprite(self._entity_a), self._scene:get_sprite(self._entity_b)
+    local a_x, _ = sprite_a:get_position()
+    local b_x, _ = sprite_b:get_position()
+
+    local a, b
+    if a_x < b_x then
+        a, b = sprite_a, sprite_b
+    else
+        a, b = sprite_b, sprite_a
+    end
+
+    self._target_a = sprite_a
+    self._target_b = sprite_b
+
     local target_a_x, target_a_y = self._target_a:get_position()
     local target_b_x, target_b_y = self._target_b:get_position()
 

@@ -411,6 +411,10 @@ rt.Translation = rt.initialize_translation({
 
             priority_changed_f = function(entity, value)
                 return entity .. "s <color=SPEED>Priority</color> is now <mono>" .. value .. "</value>"
+            end,
+
+            start_battle_f = function()
+                return "start battle"
             end
         }
     }

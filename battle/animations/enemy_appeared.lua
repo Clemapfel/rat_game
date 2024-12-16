@@ -3,13 +3,14 @@ rt.settings.battle.animation.enemy_appeared = {
 }
 
 --- @class bt.Animation.ENEMY_APPEARED
-bt.Animation.ENEMY_APPEARED = meta.new_type("ENEMY_APPEARED", rt.Animation, function(scene, sprite)
+bt.Animation.ENEMY_APPEARED = meta.new_type("ENEMY_APPEARED", rt.Animation, function(scene, entity)
     meta.assert_isa(scene, bt.BattleScene)
-    meta.assert_isa(sprite, bt.EntitySprite)
+    meta.assert_isa(entity, bt.Entity)
     local duration = rt.settings.battle.animation.enemy_appeared.duration
     return meta.new(bt.Animation.ENEMY_APPEARED, {
         _scene = scene,
-        _target = sprite,
+        _entity = entity,
+        _target = nil,
 
         _path = nil, -- rt.Path
         _position_x = 0,
@@ -37,6 +38,8 @@ end, {
 
 --- @override
 function bt.Animation.ENEMY_APPEARED:start()
+    self._target = self._scene:get_sprite(self._entity)
+
     self._target:set_is_visible(false)
     self._target:set_health_visible(false)
     self._target:set_speed_visible(false)

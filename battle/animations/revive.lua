@@ -4,11 +4,15 @@ rt.settings.battle.animations.revive = {
 }
 
 --- @class bt.Animation.REVIVE
-bt.Animation.REVIVE = meta.new_type("REVIVE", rt.Animation, function(scene, sprite)
+bt.Animation.REVIVE = meta.new_type("REVIVE", rt.Animation, function(scene, entity)
+    meta.assert_isa(scene, bt.Scene)
+    meta.assert_isa(entity, bt.Entity)
+
     local settings = rt.settings.battle.animations.revive
     return meta.new(bt.Animation.REVIVE, {
         _scene = scene,
-        _sprite = sprite,
+        _entity = entity,
+        _sprite = nil,
 
         _sprite_x = 0,
         _sprite_y = 0,

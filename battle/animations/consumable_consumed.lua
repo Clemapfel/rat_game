@@ -3,19 +3,17 @@ rt.settings.battle.animation.consumable_consumed = {
 }
 
 --- @class bt.Animation.CONSUMABLE_CONSUMED
---- @param scene bt.BattleScene
---- @param consumable bt.ConsumableConfig
---- @param sprite bt.EntitySprite
-bt.Animation.CONSUMABLE_CONSUMED = meta.new_type("CONSUMABLE_CONSUMED", rt.Animation, function(scene, consumable, sprite)
+bt.Animation.CONSUMABLE_CONSUMED = meta.new_type("CONSUMABLE_CONSUMED", rt.Animation, function(scene, consumable, entity)
     meta.assert_isa(scene, bt.BattleScene)
     meta.assert_isa(consumable, bt.ConsumableConfig)
-    meta.assert_isa(sprite, bt.EntitySprite)
+    meta.assert_isa(entity, bt.Entity)
     local duration = rt.settings.battle.animation.consumable_consumed.duration
     local n_bites = 3
     return meta.new(bt.Animation.CONSUMABLE_CONSUMED, {
         _scene = scene,
         _consumable = consumable,
-        _target = sprite,
+        _entity = entity,
+        _target = nil,
 
         _sprite = nil, -- rt.Sprite
         _sprite_x = 0,
@@ -41,6 +39,8 @@ end, {
 
 --- @override
 function bt.Animation.CONSUMABLE_CONSUMED:start()
+    self._target = self._scene:get_sprite(self._entity)
+
     local sprite = self.consumable_to_sprite[self._consumable]
     local sprite_w, sprite_h
     if sprite == nil then

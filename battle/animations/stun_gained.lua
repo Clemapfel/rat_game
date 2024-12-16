@@ -1,9 +1,9 @@
 --- @class bt.Animation.STUN_GAINED
 --- @param scene bt.BattleScene
 --- @param sprite bt.EntitySprite
-bt.Animation.STUN_GAINED = meta.new_type("STUN_GAINED", rt.Animation, function(scene, sprite)
+bt.Animation.STUN_GAINED = meta.new_type("STUN_GAINED", rt.Animation, function(scene, entity)
     meta.assert_isa(scene, bt.BattleScene)
-    meta.assert_isa(sprite, bt.EntitySprite)
+    meta.assert_isa(entity, bt.Entity)
 
     local type = bt.Animation.STUN_GAINED
     if type._initialized == false then
@@ -31,7 +31,8 @@ bt.Animation.STUN_GAINED = meta.new_type("STUN_GAINED", rt.Animation, function(s
 
     return meta.new(bt.Animation.STUN_GAINED, {
         _scene = scene,
-        _target = sprite,
+        _entity = entity,
+        _target = nil, -- bt.EntitySprite
 
         _snapshot = nil, -- rt.RenderTexture
         _offset_x = 0,
@@ -53,6 +54,7 @@ end, {
 
 --- @overload
 function bt.Animation.STUN_GAINED:start()
+    self._target = self._scene:get_sprite(self._entity)
     self._sprite_timer = rt.TimedAnimation(
         self._duration, 0, 1,
         rt.InterpolationFunctions.GAUSSIAN

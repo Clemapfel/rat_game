@@ -3,14 +3,16 @@ rt.settings.battle.animations.hp_gained = {
 }
 
 --- @class bt.Animation.HP_GAINED
---- @param scene bt.BattleScene
---- @param sprite bt.EntitySprite
---- @param value Number
-bt.Animation.HP_GAINED = meta.new_type("HP_GAINED", rt.Animation, function(scene, sprite, value)
+bt.Animation.HP_GAINED = meta.new_type("HP_GAINED", rt.Animation, function(scene, entity, value)
+    meta.assert_isa(scene, bt.Scene)
+    meta.assert_isa(entity, bt.Entity)
+    meta.assert_number(value)
+
     local settings = rt.settings.battle.animations.hp_gained
     return meta.new(bt.Animation.HP_GAINED, {
         _scene = scene,
-        _target = sprite,
+        _entity = entity,
+        _target = nil,
         _value = value,
 
         _label = nil, -- rt.Label
@@ -54,6 +56,8 @@ do
 
     --- @override
     function bt.Animation.HP_GAINED:start()
+        self._target = self._scene:get_sprite(self._entity)
+
         self._label = rt.Label(
             "<b><o><color=HP><mono>" .. self._value .. "</mono></color></o></b>",
             rt.settings.font.default_large,

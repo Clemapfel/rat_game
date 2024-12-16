@@ -4,17 +4,15 @@ rt.settings.battle.animation.status_lost = {
 }
 
 --- @class bt.Animation.STATUS_LOST
---- @param scene bt.BattleScene
---- @param status bt.StatusConfig
---- @param sprite bt.EntitySprite
-bt.Animation.STATUS_LOST = meta.new_type("STATUS_LOST", rt.Animation, function(scene, status, sprite)
+bt.Animation.STATUS_LOST = meta.new_type("STATUS_LOST", rt.Animation, function(scene, status, entity)
     meta.assert_isa(scene, bt.BattleScene)
     meta.assert_isa(status, bt.StatusConfig)
-    meta.assert_isa(sprite, bt.EntitySprite)
+    meta.assert_isa(sprite, bt.Entity)
     return meta.new(bt.Animation.STATUS_LOST, {
         _scene = scene,
         _status = status,
-        _target = sprite,
+        _entity = entity,
+        _target = nil, -- bt.EntitySprite
         _sprite = rt.Sprite(status:get_sprite_id()),
         _sprite_texture = rt.RenderTexture(),
         _batch = nil, -- rt.SpriteBatch
@@ -31,6 +29,7 @@ end)
 
 --- @override
 function bt.Animation.STATUS_LOST:start()
+    self._target = self._scene:get_sprite(self._entity)
     self._sprite:realize()
     local sprite_w, sprite_h = self._sprite:measure()
 

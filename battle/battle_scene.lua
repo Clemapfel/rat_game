@@ -17,7 +17,7 @@ bt.BattleScene = meta.new_type("BattleScene", rt.Scene, function(state)
         _global_status_bar = bt.OrderedBox(),
         _global_status_to_sprite = {}, -- Table<bt.GlobalStatusConfig, rt.Sprite>
 
-        _entity_to_sprite = {},
+        _entity_id_to_sprite = {},
 
         _party_sprites = {}, -- Table<bt.PartySprite>
         _party_sprites_motion = {}, -- Table<bt.PartySprite, bt.SmoothedMotion2D>
@@ -72,14 +72,19 @@ end
 --- @brief
 function bt.BattleScene:get_sprite(entity)
     meta.assert_isa(entity, bt.Entity)
-    return self._entity_to_sprite[entity]
+    local out = self._entity_id_to_sprite[entity:get_id()]
+
+    if out == nil then
+        rt.error("In bt.BattleScene.get_sprite: no sprite for entity `" .. entity:get_id() .. "`")
+    end
+    return out
 end
 
 --- @override
 function bt.BattleScene:create_from_state()
     self._enemy_sprites = {}
     self._party_sprites = {}
-    self._entity_to_sprite = {}
+    self._entity_id_to_sprite = {}
 
     local entities = self._state:list_entities()
     self:add_entity(table.unpack(entities))
@@ -131,8 +136,7 @@ function bt.BattleScene:add_entity(...)
             -- TODO: setup UI
             table.insert(self._party_sprites, sprite)
         end
-        self._entity_to_sprite[entity] = sprite
-        assert(self._entity_to_sprite[entity] == sprite)
+        self._entity_id_to_sprite[entity:get_id()] = sprite
     end
 
     if reformat_allies then self:reformat_party_sprites() end
@@ -145,24 +149,31 @@ function bt.BattleScene:remove_entity(...)
 
     for entity in range(...) do
         local sprite = self:get_sprite(entity)
+        local removed = false
         if sprite ~= nil then
-            if self._state:entity_get_is_enemy(entity) then
-                for i, other in ipairs(self._enemy_sprites) do
-                    if other == sprite then
-                        table.remove(self._enemy_sprites, i)
-                        break
-                    end
+            for i, other in ipairs(self._enemy_sprites) do
+                if other == sprite then
+                    table.remove(self._enemy_sprites, i)
+                    removed = true
+                    break
                 end
-            else
+            end
+
+            if not removed then
                 for i, other in ipairs(self._party_sprites) do
                     if other == sprite then
                         table.remove(self._party_sprites, i)
+                        removed = true
                         break
                     end
                 end
             end
         end
-        self._entity_to_sprite[entity] = nil
+
+        self._entity_id_to_sprite[entity:get_id()] = nil
+        if not removed then
+            rt.error("In bt.BattleScene.remove_entity: no sprite for entity `" .. entity:get_id() .. "` present")
+        end
     end
 
     if reformat_allies then self:reformat_party_sprites() end

@@ -10,14 +10,15 @@ do
 end
 
 --- @class bt.Animation.HP_LOST
---- @param scene bt.BattleScene
---- @param sprite bt.EntitySprite
---- @param value Number
-bt.Animation.HP_LOST = meta.new_type("HP_LOST", rt.Animation, function(scene, sprite, value)
+bt.Animation.HP_LOST = meta.new_type("HP_LOST", rt.Animation, function(scene, entity, value)
+    meta.assert_isa(scene, bt.Scene)
+    meta.assert_isa(entity, bt.Entity)
+    meta.assert_number(value)
     local settings = rt.settings.battle.animations.hp_lost
     return meta.new(bt.Animation.HP_LOST, {
         _scene = scene,
-        _target = sprite,
+        _entity = entity,
+        _target = nil,
         _value = value,
 
         _label = nil, -- rt.Label
@@ -76,6 +77,7 @@ do
 
     --- @override
     function bt.Animation.HP_LOST:start()
+        self._target = self._scene:get_sprite(self._entity)
         if _shader == nil then _shader = rt.Shader("battle/animations/hp_lost.glsl") end
         self._shader = _shader
 

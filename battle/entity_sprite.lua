@@ -32,47 +32,47 @@ end
 
 --- @brief
 function bt.EntitySprite:add_status(status, n_turns_left)
-   error("abstract method called")
+    rt.warning("In " .. meta.typeof(self) .. ".add_status: abstract method called")
 end
 
 --- @brief
 function bt.EntitySprite:remove_status(value)
-    error("abstract method called")
+    rt.warning("In " .. meta.typeof(self) .. ".remove_status: abstract method called")
 end
 
 --- @brief
 function bt.EntitySprite:set_status_n_turns_left()
-    error("abtract method called")
+    rt.warning("In " .. meta.typeof(self) .. ".set_status_n_turns_left: abstract method called")
 end
 
 --- @brief
 function bt.EntitySprite:activate_status(status, on_done_notify)
-    error("abtract method called")
+    rt.warning("In " .. meta.typeof(self) .. ".activate_status: abstract method called")
 end
 
 --- @brief
 function bt.EntitySprite:add_consumable(value)
-    error("abstract method called")
+    rt.warning("In " .. meta.typeof(self) .. ".add_consumable: abstract method called")
 end
 
 --- @brief
 function bt.EntitySprite:remove_consumable(value)
-    error("abstract method called")
+    rt.warning("In " .. meta.typeof(self) .. ".remove_consumable: abstract method called")
 end
 
 --- @brief
 function bt.EntitySprite:set_consumable_n_uses_left(status)
-    error("abtract method called")
+    rt.warning("In " .. meta.typeof(self) .. ".set_consumable_n_uses_left: abstract method called")
 end
 
 --- @brief
 function bt.EntitySprite:activate_consumable(status, on_done_notify)
-    error("abtract method called")
+    rt.warning("In " .. meta.typeof(self) .. ".activate_consumable: abstract method called")
 end
 
 --- @brief
 function bt.EntitySprite:set_selection_state(state)
-    error("abstract method called")
+    rt.warning("In " .. meta.typeof(self) .. ".set_selection_state: abstract method called")
 end
 
 --- @brief

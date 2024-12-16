@@ -6,14 +6,15 @@ rt.settings.battle.animation.object_enabled = {
 }
 
 --- @class bt.Animation.OBJECT_ENABLED
-bt.Animation.OBJECT_ENABLED = meta.new_type("OBJECT_ENABLED", rt.Animation, function(scene, object, sprite)
+bt.Animation.OBJECT_ENABLED = meta.new_type("OBJECT_ENABLED", rt.Animation, function(scene, object, entity)
     meta.assert_isa(scene, bt.BattleScene)
-    meta.assert_isa(sprite, bt.EnemySprite)
+    meta.assert_isa(entity, bt.Entity)
     assert(object.get_sprite_id ~= nil)
     return meta.new(bt.Animation.OBJECT_ENABLED, {
         _scene = scene,
         _object = object,
-        _target = sprite,
+        _entity = entity,
+        _target = nil,
         _triangles = {},
 
         _fade_out_animation = rt.TimedAnimation(0.3, 0, 1, rt.InterpolationFunctions.GAUSSIAN_LOWPASS),
@@ -35,6 +36,8 @@ end, {
 
 --- @override
 function bt.Animation.OBJECT_ENABLED:start()
+    self._target = self._scene:get_sprite(self._entity)
+
     local sprite = rt.Sprite(self._object:get_sprite_id())
     sprite:realize()
     local sprite_w, sprite_h = sprite:measure()

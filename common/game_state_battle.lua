@@ -314,25 +314,45 @@ end
 --- @brief
 function rt.GameState:entity_get_is_enemy(entity)
     meta.assert_isa(entity, bt.Entity)
-    return bt.EntityConfig(self:_get_entity_entry(entity).id):get_is_enemy()
+    local entry = self:_get_entity_entry(entity)
+    if entry == nil then
+        rt.error("In rt.GameState:entity_get_is_enemy: entity `" .. entity:get_id() .. "` is not part of state")
+        return
+    end
+    return bt.EntityConfig(entry.id):get_is_enemy()
 end
 
 --- @brief
 function rt.GameState:entity_get_n_consumable_slots(entity)
     meta.assert_isa(entity, bt.Entity)
-    return bt.EntityConfig(self:_get_entity_entry(entity).id):get_n_consumable_slots()
+    local entry = self:_get_entity_entry(entity)
+    if entry == nil then
+        rt.error("In rt.GameState:entity_get_n_consumable_slots: entity `" .. entity:get_id() .. "` is not part of state")
+        return
+    end
+    return bt.EntityConfig(entry.id):get_n_consumable_slots()
 end
 
 --- @brief
 function rt.GameState:entity_get_n_equip_slots(entity)
     meta.assert_isa(entity, bt.Entity)
-    return bt.EntityConfig(self:_get_entity_entry(entity).id):get_n_equip_slots()
+    local entry = self:_get_entity_entry(entity)
+    if entry == nil then
+        rt.error("In rt.GameState:entity_get_n_equip_slots: entity `" .. entity:get_id() .. "` is not part of state")
+        return
+    end
+    return bt.EntityConfig(entry.id):get_n_equip_slots()
 end
 
 --- @brief
 function rt.GameState:entity_get_n_move_slots(entity)
     meta.assert_isa(entity, bt.Entity)
-    return bt.EntityConfig(self:_get_entity_entry(entity).id):get_n_move_slots()
+    local entry = self:_get_entity_entry(entity)
+    if entry == nil then
+        rt.error("In rt.GameState:entity_get_n_move_slots: entity `" .. entity:get_id() .. "` is not part of state")
+        return
+    end
+    return bt.EntityConfig(entry.id):get_n_move_slots()
 end
 
 --- @brief

@@ -6,14 +6,15 @@ rt.settings.battle.animation.object_disabled = {
 }
 
 --- @class bt.Animation.OBJECT_DISABLED
-bt.Animation.OBJECT_DISABLED = meta.new_type("OBJECT_DISABLED", rt.Animation, function(scene, object, sprite)
+bt.Animation.OBJECT_DISABLED = meta.new_type("OBJECT_DISABLED", rt.Animation, function(scene, object, entity)
     meta.assert_isa(scene, bt.BattleScene)
-    meta.assert_isa(sprite, bt.EnemySprite)
+    meta.assert_isa(entity, bt.Entity)
     assert(object.get_sprite_id ~= nil)
     return meta.new(bt.Animation.OBJECT_DISABLED, {
         _scene = scene,
         _object = object,
-        _target = sprite,
+        _entity = entity,
+        _target = nil,
         _triangles = {},
         _opacity_animation = rt.TimedAnimation(rt.settings.battle.animation.object_disabled.fade_out_duration, 0, 1, rt.InterpolationFunctions.GAUSSIAN_LOWPASS),
         _opacity = 1,
@@ -30,6 +31,8 @@ end)
 
 --- @override
 function bt.Animation.OBJECT_DISABLED:start()
+    self._target = self._scene:get_sprite(self._entity)
+
     local sprite = rt.Sprite(self._object:get_sprite_id())
     sprite:realize()
     local sprite_w, sprite_h = sprite:measure()

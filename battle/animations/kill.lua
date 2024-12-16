@@ -1,7 +1,7 @@
 --- @class
-bt.Animation.KILL = meta.new_type("KILL", rt.Animation, function(scene, target)
+bt.Animation.KILL = meta.new_type("KILL", rt.Animation, function(scene, entity)
     meta.assert_isa(scene, bt.BattleScene)
-    meta.assert_isa(target, bt.EnemySprite)
+    meta.assert_isa(entity, bt.Entity)
 
     return meta.new(bt.Animation.KILL, {
         _step_shader = rt.ComputeShader("battle/animations/kill_step.glsl"),
@@ -13,7 +13,8 @@ bt.Animation.KILL = meta.new_type("KILL", rt.Animation, function(scene, target)
         _n_instances = 1,
 
         _scene = scene,
-        _target = target,
+        _entity = entity,
+        _target = nil,
         _target_aabb = rt.AABB(0, 0, 1, 1),
 
         _color_texture = nil,       -- love.Canvas
@@ -37,6 +38,8 @@ end
 
 --- @brief
 function bt.Animation.KILL:start()
+    self._target = self._scene:get_sprite(self._entity)
+
     local pixel_size = self._pixel_size
     self._pixel_shape:reformat(
         0, 0,

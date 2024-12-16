@@ -5,20 +5,18 @@ rt.settings.battle.animation.equip_applied = {
 }
 
 --- @class bt.Animation.EQUIP_APPLIED
---- @param scene bt.BattleScene
---- @param equip bt.EquipConfig
---- @param sprite bt.EntitySprite
-bt.Animation.EQUIP_APPLIED = meta.new_type("EQUIP_APPLIED", rt.Animation, function(scene, equip, sprite)
+bt.Animation.EQUIP_APPLIED = meta.new_type("EQUIP_APPLIED", rt.Animation, function(scene, equip, entity)
     meta.assert_isa(scene, bt.BattleScene)
     meta.assert_isa(equip, bt.EquipConfig)
-    meta.assert_isa(sprite, bt.EntitySprite)
+    meta.assert_isa(entity, bt.Entity)
     local move_duration = rt.settings.battle.animation.equip_applied.move_duration
     local hold_duration = rt.settings.battle.animation.equip_applied.hold_duration
     local fade_duration = rt.settings.battle.animation.equip_applied.fade_duration
     return meta.new(bt.Animation.EQUIP_APPLIED, {
         _scene = scene,
         _equip = equip,
-        _target = sprite,
+        _entity = entity,
+        _target = nil,
 
         _sprite = nil, -- rt.Sprite
         _sprite_x = 0,
@@ -39,6 +37,8 @@ end, {
 
 --- @override
 function bt.Animation.EQUIP_APPLIED:start()
+    self._target = self._scene:get_sprite(self._entity)
+
     local sprite = bt.Animation.EQUIP_APPLIED._equip_to_sprite[self._equip]
     local sprite_w, sprite_h
     if sprite == nil then

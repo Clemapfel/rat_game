@@ -12,6 +12,9 @@ end
 
 --- @class bt.Animation.TURN_START_END
 bt.Animation.TURN_START_END = meta.new_type("TURN_START_END", rt.Animation, function(scene, start_or_end)
+    meta.assert_isa(scene, bt.Scene)
+    meta.assert_boolean(start_or_end)
+
     local settings = rt.settings.battle.animations.turn_start
     return meta.new(bt.Animation.TURN_START_END, {
         _scene = scene,

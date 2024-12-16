@@ -35,16 +35,17 @@ function bt.Animation.PRIORITY_LOWERED(scene, sprite)
 end
 
 --- @class bt.Animation.STAT_CHANGED
-bt.Animation.STAT_CHANGED = meta.new_type("STAT_CHANGED", rt.Animation, function(scene, sprite, stat, direction)
+bt.Animation.STAT_CHANGED = meta.new_type("STAT_CHANGED", rt.Animation, function(scene, entity, stat, direction)
     meta.assert_isa(scene, bt.BattleScene)
-    meta.assert_isa(sprite, bt.EnemySprite)
+    meta.assert_isa(entity, bt.Entity)
     meta.assert_boolean(direction)
     meta.assert_enum_value(stat, bt.StatType)
 
     local settings = rt.settings.battle.animation.stat_changed
     return meta.new(bt.Animation.STAT_CHANGED, {
         _scene = scene,
-        _target = sprite,
+        _entity = entity,
+        _target = nil,
         _direction = direction, -- true = up, false = down
         _stat = stat,
 
@@ -74,6 +75,7 @@ do
 
     --- @override
     function bt.Animation.STAT_CHANGED:start()
+        self._target = self._scene:get_sprite(self._entity)
         self._shader = _shader
 
         local stat = ""
